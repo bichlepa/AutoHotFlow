@@ -9,9 +9,11 @@ When the flow executes the currently running elements are highlighted red.
  ![Editor](https://www.dropbox.com/s/vwjdy528vvnlvv1/Flow%20Editor.png?dl=1)
  
 Every element has settings
+
  ![Element Tooltip](https://www.dropbox.com/s/fzj75txfnlj1bzn/Element%20Tooltip.png?dl=1)
 
 There is also flow manager
+
  ![Manager](https://www.dropbox.com/s/szgtxzcl0u31uka/Manager.png?dl=1)
 
 It has all basic functions. I'm working on it and its abilities are raising.
