@@ -1,0 +1,56 @@
+﻿iniAllActions.="Rename_file|" ;Add this action to list of all actions on initialisation
+
+runActionRename_file(InstanceID,ElementID,ElementIDInInstance)
+{
+	global
+	local tempdir
+	local tempfilename
+	local temp:=v_replaceVariables(InstanceID,%ElementID%file)
+	SplitPath,temp,tempfilename,tempdir
+	
+	if (tempfilename!="" && tempdir!="")
+	{
+	
+		FileMove,%tempdir%\%tempfilename%,% tempdir "\" v_replaceVariables(InstanceID,%ElementID%newName),% %ElementID%Overwrite
+		
+		if ErrorLevel
+			MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+		else
+			MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+	}
+	else
+		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+	return
+}
+getNameActionRename_file()
+{
+	return lang("Rename_file")
+}
+getCategoryActionRename_file()
+{
+	return lang("Files")
+}
+
+getParametersActionRename_file()
+{
+	global
+	
+	parametersToEdit:=["Label|" lang("File"),"File||file|" lang("Select a file") "|","Label|" lang("New name"),"Text|" lang("Unnamed") "|newName","Checkbox|0|Overwrite|" lang("Overwrite existing files")]
+	return parametersToEdit
+}
+
+GenerateNameActionRename_file(ID)
+{
+	global
+	;MsgBox % %ID%text_to_show
+	
+	
+	return lang("Rename_file") " " GUISettingsOfElement%ID%file " " lang("To") " " GUISettingsOfElement%ID%newName 
+	
+}
+
+CheckSettingsActionRename_file(ID)
+{
+	
+	
+}

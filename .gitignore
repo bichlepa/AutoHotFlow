@@ -6,14 +6,14 @@ AutoHotFlow Installation.exe
 Editor.exe
 
 # exclude flows except of demonstration flows
-/Saved Flows\*
-
+Saved Flows/*
+!Saved Flows/D_*
 
 #other files that are generated when AutoHotFlow is running
-/Log
-/Global variables
-/Generated Scripts\*.ahk
-/Generated Scripts\AutoHotkey.exe
+Log
+Global variables.ini
+Clipboard.ini
+Generated Scripts/*.ahk
 
 # user paul
 compress install.bat

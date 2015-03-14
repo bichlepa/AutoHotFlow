@@ -1,0 +1,92 @@
+﻿iniAllActions.="Shuffle_list|" ;Add this action to list of all actions on initialisation
+
+runActionShuffle_list(InstanceID,ElementID,ElementIDInInstance)
+{
+	global
+
+	local Varname:=v_replaceVariables(InstanceID,%ElementID%Varname)
+	local tempList:=v_getVariable(InstanceID,Varname,"list")
+	local tempObject:=Object()
+	local tempkey
+	local tempvalue
+	local maxindex
+	local minindex
+	local randomnumber	
+	local countOfElements=0
+
+	
+	
+	if IsObject(tempList)
+	{
+		maxindex:=tempList.MaxIndex()
+		
+		;Copy all numeric elements to a separate list
+		for tempkey, tempvalue in tempList
+		{
+			
+			if tempkey is number
+			{
+				tempObject.insert(tempvalue)
+				countOfElements++
+			}
+			
+		}
+		;Delete all numeric elements
+		Loop
+		{
+			tempkey:=tempList.MaxIndex()
+			if tempkey!=
+			{
+				tempList.remove(tempkey)
+			}
+			else
+				break
+		}
+		;Add all previous copied list to the list in random order
+		loop %countOfElements%
+		{
+			random,randomnumber,1,% countOfElements + 1 - A_Index
+			tempvalue:=tempObject.Remove(randomnumber)
+			tempList.Insert(tempvalue)
+			
+		}
+		v_SetVariable(InstanceID,Varname,tempList,"list")
+		
+		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+		
+	}
+	else
+		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+	
+
+	return
+}
+getNameActionShuffle_list()
+{
+	return lang("Shuffle_list")
+}
+getCategoryActionShuffle_list()
+{
+	return lang("Variable")
+}
+
+getParametersActionShuffle_list()
+{
+	global
+	parametersToEdit:=["Label|" lang("Variable_name"),"VariableName|List|Varname"]
+	
+	return parametersToEdit
+}
+
+GenerateNameActionShuffle_list(ID)
+{
+	global
+	
+	return % lang("Shuffle_list") "`n" GUISettingsOfElement%ID%Varname 
+	
+}
+
+CheckSettingsActionShuffle_list(ID)
+{
+	
+}
