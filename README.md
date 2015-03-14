@@ -21,13 +21,13 @@ It could also demontrate the broad possibilities of AutoHotkey.
 I'd appreciate if you will use it, test it, help me programming and /or comment this project :wave:
 
 ####Those elements are available by now:
-- Triggers
- - User interaction
+##Triggers
+- User interaction
   - Hotkey
   - Shortcut
   - Clipboard changes 
   - User idle time
- - Time
+- Time
   - Periodic timer
   - Time of day
   - User idle time
@@ -35,13 +35,13 @@ I'd appreciate if you will use it, test it, help me programming and /or comment 
   - Window closes
   - Window gets active
   - Window gets inactive
- - Process
+- Process
   - Process starts
   - Process closes
- - Power
+- Power
   - Start up
-- Actions
- - Variable
+##Actions
+- Variable
   - New variable
   - Copy variable
   - Get clipboard
@@ -66,7 +66,7 @@ I'd appreciate if you will use it, test it, help me programming and /or comment 
   - Delete from list
   - Get index of element in list
   - Shuffle list
- - User interaction
+- User interaction
   - Tooltip
   - Traytip
   - Message box
@@ -74,19 +74,19 @@ I'd appreciate if you will use it, test it, help me programming and /or comment 
   - Speech output
   - Select file
   - Select folder
- - Flow control
+- Flow control
   - Sleep
   - Set flow status
   - Execute flow
   - Stop flow
- - User simulation
+- User simulation
   - Send keystrokes
   - Send keystrokes to a control
   - Click
   - Move mouse
   - Drag with mouse
   - Get mouse position
- - Window
+- Window
   - Activate window
   - Close window
   - Kill window
@@ -97,12 +97,12 @@ I'd appreciate if you will use it, test it, help me programming and /or comment 
   - Send keystrokes to a control
   - Get control text
   - Set control text
- - Process
+- Process
   - Run
   - Kill window
   - Kill process
   - Set process priority
- - Files
+- Files
   - Write to file
   - Download file
   - Delete file
@@ -127,13 +127,13 @@ I'd appreciate if you will use it, test it, help me programming and /or comment 
   - Select file
   - Select folder
   - Empty recycle bin
- - Sound
+- Sound
   - Play sound
   - Stop sound
   - Beep
   - Set volume
   - Get volume
- - Internet
+- Internet
   - Download file
  - Power
   - Lock computer
@@ -144,21 +144,21 @@ I'd appreciate if you will use it, test it, help me programming and /or comment 
   - Suspend computer
  - For experts
   - AutoHotKey script
-- Conditions
- - Variable
+##Conditions
+- Variable
   - Expression
   - String contains text
   - List contains element
   - Variable is empty
- - User interaction
+- User interaction
   - Confirmation dialog
   - Key is down
- - Process
+- Process
   - Process is running
- - Flow control
+- Flow control
   - Flow enables
   - Flow is executing
- - Files
+- Files
   - File exists
   - File has attribute
   - Folder exists 
