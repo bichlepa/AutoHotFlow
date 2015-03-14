@@ -21,7 +21,8 @@ It could also demontrate the broad possibilities of AutoHotkey.
 I'd appreciate if you will use it, test it, help me programming and /or comment this project :wave:
 
 ####Those elements are available by now:
-##Triggers
+
+#####Triggers
 - User interaction
   - Hotkey
   - Shortcut
@@ -40,7 +41,8 @@ I'd appreciate if you will use it, test it, help me programming and /or comment 
   - Process closes
 - Power
   - Start up
-##Actions
+
+#####Actions
 - Variable
   - New variable
   - Copy variable
@@ -144,7 +146,8 @@ I'd appreciate if you will use it, test it, help me programming and /or comment 
   - Suspend computer
  - For experts
   - AutoHotKey script
-##Conditions
+
+#####Conditions
 - Variable
   - Expression
   - String contains text
