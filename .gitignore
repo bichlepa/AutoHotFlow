@@ -1,3 +1,23 @@
+# AutoHotKey
+*.bak
+
+# compiled files
+AutoHotFlow Installation.exe
+Editor.exe
+
+# exclude flows except of demonstration flows
+/Saved Flows\*
+
+
+#other files that are generated when AutoHotFlow is running
+/Log
+/Global variables
+/Generated Scripts\*.ahk
+/Generated Scripts\AutoHotkey.exe
+
+# user paul
+compress install.bat
+
 # Windows image file caches
 Thumbs.db
 ehthumbs.db
@@ -41,3 +61,4 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+
