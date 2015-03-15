@@ -180,6 +180,17 @@ else if (elementWithHighestPriority="MenuCreateNewAction" or elementWithHighestP
 		saved=no
 		ui_draw()
 		ui_settingsOfElement(elementWithHighestPriority) ;open settings of element
+		Loop
+		{
+			if NowResultEditingElement
+			{
+				if NowResultEditingElement=aborted
+				{
+					e_removeElement(tempElement2)
+				}
+				break
+			}
+		}
 	}
 	
 	
@@ -199,7 +210,7 @@ else if (elementWithHighestPriority="PlusButton") ;user click on plus button
 		
 		%tempConnection1%to:="MOUSE"
 		
-		
+		GDI_DrawMoveButtonUnderMouse:=true
 		
 		if (detectMovement()) ;If user moves the mouse
 		{
@@ -242,6 +253,7 @@ else if (elementWithHighestPriority="PlusButton") ;user click on plus button
 			}
 			
 		}
+		GDI_DrawMoveButtonUnderMouse:=false
 		if (!abortAddingElement) 
 		{
 			MouseGetPos,mx2,my2 ;Get the mouse position
@@ -317,7 +329,23 @@ else if (elementWithHighestPriority="PlusButton") ;user click on plus button
 					saved=no
 					markElement(tempElement2)
 					elementWithHighestPriority:=tempElement2
+					ui_draw()
 					ui_settingsOfElement(TheOnlyOneMarkedElement) ;open settings of element
+					Loop
+					{
+						
+						if NowResultEditingElement
+						{
+							if NowResultEditingElement=aborted
+							{
+								%tempConnection1%to:=%tempConnection2%to
+								e_removeElement(tempConnection2)
+								e_removeElement(tempElement2)
+							}
+							break
+						}
+						sleep 10
+					}
 				}
 			}
 			else ;If user pulled the end of the connection to an existing element
@@ -430,6 +458,7 @@ else if (elementWithHighestPriority="PlusButton") ;user click on plus button
 		tempConnection1:=e_NewConnection(TheOnlyOneMarkedElement,"MOUSE")
 		tempElement1:=TheOnlyOneMarkedElement
 		
+		GDI_DrawMoveButtonUnderMouse:=true
 		if (detectMovement()) ;If user moves the mouse
 		{
 			;Wait until user releases the mouse and add an element there
@@ -470,6 +499,7 @@ else if (elementWithHighestPriority="PlusButton") ;user click on plus button
 			}
 			
 		}
+		GDI_DrawMoveButtonUnderMouse:=false
 		if (!abortAddingElement) 
 		{
 			MouseGetPos,mx2,my2 ;Get the mouse position
@@ -543,7 +573,21 @@ else if (elementWithHighestPriority="PlusButton") ;user click on plus button
 					saved=no
 					markElement(tempElement2)
 					elementWithHighestPriority:=tempElement2
+					ui_draw()
 					ui_settingsOfElement(TheOnlyOneMarkedElement) ;open settings of element
+					Loop
+					{
+						if NowResultEditingElement
+						{
+							if NowResultEditingElement=aborted
+							{
+								e_removeElement(tempConnection1)
+								e_removeElement(tempElement2)
+							}
+							break
+						}
+						sleep 10
+					}
 				}
 			}
 			else ;If user pulled the end of the connection to an existing element
@@ -645,7 +689,7 @@ else if (elementWithHighestPriority="MoveButton1")
 	tempOldConnection1from:=%tempConnection1%from
 	%tempConnection1%from:="MOUSE"
 	
-	
+	GDI_DrawMoveButtonUnderMouse:=true
 	if (detectMovement()) ;If user moves the mouse
 	{
 		;Wait until user releases the mouse and add an element there
@@ -686,6 +730,8 @@ else if (elementWithHighestPriority="MoveButton1")
 		}
 		
 	}
+	GDI_DrawMoveButtonUnderMouse:=false
+	
 	if (!abortAddingElement) 
 	{
 		MouseGetPos,mx2,my2 ;Get the mouse position
@@ -752,7 +798,21 @@ else if (elementWithHighestPriority="MoveButton1")
 				saved=no
 				markElement(tempElement1)
 				elementWithHighestPriority:=tempElement1
+				ui_draw()
 				ui_settingsOfElement(TheOnlyOneMarkedElement) ;open settings of element
+				Loop
+				{
+					if NowResultEditingElement
+					{
+						if NowResultEditingElement=aborted
+						{
+							%tempConnection1%from:=tempOldConnection1from
+							e_removeElement(tempElement1)
+						}
+						break
+					}
+					sleep 10
+				}
 			}
 		}
 		else ;If user pulled the end of the connection to an existing element
@@ -771,21 +831,24 @@ else if (elementWithHighestPriority="MoveButton1")
 			if (thisConnectionPossible=true)
 			{
 				;If the old element has not the same type as the new element, the connection type must be changed
-				if (%tempElement1%Type!=%tempOldConnection1from%type)
+				if (%tempElement1%Type!=%tempOldConnection1from%type )
 				{
-					if (%tempElement1%Type="Condition")
+					if !((%tempElement1%Type = "Trigger" or %tempElement1%Type ="Action") and (%tempOldConnection1from%Type = "Trigger" or %tempOldConnection1from%Type ="Action")) ;ignore if the connection was moved from trigger to action or the other way
 					{
-						
-						tempReturn:=ui_settingsOfElement(tempConnection1)
-						if tempReturn=aborted
-							thisConnectionPossible:=false
-					}
-					else
-					{
-						
-						tempReturn:=ui_settingsOfElement(tempConnection1)
-						if tempReturn=aborted
-							thisConnectionPossible:=false
+						if (%tempElement1%Type="Condition")
+						{
+							
+							tempReturn:=ui_settingsOfElement(tempConnection1)
+							if tempReturn=aborted
+								thisConnectionPossible:=false
+						}
+						else
+						{
+							
+							tempReturn:=ui_settingsOfElement(tempConnection1)
+							if tempReturn=aborted
+								thisConnectionPossible:=false
+						}
 					}
 				}
 				
@@ -848,7 +911,7 @@ else if (elementWithHighestPriority="MoveButton2")
 	tempOldConnection1to:=%tempConnection1%to
 	%tempConnection1%to:="MOUSE"
 	
-	
+	GDI_DrawMoveButtonUnderMouse:=true
 	if (detectMovement()) ;If user moves the mouse
 	{
 		;Wait until user releases the mouse and add an element there
@@ -889,6 +952,8 @@ else if (elementWithHighestPriority="MoveButton2")
 		}
 		
 	}
+	GDI_DrawMoveButtonUnderMouse:=false
+	
 	if (!abortAddingElement) 
 	{
 		MouseGetPos,mx2,my2 ;Get the mouse position
@@ -954,8 +1019,24 @@ else if (elementWithHighestPriority="MoveButton2")
 			{
 				saved=no
 				markElement(tempElement2)
+				ui_draw()
 				elementWithHighestPriority:=tempElement2
+				
 				ui_settingsOfElement(TheOnlyOneMarkedElement) ;open settings of element
+				Loop
+				{
+					if NowResultEditingElement
+					{
+						if NowResultEditingElement=aborted
+						{
+							%tempConnection1%to:=tempOldConnection1to
+							e_removeElement(tempElement2)
+						}
+						break
+					}
+					sleep 10
+				}
+				
 			}
 		}
 		else ;If user pulled the end of the connection to an existing element

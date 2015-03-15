@@ -21,6 +21,8 @@ heightofguipic=300
 OnTopLabel=
 
 
+GDI_DrawPlusUnderMouse:=false
+
 
 ; Thanks to tic (Tariq Porter) for his GDI+ Library
 ; http://www.autohotkey.com/forum/viewtopic.php?t=32238
@@ -476,7 +478,7 @@ ui_DrawEverything(ByRef Variable,bildw,bildh)
 	EditButtonExist:=false
 	MoveButton1Exist:=false
 	MoveButton2Exist:=false
-	if (countMarkedElements=1 )
+	if (countMarkedElements=1 and GDI_DrawMoveButtonUnderMouse!=true)
 	{
 		pBitmapEdit := Gdip_CreateBitmapFromFile("Icons\edit.ico")
 		pBitmapPlus := Gdip_CreateBitmapFromFile("Icons\plus.ico")
@@ -547,6 +549,17 @@ ui_DrawEverything(ByRef Variable,bildw,bildh)
 			PlusButtonExist:=true
 		}
 		
+		
+	}
+	else if (GDI_DrawMoveButtonUnderMouse=true)
+	{
+		MouseGetPos,mx2,my2 ;Get the mouse position
+		mx3:=mx2-guipicx ;calculate the mouse position relative to the picture
+		my3:=my2-guipicy
+		middlePointOfMoveButtonX:=(mx3)/zoomfactor+offsetx
+		middlePointOfMoveButtonY:=(my3)/zoomfactor+offsety
+		
+		Gdip_DrawImage(G, pBitmapMove, (middlePointOfMoveButtonX - (SizeOfButtons*0.5) )*zoomFactor, ( middlePointOfMoveButtonY - (SizeOfButtons*0.5)) *zoomFactor, SizeOfButtons*zoomFactor, SizeOfButtons*zoomFactor , 0, 0, 48, 48)
 		
 	}
 	

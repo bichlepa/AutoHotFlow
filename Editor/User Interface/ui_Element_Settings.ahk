@@ -5,6 +5,8 @@
 	local temptext
 	local tempIsDefault
 	local tempAssigned
+	
+	NowResultEditingElement=
 	;MsgBox %ElementID%
 	setElementID:=ElementID
 	setElementType:=%setElementID%Type
@@ -620,7 +622,10 @@
 		if %selElementID%Type=trigger
 			e_removeTrigger(selElementID)
 		else
-			e_removeElement(selElementID)
+		{
+			NowResultEditingElement=aborted
+			
+		}
 		ui_draw()
 		gui,2:default
 	}
@@ -707,6 +712,8 @@
 	ui_EnableMainGUI()
 	saved=no
 	
+	NowResultEditingElement=OK
+	
 	if (tempReenablethen)
 		r_EnableFlow()
 	
@@ -745,6 +752,7 @@ ui_EnableElementSettingsWindow()
 ui_selectElementType(type,setElementID)
 {
 	global
+	NowResultEditingElement=
 	selElementType:=type
 	selElementID:=setElementID
 	if type=condition
@@ -828,7 +836,8 @@ ui_selectElementType(type,setElementID)
 	gui,destroy
 	if (%selElementID%SubType="" and %selElementID%Type!="Trigger")
 	{
-		e_removeElement(selElementID)
+		
+		NowResultEditingElement=aborted
 		ui_draw()
 	}
 	else if (%selElementID%Type="Trigger" and %selElementID%SubType="")
@@ -850,6 +859,7 @@ ui_selectElementType(type,setElementID)
 		GuiControl,enable,GuiElementChooseOK
 	else
 		GuiControl,disable,GuiElementChooseOK
+	
 	return
 	GuiElementChooseOK:
 	
@@ -870,6 +880,7 @@ ui_selectElementType(type,setElementID)
 	
 	%GuiElementChoosedID%subType:=TVsubType%GuiElementChoosedTV%
 	;%GuiElementChoosedID%name:="¦ new element" ;Do not translate!
+	NowResultEditingElement=OK
 	ui_settingsOfElement(GuiElementChoosedID)
 
 	return 
