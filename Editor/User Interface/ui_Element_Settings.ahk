@@ -998,7 +998,7 @@ ui_selectContainerType(tempNewID="")
 	
 
 	gui,font,s12
-	gui,add,text,,% lang("Select_Connection_type")
+	gui,add,text,,% lang("Select_element_type")
 		
 	
 	if (tempNewID%type%="Action" or tempNewID%type%="")

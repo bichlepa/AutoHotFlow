@@ -54,14 +54,18 @@ ui_Draw()
 	gui 1:default
 	
 	DetectHiddenWindows off
+	;Only draw if the window is visible
 	IfWinExist,·AutoHotFlow· Editor - %FlowName%
 	{
+		DetectHiddenWindows on
+		
+		;Check whether the zoomfactor is inside the allowed bounds
 		if (zoomFactor<zoomFactorMin)
 			zoomFactor:=zoomFactorMin
 		if (zoomFactor>zoomFactorMax)
 			zoomFactor:=zoomFactorMax
 		
-		DetectHiddenWindows on
+		;Prevent that the function ui_DrawEverything() is called twice at same time. Under sircumstances this would cause a crash.
 		if (DrawingRightNow=true)
 		{
 			
@@ -84,13 +88,16 @@ ui_Draw()
 ui_DrawEverything(ByRef Variable,bildw,bildh)
 {
 	global
+
+	
+	
 	; We first want the hwnd (handle to the picture control) so that we know where to put the bitmap we create
 	; We also want to width and height (posw and Posh)
 	;GuiControlGet, Pos, Pos, Variable
 	 
 	
 	DrawingRightNow:=true
-	thread, Priority, 0
+	thread, Priority, 0 ;Set normal priority
 	GuiControlGet, hwnd, hwnd, Variable
 	
 	Posw=%bildw%
@@ -98,26 +105,26 @@ ui_DrawEverything(ByRef Variable,bildw,bildh)
 	
 	
 	
-	TextOptions:=" s" (textSize*zoomFactor) " Center cff000000  Bold"
-	TextOptionsmarked:=" s" (textSize*zoomFactor) " Center cff00aa00  Bold"
-	TextOptionsRunning:=" s" (textSize*zoomFactor) " Center cffaa0000  Bold"
+	local TextOptions:=" s" (textSize*zoomFactor) " Center cff000000  Bold"
+	local TextOptionsmarked:=" s" (textSize*zoomFactor) " Center cff00aa00  Bold"
+	local TextOptionsRunning:=" s" (textSize*zoomFactor) " Center cffaa0000  Bold"
 
-	TextOptionsLeft:=" s" (textSize*zoomFactor) " Left cff000000  Bold"
-	TextOptionsLeftmarked:=" s" (textSize*zoomFactor) " Left cff00aa00  Bold"
-	TextOptionsLeftRunning:=" s" (textSize*zoomFactor) " Left cffaa0000  Bold"
+	local TextOptionsLeft:=" s" (textSize*zoomFactor) " Left cff000000  Bold"
+	local TextOptionsLeftmarked:=" s" (textSize*zoomFactor) " Left cff00aa00  Bold"
+	local TextOptionsLeftRunning:=" s" (textSize*zoomFactor) " Left cffaa0000  Bold"
 
-	TextOptionsRight:=" s" (textSize*zoomFactor) " Right cff000000  Bold"
-	TextOptionsRightmarked:=" s" (textSize*zoomFactor) " Right  cff00aa00  Bold"
-	TextOptionsRightRunning:=" s" (textSize*zoomFactor) " Right  cffaa0000  Bold"
+	local TextOptionsRight:=" s" (textSize*zoomFactor) " Right cff000000  Bold"
+	local TextOptionsRightmarked:=" s" (textSize*zoomFactor) " Right  cff00aa00  Bold"
+	local TextOptionsRightRunning:=" s" (textSize*zoomFactor) " Right  cffaa0000  Bold"
 
-	TextOptionsTopLabel:=" s20"  "  cff330000  Bold"
+	local TextOptionsTopLabel:=" s20"  "  cff330000  Bold"
 	
 	
 	; Create a gdi+ bitmap the width and height that we found the picture control to be
 	; We will then get a reference to the graphics of this bitmap
 	; We will also set the smoothing mode of the graphics to 4 (Antialias) to make the shapes we use smooth
-	pBitmap := Gdip_CreateBitmap(Posw, Posh)
-	G := Gdip_GraphicsFromImage(pBitmap)
+	 pBitmap := Gdip_CreateBitmap(Posw, Posh)
+	 G := Gdip_GraphicsFromImage(pBitmap)
 	Gdip_SetSmoothingMode(G, 4)
 	
 	
@@ -233,53 +240,68 @@ ui_DrawEverything(ByRef Variable,bildw,bildh)
 		{
 			;msgbox,% %Element%from "Pic"
 			;msgbox,% %Element%to "Pic"
-			tempfromEL:=%Element%from
-			tempzuEl:=%Element%to
-			;msgbox,% tempfromEL "`n" %tempfromEL%x
+			tempFromEl:=%Element%from
+			tempToEl:=%Element%to
+			;msgbox,% tempFromEl "`n" %tempFromEl%x
 			
 			
-			StartPosx:=%tempfromEL%x+(ElementWidth/2)
-			StartPosy:=%tempfromEL%y+ElementHeight
-			if tempzuEl=MOUSE
+			
+			if tempFromEl=MOUSE
 			{
 				MouseGetPos,mx2,my2 ;Get the mouse position
 				mx3:=mx2-guipicx ;calculate the mouse position relative to the picture
 				my3:=my2-guipicy
-				ZielPosx:=(mx3)/zoomfactor+offsetx
-				ZielPosy:=(my3)/zoomfactor+offsety
+				StartPosx:=(mx3)/zoomfactor+offsetx
+				StartPosy:=(my3)/zoomfactor+offsety
 				
 			}
 			else
 			{
-				ZielPosx:=%tempzuEl%x+(ElementWidth/2)
-				ZielPosy:=%tempzuEl%y
+				StartPosx:=%tempFromEl%x+(ElementWidth/2)
+				StartPosy:=%tempFromEl%y+ElementHeight
 			}
+			
+			if tempToEl=MOUSE
+			{
+				MouseGetPos,mx2,my2 ;Get the mouse position
+				mx3:=mx2-guipicx ;calculate the mouse position relative to the picture
+				my3:=my2-guipicy
+				aimPosx:=(mx3)/zoomfactor+offsetx
+				aimPosy:=(my3)/zoomfactor+offsety
+				
+			}
+			else
+			{
+				aimPosx:=%tempToEl%x+(ElementWidth/2)
+				aimPosy:=%tempToEl%y
+			}
+			
 			;MsgBox
 			lin1x:=startposx
 			lin1y:=startposy
 			lin1w:=0
-			if ((zielposy-startposy)<20)
+			if ((aimPosy-startposy)<20)
 			{
 				lin1h:=10
 			}
 			else
 			{
-				lin1h:=(zielposy-StartPosy)/2
+				lin1h:=(aimPosy-StartPosy)/2
 			}
 			
 			
 			
 			lin2y:=lin1y+lin1h
 			lin2h:=0
-			if (ZielPosx>StartPosx)
+			if (aimPosx>StartPosx)
 			{
 				lin2x:=lin1x
-				lin2w:=(ZielPosx-StartPosx)/2
-				if (lin2w<ElementWidth/2 +5 and StartPosy>ZielPosy)
+				lin2w:=(aimPosx-StartPosx)/2
+				if (lin2w<ElementWidth/2 +5 and StartPosy>aimPosy)
 					lin2w:=ElementWidth/2+5
-				if (zielposx-ElementWidth/2-5<lin2x+lin2w and StartPosy>ZielPosy)
+				if (aimPosx-ElementWidth/2-5<lin2x+lin2w and StartPosy>aimPosy)
 				{
-					lin2w:=zielposx+ElementWidth/2+5-lin2x
+					lin2w:=aimPosx+ElementWidth/2+5-lin2x
 					
 				}
 				
@@ -288,14 +310,14 @@ ui_DrawEverything(ByRef Variable,bildw,bildh)
 			else
 			{
 				
-				lin2w:=(StartPosx- ZielPosx)/2
+				lin2w:=(StartPosx- aimPosx)/2
 				
-				if (lin2w<ElementWidth/2 +5 and StartPosy>ZielPosy)
+				if (lin2w<ElementWidth/2 +5 and StartPosy>aimPosy)
 					lin2w:=ElementWidth/2+5
 				lin2x:=lin1x-lin2w
-				if (zielposx+ElementWidth/2+5>lin2x and StartPosy>ZielPosy)
+				if (aimPosx+ElementWidth/2+5>lin2x and StartPosy>aimPosy)
 				{
-					lin2x:=zielposx-ElementWidth/2-5
+					lin2x:=aimPosx-ElementWidth/2-5
 					lin2w:=lin1x-lin2x
 					
 				}
@@ -305,7 +327,7 @@ ui_DrawEverything(ByRef Variable,bildw,bildh)
 			
 			
 			lin3w:=0
-			if (ZielPosx>StartPosx)
+			if (aimPosx>StartPosx)
 			{
 				
 				
@@ -320,10 +342,10 @@ ui_DrawEverything(ByRef Variable,bildw,bildh)
 			
 			
 			
-			if (StartPosy>ZielPosy-20)
+			if (StartPosy>aimPosy-20)
 			{
 				
-				lin3y:=ZielPosy-10
+				lin3y:=aimPosy-10
 				lin3h:=lin2y-lin3y
 			}
 			else
@@ -336,40 +358,40 @@ ui_DrawEverything(ByRef Variable,bildw,bildh)
 			
 			lin4y:=lin3y
 			lin4h:=0
-			if (ZielPosx>lin3x)
+			if (aimPosx>lin3x)
 			{
 				lin4x:=lin3x
-				lin4w:=(ZielPosx-lin4x)
+				lin4w:=(aimPosx-lin4x)
 				
 			}
 			else
 			{
 				
-				lin4x:=zielposx
+				lin4x:=aimPosx
 				lin4w:=(lin3x-lin4x)
 				
 			}
 			
 			
-			lin5x:=zielposx
+			lin5x:=aimPosx
 			
 			lin5w:=0
-			if ((zielposy-startposy)<20)
+			if ((aimPosy-startposy)<20)
 			{
 				lin5h:=10
-				lin5y:=zielposy-lin5h
+				lin5y:=aimPosy-lin5h
 			}
 			else
 			{
-				lin5h:=(zielposy-StartPosy)/2
-				lin5y:=zielposy-lin5h
+				lin5h:=(aimPosy-StartPosy)/2
+				lin5y:=aimPosy-lin5h
 			}
 			
 			if (not ((%element%ConnectionType="normal") or (%element%ConnectionType="exception")))
 			{
 				if (%element%ConnectionType="yes")
 				{
-					schrx:=zielposx-ElementWidth/2
+					schrx:=aimPosx-ElementWidth/2
 					schrw:=ElementWidth/2-3
 					TextOptionsmarkedThis:=TextOptionsRightmarked
 					TextOptionsRunningThis:=TextOptionsRightRunning
@@ -377,18 +399,18 @@ ui_DrawEverything(ByRef Variable,bildw,bildh)
 				}
 				else 
 				{
-					schrx:=zielposx+5
+					schrx:=aimPosx+5
 					schrw:=ElementWidth/2
 					TextOptionsmarkedThis:=TextOptionsLeftmarked
 					TextOptionsRunningThis:=TextOptionsLeftRunning
 					TextOptionsThis:=TextOptionsLeft
 				}
 				
-				Aufschrift:=zielposx
+				Aufschrift:=aimPosx
 				
 				schrh:=17
 				
-				schry:=zielposy-schrh
+				schry:=aimPosy-schrh
 				
 				
 				
@@ -446,22 +468,38 @@ ui_DrawEverything(ByRef Variable,bildw,bildh)
 	}
 	
 	
+	
+	
+	;Draw some icons near to the selected element, if only one is selected
 	PlusButtonExist:=false
 	TrashButtonExist:=false
 	EditButtonExist:=false
-	;Draw some icons near to the selected element, if only one is selected
+	MoveButton1Exist:=false
+	MoveButton2Exist:=false
 	if (countMarkedElements=1 )
 	{
-		
-		; Get bitmaps for both the files we are going to be working with
 		pBitmapEdit := Gdip_CreateBitmapFromFile("Icons\edit.ico")
 		pBitmapPlus := Gdip_CreateBitmapFromFile("Icons\plus.ico")
+		pBitmapMove := Gdip_CreateBitmapFromFile("Icons\move.ico")
 		pBitmapTrash := Gdip_CreateBitmapFromFile("Icons\trash.ico")
-
-		; Get the width and height of the 1st bitmap
+		
+		;Move Button
+		if (%TheOnlyOneMarkedElement%type = "connection")
+		{
+			tempFromEl:=%TheOnlyOneMarkedElement%from
+			tempToEl:=%TheOnlyOneMarkedElement%to
+			middlePointOfMoveButton1X:=%tempFromEl%x + ElementWidth *0.5 - Offsetx
+			middlePointOfMoveButton1Y:=%tempFromEl%y +ElementHeight  - Offsety
+			Gdip_DrawImage(G, pBitmapMove, (middlePointOfMoveButton1X - (SizeOfButtons*0.5) )*zoomFactor, ( middlePointOfMoveButton1Y - (SizeOfButtons*0.5)) *zoomFactor, SizeOfButtons*zoomFactor, SizeOfButtons*zoomFactor , 0, 0, 48, 48)
+			MoveButton1Exist:=true
+			middlePointOfMoveButton2X:=%tempToEl%x + ElementWidth *0.5 - Offsetx
+			middlePointOfMoveButton2Y:=%tempToEl%y  - Offsety
+			Gdip_DrawImage(G, pBitmapMove, (middlePointOfMoveButton2X - (SizeOfButtons*0.5) )*zoomFactor, ( middlePointOfMoveButton2Y - (SizeOfButtons*0.5)) *zoomFactor, SizeOfButtons*zoomFactor, SizeOfButtons*zoomFactor , 0, 0, 48, 48)
+			MoveButton2Exist:=True
+		}
 		
 		
-		; Draw the 1st bitmap (1st image) onto our "canvas" (the graphics of the original bitmap we created) with the same height and same width
+		;Edit Button
 		if ((%TheOnlyOneMarkedElement%type = "action" or  %TheOnlyOneMarkedElement%type = "condition" or %TheOnlyOneMarkedElement%type = "trigger"))
 		{
 			middlePointOfEditButtonX:=%TheOnlyOneMarkedElement%x - ElementWidth *0.125 - SizeOfButtons*0.2 - Offsetx
@@ -470,16 +508,18 @@ ui_DrawEverything(ByRef Variable,bildw,bildh)
 		}
 		else if (%TheOnlyOneMarkedElement%type = "connection")
 		{
-			middlePointOfEditButtonX:=((%TheOnlyOneMarkedElement%part3x1 +  %TheOnlyOneMarkedElement%part3x2)/2  ) / zoomFactor - SizeOfButtons*0.7
+			middlePointOfEditButtonX:=((%TheOnlyOneMarkedElement%part3x1 +  %TheOnlyOneMarkedElement%part3x2)/2  ) / zoomFactor - SizeOfButtons*1.3
 			middlePointOfEditButtonY:=(%TheOnlyOneMarkedElement%part3y1   ) / zoomFactor + SizeOfButtons*0.5 
 		}
 		Gdip_DrawImage(G, pBitmapEdit, (middlePointOfEditButtonX - (SizeOfButtons*0.5) )*zoomFactor, ( middlePointOfEditButtonY - (SizeOfButtons*0.5)) *zoomFactor, SizeOfButtons*zoomFactor, SizeOfButtons*zoomFactor , 0, 0, 48, 48)
 		EditButtonExist:=true
+		
+		;Trash Button
 		if (%TheOnlyOneMarkedElement%type="action" or  %TheOnlyOneMarkedElement%type = "condition" or %TheOnlyOneMarkedElement%type = "connection")
 		{
-			 if (%TheOnlyOneMarkedElement%type = "connection")
+			if (%TheOnlyOneMarkedElement%type = "connection")
 			{
-				middlePointOfTrashButtonX:=((%TheOnlyOneMarkedElement%part3x1 +  %TheOnlyOneMarkedElement%part3x2)/2  ) / zoomFactor + SizeOfButtons*0.7 
+				middlePointOfTrashButtonX:=((%TheOnlyOneMarkedElement%part3x1 +  %TheOnlyOneMarkedElement%part3x2)/2  ) / zoomFactor + SizeOfButtons*1.3
 				middlePointOfTrashButtonY:=(%TheOnlyOneMarkedElement%part3y1  ) / zoomFactor + SizeOfButtons*0.5 
 			}
 			else
@@ -490,13 +530,23 @@ ui_DrawEverything(ByRef Variable,bildw,bildh)
 			Gdip_DrawImage(G, pBitmapTrash, (middlePointOfTrashButtonX - (SizeOfButtons*0.5) )*zoomFactor, ( middlePointOfTrashButtonY - (SizeOfButtons*0.5)) *zoomFactor, SizeOfButtons*zoomFactor, SizeOfButtons*zoomFactor , 0, 0, 48, 48)
 			TrashButtonExist:=true
 		}
-		if ((%TheOnlyOneMarkedElement%type = "action" or  %TheOnlyOneMarkedElement%type = "condition" or %TheOnlyOneMarkedElement%type = "trigger"))
+		
+		;Plus Button
+		if (%TheOnlyOneMarkedElement%type = "connection")
+		{
+			middlePointOfPlusButtonX:=((%TheOnlyOneMarkedElement%part3x1 +  %TheOnlyOneMarkedElement%part3x2)/2  ) / zoomFactor 
+			middlePointOfPlusButtonY:=(%TheOnlyOneMarkedElement%part3y1  ) / zoomFactor + SizeOfButtons*0.5 
+			Gdip_DrawImage(G, pBitmapPlus, (middlePointOfPlusButtonX - (SizeOfButtons*0.5) )*zoomFactor, ( middlePointOfPlusButtonY - (SizeOfButtons*0.5)) *zoomFactor, SizeOfButtons*zoomFactor, SizeOfButtons*zoomFactor , 0, 0, 48, 48)
+			PlusButtonExist:=true
+		}
+		else if ((%TheOnlyOneMarkedElement%type = "action" or  %TheOnlyOneMarkedElement%type = "condition" or %TheOnlyOneMarkedElement%type = "trigger"))
 		{
 			middlePointOfPlusButtonX:=%TheOnlyOneMarkedElement%x + ElementWidth *0.5 - Offsetx
 			middlePointOfPlusButtonY:=%TheOnlyOneMarkedElement%y +ElementWidth *7/8 + SizeOfButtons*0.2 - Offsety
 			Gdip_DrawImage(G, pBitmapPlus, (middlePointOfPlusButtonX - (SizeOfButtons*0.5) )*zoomFactor, ( middlePointOfPlusButtonY - (SizeOfButtons*0.5)) *zoomFactor, SizeOfButtons*zoomFactor, SizeOfButtons*zoomFactor , 0, 0, 48, 48)
 			PlusButtonExist:=true
 		}
+		
 		
 	}
 	

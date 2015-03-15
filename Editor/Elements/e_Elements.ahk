@@ -47,9 +47,9 @@ e_NewAction()
 	%tempNewID%running:=0
 	%tempNewID%Type=Action
 	%tempNewID%Name=Νew Соntainȩr
-	ui_seekForNewElementPosition()
-	%tempNewID%x=%goodNewPositionX%
-	%tempNewID%y=%goodNewPositionY%
+	;ui_seekForNewElementPosition()
+	;%tempNewID%x=%goodNewPositionX%
+	;%tempNewID%y=%goodNewPositionY%
 	ID_Count++ 
 
 	
@@ -67,9 +67,28 @@ e_NewCondition()
 	
 	%tempNewID%Type=Condition
 	%tempNewID%Name=Νew Соntainȩr
-	ui_seekForNewElementPosition()
-	%tempNewID%x=%goodNewPositionX%
-	%tempNewID%y=%goodNewPositionY%
+	;ui_seekForNewElementPosition()
+	;%tempNewID%x=%goodNewPositionX%
+	;%tempNewID%y=%goodNewPositionY%
+	ID_Count++
+
+	return (tempNewID)
+}
+
+;Creates a new loop. ;Not used yet
+e_NewLoop()
+{
+	global
+	tempNewID:="loop" ID_Count
+	allElements.insert(tempNewID)
+	%tempNewID%marked=false
+	%tempNewID%running:=0
+	
+	%tempNewID%Type=Loop
+	%tempNewID%Name=Νew Соntainȩr
+	;ui_seekForNewElementPosition()
+	;%tempNewID%x=%goodNewPositionX%
+	;%tempNewID%y=%goodNewPositionY%
 	ID_Count++
 
 	return (tempNewID)

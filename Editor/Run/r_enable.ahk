@@ -1,11 +1,12 @@
-﻿r_EnableFlow()
+﻿;enable or disable flow
+r_EnableFlow()
 {
 	global
 	if alreadyenabling=true ;Prevent that e.g. it tries to enable twice or disable and enable at same time. This may happen if user clicks on the enable button quickly
 		return
 	alreadyenabling=true
 
-	if (triggersEnabled=true)
+	if (triggersEnabled=true) ;IF the flow is enabled, disable flow
 	{
 		
 		for tempindex, temptrigger in allTriggers
@@ -18,7 +19,7 @@
 		r_TellThatFlowIsDisabled()
 		
 	}
-	else
+	else ;If the flow is disabled, enable flow
 	{
 		
 		for tempindex, temptrigger in allTriggers
@@ -35,13 +36,14 @@
 
 }
 
+;Tells the manager about the current flow status. Also sets the right GUI Text and changes the icon.
 r_TellThatFlowIsDisabled()
 {
 	global
 	try Menu, MyMenu,Rename,% lang("Disable"),% lang("Enable") ;Show enable when disabled
 	try menu, tray, rename,% lang("Disable"),% lang("Enable")
 	ControlSetText,edit1,disabled|%flowName%,CommandWindowOfManager ;Tell the manager that this flow is disabled
-	if (nowrunning!=true)
+	if (nowrunning!=true) ;Only show whether the flow is enabled if flow is not running
 		menu tray,icon,Icons\disabled.ico
 	
 }

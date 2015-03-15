@@ -34,6 +34,10 @@ if (((NewElementIconWidth*1.2*zoomFactor) < mx) and (0 < my) and ((NewElementIco
 		elementWithHighestPriority=EditButton
 	else if (TrashButtonExist=true and Sqrt((middlePointOfTrashButtonX*zoomFactor - mx)*(middlePointOfTrashButtonX*zoomFactor - mx) + (middlePointOfTrashButtonY*zoomFactor - my)*(middlePointOfTrashButtonY*zoomFactor - my)) < SizeOfButtons/2*zoomFactor)
 		elementWithHighestPriority=TrashButton
+	else if (MoveButton2Exist=true and Sqrt((middlePointOfMoveButton2X*zoomFactor - mx)*(middlePointOfMoveButton2X*zoomFactor - mx) + (middlePointOfMoveButton2Y*zoomFactor - my)*(middlePointOfMoveButton2Y*zoomFactor - my)) < SizeOfButtons/2*zoomFactor)
+		elementWithHighestPriority=MoveButton2
+	else if (MoveButton1Exist=true and Sqrt((middlePointOfMoveButton1X*zoomFactor - mx)*(middlePointOfMoveButton1X*zoomFactor - mx) + (middlePointOfMoveButton1Y*zoomFactor - my)*(middlePointOfMoveButton1Y*zoomFactor - my)) < SizeOfButtons/2*zoomFactor)
+		elementWithHighestPriority=MoveButton1
 	
 
 
@@ -143,7 +147,7 @@ if elementWithHighestPriority= ;If nothing was selected (click on nowhere). -> S
 		
 	}
 }
-else if (elementWithHighestPriority="MenuCreateNewAction" or elementWithHighestPriority="MenuCreateNewCondition")
+else if (elementWithHighestPriority="MenuCreateNewAction" or elementWithHighestPriority="MenuCreateNewCondition") ;User click either on "Create new action" or ".. condtion" in the drawn menu
 {
 	if (elementWithHighestPriority="MenuCreateNewAction")
 		tempNewID:=e_NewAction()
@@ -181,12 +185,467 @@ else if (elementWithHighestPriority="MenuCreateNewAction" or elementWithHighestP
 	
 	return
 }
-else if (elementWithHighestPriority="PlusButton")
+else if (elementWithHighestPriority="PlusButton") ;user click on plus button
 {
-	
-	tempNewConID:=e_NewConnection(TheOnlyOneMarkedElement,"MOUSE")
 	abortAddingElement:=false
-	toConnectFrom:=TheOnlyOneMarkedElement
+	
+	
+	if (%TheOnlyOneMarkedElement%type="Connection") ;The selected element is connection
+	{
+		tempElement1:=%TheOnlyOneMarkedElement%from
+		tempElement3:=%TheOnlyOneMarkedElement%to
+		tempConnection1:=TheOnlyOneMarkedElement
+		tempConnection2:=e_NewConnection("MOUSE" , %TheOnlyOneMarkedElement%to) ;Create new connection
+		
+		%tempConnection1%to:="MOUSE"
+		
+		
+		
+		if (detectMovement()) ;If user moves the mouse
+		{
+			;Wait until user releases the mouse and add an element there
+			;The connections follow the mouse
+			Loop
+			{
+				if (detectMovementWithoutBlocking())
+					ui_draw()
+				if (!getkeystate("lbutton","P") )
+				{
+					
+					break
+				}
+				if ( getkeystate("rbutton","P") or getkeystate("esc","P"))
+				{
+					abortAddingElement:=true
+					break
+				}
+				sleep 1
+			}
+		}
+		else ;User has not moved the mouse after clicking
+		{
+			;Wait until the user clicks on a place to add the element
+			Loop
+			{
+				if (detectMovementWithoutBlocking())
+					ui_draw()
+				if (GetKeyState("lbutton","P"))
+					break
+				if (GetKeyState("rbutton","P") or GetKeyState("esc","P"))
+				{
+					abortAddingElement:=true
+					break
+				}
+
+				sleep 1
+
+			}
+			
+		}
+		if (!abortAddingElement) 
+		{
+			MouseGetPos,mx2,my2 ;Get the mouse position
+			mx3:=mx2 ;calculate the mouse position relative to the picture
+			my3:=my2
+			
+			;Search an element beneath the mouse.
+			clickHighestPriority=0 ;The highest priority decides whitch element will be selected.
+			for index, element in allElements
+			{
+				if (%element%type="action" or %element%type = "condition" or %element%type = "trigger")
+				{
+					Loop % %element%CountOfParts ;Connections consist of multiple parts
+					{
+						
+						;msgbox,% element "`n" %element%part%a_index%x1 "  " %element%part%a_index%y1 "`n"  %element%part%a_index%x2 "  "  %element%part%a_index%y2 "`n" mx "  " my
+						if (%element%part%a_index%x1 < mx3 and %element%part%a_index%y1 < my3 and %element%part%a_index%x2 > mx3 and %element%part%a_index%y2 > my3)
+						{
+							
+							if (clickHighestPriority < %element%ClickPriority) ;Select the element with highest priority
+							{
+								clickHighestPriority:=%element%ClickPriority
+								
+								elementWithHighestPriority:=element
+							}
+							
+							;msgbox,%element%
+						}
+					}
+				}
+			}
+			if (clickHighestPriority=0) ;If user pulled the end of the connection to empty space. Create new element
+			{
+				returnedElementType:=ui_selectContainerType()
+				if (returnedElementType="aborted") ;If user did not select the container type
+				{
+					
+					%tempConnection1%to:=tempElement3
+					e_removeElement(tempConnection2)
+					
+					ui_draw()
+					return
+				}
+				
+				tempElement2:=e_New%returnedElementType%()
+				%tempElement2%x:=(mx3)/zoomfactor+offsetx - ElementWidth/2
+				%tempElement2%y:=(my3)/zoomfactor+offsety  - ElementHeight/2
+				%tempElement2%x:=ui_FitGridX(%tempElement2%x)
+				%tempElement2%y:=ui_FitGridY(%tempElement2%y)
+				
+				
+				%tempConnection1%to:=tempElement2
+				%tempConnection2%from:=tempElement2
+				if (%tempElement2%Type="Condition")
+				{
+					tempReturn:=ui_settingsOfElement(tempConnection2)
+				}
+				
+				
+				
+				if tempReturn=aborted ;If User did not select the connection type
+				{
+					
+					
+					%tempConnection1%to:=%tempConnection2%to
+					e_removeElement(tempConnection2)
+					e_removeElement(tempElement2)
+					
+					ui_draw()
+				}
+				else
+				{
+					saved=no
+					markElement(tempElement2)
+					elementWithHighestPriority:=tempElement2
+					ui_settingsOfElement(TheOnlyOneMarkedElement) ;open settings of element
+				}
+			}
+			else ;If user pulled the end of the connection to an existing element
+			{
+				tempElement2:=elementWithHighestPriority
+				
+				%tempConnection2%from:=tempElement2
+				%tempConnection1%to:=tempElement2
+				
+				thisConnectionPossible:=true ;Check whether Connection is possible
+				
+				
+				if %tempElement2%Type=Trigger
+				{
+					Msgbox,% lang("You_cannot_connect_to_trigger!")
+					thisConnectionPossible:=false
+				}
+				if (tempElement2=tempElement1 OR tempElement2=tempElement3)
+				{
+					Msgbox,% lang("The_Connection_cannot_start_and_end_on_the_same_element!")
+					thisConnectionPossible:=false
+				}
+				if (thisConnectionPossible=true)
+				{
+					
+					if (%tempElement2%Type="Condition")
+					{
+						
+						tempReturn:=ui_settingsOfElement(tempConnection2)
+						if tempReturn=aborted
+							thisConnectionPossible:=false
+					}
+					
+					/* Not necessary
+					if (thisConnectionPossible=true)
+					{
+						for index, element in allElements
+						{
+							if (element=tempConnection1 or element=tempConnection2)
+								continue
+							if (%element%Type="Connection")
+							{
+								if (%element%from=tempElement1 and %element%to=tempElement2 )
+								{
+									if (%element%ConnectionType=%tempConnection1%ConnectionType)
+									{
+										
+										msgbox,% lang("This_Connection_Already_Exists!")
+										thisConnectionPossible:=false
+										break
+									}
+									
+								}
+								if (%element%from=tempElement2 and %element%to=tempElement3 )
+								{
+									if (%element%ConnectionType=%tempConnection2%ConnectionType)
+									{
+										
+										msgbox,% lang("This_Connection_Already_Exists!")
+										thisConnectionPossible:=false
+										break
+									}
+									
+								}
+							}
+							
+						}
+					}
+					*/
+					
+				}
+				if (thisConnectionPossible=true)
+				{
+					
+					markElement(tempConnection2)
+					saved=no
+					
+				}
+				else
+				{
+					
+					%tempConnection1%to:=tempElement3
+					e_removeElement(tempConnection2)
+					
+				}
+				
+				
+				
+			}
+			
+			
+			
+		}
+		else ;User aborted adding a new element
+		{
+			
+			%tempConnection1%to:=tempElement3
+			
+			e_removeElement(tempConnection2)
+			
+		}
+		
+		
+		
+		
+
+	}
+	else ;The selected element is either action, condition or trigger
+	{
+		tempConnection1:=e_NewConnection(TheOnlyOneMarkedElement,"MOUSE")
+		tempElement1:=TheOnlyOneMarkedElement
+		
+		if (detectMovement()) ;If user moves the mouse
+		{
+			;Wait until user releases the mouse and add an element there
+			Loop
+			{
+				if (detectMovementWithoutBlocking())
+					ui_draw()
+				if (!getkeystate("lbutton","P") )
+				{
+					
+					break
+				}
+				if ( getkeystate("rbutton","P") or getkeystate("esc","P"))
+				{
+					abortAddingElement:=true
+					break
+				}
+				sleep 1
+			}
+		}
+		else ;User has not moved the mouse after clicking
+		{
+			;Wait until the user clicks on a place to add the element
+			Loop
+			{
+				if (detectMovementWithoutBlocking())
+					ui_draw()
+				if (GetKeyState("lbutton","P"))
+					break
+				if (GetKeyState("rbutton","P") or GetKeyState("esc","P"))
+				{
+					abortAddingElement:=true
+					break
+				}
+
+				sleep 1
+
+			}
+			
+		}
+		if (!abortAddingElement) 
+		{
+			MouseGetPos,mx2,my2 ;Get the mouse position
+			mx3:=mx2 ;calculate the mouse position relative to the picture
+			my3:=my2
+			
+			;Search an element beneath the mouse.
+			clickHighestPriority=0 ;The highest priority decides whitch element will be selected.
+			for index, element in allElements
+			{
+				if (%element%type="action" or %element%type = "condition" or %element%type = "trigger")
+				{
+					Loop % %element%CountOfParts ;Connections consist of multiple parts
+					{
+						
+						;msgbox,% element "`n" %element%part%a_index%x1 "  " %element%part%a_index%y1 "`n"  %element%part%a_index%x2 "  "  %element%part%a_index%y2 "`n" mx "  " my
+						if (%element%part%a_index%x1 < mx3 and %element%part%a_index%y1 < my3 and %element%part%a_index%x2 > mx3 and %element%part%a_index%y2 > my3)
+						{
+							
+							if (clickHighestPriority < %element%ClickPriority) ;Select the element with highest priority
+							{
+								clickHighestPriority:=%element%ClickPriority
+								
+								elementWithHighestPriority:=element
+							}
+							
+							;msgbox,%element%
+						}
+					}
+				}
+			}
+			if (clickHighestPriority=0) ;If user pulled the end of the connection to empty space. Create new element
+			{
+				returnedElementType:=ui_selectContainerType()
+				if (returnedElementType="aborted") ;If user did not select the container type
+				{
+					
+					e_removeElement(tempConnection1)
+					
+					ui_draw()
+					return
+				}
+				
+				tempElement2:=e_New%returnedElementType%()
+				%tempElement2%x:=(mx3)/zoomfactor+offsetx - ElementWidth/2
+				%tempElement2%y:=(my3)/zoomfactor+offsety  - ElementHeight/2
+				%tempElement2%x:=ui_FitGridX(%tempElement2%x)
+				%tempElement2%y:=ui_FitGridY(%tempElement2%y)
+				
+				
+				
+				
+				%tempConnection1%to:=tempElement2
+				if (%tempElement1%Type="Condition")
+				{
+					tempReturn:=ui_settingsOfElement(tempConnection1)
+				}
+				
+				
+				
+				if tempReturn=aborted ;If User did not select the connection type
+				{
+					
+					e_removeElement(tempConnection1)
+					e_removeElement(tempElement2)
+					
+					ui_draw()
+				}
+				else
+				{
+					saved=no
+					markElement(tempElement2)
+					elementWithHighestPriority:=tempElement2
+					ui_settingsOfElement(TheOnlyOneMarkedElement) ;open settings of element
+				}
+			}
+			else ;If user pulled the end of the connection to an existing element
+			{
+				tempElement2:=elementWithHighestPriority
+				
+				thisConnectionPossible:=true ;Check whether Connection is possible
+				
+				
+				
+				if %tempElement2%Type=Trigger
+				{
+					Msgbox,% lang("You_cannot_connect_to_trigger!")
+					thisConnectionPossible:=false
+				}
+				if (tempElement2=tempElement1)
+				{
+					Msgbox,% lang("The_Connection_cannot_start_and_end_on_the_same_element!")
+					thisConnectionPossible:=false
+				}
+				if (thisConnectionPossible=true)
+				{
+					
+					if (%tempElement1%Type="Condition")
+					{
+						
+						tempReturn:=ui_settingsOfElement(tempConnection1)
+						if tempReturn=aborted
+							thisConnectionPossible:=false
+					}
+					
+					if (thisConnectionPossible=true)
+					{
+						for index, element in allElements
+						{
+							
+							if (%element%Type="Connection")
+							{
+								if (%element%from=tempElement1 and %element%to=tempElement2 )
+								{
+									if (%element%ConnectionType=%tempConnection1%ConnectionType)
+									{
+										
+										msgbox,% lang("This_Connection_Already_Exists!")
+										thisConnectionPossible:=false
+										break
+									}
+									
+								}
+							}
+						}
+					}
+					
+				}
+				if (thisConnectionPossible=true)
+				{
+					markElement(tempConnection1)
+					%tempConnection1%to:=elementWithHighestPriority
+					saved=no
+				}
+				else
+				{
+					e_removeElement(tempConnection1)
+					
+				}
+					
+					
+			}
+			
+		}
+		else ;User aborted adding a new element
+		{
+			
+			e_removeElement(tempConnection1)
+			
+		}
+		
+		
+		
+		
+		
+	}
+	
+	
+	
+	
+	
+	ui_draw()
+	;ui_settingsOfElement(elementWithHighestPriority) ;open settings of element
+	return
+}
+else if (elementWithHighestPriority="MoveButton1")
+{
+	abortAddingElement:=false
+	
+	tempConnection1:=TheOnlyOneMarkedElement
+	tempElement2:=%TheOnlyOneMarkedElement%to
+	
+	tempOldConnection1from:=%tempConnection1%from
+	%tempConnection1%from:="MOUSE"
+	
+	
 	if (detectMovement()) ;If user moves the mouse
 	{
 		;Wait until user releases the mouse and add an element there
@@ -261,83 +720,89 @@ else if (elementWithHighestPriority="PlusButton")
 		if (clickHighestPriority=0) ;If user pulled the end of the connection to empty space. Create new element
 		{
 			returnedElementType:=ui_selectContainerType()
-			if (returnedElementType="aborted")
+			if (returnedElementType="aborted") ;If user did not select the container type
 			{
-				e_removeElement(tempNewConID)
+				
+				%tempConnection1%from:=tempOldConnection1from
+				
 				ui_draw()
 				return
 			}
 			
-			toConnectTo:=e_New%returnedElementType%()
-			%tempNewConID%to:=toConnectTo
-			%toConnectTo%x:=(mx3)/zoomfactor+offsetx - ElementWidth/2
-			%toConnectTo%y:=(my3)/zoomfactor+offsety  - ElementHeight/2
-			%toConnectTo%x:=ui_FitGridX(%toConnectTo%x)
-			%toConnectTo%y:=ui_FitGridY(%toConnectTo%y)
-			markElement(toConnectTo)
-			elementWithHighestPriority:=toConnectTo
+			tempElement1:=e_New%returnedElementType%()
+			%tempElement1%x:=(mx3)/zoomfactor+offsetx - ElementWidth/2
+			%tempElement1%y:=(my3)/zoomfactor+offsety  - ElementHeight/2
+			%tempElement1%x:=ui_FitGridX(%tempElement1%x)
+			%tempElement1%y:=ui_FitGridY(%tempElement1%y)
 			
-		
-					
-		
 			
-			if (%toConnectFrom%Type="Condition")
+			%tempConnection1%from:=tempElement1
+			
+			
+			if tempReturn=aborted ;If User did not select the connection type
 			{
 				
-				tempReturn:=ui_settingsOfElement(tempNewConID)
-			}
-			if tempReturn=aborted
-			{
-				e_removeElement(tempNewConID)
-				e_removeElement(toConnectTo)
+				%tempConnection1%from:=tempOldConnection1from
+				e_removeElement(tempElement1)
+				
 				ui_draw()
 			}
 			else
 			{
 				saved=no
+				markElement(tempElement1)
+				elementWithHighestPriority:=tempElement1
 				ui_settingsOfElement(TheOnlyOneMarkedElement) ;open settings of element
 			}
 		}
-		else ;If user pullted the end of the connection to an existing element
+		else ;If user pulled the end of the connection to an existing element
 		{
-			toConnectTo:=elementWithHighestPriority
+			tempElement1:=elementWithHighestPriority
 			
 			thisConnectionPossible:=true ;Check whether Connection is possible
 			
-			if %toConnectTo%Type=Trigger
-			{
-				Msgbox,% lang("You_cannot_connect_to_trigger!")
-				thisConnectionPossible:=false
-			}
-			if (toConnectTo=toConnectFrom)
+			%tempConnection1%from:=tempElement1
+			
+			if (tempElement2=tempElement1)
 			{
 				Msgbox,% lang("The_Connection_cannot_start_and_end_on_the_same_element!")
 				thisConnectionPossible:=false
 			}
 			if (thisConnectionPossible=true)
 			{
-				
-				if (%toConnectFrom%Type="Condition")
+				;If the old element has not the same type as the new element, the connection type must be changed
+				if (%tempElement1%Type!=%tempOldConnection1from%type)
 				{
-					
-					tempReturn:=ui_settingsOfElement(tempNewConID)
-					if tempReturn=aborted
-						thisConnectionPossible:=false
+					if (%tempElement1%Type="Condition")
+					{
+						
+						tempReturn:=ui_settingsOfElement(tempConnection1)
+						if tempReturn=aborted
+							thisConnectionPossible:=false
+					}
+					else
+					{
+						
+						tempReturn:=ui_settingsOfElement(tempConnection1)
+						if tempReturn=aborted
+							thisConnectionPossible:=false
+					}
 				}
 				
 				
 				for index, element in allElements
 				{
 					
-					if (%element%Type="Connection")
+					if (element!=tempConnection1 and %element%Type="Connection")
 					{
-						if (%element%from=toConnectFrom and %element%to=toConnectTo )
+						if (%element%from=tempElement1 and %element%to=tempElement2 )
 						{
-							if (%element%ConnectionType=%tempNewConID%ConnectionType)
+							if (%element%ConnectionType=%tempConnection1%ConnectionType)
 							{
 								
 								msgbox,% lang("This_Connection_Already_Exists!")
 								thisConnectionPossible:=false
+								break
 							}
 							
 						}
@@ -348,28 +813,227 @@ else if (elementWithHighestPriority="PlusButton")
 			}
 			if (thisConnectionPossible=true)
 			{
-				markElement(tempNewConID)
-				%tempNewConID%to:=elementWithHighestPriority
+				markElement(tempConnection1)
+				%tempConnection1%from:=elementWithHighestPriority
 				saved=no
-				;ui_settingsOfElement(TheOnlyOneMarkedElement) ;open settings of element
 			}
 			else
 			{
-				e_removeElement(tempNewConID)
+				%tempConnection1%from:=tempOldConnection1from
+				
 			}
+				
+				
 		}
 		
-		
-		
 	}
-	else
+	else ;User aborted adding a new element
 	{
-		e_removeElement(tempNewConID)
+		
+		%tempConnection1%from:=tempOldConnection1from
 	}
 	
+	
+	
 	ui_draw()
-	;ui_settingsOfElement(elementWithHighestPriority) ;open settings of element
-	return
+
+}
+else if (elementWithHighestPriority="MoveButton2")
+{
+	abortAddingElement:=false
+	
+	tempConnection1:=TheOnlyOneMarkedElement
+	tempElement1:=%TheOnlyOneMarkedElement%from
+	
+	tempOldConnection1to:=%tempConnection1%to
+	%tempConnection1%to:="MOUSE"
+	
+	
+	if (detectMovement()) ;If user moves the mouse
+	{
+		;Wait until user releases the mouse and add an element there
+		Loop
+		{
+			if (detectMovementWithoutBlocking())
+				ui_draw()
+			if (!getkeystate("lbutton","P") )
+			{
+				
+				break
+			}
+			if ( getkeystate("rbutton","P") or getkeystate("esc","P"))
+			{
+				abortAddingElement:=true
+				break
+			}
+			sleep 1
+		}
+	}
+	else ;User has not moved the mouse after clicking
+	{
+		;Wait until the user clicks on a place to add the element
+		Loop
+		{
+			if (detectMovementWithoutBlocking())
+				ui_draw()
+			if (GetKeyState("lbutton","P"))
+				break
+			if (GetKeyState("rbutton","P") or GetKeyState("esc","P"))
+			{
+				abortAddingElement:=true
+				break
+			}
+
+			sleep 1
+
+		}
+		
+	}
+	if (!abortAddingElement) 
+	{
+		MouseGetPos,mx2,my2 ;Get the mouse position
+		mx3:=mx2 ;calculate the mouse position relative to the picture
+		my3:=my2
+		
+		;Search an element beneath the mouse.
+		clickHighestPriority=0 ;The highest priority decides whitch element will be selected.
+		for index, element in allElements
+		{
+			if (%element%type="action" or %element%type = "condition" or %element%type = "trigger")
+			{
+				Loop % %element%CountOfParts ;Connections consist of multiple parts
+				{
+					
+					;msgbox,% element "`n" %element%part%a_index%x1 "  " %element%part%a_index%y1 "`n"  %element%part%a_index%x2 "  "  %element%part%a_index%y2 "`n" mx "  " my
+					if (%element%part%a_index%x1 < mx3 and %element%part%a_index%y1 < my3 and %element%part%a_index%x2 > mx3 and %element%part%a_index%y2 > my3)
+					{
+						
+						if (clickHighestPriority < %element%ClickPriority) ;Select the element with highest priority
+						{
+							clickHighestPriority:=%element%ClickPriority
+							
+							elementWithHighestPriority:=element
+						}
+						
+						;msgbox,%element%
+					}
+				}
+			}
+		}
+		if (clickHighestPriority=0) ;If user pulled the end of the connection to empty space. Create new element
+		{
+			returnedElementType:=ui_selectContainerType()
+			if (returnedElementType="aborted") ;If user did not select the container type
+			{
+				
+				%tempConnection1%to:=tempOldConnection1to
+				
+				ui_draw()
+				return
+			}
+			
+			tempElement2:=e_New%returnedElementType%()
+			%tempElement2%x:=(mx3)/zoomfactor+offsetx - ElementWidth/2
+			%tempElement2%y:=(my3)/zoomfactor+offsety  - ElementHeight/2
+			%tempElement2%x:=ui_FitGridX(%tempElement2%x)
+			%tempElement2%y:=ui_FitGridY(%tempElement2%y)
+			
+			
+			%tempConnection1%to:=tempElement2
+			
+			
+			if tempReturn=aborted ;If User did not select the connection type
+			{
+				
+				%tempConnection1%to:=tempOldConnection1to
+				e_removeElement(tempElement2)
+				
+				ui_draw()
+			}
+			else
+			{
+				saved=no
+				markElement(tempElement2)
+				elementWithHighestPriority:=tempElement2
+				ui_settingsOfElement(TheOnlyOneMarkedElement) ;open settings of element
+			}
+		}
+		else ;If user pulled the end of the connection to an existing element
+		{
+			tempElement2:=elementWithHighestPriority
+			
+			thisConnectionPossible:=true ;Check whether Connection is possible
+			
+			
+			
+			if %tempElement2%Type=Trigger
+			{
+				Msgbox,% lang("You_cannot_connect_to_trigger!")
+				thisConnectionPossible:=false
+			}
+			if (tempElement2=tempElement1)
+			{
+				Msgbox,% lang("The_Connection_cannot_start_and_end_on_the_same_element!")
+				thisConnectionPossible:=false
+			}
+			if (thisConnectionPossible=true)
+			{
+				
+				
+				for index, element in allElements
+				{
+					
+					if (%element%Type="Connection")
+					{
+						if (%element%from=tempElement1 and %element%to=tempElement2 )
+						{
+							if (%element%ConnectionType=%tempConnection1%ConnectionType)
+							{
+								
+								msgbox,% lang("This_Connection_Already_Exists!")
+								thisConnectionPossible:=false
+								break
+							}
+							
+						}
+					}
+				}
+				
+				
+			}
+			if (thisConnectionPossible=true)
+			{
+				markElement(tempConnection1)
+				%tempConnection1%to:=elementWithHighestPriority
+				saved=no
+			}
+			else
+			{
+				%tempConnection1%to:=tempOldConnection1to
+				
+			}
+				
+				
+		}
+		
+	}
+	else ;User aborted adding a new element
+	{
+		
+		%tempConnection1%to:=tempOldConnection1to
+	}
+	
+	
+	
+	
+	
+
+	
+	
+	ui_draw()
+	
+	
+
 }
 else if (elementWithHighestPriority="TrashButton")
 {

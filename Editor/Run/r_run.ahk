@@ -7,37 +7,38 @@ executionSpeed=1
 
 
 
-
+;Starts a new instance
 r_startRun()
 {
 	global
 	
 	
-	if (nowrunning=true)
+	if (nowrunning=true) ;If the flow is already running.
 	{
-		if SettingFlowExecutionPolicy=stop
+		;Consider the execution policy setting
+		if SettingFlowExecutionPolicy=stop ;Stop current instance and start a new one
 		{
 			gosub r_escapeRun
 			SetTimer,r_WaitUntilStoppedAndThenStart,50
 			return
 		}
-		else if SettingFlowExecutionPolicy=wait
+		else if SettingFlowExecutionPolicy=wait ;Wait until the current instance has finished
 		{
-			temp= ;Do nothing. In the run loop will only the first instance will be considered
+			temp= ;Do nothing. In the run loop will only the first instance be considered
 		}
-		else if SettingFlowExecutionPolicy=skip
+		else if SettingFlowExecutionPolicy=skip ;Skip the execution
 		{
 			
 			return
 		}
-		else if SettingFlowExecutionPolicy=parallel
+		else if SettingFlowExecutionPolicy=parallel ;Execute multiple instancec parallel
 		{
 			temp= ;Do nothing
 		}
 		
 	}
 	
-	Critical on
+	Critical on ;This code generates one instance. it should not be interrupted. (especially if a new instance should be created)
 	r_RunningCounter++
 	
 	InstanceIDList.insert("Instance_" r_RunningCounter) ;Insert a new Instance
@@ -50,13 +51,14 @@ r_startRun()
 	;MsgBox %ThisExecution_InstanceIDOfCallingFlow%
 	;MsgBox %ThisExecution_WhetherToReturVariables%
 	;MsgBox %ThisExecution_ElementIDInInstanceOfCallingFlow%
+	;if an other flow has called this flow. Those variables will be needed to get the variables from the other flow, inform it when this flow has finished and send the variables back.
 	Instance_%r_RunningCounter%_CallingFlow:=ThisExecution_CallingFlow
 	Instance_%r_RunningCounter%_InstanceOfCallingFlow:=ThisExecution_InstanceIDOfCallingFlow
 	Instance_%r_RunningCounter%_WhetherToReturVariables:=ThisExecution_WhetherToReturVariables
 	Instance_%r_RunningCounter%_ElementIDInInstanceOfCallingFlow:=ThisExecution_ElementIDInInstanceOfCallingFlow
 	
 	;MsgBox %  r_RunningCounter "-"Instance_%r_RunningCounter%_CallingFlow
-	
+	 ;Import variables if the trigger provides some variables. E.g. if an other flow has called this flow.
 	if ThisExecution_localVariables!=
 	{
 		
@@ -76,23 +78,23 @@ r_startRun()
 		ThisExecution_localVariables=
 		
 	}
-	v_setVariable(r_RunningCounter,"t_triggertime",a_now,"Date")
+	v_setVariable(r_RunningCounter,"t_triggertime",a_now,"Date") ;Set the triggertime variable
 	
-
+	;set some variables for correct  visual appearance of the trigger
 	if (triggerrunning<=0)
 			triggerrunning=1
 		else
 			triggerrunning++
-	Instance_%r_RunningCounter%_trigger_1_finishedRunning:=true
+	Instance_%r_RunningCounter%_trigger_1_finishedRunning:=true 
 	Instance_%r_RunningCounter%_trigger_1_result=normal
 	
 	
-	if (nowRunning!=true) ;if not already running, execute the r_run() function
+	if (nowRunning!=true) ;if not already running, execute the r_run() function. of not the currently running r_run function will find that new thread
 	{
 		nowRunning:=true
 		stopRun:=false
 		
-		r_TellThatFlowIsStarted()
+		r_TellThatFlowIsStarted() ;Tell manager that flow has started. Also replace some text in the GUI buttons.
 		Critical off
 		UI_draw()
 		r_run()
@@ -121,12 +123,12 @@ r_run()
 	nextrun: ;endless loop until no elements to execute left
 
 	
-	
+	;lower the priority. This would make any interrupted ahk threads finish. (like redraw)
 	thread, Priority, -100
 	Thread, Interrupt, 0,0
 
 	
-	goingToRunIDs:=Object() ;contains the Element IDs with instance ID that are going to run
+	goingToRunIDs:=Object() ;contains the Element IDs with instance ID that are going to run now
 	runNeedToRedraw:=false
 	
 	;The previous running elements are shown pink for a certain time
@@ -145,16 +147,16 @@ r_run()
 
 	
 	;MsgBox
-	ElementsThatHaveFinished:=Object()
-	InstancesThatHaveFinished:=Object()
+	ElementsThatHaveFinished:=Object() ;Contains all elements that have finished right now
+	InstancesThatHaveFinished:=Object() ;Contains all instances that have finishd right now
 	;Go through all running instances
-	for index1, tempInstanceID in InstanceIDList
+	for index1, tempInstanceID in InstanceIDList ;Go through all instances
 	{
-		if (SettingFlowExecutionPolicy="wait" && index1!=1)
+		if (SettingFlowExecutionPolicy="wait" && index1!=1) ;If execution policy allows only one running instance and others have to wait
 			break
 			
 		
-		tempCountOfRunningElementsInInstance=0
+		tempCountOfRunningElementsInInstance=0 ;Empty the counter of running elements in the current instance. If the number will remain 0 the isntance will be removed
 		;MsgBox tempInstanceID %tempInstanceID%
 		;Go through all running elements of the instance
 		for index2, tempRunningElement in %tempInstanceID%_RunningElements
@@ -164,14 +166,15 @@ r_run()
 			; tempRunningElement2 = Element id in the instance
 			
 			;MsgBox %tempInstanceID%_%tempRunningElement%_FinishedRunning = true ?
-			if (%tempInstanceID%_%tempRunningElement%_FinishedRunning=true) ;If an element has finished
+			if (%tempInstanceID%_%tempRunningElement%_FinishedRunning=true) ;If the element has finished
 			{
 				
-				;mark the element that it has recently run by setting a negative number. It will be drawn pink. If several instances are running only decrement the number
+				;mark the element that it has recently run by setting a negative number. It will be drawn pink. If several instances are running only decrement the number. Needed for correct visual appearance of the elements
 				%tempRunningElement1%running--
 				if (%tempRunningElement1%running=0)
 					%tempRunningElement1%running=-10
 				
+				;Insert the element that has finished to the list
 				ElementsThatHaveFinished.Insert(tempInstanceID "_" tempRunningElement)
 				
 				
@@ -185,13 +188,15 @@ r_run()
 					
 					if %element%Type=Connection
 					{
-						;MsgBox % "verbindung gefunden " %element%from "  " tempRunningElement1 "  " %element%ConnectionType "  " %tempInstanceID%_%tempRunningElement%_result
+						;MsgBox % "connection found " %element%from "  " tempRunningElement1 "  " %element%ConnectionType "  " %tempInstanceID%_%tempRunningElement%_result
+						;If the connection starts on the currend finised element and the elements finished with the same result that is assigned to the connection
 						if (%element%from=tempRunningElement1 and  %element%ConnectionType=%tempInstanceID%_%tempRunningElement%_result )
 						{
 							
 							%tempInstanceID%_RunningCounter++
 							tempCountOfRunningElementsInInstance++
 							
+							;Insert the element that is on the end of the connection to the list
 							goingToRunIDs.insert(tempInstanceID "_"  %element%to "_" %tempInstanceID%_RunningCounter)
 							;MsgBox % "going to run hinzugefügt "  tempInstanceID "_"  %element%to "_" %tempInstanceID%_RunningCounter
 							
@@ -220,7 +225,7 @@ r_run()
 			 
 		}
 		
-		if (tempCountOfRunningElementsInInstance=0)
+		if (tempCountOfRunningElementsInInstance=0) ;Prepare to remove the instance, because no elements are running and thus the instance has finished
 		{
 			;MsgBox %tempInstanceID% was added to the list of instances that have finished
 			InstancesThatHaveFinished.Insert(tempInstanceID)
@@ -229,6 +234,7 @@ r_run()
 		
 	}
 	
+	;Remove the elements that have finished running from the instance
 	for index, tempElement in ElementsThatHaveFinished
 	{
 		StringSplit,tempElement,tempElement,_
@@ -252,6 +258,7 @@ r_run()
 		
 	}
 	
+	;Remove the instance that have finished from the list of instances
 	for index, tempFinishedInstanceID in InstancesThatHaveFinished
 	{
 		;MsgBox, instance %tempFinishedInstanceID% has finished and will be removed
@@ -264,12 +271,14 @@ r_run()
 				;MsgBox % tempFinishedInstanceID "-" %tempFinishedInstanceID%_InstanceOfCallingFlow
 				;MsgBox % %tempFinishedInstanceID%_CallingFlow
 				;MsgBox % %tempFinishedInstanceID%_ElementIDInInstanceOfCallingFlow
+				;If the now finished instance was called by another flows that waits for a reply
 				if (%tempFinishedInstanceID%_InstanceOfCallingFlow!="" and %tempFinishedInstanceID%_CallingFlow!="" and %tempFinishedInstanceID%_ElementIDInInstanceOfCallingFlow!="")
 				{
 					tempInstanceToReturn:=%tempFinishedInstanceID%_InstanceOfCallingFlow
 					tempElementIDInInstanceToReturn:=%tempFinishedInstanceID%_ElementIDInInstanceOfCallingFlow
 					tempCallingFlow:=%tempFinishedInstanceID%_CallingFlow
 					;MsgBox %tempCallingFlow%
+					;If the calling flow wants to receive the variables
 					if %tempFinishedInstanceID%_WhetherToReturVariables!=
 					{
 						
@@ -278,14 +287,9 @@ r_run()
 					else
 						tempVariablesToReturn=
 					
+					;Tell the other flow that this instance has finished and eventually return the variables
 					ControlSetText,edit1,CalledFlowHasFinished|%tempInstanceToReturn%|%tempElementIDInInstanceToReturn%|%tempVariablesToReturn% ,CommandWindowOfEditor,% "Ѻ" %tempFinishedInstanceID%_CallingFlow
 				}
-				
-					
-				
-
-				
-				
 				
 				;Clean to free memory
 				InstanceIDList.Remove(index1)
@@ -296,7 +300,7 @@ r_run()
 	}
 	
 	
-	
+	;Loop through the elements that are going to run
 	for index3, runElement in goingToRunIDs
 	{
 		StringSplit, runElement,runElement,_ ;a word like Instance_1_action2_3
@@ -304,8 +308,10 @@ r_run()
 		; runElement2 = instance id
 		; runElement3 = element id
 		; runElement4 = element id in the instance
+		;Insert the element to the list of running elements of the instance
 		Instance_%runElement2%_RunningElements.insert(runElement3 "_" runElement4)
 		
+		;set some variables for correct visual appearance of the element
 		if (%runElement3%running<=0)
 			%runElement3%running=1
 		else
@@ -342,15 +348,17 @@ r_run()
 		
 		Instance_%runElement2%_%runElement3%_%runElement4%_finishedRunning:=false
 		
-		run%tempElementType%%tempElementSubType%(runElement2,runElement3,runElement4)
+		run%tempElementType%%tempElementSubType%(runElement2,runElement3,runElement4) ;Execute the element
 		
 		
 	}
 	
+	;Detect whether the instance list is empty
 	tempTheInstanceListIsNotEmpty=0
 	for index1, tempInstanceID in InstanceIDList
 	{
 		tempTheInstanceListIsNotEmpty++
+		break
 	}
 	;Detect whether there is no instance running anymore
 	;ToolTip(tempTheInstanceListIsNotEmpty)
@@ -410,6 +418,7 @@ stopRun:=true
 ;Hotkey,esc,off
 return
 
+;This timer is used when the a new instance starts and the execution policy says that the old instance has to be stopped
 r_WaitUntilStoppedAndThenStart:
 if (nowrunning!=true)
 {
@@ -418,6 +427,7 @@ if (nowrunning!=true)
 }
 return
 
+;Those three functions tell the manager about the current status of the flow, set the right text in the GUI elements, and change the icon
 r_TellThatFlowIsStopped()
 {
 	global
