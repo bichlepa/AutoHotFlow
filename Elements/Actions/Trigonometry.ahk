@@ -1,6 +1,6 @@
 ﻿iniAllActions.="Trigonometry|" ;Add this action to list of all actions on initialisation
 
-runActionTrigonometry(InstanceID,ElementID,ElementIDInInstance)
+runActionTrigonometry(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	local temp
@@ -10,9 +10,9 @@ runActionTrigonometry(InstanceID,ElementID,ElementIDInInstance)
 	local Unit
 	
 	if %ElementID%expression=1
-		temp:=v_replaceVariables(InstanceID,%ElementID%VarValue)
+		temp:=v_replaceVariables(InstanceID,ThreadID,%ElementID%VarValue)
 	else
-		temp:=v_EvaluateExpression(InstanceID,%ElementID%VarValue)
+		temp:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%VarValue)
 	
 	OutputType:=%ElementID%OutputType
 	Operation:=%ElementID%Operation
@@ -47,11 +47,11 @@ runActionTrigonometry(InstanceID,ElementID,ElementIDInInstance)
 			}
 		}
 		
-		v_SetVariable(InstanceID,v_replaceVariables(InstanceID,%ElementID%Varname),Result)
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+		v_SetVariable(InstanceID,ThreadID,v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname),Result)
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	}
 	else
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 
 	
 	return

@@ -1,12 +1,12 @@
 ﻿iniAllActions.="Shutdown|" ;Add this action to list of all actions on initialisation
 
-runActionShutdown(InstanceID,ElementID,ElementIDInInstance)
+runActionShutdown(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	
 	shutdown,9 ;Shutdown and power off
 	
-	MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	return
 }
 getNameActionShutdown()

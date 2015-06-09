@@ -1,6 +1,6 @@
 ﻿iniAllActions.="Rounding_a_number|" ;Add this action to list of all actions on initialisation
 
-runActionRounding_a_number(InstanceID,ElementID,ElementIDInInstance)
+runActionRounding_a_number(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	local temp
@@ -8,13 +8,13 @@ runActionRounding_a_number(InstanceID,ElementID,ElementIDInInstance)
 	local tempResult
 	
 	if %ElementID%expression=1
-		temp:=v_replaceVariables(InstanceID,%ElementID%VarValue)
+		temp:=v_replaceVariables(InstanceID,ThreadID,%ElementID%VarValue)
 	else
-		temp:=v_EvaluateExpression(InstanceID,%ElementID%VarValue)
+		temp:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%VarValue)
 	if %ElementID%expressionPlaces=1
-		tempPlaces:=v_replaceVariables(InstanceID,%ElementID%Places)
+		tempPlaces:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Places)
 	else
-		tempPlaces:=v_EvaluateExpression(InstanceID,%ElementID%Places)
+		tempPlaces:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%Places)
 	;MsgBox % tempRounding_a_number "|" temp
 	if temp is number
 	{
@@ -42,14 +42,14 @@ runActionRounding_a_number(InstanceID,ElementID,ElementIDInInstance)
 					tempResult:=round(tempResult,tempPlaces)
 				}	
 			}
-			v_SetVariable(InstanceID,v_replaceVariables(InstanceID,%ElementID%Varname),tempResult)
-			MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+			v_SetVariable(InstanceID,ThreadID,v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname),tempResult)
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 		}
 		else
-			MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 	}
 	else
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 
 	
 	return

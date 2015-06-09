@@ -1,16 +1,16 @@
 ﻿iniAllActions.="Get_control_text|" ;Add this action to list of all actions on initialisation
 
-runActionGet_control_text(InstanceID,ElementID,ElementIDInInstance)
+runActionGet_control_text(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	
-	local tempWinTitle:=v_replaceVariables(InstanceID,%ElementID%Wintitle)
-	local tempExcludeTitle:=v_replaceVariables(InstanceID,%ElementID%excludeTitle)
+	local tempWinTitle:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Wintitle)
+	local tempExcludeTitle:=v_replaceVariables(InstanceID,ThreadID,%ElementID%excludeTitle)
 	local tempTitleMatchMode :=%ElementID%TitleMatchMode
-	local tempahk_class:=v_replaceVariables(InstanceID,%ElementID%ahk_class)
-	local tempahk_exe:=v_replaceVariables(InstanceID,%ElementID%ahk_exe)
-	local tempahk_id:=v_replaceVariables(InstanceID,%ElementID%ahk_id)
-	local tempahk_pid:=v_replaceVariables(InstanceID,%ElementID%ahk_pid)
+	local tempahk_class:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ahk_class)
+	local tempahk_exe:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ahk_exe)
+	local tempahk_id:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ahk_id)
+	local tempahk_pid:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ahk_pid)
 	local tempID
 	local tempText
 	
@@ -40,13 +40,13 @@ runActionGet_control_text(InstanceID,ElementID,ElementIDInInstance)
 		
 		SetTitleMatchMode,%tempControlMatchMode%
 		
-		ControlGetText,tempText,% v_replaceVariables(InstanceID,%ElementID%Control_identifier),ahk_id %tempID%
-		v_SetVariable(InstanceID,"t_Text",tempText)
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+		ControlGetText,tempText,% v_replaceVariables(InstanceID,ThreadID,%ElementID%Control_identifier),ahk_id %tempID%
+		v_SetVariable(InstanceID,ThreadID,"t_Text",tempText)
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	}
 	else
 	{
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 	}
 	
 

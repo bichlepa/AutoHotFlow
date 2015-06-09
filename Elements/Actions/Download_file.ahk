@@ -1,32 +1,32 @@
 ﻿iniAllActions.="Download_file|" ;Add this action to list of all actions on initialisation
 
-runActionDownload_file(InstanceID,ElementID,ElementIDInInstance)
+runActionDownload_file(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 
-	local tempFileName:=v_replaceVariables(InstanceID,%ElementID%file)
+	local tempFileName:=v_replaceVariables(InstanceID,ThreadID,%ElementID%file)
 	local tempURL
 	
 	if tempFileName=
 	{
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 		return
 	}
 
 	if %ElementID%IsExpression=1
 		tempURL:=%ElementID%URL
 	else if %ElementID%IsExpression=2
-		tempURL:=v_replaceVariables(InstanceID,%ElementID%URL)
+		tempURL:=v_replaceVariables(InstanceID,ThreadID,%ElementID%URL)
 	else if %ElementID%IsExpression=3
-		tempURL:=v_EvaluateExpression(InstanceID,%ElementID%URL)
+		tempURL:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%URL)
 	
 	URLDownloadToFile,%tempURL%,%tempFileName%
 	if ErrorLevel
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 	else
 	{
-		v_SetVariable(InstanceID,tempVarName,temp)
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+		v_SetVariable(InstanceID,ThreadID,tempVarName,temp)
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	}
 	return
 }

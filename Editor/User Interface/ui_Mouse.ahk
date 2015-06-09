@@ -23,6 +23,8 @@ if ((0 < mx) and (0 < my) and ((NewElementIconWidth*1.2*zoomFactor)  > mx) and (
 	elementWithHighestPriority=MenuCreateNewAction
 if (((NewElementIconWidth*1.2*zoomFactor) < mx) and (0 < my) and ((NewElementIconWidth*1.2 * 2*zoomFactor)  > mx) and ((NewElementIconHeight*1.2*zoomFactor) > my))
 	elementWithHighestPriority=MenuCreateNewCondition
+if (((NewElementIconWidth*2.4*zoomFactor) < mx) and (0 < my) and ((NewElementIconWidth*2.4 * 2*zoomFactor)  > mx) and ((NewElementIconHeight*1.2*zoomFactor) > my))
+	elementWithHighestPriority=MenuCreateNewLoop
 
 
 
@@ -30,6 +32,8 @@ if (((NewElementIconWidth*1.2*zoomFactor) < mx) and (0 < my) and ((NewElementIco
 	
 	if (PlusButtonExist=true and Sqrt((middlePointOfPlusButtonX*zoomFactor - mx)*(middlePointOfPlusButtonX*zoomFactor - mx) + (middlePointOfPlusButtonY*zoomFactor - my)*(middlePointOfPlusButtonY*zoomFactor - my)) < SizeOfButtons/2*zoomFactor)
 		elementWithHighestPriority=PlusButton
+	else if (PlusButton2Exist=true and Sqrt((middlePointOfPlusButton2X*zoomFactor - mx)*(middlePointOfPlusButton2X*zoomFactor - mx) + (middlePointOfPlusButton2Y*zoomFactor - my)*(middlePointOfPlusButton2Y*zoomFactor - my)) < SizeOfButtons/2*zoomFactor)
+		elementWithHighestPriority=PlusButton2
 	else if (EditButtonExist=true and Sqrt((middlePointOfEditButtonX*zoomFactor - mx)*(middlePointOfEditButtonX*zoomFactor - mx) + (middlePointOfEditButtonY*zoomFactor - my)*(middlePointOfEditButtonY*zoomFactor - my)) < SizeOfButtons/2 *zoomFactor)
 		elementWithHighestPriority=EditButton
 	else if (TrashButtonExist=true and Sqrt((middlePointOfTrashButtonX*zoomFactor - mx)*(middlePointOfTrashButtonX*zoomFactor - mx) + (middlePointOfTrashButtonY*zoomFactor - my)*(middlePointOfTrashButtonY*zoomFactor - my)) < SizeOfButtons/2*zoomFactor)
@@ -57,6 +61,7 @@ if elementWithHighestPriority=
 				{
 					clickHighestPriority:=%element%ClickPriority
 					
+					partOfElementWithHighestPriority:=A_Index
 					elementWithHighestPriority:=element
 				}
 				
@@ -147,12 +152,14 @@ if elementWithHighestPriority= ;If nothing was selected (click on nowhere). -> S
 		
 	}
 }
-else if (elementWithHighestPriority="MenuCreateNewAction" or elementWithHighestPriority="MenuCreateNewCondition") ;User click either on "Create new action" or ".. condtion" in the drawn menu
+else if (elementWithHighestPriority="MenuCreateNewAction" or elementWithHighestPriority="MenuCreateNewCondition" or elementWithHighestPriority="MenuCreateNewLoop") ;User click either on "Create new action" or ".. condtion" in the drawn menu
 {
 	if (elementWithHighestPriority="MenuCreateNewAction")
 		tempNewID:=e_NewAction()
-	else
+	else if (elementWithHighestPriority="MenuCreateNewCondition")
 		tempNewID:=e_NewCondition()
+	else
+		tempNewID:=e_NewLoop()
 	
 	markElement(tempNewID)
 	elementWithHighestPriority:=tempNewID
@@ -172,6 +179,7 @@ else if (elementWithHighestPriority="MenuCreateNewAction" or elementWithHighestP
 	}
 	if (MovementAborted)
 	{
+		
 		e_removeElement(tempNewID)
 		ui_draw()
 	}
@@ -186,7 +194,8 @@ else if (elementWithHighestPriority="MenuCreateNewAction" or elementWithHighestP
 			{
 				if NowResultEditingElement=aborted
 				{
-					e_removeElement(tempElement2)
+					e_removeElement(tempNewID)
+					ui_draw()
 				}
 				break
 			}
@@ -196,7 +205,7 @@ else if (elementWithHighestPriority="MenuCreateNewAction" or elementWithHighestP
 	
 	return
 }
-else if (elementWithHighestPriority="PlusButton") ;user click on plus button
+else if (elementWithHighestPriority="PlusButton" or elementWithHighestPriority="PlusButton2") ;user click on plus button
 {
 	abortAddingElement:=false
 	
@@ -264,7 +273,8 @@ else if (elementWithHighestPriority="PlusButton") ;user click on plus button
 			clickHighestPriority=0 ;The highest priority decides whitch element will be selected.
 			for index, element in allElements
 			{
-				if (%element%type="action" or %element%type = "condition" or %element%type = "trigger")
+				
+				if (%element%type="action" or %element%type = "condition" or %element%type = "trigger" or %element%type = "loop")
 				{
 					Loop % %element%CountOfParts ;Connections consist of multiple parts
 					{
@@ -278,6 +288,8 @@ else if (elementWithHighestPriority="PlusButton") ;user click on plus button
 								clickHighestPriority:=%element%ClickPriority
 								
 								elementWithHighestPriority:=element
+								partOfElementWithHighestPriority:=A_Index
+								
 							}
 							
 							;msgbox,%element%
@@ -326,6 +338,20 @@ else if (elementWithHighestPriority="PlusButton") ;user click on plus button
 				}
 				else
 				{
+					if %tempElement3%Type=Loop ;If the third element is a loop. The information about the connected part is not yet in the second connection.
+					{
+						%tempConnection2%toPart:=%tempConnection1%toPart
+						
+					}
+					if %tempElement2%Type=Loop ;If user created to a loop
+					{
+						
+						%tempConnection1%toPart:="HEAD" 
+						%tempConnection2%fromPart:="TAIL" 
+						
+					}
+					
+					
 					saved=no
 					markElement(tempElement2)
 					elementWithHighestPriority:=tempElement2
@@ -352,8 +378,7 @@ else if (elementWithHighestPriority="PlusButton") ;user click on plus button
 			{
 				tempElement2:=elementWithHighestPriority
 				
-				%tempConnection2%from:=tempElement2
-				%tempConnection1%to:=tempElement2
+				
 				
 				thisConnectionPossible:=true ;Check whether Connection is possible
 				
@@ -379,46 +404,46 @@ else if (elementWithHighestPriority="PlusButton") ;user click on plus button
 							thisConnectionPossible:=false
 					}
 					
-					/* Not necessary
-					if (thisConnectionPossible=true)
-					{
-						for index, element in allElements
-						{
-							if (element=tempConnection1 or element=tempConnection2)
-								continue
-							if (%element%Type="Connection")
-							{
-								if (%element%from=tempElement1 and %element%to=tempElement2 )
-								{
-									if (%element%ConnectionType=%tempConnection1%ConnectionType)
-									{
-										
-										msgbox,% lang("This_Connection_Already_Exists!")
-										thisConnectionPossible:=false
-										break
-									}
-									
-								}
-								if (%element%from=tempElement2 and %element%to=tempElement3 )
-								{
-									if (%element%ConnectionType=%tempConnection2%ConnectionType)
-									{
-										
-										msgbox,% lang("This_Connection_Already_Exists!")
-										thisConnectionPossible:=false
-										break
-									}
-									
-								}
-							}
-							
-						}
-					}
-					*/
+					
 					
 				}
 				if (thisConnectionPossible=true)
 				{
+					
+					%tempConnection2%from:=tempElement2
+					%tempConnection1%to:=tempElement2
+					
+					if %tempElement3%Type=Loop ;If the third element is a loop. The information about the connected part is not yet in the second connection.
+					{
+						%tempConnection2%toPart:=%tempConnection1%toPart
+						
+					}
+					
+					
+					if %tempElement2%Type=Loop ;If user pulled to a loop
+					{
+						%tempConnection1%toPart:="HEAD" 
+						%tempConnection2%fromPart:="TAIL" 
+						
+						;~ if partOfElementWithHighestPriority=3
+						;~ {
+							;~ %tempConnection1%toPart:="TAIL" 
+							;~ %tempConnection2%fromPart:="TAIL" 
+						;~ }
+						;~ else if partOfElementWithHighestPriority=4
+						;~ {
+							;~ %tempConnection1%toPart:="BREAK"  ;A connection can only lead to break but can't start in break
+							;~ %tempConnection2%fromPart:="TAIL" 
+						;~ }
+						;~ else
+						;~ {
+							;~ %tempConnection1%toPart:="HEAD" 
+							;~ %tempConnection2%fromPart:="HEAD" 
+						;~ }
+					}
+					
+					
+					
 					
 					markElement(tempConnection2)
 					saved=no
@@ -453,9 +478,17 @@ else if (elementWithHighestPriority="PlusButton") ;user click on plus button
 		
 
 	}
-	else ;The selected element is either action, condition or trigger
+	else ;The selected element is either action, condition or trigger or loop
 	{
 		tempConnection1:=e_NewConnection(TheOnlyOneMarkedElement,"MOUSE")
+		if (%TheOnlyOneMarkedElement%type="loop")
+		{
+			if (elementWithHighestPriority="PlusButton")
+				%tempConnection1%fromPart=HEAD
+			else if (elementWithHighestPriority="PlusButton2")
+				%tempConnection1%fromPart=TAIL
+			
+		}
 		tempElement1:=TheOnlyOneMarkedElement
 		
 		GDI_DrawMoveButtonUnderMouse:=true
@@ -510,9 +543,9 @@ else if (elementWithHighestPriority="PlusButton") ;user click on plus button
 			clickHighestPriority=0 ;The highest priority decides whitch element will be selected.
 			for index, element in allElements
 			{
-				if (%element%type="action" or %element%type = "condition" or %element%type = "trigger")
+				if (%element%type="action" or %element%type = "condition" or %element%type = "trigger" or %element%type = "loop")
 				{
-					Loop % %element%CountOfParts ;Connections consist of multiple parts
+					Loop % %element%CountOfParts ;Connections and loops consist of multiple parts
 					{
 						
 						;msgbox,% element "`n" %element%part%a_index%x1 "  " %element%part%a_index%y1 "`n"  %element%part%a_index%x2 "  "  %element%part%a_index%y2 "`n" mx "  " my
@@ -524,6 +557,7 @@ else if (elementWithHighestPriority="PlusButton") ;user click on plus button
 								clickHighestPriority:=%element%ClickPriority
 								
 								elementWithHighestPriority:=element
+								partOfElementWithHighestPriority:=A_Index
 							}
 							
 							;msgbox,%element%
@@ -543,12 +577,19 @@ else if (elementWithHighestPriority="PlusButton") ;user click on plus button
 					return
 				}
 				
+				
+				
 				tempElement2:=e_New%returnedElementType%()
 				%tempElement2%x:=(mx3)/zoomfactor+offsetx - ElementWidth/2
 				%tempElement2%y:=(my3)/zoomfactor+offsety  - ElementHeight/2
 				%tempElement2%x:=ui_FitGridX(%tempElement2%x)
 				%tempElement2%y:=ui_FitGridY(%tempElement2%y)
 				
+				if %tempElement2%Type=Loop
+				{
+					%tempConnection1%toPart:="HEAD" 
+					
+				}
 				
 				
 				
@@ -645,6 +686,16 @@ else if (elementWithHighestPriority="PlusButton") ;user click on plus button
 				if (thisConnectionPossible=true)
 				{
 					markElement(tempConnection1)
+					if %tempElement2%Type=Loop
+					{
+						if partOfElementWithHighestPriority=3
+							%tempConnection1%toPart:="TAIL" 
+						else if partOfElementWithHighestPriority=4
+							%tempConnection1%toPart:="BREAK" 
+						else
+							%tempConnection1%toPart:="HEAD" 
+					}
+					
 					%tempConnection1%to:=elementWithHighestPriority
 					saved=no
 				}
@@ -742,7 +793,7 @@ else if (elementWithHighestPriority="MoveButton1")
 		clickHighestPriority=0 ;The highest priority decides whitch element will be selected.
 		for index, element in allElements
 		{
-			if (%element%type="action" or %element%type = "condition" or %element%type = "trigger")
+			if (%element%type="action" or %element%type = "condition" or %element%type = "trigger" or %element%type = "loop")
 			{
 				Loop % %element%CountOfParts ;Connections consist of multiple parts
 				{
@@ -754,7 +805,7 @@ else if (elementWithHighestPriority="MoveButton1")
 						if (clickHighestPriority < %element%ClickPriority) ;Select the element with highest priority
 						{
 							clickHighestPriority:=%element%ClickPriority
-							
+							partOfElementWithHighestPriority:=A_Index
 							elementWithHighestPriority:=element
 						}
 						
@@ -877,6 +928,17 @@ else if (elementWithHighestPriority="MoveButton1")
 			if (thisConnectionPossible=true)
 			{
 				markElement(tempConnection1)
+				
+				if %elementWithHighestPriority%Type=Loop
+				{
+					if partOfElementWithHighestPriority=3
+						%tempConnection1%fromPart:="TAIL" 
+					else if partOfElementWithHighestPriority=4
+						%tempConnection1%fromPart:="TAIL" 
+					else
+						%tempConnection1%fromPart:="HEAD" 
+				}
+				
 				%tempConnection1%from:=elementWithHighestPriority
 				saved=no
 			}
@@ -964,7 +1026,7 @@ else if (elementWithHighestPriority="MoveButton2")
 		clickHighestPriority=0 ;The highest priority decides whitch element will be selected.
 		for index, element in allElements
 		{
-			if (%element%type="action" or %element%type = "condition" or %element%type = "trigger")
+			if (%element%type="action" or %element%type = "condition" or %element%type = "trigger" or %element%type = "loop")
 			{
 				Loop % %element%CountOfParts ;Connections consist of multiple parts
 				{
@@ -976,7 +1038,7 @@ else if (elementWithHighestPriority="MoveButton2")
 						if (clickHighestPriority < %element%ClickPriority) ;Select the element with highest priority
 						{
 							clickHighestPriority:=%element%ClickPriority
-							
+							partOfElementWithHighestPriority:=A_Index
 							elementWithHighestPriority:=element
 						}
 						
@@ -1085,6 +1147,17 @@ else if (elementWithHighestPriority="MoveButton2")
 			if (thisConnectionPossible=true)
 			{
 				markElement(tempConnection1)
+				
+				if %elementWithHighestPriority%Type=Loop
+				{
+					if partOfElementWithHighestPriority=3
+						%tempConnection1%toPart:="TAIL" 
+					else if partOfElementWithHighestPriority=4
+						%tempConnection1%toPart:="BREAK" 
+					else
+						%tempConnection1%toPart:="HEAD" 
+				}
+				
 				%tempConnection1%to:=elementWithHighestPriority
 				saved=no
 			}
@@ -1168,79 +1241,6 @@ else if (elementWithHighestPriority) ;if user clicked on an element
 	
 	
 	
-	if (clickMoved=false) ;if nothing was moved
-	{
-		
-		if clickModus=connect1 ;If user is about to select where a new Connection should start
-		{
-			toConnectFrom:=elementWithHighestPriority
-			markElement(elementWithHighestPriority)
-			clickModus=connect2
-			OnTopLabel:=lang("Creating_Connection") "...`n" lang("Select_second_element")
-		}
-		else if clickModus=connect2 ;If user is about to select where a new Connection should end
-		{
-			OnTopLabel=
-			toConnectTo:=elementWithHighestPriority
-			
-			
-			thisConnectionPossible=true ;Check whether Connection is possible
-			
-			if %toConnectTo%Type=Trigger
-			{
-				Msgbox,% lang("You_cannot_connect_to_trigger!")
-				thisConnectionPossible=false
-			}
-			if (toConnectTo=toConnectFrom)
-			{
-				Msgbox,% lang("The_Connection_cannot_start_and_end_on_the_same_element!")
-				thisConnectionPossible=false
-			}
-			if thisConnectionPossible=true
-			{
-				ConnectionType=Normal
-				if (%toConnectFrom%Type="Condition")
-				{
-					
-					ConnectionType:=ui_selectConnectionType("")
-				}
-				
-				
-				for index, element in allElements
-				{
-					
-					if (%element%Type="Connection")
-					{
-						if (%element%from=toConnectFrom and %element%to=toConnectTo )
-						{
-							if (%element%ConnectionType=ConnectionType)
-							{
-								
-								msgbox,% lang("This_Connection_Already_Exists!")
-								thisConnectionPossible=false
-							}
-							
-						}
-					}
-				}
-				
-				
-			}
-			if thisConnectionPossible=true ;if possible create new Connection
-			{
-				
-				e_newConnection(toConnectFrom,toConnectTo,ConnectionType)
-				
-			}
-			clickModus=normal
-			
-			ui_draw()
-			
-			
-		}
-		
-		
-	}
 
 
 
@@ -1264,74 +1264,149 @@ moveSelectedElements(option="")
 	
 	
 	clickMoved:=false
-	for index, markedElement in markedElements  ;Preparing to move
+	
+	
+	if (TheOnlyOneMarkedElement!= "" && %TheOnlyOneMarkedElement%type = "loop" && partOfElementWithHighestPriority>=3) ;If a loop is selected and user moves its trail
 	{
-		%markedElement%oldx:=%markedElement%x
-		%markedElement%oldy:=%markedElement%y
+		oldHeightOfVerticalBar:=%TheOnlyOneMarkedElement%HeightOfVerticalBar
+		
+		
+		Loop ;Move element(s)
+		{
+			
+			GetKeyState,k,lbutton,p ;When mouse releases, the element(s) will be fittet to the Grid
+			if (option!= "InvertLbutton" and k!="d" or option= "InvertLbutton" and k="d")
+			{
+				if howMuchMoved>0
+				{
+					;Fit to grid
+					
+					%TheOnlyOneMarkedElement%HeightOfVerticalBar:=ui_FitGridx(%TheOnlyOneMarkedElement%HeightOfVerticalBar)
+					
+					
+					ui_draw()
+				}
+				
+				
+				break
+				
+			}
+			if (getkeystate("rbutton","P") or getkeystate("esc","P"))
+			{
+				
+				%TheOnlyOneMarkedElement%HeightOfVerticalBar:=oldHeightOfVerticalBar
+				MovementAborted:=true
+				ui_draw()
+				break
+			}
+			
+			MouseGetPos,newmx1,newmy1 ;get mouse position and calculate the new position of the element
+			newmx:=newmx1
+			newmy:=newmy1
+			newposy:=(firstposy+(newmy-my)/zoomFactor)
+			if (newposx!=oldposx OR newposy!=oldposy) ;If mouse is currently moving
+			{
+				oldposx:=newposx
+				oldposy:=newposy
+				
+				
+				%TheOnlyOneMarkedElement%HeightOfVerticalBar:=(oldHeightOfVerticalBar+(newmy-my)/zoomFactor)
+					
+				
+				howMuchMoved++
+				if howMuchMoved>2
+					clickMoved:=true
+				ui_draw()
+			}
+			else ;If mouse is not currently moving
+			{
+				nothingChanged=true
+				sleep,10 ;Save processor load
+			}
+			
+			
+			
+		}
+		
 		
 	}
-	Loop ;Move element(s)
+	else
 	{
-		
-		GetKeyState,k,lbutton,p ;When mouse releases, the element(s) will be fittet to the Grid
-		if (option!= "InvertLbutton" and k!="d" or option= "InvertLbutton" and k="d")
+		for index, element in markedElements  ;Preparing to move
 		{
-			if howMuchMoved>0
+			%element%oldx:=%element%x
+			%element%oldy:=%element%y
+			
+		}
+		
+		Loop ;Move element(s)
+		{
+			
+			GetKeyState,k,lbutton,p ;When mouse releases, the element(s) will be fittet to the Grid
+			if (option!= "InvertLbutton" and k!="d" or option= "InvertLbutton" and k="d")
 			{
-				;Fit to grid
+				if howMuchMoved>0
+				{
+					;Fit to grid
+					for index, element in markedElements
+					{
+						
+						%element%x:=ui_FitGridX(%element%x)
+						%element%y:=ui_FitGridY(%element%y)
+						
+					}
+					
+					ui_draw()
+				}
+				
+				
+				break
+				
+			}
+			if (getkeystate("rbutton","P") or getkeystate("esc","P"))
+			{
 				for index, element in markedElements
 				{
-					
-					%element%x:=ui_FitGridX(%element%x)
-					%element%y:=ui_FitGridY(%element%y)
+					%element%x:=%element%oldx
+					%element%y:=%element%oldy
 					
 				}
 				
+				MovementAborted:=true
+				ui_draw()
+				break
+			}
+			
+			MouseGetPos,newmx1,newmy1 ;get mouse position and calculate the new position of the element
+			newmx:=newmx1
+			newmy:=newmy1
+			newposx:=(firstposx+(newmx-mx)/zoomFactor)
+			newposy:=(firstposy+(newmy-my)/zoomFactor)
+			if (newposx!=oldposx OR newposy!=oldposy) ;If mouse is currently moving
+			{
+				oldposx:=newposx
+				oldposy:=newposy
+				for index, element in markedElements
+				{
+					%element%x:=(%element%oldx+(newmx-mx)/zoomFactor)
+					%element%y:=(%element%oldy+(newmy-my)/zoomFactor)
+					
+				}
+				
+				howMuchMoved++
+				if howMuchMoved>2
+					clickMoved:=true
 				ui_draw()
 			}
-			
-			
-			break
-			
-		}
-		if (getkeystate("rbutton","P") or getkeystate("esc","P"))
-		{
-			%element%x:=firstposx
-			%element%y:=firstposy
-			MovementAborted:=true
-			ui_draw()
-			break
-		}
-		
-		MouseGetPos,newmx1,newmy1 ;get mouse position and calculate the new position of the element
-		newmx:=newmx1
-		newmy:=newmy1
-		newposx:=(firstposx+(newmx-mx)/zoomFactor)
-		newposy:=(firstposy+(newmy-my)/zoomFactor)
-		if (newposx!=oldposx OR newposy!=oldposy) ;If mouse is currently moving
-		{
-			oldposx:=newposx
-			oldposy:=newposy
-			for index, element in markedElements
+			else ;If mouse is not currently moving
 			{
-				%element%x:=(%element%oldx+(newmx-mx)/zoomFactor)
-				%element%y:=(%element%oldy+(newmy-my)/zoomFactor)
-				
+				nothingChanged=true
+				sleep,10 ;Save processor load
 			}
 			
-			howMuchMoved++
-			if howMuchMoved>2
-				clickMoved:=true
-			ui_draw()
+			
+			
 		}
-		else ;If mouse is not currently moving
-		{
-			nothingChanged=true
-			sleep,10 ;Save processor load
-		}
-		
-		
-		
 	}
 	return clickMoved
 }
@@ -1476,7 +1551,7 @@ SortMarkedInForeground()
 	tempObject:=Object()
 	for index, element in allElements
 	{
-		if ((%element%Type="Condition" or %element%Type="Action" or %element%Type="Trigger") and %element%marked="false")
+		if ((%element%Type="Condition" or %element%Type="Action" or %element%Type="Trigger" or %element%Type="Loop") and %element%marked="false")
 			tempObject.insert(element)
 		
 		
@@ -1619,16 +1694,16 @@ return
 
 
 ctrl_x:
-ToolTip("Control + X pressed")
+;ToolTip("Control + X pressed")
 return
 
 ctrl_c:
-ToolTip("Control + C pressed")
+;ToolTip("Control + C pressed")
 i_SaveToClipboard()
 return
 
 ctrl_v:
-ToolTip("Control + V pressed")
+;ToolTip("Control + V pressed")
 i_loadFromClipboard()
 return
 

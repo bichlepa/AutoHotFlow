@@ -1,16 +1,16 @@
 ﻿iniAllActions.="Copy_folder|" ;Add this action to list of all actions on initialisation
 
-runActionCopy_folder(InstanceID,ElementID,ElementIDInInstance)
+runActionCopy_folder(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	
 	
-	FileCopyDir,% v_replaceVariables(InstanceID,%ElementID%folder),% v_replaceVariables(InstanceID,%ElementID%destFolder),% %ElementID%Overwrite
+	FileCopyDir,% v_replaceVariables(InstanceID,ThreadID,%ElementID%folder),% v_replaceVariables(InstanceID,ThreadID,%ElementID%destFolder),% %ElementID%Overwrite
 	
 	if ErrorLevel
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 	else
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	return
 }
 getNameActionCopy_folder()

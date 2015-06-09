@@ -1,12 +1,12 @@
 ﻿iniAllConditions.="Confirmation_Dialog|" ;Add this condition to list of all conditions on initialisation
 
-runConditionConfirmation_Dialog(InstanceID,ElementID,ElementIDInInstance)
+runConditionConfirmation_Dialog(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	if (!IsObject(ConditionConfirmation_DialogToStart))
 		ConditionConfirmation_DialogToStart:=Object()
 	
-	tempInstanceString:="Instance_" InstanceID "_" ElementID "_" ElementIDInInstance
+	tempInstanceString:="Instance_" InstanceID "_" ThreadID "_" ElementID "_" ElementIDInInstance
 	ConditionConfirmation_DialogToStart.insert(tempInstanceString)
 	
 	if (Confirmation_DialogStarted=true)
@@ -21,19 +21,24 @@ runConditionConfirmation_Dialog(InstanceID,ElementID,ElementIDInInstance)
 		StringSplit,tempElement,tempcConfirmation_DialogidToStart,_
 		; tempElement1 = word "instance"
 		; tempElement2 = instance id
-		; tempElement3 = element id
-		; tempElement4 = element id in the instance
-		ConditionConfirmation_DialogToStart_Element_ID:=tempElement3
+		; tempElement3 = Thread id
+		; tempElement4 = element id
+		; tempElement5 = element id in the instance
+		ConditionConfirmation_DialogToStart_Element_ID:=tempElement4
+		ConditionConfirmation_DialogToStart_Thread_ID:=tempElement3
+		ConditionConfirmation_DialogToStart_Instance_ID:=tempElement2
 		
+		;MsgBox ConditionConfirmation_DialogToStart_Element_ID %ConditionConfirmation_DialogToStart_Element_ID%`nConditionConfirmation_DialogToStart_Thread_ID %ConditionConfirmation_DialogToStart_Thread_ID%`nConditionConfirmation_DialogToStart_Instance_ID %ConditionConfirmation_DialogToStart_Instance_ID%
 		
+		;MsgBox % "question" %ConditionConfirmation_DialogToStart_Element_ID%question
 		;gui,%tempcConfirmation_DialogidToStart%:default
 		
 		;gui,10:-SysMenu 
 		
-		gui,10:add,text,x10 w320 h100, % v_replaceVariables(InstanceID,%ConditionConfirmation_DialogToStart_Element_ID%question)
+		gui,10:add,text,x10 w320 h100, % v_replaceVariables(ConditionConfirmation_DialogToStart_Instance_ID,ConditionConfirmation_DialogToStart_Thread_ID,%ConditionConfirmation_DialogToStart_Element_ID%question)
 		gui,10:add,button,x10 w150 h30 gConditionConfirmation_DialogButtonYes,% lang("Yes")
 		gui,10:add,button,X+10 yp w150 h30 gConditionConfirmation_DialogButtonNo,% lang("No")
-		gui,10:show,w330 h150 ,% v_replaceVariables(InstanceID,%ConditionConfirmation_DialogToStart_Element_ID%title)
+		gui,10:show,w330 h150 ,% v_replaceVariables(ConditionConfirmation_DialogToStart_Instance_ID,ConditionConfirmation_DialogToStart_Thread_ID,%ConditionConfirmation_DialogToStart_Element_ID%title)
 		
 		ConditionConfirmation_DialogStart_Current:=tempcConfirmation_DialogidToStart
 		Confirmation_DialogStarted:=true

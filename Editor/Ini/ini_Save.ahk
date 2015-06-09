@@ -4,6 +4,7 @@
 	
 	
 	ui_DisableMainGUI()
+	busy:=true
 	GetKeyState,k,control,p 
 	if (ThisFlowFilename="" or k="d")
 	{
@@ -48,6 +49,18 @@
 			IniWrite,%saveElementto%,%ThisFlowFolder%\%ThisFlowFilename%.ini,element%SaveIndex1%,to
 			IniWrite,%saveElementConnectionType%,%ThisFlowFolder%\%ThisFlowFilename%.ini,element%SaveIndex1%,ConnectionType
 			
+			if %saveElementfrom%type=Loop
+			{
+				saveElementfromPart:=%saveElementID%fromPart
+				IniWrite,%saveElementfromPart%,%ThisFlowFolder%\%ThisFlowFilename%.ini,element%SaveIndex1%,fromPart
+			}
+			if %saveElementto%type=Loop
+			{
+				saveElementtoPart:=%saveElementID%toPart
+				IniWrite,%saveElementtoPart%,%ThisFlowFolder%\%ThisFlowFilename%.ini,element%SaveIndex1%,toPart
+			}
+			
+			
 		}
 		else if (saveElementType="trigger")
 		{
@@ -70,6 +83,13 @@
 			IniWrite,%saveElementname%,%ThisFlowFolder%\%ThisFlowFilename%.ini,element%SaveIndex1%,name
 			IniWrite,%saveElementX%,%ThisFlowFolder%\%ThisFlowFilename%.ini,element%SaveIndex1%,x
 			IniWrite,%saveElementY%,%ThisFlowFolder%\%ThisFlowFilename%.ini,element%SaveIndex1%,y
+			
+			if (saveElementType="loop")
+			{
+				saveElementHeightOfVerticalBar:=%saveElementID%HeightOfVerticalBar
+				IniWrite,%saveElementHeightOfVerticalBar%,%ThisFlowFolder%\%ThisFlowFilename%.ini,element%SaveIndex1%,HeightOfVerticalBar
+			}
+			
 			
 			parametersToSave:=getParameters%saveElementType%%saveElementsubType%()
 			for tempSaveindex2, tempSaveParameter in parametersToSave
@@ -129,5 +149,5 @@
 	ToolTip(lang("saved"))
 	ui_EnableMainGUI()
 	saved=yes
-	
+	busy:=false
 }

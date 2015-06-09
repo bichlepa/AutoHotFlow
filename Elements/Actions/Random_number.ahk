@@ -1,6 +1,6 @@
 ﻿iniAllActions.="Random_number|" ;Add this action to list of all actions on initialisation
 
-runActionRandom_number(InstanceID,ElementID,ElementIDInInstance)
+runActionRandom_number(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	local tempmin
@@ -8,27 +8,27 @@ runActionRandom_number(InstanceID,ElementID,ElementIDInInstance)
 	local result
 	
 	if %ElementID%expressionmin=1
-		tempmin:=v_replaceVariables(InstanceID,%ElementID%MinValue)
+		tempmin:=v_replaceVariables(InstanceID,ThreadID,%ElementID%MinValue)
 	else
-		tempmin:=v_EvaluateExpression(InstanceID,%ElementID%MinValue)
+		tempmin:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%MinValue)
 	if %ElementID%expressiomax=1
-		tempmax:=v_replaceVariables(InstanceID,%ElementID%MaxValue)
+		tempmax:=v_replaceVariables(InstanceID,ThreadID,%ElementID%MaxValue)
 	else
-		tempmax:=v_EvaluateExpression(InstanceID,%ElementID%MaxValue)
+		tempmax:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%MaxValue)
 	;MsgBox,%  %ElementID%Varname "---" %ElementID%VarValue "---" v_replaceVariables(InstanceID,%ElementID%Varname) "---" v_replaceVariables(InstanceID,%ElementID%VarValue)
 	if tempmin is number
 	{
 		if tempmax is number
 		{
 			Random,result,tempmin,tempmax
-			v_SetVariable(InstanceID,v_replaceVariables(InstanceID,%ElementID%Varname),result)
-			MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+			v_SetVariable(InstanceID,ThreadID,v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname),result)
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 		}
 		else
-			MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 	}
 	else
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 
 	
 	return

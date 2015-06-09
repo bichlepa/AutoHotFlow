@@ -1,21 +1,21 @@
 ﻿iniAllActions.="Get_Clipboard|" ;Add this action to list of all actions on initialisation
 
-runActionGet_Clipboard(InstanceID,ElementID,ElementIDInInstance)
+runActionGet_Clipboard(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	
 	if %ElementID%All=0
 	{
 		tempClipboardAll:=ClipboardAll
-		v_SetVariable(InstanceID,v_replaceVariables(InstanceID,%ElementID%Varname),tempClipboardAll,binary)
+		v_SetVariable(InstanceID,ThreadID,v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname),tempClipboardAll,binary)
 	}
 	else
 	{
-		v_SetVariable(InstanceID,v_replaceVariables(InstanceID,%ElementID%Varname),Clipboard)
+		v_SetVariable(InstanceID,ThreadID,v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname),Clipboard)
 	}
 	
 
-	MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	return
 }
 getNameActionGet_Clipboard()

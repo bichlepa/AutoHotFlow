@@ -38,16 +38,16 @@ If !pToken := Gdip_Startup()
 Font:="Arial"
 
 ; Create some brushes
-pPenBlack := Gdip_CreatePen("0xff000000",2)
-pPenMarkLin := Gdip_CreatePen("0xff00aa00",2)
-pPenRunningLin := Gdip_CreatePen("0xaaff0000",2)
-pPenRed := Gdip_CreatePen("0xffaa0000",2)
-pPenGrey := Gdip_CreatePen("0xffaaaaff",2)
-pBrushBlack := Gdip_BrushCreateSolid("0xff000000")
-pBrushUnmark := Gdip_BrushCreateSolid("0xfffafafa")
-pBrushMark := Gdip_BrushCreateSolid("0x5000ff00")
-pBrushRunning := Gdip_BrushCreateSolid("0x50ff0000")
-pBrushLastRunning := Gdip_BrushCreateSolid("0x10ff0000")
+pPenBlack := Gdip_CreatePen("0xff000000",2) ;Black pen
+pPenMarkLin := Gdip_CreatePen("0xff00aa00",2) ;Green pen 
+pPenRunningLin := Gdip_CreatePen("0xaaff0000",2) ;Red pen, transparent
+pPenRed := Gdip_CreatePen("0xffaa0000",2) ;Red pen
+pPenGrey := Gdip_CreatePen("0xffaaaaff",2) ;Grey pen
+pBrushBlack := Gdip_BrushCreateSolid("0xff000000") ;Black brush
+pBrushUnmark := Gdip_BrushCreateSolid("0xfffafafa") ;White brush
+pBrushMark := Gdip_BrushCreateSolid("0x5000ff00") ;Green brush, transparent
+pBrushRunning := Gdip_BrushCreateSolid("0x50ff0000") ;Red brush, transparent
+pBrushLastRunning := Gdip_BrushCreateSolid("0x10ff0000") ;Red brush, very transparent
 
 
 ui_Draw()
@@ -119,6 +119,7 @@ ui_DrawEverything(ByRef Variable,bildw,bildh)
 	local TextOptionsRightmarked:=" s" (textSize*zoomFactor) " Right  cff00aa00  Bold"
 	local TextOptionsRightRunning:=" s" (textSize*zoomFactor) " Right  cffaa0000  Bold"
 
+	local TextOptionsSmall:=" s" (textSize*0.7*zoomFactor) " Center cff000000  Bold"
 	local TextOptionsTopLabel:=" s20"  "  cff330000  Bold"
 	
 	
@@ -177,8 +178,8 @@ ui_DrawEverything(ByRef Variable,bildw,bildh)
 			;Define area of parts
 			%element%part1x1:=((%element%x-Offsetx)*zoomFactor)
 			%element%part1y1:=((%element%y-Offsety)*zoomFactor)
-			%element%part1x2:=((%element%x-Offsetx)*zoomFactor)+(ElementWidth*zoomFactor)
-			%element%part1y2:=((%element%y-Offsety)*zoomFactor)+(ElementHeight*zoomFactor)
+			%element%part1x2:=((%element%x+ElementWidth-Offsetx)*zoomFactor)
+			%element%part1y2:=((%element%y+ElementHeight-Offsety)*zoomFactor)
 			;MsgBox,% "x1 " %element%part1x1 " y1 " %element%part1y1 " x2 " %element%part1x2 "y2" %element%part1y2
 			%element%CountOfParts=1
 			%element%ClickPriority=500
@@ -205,8 +206,8 @@ ui_DrawEverything(ByRef Variable,bildw,bildh)
 			;Define area of parts
 			%element%part1x1:=((%element%x-Offsetx)*zoomFactor)
 			%element%part1y1:=((%element%y-Offsety)*zoomFactor)
-			%element%part1x2:=((%element%x-Offsetx)*zoomFactor)+(ElementWidth*zoomFactor)
-			%element%part1y2:=((%element%y-Offsety)*zoomFactor)+(ElementHeight*zoomFactor)
+			%element%part1x2:=((%element%x+ElementWidth-Offsetx)*zoomFactor)
+			%element%part1y2:=((%element%y+ElementHeight-Offsety)*zoomFactor)
 			%element%CountOfParts=1
 			%element%ClickPriority=500
 		}
@@ -231,9 +232,64 @@ ui_DrawEverything(ByRef Variable,bildw,bildh)
 			;Define area of parts
 			%element%part1x1:=((%element%x-Offsetx)*zoomFactor)
 			%element%part1y1:=((%element%y-Offsety)*zoomFactor)
-			%element%part1x2:=((%element%x-Offsetx)*zoomFactor)+(ElementWidth*zoomFactor)
-			%element%part1y2:=((%element%y-Offsety)*zoomFactor)+(ElementHeight*zoomFactor)
+			%element%part1x2:=((%element%x+ElementWidth-Offsetx)*zoomFactor)
+			%element%part1y2:=((%element%y+ElementHeight-Offsety)*zoomFactor)
 			%element%CountOfParts=1
+			%element%ClickPriority=500
+		}
+		
+		if %element%Type=Loop
+		{
+			
+			Gdip_FillRectangle(G, pBrushUnmark, ((%element%x-Offsetx)*zoomFactor), ((%element%y-Offsety)*zoomFactor), ((ElementWidth)*zoomFactor), ((ElementHeight)*zoomFactor))
+			Gdip_FillRectangle(G, pBrushUnmark, ((%element%x-Offsetx)*zoomFactor), ((%element%y+ElementHeight-Offsety)*zoomFactor), ((ElementWidth/8)*zoomFactor), ((%element%HeightOfVerticalBar)*zoomFactor))
+			Gdip_FillRectangle(G, pBrushUnmark, ((%element%x-Offsetx)*zoomFactor), ((%element%y+ElementHeight+%element%HeightOfVerticalBar-Offsety)*zoomFactor), ((ElementWidth)*zoomFactor), ((ElementHeight/3)*zoomFactor))
+			Gdip_FillRectangle(G, pBrushRunning,  ((%element%x+(ElementWidth *3/4)-Offsetx)*zoomFactor), ((%element%y+ElementHeight+%element%HeightOfVerticalBar-Offsety)*zoomFactor), ((ElementWidth *1/4)*zoomFactor), ((ElementHeight/3)*zoomFactor)) ;Break field
+			
+			Gdip_DrawLines(G, pPenGrey,((%element%x+0-Offsetx)*zoomFactor) "," ((%element%y+0-Offsety)*zoomFactor) "|" ((%element%x+ElementWidth-Offsetx)*zoomFactor) "," ((%element%y+0-Offsety)*zoomFactor) "|" ((%element%x+ElementWidth-Offsetx)*zoomFactor) "," ((%element%y+ElementHeight-Offsety)*zoomFactor) "|" ((%element%x+ElementWidth/8-Offsetx)*zoomFactor) "," ((%element%y+ElementHeight-Offsety)*zoomFactor) "|" ((%element%x+ElementWidth/8-Offsetx)*zoomFactor) "," ((%element%y+ElementHeight+%element%HeightOfVerticalBar-Offsety)*zoomFactor) "|" ((%element%x+ElementWidth-Offsetx)*zoomFactor) "," ((%element%y+ElementHeight+%element%HeightOfVerticalBar-Offsety)*zoomFactor) "|" ((%element%x+ElementWidth-Offsetx)*zoomFactor) "," ((%element%y+ElementHeight*4/3+%element%HeightOfVerticalBar-Offsety)*zoomFactor) "|" ((%element%x-Offsetx)*zoomFactor) "," ((%element%y+ElementHeight*4/3+%element%HeightOfVerticalBar-Offsety)*zoomFactor) "|" ((%element%x+0-Offsetx)*zoomFactor) "," ((%element%y+0-Offsety)*zoomFactor) )
+			
+			Gdip_TextToGraphics(G, %element%name, "x" ((%element%x-Offsetx)*zoomFactor +4) " y" ((%element%y-Offsety)*zoomFactor+4) " vCenter " TextOptions , Font, (ElementWidth*zoomFactor-8), (ElementHeight*zoomFactor-8))
+			Gdip_TextToGraphics(G, "break", "x" ((%element%x+(ElementWidth *3/4)-Offsetx)*zoomFactor ) " y" ((%element%y+ElementHeight+%element%HeightOfVerticalBar-Offsety)*zoomFactor) " vCenter " TextOptionsSmall , Font, (ElementWidth*1/4*zoomFactor), (ElementHeight*1/3*zoomFactor)) ;Break text
+			if %element%marked=true
+			{
+				;~ Gdip_FillRectangle(G, pBrushMark, ((%element%x-Offsetx)*zoomFactor), ((%element%y-Offsety)*zoomFactor), (ElementWidth*zoomFactor), (ElementHeight*zoomFactor))
+				Gdip_FillRectangle(G, pBrushMark, ((%element%x-Offsetx)*zoomFactor), ((%element%y-Offsety)*zoomFactor), ((ElementWidth)*zoomFactor), ((ElementHeight)*zoomFactor))
+				Gdip_FillRectangle(G, pBrushMark, ((%element%x-Offsetx)*zoomFactor), ((%element%y+ElementHeight-Offsety)*zoomFactor), ((ElementWidth/8)*zoomFactor), ((%element%HeightOfVerticalBar)*zoomFactor))
+				Gdip_FillRectangle(G, pBrushMark, ((%element%x-Offsetx)*zoomFactor), ((%element%y+ElementHeight+%element%HeightOfVerticalBar-Offsety)*zoomFactor), ((ElementWidth)*zoomFactor), ((ElementHeight/3)*zoomFactor))
+			}
+			
+			if (%element%running>0) ;If element is running
+			{
+				;Gdip_FillRectangle(G, pBrushRunning, ((%element%x-Offsetx)*zoomFactor), ((%element%y-Offsety)*zoomFactor), (ElementWidth*zoomFactor), (ElementHeight*zoomFactor))
+				Gdip_FillRectangle(G, pBrushRunning, ((%element%x-Offsetx)*zoomFactor), ((%element%y-Offsety)*zoomFactor), ((ElementWidth)*zoomFactor), ((ElementHeight)*zoomFactor))
+				Gdip_FillRectangle(G, pBrushRunning, ((%element%x-Offsetx)*zoomFactor), ((%element%y+ElementHeight-Offsety)*zoomFactor), ((ElementWidth/8)*zoomFactor), ((%element%HeightOfVerticalBar)*zoomFactor))
+				Gdip_FillRectangle(G, pBrushRunning, ((%element%x-Offsetx)*zoomFactor), ((%element%y+ElementHeight+%element%HeightOfVerticalBar-Offsety)*zoomFactor), ((ElementWidth)*zoomFactor), ((ElementHeight/3)*zoomFactor))
+			}
+			if (%element%running<0) ;If element has recently run
+			{
+				;~ Gdip_FillRectangle(G, pBrushLastRunning, ((%element%x-Offsetx)*zoomFactor), ((%element%y-Offsety)*zoomFactor), (ElementWidth*zoomFactor), (ElementHeight*zoomFactor))
+				Gdip_FillRectangle(G, pBrushLastRunning, ((%element%x-Offsetx)*zoomFactor), ((%element%y-Offsety)*zoomFactor), ((ElementWidth)*zoomFactor), ((ElementHeight)*zoomFactor))
+				Gdip_FillRectangle(G, pBrushLastRunning, ((%element%x-Offsetx)*zoomFactor), ((%element%y+ElementHeight-Offsety)*zoomFactor), ((ElementWidth/8)*zoomFactor), ((%element%HeightOfVerticalBar)*zoomFactor))
+				Gdip_FillRectangle(G, pBrushLastRunning, ((%element%x-Offsetx)*zoomFactor), ((%element%y+ElementHeight+%element%HeightOfVerticalBar-Offsety)*zoomFactor), ((ElementWidth)*zoomFactor), ((ElementHeight/3)*zoomFactor))
+			}
+			;Define area of parts
+			%element%part1x1:=((%element%x-Offsetx)*zoomFactor)
+			%element%part1y1:=((%element%y-Offsety)*zoomFactor)
+			%element%part1x2:=((%element%x+ElementWidth-Offsetx)*zoomFactor)
+			%element%part1y2:=((%element%y+ElementHeight-Offsety)*zoomFactor)
+			%element%part2x1:=((%element%x-Offsetx)*zoomFactor)
+			%element%part2y1:=((%element%y+ElementHeight-Offsety)*zoomFactor)
+			%element%part2x2:=((%element%x+ElementWidth/8-Offsetx)*zoomFactor)
+			%element%part2y2:=((%element%y+ElementHeight+%element%HeightOfVerticalBar-Offsety)*zoomFactor)
+			%element%part3x1:=((%element%x-Offsetx)*zoomFactor)
+			%element%part3y1:=((%element%y+ElementHeight+%element%HeightOfVerticalBar-Offsety)*zoomFactor)
+			%element%part3x2:=((%element%x+ElementWidth*3/4-Offsetx)*zoomFactor)
+			%element%part3y2:=((%element%y+ElementHeight*4/3+%element%HeightOfVerticalBar-Offsety)*zoomFactor)
+			%element%part4x1:=((%element%x+ElementWidth*3/4-Offsetx)*zoomFactor)
+			%element%part4y1:=((%element%y+ElementHeight+%element%HeightOfVerticalBar-Offsety)*zoomFactor)
+			%element%part4x2:=((%element%x+ElementWidth-Offsetx)*zoomFactor)
+			%element%part4y2:=((%element%y+ElementHeight*4/3+%element%HeightOfVerticalBar-Offsety)*zoomFactor)
+			%element%CountOfParts=4
 			%element%ClickPriority=500
 		}
 		
@@ -257,6 +313,29 @@ ui_DrawEverything(ByRef Variable,bildw,bildh)
 				StartPosy:=(my3)/zoomfactor+offsety
 				
 			}
+			else if (%tempFromEl%type="loop")
+			{
+				
+				if %element%ConnectionType=Normal
+				{
+					if %element%fromPart=HEAD
+					{
+						StartPosx:=%tempFromEl%x+(ElementWidth/2)
+						StartPosy:=%tempFromEl%y+ElementHeight
+					}
+					else
+					{
+						StartPosx:=%tempFromEl%x+(ElementWidth/2)
+						StartPosy:=%tempFromEl%y+%tempFromEl%HeightOfVerticalBar+ElementHeight*4/3
+					}
+				}
+				else ;If exception
+				{
+					StartPosx:=%tempFromEl%x+(ElementWidth/2)
+					StartPosy:=%tempFromEl%y+%tempFromEl%HeightOfVerticalBar+ElementHeight*4/3
+				}
+				
+			}
 			else
 			{
 				StartPosx:=%tempFromEl%x+(ElementWidth/2)
@@ -270,6 +349,27 @@ ui_DrawEverything(ByRef Variable,bildw,bildh)
 				my3:=my2-guipicy
 				aimPosx:=(mx3)/zoomfactor+offsetx
 				aimPosy:=(my3)/zoomfactor+offsety
+				
+			}
+			else if (%tempToEl%type="loop")
+			{
+
+				if %element%toPart=HEAD
+				{
+					aimPosx:=%tempToEl%x+(ElementWidth/2 )
+					aimPosy:=%tempToEl%y
+				}
+				else if %element%toPart=BREAK
+				{
+					
+					aimPosx:=%tempToEl%x+(ElementWidth*7/8)
+					aimPosy:=%tempToEl%y+%tempToEl%HeightOfVerticalBar+ElementHeight
+				}
+				else
+				{
+					aimPosx:=%tempToEl%x+(ElementWidth/2)
+					aimPosy:=%tempToEl%y+%tempToEl%HeightOfVerticalBar+ElementHeight
+				}
 				
 			}
 			else
@@ -474,6 +574,7 @@ ui_DrawEverything(ByRef Variable,bildw,bildh)
 	
 	;Draw some icons near to the selected element, if only one is selected
 	PlusButtonExist:=false
+	PlusButton2Exist:=false
 	TrashButtonExist:=false
 	EditButtonExist:=false
 	MoveButton1Exist:=false
@@ -490,19 +591,76 @@ ui_DrawEverything(ByRef Variable,bildw,bildh)
 		{
 			tempFromEl:=%TheOnlyOneMarkedElement%from
 			tempToEl:=%TheOnlyOneMarkedElement%to
-			middlePointOfMoveButton1X:=%tempFromEl%x + ElementWidth *0.5 - Offsetx
-			middlePointOfMoveButton1Y:=%tempFromEl%y +ElementHeight  - Offsety
+			
+			
+			if (%tempFromEl%type="loop")
+			{
+
+				if %TheOnlyOneMarkedElement%ConnectionType=Normal
+				{
+					if %TheOnlyOneMarkedElement%fromPart=HEAD
+					{
+						middlePointOfMoveButton1X:=%tempFromEl%x + ElementWidth *0.5 - Offsetx
+						middlePointOfMoveButton1Y:=%tempFromEl%y +ElementHeight - Offsety
+					}
+					else
+					{
+						middlePointOfMoveButton1X:=%tempFromEl%x + ElementWidth *0.5 - Offsetx
+						middlePointOfMoveButton1Y:=%tempFromEl%y + %tempFromEl%HeightOfVerticalBar+ElementHeight*4/3 - Offsety
+					}
+				}
+				else
+				{
+					middlePointOfMoveButton1X:=%tempFromEl%x + ElementWidth *0.5 - Offsetx
+					middlePointOfMoveButton1Y:=%tempFromEl%y + %tempFromEl%HeightOfVerticalBar+ElementHeight*4/3 - Offsety
+					}
+			}
+			else
+			{
+				middlePointOfMoveButton1X:=%tempFromEl%x + ElementWidth *0.5 - Offsetx
+				middlePointOfMoveButton1Y:=%tempFromEl%y +ElementHeight  - Offsety
+			}
+			
+			
+			
+			if (%tempToEl%type="loop")
+			{
+
+				if %TheOnlyOneMarkedElement%toPart=HEAD
+				{
+					middlePointOfMoveButton2X:=%tempToEl%x + ElementWidth *0.5 - Offsetx
+					middlePointOfMoveButton2Y:=%tempToEl%y  - Offsety
+				}
+				else if %TheOnlyOneMarkedElement%toPart=BREAK
+				{
+					middlePointOfMoveButton2X:=%tempToEl%x + ElementWidth *7/8 - Offsetx
+					middlePointOfMoveButton2Y:=%tempToEl%y + %tempToEl%HeightOfVerticalBar+ElementHeight - Offsety
+				}
+				else
+				{
+					 middlePointOfMoveButton2X:=%tempToEl%x + ElementWidth *0.5 - Offsetx
+					middlePointOfMoveButton2Y:=%tempToEl%y + %tempToEl%HeightOfVerticalBar+ElementHeight - Offsety
+				}
+				
+			}
+			else
+			{
+				middlePointOfMoveButton2X:=%tempToEl%x + ElementWidth *0.5 - Offsetx
+				middlePointOfMoveButton2Y:=%tempToEl%y  - Offsety
+			}
+			
 			Gdip_DrawImage(G, pBitmapMove, (middlePointOfMoveButton1X - (SizeOfButtons*0.5) )*zoomFactor, ( middlePointOfMoveButton1Y - (SizeOfButtons*0.5)) *zoomFactor, SizeOfButtons*zoomFactor, SizeOfButtons*zoomFactor , 0, 0, 48, 48)
-			MoveButton1Exist:=true
-			middlePointOfMoveButton2X:=%tempToEl%x + ElementWidth *0.5 - Offsetx
-			middlePointOfMoveButton2Y:=%tempToEl%y  - Offsety
+			
+			
 			Gdip_DrawImage(G, pBitmapMove, (middlePointOfMoveButton2X - (SizeOfButtons*0.5) )*zoomFactor, ( middlePointOfMoveButton2Y - (SizeOfButtons*0.5)) *zoomFactor, SizeOfButtons*zoomFactor, SizeOfButtons*zoomFactor , 0, 0, 48, 48)
+			
+			MoveButton1Exist:=true
 			MoveButton2Exist:=True
 		}
 		
 		
 		;Edit Button
-		if ((%TheOnlyOneMarkedElement%type = "action" or  %TheOnlyOneMarkedElement%type = "condition" or %TheOnlyOneMarkedElement%type = "trigger"))
+		if ((%TheOnlyOneMarkedElement%type = "action" or  %TheOnlyOneMarkedElement%type = "condition" or %TheOnlyOneMarkedElement%type = "trigger" or %TheOnlyOneMarkedElement%type = "loop"))
 		{
 			middlePointOfEditButtonX:=%TheOnlyOneMarkedElement%x - ElementWidth *0.125 - SizeOfButtons*0.2 - Offsetx
 			middlePointOfEditButtonY:=%TheOnlyOneMarkedElement%y +ElementWidth *0.375 - Offsety
@@ -517,7 +675,7 @@ ui_DrawEverything(ByRef Variable,bildw,bildh)
 		EditButtonExist:=true
 		
 		;Trash Button
-		if (%TheOnlyOneMarkedElement%type="action" or  %TheOnlyOneMarkedElement%type = "condition" or %TheOnlyOneMarkedElement%type = "connection")
+		if (%TheOnlyOneMarkedElement%type="action" or  %TheOnlyOneMarkedElement%type = "condition" or %TheOnlyOneMarkedElement%type = "connection" or %TheOnlyOneMarkedElement%type = "loop")
 		{
 			if (%TheOnlyOneMarkedElement%type = "connection")
 			{
@@ -541,12 +699,20 @@ ui_DrawEverything(ByRef Variable,bildw,bildh)
 			Gdip_DrawImage(G, pBitmapPlus, (middlePointOfPlusButtonX - (SizeOfButtons*0.5) )*zoomFactor, ( middlePointOfPlusButtonY - (SizeOfButtons*0.5)) *zoomFactor, SizeOfButtons*zoomFactor, SizeOfButtons*zoomFactor , 0, 0, 48, 48)
 			PlusButtonExist:=true
 		}
-		else if ((%TheOnlyOneMarkedElement%type = "action" or  %TheOnlyOneMarkedElement%type = "condition" or %TheOnlyOneMarkedElement%type = "trigger"))
+		else if ((%TheOnlyOneMarkedElement%type = "action" or  %TheOnlyOneMarkedElement%type = "condition" or %TheOnlyOneMarkedElement%type = "trigger" or %TheOnlyOneMarkedElement%type = "loop"))
 		{
 			middlePointOfPlusButtonX:=%TheOnlyOneMarkedElement%x + ElementWidth *0.5 - Offsetx
 			middlePointOfPlusButtonY:=%TheOnlyOneMarkedElement%y +ElementWidth *7/8 + SizeOfButtons*0.2 - Offsety
 			Gdip_DrawImage(G, pBitmapPlus, (middlePointOfPlusButtonX - (SizeOfButtons*0.5) )*zoomFactor, ( middlePointOfPlusButtonY - (SizeOfButtons*0.5)) *zoomFactor, SizeOfButtons*zoomFactor, SizeOfButtons*zoomFactor , 0, 0, 48, 48)
 			PlusButtonExist:=true
+		}
+		if (%TheOnlyOneMarkedElement%type = "loop") ;Additional plus button for loop
+		{
+			middlePointOfPlusButton2X:=%TheOnlyOneMarkedElement%x + ElementWidth *0.5 - Offsetx
+			middlePointOfPlusButton2Y:=%TheOnlyOneMarkedElement%y +ElementWidth /8 + ElementHeight*4/3+%TheOnlyOneMarkedElement%HeightOfVerticalBar + SizeOfButtons*0.2 - Offsety
+			Gdip_DrawImage(G, pBitmapPlus, (middlePointOfPlusButton2X - (SizeOfButtons*0.5) )*zoomFactor, ( middlePointOfPlusButton2Y - (SizeOfButtons*0.5)) *zoomFactor, SizeOfButtons*zoomFactor, SizeOfButtons*zoomFactor , 0, 0, 48, 48)
+			PlusButton2Exist:=true
+			
 		}
 		
 		
@@ -556,15 +722,15 @@ ui_DrawEverything(ByRef Variable,bildw,bildh)
 		MouseGetPos,mx2,my2 ;Get the mouse position
 		mx3:=mx2-guipicx ;calculate the mouse position relative to the picture
 		my3:=my2-guipicy
-		middlePointOfMoveButtonX:=(mx3)/zoomfactor+offsetx
-		middlePointOfMoveButtonY:=(my3)/zoomfactor+offsety
+		middlePointOfMoveButtonX:=(mx3)/zoomfactor 
+		middlePointOfMoveButtonY:=(my3)/zoomfactor 
 		
 		Gdip_DrawImage(G, pBitmapMove, (middlePointOfMoveButtonX - (SizeOfButtons*0.5) )*zoomFactor, ( middlePointOfMoveButtonY - (SizeOfButtons*0.5)) *zoomFactor, SizeOfButtons*zoomFactor, SizeOfButtons*zoomFactor , 0, 0, 48, 48)
 		
 	}
 	
 	;At the end draw the menu bar
-	Gdip_FillRectangle(G, pBrushUnmark, ((0)*zoomFactor), ((0)*zoomFactor), ((NewElementIconWidth *1.2)*zoomFactor *2), ((NewElementIconHeight * 1.2)*zoomFactor)) ;Draw a white area
+	Gdip_FillRectangle(G, pBrushUnmark, ((0)*zoomFactor), ((0)*zoomFactor), ((NewElementIconWidth *1.2)*zoomFactor *3), ((NewElementIconHeight * 1.2)*zoomFactor)) ;Draw a white area
 	
 	;Draw an action
 	;Gdip_FillRectangle(G, pBrushUnmark, ((ElementWidth *0.1)*zoomFactor), ((ElementHeight * 0.1)*zoomFactor), ((ElementWidth )*zoomFactor), ((ElementHeight )*zoomFactor))
@@ -574,6 +740,10 @@ ui_DrawEverything(ByRef Variable,bildw,bildh)
 	;Draw a condition
 	Gdip_DrawLines(G, pPenGrey,(((NewElementIconWidth *1.3)+NewElementIconWidth/2)*zoomFactor) "," (((NewElementIconHeight * 0.1)+0)*zoomFactor) "|" (((NewElementIconWidth *1.3)+NewElementIconWidth)*zoomFactor) "," (((NewElementIconHeight * 0.1)+NewElementIconHeight/2)*zoomFactor) "|" (((NewElementIconWidth *1.3)+NewElementIconWidth/2)*zoomFactor) "," (((NewElementIconHeight * 0.1)+NewElementIconHeight)*zoomFactor) "|" (((NewElementIconWidth *1.3)+0)*zoomFactor) "," (((NewElementIconHeight * 0.1)+NewElementIconHeight/2)*zoomFactor) "|" (((NewElementIconWidth *1.3)+NewElementIconWidth/2)*zoomFactor) "," (((NewElementIconHeight * 0.1)+0)*zoomFactor))
 	Gdip_TextToGraphics(G, lang("Create new condition"), "x" ((NewElementIconWidth *1.3)*zoomFactor+4) " y" ((NewElementIconHeight * 0.1)*zoomFactor+4) " vCenter " TextOptions , Font, ((NewElementIconWidth)*zoomFactor-8), ((NewElementIconHeight)*zoomFactor-8))
+	
+	;Draw a loop
+	Gdip_DrawLines(G, pPenGrey,((NewElementIconWidth *2.5)*zoomFactor) "," ((NewElementIconHeight * 0.1)*zoomFactor) "|" (((NewElementIconWidth *2.5)+NewElementIconWidth)*zoomFactor) "," ((NewElementIconHeight * 0.1)*zoomFactor) "|"  (((NewElementIconWidth *2.5)+NewElementIconWidth)*zoomFactor) "," (((NewElementIconHeight * 0.1)+NewElementIconHeight/2)*zoomFactor) "|"(((NewElementIconWidth *2.5)+NewElementIconWidth/6)*zoomFactor) "," (((NewElementIconHeight * 0.1)+NewElementIconHeight/2)*zoomFactor) "|" (((NewElementIconWidth *2.5)+NewElementIconWidth/6)*zoomFactor) "," (((NewElementIconHeight * 0.1)+NewElementIconHeight*5/6)*zoomFactor) "|" (((NewElementIconWidth *2.5)+NewElementIconWidth)*zoomFactor) "," (((NewElementIconHeight * 0.1)+NewElementIconHeight*5/6)*zoomFactor) "|" (((NewElementIconWidth *2.5)+NewElementIconWidth)*zoomFactor) "," (((NewElementIconHeight * 0.1)+NewElementIconHeight)*zoomFactor) "|" (((NewElementIconWidth *2.5))*zoomFactor) "," (((NewElementIconHeight * 0.1)+NewElementIconHeight)*zoomFactor) "|" ((NewElementIconWidth *2.5)*zoomFactor) "," ((NewElementIconHeight * 0.1)*zoomFactor)  )
+	Gdip_TextToGraphics(G, lang("Create new loop"), "x" ((NewElementIconWidth *2.5)*zoomFactor+4) " y" ((NewElementIconHeight * 0.1)*zoomFactor+4) " vCenter " TextOptions , Font, ((NewElementIconWidth)*zoomFactor-8), ((NewElementIconHeight)*zoomFactor-8))
 	
 
 

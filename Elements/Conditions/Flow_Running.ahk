@@ -1,10 +1,10 @@
 ﻿iniAllConditions.="Flow_Running|" ;Add this condition to list of all conditions on initialisation
 
-runConditionFlow_Running(InstanceID,ElementID,ElementIDInInstance)
+runConditionFlow_Running(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	
-	tempFlowName:=%ElementID%flowName
+	tempFlowName:=v_replaceVariables(InstanceID,ThreadID,%ElementID%flowName)
 	
 	
 	
@@ -19,13 +19,13 @@ runConditionFlow_Running(InstanceID,ElementID,ElementIDInInstance)
 		sleep 10
 	}
 	if returnedWhetherFlowIsRunning=running
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"yes")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"yes")
 	else if returnedWhetherFlowIsRunning=stopped
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"no")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"no")
 	else if returnedWhetherFlowIsRunning=ǸoⱾuchȠaⱮe
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 	else 
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 	
 	
 	

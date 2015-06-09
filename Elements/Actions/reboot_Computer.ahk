@@ -1,12 +1,12 @@
 ﻿iniAllActions.="Reboot_Computer|" ;Add this action to list of all actions on initialisation
 
-runActionReboot_Computer(InstanceID,ElementID,ElementIDInInstance)
+runActionReboot_Computer(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	
 	shutdown,2
 	
-	MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	return
 }
 getNameActionReboot_Computer()

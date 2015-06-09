@@ -1,6 +1,6 @@
 ﻿iniAllActions.="Get_Volume|" ;Add this action to list of all actions on initialisation
 
-runActionGet_Volume(InstanceID,ElementID,ElementIDInInstance)
+runActionGet_Volume(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	local temp
@@ -8,8 +8,8 @@ runActionGet_Volume(InstanceID,ElementID,ElementIDInInstance)
 	
 	SoundGet,temp
 
-	v_setVariable(InstanceID,"t_volume",round(temp,1))
-	MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+	v_setVariable(InstanceID,ThreadID,"t_volume",round(temp,1))
+	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	return
 
 }

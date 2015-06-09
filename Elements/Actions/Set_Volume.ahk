@@ -1,27 +1,27 @@
 ﻿iniAllActions.="Set_Volume|" ;Add this action to list of all actions on initialisation
 
-runActionSet_Volume(InstanceID,ElementID,ElementIDInInstance)
+runActionSet_Volume(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	local temp
 	
 	if %ElementID%Relatively
 	{
-		temp:=v_replaceVariables(InstanceID,%ElementID%volumeRelative)
+		temp:=v_replaceVariables(InstanceID,ThreadID,%ElementID%volumeRelative)
 		if temp<0
-			SoundSet,v_replaceVariables(InstanceID,%ElementID%volumeRelative)
+			SoundSet,v_replaceVariables(InstanceID,ThreadID,%ElementID%volumeRelative)
 		else
-			SoundSet,"+" v_replaceVariables(InstanceID,%ElementID%volumeRelative)
+			SoundSet,"+" v_replaceVariables(InstanceID,ThreadID,%ElementID%volumeRelative)
 	}
 	else
 	{
-		SoundSet,v_replaceVariables(InstanceID,%ElementID%volume)
+		SoundSet,v_replaceVariables(InstanceID,ThreadID,%ElementID%volume)
 	}
 	
 	SoundGet,temp
-	v_setVariable(InstanceID,"t_volume",round(temp,1))
+	v_setVariable(InstanceID,ThreadID,"t_volume",round(temp,1))
 	
-	MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	return
 
 }

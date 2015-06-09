@@ -1,31 +1,31 @@
 ﻿iniAllActions.="Add_to_list|" ;Add this action to list of all actions on initialisation
 
-runActionAdd_to_list(InstanceID,ElementID,ElementIDInInstance)
+runActionAdd_to_list(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	local temp
 	local varvalue
 	local varvalues
-	local Varname:=v_replaceVariables(InstanceID,%ElementID%Varname)
-	local Position:=v_replaceVariables(InstanceID,%ElementID%Position)
-	local tempObject:=v_getVariable(InstanceID,Varname,"list")
+	local Varname:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname)
+	local Position:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Position)
+	local tempObject:=v_getVariable(InstanceID,ThreadID,Varname,"list")
 	
 	if (!(IsObject(tempObject)))
 	{
-		if tempObject=""
+		if tempObject=
 			tempObject:=Object()
 		else
-			MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 	}
 	
 	if (%ElementID%NumberOfElements=1) ;Add one element
 	{
-		varvalue:=v_replaceVariables(InstanceID,%ElementID%varvalue)
+		varvalue:=v_replaceVariables(InstanceID,ThreadID,%ElementID%varvalue)
 		
 		if %ElementID%isExpression=1
-			temp:=v_replaceVariables(InstanceID,%ElementID%VarValue)
+			temp:=v_replaceVariables(InstanceID,ThreadID,%ElementID%VarValue)
 		else
-			temp:=v_EvaluateExpression(InstanceID,%ElementID%VarValue)
+			temp:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%VarValue)
 		
 		if %ElementID%WhitchPosition=1
 		{
@@ -42,7 +42,7 @@ runActionAdd_to_list(InstanceID,ElementID,ElementIDInInstance)
 	}
 	else ;Add multiple elements
 	{
-		varvalues:=v_replaceVariables(InstanceID,%ElementID%varvalues)
+		varvalues:=v_replaceVariables(InstanceID,ThreadID,%ElementID%varvalues)
 		
 		if %ElementID%DelimiterLinefeed
 			StringReplace,varvalues,varvalues,`n,▬,all
@@ -76,9 +76,9 @@ runActionAdd_to_list(InstanceID,ElementID,ElementIDInInstance)
 			}
 		}
 	}
-	v_SetVariable(InstanceID,Varname,tempObject,"list")
+	v_SetVariable(InstanceID,ThreadID,Varname,tempObject,"list")
 	
-	MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	
 
 	

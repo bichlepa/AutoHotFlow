@@ -6,6 +6,10 @@ SetBatchLines -1
 DetectHiddenWindows on
 #SingleInstance force
 
+
+if not a_iscompiled
+	developing=yes
+
 allGlobalVariableNames=|
 
 IDCount2=1
@@ -303,6 +307,8 @@ shuttingDown=true
 ;~ }
 exitapp
 
+/*
 f10::
 debug()
 return
+*/

@@ -1,6 +1,6 @@
 ﻿iniAllConditions.="key_is_down|" ;Add this condition to list of all conditions on initialisation
 
-runConditionkey_is_down(InstanceID,ElementID,ElementIDInInstance)
+runConditionkey_is_down(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 
@@ -11,11 +11,11 @@ runConditionkey_is_down(InstanceID,ElementID,ElementIDInInstance)
 	
 	
 	if (tempKeyState="d")
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"yes")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"yes")
 	else if (tempKeyState="u")
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"no")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"no")
 	else
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 	 
 	
 }

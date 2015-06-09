@@ -1,11 +1,11 @@
 ﻿iniAllActions.="Shuffle_list|" ;Add this action to list of all actions on initialisation
 
-runActionShuffle_list(InstanceID,ElementID,ElementIDInInstance)
+runActionShuffle_list(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 
-	local Varname:=v_replaceVariables(InstanceID,%ElementID%Varname)
-	local tempList:=v_getVariable(InstanceID,Varname,"list")
+	local Varname:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname)
+	local tempList:=v_getVariable(InstanceID,ThreadID,Varname,"list")
 	local tempObject:=Object()
 	local tempkey
 	local tempvalue
@@ -50,13 +50,13 @@ runActionShuffle_list(InstanceID,ElementID,ElementIDInInstance)
 			tempList.Insert(tempvalue)
 			
 		}
-		v_SetVariable(InstanceID,Varname,tempList,"list")
+		v_SetVariable(InstanceID,ThreadID,Varname,tempList,"list")
 		
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 		
 	}
 	else
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 	
 
 	return

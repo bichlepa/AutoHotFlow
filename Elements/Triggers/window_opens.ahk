@@ -4,15 +4,15 @@ EnableTriggerWindow_Opens(ID)
 {
 	global
 	
-	tempWinTitle:=v_replaceVariables(0,%ID%Wintitle)
-	tempWinText:=v_replaceVariables(0,%ID%winText)
-	tempExcludeTitle:=v_replaceVariables(0,%ID%excludeTitle)
-	tempExcludeText:=v_replaceVariables(0,%ID%ExcludeText)
+	tempWinTitle:=v_replaceVariables(0,0,%ID%Wintitle)
+	tempWinText:=v_replaceVariables(0,0,%ID%winText)
+	tempExcludeTitle:=v_replaceVariables(0,0,%ID%excludeTitle)
+	tempExcludeText:=v_replaceVariables(0,0,%ID%ExcludeText)
 	tempTitleMatchMode :=%ID%TitleMatchMode
-	tempahk_class:=v_replaceVariables(0,%ID%ahk_class)
-	tempahk_exe:=v_replaceVariables(0,%ID%ahk_exe)
-	tempahk_id:=v_replaceVariables(0,%ID%ahk_id)
-	tempahk_pid:=v_replaceVariables(0,%ID%ahk_pid)
+	tempahk_class:=v_replaceVariables(0,0,%ID%ahk_class)
+	tempahk_exe:=v_replaceVariables(0,0,%ID%ahk_exe)
+	tempahk_id:=v_replaceVariables(0,0,%ID%ahk_id)
+	tempahk_pid:=v_replaceVariables(0,0,%ID%ahk_pid)
 	
 	
 	tempwinwaitstring=%tempWinTitle%

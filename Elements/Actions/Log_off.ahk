@@ -1,12 +1,12 @@
 ﻿iniAllActions.="Log_Off|" ;Add this action to list of all actions on initialisation
 
-runActionLog_Off(InstanceID,ElementID,ElementIDInInstance)
+runActionLog_Off(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	
 	shutdown,0
 	
-	MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	return
 }
 getNameActionLog_Off()

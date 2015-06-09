@@ -1,7 +1,23 @@
 ﻿i_loadFromClipboard()
 {
 	global
+	local TempMouseX
+	local TempMouseY
+	local TempControl
+	local tempWin
+	local tempOffsetX
+	local tempOffsetY
+	local tempPosUnderMouseX
+	local tempPosUnderMouseY
+	local tempOffsetAlreadySet
+	local tempfound
+	local tempx
+	local tempy
 	
+	if (busy=true)
+		return
+	
+	busy:=true
 	ui_disablemaingui()
 	
 	
@@ -10,6 +26,17 @@
 	ToolTip(lang("loading from clipboard"),100000)
 	tempClipboardconnectionList:=Object()
 	markelement()  ;Unmark all elements
+	
+	;Find mouse position and find out whether the mouse is hovering the editor
+	MouseGetPos,TempMouseX,TempMouseY,tempWin,TempControl,2
+	
+	;MsgBox % tempWin "`n" MainGuihwnd "`n" TempControl "`n" PicFlowHWND
+	If (tempWin= MainGuihwnd and TempControl=PicFlowHWND)
+	{
+		tempPosUnderMouseX:=((TempMouseX)/zoomfactor)+offsetx
+		tempPosUnderMouseY:=((TempMouseY)/zoomfactor)+offsety
+	}
+		
 	
 	loop
 	{
@@ -32,7 +59,8 @@
 			Iniread,tempClipboardconnection%loadElementID%to,%ClipboardFlowFilename%,element%index1%,to
 			Iniread,tempClipboardconnection%loadElementID%ConnectionType,%ClipboardFlowFilename%,element%index1%,ConnectionType
 			
-			
+			Iniread,tempClipboardconnection%loadElementID%fromPart,%ClipboardFlowFilename%,element%index1%,fromPart,%A_Space%
+			Iniread,tempClipboardconnection%loadElementID%ToPart,%ClipboardFlowFilename%,element%index1%,toPart,%A_Space%
 		}
 		else if (loadElementType="Trigger")
 		{
@@ -45,11 +73,12 @@
 				tempNewID:=e_NewAction()
 			else if (loadElementType="condition")
 				tempNewID:=e_Newcondition()
+			else if (loadElementType="loop")
+				tempNewID:=e_NewLoop()
 			;allElements.insert(tempNewID)
 			tempClipboardMap%loadElementID%:=tempNewID ;Needed to realize connections later
 			markelement(tempNewID,"true")
 			%tempNewID%running=0
-			
 			
 			
 			Iniread,loadElementname,%ClipboardFlowFilename%,element%index1%,name
@@ -58,17 +87,53 @@
 			Iniread,loadElementX,%ClipboardFlowFilename%,element%index1%,x
 			Iniread,loadElementY,%ClipboardFlowFilename%,element%index1%,y
 			
+			if (tempOffsetAlreadySet!=true)
+			{
+				if tempPosUnderMouseX
+				{
+					tempOffsetX:=ui_FitGridX(tempPosUnderMouseX-loadElementX -0.5*ElementWidth) 
+					tempOffsetY:=ui_FitGridY(tempPosUnderMouseY-loadElementY - 0.5* ElementHeight)
+				}
+				else
+				{
+					Loop
+					{
+						tempfound:=false
+						tempX:=ui_FitGridX(loadElementX+ElementWidth*0.25*A_Index)
+						tempY:=ui_FitGridY(loadElementY+ElementWidth*0.25*A_Index)
+						for SaveIndex1, saveElementID in allElements
+						{
+							if (tempX=%saveElementID%x and tempY=%saveElementID%y)
+							{
+								tempfound:=true
+								break
+							}
+						}
+						if (tempfound=false)
+						{
+							tempOffsetX:=ElementWidth*0.25*A_Index
+							tempOffsetY:=ElementWidth*0.25*A_Index
+							break
+						}
+					}
+					
+				}
+				tempOffsetAlreadySet:=true
+			}
 			
 			%tempNewID%Name=%loadElementname%
-			%tempNewID%x=%loadElementX%
-			%tempNewID%y=%loadElementY%
+			%tempNewID%x:=loadElementX+tempOffsetX
+			%tempNewID%y:=loadElementY+tempOffsetY
 			
 			
 			Iniread,loadElementsubType,%ClipboardFlowFilename%,element%index1%,subType
 			%tempNewID%subType=%loadElementsubType%
 			
-			
-			
+			if (loadElementType="loop")
+			{
+				Iniread,loadElementHeightOfVerticalBar,%ClipboardFlowFilename%,element%index1%,HeightOfVerticalBar
+				%loadElementID%HeightOfVerticalBar=%loadElementHeightOfVerticalBar%
+			}
 			
 			parametersToload:=getParameters%loadElementType%%loadElementsubType%()
 			for index2, parameter in parametersToload
@@ -91,34 +156,34 @@
 					%tempNewID%%temponeparname%=%tempContent%
 				}
 			}
-				
-			
-			
 			
 		}
 		
 		ui_draw()
 		
 		
-		
 	}
 	for SaveIndex1, LoadElementID in tempClipboardconnectionList
-		{
-			
-			tempFrom:=tempClipboardconnection%LoadElementID%from
-			tempTo:=tempClipboardconnection%LoadElementID%to
-			
-			
-			e_newConnection(tempClipboardMap%tempFrom%,tempClipboardMap%tempTo%,tempClipboardconnection%LoadElementID%ConnectionType)
-			
-		}
+	{
+		tempFrom:=tempClipboardconnection%LoadElementID%from
+		tempTo:=tempClipboardconnection%LoadElementID%to
+		
+		
+		tempConn:=e_newConnection(tempClipboardMap%tempFrom%,tempClipboardMap%tempTo%,tempClipboardconnection%LoadElementID%ConnectionType)
+		
+		if tempClipboardconnection%loadElementID%fromPart!=
+			%tempConn%fromPart:=tempClipboardconnection%loadElementID%fromPart
+		if tempClipboardconnection%loadElementID%toPart!=
+			%tempConn%toPart:=tempClipboardconnection%loadElementID%toPart
+	}
 	ToolTip(lang("loaded"),1000)
 	e_UpdateTriggerName()
 	
 	
 	ui_EnableMainGUI()
-	d_logger("Flow loaded`nName: "FlowName)
+	d_logger("Loaded Elements from clipboard")
 	ui_draw()
-	saved=yes
+
+	busy:=false
 }
 

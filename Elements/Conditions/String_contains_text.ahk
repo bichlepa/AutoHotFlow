@@ -1,6 +1,6 @@
 ﻿iniAllConditions.="String_contains_text|" ;Add this condition to list of all conditions on initialisation
 
-runConditionString_contains_text(InstanceID,ElementID,ElementIDInInstance)
+runConditionString_contains_text(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	local temp
@@ -8,15 +8,15 @@ runConditionString_contains_text(InstanceID,ElementID,ElementIDInInstance)
 	local tempSearchText
 	
 	if %ElementID%expression=1
-		tempVarValue:=v_replaceVariables(InstanceID,%ElementID%VarValue)
+		tempVarValue:=v_replaceVariables(InstanceID,ThreadID,%ElementID%VarValue)
 	else
-		tempVarValue:=v_EvaluateExpression(InstanceID,%ElementID%VarValue)
+		tempVarValue:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%VarValue)
 	if %ElementID%IsExpressionSearchText=1
-		tempSearchText:=v_replaceVariables(InstanceID,%ElementID%SearchText)
+		tempSearchText:=v_replaceVariables(InstanceID,ThreadID,%ElementID%SearchText)
 	else
-		tempSearchText:=v_EvaluateExpression(InstanceID,%ElementID%SearchText)
+		tempSearchText:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%SearchText)
 	
-	
+	;~ MsgBox %tempVarValue% - %tempSearchText% 
 	
 	if %ElementID%WhereToBegin=3 ;Search somewhere
 	{
@@ -27,12 +27,12 @@ runConditionString_contains_text(InstanceID,ElementID,ElementIDInInstance)
 		IfInString, tempVarValue,%tempSearchText%
 		{
 			StringCaseSense,off
-			MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"yes")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"yes")
 		}
 		else
 		{
 			StringCaseSense,off
-			MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"no")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"no")
 		}
 	}
 	else if %ElementID%WhereToBegin=1 ;Starts with
@@ -41,16 +41,16 @@ runConditionString_contains_text(InstanceID,ElementID,ElementIDInInstance)
 		if %ElementID%CaseSensitive=1 ;Case insensitive
 		{
 			if (temp=tempSearchText)
-				MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"yes")
+				MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"yes")
 			else
-				MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"no")
+				MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"no")
 		}
 		else
 		{
 			if (temp==tempSearchText)
-				MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"yes")
+				MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"yes")
 			else
-				MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"no")
+				MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"no")
 		}
 	}
 	else if %ElementID%WhereToBegin=2 ;Ends with
@@ -60,16 +60,16 @@ runConditionString_contains_text(InstanceID,ElementID,ElementIDInInstance)
 		if %ElementID%CaseSensitive=1 ;Case insensitive
 		{
 			if (temp=tempSearchText)
-				MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"yes")
+				MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"yes")
 			else
-				MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"no")
+				MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"no")
 		}
 		else
 		{
 			if (temp==tempSearchText)
-				MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"yes")
+				MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"yes")
 			else
-				MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"no")
+				MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"no")
 		}
 	}
 	

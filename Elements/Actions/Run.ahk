@@ -1,21 +1,21 @@
 ﻿iniAllActions.="Run|" ;Add this action to list of all actions on initialisation
 
-runActionRun(InstanceID,ElementID,ElementIDInInstance)
+runActionRun(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	if ( %ElementID%ReplaceVariables)
 		run, % %ElementID%ToRun, UseErrorLevel,ActionRuntempPid 
 	else
-		run, % v_replaceVariables(InstanceID,%ElementID%ToRun), UseErrorLevel,ActionRuntempPid
+		run, % v_replaceVariables(InstanceID,ThreadID,%ElementID%ToRun), UseErrorLevel,ActionRuntempPid
 	
 	if (ErrorLevel)
 	{
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 	}
 	else
 	{
-		v_setVariable(InstanceID,t_pid,ActionRuntempPid)
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+		v_setVariable(InstanceID,ThreadID,"t_pid",ActionRuntempPid)
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	}
 	return
 }

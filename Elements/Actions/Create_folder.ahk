@@ -1,14 +1,14 @@
 ﻿iniAllActions.="Create_folder|" ;Add this action to list of all actions on initialisation
 
-runActionCreate_folder(InstanceID,ElementID,ElementIDInInstance)
+runActionCreate_folder(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	
-	FileCreateDir,% v_replaceVariables(InstanceID,%ElementID%folder)
+	FileCreateDir,% v_replaceVariables(InstanceID,ThreadID,%ElementID%folder)
 	if ErrorLevel
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 	else
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	return
 }
 getNameActionCreate_folder()

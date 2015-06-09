@@ -1,16 +1,16 @@
 ﻿iniAllActions.="Move_folder|" ;Add this action to list of all actions on initialisation
 
-runActionMove_folder(InstanceID,ElementID,ElementIDInInstance)
+runActionMove_folder(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	
 	
-	FileMoveDir,% v_replaceVariables(InstanceID,%ElementID%folder),% v_replaceVariables(InstanceID,%ElementID%destFolder),% %ElementID%Overwrite
+	FileMoveDir,% v_replaceVariables(InstanceID,ThreadID,%ElementID%folder),% v_replaceVariables(InstanceID,ThreadID,%ElementID%destFolder),% %ElementID%Overwrite
 	
 	if ErrorLevel
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 	else
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	return
 }
 getNameActionMove_folder()

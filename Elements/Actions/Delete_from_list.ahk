@@ -1,12 +1,12 @@
 ﻿iniAllActions.="Delete_from_list|" ;Add this action to list of all actions on initialisation
 
-runActionDelete_from_list(InstanceID,ElementID,ElementIDInInstance)
+runActionDelete_from_list(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 
-	local Varname:=v_replaceVariables(InstanceID,%ElementID%Varname)
-	local Position:=v_replaceVariables(InstanceID,%ElementID%Position)
-	local tempObject:=v_getVariable(InstanceID,Varname,"list")
+	local Varname:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname)
+	local Position:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Position)
+	local tempObject:=v_getVariable(InstanceID,ThreadID,Varname,"list")
 	
 	;MsgBox,%  %ElementID%Varname "---" %ElementID%VarValue "---" v_replaceVariables(InstanceID,%ElementID%Varname) "---" v_replaceVariables(InstanceID,%ElementID%VarValue)
 	
@@ -29,13 +29,13 @@ runActionDelete_from_list(InstanceID,ElementID,ElementIDInInstance)
 			tempObject.Remove(Position)
 		}
 		
-		v_SetVariable(InstanceID,Varname,tempObject,"list")
+		v_SetVariable(InstanceID,ThreadID,Varname,tempObject,"list")
 		
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 		
 	}
 	else
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 	
 
 	return

@@ -1,18 +1,18 @@
 ﻿iniAllConditions.="Window_Exists|" ;Add this condition to list of all conditions on initialisation
 
-runConditionWindow_Exists(InstanceID,ElementID,ElementIDInInstance)
+runConditionWindow_Exists(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	
-	tempWinTitle:=v_replaceVariables(InstanceID,%ElementID%Wintitle)
-	tempWinText:=v_replaceVariables(InstanceID,%ElementID%winText)
-	tempExcludeTitle:=v_replaceVariables(InstanceID,%ElementID%excludeTitle)
-	tempExcludeText:=v_replaceVariables(InstanceID,%ElementID%ExcludeText)
+	tempWinTitle:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Wintitle)
+	tempWinText:=v_replaceVariables(InstanceID,ThreadID,%ElementID%winText)
+	tempExcludeTitle:=v_replaceVariables(InstanceID,ThreadID,%ElementID%excludeTitle)
+	tempExcludeText:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ExcludeText)
 	tempTitleMatchMode :=%ElementID%TitleMatchMode
-	tempahk_class:=v_replaceVariables(InstanceID,%ElementID%ahk_class)
-	tempahk_exe:=v_replaceVariables(InstanceID,%ElementID%ahk_exe)
-	tempahk_id:=v_replaceVariables(InstanceID,%ElementID%ahk_id)
-	tempahk_pid:=v_replaceVariables(InstanceID,%ElementID%ahk_pid)
+	tempahk_class:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ahk_class)
+	tempahk_exe:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ahk_exe)
+	tempahk_id:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ahk_id)
+	tempahk_pid:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ahk_pid)
 	
 	tempwinstring=%tempWinTitle%
 	if tempahk_class<>
@@ -37,13 +37,13 @@ runConditionWindow_Exists(InstanceID,ElementID,ElementIDInInstance)
 	{
 		DetectHiddenWindows %tempCurrentDetectHiddenWindows%
 		
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"yes")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"yes")
 	}
 	else
 	{
 		DetectHiddenWindows %tempCurrentDetectHiddenWindows%
 		
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"no")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"no")
 	}
 	;the code should not pass here
 	DetectHiddenWindows %tempCurrentDetectHiddenWindows%

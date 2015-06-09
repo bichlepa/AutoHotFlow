@@ -1,18 +1,18 @@
 ﻿iniAllActions.="Move_window|" ;Add this action to list of all actions on initialisation
 
-runActionMove_window(InstanceID,ElementID,ElementIDInInstance)
+runActionMove_window(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	
-	local tempWinTitle:=v_replaceVariables(InstanceID,%ElementID%Wintitle)
-	local tempWinText:=v_replaceVariables(InstanceID,%ElementID%winText)
-	local tempExcludeTitle:=v_replaceVariables(InstanceID,%ElementID%excludeTitle)
-	local tempExcludeText:=v_replaceVariables(InstanceID,%ElementID%ExcludeText)
+	local tempWinTitle:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Wintitle)
+	local tempWinText:=v_replaceVariables(InstanceID,ThreadID,%ElementID%winText)
+	local tempExcludeTitle:=v_replaceVariables(InstanceID,ThreadID,%ElementID%excludeTitle)
+	local tempExcludeText:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ExcludeText)
 	local tempTitleMatchMode :=%ElementID%TitleMatchMode
-	local tempahk_class:=v_replaceVariables(InstanceID,%ElementID%ahk_class)
-	local tempahk_exe:=v_replaceVariables(InstanceID,%ElementID%ahk_exe)
-	local tempahk_id:=v_replaceVariables(InstanceID,%ElementID%ahk_id)
-	local tempahk_pid:=v_replaceVariables(InstanceID,%ElementID%ahk_pid)
+	local tempahk_class:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ahk_class)
+	local tempahk_exe:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ahk_exe)
+	local tempahk_id:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ahk_id)
+	local tempahk_pid:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ahk_pid)
 	
 	local tempwinstring:=tempWinTitle
 	if tempahk_class<>
@@ -37,12 +37,12 @@ runActionMove_window(InstanceID,ElementID,ElementIDInInstance)
 		else if %ElementID%WinMoveEvent=3
 			WinRestore,%tempwinstring%,%tempWinText%,%tempExcludeTitle%,%tempExcludeText%
 		else if %ElementID%WinMoveEvent=4
-			Winmove,%tempwinstring%,%tempWinText%,% v_replaceVariables(InstanceID,%ElementID%Xpos),% v_replaceVariables(InstanceID,%ElementID%Ypos),% v_replaceVariables(InstanceID,%ElementID%Width),% v_replaceVariables(InstanceID,%ElementID%Height),%tempExcludeTitle%,%tempExcludeText%
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+			Winmove,%tempwinstring%,%tempWinText%,% v_replaceVariables(InstanceID,ThreadID,%ElementID%Xpos),% v_replaceVariables(InstanceID,ThreadID,%ElementID%Ypos),% v_replaceVariables(InstanceID,ThreadID,%ElementID%Width),% v_replaceVariables(InstanceID,ThreadID,%ElementID%Height),%tempExcludeTitle%,%tempExcludeText%
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	}
 	else
 	{
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"Exception")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"Exception")
 		
 	}
 

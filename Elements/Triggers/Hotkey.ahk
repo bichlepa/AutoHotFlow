@@ -19,15 +19,15 @@ EnableTriggerHotkey(ElementID)
 	
 	if (%ElementID%UseWindow =2 or %ElementID%UseWindow =3)
 	{
-		tempWinTitle:=v_replaceVariables(InstanceID,%ElementID%Wintitle)
-		tempWinText:=v_replaceVariables(InstanceID,%ElementID%winText)
-		tempExcludeTitle:=v_replaceVariables(InstanceID,%ElementID%excludeTitle)
-		tempExcludeText:=v_replaceVariables(InstanceID,%ElementID%ExcludeText)
+		tempWinTitle:=v_replaceVariables(0,0,%ElementID%Wintitle)
+		tempWinText:=v_replaceVariables(0,0,%ElementID%winText)
+		tempExcludeTitle:=v_replaceVariables(0,0,%ElementID%excludeTitle)
+		tempExcludeText:=v_replaceVariables(0,0,%ElementID%ExcludeText)
 		tempTitleMatchMode :=%ElementID%TitleMatchMode
-		tempahk_class:=v_replaceVariables(InstanceID,%ElementID%ahk_class)
-		tempahk_exe:=v_replaceVariables(InstanceID,%ElementID%ahk_exe)
-		tempahk_id:=v_replaceVariables(InstanceID,%ElementID%ahk_id)
-		tempahk_pid:=v_replaceVariables(InstanceID,%ElementID%ahk_pid)
+		tempahk_class:=v_replaceVariables(0,0,%ElementID%ahk_class)
+		tempahk_exe:=v_replaceVariables(0,0,%ElementID%ahk_exe)
+		tempahk_id:=v_replaceVariables(0,0,%ElementID%ahk_id)
+		tempahk_pid:=v_replaceVariables(0,0,%ElementID%ahk_pid)
 		
 		tempwinstring=%tempWinTitle%
 		if tempahk_class<>

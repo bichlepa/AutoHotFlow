@@ -1,14 +1,14 @@
 ﻿iniAllConditions.="File_has_attribute|" ;Add this condition to list of all conditions on initialisation
 
-runConditionFile_has_attribute(InstanceID,ElementID,ElementIDInInstance)
+runConditionFile_has_attribute(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	local tempattribute
 	local tempcompare
 	
-	FileGetAttrib,tempattribute,% v_replaceVariables(InstanceID,%ElementID%file)
+	FileGetAttrib,tempattribute,% v_replaceVariables(InstanceID,ThreadID,%ElementID%file)
 	if ErrorLevel
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 	else
 	{
 		if %ElementID%Attribute=1
@@ -31,9 +31,9 @@ runConditionFile_has_attribute(InstanceID,ElementID,ElementIDInInstance)
 			tempcompare=T
 		;MsgBox %tempcompare%
 		IfInString,tempattribute,%tempcompare%
-			MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"yes")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"yes")
 		else
-			MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"no")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"no")
 	}
 	
 	

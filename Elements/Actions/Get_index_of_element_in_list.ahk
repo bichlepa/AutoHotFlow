@@ -1,19 +1,19 @@
 ﻿iniAllActions.="Get_index_of_element_in_list|" ;Add this action to list of all actions on initialisation
 
-runActionGet_index_of_element_in_list(InstanceID,ElementID,ElementIDInInstance)
+runActionGet_index_of_element_in_list(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 
-	local Varname:=v_replaceVariables(InstanceID,%ElementID%Varname)
-	local ListName:=v_replaceVariables(InstanceID,%ElementID%ListName)
+	local Varname:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname)
+	local ListName:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ListName)
 	local SearchContent
-	local tempObject:=v_getVariable(InstanceID,ListName,"list")
+	local tempObject:=v_getVariable(InstanceID,ThreadID,ListName,"list")
 	local result
 	
 	if %ElementID%isExpressionSearchContent=1
-		SearchContent:=v_replaceVariables(InstanceID,%ElementID%SearchContent)
+		SearchContent:=v_replaceVariables(InstanceID,ThreadID,%ElementID%SearchContent)
 	else
-		SearchContent:=v_EvaluateExpression(InstanceID,%ElementID%SearchContent)
+		SearchContent:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%SearchContent)
 	
 	;MsgBox,%  %ElementID%Varname "---" %ElementID%VarValue "---" v_replaceVariables(InstanceID,%ElementID%Varname) "---" v_replaceVariables(InstanceID,%ElementID%VarValue)
 	
@@ -31,22 +31,22 @@ runActionGet_index_of_element_in_list(InstanceID,ElementID,ElementIDInInstance)
 		}
 		if (found=true)
 		{
-			v_SetVariable(InstanceID,Varname,result)
-			MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+			v_SetVariable(InstanceID,ThreadID,Varname,result)
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 		}
 		else
 		{
-			v_SetVariable(InstanceID,Varname,result)
+			v_SetVariable(InstanceID,ThreadID,Varname,result)
 			if %ElementID%ExceptionWhenNotFound=1
-				MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+				MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 			else
-				MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+				MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 		}
 		
 		
 	}
 	else
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 	
 
 	return

@@ -1,20 +1,20 @@
 ﻿iniAllActions.="Kill_Process|" ;Add this action to list of all actions on initialisation
 
-RunActionKill_Process(InstanceID,ElementID,ElementIDInInstance)
+RunActionKill_Process(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	
-	Process,close, % v_replaceVariables(InstanceID,%ElementID%ProcessName) 
+	Process,close, % v_replaceVariables(InstanceID,ThreadID,%ElementID%ProcessName) 
 	
 	
 	if (ErrorLevel=0)
 	{
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 	}
 	else
 	{
-		v_setVariable(InstanceID,"t_pid",ActionKill_ProcesstempPid)
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+		v_setVariable(InstanceID,ThreadID,"t_pid",ActionKill_ProcesstempPid)
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	}
 	return
 }

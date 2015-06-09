@@ -1,16 +1,16 @@
 ﻿iniAllActions.="Send_Keystrokes_To_Control|" ;Add this action to list of all actions on initialisation
 
-runActionSend_Keystrokes_To_Control(InstanceID,ElementID,ElementIDInInstance)
+runActionSend_Keystrokes_To_Control(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	
-	local tempWinTitle:=v_replaceVariables(InstanceID,%ElementID%Wintitle)
-	local tempExcludeTitle:=v_replaceVariables(InstanceID,%ElementID%excludeTitle)
+	local tempWinTitle:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Wintitle)
+	local tempExcludeTitle:=v_replaceVariables(InstanceID,ThreadID,%ElementID%excludeTitle)
 	local tempTitleMatchMode :=%ElementID%TitleMatchMode
-	local tempahk_class:=v_replaceVariables(InstanceID,%ElementID%ahk_class)
-	local tempahk_exe:=v_replaceVariables(InstanceID,%ElementID%ahk_exe)
-	local tempahk_id:=v_replaceVariables(InstanceID,%ElementID%ahk_id)
-	local tempahk_pid:=v_replaceVariables(InstanceID,%ElementID%ahk_pid)
+	local tempahk_class:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ahk_class)
+	local tempahk_exe:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ahk_exe)
+	local tempahk_id:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ahk_id)
+	local tempahk_pid:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ahk_pid)
 	local tempID
 	
 	local tempwinstring:=tempWinTitle
@@ -39,14 +39,14 @@ runActionSend_Keystrokes_To_Control(InstanceID,ElementID,ElementIDInInstance)
 		
 		SetTitleMatchMode,%tempControlMatchMode%
 		if %ElementID%RawMode=1
-			ControlSendraw,% v_replaceVariables(InstanceID,%ElementID%Control_identifier),% v_replaceVariables(InstanceID,%ElementID%KeysToSend),ahk_id %tempID%
+			ControlSendraw,% v_replaceVariables(InstanceID,ThreadID,%ElementID%Control_identifier),% v_replaceVariables(InstanceID,ThreadID,%ElementID%KeysToSend),ahk_id %tempID%
 		else
-			ControlSend,% v_replaceVariables(InstanceID,%ElementID%Control_identifier),% v_replaceVariables(InstanceID,%ElementID%KeysToSend),ahk_id %tempID%
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+			ControlSend,% v_replaceVariables(InstanceID,ThreadID,%ElementID%Control_identifier),% v_replaceVariables(InstanceID,ThreadID,%ElementID%KeysToSend),ahk_id %tempID%
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	}
 	else
 	{
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 	}
 	
 

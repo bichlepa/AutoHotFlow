@@ -1,6 +1,6 @@
 ﻿iniAllActions.="Search_in_a_string|" ;Add this action to list of all actions on initialisation
 
-runActionSearch_in_a_string(InstanceID,ElementID,ElementIDInInstance)
+runActionSearch_in_a_string(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	local temp
@@ -11,19 +11,19 @@ runActionSearch_in_a_string(InstanceID,ElementID,ElementIDInInstance)
 	local Result
 	local Options
 	
-	tempVarname:=v_replaceVariables(InstanceID,%ElementID%Varname)
+	tempVarname:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname)
 	
 	if %ElementID%expression=1
-		temp:=v_replaceVariables(InstanceID,%ElementID%VarValue)
+		temp:=v_replaceVariables(InstanceID,ThreadID,%ElementID%VarValue)
 	else
-		temp:=v_EvaluateExpression(InstanceID,%ElementID%VarValue)
+		temp:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%VarValue)
 	if %ElementID%IsExpressionSearchText=1
-		tempSearchText:=v_replaceVariables(InstanceID,%ElementID%SearchText)
+		tempSearchText:=v_replaceVariables(InstanceID,ThreadID,%ElementID%SearchText)
 	else
-		tempSearchText:=v_EvaluateExpression(InstanceID,%ElementID%SearchText)
+		tempSearchText:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%SearchText)
 	
-	OccurenceNumber:=v_replaceVariables(InstanceID,%ElementID%OccurenceNumber)
-	Offset:=v_replaceVariables(InstanceID,%ElementID%Offset)
+	OccurenceNumber:=v_replaceVariables(InstanceID,ThreadID,%ElementID%OccurenceNumber)
+	Offset:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Offset)
 	;MsgBox,%  %ElementID%Varname "---" %ElementID%VarValue "---" v_replaceVariables(InstanceID,%ElementID%Varname) "---" v_replaceVariables(InstanceID,%ElementID%VarValue)
 	if %ElementID%CaseSensitive=2
 	{
@@ -44,13 +44,13 @@ runActionSearch_in_a_string(InstanceID,ElementID,ElementIDInInstance)
 	StringCaseSense,off
 	if errorlevel=1 ;If no string was found
 	{
-		v_SetVariable(InstanceID,tempVarname,Result+1)
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+		v_SetVariable(InstanceID,ThreadID,tempVarname,Result+1)
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 	}
 	else
 	{
-		v_SetVariable(InstanceID,tempVarname,Result+1)
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+		v_SetVariable(InstanceID,ThreadID,tempVarname,Result+1)
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	}
 	
 	

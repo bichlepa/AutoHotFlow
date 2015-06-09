@@ -1,20 +1,20 @@
 ﻿iniAllConditions.="List_contains_element|" ;Add this condition to list of all conditions on initialisation
 
-runConditionList_contains_element(InstanceID,ElementID,ElementIDInInstance)
+runConditionList_contains_element(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	local tempkey
 	local tempvalue
 	local found
 
-	local Varname:=v_replaceVariables(InstanceID,%ElementID%Varname)
-	local SearchPosition:=v_replaceVariables(InstanceID,%ElementID%Position)
-	local tempObject:=v_getVariable(InstanceID,Varname,"list")
+	local Varname:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname)
+	local SearchPosition:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Position)
+	local tempObject:=v_getVariable(InstanceID,ThreadID,Varname,"list")
 	
 	if %ElementID%isExpressionSearchContent=1
-		SearchContent:=v_replaceVariables(InstanceID,%ElementID%SearchContent)
+		SearchContent:=v_replaceVariables(InstanceID,ThreadID,%ElementID%SearchContent)
 	else
-		SearchContent:=v_EvaluateExpression(InstanceID,%ElementID%SearchContent)
+		SearchContent:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%SearchContent)
 	
 	
 	found:=false
@@ -32,11 +32,11 @@ runConditionList_contains_element(InstanceID,ElementID,ElementIDInInstance)
 			}
 			if (found=true)
 			{
-				MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"yes")
+				MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"yes")
 			}
 			else
 			{
-				MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"no")
+				MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"no")
 			}
 			
 		}
@@ -53,18 +53,18 @@ runConditionList_contains_element(InstanceID,ElementID,ElementIDInInstance)
 			}
 			if (found=true)
 			{
-				MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"yes")
+				MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"yes")
 			}
 			else
 			{
-				MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"no")
+				MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"no")
 			}
 			
 		}
 	}
 	else
 	{
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 	}
 	
 	

@@ -1,17 +1,17 @@
 ﻿iniAllActions.="AutoHotKey_script|" ;Add this action to list of all actions on initialisation
 
-runActionAutoHotKey_script(InstanceID,ElementID,ElementIDInInstance)
+runActionAutoHotKey_script(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	
-	tempscriptpath=Generated Scripts\ActionScript_Instance_%InstanceID%_%ElementID%_%ElementIDInInstance%.ahk
+	tempscriptpath=Generated Scripts\ActionScript_Instance_%InstanceID%_%ThreadID%_%ElementID%_%ElementIDInInstance%.ahk
 	;Write all local variables in the script
 	FileDelete,%tempscriptpath%
 	loop,parse,%ElementID%ExportVariables,|`,`n%a_space%
 	{
 		if A_LoopField=
 			continue
-		tempv:=v_getVariable(InstanceID,v_replaceVariables(ElementID,A_LoopField))
+		tempv:=v_getVariable(InstanceID,ThreadID,v_replaceVariables(ElementID,ThreadID,A_LoopField))
 		FileAppend,
 		(
 		%A_LoopField%:="%tempv%"
@@ -71,7 +71,7 @@ runActionAutoHotKey_script(InstanceID,ElementID,ElementIDInInstance)
 		
 		FileAppend,
 		(
-		ControlSetText,Edit1,setVariable|Instance_%InstanceID%_%ElementID%_%ElementIDInInstance%|%A_LoopField%|`%%A_LoopField%`%,CommandWindowOfEditor
+		ControlSetText,Edit1,setVariable|Instance_%InstanceID%_%ThreadID%_%ElementID%_%ElementIDInInstance%|%A_LoopField%|`%%A_LoopField%`%,CommandWindowOfEditor
 		
 		),%tempscriptpath%
 		
@@ -81,7 +81,7 @@ runActionAutoHotKey_script(InstanceID,ElementID,ElementIDInInstance)
 	;Write code for let the flow know that the script ended
 	FileAppend,
 	(
-	ControlSetText,Edit1,elementEnd|Instance_%InstanceID%_%ElementID%_%ElementIDInInstance%|normal,CommandWindowOfEditor
+	ControlSetText,Edit1,elementEnd|Instance_%InstanceID%_%ThreadID%_%ElementID%_%ElementIDInInstance%|normal,CommandWindowOfEditor
 	filedelete,`%A_ScriptFullPath`%
 	
 	),%tempscriptpath%

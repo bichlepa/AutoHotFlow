@@ -1,6 +1,6 @@
 ﻿iniAllActions.="Move_mouse|" ;Add this action to list of all actions on initialisation
 
-runActionMove_mouse(InstanceID,ElementID,ElementIDInInstance)
+runActionMove_mouse(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	
@@ -23,7 +23,7 @@ runActionMove_mouse(InstanceID,ElementID,ElementIDInInstance)
 	else
 		MouseMove,% %ElementID%Xpos,% %ElementID%Ypos,% %ElementID%speed
 	
-	MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	return
 }
 getNameActionMove_mouse()

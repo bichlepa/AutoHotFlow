@@ -1,13 +1,13 @@
 ﻿iniAllConditions.="Expression|" ;Add this condition to list of all conditions on initialisation
 
-runConditionExpression(InstanceID,ElementID,ElementIDInInstance)
+runConditionExpression(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	
 	global
-	if (v_EvaluateExpression(InstanceID,%ElementID%Expression))
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"yes")
+	if (v_EvaluateExpression(InstanceID,ThreadID,%ElementID%Expression))
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"yes")
 	else
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"no")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"no")
 }
 
 

@@ -1,16 +1,16 @@
 ﻿iniAllConditions.="Variable_is_empty|" ;Add this condition to list of all conditions on initialisation
 
-runConditionVariable_is_empty(InstanceID,ElementID,ElementIDInInstance)
+runConditionVariable_is_empty(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	
-	local Varname:=v_replaceVariables(InstanceID,%ElementID%Varname)
-	local VarContent:=v_getVariable(InstanceID,Varname)
+	local Varname:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname)
+	local VarContent:=v_getVariable(InstanceID,ThreadID,Varname)
 	;MsgBox "%VarContent%"
 	if (VarContent="")
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"yes")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"yes")
 	else
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"no")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"no")
 }
 
 

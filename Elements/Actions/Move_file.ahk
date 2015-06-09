@@ -1,16 +1,16 @@
 ﻿iniAllActions.="Move_file|" ;Add this action to list of all actions on initialisation
 
-runActionMove_file(InstanceID,ElementID,ElementIDInInstance)
+runActionMove_file(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	
 	
-	FileMove,% v_replaceVariables(InstanceID,%ElementID%file),% v_replaceVariables(InstanceID,%ElementID%destFile),% %ElementID%Overwrite
+	FileMove,% v_replaceVariables(InstanceID,ThreadID,%ElementID%file),% v_replaceVariables(InstanceID,ThreadID,%ElementID%destFile),% %ElementID%Overwrite
 	
 	if ErrorLevel
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 	else
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	return
 }
 getNameActionMove_file()

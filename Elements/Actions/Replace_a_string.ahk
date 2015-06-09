@@ -1,6 +1,6 @@
 ﻿iniAllActions.="Replace_a_string|" ;Add this action to list of all actions on initialisation
 
-runActionReplace_a_string(InstanceID,ElementID,ElementIDInInstance)
+runActionReplace_a_string(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	local temp
@@ -10,20 +10,20 @@ runActionReplace_a_string(InstanceID,ElementID,ElementIDInInstance)
 	local Result
 	local Options
 	
-	tempVarname:=v_replaceVariables(InstanceID,%ElementID%Varname)
+	tempVarname:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname)
 	
 	if %ElementID%expression=1
-		temp:=v_replaceVariables(InstanceID,%ElementID%VarValue)
+		temp:=v_replaceVariables(InstanceID,ThreadID,%ElementID%VarValue)
 	else
-		temp:=v_EvaluateExpression(InstanceID,%ElementID%VarValue)
+		temp:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%VarValue)
 	if %ElementID%IsExpressionSearchText=1
-		tempSearchText:=v_replaceVariables(InstanceID,%ElementID%SearchText)
+		tempSearchText:=v_replaceVariables(InstanceID,ThreadID,%ElementID%SearchText)
 	else
-		tempSearchText:=v_EvaluateExpression(InstanceID,%ElementID%SearchText)
+		tempSearchText:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%SearchText)
 	if %ElementID%isExpressionReplaceText=1
-		tempReplaceText:=v_replaceVariables(InstanceID,%ElementID%ReplaceText)
+		tempReplaceText:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ReplaceText)
 	else
-		tempReplaceText:=v_EvaluateExpression(InstanceID,%ElementID%ReplaceText)
+		tempReplaceText:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%ReplaceText)
 	;MsgBox,%  %ElementID%Varname "---" %ElementID%VarValue "---" v_replaceVariables(InstanceID,%ElementID%Varname) "---" v_replaceVariables(InstanceID,%ElementID%VarValue)
 	if %ElementID%CaseSensitive=2
 	{
@@ -37,15 +37,15 @@ runActionReplace_a_string(InstanceID,ElementID,ElementIDInInstance)
 		StringCaseSense,off
 		if errorlevel=0 ;If no string was found
 		{
-			v_SetVariable(InstanceID,tempVarname,"")
-			MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+			v_SetVariable(InstanceID,ThreadID,tempVarname,"")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 		}
 		else
 		{
 			
-			v_SetVariable(InstanceID,tempVarname,Result)
-			v_SetVariable(InstanceID,"t_NumberOfReplacements",errorlevel)
-			MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+			v_SetVariable(InstanceID,ThreadID,tempVarname,Result)
+			v_SetVariable(InstanceID,ThreadID,"t_NumberOfReplacements",errorlevel)
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 		}
 	}
 	else
@@ -54,14 +54,14 @@ runActionReplace_a_string(InstanceID,ElementID,ElementIDInInstance)
 		StringCaseSense,off
 		if errorlevel=1 ;If no string was found
 		{
-			v_SetVariable(InstanceID,tempVarname,"")
-			MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+			v_SetVariable(InstanceID,ThreadID,tempVarname,"")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 		}
 		else
 		{
 			
-			v_SetVariable(InstanceID,tempVarname,Result)
-			MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+			v_SetVariable(InstanceID,ThreadID,tempVarname,Result)
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 		}
 	}
 	

@@ -83,6 +83,7 @@ e_NewLoop()
 	allElements.insert(tempNewID)
 	%tempNewID%marked=false
 	%tempNewID%running:=0
+	%tempNewID%heightOfVerticalBar:=Gridy*5
 	
 	%tempNewID%Type=Loop
 	%tempNewID%Name=Νew Соntainȩr
@@ -151,12 +152,12 @@ e_removeElement(id)
 	
 	tempObject:=Object() 
 	temp=0
-	if (%id%Type="Action" or %id%Type="Condition") ;If an element was removed
+	if (%id%Type="Action" or %id%Type="Condition" or %id%Type="Loop") ;If an element was removed, Delete also all Connections to and from that element
 	{
 		for index, tempdelelement in allElements 
 		{
 			
-			if (%tempdelelement%Type="Connection") ;Delete also all Connections to and from that element
+			if (%tempdelelement%Type="Connection") 
 			{
 				
 				if (%tempdelelement%to=id or %tempdelelement%from=id )
@@ -180,7 +181,7 @@ e_removeElement(id)
 	}
 	
 	
-	
+	;Unmark deleted elements
 	for objectCount, tempdelelement in allElements
 	{
 		if (tempdelelement=id)

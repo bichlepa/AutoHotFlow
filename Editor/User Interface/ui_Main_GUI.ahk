@@ -3,7 +3,7 @@
 	global
 	;Create tha main gui
 	gui,1:default
-	gui,add,picture,vPicFlow x0 y0 0xE gclickOnPicture
+	gui,add,picture,vPicFlow hwndPicFlowHWND x0 y0 0xE gclickOnPicture
 	gui,add,StatusBar
 	
 	gui +resize
@@ -12,6 +12,8 @@
 	gui +lastfound
 	gui,+HwndMainGuihwnd
 	ControlGetPos,,,,StatusBarHeight,msctls_statusbar321,ahk_id %MainGuihwnd%
+	
+	;Set some hotkeys that are needed in main window
 	hotkey,IfWinActive,ahk_id %MainGuihwnd%
 	hotkey,^x,ctrl_x
 	hotkey,^c,ctrl_c

@@ -1,12 +1,12 @@
 ﻿iniAllActions.="Select_file|" ;Add this action to list of all actions on initialisation
 
-runActionSelect_file(InstanceID,ElementID,ElementIDInInstance)
+runActionSelect_file(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	if (!IsObject(ActionSelect_fileToStart))
 		ActionSelect_fileToStart:=Object()
 	
-	tempInstanceString:="Instance_" InstanceID "_" ElementID "_" ElementIDInInstance
+	tempInstanceString:="Instance_" InstanceID "_" ThreadID "_" ElementID "_" ElementIDInInstance
 	ActionSelect_fileToStart.insert(tempInstanceString)
 	
 	SetTimer,ActionSelect_file_StartNextQuestion,10,-10 ;lower priority
@@ -23,10 +23,12 @@ runActionSelect_file(InstanceID,ElementID,ElementIDInInstance)
 		StringSplit,tempElement,tempcSelect_fileidToStart,_
 		; tempElement1 = word "instance"
 		; tempElement2 = instance id
-		; tempElement3 = element id
-		; tempElement4 = element id in the instance
-		ActionSelect_fileToStart_Element_ID:=tempElement3
+		; tempElement3 = thread id
+		; tempElement4 = element id
+		; tempElement5 = element id in the instance
+		ActionSelect_fileToStart_Element_ID:=tempElement4
 		ActionSelect_fileStart_CurrentInstanceID:=tempElement2
+		ActionSelect_fileStart_CurrentThreadID:=tempElement3
 		
 		;gui,%tempcSelect_fileidToStart%:default
 		
@@ -46,7 +48,7 @@ runActionSelect_file(InstanceID,ElementID,ElementIDInInstance)
 		if %ActionSelect_fileToStart_Element_ID%MultiSelect
 			tempActionSelectFileOptions=M%tempActionSelectFileOptions%
 		;MsgBox %tempActionSelectFileOptions%
-		FileSelectFile,tempActionSelectFilefile,%tempActionSelectFileOptions%,% v_replaceVariables(InstanceID,%ActionSelect_fileToStart_Element_ID%folder),% v_replaceVariables(InstanceID,%ActionSelect_fileToStart_Element_ID%title),% v_replaceVariables(InstanceID,%ActionSelect_fileToStart_Element_ID%filter)
+		FileSelectFile,tempActionSelectFilefile,%tempActionSelectFileOptions%,% v_replaceVariables(ActionSelect_fileStart_CurrentInstanceID,ActionSelect_fileStart_CurrentThreadID,%ActionSelect_fileToStart_Element_ID%folder),% v_replaceVariables(ActionSelect_fileStart_CurrentInstanceID,ActionSelect_fileStart_CurrentThreadID,%ActionSelect_fileToStart_Element_ID%title),% v_replaceVariables(ActionSelect_fileStart_CurrentInstanceID,ActionSelect_fileStart_CurrentThreadID,%ActionSelect_fileToStart_Element_ID%filter)
 		;MsgBox %ActionSelect_fileToStart_Element_ID% %tempActionSelectFilefile% %errorlevel%
 		
 		if errorlevel
@@ -66,10 +68,10 @@ runActionSelect_file(InstanceID,ElementID,ElementIDInInstance)
 				StringTrimRight,tempActionSelectFilefilelist,tempActionSelectFilefilelist,1
 				;MsgBox %tempActionSelectFilefilelist%
 				;MsgBox % v_importVariable(tempActionSelectFilefilelist,"list","▬")
-				v_setVariable(ActionSelect_fileStart_CurrentInstanceID,%ActionSelect_fileToStart_Element_ID%Varname,v_importVariable(tempActionSelectFilefilelist,"list","▬"),"list")
+				v_setVariable(ActionSelect_fileStart_CurrentInstanceID,ActionSelect_fileStart_CurrentThreadID,%ActionSelect_fileToStart_Element_ID%Varname,v_importVariable(tempActionSelectFilefilelist,"list","▬"),"list")
 			}
 			else
-				v_setVariable(ActionSelect_fileStart_CurrentInstanceID,%ActionSelect_fileToStart_Element_ID%Varname,tempActionSelectFilefile)
+				v_setVariable(ActionSelect_fileStart_CurrentInstanceID,ActionSelect_fileStart_CurrentThreadID,%ActionSelect_fileToStart_Element_ID%Varname,tempActionSelectFilefile)
 			
 			
 			MarkThatElementHasFinishedRunningOneVar(tempcSelect_fileidToStart,"normal")

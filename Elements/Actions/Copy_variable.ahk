@@ -1,16 +1,16 @@
 ﻿iniAllActions.="Copy_variable|" ;Add this action to list of all actions on initialisation
 
-runActionCopy_variable(InstanceID,ElementID,ElementIDInInstance)
+runActionCopy_variable(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	
-	local Varname:=v_replaceVariables(InstanceID,%ElementID%Varname)
-	local OldVarname:=v_replaceVariables(InstanceID,%ElementID%OldVarname)
-	local tempType:=v_getVariableType(InstanceID,%ElementID%OldVarname)
-	local tempValue:=v_getVariable(InstanceID,%ElementID%OldVarname,tempType)
-	v_setVariable(InstanceID,%ElementID%Varname,tempValue,tempType)
+	local Varname:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname)
+	local OldVarname:=v_replaceVariables(InstanceID,ThreadID,%ElementID%OldVarname)
+	local tempType:=v_getVariableType(InstanceID,ThreadID,%ElementID%OldVarname)
+	local tempValue:=v_getVariable(InstanceID,ThreadID,%ElementID%OldVarname,tempType)
+	v_setVariable(InstanceID,ThreadID,%ElementID%Varname,tempValue,tempType)
 
-	MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	return
 }
 getNameActionCopy_variable()

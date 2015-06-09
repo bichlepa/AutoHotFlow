@@ -1,12 +1,12 @@
 ﻿iniAllActions.="Set_process_priority|" ;Add this action to list of all actions on initialisation
 
-RunActionSet_process_priority(InstanceID,ElementID,ElementIDInInstance)
+RunActionSet_process_priority(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	local temp
 	local tempname
-	temp:=v_replaceVariables(InstanceID,%ElementID%Priority) 
-	tempname:=v_replaceVariables(InstanceID,%ElementID%ProcessName) 
+	temp:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Priority) 
+	tempname:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ProcessName) 
 	if temp=1
 		Process,Priority, % tempname,L
 	else if temp=2
@@ -23,12 +23,12 @@ RunActionSet_process_priority(InstanceID,ElementID,ElementIDInInstance)
 	
 	if (ErrorLevel=0)
 	{
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 	}
 	else
 	{
-		v_setVariable(InstanceID,t_pid,ActionSet_process_prioritytempPid)
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+		v_setVariable(InstanceID,ThreadID,t_pid,ActionSet_process_prioritytempPid)
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	}
 	return
 }

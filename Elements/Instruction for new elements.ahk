@@ -1,4 +1,4 @@
-
+﻿
 Create a new AHK Script that has the name of the Action. The name must be like a variable name! This name will not be displayed.
 Include the file in the main script AutoHotFlow.ahk
 

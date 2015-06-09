@@ -1,6 +1,6 @@
 ﻿iniAllActions.="Set_file_attributes|" ;Add this action to list of all actions on initialisation
 
-runActionSet_file_attributes(InstanceID,ElementID,ElementIDInInstance)
+runActionSet_file_attributes(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	local tempattr
@@ -47,13 +47,13 @@ runActionSet_file_attributes(InstanceID,ElementID,ElementIDInInstance)
 		recurse=1
 	
 	
-	FileSetAttrib,%tempattr%,% v_replaceVariables(InstanceID,%ElementID%file),%operateon%,%recurse%
+	FileSetAttrib,%tempattr%,% v_replaceVariables(InstanceID,ThreadID,%ElementID%file),%operateon%,%recurse%
 	if ErrorLevel
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 	else
 	{
 		
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	}
 	return
 }

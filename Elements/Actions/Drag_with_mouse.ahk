@@ -1,6 +1,6 @@
 ﻿iniAllActions.="Drag_with_mouse|" ;Add this action to list of all actions on initialisation
 
-runActionDrag_with_mouse(InstanceID,ElementID,ElementIDInInstance)
+runActionDrag_with_mouse(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	local temprelative
@@ -53,7 +53,7 @@ runActionDrag_with_mouse(InstanceID,ElementID,ElementIDInInstance)
 	MouseClickDrag,%tempButton%,% %ElementID%Xposfrom,% %ElementID%Yposfrom,% %ElementID%Xpos,% %ElementID%Ypos,% %ElementID%speed,%temprelative%
 	
 	
-	MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	return
 }
 getNameActionDrag_with_mouse()

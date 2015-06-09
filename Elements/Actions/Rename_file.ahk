@@ -1,25 +1,25 @@
 ﻿iniAllActions.="Rename_file|" ;Add this action to list of all actions on initialisation
 
-runActionRename_file(InstanceID,ElementID,ElementIDInInstance)
+runActionRename_file(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	local tempdir
 	local tempfilename
-	local temp:=v_replaceVariables(InstanceID,%ElementID%file)
+	local temp:=v_replaceVariables(InstanceID,ThreadID,%ElementID%file)
 	SplitPath,temp,tempfilename,tempdir
 	
 	if (tempfilename!="" && tempdir!="")
 	{
 	
-		FileMove,%tempdir%\%tempfilename%,% tempdir "\" v_replaceVariables(InstanceID,%ElementID%newName),% %ElementID%Overwrite
+		FileMove,%tempdir%\%tempfilename%,% tempdir "\" v_replaceVariables(InstanceID,ThreadID,%ElementID%newName),% %ElementID%Overwrite
 		
 		if ErrorLevel
-			MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 		else
-			MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	}
 	else
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 	return
 }
 getNameActionRename_file()

@@ -1,6 +1,6 @@
 ﻿iniAllActions.="Get_mouse_position|" ;Add this action to list of all actions on initialisation
 
-runActionGet_mouse_position(InstanceID,ElementID,ElementIDInInstance)
+runActionGet_mouse_position(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	local tempx
@@ -18,12 +18,12 @@ runActionGet_mouse_position(InstanceID,ElementID,ElementIDInInstance)
 
 	MouseGetPos,tempx,tempy,tempwin,tempcontrol
 	
-	v_SetVariable(InstanceID,"t_posx",tempx)
-	v_SetVariable(InstanceID,"t_posy",tempy)
-	v_SetVariable(InstanceID,"t_windowid",tempwin)
-	v_SetVariable(InstanceID,"t_control",tempcontrol)
+	v_SetVariable(InstanceID,ThreadID,"t_posx",tempx)
+	v_SetVariable(InstanceID,ThreadID,"t_posy",tempy)
+	v_SetVariable(InstanceID,ThreadID,"t_windowid",tempwin)
+	v_SetVariable(InstanceID,ThreadID,"t_control",tempcontrol)
 	
-	MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	return
 }
 getNameActionGet_mouse_position()

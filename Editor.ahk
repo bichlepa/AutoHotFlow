@@ -3,11 +3,15 @@
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
 SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 SetBatchLines -1
+#SingleInstance off
 CoordMode,mouse,client
 ;FileEncoding,UTF-8
 OnExit,Exit
 
-#SingleInstance off
+if not a_iscompiled
+	developing=yes
+
+
 DetectHiddenWindows,on
 FileCreateDir,Log
 
@@ -165,6 +169,13 @@ iniAllTriggers=
 #include elements\triggers\User_Idle_Time.ahk
 #include elements\triggers\Process_starts.ahk
 #include elements\triggers\Process_closes.ahk
+
+
+#include elements\loops\SimpleLoop.ahk
+#include elements\loops\Condition.ahk
+#include elements\loops\Work_through_a_list.ahk
+#include elements\loops\Loop_through_files.ahk
+#include elements\loops\Parse_a_string.ahk
 
 
 
@@ -378,7 +389,7 @@ Loop
 	{
 		StringSplit,tempInstance,tempCommand2,_
 		
-		v_setVariable(tempInstance2,tempCommand3,tempCommand4)
+		v_setVariable(tempInstance2,0,tempCommand3,tempCommand4)
 		
 	}
 	else if tempCommand1=stop

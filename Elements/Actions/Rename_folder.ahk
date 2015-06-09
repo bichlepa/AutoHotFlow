@@ -1,21 +1,21 @@
 ﻿iniAllActions.="Rename_folder|" ;Add this action to list of all actions on initialisation
 
-runActionRename_folder(InstanceID,ElementID,ElementIDInInstance)
+runActionRename_folder(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	local temppos
 	local tempoldname
-	local tempfolder:=v_replaceVariables(InstanceID,%ElementID%folder)
+	local tempfolder:=v_replaceVariables(InstanceID,ThreadID,%ElementID%folder)
 	StringGetPos,temppos,tempfolder,\,R
 	StringTrimLeft,tempoldname,tempfolder,% temppos +1
 	StringLeft,tempfolder,tempfolder,% temppos
 	
-	FileMoveDir,% tempfolder "\" tempoldname ,% tempfolder "\" v_replaceVariables(InstanceID,%ElementID%newName),R
+	FileMoveDir,% tempfolder "\" tempoldname ,% tempfolder "\" v_replaceVariables(InstanceID,ThreadID,%ElementID%newName),R
 	
 	if ErrorLevel
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 	else
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	return
 }
 getNameActionRename_folder()

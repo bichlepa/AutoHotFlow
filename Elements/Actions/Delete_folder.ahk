@@ -1,9 +1,9 @@
 ﻿iniAllActions.="Delete_folder|" ;Add this action to list of all actions on initialisation
 
-runActionDelete_folder(InstanceID,ElementID,ElementIDInInstance)
+runActionDelete_folder(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
-	local temp:=% v_replaceVariables(InstanceID,%ElementID%folder)
+	local temp:=% v_replaceVariables(InstanceID,ThreadID,%ElementID%folder)
 	
 	if %ElementID%ifEmpty
 		FileRemoveDir,%temp%
@@ -11,9 +11,9 @@ runActionDelete_folder(InstanceID,ElementID,ElementIDInInstance)
 		FileRemoveDir,%temp%,1
 	
 	if ErrorLevel
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 	else
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	return
 }
 getNameActionDelete_folder()

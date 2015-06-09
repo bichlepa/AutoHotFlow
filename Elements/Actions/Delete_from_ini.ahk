@@ -1,6 +1,6 @@
 ﻿iniAllActions.="Delete_from_ini|" ;Add this action to list of all actions on initialisation
 
-runActionDelete_from_ini(InstanceID,ElementID,ElementIDInInstance)
+runActionDelete_from_ini(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 
@@ -9,19 +9,19 @@ runActionDelete_from_ini(InstanceID,ElementID,ElementIDInInstance)
 	if %ElementID%Action=1 ;Delete a key
 	{
 		
-		IniDelete,% v_replaceVariables(InstanceID,%ElementID%file),% v_replaceVariables(InstanceID,%ElementID%section),% v_replaceVariables(InstanceID,%ElementID%key)
+		IniDelete,% v_replaceVariables(InstanceID,ThreadID,%ElementID%file),% v_replaceVariables(InstanceID,ThreadID,%ElementID%section),% v_replaceVariables(InstanceID,ThreadID,%ElementID%key)
 		
 	}
 	else ;Delete a section
 	{
-		IniDelete,% v_replaceVariables(InstanceID,%ElementID%file),% v_replaceVariables(InstanceID,%ElementID%section)
+		IniDelete,% v_replaceVariables(InstanceID,ThreadID,%ElementID%file),% v_replaceVariables(InstanceID,ThreadID,%ElementID%section)
 		
 	}
 	
 	if errorlevel
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 	else
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	
 	
 	return

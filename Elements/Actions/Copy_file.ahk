@@ -1,16 +1,16 @@
 ﻿iniAllActions.="Copy_file|" ;Add this action to list of all actions on initialisation
 
-runActionCopy_file(InstanceID,ElementID,ElementIDInInstance)
+runActionCopy_file(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	
 	
-	FileCopy,% v_replaceVariables(InstanceID,%ElementID%file),% v_replaceVariables(InstanceID,%ElementID%destFile),% %ElementID%Overwrite
+	FileCopy,% v_replaceVariables(InstanceID,ThreadID,%ElementID%file),% v_replaceVariables(InstanceID,ThreadID,%ElementID%destFile),% %ElementID%Overwrite
 	
 	if ErrorLevel
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 	else
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	return
 }
 getNameActionCopy_file()

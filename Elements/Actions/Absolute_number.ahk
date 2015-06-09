@@ -1,22 +1,22 @@
 ﻿iniAllActions.="Absolute_number|" ;Add this action to list of all actions on initialisation
 
-runActionAbsolute_number(InstanceID,ElementID,ElementIDInInstance)
+runActionAbsolute_number(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	local temp
 	
 	if %ElementID%expression=1
-		temp:=v_replaceVariables(InstanceID,%ElementID%VarValue)
+		temp:=v_replaceVariables(InstanceID,ThreadID,%ElementID%VarValue)
 	else
-		temp:=v_EvaluateExpression(InstanceID,%ElementID%VarValue)
+		temp:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%VarValue)
 	;MsgBox,%  %ElementID%Varname "---" %ElementID%VarValue "---" v_replaceVariables(InstanceID,%ElementID%Varname) "---" v_replaceVariables(InstanceID,%ElementID%VarValue)
 	if temp is number
 	{
-		v_SetVariable(InstanceID,v_replaceVariables(InstanceID,%ElementID%Varname),abs(temp))
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+		v_SetVariable(InstanceID,ThreadID,v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname),abs(temp))
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	}
 	else
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 
 	
 	return

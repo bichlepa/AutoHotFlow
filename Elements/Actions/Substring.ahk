@@ -1,6 +1,6 @@
 ﻿iniAllActions.="Substring|" ;Add this action to list of all actions on initialisation
 
-runActionSubstring(InstanceID,ElementID,ElementIDInInstance)
+runActionSubstring(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	local temp
@@ -10,33 +10,33 @@ runActionSubstring(InstanceID,ElementID,ElementIDInInstance)
 	local OptionStartPos
 	
 	if %ElementID%expression=1
-		temp:=v_replaceVariables(InstanceID,%ElementID%VarValue)
+		temp:=v_replaceVariables(InstanceID,ThreadID,%ElementID%VarValue)
 	else
-		temp:=v_EvaluateExpression(InstanceID,%ElementID%VarValue)
+		temp:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%VarValue)
 	;MsgBox,%  %ElementID%Varname "---" %ElementID%VarValue "---" v_replaceVariables(InstanceID,%ElementID%Varname) "---" v_replaceVariables(InstanceID,%ElementID%VarValue)
 	if %ElementID%WhereToBegin=1 ;Begin from left
 	{
 		
 		StringLeft,Result,temp,%ElementID%Length
-		v_SetVariable(InstanceID,v_replaceVariables(InstanceID,%ElementID%Varname),Result)
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+		v_SetVariable(InstanceID,ThreadID,v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname),Result)
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	}
 	else if %ElementID%WhereToBegin=2 ;Begin from right
 	{
 		StringRight,Result,temp,% %ElementID%Length
-		v_SetVariable(InstanceID,v_replaceVariables(InstanceID,%ElementID%Varname),Result)
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+		v_SetVariable(InstanceID,ThreadID,v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname),Result)
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	}
 	else if %ElementID%WhereToBegin=3 ;Begin from middle
 	{
-		OptionStartPos:=v_replaceVariables(InstanceID,%ElementID%StartPos) 
+		OptionStartPos:=v_replaceVariables(InstanceID,ThreadID,%ElementID%StartPos) 
 		if %ElementID%LeftOrRight=1 ;Go left
 		{
 			OptionToLeft=L
 		}
 		if  %ElementID%UntilTheEnd=0
 		{
-			OptionLength:=v_replaceVariables(InstanceID,%ElementID%Length) 
+			OptionLength:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Length) 
 			Stringmid,Result,temp,% OptionStartPos,%OptionLength%,%OptionToLeft%
 		}
 		else
@@ -45,11 +45,11 @@ runActionSubstring(InstanceID,ElementID,ElementIDInInstance)
 		}
 		
 		
-		v_SetVariable(InstanceID,v_replaceVariables(InstanceID,%ElementID%Varname),Result)
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+		v_SetVariable(InstanceID,ThreadID,v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname),Result)
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	}
 	else
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 
 	
 	return

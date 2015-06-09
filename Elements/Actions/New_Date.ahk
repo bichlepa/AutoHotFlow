@@ -1,15 +1,15 @@
 ﻿iniAllActions.="New_date|" ;Add this action to list of all actions on initialisation
 
-runActionNew_date(InstanceID,ElementID,ElementIDInInstance)
+runActionNew_date(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	
 	;MsgBox,%  %ElementID%Varname "---" %ElementID%VarValue "---" v_replaceVariables(InstanceID,%ElementID%Varname) "---" v_replaceVariables(InstanceID,%ElementID%VarValue)
 
-	v_SetVariable(InstanceID,v_replaceVariables(InstanceID,%ElementID%Varname),v_replaceVariables(InstanceID,%ElementID%Date),"Date")
+	v_SetVariable(InstanceID,ThreadID,v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname),v_replaceVariables(InstanceID,ThreadID,%ElementID%Date),"Date")
 	
 
-	MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	return
 }
 getNameActionNew_date()

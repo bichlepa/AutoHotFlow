@@ -1,14 +1,14 @@
 ﻿iniAllActions.="Get_from_list|" ;Add this action to list of all actions on initialisation
 
-runActionGet_from_list(InstanceID,ElementID,ElementIDInInstance)
+runActionGet_from_list(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	local temp
 	local Result
-	local Varname:=v_replaceVariables(InstanceID,%ElementID%Varname)
-	local ListName:=v_replaceVariables(InstanceID,%ElementID%ListName)
-	local Position:=v_replaceVariables(InstanceID,%ElementID%Position)
-	local tempObject:=v_getVariable(InstanceID,ListName,"list")
+	local Varname:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname)
+	local ListName:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ListName)
+	local Position:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Position)
+	local tempObject:=v_getVariable(InstanceID,ThreadID,ListName,"list")
 	
 	
 	if IsObject(tempObject)
@@ -18,20 +18,20 @@ runActionGet_from_list(InstanceID,ElementID,ElementIDInInstance)
 			if (tempObject.MinIndex()!="")
 			{
 				Result:=tempObject[tempObject.MinIndex()]
-				MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+				MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 			}
 			else
-				MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+				MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 		}
 		else if %ElementID%WhitchPosition=2 ;Last item
 		{
 			if (tempObject.MaxIndex()!="")
 			{
 				Result:=tempObject[tempObject.MaxIndex()]
-				MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+				MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 			}
 			else
-				MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+				MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 		}
 		else if %ElementID%WhitchPosition=3 ;Random item
 		{
@@ -40,31 +40,31 @@ runActionGet_from_list(InstanceID,ElementID,ElementIDInInstance)
 			{
 				random,temp,tempObject.MinIndex(),tempObject.MaxIndex()
 				Result:=tempObject[temp]
-				MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+				MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 			}
 			else
-				MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+				MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 		}
 		else if %ElementID%WhitchPosition=4 ;Specified item
 		{
 			if Position!=""
 			{
 				Result:=tempObject[Position]
-				MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+				MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 			}
 			else
 			{
-				MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+				MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 				
 			}
 		}
-		v_SetVariable(InstanceID,Varname,Result)
+		v_SetVariable(InstanceID,ThreadID,Varname,Result)
 		
 		
 		
 	}
 	else
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 	
 
 	return

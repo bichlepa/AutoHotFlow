@@ -1,21 +1,21 @@
 ﻿iniAllActions.="Traytip|" ;Add this action to list of all actions on initialisation
 
-runActionTraytip(InstanceID,ElementID,ElementIDInInstance)
+runActionTraytip(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	local tempDuration
 	
-	runActionTraytip_Text:=v_replaceVariables(InstanceID,%ElementID%text,"normal")
-	runActionTraytip_Title:=v_replaceVariables(InstanceID,%ElementID%Title,"normal")
-	runActionTraytip_Icon:=v_replaceVariables(InstanceID,%ElementID%Icon)
-	runActionTraytip_Duration:=v_replaceVariables(InstanceID,%ElementID%duration)
+	runActionTraytip_Text:=v_replaceVariables(InstanceID,ThreadID,%ElementID%text,"normal")
+	runActionTraytip_Title:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Title,"normal")
+	runActionTraytip_Icon:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Icon)
+	runActionTraytip_Duration:=v_replaceVariables(InstanceID,ThreadID,%ElementID%duration)
 	Traytip,%runActionTraytip_Title%,%runActionTraytip_Text%,runActionTraytip_Duration,% runActionTraytip_Icon -1
 	;if runActionTraytip_Duration>15
 		;SetTimer,runActionTraytip_refresh,4000
 	
 	
 	
-	MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	return
 
 }

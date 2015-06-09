@@ -1,18 +1,18 @@
 ﻿iniAllActions.="Close_window|" ;Add this action to list of all actions on initialisation
 
-runActionClose_window(InstanceID,ElementID,ElementIDInInstance)
+runActionClose_window(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	
-	tempWinTitle:=v_replaceVariables(InstanceID,%ElementID%Wintitle)
-	tempWinText:=v_replaceVariables(InstanceID,%ElementID%winText)
-	tempExcludeTitle:=v_replaceVariables(InstanceID,%ElementID%excludeTitle)
-	tempExcludeText:=v_replaceVariables(InstanceID,%ElementID%ExcludeText)
+	tempWinTitle:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Wintitle)
+	tempWinText:=v_replaceVariables(InstanceID,ThreadID,%ElementID%winText)
+	tempExcludeTitle:=v_replaceVariables(InstanceID,ThreadID,%ElementID%excludeTitle)
+	tempExcludeText:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ExcludeText)
 	tempTitleMatchMode :=%ElementID%TitleMatchMode
-	tempahk_class:=v_replaceVariables(InstanceID,%ElementID%ahk_class)
-	tempahk_exe:=v_replaceVariables(InstanceID,%ElementID%ahk_exe)
-	tempahk_id:=v_replaceVariables(InstanceID,%ElementID%ahk_id)
-	tempahk_pid:=v_replaceVariables(InstanceID,%ElementID%ahk_pid)
+	tempahk_class:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ahk_class)
+	tempahk_exe:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ahk_exe)
+	tempahk_id:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ahk_id)
+	tempahk_pid:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ahk_pid)
 	
 	tempwinstring=%tempWinTitle%
 	if tempahk_class<>
@@ -31,11 +31,11 @@ runActionClose_window(InstanceID,ElementID,ElementIDInInstance)
 	IfWinExist,%tempwinstring%,%tempWinText%,%tempExcludeTitle%,%tempExcludeText%
 	{
 		Winclose,%tempwinstring%,%tempWinText%,%tempExcludeTitle%,%tempExcludeText%
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	}
 	else
 	{
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"Exception")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"Exception")
 		
 	}
 

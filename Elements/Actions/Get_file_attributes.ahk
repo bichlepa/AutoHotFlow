@@ -1,16 +1,16 @@
 ﻿iniAllActions.="Get_file_attributes|" ;Add this action to list of all actions on initialisation
 
-runActionGet_file_attributes(InstanceID,ElementID,ElementIDInInstance)
+runActionGet_file_attributes(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	local tempattr
-	FileGetAttrib,tempattr,% v_replaceVariables(InstanceID,%ElementID%file)
+	FileGetAttrib,tempattr,% v_replaceVariables(InstanceID,ThreadID,%ElementID%file)
 	if ErrorLevel
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 	else
 	{
-		v_SetVariable(InstanceID,v_replaceVariables(InstanceID,%ElementID%varname),tempattr)
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+		v_SetVariable(InstanceID,ThreadID,v_replaceVariables(InstanceID,ThreadID,%ElementID%varname),tempattr)
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	}
 	return
 }

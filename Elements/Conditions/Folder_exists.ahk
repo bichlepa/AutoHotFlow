@@ -1,15 +1,15 @@
 ﻿iniAllConditions.="Folder_exists|" ;Add this condition to list of all conditions on initialisation
 
-runConditionFolder_exists(InstanceID,ElementID,ElementIDInInstance)
+runConditionFolder_exists(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
-	local tempFolder:=v_replaceVariables(InstanceID,%ElementID%folder)
+	local tempFolder:=v_replaceVariables(InstanceID,ThreadID,%ElementID%folder)
 	
 	
 	IfExist, % tempFolder
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"yes")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"yes")
 	else 
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"no")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"no")
 	
 	 
 	

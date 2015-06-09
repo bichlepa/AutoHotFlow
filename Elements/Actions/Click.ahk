@@ -1,6 +1,6 @@
 ﻿iniAllActions.="Click|" ;Add this action to list of all actions on initialisation
 
-runActionClick(InstanceID,ElementID,ElementIDInInstance)
+runActionClick(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	local temprelative
@@ -62,7 +62,7 @@ runActionClick(InstanceID,ElementID,ElementIDInInstance)
 	else
 		MouseClick,%tempButton%,,,% %ElementID%ClickCount,,%tempupdown%
 	
-	MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	return
 }
 getNameActionClick()

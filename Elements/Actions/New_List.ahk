@@ -1,12 +1,12 @@
 ﻿iniAllActions.="New_list|" ;Add this action to list of all actions on initialisation
 
-runActionNew_list(InstanceID,ElementID,ElementIDInInstance)
+runActionNew_list(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
-	local varvalue:=v_replaceVariables(InstanceID,%ElementID%varvalue)
-	local varvalues:=v_replaceVariables(InstanceID,%ElementID%varvalues)
-	local Varname:=v_replaceVariables(InstanceID,%ElementID%Varname)
-	local Position:=v_replaceVariables(InstanceID,%ElementID%Position)
+	local varvalue:=v_replaceVariables(InstanceID,ThreadID,%ElementID%varvalue)
+	local varvalues:=v_replaceVariables(InstanceID,ThreadID,%ElementID%varvalues)
+	local Varname:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname)
+	local Position:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Position)
 	local temp
 	local templist
 	;MsgBox,%  %ElementID%Varname "---" %ElementID%VarValue "---" v_replaceVariables(InstanceID,%ElementID%Varname) "---" v_replaceVariables(InstanceID,%ElementID%VarValue)
@@ -14,15 +14,15 @@ runActionNew_list(InstanceID,ElementID,ElementIDInInstance)
 	
 	if (%ElementID%InitialContent=1) ;empty list
 	{
-		v_SetVariable(InstanceID,Varname,Object(),"list")
+		v_SetVariable(InstanceID,ThreadID,Varname,Object(),"list")
 		
 	}
 	else if (%ElementID%InitialContent=2) ;one element
 	{
 		if %ElementID%isExpression=1
-			temp:=v_replaceVariables(InstanceID,%ElementID%VarValue)
+			temp:=v_replaceVariables(InstanceID,ThreadID,%ElementID%VarValue)
 		else
-			temp:=v_EvaluateExpression(InstanceID,%ElementID%VarValue)
+			temp:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%VarValue)
 		templist:=Object()
 		if %ElementID%WhitchPosition=1
 		{
@@ -33,7 +33,7 @@ runActionNew_list(InstanceID,ElementID,ElementIDInInstance)
 			templist.insert(Position,temp)
 		}
 		
-		v_SetVariable(InstanceID,Varname,templist,"list")
+		v_SetVariable(InstanceID,ThreadID,Varname,templist,"list")
 	}
 	else
 	{
@@ -51,14 +51,14 @@ runActionNew_list(InstanceID,ElementID,ElementIDInInstance)
 			templist.Insert(A_Index,A_LoopField)
 		}
 		
-		v_SetVariable(InstanceID,Varname,templist,"list")
+		v_SetVariable(InstanceID,ThreadID,Varname,templist,"list")
 	}
 		
 	
 	
 	
 
-	MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	return
 }
 getNameActionNew_list()

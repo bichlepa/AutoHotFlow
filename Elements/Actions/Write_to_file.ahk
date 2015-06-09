@@ -1,11 +1,11 @@
 ﻿iniAllActions.="Write_to_file|" ;Add this action to list of all actions on initialisation
 
-runActionWrite_to_file(InstanceID,ElementID,ElementIDInInstance)
+runActionWrite_to_file(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	local tempEncoding
 	local tempOverwrite
-	local tempText:=v_replaceVariables(InstanceID,%ElementID%text)
+	local tempText:=v_replaceVariables(InstanceID,ThreadID,%ElementID%text)
 	
 
 		
@@ -27,12 +27,12 @@ runActionWrite_to_file(InstanceID,ElementID,ElementIDInInstance)
 	}
 
 	if %ElementID%Overwrite=2
-		FileDelete,% v_replaceVariables(InstanceID,%ElementID%file)
-	FileAppend,% tempText,% v_replaceVariables(InstanceID,%ElementID%file),%tempEncoding%
+		FileDelete,% v_replaceVariables(InstanceID,ThreadID,%ElementID%file)
+	FileAppend,% tempText,% v_replaceVariables(InstanceID,ThreadID,%ElementID%file),%tempEncoding%
 	if ErrorLevel
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 	else
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	return
 }
 getNameActionWrite_to_file()

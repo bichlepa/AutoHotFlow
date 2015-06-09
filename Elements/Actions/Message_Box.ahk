@@ -1,12 +1,12 @@
 ﻿iniAllActions.="Message_Box|" ;Add this action to list of all actions on initialisation
 
-runActionMessage_Box(InstanceID,ElementID,ElementIDInInstance)
+runActionMessage_Box(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	if (!IsObject(ActionMessage_BoxToStart))
 		ActionMessage_BoxToStart:=Object()
 	
-	tempInstanceString:="Instance_" InstanceID "_" ElementID "_" ElementIDInInstance
+	tempInstanceString:="Instance_" InstanceID "_" ThreadID "_"ElementID "_" ElementIDInInstance
 	ActionMessage_BoxToStart.insert(tempInstanceString)
 	
 	if (Message_BoxStarted=true)
@@ -21,18 +21,21 @@ runActionMessage_Box(InstanceID,ElementID,ElementIDInInstance)
 		StringSplit,tempElement,tempcMessage_BoxidToStart,_
 		; tempElement1 = word "instance"
 		; tempElement2 = instance id
-		; tempElement3 = element id
-		; tempElement4 = element id in the instance
-		ActionMessage_BoxToStart_Element_ID:=tempElement3
+		; tempElement3 = Thread id
+		; tempElement4 = element id
+		; tempElement5 = element id in the instance
+		ActionMessage_BoxToStart_Instance_ID:=tempElement2
+		ActionMessage_BoxToStart_Element_ID:=tempElement4
+		ActionMessage_BoxToStart_Thread_ID:=tempElement3
 		
 		
 		;gui,%tempcMessage_BoxidToStart%:default
 		
 		;gui,10:-SysMenu 
 		
-		gui,11:add,text,x10 w320 h100, % v_replaceVariables(InstanceID,%ActionMessage_BoxToStart_Element_ID%text,"normal")
+		gui,11:add,text,x10 w320 h100, % v_replaceVariables(ActionMessage_BoxToStart_Instance_ID,ActionMessage_BoxToStart_Thread_ID,%ActionMessage_BoxToStart_Element_ID%text,"normal")
 		gui,11:add,button,x10 w150 h30 gActionMessage_BoxButtonOK Default,% lang("OK")
-		gui,11:show,w330 h150 ,% v_replaceVariables(InstanceID,%ActionMessage_BoxToStart_Element_ID%title,"normal")
+		gui,11:show,w330 h150 ,% v_replaceVariables(ActionMessage_BoxToStart_Instance_ID,ActionMessage_BoxToStart_Thread_ID,%ActionMessage_BoxToStart_Element_ID%title,"normal")
 		
 		ActionMessage_BoxStart_Current:=tempcMessage_BoxidToStart
 		Message_BoxStarted:=true

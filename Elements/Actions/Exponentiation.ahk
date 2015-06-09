@@ -1,6 +1,6 @@
 ﻿iniAllActions.="Exponentiation|" ;Add this action to list of all actions on initialisation
 
-runActionExponentiation(InstanceID,ElementID,ElementIDInInstance)
+runActionExponentiation(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	local temp
@@ -8,27 +8,27 @@ runActionExponentiation(InstanceID,ElementID,ElementIDInInstance)
 	local tempResult
 	
 	if %ElementID%expression=1
-		temp:=v_replaceVariables(InstanceID,%ElementID%VarValue)
+		temp:=v_replaceVariables(InstanceID,ThreadID,%ElementID%VarValue)
 	else
-		temp:=v_EvaluateExpression(InstanceID,%ElementID%VarValue)
+		temp:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%VarValue)
 	if %ElementID%expressionExponent=1
-		tempExponentiation:=v_replaceVariables(InstanceID,%ElementID%Exponent)
+		tempExponentiation:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Exponent)
 	else
-		tempExponentiation:=v_EvaluateExpression(InstanceID,%ElementID%Exponent)
+		tempExponentiation:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%Exponent)
 	;MsgBox % tempExponentiation "|" temp
 	if temp is number
 	{
 		if tempExponentiation is number
 		{
 			tempResult:=temp**tempExponentiation
-			v_SetVariable(InstanceID,v_replaceVariables(InstanceID,%ElementID%Varname),tempResult)
-			MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+			v_SetVariable(InstanceID,ThreadID,v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname),tempResult)
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 		}
 		else
-			MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 	}
 	else
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 
 	
 	return

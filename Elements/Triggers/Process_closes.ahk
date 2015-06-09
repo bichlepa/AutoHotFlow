@@ -4,7 +4,7 @@ EnableTriggerProcess_closes(ID)
 {
 	global
 	
-	tempProcessName:=v_replaceVariables(0,%ID%ProcessName)
+	tempProcessName:=v_replaceVariables(0,0,%ID%ProcessName)
 	
 	
 	FileDelete,Generated Scripts\TriggerProcess_closes%ID%.ahk

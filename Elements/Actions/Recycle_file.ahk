@@ -1,14 +1,14 @@
 ﻿iniAllActions.="Recycle_file|" ;Add this action to list of all actions on initialisation
 
-runActionRecycle_file(InstanceID,ElementID,ElementIDInInstance)
+runActionRecycle_file(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	
-	FileRecycle,% v_replaceVariables(InstanceID,%ElementID%file)
+	FileRecycle,% v_replaceVariables(InstanceID,ThreadID,%ElementID%file)
 	if ErrorLevel
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 	else
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	return
 }
 getNameActionRecycle_file()

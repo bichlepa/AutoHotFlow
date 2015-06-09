@@ -1,6 +1,6 @@
 ﻿iniAllActions.="Execute_Flow|" ;Add this action to list of all actions on initialisation
 
-runActionExecute_Flow(InstanceID,ElementID,ElementIDInInstance)
+runActionExecute_Flow(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	returnedFlowIsRunning=
@@ -8,7 +8,7 @@ runActionExecute_Flow(InstanceID,ElementID,ElementIDInInstance)
 	tempVarsToSend=
 	if (%ElementID%SendLocalVars)
 	{
-		tempVarsToSend:=v_WriteLocalVariablesToString("Instance_" InstanceID)
+		tempVarsToSend:=v_WriteLocalVariablesToString("Instance_" InstanceID) ;Thread variables won't be sent yet 
 	}
 	if (%ElementID%WaitToFinish)
 	{
@@ -29,16 +29,16 @@ runActionExecute_Flow(InstanceID,ElementID,ElementIDInInstance)
 	}
 		;MsgBox ga %returnedFlowIsRunning%
 	if returnedFlowIsRunning=ǸoⱾuchȠaⱮe
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 	else if returnedFlowIsRunning=Dἰsḁbled
 	{
 		if (%ElementID%SkipDisabled)
-			MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 		else
-			MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 	}
 	else if returnedFlowIsRunning=
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 	else ;if the flow is running
 	{
 		if (%ElementID%WaitToFinish)
@@ -60,7 +60,7 @@ runActionExecute_Flow(InstanceID,ElementID,ElementIDInInstance)
 						stringleft,tempVarName,A_LoopField,% temppos
 						StringTrimLeft,tempVarContent,A_LoopField,% temppos+1
 						;MsgBox %A_LoopField% %tempVarName% %tempVarContent%
-						v_setVariable(InstanceID,tempVarName,tempVarContent)
+						v_setVariable(InstanceID,ThreadID,tempVarName,tempVarContent)
 						
 					}
 					
@@ -68,7 +68,7 @@ runActionExecute_Flow(InstanceID,ElementID,ElementIDInInstance)
 			}
 		}
 		
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal") 
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal") 
 		
 	}
 	

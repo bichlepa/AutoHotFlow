@@ -1,19 +1,19 @@
 ﻿iniAllActions.="Tooltip|" ;Add this action to list of all actions on initialisation
 
-runActionTooltip(InstanceID,ElementID,ElementIDInInstance)
+runActionTooltip(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	local tempDuration
 	runActionTooltip_Oldx=
 	runActionTooltip_Oldy=
-	runActionTooltip_Text:=v_replaceVariables(InstanceID,%ElementID%text,"normal")
+	runActionTooltip_Text:=v_replaceVariables(InstanceID,ThreadID,%ElementID%text,"normal")
 	ToolTip,%runActionTooltip_Text%,,,13
 	if %ElementID%follow_mouse =1
 		SetTimer,runActionTooltip_follow_mouse,10,,,13
 	
 	tempDuration:=%ElementID%duration
 	SetTimer,runActionTooltip_RemoveTooltip,-%tempDuration%
-	MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	return
 	runActionTooltip_follow_mouse:
 	MouseGetPos,runActionTooltip_MouseX,runActionTooltip_MouseY

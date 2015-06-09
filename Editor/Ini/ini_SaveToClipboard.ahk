@@ -2,7 +2,7 @@
 {
 	global
 	
-	
+	busy:=true
 	ui_DisableMainGUI()
 
 	
@@ -28,7 +28,7 @@
 			
 			tempTo:=%saveElementID%to
 			tempFrom:=%saveElementID%from
-			if (%tempTo%marked="true" and %tempFrom%marked="true")
+			if (%tempTo%marked="true" and %tempFrom%marked="true" and %tempFrom%type!="Trigger") ;Ignore connections from trigger
 				tempShouldBeStoredToClipboard:=true
 			
 		}
@@ -39,7 +39,7 @@
 				ToolTip("No triggers can be copied to the clipboard by now. Sorry.")
 			
 		}
-		else if (saveElementType="action" or saveElementType="condition")
+		else if (saveElementType="action" or saveElementType="condition" or saveElementType="loop")
 		{
 			
 			if %saveElementID%marked=true
@@ -67,6 +67,16 @@
 				IniWrite,%saveElementto%,%ClipboardFlowFilename%,element%saveCounter%,to
 				IniWrite,%saveElementConnectionType%,%ClipboardFlowFilename%,element%saveCounter%,ConnectionType
 				
+				if %saveElementfrom%type=Loop
+				{
+					saveElementfromPart:=%saveElementID%fromPart
+					IniWrite,%saveElementfromPart%,%ClipboardFlowFilename%,element%saveCounter%,fromPart
+				}
+				if %saveElementto%type=Loop
+				{
+					saveElementtoPart:=%saveElementID%toPart
+					IniWrite,%saveElementtoPart%,%ClipboardFlowFilename%,element%saveCounter%,toPart
+				}
 			}
 			else if (saveElementType="trigger")
 			{
@@ -89,6 +99,13 @@
 				IniWrite,%saveElementname%,%ClipboardFlowFilename%,element%saveCounter%,name
 				IniWrite,%saveElementX%,%ClipboardFlowFilename%,element%saveCounter%,x
 				IniWrite,%saveElementY%,%ClipboardFlowFilename%,element%saveCounter%,y
+				
+				if (saveElementType="loop")
+				{
+					saveElementHeightOfVerticalBar:=%saveElementID%HeightOfVerticalBar
+					IniWrite,%saveElementHeightOfVerticalBar%,%ClipboardFlowFilename%,element%saveCounter%,HeightOfVerticalBar
+				}
+				
 				
 				parametersToSave:=getParameters%saveElementType%%saveElementsubType%()
 				for tempSaveindex2, tempSaveParameter in parametersToSave
@@ -113,8 +130,9 @@
 		}
 	}
 	
-	ToolTip(lang("saved %1% elements to clipboard",saveCounter))
+	if saveCounter>0
+		ToolTip(lang("saved %1% elements to clipboard",saveCounter))
 	ui_EnableMainGUI()
-	
+	busy:=false
 	
 }

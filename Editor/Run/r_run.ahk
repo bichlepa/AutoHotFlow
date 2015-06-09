@@ -3,6 +3,7 @@
 
 InstanceIDList:=Object()
 r_RunningCounter=0
+r_RunningThreadCounter=0
 executionSpeed=1
 
 
@@ -40,12 +41,15 @@ r_startRun()
 	
 	Critical on ;This code generates one instance. it should not be interrupted. (especially if a new instance should be created)
 	r_RunningCounter++
+	r_RunningThreadCounter++
+	
 	
 	InstanceIDList.insert("Instance_" r_RunningCounter) ;Insert a new Instance
 	Instance_%r_RunningCounter%_RunningCounter=1 ;Counter that is incremented every time a new element is going to run
 	Instance_%r_RunningCounter%_RunningElements:=Object() ;Create an object for the instance containing the running elements
-	Instance_%r_RunningCounter%_RunningElements.insert("trigger_" Instance_%r_RunningCounter%_RunningCounter) ;A flow is always launched from trigger
+	Instance_%r_RunningCounter%_RunningElements.insert(r_RunningThreadCounter "_trigger_" Instance_%r_RunningCounter%_RunningCounter) ;A flow is always launched from trigger
 	Instance_%r_RunningCounter%_LocalVariables:=Object() ;Create an object for the instance containing the running elements
+	Instance_%r_RunningCounter%_Thread_%r_RunningThreadCounter%_Variables:=Object() ;Create an object for the instance containing the running elements
 	
 	;MsgBox %ThisExecution_CallingFlow%
 	;MsgBox %ThisExecution_InstanceIDOfCallingFlow%
@@ -69,7 +73,7 @@ r_startRun()
 			{
 				stringleft,tempVarName,A_LoopField,% temppos
 				StringTrimLeft,tempVarContent,A_LoopField,% temppos+1
-				v_setVariable(r_RunningCounter,tempVarName,tempVarContent)
+				v_setVariable(r_RunningCounter,1,tempVarName,tempVarContent)
 				
 			}
 			
@@ -78,15 +82,15 @@ r_startRun()
 		ThisExecution_localVariables=
 		
 	}
-	v_setVariable(r_RunningCounter,"t_triggertime",a_now,"Date") ;Set the triggertime variable
+	v_setVariable(r_RunningCounter,ThreadID,"triggertime",a_now,"Date") ;Set the triggertime variable
 	
 	;set some variables for correct  visual appearance of the trigger
 	if (triggerrunning<=0)
 			triggerrunning=1
 		else
 			triggerrunning++
-	Instance_%r_RunningCounter%_trigger_1_finishedRunning:=true 
-	Instance_%r_RunningCounter%_trigger_1_result=normal
+	Instance_%r_RunningCounter%_%r_RunningThreadCounter%_trigger_1_finishedRunning:=true 
+	Instance_%r_RunningCounter%_%r_RunningThreadCounter%_trigger_1_result=normal
 	
 	
 	if (nowRunning!=true) ;if not already running, execute the r_run() function. of not the currently running r_run function will find that new thread
@@ -149,33 +153,36 @@ r_run()
 	;MsgBox
 	ElementsThatHaveFinished:=Object() ;Contains all elements that have finished right now
 	InstancesThatHaveFinished:=Object() ;Contains all instances that have finishd right now
-	;Go through all running instances
+	;Go through all running instances. Find elements that are still running. Find elements that have finished and prepare connected elements to run. 
 	for index1, tempInstanceID in InstanceIDList ;Go through all instances
 	{
 		if (SettingFlowExecutionPolicy="wait" && index1!=1) ;If execution policy allows only one running instance and others have to wait
 			break
 			
 		
-		tempCountOfRunningElementsInInstance=0 ;Empty the counter of running elements in the current instance. If the number will remain 0 the isntance will be removed
+		
+		
+		tempCountOfRunningElementsInInstance=0 ;Empty the counter of running elements in the current instance. If the number will remain 0 the instance will be removed
 		;MsgBox tempInstanceID %tempInstanceID%
 		;Go through all running elements of the instance
 		for index2, tempRunningElement in %tempInstanceID%_RunningElements
 		{
 			StringSplit, tempRunningElement,tempRunningElement,_ 
-			; tempRunningElement1 = Element id
-			; tempRunningElement2 = Element id in the instance
+			; tempRunningElement1 = thread id
+			; tempRunningElement2 = Element id
+			; tempRunningElement3 = Element id in the instance
 			
-			;MsgBox %tempInstanceID%_%tempRunningElement%_FinishedRunning = true ?
+			;MsgBox %tempInstanceID%_%tempThreadID%_%tempRunningElement%_FinishedRunning = true ?
 			if (%tempInstanceID%_%tempRunningElement%_FinishedRunning=true) ;If the element has finished
 			{
 				
 				;mark the element that it has recently run by setting a negative number. It will be drawn pink. If several instances are running only decrement the number. Needed for correct visual appearance of the elements
-				%tempRunningElement1%running--
-				if (%tempRunningElement1%running=0)
-					%tempRunningElement1%running=-10
+				%tempRunningElement2%running--
+				if (%tempRunningElement2%running=0)
+					%tempRunningElement2%running=-10
 				
 				;Insert the element that has finished to the list
-				ElementsThatHaveFinished.Insert(tempInstanceID "_" tempRunningElement)
+				ElementsThatHaveFinished.Insert(tempInstanceID "_"  tempRunningElement)
 				
 				
 				runNeedToRedraw:=true
@@ -183,21 +190,70 @@ r_run()
 				;MsgBox, %tempRunningElement% finished running
 				
 				;Find elements that are connected to the finished element and prepare them to run
+				tempConnectionCountToRun:=0
 				for index1, element in allElements
 				{
 					
 					if %element%Type=Connection
 					{
-						;MsgBox % "connection found " %element%from "  " tempRunningElement1 "  " %element%ConnectionType "  " %tempInstanceID%_%tempRunningElement%_result
+						;MsgBox % "connection found " %element%from "  " tempRunningElement1 "  " %element%ConnectionType "  " %tempInstanceID%_%tempThreadID%_%tempRunningElement%_result
+						tempTo:=%element%to
+						tempFrom:=%element%from
+						;~ MsgBox % %tempfrom%type "`n" %tempTo%type "`n" %element%ConnectionType "`n" %tempInstanceID%_%tempRunningElement%_result "`n" %element%frompart
 						;If the connection starts on the currend finised element and the elements finished with the same result that is assigned to the connection
-						if (%element%from=tempRunningElement1 and  %element%ConnectionType=%tempInstanceID%_%tempRunningElement%_result )
+						if (%element%from=tempRunningElement2 && ( %element%ConnectionType=%tempInstanceID%_%tempRunningElement%_result || (%tempfrom%type="loop" && %element%ConnectionType = "normal" && ((%tempInstanceID%_%tempRunningElement%_result = "normalHead" && %element%frompart ="Head") || (%tempInstanceID%_%tempRunningElement%_result = "normalTail") && %element%frompart ="Tail")  )))
 						{
+							;~ MsgBox % "drin: " %tempTo%type "`n" %element%ConnectionType "`n" %tempInstanceID%_%tempRunningElement%_result "`n" %element%frompart
+							if (tempConnectionCountToRun>0)
+							{
+								r_RunningThreadCounter++
+								tempThreadIDToRun :=r_RunningThreadCounter
+								%tempInstanceID%_Thread_%r_RunningThreadCounter%_Variables:=%tempInstanceID%_Thread_%tempRunningElement1%_Variables.Clone()
+								;~ MsgBox tempInstanceID %tempInstanceID% `n r_RunningThreadCounter %r_RunningThreadCounter% `n tempRunningElement1 %tempRunningElement1%
+								;~ MsgBox % StrObj(%tempInstanceID%_Thread_%tempRunningElement1%_Variables)
+								;~ MsgBox % StrObj(%tempInstanceID%_Thread_%r_RunningThreadCounter%_Variables)
+							}
+							else
+								tempThreadIDToRun:=tempRunningElement1
 							
 							%tempInstanceID%_RunningCounter++
 							tempCountOfRunningElementsInInstance++
 							
+							if %tempFrom%type=Loop ;restore previous loop vars (if any) when leaving a loop
+							{
+								if (%element%frompart="Tail" or %element%ConnectionType = "exception") ;either normal leaving or exception
+									PrepareLeavingALoop(tempInstanceID,tempThreadIDToRun,tempFrom)
+								
+							}
+							
+							tempRunSkipCurrentRun:=false
 							;Insert the element that is on the end of the connection to the list
-							goingToRunIDs.insert(tempInstanceID "_"  %element%to "_" %tempInstanceID%_RunningCounter)
+							if (%tempTo%type="Loop")
+							{
+								if %element%toPart = Head ;Save previous loop vars (if any) when entering a loop
+								{
+									PrepareEnteringALoop(tempInstanceID,tempThreadIDToRun,tempTo)
+									
+								}
+								else if (%element%toPart = "Tail" or %element%toPart = "break") ;When entering a tail of the loop, check whether is was last on the head of the same loop
+								{
+									if (tempTo != %tempInstanceID%_Thread_%tempThreadIDToRun%_Variables["CurrentLoop"])
+									{
+										MsgBox, 16, % lang("Error"),% lang("The end of a loop was entered, but this loop was not the current one.")  "`n" lang("Current thread will be closed") 
+										tempRunSkipCurrentRun:=true
+									}
+								}
+								if (tempRunSkipCurrentRun != true)
+								{
+									goingToRunIDs.insert(tempInstanceID "_" tempThreadIDToRun "_" tempTo "_" %tempInstanceID%_RunningCounter "_" %element%toPart)
+									tempConnectionCountToRun++
+								}
+							}
+							else
+							{
+								goingToRunIDs.insert(tempInstanceID "_" tempThreadIDToRun "_" tempTo "_" %tempInstanceID%_RunningCounter)
+								tempConnectionCountToRun++
+							}
 							;MsgBox % "going to run hinzugefügt "  tempInstanceID "_"  %element%to "_" %tempInstanceID%_RunningCounter
 							
 						}
@@ -222,7 +278,7 @@ r_run()
 			
 			
 			
-			 
+		
 		}
 		
 		if (tempCountOfRunningElementsInInstance=0) ;Prepare to remove the instance, because no elements are running and thus the instance has finished
@@ -240,13 +296,14 @@ r_run()
 		StringSplit,tempElement,tempElement,_
 		; tempElement1 = word "instance"
 		; tempElement2 = instance id
-		; tempElement3 = element id
-		; tempElement4 = element id in the instance
+		; tempElement3 = thread id
+		; tempElement4 = element id
+		; tempElement5 = element id in the instance
 		
 		;MsgBox, element %tempElement% has finished and will be removed
 		for index2, tempRunningElement in Instance_%tempElement2%_RunningElements
 		{
-			if (tempRunningElement=tempElement3 "_" tempElement4)
+			if (tempRunningElement=tempElement3 "_" tempElement4 "_" tempElement5)
 			{
 				
 				
@@ -306,16 +363,19 @@ r_run()
 		StringSplit, runElement,runElement,_ ;a word like Instance_1_action2_3
 		; runElement1 = word "instance"
 		; runElement2 = instance id
-		; runElement3 = element id
-		; runElement4 = element id in the instance
+		; runElement3 = thread
+		; runElement4 = element id
+		; runElement5 = element id in the instance
 		;Insert the element to the list of running elements of the instance
-		Instance_%runElement2%_RunningElements.insert(runElement3 "_" runElement4)
+		Instance_%runElement2%_RunningElements.insert(runElement3 "_" runElement4 "_" runElement5)
+		
+		
 		
 		;set some variables for correct visual appearance of the element
-		if (%runElement3%running<=0)
-			%runElement3%running=1
+		if (%runElement4%running<=0)
+			%runElement4%running=1
 		else
-			%runElement3%running++
+			%runElement4%running++
 			
 		
 		runNeedToRedraw:=true
@@ -336,19 +396,29 @@ r_run()
 		if stopRun=true
 			break
 		
+		
+		
 		StringSplit, runElement,runElement,_ ;a word like Instance_1_action2_3
 		; runElement1 = word "instance"
 		; runElement2 = instance id
-		; runElement3 = element id
-		; runElement4 = element id in the instance
+		; runElement3 = Thread id
+		; runElement4 = element id
+		; runElement5 = element id in the instance
+		; runElement6 = part of the element (only with a loop element)
 		
 		;Start the elements that are marked as going to run
-		tempElementType:=%runElement3%Type
-		tempElementSubType:=%runElement3%subType
+		tempElementType:=%runElement4%Type
+		tempElementSubType:=%runElement4%subType
 		
-		Instance_%runElement2%_%runElement3%_%runElement4%_finishedRunning:=false
 		
-		run%tempElementType%%tempElementSubType%(runElement2,runElement3,runElement4) ;Execute the element
+		
+		Instance_%runElement2%_%runElement3%_%runElement4%_%runElement5%_finishedRunning:=false
+		
+		;~ MsgBox executing: %runElement%
+		if %runElement4%type=loop
+			run%tempElementType%%tempElementSubType%(runElement2,runElement3,runElement4,runElement5,runElement6) ;Execute the element
+		else
+			run%tempElementType%%tempElementSubType%(runElement2,runElement3,runElement4,runElement5) ;Execute the element
 		
 		
 	}

@@ -2,9 +2,10 @@
 if (!NoTests) ;Test mode when executing this script directly
 {
 	InstanceID=5
+	TrheadID=1
 	Instance_%InstanceID%_LocalVariables:=Object()
-	v_setVariable(InstanceID,"kontostand",5000)
-	v_setVariable(InstanceID,"schulden",4000)
+	v_setVariable(InstanceID,TrheadID,"kontostand",5000)
+	v_setVariable(InstanceID,TrheadID,"schulden",4000)
 	;MsgBox % "Gesetzte Variablen:`nkonstostand: " v_getVariable(InstanceID,"kontostand") "`nschulden: " v_getVariable(InstanceID,"schulden")
 	
 	;teststring=((4+5)*2)*(3+1-(2+1))
@@ -14,14 +15,14 @@ if (!NoTests) ;Test mode when executing this script directly
 	teststring=% "2+ 3/4 + 5"
 	
 	MsgBox I am starting
-	res:=v_EvaluateExpression(InstanceID,teststring)
+	res:=v_EvaluateExpression(InstanceID,TrheadID,teststring)
 	MsgBox % "Result of " teststring " is " res 
 }
 
 
-v_EvaluateExpression(InstanceID,ExpressionString)
+v_EvaluateExpression(InstanceID,ThreadID,ExpressionString)
 {
-	v_replaceVariables(InstanceID,ExpressionString)
+	v_replaceVariables(InstanceID,ThreadID,ExpressionString)
 	StringReplace,ExpressionString,ExpressionString,>=,≥,all
 	StringReplace,ExpressionString,ExpressionString,<=,≤,all
 	StringReplace,ExpressionString,ExpressionString,!=,≠,all
@@ -33,13 +34,13 @@ v_EvaluateExpression(InstanceID,ExpressionString)
 	StringReplace,ExpressionString,ExpressionString,&&,∧,all
 	StringReplace,ExpressionString,ExpressionString,% " not ",% " ¬",all
 	StringReplace,ExpressionString,ExpressionString,% "!",% "¬",all
-	return v_EvaluateExpressionRecurse(InstanceID,ExpressionString)
+	return v_EvaluateExpressionRecurse(InstanceID,ThreadID,ExpressionString)
 }
 
 /* Evaluation of an Expression
 Thanks to Sunshine for the easy to understand instruction. See http://www.sunshine2k.de/coding/java/SimpleParser/SimpleParser.html
 */
-v_EvaluateExpressionRecurse(InstanceID,ExpressionString)
+v_EvaluateExpressionRecurse(InstanceID,ThreadID,ExpressionString)
 {
 	;MsgBox %ExpressionString%
 	
@@ -56,8 +57,8 @@ v_EvaluateExpressionRecurse(InstanceID,ExpressionString)
 	{
 		;MsgBox %  leftSubstring FoundOpreand rightSubstring 
 		if ( FoundOpreand != "¬")
-			resleft:= v_EvaluateExpression(InstanceID,leftSubstring)
-		resright:=v_EvaluateExpression(InstanceID,rightSubstring)
+			resleft:= v_EvaluateExpression(InstanceID,ThreadID,leftSubstring)
+		resright:=v_EvaluateExpression(InstanceID,ThreadID,rightSubstring)
 		;MsgBox %FoundOpreand% %resleft% %resright%
 		if FoundOpreand = +
 			return resleft + resright
@@ -100,7 +101,7 @@ v_EvaluateExpressionRecurse(InstanceID,ExpressionString)
 		{
 			StringTrimLeft,ExpressionString,ExpressionString,1
 			StringTrimRight,ExpressionString,ExpressionString,1
-			return (v_EvaluateExpression(InstanceID,ExpressionString))
+			return (v_EvaluateExpression(InstanceID,ThreadID,ExpressionString))
 		}
 		   
 		else
@@ -114,7 +115,7 @@ v_EvaluateExpressionRecurse(InstanceID,ExpressionString)
 		return ExpressionString
 	
 	;MsgBox % v_GetVariable(InstanceID,ExpressionString,"asIs")
-	return v_GetVariable(InstanceID,ExpressionString,"asIs")
+	return v_GetVariable(InstanceID,ThreadID,ExpressionString,"asIs")
 	
 	
 	

@@ -1,14 +1,14 @@
 ﻿iniAllActions.="Read_from_file|" ;Add this action to list of all actions on initialisation
 
-runActionRead_from_file(InstanceID,ElementID,ElementIDInInstance)
+runActionRead_from_file(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	local tempOptions=""
-	local tempVarName:=v_replaceVariables(InstanceID,%ElementID%varname)
+	local tempVarName:=v_replaceVariables(InstanceID,ThreadID,%ElementID%varname)
 	local tempText
 	
 	if tempVarName=
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 
 	if %ElementID%Encoding=2
 		tempOptions.="*P65001 "
@@ -22,13 +22,13 @@ runActionRead_from_file(InstanceID,ElementID,ElementIDInInstance)
 	
 
 	
-	FileRead,tempText,% tempOptions v_replaceVariables(InstanceID,%ElementID%file)
+	FileRead,tempText,% tempOptions v_replaceVariables(InstanceID,ThreadID,%ElementID%file)
 	if ErrorLevel
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 	else
 	{
-		v_SetVariable(InstanceID,tempVarName,tempText)
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+		v_SetVariable(InstanceID,ThreadID,tempVarName,tempText)
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	}
 	return
 }

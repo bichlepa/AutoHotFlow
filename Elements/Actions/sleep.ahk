@@ -1,13 +1,13 @@
 ﻿iniAllActions.="Sleep|" ;Add this action to list of all actions on initialisation
 
-runActionSleep(InstanceID,ElementID,ElementIDInInstance)
+runActionSleep(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	if (!IsObject(ActionSleepCurrentSleeps))
 		ActionSleepCurrentSleeps:=Object()
 	tempActionSleepDuration:=%ElementID%duration
 	
-	ActionSleepCurrentSleeps.insert("Instance_" InstanceID "_" ElementID "_" ElementIDInInstance,(A_TickCount + tempActionSleepDuration-10)) ;Save the end time.
+	ActionSleepCurrentSleeps.insert("Instance_" InstanceID "_" ThreadID "_" ElementID "_" ElementIDInInstance,(A_TickCount + tempActionSleepDuration-10)) ;Save the end time.
 	SetTimer,ActionSleepEnd,10
 	
 	return
@@ -22,7 +22,12 @@ runActionSleep(InstanceID,ElementID,ElementIDInInstance)
 		{
 			
 			StringSplit,tempSleepid,tempSleepid,_
-			MarkThatElementHasFinishedRunning(tempSleepid2,tempSleepid3,tempSleepid4,"normal")
+			; tempElement1 = word "instance"
+			; tempElement2 = instance id
+			; tempElement3 = Thread ID
+			; tempElement4 = element id
+			; tempElement5 = element id in the instance
+			MarkThatElementHasFinishedRunning(tempSleepid2,tempSleepid3,tempSleepid4,tempSleepid5,"normal")
 
 			ActionSleepCurrentSleeps.remove(tempSleepid)
 		}

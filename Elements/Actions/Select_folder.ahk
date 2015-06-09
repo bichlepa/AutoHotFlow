@@ -1,12 +1,12 @@
 ﻿iniAllActions.="Select_folder|" ;Add this action to list of all actions on initialisation
 
-runActionSelect_folder(InstanceID,ElementID,ElementIDInInstance)
+runActionSelect_folder(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	if (!IsObject(ActionSelect_folderToStart))
 		ActionSelect_folderToStart:=Object()
 	
-	tempInstanceString:="Instance_" InstanceID "_" ElementID "_" ElementIDInInstance
+	tempInstanceString:="Instance_" InstanceID "_" ThreadID "_" ElementID "_" ElementIDInInstance
 	ActionSelect_folderToStart.insert(tempInstanceString)
 	
 	SetTimer,ActionSelect_folder_StartNextQuestion,10,-10 ;lower priority
@@ -23,9 +23,11 @@ runActionSelect_folder(InstanceID,ElementID,ElementIDInInstance)
 		StringSplit,tempElement,tempcSelect_folderidToStart,_
 		; tempElement1 = word "instance"
 		; tempElement2 = instance id
-		; tempElement3 = element id
-		; tempElement4 = element id in the instance
-		ActionSelect_folderToStart_Element_ID:=tempElement3
+		; tempElement3 = thread id
+		; tempElement4 = element id
+		; tempElement5 = element id in the instance
+		ActionSelect_folderToStart_Element_ID:=tempElement4
+		ActionSelect_folderStart_CurrentThread_ID:=tempElement3
 		ActionSelect_folderStart_CurrentInstanceID:=tempElement2
 		
 		;gui,%tempcSelect_folderidToStart%:default
@@ -33,7 +35,7 @@ runActionSelect_folder(InstanceID,ElementID,ElementIDInInstance)
 		;gui,10:-SysMenu 
 		
 		tempActionSelectFolderOptions=0
-		tempActionSelectFolderRoot:=v_replaceVariables(InstanceID,%ActionSelect_folderToStart_Element_ID%folder)
+		tempActionSelectFolderRoot:=v_replaceVariables(ActionSelect_folderStart_CurrentInstanceID,ActionSelect_folderStart_CurrentThread_ID,%ActionSelect_folderToStart_Element_ID%folder)
 		if %ActionSelect_folderToStart_Element_ID%ButtonNewFolder
 			tempActionSelectFolderOptions+=1
 		if %ActionSelect_folderToStart_Element_ID%EditField
@@ -43,14 +45,14 @@ runActionSelect_folder(InstanceID,ElementID,ElementIDInInstance)
 			tempActionSelectFolderRoot:="*" tempActionSelectFolderRoot
 		
 		;MsgBox %tempActionSelectFileOptions%
-		FileSelectFolder,tempActionSelectFolderFolder,% tempActionSelectFolderRoot ,%tempActionSelectFolderOptions%,% v_replaceVariables(InstanceID,%ActionSelect_folderToStart_Element_ID%title)
+		FileSelectFolder,tempActionSelectFolderFolder,% tempActionSelectFolderRoot ,%tempActionSelectFolderOptions%,% v_replaceVariables(ActionSelect_folderStart_CurrentInstanceID,ActionSelect_folderStart_CurrentThread_ID,%ActionSelect_folderToStart_Element_ID%title)
 		;MsgBox %ActionSelect_folderToStart_Element_ID% %tempActionSelectFilefile% %errorlevel%
 		
 		if errorlevel
 			MarkThatElementHasFinishedRunningOneVar(tempcSelect_folderidToStart,"exception")
 		else
 		{
-			v_setVariable(ActionSelect_folderStart_CurrentInstanceID,%ActionSelect_folderToStart_Element_ID%Varname,tempActionSelectFolderFolder)
+			v_setVariable(ActionSelect_folderStart_CurrentInstanceID,ActionSelect_folderStart_CurrentThread_ID,%ActionSelect_folderToStart_Element_ID%Varname,tempActionSelectFolderFolder)
 			
 			MarkThatElementHasFinishedRunningOneVar(tempcSelect_folderidToStart,"normal")
 		}

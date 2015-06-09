@@ -1,6 +1,6 @@
 ﻿iniAllActions.="Send_Keystrokes|" ;Add this action to list of all actions on initialisation
 
-runActionSend_Keystrokes(InstanceID,ElementID,ElementIDInInstance)
+runActionSend_Keystrokes(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	if %ElementID%RawMode=1
@@ -15,7 +15,7 @@ runActionSend_Keystrokes(InstanceID,ElementID,ElementIDInInstance)
 	else if %ElementID%SendMode=3
 		SendPlay,% tempRawText %ElementID%KeysToSend
 	
-	MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	return
 }
 getNameActionSend_Keystrokes()

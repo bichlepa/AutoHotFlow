@@ -6,7 +6,7 @@ runActionLock_Computer(InstanceID,ElementID,ElementIDInInstance)
 	
 	DllCall("LockWorkStation")
 	
-	MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	return
 }
 getNameActionLock_Computer()

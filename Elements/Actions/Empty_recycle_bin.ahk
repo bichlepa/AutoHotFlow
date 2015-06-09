@@ -1,15 +1,15 @@
 ﻿iniAllActions.="Empty_recycle_bin|" ;Add this action to list of all actions on initialisation
 
-runActionEmpty_recycle_bin(InstanceID,ElementID,ElementIDInInstance)
+runActionEmpty_recycle_bin(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	
 	if %ElementID%AllDrives=1
 		FileRecycleEmpty
 	else
-		FileRecycleEmpty, % v_replaceVariables(InstanceID,%ElementID%Drive)
+		FileRecycleEmpty, % v_replaceVariables(InstanceID,ThreadID,%ElementID%Drive)
 	
-	MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	return
 }
 getNameActionEmpty_recycle_bin()

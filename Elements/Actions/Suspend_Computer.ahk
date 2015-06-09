@@ -1,12 +1,12 @@
 ﻿iniAllActions.="Suspend_Computer|" ;Add this action to list of all actions on initialisation
 
-runActionSuspend_Computer(InstanceID,ElementID,ElementIDInInstance)
+runActionSuspend_Computer(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	
 	DllCall("PowrProf\SetSuspendState", "int", 0, "int", 0, "int", 0) ;Hybernate
 	
-	MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	return
 }
 getNameActionSuspend_Computer()

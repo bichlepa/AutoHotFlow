@@ -1,15 +1,15 @@
 ﻿iniAllActions.="Speech_output|" ;Add this action to list of all actions on initialisation
 
-runActionSpeech_output(InstanceID,ElementID,ElementIDInInstance)
+runActionSpeech_output(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	local tempDuration
 	
-	local runActionSpeech_Engine:=v_replaceVariables(InstanceID,%ElementID%TTSEngine)
-	local runActionSpeech_Volume:=v_replaceVariables(InstanceID,%ElementID%Volume)
-	local runActionSpeech_Pitch:=v_replaceVariables(InstanceID,%ElementID%Pitch)
-	local runActionSpeech_Speed:=v_replaceVariables(InstanceID,%ElementID%Speed)
-	local runActionSpeech_output_Text:=v_replaceVariables(InstanceID,%ElementID%text,"normal")
+	local runActionSpeech_Engine:=v_replaceVariables(InstanceID,ThreadID,%ElementID%TTSEngine)
+	local runActionSpeech_Volume:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Volume)
+	local runActionSpeech_Pitch:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Pitch)
+	local runActionSpeech_Speed:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Speed)
+	local runActionSpeech_output_Text:=v_replaceVariables(InstanceID,ThreadID,%ElementID%text,"normal")
 	
 	
 	if ActionSpeech_Engine_lastreadingvoice
@@ -64,7 +64,7 @@ runActionSpeech_output(InstanceID,ElementID,ElementIDInInstance)
 	}
 	
 	ActionSpeech_output_now_Speaking:=false
-	MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	
 	return
 

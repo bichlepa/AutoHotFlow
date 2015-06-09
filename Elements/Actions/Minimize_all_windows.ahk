@@ -1,6 +1,6 @@
 ﻿iniAllActions.="Minimize_all_windows|" ;Add this action to list of all actions on initialisation
 
-runActionMinimize_all_windows(InstanceID,ElementID,ElementIDInInstance)
+runActionMinimize_all_windows(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 
@@ -10,7 +10,7 @@ runActionMinimize_all_windows(InstanceID,ElementID,ElementIDInInstance)
 	else
 		WinMinimizeAllUndo
 
-	MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	return
 }
 getNameActionMinimize_all_windows()

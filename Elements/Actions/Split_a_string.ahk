@@ -1,6 +1,6 @@
 ﻿iniAllActions.="Split_a_string|" ;Add this action to list of all actions on initialisation
 
-runActionSplit_a_string(InstanceID,ElementID,ElementIDInInstance)
+runActionSplit_a_string(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	local temp
@@ -8,15 +8,15 @@ runActionSplit_a_string(InstanceID,ElementID,ElementIDInInstance)
 	local OptionOmitChars
 	local OptionDelimiters
 	local tempVarname
-	tempVarname:=v_replaceVariables(InstanceID,%ElementID%Varname)
+	tempVarname:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname)
 	if %ElementID%expression=1
-		temp:=v_replaceVariables(InstanceID,%ElementID%VarValue)
+		temp:=v_replaceVariables(InstanceID,ThreadID,%ElementID%VarValue)
 	else
-		temp:=v_EvaluateExpression(InstanceID,%ElementID%VarValue)
+		temp:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%VarValue)
 	;MsgBox,%  %ElementID%Varname "---" %ElementID%VarValue "---" v_replaceVariables(InstanceID,%ElementID%Varname) "---" 
 	
-	OptionOmitChars:=v_replaceVariables(InstanceID,%ElementID%OmitChars) 
-	OptionDelimiters:=v_replaceVariables(InstanceID,%ElementID%Delimiters) 
+	OptionOmitChars:=v_replaceVariables(InstanceID,ThreadID,%ElementID%OmitChars) 
+	OptionDelimiters:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Delimiters) 
 	
 	loop,parse,temp,%OptionDelimiters%,%OptionOmitChars%
 	{
@@ -26,8 +26,8 @@ runActionSplit_a_string(InstanceID,ElementID,ElementIDInInstance)
 	
 
 	
-	v_SetVariable(InstanceID,tempVarname,v_importVariable(Result,"list","▬"),"list")
-	MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+	v_SetVariable(InstanceID,ThreadID,tempVarname,v_importVariable(Result,"list","▬"),"list")
+	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 
 	
 

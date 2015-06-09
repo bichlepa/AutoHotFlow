@@ -28,6 +28,14 @@
 			return
 		}
 	}
+	else if %setElementID%Type=Loop
+	{
+		if %setElementID%subType=
+		{
+			ui_selectElementType(%setElementID%Type,setElementID)
+			return
+		}
+	}
 	else if %setElementID%Type=Trigger
 	{
 		if setElementID=trigger
@@ -128,6 +136,8 @@
 	else 
 	{
 		MsgBox,,Internal error, Element Type unknown
+		NowResultEditingElement=ok
+		ui_EnableMainGUI()
 		return
 	}
 	ui_DisableMainGUI()
@@ -405,9 +415,9 @@
 			GUISettingsOfElement%setElementID%%parameter3%Prompt:=parameter4
 			GUISettingsOfElement%setElementID%%parameter3%Options:=parameter5
 			GUISettingsOfElement%setElementID%%parameter3%Filter:=parameter6
-			gui,add,edit,w370 x10 gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%parameter3%,%temp%
+			gui,add,edit,w340 x10 gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%parameter3%,%temp%
 			gui,add,button,w20 X+10  gGUISettingsOfElementSelectFolder vGUISettingsOfElementbuttonSelectFile_%setElementID%_%parameter3%,...
-			
+			gui,add,button,w20 X+10 gGUISettingsOfElementSelectFolderHelp,?
 		}
 		else if parameter1=weekdays
 		{
@@ -612,6 +622,16 @@
 	return
 	
 	
+	
+	
+	
+	GUISettingsOfElementSelectFolderHelp:
+	MsgBox % lang("Help is not implemented yet") " :-("
+	return
+	
+	
+	
+	
 	Gui2Close:
 	Gui2Escape:
 	2guiclose:
@@ -631,6 +651,7 @@
 	}
 	Gui,destroy
 	SG2.Destroy()
+	
 	ui_EnableMainGUI()
 	return
 	
@@ -709,6 +730,7 @@
 	
 	SG2.Destroy()
 	Gui,destroy
+	
 	ui_EnableMainGUI()
 	saved=no
 	
@@ -773,9 +795,15 @@ ui_selectElementType(type,setElementID)
 		tempElementNames:=IniAllActionNames
 		tempElementCategories:=IniAllActionCategories
 	}
+	else if type=loop
+	{
+		tempElements:=IniAllLoops
+		tempElementNames:=IniAllLoopNames
+		tempElementCategories:=IniAllLoopCategories
+	}
 	else
 	{
-		MsgBox,Error %type%
+		MsgBox,Internal Error: Unknown element type: %type%
 		return
 	}
 	StringSplit,tempElements,tempElements,|
@@ -1016,6 +1044,7 @@ ui_selectContainerType(tempNewID="")
 	{
 		gui,add,Button,w100 h50 gGuiElementTypeChooseAction gGuiElementTypeChooseAction default,% lang("Action")
 		gui,add,Button,w100 h50 X+10 gGuiElementTypeChooseCondition gGuiElementTypeChooseCondition,% lang("Condition")
+		gui,add,Button,w100 h50 X+10 gGuiElementTypeChooseLoop gGuiElementTypeChooseLoop,% lang("Loop")
 		
 		
 		
@@ -1024,6 +1053,7 @@ ui_selectContainerType(tempNewID="")
 	{
 		gui,add,Button,w100 h50 gGuiElementTypeChooseAction gGuiElementTypeChooseAction ,% lang("Action")
 		gui,add,Button,w100 h50 X+10  gGuiElementTypeChooseCondition gGuiElementTypeChooseCondition default,% lang("Condition")
+		gui,add,Button,w100 h50 X+10 gGuiElementTypeChooseLoop gGuiElementTypeChooseLoop,% lang("Loop")
 
 		
 	}
@@ -1062,6 +1092,13 @@ ui_selectContainerType(tempNewID="")
 	ui_EnableMainGUI()
 	gui,1:default
 	NowTypeChoosed:="condition"
+	return
+	
+	GuiElementTypeChooseLoop:
+	gui,destroy
+	ui_EnableMainGUI()
+	gui,1:default
+	NowTypeChoosed:="loop"
 	return 
 	
 	

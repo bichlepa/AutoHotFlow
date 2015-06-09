@@ -1,15 +1,15 @@
 ﻿iniAllConditions.="File_exists|" ;Add this condition to list of all conditions on initialisation
 
-runConditionFile_exists(InstanceID,ElementID,ElementIDInInstance)
+runConditionFile_exists(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 
-	local tempfile:=v_replaceVariables(InstanceID,%ElementID%file)
+	local tempfile:=v_replaceVariables(InstanceID,ThreadID,%ElementID%file)
 	
 	IfExist, % tempfile
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"yes")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"yes")
 	else 
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"no")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"no")
 	
 	 
 	

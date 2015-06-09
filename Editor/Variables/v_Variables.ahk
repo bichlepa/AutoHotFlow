@@ -1,6 +1,6 @@
-﻿
+﻿AllBuiltInVars:="-A_Space-A_Tab-A_YYYY-A_MM-A_DD-A_MMMM-A_MMM-A_DDDD-A_DDD-A_WDay-A_YDay-A_YWeek-A_Hour-A_Min-A_Sec-A_MSec-A_TickCount-A_TimeIdle-A_TimeIdlePhysical-A_Temp-A_OSType-A_OSVersion-A_Is64bitOS-A_PtrSize-A_Language-A_ComputerName-A_UserName-A_ScriptDir-A_WinDir-A_ProgramFiles-A_AppData-A_AppDataCommon-A_Desktop-A_DesktopCommon-A_StartMenu-A_StartMenuCommon-A_Programs-A_ProgramsCommon-A_Startup-A_StartupCommon-A_MyDocuments-A_IsAdmin-A_ScreenWidth-A_ScreenHeight-A_ScreenDPI-A_IPAddress1-A_IPAddress2-A_IPAddress3-A_IPAddress4-A_Cursor-A_CaretX-A_CaretY-----" ;a_now and a_nowutc not included
 
-v_replaceVariables(InstanceID,String,VariableType="asIs")
+v_replaceVariables(InstanceID,ThreadID,String,VariableType="asIs")
 {
 	
 	Loop
@@ -8,7 +8,7 @@ v_replaceVariables(InstanceID,String,VariableType="asIs")
 		tempFoundPos:=RegExMatch(String, "U).*%(.+)%.*", tempVariablesToReplace)
 		if tempFoundPos=0
 			break
-		StringReplace,String,String,`%%tempVariablesToReplace1%`%,% v_getVariable(InstanceID,tempVariablesToReplace1,VariableType)
+		StringReplace,String,String,`%%tempVariablesToReplace1%`%,% v_getVariable(InstanceID,ThreadID,tempVariablesToReplace1,VariableType)
 		;~ MsgBox %tempVariablesToReplace1%
 	}
 	return String
@@ -27,7 +27,7 @@ v_deleteLocalVariable(InstanceID,name)
 	
 }
 
-v_getVariable(InstanceID,name,VariableType="asIs")
+v_getVariable(InstanceID,ThreadID,name,VariableType="asIs")
 {
 	global
 	local tempvalue
@@ -35,7 +35,7 @@ v_getVariable(InstanceID,name,VariableType="asIs")
 	local tempGlobalVariable
 	
 	StringLeft,templeft,name,7
-	if templeft=global_
+	if templeft=global_ ;If variable is global
 	{
 		
 		if fileexist("global variables\" name ".txt")
@@ -93,7 +93,7 @@ v_getVariable(InstanceID,name,VariableType="asIs")
 		else
 			return
 	}
-	else if (substr(name,1,2)="A_")
+	else if (substr(name,1,2)="A_") ; if variable is a built in variable or a thread variable
 	{
 		if (name="a_now" || name="A_NowUTC")
 		{
@@ -108,19 +108,24 @@ v_getVariable(InstanceID,name,VariableType="asIs")
 				return tempvalue
 			}
 		}
-		else
+		else IfInString,AllBuiltInVars,-%name%-
+		{
 			tempvalue:=%name%
+			
+		}
+		else
+			tempvalue:=Instance_%InstanceID%_Thread_%ThreadID%_Variables[name] 
 		
 		return tempvalue
 		
 	}
-	else
+	else ; if variable is a local variable
 	{
 		tempvalue:=Instance_%InstanceID%_LocalVariables[name]
 		if isobject(tempvalue)
 		{
 			
-			if (VariableType="normal")
+			if (VariableType="asIs" or VariableType="list")
 				return tempvalue
 			else
 			{
@@ -161,21 +166,28 @@ v_getVariable(InstanceID,name,VariableType="asIs")
 	
 	
 }
-v_setVariable(InstanceID,name,value,VariableType="Normal")
+v_setVariable(InstanceID,ThreadID,name,value,VariableType="Normal",whetherToSetThreadVar=0)
 {
 	global
 	local tempstring
 	local templeft
 	local tempvalue
 	
+	;Refuse setting a variable that begins with "a_". But set thread var if it is designated
 	if (substr(name,1,2)="A_")
 	{
-		return "ERROR"
+		if (whetherToSetThreadVar=true)
+		{
+			Instance_%r_RunningCounter%_Thread_%ThreadID%_Variables.insert(name,value)
+			
+		}
+		else
+			return "ERROR"
 	}
 	
 	;MsgBox % var "  " value
 	StringLeft,templeft,name,7
-	if templeft=global_
+	if templeft=global_ ;If variable is global
 	{
 		if isobject(value)
 		{
@@ -211,7 +223,7 @@ v_setVariable(InstanceID,name,value,VariableType="Normal")
 		}
 		
 	}
-	else
+	else ;if variable is local
 	{
 		;insert the local variable
 		;The first character will contain the information about the variable type
@@ -235,7 +247,7 @@ v_setVariable(InstanceID,name,value,VariableType="Normal")
 	
 }
 
-v_getVariableType(InstanceID,name)
+v_getVariableType(InstanceID,ThreadID,name)
 {
 	global
 	local tempvalue
@@ -373,10 +385,6 @@ v_deleteVariable(InstanceID,name)
 
 
 
-
-
-
-
 v_WriteLocalVariablesToString(InstanceID)
 {
 	global
@@ -387,4 +395,29 @@ v_WriteLocalVariablesToString(InstanceID)
 	}
 	StringTrimRight,tempReturnString,tempReturnString,1
 	return tempReturnString
+}
+
+
+PrepareEnteringALoop(InstanceID,ThreadID,LoopElement)
+{
+	global
+	;~ MsgBox % StrObj(Instance_%InstanceID%_Thread_%ThreadID%_Variables)
+	local temp:=%InstanceID%_Thread_%ThreadID%_Variables.clone()
+	%InstanceID%_Thread_%ThreadID%_Variables:=Object()
+	%InstanceID%_Thread_%ThreadID%_Variables.insert("OldLoopVars",temp)
+	%InstanceID%_Thread_%ThreadID%_Variables.insert("CurrentLoop",LoopElement)
+	;~ MsgBox % StrObj(temp)
+	
+}
+
+
+PrepareLeavingALoop(InstanceID,ThreadID,LoopElement)
+{
+	global
+	;~ MsgBox % StrObj(Instance_%InstanceID%_Thread_%ThreadID%_Variables)
+	;~ MsgBox % LoopElement " - " %InstanceID%_Thread_%ThreadID%_Variables["CurrentLoop"]
+	%InstanceID%_Thread_%ThreadID%_Variables:=%InstanceID%_Thread_%ThreadID%_Variables["OldLoopVars"]
+	
+	;~ MsgBox % StrObj(Instance_%InstanceID%_Thread_%ThreadID%_Variables)
+	
 }

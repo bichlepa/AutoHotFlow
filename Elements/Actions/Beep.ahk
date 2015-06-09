@@ -1,14 +1,14 @@
 ﻿iniAllActions.="Beep|" ;Add this action to list of all actions on initialisation
 
-runActionBeep(InstanceID,ElementID,ElementIDInInstance)
+runActionBeep(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 
 
 
-	SoundBeep,% v_replaceVariables(InstanceID,%ElementID%frequency),% v_replaceVariables(InstanceID,%ElementID%duration)
+	SoundBeep,% v_replaceVariables(InstanceID,ThreadID,%ElementID%frequency),% v_replaceVariables(InstanceID,ThreadID,%ElementID%duration)
 
-	MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	return
 }
 getNameActionBeep()

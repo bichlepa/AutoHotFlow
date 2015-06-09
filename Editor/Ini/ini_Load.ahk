@@ -2,6 +2,7 @@
 {
 	global
 	
+	busy:=true
 	ui_disablemaingui()
 	if ThisFlowFilePath=
 	{
@@ -50,7 +51,8 @@
 			Iniread,%loadElementID%to,%ThisFlowFolder%\%ThisFlowFilename%.ini,element%index1%,to
 			Iniread,%loadElementID%ConnectionType,%ThisFlowFolder%\%ThisFlowFilename%.ini,element%index1%,ConnectionType
 			
-			
+			Iniread,%loadElementID%fromPart,%ThisFlowFolder%\%ThisFlowFilename%.ini,element%index1%,fromPart,%A_Space%
+			Iniread,%loadElementID%ToPart,%ThisFlowFolder%\%ThisFlowFilename%.ini,element%index1%,toPart,%A_Space%
 		}
 		else if (loadElementType="Trigger")
 		{
@@ -85,7 +87,11 @@
 			Iniread,loadElementsubType,%ThisFlowFolder%\%ThisFlowFilename%.ini,element%index1%,subType
 			%loadElementID%subType=%loadElementsubType%
 			
-			
+			if (loadElementType="loop")
+			{
+				Iniread,loadElementHeightOfVerticalBar,%ThisFlowFolder%\%ThisFlowFilename%.ini,element%index1%,HeightOfVerticalBar
+				%loadElementID%HeightOfVerticalBar=%loadElementHeightOfVerticalBar%
+			}
 			
 			
 			parametersToload:=getParameters%loadElementType%%loadElementsubType%()
@@ -182,6 +188,7 @@
 	d_logger("Flow loaded`nName: "FlowName)
 	ui_draw()
 	saved=yes
+	busy:=false
 }
 
 i_loadGeneralParameters()

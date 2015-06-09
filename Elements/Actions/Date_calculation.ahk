@@ -1,12 +1,12 @@
 ﻿iniAllActions.="Date_Calculation|" ;Add this action to list of all actions on initialisation
 
-runActionDate_Calculation(InstanceID,ElementID,ElementIDInInstance)
+runActionDate_Calculation(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	
-	local tempVarName:=v_replaceVariables(InstanceID,%ElementID%varname)
-	local tempTime:=v_GetVariable(InstanceID,tempVarName,"Date")
-	local tempCount:=v_replaceVariables(InstanceID,%ElementID%Units)
+	local tempVarName:=v_replaceVariables(InstanceID,ThreadID,%ElementID%varname)
+	local tempTime:=v_GetVariable(InstanceID,ThreadID,tempVarName,"Date")
+	local tempCount:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Units)
 	
 	local tempUnit
 	if %ElementID%Unit=1
@@ -23,12 +23,12 @@ runActionDate_Calculation(InstanceID,ElementID,ElementIDInInstance)
 		envadd,tempTime,%tempCount%,%tempUnit%
 	;MsgBox,%  %ElementID%Varname "---" %ElementID%VarValue "---" v_replaceVariables(InstanceID,%ElementID%Varname) "---" v_replaceVariables(InstanceID,%ElementID%VarValue)
 	
-		v_SetVariable(InstanceID,tempVarName,tempTime,"Date")
+		v_SetVariable(InstanceID,ThreadID,tempVarName,tempTime,"Date")
 		
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	}
 	else
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"Exception")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"Exception")
 	
 
 	

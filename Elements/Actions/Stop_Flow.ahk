@@ -1,6 +1,6 @@
 ﻿iniAllActions.="Stop_Flow|" ;Add this action to list of all actions on initialisation
 
-runActionStop_Flow(InstanceID,ElementID,ElementIDInInstance)
+runActionStop_Flow(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	
@@ -19,11 +19,11 @@ runActionStop_Flow(InstanceID,ElementID,ElementIDInInstance)
 		sleep 100
 	}
 	if returnedFlowIsStopped=
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 	else if returnedFlowIsStopped=ǸoⱾuchȠaⱮe
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 	else
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	
 	
 	

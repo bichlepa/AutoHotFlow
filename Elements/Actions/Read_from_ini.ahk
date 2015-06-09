@@ -1,14 +1,14 @@
 ﻿iniAllActions.="Read_from_ini|" ;Add this action to list of all actions on initialisation
 
-runActionRead_from_ini(InstanceID,ElementID,ElementIDInInstance)
+runActionRead_from_ini(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	local tempOptions=""
-	local tempVarName:=v_replaceVariables(InstanceID,%ElementID%varname)
+	local tempVarName:=v_replaceVariables(InstanceID,ThreadID,%ElementID%varname)
 	local tempText
 	
 	if tempVarName=
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 
 	
 	
@@ -17,28 +17,28 @@ runActionRead_from_ini(InstanceID,ElementID,ElementIDInInstance)
 	{
 		if %ElementID%WhenError=1
 		{
-			IniRead,tempText,% v_replaceVariables(InstanceID,%ElementID%file),% v_replaceVariables(InstanceID,%ElementID%section),% v_replaceVariables(InstanceID,%ElementID%key),% v_replaceVariables(InstanceID,%ElementID%default)
+			IniRead,tempText,% v_replaceVariables(InstanceID,ThreadID,%ElementID%file),% v_replaceVariables(InstanceID,ThreadID,%ElementID%section),% v_replaceVariables(InstanceID,ThreadID,%ElementID%key),% v_replaceVariables(InstanceID,ThreadID,%ElementID%default)
 		}
 		else
 		{
-			IniRead,tempText,% v_replaceVariables(InstanceID,%ElementID%file),% v_replaceVariables(InstanceID,%ElementID%section),% v_replaceVariables(InstanceID,%ElementID%key),E?R ROR
+			IniRead,tempText,% v_replaceVariables(InstanceID,ThreadID,%ElementID%file),% v_replaceVariables(InstanceID,ThreadID,%ElementID%section),% v_replaceVariables(InstanceID,ThreadID,%ElementID%key),E?R ROR
 			if tempText=E?R ROR
 			{
-				MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+				MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 				return
 			}
 		}
 		
-		v_SetVariable(InstanceID,tempVarName,tempText)
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+		v_SetVariable(InstanceID,ThreadID,tempVarName,tempText)
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 		
 	}
 	else ;Get section list
 	{
-		IniRead,tempText,% v_replaceVariables(InstanceID,%ElementID%file)
-		v_setVariable(InstanceID,tempVarName,v_importVariable(tempText,"list","`n"),"list")
+		IniRead,tempText,% v_replaceVariables(InstanceID,ThreadID,%ElementID%file)
+		v_setVariable(InstanceID,ThreadID,tempVarName,v_importVariable(tempText,"list","`n"),"list")
 		
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	}
 
 	

@@ -1,6 +1,6 @@
 ﻿iniAllActions.="Play_Sound|" ;Add this action to list of all actions on initialisation
 
-runActionPlay_Sound(InstanceID,ElementID,ElementIDInInstance)
+runActionPlay_Sound(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	local tempSound
@@ -16,11 +16,11 @@ runActionPlay_Sound(InstanceID,ElementID,ElementIDInInstance)
 	else if (%ElementID%WhitchSound=5)
 		SoundPlay,*64
 	else if (%ElementID%WhitchSound=6)
-		SoundPlay,% v_replaceVariables(InstanceID,%ElementID%soundfile)
+		SoundPlay,% v_replaceVariables(InstanceID,ThreadID,%ElementID%soundfile)
 	if errorlevel
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 	else
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	return
 }
 getNameActionPlay_Sound()

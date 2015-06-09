@@ -1,14 +1,14 @@
 ﻿iniAllActions.="Delete_file|" ;Add this action to list of all actions on initialisation
 
-runActionDelete_file(InstanceID,ElementID,ElementIDInInstance)
+runActionDelete_file(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	
-	FileDelete,% v_replaceVariables(InstanceID,%ElementID%file)
+	FileDelete,% v_replaceVariables(InstanceID,ThreadID,%ElementID%file)
 	if ErrorLevel
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 	else
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	return
 }
 getNameActionDelete_file()

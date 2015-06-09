@@ -5,7 +5,7 @@ ini_ReadSettings()
 
 	;Read settings
 	iniread,translationto,settings.ini,common,translatingto
-	iniread,developing,settings.ini,common,developing
+	;iniread,developing,settings.ini,common,developing
 
 
 
@@ -22,6 +22,8 @@ ini_GetElementInformations()
 	IniAllActionCategories=|
 	IniAllConditionCategories=|
 	IniAllTriggerCategories=|
+	IniAllLoopCategories=|
+	
 	loop,parse, iniAllActions,|
 	{
 		
@@ -82,5 +84,25 @@ ini_GetElementInformations()
 	StringSplit,IniAllTriggerNames,IniAllTriggerNames,|
 	StringTrimRight,IniAllTriggerCategories,IniAllTriggerCategories,1
 	StringTrimLeft,IniAllTriggerCategories,IniAllTriggerCategories,1
+
+	loop,parse, iniAllLoops,|
+	{
+		tempname:=getnameLoop%a_loopfield%()
+		if tempname!=
+		{
+			IniAllLoopNames=%IniAllLoopNames%%tempname%|
+		}
+		
+		tempCategory:=getCategoryLoop%a_loopfield%()
+		Loop parse,tempCategory,|
+		{
+			IfNotInString,IniAllLoopCategories,|%A_LoopField%|
+				IniAllLoopCategories=%IniAllLoopCategories%%A_LoopField%|
+		}
+	}
+	StringTrimRight,IniAllLoopNames,IniAllLoopNames,1
+	StringSplit,IniAllLoopNames,IniAllLoopNames,|
+	StringTrimRight,IniAllLoopCategories,IniAllLoopCategories,1
+	StringTrimLeft,IniAllLoopCategories,IniAllLoopCategories,1
 
 }

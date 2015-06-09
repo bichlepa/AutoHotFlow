@@ -1,17 +1,17 @@
 ﻿iniAllActions.="New_variable|" ;Add this action to list of all actions on initialisation
 
-runActionNew_variable(InstanceID,ElementID,ElementIDInInstance)
+runActionNew_variable(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	
 	;MsgBox,%  %ElementID%Varname "---" %ElementID%VarValue "---" v_replaceVariables(InstanceID,%ElementID%Varname) "---" v_replaceVariables(InstanceID,%ElementID%VarValue)
 	if %ElementID%expression=1
-		v_SetVariable(InstanceID,v_replaceVariables(InstanceID,%ElementID%Varname),v_replaceVariables(InstanceID,%ElementID%VarValue))
+		v_SetVariable(InstanceID,ThreadID,v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname),v_replaceVariables(InstanceID,ThreadID,%ElementID%VarValue))
 	else
-		v_SetVariable(InstanceID,v_replaceVariables(InstanceID,%ElementID%Varname),v_EvaluateExpression(InstanceID,%ElementID%VarValue))
+		v_SetVariable(InstanceID,ThreadID,v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname),v_EvaluateExpression(InstanceID,ThreadID,%ElementID%VarValue))
 	
 
-	MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	return
 }
 getNameActionNew_variable()

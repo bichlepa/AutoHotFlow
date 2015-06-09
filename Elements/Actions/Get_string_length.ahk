@@ -1,6 +1,6 @@
 ﻿iniAllActions.="Get_string_length|" ;Add this action to list of all actions on initialisation
 
-runActionGet_string_length(InstanceID,ElementID,ElementIDInInstance)
+runActionGet_string_length(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	local temp
@@ -11,16 +11,16 @@ runActionGet_string_length(InstanceID,ElementID,ElementIDInInstance)
 	local Result
 	local Options
 	
-	tempVarname:=v_replaceVariables(InstanceID,%ElementID%Varname)
+	tempVarname:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname)
 	
 	if %ElementID%expression=1
-		temp:=v_replaceVariables(InstanceID,%ElementID%VarValue)
+		temp:=v_replaceVariables(InstanceID,ThreadID,%ElementID%VarValue)
 	else
-		temp:=v_EvaluateExpression(InstanceID,%ElementID%VarValue)
+		temp:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%VarValue)
 	
 	StringLen,Result,temp
-	v_SetVariable(InstanceID,tempVarname,Result)
-	MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+	v_SetVariable(InstanceID,ThreadID,tempVarname,Result)
+	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	
 	
 	

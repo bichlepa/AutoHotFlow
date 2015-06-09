@@ -1,6 +1,6 @@
 ﻿iniAllActions.="Change_character_case|" ;Add this action to list of all actions on initialisation
 
-runActionChange_character_case(InstanceID,ElementID,ElementIDInInstance)
+runActionChange_character_case(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	local temp
@@ -8,20 +8,20 @@ runActionChange_character_case(InstanceID,ElementID,ElementIDInInstance)
 	local OptionCharCase
 	
 	if %ElementID%expression=1
-		temp:=v_replaceVariables(InstanceID,%ElementID%VarValue)
+		temp:=v_replaceVariables(InstanceID,ThreadID,%ElementID%VarValue)
 	else
-		temp:=v_EvaluateExpression(InstanceID,%ElementID%VarValue)
+		temp:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%VarValue)
 
 
-	OptionCharCase:=v_replaceVariables(InstanceID,%ElementID%CharCase) 
+	OptionCharCase:=v_replaceVariables(InstanceID,ThreadID,%ElementID%CharCase) 
 	if OptionCharCase=1 ;Uppercase
 		StringUpper,Result,temp
 	else if OptionCharCase=2 ;Lowercase
 		StringLower,Result,temp
 	else if OptionCharCase=3
 		StringUpper,Result,temp,T ;First character of a word is uppercase
-	v_SetVariable(InstanceID,v_replaceVariables(InstanceID,%ElementID%Varname),Result)
-	MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+	v_SetVariable(InstanceID,ThreadID,v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname),Result)
+	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 
 	return
 }

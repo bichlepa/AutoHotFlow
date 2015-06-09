@@ -1,6 +1,6 @@
 ﻿iniAllActions.="Set_Flow_Status|" ;Add this action to list of all actions on initialisation
 
-runActionSet_Flow_Status(InstanceID,ElementID,ElementIDInInstance)
+runActionSet_Flow_Status(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	
@@ -20,11 +20,11 @@ runActionSet_Flow_Status(InstanceID,ElementID,ElementIDInInstance)
 			sleep 100
 		}
 		if returnedFlowIsEnabled=
-			MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 		else if returnedFlowIsEnabled=ǸoⱾuchȠaⱮe
-			MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 		else
-			MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 		
 		
 	}
@@ -40,11 +40,11 @@ runActionSet_Flow_Status(InstanceID,ElementID,ElementIDInInstance)
 			sleep 50
 		}
 		if returnedFlowIsDisabled=
-			MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 		else if returnedFlowIsDisabled=ǸoⱾuchȠaⱮe
-			MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 		else
-			MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 		
 		
 	}

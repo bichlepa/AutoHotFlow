@@ -1,15 +1,15 @@
 ﻿iniAllActions.="Set_Clipboard|" ;Add this action to list of all actions on initialisation
 
-runActionSet_Clipboard(InstanceID,ElementID,ElementIDInInstance)
+runActionSet_Clipboard(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	
 	
-	Clipboard:=v_GetVariable(InstanceID,v_replaceVariables(InstanceID,%ElementID%Varname))
+	Clipboard:=v_GetVariable(InstanceID,ThreadID,v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname))
 	
 	
 
-	MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	return
 }
 GetNameActionSet_Clipboard()

@@ -1,11 +1,11 @@
 ﻿iniAllActions.="Stop_Sound|" ;Add this action to list of all actions on initialisation
 
-runActionStop_Sound(InstanceID,ElementID,ElementIDInInstance)
+runActionStop_Sound(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	
 	SoundPlay,-
-	MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	return
 }
 getNameActionStop_Sound()

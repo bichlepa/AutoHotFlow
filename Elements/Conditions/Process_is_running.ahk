@@ -1,19 +1,19 @@
 ﻿iniAllConditions.="Process_is_running|" ;Add this condition to list of all conditions on initialisation
 
-runConditionProcess_is_running(InstanceID,ElementID,ElementIDInInstance)
+runConditionProcess_is_running(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	
 	
 	;MsgBox % %ElementID%ProcessName
-	Process,exist,% v_replaceVariables(InstanceID,%ElementID%ProcessName) 
+	Process,exist,% v_replaceVariables(InstanceID,ThreadID,%ElementID%ProcessName) 
 	if errorlevel
 	{
-		v_setVariable(InstanceID,t_pid,errorlevel)
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"yes")
+		v_setVariable(InstanceID,ThreadID,t_pid,errorlevel)
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"yes")
 	}
 	else
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"no")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"no")
 	
 	
 

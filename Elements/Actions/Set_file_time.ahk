@@ -1,14 +1,14 @@
 ﻿iniAllActions.="Set_file_time|" ;Add this action to list of all actions on initialisation
 
-runActionSet_file_time(InstanceID,ElementID,ElementIDInInstance)
+runActionSet_file_time(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	local tempOptions=""
-	local tempVar:=v_replaceVariables(InstanceID,%ElementID%time,"Date")
+	local tempVar:=v_replaceVariables(InstanceID,ThreadID,%ElementID%time,"Date")
 	local temp
 	
 	if tempVar=
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 
 	if %ElementID%TimeType=1
 		tempOptions:="M"
@@ -19,14 +19,14 @@ runActionSet_file_time(InstanceID,ElementID,ElementIDInInstance)
 		
 	
 	;MsgBox %tempVar%
-	FileSetTime,%tempVar%,% v_replaceVariables(InstanceID,%ElementID%file),%tempOptions%
+	FileSetTime,%tempVar%,% v_replaceVariables(InstanceID,ThreadID,%ElementID%file),%tempOptions%
 	
 	if ErrorLevel
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 	else
 	{
-		v_SetVariable(InstanceID,tempVarName,temp,"Date")
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+		v_SetVariable(InstanceID,ThreadID,tempVarName,temp,"Date")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	}
 	return
 }

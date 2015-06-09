@@ -1,15 +1,15 @@
 ﻿iniAllActions.="Get_file_size|" ;Add this action to list of all actions on initialisation
 
-runActionGet_file_size(InstanceID,ElementID,ElementIDInInstance)
+runActionGet_file_size(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	local tempOptions=""
-	local tempVarName:=v_replaceVariables(InstanceID,%ElementID%varname)
+	local tempVarName:=v_replaceVariables(InstanceID,ThreadID,%ElementID%varname)
 	local temp
 	
 	if tempVarName=
 	{
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 		return
 	}
 
@@ -20,13 +20,13 @@ runActionGet_file_size(InstanceID,ElementID,ElementIDInInstance)
 		
 	
 	
-	FileGetSize,temp,% v_replaceVariables(InstanceID,%ElementID%file),%tempOptions%
+	FileGetSize,temp,% v_replaceVariables(InstanceID,ThreadID,%ElementID%file),%tempOptions%
 	if ErrorLevel
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 	else
 	{
-		v_SetVariable(InstanceID,tempVarName,temp)
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+		v_SetVariable(InstanceID,ThreadID,tempVarName,temp)
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	}
 	return
 }

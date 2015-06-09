@@ -1,6 +1,6 @@
 ﻿iniAllActions.="Write_to_ini|" ;Add this action to list of all actions on initialisation
 
-runActionWrite_to_ini(InstanceID,ElementID,ElementIDInInstance)
+runActionWrite_to_ini(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	local tempOptions=""
@@ -13,12 +13,12 @@ runActionWrite_to_ini(InstanceID,ElementID,ElementIDInInstance)
 	
 	
 	
-	IniWrite,% v_replaceVariables(InstanceID,%ElementID%Value),% v_replaceVariables(InstanceID,%ElementID%file),% v_replaceVariables(InstanceID,%ElementID%section),% v_replaceVariables(InstanceID,%ElementID%key)
+	IniWrite,% v_replaceVariables(InstanceID,ThreadID,%ElementID%Value),% v_replaceVariables(InstanceID,ThreadID,%ElementID%file),% v_replaceVariables(InstanceID,ThreadID,%ElementID%section),% v_replaceVariables(InstanceID,ThreadID,%ElementID%key)
 	
 	if errorlevel
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"exception")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 	else
-		MarkThatElementHasFinishedRunning(InstanceID,ElementID,ElementIDInInstance,"normal")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	
 	
 	
