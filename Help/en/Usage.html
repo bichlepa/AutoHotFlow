@@ -1,0 +1,283 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=windows-1252">
+	<TITLE>Bedienung</TITLE>
+	<META NAME="GENERATOR" CONTENT="OpenOffice 4.1.0  (Win32)">
+	<META NAME="CREATED" CONTENT="0;0">
+	<META NAME="CHANGEDBY" CONTENT="Paul Bichler">
+	<META NAME="CHANGED" CONTENT="20150313;18051446">
+	<META NAME="CHANGEDBY" CONTENT="Paul Bichler">
+	<STYLE TYPE="text/css">
+	<!--
+		P { color: #000000 }
+		TD P { color: #000000 }
+		DT { color: #000000 }
+	-->
+	</STYLE>
+</HEAD>
+<BODY LANG="de-DE" TEXT="#000000" DIR="LTR">
+<TABLE WIDTH=100% BORDER=0 CELLPADDING=2 CELLSPACING=2 STYLE="page-break-before: always">
+	<TR>
+		<TD BGCOLOR="#6a5acd">
+			<P ALIGN=CENTER><FONT SIZE=7>Usage</FONT></P>
+		</TD>
+	</TR>
+</TABLE>
+<P><BR><BR>
+</P>
+<DL>
+	<DT STYLE="margin-bottom: 0.5cm"><A NAME="Quick Start"></A><FONT SIZE=6>Quick Start</FONT> 
+	</DT></DL>
+<P>
+<FONT SIZE=4>Start Base Frame. Press on Open and choose your main
+uncompiled script.<BR>Fill all edit fields on the left-hand side.</FONT></P>
+<DL>
+	<DD>
+	<TABLE BORDER=0 CELLPADDING=2 CELLSPACING=2>
+		<TR>
+			<TD WIDTH=150>
+				<P><B><BR>Application name:</B></P>
+			</TD>
+			<TD>
+				<P><BR>Name of the application.</P>
+			</TD>
+		</TR>
+		<TR>
+			<TD>
+				<P><B><BR>Abbreviation:</B></P>
+			</TD>
+			<TD>
+				<P><BR>The abbreviation of the application name.</P>
+			</TD>
+		</TR>
+		<TR>
+			<TD>
+				<P><B><BR>Long name:</B></P>
+			</TD>
+			<TD>
+				<P><BR>Name of the application which may be longer.</P>
+			</TD>
+		</TR>
+		<TR>
+			<TD>
+				<P><B><BR>Installation folder:</B></P>
+			</TD>
+			<TD>
+				<P><BR>Folder where the installation files will be unpacked.</P>
+			</TD>
+		</TR>
+		<TR>
+			<TD>
+				<P><B><BR>Application version:</B></P>
+			</TD>
+			<TD>
+				<P><BR>Short application version number whitch will be shown
+				during install.</P>
+			</TD>
+		</TR>
+		<TR>
+			<TD>
+				<P><B><BR>Update Version:</B></P>
+			</TD>
+			<TD>
+				<P><BR>Precise application version number. It will be used for
+				the comparison of the current version and the online available
+				version.</P>
+			</TD>
+		</TR>
+		<TR>
+			<TD>
+				<P><B><BR>Update URL:</B></P>
+			</TD>
+			<TD>
+				<P><BR>Link to the .ini file which contains the Informations
+				about the current online available version.</P>
+			</TD>
+		</TR>
+	</TABLE>
+</DL>
+<P STYLE="margin-left: 1.06cm; margin-right: 1.06cm; margin-bottom: 0cm">
+<BR>
+</P>
+<HR>
+<P STYLE="margin-bottom: 0cm"><FONT SIZE=4>Select files on right-hand
+side, whitch will be packed into the installer.</FONT></P>
+<DL>
+	<DD>
+	<TABLE BORDER=0 CELLPADDING=2 CELLSPACING=2>
+		<TR>
+			<TD WIDTH=150>
+				<P><B><BR>Folders:</B></P>
+			</TD>
+			<TD>
+				<P><BR>All subfolders in the installed application.</P>
+			</TD>
+		</TR>
+		<TR>
+			<TD>
+				<P><B><BR>Files:</B></P>
+			</TD>
+			<TD>
+				<P><BR>All files that will be packet into the installation file
+				and extracted during installation.</P>
+			</TD>
+		</TR>
+		<TR>
+			<TD>
+				<P><B><BR>Exe:</B></P>
+			</TD>
+			<TD>
+				<P><BR>All scripts, whitch will be compiled and packed into the
+				installation file.</P>
+			</TD>
+		</TR>
+	</TABLE>
+</DL>
+<P STYLE="margin-left: 1.06cm; margin-bottom: 0cm"><BR>Optionally you
+can choose an icon for each of your scripts that should be compiled. 
+</P>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+<HR>
+<P><FONT SIZE=4>Press the button &quot;Generate installation file&quot;.</FONT>
+</P>
+<P><FONT COLOR="#000000"><FONT SIZE=4>Your settings will be saved in
+setting.ini. You wont need set everything again next time.</FONT></FONT><BR><BR><BR><BR>
+</P>
+<DL>
+	<DT STYLE="margin-bottom: 0.5cm"><A NAME="Details"></A><FONT SIZE=6>Details</FONT>
+		</DT></DL>
+<P>
+<FONT SIZE=4>Application name, Abbreviation and long name will be
+shown during the Installation.</FONT></P>
+<P><FONT SIZE=4>They don't have any other importance.</FONT></P>
+<HR>
+<P><FONT SIZE=4>The update function will be started when the main
+application will start. It checks in the background whether an update
+is available. The automatic Update check can be disabled:</FONT></P>
+<UL>
+	<LI><P STYLE="margin-bottom: 0cm">In the file settings.ini you need
+	to add following entry:</P>
+	<CENTER>
+		<TABLE WIDTH=90% BORDER=0 CELLPADDING=3 CELLSPACING=1>
+			<TR>
+				<TD BGCOLOR="#fafafa">
+					<P STYLE="border: 1.00pt solid #d1d7dc; padding: 0.05cm"><FONT COLOR="#212121"><FONT FACE="Andale Mono, Courier New, Courier, sans-serif"><FONT SIZE=2 STYLE="font-size: 9pt">[BaseFrame]<BR>Check
+					for updates=0</FONT></FONT></FONT></P>
+				</TD>
+			</TR>
+		</TABLE>
+	</CENTER>
+	<P><BR>A 0 inactivates the update function. I recommend to add a
+	setting into your application whitch lets the user to decide whether
+	to check for updates automatically changes this entry.</P>
+</UL>
+<HR>
+<P><FONT SIZE=4>The update function will work when you consider
+following:</FONT></P>
+<UL>
+	<LI><P STYLE="margin-bottom: 0cm">There must be a link to the update
+	comparison file. The link must lead directly to the file.</P>
+	<LI><P STYLE="margin-bottom: 0cm">The comparison file must be
+	formatted like an ini file. Example:</P>
+	<CENTER>
+		<TABLE WIDTH=90% BORDER=0 CELLPADDING=3 CELLSPACING=1>
+			<TR>
+				<TD BGCOLOR="#fafafa">
+					<P STYLE="border: 1.00pt solid #d1d7dc; padding: 0.05cm"><FONT COLOR="#212121"><FONT FACE="Andale Mono, Courier New, Courier, sans-serif"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Consolas">[Update
+					Info]</FONT><BR><FONT FACE="Consolas">Version=2.00.00</FONT><BR><FONT FACE="Consolas">Download
+					Path=https://dl.dropbox.com/s/...</FONT><BR><FONT FACE="Consolas">Open
+					Site=http://de.autohotkey.com/forum/...</FONT></FONT></FONT></FONT></P>
+				</TD>
+			</TR>
+		</TABLE>
+	</CENTER>
+	<P STYLE="margin-bottom: 0cm"></P>
+	<LI><P STYLE="margin-bottom: 0cm">The comparison file must contain
+	whitch information is available and either the direct download link
+	to the installer or a webpage. Or both.</P>
+	<LI><P STYLE="margin-bottom: 0cm">The comparison version numbers
+	will be compared as following:</P>
+	<CENTER>
+		<TABLE WIDTH=90% BORDER=0 CELLPADDING=3 CELLSPACING=1>
+			<TR>
+				<TD BGCOLOR="#fafafa">
+					<P STYLE="border: 1.00pt solid #d1d7dc; padding: 0.05cm"><FONT COLOR="#212121">&nbsp;<FONT FACE="Consolas"><FONT SIZE=2 STYLE="font-size: 9pt">if
+					(DieseVersion &lt; DownloadedVersion)</FONT></FONT><FONT FACE="Andale Mono, Courier New, Courier, sans-serif"><FONT SIZE=2 STYLE="font-size: 9pt">&nbsp;
+					</FONT></FONT></FONT>
+					</P>
+				</TD>
+			</TR>
+		</TABLE>
+	</CENTER>
+	<P>You must make sure, that the version number of any new
+	application is greater than the other.<BR>I recommend following
+	format:  <FONT COLOR="#212121"><FONT FACE="Consolas"><FONT SIZE=2 STYLE="font-size: 9pt">2.02.14</FONT></FONT></FONT></P>
+</UL>
+<P><FONT SIZE=4>Other important notes:</FONT></P>
+<UL>
+	<LI><P STYLE="margin-bottom: 0cm">It is possible to show the license
+	terms again in the main program. You just need to use theYou will
+	need to use the Label BaseFrame_About. You may also set it as
+	following in the main application script:   
+	</P>
+	<CENTER>
+		<TABLE WIDTH=90% BORDER=0 CELLPADDING=3 CELLSPACING=1>
+			<TR>
+				<TD BGCOLOR="#fafafa">
+					<P STYLE="border: 1.00pt solid #d1d7dc; padding: 0.05cm"><FONT COLOR="#212121"><FONT FACE="Andale Mono, Courier New, Courier, sans-serif"><FONT SIZE=2 STYLE="font-size: 9pt"><FONT FACE="Consolas">Lizenzbedingungen&Uuml;ber:</FONT>
+					<BR><FONT FACE="Consolas">Return</FONT> </FONT></FONT></FONT>
+					</P>
+				</TD>
+			</TR>
+		</TABLE>
+	</CENTER>
+	<P>On code creation the Label will be replaced.</P>
+</UL>
+<P><BR><BR><BR><BR>
+</P>
+<DL>
+	<DT STYLE="margin-bottom: 0.5cm"><A NAME="What does Base Frame"></A><FONT SIZE=6>What does Base Frame</FONT>
+		</DT></DL>
+<UL>
+	<LI><P STYLE="margin-bottom: 0cm">
+	As first step it generates the sourcecodes for all three fuctions:</P>
+	<UL>
+		<LI><P STYLE="margin-bottom: 0cm">Update Checker.ahk 
+		</P>
+		<LI><P STYLE="margin-bottom: 0cm">&quot;Application name&quot;
+		modified.ahk 
+		</P>
+		<LI><P STYLE="margin-bottom: 0cm">&quot;Application name&quot;
+		Installer.ahk 
+		</P>
+	</UL>
+	<P STYLE="margin-bottom: 0cm"><BR>The original quellcode files of
+	the appications will be left untouched.</P>
+	<LI><P STYLE="margin-bottom: 0cm">The three scripts (and eventually
+	other that you have set) will be compiled.</P>
+	<LI><P>The installation file will be compiled. 
+	</P>
+</UL>
+<P><BR><BR><BR><BR>
+</P>
+<DL>
+	<DT STYLE="margin-bottom: 0.5cm"><A NAME="Languages"></A><FONT SIZE=6>Languages</FONT> 
+	</DT></DL>
+<P>
+Base Frame supports those two languages: 
+</P>
+<UL>
+	<LI><P STYLE="margin-bottom: 0cm">German 
+	</P>
+	<LI><P>English 
+	</P>
+</UL>
+<P><BR>The language can be set in the menu &bdquo;Settings&ldquo; &rarr;
+&bdquo;Language&ldquo;<BR><BR>In the installer package there is also
+a translatino tool whitch allows you the create translations for
+other languages.<BR>You may send the language file to me. I will
+include ist immediately.</P>
+</BODY>
+</HTML>

@@ -1,7 +1,9 @@
 ﻿;enable or disable flow
-r_EnableFlow()
+r_EnableFlow(options:="")
 {
+	
 	global
+	
 	if alreadyenabling=true ;Prevent that e.g. it tries to enable twice or disable and enable at same time. This may happen if user clicks on the enable button quickly
 		return
 	alreadyenabling=true
@@ -16,7 +18,11 @@ r_EnableFlow()
 			
 		}
 		triggersEnabled:=false
-		r_TellThatFlowIsDisabled()
+		if (options!="noTellDisabled")
+		{
+			r_TellThatFlowIsDisabled()
+			
+		}
 		
 	}
 	else ;If the flow is disabled, enable flow

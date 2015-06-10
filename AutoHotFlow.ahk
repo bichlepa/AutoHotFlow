@@ -92,6 +92,7 @@ else if CommandWindowRecieve1=Enabled ;Show that a flow is enabled
 	tempid:=IDOfName(CommandWindowRecieve2,"Flow")
 	%tempid%enabled=true
 	updateIcon(tempid)
+	
 	SaveFlow(tempid)
 	
 	if %tempSelectedID%enabled=true
@@ -105,7 +106,11 @@ else if CommandWindowRecieve1=Disabled ;Show that a flow is disabled
 	tempid:=IDOfName(CommandWindowRecieve2,"Flow")
 	%tempid%enabled=false
 	updateIcon(tempid)
-	SaveFlow(tempid)
+	
+	;It could happen that the other flows are closed right before the manager is closed. For example on shutdown. This is a try to prevent that the flows are disabled.
+	FlowsToSaveSoon.Insert(tempid)
+	SetTimer,saveFlows,2000 ;Wait 2 seconds and save then. If the manager is closed before that perioud, the flow will be enabled at next startup
+	
 	
 	if %tempSelectedID%enabled=true
 		guicontrol,,ButtonEnableFlow,% lang("Disable")

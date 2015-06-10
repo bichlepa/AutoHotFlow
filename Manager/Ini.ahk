@@ -6,6 +6,8 @@ iniread,LastExecutionTime,settings.ini,common,LastExecutionTime
 if LastExecutionTime=
 	LastExecutionTime:=2000
 
+
+iniread,UILang,settings.ini,common,UILanguage
 iniwrite,%a_now%,settings.ini,common,LastExecutionTime
 if uilang=error
 {
@@ -24,7 +26,6 @@ loadSavedFlows()
 	local tempflowcategory
 	local tempflowenabled
 	local tempflowid
-	local tempflowenabled
 	;Load existing Flows
 	loop Saved Flows\*.ini
 	{
@@ -88,4 +89,17 @@ SaveFlow(ID)
 	
 }
 
+FlowsToSaveSoon:=Object()
 
+goto,jumpoversaveflow
+
+saveFlows:
+for tempskey, tempsval in FlowsToSaveSoon
+{
+	SaveFlow(tempsval)
+}
+
+return
+
+jumpoversaveflow:
+temp=

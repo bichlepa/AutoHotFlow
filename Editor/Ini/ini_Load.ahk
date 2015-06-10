@@ -194,6 +194,7 @@
 i_loadGeneralParameters()
 {
 	global
+	
 	Iniread,FlowName,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,name
 	Iniread,FlowCategory,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,category
 	

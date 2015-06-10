@@ -46,8 +46,13 @@ GenerateNameActionAbsolute_number(ID)
 	
 }
 
-showHelpForActionAbsolute_number(ID)
+showHelpForActionAbsolute_number()
 {
 	
+	ui_MakeNewHelp()
+	
+	;~ ui_AddToHelp()
+	
+	ui_showHelp()
 	
 }

@@ -41,6 +41,7 @@ lang_FindAllLanguages()
 	}
 	IniRead,%UILang%enlangname,language\%UILang%.ini\general\enname
 	IniRead,%UILang%langname,language\%UILang%.ini\general\name
+	
 }
 
 lang(langvar,$1="",$2="",$3="",$4="",$5="",$6="",$7="",$8="",$9="")

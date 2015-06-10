@@ -194,6 +194,7 @@ iniAllTriggers=
 #include editor\Variables\v_Expression.ahk
 #include editor\User Interface\ui_GDI+.ahk
 #include editor\User Interface\ui_Mouse.ahk
+#include editor\User Interface\ui_Help.ahk
 #include editor\User Interface\ui_Element_Settings.ahk
 #include editor\User Interface\ui_Menu_Bar.ahk
 #include editor\User Interface\ui_Main_GUI.ahk
@@ -547,7 +548,14 @@ if (saved="no" and immediatelyexit!="true")
 saved=yes ;Prevent second prompt to save
 
 if (triggersEnabled=true)
-	gosub,ui_Menu_Enable
+{
+	FileAppend,%A_ExitReason%`n,test.txt
+	if (A_ExitReason ="shutdown" or A_ExitReason = "logoff")
+		r_EnableFlow("noTellDisabled")
+	else
+		r_EnableFlow()
+	
+}
 if nowRunning=true
 {
 	stopRun=true

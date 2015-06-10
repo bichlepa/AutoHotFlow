@@ -144,7 +144,8 @@
 	gui,2:default
 	
 	gui,font,s8 cDefault wnorm
-	gui,add,button,w400 x10 gGUISettingsOfElementSelectType,% lang("%1%_type:_%2%",lang(setElementType),getname%setElementType%%setElementsubType%())
+	gui,add,button,w370 x10 gGUISettingsOfElementSelectType,% lang("%1%_type:_%2%",lang(setElementType),getname%setElementType%%setElementsubType%())
+	gui,add,button,w20 x10 X+10 yp gGUISettingsOfElementHelp,?
 	gui,font,s10 cnavy wbold
 	gui,add,text,x10 w400,Name
 	gui,font,s8 cDefault wnorm
@@ -511,6 +512,19 @@
 	ui_selectElementType(%setElementID%Type,setElementID)
 	return
 	
+	GUISettingsOfElementHelp:
+	;~ MsgBox %setElementType% %setElementsubType%
+	
+	IfWinExist,ahk_id %GUIHelpHWND%
+		ui_closeHelp()
+	else
+		showHelpFor%setElementType%%setElementsubType%()
+	;~ IfWinExist,ahk_id %GUIHelpHWND%
+		;~ ui_closeHelp()
+	;~ else
+		;~ ui_showHelp("index")
+		;~ ui_showHelp(%setElementID%Type "\" %ElementID%subtype)
+	return
 	GUISettingsOfElementCheckStandardName:
 	gui,2:default
 	gui,submit,nohide
