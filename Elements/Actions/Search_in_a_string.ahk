@@ -71,7 +71,7 @@ getCategoryActionSearch_in_a_string()
 getParametersActionSearch_in_a_string()
 {
 	global
-	parametersToEdit:=["Label|" lang("Name of the variable that will contain the result"),"VariableName|NewPosition|Varname","Label| " lang("Input string"),"Radio|1|expression|" lang("This is a string") ";" lang("This is a variable name or expression") ,"Text|Hello World|VarValue","Label| " lang("Text to search"),"Radio|1|IsExpressionSearchText|" lang("This is a string") ";" lang("This is a variable name or expression") ,"Text|World|SearchText","Label|" lang("Whitch occurence"),"Text|1|OccurenceNumber","Radio|1|LeftOrRight|" lang("From left") ";" lang("From right"),"Label|" lang("Start position"),"Text|1|Offset","Label|" lang("Case sensitivity"),"Radio|1|CaseSensitive|" lang("Case insensitive") ";" lang("Case sensitive")]
+	parametersToEdit:=["Label|" lang("Output variable"),"VariableName|NewPosition|Varname","Label| " lang("Input string"),"Radio|1|expression|" lang("This is a string") ";" lang("This is a variable name or expression") ,"Text|Hello World|VarValue","Label| " lang("Text to search"),"Radio|1|IsExpressionSearchText|" lang("This is a string") ";" lang("This is a variable name or expression") ,"Text|World|SearchText","Label|" lang("Which occurence"),"Text|1|OccurenceNumber","Radio|1|LeftOrRight|" lang("From left") ";" lang("From right"),"Label|" lang("Start position"),"Text|1|Offset","Label|" lang("Case sensitivity"),"Radio|1|CaseSensitive|" lang("Case insensitive") ";" lang("Case sensitive")]
 	
 	return parametersToEdit
 }

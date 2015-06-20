@@ -1,0 +1,5 @@
+This is an incomplete changelog of the last release.
+
+- Help files created for all elements
+- Removed action "Folder exists"
+- Many improvements and some bux fixes

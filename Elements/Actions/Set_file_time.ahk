@@ -19,7 +19,11 @@ runActionSet_file_time(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 		
 	
 	;MsgBox %tempVar%
-	FileSetTime,%tempVar%,% v_replaceVariables(InstanceID,ThreadID,%ElementID%file),%tempOptions%
+	local tempPath:=% v_replaceVariables(InstanceID,ThreadID,%ElementID%file)
+	if  DllCall("Shlwapi.dll\PathIsRelative","Str",tempPath)
+		tempPath:=SettingWorkingDir "\" tempPath
+	
+	FileSetTime,%tempVar%,% tempPath,%tempOptions%
 	
 	if ErrorLevel
 		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
@@ -43,7 +47,7 @@ getParametersActionSet_file_time()
 {
 	global
 	
-	parametersToEdit:=["Label|" lang("New time") " (" lang("Date format") ")","Text||time","Label|" lang("Select file"),"File||file|" lang("Select a file") "|8","Label|" lang("Whitch time"),"Radio|1|TimeType|" lang("Modification time") ";" lang("Creation time") ";" lang("Last access time")]
+	parametersToEdit:=["Label|" lang("New time") " (" lang("Date format") ")","Text||time","Label|" lang("Select file"),"File||file|" lang("Select a file") "|8","Label|" lang("Which time"),"Radio|1|TimeType|" lang("Modification time") ";" lang("Creation time") ";" lang("Last access time"),"Label|" lang("Options"),"Radio|1|OperateOnWhat|" lang("Operate on files") ";" lang("Operate on files and folders") ";" lang("Operate on folders"),"Checkbox|0|Recurse|" lang("Recurse subfolders into")]
 	return parametersToEdit
 }
 

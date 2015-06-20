@@ -23,7 +23,7 @@ EnableTriggerProcess_starts(ID)
 		process,wait,%tempProcessName%
 		
 		
-		ControlSetText,Edit1,Run|t_pid=`%errorlevel`%,CommandWindowOfEditor,Ѻ%flowname%Ѻ
+		ControlSetText,Edit1,Run|a_pid=`%errorlevel`%,CommandWindowOfEditor,Ѻ%flowname%Ѻ
 		process,waitclose,%tempProcessName%
 	}
 	

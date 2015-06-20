@@ -39,7 +39,7 @@ getCategoryActionGet_string_length()
 getParametersActionGet_string_length()
 {
 	global
-	parametersToEdit:=["Label|" lang("Name of the variable that will contain the result"),"VariableName|NewLength|Varname","Label| " lang("Input string"),"Radio|1|expression|" lang("This is a string") ";" lang("This is a variable name or expression") ,"Text|Hello World|VarValue"]
+	parametersToEdit:=["Label|" lang("Output variable name"),"VariableName|NewLength|Varname","Label| " lang("Input string"),"Radio|1|expression|" lang("This is a string") ";" lang("This is a variable name or expression") ,"Text|Hello World|VarValue"]
 	
 	return parametersToEdit
 }

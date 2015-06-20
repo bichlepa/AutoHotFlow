@@ -767,7 +767,7 @@ ui_DrawEverything(ByRef Variable,bildw,bildh)
 	if (DrawAgain=true)
 	{
 		DrawAgain:=false
-		ToolTip("Draw Again")
+		;~ ToolTip("Draw Again")
 		;ui_drawEverything(PicFlow,widthofguipic,heightofguipic)
 		SetTimer,ui_Draw,-10
 	}

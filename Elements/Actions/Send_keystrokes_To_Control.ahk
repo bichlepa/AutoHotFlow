@@ -6,12 +6,16 @@ runActionSend_Keystrokes_To_Control(InstanceID,ThreadID,ElementID,ElementIDInIns
 	
 	local tempWinTitle:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Wintitle)
 	local tempExcludeTitle:=v_replaceVariables(InstanceID,ThreadID,%ElementID%excludeTitle)
+	local tempWinText:=v_replaceVariables(InstanceID,ThreadID,%ElementID%winText)
+	local tempExcludeText:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ExcludeText)
 	local tempTitleMatchMode :=%ElementID%TitleMatchMode
 	local tempahk_class:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ahk_class)
 	local tempahk_exe:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ahk_exe)
 	local tempahk_id:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ahk_id)
 	local tempahk_pid:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ahk_pid)
 	local tempID
+	local tempControl_identifier:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Control_identifier)
+	local tempKeysToSend:=v_replaceVariables(InstanceID,ThreadID,%ElementID%KeysToSend)
 	
 	local tempwinstring:=tempWinTitle
 	if tempahk_class<>
@@ -39,9 +43,9 @@ runActionSend_Keystrokes_To_Control(InstanceID,ThreadID,ElementID,ElementIDInIns
 		
 		SetTitleMatchMode,%tempControlMatchMode%
 		if %ElementID%RawMode=1
-			ControlSendraw,% v_replaceVariables(InstanceID,ThreadID,%ElementID%Control_identifier),% v_replaceVariables(InstanceID,ThreadID,%ElementID%KeysToSend),ahk_id %tempID%
+			ControlSendraw,% tempControl_identifier,% tempKeysToSend,ahk_id %tempID%
 		else
-			ControlSend,% v_replaceVariables(InstanceID,ThreadID,%ElementID%Control_identifier),% v_replaceVariables(InstanceID,ThreadID,%ElementID%KeysToSend),ahk_id %tempID%
+			ControlSend,% tempControl_identifier,% tempKeysToSend,ahk_id %tempID%
 		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	}
 	else
@@ -64,7 +68,7 @@ getCategoryActionSend_Keystrokes_To_Control()
 getParametersActionSend_Keystrokes_To_Control()
 {
 	global
-	parametersToEdit:=["Label|" lang("Keys_or_text_to_send"),"Checkbox|0|RawMode|" lang("Raw mode"),"Text||KeysToSend","Label|" lang("Method_for_control_Identification"),"Radio|1|IdentifyControlBy|" lang("Text_in_control") ";" lang("Classname and instance number of the control"),"Label|" lang("Control_Identification")"|Label_Control_Identification","Radio|2|ControlTextMatchMode|" lang("Start_with") ";" lang("Contain_anywhere") ";" lang("Exactly"),"text||Control_identifier","Label|" lang("Title_of_Window"),"Radio|1|TitleMatchMode|" lang("Start_with") ";" lang("Contain_anywhere") ";" lang("Exactly"),"text||Wintitle","Label|" lang("Exclude_title"),"text||excludeTitle","Label|" lang("Window_Class"),"text||ahk_class","Label|" lang("Process_Name"),"text||ahk_exe","Label|" lang("Unique_window_ID"),"text||ahk_id","Label|" lang("Unique_Process_ID"),"text||ahk_pid","button|FunctionsForElementGetControlInformation||" lang("Wizard_to_get_parameters")]
+	parametersToEdit:=["Label|" lang("Keys_or_text_to_send"),"Checkbox|0|RawMode|" lang("Raw mode"),"Text||KeysToSend","Label|" lang("Method_for_control_Identification"),"Radio|1|IdentifyControlBy|" lang("Text_in_control") ";" lang("Classname and instance number of the control"),"Label|" lang("Control_Identification")"|Label_Control_Identification","Radio|2|ControlTextMatchMode|" lang("Start_with") ";" lang("Contain_anywhere") ";" lang("Exactly"),"text||Control_identifier","Label|" lang("Title_of_Window"),"Radio|1|TitleMatchMode|" lang("Start_with") ";" lang("Contain_anywhere") ";" lang("Exactly"),"text||Wintitle","Label|" lang("Exclude_title"),"text||excludeTitle","Label|" lang("Text_of_a_control_in_Window"),"text||winText","Label|" lang("Exclude_text_of_a_control_in_window"),"text||ExcludeText","Label|" lang("Window_Class"),"text||ahk_class","Label|" lang("Process_Name"),"text||ahk_exe","Label|" lang("Unique_window_ID"),"text||ahk_id","Label|" lang("Unique_Process_ID"),"text||ahk_pid","button|FunctionsForElementGetControlInformation||" lang("Wizard_to_get_parameters")]
 	;,"Label|" lang("Insert_a_keystroke"), "Hotkey||HotkeyToInsert,"Button|customSettingButtonOfActionSend_Keystrokes_To_ControlHotkeyToInsert||" lang("Insert")
 	return parametersToEdit
 }

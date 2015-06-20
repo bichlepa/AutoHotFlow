@@ -66,7 +66,7 @@ getCategoryActionSubstring()
 getParametersActionSubstring()
 {
 	global
-	parametersToEdit:=["Label|" lang("Variable_name"),"VariableName|NewVariable|Varname","Label| " lang("Input string"),"Radio|1|expression|" lang("This is a string") ";" lang("This is a variable name or expression") ,"Text|Hello World|VarValue","Label|" lang("Options"),"Radio|1|WhereToBegin|" lang("Begin from left") ";" lang("Begin from right") ";" lang("Start somewhere else") , "Label|" lang("Start position"),"Text|1|StartPos","Label|" lang("Count of characters"),"CheckBox|0|UntilTheEnd|" lang("Until the end"),"Text|5|Length","Radio|1|LeftOrRight|" lang("Go left") ";" lang("Go right")]
+	parametersToEdit:=["Label|" lang("Output variable_name"),"VariableName|NewVariable|Varname","Label| " lang("Input string"),"Radio|1|expression|" lang("This is a string") ";" lang("This is a variable name or expression") ,"Text|Hello World|VarValue","Label|" lang("Start position"),"Radio|1|WhereToBegin|" lang("Begin from left") ";" lang("Begin from right") ";" lang("Start from following position"),"Text|1|StartPos","Label|" lang("Count of characters"),"CheckBox|0|UntilTheEnd|" lang("Until the end"),"Text|5|Length","Radio|1|LeftOrRight|" lang("Go left") ";" lang("Go right")]
 	
 	return parametersToEdit
 }

@@ -73,7 +73,7 @@ getCategoryActionShuffle_list()
 getParametersActionShuffle_list()
 {
 	global
-	parametersToEdit:=["Label|" lang("Variable_name"),"VariableName|List|Varname"]
+	parametersToEdit:=["Label|" lang("Output list name"),"VariableName|List|Varname","Label|" lang("Input list name"),"Text|List|VarValue"]
 	
 	return parametersToEdit
 }

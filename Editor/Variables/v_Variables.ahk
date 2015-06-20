@@ -1,4 +1,4 @@
-﻿AllBuiltInVars:="-A_Space-A_Tab-A_YYYY-A_MM-A_DD-A_MMMM-A_MMM-A_DDDD-A_DDD-A_WDay-A_YDay-A_YWeek-A_Hour-A_Min-A_Sec-A_MSec-A_TickCount-A_TimeIdle-A_TimeIdlePhysical-A_Temp-A_OSType-A_OSVersion-A_Is64bitOS-A_PtrSize-A_Language-A_ComputerName-A_UserName-A_ScriptDir-A_WinDir-A_ProgramFiles-A_AppData-A_AppDataCommon-A_Desktop-A_DesktopCommon-A_StartMenu-A_StartMenuCommon-A_Programs-A_ProgramsCommon-A_Startup-A_StartupCommon-A_MyDocuments-A_IsAdmin-A_ScreenWidth-A_ScreenHeight-A_ScreenDPI-A_IPAddress1-A_IPAddress2-A_IPAddress3-A_IPAddress4-A_Cursor-A_CaretX-A_CaretY-----" ;a_now and a_nowutc not included
+﻿AllBuiltInVars:="-A_Space-A_Tab-A_YYYY-A_Year-A_MM-A_Mon-A_DD-A_MDay-A_MMMM-A_MMM-A_DDDD-A_DDD-A_WDay-A_YDay-A_Hour-A_Min-A_Sec-A_MSec-A_TickCount-A_TimeIdle-A_TimeIdlePhysical-A_Temp-A_OSVersion-A_Is64bitOS-A_PtrSize-A_Language-A_ComputerName-A_UserName-A_ScriptDir-A_WinDir-A_ProgramFiles-A_AppData-A_AppDataCommon-A_Desktop-A_DesktopCommon-A_StartMenu-A_StartMenuCommon-A_Programs-A_ProgramsCommon-A_Startup-A_StartupCommon-A_MyDocuments-A_IsAdmin-A_ScreenWidth-A_ScreenHeight-A_ScreenDPI-A_IPAddress1-A_IPAddress2-A_IPAddress3-A_IPAddress4-A_Cursor-A_CaretX-A_CaretY-----" ;a_now and a_nowutc not included
 
 v_replaceVariables(InstanceID,ThreadID,String,VariableType="asIs")
 {
@@ -47,7 +47,7 @@ v_getVariable(InstanceID,ThreadID,name,VariableType="asIs")
 				if (a_loopfield="[Normal]")
 				{
 					
-					StringTrimLeft,tempvalue,tempvalue,9 ;Remove [normal]
+					StringTrimLeft,tempvalue,tempvalue,10 ;Remove [normal]
 					
 					done:=true
 				}
@@ -108,6 +108,35 @@ v_getVariable(InstanceID,ThreadID,name,VariableType="asIs")
 				return tempvalue
 			}
 		}
+		else if (name="A_YWeek") ;Separate the week.
+		{
+			StringRight,tempvalue,A_YWeek,2
+			return tempvalue
+		}
+		else if (name="A_LanguageName") 
+		{
+			tempvalue:= GetLanguageNameFromCode(A_Language)
+			
+			return tempvalue
+		}
+		else if (name="a_workingdir")
+		{
+			return SettingWorkingDir
+		}
+		else if (name="a_triggertime")
+		{
+			tempvalue:=Instance_%InstanceID%_Thread_%ThreadID%_Variables[name] 
+			if VariableType=Normal
+				return v_exportVariable(tempvalue,"date","`n") 
+			else
+			{
+				return tempvalue
+			}
+		}
+		else if (name="a_linefeed" or name="a_lf")
+		{
+			return "`n"
+		}
 		else IfInString,AllBuiltInVars,-%name%-
 		{
 			tempvalue:=%name%
@@ -142,13 +171,6 @@ v_getVariable(InstanceID,ThreadID,name,VariableType="asIs")
 			
 			if templeft=●
 				return tempvalue
-			else if templeft=↕
-			{
-				if VariableType=binary
-					return tempvalue
-				else
-					return
-			}
 			else if templeft=└
 			{
 				if VariableType=Normal
@@ -158,7 +180,13 @@ v_getVariable(InstanceID,ThreadID,name,VariableType="asIs")
 					return tempvalue
 				}
 			}
-			
+			else ;Binary data
+			{
+				if VariableType=binary
+					return tempvalue
+				else
+					return
+			}
 			
 		}
 	}
@@ -178,7 +206,10 @@ v_setVariable(InstanceID,ThreadID,name,value,VariableType="Normal",whetherToSetT
 	{
 		if (whetherToSetThreadVar=true)
 		{
-			Instance_%r_RunningCounter%_Thread_%ThreadID%_Variables.insert(name,value)
+			
+			
+			
+			Instance_%InstanceID%_Thread_%ThreadID%_Variables.insert(name,value)
 			
 		}
 		else
@@ -230,7 +261,7 @@ v_setVariable(InstanceID,ThreadID,name,value,VariableType="Normal",whetherToSetT
 		if VariableType=normal
 			Instance_%InstanceID%_LocalVariables.insert(name,"●" value)
 		else if VariableType=binary
-			Instance_%InstanceID%_LocalVariables.insert(name,"↕" value)
+			Instance_%InstanceID%_LocalVariables.insert(name, value)
 		else if VariableType=date
 			Instance_%InstanceID%_LocalVariables.insert(name,"└" value)
 		else if VariableType=list

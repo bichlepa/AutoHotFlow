@@ -7,14 +7,10 @@ runActionExponentiation(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	local tempExponentiation
 	local tempResult
 	
-	if %ElementID%expression=1
-		temp:=v_replaceVariables(InstanceID,ThreadID,%ElementID%VarValue)
-	else
-		temp:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%VarValue)
-	if %ElementID%expressionExponent=1
-		tempExponentiation:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Exponent)
-	else
-		tempExponentiation:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%Exponent)
+	
+	temp:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%VarValue)
+	
+	tempExponentiation:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%Exponent)
 	;MsgBox % tempExponentiation "|" temp
 	if temp is number
 	{
@@ -45,7 +41,7 @@ getCategoryActionExponentiation()
 getParametersActionExponentiation()
 {
 	global
-	parametersToEdit:=["Label|" lang("Variable_name"),"VariableName|NewVariable|Varname","Label| " lang("Number"),"Radio|2|expression|" lang("This is a number") ";" lang("This is a variable name or expression") ,"Text|3|VarValue","Label| " lang("Exponent"),"Radio|1|expressionExponent|" lang("This is a number") ";" lang("This is a variable name or expression") ,"Text|2|Exponent"]
+	parametersToEdit:=["Label|" lang("Output variable_name"),"VariableName|NewVariable|Varname","Label| " lang("Input number"),"Text|3|VarValue","Label| " lang("Exponent") ,"Text|2|Exponent"]
 	
 	return parametersToEdit
 }

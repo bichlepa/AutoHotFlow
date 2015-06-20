@@ -4,17 +4,19 @@ runActionDelete_from_ini(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 
-
+	local tempPath:=% v_replaceVariables(InstanceID,ThreadID,%ElementID%file)
+	if  DllCall("Shlwapi.dll\PathIsRelative","Str",tempPath)
+		tempPath:=SettingWorkingDir "\" tempPath
 	
 	if %ElementID%Action=1 ;Delete a key
 	{
 		
-		IniDelete,% v_replaceVariables(InstanceID,ThreadID,%ElementID%file),% v_replaceVariables(InstanceID,ThreadID,%ElementID%section),% v_replaceVariables(InstanceID,ThreadID,%ElementID%key)
+		IniDelete,% tempPath,% v_replaceVariables(InstanceID,ThreadID,%ElementID%section),% v_replaceVariables(InstanceID,ThreadID,%ElementID%key)
 		
 	}
 	else ;Delete a section
 	{
-		IniDelete,% v_replaceVariables(InstanceID,ThreadID,%ElementID%file),% v_replaceVariables(InstanceID,ThreadID,%ElementID%section)
+		IniDelete,% tempPath,% v_replaceVariables(InstanceID,ThreadID,%ElementID%section)
 		
 	}
 	
@@ -39,7 +41,7 @@ getParametersActionDelete_from_ini()
 {
 	global
 	
-	parametersToEdit:=["Label|" lang("Select an .ini file"),"File||file|" lang("Select an .ini file") "|8|(*.ini)","Label|" lang("Action"),"Radio|1|Action|" lang("Delete a key") ";" lang("Delete a section"),"Label|" lang("Section"),"Text|section|Section","Label|" lang("Key"),"Text|key|Key" ]
+	parametersToEdit:=["Label|" lang("Path of an .ini file"),"File||file|" lang("Select an .ini file") "|8|(*.ini)","Label|" lang("Action"),"Radio|1|Action|" lang("Delete a key") ";" lang("Delete a section"),"Label|" lang("Section"),"Text|section|Section","Label|" lang("Key"),"Text|key|Key" ]
 	
 	return parametersToEdit
 }

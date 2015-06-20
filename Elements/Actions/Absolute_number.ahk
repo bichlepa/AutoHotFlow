@@ -33,7 +33,7 @@ getCategoryActionAbsolute_number()
 getParametersActionAbsolute_number()
 {
 	global
-	parametersToEdit:=["Label|" lang("Variable_name"),"VariableName|NewVariable|Varname","Label| " lang("Number"),"Radio|2|expression|" lang("This is a number") ";" lang("This is a variable name or expression") ,"Text|-2|VarValue"]
+	parametersToEdit:=["Label|" lang("Output_Variable_name"),"VariableName|NewVariable|Varname","Label| " lang("Input number"),"Text|-2|VarValue"]
 	
 	return parametersToEdit
 }
@@ -49,10 +49,10 @@ GenerateNameActionAbsolute_number(ID)
 showHelpForActionAbsolute_number()
 {
 	
-	ui_MakeNewHelp()
+	;~ ui_MakeNewHelp()
 	
 	;~ ui_AddToHelp()
 	
-	ui_showHelp()
+	;~ ui_showHelp()
 	
 }

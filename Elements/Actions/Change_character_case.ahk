@@ -37,7 +37,7 @@ getCategoryActionChange_character_case()
 getParametersActionChange_character_case()
 {
 	global
-	parametersToEdit:=["Label|" lang("Variable_name"),"VariableName|NewVariable|Varname","Label| " lang("Input string"),"Radio|1|expression|" lang("This is a string") ";" lang("This is a variable name or expression") ,"Text|Hello World|VarValue","Label|" lang("Whitch case (character case)"),"Radio|1|CharCase|" lang("Uppercase") ";" lang("Lowercase") ";" lang("Firt character of a word is uppercase")]
+	parametersToEdit:=["Label|" lang("Output Variable_name"),"VariableName|NewVariable|Varname","Label| " lang("Input string"),"Radio|1|expression|" lang("This is a string") ";" lang("This is a variable name or expression") ,"Text|Hello World|VarValue","Label|" lang("Which case (character case)"),"Radio|1|CharCase|" lang("Uppercase") ";" lang("Lowercase") ";" lang("Firt character of a word is uppercase")]
 	
 	return parametersToEdit
 }

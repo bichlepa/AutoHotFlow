@@ -24,7 +24,7 @@ runActionNew_list(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 		else
 			temp:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%VarValue)
 		templist:=Object()
-		if %ElementID%WhitchPosition=1
+		if %ElementID%WhitchPosition=1 ;Stupid misspelling :-(
 		{
 			templist.insert(temp)
 		}

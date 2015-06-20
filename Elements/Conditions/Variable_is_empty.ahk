@@ -7,7 +7,7 @@ runConditionVariable_is_empty(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	local Varname:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname)
 	local VarContent:=v_getVariable(InstanceID,ThreadID,Varname)
 	;MsgBox "%VarContent%"
-	if (VarContent="")
+	if VarContent=
 		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"yes")
 	else
 		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"no")
@@ -17,7 +17,7 @@ runConditionVariable_is_empty(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 getParametersConditionVariable_is_empty()
 {
 	
-	parametersToEdit:=["Label|" lang("Variable_is_empty"),"Text|VarName|Varname"]
+	parametersToEdit:=["Label|" lang("Variable name"),"Text|VarName|Varname"]
 	
 	return parametersToEdit
 }

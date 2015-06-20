@@ -53,18 +53,18 @@ runLoopCondition(InstanceID,ThreadID,ElementID,ElementIDInInstance,HeadOrTail)
 }
 getNameLoopCondition()
 {
-	return lang("Condition loop")
+	return lang("Conditional loop") 
 }
 getCategoryLoopCondition()
 {
-	return lang("Variable")
+	return lang("Variable") "|" lang("General")
 }
 
 getParametersLoopCondition()
 {
 	global
 	
-	parametersToEdit:=[ "Label|" lang("Condition loop"),"text|a_index <= 5|Expression", "Checkbox|1|EvaluateOnFirstIteration|" lang("Evaluate on first iteration")]
+	parametersToEdit:=[ "Label|" lang("Condition"),"text|a_index <= 5|Expression", "Checkbox|1|EvaluateOnFirstIteration|" lang("Evaluate on first iteration")]
 	return parametersToEdit
 }
 
@@ -73,7 +73,7 @@ GenerateNameLoopCondition(ID)
 	global
 	;MsgBox % %ID%text_to_show
 	
-	return lang("Condition") ": "  lang("Until") " " GUISettingsOfElement%id%Expression 
+	return lang("Conditional loop") ": "  lang("Until") " " GUISettingsOfElement%id%Expression 
 	
 }
 

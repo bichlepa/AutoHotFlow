@@ -3,12 +3,17 @@
 runActionDelete_folder(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
-	local temp:=% v_replaceVariables(InstanceID,ThreadID,%ElementID%folder)
+	
+	local tempPath:=% v_replaceVariables(InstanceID,ThreadID,%ElementID%folder)
+	if  DllCall("Shlwapi.dll\PathIsRelative","Str",tempPath)
+		tempPath:=SettingWorkingDir "\" tempPath
+	
+	
 	
 	if %ElementID%ifEmpty
-		FileRemoveDir,%temp%
+		FileRemoveDir,%tempPath%
 	else
-		FileRemoveDir,%temp%,1
+		FileRemoveDir,%tempPath%,1
 	
 	if ErrorLevel
 		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
@@ -29,7 +34,7 @@ getParametersActionDelete_folder()
 {
 	global
 	
-	parametersToEdit:=["Label|" lang("Select folder"),"Folder||folder|" lang("Select a folder") "|","Checkbox|0|ifEmpty|" lang("Remove only if the folder is empty")]
+	parametersToEdit:=["Label|" lang("Folder path"),"Folder||folder|" lang("Select a folder") "|","Label|" lang("Options"),"Checkbox|0|ifEmpty|" lang("Remove only if the folder is empty")]
 	return parametersToEdit
 }
 

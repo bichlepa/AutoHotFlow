@@ -6,7 +6,11 @@ runConditionFile_has_attribute(InstanceID,ThreadID,ElementID,ElementIDInInstance
 	local tempattribute
 	local tempcompare
 	
-	FileGetAttrib,tempattribute,% v_replaceVariables(InstanceID,ThreadID,%ElementID%file)
+	local tempPath:=% v_replaceVariables(InstanceID,ThreadID,%ElementID%file)
+	if  DllCall("Shlwapi.dll\PathIsRelative","Str",tempPath)
+		tempPath:=SettingWorkingDir "\" tempPath
+	
+	FileGetAttrib,tempattribute,% tempPath
 	if ErrorLevel
 		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 	else
@@ -51,7 +55,7 @@ stopConditionFile_has_attribute(ID)
 getParametersConditionFile_has_attribute()
 {
 	
-	parametersToEdit:=["Label|" lang("Select file"),"File||file|" lang("Select a file") "|","Label|" lang("Whitch attribute"),"Radio|1|Attribute|" lang("Read only") ";" lang("Archive") ";" lang("System") ";" lang("Hidden") ";" lang("Normal") ";" lang("Directory") ";" lang("Offline") ";" lang("Compressed") ";" lang("Temporary")]
+	parametersToEdit:=["Label|" lang("File path"),"File||file|" lang("Select a file") "|","Label|" lang("Which attribute"),"Radio|1|Attribute|" lang("Read only") ";" lang("Archive") ";" lang("System") ";" lang("Hidden") ";" lang("Normal") ";" lang("Directory") ";" lang("Offline") ";" lang("Compressed") ";" lang("Temporary")]
 	
 	return parametersToEdit
 }

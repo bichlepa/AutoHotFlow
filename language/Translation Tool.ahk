@@ -24,7 +24,7 @@ Loop,%A_WorkingDir%\*.ini
 
 
 
-InputBox,translationto,Select Language,To whitch language do you want to translate?`nEnter a new short code or one of following codes:`n%stringalllangs%,,,% A_ScreenHeight*0.9
+InputBox,translationto,Select Language,To which language do you want to translate?`nEnter a new short code or one of following codes:`n%stringalllangs%,,,% A_ScreenHeight*0.9
 
 IfnotInString,stringalllangs,`n%translationto% (
 {

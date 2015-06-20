@@ -9,7 +9,7 @@ runConditionProcess_is_running(InstanceID,ThreadID,ElementID,ElementIDInInstance
 	Process,exist,% v_replaceVariables(InstanceID,ThreadID,%ElementID%ProcessName) 
 	if errorlevel
 	{
-		v_setVariable(InstanceID,ThreadID,t_pid,errorlevel)
+		v_setVariable(InstanceID,ThreadID,"a_pid",errorlevel,,true)
 		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"yes")
 	}
 	else
@@ -32,7 +32,7 @@ getParametersConditionProcess_is_running()
 {
 	global
 	
-	parametersToEdit:=["Label|" lang("Process name"),"Text||ProcessName"]
+	parametersToEdit:=["Label|" lang("Process name or ID"),"Text||ProcessName"]
 	return parametersToEdit
 }
 

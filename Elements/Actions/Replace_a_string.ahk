@@ -72,7 +72,7 @@ runActionReplace_a_string(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 }
 getNameActionReplace_a_string()
 {
-	return lang("Replace_a_string")
+	return lang("Replace_in_a_string")
 }
 getCategoryActionReplace_a_string()
 {

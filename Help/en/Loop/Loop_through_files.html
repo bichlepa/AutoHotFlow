@@ -1,0 +1,216 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=windows-1252"/>
+	<title>Bedienung</title>
+	<meta name="generator" content="LibreOffice 4.4.3.2 (Windows)"/>
+	<meta name="created" content="00:00:00"/>
+	<meta name="changedby" content="Paul Bichler"/>
+	<meta name="changed" content="2015-06-17T19:14:26.183000000"/>
+	<meta name="CHANGEDBY" content="Paul Bichler">
+	<meta name="CHANGEDBY" content="Paul Bichler">
+	<meta name="CHANGEDBY" content="Paul Bichler">
+	<meta name="CHANGEDBY" content="Paul Bichler">
+	<meta name="CHANGEDBY" content="Paul Bichler">
+	<meta name="CHANGEDBY" content="Paul Bichler">
+	<meta name="CHANGEDBY" content="Paul Bichler">
+	<style type="text/css">
+		td p { color: #000000 }
+		h1 { color: #000000 }
+		p { color: #000000 }
+		dt { color: #000000 }
+		dd { color: #000000 }
+		h2 { color: #000000 }
+		h2.western { font-family: "Albany", sans-serif; font-size: 14pt; font-style: italic }
+		h2.cjk { font-family: "HG Mincho Light J"; font-size: 14pt; font-style: italic }
+		h2.ctl { font-family: "Arial Unicode MS"; font-size: 14pt; font-style: italic }
+	</style>
+</head>
+<body lang="en-US" text="#000000" dir="ltr">
+<h1 style="margin-top: 0.3cm; margin-bottom: 0.4cm; page-break-before: always">
+Loop through files</h1>
+<dl>
+	<dt style="margin-bottom: 0.1cm">The loop <b>Loop through files</b>
+	r<span style="font-weight: normal">etrieves the specified files or
+	folders, one at a time.</span></dt></dl>
+<h2 class="western" style="margin-top: 0.3cm; margin-bottom: 0.1cm; font-weight: normal">
+Settings</h2>
+<table width="100%" cellpadding="4" cellspacing="0" bgcolor="#ccffff">
+	<col width="256*">
+	<tr>
+		<td width="100%" valign="top" style="border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding: 0.11cm">
+			<p style="margin-bottom: 0.1cm"><b>File pattern</b></p>
+			<dl>
+				<dd style="margin-left: 0cm; font-weight: normal">The name of a
+				single file or folder, or a wildcard pattern.</dd><dd style="margin-left: 0cm">
+				<span style="font-weight: normal">Both asterisks and question
+				marks are supported as wildcards. A match occurs when the pattern
+				appears in either the file's long/normal name or its <a href="mk:@MSITStore:C:%5CProgram%20Files%20(x86)%5CAutoHotkey%5CAutoHotkey.chm::/docs/commands/LoopFile.htm#LoopFileShortName">8.3
+				short name</a>.<br/>
+The file pattern is assumed to be in the
+				working directory if an absolute path isn't specified.</span></dd></dl>
+		</td>
+	</tr>
+	<tr>
+		<td width="100%" valign="top" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
+			<p style="margin-bottom: 0.1cm"><b>Options</b></p>
+			<p style="margin-bottom: 0cm; font-weight: normal">If <b>Operate
+			on files </b>is checked, only files that match the pattern will be
+			found.</p>
+			<p style="margin-bottom: 0cm; font-weight: normal">If <b>Operate
+			on files and folders </b>is checked, files and folders will be
+			found.</p>
+			<p><span style="font-weight: normal">If </span><b>Operate on files
+			</b><span style="font-weight: normal">is checked, only folders
+			will be found.<br/>
+If </span><b>Recurse subfolders into </b><span style="font-weight: normal">is
+			checked, all</span> files and folders contained therein are
+			retrieved if they match <em><span style="font-variant: normal"><span style="font-style: normal">the
+			file pattern</span></span></em>. All subfolders will be recursed
+			into, not just those whose names match <em><span style="font-variant: normal"><span style="font-style: normal">the
+			file pattern.</span></span></em></p>
+		</td>
+	</tr>
+</table>
+<h2 class="western" style="margin-top: 0.3cm; margin-bottom: 0.1cm; font-weight: normal">
+Supplied variables</h2>
+<table width="100%" cellpadding="4" cellspacing="0" bgcolor="#ccffff">
+	<col width="256*">
+	<tr>
+		<td width="100%" valign="top" bgcolor="#ffffcc" style="border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding: 0.11cm">
+			<p style="margin-bottom: 0.1cm"><font face="Consolas, monospace"><b>A_Index</b></font></p>
+			<p style="font-weight: normal">contains the number of the current
+			iteration. It starts with the value 1 and increases on every loop.</p>
+		</td>
+	</tr>
+	<tr>
+		<td width="100%" valign="top" bgcolor="#ffffcc" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
+			<p style="margin-bottom: 0.1cm"><font face="Consolas, monospace"><b>A_LoopFileName</b></font></p>
+			<p><span style="font-weight: normal">contains t</span>he name of
+			the file or folder currently retrieved (without the path).</p>
+		</td>
+	</tr>
+	<tr>
+		<td width="100%" valign="top" bgcolor="#ffffcc" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
+			<p style="margin-bottom: 0.1cm"><font face="Consolas, monospace"><b>A_LoopFileFullPath</b></font></p>
+			<p><span style="font-weight: normal">contains the</span> path and
+			name of the file/folder currently retrieved.<br/>
+Any short folder
+			names in <em>FilePattern</em> will still be short (see next item
+			to get the long version).</p>
+		</td>
+	</tr>
+	<tr>
+		<td width="100%" valign="top" bgcolor="#ffffcc" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
+			<p style="margin-bottom: 0.1cm"><font face="Consolas, monospace"><b>A_LoopFileLongPath</b></font></p>
+			<p style="font-weight: normal">contains the long path and name of
+			the file/folder currently retrieved.</p>
+		</td>
+	</tr>
+	<tr>
+		<td width="100%" valign="top" bgcolor="#ffffcc" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
+			<p style="margin-bottom: 0.1cm"><font face="Consolas, monospace"><b>A_LoopFileLongPath</b></font></p>
+			<p><a name="LoopFileShortPath"></a><span style="font-weight: normal">The
+			8.3 short path and name of the file/folder currently
+			retrieved.<br/>
+</span>For example: C:\MYDOCU~1\ADDRES~1.txt.</p>
+		</td>
+	</tr>
+	<tr>
+		<td width="100%" valign="top" bgcolor="#ffffcc" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
+			<p style="margin-bottom: 0.1cm"><font face="Consolas, monospace"><b>A_LoopFileShortName</b></font></p>
+			<p><a name="LoopFileShortName"></a>The 8.3 short name, or
+			alternate name of the file. If the file doesn't have one
+			<em><span style="font-variant: normal"><font face="Consolas, monospace"><span style="font-style: normal"><b>A_LoopFileName</b></span></font></span></em>
+			will be retrieved instead.</p>
+		</td>
+	</tr>
+	<tr>
+		<td width="100%" valign="top" bgcolor="#ffffcc" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
+			<p style="margin-bottom: 0.1cm"><font face="Consolas, monospace"><b>A_LoopFileDir</b></font></p>
+			<p>The path of the directory in which the found file resides.</p>
+		</td>
+	</tr>
+	<tr>
+		<td width="100%" valign="top" bgcolor="#ffffcc" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
+			<p style="margin-bottom: 0.1cm"><font face="Consolas, monospace"><b>A_LoopFileTimeModified</b></font></p>
+			<p><a name="LoopFileTimeModified"></a>The time the file was last
+			modified.</p>
+		</td>
+	</tr>
+	<tr>
+		<td width="100%" valign="top" bgcolor="#ffffcc" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
+			<p style="margin-bottom: 0.1cm"><font face="Consolas, monospace"><b>A_LoopFileTimeCreated</b></font></p>
+			<p><a name="LoopFileTimeCreated"></a>The time the file was
+			created.</p>
+		</td>
+	</tr>
+	<tr>
+		<td width="100%" valign="top" bgcolor="#ffffcc" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
+			<p style="margin-bottom: 0.1cm"><font face="Consolas, monospace"><b>A_LoopFileTimeModified</b></font></p>
+			<p><a name="LoopFileTimeModified2"></a>The time the file was last
+			modified.</p>
+		</td>
+	</tr>
+	<tr>
+		<td width="100%" valign="top" bgcolor="#ffffcc" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
+			<p style="margin-bottom: 0.1cm"><font face="Consolas, monospace"><b>A_LoopFileTimeAccessed</b></font></p>
+			<p><a name="LoopFileTimeAccessed"></a>The time the file was last
+			accessed.</p>
+		</td>
+	</tr>
+	<tr>
+		<td width="100%" valign="top" bgcolor="#ffffcc" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
+			<p style="margin-bottom: 0.1cm"><font face="Consolas, monospace"><b>A_LoopFileAttrib</b></font></p>
+			<p style="margin-bottom: 0cm"><a name="LoopFileAttrib"></a><a name="attrib"></a>
+			The attributes the file currently retrieved.<br/>
+The string will
+			contain a subset of the letters in the string &quot;<font face="Consolas, monospace">RASHNDOCT</font>&quot;:</p>
+			<p><font face="Consolas, monospace">R = READONLY<br/>
+A =
+			ARCHIVE<br/>
+S = SYSTEM<br/>
+H = HIDDEN<br/>
+N = NORMAL<br/>
+D =
+			DIRECTORY<br/>
+O = OFFLINE<br/>
+C = COMPRESSED<br/>
+T = TEMPORARY</font></p>
+		</td>
+	</tr>
+	<tr>
+		<td width="100%" valign="top" bgcolor="#ffffcc" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
+			<p style="margin-bottom: 0.1cm"><font face="Consolas, monospace"><b>A_LoopFileSize</b></font></p>
+			<p><a name="LoopFileSize"></a>The size in bytes of the file
+			currently retrieved. Files larger than 4 gigabytes are also
+			supported.</p>
+		</td>
+	</tr>
+	<tr>
+		<td width="100%" valign="top" bgcolor="#ffffcc" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
+			<p style="margin-bottom: 0.1cm"><font face="Consolas, monospace"><b>A_LoopFileSizeKB</b></font></p>
+			<p><a name="LoopFileSizeKB"></a>The size in Kbytes of the file
+			currently retrieved, rounded down to the nearest integer.</p>
+		</td>
+	</tr>
+	<tr>
+		<td width="100%" valign="top" bgcolor="#ffffcc" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
+			<p style="margin-bottom: 0.1cm"><font face="Consolas, monospace"><b>A_LoopFileSizeMB</b></font></p>
+			<p><a name="LoopFileSizeMB"></a>The size in Mbytes of the file
+			currently retrieved, rounded down to the nearest integer.</p>
+		</td>
+	</tr>
+	<tr>
+		<td width="100%" valign="top" bgcolor="#ffffcc" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
+			<p style="margin-bottom: 0.1cm"><font face="Consolas, monospace"><b>A_LoopCurrentList</b></font></p>
+			<p style="font-weight: normal">contains a list, which contains all
+			informations about all files.</p>
+		</td>
+	</tr>
+</table>
+<p style="margin-bottom: 0cm"><br/>
+
+</p>
+</body>
+</html>

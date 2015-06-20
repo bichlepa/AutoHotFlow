@@ -33,7 +33,7 @@ guicontrol,,GUISettingsOfElement%setElementID%ahk_exe,%tempPar%
 winget,tempPar,ControlList,A
 ;~ MsgBox,%tempPar%
 gui, FunctionsForElementGetWindowInformation:Default
-gui,add,text,w400 ,% lang("Select_a_control_text_whitch_you_want_to_import")
+gui,add,text,w400 ,% lang("Select_a_control_text_which_you_want_to_import")
 gui,add,listbox,w400 h500 vFunctionsForElementGetWindowInformationListBoxOfContolTexts gFunctionsForElementGetWindowInformationListBoxOfContolTexts
 gui,add,checkbox,w400 vFunctionsForElementGetWindowInformationCheckBoxImportUniqueIDs,% lang("Also_import_unique_IDs")
 gui,add,button,w400 h30 default gFunctionsForElementGetWindowInformationListBoxOfContolTextsButtonGoOn,% lang("OK")

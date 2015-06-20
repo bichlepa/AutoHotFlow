@@ -3,7 +3,7 @@
 runLoopLoop_through_files(InstanceID,ThreadID,ElementID,ElementIDInInstance,HeadOrTail)
 {
 	global
-	local filepattern
+	local tempPath
 	local operateon
 	local recurse
 	local tempError
@@ -26,13 +26,16 @@ runLoopLoop_through_files(InstanceID,ThreadID,ElementID,ElementIDInInstance,Head
 		else if %ElementID%Recurse=1
 			recurse=1
 		
-		filepattern:=v_replaceVariables(InstanceID,ThreadID,%ElementID%file)
+		
+		tempPath:=% v_replaceVariables(InstanceID,ThreadID,%ElementID%file)
+		if  DllCall("Shlwapi.dll\PathIsRelative","Str",tempPath)
+			tempPath:=SettingWorkingDir "\" tempPath
 		
 		tempError:=false
 		tempFiles:=Object()
 		tempFound:=false
 		
-		Loop,%filepattern%,%operateOn%,%recurse%
+		Loop,%tempPath%,%operateOn%,%recurse%
 		{
 			;~ MsgBox %a_loopfilefullpath%
 			if a_loopfilefullpath= ;If the file pattern isn't a file pattern, but maybe a number

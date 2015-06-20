@@ -35,7 +35,11 @@ runActionSelect_folder(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 		;gui,10:-SysMenu 
 		
 		tempActionSelectFolderOptions=0
+
 		tempActionSelectFolderRoot:=v_replaceVariables(ActionSelect_folderStart_CurrentInstanceID,ActionSelect_folderStart_CurrentThread_ID,%ActionSelect_folderToStart_Element_ID%folder)
+		if  DllCall("Shlwapi.dll\PathIsRelative","Str",tempActionSelectFolderRoot)
+			tempActionSelectFolderRoot:=SettingWorkingDir "\" tempActionSelectFolderRoot
+		
 		if %ActionSelect_folderToStart_Element_ID%ButtonNewFolder
 			tempActionSelectFolderOptions+=1
 		if %ActionSelect_folderToStart_Element_ID%EditField
@@ -43,6 +47,8 @@ runActionSelect_folder(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 		
 		if %ActionSelect_folderToStart_Element_ID%AllowUpward
 			tempActionSelectFolderRoot:="*" tempActionSelectFolderRoot
+		
+		
 		
 		;MsgBox %tempActionSelectFileOptions%
 		FileSelectFolder,tempActionSelectFolderFolder,% tempActionSelectFolderRoot ,%tempActionSelectFolderOptions%,% v_replaceVariables(ActionSelect_folderStart_CurrentInstanceID,ActionSelect_folderStart_CurrentThread_ID,%ActionSelect_folderToStart_Element_ID%title)
@@ -74,7 +80,7 @@ runActionSelect_folder(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 stopActionSelect_folder(ID)
 {
 	
-
+	
 }
 
 
@@ -82,7 +88,7 @@ stopActionSelect_folder(ID)
 getParametersActionSelect_folder()
 {
 	
-	parametersToEdit:=["Label|" lang("Variable_name"),"VariableName|selectedFolder|Varname","Label|" lang("Prompt"),"text|" lang("Select a folder")" |title","Label|" lang("Starting folder"),"folder||folder","Label|" lang("Options"), "checkbox|1|AllowUpward|" lang("Permit to navigate upward"),"checkbox|0|ButtonNewFolder|" lang("Show a button to create a new folder"),"checkbox|0|EditField|" lang("Show an edit field to type in the folder name")]
+	parametersToEdit:=["Label|" lang("Output variable_name"),"VariableName|selectedFolder|Varname","Label|" lang("Prompt"),"text|" lang("Select a folder")" |title","Label|" lang("Root directory"),"folder||folder","Label|" lang("Options"), "checkbox|1|AllowUpward|" lang("Permit to navigate upward"),"checkbox|0|ButtonNewFolder|" lang("Show a button to create a new folder"),"checkbox|0|EditField|" lang("Show an edit field to type in the folder name")]
 	
 	return parametersToEdit
 }

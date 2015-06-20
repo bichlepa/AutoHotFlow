@@ -34,7 +34,7 @@ winget,tempPar,ControlList,A
 ;~ MsgBox,%tempPar%
 gui, FunctionsForElementGetControlInformation:Default
 
-gui,add,text,w400 ,% lang("Select_a_control_text_whitch_you_want_to_import")
+gui,add,text,w400 ,% lang("Select_a_control_text_which_you_want_to_import")
 gui,add,listbox,w400 h500 AltSubmit vFunctionsForElementGetControlInformationListBoxOfContolTexts gFunctionsForElementGetControlInformationListBoxOfContolTexts
 gui,add,checkbox,w400 vFunctionsForElementGetControlInformationCheckBoxImportUniqueIDs,% lang("Also_import_unique_IDs")
 if (GUISettingsOfElement%setElementID%IdentifyControlBy1=1)

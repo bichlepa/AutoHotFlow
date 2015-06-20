@@ -15,6 +15,8 @@ EnableTriggerHotkey(ElementID)
 		temphotkey=~%temphotkey%
 	if (%ElementID%WhenRelease=1)
 		temphotkey=%temphotkey% UP
+	if (%ElementID%Wildcard=1)
+		temphotkey=*%temphotkey%
 	
 	
 	if (%ElementID%UseWindow =2 or %ElementID%UseWindow =3)
@@ -65,7 +67,7 @@ EnableTriggerHotkey(ElementID)
 getParametersTriggerHotkey()
 {
 	
-	parametersToEdit:=["Label|" lang("Select_Hotkey"),"Hotkey||hotkey","Checkbox|1|BlockKey|" lang("Block_key"),"Checkbox|0|WhenRelease|" lang("Trigger on release"),"Label|" lang("Window"),"Radio|1|UseWindow|" lang("Always active") ";" lang("Only active when the specified window is active") ";" lang("Only active whe the specified window exists"),"Label|" lang("Title_of_Window"),"Radio|1|TitleMatchMode|" lang("Start_with") ";" lang("Contain_anywhere") ";" lang("Exactly"),"text||Wintitle","Label|" lang("Text_of_a_control_in_Window"),"text||winText","Label|" lang("Window_Class"),"text||ahk_class","Label|" lang("Process_Name"),"text||ahk_exe","Label|" lang("Unique_window_ID"),"text||ahk_id","Label|" lang("Unique_Process_ID"),"text||ahk_pid","Label|" lang("Get_parameters"), "button|FunctionsForElementGetWindowInformation|GetWindowInformation|" lang("Get_Parameters")]
+	parametersToEdit:=["Label|" lang("Hotkey"),"Hotkey||hotkey","Label|" lang("Options"),"Checkbox|1|BlockKey|" lang("Block_key"),"Checkbox|0|Wildcard|" lang("Trigger even if other keys are already held down"),"Checkbox|0|WhenRelease|" lang("Trigger on release rather than press"),"Label|" lang("Window"),"Radio|1|UseWindow|" lang("Always active") ";" lang("Only active when the specified window is active") ";" lang("Only active whe the specified window exists"),"Label|" lang("Title_of_Window"),"Radio|1|TitleMatchMode|" lang("Start_with") ";" lang("Contain_anywhere") ";" lang("Exactly"),"text||Wintitle","Label|" lang("Text_of_a_control_in_Window"),"text||winText","Label|" lang("Window_Class"),"text||ahk_class","Label|" lang("Process_Name"),"text||ahk_exe","Label|" lang("Unique_window_ID"),"text||ahk_id","Label|" lang("Unique_Process_ID"),"text||ahk_pid","Label|" lang("Get_parameters"), "button|FunctionsForElementGetWindowInformation|GetWindowInformation|" lang("Get_Parameters")]
 
 	
 	
@@ -99,20 +101,31 @@ GenerateNameTriggerHotkey(ID)
 CheckSettingsTriggerHotkey(ID)
 {
 	
+	if (GUISettingsOfElement%ID%BlockKey=1)
+		tempenable:=0
+	else
+		tempenable:=1
+	GuiControl,Enable%tempenable%,GUISettingsOfElement%ID%WhenRelease 
+	if (GUISettingsOfElement%ID%WhenRelease=1)
+		tempenable:=0
+	else
+		tempenable:=1
+	GuiControl,Enable%tempenable%,GUISettingsOfElement%ID%BlockKey 
+	
 	if (GUISettingsOfElement%ID%UseWindow2=1 or GUISettingsOfElement%ID%UseWindow3=1)
 		tempenable:=1
 	else
 		tempenable:=0
-	GuiControl,Enable%tempenable%,GUISettingsOfElement%ID%TitleMatchMode1 ;Deactivate this option
-	GuiControl,Enable%tempenable%,GUISettingsOfElement%ID%TitleMatchMode2 ;Deactivate this option
-	GuiControl,Enable%tempenable%,GUISettingsOfElement%ID%TitleMatchMode3 ;Deactivate this option
-	GuiControl,Enable%tempenable%,GUISettingsOfElement%ID%Wintitle ;Deactivate this option
-	GuiControl,Enable%tempenable%,GUISettingsOfElement%ID%excludeTitle ;Deactivate this option
-	GuiControl,Enable%tempenable%,GUISettingsOfElement%ID%winText ;Deactivate this option
-	GuiControl,Enable%tempenable%,GUISettingsOfElement%ID%ExcludeText ;Deactivate this option
-	GuiControl,Enable%tempenable%,GUISettingsOfElement%ID%ahk_class ;Deactivate this option
-	GuiControl,Enable%tempenable%,GUISettingsOfElement%ID%ahk_exe ;Deactivate this option
-	GuiControl,Enable%tempenable%,GUISettingsOfElement%ID%ahk_id ;Deactivate this option
-	GuiControl,Enable%tempenable%,GUISettingsOfElement%ID%ahk_pid ;Deactivate this option
-	GuiControl,Enable%tempenable%,GUISettingsOfElement%ID%GetWindowInformation ;Deactivate this option
+	GuiControl,Enable%tempenable%,GUISettingsOfElement%ID%TitleMatchMode1 
+	GuiControl,Enable%tempenable%,GUISettingsOfElement%ID%TitleMatchMode2
+	GuiControl,Enable%tempenable%,GUISettingsOfElement%ID%TitleMatchMode3 
+	GuiControl,Enable%tempenable%,GUISettingsOfElement%ID%Wintitle 
+	GuiControl,Enable%tempenable%,GUISettingsOfElement%ID%excludeTitle
+	GuiControl,Enable%tempenable%,GUISettingsOfElement%ID%winText
+	GuiControl,Enable%tempenable%,GUISettingsOfElement%ID%ExcludeText 
+	GuiControl,Enable%tempenable%,GUISettingsOfElement%ID%ahk_class
+	GuiControl,Enable%tempenable%,GUISettingsOfElement%ID%ahk_exe
+	GuiControl,Enable%tempenable%,GUISettingsOfElement%ID%ahk_id 
+	GuiControl,Enable%tempenable%,GUISettingsOfElement%ID%ahk_pid 
+	GuiControl,Enable%tempenable%,GUISettingsOfElement%ID%GetWindowInformation 
 }

@@ -54,7 +54,7 @@ getCategoryActionTrim_a_string()
 getParametersActionTrim_a_string()
 {
 	global
-	parametersToEdit:=["Label|" lang("Variable_name"),"VariableName|NewVariable|Varname","Label| " lang("Input string"),"Radio|1|expression|" lang("This is a string") ";" lang("This is a variable name or expression") ,"Text|Hello World|VarValue","Label|" lang("Options"),"Radio|1|TrimWhat|" lang("Remove a number of characters") ";" lang("Remove specific caracters"), "Label|" lang("Remove from whitch side"),"CheckBox|1|LeftSide|" lang("Left-hand side"),"CheckBox|0|RightSide|" lang("Right-hand side"),"Label|" lang("Count of characters"),"Text|6|Length","Label|" lang("Whitch characters"),"CheckBox|1|SpacesAndTabs|" lang("Spaces and tabs"),"Text|%a_space%%a_tab%|OmitChars"]
+	parametersToEdit:=["Label|" lang("Output variable_name"),"VariableName|NewVariable|Varname","Label| " lang("Input string"),"Radio|1|expression|" lang("This is a string") ";" lang("This is a variable name or expression") ,"Text|Hello World|VarValue","Label|" lang("Operation"),"Radio|1|TrimWhat|" lang("Remove a number of characters") ";" lang("Remove specific caracters"), "Label|" lang("Remove from which side"),"CheckBox|1|LeftSide|" lang("Left-hand side"),"CheckBox|0|RightSide|" lang("Right-hand side"),"Label|" lang("Count of characters"),"Text|6|Length","Label|" lang("Which characters"),"Radio|1|SpacesAndTabs|" lang("Spaces and tabs") ";" lang("Following characters"),"Text|%a_space%%a_tab%|OmitChars"]
 	
 	return parametersToEdit
 }
@@ -75,16 +75,17 @@ CheckSettingsActionTrim_a_string(ID)
 	if GUISettingsOfElement%ID%TrimWhat1=1 ;Trim a count of characters
 	{
 		GuiControl,Enable,GUISettingsOfElement%ID%Length
-		GuiControl,Disable,GUISettingsOfElement%ID%SpacesAndTabs
+		GuiControl,Disable,GUISettingsOfElement%ID%SpacesAndTabs1
+		GuiControl,Disable,GUISettingsOfElement%ID%SpacesAndTabs2
 		GuiControl,Disable,GUISettingsOfElement%ID%OmitChars
-		
 	}
 	else ;Trim specific characters
 	{
 		GuiControl,Disable,GUISettingsOfElement%ID%Length
-		GuiControl,Enable,GUISettingsOfElement%ID%SpacesAndTabs
-
-		if GUISettingsOfElement%ID%SpacesAndTabs=1
+		GuiControl,Enable,GUISettingsOfElement%ID%SpacesAndTabs1
+		GuiControl,Enable,GUISettingsOfElement%ID%SpacesAndTabs2
+		
+		if GUISettingsOfElement%ID%SpacesAndTabs1=1
 		{
 			GuiControl,Disable,GUISettingsOfElement%ID%OmitChars
 		}

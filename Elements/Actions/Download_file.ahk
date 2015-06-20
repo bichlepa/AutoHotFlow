@@ -3,15 +3,22 @@
 runActionDownload_file(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
-
-	local tempFileName:=v_replaceVariables(InstanceID,ThreadID,%ElementID%file)
-	local tempURL
 	
-	if tempFileName=
+	
+	local tempPath:=% v_replaceVariables(InstanceID,ThreadID,%ElementID%file)
+	if tempPath=
 	{
 		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 		return
 	}
+	if  DllCall("Shlwapi.dll\PathIsRelative","Str",tempPath)
+		tempPath:=SettingWorkingDir "\" tempPath
+	
+	
+
+	local tempURL
+	
+	
 
 	if %ElementID%IsExpression=1
 		tempURL:=%ElementID%URL
@@ -20,7 +27,7 @@ runActionDownload_file(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	else if %ElementID%IsExpression=3
 		tempURL:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%URL)
 	
-	URLDownloadToFile,%tempURL%,%tempFileName%
+	URLDownloadToFile,%tempURL%,%tempPath%
 	if ErrorLevel
 		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 	else
@@ -43,7 +50,7 @@ getParametersActionDownload_file()
 {
 	global
 	
-	parametersToEdit:=["Label|" lang("URL"),"Radio|1|IsExpression|" lang("This is a Link. It does not contain variables") ";" lang("This is a Link. It contains variables enclosed in percentage signs") ";" lang("This is a variable name or expression"),"Text|http://www.example.com|URL","Label|" lang("Select file"),"File||file|" lang("Select a file") "|" ]
+	parametersToEdit:=["Label|" lang("URL"),"Radio|1|IsExpression|" lang("This is a Link. It does not contain variables") ";" lang("This is a Link. It contains variables enclosed in percentage signs") ";" lang("This is a variable name or expression"),"Text|http://www.example.com|URL","Label|" lang("File path"),"File||file|" lang("Select file") "|" ]
 	return parametersToEdit
 }
 

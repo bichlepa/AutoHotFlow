@@ -23,6 +23,7 @@ if (!NoTests) ;Test mode when executing this script directly
 v_EvaluateExpression(InstanceID,ThreadID,ExpressionString)
 {
 	v_replaceVariables(InstanceID,ThreadID,ExpressionString)
+	ExpressionString:=A_Space ExpressionString A_Space
 	StringReplace,ExpressionString,ExpressionString,>=,≥,all
 	StringReplace,ExpressionString,ExpressionString,<=,≤,all
 	StringReplace,ExpressionString,ExpressionString,!=,≠,all
@@ -39,6 +40,7 @@ v_EvaluateExpression(InstanceID,ThreadID,ExpressionString)
 
 /* Evaluation of an Expression
 Thanks to Sunshine for the easy to understand instruction. See http://www.sunshine2k.de/coding/java/SimpleParser/SimpleParser.html
+If anybody knows hot to implement more operants and make this more flexible, or even support scripts, please come in touch with me!
 */
 v_EvaluateExpressionRecurse(InstanceID,ThreadID,ExpressionString)
 {

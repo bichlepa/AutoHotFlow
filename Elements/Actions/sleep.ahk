@@ -5,7 +5,14 @@ runActionSleep(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	global
 	if (!IsObject(ActionSleepCurrentSleeps))
 		ActionSleepCurrentSleeps:=Object()
-	tempActionSleepDuration:=%ElementID%duration
+	
+	
+	if %ElementID%Unit=1 ;Milliseconds
+		tempActionSleepDuration:=%ElementID%duration
+	else if %ElementID%Unit=2 ;Seconds
+		tempActionSleepDuration:=%ElementID%duration * 1000
+	else if %ElementID%Unit=3 ;minutes
+		tempActionSleepDuration:=%ElementID%duration * 60000
 	
 	ActionSleepCurrentSleeps.insert("Instance_" InstanceID "_" ThreadID "_" ElementID "_" ElementIDInInstance,(A_TickCount + tempActionSleepDuration-10)) ;Save the end time.
 	SetTimer,ActionSleepEnd,10
@@ -49,7 +56,7 @@ getCategoryActionSleep()
 getParametersActionSleep()
 {
 	global
-	parametersToEdit:=["Label| " lang("Duration_in_ms"),"Number|1000|Duration"]
+	parametersToEdit:=["Label| " lang("Duration"),"Number|2|Duration","Radio|2|Unit|" lang("Milliseconds") ";" lang("Seconds") ";" lang("Minutes")]
 	
 	return parametersToEdit
 }
@@ -57,7 +64,15 @@ getParametersActionSleep()
 GenerateNameActionSleep(ID)
 {
 	global
+	local unit
 	
-	return % lang("Sleep") "`n" GUISettingsOfElement%ID%Duration " ms" 
+	if GUISettingsOfElement%ID%Unit1
+		unit:= lang("ms #milliseconds")
+	else if GUISettingsOfElement%ID%Unit2
+		unit:= lang("s #seconds")
+	else if GUISettingsOfElement%ID%Unit3
+		unit:= lang("m #minutes")
+	
+	return % lang("Sleep") "`n" GUISettingsOfElement%ID%Duration " "  unit
 	
 }

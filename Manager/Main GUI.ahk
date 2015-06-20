@@ -27,6 +27,7 @@ gui,add,Button,vButtonEnableFlow gButtonEnableFlow Disabled Y+30 x330 w200 h30, 
 gui,add,Button,vButtonRunFlow gButtonRunFlow Disabled X+10 yp w200 h30,% lang("Run")
 
 gui,add,Button,vButtonSelectLanguage gButtonSelectLanguage  X330 Y+100 w200 h30,% lang("Change_Language")
+gui,add,Button,vButtonHelp gButtonHelp X+10 yp w200 h30,% lang("Help")
 gui,add,Button,vButtonSettings gButtonSettings  X330 Y+30 w200 h30,% lang("Settings")
 
 if 1=AutomaticStartup
@@ -81,8 +82,19 @@ tempselectedID:=IDOf(tempselected)
 changeCategory(tempselectedID)
 return
 
-
-
+ButtonHelp:
+IfNotExist, Help\%UILang%\index.html
+{
+	IfNotExist, Help\en\index.html
+	{
+		MsgBox, 16, % lang("Error"),% lang("No help file was found")
+		Return
+	}
+	run,Help\en\index.html
+}
+else
+	run,Help\%UILang%\index.html
+return
 
 ButtonEditFlow:
 tempselected:=TV_GetSelection() 

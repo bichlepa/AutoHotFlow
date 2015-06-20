@@ -5,8 +5,11 @@ runActionRename_file(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	global
 	local tempdir
 	local tempfilename
-	local temp:=v_replaceVariables(InstanceID,ThreadID,%ElementID%file)
-	SplitPath,temp,tempfilename,tempdir
+	local tempPath:=% v_replaceVariables(InstanceID,ThreadID,%ElementID%file)
+	if  DllCall("Shlwapi.dll\PathIsRelative","Str",tempPath)
+		tempPath:=SettingWorkingDir "\" tempPath
+	
+	SplitPath,tempPath,tempfilename,tempdir
 	
 	if (tempfilename!="" && tempdir!="")
 	{
@@ -35,7 +38,7 @@ getParametersActionRename_file()
 {
 	global
 	
-	parametersToEdit:=["Label|" lang("File"),"File||file|" lang("Select a file") "|","Label|" lang("New name"),"Text|" lang("Unnamed") "|newName","Checkbox|0|Overwrite|" lang("Overwrite existing files")]
+	parametersToEdit:=["Label|" lang("File"),"File||file|" lang("Select a file") "|","Label|" lang("New name"),"Text|" lang("Renamed.txt") "|newName","Label|" lang("Overwrite"),"Checkbox|0|Overwrite|" lang("Overwrite existing files")]
 	return parametersToEdit
 }
 

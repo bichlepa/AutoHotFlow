@@ -73,7 +73,7 @@ r_startRun()
 			{
 				stringleft,tempVarName,A_LoopField,% temppos
 				StringTrimLeft,tempVarContent,A_LoopField,% temppos+1
-				v_setVariable(r_RunningCounter,1,tempVarName,tempVarContent)
+				v_setVariable(r_RunningCounter,1,tempVarName,tempVarContent,,true)
 				
 			}
 			
@@ -82,7 +82,7 @@ r_startRun()
 		ThisExecution_localVariables=
 		
 	}
-	v_setVariable(r_RunningCounter,ThreadID,"triggertime",a_now,"Date") ;Set the triggertime variable
+	v_setVariable(r_RunningCounter,r_RunningThreadCounter,"a_triggertime",a_now,"Date",true) ;Set the triggertime variable
 	
 	;set some variables for correct  visual appearance of the trigger
 	if (triggerrunning<=0)
@@ -201,7 +201,7 @@ r_run()
 						tempFrom:=%element%from
 						;~ MsgBox % %tempfrom%type "`n" %tempTo%type "`n" %element%ConnectionType "`n" %tempInstanceID%_%tempRunningElement%_result "`n" %element%frompart
 						;If the connection starts on the currend finised element and the elements finished with the same result that is assigned to the connection
-						if (%element%from=tempRunningElement2 && ( %element%ConnectionType=%tempInstanceID%_%tempRunningElement%_result || (%tempfrom%type="loop" && %element%ConnectionType = "normal" && ((%tempInstanceID%_%tempRunningElement%_result = "normalHead" && %element%frompart ="Head") || (%tempInstanceID%_%tempRunningElement%_result = "normalTail") && %element%frompart ="Tail")  )))
+						if (%element%from=tempRunningElement2 && ( %element%ConnectionType=%tempInstanceID%_%tempRunningElement%_result || (%tempfrom%type="loop" && %element%ConnectionType = "normal" && ((%tempInstanceID%_%tempRunningElement%_result = "normalHead" && %element%frompart ="Head") || (%tempInstanceID%_%tempRunningElement%_result = "normalTail") && %element%frompart ="Tail")  )) && %tempTo%subtype!="")
 						{
 							;~ MsgBox % "drin: " %tempTo%type "`n" %element%ConnectionType "`n" %tempInstanceID%_%tempRunningElement%_result "`n" %element%frompart
 							if (tempConnectionCountToRun>0)

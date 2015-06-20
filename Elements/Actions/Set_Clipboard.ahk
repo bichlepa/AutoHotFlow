@@ -5,8 +5,8 @@ runActionSet_Clipboard(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	global
 	
 	
-	Clipboard:=v_GetVariable(InstanceID,ThreadID,v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname))
 	
+	Clipboard:=v_GetVariable(InstanceID,ThreadID,v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname))
 	
 
 	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")

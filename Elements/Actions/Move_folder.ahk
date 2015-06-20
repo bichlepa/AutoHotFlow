@@ -3,9 +3,14 @@
 runActionMove_folder(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
+	local tempFrom:=% v_replaceVariables(InstanceID,ThreadID,%ElementID%folder)
+	local tempTo:=% v_replaceVariables(InstanceID,ThreadID,%ElementID%destFolder)
+	if  DllCall("Shlwapi.dll\PathIsRelative","Str",tempFrom)
+		tempFrom:=SettingWorkingDir "\" tempFrom
+	if  DllCall("Shlwapi.dll\PathIsRelative","Str",tempTo)
+		tempTo:=SettingWorkingDir "\" tempTo
 	
-	
-	FileMoveDir,% v_replaceVariables(InstanceID,ThreadID,%ElementID%folder),% v_replaceVariables(InstanceID,ThreadID,%ElementID%destFolder),% %ElementID%Overwrite
+	FileMoveDir,% tempFrom,% tempTo,% %ElementID%Overwrite
 	
 	if ErrorLevel
 		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")

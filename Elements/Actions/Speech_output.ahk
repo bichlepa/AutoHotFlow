@@ -82,7 +82,7 @@ getParametersActionSpeech_output()
 {
 	global
 	
-	parametersToEdit:=["Label|" lang("Text_to_speak"),"MultiLineText|" lang("Message") "|text","Checkbox|0|WaitUntilPreviousFinished|" lang("Wait until previous speech output has finished (if any)"),"Checkbox|1|WaitUntilCurrentFinishes|" lang("Wait until current speech output finishes"),"Label|" lang("Speech engine"), "DropDownListByName|" TTSDefaultLanguage "|TTSEngine|" TTSList,"Label|" lang("Volume"), "Slider|100|volume|Range0-100 TickInterval10 tooltip","Label|" lang("Speed"), "Slider|0|speed|Range-10-10 TickInterval1 tooltip","Label|" lang("Pitch"), "Slider|0|pitch|Range-10-10 TickInterval1 tooltip"]
+	parametersToEdit:=["Label|" lang("Text_to_speak"),"MultiLineText|" lang("Message") "|text","Label|" lang("Wait options"),"Checkbox|0|WaitUntilPreviousFinished|" lang("Wait until previous speech output has finished (if any)"),"Checkbox|1|WaitUntilCurrentFinishes|" lang("Wait until current speech output finishes"),"Label|" lang("Speech engine"), "DropDownListByName|" TTSDefaultLanguage "|TTSEngine|" TTSList,"Label|" lang("Volume"), "Slider|100|volume|Range0-100 TickInterval10 tooltip","Label|" lang("Speed"), "Slider|0|speed|Range-10-10 TickInterval1 tooltip","Label|" lang("Pitch"), "Slider|0|pitch|Range-10-10 TickInterval1 tooltip"]
 	
 	return parametersToEdit
 }

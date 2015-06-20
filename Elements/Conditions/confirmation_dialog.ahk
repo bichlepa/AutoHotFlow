@@ -3,84 +3,83 @@
 runConditionConfirmation_Dialog(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
-	if (!IsObject(ConditionConfirmation_DialogToStart))
-		ConditionConfirmation_DialogToStart:=Object()
+	local tempText:=v_replaceVariables(InstanceID,ThreadID,%ElementID%question,"normal")
+	local tempTitle:=v_replaceVariables(InstanceID,ThreadID,%ElementID%title,"normal")
 	
-	tempInstanceString:="Instance_" InstanceID "_" ThreadID "_" ElementID "_" ElementIDInInstance
-	ConditionConfirmation_DialogToStart.insert(tempInstanceString)
+	if (!IsObject(ConditionConfirmation_DialogAllGUIs))
+		ConditionConfirmation_DialogAllGUIs:=Object()
 	
-	if (Confirmation_DialogStarted=true)
-		return
+	local tempNew:=Object() ;create object that will contain all settings of the current element
+	tempNew.insert("instanceID",InstanceID)
+	tempNew.insert("ThreadID",ThreadID)
+	tempNew.insert("ElementID",ElementID)
+	tempNew.insert("ElementIDInInstance",ElementIDInInstance)
+	tempNew.insert("Text",tempText)
+	tempNew.insert("Title",tempTitle)
+	
+	;Create a gui label. This label will always be unique. 
+	local tempGUILabel:="GUI_Confirmation_Dialog_" instanceID "_" ThreadID "_" ElementID "_" ElementIDInInstance 
 	
 	
-
-	ConditionConfirmation_Dialog_StartNextQuestion:
-	Confirmation_DialogStarted:=false
-	for count, tempcConfirmation_DialogidToStart in ConditionConfirmation_DialogToStart ;get the first element
-	{
-		StringSplit,tempElement,tempcConfirmation_DialogidToStart,_
-		; tempElement1 = word "instance"
-		; tempElement2 = instance id
-		; tempElement3 = Thread id
-		; tempElement4 = element id
-		; tempElement5 = element id in the instance
-		ConditionConfirmation_DialogToStart_Element_ID:=tempElement4
-		ConditionConfirmation_DialogToStart_Thread_ID:=tempElement3
-		ConditionConfirmation_DialogToStart_Instance_ID:=tempElement2
-		
-		;MsgBox ConditionConfirmation_DialogToStart_Element_ID %ConditionConfirmation_DialogToStart_Element_ID%`nConditionConfirmation_DialogToStart_Thread_ID %ConditionConfirmation_DialogToStart_Thread_ID%`nConditionConfirmation_DialogToStart_Instance_ID %ConditionConfirmation_DialogToStart_Instance_ID%
-		
-		;MsgBox % "question" %ConditionConfirmation_DialogToStart_Element_ID%question
-		;gui,%tempcConfirmation_DialogidToStart%:default
-		
-		;gui,10:-SysMenu 
-		
-		gui,10:add,text,x10 w320 h100, % v_replaceVariables(ConditionConfirmation_DialogToStart_Instance_ID,ConditionConfirmation_DialogToStart_Thread_ID,%ConditionConfirmation_DialogToStart_Element_ID%question)
-		gui,10:add,button,x10 w150 h30 gConditionConfirmation_DialogButtonYes,% lang("Yes")
-		gui,10:add,button,X+10 yp w150 h30 gConditionConfirmation_DialogButtonNo,% lang("No")
-		gui,10:show,w330 h150 ,% v_replaceVariables(ConditionConfirmation_DialogToStart_Instance_ID,ConditionConfirmation_DialogToStart_Thread_ID,%ConditionConfirmation_DialogToStart_Element_ID%title)
-		
-		ConditionConfirmation_DialogStart_Current:=tempcConfirmation_DialogidToStart
-		Confirmation_DialogStarted:=true
-		break
-		
-	}
+	;Create GUI
+	gui,%tempGUILabel%:+LabelConfirmation_DialogGUI ;This label leads to a jump label beneath. It's needed if user closes the window
+	gui,%tempGUILabel%:add,text,x10 w320 h100, % tempText
+	gui,%tempGUILabel%:add,button,x10 w150 h30 gConditionConfirmation_DialogButtonYes,% lang("Yes")
+	gui,%tempGUILabel%:add,button,X+10 yp w150 h30 gConditionConfirmation_DialogButtonNo,% lang("No")
+	gui,%tempGUILabel%:show,w330 h150 ,% tempTitle
 	
-	if (Confirmation_DialogStarted)
-		ConditionConfirmation_DialogToStart.remove(1) ;Remove the shown question
+	;Add the label to the list of all GUI labels, so it can be found.
+	ConditionConfirmation_DialogAllGUIs.insert(tempGUILabel,tempNew)
 	
 	return
 	
 	ConditionConfirmation_DialogButtonYes:
-	
-	gui,10:destroy
-	
-	MarkThatElementHasFinishedRunningOneVar(ConditionConfirmation_DialogStart_Current,"yes")
-	
-	goto,ConditionConfirmation_Dialog_StartNextQuestion
-	
-	
-		
-	
-	
 	ConditionConfirmation_DialogButtonNo:
-	gui,10:destroy
+	gui,%a_gui%:destroy
 	
-	MarkThatElementHasFinishedRunningOneVar(ConditionConfirmation_DialogStart_Current,"no")
+	;Get the parameter list for the current GUI from the list of all GUIs
+	tempConfirmation_DialogBut:=ConditionConfirmation_DialogAllGUIs[a_gui]
+	
+	;~ MsgBox % a_gui " - " temp.instanceID
+	if A_ThisLabel=ConditionConfirmation_DialogButtonYes
+		MarkThatElementHasFinishedRunning(tempConfirmation_DialogBut.instanceID,tempConfirmation_DialogBut.threadid,tempConfirmation_DialogBut.ElementID,tempConfirmation_DialogBut.ElementIDInInstance,"yes")
+	else
+		MarkThatElementHasFinishedRunning(tempConfirmation_DialogBut.instanceID,tempConfirmation_DialogBut.threadid,tempConfirmation_DialogBut.ElementID,tempConfirmation_DialogBut.ElementIDInInstance,"no")
+	
+	;Remove this GUI from the list of all GUIs
+	ConditionConfirmation_DialogAllGUIs.Remove(a_gui)
+	
+	return
+	
+	Confirmation_DialogGUIclose:
+	
+	gui,%a_gui%:destroy
+	
+	;Get the parameter list for the current GUI from the list of all GUIs
+	tempConfirmation_DialogBut:=ConditionConfirmation_DialogAllGUIs[a_gui]
+	
+	;~ MsgBox % a_gui " - " temp.instanceID
+	MarkThatElementHasFinishedRunning(tempConfirmation_DialogBut.instanceID,tempConfirmation_DialogBut.threadid,tempConfirmation_DialogBut.ElementID,tempConfirmation_DialogBut.ElementIDInInstance,"exception")
 
-	goto,ConditionConfirmation_Dialog_StartNextQuestion
 	
-	10guiclose:
-	gui,10:destroy
-	
-	MarkThatElementHasFinishedRunningOneVar(ConditionConfirmation_DialogStart_Current,"exception")
+	ConditionConfirmation_DialogAllGUIs.Remove(a_gui)
+	return
 	
 	
-	goto,ConditionConfirmation_Dialog_StartNextQuestion
+	
 }
 
 stopConditionConfirmation_Dialog(ID)
 {
+	global
+	;Go through all GUI Labels that are in the list of all GUIs
+	for tempConditionConfirmation_DialogGuiLabel, tempConditionConfirmation_DialogSettings in ConditionConfirmation_DialogAllGUIs
+	{
+		gui,%tempConditionConfirmation_DialogGuiLabel%:destroy ;Close the window
+		
+	}
+	
+	ConditionConfirmation_DialogAllGUIs:=Object() ;Delete all elements from the list of all GUIs
 	
 	gui,%ID%:default
 	gui,destroy

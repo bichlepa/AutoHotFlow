@@ -8,6 +8,9 @@ runActionGet_mouse_position(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	local tempwin
 	local tempcontrol
 	
+	local tempVarNamex:=v_replaceVariables(InstanceID,ThreadID,%ElementID%varnamex)
+	
+	local tempVarNamey:=v_replaceVariables(InstanceID,ThreadID,%ElementID%varnamey)
 	
 	if %ElementID%CoordMode=1
 		CoordMode, Mouse, Screen
@@ -18,10 +21,10 @@ runActionGet_mouse_position(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 
 	MouseGetPos,tempx,tempy,tempwin,tempcontrol
 	
-	v_SetVariable(InstanceID,ThreadID,"t_posx",tempx)
-	v_SetVariable(InstanceID,ThreadID,"t_posy",tempy)
-	v_SetVariable(InstanceID,ThreadID,"t_windowid",tempwin)
-	v_SetVariable(InstanceID,ThreadID,"t_control",tempcontrol)
+	v_SetVariable(InstanceID,ThreadID,tempVarNamex,tempx)
+	v_SetVariable(InstanceID,ThreadID,tempVarNamey,tempy)
+	v_SetVariable(InstanceID,ThreadID,"a_windowid",tempwin,,true)
+	v_SetVariable(InstanceID,ThreadID,"a_controlID",tempcontrol,,true)
 	
 	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	return
@@ -38,7 +41,7 @@ getCategoryActionGet_mouse_position()
 getParametersActionGet_mouse_position()
 {
 	global
-	parametersToEdit:=["Label|" lang("Mouse position"),"Radio|1|CoordMode|" lang("Relative to screen") ";" lang("Relative to active window position") ";" lang("Relative to active window client position")]
+	parametersToEdit:=["Label|" lang("Output variable X position"),"VariableName|PosX|varnameX","Label|" lang("Output variable Y position"),"VariableName|PosY|varnameY","Label|" lang("Mouse position"),"Radio|1|CoordMode|" lang("Relative to screen") ";" lang("Relative to active window position") ";" lang("Relative to active window client position")]
 	
 	return parametersToEdit
 }

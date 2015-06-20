@@ -15,7 +15,7 @@ runConditionExpression(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 getParametersConditionExpression()
 {
 	
-	parametersToEdit:=["Label|" lang("Expression"),"Text||Expression","Label| " lang("Value")]
+	parametersToEdit:=["Label|" lang("Expression"),"Text||Expression"]
 	
 	return parametersToEdit
 }

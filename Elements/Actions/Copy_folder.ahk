@@ -4,8 +4,15 @@ runActionCopy_folder(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	
+	local tempFrom:=% v_replaceVariables(InstanceID,ThreadID,%ElementID%folder)
+	local tempTo:=% v_replaceVariables(InstanceID,ThreadID,%ElementID%destFolder)
+	if  DllCall("Shlwapi.dll\PathIsRelative","Str",tempFrom)
+		tempFrom:=SettingWorkingDir "\" tempFrom
+	if  DllCall("Shlwapi.dll\PathIsRelative","Str",tempTo)
+		tempTo:=SettingWorkingDir "\" tempTo
 	
-	FileCopyDir,% v_replaceVariables(InstanceID,ThreadID,%ElementID%folder),% v_replaceVariables(InstanceID,ThreadID,%ElementID%destFolder),% %ElementID%Overwrite
+	
+	FileCopyDir,% tempFrom,% tempTo,% %ElementID%Overwrite
 	
 	if ErrorLevel
 		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
@@ -26,7 +33,7 @@ getParametersActionCopy_folder()
 {
 	global
 	
-	parametersToEdit:=["Label|" lang("Source folder"),"Folder||folder|" lang("Select a folder") "|","Label|" lang("Destination folder"),"Folder||destFolder|" lang("Select folder") "|","Checkbox|0|Overwrite|" lang("Overwrite existing files")]
+	parametersToEdit:=["Label|" lang("Source folder"),"Folder||folder|" lang("Select a folder") "|","Label|" lang("Destination folder"),"Folder||destFolder|" lang("Select folder") "|","Label|" lang("Overwrite"),"Checkbox|0|Overwrite|" lang("Overwrite existing files")]
 	return parametersToEdit
 }
 

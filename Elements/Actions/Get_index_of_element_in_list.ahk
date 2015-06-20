@@ -63,7 +63,7 @@ getCategoryActionGet_index_of_element_in_list()
 getParametersActionGet_index_of_element_in_list()
 {
 	global
-	parametersToEdit:=["Label|" lang("Output variable name"),"VariableName|NewVariable|Varname","Label|" lang("Variable_name"),"VariableName|List|ListName","Label|" lang("Content"),"Radio|1|isExpressionSearchContent|" lang("This is a value") ";" lang("This is a variable name or expression"),"Text|Any element|SearchContent","Label|" lang("Options"),"Checkbox|0|ExceptionWhenNotFound|" lang("Throw exeption if no element was found")]
+	parametersToEdit:=["Label|" lang("Output variable name"),"VariableName|NewVariable|Varname","Label|" lang("Input list"),"VariableName|List|ListName","Label|" lang("Content"),"Radio|1|isExpressionSearchContent|" lang("This is a value") ";" lang("This is a variable name or expression"),"Text|Any element|SearchContent","Label|" lang("Options"),"Checkbox|0|ExceptionWhenNotFound|" lang("Throw exeption if no element was found")]
 	
 	return parametersToEdit
 }

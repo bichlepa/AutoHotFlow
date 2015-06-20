@@ -5,10 +5,10 @@ runActionGet_Volume(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	global
 	local temp
 	
-	
+	local tempVarname:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname)
 	SoundGet,temp
 
-	v_setVariable(InstanceID,ThreadID,"t_volume",round(temp,1))
+	v_setVariable(InstanceID,ThreadID,tempVarname,round(temp,1))
 	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	return
 
@@ -27,7 +27,7 @@ getParametersActionGet_Volume()
 	global
 	
 	
-	parametersToEdit:=[]
+	parametersToEdit:=["Label|" lang("Output variable name"),"VariableName|Volume|Varname"]
 	
 	return parametersToEdit
 }

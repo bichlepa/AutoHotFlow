@@ -13,7 +13,7 @@ runActionGet_from_list(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	
 	if IsObject(tempObject)
 	{
-		if %ElementID%WhitchPosition=1 ;first item
+		if %ElementID%WhitchPosition=1 ;first item ; Stupid misspelling
 		{
 			if (tempObject.MinIndex()!="")
 			{
@@ -81,7 +81,7 @@ getCategoryActionGet_from_list()
 getParametersActionGet_from_list()
 {
 	global
-	parametersToEdit:=["Label|" lang("Output variable name"),"VariableName|NewVariable|Varname","Label|" lang("Input list name"),"VariableName|List|ListName","Radio|3|WhitchPosition|" lang("First position") ";" lang("Last position")";" lang("Random position") ";" lang("Following position or key"),"text|2|Position"]
+	parametersToEdit:=["Label|" lang("Output variable name"),"VariableName|NewVariable|Varname","Label|" lang("Input list"),"VariableName|List|ListName","Label|" lang("Key or position"),"Radio|1|WhitchPosition|" lang("First position") ";" lang("Last position")";" lang("Random position") ";" lang("Following position or key"),"text|2|Position"]
 	
 	return parametersToEdit
 }

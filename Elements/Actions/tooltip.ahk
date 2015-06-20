@@ -11,7 +11,14 @@ runActionTooltip(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	if %ElementID%follow_mouse =1
 		SetTimer,runActionTooltip_follow_mouse,10,,,13
 	
-	tempDuration:=%ElementID%duration
+	if %ElementID%Unit=1 ;Milliseconds
+		tempDuration:=%ElementID%duration
+	else if %ElementID%Unit=2 ;Seconds
+		tempDuration:=%ElementID%duration * 1000
+	else if %ElementID%Unit=3 ;minutes
+		tempDuration:=%ElementID%duration * 60000
+	
+	
 	SetTimer,runActionTooltip_RemoveTooltip,-%tempDuration%
 	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	return
@@ -43,7 +50,7 @@ getCategoryActionTooltip()
 getParametersActionTooltip()
 {
 	global
-	parametersToEdit:=["Label|" lang("Text_to_show"),"MultiLineText|" lang("Message") "|text","Label|" lang("Duration_ms"),"Number|1000|duration","Checkbox|1|follow_mouse|" lang("Follow_Mouse")]
+	parametersToEdit:=["Label|" lang("Text_to_show"),"MultiLineText|" lang("Message") "|text","Label|" lang("Duration"),"Number|2|duration","Radio|2|Unit|" lang("Milliseconds") ";" lang("Seconds") ";" lang("Minutes"),"Label|" lang("Options"),"Checkbox|1|follow_mouse|" lang("Follow_Mouse")]
 	
 	return parametersToEdit
 }
@@ -51,11 +58,19 @@ getParametersActionTooltip()
 GenerateNameActionTooltip(ID)
 {
 	global
+	local temptext
+	local duration
+	if GUISettingsOfElement%ID%Unit1
+		duration:=GUISettingsOfElement%ID%duration " " lang("ms #Milliseconds")
+	if GUISettingsOfElement%ID%Unit2
+		duration:=GUISettingsOfElement%ID%duration " " lang("s #Seconds")
+	if GUISettingsOfElement%ID%Unit3
+		duration:=GUISettingsOfElement%ID%duration " " lang("m #Minutes")
 	
 	if GUISettingsOfElement%ID%follow_mouse=1
 		temptext:=lang("Follow_Mouse") "`n"
 	else
 		temptext=
-	return lang("Tooltip") ": " GUISettingsOfElement%ID%text "`n" GUISettingsOfElement%ID%duration " ms`n" temptext
+	return lang("Tooltip") ": " GUISettingsOfElement%ID%text "`n" duration "`n" temptext
 	
 }

@@ -63,10 +63,10 @@ ui_showgui()
 	
 }
 
-ui_UpdateStatusbartext(whitch="")
+ui_UpdateStatusbartext(which="")
 {
 	global
-	if (whitch="pos" or whitch ="")
+	if (which="pos" or which ="")
 	{
 		sb_SetText("Offset: x " Round(offsetx) " y " Round(offsety) "   |   Zoom: " Round(zoomFactor,2 ),1)
 	}

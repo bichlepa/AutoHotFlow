@@ -3,9 +3,10 @@
 runActionPlay_Sound(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
-	local tempSound
+	
+	local tempPath
 
-	if (%ElementID%WhitchSound=1)
+	if (%ElementID%WhitchSound=1) ;Stupid misspelling :-(
 		SoundPlay,*-1
 	else if (%ElementID%WhitchSound=2)
 		SoundPlay,*16
@@ -16,7 +17,13 @@ runActionPlay_Sound(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	else if (%ElementID%WhitchSound=5)
 		SoundPlay,*64
 	else if (%ElementID%WhitchSound=6)
-		SoundPlay,% v_replaceVariables(InstanceID,ThreadID,%ElementID%soundfile)
+	{
+		tempPath:=% v_replaceVariables(InstanceID,ThreadID,%ElementID%soundfile)
+		if  DllCall("Shlwapi.dll\PathIsRelative","Str",tempPath)
+			tempPath:=SettingWorkingDir "\" tempPath
+		SoundPlay,% tempPath
+		
+	}
 	if errorlevel
 		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 	else

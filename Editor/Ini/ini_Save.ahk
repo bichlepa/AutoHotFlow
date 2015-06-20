@@ -1,4 +1,5 @@
-﻿i_save()
+﻿
+i_save()
 {
 	global
 	
@@ -25,8 +26,10 @@
 	Filemove,%ThisFlowFolder%\%ThisFlowFilename%.ini,%ThisFlowFolder%\%ThisFlowFilename%backup.ini
 	IniWrite,%ID_count%,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,count
 	IniWrite,%SettingFlowExecutionPolicy%,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,SettingFlowExecutionPolicy
+	IniWrite,%SettingWorkingDir%,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,SettingWorkingDir
 	IniWrite,%flowName%,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,name
 	IniWrite,%FlowCategory%,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,category
+	IniWrite,%FlowCompabilityVersionOfApp%,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,FlowCompabilityVersion
 	saveCopyOfallElements:=allElements.clone()
 	
 	for SaveIndex1, element in saveCopyOfallElements

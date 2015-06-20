@@ -5,12 +5,16 @@ runActionRename_folder(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	global
 	local temppos
 	local tempoldname
-	local tempfolder:=v_replaceVariables(InstanceID,ThreadID,%ElementID%folder)
-	StringGetPos,temppos,tempfolder,\,R
-	StringTrimLeft,tempoldname,tempfolder,% temppos +1
-	StringLeft,tempfolder,tempfolder,% temppos
+	local tempPath:=% v_replaceVariables(InstanceID,ThreadID,%ElementID%folder)
+	if  DllCall("Shlwapi.dll\PathIsRelative","Str",tempPath)
+		tempPath:=SettingWorkingDir "\" tempPath
 	
-	FileMoveDir,% tempfolder "\" tempoldname ,% tempfolder "\" v_replaceVariables(InstanceID,ThreadID,%ElementID%newName),R
+	local tempPath:=v_replaceVariables(InstanceID,ThreadID,%ElementID%folder)
+	StringGetPos,temppos,tempPath,\,R
+	StringTrimLeft,tempoldname,tempPath,% temppos +1
+	StringLeft,tempPath,tempPath,% temppos
+	
+	FileMoveDir,% tempPath "\" tempoldname ,% tempPath "\" v_replaceVariables(InstanceID,ThreadID,%ElementID%newName),R
 	
 	if ErrorLevel
 		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")

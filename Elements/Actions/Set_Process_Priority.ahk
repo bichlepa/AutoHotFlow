@@ -27,7 +27,7 @@ RunActionSet_process_priority(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	}
 	else
 	{
-		v_setVariable(InstanceID,ThreadID,t_pid,ActionSet_process_prioritytempPid)
+		v_setVariable(InstanceID,ThreadID,a_pid,ActionSet_process_prioritytempPid,,true)
 		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	}
 	return

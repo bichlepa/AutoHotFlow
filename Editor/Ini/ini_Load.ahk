@@ -23,6 +23,10 @@
 	ToolTip(lang("loading"),100000)
 	Iniread,ID_count,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,count,1
 	Iniread,SettingFlowExecutionPolicy,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,SettingFlowExecutionPolicy,parallel
+	Iniread,SettingWorkingDir,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,SettingWorkingDir,%A_MyDocuments%\AutoHotFlow default working direction
+	if not fileexist(SettingWorkingDir)
+		FileCreateDir,%SettingWorkingDir%
+	Iniread,FlowCompabilityVersion,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,FlowCompabilityVersion,0
 	
 	i_loadGeneralParameters() ;Outsourced in order to execute only that later when flow name changes
 	
@@ -87,6 +91,8 @@
 			Iniread,loadElementsubType,%ThisFlowFolder%\%ThisFlowFilename%.ini,element%index1%,subType
 			%loadElementID%subType=%loadElementsubType%
 			
+			i_CheckCompabilitySubtype(loadElementID,"element" index1,ThisFlowFolder "\" ThisFlowFilename ".ini")
+			
 			if (loadElementType="loop")
 			{
 				Iniread,loadElementHeightOfVerticalBar,%ThisFlowFolder%\%ThisFlowFilename%.ini,element%index1%,HeightOfVerticalBar
@@ -116,7 +122,7 @@
 			
 			
 		}
-		
+		i_CheckCompability(loadElementID,"element" index1,ThisFlowFolder "\" ThisFlowFilename ".ini")
 		ui_draw()
 		
 		

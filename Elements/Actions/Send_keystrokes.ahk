@@ -30,7 +30,7 @@ getCategoryActionSend_Keystrokes()
 getParametersActionSend_Keystrokes()
 {
 	global
-	parametersToEdit:=["Label|" lang("Keys_or_text_to_send"),"Checkbox|0|RawMode|" lang("Raw mode"),"Text||KeysToSend","Label|" lang("Method"),"Radio|1|SendMode|" lang("Input mode") ";" lang("Event mode") ";" lang("Play mode")]
+	parametersToEdit:=["Label|" lang("Keys_or_text_to_send"),"Checkbox|0|RawMode|" lang("Raw mode"),"Text||KeysToSend","Label|" lang("Send mode"),"Radio|1|SendMode|" lang("Input mode") ";" lang("Event mode") ";" lang("Play mode")]
 	;,"Label|" lang("Insert_a_keystroke"), "Hotkey||HotkeyToInsert,"Button|customSettingButtonOfActionSend_KeystrokesHotkeyToInsert||" lang("Insert")
 	return parametersToEdit
 }

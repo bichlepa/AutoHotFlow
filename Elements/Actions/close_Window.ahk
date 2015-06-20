@@ -5,8 +5,8 @@ runActionClose_window(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	global
 	
 	tempWinTitle:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Wintitle)
-	tempWinText:=v_replaceVariables(InstanceID,ThreadID,%ElementID%winText)
 	tempExcludeTitle:=v_replaceVariables(InstanceID,ThreadID,%ElementID%excludeTitle)
+	tempWinText:=v_replaceVariables(InstanceID,ThreadID,%ElementID%winText)
 	tempExcludeText:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ExcludeText)
 	tempTitleMatchMode :=%ElementID%TitleMatchMode
 	tempahk_class:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ahk_class)

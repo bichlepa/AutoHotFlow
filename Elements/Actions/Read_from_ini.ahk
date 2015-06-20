@@ -7,6 +7,10 @@ runActionRead_from_ini(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	local tempVarName:=v_replaceVariables(InstanceID,ThreadID,%ElementID%varname)
 	local tempText
 	
+	local tempPath:=% v_replaceVariables(InstanceID,ThreadID,%ElementID%file)
+	if  DllCall("Shlwapi.dll\PathIsRelative","Str",tempPath)
+		tempPath:=SettingWorkingDir "\" tempPath
+	
 	if tempVarName=
 		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 
@@ -17,11 +21,11 @@ runActionRead_from_ini(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	{
 		if %ElementID%WhenError=1
 		{
-			IniRead,tempText,% v_replaceVariables(InstanceID,ThreadID,%ElementID%file),% v_replaceVariables(InstanceID,ThreadID,%ElementID%section),% v_replaceVariables(InstanceID,ThreadID,%ElementID%key),% v_replaceVariables(InstanceID,ThreadID,%ElementID%default)
+			IniRead,tempText,% tempPath,% v_replaceVariables(InstanceID,ThreadID,%ElementID%section),% v_replaceVariables(InstanceID,ThreadID,%ElementID%key),% v_replaceVariables(InstanceID,ThreadID,%ElementID%default)
 		}
 		else
 		{
-			IniRead,tempText,% v_replaceVariables(InstanceID,ThreadID,%ElementID%file),% v_replaceVariables(InstanceID,ThreadID,%ElementID%section),% v_replaceVariables(InstanceID,ThreadID,%ElementID%key),E?R ROR
+			IniRead,tempText,% tempPath,% v_replaceVariables(InstanceID,ThreadID,%ElementID%section),% v_replaceVariables(InstanceID,ThreadID,%ElementID%key),E?R ROR
 			if tempText=E?R ROR
 			{
 				MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
@@ -35,7 +39,7 @@ runActionRead_from_ini(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	}
 	else ;Get section list
 	{
-		IniRead,tempText,% v_replaceVariables(InstanceID,ThreadID,%ElementID%file)
+		IniRead,tempText,% tempPath
 		v_setVariable(InstanceID,ThreadID,tempVarName,v_importVariable(tempText,"list","`n"),"list")
 		
 		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
@@ -59,7 +63,7 @@ getParametersActionRead_from_ini()
 {
 	global
 	
-	parametersToEdit:=["Label|" lang("Variable name"),"VariableName|value|varname","Label|" lang("Select an .ini file"),"File||file|" lang("Select an .ini file") "|8|(*.ini)","Label|" lang("Action"),"Radio|1|Action|" lang("Read a key") ";" lang("Read the section names"),"Label|" lang("Section"),"Text|section|Section","Label|" lang("Key"),"Text|key|Key","Label|" lang("Behaviour on error"),"Radio|1|WhenError|" lang("Insert default value in the variable") ";" lang("Throw exception"),"Label|" lang("Default value on failure"),"Text|ERROR|Default" ]
+	parametersToEdit:=["Label|" lang("Output Variable name"),"VariableName|NewVariable|varname","Label|" lang("Path of .ini file"),"File||file|" lang("Select an .ini file") "|8|(*.ini)","Label|" lang("Action"),"Radio|1|Action|" lang("Read a key") ";" lang("Read the section names"),"Label|" lang("Section"),"Text|section|Section","Label|" lang("Key"),"Text|key|Key","Label|" lang("Behavior on error"),"Radio|1|WhenError|" lang("Insert default value in the variable") ";" lang("Throw exception"),"Label|" lang("Default value on failure"),"Text|ERROR|Default" ]
 	return parametersToEdit
 }
 

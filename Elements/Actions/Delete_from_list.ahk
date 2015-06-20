@@ -15,7 +15,7 @@ runActionDelete_from_list(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	
 	if IsObject(tempObject)
 	{
-		if %ElementID%WhitchPosition=1
+		if %ElementID%WhitchPosition=1 ; Stupid misspelling :-(
 		{
 			tempObject.Remove(1)
 		}
@@ -52,7 +52,7 @@ getCategoryActionDelete_from_list()
 getParametersActionDelete_from_list()
 {
 	global
-	parametersToEdit:=["Label|" lang("Variable_name"),"VariableName|NewList|Varname","Label|" lang("Whitch element"),"Radio|2|WhitchPosition|" lang("First element") ";" lang("Last element")";" lang("Following element or key"),"text|2|Position"]
+	parametersToEdit:=["Label|" lang("Variable_name"),"VariableName|NewList|Varname","Label|" lang("Which element"),"Radio|2|WhitchPosition|" lang("First element") ";" lang("Last element")";" lang("Following element or key"),"text|2|Position"]
 	
 	return parametersToEdit
 }

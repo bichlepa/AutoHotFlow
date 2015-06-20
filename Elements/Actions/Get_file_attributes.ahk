@@ -4,7 +4,11 @@ runActionGet_file_attributes(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	local tempattr
-	FileGetAttrib,tempattr,% v_replaceVariables(InstanceID,ThreadID,%ElementID%file)
+	local tempPath:=% v_replaceVariables(InstanceID,ThreadID,%ElementID%file)
+	if  DllCall("Shlwapi.dll\PathIsRelative","Str",tempPath)
+		tempPath:=SettingWorkingDir "\" tempPath
+	
+	FileGetAttrib,tempattr,% tempPath
 	if ErrorLevel
 		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 	else
@@ -27,7 +31,7 @@ getParametersActionGet_file_attributes()
 {
 	global
 	
-	parametersToEdit:=["Label|" lang("Variable name"),"VariableName|FileAttributes|varname","Label|" lang("Select file"),"File||file|" lang("Select a file") "|"]
+	parametersToEdit:=["Label|" lang("Output variable name"),"VariableName|FileAttributes|varname","Label|" lang("File path"),"File||file|" lang("Select a file") "|"]
 	return parametersToEdit
 }
 

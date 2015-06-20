@@ -25,7 +25,7 @@ getParametersActionEmpty_recycle_bin()
 {
 	global
 	
-	parametersToEdit:=["Label|" lang("Whitch drive"),"Radio|1|AllDrives|" lang("All drives") ";" lang("Secified drive"),"Folder||drive|" lang("Select the root Folder of a drive") "|2"]
+	parametersToEdit:=["Label|" lang("Which drive"),"Radio|1|AllDrives|" lang("All drives") ";" lang("Specified drive"),"Folder||drive|" lang("Select the root Folder of a drive") "|2"]
 	return parametersToEdit
 }
 
@@ -35,5 +35,21 @@ GenerateNameActionEmpty_recycle_bin(ID)
 	;MsgBox % %ID%text_to_show
 	
 	return lang("Empty_recycle_bin")
+	
+}
+
+CheckSettingsActionEmpty_recycle_bin(ID)
+{
+	if (GUISettingsOfElement%ID%AllDrives1 = 1)
+	{
+		
+		GuiControl,Disable,GUISettingsOfElement%ID%drive
+	}
+	else
+	{
+		
+		GuiControl,Enable,GUISettingsOfElement%ID%drive
+	}
+	
 	
 }

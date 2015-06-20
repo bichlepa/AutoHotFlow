@@ -8,7 +8,11 @@ ui_SettingsOwFLow()
 	ui_DisableMainGUI()
 	gui,5:default
 	gui,+owner
-	gui,add,text,x10 w300,% lang("Flow_ececution_policy")
+	gui,font,s10 cnavy wbold
+	gui,add,text,x10 w300,% lang("Flow_execution_policy")
+	
+	gui,font,s8 cDefault wnorm
+	
 	if SettingFlowExecutionPolicy=parallel
 		tempchecked=1
 	else
@@ -30,17 +34,24 @@ ui_SettingsOwFLow()
 		tempchecked=0
 	gui,add,radio,w300 x10 Y+10 vGuiFlowSettingsStop  checked%tempchecked%,% lang("Stop_the_currently_executing_instance_and_execute_afterwards")
 	 
+	gui,font,s10 cnavy wbold
+	gui,add,text,x10 w300 Y+15,% lang("Working directory")
+	gui,font,s8 cDefault wnorm
+	gui,add,Edit,w300 x10 Y+10 vGuiFlowSettingsWorkingDir,% SettingWorkingDir
 	
+	gui,add,button,w145 x10 h30 Y+20 gGuiFlowSettingsOK default,% lang("Save")
+	gui,add,button,w145 h30 yp X+10 gGuiFlowSettingsCancel,% lang("Cancel")
 	
-	gui,add,button,w90 x10 h30 Y+20 gGuiFlowSettingsOK,% lang("OK")
-	gui,add,button,w90 X+10 h30 yp gGuiFlowSettingsCancel,% lang("Cancel")
+
 	gui,show
 	return
 	
 	
 	GuiFlowSettingsOK:
+	GuiFlowSettingsStayOpen:=false
+	tempSettingFlowExecutionPolicyOld:=SettingFlowExecutionPolicy
 	
-	gui,submit
+	gui,submit,NoHide
 	if GuiFlowSettingsParallel=1
 		SettingFlowExecutionPolicy=parallel
 	else if GuiFlowSettingsSkip=1
@@ -49,8 +60,57 @@ ui_SettingsOwFLow()
 		SettingFlowExecutionPolicy=wait		
 	else if GuiFlowSettingsStop=1
 		SettingFlowExecutionPolicy=stop
-	gui,destroy
-	ui_EnableMainGUI()
+	
+	if (tempSettingFlowExecutionPolicyOld!=SettingFlowExecutionPolicy)
+		saved=no
+	
+	
+	tempDir:=% v_replaceVariables(InstanceID,ThreadID,GuiFlowSettingsWorkingDir) ;if user entered a built in variable
+	if DllCall("Shlwapi.dll\PathIsRelative","Str",tempDir) ;if user did not enter an absolute path
+	{
+		if GuiFlowSettingsWorkingDir!=  ;If user left it blank, he don't want to change it. if not...
+		{
+			MsgBox, 17, AutoHotFlow, % lang("The specified folder is not an absolute path!") "`n" lang("If you press '%1%', previous path will remain.",lang("OK"))
+			IfMsgBox cancel
+				GuiFlowSettingsStayOpen:=true
+		}
+	}
+	else
+	{
+		if not FileExist(GuiFlowSettingsWorkingDir)
+		{
+			MsgBox, 35, AutoHotFlow, % lang("The specified folder does not exist. Should it be created?") "`n" lang("If you press '%1%', previous path will remain.",lang("No"))
+			IfMsgBox Yes
+			{
+				FileCreateDir,%GuiFlowSettingsWorkingDir%
+				if errorlevel
+				{
+					
+					MsgBox, 16, AutoHotFlow, % lang("The specified folder could not be created!")
+					GuiFlowSettingsStayOpen:=true
+				}
+				else
+				{
+					SettingWorkingDir:=GuiFlowSettingsWorkingDir
+					saved=no
+				}
+				
+			}
+			else IfMsgBox cancel
+				GuiFlowSettingsStayOpen:=true
+		}
+		else
+		{
+			SettingWorkingDir:=GuiFlowSettingsWorkingDir
+			saved=no
+		}
+	}
+	
+	if not GuiFlowSettingsStayOpen
+	{
+		gui,destroy
+		ui_EnableMainGUI()
+	}
 	return
 	
 	GuiFlowSettingsCancel:

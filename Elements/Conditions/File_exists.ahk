@@ -4,9 +4,13 @@ runConditionFile_exists(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 
-	local tempfile:=v_replaceVariables(InstanceID,ThreadID,%ElementID%file)
 	
-	IfExist, % tempfile
+	local tempPath:=% v_replaceVariables(InstanceID,ThreadID,%ElementID%file)
+	if  DllCall("Shlwapi.dll\PathIsRelative","Str",tempPath)
+		tempPath:=SettingWorkingDir "\" tempPath
+	
+	
+	IfExist, % tempPath
 		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"yes")
 	else 
 		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"no")
@@ -25,14 +29,14 @@ stopConditionFile_exists(ID)
 getParametersConditionFile_exists()
 {
 	
-	parametersToEdit:=["Label|" lang("Select file"),"File||file|" lang("Select a file") "|"]
+	parametersToEdit:=["Label|" lang("File pattern"),"File||file|" lang("Select a file") "|"]
 	
 	return parametersToEdit
 }
 
 getNameConditionFile_exists()
 {
-	return lang("File_exists")
+	return lang("File or folder exists")
 }
 
 getCategoryConditionFile_exists()
@@ -42,6 +46,6 @@ getCategoryConditionFile_exists()
 
 GenerateNameConditionFile_exists(ID)
 {
-	return lang("File_exists") ": " GUISettingsOfElement%ID%file
+	return lang("File or folder exists") ": " GUISettingsOfElement%ID%file
 	
 }

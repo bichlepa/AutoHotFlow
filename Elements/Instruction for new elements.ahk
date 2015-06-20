@@ -35,7 +35,7 @@ getName+ElementType++ElementName+()
 	This returns the name of the Action that will be displayed when the user selects a new Action. 
 
 getCategory+ElementType++ElementName+()
-	This returns the category of the Action in whitch the Element will be displayed when the user selects a new Action. 
+	This returns the category of the Action in which the Element will be displayed when the user selects a new Action. 
 
 
 GenerateName+ElementType++ElementName+(ID)

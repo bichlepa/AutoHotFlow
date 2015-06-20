@@ -58,7 +58,7 @@ getParametersLoopSimpleLoop()
 {
 	global
 	
-	parametersToEdit:=["Checkbox|0|Infinite|" lang("Infinite loop") , "Label|" lang("Repeats"),"text|5|repeatCount"]
+	parametersToEdit:=["Label|" lang("Repeats"),"Checkbox|0|Infinite|" lang("Endless loop"),"text|5|repeatCount"]
 	return parametersToEdit
 }
 
@@ -74,3 +74,16 @@ GenerateNameLoopSimpleLoop(ID)
 }
 
 
+CheckSettingsLoopSimpleLoop(ID)
+{
+	if (GUISettingsOfElement%ID%Infinite = 1)
+	{
+		GuiControl,Disable,GUISettingsOfElement%ID%repeatCount
+		
+	}
+	else
+	{
+		GuiControl,Enable,GUISettingsOfElement%ID%repeatCount
+	}
+	
+}

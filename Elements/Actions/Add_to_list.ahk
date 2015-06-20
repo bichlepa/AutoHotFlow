@@ -27,7 +27,7 @@ runActionAdd_to_list(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 		else
 			temp:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%VarValue)
 		
-		if %ElementID%WhitchPosition=1
+		if %ElementID%WhitchPosition=1 ;Stupid misspelling :-(
 		{
 			tempObject.insert(1,temp)
 		}
@@ -97,7 +97,7 @@ getCategoryActionAdd_to_list()
 getParametersActionAdd_to_list()
 {
 	global
-	parametersToEdit:=["Label|" lang("Output variable name"),"VariableName|List|Varname","Label|" lang("Number of elements"),"Radio|1|NumberOfElements|" lang("Add one element") ";" lang("Add multiple elements"),"Label|" lang("Content to add"),"Radio|1|isExpression|" lang("This is a value") ";" lang("This is a variable name or expression"),"Text|New element|VarValue","MultiLineText|Added Element 1`nAdded Element 2|VarValues","Checkbox|1|DelimiterLinefeed|" lang("Use linefeed as delimiter") ,"Checkbox|0|DelimiterComma|" lang("Use comma as delimiter") ,"Checkbox|0|DelimiterSemicolon|" lang("Use semicolon as delimiter") ,"Checkbox|0|DelimiterSpace|" lang("Use space as delimiter"),"Label|" lang("Where to insert"),"Radio|2|WhitchPosition|" lang("First position") ";" lang("Last position")";" lang("Following position or key"),"text|2|Position"]
+	parametersToEdit:=["Label|" lang("List variable name"),"VariableName|List|Varname","Label|" lang("Number of elements"),"Radio|1|NumberOfElements|" lang("Add one element") ";" lang("Add multiple elements"),"Label|" lang("Content to add"),"Radio|1|isExpression|" lang("This is a value") ";" lang("This is a variable name or expression"),"Text|New element|VarValue","MultiLineText|Added Element 1`nAdded Element 2|VarValues","Checkbox|1|DelimiterLinefeed|" lang("Use linefeed as delimiter") ,"Checkbox|0|DelimiterComma|" lang("Use comma as delimiter") ,"Checkbox|0|DelimiterSemicolon|" lang("Use semicolon as delimiter") ,"Checkbox|0|DelimiterSpace|" lang("Use space as delimiter"),"Label|" lang("Where to insert"),"Radio|2|WhitchPosition|" lang("First position") ";" lang("Last position")";" lang("Following position or key"),"text|2|Position"]
 	
 	return parametersToEdit
 }

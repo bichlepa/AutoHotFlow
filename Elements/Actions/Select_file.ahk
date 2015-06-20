@@ -47,8 +47,13 @@ runActionSelect_file(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 			tempActionSelectFileOptions=S%tempActionSelectFileOptions%
 		if %ActionSelect_fileToStart_Element_ID%MultiSelect
 			tempActionSelectFileOptions=M%tempActionSelectFileOptions%
+		
+		
+		tempActionSelectFilePath:=v_replaceVariables(ActionSelect_fileStart_CurrentInstanceID,ActionSelect_fileStart_CurrentThreadID,%ActionSelect_fileToStart_Element_ID%folder)
+		if  DllCall("Shlwapi.dll\PathIsRelative","Str",tempActionSelectFilePath)
+			tempActionSelectFilePath:=SettingWorkingDir "\" tempActionSelectFilePath
 		;MsgBox %tempActionSelectFileOptions%
-		FileSelectFile,tempActionSelectFilefile,%tempActionSelectFileOptions%,% v_replaceVariables(ActionSelect_fileStart_CurrentInstanceID,ActionSelect_fileStart_CurrentThreadID,%ActionSelect_fileToStart_Element_ID%folder),% v_replaceVariables(ActionSelect_fileStart_CurrentInstanceID,ActionSelect_fileStart_CurrentThreadID,%ActionSelect_fileToStart_Element_ID%title),% v_replaceVariables(ActionSelect_fileStart_CurrentInstanceID,ActionSelect_fileStart_CurrentThreadID,%ActionSelect_fileToStart_Element_ID%filter)
+		FileSelectFile,tempActionSelectFilefile,%tempActionSelectFileOptions%,%tempActionSelectFilePath%,% v_replaceVariables(ActionSelect_fileStart_CurrentInstanceID,ActionSelect_fileStart_CurrentThreadID,%ActionSelect_fileToStart_Element_ID%title),% v_replaceVariables(ActionSelect_fileStart_CurrentInstanceID,ActionSelect_fileStart_CurrentThreadID,%ActionSelect_fileToStart_Element_ID%filter)
 		;MsgBox %ActionSelect_fileToStart_Element_ID% %tempActionSelectFilefile% %errorlevel%
 		
 		if errorlevel
@@ -102,7 +107,7 @@ stopActionSelect_file(ID)
 getParametersActionSelect_file()
 {
 	
-	parametersToEdit:=["Label|" lang("Variable_name"),"VariableName|selectedFiles|Varname","Label|" lang("Prompt"),"text|" lang("Select a file")" |title","Label|" lang("Starting folder or file"),"folder||folder","Label|" lang("Filter"),"Text|" lang("Any files") " (*.*)|filter","Label|" lang("Options"), "checkbox|0|MultiSelect|" lang("Allow to select multiple files"),"checkbox|0|SaveButton|" lang("'Save' button instead of an 'Open' button"),"checkbox|0|fileMustExist|" lang("File must exist"),"checkbox|0|PathMustExist|" lang("Path must exist"),"checkbox|0|PromptNewFile|" lang("Prompt to create new file"),"checkbox|0|PromptOverwriteFile|" lang("Prompt to overwrite file")]
+	parametersToEdit:=["Label|" lang("Output variable_name"),"VariableName|selectedFiles|Varname","Label|" lang("Prompt"),"text|" lang("Select a file")" |title","Label|" lang("Root directory"),"folder||folder","Label|" lang("Filter"),"Text|" lang("Any files") " (*.*)|filter","Label|" lang("Options"), "checkbox|0|MultiSelect|" lang("Allow to select multiple files"),"checkbox|0|SaveButton|" lang("'Save' button instead of an 'Open' button"),"checkbox|0|fileMustExist|" lang("File must exist"),"checkbox|0|PathMustExist|" lang("Path must exist"),"checkbox|0|PromptNewFile|" lang("Prompt to create new file"),"checkbox|0|PromptOverwriteFile|" lang("Prompt to overwrite file")]
 	
 	return parametersToEdit
 }

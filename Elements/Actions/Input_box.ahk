@@ -3,81 +3,83 @@
 runActionInput_box(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
-	if (!IsObject(ActionInput_boxToStart))
-		ActionInput_boxToStart:=Object()
+	local tempVarname:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname)
+	local tempText:=v_replaceVariables(InstanceID,ThreadID,%ElementID%text,"normal")
+	local tempTitle:=v_replaceVariables(InstanceID,ThreadID,%ElementID%title,"normal")
 	
-	tempInstanceString:="Instance_" InstanceID "_" ThreadID "_" ElementID "_" ElementIDInInstance
-	ActionInput_boxToStart.insert(tempInstanceString)
 	
-	if (Input_boxStarted=true)
-		return
+	if (!IsObject(ActionInput_BoxAllGUIs))
+		ActionInput_BoxAllGUIs:=Object()
 	
+	local tempNew:=Object()
+	tempNew.insert("instanceID",InstanceID)
+	tempNew.insert("ThreadID",ThreadID)
+	tempNew.insert("ElementID",ElementID)
+	tempNew.insert("ElementIDInInstance",ElementIDInInstance)
+	tempNew.insert("Varname",tempVarname)
+	tempNew.insert("Text",tempText)
+	tempNew.insert("Title",tempTitle)
+	
+	
+	local tempGUILabel:="GUI_InputBox_" instanceID "_" ThreadID "_" ElementID "_" ElementIDInInstance
+	
+	;~ gui,tempGUILabel:default
+	
+	gui,%tempGUILabel%:+LabelInputBoxGUI
 	
 
-	ActionInput_box_StartNextQuestion:
-	Input_boxStarted:=false
-	for count, tempcInput_boxidToStart in ActionInput_boxToStart ;get the first element
-	{
-		StringSplit,tempElement,tempcInput_boxidToStart,_
-		; tempElement1 = word "instance"
-		; tempElement2 = instance id
-		; tempElement3 = Thread ID
-		; tempElement4 = element id
-		; tempElement5 = element id in the instance
-		ActionInput_boxToStart_Instance_ID:=tempElement4
-		ActionInput_boxToStart_Element_ID:=tempElement4
-		ActionInput_boxToStart_Trhead_ID:=tempElement3
-		
-		
-		;gui,%tempcInput_boxidToStart%:default
-		
-		;gui,10:-SysMenu 
-		
-		gui,12:add,text,x10 w320 h100, % v_replaceVariables(ActionInput_boxToStart_Instance_ID,ActionInput_boxToStart_Trhead_ID,%ActionInput_boxToStart_Element_ID%text,"normal")
-		gui,12:add,edit,x10 w320 h20 vActionInput_box_edit, 
-		gui,12:add,button,x10 w150 h30 gActionInput_boxButtonOK Default,% lang("OK")
-		gui,12:show,w330 h180 ,% v_replaceVariables(ActionInput_boxToStart_Instance_ID,ActionInput_boxToStart_Trhead_ID,%ActionInput_boxToStart_Element_ID%title,"normal")
-		
-		ActionInput_boxStart_Current:=tempcInput_boxidToStart
-		ActionInput_boxStart_CurrentInstanceID:=ActionInput_boxToStart_Instance_ID
-		ActionInput_boxStart_CurrentThreadID:=ActionInput_boxToStart_Trhead_ID
-		Input_boxStarted:=true
-		break
-		
-	}
+	gui,%tempGUILabel%:add,text,x10 w320 h100, % tempText
+	gui,%tempGUILabel%:add,edit,x10 w320 h20 v%tempGUILabel%GUIEdit, 
+	gui,%tempGUILabel%:add,button,x10 w150 h30 gActionInput_boxButtonOK Default,% lang("OK")
+	gui,%tempGUILabel%:show,w330 h180 ,% tempTitle
 	
-	if (Input_boxStarted)
-		ActionInput_boxToStart.remove(1) ;Remove the shown question
+	
+	ActionInput_BoxAllGUIs.insert(tempGUILabel,tempNew)
 	
 	return
 	
-	ActionInput_boxButtonOK:
-	gui,12:submit
+	ActionInput_BoxButtonOK:
+	;~ MsgBox %a_gui%
 	
-	gui,12:destroy
+	gui,%a_gui%:submit
+	gui,%a_gui%:destroy
 	
-	;MsgBox %ActionInput_boxStart_CurrentInstanceID%
-	v_setVariable(ActionInput_boxStart_CurrentInstanceID,ActionInput_boxStart_CurrentThreadID,"t_input",ActionInput_box_edit)
-	MarkThatElementHasFinishedRunningOneVar(ActionInput_boxStart_Current,"normal")
+	tempInputBoxBut:=ActionInput_BoxAllGUIs[a_gui]
 	
-	goto,ActionInput_box_StartNextQuestion
+	v_setVariable(tempInputBoxBut.instanceID,tempInputBoxBut.threadid,tempInputBoxBut.varname,%a_gui%GUIEdit)
 	
-	
-	
-	12guiclose:
-	gui,12:destroy
-	
-	MarkThatElementHasFinishedRunningOneVar(ActionInput_boxStart_Current,"exception")
+	;~ MsgBox % a_gui " - " temp.instanceID
+	MarkThatElementHasFinishedRunning(tempInputBoxBut.instanceID,tempInputBoxBut.threadid,tempInputBoxBut.ElementID,tempInputBoxBut.ElementIDInInstance,"normal")
 	
 	
-	goto,ActionInput_box_StartNextQuestion
+	ActionInput_BoxAllGUIs.Remove(a_gui)
+	
+	return
+	
+	InputBoxGUIclose:
+	gui,%a_gui%:destroy
+	
+	tempInputBoxBut:=ActionInput_BoxAllGUIs[a_gui]
+	
+	;~ MsgBox % a_gui " - " temp.instanceID
+	MarkThatElementHasFinishedRunning(tempInputBoxBut.instanceID,tempInputBoxBut.threadid,tempInputBoxBut.ElementID,tempInputBoxBut.ElementIDInInstance,"exception")
+
+	
+	ActionInput_BoxAllGUIs.Remove(a_gui)
+	return
+	
+
 }
 
 stopActionInput_box(ID)
 {
-	
-	gui,%ID%:default
-	gui,destroy
+	global
+	for tempActionInputBoxGuiLabel, tempActionInputBoxSettings in ActionInput_BoxAllGUIs
+	{
+		gui,%tempActionInputBoxGuiLabel%:destroy
+		
+	}
+	ActionInput_BoxAllGUIs:=Object()
 }
 
 
@@ -85,7 +87,7 @@ stopActionInput_box(ID)
 getParametersActionInput_box()
 {
 	
-	parametersToEdit:=["Label|" lang("Title"),"text|" lang("Title")" |title","Label|" lang("Question"),"multilinetext|" lang("Message") "|text"]
+	parametersToEdit:=["Label|" lang("Output variable name"),"VariableName|UserInput|Varname","Label|" lang("Title"),"text|" lang("Title")" |title","Label|" lang("Question"),"multilinetext|" lang("Message") "|text"]
 	
 	return parametersToEdit
 }

@@ -13,7 +13,7 @@ RunActionKill_Process(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	}
 	else
 	{
-		v_setVariable(InstanceID,ThreadID,"t_pid",ActionKill_ProcesstempPid)
+		v_setVariable(InstanceID,ThreadID,"a_pid",ActionKill_ProcesstempPid,,true)
 		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	}
 	return

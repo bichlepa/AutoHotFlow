@@ -7,6 +7,10 @@ runActionRead_from_file(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	local tempVarName:=v_replaceVariables(InstanceID,ThreadID,%ElementID%varname)
 	local tempText
 	
+	local tempPath:=% v_replaceVariables(InstanceID,ThreadID,%ElementID%file)
+	if  DllCall("Shlwapi.dll\PathIsRelative","Str",tempPath)
+		tempPath:=SettingWorkingDir "\" tempPath
+	
 	if tempVarName=
 		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 
@@ -22,7 +26,7 @@ runActionRead_from_file(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	
 
 	
-	FileRead,tempText,% tempOptions v_replaceVariables(InstanceID,ThreadID,%ElementID%file)
+	FileRead,tempText,% tempPath
 	if ErrorLevel
 		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 	else
@@ -45,7 +49,7 @@ getParametersActionRead_from_file()
 {
 	global
 	
-	parametersToEdit:=["Label|" lang("Variable name"),"VariableName|FileText|varname","Label|" lang("Select file"),"File||file|" lang("Select a file") "|8","Label|" lang("Encoding"),"Radio|2|Encoding|" "ANSI" ";" "Unicode UTF-8" ";" "Unicode UTF-16","Label|" lang("Linefeed"),"Checkbox|1|Linefeed|" lang("Replace Carriage return and linefeed with single linefeeds") ]
+	parametersToEdit:=["Label|" lang("Output variable name"),"VariableName|FileText|varname","Label|" lang("File path"),"File||file|" lang("Select a file") "|8","Label|" lang("Encoding"),"Radio|2|Encoding|" "ANSI" ";" "Unicode UTF-8" ";" "Unicode UTF-16","Label|" lang("Linefeed"),"Checkbox|1|Linefeed|" lang("Replace Carriage return and linefeed with single linefeeds") ]
 	return parametersToEdit
 }
 

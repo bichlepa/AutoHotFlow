@@ -6,6 +6,8 @@ EnableTriggerProcess_closes(ID)
 	
 	tempProcessName:=v_replaceVariables(0,0,%ID%ProcessName)
 	
+	if tempProcessName="" ;TODO: Handle error
+		return
 	
 	FileDelete,Generated Scripts\TriggerProcess_closes%ID%.ahk
 	FileAppend,
@@ -40,7 +42,7 @@ EnableTriggerProcess_closes(ID)
 getParametersTriggerProcess_closes()
 {
 	
-	parametersToEdit:=["Label|" lang("Process name"),"text||ProcessName"]
+	parametersToEdit:=["Label|" lang("Process name or ID"),"text||ProcessName"]
 	
 	
 	return parametersToEdit

@@ -7,14 +7,10 @@ runActionRounding_a_number(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	local tempPlaces
 	local tempResult
 	
-	if %ElementID%expression=1
-		temp:=v_replaceVariables(InstanceID,ThreadID,%ElementID%VarValue)
-	else
-		temp:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%VarValue)
-	if %ElementID%expressionPlaces=1
-		tempPlaces:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Places)
-	else
-		tempPlaces:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%Places)
+
+	temp:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%VarValue)
+
+	tempPlaces:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%Places)
 	;MsgBox % tempRounding_a_number "|" temp
 	if temp is number
 	{
@@ -66,7 +62,7 @@ getCategoryActionRounding_a_number()
 getParametersActionRounding_a_number()
 {
 	global
-	parametersToEdit:=["Label|" lang("Variable_name"),"VariableName|NewVariable|Varname","Label| " lang("Number"),"Radio|2|expression|" lang("This is a number") ";" lang("This is a variable name or expression") ,"Text|1.2345|VarValue","Label| " lang("Places after comma"),"Radio|1|expressionPlaces|" lang("This is a number") ";" lang("This is a variable name or expression") ,"Text|0|Places","Radio|1|Roundingtype|" lang("Round normally") ";" lang("Round up") ";" lang("Round down") ]
+	parametersToEdit:=["Label|" lang("Output variable_name"),"VariableName|NewVariable|Varname","Label| " lang("Input number") ,"Text|1.2345|VarValue","Label| " lang("Places after comma") ,"Text|0|Places","Label|" lang("Operation"),"Radio|1|Roundingtype|" lang("Round normally") ";" lang("Round up") ";" lang("Round down") ]
 	
 	return parametersToEdit
 }

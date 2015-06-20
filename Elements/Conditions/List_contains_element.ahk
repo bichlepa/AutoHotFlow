@@ -6,6 +6,7 @@ runConditionList_contains_element(InstanceID,ThreadID,ElementID,ElementIDInInsta
 	local tempkey
 	local tempvalue
 	local found
+	local foundkey
 
 	local Varname:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname)
 	local SearchPosition:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Position)
@@ -48,11 +49,13 @@ runConditionList_contains_element(InstanceID,ThreadID,ElementID,ElementIDInInsta
 				if (tempvalue=SearchContent)
 				{
 					found:=true
+					foundkey:=tempkey
 					break
 				}
 			}
 			if (found=true)
 			{
+				v_setVariable(InstanceID,ThreadID,"a_FoundKey",foundkey,,true)
 				MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"yes")
 			}
 			else

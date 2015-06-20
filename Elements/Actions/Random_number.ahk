@@ -7,14 +7,10 @@ runActionRandom_number(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	local tempmax
 	local result
 	
-	if %ElementID%expressionmin=1
-		tempmin:=v_replaceVariables(InstanceID,ThreadID,%ElementID%MinValue)
-	else
-		tempmin:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%MinValue)
-	if %ElementID%expressiomax=1
-		tempmax:=v_replaceVariables(InstanceID,ThreadID,%ElementID%MaxValue)
-	else
-		tempmax:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%MaxValue)
+
+	tempmin:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%MinValue)
+
+	tempmax:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%MaxValue)
 	;MsgBox,%  %ElementID%Varname "---" %ElementID%VarValue "---" v_replaceVariables(InstanceID,%ElementID%Varname) "---" v_replaceVariables(InstanceID,%ElementID%VarValue)
 	if tempmin is number
 	{
@@ -45,7 +41,7 @@ getCategoryActionRandom_number()
 getParametersActionRandom_number()
 {
 	global
-	parametersToEdit:=["Label|" lang("Variable_name"),"VariableName|NewVariable|Varname","Label| " lang("Minimum value"),"Radio|1|expressionmin|" lang("This is a number") ";" lang("This is a variable name or expression") ,"Text|0|MinValue","Label| " lang("Maximum value"),"Radio|1|expressiomax|" lang("This is a number") ";" lang("This is a variable name or expression") ,"Text|100|MaxValue"]
+	parametersToEdit:=["Label|" lang("Variable_name"),"VariableName|NewVariable|Varname","Label| " lang("Minimum value"),"Text|0|MinValue","Label| " lang("Maximum value"),"Text|100|MaxValue"]
 	
 	return parametersToEdit
 }

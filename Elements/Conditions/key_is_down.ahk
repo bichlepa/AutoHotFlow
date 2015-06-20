@@ -5,7 +5,7 @@ runConditionkey_is_down(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	global
 
 	
-
+	
 	
 	GetKeyState,tempKeyState,% %ElementID%key
 	
@@ -30,7 +30,7 @@ stopConditionKey_is_down(ID)
 getParametersConditionkey_is_down()
 {
 	
-	parametersToEdit:=["Label|" lang("Select_key"),"text||key"]
+	parametersToEdit:=["Label|" lang("Key name"),"text||key"]
 	
 	return parametersToEdit
 }

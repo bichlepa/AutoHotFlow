@@ -67,7 +67,7 @@ getParametersActionSet_Flow_Status()
 {
 	global
 	
-	parametersToEdit:=["Label|" lang("Flow_name"),"Text||flowName","Radio|1|Enable|" lang("Enable") ";" lang("Disable")]
+	parametersToEdit:=["Label|" lang("Flow_name"),"Text||flowName","Label|" lang("New state"),"Radio|1|Enable|" lang("Enable") ";" lang("Disable")]
 	return parametersToEdit
 }
 

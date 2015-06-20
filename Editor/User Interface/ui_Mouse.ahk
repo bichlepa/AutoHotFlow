@@ -47,7 +47,7 @@ if (((NewElementIconWidth*2.4*zoomFactor) < mx) and (0 < my) and ((NewElementIco
 
 if elementWithHighestPriority=
 {
-	clickHighestPriority=0 ;The highest priority decides whitch element will be selected. The priority reduces a little bit when the element was selected, and increases every time the user clicks on it but something else is selected. This way it is possible to click through the elements whith are beneath each other.
+	clickHighestPriority=0 ;The highest priority decides which element will be selected. The priority reduces a little bit when the element was selected, and increases every time the user clicks on it but something else is selected. This way it is possible to click through the elements whith are beneath each other.
 	for index, element in allElements
 	{
 		
@@ -270,7 +270,7 @@ else if (elementWithHighestPriority="PlusButton" or elementWithHighestPriority="
 			my3:=my2
 			
 			;Search an element beneath the mouse.
-			clickHighestPriority=0 ;The highest priority decides whitch element will be selected.
+			clickHighestPriority=0 ;The highest priority decides which element will be selected.
 			for index, element in allElements
 			{
 				
@@ -540,7 +540,7 @@ else if (elementWithHighestPriority="PlusButton" or elementWithHighestPriority="
 			my3:=my2
 			
 			;Search an element beneath the mouse.
-			clickHighestPriority=0 ;The highest priority decides whitch element will be selected.
+			clickHighestPriority=0 ;The highest priority decides which element will be selected.
 			for index, element in allElements
 			{
 				if (%element%type="action" or %element%type = "condition" or %element%type = "trigger" or %element%type = "loop")
@@ -790,7 +790,7 @@ else if (elementWithHighestPriority="MoveButton1")
 		my3:=my2
 		
 		;Search an element beneath the mouse.
-		clickHighestPriority=0 ;The highest priority decides whitch element will be selected.
+		clickHighestPriority=0 ;The highest priority decides which element will be selected.
 		for index, element in allElements
 		{
 			if (%element%type="action" or %element%type = "condition" or %element%type = "trigger" or %element%type = "loop")
@@ -1023,7 +1023,7 @@ else if (elementWithHighestPriority="MoveButton2")
 		my3:=my2
 		
 		;Search an element beneath the mouse.
-		clickHighestPriority=0 ;The highest priority decides whitch element will be selected.
+		clickHighestPriority=0 ;The highest priority decides which element will be selected.
 		for index, element in allElements
 		{
 			if (%element%type="action" or %element%type = "condition" or %element%type = "trigger" or %element%type = "loop")

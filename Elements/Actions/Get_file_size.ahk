@@ -7,6 +7,10 @@ runActionGet_file_size(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	local tempVarName:=v_replaceVariables(InstanceID,ThreadID,%ElementID%varname)
 	local temp
 	
+	local tempPath:=% v_replaceVariables(InstanceID,ThreadID,%ElementID%file)
+	if  DllCall("Shlwapi.dll\PathIsRelative","Str",tempPath)
+		tempPath:=SettingWorkingDir "\" tempPath
+	
 	if tempVarName=
 	{
 		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
@@ -20,7 +24,7 @@ runActionGet_file_size(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 		
 	
 	
-	FileGetSize,temp,% v_replaceVariables(InstanceID,ThreadID,%ElementID%file),%tempOptions%
+	FileGetSize,temp,% tempPath,%tempOptions%
 	if ErrorLevel
 		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 	else
@@ -43,7 +47,7 @@ getParametersActionGet_file_size()
 {
 	global
 	
-	parametersToEdit:=["Label|" lang("Variable name"),"VariableName|NewSize|varname","Label|" lang("Select file"),"File||file|" lang("Select a file") "|8","Label|" lang("Unit"),"Radio|1|Unit|" lang("Bytes") ";" lang("Kilobytes") ";" lang("Megabytes")]
+	parametersToEdit:=["Label|" lang("Output variable name"),"VariableName|NewSize|varname","Label|" lang("File path"),"File||file|" lang("Select a file") "|8","Label|" lang("Unit"),"Radio|1|Unit|" lang("Bytes") ";" lang("Kilobytes") ";" lang("Megabytes")]
 	return parametersToEdit
 }
 

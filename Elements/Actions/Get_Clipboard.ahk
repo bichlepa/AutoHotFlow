@@ -30,7 +30,7 @@ getCategoryActionGet_Clipboard()
 getParametersActionGet_Clipboard()
 {
 	global
-	parametersToEdit:=["Label|" lang("Variable_name"),"Text||Varname","Radio|1|All|" lang("Only Text") ";" lang("Everything (e.g. picture)")]
+	parametersToEdit:=["Label|" lang("Variable_name"),"Text||Varname","Label|" lang("Options"),"Radio|1|All|" lang("Only Text") ";" lang("Everything (e.g. picture)")]
 	
 	return parametersToEdit
 }

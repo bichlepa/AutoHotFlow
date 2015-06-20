@@ -7,6 +7,8 @@ runActionSet_control_text(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	local tempWinTitle:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Wintitle)
 	local tempExcludeTitle:=v_replaceVariables(InstanceID,ThreadID,%ElementID%excludeTitle)
 	local tempTitleMatchMode :=%ElementID%TitleMatchMode
+	local tempWinText:=v_replaceVariables(InstanceID,ThreadID,%ElementID%winText)
+	local tempExcludeText:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ExcludeText)
 	local tempahk_class:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ahk_class)
 	local tempahk_exe:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ahk_exe)
 	local tempahk_id:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ahk_id)
@@ -64,7 +66,7 @@ getCategoryActionSet_control_text()
 getParametersActionSet_control_text()
 {
 	global
-	parametersToEdit:=["Label|" lang("Text to set"),"Text||Text","Label|" lang("Method_for_control_Identification"),"Radio|1|IdentifyControlBy|" lang("Text_in_control") ";" lang("Classname and instance number of the control"),"Label|" lang("Control_Identification")"|Label_Control_Identification","Radio|2|ControlTextMatchMode|" lang("Start_with") ";" lang("Contain_anywhere") ";" lang("Exactly"),"text||Control_identifier","Label|" lang("Title_of_Window"),"Radio|1|TitleMatchMode|" lang("Start_with") ";" lang("Contain_anywhere") ";" lang("Exactly"),"text||Wintitle","Label|" lang("Exclude_title"),"text||excludeTitle","Label|" lang("Window_Class"),"text||ahk_class","Label|" lang("Process_Name"),"text||ahk_exe","Label|" lang("Unique_window_ID"),"text||ahk_id","Label|" lang("Unique_Process_ID"),"text||ahk_pid","button|FunctionsForElementGetControlInformation||" lang("Wizard_to_get_parameters")]
+	parametersToEdit:=["Label|" lang("Text to set"),"Text||Text","Label|" lang("Method_for_control_Identification"),"Radio|1|IdentifyControlBy|" lang("Text_in_control") ";" lang("Classname and instance number of the control"),"Label|" lang("Control_Identification")"|Label_Control_Identification","Radio|2|ControlTextMatchMode|" lang("Start_with") ";" lang("Contain_anywhere") ";" lang("Exactly"),"text||Control_identifier","Label|" lang("Title_of_Window"),"Radio|1|TitleMatchMode|" lang("Start_with") ";" lang("Contain_anywhere") ";" lang("Exactly"),"text||Wintitle","Label|" lang("Exclude_title"),"text||excludeTitle","Label|" lang("Text_of_a_control_in_Window"),"text||winText","Label|" lang("Exclude_text_of_a_control_in_window"),"text||ExcludeText","Label|" lang("Window_Class"),"text||ahk_class","Label|" lang("Process_Name"),"text||ahk_exe","Label|" lang("Unique_window_ID"),"text||ahk_id","Label|" lang("Unique_Process_ID"),"text||ahk_pid","button|FunctionsForElementGetControlInformation||" lang("Wizard_to_get_parameters")]
 	;,"Label|" lang("Insert_a_keystroke"), "Hotkey||HotkeyToInsert,"Button|customSettingButtonOfActionSet_control_textHotkeyToInsert||" lang("Insert")
 	return parametersToEdit
 }

@@ -1,10 +1,13 @@
-﻿ui_settingsOfElement(ElementID)
+﻿ui_settingsOfElement(ElementID,PreviousSubType="")
 {
 	global
 	local temp
 	local temptext
 	local tempIsDefault
 	local tempAssigned
+	
+
+	PreviousSubType2:=PreviousSubType ;This variable will contain anything when user has changed the subtype of the element. The subtype will be restored if user cancels
 	
 	NowResultEditingElement=
 	;MsgBox %ElementID%
@@ -416,9 +419,9 @@
 			GUISettingsOfElement%setElementID%%parameter3%Prompt:=parameter4
 			GUISettingsOfElement%setElementID%%parameter3%Options:=parameter5
 			GUISettingsOfElement%setElementID%%parameter3%Filter:=parameter6
-			gui,add,edit,w340 x10 gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%parameter3%,%temp%
+			gui,add,edit,w370 x10 gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%parameter3%,%temp%
 			gui,add,button,w20 X+10  gGUISettingsOfElementSelectFolder vGUISettingsOfElementbuttonSelectFile_%setElementID%_%parameter3%,...
-			gui,add,button,w20 X+10 gGUISettingsOfElementSelectFolderHelp,?
+			;~ gui,add,button,w20 X+10 gGUISettingsOfElementSelectFolderHelp,?
 		}
 		else if parameter1=weekdays
 		{
@@ -501,6 +504,7 @@
 	
 	SG2.Show(lang("Settings") " - " lang(%ElementID%type) " - " lang(%ElementID%subtype), "xCenter yCenter")
 	
+	
 	;gui,show,,% "·AutoHotFlow· " lang("Settings") " - " lang(%ElementID%type) " - " lang(%ElementID%subtype)
 	return
 	
@@ -509,7 +513,12 @@
 	gui,destroy
 	SG2.Destroy()
 	ui_EnableMainGUI()
-	ui_selectElementType(%setElementID%Type,setElementID)
+	if PreviousSubType2
+		ui_selectElementType(%setElementID%Type,setElementID,PreviousSubType2)
+	else
+		ui_selectElementType(%setElementID%Type,setElementID,%setElementID%SubType)
+	
+
 	return
 	
 	GUISettingsOfElementHelp:
@@ -518,12 +527,12 @@
 	IfWinExist,ahk_id %GUIHelpHWND%
 		ui_closeHelp()
 	else
-		showHelpFor%setElementType%%setElementsubType%()
+		;~ showHelpFor%setElementType%%setElementsubType%()
 	;~ IfWinExist,ahk_id %GUIHelpHWND%
 		;~ ui_closeHelp()
 	;~ else
 		;~ ui_showHelp("index")
-		;~ ui_showHelp(%setElementID%Type "\" %ElementID%subtype)
+		ui_showHelp(%setElementID%Type "\" %setElementID%subtype)
 	return
 	GUISettingsOfElementCheckStandardName:
 	gui,2:default
@@ -617,31 +626,14 @@
 	tempSetID:=tempButton2
 	tempSetPar:=tempButton3
 	
-	/*
-	if tempsetwhat=NewFile
-	{
-		FileSelectFile,tempSetPath,S34,% GUISettingsOfElement%tempSetID%%tempSetPar%,% GUISettingsOfElement%tempSetID%%tempSetPar%prompt,% "(" GUISettingsOfElement%tempSetID%%tempSetPar%Filter ")"
-		if not errorlevel
-		{
-			stringright,tempSetPathend,tempSetPath,4
-			if tempSetPathend<>.lnk
-				tempSetPath=%tempSetPath%.lnk
-			guicontrol,,GUISettingsOfElement%tempSetID%%tempSetPar%,%tempSetPath%
-			
-			
-		}
-	}
-	*/
+	
 	gosub,GUISettingsOfElementUpdateName
 	return
 	
 	
 	
 	
-	
-	GUISettingsOfElementSelectFolderHelp:
-	MsgBox % lang("Help is not implemented yet") " :-("
-	return
+
 	
 	
 	
@@ -657,14 +649,21 @@
 			e_removeTrigger(selElementID)
 		else
 		{
+			
 			NowResultEditingElement=aborted
 			
 		}
 		ui_draw()
 		gui,2:default
 	}
+	
+	
+	if PreviousSubType2
+		%selElementID%SubType:=PreviousSubType2
+	
 	Gui,destroy
 	SG2.Destroy()
+	
 	
 	ui_EnableMainGUI()
 	return
@@ -785,11 +784,15 @@ ui_EnableElementSettingsWindow()
 	WinActivate,% "·AutoHotFlow· " lang("Settings")
 }
 
-ui_selectElementType(type,setElementID)
+;Select element subtype
+ui_selectElementType(type,setElementID,PreviousSubType="")
 {
 	global
+	
+	PreviousSubType2:=PreviousSubType ;make it global
+	
 	NowResultEditingElement=
-	selElementType:=type
+	selElementType:=type 
 	selElementID:=setElementID
 	if type=condition
 	{
@@ -826,7 +829,7 @@ ui_selectElementType(type,setElementID)
 	ui_DisableMainGUI()
 	gui,3:default
 	gui,font,s12
-	gui,add,text,,% lang("Whitch_%1% should be created?", lang(selElementType))
+	gui,add,text,,% lang("Which_%1% should be created?", lang(selElementType))
 	gui,add,TreeView,w400 h500 vGuiElementChoose gGuiElementChoose AltSubmit
 	gui,add,Button,w250 gGuiElementChooseOK vGuiElementChooseOK default Disabled,% lang("OK")
 	gui,add,Button,w140 X+10 yp gGuiElementChooseCancel,% lang("Cancel")
@@ -923,7 +926,7 @@ ui_selectElementType(type,setElementID)
 	%GuiElementChoosedID%subType:=TVsubType%GuiElementChoosedTV%
 	;%GuiElementChoosedID%name:="¦ new element" ;Do not translate!
 	NowResultEditingElement=OK
-	ui_settingsOfElement(GuiElementChoosedID)
+	ui_settingsOfElement(GuiElementChoosedID,PreviousSubType2)
 
 	return 
 	

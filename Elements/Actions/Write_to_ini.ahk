@@ -7,13 +7,15 @@ runActionWrite_to_ini(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	
 	local tempText
 	
-
+	local tempPath:=% v_replaceVariables(InstanceID,ThreadID,%ElementID%file)
+	if  DllCall("Shlwapi.dll\PathIsRelative","Str",tempPath)
+		tempPath:=SettingWorkingDir "\" tempPath
 	
 	
 	
 	
 	
-	IniWrite,% v_replaceVariables(InstanceID,ThreadID,%ElementID%Value),% v_replaceVariables(InstanceID,ThreadID,%ElementID%file),% v_replaceVariables(InstanceID,ThreadID,%ElementID%section),% v_replaceVariables(InstanceID,ThreadID,%ElementID%key)
+	IniWrite,% v_replaceVariables(InstanceID,ThreadID,%ElementID%Value),% tempPath,% v_replaceVariables(InstanceID,ThreadID,%ElementID%section),% v_replaceVariables(InstanceID,ThreadID,%ElementID%key)
 	
 	if errorlevel
 		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")

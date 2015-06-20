@@ -46,8 +46,11 @@ runActionSet_file_attributes(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	else if %ElementID%Recurse=2
 		recurse=1
 	
+	local tempPath:=% v_replaceVariables(InstanceID,ThreadID,%ElementID%file)
+	if  DllCall("Shlwapi.dll\PathIsRelative","Str",tempPath)
+		tempPath:=SettingWorkingDir "\" tempPath
 	
-	FileSetAttrib,%tempattr%,% v_replaceVariables(InstanceID,ThreadID,%ElementID%file),%operateon%,%recurse%
+	FileSetAttrib,%tempattr%,% tempPath,%operateon%,%recurse%
 	if ErrorLevel
 		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 	else

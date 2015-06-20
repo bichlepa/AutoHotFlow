@@ -3,8 +3,17 @@
 EnableTriggerPeriodic_timer(ElementID)
 {
 	global
+	local tempDuration
 	
-	settimer,TriggerPeriodic_TimerStart,% %ElementID%Intervall_S * 1000
+	if %ElementID%Unit=1 ;Milliseconds
+		tempDuration:=%ElementID%Intervall_S
+	else if %ElementID%Unit=2 ;Seconds
+		tempDuration:=%ElementID%Intervall_S * 1000
+	else if %ElementID%Unit=3 ;minutes
+		tempDuration:=%ElementID%Intervall_S * 60000
+	
+	
+	settimer,TriggerPeriodic_TimerStart,%tempDuration%
 	
 	
 }
@@ -12,7 +21,7 @@ EnableTriggerPeriodic_timer(ElementID)
 getParametersTriggerPeriodic_timer()
 {
 	
-	parametersToEdit:=["Label|" lang("Time in Seconds"),"Text|10|Intervall_S"]
+	parametersToEdit:=["Label|" lang("Time interval"),"Text|10|Intervall_S","Radio|2|Unit|" lang("Milliseconds") ";" lang("Seconds") ";" lang("Minutes")]
 	
 	
 	return parametersToEdit

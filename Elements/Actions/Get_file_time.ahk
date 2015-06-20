@@ -44,7 +44,7 @@ getParametersActionGet_file_time()
 {
 	global
 	
-	parametersToEdit:=["Label|" lang("Variable name"),"VariableName|FileTime|varname","Label|" lang("Select file"),"File||file|" lang("Select a file") "|8","Label|" lang("Whitch time"),"Radio|1|TimeType|" lang("Modification time") ";" lang("Creation time") ";" lang("Last access time")]
+	parametersToEdit:=["Label|" lang("Output variable name"),"VariableName|FileTime|varname","Label|" lang("File path"),"File||file|" lang("Select a file") "|8","Label|" lang("Which time"),"Radio|1|TimeType|" lang("Modification time") ";" lang("Creation time") ";" lang("Last access time")]
 	return parametersToEdit
 }
 

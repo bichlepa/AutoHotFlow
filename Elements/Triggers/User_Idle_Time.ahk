@@ -6,9 +6,16 @@ EnableTriggerUser_Idle_Time(ElementID)
 	if (!IsObject(TriggerUser_Idle_TimeCurrentTimes))
 		TriggerUser_Idle_TimeCurrentTimes:=Object()
 
+
+	 if %ElementID%Unit=1 ;Seconds
+		tempDuration:=%ElementID%Intervall_S 
+	else if %ElementID%Unit=2 ;minutes
+		tempDuration:=%ElementID%Intervall_S * 60
+	else if %ElementID%Unit=3 ;hours
+		tempDuration:=%ElementID%Intervall_S * 60*60
 	
 	
-	TriggerUser_Idle_TimeCurrentTimes.insert( ElementID ,%ElementID%Intervall_S) 
+	TriggerUser_Idle_TimeCurrentTimes.insert( ElementID ,tempDuration) 
 	SetTimer,TriggerUser_Idle_TimeLoop,1000
 	
 	return
@@ -45,7 +52,7 @@ EnableTriggerUser_Idle_Time(ElementID)
 getParametersTriggerUser_Idle_Time()
 {
 	
-	parametersToEdit:=["Label|" lang("Time in Seconds"),"Text|10|Intervall_S"]
+	parametersToEdit:=["Label|" lang("Period of time"),"Text|10|Intervall_S","Radio|2|Unit|"  lang("Seconds") ";" lang("Minutes") ";" lang("Hours")]
 	
 	
 	return parametersToEdit

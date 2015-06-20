@@ -4,7 +4,12 @@ runActionDelete_file(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	
-	FileDelete,% v_replaceVariables(InstanceID,ThreadID,%ElementID%file)
+	local tempPath:=% v_replaceVariables(InstanceID,ThreadID,%ElementID%file)
+	if  DllCall("Shlwapi.dll\PathIsRelative","Str",tempPath)
+		tempPath:=SettingWorkingDir "\" tempPath
+	
+	MsgBox %tempPath%
+	FileDelete,% tempPath
 	if ErrorLevel
 		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 	else
@@ -24,7 +29,7 @@ getParametersActionDelete_file()
 {
 	global
 	
-	parametersToEdit:=["Label|" lang("Select file"),"File||file|" lang("Select a file") "|"]
+	parametersToEdit:=["Label|" lang("File pattern"),"File||file|" lang("Select a file") "|"]
 	return parametersToEdit
 }
 
@@ -34,7 +39,7 @@ GenerateNameActionDelete_file(ID)
 	;MsgBox % %ID%text_to_show
 	
 	
-	return lang("Delete_file") " " GUISettingsOfElement%ID%file ": " GUISettingsOfElement%ID%text
+	return lang("Delete_file") " " GUISettingsOfElement%ID%file 
 	
 }
 

@@ -4,8 +4,14 @@ runActionCopy_file(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	
+	local tempFrom:=% v_replaceVariables(InstanceID,ThreadID,%ElementID%file)
+	local tempTo:=% v_replaceVariables(InstanceID,ThreadID,%ElementID%destFile)
+	if  DllCall("Shlwapi.dll\PathIsRelative","Str",tempFrom)
+		tempFrom:=SettingWorkingDir "\" tempFrom
+	if  DllCall("Shlwapi.dll\PathIsRelative","Str",tempTo)
+		tempTo:=SettingWorkingDir "\" tempTo
 	
-	FileCopy,% v_replaceVariables(InstanceID,ThreadID,%ElementID%file),% v_replaceVariables(InstanceID,ThreadID,%ElementID%destFile),% %ElementID%Overwrite
+	FileCopy,% tempFrom,% tempTo,% %ElementID%Overwrite
 	
 	if ErrorLevel
 		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
@@ -26,7 +32,7 @@ getParametersActionCopy_file()
 {
 	global
 	
-	parametersToEdit:=["Label|" lang("Source file"),"File||file|" lang("Select a file") "|","Label|" lang("Destination file or folder"),"Folder||destFile|" lang("Select a file or folder") "|","Checkbox|0|Overwrite|" lang("Overwrite existing files")]
+	parametersToEdit:=["Label|" lang("Source file"),"File||file|" lang("Select a file") "|","Label|" lang("Destination file or folder"),"Folder||destFile|" lang("Select a file or folder") "|","Label|" lang("Overwrite"),"Checkbox|0|Overwrite|" lang("Overwrite existing files")]
 	return parametersToEdit
 }
 
