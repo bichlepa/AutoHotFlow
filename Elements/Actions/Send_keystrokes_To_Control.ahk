@@ -9,6 +9,7 @@ runActionSend_Keystrokes_To_Control(InstanceID,ThreadID,ElementID,ElementIDInIns
 	local tempWinText:=v_replaceVariables(InstanceID,ThreadID,%ElementID%winText)
 	local tempExcludeText:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ExcludeText)
 	local tempTitleMatchMode :=%ElementID%TitleMatchMode
+	local tempControlTextMatchMode :=%ElementID%ControlTextMatchMode
 	local tempahk_class:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ahk_class)
 	local tempahk_exe:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ahk_exe)
 	local tempahk_id:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ahk_id)
@@ -29,19 +30,14 @@ runActionSend_Keystrokes_To_Control(InstanceID,ThreadID,ElementID,ElementIDInIns
 	if tempwinstring=
 		tempwinstring=A
 	
-	if (%ElementID%ControlTextMatchMode) 
-			tempControlMatchMode:=1
-		else if (%ElementID%ControlTextMatchMode) 
-			tempControlMatchMode:=2
-		else (%ElementID%ControlTextMatchMode) 
-			tempControlMatchMode:=3
 	
+
 	SetTitleMatchMode,%tempTitleMatchMode%
 	WinGet,tempID,ID,%tempwinstring%,%tempWinText%,%tempExcludeTitle%,%tempExcludeText%
 	if tempID ;If a window was found
 	{
 		
-		SetTitleMatchMode,%tempControlMatchMode%
+		SetTitleMatchMode,%tempControlTextMatchMode%
 		if %ElementID%RawMode=1
 			ControlSendraw,% tempControl_identifier,% tempKeysToSend,ahk_id %tempID%
 		else

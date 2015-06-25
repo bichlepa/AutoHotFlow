@@ -28,10 +28,10 @@ runActionInput_box(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	gui,%tempGUILabel%:+LabelInputBoxGUI
 	
 
-	gui,%tempGUILabel%:add,text,x10 w320 h100, % tempText
-	gui,%tempGUILabel%:add,edit,x10 w320 h20 v%tempGUILabel%GUIEdit, 
+	gui,%tempGUILabel%:add,text,, % tempText
+	gui,%tempGUILabel%:add,edit, v%tempGUILabel%GUIEdit, 
 	gui,%tempGUILabel%:add,button,x10 w150 h30 gActionInput_boxButtonOK Default,% lang("OK")
-	gui,%tempGUILabel%:show,w330 h180 ,% tempTitle
+	gui,%tempGUILabel%:show, ,% tempTitle
 	
 	
 	ActionInput_BoxAllGUIs.insert(tempGUILabel,tempNew)

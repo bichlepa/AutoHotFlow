@@ -5,18 +5,20 @@ runActionAbsolute_number(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	global
 	local temp
 	
-	if %ElementID%expression=1
-		temp:=v_replaceVariables(InstanceID,ThreadID,%ElementID%VarValue)
-	else
-		temp:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%VarValue)
+	
+	temp:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%VarValue)
 	;MsgBox,%  %ElementID%Varname "---" %ElementID%VarValue "---" v_replaceVariables(InstanceID,%ElementID%Varname) "---" v_replaceVariables(InstanceID,%ElementID%VarValue)
 	if temp is number
 	{
+		
 		v_SetVariable(InstanceID,ThreadID,v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname),abs(temp))
 		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	}
 	else
+	{
+		logger("f0",lang("Instance") " " InstanceID " - " lang(%ElementID%type) " '" %ElementID%name "': " lang("Error") "! " lang("Input number %1% is not a number",temp))
 		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
+	}
 
 	
 	return
@@ -42,7 +44,7 @@ GenerateNameActionAbsolute_number(ID)
 {
 	global
 	
-	return % lang("Absolute_number") "`n" GUISettingsOfElement%ID%Varname " = " GUISettingsOfElement%ID%VarValue
+	return % lang("Absolute_number") " - " GUISettingsOfElement%ID%Varname " = " GUISettingsOfElement%ID%VarValue
 	
 }
 

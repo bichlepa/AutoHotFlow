@@ -15,14 +15,15 @@
 	
 	;Set some hotkeys that are needed in main window
 	hotkey,IfWinActive,ahk_id %MainGuihwnd%
-	hotkey,^x,ctrl_x
+	;~ hotkey,^x,ctrl_x
 	hotkey,^c,ctrl_c
 	hotkey,^v,ctrl_v
+	hotkey,^s,ctrl_s
 	hotkey,esc,esc
 	hotkey,del,del
 	hotkey,^wheelup,ctrl_wheelup
 	hotkey,^wheeldown,ctrl_wheeldown
-	
+	hotkey,~rbutton,rightmousebuttonclick
 }
 
 
@@ -95,6 +96,8 @@ SB_SetParts(a_guiwidth)
 
 ui_draw()
 return
+
+
 
 
 jumpOverGUIJumpLabels:

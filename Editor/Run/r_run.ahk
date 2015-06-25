@@ -4,36 +4,41 @@
 InstanceIDList:=Object()
 r_RunningCounter=0
 r_RunningThreadCounter=0
-executionSpeed=1
-
+executionSpeed=1 ;The smaller the value the faster
 
 
 ;Starts a new instance
-r_startRun()
+r_startRun(Execution_Parameters="")
 {
 	global
+	local temp
+	local tempID
 	
+	logger("f1","Starting new instance")
 	
 	if (nowrunning=true) ;If the flow is already running.
 	{
 		;Consider the execution policy setting
 		if SettingFlowExecutionPolicy=stop ;Stop current instance and start a new one
 		{
+			logger("f1","An instance already exists. Old execution stopped to launch the new one.")
 			gosub r_escapeRun
 			SetTimer,r_WaitUntilStoppedAndThenStart,50
 			return
 		}
 		else if SettingFlowExecutionPolicy=wait ;Wait until the current instance has finished
 		{
+			logger("f2","An instance already exists. Execution will wait.")
 			temp= ;Do nothing. In the run loop will only the first instance be considered
 		}
 		else if SettingFlowExecutionPolicy=skip ;Skip the execution
 		{
-			
+			logger("f1","An instance already exists. Execution skipped.")
 			return
 		}
 		else if SettingFlowExecutionPolicy=parallel ;Execute multiple instancec parallel
 		{
+			logger("f2","An instance already exists. This execution is going to run parallel.")
 			temp= ;Do nothing
 		}
 		
@@ -42,6 +47,7 @@ r_startRun()
 	Critical on ;This code generates one instance. it should not be interrupted. (especially if a new instance should be created)
 	r_RunningCounter++
 	r_RunningThreadCounter++
+	
 	
 	
 	InstanceIDList.insert("Instance_" r_RunningCounter) ;Insert a new Instance
@@ -56,33 +62,24 @@ r_startRun()
 	;MsgBox %ThisExecution_WhetherToReturVariables%
 	;MsgBox %ThisExecution_ElementIDInInstanceOfCallingFlow%
 	;if an other flow has called this flow. Those variables will be needed to get the variables from the other flow, inform it when this flow has finished and send the variables back.
-	Instance_%r_RunningCounter%_CallingFlow:=ThisExecution_CallingFlow
-	Instance_%r_RunningCounter%_InstanceOfCallingFlow:=ThisExecution_InstanceIDOfCallingFlow
-	Instance_%r_RunningCounter%_WhetherToReturVariables:=ThisExecution_WhetherToReturVariables
-	Instance_%r_RunningCounter%_ElementIDInInstanceOfCallingFlow:=ThisExecution_ElementIDInInstanceOfCallingFlow
-	
-	;MsgBox %  r_RunningCounter "-"Instance_%r_RunningCounter%_CallingFlow
-	 ;Import variables if the trigger provides some variables. E.g. if an other flow has called this flow.
-	if ThisExecution_localVariables!=
+	if isobject(Execution_Parameters)
 	{
 		
-		loop, parse, ThisExecution_localVariables,◘
-		{
-			StringGetPos,temppos,A_LoopField,=
-			if temppos!=
-			{
-				stringleft,tempVarName,A_LoopField,% temppos
-				StringTrimLeft,tempVarContent,A_LoopField,% temppos+1
-				v_setVariable(r_RunningCounter,1,tempVarName,tempVarContent,,true)
-				
-			}
-			
-		}
+		;~ MsgBox % strobj(Execution_Parameters)
+		Instance_%r_RunningCounter%_CallingFlow:=Execution_Parameters["CallingFlow"]
+		Instance_%r_RunningCounter%_InstanceOfCallingFlow:=Execution_Parameters["InstanceIDOfCallingFlow"]
+		Instance_%r_RunningCounter%_WhetherToReturVariables:=Execution_Parameters["WhetherToReturVariables"]
+		Instance_%r_RunningCounter%_ElementIDInInstanceOfCallingFlow:=Execution_Parameters["ElementIDInInstanceOfCallingFlow"]
 		
-		ThisExecution_localVariables=
+		;Import variables if the trigger provides some variables or if an other flow has called this flow.
+		temp:=Execution_Parameters["localVariables"]
+		v_ImportLocalVariablesFromString(r_RunningCounter,temp)
 		
+		logger("f2","Instance " r_RunningCounter ": the flow was called by " Execution_Parameters["CallingFlow"])
 	}
-	v_setVariable(r_RunningCounter,r_RunningThreadCounter,"a_triggertime",a_now,"Date",true) ;Set the triggertime variable
+	
+	
+	v_setVariable(r_RunningCounter,r_RunningThreadCounter,"a_triggertime",a_now,"Date",c_SetBuiltInVar) ;Set the triggertime variable
 	
 	;set some variables for correct  visual appearance of the trigger
 	if (triggerrunning<=0)
@@ -121,12 +118,12 @@ r_startRun()
 r_run()
 {
 	global
-
+	local temp
 	
 	
 	nextrun: ;endless loop until no elements to execute left
 
-	
+
 	;lower the priority. This would make any interrupted ahk threads finish. (like redraw)
 	thread, Priority, -100
 	Thread, Interrupt, 0,0
@@ -167,6 +164,7 @@ r_run()
 		;Go through all running elements of the instance
 		for index2, tempRunningElement in %tempInstanceID%_RunningElements
 		{
+			
 			StringSplit, tempRunningElement,tempRunningElement,_ 
 			; tempRunningElement1 = thread id
 			; tempRunningElement2 = Element id
@@ -199,10 +197,12 @@ r_run()
 						;MsgBox % "connection found " %element%from "  " tempRunningElement1 "  " %element%ConnectionType "  " %tempInstanceID%_%tempThreadID%_%tempRunningElement%_result
 						tempTo:=%element%to
 						tempFrom:=%element%from
+						
 						;~ MsgBox % %tempfrom%type "`n" %tempTo%type "`n" %element%ConnectionType "`n" %tempInstanceID%_%tempRunningElement%_result "`n" %element%frompart
 						;If the connection starts on the currend finised element and the elements finished with the same result that is assigned to the connection
 						if (%element%from=tempRunningElement2 && ( %element%ConnectionType=%tempInstanceID%_%tempRunningElement%_result || (%tempfrom%type="loop" && %element%ConnectionType = "normal" && ((%tempInstanceID%_%tempRunningElement%_result = "normalHead" && %element%frompart ="Head") || (%tempInstanceID%_%tempRunningElement%_result = "normalTail") && %element%frompart ="Tail")  )) && %tempTo%subtype!="")
 						{
+							
 							;~ MsgBox % "drin: " %tempTo%type "`n" %element%ConnectionType "`n" %tempInstanceID%_%tempRunningElement%_result "`n" %element%frompart
 							if (tempConnectionCountToRun>0)
 							{
@@ -230,16 +230,19 @@ r_run()
 							;Insert the element that is on the end of the connection to the list
 							if (%tempTo%type="Loop")
 							{
-								if %element%toPart = Head ;Save previous loop vars (if any) when entering a loop
+								if %element%toPart = Head ;Save previous loop vars (if any) when entering a loop and write the information which loop was enetered
 								{
 									PrepareEnteringALoop(tempInstanceID,tempThreadIDToRun,tempTo)
 									
 								}
 								else if (%element%toPart = "Tail" or %element%toPart = "break") ;When entering a tail of the loop, check whether is was last on the head of the same loop
 								{
-									if (tempTo != %tempInstanceID%_Thread_%tempThreadIDToRun%_Variables["CurrentLoop"])
+									temp:=%tempInstanceID%_Thread_%tempThreadIDToRun%_Variables[c_loopVarsName]
+									;~ MsgBox % strobj(temp)
+									if (tempTo != temp["CurrentLoop"])
 									{
-										MsgBox, 16, % lang("Error"),% lang("The end of a loop was entered, but this loop was not the current one.")  "`n" lang("Current thread will be closed") 
+										logger("f0","Error! " tempInstanceID ": " lang("The end of a loop was entered, but this loop was not the current one.")  " " lang("Current thread will be closed"))
+										;~ MsgBox, 16, % lang("Error"),% lang("The end of a loop was entered, but this loop was not the current one.")  "`n" lang("Current thread will be closed") 
 										tempRunSkipCurrentRun:=true
 									}
 								}
@@ -290,6 +293,7 @@ r_run()
 		
 	}
 	
+	
 	;Remove the elements that have finished running from the instance
 	for index, tempElement in ElementsThatHaveFinished
 	{
@@ -299,6 +303,8 @@ r_run()
 		; tempElement3 = thread id
 		; tempElement4 = element id
 		; tempElement5 = element id in the instance
+		
+		logger("f2","Instance " tempElement2 ": " %tempElement4%type " '" %tempElement4%name "' has finished with result " %tempElement%_result)
 		
 		;MsgBox, element %tempElement% has finished and will be removed
 		for index2, tempRunningElement in Instance_%tempElement2%_RunningElements
@@ -318,6 +324,7 @@ r_run()
 	;Remove the instance that have finished from the list of instances
 	for index, tempFinishedInstanceID in InstancesThatHaveFinished
 	{
+		logger("fa","Instance " tempFinishedInstanceID ": has finished")
 		;MsgBox, instance %tempFinishedInstanceID% has finished and will be removed
 		for index1, tempInstanceID in InstanceIDList
 		{
@@ -345,6 +352,8 @@ r_run()
 						tempVariablesToReturn=
 					
 					;Tell the other flow that this instance has finished and eventually return the variables
+					;~ MsgBox CalledFlowHasFinished|%tempInstanceToReturn%|%tempElementIDInInstanceToReturn%|%tempVariablesToReturn%
+					;~ MsgBox % "Ѻ" %tempFinishedInstanceID%_CallingFlow
 					ControlSetText,edit1,CalledFlowHasFinished|%tempInstanceToReturn%|%tempElementIDInInstanceToReturn%|%tempVariablesToReturn% ,CommandWindowOfEditor,% "Ѻ" %tempFinishedInstanceID%_CallingFlow
 				}
 				
@@ -356,10 +365,12 @@ r_run()
 			
 	}
 	
-	
+
 	;Loop through the elements that are going to run
 	for index3, runElement in goingToRunIDs
 	{
+		
+		
 		StringSplit, runElement,runElement,_ ;a word like Instance_1_action2_3
 		; runElement1 = word "instance"
 		; runElement2 = instance id
@@ -369,6 +380,7 @@ r_run()
 		;Insert the element to the list of running elements of the instance
 		Instance_%runElement2%_RunningElements.insert(runElement3 "_" runElement4 "_" runElement5)
 		
+		logger("a2","Instance " runElement2 ": " lang(%runElement4%type) " '" %runElement4%name "' is going to run")
 		
 		
 		;set some variables for correct visual appearance of the element
@@ -389,7 +401,7 @@ r_run()
 		thread, Priority, -100
 	}
 	
-	
+
 	
 	for index3, runElement in goingToRunIDs
 	{
@@ -411,7 +423,7 @@ r_run()
 		tempElementSubType:=%runElement4%subType
 		
 		
-		
+		logger("f1","Instance " runElement2 ": Starting " lang(%runElement4%type) " '" %runElement4%name "' now")
 		Instance_%runElement2%_%runElement3%_%runElement4%_%runElement5%_finishedRunning:=false
 		
 		;~ MsgBox executing: %runElement%
@@ -435,7 +447,7 @@ r_run()
 	if (tempTheInstanceListIsNotEmpty=0)
 	{
 		;ToolTip("Fertig")
-		
+		logger("a2","No instances running. Flow is going to stop.")
 		stopRun:=true
 	}
 	
@@ -451,7 +463,7 @@ r_run()
 	;Stop running
 	stopRunning:
 	Critical on
-	
+	logger("f1a1","Stopping flow.")
 	SetTimer,nextRun,off
 	;Delete all running tags after finishing run
 	for index1, element in allElements
@@ -492,6 +504,7 @@ return
 r_WaitUntilStoppedAndThenStart:
 if (nowrunning!=true)
 {
+	logger("f1a1","Starting the waiting instance.")
 	r_startRun()
 	settimer,r_WaitUntilStoppedAndThenStart,off
 }

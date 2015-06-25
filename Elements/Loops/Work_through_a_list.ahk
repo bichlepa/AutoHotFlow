@@ -14,7 +14,7 @@ runLoopWork_through_a_list(InstanceID,ThreadID,ElementID,ElementIDInInstance,Hea
 		templist:=v_GetVariable(InstanceID,ThreadID,templistname,"list") 
 		
 		tempindex:=1
-		v_SetVariable(InstanceID,ThreadID,"a_index",tempindex,,true)
+		v_SetVariable(InstanceID,ThreadID,"a_index",tempindex,,c_SetLoopVar)
 		
 		if isobject(templist)
 		{
@@ -22,15 +22,15 @@ runLoopWork_through_a_list(InstanceID,ThreadID,ElementID,ElementIDInInstance,Hea
 			if %ElementID%CopyFirst=1
 			{
 				templist:=templist.Clone()
-				v_SetVariable(InstanceID,ThreadID,"A_LoopCurrentList",templist,,true)
-				v_SetVariable(InstanceID,ThreadID,"A_LoopUseCopiedList",1,,true)
+				v_SetVariable(InstanceID,ThreadID,"A_LoopCurrentList",templist,,c_SetLoopVar)
+				v_SetVariable(InstanceID,ThreadID,"A_LoopUseCopiedList",1,,c_SetLoopVar)
 				tempFound:=false
 				for tempkey, tempvalue in templist
 				{
 					
 					;~ MsgBox %InstanceID% %ThreadID% `n %tempkey% = %tempvalue%
-					v_SetVariable(InstanceID,ThreadID,"a_LoopValue",tempvalue,,true)
-					v_SetVariable(InstanceID,ThreadID,"a_LoopKey",tempkey,,true)
+					v_SetVariable(InstanceID,ThreadID,"a_LoopValue",tempvalue,,c_SetLoopVar)
+					v_SetVariable(InstanceID,ThreadID,"a_LoopKey",tempkey,,c_SetLoopVar)
 					templist.Remove(tempkey,"")
 					tempFound:=true
 					break
@@ -39,7 +39,7 @@ runLoopWork_through_a_list(InstanceID,ThreadID,ElementID,ElementIDInInstance,Hea
 			}
 			else
 			{
-				v_SetVariable(InstanceID,ThreadID,"A_LoopUseCopiedList",0,,true)
+				v_SetVariable(InstanceID,ThreadID,"A_LoopUseCopiedList",0,,c_SetLoopVar)
 				tempFound:=false
 				for tempkey, tempvalue in templist
 				{
@@ -47,8 +47,8 @@ runLoopWork_through_a_list(InstanceID,ThreadID,ElementID,ElementIDInInstance,Hea
 					if (A_Index=tempindex)
 					{
 						;~ MsgBox %InstanceID% %ThreadID% `n %tempkey% = %tempvalue%
-						v_SetVariable(InstanceID,ThreadID,"a_LoopValue",tempvalue,,true)
-						v_SetVariable(InstanceID,ThreadID,"a_LoopKey",tempkey,,true)
+						v_SetVariable(InstanceID,ThreadID,"a_LoopValue",tempvalue,,c_SetLoopVar)
+						v_SetVariable(InstanceID,ThreadID,"a_LoopKey",tempkey,,c_SetLoopVar)
 						tempFound:=true
 						break
 					}
@@ -72,7 +72,7 @@ runLoopWork_through_a_list(InstanceID,ThreadID,ElementID,ElementIDInInstance,Hea
 	{
 		tempindex:=v_GetVariable(InstanceID,ThreadID,"A_Index")
 		tempindex++
-		v_SetVariable(InstanceID,ThreadID,"A_Index",tempindex,,true)
+		v_SetVariable(InstanceID,ThreadID,"A_Index",tempindex,,c_SetLoopVar)
 		tempUseCopiedList:=v_GetVariable(InstanceID,ThreadID,"A_LoopUseCopiedList")
 		if tempUseCopiedList
 		{
@@ -81,8 +81,8 @@ runLoopWork_through_a_list(InstanceID,ThreadID,ElementID,ElementIDInInstance,Hea
 			for tempkey, tempvalue in templist
 			{
 				
-				v_SetVariable(InstanceID,ThreadID,"a_LoopValue",tempvalue,,true)
-				v_SetVariable(InstanceID,ThreadID,"a_LoopKey",tempkey,,true)
+				v_SetVariable(InstanceID,ThreadID,"a_LoopValue",tempvalue,,c_SetLoopVar)
+				v_SetVariable(InstanceID,ThreadID,"a_LoopKey",tempkey,,c_SetLoopVar)
 				templist.Remove(tempkey,"")
 				tempFound:=true
 				break
@@ -98,8 +98,8 @@ runLoopWork_through_a_list(InstanceID,ThreadID,ElementID,ElementIDInInstance,Hea
 			{
 				if (A_Index=tempindex)
 				{
-					v_SetVariable(InstanceID,ThreadID,"a_LoopValue",tempvalue,,true)
-					v_SetVariable(InstanceID,ThreadID,"a_LoopKey",tempkey,,true)
+					v_SetVariable(InstanceID,ThreadID,"a_LoopValue",tempvalue,,c_SetLoopVar)
+					v_SetVariable(InstanceID,ThreadID,"a_LoopKey",tempkey,,c_SetLoopVar)
 					tempFound:=true
 					break
 				}

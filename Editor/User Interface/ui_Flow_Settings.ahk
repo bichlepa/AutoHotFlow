@@ -7,7 +7,7 @@ ui_SettingsOwFLow()
 	
 	ui_DisableMainGUI()
 	gui,5:default
-	gui,+owner
+	;~ gui,+owner
 	gui,font,s10 cnavy wbold
 	gui,add,text,x10 w300,% lang("Flow_execution_policy")
 	
@@ -18,17 +18,17 @@ ui_SettingsOwFLow()
 	else
 		tempchecked=0
 	gui,add,radio,w300 x10 Y+10 vGuiFlowSettingsParallel checked%tempchecked%,% lang("Parallel_execution_of_multiple_instances")
-		if SettingFlowExecutionPolicy=skip
+	if SettingFlowExecutionPolicy=skip
 		tempchecked=1
 	else
 		tempchecked=0
 	gui,add,radio,w300 x10 Y+10 vGuiFlowSettingsSkip checked%tempchecked% ,% lang("Skip_execution_when_an_instance_is_already_executing")
-		if SettingFlowExecutionPolicy=wait
+	if SettingFlowExecutionPolicy=wait
 		tempchecked=1
 	else
 		tempchecked=0
 	gui,add,radio,w300 x10 Y+10 vGuiFlowSettingsWait  checked%tempchecked%,% lang("Wait_until_the_currently_executing_instance_has_finished")
-		if SettingFlowExecutionPolicy=stop
+	if SettingFlowExecutionPolicy=stop
 		tempchecked=1
 	else
 		tempchecked=0
@@ -39,12 +39,26 @@ ui_SettingsOwFLow()
 	gui,font,s8 cDefault wnorm
 	gui,add,Edit,w300 x10 Y+10 vGuiFlowSettingsWorkingDir,% SettingWorkingDir
 	
+	
+	gui,font,s10 cnavy wbold
+	gui,add,text,x10 w300 Y+15,% lang("Debug options")
+	gui,font,s8 cDefault wnorm
+	if SettingFlowLogToFile=1
+		tempchecked=1
+	gui,add,Checkbox,w300 x10 Y+10 vGuiFlowSettingsLogToFile checked%tempchecked% ,% lang("Log to file")
+	gui,add,button,w300 x10 h30 Y+10 gGuiFlowSettingsButtonShowLog,% lang("Show log")
+	
 	gui,add,button,w145 x10 h30 Y+20 gGuiFlowSettingsOK default,% lang("Save")
 	gui,add,button,w145 h30 yp X+10 gGuiFlowSettingsCancel,% lang("Cancel")
 	
 
 	gui,show
 	return
+	
+	GuiFlowSettingsButtonShowLog:
+	showlog()
+	return
+	
 	
 	
 	GuiFlowSettingsOK:
@@ -60,6 +74,8 @@ ui_SettingsOwFLow()
 		SettingFlowExecutionPolicy=wait		
 	else if GuiFlowSettingsStop=1
 		SettingFlowExecutionPolicy=stop
+	
+	SettingFlowLogToFile:=GuiFlowSettingsLogToFile
 	
 	if (tempSettingFlowExecutionPolicyOld!=SettingFlowExecutionPolicy)
 		saved=no

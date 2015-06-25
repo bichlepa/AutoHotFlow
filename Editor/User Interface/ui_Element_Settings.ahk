@@ -72,7 +72,7 @@
 				
 				ui_DisableMainGUI()
 				gui,4:default
-				gui,+owner
+				;~ gui,+owner
 				gui,add,text,w300,% lang("Select_a_trigger")
 				gui,add,ListBox,w400 h500 vGuiTriggerChoose gGuiTriggerChoose AltSubmit choose1,%temptriggerNames%
 				gui,add,button,w100 h30 gGuiTriggerOK default,% lang("OK")

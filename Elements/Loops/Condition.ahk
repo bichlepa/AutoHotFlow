@@ -3,11 +3,12 @@
 runLoopCondition(InstanceID,ThreadID,ElementID,ElementIDInInstance,HeadOrTail)
 {
 	global
-
+	
+	
 	if HeadOrTail=Head ;Initialize loop
 	{
 		
-		v_SetVariable(InstanceID,ThreadID,"A_Index",1,,true)
+		v_SetVariable(InstanceID,ThreadID,"A_Index",1,,c_SetLoopVar)
 		if (%ElementID%EvaluateOnFirstIteration =0 || v_EvaluateExpression(InstanceID,ThreadID,%ElementID%Expression))
 		{
 			
@@ -24,7 +25,7 @@ runLoopCondition(InstanceID,ThreadID,ElementID,ElementIDInInstance,HeadOrTail)
 	else if HeadOrTail=tail ;Continue loop
 	{
 		tempindex:=v_GetVariable(InstanceID,ThreadID,"A_Index")
-		v_SetVariable(InstanceID,ThreadID,"A_Index",tempindex+1,,true)
+		v_SetVariable(InstanceID,ThreadID,"A_Index",tempindex+1,,c_SetLoopVar)
 		
 		if (v_EvaluateExpression(InstanceID,ThreadID,%ElementID%Expression)) ;If infinite loop or index has not reached the aim value
 		{

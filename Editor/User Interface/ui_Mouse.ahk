@@ -1,6 +1,18 @@
 ﻿goto,jumpoverclickstuff
 
+rightmousebuttonclick:
+thread, Priority, -50
+MouseGetPos,,,,temphwnd,2
+;~ MsgBox %temphwnd% %PicFlowHWND%
+if (PicFlowHWND=temphwnd) ;Scroll using right button
+{
+	scrollwithMouse("rbutton")
+}
+return
+
+
 clickOnPicture: ;react on clicks of the user
+
 
 thread, Priority, -50
 
@@ -98,43 +110,9 @@ howMuchMoved=0 ;Helpful to detect whether user wanted to move or whether he acci
 if elementWithHighestPriority= ;If nothing was selected (click on nowhere). -> Scroll
 {
 	
-
-	firstposx:=offsetx ;Store the first offset position
-	firstposy:=offsety
-	Loop ;scroll with mouse
-	{
-		
-		GetKeyState,LbuttonKeyState,lbutton,p
-		if (LbuttonKeyState!="d")
-		{
-			ui_UpdateStatusbartext("pos")
-			ui_draw()
-			break
-		}
-		
-		MouseGetPos,newmx1,newmy1 ;Get mouse position and calculate
-		newmx:=newmx1
-		newmy:=newmy1
-		newposx:=(firstposx-(newmx-mx)/zoomFactor)
-		newposy:=(firstposy-(newmy-my)/zoomFactor)
-		if (newposx!=oldposx OR newposy!=oldposy) ;If mouse is moving currently
-		{
-			
-			oldposx:=newposx
-			oldposy:=newposy
-			Offsetx:=newposx
-			Offsety:=newposy
-			howMuchMoved++
-			if howMuchMoved>2
-				clickMoved:=true
-			ui_UpdateStatusbartext("pos")
-			ui_draw()
-			
-		}
-		else
-			sleep,10 ;Save processor work
-		
-	}
+	
+	
+	clickMoved:= scrollwithMouse()
 	if (clickMoved=false) ;If the background wasn't moved, unmark elements
 	{
 		if (countMarkedElements) ;if at least one element is marked
@@ -395,9 +373,11 @@ else if (elementWithHighestPriority="PlusButton" or elementWithHighestPriority="
 				}
 				if (thisConnectionPossible=true)
 				{
-					
+					%tempConnection2%from:=tempElement2
+					%tempConnection1%to:=tempElement2
 					if (%tempElement2%Type="Condition")
 					{
+						
 						
 						tempReturn:=ui_settingsOfElement(tempConnection2)
 						if tempReturn=aborted
@@ -410,8 +390,6 @@ else if (elementWithHighestPriority="PlusButton" or elementWithHighestPriority="
 				if (thisConnectionPossible=true)
 				{
 					
-					%tempConnection2%from:=tempElement2
-					%tempConnection1%to:=tempElement2
 					
 					if %tempElement3%Type=Loop ;If the third element is a loop. The information about the connected part is not yet in the second connection.
 					{
@@ -1311,8 +1289,8 @@ moveSelectedElements(option="")
 				
 				
 				%TheOnlyOneMarkedElement%HeightOfVerticalBar:=(oldHeightOfVerticalBar+(newmy-my)/zoomFactor)
-					
-				
+				if (%TheOnlyOneMarkedElement%HeightOfVerticalBar< Gridy*2)
+					%TheOnlyOneMarkedElement%HeightOfVerticalBar:= Gridy*2
 				howMuchMoved++
 				if howMuchMoved>2
 					clickMoved:=true
@@ -1543,6 +1521,65 @@ markElement(toMark="",additional="false")
 	SortMarkedInForeground()
 }
 
+scrollwithMouse(button="lbutton")
+{
+	global
+	local newmy
+	local newmy
+	local newposx
+	local newposy
+	local oldposx
+	local oldposy
+	local howMuchMoved
+	
+	local firstposx:=offsetx ;Store the first offset position
+	local firstposy:=offsety
+	local clickMoved:=false
+	local mx
+	local my
+	
+	MouseGetPos,mx,my ;Get the mouse position
+	
+	Loop ;scroll with mouse
+	{
+		
+		GetKeyState,LbuttonKeyState,%button%,p
+		if (LbuttonKeyState!="d")
+		{
+			ui_UpdateStatusbartext("pos")
+			ui_draw()
+			break
+		}
+		
+		MouseGetPos,newmx1,newmy1 ;Get mouse position and calculate
+		newmx:=newmx1
+		newmy:=newmy1
+		newposx:=(firstposx-(newmx-mx)/zoomFactor)
+		newposy:=(firstposy-(newmy-my)/zoomFactor)
+		if (newposx!=oldposx OR newposy!=oldposy) ;If mouse is moving currently
+		{
+			
+			oldposx:=newposx
+			oldposy:=newposy
+			Offsetx:=newposx
+			Offsety:=newposy
+			howMuchMoved++
+			if howMuchMoved>2
+				clickMoved:=true
+			ui_UpdateStatusbartext("pos")
+			ui_draw()
+			
+		}
+		else
+			sleep,10 ;Save processor work
+		
+	}
+	
+	return clickMoved
+	
+}
+
+
 
 SortMarkedInForeground()
 {
@@ -1698,6 +1735,7 @@ ctrl_x:
 return
 
 ctrl_c:
+
 ;ToolTip("Control + C pressed")
 i_SaveToClipboard()
 return
@@ -1707,7 +1745,9 @@ ctrl_v:
 i_loadFromClipboard()
 return
 
-
+ctrl_s:
+i_save()
+return
 
 
 

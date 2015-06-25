@@ -8,7 +8,7 @@ runActionDelete_file(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	if  DllCall("Shlwapi.dll\PathIsRelative","Str",tempPath)
 		tempPath:=SettingWorkingDir "\" tempPath
 	
-	MsgBox %tempPath%
+	;~ MsgBox %tempPath%
 	FileDelete,% tempPath
 	if ErrorLevel
 		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")

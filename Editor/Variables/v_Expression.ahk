@@ -19,9 +19,11 @@ if (!NoTests) ;Test mode when executing this script directly
 	MsgBox % "Result of " teststring " is " res 
 }
 
-
+/* Evaluation of an Expression
+*/
 v_EvaluateExpression(InstanceID,ThreadID,ExpressionString)
 {
+	logger("f3","Evaluating expression " ExpressionString)
 	v_replaceVariables(InstanceID,ThreadID,ExpressionString)
 	ExpressionString:=A_Space ExpressionString A_Space
 	StringReplace,ExpressionString,ExpressionString,>=,≥,all

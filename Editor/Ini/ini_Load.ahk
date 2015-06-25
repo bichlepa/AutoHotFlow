@@ -1,4 +1,4 @@
-﻿i_load(ThisFlowFilePath="")
+﻿i_load(ThisFlowFilePath)
 {
 	global
 	
@@ -6,26 +6,35 @@
 	ui_disablemaingui()
 	if ThisFlowFilePath=
 	{
-		FileSelectFile,ThisFlowFilePath,1,Saved Flows,% lang("Open_flow"),  *.ini
-		if errorlevel
-		{
-			ui_EnableMainGUI()
-			return
-		}
-		
-		
+		logger("a0","ERROR! File path of the Flow not specified!")
+		ExitApp
 		
 	}
 	
-		
+	
 	SplitPath,ThisFlowFilePath,,ThisFlowFolder,,ThisFlowFilename
+	
+	logger("a1","Loading flow from file: " ThisFlowFilePath)
+	
+	IfnotExist,%ThisFlowFolder%\%ThisFlowFilename%.ini
+	{
+		logger("a0","ERROR! Flow file does not exist!")
+		ExitApp
+	}
 	
 	ToolTip(lang("loading"),100000)
 	Iniread,ID_count,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,count,1
 	Iniread,SettingFlowExecutionPolicy,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,SettingFlowExecutionPolicy,parallel
 	Iniread,SettingWorkingDir,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,SettingWorkingDir,%A_MyDocuments%\AutoHotFlow default working direction
 	if not fileexist(SettingWorkingDir)
+	{
+		logger("a1","Working directory of the flow does not exist. Creating it now.")
 		FileCreateDir,%SettingWorkingDir%
+		if errorlevel
+		{
+			logger("a0","Error! Working directory couldn't be created.")
+		}
+	}
 	Iniread,FlowCompabilityVersion,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,FlowCompabilityVersion,0
 	
 	i_loadGeneralParameters() ;Outsourced in order to execute only that later when flow name changes
@@ -99,25 +108,45 @@
 				%loadElementID%HeightOfVerticalBar=%loadElementHeightOfVerticalBar%
 			}
 			
-			
+			;Get the list of all parameters and read all parameters from ini
 			parametersToload:=getParameters%loadElementType%%loadElementsubType%()
 			for index2, parameter in parametersToload
 			{
+				parameter1=
+				parameter2=
+				parameter3=
 				StringSplit,parameter,parameter,|
+				;parameter1: type of control
+				;parameter2: default value
+				;parameter3: parameter name
+				;parameter4 ...: further options
 				if (parameter3="" or parameter0<3) ; ;If this is only a label for the edit fielt etc. Do nothing
 					continue
-				StringSplit,tempparname,parameter3,; ;get the parameter names
+				;~ MsgBox %parameter3%
+				tempparname1=
+				tempparname2=
+				tempdefault1=
+				tempdefault2=
+				StringSplit,tempparname,parameter3,; ;get the parameter names if it has more than one
 				StringSplit,tempdefault,parameter2,; ;get the default parameter
-				Loop % tempparname0
+
+				;Certain types of control consist of multiple controls and thus contain multiple parameters.
+				loop,%tempparname0%
 				{
-					temponeparname:=tempparname%A_Index%
-					Iniread,tempContent,%ThisFlowFolder%\%ThisFlowFilename%.ini,element%index1%,%temponeparname%
-					if (tempContent=="ERROR")
-						tempContent:=tempdefault%A_Index%
+					tempCurrentParName:=tempparname%a_index%
+					;~ MsgBox %tempCurrentParName%
+					Iniread,tempContent,%ThisFlowFolder%\%ThisFlowFilename%.ini,element%index1%,%tempCurrentParName%,ẺⱤᶉӧɼ
+					if (tempContent=="ẺⱤᶉӧɼ")
+					{
+						;~ MsgBox element %loadElementID% parameter %parameter3% nicht vorhanden setze es auf %parameter2%
+						tempContent:=tempdefault%a_index%
+						
+					}
 					StringReplace, tempContent, tempContent, |¶,`n, All
-					
-					%loadElementID%%temponeparname%=%tempContent%
+					%loadElementID%%tempCurrentParName%=%tempContent%
 				}
+				
+				
 			}
 			
 			
@@ -159,19 +188,41 @@
 		parametersToload:=getParameters%loadElementType%%loadElementsubType%()
 		for index2, parameter in parametersToload
 		{
+			parameter1=
+			parameter2=
+			parameter3=
 			StringSplit,parameter,parameter,|
-			;~ MsgBox,% "-" parameter3 "-"
+			;parameter1: type of control
+			;parameter2: default value
+			;parameter3: parameter name
+			;parameter4 ...: further options
+			
 			if (parameter3="" or parameter0<3) ;If this is only a label for the edit fielt etc. Do nothing
 				continue
-			;~ MsgBox,% "-" parameter3 "_"
-			;~ MsgBox,% parameter
-			Iniread,tempContent,%ThisFlowFolder%\%ThisFlowFilename%.ini,Trigger%index1%,%parameter3%
-			if (tempContent=="ERROR")
-					tempContent=%parameter2%
-			;~ MsgBox,% tempContent "-" parameter2 "`n" trigger1ahk_class
-			StringReplace, tempContent, tempContent, |¶,`n, All
-			;~ setParameter(loadElementID,parameter3,tempContent
-			%loadElementID%%parameter3%=%tempContent%
+			
+			tempparname1=
+			tempparname2=
+			tempdefault1=
+			tempdefault2=
+			StringSplit,tempparname,parameter3,; ;get the parameter names if it has more than one
+			StringSplit,tempdefault,parameter2,; ;get the default parameter
+			
+			;Certain types of control consist of multiple controls and thus contain multiple parameters.
+			loop,%tempparname0%
+			{
+				tempCurrentParName:=tempparname%a_index%
+				Iniread,tempContent,%ThisFlowFolder%\%ThisFlowFilename%.ini,Trigger%index1%,%tempCurrentParName%,ẺⱤᶉӧɼ
+				if (tempContent=="ẺⱤᶉӧɼ")
+				{
+					;~ MsgBox element %loadElementID% parameter %parameter3% nicht vorhanden setze es auf %parameter2%
+					tempContent:=tempdefault%a_index%
+				}
+				StringReplace, tempContent, tempContent, |¶,`n, All
+				%loadElementID%%tempCurrentParName%=%tempContent%
+			}
+		
+			
+			
 		}
 			
 			
@@ -183,6 +234,7 @@
 		
 	}
 	
+	logger("a1","Flow " FlowName " was successfully loaded.")
 	ToolTip(lang("loaded"),1000)
 	e_UpdateTriggerName()
 	
@@ -191,7 +243,7 @@
 	menu,tray,tip,% lang("Flow %1%",flowName)
 	
 	ui_EnableMainGUI()
-	d_logger("Flow loaded`nName: "FlowName)
+	
 	ui_draw()
 	saved=yes
 	busy:=false
@@ -203,6 +255,7 @@ i_loadGeneralParameters()
 	
 	Iniread,FlowName,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,name
 	Iniread,FlowCategory,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,category
+	Iniread,SettingFlowLogToFile,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,LogToFile
 	
 	GuiControl,CommandWindow:text,CommandWindowFlowName,Ѻ%flowName%Ѻ ;Set the name of the flow as text in the hidden window. So the other ahks can find the right window
 	

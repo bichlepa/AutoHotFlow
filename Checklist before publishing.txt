@@ -1,0 +1,3 @@
+- Write down new version number and the changes into Base Frame 
+- Run the translation tool
+- Run the huge test flow

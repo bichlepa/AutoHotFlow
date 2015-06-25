@@ -13,6 +13,7 @@ goto,jumpOverGUIStuff
 
 CreateMainGUI:
 gui,1:default
+
 ;Create main GUI
 gui,font,s15
 Gui, Add, TreeView, gTreeView x10 y10 w300 h500 -ReadOnly AltSubmit ImageList%IconList%
@@ -29,18 +30,15 @@ gui,add,Button,vButtonRunFlow gButtonRunFlow Disabled X+10 yp w200 h30,% lang("R
 gui,add,Button,vButtonSelectLanguage gButtonSelectLanguage  X330 Y+100 w200 h30,% lang("Change_Language")
 gui,add,Button,vButtonHelp gButtonHelp X+10 yp w200 h30,% lang("Help")
 gui,add,Button,vButtonSettings gButtonSettings  X330 Y+30 w200 h30,% lang("Settings")
+gui,add,Button,vButtonAbout gButtonAbout  X330 Y+30 w200 h30,% lang("About AutoHotFlow")
 
-if 1=AutomaticStartup
-{
-	Gui, Show,hide, % "•AutoHotFlow• " lang("Manager")  ; Hide the window if automatic startup
-	
-}
-else
-	Gui, Show,, % "•AutoHotFlow• " lang("Manager")  ; Show the window and its TreeView.
 
+Gui, Show,hide, % "•AutoHotFlow• " lang("Manager")  ; Do not show window while loading flows. Otherway the treeview will not show the plus signs
 
 
 return
+
+
 
 ShowMainGUI:
 
@@ -175,7 +173,7 @@ if A_GuiEvent =E ;If user has renamed an entry
 		}
 		else if %tempSelectedID%type=flow ;If the item is a flow
 		{
-			if (OutputVar<>"" and (IDOfName(OutputVar,"Flow")="" or (!(OutputVar==%tempSelectedID%name) and IDOfName(OutputVar,"Flow")=tempSelectedID))) ;It will only be renamed if the user didn't enter an empty name and there isn't already a flow with the same name. It wil also rename if user only changed the case of a letter.
+			if ((OutputVar<>"") and (IDOfName(OutputVar,"Flow")="" )) ;It will only be renamed if the user didn't enter an empty name and there isn't already a flow with the same name. 
 			{
 				%tempSelectedID%name:=OutputVar
 				SaveFlow(tempSelectedID)
@@ -318,6 +316,14 @@ else if %tempselectedID%type=category
 removeUncategorizedCategoryIfPossible()
 EnableMainGUI()
 return
+
+ButtonAbout:
+goto,BaseFrame_About
+
+
+return
+
+
 
 jumpOverGUIStuff:
 temp= ;Do nothing

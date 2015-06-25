@@ -3,23 +3,39 @@ i_save()
 {
 	global
 	
+	local saveCopyOfallElements
+	local saveCopyOfallTriggers
+	local saveElementType
+	local saveElementID
+	local saveElementfrom
+	local saveElementConnectionType
+	local saveElementfromPart
+	local saveElementtoPart
+	local saveElementX
+	local saveElementY
+	local saveElementname
+	local saveElementsubType
+	local saveElementHeightOfVerticalBar
+	local temponeparname
+	local SaveContent
+	local parametersToSave
 	
 	ui_DisableMainGUI()
 	busy:=true
 	GetKeyState,k,control,p 
-	if (ThisFlowFilename="" or k="d")
-	{
-		FileSelectFile,ThisFlowFilePath,S24,Saved Flows,Save flow, *.ini
-		if errorlevel
-		{
+	;~ if (ThisFlowFilename="" or k="d") ;this cannot happen anymore
+	;~ {
+		;~ FileSelectFile,ThisFlowFilePath,S24,Saved Flows,Save flow, *.ini
+		;~ if errorlevel
+		;~ {
 			
-			ui_EnableMainGUI()
-			return
-		}
-		SplitPath,ThisFlowFilePath,,ThisFlowFolder,,ThisFlowFilename
-	}
+			;~ ui_EnableMainGUI()
+			;~ return
+		;~ }
+		;~ SplitPath,ThisFlowFilePath,,ThisFlowFolder,,ThisFlowFilename
+	;~ }
 
-	
+	logger("a1","Saving flow " FlowName)
 	ToolTip(lang("saving"),100000)
 	
 	FileCreateDir,%ThisFlowFolder%
@@ -27,10 +43,12 @@ i_save()
 	IniWrite,%ID_count%,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,count
 	IniWrite,%SettingFlowExecutionPolicy%,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,SettingFlowExecutionPolicy
 	IniWrite,%SettingWorkingDir%,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,SettingWorkingDir
+	IniWrite,%SettingFlowLogToFile%,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,LogToFile
 	IniWrite,%flowName%,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,name
 	IniWrite,%FlowCategory%,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,category
 	IniWrite,%FlowCompabilityVersionOfApp%,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,FlowCompabilityVersion
 	saveCopyOfallElements:=allElements.clone()
+	saveCopyOfallTriggers:=allTriggers.clone()
 	
 	for SaveIndex1, element in saveCopyOfallElements
 	{
@@ -116,7 +134,7 @@ i_save()
 			
 		}
 	}
-	saveCopyOfallTriggers:=allTriggers.clone()
+	
 	for SaveIndex1, tempSaveElement in saveCopyOfallTriggers
 	{
 		saveElementID:=tempSaveElement
@@ -148,7 +166,7 @@ i_save()
 		
 	}
 	Filedelete,%ThisFlowFolder%\%ThisFlowFilename%backup.ini
-	
+	logger("a1","Flow " FlowName " was successfully saved.")
 	ToolTip(lang("saved"))
 	ui_EnableMainGUI()
 	saved=yes

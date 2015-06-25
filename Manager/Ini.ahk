@@ -8,7 +8,7 @@ if LastExecutionTime=
 
 
 iniread,UILang,settings.ini,common,UILanguage
-iniwrite,%a_now%,settings.ini,common,LastExecutionTime
+
 if uilang=error
 {
 	if A_Language=0407
@@ -16,6 +16,11 @@ if uilang=error
 	else
 		uilang=en
 }
+
+;Write information into settings file
+iniwrite,%a_now%,settings.ini,common,LastExecutionTime
+iniwrite,%HiddenGUIHWND%,settings.ini,common,Hidden window ID of manager
+
 
 loadSavedFlows()
 {
@@ -32,19 +37,21 @@ loadSavedFlows()
 		StringTrimRight,filenameNoExt,A_LoopFileName,4
 		iniread, tempflowName,%A_LoopFileFullPath%,general,name
 		
-		if (filenameNoExt!=tempflowName)
-		{
-			;MsgBox %tempflowName%
-			FileMove,Saved Flows\%filenameNoExt%.ini,Saved Flows\%tempflowName%.ini
-			if not errorlevel
-			{
-				;MsgBox  Saved Flows\%filenameNoExt%.ini - Saved Flows\%tempflowName%.ini
-				FileFullPath=Saved Flows\%tempflowName%.ini
-			}
-			else
-				FileFullPath:=A_LoopFileFullPath
-		}
-		else
+		;~ if (filenameNoExt!=tempflowName) ;renaming flow ini files is risky. Instead a feature flow export should be implemented
+		;~ {
+			
+			
+			;~ ;MsgBox %tempflowName%
+			;~ FileMove,Saved Flows\%filenameNoExt%.ini,Saved Flows\%tempflowName%.ini
+			;~ if not errorlevel
+			;~ {
+				;~ ;MsgBox  Saved Flows\%filenameNoExt%.ini - Saved Flows\%tempflowName%.ini
+				;~ FileFullPath=Saved Flows\%tempflowName%.ini
+			;~ }
+			;~ else
+				;~ FileFullPath:=A_LoopFileFullPath
+		;~ }
+		;~ else
 			FileFullPath:=A_LoopFileFullPath
 		
 		iniread, tempflowcategory,%FileFullPath%,general,category,%a_space% 

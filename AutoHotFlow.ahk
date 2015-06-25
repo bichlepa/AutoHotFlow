@@ -22,12 +22,26 @@ if a_iscompiled=1
 else
 	editorPath=Editor.ahk
 
+;Create folder for global variables
+FileCreateDir,Global variables
+FileCreateDir,Saved Flows\Static variables
+
+
+;Create a hidden window to recieve commands
+gui,45:default
+gui,new,,CommandWindowOfManager
+gui,add,edit,vCommandWindowRecieve gCommandWindowRecieve
+gui,45:+HwndHiddenGUIHWND
+
+
+
 #Include %a_scriptdir%
 #Include manager\ini.ahk
 #include language\language.ahk
 #Include manager\functions of manager.ahk
 #Include manager\settings of flows.ahk
 #Include manager\tray.ahk
+#Include manager\about.ahk
 #Include manager\Main GUI.ahk
 #Include manager\settings\s_language.ahk
 #Include manager\settings\s_settings.ahk
@@ -35,18 +49,16 @@ else
 
 
 
-;Create folder for global variables
-FileCreateDir,Global variables
-
-
-;Create a hidden window to recieve commands
-gui,45:default
-gui,new,,CommandWindowOfManager
-gui,add,edit,vCommandWindowRecieve gCommandWindowRecieve
 
 gosub,CreateMainGUI
 
 loadSavedFlows()
+if (1!="AutomaticStartup")
+	gosub,ShowMainGUI
+
+
+
+gosub,ShowMainGUI
 
 SetTimer,regularStatusUpdateOfFlows,5000
 return
@@ -116,24 +128,6 @@ else if CommandWindowRecieve1=Disabled ;Show that a flow is disabled
 		guicontrol,,ButtonEnableFlow,% lang("Disable")
 	else
 		guicontrol,,ButtonEnableFlow,% lang("Enable")
-	
-}
-else if CommandWindowRecieve1=SetGlobalVariable 
-{
-	setGlobalVariable(CommandWindowRecieve2,CommandWindowRecieve3)
-	
-}
-else if CommandWindowRecieve1=DeleteGlobalVariable 
-{
-	deleteGlobalVariable(CommandWindowRecieve2)
-	
-}
-else if CommandWindowRecieve1=GetGlobalVariable 
-{
-	
-	tempgetValue:=getGlobalVariable(CommandWindowRecieve2)
-;MsgBox globale Variable %CommandWindowRecieve2% = %tempgetValue%  angefragt
-	ControlSetText,edit1,ReturnGlobalVariable|%tempgetValue%| ,CommandWindowOfEditor,% "Ѻ" CommandWindowRecieve3 "Ѻ" ;Send the command to the Editor.
 	
 }
 else if CommandWindowRecieve1=ExecuteFlow ;Run a flow
@@ -311,6 +305,9 @@ shuttingDown=true
 	
 ;~ }
 exitapp
+
+BaseFrame_About:
+return
 
 /*
 f10::

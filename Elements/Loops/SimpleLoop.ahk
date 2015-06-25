@@ -8,7 +8,7 @@ runLoopSimpleLoop(InstanceID,ThreadID,ElementID,ElementIDInInstance,HeadOrTail)
 	{
 		
 		
-		v_SetVariable(InstanceID,ThreadID,"A_Index",1,,true)
+		v_SetVariable(InstanceID,ThreadID,"A_Index",1,,c_SetLoopVar)
 		
 		
 		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normalHead")
@@ -19,7 +19,7 @@ runLoopSimpleLoop(InstanceID,ThreadID,ElementID,ElementIDInInstance,HeadOrTail)
 		
 		if (%ElementID%Infinite =1 || tempindex < v_EvaluateExpression(InstanceID,ThreadID,%ElementID%repeatCount)) ;If infinite loop or index has not reached the aim value
 		{
-			v_SetVariable(InstanceID,ThreadID,"A_Index",tempindex+1,,true)
+			v_SetVariable(InstanceID,ThreadID,"A_Index",tempindex+1,,c_SetLoopVar)
 			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normalHead")
 		}
 		else

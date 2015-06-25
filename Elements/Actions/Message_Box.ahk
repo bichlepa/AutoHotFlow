@@ -24,9 +24,9 @@ runActionMessage_Box(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	
 	;Create GUI
 	gui,%tempGUILabel%:+LabelMessageBoxGUI ;This label leads to a jump label beneath. It's needed if user closes the window
-	gui,%tempGUILabel%:add,text,x10 w320 h100, % tempText
+	gui,%tempGUILabel%:add,text,, % tempText
 	gui,%tempGUILabel%:add,button,x10 w150 h30 gActionMessage_BoxButtonOK Default,% lang("OK")
-	gui,%tempGUILabel%:show,w330 h150 ,% tempTitle
+	gui,%tempGUILabel%:show,,% tempTitle
 	
 	;Add the label to the list of all GUI labels, so it can be found.
 	ActionMessage_BoxAllGUIs.insert(tempGUILabel,tempNew)

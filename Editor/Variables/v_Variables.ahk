@@ -1,4 +1,4 @@
-﻿AllBuiltInVars:="-A_Space-A_Tab-A_YYYY-A_Year-A_MM-A_Mon-A_DD-A_MDay-A_MMMM-A_MMM-A_DDDD-A_DDD-A_WDay-A_YDay-A_Hour-A_Min-A_Sec-A_MSec-A_TickCount-A_TimeIdle-A_TimeIdlePhysical-A_Temp-A_OSVersion-A_Is64bitOS-A_PtrSize-A_Language-A_ComputerName-A_UserName-A_ScriptDir-A_WinDir-A_ProgramFiles-A_AppData-A_AppDataCommon-A_Desktop-A_DesktopCommon-A_StartMenu-A_StartMenuCommon-A_Programs-A_ProgramsCommon-A_Startup-A_StartupCommon-A_MyDocuments-A_IsAdmin-A_ScreenWidth-A_ScreenHeight-A_ScreenDPI-A_IPAddress1-A_IPAddress2-A_IPAddress3-A_IPAddress4-A_Cursor-A_CaretX-A_CaretY-----" ;a_now and a_nowutc not included
+﻿AllBuiltInVars:="-A_Space-A_Tab-A_YYYY-A_Year-A_MM-A_Mon-A_DD-A_MDay-A_MMMM-A_MMM-A_DDDD-A_DDD-A_WDay-A_YDay-A_Hour-A_Min-A_Sec-A_MSec-A_TickCount-A_TimeIdle-A_TimeIdlePhysical-A_Temp-A_OSVersion-A_Is64bitOS-A_PtrSize-A_Language-A_ComputerName-A_UserName-A_ScriptDir-A_WinDir-A_ProgramFiles-A_AppData-A_AppDataCommon-A_Desktop-A_DesktopCommon-A_StartMenu-A_StartMenuCommon-A_Programs-A_ProgramsCommon-A_Startup-A_StartupCommon-A_MyDocuments-A_IsAdmin-A_ScreenWidth-A_ScreenHeight-A_ScreenDPI-A_IPAddress1-A_IPAddress2-A_IPAddress3-A_IPAddress4-A_Cursor-A_CaretX-A_CaretY-----" ;a_now and a_nowutc not included, they will be treated specially
 
 v_replaceVariables(InstanceID,ThreadID,String,VariableType="asIs")
 {
@@ -16,26 +16,18 @@ v_replaceVariables(InstanceID,ThreadID,String,VariableType="asIs")
 
 
 
-
-
-v_deleteLocalVariable(InstanceID,name)
-{
-	global
-	
-	Instance_%InstanceID%_LocalVariables.Remove(name)
-	return value
-	
-}
-
 v_getVariable(InstanceID,ThreadID,name,VariableType="asIs")
 {
 	global
 	local tempvalue
 	local templeft
 	local tempGlobalVariable
+	local temp
 	
-	StringLeft,templeft,name,7
-	if templeft=global_ ;If variable is global
+	logger("f3","Retrieving variable " name " as type " VariableType)
+	
+
+	if (substr(name,1,7)="global_") ;If variable is global
 	{
 		
 		if fileexist("global variables\" name ".txt")
@@ -53,6 +45,7 @@ v_getVariable(InstanceID,ThreadID,name,VariableType="asIs")
 				}
 				else if a_loopfield=[date]
 				{
+					
 					StringTrimLeft,tempvalue,tempvalue,7 ;Remove [date]
 					
 					if (VariableType!="Date" and VariableType!="asIs")
@@ -79,10 +72,17 @@ v_getVariable(InstanceID,ThreadID,name,VariableType="asIs")
 			}
 			if (done=false) ;It seems to be binary data
 			{
-				if (VariableType!="binary" and VariableType!="asIs")
-					FileRead,tempvalue,*c global variables\%name%.txt
-				else
+				
+				;~ if (VariableType!="binary" and VariableType!="asIs") ;binary data disabled
+				;~ {
+					;~ logger("f3","Global variable " name "has no type. It is assumed to be binary. It is set.")
+					;~ FileRead,tempvalue,*c global variables\%name%.txt
+				;~ }
+				;~ else
+				;~ {
+					logger("f0a0","Global variable " name "has no type. It won't be set.")
 					return
+				;~ }
 			}
 			
 			
@@ -91,10 +91,36 @@ v_getVariable(InstanceID,ThreadID,name,VariableType="asIs")
 			
 		}
 		else
+		{
+			
+		logger("f1","Global variable " name "does not exist.")
 			return
+		}
 	}
 	else if (substr(name,1,2)="A_") ; if variable is a built in variable or a thread variable
 	{
+		tempvalue=
+		
+		
+		if Instance_%InstanceID%_Thread_%ThreadID%_Variables.HasKey(name)
+		{
+			logger("f3","Retrieving built in variable " name)
+			tempvalue:=Instance_%InstanceID%_Thread_%ThreadID%_Variables[name] 
+			return tempvalue
+		}
+		if Instance_%InstanceID%_Thread_%ThreadID%_Variables.HasKey(c_loopVarsName)
+		{
+			
+			temp:=Instance_%InstanceID%_Thread_%ThreadID%_Variables[c_loopVarsName]
+			;~ MsgBox % strobj(temp)
+			if temp.HasKey(name)
+			{
+				logger("f3","Retrieving loop variable " name)
+				tempvalue:=temp[name] 
+				return tempvalue
+			}
+		}
+		logger("f3","Retrieving built in variable " name)
 		if (name="a_now" || name="A_NowUTC")
 		{
 			
@@ -140,25 +166,27 @@ v_getVariable(InstanceID,ThreadID,name,VariableType="asIs")
 		else IfInString,AllBuiltInVars,-%name%-
 		{
 			tempvalue:=%name%
-			
-		}
-		else
-			tempvalue:=Instance_%InstanceID%_Thread_%ThreadID%_Variables[name] 
+			return tempvalue
+		} 
 		
-		return tempvalue
+		
 		
 	}
 	else ; if variable is a local variable
 	{
+		logger("f3","Retrieving local variable " name)
 		tempvalue:=Instance_%InstanceID%_LocalVariables[name]
 		if isobject(tempvalue)
 		{
 			
 			if (VariableType="asIs" or VariableType="list")
+			{
+				logger("f3","Local variable " name " is a list. Returning the list.")
 				return tempvalue
+			}
 			else
 			{
-				
+				logger("f3","Local variable " name " is a list. Converting the list to a string.")
 				return StrObj(tempvalue)
 			}
 			
@@ -174,18 +202,28 @@ v_getVariable(InstanceID,ThreadID,name,VariableType="asIs")
 			else if templeft=└
 			{
 				if VariableType=Normal
+				{
+					logger("f3","Local variable " name " is a date. Converting the date to a string.")
 					return v_exportVariable(tempvalue,"date","`n") 
+				}
 				else
 				{
+					logger("f3","Local variable " name " is a date. Returning the date.")
 					return tempvalue
 				}
 			}
-			else ;Binary data
+			else ;No type. Binary data disabled
 			{
-				if VariableType=binary
-					return tempvalue
-				else
+				;~ if VariableType=binary
+				;~ {
+					;~ logger("f3","Local variable " name " is binary. Returning the binary data.")
+					;~ return tempvalue
+				;~ }
+				;~ else
+				;~ {
+					logger("f0a0","Local variable " name " has not type. Returning empty string.")
 					return
+				;~ }
 			}
 			
 		}
@@ -194,32 +232,49 @@ v_getVariable(InstanceID,ThreadID,name,VariableType="asIs")
 	
 	
 }
-v_setVariable(InstanceID,ThreadID,name,value,VariableType="Normal",whetherToSetThreadVar=0)
+v_setVariable(InstanceID,ThreadID,name,value,VariableType="Normal",Permissions=0)
 {
 	global
 	local tempstring
 	local templeft
 	local tempvalue
+	local temp
 	
 	;Refuse setting a variable that begins with "a_". But set thread var if it is designated
 	if (substr(name,1,2)="A_")
 	{
-		if (whetherToSetThreadVar=true)
+		if (Permissions=c_SetBuiltInVar)
 		{
-			
-			
-			
+			logger("f2","Setting thread variable " name ". Permission is given.")
 			Instance_%InstanceID%_Thread_%ThreadID%_Variables.insert(name,value)
+		}
+		else if (Permissions=c_SetLoopVar)
+		{
+			logger("f2","Setting loop variable " name ". Permission is given.")
+			temp:=Instance_%InstanceID%_Thread_%ThreadID%_Variables[c_loopVarsName]
+			if not isobject(temp)
+			{
+				
+				temp:=Object()
+			}
+			temp[name]:=value
+			
+			Instance_%InstanceID%_Thread_%ThreadID%_Variables[c_loopVarsName]:=temp
 			
 		}
 		else
+		{
+			logger("f0","Setting built in variable " name " failed. No permission given.")
 			return "ERROR"
+		}
+		return
 	}
 	
 	;MsgBox % var "  " value
 	StringLeft,templeft,name,7
 	if templeft=global_ ;If variable is global
 	{
+		logger("f3","Setting global variable " name ".")
 		if isobject(value)
 		{
 			tempstring=[List]`n
@@ -239,39 +294,49 @@ v_setVariable(InstanceID,ThreadID,name,value,VariableType="Normal",whetherToSetT
 				FileDelete,global variables\%name%.txt
 				FileAppend,[Normal]`n%value%,global variables\%name%.txt,UTF-8
 			}
-			else if variableType=binary
-			{
-				FileDelete,global variables\%name%.txt
-				FileAppend,%value%,*global variables\%name%.txt
-			}
+			;~ else if variableType=binary ;binary data disabled
+			;~ {
+				;~ FileDelete,global variables\%name%.txt
+				;~ FileAppend,%value%,*global variables\%name%.txt
+			;~ }
 			else if variableType=date
 			{
 				FileDelete,global variables\%name%.txt
 				FileAppend,[Date]`n%value%,global variables\%name%.txt,UTF-8
 			}
+			else
+				logger("f0","Setting built in variable " name " failed. No type specified.")
 			
 			
 		}
-		
+		return
 	}
 	else ;if variable is local
 	{
+		logger("f3","Setting local variable " name ".")
 		;insert the local variable
 		;The first character will contain the information about the variable type
 		if VariableType=normal
 			Instance_%InstanceID%_LocalVariables.insert(name,"●" value)
-		else if VariableType=binary
-			Instance_%InstanceID%_LocalVariables.insert(name, value)
+		;~ else if VariableType=binary
+			;~ Instance_%InstanceID%_LocalVariables.insert(name, value)
 		else if VariableType=date
+		{
+			
 			Instance_%InstanceID%_LocalVariables.insert(name,"└" value)
+		}
 		else if VariableType=list
 		{
 			if isobject(value)
 				Instance_%InstanceID%_LocalVariables.insert(name,value)
 			else
-				MsgBox Internal error! A list should be created but it is not an object.
+			{
+				logger("a0","Error! A list " name "should be created but it is not an object.")
+			}
 		}
-		
+		else
+			logger("f0","Setting local variable " name " failed. No type specified.")
+		return
 	}
 	return 
 	
@@ -286,29 +351,8 @@ v_getVariableType(InstanceID,ThreadID,name)
 	local tempfirstline
 	local done:=false
 	StringLeft,templeft,name,7
+	logger("f3","Getting variable type of " name ".")
 	if templeft=global_
-	{
-		IniRead,tempvalue,Global_Variables.ini,%VariableType%,%name%,%A_Space%
-	}
-	else if (substr(name,1,2)="A_")
-	{
-		if (name="a_now" || name="A_NowUTC")
-		{
-			return "date"
-			
-		}
-		else
-			return "normal"
-		
-	}
-	else
-		tempvalue:=Instance_%InstanceID%_LocalVariables[name]
-	
-	if isobject(tempvalue)
-	{
-		return "list"
-	}
-	else
 	{
 		if fileexist("global variables\" name ".txt")
 		{
@@ -327,18 +371,88 @@ v_getVariableType(InstanceID,ThreadID,name)
 				return "list"
 			}
 			else
-				return "binary"
+				return "unknown" ;Binary type disabled
 			
 			
 			
 		}
 		else
 			return
+	}
+	else if (substr(name,1,2)="A_")
+	{
+		
+		if (name="a_now" || name="A_NowUTC" || name="a_triggertime")
+		{
+			return "date"
+			
+		}
+		else if (name="a_loopcurrentlist")
+		{
+			return "list"
+			
+		}
+		else
+			return "normal"
 		
 	}
-	
+	else
+	{
+		tempvalue:=Instance_%InstanceID%_LocalVariables[name]
+		
+		if isobject(tempvalue)
+		{
+			return "list"
+		}
+		else
+		{
+			StringLeft,templeft,tempvalue,1
+			StringTrimLeft,tempvalue,tempvalue,1
+			
+			if templeft=●
+				return "normal"
+			else if templeft=└
+				return "date"
+		}
+	}
 }
 
+getVariableLocation(InstanceID,ThreadID,name)
+{
+	global
+	if (substr(name,1,2)="a_")
+	{
+		
+		;~ MsgBox adsgf
+		if Instance_%InstanceID%_Thread_%ThreadID%_Variables.HasKey(name)
+		{
+			
+			return "Thread"
+		}
+		if Instance_%InstanceID%_Thread_%ThreadID%_Variables[c_loopVarsName].HasKey(name)
+		{
+			return "loop"
+		}
+	}
+	else if (substr(name,1,7)="global_")
+	{
+		if fileexist("global variables\" name ".txt")
+			return "global"
+		
+	}
+	else ;Seems to be local
+	{
+		if Instance_%InstanceID%_LocalVariables.HasKey(name)
+			return "local"
+	}
+	;~ MsgBox not found
+	return
+}
+
+
+
+
+;Convert variable content to string.
 v_exportVariable(content,type,delimiters="▬")
 {
 	local tempName
@@ -367,6 +481,7 @@ v_exportVariable(content,type,delimiters="▬")
 	return content
 }
 
+;Generate variable content from string.
 v_importVariable(content,type,delimiters="▬")
 {
 	local result
@@ -384,59 +499,157 @@ v_importVariable(content,type,delimiters="▬")
 	return result
 }
 
-;Export list to a string. It is used for saving the list in ini as global variable
-v_exportList(List)
-{
-	return "≡savedList"
-	
-}
-;Imports list from a string. It is used for getting the list from ini
-v_importList(List)
-{
-	local tempObject:=Object()
-	tempObject.insert("imported List")
-	return tempObject
-	
-}
 
 
-v_deleteVariable(InstanceID,name)
+;Delete a variable
+v_deleteVariable(InstanceID,ThreadID,name,Permission="")
 {
 	global
-	StringLeft,templeft,name,7
-	if templeft=global_
-		ControlSetText,edit1,DeleteGlobalVariable|%name%|,CommandWindowOfManager ;Tell the Manager to delete the variable
+	logger("f3","Deleting variable " name ".")
+
+	if (substr(name,1,7)= "global_")
+	{
+		logger("f3","Deleting global variable " name)
+		FileDelete,global variables\%name%.txt
+	}
+	else if (substr(name,1,2)= "a_")
+	{
+		if Instance_%InstanceID%_Thread_%ThreadID%_Variables.HasKey(name)
+		{
+			logger("f3","Deleting built in variable " name)
+			Instance_%InstanceID%_Thread_%ThreadID%_Variables.delete(name)
+			
+		}
+		else if Instance_%InstanceID%_Thread_%ThreadID%_Variables[c_loopVarsName].HasKey(name)
+		{
+			logger("f3","Deleting loop variable " name)
+			Instance_%InstanceID%_Thread_%ThreadID%_Variables[c_loopVarsName].delete(name)
+			
+		}
+		
+		
+	}
 	else
 	{
-		v_deleteLocalVariable(InstanceID,name)
+		logger("f3","Deleting local variable " name)
+		Instance_%InstanceID%_LocalVariables.Remove(name)
 	}
+	
 	return 
 	
 }
 
 
 
+v_ImportLocalVariablesFromString(InstanceID,string)
+{
+	global
+	local temp
+	local templeft
+	local tempVarContent
+	local tempVarName
+	local temppos
+	
+	;~ MsgBox --- %string%
+	loop, parse,string ,◘
+	{
+		;~ MsgBox sdf %A_LoopField%
+		
+		StringGetPos,temppos,A_LoopField,=
+		if temppos!=
+		{
+			stringleft,tempVarName,A_LoopField,% temppos
+			StringTrimLeft,tempVarContent,A_LoopField,% temppos+1
+			
+			StringLeft,templeft,tempVarContent,1
+			StringTrimLeft,tempVarContent,tempVarContent,1
+			
+			if templeft=●
+			{
+				v_setVariable(InstanceID,1,tempVarName,tempVarContent,"normal")
+				
+			}
+			else if templeft=└
+			{
+				;~ MsgBox fasdf %tempVarName% = %tempVarContent%
+				v_setVariable(InstanceID,1,tempVarName,tempVarContent,"date")
+				
+			}
+			else if templeft=╒
+			{
+				;~ StringReplace,tempVarContent,tempVarContent,◙,`n,all
+				v_setVariable(InstanceID,1,tempVarName,strobj(tempVarContent) ,"list")
+				
+			}
+			;~ else ;Binary data not supported
+			;~ {
+				;~ v_setVariable(InstanceID,1,tempVarName,tempVarContent,"binary")
+			;~ }
+		}
+	}
+	
+	
+	return
+}
+
 v_WriteLocalVariablesToString(InstanceID)
 {
 	global
-	tempReturnString=
+	local tempReturnString
+	local temp
+	local templeft
+	local tempVarName
+	local tempVarValue
+	
 	for tempVarName, tempVarValue in %InstanceID%_LocalVariables
 	{
-		tempReturnString=%tempVarName%=%tempVarValue%◘
+		if IsObject(tempVarValue)
+		{
+			temp:=strobj(tempVarValue)
+			;~ StringReplace,temp,temp,`n`r,◙,all
+			tempReturnString.=tempVarName "=" "╒" temp "◘"
+		}
+		else
+		{
+			StringLeft,templeft,tempVarContent,1
+			if (templeft!="└" and templeft !="●")
+				tempReturnString.=tempVarName "=" tempVarValue "◘"
+		}
 	}
 	StringTrimRight,tempReturnString,tempReturnString,1
+	;~ MsgBox %tempReturnString%
 	return tempReturnString
 }
+
+
 
 
 PrepareEnteringALoop(InstanceID,ThreadID,LoopElement)
 {
 	global
+	local temp
+	local tempclone
 	;~ MsgBox % StrObj(Instance_%InstanceID%_Thread_%ThreadID%_Variables)
-	local temp:=%InstanceID%_Thread_%ThreadID%_Variables.clone()
-	%InstanceID%_Thread_%ThreadID%_Variables:=Object()
-	%InstanceID%_Thread_%ThreadID%_Variables.insert("OldLoopVars",temp)
-	%InstanceID%_Thread_%ThreadID%_Variables.insert("CurrentLoop",LoopElement)
+	;~ MsgBox % " -dfsd--" strobj(%InstanceID%_Thread_%ThreadID%_Variables)
+	if %InstanceID%_Thread_%ThreadID%_Variables.HasKey(c_loopVarsName)
+	{
+		
+		local temp:=%InstanceID%_Thread_%ThreadID%_Variables[c_loopVarsName]
+		;~ MsgBox % " -d--" strobj(temp)
+		if isobject(temp)
+		{
+			local tempclone:=temp.clone()
+			
+			temp["OldLoopVars"]:=tempclone
+		}
+		
+	}
+	else
+		temp:=Object()
+	
+	temp["CurrentLoop"]:=LoopElement
+	;~ MsgBox % " ---" strobj(temp)
+	%InstanceID%_Thread_%ThreadID%_Variables[c_loopVarsName]:=temp
 	;~ MsgBox % StrObj(temp)
 	
 }
@@ -447,7 +660,9 @@ PrepareLeavingALoop(InstanceID,ThreadID,LoopElement)
 	global
 	;~ MsgBox % StrObj(Instance_%InstanceID%_Thread_%ThreadID%_Variables)
 	;~ MsgBox % LoopElement " - " %InstanceID%_Thread_%ThreadID%_Variables["CurrentLoop"]
-	%InstanceID%_Thread_%ThreadID%_Variables:=%InstanceID%_Thread_%ThreadID%_Variables["OldLoopVars"]
+	local temp:=%InstanceID%_Thread_%ThreadID%_Variables[c_loopVarsName]
+	local tempOld:=temp["OldLoopVars"]
+	%InstanceID%_Thread_%ThreadID%_Variables[c_loopVarsName]:=tempOld
 	
 	;~ MsgBox % StrObj(Instance_%InstanceID%_Thread_%ThreadID%_Variables)
 	

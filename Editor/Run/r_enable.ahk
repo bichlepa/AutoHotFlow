@@ -11,6 +11,7 @@ r_EnableFlow(options:="")
 	if (triggersEnabled=true) ;IF the flow is enabled, disable flow
 	{
 		
+		logger("f1a1","Disabling flow.")
 		for tempindex, temptrigger in allTriggers
 		{
 			tempName:=%temptrigger%subType
@@ -27,7 +28,7 @@ r_EnableFlow(options:="")
 	}
 	else ;If the flow is disabled, enable flow
 	{
-		
+		logger("f1a1","Enabling flow.")
 		for tempindex, temptrigger in allTriggers
 		{
 			tempName:=%temptrigger%subType

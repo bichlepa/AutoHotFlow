@@ -1878,7 +1878,6 @@ Gdip_TextToGraphics(pGraphics, Text, Options, Font="Arial", Width="", Height="",
 {
 	IWidth := Width, IHeight:= Height
 	
-	
 	RegExMatch(Options, "i)X([\-\d\.]+)(p*)", xpos)
 	RegExMatch(Options, "i)Y([\-\d\.]+)(p*)", ypos)
 	RegExMatch(Options, "i)W([\-\d\.]+)(p*)", Width)

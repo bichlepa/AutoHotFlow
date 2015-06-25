@@ -50,6 +50,21 @@ pBrushRunning := Gdip_BrushCreateSolid("0x50ff0000") ;Red brush, transparent
 pBrushLastRunning := Gdip_BrushCreateSolid("0x10ff0000") ;Red brush, very transparent
 
 
+TextOptions:=" s" (textSize*zoomFactor) " Center cff000000  Bold"
+TextOptionsmarked:=" s" (textSize*zoomFactor) " Center cff00aa00  Bold"
+TextOptionsRunning:=" s" (textSize*zoomFactor) " Center cffaa0000  Bold"
+
+TextOptionsLeft:=" s" (textSize*zoomFactor) " Left cff000000  Bold"
+TextOptionsLeftmarked:=" s" (textSize*zoomFactor) " Left cff00aa00  Bold"
+TextOptionsLeftRunning:=" s" (textSize*zoomFactor) " Left cffaa0000  Bold"
+
+TextOptionsRight:=" s" (textSize*zoomFactor) " Right cff000000  Bold"
+TextOptionsRightmarked:=" s" (textSize*zoomFactor) " Right  cff00aa00  Bold"
+TextOptionsRightRunning:=" s" (textSize*zoomFactor) " Right  cffaa0000  Bold"
+
+TextOptionsSmall:=" s" (textSize*0.7*zoomFactor) " Center cff000000  Bold"
+TextOptionsTopLabel:=" s20"  "  cff330000  Bold"
+
 ui_Draw()
 {
 	global
@@ -79,7 +94,7 @@ ui_Draw()
 			return
 		}
 		else
-			ui_drawEverything(PicFlow,widthofguipic,heightofguipic)
+			ui_drawEverything(widthofguipic,heightofguipic)
 	}
 
 	DetectHiddenWindows on
@@ -87,7 +102,7 @@ ui_Draw()
 	
 }
 
-ui_DrawEverything(ByRef Variable,bildw,bildh)
+ui_DrawEverything(Posw,Posh)
 {
 	global
 
@@ -100,38 +115,18 @@ ui_DrawEverything(ByRef Variable,bildw,bildh)
 	
 	DrawingRightNow:=true
 	thread, Priority, 0 ;Set normal priority
-	GuiControlGet, hwnd, hwnd, Variable
-	
-	Posw=%bildw%
-	Posh=%bildh%
-	
-	
-	
-	local TextOptions:=" s" (textSize*zoomFactor) " Center cff000000  Bold"
-	local TextOptionsmarked:=" s" (textSize*zoomFactor) " Center cff00aa00  Bold"
-	local TextOptionsRunning:=" s" (textSize*zoomFactor) " Center cffaa0000  Bold"
 
-	local TextOptionsLeft:=" s" (textSize*zoomFactor) " Left cff000000  Bold"
-	local TextOptionsLeftmarked:=" s" (textSize*zoomFactor) " Left cff00aa00  Bold"
-	local TextOptionsLeftRunning:=" s" (textSize*zoomFactor) " Left cffaa0000  Bold"
+	GuiControlGet, hwnd, hwnd, PicFlow
 
-	local TextOptionsRight:=" s" (textSize*zoomFactor) " Right cff000000  Bold"
-	local TextOptionsRightmarked:=" s" (textSize*zoomFactor) " Right  cff00aa00  Bold"
-	local TextOptionsRightRunning:=" s" (textSize*zoomFactor) " Right  cffaa0000  Bold"
-
-	local TextOptionsSmall:=" s" (textSize*0.7*zoomFactor) " Center cff000000  Bold"
-	local TextOptionsTopLabel:=" s20"  "  cff330000  Bold"
-	
-	
 	; Create a gdi+ bitmap the width and height that we found the picture control to be
 	; We will then get a reference to the graphics of this bitmap
 	; We will also set the smoothing mode of the graphics to 4 (Antialias) to make the shapes we use smooth
-	 pBitmap := Gdip_CreateBitmap(Posw, Posh)
-	 G := Gdip_GraphicsFromImage(pBitmap)
+	pBitmap := Gdip_CreateBitmap(Posw, Posh)
+	G := Gdip_GraphicsFromImage(pBitmap)
 	Gdip_SetSmoothingMode(G, 4)
 	
 	
-	if (zoomFactor>0.65)
+	if (zoomFactor>0.70) 
 	{
 		;Draw Grid
 		tempy:=round(Offsety/(Gridy)) * Gridy - 17.5
@@ -757,11 +752,13 @@ ui_DrawEverything(ByRef Variable,bildw,bildh)
 	hBitmap := Gdip_CreateHBITMAPFromBitmap(pBitmap)
 	; ... and set it to the hwnd we found for the picture control
 	
-	
+
 	SetImage(hwnd, hBitmap)
 	
 	;delete bitmaps
-	Gdip_DeleteGraphics(G), Gdip_DisposeImage(pBitmap), DeleteObject(hBitmap)
+	Gdip_DeleteGraphics(G)
+	Gdip_DisposeImage(pBitmap)
+	DeleteObject(hBitmap)
 	
 	DrawingRightNow:=false
 	if (DrawAgain=true)

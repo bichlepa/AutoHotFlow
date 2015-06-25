@@ -9,7 +9,7 @@
 	ClipboardFlowFilename=%A_ScriptDir%\Clipboard.ini
 	
 	ToolTip(lang("saving to clipboard"),100000)
-	
+	logger("a2","Saving elements to clipboard")
 
 
 	
@@ -131,7 +131,15 @@
 	}
 	
 	if saveCounter>0
-		ToolTip(lang("saved %1% elements to clipboard",saveCounter))
+	{
+		logger("a2","Saved %1% elements to clipboard")
+		ToolTip(lang("Saved %1% elements to clipboard",saveCounter))
+	}
+	else
+	{
+		logger("a2","No elements saved to clipboard")
+		ToolTip(lang("No elements selected",saveCounter))
+	}
 	ui_EnableMainGUI()
 	busy:=false
 	

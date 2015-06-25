@@ -23,6 +23,7 @@
 	
 	ClipboardFlowFilename=%A_ScriptDir%\Clipboard.ini
 	
+	logger("a2","Loading elements from clipboard")
 	ToolTip(lang("loading from clipboard"),100000)
 	tempClipboardconnectionList:=Object()
 	markelement()  ;Unmark all elements
@@ -176,12 +177,20 @@
 		if tempClipboardconnection%loadElementID%toPart!=
 			%tempConn%toPart:=tempClipboardconnection%loadElementID%toPart
 	}
+	index1--
+	if index1>0
+	{
+		saved=no
+		logger("a2","Loaded " index1 " elements from clipboard")
+	}
+	else
+		logger("a2","No elements found in clipboard")
+	
 	ToolTip(lang("loaded"),1000)
 	e_UpdateTriggerName()
 	
-	
 	ui_EnableMainGUI()
-	d_logger("Loaded Elements from clipboard")
+	
 	ui_draw()
 
 	busy:=false

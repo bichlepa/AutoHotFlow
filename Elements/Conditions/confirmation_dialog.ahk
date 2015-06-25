@@ -23,10 +23,10 @@ runConditionConfirmation_Dialog(InstanceID,ThreadID,ElementID,ElementIDInInstanc
 	
 	;Create GUI
 	gui,%tempGUILabel%:+LabelConfirmation_DialogGUI ;This label leads to a jump label beneath. It's needed if user closes the window
-	gui,%tempGUILabel%:add,text,x10 w320 h100, % tempText
+	gui,%tempGUILabel%:add,text,x10 , % tempText
 	gui,%tempGUILabel%:add,button,x10 w150 h30 gConditionConfirmation_DialogButtonYes,% lang("Yes")
 	gui,%tempGUILabel%:add,button,X+10 yp w150 h30 gConditionConfirmation_DialogButtonNo,% lang("No")
-	gui,%tempGUILabel%:show,w330 h150 ,% tempTitle
+	gui,%tempGUILabel%:show, ,% tempTitle
 	
 	;Add the label to the list of all GUI labels, so it can be found.
 	ConditionConfirmation_DialogAllGUIs.insert(tempGUILabel,tempNew)

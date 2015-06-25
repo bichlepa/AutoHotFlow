@@ -9,6 +9,7 @@ runActionExecute_Flow(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	if (%ElementID%SendLocalVars)
 	{
 		tempVarsToSend:=v_WriteLocalVariablesToString("Instance_" InstanceID) ;Thread variables won't be sent yet 
+		
 	}
 	if (%ElementID%WaitToFinish)
 	{
@@ -28,6 +29,7 @@ runActionExecute_Flow(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 		sleep 10
 	}
 		;MsgBox ga %returnedFlowIsRunning%
+		
 	if returnedFlowIsRunning=ǸoⱾuchȠaⱮe
 		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 	else if returnedFlowIsRunning=Dἰsḁbled
@@ -47,24 +49,14 @@ runActionExecute_Flow(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 			{
 				if returnedFlowHasFinished_Instance_%InstanceID%_Element_%ElementIDInInstance%!=
 					break
+				if stopRun
+					break
 				sleep 10
 			}
-			if (%ElementID%ReturnVariables)
+			if (%ElementID%ReturnVariables && !(stopRun))
 			{
-				loop, parse, returnedFlowHasFinishedVariables_Instance_%InstanceID%_Element_%ElementIDInInstance%,◘
-				{
-					
-					StringGetPos,temppos,A_LoopField,=
-					if temppos!=
-					{
-						stringleft,tempVarName,A_LoopField,% temppos
-						StringTrimLeft,tempVarContent,A_LoopField,% temppos+1
-						;MsgBox %A_LoopField% %tempVarName% %tempVarContent%
-						v_setVariable(InstanceID,ThreadID,tempVarName,tempVarContent)
-						
-					}
-					
-				}
+				v_ImportLocalVariablesFromString(InstanceID,returnedFlowHasFinishedVariables_Instance_%InstanceID%_Element_%ElementIDInInstance%)
+				
 			}
 		}
 		
@@ -75,6 +67,9 @@ runActionExecute_Flow(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 
 	return
 }
+
+
+
 getNameActionExecute_Flow()
 {
 	return lang("Execute_flow")

@@ -43,18 +43,3 @@
 	MsgBox,debugging
 }
 
-d_logger(textToLog,debugMode=0)
-{
-	global
-	static logFileName
-	
-	if logFileName=
-		logFilename=Log\Log Editor %A_YYYY%.%A_MM%.%A_DD%.txt
-	StringReplace,textToLog,textToLog,`n,`n%a_tab%,all
-	StringReplace,textToLog,textToLog,%a_tab%%a_tab%,%a_tab%,all
-	
-	if (debugmode=1 and developing=yes or debugmode=0)
-		FileAppend,%A_Hour%:%A_Min%:%A_Sec%.%A_MSec%`n	%textToLog%`n,%logFilename%
-	
-	
-}

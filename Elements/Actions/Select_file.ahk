@@ -1,11 +1,9 @@
 ﻿iniAllActions.="Select_file|" ;Add this action to list of all actions on initialisation
-
+ActionSelect_fileToStart:=Object()
 runActionSelect_file(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
-	if (!IsObject(ActionSelect_fileToStart))
-		ActionSelect_fileToStart:=Object()
-	
+		
 	tempInstanceString:="Instance_" InstanceID "_" ThreadID "_" ElementID "_" ElementIDInInstance
 	ActionSelect_fileToStart.insert(tempInstanceString)
 	
@@ -98,7 +96,7 @@ runActionSelect_file(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 
 stopActionSelect_file(ID)
 {
-	
+	ActionSelect_fileToStart:=Object()
 
 }
 

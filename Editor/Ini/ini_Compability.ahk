@@ -9,6 +9,7 @@ i_CheckCompability(ElementID,IndexInIniFile,IniFilePath)
 	if FlowCompabilityVersion<1 ; 2015,06
 	{
 		
+		logger("a2","Flow has elder format than version 1. Tryting to keep compability.")
 		if (%ElementID%type="action" and %ElementID%subtype="Date_Calculation") 
 		{
 			
@@ -18,11 +19,10 @@ i_CheckCompability(ElementID,IndexInIniFile,IniFilePath)
 			
 			
 		}
-		
 	}
 	if FlowCompabilityVersion<2 ; 2015,06
 	{
-		
+		logger("a2","Flow has elder format than version 2. Tryting to keep compability.")
 		if (%ElementID%type="action" and %ElementID%subtype="Get_control_text") 
 		{
 			
@@ -75,6 +75,7 @@ i_CheckCompability(ElementID,IndexInIniFile,IniFilePath)
 			
 			%ElementID%Unit=2 ;The only unit was seconds
 		}
+		
 	}
 	
 	if FlowCompabilityVersion<1000000000 ; Only for test cases. On release this should be empty

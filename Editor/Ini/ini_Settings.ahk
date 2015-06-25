@@ -2,9 +2,11 @@
 ini_ReadSettings()
 {
 	global
-
+	
+	logger("a2","Reading general settings")
 	;Read settings
 	iniread,translationto,settings.ini,common,translatingto
+	iniread,CurrentManagerWindowID,settings.ini,common,Hidden window ID of manager
 	;iniread,developing,settings.ini,common,developing
 
 

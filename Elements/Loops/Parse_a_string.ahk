@@ -45,12 +45,12 @@ runLoopParse_a_string(InstanceID,ThreadID,ElementID,ElementIDInInstance,HeadOrTa
 		}
 		else if tempFound
 		{
-			v_SetVariable(InstanceID,ThreadID,"A_LoopCurrentList",tempList,,true)
-			v_SetVariable(InstanceID,ThreadID,"A_Index",1,,true)
+			v_SetVariable(InstanceID,ThreadID,"A_LoopCurrentList",tempList,,c_SetLoopVar)
+			v_SetVariable(InstanceID,ThreadID,"A_Index",1,,c_SetLoopVar)
 			
 			tempOneElement:=tempList[1]
 			tempList.remove(1)
-			v_SetVariable(InstanceID,ThreadID,"A_LoopField",tempOneElement,,true)
+			v_SetVariable(InstanceID,ThreadID,"A_LoopField",tempOneElement,,c_SetLoopVar)
 			
 			
 			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normalHead")
@@ -64,7 +64,7 @@ runLoopParse_a_string(InstanceID,ThreadID,ElementID,ElementIDInInstance,HeadOrTa
 	{
 		tempindex:=v_GetVariable(InstanceID,ThreadID,"A_Index")
 		tempindex++
-		v_SetVariable(InstanceID,ThreadID,"A_Index",tempindex,,true)
+		v_SetVariable(InstanceID,ThreadID,"A_Index",tempindex,,c_SetLoopVar)
 		
 		tempList:=v_GetVariable(InstanceID,ThreadID,"A_LoopCurrentList")
 		
@@ -77,7 +77,7 @@ runLoopParse_a_string(InstanceID,ThreadID,ElementID,ElementIDInInstance,HeadOrTa
 		{
 			tempOneElement:=tempList[1]
 			tempList.remove(1)
-			v_SetVariable(InstanceID,ThreadID,"A_LoopField",tempOneElement,,true)
+			v_SetVariable(InstanceID,ThreadID,"A_LoopField",tempOneElement,,c_SetLoopVar)
 			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normalHead")
 			
 			
