@@ -3,7 +3,7 @@
 	global
 	;Create tha main gui
 	gui,1:default
-	gui,add,picture,vPicFlow hwndPicFlowHWND x0 y0 0xE gclickOnPicture
+	gui,add,picture,vPicFlow hwndPicFlowHWND x0 y0 0xE gclickOnPicture ;Althogh the picture does not show anything, it is still needed to catch mouse clicks
 	gui,add,StatusBar
 	
 	gui +resize
@@ -11,6 +11,7 @@
 	;This is needed by GDI+
 	gui +lastfound
 	gui,+HwndMainGuihwnd
+	MainGuiHwnddc := GetDC(MainGuihwnd)
 	ControlGetPos,,,,StatusBarHeight,msctls_statusbar321,ahk_id %MainGuihwnd%
 	
 	;Set some hotkeys that are needed in main window

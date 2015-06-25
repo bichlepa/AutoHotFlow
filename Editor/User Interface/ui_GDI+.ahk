@@ -48,6 +48,7 @@ pBrushUnmark := Gdip_BrushCreateSolid("0xfffafafa") ;White brush
 pBrushMark := Gdip_BrushCreateSolid("0x5000ff00") ;Green brush, transparent
 pBrushRunning := Gdip_BrushCreateSolid("0x50ff0000") ;Red brush, transparent
 pBrushLastRunning := Gdip_BrushCreateSolid("0x10ff0000") ;Red brush, very transparent
+pBrushBackground := Gdip_BrushCreateSolid("0xFFeaf0ea") ;Red brush, very transparent
 
 
 TextOptions:=" s" (textSize*zoomFactor) " Center cff000000  Bold"
@@ -116,14 +117,23 @@ ui_DrawEverything(Posw,Posh)
 	DrawingRightNow:=true
 	thread, Priority, 0 ;Set normal priority
 
-	GuiControlGet, hwnd, hwnd, PicFlow
+	;~ GuiControlGet, hwnd, hwnd, PicFlow
 
 	; Create a gdi+ bitmap the width and height that we found the picture control to be
 	; We will then get a reference to the graphics of this bitmap
 	; We will also set the smoothing mode of the graphics to 4 (Antialias) to make the shapes we use smooth
-	pBitmap := Gdip_CreateBitmap(Posw, Posh)
-	G := Gdip_GraphicsFromImage(pBitmap)
-	Gdip_SetSmoothingMode(G, 4)
+	
+hbm := CreateDIBSection(Posw, Posh)
+hdc := CreateCompatibleDC()
+obm := SelectObject(hdc, hbm)
+G := Gdip_GraphicsFromHDC(hdc)
+Gdip_SetSmoothingMode(G, 4)
+
+Gdip_FillRectangle(G, pBrushBackground, 0, 0, posw,posh)
+
+	;~ pBitmap := Gdip_CreateBitmap(Posw, Posh)
+	;~ G := Gdip_GraphicsFromImage(pBitmap)
+	;~ Gdip_SetSmoothingMode(G, 4)
 	
 	
 	if (zoomFactor>0.70) 
@@ -749,17 +759,17 @@ ui_DrawEverything(Posw,Posh)
 	
 	
 	; We then get a gdi bitmap from the gdi+ one we've been working with...
-	hBitmap := Gdip_CreateHBITMAPFromBitmap(pBitmap)
+	;~ hBitmap := Gdip_CreateHBITMAPFromBitmap(pBitmap)
 	; ... and set it to the hwnd we found for the picture control
-	
-
-	SetImage(hwnd, hBitmap)
+	;~ Gdip_DrawImage(G, pBitmap1)
+;~ BitBlt(MainGuiHwnddc, 0, 0, Width, Height, hdc, 0, 0)
+	;~ SetImage(hwnd, hBitmap)
 	
 	;delete bitmaps
-	Gdip_DeleteGraphics(G)
-	Gdip_DisposeImage(pBitmap)
-	DeleteObject(hBitmap)
-	
+	;~ Gdip_DeleteGraphics(G)
+	;~ Gdip_DisposeImage(pBitmap)
+	;~ DeleteObject(hBitmap)
+	BitBlt(MainGuiHwnddc, 0, 0, posw, posh, hdc, 0, 0)
 	DrawingRightNow:=false
 	if (DrawAgain=true)
 	{
