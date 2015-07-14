@@ -2,63 +2,59 @@
 
 FunctionsForElementGetControlInformation:
 ui_disableElementSettingsWindow()
-hotkey,ifwinactive
-hotkey,f12,FunctionsForElementGetControlInformationf12,on
-hotkey,esc,FunctionsForElementGetControlInformationEscape,on
-ToolTip(lang("Get_parameters.") "`n`n" lang("Activate_a_Window_and_press_F12.") "`n`n" lang("If you want to cancel, press Escape"),100000)
-return
+FunctionsForElementGetWindowInformationGetControlInformationAfterwards:=true
+goto,FunctionsForElementGetWindowInformation2
 
-FunctionsForElementGetControlInformationf12:
+FunctionsForElementGetControlInformation2:
 
-ToolTip()
-hotkey,f12,FunctionsForElementGetControlInformationf12,off
-hotkey,esc,FunctionsForElementGetControlInformationEscape,off
+
+
 
 gui,2:default
 gui,submit,nohide
 
-WinGetActiveTitle,tempParWintitle
 
 
-WinGetClass,tempParahk_class,A
 
-
-winget,tempParPID,PID,A
-
-winget,tempParID,ID,A
-
-winget,tempParProcessName,ProcessName,A
-
-
-winget,tempPar,ControlList,A
+winget,tempPar,ControlList,ahk_id %FunctionsForElementGetControlInformationWinID%
 ;~ MsgBox,%tempPar%
 gui, FunctionsForElementGetControlInformation:Default
 
 gui,add,text,w400 ,% lang("Select_a_control_text_which_you_want_to_import")
 gui,add,listbox,w400 h500 AltSubmit vFunctionsForElementGetControlInformationListBoxOfContolTexts gFunctionsForElementGetControlInformationListBoxOfContolTexts
-gui,add,checkbox,w400 vFunctionsForElementGetControlInformationCheckBoxImportUniqueIDs,% lang("Also_import_unique_IDs")
 if (GUISettingsOfElement%setElementID%IdentifyControlBy1=1)
 {
 	gui,add,radio,w400 checked vFunctionsForElementGetControlInformationRadioImportControlText,% lang("Import_Text_in_control")
 	gui,add,radio,w400 vFunctionsForElementGetControlInformationRadioImportControlClassNN,%  lang("Import Classname and instance number of the control")
+	gui,add,radio,w400 vFunctionsForElementGetControlInformationRadioImportControlHWND,%  lang("Import unique control ID of the control")
 }
-else
+else if (GUISettingsOfElement%setElementID%IdentifyControlBy2=1)
 {
 	gui,add,radio,w400 vFunctionsForElementGetControlInformationRadioImportControlText,% lang("Import_Text_in_control")
 	gui,add,radio,w400 checked vFunctionsForElementGetControlInformationRadioImportControlClassNN,%  lang("Import Classname and instance number of the control")
+	gui,add,radio,w400 vFunctionsForElementGetControlInformationRadioImportControlHWND,%  lang("Import unique control ID of the control")
+}
+else if (GUISettingsOfElement%setElementID%IdentifyControlBy3=1)
+{
+	gui,add,radio,w400 vFunctionsForElementGetControlInformationRadioImportControlText,% lang("Import_Text_in_control")
+	gui,add,radio,w400 vFunctionsForElementGetControlInformationRadioImportControlClassNN,%  lang("Import Classname and instance number of the control")
+	gui,add,radio,w400 checked vFunctionsForElementGetControlInformationRadioImportControlHWND,%  lang("Import unique control ID of the control")
 }
 gui,add,button,w400 h30 default gFunctionsForElementGetControlInformationListBoxOfContolTextsButtonGoOn,% lang("OK")
 tempCountOfControlsInWindow=0
 loop,parse,tempPar,`n
 {
-	ControlGetText,tempparText,%a_loopfield%,A
+	ControlGetText,tempparText,%a_loopfield%,ahk_id %FunctionsForElementGetControlInformationWinID%
+	ControlGet,tempparControlID,hwnd,,%a_loopfield%,ahk_id %FunctionsForElementGetControlInformationWinID%
 	
-	tempParControlID%a_index%:=a_loopfield
+	tempParControlClassNN%a_index%:=a_loopfield
+	tempParControlID%a_index%:=tempparControlID
 	tempParText%a_index%:=tempparText
 	
 	StringReplace,tempparText,tempparText,`r
 	StringReplace,tempparText,tempparText,`n,¶
-	stringleft,tempparText,tempparText,100
+	StringReplace,tempparText,tempparText,|,_
+	;~ stringleft,tempparText,tempparText,100
 	guicontrol,,FunctionsForElementGetControlInformationListBoxOfContolTexts,%a_loopfield% ► %tempparText%
 	
 	tempCountOfControlsInWindow++
@@ -74,8 +70,8 @@ if tempCountOfControlsInWindow>0
 }
 else
 {
-	MsgBox,0,% lang("Error"), lang("This window seems not to have controls")
-	goto,FunctionsForElementGetControlInformationListBoxOfContolTextsButtonGoOn
+	MsgBox,16,% lang("Error"),% lang("This window seems not to have controls")
+	goto,FunctionsForElementGetControlInformationGuiClose
 	
 }
 
@@ -87,17 +83,10 @@ if a_guievent=doubleclick
 gui,submit,NoHide
 ;ToolTip,%FunctionsForElementGetControlInformationListBoxOfContolTexts%
 
-tempwinstring=%tempParWintitle%
-	if tempParahk_class<>
-		tempwinstring=%tempwinstring% ahk_class %tempParahk_class%
-	if tempParControlID<>
-		tempwinstring=%tempwinstring% ahk_id %tempParControlID%
-	if tempParPID<>
-		tempwinstring=%tempwinstring% ahk_pid %tempParPID%
 
-ControlGetPos, tempx,tempy,tempw,temph,% tempParControlID%FunctionsForElementGetControlInformationListBoxOfContolTexts%,%tempwinstring%
+ControlGetPos, tempx,tempy,tempw,temph,,% "ahk_id " tempParControlID%FunctionsForElementGetControlInformationListBoxOfContolTexts%
 ;ToolTip("FunctionsForElementGetControlInformationListBoxOfContolTexts " FunctionsForElementGetControlInformationListBoxOfContolTexts "`tempParControlID " tempParControlID%FunctionsForElementGetControlInformationListBoxOfContolTexts% "`ntempwinstring " tempwinstring "`n`ntempx " tempx "`ntempy " tempy "`ntempw " tempw "`ntemph " temph)
-WinGetPos,tempwinx,tempwiny,tempwinw,tempwinh,%tempwinstring%
+WinGetPos,tempwinx,tempwiny,tempwinw,tempwinh,ahk_id %FunctionsForElementGetControlInformationWinID%
 
 ui_DrawShapeOnScreen(tempwinx,tempwiny,tempwinw,tempwinh,tempx,tempy,tempw,temph)
 SetTimer,FunctionsForElementGetControlInformationRemoveShape,-2000
@@ -117,17 +106,6 @@ gui,destroy
 
 gui,2:default
 
-if FunctionsForElementGetControlInformationCheckBoxImportUniqueIDs=1
-{
-	guicontrol,,GUISettingsOfElement%setElementID%ahk_id,%tempParID%
-	guicontrol,,GUISettingsOfElement%setElementID%ahk_pid,%tempParPID%
-}
-else
-{
-	
-	guicontrol,,GUISettingsOfElement%setElementID%ahk_id
-	guicontrol,,GUISettingsOfElement%setElementID%ahk_pid
-}
 
 ;guicontrol,,GUISettingsOfElement%setElementID%winText,% tempParControlID%FunctionsForElementGetControlInformationListBoxOfContolTexts%  ;thrown out
 if (FunctionsForElementGetControlInformationRadioImportControlText=1) ;if selected that the name will be imported
@@ -136,22 +114,22 @@ if (FunctionsForElementGetControlInformationRadioImportControlText=1) ;if select
 	guicontrol,,GUISettingsOfElement%setElementID%IdentifyControlBy1,1
 	guicontrol,,GUISettingsOfElement%setElementID%ControlTextMatchMode3,1
 }
-else
+else if (FunctionsForElementGetControlInformationRadioImportControlClassNN=1)
 {
-	guicontrol,,GUISettingsOfElement%setElementID%Control_identifier,% tempParControlID%FunctionsForElementGetControlInformationListBoxOfContolTexts%
+	guicontrol,,GUISettingsOfElement%setElementID%Control_identifier,% tempParControlClassNN%FunctionsForElementGetControlInformationListBoxOfContolTexts%
 	guicontrol,,GUISettingsOfElement%setElementID%IdentifyControlBy2,1
 }
+else if (FunctionsForElementGetControlInformationRadioImportControlHWND=1)
+{
+	guicontrol,,GUISettingsOfElement%setElementID%Control_identifier,% tempParControlID%FunctionsForElementGetControlInformationListBoxOfContolTexts%
+	guicontrol,,GUISettingsOfElement%setElementID%IdentifyControlBy3,1
+}
 
-guicontrol,,GUISettingsOfElement%setElementID%ahk_exe,%tempParProcessName%
-guicontrol,,GUISettingsOfElement%setElementID%ahk_class,%tempParahk_class%
-guicontrol,,GUISettingsOfElement%setElementID%Wintitle,%tempParWintitle%
 
 ui_EnableElementSettingsWindow()
 return
 FunctionsForElementGetControlInformationEscape:
-ToolTip()
-hotkey,esc,FunctionsForElementGetControlInformationEscape,off
-hotkey,f12,FunctionsForElementGetControlInformationf12,off
+gui,destroy
 SetTimer,FunctionsForElementGetControlInformationGetControlCoveredByMouse,Off
 ui_DeleteShapeOnScreen()
 ui_EnableElementSettingsWindow()
@@ -159,8 +137,6 @@ return
 
 FunctionsForElementGetControlInformationGuiClose:
 gui,destroy
-hotkey,esc,FunctionsForElementGetControlInformationEscape,off
-hotkey,f12,FunctionsForElementGetControlInformationf12,off
 SetTimer,FunctionsForElementGetControlInformationGetControlCoveredByMouse,Off
 ui_DeleteShapeOnScreen()
 ui_EnableElementSettingsWindow()

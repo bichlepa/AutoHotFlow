@@ -131,13 +131,28 @@ enableFlow(ID,options="")
 		ControlSetText,edit1,enable|startup,CommandWindowOfEditor,% "Ѻ" nameOf(ID) "Ѻ" ;Try to send the command to the command window of the editor, if it is already open
 		if errorlevel
 			run,% editorpath  " enableFlow """ %ID%ini " "" ""startup""" 
-		
+		sleep 300
+		loop 10 ;Wait for the flow to appear
+		{
+			IfWinExist CommandWindowOfEditor,% "Ѻ" nameOf(ID) "Ѻ"
+				return
+			
+		}
+		run,% editorpath  " enableFlow """ %ID%ini " "" ""startup"""  ;If it doesn't appear, try again
 	}
 	else
 	{
 		ControlSetText,edit1,enable,CommandWindowOfEditor,% "Ѻ" nameOf(ID) "Ѻ" ;Try to send the command to the command window of the editor, if it is already open
 		if errorlevel
 			run,% editorpath  " enableFlow """ %ID%ini " """
+		sleep 300
+		loop 10 ;Wait for the flow to appear
+		{
+			IfWinExist CommandWindowOfEditor,% "Ѻ" nameOf(ID) "Ѻ"
+				return
+			
+		}
+		run,% editorpath  " enableFlow """ %ID%ini " """  ;If it doesn't appear, try again
 	}
 	
 }

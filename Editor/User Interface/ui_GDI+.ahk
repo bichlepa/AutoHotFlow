@@ -24,6 +24,8 @@ OnTopLabel=
 GDI_DrawPlusUnderMouse:=false
 
 
+
+
 ; Thanks to tic (Tariq Porter) for his GDI+ Library
 ; http://www.autohotkey.com/forum/viewtopic.php?t=32238
 ; Start gdi+
@@ -48,23 +50,14 @@ pBrushUnmark := Gdip_BrushCreateSolid("0xfffafafa") ;White brush
 pBrushMark := Gdip_BrushCreateSolid("0x5000ff00") ;Green brush, transparent
 pBrushRunning := Gdip_BrushCreateSolid("0x50ff0000") ;Red brush, transparent
 pBrushLastRunning := Gdip_BrushCreateSolid("0x10ff0000") ;Red brush, very transparent
-pBrushBackground := Gdip_BrushCreateSolid("0xFFeaf0ea") ;Red brush, very transparent
+pBrushBackground := Gdip_BrushCreateSolid("0xFFeaf0ea") ;Almost white brush for background
 
 
-TextOptions:=" s" (textSize*zoomFactor) " Center cff000000  Bold"
-TextOptionsmarked:=" s" (textSize*zoomFactor) " Center cff00aa00  Bold"
-TextOptionsRunning:=" s" (textSize*zoomFactor) " Center cffaa0000  Bold"
 
-TextOptionsLeft:=" s" (textSize*zoomFactor) " Left cff000000  Bold"
-TextOptionsLeftmarked:=" s" (textSize*zoomFactor) " Left cff00aa00  Bold"
-TextOptionsLeftRunning:=" s" (textSize*zoomFactor) " Left cffaa0000  Bold"
 
-TextOptionsRight:=" s" (textSize*zoomFactor) " Right cff000000  Bold"
-TextOptionsRightmarked:=" s" (textSize*zoomFactor) " Right  cff00aa00  Bold"
-TextOptionsRightRunning:=" s" (textSize*zoomFactor) " Right  cffaa0000  Bold"
 
-TextOptionsSmall:=" s" (textSize*0.7*zoomFactor) " Center cff000000  Bold"
-TextOptionsTopLabel:=" s20"  "  cff330000  Bold"
+
+goto,jumpoverUIDRaw
 
 ui_Draw()
 {
@@ -100,36 +93,44 @@ ui_Draw()
 
 	DetectHiddenWindows on
 	
-	
+	SetTimer,ui_regularUpdateIfWinMoved,100
 }
+
+
 
 ui_DrawEverything(Posw,Posh)
 {
 	global
 
-	
-	
-	; We first want the hwnd (handle to the picture control) so that we know where to put the bitmap we create
-	; We also want to width and height (posw and Posh)
-	;GuiControlGet, Pos, Pos, Variable
-	 
-	
+	;~ ToolTip redraw
+
 	DrawingRightNow:=true
 	thread, Priority, 0 ;Set normal priority
 
-	;~ GuiControlGet, hwnd, hwnd, PicFlow
+	TextOptions:=" s" (textSize*zoomFactor) " Center cff000000  Bold"
+	TextOptionsmarked:=" s" (textSize*zoomFactor) " Center cff00aa00  Bold"
+	TextOptionsRunning:=" s" (textSize*zoomFactor) " Center cffaa0000  Bold"
 
-	; Create a gdi+ bitmap the width and height that we found the picture control to be
-	; We will then get a reference to the graphics of this bitmap
-	; We will also set the smoothing mode of the graphics to 4 (Antialias) to make the shapes we use smooth
+	TextOptionsLeft:=" s" (textSize*zoomFactor) " Left cff000000  Bold"
+	TextOptionsLeftmarked:=" s" (textSize*zoomFactor) " Left cff00aa00  Bold"
+	TextOptionsLeftRunning:=" s" (textSize*zoomFactor) " Left cffaa0000  Bold"
+
+	TextOptionsRight:=" s" (textSize*zoomFactor) " Right cff000000  Bold"
+	TextOptionsRightmarked:=" s" (textSize*zoomFactor) " Right  cff00aa00  Bold"
+	TextOptionsRightRunning:=" s" (textSize*zoomFactor) " Right  cffaa0000  Bold"
+
+	TextOptionsSmall:=" s" (textSize*0.7*zoomFactor) " Center cff000000  Bold"
+	TextOptionsTopLabel:=" s20"  "  cff330000  Bold"
+
+	hbm := CreateDIBSection(Posw, Posh)
+	hdc := CreateCompatibleDC()
+	obm := SelectObject(hdc, hbm)
+	G := Gdip_GraphicsFromHDC(hdc)
+	Gdip_SetSmoothingMode(G, 4) ;We will also set the smoothing mode of the graphics to 4 (Antialias) to make the shapes we use smooth
 	
-hbm := CreateDIBSection(Posw, Posh)
-hdc := CreateCompatibleDC()
-obm := SelectObject(hdc, hbm)
-G := Gdip_GraphicsFromHDC(hdc)
-Gdip_SetSmoothingMode(G, 4)
-
-Gdip_FillRectangle(G, pBrushBackground, 0, 0, posw,posh)
+	
+	
+	Gdip_FillRectangle(G, pBrushBackground, 0, 0, posw,posh)
 
 	;~ pBitmap := Gdip_CreateBitmap(Posw, Posh)
 	;~ G := Gdip_GraphicsFromImage(pBitmap)
@@ -311,9 +312,10 @@ Gdip_FillRectangle(G, pBrushBackground, 0, 0, posw,posh)
 			
 			if tempFromEl=MOUSE
 			{
+				
 				MouseGetPos,mx2,my2 ;Get the mouse position
-				mx3:=mx2-guipicx ;calculate the mouse position relative to the picture
-				my3:=my2-guipicy
+				mx3:=mx2 ;calculate the mouse position relative to the picture
+				my3:=my2
 				StartPosx:=(mx3)/zoomfactor+offsetx
 				StartPosy:=(my3)/zoomfactor+offsety
 				
@@ -350,8 +352,8 @@ Gdip_FillRectangle(G, pBrushBackground, 0, 0, posw,posh)
 			if tempToEl=MOUSE
 			{
 				MouseGetPos,mx2,my2 ;Get the mouse position
-				mx3:=mx2-guipicx ;calculate the mouse position relative to the picture
-				my3:=my2-guipicy
+				mx3:=mx2 ;calculate the mouse position relative to the picture
+				my3:=my2
 				aimPosx:=(mx3)/zoomfactor+offsetx
 				aimPosy:=(my3)/zoomfactor+offsety
 				
@@ -725,8 +727,8 @@ Gdip_FillRectangle(G, pBrushBackground, 0, 0, posw,posh)
 	else if (GDI_DrawMoveButtonUnderMouse=true)
 	{
 		MouseGetPos,mx2,my2 ;Get the mouse position
-		mx3:=mx2-guipicx ;calculate the mouse position relative to the picture
-		my3:=my2-guipicy
+		mx3:=mx2 ;calculate the mouse position relative to the picture
+		my3:=my2
 		middlePointOfMoveButtonX:=(mx3)/zoomfactor 
 		middlePointOfMoveButtonY:=(my3)/zoomfactor 
 		
@@ -757,25 +759,22 @@ Gdip_FillRectangle(G, pBrushBackground, 0, 0, posw,posh)
 	
 	
 	
-	
-	; We then get a gdi bitmap from the gdi+ one we've been working with...
-	;~ hBitmap := Gdip_CreateHBITMAPFromBitmap(pBitmap)
-	; ... and set it to the hwnd we found for the picture control
-	;~ Gdip_DrawImage(G, pBitmap1)
-;~ BitBlt(MainGuiHwnddc, 0, 0, Width, Height, hdc, 0, 0)
-	;~ SetImage(hwnd, hBitmap)
-	
-	;delete bitmaps
-	;~ Gdip_DeleteGraphics(G)
-	;~ Gdip_DisposeImage(pBitmap)
-	;~ DeleteObject(hBitmap)
+	;Show the image
 	BitBlt(MainGuiHwnddc, 0, 0, posw, posh, hdc, 0, 0)
+
+	; Now the bitmap may be deleted
+	DeleteObject(hbm)
+
+	; Also the device context related to the bitmap may be deleted
+	DeleteDC(hdc)
+	;delete bitmaps
+	Gdip_DeleteGraphics(G)
+	
 	DrawingRightNow:=false
 	if (DrawAgain=true)
 	{
 		DrawAgain:=false
 		;~ ToolTip("Draw Again")
-		;ui_drawEverything(PicFlow,widthofguipic,heightofguipic)
 		SetTimer,ui_Draw,-10
 	}
 	
@@ -785,6 +784,20 @@ Gdip_FillRectangle(G, pBrushBackground, 0, 0, posw,posh)
 
 }
 
+
+ui_regularUpdateIfWinMoved:
+
+WinGetPos,winx,winy,,,ahk_id %MainGuihwnd%
+if (winx!=winxold and winy!=winyOld)
+{
+	winxold:=winx
+	winyOld:=winy
+	
+	ui_Draw()
+	
+}
+
+return
 
 ;Fit the position of an element to the grid
 ui_FitgridX(pos){
@@ -859,10 +872,13 @@ ui_DrawShapeOnScreen(WindowPosx,WindowPosy,WindowWidth,WindowHeight,ControlPosx,
 	; Create a fully opaque red pen (ARGB = Transparency, red, green, blue) of width 3 (the thickness the pen will draw at) to draw a circle
 	pPen := Gdip_CreatePen(0xffff0000, 3)
 
+	pBrushRed := Gdip_BrushCreateSolid("0x10ff0000") ;Red brush, very transparent
+	
 	; Draw a rectangle onto the graphics of the bitmap using the pen just created
 	; Draws the rectangle from coordinates (250,80) a rectangle of 300x200 and outline width of 10 (specified when creating the pen)
 	Gdip_DrawRectangle(G, pPen, ControlPosx, ControlPosy,  ControlWidth,ControlHeight)
-
+	Gdip_FillRectangle(G, pBrushRed, ControlPosx, ControlPosy, ControlWidth,ControlHeight)
+	
 	; Delete the brush as it is no longer needed and wastes memory
 	Gdip_DeletePen(pPen)
 
@@ -883,6 +899,11 @@ ui_DrawShapeOnScreen(WindowPosx,WindowPosy,WindowWidth,WindowHeight,ControlPosx,
 	; The graphics may now be deleted
 	Gdip_DeleteGraphics(G)
 	
+ 
+	WinSet, ExStyle, +0x20, % "ahk_id " hwnd1 ;Make window click through
+
+
+
 }
 
 ui_DeleteShapeOnScreen()
@@ -891,7 +912,7 @@ ui_DeleteShapeOnScreen()
 }
 
 
-goto,jumpoverUIDRaw
+
 ui_Draw:
 ui_Draw()
 return

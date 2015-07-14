@@ -8,10 +8,11 @@ runActionDownload_file(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	local tempPath:=% v_replaceVariables(InstanceID,ThreadID,%ElementID%file)
 	if tempPath=
 	{
-		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! File path not specified.")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not specified.",lang("File path")))
 		return
 	}
-	if  DllCall("Shlwapi.dll\PathIsRelative","Str",tempPath)
+	if DllCall("Shlwapi.dll\PathIsRelative","Str",tempPath)
 		tempPath:=SettingWorkingDir "\" tempPath
 	
 	
@@ -29,12 +30,14 @@ runActionDownload_file(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	
 	URLDownloadToFile,%tempURL%,%tempPath%
 	if ErrorLevel
-		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
-	else
 	{
-		v_SetVariable(InstanceID,ThreadID,tempVarName,temp)
-		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! File not downloaded.")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("Couldn't download file"))
+		return
 	}
+	v_SetVariable(InstanceID,ThreadID,tempVarName,temp)
+	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
+	
 	return
 }
 getNameActionDownload_file()

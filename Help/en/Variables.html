@@ -6,7 +6,10 @@
 	<meta name="generator" content="LibreOffice 4.4.3.2 (Windows)"/>
 	<meta name="created" content="00:00:00"/>
 	<meta name="changedby" content="Paul Bichler"/>
-	<meta name="changed" content="2015-06-23T19:00:27.431000000"/>
+	<meta name="changed" content="2015-06-26T14:48:35.919000000"/>
+	<meta name="created" content="00:00:00">
+	<meta name="changedby" content="Paul Bichler">
+	<meta name="changed" content="2015-06-23T19:00:27.431000000">
 	<meta name="created" content="00:00:00">
 	<meta name="changedby" content="Paul Bichler">
 	<meta name="changed" content="2015-06-21T20:03:19.829000000">
@@ -64,7 +67,7 @@ names are not case sensitive (for example, </span><em><span style="font-weight: 
 Variable names may be up to 253 characters long and may consist of
 letters, numbers and the following punctuation: # _ @ $</span></p>
 <p style="margin-bottom: 0.1cm; font-weight: normal">A variable name
-musn't start with the letters &quot;<font face="Consolas, monospace">A_</font>&quot;,
+mustn&rsquo;t start with the letters &quot;<font face="Consolas, monospace">A_</font>&quot;,
 since those are built in variables.</p>
 <h2 class="western" style="margin-top: 0cm; margin-bottom: 0.1cm; font-weight: normal">
 Global and local variables</h2>
@@ -73,12 +76,22 @@ Global and local variables</h2>
 variable can have almost any name. As soon it is set, it is available
 in the current instance. An instance is one execution. As soon the
 instance ends, all local variables will be deleted.</p>
+<p style="margin-bottom: 0.1cm"><b>Static variables</b></p>
+<p style="margin-bottom: 0.1cm; font-weight: normal">Static variables
+must begin with &quot;<font face="Consolas, monospace">Static</font><font face="Consolas, monospace">_</font>&quot;.
+For example: <font face="Consolas, monospace">Static</font><font face="Consolas, monospace">_MyVar</font><font face="Times New Roman, serif">.
+Those variables are available</font><font face="Times New Roman, serif">
+in the current</font><font face="Times New Roman, serif"> flow</font><font face="Times New Roman, serif">
+in all instances</font><font face="Times New Roman, serif">. </font><font face="Times New Roman, serif">They
+are </font><font face="Times New Roman, serif">kept when the flow has
+ended, even after a reboot.</font></p>
 <p style="margin-bottom: 0.1cm"><b>Global variables</b></p>
 <p style="margin-bottom: 0.1cm"><span style="font-weight: normal">Global
 variables must begin with &quot;</span><font face="Consolas, monospace"><span style="font-weight: normal">Global_</span></font><span style="font-weight: normal">&quot;.
 For example: </span><font face="Consolas, monospace"><span style="font-weight: normal">Global_MyVar</span></font><font face="Times New Roman, serif"><span style="font-weight: normal">.
-Those variables are available in all flows and kept when the flow has
-ended, even after a reboot.</span></font></p>
+Those variables are available in all flows and </span></font><font face="Times New Roman, serif"><span style="font-weight: normal">they
+are </span></font><font face="Times New Roman, serif"><span style="font-weight: normal">kept
+when the flow has ended, even after a reboot.</span></font></p>
 <h2 class="western" style="font-weight: normal">Using variables</h2>
 <p style="font-weight: normal">Variables can be used in almost every
 edit field in the settings. If a string is needed, a variable's
@@ -183,7 +196,7 @@ operands are supported:</p>
 			<p><b>=</b></p>
 		</td>
 		<td width="80%" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
-			<p><b>Equal. Case insensetive. </b><span style="font-weight: normal">This
+			<p><b>Equal. Case </b><b>insensitive.</b><b> </b><span style="font-weight: normal">This
 			operator is a comparison. It does not assign a value to a
 			variable.</span></p>
 		</td>
@@ -193,7 +206,7 @@ operands are supported:</p>
 			<p><b>==</b></p>
 		</td>
 		<td width="80%" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
-			<p><b>Equal. Case sensetive.</b></p>
+			<p><b>Equal. Case sensitive.</b></p>
 		</td>
 	</tr>
 	<tr valign="top">

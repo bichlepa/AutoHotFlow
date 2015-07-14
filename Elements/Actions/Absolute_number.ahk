@@ -4,21 +4,25 @@ runActionAbsolute_number(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	local temp
-	
+	local varname:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname)
+	if not v_CheckVariableName(varname)
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Output variable name '" varname "' is not valid")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not valid",lang("Output variable name '%1%'",varname)) )
+		return
+	}
 	
 	temp:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%VarValue)
 	;MsgBox,%  %ElementID%Varname "---" %ElementID%VarValue "---" v_replaceVariables(InstanceID,%ElementID%Varname) "---" v_replaceVariables(InstanceID,%ElementID%VarValue)
-	if temp is number
+	if temp is not number
 	{
-		
-		v_SetVariable(InstanceID,ThreadID,v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname),abs(temp))
-		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Input number " temp " is not a number")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not a number.",lang("Input number '%1%'",temp)) )
+		return
 	}
-	else
-	{
-		logger("f0",lang("Instance") " " InstanceID " - " lang(%ElementID%type) " '" %ElementID%name "': " lang("Error") "! " lang("Input number %1% is not a number",temp))
-		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
-	}
+	
+	v_SetVariable(InstanceID,ThreadID,varname,abs(temp))
+	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 
 	
 	return
@@ -44,7 +48,7 @@ GenerateNameActionAbsolute_number(ID)
 {
 	global
 	
-	return % lang("Absolute_number") " - " GUISettingsOfElement%ID%Varname " = " GUISettingsOfElement%ID%VarValue
+	return % lang("Absolute_number") ": " GUISettingsOfElement%ID%Varname " = |" GUISettingsOfElement%ID%VarValue "|"
 	
 }
 

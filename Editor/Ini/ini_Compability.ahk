@@ -1,4 +1,4 @@
-﻿FlowCompabilityVersionOfApp:=2 ;This variable contains a number which will be incremented as soon an incompability appears. This will make it possible to identify old scripts and convert them. This value will be written in any saved flows.
+﻿FlowCompabilityVersionOfApp:=3 ;This variable contains a number which will be incremented as soon an incompability appears. This will make it possible to identify old scripts and convert them. This value will be written in any saved flows.
 
 i_CheckCompability(ElementID,IndexInIniFile,IniFilePath)
 {

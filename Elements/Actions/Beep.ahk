@@ -3,10 +3,22 @@
 runActionBeep(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
+	local frequency:=v_evaluateExpression(InstanceID,ThreadID,%ElementID%frequency)
+	local duration:=v_evaluateExpression(InstanceID,ThreadID,%ElementID%duration)
 
-
-
-	SoundBeep,% v_replaceVariables(InstanceID,ThreadID,%ElementID%frequency),% v_replaceVariables(InstanceID,ThreadID,%ElementID%duration)
+	if frequency is not number
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Frequency is not a number.")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not a number.",lang("Frequency")))
+		return
+	}
+	if duration is not number
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Duration is not a number.")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not a number.",lang("Duration")))
+		return
+	}
+	SoundBeep,% frequency,% duration
 
 	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	return

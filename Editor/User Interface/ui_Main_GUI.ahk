@@ -3,8 +3,8 @@
 	global
 	;Create tha main gui
 	gui,1:default
-	gui,add,picture,vPicFlow hwndPicFlowHWND x0 y0 0xE gclickOnPicture ;Althogh the picture does not show anything, it is still needed to catch mouse clicks
-	gui,add,StatusBar
+	;~ gui,add,picture,vPicFlow hwndPicFlowHWND x0 y0 0xE hidden gclickOnPicture ;No picture needed anymore
+	gui,add,StatusBar,hwndStatusbarHWND
 	
 	gui +resize
 
@@ -14,18 +14,73 @@
 	MainGuiHwnddc := GetDC(MainGuihwnd)
 	ControlGetPos,,,,StatusBarHeight,msctls_statusbar321,ahk_id %MainGuihwnd%
 	
+	
+
+	
 	;Set some hotkeys that are needed in main window
 	hotkey,IfWinActive,ahk_id %MainGuihwnd%
-	;~ hotkey,^x,ctrl_x
+	hotkey,^x,ctrl_x
 	hotkey,^c,ctrl_c
 	hotkey,^v,ctrl_v
 	hotkey,^s,ctrl_s
 	hotkey,esc,esc
 	hotkey,del,del
-	hotkey,^wheelup,ctrl_wheelup
-	hotkey,^wheeldown,ctrl_wheeldown
-	hotkey,~rbutton,rightmousebuttonclick
+
+	OnMessage(0x203,"leftmousebuttondoubleclick",1)
+	OnMessage(0x201,"leftmousebuttonclick",1)
+	OnMessage(0x204,"rightmousebuttonclick",1)
+	OnMessage(0x20A,"mousewheelmove",1)
+
+
+	
+	
 }
+
+leftmousebuttonclick(wpar,lpar,msg,hwn)
+{
+	global
+	if (hwn!=MainGuihwnd and hwn!=StatusbarHWND)
+		return
+	SetTimer, leftmousebuttonclick,-1
+}
+rightmousebuttonclick(wpar,lpar,msg,hwn)
+{
+	global
+	if (hwn!=MainGuihwnd and hwn!=StatusbarHWND)
+		return
+	SetTimer, rightmousebuttonclick,-1
+}
+
+leftmousebuttondoubleclick(wpar,lpar,msg,hwn)
+{
+	global
+	;~ ToolTip  %hwn% d
+	if (hwn!=MainGuihwnd and hwn!=StatusbarHWND)
+		return
+	SetTimer, leftmousebuttondoubleclick,-1
+}
+
+
+
+mousewheelmove(wpar,lpar,msg,hwn)
+{
+	global
+	;~ temp:=format("{1:#x}",hwn)
+	;~ wingetpos,tempwinx,tempwiny,tempwinw,tempwinh,ahk_id %MainGuihwnd%
+	;~ controlgetpos,tempx,tempy,tempw,temph,,ahk_id %hwn%
+	;~ ToolTip %wpar% - %lpar% - %msg% - %hwn% : %StatusbarHWND% - %temp% - %MainGuihwnd% __ %tempx%- %tempy%- %tempw%- %temph% __ %tempwinx%-%tempwiny%-%tempwinw%-%tempwinh%
+	;~ ui_DrawShapeOnScreen(tempwinx,tempwiny,tempwinw,tempwinh,tempx,tempy,tempw,temph)
+	if (hwn!=MainGuihwnd and hwn!=StatusbarHWND)
+		return
+	;~ ToolTip %wpar% - %lpar% - %msg% - %hwn%
+	if wpar=7864328
+		SetTimer, ctrl_wheelup,-1 
+	else if wpar=4287102984
+		SetTimer, ctrl_wheeldown,-1 
+	;~ ToolTip %wpar% - %lpar% - %msg% - %hwn%
+	;~ SetTimer, ctrl_wheelup,-1 
+}
+
 
 
 ui_DisableMainGUI()
@@ -73,6 +128,14 @@ ui_UpdateStatusbartext(which="")
 		sb_SetText("Offset: x " Round(offsetx) " y " Round(offsety) "   |   Zoom: " Round(zoomFactor,2 ),1)
 	}
 }
+
+;Get the position of main gui and store it into global variables
+ui_GetMainGUIPos()
+{
+	global 
+	WinGetPos,MainGUIX,MainGUIY,MainGUIWidth,MainGUIHeight,ahk_id %MainGuihwnd%
+}
+
 
 goto,jumpOverGUIJumpLabels
 

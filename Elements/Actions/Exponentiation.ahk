@@ -3,29 +3,41 @@
 runActionExponentiation(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
-	local temp
-	local tempExponentiation
+	local temp:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%VarValue)
+	local tempExponentiation:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%Exponent)
 	local tempResult
+	local varname:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname)
 	
 	
-	temp:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%VarValue)
 	
-	tempExponentiation:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%Exponent)
-	;MsgBox % tempExponentiation "|" temp
-	if temp is number
+	if not v_CheckVariableName(varname)
 	{
-		if tempExponentiation is number
-		{
-			tempResult:=temp**tempExponentiation
-			v_SetVariable(InstanceID,ThreadID,v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname),tempResult)
-			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
-		}
-		else
-			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Output variable name '" varname "' is not valid")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not valid",lang("Output variable name '%1%'",varname)) )
+		return
 	}
-	else
-		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
-
+	
+	;MsgBox % tempExponentiation "|" temp
+	
+	if temp is not number
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Input number " temp " is not a number")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not a number.",lang("Input number '%1%'",temp)) )
+		return
+	}
+	
+	if tempExponentiation is not number
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Input exponent " tempExponentiation " is not a number")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not a number.",lang("Input exponent '%1%'",tempExponentiation)) )
+		return
+	}
+	
+	
+	tempResult:=temp**tempExponentiation
+	v_SetVariable(InstanceID,ThreadID,varname,tempResult)
+	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
+	
 	
 	return
 }

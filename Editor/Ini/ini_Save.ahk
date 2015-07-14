@@ -39,7 +39,7 @@ i_save()
 	ToolTip(lang("saving"),100000)
 	
 	FileCreateDir,%ThisFlowFolder%
-	Filemove,%ThisFlowFolder%\%ThisFlowFilename%.ini,%ThisFlowFolder%\%ThisFlowFilename%backup.ini
+	Filemove,%ThisFlowFolder%\%ThisFlowFilename%.ini,%ThisFlowFolder%\%ThisFlowFilename%_backup.txt
 	IniWrite,%ID_count%,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,count
 	IniWrite,%SettingFlowExecutionPolicy%,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,SettingFlowExecutionPolicy
 	IniWrite,%SettingWorkingDir%,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,SettingWorkingDir
@@ -47,6 +47,7 @@ i_save()
 	IniWrite,%flowName%,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,name
 	IniWrite,%FlowCategory%,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,category
 	IniWrite,%FlowCompabilityVersionOfApp%,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,FlowCompabilityVersion
+	IniWrite,%FolderOfStaticVariables%,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,Static variables folder
 	saveCopyOfallElements:=allElements.clone()
 	saveCopyOfallTriggers:=allTriggers.clone()
 	
@@ -116,9 +117,12 @@ i_save()
 			for tempSaveindex2, tempSaveParameter in parametersToSave
 			{
 				StringSplit,tempSaveParameter,tempSaveParameter,|
+				;tempSaveParameter1: type of control
+				;tempSaveParameter2: default value
+				;tempSaveParameter3: parameter name
+				;tempSaveParameter4 ...: further options
 				
-				; tempSaveParameter3 contains the parameter ID
-				if tempSaveParameter3= ;If this is only a label for the edit fielt etc. Do nothing
+				if (tempSaveParameter3="" or tempSaveParameter1="Label") ;If this is only a label for the edit fielt etc. Do nothing
 					continue
 				StringSplit,tempparname,tempSaveParameter3,; ;get the parameter names
 				Loop % tempparname0
@@ -165,7 +169,9 @@ i_save()
 			
 		
 	}
-	Filedelete,%ThisFlowFolder%\%ThisFlowFilename%backup.ini
+	IniWrite,Yes,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,Finished Saving
+	
+	Filedelete,%ThisFlowFolder%\%ThisFlowFilename%_backup.txt
 	logger("a1","Flow " FlowName " was successfully saved.")
 	ToolTip(lang("saved"))
 	ui_EnableMainGUI()

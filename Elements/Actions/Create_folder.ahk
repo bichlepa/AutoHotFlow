@@ -10,7 +10,10 @@ runActionCreate_folder(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	
 	FileCreateDir,% tempPath
 	if ErrorLevel
-		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Folder not created.")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("Folder not created"))
+	}
 	else
 		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	return

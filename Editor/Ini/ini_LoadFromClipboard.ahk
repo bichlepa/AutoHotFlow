@@ -181,12 +181,16 @@
 	if index1>0
 	{
 		saved=no
+		ToolTip(lang("Loaded %1% elements from clipboard",index1),1000)
 		logger("a2","Loaded " index1 " elements from clipboard")
 	}
 	else
+	{
+		ToolTip(lang("No elements found in clipboard"),1000)
 		logger("a2","No elements found in clipboard")
+	}
 	
-	ToolTip(lang("loaded"),1000)
+
 	e_UpdateTriggerName()
 	
 	ui_EnableMainGUI()

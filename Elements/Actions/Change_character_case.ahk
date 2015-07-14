@@ -6,13 +6,27 @@ runActionChange_character_case(InstanceID,ThreadID,ElementID,ElementIDInInstance
 	local temp
 	local Result
 	local OptionCharCase
+	local Varname:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname)
 	
 	if %ElementID%expression=1
 		temp:=v_replaceVariables(InstanceID,ThreadID,%ElementID%VarValue)
 	else
 		temp:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%VarValue)
 
-
+	
+	if varname=
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Output variable name is empty.")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is empty.",lang("Output variable name")))
+		return
+	}
+	if temp=
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Input string is empty.")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is empty.",lang("Input string")))
+	}
+	
+	
 	OptionCharCase:=v_replaceVariables(InstanceID,ThreadID,%ElementID%CharCase) 
 	if OptionCharCase=1 ;Uppercase
 		StringUpper,Result,temp
@@ -20,7 +34,7 @@ runActionChange_character_case(InstanceID,ThreadID,ElementID,ElementIDInInstance
 		StringLower,Result,temp
 	else if OptionCharCase=3
 		StringUpper,Result,temp,T ;First character of a word is uppercase
-	v_SetVariable(InstanceID,ThreadID,v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname),Result)
+	v_SetVariable(InstanceID,ThreadID,Varname,Result)
 	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 
 	return
@@ -45,8 +59,16 @@ getParametersActionChange_character_case()
 GenerateNameActionChange_character_case(ID)
 {
 	global
+	local tempcase
 	
-	return % lang("Change_character_case") "`n" GUISettingsOfElement%ID%Varname " = " GUISettingsOfElement%ID%VarValue
+	if GUISettingsOfElement%ID%CharCase1
+		tempcase:=lang("Uppercase")
+	else if GUISettingsOfElement%ID%CharCase2
+		tempcase:=lang("Lowercase")
+	else if GUISettingsOfElement%ID%CharCase3
+		tempcase:=lang("Firt character of a word is uppercase")
+	
+	return % lang("Change_character_case") ": " GUISettingsOfElement%ID%Varname " = " GUISettingsOfElement%ID%VarValue " to " tempcase
 	
 }
 

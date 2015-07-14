@@ -8,14 +8,32 @@ runActionAdd_to_list(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	local varvalues
 	local Varname:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname)
 	local Position:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Position)
+	
+	if not v_CheckVariableName(varname)
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! List name '" varname "' is not valid")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not valid",lang("List name '%1%'",varname)) )
+		return
+	}
+	
+	
+	
 	local tempObject:=v_getVariable(InstanceID,ThreadID,Varname,"list")
+	
 	
 	if (!(IsObject(tempObject)))
 	{
 		if tempObject=
+		{
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Waring! Variable '" Varname "' is empty. A new list will be created.")
 			tempObject:=Object()
+		}
 		else
-			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
+		{
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Variable '" Varname "' is not empty and does not contain a list.")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("Variable '%1%' is not empty and does not contain a list.",Varname))
+			return
+		}
 	}
 	
 	if (%ElementID%NumberOfElements=1) ;Add one element
@@ -37,6 +55,12 @@ runActionAdd_to_list(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 		}
 		else
 		{
+			if Position=
+			{
+				logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Position is not specified.")
+				MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is empty.",lang("Position")))
+				return
+			}
 			tempObject.insert(Position,temp)
 		}
 	}
@@ -69,6 +93,12 @@ runActionAdd_to_list(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 		}
 		else if %ElementID%WhitchPosition=3
 		{
+			if Position=
+			{
+				logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Position is not specified.")
+				MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not specified.",lang("Position")))
+				return
+			}
 			Position--
 			loop,parse,varvalues,▬
 			{

@@ -4,8 +4,8 @@ runActionExecute_Flow(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	returnedFlowIsRunning=
-	tempFlowName:=%ElementID%flowName
-	tempVarsToSend=
+	local tempFlowName:=%ElementID%flowName
+	local tempVarsToSend=
 	if (%ElementID%SendLocalVars)
 	{
 		tempVarsToSend:=v_WriteLocalVariablesToString("Instance_" InstanceID) ;Thread variables won't be sent yet 
@@ -31,16 +31,29 @@ runActionExecute_Flow(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 		;MsgBox ga %returnedFlowIsRunning%
 		
 	if returnedFlowIsRunning=ǸoⱾuchȠaⱮe
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Flow " tempFlowName " does not exist.")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("Flow %1% does not exist",tempFlowName))
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
+	}
 	else if returnedFlowIsRunning=Dἰsḁbled
 	{
 		if (%ElementID%SkipDisabled)
 			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 		else
+		{
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Flow " tempFlowName "could not be started. Flow is not enabled.")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("Flow %1% could not be started.",tempFlowName) " " lang("Flow is not enabled"))
 			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
+		}
 	}
 	else if returnedFlowIsRunning=
-		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Flow " tempFlowName "could not be started. Manager did not respond.")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("Flow %1% could not be started.",tempFlowName) " " lang("Unknown reason."))
+		return
+	}
 	else ;if the flow is running
 	{
 		if (%ElementID%WaitToFinish)
@@ -50,10 +63,13 @@ runActionExecute_Flow(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 				if returnedFlowHasFinished_Instance_%InstanceID%_Element_%ElementIDInInstance%!=
 					break
 				if stopRun
-					break
+				{
+					return
+				}
 				sleep 10
 			}
-			if (%ElementID%ReturnVariables && !(stopRun))
+			
+			if (%ElementID%ReturnVariables)
 			{
 				v_ImportLocalVariablesFromString(InstanceID,returnedFlowHasFinishedVariables_Instance_%InstanceID%_Element_%ElementIDInInstance%)
 				

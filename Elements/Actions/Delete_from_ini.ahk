@@ -8,22 +8,35 @@ runActionDelete_from_ini(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	if  DllCall("Shlwapi.dll\PathIsRelative","Str",tempPath)
 		tempPath:=SettingWorkingDir "\" tempPath
 	
+	local tempsection:=v_replaceVariables(InstanceID,ThreadID,%ElementID%section)
+	local tempkey
+	
+	
 	if %ElementID%Action=1 ;Delete a key
 	{
-		
-		IniDelete,% tempPath,% v_replaceVariables(InstanceID,ThreadID,%ElementID%section),% v_replaceVariables(InstanceID,ThreadID,%ElementID%key)
-		
+		tempkey:=v_replaceVariables(InstanceID,ThreadID,%ElementID%key)
+		IniDelete,% tempPath,% tempsection,% tempkey
+		if errorlevel
+		{
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Not deleted from ini.")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("Not deleted from ini"))
+			return
+		}
+	
 	}
 	else ;Delete a section
 	{
-		IniDelete,% tempPath,% v_replaceVariables(InstanceID,ThreadID,%ElementID%section)
-		
+		IniDelete,% tempPath,% tempsection
+		if errorlevel
+		{
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Not deleted from ini.")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("Not deleted from ini"))
+			return
+		}
 	}
 	
-	if errorlevel
-		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
-	else
-		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
+	
+	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	
 	
 	return

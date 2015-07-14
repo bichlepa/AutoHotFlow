@@ -73,13 +73,24 @@
 				ui_DisableMainGUI()
 				gui,4:default
 				;~ gui,+owner
+				gui,+hwndSettingsHWND
 				gui,add,text,w300,% lang("Select_a_trigger")
 				gui,add,ListBox,w400 h500 vGuiTriggerChoose gGuiTriggerChoose AltSubmit choose1,%temptriggerNames%
 				gui,add,button,w100 h30 gGuiTriggerOK default,% lang("OK")
 				gui,add,button,w90 h30 X+10 gGuiTriggerNew,% lang("New_Trigger")
 				gui,add,button,w90 X+10 h30 gGuiTriggerDelete,% lang("Delete_Trigger")
 				gui,add,button,w90 X+10 h30 yp gGuiTriggerCancel,% lang("Cancel")
-				gui,show
+				
+				ui_GetMainGUIPos()
+
+				gui,show,hide
+				;Put the window in the center of the main window
+				wingetpos,,,tempWidth,tempHeight,ahk_id %SettingsHWND%
+				tempXpos:=round(MainGUIX+MainGUIWidth/2- tempWidth/2)
+				tempYpos:=round(MainGUIY+MainGUIHeight/2- tempHeight/2)
+				
+				gui,show,x%tempXpos% y%tempYpos%
+				
 				return
 				GuiTriggerChoose:
 				if A_GuiEvent !=DoubleClick 
@@ -502,7 +513,11 @@
 	gui -hwndSettingWindowHWND
 	SG2 := New ScrollGUI(SettingWindowHWND,600, A_ScreenHeight*0.8, "+LabelGui2 +Resize +MinSize420x100 ",2,2)
 	
-	SG2.Show(lang("Settings") " - " lang(%ElementID%type) " - " lang(%ElementID%subtype), "xCenter yCenter")
+	SG2.Show(lang("Settings") " - " lang(%ElementID%type) " - " lang(%ElementID%subtype), " hide")
+	ui_GetMainGUIPos() ;Shiw the window in the middle of the main window
+	tempXpos:=round(MainGUIX+MainGUIWidth/2- SG2.width/2)
+	tempYpos:=round(MainGUIY+MainGUIHeight/2- SG2.height/2)
+	SG2.Show(,"x" tempXpos " y" tempYpos)
 	
 	
 	;gui,show,,% "·AutoHotFlow· " lang("Settings") " - " lang(%ElementID%type) " - " lang(%ElementID%subtype)
@@ -828,6 +843,8 @@ ui_selectElementType(type,setElementID,PreviousSubType="")
 	
 	ui_DisableMainGUI()
 	gui,3:default
+	
+	gui,destroy
 	gui,font,s12
 	gui,add,text,,% lang("Which_%1% should be created?", lang(selElementType))
 	gui,add,TreeView,w400 h500 vGuiElementChoose gGuiElementChoose AltSubmit
@@ -869,8 +886,16 @@ ui_selectElementType(type,setElementID,PreviousSubType="")
 	}
 	
 	
+	;Put the window in the center of the main window
+	gui,+hwndSettingsHWND
+	gui,show,hide
+	ui_GetMainGUIPos()
+	wingetpos,,,tempWidth,tempHeight,ahk_id %SettingsHWND%
+	tempXpos:=round(MainGUIX+MainGUIWidth/2- tempWidth/2)
+	tempYpos:=round(MainGUIY+MainGUIHeight/2- tempHeight/2)
 	
-	gui,show
+	gui,show,x%tempXpos% y%tempYpos%
+	
 	;~ MsgBox
 	return
 
@@ -916,10 +941,11 @@ ui_selectElementType(type,setElementID,PreviousSubType="")
 	if GuiElementChoosedID=
 		return
 	gui,destroy
+	gui,1:default
 	ui_EnableMainGUI()
 	
 	
-	gui,1:default
+	
 	
 	;MsgBox,%selElementID% %GuiElementChoose%
 	
@@ -943,7 +969,7 @@ ui_selectConnectionType(tempNewID)
 	
 	ui_DisableMainGUI()
 	gui, 7:default
-	
+
 
 	gui,font,s12
 	gui,add,text,,% lang("Select_Connection_type")
@@ -992,7 +1018,15 @@ ui_selectConnectionType(tempNewID)
 	}
 	
 	gui,add,Button,w90 Y+10 gGuiConnectionChooseCancel,% lang("Cancel")
-	gui,show
+	;Put the window in the center of the main window
+	gui,+hwndSettingsHWND
+	gui,show,hide
+	ui_GetMainGUIPos()
+	wingetpos,,,tempWidth,tempHeight,ahk_id %SettingsHWND%
+	tempXpos:=round(MainGUIX+MainGUIWidth/2- tempWidth/2)
+	tempYpos:=round(MainGUIY+MainGUIHeight/2- tempHeight/2)
+	
+	gui,show,x%tempXpos% y%tempYpos%
 	
 	NowConnectionChoosed=
 	Loop
@@ -1076,7 +1110,15 @@ ui_selectContainerType(tempNewID="")
 	}
 	
 	gui,add,Button,w90  Y+10 gGuiElementTypeChooseCancel,% lang("Cancel")
-	gui,show
+	;Put the window in the center of the main window
+	gui,+hwndSettingsHWND
+	gui,show,hide
+	ui_GetMainGUIPos()
+	wingetpos,,,tempWidth,tempHeight,ahk_id %SettingsHWND%
+	tempXpos:=round(MainGUIX+MainGUIWidth/2- tempWidth/2)
+	tempYpos:=round(MainGUIY+MainGUIHeight/2- tempHeight/2)
+	
+	gui,show,x%tempXpos% y%tempYpos%
 	
 	NowTypeChoosed=
 	Loop

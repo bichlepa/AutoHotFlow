@@ -6,6 +6,16 @@ runActionClick(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	local temprelative
 	local tempButton
 	local tempupdown
+	local Xpos
+	local Ypos
+	local ClickCount:=v_evaluateExpression(InstanceID,ThreadID,%ElementID%ClickCount)
+	if ClickCount is not number
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Click count is not a number.")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not a number.",lang("Click count")))
+		return
+	}
+	
 	
 	if %ElementID%SendMode=1
 		SendMode, Input
@@ -13,6 +23,8 @@ runActionClick(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 		SendMode, Event
 	else if %ElementID%SendMode=3
 		SendMode, Play
+	else
+		MsgBox Unexpected error! Send mode not set!
 	
 	if %ElementID%DownUp=1
 		tempupdown=
@@ -41,7 +53,7 @@ runActionClick(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	else if %ElementID%Button=9
 		tempButton=X2
 	else
-		MsgBox Unexpected error! unknown button
+		MsgBox Unexpected error! Unknown button
 	
 	if %ElementID%changePosition=1
 	{
@@ -55,6 +67,20 @@ runActionClick(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 		if %ElementID%CoordMode=4
 			temprelative=R
 		
+		Xpos:=v_evaluateExpression(InstanceID,ThreadID,%ElementID%Xpos)
+		Ypos:=v_evaluateExpression(InstanceID,ThreadID,%ElementID%Ypos)
+		if Xpos is not number
+		{
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! X position is not a number.")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not a number.",lang("X position")))
+			return
+		}
+		if Ypos is not number
+		{
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Y position is not a number.")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not a number.",lang("Y position")))
+			return
+		}
 		
 		;MsgBox % tempButton " - " %ElementID%Xpos " - " %ElementID%Ypos " - "  %ElementID%ClickCount " - " %ElementID%speed  " - " tempupdown " - " temprelative 
 		MouseClick,%tempButton%,% %ElementID%Xpos,% %ElementID%Ypos,% %ElementID%ClickCount,% %ElementID%speed,%tempupdown%,%temprelative%
@@ -151,7 +177,7 @@ GenerateNameActionClick(ID)
 	else if GUISettingsOfElement%ID%speed<=100
 		tempstring.=lang("Very slow")
 	
-	return % lang("Click") "`n" tempstring
+	return % lang("Click") ": " tempstring
 	
 }
 

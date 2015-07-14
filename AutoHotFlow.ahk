@@ -53,12 +53,12 @@ gui,45:+HwndHiddenGUIHWND
 gosub,CreateMainGUI
 
 loadSavedFlows()
-if (1!="AutomaticStartup")
+if 1!=AutomaticStartup
 	gosub,ShowMainGUI
 
 
 
-gosub,ShowMainGUI
+
 
 SetTimer,regularStatusUpdateOfFlows,5000
 return

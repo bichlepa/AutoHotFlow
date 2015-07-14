@@ -8,12 +8,35 @@ runActionDelete_file(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	if  DllCall("Shlwapi.dll\PathIsRelative","Str",tempPath)
 		tempPath:=SettingWorkingDir "\" tempPath
 	
+	if tempPath=
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! File path not specified.")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not specified.",lang("File path")))
+		return
+	}
+	
 	;~ MsgBox %tempPath%
 	FileDelete,% tempPath
-	if ErrorLevel
-		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
-	else
-		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
+	temperror:=errorlevel
+	
+	if a_lasterror
+	{
+		;~ MsgBox % a_lasterror 
+		if temperror
+		{
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! " temperror " files not deleted.")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% files not deleted",temperror))
+		}
+		else
+		{
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! No files deleted.")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("No files deleted"))
+		}
+		return
+	}
+	
+	
+	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	return
 }
 getNameActionDelete_file()

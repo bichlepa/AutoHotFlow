@@ -21,10 +21,10 @@ runActionSleep(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	
 	ActionSleepEnd:
 	
-	tempSleepSmallestTime=0
+	tempActionSleepFoundActiveSleep:=false
 	for tempSleepid, tempSleepEndTime in ActionSleepCurrentSleeps ;loop through all sleepTimes and look whether the sleep time is over
 	{
-		
+		;~ MsgBox %tempSleepid% - %tempSleepEndTime%
 		if (tempSleepEndTime<A_TickCount)
 		{
 			
@@ -34,13 +34,15 @@ runActionSleep(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 			; tempElement3 = Thread ID
 			; tempElement4 = element id
 			; tempElement5 = element id in the instance
+			
 			MarkThatElementHasFinishedRunning(tempSleepid2,tempSleepid3,tempSleepid4,tempSleepid5,"normal")
 
 			ActionSleepCurrentSleeps.remove(tempSleepid)
 		}
 		
+		tempActionSleepFoundActiveSleep:=true
 	}
-	if (ActionSleepCurrentSleeps.GetCapacity()=0)
+	if not (tempActionSleepFoundActiveSleep)
 		settimer,ActionSleepEnd,off
 	
 	return

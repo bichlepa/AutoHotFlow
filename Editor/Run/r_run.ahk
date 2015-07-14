@@ -203,6 +203,7 @@ r_run()
 						if (%element%from=tempRunningElement2 && ( %element%ConnectionType=%tempInstanceID%_%tempRunningElement%_result || (%tempfrom%type="loop" && %element%ConnectionType = "normal" && ((%tempInstanceID%_%tempRunningElement%_result = "normalHead" && %element%frompart ="Head") || (%tempInstanceID%_%tempRunningElement%_result = "normalTail") && %element%frompart ="Tail")  )) && %tempTo%subtype!="")
 						{
 							
+							
 							;~ MsgBox % "drin: " %tempTo%type "`n" %element%ConnectionType "`n" %tempInstanceID%_%tempRunningElement%_result "`n" %element%frompart
 							if (tempConnectionCountToRun>0)
 							{
@@ -241,22 +242,21 @@ r_run()
 									;~ MsgBox % strobj(temp)
 									if (tempTo != temp["CurrentLoop"])
 									{
-										logger("f0","Error! " tempInstanceID ": " lang("The end of a loop was entered, but this loop was not the current one.")  " " lang("Current thread will be closed"))
+										logger("f0","Error! " tempInstanceID ": " lang("The end of a loop was entered, but this loop was not the current one.")  " " lang("Current thread was closed"))
 										;~ MsgBox, 16, % lang("Error"),% lang("The end of a loop was entered, but this loop was not the current one.")  "`n" lang("Current thread will be closed") 
 										tempRunSkipCurrentRun:=true
 									}
 								}
-								if (tempRunSkipCurrentRun != true)
-								{
-									goingToRunIDs.insert(tempInstanceID "_" tempThreadIDToRun "_" tempTo "_" %tempInstanceID%_RunningCounter "_" %element%toPart)
-									tempConnectionCountToRun++
-								}
 							}
-							else
+							if (tempRunSkipCurrentRun != true)
 							{
-								goingToRunIDs.insert(tempInstanceID "_" tempThreadIDToRun "_" tempTo "_" %tempInstanceID%_RunningCounter)
+								%tempInstanceID%_%tempRunningElement%_FoundNextElement:=true
+								;~ MsgBox %tempInstanceID%_%tempRunningElement%_FoundNextElement
+								goingToRunIDs.insert(tempInstanceID "_" tempThreadIDToRun "_" tempTo "_" %tempInstanceID%_RunningCounter "_" %element%toPart)
 								tempConnectionCountToRun++
 							}
+
+							
 							;MsgBox % "going to run hinzugefügt "  tempInstanceID "_"  %element%to "_" %tempInstanceID%_RunningCounter
 							
 						}
@@ -305,6 +305,16 @@ r_run()
 		; tempElement5 = element id in the instance
 		
 		logger("f2","Instance " tempElement2 ": " %tempElement4%type " '" %tempElement4%name "' has finished with result " %tempElement%_result)
+		
+		if (%tempElement%_FoundNextElement!=true)
+		{
+			if (%tempElement%_result="exception" and %tempElement%_reason!="")
+			{
+				;~ %tempElement%_FoundNextElement
+				MsgBox, 16, % lang("Error"),% lang("%1% '%2%' ended with an error",lang(%tempElement4%type),%tempElement4%name) ":`n" %tempElement%_reason "`n`n" lang("Current thread was closed") 
+				;~ MsgBox % %tempElement%_reason
+			}
+		}
 		
 		;MsgBox, element %tempElement% has finished and will be removed
 		for index2, tempRunningElement in Instance_%tempElement2%_RunningElements

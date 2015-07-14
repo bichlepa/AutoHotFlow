@@ -16,9 +16,14 @@ runActionDelete_folder(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 		FileRemoveDir,%tempPath%,1
 	
 	if ErrorLevel
-		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
-	else
-		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Folder not deleted.")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("Folder not deleted"))
+		return
+	}
+	
+	
+	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	return
 }
 getNameActionDelete_folder()

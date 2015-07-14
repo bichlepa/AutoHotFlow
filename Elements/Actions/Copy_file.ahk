@@ -3,6 +3,7 @@
 runActionCopy_file(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
+	local temperror
 	
 	local tempFrom:=% v_replaceVariables(InstanceID,ThreadID,%ElementID%file)
 	local tempTo:=% v_replaceVariables(InstanceID,ThreadID,%ElementID%destFile)
@@ -11,12 +12,34 @@ runActionCopy_file(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	if  DllCall("Shlwapi.dll\PathIsRelative","Str",tempTo)
 		tempTo:=SettingWorkingDir "\" tempTo
 	
-	FileCopy,% tempFrom,% tempTo,% %ElementID%Overwrite
+	if tempFrom=
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Source file not specified.")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not specified.",lang("Source file")))
+		return
+	}
 	
-	if ErrorLevel
-		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
-	else
-		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
+	FileCopy,% tempFrom,% tempTo,% %ElementID%Overwrite
+	temperror:=errorlevel
+	
+	if a_lasterror
+	{
+		;~ MsgBox % a_lasterror 
+		if temperror
+		{
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! " temperror " files not copied.")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% files not copied",temperror))
+		}
+		else
+		{
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! No files copied.")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("No files copied"))
+		}
+		return
+	}
+	
+	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
+	
 	return
 }
 getNameActionCopy_file()

@@ -52,7 +52,15 @@ ui_SettingsOwFLow()
 	gui,add,button,w145 h30 yp X+10 gGuiFlowSettingsCancel,% lang("Cancel")
 	
 
-	gui,show
+		;Put the window in the center of the main window
+	gui,+hwndSettingsHWND
+	gui,show,hide
+	
+	ui_GetMainGUIPos()
+	wingetpos,,,tempWidth,tempHeight,ahk_id %SettingsHWND%
+	tempXpos:=round(MainGUIX+MainGUIWidth/2- tempWidth/2)
+	tempYpos:=round(MainGUIY+MainGUIHeight/2- tempHeight/2)
+	gui,show,x%tempXpos% y%tempYpos%
 	return
 	
 	GuiFlowSettingsButtonShowLog:

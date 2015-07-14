@@ -8,7 +8,12 @@ runActionEmpty_recycle_bin(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 		FileRecycleEmpty
 	else
 		FileRecycleEmpty, % v_replaceVariables(InstanceID,ThreadID,%ElementID%Drive)
-	
+	if ErrorLevel
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Recycle bin could not be emptied.")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("Recycle bin could not be emptied."))
+		return
+	}
 	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	return
 }

@@ -46,7 +46,7 @@ v_getVariable(InstanceID,ThreadID,name,VariableType="asIs")
 				else if a_loopfield=[date]
 				{
 					
-					StringTrimLeft,tempvalue,tempvalue,7 ;Remove [date]
+					StringTrimLeft,tempvalue,tempvalue,8 ;Remove [date]
 					
 					if (VariableType!="Date" and VariableType!="asIs")
 					{
@@ -57,7 +57,7 @@ v_getVariable(InstanceID,ThreadID,name,VariableType="asIs")
 				}
 				else if a_loopfield=[list]
 				{
-					StringTrimLeft,tempvalue,tempvalue,7 ;Remove [list]
+					StringTrimLeft,tempvalue,tempvalue,8 ;Remove [list]
 					
 					tempvalue:=StrObj(tempvalue)
 					
@@ -94,6 +94,76 @@ v_getVariable(InstanceID,ThreadID,name,VariableType="asIs")
 		{
 			
 		logger("f1","Global variable " name "does not exist.")
+			return
+		}
+	}
+	else if (substr(name,1,7)="static_") ;If variable is static
+	{
+		
+		if fileexist(FolderOfStaticVariables "\" name ".txt")
+		{
+			FileRead,tempvalue,%FolderOfStaticVariables%\%name%.txt ;read file content
+			loop,parse,tempvalue,`n,`r ;Get the first line
+			{
+				
+				if (a_loopfield="[Normal]")
+				{
+					
+					StringTrimLeft,tempvalue,tempvalue,10 ;Remove [normal]
+					
+					done:=true
+				}
+				else if a_loopfield=[date]
+				{
+					
+					StringTrimLeft,tempvalue,tempvalue,8 ;Remove [date]
+					
+					if (VariableType!="Date" and VariableType!="asIs")
+					{
+						tempvalue:= v_exportVariable(tempvalue,"date","`n")
+					}
+					
+					done:=true
+				}
+				else if a_loopfield=[list]
+				{
+					StringTrimLeft,tempvalue,tempvalue,8 ;Remove [list]
+					
+					tempvalue:=StrObj(tempvalue)
+					
+					if (VariableType!="list" and VariableType!="asIs")
+						tempvalue:= StrObj(tempvalue)
+					
+					
+					
+					done:=true
+				}
+				break
+			}
+			if (done=false) ;It seems to be binary data
+			{
+				
+				;~ if (VariableType!="binary" and VariableType!="asIs") ;binary data disabled
+				;~ {
+					;~ logger("f3","Global variable " name "has no type. It is assumed to be binary. It is set.")
+					;~ FileRead,tempvalue,*c global variables\%name%.txt
+				;~ }
+				;~ else
+				;~ {
+					logger("f0a0","Static variable " name "has no type. It won't be set.")
+					return
+				;~ }
+			}
+			
+			
+			
+			return tempvalue
+			
+		}
+		else
+		{
+			
+		logger("f1","Static variable " name "does not exist.")
 			return
 		}
 	}
@@ -240,6 +310,18 @@ v_setVariable(InstanceID,ThreadID,name,value,VariableType="Normal",Permissions=0
 	local tempvalue
 	local temp
 	
+	if (substr(varName,1,2)="A_" and Permissions!=c_SetBuiltInVar and Permissions!=c_SetLoopVar)
+	{
+		logger("f0","Setting built in variable " name " failed. No permission given.")
+		return 0
+	}
+	
+	if not v_CheckVariableName(name,Permissions)
+	{
+		logger("f0","Setting variable " name " failed. Variable name is not valid")
+		return 0
+	}
+	
 	;Refuse setting a variable that begins with "a_". But set thread var if it is designated
 	if (substr(name,1,2)="A_")
 	{
@@ -265,14 +347,11 @@ v_setVariable(InstanceID,ThreadID,name,value,VariableType="Normal",Permissions=0
 		else
 		{
 			logger("f0","Setting built in variable " name " failed. No permission given.")
-			return "ERROR"
+			return 0
 		}
-		return
+		
 	}
-	
-	;MsgBox % var "  " value
-	StringLeft,templeft,name,7
-	if templeft=global_ ;If variable is global
+	else if (substr(name,1,7)="global_") ;If variable is global
 	{
 		logger("f3","Setting global variable " name ".")
 		if isobject(value)
@@ -305,11 +384,56 @@ v_setVariable(InstanceID,ThreadID,name,value,VariableType="Normal",Permissions=0
 				FileAppend,[Date]`n%value%,global variables\%name%.txt,UTF-8
 			}
 			else
-				logger("f0","Setting built in variable " name " failed. No type specified.")
+			{
+				logger("f0","Setting global variable " name " failed. No type specified.")
+				return 0
+			}
 			
 			
 		}
-		return
+		
+	}
+	else if (substr(name,1,7)="static_") ;If variable is static
+	{
+		logger("f3","Setting static variable " name ".")
+		if isobject(value)
+		{
+			tempstring=[List]`n
+			tempstring.=StrObj(value)
+			FileDelete,%FolderOfStaticVariables%\%name%.txt
+			FileAppend,%tempstring%,%FolderOfStaticVariables%\%name%.txt,UTF-8
+		}
+		else
+		{
+			;StringReplace, value, value, `n,|¶, All ;Convert a linefeed to |¶. Otherwise the next lines will not be readable.
+			;StringReplace, value, value, `r,³¶, All ;Convert a linefeed to |¶. Otherwise the next lines will not be readable.
+			
+			
+			;The first character contains the information about the variable type
+			if variableType=Normal
+			{
+				FileDelete,%FolderOfStaticVariables%\%name%.txt
+				FileAppend,[Normal]`n%value%,%FolderOfStaticVariables%\%name%.txt,UTF-8
+			}
+			;~ else if variableType=binary ;binary data disabled
+			;~ {
+				;~ FileDelete,global variables\%name%.txt
+				;~ FileAppend,%value%,*global variables\%name%.txt
+			;~ }
+			else if variableType=date
+			{
+				FileDelete,%FolderOfStaticVariables%\%name%.txt
+				FileAppend,[Date]`n%value%,%FolderOfStaticVariables%\%name%.txt,UTF-8
+			}
+			else
+			{
+				logger("f0","Setting static variable " name " failed. No type specified.")
+				return 0
+			}
+			
+			
+		}
+		
 	}
 	else ;if variable is local
 	{
@@ -335,10 +459,13 @@ v_setVariable(InstanceID,ThreadID,name,value,VariableType="Normal",Permissions=0
 			}
 		}
 		else
+		{
 			logger("f0","Setting local variable " name " failed. No type specified.")
-		return
+			return 0
+		}
+		
 	}
-	return 
+	return 1
 	
 	
 }
@@ -350,13 +477,39 @@ v_getVariableType(InstanceID,ThreadID,name)
 	local templeft
 	local tempfirstline
 	local done:=false
-	StringLeft,templeft,name,7
 	logger("f3","Getting variable type of " name ".")
-	if templeft=global_
+	if (substr(name,1,7)="global_")
 	{
 		if fileexist("global variables\" name ".txt")
 		{
 			FileReadLine,tempvalue,global variables\%name%.txt,1
+			
+			if tempvalue=[normal]
+			{
+				return "normal"
+			}
+			else if tempvalue=[date]
+			{
+				return "date"
+			}
+			else if tempvalue=[list]
+			{
+				return "list"
+			}
+			else
+				return "unknown" ;Binary type disabled
+			
+			
+			
+		}
+		else
+			return
+	}
+	else if (substr(name,1,7)="static_")
+	{
+		if fileexist(FolderOfStaticVariables "\" name ".txt")
+		{
+			FileReadLine,tempvalue,%FolderOfStaticVariables%\%name%.txt,1
 			
 			if tempvalue=[normal]
 			{
@@ -440,6 +593,12 @@ getVariableLocation(InstanceID,ThreadID,name)
 			return "global"
 		
 	}
+	else if (substr(name,1,7)="static_")
+	{
+		if fileexist(FolderOfStaticVariables "\" name ".txt")
+			return "static"
+		
+	}
 	else ;Seems to be local
 	{
 		if Instance_%InstanceID%_LocalVariables.HasKey(name)
@@ -511,6 +670,11 @@ v_deleteVariable(InstanceID,ThreadID,name,Permission="")
 	{
 		logger("f3","Deleting global variable " name)
 		FileDelete,global variables\%name%.txt
+	}
+	else if (substr(name,1,7)= "static_")
+	{
+		logger("f3","Deleting static variable " name)
+		FileDelete,%FolderOfStaticVariables%\%name%.txt
 	}
 	else if (substr(name,1,2)= "a_")
 	{
@@ -622,7 +786,35 @@ v_WriteLocalVariablesToString(InstanceID)
 }
 
 
-
+v_CheckVariableName(varName,Permissions:="")
+{
+	global c_SetBuiltInVar
+	global c_SetLoopVar
+	try
+		asdf%varName%:=1
+	catch
+	{
+		;~ MsgBox fsdg %varName%
+		return 0
+		
+	}
+	
+	if varName=
+	{
+		;~ MsgBox erze
+		return 0
+	}
+	
+	if (substr(varName,1,2)="A_" and Permissions!=c_SetBuiltInVar and Permissions!=c_SetLoopVar)
+	{
+		;~ MsgBox %varName% - %Permissions%
+		return 0
+	}
+	
+	return 1
+	
+	
+}
 
 PrepareEnteringALoop(InstanceID,ThreadID,LoopElement)
 {

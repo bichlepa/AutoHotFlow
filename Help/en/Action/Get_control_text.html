@@ -6,7 +6,13 @@
 	<meta name="generator" content="LibreOffice 4.4.3.2 (Windows)"/>
 	<meta name="created" content="00:00:00"/>
 	<meta name="changedby" content="Paul Bichler"/>
-	<meta name="changed" content="2015-06-17T19:00:46.791000000"/>
+	<meta name="changed" content="2015-06-30T20:35:31.133000000"/>
+	<meta name="created" content="00:00:00">
+	<meta name="changedby" content="Paul Bichler">
+	<meta name="changed" content="2015-06-30T16:04:16.267000000">
+	<meta name="created" content="00:00:00">
+	<meta name="changedby" content="Paul Bichler">
+	<meta name="changed" content="2015-06-17T19:00:46.791000000">
 	<meta name="CHANGEDBY" content="Paul Bichler">
 	<style type="text/css">
 		td p { color: #000000 }
@@ -35,7 +41,7 @@ Settings</h2>
 <table width="100%" cellpadding="4" cellspacing="0" bgcolor="#ccffff">
 	<col width="256*">
 	<tr>
-		<td width="100%" valign="top" style="border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding: 0.11cm">
+		<td width="100%" valign="top" style="border: 1px solid #000000; padding: 0.11cm">
 			<p style="margin-bottom: 0.1cm"><b>Output variable name</b></p>
 			<p style="font-weight: normal">Name of the variable which will
 			contain the retrieved control text.</p>
@@ -45,8 +51,20 @@ Settings</h2>
 		<td width="100%" valign="top" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
 			<p style="margin-bottom: 0.1cm"><b>Method for control
 			identification</b></p>
-			<p style="font-weight: normal">The control can be identified
-			either by its text or by its classname and instance number.</p>
+			<p style="font-weight: normal">There are three different methods
+			for identification:<br/>
+If <b>Text in </b><b>control</b> is
+			selected, a control will be identified by its text, which must
+			contain the entered string.<br/>
+If <b>C</b><b>lassname and
+			instance number</b> is selected, the control will be identified by
+			its unique classname and instance number. Usually this identifier
+			is always the same in every instance of the window.<br/>
+If <b>Unique
+			control ID</b> is selected, the control will be identified by it
+			unique ID. This ID is different in every instance of the window.
+			So, if a window is closed and opened again, the ID of the same
+			control is different.</p>
 		</td>
 	</tr>
 	<tr>
@@ -129,9 +147,28 @@ Settings</h2>
 		</td>
 	</tr>
 </table>
-<p style="margin-bottom: 0.1cm"><br/>
+<h2 class="western" style="margin-top: 0.3cm; margin-bottom: 0.1cm; font-weight: normal">
+Supplied variables</h2>
+<table width="100%" cellpadding="4" cellspacing="0" bgcolor="#ccffff">
+	<col width="256*">
+	<tr>
+		<td width="100%" valign="top" bgcolor="#ffffcc" style="border: 1px solid #000000; padding: 0.11cm">
+			<p style="margin-bottom: 0.1cm"><font face="Consolas, monospace"><b>A_WindowID</b></font></p>
+			<p style="font-weight: normal">contains the unique ID of the found
+			window.</p>
+		</td>
+	</tr>
+	<tr>
+		<td width="100%" valign="top" bgcolor="#ffffcc" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
+			<p style="margin-bottom: 0.1cm"><font face="Consolas, monospace"><b>A_ControlID</b></font></p>
+			<p style="font-weight: normal">contains the unique ID of the found
+			control.</p>
+		</td>
+	</tr>
+</table>
+<h2 class="western" style="margin-top: 0.3cm; margin-bottom: 0.1cm"><br/>
 <br/>
 
-</p>
+</h2>
 </body>
 </html>

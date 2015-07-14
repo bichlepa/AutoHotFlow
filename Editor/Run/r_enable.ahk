@@ -63,3 +63,16 @@ r_TellThatFlowIsEnabled()
 	if (nowrunning!=true)
 		menu tray,icon,Icons\enabled.ico
 }
+
+r_TellCurrentStatus()
+{
+	global 
+	if triggersEnabled
+		r_TellThatFlowIsEnabled()
+	else
+		r_TellThatFlowIsDisabled()
+	if nowrunning
+		r_TellThatFlowIsStarted()
+	else
+		r_TellThatFlowIsStopped()
+}

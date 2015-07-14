@@ -90,6 +90,14 @@ runConditionDebug_Dialog(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 		tempVariableNames.=tempVarName "|"
 	}
 	
+	loop,%FolderOfStaticVariables%\static_*.txt
+	{
+		if a_index=1
+			tempVariableNames.= "--- " lang("Static variables") " ---|"
+		StringTrimRight,tempVarName,A_LoopFileName,4
+		tempVariableNames.=tempVarName "|"
+	}
+	
 	loop,global variables\global_*.txt
 	{
 		if a_index=1

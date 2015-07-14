@@ -6,12 +6,19 @@ runActionDelete_from_list(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 
 	local Varname:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname)
 	local Position:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Position)
-	local tempObject:=v_getVariable(InstanceID,ThreadID,Varname,"list")
 	
 	;MsgBox,%  %ElementID%Varname "---" %ElementID%VarValue "---" v_replaceVariables(InstanceID,%ElementID%Varname) "---" v_replaceVariables(InstanceID,%ElementID%VarValue)
 	
 
+	if not v_CheckVariableName(varname)
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! List name '" varname "' is not valid")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not valid",lang("List name '%1%'",varname)) )
+		return
+	}
 	
+	
+	local tempObject:=v_getVariable(InstanceID,ThreadID,Varname,"list")
 	
 	if IsObject(tempObject)
 	{
@@ -25,7 +32,12 @@ runActionDelete_from_list(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 		}
 		else if %ElementID%WhitchPosition=3
 		{
-			
+			if Position=
+			{
+				logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Position is not specified.")
+				MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is empty.",lang("Position")))
+				return
+			}
 			tempObject.Remove(Position)
 		}
 		
@@ -35,7 +47,13 @@ runActionDelete_from_list(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 		
 	}
 	else
-		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
+	{
+		
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Variable '" Varname "' does not contain a list.")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("Variable '%1%' does not contain a list.",Varname))
+		return
+		
+	}
 	
 
 	return

@@ -10,14 +10,23 @@ runActionCopy_folder(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 		tempFrom:=SettingWorkingDir "\" tempFrom
 	if  DllCall("Shlwapi.dll\PathIsRelative","Str",tempTo)
 		tempTo:=SettingWorkingDir "\" tempTo
-	
+	if tempFrom=
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Source folder not specified.")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not specified.",lang("Source folder")))
+		return
+	}
 	
 	FileCopyDir,% tempFrom,% tempTo,% %ElementID%Overwrite
 	
 	if ErrorLevel
-		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
-	else
-		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Folder not copied.")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("Folder not copied"))
+		return
+	}
+	
+	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	return
 }
 getNameActionCopy_folder()

@@ -1,41 +1,66 @@
-﻿goto,jumpoverclickstuff
+﻿
+goto,jumpoverclickstuff
 
+leftmousebuttonclick:
 rightmousebuttonclick:
-thread, Priority, -50
-MouseGetPos,,,,temphwnd,2
-;~ MsgBox %temphwnd% %PicFlowHWND%
-if (PicFlowHWND=temphwnd) ;Scroll using right button
+
+IfWinnotActive,ahk_id %MainGuihwnd%
 {
-	scrollwithMouse("rbutton")
+	return
 }
+thread, Priority, -50
+CoordMode,mouse,client
+MouseGetPos,mx,my,temphwnd
+
+
+;~ MsgBox %mx% %my% - %temphwnd% - %MainGuihwnd% 
+;~ MsgBox %temphwnd% %PicFlowHWND%
+;~ if (MainGuihwnd=temphwnd and mx>0 and mx<widthofguipic and my>0 and my<heightofguipic) ;Scroll using right button
+;~ {
+	if a_thislabel =rightmousebuttonclick
+	{
+		
+		scrollwithMouse("rbutton")
+	}
+	else
+	{
+		
+		SetTimer,clickonpicture,-1
+	}
+;~ }
 return
 
+leftmousebuttondoubleclick:
+if (theOnlyOneMarkedElement)
+{
+	sleep 10
+	ui_settingsOfElement(theOnlyOneMarkedElement) ;open settings of the marked element
+}
+return
 
 clickOnPicture: ;react on clicks of the user
 
 
+
+if (workingOnClick=true)
+	return
+workingOnClick:=true
 thread, Priority, -50
 
 MouseGetPos,mx,my ;Get the mouse position
 
 
 
-if (A_GuiEvent="DoubleClick") ;If user double clicked
-{
-	
-	if (theOnlyOneMarkedElement)
-		ui_settingsOfElement(theOnlyOneMarkedElement) ;open settings of the marked element
-	return
-}
+GetKeyState,ControlKeyState,control
 
-GetKeyState,ControlKeyState,control,p ;If control is pressed
+
 
 elementWithHighestPriority=
 if ((0 < mx) and (0 < my) and ((NewElementIconWidth*1.2*zoomFactor)  > mx) and ((NewElementIconHeight*1.2*zoomFactor) > my))
 	elementWithHighestPriority=MenuCreateNewAction
 if (((NewElementIconWidth*1.2*zoomFactor) < mx) and (0 < my) and ((NewElementIconWidth*1.2 * 2*zoomFactor)  > mx) and ((NewElementIconHeight*1.2*zoomFactor) > my))
 	elementWithHighestPriority=MenuCreateNewCondition
-if (((NewElementIconWidth*2.4*zoomFactor) < mx) and (0 < my) and ((NewElementIconWidth*2.4 * 2*zoomFactor)  > mx) and ((NewElementIconHeight*1.2*zoomFactor) > my))
+if (((NewElementIconWidth*2.4*zoomFactor) < mx) and (0 < my) and ((NewElementIconWidth*1.2 * 3*zoomFactor)  > mx) and ((NewElementIconHeight*1.2*zoomFactor) > my))
 	elementWithHighestPriority=MenuCreateNewLoop
 
 
@@ -181,7 +206,6 @@ else if (elementWithHighestPriority="MenuCreateNewAction" or elementWithHighestP
 	}
 	
 	
-	return
 }
 else if (elementWithHighestPriority="PlusButton" or elementWithHighestPriority="PlusButton2") ;user click on plus button
 {
@@ -285,6 +309,7 @@ else if (elementWithHighestPriority="PlusButton" or elementWithHighestPriority="
 					e_removeElement(tempConnection2)
 					
 					ui_draw()
+					workingOnClick:=false
 					return
 				}
 				
@@ -552,6 +577,7 @@ else if (elementWithHighestPriority="PlusButton" or elementWithHighestPriority="
 					e_removeElement(tempConnection1)
 					
 					ui_draw()
+					workingOnClick:=false
 					return
 				}
 				
@@ -705,6 +731,7 @@ else if (elementWithHighestPriority="PlusButton" or elementWithHighestPriority="
 	
 	
 	ui_draw()
+	workingOnClick:=false
 	;ui_settingsOfElement(elementWithHighestPriority) ;open settings of element
 	return
 }
@@ -801,6 +828,7 @@ else if (elementWithHighestPriority="MoveButton1")
 				%tempConnection1%from:=tempOldConnection1from
 				
 				ui_draw()
+				workingOnClick:=false
 				return
 			}
 			
@@ -1034,6 +1062,7 @@ else if (elementWithHighestPriority="MoveButton2")
 				%tempConnection1%to:=tempOldConnection1to
 				
 				ui_draw()
+				workingOnClick:=false
 				return
 			}
 			
@@ -1184,10 +1213,20 @@ else if (elementWithHighestPriority="EditButton")
 else if (elementWithHighestPriority) ;if user clicked on an element
 {
 	
-	
-	if (clickModus="Normal") ;Normal modus: mark elements 
+	if %elementWithHighestPriority%type=connection
 	{
+		if (ControlKeyState="d")
+		{
+			markElement(elementWithHighestPriority,"true") ;mark multiple elements
+			
+		}
+		else
+			markElement(elementWithHighestPriority) ;mark one element and unmark others
+		ui_draw() 
 		
+	}
+	else
+	{
 		
 		
 		if (!detectMovement()) ;If user did not move the mouse
@@ -1195,6 +1234,7 @@ else if (elementWithHighestPriority) ;if user clicked on an element
 			
 			if (ControlKeyState="d")
 			{
+				
 				markElement(elementWithHighestPriority,"true") ;mark multiple elements
 				
 			}
@@ -1211,11 +1251,16 @@ else if (elementWithHighestPriority) ;if user clicked on an element
 				markElement(elementWithHighestPriority) 
 				moveSelectedElements()
 			}
+			ui_draw() 
 			saved=no
 		}
-		
-		
 	}
+	
+	
+	
+	
+	
+	
 	
 	
 	
@@ -1228,7 +1273,7 @@ else if (elementWithHighestPriority) ;if user clicked on an element
 
 
 
-
+workingOnClick:=false
 return
 
 moveSelectedElements(option="")
@@ -1692,13 +1737,15 @@ if (zoomFactor<zoomFactorMin)
 	zoomFactor:=zoomFactorMin
 }
 
-mx5new:=(mx5 - guipicx)/zoomFactor
-my5new:=(my5 - guipicy)/zoomFactor
+mx5new:=mx5 /zoomFactor
+my5new:=my5 /zoomFactor
 offsetx:=  offsetx + mx5old - mx5new 
 offsety:= offsety + my5old  - my5new
 ui_UpdateStatusbartext("pos")
 ui_draw()
+
 return
+
 ctrl_wheelup:
 
 MouseGetPos,mx5,my5 ;Get the mouse position
@@ -1727,6 +1774,7 @@ offsety:= offsety + my5old  - my5new
 ui_UpdateStatusbartext("pos")
 
 ui_draw()
+
 return
 
 

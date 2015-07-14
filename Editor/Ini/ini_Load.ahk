@@ -1,7 +1,7 @@
 ﻿i_load(ThisFlowFilePath)
 {
 	global
-	
+	local FinishedSaving
 	busy:=true
 	ui_disablemaingui()
 	if ThisFlowFilePath=
@@ -23,6 +23,20 @@
 	}
 	
 	ToolTip(lang("loading"),100000)
+	Iniread,FlowCompabilityVersion,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,FlowCompabilityVersion,0
+
+	Iniread,FinishedSaving,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,Finished Saving,No ;Check whether the flow was saved completely
+	if (FinishedSaving="no" and FlowCompabilityVersion>=3)
+	{
+		if fileexist(ThisFlowFolder "\" ThisFlowFilename "_Backup.txt")
+		{
+			MsgBox, 48, AutoHotFlow,%  lang("The flow was not saved properly last time.") " " lang("A backup is available. It will be loaded.")
+			FileMove,%ThisFlowFolder%\%ThisFlowFilename%_Backup.txt,%ThisFlowFolder%\%ThisFlowFilename%.ini,1
+			Iniread,FlowCompabilityVersion,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,FlowCompabilityVersion,0
+		}
+		else
+			MsgBox, 48, AutoHotFlow,% lang("The flow was not saved properly last time.") " " lang("Unfortunately no backup is available.")
+	}
 	Iniread,ID_count,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,count,1
 	Iniread,SettingFlowExecutionPolicy,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,SettingFlowExecutionPolicy,parallel
 	Iniread,SettingWorkingDir,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,SettingWorkingDir,%A_MyDocuments%\AutoHotFlow default working direction
@@ -35,7 +49,6 @@
 			logger("a0","Error! Working directory couldn't be created.")
 		}
 	}
-	Iniread,FlowCompabilityVersion,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,FlowCompabilityVersion,0
 	
 	i_loadGeneralParameters() ;Outsourced in order to execute only that later when flow name changes
 	
@@ -120,7 +133,7 @@
 				;parameter2: default value
 				;parameter3: parameter name
 				;parameter4 ...: further options
-				if (parameter3="" or parameter0<3) ; ;If this is only a label for the edit fielt etc. Do nothing
+				if (parameter3="" or parameter0<3 or parameter1="label") ; ;If this is only a label for the edit fielt etc. Do nothing
 					continue
 				;~ MsgBox %parameter3%
 				tempparname1=
@@ -252,11 +265,14 @@
 i_loadGeneralParameters()
 {
 	global
-	
+	local temp
+
 	Iniread,FlowName,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,name
 	Iniread,FlowCategory,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,category
 	Iniread,SettingFlowLogToFile,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,LogToFile
-	
+	Iniread,FolderOfStaticVariables,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,Static variables folder,%ThisFlowFolder%\Static variables\%ThisFlowFilename%
+	if not fileexist(FolderOfStaticVariables)
+		FileCreateDir,%FolderOfStaticVariables%
 	GuiControl,CommandWindow:text,CommandWindowFlowName,Ѻ%flowName%Ѻ ;Set the name of the flow as text in the hidden window. So the other ahks can find the right window
 	
 	;IfWinExist,·AutoHotFlow·

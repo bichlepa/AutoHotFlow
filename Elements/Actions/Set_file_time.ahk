@@ -29,7 +29,7 @@ runActionSet_file_time(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
 	else
 	{
-		v_SetVariable(InstanceID,ThreadID,tempVarName,temp,"Date")
+		
 		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	}
 	return
