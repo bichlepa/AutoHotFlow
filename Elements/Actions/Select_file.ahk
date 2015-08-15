@@ -18,6 +18,8 @@ runActionSelect_file(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	Select_fileStarted:=false
 	for count, tempcSelect_fileidToStart in ActionSelect_fileToStart ;get the first element
 	{
+		Select_fileStarted:=true
+		
 		StringSplit,tempElement,tempcSelect_fileidToStart,_
 		; tempElement1 = word "instance"
 		; tempElement2 = instance id
@@ -25,12 +27,21 @@ runActionSelect_file(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 		; tempElement4 = element id
 		; tempElement5 = element id in the instance
 		ActionSelect_fileToStart_Element_ID:=tempElement4
+		ActionSelect_fileToStart_Element_IDInInstance:=tempElement5
 		ActionSelect_fileStart_CurrentInstanceID:=tempElement2
 		ActionSelect_fileStart_CurrentThreadID:=tempElement3
 		
 		;gui,%tempcSelect_fileidToStart%:default
 		
 		;gui,10:-SysMenu 
+		
+		ActionSelect_fileStart_CurrentVarname:=v_replaceVariables(ActionSelect_fileStart_CurrentInstanceID,ActionSelect_fileStart_CurrentThreadID,%ActionSelect_fileToStart_Element_ID%Varname)
+		if not v_CheckVariableName(ActionSelect_fileStart_CurrentVarname)
+		{
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Ouput variable name '" ActionSelect_fileStart_CurrentVarname "' is not valid")
+			MarkThatElementHasFinishedRunning(ActionSelect_fileStart_CurrentInstanceID,ActionSelect_fileStart_CurrentThreadID,ActionSelect_fileToStart_Element_ID,ActionSelect_fileToStart_Element_IDInInstance,"exception",lang("%1% is not valid",lang("Ouput variable name '%1%'",ActionSelect_fileStart_CurrentVarname)) )
+			continue
+		}
 		
 		tempActionSelectFileOptions=0
 		if %ActionSelect_fileToStart_Element_ID%fileMustExist
@@ -41,6 +52,8 @@ runActionSelect_file(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 			tempActionSelectFileOptions+=8
 		if %ActionSelect_fileToStart_Element_ID%PromptOverwriteFile
 			tempActionSelectFileOptions+=16
+		if %ActionSelect_fileToStart_Element_ID%NoShortcutTarget
+			tempActionSelectFileOptions+=32
 		if %ActionSelect_fileToStart_Element_ID%SaveButton
 			tempActionSelectFileOptions=S%tempActionSelectFileOptions%
 		if %ActionSelect_fileToStart_Element_ID%MultiSelect
@@ -51,15 +64,21 @@ runActionSelect_file(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 		if  DllCall("Shlwapi.dll\PathIsRelative","Str",tempActionSelectFilePath)
 			tempActionSelectFilePath:=SettingWorkingDir "\" tempActionSelectFilePath
 		;MsgBox %tempActionSelectFileOptions%
+		
 		FileSelectFile,tempActionSelectFilefile,%tempActionSelectFileOptions%,%tempActionSelectFilePath%,% v_replaceVariables(ActionSelect_fileStart_CurrentInstanceID,ActionSelect_fileStart_CurrentThreadID,%ActionSelect_fileToStart_Element_ID%title),% v_replaceVariables(ActionSelect_fileStart_CurrentInstanceID,ActionSelect_fileStart_CurrentThreadID,%ActionSelect_fileToStart_Element_ID%filter)
 		;MsgBox %ActionSelect_fileToStart_Element_ID% %tempActionSelectFilefile% %errorlevel%
 		
 		if errorlevel
-			MarkThatElementHasFinishedRunningOneVar(tempcSelect_fileidToStart,"exception")
+		{
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! User dismissed the dialog without selecting a file or system refused to show the dialog.")
+			MarkThatElementHasFinishedRunning(ActionSelect_fileStart_CurrentInstanceID,ActionSelect_fileStart_CurrentThreadID,ActionSelect_fileToStart_Element_ID,ActionSelect_fileToStart_Element_IDInInstance,"exception",lang("User dismissed the dialog without selecting a file or system refused to show the dialog."))
+			continue
+		}
 		else
 		{
-			if %ActionSelect_fileToStart_Element_ID%MultiSelect
+			if %ActionSelect_fileToStart_Element_ID%MultiSelect ;If multiselect, make a list
 			{
+				tempActionSelectFilefilelist=
 				Loop,parse,tempActionSelectFilefile,`n
 				{
 					if a_index=1
@@ -69,17 +88,17 @@ runActionSelect_file(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 					
 				}
 				StringTrimRight,tempActionSelectFilefilelist,tempActionSelectFilefilelist,1
-				;MsgBox %tempActionSelectFilefilelist%
+				;~ MsgBox %tempActionSelectFilefilelist%
 				;MsgBox % v_importVariable(tempActionSelectFilefilelist,"list","▬")
-				v_setVariable(ActionSelect_fileStart_CurrentInstanceID,ActionSelect_fileStart_CurrentThreadID,%ActionSelect_fileToStart_Element_ID%Varname,v_importVariable(tempActionSelectFilefilelist,"list","▬"),"list")
+				v_setVariable(ActionSelect_fileStart_CurrentInstanceID,ActionSelect_fileStart_CurrentThreadID,ActionSelect_fileStart_CurrentVarname,v_importVariable(tempActionSelectFilefilelist,"list","▬"),"list")
 			}
 			else
-				v_setVariable(ActionSelect_fileStart_CurrentInstanceID,ActionSelect_fileStart_CurrentThreadID,%ActionSelect_fileToStart_Element_ID%Varname,tempActionSelectFilefile)
+				v_setVariable(ActionSelect_fileStart_CurrentInstanceID,ActionSelect_fileStart_CurrentThreadID,ActionSelect_fileStart_CurrentVarname,tempActionSelectFilefile)
 			
 			
 			MarkThatElementHasFinishedRunningOneVar(tempcSelect_fileidToStart,"normal")
 		}
-		Select_fileStarted:=true
+		
 		break
 		
 	}
@@ -105,7 +124,7 @@ stopActionSelect_file(ID)
 getParametersActionSelect_file()
 {
 	
-	parametersToEdit:=["Label|" lang("Output variable_name"),"VariableName|selectedFiles|Varname","Label|" lang("Prompt"),"text|" lang("Select a file")" |title","Label|" lang("Root directory"),"folder||folder","Label|" lang("Filter"),"Text|" lang("Any files") " (*.*)|filter","Label|" lang("Options"), "checkbox|0|MultiSelect|" lang("Allow to select multiple files"),"checkbox|0|SaveButton|" lang("'Save' button instead of an 'Open' button"),"checkbox|0|fileMustExist|" lang("File must exist"),"checkbox|0|PathMustExist|" lang("Path must exist"),"checkbox|0|PromptNewFile|" lang("Prompt to create new file"),"checkbox|0|PromptOverwriteFile|" lang("Prompt to overwrite file")]
+	parametersToEdit:=["Label|" lang("Output variable_name"),"VariableName|selectedFiles|Varname","Label|" lang("Prompt"),"text|" lang("Select a file")" |title","Label|" lang("Root directory"),"folder||folder","Label|" lang("Filter"),"Text|" lang("Any files") " (*.*)|filter","Label|" lang("Options"), "checkbox|0|MultiSelect|" lang("Allow to select multiple files"),"checkbox|0|SaveButton|" lang("'Save' button instead of an 'Open' button"),"checkbox|0|fileMustExist|" lang("File must exist"),"checkbox|0|PathMustExist|" lang("Path must exist"),"checkbox|0|PromptNewFile|" lang("Prompt to create new file"),"checkbox|0|PromptOverwriteFile|" lang("Prompt to overwrite file"),"checkbox|0|NoShortcutTarget|" lang("Don't resolve shortcuts to their targets")]
 	
 	return parametersToEdit
 }

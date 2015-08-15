@@ -6,6 +6,7 @@ runActionSet_file_attributes(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	local tempattr
 	local operateon
 	local recurse
+	
 	if %ElementID%ReadOnly=1
 		tempattr.="+R"
 	else if %ElementID%ReadOnly=0
@@ -52,12 +53,24 @@ runActionSet_file_attributes(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	
 	FileSetAttrib,%tempattr%,% tempPath,%operateon%,%recurse%
 	if ErrorLevel
-		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
-	else
 	{
-		
-		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
+		if not fileexist(tempPath)
+		{
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! File '" tempPath "' does not exist")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("File '%1%' does not exist",tempPath))
+			return
+		}
+		else
+		{
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! File '" tempPath "' could not be read")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("File '%1%' could not be read",tempPath))
+			return
+		}
 	}
+	
+	
+	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
+	
 	return
 }
 getNameActionSet_file_attributes()

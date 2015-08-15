@@ -4,27 +4,59 @@ runActionSearch_in_a_string(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	local temp
-	local tempVarname
+	local Varname:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname)
 	local tempSearchText
 	local OccurenceNumber
 	local Offset
 	local Result
 	local Options
 	
-	tempVarname:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname)
+	if not v_CheckVariableName(varname)
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Ouput variable name '" varname "' is not valid")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not valid",lang("Ouput variable name '%1%'",varname)) )
+		return
+	}
 	
 	if %ElementID%expression=1
 		temp:=v_replaceVariables(InstanceID,ThreadID,%ElementID%VarValue)
 	else
 		temp:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%VarValue)
+	
+	if temp=
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Warning! Input string is empty")
+	}
+	
 	if %ElementID%IsExpressionSearchText=1
 		tempSearchText:=v_replaceVariables(InstanceID,ThreadID,%ElementID%SearchText)
 	else
 		tempSearchText:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%SearchText)
 	
-	OccurenceNumber:=v_replaceVariables(InstanceID,ThreadID,%ElementID%OccurenceNumber)
-	Offset:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Offset)
-	;MsgBox,%  %ElementID%Varname "---" %ElementID%VarValue "---" v_replaceVariables(InstanceID,%ElementID%Varname) "---" v_replaceVariables(InstanceID,%ElementID%VarValue)
+	if tempSearchText=
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Search text is not specified.")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not specified.",lang("Search text")))
+		return
+	}
+	
+	
+	OccurenceNumber:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%OccurenceNumber)
+	if OccurenceNumber is not number
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Occurence number is not a number.")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not a number.",lang("Occurence number")))
+		return
+	}
+	
+	Offset:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%Offset)
+	if Offset is not number
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Offset is not a number.")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not a number.",lang("Offset")))
+		return
+	}
+	
 	if %ElementID%CaseSensitive=2
 	{
 		StringCaseSense,on
@@ -40,17 +72,20 @@ runActionSearch_in_a_string(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 		Options=R%OccurenceNumber%
 	}
 		
-	StringGetPos,Result,temp,% tempSearchText,%Options%,%Offset%
+	StringGetPos,Result,temp,% tempSearchText,%Options%,%Offset% ;later: Result + 1: because the first character intex is 0 in this function
 	StringCaseSense,off
+	
 	if errorlevel=1 ;If no string was found
 	{
-		v_SetVariable(InstanceID,ThreadID,tempVarname,Result+1)
-		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
+		v_SetVariable(InstanceID,ThreadID,Varname,"") 
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Searched text not found.")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("Searched text not found"))
 	}
 	else
 	{
-		v_SetVariable(InstanceID,ThreadID,tempVarname,Result+1)
+		v_SetVariable(InstanceID,ThreadID,Varname,Result+1)
 		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
+		
 	}
 	
 	

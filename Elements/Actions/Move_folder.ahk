@@ -3,19 +3,30 @@
 runActionMove_folder(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
+	
 	local tempFrom:=% v_replaceVariables(InstanceID,ThreadID,%ElementID%folder)
 	local tempTo:=% v_replaceVariables(InstanceID,ThreadID,%ElementID%destFolder)
 	if  DllCall("Shlwapi.dll\PathIsRelative","Str",tempFrom)
 		tempFrom:=SettingWorkingDir "\" tempFrom
 	if  DllCall("Shlwapi.dll\PathIsRelative","Str",tempTo)
 		tempTo:=SettingWorkingDir "\" tempTo
+	if tempFrom=
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Source folder not specified.")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not specified.",lang("Source folder")))
+		return
+	}
 	
 	FileMoveDir,% tempFrom,% tempTo,% %ElementID%Overwrite
 	
 	if ErrorLevel
-		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
-	else
-		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Folder not moved.")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("Folder not moved"))
+		return
+	}
+	
+	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	return
 }
 getNameActionMove_folder()

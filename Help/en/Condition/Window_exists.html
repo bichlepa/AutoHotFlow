@@ -6,7 +6,10 @@
 	<meta name="generator" content="LibreOffice 4.4.3.2 (Windows)"/>
 	<meta name="created" content="00:00:00"/>
 	<meta name="changedby" content="Paul Bichler"/>
-	<meta name="changed" content="2015-06-20T13:11:42.379000000"/>
+	<meta name="changed" content="2015-08-11T08:37:55.380000000"/>
+	<meta name="created" content="00:00:00">
+	<meta name="changedby" content="Paul Bichler">
+	<meta name="changed" content="2015-06-20T13:11:42.379000000">
 	<meta name="created" content="00:00:00">
 	<meta name="changedby" content="Paul Bichler">
 	<meta name="changed" content="2015-06-20T13:09:13.116000000">
@@ -25,8 +28,8 @@
 <h1 style="margin-top: 0.3cm; margin-bottom: 0.4cm; page-break-before: always">
 Window exists</h1>
 <dl>
-	<dt style="margin-bottom: 0.1cm">The condition <b>Window </b><b>exists</b>
-	c<span style="font-weight: normal">hecks whether a window </span><span style="font-weight: normal">exists</span><span style="font-weight: normal"><br/>
+	<dt style="margin-bottom: 0.1cm">The condition <b>Window exists</b>
+	c<span style="font-weight: normal">hecks whether a window exists<br/>
 You
 	may assign the parameters manually or use the Wizard (Button &quot;Get
 	parameters&quot;).<br/>
@@ -36,14 +39,7 @@ Settings</h2>
 <table width="100%" cellpadding="4" cellspacing="0" bgcolor="#ccffff">
 	<col width="256*">
 	<tr>
-		<td width="100%" valign="top" style="border: 1px solid #000000; padding: 0.11cm">
-			<p style="margin-bottom: 0.1cm"><b>Detection options</b></p>
-			<p style="font-weight: normal">If <b>Detect hidden window</b> is
-			selected, an existing invisible window will be found, too.</p>
-		</td>
-	</tr>
-	<tr>
-		<td width="100%" valign="top" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
+		<td width="100%" valign="top" style="border: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
 			<p style="margin-bottom: 0.1cm"><b>Title of window</b></p>
 			<p style="font-weight: normal">Name of the window title. It can be
 			chosen whether the title starts, contains or ends with the
@@ -61,7 +57,9 @@ Settings</h2>
 		<td width="100%" valign="top" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
 			<p style="margin-bottom: 0.1cm"><b>Text of a control in window</b></p>
 			<p style="font-weight: normal">If present, this parameter must be
-			a substring from a single text element of the target window.</p>
+			a substring from a single text element of the target window.<br/>
+It
+			can be specified whether hidden text will be found.</p>
 		</td>
 	</tr>
 	<tr>
@@ -103,6 +101,13 @@ Settings</h2>
 			<p style="font-weight: normal">Use the unique process id to
 			identify a window belonging to a specific process. Each process
 			has its unique ID, even if it has the same executable.</p>
+		</td>
+	</tr>
+	<tr>
+		<td width="100%" valign="top" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
+			<p style="margin-bottom: 0.1cm"><b>Hidden window</b></p>
+			<p style="font-weight: normal">If detect hidden window is
+			selected, a window that exists but is not visible will be found.</p>
 		</td>
 	</tr>
 	<tr>

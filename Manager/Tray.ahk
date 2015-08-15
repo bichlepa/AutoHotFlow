@@ -1,4 +1,5 @@
-﻿menu, tray, NoStandard
+﻿if a_iscompiled
+	menu, tray, NoStandard
 
 menu, tray, add,  Show
 menu, tray, Default, Show

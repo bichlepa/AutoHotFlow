@@ -6,46 +6,58 @@ runActionRounding_a_number(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	local temp
 	local tempPlaces
 	local tempResult
-	
-
-	temp:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%VarValue)
-
-	tempPlaces:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%Places)
-	;MsgBox % tempRounding_a_number "|" temp
-	if temp is number
+	local Varname:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname)
+	if not v_CheckVariableName(varname)
 	{
-		if tempPlaces is number
-		{
-			if %ElementID%roundingtype=1 ;Normal rounding
-			{
-				tempResult:=round(temp,tempPlaces)
-			}
-			else if %ElementID%Roundingtype=2 ;Rounding_a_number up
-			{
-				tempResult:=round(temp,tempPlaces)
-				if (tempResult<temp)
-				{
-					tempResult+=10**(-tempPlaces)
-					tempResult:=round(tempResult,tempPlaces)
-				}
-			}
-			else if %ElementID%Roundingtype=3 ;Rounding_a_number down
-			{
-				tempResult:=round(temp,tempPlaces)
-				if (tempResult>temp)
-				{
-					tempResult-=10**(-tempPlaces)
-					tempResult:=round(tempResult,tempPlaces)
-				}	
-			}
-			v_SetVariable(InstanceID,ThreadID,v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname),tempResult)
-			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
-		}
-		else
-			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Ouput variable name '" varname "' is not valid")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not valid",lang("Ouput variable name '%1%'",varname)) )
+		return
 	}
-	else
-		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
+	
+	temp:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%VarValue)
+	if temp is not number
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Input value is not a number.")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not a number.",lang("Input value")))
+		return
+	}
+	
+	tempPlaces:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%Places)
+	if tempPlaces is not number
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Places after comma is not a number.")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not a number.",lang("Places after comma")))
+		
+		return
+	}
+	;MsgBox % tempRounding_a_number "|" temp
+	
+	if %ElementID%roundingtype=1 ;Normal rounding
+	{
+		tempResult:=round(temp,tempPlaces)
+	}
+	else if %ElementID%Roundingtype=2 ;Rounding_a_number up
+	{
+		tempResult:=round(temp,tempPlaces)
+		if (tempResult<temp)
+		{
+			tempResult+=10**(-tempPlaces)
+			tempResult:=round(tempResult,tempPlaces)
+		}
+	}
+	else if %ElementID%Roundingtype=3 ;Rounding_a_number down
+	{
+		tempResult:=round(temp,tempPlaces)
+		if (tempResult>temp)
+		{
+			tempResult-=10**(-tempPlaces)
+			tempResult:=round(tempResult,tempPlaces)
+		}	
+	}
+	
+	v_SetVariable(InstanceID,ThreadID,v_replaceVariables(InstanceID,ThreadID,varname),tempResult)
+	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
+	
 
 	
 	return

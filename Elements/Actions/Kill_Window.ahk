@@ -3,28 +3,19 @@
 runActionKill_Window(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
-	local tempWinTitle
-	local tempWinText
-	local tempExcludeTitle
-	local tempExcludeText
-	local tempTitleMatchMode
-	local tempahk_class
-	local tempahk_exe
-	local tempahk_id
-	local tempahk_pid
-	local tempwinstring
+	local tempWinid
 	
-	tempWinTitle:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Wintitle)
-	tempWinText:=v_replaceVariables(InstanceID,ThreadID,%ElementID%winText)
-	tempExcludeTitle:=v_replaceVariables(InstanceID,ThreadID,%ElementID%excludeTitle)
-	tempExcludeText:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ExcludeText)
-	tempTitleMatchMode :=%ElementID%TitleMatchMode
-	tempahk_class:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ahk_class)
-	tempahk_exe:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ahk_exe)
-	tempahk_id:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ahk_id)
-	tempahk_pid:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ahk_pid)
+	local tempWinTitle:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Wintitle)
+	local tempExcludeTitle:=v_replaceVariables(InstanceID,ThreadID,%ElementID%excludeTitle)
+	local tempWinText:=v_replaceVariables(InstanceID,ThreadID,%ElementID%winText)
+	local tempExcludeText:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ExcludeText)
+	local tempTitleMatchMode :=%ElementID%TitleMatchMode
+	local tempahk_class:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ahk_class)
+	local tempahk_exe:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ahk_exe)
+	local tempahk_id:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ahk_id)
+	local tempahk_pid:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ahk_pid)
 	
-	tempwinstring=%tempWinTitle%
+	local tempwinstring:=tempWinTitle
 	if tempahk_class<>
 		tempwinstring=%tempwinstring% ahk_class %tempahk_class%
 	if tempahk_id<>
@@ -38,14 +29,28 @@ runActionKill_Window(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	
 	SetTitleMatchMode,%tempTitleMatchMode%
 	
-	IfWinExist,%tempwinstring%,%tempWinText%,%tempExcludeTitle%,%tempExcludeText%
+	if %ElementID%findhiddenwindow=0
+		DetectHiddenWindows off
+	else
+		DetectHiddenWindows on
+	if %ElementID%findhiddentext=0
+		DetectHiddenText off
+	else
+		DetectHiddenText on
+	
+	
+	tempWinid:=winexist(tempwinstring,tempWinText,tempExcludeTitle,tempExcludeText)
+	If tempWinid
 	{
-		Winkill,%tempwinstring%,%tempWinText%,%tempExcludeTitle%,%tempExcludeText%
+		v_SetVariable(InstanceID,ThreadID,"A_WindowID",tempWinid,,c_SetBuiltInVar)
+		Winkill,ahk_id %tempWinid%
 		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	}
 	else
 	{
-		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"Exception")
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Seeked window does not exist")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"Exception", lang("Seeked window does not exist"))
+		return
 		
 	}
 
@@ -64,7 +69,7 @@ getCategoryActionKill_Window()
 getParametersActionKill_Window()
 {
 	global
-	parametersToEdit:=["Label|" lang("Title_of_Window"),"Radio|1|TitleMatchMode|" lang("Start_with") ";" lang("Contain_anywhere") ";" lang("Exactly"),"text||Wintitle","Label|" lang("Exclude_title"),"text||excludeTitle","Label|" lang("Text_of_a_control_in_Window"),"text||winText","Label|" lang("Exclude_text_of_a_control_in_window"),"text||ExcludeText","Label|" lang("Window_Class"),"text||ahk_class","Label|" lang("Process_Name"),"text||ahk_exe","Label|" lang("Unique_window_ID"),"text||ahk_id","Label|" lang("Unique_Process_ID"),"text||ahk_pid","Label|" lang("Get_parameters"), "button|FunctionsForElementGetWindowInformation||" lang("Get_Parameters")]
+	parametersToEdit:=["Label|" lang("Title_of_Window"),"Radio|1|TitleMatchMode|" lang("Start_with") ";" lang("Contain_anywhere") ";" lang("Exactly"),"text||Wintitle","Label|" lang("Exclude_title"),"text||excludeTitle","Label|" lang("Text_of_a_control_in_Window"),"text||winText","Checkbox|0|FindHiddenText|" lang("Detect hidden text"),"Label|" lang("Exclude_text_of_a_control_in_window"),"text||ExcludeText","Label|" lang("Window_Class"),"text||ahk_class","Label|" lang("Process_Name"),"text||ahk_exe","Label|" lang("Unique_window_ID"),"text||ahk_id","Label|" lang("Unique_Process_ID"),"text||ahk_pid","Label|" lang("Hidden window"),"Checkbox|0|FindHiddenWindow|" lang("Detect hidden window"),"Label|" lang("Get_parameters"), "button|FunctionsForElementGetWindowInformation||" lang("Get_Parameters")]
 	
 	return parametersToEdit
 }

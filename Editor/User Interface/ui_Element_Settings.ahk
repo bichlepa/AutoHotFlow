@@ -5,6 +5,7 @@
 	local temptext
 	local tempIsDefault
 	local tempAssigned
+	local tempReenablethen
 	
 
 	PreviousSubType2:=PreviousSubType ;This variable will contain anything when user has changed the subtype of the element. The subtype will be restored if user cancels
@@ -118,11 +119,23 @@
 				gui,4:default
 				gui,submit
 				
+				if (%setElementID%type="trigger" and triggersEnabled=true) ;When editing a trigger, disable Triggers and enable them afterwards
+				{
+					tempReenablethen:=true
+					r_EnableFlow()
+				}
+				else
+					tempReenablethen:=false
+				
 				e_removeTrigger(e_TriggerNumbertoID(GuiTriggerChoose))
 				saved=no
 				gui,destroy
 				ui_EnableMainGUI()
 				e_UpdateTriggerName()
+				
+				if (tempReenablethen)
+					r_EnableFlow()
+				
 				ui_settingsOfElement("trigger")
 				return
 				
@@ -695,9 +708,9 @@
 	{
 		tempReenablethen:=true
 		r_EnableFlow()
-		
 	}
-	
+	else
+		tempReenablethen:=false
 	
 	
 	%setElementID%Name:=GUISettingsOfElementEditName

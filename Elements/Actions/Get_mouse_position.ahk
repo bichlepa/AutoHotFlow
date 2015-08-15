@@ -9,8 +9,19 @@ runActionGet_mouse_position(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	local tempcontrol
 	
 	local tempVarNamex:=v_replaceVariables(InstanceID,ThreadID,%ElementID%varnamex)
-	
+	if not v_CheckVariableName(tempVarNamex)
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Ouput variable name '" tempVarNamex "' is not valid")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not valid",lang("Ouput variable name '%1%'",tempVarNamex)) )
+		return
+	}
 	local tempVarNamey:=v_replaceVariables(InstanceID,ThreadID,%ElementID%varnamey)
+	if not v_CheckVariableName(tempVarNamey)
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Ouput variable name '" tempVarNamey "' is not valid")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not valid",lang("Ouput variable name '%1%'",tempVarNamey)) )
+		return
+	}
 	
 	if %ElementID%CoordMode=1
 		CoordMode, Mouse, Screen

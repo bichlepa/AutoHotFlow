@@ -40,20 +40,17 @@ runActionClose_window(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	
 	
 	tempWinid:=winexist(tempwinstring,tempWinText,tempExcludeTitle,tempExcludeText)
-	If tempWinid
-	{
-		v_SetVariable(InstanceID,ThreadID,"A_WindowID",tempWinid,,c_SetBuiltInVar)
-		Winclose,ahk_id %tempWinid%
-		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
-	}
-	else
+	If not tempWinid
 	{
 		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Seeked window does not exist")
 		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"Exception", lang("Seeked window does not exist"))
 		return
 		
 	}
-
+	
+	v_SetVariable(InstanceID,ThreadID,"A_WindowID",tempWinid,,c_SetBuiltInVar)
+	Winclose,ahk_id %tempWinid%
+	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	
 	return
 }

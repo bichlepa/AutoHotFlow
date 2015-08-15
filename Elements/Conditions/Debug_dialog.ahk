@@ -14,6 +14,8 @@ runConditionDebug_Dialog(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	tempNew.insert("ElementIDInInstance",ElementIDInInstance)
 	tempNew.insert("Text",tempText)
 	tempNew.insert("Title",tempTitle)
+	tempNew.insert("Type",%ElementID%type)
+	tempNew.insert("Name",%ElementID%name)
 	
 	;Create a gui label. This label will always be unique. 
 	local tempGUILabel:="GUI_Debug_Dialog_" instanceID "_" ThreadID "_" ElementID "_" ElementIDInInstance 
@@ -253,7 +255,9 @@ runConditionDebug_Dialog(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	tempDebug_DialogBut:=ConditionDebug_DialogAllGUIs[a_gui]
 	
 	;~ MsgBox % a_gui " - " temp.instanceID
-	MarkThatElementHasFinishedRunning(tempDebug_DialogBut.instanceID,tempDebug_DialogBut.threadid,tempDebug_DialogBut.ElementID,tempDebug_DialogBut.ElementIDInInstance,"exception")
+	logger("f0","Instance " tempDebug_DialogBut.instanceID " - " tempDebug_DialogBut.type " '" tempDebug_DialogBut.name "': Error! User dismissed the dialog")
+	MarkThatElementHasFinishedRunning(tempDebug_DialogBut.instanceID,tempDebug_DialogBut.threadid,tempDebug_DialogBut.ElementID,tempDebug_DialogBut.ElementIDInInstance,"exception",lang("User dismissed the dialog"))
+	
 
 	
 	ConditionDebug_DialogAllGUIs.Remove(a_gui)

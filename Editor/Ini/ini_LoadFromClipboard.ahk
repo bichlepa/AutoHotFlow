@@ -123,8 +123,8 @@
 			}
 			
 			%tempNewID%Name=%loadElementname%
-			%tempNewID%x:=loadElementX+tempOffsetX
-			%tempNewID%y:=loadElementY+tempOffsetY
+			%tempNewID%x:=ui_FitGridX(loadElementX+tempOffsetX) 
+			%tempNewID%y:=ui_FitGridY(loadElementY+tempOffsetY) 
 			
 			
 			Iniread,loadElementsubType,%ClipboardFlowFilename%,element%index1%,subType
@@ -192,6 +192,7 @@
 	
 
 	e_UpdateTriggerName()
+	e_CorrectElementErrors("Loaded from clipboard")
 	
 	ui_EnableMainGUI()
 	

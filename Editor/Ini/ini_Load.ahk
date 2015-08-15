@@ -255,6 +255,7 @@
 	Tray_OldShowName:=lang("Edit %1%", flowName)
 	menu,tray,tip,% lang("Flow %1%",flowName)
 	
+	e_CorrectElementErrors("Loaded the saved flow")
 	ui_EnableMainGUI()
 	
 	ui_draw()
@@ -267,14 +268,30 @@ i_loadGeneralParameters()
 	global
 	local temp
 
+	Iniread,Offsetx,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,Offsetx,%Offsetx%
+	Iniread,Offsety,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,OffsetY,%OffsetY%
+	Iniread,zoomFactor,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,zoomFactor,%zoomFactor%
 	Iniread,FlowName,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,name
 	Iniread,FlowCategory,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,category
 	Iniread,SettingFlowLogToFile,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,LogToFile
 	Iniread,FolderOfStaticVariables,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,Static variables folder,%ThisFlowFolder%\Static variables\%ThisFlowFilename%
 	if not fileexist(FolderOfStaticVariables)
 		FileCreateDir,%FolderOfStaticVariables%
-	GuiControl,CommandWindow:text,CommandWindowFlowName,Ѻ%flowName%Ѻ ;Set the name of the flow as text in the hidden window. So the other ahks can find the right window
 	
+	;Set the name of the flow as text in the hidden window. So the other ahks can find the right window
+	GuiControl,CommandWindow:text,CommandWindowFlowName,Ѻ%flowName%Ѻ§%CurrentManagerHiddenWindowID%§
+	
+
+	
+	
+	;Change the window title if it is visible
+	DetectHiddenWindows,off
+	IfWinExist,ahk_id %MainGuihwnd%
+	{
+		
+		gui,1:show,  NA,% "·AutoHotFlow· " lang("Editor") " - " flowName
+	}
+	DetectHiddenWindows,on
 	;IfWinExist,·AutoHotFlow·
 		;ui_showgui()
 }

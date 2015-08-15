@@ -8,7 +8,11 @@ runActionSet_file_time(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	local temp
 	
 	if tempVar=
-		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Places after comma is not a date.")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not a date.",lang("Input value")))
+		return
+	}
 
 	if %ElementID%TimeType=1
 		tempOptions:="M"
@@ -26,12 +30,22 @@ runActionSet_file_time(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	FileSetTime,%tempVar%,% tempPath,%tempOptions%
 	
 	if ErrorLevel
-		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
-	else
 	{
-		
-		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
-	}
+		if not fileexist(tempPath)
+		{
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! File '" tempPath "' does not exist")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("File '%1%' does not exist",tempPath))
+			return
+		}
+		else
+		{
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! File '" tempPath "' could not be read")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("File '%1%' could not be read",tempPath))
+			return
+		}
+	}	
+	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
+	
 	return
 }
 getNameActionSet_file_time()

@@ -1,103 +1,117 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML>
-<HEAD>
-	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=windows-1252">
-	<TITLE>Bedienung</TITLE>
-	<META NAME="GENERATOR" CONTENT="OpenOffice 4.1.0  (Win32)">
-	<META NAME="CREATED" CONTENT="0;0">
-	<META NAME="CHANGEDBY" CONTENT="Paul Bichler">
-	<META NAME="CHANGED" CONTENT="20150615;21401110">
-	<STYLE TYPE="text/css">
-	<!--
-		P { color: #000000 }
-		TD P { color: #000000 }
-		H1 { color: #000000 }
-		DT { color: #000000 }
-		DD { color: #000000 }
-		H2 { color: #000000 }
-		H2.western { font-family: "Albany", sans-serif; font-size: 14pt; font-style: italic }
-		H2.cjk { font-family: "HG Mincho Light J"; font-size: 14pt; font-style: italic }
-		H2.ctl { font-family: "Arial Unicode MS"; font-size: 14pt; font-style: italic }
-		PRE { color: #000000 }
-		PRE.cjk { font-family: "NSimSun", monospace }
-	-->
-	</STYLE>
-</HEAD>
-<BODY LANG="en-US" TEXT="#000000" DIR="LTR">
-<H1 STYLE="margin-top: 0.3cm; margin-bottom: 0.4cm; page-break-before: always">
-Read from ini</H1>
-<DL>
-	<DT STYLE="margin-bottom: 0.1cm">The action<B> Read from ini</B>
-	reads a value from a standard format .ini file.</DT></DL>
-<H2 CLASS="western" STYLE="margin-top: 0.3cm; margin-bottom: 0.1cm; font-weight: normal">
-Settings</H2>
-<TABLE WIDTH=100% BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0 BGCOLOR="#ccffff">
-	<COL WIDTH=256*>
-	<TR>
-		<TD WIDTH=100% VALIGN=TOP>
-			<P STYLE="margin-bottom: 0.1cm"><B>Output variable name</B></P>
-			<P STYLE="font-weight: normal">Name of the variable which will
-			contain the result.</P>
-		</TD>
-	</TR>
-	<TR>
-		<TD WIDTH=100% VALIGN=TOP>
-			<P STYLE="margin-bottom: 0.1cm"><B>Path of .ini file</B></P>
-			<DL>
-				<DD STYLE="margin-left: 0cm; font-weight: normal">Name and path
-				of the file.<BR>The file path is assumed to be in the working
-				directory if an absolute path isn't specified.</DD></DL>
-		</TD>
-	</TR>
-	<TR>
-		<TD WIDTH=100% VALIGN=TOP>
-			<P STYLE="margin-bottom: 0.1cm"><B>Action</B></P>
-			<P STYLE="margin-bottom: 0.1cm; font-weight: normal">If <B>Read </B><B>a
-			key</B> is checked, only one key will be read and its value will
-			be stored to the output variable.</P>
-			<P STYLE="font-weight: normal">If <B>Read </B><B>a section</B> is
-			checked, a list of all section names will be stored to the output
-			variable..</P>
-		</TD>
-	</TR>
-	<TR>
-		<TD WIDTH=100% VALIGN=TOP>
-			<P STYLE="margin-bottom: 0.1cm"><B>Section </B><SPAN STYLE="font-weight: normal">and</SPAN><B>
-			Key</B></P>
-			<P STYLE="font-weight: normal">The section and the key that
-			contain the value.</P>
-		</TD>
-	</TR>
-	<TR>
-		<TD WIDTH=100% VALIGN=TOP>
-			<P STYLE="margin-bottom: 0.1cm"><B>Behavior on error</B></P>
-			<P STYLE="font-weight: normal">If the file, section or key won't
-			be found, the action could throw an exception or write a default
-			value in the variable.</P>
-		</TD>
-	</TR>
-	<TR>
-		<TD WIDTH=100% VALIGN=TOP>
-			<P STYLE="margin-bottom: 0.1cm"><B>Default value on failure</B></P>
-			<P STYLE="font-weight: normal">If <B>Insert default value in the
-			variable</B> is selected, in case of an error, this value will be
-			stored to the variable.</P>
-		</TD>
-	</TR>
-</TABLE>
-<H2 CLASS="western" STYLE="margin-top: 0.3cm; margin-bottom: 0.1cm; font-weight: normal">
-Remarks</H2>
-<P STYLE="margin-bottom: 0.1cm">A standard ini file looks like this:</P>
-<TABLE WIDTH=100% BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0 BGCOLOR="#ccffcc">
-	<COL WIDTH=256*>
-	<TR>
-		<TD WIDTH=100% VALIGN=TOP>
-			<PRE CLASS="western"><FONT FACE="Courier New, monospace">[SectionName]</FONT>
-<FONT FACE="Courier New, monospace">Key=Value</FONT></PRE>
-		</TD>
-	</TR>
-</TABLE>
-<P STYLE="margin-bottom: 0.1cm"><BR><BR>
-</P>
-</BODY>
-</HTML>
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=windows-1252"/>
+	<title>Bedienung</title>
+	<meta name="generator" content="LibreOffice 4.4.3.2 (Windows)"/>
+	<meta name="created" content="00:00:00"/>
+	<meta name="changedby" content="Paul Bichler"/>
+	<meta name="changed" content="2015-08-09T21:06:49.750000000"/>
+	<meta name="CHANGEDBY" content="Paul Bichler">
+	<style type="text/css">
+		td p { color: #000000 }
+		h1 { color: #000000 }
+		p { color: #000000 }
+		dt { color: #000000 }
+		dd { color: #000000 }
+		h2 { color: #000000 }
+		h2.western { font-family: "Albany", sans-serif; font-size: 14pt; font-style: italic }
+		h2.cjk { font-family: "HG Mincho Light J"; font-size: 14pt; font-style: italic }
+		h2.ctl { font-family: "Arial Unicode MS"; font-size: 14pt; font-style: italic }
+		pre { color: #000000 }
+		pre.cjk { font-family: "NSimSun", monospace }
+	</style>
+</head>
+<body lang="en-US" text="#000000" dir="ltr">
+<h1 style="margin-top: 0.3cm; margin-bottom: 0.4cm; page-break-before: always">
+Read from ini</h1>
+<dl>
+	<dt style="margin-bottom: 0.1cm">The action <b>Read from ini</b>
+	reads a value from a standard format .ini file.</dt></dl>
+<h2 class="western" style="margin-top: 0.3cm; margin-bottom: 0.1cm; font-weight: normal">
+Settings</h2>
+<table width="100%" cellpadding="4" cellspacing="0" bgcolor="#ccffff">
+	<col width="256*">
+	<tr>
+		<td width="100%" valign="top" style="border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding: 0.11cm">
+			<p style="margin-bottom: 0.1cm"><b>Output variable name</b></p>
+			<p style="font-weight: normal">Name of the variable which will
+			contain the result.</p>
+		</td>
+	</tr>
+	<tr>
+		<td width="100%" valign="top" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
+			<p style="margin-bottom: 0.1cm"><b>Path of .ini file</b></p>
+			<dl>
+				<dd style="margin-left: 0cm; font-weight: normal">Name and path
+				of the file.<br/>
+The file path is assumed to be in the working
+				directory if an absolute path isn't specified.</dd></dl>
+		</td>
+	</tr>
+	<tr>
+		<td width="100%" valign="top" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
+			<p style="margin-bottom: 0.1cm"><b>Action</b></p>
+			<p style="margin-bottom: 0.1cm; font-weight: normal">If <b>Read a
+			key</b> is checked, only one key will be read and its value will
+			be stored to the output variable.</p>
+			<p style="margin-bottom: 0.1cm"><span style="font-weight: normal">If
+			</span><b>Read </b><b>the entire section</b><span style="font-weight: normal">
+			is checked, </span><span style="font-weight: normal">the entire
+			section</span><span style="font-weight: normal"> will be stored to
+			the output variable. </span>Comments and empty lines are omitted.
+			Only the first 65,533 characters of the section are retrieved.</p>
+			<p style="font-weight: normal">If <b>Read </b><b>the</b><b>
+			section </b><b>names</b> is checked, a list of all section names
+			will be stored to the output variable.</p>
+		</td>
+	</tr>
+	<tr>
+		<td width="100%" valign="top" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
+			<p style="margin-bottom: 0.1cm"><b>Section </b><span style="font-weight: normal">and</span>
+			<b>Key</b></p>
+			<p style="font-weight: normal">The section and the key that
+			contain the value.<br/>
+One or both of the options may be
+			disabled, depending on the choice in <b>Action</b>.</p>
+		</td>
+	</tr>
+	<tr>
+		<td width="100%" valign="top" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
+			<p style="margin-bottom: 0.1cm"><b>Behavior on error</b></p>
+			<p style="font-weight: normal">This option is only available if
+			<b>Read a key </b>is checked.<br/>
+If the file, section or key
+			won't be found, the action could throw an exception or write a
+			default value in the variable.</p>
+		</td>
+	</tr>
+	<tr>
+		<td width="100%" valign="top" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
+			<p style="margin-bottom: 0.1cm"><b>Default value on failure</b></p>
+			<p style="font-weight: normal">This option is only available if
+			<b>Read a key </b>is checked.<br/>
+If <b>Insert default value in
+			the variable</b> is selected, in case of an error, this value will
+			be stored to the variable.</p>
+		</td>
+	</tr>
+</table>
+<h2 class="western" style="margin-top: 0.3cm; margin-bottom: 0.1cm; font-weight: normal">
+Remarks</h2>
+<p style="margin-bottom: 0.1cm">A standard ini file looks like this:</p>
+<table width="100%" cellpadding="4" cellspacing="0" bgcolor="#ccffcc">
+	<col width="256*">
+	<tr>
+		<td width="100%" valign="top" style="border: 1px solid #000000; padding: 0.11cm">
+			<pre class="western"><font face="Courier New, monospace">[SectionName]</font>
+<font face="Courier New, monospace">Key=Value</font></pre>
+		</td>
+	</tr>
+</table>
+<p style="margin-bottom: 0.1cm"><br/>
+<br/>
+
+</p>
+</body>
+</html>

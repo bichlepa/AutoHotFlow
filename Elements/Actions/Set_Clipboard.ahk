@@ -3,10 +3,14 @@
 runActionSet_Clipboard(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
+	local tempText
 	
+	if %ElementID%expression=1
+		tempText:=v_replaceVariables(InstanceID,ThreadID,%ElementID%text)
+	else
+		tempText:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%text)
 	
-	
-	Clipboard:=v_GetVariable(InstanceID,ThreadID,v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname))
+	Clipboard:=tempText
 	
 
 	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
@@ -24,7 +28,7 @@ GetCategoryActionSet_Clipboard()
 GetParametersActionSet_Clipboard()
 {
 	global
-	parametersToEdit:=["Label|" lang("Variable_name"),"Text||Varname"]
+	parametersToEdit:=["Label|" lang("Text to set"),"Radio|1|expression|" lang("This is a string") ";" lang("This is a variable name or expression")y,"Text||text"]
 	
 	return parametersToEdit
 }
@@ -33,6 +37,6 @@ GenerateNameActionSet_Clipboard(ID)
 {
 	global
 	
-	return % lang("Set_Clipboard") "`n" lang("from %1%",GUISettingsOfElement%ID%Varname) 
+	return % lang("Set_Clipboard") " - " GUISettingsOfElement%ID%text
 	
 }

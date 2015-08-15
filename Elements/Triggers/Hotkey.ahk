@@ -1,14 +1,21 @@
 ﻿iniAllTriggers.="Hotkey|" ;Add this trigger to list of all triggers on initialisation
 
+TriggerHotkey_AllActiveTriggerObj:=Object()
+TriggerHotkey_MaxAmount:=10
+
+goto,jumpoverTriggerHotkeyLabels
 
 EnableTriggerHotkey(ElementID)
 {
 	global
 	
-	temphotkey:=%ElementID%hotkey
+	local success:=false
+	
+	local temphotkey:=%ElementID%hotkey
 	if temphotkey=
 	{
-		MsgBox,% lang("Error. The_Hotkey_is_not_set!")
+		logger("f0",%ElementID%type " '" %ElementID%name "': Error! Hotkey is not specified.")
+		MsgBox,16,% lang("Error"),% lang("The_Hotkey_is_not_set!")
 		return
 	}
 	if (%ElementID%BlockKey=0)
@@ -21,15 +28,21 @@ EnableTriggerHotkey(ElementID)
 	
 	if (%ElementID%UseWindow =2 or %ElementID%UseWindow =3)
 	{
-		tempWinTitle:=v_replaceVariables(0,0,%ElementID%Wintitle)
-		tempWinText:=v_replaceVariables(0,0,%ElementID%winText)
-		tempExcludeTitle:=v_replaceVariables(0,0,%ElementID%excludeTitle)
-		tempExcludeText:=v_replaceVariables(0,0,%ElementID%ExcludeText)
-		tempTitleMatchMode :=%ElementID%TitleMatchMode
-		tempahk_class:=v_replaceVariables(0,0,%ElementID%ahk_class)
-		tempahk_exe:=v_replaceVariables(0,0,%ElementID%ahk_exe)
-		tempahk_id:=v_replaceVariables(0,0,%ElementID%ahk_id)
-		tempahk_pid:=v_replaceVariables(0,0,%ElementID%ahk_pid)
+		local tempWinTitle:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Wintitle)
+		local tempWinText:=v_replaceVariables(InstanceID,ThreadID,%ElementID%winText)
+		local tempTitleMatchMode :=%ElementID%TitleMatchMode
+		local tempahk_class:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ahk_class)
+		local tempahk_exe:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ahk_exe)
+		local tempahk_id:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ahk_id)
+		local tempahk_pid:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ahk_pid)
+		
+		;If no window specified, error
+		if (tempwinstring="" and tempWinText="")
+		{
+			logger("f0",%ElementID%type " '" %ElementID%name "': Error! No window specified")
+			MsgBox,16,% lang("Error"),% lang("The hotkey %1% cannot be set!",temphotkey) " " lang("No window specified")
+			return
+		}
 		
 		tempwinstring=%tempWinTitle%
 		if tempahk_class<>
@@ -42,6 +55,15 @@ EnableTriggerHotkey(ElementID)
 			tempwinstring=%tempwinstring% ahk_exe %tempahk_exe%
 		
 		SetTitleMatchMode,%tempTitleMatchMode%
+		
+		if %ElementID%findhiddenwindow=0
+			DetectHiddenWindows off
+		else
+			DetectHiddenWindows on
+		if %ElementID%findhiddentext=0
+			DetectHiddenText off
+		else
+			DetectHiddenText on
 	}
 
 
@@ -53,12 +75,91 @@ EnableTriggerHotkey(ElementID)
 	else
 		hotkey,IfWinActive
 	
-	hotkey,%temphotkey%,r_startRun, UseErrorLevel on
-	if ErrorLevel
+	
+	loop %TriggerHotkey_MaxAmount%
 	{
-		MsgBox,% lang("Error. The hotkey %1% cannot be set!",temphotkey)
+		if TriggerHotkey_AllActiveTriggerObj.HasKey("Index" A_Index)
+			continue
+		else
+		{
+			
+			TriggerHotkey_AllActiveTriggerObj["Index" A_Index]:=ElementID
+			
+			hotkey,%temphotkey%,TriggerTriggerHotkey%a_index%, UseErrorLevel on
+			if ErrorLevel
+			{
+				logger("f0",%ElementID%type " '" %ElementID%name "': Error! The hotkey " temphotkey " cannot be set!")
+				MsgBox,16,% lang("Error"),% lang("The hotkey %1% cannot be set!",temphotkey)
+			}
+			%ElementID%enabledHotkey:=temphotkey
+			success:=true
+			break
+		}
 	}
-	%ElementID%enabledHotkey:=temphotkey
+	
+	if not success
+	{
+		logger("f0",%ElementID%type " '" %ElementID%name "': Error! The hotkey cannot be set! The maximum amount is reached.")
+		MsgBox,16,% lang("Error"),% lang("The hotkey %1% cannot be set!",temphotkey) " " lang("The maximum amount is reached.") 
+		return
+	}
+	
+	
+	
+	
+}
+
+TriggerTriggerHotkey1:
+TriggerTriggerHotkey2:
+TriggerTriggerHotkey3:
+TriggerTriggerHotkey4:
+TriggerTriggerHotkey5:
+TriggerTriggerHotkey6:
+TriggerTriggerHotkey7:
+TriggerTriggerHotkey8:
+TriggerTriggerHotkey9:
+TriggerTriggerHotkey10:
+StringTrimLeft,tempTriggerHotkeyIndex,A_ThisLabel,20
+TriggerTriggerHotkey(tempTriggerHotkeyIndex)
+return
+
+
+TriggerTriggerHotkey(Index)
+{
+	global
+	local ElementID:=TriggerHotkey_AllActiveTriggerObj["Index" index]
+	local temppars:=Object()
+	temppars["threadVariables"]:=v_AppendAVariableToString("","A_ThisHotkey",%ElementID%enabledHotkey)
+	
+	r_Trigger(ElementID,temppars)
+}
+
+DisableTriggerHotkey(ID)
+{
+	
+	global
+	local index
+	local success
+	
+	for key, value in TriggerHotkey_AllActiveTriggerObj
+	{
+		if (value=ID)
+		{
+			TriggerHotkey_AllActiveTriggerObj.delete(key)
+			StringTrimLeft,index,key,5
+			success:=true
+			break
+		}
+		
+	}
+	
+	if success
+	{
+		temphotkey:=%ID%enabledHotkey
+		hotkey,%temphotkey%,TriggerTriggerHotkey%index%,UseErrorLevel off
+		
+	}
+	
 	
 	
 }
@@ -67,7 +168,7 @@ EnableTriggerHotkey(ElementID)
 getParametersTriggerHotkey()
 {
 	
-	parametersToEdit:=["Label|" lang("Hotkey"),"Hotkey||hotkey","Label|" lang("Options"),"Checkbox|1|BlockKey|" lang("Block_key"),"Checkbox|0|Wildcard|" lang("Trigger even if other keys are already held down"),"Checkbox|0|WhenRelease|" lang("Trigger on release rather than press"),"Label|" lang("Window"),"Radio|1|UseWindow|" lang("Always active") ";" lang("Only active when the specified window is active") ";" lang("Only active whe the specified window exists"),"Label|" lang("Title_of_Window"),"Radio|1|TitleMatchMode|" lang("Start_with") ";" lang("Contain_anywhere") ";" lang("Exactly"),"text||Wintitle","Label|" lang("Text_of_a_control_in_Window"),"text||winText","Label|" lang("Window_Class"),"text||ahk_class","Label|" lang("Process_Name"),"text||ahk_exe","Label|" lang("Unique_window_ID"),"text||ahk_id","Label|" lang("Unique_Process_ID"),"text||ahk_pid","Label|" lang("Get_parameters"), "button|FunctionsForElementGetWindowInformation|GetWindowInformation|" lang("Get_Parameters")]
+	parametersToEdit:=["Label|" lang("Hotkey"),"Hotkey||hotkey","Label|" lang("Options"),"Checkbox|1|BlockKey|" lang("Block_key"),"Checkbox|0|Wildcard|" lang("Trigger even if other keys are already held down"),"Checkbox|0|WhenRelease|" lang("Trigger on release rather than press"),"Label|" lang("Window"),"Radio|1|UseWindow|" lang("Always active") ";" lang("Only active when the specified window is active") ";" lang("Only active whe the specified window exists"),"Label|" lang("Title_of_Window"),"Radio|1|TitleMatchMode|" lang("Start_with") ";" lang("Contain_anywhere") ";" lang("Exactly"),"text||Wintitle","Label|" lang("Text_of_a_control_in_Window"),"text||winText","Checkbox|0|FindHiddenText|" lang("Detect hidden text"),"Label|" lang("Window_Class"),"text||ahk_class","Label|" lang("Process_Name"),"text||ahk_exe","Label|" lang("Unique_window_ID"),"text||ahk_id","Label|" lang("Unique_Process_ID"),"text||ahk_pid","Label|" lang("Hidden window"),"Checkbox|0|FindHiddenWindow|" lang("Detect hidden window"),"Label|" lang("Get_parameters"), "button|FunctionsForElementGetWindowInformation|GetWindowInformation|" lang("Get_Parameters")]
 
 	
 	
@@ -83,14 +184,6 @@ getCategoryTriggerHotkey()
 	return lang("User_interaction")
 }
 
-DisableTriggerHotkey(ID)
-{
-	
-	temphotkey:=%ID%enabledHotkey
-	hotkey,%temphotkey%,r_startRun,UseErrorLevel off
-	
-	
-}
 
 GenerateNameTriggerHotkey(ID)
 {
@@ -129,3 +222,6 @@ CheckSettingsTriggerHotkey(ID)
 	GuiControl,Enable%tempenable%,GUISettingsOfElement%ID%ahk_pid 
 	GuiControl,Enable%tempenable%,GUISettingsOfElement%ID%GetWindowInformation 
 }
+
+jumpoverTriggerHotkeyLabels:
+temp= ;Do nothing

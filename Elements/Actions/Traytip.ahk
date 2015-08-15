@@ -8,8 +8,9 @@ runActionTraytip(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	runActionTraytip_Text:=v_replaceVariables(InstanceID,ThreadID,%ElementID%text,"normal")
 	runActionTraytip_Title:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Title,"normal")
 	runActionTraytip_Icon:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Icon)
-	runActionTraytip_Duration:=v_replaceVariables(InstanceID,ThreadID,%ElementID%duration)
-	Traytip,%runActionTraytip_Title%,%runActionTraytip_Text%,runActionTraytip_Duration,% runActionTraytip_Icon -1
+	
+	
+	Traytip,%runActionTraytip_Title%,%runActionTraytip_Text%,,% runActionTraytip_Icon -1
 	;if runActionTraytip_Duration>15
 		;SetTimer,runActionTraytip_refresh,4000
 	

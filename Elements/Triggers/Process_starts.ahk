@@ -1,42 +1,78 @@
 ﻿iniAllTriggers.="Process_starts|" ;Add this trigger to list of all triggers on initialisation
 
-EnableTriggerProcess_starts(ID)
+EnableTriggerProcess_starts(ElementID)
 {
 	global
 	
-	tempProcessName:=v_replaceVariables(0,0,%ID%ProcessName)
+	local tempProcessName:=v_replaceVariables(0,0,%ElementID%ProcessName)
 	
+	if tempProcessName=
+	{
+		logger("f0",%ElementID%type " '" %ElementID%name "': Error! Process name is not specified.")
+		MsgBox,16,% lang("Error"),% lang("Trigger '%1%' couln't be activated!", %ElementID%name) " " lang("%1% is not specified.",lang("Process name"))
+		
+		return
+	}
 	
-	FileDelete,Generated Scripts\TriggerProcess_starts%ID%.ahk
-	FileAppend,
+	TriggerProcess_starts%ElementID%:=object()
+	TriggerProcess_starts%ElementID%["Title"]:="Trigger Process Starts. Flow - " flowName ". ID - " ElementID
+	local tempTitle:=TriggerProcess_starts%ElementID%["Title"]
+	local generatedScript
+	
+	generatedScript=
 	(
-	#SingleInstance force
-	DetectHiddenWindows, On
+	%ScriptGenerationHeader%
+	%ScriptGenerationCommunicationPart1%
+	%ScriptGenerationEndWhenFlowClosesPart1%
 	
-	;open a window so the main program can stop it
-	gui,45:default
-	gui,new,,CommandWindowFor%ID%
-	gui,add,edit,vcommandFortrigger gCommandForTrigger
+	%ScriptGenerationIportantVars%
 	
+	;Main actions
 	loop
 	{
 		process,wait,%tempProcessName%
 		
+		threadVars:=object()
+		threadVars["a_pid"]:=errorlevel
+		com_SendCommand({function: "trigger",ElementID: ►ParentElementID,ThreadVariables: threadVars},"editor",►ParentFlowName)
 		
-		ControlSetText,Edit1,Run|a_pid=`%errorlevel`%,CommandWindowOfEditor,Ѻ%flowname%Ѻ
 		process,waitclose,%tempProcessName%
 	}
 	
-	CommandForTrigger:
-	gui,submit
-	if CommandForTrigger=exit
-	{
-		exitapp
-	}
-	),Generated Scripts\TriggerProcess_starts%ID%.ahk
-	run,Generated Scripts\AutoHotkey.exe "Generated Scripts\TriggerProcess_starts%ID%.ahk"
+	;End of auto-execution:
+	%ScriptGenerationCommunicationPart2%
+		
+	;Evaluating command. Add some custom messages here. Example: if (tempNewReceivedCommand["Function"]="commandname") {}
+	
+	%ScriptGenerationCommunicationPart3% ;Part 3 must be inserted right after part 2 and optionally some other command evaluation
+	%ScriptGenerationEndWhenFlowClosesPart2%
+	%ScriptGenerationFunctionSendCommand%
+	%ScriptGenerationFunctionStrObj%
+	)
+	ScriptGenerationReplaceImportantVars(generatedScript,tempTitle,ElementID)
+	
+	FileDelete,Generated Scripts\%tempTitle%.ahk
+	FileAppend,% generatedScript,Generated Scripts\%tempTitle%.ahk,utf-8
+	local tempPID
+	run,Generated Scripts\AutoHotkey.exe "Generated Scripts\%tempTitle%.ahk",,,tempPID
+	;~ MsgBox % ErrorLevel
+	TriggerProcess_starts%ElementID%["ahkpid"]:=tempPID
+	
 	
 }
+
+DisableTriggerProcess_starts(ElementID)
+{
+	global
+	DetectHiddenWindows, On
+	;Three different methods to terminate the trigger
+	winclose,% TriggerProcess_starts%ElementID%["Title"] "§" CurrentManagerHiddenWindowID "§"
+	com_SendCommand({function: "exit"},"custom",TriggerProcess_starts%ElementID%["Title"] "§" CurrentManagerHiddenWindowID "§")
+	Process,close,% TriggerProcess_starts%ElementID%["ahkpid"]
+	
+
+}
+
 getParametersTriggerProcess_starts()
 {
 	
@@ -56,17 +92,9 @@ getCategoryTriggerProcess_starts()
 }
 
 
-
-DisableTriggerProcess_starts(ID)
-{
-	DetectHiddenWindows, On
-	ControlSetText,Edit1,exit,CommandWindowFor%ID%
-	
-}
-
 GenerateNameTriggerProcess_starts(ID)
 {
-	return lang("Process_starts") " " GUISettingsOfElement%ID%ProcessName
+	return lang("Process_starts") " - " GUISettingsOfElement%ID%ProcessName
 	
 }
 

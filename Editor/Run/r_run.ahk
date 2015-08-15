@@ -4,17 +4,75 @@
 InstanceIDList:=Object()
 r_RunningCounter=0
 r_RunningThreadCounter=0
+r_RunsBlocked:=false
+MaximumCountOfParallelInstances:=100
 executionSpeed=1 ;The smaller the value the faster
+
+ToTriggerList:=Object()
+
+r_Trigger(ElementID,Execution_Parameters="")
+{
+	global
+	;~ Logger("a3","Passing r_Trigger() function")
+	
+	if r_RunsBlocked
+		return
+	
+	if (InstanceIDList.MaxIndex()>MaximumCountOfParallelInstances)
+	{
+		Logger("f1","Already " MaximumCountOfParallelInstances "Instances are running. Skipping execution")
+		return
+	}
+	
+	local ToTrigger:=Object()
+	ToTrigger["ElementID"]:=ElementID
+	ToTrigger["Execution_Parameters"]:=Execution_Parameters
+	ToTriggerList.push(ToTrigger)
+	
+	SetTimer,r_TriggerNow,-10
+	
+	
+}
+
+r_TriggerNow()
+{
+	global
+	local ToTrigger
+	local ElementID
+	;~ Logger("a3","Passing r_TriggerNow() function")
+	if r_RunsBlocked
+		return
+	
+	Loop
+	{
+		ToTrigger:=ToTriggerList.pop()
+		if isobject(ToTrigger)
+		{
+			ElementID:=ToTrigger["ElementID"]
+			
+			Logger("f1",%ElementID%type " '" %ElementID%name "': Trigger executes")
+			r_startRun(ToTrigger["Execution_Parameters"])
+		}
+		else
+			break
+	}
+	
+}
 
 
 ;Starts a new instance
 r_startRun(Execution_Parameters="")
 {
 	global
+	
 	local temp
 	local tempID
+	;~ Logger("a3","Passing r_startRun() function")
+	if r_RunsBlocked
+		return
 	
 	logger("f1","Starting new instance")
+	
 	
 	if (nowrunning=true) ;If the flow is already running.
 	{
@@ -38,8 +96,16 @@ r_startRun(Execution_Parameters="")
 		}
 		else if SettingFlowExecutionPolicy=parallel ;Execute multiple instancec parallel
 		{
-			logger("f2","An instance already exists. This execution is going to run parallel.")
-			temp= ;Do nothing
+			if (InstanceIDList.MaxIndex()>MaximumCountOfParallelInstances)
+			{
+				logger("f1","An instance already exists. This execution should run parallel, but already " MaximumCountOfParallelInstances " are running. Execution skipped.")
+				return
+			}
+			else
+				logger("f2","An instance already exists. This execution is going to run parallel.")
+			
+			
+			
 		}
 		
 	}
@@ -66,14 +132,27 @@ r_startRun(Execution_Parameters="")
 	{
 		
 		;~ MsgBox % strobj(Execution_Parameters)
-		Instance_%r_RunningCounter%_CallingFlow:=Execution_Parameters["CallingFlow"]
-		Instance_%r_RunningCounter%_InstanceOfCallingFlow:=Execution_Parameters["InstanceIDOfCallingFlow"]
+		Instance_%r_RunningCounter%_CallingFlow:=Execution_Parameters["SendingFlow"]
+		Instance_%r_RunningCounter%_ElementIDInCallingFLow:=Execution_Parameters["CallerElementID"]
+		Instance_%r_RunningCounter%_InstanceIDOfCallingFlow:=Execution_Parameters["CallerInstanceID"]
+		Instance_%r_RunningCounter%_ThreadIDOfCallingFlow:=Execution_Parameters["CallerThreadID"]
+		Instance_%r_RunningCounter%_ElementIDInInstanceOfCallingFlow:=Execution_Parameters["CallerElementIDInInstance"]
 		Instance_%r_RunningCounter%_WhetherToReturVariables:=Execution_Parameters["WhetherToReturVariables"]
-		Instance_%r_RunningCounter%_ElementIDInInstanceOfCallingFlow:=Execution_Parameters["ElementIDInInstanceOfCallingFlow"]
+		
+		;~ MsgBox % Execution_Parameters["localVariables"] "`n`n" strobj(Execution_Parameters)
 		
 		;Import variables if the trigger provides some variables or if an other flow has called this flow.
-		temp:=Execution_Parameters["localVariables"]
-		v_ImportLocalVariablesFromString(r_RunningCounter,temp)
+		if isobject(Execution_Parameters["localVariables"])
+			v_ImportLocalVariablesFromObject(r_RunningCounter,Execution_Parameters["localVariables"])
+		else
+			v_ImportLocalVariablesFromString(r_RunningCounter,Execution_Parameters["localVariables"])
+		
+		if isobject(Execution_Parameters["threadVariables"])
+		{
+			v_ImportThreadVariablesFromObject(r_RunningCounter,r_RunningThreadCounter,Execution_Parameters["ThreadVariables"])
+		}
+		else
+			v_ImportThreadVariablesFromString(r_RunningCounter,r_RunningThreadCounter,Execution_Parameters["ThreadVariables"])
 		
 		logger("f2","Instance " r_RunningCounter ": the flow was called by " Execution_Parameters["CallingFlow"])
 	}
@@ -120,9 +199,10 @@ r_run()
 	global
 	local temp
 	
-	
+	;~ Logger("a3","Passing r_run() function")
 	nextrun: ;endless loop until no elements to execute left
-
+	;~ Logger("a3","Passing nextrun label")
+	
 
 	;lower the priority. This would make any interrupted ahk threads finish. (like redraw)
 	thread, Priority, -100
@@ -188,7 +268,8 @@ r_run()
 				;MsgBox, %tempRunningElement% finished running
 				
 				;Find elements that are connected to the finished element and prepare them to run
-				tempConnectionCountToRun:=0
+				
+				tempConnectionsToRun:=object()
 				for index1, element in allElements
 				{
 					
@@ -202,59 +283,9 @@ r_run()
 						;If the connection starts on the currend finised element and the elements finished with the same result that is assigned to the connection
 						if (%element%from=tempRunningElement2 && ( %element%ConnectionType=%tempInstanceID%_%tempRunningElement%_result || (%tempfrom%type="loop" && %element%ConnectionType = "normal" && ((%tempInstanceID%_%tempRunningElement%_result = "normalHead" && %element%frompart ="Head") || (%tempInstanceID%_%tempRunningElement%_result = "normalTail") && %element%frompart ="Tail")  )) && %tempTo%subtype!="")
 						{
+							tempConnectionsToRun.Insert(element)
 							
 							
-							;~ MsgBox % "drin: " %tempTo%type "`n" %element%ConnectionType "`n" %tempInstanceID%_%tempRunningElement%_result "`n" %element%frompart
-							if (tempConnectionCountToRun>0)
-							{
-								r_RunningThreadCounter++
-								tempThreadIDToRun :=r_RunningThreadCounter
-								%tempInstanceID%_Thread_%r_RunningThreadCounter%_Variables:=%tempInstanceID%_Thread_%tempRunningElement1%_Variables.Clone()
-								;~ MsgBox tempInstanceID %tempInstanceID% `n r_RunningThreadCounter %r_RunningThreadCounter% `n tempRunningElement1 %tempRunningElement1%
-								;~ MsgBox % StrObj(%tempInstanceID%_Thread_%tempRunningElement1%_Variables)
-								;~ MsgBox % StrObj(%tempInstanceID%_Thread_%r_RunningThreadCounter%_Variables)
-							}
-							else
-								tempThreadIDToRun:=tempRunningElement1
-							
-							%tempInstanceID%_RunningCounter++
-							tempCountOfRunningElementsInInstance++
-							
-							if %tempFrom%type=Loop ;restore previous loop vars (if any) when leaving a loop
-							{
-								if (%element%frompart="Tail" or %element%ConnectionType = "exception") ;either normal leaving or exception
-									PrepareLeavingALoop(tempInstanceID,tempThreadIDToRun,tempFrom)
-								
-							}
-							
-							tempRunSkipCurrentRun:=false
-							;Insert the element that is on the end of the connection to the list
-							if (%tempTo%type="Loop")
-							{
-								if %element%toPart = Head ;Save previous loop vars (if any) when entering a loop and write the information which loop was enetered
-								{
-									PrepareEnteringALoop(tempInstanceID,tempThreadIDToRun,tempTo)
-									
-								}
-								else if (%element%toPart = "Tail" or %element%toPart = "break") ;When entering a tail of the loop, check whether is was last on the head of the same loop
-								{
-									temp:=%tempInstanceID%_Thread_%tempThreadIDToRun%_Variables[c_loopVarsName]
-									;~ MsgBox % strobj(temp)
-									if (tempTo != temp["CurrentLoop"])
-									{
-										logger("f0","Error! " tempInstanceID ": " lang("The end of a loop was entered, but this loop was not the current one.")  " " lang("Current thread was closed"))
-										;~ MsgBox, 16, % lang("Error"),% lang("The end of a loop was entered, but this loop was not the current one.")  "`n" lang("Current thread will be closed") 
-										tempRunSkipCurrentRun:=true
-									}
-								}
-							}
-							if (tempRunSkipCurrentRun != true)
-							{
-								%tempInstanceID%_%tempRunningElement%_FoundNextElement:=true
-								;~ MsgBox %tempInstanceID%_%tempRunningElement%_FoundNextElement
-								goingToRunIDs.insert(tempInstanceID "_" tempThreadIDToRun "_" tempTo "_" %tempInstanceID%_RunningCounter "_" %element%toPart)
-								tempConnectionCountToRun++
-							}
 
 							
 							;MsgBox % "going to run hinzugefügt "  tempInstanceID "_"  %element%to "_" %tempInstanceID%_RunningCounter
@@ -267,6 +298,71 @@ r_run()
 					}
 					
 				}
+				
+				if tempConnectionsToRun.maxindex()>1
+				{
+					tempRunCopyOfThreadVariables:=%tempInstanceID%_Thread_%tempRunningElement1%_Variables.Clone()
+				}
+				
+				tempConnectionCountToRun:=0
+				for, index, RunElement in tempConnectionsToRun
+				{
+					tempTo:=%RunElement%to
+					tempFrom:=%RunElement%from
+					
+					if (tempConnectionCountToRun>0)
+					{
+						r_RunningThreadCounter++
+						tempThreadIDToRun :=r_RunningThreadCounter
+						%tempInstanceID%_Thread_%tempThreadIDToRun%_Variables:=tempRunCopyOfThreadVariables.Clone()
+						;~ MsgBox tempInstanceID %tempInstanceID% `n r_RunningThreadCounter %r_RunningThreadCounter% `n tempRunningElement1 %tempRunningElement1%
+						;~ MsgBox % StrObj(%tempInstanceID%_Thread_%tempRunningElement1%_Variables)
+						;~ MsgBox % StrObj(%tempInstanceID%_Thread_%r_RunningThreadCounter%_Variables)
+					}
+					else
+						tempThreadIDToRun:=tempRunningElement1
+					
+					%tempInstanceID%_RunningCounter++
+					tempCountOfRunningElementsInInstance++
+					
+					if %tempFrom%type=Loop ;restore previous loop vars (if any) when leaving a loop
+					{
+						if (%RunElement%frompart="Tail" or %RunElement%ConnectionType = "exception") ;either normal leaving or exception
+							PrepareLeavingALoop(tempInstanceID,tempThreadIDToRun,tempFrom)
+						
+					}
+					
+					tempRunSkipCurrentRun:=false
+					;Insert the element that is on the end of the connection to the list
+					if (%tempTo%type="Loop")
+					{
+						if %RunElement%toPart = Head ;Save previous loop vars (if any) when entering a loop and write the information which loop was enetered
+						{
+							;~ MsgBox % tempTo "`n" strobj(%tempInstanceID%_Thread_%tempThreadIDToRun%_Variables) 
+							PrepareEnteringALoop(tempInstanceID,tempThreadIDToRun,tempTo)
+							
+						}
+						else if (%RunElement%toPart = "Tail" or %RunElement%toPart = "break") ;When entering a tail of the loop, check whether is was last on the head of the same loop
+						{
+							temp:=%tempInstanceID%_Thread_%tempThreadIDToRun%_Variables[c_loopVarsName]
+							;~ MsgBox % strobj(%tempInstanceID%_Thread_%tempThreadIDToRun%_Variables)
+							if (tempTo != temp["CurrentLoop"])
+							{
+								logger("f0","Error! " tempInstanceID ": " lang("The end of a loop was entered, but this loop was not the current one.")  " " lang("Current thread was closed"))
+								;~ MsgBox, 16, % lang("Error"),% lang("The end of a loop was entered, but this loop was not the current one.")  "`n" lang("Current thread will be closed") 
+								tempRunSkipCurrentRun:=true
+							}
+						}
+					}
+					if (tempRunSkipCurrentRun != true)
+					{
+						%tempInstanceID%_%tempRunningElement%_FoundNextElement:=true
+						;~ MsgBox %tempInstanceID%_%tempRunningElement%_FoundNextElement
+						goingToRunIDs.insert(tempInstanceID "_" tempThreadIDToRun "_" tempTo "_" %tempInstanceID%_RunningCounter "_" %RunElement%toPart)
+						tempConnectionCountToRun++
+					}
+				}
+				
 				
 			}
 			else
@@ -346,29 +442,29 @@ r_run()
 				;MsgBox % %tempFinishedInstanceID%_CallingFlow
 				;MsgBox % %tempFinishedInstanceID%_ElementIDInInstanceOfCallingFlow
 				;If the now finished instance was called by another flows that waits for a reply
-				if (%tempFinishedInstanceID%_InstanceOfCallingFlow!="" and %tempFinishedInstanceID%_CallingFlow!="" and %tempFinishedInstanceID%_ElementIDInInstanceOfCallingFlow!="")
+				if (%tempFinishedInstanceID%_InstanceIDOfCallingFlow!="" and %tempFinishedInstanceID%_CallingFlow!="" and %tempFinishedInstanceID%_ElementIDInInstanceOfCallingFlow!="")
 				{
-					tempInstanceToReturn:=%tempFinishedInstanceID%_InstanceOfCallingFlow
-					tempElementIDInInstanceToReturn:=%tempFinishedInstanceID%_ElementIDInInstanceOfCallingFlow
-					tempCallingFlow:=%tempFinishedInstanceID%_CallingFlow
-					;MsgBox %tempCallingFlow%
+					
 					;If the calling flow wants to receive the variables
-					if %tempFinishedInstanceID%_WhetherToReturVariables!=
+					
+					if %tempFinishedInstanceID%_WhetherToReturVariables
 					{
 						
-						tempVariablesToReturn:=v_WriteLocalVariablesToString(tempFinishedInstanceID)
+						tempLocalVarsToSend:=%tempFinishedInstanceID%_LocalVariables.clone()
+						;~ MsgBox % "dfs " %tempFinishedInstanceID%_WhetherToReturVariables "`n" strobj(tempLocalVarsToSend)
 					}
 					else
-						tempVariablesToReturn=
+						tempLocalVarsToSend=
 					
 					;Tell the other flow that this instance has finished and eventually return the variables
-					;~ MsgBox CalledFlowHasFinished|%tempInstanceToReturn%|%tempElementIDInInstanceToReturn%|%tempVariablesToReturn%
-					;~ MsgBox % "Ѻ" %tempFinishedInstanceID%_CallingFlow
-					ControlSetText,edit1,CalledFlowHasFinished|%tempInstanceToReturn%|%tempElementIDInInstanceToReturn%|%tempVariablesToReturn% ,CommandWindowOfEditor,% "Ѻ" %tempFinishedInstanceID%_CallingFlow
+					;~ MsgBox % "callinglfow" %tempFinishedInstanceID%_CallingFlow
+					com_SendCommand({function: "CalledFlowHasFinished", flowName: flowName, localVariables: tempLocalVarsToSend,ThreadVariables: "",CallerElementID: %tempFinishedInstanceID%_ElementIDInCallingFlow,CallerInstanceID: %tempFinishedInstanceID%_InstanceIDOfCallingFlow, CallerElementIDInInstance: %tempFinishedInstanceID%_ElementIDInInstanceOfCallingFlow, CallerThreadID: %tempFinishedInstanceID%_ThreadIDOfCallingFlow},"editor",%tempFinishedInstanceID%_CallingFlow) ;Send the command to the other flow.
+					
 				}
 				
 				;Clean to free memory
 				InstanceIDList.Remove(index1)
+				Instance_%tempFinishedInstanceID%_LocalVariables=""
 				break
 			}
 		}
@@ -474,6 +570,7 @@ r_run()
 	stopRunning:
 	Critical on
 	logger("f1a1","Stopping flow.")
+	SetTimer,r_unblockRuns,-1000
 	SetTimer,nextRun,off
 	;Delete all running tags after finishing run
 	for index1, element in allElements
@@ -482,6 +579,8 @@ r_run()
 		%tempstopfunctionname%(element)
 		%element%running:=0
 	}
+	
+	
 	
 	InstanceIDList:=Object() ;Remove all Instances
 	
@@ -496,7 +595,9 @@ r_run()
 }
 goto,jumpOverExcapeRunLabel
 
-
+r_unblockRuns:
+r_RunsBlocked:=false
+return
 
 r_startRun:
 r_startRun()
@@ -505,8 +606,10 @@ return
 
 r_escapeRun:
 r_TellThatFlowIsStopping()
+logger("f1a1","User is stopping flow. Blocking executions for 1 second.")
 
 stopRun:=true
+r_RunsBlocked:=true
 ;Hotkey,esc,off
 return
 
@@ -528,7 +631,7 @@ r_TellThatFlowIsStopped()
 	try Menu MyMenu,Rename,% lang("Stop"),% lang("Run")
 	try menu, tray, rename, % lang("Stopping"),% lang("Run")
 	try menu, tray, rename, % lang("Stop"),% lang("Run")
-	ControlSetText,edit1,stopped|%flowName%,CommandWindowOfManager ;Tell the manager that this flow is stopped
+	com_SendCommand({function: "ReportStatus",status: "stopped"},"manager") ;Send the command to the Manager.
 	
 	if (triggersEnabled=true)
 		menu tray,icon,Icons\enabled.ico
@@ -543,7 +646,7 @@ r_TellThatFlowIsStarted()
 	try Menu MyMenu,Rename,% lang("Stopping"),% lang("Stop")
 	try menu, tray, rename, % lang("Run"),% lang("Stop")
 	try menu, tray, rename, % lang("Stopping"),% lang("Stop")
-	ControlSetText,edit1,running|%flowName%,CommandWindowOfManager ;Tell the manager that this flow is running
+	com_SendCommand({function: "ReportStatus",status: "running"},"manager") ;Send the command to the Manager.
 	menu tray,icon,Icons\running.ico
 }
 
@@ -554,7 +657,7 @@ r_TellThatFlowIsStopping()
 	try Menu MyMenu,Rename,% lang("Stop"),% lang("Stopping")
 	try menu, tray, rename, % lang("Run"),% lang("Stopping")
 	try menu, tray, rename, % lang("Stop"),% lang("Stopping")
-	ControlSetText,edit1,stopping|%flowName%,CommandWindowOfManager ;Tell the manager that this flow is stopping
+	com_SendCommand({function: "ReportStatus",status: "stopping"},"manager") ;Send the command to the Manager.
 	
 }
 jumpOverExcapeRunLabel:

@@ -4,27 +4,41 @@ runActionReplace_a_string(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	local temp
-	local tempVarname
+	local varname:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname)
 	local tempSearchText
 	local tempReplaceText
 	local Result
 	local Options
 	
-	tempVarname:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname)
+	if not v_CheckVariableName(varname)
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Ouput variable name '" varname "' is not valid")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not valid",lang("Ouput variable name '%1%'",varname)) )
+		return
+	}
 	
 	if %ElementID%expression=1
 		temp:=v_replaceVariables(InstanceID,ThreadID,%ElementID%VarValue)
 	else
 		temp:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%VarValue)
+	
 	if %ElementID%IsExpressionSearchText=1
 		tempSearchText:=v_replaceVariables(InstanceID,ThreadID,%ElementID%SearchText)
 	else
 		tempSearchText:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%SearchText)
+	
 	if %ElementID%isExpressionReplaceText=1
 		tempReplaceText:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ReplaceText)
 	else
 		tempReplaceText:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%ReplaceText)
-	;MsgBox,%  %ElementID%Varname "---" %ElementID%VarValue "---" v_replaceVariables(InstanceID,%ElementID%Varname) "---" v_replaceVariables(InstanceID,%ElementID%VarValue)
+	
+	if tempSearchText=
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Search text is not specified.")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not specified.",lang("Search text")))
+		return
+	}
+	
 	if %ElementID%CaseSensitive=2
 	{
 		StringCaseSense,on
@@ -37,16 +51,18 @@ runActionReplace_a_string(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 		StringCaseSense,off
 		if errorlevel=0 ;If no string was found
 		{
-			v_SetVariable(InstanceID,ThreadID,tempVarname,"")
-			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
+			v_SetVariable(InstanceID,ThreadID,varname,"")
+			v_SetVariable(InstanceID,ThreadID,"a_Replacements",0,,true)
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Searched text not found.")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("Searched text not found"))
+			return
 		}
-		else
-		{
-			
-			v_SetVariable(InstanceID,ThreadID,tempVarname,Result)
-			v_SetVariable(InstanceID,ThreadID,"t_NumberOfReplacements",errorlevel)
-			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
-		}
+		
+		
+		v_SetVariable(InstanceID,ThreadID,varname,Result)
+		v_SetVariable(InstanceID,ThreadID,"a_Replacements",errorlevel,,true)
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
+		
 	}
 	else
 	{
@@ -54,15 +70,17 @@ runActionReplace_a_string(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 		StringCaseSense,off
 		if errorlevel=1 ;If no string was found
 		{
-			v_SetVariable(InstanceID,ThreadID,tempVarname,"")
-			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
+			v_SetVariable(InstanceID,ThreadID,varname,"")
+			v_SetVariable(InstanceID,ThreadID,"a_Replacements",0,,true)
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Searched text not found.")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("Searched text not found"))
+			return
 		}
-		else
-		{
-			
-			v_SetVariable(InstanceID,ThreadID,tempVarname,Result)
-			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
-		}
+		
+		v_SetVariable(InstanceID,ThreadID,varname,Result)
+		v_SetVariable(InstanceID,ThreadID,"a_Replacements",1,,true)
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
+		
 	}
 	
 	

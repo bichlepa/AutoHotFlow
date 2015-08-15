@@ -5,24 +5,52 @@ runActionWrite_to_ini(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	global
 	local tempOptions=""
 	
+	local tempSection
+	local tempKey
 	local tempText
+	local tempValue
 	
 	local tempPath:=% v_replaceVariables(InstanceID,ThreadID,%ElementID%file)
 	if  DllCall("Shlwapi.dll\PathIsRelative","Str",tempPath)
 		tempPath:=SettingWorkingDir "\" tempPath
 	
 	
+	tempSection:=v_replaceVariables(InstanceID,ThreadID,%ElementID%section)
+	tempKey:=v_replaceVariables(InstanceID,ThreadID,%ElementID%key)
+	tempValue:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Value)
+	
+	if tempSection=
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Section name is not specified.")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not specified.",lang("Section name")))
+		return
+		
+	}
+	if tempKey=
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Key name is not specified.")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not specified.",lang("Key name")))
+		return
+		
+	}
+	if tempValue=
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Warning! Value is not specified.")
+	}
+	
+	IniWrite,% tempValue,% tempPath,% tempSection,% tempKey
+	
+	if ErrorLevel
+	{
+		
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! File '" tempPath "' could not be written")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("File '%1%' could not be read",tempPath))
+		return
+		
+	}
 	
 	
-	
-	IniWrite,% v_replaceVariables(InstanceID,ThreadID,%ElementID%Value),% tempPath,% v_replaceVariables(InstanceID,ThreadID,%ElementID%section),% v_replaceVariables(InstanceID,ThreadID,%ElementID%key)
-	
-	if errorlevel
-		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
-	else
-		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
-	
-	
+	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	
 	
 	

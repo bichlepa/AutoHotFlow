@@ -16,7 +16,7 @@ gui,submit,nohide
 
 
 
-winget,tempPar,ControlList,ahk_id %FunctionsForElementGetControlInformationWinID%
+winget,tempPar,ControlList,ahk_id %FunctionsForElementGetControlInformationWinID% ;Get all controls in the window
 ;~ MsgBox,%tempPar%
 gui, FunctionsForElementGetControlInformation:Default
 
@@ -42,6 +42,7 @@ else if (GUISettingsOfElement%setElementID%IdentifyControlBy3=1)
 }
 gui,add,button,w400 h30 default gFunctionsForElementGetControlInformationListBoxOfContolTextsButtonGoOn,% lang("OK")
 tempCountOfControlsInWindow=0
+
 loop,parse,tempPar,`n
 {
 	ControlGetText,tempparText,%a_loopfield%,ahk_id %FunctionsForElementGetControlInformationWinID%
@@ -150,10 +151,11 @@ return
 
 FunctionsForElementGetControlInformationGetControlCoveredByMouse:
 ;get the mouse position and the control that is covered by the mouse
-MouseGetPos,tempmousex,tempmousey,tempwinidundermouse,tempcontrol
-
-if (tempwinidundermouse=tempParID and tempcontrol!="") ;Check whether the mouse is over the right window and coveres a control
+MouseGetPos,tempmousex,tempmousey,tempwinidundermouse,tempcontrol,2
+;~ ToolTip,%tempwinidundermouse% - %FunctionsForElementGetControlInformationWinID% - %tempcontrol%
+if (tempwinidundermouse=FunctionsForElementGetControlInformationWinID and tempcontrol!="") ;Check whether the mouse is over the right window and coveres a control
 {
+	
 	if (tempmousex!=tempmouseOldx or tempmousey!=tempmouseOldy) ;Prevent to adapt the control while mouse is moving
 	{
 		tempmouseOldx:=tempmousex
@@ -164,12 +166,13 @@ if (tempwinidundermouse=tempParID and tempcontrol!="") ;Check whether the mouse 
 		;Select the control that is covered by mouse
 		Loop,%tempCountOfControlsInWindow%
 		{
-		
+			;~ MsgBox % tempcontrol " --- " tempParControlID%a_index%
+			
 			if (tempcontrol=tempParControlID%a_index%)
 			{
-				;ToolTip("tempwinidundermouse: " tempwinidundermouse " tempcontrol:" tempcontrol " tempParControlID%a_index%: " tempParControlID%a_index% " a_index: " a_index)
+				;~ ToolTip("tempwinidundermouse: " tempwinidundermouse " tempcontrol:" tempcontrol " tempParControlID%a_index%: " tempParControlID%a_index% " a_index: " a_index)
 				guicontrol,FunctionsForElementGetControlInformation:choose,FunctionsForElementGetControlInformationListBoxOfContolTexts,|%a_index%
-					
+				
 			}
 			
 		}

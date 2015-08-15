@@ -11,10 +11,23 @@ runConditionString_contains_text(InstanceID,ThreadID,ElementID,ElementIDInInstan
 		tempVarValue:=v_replaceVariables(InstanceID,ThreadID,%ElementID%VarValue)
 	else
 		tempVarValue:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%VarValue)
+	
+	if tempVarValue=
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Warning! Input string is empty")
+	}
+	
 	if %ElementID%IsExpressionSearchText=1
 		tempSearchText:=v_replaceVariables(InstanceID,ThreadID,%ElementID%SearchText)
 	else
 		tempSearchText:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%SearchText)
+	
+	if tempSearchText=
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Search text is not specified.")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not specified.",lang("Search text")))
+		return
+	}
 	
 	;~ MsgBox %tempVarValue% - %tempSearchText% 
 	

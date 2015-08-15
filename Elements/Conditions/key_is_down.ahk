@@ -15,7 +15,11 @@ runConditionkey_is_down(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	else if (tempKeyState="u")
 		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"no")
 	else
-		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Couldn't get key state.")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("Couldn't get key state"))
+		return
+	}
 	 
 	
 }

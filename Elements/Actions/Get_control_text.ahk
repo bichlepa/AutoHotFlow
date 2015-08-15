@@ -5,22 +5,30 @@ runActionGet_control_text(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	global
 	local varname:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname)
 	
+	if not v_CheckVariableName(varname)
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Ouput variable name '" varname "' is not valid")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not valid",lang("Ouput variable name '%1%'",varname)) )
+		return
+	}
+	
 	local tempWinTitle:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Wintitle)
 	local tempExcludeTitle:=v_replaceVariables(InstanceID,ThreadID,%ElementID%excludeTitle)
-	local tempTitleMatchMode :=%ElementID%TitleMatchMode
 	local tempWinText:=v_replaceVariables(InstanceID,ThreadID,%ElementID%winText)
 	local tempExcludeText:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ExcludeText)
+	local tempTitleMatchMode :=%ElementID%TitleMatchMode
+	local tempControlTextMatchMode :=%ElementID%ControlTextMatchMode
 	local tempahk_class:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ahk_class)
 	local tempahk_exe:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ahk_exe)
 	local tempahk_id:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ahk_id)
 	local tempahk_pid:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ahk_pid)
 	local tempWinid
-	local tempText
-	local tempwinstring
+	
+	local tempText	
 	local tempControl_identifier:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Control_identifier)
 	
+	local tempwinstring:=tempWinTitle
 	
-	tempwinstring=%tempWinTitle%
 	if tempahk_class<>
 		tempwinstring=%tempwinstring% ahk_class %tempahk_class%
 	if tempahk_id<>
@@ -32,12 +40,7 @@ runActionGet_control_text(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	if tempwinstring=
 		tempwinstring=A
 	
-	if (%ElementID%ControlTextMatchMode) 
-			tempControlMatchMode:=1
-		else if (%ElementID%ControlTextMatchMode) 
-			tempControlMatchMode:=2
-		else (%ElementID%ControlTextMatchMode) 
-			tempControlMatchMode:=3
+	
 	
 	SetTitleMatchMode,%tempTitleMatchMode%
 	
@@ -51,14 +54,15 @@ runActionGet_control_text(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 		DetectHiddenText on
 	
 	WinGet,tempWinid,ID,%tempwinstring%,%tempWinText%,%tempExcludeTitle%,%tempExcludeText%
+
 	if tempWinid=
 	{
 		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Seeked window does not exist")
 		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"Exception", lang("Seeked window does not exist"))
 		return
 	}
-	
-	SetTitleMatchMode,%tempControlMatchMode%
+	;~ MsgBox %tempControlTextMatchMode%
+	SetTitleMatchMode,%tempControlTextMatchMode%
 	
 	controlget,tempControlID,hwnd,,% tempControl_identifier,ahk_id %tempWinid%
 	if tempControlID=

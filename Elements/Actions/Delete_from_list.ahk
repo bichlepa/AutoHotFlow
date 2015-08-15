@@ -6,7 +6,7 @@ runActionDelete_from_list(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 
 	local Varname:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname)
 	local Position:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Position)
-	
+	local temp
 	;MsgBox,%  %ElementID%Varname "---" %ElementID%VarValue "---" v_replaceVariables(InstanceID,%ElementID%Varname) "---" v_replaceVariables(InstanceID,%ElementID%VarValue)
 	
 
@@ -20,33 +20,7 @@ runActionDelete_from_list(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	
 	local tempObject:=v_getVariable(InstanceID,ThreadID,Varname,"list")
 	
-	if IsObject(tempObject)
-	{
-		if %ElementID%WhitchPosition=1 ; Stupid misspelling :-(
-		{
-			tempObject.Remove(1)
-		}
-		else if %ElementID%WhitchPosition=2
-		{
-			tempObject.Remove(tempObject.MaxIndex())
-		}
-		else if %ElementID%WhitchPosition=3
-		{
-			if Position=
-			{
-				logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Position is not specified.")
-				MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is empty.",lang("Position")))
-				return
-			}
-			tempObject.Remove(Position)
-		}
-		
-		v_SetVariable(InstanceID,ThreadID,Varname,tempObject,"list")
-		
-		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
-		
-	}
-	else
+	if not IsObject(tempObject)
 	{
 		
 		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Variable '" Varname "' does not contain a list.")
@@ -54,6 +28,53 @@ runActionDelete_from_list(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 		return
 		
 	}
+
+	if %ElementID%WhitchPosition=1 ; Stupid misspelling :-(
+	{
+		temp:=tempObject.MinIndex()
+		if temp=
+		{
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! The list '" varname "' does not contain an integer key.")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("The list '%1%' does not contain an integer key.",varname))
+			return
+		}
+		
+		tempObject.Remove(temp)
+	}
+	else if %ElementID%WhitchPosition=2
+	{
+		temp:=tempObject.MaxIndex()
+		if temp=
+		{
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! The list '" varname "' does not contain an integer key.")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("The list '%1%' does not contain an integer key.",varname))
+			return
+		}
+		tempObject.Remove(temp)
+	}
+	else if %ElementID%WhitchPosition=3
+	{
+		if Position=
+		{
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Position is not specified.")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not secified.",lang("Position")))
+			return
+		}
+		if not tempObject.HasKey(Position)
+		{
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! The list '" varname "' does not contain the key '" Position "'.")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("The list '%1%' does not contain the key '%2%'.",varname,Position))
+			return
+		}
+		tempObject.Remove(Position)
+	}
+	
+	v_SetVariable(InstanceID,ThreadID,Varname,tempObject,"list")
+	
+	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
+	
+
+	
 	
 
 	return

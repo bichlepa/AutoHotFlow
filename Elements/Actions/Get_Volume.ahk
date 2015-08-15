@@ -5,10 +5,18 @@ runActionGet_Volume(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	global
 	local temp
 	
-	local tempVarname:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname)
+	local Varname:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname)
+	
+	if not v_CheckVariableName(varname)
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Ouput variable name '" varname "' is not valid")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not valid",lang("Ouput variable name '%1%'",varname)) )
+		return
+	}
+	
 	SoundGet,temp
 
-	v_setVariable(InstanceID,ThreadID,tempVarname,round(temp,1))
+	v_setVariable(InstanceID,ThreadID,Varname,round(temp,1))
 	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	return
 

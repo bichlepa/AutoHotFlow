@@ -9,7 +9,14 @@ runActionRename_folder(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	if  DllCall("Shlwapi.dll\PathIsRelative","Str",tempPath)
 		tempPath:=SettingWorkingDir "\" tempPath
 	
-	local tempPath:=v_replaceVariables(InstanceID,ThreadID,%ElementID%folder)
+	if tempPath=
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Folder path not specified.")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not specified.",lang("Folder path")))
+		return
+	}
+	
+	
 	StringGetPos,temppos,tempPath,\,R
 	StringTrimLeft,tempoldname,tempPath,% temppos +1
 	StringLeft,tempPath,tempPath,% temppos
@@ -17,9 +24,13 @@ runActionRename_folder(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	FileMoveDir,% tempPath "\" tempoldname ,% tempPath "\" v_replaceVariables(InstanceID,ThreadID,%ElementID%newName),R
 	
 	if ErrorLevel
-		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
-	else
-		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Folder not renamed.")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("Folder not renamed"))
+		return
+	}
+	
+	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	return
 }
 getNameActionRename_folder()

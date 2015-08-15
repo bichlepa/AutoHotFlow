@@ -12,14 +12,10 @@ runActionRun(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	if ( %ElementID%ReplaceVariables)
 	{
 		tempPath:=% v_replaceVariables(InstanceID,ThreadID,%ElementID%ToRun)
-		
-		
-		
 	}		
 	else
 	{
 		tempPath:=% %ElementID%ToRun
-		
 	}
 	
 	if  DllCall("Shlwapi.dll\PathIsRelative","Str",tempPath)
@@ -37,7 +33,9 @@ runActionRun(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 		run, % tempPathRelative,% SettingWorkingDir, UseErrorLevel,ActionRuntempPid ;Try tu run it without the working direction (relative path)
 		if (ErrorLevel)
 		{
-			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Can't run '" tempPathRelative "'")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("Can't run '%1%'",tempPathRelative))
+			return
 		}
 		else
 		{

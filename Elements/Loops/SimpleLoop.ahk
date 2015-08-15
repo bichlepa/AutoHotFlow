@@ -39,7 +39,11 @@ runLoopSimpleLoop(InstanceID,ThreadID,ElementID,ElementIDInInstance,HeadOrTail)
 		
 	}
 	else
-		MsgBox Internal Error. Loop should be executed but there is no information about the connection lead into head or tail.
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Unexpected Error! No information whether the connection lead into head or tail")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("No information whether the connection lead into head or tail") )
+		return
+	}
 
 	
 

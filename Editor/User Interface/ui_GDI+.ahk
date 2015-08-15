@@ -165,6 +165,12 @@ ui_DrawEverything(Posw,Posh)
 		
 		if %element%Type=Trigger
 		{
+			if (((%element%x+ElementWidth)<(Offsetx)) or ((%element%x)>(Offsetx+widthofguipic/zoomFactor)) or ((%element%y+ElementHeight)<(Offsety)) or ((%element%y)>(Offsety+heightofguipic/zoomFactor)))
+			{
+				continue
+			}
+			
+			
 			Gdip_FillRoundedRectangle(G, pBrushUnmark, ((%element%x-Offsetx)*zoomFactor), ((%element%y-Offsety)*zoomFactor), ((ElementWidth)*zoomFactor), ((ElementHeight)*zoomFactor),(30*zoomFactor))
 			Gdip_DrawroundedRectangle(G, pPenGrey, ((%element%x-Offsetx)*zoomFactor), ((%element%y-Offsety)*zoomFactor), ((ElementWidth)*zoomFactor), ((ElementHeight)*zoomFactor),(30*zoomFactor))
 			Gdip_TextToGraphics(G, %element%name, "x" ((%element%x-Offsetx)*zoomFactor +4) " y" ((%element%y-Offsety)*zoomFactor+4) " vCenter " TextOptions , Font, ((ElementWidth)*zoomFactor-8), ((ElementHeight)*zoomFactor-8))
@@ -192,6 +198,10 @@ ui_DrawEverything(Posw,Posh)
 		}
 		if %element%Type=Action
 		{
+			if (((%element%x+ElementWidth)<(Offsetx)) or ((%element%x)>(Offsetx+widthofguipic/zoomFactor)) or ((%element%y+ElementHeight)<(Offsety)) or ((%element%y)>(Offsety+heightofguipic/zoomFactor)))
+			{
+				continue
+			}
 			
 			Gdip_FillRectangle(G, pBrushUnmark, ((%element%x-Offsetx)*zoomFactor), ((%element%y-Offsety)*zoomFactor), ((ElementWidth)*zoomFactor), ((ElementHeight)*zoomFactor))
 			Gdip_DrawRectangle(G, pPenGrey, ((%element%x-Offsetx)*zoomFactor), ((%element%y-Offsety)*zoomFactor), ((ElementWidth)*zoomFactor), ((ElementHeight)*zoomFactor))
@@ -219,6 +229,11 @@ ui_DrawEverything(Posw,Posh)
 		}
 		if %element%Type=Condition
 		{
+			if (((%element%x+ElementWidth)<(Offsetx)) or ((%element%x)>(Offsetx+widthofguipic/zoomFactor)) or ((%element%y+ElementHeight)<(Offsety)) or ((%element%y)>(Offsety+heightofguipic/zoomFactor)))
+			{
+				continue
+			}
+			
 			Gdip_FillRoundedRectangle(G, pBrushUnmark, ((%element%x-Offsetx)*zoomFactor), ((%element%y-Offsety)*zoomFactor), (ElementWidth*zoomFactor), (ElementHeight*zoomFactor),(30*zoomFactor))
 			;Gdip_FillPolygon(G, pBrushUnmark,((%element%x+ElementWidth/2)*zoomFactor) "," ((%element%y+0)*zoomFactor) "|" ((%element%x+ElementWidth)*zoomFactor) "," ((%element%y+ElementHeight/2)*zoomFactor) "|" ((%element%x+ElementWidth/2)*zoomFactor) "," ((%element%y+ElementHeight)*zoomFactor) "|" ((%element%x+0)*zoomFactor) "," ((%element%y+ElementHeight/2)*zoomFactor) "|" ((%element%x+ElementWidth/2)*zoomFactor) "," ((%element%y+0)*zoomFactor))
 			Gdip_DrawLines(G, pPenGrey,((%element%x+ElementWidth/2-Offsetx)*zoomFactor) "," ((%element%y+0-Offsety)*zoomFactor) "|" ((%element%x+ElementWidth-Offsetx)*zoomFactor) "," ((%element%y+ElementHeight/2-Offsety)*zoomFactor) "|" ((%element%x+ElementWidth/2-Offsetx)*zoomFactor) "," ((%element%y+ElementHeight-Offsety)*zoomFactor) "|" ((%element%x+0-Offsetx)*zoomFactor) "," ((%element%y+ElementHeight/2-Offsety)*zoomFactor) "|" ((%element%x+ElementWidth/2-Offsetx)*zoomFactor) "," ((%element%y+0-Offsety)*zoomFactor))
@@ -246,6 +261,11 @@ ui_DrawEverything(Posw,Posh)
 		
 		if %element%Type=Loop
 		{
+			if (((%element%x+ElementWidth)<(Offsetx)) or ((%element%x)>(Offsetx+widthofguipic/zoomFactor)) or ((%element%y+ElementHeight*4/3+%element%HeightOfVerticalBar)<(Offsety)) or ((%element%y)>(Offsety+heightofguipic/zoomFactor)))
+			{
+				continue
+			}
+			
 			
 			Gdip_FillRectangle(G, pBrushUnmark, ((%element%x-Offsetx)*zoomFactor), ((%element%y-Offsety)*zoomFactor), ((ElementWidth)*zoomFactor), ((ElementHeight)*zoomFactor))
 			Gdip_FillRectangle(G, pBrushUnmark, ((%element%x-Offsetx)*zoomFactor), ((%element%y+ElementHeight-Offsety)*zoomFactor), ((ElementWidth/8)*zoomFactor), ((%element%HeightOfVerticalBar)*zoomFactor))
@@ -302,12 +322,13 @@ ui_DrawEverything(Posw,Posh)
 		
 		if %element%Type=Connection
 		{
+			
+			
 			;msgbox,% %Element%from "Pic"
 			;msgbox,% %Element%to "Pic"
 			tempFromEl:=%Element%from
 			tempToEl:=%Element%to
 			;msgbox,% tempFromEl "`n" %tempFromEl%x
-			
 			
 			
 			if tempFromEl=MOUSE
@@ -322,6 +343,7 @@ ui_DrawEverything(Posw,Posh)
 			}
 			else if (%tempFromEl%type="loop")
 			{
+				
 				
 				if %element%ConnectionType=Normal
 				{
@@ -385,6 +407,11 @@ ui_DrawEverything(Posw,Posh)
 				aimPosy:=%tempToEl%y
 			}
 			
+			
+			if ((StartPosx<Offsetx and aimPosx<Offsetx) or (StartPosx>(Offsetx+widthofguipic/zoomFactor) and aimPosx>(Offsetx+widthofguipic/zoomFactor)) or (StartPosy<Offsety and  aimPosy<Offsety) or (StartPosy>(Offsety+heightofguipic/zoomFactor) and aimPosy>(Offsety+heightofguipic/zoomFactor)))
+			{
+				continue
+			}
 			;MsgBox
 			lin1x:=startposx
 			lin1y:=startposy

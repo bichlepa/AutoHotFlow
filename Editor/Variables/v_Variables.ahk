@@ -703,7 +703,40 @@ v_deleteVariable(InstanceID,ThreadID,name,Permission="")
 	
 }
 
-
+v_ImportLocalVariablesFromObject(InstanceID,ImportObject)
+{
+	if not isobject(ImportObject)
+		return
+	
+	for tempName, tempValue in ImportObject
+	{
+		if isobject(tempValue)
+			Instance_%InstanceID%_LocalVariables[tempName]:=tempValue
+		else
+		{
+			tempfirstchar:=substr(tempValue,1,1)
+			if (tempfirstchar="●" or tempfirstchar="└") 
+				Instance_%InstanceID%_LocalVariables[tempName]:=tempValue
+			else
+				Instance_%InstanceID%_LocalVariables[tempName]:="●"tempValue ;if not type was assigned, assign type normal
+		}
+		
+		
+	}
+	
+}
+v_ImportThreadVariablesFromObject(InstanceID,ThreadID,ImportObject)
+{
+	if not isobject(ImportObject)
+		return
+	
+	for tempName, tempValue in ImportObject
+	{
+		Instance_%InstanceID%_Thread_%ThreadID%_Variables[tempName]:=tempValue
+		
+	}
+	
+}
 
 v_ImportLocalVariablesFromString(InstanceID,string)
 {
@@ -752,7 +785,6 @@ v_ImportLocalVariablesFromString(InstanceID,string)
 		}
 	}
 	
-	
 	return
 }
 
@@ -775,7 +807,7 @@ v_WriteLocalVariablesToString(InstanceID)
 		}
 		else
 		{
-			StringLeft,templeft,tempVarContent,1
+			StringLeft,templeft,tempVarValue,1
 			if (templeft!="└" and templeft !="●")
 				tempReturnString.=tempVarName "=" tempVarValue "◘"
 		}
@@ -786,12 +818,106 @@ v_WriteLocalVariablesToString(InstanceID)
 }
 
 
+v_ImportThreadVariablesFromString(InstanceID,threadID,string)
+{
+	global
+	local temp
+	local templeft
+	local tempVarContent
+	local tempVarName
+	local temppos
+	
+	;~ MsgBox --- %string%
+	loop, parse,string ,◘
+	{
+		;~ MsgBox sdf %A_LoopField%
+		
+		StringGetPos,temppos,A_LoopField,=
+		if temppos!=
+		{
+			stringleft,tempVarName,A_LoopField,% temppos
+			StringTrimLeft,tempVarContent,A_LoopField,% temppos+1
+			
+			StringLeft,templeft,tempVarContent,1
+			StringTrimLeft,tempVarContent,tempVarContent,1
+			
+			if templeft=●
+			{
+				v_setVariable(InstanceID,threadID,tempVarName,tempVarContent,"normal",c_SetBuiltInVar)
+				
+			}
+			else if templeft=└
+			{
+				;~ MsgBox fasdf %tempVarName% = %tempVarContent%
+				v_setVariable(InstanceID,threadID,tempVarName,tempVarContent,"date",c_SetBuiltInVar)
+				
+			}
+			else if templeft=╒
+			{
+				;~ StringReplace,tempVarContent,tempVarContent,◙,`n,all
+				v_setVariable(InstanceID,threadID,tempVarName,strobj(tempVarContent) ,"list",c_SetBuiltInVar)
+				
+			}
+			;~ else ;Binary data not supported
+			;~ {
+				;~ v_setVariable(InstanceID,1,tempVarName,tempVarContent,"binary")
+			;~ }
+		}
+	}
+	
+	return
+}
+
+;Writes a variable name and its content into sring
+v_AppendAVariableToString(string,name,value,VariableType="normal")
+{
+	
+	logger("a3","Appending variable " name ". to string")
+	;insert the local variable
+	;The first character will contain the information about the variable type
+	if VariableType=normal
+	{
+		string.=name "=●" value "◘"
+		
+	}
+	else if VariableType=date
+	{
+		string.=name "=└" value "◘"
+	}
+	else if VariableType=list
+	{
+		if isobject(value)
+		{
+			temp:=strobj(value)
+			string.=name "=" "╒" temp "◘"
+			
+		}
+		else
+		{
+			logger("a0","Error! A list " name "should be written to string but it is not an object.")
+		}
+	}
+	else
+	{
+		logger("a0","Appending local variable " name " to string failed. No type specified.")
+		return 0
+	}
+	;~ MsgBox %string%
+	return string
+	
+	
+}
+
+
+;check whether a variable name is valid
 v_CheckVariableName(varName,Permissions:="")
 {
 	global c_SetBuiltInVar
 	global c_SetLoopVar
+	
+	;Try to set a variable. If ahk refuses, the variable name is invalid
 	try
-		asdf%varName%:=1
+		asdf%varName%:=1 
 	catch
 	{
 		;~ MsgBox fsdg %varName%
@@ -799,12 +925,14 @@ v_CheckVariableName(varName,Permissions:="")
 		
 	}
 	
+	;Check whether the variable name is not empty
 	if varName=
 	{
 		;~ MsgBox erze
 		return 0
 	}
 	
+	;Check whether the permissions are given
 	if (substr(varName,1,2)="A_" and Permissions!=c_SetBuiltInVar and Permissions!=c_SetLoopVar)
 	{
 		;~ MsgBox %varName% - %Permissions%
@@ -854,7 +982,10 @@ PrepareLeavingALoop(InstanceID,ThreadID,LoopElement)
 	;~ MsgBox % LoopElement " - " %InstanceID%_Thread_%ThreadID%_Variables["CurrentLoop"]
 	local temp:=%InstanceID%_Thread_%ThreadID%_Variables[c_loopVarsName]
 	local tempOld:=temp["OldLoopVars"]
-	%InstanceID%_Thread_%ThreadID%_Variables[c_loopVarsName]:=tempOld
+	if isobject(tempOld)
+		%InstanceID%_Thread_%ThreadID%_Variables[c_loopVarsName]:=tempOld
+	else
+		%InstanceID%_Thread_%ThreadID%_Variables.delete(c_loopVarsName)
 	
 	;~ MsgBox % StrObj(Instance_%InstanceID%_Thread_%ThreadID%_Variables)
 	

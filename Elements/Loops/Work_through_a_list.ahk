@@ -16,56 +16,57 @@ runLoopWork_through_a_list(InstanceID,ThreadID,ElementID,ElementIDInInstance,Hea
 		tempindex:=1
 		v_SetVariable(InstanceID,ThreadID,"a_index",tempindex,,c_SetLoopVar)
 		
-		if isobject(templist)
+		if not isobject(templist)
 		{
-			;~ MsgBox % "a list - `n" StrObj(templist)
-			if %ElementID%CopyFirst=1
-			{
-				templist:=templist.Clone()
-				v_SetVariable(InstanceID,ThreadID,"A_LoopCurrentList",templist,,c_SetLoopVar)
-				v_SetVariable(InstanceID,ThreadID,"A_LoopUseCopiedList",1,,c_SetLoopVar)
-				tempFound:=false
-				for tempkey, tempvalue in templist
-				{
-					
-					;~ MsgBox %InstanceID% %ThreadID% `n %tempkey% = %tempvalue%
-					v_SetVariable(InstanceID,ThreadID,"a_LoopValue",tempvalue,,c_SetLoopVar)
-					v_SetVariable(InstanceID,ThreadID,"a_LoopKey",tempkey,,c_SetLoopVar)
-					templist.Remove(tempkey,"")
-					tempFound:=true
-					break
-					
-				}
-			}
-			else
-			{
-				v_SetVariable(InstanceID,ThreadID,"A_LoopUseCopiedList",0,,c_SetLoopVar)
-				tempFound:=false
-				for tempkey, tempvalue in templist
-				{
-					
-					if (A_Index=tempindex)
-					{
-						;~ MsgBox %InstanceID% %ThreadID% `n %tempkey% = %tempvalue%
-						v_SetVariable(InstanceID,ThreadID,"a_LoopValue",tempvalue,,c_SetLoopVar)
-						v_SetVariable(InstanceID,ThreadID,"a_LoopKey",tempkey,,c_SetLoopVar)
-						tempFound:=true
-						break
-					}
-				}
-			}
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Variable '" templistname "' does not contain a list.")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("Variable '%1%' does not contain a list.",templistname))
+			return
 			
-			if tempFound
-				MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normalHead")
-			else
-				MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normalTail")
+		}
+			
+		;~ MsgBox % "a list - `n" StrObj(templist)
+		if %ElementID%CopyFirst=1
+		{
+			templist:=templist.Clone()
+			v_SetVariable(InstanceID,ThreadID,"A_LoopCurrentList",templist,,c_SetLoopVar)
+			v_SetVariable(InstanceID,ThreadID,"A_LoopUseCopiedList",1,,c_SetLoopVar)
+			tempFound:=false
+			for tempkey, tempvalue in templist
+			{
+				
+				;~ MsgBox %InstanceID% %ThreadID% `n %tempkey% = %tempvalue%
+				v_SetVariable(InstanceID,ThreadID,"a_LoopValue",tempvalue,,c_SetLoopVar)
+				v_SetVariable(InstanceID,ThreadID,"a_LoopKey",tempkey,,c_SetLoopVar)
+				templist.Remove(tempkey,"")
+				tempFound:=true
+				break
+				
+			}
 		}
 		else
 		{
-			
-			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
-			
+			v_SetVariable(InstanceID,ThreadID,"A_LoopUseCopiedList",0,,c_SetLoopVar)
+			tempFound:=false
+			for tempkey, tempvalue in templist
+			{
+				
+				if (A_Index=tempindex)
+				{
+					;~ MsgBox %InstanceID% %ThreadID% `n %tempkey% = %tempvalue%
+					v_SetVariable(InstanceID,ThreadID,"a_LoopValue",tempvalue,,c_SetLoopVar)
+					v_SetVariable(InstanceID,ThreadID,"a_LoopKey",tempkey,,c_SetLoopVar)
+					tempFound:=true
+					break
+				}
+			}
 		}
+		
+		if tempFound
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normalHead")
+		else
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normalTail")
+	
+		
 		
 	}
 	else if HeadOrTail=tail ;Continue loop
@@ -124,7 +125,11 @@ runLoopWork_through_a_list(InstanceID,ThreadID,ElementID,ElementIDInInstance,Hea
 		
 	}
 	else
-		MsgBox Internal Error. Loop should be executed but there is no information about the connection lead into head or tail.
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Unexpected Error! No information whether the connection lead into head or tail")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("No information whether the connection lead into head or tail") )
+		return
+	}
 
 	
 

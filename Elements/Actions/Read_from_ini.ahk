@@ -4,43 +4,94 @@ runActionRead_from_ini(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	local tempOptions=""
-	local tempVarName:=v_replaceVariables(InstanceID,ThreadID,%ElementID%varname)
+	local varname:=v_replaceVariables(InstanceID,ThreadID,%ElementID%varname)
 	local tempText
+	local tempSection
+	local tempKey
+	local tempDefault
 	
 	local tempPath:=% v_replaceVariables(InstanceID,ThreadID,%ElementID%file)
 	if  DllCall("Shlwapi.dll\PathIsRelative","Str",tempPath)
 		tempPath:=SettingWorkingDir "\" tempPath
 	
-	if tempVarName=
-		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
-
+	if not v_CheckVariableName(varname)
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Ouput variable name '" varname "' is not valid")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not valid",lang("Ouput variable name '%1%'",varname)) )
+		return
+	}
 	
-	
+	if not fileexist(tempPath)
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! File '" tempPath "' does not exist")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("File '%1%' does not exist",tempPath))
+		return
+	}
 	
 	if %ElementID%Action=1 ;Read a key
 	{
+		tempSection:=v_replaceVariables(InstanceID,ThreadID,%ElementID%section)
+		tempKey:=v_replaceVariables(InstanceID,ThreadID,%ElementID%key)
+		
+		if tempSection=
+		{
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Section name is not specified.")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not specified.",lang("Section name")))
+			return
+			
+		}
+		if tempKey=
+		{
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Key name is not specified.")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not specified.",lang("Key name")))
+			return
+			
+		}
+		
 		if %ElementID%WhenError=1
 		{
-			IniRead,tempText,% tempPath,% v_replaceVariables(InstanceID,ThreadID,%ElementID%section),% v_replaceVariables(InstanceID,ThreadID,%ElementID%key),% v_replaceVariables(InstanceID,ThreadID,%ElementID%default)
+			tempDefault:=v_replaceVariables(InstanceID,ThreadID,%ElementID%default)
+			
+			IniRead,tempText,% tempPath,% tempSection,% tempKey,% tempDefault
+			
 		}
 		else
 		{
-			IniRead,tempText,% tempPath,% v_replaceVariables(InstanceID,ThreadID,%ElementID%section),% v_replaceVariables(InstanceID,ThreadID,%ElementID%key),E?R ROR
+			IniRead,tempText,% tempPath,% tempSection,% tempKey,E?R ROR
 			if tempText=E?R ROR
 			{
-				MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
+				logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Section '" tempSection "' and  key '" tempKey "' not found.")
+				MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("Section '%1%' and key '%2%' not found.",tempSection,tempKey))
+				
 				return
 			}
 		}
 		
-		v_SetVariable(InstanceID,ThreadID,tempVarName,tempText)
+		v_SetVariable(InstanceID,ThreadID,varname,tempText)
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
+		
+	}
+	else if %ElementID%Action=2 ;Read entire section
+	{
+		tempSection:=v_replaceVariables(InstanceID,ThreadID,%ElementID%section)
+		if tempSection=
+		{
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Section name is not specified.")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not specified.",lang("Section name")))
+			return
+			
+		}
+		
+		IniRead,tempText,% tempPath,tempSection
+		v_SetVariable(InstanceID,ThreadID,varname,tempText)
+		
 		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 		
 	}
 	else ;Get section list
 	{
 		IniRead,tempText,% tempPath
-		v_setVariable(InstanceID,ThreadID,tempVarName,v_importVariable(tempText,"list","`n"),"list")
+		v_setVariable(InstanceID,ThreadID,varname,v_importVariable(tempText,"list","`n"),"list")
 		
 		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	}
@@ -63,7 +114,7 @@ getParametersActionRead_from_ini()
 {
 	global
 	
-	parametersToEdit:=["Label|" lang("Output Variable name"),"VariableName|NewVariable|varname","Label|" lang("Path of .ini file"),"File||file|" lang("Select an .ini file") "|8|(*.ini)","Label|" lang("Action"),"Radio|1|Action|" lang("Read a key") ";" lang("Read the section names"),"Label|" lang("Section"),"Text|section|Section","Label|" lang("Key"),"Text|key|Key","Label|" lang("Behavior on error"),"Radio|1|WhenError|" lang("Insert default value in the variable") ";" lang("Throw exception"),"Label|" lang("Default value on failure"),"Text|ERROR|Default" ]
+	parametersToEdit:=["Label|" lang("Output Variable name"),"VariableName|NewVariable|varname","Label|" lang("Path of .ini file"),"File||file|" lang("Select an .ini file") "|8|(*.ini)","Label|" lang("Action"),"Radio|1|Action|" lang("Read a key") ";" lang("Read the entire section") ";" lang("Read the section names"),"Label|" lang("Section"),"Text|section|Section","Label|" lang("Key"),"Text|key|Key","Label|" lang("Behavior on error"),"Radio|1|WhenError|" lang("Insert default value in the variable") ";" lang("Throw exception"),"Label|" lang("Default value on failure"),"Text|ERROR|Default" ]
 	return parametersToEdit
 }
 
@@ -81,15 +132,7 @@ GenerateNameActionRead_from_ini(ID)
 
 CheckSettingsActionRead_from_ini(ID)
 {
-	if (GUISettingsOfElement%ID%Action1 != 1)
-	{
-		GuiControl,Disable,GUISettingsOfElement%ID%Section
-		GuiControl,Disable,GUISettingsOfElement%ID%Key
-		GuiControl,Disable,GUISettingsOfElement%ID%WhenError1
-		GuiControl,Disable,GUISettingsOfElement%ID%WhenError2
-		GuiControl,Disable,GUISettingsOfElement%ID%Default
-	}
-	else
+	if (GUISettingsOfElement%ID%Action1 = 1) ;Read key
 	{
 		GuiControl,Enable,GUISettingsOfElement%ID%Section
 		GuiControl,Enable,GUISettingsOfElement%ID%Key
@@ -99,6 +142,22 @@ CheckSettingsActionRead_from_ini(ID)
 			GuiControl,Enable,GUISettingsOfElement%ID%Default
 		else
 			GuiControl,Disable,GUISettingsOfElement%ID%Default
+	}
+	else if (GUISettingsOfElement%ID%Action2 = 1) ;Read section
+	{
+		GuiControl,Enable,GUISettingsOfElement%ID%Section
+		GuiControl,Disable,GUISettingsOfElement%ID%Key
+		GuiControl,Disable,GUISettingsOfElement%ID%WhenError1
+		GuiControl,Disable,GUISettingsOfElement%ID%WhenError2
+		GuiControl,Disable,GUISettingsOfElement%ID%Default
+	}
+	else ;Read section names
+	{
+		GuiControl,Disable,GUISettingsOfElement%ID%Section
+		GuiControl,Disable,GUISettingsOfElement%ID%Key
+		GuiControl,Disable,GUISettingsOfElement%ID%WhenError1
+		GuiControl,Disable,GUISettingsOfElement%ID%WhenError2
+		GuiControl,Disable,GUISettingsOfElement%ID%Default
 	}
 	
 	

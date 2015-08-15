@@ -23,30 +23,42 @@ runConditionWindow_Exists(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 		tempwinstring=%tempwinstring% ahk_pid %tempahk_pid%
 	if tempahk_exe<>
 		tempwinstring=%tempwinstring% ahk_exe %tempahk_exe%
-	
-	
-	
+	;If no active window, unlike in other actions, do not check whether the active window is active, instead error
+	if (tempwinstring="" and tempWinText="" and tempExcludeTitle = "" and tempExcludeText ="") 
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! No window specified")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"Exception", lang("No window specified"))
+		return
+	}
 	
 	SetTitleMatchMode,%tempTitleMatchMode%
-	tempCurrentDetectHiddenWindows :=A_DetectHiddenWindows 
-	if (%ElementID%detect_hidden)
-		DetectHiddenWindows On
+	
+	if %ElementID%findhiddenwindow=0
+		DetectHiddenWindows off
 	else
-		DetectHiddenWindows Off
-	IfWinExist,%tempwinstring%,%tempWinText%,%tempExcludeTitle%,%tempExcludeText%
-	{
-		DetectHiddenWindows %tempCurrentDetectHiddenWindows%
-		
-		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"yes")
-	}
+		DetectHiddenWindows on
+	if %ElementID%findhiddentext=0
+		DetectHiddenText off
 	else
+		DetectHiddenText on
+	
+	SetTitleMatchMode,%tempTitleMatchMode%
+
+	tempWinid:=WinActive(tempwinstring,tempWinText,tempExcludeTitle,tempExcludeText)
+	If not tempWinid
 	{
-		DetectHiddenWindows %tempCurrentDetectHiddenWindows%
-		
 		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"no")
+		return
+		
 	}
-	;the code should not pass here
-	DetectHiddenWindows %tempCurrentDetectHiddenWindows%
+	else
+	{
+		v_SetVariable(InstanceID,ThreadID,"A_WindowID",tempWinid,,c_SetBuiltInVar)
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"yes")
+		return
+		
+	}
+	
 	
 	return
 }
@@ -62,7 +74,7 @@ getCategoryConditionWindow_Exists()
 getParametersConditionWindow_Exists()
 {
 	global
-	parametersToEdit:=["Label|" lang("Detection options"),"Checkbox|0|detect_hidden|" lang("Detect_hidden_window"),"Label|" lang("Title_of_Window"),"Radio|1|TitleMatchMode|" lang("Start_with") ";" lang("Contain_anywhere") ";" lang("Exactly"),"text||Wintitle","Label|" lang("Exclude_title"),"text||excludeTitle","Label|" lang("Text_of_a_control_in_Window"),"text||winText","Label|" lang("Exclude_text_of_a_control_in_window"),"text||ExcludeText","Label|" lang("Window_Class"),"text||ahk_class","Label|" lang("Process_Name"),"text||ahk_exe","Label|" lang("Unique_window_ID"),"text||ahk_id","Label|" lang("Unique_Process_ID"),"text||ahk_pid","Label|" lang("Get_parameters"), "button|FunctionsForElementGetWindowInformation||" lang("Get_Parameters")]
+	parametersToEdit:=["Label|" lang("Title_of_Window"),"Radio|1|TitleMatchMode|" lang("Start_with") ";" lang("Contain_anywhere") ";" lang("Exactly"),"text||Wintitle","Label|" lang("Exclude_title"),"text||excludeTitle","Label|" lang("Text_of_a_control_in_Window"),"text||winText","Checkbox|0|FindHiddenText|" lang("Detect hidden text"),"Label|" lang("Exclude_text_of_a_control_in_window"),"text||ExcludeText","Label|" lang("Window_Class"),"text||ahk_class","Label|" lang("Process_Name"),"text||ahk_exe","Label|" lang("Unique_window_ID"),"text||ahk_id","Label|" lang("Unique_Process_ID"),"text||ahk_pid","Label|" lang("Hidden window"),"Checkbox|0|FindHiddenWindow|" lang("Detect hidden window"),"Label|" lang("Get_parameters"), "button|FunctionsForElementGetWindowInformation||" lang("Get_Parameters")]
 	
 	return parametersToEdit
 }

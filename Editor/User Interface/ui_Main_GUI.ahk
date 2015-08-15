@@ -5,7 +5,7 @@
 	gui,1:default
 	;~ gui,add,picture,vPicFlow hwndPicFlowHWND x0 y0 0xE hidden gclickOnPicture ;No picture needed anymore
 	gui,add,StatusBar,hwndStatusbarHWND
-	
+	gui,add,hotkey,hidden hwndEditHWND ;To avoid error sound when user presses keys while this window is open
 	gui +resize
 
 	;This is needed by GDI+
@@ -18,14 +18,15 @@
 
 	
 	;Set some hotkeys that are needed in main window
-	hotkey,IfWinActive,ahk_id %MainGuihwnd%
-	hotkey,^x,ctrl_x
-	hotkey,^c,ctrl_c
-	hotkey,^v,ctrl_v
-	hotkey,^s,ctrl_s
-	hotkey,esc,esc
-	hotkey,del,del
+	;~ hotkey,IfWinActive,ahk_id %MainGuihwnd%
+	;~ hotkey,^x,ctrl_x
+	;~ hotkey,^c,ctrl_c
+	;~ hotkey,^v,ctrl_v
+	;~ hotkey,^s,ctrl_s
+	;~ hotkey,esc,esc
+	;~ hotkey,del,del
 
+	OnMessage(0x100,"keyPressed",1)
 	OnMessage(0x203,"leftmousebuttondoubleclick",1)
 	OnMessage(0x201,"leftmousebuttonclick",1)
 	OnMessage(0x204,"rightmousebuttonclick",1)
@@ -62,6 +63,41 @@ leftmousebuttondoubleclick(wpar,lpar,msg,hwn)
 
 
 
+keyPressed(wpar,lpar,msg,hwn)
+{
+	global
+	
+	if (hwn!=MainGuihwnd and hwn!=StatusbarHWND and hwn!=EditHWND)
+		return
+	;~ ToolTip %wpar% - %lpar% - %msg% - %hwn%
+	wpar2:=wpar
+	;~ ToolTip % format("{1:#X} - {2:#X} - ",wpar2,lpar)
+	
+	if (wpar=0x53)
+	{
+		if getkeystate("ctrl")
+			SetTimer, ctrl_s,-1
+	}
+	if (wpar=0x43)
+	{
+		if getkeystate("ctrl")
+			SetTimer, ctrl_c,-1
+	}
+	if (wpar=0x56)
+	{
+		if getkeystate("ctrl")
+			SetTimer, ctrl_v,-1
+	}
+	if (wpar=0x1b)
+	{
+		SetTimer, esc,-1
+	}
+	if (wpar=0x2e)
+	{
+		SetTimer, del,-1
+	}
+}
+
 mousewheelmove(wpar,lpar,msg,hwn)
 {
 	global
@@ -70,9 +106,11 @@ mousewheelmove(wpar,lpar,msg,hwn)
 	;~ controlgetpos,tempx,tempy,tempw,temph,,ahk_id %hwn%
 	;~ ToolTip %wpar% - %lpar% - %msg% - %hwn% : %StatusbarHWND% - %temp% - %MainGuihwnd% __ %tempx%- %tempy%- %tempw%- %temph% __ %tempwinx%-%tempwiny%-%tempwinw%-%tempwinh%
 	;~ ui_DrawShapeOnScreen(tempwinx,tempwiny,tempwinw,tempwinh,tempx,tempy,tempw,temph)
-	if (hwn!=MainGuihwnd and hwn!=StatusbarHWND)
+	if (hwn!=MainGuihwnd and hwn!=StatusbarHWND and hwn!=EditHWND)
 		return
 	;~ ToolTip %wpar% - %lpar% - %msg% - %hwn%
+	wpar2:=wpar
+	;~ ToolTip % format("{1:#X}",wpar2)
 	if wpar=7864328
 		SetTimer, ctrl_wheelup,-1 
 	else if wpar=4287102984
@@ -125,7 +163,11 @@ ui_UpdateStatusbartext(which="")
 	global
 	if (which="pos" or which ="")
 	{
-		sb_SetText("Offset: x " Round(offsetx) " y " Round(offsety) "   |   Zoom: " Round(zoomFactor,2 ),1)
+		
+		if not TheOnlyOneMarkedElement
+			sb_SetText("Offset: x " Round(offsetx) " y " Round(offsety) "   |   Zoom: " Round(zoomFactor,2 ),1) 
+		else
+			sb_SetText("Offset: x " Round(offsetx) " y " Round(offsety) "   |   Zoom: " Round(zoomFactor,2 ) "   |   Marked Element: " TheOnlyOneMarkedElement ,1) 
 	}
 }
 

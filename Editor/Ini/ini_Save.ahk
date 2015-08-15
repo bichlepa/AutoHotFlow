@@ -40,6 +40,7 @@ i_save()
 	
 	FileCreateDir,%ThisFlowFolder%
 	Filemove,%ThisFlowFolder%\%ThisFlowFilename%.ini,%ThisFlowFolder%\%ThisFlowFilename%_backup.txt
+	i_saveGeneralParameters()
 	IniWrite,%ID_count%,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,count
 	IniWrite,%SettingFlowExecutionPolicy%,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,SettingFlowExecutionPolicy
 	IniWrite,%SettingWorkingDir%,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,SettingWorkingDir
@@ -177,4 +178,12 @@ i_save()
 	ui_EnableMainGUI()
 	saved=yes
 	busy:=false
+}
+
+i_saveGeneralParameters()
+{
+	global
+	IniWrite,%Offsetx%,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,Offsetx
+	IniWrite,%OffsetY%,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,OffsetY
+	IniWrite,%zoomFactor%,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,zoomFactor
 }

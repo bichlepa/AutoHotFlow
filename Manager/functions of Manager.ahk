@@ -128,43 +128,113 @@ enableFlow(ID,options="")
 	global
 	if options=Startup
 	{
-		ControlSetText,edit1,enable|startup,CommandWindowOfEditor,% "Ѻ" nameOf(ID) "Ѻ" ;Try to send the command to the command window of the editor, if it is already open
-		if errorlevel
-			run,% editorpath  " enableFlow """ %ID%ini " "" ""startup""" 
-		sleep 300
-		loop 10 ;Wait for the flow to appear
-		{
-			IfWinExist CommandWindowOfEditor,% "Ѻ" nameOf(ID) "Ѻ"
-				return
-			
-		}
-		run,% editorpath  " enableFlow """ %ID%ini " "" ""startup"""  ;If it doesn't appear, try again
+		
+		run,% editorpath  " enableFlow """ %ID%ini " "" ""startup""" 
+		if waitForFlowToAppear(nameOf(ID))
+			return true
+		else
+			return false
+		
 	}
 	else
 	{
-		ControlSetText,edit1,enable,CommandWindowOfEditor,% "Ѻ" nameOf(ID) "Ѻ" ;Try to send the command to the command window of the editor, if it is already open
-		if errorlevel
-			run,% editorpath  " enableFlow """ %ID%ini " """
-		sleep 300
-		loop 10 ;Wait for the flow to appear
+		temperrorlevel:=com_SendCommand({function: "enable"},nameOf(ID))
+		
+		if temperrorlevel
 		{
-			IfWinExist CommandWindowOfEditor,% "Ѻ" nameOf(ID) "Ѻ"
-				return
-			
+			run,% editorpath  " enableFlow """ %ID%ini " """
+			if waitForFlowToAppear(nameOf(ID))
+				return true
+			else
+				return false
 		}
-		run,% editorpath  " enableFlow """ %ID%ini " """  ;If it doesn't appear, try again
+		else
+			return true
 	}
+	
+}
+
+runFlow(ID,configuration="empty")
+{
+	global
+	local temperrorlevel
+	
+	if configuration=empty
+		configuration:=Object()
+	
+	configuration["function"]:="run"
+	;~ MsgBox % configuration["localVariables"] "`n`n" strobj(configuration)
+	temperrorlevel:=com_SendCommand(configuration,nameOf(ID))
+	
+	if temperrorlevel
+	{
+		run,% editorpath  " runFlow """ %ID%ini " """
+		if waitForFlowToAppear(nameOf(ID))
+			return true
+		else
+			return false
+	}
+	else
+		return true
+}
+
+editFlow(ID)
+{
+	global
+
+	temperrorlevel:=com_SendCommand({function: "edit"},nameOf(ID))
+	
+	if temperrorlevel
+	{
+		run,% editorpath  " editFlow """ %ID%ini " """
+		if waitForFlowToAppear(nameOf(ID))
+			return true
+		else
+			return false
+	}
+	else
+		return true
 	
 }
 
 disableFlow(ID)
 {
 	global
-	ControlSetText,edit1,disable,CommandWindowOfEditor,% "Ѻ" nameOf(ID) "Ѻ" ;Send the command to the Editor.
+	local temperrorlevel
 	
+	temperrorlevel:=com_SendCommand({function: "disable"},nameOf(ID))
+	if temperrorlevel
+	{
+		return false
+	}
+	else
+		return true
 }
 
+stopFlow(ID)
+{
+	global
+	local temperrorlevel
+	
+	temperrorlevel:=com_SendCommand({function: "stop"},nameOf(ID))
+	if temperrorlevel
+	{
+		return false
+	}
+	else
+		return true
+}
 
+waitForFlowToAppear(name)
+{
+	loop 20 ;Wait for the flow to appear
+	{
+		IfWinExist CommandWindowOfEditor,% "Ѻ" name "Ѻ"
+			return true
+		sleep 50
+	}
+	return false
+}
 
 
 
@@ -274,38 +344,6 @@ updateIcon(tempItem)
 
 
 
-
-setGlobalVariable(var,value,noSave="")
-{
-	global
-	
-	globalVariables.insert(var,value)
-	
-	IfNotInString,allGlobalVariableNames,%var%
-		allGlobalVariableNames=%allGlobalVariableNames%%var%|
-	if !(noSave="noSave")
-	{
-		IniWrite,%value%,settings.ini,global Variables,%var%
-		IniWrite,%allGlobalVariableNames%,settings.ini,global Variables,allVariableƝames
-		
-	}
-	
-}
-
-getGlobalVariable(var)
-{
-	global
-	
-	return globalVariables[var]
-	
-}
-
-deleteGlobalVariable(var)
-{
-	global
-	globalVariables.remove(var)
-	
-}
 
 
 

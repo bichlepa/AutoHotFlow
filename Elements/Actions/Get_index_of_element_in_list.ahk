@@ -9,6 +9,20 @@ runActionGet_index_of_element_in_list(InstanceID,ThreadID,ElementID,ElementIDInI
 	local SearchContent
 	local tempObject:=v_getVariable(InstanceID,ThreadID,ListName,"list")
 	local result
+	local found:=false
+	
+	if not v_CheckVariableName(varname)
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Ouput variable name '" varname "' is not valid")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not valid",lang("Ouput variable name '%1%'",varname)) )
+		return
+	}
+	if not v_CheckVariableName(ListName)
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! List name '" ListName "' is not valid")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not valid",lang("List name '%1%'",ListName)) )
+		return
+	}
 	
 	if %ElementID%isExpressionSearchContent=1
 		SearchContent:=v_replaceVariables(InstanceID,ThreadID,%ElementID%SearchContent)
@@ -17,36 +31,48 @@ runActionGet_index_of_element_in_list(InstanceID,ThreadID,ElementID,ElementIDInI
 	
 	;MsgBox,%  %ElementID%Varname "---" %ElementID%VarValue "---" v_replaceVariables(InstanceID,%ElementID%Varname) "---" v_replaceVariables(InstanceID,%ElementID%VarValue)
 	
-	if IsObject(tempObject)
+	if not IsObject(tempObject)
 	{
-		for tempkey, tempvalue in tempObject
+		
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Variable '" Varname "' does not contain a list.")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("Variable '%1%' does not contain a list.",Varname))
+		return
+		
+	}
+	
+	for tempkey, tempvalue in tempObject
+	{
+		
+		if (tempvalue=SearchContent)
 		{
-			
-			if (tempvalue=SearchContent)
-			{
-				found:=true
-				result:=tempkey
-				break
-			}
+			found:=true
+			result:=tempkey
+			break
 		}
-		if (found=true)
+	}
+	if (found!=true)
+	{
+		v_SetVariable(InstanceID,ThreadID,Varname,result)
+		if %ElementID%ExceptionWhenNotFound=1
 		{
-			v_SetVariable(InstanceID,ThreadID,Varname,result)
-			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! The list '" ListName "' does not contain the key '" Position "'.")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("The list '%1%' does not contain the key '%2%'.",ListName,Position))
+			return
 		}
 		else
 		{
-			v_SetVariable(InstanceID,ThreadID,Varname,result)
-			if %ElementID%ExceptionWhenNotFound=1
-				MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
-			else
-				MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Warning! The list '" ListName "' does not contain the key '" Position "'.")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
+			return
 		}
 		
 		
-	}
-	else
-		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
+	
+	}	
+	v_SetVariable(InstanceID,ThreadID,Varname,result)
+	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
+	
+	
 	
 
 	return

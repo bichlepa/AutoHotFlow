@@ -1,87 +1,145 @@
 ﻿iniAllActions.="Execute_Flow|" ;Add this action to list of all actions on initialisation
+TempConditionExecute_FlowData:=Object()
 
 runActionExecute_Flow(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
-	returnedFlowIsRunning=
-	local tempFlowName:=%ElementID%flowName
-	local tempVarsToSend=
+
+	local tempFlowName:=v_replaceVariables(InstanceID,ThreadID,%ElementID%flowName) 
+	
+	if tempFlowName=
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Flow name not specified.")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not specified.",lang("Flow name")))
+		return
+	}
+	
+	TempConditionExecute_FlowData["FlowName"]:=tempFlowName
+	TempConditionExecute_FlowData["ElementID"]:=ElementID
+	TempConditionExecute_FlowData["InstanceID"]:=InstanceID
+	TempConditionExecute_FlowData["ThreadID"]:=ThreadID
+	TempConditionExecute_FlowData["ElementIDInInstance"]:=ElementIDInInstance
+	
+	returnedFlowStatus=
+	
+	local tempLocalVarsToSend
 	if (%ElementID%SendLocalVars)
 	{
-		tempVarsToSend:=v_WriteLocalVariablesToString("Instance_" InstanceID) ;Thread variables won't be sent yet 
+		tempLocalVarsToSend:=Instance_%InstanceID%_LocalVariables.clone()
+		;~ tempThreadVarsToSend:=Instance_%InstanceID%_Thread_%ThreadID%_Variables.clone() ;No Thread Variables
 		
 	}
 	if (%ElementID%WaitToFinish)
 	{
 		if (%ElementID%ReturnVariables)
-			ControlSetText,edit1,ExecuteFlow|%tempFlowName%|%FlowName%|%tempVarsToSend%|%InstanceID%|%ElementIDInInstance%|ReturnVariables,CommandWindowOfManager 
+		{
+			com_SendCommand({function: "ChangeFlowStatus", status: "Run", flowName: tempFlowName, localVariables: tempLocalVarsToSend, ThreadVariables: "",CallerElementID: ElementID, CallerInstanceID: InstanceID, CallerElementIDInInstance: ElementIDInInstance, CallerThreadID: ThreadID, WhetherToReturVariables: true },"manager") ;Send the command to the Manager.
+		}
 		else
-			ControlSetText,edit1,ExecuteFlow|%tempFlowName%|%FlowName%|%tempVarsToSend%|%InstanceID%|%ElementIDInInstance%,CommandWindowOfManager 
+		{
+			com_SendCommand({function: "ChangeFlowStatus", status: "Run", flowName: tempFlowName, localVariables: tempLocalVarsToSend,ThreadVariables: tempThreadVarsToSend,CallerElementID: ElementID,CallerInstanceID: InstanceID, CallerElementIDInInstance: ElementIDInInstance, CallerThreadID: ThreadID},"manager") ;Send the command to the Manager.
+		}
 		
 		
 	}
 	else
-		ControlSetText,edit1,ExecuteFlow|%tempFlowName%|%FlowName%|%tempVarsToSend%|,CommandWindowOfManager 
-	loop 20
 	{
-		if returnedFlowIsRunning!=
-			break
-		sleep 10
+		com_SendCommand({function: "ChangeFlowStatus", status: "Run", flowName: tempFlowName, localVariables: tempLocalVarsToSend,ThreadVariables: tempThreadVarsToSend,CallerElementID: ElementID},"manager") ;Send the command to the Manager.
 	}
-		;MsgBox ga %returnedFlowIsRunning%
+	
+	TempConditionExecute_FlowData["Count"]:=0
+	TempConditionExecute_FlowData["AnswerReceived"]:=false
+	SetTimer, ConditionExecute_FlowTimerLabelLoop,50
+	return
+	
+	ConditionExecute_FlowTimerLabelLoop:
+	;~ ToolTip % TempConditionExecute_FlowData["Count"]
+	TempConditionExecute_FlowData["Count"]+=1
+	;~ ToolTip % strobj(returnedFlowStatus)
+	if IsObject(returnedFlowStatus)
+	{
+		TempConditionExecute_FlowData["AnswerReceived"]:=true
+		TempConditionExecute_FlowData["Count"]:=10000
+		;~ MsgBox % TempConditionExecute_FlowData["AnswerReceived"]
+	}
+	
+	
+	if TempConditionExecute_FlowData["Count"]>100
+	{
+		SetTimer, ConditionExecute_FlowTimerLabelLoop,off
+		runConditionExecute_FlowPart2(TempConditionExecute_FlowData["InstanceID"],TempConditionExecute_FlowData["ThreadID"],TempConditionExecute_FlowData["ElementID"],TempConditionExecute_FlowData["ElementIDInInstance"])
+		;~ MsgBox fads
+	}
+	
+	return
+	
+}
+
+runConditionExecute_FlowPart2(InstanceID,ThreadID,ElementID,ElementIDInInstance)
+{
+	global
+	
+	local tempFlowName:=TempConditionExecute_FlowData["FlowName"]
+	;~ MsgBox % TempConditionExecute_FlowData["AnswerReceived"]
+	if (TempConditionExecute_FlowData["AnswerReceived"]=true)
+	{
+		if (returnedFlowStatus["flowname"]!=tempFlowName)
+		{
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Unexpected error! Manager reported the status of an other flow than requested." )
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("Unexpected Error!"))
+			return
+		}
 		
-	if returnedFlowIsRunning=ǸoⱾuchȠaⱮe
-	{
-		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Flow " tempFlowName " does not exist.")
-			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("Flow %1% does not exist",tempFlowName))
-			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
-		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
-	}
-	else if returnedFlowIsRunning=Dἰsḁbled
-	{
-		if (%ElementID%SkipDisabled)
-			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
-		else
+		if (returnedFlowStatus["result"]="stopped")
+		{
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Manager did not start the flow")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("Manager did not start the flow"))
+		}
+		else if (returnedFlowStatus["result"]="disabled")
 		{
 			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Flow " tempFlowName "could not be started. Flow is not enabled.")
-			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("Flow %1% could not be started.",tempFlowName) " " lang("Flow is not enabled"))
-			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
-		}
-	}
-	else if returnedFlowIsRunning=
-	{
-		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Flow " tempFlowName "could not be started. Manager did not respond.")
-		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("Flow %1% could not be started.",tempFlowName) " " lang("Unknown reason."))
-		return
-	}
-	else ;if the flow is running
-	{
-		if (%ElementID%WaitToFinish)
-		{
-			loop  ;Wait until finished
+			if (%ElementID%SkipDisabled)
 			{
-				if returnedFlowHasFinished_Instance_%InstanceID%_Element_%ElementIDInInstance%!=
-					break
-				if stopRun
-				{
-					return
-				}
-				sleep 10
+				MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 			}
-			
-			if (%ElementID%ReturnVariables)
+			else
 			{
-				v_ImportLocalVariablesFromString(InstanceID,returnedFlowHasFinishedVariables_Instance_%InstanceID%_Element_%ElementIDInInstance%)
+				MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("Flow %1% could not be started.",tempFlowName) " " lang("Flow is not enabled"))
+			}
+		}
+		else if (returnedFlowStatus["result"]="NoSuchName")
+		{
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! There is no flow named '" tempFlowName "'")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("There is no flow named '%1%'",tempFlowName))
+			return
+		}
+		else if not (returnedFlowStatus["result"]="running")
+		{
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Unexpected Error! Manager reported an unknown status.")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("Unexpected Error!"))
+			return
+		}
+		else ;Flow is running
+		{
+			if not (%ElementID%WaitToFinish)
+				MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
+			else
+			{
+				;It will wait now for a reply from the other flow. As soon as the reply arrived, this action will be marked as finished
+				return
 				
 			}
 		}
 		
-		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal") 
-		
+	}
+	else 
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! No response from the manager.")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("No response from the manager"))
+		return
 	}
 	
-
-	return
+	
 }
 
 

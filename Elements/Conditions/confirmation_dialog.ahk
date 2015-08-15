@@ -16,6 +16,8 @@ runConditionConfirmation_Dialog(InstanceID,ThreadID,ElementID,ElementIDInInstanc
 	tempNew.insert("ElementIDInInstance",ElementIDInInstance)
 	tempNew.insert("Text",tempText)
 	tempNew.insert("Title",tempTitle)
+	tempNew.insert("Type",%ElementID%type)
+	tempNew.insert("Name",%ElementID%name)
 	
 	;Create a gui label. This label will always be unique. 
 	local tempGUILabel:="GUI_Confirmation_Dialog_" instanceID "_" ThreadID "_" ElementID "_" ElementIDInInstance 
@@ -59,8 +61,8 @@ runConditionConfirmation_Dialog(InstanceID,ThreadID,ElementID,ElementIDInInstanc
 	tempConfirmation_DialogBut:=ConditionConfirmation_DialogAllGUIs[a_gui]
 	
 	;~ MsgBox % a_gui " - " temp.instanceID
-	MarkThatElementHasFinishedRunning(tempConfirmation_DialogBut.instanceID,tempConfirmation_DialogBut.threadid,tempConfirmation_DialogBut.ElementID,tempConfirmation_DialogBut.ElementIDInInstance,"exception")
-
+	logger("f0","Instance " tempConfirmation_DialogBut.instanceID " - " tempConfirmation_DialogBut.type " '" tempConfirmation_DialogBut.name "': Error! User dismissed the dialog")
+	MarkThatElementHasFinishedRunning(tempConfirmation_DialogBut.instanceID,tempConfirmation_DialogBut.threadid,tempConfirmation_DialogBut.ElementID,tempConfirmation_DialogBut.ElementIDInInstance,"exception",lang("User dismissed the dialog"))
 	
 	ConditionConfirmation_DialogAllGUIs.Remove(a_gui)
 	return

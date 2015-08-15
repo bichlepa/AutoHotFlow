@@ -19,7 +19,7 @@ if uilang=error
 
 ;Write information into settings file
 iniwrite,%a_now%,settings.ini,common,LastExecutionTime
-iniwrite,%HiddenGUIHWND%,settings.ini,common,Hidden window ID of manager
+
 
 
 loadSavedFlows()

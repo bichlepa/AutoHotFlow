@@ -1,70 +1,117 @@
 ﻿iniAllTriggers.="Window_Closes|" ;Add this trigger to list of all triggers on initialisation
 
-EnableTriggerWindow_Closes(ID)
+EnableTriggerWindow_Closes(ElementID)
 {
 	global
 	
-	tempWinTitle:=v_replaceVariables(0,0,%ID%Wintitle)
-	tempWinText:=v_replaceVariables(0,0,%ID%winText)
-	tempExcludeTitle:=v_replaceVariables(0,0,%ID%excludeTitle)
-	tempExcludeText:=v_replaceVariables(0,0,%ID%ExcludeText)
-	tempTitleMatchMode :=%ID%TitleMatchMode
-	tempahk_class:=v_replaceVariables(0,0,%ID%ahk_class)
-	tempahk_exe:=v_replaceVariables(0,0,%ID%ahk_exe)
-	tempahk_id:=v_replaceVariables(0,0,%ID%ahk_id)
-	tempahk_pid:=v_replaceVariables(0,0,%ID%ahk_pid)
+	local tempWinTitle:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Wintitle)
+	local tempWinText:=v_replaceVariables(InstanceID,ThreadID,%ElementID%winText)
+	local tempExcludeTitle:=v_replaceVariables(InstanceID,ThreadID,%ElementID%excludeTitle)
+	local tempExcludeText:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ExcludeText)
+	local tempTitleMatchMode :=%ElementID%TitleMatchMode
+	local tempahk_class:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ahk_class)
+	local tempahk_exe:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ahk_exe)
+	local tempahk_id:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ahk_id)
+	local tempahk_pid:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ahk_pid)
 	
 	
-	tempwinwaitstring=%tempWinTitle%
+	local tempwinstring:=tempWinTitle
 	if tempahk_class<>
-		tempwinwaitstring=%tempwinwaitstring% ahk_class %tempahk_class%
+		tempwinstring=%tempwinstring% ahk_class %tempahk_class%
 	if tempahk_id<>
-		tempwinwaitstring=%tempwinwaitstring% ahk_id %tempahk_id%
+		tempwinstring=%tempwinstring% ahk_id %tempahk_id%
 	if tempahk_pid<>
-		tempwinwaitstring=%tempwinwaitstring% ahk_pid %tempahk_pid%
+		tempwinstring=%tempwinstring% ahk_pid %tempahk_pid%
 	if tempahk_exe<>
-		tempwinwaitstring=%tempwinwaitstring% ahk_exe %tempahk_exe%
+		tempwinstring=%tempwinstring% ahk_exe %tempahk_exe%
+	;If no window specified, unlike in other actions, do not check whether the active window is active, instead error
+	if (tempwinstring="" and tempWinText="" and tempExcludeTitle = "" and tempExcludeText ="")
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! No window specified")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("No window specified.") )
+		return
+		
+	}
 	
-	tempwinwaitstring=%tempwinwaitstring%,%tempWinText%,,%tempExcludeTitle%,%tempExcludeText%
+	tempwinwaitstring=%tempwinstring%,%tempWinText%,,%tempExcludeTitle%,%tempExcludeText%
 	
-	FileDelete,Generated Scripts\TriggerWindow_Closes%ID%.ahk
-	FileAppend,
+	
+	local tempDetectHiddenWindows
+	local tempDetectHiddenText
+	
+	if %ElementID%findhiddenwindow=0
+		tempDetectHiddenWindows =off
+	else
+		tempDetectHiddenWindows= on
+	if %ElementID%findhiddentext=0
+		tempDetectHiddenText= off
+	else
+		tempDetectHiddenText= on
+	
+	
+	TriggerWindow_closes%ElementID%:=object()
+	TriggerWindow_closes%ElementID%["Title"]:="Trigger Window_closes. Flow - " flowName ". ID - " ElementID
+	local tempTitle:=TriggerWindow_closes%ElementID%["Title"]
+	local generatedScript
+	
+	generatedScript=
 	(
-	#SingleInstance force
-	DetectHiddenWindows, On
+	%ScriptGenerationHeader%
+	%ScriptGenerationCommunicationPart1%
+	%ScriptGenerationEndWhenFlowClosesPart1%
+	
+	%ScriptGenerationIportantVars%
+	
+	;Main actions
 	SetTitleMatchMode,%tempTitleMatchMode%
-	
-	;open a window so the main program can stop it
-	gui,45:default
-	gui,new,,CommandWindowFor%ID%
-	gui,add,edit,vcommandFortrigger gCommandForTrigger
-	
+	DetectHiddenText,%tempDetectHiddenText%
+	DetectHiddenWindows,%tempDetectHiddenWindows%
 	loop
 	{
 		WinWait,%tempwinwaitstring%
 		
 		WinWaitClose %tempwinwaitstring%
 		
-		ControlSetText,Edit1,Run,CommandWindowOfEditor,Ѻ%flowname%Ѻ
-
+		threadVars:=object()
+		com_SendCommand({function: "trigger",ElementID: ►ParentElementID,ThreadVariables: threadVars},"editor",►ParentFlowName)
+	}
+	
+	
+	;End of auto-execution:
+	%ScriptGenerationCommunicationPart2%
 		
-	}
+	;Evaluating command. Add some custom messages here. Example: if (tempNewReceivedCommand["Function"]="commandname") {}
 	
-	CommandForTrigger:
-	gui,submit
-	if CommandForTrigger=exit
-	{
-		exitapp
-	}
-	),Generated Scripts\TriggerWindow_Closes%ID%.ahk
-	run,Generated Scripts\AutoHotkey.exe "Generated Scripts\TriggerWindow_Closes%ID%.ahk"
+	%ScriptGenerationCommunicationPart3% ;Part 3 must be inserted right after part 2 and optionally some other command evaluation
+	%ScriptGenerationEndWhenFlowClosesPart2%
+	%ScriptGenerationFunctionSendCommand%
+	%ScriptGenerationFunctionStrObj%
+	)
+	ScriptGenerationReplaceImportantVars(generatedScript,tempTitle,ElementID)
 	
+	FileDelete,Generated Scripts\%tempTitle%.ahk
+	FileAppend,% generatedScript,Generated Scripts\%tempTitle%.ahk,utf-8
+	local tempPID
+	run,Generated Scripts\AutoHotkey.exe "Generated Scripts\%tempTitle%.ahk",,,tempPID
+	;~ MsgBox % ErrorLevel
+	TriggerWindow_closes%ElementID%["ahkpid"]:=tempPID
+	
+}
+
+DisableTriggerWindow_Closes(ElementID)
+{
+	global
+	DetectHiddenWindows, On
+	;Three different methods to terminate the trigger
+	winclose,% TriggerWindow_closes%ElementID%["Title"] "§" CurrentManagerHiddenWindowID "§"
+	com_SendCommand({function: "exit"},"custom",TriggerWindow_closes%ElementID%["Title"] "§" CurrentManagerHiddenWindowID "§")
+	Process,close,% TriggerWindow_closes%ElementID%["ahkpid"]
 }
 
 getParametersTriggerWindow_Closes()
 {
 	
-	parametersToEdit:=["Label|" lang("Title_of_Window"),"Radio|1|TitleMatchMode|" lang("Start_with") ";" lang("Contain_anywhere") ";" lang("Exactly"),"text||Wintitle","Label|" lang("Exclude_title"),"text||excludeTitle","Label|" lang("Text_of_a_control_in_Window"),"text||winText","Label|" lang("Exclude_text_of_a_control_in_window"),"text||ExcludeText","Label|" lang("Window_Class"),"text||ahk_class","Label|" lang("Process_Name"),"text||ahk_exe","Label|" lang("Unique_window_ID"),"text||ahk_id","Label|" lang("Unique_Process_ID"),"text||ahk_pid","Label|" lang("Get_parameters"), "button|FunctionsForElementGetWindowInformation||" lang("Get_Parameters")]
+	parametersToEdit:=["Label|" lang("Title_of_Window"),"Radio|1|TitleMatchMode|" lang("Start_with") ";" lang("Contain_anywhere") ";" lang("Exactly"),"text||Wintitle","Label|" lang("Exclude_title"),"text||excludeTitle","Label|" lang("Text_of_a_control_in_Window"),"text||winText","Checkbox|0|FindHiddenText|" lang("Detect hidden text"),"Label|" lang("Exclude_text_of_a_control_in_window"),"text||ExcludeText","Label|" lang("Window_Class"),"text||ahk_class","Label|" lang("Process_Name"),"text||ahk_exe","Label|" lang("Unique_window_ID"),"text||ahk_id","Label|" lang("Unique_Process_ID"),"text||ahk_pid","Label|" lang("Hidden window"),"Checkbox|0|FindHiddenWindow|" lang("Detect hidden window"),"Label|" lang("Get_parameters"), "button|FunctionsForElementGetWindowInformation||" lang("Get_Parameters")]
 	
 	
 	return parametersToEdit
@@ -80,17 +127,9 @@ getCategoryTriggerWindow_Closes()
 }
 
 
-
-DisableTriggerWindow_Closes(ID)
-{
-	DetectHiddenWindows, On
-	ControlSetText,Edit1,exit,CommandWindowFor%ID%
-	
-}
-
 GenerateNameTriggerWindow_Closes(ID)
 {
-	tempNameString:=lang("Window_Closes")
+	tempNameString:=lang("Window_Closes") " - "
 	if GUISettingsOfElement%ID%Wintitle<>
 	{
 		

@@ -6,7 +6,13 @@
 	<meta name="generator" content="LibreOffice 4.4.3.2 (Windows)"/>
 	<meta name="created" content="00:00:00"/>
 	<meta name="changedby" content="Paul Bichler"/>
-	<meta name="changed" content="2015-06-20T14:30:15.315000000"/>
+	<meta name="changed" content="2015-08-14T21:41:40.217000000"/>
+	<meta name="created" content="00:00:00">
+	<meta name="changedby" content="Paul Bichler">
+	<meta name="changed" content="2015-08-12T20:17:29.077000000">
+	<meta name="created" content="00:00:00">
+	<meta name="changedby" content="Paul Bichler">
+	<meta name="changed" content="2015-06-20T14:30:15.315000000">
 	<style type="text/css">
 		td p { color: #000000 }
 		h1 { color: #000000 }
@@ -37,22 +43,41 @@ Settings</h2>
 	</tr>
 </table>
 <h2 class="western" style="margin-top: 0.3cm; margin-bottom: 0.1cm; font-weight: normal">
-Remarks</h2>
-<p style="margin-top: 0.3cm; margin-bottom: 0.1cm; font-weight: normal">
-It will not trigger on activation.</p>
-<h2 class="western" style="margin-top: 0.3cm; margin-bottom: 0.1cm; font-weight: normal">
-<font color="#990000"><font size="3" style="font-size: 12pt">Note!</font></font></h2>
-<table width="100%" cellpadding="4" cellspacing="0" bgcolor="#ffcccc">
+Supplied variables</h2>
+<table width="100%" cellpadding="4" cellspacing="0" bgcolor="#ccffff">
 	<col width="256*">
 	<tr>
-		<td width="100%" valign="top" style="border: 1px solid #000000; padding: 0.11cm">
-			<p style="margin-top: 0.3cm; font-weight: normal">Only one of this
-			trigger can be activated at once.</p>
+		<td width="100%" valign="top" bgcolor="#ffffcc" style="border: 1px solid #000000; padding: 0.11cm">
+			<p style="margin-bottom: 0.1cm"><font face="Consolas, monospace"><b>A_ThisHokey</b></font></p>
+			<p>contains the text (if any) which were found in the clipboard.</p>
+		</td>
+	</tr>
+	<tr>
+		<td width="100%" valign="top" bgcolor="#ffffcc" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
+			<p style="margin-bottom: 0.1cm"><font face="Consolas, monospace"><b>A_ContentType</b></font></p>
+			<p><span style="font-weight: normal">contains one of following
+			values:<br/>
+- </span><strong>0</strong> if the clipboard is now
+			empty<br/>
+- <strong>1</strong> if it contains something that can
+			be expressed as text (this includes files copied from an Explorer
+			window)<br/>
+- <strong>2</strong> if it contains something
+			entirely non-text such as a picture</p>
 		</td>
 	</tr>
 </table>
 <h2 class="western" style="margin-top: 0.3cm; margin-bottom: 0.1cm; font-weight: normal">
-<br/>
+Remarks</h2>
+<p style="margin-top: 0.3cm; margin-bottom: 0.1cm"><span style="font-weight: normal">It
+will not trigger on activation, instead </span>the entirety of its
+period must elapse before it triggers the flow.</p>
+<p style="margin-top: 0.3cm; margin-bottom: 0.1cm">The maximum amount
+of periodic timers in one flow is 10.</p>
+<p style="margin-top: 0.3cm; margin-bottom: 0.1cm; font-weight: normal">
+Do not specify a period smaller than 100 ms. AutoHotFlow can't work
+that fast.</p>
+<h2 class="western" style="margin-top: 0.3cm; margin-bottom: 0.1cm"><br/>
 <br/>
 
 </h2>

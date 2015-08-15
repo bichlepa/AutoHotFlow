@@ -10,7 +10,7 @@ r_EnableFlow(options:="")
 
 	if (triggersEnabled=true) ;IF the flow is enabled, disable flow
 	{
-		
+		Critical on
 		logger("f1a1","Disabling flow.")
 		for tempindex, temptrigger in allTriggers
 		{
@@ -19,6 +19,7 @@ r_EnableFlow(options:="")
 			
 		}
 		triggersEnabled:=false
+		Critical off
 		if (options!="noTellDisabled")
 		{
 			r_TellThatFlowIsDisabled()
@@ -49,7 +50,7 @@ r_TellThatFlowIsDisabled()
 	global
 	try Menu, MyMenu,Rename,% lang("Disable"),% lang("Enable") ;Show enable when disabled
 	try menu, tray, rename,% lang("Disable"),% lang("Enable")
-	ControlSetText,edit1,disabled|%flowName%,CommandWindowOfManager ;Tell the manager that this flow is disabled
+	com_SendCommand({function: "ReportStatus",status: "disabled"},"manager") ;Send the command to the Manager.
 	if (nowrunning!=true) ;Only show whether the flow is enabled if flow is not running
 		menu tray,icon,Icons\disabled.ico
 	
@@ -59,7 +60,7 @@ r_TellThatFlowIsEnabled()
 	global
 	try Menu, MyMenu,Rename,% lang("Enable"),% lang("Disable") ;Show disable when enabled
 	try menu, tray, rename, % lang("Enable"),% lang("Disable")
-	ControlSetText,edit1,enabled|%flowName%,CommandWindowOfManager ;Tell the manager that this flow is enabled
+	com_SendCommand({function: "ReportStatus",status: "enabled"},"manager") ;Send the command to the Manager.
 	if (nowrunning!=true)
 		menu tray,icon,Icons\enabled.ico
 }

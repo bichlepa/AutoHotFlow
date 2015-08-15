@@ -1,14 +1,53 @@
 ﻿iniAllTriggers.="Time_of_day|" ;Add this trigger to list of all triggers on initialisation
 
+TriggerTime_of_dayCurrentTimes:=Object()
+
 EnableTriggerTime_of_day(ElementID)
 {
 	global
-	if (!IsObject(TriggerTime_of_dayCurrentTimes))
-		TriggerTime_of_dayCurrentTimes:=Object()
-	tempTriggerTime_of_dayTimeStamp:=%ElementID%time
 	
-	if (%ElementID%WeekDays!="") ;If at least one day is selected
-		TriggerTime_of_dayCurrentTimes.insert( ElementID ,tempTriggerTime_of_dayTimeStamp) 
+	local tempTriggerParams:=Object()
+	tempTriggerParams["TimeStamp"]:=%ElementID%time
+	tempTriggerParams["ElementID"]:=ElementID
+
+	
+	if (%ElementID%WeekDays="") ;If at least one day is selected
+	{
+		logger("f0",%ElementID%type " '" %ElementID%name "': Error! No weekdays selected")
+		MsgBox,16,% lang("Error"),% lang("The hotkey %1% cannot be set!",temphotkey) " " lang("No weekdays selected")
+		return
+	}
+	
+	;Find the next timestamp, where the trigger should start
+	FormatTime,TriggerTime_of_dayNewTimeWithoutDate,% tempTriggerParams["TimeStamp"],HHmmss
+	;~ MsgBox % "sdafklj---" TriggerTime_of_dayNewTimeWithoutDate
+	loop 8 ;Go through all days of week
+	{
+		
+		TriggerTime_of_dayNewTime:=A_YYYY . A_MM . A_DD . TriggerTime_of_dayNewTimeWithoutDate ;Create a new time and date
+		;~ MsgBox %TriggerTime_of_dayNewTime%    %TriggerTime_of_dayNewTimeWithoutDate%
+		EnvAdd,TriggerTime_of_dayNewTime,% A_Index -1,days
+		;~ MsgBox %TriggerTime_of_dayNewTime%    %TriggerTime_of_dayNewTimeWithoutDate%
+		tempdiff:=TriggerTime_of_dayNewTime
+		EnvSub,tempdiff,a_now,seconds
+		if (tempdiff>0 ) ;Prove that the time is not passed yet. This may occure in the first loop
+		{
+			FormatTime,tempDayOfWeek,%TriggerTime_of_dayNewTime%,WDay ;find out the weekday of the new day
+			;~ MsgBox % tempDayOfWeek "   " %ElementID%WeekDays "    " TriggerTime_of_dayNewTime
+			IfInString,%ElementID%WeekDays,% tempDayOfWeek
+			{
+				tempTriggerParams["TimeStamp"]:=TriggerTime_of_dayNewTime ;Add the new time and date as the next trigger time
+				
+				break
+			}
+			
+			
+		}
+	}
+	
+	
+	
+	TriggerTime_of_dayCurrentTimes.push(tempTriggerParams) 
 	SetTimer,TriggerTime_of_dayLoop,1000
 	
 	return
@@ -16,24 +55,27 @@ EnableTriggerTime_of_day(ElementID)
 	TriggerTime_of_dayLoop:
 	
 	
-	for tempTime_of_dayid, tempTime_of_dayEndTime in TriggerTime_of_dayCurrentTimes ;loop through all sleepTimes and look whether the sleep time is over
+	for temp_index, tempTime_of_dayObject in TriggerTime_of_dayCurrentTimes ;loop through all sleepTimes and look whether the sleep time is over
 	{
-		;MsgBox %tempTime_of_dayEndTime%
-		EnvSub,tempTime_of_dayEndTime,a_now,seconds
+		tempTime_of_dayEndTime:=tempTime_of_dayObject["TimeStamp"]
+		tempTime_of_dayid:=tempTime_of_dayObject["ElementID"]
+		;~ MsgBox % tempTime_of_dayEndTime "`n" strobj(TriggerTime_of_dayCurrentTimes)
+		tempTime_of_dayDiffTime:=tempTime_of_dayEndTime
+		EnvSub,tempTime_of_dayDiffTime,a_now,seconds
 		
-		if (tempTime_of_dayEndTime<=0) ;If the time is over
+		if (tempTime_of_dayDiffTime<=0) ;If the time is over
 		{
 			
-			if (tempTime_of_dayEndTime>-60) ;If less than 60 seconds passed after the triggertime
+			if (tempTime_of_dayDiffTime>-60) ;If less than 60 seconds passed after the triggertime
 			{
-				
-				SetTimer,r_startRun,-1 ;Run flow
+				r_Trigger(tempTime_of_dayid )
 			}
 			
 			if (%tempTime_of_dayid%WeekDays!="") ;Set a new time
 			{
 				
-				FormatTime,TriggerTime_of_dayNewTimeWithoutDate,tempTime_of_dayEndTime,HHmmss
+				FormatTime,TriggerTime_of_dayNewTimeWithoutDate,%tempTime_of_dayEndTime%,HHmmss
+				;~ MsgBox % "sdafklj---" TriggerTime_of_dayNewTimeWithoutDate
 				loop 8 ;Go through all days of week
 				{
 					
@@ -42,13 +84,13 @@ EnableTriggerTime_of_day(ElementID)
 					;MsgBox %TriggerTime_of_dayNewTime%    %TriggerTime_of_dayNewTimeWithoutDate%
 					tempdiff:=TriggerTime_of_dayNewTime
 					EnvSub,tempdiff,a_now,seconds
-					if (tempdiff>0 ) ;Prove that the time is not passed yes. This may occure in the first loop
+					if (tempdiff>0 ) ;Prove that the time is not passed yet. This may occure in the first loop
 					{
 						FormatTime,tempDayOfWeek,%TriggerTime_of_dayNewTime%,WDay ;find out the weekday of the new day
 						;MsgBox % tempDayOfWeek "   " %tempTime_of_dayid%WeekDays
 						IfInString,%tempTime_of_dayid%WeekDays,%tempDayOfWeek%
 						{
-							TriggerTime_of_dayCurrentTimes.insert(tempTime_of_dayid,TriggerTime_of_dayNewTime) ;Add the new time and date as the next trigger time
+							TriggerTime_of_dayCurrentTimes[temp_index]["TimeStamp"]:=TriggerTime_of_dayNewTime ;Add the new time and date as the next trigger time
 							
 							break
 						}
@@ -64,7 +106,7 @@ EnableTriggerTime_of_day(ElementID)
 		}
 		
 	}
-	if (TriggerTime_of_dayCurrentTimes.GetCapacity()=0)
+	if not (TriggerTime_of_dayCurrentTimes.HasKey(1))
 		settimer,TriggerTime_of_dayLoop,off
 	
 	
@@ -75,6 +117,26 @@ EnableTriggerTime_of_day(ElementID)
 	
 	
 }
+
+DisableTriggerTime_of_day(ID)
+{
+	
+	
+	
+	for tempTime_of_dayid, tempTime_of_dayObject in TriggerTime_of_dayCurrentTimes
+	{
+		if (tempTime_of_dayObject["elementid"]=ID)
+		{
+			
+			TriggerTime_of_dayCurrentTimes.delete(tempTime_of_dayid)
+		}
+		
+	}
+	
+	
+	
+}
+
 
 getParametersTriggerTime_of_day()
 {
@@ -96,13 +158,6 @@ getCategoryTriggerTime_of_day()
 
 
 
-DisableTriggerTime_of_day(ID)
-{
-	
-	SetTimer,TriggerTime_of_dayLoop,off
-	TriggerTime_of_dayCurrentTimes.remove(ID)
-	
-}
 
 GenerateNameTriggerTime_of_day(ID)
 {
@@ -114,7 +169,7 @@ GenerateNameTriggerTime_of_day(ID)
 		IfInString,GUISettingsOfElement%ID%weekdays,2
 			tempDaysstring.= lang("Mon (Short for Monday") ", "
 		IfInString, GUISettingsOfElement%ID%weekdays,3
-			tempDaysstring.= lang("Thu (Short for Thursday") ", "
+			tempDaysstring.= lang("Tue (Short for Tuesday") ", "
 		IfInString, GUISettingsOfElement%ID%weekdays,4
 			tempDaysstring.=  lang("Wed (Short for Wednesday") ", "
 		IfInString, GUISettingsOfElement%ID%weekdays,5

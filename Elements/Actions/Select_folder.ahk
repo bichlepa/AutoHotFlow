@@ -11,7 +11,7 @@ runActionSelect_folder(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	
 	SetTimer,ActionSelect_folder_StartNextQuestion,10,-10 ;lower priority
 	
-	
+	;~ MsgBox
 	return
 	
 	
@@ -20,6 +20,8 @@ runActionSelect_folder(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	Select_folderStarted:=false
 	for count, tempcSelect_folderidToStart in ActionSelect_folderToStart ;get the first element
 	{
+		
+		Select_folderStarted:=true
 		StringSplit,tempElement,tempcSelect_folderidToStart,_
 		; tempElement1 = word "instance"
 		; tempElement2 = instance id
@@ -27,12 +29,23 @@ runActionSelect_folder(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 		; tempElement4 = element id
 		; tempElement5 = element id in the instance
 		ActionSelect_folderToStart_Element_ID:=tempElement4
+		ActionSelect_folderToStart_Element_IDInInstance:=tempElement5
 		ActionSelect_folderStart_CurrentThread_ID:=tempElement3
 		ActionSelect_folderStart_CurrentInstanceID:=tempElement2
 		
 		;gui,%tempcSelect_folderidToStart%:default
 		
 		;gui,10:-SysMenu 
+		
+		ActionSelect_folderStart_CurrentVarname:=v_replaceVariables(ActionSelect_folderStart_CurrentInstanceID,ActionSelect_folderStart_CurrentThreadID,%ActionSelect_folderToStart_Element_ID%Varname)
+		;~ MsgBox % tempcSelect_folderidToStart "--" ActionSelect_folderStart_CurrentVarname
+		if not v_CheckVariableName(ActionSelect_folderStart_CurrentVarname)
+		{
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Ouput variable name '" ActionSelect_folderStart_CurrentVarname "' is not valid")
+			MarkThatElementHasFinishedRunning(ActionSelect_folderStart_CurrentInstanceID,ActionSelect_folderStart_CurrentThread_ID,ActionSelect_folderToStart_Element_ID,ActionSelect_folderToStart_Element_IDInInstance,"exception",lang("%1% is not valid",lang("Ouput variable name '%1%'",ActionSelect_folderStart_CurrentVarname)) )
+			break
+		}
+		
 		
 		tempActionSelectFolderOptions=0
 
@@ -50,19 +63,23 @@ runActionSelect_folder(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 		
 		
 		
-		;MsgBox %tempActionSelectFileOptions%
+		;~ MsgBox %tempActionSelectFileOptions%
 		FileSelectFolder,tempActionSelectFolderFolder,% tempActionSelectFolderRoot ,%tempActionSelectFolderOptions%,% v_replaceVariables(ActionSelect_folderStart_CurrentInstanceID,ActionSelect_folderStart_CurrentThread_ID,%ActionSelect_folderToStart_Element_ID%title)
 		;MsgBox %ActionSelect_folderToStart_Element_ID% %tempActionSelectFilefile% %errorlevel%
 		
 		if errorlevel
-			MarkThatElementHasFinishedRunningOneVar(tempcSelect_folderidToStart,"exception")
+		{
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! User dismissed the dialog without selecting a folder or system refused to show the dialog.")
+			MarkThatElementHasFinishedRunning(ActionSelect_folderStart_CurrentInstanceID,ActionSelect_folderStart_CurrentThread_ID,ActionSelect_folderToStart_Element_ID,ActionSelect_folderToStart_Element_IDInInstance,"exception",lang("User dismissed the dialog without selecting a folder or system refused to show the dialog."))
+			break
+		}
 		else
 		{
-			v_setVariable(ActionSelect_folderStart_CurrentInstanceID,ActionSelect_folderStart_CurrentThread_ID,%ActionSelect_folderToStart_Element_ID%Varname,tempActionSelectFolderFolder)
+			v_setVariable(ActionSelect_folderStart_CurrentInstanceID,ActionSelect_folderStart_CurrentThread_ID,ActionSelect_folderStart_CurrentVarname,tempActionSelectFolderFolder)
 			
 			MarkThatElementHasFinishedRunningOneVar(tempcSelect_folderidToStart,"normal")
 		}
-		Select_folderStarted:=true
+		
 		break
 		
 	}

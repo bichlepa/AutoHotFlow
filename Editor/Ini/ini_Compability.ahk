@@ -1,4 +1,4 @@
-﻿FlowCompabilityVersionOfApp:=3 ;This variable contains a number which will be incremented as soon an incompability appears. This will make it possible to identify old scripts and convert them. This value will be written in any saved flows.
+﻿FlowCompabilityVersionOfApp:=4 ;This variable contains a number which will be incremented as soon an incompability appears. This will make it possible to identify old scripts and convert them. This value will be written in any saved flows.
 
 i_CheckCompability(ElementID,IndexInIniFile,IniFilePath)
 {
@@ -74,6 +74,32 @@ i_CheckCompability(ElementID,IndexInIniFile,IniFilePath)
 		{
 			
 			%ElementID%Unit=2 ;The only unit was seconds
+		}
+		
+	}
+	
+	if FlowCompabilityVersion<3 ; 2015,08,09
+	{
+		logger("a2","Flow has elder format than version 3. Tryting to keep compability.")
+		if (%ElementID%type="action" and %ElementID%subtype="Read_from_ini") 
+		{
+			if %ElementID%Action=2
+			%ElementID%Action=3
+		}
+		
+	}
+	if FlowCompabilityVersion<4 ; 2015,08,15
+	{
+		logger("a2","Flow has elder format than version 4. Tryting to keep compability.")
+		if (%ElementID%type="action" and %ElementID%subtype="Set_Clipboard") 
+		{
+			Iniread,temp,%IniFilePath%,%IndexInIniFile%,varname
+			if temp
+			{
+				%ElementID%text:=temp
+				%ElementID%expression:=2
+				
+			}
 		}
 		
 	}

@@ -1,4 +1,5 @@
 ﻿iniAllActions.="Message_Box|" ;Add this action to list of all actions on initialisation
+ActionMessage_BoxAllGUIs:=Object()
 
 runActionMessage_Box(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
@@ -7,8 +8,7 @@ runActionMessage_Box(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	local tempText:=v_replaceVariables(InstanceID,ThreadID,%ElementID%text,"normal")
 	local tempTitle:=v_replaceVariables(InstanceID,ThreadID,%ElementID%title,"normal")
 	
-	if (!IsObject(ActionMessage_BoxAllGUIs)) ;On first run, create object that will contain all current openen windows
-		ActionMessage_BoxAllGUIs:=Object()
+	
 	
 	local tempNew:=Object() ;create object that will contain all settings of the current element
 	tempNew.insert("instanceID",InstanceID)
@@ -17,6 +17,8 @@ runActionMessage_Box(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	tempNew.insert("ElementIDInInstance",ElementIDInInstance)
 	tempNew.insert("Text",tempText)
 	tempNew.insert("Title",tempTitle)
+	tempNew.insert("Type",%ElementID%type)
+	tempNew.insert("Name",%ElementID%name)
 	
 	;Create a gui label. This label will always be unique. 
 	local tempGUILabel:="GUI_MessageBox_" instanceID "_" ThreadID "_" ElementID "_" ElementIDInInstance 
@@ -60,8 +62,8 @@ runActionMessage_Box(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	tempMessageBoxBut:=ActionMessage_BoxAllGUIs[a_gui]
 	
 	;~ MsgBox % a_gui " - " temp.instanceID
-	MarkThatElementHasFinishedRunning(tempMessageBoxBut.instanceID,tempMessageBoxBut.threadid,tempMessageBoxBut.ElementID,tempMessageBoxBut.ElementIDInInstance,"exception")
-
+	logger("f0","Instance " tempMessageBoxBut.instanceID " - " tempMessageBoxBut.type " '" tempMessageBoxBut.name "': Error! User dismissed the dialog")
+	MarkThatElementHasFinishedRunning(tempMessageBoxBut.instanceID,tempMessageBoxBut.threadid,tempMessageBoxBut.ElementID,tempMessageBoxBut.ElementIDInInstance,"exception",lang("User dismissed the dialog"))
 	
 	ActionMessage_BoxAllGUIs.Remove(a_gui)
 	return

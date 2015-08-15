@@ -12,6 +12,7 @@ runLoopLoop_through_files(InstanceID,ThreadID,ElementID,ElementIDInInstance,Head
 	local tempOneFile
 	local OutNameNoExt
 	local OutDrive
+	
 	if HeadOrTail=Head ;Initialize loop
 	{
 		if %ElementID%OperateOnWhat=1
@@ -68,8 +69,9 @@ runLoopLoop_through_files(InstanceID,ThreadID,ElementID,ElementIDInInstance,Head
 		
 		if tempError
 		{
-			
-			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Invalid path: " tempPath)
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("Invalid path: %1%",tempPath) )
+			return
 		}
 		else if tempFound
 		{
@@ -140,7 +142,11 @@ runLoopLoop_through_files(InstanceID,ThreadID,ElementID,ElementIDInInstance,Head
 		
 	}
 	else
-		MsgBox Internal Error. Loop should be executed but there is no information about the connection lead into head or tail.
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Unexpected Error! No information whether the connection lead into head or tail")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("No information whether the connection lead into head or tail") )
+		return
+	}
 
 	
 

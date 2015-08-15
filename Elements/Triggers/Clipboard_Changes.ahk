@@ -1,18 +1,50 @@
 ﻿iniAllTriggers.="Clipboard_Changes|" ;Add this trigger to list of all triggers on initialisation
 
+
+
 EnableTriggerClipboard_Changes(ElementID)
 {
 	global
 	
 	TriggerClipboard_Changes_Enabled:=true
-	
+	OnClipboardChange("TriggerTriggerClipboard_Changes")
+	TriggerClipboard_Changes_SettingOnlyText:=%ElementID%OnlyText
+	TriggerClipboard_Changes_SettingWhenEmpty:=%ElementID%WhenEmpty
 	
 }
+
+TriggerTriggerClipboard_Changes(contenttype)
+{
+	global
+	local temppars
+	
+	if (TriggerClipboard_Changes_Enabled=true)
+	{
+		if ((TriggerClipboard_Changes_SettingOnlyText=0  and contenttype!=0) or (TriggerClipboard_Changes_SettingOnlyText=1 and contenttype=1) or (TriggerClipboard_Changes_SettingWhenEmpty=1 and contenttype=0))
+		{
+			logger("f1",%ElementID%type " '" %ElementID%name "': Trigger executes")
+			
+			temppars:=Object()
+			temppars["threadVariables"]:=v_AppendAVariableToString(temppars["threadVariables"],"A_Clipboard",Clipboard)
+			temppars["threadVariables"]:=v_AppendAVariableToString(temppars["threadVariables"],"A_ContentType",contenttype)
+			r_Trigger(ElementID,temppars)
+		}
+	}
+	
+}
+
+DisableTriggerClipboard_Changes(ID)
+{
+	global
+	TriggerClipboard_Changes_Enabled:=false
+	
+}
+
 
 getParametersTriggerClipboard_Changes()
 {
 	
-	parametersToEdit:=[]
+	parametersToEdit:=["Label|" lang("Options"),"Checkbox|1|OnlyText|" lang("Trigger only if the clipboard contains some text."),"Checkbox|0|WhenEmpty|" lang("Trigger if clipboard is empty.")]
 	
 	
 	return parametersToEdit
@@ -29,13 +61,7 @@ getCategoryTriggerClipboard_Changes()
 
 
 
-DisableTriggerClipboard_Changes(ID)
-{
-	global
-	TriggerClipboard_Changes_Enabled:=false
-	
-	
-}
+
 
 GenerateNameTriggerClipboard_Changes(ID)
 {
@@ -43,12 +69,3 @@ GenerateNameTriggerClipboard_Changes(ID)
 	
 }
 
-goto,JumpOverTriggerClipboard_Changes
-
-OnClipboardChange:
-if (TriggerClipboard_Changes_Enabled=true)
-	goto,r_startRun
-return
-
-JumpOverTriggerClipboard_Changes:
-temp= ;Do nothing

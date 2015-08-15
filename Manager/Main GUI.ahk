@@ -31,6 +31,7 @@ gui,add,Button,vButtonSelectLanguage gButtonSelectLanguage  X330 Y+100 w200 h30,
 gui,add,Button,vButtonHelp gButtonHelp X+10 yp w200 h30,% lang("Help")
 gui,add,Button,vButtonSettings gButtonSettings  X330 Y+30 w200 h30,% lang("Settings")
 gui,add,Button,vButtonAbout gButtonAbout  X330 Y+30 w200 h30,% lang("About AutoHotFlow")
+gui,add,Button,vButtonShowLog gButtonShowLog  X330 Y+30 w200 h30,% lang("Show log")
 
 
 Gui, Show,hide, % "•AutoHotFlow• " lang("Manager")  ; Do not show window while loading flows. Otherway the treeview will not show the plus signs
@@ -97,20 +98,22 @@ return
 ButtonEditFlow:
 tempselected:=TV_GetSelection() 
 tempselectedID:=IDOf(tempselected)
-ControlSetText,edit1,edit,CommandWindowOfEditor,% "Ѻ" nameOf(tempselected) "Ѻ" ;Try to send the command to the command window of the editor, if it is already open
-if errorlevel
-	run,% editorpath  " editFlow """ %tempselectedID%ini " """
+
+editFlow(tempselectedID)
+
 return
 
 ButtonRunFlow:
 tempselected:=TV_GetSelection() 
 tempselectedID:=IDOf(tempselected)
 if %tempselectedID%running=true
-	ControlSetText,edit1,stop,CommandWindowOfEditor,% "Ѻ" nameOf(tempselected) "Ѻ" ;Try to send the command to the command window of the editor, if it is already open
+{
+	stopFlow(tempselectedID)
+}
 else
-	ControlSetText,edit1,run,CommandWindowOfEditor,% "Ѻ" nameOf(tempselected) "Ѻ" ;Try to send the command to the command window of the editor, if it is already open
-if errorlevel
-	run,% editorpath  " RunFlow """ %tempselectedID%ini " """
+{
+	runFlow(tempselectedID)
+}
 return
 
 ButtonEnableFlow:
@@ -177,7 +180,7 @@ if A_GuiEvent =E ;If user has renamed an entry
 			{
 				%tempSelectedID%name:=OutputVar
 				SaveFlow(tempSelectedID)
-				ControlSetText,edit1,FlowParametersChanged,CommandWindowOfEditor,% "Ѻ" tempOldName "Ѻ" ;Send the command to the Editor.
+				com_SendCommand({function: "FlowParametersChanged"},tempOldName) ;Send the command to the Editor.
 				tooltip(lang("Renamed"))
 				;warn if the name begins with "D_"
 				
@@ -226,6 +229,10 @@ if (A_GuiEvent ="s") ;If user has selected an item. En- or disable some buttons.
 		guicontrol,,ButtonEnableFlow,% lang("Disable")
 	else
 		guicontrol,,ButtonEnableFlow,% lang("Enable")
+	if %tempSelectedID%running=true
+		guicontrol,,ButtonRunFlow,% lang("Stop")
+	else
+		guicontrol,,ButtonRunFlow,% lang("Run")
 }
 
 
@@ -244,7 +251,7 @@ if %tempselectedID%type=flow
 	MsgBox, 4, % lang("Confirm_deletion"),% lang("Do_you_really_want_to_delete_the_flow_%1%?",%tempselectedID%name)
 	IfMsgBox,Yes
 	{
-		ControlSetText,edit1,immediatelyexit,CommandWindowOfEditor,% "Ѻ" %tempselectedID%name "Ѻ" ;Send the command to the Editor.
+		com_SendCommand({function: "immediatelyexit"},%tempselectedID%name) ;Send the command to the Editor.
 		if not errorlevel
 			sleep,500
 		FileDelete,% %tempselectedID%ini
@@ -320,10 +327,12 @@ return
 ButtonAbout:
 goto,BaseFrame_About
 
-
 return
 
+ButtonShowLog:
+showlog()
 
+return
 
 jumpOverGUIStuff:
 temp= ;Do nothing

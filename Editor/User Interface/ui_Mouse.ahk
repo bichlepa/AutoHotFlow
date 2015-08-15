@@ -123,6 +123,7 @@ if elementWithHighestPriority=
 	if (%elementWithHighestPriority%ClickPriority<=200 and %elementWithHighestPriority%ClickPriority >=190)
 		%elementWithHighestPriority%ClickPriority:=190
 	;msgbox,%elementWithHighestPriority% : clickHighestPriority
+	
 }
 
 
@@ -205,7 +206,7 @@ else if (elementWithHighestPriority="MenuCreateNewAction" or elementWithHighestP
 		}
 	}
 	
-	
+	e_CorrectElementErrors("Code: 3053165186.")
 }
 else if (elementWithHighestPriority="PlusButton" or elementWithHighestPriority="PlusButton2") ;user click on plus button
 {
@@ -218,7 +219,7 @@ else if (elementWithHighestPriority="PlusButton" or elementWithHighestPriority="
 		tempElement3:=%TheOnlyOneMarkedElement%to
 		tempConnection1:=TheOnlyOneMarkedElement
 		tempConnection2:=e_NewConnection("MOUSE" , %TheOnlyOneMarkedElement%to) ;Create new connection
-		
+		%tempConnection2%ToPart:=%tempConnection1%ToPart
 		%tempConnection1%to:="MOUSE"
 		
 		GDI_DrawMoveButtonUnderMouse:=true
@@ -310,6 +311,7 @@ else if (elementWithHighestPriority="PlusButton" or elementWithHighestPriority="
 					
 					ui_draw()
 					workingOnClick:=false
+					e_CorrectElementErrors("Aborted creating new element between two connections. Code: 1238")
 					return
 				}
 				
@@ -578,6 +580,7 @@ else if (elementWithHighestPriority="PlusButton" or elementWithHighestPriority="
 					
 					ui_draw()
 					workingOnClick:=false
+					e_CorrectElementErrors("Code: 23946239.")
 					return
 				}
 				
@@ -732,6 +735,7 @@ else if (elementWithHighestPriority="PlusButton" or elementWithHighestPriority="
 	
 	ui_draw()
 	workingOnClick:=false
+	e_CorrectElementErrors("Code: 2389423789.")
 	;ui_settingsOfElement(elementWithHighestPriority) ;open settings of element
 	return
 }
@@ -829,6 +833,7 @@ else if (elementWithHighestPriority="MoveButton1")
 				
 				ui_draw()
 				workingOnClick:=false
+				e_CorrectElementErrors("Code: 394682398.")
 				return
 			}
 			
@@ -965,7 +970,7 @@ else if (elementWithHighestPriority="MoveButton1")
 	}
 	
 	
-	
+	e_CorrectElementErrors("Code: 3186165186456.")
 	ui_draw()
 
 }
@@ -1063,6 +1068,7 @@ else if (elementWithHighestPriority="MoveButton2")
 				
 				ui_draw()
 				workingOnClick:=false
+				e_CorrectElementErrors("Code: 2456784546.")
 				return
 			}
 			
@@ -1190,7 +1196,7 @@ else if (elementWithHighestPriority="MoveButton2")
 	
 
 	
-	
+	e_CorrectElementErrors("Code: 1365415616.")
 	ui_draw()
 	
 	
@@ -1202,6 +1208,7 @@ else if (elementWithHighestPriority="TrashButton")
 	IfMsgBox yes
 		e_removeElement(TheOnlyOneMarkedElement)
 	ui_draw()
+	e_CorrectElementErrors("Code: 231684866.")
 	saved=no
 }
 else if (elementWithHighestPriority="EditButton")
@@ -1274,6 +1281,7 @@ else if (elementWithHighestPriority) ;if user clicked on an element
 
 
 workingOnClick:=false
+
 return
 
 moveSelectedElements(option="")
@@ -1562,7 +1570,7 @@ markElement(toMark="",additional="false")
 		TheOnlyOneMarkedElement=
 	
 	;ToolTip("-" element "-" %element%marked "-" TheOnlyOneMarkedElement "-" countMarkedElements "-")
-	
+	ui_UpdateStatusbartext()
 	SortMarkedInForeground()
 }
 
@@ -1712,6 +1720,7 @@ for markindex, markelement in markedElements
 
 }
 
+e_CorrectElementErrors("Code: 354546841.")
 markElement()
 
 ui_draw()

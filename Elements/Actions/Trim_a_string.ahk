@@ -5,21 +5,41 @@ runActionTrim_a_string(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	global
 	local temp
 	local Result
+	local length
 	local OptionOmitChars
-
+	
+	local Varname:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname)
+	if not v_CheckVariableName(varname)
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Ouput variable name '" varname "' is not valid")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not valid",lang("Ouput variable name '%1%'",varname)) )
+		return
+	}
 	
 	if %ElementID%expression=1
 		temp:=v_replaceVariables(InstanceID,ThreadID,%ElementID%VarValue)
 	else
 		temp:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%VarValue)
-	;MsgBox,%  %ElementID%Varname "---" %ElementID%VarValue "---" v_replaceVariables(InstanceID,%ElementID%Varname) "---" v_replaceVariables(InstanceID,%ElementID%VarValue)
+	if temp=
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Warning! Input string is empty")
+	}
+	
 	if %ElementID%TrimWhat=1 ;Trim a number of characters
 	{
+		length:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%Length)
+		if temp is not number
+		{
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Length is not a number.")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not a number.",lang("Length")))
+			return
+		}
 		if %ElementID%LeftSide=1
 			StringTrimLeft,temp,temp,%ElementID%Length
 		if %ElementID%RightSide=1
 			StringTrimRight,temp,temp,%ElementID%Length
-		v_SetVariable(InstanceID,ThreadID,v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname),temp)
+			
+		v_SetVariable(InstanceID,ThreadID,Varname,temp)
 		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	}
 	else  ;Trim specific characters
@@ -27,14 +47,22 @@ runActionTrim_a_string(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 		if %ElementID%SpacesAndTabs=1
 			OptionOmitChars:=" `t"
 		else
-			OptionOmitChars:=v_replaceVariables(InstanceID,ThreadID,%ElementID%OmitChars) 
+		{
+			OptionOmitChars:=v_replaceVariables(InstanceID,ThreadID,%ElementID%OmitChars)
+			if temp=
+			{
+				logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Warning! Omit chars is empty")
+			}
+		}
+		
 		if (%ElementID%LeftSide=1 and %ElementID%RightSide=1)
 			Result:=Trim(temp,OptionOmitChars)
 		else if (%ElementID%LeftSide=1 and %ElementID%RightSide=0)
 			Result:=LTrim(temp,OptionOmitChars)
 		else if (%ElementID%LeftSide=0 and %ElementID%RightSide=1)
 			Result:=RTrim(temp,OptionOmitChars)
-		v_SetVariable(InstanceID,ThreadID,v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname),Result)
+		
+		v_SetVariable(InstanceID,ThreadID,Varname,Result)
 		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	}
 	

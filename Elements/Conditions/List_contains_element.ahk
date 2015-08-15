@@ -19,56 +19,57 @@ runConditionList_contains_element(InstanceID,ThreadID,ElementID,ElementIDInInsta
 	
 	
 	found:=false
-	if isobject(tempObject)
+	if not IsObject(tempObject)
 	{
-		if (%ElementID%SearchWhat=1) ;search for an index or key
-		{
-			for tempkey, tempvalue in tempObject
-			{
-				if (tempkey=SearchPosition)
-				{
-					found:=true
-					break
-				}
-			}
-			if (found=true)
-			{
-				MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"yes")
-			}
-			else
-			{
-				MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"no")
-			}
-			
-		}
-		else  ;search for a value
-		{
-			for tempkey, tempvalue in tempObject
-			{
-				
-				if (tempvalue=SearchContent)
-				{
-					found:=true
-					foundkey:=tempkey
-					break
-				}
-			}
-			if (found=true)
-			{
-				v_setVariable(InstanceID,ThreadID,"a_FoundKey",foundkey,,true)
-				MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"yes")
-			}
-			else
-			{
-				MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"no")
-			}
-			
-		}
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Variable '" Varname "' does not contain a list.")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("Variable '%1%' does not contain a list.",Varname))
+		return
 	}
-	else
+	
+	if (%ElementID%SearchWhat=1) ;search for an index or key
 	{
-		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
+		for tempkey, tempvalue in tempObject
+		{
+			if (tempkey=SearchPosition)
+			{
+				found:=true
+				break
+			}
+		}
+		if (found=true)
+		{
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"yes")
+		}
+		else
+		{
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"no")
+		}
+		
 	}
+	else  ;search for a value
+	{
+		for tempkey, tempvalue in tempObject
+		{
+			
+			if (tempvalue=SearchContent)
+			{
+				found:=true
+				foundkey:=tempkey
+				break
+			}
+		}
+		if (found=true)
+		{
+			v_setVariable(InstanceID,ThreadID,"a_FoundKey",foundkey,,true)
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"yes")
+		}
+		else
+		{
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"no")
+		}
+		
+	}
+	
 	
 	
 	

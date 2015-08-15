@@ -5,31 +5,62 @@ runActionSubstring(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	global
 	local temp
 	local Result
+	local Varname:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname)
+	if not v_CheckVariableName(varname)
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Ouput variable name '" varname "' is not valid")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not valid",lang("Ouput variable name '%1%'",varname)) )
+		return
+	}
+	
 	local OptionToLeft
-	local OptionLength
+	local OptionLength:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%Length)
+	if OptionLength is not number
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Length is not a number.")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not a number.",lang("Length")))
+		return
+	}
 	local OptionStartPos
+
+
+	
 	
 	if %ElementID%expression=1
 		temp:=v_replaceVariables(InstanceID,ThreadID,%ElementID%VarValue)
 	else
 		temp:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%VarValue)
-	;MsgBox,%  %ElementID%Varname "---" %ElementID%VarValue "---" v_replaceVariables(InstanceID,%ElementID%Varname) "---" v_replaceVariables(InstanceID,%ElementID%VarValue)
+	
+	if temp=
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Warning! Input string is empty")
+	}
+	
+	
 	if %ElementID%WhereToBegin=1 ;Begin from left
 	{
 		
 		StringLeft,Result,temp,%ElementID%Length
-		v_SetVariable(InstanceID,ThreadID,v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname),Result)
+		v_SetVariable(InstanceID,ThreadID,Varname,Result)
 		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	}
 	else if %ElementID%WhereToBegin=2 ;Begin from right
 	{
 		StringRight,Result,temp,% %ElementID%Length
-		v_SetVariable(InstanceID,ThreadID,v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname),Result)
+		v_SetVariable(InstanceID,ThreadID,Varname,Result)
 		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	}
 	else if %ElementID%WhereToBegin=3 ;Begin from middle
 	{
-		OptionStartPos:=v_replaceVariables(InstanceID,ThreadID,%ElementID%StartPos) 
+		OptionStartPos:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%StartPos)
+		if OptionStartPos is not number
+		{
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Start position is not a number.")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not a number.",lang("Start position")))
+			return
+		}
+		
+		
 		if %ElementID%LeftOrRight=1 ;Go left
 		{
 			OptionToLeft=L
@@ -45,11 +76,15 @@ runActionSubstring(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 		}
 		
 		
-		v_SetVariable(InstanceID,ThreadID,v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname),Result)
+		v_SetVariable(InstanceID,ThreadID,Varname,Result)
 		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	}
 	else
-		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Unexpected error.")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("Unexpected error"))
+		return
+	}
 
 	
 	return

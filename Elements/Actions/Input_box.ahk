@@ -19,6 +19,8 @@ runActionInput_box(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	tempNew.insert("Varname",tempVarname)
 	tempNew.insert("Text",tempText)
 	tempNew.insert("Title",tempTitle)
+	tempNew.insert("Type",%ElementID%type)
+	tempNew.insert("Name",%ElementID%name)
 	
 	
 	local tempGUILabel:="GUI_InputBox_" instanceID "_" ThreadID "_" ElementID "_" ElementIDInInstance
@@ -62,7 +64,8 @@ runActionInput_box(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	tempInputBoxBut:=ActionInput_BoxAllGUIs[a_gui]
 	
 	;~ MsgBox % a_gui " - " temp.instanceID
-	MarkThatElementHasFinishedRunning(tempInputBoxBut.instanceID,tempInputBoxBut.threadid,tempInputBoxBut.ElementID,tempInputBoxBut.ElementIDInInstance,"exception")
+	logger("f0","Instance " tempInputBoxBut.instanceID " - " tempInputBoxBut.type " '" tempInputBoxBut.name "': Error! User dismissed the dialog")
+	MarkThatElementHasFinishedRunning(tempInputBoxBut.instanceID,tempInputBoxBut.threadid,tempInputBoxBut.ElementID,tempInputBoxBut.ElementIDInInstance,"exception",lang("User dismissed the dialog"))
 
 	
 	ActionInput_BoxAllGUIs.Remove(a_gui)

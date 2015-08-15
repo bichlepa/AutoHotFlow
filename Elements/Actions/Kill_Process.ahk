@@ -4,12 +4,28 @@ RunActionKill_Process(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	
-	Process,close, % v_replaceVariables(InstanceID,ThreadID,%ElementID%ProcessName) 
+	local tempProcessName:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ProcessName) 
+	
+	Process,close, % tempProcessName
 	
 	
 	if (ErrorLevel=0)
 	{
-		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
+		Process,exist,% tempProcessName
+		if (ErrorLevel=0)
+		{
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Seeked process does not exist")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"Exception", lang("Seeked process does not exist"))
+			
+		}
+		else
+		{
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Process could not be closed")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"Exception", lang("Process could not be closed"))
+			
+		}
+
+		return
 	}
 	else
 	{

@@ -12,33 +12,45 @@ runConditionFile_has_attribute(InstanceID,ThreadID,ElementID,ElementIDInInstance
 	
 	FileGetAttrib,tempattribute,% tempPath
 	if ErrorLevel
-		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
-	else
 	{
-		if %ElementID%Attribute=1
-			tempcompare=R
-		else if %ElementID%Attribute=2
-			tempcompare=A
-		else if %ElementID%Attribute=3
-			tempcompare=S
-		else if %ElementID%Attribute=4
-			tempcompare=H
-		else if %ElementID%Attribute=5
-			tempcompare=N
-		else if %ElementID%Attribute=6
-			tempcompare=D
-		else if %ElementID%Attribute=7
-			tempcompare=O
-		else if %ElementID%Attribute=8
-			tempcompare=C
-		else if %ElementID%Attribute=9
-			tempcompare=T
-		;MsgBox %tempcompare%
-		IfInString,tempattribute,%tempcompare%
-			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"yes")
+		if not fileexist(tempPath)
+		{
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! File '" tempPath "' does not exist")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("File '%1%' does not exist",tempPath))
+			return
+		}
 		else
-			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"no")
+		{
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Attributes of file '" tempPath "' could not be read")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("Attributes of file '%1%' could not be read",tempPath))
+			return
+		}
 	}
+	
+	if %ElementID%Attribute=1
+		tempcompare=R
+	else if %ElementID%Attribute=2
+		tempcompare=A
+	else if %ElementID%Attribute=3
+		tempcompare=S
+	else if %ElementID%Attribute=4
+		tempcompare=H
+	else if %ElementID%Attribute=5
+		tempcompare=N
+	else if %ElementID%Attribute=6
+		tempcompare=D
+	else if %ElementID%Attribute=7
+		tempcompare=O
+	else if %ElementID%Attribute=8
+		tempcompare=C
+	else if %ElementID%Attribute=9
+		tempcompare=T
+	;MsgBox %tempcompare%
+	IfInString,tempattribute,%tempcompare%
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"yes")
+	else
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"no")
+	
 	
 	
 	

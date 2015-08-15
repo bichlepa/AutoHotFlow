@@ -11,6 +11,12 @@ runActionNew_list(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	local templist
 	;MsgBox,%  %ElementID%Varname "---" %ElementID%VarValue "---" v_replaceVariables(InstanceID,%ElementID%Varname) "---" v_replaceVariables(InstanceID,%ElementID%VarValue)
 	
+	if not v_CheckVariableName(Varname)
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! List name '" varname "' is not valid")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not valid",lang("List name '%1%'",varname)) )
+		return
+	}
 	
 	if (%ElementID%InitialContent=1) ;empty list
 	{
@@ -35,7 +41,7 @@ runActionNew_list(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 		
 		v_SetVariable(InstanceID,ThreadID,Varname,templist,"list")
 	}
-	else
+	else ;multiple elements
 	{
 		if %ElementID%DelimiterLinefeed
 			StringReplace,varvalues,varvalues,`n,▬,all

@@ -7,6 +7,14 @@ RunActionSet_process_priority(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	local tempname
 	temp:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Priority) 
 	tempname:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ProcessName) 
+	if tempname=
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Process name is not specified.")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not specified.",lang("Process name")))
+		return
+	}
+	
+	
 	if temp=1
 		Process,Priority, % tempname,L
 	else if temp=2
@@ -23,7 +31,9 @@ RunActionSet_process_priority(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	
 	if (ErrorLevel=0)
 	{
-		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Couldn't set the process priority")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("Couldn't set the process priority"))
+		return
 	}
 	else
 	{

@@ -1,4 +1,10 @@
-﻿
+﻿I wrote this instruction because I thought it might help you with creating new elements.
+But now my advise is: If you want to create a new element, copy the mostly similar element and modify it.
+If you have questions, don't hesitate to contact me!
+	
+You can still read my old instruction:
+
+
 Create a new AHK Script that has the name of the Action. The name must be like a variable name! This name will not be displayed.
 Include the file in the main script AutoHotFlow.ahk
 

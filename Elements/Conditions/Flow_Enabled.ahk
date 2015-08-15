@@ -1,38 +1,97 @@
 ﻿iniAllConditions.="Flow_Enabled|" ;Add this condition to list of all conditions on initialisation
+TempConditionFlow_EnabledData:=Object()
 
 runConditionFlow_Enabled(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	
-	tempFlowName:=v_replaceVariables(InstanceID,ThreadID,%ElementID%flowName) 
+	local tempFlowName:=v_replaceVariables(InstanceID,ThreadID,%ElementID%flowName)
 	
-	
-	
-	
-	returnedWhetherFlowIsEnabled=
-	ControlSetText,edit1,FlowIsEnabled?|%tempFlowName%|%FlowName%,CommandWindowOfManager 
-	
-	loop 20
+	if tempFlowName=
 	{
-		if returnedWhetherFlowIsEnabled!=
-			break
-		sleep 10
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Flow name not specified.")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not specified.",lang("Flow name")))
+		return
 	}
-	if returnedWhetherFlowIsEnabled=enabled
-		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"yes")
-	else if returnedWhetherFlowIsEnabled=disabled
-		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"no")
-	else if returnedWhetherFlowIsEnabled=ǸoⱾuchȠaⱮe
-		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
-	else 
-		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception")
+	
+	TempConditionFlow_EnabledData["FlowName"]:=tempFlowName
+	TempConditionFlow_EnabledData["ElementID"]:=ElementID
+	TempConditionFlow_EnabledData["InstanceID"]:=InstanceID
+	TempConditionFlow_EnabledData["ThreadID"]:=ThreadID
+	TempConditionFlow_EnabledData["ElementIDInInstance"]:=ElementIDInInstance
+	
+	returnedFlowStatus=
+	com_SendCommand({function: "AskFlowStatus", status: "Enabled", flowName: tempFlowName},"manager") ;Send the command to the Manager.
+	
+	TempConditionFlow_EnabledData["Count"]:=0
+	TempConditionFlow_RunningData["AnswerReceived"]:=false
+	SetTimer, ConditionFlow_EnabledTimerLabelLoop,20
+	
+	return
+	
+	ConditionFlow_EnabledTimerLabelLoop:
+	;~ ToolTip % TempConditionFlow_EnabledData["Count"]
+	TempConditionFlow_EnabledData["Count"]+=1
+	;~ ToolTip % strobj(returnedFlowStatus)
+	if IsObject(returnedFlowStatus)
+	{
+		TempConditionFlow_EnabledData["AnswerReceived"]:=true
+		TempConditionFlow_EnabledData["Count"]:=100
+		;~ MsgBox % TempConditionFlow_EnabledData["AnswerReceived"]
+	}
 	
 	
+	if TempConditionFlow_EnabledData["Count"]>20
+	{
+		SetTimer, ConditionFlow_EnabledTimerLabelLoop,off
+		runConditionFlow_EnabledPart2(TempConditionFlow_EnabledData["InstanceID"],TempConditionFlow_EnabledData["ThreadID"],TempConditionFlow_EnabledData["ElementID"],TempConditionFlow_EnabledData["ElementIDInInstance"])
+		;~ MsgBox fads
+	}
 	
-	
-
 	return
 }
+
+runConditionFlow_EnabledPart2(InstanceID,ThreadID,ElementID,ElementIDInInstance)
+{
+	global
+	
+	local tempFlowName:=TempConditionFlow_EnabledData["FlowName"]
+	;~ MsgBox % TempConditionFlow_EnabledData["AnswerReceived"]
+	if (TempConditionFlow_EnabledData["AnswerReceived"]=true)
+	{
+		if (returnedFlowStatus["flowname"]!=tempFlowName)
+		{
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Unexpected error! Manager reported the status of an other flow than requested." )
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("Unexpected Error!"))
+			return
+		}
+		
+		if (returnedFlowStatus["result"]="Enabled")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"yes")
+		else if (returnedFlowStatus["result"]="disabled")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"no")
+		else if (returnedFlowStatus["result"]="NoSuchName")
+		{
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! There is no flow named '" tempFlowName "'")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("There is no flow named '%1%'",tempFlowName))
+			return
+		}
+		else
+		{
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Unexpected Error! Manager reported an unknown status.")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("Unexpected Error!"))
+			return
+		}
+	}
+	else 
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! No response from the manager.")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("No response from the manager"))
+		return
+	}
+	
+}
+
 getNameConditionFlow_Enabled()
 {
 	return lang("Flow_enabled")

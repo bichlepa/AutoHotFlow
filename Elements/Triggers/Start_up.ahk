@@ -8,7 +8,7 @@ EnableTriggerStart_Up(ElementID)
 	{
 		
 		EnableFlowOptions=
-		settimer,r_startRun,-1000
+		r_Trigger(ElementID)
 	}
 	
 	

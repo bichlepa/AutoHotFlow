@@ -7,16 +7,34 @@ runActionSplit_a_string(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	local Result
 	local OptionOmitChars
 	local OptionDelimiters
-	local tempVarname
-	tempVarname:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname)
+	local varname:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Varname)
+
+	if not v_CheckVariableName(varname)
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Ouput variable name '" varname "' is not valid")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not valid",lang("Ouput variable name '%1%'",varname)) )
+		return
+	}
+	
+	
 	if %ElementID%expression=1
 		temp:=v_replaceVariables(InstanceID,ThreadID,%ElementID%VarValue)
 	else
 		temp:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%VarValue)
 	;MsgBox,%  %ElementID%Varname "---" %ElementID%VarValue "---" v_replaceVariables(InstanceID,%ElementID%Varname) "---" 
 	
+	if temp=
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Warning! Input string is empty")
+	}
+	
 	OptionOmitChars:=v_replaceVariables(InstanceID,ThreadID,%ElementID%OmitChars) 
 	OptionDelimiters:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Delimiters) 
+	
+	if OptionDelimiters=
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Warning! No delimiters specified. Each character will be treated as a substring.")
+	}
 	
 	loop,parse,temp,%OptionDelimiters%,%OptionOmitChars%
 	{
@@ -26,7 +44,7 @@ runActionSplit_a_string(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	
 
 	
-	v_SetVariable(InstanceID,ThreadID,tempVarname,v_importVariable(Result,"list","▬"),"list")
+	v_SetVariable(InstanceID,ThreadID,varname,v_importVariable(Result,"list","▬"),"list")
 	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 
 	

@@ -4,6 +4,23 @@ runActionMove_mouse(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 {
 	global
 	
+	local Xpos:=v_evaluateExpression(InstanceID,ThreadID,%ElementID%Xpos)
+	local Ypos:=v_evaluateExpression(InstanceID,ThreadID,%ElementID%Ypos)
+	
+	if Xpos is not number
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! X position is not a number.")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not a number.",lang("X position")))
+		return
+	}
+	if Ypos is not number
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Y position is not a number.")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not a number.",lang("Y position")))
+		return
+	}
+	
+	
 	if %ElementID%SendMode=1
 		SendMode, Input
 	else if %ElementID%SendMode=2
@@ -19,9 +36,9 @@ runActionMove_mouse(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 		CoordMode, Mouse, Client
 
 	if  %ElementID%CoordMode=4
-		MouseMove,% %ElementID%Xpos,% %ElementID%Ypos,% %ElementID%speed,R
+		MouseMove,% Xpos,% Ypos,% %ElementID%speed,R
 	else
-		MouseMove,% %ElementID%Xpos,% %ElementID%Ypos,% %ElementID%speed
+		MouseMove,% Xpos,% Ypos,% %ElementID%speed
 	
 	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
 	return
