@@ -112,7 +112,7 @@
 				{
 					StringSplit,tempSaveParameter,tempSaveParameter,|
 					; tempSaveParameter3 contains the parameter ID
-					if tempSaveParameter3= ;If this is only a label for the edit fielt etc. Do nothing
+					if (tempSaveParameter3="" or tempSaveParameter1="Label" or tempSaveParameter1="SmallLabel") ;If this is only a label for the edit fielt etc. Do nothing
 						continue
 					StringSplit,tempparname,tempSaveParameter3,; ;get the parameter names
 					Loop % tempparname0

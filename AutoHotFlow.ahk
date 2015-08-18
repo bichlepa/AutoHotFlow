@@ -4,11 +4,15 @@ SendMode Input  ; Recommended for new scripts due to its superior speed and reli
 SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 SetBatchLines -1
 DetectHiddenWindows on
-#SingleInstance force
+#SingleInstance ignore
 
 
 if not a_iscompiled
 	developing=yes
+
+DebugLogLevelApp=3 ;Debug level for app debugs: 0=Only errors; 1=Important logs; 2=Detailed logs ; 3=Debug logs
+DebugLogLevelFlow=3 ;Debug levels: 0=Only errors; 1=Important logs; 2=Detailed logs ; 3=Debug logs
+SettingFlowLogToFile:=true
 
 allGlobalVariableNames=|
 

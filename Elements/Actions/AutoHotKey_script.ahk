@@ -49,7 +49,7 @@ runActionAutoHotKey_script(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 		if A_LoopField=
 			continue
 		
-		generatedScriptPartImportVars.="►localVars[""" A_LoopField """]:=" A_LoopField
+		generatedScriptPartImportVars.="►localVars[""" A_LoopField """]:=" A_LoopField "`n"
 		
 		
 	}

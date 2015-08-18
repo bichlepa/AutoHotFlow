@@ -132,7 +132,14 @@ ui_EnableMainGUI()
 	global
 	gui,1:-disabled
 	
-	WinActivate,ahk_id %MainGuihwnd%
+	;Activate window if it is not hidden
+	DetectHiddenWindows,off
+	IfWinExist,ahk_id %MainGuihwnd%
+	{
+		DetectHiddenWindows,on
+		WinActivate,ahk_id %MainGuihwnd%
+	}
+	DetectHiddenWindows,on
 }
 
 ui_showgui()

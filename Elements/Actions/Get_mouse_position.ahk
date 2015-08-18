@@ -52,7 +52,7 @@ getCategoryActionGet_mouse_position()
 getParametersActionGet_mouse_position()
 {
 	global
-	parametersToEdit:=["Label|" lang("Output variable X position"),"VariableName|PosX|varnameX","Label|" lang("Output variable Y position"),"VariableName|PosY|varnameY","Label|" lang("Mouse position"),"Radio|1|CoordMode|" lang("Relative to screen") ";" lang("Relative to active window position") ";" lang("Relative to active window client position")]
+	parametersToEdit:=["Label|" lang("Output variables") " (" lang("Position: x,y") ")","Text2|;|varnameX;varnameY","Label|" lang("Mouse position"),"Radio|1|CoordMode|" lang("Relative to screen") ";" lang("Relative to active window position") ";" lang("Relative to active window client position")]
 	
 	return parametersToEdit
 }

@@ -79,7 +79,10 @@ loadSavedFlows()
 			if (LastStartupTime>0 )
 				enableFlow(tempflowid,"Startup")
 			else
+			{
+				
 				enableFlow(tempflowid)
+			}
 			
 		}
 	}

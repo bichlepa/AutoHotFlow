@@ -13,7 +13,6 @@ runActionAbsolute_number(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	}
 	
 	temp:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%VarValue)
-	;MsgBox,%  %ElementID%Varname "---" %ElementID%VarValue "---" v_replaceVariables(InstanceID,%ElementID%Varname) "---" v_replaceVariables(InstanceID,%ElementID%VarValue)
 	if temp is not number
 	{
 		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Input number " temp " is not a number")

@@ -83,7 +83,7 @@ runActionClick(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 		}
 		
 		;MsgBox % tempButton " - " %ElementID%Xpos " - " %ElementID%Ypos " - "  %ElementID%ClickCount " - " %ElementID%speed  " - " tempupdown " - " temprelative 
-		MouseClick,%tempButton%,% %ElementID%Xpos,% %ElementID%Ypos,% %ElementID%ClickCount,% %ElementID%speed,%tempupdown%,%temprelative%
+		MouseClick,%tempButton%,% Xpos,% Ypos,% ClickCount,% %ElementID%speed,%tempupdown%,%temprelative%
 	}
 	else
 		MouseClick,%tempButton%,,,% %ElementID%ClickCount,,%tempupdown%

@@ -204,6 +204,18 @@
 				gui,add,text,x10 w400 Y+15,%parameter2%
 			}
 		}
+		else if parameter1=SmallLabel
+		{
+			gui,font,s8 cDefault wbold
+			if (parameter3!="")
+			{
+				gui,add,text,x10 w400  vGUISettingsOfElement%setElementID%%parameter3% ,%parameter2%
+			}
+			else
+			{
+				gui,add,text,x10 w400,%parameter2%
+			}
+		}
 		else if parameter1=Text
 		{
 			gui,font,s8 cDefault wnorm
