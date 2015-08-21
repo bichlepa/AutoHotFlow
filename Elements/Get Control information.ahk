@@ -64,8 +64,17 @@ loop,parse,tempPar,`n
 }
 if tempCountOfControlsInWindow>0
 {
+	DetectHiddenWindows on
+	gui,+hwndFunctionsForElementGetControlInformationHWND
+	gui,show,hide
+	wingetpos,tempParentX,tempParentY,tempParentW,tempParentH,ahk_id %SettingsGUIHWND%
 	
-	gui,show
+	wingetpos,,,tempWidth,tempHeight,ahk_id %FunctionsForElementGetControlInformationHWND%
+	tempXpos:=round(tempParentX+tempParentW/2- tempWidth/2)
+	tempYpos:=round(tempParentY+tempParentH/2- tempHeight/2)
+	;~ MsgBox %tempWidth% %FunctionsForElementGetControlInformationHWND%
+	gui,show,x%tempXpos% y%tempYpos%,% lang("Window assistant")
+	
 	SetTimer,FunctionsForElementGetControlInformationGetControlCoveredByMouse,100
 	return
 }

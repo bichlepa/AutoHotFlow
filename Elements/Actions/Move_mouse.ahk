@@ -55,10 +55,16 @@ getCategoryActionMove_mouse()
 getParametersActionMove_mouse()
 {
 	global
-	parametersToEdit:=["Label|" lang("Mouse position"),"Radio|1|CoordMode|" lang("Relative to screen") ";" lang("Relative to active window position") ";" lang("Relative to active window client position")  ";" lang("Relative to current mouse position"),"Label|" lang("Coordinates") " " lang("(x,y)"),"Text2|10;20|Xpos;Ypos","Label|" lang("Method"),"Radio|1|SendMode|" lang("Input mode") ";" lang("Event mode") ";" lang("Play mode"),"Label|" lang("Speed"),"Slider|2|speed|Range0-100 tooltip"]
+	parametersToEdit:=["Label|" lang("Mouse position"),"Radio|1|CoordMode|" lang("Relative to screen") ";" lang("Relative to active window position") ";" lang("Relative to active window client position")  ";" lang("Relative to current mouse position"),"SmallLabel|" lang("Coordinates") " " lang("(x,y)"),"Text2|10;20|Xpos;Ypos","button|ActionMove_MouseMouseTracker|MouseTracker|" lang("Get coordinates"),"Label|" lang("Method"),"Radio|1|SendMode|" lang("Input mode") ";" lang("Event mode") ";" lang("Play mode"),"Label|" lang("Speed"),"Slider|2|speed|Range0-100 tooltip"]
 	
 	return parametersToEdit
 }
+
+ActionMove_MouseMouseTracker()
+{
+	MouseTracker({ImportMousePos:"Yes",ParCoordMode:"CoordMode",ParMousePosX:"xpos", ParMousePosY:"ypos"})
+}
+
 
 GenerateNameActionMove_mouse(ID)
 {

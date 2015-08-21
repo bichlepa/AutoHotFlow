@@ -62,11 +62,13 @@ goto,jumpoverUIDRaw
 ui_Draw()
 {
 	global
+	local temp
 	gui 1:default
 	
 	DetectHiddenWindows off
-	;Only draw if the window is visible
-	IfWinExist,·AutoHotFlow· Editor - %FlowName%
+	WinGetTitle,temp,ahk_id %mainguihwnd%
+	;~ ToolTip %temp%
+	IfWinExist,% temp
 	{
 		DetectHiddenWindows on
 		
@@ -93,7 +95,7 @@ ui_Draw()
 
 	DetectHiddenWindows on
 	
-	SetTimer,ui_regularUpdateIfWinMoved,100
+	;~ SetTimer,ui_regularUpdateIfWinMoved,100
 }
 
 
@@ -813,7 +815,6 @@ ui_DrawEverything(Posw,Posh)
 
 
 ui_regularUpdateIfWinMoved:
-
 WinGetPos,winx,winy,,,ahk_id %MainGuihwnd%
 if (winx!=winxold and winy!=winyOld)
 {

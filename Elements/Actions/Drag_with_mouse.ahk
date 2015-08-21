@@ -85,9 +85,14 @@ getCategoryActionDrag_with_mouse()
 getParametersActionDrag_with_mouse()
 {
 	global
-	parametersToEdit:=["Label|" lang("Which button"), "DropDownList|1|Button|" lang("Left button") ";" lang("Right button") ";" lang("Middle Button") ";" lang("Wheel up") ";" lang("Wheel down") ";" lang("Wheel left") ";" lang("Wheel right") ";" lang("4th mouse button (back)") ";" lang("5th mouse button (forward)"),"Label|" lang("Position"),"Radio|1|CoordMode|"  lang("Relative to screen") ";" lang("Relative to active window position") ";" lang("Relative to active window client position") ";" lang("Relative to current mouse position"),"Label|" lang("Start coordinates") " " lang("(x,y)"),"Text2|10;20|XposFrom;YposFrom","Label|" lang("End coordinates") " " lang("(x,y)"),"Text2|100;200|Xpos;Ypos","Label|" lang("Method"),"Radio|1|SendMode|" lang("Input mode") ";" lang("Event mode") ";" lang("Play mode"),"Label|" lang("Speed"),"Slider|2|speed|Range0-100 tooltip","Label|" lang("Delay in ms"),"Text|10|delay"]
+	parametersToEdit:=["Label|" lang("Which button"), "DropDownList|1|Button|" lang("Left button") ";" lang("Right button") ";" lang("Middle Button") ";" lang("Wheel up") ";" lang("Wheel down") ";" lang("Wheel left") ";" lang("Wheel right") ";" lang("4th mouse button (back)") ";" lang("5th mouse button (forward)"),"Label|" lang("Position"),"Radio|1|CoordMode|"  lang("Relative to screen") ";" lang("Relative to active window position") ";" lang("Relative to active window client position") ";" lang("Relative to current mouse position"),"Label|" lang("Start coordinates") " " lang("(x,y)"),"Text2|10;20|XposFrom;YposFrom","Label|" lang("End coordinates") " " lang("(x,y)"),"Text2|100;200|Xpos;Ypos","button|ActionDrag_with_MouseMouseTracker|MouseTracker|" lang("Get coordinates"),"Label|" lang("Method"),"Radio|1|SendMode|" lang("Input mode") ";" lang("Event mode") ";" lang("Play mode"),"Label|" lang("Speed"),"Slider|2|speed|Range0-100 tooltip","Label|" lang("Delay in ms"),"Text|10|delay"]
 	
 	return parametersToEdit
+}
+
+ActionDrag_with_MouseMouseTracker()
+{
+	MouseTracker({ImportMousePos:"Yes",SelectParMousePos:"Yes",SelectParMousePosLabelPos1:lang("Import Start coordinates"),SelectParMousePosLabelPos2:lang("Import End coordinates"),ParCoordMode:"CoordMode",ParMousePosX:"xposFrom", ParMousePosY:"yposFrom",ParMousePosX2:"xpos", ParMousePosY2:"ypos"})
 }
 
 GenerateNameActionDrag_with_mouse(ID)

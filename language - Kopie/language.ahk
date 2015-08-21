@@ -22,14 +22,7 @@ lang_FindAllLanguages()
 		;MsgBox %  filenameNoExt "|" %filenameNoExt%langname
 	}
 
-	lang_LoadCurrentLanguage()
-	
-	
-}
 
-lang_LoadCurrentLanguage()
-{
-	global
 	iniread,UILang,settings.ini,common,UILanguage
 	if uilang=error
 	{
@@ -48,65 +41,31 @@ lang_LoadCurrentLanguage()
 	}
 	IniRead,%UILang%enlangname,language\%UILang%.ini\general\enname
 	IniRead,%UILang%langname,language\%UILang%.ini\general\name
-	lang_ReadAllTranslations()
+	
 }
 
-;translate one string
 lang(langvar,$1="",$2="",$3="",$4="",$5="",$6="",$7="",$8="",$9="")
 {
 	global UILang
 	global developing
 	global translationto
-	global LangNoUseCache
 	static guiCreated
 	global allLangs
 	
-	global langAllTranslations
-	
 	if (langvar ="")
 		return ""
-	if not isobject(langAllTranslations)
-		langAllTranslations:=Object()
-	
 	langaborted:=false
 	StringReplace,langvar_no_spaces,langvar,%a_space%,_,all
 	
 	langBeginAgain:
-	;look whether the string is in cache
-	if ((!(LangNoUseCache)) and (langAllTranslations.haskey(langvar_no_spaces)))
-	{
-		;~ MsgBox %langvar_no_spaces%
-		initext:=langAllTranslations[langvar_no_spaces]
-		UsedCache:=true
-	}
-	else ;if not in cache or cache should not be used, read from ini
-	{
-		IniRead,iniAllSections,language\%UILang%.ini
-		Loop,parse,iniAllSections,`n
-		{
-			IniRead,initext,language\%UILang%.ini,%a_loopfield%,%langvar_no_spaces%,%A_Space%
-			if initext
-				break
-		}
-		
-		UsedCache:=false
-		;~ MsgBox read '%langvar_no_spaces%' from ini
-	}
-	
-	if (initext="")
+	IniRead,initext,language\%UILang%.ini,translations,%langvar_no_spaces%
+	if (initext="" or initext=="ERROR")
 	{
 		;iniwrite,% "",language\%UILang%.ini,translations,%langvar_no_spaces%
 		
-		IniRead,iniAllSections,language\en.ini
-		Loop,parse,iniAllSections,`n
-		{
-			IniRead,initexten,language\en.ini,%a_loopfield%,%langvar_no_spaces%,%A_Space%
-			if initexten
-				break
-		}
-		
+		IniRead,initexten,language\en.ini,translations,%langvar_no_spaces%
 		;MsgBox %initexten%, %langvar_no_spaces%
-		if (initexten="") 
+		if (initexten=="ERROR" or initexten="") 
 		{
 			
 			if developing=yes
@@ -179,10 +138,6 @@ lang(langvar,$1="",$2="",$3="",$4="",$5="",$6="",$7="",$8="",$9="")
 			
 		}
 	}
-	else if not UsedCache
-	{
-		langAllTranslations[langvar_no_spaces]:=initext
-	}
 	langSuccess:
 	StringReplace,initext,initext,`%1`%,%$1%,all
 	StringReplace,initext,initext,`%2`%,%$2%,all
@@ -198,50 +153,40 @@ lang(langvar,$1="",$2="",$3="",$4="",$5="",$6="",$7="",$8="",$9="")
 	return initext
 	
 }
-
-lang_ReadAllTranslations()
+/*
+LangImport()
 {
-	global UILang
-	global langAllTranslations
-	global langMakeAdditionalCategoryOfTranslationObject
+	global
+	Hotkey,ifwinactive
+	Hotkey,f12,langnewWord
 	
-	
-	langAllTranslations:=Object()
-	if langMakeAdditionalCategoryOfTranslationObject
-		global langCategoryOfTranslation:=object()
-	
-	loop,read,language\%UILang%.ini
-	{
-		
-		ifinstring,a_loopreadline,[
-			ifinstring,a_loopreadline,]
-			{
-				tempCategory:=trim(a_loopreadline) ;Remove spaces (if any)
-				tempCategory:=trim(a_loopreadline,"[]") ;remove brackets
-			}
-		
-		if tempCategory=general
-			continue
-		
-		ifinstring,a_loopreadline,=
-		{
-			;~ MsgBox %a_loopreadline%
-			stringgetpos,pos,a_loopreadline,=
-			stringleft,tempItemName,a_loopreadline,%pos%
-			
-			StringTrimLeft,tempItemContent,a_loopreadline,% (pos +1)
-			
-			langAllTranslations[tempItemName]:=tempItemContent
-			if langMakeAdditionalCategoryOfTranslationObject
-			{
-				langCategoryOfTranslation[tempItemName]:=tempCategory
-				;~ MsgBox % strobj(langCategoryOfTranslation)
-			}
-			
-			
-			
-			
-		}
-		
-	}
 }
+
+goto,jumpOverlangnewWord
+
+langnewWord:
+send,^c
+sleep,20
+langtemp=false
+StringReplace,clipboard,clipboard,%a_space%,_,all
+StringReplace,clipboard,clipboard,`",,all
+if not errorlevel
+	langtemp=true
+StringReplace,clipboard,clipboard,(,,all
+if not errorlevel
+	langtemp=true
+StringReplace,clipboard,clipboard,),,all
+if not errorlevel
+	langtemp=true
+lang(Clipboard)
+;~ if langtemp=true
+	clipboard:="lang(""" clipboard """)"
+;~ else
+	;~ clipboard:="`% lang(""" clipboard """)"
+	
+ToolTip(clipboard,1000)
+return
+
+jumpOverlangnewWord:
+temp=
+*/

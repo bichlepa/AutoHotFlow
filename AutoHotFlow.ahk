@@ -26,6 +26,9 @@ if a_iscompiled=1
 else
 	editorPath=Editor.ahk
 
+
+;~ LangNoUseCache:=true ;only for debugging
+
 ;Create folder for global variables
 FileCreateDir,Global variables
 FileCreateDir,Saved Flows\Static variables

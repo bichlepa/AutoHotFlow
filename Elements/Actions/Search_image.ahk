@@ -71,10 +71,7 @@ runActionSearch_image(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 		}
 		else ;Specified region
 		{
-			x1:=%ElementID%x1
-			y1:=%ElementID%y1
-			x2:=%ElementID%x2
-			y2:=%ElementID%y2
+			WhetherSpecifiedRegion:=true
 		}
 	}
 	else if %ElementID%CoordMode=2
@@ -90,10 +87,7 @@ runActionSearch_image(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 		}
 		else ;Specified region
 		{
-			x1:=%ElementID%x1
-			y1:=%ElementID%y1
-			x2:=%ElementID%x2
-			y2:=%ElementID%y2
+			WhetherSpecifiedRegion:=true
 		}
 	}
 	else if %ElementID%CoordMode=3
@@ -116,13 +110,42 @@ runActionSearch_image(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 		}
 		else ;Specified region
 		{
-			x1:=%ElementID%x1
-			y1:=%ElementID%y1
-			x2:=%ElementID%x2
-			y2:=%ElementID%y2
+			WhetherSpecifiedRegion:=true
 		}
 	}
 	
+	if (WhetherSpecifiedRegion=true)
+	{
+		x1:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%x1)
+		if x is not number
+		{
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Coordinate " x1 " is not a number")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not a number.",lang("Coordinate '%1%'",x1)) )
+			return
+		}
+		y1:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%y1)
+		if x is not number
+		{
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Coordinate " y1 " is not a number")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not a number.",lang("Coordinate '%1%'",y1)) )
+			return
+		}
+		x2:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%x2)
+		if x is not number
+		{
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Coordinate " x2 " is not a number")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not a number.",lang("Coordinate '%1%'",x2)) )
+			return
+		}
+		y2:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%y2)
+		if x is not number
+		{
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Coordinate " y2 " is not a number")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not a number.",lang("Coordinate '%1%'",y2)) )
+			return
+		}
+		
+	}
 	
 	if %ElementID%SetIconNumber
 	{
@@ -154,7 +177,7 @@ runActionSearch_image(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 		;TODO: check whether the string contains spaces
 		if temp=
 		{
-			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Transparent color " temp " is not a specified")
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Transparent color is not specified")
 			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not specified.",lang("Transparent color",temp)) )
 			return
 		}
@@ -257,17 +280,43 @@ getParametersActionSearch_image()
 {
 	global
 	
-	parametersToEdit:=["Label|" lang("Output variables") " (" lang("Position: x,y") ")","Text2|ImagePosX;ImagePosY|varnameX;varnameY","Label|" lang("Screen region") "(x,y)","Radio|1|CoordMode|" lang("Relative to screen") ";" lang("Relative to active window position") ";" lang("Relative to active window client position"),"Checkbox|0|WholeScreen|" lang("Whole main screen"),"Checkbox|0|AllScreens|" lang("All screens"),"SmallLabel|"  lang("Upper left corner"), "Text2|10;20|x1;y1","SmallLabel|" lang("Lower right corner") " (x,y)","Text2|600;700|x2;y2","Label|" lang("Image file path"),"File||file|" lang("Select a file") "|8|" lang("Images and icons") " (*.gif; *.jpg; *.bmp; *.ico; *.cur; *.ani; *.png; *.tif; *.exif; *.wmf; *.emf; *.exe; *.dll; *.cpl; *.scr)","Label|"  lang("File with multiple icons") ,"Checkbox|0|SetIconNumber|" lang("Set icon number"),"Text|1|IconNumber","Label|" lang("Variation"), "Slider|0|variation|Range0-255 TickInterval10 tooltip","Label|" lang("Transparent color") ,"Checkbox|0|makeTransparent|" lang("Make a color of image transparent"), "SmallLabel|"  lang("Color name or RGB value"),"Text||transparent", "Label|" lang("Scale image") ,"Checkbox|0|ScaleImage|" lang("Scale image"), "Checkbox|0|PreserveAspectRatio|" lang("Preserve aspect ratio"), "Radio|1|WhichSizeSet|" lang("Set width manually and set height automatically") ";" lang("Set height manually and set width automatically") , "SmallLabel|" lang("width, height"),"Text2|;|ImageWidth;ImageHeight" ]
+	parametersToEdit:=["Label|" lang("Output variables") " (x, y)","Text2|ImagePosX;ImagePosY|varnameX;varnameY","Label|" lang("Screen region"),"Radio|1|CoordMode|" lang("Relative to screen") ";" lang("Relative to active window position") ";" lang("Relative to active window client position"),"Checkbox|0|WholeScreen|" lang("Whole screen"),"Checkbox|0|AllScreens|" lang("All screens"),"SmallLabel|"  lang("Upper left corner")  " (x1, y1)", "Text2|10;20|x1;y1","SmallLabel|" lang("Lower right corner") " (x2, y2)","Text2|600;700|x2;y2","button|ActionSearch_imageGetCoordinates|GetCoordinates|" lang("Get coordinates"),"Label|" lang("Image file path"),"File||file|" lang("Select a file") "|8|" lang("Images and icons") " (*.gif; *.jpg; *.bmp; *.ico; *.cur; *.ani; *.png; *.tif; *.exif; *.wmf; *.emf; *.exe; *.dll; *.cpl; *.scr)","Label|"  lang("File with multiple icons") ,"Checkbox|0|SetIconNumber|" lang("Set icon number"),"Text|1|IconNumber","Label|" lang("Variation"), "Slider|0|variation|Range0-255 TickInterval10 tooltip","Label|" lang("Transparent color") ,"Checkbox|0|makeTransparent|" lang("Make a color of image transparent"), "SmallLabel|"  lang("Color name or RGB value"),"Text||transparent","button|ActionSearch_imageChooseColor|ChooseColor|" lang("Choose color"),"button|ActionSearch_imageGetColor|GetColor|" lang("Get color from screen"), "Label|" lang("Scale image") ,"Checkbox|0|ScaleImage|" lang("Scale image"), "Checkbox|0|PreserveAspectRatio|" lang("Preserve aspect ratio"), "Radio|1|WhichSizeSet|" lang("Set width manually and set height automatically") ";" lang("Set height manually and set width automatically") , "SmallLabel|" lang("width, height"),"Text2|;|ImageWidth;ImageHeight" ]
 	return parametersToEdit
 }
+
+ActionSearch_imageChooseColor()
+{
+	global
+	tempActionSearch_imageChooseColor:=chooseColor(GUISettingsOfElement%setElementID%transparent)
+	;~ MsgBox %tempActionSearch_pixelChooseColor%
+	if tempActionSearch_imageChooseColor!=
+	{
+		GuiControl,,GUISettingsOfElement%setElementID%transparent,%tempActionSearch_imageChooseColor%
+		ui_GUISettingsOfElementUpdateName()
+	}
+}
+
+ActionSearch_imageGetColor()
+{
+	MouseTracker({ImportColor:"Yes",ParColor:"transparent"})
+}
+ActionSearch_imageGetCoordinates()
+{
+	MouseTracker({ImportMousePos:"Yes",SelectParMousePos:"Yes",SelectParMousePosLabelPos1:lang("Import upper left corner"),SelectParMousePosLabelPos2:lang("Import lower right corner"),ParCoordMode:"CoordMode",ParMousePosX:"x1", ParMousePosY:"y1",ParMousePosX2:"x2", ParMousePosY2:"y2"})
+}
+
 
 GenerateNameActionSearch_image(ID)
 {
 	global
-	;MsgBox % %ID%text_to_show
+	local String := lang("Search_image")   " - " 
+	
+	string.=GUISettingsOfElement%ID%file " "
+	
+
 	
 	
-	return lang("Search_image") " " GUISettingsOfElement%ID%file 
+	return string
 	
 }
 
@@ -275,7 +324,7 @@ CheckSettingsActionSearch_image(ID)
 {
 	if (GUISettingsOfElement%ID%CoordMode1 = 1)
 	{
-		GuiControl,,GUISettingsOfElement%ID%WholeScreen,% lang("Whole main screen")
+		GuiControl,,GUISettingsOfElement%ID%WholeScreen,% lang("Whole screen")
 		if (GUISettingsOfElement%ID%WholeScreen = 1)
 			GuiControl,Enable,GUISettingsOfElement%ID%AllScreens
 		else
@@ -370,3 +419,4 @@ CheckSettingsActionSearch_image(ID)
 	
 	
 }
+

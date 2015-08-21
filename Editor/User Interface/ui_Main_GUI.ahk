@@ -32,9 +32,23 @@
 	OnMessage(0x204,"rightmousebuttonclick",1)
 	OnMessage(0x20A,"mousewheelmove",1)
 
+	;the graphics need to be redrawn if window is moved. Expecially if the window was partially moved outside the screen.
+	OnMessage(0x06,"WindowGetsActive",1)
+	OnMessage(0x03,"WindowGetsMoved",1)
+	
+	
+}
 
-	
-	
+WindowGetsActive()
+{
+SetTimer,ui_Draw,-1
+
+}
+
+WindowGetsMoved()
+{
+SetTimer,ui_Draw,-1
+
 }
 
 leftmousebuttonclick(wpar,lpar,msg,hwn)
@@ -183,6 +197,23 @@ ui_GetMainGUIPos()
 {
 	global 
 	WinGetPos,MainGUIX,MainGUIY,MainGUIWidth,MainGUIHeight,ahk_id %MainGuihwnd%
+}
+
+ui_OnLanguageChange()
+{
+	global mainguihwnd
+	global flowName
+	ui_Draw()
+	DetectHiddenWindows off
+	WinGetTitle,temp,ahk_id %mainguihwnd%
+	IfWinExist,% temp
+		gui,1:show,,% "·AutoHotFlow· " lang("Editor") " - " flowName 
+	else
+		gui,1:show,hide,% "·AutoHotFlow· " lang("Editor") " - " flowName 
+	
+	;Help! I want that the menus are renamed when the language changes.
+	;~ initializeTrayBar()
+	;~ initializeMenuBar()
 }
 
 

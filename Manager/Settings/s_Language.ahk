@@ -52,6 +52,7 @@ gui,Submit,nohide
 
 IniWrite,% allLangs[GuiLanguageChoose],settings.ini,common,UILanguage
 iniread,UILang,settings.ini,common,UILanguage
+lang_LoadCurrentLanguage()
 
 gui,destroy
 
@@ -72,6 +73,12 @@ guicontrol,,ButtonSelectLanguage ,% lang("Change_Language")
 guicontrol,,ButtonSettings ,% lang("Settings")
 
 Gui, Show,, % "•AutoHotFlow• " lang("Manager")  ; Show the window and its TreeView.
+
+for count, tempItem in allItems
+{
+	com_SendCommand({function: "languageChanged"},nameOf(tempItem)) ;Send the command to the Editor.
+	
+}
 
 return
 

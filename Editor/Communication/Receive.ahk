@@ -168,11 +168,18 @@ Loop
 		stopOneElement%temptype%%tempsubtype%(tempNewReceivedCommand["InstanceID"],tempNewReceivedCommand["ThreadID"],tempNewReceivedCommand["ElementID"],tempNewReceivedCommand["ElementIDInInstance"])
 		;~ MsgBox % "finished`n" strobj(tempNewReceivedCommand)
 	}
-	;Manager tellst that flow parameters (like flow name) has changed
+	;Manager tells that flow parameters (like flow name) has changed
 	else if (tempNewReceivedCommand["Function"]="FlowParametersChanged")
 	{
 		logger("a2","Command received to reload general flow parameters.")
 		i_loadGeneralParameters()
+	}
+	;Manager tells that language has changed
+	else if (tempNewReceivedCommand["Function"]="languageChanged")
+	{
+		logger("a2","Command received to change language.")
+		lang_LoadCurrentLanguage()
+		ui_OnLanguageChange()
 	}
 	;Manager wants the flow to immediately exit
 	else if (tempNewReceivedCommand["Function"]="immediatelyexit")

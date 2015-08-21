@@ -1,13 +1,18 @@
-﻿
+﻿initializeMenuBar()
 ;this is the menu on top of the main window
-Menu, MyMenu,add,% lang("Save"),ui_Menu_save
+;Help! I want that the menu are renamed when the language changes.
+initializeMenuBar()
+{
+	global
+	;~ try menu,MyMenu,deleteall
+	
+	Menu, MyMenu,add,% lang("Save"),ui_Menu_save
+	Menu, MyMenu,add,% lang("Run"),ui_Menu_MenuStart
+	Menu, MyMenu,add,% lang("Enable"),ui_Menu_Enable
+	Menu, MyMenu,add,% lang("Settings"),ui_Menu_Settings
 
-
-Menu, MyMenu,add,% lang("Run"),ui_Menu_MenuStart
-Menu, MyMenu,add,% lang("Enable"),ui_Menu_Enable
-Menu, MyMenu,add,% lang("Settings"),ui_Menu_Settings
-
-Gui,menu,MyMenu
+	Gui,menu,MyMenu
+}
 goto,überspringendsfasdg
 
 

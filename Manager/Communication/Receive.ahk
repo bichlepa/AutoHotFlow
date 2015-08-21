@@ -85,11 +85,16 @@ Loop
 			if %tempid%enabled=true
 			{
 				;It could happen that the other flows are closed right before the manager is closed. For example on shutdown. This is a try to prevent that the flows are disabled.
-				if not shuttingDown
-				{
+				;~ if shuttingDown
+				;~ {
+					%tempid%enabled=false
 					FlowsToSaveSoon.Insert(tempid)
 					SetTimer,saveFlows,2000 ;Wait 2 seconds and save then. If the manager is closed before that perioud, the flow will be enabled at next startup
-				}
+				;~ }
+				;~ else
+				;~ {
+					
+				;~ }
 				
 			}
 			else

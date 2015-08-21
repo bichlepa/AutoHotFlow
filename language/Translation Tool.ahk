@@ -3,89 +3,391 @@
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
 SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 #Include language.ahk
+#include strobj.ahk
+
+gui, add, dropdownlist,vDropDownLanguage  x10 y10 w70
+
+gui, add, button, gButtonFindUntranslated y10 X+10, Find untranslated entries
+
+gui, add, Edit, vEditSearch gEditSearch y10 X+30, 
+gui, add, button, gButtonSearch vButtonSearch y10 X+10, Search
+
+gui, add, button, gButtonAddNewLanguage y10 X+30, Add new language
+
+;Translators will not need that
+if not a_iscompiled
+	gui, add, button, gButtonChangeCategory y10 X+10, Change category
 
 
-allLangs:=Object()
-stringalllangs=`n
-Loop,%A_WorkingDir%\*.ini
+gui, add, TreeView ,gAction x10 y40 w250 h500 hwndtreeViewHWND
+
+
+Gui, Add, ListView,gAction AltSubmit nosort grid yp X+10 w450 h200,Language|Text
+gui,font,s12
+gui, add, edit,gEditField vEditField xp Y+10 h290 w450 disabled
+gui,font,s8
+gui,+hwndMainGuiHWND
+;~ gui,add,button,gNewEntry x10 Y+10,New Entry
+;~ gui,add,button,gEintragLöschen yp X+10,Delete Entry
+;~ gui,add,button,gNeueKategorie yp X+10,New Category
+;~ gui,add,button,gKategorieLöschen yp X+10,Delete Category
+
+LV_Modify(2, "Select") ;Zweite Sprache auswählen
+loadLanguageList()
+updateTreeView()
+;~ gui,+resize ;TODO
+gui, show
+hotkey,IfWinActive,ahk_id %MainGuiHWND%
+hotkey,pgdn,HotkeyNextEntry
+hotkey,pgup,HotkeyNextEntry
+return
+
+
+
+loadLanguageList()
 {
-	StringReplace,filenameNoExt,A_LoopFileName,.%A_LoopFileExt%
-	
-	IniRead,%filenameNoExt%enlangname,%filenameNoExt%.ini,general,enname
-	IniRead,%filenameNoExt%langname,%filenameNoExt%.ini,general,name
-	if %filenameNoExt%enlangname!=Error
+	global
+	allLangs:=Object()
+	local langname
+	local enlangname
+	local filenameNoExt
+	lv_delete()
+	LanguageListString=|
+	Loop,%A_WorkingDir%\*.ini
 	{
-		allLangs.insert(filenameNoExt)
+		StringReplace,filenameNoExt,A_LoopFileName,.%A_LoopFileExt%
 		
-	}
-	stringalllangs:=stringalllangs filenameNoExt " (" %filenameNoExt%enlangname " - "  %filenameNoExt%langname ")`n"
-	;MsgBox %  filenameNoExt "|" %filenameNoExt%langname
-}
-
-
-
-InputBox,translationto,Select Language,To which language do you want to translate?`nEnter a new short code or one of following codes:`n%stringalllangs%,,,% A_ScreenHeight*0.9
-
-IfnotInString,stringalllangs,`n%translationto% (
-{
-	
-	MsgBox,4,Question, %translationto% does not exist yet. Do you want to add a new language?
-	allLangs.insert(translationto)
-	IfMsgBox,yes
-	{
-		InputBox,%translationto%enlangname,Enter language name,What is the English name of the new language?
-		if errorlevel
-			ExitApp
-		InputBox,%translationto%langname,Enter language name,% "What is the name of the new language in " %translationto%enlangname "?"
-		if errorlevel
-			ExitApp
-		IniWrite,% %translationto%enlangname,%translationto%.ini,general,enname
-		IniWrite,% %translationto%langname,%translationto%.ini,general,name
-	}
-	else
-		ExitApp
-	
-}
-
-UILang:=translationto
-developing=yes
-
-StringReplace,newWorkingDir,a_Scriptdir,\language
-SetWorkingDir,%newWorkingDir%
-Comma=,
-loop %A_WorkingDir%\*.ahk,1,1
-{
-	;MsgBox %A_LoopFileFullPath%
-	if A_LoopFileName=language.ahk
-		continue
-	
-	FileRead,ahkFileContent,%A_LoopFileFullPath%
-	tempFoundPos=1
-	Loop
-	{
-		tempFoundPos:=RegExMatch(ahkFileContent, "U)lang\(""(.+"")", tempVariablesToReplace,tempFoundPos +1)
-		if tempFoundPos=0
-			break
-		currentfile:=A_LoopFileFullPath
-		ToolTip, %A_LoopFileFullPath% %tempFoundPos%
-		StringGetPos,pos,tempVariablesToReplace1,"
-		if pos
-			StringLeft,tempVariablesToReplace1,tempVariablesToReplace1,%pos%
-		else
+		IniRead,enlangname,%filenameNoExt%.ini,general,enname
+		IniRead,langname,%filenameNoExt%.ini,general,name
+		if enlangname!=Error
 		{
-			MsgBox, error! could not exract the
+			LanguageListString.=filenameNoExt "|"
+			allLangs[filenameNoExt]:={enlangname: enlangname,langname: langname}
+			langNumber%a_index%:=filenameNoExt
+		}
+		lv_add("",langname,"")
+	}
+	
+	stringreplace,LanguageListString,LanguageListString,|en|,|en||
+	guicontrol, ,DropDownLanguage,%LanguageListString%
+}
+
+
+updateTreeView()
+{
+	global
+	local temp
+	local tempCategory
+	local tempItemName
+	TV_Delete()
+	
+	AllCategories:=object()
+	AllItems:=object()
+	
+	loop,read,en.ini
+	{
+		
+		ifinstring,a_loopreadline,[
+			ifinstring,a_loopreadline,]
+			{
+				tempCategory:=trim(a_loopreadline,"[]")
+				AllCategories[tempCategory]:={ID: TV_Add(tempCategory)} ;insert the id of the category
+			}
+		
+		ifinstring,a_loopreadline,=
+		{
+			
+			stringgetpos,pos,a_loopreadline,=
+			stringleft,tempItemName,a_loopreadline,%pos%
+			
+			AllItems[tempItemName]:={ID: TV_Add(tempItemName,AllCategories[tempCategory]["id"]),Category: tempCategory}
+			
+			
+				
+			
 			
 		}
 		
-		ToolTip, %A_LoopFileFullPath% %tempFoundPos% %tempVariablesToReplace1%
-		SetTimer,langremovetooltip,-5000
-		lang(tempVariablesToReplace1)
+	}
+	;~ MsgBox % strobj(AllCategories)
+	;~ MsgBox % strobj(AllItems)
+}
+
+Action:
+if (A_GuiEvent = "i" or A_GuiEvent = "c")
+	return
+
+SelectedItemID:=TV_GetSelection()
+if not SelectedItemID
+	return
+TV_GetText(SelectedItemText, SelectedItemID)
+SelectedCategoryID:=TV_GetParent(SelectedItemID)
+TV_GetText(SelectedCategoryText, SelectedCategoryID)
+
+;~ MsgBox % SelectedItemID ": " SelectedItemText "`n" SelectedCategoryID ": " SelectedCategoryText
+
+
+if SelectedCategoryID ;If an item is selected
+{
+	;~ MsgBox % strobj(allLangs)
+	for templang, langobject in allLangs
+	{
+		
+		iniread,tempText,%templang%.ini,%SelectedCategoryText%,%SelectedItemText%,%a_space%
+		
+		if tempText=
+		{
+			IniRead,iniAllSections,%templang%.ini
+			;~ MsgBox %iniAllSections%
+			Loop,parse,iniAllSections,`n
+			{
+				
+				IniRead,tempText,%templang%.ini,%a_loopfield%,%SelectedItemText%,%A_Space%
+				if tempText
+				{
+					IniDelete,%templang%.ini,%a_loopfield%,%SelectedItemText%
+					IniWrite,%tempText%,%templang%.ini,%SelectedCategoryText%,%SelectedItemText%
+					break
+				}
+			}
+		}
+		;~ MsgBox %templang% - %SelectedCategoryText% - %SelectedItemText% - %tempText%
+		LV_Modify(a_index,"",langobject.langname,tempText)
+		
+		
 		
 	}
+	
+	SelectedLanguageNr:=LV_Getnext(0) ;Which Row is selected
+	if SelectedLanguageNr
+	{
+		SelectedLanguageID:=langNumber%SelectedLanguageNr%
+		
+		LV_Gettext(temptext,SelectedLanguageNr,2) 
+		
+		StringReplace,temptext,temptext,``n,`n,all
+		guicontrol,Enable,EditField
+		guicontrol,,EditField,%temptext%
+	}
+	else
+	{
+		guicontrol,disable,EditField
+		guicontrol,,EditField,
+	}
+	
+	
 }
-MsgBox Everything is translated! :-)
-ExitApp
+else ;If a category is selected
+{
+	for templang, langobject in allLangs
+	{
+		
+		LV_Modify(a_index,"",langobject.langname,"")
+		
+	}
+	guicontrol,disable,EditField
+	guicontrol,,EditField,
+}
 
-langremovetooltip:
-ToolTip
+;~ guicontrol,focus,EditField
+
+return
+
+EditField:
+;~ MsgBox % SelectedLanguageID " - " SelectedItemText "-" SelectedCategoryText
+if not SelectedLanguageID
+	return
+if not SelectedItemText
+	return
+if not SelectedCategoryText
+	return
+gui,submit,NoHide
+;~ SoundBeep
+stringreplace,EditFieldCorrected,EditField,`n,``n,all
+iniwrite,%EditFieldCorrected%,%SelectedLanguageID%.ini,%SelectedCategoryText%,%SelectedItemText%
+LV_Modify(SelectedLanguageNr,"",allLangs[SelectedLanguageID].langname,EditFieldCorrected)
+return
+
+ButtonChangeCategory:
+if not SelectedItemText
+	return
+if not SelectedCategoryText
+	return
+
+try menu,MenuCategory,DeleteAll
+for tempCategoryName, tempCategoryObject in AllCategories
+{
+	if tempCategoryName=general
+		continue
+	menu,MenuCategory,add,%tempCategoryName%,MenuChangeCategory
+	if (tempCategoryName=SelectedCategoryText)
+		menu,MenuCategory,check,%tempCategoryName%
+}
+menu,MenuCategory,add,--- New category ---,MenuChangeCategory
+menu,menucategory,show
+return
+MenuChangeCategory:
+Critical
+;~ MsgBox %A_ThisMenuItem% %SelectedLanguageID%
+if (a_thismenuitem=SelectedCategoryText)
+	return
+if (a_thismenuitem="")
+	return
+if (a_thismenuitem="--- New category ---")
+{
+	InputBox,ToChangeCategory,New category,Enter new category name for item '%SelectedItemText%'
+	if not ToChangeCategory
+		return
+	if not AllCategories.haskey(ToChangeCategory)
+		AllCategories[ToChangeCategory]:={ID: TV_Add(ToChangeCategory)} ;insert the id of the category
+}
+else
+{
+	ToChangeCategory:=a_thismenuitem
+}
+
+TV_Delete(SelectedItemID)
+
+AllItems[SelectedItemText]:={ID: TV_Add(SelectedItemText,AllCategories[ToChangeCategory]["id"])}
+
+for templang, langobject in allLangs
+{
+	iniRead,tempText,%templang%.ini,%SelectedCategoryText%,%SelectedItemText%,%a_space%
+	IniDelete,%templang%.ini,%SelectedCategoryText%,%SelectedItemText%
+	iniwrite,%tempText%,%templang%.ini,%ToChangeCategory%,%SelectedItemText%
+}
+
+return
+
+ButtonAddNewLanguage:
+gui,2:destroy
+gui,2:add,text,w200, Language ID consisting of two letters
+gui,2:add,edit,w200 vNewLangId
+gui,2:add,text,w200, Name of language in English
+gui,2:add,edit,w200 vNewLangEnName
+gui,2:add,text,w200, Name of language in the new language
+gui,2:add,edit,w200 vNewLangName
+gui,2:add,button,w95 default gNewLangOK,OK
+gui,2:add,button,X+10 yp w95 gNewLangCancel,Cancel
+gui,2:show,,New language
+return
+
+NewLangOK:
+gui,2:submit,nohide
+if NewLangId=
+{
+	MsgBox,0,Error,Please enter language ID
+	return
+}
+if strlen(NewLangId)!=2
+{
+	MsgBox,0,Error,Language ID must consist of two letters
+	return
+}
+if NewLangName=
+{
+	MsgBox,0,Error,Please enter language Name
+	return
+}
+if NewLangEnName=
+{
+	MsgBox,0,Error,Please enter language Name
+	return
+}
+IniWrite,% NewLangEnName,%NewLangId%.ini,general,enname
+iniWrite,% NewLangName,%NewLangId%.ini,general,name
+loadLanguageList()
+
+;Mark all elements which are complete
+
+ButtonFindUntranslated:
+gui,submit,nohide
+;~ MsgBox %DropDownLanguage%
+for tempCategoryName, tempCategoryObject in AllCategories
+{
+	AllCategories[tempCategoryName].isComplete:=true
+}
+for DropDowntempItem, DropDowntempItemObject in AllItems
+{
+	
+	
+	iniread,DropDowntempText,%DropDownLanguage%.ini,% DropDowntempItemObject.category,% DropDowntempItem,%a_space%
+	
+	
+	
+	;~ ToolTip % DropDowntempItem " - " DropDowntempItemObject.id " - " DropDowntempItemObject.category "`n" DropDowntempText
+	if DropDowntempText=
+	{
+		TV_Modify(DropDowntempItemObject.id ,"bold")
+		;~ MsgBox % DropDowntempItemObject.category " - " AllCategories[DropDowntempItemObject.category]["isComplete"]
+		AllCategories[DropDowntempItemObject.category]["isComplete"]:=false
+		;~ MsgBox % AllCategories[DropDowntempItemObject.category]["isComplete"]
+	}
+	else
+	{
+		TV_Modify(DropDowntempItemObject.id ,"-bold")
+	}
+	
+	
+}
+for tempCategoryName, tempCategoryObject in AllCategories
+{
+	if (tempCategoryObject.isComplete=true)
+		TV_Modify(tempCategoryObject.id ,"-bold")
+	else
+		TV_Modify(tempCategoryObject.id ,"bold")
+}
+return
+
+ButtonSearch:
+gui,submit,nohide
+for tempCategoryName, tempCategoryObject in AllCategories
+{
+	AllCategories[tempCategoryName].isComplete:=true
+}
+for DropDowntempItem, DropDowntempItemObject in AllItems
+{
+
+	iniread,DropDowntempText,%DropDownLanguage%.ini,% DropDowntempItemObject.category,% DropDowntempItem,%a_space%
+	
+
+	
+	;~ ToolTip % DropDowntempItem " - " DropDowntempItemObject.id " - " DropDowntempItemObject.category "`n" DropDowntempText
+	ifinstring,DropDowntempText,%Editsearch%
+	{
+		TV_Modify(DropDowntempItemObject.id ,"bold")
+		;~ MsgBox % DropDowntempItemObject.category " - " AllCategories[DropDowntempItemObject.category]["isComplete"]
+		AllCategories[DropDowntempItemObject.category]["isComplete"]:=false
+		;~ MsgBox % AllCategories[DropDowntempItemObject.category]["isComplete"]
+	}
+	else
+	{
+		TV_Modify(DropDowntempItemObject.id ,"-bold")
+	}
+	
+	
+}
+for tempCategoryName, tempCategoryObject in AllCategories
+{
+	if (tempCategoryObject.isComplete=true)
+		TV_Modify(tempCategoryObject.id ,"-bold")
+	else
+		TV_Modify(tempCategoryObject.id ,"bold")
+}
+
+return
+
+EditSearch:
+guicontrol,+default,buttonsearch
+return
+
+HotkeyNextEntry:
+if a_thishotkey=pgup
+	controlsend,,{up},ahk_id %treeViewHWND%
+else
+	controlsend,,{down},ahk_id %treeViewHWND%
+
+return
+NewLangCancel:
+gui,2:destroy
 return

@@ -178,7 +178,7 @@
 	gui,font,s8 cDefault wnorm
 	gui,add,checkbox, x10 vGUISettingsOfElementCheckStandardName gGUISettingsOfElementCheckStandardName,% lang("Standard_name")
 	gui,add,edit,w400 x10 Multi r5 vGUISettingsOfElementEditName gGUISettingsOfElementUpdateName,% %setElementID%name
-	
+	gui,+hwndSettingsGUIHWND
 	
 	
 	parametersToEdit:=getParameters%setElementType%%setElementsubType%()
@@ -251,6 +251,39 @@
 			else
 				temptext=%temp% ;set the saved parameter as text
 			gui,add,edit,X+10 r1 w195  gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%tempparname2%,%temptext%
+		}
+		else if parameter1=Text3
+		{
+			gui,font,s8 cDefault wnorm
+			StringSplit,tempdefault,parameter2,; ;get the default parameter
+			StringSplit,tempparname,parameter3,; ;get the parameter names
+			
+			;First edit
+			temp:=%setElementID%%tempparname1% ;get the saved parameter
+			
+			if (temp="") ;if nothing is saved
+				temptext=%tempdefault1% ;load default parameter
+			else
+				temptext=%temp% ;set the saved parameter as text
+			gui,add,edit,x10 r1 w127  gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%tempparname1%,%temptext%
+			
+			;second edit
+			temp:=%setElementID%%tempparname2% ;get the saved parameter
+			
+			if (temp="") ;if nothing is saved
+				temptext=%tempdefault2% ;load default parameter
+			else
+				temptext=%temp% ;set the saved parameter as text
+			gui,add,edit,X+10 r1 w127  gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%tempparname2%,%temptext%
+			
+			;third edit
+			temp:=%setElementID%%tempparname3% ;get the saved parameter
+			
+			if (temp="") ;if nothing is saved
+				temptext=%tempdefault3% ;load default parameter
+			else
+				temptext=%temp% ;set the saved parameter as text
+			gui,add,edit,X+10 r1 w126  gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%tempparname3%,%temptext%
 		}
 		else if parameter1=MultiLineText
 		{
@@ -639,24 +672,8 @@
 	
 	
 	GUISettingsOfElementUpdateName:
-	gui,2:default
-	gui,submit,nohide
-	
-	
-	
-	CheckSettings%setElementType%%setElementsubType%(setElementID)
-	
-	if GUISettingsOfElementCheckStandardName!=1
-	{
-		
-		return
-	}
-	
-	
-	Newname:=GenerateName%setElementType%%setElementsubType%(setElementID)
-	
-	guicontrol,,GUISettingsOfElementEditName,%Newname%
-	return 
+	ui_GUISettingsOfElementUpdateName()
+	return
 	
 	GUISettingsOfElementButton:
 	;~ MsgBox, %a_guicontrol%`n%A_gui%`n%A_guiEvent%`n%A_EventInfo%
@@ -769,6 +786,14 @@
 				%setElementID%%tempparname1%:=GUISettingsOfElement%setElementID%%tempparname1%
 				%setElementID%%tempparname2%:=GUISettingsOfElement%setElementID%%tempparname2%
 			}
+			else  if (parameter1="text3")
+			{
+				
+				StringSplit,tempparname,parameter3,; ;get the parameter names
+				%setElementID%%tempparname1%:=GUISettingsOfElement%setElementID%%tempparname1%
+				%setElementID%%tempparname2%:=GUISettingsOfElement%setElementID%%tempparname2%
+				%setElementID%%tempparname3%:=GUISettingsOfElement%setElementID%%tempparname3%
+			}
 			else
 			{
 				;MsgBox % setElementID parameter3 "=" GUISettingsOfElement%setElementID%%parameter3%
@@ -807,6 +832,28 @@
 	
 	
 	
+}
+
+ui_GUISettingsOfElementUpdateName()
+{
+	global
+	gui,2:default
+	gui,submit,nohide
+	
+	
+	
+	CheckSettings%setElementType%%setElementsubType%(setElementID)
+	
+	if GUISettingsOfElementCheckStandardName!=1
+	{
+		
+		return
+	}
+	
+	
+	Newname:=GenerateName%setElementType%%setElementsubType%(setElementID)
+	
+	guicontrol,,GUISettingsOfElementEditName,%Newname%
 }
 
 ui_disableElementSettingsWindow()

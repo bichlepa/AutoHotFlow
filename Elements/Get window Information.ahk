@@ -7,7 +7,7 @@ FunctionsForElementGetWindowInformation2:
 gui,2:default
 gui,submit,nohide
 
-DetectHiddenWindows,off
+
 
 ;~ winWholelist=
 ;~ loop %winlist%
@@ -32,10 +32,20 @@ gui,add,checkbox,w400 vFunctionsForElementGetWindowInformationCheckBoxImportUniq
 
 gui,add,button,w400 h30 default gFunctionsForElementGetWindowInformationButtonOK,% lang("OK")
 gosub FunctionsForElementGetWindowInformationUpdateWindowlist
+DetectHiddenWindows,on
 if tempCountOfWindows>0
 {
 	gui,+hwndFunctionsForElementGetWindowInformationHWND
-	gui,show
+	;Put the window in the center of the main window
+	gui,show,hide
+	wingetpos,tempParentX,tempParentY,tempParentW,tempParentH,ahk_id %SettingsGUIHWND%
+	
+	wingetpos,,,tempWidth,tempHeight,ahk_id %FunctionsForElementGetWindowInformationHWND%
+	tempXpos:=round(tempParentX+tempParentW/2- tempWidth/2)
+	tempYpos:=round(tempParentY+tempParentH/2- tempHeight/2)
+	;~ MsgBox %tempWidth% %FunctionsForElementGetWindowInformationHWND%
+	gui,show,x%tempXpos% y%tempYpos%,% lang("Window assistant")
+	
 	SetTimer,FunctionsForElementGetWindowInformationGetWindowCoveredByMouse,100
 	return
 }
