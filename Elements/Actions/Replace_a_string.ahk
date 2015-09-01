@@ -100,8 +100,23 @@ getCategoryActionReplace_a_string()
 getParametersActionReplace_a_string()
 {
 	global
-	parametersToEdit:=["Label|" lang("Variable_name"),"VariableName|NewVariable|Varname","Label| " lang("Input string"),"Radio|1|expression|" lang("This is a string") ";" lang("This is a variable name or expression") ,"Text|Hello World|VarValue","Label| " lang("Text to search"),"Radio|1|IsExpressionSearchText|" lang("This is a string") ";" lang("This is a variable name or expression") ,"Text|World|SearchText","Label| " lang("Replace by"),"Radio|1|isExpressionReplaceText|" lang("This is a string") ";" lang("This is a variable name or expression") ,"Text|%a_UserName%|ReplaceText","Label|" lang("Number of replacements"),"Radio|1|ReplaceAll|" lang("Replace only the first occurence") ";" lang("Replace all occurences"),"Label|" lang("Case sensitivity"),"Radio|1|CaseSensitive|" lang("Case insensitive") ";" lang("Case sensitive")]
-	
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Variable_name")})
+	parametersToEdit.push({type: "Edit", id: "Varname", default: "NewVariable", content: "VariableName", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label:  lang("Input string")})
+	parametersToEdit.push({type: "Radio", id: "expression", default: 1, choices: [lang("This is a string"), lang("This is a variable name or expression")]})
+	parametersToEdit.push({type: "Edit", id: "VarValue", default: "Hello World", content: "String", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label:  lang("Text to search")})
+	parametersToEdit.push({type: "Radio", id: "IsExpressionSearchText", default: 1, choices: [lang("This is a string"), lang("This is a variable name or expression")]})
+	parametersToEdit.push({type: "Edit", id: "SearchText", default: "World", content: "String", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label:  lang("Replace by")})
+	parametersToEdit.push({type: "Radio", id: "isExpressionReplaceText", default: 1, choices: [lang("This is a string"), lang("This is a variable name or expression")]})
+	parametersToEdit.push({type: "Edit", id: "ReplaceText", default: "%a_UserName%", content: "String"})
+	parametersToEdit.push({type: "Label", label: lang("Number of replacements")})
+	parametersToEdit.push({type: "Radio", id: "ReplaceAll", default: 1, choices: [lang("Replace only the first occurence"), lang("Replace all occurences")]})
+	parametersToEdit.push({type: "Label", label: lang("Case sensitivity")})
+	parametersToEdit.push({type: "Radio", id: "CaseSensitive", default: 1, choices: [lang("Case insensitive"), lang("Case sensitive")]})
+
 	return parametersToEdit
 }
 

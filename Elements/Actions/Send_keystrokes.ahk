@@ -30,8 +30,13 @@ getCategoryActionSend_Keystrokes()
 getParametersActionSend_Keystrokes()
 {
 	global
-	parametersToEdit:=["Label|" lang("Keys_or_text_to_send"),"Checkbox|0|RawMode|" lang("Raw mode"),"Text||KeysToSend","Label|" lang("Send mode"),"Radio|1|SendMode|" lang("Input mode") ";" lang("Event mode") ";" lang("Play mode")]
-	;,"Label|" lang("Insert_a_keystroke"), "Hotkey||HotkeyToInsert,"Button|customSettingButtonOfActionSend_KeystrokesHotkeyToInsert||" lang("Insert")
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Keys_or_text_to_send")})
+	parametersToEdit.push({type: "Checkbox", id: "RawMode", default: 0, label: lang("Raw mode")})
+	parametersToEdit.push({type: "Edit", id: "KeysToSend", content: "String", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: lang("Send mode")})
+	parametersToEdit.push({type: "Radio", id: "SendMode", default: 1, choices: [lang("Input mode"), lang("Event mode"), lang("Play mode")]})
+
 	return parametersToEdit
 }
 

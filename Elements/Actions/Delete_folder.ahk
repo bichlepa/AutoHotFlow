@@ -39,7 +39,12 @@ getParametersActionDelete_folder()
 {
 	global
 	
-	parametersToEdit:=["Label|" lang("Folder path"),"Folder||folder|" lang("Select a folder") "|","Label|" lang("Options"),"Checkbox|0|ifEmpty|" lang("Remove only if the folder is empty")]
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Folder path")})
+	parametersToEdit.push({type: "Folder", id: "folder", label: lang("Select a folder")})
+	parametersToEdit.push({type: "Label", label: lang("Options")})
+	parametersToEdit.push({type: "Checkbox", id: "ifEmpty", default: 0, label: lang("Remove only if the folder is empty")})
+
 	return parametersToEdit
 }
 

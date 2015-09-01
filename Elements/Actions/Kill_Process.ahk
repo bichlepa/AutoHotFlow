@@ -47,7 +47,10 @@ getParametersActionKill_Process()
 {
 	global
 	
-	parametersToEdit:=["Label|" lang("Process name or ID"),"Text||ProcessName"]
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Process name or ID")})
+	parametersToEdit.push({type: "Edit", id: "ProcessName", content: "String", WarnIfEmpty: true})
+
 	return parametersToEdit
 }
 

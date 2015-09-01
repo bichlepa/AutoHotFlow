@@ -922,7 +922,6 @@ v_CheckVariableName(varName,Permissions:="")
 	{
 		;~ MsgBox fsdg %varName%
 		return 0
-		
 	}
 	
 	;Check whether the variable name is not empty

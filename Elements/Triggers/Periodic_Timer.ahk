@@ -109,9 +109,11 @@ DisableTriggerPeriodic_timer(ID)
 
 getParametersTriggerPeriodic_timer()
 {
-	
-	parametersToEdit:=["Label|" lang("Time interval"),"Text|10|Intervall_S","Radio|2|Unit|" lang("Milliseconds") ";" lang("Seconds") ";" lang("Minutes")]
-	
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "label", label:  lang("Time interval")})
+	parametersToEdit.push({type: "edit", id: "Intervall_S", default: 10, content: "Expression", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Radio", id: "Unit", choices: [lang("Milliseconds"), lang("Seconds"), lang("Minutes")], default: 2})
+
 	
 	return parametersToEdit
 }

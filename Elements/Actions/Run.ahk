@@ -68,7 +68,12 @@ getParametersActionRun()
 {
 	global
 	
-	parametersToEdit:=["Label|" lang("Target"),"Text||ToRun","Label| " lang("Value"),"Checkbox|0|ReplaceVariables|" lang("Replace variables")]
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Target")})
+	parametersToEdit.push({type: "Edit", id: "ToRun", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label:  lang("Value")})
+	parametersToEdit.push({type: "Checkbox", id: "ReplaceVariables", default: 0, label: lang("Replace variables")})
+
 	return parametersToEdit
 }
 

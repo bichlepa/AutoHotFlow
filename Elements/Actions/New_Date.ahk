@@ -46,8 +46,13 @@ getCategoryActionNew_date()
 getParametersActionNew_date()
 {
 	global
-	parametersToEdit:=["Label|" lang("Variable_name"),"VariableName|NewDate|Varname","Label| " lang("Date"),"Radio|2|WhichDate|" lang("Current date and time") ";" lang("Specified date"),"Dateandtime||Date"]
-	
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Variable_name")})
+	parametersToEdit.push({type: "Edit", id: "Varname", default: "NewDate", content: "VariableName", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label:  lang("Date")})
+	parametersToEdit.push({type: "Radio", id: "WhichDate", default: 2, choices: [lang("Current date and time"), lang("Specified date")]})
+	parametersToEdit.push({type: "Dateandtime", id: "Date"})
+
 	return parametersToEdit
 }
 

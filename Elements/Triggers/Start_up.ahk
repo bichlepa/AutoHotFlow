@@ -17,8 +17,8 @@ EnableTriggerStart_Up(ElementID)
 getParametersTriggerStart_Up()
 {
 	
-	parametersToEdit:=[]
-	
+	parametersToEdit:=Object()
+
 	return parametersToEdit
 }
 

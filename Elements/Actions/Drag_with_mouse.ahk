@@ -85,7 +85,24 @@ getCategoryActionDrag_with_mouse()
 getParametersActionDrag_with_mouse()
 {
 	global
-	parametersToEdit:=["Label|" lang("Which button"), "DropDownList|1|Button|" lang("Left button") ";" lang("Right button") ";" lang("Middle Button") ";" lang("Wheel up") ";" lang("Wheel down") ";" lang("Wheel left") ";" lang("Wheel right") ";" lang("4th mouse button (back)") ";" lang("5th mouse button (forward)"),"Label|" lang("Position"),"Radio|1|CoordMode|"  lang("Relative to screen") ";" lang("Relative to active window position") ";" lang("Relative to active window client position") ";" lang("Relative to current mouse position"),"Label|" lang("Start coordinates") " " lang("(x,y)"),"Text2|10;20|XposFrom;YposFrom","Label|" lang("End coordinates") " " lang("(x,y)"),"Text2|100;200|Xpos;Ypos","button|ActionDrag_with_MouseMouseTracker|MouseTracker|" lang("Get coordinates"),"Label|" lang("Method"),"Radio|1|SendMode|" lang("Input mode") ";" lang("Event mode") ";" lang("Play mode"),"Label|" lang("Speed"),"Slider|2|speed|Range0-100 tooltip","Label|" lang("Delay in ms"),"Text|10|delay"]
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Which button")})
+	parametersToEdit.push({type: "DropDown", id: "Button", default: 1, choices: [lang("Left button"), lang("Right button"), lang("Middle Button"), lang("Wheel up"), lang("Wheel down"), lang("Wheel left"), lang("Wheel right"), lang("4th mouse button (back)"), lang("5th mouse button (forward)")], result: "number"})
+	parametersToEdit.push({type: "Label", label: lang("Position")})
+	parametersToEdit.push({type: "Radio", id: "CoordMode", default: 1, choices: [lang("Relative to screen"), lang("Relative to active window position"), lang("Relative to active window client position"), lang("Relative to current mouse position")]})
+	parametersToEdit.push({type: "Label", label: lang("Start coordinates") lang("(x,y)")})
+	parametersToEdit.push({type: "Edit", id: ["XposFrom", "YposFrom"], default: [10, 20], content: "Expression", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: lang("End coordinates") lang("(x,y)")})
+	parametersToEdit.push({type: "Edit", id: ["Xpos", "Ypos"], default: [100, 200], content: "Expression", WarnIfEmpty: true})
+	parametersToEdit.push({type: "button", id: "MouseTracker", goto: "ActionDrag_with_MouseMouseTracker", label: lang("Get coordinates")})
+	parametersToEdit.push({type: "Label", label: lang("Method")})
+	parametersToEdit.push({type: "Radio", id: "SendMode", default: 1, choices: [lang("Input mode"), lang("Event mode"), lang("Play mode")]})
+	parametersToEdit.push({type: "Label", label: lang("Speed")})
+	parametersToEdit.push({type: "Slider", id: "speed", default: 2, options: "Range0-100 tooltip"})
+	parametersToEdit.push({type: "Label", label: lang("Delay in ms")})
+	parametersToEdit.push({type: "Edit", id: "delay", default: 10, content: "Expression", WarnIfEmpty: true})
+
+
 	
 	return parametersToEdit
 }

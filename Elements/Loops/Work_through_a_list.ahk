@@ -148,7 +148,12 @@ getParametersLoopWork_through_a_list()
 {
 	global
 	
-	parametersToEdit:=["Label|" lang("Variable_name"),"VariableName|List|Varname","Label|" lang("Performance"),"Checkbox|1|CopyFirst|" lang("Copy list before first iteration") ]
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Variable_name")})
+	parametersToEdit.push({type: "Edit", id: "Varname", default: "List", content: "VariableName", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: lang("Performance")})
+	parametersToEdit.push({type: "Checkbox", id: "CopyFirst", default: 1, label: lang("Copy list before first iteration")})
+
 	return parametersToEdit
 }
 

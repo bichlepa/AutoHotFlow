@@ -286,7 +286,8 @@ stopConditionDebug_Dialog(ID)
 getParametersConditionDebug_Dialog()
 {
 	
-	parametersToEdit:=[]
+	parametersToEdit:=Object()
+
 	
 	return parametersToEdit
 }

@@ -114,7 +114,22 @@ getParametersActionRead_from_ini()
 {
 	global
 	
-	parametersToEdit:=["Label|" lang("Output Variable name"),"VariableName|NewVariable|varname","Label|" lang("Path of .ini file"),"File||file|" lang("Select an .ini file") "|8|(*.ini)","Label|" lang("Action"),"Radio|1|Action|" lang("Read a key") ";" lang("Read the entire section") ";" lang("Read the section names"),"Label|" lang("Section"),"Text|section|Section","Label|" lang("Key"),"Text|key|Key","Label|" lang("Behavior on error"),"Radio|1|WhenError|" lang("Insert default value in the variable") ";" lang("Throw exception"),"Label|" lang("Default value on failure"),"Text|ERROR|Default" ]
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Output Variable name")})
+	parametersToEdit.push({type: "Edit", id: "varname", default: "NewVariable", content: "VariableName", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: lang("Path of .ini file")})
+	parametersToEdit.push({type: "File", id: "file", label: lang("Select an .ini file")})
+	parametersToEdit.push({type: "Label", label: lang("Action")})
+	parametersToEdit.push({type: "Radio", id: "Action", default: 1, choices: [lang("Read a key"), lang("Read the entire section"), lang("Read the section names")]})
+	parametersToEdit.push({type: "Label", label: lang("Section")})
+	parametersToEdit.push({type: "Edit", id: "Section", default: "section", content: "String", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: lang("Key")})
+	parametersToEdit.push({type: "Edit", id: "Key", default: "key", content: "String", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: lang("Behavior on error")})
+	parametersToEdit.push({type: "Radio", id: "WhenError", default: 1, choices: [lang("Insert default value in the variable"), lang("Throw exception")]})
+	parametersToEdit.push({type: "Label", label: lang("Default value on failure")})
+	parametersToEdit.push({type: "Edit", id: "Default", default: "ERROR", content: "String"})
+
 	return parametersToEdit
 }
 

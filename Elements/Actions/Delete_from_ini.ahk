@@ -53,9 +53,16 @@ getCategoryActionDelete_from_ini()
 getParametersActionDelete_from_ini()
 {
 	global
-	
-	parametersToEdit:=["Label|" lang("Path of an .ini file"),"File||file|" lang("Select an .ini file") "|8|(*.ini)","Label|" lang("Action"),"Radio|1|Action|" lang("Delete a key") ";" lang("Delete a section"),"Label|" lang("Section"),"Text|section|Section","Label|" lang("Key"),"Text|key|Key" ]
-	
+		parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Path of an .ini file")})
+	parametersToEdit.push({type: "File", id: "file", label: lang("Select an .ini file")})
+	parametersToEdit.push({type: "Label", label: lang("Action")})
+	parametersToEdit.push({type: "Radio", id: "Action", default: 1, choices: [lang("Delete a key"), lang("Delete a section")]})
+	parametersToEdit.push({type: "Label", label: lang("Section")})
+	parametersToEdit.push({type: "Edit", id: "Section", default: "section", content: "String", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: lang("Key")})
+	parametersToEdit.push({type: "Edit", id: "Key", default: "key", content: "String", WarnIfEmpty: true})
+
 	return parametersToEdit
 }
 

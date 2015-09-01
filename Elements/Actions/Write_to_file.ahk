@@ -60,7 +60,18 @@ getParametersActionWrite_to_file()
 {
 	global
 	
-	parametersToEdit:=["Label|" lang("Text_to_write"),"MultiLineText||text","Label|" lang("File path"),"File||file|" lang("Select a file") "|8","Label|" lang("Encoding"),"Radio|2|Encoding|" "ANSI" ";" "Unicode UTF-8" ";" "Unicode UTF-16","Label|" lang("Append or overwrite"),"Radio|1|Overwrite|" lang("Append") ";" lang("Overwrite"),"Label|" lang("Linefeed"),"Radio|2|Linefeed|" lang("Only a linefeed") ";" lang("Carriage return and linefeed")]
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Text_to_write")})
+	parametersToEdit.push({type: "Edit", id: "text", multiline: true, content: "String", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: lang("File path")})
+	parametersToEdit.push({type: "File", id: "file", label: lang("Select a file"), options: 8})
+	parametersToEdit.push({type: "Label", label: lang("Encoding")})
+	parametersToEdit.push({type: "Radio", id: "Encoding", default: 2, choices: [ANSI, Unicode UTF-8, Unicode UTF-16]})
+	parametersToEdit.push({type: "Label", label: lang("Append or overwrite")})
+	parametersToEdit.push({type: "Radio", id: "Overwrite", default: 1, choices: [lang("Append"), lang("Overwrite")]})
+	parametersToEdit.push({type: "Label", label: lang("Linefeed")})
+	parametersToEdit.push({type: "Radio", id: "Linefeed", default: 2, choices: [lang("Only a linefeed"), lang("Carriage return and linefeed")]})
+
 	return parametersToEdit
 }
 

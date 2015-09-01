@@ -124,7 +124,21 @@ getCategoryActionDate_Calculation()
 getParametersActionDate_Calculation()
 {
 	global
-	parametersToEdit:=["Label|" lang("Output variable name"),"VariableName|CalculatedTime|Varname","Label|" lang("Input variable name"),"VariableName|InputTime|VarValue","Label|" lang("Operation"),"Radio|1|Operation|" lang("Add a period") ";" lang("Calculate time difference") ,"Label| " lang("How many units to add"),"Text|10|Units","Label| " lang("Second input variable Name"),"Text|a_now|VarValue2","Label| " lang("Which unit"),"Radio|2|Unit|" lang("Milliseconds") ";" lang("Seconds") ";" lang("Minutes") ";" lang("Hours") ";" lang("Days")]
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Output variable name")})
+	parametersToEdit.push({type: "Edit", id: "Varname", default: "CalculatedTime", content: "VariableName", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: lang("Input variable name")})
+	parametersToEdit.push({type: "Edit", id: "VarValue", default: "InputTime", content: "VariableName", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: lang("Operation")})
+	parametersToEdit.push({type: "Radio", id: "Operation", default: 1, choices: [lang("Add a period"), lang("Calculate time difference")]})
+	parametersToEdit.push({type: "Label", label:  lang("How many units to add")})
+	parametersToEdit.push({type: "Edit", id: "Units", default: 10, content: "Expression", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label:  lang("Second input variable Name")})
+	parametersToEdit.push({type: "Edit", id: "VarValue2", default: "a_now", content: "VariableName", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label:  lang("Which unit")})
+	parametersToEdit.push({type: "Radio", id: "Unit", default: 2, choices: [lang("Milliseconds"), lang("Seconds"), lang("Minutes"), lang("Hours"), lang("Days")]})
+
+
 	
 	return parametersToEdit
 }

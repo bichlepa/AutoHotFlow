@@ -72,7 +72,14 @@ getParametersActionRename_file()
 {
 	global
 	
-	parametersToEdit:=["Label|" lang("File"),"File||file|" lang("Select a file") "|","Label|" lang("New name"),"Text|" lang("Renamed") ".txt|newName","Label|" lang("Overwrite"),"Checkbox|0|Overwrite|" lang("Overwrite existing files")]
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("File")})
+	parametersToEdit.push({type: "File", id: "file", label: lang("Select a file")})
+	parametersToEdit.push({type: "Label", label: lang("New name")})
+	parametersToEdit.push({type: "Edit", id: "newName", default: lang("Renamed") ".txt", content: "String", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: lang("Overwrite")})
+	parametersToEdit.push({type: "Checkbox", id: "Overwrite", default: 0, label: lang("Overwrite existing files")})
+	
 	return parametersToEdit
 }
 

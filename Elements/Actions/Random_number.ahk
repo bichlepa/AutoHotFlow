@@ -59,8 +59,14 @@ getCategoryActionRandom_number()
 getParametersActionRandom_number()
 {
 	global
-	parametersToEdit:=["Label|" lang("Variable_name"),"VariableName|NewVariable|Varname","Label| " lang("Minimum value"),"Text|0|MinValue","Label| " lang("Maximum value"),"Text|100|MaxValue"]
-	
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Variable_name")})
+	parametersToEdit.push({type: "Edit", id: "Varname", default: "NewVariable", content: "VariableName", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label:  lang("Minimum value")})
+	parametersToEdit.push({type: "Edit", id: "MinValue", default: 0, content: "Expression", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label:  lang("Maximum value")})
+	parametersToEdit.push({type: "Edit", id: "MaxValue", default: 100, content: "Expression", WarnIfEmpty: true})
+
 	return parametersToEdit
 }
 

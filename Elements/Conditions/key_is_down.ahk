@@ -34,8 +34,10 @@ stopConditionKey_is_down(ID)
 getParametersConditionkey_is_down()
 {
 	
-	parametersToEdit:=["Label|" lang("Key name"),"text||key"]
-	
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Key name")})
+	parametersToEdit.push({type: "Edit", id: "key", content: "String", WarnIfEmpty: true})
+
 	return parametersToEdit
 }
 

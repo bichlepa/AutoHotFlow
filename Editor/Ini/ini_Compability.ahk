@@ -1,4 +1,4 @@
-﻿FlowCompabilityVersionOfApp:=4 ;This variable contains a number which will be incremented as soon an incompability appears. This will make it possible to identify old scripts and convert them. This value will be written in any saved flows.
+﻿FlowCompabilityVersionOfApp:=6 ;This variable contains a number which will be incremented as soon an incompability appears. This will make it possible to identify old scripts and convert them. This value will be written in any saved flows.
 
 i_CheckCompability(ElementID,IndexInIniFile,IniFilePath)
 {
@@ -100,6 +100,64 @@ i_CheckCompability(ElementID,IndexInIniFile,IniFilePath)
 				%ElementID%expression:=2
 				
 			}
+		}
+		
+	}
+	if FlowCompabilityVersion<5 ; 2015,08,28
+	{
+		logger("a2","Flow has elder format than version 5. Tryting to keep compability.")
+		if (%ElementID%type="action" and %ElementID%subtype="Play_Sound") 
+		{
+			Iniread,temp,%IniFilePath%,%IndexInIniFile%,WhitchSound%A_Space%
+			if temp
+			{
+				if temp<6
+				{
+					%ElementID%WhichSound:=1
+					
+					if temp=2
+						%ElementID%systemSound:="Windows Foreground.wav"
+					else
+						%ElementID%systemSound:="Windows Background.wav"
+				}
+				else if temp=6
+					%ElementID%WhichSound:=2
+				
+			}
+		}
+		
+	}
+	if FlowCompabilityVersion<6 ; 2015,09,01
+	{
+		logger("a2","Flow has elder format than version 6. Tryting to keep compability.")
+		if (%ElementID%type="action" and %ElementID%subtype="Input_Box") 
+		{
+			Iniread,temp,%IniFilePath%,%IndexInIniFile%,text,%A_Space%
+			%ElementID%message:=temp
+			%ElementID%IsTimeout:=0
+			%ElementID%OnlyNumbers:=0 
+			%ElementID%MaskUserInput:=0 
+			%ElementID%MultilineEdit:=0 
+			%ElementID%ShowCancelButton:=0 
+			%ElementID%IfDismiss:=2 ;Exception if dismiss
+			
+		}
+		if (%ElementID%type="condition" and %ElementID%subtype="Confirmation_Dialog") 
+		{
+			Iniread,temp,%IniFilePath%,%IndexInIniFile%,question,%A_Space%
+			%ElementID%message:=temp
+			%ElementID%IsTimeout:=0
+			%ElementID%ShowCancelButton:=0 
+			%ElementID%IfDismiss:=3 ;Exception if dismiss
+			
+		}
+		if (%ElementID%type="action" and %ElementID%subtype="Message_Box") 
+		{
+			Iniread,temp,%IniFilePath%,%IndexInIniFile%,text,%A_Space%
+			%ElementID%message:=temp
+			%ElementID%IsTimeout:=0
+			%ElementID%IfDismiss:=2 ;Exception if dismiss
+			
 		}
 		
 	}

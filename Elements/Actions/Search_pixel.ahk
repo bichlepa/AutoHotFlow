@@ -208,7 +208,27 @@ getParametersActionSearch_pixel()
 {
 	global
 	
-	parametersToEdit:=["Label|" lang("Output variables") " (x, y)","Text2|PixelPosX;PixelPosY|varnameX;varnameY","Label|" lang("Screen region"),"Radio|1|CoordMode|" lang("Relative to screen") ";" lang("Relative to active window position") ";" lang("Relative to active window client position"),"Checkbox|0|WholeScreen|" lang("Whole screen"),"Checkbox|0|AllScreens|" lang("All screens"),"SmallLabel|"  lang("Upper left corner")  " (x1, y1)", "Text2|10;20|x1;y1","SmallLabel|" lang("Lower right corner") " (x2, y2)","Text2|600;700|x2;y2","button|ActionSearch_pixelGetCoordinates|GetCoordinates|" lang("Get coordinates"),"Label|" lang("Pixel color") " (RGB)","Text|0xAA00FF|ColorID","button|ActionSearch_pixelChooseColor|SearchPixel|" lang("Choose color"),"button|ActionSearch_pixelGetColor|MouseTracker|" lang("Get color from screen"),	"Label|" lang("Variation"), "Slider|0|variation|Range0-255 TickInterval10 tooltip","Label|" lang("Method"),"Checkbox|1|FastMode|" lang("Fast method") ]
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Output variables") (x, y)})
+	parametersToEdit.push({type: "Edit", id: ["varnameX", "varnameY"], default: ["PixelPosX", "PixelPosY"], content: "VariableName", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: lang("Screen region")})
+	parametersToEdit.push({type: "Radio", id: "CoordMode", default: 1, choices: [lang("Relative to screen"), lang("Relative to active window position"), lang("Relative to active window client position")]})
+	parametersToEdit.push({type: "Checkbox", id: "WholeScreen", default: 0, label: lang("Whole screen")})
+	parametersToEdit.push({type: "Checkbox", id: "AllScreens", default: 0, label: lang("All screens")})
+	parametersToEdit.push({type: "Label", label: lang("Upper left corner") (x1, y1), size: "small"})
+	parametersToEdit.push({type: "Edit", id: ["x1", "y1"], default: [10, 20], content: "Expression", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: lang("Lower right corner") (x2, y2), size: "small"})
+	parametersToEdit.push({type: "Edit", id: ["x2", "y2"], default: [600, 700], content: "Expression", WarnIfEmpty: true})
+	parametersToEdit.push({type: "button", id: "GetCoordinates", goto: "ActionSearch_pixelGetCoordinates", label: lang("Get coordinates")})
+	parametersToEdit.push({type: "Label", label: lang("Pixel color") (RGB)})
+	parametersToEdit.push({type: "Edit", id: "ColorID", default: 0xAA00FF, content: "String", WarnIfEmpty: true})
+	parametersToEdit.push({type: "button", id: "SearchPixel", goto: "ActionSearch_pixelChooseColor", label: lang("Choose color")})
+	parametersToEdit.push({type: "button", id: "MouseTracker", goto: "ActionSearch_pixelGetColor", label: lang("Get color from screen")})
+	parametersToEdit.push({type: "Label", label: lang("Variation")})
+	parametersToEdit.push({type: "Slider", id: "variation", default: 0, options: "Range0-255 TickInterval10 tooltip"})
+	parametersToEdit.push({type: "Label", label: lang("Method")})
+	parametersToEdit.push({type: "Checkbox", id: "FastMode", default: 1, label: lang("Fast method")})
+
 	return parametersToEdit
 }
 
@@ -223,7 +243,7 @@ ActionSearch_pixelChooseColor()
 		
 	}
 	GuiControl,,GUISettingsOfElement%setElementID%ColorID,%tempActionSearch_pixelChooseColor%
-	ui_GUISettingsOfElementUpdateName()
+	GUISettingsOfElementUpdateName()
 }
 
 ActionSearch_pixelGetColor()

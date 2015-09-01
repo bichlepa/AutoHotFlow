@@ -48,8 +48,16 @@ getParametersActionSet_Volume()
 	global
 	
 	
-	parametersToEdit:=["Label|" lang("Action"),"Radio|1|Action|" lang("Set mute state") ";" lang("Set a specific volume") ";" lang("Increase or decrease volume"),"Label|" lang("Mute settings"),"Radio|1|Mute|" lang("Mute on") ";" lang("Mute off") ";" lang("Toggle") ,"Label|" lang("Absolute volume"),"Slider|80|volume|Range0-100 TickInterval10 tooltip","Label|" lang("Relative volume"),"Slider|10|volumeRelative|Range-100-100 TickInterval10 tooltip"]
-	
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Action")})
+	parametersToEdit.push({type: "Radio", id: "Action", default: 1, choices: [lang("Set mute state"), lang("Set a specific volume"), lang("Increase or decrease volume")]})
+	parametersToEdit.push({type: "Label", label: lang("Mute settings")})
+	parametersToEdit.push({type: "Radio", id: "Mute", default: 1, choices: [lang("Mute on"), lang("Mute off"), lang("Toggle")]})
+	parametersToEdit.push({type: "Label", label: lang("Absolute volume")})
+	parametersToEdit.push({type: "Slider", id: "volume", default: 80, options: "Range0-100 TickInterval10 tooltip"})
+	parametersToEdit.push({type: "Label", label: lang("Relative volume")})
+	parametersToEdit.push({type: "Slider", id: "volumeRelative", default: 10, options: "Range-100-100 TickInterval10 tooltip"})
+
 	return parametersToEdit
 }
 

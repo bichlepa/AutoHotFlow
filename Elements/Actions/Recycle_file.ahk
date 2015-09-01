@@ -32,7 +32,10 @@ getParametersActionRecycle_file()
 {
 	global
 	
-	parametersToEdit:=["Label|" lang("Select file"),"File||file|" lang("Select a file") "|"]
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Select file")})
+	parametersToEdit.push({type: "File", id: "file", label: lang("Select a file")})
+
 	return parametersToEdit
 }
 

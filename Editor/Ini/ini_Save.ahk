@@ -59,7 +59,7 @@ i_save()
 		saveElementID:=element
 		saveElementType:=%saveElementID%Type
 		
-		
+		;~ MsgBox %saveElementID%
 		IniWrite,%element%,%ThisFlowFolder%\%ThisFlowFilename%.ini,element%SaveIndex1%,ID
 		IniWrite,%saveElementType%,%ThisFlowFolder%\%ThisFlowFilename%.ini,element%SaveIndex1%,Type
 		
@@ -115,30 +115,8 @@ i_save()
 				IniWrite,%saveElementHeightOfVerticalBar%,%ThisFlowFolder%\%ThisFlowFilename%.ini,element%SaveIndex1%,HeightOfVerticalBar
 			}
 			
+			i_SaveParametersOfElement(saveElementID,saveElementType,saveElementsubType,SaveIndex1,"element")
 			
-			parametersToSave:=getParameters%saveElementType%%saveElementsubType%()
-			for tempSaveindex2, tempSaveParameter in parametersToSave
-			{
-				loop 10
-					tempSaveParameter%A_Index%=
-				StringSplit,tempSaveParameter,tempSaveParameter,|
-				;tempSaveParameter1: type of control
-				;tempSaveParameter2: default value
-				;tempSaveParameter3: parameter name
-				;tempSaveParameter4 ...: further options
-				
-				if (tempSaveParameter3="" or tempSaveParameter1="Label" or tempSaveParameter1="SmallLabel") ;If this is only a label for the edit fielt etc. Do nothing
-					continue
-				StringSplit,tempparname,tempSaveParameter3,; ;get the parameter names
-				Loop % tempparname0
-				{
-					temponeparname:=tempparname%A_Index%
-					SaveContent:=%saveElementID%%temponeparname%
-					StringReplace, SaveContent, SaveContent, `n,|¶, All
-					
-					IniWrite,%SaveContent%,%ThisFlowFolder%\%ThisFlowFilename%.ini,element%SaveIndex1%,%temponeparname%
-				}	
-			}
 			
 			
 		}
@@ -159,30 +137,8 @@ i_save()
 		IniWrite,%saveElementsubType%,%ThisFlowFolder%\%ThisFlowFilename%.ini,Trigger%SaveIndex1%,subType
 		StringReplace, saveElementname, saveElementname, `n,|¶, All ;Convert a linefeed to |¶. Otherwise the next lines will not be readable. 
 		IniWrite,%saveElementname%,%ThisFlowFolder%\%ThisFlowFilename%.ini,Trigger%SaveIndex1%,name
-		parametersToSave:=getParameters%saveElementType%%saveElementsubType%()
-		for tempSaveindex2, tempSaveParameter in parametersToSave
-		{
-			loop 10
-				tempSaveParameter%A_Index%=
-			StringSplit,tempSaveParameter,tempSaveParameter,|
-			;tempSaveParameter1: type of control
-			;tempSaveParameter2: default value
-			;tempSaveParameter3: parameter name
-			;tempSaveParameter4 ...: further options
-			if (tempSaveParameter3="" or tempSaveParameter1="Label" or tempSaveParameter1="SmallLabel") ;If this is only a label for the edit fielt etc. Do nothing
-				continue
-			StringSplit,tempparname,tempSaveParameter3,; ;get the parameter names
-			Loop % tempparname0
-			{
-				temponeparname:=tempparname%A_Index%
-				SaveContent:=%saveElementID%%temponeparname%
-				StringReplace, SaveContent, SaveContent, `n,|¶, All
-				
-				IniWrite,%SaveContent%,%ThisFlowFolder%\%ThisFlowFilename%.ini,Trigger%SaveIndex1%,%tempSaveParameter3%
-				IniWrite,%SaveContent%,%ThisFlowFolder%\%ThisFlowFilename%.ini,element%SaveIndex1%,%temponeparname%
-			}	
-			
-		}
+		
+		i_SaveParametersOfElement(saveElementID,saveElementType,saveElementsubType,SaveIndex1,"trigger")
 		
 		
 		
@@ -205,3 +161,52 @@ i_saveGeneralParameters()
 	IniWrite,%zoomFactor%,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,zoomFactor
 }
 
+i_SaveParametersOfElement(saveElementID,saveElementType,saveElementsubType,saveElementIndex,Savelocation)
+{
+	global
+	local parametersToSave
+	local index
+	local index2
+	local parameter
+	local parameterID
+	local parameterDefault
+	local SaveContent
+	local OneID
+	
+	parametersToSave:=getParameters%saveElementType%%saveElementsubType%()
+	for index, parameter in parametersToSave
+	{
+		if not IsObject(parameter.id)
+			parameterID:=[parameter.id]
+		else
+			parameterID:=parameter.id
+	
+		if (parameterID[1]="" or parameter.type="label" or parameter.type="SmallLabel") ;If this is only a label for the edit fielt etc. Do nothing
+			continue
+		;~ MsgBox % strobj(parameterID)
+		
+		;Certain types of control consist of multiple controls and thus contain multiple parameters.
+		for index2, oneID in parameterID
+		{
+			SaveContent:=%saveElementID%%oneID%
+			StringReplace, SaveContent, SaveContent, `n,|¶, All
+			if (Savelocation="clipboard")
+			{
+				IniWrite,%SaveContent%,%ClipboardFlowFilename%,Element%saveElementIndex%,%oneID%
+			}
+			else if (Savelocation="trigger")
+			{
+				IniWrite,%SaveContent%,%ThisFlowFolder%\%ThisFlowFilename%.ini,Trigger%saveElementIndex%,%oneID%
+			}
+			else if (Savelocation="element")
+			{
+				
+				IniWrite,%SaveContent%,%ThisFlowFolder%\%ThisFlowFilename%.ini,Element%saveElementIndex%,%oneID%
+			}
+			
+			
+		}
+		
+	
+	}
+}

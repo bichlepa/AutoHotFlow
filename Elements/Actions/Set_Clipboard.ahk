@@ -28,8 +28,11 @@ GetCategoryActionSet_Clipboard()
 GetParametersActionSet_Clipboard()
 {
 	global
-	parametersToEdit:=["Label|" lang("Text to set"),"Radio|1|expression|" lang("This is a string") ";" lang("This is a variable name or expression")y,"Text||text"]
-	
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Text to set")})
+	parametersToEdit.push({type: "Radio", id: "expression", default: 1, choices: [lang("This is a string"), lang("This is a variable name or expression")]})
+	parametersToEdit.push({type: "Edit", id: "text", default: "New element", content: "StringOrExpression", contentParID: "expression", WarnIfEmpty: true})
+
 	return parametersToEdit
 }
 

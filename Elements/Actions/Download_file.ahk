@@ -53,7 +53,13 @@ getParametersActionDownload_file()
 {
 	global
 	
-	parametersToEdit:=["Label|" lang("URL"),"Radio|1|IsExpression|" lang("This is a Link. It does not contain variables") ";" lang("This is a Link. It contains variables enclosed in percentage signs") ";" lang("This is a variable name or expression"),"Text|http://www.example.com|URL","Label|" lang("File path"),"File||file|" lang("Select file") "|" ]
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("URL")})
+	parametersToEdit.push({type: "Radio", id: "IsExpression", default: 1, choices: [lang("This is a Link. It does not contain variables"), lang("This is a Link. It contains variables enclosed in percentage signs"), lang("This is a variable name or expression")]})
+	parametersToEdit.push({type: "Edit", id: "URL", default: "http://www.example.com", content: "String", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: lang("File path")})
+	parametersToEdit.push({type: "File", id: "file", label: lang("Select file")})
+
 	return parametersToEdit
 }
 

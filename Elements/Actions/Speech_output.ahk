@@ -81,8 +81,22 @@ getCategoryActionSpeech_output()
 getParametersActionSpeech_output()
 {
 	global
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Text_to_speak")})
+	parametersToEdit.push({type: "Edit", id: "text", default: lang("Message"), multiline: true, content: "String"})
+	parametersToEdit.push({type: "Label", label: lang("Wait options")})
+	parametersToEdit.push({type: "Checkbox", id: "WaitUntilPreviousFinished", default: 0, label: lang("Wait until previous speech output has finished (if any)")})
+	parametersToEdit.push({type: "Checkbox", id: "WaitUntilCurrentFinishes", default: 1, label: lang("Wait until current speech output finishes")})
+	parametersToEdit.push({type: "Label", label: lang("Speech engine")})
+	parametersToEdit.push({type: "DropDown", id: "TTSEngine", default: TTSDefaultLanguage, choices: TTSList, result: "name"})
+	parametersToEdit.push({type: "Label", label: lang("Volume")})
+	parametersToEdit.push({type: "Slider", id: "volume", default: 100, options: "Range0-100 TickInterval10 tooltip"})
+	parametersToEdit.push({type: "Label", label: lang("Speed")})
+	parametersToEdit.push({type: "Slider", id: "speed", default: 0, options: "Range-10-10 TickInterval1 tooltip"})
+	parametersToEdit.push({type: "Label", label: lang("Pitch")})
+	parametersToEdit.push({type: "Slider", id: "pitch", default: 0, options: "Range-10-10 TickInterval1 tooltip"})
+
 	
-	parametersToEdit:=["Label|" lang("Text_to_speak"),"MultiLineText|" lang("Message") "|text","Label|" lang("Wait options"),"Checkbox|0|WaitUntilPreviousFinished|" lang("Wait until previous speech output has finished (if any)"),"Checkbox|1|WaitUntilCurrentFinishes|" lang("Wait until current speech output finishes"),"Label|" lang("Speech engine"), "DropDownListByName|" TTSDefaultLanguage "|TTSEngine|" TTSList,"Label|" lang("Volume"), "Slider|100|volume|Range0-100 TickInterval10 tooltip","Label|" lang("Speed"), "Slider|0|speed|Range-10-10 TickInterval1 tooltip","Label|" lang("Pitch"), "Slider|0|pitch|Range-10-10 TickInterval1 tooltip"]
 	
 	return parametersToEdit
 }
@@ -96,7 +110,7 @@ GenerateNameActionSpeech_output(ID)
 }
 
  ;Search for available Engines
-TTSList=
+TTSList:=object()
 
 TTSDefaultLanguage=
 loop,HKEY_LOCAL_MACHINE,SOFTWARE\Microsoft\Speech\Voices\Tokens,1,1 ;Liest die Registry aus um die verfügbaren Stimmen herauszufinden
@@ -122,10 +136,10 @@ loop,HKEY_LOCAL_MACHINE,SOFTWARE\Microsoft\Speech\Voices\Tokens,1,1 ;Liest die R
 				TTSDefaultLanguage:=Reginhalt
 				
 		}
-		TTSList=%TTSList%%Reginhalt%;
+		TTSList.push(Reginhalt)
 		
 	}
 }
-StringTrimRight,TTSList,TTSList,1
+
 ;MsgBox % TTSList " Default: " TTSDefaultLanguage
 ActionSpeech_output_alreadyGotSpeechEngines:=true

@@ -65,7 +65,16 @@ getParametersActionRead_from_file()
 {
 	global
 	
-	parametersToEdit:=["Label|" lang("Output variable name"),"VariableName|FileText|varname","Label|" lang("File path"),"File||file|" lang("Select a file") "|8","Label|" lang("Encoding"),"Radio|2|Encoding|" "ANSI" ";" "Unicode UTF-8" ";" "Unicode UTF-16","Label|" lang("Linefeed"),"Checkbox|1|Linefeed|" lang("Replace Carriage return and linefeed with single linefeeds") ]
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Output variable name")})
+	parametersToEdit.push({type: "Edit", id: "varname", default: "FileText", content: "VariableName", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: lang("File path")})
+	parametersToEdit.push({type: "File", id: "file", label: lang("Select a file"), options: 8})
+	parametersToEdit.push({type: "Label", label: lang("Encoding")})
+	parametersToEdit.push({type: "Radio", id: "Encoding", default: 2, choices: [ANSI, Unicode UTF-8, Unicode UTF-16]})
+	parametersToEdit.push({type: "Label", label: lang("Linefeed")})
+	parametersToEdit.push({type: "Checkbox", id: "Linefeed", default: 1, label: lang("Replace Carriage return and linefeed with single linefeeds")})
+
 	return parametersToEdit
 }
 

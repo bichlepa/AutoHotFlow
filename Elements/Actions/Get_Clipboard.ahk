@@ -37,9 +37,10 @@ getCategoryActionGet_Clipboard()
 getParametersActionGet_Clipboard()
 {
 	global
-	parametersToEdit:=["Label|" lang("Variable_name"),"Text||Varname"]
-	;~ parametersToEdit:=["Label|" lang("Variable_name"),"Text||Varname","Label|" lang("Options"),"Radio|1|All|" lang("Only Text") ";" lang("Everything (e.g. picture)")] ;Binary data disabled
-	
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Variable_name")})
+	parametersToEdit.push({type: "Edit", id: "Varname", default: "Clipboard", content: "VariableName", WarnIfEmpty: true})
+
 	return parametersToEdit
 }
 

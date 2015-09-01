@@ -55,7 +55,14 @@ getParametersActionMove_file()
 {
 	global
 	
-	parametersToEdit:=["Label|" lang("Source file"),"File||file|" lang("Select a file") "|","Label|" lang("Destination file or folder"),"Folder||destFile|" lang("Select a file or folder") "|","Label|" lang("Overwrite"),"Checkbox|0|Overwrite|" lang("Overwrite existing files")]
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Source file")})
+	parametersToEdit.push({type: "File", id: "file", label: lang("Select a file")})
+	parametersToEdit.push({type: "Label", label: lang("Destination file or folder")})
+	parametersToEdit.push({type: "Folder", id: "destFile", label: lang("Select a file or folder")})
+	parametersToEdit.push({type: "Label", label: lang("Overwrite")})
+	parametersToEdit.push({type: "Checkbox", id: "Overwrite", default: 0, label: lang("Overwrite existing files")})
+	
 	return parametersToEdit
 }
 

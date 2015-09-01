@@ -29,8 +29,10 @@ stopConditionFile_exists(ID)
 getParametersConditionFile_exists()
 {
 	
-	parametersToEdit:=["Label|" lang("File pattern"),"File||file|" lang("Select a file") "|"]
-	
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("File pattern")})
+	parametersToEdit.push({type: "File", id: "file", label: lang("Select a file")})
+
 	return parametersToEdit
 }
 

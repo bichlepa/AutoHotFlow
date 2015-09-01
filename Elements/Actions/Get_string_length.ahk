@@ -44,8 +44,13 @@ getCategoryActionGet_string_length()
 getParametersActionGet_string_length()
 {
 	global
-	parametersToEdit:=["Label|" lang("Output variable name"),"VariableName|NewLength|Varname","Label| " lang("Input string"),"Radio|1|expression|" lang("This is a string") ";" lang("This is a variable name or expression") ,"Text|Hello World|VarValue"]
-	
+		parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Output variable name")})
+	parametersToEdit.push({type: "Edit", id: "Varname", default: "NewLength", content: "VariableName", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label:  lang("Input string")})
+	parametersToEdit.push({type: "Radio", id: "expression", default: 1, choices: [lang("This is a string"), lang("This is a variable name or expression")]})
+	parametersToEdit.push({type: "Edit", id: "VarValue", default: "Hello World", default: "section", content: "String", WarnIfEmpty: true})
+
 	return parametersToEdit
 }
 

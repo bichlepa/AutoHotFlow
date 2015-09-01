@@ -22,7 +22,8 @@ getParametersActionReboot_Computer()
 {
 	global
 	
-	parametersToEdit=
+	parametersToEdit:=Object()
+
 	return parametersToEdit
 }
 

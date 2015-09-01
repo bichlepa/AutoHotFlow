@@ -31,7 +31,10 @@ getParametersActionCreate_folder()
 {
 	global
 	
-	parametersToEdit:=["Label|" lang("Folder path"),"Folder||folder|" lang("Select a folder") "|3"]
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Folder path")})
+	parametersToEdit.push({type: "Folder", id: "folder", label: lang("Select a folder")})
+
 	return parametersToEdit
 }
 

@@ -280,7 +280,38 @@ getParametersActionSearch_image()
 {
 	global
 	
-	parametersToEdit:=["Label|" lang("Output variables") " (x, y)","Text2|ImagePosX;ImagePosY|varnameX;varnameY","Label|" lang("Screen region"),"Radio|1|CoordMode|" lang("Relative to screen") ";" lang("Relative to active window position") ";" lang("Relative to active window client position"),"Checkbox|0|WholeScreen|" lang("Whole screen"),"Checkbox|0|AllScreens|" lang("All screens"),"SmallLabel|"  lang("Upper left corner")  " (x1, y1)", "Text2|10;20|x1;y1","SmallLabel|" lang("Lower right corner") " (x2, y2)","Text2|600;700|x2;y2","button|ActionSearch_imageGetCoordinates|GetCoordinates|" lang("Get coordinates"),"Label|" lang("Image file path"),"File||file|" lang("Select a file") "|8|" lang("Images and icons") " (*.gif; *.jpg; *.bmp; *.ico; *.cur; *.ani; *.png; *.tif; *.exif; *.wmf; *.emf; *.exe; *.dll; *.cpl; *.scr)","Label|"  lang("File with multiple icons") ,"Checkbox|0|SetIconNumber|" lang("Set icon number"),"Text|1|IconNumber","Label|" lang("Variation"), "Slider|0|variation|Range0-255 TickInterval10 tooltip","Label|" lang("Transparent color") ,"Checkbox|0|makeTransparent|" lang("Make a color of image transparent"), "SmallLabel|"  lang("Color name or RGB value"),"Text||transparent","button|ActionSearch_imageChooseColor|ChooseColor|" lang("Choose color"),"button|ActionSearch_imageGetColor|GetColor|" lang("Get color from screen"), "Label|" lang("Scale image") ,"Checkbox|0|ScaleImage|" lang("Scale image"), "Checkbox|0|PreserveAspectRatio|" lang("Preserve aspect ratio"), "Radio|1|WhichSizeSet|" lang("Set width manually and set height automatically") ";" lang("Set height manually and set width automatically") , "SmallLabel|" lang("width, height"),"Text2|;|ImageWidth;ImageHeight" ]
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Output variables") (x, y)})
+	parametersToEdit.push({type: "Edit", id: ["varnameX", "varnameY"], default: ["ImagePosX", "ImagePosY"], content: "VariableName", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: lang("Screen region")})
+	parametersToEdit.push({type: "Radio", id: "CoordMode", default: 1, choices: [lang("Relative to screen"), lang("Relative to active window position"), lang("Relative to active window client position")]})
+	parametersToEdit.push({type: "Checkbox", id: "WholeScreen", default: 0, label: lang("Whole screen")})
+	parametersToEdit.push({type: "Checkbox", id: "AllScreens", default: 0, label: lang("All screens")})
+	parametersToEdit.push({type: "Label", label: lang("Upper left corner") (x1, y1), size: "small"})
+	parametersToEdit.push({type: "Edit", id: ["x1", "y1"], default: [10, 20], content: "Expression", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: lang("Lower right corner") (x2, y2), size: "small"})
+	parametersToEdit.push({type: "Edit", id: ["x2", "y2"], default: [600, 700], content: "Expression", WarnIfEmpty: true})
+	parametersToEdit.push({type: "button", id: "GetCoordinates", goto: "ActionSearch_imageGetCoordinates", label: lang("Get coordinates")})
+	parametersToEdit.push({type: "Label", label: lang("Image file path")})
+	parametersToEdit.push({type: "File", id: "file", label: lang("Select a file"), options: 8, filter: lang("Images and icons") " (*.gif; *.jpg; *.bmp; *.ico; *.cur; *.ani; *.png; *.tif; *.exif; *.wmf; *.emf; *.exe; *.dll; *.cpl; *.scr)"})
+	parametersToEdit.push({type: "Label", label: lang("File with multiple icons")})
+	parametersToEdit.push({type: "Checkbox", id: "SetIconNumber", default: 0, label: lang("Set icon number")})
+	parametersToEdit.push({type: "Edit", id: "IconNumber", default: 1, content: "Expression", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: lang("Variation")})
+	parametersToEdit.push({type: "Slider", id: "variation", default: 0, options: "Range0-255 TickInterval10 tooltip"})
+	parametersToEdit.push({type: "Label", label: lang("Transparent color")})
+	parametersToEdit.push({type: "Checkbox", id: "makeTransparent", default: 0, label: lang("Make a color of image transparent")})
+	parametersToEdit.push({type: "Label", label: lang("Color name or RGB value"), size: "small"})
+	parametersToEdit.push({type: "Edit", id: "transparent", content: "String", WarnIfEmpty: true})
+	parametersToEdit.push({type: "button", id: "ChooseColor", goto: "ActionSearch_imageChooseColor", label: lang("Choose color")})
+	parametersToEdit.push({type: "button", id: "GetColor", goto: "ActionSearch_imageGetColor", label: lang("Get color from screen")})
+	parametersToEdit.push({type: "Label", label: lang("Scale image")})
+	parametersToEdit.push({type: "Checkbox", id: "ScaleImage", default: 0, label: lang("Scale image")})
+	parametersToEdit.push({type: "Checkbox", id: "PreserveAspectRatio", default: 0, label: lang("Preserve aspect ratio")})
+	parametersToEdit.push({type: "Radio", id: "WhichSizeSet", default: 1, choices: [lang("Set width manually and set height automatically"), lang("Set height manually and set width automatically")]})
+	parametersToEdit.push({type: "Label", label: lang("width, height"), size: "small"})
+	parametersToEdit.push({type: "Edit", id: ["ImageWidth", "ImageHeight"], content: "Expression", WarnIfEmpty: true})
+
 	return parametersToEdit
 }
 
@@ -292,7 +323,7 @@ ActionSearch_imageChooseColor()
 	if tempActionSearch_imageChooseColor!=
 	{
 		GuiControl,,GUISettingsOfElement%setElementID%transparent,%tempActionSearch_imageChooseColor%
-		ui_GUISettingsOfElementUpdateName()
+		GUISettingsOfElementUpdateName()
 	}
 }
 

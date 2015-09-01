@@ -44,8 +44,11 @@ DisableTriggerClipboard_Changes(ID)
 getParametersTriggerClipboard_Changes()
 {
 	
-	parametersToEdit:=["Label|" lang("Options"),"Checkbox|1|OnlyText|" lang("Trigger only if the clipboard contains some text."),"Checkbox|0|WhenEmpty|" lang("Trigger if clipboard is empty.")]
-	
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Options")})
+	parametersToEdit.push({type: "Checkbox", id: "OnlyText", default: 1, label: lang("Trigger only if the clipboard contains some text.")})
+	parametersToEdit.push({type: "Checkbox", id: "WhenEmpty", default: 0, label: lang("Trigger if clipboard is empty.")})
+
 	
 	return parametersToEdit
 }

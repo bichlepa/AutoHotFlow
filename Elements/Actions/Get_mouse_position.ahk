@@ -46,14 +46,18 @@ getNameActionGet_mouse_position()
 }
 getCategoryActionGet_mouse_position()
 {
-	return lang("User_simulation")
+	return lang("User_simulation") "|" lang("User_interaction")
 }
 
 getParametersActionGet_mouse_position()
 {
 	global
-	parametersToEdit:=["Label|" lang("Output variables") " (" lang("Position: x,y") ")","Text2|;|varnameX;varnameY","Label|" lang("Mouse position"),"Radio|1|CoordMode|" lang("Relative to screen") ";" lang("Relative to active window position") ";" lang("Relative to active window client position")]
-	
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Output variables") (lang("Position: x,y"))})
+	parametersToEdit.push({type: "Edit", id: ["varnameX", "varnameY"], content: "VariableName", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: lang("Mouse position"), size: "small"})
+	parametersToEdit.push({type: "Radio", id: "CoordMode", default: 1, choices: [lang("Relative to screen"), lang("Relative to active window position"), lang("Relative to active window client position")]})
+
 	return parametersToEdit
 }
 

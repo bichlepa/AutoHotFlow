@@ -6,13 +6,14 @@ runActionSleep(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	if (!IsObject(ActionSleepCurrentSleeps))
 		ActionSleepCurrentSleeps:=Object()
 	
+	local tempDuration:=v_evaluateExpression(InstanceID,ThreadID,%ElementID%duration)
 	
 	if %ElementID%Unit=1 ;Milliseconds
-		tempActionSleepDuration:=%ElementID%duration
+		tempActionSleepDuration:=tempDuration
 	else if %ElementID%Unit=2 ;Seconds
-		tempActionSleepDuration:=%ElementID%duration * 1000
+		tempActionSleepDuration:=tempDuration * 1000
 	else if %ElementID%Unit=3 ;minutes
-		tempActionSleepDuration:=%ElementID%duration * 60000
+		tempActionSleepDuration:=tempDuration * 60000
 	
 	ActionSleepCurrentSleeps.insert("Instance_" InstanceID "_" ThreadID "_" ElementID "_" ElementIDInInstance,(A_TickCount + tempActionSleepDuration-10)) ;Save the end time.
 	SetTimer,ActionSleepEnd,10
@@ -58,8 +59,11 @@ getCategoryActionSleep()
 getParametersActionSleep()
 {
 	global
-	parametersToEdit:=["Label| " lang("Duration"),"Number|2|Duration","Radio|2|Unit|" lang("Milliseconds") ";" lang("Seconds") ";" lang("Minutes")]
-	
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label:  lang("Duration")})
+	parametersToEdit.push({type: "edit", id: "Duration", default: 2, content: "Expression", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Radio", id: "Unit", default: 2, choices: [lang("Milliseconds"), lang("Seconds"), lang("Minutes")]})
+
 	return parametersToEdit
 }
 

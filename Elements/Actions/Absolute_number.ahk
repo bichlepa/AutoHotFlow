@@ -37,9 +37,12 @@ getCategoryActionAbsolute_number()
 
 getParametersActionAbsolute_number()
 {
-	global
-	parametersToEdit:=["Label|" lang("Output_Variable_name"),"VariableName|NewVariable|Varname","Label| " lang("Input number"),"Text|-2|VarValue"]
-	
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Output_Variable_name")})
+	parametersToEdit.push({type: "edit", id: "Varname", default: "NewVariable", content: "VariableName", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label:  lang("Input number")})
+	parametersToEdit.push({type: "edit", id: "VarValue", default: -2, content: "Expression", WarnIfEmpty: true})
+
 	return parametersToEdit
 }
 

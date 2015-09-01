@@ -55,7 +55,12 @@ getParametersActionSet_process_priority()
 {
 	global
 	
-	parametersToEdit:=["Label|" lang("Process name or ID"),"Text||ProcessName","Label| " lang("Priority"),"Radio|3|Priority|" lang("Low") ";" lang("Below normal") ";" lang("Normal") ";" lang("Above normal") ";" lang("High") ";" lang("Realtime")]
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Process name or ID")})
+	parametersToEdit.push({type: "Edit", id: "ProcessName", content: "String", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label:  lang("Priority")})
+	parametersToEdit.push({type: "Radio", id: "Priority", default: 3, choices: [lang("Low"), lang("Below normal"), lang("Normal"), lang("Above normal"), lang("High"), lang("Realtime")]})
+
 	return parametersToEdit
 }
 

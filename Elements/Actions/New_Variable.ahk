@@ -39,8 +39,13 @@ getCategoryActionNew_variable()
 getParametersActionNew_variable()
 {
 	global
-	parametersToEdit:=["Label|" lang("Variable_name"),"VariableName|NewVariable|Varname","Label| " lang("Value"),"Radio|1|expression|" lang("This is a value") ";" lang("This is a variable name or expression"),"Text||VarValue"]
-	
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Variable_name")})
+	parametersToEdit.push({type: "Edit", id: "Varname", default: "NewVariable", content: "VariableName", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label:  lang("Value")})
+	parametersToEdit.push({type: "Radio", id: "expression", default: 1, choices: [lang("This is a value"), lang("This is a variable name or expression")]})
+	parametersToEdit.push({type: "Edit", id: "VarValue", default: "New element", content: "StringOrExpression", contentParID: "expression", WarnIfEmpty: true})
+
 	return parametersToEdit
 }
 

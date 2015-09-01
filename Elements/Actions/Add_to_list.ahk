@@ -127,7 +127,23 @@ getCategoryActionAdd_to_list()
 getParametersActionAdd_to_list()
 {
 	global
-	parametersToEdit:=["Label|" lang("List variable name"),"VariableName|List|Varname","Label|" lang("Number of elements"),"Radio|1|NumberOfElements|" lang("Add one element") ";" lang("Add multiple elements"),"Label|" lang("Content to add"),"Radio|1|isExpression|" lang("This is a value") ";" lang("This is a variable name or expression"),"Text|New element|VarValue","MultiLineText|Added Element 1`nAdded Element 2|VarValues","Checkbox|1|DelimiterLinefeed|" lang("Use linefeed as delimiter") ,"Checkbox|0|DelimiterComma|" lang("Use comma as delimiter") ,"Checkbox|0|DelimiterSemicolon|" lang("Use semicolon as delimiter") ,"Checkbox|0|DelimiterSpace|" lang("Use space as delimiter"),"Label|" lang("Where to insert"),"Radio|2|WhitchPosition|" lang("First position") ";" lang("Last position")";" lang("Following position or key"),"text|2|Position"]
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("List variable name")})
+	parametersToEdit.push({type: "Edit", id: "Varname", default: "List", content: "VariableName", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: lang("Number of elements")})
+	parametersToEdit.push({type: "Radio", id: "NumberOfElements", default: 1, choices: [lang("Add one element"), lang("Add multiple elements")]})
+	parametersToEdit.push({type: "Label", label: lang("Content to add")})
+	parametersToEdit.push({type: "Radio", id: "isExpression", default: 1, choices: [lang("This is a value"), lang("This is a variable name or expression")]})
+	parametersToEdit.push({type: "Edit", id: "VarValue", default: "New element", content: "StringOrExpression", contentParID: "isExpression", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Edit", id: "VarValues", default: "Added Element 1`nAdded Element 2", multiline: true, content: "String", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Checkbox", id: "DelimiterLinefeed", default: 1, label: lang("Use linefeed as delimiter")})
+	parametersToEdit.push({type: "Checkbox", id: "DelimiterComma", default: 0, label: lang("Use comma as delimiter")})
+	parametersToEdit.push({type: "Checkbox", id: "DelimiterSemicolon", default: 0, label: lang("Use semicolon as delimiter")})
+	parametersToEdit.push({type: "Checkbox", id: "DelimiterSpace", default: 0, label: lang("Use space as delimiter")})
+	parametersToEdit.push({type: "Label", label: lang("Where to insert")})
+	parametersToEdit.push({type: "Radio", id: "WhitchPosition", default: 2, choices: [lang("First position"), lang("Last position"), lang("Following position or key")]})
+	parametersToEdit.push({type: "edit", id: "Position", default: 2, content: "Expression", WarnIfEmpty: true})
+
 	
 	return parametersToEdit
 }

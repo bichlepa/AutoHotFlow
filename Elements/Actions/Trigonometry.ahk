@@ -73,8 +73,16 @@ getCategoryActionTrigonometry()
 getParametersActionTrigonometry()
 {
 	global
-	parametersToEdit:=["Label|" lang("Output Variable_name"),"VariableName|NewVariable|Varname","Label| " lang("Input number"),"Text|0.5|VarValue", "Label| " lang("Operation"),"Radio|2|Operation|" lang("Sine") ";" lang("Cosine")";" lang("Tangent")";" lang("Arcsine")";" lang("Arccosine")";" lang("Arctangent"),"Label| " lang("Unit"),"Radio|1|Unit|" lang("Radian") ";" lang("Degree")]
-	
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Output Variable_name")})
+	parametersToEdit.push({type: "Edit", id: "Varname", default: "NewVariable", content: "VariableName", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label:  lang("Input number")})
+	parametersToEdit.push({type: "Edit", id: "VarValue", default: 0.5, content: "Expression", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label:  lang("Operation")})
+	parametersToEdit.push({type: "Radio", id: "Operation", default: 2, choices: [lang("Sine"), lang("Cosine"), lang("Tangent"), lang("Arcsine"), lang("Arccosine"), lang("Arctangent")]})
+	parametersToEdit.push({type: "Label", label:  lang("Unit")})
+	parametersToEdit.push({type: "Radio", id: "Unit", default: 1, choices: [lang("Radian"), lang("Degree")]})
+
 	return parametersToEdit
 }
 

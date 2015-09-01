@@ -106,8 +106,23 @@ getCategoryActionSearch_in_a_string()
 getParametersActionSearch_in_a_string()
 {
 	global
-	parametersToEdit:=["Label|" lang("Output variable"),"VariableName|NewPosition|Varname","Label| " lang("Input string"),"Radio|1|expression|" lang("This is a string") ";" lang("This is a variable name or expression") ,"Text|Hello World|VarValue","Label| " lang("Text to search"),"Radio|1|IsExpressionSearchText|" lang("This is a string") ";" lang("This is a variable name or expression") ,"Text|World|SearchText","Label|" lang("Which occurence"),"Text|1|OccurenceNumber","Radio|1|LeftOrRight|" lang("From left") ";" lang("From right"),"Label|" lang("Start position"),"Text|1|Offset","Label|" lang("Case sensitivity"),"Radio|1|CaseSensitive|" lang("Case insensitive") ";" lang("Case sensitive")]
-	
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Output variable")})
+	parametersToEdit.push({type: "Edit", id: "Varname", default: "NewPosition", content: "VariableName", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label:  lang("Input string")})
+	parametersToEdit.push({type: "Radio", id: "expression", default: 1, choices: [lang("This is a string"), lang("This is a variable name or expression")]})
+	parametersToEdit.push({type: "Edit", id: "VarValue", default: "Hello World", content: "String", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label:  lang("Text to search")})
+	parametersToEdit.push({type: "Radio", id: "IsExpressionSearchText", default: 1, choices: [lang("This is a string"), lang("This is a variable name or expression")]})
+	parametersToEdit.push({type: "Edit", id: "SearchText", default: "World", content: "String", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: lang("Which occurence")})
+	parametersToEdit.push({type: "Edit", id: "OccurenceNumber", default: 1, content: "Expression", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Radio", id: "LeftOrRight", default: 1, choices: [lang("From left"), lang("From right")]})
+	parametersToEdit.push({type: "Label", label: lang("Start position")})
+	parametersToEdit.push({type: "Edit", id: "Offset", default: 1, content: "Expression", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: lang("Case sensitivity")})
+	parametersToEdit.push({type: "Radio", id: "CaseSensitive", default: 1, choices: [lang("Case insensitive"), lang("Case sensitive")]})
+
 	return parametersToEdit
 }
 

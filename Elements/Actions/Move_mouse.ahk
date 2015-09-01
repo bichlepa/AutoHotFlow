@@ -55,8 +55,17 @@ getCategoryActionMove_mouse()
 getParametersActionMove_mouse()
 {
 	global
-	parametersToEdit:=["Label|" lang("Mouse position"),"Radio|1|CoordMode|" lang("Relative to screen") ";" lang("Relative to active window position") ";" lang("Relative to active window client position")  ";" lang("Relative to current mouse position"),"SmallLabel|" lang("Coordinates") " " lang("(x,y)"),"Text2|10;20|Xpos;Ypos","button|ActionMove_MouseMouseTracker|MouseTracker|" lang("Get coordinates"),"Label|" lang("Method"),"Radio|1|SendMode|" lang("Input mode") ";" lang("Event mode") ";" lang("Play mode"),"Label|" lang("Speed"),"Slider|2|speed|Range0-100 tooltip"]
-	
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Mouse position")})
+	parametersToEdit.push({type: "Radio", id: "CoordMode", default: 1, choices: [lang("Relative to screen"), lang("Relative to active window position"), lang("Relative to active window client position"), lang("Relative to current mouse position")]})
+	parametersToEdit.push({type: "Label", label: lang("Coordinates") lang("(x,y)"), size: "small"})
+	parametersToEdit.push({type: "Edit", id: ["Xpos", "Ypos"], default: [10, 20], content: "Expression", WarnIfEmpty: true})
+	parametersToEdit.push({type: "button", id: "MouseTracker", goto: "ActionMove_MouseMouseTracker", label: lang("Get coordinates")})
+	parametersToEdit.push({type: "Label", label: lang("Method")})
+	parametersToEdit.push({type: "Radio", id: "SendMode", default: 1, choices: [lang("Input mode"), lang("Event mode"), lang("Play mode")]})
+	parametersToEdit.push({type: "Label", label: lang("Speed")})
+	parametersToEdit.push({type: "Slider", id: "speed", default: 2, options: "Range0-100 tooltip"})
+
 	return parametersToEdit
 }
 

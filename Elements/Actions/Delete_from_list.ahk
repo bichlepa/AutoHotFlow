@@ -91,8 +91,13 @@ getCategoryActionDelete_from_list()
 getParametersActionDelete_from_list()
 {
 	global
-	parametersToEdit:=["Label|" lang("Variable_name"),"VariableName|NewList|Varname","Label|" lang("Which element"),"Radio|2|WhitchPosition|" lang("First element") ";" lang("Last element")";" lang("Following element or key"),"text|2|Position"]
-	
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Variable_name")})
+	parametersToEdit.push({type: "Edit", id: "Varname", default: "NewList", content: "VariableName", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: lang("Which element")})
+	parametersToEdit.push({type: "Radio", id: "WhitchPosition", default: 2, choices: [lang("First element"), lang("Last element"), lang("Following element or key")]})
+	parametersToEdit.push({type: "Edit", id: "Position", default: 2, content: "Expression", WarnIfEmpty: true})
+
 	return parametersToEdit
 }
 

@@ -86,9 +86,13 @@ DisableTriggerUser_Idle_Time(ID)
 
 getParametersTriggerUser_Idle_Time()
 {
-	
-	parametersToEdit:=["Label|" lang("Period of time"),"Text|10|Intervall_S","Radio|2|Unit|"  lang("Seconds") ";" lang("Minutes") ";" lang("Hours"),"Label|" lang("Method"),"Radio|1|Method|"   lang("Method %1%",1) ";" lang("Method %1%",2) ]
-	
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Period of time")})
+	parametersToEdit.push({type: "edit", id: "Intervall_S", default: 10, content: "Expression", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Radio", id: "Unit", default: 2, choices: [lang("Seconds"), lang("Minutes"), lang("Hours")]})
+	parametersToEdit.push({type: "Label", label: lang("Method")})
+	parametersToEdit.push({type: "Radio", id: "Method", default: 1, choices: [lang("Method %1%", 1), lang("Method %1%", 2)]})
+
 	
 	return parametersToEdit
 }

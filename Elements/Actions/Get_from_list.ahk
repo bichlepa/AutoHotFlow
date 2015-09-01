@@ -107,7 +107,15 @@ getCategoryActionGet_from_list()
 getParametersActionGet_from_list()
 {
 	global
-	parametersToEdit:=["Label|" lang("Output variable name"),"VariableName|NewVariable|Varname","Label|" lang("Input list"),"VariableName|List|ListName","Label|" lang("Key or position"),"Radio|1|WhitchPosition|" lang("First position") ";" lang("Last position")";" lang("Random position") ";" lang("Following position or key"),"text|2|Position"]
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Output variable name")})
+	parametersToEdit.push({type: "Edit", id: "Varname", default: "NewVariable", content: "VariableName", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: lang("Input list")})
+	parametersToEdit.push({type: "Edit", id: "ListName", default: "List", content: "VariableName", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: lang("Key or position")})
+	parametersToEdit.push({type: "Radio", id: "WhitchPosition", default: 1, choices: [lang("First position"), lang("Last position"), lang("Random position"), lang("Following position or key")]})
+	parametersToEdit.push({type: "Edit", id: "Position", default: 2, content: "Expression", WarnIfEmpty: true})
+
 	
 	return parametersToEdit
 }

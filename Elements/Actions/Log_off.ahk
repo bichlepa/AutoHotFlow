@@ -22,7 +22,8 @@ getParametersActionLog_Off()
 {
 	global
 	
-	parametersToEdit=
+	parametersToEdit:=Object()
+
 	return parametersToEdit
 }
 

@@ -66,7 +66,14 @@ getParametersActionGet_file_size()
 {
 	global
 	
-	parametersToEdit:=["Label|" lang("Output variable name"),"VariableName|NewSize|varname","Label|" lang("File path"),"File||file|" lang("Select a file") "|8","Label|" lang("Unit"),"Radio|1|Unit|" lang("Bytes") ";" lang("Kilobytes") ";" lang("Megabytes")]
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Output variable name")})
+	parametersToEdit.push({type: "Edit", id: "varname", default: "NewSize", content: "VariableName", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: lang("File path")})
+	parametersToEdit.push({type: "File", id: "file", label: lang("Select a file"), options: 8})
+	parametersToEdit.push({type: "Label", label: lang("Unit")})
+	parametersToEdit.push({type: "Radio", id: "Unit", default: 1, choices: [lang("Bytes"), lang("Kilobytes"), lang("Megabytes")]})
+
 	return parametersToEdit
 }
 

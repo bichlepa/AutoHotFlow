@@ -9,6 +9,8 @@ runActionTraytip(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	runActionTraytip_Title:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Title,"normal")
 	runActionTraytip_Icon:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Icon)
 	
+	if runActionTraytip_Title=
+		runActionTraytip_Title:=Flowname
 	
 	Traytip,%runActionTraytip_Title%,%runActionTraytip_Text%,,% runActionTraytip_Icon -1
 	;if runActionTraytip_Duration>15
@@ -32,8 +34,14 @@ getCategoryActionTraytip()
 getParametersActionTraytip()
 {
 	global
-	parametersToEdit:=["Label|" lang("Title"),"Text|" lang("Title") "|title", "Label|" lang("Text_to_show"),"MultiLineText|" lang("Message") "|text","Label|" lang("Icon"),"Radio|1|Icon|" lang("No icon") ";" lang("Info icon") ";" lang("Warning icon") ";" lang("Error icon")]
-	
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Title")})
+	parametersToEdit.push({type: "Edit", id: "title", default: lang("Title"), content: "String"})
+	parametersToEdit.push({type: "Label", label: lang("Text_to_show")})
+	parametersToEdit.push({type: "Edit", id: "text", default: lang("Message"), multiline: true, content: "String"})
+	parametersToEdit.push({type: "Label", label: lang("Icon")})
+	parametersToEdit.push({type: "Radio", id: "Icon", default: 1, choices: [lang("No icon"), lang("Info icon"), lang("Warning icon"), lang("Error icon")]})
+
 	return parametersToEdit
 }
 

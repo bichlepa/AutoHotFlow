@@ -122,45 +122,8 @@
 			}
 			
 			;Get the list of all parameters and read all parameters from ini
-			parametersToload:=getParameters%loadElementType%%loadElementsubType%()
-			for index2, parameter in parametersToload
-			{
-				parameter1=
-				parameter2=
-				parameter3=
-				StringSplit,parameter,parameter,|
-				;parameter1: type of control
-				;parameter2: default value
-				;parameter3: parameter name
-				;parameter4 ...: further options
-				if (parameter3="" or parameter0<3 or parameter1="label") ; ;If this is only a label for the edit fielt etc. Do nothing
-					continue
-				;~ MsgBox %parameter3%
-				tempparname1=
-				tempparname2=
-				tempdefault1=
-				tempdefault2=
-				StringSplit,tempparname,parameter3,; ;get the parameter names if it has more than one
-				StringSplit,tempdefault,parameter2,; ;get the default parameter
-
-				;Certain types of control consist of multiple controls and thus contain multiple parameters.
-				loop,%tempparname0%
-				{
-					tempCurrentParName:=tempparname%a_index%
-					;~ MsgBox %tempCurrentParName%
-					Iniread,tempContent,%ThisFlowFolder%\%ThisFlowFilename%.ini,element%index1%,%tempCurrentParName%,ẺⱤᶉӧɼ
-					if (tempContent=="ẺⱤᶉӧɼ")
-					{
-						;~ MsgBox element %loadElementID% parameter %parameter3% nicht vorhanden setze es auf %parameter2%
-						tempContent:=tempdefault%a_index%
-						
-					}
-					StringReplace, tempContent, tempContent, |¶,`n, All
-					%loadElementID%%tempCurrentParName%=%tempContent%
-				}
-				
-				
-			}
+			i_LoadParametersOfElement(loadElementID,loadElementType,loadElementsubType,index1,"element")
+			
 			
 			
 		}
@@ -196,49 +159,11 @@
 		%loadElementID%subType=%loadElementsubType%
 		
 		
+		i_LoadParametersOfElement(loadElementID,loadElementType,loadElementsubType,index1,"trigger")
+		
+		i_CheckCompability(loadElementID,"trigger" index1,ThisFlowFolder "\" ThisFlowFilename ".ini")
 		
 		
-		parametersToload:=getParameters%loadElementType%%loadElementsubType%()
-		for index2, parameter in parametersToload
-		{
-			parameter1=
-			parameter2=
-			parameter3=
-			StringSplit,parameter,parameter,|
-			;parameter1: type of control
-			;parameter2: default value
-			;parameter3: parameter name
-			;parameter4 ...: further options
-			
-			if (parameter3="" or parameter0<3) ;If this is only a label for the edit fielt etc. Do nothing
-				continue
-			
-			tempparname1=
-			tempparname2=
-			tempdefault1=
-			tempdefault2=
-			StringSplit,tempparname,parameter3,; ;get the parameter names if it has more than one
-			StringSplit,tempdefault,parameter2,; ;get the default parameter
-			
-			;Certain types of control consist of multiple controls and thus contain multiple parameters.
-			loop,%tempparname0%
-			{
-				tempCurrentParName:=tempparname%a_index%
-				Iniread,tempContent,%ThisFlowFolder%\%ThisFlowFilename%.ini,Trigger%index1%,%tempCurrentParName%,ẺⱤᶉӧɼ
-				if (tempContent=="ẺⱤᶉӧɼ")
-				{
-					;~ MsgBox element %loadElementID% parameter %parameter3% nicht vorhanden setze es auf %parameter2%
-					tempContent:=tempdefault%a_index%
-				}
-				StringReplace, tempContent, tempContent, |¶,`n, All
-				%loadElementID%%tempCurrentParName%=%tempContent%
-			}
-		
-			
-			
-		}
-			
-			
 		
 		;UpdateTriggerName()
 		ui_draw()
@@ -294,4 +219,58 @@ i_loadGeneralParameters()
 	DetectHiddenWindows,on
 	;IfWinExist,·AutoHotFlow·
 		;ui_showgui()
+}
+
+i_LoadParametersOfElement(loadElementID,loadElementType,loadElementsubType,loadElementIndex,Loadlocation)
+{
+	global
+	local parametersToload
+	local index
+	local index2
+	local parameter
+	local parameterID
+	local parameterDefault
+	local tempContent
+	local OneID
+	parametersToload:=getParameters%loadElementType%%loadElementsubType%()
+	for index, parameter in parametersToload
+	{
+		if not IsObject(parameter.id)
+			parameterID:=[parameter.id]
+		else
+			parameterID:=parameter.id
+		if not IsObject(parameter.default)
+			parameterDefault:=[parameter.default]
+		else
+			parameterDefault:=parameter.default
+		
+		if (parameterID[1]="" or parameter.type="label" or parameter.type="SmallLabel") ;If this is only a label for the edit fielt etc. Do nothing
+			continue
+		
+		;~ MsgBox % strobj(parameter)
+		;Certain types of control consist of multiple controls and thus contain multiple parameters.
+		for index2, oneID in parameterID
+		{
+			
+			if (Loadlocation="clipboard")
+			{
+				;~ MsgBox % loadElementID " - "  loadElementType " - "  loadElementsubType  " - "  loadElementIndex " - " Loadlocation
+				Iniread,tempContent,%ClipboardFlowFilename%,Element%loadElementIndex%,%oneID%,ẺⱤᶉӧɼ
+			}
+			else if (Loadlocation="trigger")
+			{
+				Iniread,tempContent,%ThisFlowFolder%\%ThisFlowFilename%.ini,Trigger%loadElementIndex%,%oneID%,ẺⱤᶉӧɼ
+			}
+			else if (Loadlocation="element")
+				Iniread,tempContent,%ThisFlowFolder%\%ThisFlowFilename%.ini,Element%loadElementIndex%,%oneID%,ẺⱤᶉӧɼ
+			
+			if (tempContent=="ẺⱤᶉӧɼ") ;If a parameter is not set (maybe because some new parameters were added to this element after Update of AHF)
+			{
+				;~ MsgBox element %loadElementID% parameter %parameter3% nicht vorhanden setze es auf %parameter2%
+				tempContent:=parameterDefault[index2]
+			}
+			StringReplace, tempContent, tempContent, |¶,`n, All
+			%loadElementID%%oneID%:=tempContent
+		}
+	}
 }

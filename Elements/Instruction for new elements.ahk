@@ -14,26 +14,44 @@ You need following functions. The +ElementName+ needs to be replaced by the name
 
 getParameters+ElementType++ElementName+()
 	The parameters that the Action needs are saved here. They are mainly needed for the Settings window, and also for saving and loading the flows.
-	It is an object, therefore there are square brackets that contain comma separated entries.
-	An entry divided by | and is constructed as following:
-		Type of the parameter | Standard value | Name of the Action | Label
-			- Type of the parameter:
-				Label - It needs only the first two parameters: "Label" | Text of Label
-				Text - It needs the first three parameters
-				Number - It needs the first three parameters
-				Checkbox - It needs the first four parameters: "Checkbox" | Enabled (0 or 1) | Name | Label
-				Hotkey - It needs the first three parameters
-				NewFile - It needs the first four parameters: "NewFile" | standard value | Name | Label
-				Button - It need the first, second, and fourth parameters: "Button" | goto-label || Label
-			- Standard value:
-				Nothing to say
-			- Name of the Action:
-				The name must be like a variable name!
-			- Label: 
-				Nothing to say
-			- goto-label:
-				To which label the script should jump to when user presses the button.
-	The parameter must not have those names:
+	It is an array object, which conatins associative arrays.
+	First line is creation of an empty object: parametersToEdit:=Object()
+	The other lines add an entry to the object. Each entry is a GUI element.
+	Examples: You can add following lines to any element to see all them in the GUI.
+	;Labels:
+	parametersToEdit.push({type: "Label", label: lang("List variable name")})
+	parametersToEdit.push({type: "Label", label: lang("Coordinates") lang("(x,y)"), size: "small"})
+	
+	;Edits:
+	parametersToEdit.push({type: "Edit", id: "Varname", default: "List", content: "VariableName", WarnIfEmpty: true})
+	parametersToEdit.push({type: "edit", id: "Position", default: 2, content: "Expression", WarnIfEmpty: true})
+	parametersToEdit.push({type: "edit", id: "Wintitle", content: "String"})
+	parametersToEdit.push({type: "Edit", id: "Section", default: "section", content: "String", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Edit", id: "VarValues", default: "Added Element 1`nAdded Element 2", multiline: true, content: "String", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Edit", id: ["Xpos", "Ypos"], default: [10, 20], content: "Expression", WarnIfEmpty: true})
+	
+	;If an edit can contain either an expression or a String (user should decide), use following two lines:
+	parametersToEdit.push({type: "Radio", id: "isExpression", default: 1, choices: [lang("This is a value"), lang("This is a variable name or expression")]})
+	parametersToEdit.push({type: "Edit", id: "VarValue", default: "New element", content: "StringOrExpression", contentParID: "isExpression", WarnIfEmpty: true})
+	
+	;Checkbox
+	parametersToEdit.push({type: "Checkbox", id: "DelimiterSpace", default: 0, label: lang("Use space as delimiter")})
+	;Radio
+	parametersToEdit.push({type: "Radio", id: "NumberOfElements", default: 1, choices: [lang("Add one element"), lang("Add multiple elements")]})
+	
+	;Folder
+	parametersToEdit.push({type: "Folder", id: "folder", label: lang("Select a folder")})
+	
+	;File
+	parametersToEdit.push({type: "File", id: "file", label: lang("Select a file")})
+	
+	;Drop down
+	parametersToEdit.push({type: "DropDown", id: "Button", default: 1, choices: [lang("Left button"), lang("Right button"), lang("Middle Button"), lang("Wheel up"), lang("Wheel down"), lang("Wheel left"), lang("Wheel right"), lang("4th mouse button (back)"), lang("5th mouse button (forward)")]
+	
+	;Slider
+	parametersToEdit.push({type: "Slider", id: "speed", default: 2, options: "Range0-100 tooltip"})
+	
+	The parameter id must not have those names:
 		FinishedRunning,result,x,y,name,CountOfParts,part1...part5,ClickPriority,to,from,marked
 		
 
@@ -56,19 +74,17 @@ run+ElementType++ElementName+(ID)
 	This is the code that will be executed when it is started.
 	It gets the ID of the Action so it can get all the parameters. Therefore this function must be global.
 		Example: %ID%title contains the parameter title
-	When the action or condition is complete it must set the variable:
-		%ID%FinishedRunning=true
+	When the action or condition is complete it must use the function:
+		MarkThatElementHasFinishedRunning(...)
 	If you want to support variables (user can define variables instead of a string) just use the function replaceVariables(String)
 		Example: replaceVariables(%ID%par1)
 	
 	To set a variable use
-		setVariable(VarName,Value)
+		v_SetVariable(...)
 	To get a variable use
-		returnedValue:=getVariable(Varname)
+		returnedValue:=v_getVariable(...)
 	
 	
-	The confirmation dialog must write "yes" or "no" in the variable %ID%result before finishing.
-		%ID%result=yes
 
 
 
@@ -102,24 +118,6 @@ An external script may be needed if the process of the element may interfere wit
 	Wite via FileAppend a script in the folder "Generated Scripts"
 	Execute the script afterwards.
 	
-	Trigger Issues:
-		To let the main Script know that it should start the flow, following:
-			There is a hidden window with a Edit field if you change it to "run" it will start the flow. You can do it by following lines of code:
-				DetectHiddenWindows, On
-				ControlSetText,Edit1,Run,CommandFromTriggerWindow
-		It is also necessary that the external script can be stopped. For this create a hidden window with a Edit field.
-			Following code may be used:
-				gui,45:default
-				gui,new,,CommandWindowFor%ID%
-				gui,add,edit,vcommandFortrigger gCommandForTrigger
-				... your event detection code
-				return
-				CommandForTrigger:
-				gui,submit
-				if CommandForTrigger=exit
-				{
-					exitapp
-				}
 	
 
 

@@ -44,10 +44,10 @@
 	{
 		if setElementID=trigger
 		{
-			anzahlTrigger=0 
+			TempTriggerCount=0 
 			tempTriggers=
 			tempTriggerNames=
-			for anzahlTrigger, temptrigger in allTriggers
+			for TempTriggerCount, temptrigger in allTriggers
 			{
 				tempTriggers=%tempTriggers%%temptrigger%|
 				tempTriggerNames:=tempTriggerNames %temptrigger%name "|"
@@ -57,13 +57,13 @@
 			StringSplit,tempTriggers,tempTriggers,|
 			StringSplit,tempTriggerNames,tempTriggerNames,|
 			
-			if anzahlTrigger=0
+			if TempTriggerCount=0
 			{
 				setElementID:=e_NewTrigger()
 				ui_selectElementType(%setElementID%Type,setElementID)
 				return
 			}
-			;~ else if anzahlTrigger =1
+			;~ else if TempTriggerCount =1
 			;~ {
 				;~ ui_settingsOfElement(tempTriggers)
 				;~ return
@@ -180,389 +180,427 @@
 	gui,add,edit,w400 x10 Multi r5 vGUISettingsOfElementEditName gGUISettingsOfElementUpdateName,% %setElementID%name
 	gui,+hwndSettingsGUIHWND
 	
-	
+	openingElementSettingsWindow:=true ;Allows some elements to initialize their parameter list. (such as in "play sound": find all system sound)
 	parametersToEdit:=getParameters%setElementType%%setElementsubType%()
+
 	;MsgBox,% parametersToEdit
 	for index, parameter in parametersToEdit
 	{
-		loop,10
-			parameter%a_index%=
-		StringSplit,parameter,parameter,|
-		; parameter1: What should be set
-		; parameter2: Default Value
-		; parameter3: Internal parameter name
+		if isobject(parameter.id)
+		{
+			for tempParIndex, tempParValue in parameter.id
+				tempParameterID%a_index%:=parameter.id[tempParIndex]
+			if parameter.id.MaxIndex()=1
+				tempParameterID:=parameter.id[1]
+			else
+				tempParameterID=
+		}
+		else
+			tempParameterID:=parameter.id
 		
-		if parameter1=Label
+		;~ if isobject(parameter.default)
+		;~ {
+			;~ for tempParIndex, tempParValue in parameter.default
+				;~ tempParameterDefault%a_index%:=parameter.default[tempParIndex]
+		;~ }
+		;~ else
+			;~ tempParameterDefault:=parameter.default
+		
+		if (parameter.type="Label")
 		{
-			gui,font,s10 cnavy wbold
-			if (parameter3!="")
+			if (parameter.size="small")
 			{
-				gui,add,text,x10 w400 Y+15 vGUISettingsOfElement%setElementID%%parameter3% ,%parameter2%
+				gui,font,s8 cDefault wbold
+				tempYPos=
 			}
 			else
 			{
-				gui,add,text,x10 w400 Y+15,%parameter2%
+				gui,font,s10 cnavy wbold
+				tempYPos=Y+15
 			}
-		}
-		else if parameter1=SmallLabel
-		{
-			gui,font,s8 cDefault wbold
-			if (parameter3!="")
+			if (tempParameterID!="")
 			{
-				gui,add,text,x10 w400  vGUISettingsOfElement%setElementID%%parameter3% ,%parameter2%
+				gui,add,text,x10 w400 %tempYPos% vGUISettingsOfElement%setElementID%%tempParameterID% ,% parameter.label
 			}
 			else
 			{
-				gui,add,text,x10 w400,%parameter2%
+				gui,add,text,x10 w400 %tempYPos%,% parameter.label
 			}
 		}
-		else if parameter1=Text
+		else if (parameter.type="Edit")
 		{
 			gui,font,s8 cDefault wnorm
-			temp:=%setElementID%%parameter3% ;get the saved parameter
 			
-			if (temp="") ;if nothing is saved
-				temptext=%parameter2% ;load default parameter
-			else
-				temptext=%temp% ;set the saved parameter as text
-			gui,add,edit,x10 r1 w400  gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%parameter3%,%temptext%
 			
-		}
-		else if parameter1=Text2
-		{
-			gui,font,s8 cDefault wnorm
-			StringSplit,tempdefault,parameter2,; ;get the default parameter
-			StringSplit,tempparname,parameter3,; ;get the parameter names
-			
-			;First edit
-			temp:=%setElementID%%tempparname1% ;get the saved parameter
-			
-			if (temp="") ;if nothing is saved
-				temptext=%tempdefault1% ;load default parameter
-			else
-				temptext=%temp% ;set the saved parameter as text
-			gui,add,edit,x10 r1 w195  gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%tempparname1%,%temptext%
-			
-			;second edit
-			temp:=%setElementID%%tempparname2% ;get the saved parameter
-			
-			if (temp="") ;if nothing is saved
-				temptext=%tempdefault2% ;load default parameter
-			else
-				temptext=%temp% ;set the saved parameter as text
-			gui,add,edit,X+10 r1 w195  gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%tempparname2%,%temptext%
-		}
-		else if parameter1=Text3
-		{
-			gui,font,s8 cDefault wnorm
-			StringSplit,tempdefault,parameter2,; ;get the default parameter
-			StringSplit,tempparname,parameter3,; ;get the parameter names
-			
-			;First edit
-			temp:=%setElementID%%tempparname1% ;get the saved parameter
-			
-			if (temp="") ;if nothing is saved
-				temptext=%tempdefault1% ;load default parameter
-			else
-				temptext=%temp% ;set the saved parameter as text
-			gui,add,edit,x10 r1 w127  gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%tempparname1%,%temptext%
-			
-			;second edit
-			temp:=%setElementID%%tempparname2% ;get the saved parameter
-			
-			if (temp="") ;if nothing is saved
-				temptext=%tempdefault2% ;load default parameter
-			else
-				temptext=%temp% ;set the saved parameter as text
-			gui,add,edit,X+10 r1 w127  gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%tempparname2%,%temptext%
-			
-			;third edit
-			temp:=%setElementID%%tempparname3% ;get the saved parameter
-			
-			if (temp="") ;if nothing is saved
-				temptext=%tempdefault3% ;load default parameter
-			else
-				temptext=%temp% ;set the saved parameter as text
-			gui,add,edit,X+10 r1 w126  gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%tempparname3%,%temptext%
-		}
-		else if parameter1=MultiLineText
-		{
-			gui,font,s8 cDefault wnorm
-			temp:=%setElementID%%parameter3% ;get the saved parameter
-			if (temp="") ;if nothing is saved
-				temptext=%parameter2% ;load default parameter
-			else
-				temptext=%temp% ;set the saved parameter as text
-			gui,add,edit,w400 h100 x10 multi gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%parameter3%,%temptext%
-			
-		}
-		else if parameter1=VariableName
-		{
-			gui,font,s8 cDefault wnorm
-			temp:=%setElementID%%parameter3% ;get the saved parameter
-			
-			if (temp="") ;if nothing is saved
-				temptext=%parameter2% ;load default parameter
-			else
-				temptext=%temp% ;set the saved parameter as text
-			gui,add,edit,x10 r1 w400  gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%parameter3%,%temptext%
-			
-		}
-		else if parameter1=Number
-		{
-			gui,font,s8 cDefault wnorm
-			temp:=%setElementID%%parameter3% 
-			if (temp="")
-				temptext=%parameter2%
-			else
-				temptext=%temp%
-			gui,add,edit,w400 x10 number gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%parameter3%,%temptext%
-			
-		}
-		else if parameter1=Checkbox
-		{
-			gui,font,s8 cDefault wnorm
-			temp:=%setElementID%%parameter3% 
-			temptext=%parameter4%
-			if temp=
+			if ( tempParameterID) ;if only one edit
 			{
-				temp=%parameter2%
+				
+				temp:=%setElementID%%tempParameterID% ;get the saved parameter
+				;~ if (temp="") ;if nothing is saved
+					;~ temptext:=parameter.default ;load default parameter
+				;~ else
+					temptext=%temp% ;set the saved parameter as text
+				
+				if parameter.multiline
+					tempIsMulti=h100 multi
+				else
+					tempIsMulti=r1
+				
+				gui,add,picture,x394 w16 h16 gGUISettingsOfElementClickOnWarningPic vGUISettingsOfElementWarningIconOf%setElementID%%tempParameterID%
+				GUISettingsOfElementWarnIfEmpty%setElementID%%tempParameterID%:=parameter.WarnIfEmpty
+				
+				if (parameter.content="Expression")
+				{
+					gui,add,picture,x10 yp w16 h16 gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%setElementID%%tempParameterID%,icons\expression.ico
+					gui,add,edit,X+4 w360 %tempIsMulti% hwndGUISettingsOfElementEditHWND%setElementID%%tempParameterID% gGUISettingsOfElementCheckContent vGUISettingsOfElement%setElementID%%tempParameterID%,%temptext%
+					GUISettingsOfElementContentType%setElementID%%tempParameterID%=Expression
+				}
+				else if (parameter.content="String")
+				{
+					gui,add,picture,x10 yp w16 h16 gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%setElementID%%tempParameterID%,icons\string.ico
+					gui,add,edit,X+4 w360 %tempIsMulti% hwndGUISettingsOfElementEditHWND%setElementID%%tempParameterID% gGUISettingsOfElementCheckContent vGUISettingsOfElement%setElementID%%tempParameterID%,%temptext%
+					
+					GUISettingsOfElementContentType%setElementID%%tempParameterID%=String
+				}
+				else if (parameter.content="VariableName")
+				{
+					gui,add,picture,x10 yp w16 h16 gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%setElementID%%tempParameterID%,icons\VariableName.ico
+					gui,add,edit,X+4 w360 %tempIsMulti% hwndGUISettingsOfElementEditHWND%setElementID%%tempParameterID% gGUISettingsOfElementCheckContent vGUISettingsOfElement%setElementID%%tempParameterID%,%temptext%
+					
+					GUISettingsOfElementContentType%setElementID%%tempParameterID%=VariableName
+				}
+				else if (parameter.content="StringOrExpression")
+				{
+					
+					tempContentTypePar:=parameter.contentParID
+					
+					if %setElementID%%tempContentTypePar%=1 ;String
+						gui,add,picture,x10 yp w16 h16 gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%setElementID%%tempParameterID%,icons\string.ico
+					else
+						gui,add,picture,x10 yp w16 h16 gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%setElementID%%tempParameterID%,icons\expression.ico
+					gui,add,edit,X+4 w360 %tempIsMulti% hwndGUISettingsOfElementEditHWND%setElementID%%tempParameterID% gGUISettingsOfElementCheckContent vGUISettingsOfElement%setElementID%%tempParameterID%,%temptext%
+					
+					GUISettingsOfElementContentType%setElementID%%tempParameterID%=StringOrExpression
+					GUISettingsOfElementContentTypeOf%setElementID%%tempContentTypePar%:=tempParameterID
+					GUISettingsOfElementContentTypeRadio%setElementID%%tempParameterID%:=tempContentTypePar
+				}
+				else
+				{
+					gui,add,edit,x10 yp w380 %tempIsMulti% hwndGUISettingsOfElementEditHWND%setElementID%%tempParameterID% gGUISettingsOfElementCheckContent vGUISettingsOfElement%setElementID%%tempParameterID%,%temptext%
+				}
+				GUISettingsOfElementCheckContent(GUISettingsOfElementEditHWND%setElementID%%tempParameterID%)
 			}
-			gui,add,checkbox,w400 x10 checked%temp% gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%parameter3%,%temptext%
-			
-		}
-		else if parameter1=CheckboxWithGray
-		{
-			gui,font,s8 cDefault wnorm
-			temp:=%setElementID%%parameter3% 
-			temptext=%parameter4%
-			if temp=
+			else ;If multiple edits in one line
 			{
-				temp=%parameter2%
-			}
-			gui,add,checkbox,w400 x10 check3 checked%temp% gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%parameter3%,%temptext%
+				
 			
+				;~ MsgBox %tempEditwidth%
+				for tempIndex, tempOneParameterID in parameter.id
+				{
+					temp:=%setElementID%%tempOneParameterID% ;get the saved parameter
+					;~ if (temp="") ;if nothing is saved
+						;~ temptext:=parameter.default[tempIndex] ;load default parameter
+					;~ else
+						temptext=%temp% ;set the saved parameter as text
+					
+					
+					if tempIndex=1
+					{
+						tempEditwidth:= round((380 - (10 * (parameter.id.MaxIndex()-1)))/parameter.id.MaxIndex())
+						tempXpos:="X+4"
+						if (parameter.content="Expression")
+						{
+							gui,add,picture,x10 w16 h16 gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%setElementID%%tempOneParameterID%,icons\expression.ico
+							tempXpos:="X+4"
+						}
+						else if (parameter.content="String")
+						{
+							gui,add,picture,x10 w16 h16 gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%setElementID%%tempOneParameterID%,icons\string.ico
+							tempXpos:="X+4"
+						}
+						else if (parameter.content="VariableName")
+						{
+							gui,add,picture,x10 w16 h16 gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%setElementID%%tempOneParameterID%,icons\VariableName.ico
+							tempXpos:="X+4"
+						}
+						else
+						{
+							tempEditwidth:= round((400 - (10 * (parameter.id.MaxIndex()-1)))/parameter.id.MaxIndex())
+							tempXpos:="x10"
+						}
+					}
+					else
+						tempXpos:="X+10"
+					;~ MsgBox %tempXpos%
+					gui,add,edit,%tempXpos% w%tempEditwidth% hwndGUISettingsOfElementEditHWND%setElementID%%tempParameterID% gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%tempOneParameterID%,%temptext%
+					
+					if (parameter.content="Expression")
+					{
+						GUISettingsOfElementContentType%setElementID%%tempOneParameterID%=Expression
+					}
+					else if (parameter.content="String")
+					{
+						GUISettingsOfElementContentType%setElementID%%tempOneParameterID%=String
+					}
+					else if (parameter.content="VariableName")
+					{
+						GUISettingsOfElementContentType%setElementID%%tempOneParameterID%=VariableName
+					}
+					GUISettingsOfElementCheckContent(GUISettingsOfElementEditHWND%setElementID%%tempParameterID%)
+				}
+				
+			}
 		}
-		else if parameter1=Hotkey
+		else if (parameter.type="VariableName")
 		{
 			gui,font,s8 cDefault wnorm
-			temp:=%setElementID%%parameter3% 
-			if temp=
-			{
-				temp=%parameter2%
-			}
-			gui,add,edit,w300 x10 gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%parameter3%,%temp%
-			gui,add,hotkey,w90 X+10 gGUISettingsOfElementHotkey vGUISettingsOfElement%setElementID%%parameter3%hotkey,%temp%
+			temp:=%setElementID%%tempParameterID% ;get the saved parameter
 			
+			;~ if (temp="") ;if nothing is saved
+				;~ temptext:=parameter.default ;load default parameter
+			;~ else
+				temptext=%temp% ;set the saved parameter as text
+			gui,add,edit,x10 r1 w400  gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%tempParameterID%,%temptext%
+			TrayTip,%setElementsubType%, variable name will ich nicht haben
 		}
-		else if parameter1=Button
+		else if (parameter.type="Checkbox")
 		{
 			gui,font,s8 cDefault wnorm
-			temp:=parameter4
-			gui,add,button,w400 x10  g%parameter2% vGUISettingsOfElement%setElementID%%parameter3%,%parameter4%
-		}
-		else if parameter1=Radio
-		{
-			gui,font,s8 cDefault wnorm
-			temp:=%setElementID%%parameter3% 
-			if temp=
-			{
-				temp:=parameter2
-				tempIsDefault:=true
-			}
+			temp:=%setElementID%%tempParameterID% 
+			temptext:=parameter.label
+			;~ if temp=
+			;~ {
+				;~ temp:=parameter.default
+			;~ }
+			if parameter.gray
+				tempParGray=check3
 			else
+				tempParGray=
+			gui,add,checkbox,w400 x10 %tempParGray% checked%temp% gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%tempParameterID%,%temptext%
+			
+		}
+		else if (parameter.type="Radio")
+		{
+			gui,font,s8 cDefault wnorm
+			temp:=%setElementID%%tempParameterID% 
+			;~ if temp=
+			;~ {
+				;~ temp:=parameter.default
+				;~ tempIsDefault:=true
+			;~ }
+			;~ else
 				tempIsDefault:=false
 			
-			StringSplit,GUISettingsOfElement%setElementID%%parameter3%allRadios,parameter4,;
+			
 			tempAssigned:=false
-			loop,% GUISettingsOfElement%setElementID%%parameter3%allRadios0
+			for tempindex, tempRadioLabel in parameter.choices
 			{
 				if a_index=1
+					tempMakeNewGroup=Group
+				else
+					tempMakeNewGroup=
+				
+				if (temp=a_index)
 				{
-					if (temp=a_index)
-					{
-						gui,add,radio, w400 x10 checked Group gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%parameter3%%a_index% ,% GUISettingsOfElement%setElementID%%parameter3%allRadios%a_index%
-						tempAssigned:=true
-					}
-					else
-						gui,add,radio, w400 x10 Group gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%parameter3%%a_index% ,% GUISettingsOfElement%setElementID%%parameter3%allRadios%a_index%
+					tempChecked=checked
+					tempAssigned:=true
+				}
+				else
+					tempChecked=
 					
-				}
-				else 
-				{
-					if (temp=a_index)
-					{
-						gui,add,radio, w400 x10 checked gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%parameter3%%a_index%,%  GUISettingsOfElement%setElementID%%parameter3%allRadios%a_index%
-						tempAssigned:=true
-					}
-					else
-						gui,add,radio, w400 x10 gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%parameter3%%a_index%,%  GUISettingsOfElement%setElementID%%parameter3%allRadios%a_index%
-				}
+				
+				
+				gui,add,radio, w400 x10 %tempChecked% %tempMakeNewGroup% gGUISettingsOfElementClickOnRadio vGUISettingsOfElement%setElementID%%tempParameterID%%a_index% ,% tempRadioLabel
+				
+				
 				
 				
 				
 			}
 			if (tempAssigned=false and tempIsDefault=false)
-				guicontrol,,GUISettingsOfElement%setElementID%%parameter3%%parameter2%,1
+			{
+				temp:=parameter.default
+				guicontrol,,GUISettingsOfElement%setElementID%%tempParameterID%%temp%,1
+			}
 			
 		}
-		else if parameter1=DropDownListByName
+		else if (parameter.type="Slider")
 		{
 			gui,font,s8 cDefault wnorm
-			temp:=%setElementID%%parameter3% 
-			if temp=
-				temp:=parameter2
-			temptoChoose=
+			temp:=%setElementID%%tempParameterID% 
+			;~ if temp=
+				;~ temp:=parameter.default
 			
-			GUISettingsOfElement%setElementID%%parameter3%allSelections=
-			StringSplit,GUISettingsOfElement%setElementID%%parameter3%allSelections,parameter4,;
-			loop,% GUISettingsOfElement%setElementID%%parameter3%allSelections0
+			tempParameterOptions:=parameter.options
+			
+			gui,add,slider, w400 x10 %tempParameterOptions%  gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%tempParameterID% ,% temp
+			
+		}
+		else if (parameter.type="DropDown")
+		{
+			gui,font,s8 cDefault wnorm
+			temp:=%setElementID%%tempParameterID% 
+			;~ if temp=
+				;~ temp:=parameter.default
+			if (parameter.result="number")
 			{
-				if (GUISettingsOfElement%setElementID%%parameter3%allSelections%a_index%=temp)
-					temptoChoose:=A_Index
-				GUISettingsOfElement%setElementID%%parameter3%allSelections.="|" GUISettingsOfElement%setElementID%%parameter3%allSelections%a_index%
+				temptoChoose:=temp
+				tempAltSumbit=AltSubmit
+			}
+			else
+				tempAltSumbit=
+			tempChoises:=parameter.choices
+			
+			tempAllChoices=
+			for tempIndex, TempOneChoice in tempChoises
+			{
+				if (parameter.result="name")
+				{
+					if (TempOneChoice=temp)
+						temptoChoose:=A_Index
+				}
+				tempAllChoices.="|" TempOneChoice
 				
 			}
-			if temptoChoose=
-				temptoChoose=1
-			StringTrimLeft,GUISettingsOfElement%setElementID%%parameter3%allSelections,GUISettingsOfElement%setElementID%%parameter3%allSelections,1
-			gui,add,DropDownList, w400 x10 choose%temptoChoose% gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%parameter3% ,% GUISettingsOfElement%setElementID%%parameter3%allSelections
+			
+			StringTrimLeft,tempAllChoices,tempAllChoices,1
+			gui,add,DropDownList, w400 x10 %tempAltSumbit% choose%temptoChoose% gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%tempParameterID% ,% tempAllChoices
 			
 		}
-		else if parameter1=DropDownList
+		else if (parameter.type="Hotkey")
 		{
 			gui,font,s8 cDefault wnorm
-			temp:=%setElementID%%parameter3% 
-			if temp=
-				:=parameter2
-			temptoChoose=
-			GUISettingsOfElement%setElementID%%parameter3%allSelections=
-			StringSplit,GUISettingsOfElement%setElementID%%parameter3%allSelections,parameter4,;
-			loop,% GUISettingsOfElement%setElementID%%parameter3%allSelections0
-			{
-				if (GUISettingsOfElement%setElementID%%parameter3%allSelections%a_index%=temp)
-					temptoChoose:=A_Index
-				GUISettingsOfElement%setElementID%%parameter3%allSelections.="|" GUISettingsOfElement%setElementID%%parameter3%allSelections%a_index%
-				
-			}
-			if temptoChoose=
-				temptoChoose=1
-			StringTrimLeft,GUISettingsOfElement%setElementID%%parameter3%allSelections,GUISettingsOfElement%setElementID%%parameter3%allSelections,1
-			gui,add,DropDownList, w400 x10 AltSubmit choose%temptoChoose% gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%parameter3% ,% GUISettingsOfElement%setElementID%%parameter3%allSelections
+			temp:=%setElementID%%tempParameterID% 
+			;~ if temp=
+			;~ {
+				;~ temp:=parameter.default
+			;~ }
+			gui,add,edit,w300 x10 gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%tempParameterID%,%temp%
+			gui,add,hotkey,w90 X+10 gGUISettingsOfElementHotkey vGUISettingsOfElement%setElementID%%tempParameterID%hotkey,%temp%
 			
 		}
-		else if parameter1=Slider
+		else if (parameter.type="Button")
 		{
 			gui,font,s8 cDefault wnorm
-			temp:=%setElementID%%parameter3% 
-			if temp=
-				temp:=parameter2
-			
-			;parameter2 contains further options
-			gui,add,slider, w400 x10 %parameter4% AltSubmit gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%parameter3% ,% temp
+			tempGoto:=parameter.goto
+			gui,add,button,w400 x10  g%tempGoto% vGUISettingsOfElement%setElementID%%tempParameterID%,% parameter.label
+		}
+		else if (parameter.type="File")
+		{
+			gui,font,s8 cDefault wnorm
+			temp:=%setElementID%%tempParameterID% 
+			;~ if temp=
+			;~ {
+				;~ temp:=parameter.default
+			;~ }
+			GUISettingsOfElement%setElementID%%tempParameterID%Prompt:=parameter.label
+			GUISettingsOfElement%setElementID%%tempParameterID%Options:=parameter.options
+			GUISettingsOfElement%setElementID%%tempParameterID%Filter:=parameter.filter
+			gui,add,edit,w370 x10 gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%tempParameterID%,%temp%
+			gui,add,button,w20 X+10  gGUISettingsOfElementSelectFile vGUISettingsOfElementbuttonSelectFile_%setElementID%_%tempParameterID%,...
 			
 		}
-		else if parameter1=File
+		else if (parameter.type="Folder")
 		{
 			gui,font,s8 cDefault wnorm
-			temp:=%setElementID%%parameter3% 
-			if temp=
-			{
-				temp=%parameter2%
-			}
-			GUISettingsOfElement%setElementID%%parameter3%Prompt:=parameter4
-			GUISettingsOfElement%setElementID%%parameter3%Options:=parameter5
-			GUISettingsOfElement%setElementID%%parameter3%Filter:=parameter6
-			gui,add,edit,w370 x10 gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%parameter3%,%temp%
-			gui,add,button,w20 X+10  gGUISettingsOfElementSelectFile vGUISettingsOfElementbuttonSelectFile_%setElementID%_%parameter3%,...
-			
-		}
-		else if parameter1=Folder
-		{
-			gui,font,s8 cDefault wnorm
-			temp:=%setElementID%%parameter3% 
-			if temp=
-			{
-				temp=%parameter2%
-			}
-			GUISettingsOfElement%setElementID%%parameter3%Prompt:=parameter4
-			GUISettingsOfElement%setElementID%%parameter3%Options:=parameter5
-			GUISettingsOfElement%setElementID%%parameter3%Filter:=parameter6
-			gui,add,edit,w370 x10 gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%parameter3%,%temp%
-			gui,add,button,w20 X+10  gGUISettingsOfElementSelectFolder vGUISettingsOfElementbuttonSelectFile_%setElementID%_%parameter3%,...
+			temp:=%setElementID%%tempParameterID% 
+			;~ if temp=
+			;~ {
+				;~ temp:=parameter.default
+			;~ }
+			GUISettingsOfElement%setElementID%%tempParameterID%Prompt:=parameter4
+			GUISettingsOfElement%setElementID%%tempParameterID%Options:=parameter5
+			GUISettingsOfElement%setElementID%%tempParameterID%Filter:=parameter6
+			gui,add,edit,w370 x10 gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%tempParameterID%,%temp%
+			gui,add,button,w20 X+10  gGUISettingsOfElementSelectFolder vGUISettingsOfElementbuttonSelectFile_%setElementID%_%tempParameterID%,...
 			;~ gui,add,button,w20 X+10 gGUISettingsOfElementSelectFolderHelp,?
 		}
-		else if parameter1=weekdays
+		else if (parameter.type="weekdays")
 		{
 			gui,font,s8 cDefault wnorm
-			temp:=%setElementID%%parameter3% 
+			temp:=%setElementID%%tempParameterID% 
 			
-			if temp=
-			{
-				temp=%parameter2%
-			}
-			gui,add,checkbox,w45 x10 gGUISettingsOfElementWeekdays vGUISettingsOfElement%setElementID%%parameter3%2,% lang("Mon (Short for Monday")
-			gui,add,checkbox,w45 X+10 gGUISettingsOfElementWeekdays vGUISettingsOfElement%setElementID%%parameter3%3,% lang("Tue (Short for Tuesday")
-			gui,add,checkbox,w45 X+10 gGUISettingsOfElementWeekdays vGUISettingsOfElement%setElementID%%parameter3%4,% lang("Wed (Short for Wednesday")
-			gui,add,checkbox,w45 X+10 gGUISettingsOfElementWeekdays vGUISettingsOfElement%setElementID%%parameter3%5,% lang("Thu (Short for Thursday")
-			gui,add,checkbox,w45 X+10 gGUISettingsOfElementWeekdays vGUISettingsOfElement%setElementID%%parameter3%6,% lang("Fri (Short for Friday")
-			gui,add,checkbox,w45 X+10 gGUISettingsOfElementWeekdays vGUISettingsOfElement%setElementID%%parameter3%7,% lang("Sat (Short for Saturday")
-			gui,add,checkbox,w45 X+10 gGUISettingsOfElementWeekdays vGUISettingsOfElement%setElementID%%parameter3%1,% lang("Sun (Short for Sunday") ;Sunday is 1
+			;~ if temp=
+			;~ {
+				;~ temp:=parameter.default
+			;~ }
+			gui,add,checkbox,w45 x10 gGUISettingsOfElementWeekdays vGUISettingsOfElement%setElementID%%tempParameterID%2,% lang("Mon (Short for Monday")
+			gui,add,checkbox,w45 X+10 gGUISettingsOfElementWeekdays vGUISettingsOfElement%setElementID%%tempParameterID%3,% lang("Tue (Short for Tuesday")
+			gui,add,checkbox,w45 X+10 gGUISettingsOfElementWeekdays vGUISettingsOfElement%setElementID%%tempParameterID%4,% lang("Wed (Short for Wednesday")
+			gui,add,checkbox,w45 X+10 gGUISettingsOfElementWeekdays vGUISettingsOfElement%setElementID%%tempParameterID%5,% lang("Thu (Short for Thursday")
+			gui,add,checkbox,w45 X+10 gGUISettingsOfElementWeekdays vGUISettingsOfElement%setElementID%%tempParameterID%6,% lang("Fri (Short for Friday")
+			gui,add,checkbox,w45 X+10 gGUISettingsOfElementWeekdays vGUISettingsOfElement%setElementID%%tempParameterID%7,% lang("Sat (Short for Saturday")
+			gui,add,checkbox,w45 X+10 gGUISettingsOfElementWeekdays vGUISettingsOfElement%setElementID%%tempParameterID%1,% lang("Sun (Short for Sunday") ;Sunday is 1
 			IfInString,temp,1
-				guicontrol,,GUISettingsOfElement%setElementID%%parameter3%1,1
+				guicontrol,,GUISettingsOfElement%setElementID%%tempParameterID%1,1
 			IfInString,temp,2
-				guicontrol,,GUISettingsOfElement%setElementID%%parameter3%2,1
+				guicontrol,,GUISettingsOfElement%setElementID%%tempParameterID%2,1
 			IfInString,temp,3
-				guicontrol,,GUISettingsOfElement%setElementID%%parameter3%3,1
+				guicontrol,,GUISettingsOfElement%setElementID%%tempParameterID%3,1
 			IfInString,temp,4
-				guicontrol,,GUISettingsOfElement%setElementID%%parameter3%4,1
+				guicontrol,,GUISettingsOfElement%setElementID%%tempParameterID%4,1
 			IfInString,temp,5
-				guicontrol,,GUISettingsOfElement%setElementID%%parameter3%5,1
+				guicontrol,,GUISettingsOfElement%setElementID%%tempParameterID%5,1
 			IfInString,temp,6
-				guicontrol,,GUISettingsOfElement%setElementID%%parameter3%6,1
+				guicontrol,,GUISettingsOfElement%setElementID%%tempParameterID%6,1
 			IfInString,temp,7
-				guicontrol,,GUISettingsOfElement%setElementID%%parameter3%7,1
-			GUISettingsOfElement%setElementID%%parameter3%:=temp
+				guicontrol,,GUISettingsOfElement%setElementID%%tempParameterID%7,1
+			GUISettingsOfElement%setElementID%%tempParameterID%:=temp
 		}
-		else if parameter1=TimeOfDay
+		else if (parameter.type="TimeOfDay")
 		{
 			gui,font,s8 cDefault wnorm
-			temp:=%setElementID%%parameter3% 
+			temp:=%setElementID%%tempParameterID% 
 			temptext=%parameter4%
 			if temp=
 			{
-				if parameter2=
+				;~ if parameter2=
 					temp=%a_now%
-				else
-					temp=%parameter2%
+				;~ else
+					;~ temp=parameter.default
 			}
-			gui,add,DateTime,w400 x10 choose%temp% gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%parameter3% ,time
+			gui,add,DateTime,w400 x10 choose%temp% gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%tempParameterID% ,time
 			
 		}
-		else if parameter1=DateAndTime
+		else if (parameter.type="DateAndTime")
 		{
 			gui,font,s8 cDefault wnorm
-			temp:=%setElementID%%parameter3% 
+			temp:=%setElementID%%tempParameterID% 
 			temptext=%parameter4%
 			if temp=
 			{
-				if parameter2=
+				;~ if parameter2=
 					temp=%a_now%
-				else
-					temp=%parameter2%
+				;~ else
+					;~ temp=%parameter2%
 			}
-			gui,add,DateTime,w400 x10 choose%temp% gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%parameter3% ,% "'" lang("Date") ":' " lang("MM/dd/yy") " '" lang("Time") ":' " lang("HH:mm:ss")
+			gui,add,DateTime,w400 x10 choose%temp% gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%tempParameterID% ,% "'" lang("Date") ":' " lang("MM/dd/yy") " '" lang("Time") ":' " lang("HH:mm:ss")
+			
+		}
+		
+		
+		else if (parameter.type="Number")
+		{
+			TrayTip,%setElementsubType%, nummer will ich nicht haben
+			gui,font,s8 cDefault wnorm
+			temp:=%setElementID%%tempParameterID% 
+			;~ if (temp="")
+				;~ temptext=%parameter2%
+			;~ else
+				temptext=%temp%
+			gui,add,edit,w400 x10 number gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%tempParameterID%,%temptext%
 			
 		}
 		
 		
 	}
+	
 	gui,submit,nohide
 	if (%ElementID%StandardName==true or %ElementID%StandardName=="")
 	{
 		GuiControl,,GUISettingsOfElementCheckStandardName,1
 		GuiControl,Disable,GUISettingsOfElementEditName
-		gosub,GUISettingsOfElementUpdateName
+		GUISettingsOfElementUpdateName()
 	}
 	
 	gui,add,button,w145 x10 h30 gGUISettingsOfElementSave default,% lang("Save")
@@ -577,7 +615,7 @@
 	tempYpos:=round(MainGUIY+MainGUIHeight/2- SG2.height/2)
 	SG2.Show(,"x" tempXpos " y" tempYpos)
 	
-	
+	openingElementSettingsWindow:=false
 	;gui,show,,% "·AutoHotFlow· " lang("Settings") " - " lang(%ElementID%type) " - " lang(%ElementID%subtype)
 	return
 	
@@ -614,7 +652,7 @@
 	if GUISettingsOfElementCheckStandardName=1
 	{
 		GuiControl,Disable,GUISettingsOfElementEditName
-		gosub,GUISettingsOfElementUpdateName
+		GUISettingsOfElementUpdateName()
 	}
 	else
 		GuiControl,Enable,GUISettingsOfElementEditName
@@ -667,25 +705,10 @@
 	;MsgBox % tempGUICotrol "=" tempGUICotrolText
 	%tempGUICotrol%:=tempGUICotrolText
 	
-	gosub,GUISettingsOfElementUpdateName
+	GUISettingsOfElementUpdateName()
 	return
 	
-	
-	GUISettingsOfElementUpdateName:
-	ui_GUISettingsOfElementUpdateName()
-	return
-	
-	GUISettingsOfElementButton:
-	;~ MsgBox, %a_guicontrol%`n%A_gui%`n%A_guiEvent%`n%A_EventInfo%
-	gui,submit,nohide
-	RegExMatch(a_guicontrol, "GUISettingsOfElementbutton_(.+)_(.+)_(.+)", tempButton) ;Find out witch button was pressed
-	tempSetWhat:=tempButton1
-	tempSetID:=tempButton2
-	tempSetPar:=tempButton3
-	
-	
-	gosub,GUISettingsOfElementUpdateName
-	return
+
 	
 	
 	
@@ -721,6 +744,7 @@
 	Gui,destroy
 	SG2.Destroy()
 	
+	GUISettingsOfElementRemoveInfoTooltip()
 	
 	ui_EnableMainGUI()
 	return
@@ -732,6 +756,7 @@
 	
 	GUISettingsOfElementSave:
 	gui,2:default
+	GUISettingsOfElementUpdateName()
 	gui,submit
 	if (%setElementID%type="trigger" and triggersEnabled=true) ;When editing a trigger, disable Triggers and enable them afterwards
 	{
@@ -747,60 +772,53 @@
 	
 	for index, parameter in parametersToEdit
 	{
-		;MsgBox %parameter%
-		StringSplit,parameter,parameter,|
-		if (parameter3!="" and parameter0>2)
+		if not IsObject(parameter.id)
+			parameterID:=[parameter.id]
+		else
+			parameterID:=parameter.id
+		
+		if (parameterID[1]="" or parameter.type="label" or parameter.type="SmallLabel") ;If this is only a label for the edit fielt etc. Do nothing
+			continue
+		;~ MsgBox % strobj(parameterID)
+		
+		if (parameter.type="Radio")
 		{
-			if (parameter1="Radio")
+			tempOneParID:=parameterID[1]
+			loop % parameter.choices.MaxIndex()
 			{
-				loop 10
+				if (GUISettingsOfElement%setElementID%%tempOneParID%%a_index%=1)
 				{
-					if (GUISettingsOfElement%setElementID%%parameter3%%a_index%=1)
-					{
-						
-						%setElementID%%parameter3%:=A_Index
-						;MsgBox % setElementID parameter3 "=" A_Index
-						break
-					}
-					;MsgBox % setElementID parameter3 "=" A_Index
+					
+					%setElementID%%tempOneParID%:=A_Index
+					break
 				}
-			}
-			else if (parameter1="weekdays")
-			{
-				%setElementID%%parameter3%=
-				loop 7
-				{
-					if (GUISettingsOfElement%setElementID%%parameter3%%a_index%=1)
-					{
-						
-						%setElementID%%parameter3%.=A_Index
-						;MsgBox % setElementID parameter3 "=" %setElementID%%parameter3%
-					}
-					;MsgBox % setElementID parameter3 "=" A_Index
-				}
-			}
-			else  if (parameter1="text2")
-			{
-				
-				StringSplit,tempparname,parameter3,; ;get the parameter names
-				%setElementID%%tempparname1%:=GUISettingsOfElement%setElementID%%tempparname1%
-				%setElementID%%tempparname2%:=GUISettingsOfElement%setElementID%%tempparname2%
-			}
-			else  if (parameter1="text3")
-			{
-				
-				StringSplit,tempparname,parameter3,; ;get the parameter names
-				%setElementID%%tempparname1%:=GUISettingsOfElement%setElementID%%tempparname1%
-				%setElementID%%tempparname2%:=GUISettingsOfElement%setElementID%%tempparname2%
-				%setElementID%%tempparname3%:=GUISettingsOfElement%setElementID%%tempparname3%
-			}
-			else
-			{
-				;MsgBox % setElementID parameter3 "=" GUISettingsOfElement%setElementID%%parameter3%
-				%setElementID%%parameter3%:=GUISettingsOfElement%setElementID%%parameter3%
-				;MsgBox % setElementID parameter3 "=" GUISettingsOfElement%setElementID%%parameter3%
 			}
 		}
+		else if (parameter.type="weekdays")
+		{
+			tempOneParID:=parameterID[1]
+			%setElementID%%tempOneParID%=
+			loop 7
+			{
+				if (GUISettingsOfElement%setElementID%%tempOneParID%%a_index%=1)
+				{
+					
+					%setElementID%%tempOneParID%.=A_Index
+					
+				}
+			}
+		}
+		else
+		{
+			;Certain types of control consist of multiple controls and thus contain multiple parameters.
+			for index2, oneID in parameterID
+			{
+				tempOneParID:=parameterID[index2]
+				%setElementID%%tempOneParID%:=GUISettingsOfElement%setElementID%%tempOneParID%
+				
+			}
+		}
+		
 		
 		
 	}
@@ -808,6 +826,7 @@
 	
 	SG2.Destroy()
 	Gui,destroy
+	GUISettingsOfElementRemoveInfoTooltip()
 	
 	ui_EnableMainGUI()
 	saved=no
@@ -834,12 +853,133 @@
 	
 }
 
-ui_GUISettingsOfElementUpdateName()
+GUISettingsOfElementClickOnRadio(CtrlHwnd, GuiEvent="", EventInfo="", ErrorLevell="")
+{
+	global
+	local tempEnabled
+	local tempControlName
+	local tempValue
+	local tempOneParamID
+	local tempToSetParamID
+	guicontrolget,tempEnabled,enabled,%CtrlHwnd%
+	guicontrolget,tempControlName,name,%CtrlHwnd%
+	;~ guicontrolget,tempValue,,%CtrlHwnd%
+	StringReplace,tempOneParamID,tempControlName,GUISettingsOfElement%setElementID%
+	stringright,tempValue,tempOneParamID,1
+	StringTrimRight,tempOneParamID,tempOneParamID,1
+	
+	if (GUISettingsOfElementContentTypeOf%setElementID%%tempOneParamID%!="")
+	{
+		
+		tempToSetParamID:=GUISettingsOfElementContentTypeOf%setElementID%%tempOneParamID%
+		;~ MsgBox % tempToSetParamID " .- " tempValue
+		if tempValue=1 ;String
+		{
+			guicontrol,,GUISettingsOfElementInfoIconOf%setElementID%%tempToSetParamID%,Icons\String.ico
+			
+		}
+		else ;Expression
+		{
+			guicontrol,,GUISettingsOfElementInfoIconOf%setElementID%%tempToSetParamID%,Icons\Expression.ico
+			
+		}
+	}
+	
+	GUISettingsOfElementUpdateName()
+}
+
+GUISettingsOfElementCheckContent(CtrlHwnd, GuiEvent="", EventInfo="", ErrorLevell="")
 {
 	global
 	gui,2:default
 	gui,submit,nohide
 	
+	local tempEnabled
+	local tempControlName
+	local tempTextInControl
+	local tempOneParamID
+	local tempFoundPos
+	
+	local thiscontrol:=A_GuiControl
+	if thiscontrol=
+		thiscontrol:=
+	;~ MsgBox %tempOneParamID%
+	guicontrolget,tempEnabled,enabled,%CtrlHwnd%
+	guicontrolget,tempControlName,name,%CtrlHwnd%
+	
+	StringReplace,tempOneParamID,tempControlName,GUISettingsOfElement%setElementID%
+	;~ MsgBox %tempEnabled% - %tempControlName% - %tempOneParamID%
+	GUISettingsOfElementWarningTextFor%setElementID%%tempOneParamID%:=
+	if tempEnabled
+	{
+		guicontrolget,tempTextInControl,,%CtrlHwnd%
+		;~ MsgBox % strobj(parametersToEdit[tempOneParamID]) " - " tempOneParamID
+		if (GUISettingsOfElementContentType%setElementID%%tempOneParamID%="Expression")
+		{
+			
+			;~ MsgBox %tempTextInControl%
+			IfInString,tempTextInControl,`%
+			{
+				guicontrol,show,GUISettingsOfElementWarningIconOf%setElementID%%tempOneParamID%
+				guicontrol,,GUISettingsOfElementWarningIconOf%setElementID%%tempOneParamID%,Icons\Question mark.ico
+				GUISettingsOfElementWarningTextFor%setElementID%%tempOneParamID%:=lang("Note!") " " lang("This is an expression.") " " lang("You musn't use percent signs to add a variable's content.") "`n"
+			}
+		}
+		else if (GUISettingsOfElementContentType%setElementID%%tempOneParamID%="variablename")
+		{
+			Loop
+			{
+				tempFoundPos:=RegExMatch(tempTextInControl, "U).*%(.+)%.*", tempVariablesToReplace)
+				if tempFoundPos=0
+					break
+				StringReplace,tempTextInControl,tempTextInControl,`%%tempVariablesToReplace1%`%,someVarName
+				;~ MsgBox %tempVariablesToReplace1%
+			}
+			;~ MsgBox %tempTextInControl%
+			
+			try
+				asdf%tempTextInControl%:=1 
+			catch
+			{
+				guicontrol,show,GUISettingsOfElementWarningIconOf%setElementID%%tempOneParamID%
+				guicontrol,,GUISettingsOfElementWarningIconOf%setElementID%%tempOneParamID%,Icons\Exclamation mark.ico
+				GUISettingsOfElementWarningTextFor%setElementID%%tempOneParamID%:=lang("Error!") " " lang("The variable name is not valid.") "`n"
+				
+			}
+			
+		}
+		
+		if GUISettingsOfElementWarnIfEmpty%setElementID%%tempOneParamID%
+		{
+			if tempTextInControl=
+			{
+				guicontrol,show,GUISettingsOfElementWarningIconOf%setElementID%%tempOneParamID%
+				guicontrol,,GUISettingsOfElementWarningIconOf%setElementID%%tempOneParamID%,Icons\Exclamation mark.ico
+				GUISettingsOfElementWarningTextFor%setElementID%%tempOneParamID%:=lang("Error!") " " lang("This field mustn't be empty!") "`n"
+				
+			}
+			
+		}
+	}
+	
+	
+	
+	if (GUISettingsOfElementWarningTextFor%setElementID%%tempOneParamID%="" and !openingElementSettingsWindow)
+		guicontrol,hide,GUISettingsOfElementWarningIconOf%setElementID%%tempOneParamID%
+	;~ MsgBox %setElementID%%tempOneParamID%
+	GUISettingsOfElementUpdateName()
+	return
+}
+
+
+
+
+GUISettingsOfElementUpdateName()
+{
+	global
+	GUISettingsOfElementRemoveInfoTooltip()
+	gui,2:default
+	gui,submit,nohide
 	
 	
 	CheckSettings%setElementType%%setElementsubType%(setElementID)
@@ -852,9 +992,90 @@ ui_GUISettingsOfElementUpdateName()
 	
 	
 	Newname:=GenerateName%setElementType%%setElementsubType%(setElementID)
-	
+	StringReplace,Newname,Newname,`n,%a_space%-%a_space%,all
 	guicontrol,,GUISettingsOfElementEditName,%Newname%
 }
+
+GUISettingsOfElementClickOnWarningPic()
+{
+	StringReplace,tempOneParamID,A_GuiControl,GUISettingsOfElementWarningIconOf%setElementID%
+	ToolTip,% GUISettingsOfElementWarningTextFor%setElementID%%tempOneParamID%,,,11
+	settimer,GUISettingsOfElementRemoveInfoTooltip,-5000
+	return
+}
+GUISettingsOfElementRemoveInfoTooltip()
+{
+	ToolTip,,,,11
+	return
+}
+GUISettingsOfElementClickOnInfoPic()
+{
+	global
+	local tempOneParamID
+	local tempRadioID
+	gui,2:default
+	gui,submit,nohide
+	StringReplace,tempOneParamID,A_GuiControl,GUISettingsOfElementInfoIconOf%setElementID%
+	;~ MsgBox %tempOneParamID%
+	;~ MsgBox % GUISettingsOfElementContentType%setElementID%%tempOneParamID%
+	if GUISettingsOfElementContentType%setElementID%%tempOneParamID%=Expression
+	{
+		
+		ToolTip,% lang("This field contains an expression") "`n" lang("Examples") ":`n5`n5+3*6`nA_ScreenWidth`n(a=4) or (b=1)" ,,,11
+	}
+	if GUISettingsOfElementContentType%setElementID%%tempOneParamID%=String
+	{
+		
+		ToolTip,% lang("This field contains a string") "`n" lang("Examples") ":`nHello World`nMy name is %A_UserName%`nToday's date is %A_Now%" ,,,11
+	}
+	if GUISettingsOfElementContentType%setElementID%%tempOneParamID%=VariableName
+	{
+		
+		ToolTip,% lang("This field contains a variable name") "`n" lang("Examples") ":`nVarname`nEntry1`nEntry%a_index%" ,,,11
+	}
+	if GUISettingsOfElementContentType%setElementID%%tempOneParamID%=StringOrExpression
+	{
+		tempRadioID:=GUISettingsOfElementContentTypeRadio%setElementID%%tempOneParamID%
+		;~ MsgBox %tempRadioID%
+		;~ MsgBox % GUISettingsOfElement%setElementID%%tempRadioID%1
+		;~ MsgBox % GUISettingsOfElement%setElementID%%tempRadioID%2
+		if (GUISettingsOfElement%setElementID%%tempRadioID%1)
+			ToolTip,% lang("This field contains a string") "`n" lang("Examples") ":`nHello World`nMy name is %A_UserName%`nToday's date is %A_Now%" ,,,11
+		else if (GUISettingsOfElement%setElementID%%tempRadioID%2)
+			ToolTip,% lang("This field contains an expression") "`n" lang("Examples") ":`n5`n5+3*6`nA_ScreenWidth`n(a=4) or (b=1)" ,,,11
+	}
+	settimer,GUISettingsOfElementRemoveInfoTooltip,-5000
+	return
+}
+	
+	
+	
+GUISettingsOfElementButton()
+{
+	;~ MsgBox, %a_guicontrol%`n%A_gui%`n%A_guiEvent%`n%A_EventInfo%
+	gui,submit,nohide
+	RegExMatch(a_guicontrol, "GUISettingsOfElementbutton_(.+)_(.+)_(.+)", tempButton) ;Find out witch button was pressed
+	tempSetWhat:=tempButton1
+	tempSetID:=tempButton2
+	tempSetPar:=tempButton3
+	
+	
+	GUISettingsOfElementUpdateName()
+	return
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ui_disableElementSettingsWindow()
 {
@@ -1024,6 +1245,8 @@ ui_selectElementType(type,setElementID,PreviousSubType="")
 	%GuiElementChoosedID%subType:=TVsubType%GuiElementChoosedTV%
 	;%GuiElementChoosedID%name:="¦ new element" ;Do not translate!
 	NowResultEditingElement=OK
+	
+	e_setUnsetDefaults(GuiElementChoosedID)
 	ui_settingsOfElement(GuiElementChoosedID,PreviousSubType2)
 
 	return 

@@ -22,7 +22,8 @@ getParametersActionShutdown()
 {
 	global
 	
-	parametersToEdit=
+	parametersToEdit:=Object()
+
 	return parametersToEdit
 }
 

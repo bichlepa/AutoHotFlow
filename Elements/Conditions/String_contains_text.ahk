@@ -97,8 +97,18 @@ runConditionString_contains_text(InstanceID,ThreadID,ElementID,ElementIDInInstan
 getParametersConditionString_contains_text()
 {
 	
-	parametersToEdit:=["Label| " lang("Input string"),"Radio|1|expression|" lang("This is a string") ";" lang("This is a variable name or expression") ,"Text|Hello World|VarValue","Label| " lang("Text to search"),"Radio|1|IsExpressionSearchText|" lang("This is a string") ";" lang("This is a variable name or expression") ,"Text|World|SearchText","Label|" lang("Search text position"),"Radio|3|WhereToBegin|" lang("Starts with") ";" lang("Ends with") ";" lang("Contains anywhere"),"Label|" lang("Case sensitivity"),"Radio|1|CaseSensitive|" lang("Case insensitive") ";" lang("Case sensitive")]
-	
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label:  lang("Input string")})
+	parametersToEdit.push({type: "Radio", id: "expression", default: 1, choices: [lang("This is a string"), lang("This is a variable name or expression")]})
+	parametersToEdit.push({type: "Edit", id: "VarValue", default: "Hello World", content: "StringOrExpression", contentParID: "expression", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label:  lang("Text to search")})
+	parametersToEdit.push({type: "Radio", id: "IsExpressionSearchText", default: 1, choices: [lang("This is a string"), lang("This is a variable name or expression")]})
+	parametersToEdit.push({type: "Edit", id: "SearchText", default: "World", content: "String", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: lang("Search text position")})
+	parametersToEdit.push({type: "Radio", id: "WhereToBegin", default: 3, choices: [lang("Starts with"), lang("Ends with"), lang("Contains anywhere")]})
+	parametersToEdit.push({type: "Label", label: lang("Case sensitivity")})
+	parametersToEdit.push({type: "Radio", id: "CaseSensitive", default: 1, choices: [lang("Case insensitive"), lang("Case sensitive")]})
+
 	return parametersToEdit
 }
 

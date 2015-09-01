@@ -62,7 +62,11 @@ getParametersLoopSimpleLoop()
 {
 	global
 	
-	parametersToEdit:=["Label|" lang("Repeats"),"Checkbox|0|Infinite|" lang("Endless loop"),"text|5|repeatCount"]
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Repeats")})
+	parametersToEdit.push({type: "Checkbox", id: "Infinite", default: 0, label: lang("Endless loop")})
+	parametersToEdit.push({type: "Edit", id: "repeatCount", default: 5, content: "Expression", WarnIfEmpty: true})
+
 	return parametersToEdit
 }
 

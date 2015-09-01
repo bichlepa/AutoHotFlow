@@ -142,8 +142,12 @@ getParametersTriggerTime_of_day()
 {
 	
 	
-	parametersToEdit:=["Label|" lang("Weekdays"), "Weekdays|1234567|WeekDays","Label|" lang("Time of day"),"TimeOfDay|1234567|Time"]
-	
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Weekdays")})
+	parametersToEdit.push({type: "Weekdays", id: "WeekDays", default: 1234567})
+	parametersToEdit.push({type: "Label", label: lang("Time of day")})
+	parametersToEdit.push({type: "TimeOfDay", id: "Time", default: a_now})
+
 	return parametersToEdit
 }
 

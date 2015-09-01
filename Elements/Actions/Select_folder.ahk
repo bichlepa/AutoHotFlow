@@ -105,8 +105,18 @@ stopActionSelect_folder(ID)
 getParametersActionSelect_folder()
 {
 	
-	parametersToEdit:=["Label|" lang("Output variable_name"),"VariableName|selectedFolder|Varname","Label|" lang("Prompt"),"text|" lang("Select a folder")" |title","Label|" lang("Root directory"),"folder||folder","Label|" lang("Options"), "checkbox|1|AllowUpward|" lang("Permit to navigate upward"),"checkbox|0|ButtonNewFolder|" lang("Show a button to create a new folder"),"checkbox|0|EditField|" lang("Show an edit field to type in the folder name")]
-	
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Output variable_name")})
+	parametersToEdit.push({type: "Edit", id: "Varname", default: "selectedFolder", content: "VariableName", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: lang("Prompt")})
+	parametersToEdit.push({type: "Edit", id: "title", default: lang("Select a folder"), content: "String"})
+	parametersToEdit.push({type: "Label", label: lang("Root directory")})
+	parametersToEdit.push({type: "folder", id: "folder"})
+	parametersToEdit.push({type: "Label", label: lang("Options")})
+	parametersToEdit.push({type: "checkbox", id: "AllowUpward", default: 1, label: lang("Permit to navigate upward")})
+	parametersToEdit.push({type: "checkbox", id: "ButtonNewFolder", default: 0, label: lang("Show a button to create a new folder")})
+	parametersToEdit.push({type: "checkbox", id: "EditField", default: 0, label: lang("Show an edit field to type in the folder name")})
+
 	return parametersToEdit
 }
 

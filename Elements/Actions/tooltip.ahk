@@ -50,8 +50,15 @@ getCategoryActionTooltip()
 getParametersActionTooltip()
 {
 	global
-	parametersToEdit:=["Label|" lang("Text_to_show"),"MultiLineText|" lang("Message") "|text","Label|" lang("Duration"),"Number|2|duration","Radio|2|Unit|" lang("Milliseconds") ";" lang("Seconds") ";" lang("Minutes"),"Label|" lang("Options"),"Checkbox|1|follow_mouse|" lang("Follow_Mouse")]
-	
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Text_to_show")})
+	parametersToEdit.push({type: "Edit", id: "text", default: lang("Message"), multiline: true, content: "String"})
+	parametersToEdit.push({type: "Label", label: lang("Duration")})
+	parametersToEdit.push({type: "Number", id: "duration", default: 2, content: "Expression", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Radio", id: "Unit", default: 2, choices: [lang("Milliseconds"), lang("Seconds"), lang("Minutes")]})
+	parametersToEdit.push({type: "Label", label: lang("Options")})
+	parametersToEdit.push({type: "Checkbox", id: "follow_mouse", default: 1, label: lang("Follow_Mouse")})
+
 	return parametersToEdit
 }
 

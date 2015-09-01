@@ -64,8 +64,17 @@ getCategoryActionSplit_a_string()
 getParametersActionSplit_a_string()
 {
 	global
-	parametersToEdit:=["Label|" lang("Output list name"),"VariableName|NewList|Varname","Label| " lang("Input string"),"Radio|1|expression|" lang("This is a string") ";" lang("This is a variable name or expression") ,"Text|Hello real world, Hello virtual world|VarValue","Label|" lang("Delimiter characters"),"Text|,|Delimiters","Label|" lang("Omit characters"),"Text|%a_space%%a_tab%|OmitChars"]
-	
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Output list name")})
+	parametersToEdit.push({type: "Edit", id: "Varname", default: "NewList", content: "VariableName", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label:  lang("Input string")})
+	parametersToEdit.push({type: "Radio", id: "expression", default: 1, choices: [lang("This is a string"), lang("This is a variable name or expression")]})
+	parametersToEdit.push({type: "Edit", id: "VarValue", default: "Hello real world, Hello virtual world", content: "StringOrExpression", contentParID: "expression", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: lang("Delimiter characters")})
+	parametersToEdit.push({type: "Edit", id: "Delimiters", default: ",", content: "String", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: lang("Omit characters")})
+	parametersToEdit.push({type: "Edit", id: "OmitChars", default: "%a_space%%a_tab%", content: "String", WarnIfEmpty: true})
+
 	return parametersToEdit
 }
 

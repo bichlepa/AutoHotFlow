@@ -67,8 +67,12 @@ stopConditionFile_has_attribute(ID)
 getParametersConditionFile_has_attribute()
 {
 	
-	parametersToEdit:=["Label|" lang("File path"),"File||file|" lang("Select a file") "|","Label|" lang("Which attribute"),"Radio|1|Attribute|" lang("Read only") ";" lang("Archive") ";" lang("System") ";" lang("Hidden") ";" lang("Normal") ";" lang("Directory") ";" lang("Offline") ";" lang("Compressed") ";" lang("Temporary")]
-	
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("File path")})
+	parametersToEdit.push({type: "File", id: "file", label: lang("Select a file")})
+	parametersToEdit.push({type: "Label", label: lang("Which attribute")})
+	parametersToEdit.push({type: "Radio", id: "Attribute", default: 1, choices: [lang("Read only"), lang("Archive"), lang("System"), lang("Hidden"), lang("Normal"), lang("Directory"), lang("Offline"), lang("Compressed"), lang("Temporary")]})
+
 	return parametersToEdit
 }
 

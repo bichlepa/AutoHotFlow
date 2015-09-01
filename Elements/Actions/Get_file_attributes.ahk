@@ -57,8 +57,12 @@ getCategoryActionGet_file_attributes()
 getParametersActionGet_file_attributes()
 {
 	global
-	
-	parametersToEdit:=["Label|" lang("Output variable name"),"VariableName|FileAttributes|varname","Label|" lang("File path"),"File||file|" lang("Select a file") "|"]
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Output variable name")})
+	parametersToEdit.push({type: "Edit", id: "varname", default: "FileAttributes", content: "VariableName", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: lang("File path"), options: 8})
+	parametersToEdit.push({type: "File", id: "file", label: lang("Select a file")})
+
 	return parametersToEdit
 }
 

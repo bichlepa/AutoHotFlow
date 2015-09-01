@@ -124,8 +124,24 @@ stopActionSelect_file(ID)
 getParametersActionSelect_file()
 {
 	
-	parametersToEdit:=["Label|" lang("Output variable_name"),"VariableName|selectedFiles|Varname","Label|" lang("Prompt"),"text|" lang("Select a file")" |title","Label|" lang("Root directory"),"folder||folder","Label|" lang("Filter"),"Text|" lang("Any files") " (*.*)|filter","Label|" lang("Options"), "checkbox|0|MultiSelect|" lang("Allow to select multiple files"),"checkbox|0|SaveButton|" lang("'Save' button instead of an 'Open' button"),"checkbox|0|fileMustExist|" lang("File must exist"),"checkbox|0|PathMustExist|" lang("Path must exist"),"checkbox|0|PromptNewFile|" lang("Prompt to create new file"),"checkbox|0|PromptOverwriteFile|" lang("Prompt to overwrite file"),"checkbox|0|NoShortcutTarget|" lang("Don't resolve shortcuts to their targets")]
-	
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Output variable_name")})
+	parametersToEdit.push({type: "Edit", id: "Varname", default: "selectedFiles", content: "VariableName", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: lang("Prompt")})
+	parametersToEdit.push({type: "Edit", id: "title", default: lang("Select a file"), content: "String"})
+	parametersToEdit.push({type: "Label", label: lang("Root directory")})
+	parametersToEdit.push({type: "folder", id: "folder"})
+	parametersToEdit.push({type: "Label", label: lang("Filter")})
+	parametersToEdit.push({type: "Edit", id: "filter", default: lang("Any files") " (*.*)", content: "String"})
+	parametersToEdit.push({type: "Label", label: lang("Options")})
+	parametersToEdit.push({type: "checkbox", id: "MultiSelect", default: 0, label: lang("Allow to select multiple files")})
+	parametersToEdit.push({type: "checkbox", id: "SaveButton", default: 0, label: lang("'Save' button instead of an 'Open' button")})
+	parametersToEdit.push({type: "checkbox", id: "fileMustExist", default: 0, label: lang("File must exist")})
+	parametersToEdit.push({type: "checkbox", id: "PathMustExist", default: 0, label: lang("Path must exist")})
+	parametersToEdit.push({type: "checkbox", id: "PromptNewFile", default: 0, label: lang("Prompt to create new file")})
+	parametersToEdit.push({type: "checkbox", id: "PromptOverwriteFile", default: 0, label: lang("Prompt to overwrite file")})
+	parametersToEdit.push({type: "checkbox", id: "NoShortcutTarget", default: 0, label: lang("Don't resolve shortcuts to their targets")})
+
 	return parametersToEdit
 }
 

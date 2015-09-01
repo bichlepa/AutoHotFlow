@@ -69,7 +69,16 @@ getParametersActionWrite_to_ini()
 {
 	global
 	
-	parametersToEdit:=["Label|" lang("Value"),"VariableName|value|Value","Label|" lang("Select an .ini file"),"File||file|" lang("Select an .ini file") "|8|(*.ini)","Label|" lang("Section"),"Text|section|Section","Label|" lang("Key"),"Text|key|Key"]
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Value")})
+	parametersToEdit.push({type: "Edit", id: "Value", default: "value", content: "String"})
+	parametersToEdit.push({type: "Label", label: lang("Select an .ini file")})
+	parametersToEdit.push({type: "File", id: "file", label: lang("Select an .ini file")})
+	parametersToEdit.push({type: "Label", label: lang("Section")})
+	parametersToEdit.push({type: "Edit", id: "Section", default: "section", content: "String", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: lang("Key")})
+	parametersToEdit.push({type: "Edit", id: "Key", default: "key", content: "String", WarnIfEmpty: true})
+
 	return parametersToEdit
 }
 

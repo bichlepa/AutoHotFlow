@@ -65,8 +65,12 @@ getCategoryActionSet_lock_key()
 getParametersActionSet_lock_key()
 {
 	global
-	parametersToEdit:=["Label|" lang("Which lock key"),"Radio|1|WhichKey|" lang("Caps lock") ";" lang("Num lock") ";" lang("Scroll lock"),"Label|" lang("Status to set"),"Radio|1|Status|" lang("On") ";" lang("Off") ";" lang("Toggle") ";" lang("Always on") ";" lang("Always off") ]
-	;,"Label|" lang("Insert_a_keystroke"), "Hotkey||HotkeyToInsert,"Button|customSettingButtonOfActionSet_lock_keyHotkeyToInsert||" lang("Insert")
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Which lock key")})
+	parametersToEdit.push({type: "Radio", id: "WhichKey", default: 1, choices: [lang("Caps lock"), lang("Num lock"), lang("Scroll lock")]})
+	parametersToEdit.push({type: "Label", label: lang("Status to set")})
+	parametersToEdit.push({type: "Radio", id: "Status", default: 1, choices: [lang("On"), lang("Off"), lang("Toggle"), lang("Always on"), lang("Always off")]})
+
 	return parametersToEdit
 }
 

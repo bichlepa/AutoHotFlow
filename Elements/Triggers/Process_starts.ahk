@@ -76,8 +76,10 @@ DisableTriggerProcess_starts(ElementID)
 getParametersTriggerProcess_starts()
 {
 	
-	parametersToEdit:=["Label|" lang("Process name"),"text||ProcessName"]
-	
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Process name")})
+	parametersToEdit.push({type: "Edit", id: "ProcessName", content: "String", WarnIfEmpty: true})
+
 	
 	return parametersToEdit
 }

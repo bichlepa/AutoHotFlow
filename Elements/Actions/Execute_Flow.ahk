@@ -157,7 +157,16 @@ getParametersActionExecute_Flow()
 {
 	global
 	
-	parametersToEdit:=["Label|" lang("Flow_name"),"Text||flowName","Label| " lang("Options"),"Checkbox|1|SendLocalVars|" lang("Send local variables"),"Checkbox|0|SkipDisabled|" lang("Skip disabled flows without error"),"Checkbox|0|WaitToFinish|" lang("Wait for called flow to finish"),"Checkbox|0|ReturnVariables|" lang("Return variables to the calling flow")]
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Flow_name")})
+	parametersToEdit.push({type: "Edit", id: "flowName", content: "String", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label:  lang("Options")})
+	parametersToEdit.push({type: "Checkbox", id: "SendLocalVars", default: 1, label: lang("Send local variables")})
+	parametersToEdit.push({type: "Checkbox", id: "SkipDisabled", default: 0, label: lang("Skip disabled flows without error")})
+	parametersToEdit.push({type: "Checkbox", id: "WaitToFinish", default: 0, label: lang("Wait for called flow to finish")})
+	parametersToEdit.push({type: "Checkbox", id: "ReturnVariables", default: 0, label: lang("Return variables to the calling flow")})
+
+
 	return parametersToEdit
 }
 

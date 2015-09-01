@@ -68,7 +68,14 @@ getParametersActionGet_file_time()
 {
 	global
 	
-	parametersToEdit:=["Label|" lang("Output variable name"),"VariableName|FileTime|varname","Label|" lang("File path"),"File||file|" lang("Select a file") "|8","Label|" lang("Which time"),"Radio|1|TimeType|" lang("Modification time") ";" lang("Creation time") ";" lang("Last access time")]
+		parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Output variable name")})
+	parametersToEdit.push({type: "Edit", id: "varname", default: "FileTime", content: "VariableName", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: lang("File path")})
+	parametersToEdit.push({type: "File", id: "file", label: lang("Select a file"), options: 8})
+	parametersToEdit.push({type: "Label", label: lang("Which time")})
+	parametersToEdit.push({type: "Radio", id: "TimeType", default: 1, choices: [lang("Modification time"), lang("Creation time"), lang("Last access time")]})
+
 	return parametersToEdit
 }
 

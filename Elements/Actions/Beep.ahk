@@ -36,7 +36,12 @@ getParametersActionBeep()
 {
 	global
 	
-	parametersToEdit:=["Label|" lang("Frequency in Hz"),"text|523|frequency","Label|" lang("Duration in ms"),"text|150|duration"]
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Frequency in Hz")})
+	parametersToEdit.push({type: "edit", id: "frequency", default: 523, content: "Expression", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: lang("Duration in ms")})
+	parametersToEdit.push({type: "edit", id: "duration", default: 150, content: "Expression", WarnIfEmpty: true})
+
 	return parametersToEdit
 }
 

@@ -136,7 +136,22 @@ getParametersActionGet_pixel_color()
 {
 	global
 	
-	parametersToEdit:=["Label|" lang("Output variables"),"Checkbox|1|OutputRGB|" lang("Write RGB value in output variable"),"Checkbox|0|OutputSeparate|" lang("Write each color in separate variable"),"SmallLabel|"  lang("RGB value") ,"Text|ColorRBG|varnameRGB","SmallLabel|"  lang("Red, green, blue"),"Text3|ColorRed;ColorBlue;ColorGreen|varnameR;varnameG;varnameB","Label|" lang("Position"),"Radio|1|CoordMode|" lang("Relative to screen") ";" lang("Relative to active window position") ";" lang("Relative to active window client position"),"SmallLabel|"  "x, y", "Text2|10;20|CoordinateX;CoordinateY","button|ActionGet_pixel_colorMouseTracker|MouseTracker|" lang("Get coordinates"),"Label|" lang("Method"),"Radio|1|Method|" lang("Default method") ";" lang("Alternative method") ";" lang("Slow method")]
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Output variables")})
+	parametersToEdit.push({type: "Checkbox", id: "OutputRGB", default: 1, label: lang("Write RGB value in output variable")})
+	parametersToEdit.push({type: "Checkbox", id: "OutputSeparate", default: 0, label: lang("Write each color in separate variable")})
+	parametersToEdit.push({type: "Label", label: lang("RGB value"), size: "small"})
+	parametersToEdit.push({type: "Edit", id: "varnameRGB", default: "ColorRBG", content: "VariableName", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: lang("Red, green, blue"), size: "small"})
+	parametersToEdit.push({type: "Edit", id: ["varnameR", "varnameG", "varnameB"], default: ["ColorRed", "ColorBlue", "ColorGreen"], content: "VariableName", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: lang("Position")})
+	parametersToEdit.push({type: "Radio", id: "CoordMode", default: 1, choices: [lang("Relative to screen"), lang("Relative to active window position"), lang("Relative to active window client position")], content: "Expression", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: "x, y", size: "small"})
+	parametersToEdit.push({type: "Edit", id: ["CoordinateX", "CoordinateY"], default: [10, 20], content: "Expression", WarnIfEmpty: true})
+	parametersToEdit.push({type: "button", id: "MouseTracker", goto: "ActionGet_pixel_colorMouseTracker", label: lang("Get coordinates")})
+	parametersToEdit.push({type: "Label", label: lang("Method")})
+	parametersToEdit.push({type: "Radio", id: "Method", default: 1, choices: [lang("Default method"), lang("Alternative method"), lang("Slow method")]})
+
 	return parametersToEdit
 }
 

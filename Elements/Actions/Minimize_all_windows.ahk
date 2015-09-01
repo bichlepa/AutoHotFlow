@@ -26,8 +26,10 @@ getParametersActionMinimize_all_windows()
 {
 	global
 	
-	parametersToEdit:=["Label|" lang("Event"),"Radio|1|WinMinimizeAllEvent|" lang("Minimize all windows") ";" lang("Undo")]
-	return parametersToEdit
+		parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Event")})
+	parametersToEdit.push({type: "Radio", id: "WinMinimizeAllEvent", default: 1, choices: [lang("Minimize all windows"), lang("Undo")]})
+return parametersToEdit
 }
 
 GenerateNameActionMinimize_all_windows(ID)

@@ -335,12 +335,20 @@ ui_DrawEverything(Posw,Posh)
 			
 			if tempFromEl=MOUSE
 			{
-				
-				MouseGetPos,mx2,my2 ;Get the mouse position
-				mx3:=mx2 ;calculate the mouse position relative to the picture
-				my3:=my2
-				StartPosx:=(mx3)/zoomfactor+offsetx
-				StartPosy:=(my3)/zoomfactor+offsety
+				MouseGetPos,GDImx2,GDImy2 ;Get the mouse position
+				IfWinActive,ahk_id %MainGuihwnd%
+				{
+					StartPosx:=(GDImx2)/zoomfactor+offsetx
+					StartPosy:=(GDImy2)/zoomfactor+offsety
+					GDIStartPosxOld:=StartPosx
+					GDIStartPosYOld:=StartPosy
+				}
+				else
+				{
+					StartPosx:=GDIStartPosxOld
+					StartPosy:=GDIStartPosYOld
+					
+				}
 				
 			}
 			else if (%tempFromEl%type="loop")
@@ -375,11 +383,19 @@ ui_DrawEverything(Posw,Posh)
 			
 			if tempToEl=MOUSE
 			{
-				MouseGetPos,mx2,my2 ;Get the mouse position
-				mx3:=mx2 ;calculate the mouse position relative to the picture
-				my3:=my2
-				aimPosx:=(mx3)/zoomfactor+offsetx
-				aimPosy:=(my3)/zoomfactor+offsety
+				MouseGetPos,GDImx2,GDImy2 ;Get the mouse position
+				IfWinActive,ahk_id %MainGuihwnd%
+				{
+					aimPosx:=(GDImx2)/zoomfactor+offsetx
+					aimPosy:=(GDImy2)/zoomfactor+offsety
+					GDIAimPosX:=aimPosx
+					GDIAimPosY:=aimPosY
+				}
+				else
+				{
+					aimPosx:=GDIAimPosX
+					aimPosY:=GDIAimPosY
+				}
 				
 			}
 			else if (%tempToEl%type="loop")

@@ -165,7 +165,13 @@ getParametersLoopLoop_through_files()
 {
 	global
 	
-	parametersToEdit:=["Label|" lang("File pattern"),"File||file|" lang("Select a file") "|","Label|" lang("Options"),"Radio|1|OperateOnWhat|" lang("Operate on files") ";" lang("Operate on files and folders") ";" lang("Operate on folders"),"Checkbox|0|Recurse|" lang("Recurse subfolders into")]
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("File pattern")})
+	parametersToEdit.push({type: "File", id: "file", label: lang("Select a file")})
+	parametersToEdit.push({type: "Label", label: lang("Options")})
+	parametersToEdit.push({type: "Radio", id: "OperateOnWhat", default: 1, choices: [lang("Operate on files"), lang("Operate on files and folders"), lang("Operate on folders")]})
+	parametersToEdit.push({type: "Checkbox", id: "Recurse", default: 0, label: lang("Recurse subfolders into")})
+
 	return parametersToEdit
 }
 

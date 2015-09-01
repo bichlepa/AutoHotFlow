@@ -20,8 +20,8 @@ getCategoryActionStop_Sound()
 getParametersActionStop_Sound()
 {
 	global
-	
-	parametersToEdit:=[]
+	parametersToEdit:=Object()
+
 	return parametersToEdit
 }
 

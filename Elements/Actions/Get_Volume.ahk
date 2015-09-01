@@ -34,8 +34,10 @@ getParametersActionGet_Volume()
 {
 	global
 	
-	
-	parametersToEdit:=["Label|" lang("Output variable name"),"VariableName|Volume|Varname"]
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Output variable name")})
+	parametersToEdit.push({type: "Edit", id: "Varname", default: "Volume", content: "VariableName", WarnIfEmpty: true})
+
 	
 	return parametersToEdit
 }

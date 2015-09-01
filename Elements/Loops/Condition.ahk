@@ -69,7 +69,11 @@ getParametersLoopCondition()
 {
 	global
 	
-	parametersToEdit:=[ "Label|" lang("Condition"),"text|a_index <= 5|Expression", "Checkbox|1|EvaluateOnFirstIteration|" lang("Evaluate on first iteration")]
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Condition")})
+	parametersToEdit.push({type: "Edit", id: "Expression", default: "a_index <= 5", content: "Expression", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Checkbox", id: "EvaluateOnFirstIteration", default: 1, label: lang("Evaluate on first iteration")})
+
 	return parametersToEdit
 }
 

@@ -85,9 +85,22 @@ getCategoryActionSet_file_attributes()
 getParametersActionSet_file_attributes()
 {
 	global
-	
-	parametersToEdit:=["Label|" lang("Select file"),"File||file|" lang("Select a file") "|","Label|" lang("Attributes"),"CheckboxWithGray|-1|ReadOnly|" ("Read only") ,"CheckboxWithGray|-1|Archive|" lang("Archive") ,"CheckboxWithGray|-1|System|" lang("System"),"CheckboxWithGray|-1|Hidden|" lang("Hidden") ,"CheckboxWithGray|-1|Offline|" lang("Offline") ,"CheckboxWithGray|-1|Temporary|" lang("Temporary"),"Label|" lang("Options"),"Radio|1|OperateOnWhat|" lang("Operate on files") ";" lang("Operate on files and folders") ";" lang("Operate on folders"),"Checkbox|0|Recurse|" lang("Recurse subfolders into")]
-	return parametersToEdit
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Select file")})
+	parametersToEdit.push({type: "File", id: "file", label: lang("Select a file")})
+	parametersToEdit.push({type: "Label", label: lang("Attributes")})
+	parametersToEdit.push({type: "CheckBox", id: "ReadOnly", default: -1, label: lang("Read only"), gray: true})
+	parametersToEdit.push({type: "CheckBox", id: "Archive", default: -1, label: lang("Archive"), gray: true})
+	parametersToEdit.push({type: "CheckBox", id: "System", default: -1, label: lang("System"), gray: true})
+	parametersToEdit.push({type: "CheckBox", id: "Hidden", default: -1, label: lang("Hidden"), gray: true})
+	parametersToEdit.push({type: "CheckBox", id: "Offline", default: -1, label: lang("Offline"), gray: true})
+	parametersToEdit.push({type: "CheckBox", id: "Temporary", default: -1, label: lang("Temporary"), gray: true})
+	parametersToEdit.push({type: "Label", label: lang("Options")})
+	parametersToEdit.push({type: "Radio", id: "OperateOnWhat", default: 1, choices: [lang("Operate on files"), lang("Operate on files and folders"), lang("Operate on folders")]})
+	parametersToEdit.push({type: "Checkbox", id: "Recurse", default: 0, label: lang("Recurse subfolders into")})
+
+
+		return parametersToEdit
 }
 
 GenerateNameActionSet_file_attributes(ID)

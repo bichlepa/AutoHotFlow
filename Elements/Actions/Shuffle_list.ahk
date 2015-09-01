@@ -78,8 +78,12 @@ getCategoryActionShuffle_list()
 getParametersActionShuffle_list()
 {
 	global
-	parametersToEdit:=["Label|" lang("Output list name"),"VariableName|List|Varname","Label|" lang("Input list name"),"Text|List|VarValue"]
-	
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Output list name")})
+	parametersToEdit.push({type: "Edit", id: "Varname", default: "List", content: "VariableName", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: lang("Input list name")})
+	parametersToEdit.push({type: "Edit", id: "VarValue", default: "List", content: "VariableName", WarnIfEmpty: true})
+
 	return parametersToEdit
 }
 

@@ -61,7 +61,17 @@ getParametersActionSet_file_time()
 {
 	global
 	
-	parametersToEdit:=["Label|" lang("New time") " (" lang("Date format") ")","Text||time","Label|" lang("Select file"),"File||file|" lang("Select a file") "|8","Label|" lang("Which time"),"Radio|1|TimeType|" lang("Modification time") ";" lang("Creation time") ";" lang("Last access time"),"Label|" lang("Options"),"Radio|1|OperateOnWhat|" lang("Operate on files") ";" lang("Operate on files and folders") ";" lang("Operate on folders"),"Checkbox|0|Recurse|" lang("Recurse subfolders into")]
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("New time") " (" lang("Date format") ")"})
+	parametersToEdit.push({type: "Edit", id: "time", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: lang("Select file")})
+	parametersToEdit.push({type: "File", id: "file", label: lang("Select a file"), options: 8})
+	parametersToEdit.push({type: "Label", label: lang("Which time")})
+	parametersToEdit.push({type: "Radio", id: "TimeType", default: 1, choices: [lang("Modification time"), lang("Creation time"), lang("Last access time")]})
+	parametersToEdit.push({type: "Label", label: lang("Options")})
+	parametersToEdit.push({type: "Radio", id: "OperateOnWhat", default: 1, choices: [lang("Operate on files"), lang("Operate on files and folders"), lang("Operate on folders")]})
+	parametersToEdit.push({type: "Checkbox", id: "Recurse", default: 0, label: lang("Recurse subfolders into")})
+
 	return parametersToEdit
 }
 

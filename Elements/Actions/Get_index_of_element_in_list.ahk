@@ -89,8 +89,17 @@ getCategoryActionGet_index_of_element_in_list()
 getParametersActionGet_index_of_element_in_list()
 {
 	global
-	parametersToEdit:=["Label|" lang("Output variable name"),"VariableName|NewVariable|Varname","Label|" lang("Input list"),"VariableName|List|ListName","Label|" lang("Content"),"Radio|1|isExpressionSearchContent|" lang("This is a value") ";" lang("This is a variable name or expression"),"Text|Any element|SearchContent","Label|" lang("Options"),"Checkbox|0|ExceptionWhenNotFound|" lang("Throw exeption if no element was found")]
-	
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Output variable name")})
+	parametersToEdit.push({type: "Edit", id: "Varname", default: "NewVariable", content: "VariableName", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: lang("Input list")})
+	parametersToEdit.push({type: "Edit", id: "ListName", default: "List", content: "VariableName", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: lang("Seeked content")})
+	parametersToEdit.push({type: "Radio", id: "isExpressionSearchContent", default: 1, choices: [lang("This is a value"), lang("This is a variable name or expression")]})
+	parametersToEdit.push({type: "Edit", id: "SearchContent", default: "", content: "StringOrExpression", contentParID: "isExpressionSearchContent", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: lang("Options")})
+	parametersToEdit.push({type: "Checkbox", id: "ExceptionWhenNotFound", default: 0, label: lang("Throw exeption if no element was found")})
+
 	return parametersToEdit
 }
 

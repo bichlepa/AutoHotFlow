@@ -71,8 +71,10 @@ DisableTriggerProcess_closes(ElementID)
 getParametersTriggerProcess_closes()
 {
 	
-	parametersToEdit:=["Label|" lang("Process name or ID"),"text||ProcessName"]
-	
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Process name or ID")})
+	parametersToEdit.push({type: "Edit", id: "ProcessName", content: "String", WarnIfEmpty: true})
+
 	
 	return parametersToEdit
 }

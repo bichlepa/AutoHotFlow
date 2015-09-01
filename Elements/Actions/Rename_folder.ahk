@@ -46,7 +46,12 @@ getParametersActionRename_folder()
 {
 	global
 	
-	parametersToEdit:=["Label|" lang("Folder"),"Folder||folder|" lang("Select a folder") "|","Label|" lang("New name"),"Text|" lang("Unnamed") "|newName"]
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Folder")})
+	parametersToEdit.push({type: "Folder", id: "folder", label: lang("Select a folder")})
+	parametersToEdit.push({type: "Label", label: lang("New name")})
+	parametersToEdit.push({type: "Edit", id: "newName", default: lang("Unnamed"), content: "String", WarnIfEmpty: true})
+
 	return parametersToEdit
 }
 

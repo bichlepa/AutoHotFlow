@@ -82,8 +82,23 @@ getCategoryActionTrim_a_string()
 getParametersActionTrim_a_string()
 {
 	global
-	parametersToEdit:=["Label|" lang("Output variable_name"),"VariableName|NewVariable|Varname","Label| " lang("Input string"),"Radio|1|expression|" lang("This is a string") ";" lang("This is a variable name or expression") ,"Text|Hello World|VarValue","Label|" lang("Operation"),"Radio|1|TrimWhat|" lang("Remove a number of characters") ";" lang("Remove specific caracters"), "Label|" lang("Remove from which side"),"CheckBox|1|LeftSide|" lang("Left-hand side"),"CheckBox|0|RightSide|" lang("Right-hand side"),"Label|" lang("Count of characters"),"Text|6|Length","Label|" lang("Which characters"),"Radio|1|SpacesAndTabs|" lang("Spaces and tabs") ";" lang("Following characters"),"Text|%a_space%%a_tab%|OmitChars"]
-	
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Output variable_name")})
+	parametersToEdit.push({type: "Edit", id: "Varname", default: "NewVariable", content: "VariableName", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label:  lang("Input string")})
+	parametersToEdit.push({type: "Radio", id: "expression", default: 1, choices: [lang("This is a string"), lang("This is a variable name or expression")]})
+	parametersToEdit.push({type: "Edit", id: "VarValue", default: "Hello World", content: "StringOrExpression", contentParID: "expression", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: lang("Operation")})
+	parametersToEdit.push({type: "Radio", id: "TrimWhat", default: 1, choices: [lang("Remove a number of characters"), lang("Remove specific caracters")]})
+	parametersToEdit.push({type: "Label", label: lang("Remove from which side")})
+	parametersToEdit.push({type: "CheckBox", id: "LeftSide", default: 1, label: lang("Left-hand side")})
+	parametersToEdit.push({type: "CheckBox", id: "RightSide", default: 0, label: lang("Right-hand side")})
+	parametersToEdit.push({type: "Label", label: lang("Count of characters")})
+	parametersToEdit.push({type: "Edit", id: "Length", default: 6, content: "Expression", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: lang("Which characters")})
+	parametersToEdit.push({type: "Radio", id: "SpacesAndTabs", default: 1, choices: [lang("Spaces and tabs"), lang("Following characters")]})
+	parametersToEdit.push({type: "Edit", id: "OmitChars", default: "%a_space%%a_tab%", content: "String"})
+
 	return parametersToEdit
 }
 

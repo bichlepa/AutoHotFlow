@@ -96,7 +96,39 @@ getCategoryActionGet_control_text()
 getParametersActionGet_control_text()
 {
 	global
-	parametersToEdit:=["Label|" lang("Output variable_name"),"VariableName|NewVariable|Varname","Label|" lang("Method_for_control_Identification"),"Radio|1|IdentifyControlBy|" lang("Text_in_control") ";" lang("Classname and instance number of the control") ";" lang("Unique control ID"),"Label|" lang("Control_Identification")"|Label_Control_Identification","Radio|2|ControlTextMatchMode|" lang("Start_with") ";" lang("Contain_anywhere") ";" lang("Exactly"),"text||Control_identifier","Label|" lang("Title_of_Window"),"Radio|1|TitleMatchMode|" lang("Start_with") ";" lang("Contain_anywhere") ";" lang("Exactly"),"text||Wintitle","Label|" lang("Exclude_title"),"text||excludeTitle","Label|" lang("Text_of_a_control_in_Window"),"text||winText","Checkbox|0|FindHiddenText|" lang("Detect hidden text"),,"Label|" lang("Exclude_text_of_a_control_in_window"),"text||ExcludeText","Label|" lang("Window_Class"),"text||ahk_class","Label|" lang("Process_Name"),"text||ahk_exe","Label|" lang("Unique_window_ID"),"text||ahk_id","Label|" lang("Unique_Process_ID"),"text||ahk_pid","Label|" lang("Hidden window"),"Checkbox|0|FindHiddenWindow|" lang("Detect hidden window"),"button|FunctionsForElementGetControlInformation||" lang("Wizard_to_get_parameters")]
+		parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Output variable_name")})
+	parametersToEdit.push({type: "Edit", id: "Varname", default: "NewVariable", content: "VariableName", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: lang("Method_for_control_Identification")})
+	parametersToEdit.push({type: "Radio", id: "IdentifyControlBy", default: 2, choices: [lang("Text_in_control"), lang("Classname and instance number of the control"), lang("Unique control ID")]})
+	parametersToEdit.push({type: "Label", id: "Label_Control_Identification", label: lang("Control_Identification")})
+	parametersToEdit.push({type: "Radio", id: "ControlTextMatchMode", default: 2, choices: [lang("Start_with"), lang("Contain_anywhere"), lang("Exactly")]})
+	parametersToEdit.push({type: "Edit", id: "Control_identifier", content: "String", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: lang("Title_of_Window")})
+	parametersToEdit.push({type: "Radio", id: "TitleMatchMode", default: 1, choices: [lang("Start_with"), lang("Contain_anywhere"), lang("Exactly")]})
+	parametersToEdit.push({type: "Edit", id: "Wintitle", content: "String"})
+	parametersToEdit.push({type: "Label", label: lang("Exclude_title")})
+	parametersToEdit.push({type: "Edit", id: "excludeTitle", content: "String"})
+	parametersToEdit.push({type: "Label", label: lang("Text_of_a_control_in_Window")})
+	parametersToEdit.push({type: "Edit", id: "winText", content: "String"})
+	parametersToEdit.push({type: "Checkbox", id: "FindHiddenText", default: 0, label: lang("Detect hidden text")})
+	parametersToEdit.push({type: "Label", label: lang("Exclude_text_of_a_control_in_window")})
+	parametersToEdit.push({type: "Edit", id: "ExcludeText", content: "String"})
+	parametersToEdit.push({type: "Label", label: lang("Window_Class")})
+	parametersToEdit.push({type: "Edit", id: "ahk_class", content: "String"})
+	parametersToEdit.push({type: "Label", label: lang("Process_Name")})
+	parametersToEdit.push({type: "Edit", id: "ahk_exe", content: "String"})
+	parametersToEdit.push({type: "Label", label: lang("Unique_window_ID")})
+	parametersToEdit.push({type: "Edit", id: "ahk_id", content: "String"})
+	parametersToEdit.push({type: "Label", label: lang("Unique_Process_ID")})
+	parametersToEdit.push({type: "Edit", id: "ahk_pid", content: "String"})
+	parametersToEdit.push({type: "Label", label: lang("Hidden window")})
+	parametersToEdit.push({type: "Checkbox", id: "FindHiddenWindow", default: 0, label: lang("Detect hidden window")})
+	parametersToEdit.push({type: "button", goto: "FunctionsForElementGetControlInformation", label: lang("Wizard_to_get_parameters")})
+
+	
+	
+
 	;,"Label|" lang("Insert_a_keystroke"), "Hotkey||HotkeyToInsert,"Button|customSettingButtonOfActionGet_control_textHotkeyToInsert||" lang("Insert")
 	return parametersToEdit
 }

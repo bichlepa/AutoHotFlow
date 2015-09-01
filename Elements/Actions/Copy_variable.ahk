@@ -41,7 +41,12 @@ getCategoryActionCopy_variable()
 getParametersActionCopy_variable()
 {
 	global
-	parametersToEdit:=["Label|" lang("Output variable name"),"VariableName|NewVariable|Varname","Label| " lang("Input variable name"),"VariableName|Variable|OldVarname"]
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Output variable name")})
+	parametersToEdit.push({type: "Edit", id: "Varname", default: "NewVariable", content: "VariableName", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label:  lang("Input variable name")})
+	parametersToEdit.push({type: "Edit", id: "OldVarname", default: "Variable", content: "VariableName", WarnIfEmpty: true})
+
 	
 	return parametersToEdit
 }

@@ -22,8 +22,8 @@ runActionChange_character_case(InstanceID,ThreadID,ElementID,ElementIDInInstance
 	}
 	if temp=
 	{
-		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Input string is empty.")
-		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is empty.",lang("Input string")))
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Warning! Input string is empty.")
+		
 	}
 	
 	
@@ -51,8 +51,15 @@ getCategoryActionChange_character_case()
 getParametersActionChange_character_case()
 {
 	global
-	parametersToEdit:=["Label|" lang("Output Variable_name"),"VariableName|NewVariable|Varname","Label| " lang("Input string"),"Radio|1|expression|" lang("This is a string") ";" lang("This is a variable name or expression") ,"Text|Hello World|VarValue","Label|" lang("Which case (character case)"),"Radio|1|CharCase|" lang("Uppercase") ";" lang("Lowercase") ";" lang("Firt character of a word is uppercase")]
-	
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Output Variable_name")})
+	parametersToEdit.push({type: "Edit", id: "Varname", default: "NewVariable", content: "VariableName", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label:  lang("Input string")})
+	parametersToEdit.push({type: "Radio", id: "expression", default: 1, choices: [lang("This is a string"), lang("This is a variable name or expression")]})
+	parametersToEdit.push({type: "Edit", id: "VarValue", default: "Hello World", content: "StringOrExpression", contentParID: "expression", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: lang("Which case (character case)")})
+	parametersToEdit.push({type: "Radio", id: "CharCase", default: 1, choices: [lang("Uppercase"), lang("Lowercase"), lang("Firt character of a word is uppercase")]})
+
 	return parametersToEdit
 }
 

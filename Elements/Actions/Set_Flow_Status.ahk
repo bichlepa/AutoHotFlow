@@ -144,7 +144,12 @@ getParametersActionSet_Flow_Status()
 {
 	global
 	
-	parametersToEdit:=["Label|" lang("Flow_name"),"Text||flowName","Label|" lang("New state"),"Radio|1|Enable|" lang("Enable") ";" lang("Disable")]
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Flow_name")})
+	parametersToEdit.push({type: "Edit", id: "flowName", content: "String", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: lang("New state")})
+	parametersToEdit.push({type: "Radio", id: "Enable", default: 1, choices: [lang("Enable"), lang("Disable")]})
+
 	return parametersToEdit
 }
 

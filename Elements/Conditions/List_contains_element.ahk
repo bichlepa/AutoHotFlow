@@ -88,8 +88,17 @@ stopConditionList_contains_element(ID)
 getParametersConditionList_contains_element()
 {
 	
-	parametersToEdit:=["Label|" lang("List name"),"VariableName|List|Varname","Label|" lang("Search for what"),"Radio|2|SearchWhat|" lang("Search for an index or key") ";" lang("Search for an element with a specific content"),"Label|" lang("Key or index"),"text|1|Position","Label|" lang("Content"),"Radio|1|isExpressionSearchContent|" lang("This is a value") ";" lang("This is a variable name or expression"),"Text|Any element|SearchContent"]
-	
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("List name")})
+	parametersToEdit.push({type: "Edit", id: "Varname", default: "List", content: "VariableName", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: lang("Search for what")})
+	parametersToEdit.push({type: "Radio", id: "SearchWhat", default: 2, choices: [lang("Search for an index or key"), lang("Search for an element with a specific content")]})
+	parametersToEdit.push({type: "Label", label: lang("Key or index")})
+	parametersToEdit.push({type: "Edit", id: "Position", default: 1, content: "Expression", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: lang("Seeked content")})
+	parametersToEdit.push({type: "Radio", id: "isExpressionSearchContent", default: 1, choices: [lang("This is a value"), lang("This is a variable name or expression")]})
+	parametersToEdit.push({type: "Edit", id: "SearchContent", default: "", content: "String", WarnIfEmpty: true})
+
 	return parametersToEdit
 }
 

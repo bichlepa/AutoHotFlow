@@ -101,8 +101,20 @@ getCategoryActionSubstring()
 getParametersActionSubstring()
 {
 	global
-	parametersToEdit:=["Label|" lang("Output variable_name"),"VariableName|NewVariable|Varname","Label| " lang("Input string"),"Radio|1|expression|" lang("This is a string") ";" lang("This is a variable name or expression") ,"Text|Hello World|VarValue","Label|" lang("Start position"),"Radio|1|WhereToBegin|" lang("Begin from left") ";" lang("Begin from right") ";" lang("Start from following position"),"Text|1|StartPos","Label|" lang("Count of characters"),"CheckBox|0|UntilTheEnd|" lang("Until the end"),"Text|5|Length","Radio|1|LeftOrRight|" lang("Go left") ";" lang("Go right")]
-	
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Output variable_name")})
+	parametersToEdit.push({type: "Edit", id: "Varname", default: "NewVariable", content: "VariableName", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label:  lang("Input string")})
+	parametersToEdit.push({type: "Radio", id: "expression", default: 1, choices: [lang("This is a string"), lang("This is a variable name or expression")]})
+	parametersToEdit.push({type: "Edit", id: "VarValue", default: "Hello World", content: "StringOrExpression", contentParID: "isExpression", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: lang("Start position")})
+	parametersToEdit.push({type: "Radio", id: "WhereToBegin", default: 1, choices: [lang("Begin from left"), lang("Begin from right"), lang("Start from following position")]})
+	parametersToEdit.push({type: "Edit", id: "StartPos", default: 1, content: "Expression", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: lang("Count of characters")})
+	parametersToEdit.push({type: "CheckBox", id: "UntilTheEnd", default: 0, label: lang("Until the end")})
+	parametersToEdit.push({type: "Edit", id: "Length", default: 5, content: "Expression", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Radio", id: "LeftOrRight", default: 1, choices: [lang("Go left"), lang("Go right")]})
+
 	return parametersToEdit
 }
 

@@ -42,8 +42,12 @@ getCategoryActionSquare_Root()
 getParametersActionSquare_Root()
 {
 	global
-	parametersToEdit:=["Label|" lang("Variable_name"),"VariableName|NewVariable|Varname","Label| " lang("Variable containing a number") ,"Text|16|VarValue"]
-	
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Variable_name")})
+	parametersToEdit.push({type: "Edit", id: "Varname", default: "NewVariable", content: "VariableName", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label:  lang("Variable containing a number")})
+	parametersToEdit.push({type: "Edit", id: "VarValue", default: 16, content: "Expression", WarnIfEmpty: true})
+
 	return parametersToEdit
 }
 

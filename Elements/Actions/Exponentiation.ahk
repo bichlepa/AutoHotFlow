@@ -53,7 +53,14 @@ getCategoryActionExponentiation()
 getParametersActionExponentiation()
 {
 	global
-	parametersToEdit:=["Label|" lang("Output variable_name"),"VariableName|NewVariable|Varname","Label| " lang("Input number"),"Text|3|VarValue","Label| " lang("Exponent") ,"Text|2|Exponent"]
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Output variable_name")})
+	parametersToEdit.push({type: "Edit", id: "Varname", default: "NewVariable", content: "VariableName", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label:  lang("Input number")})
+	parametersToEdit.push({type: "Edit", id: "VarValue", default: 3, content: "Expression", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label:  lang("Exponent")})
+	parametersToEdit.push({type: "Edit", id: "Exponent", default: 2, content: "Expression", WarnIfEmpty: true})
+
 	
 	return parametersToEdit
 }

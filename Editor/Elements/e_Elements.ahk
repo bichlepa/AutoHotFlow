@@ -251,6 +251,7 @@ e_TriggerNumbertoID(num)
 
 e_getParameter(elementName,parName)
 {
+	global
 	tempToReturn:=%elementName%Ƥаґ%parName%
 	return tempToReturn
 	
@@ -258,7 +259,51 @@ e_getParameter(elementName,parName)
 }
 e_setParameter(elementName,parName,value)
 {
+	global
 	%elementName%Ƥаґ%parName%:=value
+	
+	
+}
+
+;Is called when the element subtype is set. All parameters that are not set yet are set to the default parameters
+e_setUnsetDefaults(elementID)
+{
+	global
+	local elementType:=%elementID%type
+	local elementSubType:=%elementID%subtype
+	local parameters:=getParameters%elementType%%elementSubType%()
+	local parameter
+	local index
+	local index2
+	local oneID
+	
+	for index, parameter in parameters
+	{
+		
+		if not IsObject(parameter.id)
+			parameterID:=[parameter.id]
+		else
+			parameterID:=parameter.id
+		if not IsObject(parameter.default)
+			parameterdefault:=[parameter.default]
+		else
+			parameterdefault:=parameter.default
+	
+		if (parameterID[1]="" or parameter.type="label" or parameter.type="SmallLabel") ;If this is only a label for the edit fielt etc. Do nothing
+			continue
+		;~ MsgBox % strobj(parameter)
+		
+		;Certain types of control consist of multiple controls and thus contain multiple parameters.
+		for index2, oneID in parameterID
+		{
+			;~ MsgBox % oneID "  -  " index2 " - " parameterdefault[index2]
+			if %elementID%%oneID%=
+				%elementID%%oneID%:=parameterdefault[index2]
+			
+		}
+		
+	
+	}
 	
 	
 }

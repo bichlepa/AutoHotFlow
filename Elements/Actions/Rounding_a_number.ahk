@@ -74,8 +74,16 @@ getCategoryActionRounding_a_number()
 getParametersActionRounding_a_number()
 {
 	global
-	parametersToEdit:=["Label|" lang("Output variable_name"),"VariableName|NewVariable|Varname","Label| " lang("Input number") ,"Text|1.2345|VarValue","Label| " lang("Places after comma") ,"Text|0|Places","Label|" lang("Operation"),"Radio|1|Roundingtype|" lang("Round normally") ";" lang("Round up") ";" lang("Round down") ]
-	
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Output variable_name")})
+	parametersToEdit.push({type: "Edit", id: "Varname", default: "NewVariable", content: "VariableName", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label:  lang("Input number")})
+	parametersToEdit.push({type: "Edit", id: "VarValue", default: 1.2345, content: "Expression", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label:  lang("Places after comma")})
+	parametersToEdit.push({type: "Edit", id: "Places", default: 0, content: "Expression", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: lang("Operation")})
+	parametersToEdit.push({type: "Radio", id: "Roundingtype", default: 1, choices: [lang("Round normally"), lang("Round up"), lang("Round down")]})
+
 	return parametersToEdit
 }
 

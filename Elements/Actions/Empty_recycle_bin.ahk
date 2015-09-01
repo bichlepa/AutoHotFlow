@@ -30,7 +30,11 @@ getParametersActionEmpty_recycle_bin()
 {
 	global
 	
-	parametersToEdit:=["Label|" lang("Which drive"),"Radio|1|AllDrives|" lang("All drives") ";" lang("Specified drive"),"Folder||drive|" lang("Select the root Folder of a drive") "|2"]
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Which drive")})
+	parametersToEdit.push({type: "Radio", id: "AllDrives", default: 1, choices: [lang("All drives"), lang("Specified drive")]})
+	parametersToEdit.push({type: "Folder", id: "drive", label: lang("Select the root Folder of a drive")})
+
 	return parametersToEdit
 }
 

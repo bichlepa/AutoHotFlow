@@ -15,8 +15,10 @@ runConditionExpression(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 getParametersConditionExpression()
 {
 	
-	parametersToEdit:=["Label|" lang("Expression"),"Text||Expression"]
-	
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Expression")})
+	parametersToEdit.push({type: "Edit", id: "Expression", content: "Expression", WarnIfEmpty: true})
+
 	return parametersToEdit
 }
 

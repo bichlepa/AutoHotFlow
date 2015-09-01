@@ -153,8 +153,15 @@ getCategoryActionAutoHotKey_script()
 getParametersActionAutoHotKey_script()
 {
 	global
-	parametersToEdit:=["Label|" lang("AutoHotKey_script"),"MultiLineText||script","Label|" lang("Variables_that_should_be_exported_prior_to_execution"),"MultiLineText||ExportVariables","Label|" lang("Variables_that_should_be_imported_after_execution"),"MultiLineText||ImportVariables"]
-	
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("AutoHotKey_script"), WarnIfEmpty: true})
+	parametersToEdit.push({type: "edit", id: "script", multiline: 1})
+	parametersToEdit.push({type: "Label", label: lang("Variables_that_should_be_exported_prior_to_execution")})
+	parametersToEdit.push({type: "edit", id: "ExportVariables", multiline: 1})
+	parametersToEdit.push({type: "Label", label: lang("Variables_that_should_be_imported_after_execution")})
+	parametersToEdit.push({type: "edit", id: "ImportVariables", multiline: 1})
+
+
 	return parametersToEdit
 }
 

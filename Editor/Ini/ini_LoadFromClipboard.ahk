@@ -133,30 +133,12 @@
 			if (loadElementType="loop")
 			{
 				Iniread,loadElementHeightOfVerticalBar,%ClipboardFlowFilename%,element%index1%,HeightOfVerticalBar
-				%loadElementID%HeightOfVerticalBar=%loadElementHeightOfVerticalBar%
+				%tempNewID%HeightOfVerticalBar=%loadElementHeightOfVerticalBar%
 			}
 			
-			parametersToload:=getParameters%loadElementType%%loadElementsubType%()
-			for index2, parameter in parametersToload
-			{
-				StringSplit,parameter,parameter,|
-				if (parameter3="" or parameter0<3) ; ;If this is only a label for the edit fielt etc. Do nothing
-					continue
-				
-				StringSplit,tempparname,parameter3,; ;get the parameter names
-				StringSplit,tempdefault,parameter2,; ;get the default parameter
-				Loop % tempparname0
-				{
-					temponeparname:=tempparname%A_Index%
-					Iniread,tempContent,%ClipboardFlowFilename%,element%index1%,% temponeparname
-					;MsgBox % temponeparname " " tempContent
-					if (tempContent=="ERROR")
-						tempContent:=tempdefault%A_Index%
-					StringReplace, tempContent, tempContent, |¶,`n, All
-					
-					%tempNewID%%temponeparname%=%tempContent%
-				}
-			}
+			i_LoadParametersOfElement(tempNewID,loadElementType,loadElementsubType,index1,"clipboard")
+			
+			
 			
 		}
 		

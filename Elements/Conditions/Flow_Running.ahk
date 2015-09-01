@@ -107,7 +107,10 @@ getParametersConditionFlow_Running()
 {
 	global
 	
-	parametersToEdit:=["Label|" lang("Flow_name"),"Text||flowName"]
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Flow_name")})
+	parametersToEdit.push({type: "Edit", id: "flowName", content: "String", WarnIfEmpty: true})
+
 	return parametersToEdit
 }
 
