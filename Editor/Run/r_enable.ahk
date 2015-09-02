@@ -3,6 +3,7 @@ r_EnableFlow(options:="")
 {
 	
 	global
+	FlowLastActivity:=a_now
 	
 	if alreadyenabling=true ;Prevent that e.g. it tries to enable twice or disable and enable at same time. This may happen if user clicks on the enable button quickly
 		return

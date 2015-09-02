@@ -13,6 +13,7 @@ ToTriggerList:=Object()
 r_Trigger(ElementID,Execution_Parameters="")
 {
 	global
+	
 	;~ Logger("a3","Passing r_Trigger() function")
 	
 	if r_RunsBlocked
@@ -202,7 +203,7 @@ r_run()
 	;~ Logger("a3","Passing r_run() function")
 	nextrun: ;endless loop until no elements to execute left
 	;~ Logger("a3","Passing nextrun label")
-	
+	FlowLastActivity:=a_now
 
 	;lower the priority. This would make any interrupted ahk threads finish. (like redraw)
 	thread, Priority, -100

@@ -1,19 +1,17 @@
-﻿I wrote this instruction because I thought it might help you with creating new elements.
-But now my advise is: If you want to create a new element, copy the mostly similar element and modify it.
-If you have questions, don't hesitate to contact me!
+﻿
+My first advise is: If you want to create a new element, copy the mostly similar element and modify it.
+If you have questions, read the following notes and don't hesitate to contact me (autohotflow@arcor.de)!
 	
-You can still read my old instruction:
 
-
-Create a new AHK Script that has the name of the Action. The name must be like a variable name! This name will not be displayed.
+Create a new AHK Script or copy one element name it. The name must be like a variable name! This name will not be displayed.
 Include the file in the main script AutoHotFlow.ahk
 
 
 
-You need following functions. The +ElementName+ needs to be replaced by the name of the Action:
+You need following functions. The +ElementName+ needs to be replaced by the name of the Element:
 
 getParameters+ElementType++ElementName+()
-	The parameters that the Action needs are saved here. They are mainly needed for the Settings window, and also for saving and loading the flows.
+	The parameters that the Element needs are saved here. They are mainly needed for the Settings window, and also for saving and loading the flows.
 	It is an array object, which conatins associative arrays.
 	First line is creation of an empty object: parametersToEdit:=Object()
 	The other lines add an entry to the object. Each entry is a GUI element.
@@ -47,6 +45,7 @@ getParameters+ElementType++ElementName+()
 	
 	;Drop down
 	parametersToEdit.push({type: "DropDown", id: "Button", default: 1, choices: [lang("Left button"), lang("Right button"), lang("Middle Button"), lang("Wheel up"), lang("Wheel down"), lang("Wheel left"), lang("Wheel right"), lang("4th mouse button (back)"), lang("5th mouse button (forward)")]
+	parametersToEdit.push({type: "DropDown", id: "TTSEngine", default: TTSDefaultLanguage, choices: TTSList, result: "name"})
 	
 	;Slider
 	parametersToEdit.push({type: "Slider", id: "speed", default: 2, options: "Range0-100 tooltip"})
@@ -69,21 +68,102 @@ GenerateName+ElementType++ElementName+(ID)
 
 
 
-For Actions and Elements you also need following functions:
-run+ElementType++ElementName+(ID)
+For Actions, loops and Conditions you also need following functions:
+run+ElementType++ElementName+(InstanceID,ThreadID,ElementID,ElementIDInInstance)
+{
 	This is the code that will be executed when it is started.
-	It gets the ID of the Action so it can get all the parameters. Therefore this function must be global.
-		Example: %ID%title contains the parameter title
+	
+	The function must have global variable access. It is recommendet to make all temporary used variables local.
+	;Example:
+	global
+	local temp
+	local filename
+	
+	To get parameter values use following examples
+	;Access a parameter
+	%ElementID%title ;"Title" is the parameter ID
+		
+	;Replace varialbes
+	Content:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Content) ;"Content" is the parameter ID
+	
+	;Evaluate expression
+	URL:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%URL) ;"URL" is the parameter ID
+	
+	
+	
+		
+	Variables which can be edited by user manually (edit field in the GUI) should be proofed. 
+	You may use following code.
+	
+	;Check variable name 
+	if not v_CheckVariableName(varname)
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Variable name '" varname "' is not valid")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not valid",lang("Variable name '%1%'",varname)) )
+		return
+	}
+	
+	;Check whether value is not empty
+	if Position=
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Position is not specified.")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is empty.",lang("Position")))
+		return
+	}
+	
+	;Check whether value is a number
+	if temp is not number
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Input number " temp " is not a number")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not a number.",lang("Input number '%1%'",temp)) )
+		return
+	}
+	
+	;Check whether the value is a list
+	if (!(IsObject(tempObject)))
+	{
+		if tempObject=
+		{
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Waring! Variable '" Varname "' is empty. A new list will be created.")
+			tempObject:=Object()
+		}
+		else
+		{
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Variable '" Varname "' is not empty and does not contain a list.")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("Variable '%1%' is not empty and does not contain a list.",Varname))
+			return
+		}
+	}
+	
+	To get a variable's content use following examples:
+	;Get a variable
+	tempindex:=v_GetVariable(InstanceID,ThreadID,varname)
+	;Get a loop variable
+	tempindex:=v_GetVariable(InstanceID,ThreadID,"A_Index")
+	
+	To set a variable use following examples:
+	;Set variable with value 5
+	v_SetVariable(InstanceID,ThreadID,VarName,5) ;Variable "VarName" contains a variable name
+	;Write a list into variable
+	v_SetVariable(InstanceID,ThreadID,Varname,tempObject,"list")
+	;Write a built in variable, beginning with "a_"
+	v_SetVariable(InstanceID,ThreadID,"A_WindowID",tempWinid,,c_SetBuiltInVar)
+	;Write a loop variable, beginning with "a_"
+	v_SetVariable(InstanceID,ThreadID,"A_Index",1,,c_SetLoopVar)
+	
+	
 	When the action or condition is complete it must use the function:
 		MarkThatElementHasFinishedRunning(...)
-	If you want to support variables (user can define variables instead of a string) just use the function replaceVariables(String)
-		Example: replaceVariables(%ID%par1)
-	
-	To set a variable use
-		v_SetVariable(...)
-	To get a variable use
-		returnedValue:=v_getVariable(...)
-	
+	Examples:
+	;Element finished normally
+	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
+	;Condition finished with result Yes
+	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"yes")
+	;Element finished with an exception
+	logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Position is not specified.") ;Log the error, so user will be able to find the reason
+	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is empty.",lang("Position"))) ;The last parameter is a message which is shown to the user if the element has no "exception" connection.
+	return
+}
 	
 
 
@@ -93,17 +173,17 @@ run+ElementType++ElementName+(ID)
 
 For Triggers you also need following functions:
 	
-EnableTrigger+triggername+(ID)
+EnableTrigger+triggername+(ElementID)
 	This is the code for enabling the trigger.
 	It must however detect when it should be triggered and be able to start the flow.
 	It gets the ID of the Trigger so it can get all the parameters. Therefore this function must be global.
-		Example: %ID%title contains the parameter title
+		Example: %ElementID%title contains the parameter title
 	Examples how it can start the flow:
 		- Go to the label Start
 			Goto, Start
 		- An external script 
 
-DisableTrigger+triggername+(ID)
+DisableTrigger+triggername+(ElementID)
 	This is the code for disabling the trigger.
 	It must however stop event detection and not trigger anymore.
 	It gets the ID of the Trigger so it can get all the parameters. Therefore this function must be global.
@@ -115,7 +195,7 @@ DisableTrigger+triggername+(ID)
 
 
 An external script may be needed if the process of the element may interfere with the main script or stop everything else (like a MsgBox or Winwait).
-	Wite via FileAppend a script in the folder "Generated Scripts"
+	Write via FileAppend a script in the folder "Generated Scripts"
 	Execute the script afterwards.
 	
 	

@@ -1,4 +1,11 @@
-﻿ui_settingsOfElement(ElementID,PreviousSubType="")
+﻿;Needed translations:
+temp:=lang("Trigger")
+temp:=lang("Action")
+temp:=lang("Condition")
+temp:=lang("Loop")
+
+
+ui_settingsOfElement(ElementID,PreviousSubType="")
 {
 	global
 	local temp
