@@ -18,7 +18,10 @@ MouseTracker(settingsobject)
 			MouseTrackerCoordMode3=checked
 	}
 	else
-		MouseTrackerCoordMode1=checked
+	{
+		if settingsobject.HasKey("CoordMode")
+			MouseTrackerCoordMode:=settingsobject.CoordMode
+	}
 	
 	loop 3
 		MouseTrackerRadioMethod%a_index%=
@@ -96,9 +99,12 @@ gui,add,text,w200,% lang("Hold control key down and use keyboard cursors to move
 gui,font,wbold
 gui,add,text,x10,% lang("Mouse position")
 gui,font,wnorm
-gui,add,radio,vMouseTrackerCoordMode1 gMouseTrackerRadioCoordMode %MouseTrackerCoordMode1%,%  lang("Relative to screen")
-gui,add,radio,vMouseTrackerCoordMode2 gMouseTrackerRadioCoordMode %MouseTrackerCoordMode2%,% lang("Relative to active window position")
-gui,add,radio,vMouseTrackerCoordMode3 gMouseTrackerRadioCoordMode %MouseTrackerCoordMode3%,% lang("Relative to active window client position")
+if settingsobject.HasKey("ParCoordMode")
+{
+	gui,add,radio,vMouseTrackerCoordMode1 gMouseTrackerRadioCoordMode %MouseTrackerCoordMode1%,%  lang("Relative to screen")
+	gui,add,radio,vMouseTrackerCoordMode2 gMouseTrackerRadioCoordMode %MouseTrackerCoordMode2%,% lang("Relative to active window position")
+	gui,add,radio,vMouseTrackerCoordMode3 gMouseTrackerRadioCoordMode %MouseTrackerCoordMode3%,% lang("Relative to active window client position")
+}
 gui,add,edit,vMouseTrackerColorTextMouse readonly r2
 gui,font,wbold
 gui,add,text,,% lang("Color ID")

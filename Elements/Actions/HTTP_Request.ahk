@@ -5,11 +5,9 @@ runActionHTTP_Request(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	global
 	
 	
-
+	local PostData
 	local URL
-	local PostData:=v_replaceVariables(InstanceID,ThreadID,%ElementID%PostData)
-	if %ElementID%URIEncodePostData
-		uriencode(PostData)
+	
 	local Headers:=v_replaceVariables(InstanceID,ThreadID,%ElementID%RequestHeaders)
 	if %ElementID%URIEncodeRequestHeaders
 		uriencode(Headers)
@@ -23,7 +21,7 @@ runActionHTTP_Request(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	local Proxy:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Proxy)
 	local BypassProxy:=v_replaceVariables(InstanceID,ThreadID,%ElementID%BypassProxy)
 	local BytesDownloaded
-	local Options
+	local Options:=""
 	
 	if %ElementID%IsExpression=1
 		URL:=%ElementID%URL
@@ -51,7 +49,39 @@ runActionHTTP_Request(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 		return
 	}
 	
-	if %elementid%WhereToGetPostData=3 ;If file should be used
+	if %elementid%WhereToGetPostData=2 ;If data should be sent
+	{
+		PostData:=v_replaceVariables(InstanceID,ThreadID,%ElementID%PostData)
+		if %ElementID%URIEncodePostData
+			uriencode(PostData)
+		
+		if %elementid%WhichCodepage=2
+		{
+			Options.="Charset: " Codepage "`n"
+		}
+		else if %elementid%WhichCodepage=3
+		{
+			Options.="Codepage: " Codepage "`n"
+		}
+		if %elementid%WhichContentType=2
+		{
+			Options.="Content-Type: " Contenttype "`n"
+		}
+		if %elementid%WhichContentLength=2
+		{
+			Options.="Content-Length: " ContentLength "`n"
+		}
+		if %elementid%WhichContentMD5=2
+		{
+			Options.="Content-MD5:"  "`n"
+		}
+		if %elementid%WhichContentMD5=3
+		{
+			Options.="Content-MD5: " ContentMD5 "`n"
+		}
+		
+	}
+	else if %elementid%WhereToGetPostData=3 ;If file should be used
 	{
 		local InputFile:=% v_replaceVariables(InstanceID,ThreadID,%ElementID%InputFile)
 		if InputFile=
@@ -62,8 +92,28 @@ runActionHTTP_Request(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 		}
 		if DllCall("Shlwapi.dll\PathIsRelative","Str",InputFile)
 			InputFile:=SettingWorkingDir "\" InputFile
+		
+		Options.="Upload: " InputFile "`n"
 	}
-	
+	if (%elementid%WhereToGetPostData=2 or %elementid%WhereToGetPostData=3) ;If data or file should be sent
+	{
+		if %elementid%WhichContentType=2
+		{
+			Options.="Content-Type: " Contenttype "`n"
+		}
+		if %elementid%WhichContentLength=2
+		{
+			Options.="Content-Length: " ContentLength "`n"
+		}
+		if %elementid%WhichContentMD5=2
+		{
+			Options.="Content-MD5:"  "`n"
+		}
+		if %elementid%WhichContentMD5=3
+		{
+			Options.="Content-MD5: " ContentMD5 "`n"
+		}
+	}
 	if %elementid%WhereToPutResponseData=2 ;If file should be used
 	{
 		local OutputFile:=% v_replaceVariables(InstanceID,ThreadID,%ElementID%OutputFile)
@@ -75,40 +125,20 @@ runActionHTTP_Request(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 		}
 		if DllCall("Shlwapi.dll\PathIsRelative","Str",OutputFile)
 			OutputFile:=SettingWorkingDir "\" OutputFile
+		
+		Options.="SaveAs: " OutputFile "`n"
 	}
 	
-	Options:=""
-	if %elementid%WhichContentType=2
-	{
-		Options.="Content-Type: " Contenttype "`n"
-	}
-	if %elementid%WhichContentLength=2
-	{
-		Options.="Content-Length: " ContentLength "`n"
-	}
+
+	
+	
 	if %elementid%WhichMethod=2
 	{
 		Options.="Method: " %elementid%Method "`n"
 	}
-	if %elementid%WhichContentMD5=2
-	{
-		Options.="Content-MD5:"  "`n"
-	}
-	if %elementid%WhichContentMD5=3
-	{
-		Options.="Content-MD5: " ContentMD5 "`n"
-	}
 	if %elementid%WhichUserAgent=2
 	{
 		Options.="User-Agent: " UserAgent "`n"
-	}
-	if %elementid%WhichCodepage=2
-	{
-		Options.="Charset: " Codepage "`n"
-	}
-	else if %elementid%WhichCodepage=3
-	{
-		Options.="Codepage: " Codepage "`n"
 	}
 	if %elementid%WhichProxy=2
 	{
@@ -122,17 +152,10 @@ runActionHTTP_Request(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	{
 		Options.="ProxyBypass: " BypassProxy "`n"
 	}
+	
 	Options.=Flags "`n"
 	
-	if %elementid%WhereToGetPostData=2
-	{
-		Options.="Upload: " InputFile "`n"
-	}
 	
-	if %elementid%WhereToPutResponseData=2
-	{
-		Options.="SaveAs: " OutputFile "`n"
-	}
 	
 		;~ MsgBox %Options%
 	BytesDownloaded := HTTPRequest( URL, PostData, Headers, Options )
@@ -154,7 +177,7 @@ runActionHTTP_Request(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 }
 getNameActionHTTP_Request()
 {
-	return lang("HTTP_Request")
+	return lang("HTTP_Request") " (" lang("Experimental") ")"
 }
 getCategoryActionHTTP_Request()
 {
@@ -174,11 +197,11 @@ getParametersActionHTTP_Request()
 	parametersToEdit.push({type: "Radio", id: "WhereToGetPostData", default: 1, choices: [lang("Do not upload any data"), lang("Use follwing post data"), lang("Use file as source (upload)")]})
 	parametersToEdit.push({type: "Edit", id: "PostData", default: "", multiline: true, content: "String"})
 	parametersToEdit.push({type: "Checkbox", id: "URIEncodePostData", default: 0, label: lang("URI encode post data")})
-	parametersToEdit.push({type: "Label", label: lang("File path"), size: "small"})
-	parametersToEdit.push({type: "File", id: "InputFile", label: lang("Select file")})
 	parametersToEdit.push({type: "Label", label: lang("Charset"), size: "small"})
 	parametersToEdit.push({type: "Radio", id: "WhichCodepage", default: 1, choices: [lang("Use UTF-8 charset"), lang("Define charset"), lang("Define codepage")]})
 	parametersToEdit.push({type: "Edit", id: "Codepage", default: "", content: "String", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: lang("File path"), size: "small"})
+	parametersToEdit.push({type: "File", id: "InputFile", label: lang("Select file")})
 	
 	parametersToEdit.push({type: "Label", label: lang("Request headers")})
 	parametersToEdit.push({type: "Edit", id: "RequestHeaders", default: "", multiline: true, content: "String"})
@@ -234,12 +257,126 @@ GenerateNameActionHTTP_Request(ID)
 	;MsgBox % %ID%text_to_show
 	
 	
-	return lang("HTTP_Request") " " GUISettingsOfElement%ID%file ": " GUISettingsOfElement%ID%URL 
+	return lang("HTTP_Request") " - " GUISettingsOfElement%ID%URL 
 	
 }
 
 CheckSettingsActionHTTP_Request(ID)
 {
+	global
+	if (GUISettingsOfElement%ID%WhereToGetPostData1 = 1)
+	{
+		GuiControl,Disable,GUISettingsOfElement%ID%PostData
+		GuiControl,Disable,GUISettingsOfElement%ID%URIEncodePostData
+		GuiControl,Disable,GUISettingsOfElement%ID%InputFile
+		GuiControl,Disable,GUISettingsOfElement%ID%WhichCodepage1
+		GuiControl,Disable,GUISettingsOfElement%ID%WhichCodepage2
+		GuiControl,Disable,GUISettingsOfElement%ID%WhichCodepage3
+		GuiControl,Disable,GUISettingsOfElement%ID%Codepage
+
+		GuiControl,Disable,GUISettingsOfElement%ID%WhichContentType1
+		GuiControl,Disable,GUISettingsOfElement%ID%WhichContentType2
+		GuiControl,Disable,GUISettingsOfElement%ID%Contenttype
+		GuiControl,Disable,GUISettingsOfElement%ID%WhichContentLength1
+		GuiControl,Disable,GUISettingsOfElement%ID%WhichContentLength2
+		GuiControl,Disable,GUISettingsOfElement%ID%ContentLength
+		GuiControl,Disable,GUISettingsOfElement%ID%WhichContentMD51
+		GuiControl,Disable,GUISettingsOfElement%ID%WhichContentMD52
+		GuiControl,Disable,GUISettingsOfElement%ID%WhichContentMD53
+		GuiControl,Disable,GUISettingsOfElement%ID%ContentMD5
+	}
+	else if (GUISettingsOfElement%ID%WhereToGetPostData2 = 1)
+	{
+		GuiControl,Enable,GUISettingsOfElement%ID%PostData
+		GuiControl,Enable,GUISettingsOfElement%ID%URIEncodePostData
+		GuiControl,Disable,GUISettingsOfElement%ID%InputFile
+		GuiControl,Enable,GUISettingsOfElement%ID%WhichCodepage1
+		GuiControl,Enable,GUISettingsOfElement%ID%WhichCodepage2
+		GuiControl,Enable,GUISettingsOfElement%ID%WhichCodepage3
+		if GUISettingsOfElement%ID%WhichCodepage1=1
+			GuiControl,Disable,GUISettingsOfElement%ID%
+		else
+			GuiControl,Enable,GUISettingsOfElement%ID%
+
+	}
+	else if (GUISettingsOfElement%ID%WhereToGetPostData3 = 1)
+	{
+		GuiControl,Disable,GUISettingsOfElement%ID%PostData
+		GuiControl,Disable,GUISettingsOfElement%ID%URIEncodePostData
+		GuiControl,Enable,GUISettingsOfElement%ID%InputFile
+		GuiControl,Disable,GUISettingsOfElement%ID%WhichCodepage1
+		GuiControl,Disable,GUISettingsOfElement%ID%WhichCodepage2
+		GuiControl,Disable,GUISettingsOfElement%ID%WhichCodepage3
+		GuiControl,Disable,GUISettingsOfElement%ID%Codepage
+
+	}
+	if (GUISettingsOfElement%ID%WhereToGetPostData2 = 1 or GUISettingsOfElement%ID%WhereToGetPostData3 = 1)
+	{
+		
+		GuiControl,Enable,GUISettingsOfElement%ID%WhichContentType1
+		GuiControl,Enable,GUISettingsOfElement%ID%WhichContentType2
+		
+		if GUISettingsOfElement%ID%WhichContentType2=1
+			GuiControl,Enable,GUISettingsOfElement%ID%Contenttype
+		else
+			GuiControl,Disable,GUISettingsOfElement%ID%Contenttype
+		
+		GuiControl,Enable,GUISettingsOfElement%ID%WhichContentLength1
+		GuiControl,Enable,GUISettingsOfElement%ID%WhichContentLength2
+		if GUISettingsOfElement%ID%WhichContentLength2=1
+			GuiControl,Enable,GUISettingsOfElement%ID%ContentLength
+		else
+			GuiControl,Disable,GUISettingsOfElement%ID%ContentLength
+		
+		GuiControl,Enable,GUISettingsOfElement%ID%WhichContentMD51
+		GuiControl,Enable,GUISettingsOfElement%ID%WhichContentMD52
+		GuiControl,Enable,GUISettingsOfElement%ID%WhichContentMD53
+		
+		if GUISettingsOfElement%ID%WhichContentMD53=1
+			GuiControl,Enable,GUISettingsOfElement%ID%ContentMD5
+		else
+			GuiControl,Disable,GUISettingsOfElement%ID%ContentMD5
+		
+		
+	}
+	if GUISettingsOfElement%ID%WhereToPutResponseData1=1
+	{
+		GuiControl,Enable,GUISettingsOfElement%ID%ResponseDataVar
+		GuiControl,Disable,GUISettingsOfElement%ID%OutputFile
+	}
+	else
+	{
+		GuiControl,Disable,GUISettingsOfElement%ID%ResponseDataVar
+		GuiControl,Enable,GUISettingsOfElement%ID%OutputFile
+	}
 	
+	if GUISettingsOfElement%ID%WhichMethod2=1
+		GuiControl,Enable,GUISettingsOfElement%ID%Method
+	else
+		GuiControl,Disable,GUISettingsOfElement%ID%Method
+	
+	if GUISettingsOfElement%ID%WhichUserAgent2=1
+		GuiControl,Enable,GUISettingsOfElement%ID%UserAgent
+	else
+		GuiControl,Disable,GUISettingsOfElement%ID%UserAgent
+	
+	if GUISettingsOfElement%ID%WhichProxy3=1
+		GuiControl,Enable,GUISettingsOfElement%ID%Proxy
+	else
+		GuiControl,Disable,GUISettingsOfElement%ID%Proxy
+	
+	if GUISettingsOfElement%ID%WhichProxy1=1
+	{
+		GuiControl,Disable,GUISettingsOfElement%ID%WhetherBypassProxy
+		GuiControl,Disable,GUISettingsOfElement%ID%BypassProxy
+	}
+	else
+	{
+		GuiControl,Enable,GUISettingsOfElement%ID%WhetherBypassProxy
+		if GUISettingsOfElement%ID%WhetherBypassProxy=1
+			GuiControl,Enable,GUISettingsOfElement%ID%BypassProxy
+		else
+			GuiControl,Disable,GUISettingsOfElement%ID%BypassProxy
+	}
 	
 }

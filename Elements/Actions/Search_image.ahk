@@ -117,28 +117,28 @@ runActionSearch_image(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	if (WhetherSpecifiedRegion=true)
 	{
 		x1:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%x1)
-		if x is not number
+		if x1 is not number
 		{
 			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Coordinate " x1 " is not a number")
 			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not a number.",lang("Coordinate '%1%'",x1)) )
 			return
 		}
 		y1:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%y1)
-		if x is not number
+		if y1 is not number
 		{
 			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Coordinate " y1 " is not a number")
 			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not a number.",lang("Coordinate '%1%'",y1)) )
 			return
 		}
 		x2:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%x2)
-		if x is not number
+		if x2 is not number
 		{
 			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Coordinate " x2 " is not a number")
 			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not a number.",lang("Coordinate '%1%'",x2)) )
 			return
 		}
 		y2:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%y2)
-		if x is not number
+		if y2 is not number
 		{
 			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Coordinate " y2 " is not a number")
 			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not a number.",lang("Coordinate '%1%'",y2)) )
@@ -396,8 +396,8 @@ CheckSettingsActionSearch_image(ID)
 	else
 	{
 		GuiControl,Disable,GUISettingsOfElement%ID%transparent
-		
 	}
+	
 	if (GUISettingsOfElement%ID%SetIconNumber = 1)
 	{
 		GuiControl,Enable,GUISettingsOfElement%ID%IconNumber
@@ -405,7 +405,6 @@ CheckSettingsActionSearch_image(ID)
 	else
 	{
 		GuiControl,Disable,GUISettingsOfElement%ID%IconNumber
-		
 	}
 	
 	if (GUISettingsOfElement%ID%ScaleImage = 1)

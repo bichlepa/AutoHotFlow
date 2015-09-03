@@ -14,8 +14,8 @@ runActionClose_window(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	local tempahk_exe:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ahk_exe)
 	local tempahk_id:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ahk_id)
 	local tempahk_pid:=v_replaceVariables(InstanceID,ThreadID,%ElementID%ahk_pid)
-	
 	local tempwinstring:=tempWinTitle
+	
 	if tempahk_class<>
 		tempwinstring=%tempwinstring% ahk_class %tempahk_class%
 	if tempahk_id<>

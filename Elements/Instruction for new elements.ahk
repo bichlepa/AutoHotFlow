@@ -42,6 +42,7 @@ getParameters+ElementType++ElementName+()
 	
 	;File
 	parametersToEdit.push({type: "File", id: "file", label: lang("Select a file")})
+	parametersToEdit.push({type: "File", id: "file", label: lang("Select a file"), options: 8, filter: lang("Images and icons") " (*.gif; *.jpg; *.bmp; *.ico; *.cur; *.ani; *.png; *.tif; *.exif; *.wmf; *.emf; *.exe; *.dll; *.cpl; *.scr)"})
 	
 	;Drop down
 	parametersToEdit.push({type: "DropDown", id: "Button", default: 1, choices: [lang("Left button"), lang("Right button"), lang("Middle Button"), lang("Wheel up"), lang("Wheel down"), lang("Wheel left"), lang("Wheel right"), lang("4th mouse button (back)"), lang("5th mouse button (forward)")]
@@ -157,12 +158,14 @@ run+ElementType++ElementName+(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	Examples:
 	;Element finished normally
 	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"normal")
+	
 	;Condition finished with result Yes
 	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"yes")
+	
 	;Element finished with an exception
 	logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Position is not specified.") ;Log the error, so user will be able to find the reason
 	MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is empty.",lang("Position"))) ;The last parameter is a message which is shown to the user if the element has no "exception" connection.
-	return
+	return ;Return if an error occured
 }
 	
 

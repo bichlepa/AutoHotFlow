@@ -24,7 +24,6 @@ runActionActivate_window(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 		tempwinstring=%tempwinstring% ahk_pid %tempahk_pid%
 	if tempahk_exe<>
 		tempwinstring=%tempwinstring% ahk_exe %tempahk_exe%
-	;If no window specified, unlike in other actions, do not check whether the active window is active, instead error
 	if (tempwinstring="" and tempWinText="" and tempExcludeTitle = "" and tempExcludeText ="")
 	{
 		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! No window specified")

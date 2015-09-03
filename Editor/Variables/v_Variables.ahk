@@ -261,7 +261,7 @@ v_getVariable(InstanceID,ThreadID,name,VariableType="asIs")
 			}
 			
 		}
-		
+		else
 		{
 			
 			StringLeft,templeft,tempvalue,1
