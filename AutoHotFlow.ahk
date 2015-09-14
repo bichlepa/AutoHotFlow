@@ -4,8 +4,17 @@ SendMode Input  ; Recommended for new scripts due to its superior speed and reli
 SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 SetBatchLines -1
 DetectHiddenWindows on
-#SingleInstance ignore
+#SingleInstance off
 
+;Check whether the manager is already opened
+iniread,tempHiddenWindowID,settings.ini,common,Hidden window ID of manager
+;~ MsgBox %tempHiddenWindowID% - §%tempHiddenWindowID%§
+IfWinExist,CommandWindowOfManager,§%tempHiddenWindowID%§
+{
+	;~ MsgBox sdgfasf
+	com_SendCommand({function: "ShowManagerWindow"},"manager",tempHiddenWindowID) ;Send the command to the Editor.
+	ExitApp
+}
 
 if not a_iscompiled
 	developing=yes
@@ -25,6 +34,9 @@ if a_iscompiled=1
 	editorPath=Editor.exe
 else
 	editorPath=Editor.ahk
+
+;Check whether AHF is already running
+
 
 
 ;~ LangNoUseCache:=true ;only for debugging
@@ -82,7 +94,7 @@ for tempRegCount, tempRegItem in allItems
 
 	if (%tempRegItem%enabled="true" or  %tempRegItem%running="true")
 	{
-		com_SendCommand({function: "UpdateStatus"},%tempRegItem%name) ;Send the command to the Editor.
+		com_SendCommand({function: "UpdateStatus"},"editor",%tempRegItem%name) ;Send the command to the Editor.
 		if errorlevel
 		{
 			
@@ -106,7 +118,7 @@ exit:
 shuttingDown=true
 for count, tempItem in allItems
 {
-	com_SendCommand({function: "exit"},nameOf(tempItem)) ;Send the command to the Editor.
+	com_SendCommand({function: "exit"},"editor",nameOf(tempItem)) ;Send the command to the Editor.
 	
 }
 exitapp

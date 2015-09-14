@@ -165,7 +165,7 @@ return
 
 MouseTrackerbuttonOK:
 gui,MouseTracker:submit
-gui,2:default
+gui,SettingsOfElement:default
 if (MouseTrackerImportColor="yes")
 {
 	guicontrol,,GUISettingsOfElement%setElementID%%MouseTrackerParColor%,%MouseTrackerColorText%
@@ -207,7 +207,7 @@ if (MouseTrackerImportMousePos="yes" or( MouseTrackerImportMousePos="optional" a
 goto,MouseTrackerbuttonCancel
 MouseTrackerbuttonCancel:
 gui,MouseTracker:destroy
-gui,2:default
+gui,SettingsOfElement:default
 hotkey,right,MouseTrackerRight,off
 hotkey,left,MouseTrackerLeft,off
 hotkey,up,MouseTrackerup,off

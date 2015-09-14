@@ -10,8 +10,9 @@ initializeMenuBar()
 	Menu, MyMenu,add,% lang("Run"),ui_Menu_MenuStart
 	Menu, MyMenu,add,% lang("Enable"),ui_Menu_Enable
 	Menu, MyMenu,add,% lang("Settings"),ui_Menu_Settings
+	Menu, MyMenu,add,% lang("Exit"),Exit
 
-	Gui,menu,MyMenu
+	Gui,Maingui:menu,MyMenu
 }
 goto,überspringendsfasdg
 
@@ -48,6 +49,7 @@ return
 ui_Menu_Settings:
 ui_SettingsOwFLow()
 return
+
 
 
 überspringendsfasdg:

@@ -1,7 +1,14 @@
 ﻿
 
 if A_IsCompiled
+{
 	menu, tray, NoStandard
+}
+else
+{
+
+	
+}
 initializeTrayBar()
 
 ;Help! I want that the menu are renamed when the language changes.

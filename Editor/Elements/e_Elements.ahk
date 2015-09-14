@@ -271,7 +271,11 @@ e_setUnsetDefaults(elementID)
 	global
 	local elementType:=%elementID%type
 	local elementSubType:=%elementID%subtype
-	local parameters:=getParameters%elementType%%elementSubType%()
+	local parameters
+	try
+		parameters:=getParameters%elementType%%elementSubType%(true)
+	catch
+		parameters:=getParameters%elementType%%elementSubType%()
 	local parameter
 	local index
 	local index2

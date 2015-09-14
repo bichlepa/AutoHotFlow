@@ -41,8 +41,13 @@ Loop
 	;~ MsgBox % tempCommand
 	
 	;Evaluating command
-	;Manager wants the flow to start
-	if (tempNewReceivedCommand["Function"]="ReportStatus")
+	
+	if (tempNewReceivedCommand["Function"]="ShowManagerWindow")
+	{
+		logger("a2","Command received. Manager window should be shown")
+		gosub ShowMainGUI
+	}
+	else if (tempNewReceivedCommand["Function"]="ReportStatus")
 	{
 		
 		logger("a2","Command received. Flow " tempNewReceivedCommand["SendingFlow"] " reports its status: "  tempNewReceivedCommand["status"])
@@ -121,7 +126,7 @@ Loop
 		tempid:=IDOfName(tempNewReceivedCommand["flowname"],"flow")
 		if tempid=
 		{
-			com_SendCommand({function: "AnswerFlowStatus", result: "NoSuchName", flowName: tempNewReceivedCommand["flowname"]},tempNewReceivedCommand["SendingFlow"]) ;Send the command to the Editor.
+			com_SendCommand({function: "AnswerFlowStatus", result: "NoSuchName", flowName: tempNewReceivedCommand["flowname"]},"editor",tempNewReceivedCommand["SendingFlow"]) ;Send the command to the Editor.
 			;~ ControlSetText,edit1,AnswerFlowIsEnabled|ǸoⱾuchȠaⱮe ,CommandWindowOfEditor,% "Ѻ" CommandWindowRecieve3
 		}
 		else
@@ -131,13 +136,13 @@ Loop
 				
 				if %tempid%enabled=true
 				{
-					com_SendCommand({function: "AnswerFlowStatus", result: "enabled", flowName: tempNewReceivedCommand["flowname"]},tempNewReceivedCommand["SendingFlow"]) ;Send the command to the Editor.
+					com_SendCommand({function: "AnswerFlowStatus", result: "enabled", flowName: tempNewReceivedCommand["flowname"]},"editor",tempNewReceivedCommand["SendingFlow"]) ;Send the command to the Editor.
 					
 					
 				}
 				else
 				{
-					com_SendCommand({function: "AnswerFlowStatus", result: "disabled", flowName: tempNewReceivedCommand["flowname"]},tempNewReceivedCommand["SendingFlow"]) ;Send the command to the Editor.
+					com_SendCommand({function: "AnswerFlowStatus", result: "disabled", flowName: tempNewReceivedCommand["flowname"]},"editor",tempNewReceivedCommand["SendingFlow"]) ;Send the command to the Editor.
 				}
 					
 				
@@ -146,13 +151,13 @@ Loop
 			{
 				if %tempid%running=true
 				{
-					com_SendCommand({function: "AnswerFlowStatus", result: "running", flowName: tempNewReceivedCommand["flowname"]},tempNewReceivedCommand["SendingFlow"]) ;Send the command to the Editor.
+					com_SendCommand({function: "AnswerFlowStatus", result: "running", flowName: tempNewReceivedCommand["flowname"]},"editor",tempNewReceivedCommand["SendingFlow"]) ;Send the command to the Editor.
 					
 					
 				}
 				else
 				{
-					com_SendCommand({function: "AnswerFlowStatus", result: "stopped", flowName: tempNewReceivedCommand["flowname"]},tempNewReceivedCommand["SendingFlow"]) ;Send the command to the Editor.
+					com_SendCommand({function: "AnswerFlowStatus", result: "stopped", flowName: tempNewReceivedCommand["flowname"]},"editor",tempNewReceivedCommand["SendingFlow"]) ;Send the command to the Editor.
 				}
 			}
 		}
@@ -165,7 +170,7 @@ Loop
 		tempid:=IDOfName(tempNewReceivedCommand["flowname"],"flow")
 		if tempid=
 		{
-			com_SendCommand({function: "AnswerFlowStatus", result: "NoSuchName", flowName: tempNewReceivedCommand["flowname"]},tempNewReceivedCommand["SendingFlow"]) ;Send the command to the Editor.
+			com_SendCommand({function: "AnswerFlowStatus", result: "NoSuchName", flowName: tempNewReceivedCommand["flowname"]},"editor",tempNewReceivedCommand["SendingFlow"]) ;Send the command to the Editor.
 			;~ ControlSetText,edit1,AnswerFlowIsEnabled|ǸoⱾuchȠaⱮe ,CommandWindowOfEditor,% "Ѻ" CommandWindowRecieve3
 		}
 		else
@@ -177,18 +182,18 @@ Loop
 				{
 					if runflow(tempid,tempNewReceivedCommand)
 					{
-						com_SendCommand({function: "AnswerFlowStatus", result: "running", flowName: tempNewReceivedCommand["flowname"]},tempNewReceivedCommand["SendingFlow"]) ;Send the command to the Editor.
+						com_SendCommand({function: "AnswerFlowStatus", result: "running", flowName: tempNewReceivedCommand["flowname"]},"editor",tempNewReceivedCommand["SendingFlow"]) ;Send the command to the Editor.
 					}
 					else
 					{
-						com_SendCommand({function: "AnswerFlowStatus", result: "stopped", flowName: tempNewReceivedCommand["flowname"]},tempNewReceivedCommand["SendingFlow"]) ;Send the command to the Editor.
+						com_SendCommand({function: "AnswerFlowStatus", result: "stopped", flowName: tempNewReceivedCommand["flowname"]},"editor",tempNewReceivedCommand["SendingFlow"]) ;Send the command to the Editor.
 					}
 					
 					
 				}
 				else
 				{
-					com_SendCommand({function: "AnswerFlowStatus", result: "disabled", flowName: tempNewReceivedCommand["flowname"]},tempNewReceivedCommand["SendingFlow"]) ;Send the command to the Editor.
+					com_SendCommand({function: "AnswerFlowStatus", result: "disabled", flowName: tempNewReceivedCommand["flowname"]},"editor",tempNewReceivedCommand["SendingFlow"]) ;Send the command to the Editor.
 				}
 			}
 			else if (tempNewReceivedCommand["status"]="stop")
@@ -197,11 +202,11 @@ Loop
 				
 				if stopflow(tempid)
 				{
-					com_SendCommand({function: "AnswerFlowStatus", result: "stopped", flowName: tempNewReceivedCommand["flowname"]},tempNewReceivedCommand["SendingFlow"]) ;Send the command to the Editor.
+					com_SendCommand({function: "AnswerFlowStatus", result: "stopped", flowName: tempNewReceivedCommand["flowname"]},"editor",tempNewReceivedCommand["SendingFlow"]) ;Send the command to the Editor.
 				}
 				else
 				{
-					com_SendCommand({function: "AnswerFlowStatus", result: "running", flowName: tempNewReceivedCommand["flowname"]},tempNewReceivedCommand["SendingFlow"]) ;Send the command to the Editor.
+					com_SendCommand({function: "AnswerFlowStatus", result: "running", flowName: tempNewReceivedCommand["flowname"]},"editor",tempNewReceivedCommand["SendingFlow"]) ;Send the command to the Editor.
 				}
 				
 				
@@ -212,11 +217,11 @@ Loop
 				
 				if enableflow(tempid)
 				{
-					com_SendCommand({function: "AnswerFlowStatus", result: "enabled", flowName: tempNewReceivedCommand["flowname"]},tempNewReceivedCommand["SendingFlow"]) ;Send the command to the Editor.
+					com_SendCommand({function: "AnswerFlowStatus", result: "enabled", flowName: tempNewReceivedCommand["flowname"]},"editor",tempNewReceivedCommand["SendingFlow"]) ;Send the command to the Editor.
 				}
 				else
 				{
-					com_SendCommand({function: "AnswerFlowStatus", result: "disabled", flowName: tempNewReceivedCommand["flowname"]},tempNewReceivedCommand["SendingFlow"]) ;Send the command to the Editor.
+					com_SendCommand({function: "AnswerFlowStatus", result: "disabled", flowName: tempNewReceivedCommand["flowname"]},"editor",tempNewReceivedCommand["SendingFlow"]) ;Send the command to the Editor.
 				}
 				
 				
@@ -227,11 +232,11 @@ Loop
 				
 				if disableflow(tempid)
 				{
-					com_SendCommand({function: "AnswerFlowStatus", result: "disabled", flowName: tempNewReceivedCommand["flowname"]},tempNewReceivedCommand["SendingFlow"]) ;Send the command to the Editor.
+					com_SendCommand({function: "AnswerFlowStatus", result: "disabled", flowName: tempNewReceivedCommand["flowname"]},"editor",tempNewReceivedCommand["SendingFlow"]) ;Send the command to the Editor.
 				}
 				else
 				{
-					com_SendCommand({function: "AnswerFlowStatus", result: "enabled", flowName: tempNewReceivedCommand["flowname"]},tempNewReceivedCommand["SendingFlow"]) ;Send the command to the Editor.
+					com_SendCommand({function: "AnswerFlowStatus", result: "enabled", flowName: tempNewReceivedCommand["flowname"]},"editor",tempNewReceivedCommand["SendingFlow"]) ;Send the command to the Editor.
 				}
 				
 				

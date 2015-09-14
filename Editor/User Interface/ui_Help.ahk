@@ -68,7 +68,7 @@ ui_showHelp(helpFile)
 	{
 		tempx:= VirtualWidth - helpw - tempw -10
 		;~ MsgBox %A_ScreenWidth% - %widthhelp% - %tempw% 
-		WinMove,% "ahk_id " SG2.hwnd,,%tempx%
+		WinMove,% "ahk_id " SG1.hwnd,,%tempx%
 		helpx:=VirtualWidth - helpw -10
 	}
 	

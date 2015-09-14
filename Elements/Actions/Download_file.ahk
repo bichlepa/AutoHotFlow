@@ -46,7 +46,7 @@ getNameActionDownload_file()
 }
 getCategoryActionDownload_file()
 {
-	return lang("Files") "|" lang("Internet")
+	return lang("Internet")
 }
 
 getParametersActionDownload_file()

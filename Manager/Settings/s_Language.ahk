@@ -76,7 +76,7 @@ Gui, Show,, % "•AutoHotFlow• " lang("Manager")  ; Show the window and its Tr
 
 for count, tempItem in allItems
 {
-	com_SendCommand({function: "languageChanged"},nameOf(tempItem)) ;Send the command to the Editor.
+	com_SendCommand({function: "languageChanged"},"Editor",nameOf(tempItem)) ;Send the command to the Editor.
 	
 }
 

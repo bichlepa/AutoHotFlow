@@ -176,9 +176,7 @@
 	ToolTip(lang("loaded"),1000)
 	e_UpdateTriggerName()
 	
-	menu, tray, rename, % Tray_OldShowName, % lang("Edit %1%", flowName)
-	Tray_OldShowName:=lang("Edit %1%", flowName)
-	menu,tray,tip,% lang("Flow %1%",flowName)
+	
 	
 	e_CorrectElementErrors("Loaded the saved flow")
 	ui_EnableMainGUI()
@@ -213,12 +211,23 @@ i_loadGeneralParameters()
 	DetectHiddenWindows,off
 	IfWinExist,ahk_id %MainGuihwnd%
 	{
-		
-		gui,1:show,  NA,% "·AutoHotFlow· " lang("Editor") " - " flowName
+		if A_IsCompiled
+			gui,1:show,  NA,% "·AutoHotFlow· " lang("Editor") " - " flowName
+		else
+			gui,1:show,  NA,% "·AutoHotFlow· " lang("Editor") " - " flowName " - UNCOMPILED" ;Makes it easier for me to find the uncompiled instance
 	}
 	DetectHiddenWindows,on
 	;IfWinExist,·AutoHotFlow·
 		;ui_showgui()
+	
+	menu, tray, rename, % Tray_OldShowName, % lang("Edit %1%", flowName)
+	Tray_OldShowName:=lang("Edit %1%", flowName)
+	if A_IsCompiled
+		menu,tray,tip,% lang("Flow %1%",flowName) 
+	else
+		menu,tray,tip,% lang("Flow %1%",flowName) " - UNCOMPILED" ;Makes it easier for me to find the uncompiled instance
+	
+	
 }
 
 i_LoadParametersOfElement(loadElementID,loadElementType,loadElementsubType,loadElementIndex,Loadlocation)

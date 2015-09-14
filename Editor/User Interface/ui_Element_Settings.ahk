@@ -13,6 +13,9 @@ ui_settingsOfElement(ElementID,PreviousSubType="")
 	local tempIsDefault
 	local tempAssigned
 	local tempReenablethen
+	local tempXpos
+	local tempYpos
+	local tempHeight
 	
 
 	PreviousSubType2:=PreviousSubType ;This variable will contain anything when user has changed the subtype of the element. The subtype will be restored if user cancels
@@ -175,11 +178,11 @@ ui_settingsOfElement(ElementID,PreviousSubType="")
 		return
 	}
 	ui_DisableMainGUI()
-	gui,2:default
+	gui,SettingsOfElement:default
 	
-	gui,font,s8 cDefault wnorm
-	gui,add,button,w370 x10 gGUISettingsOfElementSelectType,% lang("%1%_type:_%2%",lang(setElementType),getname%setElementType%%setElementsubType%())
-	gui,add,button,w20 x10 X+10 yp gGUISettingsOfElementHelp,?
+	;~ gui,font,s8 cDefault wnorm
+	;~ gui,add,button,w370 x10 gGUISettingsOfElementSelectType,% lang("%1%_type:_%2%",lang(setElementType),getname%setElementType%%setElementsubType%())
+	;~ gui,add,button,w20 x10 X+10 yp gGUISettingsOfElementHelp,?
 	gui,font,s10 cnavy wbold
 	gui,add,text,x10 w400,Name
 	gui,font,s8 cDefault wnorm
@@ -188,8 +191,10 @@ ui_settingsOfElement(ElementID,PreviousSubType="")
 	gui,+hwndSettingsGUIHWND
 	
 	openingElementSettingsWindow:=true ;Allows some elements to initialize their parameter list. (such as in "play sound": find all system sound)
-	parametersToEdit:=getParameters%setElementType%%setElementsubType%()
-
+	try
+		parametersToEdit:=getParameters%setElementType%%setElementsubType%(true)
+	catch
+		parametersToEdit:=getParameters%setElementType%%setElementsubType%()
 	;MsgBox,% parametersToEdit
 	for index, parameter in parametersToEdit
 	{
@@ -242,11 +247,7 @@ ui_settingsOfElement(ElementID,PreviousSubType="")
 			if ( tempParameterID) ;if only one edit
 			{
 				
-				temp:=%setElementID%%tempParameterID% ;get the saved parameter
-				;~ if (temp="") ;if nothing is saved
-					;~ temptext:=parameter.default ;load default parameter
-				;~ else
-					temptext=%temp% ;set the saved parameter as text
+				temptext:=%setElementID%%tempParameterID% ;get the saved parameter
 				
 				if parameter.multiline
 					tempIsMulti=h100 multi
@@ -259,7 +260,18 @@ ui_settingsOfElement(ElementID,PreviousSubType="")
 				if (parameter.content="Expression")
 				{
 					gui,add,picture,x10 yp w16 h16 gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%setElementID%%tempParameterID%,icons\expression.ico
-					gui,add,edit,X+4 w360 %tempIsMulti% hwndGUISettingsOfElementEditHWND%setElementID%%tempParameterID% gGUISettingsOfElementCheckContent vGUISettingsOfElement%setElementID%%tempParameterID%,%temptext%
+					
+						gui,add,edit,X+4 w360 %tempIsMulti% hwndGUISettingsOfElementEditHWND%setElementID%%tempParameterID% gGUISettingsOfElementCheckContent vGUISettingsOfElement%setElementID%%tempParameterID%,%temptext%
+					if parameter.useupdown
+					{
+						
+						if parameter.range
+							gui,add,updown,% "range" parameter.range
+						else
+							gui,add,updown
+						guicontrol,,GUISettingsOfElement%setElementID%%tempParameterID%,%temptext%
+					}
+					
 					GUISettingsOfElementContentType%setElementID%%tempParameterID%=Expression
 				}
 				else if (parameter.content="String")
@@ -435,12 +447,18 @@ ui_settingsOfElement(ElementID,PreviousSubType="")
 		{
 			gui,font,s8 cDefault wnorm
 			temp:=%setElementID%%tempParameterID% 
-			;~ if temp=
-				;~ temp:=parameter.default
 			
 			tempParameterOptions:=parameter.options
-			
-			gui,add,slider, w400 x10 %tempParameterOptions%  gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%tempParameterID% ,% temp
+			if (parameter.allowExpression=true)
+			{
+				gui,add,picture,x10 w16 h16 gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%setElementID%%tempParameterID%,icons\expression.ico
+				gui,add,edit,X+6 w190 gGUISettingsOfElementSliderChangeEdit vGUISettingsOfElement%setElementID%%tempParameterID%,%temp%
+				gui,add,slider, w180 X+10 %tempParameterOptions%  gGUISettingsOfElementSliderChangeSlide vGUISettingsOfElementSlideOf%setElementID%%tempParameterID% ,% temp
+				
+				GUISettingsOfElementContentType%setElementID%%tempParameterID%=Expression
+			}
+			else
+				gui,add,slider, w400 x10 %tempParameterOptions%  gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%tempParameterID% ,% temp
 			
 		}
 		else if (parameter.type="DropDown")
@@ -458,6 +476,7 @@ ui_settingsOfElement(ElementID,PreviousSubType="")
 				tempAltSumbit=
 			tempChoises:=parameter.choices
 			
+			;loop through all choices. Find which one to select. Make a selection list which is capable for the gui,add command
 			tempAllChoices=
 			for tempIndex, TempOneChoice in tempChoises
 			{
@@ -472,6 +491,38 @@ ui_settingsOfElement(ElementID,PreviousSubType="")
 			
 			StringTrimLeft,tempAllChoices,tempAllChoices,1
 			gui,add,DropDownList, w400 x10 %tempAltSumbit% choose%temptoChoose% gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%tempParameterID% ,% tempAllChoices
+			
+		}
+		else if (parameter.type="ComboBox")
+		{
+			gui,font,s8 cDefault wnorm
+			temp:=%setElementID%%tempParameterID% 
+			;~ if temp=
+				;~ temp:=parameter.default
+			if (parameter.result="number")
+			{
+				temptoChoose:=temp
+				tempAltSumbit=AltSubmit
+			}
+			else
+				tempAltSumbit=
+			tempChoises:=parameter.choices
+			
+			;loop through all choices. Find which one to select. Make a selection list which is capable for the gui,add command
+			tempAllChoices=
+			for tempIndex, TempOneChoice in tempChoises
+			{
+				if (parameter.result="name")
+				{
+					if (TempOneChoice=temp)
+						temptoChoose:=A_Index
+				}
+				tempAllChoices.="|" TempOneChoice
+				
+			}
+			StringTrimLeft,tempAllChoices,tempAllChoices,1
+			gui,add,ComboBox, w400 x10 %tempAltSumbit% choose%temptoChoose% gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%tempParameterID% ,% tempAllChoices
+			guicontrol,text,GUISettingsOfElement%setElementID%%tempParameterID%,% temp
 			
 		}
 		else if (parameter.type="Hotkey")
@@ -585,7 +636,6 @@ ui_settingsOfElement(ElementID,PreviousSubType="")
 			
 		}
 		
-		
 		else if (parameter.type="Number")
 		{
 			TrayTip,%setElementsubType%, nummer will ich nicht haben
@@ -610,26 +660,81 @@ ui_settingsOfElement(ElementID,PreviousSubType="")
 		GUISettingsOfElementUpdateName()
 	}
 	
-	gui,add,button,w145 x10 h30 gGUISettingsOfElementSave default,% lang("Save")
-	gui,add,button,w145 h30 yp X+10 gGUISettingsOfElementCancel,% lang("Cancel")
+	;~ gui,add,button,w145 x10 h30 gGUISettingsOfElementSave default,% lang("Save")
+	;~ gui,add,button,w145 h30 yp X+10 gGUISettingsOfElementCancel,% lang("Cancel")
 	
-	gui -hwndSettingWindowHWND
-	SG2 := New ScrollGUI(SettingWindowHWND,600, A_ScreenHeight*0.8, "+LabelGui2 +Resize +MinSize420x100 ",2,2)
+	gui +hwndSettingWindowHWND
+	SG2 := New ScrollGUI(SettingWindowHWND,600, A_ScreenHeight*0.8, " ",2,2)
 	
-	SG2.Show(lang("Settings") " - " lang(%ElementID%type) " - " lang(%ElementID%subtype), " hide")
-	ui_GetMainGUIPos() ;Shiw the window in the middle of the main window
-	tempXpos:=round(MainGUIX+MainGUIWidth/2- SG2.width/2)
-	tempYpos:=round(MainGUIY+MainGUIHeight/2- SG2.height/2)
-	SG2.Show(,"x" tempXpos " y" tempYpos)
+	
+	; Create the main window (parent)
+	Gui, GUISettingsOfElementParent:New
+	Gui, GUISettingsOfElementParent:Margin, 0, 20
+	Gui, % SG2.HWND . ": -Caption +ParentGUISettingsOfElementParent +LastFound"
+	Gui, % SG2.HWND . ":Show", Hide  y25
+	WinGetPos, , , WsettingsParent, HsettingsParent,% "ahk_id " SG2.HWND
+	;~ W := Round(W * (96 / A_ScreenDPI))
+	;~ H := Round(H * (96 / A_ScreenDPI))
+	YsettingsButtoPos := HsettingsParent + 10
+	WinGetPos, , , Wsettings, Hsettings,% "ahk_id " SG2.HGUI
+	HParent:=Hsettings+90
+	;Make resizeable
+	gui,+hwndSettingWindowParentHWND
+	gui,+LabelSettingsOfElementParent
+	gui,+resize
+	gui,+minsize%WsettingsParent%x200 ;Ensure constant width.
+	gui,+maxsize%WsettingsParent%x%HParent%
+	
+	;add buttons
+	gui,font,s8 cDefault wnorm
+	gui, GUISettingsOfElementParent:add,button, w370 x10 y10 gGUISettingsOfElementSelectType h20,% lang("%1%_type:_%2%",lang(setElementType),getname%setElementType%%setElementsubType%())
+	gui, GUISettingsOfElementParent:add,button, w20 X+10 yp h20 gGUISettingsOfElementHelp vGUISettingsOfElementHelp,?
+	;~ guicontrol,focus,GUISettingsOfElementHelp
+	Gui, GUISettingsOfElementParent:Add, Button, gGUISettingsOfElementSave vButtonSave w145 x10 h30 y%YsettingsButtoPos%,% lang("Save")
+	Gui, GUISettingsOfElementParent:Add, Button, gGUISettingsOfElementCancel vButtonCancel default w145 h30 yp X+10,% lang("Cancel")
+	;Make GUI autosizing
+	Gui, GUISettingsOfElementParent:Show, hide w%WsettingsParent%
+	Gui, GUISettingsOfElementParent:Show, hide w%WsettingsParent%,% lang("Settings") " - " lang(%ElementID%type) " - " lang(%ElementID%subtype) ;Needed twice, otherwise the width is not correct
+	; Show ScrollGUI1
+	;~ Return
+	
+	;Calculate position to show the settings window in the middle of the main window
+	ui_GetMainGUIPos() 
+	tempHeight:=round(MainGUIHeight-100) ;This will be the max height. If child gui is larger, it must be scrolled
+	WinGetPos,ElSetingGUIX,ElSetingGUIY,ElSetingGUIW,ElSetingGUIH,ahk_id %SettingWindowParentHWND%
+	tempXpos:=round(MainGUIX+MainGUIWidth/2- ElSetingGUIW/2)
+	tempYpos:=round(MainGUIY+MainGUIHeight/2- tempHeight/2)
+	;move Parent window
+	gui,GUISettingsOfElementParent:show,% "x" tempXpos " y" tempYpos " h" tempHeight " hide" 
+	
+	;~ SetWinDelay,0
+	;~ Gui, % SG2.HWND . ":Show", Hide  y40
+	;Make ScrollGUI autosize 
+	SG2.Show("", "x0 y40 h" tempHeight " hide ")
+	
+	;position lower buttons
+	GetClientSize(SettingWindowParentHWND, ElSetingGUIW, ElSetingGUIH)
+	guicontrol, GUISettingsOfElementParent:move,ButtonSave,% "y" ElSetingGUIH-40
+	guicontrol, GUISettingsOfElementParent:move,ButtonCancel,% "y" ElSetingGUIH-40
+	;Position the Scroll gui
+	wingetpos,,,ElSetingGUIW,ElSetingGUIH,ahk_id %SettingWindowParentHWND%
+	WinMove,ahk_id %SettingWindowParentHWND%,,,,% ElSetingGUIW,% ElSetingGUIH+1 ;make the autosize function trigger, which resizes and moves the scrollgui
+	
+	;show gui
+	SG2.Show() 
+	gui,GUISettingsOfElementParent:show
 	
 	openingElementSettingsWindow:=false
-	;gui,show,,% "·AutoHotFlow· " lang("Settings") " - " lang(%ElementID%type) " - " lang(%ElementID%subtype)
 	return
 	
+
+	
 	GUISettingsOfElementSelectType:
-	gui,2:default
-	gui,destroy
+	gui,SettingsOfElement:destroy
 	SG2.Destroy()
+	gui,GUISettingsOfElementParent:destroy
+	ui_closeHelp()
+	
 	ui_EnableMainGUI()
 	if PreviousSubType2
 		ui_selectElementType(%setElementID%Type,setElementID,PreviousSubType2)
@@ -653,7 +758,7 @@ ui_settingsOfElement(ElementID,PreviousSubType="")
 		ui_showHelp(%setElementID%Type "\" %setElementID%subtype)
 	return
 	GUISettingsOfElementCheckStandardName:
-	gui,2:default
+	gui,SettingsOfElement:default
 	gui,submit,nohide
 	
 	if GUISettingsOfElementCheckStandardName=1
@@ -686,7 +791,7 @@ ui_settingsOfElement(ElementID,PreviousSubType="")
 	return
 
 	GUISettingsOfElementHotkey:
-	gui,2:default
+	gui,SettingsOfElement:default
 	gui,submit,nohide
 	StringTrimRight,tempHotkeyCotrol,a_guicontrol,6
 	
@@ -694,7 +799,7 @@ ui_settingsOfElement(ElementID,PreviousSubType="")
 	return
 	
 	GUISettingsOfElementWeekdays:
-	gui,2:default
+	gui,SettingsOfElement:default
 	gui,submit,nohide
 	StringTrimRight,tempGUICotrol,a_guicontrol,1
 	
@@ -715,21 +820,34 @@ ui_settingsOfElement(ElementID,PreviousSubType="")
 	GUISettingsOfElementUpdateName()
 	return
 	
+	GUISettingsOfElementSliderChangeEdit:
+	gui,SettingsOfElement:default
+	gui,submit,nohide
+	
+	StringTrimleft,tempGUICotrol,a_guicontrol,20
+	;~ MsgBox % GUISettingsOfElement tempGUICotrol
+	guicontrol,,% "GUISettingsOfElementSlideOf" tempGUICotrol,% %a_guicontrol%
+	return
+	GUISettingsOfElementSliderChangeSlide:
+	
+	gui,SettingsOfElement:default
+	gui,submit,nohide
+	
+	StringTrimleft,tempGUICotrol,a_guicontrol,27
+	guicontrol,,% "GUISettingsOfElement" tempGUICotrol,% %a_guicontrol%
+	return
+	
+	
+	
 
 	
 	
 	
 	
-
-	
-	
-	
-	
-	Gui2Close:
-	Gui2Escape:
-	2guiclose:
+	SettingsOfElementParentClose:
+	SettingsOfElementParentEscape:
 	GUISettingsOfElementCancel:
-	gui,2:default
+	;~ ToolTip %a_thislabel%
 	if (%selElementID%name="Νew Соntainȩr") ;Do not translate!
 	{
 		if %selElementID%Type=trigger
@@ -741,30 +859,29 @@ ui_settingsOfElement(ElementID,PreviousSubType="")
 			
 		}
 		ui_draw()
-		gui,2:default
+		gui,SettingsOfElement:default
 	}
 	
 	
 	if PreviousSubType2
 		%selElementID%SubType:=PreviousSubType2
 	
-	Gui,destroy
+	ui_closeHelp()
+	
+	gui,SettingsOfElement:destroy
 	SG2.Destroy()
+	gui,GUISettingsOfElementParent:destroy
 	
 	GUISettingsOfElementRemoveInfoTooltip()
 	
 	ui_EnableMainGUI()
 	return
 	
-	Gui2Size:
-    If (A_EventInfo <> 1)
-        SG2.AdjustToParent()
-	Return
+	
 	
 	GUISettingsOfElementSave:
-	gui,2:default
 	GUISettingsOfElementUpdateName()
-	gui,submit
+	gui,SettingsOfElement:submit
 	if (%setElementID%type="trigger" and triggersEnabled=true) ;When editing a trigger, disable Triggers and enable them afterwards
 	{
 		tempReenablethen:=true
@@ -830,9 +947,10 @@ ui_settingsOfElement(ElementID,PreviousSubType="")
 		
 	}
 	
-	
+	ui_closeHelp()
 	SG2.Destroy()
-	Gui,destroy
+	gui,SettingsOfElement:destroy
+	gui,GUISettingsOfElementParent:destroy
 	GUISettingsOfElementRemoveInfoTooltip()
 	
 	ui_EnableMainGUI()
@@ -859,6 +977,25 @@ ui_settingsOfElement(ElementID,PreviousSubType="")
 	
 	
 }
+
+SettingsOfElementParentSize(GuiHwnd, EventInfo, Width, Height)
+{
+    global
+	
+	If (EventInfo <> 1) ;if not minimized
+	{
+		;~ GuiHwnd+=0
+		SetWinDelay,0
+		GetClientSize(SettingWindowParentHWND, ElSetingGUIW, ElSetingGUIH) ;Sometimes for some reason the width and height parameters are not correct. therefore get the gui size again
+		guicontrol, GUISettingsOfElementParent:move,ButtonSave,% "y" ElSetingGUIH-40
+		guicontrol, GUISettingsOfElementParent:move,ButtonCancel,% "y" ElSetingGUIH-40
+		winmove,% "ahk_id " SG2.HWND,  , 0, 40,  ,% ElSetingGUIH-90
+		;~ if not a_iscompiled
+			;~ ToolTip %GuiHwnd% %Width% %Height% - %ElSetingGUIW% %ElSetingGUIH%
+	}
+	Return
+}
+
 
 GUISettingsOfElementClickOnRadio(CtrlHwnd, GuiEvent="", EventInfo="", ErrorLevell="")
 {
@@ -898,7 +1035,7 @@ GUISettingsOfElementClickOnRadio(CtrlHwnd, GuiEvent="", EventInfo="", ErrorLevel
 GUISettingsOfElementCheckContent(CtrlHwnd, GuiEvent="", EventInfo="", ErrorLevell="")
 {
 	global
-	gui,2:default
+	gui,SettingsOfElement:default
 	gui,submit,nohide
 	
 	local tempEnabled
@@ -985,7 +1122,7 @@ GUISettingsOfElementUpdateName()
 {
 	global
 	GUISettingsOfElementRemoveInfoTooltip()
-	gui,2:default
+	gui,SettingsOfElement:default
 	gui,submit,nohide
 	
 	
@@ -1020,7 +1157,7 @@ GUISettingsOfElementClickOnInfoPic()
 	global
 	local tempOneParamID
 	local tempRadioID
-	gui,2:default
+	gui,SettingsOfElement:default
 	gui,submit,nohide
 	StringReplace,tempOneParamID,A_GuiControl,GUISettingsOfElementInfoIconOf%setElementID%
 	;~ MsgBox %tempOneParamID%
@@ -1088,14 +1225,14 @@ ui_disableElementSettingsWindow()
 {
 	global
 	
-	gui,2:+disabled
+	gui,SettingsOfElement:+disabled
 }
 
 ui_EnableElementSettingsWindow()
 {
 	global
 	
-	gui,2:-disabled
+	gui,SettingsOfElement:-disabled
 	WinActivate,% "·AutoHotFlow· " lang("Settings")
 }
 
@@ -1217,7 +1354,7 @@ ui_selectElementType(type,setElementID,PreviousSubType="")
 		ui_draw()
 		
 	}
-	gui,1:default
+	gui,MainGUI:default
 	return
 	GuiElementChoose:
 	gui,3:default
@@ -1241,7 +1378,7 @@ ui_selectElementType(type,setElementID,PreviousSubType="")
 	if GuiElementChoosedID=
 		return
 	gui,destroy
-	gui,1:default
+	gui,MainGUI:default
 	ui_EnableMainGUI()
 	
 	
@@ -1345,35 +1482,35 @@ ui_selectConnectionType(tempNewID)
 	GuiConnectionChooseCancel:
 	gui,destroy
 	ui_EnableMainGUI()
-	gui,1:default
+	gui,MainGUI:default
 	NowConnectionChoosed:="aborted"
 	return 
 	
 	GuiConnectionChooseTrue:
 	gui,destroy
 	ui_EnableMainGUI()
-	gui,1:default
+	gui,MainGUI:default
 	NowConnectionChoosed:="yes"
 	return
 	
 	GuiConnectionChooseFalse:
 	gui,destroy
 	ui_EnableMainGUI()
-	gui,1:default
+	gui,MainGUI:default
 	NowConnectionChoosed:="no"
 	return 
 	
 	GuiConnectionChooseException:
 	gui,destroy
 	ui_EnableMainGUI()
-	gui,1:default
+	gui,MainGUI:default
 	NowConnectionChoosed:="exception"
 	return 
 	
 	GuiConnectionChooseNormal:
 	gui,destroy
 	ui_EnableMainGUI()
-	gui,1:default
+	gui,MainGUI:default
 	NowConnectionChoosed:="normal"
 	return 
 	
@@ -1437,28 +1574,28 @@ ui_selectContainerType(tempNewID="")
 	GuiElementTypeChooseCancel:
 	gui,destroy
 	ui_EnableMainGUI()
-	gui,1:default
+	gui,MainGUI:default
 	NowTypeChoosed:="aborted"
 	return 
 	
 	GuiElementTypeChooseAction:
 	gui,destroy
 	ui_EnableMainGUI()
-	gui,1:default
+	gui,MainGUI:default
 	NowTypeChoosed:="action"
 	return
 	
 	GuiElementTypeChooseCondition:
 	gui,destroy
 	ui_EnableMainGUI()
-	gui,1:default
+	gui,MainGUI:default
 	NowTypeChoosed:="condition"
 	return
 	
 	GuiElementTypeChooseLoop:
 	gui,destroy
 	ui_EnableMainGUI()
-	gui,1:default
+	gui,MainGUI:default
 	NowTypeChoosed:="loop"
 	return 
 	

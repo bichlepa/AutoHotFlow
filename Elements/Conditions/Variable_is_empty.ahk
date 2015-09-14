@@ -16,8 +16,11 @@ runConditionVariable_is_empty(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 
 getParametersConditionVariable_is_empty()
 {
-	
-	parametersToEdit:=["Label|" lang("Variable name"),"Text|VarName|Varname"]
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label:  lang("Variable name")})
+	parametersToEdit.push({type: "Edit", id: "VarName", default: "Varname", content: "VariableName", WarnIfEmpty: true})
+
+
 	
 	return parametersToEdit
 }

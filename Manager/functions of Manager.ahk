@@ -138,7 +138,7 @@ enableFlow(ID,options="")
 	}
 	else
 	{
-		temperrorlevel:=com_SendCommand({function: "enable"},nameOf(ID))
+		temperrorlevel:=com_SendCommand({function: "enable"},"editor",nameOf(ID))
 		
 		if temperrorlevel
 		{
@@ -164,7 +164,7 @@ runFlow(ID,configuration="empty")
 	
 	configuration["function"]:="run"
 	;~ MsgBox % configuration["localVariables"] "`n`n" strobj(configuration)
-	temperrorlevel:=com_SendCommand(configuration,nameOf(ID))
+	temperrorlevel:=com_SendCommand(configuration,"editor",nameOf(ID))
 	
 	if temperrorlevel
 	{
@@ -182,7 +182,7 @@ editFlow(ID)
 {
 	global
 
-	temperrorlevel:=com_SendCommand({function: "edit"},nameOf(ID))
+	temperrorlevel:=com_SendCommand({function: "edit"},"editor",nameOf(ID))
 	
 	if temperrorlevel
 	{
@@ -202,7 +202,7 @@ disableFlow(ID)
 	global
 	local temperrorlevel
 	
-	temperrorlevel:=com_SendCommand({function: "disable"},nameOf(ID))
+	temperrorlevel:=com_SendCommand({function: "disable"},"editor",nameOf(ID))
 	if temperrorlevel
 	{
 		return false
@@ -216,7 +216,7 @@ stopFlow(ID)
 	global
 	local temperrorlevel
 	
-	temperrorlevel:=com_SendCommand({function: "stop"},nameOf(ID))
+	temperrorlevel:=com_SendCommand({function: "stop"},"editor",nameOf(ID))
 	if temperrorlevel
 	{
 		return false

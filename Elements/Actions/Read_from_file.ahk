@@ -71,7 +71,7 @@ getParametersActionRead_from_file()
 	parametersToEdit.push({type: "Label", label: lang("File path")})
 	parametersToEdit.push({type: "File", id: "file", label: lang("Select a file"), options: 8})
 	parametersToEdit.push({type: "Label", label: lang("Encoding")})
-	parametersToEdit.push({type: "Radio", id: "Encoding", default: 2, choices: [ANSI, Unicode UTF-8, Unicode UTF-16]})
+	parametersToEdit.push({type: "Radio", id: "Encoding", default: 2, choices: ["ANSI", "Unicode UTF-8", "Unicode UTF-16"]})
 	parametersToEdit.push({type: "Label", label: lang("Linefeed")})
 	parametersToEdit.push({type: "Checkbox", id: "Linefeed", default: 1, label: lang("Replace Carriage return and linefeed with single linefeeds")})
 

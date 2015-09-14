@@ -27,6 +27,8 @@ getParameters+ElementType++ElementName+()
 	parametersToEdit.push({type: "Edit", id: "Section", default: "section", content: "String", WarnIfEmpty: true})
 	parametersToEdit.push({type: "Edit", id: "VarValues", default: "Added Element 1`nAdded Element 2", multiline: true, content: "String", WarnIfEmpty: true})
 	parametersToEdit.push({type: "Edit", id: ["Xpos", "Ypos"], default: [10, 20], content: "Expression", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Edit", id: ["varnameR", "varnameG", "varnameB"], default: ["ColorRed", "ColorBlue", "ColorGreen"], content: "VariableName", WarnIfEmpty: true})
+	parametersToEdit.push({type: "edit", id: "MonitorNumber", default: 1, content: "Expression", WarnIfEmpty: true, UseUpDown: true, range: "1-5"})
 	
 	;If an edit can contain either an expression or a String (user should decide), use following two lines:
 	parametersToEdit.push({type: "Radio", id: "isExpression", default: 1, choices: [lang("This is a value"), lang("This is a variable name or expression")]})
@@ -45,11 +47,29 @@ getParameters+ElementType++ElementName+()
 	parametersToEdit.push({type: "File", id: "file", label: lang("Select a file"), options: 8, filter: lang("Images and icons") " (*.gif; *.jpg; *.bmp; *.ico; *.cur; *.ani; *.png; *.tif; *.exif; *.wmf; *.emf; *.exe; *.dll; *.cpl; *.scr)"})
 	
 	;Drop down
-	parametersToEdit.push({type: "DropDown", id: "Button", default: 1, choices: [lang("Left button"), lang("Right button"), lang("Middle Button"), lang("Wheel up"), lang("Wheel down"), lang("Wheel left"), lang("Wheel right"), lang("4th mouse button (back)"), lang("5th mouse button (forward)")]
+	parametersToEdit.push({type: "DropDown", id: "Button", default: 1, choices: [lang("Left button"), lang("Right button"), lang("Middle Button"), lang("Wheel up"), lang("Wheel down"), lang("Wheel left"), lang("Wheel right"), lang("4th mouse button (back)"), lang("5th mouse button (forward)"), result: "number"]
 	parametersToEdit.push({type: "DropDown", id: "TTSEngine", default: TTSDefaultLanguage, choices: TTSList, result: "name"})
 	
+	;Combo box
+	parametersToEdit.push({type: "ComboBox", id: "TTSEngine", default: TTSDefaultLanguage, choices: TTSList, result: "name"})
+	
 	;Slider
-	parametersToEdit.push({type: "Slider", id: "speed", default: 2, options: "Range0-100 tooltip"})
+	parametersToEdit.push({type: "Slider", id: "speed", default: 2, options: "Range0-100 tooltip tickinterval10"})
+	
+	
+	If something must be initialized (like a selection list) when the settings window is opened, use following code to reduce unnecessary initialisations when the flow is saved or loaded:
+	
+	if openingElementSettingsWindow
+	{
+		;example initialisation
+		local listOfSysSounds:=Object()
+		loop, %a_windir%\media\*
+		{
+			listOfSysSounds.Insert(a_loopfilename)
+		}
+	}
+	
+	
 	
 	The parameter id must not have those names:
 		FinishedRunning,result,x,y,name,CountOfParts,part1...part5,ClickPriority,to,from,marked
@@ -83,12 +103,12 @@ run+ElementType++ElementName+(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	To get parameter values use following examples
 	;Access a parameter
 	%ElementID%title ;"Title" is the parameter ID
-		
+	
 	;Replace varialbes
 	Content:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Content) ;"Content" is the parameter ID
 	
 	;Evaluate expression
-	URL:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%URL) ;"URL" is the parameter ID
+	MonitorNumber:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%MonitorNumber) ;"MonitorNumber" is the parameter ID
 	
 	
 	
@@ -97,6 +117,7 @@ run+ElementType++ElementName+(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	You may use following code.
 	
 	;Check variable name 
+	varname:=v_replaceVariables(InstanceID,ThreadID,%ElementID%varname) ;"varname" is the parameter ID
 	if not v_CheckVariableName(varname)
 	{
 		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Variable name '" varname "' is not valid")
@@ -105,6 +126,7 @@ run+ElementType++ElementName+(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	}
 	
 	;Check whether value is not empty
+	Position:=v_replaceVariables(InstanceID,ThreadID,%ElementID%Position) ;"Position" is the parameter ID
 	if Position=
 	{
 		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Position is not specified.")
@@ -113,14 +135,18 @@ run+ElementType++ElementName+(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	}
 	
 	;Check whether value is a number
-	if temp is not number
+	InputNumber:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%InputNumber) ;"MonitorNumber" is the parameter ID
+	if InputNumber is not number
 	{
-		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Input number " temp " is not a number")
-		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not a number.",lang("Input number '%1%'",temp)) )
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Input number " InputNumber " is not a number")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% '%2%' is not a number.",lang("Input number"),%ElementID%InputNumber) )
 		return
 	}
 	
+	
+	
 	;Check whether the value is a list
+	local tempObject:=v_getVariable(InstanceID,ThreadID,Varname,"list")
 	if (!(IsObject(tempObject)))
 	{
 		if tempObject=

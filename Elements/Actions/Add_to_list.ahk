@@ -170,6 +170,8 @@ GenerateNameActionAdd_to_list(ID)
 
 CheckSettingsActionAdd_to_list(ID)
 {
+	global
+	
 	if (GUISettingsOfElement%ID%NumberOfElements1 = 1) ;one element
 	{
 		GuiControl,Enable,GUISettingsOfElement%ID%isExpression1

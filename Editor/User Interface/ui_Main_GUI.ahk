@@ -2,7 +2,7 @@
 {
 	global
 	;Create tha main gui
-	gui,1:default
+	gui,MainGUI:default
 	;~ gui,add,picture,vPicFlow hwndPicFlowHWND x0 y0 0xE hidden gclickOnPicture ;No picture needed anymore
 	gui,add,StatusBar,hwndStatusbarHWND
 	gui,add,hotkey,hidden hwndEditHWND ;To avoid error sound when user presses keys while this window is open
@@ -138,13 +138,13 @@ mousewheelmove(wpar,lpar,msg,hwn)
 ui_DisableMainGUI()
 {
 	global
-	gui,1:+disabled
+	gui,MainGUI:+disabled
 	
 }
 ui_EnableMainGUI()
 {
 	global
-	gui,1:-disabled
+	gui,MainGUI:-disabled
 	
 	;Activate window if it is not hidden
 	DetectHiddenWindows,off
@@ -167,9 +167,9 @@ ui_showgui()
 	tempheight:=round((MonitorWorkAreabottom -MonitorWorkAreatop)*0.9)
 
 	if guiAlreadyShowed=true
-		gui,1:show, w%widthofguipic%,% "·AutoHotFlow· " lang("Editor") " - " flowName ;Added  w%widthofguipic% to trigger the guisize label
+		gui,MainGUI:show, w%widthofguipic%,% "·AutoHotFlow· " lang("Editor") " - " flowName ;Added  w%widthofguipic% to trigger the guisize label
 	else
-		gui,1:show,  w%tempwidth% h%tempheight%,% "·AutoHotFlow· " lang("Editor") " - " flowName
+		gui,MainGUI:show,  w%tempwidth% h%tempheight%,% "·AutoHotFlow· " lang("Editor") " - " flowName
 	sleep 10
 	
 	ui_Draw()
@@ -207,9 +207,9 @@ ui_OnLanguageChange()
 	DetectHiddenWindows off
 	WinGetTitle,temp,ahk_id %mainguihwnd%
 	IfWinExist,% temp
-		gui,1:show,,% "·AutoHotFlow· " lang("Editor") " - " flowName 
+		gui,MainGUI:show,,% "·AutoHotFlow· " lang("Editor") " - " flowName 
 	else
-		gui,1:show,hide,% "·AutoHotFlow· " lang("Editor") " - " flowName 
+		gui,MainGUI:show,hide,% "·AutoHotFlow· " lang("Editor") " - " flowName 
 	
 	;Help! I want that the menus are renamed when the language changes.
 	;~ initializeTrayBar()
@@ -223,13 +223,12 @@ goto,jumpOverGUIJumpLabels
 
 
 
-guisize: ;resize the picture when GUI is resized
+MainGUIguisize: ;resize the picture when GUI is resized
+
 
 ;MsgBox w%A_guiwidth%  %a_guiheight%
 GuiControl,move,PicFlow,w%A_guiwidth%  h%a_guiheight%
 heightofguipic:=a_guiheight - StatusBarHeight
-
-
 
 widthofguipic:=a_guiwidth
 guicontrolget,guipic,pos,PicFlow ;get the picture position. -> gx, gy
@@ -241,7 +240,13 @@ SB_SetParts(a_guiwidth)
 ui_draw()
 return
 
-
+GetClientSize(hwnd, ByRef w, ByRef h)
+{
+    VarSetCapacity(rc, 16)
+    DllCall("GetClientRect", "uint", hwnd, "uint", &rc)
+    w := NumGet(rc, 8, "int")
+    h := NumGet(rc, 12, "int")
+}
 
 
 jumpOverGUIJumpLabels:

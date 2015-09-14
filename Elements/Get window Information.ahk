@@ -4,7 +4,7 @@ FunctionsForElementGetWindowInformation:
 FunctionsForElementGetWindowInformationGetControlInformationAfterwards:=false
 ui_disableElementSettingsWindow()
 FunctionsForElementGetWindowInformation2:
-gui,2:default
+gui,SettingsOfElement:default
 gui,submit,nohide
 
 
@@ -106,7 +106,7 @@ SetTimer,FunctionsForElementGetWindowInformationGetWindowCoveredByMouse,off
 
 gui,submit
 gui,destroy
-gui,2:default
+gui,SettingsOfElement:default
 tempWinID:=tempParWinID%FunctionsForElementGetWindowInformationListBoxTitles%
 WinGetTitle,temp,ahk_id %tempWinID%
 guicontrol,,GUISettingsOfElement%setElementID%Wintitle,%temp%

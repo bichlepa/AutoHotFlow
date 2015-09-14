@@ -10,7 +10,7 @@ FunctionsForElementGetControlInformation2:
 
 
 
-gui,2:default
+gui,SettingsOfElement:default
 gui,submit,nohide
 
 
@@ -114,7 +114,7 @@ gui,destroy
 
 
 
-gui,2:default
+gui,SettingsOfElement:default
 
 
 ;guicontrol,,GUISettingsOfElement%setElementID%winText,% tempParControlID%FunctionsForElementGetControlInformationListBoxOfContolTexts%  ;thrown out

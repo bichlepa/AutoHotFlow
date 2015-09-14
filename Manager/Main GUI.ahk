@@ -29,13 +29,21 @@ gui,add,Button,vButtonRunFlow gButtonRunFlow Disabled X+10 yp w200 h30,% lang("R
 
 gui,add,Button,vButtonSelectLanguage gButtonSelectLanguage  X330 Y+100 w200 h30,% lang("Change_Language")
 gui,add,Button,vButtonHelp gButtonHelp X+10 yp w200 h30,% lang("Help")
-gui,add,Button,vButtonSettings gButtonSettings  X330 Y+30 w200 h30,% lang("Settings")
-gui,add,Button,vButtonAbout gButtonAbout  X330 Y+30 w200 h30,% lang("About AutoHotFlow")
-gui,add,Button,vButtonShowLog gButtonShowLog  X330 Y+30 w200 h30,% lang("Show log")
+gui,add,Button,vButtonSettings gButtonSettings  X330 Y+20 w200 h30,% lang("Settings")
+gui,add,Button,vButtonAbout gButtonAbout  X330 Y+20 w200 h30,% lang("About AutoHotFlow")
+gui,add,Button,vButtonShowLog gButtonShowLog  X330 Y+20 w200 h30,% lang("Show log")
+gui,add,Button,vButtonExit gButtonExit X+10 yp w200 h30,% lang("Exit")
 
-
-Gui, Show,hide, % "•AutoHotFlow• " lang("Manager")  ; Do not show window while loading flows. Otherway the treeview will not show the plus signs
-
+if a_iscompiled
+{
+	menu,tray, tip,% "•AutoHotFlow• " lang("Manager")
+	Gui, Show,hide, % "•AutoHotFlow• " lang("Manager")  ; Do not show window while loading flows. Otherway the treeview will not show the plus signs
+}
+else ;Helps me to find the uncompiled AHF instance
+{
+	menu,tray, tip,% "•AutoHotFlow• " lang("Manager") " - UNCOMPILED "
+	Gui, Show,hide, % "•AutoHotFlow• " lang("Manager") " - UNCOMPILED "
+}
 
 return
 
@@ -180,7 +188,7 @@ if A_GuiEvent =E ;If user has renamed an entry
 			{
 				%tempSelectedID%name:=OutputVar
 				SaveFlow(tempSelectedID)
-				com_SendCommand({function: "FlowParametersChanged"},tempOldName) ;Send the command to the Editor.
+				com_SendCommand({function: "FlowParametersChanged"},"editor",tempOldName) ;Send the command to the Editor.
 				tooltip(lang("Renamed"))
 				;warn if the name begins with "D_"
 				
@@ -251,7 +259,7 @@ if %tempselectedID%type=flow
 	MsgBox, 4, % lang("Confirm_deletion"),% lang("Do_you_really_want_to_delete_the_flow_%1%?",%tempselectedID%name)
 	IfMsgBox,Yes
 	{
-		com_SendCommand({function: "immediatelyexit"},%tempselectedID%name) ;Send the command to the Editor.
+		com_SendCommand({function: "immediatelyexit"},"editor",%tempselectedID%name) ;Send the command to the Editor.
 		if not errorlevel
 			sleep,500
 		FileDelete,% %tempselectedID%ini
@@ -332,6 +340,10 @@ return
 ButtonShowLog:
 showlog()
 
+return
+
+ButtonExit:
+goto,exit
 return
 
 jumpOverGUIStuff:

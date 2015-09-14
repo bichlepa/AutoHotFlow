@@ -63,7 +63,7 @@ ui_Draw()
 {
 	global
 	local temp
-	gui 1:default
+	gui MainGUI:default
 	
 	DetectHiddenWindows off
 	WinGetTitle,temp,ahk_id %mainguihwnd%

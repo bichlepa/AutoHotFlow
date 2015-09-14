@@ -43,11 +43,11 @@ getCategoryActionPlay_Sound()
 	return lang("Sound")
 }
 
-getParametersActionPlay_Sound()
+getParametersActionPlay_Sound(shouldInitialize = false)
 {
 	global
 	
-	if openingElementSettingsWindow
+	if shouldInitialize 
 	{
 		local listOfSysSounds:=Object()
 		loop, %a_windir%\media\*
