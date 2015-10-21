@@ -101,7 +101,7 @@ ui_settingsOfElement(ElementID,PreviousSubType="")
 				tempYpos:=round(MainGUIY+MainGUIHeight/2- tempHeight/2)
 				
 				gui,show,x%tempXpos% y%tempYpos%
-				
+				CurrentlyActiveWindowHWND:=SettingsHWND
 				return
 				GuiTriggerChoose:
 				if A_GuiEvent !=DoubleClick 
@@ -722,6 +722,8 @@ ui_settingsOfElement(ElementID,PreviousSubType="")
 	
 	;show gui
 	SG2.Show() 
+	
+	CurrentlyActiveWindowHWND:=SettingWindowParentHWND
 	gui,GUISettingsOfElementParent:show
 	
 	openingElementSettingsWindow:=false
@@ -1325,6 +1327,7 @@ ui_selectElementType(type,setElementID,PreviousSubType="")
 	
 	;Put the window in the center of the main window
 	gui,+hwndSettingsHWND
+	CurrentlyActiveWindowHWND:=SettingsHWND
 	gui,show,hide
 	ui_GetMainGUIPos()
 	wingetpos,,,tempWidth,tempHeight,ahk_id %SettingsHWND%
@@ -1459,6 +1462,7 @@ ui_selectConnectionType(tempNewID)
 	gui,add,Button,w90 Y+10 gGuiConnectionChooseCancel,% lang("Cancel")
 	;Put the window in the center of the main window
 	gui,+hwndSettingsHWND
+	CurrentlyActiveWindowHWND:=SettingsHWND
 	gui,show,hide
 	ui_GetMainGUIPos()
 	wingetpos,,,tempWidth,tempHeight,ahk_id %SettingsHWND%
@@ -1551,6 +1555,7 @@ ui_selectContainerType(tempNewID="")
 	gui,add,Button,w90  Y+10 gGuiElementTypeChooseCancel,% lang("Cancel")
 	;Put the window in the center of the main window
 	gui,+hwndSettingsHWND
+	CurrentlyActiveWindowHWND:=SettingsHWND
 	gui,show,hide
 	ui_GetMainGUIPos()
 	wingetpos,,,tempWidth,tempHeight,ahk_id %SettingsHWND%

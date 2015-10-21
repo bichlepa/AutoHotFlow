@@ -31,6 +31,11 @@ MouseGetPos,mx,my,temphwnd
 return
 
 leftmousebuttondoubleclick:
+if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of the main gui are disabled
+{
+	ui_ActionWhenMainGUIDisabled()
+	return
+}
 if (theOnlyOneMarkedElement)
 {
 	sleep 10
@@ -139,8 +144,9 @@ if elementWithHighestPriority= ;If nothing was selected (click on nowhere). -> S
 	
 	
 	clickMoved:= scrollwithMouse()
-	if (clickMoved=false) ;If the background wasn't moved, unmark elements
+	if (clickMoved=false and CurrentlyMainGuiIsDisabled=false) ;If the background wasn't moved, unmark elements. Ignore if GUI is disabled
 	{
+		
 		if (countMarkedElements) ;if at least one element is marked
 		{
 			
@@ -156,8 +162,14 @@ if elementWithHighestPriority= ;If nothing was selected (click on nowhere). -> S
 		
 	}
 }
+else if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of the main gui are disabled
+{
+	ui_ActionWhenMainGUIDisabled()
+	
+}
 else if (elementWithHighestPriority="MenuCreateNewAction" or elementWithHighestPriority="MenuCreateNewCondition" or elementWithHighestPriority="MenuCreateNewLoop") ;User click either on "Create new action" or ".. condtion" in the drawn menu
 {
+
 	if (elementWithHighestPriority="MenuCreateNewAction")
 		tempNewID:=e_NewAction()
 	else if (elementWithHighestPriority="MenuCreateNewCondition")
@@ -1624,7 +1636,11 @@ scrollwithMouse(button="lbutton")
 			
 		}
 		else
+		{
+			Thread,priority,-1000
 			sleep,10 ;Save processor work
+			Thread,priority,0
+		}
 		
 	}
 	
@@ -1691,7 +1707,11 @@ esc:
 return
 
 del: ;delete marked element
-
+if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of the main gui are disabled
+{
+	ui_ActionWhenMainGUIDisabled()
+	return
+}
 
 for markindex, markelement in markedElements
 {
@@ -1792,17 +1812,31 @@ ctrl_x:
 return
 
 ctrl_c:
-
+if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of the main gui are disabled
+{
+	ui_ActionWhenMainGUIDisabled()
+	return
+}
 ;ToolTip("Control + C pressed")
 i_SaveToClipboard()
 return
 
 ctrl_v:
+if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of the main gui are disabled
+{
+	ui_ActionWhenMainGUIDisabled()
+	return
+}
 ;ToolTip("Control + V pressed")
 i_loadFromClipboard()
 return
 
 ctrl_s:
+if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of the main gui are disabled
+{
+	ui_ActionWhenMainGUIDisabled()
+	return
+}
 i_save()
 return
 

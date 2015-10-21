@@ -19,6 +19,11 @@ goto,überspringendsfasdg
 
 
 ui_Menu_save:
+if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of the main gui are disabled
+{
+	ui_ActionWhenMainGUIDisabled()
+	return
+}
 i_save()
 return
 
@@ -47,6 +52,11 @@ r_EnableFlow()
 return
 
 ui_Menu_Settings:
+if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of the main gui are disabled
+{
+	ui_ActionWhenMainGUIDisabled()
+	return
+}
 ui_SettingsOwFLow()
 return
 

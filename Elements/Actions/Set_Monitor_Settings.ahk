@@ -10,7 +10,7 @@ RunActionSet_Monitor_Settings(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	
 	if not %ElementID%AllMonitors
 	{
-		local MonitorNumber:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%MonitorNumber) ;"URL" is the parameter ID
+		local MonitorNumber:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%MonitorNumber) 
 		if MonitorNumber is not number
 		{
 			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Monitor number " MonitorNumber " is not a number")
@@ -21,7 +21,7 @@ RunActionSet_Monitor_Settings(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	
 	if %ElementID%WhetherChangeBrightness
 	{
-		local brightness:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%brightness) ;"URL" is the parameter ID
+		local brightness:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%brightness) 
 		if brightness is not number
 		{
 			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Brightness " brightness " is not a number")
@@ -31,7 +31,7 @@ RunActionSet_Monitor_Settings(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	}
 	if %ElementID%WhetherChangecontrast
 	{
-		local contrast:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%contrast) ;"URL" is the parameter ID
+		local contrast:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%contrast) 
 		if contrast is not number
 		{
 			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Contrast " contrast " is not a number")
@@ -39,19 +39,19 @@ RunActionSet_Monitor_Settings(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 			return
 		}
 	}
-	if %ElementID%WhetherChangegamma
-	{
-		local gamma:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%gamma) ;"URL" is the parameter ID
-		if gamma is not number
-		{
-			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Gamma " gamma " is not a number")
-			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% '%2%' is not a number.",lang("Gamma"),%ElementID%gamma) )
-			return
-		}
-	}
+	;~ if %ElementID%WhetherChangegamma
+	;~ {
+		;~ local gamma:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%gamma) 
+		;~ if gamma is not number
+		;~ {
+			;~ logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Gamma " gamma " is not a number")
+			;~ MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% '%2%' is not a number.",lang("Gamma"),%ElementID%gamma) )
+			;~ return
+		;~ }
+	;~ }
 	if %ElementID%WhetherSetRedGain
 	{
-		local RedGain:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%RedGain) ;"URL" is the parameter ID
+		local RedGain:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%RedGain) 
 		if RedGain is not number
 		{
 			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Red gain " RedGain " is not a number")
@@ -61,7 +61,7 @@ RunActionSet_Monitor_Settings(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	}
 	if %ElementID%WhetherSetGreenGain
 	{
-		local GreenGain:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%GreenGain) ;"URL" is the parameter ID
+		local GreenGain:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%GreenGain) 
 		if GreenGain is not number
 		{
 			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Green gain " GreenGain " is not a number")
@@ -71,11 +71,41 @@ RunActionSet_Monitor_Settings(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	}
 	if %ElementID%WhetherSetBlueGain
 	{
-		local BlueGain:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%BlueGain) ;"URL" is the parameter ID
+		local BlueGain:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%BlueGain) 
 		if BlueGain is not number
 		{
 			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Blue gain " BlueGain " is not a number")
 			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% '%2%' is not a number.",lang("Blue gain"),%ElementID%BlueGain) )
+			return
+		}
+	}
+	if %ElementID%WhetherSetRedDrive
+	{
+		local RedDrive:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%RedDrive) 
+		if RedDrive is not number
+		{
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Red drive " RedDrive " is not a number")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% '%2%' is not a number.",lang("Red drive"),%ElementID%RedDrive) )
+			return
+		}
+	}
+	if %ElementID%WhetherSetGreenDrive
+	{
+		local GreenDrive:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%GreenDrive) 
+		if GreenDrive is not number
+		{
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Green drive " GreenDrive " is not a number")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% '%2%' is not a number.",lang("Green drive"),%ElementID%GreenDrive) )
+			return
+		}
+	}
+	if %ElementID%WhetherSetBlueDrive
+	{
+		local BlueDrive:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%BlueDrive) 
+		if BlueDrive is not number
+		{
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Blue drive " BlueDrive " is not a number")
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% '%2%' is not a number.",lang("Blue drive"),%ElementID%BlueDrive) )
 			return
 		}
 	}
@@ -96,32 +126,43 @@ RunActionSet_Monitor_Settings(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 		{
 			result:=ActionsWithMonitorDisplay.SetMonitorContrast(tempnumber,contrast)
 		}
-		if %ElementID%WhetherChangeColorTemperature
-		{
-			result:=ActionsWithMonitorDisplay.SetMonitorColorTemperature(tempnumber,%ElementID%ColorTemperature)
-		}
 		
 		if %ElementID%WhetherSetRedGain
 		{
-			result:=ActionsWithMonitorDisplay.SetMonitorRGBGain(tempnumber,0,RedGain)
+			result:=ActionsWithMonitorDisplay.SetMonitorRedGreenOrBlueGain(tempnumber,0,RedGain)
 		}
 		if %ElementID%WhetherSetGreenGain
 		{
-			;~ MsgBox %GreenGain%
-			result:=ActionsWithMonitorDisplay.SetMonitorRGBGain(tempnumber,1,GreenGain)
+			result:=ActionsWithMonitorDisplay.SetMonitorRedGreenOrBlueGain(tempnumber,1,GreenGain)
 		}
 		if %ElementID%WhetherSetBlueGain
 		{
-			result:=ActionsWithMonitorDisplay.SetMonitorRGBGain(tempnumber,2,BlueGain)
+			result:=ActionsWithMonitorDisplay.SetMonitorRedGreenOrBlueGain(tempnumber,2,BlueGain)
+		}
+		if %ElementID%WhetherSetRedDrive
+		{
+			result:=ActionsWithMonitorDisplay.SetMonitorRedGreenOrBlueDrive(tempnumber,0,RedDrive)
+		}
+		if %ElementID%WhetherSetGreenDrive
+		{
+			result:=ActionsWithMonitorDisplay.SetMonitorRedGreenOrBlueDrive(tempnumber,1,GreenDrive)
+		}
+		if %ElementID%WhetherSetBlueDrive
+		{
+			result:=ActionsWithMonitorDisplay.SetMonitorRedGreenOrBlueDrive(tempnumber,2,BlueDrive)
+		}
+		if %ElementID%WhetherChangeColorTemperature
+		{
+			result:=ActionsWithMonitorDisplay.SetMonitorColorTemperature(tempnumber,%ElementID%ColorTemperature)
 		}
 		if not %ElementID%AllMonitors
 			break
 	}
 	
-	if %ElementID%WhetherChangeGamma
-	{
-		ActionSet_Monitor_SettingsDisplay.SetDeviceGammaRamp(gamma)
-	}
+	;~ if %ElementID%WhetherChangeGamma
+	;~ {
+		;~ ActionSet_Monitor_SettingsDisplay.SetDeviceGammaRamp(gamma)
+	;~ }
 	
 	if (substr(result,1,1)="*")
 	{
@@ -161,9 +202,9 @@ getParametersActionSet_Monitor_Settings()
 	parametersToEdit.push({type: "Checkbox", id: "WhetherChangeContrast", default: 0, label: lang("Change contrast")})
 	parametersToEdit.push({type: "Slider", id: "contrast", default: 50, options: "Range0-100 tooltip tickinterval10", AllowExpression: true})
 	
-	parametersToEdit.push({type: "Label", label:  lang("Gamma") " (" lang("Affects all monitors") ")" })
-	parametersToEdit.push({type: "Checkbox", id: "WhetherChangeGamma", default: 0, label: lang("Change gamma")})
-	parametersToEdit.push({type: "Slider", id: "gamma", default: 128, options: "Range0-255 tooltip tickinterval128", AllowExpression: true})
+	;~ parametersToEdit.push({type: "Label", label:  lang("Gamma") " (" lang("Affects all monitors") ")" })
+	;~ parametersToEdit.push({type: "Checkbox", id: "WhetherChangeGamma", default: 0, label: lang("Change gamma")})
+	;~ parametersToEdit.push({type: "Slider", id: "gamma", default: 128, options: "Range0-255 tooltip tickinterval128", AllowExpression: true})
 	
 	parametersToEdit.push({type: "Label", label:  lang("Color gain") })
 	parametersToEdit.push({type: "Checkbox", id: "WhetherSetRedGain", default: 0, label: lang("Change red gain value")})
@@ -172,6 +213,14 @@ getParametersActionSet_Monitor_Settings()
 	parametersToEdit.push({type: "Slider", id: "GreenGain", default: 128, options: "Range0-100 tooltip tickinterval10", AllowExpression: true})
 	parametersToEdit.push({type: "Checkbox", id: "WhetherSetBlueGain", default: 0, label: lang("Change blue gain value")})
 	parametersToEdit.push({type: "Slider", id: "BlueGain", default: 128, options: "Range0-100 tooltip tickinterval10", AllowExpression: true})
+	
+	parametersToEdit.push({type: "Label", label:  lang("Color drive") })
+	parametersToEdit.push({type: "Checkbox", id: "WhetherSetRedDrive", default: 0, label: lang("Change red drive value")})
+	parametersToEdit.push({type: "Slider", id: "RedDrive", default: 128, options: "Range0-100 tooltip tickinterval10", AllowExpression: true})
+	parametersToEdit.push({type: "Checkbox", id: "WhetherSetGreenDrive", default: 0, label: lang("Change green drive value")})
+	parametersToEdit.push({type: "Slider", id: "GreenDrive", default: 128, options: "Range0-100 tooltip tickinterval10", AllowExpression: true})
+	parametersToEdit.push({type: "Checkbox", id: "WhetherSetBlueDrive", default: 0, label: lang("Change blue drive value")})
+	parametersToEdit.push({type: "Slider", id: "BlueDrive", default: 128, options: "Range0-100 tooltip tickinterval10", AllowExpression: true})
 	
 	parametersToEdit.push({type: "Label", label:  lang("Color temperature")})
 	parametersToEdit.push({type: "Checkbox", id: "WhetherChangeColorTemperature", default: 0, label: lang("Change color temperature")})
@@ -189,8 +238,20 @@ GenerateNameActionSet_Monitor_Settings(ID)
 		tempText.= " - " lang("Brightness") ": " GUISettingsOfElement%ID%brightness
 	if GUISettingsOfElement%ID%WhetherChangeContrast
 		tempText.= " - " lang("Contrast") ": " GUISettingsOfElement%ID%contrast 
-	if GUISettingsOfElement%ID%WhetherChangeGamma
-		tempText.= " - " lang("Gamma") ": " GUISettingsOfElement%ID%gamma 
+	;~ if GUISettingsOfElement%ID%WhetherChangeGamma
+		;~ tempText.= " - " lang("Gamma") ": " GUISettingsOfElement%ID%gamma 
+	if GUISettingsOfElement%ID%WhetherSetRedGain
+		tempText.= " - " lang("Red gain") ": " GUISettingsOfElement%ID%RedGain
+	if GUISettingsOfElement%ID%WhetherSetGreenGain
+		tempText.= " - " lang("Green gain") ": " GUISettingsOfElement%ID%GreenGain 
+	if GUISettingsOfElement%ID%WhetherSetBlueGain
+		tempText.= " - " lang("Blue gain") ": " GUISettingsOfElement%ID%BlueGain
+	if GUISettingsOfElement%ID%WhetherSetRedDrive
+		tempText.= " - " lang("Red gain") ": " GUISettingsOfElement%ID%RedDrive
+	if GUISettingsOfElement%ID%WhetherSetGreenDrive
+		tempText.= " - " lang("Green gain") ": " GUISettingsOfElement%ID%GreenDrive 
+	if GUISettingsOfElement%ID%WhetherSetBlueDrive
+		tempText.= " - " lang("Blue gain") ": " GUISettingsOfElement%ID%BlueDrive
 	if GUISettingsOfElement%ID%WhetherChangeColorTemperature
 		tempText.= " - " lang("Color temperature") ": " colortemperatures[GUISettingsOfElement%ID%ColorTemperature]
 	
@@ -252,16 +313,16 @@ CheckSettingsActionSet_Monitor_Settings(ID)
 		GuiControl,Disable,GUISettingsOfElement%ID%contrast
 	}
 	
-	if (GUISettingsOfElement%ID%WhetherChangeGamma = 1)
-	{
-		GuiControl,Enable,GUISettingsOfElementSlideOf%ID%gamma
-		GuiControl,Enable,GUISettingsOfElement%ID%gamma
-	}
-	else
-	{
-		GuiControl,Disable,GUISettingsOfElementSlideOf%ID%gamma
-		GuiControl,Disable,GUISettingsOfElement%ID%gamma
-	}
+	;~ if (GUISettingsOfElement%ID%WhetherChangeGamma = 1)
+	;~ {
+		;~ GuiControl,Enable,GUISettingsOfElementSlideOf%ID%gamma
+		;~ GuiControl,Enable,GUISettingsOfElement%ID%gamma
+	;~ }
+	;~ else
+	;~ {
+		;~ GuiControl,Disable,GUISettingsOfElementSlideOf%ID%gamma
+		;~ GuiControl,Disable,GUISettingsOfElement%ID%gamma
+	;~ }
 	
 	if (GUISettingsOfElement%ID%WhetherSetRedGain = 1)
 	{
@@ -293,6 +354,36 @@ CheckSettingsActionSet_Monitor_Settings(ID)
 		GuiControl,Disable,GUISettingsOfElementSlideOf%ID%BlueGain
 		GuiControl,Disable,GUISettingsOfElement%ID%BlueGain
 	}
+	if (GUISettingsOfElement%ID%WhetherSetRedDrive = 1)
+	{
+		GuiControl,Enable,GUISettingsOfElementSlideOf%ID%RedDrive
+		GuiControl,Enable,GUISettingsOfElement%ID%RedDrive
+	}
+	else
+	{
+		GuiControl,Disable,GUISettingsOfElementSlideOf%ID%RedDrive
+		GuiControl,Disable,GUISettingsOfElement%ID%RedDrive
+	}
+	if (GUISettingsOfElement%ID%WhetherSetGreenDrive = 1)
+	{
+		GuiControl,Enable,GUISettingsOfElementSlideOf%ID%GreenDrive
+		GuiControl,Enable,GUISettingsOfElement%ID%GreenDrive
+	}
+	else
+	{
+		GuiControl,Disable,GUISettingsOfElementSlideOf%ID%GreenDrive
+		GuiControl,Disable,GUISettingsOfElement%ID%GreenDrive
+	}
+	if (GUISettingsOfElement%ID%WhetherSetBlueDrive = 1)
+	{
+		GuiControl,Enable,GUISettingsOfElementSlideOf%ID%BlueDrive
+		GuiControl,Enable,GUISettingsOfElement%ID%BlueDrive
+	}
+	else
+	{
+		GuiControl,Disable,GUISettingsOfElementSlideOf%ID%BlueDrive
+		GuiControl,Disable,GUISettingsOfElement%ID%BlueDrive
+	}
 	
 	if (GUISettingsOfElement%ID%WhetherChangeColorTemperature = 1)
 	{
@@ -308,20 +399,31 @@ CheckSettingsActionSet_Monitor_Settings(ID)
 	{
 		
 		temp:=ActionsWithMonitorDisplay.GetMonitorBrightness(oldMonitorNumber)
-		guicontrol,% "+range" temp.MinimumBrightness  "-" temp.MaximumBrightness,GUISettingsOfElementSlideOf%ID%brightness
+		guicontrol,% "+range" temp.Minimum  "-" temp.Maximum,GUISettingsOfElementSlideOf%ID%brightness
 		guicontrol,,GUISettingsOfElementSlideOf%ID%brightness,% GUISettingsOfElement%ID%brightness
 		temp:=ActionsWithMonitorDisplay.GetMonitorContrast(oldMonitorNumber)
-		guicontrol,% "+range" temp.MinimumContrast  "-" temp.MaximumContrast,GUISettingsOfElementSlideOf%ID%contrast
-		guicontrol,,GUISettingsOfElementSlideOf%ID%brightness,% GUISettingsOfElement%ID%contrast
-		temp:=ActionsWithMonitorDisplay.GetMonitorRGBGain(oldMonitorNumber,0)
-		guicontrol,% "+range" temp.MinimumGain  "-" temp.MaximumGain,GUISettingsOfElementSlideOf%ID%redgain
+		guicontrol,% "+range" temp.Minimum  "-" temp.Maximum,GUISettingsOfElementSlideOf%ID%contrast
+		guicontrol,,GUISettingsOfElementSlideOf%ID%contrast,% GUISettingsOfElement%ID%contrast
+		
+		temp:=ActionsWithMonitorDisplay.GetMonitorRedGreenOrBlueGain(oldMonitorNumber,0)
+		guicontrol,% "+range" temp.Minimum  "-" temp.Maximum,GUISettingsOfElementSlideOf%ID%redgain
 		guicontrol,,GUISettingsOfElementSlideOf%ID%redgain, % GUISettingsOfElement%ID%redgain
-		temp:=ActionsWithMonitorDisplay.GetMonitorRGBGain(oldMonitorNumber,1)
-		guicontrol,% "+range" temp.MinimumGain  "-" temp.MaximumGain,GUISettingsOfElementSlideOf%ID%greengain
+		temp:=ActionsWithMonitorDisplay.GetMonitorRedGreenOrBlueGain(oldMonitorNumber,1)
+		guicontrol,% "+range" temp.Minimum  "-" temp.Maximum,GUISettingsOfElementSlideOf%ID%greengain
 		guicontrol,,GUISettingsOfElementSlideOf%ID%greengain,% GUISettingsOfElement%ID%greengain
-		temp:=ActionsWithMonitorDisplay.GetMonitorRGBGain(oldMonitorNumber,2)
-		guicontrol,% "+range" temp.MinimumGain  "-" temp.MaximumGain,GUISettingsOfElementSlideOf%ID%bluegain
+		temp:=ActionsWithMonitorDisplay.GetMonitorRedGreenOrBlueGain(oldMonitorNumber,2)
+		guicontrol,% "+range" temp.Minimum  "-" temp.Maximum,GUISettingsOfElementSlideOf%ID%bluegain
 		guicontrol,,GUISettingsOfElementSlideOf%ID%bluegain,% GUISettingsOfElement%ID%bluegain
+		
+		temp:=ActionsWithMonitorDisplay.GetMonitorRedGreenOrBlueDrive(oldMonitorNumber,0)
+		guicontrol,% "+range" temp.Minimum  "-" temp.Maximum,GUISettingsOfElementSlideOf%ID%redDrive
+		guicontrol,,GUISettingsOfElementSlideOf%ID%redDrive, % GUISettingsOfElement%ID%redDrive
+		temp:=ActionsWithMonitorDisplay.GetMonitorRedGreenOrBlueDrive(oldMonitorNumber,1)
+		guicontrol,% "+range" temp.Minimum  "-" temp.Maximum,GUISettingsOfElementSlideOf%ID%greenDrive
+		guicontrol,,GUISettingsOfElementSlideOf%ID%greenDrive,% GUISettingsOfElement%ID%greenDrive
+		temp:=ActionsWithMonitorDisplay.GetMonitorRedGreenOrBlueDrive(oldMonitorNumber,2)
+		guicontrol,% "+range" temp.Minimum  "-" temp.Maximum,GUISettingsOfElementSlideOf%ID%blueDrive
+		guicontrol,,GUISettingsOfElementSlideOf%ID%blueDrive,% GUISettingsOfElement%ID%blueDrive
 	}
 	
 }

@@ -126,13 +126,70 @@ RunActionGet_Monitor_Settings(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 		return
 	}
 	
-	VarnameGamma:=v_replaceVariables(InstanceID,ThreadID,%ElementID%VarnameGamma) ;"varname" is the parameter ID
-	if ((not v_CheckVariableName(VarnameGamma)) and VarnameGamma!="")
+	VarnameRedDrive:=v_replaceVariables(InstanceID,ThreadID,%ElementID%VarnameRedDrive) ;"varname" is the parameter ID
+	if ((not v_CheckVariableName(VarnameRedDrive)) and VarnameRedDrive!="")
 	{
-		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Variable name '" VarnameGamma "' is not valid")
-		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not valid",lang("Variable name '%1%'",VarnameGamma)) )
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Variable name '" VarnameRedDrive "' is not valid")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not valid",lang("Variable name '%1%'",VarnameRedDrive)) )
 		return
 	}
+	VarnameRedDriveMin:=v_replaceVariables(InstanceID,ThreadID,%ElementID%VarnameRedDriveMin) ;"varname" is the parameter ID
+	if ((not v_CheckVariableName(VarnameRedDriveMin)) and VarnameRedDriveMin!="")
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Variable name '" VarnameRedDriveMin "' is not valid")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not valid",lang("Variable name '%1%'",VarnameRedDriveMin)) )
+		return
+	}
+	VarnameRedDriveMax:=v_replaceVariables(InstanceID,ThreadID,%ElementID%VarnameRedDriveMax) ;"varname" is the parameter ID
+	if ((not v_CheckVariableName(VarnameRedDriveMax)) and VarnameRedDriveMax!="")
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Variable name '" VarnameRedDriveMax "' is not valid")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not valid",lang("Variable name '%1%'",VarnameRedDriveMax)) )
+		return
+	}
+	VarnameGreenDrive:=v_replaceVariables(InstanceID,ThreadID,%ElementID%VarnameGreenDrive) ;"varname" is the parameter ID
+	if ((not v_CheckVariableName(VarnameGreenDrive)) and VarnameGreenDrive!="")
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Variable name '" VarnameGreenDrive "' is not valid")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not valid",lang("Variable name '%1%'",VarnameGreenDrive)) )
+		return
+	}
+	VarnameGreenDriveMin:=v_replaceVariables(InstanceID,ThreadID,%ElementID%VarnameGreenDriveMin) ;"varname" is the parameter ID
+	if ((not v_CheckVariableName(VarnameGreenDriveMin)) and VarnameGreenDriveMin!="")
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Variable name '" VarnameGreenDriveMin "' is not valid")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not valid",lang("Variable name '%1%'",VarnameGreenDriveMin)) )
+		return
+	}
+	VarnameGreenDriveMax:=v_replaceVariables(InstanceID,ThreadID,%ElementID%VarnameGreenDriveMax) ;"varname" is the parameter ID
+	if ((not v_CheckVariableName(VarnameGreenDriveMax)) and VarnameGreenDriveMax!="")
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Variable name '" VarnameGreenDriveMax "' is not valid")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not valid",lang("Variable name '%1%'",VarnameGreenDriveMax)) )
+		return
+	}
+	VarnameBlueDrive:=v_replaceVariables(InstanceID,ThreadID,%ElementID%VarnameBlueDrive) ;"varname" is the parameter ID
+	if ((not v_CheckVariableName(VarnameBlueDrive)) and VarnameBlueDrive!="")
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Variable name '" VarnameBlueDrive "' is not valid")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not valid",lang("Variable name '%1%'",VarnameBlueDrive)) )
+		return
+	}
+	VarnameBlueDriveMin:=v_replaceVariables(InstanceID,ThreadID,%ElementID%VarnameBlueDriveMin) ;"varname" is the parameter ID
+	if ((not v_CheckVariableName(VarnameBlueDriveMin)) and VarnameBlueDriveMin!="")
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Variable name '" VarnameBlueDriveMin "' is not valid")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not valid",lang("Variable name '%1%'",VarnameBlueDriveMin)) )
+		return
+	}
+	VarnameBlueDriveMax:=v_replaceVariables(InstanceID,ThreadID,%ElementID%VarnameBlueDriveMax) ;"varname" is the parameter ID
+	if ((not v_CheckVariableName(VarnameBlueDriveMax)) and VarnameBlueDriveMax!="")
+	{
+		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Variable name '" VarnameBlueDriveMax "' is not valid")
+		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not valid",lang("Variable name '%1%'",VarnameBlueDriveMax)) )
+		return
+	}
+	
 	VarnameColorTemperature:=v_replaceVariables(InstanceID,ThreadID,%ElementID%VarnameColorTemperature) ;"varname" is the parameter ID
 	if ((not v_CheckVariableName(VarnameColorTemperature)) and VarnameColorTemperature!="")
 	{
@@ -140,6 +197,14 @@ RunActionGet_Monitor_Settings(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 		MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not valid",lang("Variable name '%1%'",VarnameColorTemperature)) )
 		return
 	}
+	
+	;~ VarnameGamma:=v_replaceVariables(InstanceID,ThreadID,%ElementID%VarnameGamma) ;"varname" is the parameter ID
+	;~ if ((not v_CheckVariableName(VarnameGamma)) and VarnameGamma!="")
+	;~ {
+		;~ logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Variable name '" VarnameGamma "' is not valid")
+		;~ MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("%1% is not valid",lang("Variable name '%1%'",VarnameGamma)) )
+		;~ return
+	;~ }
 	
 	
 	
@@ -157,11 +222,11 @@ RunActionGet_Monitor_Settings(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 			return
 		}
 		if (VarnameBrightness!="")
-			v_SetVariable(InstanceID,ThreadID,VarnameBrightness,result.CurrentBrightness)
+			v_SetVariable(InstanceID,ThreadID,VarnameBrightness,result.Current)
 		if (VarnameBrightnessmin!="")
-			v_SetVariable(InstanceID,ThreadID,VarnameBrightnessmin,result.MinimumBrightness)
+			v_SetVariable(InstanceID,ThreadID,VarnameBrightnessmin,result.Minimum)
 		if (VarnameBrightnessmax!="")
-			v_SetVariable(InstanceID,ThreadID,VarnameBrightnessmax,result.MaximumBrightness)
+			v_SetVariable(InstanceID,ThreadID,VarnameBrightnessmax,result.Maximum)
 	}
 	
 	if (VarnameContrast!="" or VarnameContrastMin!="" or VarnameContrastMax!="")
@@ -174,16 +239,16 @@ RunActionGet_Monitor_Settings(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 			return
 		}
 		if (VarnameContrast!="")
-			v_SetVariable(InstanceID,ThreadID,VarnameContrast,result.CurrentContrast)
+			v_SetVariable(InstanceID,ThreadID,VarnameContrast,result.Current)
 		if (VarnameContrastmin!="")
-			v_SetVariable(InstanceID,ThreadID,VarnameContrastmin,result.MinimumContrast)
+			v_SetVariable(InstanceID,ThreadID,VarnameContrastmin,result.Minimum)
 		if (VarnameContrastmax!="")
-			v_SetVariable(InstanceID,ThreadID,VarnameContrastmax,result.MaximumContrast)
+			v_SetVariable(InstanceID,ThreadID,VarnameContrastmax,result.Maximum)
 	}
 	
 	if (VarnameRedGain!="" or VarnameRedGainMin!="" or VarnameRedGainMax!="")
 	{
-		result:=ActionsWithMonitorDisplay.GetMonitorRGBGain(MonitorNumber,0)
+		result:=ActionsWithMonitorDisplay.GetMonitorRedGreenOrBlueGain(MonitorNumber,0)
 		if (substr(result,1,1)="*")
 		{
 			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Couldn't get monitor red gain. Error code: " result)
@@ -191,15 +256,15 @@ RunActionGet_Monitor_Settings(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 			return
 		}
 		if (VarnameRedGain!="")
-			v_SetVariable(InstanceID,ThreadID,VarnameRedGain,result.CurrentGain)
+			v_SetVariable(InstanceID,ThreadID,VarnameRedGain,result.Current)
 		if (VarnameRedGainmin!="")
-			v_SetVariable(InstanceID,ThreadID,VarnameRedGainmin,result.MinimumGain)
+			v_SetVariable(InstanceID,ThreadID,VarnameRedGainmin,result.Minimum)
 		if (VarnameRedGainmax!="")
-			v_SetVariable(InstanceID,ThreadID,VarnameRedGainmax,result.MaximumGain)
+			v_SetVariable(InstanceID,ThreadID,VarnameRedGainmax,result.Maximum)
 	}
 	if (VarnameGreenGain!="" or VarnameGreenGainMin!="" or VarnameGreenGainMax!="")
 	{
-		result:=ActionsWithMonitorDisplay.GetMonitorRGBGain(MonitorNumber,1)
+		result:=ActionsWithMonitorDisplay.GetMonitorRedGreenOrBlueGain(MonitorNumber,1)
 		if (substr(result,1,1)="*")
 		{
 			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Couldn't get monitor green gain. Error code: " result)
@@ -207,15 +272,15 @@ RunActionGet_Monitor_Settings(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 			return
 		}
 		if (VarnameGreenGain!="")
-			v_SetVariable(InstanceID,ThreadID,VarnameGreenGain,result.CurrentGain)
+			v_SetVariable(InstanceID,ThreadID,VarnameGreenGain,result.Current)
 		if (VarnameGreenGainmin!="")
-			v_SetVariable(InstanceID,ThreadID,VarnameGreenGainmin,result.MinimumGain)
+			v_SetVariable(InstanceID,ThreadID,VarnameGreenGainmin,result.Minimum)
 		if (VarnameGreenGainmax!="")
-			v_SetVariable(InstanceID,ThreadID,VarnameGreenGainmax,result.MaximumGain)
+			v_SetVariable(InstanceID,ThreadID,VarnameGreenGainmax,result.Maximum)
 	}
 	if (VarnameBlueGain!="" or VarnameBlueGainMin!="" or VarnameBlueGainMax!="")
 	{
-		result:=ActionsWithMonitorDisplay.GetMonitorRGBGain(MonitorNumber,2)
+		result:=ActionsWithMonitorDisplay.GetMonitorRedGreenOrBlueGain(MonitorNumber,2)
 		if (substr(result,1,1)="*")
 		{
 			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Couldn't get monitor blue gain. Error code: " result)
@@ -223,24 +288,62 @@ RunActionGet_Monitor_Settings(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 			return
 		}
 		if (VarnameBlueGain!="")
-			v_SetVariable(InstanceID,ThreadID,VarnameBlueGain,result.CurrentGain)
+			v_SetVariable(InstanceID,ThreadID,VarnameBlueGain,result.Current)
 		if (VarnameBlueGainmin!="")
-			v_SetVariable(InstanceID,ThreadID,VarnameBlueGainmin,result.MinimumGain)
+			v_SetVariable(InstanceID,ThreadID,VarnameBlueGainmin,result.Minimum)
 		if (VarnameBlueGainmax!="")
-			v_SetVariable(InstanceID,ThreadID,VarnameBlueGainmax,result.MaximumGain)
+			v_SetVariable(InstanceID,ThreadID,VarnameBlueGainmax,result.Maximum)
 	}
 	
-	if (VarnameGamma!="")
+	if (VarnameRedDrive!="" or VarnameRedDriveMin!="" or VarnameRedDriveMax!="")
 	{
-		result:=ActionsWithMonitorDisplay.GetDeviceGammaRamp()
+		result:=ActionsWithMonitorDisplay.GetMonitorRedGreenOrBlueDrive(MonitorNumber,0)
 		if (substr(result,1,1)="*")
 		{
-			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Couldn't get monitor gamma. Error code: " result)
-			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("Couldn't get monitor setting: %1%",lang("Gamma")) ". " lang("Error code: %1%",result))
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Couldn't get monitor red drive. Error code: " result)
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("Couldn't get monitor setting: %1%",lang("Red drive")) ". " lang("Error code: %1%",result))
 			return
 		}
-		v_SetVariable(InstanceID,ThreadID,VarnameGamma,result)
+		if (VarnameRedDrive!="")
+			v_SetVariable(InstanceID,ThreadID,VarnameRedDrive,result.Current)
+		if (VarnameRedDrivemin!="")
+			v_SetVariable(InstanceID,ThreadID,VarnameRedDrivemin,result.Minimum)
+		if (VarnameRedDrivemax!="")
+			v_SetVariable(InstanceID,ThreadID,VarnameRedDrivemax,result.Maximum)
 	}
+	if (VarnameGreenDrive!="" or VarnameGreenDriveMin!="" or VarnameGreenDriveMax!="")
+	{
+		result:=ActionsWithMonitorDisplay.GetMonitorRedGreenOrBlueDrive(MonitorNumber,1)
+		if (substr(result,1,1)="*")
+		{
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Couldn't get monitor green drive. Error code: " result)
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("Couldn't get monitor setting: %1%",lang("Green drive")) ". " lang("Error code: %1%",result))
+			return
+		}
+		if (VarnameGreenDrive!="")
+			v_SetVariable(InstanceID,ThreadID,VarnameGreenDrive,result.Current)
+		if (VarnameGreenDrivemin!="")
+			v_SetVariable(InstanceID,ThreadID,VarnameGreenDrivemin,result.Minimum)
+		if (VarnameGreenDrivemax!="")
+			v_SetVariable(InstanceID,ThreadID,VarnameGreenDrivemax,result.Maximum)
+	}
+	if (VarnameBlueDrive!="" or VarnameBlueDriveMin!="" or VarnameBlueDriveMax!="")
+	{
+		result:=ActionsWithMonitorDisplay.GetMonitorRedGreenOrBlueDrive(MonitorNumber,2)
+		if (substr(result,1,1)="*")
+		{
+			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Couldn't get monitor blue drive. Error code: " result)
+			MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("Couldn't get monitor setting: %1%",lang("Blue drive")) ". " lang("Error code: %1%",result))
+			return
+		}
+		if (VarnameBlueDrive!="")
+			v_SetVariable(InstanceID,ThreadID,VarnameBlueDrive,result.Current)
+		if (VarnameBlueDrivemin!="")
+			v_SetVariable(InstanceID,ThreadID,VarnameBlueDrivemin,result.Minimum)
+		if (VarnameBlueDrivemax!="")
+			v_SetVariable(InstanceID,ThreadID,VarnameBlueDrivemax,result.Maximum)
+	}
+	
 	if (VarnameColorTemperature!="")
 	{
 		result:=ActionsWithMonitorDisplay.GetMonitorColorTemperature(MonitorNumber)
@@ -252,6 +355,18 @@ RunActionGet_Monitor_Settings(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 		}
 		v_SetVariable(InstanceID,ThreadID,VarnameColorTemperature,result)
 	}
+	
+	;~ if (VarnameGamma!="")
+	;~ {
+		;~ result:=ActionsWithMonitorDisplay.GetDeviceGammaRamp()
+		;~ if (substr(result,1,1)="*")
+		;~ {
+			;~ logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Couldn't get monitor gamma. Error code: " result)
+			;~ MarkThatElementHasFinishedRunning(InstanceID,ThreadID,ElementID,ElementIDInInstance,"exception",lang("Couldn't get monitor setting: %1%",lang("Gamma")) ". " lang("Error code: %1%",result))
+			;~ return
+		;~ }
+		;~ v_SetVariable(InstanceID,ThreadID,VarnameGamma,result)
+	;~ }
 	
 	;~ MsgBox % strobj(ActionsWithMonitorDisplay.GetMonitorBrightness(MonitorNumber))
 	;~ MsgBox % strobj(ActionsWithMonitorDisplay.GetMonitorRGBGain(MonitorNumber,2))
@@ -294,8 +409,8 @@ getParametersActionGet_Monitor_Settings()
 	parametersToEdit.push({type: "Label", label:  lang("Contrast") ": " lang("Current value") " - " lang("Minimum") " - " lang("Maximum") , size: "small"})
 	parametersToEdit.push({type: "Edit", id: ["VarnameContrast", "VarnameContrastMin", "VarnameContrastMax"], default: ["Contrast","" ,"" ], content: "VariableName"})
 	
-	parametersToEdit.push({type: "Label", label:  lang("Gamma") " (" lang("Not monitor specific") ")" , size: "small"})
-	parametersToEdit.push({type: "Edit", id: "VarnameGamma", default: "Gamma", content: "VariableName"})
+	;~ parametersToEdit.push({type: "Label", label:  lang("Gamma") " (" lang("Not monitor specific") ")" , size: "small"})
+	;~ parametersToEdit.push({type: "Edit", id: "VarnameGamma", default: "Gamma", content: "VariableName"})
 	
 	parametersToEdit.push({type: "Label", label:  lang("Red gain") ": " lang("Current value") " - " lang("Minimum") " - " lang("Maximum") , size: "small" })
 	parametersToEdit.push({type: "Edit", id: ["VarnameRedGain", "VarnameRedGainMin", "VarnameRedGainMax"], default: ["RedGain", "","" ], content: "VariableName"})
@@ -303,6 +418,13 @@ getParametersActionGet_Monitor_Settings()
 	parametersToEdit.push({type: "Edit", id: ["VarnameGreenGain", "VarnameGreenGainMin", "VarnameGreenGainMax"], default: ["GreenGain", "", ""], content: "VariableName"})
 	parametersToEdit.push({type: "Label", label:  lang("Blue gain") ": " lang("Current value") " - " lang("Minimum") " - " lang("Maximum") , size: "small" })
 	parametersToEdit.push({type: "Edit", id: ["VarnameBlueGain", "VarnameBlueGainMin", "VarnameBlueGainMax"], default: ["BlueGain","" , ""], content: "VariableName"})
+	
+	parametersToEdit.push({type: "Label", label:  lang("Red drive") ": " lang("Current value") " - " lang("Minimum") " - " lang("Maximum") , size: "small" })
+	parametersToEdit.push({type: "Edit", id: ["VarnameReddrive", "VarnameReddriveMin", "VarnameReddriveMax"], default: ["RedDrive", "","" ], content: "VariableName"})
+	parametersToEdit.push({type: "Label", label:  lang("Green drive") ": " lang("Current value") " - " lang("Minimum") " - " lang("Maximum") , size: "small" })
+	parametersToEdit.push({type: "Edit", id: ["VarnameGreendrive", "VarnameGreendriveMin", "VarnameGreendriveMax"], default: ["GreenDrive", "", ""], content: "VariableName"})
+	parametersToEdit.push({type: "Label", label:  lang("Blue drive") ": " lang("Current value") " - " lang("Minimum") " - " lang("Maximum") , size: "small" })
+	parametersToEdit.push({type: "Edit", id: ["VarnameBluedrive", "VarnameBluedriveMin", "VarnameBluedriveMax"], default: ["BlueDrive","" , ""], content: "VariableName"})
 	
 	parametersToEdit.push({type: "Label", label:  lang("Color temperature"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: "VarnameColorTemperature", default: "ColorTemperature", content: "VariableName"})
@@ -324,48 +446,7 @@ CheckSettingsActionGet_Monitor_Settings(ID)
 	global
 
 	
-	if (GUISettingsOfElement%ID%WhetherChangeBrightness = 1)
-	{
-		GuiControl,Enable,GUISettingsOfElementSlideOf%ID%brightness
-		GuiControl,Enable,GUISettingsOfElement%ID%brightness
-	}
-	else
-	{
-		GuiControl,Disable,GUISettingsOfElementSlideOf%ID%brightness
-		GuiControl,Disable,GUISettingsOfElement%ID%brightness
-	}
-	
-	if (GUISettingsOfElement%ID%WhetherChangeContrast = 1)
-	{
-		GuiControl,Enable,GUISettingsOfElementSlideOf%ID%contrast
-		GuiControl,Enable,GUISettingsOfElement%ID%contrast
-	}
-	else
-	{
-		GuiControl,Disable,GUISettingsOfElementSlideOf%ID%contrast
-		GuiControl,Disable,GUISettingsOfElement%ID%contrast
-	}
-	
-	if (GUISettingsOfElement%ID%WhetherChangeGamma = 1)
-	{
-		GuiControl,Enable,GUISettingsOfElementSlideOf%ID%gamma
-		GuiControl,Enable,GUISettingsOfElement%ID%gamma
-	}
-	else
-	{
-		GuiControl,Disable,GUISettingsOfElementSlideOf%ID%gamma
-		GuiControl,Disable,GUISettingsOfElement%ID%gamma
-	}
-	
-	if (GUISettingsOfElement%ID%WhetherChangeColorTemperature = 1)
-	{
-		GuiControl,Enable,GUISettingsOfElement%ID%ColorTemperature
-	}
-	else
-	{
-		GuiControl,Disable,GUISettingsOfElement%ID%ColorTemperature
-	}
-	
+
 	
 	
 }

@@ -9,7 +9,3 @@ Static PIT, PKT, PUT                           ; http://ahkscript.org/boards/vie
 Return ( ( SystemTime - IdleTime ) * 100 ) // SystemTime,    PIT := CIT,    PKT := CKT,    PUT := CUT 
 } 
 
-Loop {
-  Tooltip % CPULoad()
-  Sleep 250
-}

@@ -54,6 +54,7 @@ ui_SettingsOwFLow()
 
 		;Put the window in the center of the main window
 	gui,+hwndSettingsHWND
+	CurrentlyActiveWindowHWND:=SettingsHWND
 	gui,show,hide
 	
 	ui_GetMainGUIPos()

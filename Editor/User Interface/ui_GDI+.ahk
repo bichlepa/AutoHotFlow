@@ -108,7 +108,7 @@ ui_DrawEverything(Posw,Posh)
 
 	DrawingRightNow:=true
 	thread, Priority, 0 ;Set normal priority
-
+	Critical on
 	TextOptions:=" s" (textSize*zoomFactor) " Center cff000000  Bold"
 	TextOptionsmarked:=" s" (textSize*zoomFactor) " Center cff00aa00  Bold"
 	TextOptionsRunning:=" s" (textSize*zoomFactor) " Center cffaa0000  Bold"
@@ -816,6 +816,7 @@ ui_DrawEverything(Posw,Posh)
 	Gdip_DeleteGraphics(G)
 	
 	DrawingRightNow:=false
+	Critical off
 	if (DrawAgain=true)
 	{
 		DrawAgain:=false

@@ -138,13 +138,13 @@ mousewheelmove(wpar,lpar,msg,hwn)
 ui_DisableMainGUI()
 {
 	global
-	gui,MainGUI:+disabled
-	
+	;~ gui,MainGUI:+disabled
+	CurrentlyMainGuiIsDisabled:=true
 }
 ui_EnableMainGUI()
 {
 	global
-	gui,MainGUI:-disabled
+	;~ gui,MainGUI:-disabled
 	
 	;Activate window if it is not hidden
 	DetectHiddenWindows,off
@@ -154,6 +154,19 @@ ui_EnableMainGUI()
 		WinActivate,ahk_id %MainGuihwnd%
 	}
 	DetectHiddenWindows,on
+	CurrentlyMainGuiIsDisabled:=false
+	
+}
+
+ui_ActionWhenMainGUIDisabled()
+{
+	global
+	SoundPlay,*16
+	;~ MsgBox % CurrentlyActiveWindowHWND
+	if nowexiting
+		WinActivate,ahk_id %ExitMessageBoxHWND%
+	else
+		WinActivate,ahk_id %CurrentlyActiveWindowHWND%
 }
 
 ui_showgui()
@@ -161,8 +174,6 @@ ui_showgui()
 	global
 	SysGet, MonitorPrimary, MonitorPrimary
 	SysGet,MonitorWorkArea,MonitorWorkArea,%MonitorPrimary% 
-	
-	
 	tempwidth:=round((MonitorWorkArearight - MonitorWorkArealeft)*0.9)
 	tempheight:=round((MonitorWorkAreabottom -MonitorWorkAreatop)*0.9)
 

@@ -233,6 +233,23 @@ v_getVariable(InstanceID,ThreadID,name,VariableType="asIs")
 		{
 			return "`n"
 		}
+		else if (name="a_CPULoad")
+		{
+			return CPULoad()
+		}
+		else if (name="a_MemoryUsage")
+		{
+			return MemoryLoad()
+		}
+		else if (name="a_OSInstallDate")
+		{
+			if VariableType=Normal
+				return v_exportVariable(OSInstallDate(),"date","`n") 
+			else
+			{
+				return OSInstallDate()
+			}
+		}
 		else IfInString,AllBuiltInVars,-%name%-
 		{
 			tempvalue:=%name%

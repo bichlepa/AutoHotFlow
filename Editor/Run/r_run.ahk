@@ -81,7 +81,7 @@ r_startRun(Execution_Parameters="")
 		if SettingFlowExecutionPolicy=stop ;Stop current instance and start a new one
 		{
 			logger("f1","An instance already exists. Old execution stopped to launch the new one.")
-			gosub r_escapeRun
+			gosub r_escapeRunNoBlock
 			SetTimer,r_WaitUntilStoppedAndThenStart,50
 			return
 		}
@@ -604,13 +604,14 @@ r_startRun:
 r_startRun()
 return
 
-
+r_escapeRunNoBlock:
 r_escapeRun:
 r_TellThatFlowIsStopping()
 logger("f1a1","User is stopping flow. Blocking executions for 1 second.")
 
 stopRun:=true
-r_RunsBlocked:=true
+if (a_thislabel!="r_escapeRunNoBlock")
+	r_RunsBlocked:=true
 ;Hotkey,esc,off
 return
 

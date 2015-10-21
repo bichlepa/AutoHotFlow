@@ -127,7 +127,7 @@ runActionMessage_Box(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 		
 		gui,%tempGUILabel%:destroy
 		
-		gui,%tempGUILabel%:+LabelMessageBoxGUI ;This label leads to a jump label beneath. It's needed if user closes the window
+		gui,%tempGUILabel%:+LabelActionMessageBoxGUI ;This label leads to a jump label beneath. It's needed if user closes the window
 		if (minresulttoohigh=0 and minresulttoowide=0)
 		{
 			if minresulth<100
@@ -200,7 +200,7 @@ runActionMessage_Box(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 		}
 		
 		
-		gui,%tempGUILabel%:+LabelMessageBoxGUI ;This label leads to a jump label beneath. It's needed if user closes the window
+		gui,%tempGUILabel%:+LabelActionMessageBoxGUI ;This label leads to a jump label beneath. It's needed if user closes the window
 		temph:=tempHeight-30-10*3
 		if %ElementID%IsTimeout=2
 			temph-=10 +15
@@ -354,7 +354,7 @@ runActionMessage_Box(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	return
 	
 	ActionMessage_BoxButtonCancel:
-	MessageBoxGUIclose:
+	ActionMessageBoxGUIclose:
 	
 	gui,%a_gui%:destroy
 	
