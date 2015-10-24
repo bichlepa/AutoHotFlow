@@ -14,5 +14,6 @@ Special thanks to:
 - SKAN for the "Eject" function. It allows a safe eject of a removable drive.
 - HotKeyIt for the "WatchDirectory" function. It allows to monitor changes on files in a folder.
 - jNizM for the "Class_Monitor" functions. They allow to get and set monitor properties.
+- Soft for the Corean translation.
 )
 

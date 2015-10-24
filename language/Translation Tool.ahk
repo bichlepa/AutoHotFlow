@@ -204,7 +204,10 @@ if not SelectedCategoryText
 gui,submit,NoHide
 ;~ SoundBeep
 stringreplace,EditFieldCorrected,EditField,`n,``n,all
-iniwrite,%EditFieldCorrected%,%SelectedLanguageID%.ini,%SelectedCategoryText%,%SelectedItemText%
+if EditFieldCorrected=
+	IniDelete,%SelectedLanguageID%.ini,%SelectedCategoryText%,%SelectedItemText%
+else
+	iniwrite,%EditFieldCorrected%,%SelectedLanguageID%.ini,%SelectedCategoryText%,%SelectedItemText%
 LV_Modify(SelectedLanguageNr,"",allLangs[SelectedLanguageID].langname,EditFieldCorrected)
 return
 
