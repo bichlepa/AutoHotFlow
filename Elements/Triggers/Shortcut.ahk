@@ -30,7 +30,7 @@ getParametersTriggerShortcut()
 	global
 	parametersToEdit:=Object()
 	parmetersToEdit.push({type: "Label", label: lang("Path of the Shortcut")})
-	parametersToEdit.push({type: "File", id: "ShortCutPath", default: "%A_Desktop%\" lang("Flow") " " FlowName ".lnk" , label: lang("Set_the_Shortcut_path"), options: 8, filter: lang("Shortcut") " (*.lnk)"})
+	parametersToEdit.push({type: "File", id: "ShortCutPath", default: "%A_Desktop%\" lang("Flow") " " flowSettings.Name ".lnk" , label: lang("Set_the_Shortcut_path"), options: 8, filter: lang("Shortcut") " (*.lnk)"})
 	parametersToEdit.push({type: "Label", label: lang("Options")})
 	parametersToEdit.push({type: "CheckBox", id: "RemoveShortcutOnDisabling", default: 1, label: lang("Remove_shortcut_when_disabling")})
 

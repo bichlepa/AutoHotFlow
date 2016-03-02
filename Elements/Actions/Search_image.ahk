@@ -26,7 +26,7 @@ runActionSearch_image(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	
 	local tempPath:=% v_replaceVariables(InstanceID,ThreadID,%ElementID%file)
 	if  DllCall("Shlwapi.dll\PathIsRelative","Str",tempPath)
-		tempPath:=SettingWorkingDir "\" tempPath
+		tempPath:=flowSettings.WorkingDir "\" tempPath
 
 	
 	if not v_CheckVariableName(varnameX)

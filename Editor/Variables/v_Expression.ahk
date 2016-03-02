@@ -1,30 +1,9 @@
-﻿;#include v_variables.ahk ;only include for testing
-if (!NoTests) ;Test mode when executing this script directly
-{
-	InstanceID=5
-	TrheadID=1
-	Instance_%InstanceID%_LocalVariables:=Object()
-	v_setVariable(InstanceID,TrheadID,"kontostand",5000)
-	v_setVariable(InstanceID,TrheadID,"schulden",4000)
-	;MsgBox % "Gesetzte Variablen:`nkonstostand: " v_getVariable(InstanceID,"kontostand") "`nschulden: " v_getVariable(InstanceID,"schulden")
-	
-	;teststring=((4+5)*2)*(3+1-(2+1))
-	;teststring=% "2<=1"
-	;teststring=% "!(var1 < 10) and !0"
-	;teststring=% "kontostand - schulden"
-	teststring=% "2+ 3/4 + 5"
-	
-	MsgBox I am starting
-	res:=v_EvaluateExpression(InstanceID,TrheadID,teststring)
-	MsgBox % "Result of " teststring " is " res 
-}
-
+﻿
 /* Evaluation of an Expression
 */
-v_EvaluateExpression(InstanceID,ThreadID,ExpressionString)
+v_EvaluateExpression(p_variable,p_Thread,ExpressionString)
 {
 	logger("f3","Evaluating expression " ExpressionString)
-	v_replaceVariables(InstanceID,ThreadID,ExpressionString)
 	ExpressionString:=A_Space ExpressionString A_Space
 	StringReplace,ExpressionString,ExpressionString,>=,≥,all
 	StringReplace,ExpressionString,ExpressionString,<=,≤,all
@@ -37,18 +16,17 @@ v_EvaluateExpression(InstanceID,ThreadID,ExpressionString)
 	StringReplace,ExpressionString,ExpressionString,&&,∧,all
 	StringReplace,ExpressionString,ExpressionString,% " not ",% " ¬",all
 	StringReplace,ExpressionString,ExpressionString,% "!",% "¬",all
-	return v_EvaluateExpressionRecurse(InstanceID,ThreadID,ExpressionString)
+	return v_EvaluateExpressionRecurse(p_variable,p_Thread,ExpressionString)
 }
 
 /* Evaluation of an Expression
 Thanks to Sunshine for the easy to understand instruction. See http://www.sunshine2k.de/coding/java/SimpleParser/SimpleParser.html
-If anybody knows hot to implement more operants and make this more flexible, or even support scripts, please come in touch with me!
+If anybody knows how to implement more operands and make this more flexible, or even support scripts, please contribute!
 */
-v_EvaluateExpressionRecurse(InstanceID,ThreadID,ExpressionString)
+v_EvaluateExpressionRecurse(p_variable,p_Thread,ExpressionString)
 {
 	;MsgBox %ExpressionString%
 	
-	 
 	
 	ExpressionString:=trim(ExpressionString)
 	
@@ -56,13 +34,12 @@ v_EvaluateExpressionRecurse(InstanceID,ThreadID,ExpressionString)
 		ExpressionString:="0" ExpressionString
 	
 	
-	
 	if (v_SearchForFirstOperand(ExpressionString,FoundOpreand,leftSubstring,rightSubstring))
 	{
 		;MsgBox %  leftSubstring FoundOpreand rightSubstring 
 		if ( FoundOpreand != "¬")
-			resleft:= v_EvaluateExpression(InstanceID,ThreadID,leftSubstring)
-		resright:=v_EvaluateExpression(InstanceID,ThreadID,rightSubstring)
+			resleft:= v_EvaluateExpression(p_variable,p_Thread,leftSubstring)
+		resright:=v_EvaluateExpression(p_variable,p_Thread,rightSubstring)
 		;MsgBox %FoundOpreand% %resleft% %resright%
 		if FoundOpreand = +
 			return resleft + resright
@@ -105,7 +82,7 @@ v_EvaluateExpressionRecurse(InstanceID,ThreadID,ExpressionString)
 		{
 			StringTrimLeft,ExpressionString,ExpressionString,1
 			StringTrimRight,ExpressionString,ExpressionString,1
-			return (v_EvaluateExpression(InstanceID,ThreadID,ExpressionString))
+			return (v_EvaluateExpression(p_variable,p_Thread,ExpressionString))
 		}
 		   
 		else
@@ -118,10 +95,7 @@ v_EvaluateExpressionRecurse(InstanceID,ThreadID,ExpressionString)
 	if ExpressionString is number
 		return ExpressionString
 	
-	;MsgBox % v_GetVariable(InstanceID,ExpressionString,"asIs")
-	return v_GetVariable(InstanceID,ThreadID,ExpressionString,"asIs")
-	
-	
+	return p_variable.Get(p_Thread,ExpressionString,"asIs")
 	
 	
 }
@@ -349,16 +323,4 @@ v_SearchForFirstOperand(String,ByRef ResFoundoperand,Byref ResLeftString, Byref 
 	;MsgBox No operand found in "%String%" firstplus %firstplus% firstminus %firstminus% firstplusminus %firstplusminus%
 	return false
 	
-}
-
-getvariabletest(name)
-{
-	var1=11
-	var2=hi
-	var22=hi
-	var23=hie
-	
- retval:=%name%
-	return retval
-
 }

@@ -25,7 +25,7 @@ ScriptGenerationReplaceImportantVars(byref generatedScript,temptitle,ElementID,I
 {
 	global
 	stringreplace,generatedScript,generatedScript,_title_,%tempTitle%,all
-	stringreplace,generatedScript,generatedScript,_flowname_,%flowname%,all
+	stringreplace,generatedScript,generatedScript,_flowname_,% flowSettings.Name,all
 	stringreplace,generatedScript,generatedScript,_CurrentManagerHiddenWindowID_,%CurrentManagerHiddenWindowID%,all
 	stringreplace,generatedScript,generatedScript,_ElementID_,%ElementID%,all
 	stringreplace,generatedScript,generatedScript,_InstanceID_,%InstanceID%,all

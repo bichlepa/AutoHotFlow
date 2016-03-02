@@ -61,10 +61,10 @@ logger(LogLevel,LoggingText)
 	{
 		FormatTime,timestamp,a_now,yyyy MM dd HH:mm:ss
 		DebugLogContent.="`n--- " timestamp " " LoggingText
-		if SettingFlowLogToFile
+		if (flowSettings.LogToFile=true)
 		{
 			
-			FileAppend,`n--- %timestamp% %LoggingText%,Log\Log %FlowName%.txt,UTF-8
+			FileAppend,`n--- %timestamp% %LoggingText%,% "Log\Log " flowSettings.Name ".txt",UTF-8
 			
 		}
 	}
@@ -75,7 +75,7 @@ logger(LogLevel,LoggingText)
 		
 		FileGetSize,temp,Log.txt,K
 		if temp>100
-			FileMove,Log\Log %FlowName%.txt,Log\Log %FlowName% Old.txt,1
+			FileMove,"Log\Log " flowSettings.Name ".txt","Log\Log " flowSettings.Name " Old.txt",1
 	}
 }
 
@@ -87,7 +87,7 @@ showlog()
 	local tempw:=A_ScreenWidth*0.8
 	gui,log:add,edit, h%temph% w%tempw% ReadOnly vGuiLogTextField, %DebugLogContent%
 	gui,log:add,button,w%tempw% h30 Y+10 xp gGuiLogClose default,% lang("Close")
-	gui,log:show,,% lang("Log of flow %1%",flowname)
+	gui,log:show,,% lang("Log of flow %1%",flowSettings.Name)
 	DebugLogContentOld:=DebugLogContent
 	SetTimer,refreshLogGUI,100
 	

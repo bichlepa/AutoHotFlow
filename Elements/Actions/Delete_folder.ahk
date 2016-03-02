@@ -6,7 +6,7 @@ runActionDelete_folder(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	
 	local tempPath:=% v_replaceVariables(InstanceID,ThreadID,%ElementID%folder)
 	if  DllCall("Shlwapi.dll\PathIsRelative","Str",tempPath)
-		tempPath:=SettingWorkingDir "\" tempPath
+		tempPath:=flowSettings.WorkingDir "\" tempPath
 	
 	
 	

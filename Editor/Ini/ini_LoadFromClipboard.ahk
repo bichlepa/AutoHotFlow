@@ -13,156 +13,137 @@
 	local tempfound
 	local tempx
 	local tempy
+	local tempClipboardconnectionList
+	local tempCountLoadedElements=0
 	
 	if (busy=true)
 		return
 	
 	busy:=true
-	ui_disablemaingui()
+	maingui.disable()
 	
 	
-	ClipboardFlowFilename=%A_ScriptDir%\Clipboard.ini
+	ClipboardFlowFilename:=flow.ClipboardFilePath
+	RIni_Shutdown("ClipboardLoadFile")
+	res:=RIni_Read("ClipboardLoadFile",flow.ClipboardFilePath)
 	
 	logger("a2","Loading elements from clipboard")
 	ToolTip(lang("loading from clipboard"),100000)
-	tempClipboardconnectionList:=Object()
-	markelement()  ;Unmark all elements
+	element.unmarkall()  ;Unmark all elements
 	
 	;Find mouse position and find out whether the mouse is hovering the editor
 	MouseGetPos,TempMouseX,TempMouseY,tempWin,TempControl,2
-	
-	;MsgBox % tempWin "`n" MainGuihwnd "`n" TempControl "`n" PicFlowHWND
-	If (tempWin= MainGuihwnd and TempControl=PicFlowHWND)
+	If (tempWin= maingui.hwnd and TempControl=PicFlowHWND)
 	{
 		tempPosUnderMouseX:=((TempMouseX)/zoomfactor)+offsetx
 		tempPosUnderMouseY:=((TempMouseY)/zoomfactor)+offsety
 	}
-		
-	
-	loop
+	else ;Insert in the middle of the screen
 	{
-		index1:=A_Index
+		tempPosUnderMouseX:=(visibleArea.x1+visiblearea.w/2)
+		tempPosUnderMouseY:=(visibleArea.y1+visiblearea.h/2)
+	}
+	
+	tempClipboardconnectionList:=[]
+	
+	AllSections:=RIni_GetSections("ClipboardLoadFile")	
+	loop,parse,AllSections,`,
+	{
+		tempSection:=A_LoopField
 		
-		Iniread,loadElementID,%ClipboardFlowFilename%,element%index1%,ID
-		;MsgBox,,, %ID_count%`nIniread,loadElementID,%ClipboardFlowFilename%,element%index1%,ID`n%loadElementID%
-		if loadElementID=Error
-			break
-		
-		Iniread,loadElementType,%ClipboardFlowFilename%,element%index1%,Type
-		
-		if (loadElementType="Connection")
+		loadElementID:=RIni_GetKeyValue("ClipboardLoadFile", tempSection, "ID", "")
+		if (loadElementID="")
 		{
-			;Store the connections to a list and add them later
-			tempClipboardconnectionList.insert(loadElementID)
-			
-			
-			Iniread,tempClipboardconnection%loadElementID%from,%ClipboardFlowFilename%,element%index1%,from
-			Iniread,tempClipboardconnection%loadElementID%to,%ClipboardFlowFilename%,element%index1%,to
-			Iniread,tempClipboardconnection%loadElementID%ConnectionType,%ClipboardFlowFilename%,element%index1%,ConnectionType
-			
-			Iniread,tempClipboardconnection%loadElementID%fromPart,%ClipboardFlowFilename%,element%index1%,fromPart,%A_Space%
-			Iniread,tempClipboardconnection%loadElementID%ToPart,%ClipboardFlowFilename%,element%index1%,toPart,%A_Space%
+			logger("a0","Error! Could not read the ID of an element " tempSection ". This element will not be loaded")
+			continue
 		}
-		else if (loadElementType="Trigger")
+		loadElementType:=RIni_GetKeyValue("ClipboardLoadFile", tempSection, "Type", "")
+		
+		tempCountLoadedElements++
+		
+		
+		IfInString,tempSection,element
 		{
-			;TODO
+			loadElement:=new element(loadElementType) ;Do not pass Element ID
+			loadElement.OldID:=loadElementID ;Save the old ID in order to be able to assign the correct elements to the connections
 			
-		}
-		else
-		{
-			if (loadElementType="action")
-				tempNewID:=e_NewAction()
-			else if (loadElementType="condition")
-				tempNewID:=e_Newcondition()
-			else if (loadElementType="loop")
-				tempNewID:=e_NewLoop()
-			;allElements.insert(tempNewID)
-			tempClipboardMap%loadElementID%:=tempNewID ;Needed to realize connections later
-			markelement(tempNewID,"true")
-			%tempNewID%running=0
+			tempValue:=RIni_GetKeyValue("ClipboardLoadFile", tempSection, "name", "")
+			StringReplace, tempValue, tempValue, |¶,`n, All
+			loadElement.Name:=tempValue
 			
+			loadElement.StandardName:=RIni_GetKeyValue("ClipboardLoadFile", tempSection, "StandardName", "")
+			loadElement.x:=RIni_GetKeyValue("ClipboardLoadFile", tempSection, "x", 200)
+			loadElement.y:=RIni_GetKeyValue("ClipboardLoadFile", tempSection, "y", 200)
 			
-			Iniread,loadElementname,%ClipboardFlowFilename%,element%index1%,name
-			StringReplace, loadElementname, loadElementname, |¶,`n, All
+			loadElement.subType:=RIni_GetKeyValue("ClipboardLoadFile", tempSection, "subType", 200)
 			
-			Iniread,loadElementX,%ClipboardFlowFilename%,element%index1%,x
-			Iniread,loadElementY,%ClipboardFlowFilename%,element%index1%,y
-			
-			if (tempOffsetAlreadySet!=true)
-			{
-				if tempPosUnderMouseX
-				{
-					tempOffsetX:=ui_FitGridX(tempPosUnderMouseX-loadElementX -0.5*ElementWidth) 
-					tempOffsetY:=ui_FitGridY(tempPosUnderMouseY-loadElementY - 0.5* ElementHeight)
-				}
-				else
-				{
-					Loop
-					{
-						tempfound:=false
-						tempX:=ui_FitGridX(loadElementX+ElementWidth*0.25*A_Index)
-						tempY:=ui_FitGridY(loadElementY+ElementWidth*0.25*A_Index)
-						for SaveIndex1, saveElementID in allElements
-						{
-							if (tempX=%saveElementID%x and tempY=%saveElementID%y)
-							{
-								tempfound:=true
-								break
-							}
-						}
-						if (tempfound=false)
-						{
-							tempOffsetX:=ElementWidth*0.25*A_Index
-							tempOffsetY:=ElementWidth*0.25*A_Index
-							break
-						}
-					}
-					
-				}
-				tempOffsetAlreadySet:=true
-			}
-			
-			%tempNewID%Name=%loadElementname%
-			%tempNewID%x:=ui_FitGridX(loadElementX+tempOffsetX) 
-			%tempNewID%y:=ui_FitGridY(loadElementY+tempOffsetY) 
-			
-			
-			Iniread,loadElementsubType,%ClipboardFlowFilename%,element%index1%,subType
-			%tempNewID%subType=%loadElementsubType%
+			i_CheckCompabilitySubtype(loadElement,tempSection)
 			
 			if (loadElementType="loop")
 			{
-				Iniread,loadElementHeightOfVerticalBar,%ClipboardFlowFilename%,element%index1%,HeightOfVerticalBar
-				%tempNewID%HeightOfVerticalBar=%loadElementHeightOfVerticalBar%
+				loadElement.HeightOfVerticalBar:=RIni_GetKeyValue("ClipboardLoadFile", tempSection, "HeightOfVerticalBar", 200)
 			}
 			
-			i_LoadParametersOfElement(tempNewID,loadElementType,loadElementsubType,index1,"clipboard")
+			;Get the list of all parameters and read all parameters from ini
+			i_LoadParametersOfElement(loadElement,"ClipboardLoadFile",tempSection)
 			
 			
+			;Correct position.
+			if (not tempOffsetX) ;On first iteration, find out where was the position of the first element and put it near to the mouse
+			{
+				tempOffsetX:=ui_FitGridX(tempPosUnderMouseX-loadElement.X -0.5*ElementWidth) 
+				tempOffsetY:=ui_FitGridY(tempPosUnderMouseY-loadElement.Y - 0.5* ElementHeight)
+			}
+			;Correct the position. Each element should have the same relative position to each other as in the flow where they were copied from
+			loadElement.x:=ui_FitGridX(loadElement.X+tempOffsetX) 
+			loadElement.y:=ui_FitGridY(loadElement.Y+tempOffsetY) 
+			
+			
+			loadElement.mark(true)
+		}
+		
+		IfInString,tempSection,Connection
+		{
+			loadElement:=new connection(loadElementType)
+			
+			tempClipboardconnectionList.push(loadElement.id) ;Save new connection in order to be able to assign the correct elements to the connections
+			
+			loadElement.from:=RIni_GetKeyValue("ClipboardLoadFile", tempSection, "from", "")
+			loadElement.to:=RIni_GetKeyValue("ClipboardLoadFile", tempSection, "to", "")
+			loadElement.ConnectionType:=RIni_GetKeyValue("ClipboardLoadFile", tempSection, "ConnectionType", "")
+			loadElement.fromPart:=RIni_GetKeyValue("ClipboardLoadFile", tempSection, "fromPart", "")
+			loadElement.ToPart:=RIni_GetKeyValue("ClipboardLoadFile", tempSection, "ToPart", "")
 			
 		}
 		
-		ui_draw()
-		
 		
 	}
-	for SaveIndex1, LoadElementID in tempClipboardconnectionList
+	
+	;Assign the correct elements to the connections
+	for index, tempConnectionID in tempClipboardconnectionList
 	{
-		tempFrom:=tempClipboardconnection%LoadElementID%from
-		tempTo:=tempClipboardconnection%LoadElementID%to
-		
-		
-		tempConn:=e_newConnection(tempClipboardMap%tempFrom%,tempClipboardMap%tempTo%,tempClipboardconnection%LoadElementID%ConnectionType)
-		
-		if tempClipboardconnection%loadElementID%fromPart!=
-			%tempConn%fromPart:=tempClipboardconnection%loadElementID%fromPart
-		if tempClipboardconnection%loadElementID%toPart!=
-			%tempConn%toPart:=tempClipboardconnection%loadElementID%toPart
+		tempConnection:=allConnections[tempConnectionID]
+		for tempID, tempElement in allelements
+		{
+			if (tempConnection.to=tempElement.OldID)
+			{
+				tempConnection.to:=tempElement.id
+			}
+			if (tempConnection.from=tempElement.OldID)
+			{
+				tempConnection.from:=tempElement.id
+			}
+		}
 	}
-	index1--
-	if index1>0
+	
+	for tempID, tempElement in allelements ;remove the oldIDs otherwise it will cause errors on next paste
 	{
-		saved=no
+		tempElement.delete("oldID")
+	}
+	
+	if tempCountLoadedElements>0
+	{
+		new state()
 		ToolTip(lang("Loaded %1% elements from clipboard",index1),1000)
 		logger("a2","Loaded " index1 " elements from clipboard")
 	}
@@ -173,10 +154,10 @@
 	}
 	
 
-	e_UpdateTriggerName()
-	e_CorrectElementErrors("Loaded from clipboard")
 	
-	ui_EnableMainGUI()
+	;~ e_CorrectElementErrors("Loaded from clipboard")
+	RIni_Shutdown("ClipboardLoadFile")
+	maingui.enable()
 	
 	ui_draw()
 

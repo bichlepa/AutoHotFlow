@@ -4,222 +4,566 @@ temp:=lang("Action")
 temp:=lang("Condition")
 temp:=lang("Loop")
 
+/* prototypes
+selectContainerType(parelement, "wait")
+selectConnectionType(parelement,"wait")
+selectSubType(parElement,"wait")
+ElementSettings.open(newElement,"wait")
+ElementSettings.selectTrigger("wait")
+*/
 
-ui_settingsOfElement(ElementID,PreviousSubType="")
+class ElementSettings
 {
-	global
-	local temp
-	local temptext
-	local tempIsDefault
-	local tempAssigned
-	local tempReenablethen
-	local tempXpos
-	local tempYpos
-	local tempHeight
 	
-
-	PreviousSubType2:=PreviousSubType ;This variable will contain anything when user has changed the subtype of the element. The subtype will be restored if user cancels
 	
-	NowResultEditingElement=
-	;MsgBox %ElementID%
-	setElementID:=ElementID
-	setElementType:=%setElementID%Type
-	setElementsubType:=%setElementID%subType
-	;Check whether the action-, condition- or trigger type is set. It is unset when a new element is added
-	if %setElementID%Type=Action
+	;Open GUI for settings parameters of an element.
+	open(ParElement,wait="")
 	{
-		if %setElementID%subType=
+		global
+		local temp, tempYPos, tempXPos, tempEditwidth, tempIsDefault, tempAssigned, tempChecked, tempMakeNewGroup, temptoChoose, tempAltSumbit, tempChoises, tempAllChoices, tempParameterOptions, tempres, tempelement
+		;~ MsgBox agews
+		;~ MsgBox % strobj(newElement)
+		GUISettingsOfElementObject:=this
+		static NowResultEditingElement, somethingchanged, temponeValue
+		;~ static setElement, setElementID, setElementType, setElementsubType
+		static Parameterwait
+		this.element:=ParElement
+		setElement:=ParElement
+		setElementID:=setElement.id
+		setElementType:=setElement.Type
+		setElementsubType:=setElement.subType
+		Parameterwait:=wait
+		;~ MsgBox % strobj(setElement)
+		
+		;At first check whether other settings must be opened first
+		if (setElement.Type="Trigger")
 		{
-			ui_selectElementType(%setElementID%Type,setElementID)
-			return
-		}
-	}
-	else if %setElementID%Type=Condition
-	{
-		if %setElementID%subType=
-		{
-			ui_selectElementType(%setElementID%Type,setElementID)
-			return
-		}
-	}
-	else if %setElementID%Type=Loop
-	{
-		if %setElementID%subType=
-		{
-			ui_selectElementType(%setElementID%Type,setElementID)
-			return
-		}
-	}
-	else if %setElementID%Type=Trigger
-	{
-		if setElementID=trigger
-		{
-			TempTriggerCount=0 
-			tempTriggers=
-			tempTriggerNames=
-			for TempTriggerCount, temptrigger in allTriggers
+			if (setElement.ID="trigger")
 			{
-				tempTriggers=%tempTriggers%%temptrigger%|
-				tempTriggerNames:=tempTriggerNames %temptrigger%name "|"
-			}
-			StringTrimRight,tempTriggers,tempTriggers,1
-			StringTrimRight,tempTriggerNames,tempTriggerNames,1
-			StringSplit,tempTriggers,tempTriggers,|
-			StringSplit,tempTriggerNames,tempTriggerNames,|
-			
-			if TempTriggerCount=0
-			{
-				setElementID:=e_NewTrigger()
-				ui_selectElementType(%setElementID%Type,setElementID)
-				return
-			}
-			;~ else if TempTriggerCount =1
-			;~ {
-				;~ ui_settingsOfElement(tempTriggers)
-				;~ return
-			;~ }
-			else
-			{
-				
-				ui_DisableMainGUI()
-				gui,4:default
-				;~ gui,+owner
-				gui,+hwndSettingsHWND
-				gui,add,text,w300,% lang("Select_a_trigger")
-				gui,add,ListBox,w400 h500 vGuiTriggerChoose gGuiTriggerChoose AltSubmit choose1,%temptriggerNames%
-				gui,add,button,w100 h30 gGuiTriggerOK default,% lang("OK")
-				gui,add,button,w90 h30 X+10 gGuiTriggerNew,% lang("New_Trigger")
-				gui,add,button,w90 X+10 h30 gGuiTriggerDelete,% lang("Delete_Trigger")
-				gui,add,button,w90 X+10 h30 yp gGuiTriggerCancel,% lang("Cancel")
-				
-				ui_GetMainGUIPos()
-
-				gui,show,hide
-				;Put the window in the center of the main window
-				wingetpos,,,tempWidth,tempHeight,ahk_id %SettingsHWND%
-				tempXpos:=round(MainGUIX+MainGUIWidth/2- tempWidth/2)
-				tempYpos:=round(MainGUIY+MainGUIHeight/2- tempHeight/2)
-				
-				gui,show,x%tempXpos% y%tempYpos%
-				CurrentlyActiveWindowHWND:=SettingsHWND
-				return
-				GuiTriggerChoose:
-				if A_GuiEvent !=DoubleClick 
-					return
-				GuiTriggerOK:
-				gui,submit
-				
-				
-				
-				;MsgBox %tempElementID%--- %A_EventInfo%
-				gui,destroy
-				ui_EnableMainGUI()
-				WinActivate,·AutoHotFlow·
-				ui_settingsOfElement(tempTriggers%GuiTriggerChoose%)
-				return
-				GuiTriggerNew:
-				gui,4:default
-				gui,destroy
-				ui_EnableMainGUI()
-				setElementID:=e_NewTrigger()
-				ui_selectElementType(%setElementID%Type,setElementID)
-				
-				return
-				GuiTriggerDelete:
-				gui,4:default
-				gui,submit
-				
-				if (%setElementID%type="trigger" and triggersEnabled=true) ;When editing a trigger, disable Triggers and enable them afterwards
+				ElementSettingsGOTOPointIfATriggerWasDeleted:
+				;~ MsgBox % setElement.triggers.count()
+				if (setElement.triggers.count()>0)
 				{
-					tempReenablethen:=true
-					r_EnableFlow()
+					tempres:=this.selectTrigger("wait")
+					;~ MsgBox % tempres
+					if tempres=aborted
+					{
+						this.close()
+						return tempres
+					}
+					if tempres=deleted
+					{
+						new state()
+						goto ElementSettingsGOTOPointIfATriggerWasDeleted
+					}
+					setElement:=ParElement
 				}
 				else
-					tempReenablethen:=false
-				
-				e_removeTrigger(e_TriggerNumbertoID(GuiTriggerChoose))
-				saved=no
-				gui,destroy
-				ui_EnableMainGUI()
-				e_UpdateTriggerName()
-				
-				if (tempReenablethen)
-					r_EnableFlow()
-				
-				ui_settingsOfElement("trigger")
-				return
-				
-				
-				GuiTriggerCancel:
-				4GuiClose:
-				gui,4:default
-				gui,destroy
-				ui_EnableMainGUI()
-				return
+				{
+					tempelement:=new trigger(setElement.id)
+					;~ MsgBox % strobj(tempelement)
+					tempres:=selectsubtype(tempelement,"wait")
+					if tempres=aborted
+					{
+						this.close()
+						return tempres
+					}
+					else
+					{
+						this.element:=tempelement
+						setElement:=tempelement
+						setElementID:=tempelement.id
+						setElementType:=tempelement.Type
+						setElementsubType:=tempelement.subType
+					}
+				}
+			}
+			
+		}
+		NowResultEditingElement:=""
+		
+		
+		
+		
+		static varsToDelete:=[] ;TODO: maybe unnecessary
+		ElementSettingsFields:={} ;global. contains the fields which will be shown in the GUI. Each field is a bunch of controls
+		ElementSettingsFieldHWNDs:={} ;global. Contains the field hwnds and the field object. Needed for responding user input
+		ElementSettingsFieldParIDs:={} ;global. Contains the field hwnds and the field object. Needed for responding user input
+		
+		maingui.disable()
+		gui,SettingsOfElement:default
+		gui,-DPIScale
+		;~ gui,font,s8 cDefault wnorm
+		;~ gui,add,button,w370 x10 gGUISettingsOfElementSelectType,% lang("%1%_type:_%2%",lang(setElementType),getname%setElementType%%setElementsubType%())
+		;~ gui,add,button,w20 x10 X+10 yp gGUISettingsOfElementHelp,?
+		;~ gui,font,s10 cnavy wbold
+		;~ gui,add,text,x10 w400,Name
+		;~ gui,font,s8 cDefault wnorm
+		;~ gui,add,checkbox, x10 vGUISettingsOfElementCheckStandardName gGUISettingsOfElementCheckStandardName,% lang("Standard_name")
+		;~ gui,add,edit,w400 x10 Multi r5 vGUISettingsOfElementEditName gGUISettingsOfElementUpdateName,% setElement.name
+		gui,+hwndSettingsGUIHWND
+		CurrentlyActiveWindowHWND:=SettingsGUIHWND
+		
+		
+		openingElementSettingsWindow:=true ;Allows some elements to initialize their parameter list. (such as in "play sound": find all system sound)
+		try
+			parametersToEdit:=%setElementType%%setElementsubType%.getParameters(true)
+		catch
+			parametersToEdit:=%setElementType%%setElementsubType%.getParameters() ;TODO: all elements should accept one parameter
+		
+		ElementSettingsFields.push(new this.label({label: lang("name (name)")}))
+		ElementSettingsFields.push(new this.name({id: ["name", "defaultname"]}))
+		
+		;Loop through all parameters
+		for index, parameter in parametersToEdit
+		{
+			
+			
+			if (parameter.type="Label")
+			{
+				ElementSettingsFields.push(new this.label(parameter))
+			}
+			else if (parameter.type="Edit")
+			{
+				ElementSettingsFields.push(new this.edit(parameter))
+			}
+			else if (parameter.type="Checkbox")
+			{
+				ElementSettingsFields.push(new this.checkbox(parameter))
+			}
+			else if (parameter.type="Radio")
+			{
+				ElementSettingsFields.push(new this.radio(parameter))
+			}
+			else if (parameter.type="Slider")
+			{
+				ElementSettingsFields.push(new this.slider(parameter))
+			}
+			else if (parameter.type="DropDown")
+			{
+				ElementSettingsFields.push(new this.DropDown(parameter))
+			}
+			else if (parameter.type="ComboBox")
+			{
+				ElementSettingsFields.push(new this.ComboBox(parameter))
+			}
+			else if (parameter.type="Hotkey")
+			{
+				ElementSettingsFields.push(new this.Hotkey(parameter))
+			}
+			else if (parameter.type="Button")
+			{
+				ElementSettingsFields.push(new this.Button(parameter))
+			}
+			else if (parameter.type="File")
+			{
+				ElementSettingsFields.push(new this.file(parameter))
+			}
+			else if (parameter.type="Folder")
+			{
+				ElementSettingsFields.push(new this.folder(parameter))
+			}
+			else if (parameter.type="weekdays")
+			{
+				ElementSettingsFields.push(new this.weekdays(parameter))
+			}
+			else if (parameter.type="TimeOfDay")
+			{
+				ElementSettingsFields.push(new this.TimeOfDay(parameter))
+			}
+			else if (parameter.type="DateAndTime")
+			{
+				ElementSettingsFields.push(new this.DateAndTime(parameter))
+			}
+			
+		}
+		
+		
+		
+		;Create scrollable GUI
+		gui +hwndSettingWindowHWND
+		;~ d(instance,52345)
+		SG2 := New ScrollGUI(SettingWindowHWND,600, A_ScreenHeight*0.8, "-dpiscale",2,2)
+		;~ d(instance,45234)
+		; Create the main window (parent)
+		Gui, GUISettingsOfElementParent:New
+		;~ d(instance,4849)
+		gui,GUISettingsOfElementParent:-DPIScale
+		;~ d(instance,13223213)
+		Gui, GUISettingsOfElementParent:Margin, 0, 20
+		;~ d(instance,54668)
+		Gui, % SG2.HWND . ": -Caption +ParentGUISettingsOfElementParent +LastFound"
+		Gui, % SG2.HWND . ":Show", Hide  y25
+		;~ d(instance,1891)
+		WinGetPos, , , WsettingsParent, HsettingsParent,% "ahk_id " SG2.HWND
+		;~ W := Round(W * (96 / A_ScreenDPI))
+		;~ H := Round(H * (96 / A_ScreenDPI))
+		YsettingsButtoPos := HsettingsParent + 10
+		WinGetPos, , , Wsettings, Hsettings,% "ahk_id " SG2.HGUI
+		HParent:=Hsettings+90
+		;Make resizeable
+		gui,+hwndSettingWindowParentHWND
+		gui,+LabelSettingsOfElementParent
+		gui,+resize
+		gui,+minsize%WsettingsParent%x200 ;Ensure constant width.
+		gui,+maxsize%WsettingsParent%x%HParent%
+		;~ d(instance,2634)
+		;add buttons
+		gui,font,s8 cDefault wnorm
+		gui, GUISettingsOfElementParent:add,button, w370 x10 y10 gGUISettingsOfElementSelectType h20,% lang("%1%_type:_%2%",lang(setElementType),%setElementType%%setElementsubType%.getname())
+		gui, GUISettingsOfElementParent:add,button, w20 X+10 yp h20 gGUISettingsOfElementHelp vGUISettingsOfElementHelp,?
+		;~ guicontrol,focus,GUISettingsOfElementHelp
+		Gui, GUISettingsOfElementParent:Add, Button, gGUISettingsOfElementSave vButtonSave w145 x10 h30 y%YsettingsButtoPos%,% lang("Save")
+		Gui, GUISettingsOfElementParent:Add, Button, gGUISettingsOfElementCancel vButtonCancel default w145 h30 yp X+10,% lang("Cancel")
+		;Make GUI autosizing
+		Gui, GUISettingsOfElementParent:Show, hide w%WsettingsParent%
+		Gui, GUISettingsOfElementParent:Show, hide w%WsettingsParent%,% lang("Settings") " - " lang(Element.type) " - " %setElementType%%setElementsubType%.getname() ;Needed twice, otherwise the width is not correct
+		; Show ScrollGUI1
+		;~ Return
+		;~ d(instance,635)
+		;Calculate position to show the settings window in the middle of the main window
+		pos:=maingui.getpos() 
+		tempHeight:=round(pos.h-100) ;This will be the max height. If child gui is larger, it must be scrolled
+		WinGetPos,ElSetingGUIX,ElSetingGUIY,ElSetingGUIW,ElSetingGUIH,ahk_id %SettingWindowParentHWND%
+		tempXpos:=round(pos.x+pos.w/2- ElSetingGUIW/2)
+		tempYpos:=round(pos.y+pos.h/2- tempHeight/2)
+		;move Parent window
+		gui,GUISettingsOfElementParent:show,% "x" tempXpos " y" tempYpos " h" tempHeight " hide" 
+		
+		;~ SetWinDelay,0
+		;~ Gui, % SG2.HWND . ":Show", Hide  y40
+		;Make ScrollGUI autosize 
+		;~ d(instance,84946516)
+		SG2.Show("", "x0 y40 h" tempHeight " hide ")
+		;~ d(instance,7347)
+		;position lower buttons
+		GetClientSize(SettingWindowParentHWND, ElSetingGUIW, ElSetingGUIH)
+		guicontrol, GUISettingsOfElementParent:move,ButtonSave,% "y" ElSetingGUIH-40
+		guicontrol, GUISettingsOfElementParent:move,ButtonCancel,% "y" ElSetingGUIH-40
+		;Position the Scroll gui
+		wingetpos,,,ElSetingGUIW,ElSetingGUIH,ahk_id %SettingWindowParentHWND%
+		WinMove,ahk_id %SettingWindowParentHWND%,,,,% ElSetingGUIW,% ElSetingGUIH+1 ;make the autosize function trigger, which resizes and moves the scrollgui
+		;~ d(instance,2346346)
+		;show gui
+		SG2.Show() 
+		
+		CurrentlyActiveWindowHWND:=SettingWindowParentHWND
+		
+		openingElementSettingsWindow:=false
+		
+		ElementSettingsNameField.updatename()
+			
+		gui,GUISettingsOfElementParent:show
+		
+		if (wait=1 or wait="wait")
+		{
+			Loop
+			{
+				if (NowResultEditingElement="")
+					sleep 100
+				else 
+					break
 			}
 		}
+		return NowResultEditingElement
 		
-	}
-	else if %setElementID%Type=Connection
-	{
 		
-		tempNewType:=ui_selectConnectionType(setElementID)
-		if (tempNewType !="aborted")
-			%setElementID%ConnectionType:=tempNewType
+		;If user wants to change the subtype of the element
+		GUISettingsOfElementSelectType:
+		gui,SettingsOfElement:destroy
+		SG2.Destroy()
+		gui,GUISettingsOfElementParent:destroy
+		ui_closeHelp() 
+		maingui.enable()
 		
-		ui_draw()
-		return tempNewType
-	}
-	else 
-	{
-		MsgBox,,Internal error, Element Type unknown
-		NowResultEditingElement=ok
-		ui_EnableMainGUI()
-		return
-	}
-	ui_DisableMainGUI()
-	gui,SettingsOfElement:default
-	
-	;~ gui,font,s8 cDefault wnorm
-	;~ gui,add,button,w370 x10 gGUISettingsOfElementSelectType,% lang("%1%_type:_%2%",lang(setElementType),getname%setElementType%%setElementsubType%())
-	;~ gui,add,button,w20 x10 X+10 yp gGUISettingsOfElementHelp,?
-	gui,font,s10 cnavy wbold
-	gui,add,text,x10 w400,Name
-	gui,font,s8 cDefault wnorm
-	gui,add,checkbox, x10 vGUISettingsOfElementCheckStandardName gGUISettingsOfElementCheckStandardName,% lang("Standard_name")
-	gui,add,edit,w400 x10 Multi r5 vGUISettingsOfElementEditName gGUISettingsOfElementUpdateName,% %setElementID%name
-	gui,+hwndSettingsGUIHWND
-	
-	openingElementSettingsWindow:=true ;Allows some elements to initialize their parameter list. (such as in "play sound": find all system sound)
-	try
-		parametersToEdit:=getParameters%setElementType%%setElementsubType%(true)
-	catch
-		parametersToEdit:=getParameters%setElementType%%setElementsubType%()
-	;MsgBox,% parametersToEdit
-	for index, parameter in parametersToEdit
-	{
-		if isobject(parameter.id)
+		tempres:=selectSubType(setelement, "wait")
+		if tempres!=aborted
+			NowResultEditingElement:= ElementSettings.open(setelement,Parameterwait)
+		else 
 		{
-			for tempParIndex, tempParValue in parameter.id
-				tempParameterID%a_index%:=parameter.id[tempParIndex]
-			if parameter.id.MaxIndex()=1
-				tempParameterID:=parameter.id[1]
-			else
-				tempParameterID=
+			NowResultEditingElement:="aborted"
+			return
+		}
+		
+		
+		GUISettingsOfElementHelp:
+		;~ MsgBox %setElementType% %setElementsubType%
+		
+		IfWinExist,ahk_id %GUIHelpHWND%
+			ui_closeHelp()
+		else
+			ui_showHelp(setElement.Type "\" setElement.subtype)
+		return
+		
+		
+		
+		
+		
+		SettingsOfElementParentClose:
+		SettingsOfElementParentEscape:
+		GUISettingsOfElementCancel:
+		;~ ToolTip %a_thislabel%
+		if (setElement.name="Νew Соntainȩr" or setElement.name="Νew Triggȩr") ;Do not translate!
+		{
+			setElement.remove()
+		}
+		
+		if (element.previousSubType)
+		{
+			setElement.SubType:=element.previousSubType
+			element.previousSubType:=""
+		}
+		
+		ui_closeHelp() 
+		
+		gui,SettingsOfElement:destroy
+		SG2.Destroy()
+		gui,GUISettingsOfElementParent:destroy
+		
+		GUISettingsOfElementRemoveInfoTooltip()
+		
+		maingui.enable()
+		NowResultEditingElement:="aborted"
+		GUISettingsOfElementObject.close()
+		return
+		
+		
+		
+		GUISettingsOfElementSave:
+		somethingchanged:=0 ;will be incremented if a change will be detected
+		GUISettingsOfElementobject.updatename()
+		;~ gui,SettingsOfElement:submit
+		if (setElement.type="trigger" and triggersEnabled=true) ;When editing a trigger, disable Triggers and enable them afterwards
+		{
+			tempReenablethen:=true
+			;r_EnableFlow() ;TODO ;Disable flow
 		}
 		else
-			tempParameterID:=parameter.id
+			tempReenablethen:=false
 		
-		;~ if isobject(parameter.default)
-		;~ {
-			;~ for tempParIndex, tempParValue in parameter.default
-				;~ tempParameterDefault%a_index%:=parameter.default[tempParIndex]
-		;~ }
-		;~ else
-			;~ tempParameterDefault:=parameter.default
 		
-		if (parameter.type="Label")
+		setElement.Name:=ElementSettingsNameField.getValue("Name")
+		setElement.StandardName:=ElementSettingsNameField.getValue("StandardName")
+		;~ MsgBox % strobj(parametersToEdit)
+		for ElementSaveindex, parameter in parametersToEdit
 		{
+			if not IsObject(parameter.id)
+				parameterID:=[parameter.id]
+			else
+				parameterID:=parameter.id
+			;~ MsgBox % strobj(parameterID)
+			if (parameterID[1]="" or parameter.type="label" or parameter.type="SmallLabel") ;If this is only a label do nothing
+				continue
+			;~ MsgBox % strobj(parameterID)
+			
+			
+			;Certain types of control consist of multiple controls and thus contain multiple parameters.
+			for ElementSaveindex2, oneID in parameterID
+			{
+				tempOneParID:=parameterID[ElementSaveindex2]
+				temponeValue:=ElementSettingsFieldParIDs[tempOneParID].getValue(tempOneParID)
+				if (setElement.par[tempOneParID]!=temponeValue)
+					somethingchanged++
+				setElement.par[tempOneParID]:=temponeValue
+				
+				;~ MsgBox,1,, % tempOneParID "`n`n" ElementSaveindex  "-" ElementSaveindex2 "`n`n" strobj(ElementSettingsFieldParIDs[tempOneParID]) "`n`n" strobj(setElement)
+				;~ IfMsgBox cancel
+					;~ MsgBox % strobj(ElementSettingsFieldParIDs)
+			
+			}
+			
+			
+			
+		}
+		temponeValue:=""
+		
+		ui_closeHelp() 
+		SG2.Destroy()
+		gui,SettingsOfElement:destroy
+		gui,GUISettingsOfElementParent:destroy
+		GUISettingsOfElementRemoveInfoTooltip()
+		
+		maingui.enable()
+		
+
+		NowResultEditingElement:=somethingchanged " Changes"
+		
+		;if (tempReenablethen) ;TODO
+			;r_EnableFlow()
+		
+		if (setElementType="Trigger")
+		{
+			maintrigger.updatename()
+			ui_draw()
+			
+		}
+		
+		ui_draw()
+		GUISettingsOfElementObject.close()
+		return
+		
+	}
+	
+	
+	
+	
+	;The fields will be added to the GUI
+	class field
+	{
+		__new(parameter)
+		{
+			global
+			this.parameter:=parameter
+			this.components:=[]
+			this.enabled:=1
+			if (isobject(parameter.id))
+			{
+				for index, onepar in parameter.id
+				{
+					ElementSettingsFieldParIDs[onepar]:=this
+				}
+			}
+			else if (parameter.id!="")
+				ElementSettingsFieldParIDs[parameter.id]:=this
+		}
+		
+		getvalue(parameterID="")
+		{
+			global
+			local temp, tempParameterID
+			if parameterID=
+			{
+				tempParameterID:=this.parameter.id
+				if isobject(tempParameterID)
+					tempParameterID:=tempParameterID[1]
+			}
+			else
+				tempParameterID:=parameterID
+			GUIControlGet,temp,SettingsOfElement:,GUISettingsOfElement%tempParameterID%
+			return temp
+		}
+		
+		setvalue(value, parameterID="")
+		{
+			global
+			local tempParameterID:=this.parameter.id
+			if parameterID=
+			{
+				tempParameterID:=this.parameter.id
+				if isobject(tempParameterID)
+					tempParameterID:=tempParameterID[1]
+			}
+			else
+				tempParameterID:=parameterID
+			
+			GUIControl,SettingsOfElement:,GUISettingsOfElement%tempParameterID%,% value
+			return
+		}
+		
+		setText(Text,index="")
+		{
+			global
+			local tempParameterID:=this.parameter.id
+			guicontrol,SettingsOfElement:text,GUISettingsOfElement%tempParameterID%%index%,% Text
+		}
+		
+		enable(parameterID="",enOrDis=1)
+		{
+			global
+			;~ MsgBox % strobj(this.components)
+			;~ MsgBox % parameterID
+			if parameterID=
+			{
+				for index, component in this.components
+				{
+					
+					guicontrol,SettingsOfElement:enable%enOrDis%,% component
+				}
+				this.enabled:=enOrDis
+			}
+			else
+			{
+				;~ MsgBox guicontrol,SettingsOfElement:enable%enOrDis%,GUISettingsOfElement%parameterID%
+				guicontrol,SettingsOfElement:enable%enOrDis%,GUISettingsOfElement%parameterID%
+				this.enabled:=-1 ;Means that it is not globally enabled or disabled
+			}
+			
+		}
+		disable(parameterID="")
+		{
+			this.enable(parameterID,0)
+		}
+		
+		
+		ClickOnWarningPic()
+		{
+			;~ MsgBox gaga 
+			ToolTip,% this.warningtext,,,11
+			settimer,GUISettingsOfElementRemoveInfoTooltip,-5000
+		}
+		
+		
+	}
+	
+	
+	class name extends ElementSettings.field
+	{
+		__new(parameter)
+		{
+			global
+			base.__new(parameter)
+			local tempchecked, temptext, tempParGray, tempHWND
+			local tempParameterID:=parameter.id
+			ElementSettingsNameField:=this
+			
+			gui,font,s8 cDefault wnorm
+			tempchecked:=setElement["StandardName"] 
+			;~ temptext:=setElement.par["Name"] 
+			
+			gui,add,checkbox, x10 hwndtempHWND checked%tempchecked% vGUISettingsOfElementStandardName gGUISettingsOfElementCheckStandardName,% lang("Standard_name")
+			this.components.push("GUISettingsOfElementStandardName")
+			ElementSettingsFieldHWNDs[tempHWND]:=this
+			gui,add,edit,w400 x10 Multi r5 hwndtempHWND vGUISettingsOfElementName gGUISettingsOfElementUpdateName,% setElement.name
+			this.components.push("GUISettingsOfElementName")
+			ElementSettingsFieldHWNDs[tempHWND]:=this
+			
+			varsToDelete.push("GUISettingsOfElementCheckStandardName")
+			varsToDelete.push("GUISettingsOfElementEditName")
+			
+		}
+		
+		updateName()
+		{
+			global
+			local Newname
+			
+			if (openingElementSettingsWindow=true)
+				return
+			
+			if (this.getvalue("StandardName")=1)
+			{
+				this.disable("Name")
+				
+				Newname:=%setElementType%%setElementsubType%.GenerateName(this)
+				StringReplace,Newname,Newname,`n,%a_space%-%a_space%,all
+				this.setvalue(Newname)
+			}
+			else
+				this.enable("Name")
+			return
+			
+		}
+	}
+
+	
+	class label extends ElementSettings.field
+	{
+		__new(parameter)
+		{
+			global
+			base.__new(parameter)
+			local tempYPos
+			local tempParameterID:=parameter.id
 			if (parameter.size="small")
 			{
 				gui,font,s8 cDefault wbold
@@ -232,185 +576,54 @@ ui_settingsOfElement(ElementID,PreviousSubType="")
 			}
 			if (tempParameterID!="")
 			{
-				gui,add,text,x10 w400 %tempYPos% vGUISettingsOfElement%setElementID%%tempParameterID% ,% parameter.label
+				gui,add,text,x10 w400 %tempYPos% vGUISettingsOfElement%tempParameterID% ,% parameter.label
+				varsToDelete.push("GUISettingsOfElement" tempParameterID)
+				this.components.push("GUISettingsOfElement" tempParameterID)
 			}
 			else
 			{
 				gui,add,text,x10 w400 %tempYPos%,% parameter.label
 			}
 		}
-		else if (parameter.type="Edit")
+		
+		
+		
+	}
+	class checkbox extends ElementSettings.field
+	{
+		__new(parameter)
 		{
+			global
+			base.__new(parameter)
+			local temp, temptext, tempParGray, tempHWND
+			local tempParameterID:=parameter.id
+			
 			gui,font,s8 cDefault wnorm
-			
-			
-			if ( tempParameterID) ;if only one edit
-			{
-				
-				temptext:=%setElementID%%tempParameterID% ;get the saved parameter
-				
-				if parameter.multiline
-					tempIsMulti=h100 multi
-				else
-					tempIsMulti=r1
-				
-				gui,add,picture,x394 w16 h16 gGUISettingsOfElementClickOnWarningPic vGUISettingsOfElementWarningIconOf%setElementID%%tempParameterID%
-				GUISettingsOfElementWarnIfEmpty%setElementID%%tempParameterID%:=parameter.WarnIfEmpty
-				
-				if (parameter.content="Expression")
-				{
-					gui,add,picture,x10 yp w16 h16 gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%setElementID%%tempParameterID%,icons\expression.ico
-					
-						gui,add,edit,X+4 w360 %tempIsMulti% hwndGUISettingsOfElementEditHWND%setElementID%%tempParameterID% gGUISettingsOfElementCheckContent vGUISettingsOfElement%setElementID%%tempParameterID%,%temptext%
-					if parameter.useupdown
-					{
-						
-						if parameter.range
-							gui,add,updown,% "range" parameter.range
-						else
-							gui,add,updown
-						guicontrol,,GUISettingsOfElement%setElementID%%tempParameterID%,%temptext%
-					}
-					
-					GUISettingsOfElementContentType%setElementID%%tempParameterID%=Expression
-				}
-				else if (parameter.content="String")
-				{
-					gui,add,picture,x10 yp w16 h16 gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%setElementID%%tempParameterID%,icons\string.ico
-					gui,add,edit,X+4 w360 %tempIsMulti% hwndGUISettingsOfElementEditHWND%setElementID%%tempParameterID% gGUISettingsOfElementCheckContent vGUISettingsOfElement%setElementID%%tempParameterID%,%temptext%
-					
-					GUISettingsOfElementContentType%setElementID%%tempParameterID%=String
-				}
-				else if (parameter.content="VariableName")
-				{
-					gui,add,picture,x10 yp w16 h16 gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%setElementID%%tempParameterID%,icons\VariableName.ico
-					gui,add,edit,X+4 w360 %tempIsMulti% hwndGUISettingsOfElementEditHWND%setElementID%%tempParameterID% gGUISettingsOfElementCheckContent vGUISettingsOfElement%setElementID%%tempParameterID%,%temptext%
-					
-					GUISettingsOfElementContentType%setElementID%%tempParameterID%=VariableName
-				}
-				else if (parameter.content="StringOrExpression")
-				{
-					
-					tempContentTypePar:=parameter.contentParID
-					
-					if %setElementID%%tempContentTypePar%=1 ;String
-						gui,add,picture,x10 yp w16 h16 gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%setElementID%%tempParameterID%,icons\string.ico
-					else
-						gui,add,picture,x10 yp w16 h16 gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%setElementID%%tempParameterID%,icons\expression.ico
-					gui,add,edit,X+4 w360 %tempIsMulti% hwndGUISettingsOfElementEditHWND%setElementID%%tempParameterID% gGUISettingsOfElementCheckContent vGUISettingsOfElement%setElementID%%tempParameterID%,%temptext%
-					
-					GUISettingsOfElementContentType%setElementID%%tempParameterID%=StringOrExpression
-					GUISettingsOfElementContentTypeOf%setElementID%%tempContentTypePar%:=tempParameterID
-					GUISettingsOfElementContentTypeRadio%setElementID%%tempParameterID%:=tempContentTypePar
-				}
-				else
-				{
-					gui,add,edit,x10 yp w380 %tempIsMulti% hwndGUISettingsOfElementEditHWND%setElementID%%tempParameterID% gGUISettingsOfElementCheckContent vGUISettingsOfElement%setElementID%%tempParameterID%,%temptext%
-				}
-				GUISettingsOfElementCheckContent(GUISettingsOfElementEditHWND%setElementID%%tempParameterID%)
-			}
-			else ;If multiple edits in one line
-			{
-				
-			
-				;~ MsgBox %tempEditwidth%
-				for tempIndex, tempOneParameterID in parameter.id
-				{
-					temp:=%setElementID%%tempOneParameterID% ;get the saved parameter
-					;~ if (temp="") ;if nothing is saved
-						;~ temptext:=parameter.default[tempIndex] ;load default parameter
-					;~ else
-						temptext=%temp% ;set the saved parameter as text
-					
-					
-					if tempIndex=1
-					{
-						tempEditwidth:= round((380 - (10 * (parameter.id.MaxIndex()-1)))/parameter.id.MaxIndex())
-						tempXpos:="X+4"
-						if (parameter.content="Expression")
-						{
-							gui,add,picture,x10 w16 h16 gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%setElementID%%tempOneParameterID%,icons\expression.ico
-							tempXpos:="X+4"
-						}
-						else if (parameter.content="String")
-						{
-							gui,add,picture,x10 w16 h16 gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%setElementID%%tempOneParameterID%,icons\string.ico
-							tempXpos:="X+4"
-						}
-						else if (parameter.content="VariableName")
-						{
-							gui,add,picture,x10 w16 h16 gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%setElementID%%tempOneParameterID%,icons\VariableName.ico
-							tempXpos:="X+4"
-						}
-						else
-						{
-							tempEditwidth:= round((400 - (10 * (parameter.id.MaxIndex()-1)))/parameter.id.MaxIndex())
-							tempXpos:="x10"
-						}
-					}
-					else
-						tempXpos:="X+10"
-					;~ MsgBox %tempXpos%
-					gui,add,edit,%tempXpos% w%tempEditwidth% hwndGUISettingsOfElementEditHWND%setElementID%%tempParameterID% gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%tempOneParameterID%,%temptext%
-					
-					if (parameter.content="Expression")
-					{
-						GUISettingsOfElementContentType%setElementID%%tempOneParameterID%=Expression
-					}
-					else if (parameter.content="String")
-					{
-						GUISettingsOfElementContentType%setElementID%%tempOneParameterID%=String
-					}
-					else if (parameter.content="VariableName")
-					{
-						GUISettingsOfElementContentType%setElementID%%tempOneParameterID%=VariableName
-					}
-					GUISettingsOfElementCheckContent(GUISettingsOfElementEditHWND%setElementID%%tempParameterID%)
-				}
-				
-			}
-		}
-		else if (parameter.type="VariableName")
-		{
-			gui,font,s8 cDefault wnorm
-			temp:=%setElementID%%tempParameterID% ;get the saved parameter
-			
-			;~ if (temp="") ;if nothing is saved
-				;~ temptext:=parameter.default ;load default parameter
-			;~ else
-				temptext=%temp% ;set the saved parameter as text
-			gui,add,edit,x10 r1 w400  gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%tempParameterID%,%temptext%
-			TrayTip,%setElementsubType%, variable name will ich nicht haben
-		}
-		else if (parameter.type="Checkbox")
-		{
-			gui,font,s8 cDefault wnorm
-			temp:=%setElementID%%tempParameterID% 
+			temp:=setElement.par[parameter.id] 
 			temptext:=parameter.label
-			;~ if temp=
-			;~ {
-				;~ temp:=parameter.default
-			;~ }
 			if parameter.gray
 				tempParGray=check3
 			else
 				tempParGray=
-			gui,add,checkbox,w400 x10 %tempParGray% checked%temp% gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%tempParameterID%,%temptext%
+			gui,add,checkbox,w400 x10 %tempParGray% checked%temp% hwndtempHWND gGUISettingsOfElementUpdateName vGUISettingsOfElement%tempParameterID%,%temptext%
+			this.components.push("GUISettingsOfElement" tempParameterID)
+			ElementSettingsFieldHWNDs[tempHWND]:=this
 			
+			varsToDelete.push("GUISettingsOfElement" tempParameterID)
 		}
-		else if (parameter.type="Radio")
+	}
+	
+	class radio extends ElementSettings.field
+	{
+		__new(parameter)
 		{
+			global
+			base.__new(parameter)
+			local tempAssigned, tempMakeNewGroup, tempChecked, temp, tempHWND
+			local tempParameterID:=parameter.id
+			
 			gui,font,s8 cDefault wnorm
-			temp:=%setElementID%%tempParameterID% 
-			;~ if temp=
-			;~ {
-				;~ temp:=parameter.default
-				;~ tempIsDefault:=true
-			;~ }
-			;~ else
-				tempIsDefault:=false
-			
-			
+			temp:=setElement.par[tempParameterID] 
 			tempAssigned:=false
 			for tempindex, tempRadioLabel in parameter.choices
 			{
@@ -427,46 +640,484 @@ ui_settingsOfElement(ElementID,PreviousSubType="")
 				else
 					tempChecked=
 					
+				gui,add,radio, w400 x10 %tempChecked% %tempMakeNewGroup% hwndtempHWND gGUISettingsOfElementUpdateName vGUISettingsOfElement%tempParameterID%%a_index% ,% tempRadioLabel
+				this.components.push("GUISettingsOfElement" tempParameterID a_index)
+				ElementSettingsFieldHWNDs[tempHWND]:=this
 				
+				varsToDelete.push("GUISettingsOfElement" tempParameterID a_index)
+			}
+			if (tempAssigned=false) ;Catch if a wrong value was saved and set to default value.
+			{
+				temp:=parameter.default
+				guicontrol,SettingsOfElement:,GUISettingsOfElement%tempParameterID%%temp%,1
+			}
+		}
+		
+		getvalue()
+		{
+			global
+			local temp
+			local tempParameterID:=this.parameter.id
+			
+			loop % this.parameter.choices.MaxIndex()
+			{
+				guicontrolget,temp,SettingsOfElement:,GUISettingsOfElement%tempParameterID%%a_index%
+				if (temp=1)
+				{
+					temp:=A_Index
+					break
+				}
+			}
+			
+			return temp
+		}
+		setvalue(value)
+		{
+			global
+			local tempParameterID:=this.parameter.id
+			GUIControl,SettingsOfElement:,GUISettingsOfElement%tempParameterID%%value%,1
+			return temp
+		}
+		
+		
+	}
+	
+	class edit extends ElementSettings.field
+	{
+		__new(parameter)
+		{
+			global
+			base.__new(parameter)
+			local temp, temptext, tempIsMulti, tempXpos,tempEditwidth, tempHWND, tempContentTypeID, tempContentTypeNum, tempOneParameterID, tempchecked1, tempchecked2, tempassigned
+			if (not IsObject(parameter.id))
+				parameter.id:=[parameter.id]
+			local tempParameterID:=parameter.id
+		
+			
+			gui,font,s8 cDefault wnorm
+			
+			if (tempParameterID.MaxIndex()=1 or parameter.content="StringOrExpression") ;if only one edit
+			{
+				tempOneParameterID:=tempParameterID[1]
+				tempContentTypeID:=tempParameterID[2]
 				
-				gui,add,radio, w400 x10 %tempChecked% %tempMakeNewGroup% gGUISettingsOfElementClickOnRadio vGUISettingsOfElement%setElementID%%tempParameterID%%a_index% ,% tempRadioLabel
+				temptext:=setElement.par[tempOneParameterID] ;get the saved parameter
 				
+				if parameter.multiline
+					tempIsMulti=h100 multi
+				else
+					tempIsMulti=r1
 				
+				if (parameter.content="StringOrExpression") ;Add two radios to select the element type
+				{
+					tempContentTypeNum:=setElement.par[tempContentTypeID] ;get the saved parameter
+					tempassigned:=false
+					if tempContentTypeNum=1
+					{
+						tempchecked1=checked
+						tempassigned:=true
+					}
+					else
+						tempchecked1=
+					if tempContentTypeNum=2
+					{
+						tempchecked2=checked
+						tempassigned:=true
+					}
+					else
+						tempchecked2=
+					
+					gui,add,radio, w400 x10 %tempchecked1% Group hwndtempHWND gGUISettingsOfElementChangeRadio vGUISettingsOfElement%tempContentTypeID%1 ,% lang("This is a value")
+					this.components.push("GUISettingsOfElement" tempOneParameterID a_index)
+					ElementSettingsFieldHWNDs[tempHWND]:=this
+					
+					gui,add,radio, w400 x10 %tempChecked2% hwndtempHWND gGUISettingsOfElementChangeRadio vGUISettingsOfElement%tempContentTypeID%2 ,% lang("This is a variable name or expression")
+					this.components.push("GUISettingsOfElement" tempOneParameterID a_index)
+					ElementSettingsFieldHWNDs[tempHWND]:=this
+					
+					if (tempAssigned=false) ;Catch if a wrong value was saved and set to default value.
+					{
+						temp:=parameter.default[2]
+						guicontrol,SettingsOfElement:,GUISettingsOfElement%tempContentTypeID%%temp%,1
+					}
+					
+					varsToDelete.push("GUISettingsOfElement" tempContentTypeID "1")
+					varsToDelete.push("GUISettingsOfElement" tempContentTypeID "2")
+				}
 				
+				;Add picture, which will warn user if the etry is obviously invalid
+				gui,add,picture,x394 w16 h16 hwndtempHWND gGUISettingsOfElementClickOnWarningPic vGUISettingsOfElementWarningIconOf%tempOneParameterID%
+				this.components.push("GUISettingsOfElementWarningIconOf" tempOneParameterID)
+				ElementSettingsFieldHWNDs[tempHWND]:=this
+				this.warnIfEmpty:=parameter.WarnIfEmpty
+				
+				if (parameter.content="Expression")
+				{
+					;The info icon tells user which conent type it is
+					gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempOneParameterID%,icons\expression.ico
+					this.components.push("GUISettingsOfElementInfoIconOf" tempOneParameterID)
+					ElementSettingsFieldHWNDs[tempHWND]:=this
+					
+					gui,add,edit,X+4 w360 %tempIsMulti% hwndtempHWND gGUISettingsOfElementCheckContent vGUISettingsOfElement%tempOneParameterID%,%temptext%
+					this.components.push("vGUISettingsOfElement" tempOneParameterID)
+					ElementSettingsFieldHWNDs[tempHWND]:=this
+					if parameter.useupdown
+					{
+						if parameter.range
+							gui,add,updown,% "range" parameter.range
+						else
+							gui,add,updown
+						guicontrol,SettingsOfElement:,GUISettingsOfElement%tempOneParameterID%,%temptext%
+					}
+					this.ContentType:="Expression"
+					;~ GUISettingsOfElementContentType%tempOneParameterID%=Expression
+				}
+				else if (parameter.content="String")
+				{
+					gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempOneParameterID%,icons\string.ico
+					this.components.push("GUISettingsOfElementInfoIconOf" tempOneParameterID)
+					ElementSettingsFieldHWNDs[tempHWND]:=this
+					gui,add,edit,X+4 w360 %tempIsMulti% hwndtempHWND gGUISettingsOfElementCheckContent vGUISettingsOfElement%tempOneParameterID%,%temptext%
+					this.components.push("GUISettingsOfElement" tempOneParameterID)
+					ElementSettingsFieldHWNDs[tempHWND]:=this
+					
+					this.ContentType:="String"
+					;~ GUISettingsOfElementContentType%tempOneParameterID%=String
+				}
+				else if (parameter.content="VariableName")
+				{
+					gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempOneParameterID%,icons\VariableName.ico
+					this.components.push("GUISettingsOfElementInfoIconOf" tempOneParameterID)
+					ElementSettingsFieldHWNDs[tempHWND]:=this
+					gui,add,edit,X+4 w360 %tempIsMulti% hwndtempHWND gGUISettingsOfElementCheckContent vGUISettingsOfElement%tempOneParameterID%,%temptext%
+					this.components.push("GUISettingsOfElement" tempOneParameterID)
+					ElementSettingsFieldHWNDs[tempHWND]:=this
+					
+					this.ContentType:="VariableName"
+					;~ GUISettingsOfElementContentType%tempOneParameterID%=VariableName
+				}
+				else if (parameter.content="StringOrExpression")
+				{
+					
+					
+					if (tempContentTypeNum=1) 
+						gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempOneParameterID%,icons\string.ico
+					else ;If content is expression
+						gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempOneParameterID%,icons\expression.ico
+					this.components.push("GUISettingsOfElementInfoIconOf" tempOneParameterID)
+					ElementSettingsFieldHWNDs[tempHWND]:=this
+					
+					gui,add,edit,X+4 w360 %tempIsMulti% hwndtempHWND gGUISettingsOfElementCheckContent vGUISettingsOfElement%tempOneParameterID%,%temptext%
+					this.components.push("GUISettingsOfElement" tempOneParameterID)
+					ElementSettingsFieldHWNDs[tempHWND]:=this
+					
+					this.ContentType:="StringOrExpression"
+				}
+				else ;Text field without specified content type and without info icon
+				{
+					gui,add,edit,x10 yp w380 %tempIsMulti% hwndtempHWND gGUISettingsOfElementCheckContent vGUISettingsOfElement%tempOneParameterID%,%temptext%
+					this.components.push("GUISettingsOfElement" tempOneParameterID)
+					ElementSettingsFieldHWNDs[tempHWND]:=this
+				}
+				
+				this.checkContent()
+				
+				varsToDelete.push("GUISettingsOfElement" tempOneParameterID, "GUISettingsOfElementContentTypeRadio" tempOneParameterID, "GUISettingsOfElementInfoIconOf" tempOneParameterID, "GUISettingsOfElementWarningIconOf" tempOneParameterID)
 				
 				
 			}
-			if (tempAssigned=false and tempIsDefault=false)
+			else ;If multiple edits in one line
 			{
-				temp:=parameter.default
-				guicontrol,,GUISettingsOfElement%setElementID%%tempParameterID%%temp%,1
+				;~ MsgBox %tempEditwidth%
+				for tempIndex, tempOneParameterID in parameter.id
+				{
+					temptext:=setElement.par[tempOneParameterID] ;get the saved parameter
+					
+					
+					if tempIndex=1
+					{
+						tempEditwidth:= round((380 - (10 * (parameter.id.MaxIndex()-1)))/parameter.id.MaxIndex())
+						tempXpos:="X+4"
+						if (parameter.content="Expression")
+						{
+							gui,add,picture,x10 w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempOneParameterID%,icons\expression.ico
+							this.components.push("GUISettingsOfElementInfoIconOf" tempOneParameterID)
+							ElementSettingsFieldHWNDs[tempHWND]:=this
+							tempXpos:="X+4"
+						}
+						else if (parameter.content="String")
+						{
+							gui,add,picture,x10 w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempOneParameterID%,icons\string.ico
+							this.components.push("GUISettingsOfElementInfoIconOf" tempOneParameterID)
+							ElementSettingsFieldHWNDs[tempHWND]:=this
+							tempXpos:="X+4"
+						}
+						else if (parameter.content="VariableName")
+						{
+							gui,add,picture,x10 w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempOneParameterID%,icons\VariableName.ico
+							this.components.push("GUISettingsOfElementInfoIconOf" tempOneParameterID)
+							ElementSettingsFieldHWNDs[tempHWND]:=this
+							tempXpos:="X+4"
+						}
+						else
+						{
+							tempEditwidth:= round((400 - (10 * (parameter.id.MaxIndex()-1)))/parameter.id.MaxIndex())
+							tempXpos:="x10"
+						}
+					}
+					else
+						tempXpos:="X+10"
+					;~ MsgBox %tempXpos%
+					gui,add,edit,%tempXpos% w%tempEditwidth% hwndtempHWND gGUISettingsOfElementUpdateName vGUISettingsOfElement%tempOneParameterID%,%temptext%
+					this.components.push("GUISettingsOfElement" tempOneParameterID)
+					ElementSettingsFieldHWNDs[tempHWND]:=this
+					
+					this.ContentType:=this.parameter.content
+					
+					varsToDelete.push("GUISettingsOfElement" tempOneParameterID)
+					varsToDelete.push("GUISettingsOfElementContentType" tempOneParameterID)
+					varsToDelete.push("GUISettingsOfElementInfoIconOf" tempOneParameterID)
+				}
+				
+			}
+		}
+		
+		
+		getvalue(parameterID="")
+		{
+			global
+			local temp, tempParameterID
+			if (parameterID!="" and parameterID=this.parameter.id[2] and this.parameter.content = "StringOrExpression")
+			{
+				loop 2
+				{
+					GUIControlGet,temp,SettingsOfElement:,GUISettingsOfElement%parameterID%%a_index%
+					if temp=1
+					{
+						temp:=a_index
+						break
+					}
+				}
+				return temp
+			}
+			else
+			{
+				if parameterID=
+				{
+					tempParameterID:=this.parameter.id
+					if IsObject(tempParameterID)
+						tempParameterID:=tempParameterID[1]
+				}
+				else
+					tempParameterID:=parameterID
+				GUIControlGet,temp,SettingsOfElement:,GUISettingsOfElement%tempParameterID%
+				;~ MsgBox -++-- %parameterID%
+				;~ MsgBox % "..." temp
+				return temp
 			}
 			
 		}
-		else if (parameter.type="Slider")
+		
+		checkContent()
 		{
+			global
+			local tempFoundPos, tempRadioVal, tempOneParamID, tempTextInControl, tempTextInControlReplaced
+			
+			tempRadioID:=this.parameter.id[2]
+			;~ GUIControlGet,tempRadioVal2,SettingsOfElement:,GUISettingsOfElement%tempRadioID%2
+			tempRadioVal:=this.getvalue(tempRadioID)
+			tempOneParamID:=this.parameter.id[1]
+			if tempOneParamID=
+				MsgBox error! tempOneParamID is empty. Code: 7625893756
+			
+			This.warningText:=""
+			if (this.enabled)
+			{
+				tempTextInControl:=this.getvalue(tempOneParamID)
+				;~ MsgBox % tempTextInControl "`n" this.ContentType
+				if (this.ContentType="Expression" or (this.ContentType="StringOrExpression" and tempRadioVal=2))
+				{
+					
+					
+					IfInString,tempTextInControl,`%
+					{
+						guicontrol,SettingsOfElement:show,GUISettingsOfElementWarningIconOf%tempOneParamID%
+						guicontrol,SettingsOfElement:,GUISettingsOfElementWarningIconOf%tempOneParamID%,Icons\Question mark.ico
+						This.warningText:=lang("Note!") " " lang("This is an expression.") " " lang("You musn't use percent signs to add a variable's content.") "`n"
+					}
+				}
+				else if (this.ContentType="variablename")
+				{
+					tempTextInControlReplaced:=tempTextInControl
+					Loop
+					{
+						tempFoundPos:=RegExMatch(tempTextInControlReplaced, "U).*%(.+)%.*", tempVariablesToReplace)
+						if tempFoundPos=0
+							break
+						StringReplace,tempTextInControlReplaced,tempTextInControlReplaced,`%%tempVariablesToReplace1%`%,someVarName
+					}
+					;~ ToolTip( tempTextInControlReplaced " - " tempTextInControl)
+					try
+						asdf%tempTextInControlReplaced%:=1 
+					catch
+					{
+						guicontrol,SettingsOfElement:show,GUISettingsOfElementWarningIconOf%tempOneParamID%
+						guicontrol,SettingsOfElement:,GUISettingsOfElementWarningIconOf%tempOneParamID%,Icons\Exclamation mark.ico
+						This.warningText:=lang("Error!") " " lang("The variable name is not valid.") "`n"
+					}
+				}
+				
+				if (this.WarnIfEmpty)
+				{
+					if tempTextInControl=
+					{
+						guicontrol,SettingsOfElement:show,GUISettingsOfElementWarningIconOf%tempOneParamID%
+						guicontrol,SettingsOfElement:,GUISettingsOfElementWarningIconOf%tempOneParamID%,Icons\Exclamation mark.ico
+						This.warningText:=lang("Error!") " " lang("This field mustn't be empty!") "`n"
+					}
+				}
+			}
+			;~ ToolTip(This.warningText)
+			if (This.warningText="" and !openingElementSettingsWindow)
+			{
+				
+				guicontrol,SettingsOfElement:hide,GUISettingsOfElementWarningIconOf%tempOneParamID%
+			}
+			ElementSettingsNameField.updatename()
+		}
+		
+		clickOnInfoPic()
+		{
+			global
+			local temp, tempOneParamID, tempRadioID
+			tempOneParamID:=this.parameter.id[1]
+			tempRadioID:=this.parameter.id[2]
+			
+			if (this.contenttype="Expression")
+			{
+				ToolTip,% lang("This field contains an expression") "`n" lang("Examples") ":`n5`n5+3*6`nA_ScreenWidth`n(a=4) or (b=1)" ,,,11
+			}
+			if (this.contenttype="String")
+			{
+				ToolTip,% lang("This field contains a string") "`n" lang("Examples") ":`nHello World`nMy name is %A_UserName%`nToday's date is %A_Now%" ,,,11
+			}
+			if (this.contenttype="VariableName") 
+			{
+				ToolTip,% lang("This field contains a variable name") "`n" lang("Examples") ":`nVarname`nEntry1`nEntry%a_index%" ,,,11
+			}
+			if (this.contenttype="StringOrExpression") 
+			{
+				GUIControlGet,temp,SettingsOfElement:,GUISettingsOfElement%tempRadioID%1
+				if (temp=1)
+					ToolTip,% lang("This field contains a string") "`n" lang("Examples") ":`nHello World`nMy name is %A_UserName%`nToday's date is %A_Now%" ,,,11
+				else
+					ToolTip,% lang("This field contains an expression") "`n" lang("Examples") ":`n5`n5+3*6`nA_ScreenWidth`n(a=4) or (b=1)" ,,,11
+			}
+			settimer,GUISettingsOfElementRemoveInfoTooltip,-5000
+		}
+		
+		
+		changeRadio()
+		{
+			global
+			local temp, tempGUIControl, tempContentTypeID
+			tempGUIControl:=this.parameter.id[1]
+			tempContentTypeID:=this.parameter.id[2]
+			
+			temp:=this.getvalue(tempContentTypeID)
+			;~ GUIControlGet,temp,SettingsOfElement:,GUISettingsOfElement%tempContentTypeID%1
+			
+			if temp=1 ;String
+			{
+				guicontrol,SettingsOfElement:,GUISettingsOfElementInfoIconOf%tempGUIControl%,Icons\String.ico
+				
+			}
+			else ;Expression
+			{
+				guicontrol,SettingsOfElement:,GUISettingsOfElementInfoIconOf%tempGUIControl%,Icons\Expression.ico
+				
+			}
+			
+			
+			ElementSettingsNameField.UpdateName()
+			this.checkcontent()
+		}
+		
+	}
+	
+	class slider extends ElementSettings.field
+	{
+		__new(parameter)
+		{
+			global
+			base.__new(parameter)
+			local temp, tempParameterOptions, tempHWND
+			local tempParameterID:=parameter.id
+			
 			gui,font,s8 cDefault wnorm
-			temp:=%setElementID%%tempParameterID% 
+			temp:=setElement.par[tempParameterID] 
 			
 			tempParameterOptions:=parameter.options
 			if (parameter.allowExpression=true)
 			{
-				gui,add,picture,x10 w16 h16 gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%setElementID%%tempParameterID%,icons\expression.ico
-				gui,add,edit,X+6 w190 gGUISettingsOfElementSliderChangeEdit vGUISettingsOfElement%setElementID%%tempParameterID%,%temp%
-				gui,add,slider, w180 X+10 %tempParameterOptions%  gGUISettingsOfElementSliderChangeSlide vGUISettingsOfElementSlideOf%setElementID%%tempParameterID% ,% temp
+				gui,add,picture,x10 w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempParameterID%,icons\expression.ico
+				this.components.push("GUISettingsOfElementInfoIconOf" tempParameterID)
+				ElementSettingsFieldHWNDs[tempHWND]:=this
+				gui,add,edit,X+6 w190 hwndtempHWND gGUISettingsOfElementSliderChangeEdit vGUISettingsOfElement%tempParameterID%,%temp%
+				this.components.push("GUISettingsOfElement" tempParameterID)
+				ElementSettingsFieldHWNDs[tempHWND]:=this
+				gui,add,slider, w180 X+10 %tempParameterOptions%  hwndtempHWND gGUISettingsOfElementSliderChangeSlide vGUISettingsOfElementSlideOf%tempParameterID% ,% temp
+				this.components.push("GUISettingsOfElementSlideOf" tempParameterID)
+				ElementSettingsFieldHWNDs[tempHWND]:=this
 				
-				GUISettingsOfElementContentType%setElementID%%tempParameterID%=Expression
+				this.contentType:="Expression"
 			}
 			else
-				gui,add,slider, w400 x10 %tempParameterOptions%  gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%tempParameterID% ,% temp
+			{
+				gui,add,slider, w400 x10 %tempParameterOptions% hwndtempHWND gGUISettingsOfElementUpdateName vGUISettingsOfElement%tempParameterID% ,% temp
+				this.components.push("vGUISettingsOfElement" tempParameterID)
+				ElementSettingsFieldHWNDs[tempHWND]:=this
+				
+			}
 			
+			varsToDelete.push("GUISettingsOfElement" tempParameterID)
+			varsToDelete.push("GUISettingsOfElementInfoIconOf" tempParameterID)
+			varsToDelete.push("GUISettingsOfElementSlideOf" tempParameterID)
 		}
-		else if (parameter.type="DropDown")
+		
+		sliderChangeEdit()
 		{
+			global
+			local temp, tempGUIControl
+			tempGUIControl:=this.parameter.id
+			temp:=this.getValue()
+			this.setValue(temp,"SlideOf" tempGUIControl)
+			this.udpatename()
+		}
+		sliderChangeSlide()
+		{
+			global
+			local temp, tempGUIControl
+			tempGUIControl:=this.parameter.id
+			temp:=this.getValue("SlideOf" tempGUIControl)
+			this.setValue(temp)
+			this.udpatename()
+		}
+		
+	}
+	
+	class DropDown extends ElementSettings.field
+	{
+		__new(parameter)
+		{
+			global
+			base.__new(parameter)
+			local temp, temptoChoose,tempAltSumbit,tempChoises,tempAllChoices, tempHWND
+			local tempParameterID:=parameter.id
+			
 			gui,font,s8 cDefault wnorm
-			temp:=%setElementID%%tempParameterID% 
-			;~ if temp=
-				;~ temp:=parameter.default
+			temp:=setElement.par[tempParameterID] 
+			
 			if (parameter.result="number")
 			{
 				temptoChoose:=temp
@@ -490,15 +1141,27 @@ ui_settingsOfElement(ElementID,PreviousSubType="")
 			}
 			
 			StringTrimLeft,tempAllChoices,tempAllChoices,1
-			gui,add,DropDownList, w400 x10 %tempAltSumbit% choose%temptoChoose% gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%tempParameterID% ,% tempAllChoices
-			
+			gui,add,DropDownList, w400 x10 %tempAltSumbit% choose%temptoChoose% hwndtempHWND gGUISettingsOfElementUpdateName vGUISettingsOfElement%tempParameterID% ,% tempAllChoices
+			this.components.push("GUISettingsOfElement" tempParameterID)
+			ElementSettingsFieldHWNDs[tempHWND]:=this
+			varsToDelete.push("GUISettingsOfElement" tempParameterID)
 		}
-		else if (parameter.type="ComboBox")
+	}
+	
+	
+	
+	class ComboBox extends ElementSettings.field
+	{
+		__new(parameter)
 		{
+			global
+			base.__new(parameter)
+			local temp, temptoChoose,tempAltSumbit,tempChoises,tempAllChoices, tempHWND
+			local tempParameterID:=parameter.id
+			
 			gui,font,s8 cDefault wnorm
-			temp:=%setElementID%%tempParameterID% 
-			;~ if temp=
-				;~ temp:=parameter.default
+			temp:=setElement.par[tempParameterID] 
+			
 			if (parameter.result="number")
 			{
 				temptoChoose:=temp
@@ -521,468 +1184,474 @@ ui_settingsOfElement(ElementID,PreviousSubType="")
 				
 			}
 			StringTrimLeft,tempAllChoices,tempAllChoices,1
-			gui,add,ComboBox, w400 x10 %tempAltSumbit% choose%temptoChoose% gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%tempParameterID% ,% tempAllChoices
-			guicontrol,text,GUISettingsOfElement%setElementID%%tempParameterID%,% temp
+			
+			gui,add,ComboBox, w400 x10 %tempAltSumbit% choose%temptoChoose% hwndtempHWND gGUISettingsOfElementUpdateName vGUISettingsOfElement%tempParameterID% ,% tempAllChoices
+			this.components.push("GUISettingsOfElement" tempParameterID)
+			ElementSettingsFieldHWNDs[tempHWND]:=this
+			
+			guicontrol,SettingsOfElement:text,GUISettingsOfElement%tempParameterID%,% temp
+			
+			varsToDelete.push("GUISettingsOfElement" tempParameterID)
+		}
+	}
+	
+	class Hotkey extends ElementSettings.field
+	{
+		__new(parameter)
+		{
+			global
+			base.__new(parameter)
+			local temp, tempHWND
+			local tempParameterID:=parameter.id
+			
+			gui,font,s8 cDefault wnorm
+			temp:=setElement.par[tempParameterID] 
+			
+			gui,add,edit,w300 x10 hwndtempHWND gGUISettingsOfElementUpdateName vGUISettingsOfElement%tempParameterID%,%temp%
+			this.components.push("GUISettingsOfElement" tempParameterID)
+			ElementSettingsFieldHWNDs[tempHWND]:=this
+			gui,add,hotkey,w90 X+10 hwndtempHWND gGUISettingsOfElementHotkey vGUISettingsOfElement%tempParameterID%hotkey,%temp%
+			this.components.push("GUISettingsOfElementHotkey" tempParameterID)
+			ElementSettingsFieldHWNDs[tempHWND]:=this
+			
+			varsToDelete.push("GUISettingsOfElement" tempParameterID)
+			varsToDelete.push("GUISettingsOfElementHotkey" tempParameterID)
+		}
+		
+		changeHotkey()
+		{
+			global
+			local temp, tempGUIControl
+			tempGUIControl:=this.parameter.id
+			temp:=this.getValue("Hotkey" tempGUIControl)
+			this.setValue(temp)
+			this.udpatename()
+			return
 			
 		}
-		else if (parameter.type="Hotkey")
+	}
+	
+	class Button extends ElementSettings.field
+	{
+		__new(parameter)
 		{
+			global
+			base.__new(parameter)
+			local temp, tempHWND
+			local tempParameterID:=parameter.id
+			
 			gui,font,s8 cDefault wnorm
-			temp:=%setElementID%%tempParameterID% 
-			;~ if temp=
-			;~ {
-				;~ temp:=parameter.default
-			;~ }
-			gui,add,edit,w300 x10 gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%tempParameterID%,%temp%
-			gui,add,hotkey,w90 X+10 gGUISettingsOfElementHotkey vGUISettingsOfElement%setElementID%%tempParameterID%hotkey,%temp%
+			temp:=parameter.goto
+			gui,add,button,w400 x10 hwndtempHWND gGUISettingsOfElementButton vGUISettingsOfElement%tempParameterID%,% parameter.label
+			this.components.push("GUISettingsOfElement" tempParameterID)
+			ElementSettingsFieldHWNDs[tempHWND]:=this
+			
+			varsToDelete.push("GUISettingsOfElement" tempParameterID)
+		}
+		
+		clickOnButton()
+		{
+			global
+			gosub,% this.parameter.goto
+			return
+		}
+	}
+	
+	class file extends ElementSettings.field
+	{
+		__new(parameter)
+		{
+			global
+			base.__new(parameter)
+			local temp, tempHWND
+			local tempParameterID:=parameter.id
+			
+			gui,font,s8 cDefault wnorm
+			temp:=setElement.par[tempParameterID] 
+			
+			gui,add,edit,w370 x10 hwndtempHWND gGUISettingsOfElementUpdateName vGUISettingsOfElement%tempParameterID%,%temp%
+			this.components.push("GUISettingsOfElement" tempParameterID)
+			ElementSettingsFieldHWNDs[tempHWND]:=this
+			
+			gui,add,button,w20 X+10 hwndtempHWND gGUISettingsOfElementButton vGUISettingsOfElementbutton%tempParameterID%,...
+			this.components.push("GUISettingsOfElementbutton" tempParameterID)
+			ElementSettingsFieldHWNDs[tempHWND]:=this
+			
+			varsToDelete.push("GUISettingsOfElementbutton" tempParameterID)
+			varsToDelete.push("GUISettingsOfElement" tempParameterID)
+		}
+		clickOnButton()
+		{
+			global
+			local tempfile, tempGUIControl
+			tempGUIControl:=this.parameter.id
+			
+			FileSelectFile,tempfile,% this.parameter.options,% this.getvalue(),% this.parameter.prompt,% this.parameter.filter
+			
+			if not errorlevel
+				this.setvalue(tempfile)
+			this.udpatename()
+			return
+		}
+	}
+	
+	class folder extends ElementSettings.field
+	{
+		__new(parameter)
+		{
+			global
+			base.__new(parameter)
+			local temp, tempHWND
+			local tempParameterID:=parameter.id
+			
+			gui,font,s8 cDefault wnorm
+			temp:=setElement.par[tempParameterID] 
+			
+			
+			gui,add,edit,w370 x10 hwndtempHWND gGUISettingsOfElementUpdateName vGUISettingsOfElement%tempParameterID%,%temp%
+			this.components.push("GUISettingsOfElement" tempParameterID)
+			ElementSettingsFieldHWNDs[tempHWND]:=this
+			gui,add,button,w20 X+10 hwndtempHWND gGUISettingsOfElementButton vGUISettingsOfElementbutton%tempParameterID%,...
+			this.components.push("GUISettingsOfElementbutton" tempParameterID)
+			ElementSettingsFieldHWNDs[tempHWND]:=this
+			
+			varsToDelete.push("GUISettingsOfElementbuttonSelectFile__" tempParameterID)
+			varsToDelete.push("GUISettingsOfElement" tempParameterID "Prompt")
+			varsToDelete.push("GUISettingsOfElement" tempParameterID "Options")
+			varsToDelete.push("GUISettingsOfElement" tempParameterID "Filter")
+		}
+		
+		clickOnButton()
+		{
+			global
+			local tempfile, tempGUIControl
+			tempGUIControl:=this.parameter.id
+			
+			FileSelectFolder,tempfile,% "*" this.getvalue(),this.parameter.options,% this.parameter.prompt
+			
+			if not errorlevel
+				this.setvalue(tempfile)
+			this.udpatename()
+			return
 			
 		}
-		else if (parameter.type="Button")
+	}
+	
+	
+	class weekdays extends ElementSettings.field
+	{
+		__new(parameter)
 		{
-			gui,font,s8 cDefault wnorm
-			tempGoto:=parameter.goto
-			gui,add,button,w400 x10  g%tempGoto% vGUISettingsOfElement%setElementID%%tempParameterID%,% parameter.label
-		}
-		else if (parameter.type="File")
-		{
-			gui,font,s8 cDefault wnorm
-			temp:=%setElementID%%tempParameterID% 
-			;~ if temp=
-			;~ {
-				;~ temp:=parameter.default
-			;~ }
-			GUISettingsOfElement%setElementID%%tempParameterID%Prompt:=parameter.label
-			GUISettingsOfElement%setElementID%%tempParameterID%Options:=parameter.options
-			GUISettingsOfElement%setElementID%%tempParameterID%Filter:=parameter.filter
-			gui,add,edit,w370 x10 gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%tempParameterID%,%temp%
-			gui,add,button,w20 X+10  gGUISettingsOfElementSelectFile vGUISettingsOfElementbuttonSelectFile_%setElementID%_%tempParameterID%,...
+			global
+			base.__new(parameter)
+			local temp, tempHWND
+			local tempParameterID:=parameter.id
 			
-		}
-		else if (parameter.type="Folder")
-		{
 			gui,font,s8 cDefault wnorm
-			temp:=%setElementID%%tempParameterID% 
-			;~ if temp=
-			;~ {
-				;~ temp:=parameter.default
-			;~ }
-			GUISettingsOfElement%setElementID%%tempParameterID%Prompt:=parameter4
-			GUISettingsOfElement%setElementID%%tempParameterID%Options:=parameter5
-			GUISettingsOfElement%setElementID%%tempParameterID%Filter:=parameter6
-			gui,add,edit,w370 x10 gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%tempParameterID%,%temp%
-			gui,add,button,w20 X+10  gGUISettingsOfElementSelectFolder vGUISettingsOfElementbuttonSelectFile_%setElementID%_%tempParameterID%,...
-			;~ gui,add,button,w20 X+10 gGUISettingsOfElementSelectFolderHelp,?
-		}
-		else if (parameter.type="weekdays")
-		{
-			gui,font,s8 cDefault wnorm
-			temp:=%setElementID%%tempParameterID% 
+			temp:=setElement.par[tempParameterID] 
 			
-			;~ if temp=
-			;~ {
-				;~ temp:=parameter.default
-			;~ }
-			gui,add,checkbox,w45 x10 gGUISettingsOfElementWeekdays vGUISettingsOfElement%setElementID%%tempParameterID%2,% lang("Mon (Short for Monday")
-			gui,add,checkbox,w45 X+10 gGUISettingsOfElementWeekdays vGUISettingsOfElement%setElementID%%tempParameterID%3,% lang("Tue (Short for Tuesday")
-			gui,add,checkbox,w45 X+10 gGUISettingsOfElementWeekdays vGUISettingsOfElement%setElementID%%tempParameterID%4,% lang("Wed (Short for Wednesday")
-			gui,add,checkbox,w45 X+10 gGUISettingsOfElementWeekdays vGUISettingsOfElement%setElementID%%tempParameterID%5,% lang("Thu (Short for Thursday")
-			gui,add,checkbox,w45 X+10 gGUISettingsOfElementWeekdays vGUISettingsOfElement%setElementID%%tempParameterID%6,% lang("Fri (Short for Friday")
-			gui,add,checkbox,w45 X+10 gGUISettingsOfElementWeekdays vGUISettingsOfElement%setElementID%%tempParameterID%7,% lang("Sat (Short for Saturday")
-			gui,add,checkbox,w45 X+10 gGUISettingsOfElementWeekdays vGUISettingsOfElement%setElementID%%tempParameterID%1,% lang("Sun (Short for Sunday") ;Sunday is 1
+			gui,add,checkbox,w45 x10 hwndtempHWND gGUISettingsOfElementWeekdays vGUISettingsOfElement%tempParameterID%2,% lang("Mon (Short for Monday")
+			this.components.push("GUISettingsOfElement" tempOneParameterID "2")
+			ElementSettingsFieldHWNDs[tempHWND]:=this
+			gui,add,checkbox,w45 X+10 hwndtempHWND gGUISettingsOfElementWeekdays vGUISettingsOfElement%tempParameterID%3,% lang("Tue (Short for Tuesday")
+			this.components.push("GUISettingsOfElement" tempOneParameterID "3")
+			ElementSettingsFieldHWNDs[tempHWND]:=this
+			gui,add,checkbox,w45 X+10 hwndtempHWND gGUISettingsOfElementWeekdays vGUISettingsOfElement%tempParameterID%4,% lang("Wed (Short for Wednesday")
+			this.components.push("GUISettingsOfElement" tempOneParameterID "4")
+			ElementSettingsFieldHWNDs[tempHWND]:=this
+			gui,add,checkbox,w45 X+10 hwndtempHWND gGUISettingsOfElementWeekdays vGUISettingsOfElement%tempParameterID%5,% lang("Thu (Short for Thursday")
+			this.components.push("GUISettingsOfElement" tempOneParameterID "5")
+			ElementSettingsFieldHWNDs[tempHWND]:=this
+			gui,add,checkbox,w45 X+10 hwndtempHWND gGUISettingsOfElementWeekdays vGUISettingsOfElement%tempParameterID%6,% lang("Fri (Short for Friday")
+			this.components.push("GUISettingsOfElement" tempOneParameterID "6")
+			ElementSettingsFieldHWNDs[tempHWND]:=this
+			gui,add,checkbox,w45 X+10 hwndtempHWND gGUISettingsOfElementWeekdays vGUISettingsOfElement%tempParameterID%7,% lang("Sat (Short for Saturday")
+			this.components.push("GUISettingsOfElement" tempOneParameterID "7")
+			ElementSettingsFieldHWNDs[tempHWND]:=this
+			gui,add,checkbox,w45 X+10 hwndtempHWND gGUISettingsOfElementWeekdays vGUISettingsOfElement%tempParameterID%1,% lang("Sun (Short for Sunday") ;Sunday is 1
+			this.components.push("GUISettingsOfElement" tempOneParameterID "1")
+			ElementSettingsFieldHWNDs[tempHWND]:=this
+			
 			IfInString,temp,1
-				guicontrol,,GUISettingsOfElement%setElementID%%tempParameterID%1,1
+				guicontrol,,GUISettingsOfElement%tempParameterID%1,1
 			IfInString,temp,2
-				guicontrol,,GUISettingsOfElement%setElementID%%tempParameterID%2,1
+				guicontrol,,GUISettingsOfElement%tempParameterID%2,1
 			IfInString,temp,3
-				guicontrol,,GUISettingsOfElement%setElementID%%tempParameterID%3,1
+				guicontrol,,GUISettingsOfElement%tempParameterID%3,1
 			IfInString,temp,4
-				guicontrol,,GUISettingsOfElement%setElementID%%tempParameterID%4,1
+				guicontrol,,GUISettingsOfElement%tempParameterID%4,1
 			IfInString,temp,5
-				guicontrol,,GUISettingsOfElement%setElementID%%tempParameterID%5,1
+				guicontrol,,GUISettingsOfElement%tempParameterID%5,1
 			IfInString,temp,6
-				guicontrol,,GUISettingsOfElement%setElementID%%tempParameterID%6,1
+				guicontrol,,GUISettingsOfElement%tempParameterID%6,1
 			IfInString,temp,7
-				guicontrol,,GUISettingsOfElement%setElementID%%tempParameterID%7,1
-			GUISettingsOfElement%setElementID%%tempParameterID%:=temp
-		}
-		else if (parameter.type="TimeOfDay")
-		{
-			gui,font,s8 cDefault wnorm
-			temp:=%setElementID%%tempParameterID% 
-			temptext=%parameter4%
-			if temp=
-			{
-				;~ if parameter2=
-					temp=%a_now%
-				;~ else
-					;~ temp=parameter.default
-			}
-			gui,add,DateTime,w400 x10 choose%temp% gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%tempParameterID% ,time
+				guicontrol,,GUISettingsOfElement%tempParameterID%7,1
 			
-		}
-		else if (parameter.type="DateAndTime")
-		{
-			gui,font,s8 cDefault wnorm
-			temp:=%setElementID%%tempParameterID% 
-			temptext=%parameter4%
-			if temp=
-			{
-				;~ if parameter2=
-					temp=%a_now%
-				;~ else
-					;~ temp=%parameter2%
-			}
-			gui,add,DateTime,w400 x10 choose%temp% gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%tempParameterID% ,% "'" lang("Date") ":' " lang("MM/dd/yy") " '" lang("Time") ":' " lang("HH:mm:ss")
+			;~ GUISettingsOfElement%tempParameterID%:=temp
 			
+			varsToDelete.push("GUISettingsOfElement" tempParameterID)
+			varsToDelete.push("GUISettingsOfElement" tempParameterID1)
+			varsToDelete.push("GUISettingsOfElement" tempParameterID2)
+			varsToDelete.push("GUISettingsOfElement" tempParameterID3)
+			varsToDelete.push("GUISettingsOfElement" tempParameterID4)
+			varsToDelete.push("GUISettingsOfElement" tempParameterID5)
+			varsToDelete.push("GUISettingsOfElement" tempParameterID6)
+			varsToDelete.push("GUISettingsOfElement" tempParameterID7)
 		}
 		
-		else if (parameter.type="Number")
+		getvalue(parameterID="")
 		{
-			TrayTip,%setElementsubType%, nummer will ich nicht haben
-			gui,font,s8 cDefault wnorm
-			temp:=%setElementID%%tempParameterID% 
-			;~ if (temp="")
-				;~ temptext=%parameter2%
-			;~ else
-				temptext=%temp%
-			gui,add,edit,w400 x10 number gGUISettingsOfElementUpdateName vGUISettingsOfElement%setElementID%%tempParameterID%,%temptext%
+			global
+			local temp, tempParameterID
+			if parameterID=
+				tempParameterID:=this.parameter.id
+			else
+				tempParameterID:=parameterID
+			GUIControlGet,temp,SettingsOfElement:,GUISettingsOfElement%tempParameterID%
 			
-		}
-		
-		
-	}
-	
-	gui,submit,nohide
-	if (%ElementID%StandardName==true or %ElementID%StandardName=="")
-	{
-		GuiControl,,GUISettingsOfElementCheckStandardName,1
-		GuiControl,Disable,GUISettingsOfElementEditName
-		GUISettingsOfElementUpdateName()
-	}
-	
-	;~ gui,add,button,w145 x10 h30 gGUISettingsOfElementSave default,% lang("Save")
-	;~ gui,add,button,w145 h30 yp X+10 gGUISettingsOfElementCancel,% lang("Cancel")
-	
-	gui +hwndSettingWindowHWND
-	SG2 := New ScrollGUI(SettingWindowHWND,600, A_ScreenHeight*0.8, " ",2,2)
-	
-	
-	; Create the main window (parent)
-	Gui, GUISettingsOfElementParent:New
-	Gui, GUISettingsOfElementParent:Margin, 0, 20
-	Gui, % SG2.HWND . ": -Caption +ParentGUISettingsOfElementParent +LastFound"
-	Gui, % SG2.HWND . ":Show", Hide  y25
-	WinGetPos, , , WsettingsParent, HsettingsParent,% "ahk_id " SG2.HWND
-	;~ W := Round(W * (96 / A_ScreenDPI))
-	;~ H := Round(H * (96 / A_ScreenDPI))
-	YsettingsButtoPos := HsettingsParent + 10
-	WinGetPos, , , Wsettings, Hsettings,% "ahk_id " SG2.HGUI
-	HParent:=Hsettings+90
-	;Make resizeable
-	gui,+hwndSettingWindowParentHWND
-	gui,+LabelSettingsOfElementParent
-	gui,+resize
-	gui,+minsize%WsettingsParent%x200 ;Ensure constant width.
-	gui,+maxsize%WsettingsParent%x%HParent%
-	
-	;add buttons
-	gui,font,s8 cDefault wnorm
-	gui, GUISettingsOfElementParent:add,button, w370 x10 y10 gGUISettingsOfElementSelectType h20,% lang("%1%_type:_%2%",lang(setElementType),getname%setElementType%%setElementsubType%())
-	gui, GUISettingsOfElementParent:add,button, w20 X+10 yp h20 gGUISettingsOfElementHelp vGUISettingsOfElementHelp,?
-	;~ guicontrol,focus,GUISettingsOfElementHelp
-	Gui, GUISettingsOfElementParent:Add, Button, gGUISettingsOfElementSave vButtonSave w145 x10 h30 y%YsettingsButtoPos%,% lang("Save")
-	Gui, GUISettingsOfElementParent:Add, Button, gGUISettingsOfElementCancel vButtonCancel default w145 h30 yp X+10,% lang("Cancel")
-	;Make GUI autosizing
-	Gui, GUISettingsOfElementParent:Show, hide w%WsettingsParent%
-	Gui, GUISettingsOfElementParent:Show, hide w%WsettingsParent%,% lang("Settings") " - " lang(%ElementID%type) " - " lang(%ElementID%subtype) ;Needed twice, otherwise the width is not correct
-	; Show ScrollGUI1
-	;~ Return
-	
-	;Calculate position to show the settings window in the middle of the main window
-	ui_GetMainGUIPos() 
-	tempHeight:=round(MainGUIHeight-100) ;This will be the max height. If child gui is larger, it must be scrolled
-	WinGetPos,ElSetingGUIX,ElSetingGUIY,ElSetingGUIW,ElSetingGUIH,ahk_id %SettingWindowParentHWND%
-	tempXpos:=round(MainGUIX+MainGUIWidth/2- ElSetingGUIW/2)
-	tempYpos:=round(MainGUIY+MainGUIHeight/2- tempHeight/2)
-	;move Parent window
-	gui,GUISettingsOfElementParent:show,% "x" tempXpos " y" tempYpos " h" tempHeight " hide" 
-	
-	;~ SetWinDelay,0
-	;~ Gui, % SG2.HWND . ":Show", Hide  y40
-	;Make ScrollGUI autosize 
-	SG2.Show("", "x0 y40 h" tempHeight " hide ")
-	
-	;position lower buttons
-	GetClientSize(SettingWindowParentHWND, ElSetingGUIW, ElSetingGUIH)
-	guicontrol, GUISettingsOfElementParent:move,ButtonSave,% "y" ElSetingGUIH-40
-	guicontrol, GUISettingsOfElementParent:move,ButtonCancel,% "y" ElSetingGUIH-40
-	;Position the Scroll gui
-	wingetpos,,,ElSetingGUIW,ElSetingGUIH,ahk_id %SettingWindowParentHWND%
-	WinMove,ahk_id %SettingWindowParentHWND%,,,,% ElSetingGUIW,% ElSetingGUIH+1 ;make the autosize function trigger, which resizes and moves the scrollgui
-	
-	;show gui
-	SG2.Show() 
-	
-	CurrentlyActiveWindowHWND:=SettingWindowParentHWND
-	gui,GUISettingsOfElementParent:show
-	
-	openingElementSettingsWindow:=false
-	return
-	
-
-	
-	GUISettingsOfElementSelectType:
-	gui,SettingsOfElement:destroy
-	SG2.Destroy()
-	gui,GUISettingsOfElementParent:destroy
-	ui_closeHelp()
-	
-	ui_EnableMainGUI()
-	if PreviousSubType2
-		ui_selectElementType(%setElementID%Type,setElementID,PreviousSubType2)
-	else
-		ui_selectElementType(%setElementID%Type,setElementID,%setElementID%SubType)
-	
-
-	return
-	
-	GUISettingsOfElementHelp:
-	;~ MsgBox %setElementType% %setElementsubType%
-	
-	IfWinExist,ahk_id %GUIHelpHWND%
-		ui_closeHelp()
-	else
-		;~ showHelpFor%setElementType%%setElementsubType%()
-	;~ IfWinExist,ahk_id %GUIHelpHWND%
-		;~ ui_closeHelp()
-	;~ else
-		;~ ui_showHelp("index")
-		ui_showHelp(%setElementID%Type "\" %setElementID%subtype)
-	return
-	GUISettingsOfElementCheckStandardName:
-	gui,SettingsOfElement:default
-	gui,submit,nohide
-	
-	if GUISettingsOfElementCheckStandardName=1
-	{
-		GuiControl,Disable,GUISettingsOfElementEditName
-		GUISettingsOfElementUpdateName()
-	}
-	else
-		GuiControl,Enable,GUISettingsOfElementEditName
-	
-	
-	return
-	
-	GUISettingsOfElementSelectFile:
-	StringSplit,tempguicontrol,a_guicontrol,_
-	;MsgBox %tempguicontrol1% %tempguicontrol2% %tempguicontrol3%
-	FileSelectFile,tempfile,% GUISettingsOfElement%tempguicontrol2%%tempguicontrol3%Options,% GUISettingsOfElement%tempguicontrol2%%tempguicontrol3%,% GUISettingsOfElement%tempguicontrol2%%tempguicontrol3%prompt,% GUISettingsOfElement%tempguicontrol2%%tempguicontrol3%filter
-	
-	if not errorlevel
-		guicontrol,,GUISettingsOfElement%tempguicontrol2%%tempguicontrol3%,% tempfile
-	return
-	
-	GUISettingsOfElementSelectFolder:
-	StringSplit,tempguicontrol,a_guicontrol,_
-	;MsgBox %tempguicontrol1% %tempguicontrol2% %tempguicontrol3%
-	FileSelectFolder,tempfile,% "*" GUISettingsOfElement%tempguicontrol2%%tempguicontrol3%,% GUISettingsOfElement%tempguicontrol2%%tempguicontrol3%Options,% GUISettingsOfElement%tempguicontrol2%%tempguicontrol3%prompt
-	
-	if not errorlevel
-		guicontrol,,GUISettingsOfElement%tempguicontrol2%%tempguicontrol3%,% tempfile
-	return
-
-	GUISettingsOfElementHotkey:
-	gui,SettingsOfElement:default
-	gui,submit,nohide
-	StringTrimRight,tempHotkeyCotrol,a_guicontrol,6
-	
-	guicontrol,,%tempHotkeyCotrol%,% %a_guicontrol%
-	return
-	
-	GUISettingsOfElementWeekdays:
-	gui,SettingsOfElement:default
-	gui,submit,nohide
-	StringTrimRight,tempGUICotrol,a_guicontrol,1
-	
-	tempGUICotrolText=
-	loop 7
-	{
-		if (%tempGUICotrol%%a_index%=1)
-		{
-			
-			tempGUICotrolText.=A_Index
-			;MsgBox % setElementID parameter3 "=" %setElementID%%parameter3%
-		}
-		
-	}
-	;MsgBox % tempGUICotrol "=" tempGUICotrolText
-	%tempGUICotrol%:=tempGUICotrolText
-	
-	GUISettingsOfElementUpdateName()
-	return
-	
-	GUISettingsOfElementSliderChangeEdit:
-	gui,SettingsOfElement:default
-	gui,submit,nohide
-	
-	StringTrimleft,tempGUICotrol,a_guicontrol,20
-	;~ MsgBox % GUISettingsOfElement tempGUICotrol
-	guicontrol,,% "GUISettingsOfElementSlideOf" tempGUICotrol,% %a_guicontrol%
-	return
-	GUISettingsOfElementSliderChangeSlide:
-	
-	gui,SettingsOfElement:default
-	gui,submit,nohide
-	
-	StringTrimleft,tempGUICotrol,a_guicontrol,27
-	guicontrol,,% "GUISettingsOfElement" tempGUICotrol,% %a_guicontrol%
-	return
-	
-	
-	
-
-	
-	
-	
-	
-	SettingsOfElementParentClose:
-	SettingsOfElementParentEscape:
-	GUISettingsOfElementCancel:
-	;~ ToolTip %a_thislabel%
-	if (%selElementID%name="Νew Соntainȩr") ;Do not translate!
-	{
-		if %selElementID%Type=trigger
-			e_removeTrigger(selElementID)
-		else
-		{
-			
-			NowResultEditingElement=aborted
-			
-		}
-		ui_draw()
-		gui,SettingsOfElement:default
-	}
-	
-	
-	if PreviousSubType2
-		%selElementID%SubType:=PreviousSubType2
-	
-	ui_closeHelp()
-	
-	gui,SettingsOfElement:destroy
-	SG2.Destroy()
-	gui,GUISettingsOfElementParent:destroy
-	
-	GUISettingsOfElementRemoveInfoTooltip()
-	
-	ui_EnableMainGUI()
-	return
-	
-	
-	
-	GUISettingsOfElementSave:
-	GUISettingsOfElementUpdateName()
-	gui,SettingsOfElement:submit
-	if (%setElementID%type="trigger" and triggersEnabled=true) ;When editing a trigger, disable Triggers and enable them afterwards
-	{
-		tempReenablethen:=true
-		r_EnableFlow()
-	}
-	else
-		tempReenablethen:=false
-	
-	
-	%setElementID%Name:=GUISettingsOfElementEditName
-	%setElementID%StandardName:=GUISettingsOfElementCheckStandardName
-	
-	for index, parameter in parametersToEdit
-	{
-		if not IsObject(parameter.id)
-			parameterID:=[parameter.id]
-		else
-			parameterID:=parameter.id
-		
-		if (parameterID[1]="" or parameter.type="label" or parameter.type="SmallLabel") ;If this is only a label for the edit fielt etc. Do nothing
-			continue
-		;~ MsgBox % strobj(parameterID)
-		
-		if (parameter.type="Radio")
-		{
-			tempOneParID:=parameterID[1]
-			loop % parameter.choices.MaxIndex()
-			{
-				if (GUISettingsOfElement%setElementID%%tempOneParID%%a_index%=1)
-				{
-					
-					%setElementID%%tempOneParID%:=A_Index
-					break
-				}
-			}
-		}
-		else if (parameter.type="weekdays")
-		{
-			tempOneParID:=parameterID[1]
-			%setElementID%%tempOneParID%=
+			temp:=""
 			loop 7
 			{
-				if (GUISettingsOfElement%setElementID%%tempOneParID%%a_index%=1)
+				if (GUISettingsOfElement%tempParameterID%%a_index%=1)
 				{
-					
-					%setElementID%%tempOneParID%.=A_Index
-					
+					temp.=A_Index
 				}
 			}
+			return temp
+		}
+		
+		setvalue(value, parameterID="")
+		{
+			global
+			local tempParameterID:=this.parameter.id
+			if parameterID=
+				tempParameterID:=this.parameter.id
+			else
+				tempParameterID:=parameterID
+			
+			IfInString,value,1
+				guicontrol,SettingsOfElement:,GUISettingsOfElement%tempParameterID%1,1
+			IfInString,value,2
+				guicontrol,SettingsOfElement:,GUISettingsOfElement%tempParameterID%2,1
+			IfInString,value,3
+				guicontrol,SettingsOfElement:,GUISettingsOfElement%tempParameterID%3,1
+			IfInString,value,4
+				guicontrol,SettingsOfElement:,GUISettingsOfElement%tempParameterID%4,1
+			IfInString,value,5
+				guicontrol,SettingsOfElement:,GUISettingsOfElement%tempParameterID%5,1
+			IfInString,value,6
+				guicontrol,SettingsOfElement:,GUISettingsOfElement%tempParameterID%6,1
+			IfInString,value,7
+				guicontrol,SettingsOfElement:,GUISettingsOfElement%tempParameterID%7,1
+			
+			return
+		}
+		
+		changeweekdays() ;TODO remove if no more action necessary
+		{
+			this.udpatename()
+		}
+		
+		
+		
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	;Update the name field
+	updatename()
+	{
+		global
+		GUISettingsOfElementRemoveInfoTooltip()
+		;~ ToolTip updakljö
+		;~ CheckSettings%setElementType%%setElementsubType%(setElement) ;?
+		ElementSettingsNameField.updatename() ;The element 0 contains the name field
+		
+	}
+	
+	
+	
+	
+	
+	
+	;When user wants to edit a trigger element, open a list with containing triggers
+	selectTrigger(wait)
+	{
+		global maingui
+		global allTriggers
+		global CurrentlyActiveWindowHWND
+		global GUISettingsOfElementObject
+		static NowResultEditingElement
+		static GuiTriggerChoose
+		setElement:=this.element
+		
+		
+		NowResultEditingElement:=""
+		
+		
+		
+		TriggersCount:=setElement.triggers.MaxIndex()
+		
+		;~ MsgBox % strobj(setElement)
+		
+		static tempTriggers=[]
+		tempTriggerNames=
+		for index, temptrigger in setElement.triggers
+		{
+			tempTriggers[a_index]:=temptrigger
+			tempTriggerNames.=temptrigger.name "|"
+		}
+		StringTrimRight,tempTriggerNames,tempTriggerNames,1
+		StringSplit,tempTriggerNames,tempTriggerNames,|
+		if (TempTriggerCount=0)
+		{
+			trigger:=new trigger()
+			selectSubType(trigger)
+			return 
 		}
 		else
 		{
-			;Certain types of control consist of multiple controls and thus contain multiple parameters.
-			for index2, oneID in parameterID
+			
+			maingui.disable()
+			;~ gui,GUITrigger:default
+			gui,GUITrigger:-DPIScale
+			;~ gui,+owner
+			gui,GUITrigger:+hwndSettingsHWND
+			this.hwnd:=settingsHWND
+			gui,GUITrigger:add,text,w300,% lang("Select_a_trigger")
+			gui,GUITrigger:add,ListBox,w400 h500 vGuiTriggerChoose gGuiTriggerChoose AltSubmit choose1,%temptriggerNames%
+			gui,GUITrigger:add,button,w100 h30 gGuiTriggerOK default,% lang("OK")
+			gui,GUITrigger:add,button,w90 h30 X+10 gGuiTriggerNew,% lang("New_Trigger")
+			gui,GUITrigger:add,button,w90 X+10 h30 gGuiTriggerDelete,% lang("Delete_Trigger")
+			gui,GUITrigger:add,button,w90 X+10 h30 yp gGuiTriggerCancel,% lang("Cancel")
+			
+			pos:=maingui.getpos()
+
+			gui,GUITrigger:show,hide
+			;Put the window in the center of the main window
+			wingetpos,,,tempWidth,tempHeight,ahk_id %SettingsHWND%
+			tempXpos:=round(pos.x+pos.w/2- tempWidth/2)
+			tempYpos:=round(pos.y+pos.h/2- tempHeight/2)
+			
+			gui,GUITrigger:show,x%tempXpos% y%tempYpos%
+			CurrentlyActiveWindowHWND:=SettingsHWND
+			
+			
+			if (wait=1 or wait="wait")
 			{
-				tempOneParID:=parameterID[index2]
-				%setElementID%%tempOneParID%:=GUISettingsOfElement%setElementID%%tempOneParID%
-				
+				Loop
+				{
+					if (NowResultEditingElement="")
+						sleep 100
+					else 
+						break
+				}
 			}
+			
+			
+			return NowResultEditingElement
+			
+			GuiTriggerChoose:
+			if A_GuiEvent !=DoubleClick 
+				return
+			
+			GuiTriggerOK:
+			gui,GUITrigger:submit
+			
+			;MsgBox %tempElementID%--- %A_EventInfo%
+			gui,GUITrigger:destroy
+			;~ WinActivate,·AutoHotFlow·   ;TODO: warum???
+			;~ MsgBox % GuiTriggerChoose "`n" strobj(tempTriggers[GuiTriggerChoose])
+			GUISettingsOfElementObject.element:=tempTriggers[GuiTriggerChoose]
+			NowResultEditingElement:="OK"
+			return
+			
+			GuiTriggerNew:
+			gui,GUITrigger:destroy
+			maingui.disable()
+			triggerNNew:=new trigger(GUISettingsOfElementObject.element)
+			ret:=selectSubType(triggerNNew,"wait")
+			if (ret="aborted")
+			{
+				;~ MsgBox % strobj(GUISettingsOfElementObject.element.triggers)
+				triggerNNew.remove()
+				NowResultEditingElement:="aborted"
+			}
+			else
+			{
+				;~ MsgBox asgesdfawe
+				GUISettingsOfElementObject.Close()
+				ElementSettings.editParameters(triggerNNew)
+				NowResultEditingElement:="New"
+			}
+			triggerNNew:=""
+			return
+			
+			GuiTriggerDelete:
+			gui,GUITrigger:submit
+			
+			if (setElement.type="trigger" and triggersEnabled=true) ;When editing a trigger, disable Triggers and enable them afterwards
+			{
+				tempReenablethen:=true
+				;r_EnableFlow() ;TODO
+			}
+			else
+				tempReenablethen:=false
+			
+			tempTriggers[GuiTriggerChoose].remove() 
+			tempTriggers:=[]
+			
+			gui,GUITrigger:destroy
+			
+			NowResultEditingElement:="deleted"
+			GUISettingsOfElementObject.element.UpdateName()
+			
+			;if (tempReenablethen) ;TODO
+				;r_EnableFlow()
+			return
+			
+			
+			GuiTriggerCancel:
+			GUITriggerGuiClose:
+			gui,GUITrigger:default
+			gui,GUITrigger:destroy
+			maingui.enable()
+			NowResultEditingElement:="aborted"
+			return
 		}
-		
-		
-		
 	}
 	
-	ui_closeHelp()
-	SG2.Destroy()
-	gui,SettingsOfElement:destroy
-	gui,GUISettingsOfElementParent:destroy
-	GUISettingsOfElementRemoveInfoTooltip()
-	
-	ui_EnableMainGUI()
-	saved=no
-	
-	NowResultEditingElement=OK
-	
-	if (tempReenablethen)
-		r_EnableFlow()
-	
-	if (setElementType="Trigger")
+	;Delete some variables on exit
+	close()
 	{
-		e_UpdateTriggerName()
-		ui_draw()
-		
+		global
+		GUISettingsOfElementObject:=""
+		ElementSettingsFields:=""
+		ElementSettingsFieldHWNDs:=""
+		ElementSettingsFieldParIDs:=""
+		setElementID:=""
+		setElementType:=""
+		setElementsubType:=""
+		setElement:=""
+		ElementSettingsNameField:=""
+		maingui.enable()
 	}
-	
-	ui_draw()
-	return
-	
-	
-	
-	
-	
+
+
+
 	
 }
 
+
+
 SettingsOfElementParentSize(GuiHwnd, EventInfo, Width, Height)
 {
-    global
+	global
 	
 	If (EventInfo <> 1) ;if not minimized
 	{
@@ -999,154 +1668,43 @@ SettingsOfElementParentSize(GuiHwnd, EventInfo, Width, Height)
 }
 
 
-GUISettingsOfElementClickOnRadio(CtrlHwnd, GuiEvent="", EventInfo="", ErrorLevell="")
+
+GUISettingsOfElementChangeRadio(CtrlHwnd, GuiEvent="", EventInfo="", ErrorLevell="")
 {
 	global
-	local tempEnabled
-	local tempControlName
-	local tempValue
-	local tempOneParamID
-	local tempToSetParamID
-	guicontrolget,tempEnabled,enabled,%CtrlHwnd%
-	guicontrolget,tempControlName,name,%CtrlHwnd%
-	;~ guicontrolget,tempValue,,%CtrlHwnd%
-	StringReplace,tempOneParamID,tempControlName,GUISettingsOfElement%setElementID%
-	stringright,tempValue,tempOneParamID,1
-	StringTrimRight,tempOneParamID,tempOneParamID,1
+	ElementSettingsFieldHWNDs[CtrlHwnd].ChangeRadio()
 	
-	if (GUISettingsOfElementContentTypeOf%setElementID%%tempOneParamID%!="")
-	{
-		
-		tempToSetParamID:=GUISettingsOfElementContentTypeOf%setElementID%%tempOneParamID%
-		;~ MsgBox % tempToSetParamID " .- " tempValue
-		if tempValue=1 ;String
-		{
-			guicontrol,,GUISettingsOfElementInfoIconOf%setElementID%%tempToSetParamID%,Icons\String.ico
-			
-		}
-		else ;Expression
-		{
-			guicontrol,,GUISettingsOfElementInfoIconOf%setElementID%%tempToSetParamID%,Icons\Expression.ico
-			
-		}
-	}
+	return
 	
-	GUISettingsOfElementUpdateName()
+	
 }
 
 GUISettingsOfElementCheckContent(CtrlHwnd, GuiEvent="", EventInfo="", ErrorLevell="")
 {
 	global
-	gui,SettingsOfElement:default
-	gui,submit,nohide
+	ElementSettingsFieldHWNDs[CtrlHwnd].checkcontent()
 	
-	local tempEnabled
-	local tempControlName
-	local tempTextInControl
-	local tempOneParamID
-	local tempFoundPos
-	
-	local thiscontrol:=A_GuiControl
-	if thiscontrol=
-		thiscontrol:=
-	;~ MsgBox %tempOneParamID%
-	guicontrolget,tempEnabled,enabled,%CtrlHwnd%
-	guicontrolget,tempControlName,name,%CtrlHwnd%
-	
-	StringReplace,tempOneParamID,tempControlName,GUISettingsOfElement%setElementID%
-	;~ MsgBox %tempEnabled% - %tempControlName% - %tempOneParamID%
-	GUISettingsOfElementWarningTextFor%setElementID%%tempOneParamID%:=
-	if tempEnabled
-	{
-		guicontrolget,tempTextInControl,,%CtrlHwnd%
-		;~ MsgBox % strobj(parametersToEdit[tempOneParamID]) " - " tempOneParamID
-		if (GUISettingsOfElementContentType%setElementID%%tempOneParamID%="Expression")
-		{
-			
-			;~ MsgBox %tempTextInControl%
-			IfInString,tempTextInControl,`%
-			{
-				guicontrol,show,GUISettingsOfElementWarningIconOf%setElementID%%tempOneParamID%
-				guicontrol,,GUISettingsOfElementWarningIconOf%setElementID%%tempOneParamID%,Icons\Question mark.ico
-				GUISettingsOfElementWarningTextFor%setElementID%%tempOneParamID%:=lang("Note!") " " lang("This is an expression.") " " lang("You musn't use percent signs to add a variable's content.") "`n"
-			}
-		}
-		else if (GUISettingsOfElementContentType%setElementID%%tempOneParamID%="variablename")
-		{
-			Loop
-			{
-				tempFoundPos:=RegExMatch(tempTextInControl, "U).*%(.+)%.*", tempVariablesToReplace)
-				if tempFoundPos=0
-					break
-				StringReplace,tempTextInControl,tempTextInControl,`%%tempVariablesToReplace1%`%,someVarName
-				;~ MsgBox %tempVariablesToReplace1%
-			}
-			;~ MsgBox %tempTextInControl%
-			
-			try
-				asdf%tempTextInControl%:=1 
-			catch
-			{
-				guicontrol,show,GUISettingsOfElementWarningIconOf%setElementID%%tempOneParamID%
-				guicontrol,,GUISettingsOfElementWarningIconOf%setElementID%%tempOneParamID%,Icons\Exclamation mark.ico
-				GUISettingsOfElementWarningTextFor%setElementID%%tempOneParamID%:=lang("Error!") " " lang("The variable name is not valid.") "`n"
-				
-			}
-			
-		}
-		
-		if GUISettingsOfElementWarnIfEmpty%setElementID%%tempOneParamID%
-		{
-			if tempTextInControl=
-			{
-				guicontrol,show,GUISettingsOfElementWarningIconOf%setElementID%%tempOneParamID%
-				guicontrol,,GUISettingsOfElementWarningIconOf%setElementID%%tempOneParamID%,Icons\Exclamation mark.ico
-				GUISettingsOfElementWarningTextFor%setElementID%%tempOneParamID%:=lang("Error!") " " lang("This field mustn't be empty!") "`n"
-				
-			}
-			
-		}
-	}
-	
-	
-	
-	if (GUISettingsOfElementWarningTextFor%setElementID%%tempOneParamID%="" and !openingElementSettingsWindow)
-		guicontrol,hide,GUISettingsOfElementWarningIconOf%setElementID%%tempOneParamID%
-	;~ MsgBox %setElementID%%tempOneParamID%
-	GUISettingsOfElementUpdateName()
 	return
 }
 
 
-
-
-GUISettingsOfElementUpdateName()
+GUISettingsOfElementCheckStandardName(CtrlHwnd, GuiEvent="", EventInfo="", ErrorLevell="")
 {
 	global
-	GUISettingsOfElementRemoveInfoTooltip()
-	gui,SettingsOfElement:default
-	gui,submit,nohide
-	
-	
-	CheckSettings%setElementType%%setElementsubType%(setElementID)
-	
-	if GUISettingsOfElementCheckStandardName!=1
-	{
-		
-		return
-	}
-	
-	
-	Newname:=GenerateName%setElementType%%setElementsubType%(setElementID)
-	StringReplace,Newname,Newname,`n,%a_space%-%a_space%,all
-	guicontrol,,GUISettingsOfElementEditName,%Newname%
+	ElementSettingsFieldHWNDs[CtrlHwnd].UpdateName()
 }
 
-GUISettingsOfElementClickOnWarningPic()
+GUISettingsOfElementUpdateName(CtrlHwnd, GuiEvent="", EventInfo="", ErrorLevell="")
 {
-	StringReplace,tempOneParamID,A_GuiControl,GUISettingsOfElementWarningIconOf%setElementID%
-	ToolTip,% GUISettingsOfElementWarningTextFor%setElementID%%tempOneParamID%,,,11
-	settimer,GUISettingsOfElementRemoveInfoTooltip,-5000
+	global
+	ElementSettingsFieldHWNDs[CtrlHwnd].UpdateName()
+	return
+}
+
+GUISettingsOfElementClickOnWarningPic(CtrlHwnd, GuiEvent="", EventInfo="", ErrorLevell="")
+{
+	global
+	ElementSettingsFieldHWNDs[CtrlHwnd].ClickOnWarningPic()
 	return
 }
 GUISettingsOfElementRemoveInfoTooltip()
@@ -1154,62 +1712,54 @@ GUISettingsOfElementRemoveInfoTooltip()
 	ToolTip,,,,11
 	return
 }
-GUISettingsOfElementClickOnInfoPic()
+GUISettingsOfElementClickOnInfoPic(CtrlHwnd, GuiEvent="", EventInfo="", ErrorLevell="")
 {
 	global
-	local tempOneParamID
-	local tempRadioID
-	gui,SettingsOfElement:default
-	gui,submit,nohide
-	StringReplace,tempOneParamID,A_GuiControl,GUISettingsOfElementInfoIconOf%setElementID%
-	;~ MsgBox %tempOneParamID%
-	;~ MsgBox % GUISettingsOfElementContentType%setElementID%%tempOneParamID%
-	if GUISettingsOfElementContentType%setElementID%%tempOneParamID%=Expression
-	{
-		
-		ToolTip,% lang("This field contains an expression") "`n" lang("Examples") ":`n5`n5+3*6`nA_ScreenWidth`n(a=4) or (b=1)" ,,,11
-	}
-	if GUISettingsOfElementContentType%setElementID%%tempOneParamID%=String
-	{
-		
-		ToolTip,% lang("This field contains a string") "`n" lang("Examples") ":`nHello World`nMy name is %A_UserName%`nToday's date is %A_Now%" ,,,11
-	}
-	if GUISettingsOfElementContentType%setElementID%%tempOneParamID%=VariableName
-	{
-		
-		ToolTip,% lang("This field contains a variable name") "`n" lang("Examples") ":`nVarname`nEntry1`nEntry%a_index%" ,,,11
-	}
-	if GUISettingsOfElementContentType%setElementID%%tempOneParamID%=StringOrExpression
-	{
-		tempRadioID:=GUISettingsOfElementContentTypeRadio%setElementID%%tempOneParamID%
-		;~ MsgBox %tempRadioID%
-		;~ MsgBox % GUISettingsOfElement%setElementID%%tempRadioID%1
-		;~ MsgBox % GUISettingsOfElement%setElementID%%tempRadioID%2
-		if (GUISettingsOfElement%setElementID%%tempRadioID%1)
-			ToolTip,% lang("This field contains a string") "`n" lang("Examples") ":`nHello World`nMy name is %A_UserName%`nToday's date is %A_Now%" ,,,11
-		else if (GUISettingsOfElement%setElementID%%tempRadioID%2)
-			ToolTip,% lang("This field contains an expression") "`n" lang("Examples") ":`n5`n5+3*6`nA_ScreenWidth`n(a=4) or (b=1)" ,,,11
-	}
-	settimer,GUISettingsOfElementRemoveInfoTooltip,-5000
-	return
-}
+	ElementSettingsFieldHWNDs[CtrlHwnd].ClickOnInfoPic()
 	
-	
-	
-GUISettingsOfElementButton()
-{
-	;~ MsgBox, %a_guicontrol%`n%A_gui%`n%A_guiEvent%`n%A_EventInfo%
-	gui,submit,nohide
-	RegExMatch(a_guicontrol, "GUISettingsOfElementbutton_(.+)_(.+)_(.+)", tempButton) ;Find out witch button was pressed
-	tempSetWhat:=tempButton1
-	tempSetID:=tempButton2
-	tempSetPar:=tempButton3
-	
-	
-	GUISettingsOfElementUpdateName()
 	return
 }
 
+
+GUISettingsOfElementSliderChangeEdit(CtrlHwnd, GuiEvent="", EventInfo="", ErrorLevell="")
+{
+	global
+	ElementSettingsFieldHWNDs[CtrlHwnd].SliderChangeEdit()
+	return
+}
+
+
+GUISettingsOfElementSliderChangeSlide(CtrlHwnd, GuiEvent="", EventInfo="", ErrorLevell="")
+{
+	global
+	ElementSettingsFieldHWNDs[CtrlHwnd].SliderChangeSlide()
+	return
+}
+
+	
+GUISettingsOfElementHotkey(CtrlHwnd, GuiEvent="", EventInfo="", ErrorLevell="")
+{
+	global
+	ElementSettingsFieldHWNDs[CtrlHwnd].ChangeHotkey()
+	return
+}
+
+GUISettingsOfElementButton(CtrlHwnd, GuiEvent="", EventInfo="", ErrorLevell="")
+{
+	global
+	ElementSettingsFieldHWNDs[CtrlHwnd].ClickOnButton()
+	return
+	
+	
+}
+GUISettingsOfElementWeekdays(CtrlHwnd, GuiEvent="", EventInfo="", ErrorLevell="")
+{
+	global
+	ElementSettingsFieldHWNDs[CtrlHwnd].ChangeWeekdays()
+	return
+	
+	
+}
 
 
 
@@ -1238,35 +1788,37 @@ ui_EnableElementSettingsWindow()
 	WinActivate,% "·AutoHotFlow· " lang("Settings")
 }
 
+
+
+
 ;Select element subtype
-ui_selectElementType(type,setElementID,PreviousSubType="")
+selectSubType(parElement,wait="")
 {
 	global
-	
-	PreviousSubType2:=PreviousSubType ;make it global
+	setElement:=parElement
+	setElementType:=setElement.type 
+	setElementID:=setElement.id
 	
 	NowResultEditingElement=
-	selElementType:=type 
-	selElementID:=setElementID
-	if type=condition
+	if setElementType=condition
 	{
 		tempElements:=IniAllConditions
 		tempElementNames:=IniAllConditionNames
 		tempElementCategories:=IniAllConditionCategories
 	}
-	else if type=trigger
+	else if setElementType=trigger
 	{
 		tempElements:=IniAllTriggers
 		tempElementNames:=IniAllTriggerNames
 		tempElementCategories:=IniAllTriggerCategories
 	}
-	else if type=action
+	else if setElementType=action
 	{
 		tempElements:=IniAllActions
 		tempElementNames:=IniAllActionNames
 		tempElementCategories:=IniAllActionCategories
 	}
-	else if type=loop
+	else if setElementType=loop
 	{
 		tempElements:=IniAllLoops
 		tempElementNames:=IniAllLoopNames
@@ -1274,18 +1826,19 @@ ui_selectElementType(type,setElementID,PreviousSubType="")
 	}
 	else
 	{
-		MsgBox,Internal Error: Unknown element type: %type%
+		MsgBox,Internal Error: Unknown element type: %setElementType%
 		return
 	}
 	StringSplit,tempElements,tempElements,|
 	StringSplit,tempElementNames,tempElementNames,|
 	
-	ui_DisableMainGUI()
+	MainGUI.disable()
 	gui,3:default
 	
 	gui,destroy
+	gui,-dpiscale
 	gui,font,s12
-	gui,add,text,,% lang("Which_%1% should be created?", lang(selElementType))
+	gui,add,text,,% lang("Which_%1% should be created?", lang(setElementType))
 	gui,add,TreeView,w400 h500 vGuiElementChoose gGuiElementChoose AltSubmit
 	gui,add,Button,w250 gGuiElementChooseOK vGuiElementChooseOK default Disabled,% lang("OK")
 	gui,add,Button,w140 X+10 yp gGuiElementChooseCancel,% lang("Cancel")
@@ -1301,7 +1854,7 @@ ui_selectElementType(type,setElementID,PreviousSubType="")
 	{
 		tempAnElementIndex:=a_index
 		tempAnElement:=a_loopfield
-		tempElementCategory:=getcategory%selElementType%%tempAnElement%()
+		tempElementCategory:=%setElementType%%tempAnElement%.getcategory()
 		;MsgBox %tempElementCategory%
 		StringSplit,tempElementCategory,tempElementCategory,|
 		;MsgBox %tempElementCategory1%
@@ -1314,11 +1867,11 @@ ui_selectElementType(type,setElementID,PreviousSubType="")
 				if (a_loopfield=tempAnElementCategory)
 					tempcategoryTV:=tempcategoryTV%a_index%
 			}
-			tempTV:=TV_Add(getname%selElementType%%a_loopfield%(),tempcategoryTV)
+			tempTV:=TV_Add(%setElementType%%a_loopfield%.getname(),tempcategoryTV)
 			TVnum%tempTV%:=tempAnElementIndex
-			TVID%tempTV%:=selElementID
+			TVID%tempTV%:=setElementID
 			TVSubType%tempTV%:=tempElements%tempAnElementIndex%
-			if (%selElementID%SubType=tempAnElement) ;Select the current element type, if any
+			if (setElement.SubType=tempAnElement) ;Select the current element type, if any
 				TV_Modify(tempTV) 
 		}
 		
@@ -1329,35 +1882,51 @@ ui_selectElementType(type,setElementID,PreviousSubType="")
 	gui,+hwndSettingsHWND
 	CurrentlyActiveWindowHWND:=SettingsHWND
 	gui,show,hide
-	ui_GetMainGUIPos()
+	pos:=maingui.getpos()
 	wingetpos,,,tempWidth,tempHeight,ahk_id %SettingsHWND%
-	tempXpos:=round(MainGUIX+MainGUIWidth/2- tempWidth/2)
-	tempYpos:=round(MainGUIY+MainGUIHeight/2- tempHeight/2)
+	tempXpos:=round(pos.x+pos.w/2- tempWidth/2)
+	tempYpos:=round(pos.y+pos.h/2- tempHeight/2)
 	
 	gui,show,x%tempXpos% y%tempYpos%
 	
+	if (wait=1 or wait="wait")
+	{
+		Loop
+		{
+			if (NowResultEditingElement="")
+				sleep 100
+			else 
+			{
+				if (NowResultEditingElement!="aborted")
+				{
+					setElement.subtype:=NowResultEditingElement
+					setElement.setUnsetDefaults()
+				}
+				break
+			}
+		}
+	}
+	
 	;~ MsgBox
-	return
+	return NowResultEditingElement
 
 	3guiclose:
 	GuiElementChooseCancel:
 	gui,3:default
-	ui_EnableMainGUI()
 	gui,destroy
-	if (%selElementID%SubType="" and %selElementID%Type!="Trigger")
+	if (setElement.SubType="" and setElement.Type!="Trigger")
 	{
-		
-		NowResultEditingElement=aborted
-		ui_draw()
+		setElement.remove()
+		;~ ui_draw()
 	}
-	else if (%selElementID%Type="Trigger" and %selElementID%SubType="")
+	else if (setElement.Type="Trigger" and setElement.SubType="") ;Remove trigger if it was a new one
 	{
-		
-		e_removeTrigger(selElementID)
-		ui_draw()
+		;~ MsgBox awgagasdgfwe
+		setElement.remove()
 		
 	}
-	gui,MainGUI:default
+	NowResultEditingElement=aborted
+	maingui.enable()
 	return
 	GuiElementChoose:
 	gui,3:default
@@ -1381,51 +1950,51 @@ ui_selectElementType(type,setElementID,PreviousSubType="")
 	if GuiElementChoosedID=
 		return
 	gui,destroy
-	gui,MainGUI:default
-	ui_EnableMainGUI()
+	maingui.enable()
 	
 	
 	
+	;MsgBox,%setElementID% %GuiElementChoose%
 	
-	;MsgBox,%selElementID% %GuiElementChoose%
-	
-	%GuiElementChoosedID%subType:=TVsubType%GuiElementChoosedTV%
 	;%GuiElementChoosedID%name:="¦ new element" ;Do not translate!
-	NowResultEditingElement=OK
+	NowResultEditingElement:=TVsubType%GuiElementChoosedTV%
 	
-	e_setUnsetDefaults(GuiElementChoosedID)
-	ui_settingsOfElement(GuiElementChoosedID,PreviousSubType2)
-
+	GUISettingsOfElementObject.open()
+	
 	return 
 	
 }
 
-ui_selectConnectionType(tempNewID)
+
+
+
+
+selectConnectionType(parelement,wait="")
 {
 	global 
-	temp_from:=%tempNewID%from
-	ConnectionType:=%tempNewID%ConnectionType
-	temp_fromType:=%temp_from%type
-	;~ if temp_fromType=
-		;~ temp_fromType=Condition
+	static NowResultEditingElement, setElement, temp_from, ConnectionType
 	
-	ui_DisableMainGUI()
+	NowResultEditingElement:=""
+	setElement:=parelement
+	temp_from:=allelements[setElement.from]
+	ConnectionType:=setElement.Type
+	
+	
+	maingui.disable()
 	gui, 7:default
-
-
 	gui,font,s12
 	gui,add,text,,% lang("Select_Connection_type")
 		
 	
-	if (temp_fromType="Condition")
+	if (temp_from.type="Condition")
 	{
-		if (ConnectionType="exception")
+		if (setElement.Type="exception")
 		{
 			gui,add,Button,w100 h50 gGuiConnectionChooseTrue vGuiConnectionChooseTrue ,% lang("Yes")
 			gui,add,Button,w100 h50 X+10 gGuiConnectionChooseFalse vGuiConnectionChooseFalse,% lang("No")
 			gui,add,Button,w100 h50 X+10 gGuiConnectionChooseException vGuiConnectionChooseException default,% lang("Exception")
 		}
-		else if (ConnectionType="no")
+		else if (setElement.Type="no")
 		{
 			gui,add,Button,w100 h50 gGuiConnectionChooseTrue vGuiConnectionChooseTrue ,% lang("Yes")
 			gui,add,Button,w100 h50 X+10 gGuiConnectionChooseFalse vGuiConnectionChooseFalse default,% lang("No")
@@ -1444,7 +2013,7 @@ ui_selectConnectionType(tempNewID)
 	}
 	else
 	{
-		if (ConnectionType="exception")
+		if (setElement.Type="exception")
 		{
 			gui,add,Button,w100 h50 gGuiConnectionChooseNormal vGuiConnectionChooseNormal,% lang("Normal")
 			gui,add,Button,w100 h50 X+10 gGuiConnectionChooseException vGuiConnectionChooseException default,% lang("Exception")
@@ -1464,69 +2033,76 @@ ui_selectConnectionType(tempNewID)
 	gui,+hwndSettingsHWND
 	CurrentlyActiveWindowHWND:=SettingsHWND
 	gui,show,hide
-	ui_GetMainGUIPos()
+	pos:=maingui.getpos()
 	wingetpos,,,tempWidth,tempHeight,ahk_id %SettingsHWND%
-	tempXpos:=round(MainGUIX+MainGUIWidth/2- tempWidth/2)
-	tempYpos:=round(MainGUIY+MainGUIHeight/2- tempHeight/2)
+	tempXpos:=round(pos.x+pos.w/2- tempWidth/2)
+	tempYpos:=round(pos.y+pos.h/2- tempHeight/2)
 	
 	gui,show,x%tempXpos% y%tempYpos%
 	
-	NowConnectionChoosed=
-	Loop
+	if (wait=1 or wait="wait")
 	{
-		sleep,10
-		if (NowConnectionChoosed)
-			return NowConnectionChoosed
+		Loop
+		{
+			if (NowResultEditingElement="")
+				sleep 100
+			else 
+			{
+				if (NowResultEditingElement!="aborted")
+					setElement.ConnectionType:=NowResultEditingElement
+				break
+			}
+		}
 	}
-	
-	return
+	return NowResultEditingElement
 	
 	
 	7guiclose:
 	GuiConnectionChooseCancel:
 	gui,destroy
-	ui_EnableMainGUI()
-	gui,MainGUI:default
-	NowConnectionChoosed:="aborted"
+	maingui.enable()
+	NowResultEditingElement:="aborted"
 	return 
 	
 	GuiConnectionChooseTrue:
 	gui,destroy
-	ui_EnableMainGUI()
-	gui,MainGUI:default
-	NowConnectionChoosed:="yes"
+	maingui.enable()
+	NowResultEditingElement:="yes"
+	setElement.ConnectionType:=NowResultEditingElement
 	return
 	
 	GuiConnectionChooseFalse:
 	gui,destroy
-	ui_EnableMainGUI()
-	gui,MainGUI:default
-	NowConnectionChoosed:="no"
+	maingui.enable()
+	NowResultEditingElement:="no"
+	setElement.ConnectionType:=NowResultEditingElement
 	return 
 	
 	GuiConnectionChooseException:
 	gui,destroy
-	ui_EnableMainGUI()
-	gui,MainGUI:default
-	NowConnectionChoosed:="exception"
+	maingui.enable()
+	NowResultEditingElement:="exception"
+	setElement.ConnectionType:=NowResultEditingElement
 	return 
 	
 	GuiConnectionChooseNormal:
 	gui,destroy
-	ui_EnableMainGUI()
-	gui,MainGUI:default
-	NowConnectionChoosed:="normal"
+	maingui.enable()
+	NowResultEditingElement:="normal"
+	setElement.ConnectionType:=NowResultEditingElement
 	return 
 	
 	
 }
 
-ui_selectContainerType(tempNewID="")
+
+selectContainerType(parelement="", wait="")
 {
 	global 
-	
-	
-	ui_DisableMainGUI()
+	static NowResultEditingElement
+	NowResultEditingElement:=""
+	setElement:=parelement
+	maingui.disable()
 	gui, 8:default
 	
 
@@ -1534,13 +2110,11 @@ ui_selectContainerType(tempNewID="")
 	gui,add,text,,% lang("Select_element_type")
 		
 	
-	if (tempNewID%type%="Action" or tempNewID%type%="")
+	if (setElement.type="Action" or setElement.type="")
 	{
 		gui,add,Button,w100 h50 gGuiElementTypeChooseAction gGuiElementTypeChooseAction default,% lang("Action")
 		gui,add,Button,w100 h50 X+10 gGuiElementTypeChooseCondition gGuiElementTypeChooseCondition,% lang("Condition")
 		gui,add,Button,w100 h50 X+10 gGuiElementTypeChooseLoop gGuiElementTypeChooseLoop,% lang("Loop")
-		
-		
 		
 	}
 	else
@@ -1557,51 +2131,58 @@ ui_selectContainerType(tempNewID="")
 	gui,+hwndSettingsHWND
 	CurrentlyActiveWindowHWND:=SettingsHWND
 	gui,show,hide
-	ui_GetMainGUIPos()
+	pos:=maingui.getpos()
 	wingetpos,,,tempWidth,tempHeight,ahk_id %SettingsHWND%
-	tempXpos:=round(MainGUIX+MainGUIWidth/2- tempWidth/2)
-	tempYpos:=round(MainGUIY+MainGUIHeight/2- tempHeight/2)
+	tempXpos:=round(pos.x+pos.w/2- tempWidth/2)
+	tempYpos:=round(pos.y+pos.h/2- tempHeight/2)
 	
 	gui,show,x%tempXpos% y%tempYpos%
 	
-	NowTypeChoosed=
-	Loop
+	if (wait=1 or wait="wait")
 	{
-		sleep,10
-		if (NowTypeChoosed)
-			return NowTypeChoosed
+		Loop
+		{
+			if (NowResultEditingElement="")
+				sleep 100
+			else 
+			{
+				if (NowResultEditingElement!="aborted")
+					setElement.type:=NowResultEditingElement
+				break
+			}
+		}
 	}
 	
-	return
+	return NowResultEditingElement
 	
 	
 	8guiclose:
 	GuiElementTypeChooseCancel:
 	gui,destroy
-	ui_EnableMainGUI()
+	maingui.enable()
 	gui,MainGUI:default
-	NowTypeChoosed:="aborted"
+	NowResultEditingElement:="aborted"
 	return 
 	
 	GuiElementTypeChooseAction:
 	gui,destroy
-	ui_EnableMainGUI()
+	maingui.enable()
 	gui,MainGUI:default
-	NowTypeChoosed:="action"
+	NowResultEditingElement:="action"
 	return
 	
 	GuiElementTypeChooseCondition:
 	gui,destroy
-	ui_EnableMainGUI()
+	maingui.enable()
 	gui,MainGUI:default
-	NowTypeChoosed:="condition"
+	NowResultEditingElement:="condition"
 	return
 	
 	GuiElementTypeChooseLoop:
 	gui,destroy
-	ui_EnableMainGUI()
+	maingui.enable()
 	gui,MainGUI:default
-	NowTypeChoosed:="loop"
+	NowResultEditingElement:="loop"
 	return 
 	
 	

@@ -7,7 +7,7 @@ runActionRename_folder(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	local tempoldname
 	local tempPath:=% v_replaceVariables(InstanceID,ThreadID,%ElementID%folder)
 	if  DllCall("Shlwapi.dll\PathIsRelative","Str",tempPath)
-		tempPath:=SettingWorkingDir "\" tempPath
+		tempPath:=flowSettings.WorkingDir "\" tempPath
 	
 	if tempPath=
 	{

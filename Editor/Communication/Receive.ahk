@@ -44,7 +44,7 @@ Loop
 	{
 		logger("a2","Command received to start run.")
 		
-		r_startRun(tempNewReceivedCommand)
+		;r_startRun(tempNewReceivedCommand) ;TODO
 		
 	}
 	;A trigger or an action of other flow wants the flow to start
@@ -53,7 +53,7 @@ Loop
 		if tempNewReceivedCommand["ElementID"]
 		{
 			logger("a2","Command received to trigger the flow.")
-			r_trigger(tempNewReceivedCommand["ElementID"],tempNewReceivedCommand)
+			;r_trigger(tempNewReceivedCommand["ElementID"],tempNewReceivedCommand) ;Todo
 		}
 		else
 		{
@@ -75,21 +75,21 @@ Loop
 		
 		logger("a2","Command received to enable flow.")
 		if (triggersEnabled=false)
-			goto,ui_Menu_Enable
+			maingui.show()
 		
 	}
 	;Manager or other flow wants this flow to disable
 	else if (tempNewReceivedCommand["Function"]="disable")
 	{
 		logger("a2","Command received to disable flow.")
-		if (triggersEnabled=true)
-			goto,ui_Menu_Enable
+		;if (triggersEnabled=true)
+			;goto,ui_Menu_Enable ;TODO
 		
 	}
 	;Manager wants this flow to show the edit window
 	else if (tempNewReceivedCommand["Function"]="edit")
 	{
-		ui_showgui()
+		maingui.show()
 		logger("a2","Command received to show the edit window.")
 		
 	}
@@ -108,7 +108,7 @@ Loop
 		else
 		{
 			logger("a2","Command received to end element " tempNewReceivedCommand["ElementID"] " with result: " tempNewReceivedCommand["Result"])
-			MarkThatElementHasFinishedRunningOneVar(tempNewReceivedCommand["ElementID"],tempNewReceivedCommand["Result"])
+			;MarkThatElementHasFinishedRunningOneVar(tempNewReceivedCommand["ElementID"],tempNewReceivedCommand["Result"]) ;TODO
 		}
 	}
 	;Manager flow asks this flow to report current status
@@ -144,8 +144,8 @@ Loop
 	{
 		logger("a2","Command received with answer from called flow that is has finished.")
 		;~ ToolTip % strobj(tempNewReceivedCommand)
-		v_ImportLocalVariablesFromObject(tempNewReceivedCommand["CallerInstanceID"],tempNewReceivedCommand["localVariables"])
-		MarkThatElementHasFinishedRunning(tempNewReceivedCommand["CallerInstanceID"],tempNewReceivedCommand["CallerThreadID"],tempNewReceivedCommand["CallerElementID"],tempNewReceivedCommand["CallerElementIDInInstance"],"normal")
+		;v_ImportLocalVariablesFromObject(tempNewReceivedCommand["CallerInstanceID"],tempNewReceivedCommand["localVariables"]) ;TODO
+		;MarkThatElementHasFinishedRunning(tempNewReceivedCommand["CallerInstanceID"],tempNewReceivedCommand["CallerThreadID"],tempNewReceivedCommand["CallerElementID"],tempNewReceivedCommand["CallerElementIDInInstance"],"normal") ;TODO
 		;~ MsgBox % "finished`n" strobj(tempNewReceivedCommand)
 	}
 	;Generated script action, condition or loop tells that it has finished
@@ -154,8 +154,8 @@ Loop
 		logger("a2","Command received with answer from generated script that is has finished.")
 		;~ ToolTip % strobj(tempNewReceivedCommand)
 		;~ MsgBox % strobj(tempNewReceivedCommand["localVariables"])
-		v_ImportLocalVariablesFromObject(tempNewReceivedCommand["InstanceID"],tempNewReceivedCommand["localVariables"])
-		v_ImportThreadVariablesFromObject(tempNewReceivedCommand["InstanceID"],tempNewReceivedCommand["ThreadID"],tempNewReceivedCommand["threadVariables"])
+		;v_ImportLocalVariablesFromObject(tempNewReceivedCommand["InstanceID"],tempNewReceivedCommand["localVariables"]) ;TODO
+		;v_ImportThreadVariablesFromObject(tempNewReceivedCommand["InstanceID"],tempNewReceivedCommand["ThreadID"],tempNewReceivedCommand["threadVariables"]) ;TODO
 		temptype:=%ElementID%type
 		tempsubtype:=%ElementID%subtype
 		
@@ -163,9 +163,9 @@ Loop
 		if not (tempresult="normal" or tempresult = "exception" or tempresult = "yes" or tempresult = "no")
 			tempresult=normal
 		
-		MarkThatElementHasFinishedRunning(tempNewReceivedCommand["InstanceID"],tempNewReceivedCommand["ThreadID"],tempNewReceivedCommand["ElementID"],tempNewReceivedCommand["ElementIDInInstance"],tempresult)
+		;MarkThatElementHasFinishedRunning(tempNewReceivedCommand["InstanceID"],tempNewReceivedCommand["ThreadID"],tempNewReceivedCommand["ElementID"],tempNewReceivedCommand["ElementIDInInstance"],tempresult) ;TODO
 		
-		stopOneElement%temptype%%tempsubtype%(tempNewReceivedCommand["InstanceID"],tempNewReceivedCommand["ThreadID"],tempNewReceivedCommand["ElementID"],tempNewReceivedCommand["ElementIDInInstance"])
+		;stopOneElement%temptype%%tempsubtype%(tempNewReceivedCommand["InstanceID"],tempNewReceivedCommand["ThreadID"],tempNewReceivedCommand["ElementID"],tempNewReceivedCommand["ElementIDInInstance"]) ;TODO
 		;~ MsgBox % "finished`n" strobj(tempNewReceivedCommand)
 	}
 	;Manager tells that flow parameters (like flow name) has changed

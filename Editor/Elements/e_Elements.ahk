@@ -1,313 +1,497 @@
-﻿;Create a new Trigger container
-ID_Count=1
+﻿
+globalcounter=0
 
-;Creates a new trigger container
-;This function is called only once on startup
-e_newTriggerContainer()
+;Create arrays
+allElements:=new ObjectwithCounter()
+allConnections:=new ObjectwithCounter()
+allTriggers:=new ObjectwithCounter()
+markedElements:=new ObjectwithCounter()
+
+class ObjectwithCounter
 {
-	global
-	tempNewID:="trigger" 
-	allElements.insert(tempNewID)
-	
-	
-	
-	%tempNewID%marked=false
-	%tempNewID%running:=0
-	%tempNewID%Type=Trigger
-	%tempNewID%Name=Νew Соntainȩr
-	ui_seekForNewElementPosition()
-	%tempNewID%x=%goodNewPositionX%
-	%tempNewID%y=%goodNewPositionY%
-	ID_Count++
-	return (tempNewID)
-}
-
-;Creates a new trigger
-e_NewTrigger()
-{
-	global
-	tempNewID:="trigger" ID_Count
-	allTriggers.insert(tempNewID)
-	
-	
-	%tempNewID%Type=Trigger
-	;%tempNewID%Name=Trigger
-	ID_Count++
-	return (tempNewID)
-}
-
-;Creates a new action
-e_NewAction()
-{
-	global
-	tempNewID:="action" ID_Count
-	
-	allElements.insert(tempNewID)
-	%tempNewID%marked=false
-	%tempNewID%running:=0
-	%tempNewID%Type=Action
-	%tempNewID%Name=Νew Соntainȩr
-	;ui_seekForNewElementPosition()
-	;%tempNewID%x=%goodNewPositionX%
-	;%tempNewID%y=%goodNewPositionY%
-	ID_Count++ 
-
-	
-	return (tempNewID)
-}
-
-;Creates a new condition
-e_NewCondition()
-{
-	global
-	tempNewID:="condition" ID_Count
-	allElements.insert(tempNewID)
-	%tempNewID%marked=false
-	%tempNewID%running:=0
-	
-	%tempNewID%Type=Condition
-	%tempNewID%Name=Νew Соntainȩr
-	;ui_seekForNewElementPosition()
-	;%tempNewID%x=%goodNewPositionX%
-	;%tempNewID%y=%goodNewPositionY%
-	ID_Count++
-
-	return (tempNewID)
-}
-
-;Creates a new loop. ;Not used yet
-e_NewLoop()
-{
-	global
-	tempNewID:="loop" ID_Count
-	allElements.insert(tempNewID)
-	%tempNewID%marked=false
-	%tempNewID%running:=0
-	%tempNewID%heightOfVerticalBar:=Gridy*5
-	
-	%tempNewID%Type=Loop
-	%tempNewID%Name=Νew Соntainȩr
-	;ui_seekForNewElementPosition()
-	;%tempNewID%x=%goodNewPositionX%
-	;%tempNewID%y=%goodNewPositionY%
-	ID_Count++
-
-	return (tempNewID)
-}
-
-;Creates a new connection
-;Param 	from 	ID of the element to start
-;Param 	to 		ID of the element to end
-;Param 	ConnectionType 		Type of connection
-e_newConnection(from,to,ConnectionType="normal")
-{
-	global
-	tempNewID:="Connection" ID_Count
-	allElements.insert(tempNewID)
-	%tempNewID%from:=from
-	%tempNewID%to:=to
-	%tempNewID%marked=false
-	%tempNewID%running:=0
-	%tempNewID%Type=Connection
-	%tempNewID%ConnectionType=%ConnectionType%
-
-	
-	
-	
-
-	ID_Count++
-	return (tempNewID)
-}
-
-
-
-
-;Generates the trigger name. It is genereted from all names of all triggers.
-e_UpdateTriggerName()
-{
-	global
-	triggername=Trigger`n
-	for objectCount, tempTrigger in allTriggers
+	count() 
 	{
-		triggername:= triggername "- " %tempTrigger%name "`n"
-	}
-	ui_draw()
-}
-
-;Remove an trigger
-e_removeTrigger(id)
-{
-	global
-	for objectCount, tempDel in allTriggers
-	{
-		if (tempDel=id)
-			allTriggers.remove(objectCount)
+		return NumGet(&this + 4*A_PtrSize)
 	}
 }
 
-;Remove an element
-e_removeElement(id)
+class commonForElements
 {
-	global
-	
-	tempObject:=Object() 
-	temp=0
-	if (%id%Type="Action" or %id%Type="Condition" or %id%Type="Loop") ;If an element was removed, Delete also all Connections to and from that element
+	__New(elementtype,elementid="")
 	{
-		for index, tempdelelement in allElements 
+		;~ MsgBox asve
+		this.marked:=false
+		this.running:=0
+	}
+	
+	markAll()
+	{
+		global markedElements 
+		global allElements 
+		global allConnections 
+		global TheOnlyOneMarkedElement 
+		
+		markedElements:=new ObjectwithCounter() ;remove all marked elements
+		for index, tempelement in allElements ;Add all marked elements into array
+		{
+			tempelement.marked:=true
+			markedElements.push(tempelement)
+		}
+		for index, tempelement in allConnections ;Add all marked elements into array
+		{
+			tempelement.marked:=true
+			markedElements.push(tempelement)
+		}
+		TheOnlyOneMarkedElement:=""
+		ui_UpdateStatusbartext()	
+		
+	}
+	
+	mark(additional:=false)
+	{
+		global markedElements
+		global allConnections
+		global allElements
+		global TheOnlyOneMarkedElement
+		
+		if (additional=false)
+		{
+			for index, tempelement in markedElements
+			{
+				tempelement.marked:=false
+			}
+			this.marked:=true
+		}
+		else ;if (additional=true)
+		{
+			;msgbox,% toMark "`n" toMark.marked
+			
+			if (this.marked=true)
+				this.marked:=false
+			else
+				this.marked:=true
+		}
+		
+		markedElements:=new ObjectwithCounter() ;remove all marked elements
+		
+		;Search for marked elements
+		TheOnlyOneMarkedElement=
+		for index, tempelement in allElements ;Add all marked elements into array
+		{
+			if (tempelement.marked=true)
+			{
+				markedElements.push(tempelement)
+				TheOnlyOneMarkedElement:=tempelement
+			}
+			;MsgBox,% element.id "   " element.marked
+		}
+		for index, tempelement in allConnections ;Add all marked elements into array
+		{
+			if (tempelement.marked=true)
+			{
+				markedElements.push(tempelement)
+				TheOnlyOneMarkedElement:=tempelement
+			}
+			;MsgBox,% element.id "   " element.marked
+		}
+		if (markedElements.count()!=1)
+			TheOnlyOneMarkedElement=
+		
+		;ToolTip("-" element.id "-" element.marked "-" TheOnlyOneMarkedElement )
+		ui_UpdateStatusbartext()
+	}
+	
+	unmarkAll()
+	{
+		global markedElements 
+		global allElements 
+		global allConnections 
+		global TheOnlyOneMarkedElement 
+		
+		markedElements:=new ObjectwithCounter() ;remove all marked elements
+		for index, tempelement in allElements ;Add all marked elements into array
+		{
+			tempelement.marked:=false
+		}
+		for index, tempelement in allConnections ;Add all marked elements into array
+		{
+			tempelement.marked:=false
+		}
+		TheOnlyOneMarkedElement:=""
+		ui_UpdateStatusbartext()
+	}
+	
+	IDtoObject(ID)
+	{
+		global allelements
+		global allConnections
+		global allTriggers
+		
+		for index, tempelement in allelements
+		{
+			if (tempelement.id=id)
+				return tempelement
+		}
+		for index, tempelement in allConnections
+		{
+			if (tempelement.id=id)
+				return tempelement
+		}
+		for index, tempelement in allTriggers
+		{
+			if (tempelement.id=id)
+				return tempelement
+		}
+		return
+	}
+	
+	
+	
+}
+
+class element extends commonForElements ;Such as action, trigger (container), condition, loop
+{
+	__New(elementtype="",elementid=""){
+		base.__new(elementtype,elementid)
+		;~ MsgBox % this.marked
+		global globalcounter
+		global allElements
+		global GridX, Gridy
+		
+		if (elementid="")
+			this.ID:="element" . format("{1:010u}",++globalcounter) 
+		else
+			this.ID:=elementid
+		
+		this.ClickPriority:=500
+		this.par:=[]
+		
+		;Assign default position, although it is commonly not needed (except when creating the trigger container)
+		this.x:=GridX * 9
+		this.y:=Gridy * 5
+		
+		this.type:=elementtype
+		
+		allElements[this.id]:=this
+		;~ MsgBox % "+++"  this.type "  " this.id "  " this.name
+	}
+	
+	type[] ;When changing type, set some default values depending on element type
+	{
+		set
+		{
+			this._type:=value 
+			
+			if (this.type="Trigger")
+			{
+				this.triggers:=new ObjectwithCounter()
+				this.name:=""
+			}
+			else
+				this.name:="Νew Соntainȩr"
+			
+			if (this.type="Loop")
+			{
+				this.heightOfVerticalBar:=150
+			}
+		}
+		get
+		{
+			return this._type
+		}
+		
+	}
+	
+	
+	;Deletes the element from list of all elements
+	remove()
+	{
+		global allElements
+		global allConnections
+		global markedElements
+		
+		if this.type="trigger"
+			return
+		
+		;remove the element from list of all elements
+		for index, tempelement in allElements
+		{
+			if (tempelement=this)
+			{
+				allElements.delete(index)
+				break
+			}
+		}
+		
+		;If the element is marked, unmark it
+		for index, tempelement in markedElements
+		{
+			if (tempelement=this)
+			{
+				this.unmarkAll() ;Unmark all elements
+				break
+			}
+		}
+		
+		;remove the connections which end or start at the element ;TODO: if removing an element with only one connection from and one connection to the element, keep one connection
+		copyAllConnections:=allConnections.clone()
+		for index, tempelement in copyAllConnections
+		{
+			if ((tempelement.from=this.id) or (tempelement.to=this.id))
+			{
+				tempelement.remove()
+			}
+		}
+		
+		
+	}
+	
+	;Is called when the element subtype is set. All parameters that are not set yet are set to the default parameters
+	setUnsetDefaults()
+	{
+		global
+		local parameter, parameters, tempContent, index, index2, oneID
+		
+		local elementType, elementSubType
+		elementType:=this.type
+		elementSubType:=this.subtype
+		
+		parameters:=%elementType%%elementSubType%.getParameters()
+		;~ MsgBox % strobj(parameters) "`n" elementType "`n" elementSubType
+		for index, parameter in parameters
 		{
 			
-			if (%tempdelelement%Type="Connection") 
-			{
-				
-				if (%tempdelelement%to=id or %tempdelelement%from=id )
-				{
-					tempObject.insert(index)
-					
-					
-					temp++
-				}
+			if not IsObject(parameter.id)
+				parameterID:=[parameter.id]
+			else
+				parameterID:=parameter.id
+			if not IsObject(parameter.default)
+				parameterdefault:=[parameter.default]
+			else
+				parameterdefault:=parameter.default
+		
+			if (parameterID[1]="" or parameter.type="label" or parameter.type="SmallLabel") ;If this is only a label for the edit fielt etc. Do nothing
+				continue
 			
+			;~ MsgBox % strobj(parameter)
+			;Certain types of control consist of multiple controls and thus contain multiple parameters.
+			for index2, oneID in parameterID
+			{
+				;~ MsgBox % oneID "  -  " index2 " - " parameterdefault[index2]
+				if (this.par[oneID]="")
+				{
+					tempContent:=parameterdefault[index2]
+					
+					StringReplace, tempContent, tempContent, |¶,`n, All
+					this.par[oneID]:=tempContent
+				}
+				
 			}
 			
+		
 		}
 		
-		for index, tempdelelement in tempObject
-		{
-			allElements.remove(tempdelelement-index+1) ;Change index for further deletions. After every deletion the amount of elements decreases, so the index.
-			
-		}
 		
 	}
 	
 	
-	;Unmark deleted elements
-	for objectCount, tempdelelement in allElements
-	{
-		if (tempdelelement=id)
-		{
-			if %tempdelelement%marked =true
-				countMarkedElements--
-			allElements.remove(objectCount)
-			
-		}
-	}
-	
-}
-
-;retrieves the element number from the id 
-;Param: ID
-;Return: Number
-e_ElementIDtoNumber(id)
-{
-	global
-	for objectCount, tempEl in allElements
-	{
-		if (tempEl=id)
-			return objectCount
-	}
-}
-
-;retrieves the trigger number from the id
-;Param: ID
-;Return: Number
-e_TriggerIDtoNumber(id)
-{
-	global
-	for objectCount, tempEl in allTriggers
-	{
-		if (tempEl=id)
-			return objectCount
-	}
-	
-}
-
-;retrieves the element id from the number 
-;Param: Number
-;Return: ID
-e_ElementNumbertoID(num)
-{
-	global
-	for objectCount, tempEl in allElements
-	{
-		if (objectCount=num)
-			return tempEl
-	}
-}
-
-;retrieves the trigger id from the number 
-;Param: Number
-;Return: ID
-e_TriggerNumbertoID(num)
-{
-	global
-	for objectCount, tempEl in allTriggers
-	{
-		if (objectCount=num)
-			return tempEl
-	}
-}
-
-
-e_getParameter(elementName,parName)
-{
-	global
-	tempToReturn:=%elementName%Ƥаґ%parName%
-	return tempToReturn
 	
 	
-}
-e_setParameter(elementName,parName,value)
-{
-	global
-	%elementName%Ƥаґ%parName%:=value
+	
 	
 	
 }
 
-;Is called when the element subtype is set. All parameters that are not set yet are set to the default parameters
-e_setUnsetDefaults(elementID)
+class connection extends commonForElements
 {
-	global
-	local elementType:=%elementID%type
-	local elementSubType:=%elementID%subtype
-	local parameters
-	try
-		parameters:=getParameters%elementType%%elementSubType%(true)
-	catch
-		parameters:=getParameters%elementType%%elementSubType%()
-	local parameter
-	local index
-	local index2
-	local oneID
-	
-	for index, parameter in parameters
-	{
+	__New(elementtype="",elementid=""){
+		base.__new(elementtype,elementid)
 		
-		if not IsObject(parameter.id)
-			parameterID:=[parameter.id]
+		global globalcounter
+		global allConnections
+		
+		this.marked:=false
+		this.running:=0
+		this.ClickPriority:=200
+		
+		this.ConnectionType:="normal"
+		
+		if (elementid="")
+			this.ID:="connection" . format("{1:010u}",++globalcounter) 
 		else
-			parameterID:=parameter.id
-		if not IsObject(parameter.default)
-			parameterdefault:=[parameter.default]
-		else
-			parameterdefault:=parameter.default
-	
-		if (parameterID[1]="" or parameter.type="label" or parameter.type="SmallLabel") ;If this is only a label for the edit fielt etc. Do nothing
-			continue
-		;~ MsgBox % strobj(parameter)
+			this.ID:=elementid
+		this.type:="Connection"
 		
-		;Certain types of control consist of multiple controls and thus contain multiple parameters.
-		for index2, oneID in parameterID
-		{
-			;~ MsgBox % oneID "  -  " index2 " - " parameterdefault[index2]
-			if %elementID%%oneID%=
-				%elementID%%oneID%:=parameterdefault[index2]
-			
-		}
-		
-	
+		allConnections[this.id]:=this
+		;~ MsgBox % "+++"  this.type "  " this.id "  " this.name
 	}
 	
+	
+	;Deletes the element from list of all elements
+	remove()
+	{
+		global allConnections
+		global markedElements
+		for index, tempelement in allConnections
+		{
+			if (tempelement=this)
+			{
+				allConnections.delete(index)
+				break
+			}
+		}
+		for index, tempelement in markedElements
+		{
+			if (tempelement=this)
+			{
+				this.unmarkAll()
+				break
+			}
+		}
+		
+	}
+	
+	
+	
+}
+
+class trigger extends commonForElements
+{
+    ;~ static type := "trigger"
+    static subtype := ""
+	static ID:=""
+	static name:="Νew Triggȩr"
+	static active:=0
+	
+	
+	__New(TriggerContainer,elementid=""){
+		global globalcounter
+		global allTriggers
+		allTriggers.push(this)
+		if (elementid="")
+			this.ID:="trigger" . format("{1:010u}",++globalcounter) 
+		else
+			this.ID:=elementid
+		TriggerContainer.triggers.push(this)
+		
+		this.ContainerID:=TriggerContainer
+		this.par:=[]
+		
+		this.refreshTriggerList()
+		this.type:= "trigger"
+		;~ MsgBox % "+++"  this.type "  " this.id "  " this.name
+	}
+	
+	;Deletes the element from list of all elements
+	remove()
+	{
+		global allElements
+		global allTriggers
+		for index, tempelement in allElements
+		{
+			if (tempelement.type="trigger")
+			{
+				for index, trigger in tempelement.triggers
+				{
+					if (trigger=this)
+					{
+						tempelement.triggers.delete(index)
+					}
+					
+				}
+			}
+		}
+		this.refreshTriggerList()
+	}
+	
+	;Is called when the element subtype is set. All parameters that are not set yet are set to the default parameters
+	setUnsetDefaults()
+	{
+		global
+		local elementType:=this.type
+		local elementSubType:=this.subtype
+		local parameters
+		try
+			parameters:=%elementType%%elementSubType%.getParameters(true)
+		catch
+			parameters:=%elementType%%elementSubType%.getParameters()
+		local parameter
+		local index
+		local index2
+		local oneID
+		
+		for index, parameter in parameters
+		{
+			
+			if not IsObject(parameter.id)
+				parameterID:=[parameter.id]
+			else
+				parameterID:=parameter.id
+			if not IsObject(parameter.default)
+				parameterdefault:=[parameter.default]
+			else
+				parameterdefault:=parameter.default
+		
+			if (parameterID[1]="" or parameter.type="label" or parameter.type="SmallLabel") ;If this is only a label for the edit fielt etc. Do nothing
+				continue
+			;~ MsgBox % strobj(parameter)
+			
+			;Certain types of control consist of multiple controls and thus contain multiple parameters.
+			for index2, oneID in parameterID
+			{
+				;~ MsgBox % oneID "  -  " index2 " - " parameterdefault[index2]
+				if this.par[oneID]=
+					this.par[oneID]:=parameterdefault[index2]
+				
+			}
+			
+		
+		}
+		
+		
+	}
+	
+	
+	IDtoObject(ID)
+	{
+		global alltriggers
+		
+		for index, ele in alltriggers
+		{
+			if (ele.id=id)
+				return ele
+		}
+		return
+	}
+	
+	refreshTriggerList()
+	{
+		global allElements
+		global alltriggers
+		for index, tempelement in allElements
+		{
+			if (tempelement.type="trigger")
+			{
+				for index, trigger in tempelement.triggers
+				{
+					alltriggers.push(trigger)
+					
+				}
+			}
+		}
+	}
+	
+	
+	
+	UpdateName() ;only for triggers
+	{
+		this.name:=""
+		for index, trigger in this.triggers
+		{
+			this.name:=trigger.name "; ●"
+			
+		}
+		this.name:=substr(this.name,1,-3)
+	}
 	
 }

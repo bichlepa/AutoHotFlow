@@ -1,18 +1,23 @@
 ﻿i_load(ThisFlowFilePath)
 {
 	global
-	local FinishedSaving
+	local FinishedSaving, ThisFlowFolder, tempValue, FlowCompabilityVersion, ID_count, index1, index2
+	local loadElement, loadElementID, loadElementType, loadElementTriggerContainer
+	local AllSections, tempSection, tempContainerID
+	
+	
 	busy:=true
-	ui_disablemaingui()
+	maingui.disable()
 	if ThisFlowFilePath=
 	{
 		logger("a0","ERROR! File path of the Flow not specified!")
 		ExitApp
 		
 	}
-	
-	
+	flow.Filename:=ThisFlowFilename
 	SplitPath,ThisFlowFilePath,,ThisFlowFolder,,ThisFlowFilename
+	flow.Folder:=ThisFlowFolder
+	flow.FilePath:=ThisFlowFilePath
 	
 	logger("a1","Loading flow from file: " ThisFlowFilePath)
 	
@@ -22,28 +27,23 @@
 		ExitApp
 	}
 	
-	ToolTip(lang("loading"),100000)
-	Iniread,FlowCompabilityVersion,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,FlowCompabilityVersion,0
-
-	Iniread,FinishedSaving,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,Finished Saving,No ;Check whether the flow was saved completely
-	if (FinishedSaving="no" and FlowCompabilityVersion>=3)
-	{
-		if fileexist(ThisFlowFolder "\" ThisFlowFilename "_Backup.txt")
-		{
-			MsgBox, 48, AutoHotFlow,%  lang("The flow was not saved properly last time.") " " lang("A backup is available. It will be loaded.")
-			FileMove,%ThisFlowFolder%\%ThisFlowFilename%_Backup.txt,%ThisFlowFolder%\%ThisFlowFilename%.ini,1
-			Iniread,FlowCompabilityVersion,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,FlowCompabilityVersion,0
-		}
-		else
-			MsgBox, 48, AutoHotFlow,% lang("The flow was not saved properly last time.") " " lang("Unfortunately no backup is available.")
-	}
-	Iniread,ID_count,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,count,1
-	Iniread,SettingFlowExecutionPolicy,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,SettingFlowExecutionPolicy,parallel
-	Iniread,SettingWorkingDir,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,SettingWorkingDir,%A_MyDocuments%\AutoHotFlow default working direction
-	if not fileexist(SettingWorkingDir)
+	
+	;read ini file
+	
+	res:=RIni_Read("IniFile",flow.FilePath)
+	if res
+		MsgBox %res%
+	
+	AllSections:=RIni_GetSections("IniFile")
+	flow.CompabilityVersion:=FlowCompabilityVersion:=RIni_GetKeyValue("IniFile", "general", "FlowCompabilityVersion", 0)
+	globalcounter:=RIni_GetKeyValue("IniFile", "general", "count", 1)
+	flowSettings.ExecutionPolicy:=RIni_GetKeyValue("IniFile", "general", "SettingFlowExecutionPolicy", "parallel")
+	flowSettings.WorkingDir:=RIni_GetKeyValue("IniFile", "general", "SettingWorkingDir", A_MyDocuments "\AutoHotFlow default working direction")
+	flowSettings.LogToFile:=RIni_GetKeyValue("IniFile", "general", 0)
+	if not fileexist(flowSettings.WorkingDir)
 	{
 		logger("a1","Working directory of the flow does not exist. Creating it now.")
-		FileCreateDir,%SettingWorkingDir%
+		FileCreateDir,% flowSettings.WorkingDir
 		if errorlevel
 		{
 			logger("a0","Error! Working directory couldn't be created.")
@@ -52,137 +52,127 @@
 	
 	i_loadGeneralParameters() ;Outsourced in order to execute only that later when flow name changes
 	
-	
-	loop
+	loop,parse,AllSections,`,
 	{
-		index1:=A_Index
+		if a_loopfield=general
+			continue
+		tempSection:=A_LoopField
 		
-		Iniread,loadElementID,%ThisFlowFolder%\%ThisFlowFilename%.ini,element%index1%,ID
-		;MsgBox,,, %ID_count%`nIniread,loadElementID,%ThisFlowFolder%\%ThisFlowFilename%.ini,element%index1%,ID`n%loadElementID%
-		if loadElementID=Error
-			break
-		Iniread,loadElementType,%ThisFlowFolder%\%ThisFlowFilename%.ini,element%index1%,Type
-		
-		
-		if (loadElementType="Connection")
+		loadElementID:=RIni_GetKeyValue("IniFile", tempSection, "ID", "")
+		if (loadElementID="")
 		{
-			allElements.insert(loadElementID)
-			
-			%loadElementID%marked=false
-			%loadElementID%running=0
-			
-			%loadElementID%Type=%loadElementType%
-			
-			Iniread,%loadElementID%from,%ThisFlowFolder%\%ThisFlowFilename%.ini,element%index1%,from
-			Iniread,%loadElementID%to,%ThisFlowFolder%\%ThisFlowFilename%.ini,element%index1%,to
-			Iniread,%loadElementID%ConnectionType,%ThisFlowFolder%\%ThisFlowFilename%.ini,element%index1%,ConnectionType
-			
-			Iniread,%loadElementID%fromPart,%ThisFlowFolder%\%ThisFlowFilename%.ini,element%index1%,fromPart,%A_Space%
-			Iniread,%loadElementID%ToPart,%ThisFlowFolder%\%ThisFlowFilename%.ini,element%index1%,toPart,%A_Space%
+			logger("a0","Error! Could not read the ID of an element " tempSection ". This element will not be loaded")
+			continue
 		}
-		else if (loadElementType="Trigger")
-		{
-			Iniread,loadElementX,%ThisFlowFolder%\%ThisFlowFilename%.ini,element%index1%,x
-			Iniread,loadElementY,%ThisFlowFolder%\%ThisFlowFilename%.ini,element%index1%,y
-			%loadElementID%x=%loadElementX%
-			%loadElementID%y=%loadElementY%
-			
-		}
-		else
-		{
-			allElements.insert(loadElementID)
+		loadElementType:=RIni_GetKeyValue("IniFile", tempSection, "Type", "")
 		
-			%loadElementID%marked=false
-			%loadElementID%running=0
+		IfInString,tempSection,element
+		{
 			
-			%loadElementID%Type=%loadElementType%
-			
-			Iniread,loadElementname,%ThisFlowFolder%\%ThisFlowFilename%.ini,element%index1%,name
-			StringReplace, loadElementname, loadElementname, |¶,`n, All
-			
-			
-			Iniread,loadElementX,%ThisFlowFolder%\%ThisFlowFilename%.ini,element%index1%,x
-			Iniread,loadElementY,%ThisFlowFolder%\%ThisFlowFilename%.ini,element%index1%,y
-			
-			
-			%loadElementID%Name=%loadElementname%
-			%loadElementID%x=%loadElementX%
-			%loadElementID%y=%loadElementY%
-			
-			
-			Iniread,loadElementsubType,%ThisFlowFolder%\%ThisFlowFilename%.ini,element%index1%,subType
-			%loadElementID%subType=%loadElementsubType%
-			
-			i_CheckCompabilitySubtype(loadElementID,"element" index1,ThisFlowFolder "\" ThisFlowFilename ".ini")
-			
-			if (loadElementType="loop")
+			if (loadElementType="Connection") ;outdated. kept for compability reasons
 			{
-				Iniread,loadElementHeightOfVerticalBar,%ThisFlowFolder%\%ThisFlowFilename%.ini,element%index1%,HeightOfVerticalBar
-				%loadElementID%HeightOfVerticalBar=%loadElementHeightOfVerticalBar%
+				StringReplace,loadElementID,loadElementID,element,connection
+				loadElement:=new connection(loadElementType,loadElementID)
+				
+				loadElement.from:=RIni_GetKeyValue("IniFile", tempSection, "from", "")
+				loadElement.to:=RIni_GetKeyValue("IniFile", tempSection, "to", "")
+				loadElement.ConnectionType:=RIni_GetKeyValue("IniFile", tempSection, "ConnectionType", "")
+				loadElement.fromPart:=RIni_GetKeyValue("IniFile", tempSection, "fromPart", "")
+				loadElement.ToPart:=RIni_GetKeyValue("IniFile", tempSection, "ToPart", "")
+				
 			}
-			
-			;Get the list of all parameters and read all parameters from ini
-			i_LoadParametersOfElement(loadElementID,loadElementType,loadElementsubType,index1,"element")
-			
-			
+			else if (loadElementType="Trigger")
+			{
+				loadElement:=maintrigger
+				
+				loadElement.x:=RIni_GetKeyValue("IniFile", tempSection, "x", 100)
+				loadElement.y:=RIni_GetKeyValue("IniFile", tempSection, "y", 100)
+				tempValue:=RIni_GetKeyValue("IniFile", tempSection, "name", "")
+				StringReplace, tempValue, tempValue, |¶,`n, All
+				loadElement.Name:=tempValue
+				
+			}
+			else
+			{
+				loadElement:=new element(loadElementType,loadElementID) ;Pass element ID, so it will be the same as the last time
+				
+				tempValue:=RIni_GetKeyValue("IniFile", tempSection, "name", "")
+				StringReplace, tempValue, tempValue, |¶,`n, All
+				loadElement.Name:=tempValue
+				
+				loadElement.StandardName:=RIni_GetKeyValue("IniFile", tempSection, "StandardName", "")
+				loadElement.x:=RIni_GetKeyValue("IniFile", tempSection, "x", 200)
+				loadElement.y:=RIni_GetKeyValue("IniFile", tempSection, "y", 200)
+				
+				loadElement.subType:=RIni_GetKeyValue("IniFile", tempSection, "subType", 200)
+				
+				i_CheckCompabilitySubtype(loadElement,tempSection)
+				
+				if (loadElementType="loop")
+				{
+					loadElement.HeightOfVerticalBar:=RIni_GetKeyValue("IniFile", tempSection, "HeightOfVerticalBar", 200)
+				}
+				;~ MsgBox % strobj(loadElement)
+				;Get the list of all parameters and read all parameters from ini
+				i_LoadParametersOfElement(loadElement,"IniFile",tempSection)
+				
+			}
+			;~ d_ExportAllDataToFile()
+			;~ MsgBox --- %loadElementID% %loadElementType%
+			i_CheckCompability(loadElement,tempSection)
 			
 		}
-		i_CheckCompability(loadElementID,"element" index1,ThisFlowFolder "\" ThisFlowFilename ".ini")
-		ui_draw()
+		
+		IfInString,tempSection,connection
+		{
+			loadElement:=new connection(loadElementType,loadElementID)
+			
+			loadElement.from:=RIni_GetKeyValue("IniFile", tempSection, "from", "")
+			loadElement.to:=RIni_GetKeyValue("IniFile", tempSection, "to", "")
+			loadElement.ConnectionType:=RIni_GetKeyValue("IniFile", tempSection, "ConnectionType", "")
+			loadElement.fromPart:=RIni_GetKeyValue("IniFile", tempSection, "fromPart", "")
+			loadElement.ToPart:=RIni_GetKeyValue("IniFile", tempSection, "ToPart", "")
+			
+			i_CheckCompability(loadElement,tempSection)
+		}
 		
 		
-		
-	}
-	loop
-	{
-		index1:=A_Index
-		
-		Iniread,loadElementID,%ThisFlowFolder%\%ThisFlowFilename%.ini,Trigger%index1%,ID
-		;MsgBox,,, %ID_count%`nIniread,loadElementID,%ThisFlowFolder%\%ThisFlowFilename%.ini,element%index1%,ID`n%loadElementID%
-		if loadElementID=Error
-			break
-		Iniread,loadElementType,%ThisFlowFolder%\%ThisFlowFilename%.ini,Trigger%index1%,Type
-		
-		
-		
-		allTriggers.insert(loadElementID)
-	
-	
-		%loadElementID%Type=%loadElementType%
-		
-		Iniread,loadElementname,%ThisFlowFolder%\%ThisFlowFilename%.ini,Trigger%index1%,name
-		StringReplace, loadElementname, loadElementname, |¶,`n, All
-		%loadElementID%Name=%loadElementname%
-		
-		
-		Iniread,loadElementsubType,%ThisFlowFolder%\%ThisFlowFilename%.ini,Trigger%index1%,subType
-		%loadElementID%subType=%loadElementsubType%
-		
-		
-		i_LoadParametersOfElement(loadElementID,loadElementType,loadElementsubType,index1,"trigger")
-		
-		i_CheckCompability(loadElementID,"trigger" index1,ThisFlowFolder "\" ThisFlowFilename ".ini")
-		
-		
-		
-		;UpdateTriggerName()
-		ui_draw()
-		
-		
+		IfInString,tempSection,trigger
+		{
+			tempContainerID:=RIni_GetKeyValue("IniFile", tempSection, "ContainerID", "trigger")	;For later use. Maybe it will support multiple trigger container.
+			
+			loadElement:=new trigger(tempContainerID,loadElementID)
+			loadElement.Type:=loadElementType
+			allelements[loadElement.Containerid].triggers.push(loadElement)
+			;~ d(loadElement.Containerid,1)
+			;~ d(allelements[loadElement.Containerid],1)
+			
+			tempValue:=RIni_GetKeyValue("IniFile", tempSection, "name", "")
+			StringReplace, tempValue, tempValue, |¶,`n, All
+			loadElement.Name:=tempValue
+			
+			
+			loadElement.subType:=RIni_GetKeyValue("IniFile", tempSection, "subType", "")
+			
+			i_LoadParametersOfElement(loadElement,"IniFile",tempSection)
+			
+			i_CheckCompability(loadElement,tempSection)
+		}
 		
 	}
+	logger("a1","Flow " flowSettings.Name " was successfully loaded.")
 	
-	logger("a1","Flow " FlowName " was successfully loaded.")
-	ToolTip(lang("loaded"),1000)
-	e_UpdateTriggerName()
-	
+	maintrigger.UpdateTriggerName()
 	
 	
-	e_CorrectElementErrors("Loaded the saved flow")
-	ui_EnableMainGUI()
 	
+	;e_CorrectElementErrors("Loaded the saved flow")
+	RIni_Shutdown("IniFile")
+	new state()
+	savedState:=currentstateid
+	maingui.enable()
+	;~ MsgBox %savedState%
 	ui_draw()
-	saved=yes
 	busy:=false
 }
 
@@ -191,18 +181,19 @@ i_loadGeneralParameters()
 	global
 	local temp
 
-	Iniread,Offsetx,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,Offsetx,%Offsetx%
-	Iniread,Offsety,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,OffsetY,%OffsetY%
-	Iniread,zoomFactor,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,zoomFactor,%zoomFactor%
-	Iniread,FlowName,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,name
-	Iniread,FlowCategory,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,category
-	Iniread,SettingFlowLogToFile,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,LogToFile
-	Iniread,FolderOfStaticVariables,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,Static variables folder,%ThisFlowFolder%\Static variables\%ThisFlowFilename%
-	if not fileexist(FolderOfStaticVariables)
-		FileCreateDir,%FolderOfStaticVariables%
+	Offsetx:=RIni_GetKeyValue("IniFile", "general", "Offsetx", Offsetx)
+	Offsety:=RIni_GetKeyValue("IniFile", "general", "Offsety", Offsety)
+	zoomFactor:=RIni_GetKeyValue("IniFile", "general", "zoomFactor", zoomFactor)
+	flowSettings.Name:=RIni_GetKeyValue("IniFile", "general", "name", "")
+	flowSettings.Category:=RIni_GetKeyValue("IniFile", "general", "Category", "")
+	flowSettings.LogToFile:=RIni_GetKeyValue("IniFile", "general", "LogToFile", "")
+	flowSettings.FolderOfStaticVariables:=RIni_GetKeyValue("IniFile", "general", "FolderOfStaticVariables", flow.Folder "\Static variables\" flow.Filename)
+	
+	if not fileexist(flowSettings.FolderOfStaticVariables)
+		FileCreateDir,% flowSettings.FolderOfStaticVariables
 	
 	;Set the name of the flow as text in the hidden window. So the other ahks can find the right window
-	GuiControl,CommandWindow:text,CommandWindowFlowName,Ѻ%flowName%Ѻ§%CurrentManagerHiddenWindowID%§
+	GuiControl,CommandWindow:text,CommandWindowFlowName,% "Ѻ" flowSettings.Name "Ѻ§" CurrentManagerHiddenWindowID "§"
 	
 
 	
@@ -212,36 +203,33 @@ i_loadGeneralParameters()
 	IfWinExist,ahk_id %MainGuihwnd%
 	{
 		if A_IsCompiled
-			gui,1:show,  NA,% "·AutoHotFlow· " lang("Editor") " - " flowName
+			gui,1:show,  NA,% "·AutoHotFlow· " lang("Editor") " - " flowSettings.Name
 		else
-			gui,1:show,  NA,% "·AutoHotFlow· " lang("Editor") " - " flowName " - UNCOMPILED" ;Makes it easier for me to find the uncompiled instance
+			gui,1:show,  NA,% "·AutoHotFlow· " lang("Editor") " - " flowSettings.Name " - UNCOMPILED" ;Makes it easier for me to find the uncompiled instance
 	}
 	DetectHiddenWindows,on
 	;IfWinExist,·AutoHotFlow·
 		;ui_showgui()
 	
-	menu, tray, rename, % Tray_OldShowName, % lang("Edit %1%", flowName)
-	Tray_OldShowName:=lang("Edit %1%", flowName)
+	;menu, tray, rename, % Tray_OldShowName, % lang("Edit %1%", flowSettings.Name)
+	Tray_OldShowName:=lang("Edit %1%", flowSettings.Name)
 	if A_IsCompiled
-		menu,tray,tip,% lang("Flow %1%",flowName) 
+		menu,tray,tip,% lang("Flow %1%",flowSettings.Name) 
 	else
-		menu,tray,tip,% lang("Flow %1%",flowName) " - UNCOMPILED" ;Makes it easier for me to find the uncompiled instance
+		menu,tray,tip,% lang("Flow %1%",flowSettings.Name) " - UNCOMPILED" ;Makes it easier for me to find the uncompiled instance
 	
 	
 }
 
-i_LoadParametersOfElement(loadElementID,loadElementType,loadElementsubType,loadElementIndex,Loadlocation)
+i_LoadParametersOfElement(parElement,parlocation, parElementID)
 {
 	global
-	local parametersToload
-	local index
-	local index2
-	local parameter
-	local parameterID
-	local parameterDefault
-	local tempContent
-	local OneID
-	parametersToload:=getParameters%loadElementType%%loadElementsubType%()
+	local parametersToload, index, index2, parameter, parameterID, parameterDefault, tempContent, OneID, loadElementType, loadElementsubType
+
+	loadElementType:=parElement.type
+	loadElementsubType:=parElement.subtype
+	
+	parametersToload:=%loadElementType%%loadElementsubType%.getParameters()
 	for index, parameter in parametersToload
 	{
 		if not IsObject(parameter.id)
@@ -260,26 +248,16 @@ i_LoadParametersOfElement(loadElementID,loadElementType,loadElementsubType,loadE
 		;Certain types of control consist of multiple controls and thus contain multiple parameters.
 		for index2, oneID in parameterID
 		{
-			
-			if (Loadlocation="clipboard")
-			{
-				;~ MsgBox % loadElementID " - "  loadElementType " - "  loadElementsubType  " - "  loadElementIndex " - " Loadlocation
-				Iniread,tempContent,%ClipboardFlowFilename%,Element%loadElementIndex%,%oneID%,ẺⱤᶉӧɼ
-			}
-			else if (Loadlocation="trigger")
-			{
-				Iniread,tempContent,%ThisFlowFolder%\%ThisFlowFilename%.ini,Trigger%loadElementIndex%,%oneID%,ẺⱤᶉӧɼ
-			}
-			else if (Loadlocation="element")
-				Iniread,tempContent,%ThisFlowFolder%\%ThisFlowFilename%.ini,Element%loadElementIndex%,%oneID%,ẺⱤᶉӧɼ
-			
+			tempContent:=RIni_GetKeyValue(parlocation, parElementID, oneID, "ẺⱤᶉӧɼ")
+				
 			if (tempContent=="ẺⱤᶉӧɼ") ;If a parameter is not set (maybe because some new parameters were added to this element after Update of AHF)
 			{
-				;~ MsgBox element %loadElementID% parameter %parameter3% nicht vorhanden setze es auf %parameter2%
+				
+				;~ MsgBox % "." strobj(parElement)
 				tempContent:=parameterDefault[index2]
 			}
 			StringReplace, tempContent, tempContent, |¶,`n, All
-			%loadElementID%%oneID%:=tempContent
+			parElement.par[oneID]:=tempContent
 		}
 	}
 }

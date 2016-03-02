@@ -51,7 +51,7 @@ runActionSelect_folder(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 
 		tempActionSelectFolderRoot:=v_replaceVariables(ActionSelect_folderStart_CurrentInstanceID,ActionSelect_folderStart_CurrentThread_ID,%ActionSelect_folderToStart_Element_ID%folder)
 		if  DllCall("Shlwapi.dll\PathIsRelative","Str",tempActionSelectFolderRoot)
-			tempActionSelectFolderRoot:=SettingWorkingDir "\" tempActionSelectFolderRoot
+			tempActionSelectFolderRoot:=flowSettings.WorkingDir "\" tempActionSelectFolderRoot
 		
 		if %ActionSelect_folderToStart_Element_ID%ButtonNewFolder
 			tempActionSelectFolderOptions+=1

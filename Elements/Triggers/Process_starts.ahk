@@ -15,7 +15,7 @@ EnableTriggerProcess_starts(ElementID)
 	}
 	
 	TriggerProcess_starts%ElementID%:=object()
-	TriggerProcess_starts%ElementID%["Title"]:="Trigger Process Starts. Flow - " flowName ". ID - " ElementID
+	TriggerProcess_starts%ElementID%["Title"]:="Trigger Process Starts. Flow - " flowSettings.Name ". ID - " ElementID
 	local tempTitle:=TriggerProcess_starts%ElementID%["Title"]
 	local generatedScript
 	

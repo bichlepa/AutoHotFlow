@@ -37,6 +37,7 @@ ui_showHelp(helpFile)
 	
 	Gui, Help:Destroy
 	
+	gui,Help:-dpiscale
 	helpfilepath=Help\%UILang%\%helpFile%.html
 	;~ MsgBox %helpfilepath%
 	IfNotExist, Help\%UILang%\%helpFile%.html
@@ -93,12 +94,6 @@ ui_closeHelp()
 	Gui, Help:Destroy
 }
 
-goto,jumpoverhelplabels
-
-
-
-jumpoverhelplabels:
-temp=
 
 
 

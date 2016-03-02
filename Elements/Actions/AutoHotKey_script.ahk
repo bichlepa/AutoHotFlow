@@ -13,7 +13,7 @@ runActionAutoHotKey_script(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	
 	
 	ActionAutoHotKey_script%ElementID%:=object()
-	ActionAutoHotKey_script%ElementID%["Title"]:="Action AutoHotKey_script. Flow - " flowName ". ID - " ElementID
+	ActionAutoHotKey_script%ElementID%["Title"]:="Action AutoHotKey_script. Flow - " flowSettings.Name ". ID - " ElementID
 	ActionAutoHotKey_script%ElementID%["InstanceID"]:=InstanceID
 	ActionAutoHotKey_script%ElementID%["ThreadID"]:=ThreadID
 	ActionAutoHotKey_script%ElementID%["ElementID"]:=ElementID

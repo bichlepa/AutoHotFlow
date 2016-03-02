@@ -13,7 +13,7 @@ runActionDownload_file(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 		return
 	}
 	if DllCall("Shlwapi.dll\PathIsRelative","Str",tempPath)
-		tempPath:=SettingWorkingDir "\" tempPath
+		tempPath:=flowSettings.WorkingDir "\" tempPath
 	
 	
 

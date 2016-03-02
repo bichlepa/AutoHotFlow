@@ -1,5 +1,101 @@
-This is an incomplete changelog of the last release.
+﻿0.02.22.02
+Minor Bugfixes
 
-- Help files created for all elements
-- Removed action "Folder exists"
-- Many improvements and some bux fixes
+0.02.22.01
+Added Corean translation
+
+0.02.22.00
+Better behaviour when a settings window is opened in the Editor.
+
+0.02.21
+New actions: Get monitor settings, Set monitor settings
+
+0.02.20
+New actions: Eject drive, Lock or unlock drive, Get drive information, Change drive label, List drives
+New trigger: File observer
+In the element settings window Important buttons are now always visible.
+
+0.02.19
+New actions HTTP Request and Screenshot
+
+0.02.18
+New action: HTTP Request
+
+0.02.16
+Element settings: New icons near to edit fields showing which content type it has (Expression, String or Variable name)
+Improved action "Play sound". Now a standard system sound can be selected.
+Improved actions "Message box", "Input Box", and condition "Confirmation dialog". Many new options.
+
+0.02.15
+New elements:
+- Get pixel color
+- Search pixel
+New assistants:
+- Color selection
+- Import color from screen
+- Import position using mouse
+New translation tool
+
+0.02.14
+New element: Search image
+Bugfix in Trigger Shortcut
+Bugfix in Manager which did not reenable flows after shutdown
+
+0.02.13
+Bugfix
+
+0.02.12
+All elements are logging now!
+Many internal changes and buxfixes
+
+0.02.11
+Improved assistant for getting window and control information
+More Logs
+
+0.02.10
+Some more logs and improvements
+
+0.02.09
+Bugfix
+
+0.02.08
+Bugfix
+
+0.02.07
+Bugfix
+High memory consumption due to changes on the graphic rendering.
+
+0.02.06
+No flickering anymore!
+
+0.02.05
+New "About AutoHotKey" window
+
+0.02.04
+New debug dialog
+
+0.02.03
+Help written for every element
+Condition "Folder exists" removed.
+New action "Set lock key"
+Many small improvements
+
+0.02.02
+Action "Date Calculation" improved
+Bugfices
+First entries in the help
+
+0.02.01
+Bugfix: Flows sometimes were disabled on shutdown.
+
+0.02.00
+New element type: Loop
+
+0.01.04
+Enhancements in user interface.
+
+0.01.01
+Text in elements is aligned vertically.
+
+0.01.00
+First BETA Version.

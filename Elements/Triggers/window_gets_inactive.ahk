@@ -48,7 +48,7 @@ EnableTriggerWindow_Gets_Inactive(ElementID)
 	
 	
 	TriggerWindow_Gets_Inactive%ElementID%:=object()
-	TriggerWindow_Gets_Inactive%ElementID%["Title"]:="Trigger Window_Gets_Inactive. Flow - " flowName ". ID - " ElementID
+	TriggerWindow_Gets_Inactive%ElementID%["Title"]:="Trigger Window_Gets_Inactive. Flow - " flowSettings.Name ". ID - " ElementID
 	local tempTitle:=TriggerWindow_Gets_Inactive%ElementID%["Title"]
 	local generatedScript
 	

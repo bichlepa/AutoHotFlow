@@ -8,7 +8,7 @@ runActionRename_file(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	local tempfilename
 	local tempPath:=% v_replaceVariables(InstanceID,ThreadID,%ElementID%file)
 	if  DllCall("Shlwapi.dll\PathIsRelative","Str",tempPath)
-		tempPath:=SettingWorkingDir "\" tempPath
+		tempPath:=flowSettings.WorkingDir "\" tempPath
 	
 	if tempPath=
 	{

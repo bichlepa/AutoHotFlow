@@ -16,7 +16,7 @@ runActionMessage_Box(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	local tempHeight:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%Height)
 	
 	if tempTitle=
-		tempTitle:=Flowname
+		tempTitle:=flowSettings.Name
 	
 	local tempEndTime
 	local tempGUIHWND
@@ -440,57 +440,57 @@ getCategoryActionMessage_Box()
 
 GenerateNameActionMessage_Box(ID)
 {
-	if (strlen(GUISettingsOfElement%ID%message)>100)
+	if (strlen(ElementSettingsFieldParIDs["message"].getvalue())>100)
 	{
-		return lang("Message_Box") ": " GUISettingsOfElement%ID%title " - " substr(GUISettingsOfElement%ID%message,1,100) " ... "
+		return lang("Message_Box") ": " ElementSettingsFieldParIDs["title"].getvalue() " - " substr(ElementSettingsFieldParIDs["message"].getvalue(),1,100) " ... "
 	}
 	else
-		return lang("Message_Box") ": " GUISettingsOfElement%ID%title " - " GUISettingsOfElement%ID%message
+		return lang("Message_Box") ": " ElementSettingsFieldParIDs["title"].getvalue() " - " ElementSettingsFieldParIDs["message"].getvalue()
 	
 }
 
 CheckSettingsActionMessage_Box(ID)
 {
 	global
-	if (GUISettingsOfElement%ID%IsTimeout1 = 1) ;no timeout
+	if (ElementSettingsFieldParIDs["IsTimeout1"].getvalue() = 1) ;no timeout
 	{
 
-		GuiControl,Disable,GUISettingsOfElement%ID%TimeoutUnits
-		GuiControl,Disable,GUISettingsOfElement%ID%Unit1
-		GuiControl,Disable,GUISettingsOfElement%ID%Unit2
-		GuiControl,Disable,GUISettingsOfElement%ID%Unit3
-		GuiControl,Disable,GUISettingsOfElement%ID%OnTimeout1
-		GuiControl,Disable,GUISettingsOfElement%ID%OnTimeout2
+		ElementSettingsFieldParIDs["TimeoutUnits"].Disable()
+		ElementSettingsFieldParIDs["Unit1"].Disable()
+		ElementSettingsFieldParIDs["Unit2"].Disable()
+		ElementSettingsFieldParIDs["Unit3"].Disable()
+		ElementSettingsFieldParIDs["OnTimeout1"].Disable()
+		ElementSettingsFieldParIDs["OnTimeout2"].Disable()
 	}
 	else ;Timeout
 	{
-		GuiControl,Enable,GUISettingsOfElement%ID%TimeoutUnits
-		GuiControl,Enable,GUISettingsOfElement%ID%Unit1
-		GuiControl,Enable,GUISettingsOfElement%ID%Unit2
-		GuiControl,Enable,GUISettingsOfElement%ID%Unit3
-		GuiControl,Enable,GUISettingsOfElement%ID%OnTimeout1
-		GuiControl,Enable,GUISettingsOfElement%ID%OnTimeout2
+		ElementSettingsFieldParIDs["TimeoutUnits"].Enable()
+		ElementSettingsFieldParIDs["Unit1"].Enable()
+		ElementSettingsFieldParIDs["Unit2"].Enable()
+		ElementSettingsFieldParIDs["Unit3"].Enable()
+		ElementSettingsFieldParIDs["OnTimeout1"].Enable()
+		ElementSettingsFieldParIDs["OnTimeout2"].Enable()
 	}
 	
-	if (GUISettingsOfElement%ID%Size1 = 1) ;automatic size
+	if (ElementSettingsFieldParIDs["Size1"].getvalue() = 1) ;automatic size
 	{
 
-		GuiControl,Disable,GUISettingsOfElement%ID%Width
-		GuiControl,Disable,GUISettingsOfElement%ID%Height
+		ElementSettingsFieldParIDs["Width"].Disable()
+		ElementSettingsFieldParIDs["Height"].Disable()
 	}
 	else ;custom 
 	{
-		GuiControl,Enable,GUISettingsOfElement%ID%Width
-		GuiControl,Enable,GUISettingsOfElement%ID%Height
+		ElementSettingsFieldParIDs["Width"].Enable()
+		ElementSettingsFieldParIDs["Height"].Enable()
 	}
 	
-	if (GUISettingsOfElement%ID%ShowCancelButton = 1) 
+	if (ElementSettingsFieldParIDs["ShowCancelButton"].getvalue() = 1) 
 	{
-		GuiControl,Enable,GUISettingsOfElement%ID%ButtonLabelCancel
+		ElementSettingsFieldParIDs["ButtonLabelCancel"].Enable()
 	}
 	else
 	{
-		GuiControl,Disable,GUISettingsOfElement%ID%ButtonLabelCancel
+		ElementSettingsFieldParIDs["ButtonLabelCancel"].Disable()
 	}
 	
 }

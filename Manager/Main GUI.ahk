@@ -90,18 +90,20 @@ changeCategory(tempselectedID)
 return
 
 ButtonHelp:
-IfNotExist, Help\%UILang%\index.html
-{
-	IfNotExist, Help\en\index.html
-	{
-		MsgBox, 16, % lang("Error"),% lang("No help file was found")
-		Return
-	}
-	run,Help\en\index.html
-}
-else
-	run,Help\%UILang%\index.html
+ui_showHelp()
 return
+;~ IfNotExist, %A_ScriptDir%\Help\%UILang%\index.html
+;~ {
+	;~ IfNotExist, %A_ScriptDir%\Help\en\index.html
+	;~ {
+		;~ MsgBox, 16, % lang("Error"),% lang("No help file was found")
+		;~ Return
+	;~ }
+	;~ run,%A_ScriptDir%\Help\en\index.html
+;~ }
+;~ else
+	;~ run,%A_ScriptDir%\Help\%UILang%\index.html
+;~ return
 
 ButtonEditFlow:
 tempselected:=TV_GetSelection() 

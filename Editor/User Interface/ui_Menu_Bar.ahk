@@ -34,12 +34,11 @@ ui_Menu_MenuStart:
 
 if (nowRunning=true)
 {
-	gosub, r_escapeRun
+	r_StopAll()
 }
 else
 {
-	SetTimer,r_startRun,-10
-
+	r_Trigger("User")
 }
 
 return
@@ -48,7 +47,7 @@ return
 
 
 ui_Menu_Enable:
-r_EnableFlow()
+;~ r_EnableFlow()
 return
 
 ui_Menu_Settings:

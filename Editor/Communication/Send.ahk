@@ -1,8 +1,8 @@
 ﻿com_SendCommand(CommandObject,WhichCommandWindow,ToFlowName="")
 {
-	global flowName
+	global flowSettings
 	global CurrentManagerHiddenWindowID
-	CommandObject["SendingFlow"]:=flowName
+	CommandObject["SendingFlow"]:=flowSettings.Name
 	commandstring:=strobj(CommandObject)
 	;~ MsgBox %  "...-" strobj(CommandObject)
 	
@@ -24,6 +24,6 @@
 
 ;Examples:
 
-;   com_SendCommand({function: "FlowParametersChanged"},"editor",flowname) ;Send the command to the Editor.
+;   com_SendCommand({function: "FlowParametersChanged"},"editor",anyflowname) ;Send the command to the Editor.
 
 ;   com_SendCommand({function: "FlowParametersChanged"},"manager") ;Send the command to the Manager.

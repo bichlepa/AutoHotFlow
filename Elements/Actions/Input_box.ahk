@@ -38,7 +38,7 @@ runActionInput_box(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	}
 	
 	if tempTitle=
-		tempTitle:=Flowname
+		tempTitle:=flowSettings.Name
 
 	local tempNew:=Object()
 	tempNew.insert("instanceID",InstanceID)

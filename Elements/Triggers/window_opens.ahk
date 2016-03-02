@@ -48,7 +48,7 @@ EnableTriggerWindow_Opens(ElementID)
 	
 	
 	TriggerWindow_opens%ElementID%:=object()
-	TriggerWindow_opens%ElementID%["Title"]:="Trigger Window_opens. Flow - " flowName ". ID - " ElementID
+	TriggerWindow_opens%ElementID%["Title"]:="Trigger Window_opens. Flow - " flowSettings.Name ". ID - " ElementID
 	local tempTitle:=TriggerWindow_opens%ElementID%["Title"]
 	local generatedScript
 	

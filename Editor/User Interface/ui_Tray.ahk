@@ -38,9 +38,11 @@ goto,JumpOverTrayStuff
 
 
 Show:
-ui_showgui()
+maingui.show()
 
 return
+
+
 
 JumpOverTrayStuff:
 temp= ;Do nothing

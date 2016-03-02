@@ -91,7 +91,7 @@ runActionHTTP_Request(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 			return
 		}
 		if DllCall("Shlwapi.dll\PathIsRelative","Str",InputFile)
-			InputFile:=SettingWorkingDir "\" InputFile
+			InputFile:=flowSettings.WorkingDir "\" InputFile
 		
 		Options.="Upload: " InputFile "`n"
 	}
@@ -124,7 +124,7 @@ runActionHTTP_Request(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 			return
 		}
 		if DllCall("Shlwapi.dll\PathIsRelative","Str",OutputFile)
-			OutputFile:=SettingWorkingDir "\" OutputFile
+			OutputFile:=flowSettings.WorkingDir "\" OutputFile
 		
 		Options.="SaveAs: " OutputFile "`n"
 	}

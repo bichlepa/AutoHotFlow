@@ -8,9 +8,9 @@ runActionMove_file(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	local tempFrom:=% v_replaceVariables(InstanceID,ThreadID,%ElementID%file)
 	local tempTo:=% v_replaceVariables(InstanceID,ThreadID,%ElementID%destFile)
 	if  DllCall("Shlwapi.dll\PathIsRelative","Str",tempFrom)
-		tempFrom:=SettingWorkingDir "\" tempFrom
+		tempFrom:=flowSettings.WorkingDir "\" tempFrom
 	if  DllCall("Shlwapi.dll\PathIsRelative","Str",tempTo)
-		tempTo:=SettingWorkingDir "\" tempTo
+		tempTo:=flowSettings.WorkingDir "\" tempTo
 	
 	if tempFrom=
 	{

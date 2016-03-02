@@ -1,23 +1,49 @@
-﻿;When an element finishes it must call this function
-;It sets some values that tell the run loop that the element has finished and the next ones can be executed
-MarkThatElementHasFinishedRunning(InstanceID,threadID,ElementID,ElementIDInInstance,value,reason="")
+﻿
+;Contains common functions that are needed for execution. They will be available for any element, which are in the subfolders
+class ElementExecution
 {
-	global
-	if reason
-		Instance_%InstanceID%_%threadID%_%ElementID%_%ElementIDInInstance%_reason:=reason
+	__new(p_Thread)
+	{
+		;~ d(p_Thread,"njöo")
+		;Save some informations
+		this.__thread:=&p_Thread
+		this.__instance:=&p_Thread.instance
+		this.element:=p_Thread.element
+		this.par:=p_Element.par.clone() ;Copy all parameters. It might happen that they will be changed by user during execution, which might cause errors
+		
+		this.running:=false
+		this.finished:=false
+		this.started:=false
+	}
 	
-	Instance_%InstanceID%_%threadID%_%ElementID%_%ElementIDInInstance%_result:=value
-	Instance_%InstanceID%_%threadID%_%ElementID%_%ElementIDInInstance%_finishedRunning:=true
-
-}
-
-MarkThatElementHasFinishedRunningOneVar(InstanceIDWithElementID,value)
-{
-	global
-	%InstanceIDWithElementID%_result:=value
-	%InstanceIDWithElementID%_finishedRunning:=true
+	run()
+	{
+		this.running:=true
+		this.started:=true
+	}
 	
-	
+	end(result,ErrorMessage="")
+	{
+		this.finished:=true
+		this.running:=false
+		this.result:=result
+		this.ErrorMessage:=ErrorMessage
+		;~ MsgBox "end"
+	}
+	instance[] ;Helps to save the instance in a parameter avoiding a circular reference
+	{
+		get {
+			if (NumGet(this.__Instance) == NumGet(&this)) ; safety check or you can use try/catch/finally
+				return Object(this.__Instance)
+		}
+	}
+	thread[] ;Helps to save the instance in a parameter avoiding a circular reference
+	{
+		get {
+			if (NumGet(this.__thread) == NumGet(&this)) ; safety check or you can use try/catch/finally
+				return Object(this.__thread)
+		}
+	}
 }
 
 

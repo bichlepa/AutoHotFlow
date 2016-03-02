@@ -19,149 +19,126 @@ i_save()
 	local temponeparname
 	local SaveContent
 	local parametersToSave
+	local CopyOfCurrentState
+	local saveSection
 	
-	ui_DisableMainGUI()
+	
+	maingui.disable()
+	
+	
 	busy:=true
-	GetKeyState,k,control,p 
-	;~ if (ThisFlowFilename="" or k="d") ;this cannot happen anymore
-	;~ {
-		;~ FileSelectFile,ThisFlowFilePath,S24,Saved Flows,Save flow, *.ini
-		;~ if errorlevel
-		;~ {
-			
-			;~ ui_EnableMainGUI()
-			;~ return
-		;~ }
-		;~ SplitPath,ThisFlowFilePath,,ThisFlowFolder,,ThisFlowFilename
-	;~ }
-
-	logger("a1","Saving flow " FlowName)
+	
+	logger("a1","Saving flow " flowSettings.Name)
+	CopyOfCurrentState:=ObjFullyClone(currentstate)
 	ToolTip(lang("saving"),100000)
 	
-	FileCreateDir,%ThisFlowFolder%
-	Filemove,%ThisFlowFolder%\%ThisFlowFilename%.ini,%ThisFlowFolder%\%ThisFlowFilename%_backup.txt
-	i_saveGeneralParameters()
-	IniWrite,%ID_count%,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,count
-	IniWrite,%SettingFlowExecutionPolicy%,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,SettingFlowExecutionPolicy
-	IniWrite,%SettingWorkingDir%,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,SettingWorkingDir
-	IniWrite,%SettingFlowLogToFile%,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,LogToFile
-	IniWrite,%flowName%,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,name
-	IniWrite,%FlowCategory%,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,category
-	IniWrite,%FlowCompabilityVersionOfApp%,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,FlowCompabilityVersion
-	IniWrite,%FolderOfStaticVariables%,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,Static variables folder
-	saveCopyOfallElements:=allElements.clone()
-	saveCopyOfallTriggers:=allTriggers.clone()
+	
+	FileCreateDir,% flow.Folder
+	RIni_Shutdown("SaveFile")
+	Rini_Create("SaveFile")
+	
+	RIni_SetKeyValue("SaveFile", "general", "OffsetX", Offsetx)
+	RIni_SetKeyValue("SaveFile", "general", "OffsetY", Offsety)
+	RIni_SetKeyValue("SaveFile", "general", "zoomFactor", zoomFactor)
+	RIni_SetKeyValue("SaveFile", "general", "count", globalcounter)
+	RIni_SetKeyValue("SaveFile", "general", "SettingFlowExecutionPolicy", flowSettings.ExecutionPolicy)
+	RIni_SetKeyValue("SaveFile", "general", "SettingWorkingDir", flowSettings.WorkingDir)
+	RIni_SetKeyValue("SaveFile", "general", "LogToFile", flowSettings.LogToFile)
+	RIni_SetKeyValue("SaveFile", "general", "name", flowSettings.Name)
+	RIni_SetKeyValue("SaveFile", "general", "category", flowSettings.category)
+	RIni_SetKeyValue("SaveFile", "general", "FlowCompabilityVersion", FlowCompabilityVersionOfApp)
+	RIni_SetKeyValue("SaveFile", "general", "Static variables folder", flowSettings.FolderOfStaticVariables)
 	
 	
-	
-	for SaveIndex1, element in saveCopyOfallElements
+	for saveElementID, saveElement in CopyOfCurrentState.allElements
 	{
-		saveElementID:=element
-		saveElementType:=%saveElementID%Type
+		saveSection:="element" a_index
+		RIni_SetKeyValue("SaveFile", saveSection,"ID", saveElementID)
+		RIni_SetKeyValue("SaveFile", saveSection,"Type", saveElement.type)
 		
-		;~ MsgBox %saveElementID%
-		IniWrite,%element%,%ThisFlowFolder%\%ThisFlowFilename%.ini,element%SaveIndex1%,ID
-		IniWrite,%saveElementType%,%ThisFlowFolder%\%ThisFlowFilename%.ini,element%SaveIndex1%,Type
-		
-		
-		
-		if (saveElementType="Connection")
+		if (saveElement.type="trigger")
 		{
-			saveElementfrom:=%saveElementID%from
-			saveElementto:=%saveElementID%to
-			saveElementConnectionType:=%saveElementID%ConnectionType
-			IniWrite,%saveElementfrom%,%ThisFlowFolder%\%ThisFlowFilename%.ini,element%SaveIndex1%,from
-			IniWrite,%saveElementto%,%ThisFlowFolder%\%ThisFlowFilename%.ini,element%SaveIndex1%,to
-			IniWrite,%saveElementConnectionType%,%ThisFlowFolder%\%ThisFlowFilename%.ini,element%SaveIndex1%,ConnectionType
 			
-			if %saveElementfrom%type=Loop
-			{
-				saveElementfromPart:=%saveElementID%fromPart
-				IniWrite,%saveElementfromPart%,%ThisFlowFolder%\%ThisFlowFilename%.ini,element%SaveIndex1%,fromPart
-			}
-			if %saveElementto%type=Loop
-			{
-				saveElementtoPart:=%saveElementID%toPart
-				IniWrite,%saveElementtoPart%,%ThisFlowFolder%\%ThisFlowFilename%.ini,element%SaveIndex1%,toPart
-			}
-			
-			
-		}
-		else if (saveElementType="trigger")
-		{
-			saveElementX:=%saveElementID%x
-			saveElementY:=%saveElementID%y
-			saveElementname:=%saveElementID%name
+			RIni_SetKeyValue("SaveFile", saveSection,"x", saveElement.x)
+			RIni_SetKeyValue("SaveFile", saveSection,"y", saveElement.y)
+			saveElementname:=saveElement.name
 			StringReplace, saveElementname, saveElementname, `n,|¶, All ;Convert a linefeed to |¶. Otherwise the next lines will not be readable. 
-			IniWrite,%saveElementname%,%ThisFlowFolder%\%ThisFlowFilename%.ini,element%SaveIndex1%,name
-			IniWrite,%saveElementX%,%ThisFlowFolder%\%ThisFlowFilename%.ini,element%SaveIndex1%,x
-			IniWrite,%saveElementY%,%ThisFlowFolder%\%ThisFlowFilename%.ini,element%SaveIndex1%,y
+			RIni_SetKeyValue("SaveFile", saveSection,"name", saveElementname)
 		}
 		else
 		{
-			saveElementX:=%saveElementID%x
-			saveElementY:=%saveElementID%y
-			saveElementsubType:=%saveElementID%subType
-			saveElementname:=%saveElementID%name
-			StringReplace, saveElementname, saveElementname, `n,|¶, All
-			IniWrite,%saveElementsubType%,%ThisFlowFolder%\%ThisFlowFilename%.ini,element%SaveIndex1%,subType
-			IniWrite,%saveElementname%,%ThisFlowFolder%\%ThisFlowFilename%.ini,element%SaveIndex1%,name
-			IniWrite,%saveElementX%,%ThisFlowFolder%\%ThisFlowFilename%.ini,element%SaveIndex1%,x
-			IniWrite,%saveElementY%,%ThisFlowFolder%\%ThisFlowFilename%.ini,element%SaveIndex1%,y
+			RIni_SetKeyValue("SaveFile", saveSection,"x", saveElement.x)
+			RIni_SetKeyValue("SaveFile", saveSection,"y", saveElement.y)
+			saveElementname:=saveElement.name
+			StringReplace, saveElementname, saveElementname, `n,|¶, All ;Convert a linefeed to |¶. Otherwise the next lines will not be readable. 
+			RIni_SetKeyValue("SaveFile", saveSection,"name", saveElementname)
+			RIni_SetKeyValue("SaveFile", saveSection,"subType", saveElement.subType)
 			
 			if (saveElementType="loop")
 			{
-				saveElementHeightOfVerticalBar:=%saveElementID%HeightOfVerticalBar
-				IniWrite,%saveElementHeightOfVerticalBar%,%ThisFlowFolder%\%ThisFlowFilename%.ini,element%SaveIndex1%,HeightOfVerticalBar
+				RIni_SetKeyValue("SaveFile", saveSection,"HeightOfVerticalBar", saveElement.HeightOfVerticalBar)
 			}
 			
-			i_SaveParametersOfElement(saveElementID,saveElementType,saveElementsubType,SaveIndex1,"element")
-			
-			
+			i_SaveParametersOfElement(saveElement,saveSection,"SaveFile")
 			
 		}
 	}
 	
-	for SaveIndex1, tempSaveElement in saveCopyOfallTriggers
+	for saveElementID, saveElement in CopyOfCurrentState.allConnections
 	{
-		saveElementID:=tempSaveElement
-		saveElementType:=%saveElementID%Type
+		saveSection:="Connection" a_index
+		RIni_SetKeyValue("SaveFile", saveSection,"ID", saveElementID)
+		RIni_SetKeyValue("SaveFile", saveSection,"Type", saveElement.type)
 		
-		
-		IniWrite,%saveElementID%,%ThisFlowFolder%\%ThisFlowFilename%.ini,Trigger%SaveIndex1%,ID
-		IniWrite,%saveElementType%,%ThisFlowFolder%\%ThisFlowFilename%.ini,Trigger%SaveIndex1%,Type
-		
-		
-		saveElementsubType:=%saveElementID%subType
-		saveElementname:=%saveElementID%name
-		IniWrite,%saveElementsubType%,%ThisFlowFolder%\%ThisFlowFilename%.ini,Trigger%SaveIndex1%,subType
-		StringReplace, saveElementname, saveElementname, `n,|¶, All ;Convert a linefeed to |¶. Otherwise the next lines will not be readable. 
-		IniWrite,%saveElementname%,%ThisFlowFolder%\%ThisFlowFilename%.ini,Trigger%SaveIndex1%,name
-		
-		i_SaveParametersOfElement(saveElementID,saveElementType,saveElementsubType,SaveIndex1,"trigger")
-		
-		
-		
+		RIni_SetKeyValue("SaveFile", saveSection,"from", saveElement.from)
+		RIni_SetKeyValue("SaveFile", saveSection,"to", saveElement.to)
+		RIni_SetKeyValue("SaveFile", saveSection,"ConnectionType", saveElement.ConnectionType)
+		if (saveElement.frompart)
+			RIni_SetKeyValue("SaveFile", saveSection,"fromPart", saveElement.frompart)
+		if (saveElement.toPart)
+			RIni_SetKeyValue("SaveFile", saveSection,"toPart", saveElement.toPart)
 	}
-	IniWrite,Yes,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,Finished Saving
 	
-	Filedelete,%ThisFlowFolder%\%ThisFlowFilename%_backup.txt
-	logger("a1","Flow " FlowName " was successfully saved.")
-	ToolTip(lang("saved"))
-	ui_EnableMainGUI()
-	saved=yes
+	
+	
+	for index, saveElement in CopyOfCurrentState.allTriggers
+	{
+		saveSection:="Trigger" a_index
+		saveElementID:="trigger" index
+		RIni_SetKeyValue("SaveFile", saveSection,"ID", saveElementID)
+		RIni_SetKeyValue("SaveFile", saveSection,"Type", saveElement.type)
+		RIni_SetKeyValue("SaveFile", saveSection,"ContainerID", saveElement.ContainerID)
+		
+		RIni_SetKeyValue("SaveFile", saveSection,"subType", saveElement.subType)
+		
+		saveElementname:=saveElement.name
+		StringReplace, saveElementname, saveElementname, `n,|¶, All ;Convert a linefeed to |¶. Otherwise the next lines will not be readable. 
+		RIni_SetKeyValue("SaveFile", saveSection,"name", saveElementname)
+			
+		
+		i_SaveParametersOfElement(saveElement,saveSection,"SaveFile")
+	}
+	
+	ret:=RIni_Write("SaveFile", flow.FilePath)
+	if not ret
+	{
+		logger("a1","Flow " flowSettings.Name " was successfully saved.")
+		ToolTip(lang("saved"))
+	}
+	else
+	{
+		logger("a0","Error. Flow " flowSettings.Name " couldn't be saved.")
+		MsgBox % lang("Saving was unsuccessful")
+	}
+	
+
+	RIni_Shutdown("SaveFile")
+	;~ savedState:=currentstateid
+	maingui.enable()
 	busy:=false
 }
 
-i_saveGeneralParameters()
-{
-	global
-	IniWrite,%Offsetx%,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,Offsetx
-	IniWrite,%OffsetY%,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,OffsetY
-	IniWrite,%zoomFactor%,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,zoomFactor
-}
-
-i_SaveParametersOfElement(saveElementID,saveElementType,saveElementsubType,saveElementIndex,Savelocation)
+i_SaveParametersOfElement(saveElement,saveSection,Savelocation)
 {
 	global
 	local parametersToSave
@@ -172,8 +149,9 @@ i_SaveParametersOfElement(saveElementID,saveElementType,saveElementsubType,saveE
 	local parameterDefault
 	local SaveContent
 	local OneID
-	
-	parametersToSave:=getParameters%saveElementType%%saveElementsubType%()
+	local saveElementType:=saveElement.type
+	local saveElementsubType:=saveElement.subtype
+	parametersToSave:=%saveElementType%%saveElementsubType%.getParameters()
 	for index, parameter in parametersToSave
 	{
 		if not IsObject(parameter.id)
@@ -188,25 +166,30 @@ i_SaveParametersOfElement(saveElementID,saveElementType,saveElementsubType,saveE
 		;Certain types of control consist of multiple controls and thus contain multiple parameters.
 		for index2, oneID in parameterID
 		{
-			SaveContent:=%saveElementID%%oneID%
+			SaveContent:=saveElement.par[oneID]
 			StringReplace, SaveContent, SaveContent, `n,|¶, All
-			if (Savelocation="clipboard")
-			{
-				IniWrite,%SaveContent%,%ClipboardFlowFilename%,Element%saveElementIndex%,%oneID%
-			}
-			else if (Savelocation="trigger")
-			{
-				IniWrite,%SaveContent%,%ThisFlowFolder%\%ThisFlowFilename%.ini,Trigger%saveElementIndex%,%oneID%
-			}
-			else if (Savelocation="element")
-			{
-				
-				IniWrite,%SaveContent%,%ThisFlowFolder%\%ThisFlowFilename%.ini,Element%saveElementIndex%,%oneID%
-			}
 			
-			
+			RIni_SetKeyValue(Savelocation, saveSection,oneID, SaveContent)
 		}
-		
-	
 	}
+}
+
+;May be called if no changes were made and user closes the script. Not yet implemented
+i_saveGeneralParameters()
+{
+	global
+	IniWrite,%Offsetx%,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,Offsetx
+	IniWrite,%OffsetY%,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,OffsetY
+	IniWrite,%zoomFactor%,%ThisFlowFolder%\%ThisFlowFilename%.ini,general,zoomFactor
+}
+
+;Checks whether the flow is saved
+i_CheckIfSaved()
+{
+	global
+	;~ MsgBox % savedState "-" currentstateid
+	if (savedState=currentstateid)
+		return 1
+	else
+		return 0
 }

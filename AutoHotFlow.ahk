@@ -17,7 +17,11 @@ IfWinExist,CommandWindowOfManager,§%tempHiddenWindowID%§
 }
 
 if not a_iscompiled
+{
 	developing=yes
+}
+else
+	Lang_NotNotifyIfNoTranslationFound:=true
 
 DebugLogLevelApp=3 ;Debug level for app debugs: 0=Only errors; 1=Important logs; 2=Detailed logs ; 3=Debug logs
 DebugLogLevelFlow=3 ;Debug levels: 0=Only errors; 1=Important logs; 2=Detailed logs ; 3=Debug logs
@@ -57,6 +61,7 @@ com_CreateHiddenReceiverWindow()
 #Include manager\settings of flows.ahk
 #Include manager\tray.ahk
 #Include manager\about.ahk
+#Include manager\help.ahk
 #Include manager\Main GUI.ahk
 #Include manager\settings\s_language.ahk
 #Include manager\settings\s_settings.ahk

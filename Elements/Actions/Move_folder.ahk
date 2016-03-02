@@ -7,9 +7,9 @@ runActionMove_folder(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	local tempFrom:=% v_replaceVariables(InstanceID,ThreadID,%ElementID%folder)
 	local tempTo:=% v_replaceVariables(InstanceID,ThreadID,%ElementID%destFolder)
 	if  DllCall("Shlwapi.dll\PathIsRelative","Str",tempFrom)
-		tempFrom:=SettingWorkingDir "\" tempFrom
+		tempFrom:=flowSettings.WorkingDir "\" tempFrom
 	if  DllCall("Shlwapi.dll\PathIsRelative","Str",tempTo)
-		tempTo:=SettingWorkingDir "\" tempTo
+		tempTo:=flowSettings.WorkingDir "\" tempTo
 	if tempFrom=
 	{
 		logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Source folder not specified.")

@@ -1,6 +1,6 @@
 ﻿FlowCompabilityVersionOfApp:=6 ;This variable contains a number which will be incremented as soon an incompability appears. This will make it possible to identify old scripts and convert them. This value will be written in any saved flows.
 
-i_CheckCompability(ElementID,IndexInIniFile,IniFilePath)
+i_CheckCompability(Element,tempsection)
 {
 	global
 	
@@ -10,12 +10,12 @@ i_CheckCompability(ElementID,IndexInIniFile,IniFilePath)
 	{
 		
 		logger("a2","Flow has elder format than version 1. Tryting to keep compability.")
-		if (%ElementID%type="action" and %ElementID%subtype="Date_Calculation") 
+		if (Element.type="action" and Element.subtype="Date_Calculation") 
 		{
 			
-			%ElementID%Unit+=1 ;Added option milliseconds
-			%ElementID%VarValue:=%ElementID%Varname ;Output and input variable separated
-			%ElementID%Operation:=1 ;Added option calculate time difference 
+			Element.Unit+=1 ;Added option milliseconds
+			Element.VarValue:=Element.Varname ;Output and input variable separated
+			Element.Operation:=1 ;Added option calculate time difference 
 			
 			
 		}
@@ -23,57 +23,55 @@ i_CheckCompability(ElementID,IndexInIniFile,IniFilePath)
 	if FlowCompabilityVersion<2 ; 2015,06
 	{
 		logger("a2","Flow has elder format than version 2. Tryting to keep compability.")
-		if (%ElementID%type="action" and %ElementID%subtype="Get_control_text") 
+		if (Element.type="action" and Element.subtype="Get_control_text") 
 		{
 			
-			%ElementID%Varname=t_Text ;The variable name can now be specified
+			Element.Varname:="t_Text" ;The variable name can now be specified
 			
 		}
 		
-		if (%ElementID%type="action" and %ElementID%subtype="Get_mouse_position") 
+		if (Element.type="action" and Element.subtype="Get_mouse_position") 
 		{
 			
-			%ElementID%Varnamey=t_posx ;The variable name can now be specified
-			%ElementID%Varnamex=t_posx ;The variable name can now be specified
+			Element.Varnamey:="t_posx" ;The variable name can now be specified
+			Element.Varnamex:="t_posx" ;The variable name can now be specified
 		}
-		if (%ElementID%type="action" and %ElementID%subtype="Get_Volume") 
+		if (Element.type="action" and Element.subtype="Get_Volume") 
 		{
 			
-			%ElementID%Varname=t_volume ;The variable name can now be specified
+			Element.Varname:="t_volume" ;The variable name can now be specified
 		}
-		if (%ElementID%type="action" and %ElementID%subtype="Input_box") 
+		if (Element.type="action" and Element.subtype="Input_box") 
 		{
 			
-			%ElementID%Varname=t_input ;The variable name can now be specified
+			Element.Varname:="t_input" ;The variable name can now be specified
 		}
-		if (%ElementID%type="action" and %ElementID%subtype="Set_Volume") 
+		if (Element.type="action" and Element.subtype="Set_Volume") 
 		{
-			if %ElementID%Relatively ;This option was deleted, a new option Action can be set between three states instead
-				%ElementID%Action=3
+			if (Element.Relatively) ;This option was deleted, a new option Action can be set between three states instead
+				Element.Action:=3
 			else
-				%ElementID%Action=2
+				Element.Action:=2
 		}
-		if (%ElementID%type="action" and %ElementID%subtype="Sleep") 
+		if (Element.type="action" and Element.subtype="Sleep") 
 		{
 			
-			%ElementID%Unit=1 ;The unit is only milliseconds
+			Element.Unit:=1 ;The unit is only milliseconds
 		}
-		if (%ElementID%type="action" and %ElementID%subtype="tooltip") 
+		if (Element.type="action" and Element.subtype="tooltip") 
 		{
 			
-			%ElementID%Unit=1 ;The unit is only milliseconds
+			Element.Unit:=1 ;The unit is only milliseconds
 		}
 		
-		if (%ElementID%type="condition" and %ElementID%subtype="file_exists" and %ElementID%CompatibilityComment="WasFolderExists") 
+		if (Element.type="condition" and Element.subtype="file_exists" and Element.CompatibilityComment="WasFolderExists") 
 		{
-			
-			Iniread,temp,%IniFilePath%,%IndexInIniFile%,folder
-			%ElementID%file:=temp ;The unit is only milliseconds
+			loadElement.file:=RIni_GetKeyValue("IniFile", tempSection, "folder", "") ;Conditions FolderExists and FileExists were combined to FileExists
 		}
-		if (%ElementID%type="trigger" and %ElementID%subtype="Periodic_timer") 
+		if (Element.type="trigger" and Element.subtype="Periodic_timer") 
 		{
 			
-			%ElementID%Unit=2 ;The only unit was seconds
+			Element.Unit:=2 ;The only unit was seconds
 		}
 		
 	}
@@ -81,23 +79,23 @@ i_CheckCompability(ElementID,IndexInIniFile,IniFilePath)
 	if FlowCompabilityVersion<3 ; 2015,08,09
 	{
 		logger("a2","Flow has elder format than version 3. Tryting to keep compability.")
-		if (%ElementID%type="action" and %ElementID%subtype="Read_from_ini") 
+		if (Element.type="action" and Element.subtype="Read_from_ini") 
 		{
-			if %ElementID%Action=2
-			%ElementID%Action=3
+			if (Element.Action=2)
+			Element.Action:=3
 		}
 		
 	}
 	if FlowCompabilityVersion<4 ; 2015,08,15
 	{
 		logger("a2","Flow has elder format than version 4. Tryting to keep compability.")
-		if (%ElementID%type="action" and %ElementID%subtype="Set_Clipboard") 
+		if (Element.type="action" and Element.subtype="Set_Clipboard") 
 		{
-			Iniread,temp,%IniFilePath%,%IndexInIniFile%,varname
+			temp:=RIni_GetKeyValue("IniFile", tempSection, "varname", "") 
 			if temp
 			{
-				%ElementID%text:=temp
-				%ElementID%expression:=2
+				Element.text:=temp
+				Element.expression:=2
 				
 			}
 		}
@@ -106,22 +104,22 @@ i_CheckCompability(ElementID,IndexInIniFile,IniFilePath)
 	if FlowCompabilityVersion<5 ; 2015,08,28
 	{
 		logger("a2","Flow has elder format than version 5. Tryting to keep compability.")
-		if (%ElementID%type="action" and %ElementID%subtype="Play_Sound") 
+		if (Element.type="action" and Element.subtype="Play_Sound") 
 		{
-			Iniread,temp,%IniFilePath%,%IndexInIniFile%,WhitchSound%A_Space%
+			temp:=RIni_GetKeyValue("IniFile", tempSection, "WhitchSound", "") 
 			if temp
 			{
 				if temp<6
 				{
-					%ElementID%WhichSound:=1
+					Element.WhichSound:=1
 					
 					if temp=2
-						%ElementID%systemSound:="Windows Foreground.wav"
+						Element.systemSound:="Windows Foreground.wav"
 					else
-						%ElementID%systemSound:="Windows Background.wav"
+						Element.systemSound:="Windows Background.wav"
 				}
 				else if temp=6
-					%ElementID%WhichSound:=2
+					Element.WhichSound:=2
 				
 			}
 		}
@@ -130,33 +128,33 @@ i_CheckCompability(ElementID,IndexInIniFile,IniFilePath)
 	if FlowCompabilityVersion<6 ; 2015,09,01
 	{
 		logger("a2","Flow has elder format than version 6. Tryting to keep compability.")
-		if (%ElementID%type="action" and %ElementID%subtype="Input_Box") 
+		if (Element.type="action" and Element.subtype="Input_Box") 
 		{
-			Iniread,temp,%IniFilePath%,%IndexInIniFile%,text,%A_Space%
-			%ElementID%message:=temp
-			%ElementID%IsTimeout:=0
-			%ElementID%OnlyNumbers:=0 
-			%ElementID%MaskUserInput:=0 
-			%ElementID%MultilineEdit:=0 
-			%ElementID%ShowCancelButton:=0 
-			%ElementID%IfDismiss:=2 ;Exception if dismiss
+			temp:=RIni_GetKeyValue("IniFile", tempSection, "text", "") 
+			Element.message:=temp
+			Element.IsTimeout:=0
+			Element.OnlyNumbers:=0 
+			Element.MaskUserInput:=0 
+			Element.MultilineEdit:=0 
+			Element.ShowCancelButton:=0 
+			Element.IfDismiss:=2 ;Exception if dismiss
 			
 		}
-		if (%ElementID%type="condition" and %ElementID%subtype="Confirmation_Dialog") 
+		if (Element.type="condition" and Element.subtype="Confirmation_Dialog") 
 		{
-			Iniread,temp,%IniFilePath%,%IndexInIniFile%,question,%A_Space%
-			%ElementID%message:=temp
-			%ElementID%IsTimeout:=0
-			%ElementID%ShowCancelButton:=0 
-			%ElementID%IfDismiss:=3 ;Exception if dismiss
+			temp:=RIni_GetKeyValue("IniFile", tempSection, "question", "") 
+			Element.message:=temp
+			Element.IsTimeout:=0
+			Element.ShowCancelButton:=0 
+			Element.IfDismiss:=3 ;Exception if dismiss
 			
 		}
-		if (%ElementID%type="action" and %ElementID%subtype="Message_Box") 
+		if (Element.type="action" and Element.subtype="Message_Box") 
 		{
-			Iniread,temp,%IniFilePath%,%IndexInIniFile%,text,%A_Space%
-			%ElementID%message:=temp
-			%ElementID%IsTimeout:=0
-			%ElementID%IfDismiss:=2 ;Exception if dismiss
+			temp:=RIni_GetKeyValue("IniFile", tempSection, "text", "") 
+			Element.message:=temp
+			Element.IsTimeout:=0
+			Element.IfDismiss:=2 ;Exception if dismiss
 			
 		}
 		
@@ -172,16 +170,16 @@ i_CheckCompability(ElementID,IndexInIniFile,IniFilePath)
 
 
 
-i_CheckCompabilitySubtype(ElementID,IndexInIniFile,IniFilePath)
+i_CheckCompabilitySubtype(Element,Section)
 {
 	global
 	if FlowCompabilityVersion<2 ; 2015,06
 	{
-		if (%ElementID%type="condition" and %ElementID%subtype="folder_exists") 
+		if (Element.type="condition" and Element.subtype="folder_exists") 
 		{
 			
-			%ElementID%subtype=file_exists ;File exists became File or folder exists, because they are the same.
-			%ElementID%CompatibilityComment=WasFolderExists ;File exists became File or folder exists, because they are the same.
+			ElementID.subtype:="file_exists" ;File exists became File or folder exists, because they are the same.
+			ElementID.CompatibilityComment:="WasFolderExists" ;File exists became File or folder exists, because they are the same.
 		}
 	}
 	

@@ -20,7 +20,7 @@ runActionPlay_Sound(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	{
 		tempPath:=% v_replaceVariables(InstanceID,ThreadID,%ElementID%soundfile)
 		if  DllCall("Shlwapi.dll\PathIsRelative","Str",tempPath)
-			tempPath:=SettingWorkingDir "\" tempPath
+			tempPath:=flowSettings.WorkingDir "\" tempPath
 		SoundPlay,% tempPath
 		
 	}

@@ -62,7 +62,7 @@ runActionSelect_file(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 		
 		tempActionSelectFilePath:=v_replaceVariables(ActionSelect_fileStart_CurrentInstanceID,ActionSelect_fileStart_CurrentThreadID,%ActionSelect_fileToStart_Element_ID%folder)
 		if  DllCall("Shlwapi.dll\PathIsRelative","Str",tempActionSelectFilePath)
-			tempActionSelectFilePath:=SettingWorkingDir "\" tempActionSelectFilePath
+			tempActionSelectFilePath:=flowSettings.WorkingDir "\" tempActionSelectFilePath
 		;MsgBox %tempActionSelectFileOptions%
 		
 		FileSelectFile,tempActionSelectFilefile,%tempActionSelectFileOptions%,%tempActionSelectFilePath%,% v_replaceVariables(ActionSelect_fileStart_CurrentInstanceID,ActionSelect_fileStart_CurrentThreadID,%ActionSelect_fileToStart_Element_ID%title),% v_replaceVariables(ActionSelect_fileStart_CurrentInstanceID,ActionSelect_fileStart_CurrentThreadID,%ActionSelect_fileToStart_Element_ID%filter)

@@ -50,7 +50,7 @@ EnableTriggerWindow_Closes(ElementID)
 	
 	
 	TriggerWindow_closes%ElementID%:=object()
-	TriggerWindow_closes%ElementID%["Title"]:="Trigger Window_closes. Flow - " flowName ". ID - " ElementID
+	TriggerWindow_closes%ElementID%["Title"]:="Trigger Window_closes. Flow - " flowSettings.Name ". ID - " ElementID
 	local tempTitle:=TriggerWindow_closes%ElementID%["Title"]
 	local generatedScript
 	

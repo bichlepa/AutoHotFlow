@@ -6,7 +6,7 @@ runActionDelete_from_ini(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 
 	local tempPath:=% v_replaceVariables(InstanceID,ThreadID,%ElementID%file)
 	if  DllCall("Shlwapi.dll\PathIsRelative","Str",tempPath)
-		tempPath:=SettingWorkingDir "\" tempPath
+		tempPath:=flowSettings.WorkingDir "\" tempPath
 	
 	local tempsection:=v_replaceVariables(InstanceID,ThreadID,%ElementID%section)
 	local tempkey

@@ -25,7 +25,7 @@ runActionSet_file_time(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	;MsgBox %tempVar%
 	local tempPath:=% v_replaceVariables(InstanceID,ThreadID,%ElementID%file)
 	if  DllCall("Shlwapi.dll\PathIsRelative","Str",tempPath)
-		tempPath:=SettingWorkingDir "\" tempPath
+		tempPath:=flowSettings.WorkingDir "\" tempPath
 	
 	FileSetTime,%tempVar%,% tempPath,%tempOptions%
 	

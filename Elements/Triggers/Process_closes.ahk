@@ -15,7 +15,7 @@ EnableTriggerProcess_closes(ElementID)
 	}
 	
 	TriggerProcess_closes%ElementID%:=object()
-	TriggerProcess_closes%ElementID%["Title"]:="Trigger Process_closes. Flow - " flowName ". ID - " ElementID
+	TriggerProcess_closes%ElementID%["Title"]:="Trigger Process_closes. Flow - " flowSettings.Name ". ID - " ElementID
 	local tempTitle:=TriggerProcess_closes%ElementID%["Title"]
 	local generatedScript
 	

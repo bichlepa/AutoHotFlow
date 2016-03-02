@@ -39,7 +39,7 @@ runActionGet_Drive_Information(InstanceID,ThreadID,ElementID,ElementIDInInstance
 		}
 		
 		if  DllCall("Shlwapi.dll\PathIsRelative","Str",tempPath)
-			tempPath:=SettingWorkingDir "\" tempPath
+			tempPath:=flowSettings.WorkingDir "\" tempPath
 		
 		
 		

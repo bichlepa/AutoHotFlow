@@ -1,0 +1,191 @@
+﻿action1: 
+	ClickPriority: 500
+	CountOfParts: 1
+	ID: action1
+	marked: 0
+	name: Starten: notepad
+	par: 
+	part1x1: 49.000000
+	part1x2: 147.000000
+	part1y1: 134.750000
+	part1y2: 208.250000
+	running: 0
+	Standardname: 1
+	subType: run
+	type: Action
+	x: 70
+	y: 192.500000
+action10: 
+	ClickPriority: 500
+	CountOfParts: 1
+	ID: action10
+	marked: 0
+	name: Pause`n2000 ms
+	par: 
+	part1x1: 49.000000
+	part1x2: 147.000000
+	part1y1: 428.750000
+	part1y2: 502.250000
+	running: 0
+	Standardname: 1
+	subType: Sleep
+	type: Action
+	Unit: 1
+	x: 70
+	y: 612.500000
+action12: 
+	ClickPriority: 500
+	CountOfParts: 1
+	ID: action12
+	marked: 0
+	name: Tasten an ein Steuerelement senden`n{enter 2}I will close it now{!} Muahahaha{!}`nSteuerelement: Edit1
+	par: 
+	part1x1: 196.000000
+	part1x2: 294.000000
+	part1y1: 85.750000
+	part1y2: 159.250000
+	running: 0
+	Standardname: 1
+	subType: Send_Keystrokes_to_Control
+	type: Action
+	x: 280
+	y: 122.500000
+action14: 
+	ClickPriority: 500
+	CountOfParts: 1
+	ID: action14
+	marked: 0
+	name: Fenster schließen`nProzess: notepad.exe
+	par: 
+	part1x1: 196.000000
+	part1x2: 294.000000
+	part1y1: 306.250000
+	part1y2: 379.750000
+	running: 0
+	Standardname: 1
+	subType: Close_window
+	type: Action
+	x: 280
+	y: 437.500000
+action16: 
+	ClickPriority: 500
+	CountOfParts: 1
+	ID: action16
+	marked: 0
+	name: Pause`n100 ms
+	par: 
+	part1x1: 343.000000
+	part1x2: 441.000000
+	part1y1: 159.250000
+	part1y2: 232.750000
+	running: 0
+	Standardname: 1
+	subType: Sleep
+	type: Action
+	Unit: 1
+	x: 490
+	y: 227.500000
+action19: 
+	ClickPriority: 500
+	CountOfParts: 1
+	ID: action19
+	marked: 0
+	name: Tasten an ein Steuerelement senden`n{right} {enter}`nSteuerelement:
+	par: 
+	part1x1: 343.000000
+	part1x2: 441.000000
+	part1y1: 257.250000
+	part1y2: 330.750000
+	running: 0
+	Standardname: 1
+	subType: Send_Keystrokes_to_Control
+	type: Action
+	x: 490
+	y: 367.500000
+action21: 
+	ClickPriority: 500
+	CountOfParts: 1
+	ID: action21
+	marked: 0
+	name: Tooltip: I have opened and closed the notepad! :-D`n3000 ms`nDer Maus folgen`n
+	par: 
+	part1x1: 343.000000
+	part1x2: 441.000000
+	part1y1: 355.250000
+	part1y2: 428.750000
+	running: 0
+	Standardname: 1
+	subType: tooltip
+	type: Action
+	Unit: 1
+	x: 490
+	y: 507.500000
+action23: 
+	ClickPriority: 500
+	CountOfParts: 1
+	ID: action23
+	marked: 0
+	name: Pause`n1000 ms
+	par: 
+	part1x1: 196.000000
+	part1x2: 294.000000
+	part1y1: 208.250000
+	part1y2: 281.750000
+	running: 0
+	Standardname: 1
+	subType: Sleep
+	type: Action
+	Unit: 1
+	x: 280
+	y: 297.500000
+action3: 
+	ClickPriority: 500
+	CountOfParts: 1
+	ID: action3
+	marked: 0
+	name: Pause`n100 ms
+	par: 
+	part1x1: 49.000000
+	part1x2: 147.000000
+	part1y1: 232.750000
+	part1y2: 306.250000
+	running: 0
+	Standardname: 1
+	subType: Sleep
+	type: Action
+	Unit: 1
+	x: 70
+	y: 332.500000
+action6: 
+	ClickPriority: 500
+	CountOfParts: 1
+	ID: action6
+	marked: 0
+	name: Tasten an ein Steuerelement senden`nI have opened the notepad! :-)`nSteuerelement: Edit1
+	par: 
+	part1x1: 49.000000
+	part1x2: 147.000000
+	part1y1: 330.750000
+	part1y2: 404.250000
+	running: 0
+	Standardname: 1
+	subType: Send_Keystrokes_to_Control
+	type: Action
+	x: 70
+	y: 472.500000
+trigger: 
+	ClickPriority: 500
+	CountOfParts: 1
+	ID: trigger
+	marked: 0
+	name: 
+	par: 
+	part1x1: 49.000000
+	part1x2: 147.000000
+	part1y1: 36.750000
+	part1y2: 110.250000
+	running: 0
+	triggers: 
+	type: trigger
+	x: 70
+	y: 52.500000

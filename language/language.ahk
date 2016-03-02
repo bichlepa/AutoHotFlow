@@ -46,8 +46,8 @@ lang_LoadCurrentLanguage()
 		if uilang=Error
 			uilang=en
 	}
-	IniRead,%UILang%enlangname,language\%UILang%.ini\general\enname
-	IniRead,%UILang%langname,language\%UILang%.ini\general\name
+	IniRead,%UILang%enlangname,language\%UILang%.ini,general,enname
+	IniRead,%UILang%langname,language\%UILang%.ini,general,name
 	lang_ReadAllTranslations()
 }
 
@@ -131,7 +131,7 @@ lang(langvar,$1="",$2="",$3="",$4="",$5="",$6="",$7="",$8="",$9="")
 				iniwrite,% newtrans,language\en.ini,translations,%langvar_no_spaces%
 				goto,langBeginAgain
 			}
-			else
+			else if (Lang_NotNotifyIfNoTranslationFound!=true)
 				MsgBox,English text for %langvar_no_spaces% not found!
 		}
 		else if (translationto=UILang and langaborted=!true)

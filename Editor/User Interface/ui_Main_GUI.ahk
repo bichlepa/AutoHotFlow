@@ -1,43 +1,111 @@
-﻿ui_CreateMainGui()
+﻿
+class mainGUI
 {
-	global
-	;Create tha main gui
-	gui,MainGUI:default
-	;~ gui,add,picture,vPicFlow hwndPicFlowHWND x0 y0 0xE hidden gclickOnPicture ;No picture needed anymore
-	gui,add,StatusBar,hwndStatusbarHWND
-	gui,add,hotkey,hidden hwndEditHWND ;To avoid error sound when user presses keys while this window is open
-	gui +resize
-
-	;This is needed by GDI+
-	gui +lastfound
-	gui,+HwndMainGuihwnd
-	MainGuiHwnddc := GetDC(MainGuihwnd)
-	ControlGetPos,,,,StatusBarHeight,msctls_statusbar321,ahk_id %MainGuihwnd%
 	
-	
+	HWND:=""
+	HWNDDC:=""
+	StatusBarHeight:=""
+	StatusBarHwnd:=""
+	__New()
+	{
+		;Create the main gui
+		global flowSettings
+		global CurrentlyMainGuiIsDisabled:=false
+		gui,MainGUI:default
+		gui,-dpiscale
+		;~ gui,add,picture,vPicFlow hwndPicFlowHWND x0 y0 0xE hidden gclickOnPicture ;No picture needed anymore
+		gui,add,StatusBar,hwndStatusbarHWND
+		this.StatusbarHWND:=StatusbarHWND
+		gui,add,hotkey,hidden hwndEditHWND ;To avoid error sound when user presses keys while this window is open
+		gui +resize
 
-	
-	;Set some hotkeys that are needed in main window
-	;~ hotkey,IfWinActive,ahk_id %MainGuihwnd%
-	;~ hotkey,^x,ctrl_x
-	;~ hotkey,^c,ctrl_c
-	;~ hotkey,^v,ctrl_v
-	;~ hotkey,^s,ctrl_s
-	;~ hotkey,esc,esc
-	;~ hotkey,del,del
+		;This is needed by GDI+
+		gui +lastfound
+		gui,+HwndMainGuihwnd
+		this.hwnd:=MainGuihwnd
+		this.hwnddc := GetDC(MainGuihwnd)
+		ControlGetPos,,,,StatusBarHeight,,ahk_id %StatusbarHWND%
+		this.StatusBarHeight:=StatusBarHeight
+		
+		;~ MsgBox %StatusBarHeight%
+		
+		;Set some hotkeys that are needed in main window ;Outdated
+		;~ hotkey,IfWinActive,ahk_id %MainGuihwnd%
+		;~ hotkey,^x,ctrl_x
+		hotkey,^c,ctrl_c
+		hotkey,^v,ctrl_v
+		hotkey,^s,ctrl_s
+		hotkey,^z,ctrl_z
+		hotkey,^y,ctrl_y
+		hotkey,^a,ctrl_a
+		;~ hotkey,esc,esc
+		;~ hotkey,del,del
+		
+		;React on user input
+		OnMessage(0x100,"keyPressed",1)
+		OnMessage(0x203,"leftmousebuttondoubleclick",1)
+		OnMessage(0x201,"leftmousebuttonclick",1)
+		OnMessage(0x204,"rightmousebuttonclick",1)
+		OnMessage(0x20A,"mousewheelmove",1)
 
-	OnMessage(0x100,"keyPressed",1)
-	OnMessage(0x203,"leftmousebuttondoubleclick",1)
-	OnMessage(0x201,"leftmousebuttonclick",1)
-	OnMessage(0x204,"rightmousebuttonclick",1)
-	OnMessage(0x20A,"mousewheelmove",1)
-
-	;the graphics need to be redrawn if window is moved. Expecially if the window was partially moved outside the screen.
-	OnMessage(0x06,"WindowGetsActive",1)
-	OnMessage(0x03,"WindowGetsMoved",1)
+		;the graphics need to be redrawn if window is moved. Expecially if the window was partially moved outside the screen.
+		OnMessage(0x06,"WindowGetsActive",1)
+		OnMessage(0x03,"WindowGetsMoved",1)
+	}
 	
+	show()
+	{
+		
+		SysGet, MonitorPrimary, MonitorPrimary
+		SysGet,MonitorWorkArea,MonitorWorkArea,%MonitorPrimary% 
+		tempwidth:=round((MonitorWorkArearight - MonitorWorkArealeft)*0.9)
+		tempheight:=round((MonitorWorkAreabottom -MonitorWorkAreatop)*0.9)
+
+		if (this.guiAlreadyShown=true)
+			gui,MainGUI:show, w%widthofguipic%,% "·AutoHotFlow· " lang("Editor") " - " flowSettings.Name ;Added  w%widthofguipic% to trigger the guisize label
+		else
+			gui,MainGUI:show,  w%tempwidth% h%tempheight%,% "·AutoHotFlow· " lang("Editor") " - " flowSettings.Name
+		;sleep 10
+		;MsgBox % hwn " - "   this.hwnd	" -  " this.test
+		ui_Draw()
+		ui_UpdateStatusbartext()
+	}
+	
+	Disable()
+	{
+		global
+		;~ gui,MainGUI:+disabled
+		CurrentlyMainGuiIsDisabled:=true
+	}
+	
+	Enable()
+	{
+		global
+		;~ gui,MainGUI:-disabled
+		
+		;Activate window if it is not hidden
+		DetectHiddenWindows,off
+		IfWinExist,% "ahk_id " MainGuihwnd
+		{
+			DetectHiddenWindows,on
+			WinActivate,% "ahk_id " MainGuihwnd
+		}
+		DetectHiddenWindows,on
+		CurrentlyMainGuiIsDisabled:=false
+		
+		ui_draw()
+	}
+	
+	;Get the position of main gui and store it into global variables
+	GetPos()
+	{
+		 
+		WinGetPos,MainGUIX,MainGUIY,MainGUIWidth,MainGUIHeight,% "ahk_id " this.hwnd
+		return {x:MainGUIX, y: MainGUIY, w: MainGUIWidth, h: MainGUIHeight}
+	}
 	
 }
+
 
 WindowGetsActive()
 {
@@ -53,24 +121,25 @@ SetTimer,ui_Draw,-1
 
 leftmousebuttonclick(wpar,lpar,msg,hwn)
 {
-	global
-	if (hwn!=MainGuihwnd and hwn!=StatusbarHWND)
+	global maingui
+	if (hwn!=maingui.hwnd and hwn!=maingui.StatusbarHWND)
 		return
 	SetTimer, leftmousebuttonclick,-1
 }
 rightmousebuttonclick(wpar,lpar,msg,hwn)
 {
-	global
-	if (hwn!=MainGuihwnd and hwn!=StatusbarHWND)
+	global maingui
+	if (hwn!=maingui.hwnd and hwn!=maingui.StatusbarHWND)
 		return
 	SetTimer, rightmousebuttonclick,-1
 }
-
+*/
 leftmousebuttondoubleclick(wpar,lpar,msg,hwn)
 {
-	global
+	global maingui
 	;~ ToolTip  %hwn% d
-	if (hwn!=MainGuihwnd and hwn!=StatusbarHWND)
+	;~ MsgBox % wpar " - " lpar " - " msg " - " hwn " . " maingui.hwnd " . " maingui.statusbarhwnd
+	if (hwn!=maingui.hwnd and hwn!=maingui.StatusbarHWND)
 		return
 	SetTimer, leftmousebuttondoubleclick,-1
 }
@@ -120,7 +189,7 @@ mousewheelmove(wpar,lpar,msg,hwn)
 	;~ controlgetpos,tempx,tempy,tempw,temph,,ahk_id %hwn%
 	;~ ToolTip %wpar% - %lpar% - %msg% - %hwn% : %StatusbarHWND% - %temp% - %MainGuihwnd% __ %tempx%- %tempy%- %tempw%- %temph% __ %tempwinx%-%tempwiny%-%tempwinw%-%tempwinh%
 	;~ ui_DrawShapeOnScreen(tempwinx,tempwiny,tempwinw,tempwinh,tempx,tempy,tempw,temph)
-	if (hwn!=MainGuihwnd and hwn!=StatusbarHWND and hwn!=EditHWND)
+	if (hwn!=MainGui.hwnd and hwn!=MainGui.StatusbarHWND and hwn!=EditHWND)
 		return
 	;~ ToolTip %wpar% - %lpar% - %msg% - %hwn%
 	wpar2:=wpar
@@ -135,29 +204,6 @@ mousewheelmove(wpar,lpar,msg,hwn)
 
 
 
-ui_DisableMainGUI()
-{
-	global
-	;~ gui,MainGUI:+disabled
-	CurrentlyMainGuiIsDisabled:=true
-}
-ui_EnableMainGUI()
-{
-	global
-	;~ gui,MainGUI:-disabled
-	
-	;Activate window if it is not hidden
-	DetectHiddenWindows,off
-	IfWinExist,ahk_id %MainGuihwnd%
-	{
-		DetectHiddenWindows,on
-		WinActivate,ahk_id %MainGuihwnd%
-	}
-	DetectHiddenWindows,on
-	CurrentlyMainGuiIsDisabled:=false
-	
-}
-
 ui_ActionWhenMainGUIDisabled()
 {
 	global
@@ -169,37 +215,28 @@ ui_ActionWhenMainGUIDisabled()
 		WinActivate,ahk_id %CurrentlyActiveWindowHWND%
 }
 
-ui_showgui()
-{
-	global
-	SysGet, MonitorPrimary, MonitorPrimary
-	SysGet,MonitorWorkArea,MonitorWorkArea,%MonitorPrimary% 
-	tempwidth:=round((MonitorWorkArearight - MonitorWorkArealeft)*0.9)
-	tempheight:=round((MonitorWorkAreabottom -MonitorWorkAreatop)*0.9)
-
-	if guiAlreadyShowed=true
-		gui,MainGUI:show, w%widthofguipic%,% "·AutoHotFlow· " lang("Editor") " - " flowName ;Added  w%widthofguipic% to trigger the guisize label
-	else
-		gui,MainGUI:show,  w%tempwidth% h%tempheight%,% "·AutoHotFlow· " lang("Editor") " - " flowName
-	sleep 10
-	
-	ui_Draw()
-	ui_UpdateStatusbartext()
-	
-	
-	
-}
 
 ui_UpdateStatusbartext(which="")
 {
 	global
+	local elementtext
 	if (which="pos" or which ="")
 	{
 		
-		if not TheOnlyOneMarkedElement
-			sb_SetText("Offset: x " Round(offsetx) " y " Round(offsety) "   |   Zoom: " Round(zoomFactor,2 ),1) 
+		if (markedElements.count()=0)
+		{
+			elementtext:=lang("%1% elements", allelements.count())
+		}
+		else if (markedElements.count()=1)
+		{
+			elementtext:=lang("1 marked element: %1%", TheOnlyOneMarkedElement.id)
+		}
 		else
-			sb_SetText("Offset: x " Round(offsetx) " y " Round(offsety) "   |   Zoom: " Round(zoomFactor,2 ) "   |   Marked Element: " TheOnlyOneMarkedElement ,1) 
+		{
+			elementtext:=lang("%1% marked elements", markedElements.count())
+		}
+		gui,maingui:default
+		sb_SetText("Offset: x " Round(offsetx) " y " Round(offsety) "   |   Zoom: " Round(zoomFactor,2 )  "   |   " elementtext  ,1)
 	}
 }
 
@@ -207,20 +244,20 @@ ui_UpdateStatusbartext(which="")
 ui_GetMainGUIPos()
 {
 	global 
-	WinGetPos,MainGUIX,MainGUIY,MainGUIWidth,MainGUIHeight,ahk_id %MainGuihwnd%
+	WinGetPos,MainGUIX,MainGUIY,MainGUIWidth,MainGUIHeight,% "ahk_id " MainGui.hwnd
 }
 
 ui_OnLanguageChange()
 {
-	global mainguihwnd
-	global flowName
+	global maingui
+	global flowSettings
 	ui_Draw()
 	DetectHiddenWindows off
-	WinGetTitle,temp,ahk_id %mainguihwnd%
+	WinGetTitle,temp,% "ahk_id " maingui.hwnd
 	IfWinExist,% temp
-		gui,MainGUI:show,,% "·AutoHotFlow· " lang("Editor") " - " flowName 
+		gui,MainGUI:show,,% "·AutoHotFlow· " lang("Editor") " - " flowSettings.Name 
 	else
-		gui,MainGUI:show,hide,% "·AutoHotFlow· " lang("Editor") " - " flowName 
+		gui,MainGUI:show,hide,% "·AutoHotFlow· " lang("Editor") " - " flowSettings.Name 
 	
 	;Help! I want that the menus are renamed when the language changes.
 	;~ initializeTrayBar()
@@ -239,7 +276,7 @@ MainGUIguisize: ;resize the picture when GUI is resized
 
 ;MsgBox w%A_guiwidth%  %a_guiheight%
 GuiControl,move,PicFlow,w%A_guiwidth%  h%a_guiheight%
-heightofguipic:=a_guiheight - StatusBarHeight
+heightofguipic:=a_guiheight - maingui.StatusBarHeight
 
 widthofguipic:=a_guiwidth
 guicontrolget,guipic,pos,PicFlow ;get the picture position. -> gx, gy

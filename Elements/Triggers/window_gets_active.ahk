@@ -48,7 +48,7 @@ EnableTriggerWindow_Gets_Active(ElementID)
 	
 	
 	TriggerWindow_Gets_Active%ElementID%:=object()
-	TriggerWindow_Gets_Active%ElementID%["Title"]:="Trigger Window_Gets_Active. Flow - " flowName ". ID - " ElementID
+	TriggerWindow_Gets_Active%ElementID%["Title"]:="Trigger Window_Gets_Active. Flow - " flowSettings.Name ". ID - " ElementID
 	local tempTitle:=TriggerWindow_Gets_Active%ElementID%["Title"]
 	local generatedScript
 	

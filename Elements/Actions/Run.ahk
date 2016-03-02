@@ -21,16 +21,16 @@ runActionRun(InstanceID,ThreadID,ElementID,ElementIDInInstance)
 	if  DllCall("Shlwapi.dll\PathIsRelative","Str",tempPath)
 	{
 		tempPathRelative:=tempPath
-		tempPath:=SettingWorkingDir "\" tempPath
+		tempPath:=flowSettings.WorkingDir "\" tempPath
 		
 	}
 	
 	
-	run, % tempPath,% SettingWorkingDir, UseErrorLevel,ActionRuntempPid ;Try to run it in the working direction
+	run, % tempPath,% flowSettings.WorkingDir, UseErrorLevel,ActionRuntempPid ;Try to run it in the working direction
 	if (ErrorLevel)
 	{
 		
-		run, % tempPathRelative,% SettingWorkingDir, UseErrorLevel,ActionRuntempPid ;Try tu run it without the working direction (relative path)
+		run, % tempPathRelative,% flowSettings.WorkingDir, UseErrorLevel,ActionRuntempPid ;Try tu run it without the working direction (relative path)
 		if (ErrorLevel)
 		{
 			logger("f0","Instance " InstanceID " - " %ElementID%type " '" %ElementID%name "': Error! Can't run '" tempPathRelative "'")

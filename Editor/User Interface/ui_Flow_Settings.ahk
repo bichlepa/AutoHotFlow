@@ -1,34 +1,36 @@
-﻿;Default settings
-SettingFlowExecutionPolicy=parallel
-
+﻿
 ui_SettingsOwFLow()
 {
-	global
+	static
+	global maingui, flowSettings, CurrentlyActiveWindowHWND, variable
+	local pos, tempchecked, tempXpos, tempYpos, tempDir, tempSettingFlowExecutionPolicyOld
 	
-	ui_DisableMainGUI()
+	maingui.disable()
 	gui,5:default
 	;~ gui,+owner
+	
+	gui,-dpiscale
 	gui,font,s10 cnavy wbold
 	gui,add,text,x10 w300,% lang("Flow_execution_policy")
 	
 	gui,font,s8 cDefault wnorm
 	
-	if SettingFlowExecutionPolicy=parallel
+	if (flowSettings.ExecutionPolicy="parallel")
 		tempchecked=1
 	else
 		tempchecked=0
 	gui,add,radio,w300 x10 Y+10 vGuiFlowSettingsParallel checked%tempchecked%,% lang("Parallel_execution_of_multiple_instances")
-	if SettingFlowExecutionPolicy=skip
+	if (flowSettings.ExecutionPolicy="skip")
 		tempchecked=1
 	else
 		tempchecked=0
 	gui,add,radio,w300 x10 Y+10 vGuiFlowSettingsSkip checked%tempchecked% ,% lang("Skip_execution_when_an_instance_is_already_executing")
-	if SettingFlowExecutionPolicy=wait
+	if (flowSettings.ExecutionPolicy="wait")
 		tempchecked=1
 	else
 		tempchecked=0
 	gui,add,radio,w300 x10 Y+10 vGuiFlowSettingsWait  checked%tempchecked%,% lang("Wait_until_the_currently_executing_instance_has_finished")
-	if SettingFlowExecutionPolicy=stop
+	if (flowSettings.ExecutionPolicy="stop")
 		tempchecked=1
 	else
 		tempchecked=0
@@ -37,14 +39,16 @@ ui_SettingsOwFLow()
 	gui,font,s10 cnavy wbold
 	gui,add,text,x10 w300 Y+15,% lang("Working directory")
 	gui,font,s8 cDefault wnorm
-	gui,add,Edit,w300 x10 Y+10 vGuiFlowSettingsWorkingDir,% SettingWorkingDir
+	gui,add,Edit,w300 x10 Y+10 vGuiFlowSettingsWorkingDir,% flowSettings.WorkingDir
 	
 	
 	gui,font,s10 cnavy wbold
 	gui,add,text,x10 w300 Y+15,% lang("Debug options")
 	gui,font,s8 cDefault wnorm
-	if SettingFlowLogToFile=1
+	if (flowSettings.LogToFile=1)
 		tempchecked=1
+	else
+		tempchecked=0
 	gui,add,Checkbox,w300 x10 Y+10 vGuiFlowSettingsLogToFile checked%tempchecked% ,% lang("Log to file")
 	gui,add,button,w300 x10 h30 Y+10 gGuiFlowSettingsButtonShowLog,% lang("Show log")
 	
@@ -57,10 +61,10 @@ ui_SettingsOwFLow()
 	CurrentlyActiveWindowHWND:=SettingsHWND
 	gui,show,hide
 	
-	ui_GetMainGUIPos()
+	pos:=maingui.getpos()
 	wingetpos,,,tempWidth,tempHeight,ahk_id %SettingsHWND%
-	tempXpos:=round(MainGUIX+MainGUIWidth/2- tempWidth/2)
-	tempYpos:=round(MainGUIY+MainGUIHeight/2- tempHeight/2)
+	tempXpos:=round(pos.x+pos.w/2- tempWidth/2)
+	tempYpos:=round(pos.y+pos.h/2- tempHeight/2)
 	gui,show,x%tempXpos% y%tempYpos%
 	return
 	
@@ -72,76 +76,89 @@ ui_SettingsOwFLow()
 	
 	GuiFlowSettingsOK:
 	GuiFlowSettingsStayOpen:=false
-	tempSettingFlowExecutionPolicyOld:=SettingFlowExecutionPolicy
+	someSettingChanged:=false
 	
 	gui,submit,NoHide
-	if GuiFlowSettingsParallel=1
-		SettingFlowExecutionPolicy=parallel
-	else if GuiFlowSettingsSkip=1
-		SettingFlowExecutionPolicy=skip
-	else if GuiFlowSettingsWait=1
-		SettingFlowExecutionPolicy=wait		
-	else if GuiFlowSettingsStop=1
-		SettingFlowExecutionPolicy=stop
-	
-	SettingFlowLogToFile:=GuiFlowSettingsLogToFile
-	
-	if (tempSettingFlowExecutionPolicyOld!=SettingFlowExecutionPolicy)
-		saved=no
 	
 	
-	tempDir:=% v_replaceVariables(InstanceID,ThreadID,GuiFlowSettingsWorkingDir) ;if user entered a built in variable
+	;~ d(variable)
+	tempDir:=% variable.replaceVariables("",GuiFlowSettingsWorkingDir) ;if user entered a built in variable
 	if DllCall("Shlwapi.dll\PathIsRelative","Str",tempDir) ;if user did not enter an absolute path
 	{
 		if GuiFlowSettingsWorkingDir!=  ;If user left it blank, he don't want to change it. if not...
 		{
 			MsgBox, 17, AutoHotFlow, % lang("The specified folder is not an absolute path!") "`n" lang("If you press '%1%', previous path will remain.",lang("OK"))
 			IfMsgBox cancel
-				GuiFlowSettingsStayOpen:=true
+				return
 		}
 	}
 	else
 	{
 		if not FileExist(GuiFlowSettingsWorkingDir)
 		{
-			MsgBox, 35, AutoHotFlow, % lang("The specified folder does not exist. Should it be created?") "`n" lang("If you press '%1%', previous path will remain.",lang("No"))
+			MsgBox, 36, AutoHotFlow, % lang("The specified folder does not exist. Should it be created?") "`n" lang("Press '%1%', if you want to correct it.",lang("No"))
 			IfMsgBox Yes
 			{
 				FileCreateDir,%GuiFlowSettingsWorkingDir%
 				if errorlevel
 				{
-					
 					MsgBox, 16, AutoHotFlow, % lang("The specified folder could not be created!")
-					GuiFlowSettingsStayOpen:=true
+					return
 				}
 				else
 				{
-					SettingWorkingDir:=GuiFlowSettingsWorkingDir
-					saved=no
+					flowSettings.WorkingDir:=GuiFlowSettingsWorkingDir
+					someSettingChanged:=true
 				}
 				
 			}
-			else IfMsgBox cancel
-				GuiFlowSettingsStayOpen:=true
+			else
+				return
 		}
 		else
 		{
-			SettingWorkingDir:=GuiFlowSettingsWorkingDir
-			saved=no
+			flowSettings.WorkingDir:=GuiFlowSettingsWorkingDir
+			someSettingChanged:=true
 		}
 	}
 	
-	if not GuiFlowSettingsStayOpen
+	
+	tempSettingFlowExecutionPolicyOld:=flowSettings.ExecutionPolicy
+	
+	if GuiFlowSettingsParallel=1
+		tempExecutionPolicy:="parallel"
+	else if GuiFlowSettingsSkip=1
+		tempExecutionPolicy:="skip"
+	else if GuiFlowSettingsWait=1
+		tempExecutionPolicy:="wait"		
+	else if GuiFlowSettingsStop=1
+		tempExecutionPolicy:="stop"
+	
+	if (flowSettings.ExecutionPolicy!=tempExecutionPolicy)
 	{
-		gui,destroy
-		ui_EnableMainGUI()
+		flowSettings.ExecutionPolicy:=tempExecutionPolicy
+		someSettingChanged:=true
 	}
+	
+	if (flowSettings.LogToFile!=GuiFlowSettingsLogToFile)
+	{
+		flowSettings.LogToFile:=GuiFlowSettingsLogToFile
+		someSettingChanged:=true
+	}
+	
+	if someSettingChanged:=true
+	{
+		new state()
+	}
+	gui,destroy
+	maingui.enable()
+	
 	return
 	
 	GuiFlowSettingsCancel:
 	
 	gui,destroy
-	ui_EnableMainGUI()
+	maingui.enable()
 	return
 	
 	

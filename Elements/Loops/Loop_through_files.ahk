@@ -30,7 +30,7 @@ runLoopLoop_through_files(InstanceID,ThreadID,ElementID,ElementIDInInstance,Head
 		
 		tempPath:=% v_replaceVariables(InstanceID,ThreadID,%ElementID%file)
 		if  DllCall("Shlwapi.dll\PathIsRelative","Str",tempPath)
-			tempPath:=SettingWorkingDir "\" tempPath
+			tempPath:=flowSettings.WorkingDir "\" tempPath
 		
 		tempError:=false
 		tempFiles:=Object()
