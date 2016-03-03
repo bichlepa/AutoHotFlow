@@ -36,7 +36,7 @@ loadSavedFlows()
 	{
 		StringTrimRight,filenameNoExt,A_LoopFileName,4
 		iniread, tempflowName,%A_LoopFileFullPath%,general,name
-		
+		;~ MsgBox %A_LoopFileFullPath% %tempflowName%
 		;~ if (filenameNoExt!=tempflowName) ;renaming flow ini files is risky. Instead a feature flow export should be implemented
 		;~ {
 			
