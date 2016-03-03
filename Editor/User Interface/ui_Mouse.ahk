@@ -8,32 +8,29 @@ IfWinnotActive,% "ahk_id " maingui.hwnd
 {
 	return
 }
-thread, Priority, -50
+
+thread, Priority, -50 ;TODO
+
 CoordMode,mouse,client
 MouseGetPos,mx,my,temphwnd
 
-
-;~ MsgBox %mx% %my% - %temphwnd% - %MainGuihwnd% 
-;~ MsgBox %temphwnd% %PicFlowHWND%
-;~ if (MainGuihwnd=temphwnd and mx>0 and mx<widthofguipic and my>0 and my<heightofguipic) ;Scroll using right button
-;~ {
-	if a_thislabel =rightmousebuttonclick
-	{
-		if workingOnClick
-			if (ui_detectMovement(,"rbutton"))
-				ui_scrollwithMouse("rbutton")
-			else
-				UserClickedRbutton:=true
-		else
+if a_thislabel =rightmousebuttonclick
+{
+	if workingOnClick
+		if (ui_detectMovement(,"rbutton"))
 			ui_scrollwithMouse("rbutton")
-			
-	}
+		else
+			UserClickedRbutton:=true
 	else
-	{
+		ui_scrollwithMouse("rbutton")
 		
-		SetTimer,clickonpicture,-1
-	}
-;~ }
+}
+else
+{
+	
+	SetTimer,clickonpicture,-1 ;Go to label clickonpicture in order to react on user click.
+}
+
 return
 
 leftmousebuttondoubleclick:
@@ -42,14 +39,14 @@ if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of t
 	ui_ActionWhenMainGUIDisabled()
 	return
 }
-if (theOnlyOneMarkedElement)
+if (theOnlyOneMarkedElement) ;if a single element is marked
 {
 	if (theOnlyOneMarkedElement.type="connection")
 	{
-		ret:=selectConnectionType(theOnlyOneMarkedElement,"wait")
+		ret:=selectConnectionType(theOnlyOneMarkedElement,"wait") ;Change connection type
 		if (ret!="aborted")
 		{
-			new state()
+			new state() ;make a new state. If user presses Ctrl+Z, the change will be undone
 		}
 		
 	}
@@ -58,7 +55,7 @@ if (theOnlyOneMarkedElement)
 		ret:=ElementSettings.open(theOnlyOneMarkedElement,"wait") ;open settings of the marked element
 		if (ret!="aborted" and ret!="0 changes" )
 		{
-			new state()
+			new state() ;make a new state. If user presses Ctrl+Z, the change will be undone
 		}
 	}
 	
@@ -69,10 +66,11 @@ clickOnPicture: ;react on clicks of the user
 
 
 
-if (workingOnClick=true)
+if (workingOnClick=true) ;Ignore if a click of user is already processed
 	return
 workingOnClick:=true
-thread, Priority, -50
+
+thread, Priority, -50 ;TODO
 
 MouseGetPos,mx,my ;Get the mouse position
 GetKeyState,ControlKeyState,control
@@ -208,7 +206,7 @@ else if (elementWithHighestPriority="PlusButton" or elementWithHighestPriority="
 	;ElementSettings.new(elementWithHighestPriority) ;open settings of element
 	
 }
-else if (elementWithHighestPriority="MoveButton1")
+else if (elementWithHighestPriority="MoveButton1") ;if a connection is selected and user moved the upper Part of it
 {
 	
 	ret:=ui_MoveConnection(,TheOnlyOneMarkedElement ,,allelements[TheOnlyOneMarkedElement.to] )
@@ -231,7 +229,7 @@ else if (elementWithHighestPriority="MoveButton1")
 	;~ ui_draw()
 
 }
-else if (elementWithHighestPriority="MoveButton2")
+else if (elementWithHighestPriority="MoveButton2") ;if a connection is selected and user moved the lower Part of it
 {
 	abortAddingElement:=false
 	
@@ -259,7 +257,7 @@ else if (elementWithHighestPriority="MoveButton2")
 	
 
 }
-else if (elementWithHighestPriority="TrashButton")
+else if (elementWithHighestPriority="TrashButton") ;if something is selected and user clicks on the trash button
 {
 	MsgBox, 4, % lang("Delete Object") , % lang("Do you really want to delete the %1% %2%?",lang (TheOnlyOneMarkedElement.type), TheOnlyOneMarkedElement.name)
 	IfMsgBox yes
@@ -271,7 +269,7 @@ else if (elementWithHighestPriority="TrashButton")
 	;~ ui_draw()
 	;e_CorrectElementErrors("Code: 231684866.")
 }
-else if (elementWithHighestPriority="EditButton")
+else if (elementWithHighestPriority="EditButton")  ;if something is selected and user clicks on the edit button
 {
 	
 	if (theOnlyOneMarkedElement.type="connection")
@@ -313,7 +311,7 @@ else if (IsObject(elementWithHighestPriority)) ;if user clicked on an element
 		if (!ui_detectMovement()) ;If user did not move the mouse
 		{	
 			
-			if (ControlKeyState="d")
+			if (ControlKeyState="d") ;if user presses Control key
 			{
 				
 				elementWithHighestPriority.mark(true) ;mark multiple elements
@@ -325,15 +323,20 @@ else if (IsObject(elementWithHighestPriority)) ;if user clicked on an element
 		}
 		else ;If user moves the mouse
 		{
-			if (markedElementWithLowestPriority!="")
-				ret:=ui_moveSelectedElements()
-			else if ((ControlKeyState!="d")) ;if no elements are marked, select an move it
+			if (markedElementWithLowestPriority!="") ;If the element under the mouse is already marked
+				ret:=ui_moveSelectedElements() ;move the elements
+			else if ((ControlKeyState!="d")) ;if no elements are marked and user does not press the control key
 			{
-				elementWithHighestPriority.mark()
-				ret:=ui_moveSelectedElements()
+				elementWithHighestPriority.mark() ;select the element (and unselect others)
+				ret:=ui_moveSelectedElements() ;Move it
+			}
+			else
+			{
+				elementWithHighestPriority.mark(true) ;select the element (additionally to others)
+				ret:=ui_moveSelectedElements() ;Move it
 			}
 			
-			if (ret.moved=true) ;if did a move
+			if (ret.moved=true) ;if user actually moved the elements
 			{
 				UserDidMinorChange:=true
 			}
@@ -371,10 +374,10 @@ tempOldConnection1to:=""
 
 if (UserDidMajorChange or UserDidMinorChange)
 {
-	new state()
+	new state() ;make a new state. If user presses Ctrl+Z, the change will be undone
 }
 else if (UserDidMinorChange)
-	new state()
+	new state() ;make a new state. If user presses Ctrl+Z, the change will be undone
 	
 workingOnClick:=false
 

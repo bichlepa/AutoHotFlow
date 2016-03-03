@@ -54,7 +54,7 @@ class ElementSettings
 					if tempres=deleted
 					{
 						new state()
-						goto ElementSettingsGOTOPointIfATriggerWasDeleted
+						goto ElementSettingsGOTOPointIfATriggerWasDeleted 
 					}
 					setElement:=ParElement
 				}
@@ -118,7 +118,7 @@ class ElementSettings
 		for index, parameter in parametersToEdit
 		{
 			
-			
+			;Add one or a group of controls. This is done dynamically, dependent on the parameters
 			if (parameter.type="Label")
 			{
 				ElementSettingsFields.push(new this.label(parameter))
@@ -255,11 +255,11 @@ class ElementSettings
 			
 		gui,GUISettingsOfElementParent:show
 		
-		if (wait=1 or wait="wait")
+		if (wait=1 or wait="wait") ;Wait until user closes the window
 		{
 			Loop
 			{
-				if (NowResultEditingElement="")
+				if (NowResultEditingElement="") ;This variable will be set when user closes the window
 					sleep 100
 				else 
 					break
@@ -303,12 +303,12 @@ class ElementSettings
 		SettingsOfElementParentEscape:
 		GUISettingsOfElementCancel:
 		;~ ToolTip %a_thislabel%
-		if (setElement.name="Νew Соntainȩr" or setElement.name="Νew Triggȩr") ;Do not translate!
+		if (setElement.name="Νew Соntainȩr" or setElement.name="Νew Triggȩr") ;Delete the element if it was newly created
 		{
 			setElement.remove()
 		}
 		
-		if (element.previousSubType)
+		if (element.previousSubType) ;restore previous subtype of element if it was changed recently
 		{
 			setElement.SubType:=element.previousSubType
 			element.previousSubType:=""
@@ -330,7 +330,6 @@ class ElementSettings
 		
 		
 		GUISettingsOfElementSave:
-		somethingchanged:=0 ;will be incremented if a change will be detected
 		GUISettingsOfElementobject.updatename()
 		;~ gui,SettingsOfElement:submit
 		if (setElement.type="trigger" and triggersEnabled=true) ;When editing a trigger, disable Triggers and enable them afterwards
@@ -341,7 +340,8 @@ class ElementSettings
 		else
 			tempReenablethen:=false
 		
-		
+		;Save the parameters
+		somethingchanged:=0 ;will be incremented if a change will be detected
 		setElement.Name:=ElementSettingsNameField.getValue("Name")
 		setElement.StandardName:=ElementSettingsNameField.getValue("StandardName")
 		;~ MsgBox % strobj(parametersToEdit)
@@ -407,7 +407,7 @@ class ElementSettings
 	
 	
 	
-	;The fields will be added to the GUI
+	;The fields will be added to the GUI. This class contains common methods
 	class field
 	{
 		__new(parameter)
@@ -1648,7 +1648,7 @@ class ElementSettings
 }
 
 
-
+;Called when the GUI is resized by user
 SettingsOfElementParentSize(GuiHwnd, EventInfo, Width, Height)
 {
 	global
@@ -1668,15 +1668,13 @@ SettingsOfElementParentSize(GuiHwnd, EventInfo, Width, Height)
 }
 
 
-
+;This and following functions will be called if user changes some value
 GUISettingsOfElementChangeRadio(CtrlHwnd, GuiEvent="", EventInfo="", ErrorLevell="")
 {
 	global
 	ElementSettingsFieldHWNDs[CtrlHwnd].ChangeRadio()
 	
 	return
-	
-	
 }
 
 GUISettingsOfElementCheckContent(CtrlHwnd, GuiEvent="", EventInfo="", ErrorLevell="")
@@ -1772,7 +1770,7 @@ GUISettingsOfElementWeekdays(CtrlHwnd, GuiEvent="", EventInfo="", ErrorLevell=""
 
 
 
-
+;Called, when some additional functions are used, e.g. get window informations
 ui_disableElementSettingsWindow()
 {
 	global
@@ -1968,7 +1966,7 @@ selectSubType(parElement,wait="")
 
 
 
-
+;Select connection type
 selectConnectionType(parelement,wait="")
 {
 	global 
@@ -2095,7 +2093,7 @@ selectConnectionType(parelement,wait="")
 	
 }
 
-
+;Select container type
 selectContainerType(parelement="", wait="")
 {
 	global 

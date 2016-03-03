@@ -133,7 +133,7 @@ i_save()
 	
 
 	RIni_Shutdown("SaveFile")
-	;~ savedState:=currentstateid
+	savedState:=currentstateid
 	maingui.enable()
 	busy:=false
 }

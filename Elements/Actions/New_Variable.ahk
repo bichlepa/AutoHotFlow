@@ -18,8 +18,9 @@ class ActionNew_variable extends ElementExecution
 			return
 		}
 		
-		if (this.par.expression=2)
+		if (this.element.par.expression=2)
 		{
+			;~ MsgBox fdgawewe
 			;~ Value:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%VarValue)
 			Value:=variable.EvaluateExpression(this.thread,this.element.par.VarValue)
 		}

@@ -128,8 +128,7 @@ enableFlow(ID,options="")
 	global
 	if options=Startup
 	{
-		
-		run,% editorpath  " enableFlow """ %ID%ini " "" ""startup""" 
+		runeditor("enableFlow """ %ID%ini " "" ""startup""" ) 
 		if waitForFlowToAppear(nameOf(ID))
 			return true
 		else
@@ -142,7 +141,7 @@ enableFlow(ID,options="")
 		
 		if temperrorlevel
 		{
-			run,% editorpath  " enableFlow """ %ID%ini " """
+			runeditor("enableFlow """ %ID%ini " """ ) 
 			if waitForFlowToAppear(nameOf(ID))
 				return true
 			else
@@ -168,7 +167,7 @@ runFlow(ID,configuration="empty")
 	
 	if temperrorlevel
 	{
-		run,% editorpath  " runFlow """ %ID%ini " """
+		runeditor("runFlow """ %ID%ini " """) 
 		if waitForFlowToAppear(nameOf(ID))
 			return true
 		else
@@ -186,7 +185,7 @@ editFlow(ID)
 	
 	if temperrorlevel
 	{
-		run,% editorpath  " editFlow """ %ID%ini " """
+		runeditor("editFlow """ %ID%ini " """)
 		if waitForFlowToAppear(nameOf(ID))
 			return true
 		else
@@ -195,6 +194,15 @@ editFlow(ID)
 	else
 		return true
 	
+}
+
+runEditor(pars)
+{
+	global
+	if a_iscompiled
+		run,% editorpath  " " pars
+	else
+		run, %A_AhkPath% %editorpath% %pars%
 }
 
 disableFlow(ID)
