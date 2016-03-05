@@ -4,6 +4,7 @@ states:=new stateClass()
 currentState=[]
 savedState=
 currentStateID=
+share.currentState:=currentState
 ;~ ;Testing:
 ;~ loop 12
 ;~ StateID1:=new state()
@@ -51,6 +52,7 @@ class stateClass
 	undo() ;Try to find an older state than the current and set it.
 	{
 		global currentStateID
+		global share
 		found:=false
 		for id, state in this
 		{
@@ -58,6 +60,7 @@ class stateClass
 			{
 				currentStateID:=previousID
 				currentState:=previousState
+				share.currentState:=currentState
 				break
 			}
 			found:=true
@@ -70,6 +73,7 @@ class stateClass
 	redo() ;Try to find a newer state than the current and set it. This is only possible after user has done a redo and did not changed anything yet.
 	{
 		global currentStateID
+		global share
 		assignnext:=false
 		for id, state in this
 		{
@@ -77,6 +81,7 @@ class stateClass
 			{
 				currentStateID:=id
 				currentState:=state
+				share.currentState:=currentState
 				break
 			}
 			if (id=currentStateID)
@@ -113,7 +118,7 @@ class state
 {
 	__new()
 	{
-		global states
+		global states, share
 		global globalstatesCounter, currentStateID, currentState
 		
 		states.deleteNewerStatesThanCurrent()
@@ -123,6 +128,7 @@ class state
 		states.crop()
 		currentStateID:=this.id
 		currentState:=this
+		share.currentState:=currentState
 		this.update()
 	}
 	
@@ -144,6 +150,10 @@ class state
 		allTriggers:=ObjFullyClone(this.allTriggers)
 		flowSettings:=ObjFullyClone(this.flowSettings)
 		element.unmarkall()
+		share.allElements:=allElements
+		share.allConnections:=allConnections
+		share.allTriggers:=allTriggers
+		share.flowSettings:=flowSettings
 	}
 	
 	delete()

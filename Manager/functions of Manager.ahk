@@ -202,7 +202,7 @@ runEditor(pars)
 	if a_iscompiled
 		run,% editorpath  " " pars
 	else
-		run, %A_AhkPath% %editorpath% %pars%
+		run, %A_ScriptDir%\AutoHotkey\AutoHotkey_H.exe %editorpath% %pars%
 }
 
 disableFlow(ID)

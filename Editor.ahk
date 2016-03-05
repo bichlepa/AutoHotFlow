@@ -8,6 +8,9 @@ CoordMode,mouse,client
 ;FileEncoding,UTF-8
 OnExit,Exit
 
+
+hModule := DllCall("LoadLibrary","Str",a_scriptdir "\AutoHotKey\AutoHotkey_H.exe")
+
 DetectHiddenWindows,on
 preventSecondPromptToSave:=false
 
@@ -26,7 +29,7 @@ flowSettings.MaximumCountOfParallelInstances:=100
 flow.ClipboardFilePath:=A_ScriptDir "\Clipboard.ini"
 ;~ LangNoUseCache:=true ;only for debugging
 
-
+share:=CriticalObject()
 ;Priorities
 c_PriorityForIteration:=-50
 c_PriorityForInstanceInitialization:=-100
@@ -336,7 +339,9 @@ FileCreateDir Generated Scripts
 
 
 maingui:=new maingui() ;Create the main GUI
-;Get window client size
+
+;Create thread for drawing
+ui_initGDIThread()
 
 ;Evaluate parameters
 if 1=EditFlow 

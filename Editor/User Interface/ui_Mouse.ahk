@@ -395,6 +395,7 @@ ui_findElementUnderMouse(par_mode="default")
 	
 	if (par_mode="default")
 	{
+		
 		;look whether user wants to create a new element (click on a field on top left corner)
 		if ((0 < mx) and (0 < my) and ((NewElementIconWidth*1.2*zoomFactor)  > mx) and ((NewElementIconHeight*1.2*zoomFactor) > my))
 			elementWithHighestPriority=MenuCreateNewAction
@@ -404,20 +405,20 @@ ui_findElementUnderMouse(par_mode="default")
 			elementWithHighestPriority=MenuCreateNewLoop
 	
 
-
-		;ToolTip( "gsdd" Sqrt((middlePointOfPlusButtonX*zoomFactor - mx)*(middlePointOfPlusButtonX*zoomFactor - mx) + (middlePointOfPlusButtonY*zoomFactor - my)*(middlePointOfPlusButtonY*zoomFactor - my)) "`n middlePointOfPlusButtonX " middlePointOfPlusButtonX "`n middlePointOfPlusButtonY " middlePointOfPlusButtonY)
+		;~ ToolTip % share.PlusButtonExist " -" share.middlePointOfPlusButtonX
+		;~ ToolTip( "gsdd" Sqrt((middlePointOfPlusButtonX*zoomFactor - mx)*(middlePointOfPlusButtonX*zoomFactor - mx) + (middlePointOfPlusButtonY*zoomFactor - my)*(middlePointOfPlusButtonY*zoomFactor - my)) "`n middlePointOfPlusButtonX " middlePointOfPlusButtonX "`n middlePointOfPlusButtonY " middlePointOfPlusButtonY)
 		;Look whether user clicked a button
-		if (PlusButtonExist=true and Sqrt((middlePointOfPlusButtonX*zoomFactor - mx)*(middlePointOfPlusButtonX*zoomFactor - mx) + (middlePointOfPlusButtonY*zoomFactor - my)*(middlePointOfPlusButtonY*zoomFactor - my)) < SizeOfButtons/2*zoomFactor)
+		if (share.PlusButtonExist=true and Sqrt((share.middlePointOfPlusButtonX*zoomFactor - mx)*(share.middlePointOfPlusButtonX*zoomFactor - mx) + (share.middlePointOfPlusButtonY*zoomFactor - my)*(share.middlePointOfPlusButtonY*zoomFactor - my)) < SizeOfButtons/2*zoomFactor)
 			elementWithHighestPriority=PlusButton
-		else if (PlusButton2Exist=true and Sqrt((middlePointOfPlusButton2X*zoomFactor - mx)*(middlePointOfPlusButton2X*zoomFactor - mx) + (middlePointOfPlusButton2Y*zoomFactor - my)*(middlePointOfPlusButton2Y*zoomFactor - my)) < SizeOfButtons/2*zoomFactor)
+		else if (share.PlusButton2Exist=true and Sqrt((share.middlePointOfPlusButton2X*zoomFactor - mx)*(share.middlePointOfPlusButton2X*zoomFactor - mx) + (share.middlePointOfPlusButton2Y*zoomFactor - my)*(share.middlePointOfPlusButton2Y*zoomFactor - my)) < SizeOfButtons/2*zoomFactor)
 			elementWithHighestPriority=PlusButton2
-		else if (EditButtonExist=true and Sqrt((middlePointOfEditButtonX*zoomFactor - mx)*(middlePointOfEditButtonX*zoomFactor - mx) + (middlePointOfEditButtonY*zoomFactor - my)*(middlePointOfEditButtonY*zoomFactor - my)) < SizeOfButtons/2 *zoomFactor)
+		else if (share.EditButtonExist=true and Sqrt((share.middlePointOfEditButtonX*zoomFactor - mx)*(share.middlePointOfEditButtonX*zoomFactor - mx) + (share.middlePointOfEditButtonY*zoomFactor - my)*(share.middlePointOfEditButtonY*zoomFactor - my)) < SizeOfButtons/2 *zoomFactor)
 			elementWithHighestPriority=EditButton
-		else if (TrashButtonExist=true and Sqrt((middlePointOfTrashButtonX*zoomFactor - mx)*(middlePointOfTrashButtonX*zoomFactor - mx) + (middlePointOfTrashButtonY*zoomFactor - my)*(middlePointOfTrashButtonY*zoomFactor - my)) < SizeOfButtons/2*zoomFactor)
+		else if (share.TrashButtonExist=true and Sqrt((share.middlePointOfTrashButtonX*zoomFactor - mx)*(share.middlePointOfTrashButtonX*zoomFactor - mx) + (share.middlePointOfTrashButtonY*zoomFactor - my)*(share.middlePointOfTrashButtonY*zoomFactor - my)) < SizeOfButtons/2*zoomFactor)
 			elementWithHighestPriority=TrashButton
-		else if (MoveButton2Exist=true and Sqrt((middlePointOfMoveButton2X*zoomFactor - mx)*(middlePointOfMoveButton2X*zoomFactor - mx) + (middlePointOfMoveButton2Y*zoomFactor - my)*(middlePointOfMoveButton2Y*zoomFactor - my)) < SizeOfButtons/2*zoomFactor)
+		else if (share.MoveButton2Exist=true and Sqrt((share.middlePointOfMoveButton2X*zoomFactor - mx)*(share.middlePointOfMoveButton2X*zoomFactor - mx) + (share.middlePointOfMoveButton2Y*zoomFactor - my)*(share.middlePointOfMoveButton2Y*zoomFactor - my)) < SizeOfButtons/2*zoomFactor)
 			elementWithHighestPriority=MoveButton2
-		else if (MoveButton1Exist=true and Sqrt((middlePointOfMoveButton1X*zoomFactor - mx)*(middlePointOfMoveButton1X*zoomFactor - mx) + (middlePointOfMoveButton1Y*zoomFactor - my)*(middlePointOfMoveButton1Y*zoomFactor - my)) < SizeOfButtons/2*zoomFactor)
+		else if (share.MoveButton1Exist=true and Sqrt((share.middlePointOfMoveButton1X*zoomFactor - mx)*(share.middlePointOfMoveButton1X*zoomFactor - mx) + (share.middlePointOfMoveButton1Y*zoomFactor - my)*(share.middlePointOfMoveButton1Y*zoomFactor - my)) < SizeOfButtons/2*zoomFactor)
 			elementWithHighestPriority=MoveButton1
 	}
 
@@ -560,10 +561,10 @@ ui_moveSelectedElements(option="")
 			}
 			
 			MouseGetPos,newmx,newmy ;get mouse position and calculate the new position of the element
-			oldposx:=newmx
-			oldposy:=newmy
 			if (newmx!=oldposx OR newmy!=oldposy) ;If mouse is currently moving
 			{
+				oldposx:=newmx
+				oldposy:=newmy
 				newposy:=(firstposy+(newmy-firstmy)/zoomFactor)-firstoffsety+offsety
 				
 				TheOnlyOneMarkedElement.HeightOfVerticalBar:=(oldHeightOfVerticalBar+(newmy-my)/zoomFactor)-firstoffsety+offsety
@@ -576,7 +577,7 @@ ui_moveSelectedElements(option="")
 			}
 			else ;If mouse is not currently moving
 			{
-				sleep,50 ;Save processor load
+				sleep,10 ;Save processor load
 			}
 			
 			
@@ -634,11 +635,10 @@ ui_moveSelectedElements(option="")
 			
 			MouseGetPos,newmx,newmy ;get mouse position and calculate the new position of the element
 			
-			oldposx:=newmx
-			oldposy:=newmy
-			if (newposx!=oldposx OR newposy!=oldposy) ;If mouse is currently moving
+			if (newmx!=oldposx OR newmy!=oldposy) ;If mouse is currently moving
 			{
-				
+				oldposx:=newmx
+				oldposy:=newmy
 				for index, forElement in markedElements
 				{
 					newposx:=(forElement.oldx+(newmx-firstmx)/zoomFactor) -firstoffsetx + offsetx
@@ -656,7 +656,7 @@ ui_moveSelectedElements(option="")
 			}
 			else ;If mouse is not currently moving
 			{
-				sleep,50 ;Save processor load
+				sleep,10 ;Save processor load
 			}
 			
 			
@@ -696,13 +696,13 @@ ui_detectMovement(threshold=2,button="lbutton")
 		}
 		
 		
-		sleep,50 ;Save processor load
+		sleep,10 ;Save processor load
 	}
 	return clickMoved
 	
 }
 
-ui_detectMovementWithoutBlocking(threshold=0)
+ui_detectMovementWithoutBlocking(threshold=1)
 {
 	static yold =0
 	static xold =0
@@ -718,7 +718,7 @@ ui_detectMovementWithoutBlocking(threshold=0)
 		xold:=xnew
 		
 		howMuchMoved++
-		if (howMuchMoved>threshold)
+		if (howMuchMoved>=threshold)
 		{
 			
 			return true
@@ -823,7 +823,7 @@ ui_MoveConnection(connection1="", connection2="", element1="", element2="")
 		
 		;~ ToolTip(strobj(connection1) "`n`n" strobj(connection2),10000)
 		
-		GDI_DrawMoveButtonUnderMouse:=true
+		share.GDIPars.DrawMoveButtonUnderMouse:=true
 		
 		if (ui_detectMovement()) ;If user moves the mouse
 			untilRelease:=true ;move until user releases mouse
@@ -847,10 +847,12 @@ ui_MoveConnection(connection1="", connection2="", element1="", element2="")
 				abortAddingElement:=true
 				break
 			}
-			sleep 50 ;save CPU load
+			sleep 10 ;save CPU load
 			
 		}
 		UserCurrentlyMovesAnElement:=false
+		
+		share.GDIPars.DrawMoveButtonUnderMouse:=false
 		
 		if (abortAddingElement)
 			return "aborted"
@@ -860,7 +862,6 @@ ui_MoveConnection(connection1="", connection2="", element1="", element2="")
 		
 		ui_findElementUnderMouse("OnlyElements") ;Search an element beneath the mouse.
 		
-		GDI_DrawMoveButtonUnderMouse:=false
 		
 		if (elementWithHighestPriority="") ;If user pulled the end of the connection to empty space. Create new element
 		{

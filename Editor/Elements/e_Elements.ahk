@@ -7,6 +7,10 @@ allConnections:=new ObjectwithCounter()
 allTriggers:=new ObjectwithCounter()
 markedElements:=new ObjectwithCounter()
 
+share.allElements:=allElements
+share.allConnections:=allConnections
+share.allTriggers:=allTriggers
+
 class ObjectwithCounter
 {
 	count() 
@@ -30,6 +34,7 @@ class commonForElements
 		global allElements 
 		global allConnections 
 		global TheOnlyOneMarkedElement 
+		global share 
 		
 		markedElements:=new ObjectwithCounter() ;remove all marked elements
 		for index, tempelement in allElements ;Add all marked elements into array
@@ -43,6 +48,8 @@ class commonForElements
 			markedElements.push(tempelement)
 		}
 		TheOnlyOneMarkedElement:=""
+		share.TheOnlyOneMarkedElement:=TheOnlyOneMarkedElement
+		share.markedElementsCount:=markedElements.Count()
 		ui_UpdateStatusbartext()	
 		
 	}
@@ -53,6 +60,7 @@ class commonForElements
 		global allConnections
 		global allElements
 		global TheOnlyOneMarkedElement
+		global share 
 		
 		if (additional=false)
 		{
@@ -97,6 +105,8 @@ class commonForElements
 		if (markedElements.count()!=1)
 			TheOnlyOneMarkedElement=
 		
+		share.TheOnlyOneMarkedElement:=TheOnlyOneMarkedElement
+		share.markedElementsCount:=markedElements.Count()
 		;ToolTip("-" element.id "-" element.marked "-" TheOnlyOneMarkedElement )
 		ui_UpdateStatusbartext()
 	}
@@ -107,6 +117,7 @@ class commonForElements
 		global allElements 
 		global allConnections 
 		global TheOnlyOneMarkedElement 
+		global share 
 		
 		markedElements:=new ObjectwithCounter() ;remove all marked elements
 		for index, tempelement in allElements ;Add all marked elements into array
@@ -118,6 +129,8 @@ class commonForElements
 			tempelement.marked:=false
 		}
 		TheOnlyOneMarkedElement:=""
+		share.markedElementsCount:=markedElements.Count()
+		share.TheOnlyOneMarkedElement:=TheOnlyOneMarkedElement
 		ui_UpdateStatusbartext()
 	}
 	
