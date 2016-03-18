@@ -16,9 +16,9 @@ d_showElementDetais()
 {
 	global
 	if GetKeyState("ctrl")
-		MsgBox % strobj(theonlyonemarkedelement)
+		MsgBox % strobj(markedElement)
 	else
-		ToolTip(strobj(theonlyonemarkedelement),10000)
+		ToolTip(strobj(markedElement),10000)
 	
 }
 

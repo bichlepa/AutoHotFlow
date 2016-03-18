@@ -2,14 +2,13 @@
 ;Contains common functions that are needed for execution. They will be available for any element, which are in the subfolders
 class ElementExecution
 {
-	__new(p_Thread)
+	__new(p_Thread,p_ClonedElement)
 	{
 		;~ d(p_Thread,"njöo")
 		;Save some informations
 		this.__thread:=&p_Thread
 		this.__instance:=&p_Thread.instance
-		this.element:=p_Thread.element
-		this.par:=p_Element.par.clone() ;Copy all parameters. It might happen that they will be changed by user during execution, which might cause errors
+		this.element:=p_ClonedElement
 		
 		this.running:=false
 		this.finished:=false

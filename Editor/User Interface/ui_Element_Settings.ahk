@@ -17,7 +17,7 @@ class ElementSettings
 	
 	
 	;Open GUI for settings parameters of an element.
-	open(ParElement,wait="")
+	open(p_ID,wait="")
 	{
 		global
 		local temp, tempYPos, tempXPos, tempEditwidth, tempIsDefault, tempAssigned, tempChecked, tempMakeNewGroup, temptoChoose, tempAltSumbit, tempChoises, tempAllChoices, tempParameterOptions, tempres, tempelement
@@ -27,8 +27,8 @@ class ElementSettings
 		static NowResultEditingElement, somethingchanged, temponeValue
 		;~ static setElement, setElementID, setElementType, setElementsubType
 		static Parameterwait
-		this.element:=ParElement
-		setElement:=ParElement
+		this.element:=p_ID
+		setElement:=allElements[p_ID]
 		setElementID:=setElement.id
 		setElementType:=setElement.Type
 		setElementsubType:=setElement.subType
@@ -70,9 +70,9 @@ class ElementSettings
 					}
 					else
 					{
-						this.element:=tempelement
-						setElement:=tempelement
-						setElementID:=tempelement.id
+						this.element:=alltriggers[tempelement]
+						setElement:=this.element
+						setElementID:=tempelement
 						setElementType:=tempelement.Type
 						setElementsubType:=tempelement.subType
 					}
@@ -1790,12 +1790,12 @@ ui_EnableElementSettingsWindow()
 
 
 ;Select element subtype
-selectSubType(parElement,wait="")
+selectSubType(p_ID,wait="")
 {
 	global
-	setElement:=parElement
+	setElementID:=p_ID
+	setElement:=allElements[p_ID]
 	setElementType:=setElement.type 
-	setElementID:=setElement.id
 	
 	NowResultEditingElement=
 	if setElementType=condition
@@ -1967,13 +1967,15 @@ selectSubType(parElement,wait="")
 
 
 ;Select connection type
-selectConnectionType(parelement,wait="")
+selectConnectionType(p_ID,wait="")
 {
 	global 
 	static NowResultEditingElement, setElement, temp_from, ConnectionType
 	
 	NowResultEditingElement:=""
-	setElement:=parelement
+	
+	setElementID:=p_ID
+	setElement:=allConnections[p_ID]
 	temp_from:=allelements[setElement.from]
 	ConnectionType:=setElement.Type
 	
@@ -2094,12 +2096,13 @@ selectConnectionType(parelement,wait="")
 }
 
 ;Select container type
-selectContainerType(parelement="", wait="")
+selectContainerType(p_ID, wait="")
 {
 	global 
 	static NowResultEditingElement
 	NowResultEditingElement:=""
-	setElement:=parelement
+	setElementID:=p_ID
+	setElement:=allElements[p_ID]
 	maingui.disable()
 	gui, 8:default
 	

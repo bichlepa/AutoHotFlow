@@ -28,12 +28,12 @@ i_save()
 	
 	busy:=true
 	
-	logger("a1","Saving flow " flowSettings.Name)
+	logger("a1","Saving flow " share.flowSettings.Name)
 	CopyOfCurrentState:=ObjFullyClone(currentstate)
 	ToolTip(lang("saving"),100000)
 	
 	
-	FileCreateDir,% flow.Folder
+	FileCreateDir,% share.flow.Folder
 	RIni_Shutdown("SaveFile")
 	Rini_Create("SaveFile")
 	
@@ -41,13 +41,13 @@ i_save()
 	RIni_SetKeyValue("SaveFile", "general", "OffsetY", Offsety)
 	RIni_SetKeyValue("SaveFile", "general", "zoomFactor", zoomFactor)
 	RIni_SetKeyValue("SaveFile", "general", "count", globalcounter)
-	RIni_SetKeyValue("SaveFile", "general", "SettingFlowExecutionPolicy", flowSettings.ExecutionPolicy)
-	RIni_SetKeyValue("SaveFile", "general", "SettingWorkingDir", flowSettings.WorkingDir)
-	RIni_SetKeyValue("SaveFile", "general", "LogToFile", flowSettings.LogToFile)
-	RIni_SetKeyValue("SaveFile", "general", "name", flowSettings.Name)
-	RIni_SetKeyValue("SaveFile", "general", "category", flowSettings.category)
+	RIni_SetKeyValue("SaveFile", "general", "SettingFlowExecutionPolicy", share.flowSettings.ExecutionPolicy)
+	RIni_SetKeyValue("SaveFile", "general", "SettingWorkingDir", share.flowSettings.WorkingDir)
+	RIni_SetKeyValue("SaveFile", "general", "LogToFile", share.flowSettings.LogToFile)
+	RIni_SetKeyValue("SaveFile", "general", "name", share.flowSettings.Name)
+	RIni_SetKeyValue("SaveFile", "general", "category", share.flowSettings.category)
 	RIni_SetKeyValue("SaveFile", "general", "FlowCompabilityVersion", FlowCompabilityVersionOfApp)
-	RIni_SetKeyValue("SaveFile", "general", "Static variables folder", flowSettings.FolderOfStaticVariables)
+	RIni_SetKeyValue("SaveFile", "general", "Static variables folder", share.flowSettings.FolderOfStaticVariables)
 	
 	
 	for saveElementID, saveElement in CopyOfCurrentState.allElements
@@ -119,15 +119,15 @@ i_save()
 		i_SaveParametersOfElement(saveElement,saveSection,"SaveFile")
 	}
 	
-	ret:=RIni_Write("SaveFile", flow.FilePath)
+	ret:=RIni_Write("SaveFile", share.flow.FilePath)
 	if not ret
 	{
-		logger("a1","Flow " flowSettings.Name " was successfully saved.")
+		logger("a1","Flow " share.flowSettings.Name " was successfully saved.")
 		ToolTip(lang("saved"))
 	}
 	else
 	{
-		logger("a0","Error. Flow " flowSettings.Name " couldn't be saved.")
+		logger("a0","Error. Flow " share.flowSettings.Name " couldn't be saved.")
 		MsgBox % lang("Saving was unsuccessful")
 	}
 	

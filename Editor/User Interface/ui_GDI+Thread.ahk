@@ -1,7 +1,10 @@
-﻿;Here at the top there will be something like this line:
+﻿GDIThreadCode=
+( ` % 
+
+;Here at the top there will be something like this line:
 ; share:=Criticalobject(1234)
 ;The object share contains values which are shared among this and other threads
-
+#NoTrayIcon
 #Persistent
 #include language\language.ahk ;Must be very first
 #include External Scripts\gdi+\gdip.ahk
@@ -61,7 +64,6 @@ pBrushBackground := Gdip_BrushCreateSolid("0xFFeaf0ea") ;Almost white brush for 
 
 
 
-
 mainguiHwnddc := GetDC(MainGuihwnd) ;Needed by GDI+
 
 
@@ -86,8 +88,8 @@ ui_DrawThread()
 		zoomFactor:=share.GDIPars.zoomFactor
 		widthofguipic:=share.GDIPars.widthofguipic
 		heightofguipic:=share.GDIPars.heightofguipic
-		TheOnlyOneMarkedElement:=share.TheOnlyOneMarkedElement
-		;~ ToolTip % strobj(TheOnlyOneMarkedElement)
+		markedElement:=share.markedElement
+		;~ ToolTip % strobj(markedElement)
 		;Check whether the zoomfactor is inside the allowed bounds
 		if (zoomFactor<zoomFactorMin)
 			zoomFactor:=zoomFactorMin
@@ -114,12 +116,12 @@ ui_DrawThread()
 	}
 
 	DetectHiddenWindows on
-	
 	;~ SetTimer,ui_regularUpdateIfWinMoved,100
 }
 
-
-
+)
+GDIThreadCode=%GDIThreadCode%`n
+( ` % 
 ;Draws everything in the main GUI
 ui_DrawEverything()
 {
@@ -139,7 +141,7 @@ ui_DrawEverything()
 	AnyRecentlyRunElementFound:=false
 	;~ ToolTip %posw% %posh%
 	;~ return
-	;~ MsgBox % strobj(share.allElements)
+	;~ MsgBox % strobj(allElements)
 	;~ Critical,on
 	
 	DrawingRightNow:=true
@@ -218,28 +220,27 @@ ui_DrawEverything()
 		}
 	}
 	
-	
 	;Draw connections. At first make a sorted copy
 	tempElementList:=[]
 	tempElementList2:=[]
-	for index, tempelement in share.allConnections
+	for drawID, tempelement in allConnections
 	{
+		;~ MsgBox %index%
 		if (tempelement.marked)
-			tempElementList2.push(tempelement)
+			tempElementList2[drawID]:=allConnections[drawID].clone()
 		else
-			tempElementList.push(tempelement)
+			tempElementList[drawID]:=allConnections[drawID].clone()
 	}
-	for index, tempelement in tempElementList2
+	for drawID, tempelement in tempElementList2
 	{
-		tempElementList.push(tempelement)
+		tempElementList[drawID]:=tempelement
 	}
-	for index, drawElement in tempElementList
+	for drawID, drawElement in tempElementList
 	{
-		
-		tempFromEl:=share.allElements[drawElement.from]
+		tempFromEl:=allElements[drawElement.from].clone()
 		if (not isobject(tempFromEl))
 			tempFromEl:=drawElement.from
-		tempToEl:=share.allElements[drawElement.to]
+		tempToEl:=allElements[drawElement.to].clone()
 		if (not isobject(tempToEl))
 			tempToEl:=drawElement.to
 		
@@ -253,8 +254,8 @@ ui_DrawEverything()
 				tempElementHasRecentlyRun:=true
 				AnyRecentlyRunElementFound:=true
 			}
-			else
-				drawElement.delete(lastRun)
+			;~ else
+				;~ drawElement.delete(lastRun)
 		}
 		
 		
@@ -494,10 +495,11 @@ ui_DrawEverything()
 		;MsgBox,% marked
 		;msgbox,x%lin3x% y%lin3y% w%lin3w% h%lin3h%`nx%lin4x% y%lin4y% w%lin4w% h%lin4h%
 		;msgbox,x%lin1x% y%lin1y% w%lin1w% h%lin1h%
+)
+GDIThreadCode=%GDIThreadCode%`n
+( ` % 
 		
-		
-		
-		drawElement.CountOfParts:=0
+		allConnections[drawID].CountOfParts:=0
 		
 		loop 5
 		{
@@ -522,34 +524,38 @@ ui_DrawEverything()
 					Gdip_DrawLine(G, pPenRunningLin, ((lin%a_index%x-Offsetx)*zoomFactor), ((lin%a_index%y-Offsety)*zoomFactor), ((lin%a_index%x+lin%a_index%w-Offsetx)*zoomFactor) , ((lin%a_index%y+lin%a_index%h-Offsety)*zoomFactor))
 			}
 			
+			;~ ToolTip % drawElement.CountOfParts
+			
 			;Define area of parts
-			drawElement["part" a_index "x1"]:=((lin%a_index%x-20-Offsetx)*zoomFactor)
-			drawElement["part" a_index "y1"]:=((lin%a_index%y-20-Offsety)*zoomFactor)
-			drawElement["part" a_index "x2"]:=((lin%a_index%x+lin%a_index%w+20-Offsetx)*zoomFactor)
-			drawElement["part" a_index "y2"]:=((lin%a_index%y+lin%a_index%h+20-Offsety)*zoomFactor)
-			drawElement.CountOfParts++
+			allConnections[drawID]["part" a_index "x1"]:=((lin%a_index%x-20-Offsetx)*zoomFactor)
+			allConnections[drawID]["part" a_index "y1"]:=((lin%a_index%y-20-Offsety)*zoomFactor)
+			allConnections[drawID]["part" a_index "x2"]:=((lin%a_index%x+lin%a_index%w+20-Offsetx)*zoomFactor)
+			allConnections[drawID]["part" a_index "y2"]:=((lin%a_index%y+lin%a_index%h+20-Offsety)*zoomFactor)
+			
 			;~ drawElement.ClickPriority:=200
 		}
-		
+		allConnections[drawID].CountOfParts:=5
 	}
 	
-	
-	
+		)
+GDIThreadCode=%GDIThreadCode%`n
+( ` %  
+
 	;Draw elements
 	tempElementList:=[]
 	tempElementList2:=[]
-	for index, tempelement in share.allElements
+	for tempID, tempelement in allElements
 	{
 		if (tempelement.marked)
-			tempElementList2.push(tempelement)
+			tempElementList2[tempID]:=allElements[tempID].clone()
 		else
-			tempElementList.push(tempelement)
+			tempElementList[tempID]:=allElements[tempID].clone()
 	}
-	for index, tempelement in tempElementList2
+	for tempID, tempelement in tempElementList2
 	{
-		tempElementList.push(tempelement)
+		tempElementList[tempID]:=tempelement
 	}
-	for index, drawElement in tempElementList
+	for drawID, drawElement in tempElementList
 	{
 		;Check whether element was recently running. This will paint it slightly red
 		tempElementHasRecentlyRun:=false
@@ -561,7 +567,7 @@ ui_DrawEverything()
 				AnyRecentlyRunElementFound:=true
 			}
 			else
-				drawElement.delete(lastRun)
+				allElements[drawID].delete(lastRun)
 		}
 		
 		;~ MsgBox % strobj(drawelement)
@@ -579,7 +585,7 @@ ui_DrawEverything()
 			;~ ToolTip % drawElement.id " - " drawElement.marked
 			if (drawElement.marked=true)
 				Gdip_FillroundedRectangle(G, pBrushMark, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y-Offsety)*zoomFactor), ((ElementWidth)*zoomFactor), ((ElementHeight)*zoomFactor),(30*zoomFactor))
-			if (drawElement.isRunning) ;If element is running
+			if (drawElement.state="Running") ;If element is running
 			{
 				Gdip_FillroundedRectangle(G, pBrushRunning, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y-Offsety)*zoomFactor), ((ElementWidth)*zoomFactor), ((ElementHeight)*zoomFactor),(30*zoomFactor))
 			}
@@ -590,12 +596,12 @@ ui_DrawEverything()
 			
 			;MsgBox,% "x" (drawElement.x*zoomFactor +4) "y" (drawElement.y*zoomFactor+4) TextOptions Font (180*zoomFactor-8) (135*zoomFactor-8)
 			;Define area of parts
-			drawElement.part1x1:=((drawElement.x-Offsetx)*zoomFactor)
-			drawElement.part1y1:=((drawElement.y-Offsety)*zoomFactor)
-			drawElement.part1x2:=((drawElement.x+ElementWidth-Offsetx)*zoomFactor)
-			drawElement.part1y2:=((drawElement.y+ElementHeight-Offsety)*zoomFactor)
+			allElements[drawID].part1x1:=((drawElement.x-Offsetx)*zoomFactor)
+			allElements[drawID].part1y1:=((drawElement.y-Offsety)*zoomFactor)
+			allElements[drawID].part1x2:=((drawElement.x+ElementWidth-Offsetx)*zoomFactor)
+			allElements[drawID].part1y2:=((drawElement.y+ElementHeight-Offsety)*zoomFactor)
 			;MsgBox,% "x1 " drawElement.part1x1 " y1 " drawElement.part1y1 " x2 " drawElement.part1x2 "y2" drawElement.part1y2
-			drawElement.CountOfParts:=1
+			allElements[drawID].CountOfParts:=1
 			;~ drawElement.ClickPriority:=500
 		}
 		if (drawElement.Type="Action")
@@ -611,7 +617,7 @@ ui_DrawEverything()
 			Gdip_TextToGraphics(G, drawElement.name, "x" ((drawElement.x-Offsetx)*zoomFactor +4) " y" ((drawElement.y-Offsety)*zoomFactor+4) " vCenter " TextOptions , Font, ((ElementWidth)*zoomFactor-8), (ElementHeight*zoomFactor-8))
 			if (drawElement.marked=true)
 				Gdip_FillRectangle(G, pBrushMark, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y-Offsety)*zoomFactor), (ElementWidth*zoomFactor), (ElementHeight*zoomFactor))
-			if (drawElement.isrunning) ;If element is running
+			if (drawElement.state:="running") ;If element is running
 			{
 				Gdip_FillRectangle(G, pBrushRunning, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y-Offsety)*zoomFactor), (ElementWidth*zoomFactor), (ElementHeight*zoomFactor))
 			}
@@ -622,11 +628,11 @@ ui_DrawEverything()
 			;MsgBox, % element "`n" drawElement.marked
 			
 			;Define area of parts
-			drawElement.part1x1:=((drawElement.x-Offsetx)*zoomFactor)
-			drawElement.part1y1:=((drawElement.y-Offsety)*zoomFactor)
-			drawElement.part1x2:=((drawElement.x+ElementWidth-Offsetx)*zoomFactor)
-			drawElement.part1y2:=((drawElement.y+ElementHeight-Offsety)*zoomFactor)
-			drawElement.CountOfParts:=1
+			allElements[drawID].part1x1:=((drawElement.x-Offsetx)*zoomFactor)
+			allElements[drawID].part1y1:=((drawElement.y-Offsety)*zoomFactor)
+			allElements[drawID].part1x2:=((drawElement.x+ElementWidth-Offsetx)*zoomFactor)
+			allElements[drawID].part1y2:=((drawElement.y+ElementHeight-Offsety)*zoomFactor)
+			allElements[drawID].CountOfParts:=1
 			;~ drawElement.ClickPriority:=500
 		}
 		if (drawElement.Type="Condition")
@@ -644,7 +650,7 @@ ui_DrawEverything()
 			if (drawElement.marked=true)
 				Gdip_FillroundedRectangle(G, pBrushMark, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y-Offsety)*zoomFactor), (ElementWidth*zoomFactor), (ElementHeight*zoomFactor),(30*zoomFactor))
 			
-			if (drawElement.isrunning) ;If element is running
+			if (drawElement.state="Running") ;If element is running
 			{
 				Gdip_FillroundedRectangle(G, pBrushRunning, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y-Offsety)*zoomFactor), (ElementWidth*zoomFactor), (ElementHeight*zoomFactor),(30*zoomFactor))
 			}
@@ -653,11 +659,11 @@ ui_DrawEverything()
 				Gdip_FillroundedRectangle(G, pBrushLastRunning, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y-Offsety)*zoomFactor), (ElementWidth*zoomFactor), (ElementHeight*zoomFactor),(30*zoomFactor))
 			}
 			;Define area of parts
-			drawElement.part1x1:=((drawElement.x-Offsetx)*zoomFactor)
-			drawElement.part1y1:=((drawElement.y-Offsety)*zoomFactor)
-			drawElement.part1x2:=((drawElement.x+ElementWidth-Offsetx)*zoomFactor)
-			drawElement.part1y2:=((drawElement.y+ElementHeight-Offsety)*zoomFactor)
-			drawElement.CountOfParts:=1
+			allElements[drawID].part1x1:=((drawElement.x-Offsetx)*zoomFactor)
+			allElements[drawID].part1y1:=((drawElement.y-Offsety)*zoomFactor)
+			allElements[drawID].part1x2:=((drawElement.x+ElementWidth-Offsetx)*zoomFactor)
+			allElements[drawID].part1y2:=((drawElement.y+ElementHeight-Offsety)*zoomFactor)
+			allElements[drawID].CountOfParts:=1
 			;~ drawElement.ClickPriority:=500
 		}
 		
@@ -686,7 +692,7 @@ ui_DrawEverything()
 				Gdip_FillRectangle(G, pBrushMark, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y+ElementHeight+drawElement.HeightOfVerticalBar-Offsety)*zoomFactor), ((ElementWidth)*zoomFactor), ((ElementHeight/3)*zoomFactor))
 			}
 			
-			if (drawElement.isrunning) ;If element is running
+			if (drawElement.state="running") ;If element is running
 			{
 				;Gdip_FillRectangle(G, pBrushRunning, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y-Offsety)*zoomFactor), (ElementWidth*zoomFactor), (ElementHeight*zoomFactor))
 				Gdip_FillRectangle(G, pBrushRunning, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y-Offsety)*zoomFactor), ((ElementWidth)*zoomFactor), ((ElementHeight)*zoomFactor))
@@ -701,23 +707,23 @@ ui_DrawEverything()
 				Gdip_FillRectangle(G, pBrushLastRunning, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y+ElementHeight+drawElement.HeightOfVerticalBar-Offsety)*zoomFactor), ((ElementWidth)*zoomFactor), ((ElementHeight/3)*zoomFactor))
 			}
 			;Define area of parts
-			drawElement.part1x1:=((drawElement.x-Offsetx)*zoomFactor)
-			drawElement.part1y1:=((drawElement.y-Offsety)*zoomFactor)
-			drawElement.part1x2:=((drawElement.x+ElementWidth-Offsetx)*zoomFactor)
-			drawElement.part1y2:=((drawElement.y+ElementHeight-Offsety)*zoomFactor)
-			drawElement.part2x1:=((drawElement.x-Offsetx)*zoomFactor)
-			drawElement.part2y1:=((drawElement.y+ElementHeight-Offsety)*zoomFactor)
-			drawElement.part2x2:=((drawElement.x+ElementWidth/8-Offsetx)*zoomFactor)
-			drawElement.part2y2:=((drawElement.y+ElementHeight+drawElement.HeightOfVerticalBar-Offsety)*zoomFactor)
-			drawElement.part3x1:=((drawElement.x-Offsetx)*zoomFactor)
-			drawElement.part3y1:=((drawElement.y+ElementHeight+drawElement.HeightOfVerticalBar-Offsety)*zoomFactor)
-			drawElement.part3x2:=((drawElement.x+ElementWidth*3/4-Offsetx)*zoomFactor)
-			drawElement.part3y2:=((drawElement.y+ElementHeight*4/3+drawElement.HeightOfVerticalBar-Offsety)*zoomFactor)
-			drawElement.part4x1:=((drawElement.x+ElementWidth*3/4-Offsetx)*zoomFactor)
-			drawElement.part4y1:=((drawElement.y+ElementHeight+drawElement.HeightOfVerticalBar-Offsety)*zoomFactor)
-			drawElement.part4x2:=((drawElement.x+ElementWidth-Offsetx)*zoomFactor)
-			drawElement.part4y2:=((drawElement.y+ElementHeight*4/3+drawElement.HeightOfVerticalBar-Offsety)*zoomFactor)
-			drawElement.CountOfParts:=4
+			allElements[drawID].part1x1:=((drawElement.x-Offsetx)*zoomFactor)
+			allElements[drawID].part1y1:=((drawElement.y-Offsety)*zoomFactor)
+			allElements[drawID].part1x2:=((drawElement.x+ElementWidth-Offsetx)*zoomFactor)
+			allElements[drawID].part1y2:=((drawElement.y+ElementHeight-Offsety)*zoomFactor)
+			allElements[drawID].part2x1:=((drawElement.x-Offsetx)*zoomFactor)
+			allElements[drawID].part2y1:=((drawElement.y+ElementHeight-Offsety)*zoomFactor)
+			allElements[drawID].part2x2:=((drawElement.x+ElementWidth/8-Offsetx)*zoomFactor)
+			allElements[drawID].part2y2:=((drawElement.y+ElementHeight+drawElement.HeightOfVerticalBar-Offsety)*zoomFactor)
+			allElements[drawID].part3x1:=((drawElement.x-Offsetx)*zoomFactor)
+			allElements[drawID].part3y1:=((drawElement.y+ElementHeight+drawElement.HeightOfVerticalBar-Offsety)*zoomFactor)
+			allElements[drawID].part3x2:=((drawElement.x+ElementWidth*3/4-Offsetx)*zoomFactor)
+			allElements[drawID].part3y2:=((drawElement.y+ElementHeight*4/3+drawElement.HeightOfVerticalBar-Offsety)*zoomFactor)
+			allElements[drawID].part4x1:=((drawElement.x+ElementWidth*3/4-Offsetx)*zoomFactor)
+			allElements[drawID].part4y1:=((drawElement.y+ElementHeight+drawElement.HeightOfVerticalBar-Offsety)*zoomFactor)
+			allElements[drawID].part4x2:=((drawElement.x+ElementWidth-Offsetx)*zoomFactor)
+			allElements[drawID].part4y2:=((drawElement.y+ElementHeight*4/3+drawElement.HeightOfVerticalBar-Offsety)*zoomFactor)
+			allElements[drawID].CountOfParts:=4
 			;~ drawElement.ClickPriority:=500
 		}
 		
@@ -725,6 +731,10 @@ ui_DrawEverything()
 		
 	}
 	
+	
+	)
+GDIThreadCode=%GDIThreadCode%`n
+( ` %  
 	
 	;Draw some icons near to the selected element, if only one is selected
 	PlusButtonExist:=false
@@ -734,8 +744,14 @@ ui_DrawEverything()
 	MoveButton1Exist:=false
 	MoveButton2Exist:=false
 	;~ MsgBox % share.markedelementscount
-	if (share.markedelementscount=1 and share.GDIPars.DrawMoveButtonUnderMouse!=true and share.GDIPars.UserCurrentlyMovesAnElement!=true)
+	if (markedElement!="" and share.GDIPars.DrawMoveButtonUnderMouse!=true and share.GDIPars.UserCurrentlyMovesAnElement!=true)
 	{
+		
+		IfInString,markedElement,connection
+			tempElList:=AllConnections
+		else
+			tempElList:=Allelements
+		
 		
 		pBitmapEdit := Gdip_CreateBitmapFromFile("Icons\edit.ico")
 		pBitmapPlus := Gdip_CreateBitmapFromFile("Icons\plus.ico")
@@ -743,129 +759,132 @@ ui_DrawEverything()
 		pBitmapTrash := Gdip_CreateBitmapFromFile("Icons\trash.ico")
 		
 		;Move Button
-		if (TheOnlyOneMarkedElement.type = "connection")
+		if (tempElList[markedElement].type = "connection")
 		{
-			tempFromEl:=share.allelements[TheOnlyOneMarkedElement.from]
-			tempToEl:=share.allelements[TheOnlyOneMarkedElement.to]
+			tempFromEl:=tempElList[markedElement].from
+			tempToEl:=tempElList[markedElement].to
 			
 			
-			if (tempFromEl.type="loop")
+			if (allelements[tempFromEl].type="loop")
 			{
 
-				if (TheOnlyOneMarkedElement.ConnectionType="Normal")
+				if (tempElList[markedElement].ConnectionType="Normal")
 				{
-					if (TheOnlyOneMarkedElement.fromPart="HEAD")
+					if (tempElList[markedElement].fromPart="HEAD")
 					{
-						middlePointOfMoveButton1X:=tempFromEl.x + ElementWidth *0.5 - Offsetx
-						middlePointOfMoveButton1Y:=tempFromEl.y +ElementHeight - Offsety
+						middlePointOfMoveButton1X:=allelements[tempFromEl].x + ElementWidth *0.5 - Offsetx
+						middlePointOfMoveButton1Y:=allelements[tempFromEl].y +ElementHeight - Offsety
 					}
 					else
 					{
-						middlePointOfMoveButton1X:=tempFromEl.x + ElementWidth *0.5 - Offsetx
-						middlePointOfMoveButton1Y:=tempFromEl.y + tempFromEl.HeightOfVerticalBar+ElementHeight*4/3 - Offsety
+						middlePointOfMoveButton1X:=allelements[tempFromEl].x + ElementWidth *0.5 - Offsetx
+						middlePointOfMoveButton1Y:=allelements[tempFromEl].y + tempFromEl.HeightOfVerticalBar+ElementHeight*4/3 - Offsety
 					}
 				}
 				else
 				{
-					middlePointOfMoveButton1X:=tempFromEl.x + ElementWidth *0.5 - Offsetx
-					middlePointOfMoveButton1Y:=tempFromEl.y + tempFromEl.HeightOfVerticalBar+ElementHeight*4/3 - Offsety
-					}
+					middlePointOfMoveButton1X:=allelements[tempFromEl].x + ElementWidth *0.5 - Offsetx
+					middlePointOfMoveButton1Y:=allelements[tempFromEl].y + allelements[tempFromEl].HeightOfVerticalBar+ElementHeight*4/3 - Offsety
+				}
 			}
 			else
 			{
-				middlePointOfMoveButton1X:=tempFromEl.x + ElementWidth *0.5 - Offsetx
-				middlePointOfMoveButton1Y:=tempFromEl.y +ElementHeight  - Offsety
+				middlePointOfMoveButton1X:=allelements[tempFromEl].x + ElementWidth *0.5 - Offsetx
+				middlePointOfMoveButton1Y:=allelements[tempFromEl].y +ElementHeight  - Offsety
 			}
 			
 			
 			
-			if (tempToEl.type="loop")
+			if (allelements[tempToEl].type="loop")
 			{
 
-				if (TheOnlyOneMarkedElement.toPart="HEAD")
+				if (tempElList[markedElement].toPart="HEAD")
 				{
-					middlePointOfMoveButton2X:=tempToEl.x + ElementWidth *0.5 - Offsetx
-					middlePointOfMoveButton2Y:=tempToEl.y  - Offsety
+					middlePointOfMoveButton2X:=allelements[tempToEl].x + ElementWidth *0.5 - Offsetx
+					middlePointOfMoveButton2Y:=allelements[tempToEl].y  - Offsety
 				}
-				else if (TheOnlyOneMarkedElement.toPart="BREAK")
+				else if (tempElList[markedElement].toPart="BREAK")
 				{
-					middlePointOfMoveButton2X:=tempToEl.x + ElementWidth *7/8 - Offsetx
-					middlePointOfMoveButton2Y:=tempToEl.y + tempToEl.HeightOfVerticalBar+ElementHeight - Offsety
+					middlePointOfMoveButton2X:=allelements[tempToEl].x + ElementWidth *7/8 - Offsetx
+					middlePointOfMoveButton2Y:=allelements[tempToEl].y + allelements[tempToEl].HeightOfVerticalBar+ElementHeight - Offsety
 				}
 				else
 				{
-					 middlePointOfMoveButton2X:=tempToEl.x + ElementWidth *0.5 - Offsetx
-					middlePointOfMoveButton2Y:=tempToEl.y + tempToEl.HeightOfVerticalBar+ElementHeight - Offsety
+					 middlePointOfMoveButton2X:=allelements[tempToEl].x + ElementWidth *0.5 - Offsetx
+					middlePointOfMoveButton2Y:=allelements[tempToEl].y + tempToEl.HeightOfVerticalBar+ElementHeight - Offsety
 				}
 				
 			}
 			else
 			{
-				middlePointOfMoveButton2X:=tempToEl.x + ElementWidth *0.5 - Offsetx
-				middlePointOfMoveButton2Y:=tempToEl.y  - Offsety
+				middlePointOfMoveButton2X:=allelements[tempToEl].x + ElementWidth *0.5 - Offsetx
+				middlePointOfMoveButton2Y:=allelements[tempToEl].y  - Offsety
 			}
 			
-			Gdip_DrawImage(G, pBitmapMove, (middlePointOfMoveButton1X - (SizeOfButtons*0.5) )*zoomFactor, ( middlePointOfMoveButton1Y - (SizeOfButtons*0.5)) *zoomFactor, SizeOfButtons*zoomFactor, SizeOfButtons*zoomFactor , 0, 0, 48, 48)
-			
-			
-			Gdip_DrawImage(G, pBitmapMove, (middlePointOfMoveButton2X - (SizeOfButtons*0.5) )*zoomFactor, ( middlePointOfMoveButton2Y - (SizeOfButtons*0.5)) *zoomFactor, SizeOfButtons*zoomFactor, SizeOfButtons*zoomFactor , 0, 0, 48, 48)
-			
-			MoveButton1Exist:=true
-			MoveButton2Exist:=True
+			if not (abs(middlePointOfMoveButton2Y-middlePointOfMoveButton1Y)<(gridy*2) and abs(middlePointOfMoveButton2X-middlePointOfMoveButton1X) <(gridx*5)) ;Don't show if they overlap other buttons
+			{
+				Gdip_DrawImage(G, pBitmapMove, (middlePointOfMoveButton1X - (SizeOfButtons*0.5) )*zoomFactor, ( middlePointOfMoveButton1Y - (SizeOfButtons*0.5)) *zoomFactor, SizeOfButtons*zoomFactor, SizeOfButtons*zoomFactor , 0, 0, 48, 48)
+				
+				Gdip_DrawImage(G, pBitmapMove, (middlePointOfMoveButton2X - (SizeOfButtons*0.5) )*zoomFactor, ( middlePointOfMoveButton2Y - (SizeOfButtons*0.5)) *zoomFactor, SizeOfButtons*zoomFactor, SizeOfButtons*zoomFactor , 0, 0, 48, 48)
+				
+				MoveButton1Exist:=true
+				MoveButton2Exist:=True
+			}
 		}
-		
 		
 		;Edit Button
-		if ((TheOnlyOneMarkedElement.type = "action" or  TheOnlyOneMarkedElement.type = "condition" or TheOnlyOneMarkedElement.type = "trigger" or TheOnlyOneMarkedElement.type = "loop"))
+		;~ MsgBox % strobj(tempElList[markedElement])
+		if ((tempElList[markedElement].type = "action" or  tempElList[markedElement].type = "condition" or tempElList[markedElement].type = "trigger" or tempElList[markedElement].type = "loop"))
 		{
-			middlePointOfEditButtonX:=TheOnlyOneMarkedElement.x - ElementWidth *0.125 - SizeOfButtons*0.2 - Offsetx
-			middlePointOfEditButtonY:=TheOnlyOneMarkedElement.y +ElementWidth *0.375 - Offsety
+			middlePointOfEditButtonX:=tempElList[markedElement].x - ElementWidth *0.125 - SizeOfButtons*0.2 - Offsetx
+			middlePointOfEditButtonY:=tempElList[markedElement].y +ElementWidth *0.375 - Offsety
 			
 		}
-		else if (TheOnlyOneMarkedElement.type = "connection")
+		else if (tempElList[markedElement].type = "connection")
 		{
-			middlePointOfEditButtonX:=((TheOnlyOneMarkedElement.part3x1 +  TheOnlyOneMarkedElement.part3x2)/2  ) / zoomFactor - SizeOfButtons*1.3
-			middlePointOfEditButtonY:=(TheOnlyOneMarkedElement.part3y1   ) / zoomFactor + SizeOfButtons*0.5 
+			
+			middlePointOfEditButtonX:=((tempElList[markedElement].part3x1 +  tempElList[markedElement].part3x2)/2  ) / zoomFactor - SizeOfButtons*1.3
+			middlePointOfEditButtonY:=((tempElList[markedElement].part3y1 + tempElList[markedElement].part3y2) /2   ) / zoomFactor 
 		}
 		Gdip_DrawImage(G, pBitmapEdit, (middlePointOfEditButtonX - (SizeOfButtons*0.5) )*zoomFactor, ( middlePointOfEditButtonY - (SizeOfButtons*0.5)) *zoomFactor, SizeOfButtons*zoomFactor, SizeOfButtons*zoomFactor , 0, 0, 48, 48)
 		EditButtonExist:=true
 		
 		;Trash Button
-		if (TheOnlyOneMarkedElement.type="action" or  TheOnlyOneMarkedElement.type = "condition" or TheOnlyOneMarkedElement.type = "connection" or TheOnlyOneMarkedElement.type = "loop")
+		if (tempElList[markedElement].type="action" or  tempElList[markedElement].type = "condition" or tempElList[markedElement].type = "connection" or tempElList[markedElement].type = "loop")
 		{
-			if (TheOnlyOneMarkedElement.type = "connection")
+			if (tempElList[markedElement].type = "connection")
 			{
-				middlePointOfTrashButtonX:=((TheOnlyOneMarkedElement.part3x1 +  TheOnlyOneMarkedElement.part3x2)/2  ) / zoomFactor + SizeOfButtons*1.3
-				middlePointOfTrashButtonY:=(TheOnlyOneMarkedElement.part3y1  ) / zoomFactor + SizeOfButtons*0.5 
+				middlePointOfTrashButtonX:=((tempElList[markedElement].part3x1 + tempElList[markedElement].part3x2)/2) / zoomFactor + SizeOfButtons*1.3
+				middlePointOfTrashButtonY:=((tempElList[markedElement].part3y1 + tempElList[markedElement].part3y2)/2) / zoomFactor 
 			}
 			else
 			{
-				middlePointOfTrashButtonX:=TheOnlyOneMarkedElement.x + ElementWidth *9/8 + SizeOfButtons*0.2 - Offsetx
-				middlePointOfTrashButtonY:=TheOnlyOneMarkedElement.y +ElementWidth *0.375 - Offsety
+				middlePointOfTrashButtonX:=tempElList[markedElement].x + ElementWidth *9/8 + SizeOfButtons*0.2 - Offsetx
+				middlePointOfTrashButtonY:=tempElList[markedElement].y +ElementWidth *0.375 - Offsety
 			}
 			Gdip_DrawImage(G, pBitmapTrash, (middlePointOfTrashButtonX - (SizeOfButtons*0.5) )*zoomFactor, ( middlePointOfTrashButtonY - (SizeOfButtons*0.5)) *zoomFactor, SizeOfButtons*zoomFactor, SizeOfButtons*zoomFactor , 0, 0, 48, 48)
 			TrashButtonExist:=true
 		}
 		
 		;Plus Button
-		if (TheOnlyOneMarkedElement.type = "connection")
+		if (tempElList[markedElement].type = "connection")
 		{
-			middlePointOfPlusButtonX:=((TheOnlyOneMarkedElement.part3x1 +  TheOnlyOneMarkedElement.part3x2)/2  ) / zoomFactor 
-			middlePointOfPlusButtonY:=(TheOnlyOneMarkedElement.part3y1  ) / zoomFactor + SizeOfButtons*0.5 
+			middlePointOfPlusButtonX:=((tempElList[markedElement].part3x1 +  tempElList[markedElement].part3x2)/2  ) / zoomFactor 
+			middlePointOfPlusButtonY:=((tempElList[markedElement].part3y1 + tempElList[markedElement].part3y2 )/2  ) / zoomFactor 
 			Gdip_DrawImage(G, pBitmapPlus, (middlePointOfPlusButtonX - (SizeOfButtons*0.5) )*zoomFactor, ( middlePointOfPlusButtonY - (SizeOfButtons*0.5)) *zoomFactor, SizeOfButtons*zoomFactor, SizeOfButtons*zoomFactor , 0, 0, 48, 48)
 			PlusButtonExist:=true
 		}
-		else if ((TheOnlyOneMarkedElement.type = "action" or  TheOnlyOneMarkedElement.type = "condition" or TheOnlyOneMarkedElement.type = "trigger" or TheOnlyOneMarkedElement.type = "loop"))
+		else if ((tempElList[markedElement].type = "action" or  tempElList[markedElement].type = "condition" or tempElList[markedElement].type = "trigger" or tempElList[markedElement].type = "loop"))
 		{
-			middlePointOfPlusButtonX:=TheOnlyOneMarkedElement.x + ElementWidth *0.5 - Offsetx
-			middlePointOfPlusButtonY:=TheOnlyOneMarkedElement.y +ElementWidth *7/8 + SizeOfButtons*0.2 - Offsety
+			middlePointOfPlusButtonX:=tempElList[markedElement].x + ElementWidth *0.5 - Offsetx
+			middlePointOfPlusButtonY:=tempElList[markedElement].y +ElementWidth *7/8 + SizeOfButtons*0.2 - Offsety
 			Gdip_DrawImage(G, pBitmapPlus, (middlePointOfPlusButtonX - (SizeOfButtons*0.5) )*zoomFactor, ( middlePointOfPlusButtonY - (SizeOfButtons*0.5)) *zoomFactor, SizeOfButtons*zoomFactor, SizeOfButtons*zoomFactor , 0, 0, 48, 48)
 			PlusButtonExist:=true
 		}
-		if (TheOnlyOneMarkedElement.type = "loop") ;Additional plus button for loop
+		if (tempElList[markedElement].type = "loop") ;Additional plus button for loop
 		{
-			middlePointOfPlusButton2X:=TheOnlyOneMarkedElement.x + ElementWidth *0.5 - Offsetx
-			middlePointOfPlusButton2Y:=TheOnlyOneMarkedElement.y +ElementWidth /8 + ElementHeight*4/3+TheOnlyOneMarkedElement.HeightOfVerticalBar + SizeOfButtons*0.2 - Offsety
+			middlePointOfPlusButton2X:=tempElList[markedElement].x + ElementWidth *0.5 - Offsetx
+			middlePointOfPlusButton2Y:=tempElList[markedElement].y +ElementWidth /8 + ElementHeight*4/3+tempElList[markedElement].HeightOfVerticalBar + SizeOfButtons*0.2 - Offsety
 			Gdip_DrawImage(G, pBitmapPlus, (middlePointOfPlusButton2X - (SizeOfButtons*0.5) )*zoomFactor, ( middlePointOfPlusButton2Y - (SizeOfButtons*0.5)) *zoomFactor, SizeOfButtons*zoomFactor, SizeOfButtons*zoomFactor , 0, 0, 48, 48)
 			PlusButton2Exist:=true
 			
@@ -952,4 +971,5 @@ ui_DrawEverything()
 	Return
 
 }
-
+)
+;~ Clipboard:=gdithreadcode

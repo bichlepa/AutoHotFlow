@@ -2,7 +2,7 @@
 ui_SettingsOwFLow()
 {
 	static
-	global maingui, flowSettings, CurrentlyActiveWindowHWND, variable
+	global maingui, share, CurrentlyActiveWindowHWND, variable
 	local pos, tempchecked, tempXpos, tempYpos, tempDir, tempSettingFlowExecutionPolicyOld
 	
 	maingui.disable()
@@ -15,22 +15,22 @@ ui_SettingsOwFLow()
 	
 	gui,font,s8 cDefault wnorm
 	
-	if (flowSettings.ExecutionPolicy="parallel")
+	if (share.flowSettings.ExecutionPolicy="parallel")
 		tempchecked=1
 	else
 		tempchecked=0
 	gui,add,radio,w300 x10 Y+10 vGuiFlowSettingsParallel checked%tempchecked%,% lang("Parallel_execution_of_multiple_instances")
-	if (flowSettings.ExecutionPolicy="skip")
+	if (share.flowSettings.ExecutionPolicy="skip")
 		tempchecked=1
 	else
 		tempchecked=0
 	gui,add,radio,w300 x10 Y+10 vGuiFlowSettingsSkip checked%tempchecked% ,% lang("Skip_execution_when_an_instance_is_already_executing")
-	if (flowSettings.ExecutionPolicy="wait")
+	if (share.flowSettings.ExecutionPolicy="wait")
 		tempchecked=1
 	else
 		tempchecked=0
 	gui,add,radio,w300 x10 Y+10 vGuiFlowSettingsWait  checked%tempchecked%,% lang("Wait_until_the_currently_executing_instance_has_finished")
-	if (flowSettings.ExecutionPolicy="stop")
+	if (share.flowSettings.ExecutionPolicy="stop")
 		tempchecked=1
 	else
 		tempchecked=0
@@ -39,13 +39,13 @@ ui_SettingsOwFLow()
 	gui,font,s10 cnavy wbold
 	gui,add,text,x10 w300 Y+15,% lang("Working directory")
 	gui,font,s8 cDefault wnorm
-	gui,add,Edit,w300 x10 Y+10 vGuiFlowSettingsWorkingDir,% flowSettings.WorkingDir
+	gui,add,Edit,w300 x10 Y+10 vGuiFlowSettingsWorkingDir,% share.flowSettings.WorkingDir
 	
 	
 	gui,font,s10 cnavy wbold
 	gui,add,text,x10 w300 Y+15,% lang("Debug options")
 	gui,font,s8 cDefault wnorm
-	if (flowSettings.LogToFile=1)
+	if (share.flowSettings.LogToFile=1)
 		tempchecked=1
 	else
 		tempchecked=0
@@ -107,7 +107,7 @@ ui_SettingsOwFLow()
 				}
 				else
 				{
-					flowSettings.WorkingDir:=GuiFlowSettingsWorkingDir
+					share.flowSettings.WorkingDir:=GuiFlowSettingsWorkingDir
 					someSettingChanged:=true
 				}
 				
@@ -117,13 +117,13 @@ ui_SettingsOwFLow()
 		}
 		else
 		{
-			flowSettings.WorkingDir:=GuiFlowSettingsWorkingDir
+			share.flowSettings.WorkingDir:=GuiFlowSettingsWorkingDir
 			someSettingChanged:=true
 		}
 	}
 	
 	
-	tempSettingFlowExecutionPolicyOld:=flowSettings.ExecutionPolicy
+	tempSettingFlowExecutionPolicyOld:=share.flowSettings.ExecutionPolicy
 	
 	if GuiFlowSettingsParallel=1
 		tempExecutionPolicy:="parallel"
@@ -134,15 +134,15 @@ ui_SettingsOwFLow()
 	else if GuiFlowSettingsStop=1
 		tempExecutionPolicy:="stop"
 	
-	if (flowSettings.ExecutionPolicy!=tempExecutionPolicy)
+	if (share.flowSettings.ExecutionPolicy!=tempExecutionPolicy)
 	{
-		flowSettings.ExecutionPolicy:=tempExecutionPolicy
+		share.flowSettings.ExecutionPolicy:=tempExecutionPolicy
 		someSettingChanged:=true
 	}
 	
-	if (flowSettings.LogToFile!=GuiFlowSettingsLogToFile)
+	if (share.flowSettings.LogToFile!=GuiFlowSettingsLogToFile)
 	{
-		flowSettings.LogToFile:=GuiFlowSettingsLogToFile
+		share.flowSettings.LogToFile:=GuiFlowSettingsLogToFile
 		someSettingChanged:=true
 	}
 	

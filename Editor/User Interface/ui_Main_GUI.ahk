@@ -229,7 +229,7 @@ ui_UpdateStatusbartext(which="")
 		}
 		else if (markedElements.count()=1)
 		{
-			elementtext:=lang("1 marked element: %1%", TheOnlyOneMarkedElement.id)
+			elementtext:=lang("1 marked element: %1%", markedElement)
 		}
 		else
 		{

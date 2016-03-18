@@ -2,126 +2,102 @@
 
 globalinstancecounter=0
 globalthreadcounter=0
-class cl_instance
+allInstances:=CriticalObject()
+allThreads:=CriticalObject()
+
+Instance_New()
 {
-	static ID:=""
-	static IsWaiting:=false
+	global globalinstancecounter
+	global allInstances
+	newInstance:=CriticalObject()
+	newInstance.state:="stopped"
+	newInstance.vars:=[]
+	newInstance.threads:=[]
+	newInstance.ID:="instance" . format("{1:010u}",++globalinstancecounter)
+	newInstance.Trigger:=""
 	
-	__New(){
-		global globalinstancecounter
-		global allInstances
-		this.vars:=[]
-		this.threads:=new ObjectwithCounter()
-		this.ID:="instance" . format("{1:010u}",++globalinstancecounter)
-		tempThread:=new this.cl_thread(this)
-		this.firstThread:=tempThread
-		tempThread.set("a_triggertime",a_now,,"thread")
-		;~ tempThread.set("a_test","hello a world",,"thread")
-		;~ tempThread.set("test","helloworld")
-		;~ tempThread.set("test2","helloworld2")
-	}
+	;Create new thread
+	NewThreadID:=Thread_New(newInstance.id)
+	newInstance.threads[NewThreadID]:=NewThreadID
+	newInstance.firstThread:=NewThreadID
+	ThreadVariable_Set(NewThreadID,"a_triggertime",a_now,"Date")
 	
-	
-	delete()
-	{
-		global allInstances
-		allInstances.delete(this.ID)
-		
-	}
-	
-	
-	stop()
-	{
-		for forThreadID, forThread in this.threads
-		{
-			forThread.stop()
-		}
-	}
-	
-	stopall()
-	{
-		global allInstances
-		for forInstanceID, forInstance in allInstances
-		{
-			forInstance.stop()
-		}
-		
-	}
-	
-	class cl_thread
-	{
-		__New(p_instance){
-			global globalthreadcounter
-			this.ID:="thread" . format("{1:010u}",++globalthreadcounter)
-			this.vars:=[]
-			this.loopvars:=[]
-			this.__Instance := &p_instance
-			this.instance.threads[this.ID]:=this
-			this.element:=""
-			this.execution:=""
-			;~ MsgBox hi
-		}
-		
-		cloneThread()
-		{
-			global globalthreadcounter
-			tempThread:=ObjFullyClone(this)
-			tempThread.id:="thread" . format("{1:010u}",++globalthreadcounter)
-			this.instance.threads[tempThread.ID]:=tempThread
-			return tempThread
-		}
-		
-		instance[] ;Helps to save the instance in a parameter avoiding a circular reference
-		{
-			get {
-				if (NumGet(this.__Instance) == NumGet(&this)) ; safety check or you can use try/catch/finally
-					return Object(this.__Instance)
-			}
-		}
-		
-		setVariable(varName,value,type="normal",location="") ;Set a variable
-		{
-			variable.set(this,varName,value,type,location)
-		}
-		
-		getVariable(name,VariableType="AsIs")
-		{
-			return variable.get(this,name,VariableType)
-		}
-		
-		replaceVariables(name,VariableType="AsIs")
-		{
-			return variable.replaceVariables(this,name,VariableType)
-		}
-		
-		delete()
-		{
-			this.instance.threads.delete(this.ID)
-		}
-		
-		stop()
-		{
-			this.execution.stop()
-		}
-	}
-	
-	
-	
-   
+	;Add to global list
+	allInstances[newInstance.ID]:=newInstance
+	return newInstance.ID
 }
 
 
-/*
-allInstances:=Object()
+Thread_New(p_InstanceID)
+{
+	global globalinstancecounter
+	global allThreads
+	
+	newThread:=CriticalObject()
+	newThread.state:="stopped"
+	newThread.vars:=[]
+	newThread.loopvars:=[]
+	newThread.Instance:=p_InstanceID
+	newThread.ID:="thread" . format("{1:010u}",++globalthreadcounter)
+	
+	;Add to global list
+	allThreads[newThread.ID]:=newThread
+	return newThread.ID
+}
 
-allInstances.push(tempInstance:=new instance())
-tempThread:=tempInstance.threads[1]
-tempThread.setVariable("name","fffalkj")
+Instance_Remove(p_ID)
+{
+	global allInstances
+	allInstances.delete(p_ID)
+}
 
-MsgBox % strobj(tempInstance)
-;~ MsgBox % strobj(tempInstance.vars)
-;~ MsgBox % strobj(tempInstance.threads[1].vars)
-MsgBox % tempThread.getVariable("a_test")
-MsgBox % tempThread.getVariable("a_now")
-MsgBox % tempThread.getVariable("now")
-*/
+Thread_Remove(p_ID)
+{
+	global allThreads
+	allThreads.delete(p_ID)
+}
+
+Instance_Stop(p_ID)
+{
+	global allInstances
+	allInstances[p_ID].state:="stopping"
+	for forID, forID2 in allInstances[p_ID].threads
+	{
+		Thread_Stop(forID)
+	}
+}
+
+Thread_Stop(p_ID)
+{
+	global allThreads
+	allThreads[p_ID].state:="stopping"
+	;TODO: Tell the execution thread that it should stop
+}
+
+Instance_StopAll()
+{
+	for forID, forInstance in allInstances
+	{
+		Instance_Stop(forID)
+	}
+}
+
+Thread_Clone(p_ID)
+{
+	newThread:=CriticalObject()
+	for forID, forValue in allThreads[p_ID]
+	{
+		if IsObject(forValue)
+		{
+			newThread[forID]:=forValue.clone()
+		}
+		else
+			newThread[forID]:=forValue
+	}
+	
+	newThread.ID:="thread" . format("{1:010u}",++globalthreadcounter)
+	
+	;Add to global list
+	allThreads[newThread.ID]:=newThread
+	
+}

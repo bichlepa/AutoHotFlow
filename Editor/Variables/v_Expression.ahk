@@ -1,10 +1,12 @@
 ﻿
 /* Evaluation of an Expression
 */
-v_EvaluateExpression(p_variable,p_Thread,ExpressionString)
+EvaluateExpression(p_Thread,ExpressionString)
 {
 	logger("f3","Evaluating expression " ExpressionString)
-	ExpressionString:=A_Space ExpressionString A_Space
+	
+	ExpressionString:=A_Space replaceVariables(p_Thread,ExpressionString) A_Space
+	
 	StringReplace,ExpressionString,ExpressionString,>=,≥,all
 	StringReplace,ExpressionString,ExpressionString,<=,≤,all
 	StringReplace,ExpressionString,ExpressionString,!=,≠,all
@@ -16,14 +18,14 @@ v_EvaluateExpression(p_variable,p_Thread,ExpressionString)
 	StringReplace,ExpressionString,ExpressionString,&&,∧,all
 	StringReplace,ExpressionString,ExpressionString,% " not ",% " ¬",all
 	StringReplace,ExpressionString,ExpressionString,% "!",% "¬",all
-	return v_EvaluateExpressionRecurse(p_variable,p_Thread,ExpressionString)
+	return v_EvaluateExpressionRecurse(p_Thread,ExpressionString)
 }
 
 /* Evaluation of an Expression
 Thanks to Sunshine for the easy to understand instruction. See http://www.sunshine2k.de/coding/java/SimpleParser/SimpleParser.html
 If anybody knows how to implement more operands and make this more flexible, or even support scripts, please contribute!
 */
-v_EvaluateExpressionRecurse(p_variable,p_Thread,ExpressionString)
+v_EvaluateExpressionRecurse(p_Thread,ExpressionString)
 {
 	;MsgBox %ExpressionString%
 	
@@ -38,8 +40,8 @@ v_EvaluateExpressionRecurse(p_variable,p_Thread,ExpressionString)
 	{
 		;MsgBox %  leftSubstring FoundOpreand rightSubstring 
 		if ( FoundOpreand != "¬")
-			resleft:= v_EvaluateExpression(p_variable,p_Thread,leftSubstring)
-		resright:=v_EvaluateExpression(p_variable,p_Thread,rightSubstring)
+			resleft:= v_EvaluateExpressionRecurse(p_Thread,leftSubstring)
+		resright:=v_EvaluateExpressionRecurse(p_Thread,rightSubstring)
 		;MsgBox %FoundOpreand% %resleft% %resright%
 		if FoundOpreand = +
 			return resleft + resright
@@ -82,7 +84,7 @@ v_EvaluateExpressionRecurse(p_variable,p_Thread,ExpressionString)
 		{
 			StringTrimLeft,ExpressionString,ExpressionString,1
 			StringTrimRight,ExpressionString,ExpressionString,1
-			return (v_EvaluateExpression(p_variable,p_Thread,ExpressionString))
+			return (v_EvaluateExpressionRecurse(p_Thread,ExpressionString))
 		}
 		   
 		else
@@ -95,7 +97,7 @@ v_EvaluateExpressionRecurse(p_variable,p_Thread,ExpressionString)
 	if ExpressionString is number
 		return ExpressionString
 	
-	return p_variable.Get(p_Thread,ExpressionString,"asIs")
+	return Variable_Get(p_Thread,ExpressionString,"asIs")
 	
 	
 }

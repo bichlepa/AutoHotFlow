@@ -1,9 +1,23 @@
 ﻿ReadyToStartInstances:=new ObjectWithCounter()
-allInstances:=new ObjectWithCounter()
+
 r_nowrunning:=false
-Execution:=[]
+ReadyToStartInstances:=[]
 Execution.stopnow:=false
 Execution.running:=false
+CriticalSectionAllInstances:=CriticalSection()
+
+;Start new execution threads
+r_StartExecutionThreads()
+{
+	global
+	
+	Loop % share.flowSettings.MaximumCountOfExeThreads
+	{
+		AhkThreadExecution%a_index% := AhkThread("CriticalSectionAllInstances := CriticalSection("CriticalSectionAllInstances ")`nshare:=CriticalObject(" (&share) ") `n allTriggers:=CriticalObject(" (&allTriggers) ") `n allConnections:=CriticalObject(" (&allConnections) ") `n allElements:=CriticalObject(" (&allElements) ") `n allInstances:=CriticalObject(" (&allInstances) ") `n allThreads:=CriticalObject(" (&allThreads) ") `n mainguihwnd:=""" maingui.hwnd """`n" ExecutionThreadCode)
+	}
+	;~ MsgBox aweg
+}
+
 
 ;Called when a new instance should be triggered
 ;p_parameter contains some of following informations.
@@ -12,59 +26,63 @@ r_Trigger(p_Trigger,p_parameter="")
 {
 	;~ MsgBox r_Trigger
 	global c_PriorityForInstanceInitialization, ReadyToStartInstances
-	tempinstance:=new cl_instance()
+	
+	
+	tempinstance:=[]
 	tempinstance.parameters:=p_parameter
 	tempinstance.trigger:=p_Trigger
-	ReadyToStartInstances[tempinstance.id]:=tempinstance
+	ReadyToStartInstances.push(tempinstance)
 	;~ d(tempinstance,0709)
 	;~ d(instance,07409)
+	;~ d(ReadyToStartInstances)
 	SetTimer,r_StartNewInstance,-10,%c_PriorityForInstanceInitialization%
 }
 
 r_StartNewInstance()
 {
-	global allInstances, c_PriorityForIteration , flowSettings,ReadyToStartInstances , maintrigger
+	global allInstances, allThreads, c_PriorityForIteration , ReadyToStartInstances , maintrigger, share, CriticalSectionAllInstances
 	;Find all pending instances and make them ready to launch
 	
 	;~ MsgBox r_StartNewInstance
 	Loop
 	{
-		tempInstance:=""
-		tempInstanceIndex:=""
-		for, index, forInstance in ReadyToStartInstances
+		;~ tempInstance:=""
+		tempInstanceID:=""
+		for, forIndex, forInstance in ReadyToStartInstances
 		{
 			tempInstance:=forInstance
-			tempInstanceIndex:=index
+			tempInstanceIndex:=forIndex
 			break
 		}
-		if isobject(tempInstance)
+		
+		if (ReadyToStartInstances.count()>0)
 		{
 			
 			if (Execution.running=true) ;If the flow is already running.
 			{
 				;Consider the execution policy setting
-				if (flowSettings.ExecutionPolicy="stop") ;Stop current instance and start a new one
+				if (share.flowSettings.ExecutionPolicy="stop") ;Stop current instance and start a new one
 				{
-					logger("f1","An instance already exists. Old execution stopped to launch the new one.")
-					cl_instance.stopAll()
+					logger("f1","An instance already exists. Old execution stopped in order to launch the new one.")
+					instance_StopAll()
 					;~ SetTimer,r_WaitUntilStoppedAndThenStart,50 ;TODO
 					return
 				}
-				else if (flowSettings.ExecutionPolicy="skip") ;Skip the execution
+				else if (share.flowSettings.ExecutionPolicy="skip") ;Skip the execution
 				{
 					logger("f1","An instance already exists. Execution skipped.")
 					return
 				}
-				else if (flowSettings.ExecutionPolicy="wait" or flowSettings.ExecutionPolicy="parallel") ;Wait until the current instance has finished
+				else if (share.flowSettings.ExecutionPolicy="wait" or share.flowSettings.ExecutionPolicy="parallel") ;Wait until the current instance has finished
 				{
-					if (allInstances.count()>flowSettings.MaximumCountOfParallelInstances)
+					if (allInstances.count()>share.flowSettings.MaximumCountOfParallelInstances)
 					{
 						;TODO: emergency stop if too many parallel executions
-						Logger("f1","Already " flowSettings.MaximumCountOfParallelInstances "Instances are running. Skipping execution")
+						Logger("f1","Already " share.flowSettings.MaximumCountOfParallelInstances "Instances are running. Skipping execution")
 						return
 					}
 					
-					if (flowSettings.ExecutionPolicy="wait")
+					if (share.flowSettings.ExecutionPolicy="wait")
 					{
 						logger("f2","An instance already exists. Execution will wait.")
 					}
@@ -76,56 +94,62 @@ r_StartNewInstance()
 			}
 			
 			
-			
-			
-			if isobject(tempinstance.parameters)
+			tempInstanceID:=instance_New()
+			;~ EnterCriticalSection(CriticalSectionAllInstances)
+			if isobject(tempInstance[tempInstanceID].parameters)
 			{
 				
 				;~ MsgBox % strobj(Execution_Parameters)
-				tempinstance.CallingFlow:=tempinstance.parameters["SendingFlow"]
-				tempinstance.ElementIDInCallingFLow:=tempinstance.parameters["CallerElementID"]
-				tempinstance.InstanceIDOfCallingFlow:=tempinstance.parameters["CallerInstanceID"]
-				tempinstance.ThreadIDOfCallingFlow:=tempinstance.parameters["CallerThreadID"]
-				tempinstance.WhetherToReturVariables:=tempinstance.parameters["WhetherToReturVariables"]
+				allInstances[tempInstanceID].CallingFlow:=tempInstance[tempInstanceID].parameters["SendingFlow"]
+				allInstances[tempInstanceID].ElementIDInCallingFLow:=tempInstance[tempInstanceID].parameters["CallerElementID"]
+				allInstances[tempInstanceID].InstanceIDOfCallingFlow:=tempInstance[tempInstanceID].parameters["CallerInstanceID"]
+				allInstances[tempInstanceID].ThreadIDOfCallingFlow:=tempInstance[tempInstanceID].parameters["CallerThreadID"]
+				allInstances[tempInstanceID].WhetherToReturVariables:=tempInstance[tempInstanceID].parameters["WhetherToReturVariables"]
 				
 				;~ MsgBox % Execution_Parameters["localVariables"] "`n`n" strobj(Execution_Parameters)
 				
 				;Import variables if the trigger provides some variables or if an other flow has called this flow. ;TODO
-				;~ if isobject(tempinstance.parameters["localVariables"])
-					;~ v_ImportLocalVariablesFromObject(r_RunningCounter,tempinstance.parameters["localVariables"])
+				;~ if isobject(tempInstanceID.parameters["localVariables"])
+					;~ v_ImportLocalVariablesFromObject(r_RunningCounter,tempInstanceID.parameters["localVariables"])
 				;~ else
-					;~ v_ImportLocalVariablesFromString(r_RunningCounter,tempinstance.parameters["localVariables"])
+					;~ v_ImportLocalVariablesFromString(r_RunningCounter,tempInstanceID.parameters["localVariables"])
 				
-				;~ if isobject(tempinstance.parameters["threadVariables"])
+				;~ if isobject(tempInstanceID.parameters["threadVariables"])
 				;~ {
-					;~ v_ImportThreadVariablesFromObject(r_RunningCounter,r_RunningThreadCounter,tempinstance.parameters["ThreadVariables"])
+					;~ v_ImportThreadVariablesFromObject(r_RunningCounter,r_RunningThreadCounter,tempInstanceID.parameters["ThreadVariables"])
 				;~ }
 				;~ else
-					;~ v_ImportThreadVariablesFromString(r_RunningCounter,r_RunningThreadCounter,tempinstance.parameters["ThreadVariables"])
+					;~ v_ImportThreadVariablesFromString(r_RunningCounter,r_RunningThreadCounter,tempInstanceID.parameters["ThreadVariables"])
 				
-				logger("f2",tempinstance.id ": the flow was called by " tempinstance.CallingFlow)
+				logger("f2",allInstances[tempInstanceID].id ": the flow was called by " allInstances[tempInstanceID].CallingFlow)
 			}
 			
-			tempinstance.firstthread.element:="trigger"
-			
+			allThreads[allInstances[tempInstanceID].firstthread].element:=maintrigger
+			allThreads[allInstances[tempInstanceID].firstthread].lastResult:="normal"
+			allThreads[allInstances[tempInstanceID].firstthread].state:="finished"
+			;~ d(tempInstanceID)
+			;~ d(allInstances[tempInstanceID])
 			;set some variables for correct  visual appearance of the trigger
 			;TODO
 			
 			
 			;Move the instance from ready to running
 			ReadyToStartInstances.delete(tempInstanceIndex)
-			allInstances[tempInstance.id]:=tempInstance
+			;~ allInstances[tempInstanceid]:=tempInstance
 			
+			;~ LeaveCriticalSection(CriticalSectionAllInstances)
 			somethingInitialized:=true
 		}
 		else
 			break
 	}
 	
-	if (somethingInitialized and Execution.running!=true) ;if not already running, execute the r_run() function. of not the currently running r_run function will find that new thread
+	if (somethingInitialized) ;if not already running, execute the r_run() function. of not the currently running r_run function will find that new thread
 	{
 		Execution.running:=true
 		;~ Execution.stopnow:=false
+		
+		r_OnChange()
 		
 		;~ r_TellThatFlowIsStarted() ;Tell manager that flow has started. Also replace some text in the GUI buttons.
 		UI_draw()
@@ -135,6 +159,16 @@ r_StartNewInstance()
 	
 	SetTimer,r_Iteration,-10,%c_PriorityForIteration%
 }
+
+r_OnChange()
+{
+	global
+	loop % share.flowSettings.MaximumCountOfExeThreads
+	{
+		AhkThreadExecution%a_index%.ahkFunction("extern_changeDetected")
+	}
+}
+
 
 r_Iteration()
 {

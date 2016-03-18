@@ -4,7 +4,6 @@ states:=new stateClass()
 currentState=[]
 savedState=
 currentStateID=
-share.currentState:=currentState
 ;~ ;Testing:
 ;~ loop 12
 ;~ StateID1:=new state()
@@ -52,15 +51,13 @@ class stateClass
 	undo() ;Try to find an older state than the current and set it.
 	{
 		global currentStateID
-		global share
 		found:=false
 		for id, state in this
 		{
 			if (id=currentStateID and found)
 			{
-				currentStateID:=previousID
+				;~ currentStateID:=previousID
 				currentState:=previousState
-				share.currentState:=currentState
 				break
 			}
 			found:=true
@@ -73,15 +70,13 @@ class stateClass
 	redo() ;Try to find a newer state than the current and set it. This is only possible after user has done a redo and did not changed anything yet.
 	{
 		global currentStateID
-		global share
 		assignnext:=false
 		for id, state in this
 		{
 			if (assignnext=true)
 			{
-				currentStateID:=id
+				;~ currentStateID:=id
 				currentState:=state
-				share.currentState:=currentState
 				break
 			}
 			if (id=currentStateID)
@@ -118,7 +113,7 @@ class state
 {
 	__new()
 	{
-		global states, share
+		global states
 		global globalstatesCounter, currentStateID, currentState
 		
 		states.deleteNewerStatesThanCurrent()
@@ -126,9 +121,8 @@ class state
 		this.ID:="state" . format("{1:010u}",globalstatesCounter)
 		states[this.ID]:=this
 		states.crop()
-		currentStateID:=this.id
+		;~ currentStateID:=this.id
 		currentState:=this
-		share.currentState:=currentState
 		this.update()
 	}
 	
@@ -138,22 +132,102 @@ class state
 		this.allElements:=ObjFullyClone(allElements)
 		this.allConnections:=ObjFullyClone(allConnections)
 		this.allTriggers:=ObjFullyClone(allTriggers)
-		this.flowSettings:=ObjFullyClone(flowSettings)
-		
+		this.flowSettings:=ObjFullyClone(share.flowSettings)
+		currentStateID:=this.id
+		share.currentStateID:=this.id
 	}
 	
 	restore()
 	{
-		global
+		global allElements, allConnections,allTriggers, share
+		
+		
+		loop 3
+		{
+		
+			if a_index=1
+				listname:="allElements"
+			else if a_index=2
+				listname:="allConnections"
+			else if a_index=3
+				listname:="allTriggers"
+			
+			existingelements:=[]	
+			for forID, forElement in this[listname]
+			{
+				existingelements[forID]:=forID
+				existingPars:=[]
+				
+				if (not %listname%.HasKey(forID))
+				{
+					%listname%[forID]:=CriticalObject()
+				}
+				
+				for forPar, forValue in forElement
+				{
+					existingPars[forPar]:=forPar
+					if not (forPar="marked" or forPar="ID" or forpar ="running")
+					{
+						if isobject(forValue)
+						{
+							%listname%[forID][forPar]:=ObjFullyClone(forValue)
+						}
+						else
+						{
+							%listname%[forID][forPar]:=forValue
+						}
+					}
+				}
+				for forPar, forValue in %listname%[forID]
+				{
+					if (not existingPars.HasKey(forPar))
+					{
+						%listname%[forID].delete(forPar)
+					}
+				}
+			}
+		
+			for forID, forElement in %listname%
+			{
+				if (not (existingelements.HasKey(forID)))
+				{
+					;~ MsgBox % "should delete " forID
+					%listname%.delete(forID)
+				}
+			}
+		}
+		
+		for forPar, forValue in this.flowSettings
+		{
+			existingPars[forPar]:=forPar
+			if not (forPar="notDefined_")
+			{
+				if isobject(forValue)
+				{
+					share.flowSettings[forPar]:=ObjFullyClone(forValue)
+				}
+				else
+				{
+					share.flowSettings[forPar]:=forValue
+				}
+			}
+		}
+		for forPar, forValue in share.flowSettings
+		{
+			if (not existingPars.HasKey(forPar))
+			{
+				share.flowSettings.delete(forPar)
+			}
+		}
+		currentStateID:=this.id
+		share.currentStateID:=this.id
+		/* simple method, but cannot be used anymore because of multithreading
 		allElements:=ObjFullyClone(this.allElements)
 		allConnections:=ObjFullyClone(this.allConnections)
 		allTriggers:=ObjFullyClone(this.allTriggers)
-		flowSettings:=ObjFullyClone(this.flowSettings)
+		share.flowSettings:=ObjFullyClone(this.flowSettings)
+		*/
 		element.unmarkall()
-		share.allElements:=allElements
-		share.allConnections:=allConnections
-		share.allTriggers:=allTriggers
-		share.flowSettings:=flowSettings
 	}
 	
 	delete()

@@ -39,11 +39,12 @@ if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of t
 	ui_ActionWhenMainGUIDisabled()
 	return
 }
-if (theOnlyOneMarkedElement) ;if a single element is marked
+if (markedElement!="") ;if a single element is marked
 {
-	if (theOnlyOneMarkedElement.type="connection")
+	tempList:=GetListContainingElement(markedElement)
+	if (tempList[markedElement].type="connection")
 	{
-		ret:=selectConnectionType(theOnlyOneMarkedElement,"wait") ;Change connection type
+		ret:=selectConnectionType(markedElement,"wait") ;Change connection type
 		if (ret!="aborted")
 		{
 			new state() ;make a new state. If user presses Ctrl+Z, the change will be undone
@@ -52,7 +53,7 @@ if (theOnlyOneMarkedElement) ;if a single element is marked
 	}
 	else
 	{
-		ret:=ElementSettings.open(theOnlyOneMarkedElement,"wait") ;open settings of the marked element
+		ret:=ElementSettings.open(markedElement,"wait") ;open settings of the marked element
 		if (ret!="aborted" and ret!="0 changes" )
 		{
 			new state() ;make a new state. If user presses Ctrl+Z, the change will be undone
@@ -60,6 +61,7 @@ if (theOnlyOneMarkedElement) ;if a single element is marked
 	}
 	
 }
+tempList:=""
 return
 
 clickOnPicture: ;react on clicks of the user
@@ -79,11 +81,9 @@ UserDidMajorChange:=false
 UserDidMinorChange:=false
 UserCancelledAction:=false
 
-elementWithHighestPriority:=ui_findElementUnderMouse()
+clickedElement:=ui_findElementUnderMouse()
 
-
-
-if ( elementWithHighestPriority="") ;If nothing was selected (click on nowhere). -> Scroll
+if ( clickedElement="") ;If nothing was selected (click on nowhere). -> Scroll
 {
 	
 	;~ MsgBox %clickMoved% %CurrentlyMainGuiIsDisabled%
@@ -95,7 +95,7 @@ if ( elementWithHighestPriority="") ;If nothing was selected (click on nowhere).
 			{
 				if (ControlKeyState!="d")
 				{
-					element.unmarkAll()
+					UnmarkEverything()
 					ui_draw()
 				}
 			}
@@ -114,22 +114,22 @@ else if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions
 	ui_ActionWhenMainGUIDisabled()
 	
 }
-else if (elementWithHighestPriority="MenuCreateNewAction" or elementWithHighestPriority="MenuCreateNewCondition" or elementWithHighestPriority="MenuCreateNewLoop") ;User click either on "Create new action" or ".. condtion" in the drawn menu
+else if (clickedElement="MenuCreateNewAction" or clickedElement="MenuCreateNewCondition" or clickedElement="MenuCreateNewLoop") ;User click either on "Create new action" or ".. condtion" in the drawn menu
 {
 
-	if (elementWithHighestPriority="MenuCreateNewAction")
-		tempNew:=New element("action")
-	else if (elementWithHighestPriority="MenuCreateNewCondition")
-		tempNew:=New element("Condition")
+	if (clickedElement="MenuCreateNewAction")
+		tempNew:=Element_New("action")
+	else if (clickedElement="MenuCreateNewCondition")
+		tempNew:=Element_New("Condition")
 	else
-		tempNew:=New element("Loop")
+		tempNew:=Element_New("Loop")
 	;~ MsgBox % strobj(tempnew)
 	
 	;function ui_moveSelectedElements() needs the following four lines of code
-	elementWithHighestPriority:=tempNew
-	tempNew.x:=(mx)/zoomfactor+offsetx - ElementWidth/2
-	tempNew.y:=(my)/zoomfactor+offsety  - ElementHeight/2
-	tempNew.mark()
+	clickedElement:=tempNew
+	allElements[clickedElement].x:=(mx)/zoomfactor+offsetx - ElementWidth/2
+	allElements[clickedElement].y:=(my)/zoomfactor+offsety  - ElementHeight/2
+	MarkOne(clickedElement)
 	if (ui_detectMovement()) ;If user moves the mouse
 	{
 		ret:=ui_moveSelectedElements() ;move the element. Stop moving when user releases the mouse button
@@ -144,14 +144,14 @@ else if (elementWithHighestPriority="MenuCreateNewAction" or elementWithHighestP
 	}
 	else
 	{
-		ret:=selectSubType(tempNew,"wait")
+		ret:=selectSubType(clickedElement,"wait")
 		if ret=aborted
 		{
 			UserCancelledAction:=true
 		}
 		else
 		{
-			ret:=ElementSettings.open(tempNew,"wait") ;open settings of element
+			ret:=ElementSettings.open(clickedElement,"wait") ;open settings of element
 			;~ MsgBox % strobj(tempnew)
 			if ret=aborted
 			{
@@ -170,21 +170,20 @@ else if (elementWithHighestPriority="MenuCreateNewAction" or elementWithHighestP
 	ui_draw()
 	;e_CorrectElementErrors("Code: 3053165186.")
 }
-else if (elementWithHighestPriority="PlusButton" or elementWithHighestPriority="PlusButton2") ;user click on plus button
+else if (clickedElement="PlusButton" or clickedElement="PlusButton2") ;user click on plus button
 {
-	
-	if (TheOnlyOneMarkedElement.type="Connection") ;The selected element is connection
+	IfInString,markedElement,Connection ;The selected element is connection
 	{
-		tempConnection2:=New Connection() ;Create new connection
+		tempConnection2:=Connection_New() ;Create new connection
 		
-		ret:=ui_MoveConnection(TheOnlyOneMarkedElement,tempConnection2,allelements[TheOnlyOneMarkedElement.from], allelements[TheOnlyOneMarkedElement.to])
+		ret:=ui_MoveConnection(markedElement,tempConnection2,allConnections[markedElement].from, allConnections[markedElement].to)
 		if ret=aborted
 			UserCancelledAction:=true
 	}
 	else ;The selected element is either action, condition or trigger or loop
 	{
-		tempConnection1:=New Connection()
-		ret:=ui_MoveConnection(tempConnection1, ,TheOnlyOneMarkedElement )
+		tempConnection1:=Connection_New()
+		ret:=ui_MoveConnection(tempConnection1, ,markedElement )
 		if ret=aborted
 			UserCancelledAction:=true
 		
@@ -203,13 +202,13 @@ else if (elementWithHighestPriority="PlusButton" or elementWithHighestPriority="
 	
 	
 	;e_CorrectElementErrors("Code: 2389423789.")
-	;ElementSettings.new(elementWithHighestPriority) ;open settings of element
+	;ElementSettings.new(clickedElement) ;open settings of element
 	
 }
-else if (elementWithHighestPriority="MoveButton1") ;if a connection is selected and user moved the upper Part of it
+else if (clickedElement="MoveButton1") ;if a connection is selected and user moved the upper Part of it
 {
 	
-	ret:=ui_MoveConnection(,TheOnlyOneMarkedElement ,,allelements[TheOnlyOneMarkedElement.to] )
+	ret:=ui_MoveConnection(,markedElement ,,allConnections[markedElement].to )
 	if ret=aborted
 		UserCancelledAction:=true
 	
@@ -229,11 +228,11 @@ else if (elementWithHighestPriority="MoveButton1") ;if a connection is selected 
 	;~ ui_draw()
 
 }
-else if (elementWithHighestPriority="MoveButton2") ;if a connection is selected and user moved the lower Part of it
+else if (clickedElement="MoveButton2") ;if a connection is selected and user moved the lower Part of it
 {
 	abortAddingElement:=false
 	
-	ret:=ui_MoveConnection(TheOnlyOneMarkedElement ,,allelements[TheOnlyOneMarkedElement.from] )
+	ret:=ui_MoveConnection(markedElement ,,allConnections[markedElement].from )
 	if ret=aborted
 		UserCancelledAction:=true
 	
@@ -257,68 +256,63 @@ else if (elementWithHighestPriority="MoveButton2") ;if a connection is selected 
 	
 
 }
-else if (elementWithHighestPriority="TrashButton") ;if something is selected and user clicks on the trash button
+else if (clickedElement="TrashButton") ;if something is selected and user clicks on the trash button
 {
-	MsgBox, 4, % lang("Delete Object") , % lang("Do you really want to delete the %1% %2%?",lang (TheOnlyOneMarkedElement.type), TheOnlyOneMarkedElement.name)
+	tempList:=GetListContainingElement(markedElement)
+	MsgBox, 4, % lang("Delete Object") , % lang("Do you really want to delete the %1% %2%?",lang (tempList[markedElement].type), tempList[markedElement].name)
 	IfMsgBox yes
 	{
-		TheOnlyOneMarkedElement.remove()
+		Element_Remove(markedElement)
 		UserDidMajorChange:=true
 	}
 	
 	;~ ui_draw()
 	;e_CorrectElementErrors("Code: 231684866.")
 }
-else if (elementWithHighestPriority="EditButton")  ;if something is selected and user clicks on the edit button
+else if (clickedElement="EditButton")  ;if something is selected and user clicks on the edit button
 {
-	
-	if (theOnlyOneMarkedElement.type="connection")
+	tempList:=GetListContainingElement(markedElement)
+	if (tempList[markedElement].type="connection")
 	{
-		ret:=selectConnectionType(theOnlyOneMarkedElement,"wait")
+		ret:=selectConnectionType(markedElement,"wait")
 		if (ret!="aborted")
 			UserDidMajorChange:=true
 		
 	}
 	else
 	{
-		ret:=ElementSettings.open(theOnlyOneMarkedElement,"wait") ;open settings of the marked element
+		ret:=ElementSettings.open(markedElement,"wait") ;open settings of the marked element
 		if (ret!="aborted" and ret!="0 changes" )
 			UserDidMajorChange:=true
 	}
 	
 
 }
-else if (IsObject(elementWithHighestPriority)) ;if user clicked on an element
+else if (clickedElement!="") ;if user clicked on an element
 {
-	
-
-	if (elementWithHighestPriority.type="connection")
+	tempList:=GetListContainingElement(clickedElement)
+	if (tempList[clickedElement].type="connection")
 	{
 		if (ControlKeyState="d")
 		{
-			elementWithHighestPriority.mark(true) ;mark multiple elements
+			MarkOne(clickedElement,true)  ;mark multiple elements
 			
 		}
 		else
-			elementWithHighestPriority.mark() ;mark one element and unmark others
+			MarkOne(clickedElement) ;mark one element and unmark others
 		ui_draw() 
 		
 	}
 	else
 	{
-		
-		
 		if (!ui_detectMovement()) ;If user did not move the mouse
 		{	
-			
 			if (ControlKeyState="d") ;if user presses Control key
 			{
-				
-				elementWithHighestPriority.mark(true) ;mark multiple elements
-				
+				MarkOne(clickedElement,true) ;mark multiple elements
 			}
 			else
-				elementWithHighestPriority.mark() ;mark one element and unmark others
+				MarkOne(clickedElement) ;mark one element and unmark others
 			ui_draw() 
 		}
 		else ;If user moves the mouse
@@ -327,12 +321,12 @@ else if (IsObject(elementWithHighestPriority)) ;if user clicked on an element
 				ret:=ui_moveSelectedElements() ;move the elements
 			else if ((ControlKeyState!="d")) ;if no elements are marked and user does not press the control key
 			{
-				elementWithHighestPriority.mark() ;select the element (and unselect others)
+				MarkOne(clickedElement) ;select the element (and unselect others)
 				ret:=ui_moveSelectedElements() ;Move it
 			}
 			else
 			{
-				elementWithHighestPriority.mark(true) ;select the element (additionally to others)
+				MarkOne(clickedElement,true) ;select the element (additionally to others)
 				ret:=ui_moveSelectedElements() ;Move it
 			}
 			
@@ -364,13 +358,14 @@ tempElement2:=""
 tempElement3:=""
 tempConnection1:=""
 tempConnection2:=""
-elementWithHighestPriority:=""
+clickedElement:=""
 elementHighestPriority:=""
 markedelementWithLowestPriority:=""
 markedelementLowestPriority:=""
 tempNew:=""
 tempOldConnection1from:=""
 tempOldConnection1to:=""
+tempList:=""
 
 if (UserDidMajorChange or UserDidMinorChange)
 {
@@ -387,8 +382,9 @@ return
 ui_findElementUnderMouse(par_mode="default")
 {
 	global
+	local tempList
 	
-	elementWithHighestPriority:=""
+	clickedElement:=""
 	elementHighestPriority:=""
 	MarkedElementWithLowestPriority:=""
 	MarkedElementLowestPriority:=""
@@ -398,36 +394,36 @@ ui_findElementUnderMouse(par_mode="default")
 		
 		;look whether user wants to create a new element (click on a field on top left corner)
 		if ((0 < mx) and (0 < my) and ((NewElementIconWidth*1.2*zoomFactor)  > mx) and ((NewElementIconHeight*1.2*zoomFactor) > my))
-			elementWithHighestPriority=MenuCreateNewAction
+			clickedElement=MenuCreateNewAction
 		if (((NewElementIconWidth*1.2*zoomFactor) < mx) and (0 < my) and ((NewElementIconWidth*1.2 * 2*zoomFactor)  > mx) and ((NewElementIconHeight*1.2*zoomFactor) > my))
-			elementWithHighestPriority=MenuCreateNewCondition
+			clickedElement=MenuCreateNewCondition
 		if (((NewElementIconWidth*2.4*zoomFactor) < mx) and (0 < my) and ((NewElementIconWidth*1.2 * 3*zoomFactor)  > mx) and ((NewElementIconHeight*1.2*zoomFactor) > my))
-			elementWithHighestPriority=MenuCreateNewLoop
+			clickedElement=MenuCreateNewLoop
 	
 
 		;~ ToolTip % share.PlusButtonExist " -" share.middlePointOfPlusButtonX
 		;~ ToolTip( "gsdd" Sqrt((middlePointOfPlusButtonX*zoomFactor - mx)*(middlePointOfPlusButtonX*zoomFactor - mx) + (middlePointOfPlusButtonY*zoomFactor - my)*(middlePointOfPlusButtonY*zoomFactor - my)) "`n middlePointOfPlusButtonX " middlePointOfPlusButtonX "`n middlePointOfPlusButtonY " middlePointOfPlusButtonY)
 		;Look whether user clicked a button
 		if (share.PlusButtonExist=true and Sqrt((share.middlePointOfPlusButtonX*zoomFactor - mx)*(share.middlePointOfPlusButtonX*zoomFactor - mx) + (share.middlePointOfPlusButtonY*zoomFactor - my)*(share.middlePointOfPlusButtonY*zoomFactor - my)) < SizeOfButtons/2*zoomFactor)
-			elementWithHighestPriority=PlusButton
+			clickedElement=PlusButton
 		else if (share.PlusButton2Exist=true and Sqrt((share.middlePointOfPlusButton2X*zoomFactor - mx)*(share.middlePointOfPlusButton2X*zoomFactor - mx) + (share.middlePointOfPlusButton2Y*zoomFactor - my)*(share.middlePointOfPlusButton2Y*zoomFactor - my)) < SizeOfButtons/2*zoomFactor)
-			elementWithHighestPriority=PlusButton2
+			clickedElement=PlusButton2
 		else if (share.EditButtonExist=true and Sqrt((share.middlePointOfEditButtonX*zoomFactor - mx)*(share.middlePointOfEditButtonX*zoomFactor - mx) + (share.middlePointOfEditButtonY*zoomFactor - my)*(share.middlePointOfEditButtonY*zoomFactor - my)) < SizeOfButtons/2 *zoomFactor)
-			elementWithHighestPriority=EditButton
+			clickedElement=EditButton
 		else if (share.TrashButtonExist=true and Sqrt((share.middlePointOfTrashButtonX*zoomFactor - mx)*(share.middlePointOfTrashButtonX*zoomFactor - mx) + (share.middlePointOfTrashButtonY*zoomFactor - my)*(share.middlePointOfTrashButtonY*zoomFactor - my)) < SizeOfButtons/2*zoomFactor)
-			elementWithHighestPriority=TrashButton
+			clickedElement=TrashButton
 		else if (share.MoveButton2Exist=true and Sqrt((share.middlePointOfMoveButton2X*zoomFactor - mx)*(share.middlePointOfMoveButton2X*zoomFactor - mx) + (share.middlePointOfMoveButton2Y*zoomFactor - my)*(share.middlePointOfMoveButton2Y*zoomFactor - my)) < SizeOfButtons/2*zoomFactor)
-			elementWithHighestPriority=MoveButton2
+			clickedElement=MoveButton2
 		else if (share.MoveButton1Exist=true and Sqrt((share.middlePointOfMoveButton1X*zoomFactor - mx)*(share.middlePointOfMoveButton1X*zoomFactor - mx) + (share.middlePointOfMoveButton1Y*zoomFactor - my)*(share.middlePointOfMoveButton1Y*zoomFactor - my)) < SizeOfButtons/2*zoomFactor)
-			elementWithHighestPriority=MoveButton1
+			clickedElement=MoveButton1
 	}
 
 	;search for an element
-	if (elementWithHighestPriority="")
+	if (clickedElement="")
 	{
 		elementHighestPriority=0 ;The highest priority decides which element will be selected. The priority reduces a little bit when the element was selected, and increases every time the user clicks on it but something else is selected. This way it is possible to click through the elements whith are beneath each other.
 		MarkedElementLowestPriority=100000
-		for index, forElement in allElements
+		for forID, forElement in allElements
 		{
 			
 			Loop % forElement.CountOfParts ;Connections consist of multiple parts
@@ -440,14 +436,14 @@ ui_findElementUnderMouse(par_mode="default")
 					{
 						;~ SoundBeep , % forElement.ClickPriority
 						elementHighestPriority:=forElement.ClickPriority
-						partOfElementWithHighestPriority:=A_Index
-						elementWithHighestPriority:=forElement
+						partOfclickedElement:=A_Index
+						clickedElement:=forID
 					}
 					if (forElement.marked = true and MarkedElementLowestPriority > forElement.ClickPriority) ;Find a marked element with lowest priority
 					{
 						MarkedElementLowestPriority:=forElement.ClickPriority
 						partOfmarkedElementWithLowestPriority:=A_Index
-						MarkedElementWithLowestPriority:=forElement
+						MarkedElementWithLowestPriority:=forID
 					}
 					if (par_mode="default")
 					{
@@ -457,21 +453,25 @@ ui_findElementUnderMouse(par_mode="default")
 				}
 			}
 		}
+		
+		
 		if (par_mode="default")
 		{
-			if (elementWithHighestPriority.ClickPriority<=500 and elementWithHighestPriority.ClickPriority >=490) ;reduce the priority of selected element
-				elementWithHighestPriority.ClickPriority:=490
+			tempList:=GetListContainingElement(clickedElement)
+			if (tempList[clickedElement].ClickPriority<=500 and tempList[clickedElement].ClickPriority >=490) ;reduce the priority of selected element
+				tempList[clickedElement].ClickPriority:=490
 		}
-		;msgbox,elementWithHighestPriority. : clickHighestPriority
+		;msgbox,clickedElement. : clickHighestPriority
 	}
 	
 	
 	;search for a connection
-	if (par_mode="default" and elementWithHighestPriority="")
+	if (par_mode="default" and clickedElement="")
 	{
 		elementHighestPriority=0 ;The highest priority decides which element will be selected. The priority reduces a little bit when the element was selected, and increases every time the user clicks on it but something else is selected. This way it is possible to click through the elements whith are beneath each other.
-		for index, forElement in allconnections
+		for forID, forElement in allconnections
 		{
+			;~ MsgBox % forID " - " forElement.CountOfParts 
 			Loop % forElement.CountOfParts ;Connections consist of multiple parts
 			{
 				if (forElement["part" a_index "x1"] < mx and forElement["part" a_index "y1"] < my and forElement["part" a_index "x2"] > mx and forElement["part" a_index "y2"] > my)
@@ -479,8 +479,8 @@ ui_findElementUnderMouse(par_mode="default")
 					if (elementHighestPriority < forElement.ClickPriority) ;find the element with highest priority
 					{
 						elementHighestPriority:=forElement.ClickPriority
-						partOfElementWithHighestPriority:=A_Index
-						elementWithHighestPriority:=forElement
+						partOfclickedElement:=A_Index
+						clickedElement:=forID
 					}
 					
 					if (forElement.ClickPriority<200 and forElement.ClickPriority >=190) ;Increase priority if element has low priority. 
@@ -488,13 +488,13 @@ ui_findElementUnderMouse(par_mode="default")
 				}
 			}
 		}
-		if (elementWithHighestPriority.ClickPriority<=200 and elementWithHighestPriority.ClickPriority >=190)
+		tempList:=GetListContainingElement(clickedElement)
+		if (tempList[clickedElement].ClickPriority<=200 and tempList[clickedElement].ClickPriority >=190)
 		{
-			elementWithHighestPriority.ClickPriority:=190
+			tempList[clickedElement].ClickPriority:=190
 		}
 	}
-	
-	return elementWithHighestPriority
+	return clickedElement
 }
 
 
@@ -504,31 +504,31 @@ ui_moveSelectedElements(option="")
 	local oldHeightOfVerticalBar, k, clickMoved, howMuchMoved, newmx1, newmy1, newmx, newmy, newposy, newposx
 	
 	local toMoveEelement
-	if IsObject(markedElementWithLowestPriority)
+	if (markedElementWithLowestPriority!="")
 		toMoveEelement:=markedElementWithLowestPriority
 	else
-		toMoveEelement:=elementWithHighestPriority
-	
+		toMoveEelement:=clickedElement
+	;~ ToolTip move %toMoveEelement%
 	local MovementAborted:=false
-	local oldposx:=toMoveEelement.x ;Store the old position of the element
-	local firstposx:=toMoveEelement.x
+	local oldposx:=allElements[toMoveEelement].x ;Store the old position of the element
+	local firstposx:=allElements[toMoveEelement].x
 	local firstoffsetx:=offsetx
 	local firstmx:=mx
-	local oldposy:=toMoveEelement.y
-	local firstposy:=toMoveEelement.y
+	local oldposy:=allElements[toMoveEelement].y
+	local firstposy:=allElements[toMoveEelement].y
 	local firstoffsety:=offsety
 	local firstmy:=my
-	
 	
 	clickMoved:=false
 	howMuchMoved:=0
 	MovementAborted:=false
 	
 	UserClickedRbutton:=false
+	
 	UserCurrentlyMovesAnElement:=true ;Prevents that, if user scroll simultanously, the scroll function will call ui_draw().
-	if (TheOnlyOneMarkedElement!= "" && TheOnlyOneMarkedElement.type = "loop" && partOfElementWithHighestPriority>=3) ;If a loop is selected and user moves its tail
+	if (markedElement!= "" && allElements[toMoveEelement].type = "loop" && partOfclickedElement>=3) ;If a loop is selected and user moves its tail
 	{
-		oldHeightOfVerticalBar:=TheOnlyOneMarkedElement.HeightOfVerticalBar
+		oldHeightOfVerticalBar:=allElements[toMoveEelement].HeightOfVerticalBar
 		
 		UserClickedRbutton:=false
 		Loop ;Move element(s)
@@ -541,8 +541,10 @@ ui_moveSelectedElements(option="")
 				{
 					;Fit to grid
 					
-					TheOnlyOneMarkedElement.HeightOfVerticalBar:=ui_FitGridx(TheOnlyOneMarkedElement.HeightOfVerticalBar)
+					allElements[toMoveEelement].HeightOfVerticalBar:=ui_FitGridx(allElements[toMoveEelement].HeightOfVerticalBar)
 					
+					if (allElements[toMoveEelement].HeightOfVerticalBar!=oldHeightOfVerticalBar)
+						clickMoved:=true
 					
 					ui_draw()
 				}
@@ -554,7 +556,7 @@ ui_moveSelectedElements(option="")
 			if (UserClickedRbutton or getkeystate("esc","P")) ;If user cancels movement, move back
 			{
 				
-				TheOnlyOneMarkedElement.HeightOfVerticalBar:=oldHeightOfVerticalBar
+				allElements[toMoveEelement].HeightOfVerticalBar:=oldHeightOfVerticalBar
 				MovementAborted:=true
 				ui_draw()
 				break
@@ -567,12 +569,11 @@ ui_moveSelectedElements(option="")
 				oldposy:=newmy
 				newposy:=(firstposy+(newmy-firstmy)/zoomFactor)-firstoffsety+offsety
 				
-				TheOnlyOneMarkedElement.HeightOfVerticalBar:=(oldHeightOfVerticalBar+(newmy-my)/zoomFactor)-firstoffsety+offsety
-				if (TheOnlyOneMarkedElement.HeightOfVerticalBar< Gridy*2)
-					TheOnlyOneMarkedElement.HeightOfVerticalBar:= Gridy*2
+				allElements[toMoveEelement].HeightOfVerticalBar:=(oldHeightOfVerticalBar+(newmy-my)/zoomFactor)-firstoffsety+offsety
+				if (allElements[toMoveEelement].HeightOfVerticalBar< Gridy*2)
+					allElements[toMoveEelement].HeightOfVerticalBar:= Gridy*2
 				howMuchMoved++
-				if howMuchMoved>2
-					clickMoved:=true
+				
 				ui_draw()
 			}
 			else ;If mouse is not currently moving
@@ -590,8 +591,8 @@ ui_moveSelectedElements(option="")
 	{
 		for index, forElement in markedElements  ;Preparing to move
 		{
-			forElement.oldx:=forElement.x
-			forElement.oldy:=forElement.y
+			allElements[forElement].oldx:=allElements[forElement].x
+			allElements[forElement].oldy:=allElements[forElement].y
 		}
 		
 		UserClickedRbutton:=false
@@ -607,9 +608,11 @@ ui_moveSelectedElements(option="")
 					for index, forElement in markedElements
 					{
 						
-						forElement.x:=ui_FitGridX(forElement.x)
-						forElement.y:=ui_FitGridY(forElement.y)
+						allElements[forElement].x:=ui_FitGridX(allElements[forElement].x)
+						allElements[forElement].y:=ui_FitGridY(allElements[forElement].y)
 						
+						if ((allElements[forElement].oldx)!=(allElements[forElement].x) or (allElements[forElement].oldy)!=(allElements[forElement].y))
+							clickMoved:=true
 					}
 					
 					ui_draw()
@@ -623,8 +626,8 @@ ui_moveSelectedElements(option="")
 			{
 				for index, forElement in markedElements
 				{
-					forElement.x:=forElement.oldx
-					forElement.y:=forElement.oldy
+					allElements[forElement].x:=allElements[forElement].oldx
+					allElements[forElement].y:=allElements[forElement].oldy
 					
 				}
 				MovementAborted:=true
@@ -641,17 +644,15 @@ ui_moveSelectedElements(option="")
 				oldposy:=newmy
 				for index, forElement in markedElements
 				{
-					newposx:=(forElement.oldx+(newmx-firstmx)/zoomFactor) -firstoffsetx + offsetx
-					newposy:=(forElement.oldy+(newmy-firstmy)/zoomFactor) -firstoffsety + offsety
+					newposx:=(allElements[forElement].oldx+(newmx-firstmx)/zoomFactor) -firstoffsetx + offsetx
+					newposy:=(allElements[forElement].oldy+(newmy-firstmy)/zoomFactor) -firstoffsety + offsety
 					;~ ToolTip(firstposx " - " newmx " - " mx " - " zoomFactor " - " firstoffsetx " - " offsetx)
-					forElement.x:=(newposx)
-					forElement.y:=(newposy)
+					allElements[forElement].x:=(newposx)
+					allElements[forElement].y:=(newposy)
 					
 				}
 				
 				howMuchMoved++
-				if howMuchMoved>2
-					clickMoved:=true
 				ui_draw()
 			}
 			else ;If mouse is not currently moving
@@ -660,8 +661,9 @@ ui_moveSelectedElements(option="")
 			}
 			
 			
-			
 		}
+		
+		
 	}
 	UserCurrentlyMovesAnElement:=false
 	return {moved:clickMoved, HowMuchMoved:howMuchMoved, Aborted: MovementAborted}
@@ -812,14 +814,14 @@ ui_MoveConnection(connection1="", connection2="", element1="", element2="")
 		
 		;move elements to mouse
 		element.unmarkall()
-		connection1.mark()
-		connection2.mark(true)
-		connection2.from:="MOUSE"
-		connection2.to:=element2.id
-		connection2.ToPart:=connection1.ToPart
+		markOne(connection1)
+		markOne(connection2,true)
+		allConnections[connection2].from:="MOUSE"
+		allConnections[connection2].to:=allElements[element2].id
+		allConnections[connection2].ToPart:=allConnections[connection1].ToPart
 		
-		connection1.from:=element1.id
-		connection1.to:="MOUSE"
+		allConnections[connection1].from:=allElements[element1].id
+		allConnections[connection1].to:="MOUSE"
 		
 		;~ ToolTip(strobj(connection1) "`n`n" strobj(connection2),10000)
 		
@@ -863,9 +865,9 @@ ui_MoveConnection(connection1="", connection2="", element1="", element2="")
 		ui_findElementUnderMouse("OnlyElements") ;Search an element beneath the mouse.
 		
 		
-		if (elementWithHighestPriority="") ;If user pulled the end of the connection to empty space. Create new element
+		if (clickedElement="") ;If user pulled the end of the connection to empty space. Create new element
 		{
-			newElement:=New element()
+			newElement:=Element_New()
 			newElementCreated:=true
 			
 			ret:=selectContainerType(newElement,"wait")
@@ -873,21 +875,21 @@ ui_MoveConnection(connection1="", connection2="", element1="", element2="")
 			{
 				return "aborted"
 			}
-			newElement.x:=(mx)/zoomfactor+offsetx - ElementWidth/2
-			newElement.y:=(my)/zoomfactor+offsety  - ElementHeight/2
-			newElement.x:=ui_FitGridX(newElement.x)
-			newElement.y:=ui_FitGridY(newElement.y)
+			allElements[newElement].x:=(mx)/zoomfactor+offsetx - ElementWidth/2
+			allElements[newElement].y:=(my)/zoomfactor+offsety  - ElementHeight/2
+			allElements[newElement].x:=ui_FitGridX(allElements[newElement].x)
+			allElements[newElement].y:=ui_FitGridY(allElements[newElement].y)
 			
 			
-			Connection1.to:=newElement.id
-			Connection2.from:=newElement.id
+			allConnections[connection1].to:=allElements[newElement].id
+			allConnections[connection2].from:=allElements[newElement].id
 			
 			gosub,ui_MoveConnectionCheckAndCorrect
 			if abortAddingElement
 				return "aborted"
 			
-			newElement.mark()
-			elementWithHighestPriority:=newElement
+			MarkOne(newElement)
+			clickedElement:=newElement
 			ui_draw()
 			
 			ret:=selectSubType(newElement,"Wait")
@@ -906,15 +908,15 @@ ui_MoveConnection(connection1="", connection2="", element1="", element2="")
 		else ;If user pulled the end of the connection to an existing element
 		{
 			;~ SoundBeep 600
-			NewElement:=elementWithHighestPriority
-			NewElementPart:=partOfElementWithHighestPriority
+			NewElement:=clickedElement
+			NewElementPart:=partOfclickedElement
 			newElementCreated:=false
 			
-			Connection2.from:=NewElement.id
-			Connection1.to:=NewElement.id
+			allConnections[connection2].from:=allElements[newElement].id
+			allConnections[connection1].to:=allElements[newElement].id
 
 			;Check whether Connection is possible
-			if (NewElement.Type="Trigger" )
+			if (allElements[newElement].Type="Trigger" )
 			{
 				Msgbox,% lang("You_cannot_connect_to_trigger!")
 				return "aborted"
@@ -930,7 +932,7 @@ ui_MoveConnection(connection1="", connection2="", element1="", element2="")
 				return "aborted"
 			
 			if (Connection1!="" and Connection2!="") ;if user has split a connection and connected an other element inbetween
-				NewElement.mark()
+				markOne(NewElement)
 			;else keep the new or modified connection marked
 			
 		}
@@ -941,7 +943,7 @@ ui_MoveConnection(connection1="", connection2="", element1="", element2="")
 		
 		if (Connection2!="") ;If connection 2 exists
 		{
-			if (NewElement.Type="Condition" and Connection2.connectiontype!="exception" and Connection2.connectiontype!="no" and Connection2.connectiontype!="yes") ;if pulled to connection and its type is not exception
+			if (allElements[newElement].Type="Condition" and allConnections[connection2].connectiontype!="exception" and allConnections[connection2].connectiontype!="no" and allConnections[connection2].connectiontype!="yes") ;if pulled to connection and its type is not exception
 			{
 				ret:=selectConnectionType(Connection2,"wait")
 				if (ret="aborted")
@@ -949,68 +951,68 @@ ui_MoveConnection(connection1="", connection2="", element1="", element2="")
 			}
 			else ;if pulled to anything else, check whether it is normal or exception
 			{
-				if (Connection2.connectiontype!="normal" and Connection2.connectiontype!="exception")
-					Connection2.connectiontype:="normal"
+				if (allConnections[connection2].connectiontype!="normal" and allConnections[connection2].connectiontype!="exception")
+					allConnections[connection2].connectiontype:="normal"
 			}
 		}
 		
 		
-		if (Element2.Type="Loop") ;If the second element is a loop. The information about the connected part is not yet in the second connection.
+		if (allElements[Element2].Type="Loop") ;If the second element is a loop. The information about the connected part is not yet in the second connection.
 		{
-			if (not Connection2.toPart) ;If no part assigned to connection
+			if (not allConnections[connection2].toPart) ;If no part assigned to connection
 			{
 				if (Connection1!="") ;If a second connection exist. Thus it was previously connected to the loop
-					Connection2.toPart:=Connection1.toPart
+					allConnections[connection2].toPart:=allConnections[connection1].toPart
 				else
-					Connection2.toPart:="HEAD" ;connect to head
+					allConnections[connection2].toPart:="HEAD" ;connect to head
 			}
 		}
 		else
-			Connection2.delete("topart") ;Delete part information if set
+			allConnections[connection2].delete("topart") ;Delete part information if set
 		
-		if (NewElement.Type="Loop") ;If user pulled to a loop, assign parts
+		if (allElements[newElement].Type="Loop") ;If user pulled to a loop, assign parts
 		{
 			if newElementCreated ;If a new one was created, define default parts
 			{
-				Connection1.toPart:="HEAD" 
-				Connection2.fromPart:="TAIL"
+				allConnections[connection1].toPart:="HEAD" 
+				allConnections[connection2].fromPart:="TAIL"
 			}
 			else ;If user has pulled to an existing loop, decide depending on which part he dropped it
 			{
 				if (Connection1!="" and Connection2!="") ;assign default if both connections exist
 				{
-					Connection1.toPart:="HEAD" 
-					Connection2.fromPart:="TAIL"
+					allConnections[connection1].toPart:="HEAD" 
+					allConnections[connection2].fromPart:="TAIL"
 				}
 				else
 				{
 					if (NewElementPart=1 or NewElementPart=2) 
 					{
-						Connection1.toPart:="HEAD" 
-						Connection2.fromPart:="HEAD"
+						allConnections[connection1].toPart:="HEAD" 
+						allConnections[connection2].fromPart:="HEAD"
 					}
 					else if (NewElementPart=3) 
 					{
-						Connection1.toPart:="TAIL" 
-						Connection2.fromPart:="TAIL"
+						allConnections[connection1].toPart:="TAIL" 
+						allConnections[connection2].fromPart:="TAIL"
 					}
 					else if (NewElementPart=4) 
 					{
-						Connection1.toPart:="BREAK" 
-						Connection2.fromPart:="TAIL"
+						allConnections[connection1].toPart:="BREAK" 
+						allConnections[connection2].fromPart:="TAIL"
 					}
 				}
 			}
 		}
 		else ;if not, delete part informations, if any
 		{
-			Connection1.delete("topart")
-			Connection2.delete("fromPart")
+			allConnections[Connection1].delete("topart")
+			allConnections[Connection2].delete("fromPart")
 		}
-		if (Element1.Type="Loop") ;If the first element is a loop
+		if (allElements[Element1].Type="Loop") ;If the first element is a loop
 		{
-			if (not Connection1.fromPart) ;If no part assigned to connection
-				Connection1.fromPart:="TAIL" ;connect to tail
+			if (not allConnections[connection1].fromPart) ;If no part assigned to connection
+				allConnections[connection1].fromPart:="TAIL" ;connect to tail
 		}
 		else
 			Connection2.delete("topart") ;Delete part information if set
@@ -1023,14 +1025,14 @@ ui_MoveConnection(connection1="", connection2="", element1="", element2="")
 			else
 				tempElement:=Connection2
 			
-			for index, forElement in allConnections
+			for forID, forElement in allConnections
 			{
 				;~ d(strobj(tempElement) "`n`n" strobj(forElement), "wait")
-				if (forElement!=tempElement)
+				if (forID!=tempElement)
 				{
-					if (forElement.from=tempElement.from and forElement.to=tempElement.to )
+					if (forElement.from=allConnections[tempElement].from and forElement.to=allConnections[tempElement].to )
 					{
-						if (forElement.ConnectionType=tempElement.ConnectionType)
+						if (forElement.ConnectionType=allConnections[tempElement].ConnectionType)
 						{
 							msgbox,% lang("This_Connection_Already_Exists!")
 							abortAddingElement:=true
@@ -1061,19 +1063,21 @@ markedElementscopy:=markedElements.clone()
 
 for markindex, markelement in markedElementscopy
 {
-	if (markelement.type="trigger")
+	tempList:=GetListContainingElement(markelement)
+	if (tempList[markelement].type="trigger")
 	{
 		MsgBox,% lang("Trigger_cannot be removed!")
 		continue
 	}
 	else ;remove all marked elements
 	{
-		markelement.remove()
+		Element_Remove(markelement)
 	}
 	
 
 }
 markedElementscopy:=""
+tempList:=""
 ;e_CorrectElementErrors("Code: 354546841.")
 new state()
 ui_UpdateStatusbartext()
@@ -1147,7 +1151,7 @@ if ret=0
 { ;Delete all marked elements
 	markedElementscopy:=markedElements.clone()
 
-	for markindex, markelement in markedElementscopy
+	for markID, markelement in markedElementscopy
 	{
 		if (markelement.type="trigger" or markelement.type="connection")
 		{
@@ -1155,7 +1159,7 @@ if ret=0
 		}
 		else ;remove all marked elements
 		{
-			markelement.remove()
+			Element_Remove(markelement)
 		}
 	}
 	markedElementscopy:=""
@@ -1221,11 +1225,8 @@ if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of t
 	ui_ActionWhenMainGUIDisabled()
 	return
 }
-element.unmarkall()
-for index, forElement in allelements
-{
-	element.markAll()
-}
+UnmarkEverything()
+MarkEverything()
 ui_draw()
 return
 

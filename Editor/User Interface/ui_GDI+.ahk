@@ -71,12 +71,12 @@ pBrushBackground := Gdip_BrushCreateSolid("0xFFeaf0ea") ;Almost white brush for 
 ui_initGDIThread()
 {
 	global
-	local tempGIDCode
+	local tempGDICode
 	
-	FileRead,tempGIDCode,% A_ScriptDir "\AutoHotKey\Threads\ui_GDI+Thread.ahk"
-	AhkThreadGDI := AhkThread("share:=CriticalObject(" (&share) ") `n" tempGIDCode)
-	AhkThreadGDI.ahkAssign("mainguihwnd",maingui.hwnd)
-	AhkThreadGDI.ahkAssign("mainguiHwnddc",MainGui.Hwnddc)
+	;~ FileRead,tempGDICode,% A_ScriptDir "\AutoHotKey\Threads\ui_GDI+Thread.ahk"
+	AhkThreadGDI := AhkThread("share:=CriticalObject(" (&share) ") `n allTriggers:=CriticalObject(" (&allTriggers) ") `n allConnections:=CriticalObject(" (&allConnections) ") `n allElements:=CriticalObject(" (&allElements) ") `n mainguihwnd:=""" maingui.hwnd """`nmainguiHwnddc:="" MainGui.Hwnddc ""`n" GDIThreadCode)
+	;~ AhkThreadGDI.ahkAssign("mainguihwnd",maingui.hwnd)
+	;~ AhkThreadGDI.ahkAssign("mainguiHwnddc",MainGui.Hwnddc)
 
 	
 }
@@ -98,7 +98,7 @@ ui_Draw()
 	share.GDIPars.widthofguipic:=widthofguipic
 	share.GDIPars.heightofguipic:=heightofguipic
 	share.GDIPars.UserCurrentlyMovesAnElement:=UserCurrentlyMovesAnElement
-	
+	share.markedElement:=markedElement
 	
 	AhkThreadGDI.ahkFunction("ui_DrawThread")
 	;~ SoundBeep 100

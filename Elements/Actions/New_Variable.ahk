@@ -2,16 +2,16 @@
 
 class ActionNew_variable extends ElementExecution
 {
-	__new(p_Thread)
+	__new(p_Thread,p_ClonedElement)
 	{
-		base.__new(p_Thread)
+		base.__new(p_Thread,p_ClonedElement)
 	}
 	
 	run()
 	{
 		base.run()
-		Varname:=variable.replaceVariables(this.thread,this.element.par.VarName)
-		if not variable.NameIsValid(varname)
+		Varname:=replaceVariables(this.thread,this.element.par.VarName)
+		if not Variable_CheckName(varname)
 		{
 			logger("f0","Instance " this.Instance.ID " - " this.Element.type " '" this.element.name "': Error! Ouput variable name '" varname "' is not valid")
 			this.end("exception",lang("%1% is not valid",lang("Ouput variable name '%1%'",varname)) )
@@ -22,15 +22,15 @@ class ActionNew_variable extends ElementExecution
 		{
 			;~ MsgBox fdgawewe
 			;~ Value:=v_EvaluateExpression(InstanceID,ThreadID,%ElementID%VarValue)
-			Value:=variable.EvaluateExpression(this.thread,this.element.par.VarValue)
+			Value:=EvaluateExpression(this.thread,this.element.par.VarValue)
 		}
 		else
 		{
 			;~ Value:=this.thread.replaceVariables(this.par.VarValue)
-			Value:=variable.replaceVariables(this.thread,this.element.par.VarValue) 
+			Value:=replaceVariables(this.thread,this.element.par.VarValue) 
 		}
 		
-		variable.set(this.thread,Varname,Value)
+		variable_set(this.thread,Varname,Value)
 		
 		this.end("normal")
 		

@@ -22,14 +22,15 @@ if not a_iscompiled
 DebugLogLevelApp=3 ;Debug level for app debugs: 0=Only errors; 1=Important logs; 2=Detailed logs ; 3=Debug logs
 DebugLogLevelFlow=3 ;Debug levels: 0=Only errors; 1=Important logs; 2=Detailed logs ; 3=Debug logs
 
-flowSettings:=[]
-flow:=[]
-flowSettings.ExecutionPolicy:="parallel"
-flowSettings.MaximumCountOfParallelInstances:=100
-flow.ClipboardFilePath:=A_ScriptDir "\Clipboard.ini"
+share:=CriticalObject()
+share.flowSettings:=[]
+share.flow:=[]
+share.flowSettings.ExecutionPolicy:="parallel"
+share.flowSettings.MaximumCountOfParallelInstances:=100
+share.flowSettings.MaximumCountOfExeThreads:=1
+share.flow.ClipboardFilePath:=A_ScriptDir "\Clipboard.ini"
 ;~ LangNoUseCache:=true ;only for debugging
 
-share:=CriticalObject()
 ;Priorities
 c_PriorityForIteration:=-50
 c_PriorityForInstanceInitialization:=-100
@@ -247,6 +248,7 @@ iniAllTriggers=
 #include editor\Variables\v_Variables.ahk
 #include editor\Variables\v_Expression.ahk
 #include editor\User Interface\ui_GDI+.ahk
+#include editor\User Interface\ui_GDI+Thread.ahk
 #include editor\User Interface\ui_Mouse.ahk
 #include editor\User Interface\ui_Help.ahk
 #include editor\User Interface\ui_Element_Settings.ahk
@@ -261,6 +263,7 @@ iniAllTriggers=
 
 #include editor\run\r_run.ahk
 #include editor\run\r_Instance.ahk
+#include editor\run\r_ExecutionThread.ahk
 ;#include editor\run\r_enable.ahk
 #include editor\Debug\d_Debug.ahk
 #include editor\Debug\d_Logger.ahk
@@ -330,7 +333,7 @@ CommandCount=0
 ;SetTimer,CheckWhetherInactive,10000
 
 ;Add the Trigger element
-maintrigger:=new element("trigger","trigger")
+maintrigger:=element_new("trigger","trigger")
 ;Create the saving folder for generated scripts
 FileCreateDir Generated Scripts
 
@@ -342,6 +345,8 @@ maingui:=new maingui() ;Create the main GUI
 
 ;Create thread for drawing
 ui_initGDIThread()
+
+r_StartExecutionThreads()
 
 ;Evaluate parameters
 if 1=EditFlow 
