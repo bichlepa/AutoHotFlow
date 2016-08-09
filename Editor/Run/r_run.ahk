@@ -10,7 +10,7 @@ CriticalSectionAllInstances:=CriticalSection()
 r_StartExecutionThreads()
 {
 	global
-	
+	FileRead,ExecutionThreadCode,% A_ScriptDir "\Threads\r_ExecutionThread.ahk"
 	Loop % share.flowSettings.MaximumCountOfExeThreads
 	{
 		AhkThreadExecution%a_index% := AhkThread("CriticalSectionAllInstances := CriticalSection("CriticalSectionAllInstances ")`nshare:=CriticalObject(" (&share) ") `n allTriggers:=CriticalObject(" (&allTriggers) ") `n allConnections:=CriticalObject(" (&allConnections) ") `n allElements:=CriticalObject(" (&allElements) ") `n allInstances:=CriticalObject(" (&allInstances) ") `n allThreads:=CriticalObject(" (&allThreads) ") `n mainguihwnd:=""" maingui.hwnd """`n" ExecutionThreadCode)
@@ -157,7 +157,7 @@ r_StartNewInstance()
 	
 	logger("f1","Starting new instance")
 	
-	SetTimer,r_Iteration,-10,%c_PriorityForIteration%
+	;~ SetTimer,r_Iteration,-10,%c_PriorityForIteration%
 }
 
 r_OnChange()
@@ -170,7 +170,7 @@ r_OnChange()
 }
 
 
-r_Iteration()
+r_Iteratioen()
 {
 	;~ MsgBox r_Iteration
 	global execution, FlowLastActivity, runNeedToRedraw, allInstances
@@ -333,7 +333,7 @@ r_Iteration()
 	}
 	else
 	{
-		SetTimer,r_Iteration,-10,%c_PriorityForInstanceInitialization%
+		;~ SetTimer,r_Iteration,-10,%c_PriorityForInstanceInitialization%
 	}
 	
 }

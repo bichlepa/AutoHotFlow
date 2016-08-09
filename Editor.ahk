@@ -248,7 +248,7 @@ iniAllTriggers=
 #include editor\Variables\v_Variables.ahk
 #include editor\Variables\v_Expression.ahk
 #include editor\User Interface\ui_GDI+.ahk
-#include editor\User Interface\ui_GDI+Thread.ahk
+;~ #include editor\User Interface\ui_GDI+Thread.ahk
 #include editor\User Interface\ui_Mouse.ahk
 #include editor\User Interface\ui_Help.ahk
 #include editor\User Interface\ui_Element_Settings.ahk
@@ -263,7 +263,7 @@ iniAllTriggers=
 
 #include editor\run\r_run.ahk
 #include editor\run\r_Instance.ahk
-#include editor\run\r_ExecutionThread.ahk
+;~ #include editor\run\r_ExecutionThread.ahk
 ;#include editor\run\r_enable.ahk
 #include editor\Debug\d_Debug.ahk
 #include editor\Debug\d_Logger.ahk

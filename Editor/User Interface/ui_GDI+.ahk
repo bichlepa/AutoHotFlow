@@ -73,7 +73,7 @@ ui_initGDIThread()
 	global
 	local tempGDICode
 	
-	;~ FileRead,tempGDICode,% A_ScriptDir "\AutoHotKey\Threads\ui_GDI+Thread.ahk"
+	FileRead,GDIThreadCode,% A_ScriptDir "\Threads\ui_GDI+Thread.ahk"
 	AhkThreadGDI := AhkThread("share:=CriticalObject(" (&share) ") `n allTriggers:=CriticalObject(" (&allTriggers) ") `n allConnections:=CriticalObject(" (&allConnections) ") `n allElements:=CriticalObject(" (&allElements) ") `n mainguihwnd:=""" maingui.hwnd """`nmainguiHwnddc:="" MainGui.Hwnddc ""`n" GDIThreadCode)
 	;~ AhkThreadGDI.ahkAssign("mainguihwnd",maingui.hwnd)
 	;~ AhkThreadGDI.ahkAssign("mainguiHwnddc",MainGui.Hwnddc)

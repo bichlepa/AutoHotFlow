@@ -1,7 +1,4 @@
 ﻿
-ExecutionThreadCode=
-( ` %
-
 
 ;Here at the top there will be something like this line:
 ; share:=Criticalobject(1234)
@@ -9,6 +6,7 @@ ExecutionThreadCode=
 #NoTrayIcon
 #Persistent
 #include language\language.ahk ;Must be very first
+#include threads\d_Debug.ahk
 
 #include External Scripts\Object to file\String-object-file.ahk
 
@@ -48,14 +46,18 @@ r_Iteration()
 	runNeedToRedraw:=false
 	
 	ToolTip, iteration
-	;Search for a pending thread
+	
 	;~ EnterCriticalSection(CriticalSectionAllInstances)
 	currentExec.thread:=""
+	;~ d(allThreads,646)
+	
+	;Search for a pending thread
 	for forThreadID, forThread in allThreads
 	{
-		;~ MsgBox % forThreadID " - " forThread.state
-		if (forThread.state="pending")
+		;~ d(forthread,8616846)
+		if (forThread.state="pending") ;Element of thread is ready to be executed
 		{
+			;Execute element
 			logger("f3","Proceeding thread " forThreadID)
 			currentExec.thread:=forThreadID
 			allThreads[currentExec.thread].state:="running"
@@ -63,12 +65,15 @@ r_Iteration()
 			currentExec.element:=forthread.element
 			currentExec.ClonedElement:=allElements[forthread.element].clone()
 			;~ LeaveCriticalSection(CriticalSectionAllInstances)
-			SetTimer,r_ExecuteElement,-10
+			SetTimer,r_ExecuteElement,-10 
 			break
 		}
-		else if (forThread.state="finished")
+		if (forThread.state="finished") ;Element of thread is has finished
 		{
+			;Find next element
 			logger("f3","Proceeding thread " forThreadID)
+			currentExec.state:="finished"
+			currentExec.element:=forthread.element
 			currentExec.thread:=forThreadID
 			;~ LeaveCriticalSection(CriticalSectionAllInstances)
 			r_FindNextElements()
@@ -84,15 +89,20 @@ r_Iteration()
 r_FindNextElements()
 {
 	
-	global FlowLastActivity, runNeedToRedraw, allInstances, allThreads, allElements, allConnections, allTriggers, currentExec
+	global FlowLastActivity, runNeedToRedraw, share, allInstances, allThreads, allElements, allConnections, allTriggers, currentExec
 	ToolTip,findnext
+	
+	;~ d(allElements)
+	;~ d(currentExec.stateID " - " share.currentStateID)
+	;~ d(currentExec)
+	;~ d(share)
 	;When starting an iteration, a copy will be made of the current state. This will prevent data inconsistency if user changes something during execution
-	if (currentExec.stateID!=share.stateID)
+	if (share.currentStateID != currentExec.stateID)
 	{
 		logger("f3","Copying current state " currentStateID " for execution")
+		;~ d("Copying current state " currentStateID " for execution")
 		
-		
-		currentExec.stateID:=share.stateID
+		currentExec.stateID:=share.currentStateID
 		currentExec.allElements:=ObjFullyClone(allElements)
 		currentExec.allConnections:=ObjFullyClone(allConnections)
 		currentExec.allTriggers:=ObjFullyClone(allTriggers)
@@ -124,30 +134,33 @@ r_FindNextElements()
 	;Find next element
 	
 	ConnectionFound:=0
-	;~ d(forThread.element,"hioawefhio")
+	;~ d(currentExec,"hioawefhio")
+	;Go through all connections which start at the current element
 	for forConnectionIndex, forConnectionID in currentExec.allElements[currentExec.element].to
 	{
 		tempConnection:=currentExec.allConnections[forConnectionID]
 		;~ d(tempConnection,"1h")
 		;~ d(tempConnection.connectiontype "-" result,"541h")
-		if (tempConnection.connectiontype=result)
+		if (tempConnection.connectiontype=result) ;If the result of the execution is the same as the connection type
 		{
-			;~ d("gserhtr",1)
+			;~ d(tempConnection,465655464651)
 			ConnectionFound++
 			
-			if (ConnectionFound=1)
+			if (ConnectionFound=1) ;If it is the first connection which was found
 			{
 				tempThread:=currentExec.thread
 				logger("f3","Found connection to '" tempConnection.to "'")
 			}
-			else
+			else ;If more than one connection was found
 			{
 				;~ d(forthread,56)
+				;Clone the thread
 				tempThread:=Thread_Clone(currentExec.thread)
 				;~ d(tempThread,5678)
 				logger("f3","Found connection to " tempConnection.to "'. New thread created: '" tempThread.id "'")
 			}
 			
+			;Assign the element of the thread
 			allThreads[tempThread].element:=currentExec.allElements[tempConnection.to]
 			
 			
@@ -160,6 +173,7 @@ r_FindNextElements()
 			;TODO: prepare entering and leaving a loop
 			
 			
+			;The thread is now pending and is ready to execute
 			allThreads[tempThread].state:="pending"
 			
 			;~ MsgBox agrar
@@ -168,11 +182,12 @@ r_FindNextElements()
 		
 	}
 	
-	if (ConnectionFound=0) ;End thread
+	if (ConnectionFound=0) ;If no matching connection found
 	{
-		;~ d("ghahtrrh",1)
-		Thread_delete(currentExec.thread)
-		logger("f3","No suitable connection found. Thread " currentExec.thread " ends")
+		;End thread
+		d("remove thread " currentExec.thread,1)
+		logger("f3","No suitablee connection found. Thread " currentExec.thread " ends")
+		Thread_Remove(currentExec.thread)
 		
 		
 		if (allInstances[allThreads[currentExec.thread].instance].threads.count()=0)
@@ -246,17 +261,15 @@ Thread_Clone(p_ID)
 	parentThread.ahkFunction("Thread_Clone",p_ID)
 }
 
-Thread_delete(p_ID)
+Thread_Remove(p_ID)
 {
 	global 
-	parentThread.ahkFunction("Thread_delete",p_ID)
+	ToolTip remove thread %p_id%
+	parentThread.ahkFunction("Thread_Remove",p_ID)
 }
 
 
-)
 
-ExecutionThreadCode=%ExecutionThreadCode%`n
-( ` % 
 AllBuiltInVars:="-A_Space-A_Tab-A_YYYY-A_Year-A_MM-A_Mon-A_DD-A_MDay-A_MMMM-A_MMM-A_DDDD-A_DDD-A_WDay-A_YDay-A_Hour-A_Min-A_Sec-A_MSec-A_TickCount-A_TimeIdle-A_TimeIdlePhysical-A_Temp-A_OSVersion-A_Is64bitOS-A_PtrSize-A_Language-A_ComputerName-A_UserName-A_ScriptDir-A_WinDir-A_ProgramFiles-A_AppData-A_AppDataCommon-A_Desktop-A_DesktopCommon-A_StartMenu-A_StartMenuCommon-A_Programs-A_ProgramsCommon-A_Startup-A_StartupCommon-A_MyDocuments-A_IsAdmin-A_ScreenWidth-A_ScreenHeight-A_ScreenDPI-A_IPAddress1-A_IPAddress2-A_IPAddress3-A_IPAddress4-A_Cursor-A_CaretX-A_CaretY-----" ;a_now and a_nowutc not included, they will be treated specially
  
 
@@ -538,11 +551,6 @@ Variable_Convert(p_Value,p_Contenttype,p_TargetType)
 	return result
 }
 
-)
-
-
-ExecutionThreadCode=%ExecutionThreadCode%`n
-( ` %
 
 /* Evaluation of an Expression
 */
@@ -885,4 +893,3 @@ ObjFullyClone(obj) ;Thanks to fincs
 }
 
 
-)

@@ -55,6 +55,7 @@ Thread_Remove(p_ID)
 {
 	global allThreads
 	allThreads.delete(p_ID)
+	MsgBox remove thread %p_id%
 }
 
 Instance_Stop(p_ID)

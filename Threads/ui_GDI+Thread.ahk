@@ -1,6 +1,4 @@
-﻿GDIThreadCode=
-( ` % 
-
+﻿
 ;Here at the top there will be something like this line:
 ; share:=Criticalobject(1234)
 ;The object share contains values which are shared among this and other threads
@@ -119,9 +117,7 @@ ui_DrawThread()
 	;~ SetTimer,ui_regularUpdateIfWinMoved,100
 }
 
-)
-GDIThreadCode=%GDIThreadCode%`n
-( ` % 
+
 ;Draws everything in the main GUI
 ui_DrawEverything()
 {
@@ -495,9 +491,7 @@ ui_DrawEverything()
 		;MsgBox,% marked
 		;msgbox,x%lin3x% y%lin3y% w%lin3w% h%lin3h%`nx%lin4x% y%lin4y% w%lin4w% h%lin4h%
 		;msgbox,x%lin1x% y%lin1y% w%lin1w% h%lin1h%
-)
-GDIThreadCode=%GDIThreadCode%`n
-( ` % 
+
 		
 		allConnections[drawID].CountOfParts:=0
 		
@@ -537,9 +531,7 @@ GDIThreadCode=%GDIThreadCode%`n
 		allConnections[drawID].CountOfParts:=5
 	}
 	
-		)
-GDIThreadCode=%GDIThreadCode%`n
-( ` %  
+
 
 	;Draw elements
 	tempElementList:=[]
@@ -732,9 +724,7 @@ GDIThreadCode=%GDIThreadCode%`n
 	}
 	
 	
-	)
-GDIThreadCode=%GDIThreadCode%`n
-( ` %  
+
 	
 	;Draw some icons near to the selected element, if only one is selected
 	PlusButtonExist:=false
@@ -971,5 +961,4 @@ GDIThreadCode=%GDIThreadCode%`n
 	Return
 
 }
-)
-;~ Clipboard:=gdithreadcode
+
