@@ -34,9 +34,9 @@ Global_ThisThreadID:="Main"
 
 AllElementClasses:=Object()
 ;Element_Includes_Start
-#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\New_Variable.ahk
-#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Tooltip.ahk
-#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Conditions\Expression.ahk
+#include C:\GitHub\AutoHotFlow\source_Elements\Default\Actions\New_Variable.ahk
+#include C:\GitHub\AutoHotFlow\source_Elements\Default\Actions\Tooltip.ahk
+#include C:\GitHub\AutoHotFlow\source_Elements\Default\Conditions\Expression.ahk
 
 ;Element_Includes_End
 

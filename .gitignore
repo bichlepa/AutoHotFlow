@@ -12,6 +12,7 @@ Saved Flows/*
 #other files that are generated when AutoHotFlow is running
 Log
 Global variables
+!Source_Common/Global variables
 Clipboard.ini
 Generated Scripts/*.ahk
 
