@@ -1,22 +1,26 @@
 ﻿;Find all languages
-lang_FindAllLanguages()
+;_language := Object()
+
+lang_Init()
 {
-	global
-	allLangs:=Object()
+	global _language
+	if not isobject(_language)
+		_language:=Object()
+	_language.allLangs:=Object()
 
 	Loop,language\*.ini
 	{
 		
 		StringReplace,filenameNoExt,A_LoopFileName,.%A_LoopFileExt%
-		
-		IniRead,%filenameNoExt%enlangname,language\%filenameNoExt%.ini,general,enname
-		IniRead,%filenameNoExt%langname,language\%filenameNoExt%.ini,general,name
-		IniRead,%filenameNoExt%code,language\%filenameNoExt%.ini,general,code
-		if %filenameNoExt%enlangname!=Error
+		IniRead,temp,language\%filenameNoExt%.ini,general,enname
+		_language[filenameNoExt].enlangname := temp
+		IniRead,temp,language\%filenameNoExt%.ini,general,name
+		_language[filenameNoExt].langname := temp
+		IniRead,temp,language\%filenameNoExt%.ini,general,code
+		_language[filenameNoExt].code := temp
+		if (_language[filenameNoExt].enlangname != "Error")
 		{
-			
-			allLangs.insert(filenameNoExt)
-			
+			_language.allLangs.insert(filenameNoExt)
 		}
 		
 		;MsgBox %  filenameNoExt "|" %filenameNoExt%langname
@@ -24,59 +28,60 @@ lang_FindAllLanguages()
 
 	lang_LoadCurrentLanguage()
 	
-	
+ ;~ d(_language,43877)
 }
 
 lang_LoadCurrentLanguage()
 {
-	global
+	global _language
 	iniread,UILang,settings.ini,common,UILanguage
+	_language.UILang := uilang
 	if uilang=error
 	{
-		
-		for index, templang in allLangs
+		for index, templang in _share.allLangs
 		{
 			;MsgBox % templang " " %templang%code " " A_Language
-			IfInString,%templang%code,%A_Language%
+			tempstring := _language[templang].code
+			IfInString, tempstring, %A_Language%
 			{
-				uilang:=templang
+				_language.UILang := templang
 				break
 			}
 		}
-		if uilang=Error
-			uilang=en
+		if (_language.UILang="Error")
+			(_language.UILang="en")
 	}
-	IniRead,%UILang%enlangname,language\%UILang%.ini,general,enname
-	IniRead,%UILang%langname,language\%UILang%.ini,general,name
+	IniRead,temp,language\%UILang%.ini,general,enname
+	_language[filenameNoExt].enlangname := temp
+	IniRead,temp,language\%UILang%.ini,general,name
+	_language[filenameNoExt].langname := temp
 	lang_ReadAllTranslations()
 }
 
 ;translate one string
 lang(langvar,$1="",$2="",$3="",$4="",$5="",$6="",$7="",$8="",$9="")
 {
-	global UILang
-	global developing
-	global translationto
-	global LangNoUseCache
 	static guiCreated
-	global allLangs
+	global _language, developing
+	;~ d(_language,456)
+	UILang := _language.UILang
+	LangNoUseCache := _language.NoUseCache
 	
-	global langAllTranslations
 	
 	if (langvar ="")
 		return ""
-	if not isobject(langAllTranslations)
-		langAllTranslations:=Object()
+	if not isobject(_language.cache)
+		_language.cache:=Object()
 	
 	langaborted:=false
 	StringReplace,langvar_no_spaces,langvar,%a_space%,_,all
 	
 	langBeginAgain:
 	;look whether the string is in cache
-	if ((!(LangNoUseCache)) and (langAllTranslations.haskey(langvar_no_spaces)))
+	if ((!(LangNoUseCache)) and (_language.cache.haskey(langvar_no_spaces)))
 	{
 		;~ MsgBox %langvar_no_spaces%
-		initext:=langAllTranslations[langvar_no_spaces]
+		initext:=_language.cache[langvar_no_spaces]
 		UsedCache:=true
 	}
 	else ;if not in cache or cache should not be used, read from ini
@@ -131,23 +136,30 @@ lang(langvar,$1="",$2="",$3="",$4="",$5="",$6="",$7="",$8="",$9="")
 				iniwrite,% newtrans,language\en.ini,translations,%langvar_no_spaces%
 				goto,langBeginAgain
 			}
-			else if (Lang_NotNotifyIfNoTranslationFound!=true)
-				MsgBox,English text for %langvar_no_spaces% not found!
+			else 
+			{
+				if (Lang_NotNotifyIfNoTranslationFound!=true)
+					MsgBox,English text for %langvar_no_spaces% not found!
+				
+				;If no translation was found, just insert the raw text
+				initext := langvar
+			}
+			
 		}
 		else if (translationto=UILang and langaborted=!true)
 		{
 			temptlangText=
-			for tempindex, templang in allLangs
+			for tempindex, templang in _share.allLangs
 			{
 				
 				IniRead,templangcont,language\%templang%.ini,translations,%langvar_no_spaces%,%A_Space%
 				;MsgBox %templang% %templangcont%
 				if templangcont
-					temptlangText:=temptlangText "`n" %templang%enlangname ": " templangcont
+					temptlangText:=temptlangText "`n" _language[templang].enlangname ": " templangcont
 				
 			}
-			
-			InputBox,newtrans,% "How is this in " %UILang%enlangname "?" ,%langvar_no_spaces% `n%temptlangText%,,% A_ScreenWidth*0.9,% A_ScreenHeight*0.9
+			;~ MsgBox %UILang%
+			InputBox,newtrans,% "How is this in " _language[UILang].enlangname "?" ,%langvar_no_spaces% `n%temptlangText%,,% A_ScreenWidth*0.9,% A_ScreenHeight*0.9
 			if errorlevel
 				langaborted:=true
 			else
@@ -181,7 +193,7 @@ lang(langvar,$1="",$2="",$3="",$4="",$5="",$6="",$7="",$8="",$9="")
 	}
 	else if not UsedCache
 	{
-		langAllTranslations[langvar_no_spaces]:=initext
+		_language.cache[langvar_no_spaces]:=initext
 	}
 	langSuccess:
 	StringReplace,initext,initext,`%1`%,%$1%,all
@@ -201,12 +213,12 @@ lang(langvar,$1="",$2="",$3="",$4="",$5="",$6="",$7="",$8="",$9="")
 
 lang_ReadAllTranslations()
 {
-	global UILang
-	global langAllTranslations
+	global _language
+	UILang := _language.UILang
 	global langMakeAdditionalCategoryOfTranslationObject
 	
 	
-	langAllTranslations:=Object()
+	_language.cache:=Object()
 	if langMakeAdditionalCategoryOfTranslationObject
 		global langCategoryOfTranslation:=object()
 	
@@ -231,7 +243,7 @@ lang_ReadAllTranslations()
 			
 			StringTrimLeft,tempItemContent,a_loopreadline,% (pos +1)
 			
-			langAllTranslations[tempItemName]:=tempItemContent
+			_language.cache[tempItemName]:=tempItemContent
 			if langMakeAdditionalCategoryOfTranslationObject
 			{
 				langCategoryOfTranslation[tempItemName]:=tempCategory
