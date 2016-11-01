@@ -17,6 +17,7 @@ OnExit,Exit
 #include lib\Object to file\String-object-file.ahk
 #include lib\GDI+\GDIp.ahk
 #include lib\ScrollGui\Class_ScrollGUI.ahk
+#include lib\objhasvalue\objhasvalue.ahk
 
 #include Source_Editor\User Interface\Editor GUI.ahk
 #include Source_Editor\User Interface\Editor GUI user input.ahk
@@ -37,7 +38,10 @@ OnExit,Exit
 #include source_Common\Debug\Logger.ahk
 #include source_Common\Defaults\Default values.ahk
 
-parentThread := AhkExported()
+AllElementClasses:=Object()
+;PlaceholderIncludesOfElements
+
+parentAHKThread := AhkExported()
 
 
 lang_Init()
@@ -57,7 +61,7 @@ return
 exit_all()
 {
 	global
-	parentThread.ahkFunction("Thread_Stopped", Global_ThisThreadID)
+	parentAHKThread.ahkFunction("Thread_Stopped", Global_ThisThreadID)
 	deinitializeTrayBar()
 }
 

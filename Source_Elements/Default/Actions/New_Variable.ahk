@@ -32,16 +32,17 @@ Element_getParametrizationDetails_Action_New_variable()
 	parametersToEdit.push({type: "Label", label: lang("Variable_name")})
 	parametersToEdit.push({type: "Edit", id: "Varname", default: "NewVariable", content: "VariableName", WarnIfEmpty: true})
 	parametersToEdit.push({type: "Label", label:  lang("Value")})
-	parametersToEdit.push({type: "Edit", id: ["VarValue","expression"], default: "New element", content: "StringOrExpression", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Edit", id: ["VarValue","expression"], default: ["New element",1], content: "StringOrExpression", WarnIfEmpty: true})
 
 	return parametersToEdit
 }
 
 Element_run_Action_New_variable(Environment, ElementParameters)
 {
+	;~ d(ElementParameters, "element parameters")
 	Varname := x_replaceVariables(Environment, ElementParameters.Varname)
 	Value := ""
-
+	
 	if not x_CheckVariableName(varname)
 	{
 		;On error, finish with exception and return
@@ -49,7 +50,7 @@ Element_run_Action_New_variable(Environment, ElementParameters)
 		return
 	}
 	
-	if ElementParameters.Expression = 2
+	if (ElementParameters.Expression = 2)
 		Value := x_EvaluateExpression(Environment, ElementParameters.VarValue)
 	else
 		Value := x_replaceVariables(Environment, ElementParameters.VarValue)

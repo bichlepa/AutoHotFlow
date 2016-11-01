@@ -5,46 +5,46 @@
 FindFlows()
 {
 	global
-	return parentThread.ahkFunction("FindFlows")
+	return parentAHKThread.ahkFunction("FindFlows")
 }
 
 ;Create a new file for a flow
 NewFlow(par_CategoryID = "")
 {
 	global
-	return parentThread.ahkFunction("NewFlow", par_CategoryID)
+	return parentAHKThread.ahkFunction("NewFlow", par_CategoryID)
 }
 
 
 NewCategory(par_Newname = "")
 {
 	global
-	return parentThread.ahkFunction("NewCategory", par_Newname)
+	return parentAHKThread.ahkFunction("NewCategory", par_Newname)
 }
 
 ChangeFlowCategory(par_FlowID, par_CategoryID)
 {
 	global
-	return parentThread.ahkFunction("ChangeFlowCategory", par_FlowID, par_CategoryID)
+	return parentAHKThread.ahkFunction("ChangeFlowCategory", par_FlowID, par_CategoryID)
 }
 
 UpdateFlowCategoryName(par_FlowID)
 {
 	global
-	return parentThread.ahkFunction("UpdateFlowCategoryName", par_FlowID)
+	return parentAHKThread.ahkFunction("UpdateFlowCategoryName", par_FlowID)
 }
 
 IDOfName(par_name,par_Type="") ;Returns the id by name
 {
 	global
-	return parentThread.ahkFunction("IDOfName", par_name, par_Type)
+	return parentAHKThread.ahkFunction("IDOfName", par_name, par_Type)
 }
 
 
 DeleteFlow(par_ID)
 {
 	global
-	return parentThread.ahkFunction("DeleteFlow", par_ID)
+	return parentAHKThread.ahkFunction("DeleteFlow", par_ID)
 	
 	
 }
@@ -52,6 +52,6 @@ DeleteFlow(par_ID)
 DeleteCategory(par_ID)
 {
 	global
-	return parentThread.ahkFunction("DeleteCategory", par_ID)
+	return parentAHKThread.ahkFunction("DeleteCategory", par_ID)
 	
 }

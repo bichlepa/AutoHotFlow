@@ -136,8 +136,7 @@ API_Call_Main_Connection_New(p_FlowID, p_elementID="")
 	global
 	local retval
 	logger("t2", A_ThisFunc " call received")
-	
-	retval := Connection_New(p_FlowID, p_elementID="")
+	retval := Connection_New(p_FlowID,p_elementID )
 	
 	logger("t2", A_ThisFunc " call finished")
 	return retval
@@ -150,6 +149,18 @@ API_Call_Main_Element_SetType(p_FlowID, p_elementID,p_elementType)
 	logger("t2", A_ThisFunc " call received")
 	
 	retval := Element_SetType(p_FlowID, p_elementID,p_elementType)
+	
+	logger("t2", A_ThisFunc " call finished")
+	return retval
+}
+
+API_Call_Main_Element_SetClass(p_FlowID, p_elementID, p_elementClass)
+{
+	global
+	local retval
+	logger("t2", A_ThisFunc " call received")
+	
+	retval := Element_SetClass(p_FlowID, p_elementID, p_elementClass)
 	
 	logger("t2", A_ThisFunc " call finished")
 	return retval
@@ -179,7 +190,53 @@ API_Call_Main_Element_Remove(p_FlowID, p_elementID)
 	return retval
 }
 
-API_main_Exit()
+API_Call_main_State_New(p_FlowID)
+{
+	global
+	local retval
+	logger("t2", A_ThisFunc " call received")
+	
+	retval := state_New(p_FlowID)
+	
+	logger("t2", A_ThisFunc " call finished")
+	return retval
+}
+API_Call_main_State_Undo(p_FlowID)
+{
+	global
+	local retval
+	logger("t2", A_ThisFunc " call received")
+	
+	retval := state_Undo(p_FlowID)
+	
+	logger("t2", A_ThisFunc " call finished")
+	return retval
+}
+API_Call_main_State_Redo(p_FlowID)
+{
+	global
+	local retval
+	logger("t2", A_ThisFunc " call received")
+	
+	retval := state_Redo(p_FlowID)
+	
+	logger("t2", A_ThisFunc " call finished")
+	return retval
+}
+API_Call_main_State_RestoreCurrent(p_FlowID)
+{
+	global
+	local retval
+	logger("t2", A_ThisFunc " call received")
+	
+	retval := state_RestoreCurrent(p_FlowID)
+	
+	logger("t2", A_ThisFunc " call finished")
+	return retval
+}
+
+
+API_Call_main_Exit()
 {
 	global
 	local retval

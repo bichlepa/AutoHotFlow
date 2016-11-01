@@ -951,6 +951,8 @@ gdip_DrawEverything(FlowObj)
 	DrawingRightNow:=false
 	
 	
+	if (AnyRecentlyRunElementFound)
+		_flows[flowID].draw.mustDraw:=true
 	
 	
 	Return

@@ -9,6 +9,7 @@
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
 SetWorkingDir %A_ScriptDir%\..  ; Ensures a consistent starting directory.
 
+#Persistent
 SetBatchLines -1
 #SingleInstance off
 CoordMode,mouse,client
@@ -16,7 +17,6 @@ CoordMode,mouse,client
 OnExit,Exit
 
 
-#Persistent
 #include language\language.ahk ;Must be very first
 #include Lib\gdi+\gdip.ahk
 #include Lib\Object to file\String-object-file.ahk
@@ -29,7 +29,7 @@ OnExit,Exit
 #include source_Common\Debug\Logger.ahk
 #include Source_Common\Defaults\Default values.ahk
 
-parentThread := AhkExported()
+parentAHKThread := AhkExported()
 
 ;initialize languages
 lang_Init()
@@ -69,7 +69,7 @@ drawTask()
 		}
 		if (somethingdrawn = false)
 		{
-			;~ ToolTip notdrawn
+			SetTimer,drawTask,100
 			break
 		}
 	}
@@ -80,7 +80,7 @@ drawTask()
 exit_all()
 {
 	global
-	parentThread.ahkFunction("Thread_Stopped", Global_ThisThreadID)
+	parentAHKThread.ahkFunction("Thread_Stopped", Global_ThisThreadID)
 }
 
 

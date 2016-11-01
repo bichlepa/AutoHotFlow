@@ -36,7 +36,7 @@ Element_New(p_FlowID, p_type="",p_elementID="")
 	
 	tempElement.ClickPriority:=500
 	;~ d(p_elementID "--" tempElement.ID "--" tempElement.ClickPriority)
-	tempElement.par:=[]
+	tempElement.pars:=[]
 	
 	tempElement.lastrun:=0
 	tempElement.marked:=false
@@ -65,6 +65,7 @@ Element_SetType(p_FlowID, p_elementID,p_elementType)
 	allElements:=_flows[p_FlowID].allElements
 	
 	allElements[p_elementID].type:=p_elementType 
+	allElements[p_elementID].class:="" ;After changing the element type only, the class is unset 
 	
 	if (p_elementType="Trigger")
 	{
@@ -80,6 +81,31 @@ Element_SetType(p_FlowID, p_elementID,p_elementType)
 	}
 }
 
+;Sets the element class. This means it is possible to change the element type and subtype
+Element_SetClass(p_FlowID, p_elementID, p_elementClass)
+{
+	global _flows
+	
+	allElements:=_flows[p_FlowID].allElements
+	
+	;First set type
+	if (allElements[p_elementID].type!=Element_getElementType_%p_elementClass%())
+		;Then set class
+		Element_SetType(p_FlowID, p_elementID,Element_getElementType_%p_elementClass%())
+	allElements[p_elementID].class:=p_elementClass 
+	
+	Element_setParameterDefaults(p_FlowID, p_elementID)
+	
+	if (p_elementType="Trigger")
+	{
+		allElements[p_elementID].triggers:=new CriticalObject()
+		allElements[p_elementID].name:=""
+	}
+	else
+		allElements[p_elementID].name:=Element_GenerateName_%p_elementClass%(allElements[p_elementID].pars)
+	
+
+}
 
 ;Is called when the element subtype is set. All parameters that are not set yet are set to the default parameters
 Element_setParameterDefaults(p_FlowID, p_elementID)
@@ -88,10 +114,9 @@ Element_setParameterDefaults(p_FlowID, p_elementID)
 	
 	allElements:=_flows[p_FlowID].allElements
 	
-	elementType:=allElements[p_elementID].type
-	elementSubType:=allElements[p_elementID].subtype
+	elementClass:=allElements[p_elementID].class
 	
-	parameters:=%elementType%%elementSubType%_getParameters()
+	parameters:=Element_getParametrizationDetails_%elementClass%()
 	;~ MsgBox % strobj(parameters) "`n" elementType "`n" elementSubType
 	for index, parameter in parameters
 	{
@@ -113,12 +138,12 @@ Element_setParameterDefaults(p_FlowID, p_elementID)
 		for index2, oneID in parameterID
 		{
 			;~ MsgBox % oneID "  -  " index2 " - " parameterdefault[index2]
-			if (allElements[p_elementID].par[oneID]="")
+			if (allElements[p_elementID].pars[oneID]="")
 			{
 				tempContent:=parameterdefault[index2]
 				
 				StringReplace, tempContent, tempContent, |¶,`n, All
-				allElements[p_elementID].par[oneID]:=tempContent
+				allElements[p_elementID].pars[oneID]:=tempContent
 			}
 			
 		}
@@ -191,18 +216,19 @@ Connection_New(p_FlowID, p_elementID="")
 	allConnections:=_flows[p_FlowID].allConnections
 	
 	tempElement:=CriticalObject()
-	
 	if (p_elementID="")
-		tempElement.ID:="connection" . format("{1:010u}",++_flows[p_FlowID].ElementIDCounter) 
+		tempElement.ID:="Connection" . format("{1:010u}",++_flows[p_FlowID].ElementIDCounter) 
 	else
 		tempElement.ID:=p_elementID
 	
 	tempElement.ConnectionType:="normal"
-	tempElement.ClickPriority:=500
+	tempElement.ClickPriority:=200
 	
 	tempElement.marked:=false
 	tempElement.state:="idle"
 	tempElement.type:="Connection"
+	tempElement.frompart:=""
+	tempElement.topart:=""
 	
 	allConnections[tempElement.id]:=tempElement
 	
@@ -263,7 +289,7 @@ Trigger_New(p_FlowID, p_ElementID,p_TriggerID)
 		tempTrigger.ID:=p_TriggerID
 	
 	tempTrigger.ContainerID:=p_ElementID
-	tempTrigger.par:=[]
+	tempTrigger.pars:=[]
 	
 	
 	allElements[p_ElementID].triggers[tempTrigger.ID]:=tempTrigger.ID
@@ -318,4 +344,19 @@ GetListContainingElement(p_FlowID, p_ElementID, p_returnPointer = false)
 		return &templist
 	else
 		return templist
+}
+
+UpdateConnectionLists(p_FlowID)
+{
+	global _flows
+	for oneElementID, oneElement in _flows[p_FlowID].allElements
+	{
+		oneElement.fromConnections:=Object()
+		oneElement.toConnections:=Object()
+	}
+	for oneConnectionID, oneConnection in _flows[p_FlowID].allConnections
+	{
+		_flows[p_FlowID].allElements[oneConnection.from].fromConnections.push(oneConnectionID)
+		_flows[p_FlowID].allElements[oneConnection.to].toConnections.push(oneConnectionID)
+	}
 }

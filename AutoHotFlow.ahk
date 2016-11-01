@@ -8,7 +8,8 @@ SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 elementInclusions := "`n"
 loop, files, %A_WorkingDir%\source_Elements\*.ahk, FR
 {
-	elementInclusions .= "#include " A_LoopFileFullPath "`n"
+	if not (substr(A_LoopFileName,1,1)=="_")
+		elementInclusions .= "#include " A_LoopFileFullPath "`n"
 }
 
 ;Replace the includes in the file main.ahk

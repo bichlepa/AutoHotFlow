@@ -6,8 +6,13 @@ SetWorkingDir %A_ScriptDir%\..  ; Ensures a consistent starting directory.
 OnExit,exit
 
 Global_ThisThreadID:="Main"
+
+
+
 #Include %A_ScriptDir%\..
 #include language\language.ahk
+lang_Init()
+
 #include lib\Object to file\String-object-file.ahk
 #include lib\Robert - Ini library\Robert - Ini library.ahk
 #include lib\ObjHasValue\ObjHasValue.ahk
@@ -18,6 +23,7 @@ Global_ThisThreadID:="Main"
 #include Source_Main\Threads\API Caller to Manager.ahk
 #include Source_Main\Threads\API Caller to Draw.ahk
 #include Source_Main\Threads\API Caller to Editor.ahk
+#include Source_Main\Threads\API Caller to Execution.ahk
 #include Source_Main\Threads\API Receiver Main.ahk
 
 #include Source_Main\Flows\Save.ahk
@@ -26,6 +32,7 @@ Global_ThisThreadID:="Main"
 #include Source_Main\Flows\Manage Flows.ahk
 #include Source_Main\Flows\Manage Elements.ahk
 #include Source_Main\Flows\Flow actions.ahk
+#include Source_Main\Flows\states.ahk
 
 #include source_Common\Elements API\API Caller Elements.ahk
 #include source_Common\Debug\Debug.ahk
@@ -34,19 +41,18 @@ Global_ThisThreadID:="Main"
 
 AllElementClasses:=Object()
 ;Element_Includes_Start
-#include C:\GitHub\AutoHotFlow\source_Elements\Default\Actions\New_Variable.ahk
-#include C:\GitHub\AutoHotFlow\source_Elements\Default\Actions\Tooltip.ahk
-#include C:\GitHub\AutoHotFlow\source_Elements\Default\Conditions\Expression.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\New_Variable.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Tooltip.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Conditions\Expression.ahk
 
 ;Element_Includes_End
 
 
 init_GlobalVars()
-lang_Init()
 
 Thread_StartManager()
 Thread_StartDraw()
-
+Thread_StartExecution()
 
 return
 

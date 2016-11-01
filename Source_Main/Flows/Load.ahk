@@ -155,7 +155,7 @@ LoadFlow(FlowID)
 			if (_flows[FlowID].allElements[loadElementID].StandardName)
 			{
 				if (IsFunc("Element_GenerateName_" loadElementClass))
-					_flows[FlowID].allElements[loadElementID].Name:=Element_GenerateName_%loadElementClass%(_flows[FlowID].allElements[loadElementID].par)
+					_flows[FlowID].allElements[loadElementID].Name:=Element_GenerateName_%loadElementClass%(_flows[FlowID].allElements[loadElementID].pars)
 			}
 		}
 		
@@ -215,7 +215,10 @@ LoadFlow(FlowID)
 	}
 	;e_CorrectElementErrors("Loaded the saved flow")
 	RIni_Shutdown("IniFile")
-		
+	
+	
+	state_New(FlowID)
+	
 	currentlyLoadingFlow:=false
 }
 
@@ -267,7 +270,7 @@ LoadFlowParametersOfElement(FlowID,parList,parElementID,parlocation, parSection)
 			tempContent:=parameterDefault[index2]
 		}
 		StringReplace, tempContent, tempContent, |¶,`n, All
-		parList[parElementID].par[oneParameterID]:=tempContent
+		parList[parElementID].pars[oneParameterID]:=tempContent
 	
 	}
 }

@@ -165,7 +165,7 @@ i_SaveParametersOfElement(saveElement,saveElementIniID,Savelocation="")
 		}
 		else 
 		{
-			RIni_AppendValue("iniSave", saveElementIniID, "par_" oneParID, saveElement.par[oneParID])
+			RIni_AppendValue("iniSave", saveElementIniID, "par_" oneParID, saveElement.pars[oneParID])
 		}
 		
 		

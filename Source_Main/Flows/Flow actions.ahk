@@ -50,7 +50,7 @@ disableFlow(par_FlowID)
 
 RunFlow(par_FlowID)
 {
-	MsgBox The function %A_ThisFunc% is not implemented yet
+	API_Execution_newInstance(par_FlowID)
 }
 
 RunToggleFlow(par_FlowID)
@@ -60,7 +60,8 @@ RunToggleFlow(par_FlowID)
 
 TriggerFlow(par_FlowID, par_Reason)
 {
-	MsgBox The function %A_ThisFunc% is not implemented yet
+	
+	API_Execution_newInstance(par_FlowID)
 }
 
 StopFlow(par_FlowID)

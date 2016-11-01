@@ -19,8 +19,8 @@ d(text,header="",wait=1)
 	gui,d:destroy
 	gui,d:margin,5,5
 	gui,d:add,edit,readonly vdedit,% text
-	gui,d:add,button,vdbutton w100 h30 gdClose Default, OK
-	gui,d:add,button,vdbuttonShowGlobals w100 h30 X+10 gdShowGlobals, Show globals
+	gui,d:add,button,vdbutton w200 h30 gdClose Default, OK
+	gui,d:add,button,vdbuttonShowGlobals w200 h30 X+10 gdShowGlobals, Show globals
 	guicontrol,d:focus,dbutton
 	gui,d:show,hide
 	gui,d:+resize

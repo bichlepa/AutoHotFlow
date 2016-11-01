@@ -360,9 +360,9 @@ class ElementSettings
 			{
 				tempOneParID:=parameterID[ElementSaveindex2]
 				temponeValue:=ElementSettingsFieldParIDs[tempOneParID].getValue(tempOneParID)
-				if (setElement.par[tempOneParID]!=temponeValue)
+				if (setElement.pars[tempOneParID]!=temponeValue)
 					somethingchanged++
-				setElement.par[tempOneParID]:=temponeValue
+				setElement.pars[tempOneParID]:=temponeValue
 				
 				;~ MsgBox,1,, % tempOneParID "`n`n" ElementSaveindex  "-" ElementSaveindex2 "`n`n" strobj(ElementSettingsFieldParIDs[tempOneParID]) "`n`n" strobj(setElement)
 				;~ IfMsgBox cancel
@@ -516,7 +516,7 @@ class ElementSettings
 			
 			gui,font,s8 cDefault wnorm
 			tempchecked:=setElement["StandardName"] 
-			;~ temptext:=setElement.par["Name"] 
+			;~ temptext:=setElement.pars["Name"] 
 			
 			gui,add,checkbox, x10 hwndtempHWND checked%tempchecked% vGUISettingsOfElementStandardName gGUISettingsOfElementCheckStandardName,% lang("Standard_name")
 			this.components.push("GUISettingsOfElementStandardName")
@@ -596,7 +596,7 @@ class ElementSettings
 			local tempParameterID:=parameter.id
 			
 			gui,font,s8 cDefault wnorm
-			temp:=setElement.par[parameter.id] 
+			temp:=setElement.pars[parameter.id] 
 			temptext:=parameter.label
 			if parameter.gray
 				tempParGray=check3
@@ -620,7 +620,7 @@ class ElementSettings
 			local tempParameterID:=parameter.id
 			
 			gui,font,s8 cDefault wnorm
-			temp:=setElement.par[tempParameterID] 
+			temp:=setElement.pars[tempParameterID] 
 			tempAssigned:=false
 			for tempindex, tempRadioLabel in parameter.choices
 			{
@@ -698,7 +698,7 @@ class ElementSettings
 				tempOneParameterID:=tempParameterID[1]
 				tempContentTypeID:=tempParameterID[2]
 				
-				temptext:=setElement.par[tempOneParameterID] ;get the saved parameter
+				temptext:=setElement.pars[tempOneParameterID] ;get the saved parameter
 				
 				if parameter.multiline
 					tempIsMulti=h100 multi
@@ -707,7 +707,7 @@ class ElementSettings
 				
 				if (parameter.content="StringOrExpression") ;Add two radios to select the element type
 				{
-					tempContentTypeNum:=setElement.par[tempContentTypeID] ;get the saved parameter
+					tempContentTypeNum:=setElement.pars[tempContentTypeID] ;get the saved parameter
 					tempassigned:=false
 					if tempContentTypeNum=1
 					{
@@ -828,7 +828,7 @@ class ElementSettings
 				;~ MsgBox %tempEditwidth%
 				for tempIndex, tempOneParameterID in parameter.id
 				{
-					temptext:=setElement.par[tempOneParameterID] ;get the saved parameter
+					temptext:=setElement.pars[tempOneParameterID] ;get the saved parameter
 					
 					
 					if tempIndex=1
@@ -1052,7 +1052,7 @@ class ElementSettings
 			local tempParameterID:=parameter.id
 			
 			gui,font,s8 cDefault wnorm
-			temp:=setElement.par[tempParameterID] 
+			temp:=setElement.pars[tempParameterID] 
 			
 			tempParameterOptions:=parameter.options
 			if (parameter.allowExpression=true)
@@ -1113,7 +1113,7 @@ class ElementSettings
 			local tempParameterID:=parameter.id
 			
 			gui,font,s8 cDefault wnorm
-			temp:=setElement.par[tempParameterID] 
+			temp:=setElement.pars[tempParameterID] 
 			
 			if (parameter.result="number")
 			{
@@ -1157,7 +1157,7 @@ class ElementSettings
 			local tempParameterID:=parameter.id
 			
 			gui,font,s8 cDefault wnorm
-			temp:=setElement.par[tempParameterID] 
+			temp:=setElement.pars[tempParameterID] 
 			
 			if (parameter.result="number")
 			{
@@ -1202,7 +1202,7 @@ class ElementSettings
 			local tempParameterID:=parameter.id
 			
 			gui,font,s8 cDefault wnorm
-			temp:=setElement.par[tempParameterID] 
+			temp:=setElement.pars[tempParameterID] 
 			
 			gui,add,edit,w300 x10 hwndtempHWND gGUISettingsOfElementUpdateName vGUISettingsOfElement%tempParameterID%,%temp%
 			this.components.push("GUISettingsOfElement" tempParameterID)
@@ -1264,7 +1264,7 @@ class ElementSettings
 			local tempParameterID:=parameter.id
 			
 			gui,font,s8 cDefault wnorm
-			temp:=setElement.par[tempParameterID] 
+			temp:=setElement.pars[tempParameterID] 
 			
 			gui,add,edit,w370 x10 hwndtempHWND gGUISettingsOfElementUpdateName vGUISettingsOfElement%tempParameterID%,%temp%
 			this.components.push("GUISettingsOfElement" tempParameterID)
@@ -1302,7 +1302,7 @@ class ElementSettings
 			local tempParameterID:=parameter.id
 			
 			gui,font,s8 cDefault wnorm
-			temp:=setElement.par[tempParameterID] 
+			temp:=setElement.pars[tempParameterID] 
 			
 			
 			gui,add,edit,w370 x10 hwndtempHWND gGUISettingsOfElementUpdateName vGUISettingsOfElement%tempParameterID%,%temp%
@@ -1345,7 +1345,7 @@ class ElementSettings
 			local tempParameterID:=parameter.id
 			
 			gui,font,s8 cDefault wnorm
-			temp:=setElement.par[tempParameterID] 
+			temp:=setElement.pars[tempParameterID] 
 			
 			gui,add,checkbox,w45 x10 hwndtempHWND gGUISettingsOfElementWeekdays vGUISettingsOfElement%tempParameterID%2,% lang("Mon (Short for Monday")
 			this.components.push("GUISettingsOfElement" tempOneParameterID "2")
@@ -1820,42 +1820,35 @@ ui_EnableElementSettingsWindow()
 selectSubType(p_ID,wait="")
 {
 	global
+	static NowResultEditingElement
 	setElementID:=p_ID
 	setElement:=flowObj.allElements[p_ID]
 	setElementType:=setElement.type 
+	local matchingElementClasses:=Object()
+	local allCategories:=Object()
+	local tempcategory
 	
-	NowResultEditingElement=
-	if setElementType=condition
+	NowResultEditingElement:=""
+	
+	;~ d(AllElementClasses)
+	for forelementIndex, forElementClass in AllElementClasses
 	{
-		tempElements:=IniAllConditions
-		tempElementNames:=IniAllConditionNames
-		tempElementCategories:=IniAllConditionCategories
+		if (Element_getElementType_%forElementClass%() = setElementType)
+		{
+			matchingElementClasses.push(forElementClass)
+			tempcategory:=Element_getCategory_%forElementClass%()
+			
+			StringSplit,tempcategory,tempcategory,|
+			;MsgBox %tempElementCategory1%
+			loop %tempcategory0%
+			{
+				if not (objhasvalue(allCategories,tempcategory%a_index%))
+					allCategories.push(tempcategory%a_index%)
+			}
+		}
 	}
-	else if setElementType=trigger
-	{
-		tempElements:=IniAllTriggers
-		tempElementNames:=IniAllTriggerNames
-		tempElementCategories:=IniAllTriggerCategories
-	}
-	else if setElementType=action
-	{
-		tempElements:=IniAllActions
-		tempElementNames:=IniAllActionNames
-		tempElementCategories:=IniAllActionCategories
-	}
-	else if setElementType=loop
-	{
-		tempElements:=IniAllLoops
-		tempElementNames:=IniAllLoopNames
-		tempElementCategories:=IniAllLoopCategories
-	}
-	else
-	{
-		MsgBox,Internal Error: Unknown element type: %setElementType%
-		return
-	}
-	StringSplit,tempElements,tempElements,|
-	StringSplit,tempElementNames,tempElementNames,|
+	if not (matchingElementClasses.MaxIndex()>0)
+		MsgBox,Internal Error: No elements found of type: %setElementType%
 	
 	EditGUIDisable()
 	gui,3:default
@@ -1868,35 +1861,34 @@ selectSubType(p_ID,wait="")
 	gui,add,Button,w250 gGuiElementChooseOK vGuiElementChooseOK default Disabled,% lang("OK")
 	gui,add,Button,w140 X+10 yp gGuiElementChooseCancel,% lang("Cancel")
 	
-	
-	
-	loop, parse,tempElementCategories,| ;add all categories to the treeview
+	TVnum:=Object()
+	TVID:=Object()
+	TVSubType:=Object()
+	TVClass:=Object()
+	for forindex, forcategory in allCategories ;add all categories to the treeview
 	{
-		
-		tempcategoryTV%a_index%:=TV_Add(A_LoopField)
+		tempcategoryTV%forindex%:=TV_Add(forcategory)
 	}
-	loop, parse,tempElements,|
+	for forelementIndex, forElementClass in matchingElementClasses
 	{
-		tempAnElementIndex:=a_index
-		tempAnElement:=a_loopfield
-		tempElementCategory:=%setElementType%%tempAnElement%.getcategory()
+		tempcategory:=Element_getCategory_%forElementClass%()
 		;MsgBox %tempElementCategory%
-		StringSplit,tempElementCategory,tempElementCategory,|
+		StringSplit,tempcategory,tempcategory,|
 		;MsgBox %tempElementCategory1%
-		loop %tempElementCategory0%
+		loop %tempcategory0%
 		{
 			;MsgBox %tempElementCategory1%
-			tempAnElementCategory:=tempElementCategory%A_Index%
-			Loop parse,tempElementCategories,|
+			tempAnCategory:=tempcategory%A_Index%
+			for forindex, forcategory in allCategories
 			{
-				if (a_loopfield=tempAnElementCategory)
-					tempcategoryTV:=tempcategoryTV%a_index%
+				if (tempAnCategory = forcategory)
+					tempcategoryTV:=tempcategoryTV%forindex%
 			}
-			tempTV:=TV_Add(%setElementType%%a_loopfield%.getname(),tempcategoryTV)
-			TVnum%tempTV%:=tempAnElementIndex
-			TVID%tempTV%:=setElementID
-			TVSubType%tempTV%:=tempElements%tempAnElementIndex%
-			if (setElement.SubType=tempAnElement) ;Select the current element type, if any
+			tempTV:=TV_Add(Element_getName_%forElementClass%(),tempcategoryTV)
+			TVnum[tempTV]:=forelementIndex
+			TVID[tempTV]:=setElementID
+			TVClass[tempTV]:=forElementClass
+			if (setElement.class=forElementClass) ;Select the current element type, if any
 				TV_Modify(tempTV) 
 		}
 		
@@ -1912,7 +1904,7 @@ selectSubType(p_ID,wait="")
 	wingetpos,,,tempWidth,tempHeight,ahk_id %SettingsHWND%
 	tempXpos:=round(pos.x+pos.w/2- tempWidth/2)
 	tempYpos:=round(pos.y+pos.h/2- tempHeight/2)
-	
+	;~ d(TVnum)
 	gui,show,x%tempXpos% y%tempYpos%
 	
 	if (wait=1 or wait="wait")
@@ -1931,6 +1923,8 @@ selectSubType(p_ID,wait="")
 				break
 			}
 		}
+		
+		EditGUIEnable()
 	}
 	
 	;~ MsgBox
@@ -1942,7 +1936,7 @@ selectSubType(p_ID,wait="")
 	gui,destroy
 	if (setElement.SubType="" and setElement.Type!="Trigger")
 	{
-		setElement.remove()
+		API_Main_Element_Remove(FlowID, setElement.id)
 		;~ API_Main_Draw()
 	}
 	else if (setElement.Type="Trigger" and setElement.SubType="") ;Remove trigger if it was a new one
@@ -1959,8 +1953,9 @@ selectSubType(p_ID,wait="")
 	if A_GuiEvent =DoubleClick 
 		goto GuiElementChooseOK
 	GuiElementChoosedTV:=TV_GetSelection()
+	;~ ToolTip %GuiElementChoosedTV%
 	gui,submit,nohide
-	if TVnum%GuiElementChoosedTV%>0	
+	if TVnum[GuiElementChoosedTV]>0	
 		GuiControl,enable,GuiElementChooseOK
 	else
 		GuiControl,disable,GuiElementChooseOK
@@ -1972,20 +1967,22 @@ selectSubType(p_ID,wait="")
 	gui,Submit,nohide
 	GuiElementChoosedTV:=TV_GetSelection()
 	TV_GetText(GuiElementChoosedText, TV_GetSelection())
-	GuiElementChoosedID:=TVID%GuiElementChoosedTV%
+	GuiElementChoosedID:=TVID[GuiElementChoosedTV]
 	if GuiElementChoosedID=
 		return
 	gui,destroy
 	EditGUIEnable()
 	
-	
+	API_Main_Element_SetClass(FlowID,setElementID,TVClass[GuiElementChoosedTV])
 	
 	;MsgBox,%setElementID% %GuiElementChoose%
 	
-	;%GuiElementChoosedID%name:="¦ new element" ;Do not translate!
-	NowResultEditingElement:=TVsubType%GuiElementChoosedTV%
 	
-	GUISettingsOfElementObject.open()
+	NowResultEditingElement:=TVClass[GuiElementChoosedTV]
+	
+	;~ MsgBox %setElementID%
+	EditGUIEnable()
+	;~ ElementSettings.open(setElementID,wait)
 	
 	return 
 	

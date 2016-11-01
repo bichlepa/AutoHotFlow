@@ -68,7 +68,7 @@ FindFlows() ;API
 		
 		_flows[newFlowid].id := newFlowid
 		_flows[newFlowid].name := tempflowName
-		_flows[newFlowid].defaultname := true
+		;~ _flows[newFlowid].defaultname := true
 		_flows[newFlowid].Type := "Flow"
 		_flows[newFlowid].category := tempCategoryID
 		UpdateFlowCategoryName(newFlowid)

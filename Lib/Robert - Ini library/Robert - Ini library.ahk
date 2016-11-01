@@ -15,8 +15,11 @@
 ;-15 : Error, Ini already exists
 ;Full function list at bottom
 
+;Modified by bichlepa
 
-
+;replacement values for saving linefeed or carriage returns inside the ini files.
+RIni_LF := "⁂↲"
+RIni_CR := "⁂↤"
 
 RIni_Create(RVar, Correct_Errors=1)
 {
@@ -80,7 +83,7 @@ RIni_Shutdown(RVar)
 }
 
 
-RIni_Read(RVar, File, Correct_Errors=1, Remove_Inline_Key_Comments=0, Remove_Lone_Line_Comments=0, Remove_Inline_Section_Comments=0, Treat_Duplicate_Sections=1, Treat_Duplicate_Keys=1, Read_Blank_Sections=1, Read_Blank_Keys=1, Trim_Spaces_From_Values=0, ByRef RIni_Read_Var = "")
+RIni_Read(RVar, File, Correct_Errors=1, Remove_Inline_Key_Comments=0, Remove_Lone_Line_Comments=0, Remove_Inline_Section_Comments=0, Treat_Duplicate_Sections=1, Treat_Duplicate_Keys=1, Read_Blank_Sections=1, Read_Blank_Keys=1, Trim_Spaces_From_Values=0, Replace_Valuewlines=1, ByRef RIni_Read_Var = "")
 {
 	;Treat_Duplicate_Sections
 	;1 - Skip
@@ -233,8 +236,15 @@ RIni_Read(RVar, File, Correct_Errors=1, Remove_Inline_Key_Comments=0, Remove_Lon
 					%RVar%_%Sec%_%Key%_Name := TKey
 				}
 				If (Trim_Spaces_From_Values)
+				{
 					T_Value := %RVar%_%Sec%_%Key%_Value
 					, %RVar%_%Sec%_%Key%_Value = %T_Value%
+				}
+				if (Replace_Valuewlines) ;replace by other characters. Modification by bichlepa
+				{
+					StringReplace, %RVar%_%Sec%_%Key%_Value, %RVar%_%Sec%_%Key%_Value, % RIni_LF, `n, all
+					StringReplace, %RVar%_%Sec%_%Key%_Value, %RVar%_%Sec%_%Key%_Value, % RIni_CR, `r, all
+				}
 			} Else {
 				C_Pos := InStr(A_LoopField, ";")
 				If (C_Pos){
@@ -250,6 +260,11 @@ RIni_Read(RVar, File, Correct_Errors=1, Remove_Inline_Key_Comments=0, Remove_Lon
 					T_Value := %RVar%_%Sec%_%Key%_Value
 					, %RVar%_%Sec%_%Key%_Value = %T_Value%
 				
+				if (Replace_Valuewlines) ;replace by other characters. Modification by bichlepa
+				{
+					StringReplace, %RVar%_%Sec%_%Key%_Value, %RVar%_%Sec%_%Key%_Value, % RIni_LF, `n, all
+					StringReplace, %RVar%_%Sec%_%Key%_Value, %RVar%_%Sec%_%Key%_Value, % RIni_CR, `r, all
+				}
 				%RVar%_All_%Sec%_Keys .= Key "`n"
 				, %RVar%_%Sec%_%Key%_Name := TKey
 			}
@@ -264,7 +279,7 @@ RIni_Read(RVar, File, Correct_Errors=1, Remove_Inline_Key_Comments=0, Remove_Lon
 }
 
 
-RIni_Write(RVar, File, Newline="`r`n", Write_Blank_Sections=1, Write_Blank_Keys=1, Space_Sections=1, Space_Keys=0, Remove_Valuewlines=1, Overwrite_If_Exists=1, Addwline_At_End=0)
+RIni_Write(RVar, File, Newline="`r`n", Write_Blank_Sections=1, Write_Blank_Keys=1, Space_Sections=1, Space_Keys=0, Remove_Valuewlines=0, Overwrite_If_Exists=1, Addwline_At_End=0)
 {
 	Global
 	Local Write_Ini, Sec, Length, Temp_Write_Ini, T_Time, T_Section, T_Key, T_Value, T_Size, E, T_Write_Section
@@ -324,6 +339,11 @@ RIni_Write(RVar, File, Newline="`r`n", Write_Blank_Sections=1, Write_Blank_Keys=
 							StringReplace, T_Value, T_Value, `n, ,A
 						If InStr(T_Value, "`r")
 							StringReplace, T_Value, T_Value, `r, ,A
+					}
+					else	;replace by other characters. Modification by bichlepa
+					{
+						StringReplace, T_Value, T_Value, `n, % RIni_LF ,A
+						StringReplace, T_Value, T_Value, `r, % RIni_CR ,A
 					}
 					If %RVar%_%T_Section%_%A_LoopField%_Comment
 						Write_Ini .= T_Key "=" T_Value %RVar%_%T_Section%_%A_LoopField%_Comment Newline
@@ -417,7 +437,7 @@ RIni_AddKey(RVar, Sec, Key)
 }
 
 
-RIni_AppendValue(RVar, Sec, Key, Value, Trim_Spaces_From_Value=0, Removewlines=1)
+RIni_AppendValue(RVar, Sec, Key, Value, Trim_Spaces_From_Value=0, Removewlines=0)
 {
 	Global
 	Static TSec, TKey, MD5Sec, MD5Key
@@ -552,7 +572,7 @@ RIni_ContractKeyValue(RVar, Sec, Key)
 }
 
 
-RIni_SetKeyValue(RVar, Sec, Key, Value, Trim_Spaces_From_Value=0, Removewlines=1)
+RIni_SetKeyValue(RVar, Sec, Key, Value, Trim_Spaces_From_Value=0, Removewlines=0)
 {
 	Global
 	Local E, TSec, TKey

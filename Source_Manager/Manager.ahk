@@ -3,13 +3,13 @@
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
 SetWorkingDir %A_ScriptDir%\..  ; Ensures a consistent starting directory.
 ;~ MsgBox %A_WorkingDir%
-parentThread := AhkExported()
+parentAHKThread := AhkExported()
 onexit exit
-
 #include lib\Object to file\String-object-file.ahk
 
 #include language\language.ahk
-
+;initialize languages
+lang_Init()
 
 #include Source_Manager\User Interface\manager gui.ahk
 #include Source_Manager\User Interface\help.ahk
@@ -26,6 +26,7 @@ onexit exit
 #include source_Common\Multithreading\API Caller Main.ahk
 
 
+menu,tray, tip, Manager
 init_Manager_GUI()
 Show_Manager_GUI()
 
@@ -36,7 +37,7 @@ return
 exit_all()
 {
 	global
-	parentThread.ahkFunction("api_main_exit")
+	parentAHKThread.ahkFunction("api_main_exit")
 }
 
 exit:

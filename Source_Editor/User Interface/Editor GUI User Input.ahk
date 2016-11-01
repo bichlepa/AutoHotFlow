@@ -42,7 +42,7 @@ if (FlowObj.markedElement != "") ;if a single element is marked
 		ret:=selectConnectionType(FlowObj.markedElement,"wait") ;Change connection type
 		if (ret!="aborted")
 		{
-			new state() ;make a new state. If user presses Ctrl+Z, the change will be undone
+			API_Main_State_New(FlowID) ;make a new state. If user presses Ctrl+Z, the change will be undone
 		}
 		
 	}
@@ -51,7 +51,7 @@ if (FlowObj.markedElement != "") ;if a single element is marked
 		ret:=ElementSettings.open(FlowObj.markedElement,"wait") ;open settings of the marked element
 		if (ret!="aborted" and ret!="0 changes" )
 		{
-			new state() ;make a new state. If user presses Ctrl+Z, the change will be undone
+			API_Main_State_New(FlowID) ;make a new state. If user presses Ctrl+Z, the change will be undone
 		}
 	}
 	
@@ -161,7 +161,10 @@ else if (clickedElement="MenuCreateNewAction" or clickedElement="MenuCreateNewCo
 	}
 	
 	if (UserCancelledAction=true)
-		currentState.restore()
+	{
+		API_Main_State_RestoreCurrent(FlowID)
+		CreateMarkedList()
+	}
 	else
 		UserDidMajorChange:=true
 	
@@ -181,7 +184,6 @@ else if (clickedElement="PlusButton" or clickedElement="PlusButton2") ;user clic
 	else ;The selected element is either action, condition or trigger or loop
 	{
 		tempConnection1:=API_Main_Connection_New(FlowID)
-		ToolTip  %tempConnection1%
 		ret:=ui_MoveConnection(tempConnection1, ,markedElement )
 		if ret=aborted
 			UserCancelledAction:=true
@@ -193,7 +195,8 @@ else if (clickedElement="PlusButton" or clickedElement="PlusButton2") ;user clic
 	if (UserCancelledAction=true)
 	{
 		;~ d(currentstate,1)
-		currentState.restore()
+		API_Main_State_RestoreCurrent(FlowID)
+		CreateMarkedList()
 		API_Main_Draw()
 	}
 	else
@@ -215,7 +218,8 @@ else if (clickedElement="MoveButton1") ;if a connection is selected and user mov
 	if (UserCancelledAction=true)
 	{
 		;~ d(currentstate,1)
-		currentState.restore()
+		API_Main_State_RestoreCurrent(FlowID)
+		CreateMarkedList()
 		API_Main_Draw()
 	}
 	else
@@ -238,7 +242,8 @@ else if (clickedElement="MoveButton2") ;if a connection is selected and user mov
 	if (UserCancelledAction=true)
 	{
 		;~ d(currentstate,1)
-		currentState.restore()
+		API_Main_State_RestoreCurrent(FlowID)
+		CreateMarkedList()
 		API_Main_Draw()
 	}
 	else
@@ -370,10 +375,10 @@ tempList:=""
 
 if (UserDidMajorChange or UserDidMinorChange)
 {
-	new state() ;make a new state. If user presses Ctrl+Z, the change will be undone
+	API_Main_State_New(FlowID) ;make a new state. If user presses Ctrl+Z, the change will be undone
 }
 else if (UserDidMinorChange)
-	new state() ;make a new state. If user presses Ctrl+Z, the change will be undone
+	API_Main_State_New(FlowID) ;make a new state. If user presses Ctrl+Z, the change will be undone
 	
 workingOnClick:=false
 
@@ -815,244 +820,268 @@ ui_scrollwithMouse(button="lbutton")
 ;Return value: "aborted" or ""
 ui_MoveConnection(connection1="", connection2="", element1="", element2="")
 {
-		global
-		local newElement, abortAddingElement, ret, untilRelease, tempElement
-		local mx2, my2, newElementCreated, NewElementPart
-		
-		;move elements to mouse
-		UnmarkEverything()
-		markOne(connection1)
-		markOne(connection2,true)
-		FlowObj.allConnections[connection2].from:="MOUSE"
-		FlowObj.allConnections[connection2].to:=FlowObj.allElements[element2].id
-		FlowObj.allConnections[connection2].ToPart:=FlowObj.allConnections[connection1].ToPart
-		
-		FlowObj.allConnections[connection1].from:=FlowObj.allElements[element1].id
-		FlowObj.allConnections[connection1].to:="MOUSE"
-		
-		;~ ToolTip(strobj(connection1) "`n`n" strobj(connection2),10000)
-		
-		FlowObj.draw.DrawMoveButtonUnderMouse:=true
-		
-		if (ui_detectMovement()) ;If user moves the mouse
-			untilRelease:=true ;move until user releases mouse
-		else
-			untilRelease:=false ;move untli user clicks
-		
-		;Wait until user releases the mouse and add an element there
-		;The connections follow the mouse
-		UserClickedRbutton:=false
-		UserCurrentlyMovesAnElement:=true
-		Loop
+	global
+	local newElement, abortAddingElement, ret, untilRelease, tempElement
+	local mx2, my2, newElementCreated, NewElementPart
+	
+	;move elements to mouse
+	UnmarkEverything()
+	markOne(connection1)
+	markOne(connection2,true)
+	FlowObj.allConnections[connection2].from:="MOUSE"
+	FlowObj.allConnections[connection2].to:=FlowObj.allElements[element2].id
+	FlowObj.allConnections[connection2].ToPart:=FlowObj.allConnections[connection1].ToPart
+	
+	FlowObj.allConnections[connection1].from:=FlowObj.allElements[element1].id
+	FlowObj.allConnections[connection1].to:="MOUSE"
+	
+	;~ ToolTip(strobj(connection1) "`n`n" strobj(connection2),10000)
+	
+	FlowObj.draw.DrawMoveButtonUnderMouse:=true
+	
+	if (ui_detectMovement()) ;If user moves the mouse
+		untilRelease:=true ;move until user releases mouse
+	else
+		untilRelease:=false ;move untli user clicks
+	
+	;Wait until user releases the mouse and add an element there
+	;The connections follow the mouse
+	UserClickedRbutton:=false
+	UserCurrentlyMovesAnElement:=true
+	Loop
+	{
+		;~ SoundBeep
+		if (ui_detectMovementWithoutBlocking()) ;check, whether user has moved mouse
+			API_Main_Draw()
+		if (untilRelease and !getkeystate("lbutton","P") or !untilRelease and getkeystate("lbutton","P")) ;if user finishes moving
 		{
-			;~ SoundBeep
-			if (ui_detectMovementWithoutBlocking()) ;check, whether user has moved mouse
-				API_Main_Draw()
-			if (untilRelease and !getkeystate("lbutton","P") or !untilRelease and getkeystate("lbutton","P")) ;if user finishes moving
-			{
-				break
-			}
-			if ( UserClickedRbutton or getkeystate("esc","P")) ;if user aborts moving
-			{
-				abortAddingElement:=true
-				break
-			}
-			sleep 10 ;save CPU load
-			
+			break
 		}
-		UserCurrentlyMovesAnElement:=false
+		if ( UserClickedRbutton or getkeystate("esc","P")) ;if user aborts moving
+		{
+			abortAddingElement:=true
+			break
+		}
+		sleep 10 ;save CPU load
 		
-		FlowObj.draw.DrawMoveButtonUnderMouse:=false
+	}
+	UserCurrentlyMovesAnElement:=false
+	
+	FlowObj.draw.DrawMoveButtonUnderMouse:=false
+	
+	if (abortAddingElement)
+		return "aborted"
+	
+	MouseGetPos,mx,my ;Get the mouse position
+	
+	
+	ui_findElementUnderMouse("OnlyElements") ;Search an element beneath the mouse.
+	
+	
+	if (clickedElement="") ;If user pulled the end of the connection to empty space. Create new element
+	{
+		newElement:=API_Main_Element_New(FlowID)
+		newElementCreated:=true
 		
-		if (abortAddingElement)
+		ret:=selectContainerType(newElement,"wait")
+		if (ret="aborted") ;If user did not select the container type
+		{
+			return "aborted"
+		}
+		FlowObj.allElements[newElement].x:=(mx)/FlowObj.flowSettings.zoomfactor+FlowObj.flowSettings.offsetx - default_ElementWidth/2
+		FlowObj.allElements[newElement].y:=(my)/FlowObj.flowSettings.zoomfactor+FlowObj.flowSettings.offsety  - default_ElementHeight/2
+		FlowObj.allElements[newElement].x:=ui_FitGridX(FlowObj.allElements[newElement].x)
+		FlowObj.allElements[newElement].y:=ui_FitGridY(FlowObj.allElements[newElement].y)
+		
+		
+		FlowObj.allConnections[connection1].to:=FlowObj.allElements[newElement].id
+		FlowObj.allConnections[connection2].from:=FlowObj.allElements[newElement].id
+		
+		gosub,ui_MoveConnectionCheckAndCorrect
+		if abortAddingElement
 			return "aborted"
 		
-		MouseGetPos,mx,my ;Get the mouse position
+		MarkOne(newElement)
+		clickedElement:=newElement
 		
-		
-		ui_findElementUnderMouse("OnlyElements") ;Search an element beneath the mouse.
-		
-		
-		if (clickedElement="") ;If user pulled the end of the connection to empty space. Create new element
+		ret:=selectSubType(newElement,"Wait")
+		if (ret="aborted") ;If user aborted
 		{
-			newElement:=API_Main_Element_New(FlowID)
-			newElementCreated:=true
-			
-			ret:=selectContainerType(newElement,"wait")
-			if (ret="aborted") ;If user did not select the container type
-			{
-				return "aborted"
-			}
-			FlowObj.allElements[newElement].x:=(mx)/FlowObj.flowSettings.zoomfactor+FlowObj.flowSettings.offsetx - default_ElementWidth/2
-			FlowObj.allElements[newElement].y:=(my)/FlowObj.flowSettings.zoomfactor+FlowObj.flowSettings.offsety  - default_ElementHeight/2
-			FlowObj.allElements[newElement].x:=ui_FitGridX(FlowObj.allElements[newElement].x)
-			FlowObj.allElements[newElement].y:=ui_FitGridY(FlowObj.allElements[newElement].y)
-			
-			
-			FlowObj.allConnections[connection1].to:=FlowObj.allElements[newElement].id
-			FlowObj.allConnections[connection2].from:=FlowObj.allElements[newElement].id
-			
-			gosub,ui_MoveConnectionCheckAndCorrect
-			if abortAddingElement
-				return "aborted"
-			
-			MarkOne(newElement)
-			clickedElement:=newElement
-			API_Main_Draw()
-			
-			ret:=selectSubType(newElement,"Wait")
-			if (ret="aborted") ;If user aborted
-			{
-				return "aborted"
-			}
-				
-			ret:=ElementSettings.open(newElement,"Wait") ;open settings of element
-			if (ret="aborted") ;If user aborted
-			{
-				return "aborted"
-			}
-			
+			return "aborted"
 		}
-		else ;If user pulled the end of the connection to an existing element
-		{
-			;~ SoundBeep 600
-			NewElement:=clickedElement
-			NewElementPart:=partOfclickedElement
-			newElementCreated:=false
 			
-			FlowObj.allConnections[connection2].from:=FlowObj.allElements[newElement].id
-			FlowObj.allConnections[connection1].to:=FlowObj.allElements[newElement].id
+		ret:=ElementSettings.open(newElement,"Wait") ;open settings of element
+		if (ret="aborted") ;If user aborted
+		{
+			return "aborted"
+		}
+		
+	}
+	else ;If user pulled the end of the connection to an existing element
+	{
+		;~ SoundBeep 600
+		NewElement:=clickedElement
+		NewElementPart:=partOfclickedElement
+		newElementCreated:=false
+		
+		FlowObj.allConnections[connection2].from:=FlowObj.allElements[newElement].id
+		FlowObj.allConnections[connection1].to:=FlowObj.allElements[newElement].id
 
-			;Check whether Connection is possible
-			if (FlowObj.allElements[newElement].Type="Trigger" )
-			{
-				Msgbox,% lang("You_cannot_connect_to_trigger!")
-				return "aborted"
-			}
-			if (NewElement=Element1 OR NewElement=Element2)
-			{
-				Msgbox,% lang("The_Connection_cannot_start_and_end_on_the_same_element!")
-				return "aborted"
-			}
-			
-			gosub,ui_MoveConnectionCheckAndCorrect
-			if abortAddingElement
-				return "aborted"
-			
-			if (Connection1!="" and Connection2!="") ;if user has split a connection and connected an other element inbetween
-				markOne(NewElement)
-			;else keep the new or modified connection marked
-			
-		}
-		API_Main_Draw()
-		return
-		
-		ui_MoveConnectionCheckAndCorrect:
-		
-		if (Connection2!="") ;If connection 2 exists
+		;Check whether Connection is possible
+		if (FlowObj.allElements[newElement].Type="Trigger" && connection1)
 		{
-			if (FlowObj.allElements[newElement].Type="Condition" and FlowObj.allConnections[connection2].connectiontype!="exception" and FlowObj.allConnections[connection2].connectiontype!="no" and FlowObj.allConnections[connection2].connectiontype!="yes") ;if pulled to connection and its type is not exception
+			Msgbox,% lang("You_cannot_connect_to_trigger!")
+			return "aborted"
+		}
+		if (NewElement=Element1 OR NewElement=Element2)
+		{
+			Msgbox,% lang("The_Connection_cannot_start_and_end_on_the_same_element!")
+			return "aborted"
+		}
+		
+		gosub,ui_MoveConnectionCheckAndCorrect
+		if abortAddingElement
+			return "aborted"
+		
+		if (Connection1!="" and Connection2!="") ;if user has split a connection and connected an other element inbetween
+			markOne(NewElement)
+		;else keep the new or modified connection marked
+		
+	}
+	API_Main_Draw()
+	return
+	
+	ui_MoveConnectionCheckAndCorrect:
+	
+	if (Connection1!="") ;If connection 1 exists
+	{
+		if (FlowObj.allElements[FlowObj.allConnections[connection1].from].Type="Condition" )
+		{
+			if (FlowObj.allConnections[connection1].connectiontype!="exception" 
+				and FlowObj.allConnections[connection1].connectiontype!="no" 
+				and FlowObj.allConnections[connection1].connectiontype!="yes") ;if pulled to connection and its type is not exception
+			{
+				ret:=selectConnectionType(Connection1,"wait")
+				if (ret="aborted")
+					return "aborted"
+			}
+		}
+		else ;if pulled to anything else, check whether it is normal or exception
+		{
+			if (FlowObj.allConnections[connection1].connectiontype!="normal" and FlowObj.allConnections[connection1].connectiontype!="exception")
+				FlowObj.allConnections[connection1].connectiontype:="normal"
+		}
+	}
+	
+	if (Connection2!="") ;If connection 2 exists
+	{
+		if (FlowObj.allElements[FlowObj.allConnections[connection2].from].Type="Condition")
+		{
+			if (FlowObj.allConnections[connection2].connectiontype!="exception" 
+				and FlowObj.allConnections[connection2].connectiontype!="no" 
+				and FlowObj.allConnections[connection2].connectiontype!="yes") ;if pulled to connection and its type is not exception
 			{
 				ret:=selectConnectionType(Connection2,"wait")
 				if (ret="aborted")
 					return "aborted"
 			}
-			else ;if pulled to anything else, check whether it is normal or exception
-			{
-				if (FlowObj.allConnections[connection2].connectiontype!="normal" and FlowObj.allConnections[connection2].connectiontype!="exception")
-					FlowObj.allConnections[connection2].connectiontype:="normal"
-			}
 		}
-		
-		
-		if (FlowObj.allElements[Element2].Type="Loop") ;If the second element is a loop. The information about the connected part is not yet in the second connection.
+		else ;if pulled to anything else, check whether it is normal or exception
 		{
-			if (not FlowObj.allConnections[connection2].toPart) ;If no part assigned to connection
-			{
-				if (Connection1!="") ;If a second connection exist. Thus it was previously connected to the loop
-					FlowObj.allConnections[connection2].toPart:=FlowObj.allConnections[connection1].toPart
-				else
-					FlowObj.allConnections[connection2].toPart:="HEAD" ;connect to head
-			}
+			if (FlowObj.allConnections[connection2].connectiontype!="normal" and FlowObj.allConnections[connection2].connectiontype!="exception")
+				FlowObj.allConnections[connection2].connectiontype:="normal"
 		}
-		else
-			FlowObj.allConnections[connection2].delete("topart") ;Delete part information if set
-		
-		if (FlowObj.allElements[newElement].Type="Loop") ;If user pulled to a loop, assign parts
+	}
+	
+	
+	if (FlowObj.allElements[Element2].Type="Loop") ;If the second element is a loop. The information about the connected part is not yet in the second connection.
+	{
+		if (not FlowObj.allConnections[connection2].toPart) ;If no part assigned to connection
 		{
-			if newElementCreated ;If a new one was created, define default parts
+			if (Connection1!="") ;If a second connection exist. Thus it was previously connected to the loop
+				FlowObj.allConnections[connection2].toPart:=FlowObj.allConnections[connection1].toPart
+			else
+				FlowObj.allConnections[connection2].toPart:="HEAD" ;connect to head
+		}
+	}
+	else
+		FlowObj.allConnections[connection2].delete("topart") ;Delete part information if set
+	
+	if (FlowObj.allElements[newElement].Type="Loop") ;If user pulled to a loop, assign parts
+	{
+		if newElementCreated ;If a new one was created, define default parts
+		{
+			FlowObj.allConnections[connection1].toPart:="HEAD" 
+			FlowObj.allConnections[connection2].fromPart:="TAIL"
+		}
+		else ;If user has pulled to an existing loop, decide depending on which part he dropped it
+		{
+			if (Connection1!="" and Connection2!="") ;assign default if both connections exist
 			{
 				FlowObj.allConnections[connection1].toPart:="HEAD" 
 				FlowObj.allConnections[connection2].fromPart:="TAIL"
 			}
-			else ;If user has pulled to an existing loop, decide depending on which part he dropped it
+			else
 			{
-				if (Connection1!="" and Connection2!="") ;assign default if both connections exist
+				if (NewElementPart=1 or NewElementPart=2) 
 				{
 					FlowObj.allConnections[connection1].toPart:="HEAD" 
+					FlowObj.allConnections[connection2].fromPart:="HEAD"
+				}
+				else if (NewElementPart=3) 
+				{
+					FlowObj.allConnections[connection1].toPart:="TAIL" 
 					FlowObj.allConnections[connection2].fromPart:="TAIL"
 				}
-				else
+				else if (NewElementPart=4) 
 				{
-					if (NewElementPart=1 or NewElementPart=2) 
-					{
-						FlowObj.allConnections[connection1].toPart:="HEAD" 
-						FlowObj.allConnections[connection2].fromPart:="HEAD"
-					}
-					else if (NewElementPart=3) 
-					{
-						FlowObj.allConnections[connection1].toPart:="TAIL" 
-						FlowObj.allConnections[connection2].fromPart:="TAIL"
-					}
-					else if (NewElementPart=4) 
-					{
-						FlowObj.allConnections[connection1].toPart:="BREAK" 
-						FlowObj.allConnections[connection2].fromPart:="TAIL"
-					}
+					FlowObj.allConnections[connection1].toPart:="BREAK" 
+					FlowObj.allConnections[connection2].fromPart:="TAIL"
 				}
 			}
 		}
-		else ;if not, delete part informations, if any
-		{
-			FlowObj.allConnections[Connection1].delete("topart")
-			FlowObj.allConnections[Connection2].delete("fromPart")
-		}
-		if (FlowObj.allElements[Element1].Type="Loop") ;If the first element is a loop
-		{
-			if (not FlowObj.allConnections[connection1].fromPart) ;If no part assigned to connection
-				FlowObj.allConnections[connection1].fromPart:="TAIL" ;connect to tail
-		}
-		else
-			Connection2.delete("topart") ;Delete part information if set
-		
-		;Check whether a connection already exists
-		Loop 2
-		{
-			if (a_index=1)
-				tempElement:=Connection1
-			else
-				tempElement:=Connection2
-			
-			for forID, forElement in FlowObj.allConnections
-			{
-				;~ d(strobj(tempElement) "`n`n" strobj(forElement), "wait")
-				if (forID!=tempElement)
-				{
-					if (forElement.from=FlowObj.allConnections[tempElement].from and forElement.to=FlowObj.allConnections[tempElement].to )
-					{
-						if (forElement.ConnectionType = FlowObj.allConnections[tempElement].ConnectionType)
-						{
-							msgbox,% lang("This_Connection_Already_Exists!")
-							abortAddingElement:=true
-						}
-					}
-				}
-			}
-			
-		}
-		
-		return
+	}
+	else ;if not, delete part informations, if any
+	{
+		FlowObj.allConnections[Connection1].delete("topart")
+		FlowObj.allConnections[Connection2].delete("fromPart")
+	}
+	if (FlowObj.allElements[Element1].Type="Loop") ;If the first element is a loop
+	{
+		if (not FlowObj.allConnections[connection1].fromPart) ;If no part assigned to connection
+			FlowObj.allConnections[connection1].fromPart:="TAIL" ;connect to tail
+	}
+	else
+		Connection2.delete("topart") ;Delete part information if set
 	
+	;Check whether a connection already exists
+	Loop 2
+	{
+		if (a_index=1)
+			tempElement:=Connection1
+		else
+			tempElement:=Connection2
+		
+		for forID, forElement in FlowObj.allConnections
+		{
+			;~ d(strobj(tempElement) "`n`n" strobj(forElement), "wait")
+			if (forID!=tempElement)
+			{
+				if (forElement.from=FlowObj.allConnections[tempElement].from and forElement.to=FlowObj.allConnections[tempElement].to )
+				{
+					if (forElement.ConnectionType = FlowObj.allConnections[tempElement].ConnectionType)
+					{
+						msgbox,% lang("This_Connection_Already_Exists!")
+						abortAddingElement:=true
+					}
+				}
+			}
+		}
+		
+	}
+	
+	return
+
 }
 
 #IfWinActive ·AutoHotFlow· Editor ;Hotkeys
@@ -1068,31 +1097,26 @@ if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of t
 }
 
 markedElementscopy:=FlowObj.markedElements.clone()
-
  ;remove all marked elements
 for markindex, markelement in markedElementscopy
 {
-	if markelement contains element
+	if (FlowObj.allElements[markelement].type="trigger")
 	{
-		if (FlowObj.allElements[markelement].type="trigger")
-		{
-			MsgBox,% lang("Trigger_cannot be removed!")
-			continue
-		}
-		
+		;Do not remove trigger
+		MsgBox,% lang("Trigger_cannot be removed!")
+		continue
 	}
 	else
 	{
 		API_Main_Element_Remove(FlowID, markelement)
 	}
-	
 
 }
 CreateMarkedList()
 markedElementscopy:=""
 tempList:=""
 ;e_CorrectElementErrors("Code: 354546841.")
-new state()
+API_Main_State_New(FlowID)
 ui_UpdateStatusbartext()
 API_Main_Draw()
 return
@@ -1190,7 +1214,7 @@ if ret=0
 	}
 	markedElementscopy:=""
 	
-	new state()
+	API_Main_State_New(FlowID)
 	ui_UpdateStatusbartext()
 	API_Main_Draw()
 }
@@ -1232,7 +1256,8 @@ if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of t
 	ui_ActionWhenMainGUIDisabled()
 	return
 }
-states.undo()
+API_Main_State_Undo(FlowID)
+CreateMarkedList()
 API_Main_Draw()
 return
 ctrl_y:
@@ -1241,7 +1266,7 @@ if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of t
 	ui_ActionWhenMainGUIDisabled()
 	return
 }
-states.redo()
+API_Main_State_Redo(FlowID)
 API_Main_Draw()
 return
 
