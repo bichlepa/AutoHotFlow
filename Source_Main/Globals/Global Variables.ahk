@@ -88,6 +88,7 @@ init_GlobalVars()
 			.FlowID			Flow ID
 			.Threads		Associative array of objects. Each object contains following values:
 				.ID				Thread ID (Which is also the key)
+				.ThreadID		Same as .ID
 				.State			Defines the current state of the execution.
 					-starting 		The element execution is ready to be started
 					-running		The element execution is currently running

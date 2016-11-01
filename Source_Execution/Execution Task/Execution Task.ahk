@@ -4,9 +4,10 @@ executionTask()
 {
 	global _execution, _flows, _settings
 	;TODO Vielleicht wird es zu Problemen kommen, wenn neue Instanzen hinzugefügt werden, während diese Schleife läuft
-	somethingexecuted:=false
+	
 	Loop
 	{
+		somethingexecuted:=false
 		for OneInstanceID, OneInstance in _execution.Instances
 		{
 			for OneThreadID, OneThread in OneInstance.threads
@@ -17,10 +18,11 @@ executionTask()
 					;Execute the element.
 					oneElement:=_flows[OneThread.flowID].allElements[OneThread.elementID]
 					oneElementClass:=oneElement.class
-					OneThread.state:="running"
 					OneThread.ElementPars:=objfullyclone(oneElement.pars)
 					
+					OneThread.state:="running"
 					oneElement.state:="running"
+					
 					_flows[OneThread.flowID].draw.mustDraw:=true
 					;~ d(oneElement, "ausführen: " oneElement.id)
 					;~ d(OneThread, "ausführen: " oneElement.id)
@@ -47,18 +49,21 @@ executionTask()
 					for oneConnectionIndex, oneConnectionID in _flows[OneThread.flowID].allElements[OneThread.elementID].FromConnections
 					{
 						;~ d(_flows[OneThread.flowID].allConnections[oneConnectionID], "connection found: " oneConnectionID)
-						NextThread := OneThread
-						if oneConnectionIndex!=1
+						if (_flows[OneThread.flowID].allConnections[oneConnectionID].ConnectionType = OneThread.result)
 						{
-							;On other than first connection first clone the thread
-							NextThread := newThread(OneInstance, OneThread)
-							;~ d(NextThread, "cloned thread")
+							NextThread := OneThread
+							if (AnyConnectionFound=True)
+							{
+								;On other than first connection first clone the thread
+								NextThread := newThread(OneInstance, OneThread)
+								;~ d(NextThread, "cloned thread")
+							}
+							;assign the next element to this thread
+							NextThread.ElementID := _flows[OneThread.flowID].allConnections[oneConnectionID].to
+							NextThread.state:="starting"
+							
+							AnyConnectionFound:=True
 						}
-						;assign the next element to this thread
-						NextThread.ElementID := _flows[OneThread.flowID].allConnections[oneConnectionID].to
-						NextThread.state:="starting"
-						
-						AnyConnectionFound:=True
 					}
 					if not AnyConnectionFound
 					{

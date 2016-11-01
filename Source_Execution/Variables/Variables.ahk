@@ -1,36 +1,144 @@
 ﻿AllBuiltInVars:="-A_Space-A_Tab-A_YYYY-A_Year-A_MM-A_Mon-A_DD-A_MDay-A_MMMM-A_MMM-A_DDDD-A_DDD-A_WDay-A_YDay-A_Hour-A_Min-A_Sec-A_MSec-A_TickCount-A_TimeIdle-A_TimeIdlePhysical-A_Temp-A_OSVersion-A_Is64bitOS-A_PtrSize-A_Language-A_ComputerName-A_UserName-A_ScriptDir-A_WinDir-A_ProgramFiles-A_AppData-A_AppDataCommon-A_Desktop-A_DesktopCommon-A_StartMenu-A_StartMenuCommon-A_Programs-A_ProgramsCommon-A_Startup-A_StartupCommon-A_MyDocuments-A_IsAdmin-A_ScreenWidth-A_ScreenHeight-A_ScreenDPI-A_IPAddress1-A_IPAddress2-A_IPAddress3-A_IPAddress4-A_Cursor-A_CaretX-A_CaretY-----" ;a_now and a_nowutc not included, they will be treated specially
 
+LoopVariable_Set(Environment,p_Name,p_Value,p_ContentType="Normal")
+{
+	Environment.loopvars[p_Name]:={name:p_Name,value:p_Value,type:p_ContentType}
+}
 ThreadVariable_Set(Environment,p_Name,p_Value,p_ContentType="Normal")
 {
 	Environment.threadvars[p_Name]:={name:p_Name,value:p_Value,type:p_ContentType}
 	
 }
-LoopVariable_Set(Environment,p_Name,p_Value,p_ContentType="Normal")
-{
-	Environment.loopvars[p_Name]:={name:p_Name,value:p_Value,type:p_ContentType}
-}
 InstanceVariable_Set(Environment,p_Name,p_Value,p_ContentType="Normal")
 {
 	global _execution
-	;~ d(p_Value,"set variable " p_Name)
-	;~ d(environment,"set variable environment")
 	_execution.instances[Environment.InstanceID].InstanceVars[p_Name]:={name:p_Name,value:p_Value,type:p_ContentType}
-	;~ d(_execution.instances[Environment.InstanceID].InstanceVars,"set variable " p_Name ". instance " Environment.InstanceID)
 	
 }
 
 StaticVariable_Set(Environment,p_Name,p_Value,p_ContentType="Normal")
 {
-	;~ Lock(global_CriticalSectionGlobalVars)
-	;~ allThreads[p_thread].loopvars[p_Name]:=CriticalObject({name=p_Name,value=p_Value,type=p_ContentType})
-	
-	;~ UnLock(global_CriticalSectionGlobalVars)
+	;todo
 }
 GlobalVariable_Set(Environment,p_Name,p_Value,p_ContentType="Normal")
 {
-	;~ Lock(global_CriticalSectionGlobalVars)
-	;~ allThreads[p_thread].loopvars[p_Name]:=CriticalObject({name=p_Name,value=p_Value,type=p_ContentType})
-	;~ UnLock(global_CriticalSectionGlobalVars)
+	;todo
+}
+
+
+LoopVariable_GetWhole(Environment,p_Name)
+{
+	return Environment.loopvars[p_Name]
+}
+ThreadVariable_GetWhole(Environment,p_Name)
+{
+	return Environment.threadvars[p_Name]
+	
+}
+InstanceVariable_GetWhole(Environment,p_Name)
+{
+	global _execution
+	return _execution.instances[Environment.InstanceID].InstanceVars[p_Name]
+	
+}
+
+StaticVariable_GetWhole(Environment,p_Name)
+{
+	;todo
+}
+GlobalVariable_GetWhole(Environment,p_Name)
+{
+	;todo
+}
+
+BuiltInVariable_GetWhole(Environment,p_Name)
+{
+	;If no thread and loop variable found, try to find a built in variable
+	if (p_Name="a_now" || p_Name="A_NowUTC")
+	{
+		tempvar:={name: p_Name, value: %p_Name%, type: "Date"}
+		return tempvar
+	}
+	else if (p_Name="A_YWeek") ;Separate the week.
+	{
+		StringRight,tempvalue,A_YWeek,2
+		tempvar:={name: p_Name, value: tempvalue, type: "Normal"}
+		return tempvar
+	}
+	else if (p_Name="A_LanguageName") 
+	{
+		tempvalue:= ;GetLanguageNameFromCode(A_Language) ;;TODO: Uncomment
+		
+		return tempvalue
+	}
+	else if (p_Name="a_workingdir")
+	{
+		;~ tempvalue:=flowSettings.WorkingDir
+		return tempvalue
+	}
+	;~ else if (name="a_triggertime")
+	;~ {
+		;~ tempvalue:=Instance_%InstanceID%_Thread_%ThreadID%_Variables[name] 
+		;~ if p_Type=Normal
+			;~ return this.convertVariable(tempvalue,"date","`n") 
+		;~ else
+		;~ {
+			;~ return tempvalue
+		;~ }
+	;~ }
+	else if (p_Name="a_linefeed" or p_Name="a_lf")
+	{
+		tempvar:={name: p_Name, value: "`n", type: "Normal"}
+		return tempvar
+	}
+	;~ else if (p_Name="a_CPULoad")
+	;~ {
+		;~ return CPULoad()
+	;~ }
+	;~ else if (p_Name="a_MemoryUsage")
+	;~ {
+		;~ return MemoryLoad()
+	;~ }
+	;~ else if (p_Name="a_OSInstallDate")
+	;~ {
+		;~ if p_Type=Normal
+			;~ return convertVariable(OSInstallDate(),"date","`n") 
+		;~ else
+		;~ {
+			;~ return OSInstallDate()
+		;~ }
+	;~ }
+	else If InStr(this.AllBuiltInVars,"-" p_Name "-")
+	{
+		tempvar:={name: p_Name, value: %p_Name%, type: "Normal"}
+		return tempvar
+	}
+	;todo
+}
+
+LoopVariable_Delete(Environment,p_Name)
+{
+	Environment.loopvars.delete(p_Name)
+}
+ThreadVariable_Delete(Environment,p_Name)
+{
+	Environment.threadvars.delete(p_Name)
+	
+}
+InstanceVariable_Delete(Environment,p_Name)
+{
+	global _execution
+	_execution.instances[Environment.InstanceID].InstanceVars.delete(p_Name)
+	
+}
+
+StaticVariable_Delete(Environment,p_Name)
+{
+	;todo
+}
+GlobalVariable_Delete(Environment,p_Name)
+{
+	;todo
 }
 
 
@@ -68,6 +176,25 @@ Var_RetrieveDestination(p_Name,p_Location,p_log=true)
 	}
 	
 	
+}
+
+Var_GetLocation(Environment, p_Name)
+{
+	global _execution
+	if (Environment.loopvars.haskey(p_Name))
+	{
+		return "Loop"
+	}
+	else if (Environment.threadvars.haskey(p_Name))
+	{
+		return "Thread"
+	}
+	else if (_execution.instances[Environment.InstanceID].InstanceVars.haskey(p_Name))
+	{
+		return "instance"
+	}
+	;~ d(Environment, "error-  " p_name)
+	;Todo: static and global variables
 }
 
 Var_Set(environment, p_Name, p_Value, p_Type, p_Destination="")
@@ -112,86 +239,41 @@ Var_Get(environment, p_Name, p_Type)
 	}
 	else if (substr(p_Name,1,2)="A_") ; if variable is a built in variable or a thread variable
 	{
-		;~ MsgBox asfh  %name%
-		if (Environment.threadvars.HasKey(p_Name)) ;Try to find a thread variable
+		;Try to find a loop variable
+		tempVar:=LoopVariable_GetWhole(environment, p_Name)
+		if IsObject(tempVar)
 		{
-			logger("f3","Retrieving thread variable '" p_Name "'")
-			tempvalue:=Environment.threadvars[p_Name].value
+			logger("f3","Retrieving loop variable '" p_Name "'")
+			tempvalue:=tempVar.value
+			if (p_Type!=tempVar.type)
+			{
+				tempvalue:= Var_ConvertType(tempvalue,"date",p_Type)
+			}
 			;~ MsgBox ag e %tempvalue%
 			return tempvalue
 		}
-		else if (Environment.loopvars.HasKey(p_Name)) ;Try to find a loop variable
+		;Try to find a thread variable
+		tempVar:=ThreadVariable_GetWhole(environment, p_Name)
+		if IsObject(tempVar)
 		{
-			logger("f3","Retrieving loop variable '" p_Name "'")
-			tempvalue:=Environment.loopvars[p_Name].value
-			return tempvalue
-		}
-		;If no thread and loop variable found, try to find a built in variable
-		else if (p_Name="a_now" || p_Name="A_NowUTC")
-		{
-			if (p_Type!="Date")
+			logger("f3","Retrieving thread variable '" p_Name "'")
+			tempvalue:=tempVar.value
+			if (p_Type!=tempVar.type)
 			{
-				tempvalue:=Var_ConvertType(p_Name,"date",p_Type)
-				
-				return tempvalue
+				tempvalue:= Var_ConvertType(tempvalue,"date",p_Type)
 			}
-			else
+			return tempvalue
+		}
+		;Try to find a built in variable
+		tempVar:=BuiltInVariable_GetWhole(environment, p_Name)
+		if IsObject(tempVar)
+		{
+			logger("f3","Retrieving built in variable '" p_Name "'")
+			tempvalue:=tempVar.value
+			if (p_Type!=tempVar.type)
 			{
-				tempvalue:=%p_Name%
-				;~ MsgBox %tempvalue%
-				return tempvalue
+				tempvalue:= Var_ConvertType(tempvalue,"date",p_Type)
 			}
-		}
-		else if (p_Name="A_YWeek") ;Separate the week.
-		{
-			StringRight,tempvalue,A_YWeek,2
-			return tempvalue
-		}
-		else if (p_Name="A_LanguageName") 
-		{
-			tempvalue:= ;GetLanguageNameFromCode(A_Language) ;;TODO: Uncomment
-			
-			return tempvalue
-		}
-		else if (p_Name="a_workingdir")
-		{
-			;~ tempvalue:=flowSettings.WorkingDir
-			return tempvalue
-		}
-		;~ else if (name="a_triggertime")
-		;~ {
-			;~ tempvalue:=Instance_%InstanceID%_Thread_%ThreadID%_Variables[name] 
-			;~ if p_Type=Normal
-				;~ return this.convertVariable(tempvalue,"date","`n") 
-			;~ else
-			;~ {
-				;~ return tempvalue
-			;~ }
-		;~ }
-		else if (p_Name="a_linefeed" or p_Name="a_lf")
-		{
-			return "`n"
-		}
-		;~ else if (p_Name="a_CPULoad")
-		;~ {
-			;~ return CPULoad()
-		;~ }
-		;~ else if (p_Name="a_MemoryUsage")
-		;~ {
-			;~ return MemoryLoad()
-		;~ }
-		;~ else if (p_Name="a_OSInstallDate")
-		;~ {
-			;~ if p_Type=Normal
-				;~ return convertVariable(OSInstallDate(),"date","`n") 
-			;~ else
-			;~ {
-				;~ return OSInstallDate()
-			;~ }
-		;~ }
-		else If InStr(this.AllBuiltInVars,"-" p_Name "-")
-		{
-			tempvalue:=%p_Name%
 			return tempvalue
 		}
 		else
@@ -203,21 +285,47 @@ Var_Get(environment, p_Name, p_Type)
 	}
 	else if (substr(p_Name,1,7)="global_") ; if variable is a global variable
 	{
-		return tempvalue
+		tempVar:=GlobalVariable_GetWhole(environment, p_Name)
+		if IsObject(tempVar)
+		{
+			logger("f3","Retrieving global variable '" p_Name "'")
+			tempvalue:=tempVar.value
+			if (p_Type!=tempVar.type)
+			{
+				tempvalue:= Var_ConvertType(tempvalue,"date",p_Type)
+			}
+			return tempvalue
+		}
+		else
+		{
+			logger("f0","Retrieving global variable '" p_Name "' failed. It does not exist")
+		}
 	}
 	else if (substr(p_Name,1,7)="static_") ; if variable is a static variable
 	{
-		return tempvalue
+		tempVar:=staticVariable_GetWhole(environment, p_Name)
+		if IsObject(tempVar)
+		{
+			logger("f3","Retrieving static variable '" p_Name "'")
+			tempvalue:=tempVar.value
+			if (p_Type!=tempVar.type)
+			{
+				tempvalue:= Var_ConvertType(tempvalue,"date",p_Type)
+			}
+			return tempvalue
+		}
+		else
+		{
+			logger("f0","Retrieving static variable '" p_Name "' failed. It does not exist")
+		}
 	}
 	else ;If this is a instance variable
 	{
-		;~ d(_execution.instances[Environment.InstanceID].InstanceVars,"instance vars" p_Name)
-		if (_execution.instances[Environment.InstanceID].InstanceVars.HasKey(p_Name)) ;Try to find a instance variable
+		tempVar:=InstanceVariable_GetWhole(environment, p_Name)
+		if IsObject(tempVar)
 		{
 			logger("f3","Retrieving instance variable '" p_Name "'")
-			tempvalue:=_execution.instances[Environment.InstanceID].InstanceVars[p_Name].value
-			;TODO, convert type if necessary
-			;~ MsgBox ag e %tempvalue% - %name%
+			tempvalue:=tempVar.value
 			return tempvalue
 		}
 		else
@@ -227,6 +335,24 @@ Var_Get(environment, p_Name, p_Type)
 	}
 }
 
+Var_GetType(Environment, p_Name)
+{
+	tempLocation := Var_GetLocation(Environment, p_Name)
+	;~ d(tempLocation)
+	if (tempLocation)
+	{
+		variable:=%tempLocation%Variable_GetWhole(Environment, p_Name)
+		;~ d(variable)
+		return variable.type
+	}
+	
+}
+Var_Delete(Environment, p_Name)
+{
+	tempLocation := Var_GetLocation(Environment, p_Name)
+	if (tempLocation)
+		%tempLocation%Variable_Delete(Environment, p_Name)
+}
 
 Var_ConvertType(p_Value,p_Contenttype,p_TargetType)
 {
@@ -295,4 +421,66 @@ Var_replaceVariables(environment, p_String, p_ContentType = "AsIs")
 	;~ d(environment, "replace variables result: " tempstring )
 	return tempstring 
 	
+}
+
+Var_GetListOfLoopVars(environment)
+{
+	retobject:=Object()
+	for varname, varcontent in Environment.loopvars
+	{
+		retobject.push(varname)
+	}
+	return retobject
+}
+Var_GetListOfThreadVars(environment)
+{
+	retobject:=Object()
+	for varname, varcontent in Environment.threadvars
+	{
+		retobject.push(varname)
+	}
+	return retobject
+}
+Var_GetListOfInstanceVars(environment)
+{
+	global _execution
+	retobject:=Object()
+	for varname, varcontent in _execution.instances[Environment.InstanceID].InstanceVars
+	{
+		retobject.push(varname)
+	}
+	return retobject
+}
+Var_GetListOfStaticVars(environment)
+{
+
+}
+Var_GetListOfGlobalVars(environment)
+{
+	
+}
+Var_GetListOfAllVars(environment)
+{
+	retobject:=Object()
+	for index, varname in Var_GetListOfLoopVars(environment)
+	{
+		retobject.push(varname)
+	}
+	for index, varname in Var_GetListOfThreadVars(environment)
+	{
+		retobject.push(varname)
+	}
+	for index, varname in Var_GetListOfInstanceVars(environment)
+	{
+		retobject.push(varname)
+	}
+	for index, varname in Var_GetListOfStaticVars(environment)
+	{
+		retobject.push(varname)
+	}
+	for index, varname in Var_GetListOfGlobalVars(environment)
+	{
+		retobject.push(varname)
+	}
+	return retobject
 }

@@ -6,7 +6,7 @@ ThreadIDCOunter:=0
 */
 newInstance(p_Flow)
 {
-	global _execution
+	global _execution, InstanceIDCOunter
 	;Search for the matching trigger element
 	for oneElementID, oneElement in p_Flow.allElements
 	{
@@ -43,6 +43,7 @@ newThread(p_Instance, p_ToCloneFromThread ="")
 		;Create a new thread which starts at the trigger
 		newThread := CriticalObject()
 		newThread.id := "thread" ++ThreadIDCOunter
+		newThread.ThreadID := newThread.id
 		newThread.InstanceID := p_Instance.id
 		newThread.FlowID := p_Instance.FlowID
 		newThread.State := "finished" ;This means, the execution of the trigger has finished
@@ -64,7 +65,7 @@ removeThread(p_thread)
 	global 
 	;~ d(_execution.Instances[p_thread.Instanceid], "going to remove " p_thread.id)
 	_execution.Instances[p_thread.Instanceid].threads.delete(p_thread.id)
-	if (_execution.Instances[p_thread.Instanceid].threads.MaxIndex() = 0)
+	if (_execution.Instances[p_thread.Instanceid].threads.count() = 0)
 	{
 		removeInstance(_execution.Instances[p_thread.Instanceid])
 	}
@@ -73,7 +74,8 @@ removeThread(p_thread)
 
 removeInstance(p_instance)
 {
-	;~ d(_execution.Instances[p_instance.id], "going to remove " p_instance.id)
-	_execution.delete(p_instance.id)
-	;~ d(_execution.Instances[p_instance.id], "removed " p_instance.id)
+	global
+	;~ d(_execution, "going to remove " p_instance.id)
+	_execution.Instances.delete(p_instance.id)
+	;~ d(_execution, "removed " p_instance.id)
 }
