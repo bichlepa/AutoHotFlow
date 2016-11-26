@@ -42,21 +42,7 @@ x_GetVariableLocation(Environment, Varname)
 	global
 	return Var_GetLocation(Environment, Varname)
 }
-x_finish(Environment, Result, Message = "")
-{
-	global
-	Environment.State:="finished"
-	Environment.result:=Result
-	Environment.message:=Message
-	_flows[Environment.FlowID].allElements[Environment.ElementID].state:="finished"
-	_flows[Environment.FlowID].allElements[Environment.ElementID].lastrun:=a_tickcount
-	_flows[Environment.FlowID].draw.mustDraw:=true
-	if (result = "Exception")
-	{
-		ThreadVariable_Set(Environment,"a_ErrorMessage",Message,p_ContentType="Normal")
-	}
-		
-}
+
 
 x_NewUniqueExecutionID(Environment)
 {
@@ -96,6 +82,33 @@ x_GetExecutionValue(p_ExecutionID, p_name)
 	return global_AllExecutionIDs[p_ExecutionID].customValues[p_name]
 }
 
+x_NewExecutionFunctionObject(Environment, p_ExecutionID, p_ToCallFunction)
+{
+	oneFunctionObject:=new FunctionObject(Environment, p_ToCallFunction)
+	global_AllExecutionIDs[p_ExecutionID].ExecutionFunctionObjects[p_ToCallFunction]:=oneFunctionObject
+	return oneFunctionObject
+}
+
+
+; Function object which can be created
+class FunctionObject 
+{
+    __New(Environment, ToCallFunction) 
+	{
+        this.Environment := Environment
+        this.FunctionObject := ObjBindMethod(this, CallFunction)
+		this.ToCallFunction := ToCallFunction
+		return this.FunctionObject
+    }
+   
+    CallFunction() 
+	{
+        ToCallFunction:=this.ToCallFunction
+		%ToCallFunction%(this.Environment)
+    }
+}
+
+
 x_GetListOfAllVars(Environment)
 {
 	return Var_GetListOfAllVars(Environment)
@@ -119,4 +132,29 @@ x_GetListOfStaticVars(Environment)
 x_GetListOfGlobalVars(Environment)
 {
 	return Var_GetListOfGlobalVars(Environment)
+}
+
+;For elements
+x_finish(Environment, Result, Message = "")
+{
+	finishExecutionOfElement(Environment, Result, Message = "")
+	
+}
+;For triggers
+x_trigger(Environment)
+{
+	global
+	
+	newInstance(_flows[Environment.flowID])
+}
+
+x_enabled(Environment, Result, Message = "")
+{
+	global
+	saveResultOfTriggerEnabling(Environment, Result, Message)
+}
+x_disabled(Environment, Result, Message = "")
+{
+	global
+	saveResultOfTriggerDisabling(Environment, Result, Message)
 }

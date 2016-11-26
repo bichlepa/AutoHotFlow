@@ -52,6 +52,10 @@ x_GetExecutionValue(p_ExecutionID, p_name)
 {
 }
 
+x_NewExecutionFunctionObject(Environment, p_ExecutionID, p_ToCallFunction)
+{
+	
+}
 x_GetListOfAllVars(Environment)
 {
 }
@@ -69,4 +73,17 @@ x_GetListOfStaticVars(Environment)
 }
 x_GetListOfGlobalVars(Environment)
 {
+}
+
+x_trigger(Environment)
+{
+	
+}
+x_enabled(Environment, Result, Message = "")
+{
+	
+}
+x_disabled(Environment, Result, Message = "")
+{
+	
 }

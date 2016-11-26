@@ -27,6 +27,10 @@ lang_Init()
 #include Source_Execution\API\API receiver Execution.ahk
 #include Source_Execution\Variables\Variables.ahk
 #include Source_Execution\Variables\Expression.ahk
+#include Source_Execution\Trigger\Trigger.ahk
+
+AllElementClasses:=Object()
+AllTriggerClasses:=Object()
 
 ;PlaceholderIncludesOfElements
 
@@ -45,7 +49,7 @@ return
 exit_all()
 {
 	global
-	parentAHKThread.ahkFunction("Thread_Stopped", Global_ThisThreadID)
+	API_Main_Thread_Stopped(Global_ThisThreadID "") 
 }
 
 

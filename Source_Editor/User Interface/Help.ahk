@@ -36,7 +36,7 @@ ui_showHelp(helpFile)
 	local VirtualHeight
 	
 	Gui, Help:Destroy
-	
+	MsgBox %helpFile%
 	gui,Help:-dpiscale
 	helpfilepath=Help\%UILang%\%helpFile%.html
 	;~ MsgBox %helpfilepath%

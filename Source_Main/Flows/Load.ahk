@@ -5,8 +5,11 @@ LoadFlow(FlowID)
 	global
 	local FinishedSaving, ThisFlowFolder, tempValue, FlowCompabilityVersion, ID_count, index1, index2
 	local loadElement, loadElementID, loadElementType, loadElementTriggerContainer, loadElementClass
-	local AllSections, tempSection, tempContainerID, missingpackages
-
+	local AllSections, tempSection, tempContainerID, missingpackages, tempName
+	local AnyTriggerLoaded, OutdatedMainTriggerContainerData
+	
+	OutdatedMainTriggerContainerData:=Object()
+	
 	if (currentlyLoadingFlow = true)
 	{
 		MsgBox unexpected error. a flow is already currently loading
@@ -20,11 +23,11 @@ LoadFlow(FlowID)
 	missingpackages :=Object()
 	logger("a1", "Loading flow from file: " ThisFlowFilePath)
 	
+		;~ d(_flows, FlowID)
 	IfnotExist,%ThisFlowFolder%\%ThisFlowFilename%.ini
 	{
-		;~ d(_flows, FlowID)
-		logger("a0", "ERROR! Flow file does not exist!")
-		ExitApp
+		logger("a0", "ERROR! Flow file " ThisFlowFolder "\ "ThisFlowFilename ".ini" " does not exist!")
+		MsgBox % "ERROR! Flow file " ThisFlowFolder "\" ThisFlowFilename ".ini" " does not exist!"
 	}
 	
 	
@@ -36,7 +39,6 @@ LoadFlow(FlowID)
 	
 	_flows[FlowID].allElements:=CriticalObject()
 	_flows[FlowID].allConnections:=CriticalObject()
-	_flows[FlowID].allTriggers:=CriticalObject()
 	_flows[FlowID].markedElements:=CriticalObject()
 	_flows[FlowID].flowSettings:=CriticalObject()
 	_flows[FlowID].draw:=CriticalObject()
@@ -59,7 +61,7 @@ LoadFlow(FlowID)
 	
 	loadFlowGeneralParameters(FlowID) ;Outsourced in order to execute only that later when flow name changes
 	
-	Element_New(FlowID, "trigger", "trigger")
+	;~ Element_New(FlowID, "trigger", "trigger")
 	
 	;Loop through all ellements and load them
 	loop,parse,AllSections,`,
@@ -91,15 +93,13 @@ LoadFlow(FlowID)
 				_flows[FlowID].allConnections[loadElementID].fromPart:=RIni_GetKeyValue("IniFile", tempSection, "fromPart", "")
 				_flows[FlowID].allConnections[loadElementID].ToPart:=RIni_GetKeyValue("IniFile", tempSection, "ToPart", "")
 			}
-			else if (loadElementType="Trigger") ;this is the trigger container
+			else if (loadElementType="Trigger" && RIni_GetKeyValue("IniFile", tempSection, "class", "") =="") ;this is the outdated trigger container
 			{
-				loadElementID:=mainTriggerContainer
+				;~ MsgBox outdated trigger container found
+				OutdatedMainTriggerContainerData.id := loadElementID
+				OutdatedMainTriggerContainerData.x:=RIni_GetKeyValue("IniFile", tempSection, "x", 100)
+				OutdatedMainTriggerContainerData.y:=RIni_GetKeyValue("IniFile", tempSection, "y", 100)
 				
-				_flows[FlowID].allElements[loadElementID].x:=RIni_GetKeyValue("IniFile", tempSection, "x", 100)
-				_flows[FlowID].allElements[loadElementID].y:=RIni_GetKeyValue("IniFile", tempSection, "y", 100)
-				tempValue:=RIni_GetKeyValue("IniFile", tempSection, "name", "")
-				StringReplace, tempValue, tempValue, |¶,`n, All
-				_flows[FlowID].allElements[loadElementID].Name:=tempValue
 			}
 			else
 			{
@@ -125,7 +125,7 @@ LoadFlow(FlowID)
 					_flows[FlowID].allElements[loadElementID].Class := loadElementClass
 				}
 				loadElementClass:=_flows[FlowID].allElements[loadElementID].Class
-
+				
 				;If element class is not installed, prepare a warning message
 				if not (ObjHasValue(AllElementClasses,loadElementClass))
 				{
@@ -140,7 +140,11 @@ LoadFlow(FlowID)
 				{
 					_flows[FlowID].allElements[loadElementID].HeightOfVerticalBar:=RIni_GetKeyValue("IniFile", tempSection, "HeightOfVerticalBar", 200)
 				}
-				
+				if (loadElementType="trigger")
+				{
+					AnyTriggerLoaded:=true
+					;~ d(_flows[FlowID].allElements[loadElementID])
+				}
 				;Get the list of all parameters and read all parameters from ini
 				LoadFlowParametersOfElement(FlowID,_flows[FlowID].allElements,loadElementID,"IniFile",tempSection)
 				
@@ -175,32 +179,68 @@ LoadFlow(FlowID)
 		
 		IfInString,tempSection,trigger
 		{
-			tempContainerID:=RIni_GetKeyValue("IniFile", tempSection, "ContainerID", mainTriggerContainer)	;For later use. Maybe it will support multiple trigger container.
+			AnyTriggerLoaded:=True
+			element_New(FlowID, "trigger", loadElementID)
 			
-			trigger_new(FlowID, tempContainerID,loadElementID)
-			
-			_flows[FlowID].allTriggers[loadElementID].Type:=loadElementType
+			_flows[FlowID].allElements[loadElementID].Type:=loadElementType
 			
 			;~ d(loadElement.Containerid,1)
 			;~ d(allelements[loadElement.Containerid],1)
 			
 			tempValue:=RIni_GetKeyValue("IniFile", tempSection, "name", "")
 			StringReplace, tempValue, tempValue, |¶,`n, All
-			_flows[FlowID].allTriggers[loadElementID].Name:=tempValue
+			_flows[FlowID].allElements[loadElementID].Name:=tempValue
 			
+		
+			_flows[FlowID].allElements[loadElementID].subType:=RIni_GetKeyValue("IniFile", tempSection, "subType", "")
+			;Find out the trigger class
+			if (loadElementClass="")
+			{
+				_flows[FlowID].allElements[loadElementID].Class := _flows[FlowID].allElements[loadElementID].Type "_" _flows[FlowID].allElements[loadElementID].subType
+			}
+			else
+			{
+				_flows[FlowID].allElements[loadElementID].Class := loadElementClass
+			}
 			
-			_flows[FlowID].allTriggers[loadElementID].subType:=RIni_GetKeyValue("IniFile", tempSection, "subType", "")
+			;If element class is not installed, prepare a warning message
+			if not (ObjHasValue(AllTriggerClasses,loadElementClass))
+			{
+				;~ MsgBox % _flows[FlowID].allElements[loadElementID].Class "`n" loadElementPackage
+				if not (ObjHasValue(missingpackages,loadElementPackage))
+					missingpackages.push(loadElementPackage)
+			}
 			
-			LoadFlowParametersOfElement(FlowID,_flows[FlowID].allTriggers,loadElementID,"IniFile",tempSection)
+			;~ d(_flows[FlowID].allElements[loadElementID])
+			LoadFlowParametersOfElement(FlowID,_flows[FlowID].allElements,loadElementID,"IniFile",tempSection)
 			
-			LoadFlowCheckCompability(_flows[FlowID].allTriggers,loadElementID,tempSection,_flows[FlowID].CompabilityVersion)
+			LoadFlowCheckCompability(_flows[FlowID].allElements,loadElementID,tempSection,_flows[FlowID].CompabilityVersion)
 		}
 		
 	}
+	if not AnyTriggerLoaded
+	{
+		loadElementID := element_New(FlowID, "trigger")
+		Element_SetClass(FlowID, loadElementID, "Trigger_Manual")
+		;~ d(_flows[flowID].allelements[loadElementID])
+	}
+	LoadFlowCheckCompabilityOverall(_flows[FlowID],_flows[FlowID].CompabilityVersion, OutdatedMainTriggerContainerData)
+		;~ d(_flows[flowID].allelements[loadElementID])
+	
+	;Regenerate Names
+	for forElementID, forElement in _flows[FlowID].allElements
+	{
+		if (forElement.StandardName = True)
+		{
+			loadElementClass:=forElement.class
+			if isfunc(Element_GenerateName_%loadElementClass%)
+				forElement.name:=Element_GenerateName_%loadElementClass%(forElement.pars)
+			;~ d(forElement, Element_GenerateName_%loadElementClass%(forElement.pars))
+		}
+	}
+	
 	_flows[FlowID].loaded:=true
 	logger("a1","Flow " flowSettings.Name " was successfully loaded.")
-	
-	TriggerContainer_UpdateName(FlowID, mainTriggerContainer)
 	
 	;~ MsgBox % missingpackages.length()
 	if (missingpackages.length()>0)
@@ -249,14 +289,23 @@ loadFlowGeneralParameters(FlowID)
 LoadFlowParametersOfElement(FlowID,parList,parElementID,parlocation, parSection)
 {
 	global
-	local parametersToload, index, index2, parameter, parameterID, parameterDefault, tempContent, OneID, loadElementType, loadElementsubType
+	local parametersToload, index, index2, oneParameterDetail, parameter, parameterID, parameterDefault, tempContent, OneID, loadElementType, loadElementsubType
 
 	loadElementClass:=parList[parElementID].class
 	;~ d(parList,parElementID) 
 	parametersToload:=Element_getParameters_%loadElementClass%()
+	parametersToloadDetails:=Element_getParametrizationDetails_%loadElementClass%()
 	;~ d(parametersToload)
 	for index, oneParameterID in parametersToload
 	{
+		for index2, oneParameterDetail in parametersToloadDetails
+		{
+			if (oneParameterDetail.ID = oneParameterID)
+			{
+				parameterDefault:=oneParameterDetail.default
+				break
+			}
+		}
 		;~ MsgBox % _flows[FlowID].CompabilityVersion
 		if (_flows[FlowID].CompabilityVersion<=6)
 			tempContent:=RIni_GetKeyValue(parlocation, parSection, oneParameterID, "ẺⱤᶉӧɼ")
@@ -267,7 +316,7 @@ LoadFlowParametersOfElement(FlowID,parList,parElementID,parlocation, parSection)
 		if (tempContent=="ẺⱤᶉӧɼ") ;If a parameter is not set (maybe because some new parameters were added to this element after Update of AHF)
 		{
 			;~ MsgBox % "." strobj(parElement)
-			tempContent:=parameterDefault[index2]
+			tempContent:=parameterDefault
 		}
 		StringReplace, tempContent, tempContent, |¶,`n, All
 		parList[parElementID].pars[oneParameterID]:=tempContent

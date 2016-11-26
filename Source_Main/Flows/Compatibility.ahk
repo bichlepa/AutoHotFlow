@@ -1,4 +1,4 @@
-﻿FlowCompabilityVersionOfApp:=7 ;This variable contains a number which will be incremented as soon an incompability appears. This will make it possible to identify old scripts and convert them. This value will be written in any saved flows.
+﻿FlowCompabilityVersionOfApp:=8 ;This variable contains a number which will be incremented as soon an incompability appears. This will make it possible to identify old scripts and convert them. This value will be written in any saved flows.
 
 LoadFlowCheckCompability(p_List,p_ElementID,p_section,FlowCompabilityVersion)
 {
@@ -191,4 +191,50 @@ LoadFlowCheckCompabilitySubtype(p_List,p_ElementID,p_section)
 		
 	}
 	
+}
+
+
+LoadFlowCheckCompabilityOverall(p_FlowObj, p_FlowCompabilityVersion, p_OutdatedMainTriggerContainerData)
+{
+	if p_FlowCompabilityVersion<7 ; 2016.11.22 
+	{
+		;Trigger container which can contain multiple triggers removed. Each trigger is now an element just as other elements
+		for forElementID, forElement in p_FlowObj.allElements
+		{
+			if (forElement.type = "trigger")
+			{
+				forElement.x := p_OutdatedMainTriggerContainerData.x
+				forElement.y := p_OutdatedMainTriggerContainerData.y
+			}
+		}
+		copyOfAllConnection:= objfullyclone(p_FlowObj.allConnections)
+		for forConnectionID, forConnection in copyOfAllConnection
+		{
+			if (forConnection.from = p_OutdatedMainTriggerContainerData.id)
+			{
+				tempCount = 0
+				for forElementID, forElement in p_FlowObj.allElements
+				{
+					if (forElement.type = "trigger")
+					{
+						if (tempCount =0)
+						{
+							p_FlowObj.allConnections[forConnectionID].from := forElementID
+						}
+						else
+						{
+							newConnectionID := connection_new(p_FlowObj.ID)
+				
+							p_FlowObj.allConnections[newConnectionID].from:=forElementID
+							p_FlowObj.allConnections[newConnectionID].to:=forConnection.to
+							p_FlowObj.allConnections[newConnectionID].ConnectionType:=forConnection.ConnectionType
+							p_FlowObj.allConnections[newConnectionID].fromPart:=forConnection.fromPart
+							p_FlowObj.allConnections[newConnectionID].ToPart:=forConnection.ToPart
+						}
+						tempCount++
+					}
+				}
+			}
+		}
+	}
 }

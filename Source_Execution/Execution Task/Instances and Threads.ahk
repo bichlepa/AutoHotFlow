@@ -16,10 +16,11 @@ newInstance(p_Flow)
 			newInstance.id:= "instance" ++InstanceIDCOunter
 			newInstance.FlowID := p_Flow.id
 			newInstance.InstanceVars := CriticalObject()
-			newInstance.InstanceVars := CriticalObject()
 			newThread := newThread(newInstance)
 			_execution.Instances[newInstance.id]:=newInstance
 			newThread.ElementID := oneElementID
+			finishExecutionOfElement(newThread, "Normal")
+			ThreadVariable_Set(newThread,"A_TriggerTime",a_now,"Date")
 		}
 	}
 	return newInstance

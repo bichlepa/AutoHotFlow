@@ -112,15 +112,22 @@ else if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions
 	ui_ActionWhenMainGUIDisabled()
 	
 }
-else if (clickedElement="MenuCreateNewAction" or clickedElement="MenuCreateNewCondition" or clickedElement="MenuCreateNewLoop") ;User click either on "Create new action" or ".. condtion" in the drawn menu
+else if (clickedElement="MenuCreateNewAction" or clickedElement="MenuCreateNewCondition" or clickedElement="MenuCreateNewLoop" or clickedElement="MenuCreateNewTrigger") ;User click either on "Create new action" or ".. condtion" in the drawn menu
 {
-
+	;~ ToolTip %clickedElement%
 	if (clickedElement="MenuCreateNewAction")
 		tempNew:=API_Main_Element_New(FlowID, "action")
 	else if (clickedElement="MenuCreateNewCondition")
 		tempNew:=API_Main_Element_New(FlowID, "Condition")
-	else
+	else if (clickedElement="MenuCreateNewLoop")
 		tempNew:=API_Main_Element_New(FlowID, "Loop")
+	else if (clickedElement="MenuCreateNewTrigger")
+		tempNew:=API_Main_Element_New(FlowID, "Trigger")
+	else
+	{
+		MsgBox unexpected internal ERROR! A new element should be created. But I don't known which one!
+		return 
+	}
 	;~ MsgBox % d(FlowObj.allElements[tempNew],clickedElement )
 	
 	;function ui_moveSelectedElements() needs the following four lines of code
@@ -403,8 +410,10 @@ ui_findElementUnderMouse(par_mode="default")
 			clickedElement = MenuCreateNewAction
 		if (((FlowObj.draw.NewElementIconWidth * 1.2) < mx) and (0 < my) and ((FlowObj.draw.NewElementIconWidth * 1.2 * 2)  > mx) and ((FlowObj.draw.NewElementIconHeight * 1.2) > my))
 			clickedElement = MenuCreateNewCondition
-		if (((FlowObj.draw.NewElementIconWidth * 2.4) < mx) and (0 < my) and ((NFlowObj.draw.ewElementIconWidth * 1.2 * 3)  > mx) and ((FlowObj.draw.NewElementIconHeight * 1.2) > my))
+		if (((FlowObj.draw.NewElementIconWidth * 1.2 * 2) < mx) and (0 < my) and ((FlowObj.draw.NewElementIconWidth * 1.2 * 3)  > mx) and ((FlowObj.draw.NewElementIconHeight * 1.2) > my))
 			clickedElement = MenuCreateNewLoop
+		if (((FlowObj.draw.NewElementIconWidth * 1.2 * 3) < mx) and (0 < my) and ((FlowObj.draw.NewElementIconWidth * 1.2 * 4)  > mx) and ((FlowObj.draw.NewElementIconHeight * 1.2) > my))
+			clickedElement = MenuCreateNewTrigger
 	
 
 		;~ ToolTip % share.PlusButtonExist " -" FlowObj.draw.middlePointOfPlusButtonX

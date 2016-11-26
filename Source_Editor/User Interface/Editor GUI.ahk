@@ -32,7 +32,7 @@ EditorGUIInit()
 	
 	
 	initializeMenuBar()
-	
+	ui_UpdateStatusbartext()
 	;~ MsgBox %StatusBarHeight%
 	
 	;Set some hotkeys that are needed in main window 

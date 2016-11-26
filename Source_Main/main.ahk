@@ -40,13 +40,19 @@ lang_Init()
 #include source_Common\Defaults\Default values.ahk
 
 AllElementClasses:=Object()
+AllTriggerClasses:=Object()
+
+
 ;Element_Includes_Start
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\New_Variable.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\Tooltip.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Conditions\Debug_dialog.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Conditions\Expression.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Triggers\Hotkey.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Triggers\Manual.ahk
 
 ;Element_Includes_End
+
 
 
 init_GlobalVars()

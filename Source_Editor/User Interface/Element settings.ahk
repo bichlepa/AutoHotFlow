@@ -4,13 +4,6 @@ temp:=lang("Action")
 temp:=lang("Condition")
 temp:=lang("Loop")
 
-/* prototypes
-selectContainerType(parelement, "wait")
-selectConnectionType(parelement,"wait")
-selectSubType(parElement,"wait")
-ElementSettings.open(newElement,"wait")
-ElementSettings.selectTrigger("wait")
-*/
 
 class ElementSettings
 {
@@ -33,51 +26,7 @@ class ElementSettings
 		Parameterwait:=wait
 		;~ MsgBox % strobj(setElement)
 		
-		;At first check whether other settings must be opened first
-		if (setElement.Type="Trigger")
-		{
-			if (setElement.ID="trigger")
-			{
-				ElementSettingsGOTOPointIfATriggerWasDeleted:
-				;~ MsgBox % setElement.triggers.count()
-				if (setElement.triggers.count()>0)
-				{
-					tempres:=this.selectTrigger("wait")
-					;~ MsgBox % tempres
-					if tempres=aborted
-					{
-						this.close()
-						return tempres
-					}
-					if tempres=deleted
-					{
-						new state()
-						goto ElementSettingsGOTOPointIfATriggerWasDeleted 
-					}
-					setElement:=ParElement
-				}
-				else
-				{
-					tempelement:=new trigger(setElement.id)
-					;~ MsgBox % strobj(tempelement)
-					tempres:=selectsubtype(tempelement,"wait")
-					if tempres=aborted
-					{
-						this.close()
-						return tempres
-					}
-					else
-					{
-						this.element:=flowObj.alltriggers[tempelement]
-						setElement:=this.element
-						setElementID:=tempelement
-						setElementType:=tempelement.Type
-						setElementClass:=tempelement.class
-					}
-				}
-			}
-			
-		}
+		
 		NowResultEditingElement:=""
 		
 		
@@ -89,26 +38,22 @@ class ElementSettings
 		ElementSettingsFieldParIDs:={} ;global. Contains the field hwnds and the field object. Needed for responding user input
 		
 		EditGUIDisable()
+		
+		;Create a scrollable Child GUI will almost all controls
 		gui,SettingsOfElement:default
+		gui +hwndSettingWindowHWND
+		gui +vscroll
 		gui,-DPIScale
-		;~ gui,font,s8 cDefault wnorm
-		;~ gui,add,button,w370 x10 gGUISettingsOfElementSelectType,% lang("%1%_type:_%2%",lang(setElementType),getname%setElementType%%setElementsubType%())
-		;~ gui,add,button,w20 x10 X+10 yp gGUISettingsOfElementHelp,?
-		;~ gui,font,s10 cnavy wbold
-		;~ gui,add,text,x10 w400,Name
-		;~ gui,font,s8 cDefault wnorm
-		;~ gui,add,checkbox, x10 vGUISettingsOfElementCheckStandardName gGUISettingsOfElementCheckStandardName,% lang("Standard_name")
-		;~ gui,add,edit,w400 x10 Multi r5 vGUISettingsOfElementEditName gGUISettingsOfElementUpdateName,% setElement.name
-		gui,+hwndSettingsGUIHWND
-		CurrentlyActiveWindowHWND:=SettingsGUIHWND
+		CurrentlyActiveWindowHWND:=SettingWindowHWND
 		
-		
+		;Get the parameter list
 		openingElementSettingsWindow:=true ;Allows some elements to initialize their parameter list. (such as in "play sound": find all system sound)
 		try
 			parametersToEdit:=Element_getParametrizationDetails_%setElementClass%(true)
 		catch
 			parametersToEdit:=Element_getParametrizationDetails_%setElementClass%() ;TODO: all elements should accept one parameter
 		
+		;All elements have the parameter "name" and "defaultname"
 		ElementSettingsFields.push(new this.label({label: lang("name (name)")}))
 		ElementSettingsFields.push(new this.name({id: ["name", "defaultname"]}))
 		
@@ -177,82 +122,78 @@ class ElementSettings
 		
 		
 		
-		;Create scrollable GUI
-		gui +hwndSettingWindowHWND
-		;~ d(instance,52345)
-		SG2 := New ScrollGUI(SettingWindowHWND,600, A_ScreenHeight*0.8, "-dpiscale",2,2)
-		;~ d(instance,45234)
-		; Create the main window (parent)
-		Gui, GUISettingsOfElementParent:New
-		;~ d(instance,4849)
-		gui,GUISettingsOfElementParent:-DPIScale
-		;~ d(instance,13223213)
-		Gui, GUISettingsOfElementParent:Margin, 0, 20
-		;~ d(instance,54668)
 		
-		Gui, % SG2.HWND . ": -Caption +ParentGUISettingsOfElementParent +LastFound"
-		Gui, % SG2.HWND . ":Show", Hide  y25
-		;~ d(instance,1891)
-		WinGetPos, , , WsettingsParent, HsettingsParent,% "ahk_id " SG2.HWND
-		;~ W := Round(W * (96 / A_ScreenDPI))
-		;~ H := Round(H * (96 / A_ScreenDPI))
-		YsettingsButtoPos := HsettingsParent + 10
-		WinGetPos, , , Wsettings, Hsettings,% "ahk_id " SG2.HGUI
-		HParent:=Hsettings+90
-		;Make resizeable
-		gui,+hwndSettingWindowParentHWND
-		gui,+LabelSettingsOfElementParent
-		gui,+resize
-		gui,+minsize%WsettingsParent%x200 ;Ensure constant width.
-		gui,+maxsize%WsettingsParent%x%HParent%
-		;~ d(instance,2634)
+		; Create the parent window which contains some always visible controls (which are not scrolled away)
+		Gui, GUISettingsOfElementParent:New
+		gui, GUISettingsOfElementParent:-DPIScale
+		Gui, GUISettingsOfElementParent:Margin, 0, 20
+		gui,GUISettingsOfElementParent:+resize
+		gui,GUISettingsOfElementParent:+hwndSettingWindowParentHWND
+		gui,GUISettingsOfElementParent:+LabelSettingsOfElementParent
+		
+		;Make the child window appear inside the parent window
+		Gui, SettingsOfElement:-Caption
+		Gui, SettingsOfElement:+parentGUISettingsOfElementParent
+		gui, SettingsOfElement:show,x0 y20
+		
+		
+		;Get the size of the child window
+		WinGetPos, , , WsettingsChild, HsettingsChild,% "ahk_id " SettingWindowHWND
+		Winmove,% "ahk_id " SettingWindowHWND, ,, , % WsettingsChild + 10, % HsettingsChild
+		WinGetPos, , , WsettingsChild, HsettingsChild,% "ahk_id " SettingWindowHWND
+		
+		;Calculate the position of controls which are outside the child window (this is temporary calculation. it will be recalculated in the size-routine)
+		YsettingsButtoPos := HsettingsChild + 30
+		HSettingsParent:=HsettingsChild + 90
+		WSettingsParent:=WsettingsChild
+		;~ MsgBox %HSettingsParent% - %WSettingsParent% , %YsettingsButtoPos%
+		
+		;Define minimal and maximal size of the parent window
+		gui,GUISettingsOfElementParent:+minsize%WSettingsParent%x200 ;Ensure constant width.
+		gui,GUISettingsOfElementParent:+maxsize%WSettingsParent%x%HSettingsParent%
+		
+		
+		
 		;add buttons
-		gui,font,s8 cDefault wnorm
+		gui,GUISettingsOfElementParent:font,s8 cDefault wnorm
 		gui, GUISettingsOfElementParent:add,button, w370 x10 y10 gGUISettingsOfElementSelectType h20,% lang("%1%_type:_%2%",lang(setElementType),Element_getName_%setElementClass%())
 		gui, GUISettingsOfElementParent:add,button, w20 X+10 yp h20 gGUISettingsOfElementHelp vGUISettingsOfElementHelp,?
 		;~ guicontrol,focus,GUISettingsOfElementHelp
 		Gui, GUISettingsOfElementParent:Add, Button, gGUISettingsOfElementSave vButtonSave w145 x10 h30 y%YsettingsButtoPos%,% lang("Save")
 		Gui, GUISettingsOfElementParent:Add, Button, gGUISettingsOfElementCancel vButtonCancel default w145 h30 yp X+10,% lang("Cancel")
 		;Make GUI autosizing
-		Gui, GUISettingsOfElementParent:Show, hide w%WsettingsParent%
-		Gui, GUISettingsOfElementParent:Show, hide w%WsettingsParent%,% lang("Settings") " - " lang(Element.type) " - " Element_getName_%setElementClass%() ;Needed twice, otherwise the width is not correct
-		; Show ScrollGUI1
-		;~ Return
-		;~ d(instance,635)
+		Gui, GUISettingsOfElementParent:Show, hide w%WSettingsParent%,% lang("Settings") " - " lang(setElementType) " - " Element_getName_%setElementClass%()
+		
+		
+		
 		;Calculate position to show the settings window in the middle of the main window
 		pos:=EditGUIGetPos()
 		tempHeight:=round(pos.h-100) ;This will be the max height. If child gui is larger, it must be scrolled
 		DetectHiddenWindows,on
 		WinGetPos,ElSetingGUIX,ElSetingGUIY,ElSetingGUIW,ElSetingGUIH,ahk_id %SettingWindowParentHWND%
+		if (ElSetingGUIH < tempHeight)
+			tempHeight := ElSetingGUIH
 		tempXpos:=round(pos.x+pos.w/2- ElSetingGUIW/2)
 		tempYpos:=round(pos.y+pos.h/2- tempHeight/2)
+		
 		;move Parent window
 		gui,GUISettingsOfElementParent:show,% "x" tempXpos " y" tempYpos " h" tempHeight " hide" 
 		
-		;~ SetWinDelay,0
-		;~ Gui, % SG2.HWND . ":Show", Hide  y40
-		;Make ScrollGUI autosize 
-		;~ d(instance,84946516)
-		SG2.Show("", "x0 y40 h" tempHeight " hide ")
-		;~ d(instance,7347)
+		
 		;position lower buttons
-		GetClientSize(SettingWindowParentHWND, ElSetingGUIW, ElSetingGUIH)
-		guicontrol, GUISettingsOfElementParent:move,ButtonSave,% "y" ElSetingGUIH-40
-		guicontrol, GUISettingsOfElementParent:move,ButtonCancel,% "y" ElSetingGUIH-40
-		;Position the Scroll gui
-		wingetpos,,,ElSetingGUIW,ElSetingGUIH,ahk_id %SettingWindowParentHWND%
+		wingetpos,,,ElSetingGUIW,ElSetingGUIH, ahk_id %SettingWindowParentHWND%
 		WinMove,ahk_id %SettingWindowParentHWND%,,,,% ElSetingGUIW,% ElSetingGUIH+1 ;make the autosize function trigger, which resizes and moves the scrollgui
-		;~ d(instance,2346346)
-		;show gui
-		SG2.Show() 
+		
+		
 		
 		CurrentlyActiveWindowHWND:=SettingWindowParentHWND
 		
 		openingElementSettingsWindow:=false
 		
 		ElementSettingsNameField.updatename()
-			
+		
 		gui,GUISettingsOfElementParent:show
+		
 		
 		if (wait=1 or wait="wait") ;Wait until user closes the window
 		{
@@ -270,20 +211,19 @@ class ElementSettings
 		;If user wants to change the subtype of the element
 		GUISettingsOfElementSelectType:
 		gui,SettingsOfElement:destroy
-		SG2.Destroy()
 		gui,GUISettingsOfElementParent:destroy
 		ui_closeHelp() 
 		EditGUIEnable()
 		
-		tempres:=selectSubType(setelement, "wait")
+		tempres:=selectSubType(setElement.id, "wait")
 		if tempres!=aborted
-			NowResultEditingElement:= ElementSettings.open(setelement,Parameterwait)
+			NowResultEditingElement:= ElementSettings.open(setelement.id,Parameterwait)
 		else 
 		{
 			NowResultEditingElement:="aborted"
 			return
 		}
-		
+		return
 		
 		GUISettingsOfElementHelp:
 		
@@ -315,7 +255,6 @@ class ElementSettings
 		ui_closeHelp() 
 		
 		gui,SettingsOfElement:destroy
-		SG2.Destroy()
 		gui,GUISettingsOfElementParent:destroy
 		
 		GUISettingsOfElementRemoveInfoTooltip()
@@ -376,7 +315,6 @@ class ElementSettings
 		temponeValue:=""
 		
 		ui_closeHelp() 
-		SG2.Destroy()
 		gui,SettingsOfElement:destroy
 		gui,GUISettingsOfElementParent:destroy
 		GUISettingsOfElementRemoveInfoTooltip()
@@ -1506,152 +1444,7 @@ class ElementSettings
 	
 	
 	
-	;When user wants to edit a trigger element, open a list with containing triggers
-	selectTrigger(wait)
-	{
-		global flowObj
-		global CurrentlyActiveWindowHWND
-		global GUISettingsOfElementObject
-		static NowResultEditingElement
-		static GuiTriggerChoose
-		setElement:=this.element
-		
-		
-		NowResultEditingElement:=""
-		
-		
-		
-		TriggersCount:=setElement.triggers.MaxIndex()
-		
-		;~ MsgBox % strobj(setElement)
-		
-		static tempTriggers=[]
-		tempTriggerNames=
-		for index, temptrigger in setElement.triggers
-		{
-			tempTriggers[a_index]:=temptrigger
-			tempTriggerNames.=temptrigger.name "|"
-		}
-		StringTrimRight,tempTriggerNames,tempTriggerNames,1
-		StringSplit,tempTriggerNames,tempTriggerNames,|
-		if (TempTriggerCount=0)
-		{
-			trigger:=new trigger()
-			selectSubType(trigger)
-			return 
-		}
-		else
-		{
-			
-			EditGUIDisable()
-			;~ gui,GUITrigger:default
-			gui,GUITrigger:-DPIScale
-			;~ gui,+owner
-			gui,GUITrigger:+hwndSettingsHWND
-			this.hwnd:=settingsHWND
-			gui,GUITrigger:add,text,w300,% lang("Select_a_trigger")
-			gui,GUITrigger:add,ListBox,w400 h500 vGuiTriggerChoose gGuiTriggerChoose AltSubmit choose1,%temptriggerNames%
-			gui,GUITrigger:add,button,w100 h30 gGuiTriggerOK default,% lang("OK")
-			gui,GUITrigger:add,button,w90 h30 X+10 gGuiTriggerNew,% lang("New_Trigger")
-			gui,GUITrigger:add,button,w90 X+10 h30 gGuiTriggerDelete,% lang("Delete_Trigger")
-			gui,GUITrigger:add,button,w90 X+10 h30 yp gGuiTriggerCancel,% lang("Cancel")
-			
-			pos:=EditGUIGetPos()
-
-			gui,GUITrigger:show,hide
-			;Put the window in the center of the main window
-			DetectHiddenWindows,on
-			wingetpos,,,tempWidth,tempHeight,ahk_id %SettingsHWND%
-			tempXpos:=round(pos.x+pos.w/2- tempWidth/2)
-			tempYpos:=round(pos.y+pos.h/2- tempHeight/2)
-			
-			gui,GUITrigger:show,x%tempXpos% y%tempYpos%
-			CurrentlyActiveWindowHWND:=SettingsHWND
-			
-			
-			if (wait=1 or wait="wait")
-			{
-				Loop
-				{
-					if (NowResultEditingElement="")
-						sleep 100
-					else 
-						break
-				}
-			}
-			
-			
-			return NowResultEditingElement
-			
-			GuiTriggerChoose:
-			if A_GuiEvent !=DoubleClick 
-				return
-			
-			GuiTriggerOK:
-			gui,GUITrigger:submit
-			
-			;MsgBox %tempElementID%--- %A_EventInfo%
-			gui,GUITrigger:destroy
-			;~ WinActivate,·AutoHotFlow·   ;TODO: warum???
-			;~ MsgBox % GuiTriggerChoose "`n" strobj(tempTriggers[GuiTriggerChoose])
-			GUISettingsOfElementObject.element:=tempTriggers[GuiTriggerChoose]
-			NowResultEditingElement:="OK"
-			return
-			
-			GuiTriggerNew:
-			gui,GUITrigger:destroy
-			EditGUIDisable()
-			triggerNNew:=new trigger(GUISettingsOfElementObject.element)
-			ret:=selectSubType(triggerNNew,"wait")
-			if (ret="aborted")
-			{
-				;~ MsgBox % strobj(GUISettingsOfElementObject.element.triggers)
-				triggerNNew.remove()
-				NowResultEditingElement:="aborted"
-			}
-			else
-			{
-				;~ MsgBox asgesdfawe
-				GUISettingsOfElementObject.Close()
-				ElementSettings.editParameters(triggerNNew)
-				NowResultEditingElement:="New"
-			}
-			triggerNNew:=""
-			return
-			
-			GuiTriggerDelete:
-			gui,GUITrigger:submit
-			
-			if (setElement.type="trigger" and triggersEnabled=true) ;When editing a trigger, disable Triggers and enable them afterwards
-			{
-				tempReenablethen:=true
-				;r_EnableFlow() ;TODO
-			}
-			else
-				tempReenablethen:=false
-			
-			tempTriggers[GuiTriggerChoose].remove() 
-			tempTriggers:=[]
-			
-			gui,GUITrigger:destroy
-			
-			NowResultEditingElement:="deleted"
-			GUISettingsOfElementObject.element.UpdateName()
-			
-			;if (tempReenablethen) ;TODO
-				;r_EnableFlow()
-			return
-			
-			
-			GuiTriggerCancel:
-			GUITriggerGuiClose:
-			gui,GUITrigger:default
-			gui,GUITrigger:destroy
-			EditGUIEnable()
-			NowResultEditingElement:="aborted"
-			return
-		}
-	}
+	
 	
 	;Delete some variables on exit
 	close()
@@ -1675,6 +1468,9 @@ class ElementSettings
 }
 
 
+
+
+
 ;Called when the GUI is resized by user
 SettingsOfElementParentSize(GuiHwnd, EventInfo, Width, Height)
 {
@@ -1684,12 +1480,12 @@ SettingsOfElementParentSize(GuiHwnd, EventInfo, Width, Height)
 	{
 		;~ GuiHwnd+=0
 		SetWinDelay,0
-		GetClientSize(SettingWindowParentHWND, ElSetingGUIW, ElSetingGUIH) ;Sometimes for some reason the width and height parameters are not correct. therefore get the gui size again
+		GetClientSize(SettingWindowParentHWND, ElSetingGUIW, ElSetingGUIH) ;Sometimes for any reason the width and height parameters are not correct. therefore get the gui size again
 		guicontrol, GUISettingsOfElementParent:move,ButtonSave,% "y" ElSetingGUIH-40
 		guicontrol, GUISettingsOfElementParent:move,ButtonCancel,% "y" ElSetingGUIH-40
-		winmove,% "ahk_id " SG2.HWND,  , 0, 40,  ,% ElSetingGUIH-90
+		winmove,% "ahk_id " SettingWindowHWND,  , 0, 30,  ,% ElSetingGUIH-90
 		;~ if not a_iscompiled
-			;~ ToolTip %GuiHwnd% %Width% %Height% - %ElSetingGUIW% %ElSetingGUIH%
+			;~ ToolTip %GuiHwnd% %Width% %Height% - %ElSetingGUIW% %ElSetingGUIH% - %SettingWindowHWND% %SettingWindowParentHWND%
 	}
 	Return
 }
@@ -1785,438 +1581,4 @@ GUISettingsOfElementWeekdays(CtrlHwnd, GuiEvent="", EventInfo="", ErrorLevell=""
 	
 	
 }
-
-
-
-
-
-
-
-
-
-
-
-
-;Called, when some additional functions are used, e.g. get window informations
-ui_disableElementSettingsWindow()
-{
-	global
-	
-	gui,SettingsOfElement:+disabled
-}
-
-ui_EnableElementSettingsWindow()
-{
-	global
-	
-	gui,SettingsOfElement:-disabled
-	WinActivate,% "·AutoHotFlow· " lang("Settings")
-}
-
-
-
-
-;Select element subtype
-selectSubType(p_ID,wait="")
-{
-	global
-	static NowResultEditingElement
-	setElementID:=p_ID
-	setElement:=flowObj.allElements[p_ID]
-	setElementType:=setElement.type 
-	local matchingElementClasses:=Object()
-	local allCategories:=Object()
-	local tempcategory
-	
-	NowResultEditingElement:=""
-	
-	;~ d(AllElementClasses)
-	for forelementIndex, forElementClass in AllElementClasses
-	{
-		if (Element_getElementType_%forElementClass%() = setElementType)
-		{
-			matchingElementClasses.push(forElementClass)
-			tempcategory:=Element_getCategory_%forElementClass%()
-			
-			StringSplit,tempcategory,tempcategory,|
-			;MsgBox %tempElementCategory1%
-			loop %tempcategory0%
-			{
-				if not (objhasvalue(allCategories,tempcategory%a_index%))
-					allCategories.push(tempcategory%a_index%)
-			}
-		}
-	}
-	if not (matchingElementClasses.MaxIndex()>0)
-		MsgBox,Internal Error: No elements found of type: %setElementType%
-	
-	EditGUIDisable()
-	gui,3:default
-	
-	gui,destroy
-	gui,-dpiscale
-	gui,font,s12
-	gui,add,text,,% lang("Which_%1% should be created?", lang(setElementType))
-	gui,add,TreeView,w400 h500 vGuiElementChoose gGuiElementChoose AltSubmit
-	gui,add,Button,w250 gGuiElementChooseOK vGuiElementChooseOK default Disabled,% lang("OK")
-	gui,add,Button,w140 X+10 yp gGuiElementChooseCancel,% lang("Cancel")
-	
-	TVnum:=Object()
-	TVID:=Object()
-	TVSubType:=Object()
-	TVClass:=Object()
-	for forindex, forcategory in allCategories ;add all categories to the treeview
-	{
-		tempcategoryTV%forindex%:=TV_Add(forcategory)
-	}
-	for forelementIndex, forElementClass in matchingElementClasses
-	{
-		tempcategory:=Element_getCategory_%forElementClass%()
-		;MsgBox %tempElementCategory%
-		StringSplit,tempcategory,tempcategory,|
-		;MsgBox %tempElementCategory1%
-		loop %tempcategory0%
-		{
-			;MsgBox %tempElementCategory1%
-			tempAnCategory:=tempcategory%A_Index%
-			for forindex, forcategory in allCategories
-			{
-				if (tempAnCategory = forcategory)
-					tempcategoryTV:=tempcategoryTV%forindex%
-			}
-			tempTV:=TV_Add(Element_getName_%forElementClass%(),tempcategoryTV)
-			TVnum[tempTV]:=forelementIndex
-			TVID[tempTV]:=setElementID
-			TVClass[tempTV]:=forElementClass
-			if (setElement.class=forElementClass) ;Select the current element type, if any
-				TV_Modify(tempTV) 
-		}
-		
-	}
-	
-	
-	;Put the window in the center of the main window
-	gui,+hwndSettingsHWND
-	CurrentlyActiveWindowHWND:=SettingsHWND
-	gui,show,hide
-	pos:=EditGUIGetPos()
-	DetectHiddenWindows,on
-	wingetpos,,,tempWidth,tempHeight,ahk_id %SettingsHWND%
-	tempXpos:=round(pos.x+pos.w/2- tempWidth/2)
-	tempYpos:=round(pos.y+pos.h/2- tempHeight/2)
-	;~ d(TVnum)
-	gui,show,x%tempXpos% y%tempYpos%
-	
-	if (wait=1 or wait="wait")
-	{
-		Loop
-		{
-			if (NowResultEditingElement="")
-				sleep 100
-			else 
-			{
-				if (NowResultEditingElement!="aborted")
-				{
-					setElement.subtype:=NowResultEditingElement
-					setElement.setUnsetDefaults()
-				}
-				break
-			}
-		}
-		
-		EditGUIEnable()
-	}
-	
-	;~ MsgBox
-	return NowResultEditingElement
-
-	3guiclose:
-	GuiElementChooseCancel:
-	gui,3:default
-	gui,destroy
-	if (setElement.SubType="" and setElement.Type!="Trigger")
-	{
-		API_Main_Element_Remove(FlowID, setElement.id)
-		;~ API_Main_Draw()
-	}
-	else if (setElement.Type="Trigger" and setElement.SubType="") ;Remove trigger if it was a new one
-	{
-		;~ MsgBox awgagasdgfwe
-		setElement.remove()
-		
-	}
-	NowResultEditingElement=aborted
-	EditGUIEnable()
-	return
-	GuiElementChoose:
-	gui,3:default
-	if A_GuiEvent =DoubleClick 
-		goto GuiElementChooseOK
-	GuiElementChoosedTV:=TV_GetSelection()
-	;~ ToolTip %GuiElementChoosedTV%
-	gui,submit,nohide
-	if TVnum[GuiElementChoosedTV]>0	
-		GuiControl,enable,GuiElementChooseOK
-	else
-		GuiControl,disable,GuiElementChooseOK
-	
-	return
-	GuiElementChooseOK:
-	
-	gui,3:default
-	gui,Submit,nohide
-	GuiElementChoosedTV:=TV_GetSelection()
-	TV_GetText(GuiElementChoosedText, TV_GetSelection())
-	GuiElementChoosedID:=TVID[GuiElementChoosedTV]
-	if GuiElementChoosedID=
-		return
-	gui,destroy
-	EditGUIEnable()
-	
-	API_Main_Element_SetClass(FlowID,setElementID,TVClass[GuiElementChoosedTV])
-	
-	;MsgBox,%setElementID% %GuiElementChoose%
-	
-	
-	NowResultEditingElement:=TVClass[GuiElementChoosedTV]
-	
-	;~ MsgBox %setElementID%
-	EditGUIEnable()
-	;~ ElementSettings.open(setElementID,wait)
-	
-	return 
-	
-}
-
-
-
-
-;Select connection type
-selectConnectionType(p_ID,wait="")
-{
-	global 
-	static NowResultEditingElement, setElement, temp_from, ConnectionType
-	
-	NowResultEditingElement:=""
-	
-	setElementID:=p_ID
-	setElement:=flowObj.allConnections[p_ID]
-	temp_from:=flowObj.allelements[setElement.from]
-	ConnectionType:=setElement.Type
-	
-	
-	EditGUIDisable()
-	gui, 7:default
-	gui,font,s12
-	gui,add,text,,% lang("Select_Connection_type")
-		
-	
-	if (temp_from.type="Condition")
-	{
-		if (setElement.Type="exception")
-		{
-			gui,add,Button,w100 h50 gGuiConnectionChooseTrue vGuiConnectionChooseTrue ,% lang("Yes")
-			gui,add,Button,w100 h50 X+10 gGuiConnectionChooseFalse vGuiConnectionChooseFalse,% lang("No")
-			gui,add,Button,w100 h50 X+10 gGuiConnectionChooseException vGuiConnectionChooseException default,% lang("Exception")
-		}
-		else if (setElement.Type="no")
-		{
-			gui,add,Button,w100 h50 gGuiConnectionChooseTrue vGuiConnectionChooseTrue ,% lang("Yes")
-			gui,add,Button,w100 h50 X+10 gGuiConnectionChooseFalse vGuiConnectionChooseFalse default,% lang("No")
-			gui,add,Button,w100 h50 X+10 gGuiConnectionChooseException vGuiConnectionChooseException ,% lang("Exception")
-		}
-		else
-		{
-			gui,add,Button,w100 h50 gGuiConnectionChooseTrue vGuiConnectionChooseTrue default,% lang("Yes")
-			gui,add,Button,w100 h50 X+10 gGuiConnectionChooseFalse vGuiConnectionChooseFalse,% lang("No")
-			gui,add,Button,w100 h50 X+10 gGuiConnectionChooseException vGuiConnectionChooseException ,% lang("Exception")
-		}
-		
-		
-		
-		
-	}
-	else
-	{
-		if (setElement.Type="exception")
-		{
-			gui,add,Button,w100 h50 gGuiConnectionChooseNormal vGuiConnectionChooseNormal,% lang("Normal")
-			gui,add,Button,w100 h50 X+10 gGuiConnectionChooseException vGuiConnectionChooseException default,% lang("Exception")
-		}
-		else
-		{
-			gui,add,Button,w100 h50 gGuiConnectionChooseNormal vGuiConnectionChooseNormal default,% lang("Normal")
-			gui,add,Button,w100 h50 X+10 gGuiConnectionChooseException vGuiConnectionChooseException ,% lang("Exception")
-		}
-		
-
-		
-	}
-	
-	gui,add,Button,w90 Y+10 gGuiConnectionChooseCancel,% lang("Cancel")
-	;Put the window in the center of the main window
-	gui,+hwndSettingsHWND
-	CurrentlyActiveWindowHWND:=SettingsHWND
-	gui,show,hide
-	pos:=EditGUIGetPos()
-	DetectHiddenWindows,on
-	wingetpos,,,tempWidth,tempHeight,ahk_id %SettingsHWND%
-	tempXpos:=round(pos.x+pos.w/2- tempWidth/2)
-	tempYpos:=round(pos.y+pos.h/2- tempHeight/2)
-	;~ d(pos, tempWidth "-" tempHeight "-" tempXpos "-" tempYpos "#" SettingsHWND)
-	gui,show,x%tempXpos% y%tempYpos%
-	
-	if (wait=1 or wait="wait")
-	{
-		Loop
-		{
-			if (NowResultEditingElement="")
-				sleep 100
-			else 
-			{
-				if (NowResultEditingElement!="aborted")
-					setElement.ConnectionType:=NowResultEditingElement
-				break
-			}
-		}
-	}
-	return NowResultEditingElement
-	
-	
-	7guiclose:
-	GuiConnectionChooseCancel:
-	gui,destroy
-	EditGUIEnable()
-	NowResultEditingElement:="aborted"
-	return 
-	
-	GuiConnectionChooseTrue:
-	gui,destroy
-	EditGUIEnable()
-	NowResultEditingElement:="yes"
-	setElement.ConnectionType:=NowResultEditingElement
-	return
-	
-	GuiConnectionChooseFalse:
-	gui,destroy
-	EditGUIEnable()
-	NowResultEditingElement:="no"
-	setElement.ConnectionType:=NowResultEditingElement
-	return 
-	
-	GuiConnectionChooseException:
-	gui,destroy
-	EditGUIEnable()
-	NowResultEditingElement:="exception"
-	setElement.ConnectionType:=NowResultEditingElement
-	return 
-	
-	GuiConnectionChooseNormal:
-	gui,destroy
-	EditGUIEnable()
-	NowResultEditingElement:="normal"
-	setElement.ConnectionType:=NowResultEditingElement
-	return 
-	
-	
-}
-
-;Select container type
-selectContainerType(p_ID, wait="")
-{
-	global 
-	static NowResultEditingElement
-	NowResultEditingElement:=""
-	setElementID:=p_ID
-	setElement:=flowObj.allElements[p_ID]
-	EditGUIDisable()
-	gui, 8:default
-	
-
-	gui,font,s12
-	gui,add,text,,% lang("Select_element_type")
-		
-	
-	if (setElement.type="Action" or setElement.type="")
-	{
-		gui,add,Button,w100 h50 gGuiElementTypeChooseAction gGuiElementTypeChooseAction default,% lang("Action")
-		gui,add,Button,w100 h50 X+10 gGuiElementTypeChooseCondition gGuiElementTypeChooseCondition,% lang("Condition")
-		gui,add,Button,w100 h50 X+10 gGuiElementTypeChooseLoop gGuiElementTypeChooseLoop,% lang("Loop")
-		
-	}
-	else
-	{
-		gui,add,Button,w100 h50 gGuiElementTypeChooseAction gGuiElementTypeChooseAction ,% lang("Action")
-		gui,add,Button,w100 h50 X+10  gGuiElementTypeChooseCondition gGuiElementTypeChooseCondition default,% lang("Condition")
-		gui,add,Button,w100 h50 X+10 gGuiElementTypeChooseLoop gGuiElementTypeChooseLoop,% lang("Loop")
-
-		
-	}
-	
-	gui,add,Button,w90  Y+10 gGuiElementTypeChooseCancel,% lang("Cancel")
-	;Put the window in the center of the main window
-	gui,+hwndSettingsHWND
-	CurrentlyActiveWindowHWND:=SettingsHWND
-	gui,show,hide
-	pos:=EditGUIGetPos()
-	DetectHiddenWindows,on
-	wingetpos,,,tempWidth,tempHeight,ahk_id %SettingsHWND%
-	tempXpos:=round(pos.x+pos.w/2- tempWidth/2)
-	tempYpos:=round(pos.y+pos.h/2- tempHeight/2)
-	
-	gui,show,x%tempXpos% y%tempYpos%
-	
-	if (wait=1 or wait="wait")
-	{
-		Loop
-		{
-			if (NowResultEditingElement="")
-				sleep 100
-			else 
-			{
-				if (NowResultEditingElement!="aborted")
-					setElement.type:=NowResultEditingElement
-				break
-			}
-		}
-	}
-	
-	return NowResultEditingElement
-	
-	
-	8guiclose:
-	GuiElementTypeChooseCancel:
-	gui,destroy
-	EditGUIEnable()
-	gui,MainGUI:default
-	NowResultEditingElement:="aborted"
-	return 
-	
-	GuiElementTypeChooseAction:
-	gui,destroy
-	EditGUIEnable()
-	gui,MainGUI:default
-	NowResultEditingElement:="action"
-	return
-	
-	GuiElementTypeChooseCondition:
-	gui,destroy
-	EditGUIEnable()
-	gui,MainGUI:default
-	NowResultEditingElement:="condition"
-	return
-	
-	GuiElementTypeChooseLoop:
-	gui,destroy
-	EditGUIEnable()
-	gui,MainGUI:default
-	NowResultEditingElement:="loop"
-	return 
-	
-	
-	
-	
-}
-
-
 

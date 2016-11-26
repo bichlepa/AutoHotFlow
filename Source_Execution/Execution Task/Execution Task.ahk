@@ -2,7 +2,7 @@
 
 executionTask()
 {
-	global _execution, _flows, _settings
+	global _execution, _flows, _settings, currentState
 	;TODO Vielleicht wird es zu Problemen kommen, wenn neue Instanzen hinzugefügt werden, während diese Schleife läuft
 	
 	Loop
@@ -22,6 +22,7 @@ executionTask()
 					
 					OneThread.state:="running"
 					oneElement.state:="running"
+					oneElement.countRuns++
 					
 					_flows[OneThread.flowID].draw.mustDraw:=true
 					;~ d(oneElement, "ausführen: " oneElement.id)
@@ -45,11 +46,11 @@ executionTask()
 					
 					;Find connections
 					AnyConnectionFound:=False
-					;~ d(_flows[OneThread.flowID].allElements[OneThread.elementID], "element " OneThread.elementID) 
-					for oneConnectionIndex, oneConnectionID in _flows[OneThread.flowID].allElements[OneThread.elementID].FromConnections
+					;~ d(_flows[OneThread.flowID].states[currentState].allElements[OneThread.elementID], "element " OneThread.elementID) 
+					for oneConnectionIndex, oneConnectionID in _flows[OneThread.flowID].states[_flows[OneThread.flowID].currentState].allElements[OneThread.elementID].FromConnections
 					{
 						;~ d(_flows[OneThread.flowID].allConnections[oneConnectionID], "connection found: " oneConnectionID)
-						if (_flows[OneThread.flowID].allConnections[oneConnectionID].ConnectionType = OneThread.result)
+						if (_flows[OneThread.flowID].states[_flows[OneThread.flowID].currentState].allConnections[oneConnectionID].ConnectionType = OneThread.result)
 						{
 							NextThread := OneThread
 							if (AnyConnectionFound=True)
@@ -59,7 +60,7 @@ executionTask()
 								;~ d(NextThread, "cloned thread")
 							}
 							;assign the next element to this thread
-							NextThread.ElementID := _flows[OneThread.flowID].allConnections[oneConnectionID].to
+							NextThread.ElementID := _flows[OneThread.flowID].states[_flows[OneThread.flowID].currentState].allConnections[oneConnectionID].to
 							NextThread.state:="starting"
 							
 							AnyConnectionFound:=True
@@ -89,3 +90,19 @@ executionTask()
 	
 }
 
+finishExecutionOfElement(Environment, Result, Message = "")
+{
+	global
+	Environment.State:="finished"
+	Environment.result:=Result
+	Environment.message:=Message
+	_flows[Environment.FlowID].allElements[Environment.ElementID].countRuns--
+	if (_flows[Environment.FlowID].allElements[Environment.ElementID].countRuns==0)
+		_flows[Environment.FlowID].allElements[Environment.ElementID].state:="finished"
+	_flows[Environment.FlowID].allElements[Environment.ElementID].lastrun:=a_tickcount
+	_flows[Environment.FlowID].draw.mustDraw:=true
+	if (result = "Exception")
+	{
+		ThreadVariable_Set(Environment,"a_ErrorMessage",Message,p_ContentType="Normal")
+	}
+}

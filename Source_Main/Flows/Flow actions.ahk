@@ -36,16 +36,32 @@
 
 enableFlow(par_FlowID)
 {
-	MsgBox The function %A_ThisFunc% is not implemented yet
+	global
+	local oneTriggerID, oneTrigger
+	if (_flows[par_FlowID].loaded != true)
+	{
+		LoadFlow(par_FlowID)
+	}
+	
+	API_Execution_EnableTriggers(par_FlowID)
 }
 enableToggleFlow(par_FlowID)
 {
-	MsgBox The function %A_ThisFunc% is not implemented yet
+	global
+	;~ d(_flows[par_FlowID],"enableToggleFlow")
+	if (_flows[par_FlowID].enabled != true)
+	{
+		enableFlow(par_FlowID)
+	}
+	else
+	{
+		disableFlow(par_FlowID)
+	}
 }
 
 disableFlow(par_FlowID)
 {
-	MsgBox The function %A_ThisFunc% is not implemented yet
+	API_Execution_DisableTriggers(par_FlowID)
 }
 
 RunFlow(par_FlowID)

@@ -241,8 +241,17 @@ API_Call_main_Exit()
 	global
 	local retval
 	logger("t2", A_ThisFunc " call received")
-	
 	retval := exit()
+	
+	logger("t2", A_ThisFunc " call finished")
+	return retval
+}
+API_Call_Main_Thread_Stopped(par_ThreadID)
+{
+	global
+	local retval
+	logger("t2", A_ThisFunc " call received")
+	retval := Thread_Stopped(par_ThreadID)
 	
 	logger("t2", A_ThisFunc " call finished")
 	return retval

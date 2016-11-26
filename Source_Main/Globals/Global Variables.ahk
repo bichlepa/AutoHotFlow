@@ -19,10 +19,12 @@ init_GlobalVars()
 			
 			.x	.y			Position
 			.heightOfVerticalBar	If element is a loop
+			.StandardName	Setting whether the name should be generated (True) or manually set by user (False)
 			.marked			True if element is marked
 			.ClickPriority	If multiple elements hover each other, this value makes it possible to click through the elements 
 			
 			.state			Execution state of the element
+			.countRuns		Count of Threads which are currently running this element
 			.lastrun		Timestamp of last execution (a_tickcount)
 			
 		.allConnections	Associative array of Objects. Each object contains following values:
@@ -41,6 +43,7 @@ init_GlobalVars()
 		.allTriggers	Associative array of Objects. Each object contains following values:
 			.ID				ID of the trigger. (Which is also the key)
 			.ContainerID	Element ID containing the trigger
+			.class			Trigger class name. Equals to %type%_%subtype%
 			.type			Contains string "Trigger"
 			.par			Associative Array with the parameters of the trigger
 			
@@ -102,9 +105,22 @@ init_GlobalVars()
 				.threadVars 	thread variables in current execution
 				.loopVars		thread loop variables in current execution
 			.InstanceVars	Local variables in current instance
+			
+		.triggers		Associative array of objects. Each object contains following values:
+			.ID				Enabled trigger ID (Which is also the key)
+			.FlowID			Flow ID
+			.ElementID		ID of trigger
+			.ElementClass	Element class of trigger
+			.enabled		Whether the element was successfully enabled
+			.result			Result of element enabling
+			.Message		Message of element enabling
+		
+		
 		
 	*/
 	_execution := CriticalObject()
+	_execution.Instances := CriticalObject()
+	_execution.triggers := CriticalObject()
 	
 	/* Content of _GlobalVars
 	

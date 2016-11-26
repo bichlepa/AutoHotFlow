@@ -24,6 +24,7 @@ OnExit,Exit
 
 #include Source_Draw\GDIp\gdip.ahk
 #include Source_Draw\API\API receiver draw.ahk
+#include source_Common\Multithreading\API Caller Main.ahk
 
 #include Source_Common\Debug\Debug.ahk
 #include source_Common\Debug\Logger.ahk
@@ -80,7 +81,7 @@ drawTask()
 exit_all()
 {
 	global
-	parentAHKThread.ahkFunction("Thread_Stopped", Global_ThisThreadID)
+	API_Main_Thread_Stopped(Global_ThisThreadID "" "")
 }
 
 

@@ -1,7 +1,7 @@
 ﻿
 default_ZoomFactor = 0.7
-default_OffsetX = 0
-default_OffsetY = 0
+default_OffsetX = -200
+default_OffsetY = -200
 
 default_zoomFactorMin = 0.1
 default_zoomFactorMax = 3

@@ -1,4 +1,25 @@
 ﻿;Call a function in the Rendering thread in oder to make it rendering
+API_Main_Exit()
+{
+	global
+	local retvalue
+	logger("t2", A_ThisFunc " called")
+	
+	retvalue := parentAHKThread.ahkFunction("API_Call_Main_Exit")
+	logger("t2", A_ThisFunc " finished")
+	return retvalue
+}
+API_Main_Thread_Stopped(par_ThreadID)
+{
+	global
+	local retvalue
+	logger("t2", A_ThisFunc " called")
+	
+	retvalue := parentAHKThread.ahkFunction("API_Call_Main_Thread_Stopped",par_ThreadID)
+	logger("t2", A_ThisFunc " finished")
+	return retvalue
+}
+
 API_Main_Draw()
 {
 	global
@@ -112,6 +133,26 @@ API_Main_Element_New(p_FlowID, p_type="",p_elementID="")
 	logger("t2", A_ThisFunc " finished")
 	return retvalue
 }
+
+;~ API_Main_Trigger_New(p_FlowID, p_elementID, p_TriggerID="")
+;~ {
+	;~ global
+	;~ local retvalue
+	;~ logger("t2", A_ThisFunc " called")
+	;~ retvalue :=  parentAHKThread.ahkFunction("API_Call_Main_Trigger_New", p_FlowID, p_elementID, p_TriggerID)
+	;~ logger("t2", A_ThisFunc " finished")
+	;~ return retvalue
+;~ }
+
+;~ API_Main_Trigger_Remove(p_FlowID, p_TriggerID="")
+;~ {
+	;~ global
+	;~ local retvalue
+	;~ logger("t2", A_ThisFunc " called")
+	;~ retvalue :=  parentAHKThread.ahkFunction("API_Call_Main_Trigger_New", p_FlowID, p_TriggerID="")
+	;~ logger("t2", A_ThisFunc " finished")
+	;~ return retvalue
+;~ }
 
 API_Main_Connection_New(p_FlowID, p_elementID="")
 {

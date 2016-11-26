@@ -23,6 +23,7 @@ OnExit,Exit
 #include Source_Editor\User Interface\Editor GUI user input.ahk
 #include Source_Editor\User Interface\Editor GUI menu bar.ahk
 #include Source_Editor\User Interface\Element settings.ahk
+#include Source_Editor\User Interface\Element settings other.ahk
 #include Source_Editor\User Interface\Flow settings.ahk
 #include Source_Editor\User Interface\GDI+.ahk
 #include Source_Editor\User Interface\Tooltip.ahk
@@ -39,6 +40,7 @@ OnExit,Exit
 #include source_Common\Defaults\Default values.ahk
 
 AllElementClasses:=Object()
+AllTriggerClasses:=Object()
 ;PlaceholderIncludesOfElements
 
 parentAHKThread := AhkExported()
@@ -46,9 +48,10 @@ parentAHKThread := AhkExported()
 
 lang_Init()
 
-initializeTrayBar()
 EditorGUIInit()
 EditGUIshow()
+initializeTrayBar()
+
 
 FlowObj := _flows[FlowID]
 
@@ -61,7 +64,7 @@ return
 exit_all()
 {
 	global
-	parentAHKThread.ahkFunction("Thread_Stopped", Global_ThisThreadID)
+	API_Main_Thread_Stopped(Global_ThisThreadID)
 	deinitializeTrayBar()
 }
 

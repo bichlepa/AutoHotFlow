@@ -8,10 +8,6 @@ UnmarkEverything()
 MarkEverything()
 Connection_New(p_elementID)
 Connection_Remove(p_elementID)
-Trigger_New(p_ElementID,p_TriggerID)
-trigger_Remove(p_TriggerID)
-Trigger_setParameterDefaults(p_triggerID)
-TriggerContainer_UpdateName(p_ElementID)
 GetListContainingElement(p_ElementID)
 */
 
@@ -20,7 +16,6 @@ Element_New(p_FlowID, p_type="",p_elementID="")
 {
 	global _flows
 	global GridX, Gridy
-	global mainTriggerContainer
 	
 	;~ allElements:=_flows[p_FlowID].allElements
 	
@@ -38,17 +33,16 @@ Element_New(p_FlowID, p_type="",p_elementID="")
 	;~ d(p_elementID "--" tempElement.ID "--" tempElement.ClickPriority)
 	tempElement.pars:=[]
 	
+	tempElement.StandardName:=True
 	tempElement.lastrun:=0
 	tempElement.marked:=false
 	tempElement.state:="idle"
+	tempElement.countRuns:=0
 	
-	;Assign default position, although it is commonly not needed (except when creating the trigger container)
-	tempElement.x:=GridX * 9
-	tempElement.y:=Gridy * 5
+	;Assign default position, although it is commonly not needed
+	tempElement.x:=0
+	tempElement.y:=0
 	
-	;Save the main trigger ID in order to find it globally.
-	if (p_type="trigger")
-		mainTriggerContainer:=p_ElementID
 	 
 	_flows[p_FlowID].allElements[tempElement.id]:=tempElement
 	
@@ -67,13 +61,8 @@ Element_SetType(p_FlowID, p_elementID,p_elementType)
 	allElements[p_elementID].type:=p_elementType 
 	allElements[p_elementID].class:="" ;After changing the element type only, the class is unset 
 	
-	if (p_elementType="Trigger")
-	{
-		allElements[p_elementID].triggers:=new CriticalObject()
-		allElements[p_elementID].name:=""
-	}
-	else
-		allElements[p_elementID].name:="Νew Соntainȩr"
+	
+	allElements[p_elementID].name:="Νew Соntainȩr"
 	
 	if (p_elementType="Loop")
 	{
@@ -96,13 +85,8 @@ Element_SetClass(p_FlowID, p_elementID, p_elementClass)
 	
 	Element_setParameterDefaults(p_FlowID, p_elementID)
 	
-	if (p_elementType="Trigger")
-	{
-		allElements[p_elementID].triggers:=new CriticalObject()
-		allElements[p_elementID].name:=""
-	}
-	else
-		allElements[p_elementID].name:=Element_GenerateName_%p_elementClass%(allElements[p_elementID].pars)
+	
+	allElements[p_elementID].name:=Element_GenerateName_%p_elementClass%(allElements[p_elementID].pars)
 	
 
 }
@@ -171,8 +155,6 @@ Element_Remove(p_FlowID, p_elementID)
 	}
 	
 	
-	if allElements[p_elementID].type="trigger" ;The trigger container cannot be removed
-		return
 	
 	;remove the element from list of all elements
 	for forID, forElement in allElements
@@ -270,66 +252,7 @@ Connection_Remove(p_FlowID, p_elementID)
 }
 
 
-;Create a new trigger. Put the trigger in the list of all triggers and also put the trigger ID in the list of triggers in the trigger container
-Trigger_New(p_FlowID, p_ElementID,p_TriggerID)
-{
-	global _flows
-	
-	allTriggers:=_flows[p_FlowID].allTriggers
-	allElements:=_flows[p_FlowID].allElements
-	
-	tempTrigger:=CriticalObject()
-	tempTrigger.name:="Νew Triggȩr"
-	tempTrigger.type:= "trigger"
-	tempTrigger.active:=false
-	
-	if (p_TriggerID="")
-		tempTrigger.ID:="trigger" . format("{1:010u}",++_flows[p_FlowID].ElementIDCounter) 
-	else
-		tempTrigger.ID:=p_TriggerID
-	
-	tempTrigger.ContainerID:=p_ElementID
-	tempTrigger.pars:=[]
-	
-	
-	allElements[p_ElementID].triggers[tempTrigger.ID]:=tempTrigger.ID
-	
-	allTriggers[tempTrigger.id]:=tempTrigger
-	return tempTrigger.ID
-}
-
-trigger_Remove(p_FlowID, p_TriggerID)
-{
-	global _flows
-	
-	allTriggers:=_flows[p_FlowID].allTriggers
-	allElements:=_flows[p_FlowID].allElements
-	
-	allElements[allTriggers[p_TriggerID].ContainerID].delete(p_TriggerID)
-	allTriggers.delete(p_TriggerID)
-}
-
-Trigger_setParameterDefaults(p_FlowID, p_triggerID)
-{
-	Element_setParameterDefaults(p_FlowID, p_triggerID)
-}
-
-TriggerContainer_UpdateName(p_FlowID, p_ElementID)
-{
-	global _flows
-	
-	allTriggers:=_flows[p_FlowID].allTriggers
-	allElements:=_flows[p_FlowID].allElements
-	
-	tempName:=""
-	for forID, forID2 in p_ElementID.triggers
-	{
-		tempName:=allTriggers[forID].name "; ●"
-	}
-	allelements[p_ElementID].name:=substr(tempName,1,-3)
-	
-}
-
+;~ ;
 GetListContainingElement(p_FlowID, p_ElementID, p_returnPointer = false)
 {
 	global _flows
@@ -338,8 +261,6 @@ GetListContainingElement(p_FlowID, p_ElementID, p_returnPointer = false)
 		templist := _flows[p_FlowID].allElements
 	else if _flows[p_FlowID].allConnections.HasKey(p_ElementID)
 		templist := _flows[p_FlowID].allConnections
-	else if _flows[p_FlowID].allTriggers.HasKey(p_ElementID)
-		templist := _flows[p_FlowID].allTriggers
 	if (p_returnPointer)
 		return &templist
 	else

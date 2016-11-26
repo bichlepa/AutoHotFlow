@@ -245,7 +245,7 @@ Var_Get(environment, p_Name, p_Type)
 		{
 			logger("f3","Retrieving loop variable '" p_Name "'")
 			tempvalue:=tempVar.value
-			if (p_Type!=tempVar.type)
+			if (p_Type!=tempVar.type and p_Type!="asis")
 			{
 				tempvalue:= Var_ConvertType(tempvalue,"date",p_Type)
 			}
@@ -258,7 +258,7 @@ Var_Get(environment, p_Name, p_Type)
 		{
 			logger("f3","Retrieving thread variable '" p_Name "'")
 			tempvalue:=tempVar.value
-			if (p_Type!=tempVar.type)
+			if (p_Type!=tempVar.type and p_Type!="asis")
 			{
 				tempvalue:= Var_ConvertType(tempvalue,"date",p_Type)
 			}
@@ -270,7 +270,7 @@ Var_Get(environment, p_Name, p_Type)
 		{
 			logger("f3","Retrieving built in variable '" p_Name "'")
 			tempvalue:=tempVar.value
-			if (p_Type!=tempVar.type)
+			if (p_Type!=tempVar.type and p_Type!="asis")
 			{
 				tempvalue:= Var_ConvertType(tempvalue,"date",p_Type)
 			}
@@ -290,7 +290,7 @@ Var_Get(environment, p_Name, p_Type)
 		{
 			logger("f3","Retrieving global variable '" p_Name "'")
 			tempvalue:=tempVar.value
-			if (p_Type!=tempVar.type)
+			if (p_Type!=tempVar.type and p_Type!="asis")
 			{
 				tempvalue:= Var_ConvertType(tempvalue,"date",p_Type)
 			}
@@ -308,7 +308,7 @@ Var_Get(environment, p_Name, p_Type)
 		{
 			logger("f3","Retrieving static variable '" p_Name "'")
 			tempvalue:=tempVar.value
-			if (p_Type!=tempVar.type)
+			if (p_Type!=tempVar.type and p_Type!="asis")
 			{
 				tempvalue:= Var_ConvertType(tempvalue,"date",p_Type)
 			}

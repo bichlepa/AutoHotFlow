@@ -272,11 +272,13 @@ Button_manager_EditFlow()
 
 Button_manager_RunFlow()
 {
+	global
 	API_Main_RuntoggleFlow(allTreeViewItems[TV_GetSelection()].id)
 }
 
 Button_manager_EnableFlow()
 {
+	global
 	API_Main_EnabletoggleFlow(allTreeViewItems[TV_GetSelection()].id)
 }
 

@@ -73,7 +73,7 @@ Element_run_Condition_Debug_Dialog(Environment, ElementParameters)
 	else
 		tempVariableNames=
 	
-	ToolTip  %tempVariableNames%,,2
+	;~ ToolTip  %tempVariableNames%,,2
 	
 	for tempIndex, tempVarName in x_GetListOfLoopVars(environment)
 	{

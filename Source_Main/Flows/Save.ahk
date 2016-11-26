@@ -2,8 +2,12 @@
 {
 	global
 	;~ d(_Flows[par_ID],par_ID)
-	IniWrite,% _Flows[par_ID].name,% _Flows[par_ID].file,general,name
+	if not fileexist(_Flows[par_ID].file)
+	{
+		IniWrite,% FlowCompabilityVersionOfApp,% _Flows[par_ID].file,general,FlowCompabilityVersion
+	}
 	
+	IniWrite,% _Flows[par_ID].name,% _Flows[par_ID].file,general,name
 	if (_Flows[par_ID].categoryname = lang("uncategorized"))
 		IniWrite,% "",% _Flows[par_ID].file,general,category ;If the flow has no category, do not save the category name
 	else

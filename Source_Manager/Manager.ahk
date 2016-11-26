@@ -37,7 +37,7 @@ return
 exit_all()
 {
 	global
-	parentAHKThread.ahkFunction("api_main_exit")
+	API_Main_Exit()
 }
 
 exit:
