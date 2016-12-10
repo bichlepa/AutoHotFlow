@@ -16,7 +16,6 @@ OnExit,Exit
 #include language\language.ahk
 #include lib\Object to file\String-object-file.ahk
 #include lib\GDI+\GDIp.ahk
-#include lib\ScrollGui\Class_ScrollGUI.ahk
 #include lib\objhasvalue\objhasvalue.ahk
 
 #include Source_Editor\User Interface\Editor GUI.ahk

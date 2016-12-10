@@ -46,7 +46,7 @@ Draw()
 {
 	global
 	SetTimer,drawTask,10
-	
+	_share.drawActive:=true
 }
 
 drawTask()
@@ -70,7 +70,8 @@ drawTask()
 		}
 		if (somethingdrawn = false)
 		{
-			SetTimer,drawTask,100
+			SetTimer,drawTask,10
+			_share.drawActive:=false
 			break
 		}
 	}

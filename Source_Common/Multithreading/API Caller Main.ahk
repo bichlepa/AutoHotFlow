@@ -23,11 +23,21 @@ API_Main_Thread_Stopped(par_ThreadID)
 API_Main_Draw()
 {
 	global
+	_flows[FlowID].draw.mustDraw := true
+	return
+	
+	
 	local retvalue
 	logger("t2", A_ThisFunc " called")
-	_flows[FlowID].draw.mustDraw := true
-	
-	retvalue := parentAHKThread.ahkFunction("API_Call_Main_Draw")
+	if (_share.drawActive == true)
+	{
+		_flows[FlowID].draw.mustDraw := true
+	}
+	else
+	{
+		_flows[FlowID].draw.mustDraw := true
+		;~ retvalue := parentAHKThread.ahkFunction("API_Call_Main_Draw")
+	}
 	logger("t2", A_ThisFunc " finished")
 	return retvalue
 }

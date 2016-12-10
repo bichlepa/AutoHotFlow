@@ -60,6 +60,9 @@ init_GlobalVars()
 		.tv 			Flow tree view ID
 		
 		.enabled 		True if flow is enabled
+		.executing 		True if flow is running
+		.countOfExecutions	
+		.countOfWaitingExecutions
 		
 		.Folder			Folder path of the flow
 		.FileName		File name of the flow
@@ -132,17 +135,21 @@ init_GlobalVars()
 	/* Content of _share
 	_share contains some values:
 		.allCategories	Internal array which contains all categories: Each entry contains following:
-			.id			Internal Category ID. (Which is also the key)
-			.Name		Category name.
-			.Type		Category Type. (Containing the string "Category")
-			.TV			Tree view ID. 
-	
+			.id				Internal Category ID. (Which is also the key)
+			.Name			Category name.
+			.Type			Category Type. (Containing the string "Category")
+			.TV				Tree view ID. 
+		.log			Log content
 	*/
 	_share := CriticalObject()
 
 	_language := CriticalObject()
 	
 	_share.hwnds := Object()
+	_share.log := ""
+	_share.logcount := 0
+	_share.logcountAfterTidy := 0
+	_share.drawActive := 0 	;True if the draw thread is currently active
 	
 	CriticalSection_Flows := CriticalSection()
 }

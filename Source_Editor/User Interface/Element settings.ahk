@@ -190,7 +190,7 @@ class ElementSettings
 		
 		openingElementSettingsWindow:=false
 		
-		ElementSettingsNameField.updatename()
+		this.generalUpdate()
 		
 		gui,GUISettingsOfElementParent:show
 		
@@ -267,7 +267,7 @@ class ElementSettings
 		
 		
 		GUISettingsOfElementSave:
-		GUISettingsOfElementobject.updatename()
+		GUISettingsOfElementobject.generalUpdate()
 		;~ gui,SettingsOfElement:submit
 		if (setElement.type="trigger" and triggersEnabled=true) ;When editing a trigger, disable Triggers and enable them afterwards
 		{
@@ -327,12 +327,7 @@ class ElementSettings
 		;if (tempReenablethen) ;TODO
 			;r_EnableFlow()
 		
-		if (setElementType="Trigger")
-		{
-			maintrigger.updatename()
-			API_Main_Draw()
-			
-		}
+		
 		
 		API_Main_Draw()
 		GUISettingsOfElementObject.close()
@@ -459,7 +454,7 @@ class ElementSettings
 			gui,add,checkbox, x10 hwndtempHWND checked%tempchecked% vGUISettingsOfElementStandardName gGUISettingsOfElementCheckStandardName,% lang("Standard_name")
 			this.components.push("GUISettingsOfElementStandardName")
 			ElementSettingsFieldHWNDs[tempHWND]:=this
-			gui,add,edit,w400 x10 Multi r5 hwndtempHWND vGUISettingsOfElementName gGUISettingsOfElementUpdateName,% setElement.name
+			gui,add,edit,w400 x10 Multi r5 hwndtempHWND vGUISettingsOfElementName gGUISettingsOfElementGeneralUpdate,% setElement.name
 			this.components.push("GUISettingsOfElementName")
 			ElementSettingsFieldHWNDs[tempHWND]:=this
 			
@@ -468,7 +463,7 @@ class ElementSettings
 			
 		}
 		
-		updateName()
+		updateName(p_CurrentPars)
 		{
 			global
 			local Newname
@@ -479,7 +474,7 @@ class ElementSettings
 			if (this.getvalue("StandardName")=1)
 			{
 				this.disable("Name")
-				Newname:=Element_GenerateName_%setElementClass%(GUISettingsOfElementObject.getAllValues()) ;TODO: Parameter mit Inhalt übergeben
+				Newname:=Element_GenerateName_%setElementClass%(setElement, p_CurrentPars) 
 				StringReplace,Newname,Newname,`n,%a_space%-%a_space%,all
 				this.setvalue(Newname)
 			}
@@ -540,7 +535,7 @@ class ElementSettings
 				tempParGray=check3
 			else
 				tempParGray=
-			gui,add,checkbox,w400 x10 %tempParGray% checked%temp% hwndtempHWND gGUISettingsOfElementUpdateName vGUISettingsOfElement%tempParameterID%,%temptext%
+			gui,add,checkbox,w400 x10 %tempParGray% checked%temp% hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID%,%temptext%
 			this.components.push("GUISettingsOfElement" tempParameterID)
 			ElementSettingsFieldHWNDs[tempHWND]:=this
 			
@@ -575,7 +570,7 @@ class ElementSettings
 				else
 					tempChecked=
 					
-				gui,add,radio, w400 x10 %tempChecked% %tempMakeNewGroup% hwndtempHWND gGUISettingsOfElementUpdateName vGUISettingsOfElement%tempParameterID%%a_index% ,% tempRadioLabel
+				gui,add,radio, w400 x10 %tempChecked% %tempMakeNewGroup% hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID%%a_index% ,% tempRadioLabel
 				this.components.push("GUISettingsOfElement" tempParameterID a_index)
 				ElementSettingsFieldHWNDs[tempHWND]:=this
 				
@@ -803,7 +798,7 @@ class ElementSettings
 					else
 						tempXpos:="X+10"
 					;~ MsgBox %tempXpos%
-					gui,add,edit,%tempXpos% w%tempEditwidth% hwndtempHWND gGUISettingsOfElementUpdateName vGUISettingsOfElement%tempOneParameterID%,%temptext%
+					gui,add,edit,%tempXpos% w%tempEditwidth% hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempOneParameterID%,%temptext%
 					this.components.push("GUISettingsOfElement" tempOneParameterID)
 					ElementSettingsFieldHWNDs[tempHWND]:=this
 					
@@ -918,7 +913,7 @@ class ElementSettings
 				
 				guicontrol,SettingsOfElement:hide,GUISettingsOfElementWarningIconOf%tempOneParamID%
 			}
-			ElementSettingsNameField.updatename()
+			GUISettingsOfElementObject.GeneralUpdate()
 		}
 		
 		clickOnInfoPic()
@@ -974,7 +969,7 @@ class ElementSettings
 			}
 			
 			
-			ElementSettingsNameField.UpdateName()
+			GUISettingsOfElementObject.GeneralUpdate()
 			this.checkcontent()
 		}
 		
@@ -1009,7 +1004,7 @@ class ElementSettings
 			}
 			else
 			{
-				gui,add,slider, w400 x10 %tempParameterOptions% hwndtempHWND gGUISettingsOfElementUpdateName vGUISettingsOfElement%tempParameterID% ,% temp
+				gui,add,slider, w400 x10 %tempParameterOptions% hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID% ,% temp
 				this.components.push("vGUISettingsOfElement" tempParameterID)
 				ElementSettingsFieldHWNDs[tempHWND]:=this
 				
@@ -1076,7 +1071,7 @@ class ElementSettings
 			}
 			
 			StringTrimLeft,tempAllChoices,tempAllChoices,1
-			gui,add,DropDownList, w400 x10 %tempAltSumbit% choose%temptoChoose% hwndtempHWND gGUISettingsOfElementUpdateName vGUISettingsOfElement%tempParameterID% ,% tempAllChoices
+			gui,add,DropDownList, w400 x10 %tempAltSumbit% choose%temptoChoose% hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID% ,% tempAllChoices
 			this.components.push("GUISettingsOfElement" tempParameterID)
 			ElementSettingsFieldHWNDs[tempHWND]:=this
 			varsToDelete.push("GUISettingsOfElement" tempParameterID)
@@ -1120,7 +1115,7 @@ class ElementSettings
 			}
 			StringTrimLeft,tempAllChoices,tempAllChoices,1
 			
-			gui,add,ComboBox, w400 x10 %tempAltSumbit% choose%temptoChoose% hwndtempHWND gGUISettingsOfElementUpdateName vGUISettingsOfElement%tempParameterID% ,% tempAllChoices
+			gui,add,ComboBox, w400 x10 %tempAltSumbit% choose%temptoChoose% hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID% ,% tempAllChoices
 			this.components.push("GUISettingsOfElement" tempParameterID)
 			ElementSettingsFieldHWNDs[tempHWND]:=this
 			
@@ -1142,7 +1137,7 @@ class ElementSettings
 			gui,font,s8 cDefault wnorm
 			temp:=setElement.pars[tempParameterID] 
 			
-			gui,add,edit,w300 x10 hwndtempHWND gGUISettingsOfElementUpdateName vGUISettingsOfElement%tempParameterID%,%temp%
+			gui,add,edit,w300 x10 hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID%,%temp%
 			this.components.push("GUISettingsOfElement" tempParameterID)
 			ElementSettingsFieldHWNDs[tempHWND]:=this
 			gui,add,hotkey,w90 X+10 hwndtempHWND gGUISettingsOfElementHotkey vGUISettingsOfElement%tempParameterID%hotkey,%temp%
@@ -1204,7 +1199,7 @@ class ElementSettings
 			gui,font,s8 cDefault wnorm
 			temp:=setElement.pars[tempParameterID] 
 			
-			gui,add,edit,w370 x10 hwndtempHWND gGUISettingsOfElementUpdateName vGUISettingsOfElement%tempParameterID%,%temp%
+			gui,add,edit,w370 x10 hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID%,%temp%
 			this.components.push("GUISettingsOfElement" tempParameterID)
 			ElementSettingsFieldHWNDs[tempHWND]:=this
 			
@@ -1243,7 +1238,7 @@ class ElementSettings
 			temp:=setElement.pars[tempParameterID] 
 			
 			
-			gui,add,edit,w370 x10 hwndtempHWND gGUISettingsOfElementUpdateName vGUISettingsOfElement%tempParameterID%,%temp%
+			gui,add,edit,w370 x10 hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID%,%temp%
 			this.components.push("GUISettingsOfElement" tempParameterID)
 			ElementSettingsFieldHWNDs[tempHWND]:=this
 			gui,add,button,w20 X+10 hwndtempHWND gGUISettingsOfElementButton vGUISettingsOfElementbutton%tempParameterID%,...
@@ -1429,13 +1424,14 @@ class ElementSettings
 	
 	
 	;Update the name field
-	updatename()
+	generalUpdate()
 	{
 		global
 		GUISettingsOfElementRemoveInfoTooltip()
 		;~ ToolTip updakljö
-		;~ CheckSettings%setElementType%%setElementsubType%(setElement) ;?
-		ElementSettingsNameField.updatename() ;The element 0 contains the name field
+		allParamValues:=GUISettingsOfElementObject.getAllValues()
+		Element_CheckSettings_%setElementClass%(setElement, allParamValues) 
+		ElementSettingsNameField.updatename(allParamValues) ;The element 0 contains the name field
 		
 	}
 	
@@ -1512,13 +1508,14 @@ GUISettingsOfElementCheckContent(CtrlHwnd, GuiEvent="", EventInfo="", ErrorLevel
 GUISettingsOfElementCheckStandardName(CtrlHwnd, GuiEvent="", EventInfo="", ErrorLevell="")
 {
 	global
-	ElementSettingsFieldHWNDs[CtrlHwnd].UpdateName()
+	GUISettingsOfElementObject.GeneralUpdate()
+	;~ ElementSettingsFieldHWNDs[CtrlHwnd].UpdateName()
 }
 
-GUISettingsOfElementUpdateName(CtrlHwnd, GuiEvent="", EventInfo="", ErrorLevell="")
+GUISettingsOfElementGeneralUpdate(CtrlHwnd, GuiEvent="", EventInfo="", ErrorLevell="")
 {
 	global
-	ElementSettingsFieldHWNDs[CtrlHwnd].UpdateName()
+	GUISettingsOfElementObject.GeneralUpdate()
 	return
 }
 

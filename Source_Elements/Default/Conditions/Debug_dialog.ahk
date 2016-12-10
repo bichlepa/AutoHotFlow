@@ -263,7 +263,17 @@ Element_run_Condition_Debug_Dialog(Environment, ElementParameters)
 
 }
 
-Element_GenerateName_Condition_Debug_Dialog(ElementParameters)
+Element_stop_Condition_Debug_Dialog(Environment, ElementParameters)
+{
+	tempGUIID:=x_GetMyUniqueExecutionID(Environment)
+	gui,%tempGUIID%:destroy
+	;~ logger("f0","Instance " tempDebug_DialogBut.instanceID " - " tempDebug_DialogBut.type " '" tempDebug_DialogBut.name "': Error! User dismissed the dialog")
+	
+	x_DeleteMyUniqueExecutionID(tempGUIID)
+	return
+}
+
+Element_GenerateName_Condition_Debug_Dialog(Environment, ElementParameters)
 {
 	global
 	return % lang("Debug_dialog")

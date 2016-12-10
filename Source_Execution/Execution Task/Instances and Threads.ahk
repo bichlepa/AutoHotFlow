@@ -4,26 +4,100 @@ ThreadIDCOunter:=0
 
 /* Starts a new execution instance
 */
-newInstance(p_Flow)
+newInstance(p_Environment)
 {
-	global _execution, InstanceIDCOunter
-	;Search for the matching trigger element
-	for oneElementID, oneElement in p_Flow.allElements
+	global _execution, InstanceIDCOunter, _flows
+	if (_flows[p_Environment.FlowID].flowSettings.ExecutionPolicy="skip" or _flows[p_Environment.FlowID].flowSettings.ExecutionPolicy="stop")
 	{
-		if (oneElement.type = "trigger")
+		;find out whether the flow is running
+		if (_flows[p_Environment.FlowID].executing)
+		{
+			if (_flows[p_Environment.FlowID].flowSettings.ExecutionPolicy="skip")
+			{
+				logger("f1", "Execution of flow '" _flows[p_Environment.FlowID].name "' skipped, due to flow execution policy")
+				return
+				
+			}
+			else if (_flows[p_Environment.FlowID].flowSettings.ExecutionPolicy="stop")
+			{
+				logger("f1", "Stopping flow '" _flows[p_Environment.FlowID].name "' in order to relaunch it, due to flow execution policy")
+				stopFlow(_flows[p_Environment.FlowID])
+			}
+		}
+	}
+	
+	;Search for the matching trigger element
+	for oneElementID, oneElement in _flows[p_Environment.flowID].allElements
+	{
+		;~ MsgBox % (oneElement.type = "trigger") " - " !(p_Environment.ElementID) " - " (p_Environment.ElementID=oneElement.id) " = " (oneElement.type = "trigger" and (!(p_Environment.ElementID) or p_Environment.ElementID=oneElement.id))
+		if (oneElement.type = "trigger" and (!(p_Environment.ElementID) or p_Environment.ElementID=oneElement.id))
 		{
 			newInstance:=CriticalObject()
 			newInstance.id:= "instance" ++InstanceIDCOunter
-			newInstance.FlowID := p_Flow.id
+			newInstance.FlowID := p_Environment.FlowID
+			newInstance.state := "init"
 			newInstance.InstanceVars := CriticalObject()
 			newThread := newThread(newInstance)
 			_execution.Instances[newInstance.id]:=newInstance
 			newThread.ElementID := oneElementID
+			newThread.EnvironmentType := "thread"
 			finishExecutionOfElement(newThread, "Normal")
 			ThreadVariable_Set(newThread,"A_TriggerTime",a_now,"Date")
+			
+			ElementClass:=p_Environment.ElementClass
+			if (isfunc("Element_postTrigger_" ElementClass))
+			{
+				Element_postTrigger_%ElementClass%(newThread, p_Environment.pars)
+			}
+			
+			newInstance.state := "running"
+			break
 		}
 	}
+	
+	updateFlowExcutingStates()
 	return newInstance
+}
+
+stopFlow(p_Flow)
+{
+	global _execution, _flows
+	
+	instancesToDelete:=Object()
+	
+	for OneInstanceID, OneInstance in _execution.Instances
+	{
+		if (OneInstance.FlowID == p_Flow.id)
+		{
+			instancesToDelete.push(OneInstanceID)
+			for OneThreadID, OneThread in OneInstance.threads
+			{
+				OneThread.oldstate := OneThread.state
+				OneThread.state := "stopping"
+			}
+		}
+	}
+	for OneInstanceIndex, OneInstanceID in instancesToDelete
+	{
+		for OneThreadID, OneThread in _execution.Instances[OneInstanceID].threads
+		{
+			if (OneThread.oldstate = "running" )
+			{
+				oneElement:=_flows[OneThread.flowID].allElements[OneThread.elementID]
+				oneElementClass:=oneElement.class
+				oneElement.countRuns--
+				if (oneElement.countRuns = 0)
+				oneElement.state:="finished"
+				oneElement.lastrun:=a_tickcount
+					
+				if Isfunc("Element_stop_" oneElementClass )
+						Element_stop_%oneElementClass%(OneThread, OneThread.elementpars)
+				
+				_flows[OneThread.flowID].draw.mustDraw:=true
+			}
+		}
+		_execution.Instances.delete(OneInstanceID)
+	}
 }
 
 /* Starts a new execution thread inside the given instance
@@ -38,6 +112,7 @@ newThread(p_Instance, p_ToCloneFromThread ="")
 		newThread := objfullyclone(p_ToCloneFromThread)
 		;Assign another thread id
 		newThread.id := "thread" ++ThreadIDCOunter
+		newThread.ThreadID := newThread.id
 	}
 	else
 	{
@@ -79,4 +154,27 @@ removeInstance(p_instance)
 	;~ d(_execution, "going to remove " p_instance.id)
 	_execution.Instances.delete(p_instance.id)
 	;~ d(_execution, "removed " p_instance.id)
+	updateFlowExcutingStates()
+}
+
+updateFlowExcutingStates()
+{
+	global _execution, _flows
+	
+	executingFlows:=Object()
+	for OneInstanceID, OneInstance in _execution.Instances
+	{
+		executingFlows[OneInstance.flowID]:=True
+	}
+	for OneFlowID, OneFlow in _flows
+	{
+		if (executingFlows.haskey(OneFlowID))
+		{
+			OneFlow.executing:=True
+		}
+		else
+		{
+			OneFlow.executing:=False
+		}
+	}
 }

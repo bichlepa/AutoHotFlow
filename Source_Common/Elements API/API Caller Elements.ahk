@@ -52,7 +52,7 @@ x_GetExecutionValue(p_ExecutionID, p_name)
 {
 }
 
-x_NewExecutionFunctionObject(Environment, p_ExecutionID, p_ToCallFunction)
+x_NewExecutionFunctionObject(Environment, p_ExecutionID, p_ToCallFunction, params*)
 {
 	
 }
@@ -75,7 +75,7 @@ x_GetListOfGlobalVars(Environment)
 {
 }
 
-x_trigger(Environment)
+x_trigger(Environment, triggerVars="")
 {
 	
 }
@@ -86,4 +86,13 @@ x_enabled(Environment, Result, Message = "")
 x_disabled(Environment, Result, Message = "")
 {
 	
+}
+
+x_Par_Disable(Environment,p_ParToDisable, p_TrueOrFalse = True)
+{
+	ElementSettings.field.enable(p_ParToDisable,not p_TrueOrFalse)
+}
+x_Par_Enable(Environment,p_ParToDisable, p_TrueOrFalse = True)
+{
+	ElementSettings.field.enable(p_ParToDisable,p_TrueOrFalse)
 }

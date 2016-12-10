@@ -77,7 +77,7 @@ Element_run_Action_Tooltip(Environment, ElementParameters)
 	
 }
 
-Element_GenerateName_Action_Tooltip(ElementParameters)
+Element_GenerateName_Action_Tooltip(Environment, ElementParameters)
 {
 	global
 	if (ElementParameters.Unit = 1)

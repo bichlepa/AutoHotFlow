@@ -1109,16 +1109,9 @@ markedElementscopy:=FlowObj.markedElements.clone()
  ;remove all marked elements
 for markindex, markelement in markedElementscopy
 {
-	if (FlowObj.allElements[markelement].type="trigger")
-	{
-		;Do not remove trigger
-		MsgBox,% lang("Trigger_cannot be removed!")
-		continue
-	}
-	else
-	{
-		API_Main_Element_Remove(FlowID, markelement)
-	}
+	
+	API_Main_Element_Remove(FlowID, markelement)
+	
 
 }
 CreateMarkedList()

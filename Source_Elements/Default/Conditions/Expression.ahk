@@ -46,7 +46,7 @@ Element_run_Condition_Expression(Environment, ElementParameters)
 
 }
 
-Element_GenerateName_Condition_Expression(ElementParameters)
+Element_GenerateName_Condition_Expression(Environment, ElementParameters)
 {
 	global
 	return % lang("Expression") " - " ElementParameters.expression

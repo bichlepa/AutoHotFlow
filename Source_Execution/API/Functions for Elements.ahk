@@ -25,10 +25,10 @@ x_getVariableType(Environment, Varname)
 {
 	return Var_GetType(Environment, Varname)
 }
-x_SetVariable(Environment, Varname, Value, Type = "normal", destination="")
+x_SetVariable(Environment, p_Varname, p_Value, p_Type = "normal", p_destination="")
 {
 	global
-	return Var_Set(Environment, Varname, Value, Type, destination)
+	return Var_Set(Environment, p_Varname, p_Value, p_Type, p_destination)
 }
 x_DeleteVariable(Environment, Varname)
 {
@@ -61,10 +61,18 @@ x_GetMyUniqueExecutionID(Environment)
 	local tempID:="GUI_" Environment.instanceID "_" Environment.threadID "_" Environment.elementID
 	return tempID
 }
-x_DeleteMyUniqueExecutionID(p_ExecutionID)
+x_DeleteMyUniqueExecutionID(Environment)
 {
 	global
-	global_AllExecutionIDs.delete(p_ExecutionID)
+	if isobject(Environment)
+	{
+		local tempID:="GUI_" Environment.instanceID "_" Environment.threadID "_" Environment.elementID
+	}
+	else
+	{
+		tempID:=Environment
+	}
+	global_AllExecutionIDs.delete(tempID)
 }
 x_GetMyEnvironmentFromExecutionID(p_ExecutionID)
 {
@@ -82,30 +90,44 @@ x_GetExecutionValue(p_ExecutionID, p_name)
 	return global_AllExecutionIDs[p_ExecutionID].customValues[p_name]
 }
 
-x_NewExecutionFunctionObject(Environment, p_ExecutionID, p_ToCallFunction)
+x_NewExecutionFunctionObject(Environment, p_ExecutionID, p_ToCallFunction, params*)
 {
-	oneFunctionObject:=new FunctionObject(Environment, p_ToCallFunction)
+	oneFunctionObject:=new Class_FunctionObject(Environment, p_ToCallFunction, params*)
+	
 	global_AllExecutionIDs[p_ExecutionID].ExecutionFunctionObjects[p_ToCallFunction]:=oneFunctionObject
 	return oneFunctionObject
 }
 
 
 ; Function object which can be created
-class FunctionObject 
+class Class_FunctionObject
 {
-    __New(Environment, ToCallFunction) 
+    __New(Environment, ToCallFunction, params*) 
 	{
         this.Environment := Environment
-        this.FunctionObject := ObjBindMethod(this, CallFunction)
+        this.FunctionObject := ObjBindMethod(this, Call)
 		this.ToCallFunction := ToCallFunction
+		this.params := params
 		return this.FunctionObject
     }
    
-    CallFunction() 
+    Call() 
 	{
         ToCallFunction:=this.ToCallFunction
-		%ToCallFunction%(this.Environment)
+		%ToCallFunction%(this.Environment, this.params*)
     }
+	
+	 __Call(method, args*) {
+        if (method = "")  ; For %fn%() or fn.()
+            return this.Call(args*)
+        if (IsObject(method))  ; If this function object is being used as a method.
+            return this.Call(method, args*)
+    }
+	
+	__delete()
+	{
+		MsgBox Class_FunctionObject __delete
+	}
 }
 
 
@@ -141,11 +163,10 @@ x_finish(Environment, Result, Message = "")
 	
 }
 ;For triggers
-x_trigger(Environment)
+x_trigger(Environment, triggerVars="")
 {
-	global
-	
-	newInstance(_flows[Environment.flowID])
+	Environment.triggerVars:=triggerVars
+	newInstance(Environment)
 }
 
 x_enabled(Environment, Result, Message = "")
@@ -157,4 +178,16 @@ x_disabled(Environment, Result, Message = "")
 {
 	global
 	saveResultOfTriggerDisabling(Environment, Result, Message)
+}
+
+
+;While editing
+
+x_Par_Disable(Environment,p_ParToDisable, p_TrueOrFalse = True)
+{
+	;~ ElementSettings.field.enable(p_ParToDisable,not p_TrueOrFalse)
+}
+x_Par_Enable(Environment,p_ParToDisable, p_TrueOrFalse = True)
+{
+	;~ ElementSettings.field.enable(p_ParToDisable,p_TrueOrFalse)
 }

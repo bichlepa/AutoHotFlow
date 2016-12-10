@@ -2,7 +2,7 @@
 ui_SettingsOwFLow()
 {
 	static
-	global maingui, share, CurrentlyActiveWindowHWND, variable
+	global maingui, CurrentlyActiveWindowHWND, variable, flowobj
 	local pos, tempchecked, tempXpos, tempYpos, tempDir, tempSettingFlowExecutionPolicyOld
 	
 	maingui.disable()
@@ -15,22 +15,22 @@ ui_SettingsOwFLow()
 	
 	gui,font,s8 cDefault wnorm
 	
-	if (share.flowSettings.ExecutionPolicy="parallel")
+	if (flowobj.flowSettings.ExecutionPolicy="parallel")
 		tempchecked=1
 	else
 		tempchecked=0
 	gui,add,radio,w300 x10 Y+10 vGuiFlowSettingsParallel checked%tempchecked%,% lang("Parallel_execution_of_multiple_instances")
-	if (share.flowSettings.ExecutionPolicy="skip")
+	if (flowobj.flowSettings.ExecutionPolicy="skip")
 		tempchecked=1
 	else
 		tempchecked=0
 	gui,add,radio,w300 x10 Y+10 vGuiFlowSettingsSkip checked%tempchecked% ,% lang("Skip_execution_when_an_instance_is_already_executing")
-	if (share.flowSettings.ExecutionPolicy="wait")
+	if (flowobj.flowSettings.ExecutionPolicy="wait")
 		tempchecked=1
 	else
 		tempchecked=0
 	gui,add,radio,w300 x10 Y+10 vGuiFlowSettingsWait  checked%tempchecked%,% lang("Wait_until_the_currently_executing_instance_has_finished")
-	if (share.flowSettings.ExecutionPolicy="stop")
+	if (flowobj.flowSettings.ExecutionPolicy="stop")
 		tempchecked=1
 	else
 		tempchecked=0
@@ -39,13 +39,13 @@ ui_SettingsOwFLow()
 	gui,font,s10 cnavy wbold
 	gui,add,text,x10 w300 Y+15,% lang("Working directory")
 	gui,font,s8 cDefault wnorm
-	gui,add,Edit,w300 x10 Y+10 vGuiFlowSettingsWorkingDir,% share.flowSettings.WorkingDir
+	gui,add,Edit,w300 x10 Y+10 vGuiFlowSettingsWorkingDir,% flowobj.flowSettings.WorkingDir
 	
 	
 	gui,font,s10 cnavy wbold
 	gui,add,text,x10 w300 Y+15,% lang("Debug options")
 	gui,font,s8 cDefault wnorm
-	if (share.flowSettings.LogToFile=1)
+	if (flowobj.flowSettings.LogToFile=1)
 		tempchecked=1
 	else
 		tempchecked=0
@@ -56,12 +56,13 @@ ui_SettingsOwFLow()
 	gui,add,button,w145 h30 yp X+10 gGuiFlowSettingsCancel,% lang("Cancel")
 	
 
-		;Put the window in the center of the main window
+	;Put the window in the center of the main window
 	gui,+hwndSettingsHWND
 	CurrentlyActiveWindowHWND:=SettingsHWND
 	gui,show,hide
+	DetectHiddenWindows,on
 	
-	pos:=maingui.getpos()
+	pos:=EditGUIGetPos()
 	wingetpos,,,tempWidth,tempHeight,ahk_id %SettingsHWND%
 	tempXpos:=round(pos.x+pos.w/2- tempWidth/2)
 	tempYpos:=round(pos.y+pos.h/2- tempHeight/2)
@@ -69,7 +70,7 @@ ui_SettingsOwFLow()
 	return
 	
 	GuiFlowSettingsButtonShowLog:
-	;~ showlog()
+	showlog()
 	return
 	
 	
@@ -82,7 +83,8 @@ ui_SettingsOwFLow()
 	
 	
 	;~ d(variable)
-	tempDir:=% variable.replaceVariables("",GuiFlowSettingsWorkingDir) ;if user entered a built in variable
+	;~ tempDir:=% variable.replaceVariables("",GuiFlowSettingsWorkingDir) ;if user entered a built in variable //TODO
+	tempDir := GuiFlowSettingsWorkingDir
 	if DllCall("Shlwapi.dll\PathIsRelative","Str",tempDir) ;if user did not enter an absolute path
 	{
 		if GuiFlowSettingsWorkingDir!=  ;If user left it blank, he don't want to change it. if not...
@@ -107,7 +109,7 @@ ui_SettingsOwFLow()
 				}
 				else
 				{
-					share.flowSettings.WorkingDir:=GuiFlowSettingsWorkingDir
+					flowobj.flowSettings.WorkingDir:=GuiFlowSettingsWorkingDir
 					someSettingChanged:=true
 				}
 				
@@ -117,13 +119,13 @@ ui_SettingsOwFLow()
 		}
 		else
 		{
-			share.flowSettings.WorkingDir:=GuiFlowSettingsWorkingDir
+			flowobj.flowSettings.WorkingDir:=GuiFlowSettingsWorkingDir
 			someSettingChanged:=true
 		}
 	}
 	
 	
-	tempSettingFlowExecutionPolicyOld:=share.flowSettings.ExecutionPolicy
+	tempSettingFlowExecutionPolicyOld:=flowobj.flowSettings.ExecutionPolicy
 	
 	if GuiFlowSettingsParallel=1
 		tempExecutionPolicy:="parallel"
@@ -134,15 +136,15 @@ ui_SettingsOwFLow()
 	else if GuiFlowSettingsStop=1
 		tempExecutionPolicy:="stop"
 	
-	if (share.flowSettings.ExecutionPolicy!=tempExecutionPolicy)
+	if (flowobj.flowSettings.ExecutionPolicy!=tempExecutionPolicy)
 	{
-		share.flowSettings.ExecutionPolicy:=tempExecutionPolicy
+		flowobj.flowSettings.ExecutionPolicy:=tempExecutionPolicy
 		someSettingChanged:=true
 	}
 	
-	if (share.flowSettings.LogToFile!=GuiFlowSettingsLogToFile)
+	if (flowobj.flowSettings.LogToFile!=GuiFlowSettingsLogToFile)
 	{
-		share.flowSettings.LogToFile:=GuiFlowSettingsLogToFile
+		flowobj.flowSettings.LogToFile:=GuiFlowSettingsLogToFile
 		someSettingChanged:=true
 	}
 	

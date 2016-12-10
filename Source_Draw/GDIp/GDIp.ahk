@@ -580,6 +580,7 @@ gdip_DrawEverything(FlowObj)
 			;MsgBox,% "x1 " drawElement.part1x1 " y1 " drawElement.part1y1 " x2 " drawElement.part1x2 "y2" drawElement.part1y2
 			allElements[drawID].CountOfParts:=1
 			;~ drawElement.ClickPriority:=500
+			
 		}
 		if (drawElement.Type="Action")
 		{
@@ -839,7 +840,7 @@ gdip_DrawEverything(FlowObj)
 		EditButtonExist:=true
 		
 		;Trash Button
-		if (tempElList[markedElement].type="action" or  tempElList[markedElement].type = "condition" or tempElList[markedElement].type = "connection" or tempElList[markedElement].type = "loop")
+		if (tempElList[markedElement].type="action" or  tempElList[markedElement].type = "condition" or tempElList[markedElement].type = "trigger" or tempElList[markedElement].type = "connection" or tempElList[markedElement].type = "loop")
 		{
 			if (tempElList[markedElement].type = "connection")
 			{

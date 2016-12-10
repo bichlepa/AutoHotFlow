@@ -519,8 +519,7 @@ Button_manager_About()
 
 Button_manager_ShowLog()
 {
-;~ showlog()
-	;TODO
+	showlog()
 }
 
 Button_manager_Exit()

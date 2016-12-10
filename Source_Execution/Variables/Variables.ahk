@@ -197,7 +197,7 @@ Var_GetLocation(Environment, p_Name)
 	;Todo: static and global variables
 }
 
-Var_Set(environment, p_Name, p_Value, p_Type, p_Destination="")
+Var_Set(Environment, p_Name, p_Value, p_Type, p_Destination="")
 {
 	global _execution
 	res:=Var_CheckName(p_Name,true)

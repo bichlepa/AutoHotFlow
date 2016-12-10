@@ -12,9 +12,11 @@ enableTriggers(p_Flow)
 	{
 		if (forElement.type = "trigger")
 		{
-			triggerEnvironment:=Object()
+			triggerEnvironment:=criticalObject()
 			triggerEnvironment.id:= "enabledTrigger" ++EnabledTriggerIDCounter
 			triggerEnvironment.flowID:=p_Flow.ID
+			triggerEnvironment.EnvironmentType:="trigger"
+			triggerEnvironment.vars:=Object()
 			triggerEnvironment.ElementID:=forElementID
 			triggerEnvironment.ElementClass:=forElement.class
 			triggerEnvironment.Pars:=ObjFullyClone(forElement.pars)

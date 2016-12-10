@@ -22,7 +22,7 @@ lang_Init()
 #include source_Common\Multithreading\API Caller Main.ahk
 
 #include Source_Execution\execution task\execution task.ahk
-#include Source_Execution\execution task\functions for elements.ahk
+#include Source_Execution\API\functions for elements.ahk
 #include Source_Execution\execution task\instances and threads.ahk
 #include Source_Execution\API\API receiver Execution.ahk
 #include Source_Execution\Variables\Variables.ahk
@@ -38,9 +38,9 @@ parentAHKThread := AhkExported()
 
 menu,tray, tip, Execution
 
-SetTimer,executionTask,100
+SetTimer,executionTask,10
 
-
+hotkey, ^NumpadMult, d_showAnyVariable
 return
 
 

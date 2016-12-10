@@ -62,7 +62,7 @@ Element_run_Action_New_variable(Environment, ElementParameters)
 	return
 }
 
-Element_GenerateName_Action_New_variable(ElementParameters)
+Element_GenerateName_Action_New_variable(Environment, ElementParameters)
 {
 	global
 	return % lang("New_variable") " - " ElementParameters.Varname " = " ElementParameters.VarValue

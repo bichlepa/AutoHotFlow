@@ -8,12 +8,19 @@ initializeMenuBar()
 	
 	Menu, MyMenu,add,% lang("Save"),ui_Menu_save
 	Menu, MyMenu,add,% lang("Run"),ui_Menu_MenuStart
-	Menu, MyMenu,add,% lang("Enable"),ui_Menu_Enable
+	Menu, MyMenu,add,% lang("Stop"),ui_Menu_MenuStop
+	Menu, MyMenu,add,%  lang("Enable"),ui_Menu_Enable
+	Menu, EditMenu,add,% "↶ " lang("Undo"),ui_Menu_Undo
+	Menu, EditMenu,add,% "↷ " lang("Redo"),ui_Menu_Redo
+	Menu, MyMenu,add,% lang("Edit"),:EditMenu
 	Menu, MyMenu,add,% lang("Settings"),ui_Menu_Settings
 	Menu, MyMenu,add,% lang("Exit"),Exit
 
 	Gui, Maingui:menu, MyMenu
 }
+
+SetTimer, ui_Menu_CheckLoop, 10
+
 goto,überspringendsfasdg
 
 
@@ -32,23 +39,26 @@ return
 
 ui_Menu_MenuStart:
 
-if (nowRunning=true)
-{
-	API_Main_StopFlow(FlowID)
-}
-else
-{
-	API_Main_TriggerFlow(FlowID, "User")
-}
+API_Main_TriggerFlow(FlowID, "User")
 
 return
 
-
-
+ui_Menu_MenuStop:
+API_Main_StopFlow(FlowID)
+return
 
 ui_Menu_Enable:
 API_Main_enableToggleFlow(FlowID)
 return
+
+ui_Menu_Undo:
+gosub, ctrl_z
+return
+
+ui_Menu_Redo:
+gosub, ctrl_y
+return
+
 
 ui_Menu_Settings:
 if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of the main gui are disabled
@@ -59,6 +69,23 @@ if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of t
 ui_SettingsOwFLow()
 return
 
+ui_Menu_CheckLoop:
+if (menu_bar_IsEnabled != FlowObj.enabled)
+{
+	if (FlowObj.enabled = True)
+	{
+		menu_bar_IsEnabled := True
+		try Menu, MyMenu,rename,% lang("Enable"),% lang("Disable")
+	}
+	else if (FlowObj.enabled = false)
+	{
+		menu_bar_IsEnabled := False
+		try Menu, MyMenu,rename,% lang("Disable"),% lang("Enable")
+	}
+	
+}
+
+return
 
 
 überspringendsfasdg:

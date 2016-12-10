@@ -82,7 +82,7 @@ TriggerFlow(par_FlowID, par_Reason)
 
 StopFlow(par_FlowID)
 {
-	MsgBox The function %A_ThisFunc% is not implemented yet
+	API_Execution_StopFlow(par_FlowID)
 }
 
 StopAllFlows()

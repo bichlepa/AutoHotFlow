@@ -77,19 +77,14 @@ SaveFlow(FlowID)
 		RIni_AppendValue("iniSave", saveElementIniID, "StandardName", saveElement.StandardName)
 		
 		
-		if (saveElement.Type="trigger")
-		{
-			
-		}
-		else
-		{
-			RIni_AppendValue("iniSave", saveElementIniID, "subType", saveElement.subType)
-			if (saveElement.HeightOfVerticalBar)
-				RIni_AppendValue("iniSave", saveElementIniID, "HeightOfVerticalBar", saveElement.HeightOfVerticalBar)	
-			
-			i_SaveParametersOfElement(saveElement,saveElementIniID)
-			
-		}
+		
+		RIni_AppendValue("iniSave", saveElementIniID, "subType", saveElement.subType)
+		if (saveElement.HeightOfVerticalBar)
+			RIni_AppendValue("iniSave", saveElementIniID, "HeightOfVerticalBar", saveElement.HeightOfVerticalBar)	
+		
+		i_SaveParametersOfElement(saveElement,saveElementIniID)
+		
+		
 	}
 	
 	for saveElementID, saveElement in saveCopyOfallConnections
@@ -120,10 +115,8 @@ SaveFlow(FlowID)
 		RIni_AppendValue("iniSave", saveElementIniID, "class", saveElement.class)
 		RIni_AppendValue("iniSave", saveElementIniID, "subType", saveElement.subType)
 		RIni_AppendValue("iniSave", saveElementIniID, "name", saveElement.name)
-	
 		
 		i_SaveParametersOfElement(saveElement,saveElementIniID)
-		
 		
 	}
 	
