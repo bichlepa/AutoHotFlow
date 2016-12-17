@@ -17,6 +17,7 @@ OnExit,Exit
 #include lib\Object to file\String-object-file.ahk
 #include lib\GDI+\GDIp.ahk
 #include lib\objhasvalue\objhasvalue.ahk
+#include lib\ObjFullyClone\ObjFullyClone.ahk
 
 #include Source_Editor\User Interface\Editor GUI.ahk
 #include Source_Editor\User Interface\Editor GUI user input.ahk
