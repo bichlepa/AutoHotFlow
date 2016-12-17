@@ -151,6 +151,7 @@ init_GlobalVars()
 	_share.logcount := 0
 	_share.logcountAfterTidy := 0
 	_share.drawActive := 0 	;True if the draw thread is currently active
+	_share.temp := criticalObject() 	;For temporary content
 	
 	CriticalSection_Flows := CriticalSection()
 }

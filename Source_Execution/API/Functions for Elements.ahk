@@ -104,6 +104,7 @@ class Class_FunctionObject
 {
     __New(Environment, ToCallFunction, params*) 
 	{
+		;~ d(params, "ih")
         this.Environment := Environment
         this.FunctionObject := ObjBindMethod(this, Call)
 		this.ToCallFunction := ToCallFunction
@@ -111,10 +112,17 @@ class Class_FunctionObject
 		return this.FunctionObject
     }
    
-    Call() 
+    Call(args*) 
 	{
-        ToCallFunction:=this.ToCallFunction
-		%ToCallFunction%(this.Environment, this.params*)
+        ;~ d(args, "adf")
+		if not isobject(args)
+			args:=Object()
+		for oneparindex, onepar in this.params
+		{
+			args.push(onepar)
+		}
+		ToCallFunction:=this.ToCallFunction
+		%ToCallFunction%(this.Environment, args*)
     }
 	
 	 __Call(method, args*) {
@@ -156,6 +164,33 @@ x_GetListOfGlobalVars(Environment)
 	return Var_GetListOfGlobalVars(Environment)
 }
 
+
+x_ExportAllInstanceVars(Environment)
+{
+	global
+	return objfullyclone(_execution.instances[Environment.InstanceID].InstanceVars)
+}
+x_ImportInstanceVars(Environment, p_VarsToImport)
+{
+	for onevarName, oneVar in p_VarsToImport
+	{
+		InstanceVariable_Set(Environment,oneVar.name,oneVar.value,oneVar.type)
+	}
+	return Var_GetListOfInstanceVars(Environment)
+}
+
+x_GetListOfFlowNames()
+{
+	global _flows
+	;Search for all flowNames
+	choices:=object()
+	for oneFlowID, oneFlow in _flows
+	{
+		choices.push(oneFlow.name)
+	}
+	return choices
+}
+
 x_FlowEnableByName(Environment, p_FlowName)
 {
 	global _Flows
@@ -180,6 +215,66 @@ x_FlowDisableByName(Environment, p_FlowName)
 	}
 
 }
+x_FlowExecuteByName(Environment, p_FlowName, p_Variables ="", p_CallBackFunction ="")
+{
+	global _Flows
+	global _share
+	random, randomnumber
+	_share.temp[randomnumber]:=Object()
+	_share.temp[randomnumber].CallBack:=p_CallBackFunction
+	
+	;Fill variables which will be passed
+			;~ _share.temp[randomnumber].varstoPass:=p_Variables
+	varsToPass:=p_Variables
+	;~ if(p_Variables)
+	;~ {
+		;~ if isobject(p_Variables)
+		;~ {
+			;~ for forvarkey, forvarcontent in p_Variables
+			;~ {
+				;~ if isobject(forvarcontent)
+				;~ {
+					;~ tempname:=forvarcontent.name
+					;~ tempvalue:=forvarcontent.value
+					;~ temptype:=forvarcontent.type
+					;~ if not (temptype)
+						;~ temptype= normal
+					;~ varsToPass[tempname]:={name: tempname, value: tempvalue, type: temptype}
+				;~ }
+				;~ else
+				;~ {
+					;~ tempname:=forvarcontent
+					;~ tempObj:= InstanceVariable_GetWhole(Environment,tempname)
+					;~ tempvalue:=tempObj.value
+					;~ temptype:=tempObj.type
+					;~ varsToPass[tempname]:={name: tempname, value: tempvalue, type: temptype}
+				;~ }
+			;~ }
+		;~ }
+		;~ else
+		;~ {
+			;~ loop, parse, p_Variables, % ","
+			;~ {
+				;~ tempname:=A_LoopField
+				;~ tempObj:= InstanceVariable_GetWhole(Environment,tempname)
+				;~ tempvalue:=tempObj.value
+				;~ temptype:=tempObj.type
+				;~ varsToPass[tempname]:={name: tempname, value: tempvalue, type: temptype}
+			;~ }
+		;~ }
+	;~ }
+	_share.temp[randomnumber].varsToPass:=varsToPass
+	
+	for forFlowID, forFlow in _Flows
+	{
+		if (forFlow.name = p_FlowName)
+		{
+			;~ d(_share.temp)
+			API_Main_executeFlow(forFlow.id, randomnumber)
+		}
+	}
+
+}
 x_isFlowEnabledByName(Environment, p_FlowName)
 {
 	global _Flows
@@ -188,6 +283,18 @@ x_isFlowEnabledByName(Environment, p_FlowName)
 		if (forFlow.name = p_FlowName)
 		{
 			return forFlow.enabled
+		}
+	}
+	return False
+}
+x_isFlowExecutingByName(Environment, p_FlowName)
+{
+	global _Flows
+	for forFlowID, forFlow in _Flows
+	{
+		if (forFlow.name = p_FlowName)
+		{
+			return forFlow.executing
 		}
 	}
 	return False
@@ -233,11 +340,19 @@ x_disabled(Environment, Result, Message = "")
 
 ;While editing
 
-x_Par_Disable(Environment,p_ParToDisable, p_TrueOrFalse = True)
+x_Par_Disable(Environment,p_ParameterID, p_TrueOrFalse = True)
 {
-	;~ ElementSettings.field.enable(p_ParToDisable,not p_TrueOrFalse)
+	;~ return ElementSettings.field.enable(p_ParameterID,not p_TrueOrFalse)
 }
-x_Par_Enable(Environment,p_ParToDisable, p_TrueOrFalse = True)
+x_Par_Enable(Environment,p_ParameterID, p_TrueOrFalse = True)
 {
-	;~ ElementSettings.field.enable(p_ParToDisable,p_TrueOrFalse)
+	;~ return ElementSettings.field.enable(p_ParameterID,p_TrueOrFalse)
+}
+x_Par_SetValue(Environment,p_ParameterID, p_Value)
+{
+	;~ return ElementSettings.field.setvalue(p_Value,p_ParameterID)
+}
+x_Par_GetValue(Environment,p_ParameterID)
+{
+	;~ return ElementSettings.field.getvalue(p_ParameterID)
 }

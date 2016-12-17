@@ -117,25 +117,25 @@ API_Call_Main_stopFlow(par_FlowID)
 	return retval
 }
 
-API_Call_Main_runFlow(par_FlowID)
+API_Call_Main_executeFlow(par_FlowID, par_PassedParsKey)
 {
 	global
 	local retval
 	logger("t2", A_ThisFunc " call received")
 	
-	retval := runFlow(par_FlowID)
+	retval := executeFlow(par_FlowID, par_PassedParsKey)
 	
 	logger("t2", A_ThisFunc " call finished")
 	return retval
 }
 
-API_Call_Main_runToggleFlow(par_FlowID)
+API_Call_Main_executeToggleFlow(par_FlowID)
 {
 	global
 	local retval
 	logger("t2", A_ThisFunc " call received")
 	
-	retval := runToggleFlow(par_FlowID)
+	retval := executeToggleFlow(par_FlowID)
 	
 	logger("t2", A_ThisFunc " call finished")
 	return retval

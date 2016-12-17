@@ -46,6 +46,20 @@ newInstance(p_Environment)
 	finishExecutionOfElement(newThread, "Normal")
 	ThreadVariable_Set(newThread,"A_TriggerTime",a_now,"Date")
 	
+	if (p_Environment.params.varstoPass)
+	{
+		;~ d(p_Environment.params.varstoPass, "ioöhöio")
+		for onevarID, oneVar in p_Environment.params.varstoPass
+		{
+			InstanceVariable_Set(newThread, oneVar.name, oneVar.value, oneVar.type)
+		}
+	}
+	
+	if (p_Environment.params.CallBack)
+	{
+		newInstance.callBack := p_Environment.params.CallBack
+	}
+	
 	ElementClass:=p_Environment.ElementClass
 	if (isfunc("Element_postTrigger_" ElementClass))
 	{
@@ -60,7 +74,7 @@ newInstance(p_Environment)
 /**
 Start all manual triggers
 */
-startFlow(p_Flow)
+startFlow(p_Flow, p_params = "")
 {
 	static
 	global _flows
@@ -75,6 +89,7 @@ startFlow(p_Flow)
 				environment:=Object()
 				environment.flowID:=p_Flow.id
 				environment.elementID:=oneElement.id
+				environment.params:=p_params
 				newInstance(environment)
 				TriggerFound:=True
 			}
@@ -132,12 +147,20 @@ stopFlow(p_Flow)
 				_flows[OneThread.flowID].draw.mustDraw:=true
 			}
 		}
+		
+		
+		if (_execution.Instances[OneInstanceID].callback)
+		{
+			tempCallBackfunc:=_execution.Instances[OneInstanceID].callback
+			%tempCallBackfunc%("stopped", _execution.Instances[OneInstanceID].InstanceVars)
+		}
+		
 		_execution.Instances.delete(OneInstanceID)
 	}
 	updateFlowExcutingStates()
 }
 
-runToggleFlow(p_Flow)
+executeToggleFlow(p_Flow)
 {
 	;~ d(p_Flow)
 	if (p_Flow.executing)
@@ -202,7 +225,15 @@ removeThread(p_thread)
 removeInstance(p_instance)
 {
 	global
+	local tempCallBackfunc
 	;~ d(_execution, "going to remove " p_instance.id)
+	
+	if (p_instance.callback)
+	{
+		tempCallBackfunc:=p_instance.callback
+		%tempCallBackfunc%("finished", objfullyclone(p_instance.InstanceVars))
+	}
+	
 	_execution.Instances.delete(p_instance.id)
 	;~ d(_execution, "removed " p_instance.id)
 	updateFlowExcutingStates()

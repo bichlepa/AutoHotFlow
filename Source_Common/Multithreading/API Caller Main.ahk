@@ -131,22 +131,22 @@ API_Main_disableFlow(par_FlowID)
 	return retvalue
 }
 
-API_Main_runFlow(par_FlowID)
+API_Main_executeFlow(par_FlowID, par_PassedParsKey = "" )
 {
 	global
 	local retvalue
 	logger("t2", A_ThisFunc " called")
-	retvalue :=  parentAHKThread.ahkFunction("API_Call_Main_RunFlow", par_FlowID)
+	retvalue :=  parentAHKThread.ahkFunction("API_Call_Main_ExecuteFlow", par_FlowID, par_PassedParsKey)
 	logger("t2", A_ThisFunc " finished")
 	return retvalue
 }
 
-API_Main_runToggleFlow(par_FlowID)
+API_Main_executeToggleFlow(par_FlowID)
 {
 	global
 	local retvalue
 	logger("t2", A_ThisFunc " called")
-	retvalue :=  parentAHKThread.ahkFunction("API_Call_Main_runToggleFlow", par_FlowID)
+	retvalue :=  parentAHKThread.ahkFunction("API_Call_Main_executeToggleFlow", par_FlowID)
 	logger("t2", A_ThisFunc " finished")
 	return retvalue
 }
@@ -173,25 +173,6 @@ API_Main_Element_New(p_FlowID, p_type="",p_elementID="")
 	return retvalue
 }
 
-;~ API_Main_Trigger_New(p_FlowID, p_elementID, p_TriggerID="")
-;~ {
-	;~ global
-	;~ local retvalue
-	;~ logger("t2", A_ThisFunc " called")
-	;~ retvalue :=  parentAHKThread.ahkFunction("API_Call_Main_Trigger_New", p_FlowID, p_elementID, p_TriggerID)
-	;~ logger("t2", A_ThisFunc " finished")
-	;~ return retvalue
-;~ }
-
-;~ API_Main_Trigger_Remove(p_FlowID, p_TriggerID="")
-;~ {
-	;~ global
-	;~ local retvalue
-	;~ logger("t2", A_ThisFunc " called")
-	;~ retvalue :=  parentAHKThread.ahkFunction("API_Call_Main_Trigger_New", p_FlowID, p_TriggerID="")
-	;~ logger("t2", A_ThisFunc " finished")
-	;~ return retvalue
-;~ }
 
 API_Main_Connection_New(p_FlowID, p_elementID="")
 {

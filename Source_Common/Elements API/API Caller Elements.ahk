@@ -74,6 +74,24 @@ x_GetListOfStaticVars(Environment)
 x_GetListOfGlobalVars(Environment)
 {
 }
+x_ExportAllInstanceVars(Environment)
+{
+}
+x_ImportInstanceVars(Environment, p_VarsToImport)
+{
+}
+
+x_GetListOfFlowNames()
+{
+	global _flows
+	;Search for all flowNames
+	choices:=object()
+	for oneFlowID, oneFlow in _flows
+	{
+		choices.push(oneFlow.name)
+	}
+	return choices
+}
 
 x_trigger(Environment, triggerVars="")
 {
@@ -88,13 +106,21 @@ x_disabled(Environment, Result, Message = "")
 	
 }
 
-x_Par_Disable(Environment,p_ParToDisable, p_TrueOrFalse = True)
+x_Par_Disable(Environment,p_ParameterID, p_TrueOrFalse = True)
 {
-	ElementSettings.field.enable(p_ParToDisable,not p_TrueOrFalse)
+	return ElementSettings.field.enable(p_ParameterID,not p_TrueOrFalse)
 }
-x_Par_Enable(Environment,p_ParToDisable, p_TrueOrFalse = True)
+x_Par_Enable(Environment,p_ParameterID, p_TrueOrFalse = True)
 {
-	ElementSettings.field.enable(p_ParToDisable,p_TrueOrFalse)
+	return ElementSettings.field.enable(p_ParameterID,p_TrueOrFalse)
+}
+x_Par_SetValue(Environment,p_ParameterID, p_Value)
+{
+	return ElementSettings.field.setvalue(p_Value,p_ParameterID)
+}
+x_Par_GetValue(Environment,p_ParameterID)
+{
+	return ElementSettings.field.getvalue(p_ParameterID)
 }
 
 x_FlowEnableByName(Environment, p_FlowName)
@@ -104,9 +130,15 @@ x_FlowDisableByName(Environment, p_FlowName)
 {
 }
 x_FlowExistsByName(Environment, p_FlowName)
+{	
+}
+
+x_FlowExecuteByName(Environment, p_FlowName, p_Variables, p_CallBackFunction ="")
 {
-	
 }
 x_isFlowEnabledByName(Environment, p_FlowName)
+{
+}
+x_isFlowExecutingByName(Environment, p_FlowName)
 {
 }

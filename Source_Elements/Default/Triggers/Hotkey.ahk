@@ -174,6 +174,7 @@ Element_disable_Trigger_Hotkey(Environment, ElementParameters)
 {
 	uniqueID:=x_GetMyUniqueExecutionID(Environment)
 	temphotkey:=x_getExecutionValue(uniqueID, "hotkey")
+	x_DeleteMyUniqueExecutionID(Environment)
 	hotkey,%temphotkey%,off
 	x_disabled(Environment, "normal",  lang("The hotkey %1% was unset.",temphotkey))
 

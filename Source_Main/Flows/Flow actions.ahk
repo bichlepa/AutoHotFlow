@@ -64,24 +64,24 @@ disableFlow(par_FlowID)
 	API_Execution_DisableTriggers(par_FlowID)
 }
 
-RunFlow(par_FlowID)
+ExecuteFlow(par_FlowID, par_PassedParsKey)
 {
 	global _flows
 	if (_flows[par_FlowID].loaded != true)
 	{
 		LoadFlow(par_FlowID)
 	}
-	API_Execution_startFlow(par_FlowID)
+	API_Execution_startFlow(par_FlowID, par_PassedParsKey)
 }
 
-RunToggleFlow(par_FlowID)
+ExecuteToggleFlow(par_FlowID)
 {
 	global _flows
 	if (_flows[par_FlowID].loaded != true)
 	{
 		LoadFlow(par_FlowID)
 	}
-	API_Execution_RunToggleFlow(par_FlowID)
+	API_Execution_ExecuteToggleFlow(par_FlowID)
 }
 
 TriggerFlow(par_FlowID, par_Reason)

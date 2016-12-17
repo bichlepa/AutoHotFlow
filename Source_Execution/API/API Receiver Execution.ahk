@@ -1,8 +1,20 @@
-API_Call_Execution_startFlow(p_FlowID)
+API_Call_Execution_startFlow(p_FlowID, par_PassedParsKey)
 {
-	global _flows
+	global _flows, _share
 	
-	retvalue := startFlow(_flows[p_FlowID])
+	if (par_PassedParsKey!= "")
+	{
+		if (_share.temp.haskey(par_PassedParsKey))
+		{
+			;~ d(_share.temp[par_PassedParsKey], "aiöhio")
+			params:=Object()
+			params.VarsToPass:=_share.temp[par_PassedParsKey].varstoPass
+			params.CallBack:=_share.temp[par_PassedParsKey].CallBack
+			params.Wait:=_share.temp[par_PassedParsKey].Wait
+			_share.temp.delete(par_PassedParsKey)
+		}
+	}
+	retvalue := startFlow(_flows[p_FlowID], params)
 	return retvalue.id
 }
 
@@ -18,10 +30,10 @@ API_Call_Execution_StopFlow(p_FlowID)
 	retvalue := stopFlow(_flows[p_FlowID])
 	return retvalue.id
 }
-API_Call_Execution_RunToggleFlow(p_FlowID)
+API_Call_Execution_ExecuteToggleFlow(p_FlowID)
 {
 	global _flows
-	retvalue := runToggleFlow(_flows[p_FlowID])
+	retvalue := ExecuteToggleFlow(_flows[p_FlowID])
 	return retvalue.id
 }
 

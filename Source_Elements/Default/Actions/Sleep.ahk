@@ -66,12 +66,12 @@ Element_stop_Action_Sleep(Environment, ElementParameters)
 	uniqueID:=x_GetMyUniqueExecutionID(Environment)
 	functionObject:=x_getExecutionValue(uniqueID, "functionObject")
 	x_DeleteMyUniqueExecutionID(Environment)
-	x_DeleteMyUniqueExecutionID(uniqueID)
 	SetTimer, % functionObject, off
 }
 
 Element_run_Action_Sleep_EndSleep(Environment, ElementParameters="")
 {
+	;~ d(ElementParameters)
 	x_DeleteMyUniqueExecutionID(Environment)
 	x_DeleteMyUniqueExecutionID(uniqueID)
 	x_finish(Environment,"normal")

@@ -1,10 +1,10 @@
-﻿API_Execution_startFlow(p_FlowID)
+﻿API_Execution_startFlow(p_FlowID, par_PassedParsKey = "")
 {
 	global
 	local retvalue
 	logger("t2", A_ThisFunc " called")
 	
-	retvalue := AhkThreadExecution1.ahkFunction("API_Call_Execution_startFlow", p_FlowID)
+	retvalue := AhkThreadExecution1.ahkFunction("API_Call_Execution_startFlow", p_FlowID, par_PassedParsKey)
 	logger("t2", A_ThisFunc " finished")
 	
 	return retvalue
@@ -35,12 +35,12 @@ API_Execution_StopFlow(p_FlowID)
 	return retvalue
 	
 }
-API_Execution_RunToggleFlow(p_FlowID)
+API_Execution_ExecuteToggleFlow(p_FlowID)
 {
 	global
 	local retvalue
 	logger("t2", A_ThisFunc " called")
-	retvalue := AhkThreadExecution1.ahkFunction("API_Call_Execution_RunToggleFlow", p_FlowID)
+	retvalue := AhkThreadExecution1.ahkFunction("API_Call_Execution_ExecuteToggleFlow", p_FlowID)
 	logger("t2", A_ThisFunc " finished")
 	
 	return retvalue
