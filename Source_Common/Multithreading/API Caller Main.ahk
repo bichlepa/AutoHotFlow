@@ -72,6 +72,25 @@ API_Main_enableFlow(par_FlowID)
 	return retvalue
 }
 
+API_Main_enableOneTrigger(par_FlowID, par_TriggerID)
+{
+	global
+	local retvalue
+	logger("t2", A_ThisFunc " called")
+	retvalue :=  parentAHKThread.ahkFunction("API_Call_Main_enableOneTrigger", par_FlowID, par_TriggerID)
+	logger("t2", A_ThisFunc " finished")
+	return retvalue
+}
+API_Main_disableOneTrigger(par_FlowID, par_TriggerID)
+{
+	global
+	local retvalue
+	logger("t2", A_ThisFunc " called")
+	retvalue :=  parentAHKThread.ahkFunction("API_Call_Main_disableOneTrigger", par_FlowID, par_TriggerID)
+	logger("t2", A_ThisFunc " finished")
+	return retvalue
+}
+
 API_Main_enableToggleFlow(par_FlowID)
 {
 	global
@@ -98,6 +117,16 @@ API_Main_stopFlow(par_FlowID)
 	local retvalue
 	logger("t2", A_ThisFunc " called")
 	retvalue :=  parentAHKThread.ahkFunction("API_Call_Main_StopFlow", par_FlowID)
+	logger("t2", A_ThisFunc " finished")
+	return retvalue
+}
+
+API_Main_disableFlow(par_FlowID)
+{
+	global
+	local retvalue
+	logger("t2", A_ThisFunc " called")
+	retvalue :=  parentAHKThread.ahkFunction("API_Call_Main_DisableFlow", par_FlowID)
 	logger("t2", A_ThisFunc " finished")
 	return retvalue
 }

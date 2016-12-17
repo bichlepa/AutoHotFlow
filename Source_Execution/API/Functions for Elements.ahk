@@ -156,10 +156,60 @@ x_GetListOfGlobalVars(Environment)
 	return Var_GetListOfGlobalVars(Environment)
 }
 
+x_FlowEnableByName(Environment, p_FlowName)
+{
+	global _Flows
+	for forFlowID, forFlow in _Flows
+	{
+		if (forFlow.name = p_FlowName)
+		{
+			API_Main_enableFlow(forFlow.id)
+		}
+	}
+
+}
+x_FlowDisableByName(Environment, p_FlowName)
+{
+	global _Flows
+	for forFlowID, forFlow in _Flows
+	{
+		if (forFlow.name = p_FlowName)
+		{
+			API_Main_disableFlow(forFlow.id)
+		}
+	}
+
+}
+x_isFlowEnabledByName(Environment, p_FlowName)
+{
+	global _Flows
+	for forFlowID, forFlow in _Flows
+	{
+		if (forFlow.name = p_FlowName)
+		{
+			return forFlow.enabled
+		}
+	}
+	return False
+}
+
+x_FlowExistsByName(Environment, p_FlowName)
+{
+	global _Flows
+	for forFlowID, forFlow in _Flows
+	{
+		if (forFlow.name = p_FlowName)
+		{
+			return True
+		}
+	}
+	Return False
+}
+
 ;For elements
 x_finish(Environment, Result, Message = "")
 {
-	finishExecutionOfElement(Environment, Result, Message = "")
+	finishExecutionOfElement(Environment, Result, Message)
 	
 }
 ;For triggers

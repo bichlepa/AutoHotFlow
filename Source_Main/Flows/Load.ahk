@@ -10,6 +10,18 @@ LoadFlow(FlowID)
 	
 	OutdatedMainTriggerContainerData:=Object()
 	
+	if (FlowID="")
+	{
+		MsgBox internal error! A flow should be loaded but no FlowID is empty!
+		return
+	}
+	
+	if (_flows[FlowID].loaded)
+	{
+		MsgBox unexpected error. Flow %FlowID% should be loaded but it was already loaded
+		return
+	}
+	
 	if (currentlyLoadingFlow = true)
 	{
 		MsgBox unexpected error. a flow is already currently loading
@@ -150,6 +162,7 @@ LoadFlow(FlowID)
 				
 				;~ MsgBox % strobj(_flows[FlowID].allElements[loadElementID])
 				
+				_flows[FlowID].allElements[loadElementID].icon:=Element_getIconPath_%loadElementClass%()
 			}
 			;~ d_ExportAllDataToFile()
 			;~ MsgBox --- %loadElementID% %loadElementType%

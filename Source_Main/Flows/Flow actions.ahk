@@ -48,7 +48,7 @@ enableFlow(par_FlowID)
 enableToggleFlow(par_FlowID)
 {
 	global
-	;~ d(_flows[par_FlowID],"enableToggleFlow")
+	
 	if (_flows[par_FlowID].enabled != true)
 	{
 		enableFlow(par_FlowID)
@@ -66,18 +66,32 @@ disableFlow(par_FlowID)
 
 RunFlow(par_FlowID)
 {
-	API_Execution_newInstance(par_FlowID)
+	global _flows
+	if (_flows[par_FlowID].loaded != true)
+	{
+		LoadFlow(par_FlowID)
+	}
+	API_Execution_startFlow(par_FlowID)
 }
 
 RunToggleFlow(par_FlowID)
 {
-	MsgBox The function %A_ThisFunc% is not implemented yet
+	global _flows
+	if (_flows[par_FlowID].loaded != true)
+	{
+		LoadFlow(par_FlowID)
+	}
+	API_Execution_RunToggleFlow(par_FlowID)
 }
 
 TriggerFlow(par_FlowID, par_Reason)
 {
-	
-	API_Execution_newInstance(par_FlowID)
+	global _flows
+	if (_flows[par_FlowID].loaded != true)
+	{
+		LoadFlow(par_FlowID)
+	}
+	API_Execution_startFlow(par_FlowID)
 }
 
 StopFlow(par_FlowID)

@@ -45,12 +45,32 @@ gdip_Init()
 	pBrushBlack := Gdip_BrushCreateSolid("0xff000000") ;Black brush
 	pBrushUnmark := Gdip_BrushCreateSolid("0xfffafafa") ;White brush
 	pBrushMark := Gdip_BrushCreateSolid("0x5000ff00") ;Green brush, transparent
+	pBrushEnabled := Gdip_BrushCreateSolid("0x500000ff") ;Blue brush, transparent
 	pBrushRunning := Gdip_BrushCreateSolid("0x50ff0000") ;Red brush, transparent
 	pBrushLastRunning := Gdip_BrushCreateSolid("0x10ff0000") ;Red brush, very transparent
 	pBrushBackground := Gdip_BrushCreateSolid("0xFFeaf0ea") ;Almost white brush for background
 
 
-
+	pBitmapEdit := Gdip_CreateBitmapFromFile("Icons\edit.ico")
+	pBitmapPlus := Gdip_CreateBitmapFromFile("Icons\plus.ico")
+	pBitmapMove := Gdip_CreateBitmapFromFile("Icons\move.ico")
+	pBitmapTrash := Gdip_CreateBitmapFromFile("Icons\trash.ico")
+	pBitmapTrash := Gdip_CreateBitmapFromFile("Icons\trash.ico")
+	pBitmapSwitchOn := Gdip_CreateBitmapFromFile("Icons\e_switch_on.ico")
+	pBitmapSwitchOn_W := Gdip_GetImageWidth(pBitmapSwitchOn)
+	pBitmapSwitchOn_H := Gdip_GetImageHeight(pBitmapSwitchOn)
+	if (pBitmapSwitchOn_H > pBitmapSwitchOn_W)
+		pBitmapSwitchOn_size := pBitmapSwitchOn_H
+	else
+		pBitmapSwitchOn_size := pBitmapSwitchOn_W
+	pBitmapSwitchOff := Gdip_CreateBitmapFromFile("Icons\e_switch_off.ico")
+	pBitmapSwitchOff_W := Gdip_GetImageWidth(pBitmapSwitchOff)
+	pBitmapSwitchOff_H := Gdip_GetImageHeight(pBitmapSwitchOff)
+	if (pBitmapSwitchOff_H > pBitmapSwitchOff_W)
+		pBitmapSwitchOff_size := pBitmapSwitchOff_H
+	else
+		pBitmapSwitchOff_size := pBitmapSwitchOff_W
+	
 
 	CoordMode,mouse,client
 
@@ -77,7 +97,6 @@ gdip_DrawEverything(FlowObj)
 	;~ return
 	;~ MsgBox % strobj(allElements)
 	Critical,on
-	
 	
 	DrawingRightNow:=true
 	
@@ -558,10 +577,38 @@ gdip_DrawEverything(FlowObj)
 			
 			Gdip_FillRoundedRectangle(G, pBrushUnmark, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y-Offsety)*zoomFactor), ((ElementWidth)*zoomFactor), ((ElementHeight)*zoomFactor),(30*zoomFactor))
 			Gdip_DrawroundedRectangle(G, pPenGrey, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y-Offsety)*zoomFactor), ((ElementWidth)*zoomFactor), ((ElementHeight)*zoomFactor),(30*zoomFactor))
+			
+			if (drawElement.icon)
+			{
+				drawElementIcon(G,((drawElement.x-Offsetx)*zoomFactor),((drawElement.y-Offsety)*zoomFactor), (ElementWidth*zoomFactor), (ElementHeight*zoomFactor), drawElement.icon) 
+			}
+			
+			
 			Gdip_TextToGraphics(G, drawElement.name, "x" ((drawElement.x-Offsetx)*zoomFactor +4) " y" ((drawElement.y-Offsety)*zoomFactor+4) " vCenter " TextOptions , Font, ((ElementWidth)*zoomFactor-8), ((ElementHeight)*zoomFactor-8))
 			;~ ToolTip % drawElement.id " - " drawElement.marked
 			if (drawElement.marked=true)
 				Gdip_FillroundedRectangle(G, pBrushMark, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y-Offsety)*zoomFactor), ((ElementWidth)*zoomFactor), ((ElementHeight)*zoomFactor),(30*zoomFactor))
+			
+			if (drawElement.enabled)
+			{
+				tempX1:=drawElement.x + ElementWidth *0.8 - SizeOfButtons*0.5 - Offsetx
+				tempX2:=tempX1 + (SizeOfButtons * pBitmapSwitchOn_W / pBitmapSwitchOn_size)
+				tempY1:=drawElement.y + ElementHeight *0.25 - SizeOfButtons*0.5 - Offsety			
+				tempY2:=tempY1 + (SizeOfButtons * pBitmapSwitchOn_H / pBitmapSwitchOn_size)
+				Gdip_DrawImage(G, pBitmapSwitchOn, (tempX1 )*zoomFactor, (tempY1) *zoomFactor, (tempX2 - tempX1) *zoomFactor, (tempY2 - tempY1) *zoomFactor , 0, 0, pBitmapSwitchOn_w,pBitmapSwitchOn_H)
+				
+			}
+			else
+			{
+				tempX1:=drawElement.x + ElementWidth *0.8 - SizeOfButtons*0.5 - Offsetx
+				tempX2:=tempX1 + (SizeOfButtons * pBitmapSwitchOn_W / pBitmapSwitchOn_size)
+				tempY1:=drawElement.y + ElementHeight *0.25 - SizeOfButtons*0.5 - Offsety			
+				tempY2:=tempY1 + (SizeOfButtons * pBitmapSwitchOn_H / pBitmapSwitchOn_size)
+				Gdip_DrawImage(G, pBitmapSwitchOff, (tempX1 )*zoomFactor, (tempY1) *zoomFactor, (tempX2 - tempX1) *zoomFactor, (tempY2 - tempY1) *zoomFactor , 0, 0, pBitmapSwitchOn_w, pBitmapSwitchOn_H)
+			}
+			
+			
+			
 			if (drawElement.state="Running") ;If element is running
 			{
 				Gdip_FillroundedRectangle(G, pBrushRunning, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y-Offsety)*zoomFactor), ((ElementWidth)*zoomFactor), ((ElementHeight)*zoomFactor),(30*zoomFactor))
@@ -592,6 +639,12 @@ gdip_DrawEverything(FlowObj)
 			
 			Gdip_FillRectangle(G, pBrushUnmark, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y-Offsety)*zoomFactor), ((ElementWidth)*zoomFactor), ((ElementHeight)*zoomFactor))
 			Gdip_DrawRectangle(G, pPenGrey, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y-Offsety)*zoomFactor), ((ElementWidth)*zoomFactor), ((ElementHeight)*zoomFactor))
+			
+			if (drawElement.icon)
+			{
+				drawElementIcon(G,((drawElement.x-Offsetx)*zoomFactor),((drawElement.y-Offsety)*zoomFactor), (ElementWidth*zoomFactor), (ElementHeight*zoomFactor), drawElement.icon) 
+			}
+			
 			;Gdip_TextToGraphics(G, drawElement.name, "x" ((drawElement.x-Offsetx)*zoomFactor +4) "y" ((drawElement.y-Offsety)*zoomFactor+4) TextOptions , Font, ((ElementWidth)*zoomFactor-8), ((ElementHeight)*zoomFactor-8))
 			Gdip_TextToGraphics(G, drawElement.name, "x" ((drawElement.x-Offsetx)*zoomFactor +4) " y" ((drawElement.y-Offsety)*zoomFactor+4) " vCenter " TextOptions , Font, ((ElementWidth)*zoomFactor-8), (ElementHeight*zoomFactor-8))
 			if (drawElement.marked=true)
@@ -606,6 +659,8 @@ gdip_DrawEverything(FlowObj)
 			}
 			;MsgBox, % element "`n" drawElement.marked
 			
+			
+			
 			;Define area of parts
 			allElements[drawID].part1x1:=((drawElement.x-Offsetx)*zoomFactor)
 			allElements[drawID].part1y1:=((drawElement.y-Offsety)*zoomFactor)
@@ -613,6 +668,8 @@ gdip_DrawEverything(FlowObj)
 			allElements[drawID].part1y2:=((drawElement.y+ElementHeight-Offsety)*zoomFactor)
 			allElements[drawID].CountOfParts:=1
 			;~ drawElement.ClickPriority:=500
+			
+			
 		}
 		if (drawElement.Type="Condition")
 		{
@@ -624,6 +681,11 @@ gdip_DrawEverything(FlowObj)
 			Gdip_FillRoundedRectangle(G, pBrushUnmark, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y-Offsety)*zoomFactor), (ElementWidth*zoomFactor), (ElementHeight*zoomFactor),(30*zoomFactor))
 			;Gdip_FillPolygon(G, pBrushUnmark,((drawElement.x+ElementWidth/2)*zoomFactor) "," ((drawElement.y+0)*zoomFactor) "|" ((drawElement.x+ElementWidth)*zoomFactor) "," ((drawElement.y+ElementHeight/2)*zoomFactor) "|" ((drawElement.x+ElementWidth/2)*zoomFactor) "," ((drawElement.y+ElementHeight)*zoomFactor) "|" ((drawElement.x+0)*zoomFactor) "," ((drawElement.y+ElementHeight/2)*zoomFactor) "|" ((drawElement.x+ElementWidth/2)*zoomFactor) "," ((drawElement.y+0)*zoomFactor))
 			Gdip_DrawLines(G, pPenGrey,((drawElement.x+ElementWidth/2-Offsetx)*zoomFactor) "," ((drawElement.y+0-Offsety)*zoomFactor) "|" ((drawElement.x+ElementWidth-Offsetx)*zoomFactor) "," ((drawElement.y+ElementHeight/2-Offsety)*zoomFactor) "|" ((drawElement.x+ElementWidth/2-Offsetx)*zoomFactor) "," ((drawElement.y+ElementHeight-Offsety)*zoomFactor) "|" ((drawElement.x+0-Offsetx)*zoomFactor) "," ((drawElement.y+ElementHeight/2-Offsety)*zoomFactor) "|" ((drawElement.x+ElementWidth/2-Offsetx)*zoomFactor) "," ((drawElement.y+0-Offsety)*zoomFactor))
+			
+			if (drawElement.icon)
+			{
+				drawElementIcon(G,((drawElement.x-Offsetx)*zoomFactor),((drawElement.y-Offsety)*zoomFactor), (ElementWidth*zoomFactor), (ElementHeight*zoomFactor), drawElement.icon) 
+			}
 			
 			Gdip_TextToGraphics(G, drawElement.name, "x" ((drawElement.x-Offsetx)*zoomFactor +4) " y" ((drawElement.y-Offsety)*zoomFactor+4) " vCenter " TextOptions , Font, (ElementWidth*zoomFactor-8), (ElementHeight*zoomFactor-8))
 			if (drawElement.marked=true)
@@ -660,6 +722,11 @@ gdip_DrawEverything(FlowObj)
 			Gdip_FillRectangle(G, pBrushRunning,  ((drawElement.x+(ElementWidth *3/4)-Offsetx)*zoomFactor), ((drawElement.y+ElementHeight+drawElement.HeightOfVerticalBar-Offsety)*zoomFactor), ((ElementWidth *1/4)*zoomFactor), ((ElementHeight/3)*zoomFactor)) ;Break field
 			
 			Gdip_DrawLines(G, pPenGrey,((drawElement.x+0-Offsetx)*zoomFactor) "," ((drawElement.y+0-Offsety)*zoomFactor) "|" ((drawElement.x+ElementWidth-Offsetx)*zoomFactor) "," ((drawElement.y+0-Offsety)*zoomFactor) "|" ((drawElement.x+ElementWidth-Offsetx)*zoomFactor) "," ((drawElement.y+ElementHeight-Offsety)*zoomFactor) "|" ((drawElement.x+ElementWidth/8-Offsetx)*zoomFactor) "," ((drawElement.y+ElementHeight-Offsety)*zoomFactor) "|" ((drawElement.x+ElementWidth/8-Offsetx)*zoomFactor) "," ((drawElement.y+ElementHeight+drawElement.HeightOfVerticalBar-Offsety)*zoomFactor) "|" ((drawElement.x+ElementWidth-Offsetx)*zoomFactor) "," ((drawElement.y+ElementHeight+drawElement.HeightOfVerticalBar-Offsety)*zoomFactor) "|" ((drawElement.x+ElementWidth-Offsetx)*zoomFactor) "," ((drawElement.y+ElementHeight*4/3+drawElement.HeightOfVerticalBar-Offsety)*zoomFactor) "|" ((drawElement.x-Offsetx)*zoomFactor) "," ((drawElement.y+ElementHeight*4/3+drawElement.HeightOfVerticalBar-Offsety)*zoomFactor) "|" ((drawElement.x+0-Offsetx)*zoomFactor) "," ((drawElement.y+0-Offsety)*zoomFactor) )
+			
+			if (drawElement.icon)
+			{
+				drawElementIcon(G,((drawElement.x-Offsetx)*zoomFactor),((drawElement.y-Offsety)*zoomFactor), (ElementWidth*zoomFactor), (ElementHeight*zoomFactor), drawElement.icon) 
+			}
 			
 			Gdip_TextToGraphics(G, drawElement.name, "x" ((drawElement.x-Offsetx)*zoomFactor +4) " y" ((drawElement.y-Offsety)*zoomFactor+4) " vCenter " TextOptions , Font, (ElementWidth*zoomFactor-8), (ElementHeight*zoomFactor-8))
 			Gdip_TextToGraphics(G, "break", "x" ((drawElement.x+(ElementWidth *3/4)-Offsetx)*zoomFactor ) " y" ((drawElement.y+ElementHeight+drawElement.HeightOfVerticalBar-Offsety)*zoomFactor) " vCenter " TextOptionsSmall , Font, (ElementWidth*1/4*zoomFactor), (ElementHeight*1/3*zoomFactor)) ;Break text
@@ -720,6 +787,8 @@ gdip_DrawEverything(FlowObj)
 	EditButtonExist:=false
 	MoveButton1Exist:=false
 	MoveButton2Exist:=false
+	SwitchOnButtonExist:=false
+	SwitchOffButtonExist:=false
 	
 	if (FlowObj.markedElements.count()=1)
 	{
@@ -743,10 +812,6 @@ gdip_DrawEverything(FlowObj)
 			tempElList:=allElements
 		
 		
-		pBitmapEdit := Gdip_CreateBitmapFromFile("Icons\edit.ico")
-		pBitmapPlus := Gdip_CreateBitmapFromFile("Icons\plus.ico")
-		pBitmapMove := Gdip_CreateBitmapFromFile("Icons\move.ico")
-		pBitmapTrash := Gdip_CreateBitmapFromFile("Icons\trash.ico")
 		
 		;Move Button
 		if (tempElList[markedElement].type = "connection")
@@ -839,6 +904,7 @@ gdip_DrawEverything(FlowObj)
 		Gdip_DrawImage(G, pBitmapEdit, (middlePointOfEditButtonX - (SizeOfButtons*0.5) )*zoomFactor, ( middlePointOfEditButtonY - (SizeOfButtons*0.5)) *zoomFactor, SizeOfButtons*zoomFactor, SizeOfButtons*zoomFactor , 0, 0, 48, 48)
 		EditButtonExist:=true
 		
+		
 		;Trash Button
 		if (tempElList[markedElement].type="action" or  tempElList[markedElement].type = "condition" or tempElList[markedElement].type = "trigger" or tempElList[markedElement].type = "connection" or tempElList[markedElement].type = "loop")
 		{
@@ -880,6 +946,32 @@ gdip_DrawEverything(FlowObj)
 			
 		}
 		
+		;Switch on or off Button
+		;~ MsgBox % strobj(tempElList[markedElement])
+		if (tempElList[markedElement].type = "trigger" )
+		{
+			if (tempElList[markedElement].enabled)
+			{
+				PosOfSwitchOnButtonX1:=tempElList[markedElement].x + ElementWidth *0.8 - SizeOfButtons*0.5 - Offsetx
+				PosOfSwitchOnButtonX2:=PosOfSwitchOnButtonX1 + (SizeOfButtons * pBitmapSwitchOn_W / pBitmapSwitchOn_size)
+				PosOfSwitchOnButtonY1:=tempElList[markedElement].y + ElementHeight *0.25 - SizeOfButtons*0.5 - Offsety			
+				PosOfSwitchOnButtonY2:=PosOfSwitchOnButtonY1 + (SizeOfButtons * pBitmapSwitchOn_H / pBitmapSwitchOn_size)
+				Gdip_DrawImage(G, pBitmapSwitchOn, (PosOfSwitchOnButtonX1 )*zoomFactor, (PosOfSwitchOnButtonY1) *zoomFactor, (PosOfSwitchOnButtonX2 - PosOfSwitchOnButtonX1) *zoomFactor, (PosOfSwitchOnButtonY2 - PosOfSwitchOnButtonY1) *zoomFactor , 0, 0, pBitmapSwitchOn_w,pBitmapSwitchOn_H)
+				SwitchOnButtonExist:=true
+				
+			}
+			else
+			{
+				PosOfSwitchOffButtonX1:=tempElList[markedElement].x + ElementWidth *0.8 - SizeOfButtons*0.5 - Offsetx
+				PosOfSwitchOffButtonX2:=PosOfSwitchOffButtonX1 + (SizeOfButtons * pBitmapSwitchOn_W / pBitmapSwitchOn_size)
+				PosOfSwitchOffButtonY1:=tempElList[markedElement].y + ElementHeight *0.25 - SizeOfButtons*0.5 - Offsety			
+				PosOfSwitchOffButtonY2:=PosOfSwitchOffButtonY1 + (SizeOfButtons * pBitmapSwitchOn_H / pBitmapSwitchOn_size)
+				Gdip_DrawImage(G, pBitmapSwitchOff, (PosOfSwitchOffButtonX1 )*zoomFactor, (PosOfSwitchOffButtonY1) *zoomFactor, (PosOfSwitchOffButtonX2 - PosOfSwitchOffButtonX1) *zoomFactor, (PosOfSwitchOffButtonY2 - PosOfSwitchOffButtonY1) *zoomFactor , 0, 0, pBitmapSwitchOn_w, pBitmapSwitchOn_H)
+				SwitchOffButtonExist:=true
+			}
+		}
+		
+		
 		
 	}
 	else if (FlowObj.draw.DrawMoveButtonUnderMouse=true)
@@ -917,7 +1009,9 @@ gdip_DrawEverything(FlowObj)
 	FlowObj.draw.TrashButtonExist:=TrashButtonExist
 	FlowObj.draw.EditButtonExist:=EditButtonExist
 	FlowObj.draw.MoveButton1Exist:=MoveButton1Exist
-	FlowObj.draw.MoveButton2Exist:=MoveButton2Exist
+	FlowObj.draw.MoveButton2Exist:=MoveButton2Exist	
+	FlowObj.draw.SwitchOnButtonExist:=SwitchOnButtonExist
+	FlowObj.draw.SwitchOffButtonExist:=SwitchOffButtonExist
 	
 	FlowObj.draw.middlePointOfPlusButtonX:=middlePointOfPlusButtonX * zoomFactor
 	FlowObj.draw.middlePointOfPlusButton2X:=middlePointOfPlusButton2X * zoomFactor
@@ -931,6 +1025,14 @@ gdip_DrawEverything(FlowObj)
 	FlowObj.draw.middlePointOfTrashButtonY:=middlePointOfTrashButtonY * zoomFactor
 	FlowObj.draw.middlePointOfMoveButton2Y:=middlePointOfMoveButton2Y * zoomFactor
 	FlowObj.draw.middlePointOfMoveButton1Y:=middlePointOfMoveButton1Y * zoomFactor
+	FlowObj.draw.PosOfSwitchOffButtonX1:=PosOfSwitchOffButtonX1 * zoomFactor
+	FlowObj.draw.PosOfSwitchOffButtonX2:=PosOfSwitchOffButtonX2 * zoomFactor
+	FlowObj.draw.PosOfSwitchOffButtonY1:=PosOfSwitchOffButtonY1 * zoomFactor
+	FlowObj.draw.PosOfSwitchOffButtonY2:=PosOfSwitchOffButtonY2	* zoomFactor
+	FlowObj.draw.PosOfSwitchOnButtonX1:=PosOfSwitchOnButtonX1 * zoomFactor
+	FlowObj.draw.PosOfSwitchOnButtonX2:=PosOfSwitchOnButtonX2 * zoomFactor
+	FlowObj.draw.PosOfSwitchOnButtonY1:=PosOfSwitchOnButtonY1 * zoomFactor
+	FlowObj.draw.PosOfSwitchOnButtonY2:=PosOfSwitchOnButtonY2 * zoomFactor
 	
 	
 	FlowObj.draw.NewElementIconWidth:=NewElementIconWidth * zoomFactor
@@ -964,3 +1066,37 @@ gdip_DrawEverything(FlowObj)
 
 }
 
+drawElementIcon(G, p_x, p_y, p_w, p_h ,path)
+{
+	static allElementIconBitmaps:=Object()
+	
+	if (allElementIconBitmaps.haskey(path))
+	{
+		BitmapIcon:=allElementIconBitmaps[path]
+	}
+	else
+	{
+		BitmapIcon := Gdip_CreateBitmapFromFile(path)
+		allElementIconBitmaps[path]:=BitmapIcon
+	}
+	
+	sw:=Gdip_GetImageWidth(BitmapIcon)
+	sh:=Gdip_GetImageHeight(BitmapIcon)
+	if (p_w/p_h > sw/sh)
+	{
+		h := p_h
+		w := h*sw/sh
+		y:=p_y
+		x:=p_x + p_w/2 - w/2
+	}
+	else
+	{
+		w := p_w
+		h := w*sh/sw
+		x:=p_x
+		y:=p_y + p_h/2 - h/2
+	}
+	
+	Gdip_DrawImage(G, BitmapIcon, x, y, w, h ,,,,,0.2)
+	
+}

@@ -5,10 +5,14 @@ globalSettings_GUI()
 	
 	Disable_Manager_GUI()
 	
+	GuiSettingAutostart=0
+	local lnk_target=0
 	IfExist, %A_Startup%\AutoHotFlow.lnk 
-		GuiSettingAutostart=1
-	else
-		GuiSettingAutostart=0
+	{
+		FileGetShortcut, %A_Startup%\AutoHotFlow.lnk , lnk_target
+		if (lnk_target = A_ScriptFullPath)
+			GuiSettingAutostart=1
+	}
 
 	gui,GlobalSettings:default
 	gui,GlobalSettings:add,text,,% lang("Startup") 
@@ -36,5 +40,5 @@ globalSettings_GUI()
 
 	gui,GlobalSettings:destroy
 	Enable_Manager_GUI()
-
+	return
 }

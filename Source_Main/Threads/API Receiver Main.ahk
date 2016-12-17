@@ -47,6 +47,29 @@ API_Call_Main_enableFlow(par_FlowID)
 	return retval
 }
 
+API_Call_Main_enableOneTrigger(par_FlowID, par_TriggerID)
+{
+	global
+	local retval
+	logger("t2", A_ThisFunc " call received")
+	
+	retval := API_Execution_enableOneTrigger(par_FlowID, par_TriggerID)
+	
+	logger("t2", A_ThisFunc " call finished")
+	return retval
+}
+API_Call_Main_disableOneTrigger(par_FlowID, par_TriggerID)
+{
+	global
+	local retval
+	logger("t2", A_ThisFunc " call received")
+	
+	retval := API_Execution_disableOneTrigger(par_FlowID, par_TriggerID)
+	
+	logger("t2", A_ThisFunc " call finished")
+	return retval
+}
+
 API_Call_Main_enableToggleFlow(par_FlowID)
 {
 	global
@@ -54,6 +77,17 @@ API_Call_Main_enableToggleFlow(par_FlowID)
 	logger("t2", A_ThisFunc " call received")
 	
 	retval := enableToggleFlow(par_FlowID)
+	
+	logger("t2", A_ThisFunc " call finished")
+	return retval
+}
+API_Call_Main_disableFlow(par_FlowID)
+{
+	global
+	local retval
+	logger("t2", A_ThisFunc " call received")
+	
+	retval := disableFlow(par_FlowID)
 	
 	logger("t2", A_ThisFunc " call finished")
 	return retval

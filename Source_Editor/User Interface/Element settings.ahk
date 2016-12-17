@@ -675,7 +675,7 @@ class ElementSettings
 					varsToDelete.push("GUISettingsOfElement" tempContentTypeID "2")
 				}
 				
-				;Add picture, which will warn user if the etry is obviously invalid
+				;Add picture, which will warn user if the entry is obviously invalid
 				gui,add,picture,x394 w16 h16 hwndtempHWND gGUISettingsOfElementClickOnWarningPic vGUISettingsOfElementWarningIconOf%tempOneParameterID%
 				this.components.push("GUISettingsOfElementWarningIconOf" tempOneParameterID)
 				ElementSettingsFieldHWNDs[tempHWND]:=this
@@ -1082,6 +1082,7 @@ class ElementSettings
 	
 	class ComboBox extends ElementSettings.field
 	{
+		;TODO: Check content as in edit field
 		__new(parameter)
 		{
 			global
@@ -1115,13 +1116,175 @@ class ElementSettings
 			}
 			StringTrimLeft,tempAllChoices,tempAllChoices,1
 			
-			gui,add,ComboBox, w400 x10 %tempAltSumbit% choose%temptoChoose% hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID% ,% tempAllChoices
-			this.components.push("GUISettingsOfElement" tempParameterID)
-			ElementSettingsFieldHWNDs[tempHWND]:=this
 			
+			;Add picture, which will warn user if the entry is obviously invalid
+			gui,add,picture,x394 w16 h16 hwndtempHWND gGUISettingsOfElementClickOnWarningPic vGUISettingsOfElementWarningIconOf%tempOneParameterID%
+			this.components.push("GUISettingsOfElementWarningIconOf" tempOneParameterID)
+			ElementSettingsFieldHWNDs[tempHWND]:=this
+			this.warnIfEmpty:=parameter.WarnIfEmpty
+			
+			if (parameter.content="Expression")
+			{
+				;The info icon tells user which conent type it is
+				gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempOneParameterID%,icons\expression.ico
+				this.components.push("GUISettingsOfElementInfoIconOf" tempOneParameterID)
+				ElementSettingsFieldHWNDs[tempHWND]:=this
+				
+				gui,add,ComboBox, X+4 yp w360 hwndtempHWND %tempAltSumbit% choose%temptoChoose%  gGUISettingsOfElementCheckContent vGUISettingsOfElement%tempParameterID% ,% tempAllChoices
+				this.components.push("vGUISettingsOfElement" tempOneParameterID)
+				ElementSettingsFieldHWNDs[tempHWND]:=this
+				if parameter.useupdown
+				{
+					if parameter.range
+						gui,add,updown,% "range" parameter.range
+					else
+						gui,add,updown
+					guicontrol,SettingsOfElement:,GUISettingsOfElement%tempOneParameterID%,%temptext%
+				}
+				this.ContentType:="Expression"
+				;~ GUISettingsOfElementContentType%tempOneParameterID%=Expression
+			}
+			else if (parameter.content="String")
+			{
+				gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempOneParameterID%,icons\string.ico
+				this.components.push("GUISettingsOfElementInfoIconOf" tempOneParameterID)
+				ElementSettingsFieldHWNDs[tempHWND]:=this
+				
+				gui,add,ComboBox, X+4 yp w360 hwndtempHWND %tempAltSumbit% choose%temptoChoose%  gGUISettingsOfElementCheckContent vGUISettingsOfElement%tempParameterID% ,% tempAllChoices
+				this.components.push("GUISettingsOfElement" tempOneParameterID)
+				ElementSettingsFieldHWNDs[tempHWND]:=this
+				
+				this.ContentType:="String"
+				;~ GUISettingsOfElementContentType%tempOneParameterID%=String
+			}
+			else if (parameter.content="VariableName")
+			{
+				gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempOneParameterID%,icons\VariableName.ico
+				this.components.push("GUISettingsOfElementInfoIconOf" tempOneParameterID)
+				ElementSettingsFieldHWNDs[tempHWND]:=this
+				
+				gui,add,ComboBox, X+4 yp w360 hwndtempHWND %tempAltSumbit% choose%temptoChoose%  gGUISettingsOfElementCheckContent vGUISettingsOfElement%tempParameterID% ,% tempAllChoices
+				this.components.push("GUISettingsOfElement" tempOneParameterID)
+				ElementSettingsFieldHWNDs[tempHWND]:=this
+				
+				this.ContentType:="VariableName"
+				;~ GUISettingsOfElementContentType%tempOneParameterID%=VariableName
+			}
+			else if (parameter.content="StringOrExpression")
+			{
+				
+				
+				if (tempContentTypeNum=1) 
+					gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempOneParameterID%,icons\string.ico
+				else ;If content is expression
+					gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempOneParameterID%,icons\expression.ico
+				this.components.push("GUISettingsOfElementInfoIconOf" tempOneParameterID)
+				ElementSettingsFieldHWNDs[tempHWND]:=this
+				
+				gui,add,ComboBox, X+4 yp w360 hwndtempHWND %tempAltSumbit% choose%temptoChoose%  gGUISettingsOfElementCheckContent vGUISettingsOfElement%tempParameterID% ,% tempAllChoices
+				this.components.push("GUISettingsOfElement" tempOneParameterID)
+				ElementSettingsFieldHWNDs[tempHWND]:=this
+				
+				this.ContentType:="StringOrExpression"
+			}
+			else ;Text field without specified content type and without info icon
+			{
+				gui,add,ComboBox, x10 yp w380 hwndtempHWND %tempAltSumbit% choose%temptoChoose%  gGUISettingsOfElementCheckContent vGUISettingsOfElement%tempParameterID% ,% tempAllChoices
+				this.components.push("GUISettingsOfElement" tempOneParameterID)
+				ElementSettingsFieldHWNDs[tempHWND]:=this
+			}
 			guicontrol,SettingsOfElement:text,GUISettingsOfElement%tempParameterID%,% temp
 			
-			varsToDelete.push("GUISettingsOfElement" tempParameterID)
+			this.checkContent()
+			
+			varsToDelete.push("GUISettingsOfElement" tempOneParameterID, "GUISettingsOfElementContentTypeRadio" tempOneParameterID, "GUISettingsOfElementInfoIconOf" tempOneParameterID, "GUISettingsOfElementWarningIconOf" tempOneParameterID)
+			
+		}
+		
+		checkContent()
+		{
+			global
+			local tempFoundPos, tempRadioVal, tempOneParamID, tempTextInControl, tempTextInControlReplaced
+			
+			tempOneParamID:=this.parameter.id
+			if tempOneParamID=
+				MsgBox error! tempOneParamID is empty. Code: 561684861
+			
+			This.warningText:=""
+			if (this.enabled)
+			{
+				tempTextInControl:=this.getvalue(tempOneParamID)
+				;~ MsgBox % tempTextInControl "`n" this.ContentType
+				if (this.ContentType="Expression")
+				{
+					
+					
+					IfInString,tempTextInControl,`%
+					{
+						guicontrol,SettingsOfElement:show,GUISettingsOfElementWarningIconOf%tempOneParamID%
+						guicontrol,SettingsOfElement:,GUISettingsOfElementWarningIconOf%tempOneParamID%,Icons\Question mark.ico
+						This.warningText:=lang("Note!") " " lang("This is an expression.") " " lang("You musn't use percent signs to add a variable's content.") "`n"
+					}
+				}
+				else if (this.ContentType="variablename")
+				{
+					tempTextInControlReplaced:=tempTextInControl
+					Loop
+					{
+						tempFoundPos:=RegExMatch(tempTextInControlReplaced, "U).*%(.+)%.*", tempVariablesToReplace)
+						if tempFoundPos=0
+							break
+						StringReplace,tempTextInControlReplaced,tempTextInControlReplaced,`%%tempVariablesToReplace1%`%,someVarName
+					}
+					;~ ToolTip( tempTextInControlReplaced " - " tempTextInControl)
+					try
+						asdf%tempTextInControlReplaced%:=1 
+					catch
+					{
+						guicontrol,SettingsOfElement:show,GUISettingsOfElementWarningIconOf%tempOneParamID%
+						guicontrol,SettingsOfElement:,GUISettingsOfElementWarningIconOf%tempOneParamID%,Icons\Exclamation mark.ico
+						This.warningText:=lang("Error!") " " lang("The variable name is not valid.") "`n"
+					}
+				}
+				
+				if (this.WarnIfEmpty)
+				{
+					if tempTextInControl=
+					{
+						guicontrol,SettingsOfElement:show,GUISettingsOfElementWarningIconOf%tempOneParamID%
+						guicontrol,SettingsOfElement:,GUISettingsOfElementWarningIconOf%tempOneParamID%,Icons\Exclamation mark.ico
+						This.warningText:=lang("Error!") " " lang("This field mustn't be empty!") "`n"
+					}
+				}
+			}
+			;~ ToolTip(This.warningText)
+			if (This.warningText="" and !openingElementSettingsWindow)
+			{
+				
+				guicontrol,SettingsOfElement:hide,GUISettingsOfElementWarningIconOf%tempOneParamID%
+			}
+			GUISettingsOfElementObject.GeneralUpdate()
+		}
+		
+		clickOnInfoPic()
+		{
+			global
+			local temp, tempOneParamID
+			tempOneParamID:=this.parameter.id
+			
+			if (this.contenttype="Expression")
+			{
+				ToolTip,% lang("This field contains an expression") "`n" lang("Examples") ":`n5`n5+3*6`nA_ScreenWidth`n(a=4) or (b=1)" ,,,11
+			}
+			if (this.contenttype="String")
+			{
+				ToolTip,% lang("This field contains a string") "`n" lang("Examples") ":`nHello World`nMy name is %A_UserName%`nToday's date is %A_Now%" ,,,11
+			}
+			if (this.contenttype="VariableName") 
+			{
+				ToolTip,% lang("This field contains a variable name") "`n" lang("Examples") ":`nVarname`nEntry1`nEntry%a_index%" ,,,11
+			}
+			settimer,GUISettingsOfElementRemoveInfoTooltip,-5000
 		}
 	}
 	

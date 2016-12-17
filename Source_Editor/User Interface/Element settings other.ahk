@@ -202,6 +202,7 @@ selectSubType(p_ElementID,wait="")
 	EditGUIEnable()
 	
 	API_Main_Element_SetClass(FlowID,setElementID,TVClass[GuiElementChoosedTV])
+
 	
 	;MsgBox,%setElementID% %GuiElementChoose%
 	

@@ -16,6 +16,11 @@ Element_getName_Action_New_variable()
 	return lang("New_variable")
 }
 
+Element_getIconPath_Action_New_variable()
+{
+	return "Source_elements\default\icons\New variable.png"
+}
+
 Element_getCategory_Action_New_variable()
 {
 	return lang("Variable")

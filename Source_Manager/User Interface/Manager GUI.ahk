@@ -10,9 +10,13 @@ init_Manager_GUI()
 	;initialize image list
 	IconList:=IL_Create("","",1)
 	IL_Add(IconList,"Icons\disabled.ico")
+	Icon_Disabled:="icon1"
 	IL_Add(IconList,"Icons\enabled.ico")
+	Icon_Enabled:="icon2"
 	IL_Add(IconList,"Icons\running.ico")
+	Icon_Running:="icon3"
 	IL_Add(IconList,"Icons\folder.ico")
+	Icon_Folder:="icon4"
 	gui,manager:default
 
 	;Create main GUI
@@ -38,6 +42,8 @@ init_Manager_GUI()
 	gui,+hwndManagerGUIHWND
 	_share.hwnds.Manager := ManagerGUIHWND
 	
+	updateFlowIcons_Manager_GUI()
+	
 	if a_iscompiled
 	{
 		menu,tray, tip,% "AutoHotFlow " lang("Manager")
@@ -48,6 +54,8 @@ init_Manager_GUI()
 		menu,tray, tip,% "AutoHotFlow " lang("Manager") " - UNCOMPILED "
 		Gui, Show,hide, % "AutoHotFlow " lang("Manager") " - UNCOMPILED "
 	}
+	
+	settimer, updateFlowIcons_Manager_GUI, 100
 }
 
 Refresh_Manager_GUI()
@@ -97,7 +105,78 @@ Enable_Manager_GUI()
 	WinActivate,% "ahk_id " _share.hwnds.Manager 
 }
 
-
+updateFlowIcons_Manager_GUI()
+{
+	global 
+	static currentIcons:=Object()
+	static currentLabelButtonRun:=""
+	static currentLabelButtonEnable:=""
+	Gui, manager:default
+	local forFlowID, forFlow, selectedFlow
+	for forFlowID, forFlow in _flows
+	{
+		if (forFlow.executing = True)
+		{
+			if (currentIcons[forFlowID]!=Icon_Running)
+			{
+				TV_Modify(forFlow.tv, Icon_Running)
+				currentIcons[forFlowID]:=Icon_Running
+			}
+		}
+		else if (forFlow.enabled = true)
+		{
+			if (currentIcons[forFlowID]!=Icon_Enabled)
+			{
+				TV_Modify(forFlow.tv, Icon_Enabled)
+				currentIcons[forFlowID]:=Icon_Enabled
+			}
+		}
+		else
+		{
+			if (currentIcons[forFlowID]!=Icon_Disabled)
+			{
+				TV_Modify(forFlow.tv, Icon_Disabled)
+				currentIcons[forFlowID]:=Icon_Disabled
+			}
+		}
+		
+	}
+	
+	
+	selectedFlow:=_flows[allTreeViewItems[TV_GetSelection()].id]
+	if (selectedFlow.executing = True)
+	{
+		if (currentLabelButtonRun != "stop")
+		{
+			guicontrol,,Button_manager_RunFlow ,% lang("Stop")
+			currentLabelButtonRun := "Stop"
+		}
+	}
+	else
+	{
+		if (currentLabelButtonRun != "Run")
+		{
+			guicontrol,,Button_manager_RunFlow ,% lang("Run")
+			currentLabelButtonRun := "Run"
+		}
+	}
+	if (selectedFlow.enabled = True)
+	{
+		if (currentLabelButtonRun != "disable")
+		{
+			guicontrol,,Button_manager_EnableFlow ,% lang("Disable")
+			currentLabelButtonRun := "disable"
+		}
+	}
+	else
+	{
+		if (currentLabelButtonRun != "Enable")
+		{
+			guicontrol,,Button_manager_EnableFlow ,% lang("Enable")
+			currentLabelButtonRun := "Enable"
+		}
+	}
+}
 TreeView_manager_AddEntry(par_Type, par_ID)
 {
 	global
@@ -106,11 +185,11 @@ TreeView_manager_AddEntry(par_Type, par_ID)
 	local tempParentTV
 	if (par_Type = "flow")
 	{
-		newTV := TV_Add(_flows[par_ID].name, _share.allCategories[_flows[par_ID].category].tv, "icon1")
+		newTV := TV_Add(_flows[par_ID].name, _share.allCategories[_flows[par_ID].category].tv, Icon_Disabled)
 	}
 	else if (par_Type = "category")
 	{
-		newTV := TV_Add(_share.allCategories[par_ID].name, "", "icon4")
+		newTV := TV_Add(_share.allCategories[par_ID].name, "", Icon_Folder)
 	}
 	else
 		MsgBox unexpected error. 3546548486432
@@ -191,7 +270,7 @@ TreeView_manager_ChangeFlowCategory(par_ID)
 	res:=TV_Delete(_flows[par_ID].TV)
 	;~ d(_flows[par_ID].TV, res)
 	allTreeViewItems.delete(_flows[par_ID].TV)
-	_flows[par_ID].TV := TV_Add(_flows[par_ID].name, _share.allCategories[_flows[par_ID].category].tv, "icon1")
+	_flows[par_ID].TV := TV_Add(_flows[par_ID].name, _share.allCategories[_flows[par_ID].category].tv, Icon_Disabled)
 	
 	allTreeViewItems[_flows[par_ID].TV] := {id: par_ID, type: "flow"}
 	;~ d(allTreeViewItems,_flows[par_ID].TV)

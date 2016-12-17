@@ -16,6 +16,11 @@ Element_getName_Action_Tooltip()
 	return lang("Tooltip")
 }
 
+Element_getIconPath_Action_Tooltip()
+{
+	return "Source_elements\default\icons\tooltip.png"
+}
+
 Element_getCategory_Action_Tooltip()
 {
 	return lang("User_interaction")
@@ -61,7 +66,12 @@ Element_run_Action_Tooltip(Environment, ElementParameters)
 	SetTimer,runActionTooltip_RemoveTooltip,-%tempDuration%
 	x_finish(Environment,"normal")
 	return
-	runActionTooltip_follow_mouse:
+	
+}
+
+runActionTooltip_follow_mouse()
+{
+	global runActionTooltip_Text
 	MouseGetPos,runActionTooltip_MouseX,runActionTooltip_MouseY
 	if !(runActionTooltip_Oldy=runActionTooltip_Mousey and runActionTooltip_Oldx=runActionTooltip_MouseX)
 	{
@@ -69,14 +79,18 @@ Element_run_Action_Tooltip(Environment, ElementParameters)
 		runActionTooltip_Oldx:=runActionTooltip_MouseX
 		ToolTip,%runActionTooltip_Text%,,,13
 	}
-	return
-	runActionTooltip_RemoveTooltip:
+}
+runActionTooltip_RemoveTooltip()
+{
 	SetTimer,runActionTooltip_follow_mouse,off
 	ToolTip,,,,13
-	return
-	
 }
 
+Element_stop_Action_Tooltip(Environment, ElementParameters)
+{
+	runActionTooltip_RemoveTooltip()
+}
+	
 Element_GenerateName_Action_Tooltip(Environment, ElementParameters)
 {
 	global

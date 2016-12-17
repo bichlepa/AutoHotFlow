@@ -12,27 +12,7 @@ enableTriggers(p_Flow)
 	{
 		if (forElement.type = "trigger")
 		{
-			triggerEnvironment:=criticalObject()
-			triggerEnvironment.id:= "enabledTrigger" ++EnabledTriggerIDCounter
-			triggerEnvironment.flowID:=p_Flow.ID
-			triggerEnvironment.EnvironmentType:="trigger"
-			triggerEnvironment.vars:=Object()
-			triggerEnvironment.ElementID:=forElementID
-			triggerEnvironment.ElementClass:=forElement.class
-			triggerEnvironment.Pars:=ObjFullyClone(forElement.pars)
-			
-			_execution.triggers[triggerEnvironment.id]:=triggerEnvironment
-			
-			tempElementClass:=forElement.class
-			;~ d(forElement,Element_enable_%tempElementClass%)
-			if isfunc("Element_enable_" tempElementClass)
-			{
-				Element_enable_%tempElementClass%(triggerEnvironment, triggerEnvironment.Pars)
-			}
-			else
-			{
-				logger("a0", "Trigger " triggerEnvironment.ElementID " cannot be enabled (missing implementation)")
-			}
+			justEnableOneTrigger(p_Flow, forElement)
 		}
 		
 	}
@@ -41,42 +21,122 @@ enableTriggers(p_Flow)
 	logger("a1", "Flow " p_Flow.name " enabled")
 	;~ d(p_flow)
 }
+
+enableOneTrigger(p_Flow, p_Trigger)
+{
+	logger("a2", "Going to enable trigger " p_Trigger.ID " in flow " p_Flow.name)
+	
+	p_Flow.enabled:="Enabling"
+	
+	justEnableOneTrigger(p_Flow, p_Trigger)
+	
+	p_Flow.enabled:=true
+	logger("a1", "Trigger " p_Trigger.ID " in flow " p_Flow.name " enabled")
+}
+
+justEnableOneTrigger(p_Flow, p_Trigger)
+{
+	global _execution, EnabledTriggerIDCounter
+	
+	triggerEnvironment:=criticalObject()
+	triggerEnvironment.id:= "enabledTrigger" ++EnabledTriggerIDCounter
+	triggerEnvironment.flowID:=p_Flow.ID
+	triggerEnvironment.EnvironmentType:="trigger"
+	triggerEnvironment.vars:=Object()
+	triggerEnvironment.ElementID:=p_Trigger.id
+	triggerEnvironment.ElementClass:=p_Trigger.class
+	triggerEnvironment.Pars:=ObjFullyClone(p_Trigger.pars)
+	
+	_execution.triggers[triggerEnvironment.id]:=triggerEnvironment
+	
+	tempElementClass:=p_Trigger.class
+	;~ d(forElement,Element_enable_%tempElementClass%)
+	if isfunc("Element_enable_" tempElementClass)
+	{
+		Element_enable_%tempElementClass%(triggerEnvironment, triggerEnvironment.Pars)
+		p_Flow.allelements[p_Trigger.ID].enabled := true
+		p_Flow.draw.mustdraw := true
+	}
+	else
+	{
+		logger("a0", "Trigger " triggerEnvironment.ElementID " cannot be enabled (missing implementation)")
+	}
+}
+
 disableTriggers(p_Flow)
 {
 	global _execution, EnabledTriggerIDCounter
 	
 	p_Flow.enabled:="Disabling"
 	logger("a2", "Going to disable Flow " p_Flow.name)
+	tempToDisableTriggers:=Object()
 	
 			;~ d(_execution.triggers,p_Flow.id)
-	for forTriggerID, forTrigger in _execution.triggers
+	for forEnabledTriggerID, forEnabledTrigger in _execution.triggers
 	{
-		if (forTrigger.flowID = p_Flow.id)
+		if (forEnabledTrigger.flowID = p_Flow.id)
 		{
-			
-			
-			triggerEnvironment:=forTrigger
-			tempElementClass:=triggerEnvironment.ElementClass
-			;~ d(forTrigger,"Element_disable_" tempElementClass)
-			if isfunc("Element_disable_" tempElementClass)
-			{
-				Element_disable_%tempElementClass%(triggerEnvironment, triggerEnvironment.Pars)
-			}
-			else
-			{
-				logger("a0", "Trigger " triggerEnvironment.ElementID " cannot be disabled (missing implementation)")
-			}
-			_execution.triggers.delete(forTriggerID)
+			tempToDisableTriggers.push({flow: p_Flow, element: p_Flow.allelements[forEnabledTrigger.elementid], enabledTrigger: forEnabledTrigger})
 		}
 		
 	}
+	
+	for index, todisabletrigger in tempToDisableTriggers
+	{
+		justDisableOneTrigger(todisabletrigger.flow, todisabletrigger.element, todisabletrigger.enabledTrigger)
+	}
+	
 	
 	
 	logger("a1", "Flow " p_Flow.name " disabled")
 	p_Flow.enabled:=false
 	;~ d(p_flow)
 }
+disableOneTrigger(p_Flow, p_Trigger)
+{
+	global _execution
+	p_Flow.enabled:="Disabling"
+	logger("a2", "Going to disable trigger " p_Trigger.ID " in Flow " p_Flow.name)
+	
+	otherTriggersInThisFlowEnabled:=False
+	for forEnabledTriggerID, forEnabledTrigger in _execution.triggers
+	{
+		if (forEnabledTrigger.flowID = p_Flow.id )
+		{
+			if ( forEnabledTrigger.elementID = p_Trigger.ID)
+				justDisableOneTrigger(p_Flow, p_Trigger, forEnabledTrigger)
+			else 
+				otherTriggersInThisFlowEnabled:=true
+		}
+	}
+	
+	
+	
+	logger("a2", "Trigger " p_Trigger.ID " in Flow " p_Flow.name " disabled")
+	if (otherTriggersInThisFlowEnabled = False)
+		p_Flow.enabled:=false
+}
 
+justDisableOneTrigger(p_Flow, p_Trigger, p_EnabledTrigger)
+{
+	
+	global _execution
+	tempElementClass:=p_Trigger.Class
+	;~ d(forTrigger,"Element_disable_" tempElementClass)
+	if isfunc("Element_disable_" tempElementClass)
+	{
+		Element_disable_%tempElementClass%(p_EnabledTrigger, p_EnabledTrigger.Pars)
+		p_Flow.allelements[p_Trigger.ID].enabled := false
+		p_Flow.draw.mustdraw := true
+	}
+	else
+	{
+		logger("a0", "Trigger " p_Trigger.ID " cannot be disabled (missing implementation)")
+	}
+	;~ d(_execution)
+	_execution.triggers.delete(p_EnabledTrigger.id)
+	;~ d(_execution)
+}
 
 saveResultOfTriggerEnabling(Environment, Result, Message)
 {

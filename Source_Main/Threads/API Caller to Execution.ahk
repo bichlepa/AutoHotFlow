@@ -1,10 +1,10 @@
-﻿API_Execution_newInstance(p_FlowID)
+﻿API_Execution_startFlow(p_FlowID)
 {
 	global
 	local retvalue
 	logger("t2", A_ThisFunc " called")
 	
-	retvalue := AhkThreadExecution1.ahkFunction("API_Call_Execution_newInstance", p_FlowID)
+	retvalue := AhkThreadExecution1.ahkFunction("API_Call_Execution_startFlow", p_FlowID)
 	logger("t2", A_ThisFunc " finished")
 	
 	return retvalue
@@ -35,6 +35,17 @@ API_Execution_StopFlow(p_FlowID)
 	return retvalue
 	
 }
+API_Execution_RunToggleFlow(p_FlowID)
+{
+	global
+	local retvalue
+	logger("t2", A_ThisFunc " called")
+	retvalue := AhkThreadExecution1.ahkFunction("API_Call_Execution_RunToggleFlow", p_FlowID)
+	logger("t2", A_ThisFunc " finished")
+	
+	return retvalue
+	
+}
 
 API_Execution_DisableTriggers(p_FlowID)
 {
@@ -43,6 +54,32 @@ API_Execution_DisableTriggers(p_FlowID)
 	logger("t2", A_ThisFunc " called")
 	
 	retvalue := AhkThreadExecution1.ahkFunction("API_Call_Execution_DisableTriggers", p_FlowID)
+	logger("t2", A_ThisFunc " finished")
+	
+	return retvalue
+	
+}
+
+
+API_Execution_enableOneTrigger(par_FlowID, par_TriggerID)
+{
+	global
+	local retvalue
+	logger("t2", A_ThisFunc " called")
+	
+	retvalue := AhkThreadExecution1.ahkFunction("API_Call_Execution_enableOneTrigger", par_FlowID, par_TriggerID)
+	logger("t2", A_ThisFunc " finished")
+	
+	return retvalue
+	
+}
+API_Execution_disableOneTrigger(par_FlowID, par_TriggerID)
+{
+	global
+	local retvalue
+	logger("t2", A_ThisFunc " called")
+	
+	retvalue := AhkThreadExecution1.ahkFunction("API_Call_Execution_disableOneTrigger", par_FlowID, par_TriggerID)
 	logger("t2", A_ThisFunc " finished")
 	
 	return retvalue

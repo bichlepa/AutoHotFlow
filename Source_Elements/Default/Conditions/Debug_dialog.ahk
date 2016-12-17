@@ -16,6 +16,11 @@ Element_getName_Condition_Debug_Dialog()
 	return lang("Debug_Dialog")
 }
 
+Element_getIconPath_Condition_Debug_Dialog()
+{
+	return "Source_elements\default\icons\bug.png"
+}
+
 Element_getCategory_Condition_Debug_Dialog()
 {
 	return lang("Debugging")

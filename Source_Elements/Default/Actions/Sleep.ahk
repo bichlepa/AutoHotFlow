@@ -16,6 +16,11 @@ Element_getName_Action_Sleep()
 	return lang("Sleep")
 }
 
+Element_getIconPath_Action_Sleep()
+{
+	return "Source_elements\default\icons\sleep.ico"
+}
+
 Element_getCategory_Action_Sleep()
 {
 	return lang("Flow_control")

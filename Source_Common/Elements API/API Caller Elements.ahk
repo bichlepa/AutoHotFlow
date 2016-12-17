@@ -96,3 +96,17 @@ x_Par_Enable(Environment,p_ParToDisable, p_TrueOrFalse = True)
 {
 	ElementSettings.field.enable(p_ParToDisable,p_TrueOrFalse)
 }
+
+x_FlowEnableByName(Environment, p_FlowName)
+{
+}
+x_FlowDisableByName(Environment, p_FlowName)
+{
+}
+x_FlowExistsByName(Environment, p_FlowName)
+{
+	
+}
+x_isFlowEnabledByName(Environment, p_FlowName)
+{
+}

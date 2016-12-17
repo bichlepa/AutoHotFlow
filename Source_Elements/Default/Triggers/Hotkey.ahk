@@ -16,6 +16,11 @@ Element_getName_Trigger_Hotkey()
 	return lang("Hotkey")
 }
 
+Element_getIconPath_Trigger_Hotkey()
+{
+	return "Source_elements\default\icons\keyboard.png"
+}
+
 Element_getCategory_Trigger_Hotkey()
 {
 	return lang("User_interaction")

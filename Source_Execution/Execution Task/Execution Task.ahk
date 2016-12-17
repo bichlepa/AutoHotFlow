@@ -93,7 +93,8 @@ executionTask()
 						{
 							if (OneThread.result = "exception")
 							{
-								MsgBox % "beendet mit Fehler: `n`n" OneThread.message
+								
+								MsgBox % "Element " OneThread.elementID " mit Fehler: `n`n" OneThread.message
 							}
 							;~ d(OneThread, "remove thread")
 							removeThread(OneThread)
@@ -132,6 +133,7 @@ finishExecutionOfElement(Environment, Result, Message = "")
 	_flows[Environment.FlowID].draw.mustDraw:=true
 	if (result = "Exception")
 	{
-		ThreadVariable_Set(Environment,"a_ErrorMessage",Message,p_ContentType="Normal")
+		ThreadVariable_Set(Environment,"a_ErrorMessage",Message)
 	}
+	;~ d(Environment, message)
 }

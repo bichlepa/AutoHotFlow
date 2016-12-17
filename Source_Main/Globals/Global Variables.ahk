@@ -48,6 +48,7 @@ init_GlobalVars()
 			.par			Associative Array with the parameters of the trigger
 			
 			.state			Execution state of the element
+			.enabled		True if trigger is enabled
 		
 		.markedElements	Contains an array of all element and connection IDs which are marked
 		

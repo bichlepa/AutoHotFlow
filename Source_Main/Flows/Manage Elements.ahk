@@ -38,6 +38,7 @@ Element_New(p_FlowID, p_type="",p_elementID="")
 	tempElement.marked:=false
 	tempElement.state:="idle"
 	tempElement.countRuns:=0
+	tempElement.enabled:=False
 	
 	;Assign default position, although it is commonly not needed
 	tempElement.x:=0
@@ -78,10 +79,18 @@ Element_SetClass(p_FlowID, p_elementID, p_elementClass)
 	allElements:=_flows[p_FlowID].allElements
 	
 	;First set type
+	if not isfunc("Element_getElementType_" p_elementClass)
+	{
+		MsgBox internal error! Function Element_getElementType_%p_elementClass% missing.
+	}
 	if (allElements[p_elementID].type!=Element_getElementType_%p_elementClass%())
-		;Then set class
+	{
 		Element_SetType(p_FlowID, p_elementID,Element_getElementType_%p_elementClass%())
+	}
+	
+	;Then set class
 	allElements[p_elementID].class:=p_elementClass 
+	allElements[p_elementID].icon:=Element_getIconPath_%p_elementClass%()
 	
 	Element_setParameterDefaults(p_FlowID, p_elementID)
 	

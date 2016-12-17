@@ -27,36 +27,72 @@ newInstance(p_Environment)
 	}
 	
 	;Search for the matching trigger element
-	for oneElementID, oneElement in _flows[p_Environment.flowID].allElements
+	oneElementID:=p_Environment.elementID
+	if oneElementID=
 	{
-		;~ MsgBox % (oneElement.type = "trigger") " - " !(p_Environment.ElementID) " - " (p_Environment.ElementID=oneElement.id) " = " (oneElement.type = "trigger" and (!(p_Environment.ElementID) or p_Environment.ElementID=oneElement.id))
-		if (oneElement.type = "trigger" and (!(p_Environment.ElementID) or p_Environment.ElementID=oneElement.id))
-		{
-			newInstance:=CriticalObject()
-			newInstance.id:= "instance" ++InstanceIDCOunter
-			newInstance.FlowID := p_Environment.FlowID
-			newInstance.state := "init"
-			newInstance.InstanceVars := CriticalObject()
-			newThread := newThread(newInstance)
-			_execution.Instances[newInstance.id]:=newInstance
-			newThread.ElementID := oneElementID
-			newThread.EnvironmentType := "thread"
-			finishExecutionOfElement(newThread, "Normal")
-			ThreadVariable_Set(newThread,"A_TriggerTime",a_now,"Date")
-			
-			ElementClass:=p_Environment.ElementClass
-			if (isfunc("Element_postTrigger_" ElementClass))
-			{
-				Element_postTrigger_%ElementClass%(newThread, p_Environment.pars)
-			}
-			
-			newInstance.state := "running"
-			break
-		}
+		MsgBox Internal Error in newInstance(): trigger element ID unknown
+		return
 	}
+	
+	newInstance:=CriticalObject()
+	newInstance.id:= "instance" ++InstanceIDCOunter
+	newInstance.FlowID := p_Environment.FlowID
+	newInstance.state := "init"
+	newInstance.InstanceVars := CriticalObject()
+	newThread := newThread(newInstance)
+	_execution.Instances[newInstance.id]:=newInstance
+	newThread.ElementID := oneElementID
+	newThread.EnvironmentType := "thread"
+	finishExecutionOfElement(newThread, "Normal")
+	ThreadVariable_Set(newThread,"A_TriggerTime",a_now,"Date")
+	
+	ElementClass:=p_Environment.ElementClass
+	if (isfunc("Element_postTrigger_" ElementClass))
+	{
+		Element_postTrigger_%ElementClass%(newThread, p_Environment.pars)
+	}
+	newInstance.state := "running"
 	
 	updateFlowExcutingStates()
 	return newInstance
+}
+
+/**
+Start all manual triggers
+*/
+startFlow(p_Flow)
+{
+	static
+	global _flows
+	local TriggerFound:=false
+	;Search for manual triggers
+	for oneElementID, oneElement in p_Flow.allElements
+	{
+		if (oneElement.type = "trigger")
+		{
+			if (oneElement.class = "trigger_manual")
+			{
+				environment:=Object()
+				environment.flowID:=p_Flow.id
+				environment.elementID:=oneElement.id
+				newInstance(environment)
+				TriggerFound:=True
+			}
+		}
+	}
+	if not TriggerFound
+	{
+		gui,hintThatNoManualTriggerAvailable:destroy
+		gui,hintThatNoManualTriggerAvailable:add, text, w200 , % lang("There is no manual trigger available")
+		gui,hintThatNoManualTriggerAvailable:add, button, default w100 x50 Y+10 h30 ghintThatNoManualTriggerAvailableGuiClose , % lang("OK")
+		gui,hintThatNoManualTriggerAvailable:show,,AutoHotFlow
+	}
+	return
+	
+	hintThatNoManualTriggerAvailableGuiClose:
+	
+	gui,hintThatNoManualTriggerAvailable:destroy
+	return
 }
 
 stopFlow(p_Flow)
@@ -98,6 +134,21 @@ stopFlow(p_Flow)
 		}
 		_execution.Instances.delete(OneInstanceID)
 	}
+	updateFlowExcutingStates()
+}
+
+runToggleFlow(p_Flow)
+{
+	;~ d(p_Flow)
+	if (p_Flow.executing)
+	{
+		stopFlow(p_Flow)
+	}
+	else
+	{
+		startFlow(p_Flow)
+	}
+	
 }
 
 /* Starts a new execution thread inside the given instance

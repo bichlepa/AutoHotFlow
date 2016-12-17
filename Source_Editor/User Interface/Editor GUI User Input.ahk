@@ -307,6 +307,18 @@ else if (clickedElement="EditButton")  ;if something is selected and user clicks
 	
 
 }
+else if (clickedElement="SwitchOnButton")  ;if something is selected and user clicks on the edit button
+{
+	
+	API_Main_disableOneTrigger(flowObj.id, markedElement)
+	
+
+}
+else if (clickedElement="SwitchOffButton")  ;if something is selected and user clicks on the edit button
+{
+	API_Main_enableOneTrigger(flowObj.id, markedElement)
+
+}
 else if (clickedElement!="") ;if user clicked on an element
 {
 	if markedElement contains connection
@@ -430,7 +442,11 @@ ui_findElementUnderMouse(par_mode="default")
 		else if (FlowObj.draw.MoveButton2Exist=true and Sqrt((FlowObj.draw.middlePointOfMoveButton2X - mx) * (FlowObj.draw.middlePointOfMoveButton2X - mx) + (FlowObj.draw.middlePointOfMoveButton2Y - my) * (FlowObj.draw.middlePointOfMoveButton2Y - my)) < default_SizeOfButtons/2)
 			clickedElement = MoveButton2
 		else if (FlowObj.draw.MoveButton1Exist=true and Sqrt((FlowObj.draw.middlePointOfMoveButton1X - mx) * (FlowObj.draw.middlePointOfMoveButton1X - mx) + (FlowObj.draw.middlePointOfMoveButton1Y - my) * (FlowObj.draw.middlePointOfMoveButton1Y - my)) < default_SizeOfButtons/2)
-			clickedElement = MoveButton1
+			clickedElement = MoveButton1		
+		else if (FlowObj.draw.SwitchOnButtonExist=true and (FlowObj.draw.PosOfSwitchOnButtonX1 < mx) and (FlowObj.draw.PosOfSwitchOnButtonX2 > mx) and (FlowObj.draw.PosOfSwitchOnButtonY1 < my) and (FlowObj.draw.PosOfSwitchOnButtonY2 > my) )
+			clickedElement = SwitchOnButton	
+		else if (FlowObj.draw.SwitchOffButtonExist=true and (FlowObj.draw.PosOfSwitchOffButtonX1 < mx) and (FlowObj.draw.PosOfSwitchOffButtonX2 > mx) and (FlowObj.draw.PosOfSwitchOffButtonY1 < my) and (FlowObj.draw.PosOfSwitchOffButtonY2 > my) )
+			clickedElement = SwitchOffButton
 	}
 	;~ ToolTip %par_mode% -- %clickedElement%
 	;~ d(FlowObj.draw, mx "  -  " my " - " Sqrt((FlowObj.draw.middlePointOfPlusButtonX - mx) * (FlowObj.draw.middlePointOfPlusButtonX - mx) + (FlowObj.draw.middlePointOfPlusButtonY - my) * (FlowObj.draw.middlePointOfPlusButtonY - my)))
