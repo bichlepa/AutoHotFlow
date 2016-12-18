@@ -3,6 +3,8 @@
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
 SetWorkingDir %A_ScriptDir%\..  ; Ensures a consistent starting directory.
 ;~ MsgBox %A_WorkingDir%
+#NoTrayIcon
+
 parentAHKThread := AhkExported()
 onexit exit
 #include lib\Object to file\String-object-file.ahk

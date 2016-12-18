@@ -7,7 +7,7 @@ OnExit,exit
 
 Global_ThisThreadID:="Main"
 
-
+Menu, tray, Icon, Icons\mainicon.ico
 
 #Include %A_ScriptDir%\..
 #include language\language.ahk
@@ -46,8 +46,10 @@ AllTriggerClasses:=Object()
 ;Element_Includes_Start
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\Execute_Flow.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\New_Variable.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\Select_file.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\Set_Flow_Status.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\Sleep.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\Stop_Flow.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\Tooltip.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Conditions\Debug_dialog.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Conditions\Expression.ahk

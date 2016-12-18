@@ -6,6 +6,8 @@ SetWorkingDir %A_ScriptDir%\..  ; Ensures a consistent starting directory.
 SetBatchLines -1
 #SingleInstance off
 
+#NoTrayIcon
+
 OnExit,Exit
 #include language\language.ahk ;Must be very first
 ;initialize languages

@@ -2,7 +2,7 @@
 ;Here at the top there will be something like this line:
 ; share:=Criticalobject(1234)
 ;The object share contains values which are shared among this and other threads
-;~ #NoTrayIcon
+#NoTrayIcon
 
 #NoEnv  ; Recommended for performance and compatibility with future AutoHotkey releases.
 ;~ #Warn  ; Recommended for catching common errors.
