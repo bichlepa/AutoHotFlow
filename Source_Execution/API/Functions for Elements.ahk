@@ -275,6 +275,18 @@ x_FlowExecuteByName(Environment, p_FlowName, p_Variables ="", p_CallBackFunction
 	}
 
 }
+x_FlowStopByName(Environment, p_FlowName)
+{
+	global _Flows
+	for forFlowID, forFlow in _Flows
+	{
+		if (forFlow.name = p_FlowName)
+		{
+			API_Main_stopFlow(forFlow.id)
+		}
+	}
+
+}
 x_isFlowEnabledByName(Environment, p_FlowName)
 {
 	global _Flows
@@ -311,6 +323,57 @@ x_FlowExistsByName(Environment, p_FlowName)
 		}
 	}
 	Return False
+}
+
+x_GetFullPath(Environment, p_Path)
+{
+	global _Flows
+	path:=p_Path
+	if  DllCall("Shlwapi.dll\PathIsRelative","Str",path)
+		path:=_Flows[Environment.FlowID].flowsettings.workingdir "\" path
+	return path
+}
+
+x_ExecuteInNewThread(Environment, p_uniqueID, p_functionObject, p_Code, p_VarsToImport, p_VarsToExport)
+{
+	global _share, global_AllExecutionIDs
+	if not isobject(global_AllExecutionIDs[p_uniqueID])
+		global_AllExecutionIDs[p_uniqueID]:=object()
+	global_AllExecutionIDs[p_uniqueID].ExeInNewThread:=object()
+	global_AllExecutionIDs[p_uniqueID].ExeInNewThread.functionObject:=p_functionObject
+	
+	_share.temp[p_uniqueID]:= Object()
+	_share.temp[p_uniqueID].sharedObject := CriticalObject()
+	_share.temp[p_uniqueID].sharedObject.varsToImport:=p_VarsToImport
+	_share.temp[p_uniqueID].sharedObject.varsToExport:=p_VarsToExport
+	_share.temp[p_uniqueID].sharedObject.varsExported:=Object()
+	;~ d(_share.temp[p_uniqueID])
+	preCode := "ahf_uniqueID :=""" p_uniqueID """`n"
+	preCode .= "ahf_sharedObject := CriticalObject(" (&_share.temp[p_uniqueID].sharedObject) ")`n"
+	preCode .= "onexit, ahf_onexit`n"
+	preCode .= "ahf_parentAHKThread := AhkExported()`n"
+	preCode .= "for ahf_varname, ahf_varvalue in ahf_sharedObject.varsToImport`n"
+	preCode .= "{`n"
+	preCode .= "  %ahf_varname%:=ahf_VarValue`n"
+	;~ preCode .= "  msgbox, %ahf_varname% - %ahf_VarValue%`n"
+	preCode .= "}`n"
+	postcode := "exitapp`n"
+	postcode .= "ahf_onexit:`n"
+	postcode .= "for ahf_varindex, ahf_varname in ahf_sharedObject.varsToExport`n{`n  ahf_sharedObject.varsExported[ahf_varname]:=%ahf_varname%`n}`n"
+	;~ postcode .= "msgbox %ahf_uniqueID%`n"
+	postcode .= "ahf_parentAHKThread.ahkFunction(""API_Execution_externalFlowFinish"", ahf_uniqueID)`n"
+	postcode .= "exitapp"
+	;~ d("`n" preCode "`n" p_Code "`n" postCode)
+	AhkThread("`n" preCode "`n" p_Code "`n" postCode)
+	
+}
+x_ExecuteInNewThread_finishedExecution(p_uniqueID)
+{
+	global _share, global_AllExecutionIDs
+	;~ d(_share.temp[p_uniqueID],p_uniqueID)
+	;~ d(global_AllExecutionIDs[p_uniqueID],p_uniqueID)
+	functionObject:=global_AllExecutionIDs[p_uniqueID].ExeInNewThread.functionObject
+	%functionObject%(_share.temp[p_uniqueID].sharedObject.varsExported)
 }
 
 ;For elements

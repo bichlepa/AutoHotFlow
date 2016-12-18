@@ -52,8 +52,14 @@ init_GlobalVars()
 		
 		.markedElements	Contains an array of all element and connection IDs which are marked
 		
-		.Settings		Contains all flow specific settings
-			.todo
+		.FlowSettings		Contains all flow specific settings
+			.ExecutionPolicy	Defines what happens if a flow is triggered but already executing. Contains "wait", "skip", "stop" or "parallel"
+			.FolderOfStaticVariables	;TODO
+			.LogToFile		Defines whether the logging of this flow should be written to file
+			.OffsetX		Current offset
+			.OffsetY		Current offset
+			.zoomFactor		Current zoom factor
+			.WorkingDir		Working dir of the flow
 		
 		;Internal values
 		.category 		Flow category ID (Internal ID, which is not the name)

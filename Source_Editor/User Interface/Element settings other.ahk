@@ -162,16 +162,11 @@ selectSubType(p_ElementID,wait="")
 	GuiElementChooseCancel:
 	gui,3:default
 	gui,destroy
-	if (setElement.SubType="" and setElement.Type!="Trigger")
+	if (setElement.class="" and setElement.Type!="Trigger")
 	{
+		;~ d(setelement)
 		API_Main_Element_Remove(FlowID, setElement.id)
 		;~ API_Main_Draw()
-	}
-	else if (setElement.Type="Trigger" and setElement.SubType="") ;Remove trigger if it was a new one
-	{
-		;~ MsgBox awgagasdgfwe
-		setElement.remove()
-		
 	}
 	NowResultEditingElement=aborted
 	EditGUIEnable()

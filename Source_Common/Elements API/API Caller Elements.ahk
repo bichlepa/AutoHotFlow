@@ -81,6 +81,12 @@ x_ImportInstanceVars(Environment, p_VarsToImport)
 {
 }
 
+x_ExecuteInNewThread(Environment, p_uniqueID, p_functionObject, p_Code, p_VarsToImport, p_VarsToExport)
+{
+	
+}
+
+
 x_GetListOfFlowNames()
 {
 	global _flows
@@ -129,12 +135,15 @@ x_FlowEnableByName(Environment, p_FlowName)
 x_FlowDisableByName(Environment, p_FlowName)
 {
 }
-x_FlowExistsByName(Environment, p_FlowName)
-{	
+x_FlowStopByName(Environment, p_FlowName)
+{
 }
-
 x_FlowExecuteByName(Environment, p_FlowName, p_Variables, p_CallBackFunction ="")
 {
+}
+
+x_FlowExistsByName(Environment, p_FlowName)
+{	
 }
 x_isFlowEnabledByName(Environment, p_FlowName)
 {

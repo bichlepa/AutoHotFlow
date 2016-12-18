@@ -398,7 +398,10 @@ if (UserDidMajorChange or UserDidMinorChange)
 }
 else if (UserDidMinorChange)
 	API_Main_State_New(FlowID) ;make a new state. If user presses Ctrl+Z, the change will be undone
-	
+else
+{
+	API_Main_State_RestoreCurrent(FlowID)
+}
 workingOnClick:=false
 
 return
