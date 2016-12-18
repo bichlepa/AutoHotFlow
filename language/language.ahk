@@ -110,7 +110,7 @@ lang(langvar,$1="",$2="",$3="",$4="",$5="",$6="",$7="",$8="",$9="")
 				break
 		}
 		
-		;MsgBox %initexten%, %langvar_no_spaces%
+		;~ MsgBox %initexten%, %langvar_no_spaces%
 		if (initexten="") 
 		{
 			
@@ -138,8 +138,8 @@ lang(langvar,$1="",$2="",$3="",$4="",$5="",$6="",$7="",$8="",$9="")
 			}
 			else 
 			{
-				if (Lang_NotNotifyIfNoTranslationFound!=true)
-					MsgBox,English text for %langvar_no_spaces% not found!
+				;~ if (Lang_NotNotifyIfNoTranslationFound!=true)
+					;~ MsgBox,English text for %langvar_no_spaces% not found!
 				
 				;If no translation was found, just insert the raw text
 				initext := langvar
@@ -191,7 +191,7 @@ lang(langvar,$1="",$2="",$3="",$4="",$5="",$6="",$7="",$8="",$9="")
 			
 		}
 	}
-	else if not UsedCache
+	else if UsedCache
 	{
 		_language.cache[langvar_no_spaces]:=initext
 	}
