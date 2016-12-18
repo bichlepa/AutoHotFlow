@@ -72,7 +72,7 @@ Element_stop_Action_Sleep(Environment, ElementParameters)
 Element_run_Action_Sleep_EndSleep(Environment, ElementParameters="")
 {
 	;~ d(ElementParameters)
-	x_DeleteMyUniqueExecutionID(Environment)
+	x_GetMyUniqueExecutionID(Environment)
 	x_DeleteMyUniqueExecutionID(uniqueID)
 	x_finish(Environment,"normal")
 }
