@@ -1,25 +1,4 @@
 ﻿
-;~ ui_MakeNewHelp()
-;~ {
-	;~ global
-	
-	;~ Gui, Help:Destroy
-	;~ Gui, Help:+HwndGUIHelpHWND
-	
-	
-	
-	
-;~ }
-
-
-;~ ui_showHelp()
-;~ {
-	
-	
-	;~ Gui, Help:Show, w720 h490,% lang("Help")
-	;~ Gui, Help:+HwndGUIHelpHWND
-;~ }
-
 ui_showHelp(helpFile)
 {
 	global
@@ -36,44 +15,57 @@ ui_showHelp(helpFile)
 	local VirtualHeight
 	
 	Gui, Help:Destroy
-	MsgBox %helpFile%
 	gui,Help:-dpiscale
-	helpfilepath=Help\%UILang%\%helpFile%.html
+	
+	;~ MsgBox %helpFile%
+	helpfilepath=%my_workingdir%\Help\%UILang%\%helpFile%.html
 	;~ MsgBox %helpfilepath%
-	IfNotExist, Help\%UILang%\%helpFile%.html
+	IfNotExist, %my_workingdir%\Help\%UILang%\%helpFile%.html
 	{
-		IfNotExist, Help\en\%helpFile%.html
+		IfNotExist, %my_workingdir%\Help\en\%helpFile%.html
 		{
 			MsgBox, 16, % lang("Error"),% lang("No help file was found")
 			Return
 		}
-		helpfilepath=Help\en\%helpFile%.html
+		helpfilepath=%my_workingdir%\Help\en\%helpFile%.html
 	}
+	
 	Gui, Help:Add, ActiveX, x0 y0 w720 h490 vHB, Shell.Explorer
-	HB.Navigate(my_WorkingDir . "\" helpfilepath)
+	HB.Navigate(helpfilepath)
 	Gui, Help: +ToolWindow 
 	Gui, Help:Color, FFFFFF
 	Gui, Help: +resize
 	
-	WinGetPos,tempx,tempy,tempw,temph,% "ahk_id " SG2.hwnd
-	
-	helpx:=tempw+tempx
-	helph:=temph
-	helpy:=tempy
-	helpw:=720
-	;~ MsgBox %A_ScreenWidth% - %helpw% - %tempw% 
-	SysGet, VirtualWidth, 78
-	;~ SysGet, VirtualHeight, 79
-	
-	if ((VirtualWidth-helpx)<helpw)
+	;find out whether the settings window is opened
+	IfWinExist, % "ahk_id " SettingWindowParentHWND
 	{
-		tempx:= VirtualWidth - helpw - tempw -10
-		;~ MsgBox %A_ScreenWidth% - %widthhelp% - %tempw% 
-		WinMove,% "ahk_id " SG1.hwnd,,%tempx%
-		helpx:=VirtualWidth - helpw -10
+		;Position the window right to the settings window
+		WinGetPos,tempx,tempy,tempw,temph,% "ahk_id " SettingWindowParentHWND
+		
+		helpx:=tempw+tempx
+		helph:=temph
+		helpy:=tempy
+		helpw:=720
+		;~ MsgBox %A_ScreenWidth% - %helpw% - %tempw% 
+		
+		;Check whether the settings window is on the righthand side and needs to be moved
+		SysGet, VirtualWidth, 78
+		if ((VirtualWidth-helpx)<helpw)
+		{
+			tempx:= VirtualWidth - helpw - tempw -10
+			;~ MsgBox %A_ScreenWidth% - %widthhelp% - %tempw% 
+			WinMove,% "ahk_id " SettingWindowParentHWND,,%tempx%
+			helpx:=VirtualWidth - helpw -10
+		}
+		
+		;show gui
+		Gui, Help:Show, x%helpx% y%helpy% w%helpw% h%helph%,% lang("Help")
+	}
+	else
+	{
+		Gui, Help:Show, w720,% lang("Help")
 	}
 	
-	Gui, Help:Show, x%helpx% y%helpy% w%helpw% h%helph%,% lang("Help")
 	Gui, Help:+HwndGUIHelpHWND
 	Return
 	
