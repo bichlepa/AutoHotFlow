@@ -9,13 +9,13 @@ init_Manager_GUI()
 	
 	;initialize image list
 	IconList:=IL_Create("","",1)
-	IL_Add(IconList,"Icons\disabled.ico")
+	IL_Add(IconList, my_Workingdir "\Icons\disabled.ico")
 	Icon_Disabled:="icon1"
-	IL_Add(IconList,"Icons\enabled.ico")
+	IL_Add(IconList, my_Workingdir "\Icons\enabled.ico")
 	Icon_Enabled:="icon2"
-	IL_Add(IconList,"Icons\running.ico")
+	IL_Add(IconList, my_Workingdir "\Icons\running.ico")
 	Icon_Running:="icon3"
-	IL_Add(IconList,"Icons\folder.ico")
+	IL_Add(IconList, my_Workingdir "\Icons\folder.ico")
 	Icon_Folder:="icon4"
 	gui,manager:default
 

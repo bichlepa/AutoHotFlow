@@ -51,19 +51,19 @@ gdip_Init()
 	pBrushBackground := Gdip_BrushCreateSolid("0xFFeaf0ea") ;Almost white brush for background
 
 
-	pBitmapEdit := Gdip_CreateBitmapFromFile("Icons\edit.ico")
-	pBitmapPlus := Gdip_CreateBitmapFromFile("Icons\plus.ico")
-	pBitmapMove := Gdip_CreateBitmapFromFile("Icons\move.ico")
-	pBitmapTrash := Gdip_CreateBitmapFromFile("Icons\trash.ico")
-	pBitmapTrash := Gdip_CreateBitmapFromFile("Icons\trash.ico")
-	pBitmapSwitchOn := Gdip_CreateBitmapFromFile("Icons\e_switch_on.ico")
+	pBitmapEdit := Gdip_CreateBitmapFromFile(my_WorkingDir "\Icons\edit.ico")
+	pBitmapPlus := Gdip_CreateBitmapFromFile(my_WorkingDir "\Icons\plus.ico")
+	pBitmapMove := Gdip_CreateBitmapFromFile(my_WorkingDir "\Icons\move.ico")
+	pBitmapTrash := Gdip_CreateBitmapFromFile(my_WorkingDir "\Icons\trash.ico")
+	pBitmapTrash := Gdip_CreateBitmapFromFile(my_WorkingDir "\Icons\trash.ico")
+	pBitmapSwitchOn := Gdip_CreateBitmapFromFile(my_WorkingDir "\Icons\e_switch_on.ico")
 	pBitmapSwitchOn_W := Gdip_GetImageWidth(pBitmapSwitchOn)
 	pBitmapSwitchOn_H := Gdip_GetImageHeight(pBitmapSwitchOn)
 	if (pBitmapSwitchOn_H > pBitmapSwitchOn_W)
 		pBitmapSwitchOn_size := pBitmapSwitchOn_H
 	else
 		pBitmapSwitchOn_size := pBitmapSwitchOn_W
-	pBitmapSwitchOff := Gdip_CreateBitmapFromFile("Icons\e_switch_off.ico")
+	pBitmapSwitchOff := Gdip_CreateBitmapFromFile(my_WorkingDir "\Icons\e_switch_off.ico")
 	pBitmapSwitchOff_W := Gdip_GetImageWidth(pBitmapSwitchOff)
 	pBitmapSwitchOff_H := Gdip_GetImageHeight(pBitmapSwitchOff)
 	if (pBitmapSwitchOff_H > pBitmapSwitchOff_W)

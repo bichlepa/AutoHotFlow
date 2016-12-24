@@ -1,17 +1,24 @@
 #NoEnv  ; Recommended for performance and compatibility with future AutoHotkey releases.
 ;#Warn  ; Recommended for catching common errors.
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
-SetWorkingDir %A_ScriptDir%\..  ; Ensures a consistent starting directory.
+
+SetWorkingDir %A_ScriptDir%\..  ; set working dir.
+my_WorkingDir = %A_WorkingDir%
+; using working dir forbidden.
+;The reason is that while any thread uses the command FileSelectFile, the working directory of the working directory of the whole process is changed to the path which is shown in the dialog.
+SetWorkingDir %a_temp%  
+;~ MsgBox %my_WorkingDir%
+
 ;~ MsgBox %1% - %2% - %3% - %4% - %5%
 OnExit,exit
 
 Global_ThisThreadID:="Main"
 
-Menu, tray, Icon, Icons\mainicon.ico
+Menu, tray, Icon,%my_WorkingDir%\Icons\mainicon.ico
 
 #Include %A_ScriptDir%\..
 #include language\language.ahk
-lang_Init()
+lang_Init(my_WorkingDir "\language", my_WorkingDir)
 
 #include lib\Object to file\String-object-file.ahk
 #include lib\Robert - Ini library\Robert - Ini library.ahk

@@ -17,7 +17,7 @@ FindFlows() ;API
 	
 	
 	;Load existing Flows
-	loop Saved Flows\*.ini
+	loop %my_Workingdir%\Saved Flows\*.ini
 	{
 		SplitPath, A_LoopFileFullPath,,ThisFlowFolder,,ThisFlowFilename
 	

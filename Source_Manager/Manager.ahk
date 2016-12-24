@@ -1,17 +1,22 @@
 ﻿#NoEnv  ; Recommended for performance and compatibility with future AutoHotkey releases.
 ;#Warn  ; Recommended for catching common errors.
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
-SetWorkingDir %A_ScriptDir%\..  ; Ensures a consistent starting directory.
-;~ MsgBox %A_WorkingDir%
+
+SetWorkingDir %A_ScriptDir%\..  ; set working dir.
+my_WorkingDir = %A_WorkingDir%
+SetWorkingDir %a_temp%  ; using working dir forbidden.
+
+;~ MsgBox %my_WorkingDir%
 #NoTrayIcon
 
 parentAHKThread := AhkExported()
 onexit exit
+#Include %A_ScriptDir%\..
 #include lib\Object to file\String-object-file.ahk
 
 #include language\language.ahk
 ;initialize languages
-lang_Init()
+lang_Init(my_WorkingDir "\language", my_WorkingDir)
 
 #include Source_Manager\User Interface\manager gui.ahk
 #include Source_Manager\User Interface\help.ahk

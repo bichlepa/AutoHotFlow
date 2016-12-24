@@ -1,7 +1,11 @@
 ﻿#NoEnv  ; Recommended for performance and compatibility with future AutoHotkey releases.
 ;~ #Warn  ; Recommended for catching common errors.
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
-SetWorkingDir %A_ScriptDir%\..  ; Ensures a consistent starting directory.
+
+SetWorkingDir %A_ScriptDir%\..  ; set working dir.
+my_WorkingDir = %A_WorkingDir%
+SetWorkingDir %a_temp%  ; using working dir forbidden.
+
 SetBatchLines -1
 #SingleInstance off
 CoordMode,mouse,client
@@ -13,7 +17,11 @@ OnExit,Exit
 ;Global_ThisThreadID
 
 
-#include language\language.ahk
+#Include %A_ScriptDir%\..
+#include language\language.ahk ;Must be very first
+;initialize languages
+lang_Init(my_WorkingDir "\language", my_WorkingDir)
+
 #include lib\Object to file\String-object-file.ahk
 #include lib\GDI+\GDIp.ahk
 #include lib\objhasvalue\objhasvalue.ahk
@@ -46,7 +54,6 @@ AllTriggerClasses:=Object()
 parentAHKThread := AhkExported()
 
 
-lang_Init()
 
 EditorGUIInit()
 EditGUIshow()

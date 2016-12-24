@@ -50,7 +50,7 @@ ui_showHelp(helpFile)
 		helpfilepath=Help\en\%helpFile%.html
 	}
 	Gui, Help:Add, ActiveX, x0 y0 w720 h490 vHB, Shell.Explorer
-	HB.Navigate(A_WorkingDir . "\" helpfilepath)
+	HB.Navigate(my_WorkingDir . "\" helpfilepath)
 	Gui, Help: +ToolWindow 
 	Gui, Help:Color, FFFFFF
 	Gui, Help: +resize

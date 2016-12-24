@@ -1,22 +1,29 @@
 ﻿;Find all languages
 ;_language := Object()
 
-lang_Init()
+lang_Init(directory := "::default::", settingsdir := "::default::")
 {
 	global _language
 	if not isobject(_language)
 		_language:=Object()
 	_language.allLangs:=Object()
+	
+	if (directory = "::default::")
+		directory:= A_ScriptDir "\language"
+	_language.dir:=directory
+	if (settingsdir = "::default::")
+		settingsdir := A_ScriptDir
+	_language.settingsdir:=settingsdir
 
-	Loop,language\*.ini
+	Loop,%directory%\*.ini
 	{
 		
 		StringReplace,filenameNoExt,A_LoopFileName,.%A_LoopFileExt%
-		IniRead,temp,language\%filenameNoExt%.ini,general,enname
+		IniRead,temp,%directory%\%filenameNoExt%.ini,general,enname
 		_language[filenameNoExt].enlangname := temp
-		IniRead,temp,language\%filenameNoExt%.ini,general,name
+		IniRead,temp,%directory%\%filenameNoExt%.ini,general,name
 		_language[filenameNoExt].langname := temp
-		IniRead,temp,language\%filenameNoExt%.ini,general,code
+		IniRead,temp,%directory%\%filenameNoExt%.ini,general,code
 		_language[filenameNoExt].code := temp
 		if (_language[filenameNoExt].enlangname != "Error")
 		{
@@ -34,8 +41,11 @@ lang_Init()
 lang_LoadCurrentLanguage()
 {
 	global _language
-	iniread,UILang,settings.ini,common,UILanguage
+	settingsdir := _language.settingsdir
+	;~ MsgBox %settingsdir%
+	iniread,UILang,%settingsdir%\settings.ini,common,UILanguage
 	_language.UILang := uilang
+	directory := _language.dir
 	if uilang=error
 	{
 		for index, templang in _share.allLangs
@@ -51,9 +61,9 @@ lang_LoadCurrentLanguage()
 		if (_language.UILang="Error")
 			(_language.UILang="en")
 	}
-	IniRead,temp,language\%UILang%.ini,general,enname
+	IniRead,temp,%directory%\%UILang%.ini,general,enname
 	_language[filenameNoExt].enlangname := temp
-	IniRead,temp,language\%UILang%.ini,general,name
+	IniRead,temp,%directory%\%UILang%.ini,general,name
 	_language[filenameNoExt].langname := temp
 	lang_ReadAllTranslations()
 }
@@ -66,7 +76,7 @@ lang(langvar,$1="",$2="",$3="",$4="",$5="",$6="",$7="",$8="",$9="")
 	;~ d(_language,456)
 	UILang := _language.UILang
 	LangNoUseCache := _language.NoUseCache
-	
+	directory := _language.dir
 	
 	if (langvar ="")
 		return ""
@@ -86,10 +96,10 @@ lang(langvar,$1="",$2="",$3="",$4="",$5="",$6="",$7="",$8="",$9="")
 	}
 	else ;if not in cache or cache should not be used, read from ini
 	{
-		IniRead,iniAllSections,language\%UILang%.ini
+		IniRead,iniAllSections,%directory%\%UILang%.ini
 		Loop,parse,iniAllSections,`n
 		{
-			IniRead,initext,language\%UILang%.ini,%a_loopfield%,%langvar_no_spaces%,%A_Space%
+			IniRead,initext,%directory%\%UILang%.ini,%a_loopfield%,%langvar_no_spaces%,%A_Space%
 			if initext
 				break
 		}
@@ -100,12 +110,12 @@ lang(langvar,$1="",$2="",$3="",$4="",$5="",$6="",$7="",$8="",$9="")
 	
 	if (initext="")
 	{
-		;iniwrite,% "",language\%UILang%.ini,translations,%langvar_no_spaces%
+		;iniwrite,% "",%directory%\%UILang%.ini,translations,%langvar_no_spaces%
 		
-		IniRead,iniAllSections,language\en.ini
+		IniRead,iniAllSections,%directory%\en.ini
 		Loop,parse,iniAllSections,`n
 		{
-			IniRead,initexten,language\en.ini,%a_loopfield%,%langvar_no_spaces%,%A_Space%
+			IniRead,initexten,%directory%\en.ini,%a_loopfield%,%langvar_no_spaces%,%A_Space%
 			if initexten
 				break
 		}
@@ -121,7 +131,7 @@ lang(langvar,$1="",$2="",$3="",$4="",$5="",$6="",$7="",$8="",$9="")
 				InputBox,newtrans,How is this in English?,%langvar_no_spaces%,,,,,,,,%langvarSpaces%
 				if ErrorLevel
 				{
-					IniDelete,language\en.ini,translations,%langvar_no_spaces%
+					IniDelete,%directory%\en.ini,translations,%langvar_no_spaces%
 					return
 				}
 				loop,9
@@ -133,7 +143,7 @@ lang(langvar,$1="",$2="",$3="",$4="",$5="",$6="",$7="",$8="",$9="")
 					StringReplace,newtrans,newtrans,$%a_index%`%,`%1`%,all
 					
 				}
-				iniwrite,% newtrans,language\en.ini,translations,%langvar_no_spaces%
+				iniwrite,% newtrans,%directory%\en.ini,translations,%langvar_no_spaces%
 				goto,langBeginAgain
 			}
 			else 
@@ -152,7 +162,7 @@ lang(langvar,$1="",$2="",$3="",$4="",$5="",$6="",$7="",$8="",$9="")
 			for tempindex, templang in _share.allLangs
 			{
 				
-				IniRead,templangcont,language\%templang%.ini,translations,%langvar_no_spaces%,%A_Space%
+				IniRead,templangcont,%directory%\%templang%.ini,translations,%langvar_no_spaces%,%A_Space%
 				;MsgBox %templang% %templangcont%
 				if templangcont
 					temptlangText:=temptlangText "`n" _language[templang].enlangname ": " templangcont
@@ -175,10 +185,10 @@ lang(langvar,$1="",$2="",$3="",$4="",$5="",$6="",$7="",$8="",$9="")
 					StringReplace,newtrans,newtrans,$%a_index%`%,`%1`%,all
 					
 				}
-				iniwrite,% newtrans,language\%UILang%.ini,translations,%langvar_no_spaces%
+				iniwrite,% newtrans,%directory%\%UILang%.ini,translations,%langvar_no_spaces%
 				if ErrorLevel
 				{
-					IniDelete,language\%UILang%.ini,translations,%langvar_no_spaces%
+					IniDelete,%directory%\%UILang%.ini,translations,%langvar_no_spaces%
 					return
 				}
 			}
@@ -216,13 +226,13 @@ lang_ReadAllTranslations()
 	global _language
 	UILang := _language.UILang
 	global langMakeAdditionalCategoryOfTranslationObject
-	
+	directory := _language.dir
 	
 	_language.cache:=Object()
 	if langMakeAdditionalCategoryOfTranslationObject
 		global langCategoryOfTranslation:=object()
 	
-	loop,read,language\%UILang%.ini
+	loop,read,%directory%\%UILang%.ini
 	{
 		
 		ifinstring,a_loopreadline,[

@@ -44,8 +44,8 @@ SelectLanguage_GUI()
 	GuiLanguageChooseOK:
 	gui, language:Submit, nohide
 
-	IniWrite, % allLangs[GuiLanguageChoose], settings.ini, common, UILanguage
-	iniread, UILang, settings.ini, common, UILanguage
+	IniWrite, % allLangs[GuiLanguageChoose], %my_workingdir%\settings.ini, common, UILanguage
+	iniread, UILang, %my_workingdir%\settings.ini, common, UILanguage
 	lang_LoadCurrentLanguage()
 
 	gui, language:destroy
