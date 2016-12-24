@@ -79,7 +79,6 @@ states_Update(p_FlowID, p_StateID)
 {
 	global _flows
 	_flows[p_FlowID].states[p_StateID].allElements:=ObjFullyClone(_flows[p_FlowID].allElements)
-	_flows[p_FlowID].states[p_StateID].allElements["action2"].bla:="blabla"
 	
 	_flows[p_FlowID].states[p_StateID].allConnections:=ObjFullyClone(_flows[p_FlowID].allConnections)
 	_flows[p_FlowID].states[p_StateID].allTriggers:=ObjFullyClone(_flows[p_FlowID].allTriggers)

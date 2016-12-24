@@ -1068,6 +1068,7 @@ gdip_DrawEverything(FlowObj)
 
 drawElementIcon(G, p_x, p_y, p_w, p_h ,path)
 {
+	global my_WorkingDir
 	static allElementIconBitmaps:=Object()
 	
 	if (allElementIconBitmaps.haskey(path))
@@ -1076,7 +1077,7 @@ drawElementIcon(G, p_x, p_y, p_w, p_h ,path)
 	}
 	else
 	{
-		BitmapIcon := Gdip_CreateBitmapFromFile(path)
+		BitmapIcon := Gdip_CreateBitmapFromFile(my_WorkingDir "\" path)
 		allElementIconBitmaps[path]:=BitmapIcon
 	}
 	

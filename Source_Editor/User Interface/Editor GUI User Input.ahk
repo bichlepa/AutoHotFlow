@@ -29,6 +29,11 @@ else
 return
 
 ui_leftmousebuttondoubleclick:
+
+UserDidMajorChange:=false
+UserDidMinorChange:=false
+UserCancelledAction:=false
+
 if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of the main gui are disabled
 {
 	ui_ActionWhenMainGUIDisabled()
@@ -40,6 +45,10 @@ if (FlowObj.markedElement != "") ;if a single element is marked
 	if instr(FlowObj.markedElement, "connection")
 	{
 		ret:=selectConnectionType(FlowObj.markedElement,"wait") ;Change connection type
+		if ret=aborted
+			UserCancelledAction:=true
+		else
+			UserDidMajorChange:=true
 		if (ret!="aborted")
 		{
 			API_Main_State_New(FlowID) ;make a new state. If user presses Ctrl+Z, the change will be undone
@@ -49,6 +58,10 @@ if (FlowObj.markedElement != "") ;if a single element is marked
 	else
 	{
 		ret:=ElementSettings.open(FlowObj.markedElement,"wait") ;open settings of the marked element
+		if ret=aborted
+			UserCancelledAction:=true
+		else
+			UserDidMajorChange:=true
 		if (ret!="aborted" and ret!="0 changes" )
 		{
 			API_Main_State_New(FlowID) ;make a new state. If user presses Ctrl+Z, the change will be undone
@@ -57,6 +70,7 @@ if (FlowObj.markedElement != "") ;if a single element is marked
 	
 }
 tempList:=""
+goto,endworkingOnClick
 return
 
 clickOnPicture: ;react on clicks of the user
@@ -92,6 +106,7 @@ if ( clickedElement="") ;If nothing was selected (click on nowhere). -> Scroll
 				if (ControlKeyState!="d")
 				{
 					UnmarkEverything()
+					ui_UpdateStatusbartext()
 					API_Main_Draw()
 				}
 			}
@@ -167,13 +182,6 @@ else if (clickedElement="MenuCreateNewAction" or clickedElement="MenuCreateNewCo
 		}
 	}
 	
-	if (UserCancelledAction=true)
-	{
-		API_Main_State_RestoreCurrent(FlowID)
-		CreateMarkedList()
-	}
-	else
-		UserDidMajorChange:=true
 	
 	API_Main_Draw()
 	;e_CorrectElementErrors("Code: 3053165186.")
@@ -187,27 +195,20 @@ else if (clickedElement="PlusButton" or clickedElement="PlusButton2") ;user clic
 		ret:=ui_MoveConnection(markedElement,tempConnection2,allConnections[markedElement].from, allConnections[markedElement].to)
 		if ret=aborted
 			UserCancelledAction:=true
+		else 
+			UserDidMajorChange:=true
 	}
 	else ;The selected element is either action, condition or trigger or loop
 	{
-		tempConnection1:=API_Main_Connection_New(FlowID)
+		tempConnection1:=API_Main_Connection_New(FlowID) ;Create new connection
+		
 		ret:=ui_MoveConnection(tempConnection1, ,markedElement )
 		if ret=aborted
 			UserCancelledAction:=true
+		else 
+			UserDidMajorChange:=true
 		
 	}
-	
-	
-	
-	if (UserCancelledAction=true)
-	{
-		;~ d(currentstate,1)
-		API_Main_State_RestoreCurrent(FlowID)
-		CreateMarkedList()
-		API_Main_Draw()
-	}
-	else
-		UserDidMajorChange:=true
 	
 	
 	;e_CorrectElementErrors("Code: 2389423789.")
@@ -220,17 +221,9 @@ else if (clickedElement="MoveButton1") ;if a connection is selected and user mov
 	ret:=ui_MoveConnection(,markedElement ,,allConnections[markedElement].to )
 	if ret=aborted
 		UserCancelledAction:=true
-	
-	
-	if (UserCancelledAction=true)
-	{
-		;~ d(currentstate,1)
-		API_Main_State_RestoreCurrent(FlowID)
-		CreateMarkedList()
-		API_Main_Draw()
-	}
-	else
+	else 
 		UserDidMajorChange:=true
+	
 	
 
 	
@@ -240,22 +233,12 @@ else if (clickedElement="MoveButton1") ;if a connection is selected and user mov
 }
 else if (clickedElement="MoveButton2") ;if a connection is selected and user moved the lower Part of it
 {
-	abortAddingElement:=false
 	
 	ret:=ui_MoveConnection(markedElement ,,allConnections[markedElement].from )
 	if ret=aborted
 		UserCancelledAction:=true
-	
-	if (UserCancelledAction=true)
-	{
-		;~ d(currentstate,1)
-		API_Main_State_RestoreCurrent(FlowID)
-		CreateMarkedList()
-		API_Main_Draw()
-	}
 	else
 		UserDidMajorChange:=true
-	
 	
 	
 	
@@ -294,14 +277,19 @@ else if (clickedElement="EditButton")  ;if something is selected and user clicks
 	if markedElement contains connection
 	{
 		ret:=selectConnectionType(markedElement,"wait")
-		if (ret!="aborted")
+		if ret=aborted
+			UserCancelledAction:=true
+		else
 			UserDidMajorChange:=true
 		
 	}
 	else
 	{
 		ret:=ElementSettings.open(markedElement,"wait") ;open settings of the marked element
-		if (ret!="aborted" and ret!="0 changes" )
+		
+		if (ret="aborted" )
+			UserCancelledAction:=true
+		else if (ret!="0 changes" )
 			UserDidMajorChange:=true
 	}
 	
@@ -377,6 +365,9 @@ else if (clickedElement!="") ;if user clicked on an element
 
 }
 
+goto, endworkingOnClick
+endworkingOnClick:
+
 ;Delete temporary vars
 tempElement1:=""
 tempElement2:=""
@@ -392,16 +383,18 @@ tempOldConnection1from:=""
 tempOldConnection1to:=""
 tempList:=""
 
-if (UserDidMajorChange or UserDidMinorChange)
+if (UserCancelledAction=true)
+{
+	API_Main_State_RestoreCurrent(FlowID)
+	CreateMarkedList()
+}
+else if (UserDidMajorChange or UserDidMinorChange)
 {
 	API_Main_State_New(FlowID) ;make a new state. If user presses Ctrl+Z, the change will be undone
 }
 else if (UserDidMinorChange)
 	API_Main_State_New(FlowID) ;make a new state. If user presses Ctrl+Z, the change will be undone
-else
-{
-	API_Main_State_RestoreCurrent(FlowID)
-}
+
 workingOnClick:=false
 
 return
@@ -461,7 +454,7 @@ ui_findElementUnderMouse(par_mode="default")
 		for forID, forElement in FlowObj.allElements
 		{
 			
-			Loop % forElement.CountOfParts ;Connections consist of multiple parts
+			Loop % forElement.CountOfParts ;Some elements consist of multiple parts
 			{
 				;~ ToolTip(strobj(forElement),10000)
 				;~ MsgBox %mx% %my%
@@ -493,10 +486,8 @@ ui_findElementUnderMouse(par_mode="default")
 		
 		if (par_mode="default" and clickedElement != "")
 		{
-
 			if (FlowObj.allElements[clickedElement].ClickPriority<=500 and FlowObj.allElements[clickedElement].ClickPriority >=490) ;reduce the priority of selected element
 				FlowObj.allElements[clickedElement].ClickPriority:=490
-			
 		}
 		;msgbox,clickedElement. : clickHighestPriority
 	}
@@ -991,7 +982,7 @@ ui_MoveConnection(connection1="", connection2="", element1="", element2="")
 			{
 				ret:=selectConnectionType(Connection1,"wait")
 				if (ret="aborted")
-					return "aborted"
+					abortAddingElement := True
 			}
 		}
 		else ;if pulled to anything else, check whether it is normal or exception
@@ -1011,7 +1002,7 @@ ui_MoveConnection(connection1="", connection2="", element1="", element2="")
 			{
 				ret:=selectConnectionType(Connection2,"wait")
 				if (ret="aborted")
-					return "aborted"
+					abortAddingElement := True
 			}
 		}
 		else ;if pulled to anything else, check whether it is normal or exception
