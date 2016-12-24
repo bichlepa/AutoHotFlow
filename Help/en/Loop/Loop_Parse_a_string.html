@@ -1,0 +1,152 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=windows-1252">
+	<TITLE>Bedienung</TITLE>
+	<META NAME="GENERATOR" CONTENT="OpenOffice 4.1.0  (Win32)">
+	<META NAME="CREATED" CONTENT="0;0">
+	<META NAME="CHANGEDBY" CONTENT="Paul Bichler">
+	<META NAME="CHANGED" CONTENT="20150611;16401805">
+	<META NAME="CHANGEDBY" CONTENT="Paul Bichler">
+	<META NAME="CHANGEDBY" CONTENT="Paul Bichler">
+	<META NAME="CHANGEDBY" CONTENT="Paul Bichler">
+	<STYLE TYPE="text/css">
+	<!--
+		P { color: #000000 }
+		TD P { color: #000000 }
+		H1 { color: #000000 }
+		DT { color: #000000 }
+		DD { color: #000000 }
+		H2 { color: #000000 }
+		H2.western { font-family: "Albany", sans-serif; font-size: 14pt; font-style: italic }
+		H2.cjk { font-family: "HG Mincho Light J"; font-size: 14pt; font-style: italic }
+		H2.ctl { font-family: "Arial Unicode MS"; font-size: 14pt; font-style: italic }
+	-->
+	</STYLE>
+</HEAD>
+<BODY LANG="en-US" TEXT="#000000" DIR="LTR">
+<H1 STYLE="margin-top: 0.3cm; margin-bottom: 0.4cm; page-break-before: always">
+Parse a string</H1>
+<DL>
+	<DT STYLE="margin-bottom: 0.1cm">The loop <B>Parse a string</B>
+	r<SPAN STYLE="font-weight: normal">etrieves substrings (fields) from
+	a string, one at a time.</SPAN></DT><DD STYLE="margin-left: 0cm; margin-bottom: 0.1cm">
+	<BR><BR>
+	</DD></DL>
+<H2 CLASS="western" STYLE="margin-top: 0.3cm; margin-bottom: 0.1cm; font-weight: normal">
+Settings</H2>
+<TABLE WIDTH=100% BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0 BGCOLOR="#ccffff">
+	<COL WIDTH=256*>
+	<TR>
+		<TD WIDTH=100% VALIGN=TOP>
+			<P STYLE="margin-bottom: 0.1cm"><B>Input string</B></P>
+			<P STYLE="margin-bottom: 0.1cm"><SPAN STYLE="font-weight: normal">If
+			</SPAN><B>This is a string</B><SPAN STYLE="font-weight: normal">
+			is selected, this field will contain the input text. You may
+			insert a variable's content by enclosing the variable in percent
+			signs.  </SPAN>
+			</P>
+			<P><SPAN STYLE="font-weight: normal">If </SPAN><B>This is a
+			variable name or expression</B><SPAN STYLE="font-weight: normal">
+			is selected, this field will contain the variable name.</SPAN></P>
+		</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=100% VALIGN=TOP>
+			<P STYLE="margin-bottom: 0.1cm"><B>Delimiter characters</B></P>
+			<P STYLE="margin-bottom: 0cm; font-weight: normal">This field
+			contains the separator characters (case sensitive). On every
+			appearance of one of those characters the input text will be split
+			into substrings.</P>
+			<P STYLE="margin-bottom: 0cm; font-weight: normal">If this field
+			is blank, each character of the input string will be treated as a
+			separate substring.</P>
+			<P STYLE="margin-bottom: 0cm; font-weight: normal">You can use a
+			space, tabulator and linefeed as delimiters by using following
+			variables:</P>
+			<P STYLE="margin-bottom: 0.1cm"><FONT FACE="Consolas, monospace"><B>a_space,
+			a_tab, a_lf</B></FONT></P>
+			<H2 CLASS="western" STYLE="margin-top: 0.3cm; margin-bottom: 0.1cm; font-weight: normal">
+			<FONT COLOR="#990000"><FONT SIZE=3>Note!</FONT></FONT></H2>
+			<TABLE WIDTH=100% BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0 BGCOLOR="#ffcccc">
+				<COL WIDTH=256*>
+				<TR>
+					<TD WIDTH=100% VALIGN=TOP>
+						<P>Each letter is a delimiter. Don't separate the delimiters by
+						a comma or space, unless you want the comma or space to be a
+						delimiter.</P>
+					</TD>
+				</TR>
+			</TABLE>
+			<P STYLE="margin-top: 0.2cm; margin-bottom: 0.1cm"><B><I><U>Examples:</U></I></B></P>
+			<TABLE WIDTH=100% BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0 BGCOLOR="#ccffcc">
+				<COL WIDTH=256*>
+				<TR>
+					<TD WIDTH=100% VALIGN=TOP>
+						<UL>
+							<LI><P STYLE="margin-bottom: 0.1cm"><FONT FACE="Consolas, monospace">,
+							<FONT COLOR="#0000ff"><I>(Use </I></FONT><FONT COLOR="#0000ff"><I><B>comma</B></I></FONT><FONT COLOR="#0000ff"><I>
+							as delimiter)</I></FONT></FONT></P>
+							<LI><P STYLE="margin-bottom: 0.1cm"><FONT FACE="Consolas, monospace">%a_space%%a_tab%%a_linefeed%
+							<FONT COLOR="#0000ff"><I>(Retrieve each word in a text)</I></FONT></FONT></P>
+							<LI><P STYLE="margin-bottom: 0.1cm"><FONT FACE="Consolas, monospace">%delimiters%
+							<FONT COLOR="#0000ff"><I>(variable that contains the
+							delimiters)</I></FONT></FONT></P>
+							<LI><P><FONT FACE="Consolas, monospace"><FONT COLOR="#000000"><SPAN STYLE="font-style: normal">ab
+							c </SPAN></FONT><FONT COLOR="#0000ff"><I>(use the letters </I></FONT><FONT COLOR="#0000ff"><I><B>a</B></I></FONT><FONT COLOR="#0000ff"><I>,
+							</I></FONT><FONT COLOR="#0000ff"><I><B>b</B></I></FONT><FONT COLOR="#0000ff"><I>,
+							</I></FONT><FONT COLOR="#0000ff"><I><B>c</B></I></FONT><FONT COLOR="#0000ff"><I>
+							and a </I></FONT><FONT COLOR="#0000ff"><I><B>space</B></I></FONT><FONT COLOR="#0000ff"><I>
+							as delimiter)</I></FONT></FONT></P>
+						</UL>
+					</TD>
+				</TR>
+			</TABLE>
+			<P STYLE="margin-bottom: 0.1cm"><BR><BR>
+			</P>
+		</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=100% VALIGN=TOP>
+			<P STYLE="margin-bottom: 0.1cm"><B>Omit characters</B></P>
+			<P STYLE="margin-bottom: 0cm"><SPAN STYLE="font-weight: normal">This
+			field contains the characters (case sensitive) </SPAN>to exclude
+			from the beginning and end of each substring.</P>
+			<P STYLE="margin-bottom: 0cm; font-weight: normal">If this field
+			can be blank.</P>
+			<P STYLE="margin-bottom: 0cm; font-weight: normal">You can use a
+			space, tabulator and linefeed by using following variables:</P>
+			<P STYLE="margin-bottom: 0.1cm"><FONT FACE="Consolas, monospace"><B>a_space,
+			a_tab, a_lf</B></FONT></P>
+		</TD>
+	</TR>
+</TABLE>
+<H2 CLASS="western" STYLE="margin-top: 0.3cm; margin-bottom: 0.1cm; font-weight: normal">
+Supplied variables</H2>
+<TABLE WIDTH=100% BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0 BGCOLOR="#ccffff">
+	<COL WIDTH=256*>
+	<TR>
+		<TD WIDTH=100% VALIGN=TOP BGCOLOR="#ffffcc">
+			<P STYLE="margin-bottom: 0.1cm"><FONT FACE="Consolas, monospace"><B>A_Index</B></FONT></P>
+			<P STYLE="font-weight: normal">contains the number of the current
+			iteration. It starts with the value 1 and increases on every loop.</P>
+		</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=100% VALIGN=TOP BGCOLOR="#ffffcc">
+			<P STYLE="margin-bottom: 0.1cm"><FONT FACE="Consolas, monospace"><B>A_LoopField</B></FONT></P>
+			<P STYLE="font-weight: normal">contains the current substring.</P>
+		</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=100% VALIGN=TOP BGCOLOR="#ffffcc">
+			<P STYLE="margin-bottom: 0.1cm"><FONT FACE="Consolas, monospace"><B>A_LoopCurrentList</B></FONT></P>
+			<P STYLE="font-weight: normal">contains a list, which contains all
+			substrings.</P>
+		</TD>
+	</TR>
+</TABLE>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+</BODY>
+</HTML>

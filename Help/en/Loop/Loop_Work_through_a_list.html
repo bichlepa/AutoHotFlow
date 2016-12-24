@@ -1,0 +1,127 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=windows-1252">
+	<TITLE>Bedienung</TITLE>
+	<META NAME="GENERATOR" CONTENT="OpenOffice 4.1.0  (Win32)">
+	<META NAME="CREATED" CONTENT="0;0">
+	<META NAME="CHANGEDBY" CONTENT="Paul Bichler">
+	<META NAME="CHANGED" CONTENT="20150611;16402127">
+	<META NAME="CHANGEDBY" CONTENT="Paul Bichler">
+	<META NAME="CHANGEDBY" CONTENT="Paul Bichler">
+	<STYLE TYPE="text/css">
+	<!--
+		P { color: #000000 }
+		TD P { color: #000000 }
+		H1 { color: #000000 }
+		DT { color: #000000 }
+		H2 { color: #000000 }
+		H2.western { font-family: "Albany", sans-serif; font-size: 14pt; font-style: italic }
+		H2.cjk { font-family: "HG Mincho Light J"; font-size: 14pt; font-style: italic }
+		H2.ctl { font-family: "Arial Unicode MS"; font-size: 14pt; font-style: italic }
+	-->
+	</STYLE>
+</HEAD>
+<BODY LANG="en-US" TEXT="#000000" DIR="LTR">
+<H1 STYLE="margin-top: 0.3cm; margin-bottom: 0.4cm; page-break-before: always">
+Work through a list</H1>
+<DL>
+	<DT STYLE="margin-bottom: 0.1cm">The loop <B>Work through a list</B>
+	<SPAN STYLE="font-weight: normal">allows to loop over all elements
+	in a list, one at a time.</SPAN></DT></DL>
+<H2 CLASS="western" STYLE="margin-top: 0.3cm; margin-bottom: 0.1cm; font-weight: normal">
+Settings</H2>
+<TABLE WIDTH=100% BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0 BGCOLOR="#ccffff">
+	<COL WIDTH=256*>
+	<TR>
+		<TD WIDTH=100% VALIGN=TOP>
+			<P STYLE="margin-bottom: 0.1cm"><B>Variable name</B></P>
+			<P><SPAN STYLE="font-weight: normal">Name of the variable that
+			contains a list.</SPAN></P>
+		</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=100% VALIGN=TOP>
+			<P STYLE="margin-bottom: 0.1cm"><B>Performance</B></P>
+			<P STYLE="margin-bottom: 0cm; font-weight: normal">If <B>Copy list
+			before first iteration </B>is checked, the list will be copied
+			prior to first iteration. This might slightly increase the
+			performance and be more convenient.<BR>If not, the elements will
+			be retrieved directly from list on each loop. 
+			</P>
+			<H2 CLASS="western" STYLE="margin-top: 0.3cm; margin-bottom: 0.1cm; font-weight: normal">
+			<FONT COLOR="#990000"><FONT SIZE=3>Note!</FONT></FONT></H2>
+			<TABLE WIDTH=100% BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0 BGCOLOR="#ffcccc">
+				<COL WIDTH=256*>
+				<TR>
+					<TD WIDTH=100% VALIGN=TOP>
+						<P STYLE="font-weight: normal">This might cause trouble if you
+						delete or add an element inside the loop. For example:</P>
+						<P STYLE="margin-bottom: 0.1cm"><I><U><B>Example:</B></U></I></P>
+						<TABLE WIDTH=100% BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0>
+							<COL WIDTH=256*>
+							<TR>
+								<TD WIDTH=100% VALIGN=TOP>
+									<P STYLE="margin-bottom: 0cm">A list contains following
+									elements: ONE, TWO, THREE</P>
+									<P>On first iteration <FONT FACE="Consolas, monospace">a_LoopValue</FONT>
+									contains ONE. Inside the loop, an action is used, that
+									deletes the first element. On second iteration <FONT FACE="Consolas, monospace">a_LoopValue</FONT>
+									will contain THREE. After that iteration the loop will end.</P>
+								</TD>
+							</TR>
+						</TABLE>
+					</TD>
+				</TR>
+			</TABLE>
+			<P STYLE="margin-bottom: 0cm; font-weight: normal"><BR>
+			</P>
+		</TD>
+	</TR>
+</TABLE>
+<H2 CLASS="western" STYLE="margin-top: 0.3cm; margin-bottom: 0.1cm; font-weight: normal">
+Supplied variables</H2>
+<TABLE WIDTH=100% BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0 BGCOLOR="#ccffff">
+	<COL WIDTH=256*>
+	<TR>
+		<TD WIDTH=100% VALIGN=TOP BGCOLOR="#ffffcc">
+			<P STYLE="margin-bottom: 0.1cm"><FONT FACE="Consolas, monospace"><B>A_Index</B></FONT></P>
+			<P STYLE="font-weight: normal">contains the number of the current
+			iteration. It starts with the value 1 and increases on every loop.</P>
+		</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=100% VALIGN=TOP BGCOLOR="#ffffcc">
+			<P STYLE="margin-bottom: 0.1cm"><FONT FACE="Consolas, monospace"><B>A_LoopKey</B></FONT></P>
+			<P STYLE="font-weight: normal">contains the current key.<BR>In
+			most lists, that only contain numerical keys, this value will be
+			same as <FONT FACE="Consolas, monospace">a_index</FONT>.</P>
+		</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=100% VALIGN=TOP BGCOLOR="#ffffcc">
+			<P STYLE="margin-bottom: 0.1cm"><FONT FACE="Consolas, monospace"><B>A_LoopValue</B></FONT></P>
+			<P STYLE="font-weight: normal">contains the current value. That is
+			one element of the list.</P>
+		</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=100% VALIGN=TOP BGCOLOR="#ffffcc">
+			<P STYLE="margin-bottom: 0.1cm"><FONT FACE="Consolas, monospace"><B>A_LoopUseCopiedList</B></FONT></P>
+			<P STYLE="font-weight: normal">contains 0 ore 1, depending on
+			whether <B>Copy list before first iteration </B>is checked.</P>
+		</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=100% VALIGN=TOP BGCOLOR="#ffffcc">
+			<P STYLE="margin-bottom: 0.1cm"><FONT FACE="Consolas, monospace"><B>A_LoopCurrentList</B></FONT></P>
+			<P STYLE="font-weight: normal">if <B>Copy list before first
+			iteration </B>is checked, this variable will contain the copied
+			list.</P>
+		</TD>
+	</TR>
+</TABLE>
+<P STYLE="margin-bottom: 0cm"><BR>
+</P>
+</BODY>
+</HTML>

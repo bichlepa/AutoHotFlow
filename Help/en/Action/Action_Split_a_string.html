@@ -1,0 +1,132 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=windows-1252"/>
+	<title>Bedienung</title>
+	<meta name="generator" content="LibreOffice 4.4.3.2 (Windows)"/>
+	<meta name="created" content="00:00:00"/>
+	<meta name="changedby" content="Paul Bichler"/>
+	<meta name="changed" content="2015-06-19T16:57:15.840000000"/>
+	<meta name="created" content="00:00:00">
+	<meta name="changedby" content="Paul Bichler">
+	<meta name="changed" content="2015-06-18T20:22:45.980000000">
+	<style type="text/css">
+		td p { color: #000000 }
+		h1 { color: #000000 }
+		p { color: #000000 }
+		dt { color: #000000 }
+		h2 { color: #000000 }
+		h2.western { font-family: "Albany", sans-serif; font-size: 14pt; font-style: italic }
+		h2.cjk { font-family: "HG Mincho Light J"; font-size: 14pt; font-style: italic }
+		h2.ctl { font-family: "Arial Unicode MS"; font-size: 14pt; font-style: italic }
+	</style>
+</head>
+<body lang="en-US" text="#000000" dir="ltr">
+<h1 style="margin-top: 0.3cm; margin-bottom: 0.4cm; page-break-before: always">
+Split a string</h1>
+<dl>
+	<dt style="margin-bottom: 0.1cm">The action <b>Split</b> <b>a string</b>
+	s<span style="font-weight: normal">eparates a string into a list</span>
+	<span style="font-weight: normal">of substrings using the specified
+	delimiters.</span></dt></dl>
+<h2 class="western" style="margin-top: 0.3cm; margin-bottom: 0.1cm; font-weight: normal">
+Settings</h2>
+<table width="100%" cellpadding="4" cellspacing="0" bgcolor="#ccffff">
+	<col width="256*">
+	<tr>
+		<td width="100%" valign="top" style="border: 1px solid #000000; padding: 0.11cm">
+			<p style="margin-bottom: 0.1cm"><b>Variable name</b></p>
+			<p style="font-weight: normal">Name of the variable which will
+			contain the list with the results.</p>
+		</td>
+	</tr>
+	<tr>
+		<td width="100%" valign="top" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
+			<p style="margin-bottom: 0.1cm"><b>Input string</b></p>
+			<p><span style="font-weight: normal">A string whose </span>contents
+			will be read from.</p>
+		</td>
+	</tr>
+	<tr>
+		<td width="100%" valign="top" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
+			<p style="margin-bottom: 0.1cm"><b>Delimiter characters</b></p>
+			<p style="margin-bottom: 0cm; font-weight: normal">This field
+			contains the separator characters (case sensitive). On every
+			appearance of one of those characters the input text will be split
+			into substrings.</p>
+			<p style="margin-bottom: 0cm; font-weight: normal">If this field
+			is blank, each character of the input string will be treated as a
+			separate substring.</p>
+			<p style="margin-bottom: 0cm; font-weight: normal">You can use a
+			space, tabulator and linefeed as delimiters by using following
+			variables:</p>
+			<p style="margin-bottom: 0.1cm"><font face="Consolas, monospace"><b>a_space,
+			a_tab, a_lf</b></font></p>
+			<h2 class="western" style="margin-top: 0.3cm; margin-bottom: 0.1cm; font-weight: normal">
+			<font color="#990000"><font size="3" style="font-size: 12pt">Note!</font></font></h2>
+			<table width="100%" cellpadding="4" cellspacing="0" bgcolor="#ffcccc">
+				<col width="256*">
+				<tr>
+					<td width="100%" valign="top" style="border: 1px solid #000000; padding: 0.11cm">
+						<p>Each letter is a delimiter. Don't separate the delimiters by
+						a comma or space, unless you want the comma or space to be a
+						delimiter.</p>
+					</td>
+				</tr>
+			</table>
+			<p style="margin-top: 0.2cm; margin-bottom: 0.1cm"><i><u><b>Examples:</b></u></i></p>
+			<table width="100%" cellpadding="4" cellspacing="0" bgcolor="#ccffcc">
+				<col width="256*">
+				<tr>
+					<td width="100%" valign="top" style="border: 1px solid #000000; padding: 0.11cm">
+						<ul>
+							<li/>
+<p style="margin-bottom: 0.1cm"><font face="Consolas, monospace">,
+							<font color="#0000ff"><i>(Use </i></font><font color="#0000ff"><i><b>comma</b></i></font><font color="#0000ff">
+							</font><font color="#0000ff"><i>as delimiter)</i></font></font></p>
+							<li/>
+<p style="margin-bottom: 0.1cm"><font face="Consolas, monospace">%a_space%%a_tab%%a_linefeed%
+							<font color="#0000ff"><i>(Retrieve each word in a text)</i></font></font></p>
+							<li/>
+<p style="margin-bottom: 0.1cm"><font face="Consolas, monospace">%delimiters%
+							<font color="#0000ff"><i>(variable that contains the
+							delimiters)</i></font></font></p>
+							<li/>
+<p><font face="Consolas, monospace"><span style="font-variant: normal"><font color="#000000"><span style="font-style: normal">ab
+							c </span></font></span><font color="#0000ff"><i>(use the
+							letters </i></font><font color="#0000ff"><i><b>a</b></i></font><font color="#0000ff"><i>,
+							</i></font><font color="#0000ff"><i><b>b</b></i></font><font color="#0000ff"><i>,
+							</i></font><font color="#0000ff"><i><b>c</b></i></font><font color="#0000ff">
+							</font><font color="#0000ff"><i>and a </i></font><font color="#0000ff"><i><b>space</b></i></font><font color="#0000ff">
+							</font><font color="#0000ff"><i>as delimiter)</i></font></font></p>
+						</ul>
+					</td>
+				</tr>
+			</table>
+			<p style="margin-bottom: 0.1cm"><br/>
+<br/>
+
+			</p>
+		</td>
+	</tr>
+	<tr>
+		<td width="100%" valign="top" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
+			<p style="margin-bottom: 0.1cm"><b>Omit characters</b></p>
+			<p style="margin-bottom: 0cm"><span style="font-weight: normal">This
+			field contains the characters (case sensitive) </span>to exclude
+			from the beginning and end of each substring.</p>
+			<p style="margin-bottom: 0cm; font-weight: normal">This field can
+			be blank.</p>
+			<p style="margin-bottom: 0cm; font-weight: normal">You can use a
+			space, tabulator and linefeed by using following variables:</p>
+			<p style="margin-bottom: 0.1cm"><font face="Consolas, monospace"><b>a_space,
+			a_tab, a_lf</b></font></p>
+		</td>
+	</tr>
+</table>
+<p style="margin-bottom: 0.1cm"><br/>
+<br/>
+
+</p>
+</body>
+</html>

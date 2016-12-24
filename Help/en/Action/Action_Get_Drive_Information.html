@@ -1,0 +1,191 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=windows-1252"/>
+	<title>Bedienung</title>
+	<meta name="generator" content="LibreOffice 4.4.3.2 (Windows)"/>
+	<meta name="created" content="00:00:00"/>
+	<meta name="changedby" content="Paul Bichler"/>
+	<meta name="changed" content="2015-09-05T13:32:57.675000000"/>
+	<meta name="created" content="00:00:00">
+	<meta name="changedby" content="Paul Bichler">
+	<meta name="changed" content="2015-09-05T13:05:33.816000000">
+	<style type="text/css">
+		td p { color: #000000 }
+		h1 { color: #000000 }
+		p { color: #000000 }
+		dt { color: #000000 }
+		dd { color: #000000 }
+		h2 { color: #000000 }
+		h2.western { font-family: "Albany", sans-serif; font-size: 14pt; font-style: italic }
+		h2.cjk { font-family: "HG Mincho Light J"; font-size: 14pt; font-style: italic }
+		h2.ctl { font-family: "Arial Unicode MS"; font-size: 14pt; font-style: italic }
+	</style>
+</head>
+<body lang="en-US" text="#000000" dir="ltr">
+<h1 style="margin-top: 0.3cm; margin-bottom: 0.4cm; page-break-before: always">
+Get drive information</h1>
+<dl>
+	<dt style="margin-bottom: 0.1cm">The action <b>Get drive information</b>
+	<span style="font-weight: normal">retrieves some information about
+	the connected drives.</span></dt></dl>
+<h2 class="western" style="margin-top: 0.3cm; margin-bottom: 0.1cm; font-weight: normal">
+Settings</h2>
+<table width="100%" cellpadding="4" cellspacing="0" bgcolor="#ccffff">
+	<col width="256*">
+	<tr>
+		<td width="100%" valign="top" style="border: 1px solid #000000; padding: 0.11cm">
+			<p style="margin-bottom: 0.1cm"><b>Output variable name</b></p>
+			<p style="font-weight: normal">Name of the variable which will
+			contain the value.</p>
+		</td>
+	</tr>
+	<tr>
+		<td width="100%" valign="top" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
+			<p style="margin-bottom: 0.1cm"><b>Which information</b></p>
+			<p style="margin-bottom: 0.1cm; font-weight: normal">Select an
+			information type which you want to retrieve. There are following
+			options:</p>
+			<ul>
+				<li/>
+<p style="margin-bottom: 0.1cm"><b>Label</b><span style="font-weight: normal">:
+				</span>Retrieves a drive's<span style="font-style: normal">
+				</span>volume label</p>
+				<li/>
+<p style="margin-bottom: 0.1cm; text-decoration: none"><b>Type</b><span style="font-weight: normal">:
+				</span>Retrieves the drive type, which is one of the following
+				words:</p>
+				<ul>
+					<li/>
+<p style="margin-bottom: 0.1cm; text-decoration: none"><font face="Consolas, monospace">Unknown</font></p>
+					<li/>
+<p style="margin-bottom: 0.1cm; text-decoration: none"><font face="Consolas, monospace">Removable</font></p>
+					<li/>
+<p style="margin-bottom: 0.1cm; text-decoration: none"><font face="Consolas, monospace">Fixed</font></p>
+					<li/>
+<p style="margin-bottom: 0.1cm; text-decoration: none"><font face="Consolas, monospace">Network</font></p>
+					<li/>
+<p style="margin-bottom: 0.1cm; text-decoration: none"><font face="Consolas, monospace">CDROM</font></p>
+					<li/>
+<p style="margin-bottom: 0.1cm; text-decoration: none"><font face="Consolas, monospace">RAMDisk</font></p>
+				</ul>
+				<li/>
+<p style="margin-bottom: 0.1cm"><span style="text-decoration: none"><b>Status</b></span><span style="text-decoration: none"><span style="font-weight: normal">:
+				</span></span><span style="text-decoration: none">Retrieves </span><span style="text-decoration: none">the</span><span style="text-decoration: none">
+				drive </span><span style="text-decoration: none">status</span><span style="text-decoration: none">,
+				which is one of the following words: </span>
+				</p>
+				<ul>
+					<li/>
+<p style="margin-bottom: 0.1cm"><font face="Consolas, monospace">Unknown</font>
+					(might indicate unformatted/RAW)</p>
+					<li/>
+<p style="margin-bottom: 0.1cm"><font face="Consolas, monospace">Ready</font></p>
+					<li/>
+<p style="margin-bottom: 0.1cm"><font face="Consolas, monospace">NotReady</font>
+					(typical for removable drives that don't contain media)</p>
+					<li/>
+<p style="margin-bottom: 0.1cm"><font face="Consolas, monospace">Invalid</font>
+					(<em>Path</em> does not exist or is a network drive that is
+					presently inaccessible, etc.)</p>
+				</ul>
+				<li/>
+<p style="margin-bottom: 0.1cm"><b>Status of CD or DVD
+				drive</b>: <span style="text-decoration: none">Retrieves </span><span style="text-decoration: none">the
+				media status of a CD or DVD drive. </span><em><span style="font-style: normal"><span style="text-decoration: none">Output
+				</span></span></em><em><span style="font-style: normal"><span style="text-decoration: none">variable</span></span></em><span style="text-decoration: none">
+				is made blank if the status cannot be determined. </span><span style="text-decoration: none">Otherwise,
+				it will contain one of the following words:</span></p>
+				<ul>
+					<li/>
+<p style="margin-bottom: 0.1cm"><font face="Consolas, monospace"><span style="text-decoration: none">not
+					ready</span></font><span style="text-decoration: none"> - The
+					drive is not ready to be accessed, perhaps due to being engaged
+					in a write operation. Known limitation: &quot;not ready&quot;
+					also occurs when the drive contains a DVD rather than a CD.</span></p>
+					<li/>
+<p style="margin-bottom: 0.1cm"><font face="Consolas, monospace"><span style="text-decoration: none">open</span></font><span style="text-decoration: none">
+					- The drive contains no disc, or the tray is ejected.</span></p>
+					<li/>
+<p style="margin-bottom: 0.1cm"><font face="Consolas, monospace"><span style="text-decoration: none">playing</span></font><span style="text-decoration: none">
+					- The drive is playing a disc.</span></p>
+					<li/>
+<p style="margin-bottom: 0.1cm"><font face="Consolas, monospace"><span style="text-decoration: none">paused</span></font><span style="text-decoration: none">
+					- The previously playing audio or video is now paused.</span></p>
+					<li/>
+<p style="margin-bottom: 0.1cm"><font face="Consolas, monospace"><span style="text-decoration: none">seeking</span></font><span style="text-decoration: none">
+					- The drive is seeking.</span></p>
+					<li/>
+<p style="margin-bottom: 0.1cm"><font face="Consolas, monospace"><span style="text-decoration: none">stopped</span></font><span style="text-decoration: none">
+					- The drive contains a CD but is not currently accessing it.</span></p>
+				</ul>
+				<li/>
+<p style="margin-bottom: 0.1cm"><span style="text-decoration: none"><b>Capacity</b></span><span style="text-decoration: none">:
+				</span><span style="text-decoration: none">Retrieves the total
+				capacity of </span><span style="text-decoration: none">a path or
+				drive, </span><span style="text-decoration: none">in </span><span style="text-decoration: none">M</span><span style="text-decoration: none">egabytes.</span></p>
+				<li/>
+<p style="margin-bottom: 0.1cm"><span style="text-decoration: none"><b>Free
+				disk space</b></span><span style="text-decoration: none">:
+				</span><span style="text-decoration: none">Retrieves the free
+				disk space of a </span><span style="text-decoration: none">path
+				or drive</span><span style="text-decoration: none">, in Megabytes</span></p>
+				<li/>
+<p style="margin-bottom: 0.1cm"><span style="text-decoration: none"><b>File
+				system</b></span><span style="text-decoration: none">: </span><span style="text-decoration: none">Retrieves
+				the type </span><span style="text-decoration: none">of drive's</span><span style="text-decoration: none">
+				file system, which is one of the following words: </span>
+				</p>
+				<ul>
+					<li/>
+<p style="margin-bottom: 0.1cm"><font face="Consolas, monospace"><span style="text-decoration: none">FAT</span></font></p>
+					<li/>
+<p style="margin-bottom: 0.1cm"><font face="Consolas, monospace"><span style="text-decoration: none">FAT32</span></font></p>
+					<li/>
+<p style="margin-bottom: 0.1cm"><font face="Consolas, monospace"><span style="text-decoration: none">NTFS</span></font></p>
+					<li/>
+<p style="margin-bottom: 0.1cm"><font face="Consolas, monospace"><span style="text-decoration: none">CDFS</span></font><span style="text-decoration: none">
+					(typically indicates a CD)</span></p>
+					<li/>
+<p style="margin-bottom: 0.1cm"><font face="Consolas, monospace"><span style="text-decoration: none">UDF</span></font><span style="text-decoration: none">
+					(typically indicates a DVD) </span>
+					</p>
+				</ul>
+				<li/>
+<p><span style="text-decoration: none"><b>Serial number</b></span><span style="text-decoration: none">:
+				</span><span style="text-decoration: none">Retrieves </span><span style="text-decoration: none">drive's
+				</span><span style="text-decoration: none">volume serial number
+				expressed as decimal integer.</span></p>
+			</ul>
+		</td>
+	</tr>
+	<tr>
+		<td width="100%" valign="top" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
+			<p style="margin-bottom: 0.1cm"><b>Drive letter or UNC name</b></p>
+			<p><span style="font-weight: normal">Specify a drive letter,
+			followed by </span>a colon and an optional backslash. In some
+			cases a UNC name (such as <font face="Consolas, monospace">\\server1\share1</font>)
+			might work.</p>
+		</td>
+	</tr>
+	<tr>
+		<td width="100%" valign="top" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
+			<p style="margin-bottom: 0.1cm"><b>Path</b></p>
+			<dl>
+				<dd style="margin-left: 0cm"><span style="font-weight: normal">Name
+				of the directory </span><span style="font-weight: normal">or a
+				drive letter, followed by a colon and an optional
+				backslash</span><span style="font-weight: normal">.<br/>
+</span>Since
+				NTFS supports mounted volumes and directory junctions, different
+				values might result in different folders of the same &quot;drive&quot;
+				in some cases.</dd></dl>
+		</td>
+	</tr>
+</table>
+<p style="margin-bottom: 0.1cm"><br/>
+<br/>
+
+</p>
+</body>
+</html>
