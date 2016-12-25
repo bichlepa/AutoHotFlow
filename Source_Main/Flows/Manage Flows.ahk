@@ -138,17 +138,17 @@ NewFlow(par_CategoryID = "")
 	
 	;Create a new file but do not overwrite existing file. Change file name if necessary.
 	NewName := _flows[newFlowid].Name 
-	_flows[newFlowid].folder := "Saved Flows"
+	_flows[newFlowid].folder := my_Workingdir "\Saved Flows"
 	_flows[newFlowid].filename := NewName
-	_flows[newFlowid].file := "Saved Flows\" NewName ".ini"
+	_flows[newFlowid].file := my_Workingdir "\Saved Flows\" NewName ".ini"
 	
 	Loop 
 	{
 		if FileExist(_flows[newFlowid].file)
 		{
-			_flows[newFlowid].folder := "Saved Flows"
+			_flows[newFlowid].folder := my_Workingdir "\Saved Flows"
 			_flows[newFlowid].filename := NewName a_index
-			_flows[newFlowid].file := "Saved Flows\" NewName a_index ".ini"
+			_flows[newFlowid].file := my_Workingdir "\Saved Flows\" NewName a_index ".ini"
 			_flows[newFlowid].Name := NewName " " a_index
 		}
 		else
