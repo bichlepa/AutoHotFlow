@@ -19,6 +19,8 @@ lang_Init(directory := "::default::", settingsdir := "::default::")
 	{
 		
 		StringReplace,filenameNoExt,A_LoopFileName,.%A_LoopFileExt%
+		_language[filenameNoExt] := Object()
+		
 		IniRead,temp,%directory%\%filenameNoExt%.ini,general,enname
 		_language[filenameNoExt].enlangname := temp
 		IniRead,temp,%directory%\%filenameNoExt%.ini,general,name
