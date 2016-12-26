@@ -686,7 +686,7 @@ class ElementSettings
 				if (parameter.content="Expression")
 				{
 					;The info icon tells user which conent type it is
-					gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempOneParameterID%,%my_WorkingDir%\icons\expression.ico
+					gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempOneParameterID%,%my_ScriptDir%\icons\expression.ico
 					this.components.push("GUISettingsOfElementInfoIconOf" tempOneParameterID)
 					ElementSettingsFieldHWNDs[tempHWND]:=this
 					
@@ -706,7 +706,7 @@ class ElementSettings
 				}
 				else if (parameter.content="String")
 				{
-					gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempOneParameterID%,%my_WorkingDir%\icons\string.ico
+					gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempOneParameterID%,%my_ScriptDir%\icons\string.ico
 					this.components.push("GUISettingsOfElementInfoIconOf" tempOneParameterID)
 					ElementSettingsFieldHWNDs[tempHWND]:=this
 					gui,add,edit,X+4 w360 %tempIsMulti% hwndtempHWND gGUISettingsOfElementCheckContent vGUISettingsOfElement%tempOneParameterID%,%temptext%
@@ -718,7 +718,7 @@ class ElementSettings
 				}
 				else if (parameter.content="VariableName")
 				{
-					gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempOneParameterID%,%my_WorkingDir%\icons\VariableName.ico
+					gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempOneParameterID%,%my_ScriptDir%\icons\VariableName.ico
 					this.components.push("GUISettingsOfElementInfoIconOf" tempOneParameterID)
 					ElementSettingsFieldHWNDs[tempHWND]:=this
 					gui,add,edit,X+4 w360 %tempIsMulti% hwndtempHWND gGUISettingsOfElementCheckContent vGUISettingsOfElement%tempOneParameterID%,%temptext%
@@ -733,9 +733,9 @@ class ElementSettings
 					
 					
 					if (tempContentTypeNum=1) 
-						gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempOneParameterID%,%my_WorkingDir%\icons\string.ico
+						gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempOneParameterID%,%my_ScriptDir%\icons\string.ico
 					else ;If content is expression
-						gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempOneParameterID%,%my_WorkingDir%\icons\expression.ico
+						gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempOneParameterID%,%my_ScriptDir%\icons\expression.ico
 					this.components.push("GUISettingsOfElementInfoIconOf" tempOneParameterID)
 					ElementSettingsFieldHWNDs[tempHWND]:=this
 					
@@ -772,21 +772,21 @@ class ElementSettings
 						tempXpos:="X+4"
 						if (parameter.content="Expression")
 						{
-							gui,add,picture,x10 w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempOneParameterID%,%my_WorkingDir%\icons\expression.ico
+							gui,add,picture,x10 w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempOneParameterID%,%my_ScriptDir%\icons\expression.ico
 							this.components.push("GUISettingsOfElementInfoIconOf" tempOneParameterID)
 							ElementSettingsFieldHWNDs[tempHWND]:=this
 							tempXpos:="X+4"
 						}
 						else if (parameter.content="String")
 						{
-							gui,add,picture,x10 w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempOneParameterID%,%my_WorkingDir%\icons\string.ico
+							gui,add,picture,x10 w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempOneParameterID%,%my_ScriptDir%\icons\string.ico
 							this.components.push("GUISettingsOfElementInfoIconOf" tempOneParameterID)
 							ElementSettingsFieldHWNDs[tempHWND]:=this
 							tempXpos:="X+4"
 						}
 						else if (parameter.content="VariableName")
 						{
-							gui,add,picture,x10 w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempOneParameterID%,%my_WorkingDir%\icons\VariableName.ico
+							gui,add,picture,x10 w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempOneParameterID%,%my_ScriptDir%\icons\VariableName.ico
 							this.components.push("GUISettingsOfElementInfoIconOf" tempOneParameterID)
 							ElementSettingsFieldHWNDs[tempHWND]:=this
 							tempXpos:="X+4"
@@ -874,7 +874,7 @@ class ElementSettings
 					IfInString,tempTextInControl,`%
 					{
 						guicontrol,SettingsOfElement:show,GUISettingsOfElementWarningIconOf%tempOneParamID%
-						guicontrol,SettingsOfElement:,GUISettingsOfElementWarningIconOf%tempOneParamID%,%my_WorkingDir%\Icons\Question mark.ico
+						guicontrol,SettingsOfElement:,GUISettingsOfElementWarningIconOf%tempOneParamID%,%my_ScriptDir%\Icons\Question mark.ico
 						This.warningText:=lang("Note!") " " lang("This is an expression.") " " lang("You musn't use percent signs to add a variable's content.") "`n"
 					}
 				}
@@ -894,7 +894,7 @@ class ElementSettings
 					catch
 					{
 						guicontrol,SettingsOfElement:show,GUISettingsOfElementWarningIconOf%tempOneParamID%
-						guicontrol,SettingsOfElement:,GUISettingsOfElementWarningIconOf%tempOneParamID%,%my_WorkingDir%\Icons\Exclamation mark.ico
+						guicontrol,SettingsOfElement:,GUISettingsOfElementWarningIconOf%tempOneParamID%,%my_ScriptDir%\Icons\Exclamation mark.ico
 						This.warningText:=lang("Error!") " " lang("The variable name is not valid.") "`n"
 					}
 				}
@@ -904,7 +904,7 @@ class ElementSettings
 					if tempTextInControl=
 					{
 						guicontrol,SettingsOfElement:show,GUISettingsOfElementWarningIconOf%tempOneParamID%
-						guicontrol,SettingsOfElement:,GUISettingsOfElementWarningIconOf%tempOneParamID%,%my_WorkingDir%\Icons\Exclamation mark.ico
+						guicontrol,SettingsOfElement:,GUISettingsOfElementWarningIconOf%tempOneParamID%,%my_ScriptDir%\Icons\Exclamation mark.ico
 						This.warningText:=lang("Error!") " " lang("This field mustn't be empty!") "`n"
 					}
 				}
@@ -961,12 +961,12 @@ class ElementSettings
 			
 			if temp=1 ;String
 			{
-				guicontrol,SettingsOfElement:,GUISettingsOfElementInfoIconOf%tempGUIControl%,%my_WorkingDir%\Icons\String.ico
+				guicontrol,SettingsOfElement:,GUISettingsOfElementInfoIconOf%tempGUIControl%,%my_ScriptDir%\Icons\String.ico
 				
 			}
 			else ;Expression
 			{
-				guicontrol,SettingsOfElement:,GUISettingsOfElementInfoIconOf%tempGUIControl%,%my_WorkingDir%\Icons\Expression.ico
+				guicontrol,SettingsOfElement:,GUISettingsOfElementInfoIconOf%tempGUIControl%,%my_ScriptDir%\Icons\Expression.ico
 				
 			}
 			
@@ -992,7 +992,7 @@ class ElementSettings
 			tempParameterOptions:=parameter.options
 			if (parameter.allowExpression=true)
 			{
-				gui,add,picture,x10 w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempParameterID%,%my_WorkingDir%\icons\expression.ico
+				gui,add,picture,x10 w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempParameterID%,%my_ScriptDir%\icons\expression.ico
 				this.components.push("GUISettingsOfElementInfoIconOf" tempParameterID)
 				ElementSettingsFieldHWNDs[tempHWND]:=this
 				gui,add,edit,X+6 w190 hwndtempHWND gGUISettingsOfElementSliderChangeEdit vGUISettingsOfElement%tempParameterID%,%temp%
@@ -1128,7 +1128,7 @@ class ElementSettings
 			if (parameter.content="Expression")
 			{
 				;The info icon tells user which conent type it is
-				gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempOneParameterID%,%my_WorkingDir%\icons\expression.ico
+				gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempOneParameterID%,%my_ScriptDir%\icons\expression.ico
 				this.components.push("GUISettingsOfElementInfoIconOf" tempOneParameterID)
 				ElementSettingsFieldHWNDs[tempHWND]:=this
 				
@@ -1148,7 +1148,7 @@ class ElementSettings
 			}
 			else if (parameter.content="String")
 			{
-				gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempOneParameterID%,%my_WorkingDir%\icons\string.ico
+				gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempOneParameterID%,%my_ScriptDir%\icons\string.ico
 				this.components.push("GUISettingsOfElementInfoIconOf" tempOneParameterID)
 				ElementSettingsFieldHWNDs[tempHWND]:=this
 				
@@ -1161,7 +1161,7 @@ class ElementSettings
 			}
 			else if (parameter.content="VariableName")
 			{
-				gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempOneParameterID%,%my_WorkingDir%\icons\VariableName.ico
+				gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempOneParameterID%,%my_ScriptDir%\icons\VariableName.ico
 				this.components.push("GUISettingsOfElementInfoIconOf" tempOneParameterID)
 				ElementSettingsFieldHWNDs[tempHWND]:=this
 				
@@ -1177,9 +1177,9 @@ class ElementSettings
 				
 				
 				if (tempContentTypeNum=1) 
-					gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempOneParameterID%,%my_WorkingDir%\icons\string.ico
+					gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempOneParameterID%,%my_ScriptDir%\icons\string.ico
 				else ;If content is expression
-					gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempOneParameterID%,%my_WorkingDir%\icons\expression.ico
+					gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempOneParameterID%,%my_ScriptDir%\icons\expression.ico
 				this.components.push("GUISettingsOfElementInfoIconOf" tempOneParameterID)
 				ElementSettingsFieldHWNDs[tempHWND]:=this
 				
@@ -1224,7 +1224,7 @@ class ElementSettings
 					IfInString,tempTextInControl,`%
 					{
 						guicontrol,SettingsOfElement:show,GUISettingsOfElementWarningIconOf%tempOneParamID%
-						guicontrol,SettingsOfElement:,GUISettingsOfElementWarningIconOf%tempOneParamID%,%my_WorkingDir%\Icons\Question mark.ico
+						guicontrol,SettingsOfElement:,GUISettingsOfElementWarningIconOf%tempOneParamID%,%my_ScriptDir%\Icons\Question mark.ico
 						This.warningText:=lang("Note!") " " lang("This is an expression.") " " lang("You musn't use percent signs to add a variable's content.") "`n"
 					}
 				}
@@ -1244,7 +1244,7 @@ class ElementSettings
 					catch
 					{
 						guicontrol,SettingsOfElement:show,GUISettingsOfElementWarningIconOf%tempOneParamID%
-						guicontrol,SettingsOfElement:,GUISettingsOfElementWarningIconOf%tempOneParamID%,%my_WorkingDir%\Icons\Exclamation mark.ico
+						guicontrol,SettingsOfElement:,GUISettingsOfElementWarningIconOf%tempOneParamID%,%my_ScriptDir%\Icons\Exclamation mark.ico
 						This.warningText:=lang("Error!") " " lang("The variable name is not valid.") "`n"
 					}
 				}
@@ -1254,7 +1254,7 @@ class ElementSettings
 					if tempTextInControl=
 					{
 						guicontrol,SettingsOfElement:show,GUISettingsOfElementWarningIconOf%tempOneParamID%
-						guicontrol,SettingsOfElement:,GUISettingsOfElementWarningIconOf%tempOneParamID%,%my_WorkingDir%\Icons\Exclamation mark.ico
+						guicontrol,SettingsOfElement:,GUISettingsOfElementWarningIconOf%tempOneParamID%,%my_ScriptDir%\Icons\Exclamation mark.ico
 						This.warningText:=lang("Error!") " " lang("This field mustn't be empty!") "`n"
 					}
 				}

@@ -3,7 +3,8 @@
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
 
 SetWorkingDir %A_ScriptDir%\..  ; set working dir.
-my_WorkingDir = %A_WorkingDir%
+my_WorkingDir := _share.my_WorkingDir
+my_ScriptDir := _share.my_ScriptDir
 SetWorkingDir %a_temp%  ; using working dir forbidden.
 
 SetBatchLines -1
@@ -20,7 +21,7 @@ OnExit,Exit
 #Include %A_ScriptDir%\..
 #include language\language.ahk ;Must be very first
 ;initialize languages
-lang_Init(my_WorkingDir "\language", my_WorkingDir)
+lang_Init(my_ScriptDir "\language", my_WorkingDir)
 
 #include lib\Object to file\String-object-file.ahk
 #include lib\GDI+\GDIp.ahk

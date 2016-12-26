@@ -3,7 +3,18 @@
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
 
 SetWorkingDir %A_ScriptDir%\..  ; set working dir.
+my_ScriptDir = %A_WorkingDir%
+
+;if portable installation, the script dir is the working dir. 
+;If installed in programs folder, it is a dir which is writable without admin rights
 my_WorkingDir = %A_WorkingDir%
+IfInString, my_WorkingDir, %A_ProgramFiles%
+{
+	my_WorkingDir = %A_AppData%\AutoHotFlow
+	if not fileexist(my_WorkingDir)
+		FileCreateDir, %my_WorkingDir%
+}
+
 ; using working dir forbidden.
 ;The reason is that while any thread uses the command FileSelectFile, the working directory of the working directory of the whole process is changed to the path which is shown in the dialog.
 SetWorkingDir %a_temp%  
@@ -14,11 +25,11 @@ OnExit,exit
 
 Global_ThisThreadID:="Main"
 
-Menu, tray, Icon,%my_WorkingDir%\Icons\mainicon.ico
+Menu, tray, Icon,%my_ScriptDir%\Icons\mainicon.ico
 
 #Include %A_ScriptDir%\..
 #include language\language.ahk
-lang_Init(my_WorkingDir "\language", my_WorkingDir)
+lang_Init(my_ScriptDir "\language", my_WorkingDir)
 
 #include lib\Object to file\String-object-file.ahk
 #include lib\Robert - Ini library\Robert - Ini library.ahk

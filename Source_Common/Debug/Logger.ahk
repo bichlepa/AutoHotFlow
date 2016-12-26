@@ -13,6 +13,10 @@ DebugLogLevelApp:=3
 DebugLogLevelFlow:=3
 DebugLogLevelThread:=3
 SettingFlowLogToFile:=true
+
+if not fileexist(my_workingdir "\Log")
+	FileCreateDir, % my_workingdir "\Log"
+
 logger(LogLevel,LoggingText)
 {
 	global 
@@ -85,7 +89,7 @@ logger(LogLevel,LoggingText)
 		_share.log.=DebugLogLastEntry
 		if SettingFlowLogToFile
 		{
-			FileAppend,% DebugLogLastEntry,Log\Log.txt,UTF-8
+			FileAppend,% DebugLogLastEntry,%my_workingdir%\Log\Log.txt,UTF-8
 		}
 	}
 	
@@ -97,9 +101,9 @@ logger(LogLevel,LoggingText)
 		_share.log:=substr(templog,templogpos+2)
 		;~ MsgBox % templogpos "`n" _share.log
 		
-		FileGetSize,temp,Log\Log.txt,K
+		FileGetSize,temp,%my_workingdir%\Log\Log.txt,K
 		if temp>10000
-			FileMove,Log\Log.txt,Log\Log Old.txt,1
+			FileMove,%my_workingdir%\Log\Log.txt,%my_workingdir%\Log\Log Old.txt,1
 		_share.logcountAfterTidy := 0
 	}
 }

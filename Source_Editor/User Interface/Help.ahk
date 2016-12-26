@@ -18,16 +18,16 @@ ui_showHelp(helpFile)
 	gui,Help:-dpiscale
 	
 	;~ MsgBox %helpFile%
-	helpfilepath=%my_workingdir%\Help\%UILang%\%helpFile%.html
+	helpfilepath=%my_ScriptDir%\Help\%UILang%\%helpFile%.html
 	;~ MsgBox %helpfilepath%
-	IfNotExist, %my_workingdir%\Help\%UILang%\%helpFile%.html
+	IfNotExist, %my_ScriptDir%\Help\%UILang%\%helpFile%.html
 	{
-		IfNotExist, %my_workingdir%\Help\en\%helpFile%.html
+		IfNotExist, %my_ScriptDir%\Help\en\%helpFile%.html
 		{
 			MsgBox, 16, % lang("Error"),% lang("No help file was found")
 			Return
 		}
-		helpfilepath=%my_workingdir%\Help\en\%helpFile%.html
+		helpfilepath=%my_ScriptDir%\Help\en\%helpFile%.html
 	}
 	
 	Gui, Help:Add, ActiveX, x0 y0 w720 h490 vHB, Shell.Explorer

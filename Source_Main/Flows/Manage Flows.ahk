@@ -15,9 +15,11 @@ FindFlows() ;API
 	local tempflowid
 	local newFlowID
 	
+	if not fileexist(my_WorkingDir "\Saved Flows")
+		FileCreateDir,%my_WorkingDir%\Saved Flows
 	
 	;Load existing Flows
-	loop %my_Workingdir%\Saved Flows\*.ini
+	loop %my_WorkingDir%\Saved Flows\*.ini
 	{
 		SplitPath, A_LoopFileFullPath,,ThisFlowFolder,,ThisFlowFilename
 	
@@ -138,17 +140,17 @@ NewFlow(par_CategoryID = "")
 	
 	;Create a new file but do not overwrite existing file. Change file name if necessary.
 	NewName := _flows[newFlowid].Name 
-	_flows[newFlowid].folder := my_Workingdir "\Saved Flows"
+	_flows[newFlowid].folder := my_WorkingDir "\Saved Flows"
 	_flows[newFlowid].filename := NewName
-	_flows[newFlowid].file := my_Workingdir "\Saved Flows\" NewName ".ini"
+	_flows[newFlowid].file := my_WorkingDir "\Saved Flows\" NewName ".ini"
 	
 	Loop 
 	{
 		if FileExist(_flows[newFlowid].file)
 		{
-			_flows[newFlowid].folder := my_Workingdir "\Saved Flows"
+			_flows[newFlowid].folder := my_WorkingDir "\Saved Flows"
 			_flows[newFlowid].filename := NewName a_index
-			_flows[newFlowid].file := my_Workingdir "\Saved Flows\" NewName a_index ".ini"
+			_flows[newFlowid].file := my_WorkingDir "\Saved Flows\" NewName a_index ".ini"
 			_flows[newFlowid].Name := NewName " " a_index
 		}
 		else

@@ -6,7 +6,7 @@ global_CriticalSectionGlobalVars := CriticalSection()
 
 
 global_elementInclusions := "`n"
-loop, files, %my_WorkingDir%\source_Elements\*.ahk, FR
+loop, files, %my_ScriptDir%\source_Elements\*.ahk, FR
 {
 	if not (substr(A_LoopFileName,1,1)=="_")
 		global_elementInclusions .= "#include " A_LoopFileFullPath "`n"
@@ -19,7 +19,7 @@ Thread_StartManager()
 	local threadID
 	
 	threadID := "Manager"
-	FileRead,ExecutionThreadCode,% my_WorkingDir "\Source_Manager\Manager.ahk"
+	FileRead,ExecutionThreadCode,% my_ScriptDir "\Source_Manager\Manager.ahk"
 	;~ MsgBox %ExecutionThreadCode%
 	AhkThread%threadID% := AhkThread("CriticalSection_Flows := CriticalSection("CriticalSection_Flows ")`n _flows := CriticalObject(" (&_flows) ") `n _settings := CriticalObject(" (&_settings) ") `n _execution := CriticalObject(" (&_execution) ") `n _GlobalVars := CriticalObject(" (&_GlobalVars) ") `n _share := CriticalObject(" (&_share) ")`n _language := CriticalObject(" (&_language) ") `n Global_ThisThreadID = " threadID "`n" ExecutionThreadCode)
 	
@@ -46,7 +46,7 @@ Thread_StartEditor(par_FlowID)
 	local ExecutionThreadCode
 	local threadID
 	threadID := "Editor" global_EditorThreadIDCounter++
-	FileRead,ExecutionThreadCode,% my_WorkingDir "\Source_Editor\Editor.ahk"
+	FileRead,ExecutionThreadCode,% my_ScriptDir "\Source_Editor\Editor.ahk"
 	;~ MsgBox %ExecutionThreadCode%
 	StringReplace,ExecutionThreadCode,ExecutionThreadCode,;PlaceholderIncludesOfElements,% global_elementInclusions
 	
@@ -61,7 +61,7 @@ Thread_StartDraw()
 	local ExecutionThreadCode
 	local threadID
 	threadID := "Draw"
-	FileRead,ExecutionThreadCode,% my_WorkingDir "\Source_Draw\Draw.ahk"
+	FileRead,ExecutionThreadCode,% my_ScriptDir "\Source_Draw\Draw.ahk"
 	;~ MsgBox %ExecutionThreadCode%
 	AhkThread%threadID% := AhkThread("CriticalSection_Flows := CriticalSection("CriticalSection_Flows ")`n _flows := CriticalObject(" (&_flows) ") `n _settings := CriticalObject(" (&_settings) ") `n _execution := CriticalObject(" (&_execution) ") `n _GlobalVars := CriticalObject(" (&_GlobalVars) ") `n _share := CriticalObject(" (&_share) ")`n _language := CriticalObject(" (&_language) ") `n Global_ThisThreadID = " threadID "`n" ExecutionThreadCode)
 	
@@ -74,7 +74,7 @@ Thread_StartExecution()
 	local ExecutionThreadCode
 	local threadID
 	threadID := "Execution" global_ExecutionThreadIDCounter++
-	FileRead,ExecutionThreadCode,% my_WorkingDir "\Source_Execution\execution.ahk"
+	FileRead,ExecutionThreadCode,% my_ScriptDir "\Source_Execution\execution.ahk"
 	StringReplace,ExecutionThreadCode,ExecutionThreadCode,;PlaceholderIncludesOfElements,% global_elementInclusions
 	;~ MsgBox %ExecutionThreadCode%
 	AhkThread%threadID% := AhkThread("CriticalSection_Flows := CriticalSection("CriticalSection_Flows ")`n _flows := CriticalObject(" (&_flows) ") `n _settings := CriticalObject(" (&_settings) ") `n _execution := CriticalObject(" (&_execution) ") `n _GlobalVars := CriticalObject(" (&_GlobalVars) ") `n _share := CriticalObject(" (&_share) ")`n _language := CriticalObject(" (&_language) ")`n global_CriticalSectionExecution := " global_CriticalSectionExecution "global_CriticalSectionGlobalVars := " global_CriticalSectionGlobalVars " `n Global_ThisThreadID = " threadID "`n" ExecutionThreadCode)

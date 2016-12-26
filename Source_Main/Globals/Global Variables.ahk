@@ -87,11 +87,10 @@ init_GlobalVars()
 	*/
 	_flows := CriticalObject()
 	
+	
 	/* Content of _settings
-	
-	
+	_settings is an associative array of objects. Each object contains some informations:
 	*/
-	
 	_settings := CriticalObject()
 	
 	/* Content of _execution
@@ -147,8 +146,12 @@ init_GlobalVars()
 			.Type			Category Type. (Containing the string "Category")
 			.TV				Tree view ID. 
 		.log			Log content
+		.my_ScriptDir		Directory which contains ahk script files, icons, language files, help files and AHK_H.exe
+		.my_WorkingDir		Directory which contains saved flows, log and settings file. It is same as my_ScriptDir if portable installation
 	*/
 	_share := CriticalObject()
+	_share.my_ScriptDir := my_ScriptDir
+	_share.my_WorkingDir := my_WorkingDir
 
 	_language := CriticalObject()
 	
