@@ -382,6 +382,13 @@ x_finish(Environment, Result, Message = "")
 	finishExecutionOfElement(Environment, Result, Message)
 	
 }
+
+;For loops
+x_getEntryPoint(Environment)
+{
+	return Environment.ElementEntryPoint
+}
+
 ;For triggers
 x_trigger(Environment, triggerVars="")
 {

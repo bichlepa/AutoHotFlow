@@ -816,65 +816,13 @@ gdip_DrawEverything(FlowObj)
 		;Move Button
 		if (tempElList[markedElement].type = "connection")
 		{
-			tempFromEl:=tempElList[markedElement].from
-			tempToEl:=tempElList[markedElement].to
+			middlePointOfMoveButton1X:=((tempElList[markedElement].part1x1 +  tempElList[markedElement].part1x2)/2  ) / zoomFactor 
+			middlePointOfMoveButton1Y:=(tempElList[markedElement].part1y1 ) / zoomFactor +20
+			
+			middlePointOfMoveButton2X:=((tempElList[markedElement].part5x1 +  tempElList[markedElement].part5x2)/2  ) / zoomFactor 
+			middlePointOfMoveButton2Y:=(tempElList[markedElement].part5y2 ) / zoomFactor  -20
 			
 			
-			if (allElements[tempFromEl].type="loop")
-			{
-
-				if (tempElList[markedElement].ConnectionType="Normal")
-				{
-					if (tempElList[markedElement].fromPart="HEAD")
-					{
-						middlePointOfMoveButton1X:=allElements[tempFromEl].x + ElementWidth *0.5 - Offsetx
-						middlePointOfMoveButton1Y:=allElements[tempFromEl].y +ElementHeight - Offsety
-					}
-					else
-					{
-						middlePointOfMoveButton1X:=allElements[tempFromEl].x + ElementWidth *0.5 - Offsetx
-						middlePointOfMoveButton1Y:=allElements[tempFromEl].y + tempFromEl.HeightOfVerticalBar+ElementHeight*4/3 - Offsety
-					}
-				}
-				else
-				{
-					middlePointOfMoveButton1X:=allElements[tempFromEl].x + ElementWidth *0.5 - Offsetx
-					middlePointOfMoveButton1Y:=allElements[tempFromEl].y + allElements[tempFromEl].HeightOfVerticalBar+ElementHeight*4/3 - Offsety
-				}
-			}
-			else
-			{
-				middlePointOfMoveButton1X:=allElements[tempFromEl].x + ElementWidth *0.5 - Offsetx
-				middlePointOfMoveButton1Y:=allElements[tempFromEl].y +ElementHeight  - Offsety
-			}
-			
-			
-			
-			if (allElements[tempToEl].type="loop")
-			{
-
-				if (tempElList[markedElement].toPart="HEAD")
-				{
-					middlePointOfMoveButton2X:=allElements[tempToEl].x + ElementWidth *0.5 - Offsetx
-					middlePointOfMoveButton2Y:=allElements[tempToEl].y  - Offsety
-				}
-				else if (tempElList[markedElement].toPart="BREAK")
-				{
-					middlePointOfMoveButton2X:=allElements[tempToEl].x + ElementWidth *7/8 - Offsetx
-					middlePointOfMoveButton2Y:=allElements[tempToEl].y + allElements[tempToEl].HeightOfVerticalBar+ElementHeight - Offsety
-				}
-				else
-				{
-					middlePointOfMoveButton2X:=allElements[tempToEl].x + ElementWidth *0.5 - Offsetx
-					middlePointOfMoveButton2Y:=allElements[tempToEl].y + tempToEl.HeightOfVerticalBar+ElementHeight - Offsety
-				}
-				
-			}
-			else
-			{
-				middlePointOfMoveButton2X:=allElements[tempToEl].x + ElementWidth *0.5 - Offsetx
-				middlePointOfMoveButton2Y:=allElements[tempToEl].y  - Offsety
-			}
 			
 			if not (abs(middlePointOfMoveButton2Y-middlePointOfMoveButton1Y)<(gridy*2) and abs(middlePointOfMoveButton2X-middlePointOfMoveButton1X) <(gridx*5)) ;Don't show if they overlap other buttons
 			{

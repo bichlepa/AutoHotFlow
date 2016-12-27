@@ -107,7 +107,6 @@ if ( clickedElement="") ;If nothing was selected (click on nowhere). -> Scroll
 				{
 					UnmarkEverything()
 					ui_UpdateStatusbartext()
-					API_Main_Draw()
 				}
 			}
 		}
@@ -183,7 +182,6 @@ else if (clickedElement="MenuCreateNewAction" or clickedElement="MenuCreateNewCo
 	}
 	
 	
-	API_Main_Draw()
 	;e_CorrectElementErrors("Code: 3053165186.")
 }
 else if (clickedElement="PlusButton" or clickedElement="PlusButton2") ;user click on plus button
@@ -201,6 +199,20 @@ else if (clickedElement="PlusButton" or clickedElement="PlusButton2") ;user clic
 	else ;The selected element is either action, condition or trigger or loop
 	{
 		tempConnection1:=API_Main_Connection_New(FlowID) ;Create new connection
+		
+		;~ d(FlowObj.allConnections[tempConnection1], tempConnection2)
+		
+		if (FlowObj.allElements[markedElement].type = "loop")
+		{
+			if (clickedElement="PlusButton")
+			{
+				FlowObj.allConnections[tempConnection1].frompart := "HEAD"
+			}
+			else if (clickedElement="PlusButton2")
+			{
+				FlowObj.allConnections[tempConnection1].frompart := "TAIL"
+			}
+		}
 		
 		ret:=ui_MoveConnection(tempConnection1, ,markedElement )
 		if ret=aborted
@@ -318,7 +330,6 @@ else if (clickedElement!="") ;if user clicked on an element
 		}
 		else
 			MarkOne(clickedElement) ;mark one element and unmark others
-		API_Main_Draw() 
 		
 	}
 	else
@@ -331,7 +342,6 @@ else if (clickedElement!="") ;if user clicked on an element
 			}
 			else
 				MarkOne(clickedElement) ;mark one element and unmark others
-			API_Main_Draw() 
 		}
 		else ;If user moves the mouse
 		{
@@ -354,7 +364,7 @@ else if (clickedElement!="") ;if user clicked on an element
 			}
 			
 			
-			API_Main_Draw() 
+			
 		}
 	}
 	
@@ -395,6 +405,7 @@ else if (UserDidMajorChange or UserDidMinorChange)
 else if (UserDidMinorChange)
 	API_Main_State_New(FlowID) ;make a new state. If user presses Ctrl+Z, the change will be undone
 
+API_Main_Draw() 
 workingOnClick:=false
 
 return
@@ -845,14 +856,25 @@ ui_MoveConnection(connection1="", connection2="", element1="", element2="")
 	
 	;move elements to mouse
 	UnmarkEverything()
-	markOne(connection1)
-	markOne(connection2,true)
-	FlowObj.allConnections[connection2].from:="MOUSE"
-	FlowObj.allConnections[connection2].to:=FlowObj.allElements[element2].id
-	FlowObj.allConnections[connection2].ToPart:=FlowObj.allConnections[connection1].ToPart
+	if (connection1!="")
+		markOne(connection1)
 	
-	FlowObj.allConnections[connection1].from:=FlowObj.allElements[element1].id
-	FlowObj.allConnections[connection1].to:="MOUSE"
+	if (connection2!="")
+		markOne(connection2,true)
+	
+	if (connection2!="")
+	{
+		FlowObj.allConnections[connection2].from:="MOUSE"
+		FlowObj.allConnections[connection2].to:=FlowObj.allElements[element2].id
+		if (connection1!="")
+			FlowObj.allConnections[connection2].ToPart:=FlowObj.allConnections[connection1].ToPart
+	}
+	
+	if (connection1!="")
+	{
+		FlowObj.allConnections[connection1].from:=FlowObj.allElements[element1].id
+		FlowObj.allConnections[connection1].to:="MOUSE"
+	}
 	
 	;~ ToolTip(strobj(connection1) "`n`n" strobj(connection2),10000)
 	
@@ -913,8 +935,11 @@ ui_MoveConnection(connection1="", connection2="", element1="", element2="")
 		FlowObj.allElements[newElement].y:=ui_FitGridY(FlowObj.allElements[newElement].y)
 		
 		
-		FlowObj.allConnections[connection1].to:=FlowObj.allElements[newElement].id
-		FlowObj.allConnections[connection2].from:=FlowObj.allElements[newElement].id
+		if (connection1!="")
+			FlowObj.allConnections[connection1].to:=FlowObj.allElements[newElement].id
+		
+		if (connection2!="")
+			FlowObj.allConnections[connection2].from:=FlowObj.allElements[newElement].id
 		
 		gosub,ui_MoveConnectionCheckAndCorrect
 		if abortAddingElement
@@ -943,8 +968,10 @@ ui_MoveConnection(connection1="", connection2="", element1="", element2="")
 		NewElementPart:=partOfclickedElement
 		newElementCreated:=false
 		
-		FlowObj.allConnections[connection2].from:=FlowObj.allElements[newElement].id
-		FlowObj.allConnections[connection1].to:=FlowObj.allElements[newElement].id
+		if (connection2!="")
+			FlowObj.allConnections[connection2].from:=FlowObj.allElements[newElement].id
+		if (connection1!="")
+			FlowObj.allConnections[connection1].to:=FlowObj.allElements[newElement].id
 
 		;Check whether Connection is possible
 		if (FlowObj.allElements[newElement].Type="Trigger" && connection1)
@@ -1068,7 +1095,10 @@ ui_MoveConnection(connection1="", connection2="", element1="", element2="")
 	if (FlowObj.allElements[Element1].Type="Loop") ;If the first element is a loop
 	{
 		if (not FlowObj.allConnections[connection1].fromPart) ;If no part assigned to connection
+		{
+			d(FlowObj.allConnections[connection1], Element1)
 			FlowObj.allConnections[connection1].fromPart:="TAIL" ;connect to tail
+		}
 	}
 	else
 		Connection2.delete("topart") ;Delete part information if set

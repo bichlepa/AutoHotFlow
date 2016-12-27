@@ -226,6 +226,24 @@ GlobalVariable_Delete(Environment,p_Name)
 }
 
 
+LoopVariable_AddToStack(Environment)
+{
+	;~ d({loopvars:Environment.loopvars, loopvarsstack:Environment.loopvarsStack},"preadd")
+	;Write current loopvars to stack
+	Environment.loopvarsStack.push(objFullyClone(Environment.loopvars))
+	
+	;~ d({loopvars:Environment.loopvars, loopvarsstack:Environment.loopvarsStack},"add")
+}
+LoopVariable_RestoreFromStack(Environment)
+{
+	;~ d({loopvars:Environment.loopvars, loopvarsstack:Environment.loopvarsStack},"prerestore")
+	;Restore loopvars from stack
+	Environment.loopvars:=Environment.loopvarsStack.pop(objFullyClone(Environment.loopvarsStack))
+	
+	;~ d({loopvars:Environment.loopvars, loopvarsstack:Environment.loopvarsStack},"restore")
+}
+
+
 Var_RetrieveDestination(p_Name,p_Location,p_log=true)
 {
 	if (substr(p_Name,1,2)="A_") ;If variable name begins with A_

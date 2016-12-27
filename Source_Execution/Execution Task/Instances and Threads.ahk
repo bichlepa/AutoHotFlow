@@ -202,6 +202,7 @@ newThread(p_Instance, p_ToCloneFromThread ="")
 		newThread.Result := "Normal"
 		newThread.threadVars := CriticalObject()
 		newThread.loopVars := CriticalObject()
+		newThread.loopVarsStack := CriticalObject()
 		
 		;~ newThread.ElementID ; Will not be set in this function
 	}

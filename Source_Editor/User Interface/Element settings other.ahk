@@ -399,7 +399,7 @@ selectContainerType(p_ElementID, wait="")
 			else 
 			{
 				if (NowResultEditingElement!="aborted")
-					setElement.type:=NowResultEditingElement
+					API_Main_Element_SetType(FlowID,setElementID,NowResultEditingElement)
 				break
 			}
 		}

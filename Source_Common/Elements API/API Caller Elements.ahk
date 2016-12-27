@@ -103,6 +103,10 @@ x_trigger(Environment, triggerVars="")
 {
 	
 }
+x_getEntryPoint(Environment)
+{
+	
+}
 x_enabled(Environment, Result, Message = "")
 {
 	

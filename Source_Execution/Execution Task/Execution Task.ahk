@@ -31,7 +31,7 @@ executionTask()
 					executingFlows[OneInstance.flowID]:=True
 				}
 				
-				;look inwhich state the thread is and perform an action
+				;look in which state the thread is and perform an action
 				for OneThreadID, OneThread in OneInstance.threads
 				{
 					;~ d(OneThread, "Schleifenstart: for OneInstance.threads")
@@ -69,12 +69,24 @@ executionTask()
 						
 						;Find connections
 						AnyConnectionFound:=False
+						
+						currentState := _flows[OneThread.flowID].states[_flows[OneThread.flowID].currentState]
+						currentFinishedElement := currentState.allElements[OneThread.ElementID]
+						
 						;~ d(_flows[OneThread.flowID].states[currentState].allElements[OneThread.elementID], "element " OneThread.elementID) 
-						for oneConnectionIndex, oneConnectionID in _flows[OneThread.flowID].states[_flows[OneThread.flowID].currentState].allElements[OneThread.elementID].FromConnections
+						for oneConnectionIndex, oneConnectionID in currentFinishedElement.FromConnections
 						{
+							currentConnection := currentState.allConnections[oneConnectionID]
 							;~ d(_flows[OneThread.flowID].allConnections[oneConnectionID], "connection found: " oneConnectionID)
-							if (_flows[OneThread.flowID].states[_flows[OneThread.flowID].currentState].allConnections[oneConnectionID].ConnectionType = OneThread.result)
+							if ((currentConnection.ConnectionType = OneThread.result) or (currentFinishedElement.type = "Loop") and currentConnection.fromPart = OneThread.result)
 							{
+								;If leaving a loop
+								if (currentFinishedElement.type = "loop" and (OneThread.result = "tail" or OneThread.result = "exception"))
+								{
+									LoopVariable_RestoreFromStack(OneThread)
+								}
+								
+								
 								NextThread := OneThread
 								if (AnyConnectionFound=True)
 								{
@@ -83,7 +95,17 @@ executionTask()
 									;~ d(NextThread, "cloned thread")
 								}
 								;assign the next element to this thread
-								NextThread.ElementID := _flows[OneThread.flowID].states[_flows[OneThread.flowID].currentState].allConnections[oneConnectionID].to
+								NextThread.ElementID := currentConnection.to
+								NextThread.ElementEntryPoint := currentConnection.toPart
+								currentStartingElement := currentState.allElements[NextThread.ElementID]
+								
+								;If entering a loop
+								if (currentStartingElement.type = "loop" and NextThread.ElementEntryPoint = "head")
+								{
+									LoopVariable_AddToStack(NextThread)
+								}
+								
+								
 								NextThread.state:="starting"
 								
 								AnyConnectionFound:=True
