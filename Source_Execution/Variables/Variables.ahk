@@ -1,5 +1,8 @@
 ﻿AllBuiltInVars:="-A_Space-A_Tab-A_YYYY-A_Year-A_MM-A_Mon-A_DD-A_MDay-A_MMMM-A_MMM-A_DDDD-A_DDD-A_WDay-A_YDay-A_Hour-A_Min-A_Sec-A_MSec-A_TickCount-A_TimeIdle-A_TimeIdlePhysical-A_Temp-A_OSVersion-A_Is64bitOS-A_PtrSize-A_Language-A_ComputerName-A_UserName-A_ScriptDir-A_WinDir-A_ProgramFiles-A_AppData-A_AppDataCommon-A_Desktop-A_DesktopCommon-A_StartMenu-A_StartMenuCommon-A_Programs-A_ProgramsCommon-A_Startup-A_StartupCommon-A_MyDocuments-A_IsAdmin-A_ScreenWidth-A_ScreenHeight-A_ScreenDPI-A_IPAddress1-A_IPAddress2-A_IPAddress3-A_IPAddress4-A_Cursor-A_CaretX-A_CaretY-----" ;a_now and a_nowutc not included, they will be treated specially
 
+if not fileexist(my_workingdir "\Variables")
+	FileCreateDir, % my_workingdir "\Variables"
+
 LoopVariable_Set(Environment,p_Name,p_Value,p_ContentType="Normal")
 {
 	Environment.loopvars[p_Name]:={name:p_Name,value:p_Value,type:p_ContentType}
@@ -18,11 +21,49 @@ InstanceVariable_Set(Environment,p_Name,p_Value,p_ContentType="Normal")
 
 StaticVariable_Set(Environment,p_Name,p_Value,p_ContentType="Normal")
 {
-	;todo
+	global my_workingdir
+	
+	path:=my_workingdir "\Variables\" Environment.flowID
+	FileCreateDir,%path%
+	FileDelete,% path "\" p_Name ".ahfvd"
+	FileDelete,% path "\" p_Name ".ahfvar"
+	content:=""
+	content.="[variable]`n"
+	content.="name=" p_Name "`n"
+	content.="type=" p_ContentType "`n"
+	FileAppend,%content%,% path "\" p_Name ".ahfvd", utf-16
+	
+	if (p_ContentType = "list")
+	{
+		FileAppend,% strobj(p_Value),% path "\" p_Name ".ahfvar"
+	}
+	else
+	{
+		FileAppend,% p_Value,% path "\" p_Name ".ahfvar"
+	}
+	
 }
 GlobalVariable_Set(Environment,p_Name,p_Value,p_ContentType="Normal")
 {
-	;todo
+	global my_workingdir
+	path:=my_workingdir "\Variables"
+	FileDelete,% path "\" p_Name ".ahfvd"
+	FileDelete,% path "\" p_Name ".ahfvar"
+	content:=""
+	content.="[variable]`n"
+	content.="name=" p_Name "`n"
+	content.="type=" p_ContentType "`n"
+	FileAppend,%content%,% path "\" p_Name ".ahfvd", utf-16
+	
+	if (p_ContentType = "list")
+	{
+		FileAppend,% strobj(p_Value),% path "\" p_Name ".ahfvar"
+	}
+	else
+	{
+		FileAppend,% p_Value,% path "\" p_Name ".ahfvar"
+	}
+	
 }
 
 
@@ -44,11 +85,48 @@ InstanceVariable_GetWhole(Environment,p_Name)
 
 StaticVariable_GetWhole(Environment,p_Name)
 {
-	;todo
+	global my_workingdir
+	path:=my_workingdir "\Variables\" Environment.flowID
+	IniRead,vartype, % path "\" p_Name ".ahfvd", variable, type,%A_Space%
+	if (vartype = "")
+	{
+		return 
+	}
+	else 
+	{
+		FileRead,varcontent, % path "\" p_Name ".ahfvar"
+		if (vartype = "list")
+		{
+			return {name:p_Name,value:strobj(varcontent),type:vartype}
+		}
+		else
+		{
+			return {name:p_Name,value:varcontent,type:vartype}
+		}
+	}
 }
+
 GlobalVariable_GetWhole(Environment,p_Name)
 {
-	;todo
+	global my_workingdir
+	path:=my_workingdir "\Variables"
+	IniRead,vartype, % path "\" p_Name ".ahfvd", variable, type,%A_Space%
+	if (vartype = "")
+	{
+		return 
+	}
+	else 
+	{
+		FileRead,varcontent, % path "\" p_Name ".ahfvar"
+		if (vartype = "list")
+		{
+			return {name:p_Name,value:strobj(varcontent),type:vartype}
+		}
+		else
+		{
+			return {name:p_Name,value:varcontent,type:vartype}
+		}
+	}
 }
 
 BuiltInVariable_GetWhole(Environment,p_Name)
@@ -134,11 +212,17 @@ InstanceVariable_Delete(Environment,p_Name)
 
 StaticVariable_Delete(Environment,p_Name)
 {
-	;todo
+	global my_workingdir
+	path:=my_workingdir "\Variables\" Environment.flowID
+	FileDelete,% path "\" p_Name ".ahfvd"
+	FileDelete,% path "\" p_Name ".ahfvar"
 }
 GlobalVariable_Delete(Environment,p_Name)
 {
-	;todo
+	global my_workingdir
+	path:=my_workingdir "\Variables"
+	FileDelete,% path "\" p_Name ".ahfvd"
+	FileDelete,% path "\" p_Name ".ahfvar"
 }
 
 

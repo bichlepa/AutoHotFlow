@@ -1,4 +1,4 @@
-﻿global_FlowIDCounter = 1
+﻿
 global_CategoryIDCounter = 1
 
 ;Find flows in folder "saved Flows" und show them in the tv.
@@ -26,23 +26,12 @@ FindFlows() ;API
 		;Compare file name and flow name 
 		StringTrimRight, filenameNoExt, A_LoopFileName ,4
 		iniread, tempflowName, %A_LoopFileFullPath%, general, name
+		
+		;Load Flow ID. If no id saved, set filename as flow ID (backward compatibility)
+		iniread, tempflowID, %A_LoopFileFullPath%, general, id, %filenameNoExt%
 		;~ MsgBox %A_LoopFileFullPath% %tempflowName%
-		;~ if (filenameNoExt!=tempflowName) ;renaming flow ini files is risky. Instead a feature flow export should be implemented
-		;~ {
-			
-			
-			;~ ;MsgBox %tempflowName%
-			;~ FileMove,Saved Flows\%filenameNoExt%.ini,Saved Flows\%tempflowName%.ini
-			;~ if not errorlevel
-			;~ {
-				;~ ;MsgBox  Saved Flows\%filenameNoExt%.ini - Saved Flows\%tempflowName%.ini
-				;~ FileFullPath=Saved Flows\%tempflowName%.ini
-			;~ }
-			;~ else
-				;~ FileFullPath:=A_LoopFileFullPath
-		;~ }
-		;~ else
-			FileFullPath := A_LoopFileFullPath
+		
+		FileFullPath := A_LoopFileFullPath
 		
 		
 		
@@ -61,7 +50,7 @@ FindFlows() ;API
 
 		
 		;Add flow to the list
-		newFlowID := "flow" global_FlowIDCounter++
+		newFlowid:=tempflowID
 		_flows[newFlowid] := object()
 		
 		_flows[newFlowID].file := FileFullPath
@@ -129,10 +118,16 @@ NewFlow(par_CategoryID = "")
 	
 	;Create the flow in the global variable
 	;~ d(NewName " - " tempcategoryid " - " Categoryname)
-	newFlowid := "flow" global_FlowIDCounter++
+	Loop
+	{
+		random,randomValue
+		newFlowid := lang("New flow") " " randomValue
+		if (not _flows.haskey(newFlowid))
+			break
+	}
 	_flows[newFlowid] := object()
 	_flows[newFlowid].id := newFlowid
-	_flows[newFlowid].name := lang("New flow")
+	_flows[newFlowid].name := newFlowid
 	_flows[newFlowid].Type := "Flow"
 	_flows[newFlowid].category := tempCategoryID
 	_flows[newFlowid].enabled := false
@@ -141,26 +136,12 @@ NewFlow(par_CategoryID = "")
 	;Create a new file but do not overwrite existing file. Change file name if necessary.
 	NewName := _flows[newFlowid].Name 
 	_flows[newFlowid].folder := my_WorkingDir "\Saved Flows"
-	_flows[newFlowid].filename := NewName
-	_flows[newFlowid].file := my_WorkingDir "\Saved Flows\" NewName ".ini"
+	_flows[newFlowid].filename := newFlowid
+	_flows[newFlowid].file := my_WorkingDir "\Saved Flows\" newFlowid ".ini"
 	
-	Loop 
-	{
-		if FileExist(_flows[newFlowid].file)
-		{
-			_flows[newFlowid].folder := my_WorkingDir "\Saved Flows"
-			_flows[newFlowid].filename := NewName a_index
-			_flows[newFlowid].file := my_WorkingDir "\Saved Flows\" NewName a_index ".ini"
-			_flows[newFlowid].Name := NewName " " a_index
-		}
-		else
-		{
-			SaveFlowMetaData(newFlowid)
-			break
-		}
-		
-	}
-	
+
+	SaveFlowMetaData(newFlowid)
+
 	;Add TV entry
 	_flows[newFlowid].TV := API_manager_TreeView_AddEntry("Flow", newFlowid)
 

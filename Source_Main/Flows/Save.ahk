@@ -8,6 +8,7 @@
 	}
 	
 	IniWrite,% _Flows[par_ID].name,% _Flows[par_ID].file,general,name
+	IniWrite,% _Flows[par_ID].id,% _Flows[par_ID].file,general,ID
 	if (_Flows[par_ID].categoryname = lang("uncategorized"))
 		IniWrite,% "",% _Flows[par_ID].file,general,category ;If the flow has no category, do not save the category name
 	else
@@ -45,6 +46,7 @@ SaveFlow(FlowID)
 	RIni_AddSection("iniSave","general")
 	RIni_AppendValue("iniSave", "general", "name", _flows[FlowID].flowSettings.Name)
 	RIni_AppendValue("iniSave", "general", "category", _share.allCategories[_flows[FlowID].category].Name )
+	RIni_AppendValue("iniSave", "general", "ID", _flows[FlowID].id )
 	RIni_AppendValue("iniSave", "general", "count", _flows[FlowID].ElementIDCounter)
 	RIni_AppendValue("iniSave", "general", "SettingFlowExecutionPolicy", _flows[FlowID].flowSettings.ExecutionPolicy)
 	RIni_AppendValue("iniSave", "general", "SettingWorkingDir", _flows[FlowID].flowSettings.WorkingDir)
