@@ -24,3 +24,16 @@ API_Call_Manager_TreeView_AddEntry(par_Type, par_ID)
 	logger("t2", A_ThisFunc " call finished")
 	return retval
 }
+
+
+API_Call_Manager_ShowWindow()
+{
+	global
+	local retval
+	logger("t2", A_ThisFunc " call received")
+	
+	retval := Show_Manager_GUI()
+	
+	logger("t2", A_ThisFunc " call finished")
+	return retval
+}

@@ -46,12 +46,10 @@ init_Manager_GUI()
 	
 	if a_iscompiled
 	{
-		menu,tray, tip,% "AutoHotFlow " lang("Manager")
 		Gui, Show,hide, % "AutoHotFlow " lang("Manager")  ; Do not show window while loading flows. Otherway the treeview will not show the plus signs
 	}
 	else ;Helps me to find the uncompiled AHF instance
 	{
-		menu,tray, tip,% "AutoHotFlow " lang("Manager") " - UNCOMPILED "
 		Gui, Show,hide, % "AutoHotFlow " lang("Manager") " - UNCOMPILED "
 	}
 	
@@ -83,6 +81,7 @@ Refresh_Manager_GUI()
 
 Show_Manager_GUI()
 {
+	
 	Gui, manager:Show
 }
 

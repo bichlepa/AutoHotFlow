@@ -24,10 +24,8 @@ SetWorkingDir %a_temp%
 OnExit,exit
 
 Global_ThisThreadID:="Main"
-
-Menu, tray, Icon,%my_ScriptDir%\Icons\mainicon.ico
-
 #Include %A_ScriptDir%\..
+
 #include language\language.ahk
 lang_Init(my_ScriptDir "\language", my_WorkingDir)
 
@@ -36,6 +34,7 @@ lang_Init(my_ScriptDir "\language", my_WorkingDir)
 #include lib\ObjHasValue\ObjHasValue.ahk
 #include lib\ObjFullyClone\ObjFullyClone.ahk
 
+#include Source_Main\Tray\Tray.ahk
 #include Source_Main\Globals\Global Variables.ahk
 #include Source_Main\Threads\Threads.ahk
 #include Source_Main\Threads\API Caller to Manager.ahk

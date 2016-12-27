@@ -23,3 +23,15 @@ API_manager_TreeView_AddEntry(par_Type, par_ID)
 	return retvalue
 	
 }
+API_Manager_ShowWindow()
+{
+	global
+	local retvalue
+	logger("t2", A_ThisFunc " called")
+	
+	retvalue := AhkThreadManager.ahkFunction("API_Call_Manager_ShowWindow")
+	logger("t2", A_ThisFunc " finished")
+	
+	return retvalue
+	
+}
