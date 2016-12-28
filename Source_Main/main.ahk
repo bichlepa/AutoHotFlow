@@ -104,9 +104,13 @@ return
 
 exit:
 global exitingNow
+
 if (exitingNow!=true)
 {
 	exitingNow:=true
+	
+	i_SaveUnsavedFlows()
+	
 	Thread_StoppAll()
 }
 ExitApp

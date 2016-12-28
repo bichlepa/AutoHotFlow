@@ -4,7 +4,7 @@ global_statesCounter:=0
 MAX_COUNT_OF_STATES:=100
 
 
-state_New(p_FlowID)
+state_New(p_FlowID, stateID="", params="")
 {
 	global _flows, global_statesCounter
 	UpdateConnectionLists(p_FlowID)
@@ -13,24 +13,35 @@ state_New(p_FlowID)
 		_flows[p_FlowID].states:=Object()
 	
 	;~ MsgBox new state %p_FlowID% 
-	states_DeleteNewerThanCurrent(p_FlowID)
-	
-	newState:=Object()
-	newState.ID:="state" . format("{1:010u}",++global_statesCounter)
-	
-	_flows[p_FlowID].states[newState.id]:=newState
-	
-	states_DeleteTooOld(p_FlowID)
+	if (stateID = "")
+	{
+		states_DeleteNewerThanCurrent(p_FlowID)
+		
+		newState:=Object()
+		newState.ID:="state" . format("{1:010u}",++global_statesCounter)
+		_flows[p_FlowID].states[newState.id]:=newState
+		states_DeleteTooOld(p_FlowID)
+	}
+	else
+	{
+		newState:=Object()
+		newState.ID:=stateID
+		_flows[p_FlowID].states[newState.id]:=newState
+	}
 	
 	states_Update(p_FlowID, newState.ID)
 	
-	_flows[p_FlowID].currentState:=newState.ID
+	IfNotInString, params, NotAsCurrent
+		_flows[p_FlowID].currentState:=newState.ID
+	
 }
 
 state_Undo(p_FlowID)
 {
-	global _flows
+	global _flows, my_workingdir
 	found:=false
+	restored:=false
+
 	;~ MsgBox undo state %p_FlowID%  
 	;Try to find an older state than the current and set it.
 	for stateid, state in _flows[p_FlowID].states
@@ -39,6 +50,7 @@ state_Undo(p_FlowID)
 		if (stateid=_flows[p_FlowID].currentState and found)
 		{
 			;Restore previous state
+			restored := True
 			states_Restore(p_FlowID, previousState)
 			_flows[p_FlowID].currentState:=previousState
 			break
@@ -48,6 +60,58 @@ state_Undo(p_FlowID)
 		previousState:=stateid
 	}
 	
+	;Try to find a backup
+	if (restored = False and _flows[p_FlowID].backupsLoaded != True)
+	{
+		filename:=_flows[p_FlowID].FileName
+		currentStateIsFromBackup:=false
+		foundfilename:=""
+		foundbackupdate:=""
+		foundfilepath:=""
+		foundBackups:=Object()
+		;~ MsgBox %my_workingdir%\saved Flows\backup\%filename%_backup_*.ini
+		;~ loop, files, %my_workingdir%\savedFlows\backup\%filename%_backup_*.ini
+		currentStateDate:=_flows[p_FlowID].currentState
+		StringReplace,currentStateDate,currentStateDate,Backup_
+		if (errorlevel = 0)
+		{
+			currentStateIsFromBackup := True
+		}
+		loop, files, %my_workingdir%\saved Flows\backup\%filename%_backup_*.ini
+		{
+			StringReplace,backupdate,a_loopfilename,%filename%_backup_
+			StringTrimRight,backupdate,backupdate,4
+			
+			if (((currentStateIsFromBackup = True and currentStateDate > backupdate) or (currentStateIsFromBackup = False)) and (_flows[p_FlowID].firstLoadedTime > backupdate))
+			{
+				;~ MsgBox %currentStateIsFromBackup% - %currentStateDate% - %backupdate%
+				foundBackups.push({foundfilepath: A_LoopFileFullPath, foundfilename: A_LoopFileName, foundbackupdate: backupdate})
+				
+			}
+		}
+		
+		if (foundBackups.MaxIndex() >0)
+		{
+			
+			MsgBox, 36, % lang("Undo"), % lang("There are backups available. Do you want to load them?")
+			IfMsgBox yes
+			{
+				SplashTextOn,300,80,,% lang("loading backups")
+				for forindex, forbackupfile in foundBackups
+				{
+					LoadFlow(p_FlowID,forbackupfile.foundfilepath, "NoNewState|LoadAgain|keepDraw|keepPosition")
+					if (foundBackups.MaxIndex() = forindex)
+						state_New(p_FlowID, "Backup_" forbackupfile.foundbackupdate)
+					else
+						state_New(p_FlowID, "Backup_" forbackupfile.foundbackupdate, "NotAsCurrent")
+				}
+				_flows[p_FlowID].backupsLoaded:=True
+				SplashTextOff
+			}
+		}
+		
+		
+	}
 }
 
 state_Redo(p_FlowID)
@@ -151,7 +215,7 @@ states_DeleteTooOld(p_FlowID)
 	{
 		Loop % _flows[p_FlowID].states.count() - MAX_COUNT_OF_STATES
 		{
-			for id, state in this
+			for id, state in _flows[p_FlowID].states
 			{
 				todelete:=id
 				break

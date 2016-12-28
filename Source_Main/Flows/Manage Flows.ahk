@@ -7,7 +7,6 @@ global_CategoryIDCounter = 1
 FindFlows() ;API
 {
 	global
-	local filenameNoExt
 	local FileFullPath
 	local tempflowName
 	local tempcategoryname
@@ -24,11 +23,10 @@ FindFlows() ;API
 		SplitPath, A_LoopFileFullPath,,ThisFlowFolder,,ThisFlowFilename
 	
 		;Compare file name and flow name 
-		StringTrimRight, filenameNoExt, A_LoopFileName ,4
 		iniread, tempflowName, %A_LoopFileFullPath%, general, name
 		
 		;Load Flow ID. If no id saved, set filename as flow ID (backward compatibility)
-		iniread, tempflowID, %A_LoopFileFullPath%, general, id, %filenameNoExt%
+		iniread, tempflowID, %A_LoopFileFullPath%, general, id, %ThisFlowFilename%
 		;~ MsgBox %A_LoopFileFullPath% %tempflowName%
 		
 		FileFullPath := A_LoopFileFullPath

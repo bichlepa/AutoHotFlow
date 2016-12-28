@@ -1,9 +1,9 @@
 ﻿
 ;Can be called from other threads
-LoadFlow(FlowID)
+LoadFlow(FlowID, filepath="", params="")
 {
 	global
-	local FinishedSaving, ThisFlowFolder, tempValue, FlowCompabilityVersion, ID_count, index1, index2
+	local FinishedSaving, tempValue, FlowCompabilityVersion, ID_count, index1, index2
 	local loadElement, loadElementID, loadElementType, loadElementTriggerContainer, loadElementClass
 	local AllSections, tempSection, tempContainerID, missingpackages, tempName
 	local AnyTriggerLoaded, OutdatedMainTriggerContainerData
@@ -16,10 +16,13 @@ LoadFlow(FlowID)
 		return
 	}
 	
-	if (_flows[FlowID].loaded)
+	ifnotinstring,params,LoadAgain
 	{
-		MsgBox unexpected error. Flow %FlowID% should be loaded but it was already loaded
-		return
+		if (_flows[FlowID].loaded)
+		{
+			MsgBox unexpected error. Flow %FlowID% should be loaded but it was already loaded
+			return
+		}
 	}
 	
 	if (currentlyLoadingFlow = true)
@@ -29,9 +32,26 @@ LoadFlow(FlowID)
 	}
 	currentlyLoadingFlow:=true
 	
-	ThisFlowFilepath := _flows[FlowID].file
-	ThisFlowFolder := _flows[FlowID].Folder
-	ThisFlowFilename :=_flows[FlowID].FileName
+	IfInString, params, keepPosition
+	{
+		oldPosition:=objFullyClone(_flows[FlowID].flowSettings)
+	}
+	
+	
+	if (filepath="")
+	{
+		ThisFlowFilepath := _flows[FlowID].file
+		ThisFlowFolder := _flows[FlowID].Folder
+		ThisFlowFilename :=_flows[FlowID].FileName
+	}
+	else
+	{
+		ThisFlowFilepath:=filepath
+		SplitPath, ThisFlowFilepath,,ThisFlowFolder,,ThisFlowFilename
+	}
+	
+	;~ MsgBox %ThisFlowFilepath% - %ThisFlowFolder% - %ThisFlowFilename%
+	
 	missingpackages :=Object()
 	logger("a1", "Loading flow from file: " ThisFlowFilePath)
 	
@@ -45,7 +65,7 @@ LoadFlow(FlowID)
 	
 	;read ini file
 	
-	res:=RIni_Read("IniFile",_flows[FlowID].File)
+	res:=RIni_Read("IniFile",ThisFlowFilepath)
 	if res
 		MsgBox Failed to load the ini file. Error code: %res%
 	
@@ -53,7 +73,8 @@ LoadFlow(FlowID)
 	_flows[FlowID].allConnections:=CriticalObject()
 	_flows[FlowID].markedElements:=CriticalObject()
 	_flows[FlowID].flowSettings:=CriticalObject()
-	_flows[FlowID].draw:=CriticalObject()
+	IfNotInString, params,keepDraw
+		_flows[FlowID].draw:=CriticalObject()
 	;~ d(_flows[flowid])
 	AllSections:=RIni_GetSections("IniFile")
 	_flows[FlowID].CompabilityVersion:=RIni_GetKeyValue("IniFile", "general", "FlowCompabilityVersion", 0)
@@ -61,7 +82,7 @@ LoadFlow(FlowID)
 	_flows[FlowID].flowSettings.ExecutionPolicy:=RIni_GetKeyValue("IniFile", "general", "SettingFlowExecutionPolicy", "parallel")
 	_flows[FlowID].flowSettings.WorkingDir:=RIni_GetKeyValue("IniFile", "general", "SettingWorkingDir", A_MyDocuments "\AutoHotFlow default working direction")
 	_flows[FlowID].flowSettings.LogToFile:=RIni_GetKeyValue("IniFile", "general", 0)
-	if not fileexist(share.flowSettings.WorkingDir)
+	if not fileexist(_flows[FlowID].flowSettings.WorkingDir)
 	{
 		logger("a1","Working directory of the flow does not exist. Creating it now.")
 		FileCreateDir,% _flows[FlowID].flowSettings.WorkingDir
@@ -252,6 +273,15 @@ LoadFlow(FlowID)
 		}
 	}
 	
+	IfInString, params, keepPosition
+	{
+		_flows[FlowID].flowSettings.Offsetx:=oldPosition.Offsetx
+		_flows[FlowID].flowSettings.Offsety:=oldPosition.Offsety
+		_flows[FlowID].flowSettings.zoomFactor:=oldPosition.zoomFactor
+	}
+	
+	if not (_flows[FlowID].firstLoadedTime)
+		_flows[FlowID].firstLoadedTime:=a_now
 	_flows[FlowID].loaded:=true
 	logger("a1","Flow " flowSettings.Name " was successfully loaded.")
 	
@@ -269,8 +299,11 @@ LoadFlow(FlowID)
 	;e_CorrectElementErrors("Loaded the saved flow")
 	RIni_Shutdown("IniFile")
 	
-	
-	state_New(FlowID)
+	IfnotInString, params, NoNewState
+	{
+		state_New(FlowID)
+		_flows[FlowID].savedState:=_flows[FlowID].currentState
+	}
 	
 	currentlyLoadingFlow:=false
 }
@@ -284,7 +317,7 @@ loadFlowGeneralParameters(FlowID)
 	_flows[FlowID].flowSettings.zoomFactor:=RIni_GetKeyValue("IniFile", "general", "zoomFactor", default_ZoomFactor)
 	_flows[FlowID].flowSettings.Name:=RIni_GetKeyValue("IniFile", "general", "name", "")
 	_flows[FlowID].flowSettings.LogToFile:=RIni_GetKeyValue("IniFile", "general", "LogToFile", "")
-	_flows[FlowID].flowSettings.FolderOfStaticVariables:=RIni_GetKeyValue("IniFile", "general", "FolderOfStaticVariables", flow.Folder "\Static variables\" flow.Filename)
+	_flows[FlowID].flowSettings.FolderOfStaticVariables:=RIni_GetKeyValue("IniFile", "general", "FolderOfStaticVariables", ThisFlowFolder "\Static variables\" ThisFlowFilename)
 	
 	if not fileexist(_flows[FlowID].flowSettings.FolderOfStaticVariables)
 	{

@@ -1,4 +1,7 @@
-﻿SaveFlowMetaData(par_ID)
+﻿
+MAX_COUNT_OF_BACKUPS:=10
+
+SaveFlowMetaData(par_ID)
 {
 	global
 	;~ d(_Flows[par_ID],par_ID)
@@ -25,6 +28,8 @@ SaveFlow(FlowID)
 	local elementCounter=0
 	local triggerCounter=0
 	local conncetionCounter=0
+	local countBackupsToDelete=0
+	local presentBackupFiles=Object()
 	local ThisFlowFilepath, ThisFlowFolder, ThisFlowFilename
 	local saveElementType, saveElement, saveElementID, saveElementIniID
 	;~ MsgBox %FlowID%
@@ -125,6 +130,20 @@ SaveFlow(FlowID)
 	;Make a backup of the old flow. It will be possible to restore the old state.
 	FileCreateDir,%ThisFlowFolder%\backup
 	Filemove,%ThisFlowFolder%\%ThisFlowFilename%.ini,%ThisFlowFolder%\backup\%ThisFlowFilename%_backup_%a_now%.ini
+	;Delete old backups
+	loop, files, %ThisFlowFolder%\backup\%ThisFlowFilename%_backup_*.ini
+	{
+		presentBackupFiles.push(A_LoopFileFullPath)
+	}
+	countBackupsToDelete:=presentBackupFiles.MaxIndex() - MAX_COUNT_OF_BACKUPS
+	if (countBackupsToDelete > 0)
+	{
+		Loop %countBackupsToDelete%
+		{
+			FileDelete,% presentBackupFiles[1]
+			presentBackupFiles.removeat(1)
+		}
+	}
 	
 	;Write new file
 	RIni_Write("iniSave", ThisFlowFolder "\" ThisFlowFilename ".ini")
@@ -135,6 +154,9 @@ SaveFlow(FlowID)
 	logger("a1","Flow " FlowName " was successfully saved.")
 	;~ ToolTip(lang("saved"))
 	;~ ui_EnableMainGUI()
+	
+	_flows[FlowID].savedState:=_flows[FlowID].currentState
+	
 	saved=yes
 	busy:=false
 	
@@ -167,6 +189,20 @@ i_SaveParametersOfElement(saveElement,saveElementIniID,Savelocation="")
 			RIni_AppendValue("iniSave", saveElementIniID, "par_" oneParID, saveElement.pars[oneParID])
 		}
 		
+		
+	}
+	
+}
+
+i_SaveUnsavedFlows()
+{
+	global _flows
+	for tempID, tempflow in _flows
+	{
+		if (tempflow.currentState != tempflow.savedState)
+		{
+			SaveFlow(tempID)
+		}
 		
 	}
 	
