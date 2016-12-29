@@ -39,19 +39,20 @@ newInstance(p_Environment)
 	newInstance.FlowID := p_Environment.FlowID
 	newInstance.state := "init"
 	newInstance.InstanceVars := CriticalObject()
+	newInstance.InstanceVarsHidden := CriticalObject()
 	newThread := newThread(newInstance)
 	_execution.Instances[newInstance.id]:=newInstance
 	newThread.ElementID := oneElementID
 	newThread.EnvironmentType := "thread"
 	finishExecutionOfElement(newThread, "Normal")
-	ThreadVariable_Set(newThread,"A_TriggerTime",a_now,"Date")
+	ThreadVariable_Set(newThread,"A_TriggerTime",a_now)
 	
 	if (p_Environment.params.varstoPass)
 	{
 		;~ d(p_Environment.params.varstoPass, "ioöhöio")
-		for onevarID, oneVar in p_Environment.params.varstoPass
+		for onevarName, oneVar in p_Environment.params.varstoPass
 		{
-			InstanceVariable_Set(newThread, oneVar.name, oneVar.value, oneVar.type)
+			InstanceVariable_Set(newThread, onevarName, oneVar)
 		}
 	}
 	
@@ -201,8 +202,11 @@ newThread(p_Instance, p_ToCloneFromThread ="")
 		newThread.ElementPars := CriticalObject()
 		newThread.Result := "Normal"
 		newThread.threadVars := CriticalObject()
+		newThread.threadVarsHidden := CriticalObject()
 		newThread.loopVars := CriticalObject()
+		newThread.loopVarsHidden := CriticalObject()
 		newThread.loopVarsStack := CriticalObject()
+		newThread.loopVarsStackHidden := CriticalObject()
 		
 		;~ newThread.ElementID ; Will not be set in this function
 	}

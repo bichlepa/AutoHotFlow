@@ -166,7 +166,7 @@ Element_trigger_Trigger_Hotkey(Environment, ElementParameters="")
 
 Element_postTrigger_Trigger_Hotkey(Environment, ElementParameters="")
 {
-	x_SetVariable(Environment, "A_Hotkey", ElementParameters.hotkey,,"thread")
+	x_SetVariable(Environment, "A_Hotkey", ElementParameters.hotkey,"thread")
 }
 
 

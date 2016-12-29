@@ -50,7 +50,10 @@ Element_run_Action_Tooltip(Environment, ElementParameters)
 	global runActionTooltip_Text=
 	global runActionTooltip_Oldx=
 	global runActionTooltip_Oldy=
-	runActionTooltip_Text:=x_replaceVariables(Environment,ElementParameters.text,"normal")
+	runActionTooltip_Text:=x_replaceVariables(Environment,ElementParameters.text)
+	if isobject(runActionTooltip_Text)
+		runActionTooltip_Text := x_ConvertObjToString(runActionTooltip_Text)
+	
 	ToolTip,%runActionTooltip_Text%,,,13
 	if (ElementParameters.follow_mouse =1)
 		SetTimer,runActionTooltip_follow_mouse,10,,,13

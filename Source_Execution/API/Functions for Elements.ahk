@@ -3,10 +3,10 @@
 
 
 
-x_replaceVariables(Environment, String, Type = "normal")
+x_replaceVariables(Environment, String)
 {
 	global
-	return Var_replaceVariables(Environment, String, Type)
+	return Var_replaceVariables(Environment, String)
 }
 x_EvaluateExpression(Environment, String)
 {
@@ -17,32 +17,46 @@ x_CheckVariableName(VarName)
 {
 	return Var_CheckName(VarName)
 }
-x_GetVariable(Environment, Varname, Type = "normal")
+x_GetVariable(Environment, Varname, p_hidden = False)
 {
-	return Var_Get(Environment, Varname, Type)
+	return Var_Get(Environment, Varname, p_hidden )
 }
-x_getVariableType(Environment, Varname)
+x_getVariableType(Environment, Varname, p_hidden = False)
 {
-	return Var_GetType(Environment, Varname)
+	return Var_GetType(Environment, Varname, p_hidden )
 }
-x_SetVariable(Environment, p_Varname, p_Value, p_Type = "normal", p_destination="")
+x_SetVariable(Environment, p_Varname, p_Value, p_destination="", p_hidden = False)
 {
 	global
-	return Var_Set(Environment, p_Varname, p_Value, p_Type, p_destination)
+	return Var_Set(Environment, p_Varname, p_Value,  p_destination, p_hidden)
 }
-x_DeleteVariable(Environment, Varname)
+x_DeleteVariable(Environment, Varname, p_hidden = False)
 {
 	global
-	return Var_Delete(Environment, Varname)
+	return Var_Delete(Environment, Varname, p_hidden)
 }
 
 
-x_GetVariableLocation(Environment, Varname)
+x_GetVariableLocation(Environment, Varname, p_hidden = False)
 {
 	global
-	return Var_GetLocation(Environment, Varname)
+	return Var_GetLocation(Environment, Varname, p_hidden)
 }
 
+x_ConvertObjToString(p_Value)
+{
+	if IsObject(p_Value)
+		return strobj(p_Value)
+}
+x_ConvertStringToObj(p_Value)
+{
+	if not IsObject(p_Value)
+		return strobj(p_Value)
+}
+x_ConvertStringToObjOrObjToString(p_Value)
+{
+	return strobj(p_Value)
+}
 
 x_NewUniqueExecutionID(Environment)
 {
@@ -174,7 +188,7 @@ x_ImportInstanceVars(Environment, p_VarsToImport)
 {
 	for onevarName, oneVar in p_VarsToImport
 	{
-		InstanceVariable_Set(Environment,oneVar.name,oneVar.value,oneVar.type)
+		InstanceVariable_Set(Environment,onevarName,oneVar)
 	}
 	return Var_GetListOfInstanceVars(Environment)
 }
@@ -226,43 +240,6 @@ x_FlowExecuteByName(Environment, p_FlowName, p_Variables ="", p_CallBackFunction
 	;Fill variables which will be passed
 			;~ _share.temp[randomnumber].varstoPass:=p_Variables
 	varsToPass:=p_Variables
-	;~ if(p_Variables)
-	;~ {
-		;~ if isobject(p_Variables)
-		;~ {
-			;~ for forvarkey, forvarcontent in p_Variables
-			;~ {
-				;~ if isobject(forvarcontent)
-				;~ {
-					;~ tempname:=forvarcontent.name
-					;~ tempvalue:=forvarcontent.value
-					;~ temptype:=forvarcontent.type
-					;~ if not (temptype)
-						;~ temptype= normal
-					;~ varsToPass[tempname]:={name: tempname, value: tempvalue, type: temptype}
-				;~ }
-				;~ else
-				;~ {
-					;~ tempname:=forvarcontent
-					;~ tempObj:= InstanceVariable_GetWhole(Environment,tempname)
-					;~ tempvalue:=tempObj.value
-					;~ temptype:=tempObj.type
-					;~ varsToPass[tempname]:={name: tempname, value: tempvalue, type: temptype}
-				;~ }
-			;~ }
-		;~ }
-		;~ else
-		;~ {
-			;~ loop, parse, p_Variables, % ","
-			;~ {
-				;~ tempname:=A_LoopField
-				;~ tempObj:= InstanceVariable_GetWhole(Environment,tempname)
-				;~ tempvalue:=tempObj.value
-				;~ temptype:=tempObj.type
-				;~ varsToPass[tempname]:={name: tempname, value: tempvalue, type: temptype}
-			;~ }
-		;~ }
-	;~ }
 	_share.temp[randomnumber].varsToPass:=varsToPass
 	
 	for forFlowID, forFlow in _Flows

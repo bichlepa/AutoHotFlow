@@ -3,7 +3,7 @@
 
 
 
-x_replaceVariables(Environment, String, Type = "normal")
+x_replaceVariables(Environment, String)
 {
 }
 x_EvaluateExpression(Environment, String)
@@ -12,23 +12,40 @@ x_EvaluateExpression(Environment, String)
 x_CheckVariableName(VarName)
 {
 }
-x_GetVariable(Environment, Varname, Type = "normal")
+x_GetVariable(Environment, Varname, p_hidden = False)
 {
 }
-x_getVariableType(Environment, Varname)
+x_getVariableType(Environment, Varname, p_hidden = False)
 {
 }
-x_SetVariable(Environment, Varname, Value, Type = "normal", destination="")
+x_SetVariable(Environment, Varname, Value, destination="", p_hidden = False)
 {
 }
-x_DeleteVariable(Environment, Varname)
+x_DeleteVariable(Environment, Varname, p_hidden = False)
 {
 }
 
 
-x_GetVariableLocation(Environment, Varname)
+x_GetVariableLocation(Environment, Varname, p_hidden = False)
 {
 }
+
+x_ConvertObjToString(p_Value)
+{
+	if IsObject(p_Value)
+		return strobj(p_Value)
+}
+x_ConvertStringToObj(p_Value)
+{
+	if not IsObject(p_Value)
+		return strobj(p_Value)
+}
+x_ConvertStringToObjOrObjToString(p_Value)
+{
+	return strobj(p_Value)
+}
+
+
 x_finish(Environment, Result, Message = "")
 {
 }

@@ -145,24 +145,18 @@ Element_run_Condition_Debug_Dialog(Environment, ElementParameters)
 	environment:=x_GetMyEnvironmentFromExecutionID(a_gui)
 	
 	
-	tempVarContent:=x_GetVariable(environment,tempvarname,"asIs")
+	tempVarContent:=x_GetVariable(environment,tempvarname)
 	tempVarType:=x_getVariableType(environment,tempvarname)
-	if tempVarType=list
+	if tempVarType=object
 	{
 		tempVarContent:=strobj(tempVarContent)
 		guicontrol,%a_gui%:,Condition_Debug_DialogEditField%a_gui%,%tempVarContent%
-		x_SetExecutionValue(a_gui, "SelectedVarType", "list")
+		x_SetExecutionValue(a_gui, "SelectedVarType","object")
 	}
 	else if tempVarType=normal
 	{
-		
 		guicontrol,%a_gui%:,Condition_Debug_DialogEditField%a_gui%,%tempVarContent%
-		x_SetExecutionValue(a_gui, "SelectedVarType", "normal")
-	}
-	else if tempVarType=date
-	{
-		guicontrol,%a_gui%:,Condition_Debug_DialogEditField%a_gui%,%tempVarContent%
-		x_SetExecutionValue(a_gui, "SelectedVarType", "date")
+		x_SetExecutionValue(a_gui, "SelectedVarType","normal")
 	}
 	;~ guicontrol,%a_gui%:,Condition_Debug_DialogEditField%a_gui%,%tempVarContent%
 	return
@@ -183,19 +177,15 @@ Element_run_Condition_Debug_Dialog(Environment, ElementParameters)
 	tempVarContent:=x_GetVariable(Environment, tempvarname)
 	tempNewVarContent:=Condition_Debug_DialogEditField%a_gui%
 	;~ MsgBox %tempVarType%
-	if tempVarType=list
+	if tempVarType=object
 	{
 		tempNewVarContent:=strobj(tempNewVarContent)
-		x_SetVariable(Environment, tempvarname, tempNewVarContent, tempVarType, tempLocation)
+		x_SetVariable(Environment, tempvarname, tempNewVarContent, tempLocation)
 	}
 	else if tempVarType=normal
 	{
-		x_SetVariable(Environment, tempvarname, tempNewVarContent, tempVarType, tempLocation)
+		x_SetVariable(Environment, tempvarname, tempNewVarContent, tempLocation)
 		
-	}
-	else if tempVarType=date
-	{
-		x_SetVariable(Environment, tempvarname, tempNewVarContent, tempVarType, tempLocation)
 	}
 	;~ ToolTip(lang("Variable is set"),1000)
 	;~ MsgBox % tempVarContent

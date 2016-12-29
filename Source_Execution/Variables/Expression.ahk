@@ -97,7 +97,7 @@ var_EvaluateExpressionRecurse(environment,ExpressionString)
 	if ExpressionString is number
 		return ExpressionString
 	
-	return Var_Get(environment,ExpressionString,"asIs")
+	return Var_Get(environment,ExpressionString)
 	
 	
 }

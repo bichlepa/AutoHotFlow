@@ -126,10 +126,7 @@ Action_Select_file_FinishExecution(Environment, values, ElementParameters)
 	if (values.result="normal")
 	{
 		varname := x_GetExecutionValue(uniqueID, "Varname")
-		if (ElementParameters.MultiSelect)
-			x_SetVariable(Environment, Varname, values.selectedFile, "list")
-		else
-			x_SetVariable(Environment, Varname, values.selectedFile)
+		x_SetVariable(Environment, Varname, values.selectedFile)
 		x_finish(Environment,values.result, values.message)
 	}
 	else

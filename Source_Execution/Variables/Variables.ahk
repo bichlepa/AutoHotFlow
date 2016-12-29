@@ -1,27 +1,39 @@
-﻿AllBuiltInVars:="-A_Space-A_Tab-A_YYYY-A_Year-A_MM-A_Mon-A_DD-A_MDay-A_MMMM-A_MMM-A_DDDD-A_DDD-A_WDay-A_YDay-A_Hour-A_Min-A_Sec-A_MSec-A_TickCount-A_TimeIdle-A_TimeIdlePhysical-A_Temp-A_OSVersion-A_Is64bitOS-A_PtrSize-A_Language-A_ComputerName-A_UserName-A_ScriptDir-A_WinDir-A_ProgramFiles-A_AppData-A_AppDataCommon-A_Desktop-A_DesktopCommon-A_StartMenu-A_StartMenuCommon-A_Programs-A_ProgramsCommon-A_Startup-A_StartupCommon-A_MyDocuments-A_IsAdmin-A_ScreenWidth-A_ScreenHeight-A_ScreenDPI-A_IPAddress1-A_IPAddress2-A_IPAddress3-A_IPAddress4-A_Cursor-A_CaretX-A_CaretY-----" ;a_now and a_nowutc not included, they will be treated specially
+﻿AllBuiltInVars:="A_Space A_Tab A_YYYY A_Year A_MM A_Mon A_DD A_MDay A_MMMM A_MMM A_DDDD A_DDD A_WDay A_YDay A_Hour A_Min A_Sec A_MSec A_TickCount A_TimeIdle A_TimeIdlePhysical A_Temp A_OSVersion A_Is64bitOS A_PtrSize A_Language A_ComputerName A_UserName A_ScriptDir A_WinDir A_ProgramFiles A_AppData A_AppDataCommon A_Desktop A_DesktopCommon A_StartMenu A_StartMenuCommon A_Programs A_ProgramsCommon A_Startup A_StartupCommon A_MyDocuments A_IsAdmin A_ScreenWidth A_ScreenHeight A_ScreenDPI A_IPAddress1 A_IPAddress2 A_IPAddress3 A_IPAddress4 A_Cursor A_CaretX A_CaretY a_now A_NowUTC a_linefeed"
+AllCustomBuiltInVars:="a_lf a_workingdir A_LanguageName"
 
 if not fileexist(my_workingdir "\Variables")
 	FileCreateDir, % my_workingdir "\Variables"
 
-LoopVariable_Set(Environment,p_Name,p_Value,p_ContentType="Normal")
+LoopVariable_Set(Environment,p_Name,p_Value, p_hidden=False)
 {
-	Environment.loopvars[p_Name]:={name:p_Name,value:p_Value,type:p_ContentType}
+	if (p_hidden)
+		Environment.loopvarsHidden[p_Name]:=p_Value
+	else
+		Environment.loopvars[p_Name]:=p_Value
 }
-ThreadVariable_Set(Environment,p_Name,p_Value,p_ContentType="Normal")
+ThreadVariable_Set(Environment,p_Name,p_Value,p_hidden=False)
 {
-	Environment.threadvars[p_Name]:={name:p_Name,value:p_Value,type:p_ContentType}
-	
+	if (p_hidden)
+		Environment.threadvarsHidden[p_Name]:=p_Value
+	else
+		Environment.threadvars[p_Name]:=p_Value
 }
-InstanceVariable_Set(Environment,p_Name,p_Value,p_ContentType="Normal")
+InstanceVariable_Set(Environment,p_Name,p_Value,p_hidden=False)
 {
 	global _execution
-	_execution.instances[Environment.InstanceID].InstanceVars[p_Name]:={name:p_Name,value:p_Value,type:p_ContentType}
+	if (p_hidden)
+		_execution.instances[Environment.InstanceID].InstanceVarsHidden[p_Name]:=p_Value
+	else
+		_execution.instances[Environment.InstanceID].InstanceVars[p_Name]:=p_Value
 	
 }
 
-StaticVariable_Set(Environment,p_Name,p_Value,p_ContentType="Normal")
+StaticVariable_Set(Environment,p_Name,p_Value, p_hidden=False)
 {
 	global my_workingdir
+	
+	if (p_hidden)
+		MsgBox unexpected error! It is not possible to set a hidden static variable!
 	
 	path:=my_workingdir "\Variables\" Environment.flowID
 	FileCreateDir,%path%
@@ -30,10 +42,13 @@ StaticVariable_Set(Environment,p_Name,p_Value,p_ContentType="Normal")
 	content:=""
 	content.="[variable]`n"
 	content.="name=" p_Name "`n"
-	content.="type=" p_ContentType "`n"
+	if isobject(p_value)
+		content.="type=object`n"
+	else
+		content.="type=normal`n"
 	FileAppend,%content%,% path "\" p_Name ".ahfvd", utf-16
 	
-	if (p_ContentType = "list")
+	if isobject(p_value)
 	{
 		FileAppend,% strobj(p_Value),% path "\" p_Name ".ahfvar"
 	}
@@ -43,19 +58,26 @@ StaticVariable_Set(Environment,p_Name,p_Value,p_ContentType="Normal")
 	}
 	
 }
-GlobalVariable_Set(Environment,p_Name,p_Value,p_ContentType="Normal")
+
+GlobalVariable_Set(Environment,p_Name,p_Value, p_hidden=False)
 {
 	global my_workingdir
+	if (p_hidden)
+		MsgBox unexpected error! It is not possible to set a hidden global variable!
+	
 	path:=my_workingdir "\Variables"
 	FileDelete,% path "\" p_Name ".ahfvd"
 	FileDelete,% path "\" p_Name ".ahfvar"
 	content:=""
 	content.="[variable]`n"
 	content.="name=" p_Name "`n"
-	content.="type=" p_ContentType "`n"
+	if isobject(p_value)
+		content.="type=object`n"
+	else
+		content.="type=normal`n"
 	FileAppend,%content%,% path "\" p_Name ".ahfvd", utf-16
 	
-	if (p_ContentType = "list")
+	if isobject(p_value)
 	{
 		FileAppend,% strobj(p_Value),% path "\" p_Name ".ahfvar"
 	}
@@ -67,25 +89,38 @@ GlobalVariable_Set(Environment,p_Name,p_Value,p_ContentType="Normal")
 }
 
 
-LoopVariable_GetWhole(Environment,p_Name)
+LoopVariable_Get(Environment,p_Name, p_hidden=False)
 {
-	return Environment.loopvars[p_Name]
+	if (p_hidden)
+		return Environment.loopvarsHidden[p_Name]
+	else
+		return Environment.loopvars[p_Name]
 }
-ThreadVariable_GetWhole(Environment,p_Name)
+ThreadVariable_Get(Environment,p_Name, p_hidden=False)
 {
-	return Environment.threadvars[p_Name]
+	if (p_hidden)
+		return Environment.threadvarsHidden[p_Name]
+	else
+		return Environment.threadvars[p_Name]
 	
 }
-InstanceVariable_GetWhole(Environment,p_Name)
+InstanceVariable_Get(Environment,p_Name, p_hidden=False)
 {
 	global _execution
-	return _execution.instances[Environment.InstanceID].InstanceVars[p_Name]
+	if (p_hidden)
+		return _execution.instances[Environment.InstanceID].InstanceVarsHidden[p_Name]
+	else
+		return _execution.instances[Environment.InstanceID].InstanceVars[p_Name]
 	
 }
 
-StaticVariable_GetWhole(Environment,p_Name)
+StaticVariable_Get(Environment,p_Name, p_hidden=False)
 {
 	global my_workingdir
+	
+	if (p_hidden)
+		MsgBox unexpected error! There are no hidden static variables!
+	
 	path:=my_workingdir "\Variables\" Environment.flowID
 	IniRead,vartype, % path "\" p_Name ".ahfvd", variable, type,%A_Space%
 	if (vartype = "")
@@ -95,20 +130,24 @@ StaticVariable_GetWhole(Environment,p_Name)
 	else 
 	{
 		FileRead,varcontent, % path "\" p_Name ".ahfvar"
-		if (vartype = "list")
+		if (vartype = "object")
 		{
-			return {name:p_Name,value:strobj(varcontent),type:vartype}
+			return strobj(varcontent)
 		}
 		else
 		{
-			return {name:p_Name,value:varcontent,type:vartype}
+			return varcontent
 		}
 	}
 }
 
-GlobalVariable_GetWhole(Environment,p_Name)
+GlobalVariable_Get(Environment,p_Name, p_hidden=False)
 {
 	global my_workingdir
+	
+	if (p_hidden)
+		MsgBox unexpected error! There are no hidden global variables!
+	
 	path:=my_workingdir "\Variables"
 	IniRead,vartype, % path "\" p_Name ".ahfvd", variable, type,%A_Space%
 	if (vartype = "")
@@ -118,30 +157,27 @@ GlobalVariable_GetWhole(Environment,p_Name)
 	else 
 	{
 		FileRead,varcontent, % path "\" p_Name ".ahfvar"
-		if (vartype = "list")
+		if (vartype = "object")
 		{
-			return {name:p_Name,value:strobj(varcontent),type:vartype}
+			return strobj(varcontent)
 		}
 		else
 		{
-			return {name:p_Name,value:varcontent,type:vartype}
+			return varcontent
 		}
 	}
 }
 
-BuiltInVariable_GetWhole(Environment,p_Name)
+BuiltInVariable_Get(Environment,p_Name, p_hidden=False)
 {
-	;If no thread and loop variable found, try to find a built in variable
-	if (p_Name="a_now" || p_Name="A_NowUTC")
-	{
-		tempvar:={name: p_Name, value: %p_Name%, type: "Date"}
-		return tempvar
-	}
-	else if (p_Name="A_YWeek") ;Separate the week.
+	if (p_hidden)
+		MsgBox unexpected error! There are no hidden built-in variables!
+	
+	;If no thread and loop variable found, try to find a built in variable if (p_Name="A_YWeek") ;Separate the week.
+	if (p_Name="A_YWeek") 
 	{
 		StringRight,tempvalue,A_YWeek,2
-		tempvar:={name: p_Name, value: tempvalue, type: "Normal"}
-		return tempvar
+		return tempvalue
 	}
 	else if (p_Name="A_LanguageName") 
 	{
@@ -164,10 +200,9 @@ BuiltInVariable_GetWhole(Environment,p_Name)
 			;~ return tempvalue
 		;~ }
 	;~ }
-	else if (p_Name="a_linefeed" or p_Name="a_lf")
+	else if (p_Name="a_lf")
 	{
-		tempvar:={name: p_Name, value: "`n", type: "Normal"}
-		return tempvar
+		return  "`n"
 	}
 	;~ else if (p_Name="a_CPULoad")
 	;~ {
@@ -188,25 +223,35 @@ BuiltInVariable_GetWhole(Environment,p_Name)
 	;~ }
 	else If InStr(this.AllBuiltInVars,"-" p_Name "-")
 	{
-		tempvar:={name: p_Name, value: %p_Name%, type: "Normal"}
+		tempvar:=%p_Name%
 		return tempvar
 	}
 	;todo
 }
 
-LoopVariable_Delete(Environment,p_Name)
+LoopVariable_Delete(Environment,p_Name, p_hidden=False)
 {
-	Environment.loopvars.delete(p_Name)
+	if (p_hidden)
+		Environment.loopvarsHidden.delete(p_Name)
+	else
+		Environment.loopvars.delete(p_Name)
 }
-ThreadVariable_Delete(Environment,p_Name)
+ThreadVariable_Delete(Environment,p_Name, p_hidden=False)
 {
-	Environment.threadvars.delete(p_Name)
+	if (p_hidden)
+		Environment.threadvarsHidden.delete(p_Name)
+	else
+		Environment.threadvars.delete(p_Name)
 	
 }
-InstanceVariable_Delete(Environment,p_Name)
+InstanceVariable_Delete(Environment,p_Name, p_hidden=False)
 {
 	global _execution
-	_execution.instances[Environment.InstanceID].InstanceVars.delete(p_Name)
+	
+	if (p_hidden)
+		_execution.instances[Environment.InstanceID].InstanceVarsHidden.delete(p_Name)
+	else
+		_execution.instances[Environment.InstanceID].InstanceVars.delete(p_Name)
 	
 }
 
@@ -231,6 +276,7 @@ LoopVariable_AddToStack(Environment)
 	;~ d({loopvars:Environment.loopvars, loopvarsstack:Environment.loopvarsStack},"preadd")
 	;Write current loopvars to stack
 	Environment.loopvarsStack.push(objFullyClone(Environment.loopvars))
+	Environment.loopvarsStackHidden.push(objFullyClone(Environment.loopvarsHidden))
 	
 	;~ d({loopvars:Environment.loopvars, loopvarsstack:Environment.loopvarsStack},"add")
 }
@@ -238,7 +284,8 @@ LoopVariable_RestoreFromStack(Environment)
 {
 	;~ d({loopvars:Environment.loopvars, loopvarsstack:Environment.loopvarsStack},"prerestore")
 	;Restore loopvars from stack
-	Environment.loopvars:=Environment.loopvarsStack.pop(objFullyClone(Environment.loopvarsStack))
+	Environment.loopvars:=objFullyClone(Environment.loopvarsStack.pop())
+	Environment.loopvarsHidden:=objFullyClone(Environment.loopvarsStackHidden.pop())
 	
 	;~ d({loopvars:Environment.loopvars, loopvarsstack:Environment.loopvarsStack},"restore")
 }
@@ -280,26 +327,64 @@ Var_RetrieveDestination(p_Name,p_Location,p_log=true)
 	
 }
 
-Var_GetLocation(Environment, p_Name)
+Var_GetLocation(Environment, p_Name, p_hidden=False)
 {
-	global _execution
-	if (Environment.loopvars.haskey(p_Name))
+	global _execution, my_workingdir
+	if (p_hidden = false)
 	{
-		return "Loop"
+		if (Environment.loopvars.haskey(p_Name))
+		{
+			return "Loop"
+		}
+		else if (Environment.threadvars.haskey(p_Name))
+		{
+			return "Thread"
+		}
+		else if (_execution.instances[Environment.InstanceID].InstanceVars.haskey(p_Name))
+		{
+			return "instance"
+		}
+		else ifinstring,AllBuiltInVars, %p_Name%
+		{
+			return "BuiltIn"
+		}
+		else ifinstring,AllCustomBuiltInVars, %p_Name%
+		{
+			return "BuiltIn"
+		}
+		else if fileexist(my_workingdir "\Variables\" p_Name ".ahfvd")
+		{		
+			return "global"
+		}
+		else if fileexist(my_workingdir "\Variables\"  Environment.flowID "\" p_Name ".ahfvd")
+		{		
+			return "static"
+		}
 	}
-	else if (Environment.threadvars.haskey(p_Name))
+	else
 	{
-		return "Thread"
-	}
-	else if (_execution.instances[Environment.InstanceID].InstanceVars.haskey(p_Name))
-	{
-		return "instance"
+		if (p_hidden != true and p_hidden != "hidden")
+		{
+			MsgBox unexpected error while retrieving variable location of %p_Name%: The parameter p_hidden has unsupported value: %p_hiden%
+		}
+		if (Environment.loopvarsHidden.haskey(p_Name))
+		{
+			return "Loop"
+		}
+		else if (Environment.threadvarsHidden.haskey(p_Name))
+		{
+			return "Thread"
+		}
+		else if (_execution.instances[Environment.InstanceID].InstanceVarsHidden.haskey(p_Name))
+		{
+			return "instance"
+		}
 	}
 	;~ d(Environment, "error-  " p_name)
 	;Todo: static and global variables
 }
 
-Var_Set(Environment, p_Name, p_Value, p_Type, p_Destination="")
+Var_Set(Environment, p_Name, p_Value, p_Destination="", p_hidden=False)
 {
 	global _execution
 	res:=Var_CheckName(p_Name,true)
@@ -322,7 +407,7 @@ Var_Set(Environment, p_Name, p_Value, p_Type, p_Destination="")
 		destination:=p_Destination
 	if (destination!="")
 	{
-		%destination%Variable_Set(environment,p_Name,p_Value,p_Type)
+		%destination%Variable_Set(environment,p_Name,p_Value,p_hidden)
 	}
 	else
 	{
@@ -331,7 +416,7 @@ Var_Set(Environment, p_Name, p_Value, p_Type, p_Destination="")
 	;~ d(_execution.instances[Environment.InstanceID].InstanceVars,"instance vars set " p_Name)
 }
 
-Var_Get(environment, p_Name, p_Type)
+Var_Get(environment, p_Name, p_hidden = False)
 {
 	global _execution
 	tempvalue=
@@ -339,142 +424,45 @@ Var_Get(environment, p_Name, p_Type)
 	{
 		logger("f0","Retrieving variable failed. The name is empty")
 	}
-	else if (substr(p_Name,1,2)="A_") ; if variable is a built in variable or a thread variable
+	
+	tempLocation := Var_GetLocation(Environment, p_Name, p_hidden)
+	
+	if (tempLocation)
 	{
-		;Try to find a loop variable
-		tempVar:=LoopVariable_GetWhole(environment, p_Name)
-		if IsObject(tempVar)
-		{
-			logger("f3","Retrieving loop variable '" p_Name "'")
-			tempvalue:=tempVar.value
-			if (p_Type!=tempVar.type and p_Type!="asis")
-			{
-				tempvalue:= Var_ConvertType(tempvalue,"date",p_Type)
-			}
-			;~ MsgBox ag e %tempvalue%
-			return tempvalue
-		}
-		;Try to find a thread variable
-		tempVar:=ThreadVariable_GetWhole(environment, p_Name)
-		if IsObject(tempVar)
-		{
-			logger("f3","Retrieving thread variable '" p_Name "'")
-			tempvalue:=tempVar.value
-			if (p_Type!=tempVar.type and p_Type!="asis")
-			{
-				tempvalue:= Var_ConvertType(tempvalue,"date",p_Type)
-			}
-			return tempvalue
-		}
-		;Try to find a built in variable
-		tempVar:=BuiltInVariable_GetWhole(environment, p_Name)
-		if IsObject(tempVar)
-		{
-			logger("f3","Retrieving built in variable '" p_Name "'")
-			tempvalue:=tempVar.value
-			if (p_Type!=tempVar.type and p_Type!="asis")
-			{
-				tempvalue:= Var_ConvertType(tempvalue,"date",p_Type)
-			}
-			return tempvalue
-		}
-		else
-		{
-			logger("f0","Retrieving variable '" p_Name "' failed. It does not exist")
-		}
-			
-			
+		logger("f3","Retrieving " tempLocation " variable '" p_Name "'")
+		tempVar := %tempLocation%Variable_Get(environment, p_Name, p_hidden)
+		return tempVar
 	}
-	else if (substr(p_Name,1,7)="global_") ; if variable is a global variable
+	else
 	{
-		tempVar:=GlobalVariable_GetWhole(environment, p_Name)
-		if IsObject(tempVar)
-		{
-			logger("f3","Retrieving global variable '" p_Name "'")
-			tempvalue:=tempVar.value
-			if (p_Type!=tempVar.type and p_Type!="asis")
-			{
-				tempvalue:= Var_ConvertType(tempvalue,"date",p_Type)
-			}
-			return tempvalue
-		}
-		else
-		{
-			logger("f0","Retrieving global variable '" p_Name "' failed. It does not exist")
-		}
-	}
-	else if (substr(p_Name,1,7)="static_") ; if variable is a static variable
-	{
-		tempVar:=staticVariable_GetWhole(environment, p_Name)
-		if IsObject(tempVar)
-		{
-			logger("f3","Retrieving static variable '" p_Name "'")
-			tempvalue:=tempVar.value
-			if (p_Type!=tempVar.type and p_Type!="asis")
-			{
-				tempvalue:= Var_ConvertType(tempvalue,"date",p_Type)
-			}
-			return tempvalue
-		}
-		else
-		{
-			logger("f0","Retrieving static variable '" p_Name "' failed. It does not exist")
-		}
-	}
-	else ;If this is a instance variable
-	{
-		tempVar:=InstanceVariable_GetWhole(environment, p_Name)
-		if IsObject(tempVar)
-		{
-			logger("f3","Retrieving instance variable '" p_Name "'")
-			tempvalue:=tempVar.value
-			return tempvalue
-		}
-		else
-		{
-			logger("f0","Retrieving instance variable '" p_Name "' failed. It does not exist")
-		}
+		logger("f0","Retrieving variable '" p_Name "' failed. It does not exist")
 	}
 }
 
-Var_GetType(Environment, p_Name)
+Var_GetType(Environment, p_Name, p_hidden = False)
 {
-	tempLocation := Var_GetLocation(Environment, p_Name)
+	tempLocation := Var_GetLocation(Environment, p_Name, p_hidden)
 	;~ d(tempLocation)
 	if (tempLocation)
 	{
-		variable:=%tempLocation%Variable_GetWhole(Environment, p_Name)
+		variable:=%tempLocation%Variable_Get(Environment, p_Name, p_hidden)
 		;~ d(variable)
-		return variable.type
+		if IsObject(variable)
+		{
+			return "object"
+		}
+		else
+		{
+			return "normal"
+		}
 	}
 	
 }
-Var_Delete(Environment, p_Name)
+Var_Delete(Environment, p_Name, p_hidden=False)
 {
-	tempLocation := Var_GetLocation(Environment, p_Name)
+	tempLocation := Var_GetLocation(Environment, p_Name, p_hidden)
 	if (tempLocation)
-		%tempLocation%Variable_Delete(Environment, p_Name)
-}
-
-Var_ConvertType(p_Value,p_Contenttype,p_TargetType)
-{
-	if (p_TargetType="normal")
-	{
-		if (p_Contenttype="date")
-		{
-			FormatTime,result,% p_Value
-		}
-		else if (p_Contenttype="list")
-		{
-			if IsObject(p_Value)
-				result:=strobj(p_Value)
-			else
-				result:= p_Value
-			
-		}
-	}
-	
-	return result
+		%tempLocation%Variable_Delete(Environment, p_Name, p_hidden)
 }
 
 Var_CheckName(p_Name, tellWhy=false) ;Return 1 if valid. 0 if not
@@ -507,7 +495,7 @@ Var_CheckName(p_Name, tellWhy=false) ;Return 1 if valid. 0 if not
 
 
 
-Var_replaceVariables(environment, p_String, p_ContentType = "AsIs")
+Var_replaceVariables(environment, p_String)
 {
 	tempstring:=p_String
 	;~ d(environment, "replace variables: " p_String )
@@ -516,7 +504,7 @@ Var_replaceVariables(environment, p_String, p_ContentType = "AsIs")
 		tempFoundPos:=RegExMatch(tempstring, "SU).*%(.+)%.*", tempFoundVarName)
 		if tempFoundPos=0
 			break
-		StringReplace,tempstring,tempstring,`%%tempFoundVarName1%`%,% Var_Get(environment,tempFoundVarName1,p_ContentType)
+		StringReplace,tempstring,tempstring,`%%tempFoundVarName1%`%,% Var_Get(environment,tempFoundVarName1)
 		;~ MsgBox % "reerhes#-" tempstring "-#-" tempFoundVarName1 "-#-" Variable_Get(p_thread,tempFoundVarName1,p_ContentType)
 		;~ MsgBox %tempVariablesToReplace1%
 	}

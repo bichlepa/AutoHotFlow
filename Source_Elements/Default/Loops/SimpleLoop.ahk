@@ -47,7 +47,7 @@ Element_run_Loop_SimpleLoop(Environment, ElementParameters)
 	{
 		if (ElementParameters.Infinite or repeatCount >= 1)
 		{
-			x_SetVariable(Environment, "A_Index", 1,, "loop")
+			x_SetVariable(Environment, "A_Index", 1, "loop")
 			x_finish(Environment, "head")
 		}
 		else
@@ -61,7 +61,7 @@ Element_run_Loop_SimpleLoop(Environment, ElementParameters)
 		index++
 		if (ElementParameters.Infinite or repeatCount >= index)
 		{
-			x_SetVariable(Environment, "A_Index", index,, "loop")
+			x_SetVariable(Environment, "A_Index", index, "loop")
 			x_finish(Environment, "head")
 		}
 		else
