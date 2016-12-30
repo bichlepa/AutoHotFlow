@@ -365,6 +365,13 @@ LoadFlowParametersOfElement(FlowID,parList,parElementID,parlocation, parSection)
 			tempContent:=parameterDefault
 		}
 		StringReplace, tempContent, tempContent, |¶,`n, All
+		if (substr(tempContent,1,3) = "ῸВĴ")
+		{
+			StringReplace, tempContent, tempContent, ῸВĴ
+			StringReplace, tempContent, tempContent, linēfḙ℮d, `n
+			StringReplace, tempContent, tempContent, ₸ÅḆ, % a_tab
+			tempContent:=strobj(tempContent)
+		}
 		parList[parElementID].pars[oneParameterID]:=tempContent
 	
 	}

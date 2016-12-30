@@ -173,6 +173,7 @@ i_SaveParametersOfElement(saveElement,saveElementIniID,Savelocation="")
 	local parameterDefault
 	local SaveContent
 	local OneID
+	local objectstring
 	local elementClass:=saveElement.class
 	
 	parametersToSave:=Element_getParameters_%elementClass%()
@@ -186,7 +187,19 @@ i_SaveParametersOfElement(saveElement,saveElementIniID,Savelocation="")
 		}
 		else 
 		{
-			RIni_AppendValue("iniSave", saveElementIniID, "par_" oneParID, saveElement.pars[oneParID])
+			if isobject(saveElement.pars[oneParID])
+			{
+				objectstring := "ῸВĴ" strobj(saveElement.pars[oneParID])
+				StringReplace, objectstring, objectstring, `n, linēfḙ℮d
+				StringReplace, objectstring, objectstring, `r
+				StringReplace, objectstring, objectstring, % a_tab, ₸ÅḆ
+				RIni_AppendValue("iniSave", saveElementIniID, "par_" oneParID, objectstring)
+				
+			}
+			else
+			{
+				RIni_AppendValue("iniSave", saveElementIniID, "par_" oneParID, saveElement.pars[oneParID])
+			}
 		}
 		
 		
