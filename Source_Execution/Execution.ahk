@@ -28,6 +28,7 @@ lang_Init(my_ScriptDir "\language", my_WorkingDir)
 #include source_Common\Debug\Logger.ahk
 #include Source_Common\Defaults\Default values.ahk
 #include source_Common\Multithreading\API Caller Main.ahk
+#include lib\Random Word List\Random Word List.ahk
 
 #include Source_Execution\execution task\execution task.ahk
 #include Source_Execution\API\functions for elements.ahk

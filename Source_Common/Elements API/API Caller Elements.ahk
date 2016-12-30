@@ -172,3 +172,9 @@ x_isFlowEnabledByName(Environment, p_FlowName)
 x_isFlowExecutingByName(Environment, p_FlowName)
 {
 }
+
+
+x_randomPhrase()
+{
+	return randomPhrase()
+}

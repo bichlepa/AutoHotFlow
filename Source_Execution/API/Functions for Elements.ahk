@@ -403,3 +403,8 @@ x_Par_GetValue(Environment,p_ParameterID)
 {
 	;~ return ElementSettings.field.getvalue(p_ParameterID)
 }
+
+x_randomPhrase()
+{
+	return randomPhrase()
+}

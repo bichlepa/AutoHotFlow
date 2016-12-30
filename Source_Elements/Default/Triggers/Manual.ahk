@@ -30,8 +30,7 @@ Element_getParametrizationDetails_Trigger_Manual()
 {
 	parametersToEdit:=Object()
 	parametersToEdit.push({type: "Label", label: lang("ID")})
-	random,randomNumber,0,100
-	parametersToEdit.push({type: "Edit", id: "ID", content: "String",  default: "Trigger" randomNumber})
+	parametersToEdit.push({type: "Edit", id: "ID", content: "String",  default: "Trigger " x_randomPhrase()})
 	return parametersToEdit
 }
 

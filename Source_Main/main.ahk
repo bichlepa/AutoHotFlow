@@ -33,6 +33,7 @@ lang_Init(my_ScriptDir "\language", my_WorkingDir)
 #include lib\Robert - Ini library\Robert - Ini library.ahk
 #include lib\ObjHasValue\ObjHasValue.ahk
 #include lib\ObjFullyClone\ObjFullyClone.ahk
+#include lib\Random Word List\Random Word List.ahk
 
 #include Source_Main\Tray\Tray.ahk
 #include Source_Main\Globals\Global Variables.ahk
