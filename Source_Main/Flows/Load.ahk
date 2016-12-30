@@ -193,7 +193,7 @@ LoadFlow(FlowID, filepath="", params="")
 			if (_flows[FlowID].allElements[loadElementID].StandardName)
 			{
 				if (IsFunc("Element_GenerateName_" loadElementClass))
-					_flows[FlowID].allElements[loadElementID].Name:=Element_GenerateName_%loadElementClass%(_flows[FlowID].allElements[loadElementID].pars)
+					_flows[FlowID].allElements[loadElementID].Name:=Element_GenerateName_%loadElementClass%(_flows[FlowID].allElements[loadElementID],_flows[FlowID].allElements[loadElementID].pars)
 			}
 		}
 		

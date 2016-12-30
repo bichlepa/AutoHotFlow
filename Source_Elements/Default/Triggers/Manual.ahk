@@ -54,11 +54,10 @@ Element_trigger_Trigger_Manual(Environment, ElementParameters)
 }
 
 
-Element_GenerateName_Trigger_Manual(ElementParameters)
+Element_GenerateName_Trigger_Manual(Environment, ElementParameters)
 {
 	global
-	
-	return % lang("Manual") "`n" ElementParameters.ID 
+	return % lang("Manual") "`n" ElementParameters.id 
 }
 
 Element_CheckSettings_Trigger_Manual(Environment, ElementParameters)

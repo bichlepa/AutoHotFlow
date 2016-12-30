@@ -95,7 +95,7 @@ Element_SetClass(p_FlowID, p_elementID, p_elementClass)
 	Element_setParameterDefaults(p_FlowID, p_elementID)
 	
 	
-	allElements[p_elementID].name:=Element_GenerateName_%p_elementClass%(allElements[p_elementID].pars)
+	allElements[p_elementID].name:=Element_GenerateName_%p_elementClass%(allElements[p_elementID], allElements[p_elementID].pars)
 	
 
 }
