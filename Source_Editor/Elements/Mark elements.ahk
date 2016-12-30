@@ -7,7 +7,6 @@ MarkOne(p_ID,additional:=false)
 	markedElements:=_flows[FlowID].markedElements
 	allConnections:=_flows[FlowID].allConnections
 	allElements:=_flows[FlowID].allElements
-	markedElements:=_flows[FlowID].markedElements
 	
 	
 	;~ ToolTip,% p_id " - " additional
@@ -35,11 +34,11 @@ MarkOne(p_ID,additional:=false)
 	{
 		if p_ID contains connection
 		{
-			_flows[FlowID].allConnections[p_ID].marked:=true
+			_flows[FlowID].allConnections[p_ID].marked:=!(_flows[FlowID].allConnections[p_ID].marked)
 		}
 		else
 		{
-			_flows[FlowID].allElements[p_ID].marked:=true
+			_flows[FlowID].allElements[p_ID].marked:=!(_flows[FlowID].allElements[p_ID].marked)
 		}
 		
 		
