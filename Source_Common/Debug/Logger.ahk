@@ -9,9 +9,9 @@
 ; 2: more logs
 ; 3: all logs
 
-DebugLogLevelApp:=3
-DebugLogLevelFlow:=3
-DebugLogLevelThread:=3
+DebugLogLevelApp:=2
+DebugLogLevelFlow:=2
+DebugLogLevelThread:=1
 SettingFlowLogToFile:=true
 
 if not fileexist(my_workingdir "\Log")
@@ -97,7 +97,7 @@ logger(LogLevel,LoggingText)
 	{
 		;~ MsgBox % _share.log
 		templog:=_share.log
-		stringgetpos,templogpos,templog,`n
+		stringgetpos,templogpos,templog,`n,l50
 		_share.log:=substr(templog,templogpos+2)
 		;~ MsgBox % templogpos "`n" _share.log
 		

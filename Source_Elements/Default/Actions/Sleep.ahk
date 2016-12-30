@@ -52,7 +52,7 @@ Element_run_Action_Sleep(Environment, ElementParameters)
 		tempDuration:=ElementParameters.duration * 60000
 	
 	uniqueID:=x_NewUniqueExecutionID(Environment)
-	functionObject:= x_NewExecutionFunctionObject(environment, uniqueID, "Element_run_Action_Sleep_EndSleep", ElementParameters)
+	functionObject:= x_NewExecutionFunctionObject(environment, uniqueID, "Action_Sleep_EndSleep", ElementParameters)
 	x_SetExecutionValue(uniqueID, "functionObject", functionObject)
 	
 	SetTimer,% functionObject,-%tempDuration%
@@ -69,7 +69,7 @@ Element_stop_Action_Sleep(Environment, ElementParameters)
 	SetTimer, % functionObject, off
 }
 
-Element_run_Action_Sleep_EndSleep(Environment, ElementParameters="")
+Action_Sleep_EndSleep(Environment, ElementParameters="")
 {
 	;~ d(ElementParameters)
 	x_GetMyUniqueExecutionID(Environment)

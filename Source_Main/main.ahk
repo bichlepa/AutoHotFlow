@@ -69,6 +69,8 @@ AllTriggerClasses:=Object()
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\Sleep.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\Stop_Flow.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\Tooltip.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\Trace_Point.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\Trace_Point_Check.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Conditions\Debug_dialog.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Conditions\Expression.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Conditions\Flow_Enabled.ahk

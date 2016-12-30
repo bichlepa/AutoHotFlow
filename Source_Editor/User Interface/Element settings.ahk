@@ -117,6 +117,10 @@ class ElementSettings
 			{
 				ElementSettingsFields.push(new this.DateAndTime(parameter))
 			}
+			else if (parameter.type="listbox")
+			{
+				ElementSettingsFields.push(new this.listbox(parameter))
+			}
 			
 		}
 		
@@ -1547,7 +1551,143 @@ class ElementSettings
 			this.udpatename()
 		}
 		
+	}
+	
+	class listbox extends ElementSettings.field
+	{
+		__new(parameter)
+		{
+			global
+			base.__new(parameter)
+			local tempHWND, tempSort, tempMulti, tempChoices, tempChosen, tempChosenNumbers, tempAltSubmit, tempChoicesString
+			local tempParameterID:=parameter.id
+			
+			gui,font,s8 cDefault wnorm
+			tempChosen:=setElement.pars[tempParameterID] 
+			tempChoices:=parameter.choices
+			this.choices:=tempChoices
+			tempChoicesString:=""
+			for tempindex, tempLabel in this.choices
+			{
+				if (tempChoicesString = "")
+					tempChoicesString:=tempLabel
+				else
+					tempChoicesString.= "|" tempLabel
+			}
+			
+			if (parameter.multi )
+				tempMulti:="multi"
+			else
+				tempMulti:=""
+			if (parameter.Sort )
+				tempSort:="Sort"
+			else
+				tempSort:=""
+			if (parameter.result = "string")
+			{
+				this.par_result:="string"
+				this.choices:=tempChoices
+				tempAltSubmit:=""
+			}
+			else
+			{
+				tempAltSubmit:="altSubmit"
+				this.par_result:="number"
+			}
+			
+			gui,add,listbox,w400 x10 %tempMulti% %tempSort% %tempAltSubmit% hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID%,%tempChoicesString%
+			
+			this.components.push("GUISettingsOfElement" tempParameterID)
+			ElementSettingsFieldHWNDs[tempHWND]:=this
+			
+			varsToDelete.push("GUISettingsOfElement" tempParameterID)
+			
+			this.setvalue(tempChosen)
+		}
 		
+		getvalue(parameterID="")
+		{
+			global
+			local tempChosen, tempChosenObj, tempChosenStrings, tempParameterID, tempChoices
+			if parameterID=
+			{
+				tempParameterID:=this.parameter.id
+				if isobject(tempParameterID)
+					tempParameterID:=tempParameterID[1]
+			}
+			else
+				tempParameterID:=parameterID
+			
+			GUIControlGet,tempChosen,SettingsOfElement:,GUISettingsOfElement%tempParameterID%
+			
+			tempChosenObj:=Object()
+			loop,parse,tempChosen,|
+			{
+				tempChosenObj.push(A_LoopField)
+			}
+			;~ if (this.par_result="string")
+			;~ {
+				;~ tempChoices:=this.choices
+				;~ tempChosenNumbers:="|" tempChosen "|" 
+				
+				;~ tempChosenStrings:=""
+				;~ loop,parse,tempChoices,|
+				;~ {
+					;~ MsgBox %tempChosenNumbers% - %a_index%
+					;~ IfInString, tempChosenNumbers, "|" a_index "|"
+					;~ {
+						;~ if (tempChosenStrings!="")
+							;~ tempChosenStrings .= "|" A_LoopField
+						;~ else
+							;~ tempChosenStrings:=A_LoopField
+					;~ }
+				;~ }
+				;~ d(tempChosenStrings, tempChosen)
+				;~ return tempChosenStrings
+			;~ }
+			;~ else
+			;~ {
+				return tempChosenObj
+			;~ }
+			
+		}
+		
+		setvalue(value, parameterID="")
+		{
+			global
+			local tempChosenNumbers, tempChoices, tempChosenStrings, tempChosen
+			local tempParameterID:=this.parameter.id
+			if parameterID=
+			{
+				tempParameterID:=this.parameter.id
+				if isobject(tempParameterID)
+					tempParameterID:=tempParameterID[1]
+			}
+			else
+				tempParameterID:=parameterID
+			
+			if (this.par_result="string")
+			{
+				for tempindexChosen, tempLabelChosen in value
+				{
+					for tempindexChoice, tempLabelChoice in this.choices
+					{
+						if (tempLabelChoice = tempLabelChosen)
+						{
+							GUIControl,SettingsOfElement:Choose,GUISettingsOfElement%tempParameterID%,% tempindexChoice
+						}
+					}
+				}
+			}
+			else
+			{
+				for tempindexChosen, tempNumberChosen in value
+				{
+					GUIControl,SettingsOfElement:Choose,GUISettingsOfElement%tempParameterID%,% tempNumberChosen
+				}
+			}
+			return
+		}
 		
 	}
 	

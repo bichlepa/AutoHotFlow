@@ -121,45 +121,51 @@ stopFlow(p_Flow)
 	{
 		if (OneInstance.FlowID == p_Flow.id)
 		{
-			instancesToDelete.push(OneInstanceID)
-			for OneThreadID, OneThread in OneInstance.threads
-			{
-				OneThread.oldstate := OneThread.state
-				OneThread.state := "stopping"
-			}
+			stopInstance(OneInstance)
 		}
 	}
-	for OneInstanceIndex, OneInstanceID in instancesToDelete
+}
+
+stopInstance(p_instance)
+{
+	global _execution, _flows
+	
+	for OneThreadID, OneThread in p_instance.threads
 	{
-		for OneThreadID, OneThread in _execution.Instances[OneInstanceID].threads
-		{
-			if (OneThread.oldstate = "running" )
-			{
-				oneElement:=_flows[OneThread.flowID].allElements[OneThread.elementID]
-				oneElementClass:=oneElement.class
-				oneElement.countRuns--
-				if (oneElement.countRuns = 0)
-				oneElement.state:="finished"
-				oneElement.lastrun:=a_tickcount
-					
-				if Isfunc("Element_stop_" oneElementClass )
-						Element_stop_%oneElementClass%(OneThread, OneThread.elementpars)
-				
-				_flows[OneThread.flowID].draw.mustDraw:=true
-			}
-		}
-		
-		
-		if (_execution.Instances[OneInstanceID].callback)
-		{
-			tempCallBackfunc:=_execution.Instances[OneInstanceID].callback
-			%tempCallBackfunc%("stopped", _execution.Instances[OneInstanceID].InstanceVars)
-		}
-		
-		_execution.Instances.delete(OneInstanceID)
+		OneThread.oldstate := OneThread.state
+		OneThread.state := "stopping"
 	}
+	
+	for OneThreadID, OneThread in p_instance.threads
+	{
+		if (OneThread.oldstate = "running" )
+		{
+			oneElement:=_flows[OneThread.flowID].allElements[OneThread.elementID]
+			oneElementClass:=oneElement.class
+			oneElement.countRuns--
+			if (oneElement.countRuns = 0)
+				oneElement.state:="finished"
+			oneElement.lastrun:=a_tickcount
+			
+			if Isfunc("Element_stop_" oneElementClass )
+				Element_stop_%oneElementClass%(OneThread, OneThread.elementpars)
+			
+			_flows[OneThread.flowID].draw.mustDraw:=true
+		}
+	}
+	
+	
+	if (p_instance.callback)
+	{
+		tempCallBackfunc:=p_instance.callback
+		%tempCallBackfunc%("stopped", p_instance.InstanceVars)
+	}
+	
+	_execution.Instances.delete(p_instance.id)
+	
 	updateFlowExcutingStates()
 }
+
 
 executeToggleFlow(p_Flow)
 {

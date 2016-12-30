@@ -43,20 +43,12 @@ x_GetVariableLocation(Environment, Varname, p_hidden = False)
 	return Var_GetLocation(Environment, Varname, p_hidden)
 }
 
-x_ConvertObjToString(p_Value)
+x_GetMyElementID(Environment)
 {
-	if IsObject(p_Value)
-		return strobj(p_Value)
+	return Environment.elementID
 }
-x_ConvertStringToObj(p_Value)
-{
-	if not IsObject(p_Value)
-		return strobj(p_Value)
-}
-x_ConvertStringToObjOrObjToString(p_Value)
-{
-	return strobj(p_Value)
-}
+
+
 
 x_NewUniqueExecutionID(Environment)
 {
@@ -193,6 +185,20 @@ x_ImportInstanceVars(Environment, p_VarsToImport)
 	return Var_GetListOfInstanceVars(Environment)
 }
 
+x_getAllElementsOfClass(Environment, p_Class)
+{
+	global _flows
+	elements:=Object()
+	for oneID, oneElement in _flows[Environment.FlowID].allElements
+	{
+		if (oneElement.class = p_Class)
+			elements.push(objFullyClone(oneElement))
+	}
+	return elements
+}
+
+
+
 x_GetListOfFlowNames()
 {
 	global _flows
@@ -302,6 +308,30 @@ x_FlowExistsByName(Environment, p_FlowName)
 	Return False
 }
 
+
+x_InstanceStop(Environment)
+{
+	global _execution
+	
+	stopInstance(_execution.Instances[Environment.instanceID])
+	
+
+}
+
+x_GetThreadCountInCurrentInstance(Environment)
+{
+	global _execution
+	count:=0
+	for oneinstanceID, oneInstance in _execution.Instances
+	{
+		if (oneInstance.ID = Environment.InstanceID)
+		{
+			count++
+		}
+	}
+	return count
+}
+
 x_GetFullPath(Environment, p_Path)
 {
 	global _Flows
@@ -352,6 +382,14 @@ x_ExecuteInNewThread_finishedExecution(p_uniqueID)
 	functionObject:=global_AllExecutionIDs[p_uniqueID].ExeInNewThread.functionObject
 	%functionObject%(_share.temp[p_uniqueID].sharedObject.varsExported)
 }
+
+
+x_log(Environment, LoggingText, loglevel = 2)
+{
+	global _flows
+	logger("f" loglevel, "Flow: " _flows[Environment.FlowID].name " (" Environment.FlowID ") - Element " _flows[Environment.FlowID].allElements[Environment.elementID].name " (" Environment.elementID "): " LoggingText)
+}
+
 
 ;For elements
 x_finish(Environment, Result, Message = "")
@@ -404,7 +442,24 @@ x_Par_GetValue(Environment,p_ParameterID)
 	;~ return ElementSettings.field.getvalue(p_ParameterID)
 }
 
+;everywhere
 x_randomPhrase()
 {
 	return randomPhrase()
+}
+
+
+x_ConvertObjToString(p_Value)
+{
+	if IsObject(p_Value)
+		return strobj(p_Value)
+}
+x_ConvertStringToObj(p_Value)
+{
+	if not IsObject(p_Value)
+		return strobj(p_Value)
+}
+x_ConvertStringToObjOrObjToString(p_Value)
+{
+	return strobj(p_Value)
 }

@@ -30,23 +30,18 @@ x_GetVariableLocation(Environment, Varname, p_hidden = False)
 {
 }
 
-x_ConvertObjToString(p_Value)
+x_GetMyElementID(Environment)
 {
-	if IsObject(p_Value)
-		return strobj(p_Value)
+	
 }
-x_ConvertStringToObj(p_Value)
-{
-	if not IsObject(p_Value)
-		return strobj(p_Value)
-}
-x_ConvertStringToObjOrObjToString(p_Value)
-{
-	return strobj(p_Value)
-}
+
 
 
 x_finish(Environment, Result, Message = "")
+{
+}
+
+x_log(Environment, LoggingText, Loglevel = 2)
 {
 }
 
@@ -97,6 +92,21 @@ x_ExportAllInstanceVars(Environment)
 x_ImportInstanceVars(Environment, p_VarsToImport)
 {
 }
+
+
+x_getAllElementsOfClass(Environment, p_Class)
+{
+	global flowObj
+	elements:=Object()
+	for oneID, oneElement in flowObj.allElements
+	{
+		if (oneElement.class = p_Class)
+			elements.push(objFullyClone(oneElement))
+	}
+	return elements
+}
+
+
 
 x_ExecuteInNewThread(Environment, p_uniqueID, p_functionObject, p_Code, p_VarsToImport, p_VarsToExport)
 {
@@ -172,9 +182,29 @@ x_isFlowEnabledByName(Environment, p_FlowName)
 x_isFlowExecutingByName(Environment, p_FlowName)
 {
 }
+x_InstanceStop(Environment)
+{
+}
 
+x_GetThreadCountInCurrentInstance(Environment)
+{
+}
 
 x_randomPhrase()
 {
 	return randomPhrase()
+}
+x_ConvertObjToString(p_Value)
+{
+	if IsObject(p_Value)
+		return strobj(p_Value)
+}
+x_ConvertStringToObj(p_Value)
+{
+	if not IsObject(p_Value)
+		return strobj(p_Value)
+}
+x_ConvertStringToObjOrObjToString(p_Value)
+{
+	return strobj(p_Value)
 }
