@@ -49,6 +49,87 @@ x_GetMyElementID(Environment)
 }
 
 
+x_GetMyFlowID(Environment)
+{
+	return Environment.FlowID
+}
+x_GetMyFlowName(Environment)
+{
+	global _flows
+	return _flows[Environment.FlowID].name
+}
+
+x_GetAllMyFlowTriggerNames(Environment)
+{
+	global _flows
+	elements:=Object()
+	for oneID, oneElement in _flows[Environment.FlowID].allElements
+	{
+		if (oneElement.type = "trigger")
+			elements.push(oneElement.name)
+	}
+	return elements
+}
+x_GetAllMyFlowManualTriggers(Environment)
+{
+	global _flows
+	elements:=Object()
+	for oneID, oneElement in _flows[Environment.FlowID].allElements
+	{
+		if (oneElement.class = "trigger_manual")
+			elements.push(objfullyclone(oneElement))
+	}
+	return elements
+}
+
+x_GetAllManualTriggersOfFlowByName(p_FlowName)
+{
+	global _Flows
+	elements:=Object()
+	
+	for forFlowID, forFlow in _Flows
+	{
+		if (forFlow.name = p_FlowName)
+		{
+			for oneID, oneElement in forFlow.allElements
+			{
+				if (oneElement.class = "trigger_manual")
+					elements.push(objfullyclone(oneElement))
+			}
+		}
+	}
+	
+	return elements
+}
+
+
+
+x_getAllElementsOfClass(Environment, p_Class)
+{
+	global _flows
+	
+	elements:=Object()
+	for oneID, oneElement in _flows[Environment.FlowID].allElements
+	{
+		if (oneElement.class = p_Class)
+			elements.push(objFullyClone(oneElement))
+	}
+	return elements
+}
+
+
+x_GetListOfFlowNames()
+{
+	global _flows
+	;Search for all flowNames
+	choices:=object()
+	for oneFlowID, oneFlow in _flows
+	{
+		choices.push(oneFlow.name)
+	}
+	return choices
+}
+
 
 x_NewUniqueExecutionID(Environment)
 {
@@ -185,32 +266,6 @@ x_ImportInstanceVars(Environment, p_VarsToImport)
 	return Var_GetListOfInstanceVars(Environment)
 }
 
-x_getAllElementsOfClass(Environment, p_Class)
-{
-	global _flows
-	elements:=Object()
-	for oneID, oneElement in _flows[Environment.FlowID].allElements
-	{
-		if (oneElement.class = p_Class)
-			elements.push(objFullyClone(oneElement))
-	}
-	return elements
-}
-
-
-
-x_GetListOfFlowNames()
-{
-	global _flows
-	;Search for all flowNames
-	choices:=object()
-	for oneFlowID, oneFlow in _flows
-	{
-		choices.push(oneFlow.name)
-	}
-	return choices
-}
-
 x_FlowEnableByName(Environment, p_FlowName)
 {
 	global _Flows
@@ -235,7 +290,7 @@ x_FlowDisableByName(Environment, p_FlowName)
 	}
 
 }
-x_FlowExecuteByName(Environment, p_FlowName, p_Variables ="", p_CallBackFunction ="")
+x_FlowExecuteByName(Environment, p_FlowName, p_TriggerName = "", p_Variables ="", p_CallBackFunction ="")
 {
 	global _Flows
 	global _share
@@ -253,7 +308,29 @@ x_FlowExecuteByName(Environment, p_FlowName, p_Variables ="", p_CallBackFunction
 		if (forFlow.name = p_FlowName)
 		{
 			;~ d(_share.temp)
-			API_Main_executeFlow(forFlow.id, randomnumber)
+			if (p_TriggerName = "")
+			{
+				;~ d(p_FlowName)
+				API_Main_executeFlow(forFlow.id, "", randomnumber)
+				return
+			}
+			else
+			{
+				;~ d(p_FlowName " - " p_TriggerName)
+				for forelementID, forelement in forFlow.allElements
+				{
+					;~ d(forelement, p_TriggerName)
+					if forelement.class = "trigger_Manual"
+					{
+						if (forelement.pars.id = p_TriggerName)
+						{
+							;~ d(forFlow.id,forelementID)
+							API_Main_executeFlow(forFlow.id, forelementID, randomnumber)
+							return
+						}
+					}
+				}
+			}
 		}
 	}
 
@@ -278,6 +355,38 @@ x_isFlowEnabledByName(Environment, p_FlowName)
 		if (forFlow.name = p_FlowName)
 		{
 			return forFlow.enabled
+		}
+	}
+	return False
+}
+x_isTriggerEnabledByName(Environment, p_FlowName, p_TriggerName="")
+{
+	global _Flows
+	for forFlowID, forFlow in _Flows
+	{
+		if (forFlow.name = p_FlowName)
+		{
+			for forelementID, forelement in forFlow.allElements
+			{
+				;~ d(forelement, p_TriggerName)
+				if (p_TriggerName = "")
+				{
+					if (forElement.class = "trigger_manual" and forElement.default = True)
+					{
+						;~ d(forElement)
+						return forElement.enabled 
+					}
+				}
+				else
+				{
+					if (forElement.type = "trigger" and forElement.pars.id = p_TriggerName)
+					{
+						;~ d(forElement)
+						return forElement.enabled 
+					}
+				}
+				
+			}
 		}
 	}
 	return False
@@ -440,6 +549,10 @@ x_Par_SetValue(Environment,p_ParameterID, p_Value)
 x_Par_GetValue(Environment,p_ParameterID)
 {
 	;~ return ElementSettings.field.getvalue(p_ParameterID)
+}
+x_Par_SetChoices(Environment,p_ParameterID, p_Choices)
+{
+	
 }
 
 ;everywhere

@@ -39,7 +39,7 @@ return
 
 ui_Menu_MenuStart:
 
-API_Main_TriggerFlow(FlowID, "User")
+API_Main_executeFlow(FlowID)
 
 return
 

@@ -4,7 +4,7 @@ global_CategoryIDCounter = 1
 ;Find flows in folder "saved Flows" und show them in the tv.
 ;Additionally read the state of flow and activate it if it should be active
 ;This function must be called once
-FindFlows() ;API
+FindFlows()
 {
 	global
 	local FileFullPath
@@ -36,7 +36,7 @@ FindFlows() ;API
 		
 		;read flow information
 		iniread, tempcategoryname, %FileFullPath%, general, category, %a_space% 
-		iniread, tempflowenabled, %FileFullPath%, general, enabled, false
+		iniread, tempflowenabled, %FileFullPath%, general, enabled, 0
 		
 		;MsgBox %FileFullPath% - %tempflowcategory%
 		
@@ -62,36 +62,20 @@ FindFlows() ;API
 		_flows[newFlowid].category := tempCategoryID
 		UpdateFlowCategoryName(newFlowid)
 		
-		if (tempflowenabled = "true")
-			_flows[newFlowid].enabled := true
-		else
-			_flows[newFlowid].enabled := false
 		;~ d(_flows[newFlowid])
 		_flows[newFlowID].tv := API_manager_TreeView_AddEntry("Flow", newFlowid)
 		
 		_flows[newFlowID].draw := []
 		
 		
-		;~ if (tempflowenabled = "true") ;Enable flow
-		;~ {
-			;~ ;TODO
-			;~ ;Decide whether AutoHotFlow has been started after a reboot. This would start the trigger "Startup".
-			;~ LastStartupTime := a_now
-			;~ Envadd, LastStartupTime, % -(A_TickCount/1000), Seconds
-			;~ ;FormatTime,LastStartupTime2,% LastStartupTime
-			;~ ;FormatTime,LastExecutionTime2,% LastExecutionTime
-			
-			;~ EnvSub, LastStartupTime, % LastExecutionTime, Seconds
-			;~ ;FormatTime,LastStartupTime3,LastStartupTime
-			;~ ;MsgBox % LastStartupTime2 "`n" LastExecutionTime2 "`n" LastStartupTime3 "`n" LastStartupTime
-			;~ if (LastStartupTime > 0)
-				;~ enableFlow(tempflowid, "Startup")
-			;~ else
-			;~ {
-				;~ enableFlow(tempflowid)
-			;~ }
-			
-		;~ }
+		if (tempflowenabled != 0) ;Enable flow
+		{
+			loop, parse,tempflowenabled,|
+			{
+				;~ d(newFlowid, A_loopfield)
+				enableOneTrigger(newFlowID, A_LoopField, False)
+			}
+		}
 	}
 	;~ d(_flows)
 }

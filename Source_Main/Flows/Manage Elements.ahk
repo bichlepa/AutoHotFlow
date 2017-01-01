@@ -92,6 +92,13 @@ Element_SetClass(p_FlowID, p_elementID, p_elementClass)
 	allElements[p_elementID].class:=p_elementClass 
 	allElements[p_elementID].icon:=Element_getIconPath_%p_elementClass%()
 	
+	;If element is trigger_manual: Set the trigger as default if no other is already default
+	if (p_elementClass = "trigger_manual" and Element_findDefaultTrigger(p_FlowID)="")
+	{
+		Element_setDefaultTrigger(p_FlowID, p_elementID)
+	}
+	
+	
 	Element_setParameterDefaults(p_FlowID, p_elementID)
 	
 	
@@ -146,6 +153,40 @@ Element_setParameterDefaults(p_FlowID, p_elementID)
 	
 	
 }
+
+Element_findDefaultTrigger(p_FlowID)
+{
+	global _flows
+	for oneID, oneElement in _flows[p_FlowID].allElements
+	{
+		if (oneElement.class = "trigger_manual")
+		{
+			if (oneElement.defaultTrigger)
+				return oneID
+		}
+	}
+}
+
+Element_setDefaultTrigger(p_FlowID, p_elementID)
+{
+	global _flows
+	for oneID, oneElement in _flows[p_FlowID].allElements
+	{
+		if (oneElement.class = "trigger_manual")
+		{
+	;~ MsgBox %p_FlowID% %p_elementID%
+			if (oneID = p_elementID )
+			{
+				oneElement.defaultTrigger:=True
+			}
+			else
+			{
+				oneElement.defaultTrigger:=False
+			}
+		}
+	}
+}
+
 
 ;Removes the element. It will be deleted from list of all elements and all connections which start or ends there will be deleted, too
 Element_Remove(p_FlowID, p_elementID)

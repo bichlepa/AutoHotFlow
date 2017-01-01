@@ -53,9 +53,9 @@ class ElementSettings
 		catch
 			parametersToEdit:=Element_getParametrizationDetails_%setElementClass%() ;TODO: all elements should accept one parameter
 		
-		;All elements have the parameter "name" and "defaultname"
+		;All elements have the parameter "name" and "StandardName"
 		ElementSettingsFields.push(new this.label({label: lang("name (name)")}))
-		ElementSettingsFields.push(new this.name({id: ["name", "defaultname"]}))
+		ElementSettingsFields.push(new this.name({id: ["name", "StandardName"]}))
 		
 		;Loop through all parameters
 		for index, parameter in parametersToEdit
@@ -364,23 +364,127 @@ class ElementSettings
 				ElementSettingsFieldParIDs[parameter.id]:=this
 		}
 		
+		;Get value of a field. 
+		;If parameterID is empty, the first (or the only) parameter of the field will be retrieved
+		;If parameterID is set, this function will check whether the curernt object instance has the parameterID and then get it,
+		;otherwise it will find the object which contains the parameterID and call its getvalue() function.
 		getvalue(parameterID="")
 		{
 			global
-			local temp, tempParameterID
+			;~ d(this, "getvalue " parameterID)
+			local temp, tempParameterID, value, oneindex, oneid, oneField
+			if parameterID=
+			{
+				;Set value of first parameter it
+				tempParameterID:=this.parameter.id
+				if isobject(tempParameterID)
+					tempParameterID:=tempParameterID[1]
+				
+				;~ d(this, "getvalue 1 " tempParameterID)
+				GUIControlGet,temp,SettingsOfElement:,GUISettingsOfElement%tempParameterID%
+				return temp
+			}
+			else
+			{
+				;make list of all available parameter ID of this object
+				tempParameterID:=this.parameter.id
+				if ((not isobject(tempParameterID)) and tempParameterID != "")
+					tempParameterID:=[tempParameterID]
+				
+				;Check whether current object has the requested parameter ID
+				for oneindex, oneid in tempParameterID
+				{
+					if (parameterID = oneid)
+					{
+						;if so, get value
+						;~ d(this, "getvalue 2 " parameterID)
+						GUIControlGet,temp,SettingsOfElement:,GUISettingsOfElement%oneid%
+						return temp
+					}
+				}
+				;Find object which has the requested parameter ID and call it
+				for oneIndex, oneField in ElementSettingsFields
+				{
+					;make list of all available parameter ID of oneField object
+					tempParameterID:=oneField.parameter.id
+					if ((not isobject(tempParameterID)) and tempParameterID != "")
+					tempParameterID:=[tempParameterID]
+					
+					for oneindex, oneid in tempParameterID
+					{
+						if (oneid = parameterID)
+						{
+							;~ d(this, "getvalue call " parameterID)
+							value:=onefield.getvalue(parameterID)
+							return value
+						}
+					}
+					
+				}
+			}
+			return 
+		}
+		
+		setvalue(value, parameterID="")
+		{
+			global
+			;~ d(this, "setvalue " parameterID)
+			local tempParameterID:=this.parameter.id
 			if parameterID=
 			{
 				tempParameterID:=this.parameter.id
 				if isobject(tempParameterID)
 					tempParameterID:=tempParameterID[1]
+				
+				;~ d(this, "setvalue 1 " tempParameterID ": " value)
+				GUIControl,SettingsOfElement:,GUISettingsOfElement%tempParameterID%,% value
+				return
 			}
 			else
-				tempParameterID:=parameterID
-			GUIControlGet,temp,SettingsOfElement:,GUISettingsOfElement%tempParameterID%
-			return temp
+			{
+				;make list of all available parameter ID of this object
+				tempParameterID:=this.parameter.id
+				if ((not isobject(tempParameterID)) and tempParameterID != "")
+					tempParameterID:=[tempParameterID]
+				
+				;Check whether current object has the requested parameter ID
+				for oneindex, oneid in tempParameterID
+				{
+					if (parameterID = oneid)
+					{
+						;if so, set value
+						;~ d(this, "setvalue 2 " parameterID)
+						GUIControl,SettingsOfElement:,GUISettingsOfElement%oneid%,% value
+						return
+					}
+				}
+				;Find object which has the requested parameter ID and call it
+				for oneIndex, oneField in ElementSettingsFields
+				{
+					;make list of all available parameter ID of oneField object
+					tempParameterID:=oneField.parameter.id
+					if ((not isobject(tempParameterID)) and tempParameterID != "")
+					tempParameterID:=[tempParameterID]
+					
+					for oneindex, oneid in tempParameterID
+					{
+						if (oneid = parameterID)
+						{
+							;~ d(this, "setvalue call " parameterID)
+							value:=onefield.setvalue(value, parameterID)
+							return value
+						}
+					}
+					
+				}
+				
+			}
+			
+			return
 		}
 		
-		setvalue(value, parameterID="")
+		
+		setChoices(value, parameterID="")
 		{
 			global
 			local tempParameterID:=this.parameter.id
@@ -389,12 +493,36 @@ class ElementSettings
 				tempParameterID:=this.parameter.id
 				if isobject(tempParameterID)
 					tempParameterID:=tempParameterID[1]
+				
+				;~ MsgBox not implemented
+				;Not implemented here. must be implemented in the extended classes
 			}
 			else
-				tempParameterID:=parameterID
-			
-			GUIControl,SettingsOfElement:,GUISettingsOfElement%tempParameterID%,% value
-			return
+			{
+				tempParameterID:=this.parameter.id
+				if not isobject(tempParameterID)
+					tempParameterID:=[tempParameterID]
+				
+				;Find object which has the requested parameter ID and call it
+				for oneIndex, oneField in ElementSettingsFields
+				{
+					;make list of all available parameter ID of oneField object
+					tempParameterID:=oneField.parameter.id
+					if ((not isobject(tempParameterID)) and tempParameterID != "")
+						tempParameterID:=[tempParameterID]
+					
+					for oneindex, oneid in tempParameterID
+					{
+						if (oneid = parameterID)
+						{
+							;~ d(this, "setChoices call " parameterID)
+							onefield.setChoices(value, parameterID)
+							return value
+						}
+					}
+					
+				}
+			}
 		}
 		
 		setText(Text,index="")
@@ -407,24 +535,65 @@ class ElementSettings
 		enable(parameterID="",enOrDis=1)
 		{
 			global
-			;~ MsgBox % strobj(this.components)
-			;~ MsgBox % parameterID
+			
+			;~ d(this, "enable " parameterID)
+			;if parameterID is empty, disable all components
 			if parameterID=
 			{
+				;~ d(this, "enable 1 " parameterID)
+				;enable all components
 				for index, component in this.components
 				{
-					
 					guicontrol,SettingsOfElement:enable%enOrDis%,% component
 				}
 				this.enabled:=enOrDis
 			}
 			else
 			{
-				;~ MsgBox guicontrol,SettingsOfElement:enable%enOrDis%,GUISettingsOfElement%parameterID%
-				guicontrol,SettingsOfElement:enable%enOrDis%,GUISettingsOfElement%parameterID%
-				this.enabled:=-1 ;Means that it is not globally enabled or disabled
+				;make list of all available parameter ID of this object
+				tempParameterID:=this.parameter.id
+				if ((not isobject(tempParameterID)) and tempParameterID != "")
+					tempParameterID:=[tempParameterID]
+				
+				;Check whether current object has the requested parameter ID
+				for oneindex, oneid in tempParameterID
+				{
+					if (parameterID = oneid)
+					{
+						;if so, get value
+						;~ d(this, "enable 2 " parameterID)
+						;enable all components
+						for index, component in this.components
+						{
+							guicontrol,SettingsOfElement:enable%enOrDis%,% component
+						}
+						this.enabled:=enOrDis
+						return
+					}
+				}
+				;Find object which has the requested parameter ID and call it
+				for oneIndex, oneField in ElementSettingsFields
+				{
+					;make list of all available parameter ID of oneField object
+					tempParameterID:=oneField.parameter.id
+					if ((not isobject(tempParameterID)) and tempParameterID != "")
+						tempParameterID:=[tempParameterID]
+					
+					for oneindex, oneid in tempParameterID
+					{
+						if (oneid = parameterID)
+						{
+							;~ d(this, "enable call " parameterID)
+							value:=onefield.enable(parameterID, enOrDis)
+							return value
+						}
+					}
+					
+				}
+				
 			}
 			
+			;~ d(this, "enable end " parameterID)
 		}
 		disable(parameterID="")
 		{
@@ -438,7 +607,6 @@ class ElementSettings
 			ToolTip,% this.warningtext,,,11
 			settimer,GUISettingsOfElementRemoveInfoTooltip,-5000
 		}
-		
 		
 	}
 	
@@ -469,20 +637,19 @@ class ElementSettings
 			
 		}
 		
+		
 		updateName(p_CurrentPars)
 		{
 			global
 			local Newname
-			
 			if (openingElementSettingsWindow=true)
 				return
-			
 			if (this.getvalue("StandardName")=1)
 			{
 				this.disable("Name")
 				Newname:=Element_GenerateName_%setElementClass%(setElement, p_CurrentPars) 
 				StringReplace,Newname,Newname,`n,%a_space%-%a_space%,all
-				this.setvalue(Newname)
+				this.setvalue(Newname, "Name")
 			}
 			else
 				this.enable("Name")
@@ -1112,7 +1279,7 @@ class ElementSettings
 			tempAllChoices=
 			for tempIndex, TempOneChoice in tempChoises
 			{
-				if (parameter.result="name")
+				if (parameter.result="string")
 				{
 					if (TempOneChoice=temp)
 						temptoChoose:=A_Index
@@ -1121,23 +1288,24 @@ class ElementSettings
 				
 			}
 			StringTrimLeft,tempAllChoices,tempAllChoices,1
-			
+			this.par_result:=parameter.result
+			this.par_choices:=parameter.choices
 			
 			;Add picture, which will warn user if the entry is obviously invalid
-			gui,add,picture,x394 w16 h16 hwndtempHWND gGUISettingsOfElementClickOnWarningPic vGUISettingsOfElementWarningIconOf%tempOneParameterID%
-			this.components.push("GUISettingsOfElementWarningIconOf" tempOneParameterID)
+			gui,add,picture,x394 w16 h16 hwndtempHWND gGUISettingsOfElementClickOnWarningPic vGUISettingsOfElementWarningIconOf%tempParameterID%
+			this.components.push("GUISettingsOfElementWarningIconOf" tempParameterID)
 			ElementSettingsFieldHWNDs[tempHWND]:=this
 			this.warnIfEmpty:=parameter.WarnIfEmpty
 			
 			if (parameter.content="Expression")
 			{
 				;The info icon tells user which conent type it is
-				gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempOneParameterID%,%my_ScriptDir%\icons\expression.ico
-				this.components.push("GUISettingsOfElementInfoIconOf" tempOneParameterID)
+				gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempParameterID%,%my_ScriptDir%\icons\expression.ico
+				this.components.push("GUISettingsOfElementInfoIconOf" tempParameterID)
 				ElementSettingsFieldHWNDs[tempHWND]:=this
 				
 				gui,add,ComboBox, X+4 yp w360 hwndtempHWND %tempAltSumbit% choose%temptoChoose%  gGUISettingsOfElementCheckContent vGUISettingsOfElement%tempParameterID% ,% tempAllChoices
-				this.components.push("vGUISettingsOfElement" tempOneParameterID)
+				this.components.push("vGUISettingsOfElement" tempParameterID)
 				ElementSettingsFieldHWNDs[tempHWND]:=this
 				if parameter.useupdown
 				{
@@ -1145,50 +1313,50 @@ class ElementSettings
 						gui,add,updown,% "range" parameter.range
 					else
 						gui,add,updown
-					guicontrol,SettingsOfElement:,GUISettingsOfElement%tempOneParameterID%,%temptext%
+					guicontrol,SettingsOfElement:,GUISettingsOfElement%tempParameterID%,%temptext%
 				}
 				this.ContentType:="Expression"
-				;~ GUISettingsOfElementContentType%tempOneParameterID%=Expression
+				;~ GUISettingsOfElementContentType%tempParameterID%=Expression
 			}
 			else if (parameter.content="String")
 			{
-				gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempOneParameterID%,%my_ScriptDir%\icons\string.ico
-				this.components.push("GUISettingsOfElementInfoIconOf" tempOneParameterID)
+				gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempParameterID%,%my_ScriptDir%\icons\string.ico
+				this.components.push("GUISettingsOfElementInfoIconOf" tempParameterID)
 				ElementSettingsFieldHWNDs[tempHWND]:=this
 				
 				gui,add,ComboBox, X+4 yp w360 hwndtempHWND %tempAltSumbit% choose%temptoChoose%  gGUISettingsOfElementCheckContent vGUISettingsOfElement%tempParameterID% ,% tempAllChoices
-				this.components.push("GUISettingsOfElement" tempOneParameterID)
+				this.components.push("GUISettingsOfElement" tempParameterID)
 				ElementSettingsFieldHWNDs[tempHWND]:=this
 				
 				this.ContentType:="String"
-				;~ GUISettingsOfElementContentType%tempOneParameterID%=String
+				;~ GUISettingsOfElementContentType%tempParameterID%=String
 			}
 			else if (parameter.content="VariableName")
 			{
-				gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempOneParameterID%,%my_ScriptDir%\icons\VariableName.ico
-				this.components.push("GUISettingsOfElementInfoIconOf" tempOneParameterID)
+				gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempParameterID%,%my_ScriptDir%\icons\VariableName.ico
+				this.components.push("GUISettingsOfElementInfoIconOf" tempParameterID)
 				ElementSettingsFieldHWNDs[tempHWND]:=this
 				
 				gui,add,ComboBox, X+4 yp w360 hwndtempHWND %tempAltSumbit% choose%temptoChoose%  gGUISettingsOfElementCheckContent vGUISettingsOfElement%tempParameterID% ,% tempAllChoices
-				this.components.push("GUISettingsOfElement" tempOneParameterID)
+				this.components.push("GUISettingsOfElement" tempParameterID)
 				ElementSettingsFieldHWNDs[tempHWND]:=this
 				
 				this.ContentType:="VariableName"
-				;~ GUISettingsOfElementContentType%tempOneParameterID%=VariableName
+				;~ GUISettingsOfElementContentType%tempParameterID%=VariableName
 			}
 			else if (parameter.content="StringOrExpression")
 			{
 				
 				
 				if (tempContentTypeNum=1) 
-					gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempOneParameterID%,%my_ScriptDir%\icons\string.ico
+					gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempParameterID%,%my_ScriptDir%\icons\string.ico
 				else ;If content is expression
-					gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempOneParameterID%,%my_ScriptDir%\icons\expression.ico
-				this.components.push("GUISettingsOfElementInfoIconOf" tempOneParameterID)
+					gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempParameterID%,%my_ScriptDir%\icons\expression.ico
+				this.components.push("GUISettingsOfElementInfoIconOf" tempParameterID)
 				ElementSettingsFieldHWNDs[tempHWND]:=this
 				
 				gui,add,ComboBox, X+4 yp w360 hwndtempHWND %tempAltSumbit% choose%temptoChoose%  gGUISettingsOfElementCheckContent vGUISettingsOfElement%tempParameterID% ,% tempAllChoices
-				this.components.push("GUISettingsOfElement" tempOneParameterID)
+				this.components.push("GUISettingsOfElement" tempParameterID)
 				ElementSettingsFieldHWNDs[tempHWND]:=this
 				
 				this.ContentType:="StringOrExpression"
@@ -1196,15 +1364,89 @@ class ElementSettings
 			else ;Text field without specified content type and without info icon
 			{
 				gui,add,ComboBox, x10 yp w380 hwndtempHWND %tempAltSumbit% choose%temptoChoose%  gGUISettingsOfElementCheckContent vGUISettingsOfElement%tempParameterID% ,% tempAllChoices
-				this.components.push("GUISettingsOfElement" tempOneParameterID)
+				this.components.push("GUISettingsOfElement" tempParameterID)
 				ElementSettingsFieldHWNDs[tempHWND]:=this
 			}
 			guicontrol,SettingsOfElement:text,GUISettingsOfElement%tempParameterID%,% temp
 			
 			this.checkContent()
 			
-			varsToDelete.push("GUISettingsOfElement" tempOneParameterID, "GUISettingsOfElementContentTypeRadio" tempOneParameterID, "GUISettingsOfElementInfoIconOf" tempOneParameterID, "GUISettingsOfElementWarningIconOf" tempOneParameterID)
+			varsToDelete.push("GUISettingsOfElement" tempParameterID, "GUISettingsOfElementContentTypeRadio" tempParameterID, "GUISettingsOfElementInfoIconOf" tempParameterID, "GUISettingsOfElementWarningIconOf" tempParameterID)
 			
+		}
+		
+		setvalue(value, parameterID="")
+		{
+			global
+			local tempLabelChoice, tempindexChoice
+			local tempParameterID:=this.parameter.id
+			if parameterID=
+			{
+				tempParameterID:=this.parameter.id
+				if isobject(tempParameterID)
+					tempParameterID:=tempParameterID[1]
+				
+				if (this.par_result="string")
+				{
+					for tempindexChoice, tempLabelChoice in this.par_choices
+					{
+						if (tempLabelChoice = value)
+						{
+							GUIControl,SettingsOfElement:Choose,GUISettingsOfElement%tempParameterID%,% tempindexChoice
+						}
+					}
+				}
+				else
+					GUIControl,SettingsOfElement:choose,GUISettingsOfElement%tempParameterID%,% value
+				
+				;Check content after setting
+				this.checkContent()
+			}
+			else
+			{
+				for oneIndex, oneField in ElementSettingsFields
+				{
+					if (oneField.parameter.id = parameterID)
+						onefield.setvalue(value)
+				}
+			}
+			
+			return
+		}
+		
+		setChoices(value, parameterID="")
+		{
+			global
+			local tempParameterID, 
+			local tempParameterID:=this.parameter.id
+			if parameterID=
+			{
+				tempParameterID:=this.parameter.id
+				if isobject(tempParameterID)
+					tempParameterID:=tempParameterID[1]
+			}
+			else
+				tempParameterID:=parameterID
+			
+			
+			tempAllChoices=|
+			for tempIndex, TempOneChoice in value
+			{
+				if (parameter.result="string")
+				{
+					if (TempOneChoice=temp)
+						temptoChoose:=A_Index
+				}
+				if (tempAllChoices="|")
+					tempAllChoices.=TempOneChoice
+				else
+					tempAllChoices.="|" TempOneChoice
+				
+			}
+			this.par_choices:=value
+			
+			GUIControl,SettingsOfElement:,GUISettingsOfElement%tempParameterID%,% tempAllChoices
+			return
 		}
 		
 		checkContent()
@@ -1450,25 +1692,25 @@ class ElementSettings
 			temp:=setElement.pars[tempParameterID] 
 			
 			gui,add,checkbox,w45 x10 hwndtempHWND gGUISettingsOfElementWeekdays vGUISettingsOfElement%tempParameterID%2,% lang("Mon (Short for Monday")
-			this.components.push("GUISettingsOfElement" tempOneParameterID "2")
+			this.components.push("GUISettingsOfElement" tempParameterID "2")
 			ElementSettingsFieldHWNDs[tempHWND]:=this
 			gui,add,checkbox,w45 X+10 hwndtempHWND gGUISettingsOfElementWeekdays vGUISettingsOfElement%tempParameterID%3,% lang("Tue (Short for Tuesday")
-			this.components.push("GUISettingsOfElement" tempOneParameterID "3")
+			this.components.push("GUISettingsOfElement" tempParameterID "3")
 			ElementSettingsFieldHWNDs[tempHWND]:=this
 			gui,add,checkbox,w45 X+10 hwndtempHWND gGUISettingsOfElementWeekdays vGUISettingsOfElement%tempParameterID%4,% lang("Wed (Short for Wednesday")
-			this.components.push("GUISettingsOfElement" tempOneParameterID "4")
+			this.components.push("GUISettingsOfElement" tempParameterID "4")
 			ElementSettingsFieldHWNDs[tempHWND]:=this
 			gui,add,checkbox,w45 X+10 hwndtempHWND gGUISettingsOfElementWeekdays vGUISettingsOfElement%tempParameterID%5,% lang("Thu (Short for Thursday")
-			this.components.push("GUISettingsOfElement" tempOneParameterID "5")
+			this.components.push("GUISettingsOfElement" tempParameterID "5")
 			ElementSettingsFieldHWNDs[tempHWND]:=this
 			gui,add,checkbox,w45 X+10 hwndtempHWND gGUISettingsOfElementWeekdays vGUISettingsOfElement%tempParameterID%6,% lang("Fri (Short for Friday")
-			this.components.push("GUISettingsOfElement" tempOneParameterID "6")
+			this.components.push("GUISettingsOfElement" tempParameterID "6")
 			ElementSettingsFieldHWNDs[tempHWND]:=this
 			gui,add,checkbox,w45 X+10 hwndtempHWND gGUISettingsOfElementWeekdays vGUISettingsOfElement%tempParameterID%7,% lang("Sat (Short for Saturday")
-			this.components.push("GUISettingsOfElement" tempOneParameterID "7")
+			this.components.push("GUISettingsOfElement" tempParameterID "7")
 			ElementSettingsFieldHWNDs[tempHWND]:=this
 			gui,add,checkbox,w45 X+10 hwndtempHWND gGUISettingsOfElementWeekdays vGUISettingsOfElement%tempParameterID%1,% lang("Sun (Short for Sunday") ;Sunday is 1
-			this.components.push("GUISettingsOfElement" tempOneParameterID "1")
+			this.components.push("GUISettingsOfElement" tempParameterID "1")
 			ElementSettingsFieldHWNDs[tempHWND]:=this
 			
 			IfInString,temp,1
@@ -1728,16 +1970,19 @@ class ElementSettings
 	
 	
 	
-	;Update the name field
+	;Update the name field, check settings
 	generalUpdate()
 	{
 		global
+		if (generalUpdateRunning)
+			return
+		generalUpdateRunning:=True
 		GUISettingsOfElementRemoveInfoTooltip()
 		;~ ToolTip updakljö
 		allParamValues:=GUISettingsOfElementObject.getAllValues()
 		Element_CheckSettings_%setElementClass%(setElement, allParamValues) 
-		ElementSettingsNameField.updatename(allParamValues) ;The element 0 contains the name field
-		
+		ElementSettingsNameField.updatename(allParamValues)
+		generalUpdateRunning:=False
 	}
 	
 	

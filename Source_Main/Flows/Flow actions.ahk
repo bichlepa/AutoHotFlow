@@ -44,6 +44,7 @@ enableFlow(par_FlowID)
 	}
 	
 	API_Execution_EnableTriggers(par_FlowID)
+	SaveFlowMetaData(par_FlowID)
 }
 enableToggleFlow(par_FlowID)
 {
@@ -62,16 +63,36 @@ enableToggleFlow(par_FlowID)
 disableFlow(par_FlowID)
 {
 	API_Execution_DisableTriggers(par_FlowID)
+	SaveFlowMetaData(par_FlowID)
 }
 
-ExecuteFlow(par_FlowID, par_PassedParsKey)
+enableOneTrigger(par_FlowID, par_TriggerID = "", save=True)
 {
 	global _flows
 	if (_flows[par_FlowID].loaded != true)
 	{
 		LoadFlow(par_FlowID)
 	}
-	API_Execution_startFlow(par_FlowID, par_PassedParsKey)
+	API_Execution_enableOneTrigger(par_FlowID, par_TriggerID)
+	if (save)
+		SaveFlowMetaData(par_FlowID)
+}
+
+disableOneTrigger(par_FlowID, par_TriggerID = "", save=True)
+{
+	API_Execution_disableOneTrigger(par_FlowID, par_TriggerID)
+	if (save)
+		SaveFlowMetaData(par_FlowID)
+}
+
+ExecuteFlow(par_FlowID, par_TriggerID, par_PassedParsKey)
+{
+	global _flows
+	if (_flows[par_FlowID].loaded != true)
+	{
+		LoadFlow(par_FlowID)
+	}
+	API_Execution_startFlow(par_FlowID, par_TriggerID, par_PassedParsKey)
 }
 
 ExecuteToggleFlow(par_FlowID)

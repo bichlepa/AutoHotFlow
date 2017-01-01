@@ -1,10 +1,10 @@
-﻿API_Execution_startFlow(p_FlowID, par_PassedParsKey = "")
+﻿API_Execution_startFlow(p_FlowID, par_TriggerID ="", par_PassedParsKey = "")
 {
 	global
 	local retvalue
 	logger("t2", A_ThisFunc " called")
 	
-	retvalue := AhkThreadExecution1.ahkFunction("API_Call_Execution_startFlow", p_FlowID, par_PassedParsKey)
+	retvalue := AhkThreadExecution1.ahkFunction("API_Call_Execution_startFlow", p_FlowID, par_TriggerID, par_PassedParsKey)
 	logger("t2", A_ThisFunc " finished")
 	
 	return retvalue

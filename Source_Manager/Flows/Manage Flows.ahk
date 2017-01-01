@@ -1,13 +1,4 @@
 ﻿
-;Find flows in folder "saved Flows" und show them in the tv.
-;Additionally read the state of flow and activate it if it should be active
-;This function must be called once
-FindFlows()
-{
-	global
-	return parentAHKThread.ahkFunction("FindFlows")
-}
-
 ;Create a new file for a flow
 NewFlow(par_CategoryID = "")
 {

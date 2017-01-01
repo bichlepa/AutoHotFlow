@@ -307,16 +307,26 @@ else if (clickedElement="EditButton")  ;if something is selected and user clicks
 	
 
 }
-else if (clickedElement="SwitchOnButton")  ;if something is selected and user clicks on the edit button
+else if (clickedElement="SwitchOnButton")  ;if something is selected and user clicks on the button
 {
 	
 	API_Main_disableOneTrigger(flowObj.id, markedElement)
 	
 
 }
-else if (clickedElement="SwitchOffButton")  ;if something is selected and user clicks on the edit button
+else if (clickedElement="SwitchOffButton")  ;if something is selected and user clicks on the button
 {
 	API_Main_enableOneTrigger(flowObj.id, markedElement)
+
+}
+else if (clickedElement="StarEmptyButton")  ;if something is selected and user clicks on the button
+{
+	API_Main_setDefaultTrigger(flowObj.id, markedElement)
+	UserDidMinorChange:=true
+}
+else if (clickedElement="StarFilledButton")  ;if something is selected and user clicks on the button
+{
+	;Nothing to do
 
 }
 else if (clickedElement!="") ;if user clicked on an element
@@ -453,7 +463,11 @@ ui_findElementUnderMouse(par_mode="default")
 		else if (FlowObj.draw.SwitchOnButtonExist=true and (FlowObj.draw.PosOfSwitchOnButtonX1 < mx) and (FlowObj.draw.PosOfSwitchOnButtonX2 > mx) and (FlowObj.draw.PosOfSwitchOnButtonY1 < my) and (FlowObj.draw.PosOfSwitchOnButtonY2 > my) )
 			clickedElement = SwitchOnButton	
 		else if (FlowObj.draw.SwitchOffButtonExist=true and (FlowObj.draw.PosOfSwitchOffButtonX1 < mx) and (FlowObj.draw.PosOfSwitchOffButtonX2 > mx) and (FlowObj.draw.PosOfSwitchOffButtonY1 < my) and (FlowObj.draw.PosOfSwitchOffButtonY2 > my) )
-			clickedElement = SwitchOffButton
+			clickedElement = SwitchOffButton		
+		else if (FlowObj.draw.StarFilledButtonExist=true and (FlowObj.draw.PosOfStarFilledButtonX1 < mx) and (FlowObj.draw.PosOfStarFilledButtonX2 > mx) and (FlowObj.draw.PosOfStarFilledButtonY1 < my) and (FlowObj.draw.PosOfStarFilledButtonY2 > my) )
+			clickedElement = StarFilledButton	
+		else if (FlowObj.draw.StarEmptyButtonExist=true and (FlowObj.draw.PosOfStarEmptyButtonX1 < mx) and (FlowObj.draw.PosOfStarEmptyButtonX2 > mx) and (FlowObj.draw.PosOfStarEmptyButtonY1 < my) and (FlowObj.draw.PosOfStarEmptyButtonY2 > my) )
+			clickedElement = StarEmptyButton
 	}
 	;~ ToolTip %par_mode% -- %clickedElement%
 	;~ d(FlowObj.draw, mx "  -  " my " - " Sqrt((FlowObj.draw.middlePointOfPlusButtonX - mx) * (FlowObj.draw.middlePointOfPlusButtonX - mx) + (FlowObj.draw.middlePointOfPlusButtonY - my) * (FlowObj.draw.middlePointOfPlusButtonY - my)))

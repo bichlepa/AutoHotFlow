@@ -10,6 +10,18 @@
 	return retval
 }
 
+API_Call_Main_LoadFlow(par_FlowID)
+{
+	global
+	local retval
+	logger("t2", A_ThisFunc " call received")
+	
+	retval := LoadFlow(par_FlowID)
+	
+	logger("t2", A_ThisFunc " call finished")
+	return retval
+	
+}
 API_Call_Main_SaveFlow(par_FlowID)
 {
 	global
@@ -53,7 +65,7 @@ API_Call_Main_enableOneTrigger(par_FlowID, par_TriggerID)
 	local retval
 	logger("t2", A_ThisFunc " call received")
 	
-	retval := API_Execution_enableOneTrigger(par_FlowID, par_TriggerID)
+	retval := enableOneTrigger(par_FlowID, par_TriggerID)
 	
 	logger("t2", A_ThisFunc " call finished")
 	return retval
@@ -64,7 +76,19 @@ API_Call_Main_disableOneTrigger(par_FlowID, par_TriggerID)
 	local retval
 	logger("t2", A_ThisFunc " call received")
 	
-	retval := API_Execution_disableOneTrigger(par_FlowID, par_TriggerID)
+	retval := disableOneTrigger(par_FlowID, par_TriggerID)
+	
+	logger("t2", A_ThisFunc " call finished")
+	return retval
+}
+
+API_Call_Main_setDefaultTrigger(par_FlowID, par_TriggerID)
+{
+	global
+	local retval
+	logger("t2", A_ThisFunc " call received")
+	
+	retval := Element_setDefaultTrigger(par_FlowID, par_TriggerID)
 	
 	logger("t2", A_ThisFunc " call finished")
 	return retval
@@ -117,13 +141,13 @@ API_Call_Main_stopFlow(par_FlowID)
 	return retval
 }
 
-API_Call_Main_executeFlow(par_FlowID, par_PassedParsKey)
+API_Call_Main_executeFlow(par_FlowID, par_TriggerID, par_PassedParsKey)
 {
 	global
 	local retval
 	logger("t2", A_ThisFunc " call received")
 	
-	retval := executeFlow(par_FlowID, par_PassedParsKey)
+	retval := executeFlow(par_FlowID, par_TriggerID, par_PassedParsKey)
 	
 	logger("t2", A_ThisFunc " call finished")
 	return retval
@@ -141,17 +165,17 @@ API_Call_Main_executeToggleFlow(par_FlowID)
 	return retval
 }
 
-API_Call_Main_triggerFlow(par_FlowID, par_Reason)
-{
-	global
-	local retval
-	logger("t2", A_ThisFunc " call received")
+;~ API_Call_Main_triggerFlow(par_FlowID, par_Reason)
+;~ {
+	;~ global
+	;~ local retval
+	;~ logger("t2", A_ThisFunc " call received")
 	
-	retval := triggerFlow(par_FlowID, par_Reason)
+	;~ retval := triggerFlow(par_FlowID, par_Reason)
 	
-	logger("t2", A_ThisFunc " call finished")
-	return retval
-}
+	;~ logger("t2", A_ThisFunc " call finished")
+	;~ return retval
+;~ }
 
 API_Call_Main_Element_New(p_FlowID, p_type="",p_elementID="")
 {

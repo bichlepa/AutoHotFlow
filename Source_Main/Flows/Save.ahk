@@ -1,25 +1,49 @@
 ﻿
 MAX_COUNT_OF_BACKUPS:=10
 
-SaveFlowMetaData(par_ID)
+SaveFlowMetaData(FlowID)
 {
 	global
-	;~ d(_Flows[par_ID],par_ID)
-	if not fileexist(_Flows[par_ID].file)
+	local enabledFlows
+	
+	if (_Flows[FlowID].file="")
 	{
-		IniWrite,% FlowCompabilityVersionOfApp,% _Flows[par_ID].file,general,FlowCompabilityVersion
+		;Do not save anything if flow does not exist. (Should not happen)
+		MsgBox unexpected error. should save flow "%FlowID%", but no flow file specified
+		return
+	}
+		
+	
+	;~ d(_Flows[FlowID],FlowID)
+	if not fileexist(_Flows[FlowID].file)
+	{
+		IniWrite,% FlowCompabilityVersionOfApp,% _Flows[FlowID].file,general,FlowCompabilityVersion
 	}
 	
-	IniWrite,% _Flows[par_ID].name,% _Flows[par_ID].file,general,name
-	IniWrite,% _Flows[par_ID].id,% _Flows[par_ID].file,general,ID
-	if (_Flows[par_ID].categoryname = lang("uncategorized"))
-		IniWrite,% "",% _Flows[par_ID].file,general,category ;If the flow has no category, do not save the category name
+	IniWrite,% _Flows[FlowID].name,% _Flows[FlowID].file,general,name
+	IniWrite,% _Flows[FlowID].id,% _Flows[FlowID].file,general,ID
+	if (_Flows[FlowID].categoryname = lang("uncategorized"))
+		IniWrite,% "",% _Flows[FlowID].file,general,category ;If the flow has no category, do not save the category name
 	else
-		IniWrite,% _Flows[par_ID].categoryname,% _Flows[par_ID].file,general,category
+		IniWrite,% _Flows[FlowID].categoryname,% _Flows[FlowID].file,general,category
 	
 	if (shuttingDown<>true) ;Do not save if it is shutting down and disabling the flows
-		IniWrite,% _Flows[par_ID].enabled,% _Flows[par_ID].file,general,enabled
-	
+	{
+		enabledTriggers:=""
+		for oneID, oneElement in _Flows[FlowID].allElements
+		{
+			if (oneElement.type = "trigger" and oneElement.enabled)
+			{
+				if (enabledTriggers="")
+					enabledTriggers.=oneID
+				else
+					enabledTriggers.= "|" oneID
+			}
+		}
+		
+		IniWrite,% enabledTriggers,% _Flows[FlowID].file,general,enabled
+		
+	}
 }
 
 SaveFlow(FlowID)
@@ -32,10 +56,26 @@ SaveFlow(FlowID)
 	local presentBackupFiles=Object()
 	local ThisFlowFilepath, ThisFlowFolder, ThisFlowFilename
 	local saveElementType, saveElement, saveElementID, saveElementIniID
+	local oneID, oneElement, enabledTriggers
 	;~ MsgBox %FlowID%
 	;~ ui_DisableMainGUI()
 	logger("a1","Saving flow " FlowName)
 	;~ ToolTip(lang("saving"),100000)
+	
+	
+	
+	enabledTriggers:=""
+	for oneID, oneElement in _Flows[FlowID].allElements
+	{
+		if (oneElement.type = "trigger" and oneElement.enabled)
+		{
+			if (enabledTriggers="")
+				enabledTriggers.=oneID
+			else
+				enabledTriggers.= "|" oneID
+		}
+	}
+	
 	
 	ThisFlowFilepath := _flows[FlowID].file
 	ThisFlowFolder := _flows[FlowID].Folder
@@ -61,7 +101,10 @@ SaveFlow(FlowID)
 	RIni_AppendValue("iniSave", "general", "Offsetx", _flows[FlowID].flowSettings.Offsetx)
 	RIni_AppendValue("iniSave", "general", "Offsety", _flows[FlowID].flowSettings.Offsety)
 	RIni_AppendValue("iniSave", "general", "zoomFactor", _flows[FlowID].flowSettings.zoomFactor)
-	RIni_AppendValue("iniSave", "general", "enabled", _flows[FlowID].enabled)
+	
+		
+	
+	RIni_AppendValue("iniSave", "general", "enabled", enabledTriggers)
 	
 	saveCopyOfallElements:=objfullyclone(_flows[FlowID].allElements)
 	saveCopyOfallConnections:=objfullyclone(_flows[FlowID].allConnections)
@@ -88,6 +131,9 @@ SaveFlow(FlowID)
 		RIni_AppendValue("iniSave", saveElementIniID, "subType", saveElement.subType)
 		if (saveElement.HeightOfVerticalBar)
 			RIni_AppendValue("iniSave", saveElementIniID, "HeightOfVerticalBar", saveElement.HeightOfVerticalBar)	
+		if (saveElement.class = "trigger_manual")
+			RIni_AppendValue("iniSave", saveElementIniID, "DefaultTrigger", saveElement.DefaultTrigger)	
+			
 		
 		i_SaveParametersOfElement(saveElement,saveElementIniID)
 		

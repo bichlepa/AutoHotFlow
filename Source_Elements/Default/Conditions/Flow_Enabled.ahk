@@ -39,7 +39,7 @@ Element_getParametrizationDetails_Condition_Flow_Enabled()
 	}
 	
 	parametersToEdit.push({type: "Label", label: lang("Flow_name")})
-	parametersToEdit.push({type: "ComboBox", id: "flowName", content: "String", WarnIfEmpty: true, result: "name", choices: choices})
+	parametersToEdit.push({type: "ComboBox", id: "flowName", content: "String", WarnIfEmpty: true, result: "string", choices: choices})
 
 	return parametersToEdit
 }

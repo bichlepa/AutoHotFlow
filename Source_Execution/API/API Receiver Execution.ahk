@@ -1,4 +1,4 @@
-API_Call_Execution_startFlow(p_FlowID, par_PassedParsKey)
+API_Call_Execution_startFlow(p_FlowID, par_TriggerID, par_PassedParsKey)
 {
 	global _flows, _share
 	
@@ -14,7 +14,7 @@ API_Call_Execution_startFlow(p_FlowID, par_PassedParsKey)
 			_share.temp.delete(par_PassedParsKey)
 		}
 	}
-	retvalue := startFlow(_flows[p_FlowID], params)
+	retvalue := startFlow(_flows[p_FlowID], _flows[p_FlowID].allElements[par_TriggerID], params)
 	return retvalue.id
 }
 

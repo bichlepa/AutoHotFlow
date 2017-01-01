@@ -75,34 +75,40 @@ newInstance(p_Environment)
 /**
 Start all manual triggers
 */
-startFlow(p_Flow, p_params = "")
+startFlow(p_Flow, p_Trigger ="", p_params = "")
 {
 	static
 	global _flows
 	local TriggerFound:=false
-	;Search for manual triggers
-	for oneElementID, oneElement in p_Flow.allElements
+	;If not trigger assigned, trigger the default manual trigger (if any)
+	if (p_Trigger="")
 	{
-		if (oneElement.type = "trigger")
+		for oneElementID, oneElement in p_Flow.allElements
 		{
-			if (oneElement.class = "trigger_manual")
+			if (oneElement.class = "trigger_manual" and oneElement.defaultTrigger = True)
 			{
-				environment:=Object()
-				environment.flowID:=p_Flow.id
-				environment.elementID:=oneElement.id
-				environment.params:=p_params
-				newInstance(environment)
+				p_Trigger := oneElement
 				TriggerFound:=True
 			}
+			
+		}
+		if not TriggerFound
+		{
+			gui,hintThatNoManualTriggerAvailable:destroy
+			gui,hintThatNoManualTriggerAvailable:add, text, w200 , % lang("There is no manual trigger available")
+			gui,hintThatNoManualTriggerAvailable:add, button, default w100 x50 Y+10 h30 ghintThatNoManualTriggerAvailableGuiClose , % lang("OK")
+			gui,hintThatNoManualTriggerAvailable:show,,AutoHotFlow
+			return
 		}
 	}
-	if not TriggerFound
-	{
-		gui,hintThatNoManualTriggerAvailable:destroy
-		gui,hintThatNoManualTriggerAvailable:add, text, w200 , % lang("There is no manual trigger available")
-		gui,hintThatNoManualTriggerAvailable:add, button, default w100 x50 Y+10 h30 ghintThatNoManualTriggerAvailableGuiClose , % lang("OK")
-		gui,hintThatNoManualTriggerAvailable:show,,AutoHotFlow
-	}
+	;~ d(p_Trigger)
+	environment:=Object()
+	environment.flowID:=p_Flow.id
+	environment.elementID:=p_Trigger.id
+	environment.params:=p_params
+	newInstance(environment)
+	
+	
 	return
 	
 	hintThatNoManualTriggerAvailableGuiClose:

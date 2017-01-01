@@ -42,6 +42,7 @@ lang_Init(my_ScriptDir "\language", my_WorkingDir)
 #include Source_Main\Threads\API Caller to Draw.ahk
 #include Source_Main\Threads\API Caller to Editor.ahk
 #include Source_Main\Threads\API Caller to Execution.ahk
+#include Source_Main\Threads\API Caller Elements.ahk
 #include Source_Main\Threads\API Receiver Main.ahk
 
 #include Source_Main\Flows\Save.ahk
@@ -52,7 +53,6 @@ lang_Init(my_ScriptDir "\language", my_WorkingDir)
 #include Source_Main\Flows\Flow actions.ahk
 #include Source_Main\Flows\states.ahk
 
-#include source_Common\Elements API\API Caller Elements.ahk
 #include source_Common\Debug\Debug.ahk
 #include source_Common\Debug\Logger.ahk
 #include source_Common\Defaults\Default values.ahk
@@ -86,10 +86,13 @@ AllTriggerClasses:=Object()
 
 init_GlobalVars()
 
+
 Thread_StartManager()
 Thread_StartDraw()
 Thread_StartExecution()
 
+;Find flows and activate some triggers
+FindFlows()
 return
 
 

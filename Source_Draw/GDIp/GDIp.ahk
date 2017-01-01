@@ -56,6 +56,22 @@ gdip_Init()
 	pBitmapMove := Gdip_CreateBitmapFromFile(my_ScriptDir "\Icons\move.ico")
 	pBitmapTrash := Gdip_CreateBitmapFromFile(my_ScriptDir "\Icons\trash.ico")
 	pBitmapTrash := Gdip_CreateBitmapFromFile(my_ScriptDir "\Icons\trash.ico")
+	
+	pBitmapStarFilled := Gdip_CreateBitmapFromFile(my_ScriptDir "\Icons\e_star_filled.ico")
+	pBitmapStarFilled_W := Gdip_GetImageWidth(pBitmapStarFilled)
+	pBitmapStarFilled_H := Gdip_GetImageHeight(pBitmapStarFilled)
+	if (pBitmapStarFilled_H > pBitmapStarFilled_W)
+		pBitmapStarFilled_size := pBitmapStarFilled_H
+	else
+		pBitmapStarFilled_size := pBitmapStarFilled_W	
+	pBitmapStarEmpty := Gdip_CreateBitmapFromFile(my_ScriptDir "\Icons\e_star_Empty.ico")
+	pBitmapStarEmpty_W := Gdip_GetImageWidth(pBitmapStarEmpty)
+	pBitmapStarEmpty_H := Gdip_GetImageHeight(pBitmapStarEmpty)
+	if (pBitmapStarEmpty_H > pBitmapStarEmpty_W)
+		pBitmapStarEmpty_size := pBitmapStarEmpty_H
+	else
+		pBitmapStarEmpty_size := pBitmapStarEmpty_W
+	
 	pBitmapSwitchOn := Gdip_CreateBitmapFromFile(my_ScriptDir "\Icons\e_switch_on.ico")
 	pBitmapSwitchOn_W := Gdip_GetImageWidth(pBitmapSwitchOn)
 	pBitmapSwitchOn_H := Gdip_GetImageHeight(pBitmapSwitchOn)
@@ -601,10 +617,31 @@ gdip_DrawEverything(FlowObj)
 			else
 			{
 				tempX1:=drawElement.x + ElementWidth *0.8 - SizeOfButtons*0.5 - Offsetx
-				tempX2:=tempX1 + (SizeOfButtons * pBitmapSwitchOn_W / pBitmapSwitchOn_size)
+				tempX2:=tempX1 + (SizeOfButtons * pBitmapSwitchOff_W / pBitmapSwitchOff_size)
 				tempY1:=drawElement.y + ElementHeight *0.25 - SizeOfButtons*0.5 - Offsety			
-				tempY2:=tempY1 + (SizeOfButtons * pBitmapSwitchOn_H / pBitmapSwitchOn_size)
-				Gdip_DrawImage(G, pBitmapSwitchOff, (tempX1 )*zoomFactor, (tempY1) *zoomFactor, (tempX2 - tempX1) *zoomFactor, (tempY2 - tempY1) *zoomFactor , 0, 0, pBitmapSwitchOn_w, pBitmapSwitchOn_H)
+				tempY2:=tempY1 + (SizeOfButtons * pBitmapSwitchOff_H / pBitmapSwitchOff_size)
+				Gdip_DrawImage(G, pBitmapSwitchOff, (tempX1 )*zoomFactor, (tempY1) *zoomFactor, (tempX2 - tempX1) *zoomFactor, (tempY2 - tempY1) *zoomFactor , 0, 0, pBitmapSwitchOff_w, pBitmapSwitchOff_H)
+			}
+			
+			if (drawElement.class = "trigger_manual" )
+			{
+				if (drawElement.defaultTrigger)
+				{
+					tempX1:=drawElement.x + ElementWidth *0.15 - SizeOfButtons*0.5 - Offsetx
+					tempX2:=tempX1 + (SizeOfButtons * pBitmapStarFilled_W / pBitmapStarFilled_size)
+					tempY1:=drawElement.y + ElementHeight *0.20 - SizeOfButtons*0.5 - Offsety			
+					tempY2:=tempY1 + (SizeOfButtons * pBitmapStarFilled_H / pBitmapStarFilled_size)
+					Gdip_DrawImage(G, pBitmapStarFilled, (tempX1 )*zoomFactor, (tempY1) *zoomFactor, (tempX2 - tempX1) *zoomFactor, (tempY2 - tempY1) *zoomFactor , 0, 0, pBitmapStarFilled_w,pBitmapStarFilled_H)
+					
+				}
+				else
+				{
+					tempX1:=drawElement.x + ElementWidth *0.15 - SizeOfButtons*0.5 - Offsetx
+					tempX2:=tempX1 + (SizeOfButtons * pBitmapStarEmpty_W / pBitmapStarEmpty_size)
+					tempY1:=drawElement.y + ElementHeight *0.20 - SizeOfButtons*0.5 - Offsety			
+					tempY2:=tempY1 + (SizeOfButtons * pBitmapStarEmpty_H / pBitmapStarEmpty_size)
+					Gdip_DrawImage(G, pBitmapStarEmpty, (tempX1 )*zoomFactor, (tempY1) *zoomFactor, (tempX2 - tempX1) *zoomFactor, (tempY2 - tempY1) *zoomFactor , 0, 0, pBitmapStarEmpty_w, pBitmapStarEmpty_H)
+				}
 			}
 			
 			
@@ -911,11 +948,36 @@ gdip_DrawEverything(FlowObj)
 			else
 			{
 				PosOfSwitchOffButtonX1:=tempElList[markedElement].x + ElementWidth *0.8 - SizeOfButtons*0.5 - Offsetx
-				PosOfSwitchOffButtonX2:=PosOfSwitchOffButtonX1 + (SizeOfButtons * pBitmapSwitchOn_W / pBitmapSwitchOn_size)
+				PosOfSwitchOffButtonX2:=PosOfSwitchOffButtonX1 + (SizeOfButtons * pBitmapSwitchOff_W / pBitmapSwitchOff_size)
 				PosOfSwitchOffButtonY1:=tempElList[markedElement].y + ElementHeight *0.25 - SizeOfButtons*0.5 - Offsety			
-				PosOfSwitchOffButtonY2:=PosOfSwitchOffButtonY1 + (SizeOfButtons * pBitmapSwitchOn_H / pBitmapSwitchOn_size)
-				Gdip_DrawImage(G, pBitmapSwitchOff, (PosOfSwitchOffButtonX1 )*zoomFactor, (PosOfSwitchOffButtonY1) *zoomFactor, (PosOfSwitchOffButtonX2 - PosOfSwitchOffButtonX1) *zoomFactor, (PosOfSwitchOffButtonY2 - PosOfSwitchOffButtonY1) *zoomFactor , 0, 0, pBitmapSwitchOn_w, pBitmapSwitchOn_H)
+				PosOfSwitchOffButtonY2:=PosOfSwitchOffButtonY1 + (SizeOfButtons * pBitmapSwitchOff_H / pBitmapSwitchOff_size)
+				Gdip_DrawImage(G, pBitmapSwitchOff, (PosOfSwitchOffButtonX1 )*zoomFactor, (PosOfSwitchOffButtonY1) *zoomFactor, (PosOfSwitchOffButtonX2 - PosOfSwitchOffButtonX1) *zoomFactor, (PosOfSwitchOffButtonY2 - PosOfSwitchOffButtonY1) *zoomFactor , 0, 0, pBitmapSwitchOff_w, pBitmapSwitchOff_H)
 				SwitchOffButtonExist:=true
+			}
+		}
+		
+		;Start filled or empty Button
+		;~ MsgBox % strobj(tempElList[markedElement])
+		if (tempElList[markedElement].class = "trigger_manual" )
+		{
+			if (tempElList[markedElement].defaultTrigger)
+			{
+				PosOfStarFilledButtonX1:=tempElList[markedElement].x + ElementWidth *0.15 - SizeOfButtons*0.5 - Offsetx
+				PosOfStarFilledButtonX2:=PosOfStarFilledButtonX1 + (SizeOfButtons * pBitmapStarFilled_W / pBitmapStarFilled_size)
+				PosOfStarFilledButtonY1:=tempElList[markedElement].y + ElementHeight *0.20 - SizeOfButtons*0.5 - Offsety			
+				PosOfStarFilledButtonY2:=PosOfStarFilledButtonY1 + (SizeOfButtons * pBitmapStarFilled_H / pBitmapStarFilled_size)
+				Gdip_DrawImage(G, pBitmapStarFilled, (PosOfStarFilledButtonX1 )*zoomFactor, (PosOfStarFilledButtonY1) *zoomFactor, (PosOfStarFilledButtonX2 - PosOfStarFilledButtonX1) *zoomFactor, (PosOfStarFilledButtonY2 - PosOfStarFilledButtonY1) *zoomFactor , 0, 0, pBitmapStarFilled_w,pBitmapStarFilled_H)
+				StarFilledButtonExist:=true
+				
+			}
+			else
+			{
+				PosOfStarEmptyButtonX1:=tempElList[markedElement].x + ElementWidth *0.15 - SizeOfButtons*0.5 - Offsetx
+				PosOfStarEmptyButtonX2:=PosOfStarEmptyButtonX1 + (SizeOfButtons * pBitmapStarEmpty_W / pBitmapStarEmpty_size)
+				PosOfStarEmptyButtonY1:=tempElList[markedElement].y + ElementHeight *0.20 - SizeOfButtons*0.5 - Offsety			
+				PosOfStarEmptyButtonY2:=PosOfStarEmptyButtonY1 + (SizeOfButtons * pBitmapStarEmpty_H / pBitmapStarEmpty_size)
+				Gdip_DrawImage(G, pBitmapStarEmpty, (PosOfStarEmptyButtonX1 )*zoomFactor, (PosOfStarEmptyButtonY1) *zoomFactor, (PosOfStarEmptyButtonX2 - PosOfStarEmptyButtonX1) *zoomFactor, (PosOfStarEmptyButtonY2 - PosOfStarEmptyButtonY1) *zoomFactor , 0, 0, pBitmapStarEmpty_w, pBitmapStarEmpty_H)
+				StarEmptyButtonExist:=true
 			}
 		}
 		
@@ -960,6 +1022,8 @@ gdip_DrawEverything(FlowObj)
 	FlowObj.draw.MoveButton2Exist:=MoveButton2Exist	
 	FlowObj.draw.SwitchOnButtonExist:=SwitchOnButtonExist
 	FlowObj.draw.SwitchOffButtonExist:=SwitchOffButtonExist
+	FlowObj.draw.StarFilledButtonExist:=SwitchOnButtonExist
+	FlowObj.draw.StarEmptyButtonExist:=SwitchOffButtonExist
 	
 	FlowObj.draw.middlePointOfPlusButtonX:=middlePointOfPlusButtonX * zoomFactor
 	FlowObj.draw.middlePointOfPlusButton2X:=middlePointOfPlusButton2X * zoomFactor
@@ -981,6 +1045,14 @@ gdip_DrawEverything(FlowObj)
 	FlowObj.draw.PosOfSwitchOnButtonX2:=PosOfSwitchOnButtonX2 * zoomFactor
 	FlowObj.draw.PosOfSwitchOnButtonY1:=PosOfSwitchOnButtonY1 * zoomFactor
 	FlowObj.draw.PosOfSwitchOnButtonY2:=PosOfSwitchOnButtonY2 * zoomFactor
+	FlowObj.draw.PosOfStarEmptyButtonX1:=PosOfStarEmptyButtonX1 * zoomFactor
+	FlowObj.draw.PosOfStarEmptyButtonX2:=PosOfStarEmptyButtonX2 * zoomFactor
+	FlowObj.draw.PosOfStarEmptyButtonY1:=PosOfStarEmptyButtonY1 * zoomFactor
+	FlowObj.draw.PosOfStarEmptyButtonY2:=PosOfStarEmptyButtonY2	* zoomFactor
+	FlowObj.draw.PosOfStarFilledButtonX1:=PosOfStarFilledButtonX1 * zoomFactor
+	FlowObj.draw.PosOfStarFilledButtonX2:=PosOfStarFilledButtonX2 * zoomFactor
+	FlowObj.draw.PosOfStarFilledButtonY1:=PosOfStarFilledButtonY1 * zoomFactor
+	FlowObj.draw.PosOfStarFilledButtonY2:=PosOfStarFilledButtonY2 * zoomFactor
 	
 	
 	FlowObj.draw.NewElementIconWidth:=NewElementIconWidth * zoomFactor

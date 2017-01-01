@@ -146,6 +146,7 @@ LoadFlow(FlowID, filepath="", params="")
 				_flows[FlowID].allElements[loadElementID].StandardName:=RIni_GetKeyValue("IniFile", tempSection, "StandardName", "1")
 				_flows[FlowID].allElements[loadElementID].x:=RIni_GetKeyValue("IniFile", tempSection, "x", 200)
 				_flows[FlowID].allElements[loadElementID].y:=RIni_GetKeyValue("IniFile", tempSection, "y", 200)
+				IsDefaultTriger:=RIni_GetKeyValue("IniFile", tempSection, "DefaultTrigger", False) 
 				
 				;Find out the element class
 				if (loadElementClass="")
@@ -175,6 +176,15 @@ LoadFlow(FlowID, filepath="", params="")
 				}
 				if (loadElementType="trigger")
 				{
+					
+					;Set default trigger
+					if (_flows[FlowID].allElements[loadElementID].Class = "trigger_manual")
+					{
+						if (IsDefaultTriger = True or Element_findDefaultTrigger(FlowID) = "")
+						{
+							Element_setDefaultTrigger(FlowID, loadElementID)
+						}
+					}
 					AnyTriggerLoaded:=true
 					;~ d(_flows[FlowID].allElements[loadElementID])
 				}
@@ -197,6 +207,7 @@ LoadFlow(FlowID, filepath="", params="")
 			}
 		}
 		
+		;outdated connections
 		IfInString,tempSection,connection
 		{
 			connection_new(FlowID, loadElementID)
@@ -210,10 +221,9 @@ LoadFlow(FlowID, filepath="", params="")
 			LoadFlowCheckCompability(_flows[FlowID].allConnections,loadElementID,tempSection,_flows[FlowID].CompabilityVersion)
 		}
 		
-		
+		;Outdated triggers
 		IfInString,tempSection,trigger
 		{
-			AnyTriggerLoaded:=True
 			element_New(FlowID, "trigger", loadElementID)
 			
 			_flows[FlowID].allElements[loadElementID].Type:=loadElementType
@@ -225,8 +235,8 @@ LoadFlow(FlowID, filepath="", params="")
 			StringReplace, tempValue, tempValue, |¶,`n, All
 			_flows[FlowID].allElements[loadElementID].Name:=tempValue
 			
-		
-			_flows[FlowID].allElements[loadElementID].subType:=RIni_GetKeyValue("IniFile", tempSection, "subType", "")
+			_flows[FlowID].allElements[loadElementID].subType:=RIni_GetKeyValue("IniFile", tempSection, "subType", "") 
+			
 			;Find out the trigger class
 			if (loadElementClass="")
 			{
@@ -237,6 +247,8 @@ LoadFlow(FlowID, filepath="", params="")
 				_flows[FlowID].allElements[loadElementID].Class := loadElementClass
 			}
 			
+			
+			
 			;If element class is not installed, prepare a warning message
 			if not (ObjHasValue(AllTriggerClasses,loadElementClass))
 			{
@@ -245,10 +257,22 @@ LoadFlow(FlowID, filepath="", params="")
 					missingpackages.push(loadElementPackage)
 			}
 			
+			
 			;~ d(_flows[FlowID].allElements[loadElementID])
 			LoadFlowParametersOfElement(FlowID,_flows[FlowID].allElements,loadElementID,"IniFile",tempSection)
 			
 			LoadFlowCheckCompability(_flows[FlowID].allElements,loadElementID,tempSection,_flows[FlowID].CompabilityVersion)
+			
+			;Set default trigger
+			if (_flows[FlowID].allElements[loadElementID].Class = "trigger_manual")
+			{
+				if (Element_findDefaultTrigger(FlowID) = "")
+				{
+					Element_setDefaultTrigger(FlowID, loadElementID)
+				}
+			}
+			
+			AnyTriggerLoaded:=True
 		}
 		
 	}

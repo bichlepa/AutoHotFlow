@@ -37,7 +37,6 @@ menu,tray, tip, Manager
 init_Manager_GUI()
 Show_Manager_GUI()
 
-FindFlows()
 
 return
 
