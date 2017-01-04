@@ -1,4 +1,4 @@
-﻿FlowCompabilityVersionOfApp:=8 ;This variable contains a number which will be incremented as soon an incompability appears. This will make it possible to identify old scripts and convert them. This value will be written in any saved flows.
+﻿FlowCompabilityVersionOfApp:=9 ;This variable contains a number which will be incremented as soon an incompability appears. This will make it possible to identify old scripts and convert them. This value will be written in any saved flows.
 
 LoadFlowCheckCompability(p_List,p_ElementID,p_section,FlowCompabilityVersion)
 {
@@ -155,6 +155,16 @@ LoadFlowCheckCompability(p_List,p_ElementID,p_section,FlowCompabilityVersion)
 			p_List[p_ElementID].pars.message:=temp
 			p_List[p_ElementID].pars.IsTimeout:=0
 			p_List[p_ElementID].pars.IfDismiss:=2 ;Exception if dismiss
+			
+		}
+		
+	}
+	if FlowCompabilityVersion<9 ; 2017,01,04
+	{
+		if (p_List[p_ElementID].class="action_New_List") 
+		{
+			p_List[p_ElementID].pars.IsExpression:=RIni_GetKeyValue("IniFile", tempSection, "IsExpression", 1) 
+			p_List[p_ElementID].pars.WhichPosition:=RIni_GetKeyValue("IniFile", tempSection, "WhitchPosition", 1) 
 			
 		}
 		

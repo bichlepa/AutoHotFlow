@@ -1,0 +1,189 @@
+﻿;Always add this element class name to the global list
+AllElementClasses.push("Action_New_List")
+
+Element_getPackage_Action_New_List()
+{
+	return "default"
+}
+
+Element_getElementType_Action_New_List()
+{
+	return "action"
+}
+
+Element_getName_Action_New_List()
+{
+	return lang("New_List")
+}
+
+Element_getIconPath_Action_New_List()
+{
+	return "Source_elements\default\icons\New variable.png"
+}
+
+Element_getCategory_Action_New_List()
+{
+	return lang("Variable")
+}
+
+Element_getParameters_Action_New_List()
+{
+	return ["Varname", "InitialContent", "VarValue", "expression", "VarValues", "DelimiterLinefeed", "DelimiterComma", "DelimiterSemicolon", "DelimiterSpace", "WhichPosition", "Position", "expressionPos"]
+}
+
+Element_getParametrizationDetails_Action_New_List()
+{
+	parametersToEdit:=Object()
+	parametersToEdit.push({type: "Label", label: lang("Variable_name")})
+	parametersToEdit.push({type: "Edit", id: "Varname", default: "NewList", content: "VariableName", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: lang("Number of elements")})
+	parametersToEdit.push({type: "Radio", id: "InitialContent", default: 1, choices: [lang("Empty list"), lang("Initialize with one element"), lang("Initialize with multiple elements")]})
+	parametersToEdit.push({type: "Label", label:  lang("Initial content")})
+	parametersToEdit.push({type: "Edit", id: ["VarValue","expression"], default: ["New element",1], content: "StringOrExpression", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Edit", id: "VarValues", default: "Element one`nElement two", multiline: true, content: "String", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Checkbox", id: "DelimiterLinefeed", default: 1, label: lang("Use linefeed as delimiter")})
+	parametersToEdit.push({type: "Checkbox", id: "DelimiterComma", default: 0, label: lang("Use comma as delimiter")})
+	parametersToEdit.push({type: "Checkbox", id: "DelimiterSemicolon", default: 0, label: lang("Use semicolon as delimiter")})
+	parametersToEdit.push({type: "Checkbox", id: "DelimiterSpace", default: 0, label: lang("Use space as delimiter")})
+	parametersToEdit.push({type: "Label", label: lang("Key")})
+	parametersToEdit.push({type: "Radio", id: "WhichPosition", default: 1, choices: [lang("Numerically as first element"), lang("Following key")]})
+	parametersToEdit.push({type: "Edit", id: ["Position","expressionPos"], default: ["keyName",1], content: "StringOrExpression", WarnIfEmpty: true})
+	
+
+	return parametersToEdit
+}
+
+Element_run_Action_New_List(Environment, ElementParameters)
+{
+	;~ d(ElementParameters, "element parameters")
+	Varname := x_replaceVariables(Environment, ElementParameters.Varname)
+	Value := ""
+	
+	if not x_CheckVariableName(varname)
+	{
+		;On error, finish with exception and return
+		x_finish(Environment, "exception", lang("%1% is not valid", lang("Ouput variable name '%1%'", varname)))
+		return
+	}
+	
+	
+	newList:=Object()
+	
+	if (ElementParameters.InitialContent = 1) ;empty list
+	{
+		x_SetVariable(Environment,Varname,newList)
+	}
+	else if (ElementParameters.InitialContent = 2) ;one element
+	{
+		if (ElementParameters.Expression = 2)
+			Value := x_EvaluateExpression(Environment, ElementParameters.VarValue)
+		else
+			Value := x_replaceVariables(Environment, ElementParameters.VarValue)
+		
+		
+		
+		if ElementParameters.WhichPosition=1 
+		{
+			newList.push(Value)
+		}
+		else
+		{
+			
+			if (ElementParameters.ExpressionPos = 2)
+				Position := x_EvaluateExpression(Environment, ElementParameters.Position)
+			else
+				Position := x_replaceVariables(Environment, ElementParameters.Position)
+			
+			newList[Position] :=Value
+		}
+		
+		x_SetVariable(Environment,Varname,newList)
+	}
+	else if (ElementParameters.InitialContent = 3) ;multiple elements
+	{
+		Value := x_replaceVariables(Environment, ElementParameters.varvalues)
+		
+		if ElementParameters.DelimiterLinefeed
+			StringReplace,Value,Value,`n,▬,all
+		if ElementParameters.DelimiterComma
+			StringReplace,Value,Value,`,,▬,all
+		if ElementParameters.DelimiterSemicolon
+			StringReplace,Value,Value,;,▬,all
+		if ElementParameters.DelimiterSpace
+			StringReplace,Value,Value,%A_Space%,▬,all
+		
+		loop,parse,Value,▬
+		{
+			newList.push(A_LoopField)
+		}
+		x_SetVariable(Environment,Varname,newList)
+	}
+	
+		;~ d(newlist)
+	
+	;Always call v_finish() before return
+	x_finish(Environment, "normal")
+	return
+}
+
+Element_GenerateName_Action_New_List(Environment, ElementParameters)
+{
+	if ElementParameters.InitialContent=1
+	{
+		Text.= lang("New empty list") " " ElementParameters.Varname
+	}
+	else if ElementParameters.InitialContent=2
+	{
+		Text.= lang("New list %1% with initial content",ElementParameters.Varname) ": "
+		Text.=  ElementParameters.VarValue
+		
+	}
+	else
+	{
+		Text.= lang("New list %1% with initial content",ElementParameters.Varname) ": "
+		Text.=  ElementParameters.VarValues
+		
+	}
+	
+	return % Text
+	
+}
+
+
+Element_CheckSettings_Action_New_List(Environment, ElementParameters)
+{
+	static oldParFlowName
+	static oldParThisFlow
+	
+	if (ElementParameters.InitialContent = 2) ;one element
+	{
+		x_Par_Enable(Environment,"VarValue")
+		x_Par_Enable(Environment,"WhichPosition")
+		x_Par_Enable(Environment,"Position", (ElementParameters.WhichPosition = 2))
+	}
+	else
+	{
+		x_Par_Disable(Environment,"VarValue")
+		x_Par_Disable(Environment,"WhichPosition")
+		x_Par_Disable(Environment,"Position")
+	}
+	
+	if (ElementParameters.InitialContent = 3) ;Multiple elements
+	{
+		x_Par_Enable(Environment,"VarValues")
+		x_Par_Enable(Environment,"DelimiterLinefeed")
+		x_Par_Enable(Environment,"DelimiterComma")
+		x_Par_Enable(Environment,"DelimiterSemicolon")
+		x_Par_Enable(Environment,"DelimiterSpace")
+	}
+	else
+	{
+		x_Par_Disable(Environment,"VarValues")
+		x_Par_Disable(Environment,"DelimiterLinefeed")
+		x_Par_Disable(Environment,"DelimiterComma")
+		x_Par_Disable(Environment,"DelimiterSemicolon")
+		x_Par_Disable(Environment,"DelimiterSpace")
+	}
+	
+	
+}

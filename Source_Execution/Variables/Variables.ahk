@@ -495,7 +495,7 @@ Var_CheckName(p_Name, tellWhy=false) ;Return 1 if valid. 0 if not
 
 
 
-Var_replaceVariables(environment, p_String)
+Var_replaceVariables(environment, p_String, pars = "")
 {
 	tempstring:=p_String
 	;~ d(environment, "replace variables: " p_String )
@@ -504,7 +504,14 @@ Var_replaceVariables(environment, p_String)
 		tempFoundPos:=RegExMatch(tempstring, "SU).*%(.+)%.*", tempFoundVarName)
 		if tempFoundPos=0
 			break
-		StringReplace,tempstring,tempstring,`%%tempFoundVarName1%`%,% Var_Get(environment,tempFoundVarName1)
+		tempVarValue:=Var_Get(environment,tempFoundVarName1)
+		if isobject(tempVarValue)
+		{
+			IfInString, pars, ConvertObjectToString
+				tempVarValue := strobj(tempVarValue)
+		}
+		
+		StringReplace,tempstring,tempstring,`%%tempFoundVarName1%`%,% tempVarValue
 		;~ MsgBox % "reerhes#-" tempstring "-#-" tempFoundVarName1 "-#-" Variable_Get(p_thread,tempFoundVarName1,p_ContentType)
 		;~ MsgBox %tempVariablesToReplace1%
 	}

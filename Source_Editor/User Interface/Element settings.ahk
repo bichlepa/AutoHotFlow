@@ -831,11 +831,11 @@ class ElementSettings
 						tempchecked2=
 					
 					gui,add,radio, w400 x10 %tempchecked1% Group hwndtempHWND gGUISettingsOfElementChangeRadio vGUISettingsOfElement%tempContentTypeID%1 ,% lang("This is a value")
-					this.components.push("GUISettingsOfElement" tempOneParameterID a_index)
+					this.components.push("GUISettingsOfElement" tempContentTypeID "1")
 					ElementSettingsFieldHWNDs[tempHWND]:=this
 					
 					gui,add,radio, w400 x10 %tempChecked2% hwndtempHWND gGUISettingsOfElementChangeRadio vGUISettingsOfElement%tempContentTypeID%2 ,% lang("This is a variable name or expression")
-					this.components.push("GUISettingsOfElement" tempOneParameterID a_index)
+					this.components.push("GUISettingsOfElement" tempContentTypeID "2")
 					ElementSettingsFieldHWNDs[tempHWND]:=this
 					
 					if (tempAssigned=false) ;Catch if a wrong value was saved and set to default value.
@@ -1079,6 +1079,10 @@ class ElementSettings
 						This.warningText:=lang("Error!") " " lang("This field mustn't be empty!") "`n"
 					}
 				}
+			}
+			else
+			{
+				guicontrol,SettingsOfElement:hide,GUISettingsOfElementWarningIconOf%tempOneParamID%
 			}
 			;~ ToolTip(This.warningText)
 			if (This.warningText="" and !openingElementSettingsWindow)

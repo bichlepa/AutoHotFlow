@@ -50,7 +50,7 @@ Element_run_Action_Tooltip(Environment, ElementParameters)
 	global runActionTooltip_Text=
 	global runActionTooltip_Oldx=
 	global runActionTooltip_Oldy=
-	runActionTooltip_Text:=x_replaceVariables(Environment,ElementParameters.text)
+	runActionTooltip_Text:=x_replaceVariables(Environment,ElementParameters.text, "ConvertObjectToString")
 	if isobject(runActionTooltip_Text)
 		runActionTooltip_Text := x_ConvertObjToString(runActionTooltip_Text)
 	

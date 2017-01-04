@@ -3,10 +3,10 @@
 
 
 
-x_replaceVariables(Environment, String)
+x_replaceVariables(Environment, String, pars ="")
 {
 	global
-	return Var_replaceVariables(Environment, String)
+	return Var_replaceVariables(Environment, String, pars)
 }
 x_EvaluateExpression(Environment, String)
 {

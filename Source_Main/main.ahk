@@ -63,6 +63,7 @@ AllTriggerClasses:=Object()
 
 ;Element_Includes_Start
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\Execute_Flow.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\New_List.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\New_Variable.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\Select_file.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\Set_Flow_Status.ahk
