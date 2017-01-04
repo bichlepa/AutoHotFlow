@@ -278,6 +278,8 @@ x_FlowEnableByName(Environment, p_FlowName)
 	}
 
 }
+
+
 x_FlowDisableByName(Environment, p_FlowName)
 {
 	global _Flows
@@ -290,6 +292,72 @@ x_FlowDisableByName(Environment, p_FlowName)
 	}
 
 }
+
+
+x_TriggerEnableByName(Environment, p_FlowName, p_TriggerName="")
+{
+	global _Flows
+	for forFlowID, forFlow in _Flows
+	{
+		if (forFlow.name = p_FlowName)
+		{
+			for forelementID, forelement in forFlow.allElements
+			{
+				;~ d(forelement, p_TriggerName)
+				if (p_TriggerName = "")
+				{
+					if (forElement.class = "trigger_manual" and forElement.defaultTrigger = True)
+					{
+						;~ d(forElement)
+						API_Main_enableOneTrigger(forFlow.id, forelement.id)
+					}
+				}
+				else
+				{
+					if (forelement.class = "trigger_Manual" and forElement.pars.id = p_TriggerName)
+					{
+						;~ d(forElement)
+						API_Main_enableOneTrigger(forFlow.id, forelement.id)
+					}
+				}
+			}
+		}
+	}
+
+}
+x_TriggerDisableByName(Environment, p_FlowName, p_TriggerName="")
+{
+	global _Flows
+	for forFlowID, forFlow in _Flows
+	{
+		if (forFlow.name = p_FlowName)
+		{
+			for forelementID, forelement in forFlow.allElements
+			{
+				;~ d(forelement, p_TriggerName)
+				if (p_TriggerName = "")
+				{
+					if (forElement.class = "trigger_manual" and forElement.defaultTrigger = True)
+					{
+						;~ d(forElement)
+						API_Main_disableOneTrigger(forFlow.id, forelement.id)
+					}
+				}
+				else
+				{
+					if (forelement.class = "trigger_Manual" and forElement.pars.id = p_TriggerName)
+					{
+						;~ d(forElement)
+						API_Main_disableOneTrigger(forFlow.id, forelement.id)
+					}
+				}
+				
+			}
+		}
+	}
+
+}
+
 x_FlowExecuteByName(Environment, p_FlowName, p_TriggerName = "", p_Variables ="", p_CallBackFunction ="")
 {
 	global _Flows
@@ -371,7 +439,7 @@ x_isTriggerEnabledByName(Environment, p_FlowName, p_TriggerName="")
 				;~ d(forelement, p_TriggerName)
 				if (p_TriggerName = "")
 				{
-					if (forElement.class = "trigger_manual" and forElement.default = True)
+					if (forElement.class = "trigger_manual" and forElement.defaultTrigger = True)
 					{
 						;~ d(forElement)
 						return forElement.enabled 
@@ -379,7 +447,7 @@ x_isTriggerEnabledByName(Environment, p_FlowName, p_TriggerName="")
 				}
 				else
 				{
-					if (forElement.type = "trigger" and forElement.pars.id = p_TriggerName)
+					if (forelement.class = "trigger_Manual" and forElement.pars.id = p_TriggerName)
 					{
 						;~ d(forElement)
 						return forElement.enabled 

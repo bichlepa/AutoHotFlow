@@ -209,3 +209,13 @@ x_GetAllManualTriggersOfFlowByName(p_FlowName)
 x_isTriggerEnabledByName(Environment, p_FlowName, p_TriggerName="")
 {
 }
+
+
+x_TriggerEnableByName(Environment, p_FlowName, p_TriggerName="")
+{
+}
+
+
+x_TriggerDisableByName(Environment, p_FlowName, p_TriggerName="")
+{
+}

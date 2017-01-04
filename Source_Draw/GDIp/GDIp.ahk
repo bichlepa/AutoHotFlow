@@ -1022,8 +1022,8 @@ gdip_DrawEverything(FlowObj)
 	FlowObj.draw.MoveButton2Exist:=MoveButton2Exist	
 	FlowObj.draw.SwitchOnButtonExist:=SwitchOnButtonExist
 	FlowObj.draw.SwitchOffButtonExist:=SwitchOffButtonExist
-	FlowObj.draw.StarFilledButtonExist:=SwitchOnButtonExist
-	FlowObj.draw.StarEmptyButtonExist:=SwitchOffButtonExist
+	FlowObj.draw.StarFilledButtonExist:=StarFilledButtonExist
+	FlowObj.draw.StarEmptyButtonExist:=StarEmptyButtonExist
 	
 	FlowObj.draw.middlePointOfPlusButtonX:=middlePointOfPlusButtonX * zoomFactor
 	FlowObj.draw.middlePointOfPlusButton2X:=middlePointOfPlusButton2X * zoomFactor
