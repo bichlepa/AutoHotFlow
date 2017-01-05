@@ -142,9 +142,8 @@ Element_enable_Trigger_Hotkey(Environment, ElementParameters)
 	
 	
 	
-	local uniqueID:=x_NewUniqueExecutionID(Environment)
-	functionObject:= x_NewExecutionFunctionObject(environment, uniqueID, "Element_trigger_Trigger_Hotkey", ElementParameters)
-	x_SetExecutionValue(uniqueID, "hotkey", temphotkey)
+	functionObject:= x_NewExecutionFunctionObject(environment, "Element_trigger_Trigger_Hotkey", ElementParameters)
+	x_SetExecutionValue(Environment, "hotkey", temphotkey)
 
 	hotkey,%temphotkey%,% functionObject, UseErrorLevel on
 	if ErrorLevel
@@ -172,9 +171,7 @@ Element_postTrigger_Trigger_Hotkey(Environment, ElementParameters="")
 
 Element_disable_Trigger_Hotkey(Environment, ElementParameters)
 {
-	uniqueID:=x_GetMyUniqueExecutionID(Environment)
-	temphotkey:=x_getExecutionValue(uniqueID, "hotkey")
-	x_DeleteMyUniqueExecutionID(Environment)
+	temphotkey:=x_getExecutionValue(Environment, "hotkey")
 	hotkey,%temphotkey%,off
 	x_disabled(Environment, "normal",  lang("The hotkey %1% was unset.",temphotkey))
 

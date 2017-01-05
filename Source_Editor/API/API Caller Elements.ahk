@@ -47,13 +47,13 @@ x_DeleteMyUniqueExecutionID(Environment)
 x_GetMyEnvironmentFromExecutionID(p_ExecutionID)
 {
 }
-x_SetExecutionValue(p_ExecutionID, p_name, p_Value)
+x_SetExecutionValue(Environment, p_name, p_Value)
 {
 }
-x_GetExecutionValue(p_ExecutionID, p_name)
+x_GetExecutionValue(Environment, p_name)
 {
 }
-x_NewExecutionFunctionObject(Environment, p_ExecutionID, p_ToCallFunction, params*)
+x_NewExecutionFunctionObject(Environment, p_ToCallFunction, params*)
 {
 	
 }
@@ -202,7 +202,7 @@ x_GetListOfFlowNames()
 }
 
 
-x_ExecuteInNewThread(Environment, p_uniqueID, p_functionObject, p_Code, p_VarsToImport, p_VarsToExport)
+x_ExecuteInNewAHKThread(Environment, p_functionObject, p_Code, p_VarsToImport, p_VarsToExport)
 {
 	
 }
@@ -292,7 +292,7 @@ x_GetFullPath(Environment, p_Path)
 {
 }
 
-x_ExecuteInNewThread_finishedExecution(p_uniqueID)
+x_ExecuteInNewAHKThread_finishedExecution(Environment)
 {
 }
 

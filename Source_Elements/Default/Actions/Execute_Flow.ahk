@@ -92,10 +92,9 @@ Element_run_Action_Execute_Flow(Environment, ElementParameters)
 			}
 			if (ElementParameters.WaitToFinish)
 			{
-				uniqueID:=x_NewUniqueExecutionID(Environment)
 				
-				functionObject:= x_NewExecutionFunctionObject(environment, uniqueID, "Action_Execute_Flow_FunctionExecutionFinished", ElementParameters)
-				x_SetExecutionValue(uniqueID, "hotkey", temphotkey)
+				functionObject:= x_NewExecutionFunctionObject(environment, "Action_Execute_Flow_FunctionExecutionFinished", ElementParameters)
+				x_SetExecutionValue(Environment, "hotkey", temphotkey)
 				x_FlowExecuteByName(Environment,FlowName, TriggerName, Variables, functionObject)
 				
 				return
@@ -127,9 +126,7 @@ Element_run_Action_Execute_Flow(Environment, ElementParameters)
 
 Action_Execute_Flow_FunctionExecutionFinished(Environment, p_result, p_variables, ElementParameters)
 {
-	uniqueID:=x_GetMyUniqueExecutionID(Environment)
-	functionObject:=x_getExecutionValue(uniqueID, "functionObject")
-	x_DeleteMyUniqueExecutionID(Environment)
+	functionObject:=x_getExecutionValue(Environment, "functionObject")
 	if (ElementParameters.ReturnVariables)
 		x_ImportInstanceVars(Environment, p_variables)
 	return x_finish(Environment,"normal")

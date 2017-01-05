@@ -51,9 +51,8 @@ Element_run_Action_Sleep(Environment, ElementParameters)
 	else if (ElementParameters.Unit=3) ;minutes
 		tempDuration:=ElementParameters.duration * 60000
 	
-	uniqueID:=x_NewUniqueExecutionID(Environment)
-	functionObject:= x_NewExecutionFunctionObject(environment, uniqueID, "Action_Sleep_EndSleep", ElementParameters)
-	x_SetExecutionValue(uniqueID, "functionObject", functionObject)
+	functionObject:= x_NewExecutionFunctionObject(environment, "Action_Sleep_EndSleep", ElementParameters)
+	x_SetExecutionValue(Environment, "functionObject", functionObject)
 	
 	SetTimer,% functionObject,-%tempDuration%
 	return
@@ -63,17 +62,13 @@ Element_run_Action_Sleep(Environment, ElementParameters)
 
 Element_stop_Action_Sleep(Environment, ElementParameters)
 {
-	uniqueID:=x_GetMyUniqueExecutionID(Environment)
-	functionObject:=x_getExecutionValue(uniqueID, "functionObject")
-	x_DeleteMyUniqueExecutionID(Environment)
+	functionObject:=x_getExecutionValue(Environment, "functionObject")
 	SetTimer, % functionObject, off
 }
 
 Action_Sleep_EndSleep(Environment, ElementParameters="")
 {
 	;~ d(ElementParameters)
-	x_GetMyUniqueExecutionID(Environment)
-	x_DeleteMyUniqueExecutionID(uniqueID)
 	x_finish(Environment,"normal")
 }
 

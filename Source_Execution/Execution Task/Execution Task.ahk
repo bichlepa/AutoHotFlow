@@ -1,4 +1,4 @@
-﻿
+﻿global global_AllExecutionIDs:=Object()
 
 executionTask()
 {
@@ -50,7 +50,11 @@ executionTask()
 						;~ d(oneElement, "ausführen: " oneElement.id)
 						;~ d(OneThread, "ausführen: " oneElement.id)
 						
-						
+						OneThread.UniqueID:= OneThread.instanceID "_" OneThread.threadID "_" OneThread.elementID "_" A_TickCount
+						OneThread.ElementExecutionValues:=Object()
+						global_AllExecutionIDs[OneThread.UniqueID]:=Object()
+						global_AllExecutionIDs[OneThread.UniqueID].Environment:=OneThread
+						;~ d(global_AllExecutionIDs, OneThread.UniqueID)
 						if Isfunc("Element_run_" oneElementClass )
 							Element_run_%oneElementClass%(OneThread, OneThread.elementpars) ;OneThread is the environment for element execution
 						else
@@ -139,7 +143,6 @@ executionTask()
 			break
 	}
 	
-	
 }
 
 finishExecutionOfElement(Environment, Result, Message = "")
@@ -153,6 +156,12 @@ finishExecutionOfElement(Environment, Result, Message = "")
 		_flows[Environment.FlowID].allElements[Environment.ElementID].state:="finished"
 	_flows[Environment.FlowID].allElements[Environment.ElementID].lastrun:=a_tickcount
 	_flows[Environment.FlowID].draw.mustDraw:=true
+	
+	;~ d(global_AllExecutionIDs, Environment.uniqueID)
+	global_AllExecutionIDs.delete(Environment.uniqueID)
+	Environment.UniqueID:=""
+	Environment.ElementExecutionValues:=""
+	
 	if (result = "Exception")
 	{
 		ThreadVariable_Set(Environment,"a_ErrorMessage",Message)

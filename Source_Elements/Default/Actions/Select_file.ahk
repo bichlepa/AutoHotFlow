@@ -110,22 +110,20 @@ Element_run_Action_Select_file(Environment, ElementParameters)
 	)
 	;Translations: lang("User dismissed the dialog without selecting a file or system refused to show the dialog.")
 	
-	uniqueID := x_NewUniqueExecutionID(Environment)
-	functionObject := x_NewExecutionFunctionObject(Environment, uniqueID, "Action_Select_file_FinishExecution", ElementParameters)
-	x_SetExecutionValue(uniqueID, "functionObject", functionObject)
-	x_SetExecutionValue(uniqueID, "Varname", Varname)
-	x_ExecuteInNewThread(Environment, uniqueID, functionObject, code, inputVars, outputVars)
+	functionObject := x_NewExecutionFunctionObject(Environment, "Action_Select_file_FinishExecution", ElementParameters)
+	x_SetExecutionValue(Environment, "functionObject", functionObject)
+	x_SetExecutionValue(Environment, "Varname", Varname)
+	x_ExecuteInNewAHKThread(Environment, functionObject, code, inputVars, outputVars)
 }
 
 Action_Select_file_FinishExecution(Environment, values, ElementParameters)
 {
 	;~ d(values,"asdf")
 	;~ d(ElementParameters,"asdf")
-	uniqueID:=x_GetMyUniqueExecutionID(Environment)
 	
 	if (values.result="normal")
 	{
-		varname := x_GetExecutionValue(uniqueID, "Varname")
+		varname := x_GetExecutionValue(Environment, "Varname")
 		x_SetVariable(Environment, Varname, values.selectedFile)
 		x_finish(Environment,values.result, values.message)
 	}
@@ -133,7 +131,6 @@ Action_Select_file_FinishExecution(Environment, values, ElementParameters)
 	{
 		x_finish(Environment,"exception", values.message)
 	}
-	x_DeleteMyUniqueExecutionID(uniqueID)
 	
 }
 

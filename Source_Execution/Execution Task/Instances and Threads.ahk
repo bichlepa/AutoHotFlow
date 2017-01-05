@@ -153,6 +153,10 @@ stopInstance(p_instance)
 				oneElement.state:="finished"
 			oneElement.lastrun:=a_tickcount
 			
+			
+			
+			global_AllExecutionIDs.delete(OneThread.uniqueID)
+			
 			if Isfunc("Element_stop_" oneElementClass )
 				Element_stop_%oneElementClass%(OneThread, OneThread.elementpars)
 			

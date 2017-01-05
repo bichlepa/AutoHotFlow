@@ -43,7 +43,7 @@ Element_run_Condition_Debug_Dialog(Environment, ElementParameters)
 	global
 	
 	local tempGUIID, tempVariableNames, tempTitle, tempallVars
-	tempGUIID:=x_NewUniqueExecutionID(Environment)
+	tempGUIID:=x_GetMyUniqueExecutionID(Environment)
 	
 	;Create GUI
 	gui,%tempGUIID%:+LabelDebug_DialogGUI ;This label leads to a jump label beneath. It's needed if user closes the window
@@ -119,7 +119,7 @@ Element_run_Condition_Debug_Dialog(Environment, ElementParameters)
 		tempVariableNames.=tempVarName "|"
 	}
 	
-	x_SetExecutionValue(tempGUIID, "VariableNames",tempVariableNames)
+	x_SetExecutionValue(environment, "VariableNames",tempVariableNames)
 	guicontrol,%tempGUIID%:,Condition_Debug_DialogAllVars%tempGUIID%,%tempVariableNames%
 	return
 	
@@ -151,12 +151,12 @@ Element_run_Condition_Debug_Dialog(Environment, ElementParameters)
 	{
 		tempVarContent:=strobj(tempVarContent)
 		guicontrol,%a_gui%:,Condition_Debug_DialogEditField%a_gui%,%tempVarContent%
-		x_SetExecutionValue(a_gui, "SelectedVarType","object")
+		x_SetExecutionValue(environment, "SelectedVarType","object")
 	}
 	else if tempVarType=normal
 	{
 		guicontrol,%a_gui%:,Condition_Debug_DialogEditField%a_gui%,%tempVarContent%
-		x_SetExecutionValue(a_gui, "SelectedVarType","normal")
+		x_SetExecutionValue(environment, "SelectedVarType","normal")
 	}
 	;~ guicontrol,%a_gui%:,Condition_Debug_DialogEditField%a_gui%,%tempVarContent%
 	return
@@ -169,7 +169,7 @@ Element_run_Condition_Debug_Dialog(Environment, ElementParameters)
 	environment:=x_GetMyEnvironmentFromExecutionID(a_gui)
 	
 	tempvarname:=Condition_Debug_DialogAllVars%a_gui%
-	tempVarType:=x_GetExecutionValue(a_gui, "SelectedVarType") 
+	tempVarType:=x_GetExecutionValue(environment, "SelectedVarType") 
 	;~ d(tempVarType)
 	tempLocation:=x_GetVariableLocation(environment,tempvarname)
 	
@@ -196,8 +196,8 @@ Element_run_Condition_Debug_Dialog(Environment, ElementParameters)
 	gui,%a_gui%:submit,nohide
 	
 	environment:=x_GetMyEnvironmentFromExecutionID(a_gui)
-	tempVarType:=x_GetExecutionValue(a_gui, "SelectedVarType") 
-	tempVariableNames:=x_GetExecutionValue(a_gui, "VariableNames") 
+	tempVarType:=x_GetExecutionValue(environment, "SelectedVarType") 
+	tempVariableNames:=x_GetExecutionValue(environment, "VariableNames") 
 	tempvarname:=Condition_Debug_DialogAllVars%a_gui%
 	
 	;~ MsgBox %tempVariableNames%
@@ -233,9 +233,6 @@ Element_run_Condition_Debug_Dialog(Environment, ElementParameters)
 	else
 		x_finish(Environment, "no")
 	
-	;Remove this GUI from the list of all GUIs
-	x_DeleteMyUniqueExecutionID(a_gui)
-	
 	return
 	
 	Debug_DialogGUIclose:
@@ -250,8 +247,6 @@ Element_run_Condition_Debug_Dialog(Environment, ElementParameters)
 	x_finish(Environment, "exception")
 	
 
-	
-	x_DeleteMyUniqueExecutionID(a_gui)
 	return
 	
 	
@@ -264,7 +259,6 @@ Element_stop_Condition_Debug_Dialog(Environment, ElementParameters)
 	gui,%tempGUIID%:destroy
 	;~ logger("f0","Instance " tempDebug_DialogBut.instanceID " - " tempDebug_DialogBut.type " '" tempDebug_DialogBut.name "': Error! User dismissed the dialog")
 	
-	x_DeleteMyUniqueExecutionID(tempGUIID)
 	return
 }
 

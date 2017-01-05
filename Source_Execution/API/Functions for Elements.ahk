@@ -131,57 +131,32 @@ x_GetListOfFlowNames()
 }
 
 
-x_NewUniqueExecutionID(Environment)
-{
-	global
-	if not IsObject(global_AllExecutionIDs)
-		global_AllExecutionIDs:=Object()
-	local tempID:="GUI_" Environment.instanceID "_" Environment.threadID "_" Environment.elementID
-	
-	global_AllExecutionIDs[tempID]:={id: tempID, instanceID: Environment.instanceID, threadID:Environment.threadID, elementID:Environment.elementID, environment: environment, customValues:Object()}
-	
-	return tempID
-}
 x_GetMyUniqueExecutionID(Environment)
 {
-	global
-	local tempID:="GUI_" Environment.instanceID "_" Environment.threadID "_" Environment.elementID
-	return tempID
+	return Environment.UniqueID
 }
-x_DeleteMyUniqueExecutionID(Environment)
-{
-	global
-	if isobject(Environment)
-	{
-		local tempID:="GUI_" Environment.instanceID "_" Environment.threadID "_" Environment.elementID
-	}
-	else
-	{
-		tempID:=Environment
-	}
-	global_AllExecutionIDs.delete(tempID)
-}
+
 x_GetMyEnvironmentFromExecutionID(p_ExecutionID)
 {
 	global
 	return global_AllExecutionIDs[p_ExecutionID].environment
 }
-x_SetExecutionValue(p_ExecutionID, p_name, p_Value)
+x_SetExecutionValue(Environment, p_name, p_Value)
 {
 	global
-	global_AllExecutionIDs[p_ExecutionID].customValues[p_name]:=p_Value
+	global_AllExecutionIDs[Environment.uniqueID].customValues[p_name]:=p_Value
 }
-x_GetExecutionValue(p_ExecutionID, p_name)
+x_GetExecutionValue(Environment, p_name)
 {
 	global
-	return global_AllExecutionIDs[p_ExecutionID].customValues[p_name]
+	return global_AllExecutionIDs[Environment.uniqueID].customValues[p_name]
 }
 
-x_NewExecutionFunctionObject(Environment, p_ExecutionID, p_ToCallFunction, params*)
+x_NewExecutionFunctionObject(Environment, p_ToCallFunction, params*)
 {
 	oneFunctionObject:=new Class_FunctionObject(Environment, p_ToCallFunction, params*)
 	
-	global_AllExecutionIDs[p_ExecutionID].ExecutionFunctionObjects[p_ToCallFunction]:=oneFunctionObject
+	global_AllExecutionIDs[Environment.uniqueID].ExecutionFunctionObjects[p_ToCallFunction]:=oneFunctionObject
 	return oneFunctionObject
 }
 
@@ -518,22 +493,22 @@ x_GetFullPath(Environment, p_Path)
 	return path
 }
 
-x_ExecuteInNewThread(Environment, p_uniqueID, p_functionObject, p_Code, p_VarsToImport, p_VarsToExport)
+x_ExecuteInNewAHKThread(Environment, p_functionObject, p_Code, p_VarsToImport, p_VarsToExport)
 {
 	global _share, global_AllExecutionIDs
-	if not isobject(global_AllExecutionIDs[p_uniqueID])
-		global_AllExecutionIDs[p_uniqueID]:=object()
-	global_AllExecutionIDs[p_uniqueID].ExeInNewThread:=object()
-	global_AllExecutionIDs[p_uniqueID].ExeInNewThread.functionObject:=p_functionObject
+	if not isobject(global_AllExecutionIDs[Environment.uniqueID])
+		global_AllExecutionIDs[Environment.uniqueID]:=object()
+	global_AllExecutionIDs[Environment.uniqueID].ExeInNewThread:=object()
+	global_AllExecutionIDs[Environment.uniqueID].ExeInNewThread.functionObject:=p_functionObject
 	
-	_share.temp[p_uniqueID]:= Object()
-	_share.temp[p_uniqueID].sharedObject := CriticalObject()
-	_share.temp[p_uniqueID].sharedObject.varsToImport:=p_VarsToImport
-	_share.temp[p_uniqueID].sharedObject.varsToExport:=p_VarsToExport
-	_share.temp[p_uniqueID].sharedObject.varsExported:=Object()
-	;~ d(_share.temp[p_uniqueID])
-	preCode := "ahf_uniqueID :=""" p_uniqueID """`n"
-	preCode .= "ahf_sharedObject := CriticalObject(" (&_share.temp[p_uniqueID].sharedObject) ")`n"
+	_share.temp[Environment.uniqueID]:= Object()
+	_share.temp[Environment.uniqueID].sharedObject := CriticalObject()
+	_share.temp[Environment.uniqueID].sharedObject.varsToImport:=p_VarsToImport
+	_share.temp[Environment.uniqueID].sharedObject.varsToExport:=p_VarsToExport
+	_share.temp[Environment.uniqueID].sharedObject.varsExported:=Object()
+	;~ d(_share.temp[Environment.uniqueID])
+	preCode := "ahf_uniqueID :=""" Environment.uniqueID """`n"
+	preCode .= "ahf_sharedObject := CriticalObject(" (&_share.temp[Environment.uniqueID].sharedObject) ")`n"
 	preCode .= "onexit, ahf_onexit`n"
 	preCode .= "ahf_parentAHKThread := AhkExported()`n"
 	preCode .= "for ahf_varname, ahf_varvalue in ahf_sharedObject.varsToImport`n"
@@ -551,13 +526,14 @@ x_ExecuteInNewThread(Environment, p_uniqueID, p_functionObject, p_Code, p_VarsTo
 	AhkThread("`n" preCode "`n" p_Code "`n" postCode)
 	
 }
-x_ExecuteInNewThread_finishedExecution(p_uniqueID)
+x_ExecuteInNewAHKThread_finishedExecution(p_ExecutionID)
 {
 	global _share, global_AllExecutionIDs
-	;~ d(_share.temp[p_uniqueID],p_uniqueID)
-	;~ d(global_AllExecutionIDs[p_uniqueID],p_uniqueID)
-	functionObject:=global_AllExecutionIDs[p_uniqueID].ExeInNewThread.functionObject
-	%functionObject%(_share.temp[p_uniqueID].sharedObject.varsExported)
+	Environment:=x_GetMyEnvironmentFromExecutionID(p_ExecutionID)
+	;~ d(_share.temp[Environment.uniqueID],Environment.uniqueID)
+	;~ d(global_AllExecutionIDs[Environment.uniqueID],Environment.uniqueID)
+	functionObject:=global_AllExecutionIDs[Environment.uniqueID].ExeInNewThread.functionObject
+	%functionObject%(_share.temp[Environment.uniqueID].sharedObject.varsExported)
 }
 
 
