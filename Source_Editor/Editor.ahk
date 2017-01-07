@@ -48,6 +48,8 @@ lang_Init(my_ScriptDir "\language", my_WorkingDir)
 #include source_Common\Debug\Debug.ahk
 #include source_Common\Debug\Logger.ahk
 #include source_Common\Defaults\Default values.ahk
+#include source_Common\Variables\global variables.ahk
+#include source_Common\Variables\expression.ahk
 
 AllElementClasses:=Object()
 AllTriggerClasses:=Object()

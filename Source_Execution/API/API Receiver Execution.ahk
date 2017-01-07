@@ -73,7 +73,7 @@ API_Call_Execution_externalFlowFinish(par_UniqueID)
 	local retval
 	logger("t2", A_ThisFunc " call received")
 	
-	retval := x_ExecuteInNewAHKThread_finishedExecution(par_UniqueID)
+	retval := ExecuteInNewAHKThread_finishedExecution(par_UniqueID)
 	
 	logger("t2", A_ThisFunc " call finished")
 	return retval

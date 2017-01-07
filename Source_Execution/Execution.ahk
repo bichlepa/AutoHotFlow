@@ -27,6 +27,8 @@ lang_Init(my_ScriptDir "\language", my_WorkingDir)
 #include Source_Common\Debug\Debug.ahk
 #include source_Common\Debug\Logger.ahk
 #include Source_Common\Defaults\Default values.ahk
+#include source_Common\variables\Global variables.ahk
+#include source_Common\Variables\Expression.ahk
 #include source_Common\Multithreading\API Caller Main.ahk
 #include lib\Random Word List\Random Word List.ahk
 
@@ -35,7 +37,6 @@ lang_Init(my_ScriptDir "\language", my_WorkingDir)
 #include Source_Execution\execution task\instances and threads.ahk
 #include Source_Execution\API\API receiver Execution.ahk
 #include Source_Execution\Variables\Variables.ahk
-#include Source_Execution\Variables\Expression.ahk
 #include Source_Execution\Trigger\Trigger.ahk
 
 AllElementClasses:=Object()

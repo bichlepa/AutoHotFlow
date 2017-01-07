@@ -26,7 +26,7 @@ Element_getParameters_Action_Stop_Flow()
 	return ["flowName"]
 }
 
-Element_getParametrizationDetails_Action_Stop_Flow()
+Element_getParametrizationDetails_Action_Stop_Flow(Environment)
 {
 	parametersToEdit:=Object()
 	parametersToEdit.push({type: "Label", label: lang("Flow_name")})
@@ -35,13 +35,20 @@ Element_getParametrizationDetails_Action_Stop_Flow()
 	return parametersToEdit
 }
 
+Element_GenerateName_Action_Stop_Flow(Environment, ElementParameters)
+{
+	return % lang("Stop_Flow") ": " ElementParameters.flowName
+	
+}
+
 Element_run_Action_Stop_Flow(Environment, ElementParameters)
 {
 	FlowName := x_replaceVariables(Environment, ElementParameters.flowName)
 	
-	if x_FlowExistsByName(Environment,FlowName)
+	if x_FlowExistsByName(FlowName)
 	{
-		x_FlowStopByName(Environment,FlowName)
+		FlowID:=x_getFlowIDByName(FlowName)
+		x_FlowStop(FlowID)
 		return x_finish(Environment,"normal")
 		
 	}
@@ -50,10 +57,4 @@ Element_run_Action_Stop_Flow(Environment, ElementParameters)
 		return x_finish(Environment,"exception",lang("Flow '%1%' does not exist",FlowName))
 	}
 	return
-}
-
-Element_GenerateName_Action_Stop_Flow(Environment, ElementParameters)
-{
-	return % lang("Stop_Flow") ": " ElementParameters.flowName
-	
 }

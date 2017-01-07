@@ -1,11 +1,11 @@
 ﻿
 /* Evaluation of an Expression
 */
-Var_EvaluateExpression(environment,ExpressionString)
+Var_EvaluateExpression(environment,ExpressionString, func_ReplaceVariables, func_GetVariable)
 {
 	logger("f3","Evaluating expression " ExpressionString)
 	
-	ExpressionString:=A_Space var_replaceVariables(environment,ExpressionString) A_Space
+	ExpressionString:=A_Space %func_ReplaceVariables%(environment,ExpressionString) A_Space
 	
 	StringReplace,ExpressionString,ExpressionString,>=,≥,all
 	StringReplace,ExpressionString,ExpressionString,<=,≤,all
@@ -18,14 +18,14 @@ Var_EvaluateExpression(environment,ExpressionString)
 	StringReplace,ExpressionString,ExpressionString,&&,∧,all
 	StringReplace,ExpressionString,ExpressionString,% " not ",% " ¬",all
 	StringReplace,ExpressionString,ExpressionString,% "!",% "¬",all
-	return var_EvaluateExpressionRecurse(environment,ExpressionString)
+	return var_EvaluateExpressionRecurse(environment,ExpressionString, func_GetVariable)
 }
 
 /* Evaluation of an Expression
 Thanks to Sunshine for the easy to understand instruction. See http://www.sunshine2k.de/coding/java/SimpleParser/SimpleParser.html
 If anybody knows how to implement more operands and make this more flexible, or even support scripts, please contribute!
 */
-var_EvaluateExpressionRecurse(environment,ExpressionString)
+var_EvaluateExpressionRecurse(environment,ExpressionString, func_GetVariable)
 {
 	;MsgBox %ExpressionString%
 	
@@ -40,8 +40,8 @@ var_EvaluateExpressionRecurse(environment,ExpressionString)
 	{
 		;MsgBox %  leftSubstring FoundOpreand rightSubstring 
 		if ( FoundOpreand != "¬")
-			resleft:= var_EvaluateExpressionRecurse(environment,leftSubstring)
-		resright:=var_EvaluateExpressionRecurse(environment,rightSubstring)
+			resleft:= var_EvaluateExpressionRecurse(environment,leftSubstring, func_GetVariable)
+		resright:=var_EvaluateExpressionRecurse(environment,rightSubstring, func_GetVariable)
 		;MsgBox %FoundOpreand% %resleft% %resright%
 		if FoundOpreand = +
 			return resleft + resright
@@ -84,7 +84,7 @@ var_EvaluateExpressionRecurse(environment,ExpressionString)
 		{
 			StringTrimLeft,ExpressionString,ExpressionString,1
 			StringTrimRight,ExpressionString,ExpressionString,1
-			return (var_EvaluateExpressionRecurse(environment,ExpressionString))
+			return (var_EvaluateExpressionRecurse(environment,ExpressionString, func_GetVariable))
 		}
 		   
 		else
@@ -97,7 +97,7 @@ var_EvaluateExpressionRecurse(environment,ExpressionString)
 	if ExpressionString is number
 		return ExpressionString
 	
-	return Var_Get(environment,ExpressionString)
+	return %func_GetVariable%(environment,ExpressionString)
 	
 	
 }

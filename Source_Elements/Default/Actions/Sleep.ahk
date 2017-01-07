@@ -31,7 +31,7 @@ Element_getParameters_Action_Sleep()
 	return ["duration", "Unit"]
 }
 
-Element_getParametrizationDetails_Action_Sleep()
+Element_getParametrizationDetails_Action_Sleep(Environment)
 {
 	parametersToEdit:=Object()
 	parametersToEdit.push({type: "Label", label:  lang("Duration")})
@@ -39,37 +39,6 @@ Element_getParametrizationDetails_Action_Sleep()
 	parametersToEdit.push({type: "Radio", id: "Unit", default: 2, choices: [lang("Milliseconds"), lang("Seconds"), lang("Minutes")]})
 
 	return parametersToEdit
-}
-
-Element_run_Action_Sleep(Environment, ElementParameters)
-{
-	
-	if (ElementParameters.Unit=1) ;Milliseconds
-		tempDuration:=ElementParameters.duration
-	else if (ElementParameters.Unit=2) ;Seconds
-		tempDuration:=ElementParameters.duration * 1000
-	else if (ElementParameters.Unit=3) ;minutes
-		tempDuration:=ElementParameters.duration * 60000
-	
-	functionObject:= x_NewExecutionFunctionObject(environment, "Action_Sleep_EndSleep", ElementParameters)
-	x_SetExecutionValue(Environment, "functionObject", functionObject)
-	
-	SetTimer,% functionObject,-%tempDuration%
-	return
-	
-	
-}
-
-Element_stop_Action_Sleep(Environment, ElementParameters)
-{
-	functionObject:=x_getExecutionValue(Environment, "functionObject")
-	SetTimer, % functionObject, off
-}
-
-Action_Sleep_EndSleep(Environment, ElementParameters="")
-{
-	;~ d(ElementParameters)
-	x_finish(Environment,"normal")
 }
 
 Element_GenerateName_Action_Sleep(Environment, ElementParameters)
@@ -86,4 +55,38 @@ Element_GenerateName_Action_Sleep(Environment, ElementParameters)
 	return lang("Sleep") ": " duration
 	
 	
+}
+
+Element_run_Action_Sleep(Environment, ElementParameters)
+{
+	
+	if (ElementParameters.Unit=1) ;Milliseconds
+		tempDuration:=ElementParameters.duration
+	else if (ElementParameters.Unit=2) ;Seconds
+		tempDuration:=ElementParameters.duration * 1000
+	else if (ElementParameters.Unit=3) ;minutes
+		tempDuration:=ElementParameters.duration * 60000
+	
+	functionObject:= x_NewExecutionFunctionObject(environment, "Action_Sleep_EndSleep", ElementParameters)
+	x_SetExecutionValue(Environment, "functionObject", functionObject)
+	
+	SetTimer,% functionObject,-%tempDuration%
+	;~ d(functionObject)
+	return
+	
+	
+}
+
+Element_stop_Action_Sleep(Environment, ElementParameters)
+{
+	;~ d(Environment)
+	functionObject:=x_getExecutionValue(Environment, "functionObject")
+	;~ d(functionObject)
+	SetTimer, % functionObject, off
+}
+
+Action_Sleep_EndSleep(Environment, ElementParameters="")
+{
+	;~ d(ElementParameters)
+	x_finish(Environment,"normal")
 }

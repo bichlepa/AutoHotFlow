@@ -31,7 +31,7 @@ Element_getParameters_Action_New_variable()
 	return ["Varname", "expression", "VarValue"]
 }
 
-Element_getParametrizationDetails_Action_New_variable()
+Element_getParametrizationDetails_Action_New_variable(Environment)
 {
 	parametersToEdit:=Object()
 	parametersToEdit.push({type: "Label", label: lang("Variable_name")})
@@ -40,6 +40,13 @@ Element_getParametrizationDetails_Action_New_variable()
 	parametersToEdit.push({type: "Edit", id: ["VarValue","expression"], default: ["New element",1], content: "StringOrExpression", WarnIfEmpty: true})
 
 	return parametersToEdit
+}
+
+Element_GenerateName_Action_New_variable(Environment, ElementParameters)
+{
+	global
+	return % lang("New_variable") " - " ElementParameters.Varname " = " ElementParameters.VarValue
+	
 }
 
 Element_run_Action_New_variable(Environment, ElementParameters)
@@ -65,11 +72,4 @@ Element_run_Action_New_variable(Environment, ElementParameters)
 	;Always call v_finish() before return
 	x_finish(Environment, "normal")
 	return
-}
-
-Element_GenerateName_Action_New_variable(Environment, ElementParameters)
-{
-	global
-	return % lang("New_variable") " - " ElementParameters.Varname " = " ElementParameters.VarValue
-	
 }

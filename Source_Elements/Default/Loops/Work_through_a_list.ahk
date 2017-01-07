@@ -26,7 +26,7 @@ Element_getParameters_Loop_Work_through_a_list()
 	return ["Varname", "CopyFirst"]
 }
 
-Element_getParametrizationDetails_Loop_Work_through_a_list()
+Element_getParametrizationDetails_Loop_Work_through_a_list(Environment)
 {
 	parametersToEdit:=Object()
 	parametersToEdit.push({type: "Label", label: lang("Variable_name")})
@@ -35,6 +35,12 @@ Element_getParametrizationDetails_Loop_Work_through_a_list()
 	parametersToEdit.push({type: "Checkbox", id: "CopyFirst", default: 1, label: lang("Copy list before first iteration")})
 
 	return parametersToEdit
+}
+
+Element_GenerateName_Loop_Work_through_a_list(Environment, ElementParameters)
+{
+	global
+	return lang("Work_through_a_list") ": " ElementParameters.Varname 
 }
 
 Element_run_Loop_Work_through_a_list(Environment, ElementParameters)
@@ -128,13 +134,4 @@ Element_run_Loop_Work_through_a_list(Environment, ElementParameters)
 	}
 
 
-}
-
-Element_GenerateName_Loop_Work_through_a_list(Environment, ElementParameters)
-{
-	global
-	return lang("Work_through_a_list") ": " ElementParameters.Varname 
-	
-
-	
 }

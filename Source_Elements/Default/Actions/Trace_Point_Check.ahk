@@ -31,14 +31,19 @@ Element_getParameters_Action_Trace_Point_Check()
 	return ["MustPassTracepointsAll", "MustPassTracepoints", "MustNotPassTracepointsAll", "MustNotPassTracepoints", "Wait"]
 }
 
-Element_getParametrizationDetails_Action_Trace_Point_Check()
+Element_getParametrizationDetails_Action_Trace_Point_Check(Environment)
 {
-	allTracePointElements := x_getAllElementsOfClass("", "Action_Trace_Point")
+	
+	FlowID:=x_GetMyFlowID(Environment)
+	
+	allTracePointElementIDs := x_getAllElementIDsOfClass(FlowID, "Action_Trace_Point")
 	;~ d(allTracePointElements)
 	allTracePointIDs:=Object()
-	for oneIndex, oneElement in allTracePointElements 
+	for oneIndex, oneElementID in allTracePointElementIDs 
 	{
-		allTracePointIDs.push(oneElement.pars.id " (" oneElement.id ")")
+		elementpars:=x_getElementPars(FlowID, oneElementID)
+		;~ d(elementpars)
+		allTracePointIDs.push(elementpars.id " (" oneElementID ")")
 	}
 	
 	parametersToEdit:=Object()
@@ -55,19 +60,57 @@ Element_getParametrizationDetails_Action_Trace_Point_Check()
 	return parametersToEdit
 }
 
+Element_GenerateName_Action_Trace_Point_Check(Environment, ElementParameters)
+{
+	global
+	return % lang("Trace_Point_Check")
+	
+}
+
+Element_CheckSettings_Action_Trace_Point_Check(Environment, ElementParameters)
+{
+	if (ElementParameters.MustPassTracepointsAll = True)
+	{
+		x_Par_Disable(Environment,"MustPassTracepoints")
+		x_Par_Disable(Environment,"MustNotPassTracepointsAll")
+		x_Par_SetValue(Environment,"MustNotPassTracepointsAll", False)
+	}
+	else
+	{
+		x_Par_Enable(Environment,"MustPassTracepoints")
+		x_Par_Enable(Environment,"MustNotPassTracepointsAll")
+	}
+	
+	if (ElementParameters.MustNotPassTracepointsAll = True)
+	{
+		x_Par_Disable(Environment,"MustNotPassTracepoints")
+		x_Par_Disable(Environment,"MustPassTracepointsAll")
+		x_Par_SetValue(Environment,"MustPassTracepointsAll", False)
+	}
+	else
+	{
+		x_Par_Enable(Environment,"MustNotPassTracepoints")
+		x_Par_Enable(Environment,"MustPassTracepointsAll")
+	}
+	
+	
+}
+
 Element_run_Action_Trace_Point_Check(Environment, ElementParameters)
 {
 	;~ d(ElementParameters, "element parameters")
+	FlowID:=x_GetMyFlowID(Environment)
 	if (ElementParameters.MustPassTracepointsAll or ElementParameters.MustNotPassTracepointsAll)
 	{
-		allTracePointElements := x_getAllElementsOfClass(Environment, "Action_Trace_Point")
+		allTracePointElementIDs := x_getAllElementIDsOfClass(FlowID, "Action_Trace_Point")
 	}
 	if (ElementParameters.MustPassTracepointsAll)
 	{
 		allTracePointMustPass:=Object()
-		for oneIndex, oneElement in allTracePointElements 
+		for oneIndex, oneElementID in allTracePointElementIDs 
 		{
-			allTracePointMustPass.push(oneElement.pars.id " (" oneElement.id ")")
+			elementpars:=x_getElementPars(FlowID, oneElementID)
+			allTracePointMustPass.push(elementpars.id " (" oneElementID ")")
 		}
 	}
 	else
@@ -77,9 +120,10 @@ Element_run_Action_Trace_Point_Check(Environment, ElementParameters)
 	if (ElementParameters.MustNotPassTracepointsAll)
 	{
 		allTracePointMustNotPass:=Object()
-		for oneIndex, oneElement in allTracePointElements 
+		for oneIndex, oneElementID in allTracePointElementIDs 
 		{
-			allTracePointMustNotPass.push(oneElement.pars.id " (" oneElement.id ")")
+			elementpars:=x_getElementPars(FlowID, oneElementID)
+			allTracePointMustNotPass.push(elementpars.id " (" oneElementID ")")
 		}
 	}
 	else
@@ -199,40 +243,4 @@ Element_run_Action_Trace_Point_Check(Environment, ElementParameters)
 	
 	;Always call v_finish() before return
 	return
-}
-
-Element_GenerateName_Action_Trace_Point_Check(Environment, ElementParameters)
-{
-	global
-	return % lang("Trace_Point_Check")
-	
-}
-
-Element_CheckSettings_Action_Trace_Point_Check(Environment, ElementParameters)
-{
-	if (ElementParameters.MustPassTracepointsAll = True)
-	{
-		x_Par_Disable(Environment,"MustPassTracepoints")
-		x_Par_Disable(Environment,"MustNotPassTracepointsAll")
-		x_Par_SetValue(Environment,"MustNotPassTracepointsAll", False)
-	}
-	else
-	{
-		x_Par_Enable(Environment,"MustPassTracepoints")
-		x_Par_Enable(Environment,"MustNotPassTracepointsAll")
-	}
-	
-	if (ElementParameters.MustNotPassTracepointsAll = True)
-	{
-		x_Par_Disable(Environment,"MustNotPassTracepoints")
-		x_Par_Disable(Environment,"MustPassTracepointsAll")
-		x_Par_SetValue(Environment,"MustPassTracepointsAll", False)
-	}
-	else
-	{
-		x_Par_Enable(Environment,"MustNotPassTracepoints")
-		x_Par_Enable(Environment,"MustPassTracepointsAll")
-	}
-	
-	
 }

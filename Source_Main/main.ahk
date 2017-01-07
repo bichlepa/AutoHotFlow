@@ -56,12 +56,15 @@ lang_Init(my_ScriptDir "\language", my_WorkingDir)
 #include source_Common\Debug\Debug.ahk
 #include source_Common\Debug\Logger.ahk
 #include source_Common\Defaults\Default values.ahk
+#include source_Common\variables\global variables.ahk
+#include source_Common\variables\expression.ahk
 
 AllElementClasses:=Object()
 AllTriggerClasses:=Object()
 
 
 ;Element_Includes_Start
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\Beep.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\Execute_Flow.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\New_List.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\New_Variable.ahk

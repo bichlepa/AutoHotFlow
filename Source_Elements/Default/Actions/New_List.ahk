@@ -31,7 +31,7 @@ Element_getParameters_Action_New_List()
 	return ["Varname", "InitialContent", "VarValue", "expression", "VarValues", "DelimiterLinefeed", "DelimiterComma", "DelimiterSemicolon", "DelimiterSpace", "WhichPosition", "Position", "expressionPos"]
 }
 
-Element_getParametrizationDetails_Action_New_List()
+Element_getParametrizationDetails_Action_New_List(Environment)
 {
 	parametersToEdit:=Object()
 	parametersToEdit.push({type: "Label", label: lang("Variable_name")})
@@ -51,6 +51,68 @@ Element_getParametrizationDetails_Action_New_List()
 	
 
 	return parametersToEdit
+}
+
+Element_GenerateName_Action_New_List(Environment, ElementParameters)
+{
+	if ElementParameters.InitialContent=1
+	{
+		Text.= lang("New empty list") " " ElementParameters.Varname
+	}
+	else if ElementParameters.InitialContent=2
+	{
+		Text.= lang("New list %1% with initial content",ElementParameters.Varname) ": "
+		Text.=  ElementParameters.VarValue
+		
+	}
+	else
+	{
+		Text.= lang("New list %1% with initial content",ElementParameters.Varname) ": "
+		Text.=  ElementParameters.VarValues
+		
+	}
+	
+	return % Text
+	
+}
+
+
+Element_CheckSettings_Action_New_List(Environment, ElementParameters)
+{
+	static oldParFlowName
+	static oldParThisFlow
+	
+	if (ElementParameters.InitialContent = 2) ;one element
+	{
+		x_Par_Enable(Environment,"VarValue")
+		x_Par_Enable(Environment,"WhichPosition")
+		x_Par_Enable(Environment,"Position", (ElementParameters.WhichPosition = 2))
+	}
+	else
+	{
+		x_Par_Disable(Environment,"VarValue")
+		x_Par_Disable(Environment,"WhichPosition")
+		x_Par_Disable(Environment,"Position")
+	}
+	
+	if (ElementParameters.InitialContent = 3) ;Multiple elements
+	{
+		x_Par_Enable(Environment,"VarValues")
+		x_Par_Enable(Environment,"DelimiterLinefeed")
+		x_Par_Enable(Environment,"DelimiterComma")
+		x_Par_Enable(Environment,"DelimiterSemicolon")
+		x_Par_Enable(Environment,"DelimiterSpace")
+	}
+	else
+	{
+		x_Par_Disable(Environment,"VarValues")
+		x_Par_Disable(Environment,"DelimiterLinefeed")
+		x_Par_Disable(Environment,"DelimiterComma")
+		x_Par_Disable(Environment,"DelimiterSemicolon")
+		x_Par_Disable(Environment,"DelimiterSpace")
+	}
+	
+	
 }
 
 Element_run_Action_New_List(Environment, ElementParameters)
@@ -124,66 +186,4 @@ Element_run_Action_New_List(Environment, ElementParameters)
 	;Always call v_finish() before return
 	x_finish(Environment, "normal")
 	return
-}
-
-Element_GenerateName_Action_New_List(Environment, ElementParameters)
-{
-	if ElementParameters.InitialContent=1
-	{
-		Text.= lang("New empty list") " " ElementParameters.Varname
-	}
-	else if ElementParameters.InitialContent=2
-	{
-		Text.= lang("New list %1% with initial content",ElementParameters.Varname) ": "
-		Text.=  ElementParameters.VarValue
-		
-	}
-	else
-	{
-		Text.= lang("New list %1% with initial content",ElementParameters.Varname) ": "
-		Text.=  ElementParameters.VarValues
-		
-	}
-	
-	return % Text
-	
-}
-
-
-Element_CheckSettings_Action_New_List(Environment, ElementParameters)
-{
-	static oldParFlowName
-	static oldParThisFlow
-	
-	if (ElementParameters.InitialContent = 2) ;one element
-	{
-		x_Par_Enable(Environment,"VarValue")
-		x_Par_Enable(Environment,"WhichPosition")
-		x_Par_Enable(Environment,"Position", (ElementParameters.WhichPosition = 2))
-	}
-	else
-	{
-		x_Par_Disable(Environment,"VarValue")
-		x_Par_Disable(Environment,"WhichPosition")
-		x_Par_Disable(Environment,"Position")
-	}
-	
-	if (ElementParameters.InitialContent = 3) ;Multiple elements
-	{
-		x_Par_Enable(Environment,"VarValues")
-		x_Par_Enable(Environment,"DelimiterLinefeed")
-		x_Par_Enable(Environment,"DelimiterComma")
-		x_Par_Enable(Environment,"DelimiterSemicolon")
-		x_Par_Enable(Environment,"DelimiterSpace")
-	}
-	else
-	{
-		x_Par_Disable(Environment,"VarValues")
-		x_Par_Disable(Environment,"DelimiterLinefeed")
-		x_Par_Disable(Environment,"DelimiterComma")
-		x_Par_Disable(Environment,"DelimiterSemicolon")
-		x_Par_Disable(Environment,"DelimiterSpace")
-	}
-	
-	
 }

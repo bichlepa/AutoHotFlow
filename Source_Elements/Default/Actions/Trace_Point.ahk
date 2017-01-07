@@ -31,7 +31,7 @@ Element_getParameters_Action_Trace_Point()
 	return ["ID", "LogMessage", "StopCondition"]
 }
 
-Element_getParametrizationDetails_Action_Trace_Point()
+Element_getParametrizationDetails_Action_Trace_Point(Environment)
 {
 	parametersToEdit:=Object()
 	parametersToEdit.push({type: "Label", label: lang("ID")})
@@ -43,6 +43,13 @@ Element_getParametrizationDetails_Action_Trace_Point()
 	
 
 	return parametersToEdit
+}
+
+Element_GenerateName_Action_Trace_Point(Environment, ElementParameters)
+{
+	global
+	return % lang("Trace_Point") " - " ElementParameters.ID 
+	
 }
 
 Element_run_Action_Trace_Point(Environment, ElementParameters)
@@ -76,11 +83,4 @@ Element_run_Action_Trace_Point(Environment, ElementParameters)
 	
 	;Always call v_finish() before return
 	return
-}
-
-Element_GenerateName_Action_Trace_Point(Environment, ElementParameters)
-{
-	global
-	return % lang("Trace_Point") " - " ElementParameters.ID 
-	
 }

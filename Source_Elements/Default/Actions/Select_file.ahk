@@ -31,7 +31,7 @@ Element_getParameters_Action_Select_file()
 	return ["Varname", "title", "folder", "filter", "MultiSelect", "SaveButton", "fileMustExist", "PathMustExist", "PromptNewFile", "PromptOverwriteFile", "NoShortcutTarget"]
 }
 
-Element_getParametrizationDetails_Action_Select_file()
+Element_getParametrizationDetails_Action_Select_file(Environment)
 {
 	parametersToEdit:=Object()
 	parametersToEdit.push({type: "Label", label: lang("Output variable_name")})
@@ -52,6 +52,35 @@ Element_getParametrizationDetails_Action_Select_file()
 	parametersToEdit.push({type: "checkbox", id: "NoShortcutTarget", default: 0, label: lang("Don't resolve shortcuts to their targets")})
 
 	return parametersToEdit
+}
+
+Element_GenerateName_Action_Select_file(Environment, ElementParameters)
+{
+	global
+	return % lang("Select_file") " - " ElementParameters.varname " - " ElementParameters.folder
+	
+}
+
+CheckSettingsActionSelect_file(ID)
+{
+	if (ElementParameters.MultiSelect = True)
+	{
+		x_Par_Disable(Environment,"SaveButton")
+		x_Par_SetValue(Environment,"SaveButton", False)
+	}
+	else
+	{
+		x_Par_Enable(Environment,"SaveButton")
+	}
+	if (ElementParameters.SaveButton = True)
+	{
+		x_Par_Disable(Environment,"fileMustExist")
+		x_Par_SetValue(Environment,"fileMustExist", False)
+	}
+	else
+	{
+		x_Par_Enable(Environment,"fileMustExist")
+	}
 }
 
 Element_run_Action_Select_file(Environment, ElementParameters)
@@ -132,34 +161,4 @@ Action_Select_file_FinishExecution(Environment, values, ElementParameters)
 		x_finish(Environment,"exception", values.message)
 	}
 	
-}
-
-
-Element_GenerateName_Action_Select_file(Environment, ElementParameters)
-{
-	global
-	return % lang("Select_file") " - " ElementParameters.varname " - " ElementParameters.folder
-	
-}
-
-CheckSettingsActionSelect_file(ID)
-{
-	if (ElementParameters.MultiSelect = True)
-	{
-		x_Par_Disable(Environment,"SaveButton")
-		x_Par_SetValue(Environment,"SaveButton", False)
-	}
-	else
-	{
-		x_Par_Enable(Environment,"SaveButton")
-	}
-	if (ElementParameters.SaveButton = True)
-	{
-		x_Par_Disable(Environment,"fileMustExist")
-		x_Par_SetValue(Environment,"fileMustExist", False)
-	}
-	else
-	{
-		x_Par_Enable(Environment,"fileMustExist")
-	}
 }

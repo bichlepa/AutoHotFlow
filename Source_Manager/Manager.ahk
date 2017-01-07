@@ -27,7 +27,7 @@ lang_Init(my_ScriptDir "\language", my_WorkingDir)
 #include Source_Manager\Flows\Manage Flows.ahk
 #include Source_Manager\API\API receiver manager.ahk
 
-#include source_Common\Global variables\global variables.ahk
+#include source_Common\variables\global variables.ahk
 #include source_Common\Debug\Debug.ahk
 #include source_Common\Debug\Logger.ahk
 #include source_Common\Multithreading\API Caller Main.ahk

@@ -26,7 +26,7 @@ Element_getParameters_Condition_Flow_Running()
 	return ["flowName"]
 }
 
-Element_getParametrizationDetails_Condition_Flow_Running()
+Element_getParametrizationDetails_Condition_Flow_Running(Environment)
 {
 	choices := x_GetListOfFlowNames()
 	
@@ -37,15 +37,24 @@ Element_getParametrizationDetails_Condition_Flow_Running()
 	return parametersToEdit
 }
 
+Element_GenerateName_Condition_Flow_Running(Environment, ElementParameters)
+{
+	global
+	return % lang("Flow_Executing") " - " ElementParameters.flowName
+	
+}
+
 Element_run_Condition_Flow_Running(Environment, ElementParameters)
 {
-	restult:=false
+	result:=false
 	FlowName := x_replaceVariables(Environment, ElementParameters.flowName)
 	
-	if x_FlowExistsByName(Environment,FlowName)
+	if x_FlowExistsByName(FlowName)
 	{
-		restult:=x_isFlowExecutingByName(Environment,FlowName)
-		if (restult)
+		FlowID:=x_getFlowIDByName(FlowName)
+		
+		result:=x_isFlowExecuting(FlowID)
+		if (result)
 			return x_finish(Environment,"yes")
 		else
 			return x_finish(Environment,"no")
@@ -54,12 +63,5 @@ Element_run_Condition_Flow_Running(Environment, ElementParameters)
 	{
 		return x_finish(Environment,"exception",lang("Flow '%1%' does not exist",FlowName))
 	}
-	
-}
-
-Element_GenerateName_Condition_Flow_Running(Environment, ElementParameters)
-{
-	global
-	return % lang("Flow_Executing") " - " ElementParameters.flowName
 	
 }

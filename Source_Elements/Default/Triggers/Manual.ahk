@@ -26,12 +26,18 @@ Element_getParameters_Trigger_Manual()
 	return ["ID"]
 }
 
-Element_getParametrizationDetails_Trigger_Manual()
+Element_getParametrizationDetails_Trigger_Manual(Environment)
 {
 	parametersToEdit:=Object()
 	parametersToEdit.push({type: "Label", label: lang("ID")})
 	parametersToEdit.push({type: "Edit", id: "ID", content: "String",  default: "Trigger " x_randomPhrase()})
 	return parametersToEdit
+}
+
+Element_GenerateName_Trigger_Manual(Environment, ElementParameters)
+{
+	global
+	return % lang("Manual") "`n" ElementParameters.id 
 }
 
 Element_enable_Trigger_Manual(Environment, ElementParameters)
@@ -47,19 +53,4 @@ Element_disable_Trigger_Manual(Environment, ElementParameters)
 
 }
 
-Element_trigger_Trigger_Manual(Environment, ElementParameters)
-{
-	x_trigger(Environment)
-}
 
-
-Element_GenerateName_Trigger_Manual(Environment, ElementParameters)
-{
-	global
-	return % lang("Manual") "`n" ElementParameters.id 
-}
-
-Element_CheckSettings_Trigger_Manual(Environment, ElementParameters)
-{
-	;~ ElementSettings.enable(ElementParameters.BlockKey,"WhenRelease")
-}

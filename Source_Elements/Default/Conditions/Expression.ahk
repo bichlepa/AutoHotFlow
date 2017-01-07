@@ -26,13 +26,20 @@ Element_getParameters_Condition_Expression()
 	return ["expression"]
 }
 
-Element_getParametrizationDetails_Condition_Expression()
+Element_getParametrizationDetails_Condition_Expression(Environment)
 {
 	parametersToEdit:=Object()
 	parametersToEdit.push({type: "Label", label: lang("Expression")})
 	parametersToEdit.push({type: "Edit", id: "Expression", content: "Expression", WarnIfEmpty: true})
 
 	return parametersToEdit
+}
+
+Element_GenerateName_Condition_Expression(Environment, ElementParameters)
+{
+	global
+	return % lang("Expression") " - " ElementParameters.expression
+	
 }
 
 Element_run_Condition_Expression(Environment, ElementParameters)
@@ -44,11 +51,4 @@ Element_run_Condition_Expression(Environment, ElementParameters)
 		return x_finish(Environment,"no")
 	
 
-}
-
-Element_GenerateName_Condition_Expression(Environment, ElementParameters)
-{
-	global
-	return % lang("Expression") " - " ElementParameters.expression
-	
 }

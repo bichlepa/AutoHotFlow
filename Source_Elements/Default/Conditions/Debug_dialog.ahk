@@ -31,11 +31,18 @@ Element_getParameters_Condition_Debug_Dialog()
 	return []
 }
 
-Element_getParametrizationDetails_Condition_Debug_Dialog()
+Element_getParametrizationDetails_Condition_Debug_Dialog(Environment)
 {
 	parametersToEdit:=Object()
 
 	return parametersToEdit
+}
+
+Element_GenerateName_Condition_Debug_Dialog(Environment, ElementParameters)
+{
+	global
+	return % lang("Debug_dialog")
+	
 }
 
 Element_run_Condition_Debug_Dialog(Environment, ElementParameters)
@@ -260,11 +267,4 @@ Element_stop_Condition_Debug_Dialog(Environment, ElementParameters)
 	;~ logger("f0","Instance " tempDebug_DialogBut.instanceID " - " tempDebug_DialogBut.type " '" tempDebug_DialogBut.name "': Error! User dismissed the dialog")
 	
 	return
-}
-
-Element_GenerateName_Condition_Debug_Dialog(Environment, ElementParameters)
-{
-	global
-	return % lang("Debug_dialog")
-	
 }

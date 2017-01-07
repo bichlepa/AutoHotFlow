@@ -26,16 +26,21 @@ Element_getParameters_Action_Execute_Flow()
 	return ["ThisFlow", "flowName", "DefaultTrigger", "triggerName", "SendLocalVars", "SkipDisabled", "WaitToFinish", "ReturnVariables"]
 }
 
-Element_getParametrizationDetails_Action_Execute_Flow()
+Element_getParametrizationDetails_Action_Execute_Flow(Environment)
 {
 	choicesFlows := x_GetListOfFlowNames()
-	allTriggers := x_GetAllMyFlowManualTriggers(Environment)
+	
+	FlowID := x_GetMyFlowID(Environment)
+	myFlowName := x_GetMyFlowName(Environment)
+	
+	allTriggerIDs := x_getAllElementIDsOfClass(FlowID, "manual_trigger")
+	
 	choicesTriggers:=Object()
-	for oneID, oneTrigger in allTriggers
+	for oneIDIndex, oneTriggerID in allTriggerIDs
 	{
-		choicesTriggers.push(oneTrigger.pars.id)
+		elementPars:=x_getElementPars(FlowID, oneTriggerID)
+		choicesTriggers.push(elementPars.id)
 	}
-	myFlowName:= x_GetMyFlowName(Environment)
 	
 	parametersToEdit:=Object()
 	parametersToEdit.push({type: "Label", label: lang("Flow_name")})
@@ -51,85 +56,6 @@ Element_getParametrizationDetails_Action_Execute_Flow()
 	parametersToEdit.push({type: "Checkbox", id: "ReturnVariables", default: 0, label: lang("Return local variables to the calling flow")})
 
 	return parametersToEdit
-}
-
-Element_run_Action_Execute_Flow(Environment, ElementParameters)
-{
-	if (ElementParameters.ThisFlow)
-		FlowName:=x_GetMyFlowName(Environment)
-	else
-		FlowName := x_replaceVariables(Environment, ElementParameters.flowName)
-	Variables:=Object()
-	
-	if (ElementParameters.DefaultTrigger)
-	{
-		TriggerName := ""
-	}
-	else
-	{
-		TriggerName := x_replaceVariables(Environment, ElementParameters.triggerName)
-		if (TriggerName ="")
-		{
-			return x_finish(Environment,"exception",lang("Trigger name is empty",FlowName))
-		}
-	}
-	if (TriggerName = "")
-		TriggerNameText:=lang("Default trigger")
-	else
-		TriggerNameText:=TriggerName
-	if (FlowName = "")
-		FlowNameText:=lang("This flow")
-	else
-		FlowNameText:=FlowName
-	
-	if x_FlowExistsByName(Environment,FlowName)
-	{
-		if x_isTriggerEnabledByName(Environment,FlowName, TriggerName)
-		{
-			if (ElementParameters.SendLocalVars = True)
-			{
-				Variables:=x_ExportAllInstanceVars(Environment)
-			}
-			if (ElementParameters.WaitToFinish)
-			{
-				
-				functionObject:= x_NewExecutionFunctionObject(environment, "Action_Execute_Flow_FunctionExecutionFinished", ElementParameters)
-				x_SetExecutionValue(Environment, "hotkey", temphotkey)
-				x_FlowExecuteByName(Environment,FlowName, TriggerName, Variables, functionObject)
-				
-				return
-			}
-			else
-			{
-				x_FlowExecuteByName(Environment,FlowName, TriggerName, Variables)
-				return x_finish(Environment,"normal")
-			}
-		}
-		else
-		{
-			if (ElementParameters.SkipDisabled)
-			{
-				return x_finish(Environment,"normal",lang("Trigger '%1%' in '%2%' is disabled",TriggerNameText, FlowNameText))
-			}
-			else
-			{
-				return x_finish(Environment,"exception",lang("Trigger '%1%' in '%2%' is disabled",TriggerNameText, FlowNameText))
-			}
-		}
-	}
-	else
-	{
-		return x_finish(Environment,"exception",lang("Flow '%1%' does not exist",FlowName))
-	}
-	return
-}
-
-Action_Execute_Flow_FunctionExecutionFinished(Environment, p_result, p_variables, ElementParameters)
-{
-	functionObject:=x_getExecutionValue(Environment, "functionObject")
-	if (ElementParameters.ReturnVariables)
-		x_ImportInstanceVars(Environment, p_variables)
-	return x_finish(Environment,"normal")
 }
 
 Element_GenerateName_Action_Execute_Flow(Environment, ElementParameters)
@@ -179,16 +105,19 @@ Element_CheckSettings_Action_Execute_Flow(Environment, ElementParameters)
 		
 		if (ElementParameters.ThisFlow)
 		{
-			allTriggers := x_GetAllMyFlowManualTriggers(Environment)
+			FlowID := x_getMyFlowID(Environment)
 		}
 		else
 		{
-			allTriggers := x_GetAllManualTriggersOfFlowByName(ElementParameters.flowName)
+			FlowID := x_getFlowIDByName(ElementParameters.flowName)
 		}
+		allTriggerIDs := x_getAllElementIDsOfClass(FlowID, "manual_trigger")
+		
 		choicesTriggers:=Object()
-		for oneID, oneTrigger in allTriggers
+		for oneIndex, oneTriggerID in allTriggerIDs
 		{
-			choicesTriggers.push(oneTrigger.pars.id)
+			elementPars:=x_getElementPars(FlowID, oneTriggerID)
+			choicesTriggers.push(elementPars.id)
 		}
 		x_Par_SetChoices(Environment,"triggerName", choicesTriggers)
 		
@@ -205,4 +134,89 @@ Element_CheckSettings_Action_Execute_Flow(Environment, ElementParameters)
 		
 	}
 	
+}
+
+Element_run_Action_Execute_Flow(Environment, ElementParameters)
+{
+	if (ElementParameters.ThisFlow)
+	{
+		FlowName:=x_GetMyFlowName(Environment)
+		FlowNameText:=lang("This flow")
+	}
+	else
+	{
+		FlowName := x_replaceVariables(Environment, ElementParameters.flowName)
+		FlowNameText:=FlowName
+		
+		if not x_FlowExistsByName(FlowName)
+		{
+			return x_finish(Environment,"exception",lang("Flow '%1%' does not exist",FlowName))
+		}
+	}
+	FlowID:=x_getFlowIDByName(FlowName)
+	
+	Variables:=Object()
+	
+	if (ElementParameters.DefaultTrigger)
+	{
+		TriggerName := ""
+		TriggerNameText:=lang("Default trigger")
+	}
+	else
+	{
+		TriggerName := x_replaceVariables(Environment, ElementParameters.triggerName)
+		TriggerNameText:=TriggerName
+		if (TriggerName ="")
+		{
+			return x_finish(Environment,"exception",lang("Trigger name is empty",FlowName))
+		}
+	}
+	
+	if not x_ManualTriggerExist(FlowID, TriggerName)
+	{
+		return x_finish(Environment,"exception",lang("Trigger '%1%' in flow '%2%' does not exist",TriggerNameText, FlowName))
+	}
+	
+	if not x_isManualTriggerEnabled(FlowID, TriggerName)
+	{
+		
+		if (ElementParameters.SkipDisabled)
+		{
+			return x_finish(Environment,"normal",lang("Trigger '%1%' in '%2%' is disabled",TriggerNameText, FlowNameText))
+		}
+		else
+		{
+			return x_finish(Environment,"exception",lang("Trigger '%1%' in '%2%' is disabled",TriggerNameText, FlowNameText))
+		}
+	}
+	
+	
+	if (ElementParameters.SendLocalVars = True)
+	{
+		Variables:=x_ExportAllInstanceVars(Environment)
+	}
+	if (ElementParameters.WaitToFinish)
+	{
+		
+		functionObject:= x_NewExecutionFunctionObject(environment, "Action_Execute_Flow_FunctionExecutionFinished", ElementParameters)
+		x_SetExecutionValue(Environment, "hotkey", temphotkey)
+		x_ManualTriggerExecute(FlowID, TriggerName, Variables, functionObject)
+		
+		return
+	}
+	else
+	{
+		x_ManualTriggerExecute(FlowID, TriggerName, Variables)
+		return x_finish(Environment,"normal")
+	}
+	
+	return
+}
+
+Action_Execute_Flow_FunctionExecutionFinished(Environment, p_result, p_variables, ElementParameters)
+{
+	functionObject:=x_getExecutionValue(Environment, "functionObject")
+	if (ElementParameters.ReturnVariables)
+		x_ImportInstanceVars(Environment, p_variables)
+	return x_finish(Environment,"normal")
 }

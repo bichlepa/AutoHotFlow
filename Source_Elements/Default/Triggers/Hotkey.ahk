@@ -31,7 +31,7 @@ Element_getParameters_Trigger_Hotkey()
 	return ["hotkey", "BlockKey", "Wildcard", "WhenRelease", "UseWindow", "TitleMatchMode", "Wintitle", "winText", "FindHiddenText", "ahk_class", "ahk_exe", "ahk_id", "ahk_pid", "FindHiddenWindow"]
 }
 
-Element_getParametrizationDetails_Trigger_Hotkey()
+Element_getParametrizationDetails_Trigger_Hotkey(Environment)
 {
 	
 	parametersToEdit:=Object()
@@ -67,11 +67,36 @@ Element_getParametrizationDetails_Trigger_Hotkey()
 	return parametersToEdit
 }
 
+Element_GenerateName_Trigger_Hotkey(Environment, ElementParameters)
+{
+	global
+	return % lang("Hotkey") " - " ElementParameters.Hotkey 
+	
+}
+
+Element_CheckSettings_Trigger_Hotkey(Environment, ElementParameters)
+{
+	x_Par_Disable(Environment,"WhenRelease", ElementParameters.BlockKey)
+	x_Par_Disable(Environment,"BlockKey", ElementParameters.WhenRelease)
+	
+	showWindowPars:=ElementParameters.UseWindow =2 or ElementParameters.UseWindow=3
+	x_Par_Enable(Environment,"TitleMatchMode", showWindowPars)
+	x_Par_Enable(Environment,"Wintitle", showWindowPars)
+	x_Par_Enable(Environment,"excludeTitle", showWindowPars)
+	x_Par_Enable(Environment,"FindHiddenText", showWindowPars)
+	x_Par_Enable(Environment,"winText", showWindowPars)
+	x_Par_Enable(Environment,"ExcludeText", showWindowPars)
+	x_Par_Enable(Environment,"ahk_class", showWindowPars)
+	x_Par_Enable(Environment,"ahk_exe", showWindowPars)
+	x_Par_Enable(Environment,"ahk_id", showWindowPars)
+	x_Par_Enable(Environment,"ahk_pid", showWindowPars)
+	x_Par_Enable(Environment,"FindHiddenWindow", showWindowPars)
+	x_Par_Enable(Environment,"GetWindowInformation", showWindowPars)
+	
+}
+
 Element_enable_Trigger_Hotkey(Environment, ElementParameters)
 {
-
-	
-	
 	
 	global
 	
@@ -158,12 +183,12 @@ Element_enable_Trigger_Hotkey(Environment, ElementParameters)
 	
 }
 
-Element_trigger_Trigger_Hotkey(Environment, ElementParameters="")
+Element_trigger_Trigger_Hotkey(Environment, ElementParameters)
 {
-	x_trigger(Environment, triggerVars)
+	x_trigger(Environment)
 }
 
-Element_postTrigger_Trigger_Hotkey(Environment, ElementParameters="")
+Element_postTrigger_Trigger_Hotkey(Environment, ElementParameters)
 {
 	x_SetVariable(Environment, "A_Hotkey", ElementParameters.hotkey,"thread")
 }
@@ -175,32 +200,4 @@ Element_disable_Trigger_Hotkey(Environment, ElementParameters)
 	hotkey,%temphotkey%,off
 	x_disabled(Environment, "normal",  lang("The hotkey %1% was unset.",temphotkey))
 
-}
-
-Element_GenerateName_Trigger_Hotkey(Environment, ElementParameters)
-{
-	global
-	return % lang("Hotkey") " - " ElementParameters.Hotkey 
-	
-}
-
-Element_CheckSettings_Trigger_Hotkey(Environment, ElementParameters)
-{
-	x_Par_Disable(Environment,"WhenRelease", ElementParameters.BlockKey)
-	x_Par_Disable(Environment,"BlockKey", ElementParameters.WhenRelease)
-	
-	showWindowPars:=ElementParameters.UseWindow =2 or ElementParameters.UseWindow=3
-	x_Par_Enable(Environment,"TitleMatchMode", showWindowPars)
-	x_Par_Enable(Environment,"Wintitle", showWindowPars)
-	x_Par_Enable(Environment,"excludeTitle", showWindowPars)
-	x_Par_Enable(Environment,"FindHiddenText", showWindowPars)
-	x_Par_Enable(Environment,"winText", showWindowPars)
-	x_Par_Enable(Environment,"ExcludeText", showWindowPars)
-	x_Par_Enable(Environment,"ahk_class", showWindowPars)
-	x_Par_Enable(Environment,"ahk_exe", showWindowPars)
-	x_Par_Enable(Environment,"ahk_id", showWindowPars)
-	x_Par_Enable(Environment,"ahk_pid", showWindowPars)
-	x_Par_Enable(Environment,"FindHiddenWindow", showWindowPars)
-	x_Par_Enable(Environment,"GetWindowInformation", showWindowPars)
-	
 }

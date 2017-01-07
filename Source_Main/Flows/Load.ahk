@@ -364,7 +364,7 @@ LoadFlowParametersOfElement(FlowID,parList,parElementID,parlocation, parSection)
 	loadElementClass:=parList[parElementID].class
 	;~ d(parList,parElementID) 
 	parametersToload:=Element_getParameters_%loadElementClass%()
-	parametersToloadDetails:=Element_getParametrizationDetails_%loadElementClass%()
+	parametersToloadDetails:=Element_getParametrizationDetails_%loadElementClass%({flowID: FlowID, elementID: parElementID})
 	;~ d(parametersToload)
 	for index, oneParameterID in parametersToload
 	{

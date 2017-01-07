@@ -47,11 +47,7 @@ class ElementSettings
 		CurrentlyActiveWindowHWND:=SettingWindowHWND
 		
 		;Get the parameter list
-		openingElementSettingsWindow:=true ;Allows some elements to initialize their parameter list. (such as in "play sound": find all system sound)
-		try
-			parametersToEdit:=Element_getParametrizationDetails_%setElementClass%(true)
-		catch
-			parametersToEdit:=Element_getParametrizationDetails_%setElementClass%() ;TODO: all elements should accept one parameter
+		parametersToEdit:=Element_getParametrizationDetails_%setElementClass%({flowID: flowobj.id, elementID: setElementID})
 		
 		;All elements have the parameter "name" and "StandardName"
 		ElementSettingsFields.push(new this.label({label: lang("name (name)")}))
@@ -749,8 +745,10 @@ class ElementSettings
 				
 				varsToDelete.push("GUISettingsOfElement" tempParameterID a_index)
 			}
-			if (tempAssigned=false) ;Catch if a wrong value was saved and set to default value.
+			if (tempAssigned=false) ;Catch if a wrong value was saved and set to default value. 
+			;TODO: is this a good idea? If this happens and user opens the settings window, he might erroneously thing that everything is ok.
 			{
+				
 				temp:=parameter.default
 				guicontrol,SettingsOfElement:,GUISettingsOfElement%tempParameterID%%temp%,1
 			}
@@ -1225,50 +1223,8 @@ class ElementSettings
 			gui,font,s8 cDefault wnorm
 			temp:=setElement.pars[tempParameterID] 
 			
-			if (parameter.result="number")
-			{
-				temptoChoose:=temp
-				tempAltSumbit=AltSubmit
-			}
-			else
-				tempAltSumbit=
-			tempChoises:=parameter.choices
-			
-			;loop through all choices. Find which one to select. Make a selection list which is capable for the gui,add command
-			tempAllChoices=
-			for tempIndex, TempOneChoice in tempChoises
-			{
-				if (parameter.result="name")
-				{
-					if (TempOneChoice=temp)
-						temptoChoose:=A_Index
-				}
-				tempAllChoices.="|" TempOneChoice
-				
-			}
-			
-			StringTrimLeft,tempAllChoices,tempAllChoices,1
-			gui,add,DropDownList, w400 x10 %tempAltSumbit% choose%temptoChoose% hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID% ,% tempAllChoices
-			this.components.push("GUISettingsOfElement" tempParameterID)
-			ElementSettingsFieldHWNDs[tempHWND]:=this
-			varsToDelete.push("GUISettingsOfElement" tempParameterID)
-		}
-	}
-	
-	
-	
-	class ComboBox extends ElementSettings.field
-	{
-		;TODO: Check content as in edit field
-		__new(parameter)
-		{
-			global
-			base.__new(parameter)
-			local temp, temptoChoose,tempAltSumbit,tempChoises,tempAllChoices, tempHWND
-			local tempParameterID:=parameter.id
-			
-			gui,font,s8 cDefault wnorm
-			temp:=setElement.pars[tempParameterID] 
+			if (parameter.result != "number" and parameter.result != "string")
+				MsgBox unexpected error: the parameter "result" of "DropDown" is unset or has unsupported value
 			
 			if (parameter.result="number")
 			{
@@ -1291,6 +1247,49 @@ class ElementSettings
 				tempAllChoices.="|" TempOneChoice
 				
 			}
+			
+			StringTrimLeft,tempAllChoices,tempAllChoices,1
+			gui,add,DropDownList, w400 x10 %tempAltSumbit% choose%temptoChoose% hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID% ,% tempAllChoices
+			this.components.push("GUISettingsOfElement" tempParameterID)
+			ElementSettingsFieldHWNDs[tempHWND]:=this
+			varsToDelete.push("GUISettingsOfElement" tempParameterID)
+		}
+	}
+	
+	
+	
+	class ComboBox extends ElementSettings.field
+	{
+		__new(parameter)
+		{
+			global
+			base.__new(parameter)
+			local temp, temptoChoose,tempAltSumbit,tempChoises,tempAllChoices, tempHWND
+			local tempParameterID:=parameter.id
+			
+			gui,font,s8 cDefault wnorm
+			tempChosen:=setElement.pars[tempParameterID] 
+			temptoChooseText := tempChosen
+			if (parameter.result="number")
+			{
+				tempAltSumbit=AltSubmit
+			}
+			else
+				tempAltSumbit=
+			tempChoises:=parameter.choices
+			
+			;loop through all choices. Find which one to select. Make a selection list which is capable for the gui,add command
+			tempAllChoices=
+			for tempIndex, TempOneChoice in tempChoises
+			{
+				if (parameter.result="number")
+				{
+					if (TempOneChoice=tempChosen)
+						temptoChooseText:=TempOneChoice
+				}
+				tempAllChoices.="|" TempOneChoice
+				
+			}
 			StringTrimLeft,tempAllChoices,tempAllChoices,1
 			this.par_result:=parameter.result
 			this.par_choices:=parameter.choices
@@ -1308,17 +1307,9 @@ class ElementSettings
 				this.components.push("GUISettingsOfElementInfoIconOf" tempParameterID)
 				ElementSettingsFieldHWNDs[tempHWND]:=this
 				
-				gui,add,ComboBox, X+4 yp w360 hwndtempHWND %tempAltSumbit% choose%temptoChoose%  gGUISettingsOfElementCheckContent vGUISettingsOfElement%tempParameterID% ,% tempAllChoices
+				gui,add,ComboBox, X+4 yp w360 hwndtempHWND %tempAltSumbit% gGUISettingsOfElementCheckContent vGUISettingsOfElement%tempParameterID% ,% tempAllChoices
 				this.components.push("vGUISettingsOfElement" tempParameterID)
 				ElementSettingsFieldHWNDs[tempHWND]:=this
-				if parameter.useupdown
-				{
-					if parameter.range
-						gui,add,updown,% "range" parameter.range
-					else
-						gui,add,updown
-					guicontrol,SettingsOfElement:,GUISettingsOfElement%tempParameterID%,%temptext%
-				}
 				this.ContentType:="Expression"
 				;~ GUISettingsOfElementContentType%tempParameterID%=Expression
 			}
@@ -1328,7 +1319,7 @@ class ElementSettings
 				this.components.push("GUISettingsOfElementInfoIconOf" tempParameterID)
 				ElementSettingsFieldHWNDs[tempHWND]:=this
 				
-				gui,add,ComboBox, X+4 yp w360 hwndtempHWND %tempAltSumbit% choose%temptoChoose%  gGUISettingsOfElementCheckContent vGUISettingsOfElement%tempParameterID% ,% tempAllChoices
+				gui,add,ComboBox, X+4 yp w360 hwndtempHWND %tempAltSumbit% gGUISettingsOfElementCheckContent vGUISettingsOfElement%tempParameterID% ,% tempAllChoices
 				this.components.push("GUISettingsOfElement" tempParameterID)
 				ElementSettingsFieldHWNDs[tempHWND]:=this
 				
@@ -1341,54 +1332,50 @@ class ElementSettings
 				this.components.push("GUISettingsOfElementInfoIconOf" tempParameterID)
 				ElementSettingsFieldHWNDs[tempHWND]:=this
 				
-				gui,add,ComboBox, X+4 yp w360 hwndtempHWND %tempAltSumbit% choose%temptoChoose%  gGUISettingsOfElementCheckContent vGUISettingsOfElement%tempParameterID% ,% tempAllChoices
+				gui,add,ComboBox, X+4 yp w360 hwndtempHWND %tempAltSumbit% gGUISettingsOfElementCheckContent vGUISettingsOfElement%tempParameterID% ,% tempAllChoices
 				this.components.push("GUISettingsOfElement" tempParameterID)
 				ElementSettingsFieldHWNDs[tempHWND]:=this
 				
 				this.ContentType:="VariableName"
 				;~ GUISettingsOfElementContentType%tempParameterID%=VariableName
 			}
-			else if (parameter.content="StringOrExpression")
-			{
-				
-				
-				if (tempContentTypeNum=1) 
-					gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempParameterID%,%my_ScriptDir%\icons\string.ico
-				else ;If content is expression
-					gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempParameterID%,%my_ScriptDir%\icons\expression.ico
-				this.components.push("GUISettingsOfElementInfoIconOf" tempParameterID)
-				ElementSettingsFieldHWNDs[tempHWND]:=this
-				
-				gui,add,ComboBox, X+4 yp w360 hwndtempHWND %tempAltSumbit% choose%temptoChoose%  gGUISettingsOfElementCheckContent vGUISettingsOfElement%tempParameterID% ,% tempAllChoices
-				this.components.push("GUISettingsOfElement" tempParameterID)
-				ElementSettingsFieldHWNDs[tempHWND]:=this
-				
-				this.ContentType:="StringOrExpression"
-			}
 			else ;Text field without specified content type and without info icon
 			{
-				gui,add,ComboBox, x10 yp w380 hwndtempHWND %tempAltSumbit% choose%temptoChoose%  gGUISettingsOfElementCheckContent vGUISettingsOfElement%tempParameterID% ,% tempAllChoices
+				gui,add,ComboBox, x10 yp w380 hwndtempHWND %tempAltSumbit%  gGUISettingsOfElementCheckContent vGUISettingsOfElement%tempParameterID% ,% tempAllChoices
 				this.components.push("GUISettingsOfElement" tempParameterID)
 				ElementSettingsFieldHWNDs[tempHWND]:=this
 			}
-			guicontrol,SettingsOfElement:text,GUISettingsOfElement%tempParameterID%,% temp
 			
-			this.checkContent()
+			this.setvalue(tempChosen)
+			;~ guicontrol,SettingsOfElement:text,GUISettingsOfElement%tempParameterID%,% temptoChooseText
 			
 			varsToDelete.push("GUISettingsOfElement" tempParameterID, "GUISettingsOfElementContentTypeRadio" tempParameterID, "GUISettingsOfElementInfoIconOf" tempParameterID, "GUISettingsOfElementWarningIconOf" tempParameterID)
 			
 		}
 		
+		getvalue()
+		{
+			global
+			local temp
+			local tempParameterID:=this.parameter.id
+			
+			
+			guicontrolget,temp,SettingsOfElement:,GUISettingsOfElement%tempParameterID%
+			;~ ToolTip asdöfio  - %temp% - %tempParameterID%
+			return temp
+		}
+		
 		setvalue(value, parameterID="")
 		{
 			global
-			local tempLabelChoice, tempindexChoice
+			local tempLabelChoice, tempindexChoice, somethingChosen
 			local tempParameterID:=this.parameter.id
 			if parameterID=
 			{
 				tempParameterID:=this.parameter.id
 				if isobject(tempParameterID)
 					tempParameterID:=tempParameterID[1]
+				
 				
 				if (this.par_result="string")
 				{
@@ -1397,11 +1384,23 @@ class ElementSettings
 						if (tempLabelChoice = value)
 						{
 							GUIControl,SettingsOfElement:Choose,GUISettingsOfElement%tempParameterID%,% tempindexChoice
+							somethingChosen:=true
+							break
 						}
 					}
+					if (somethingChosen!=true)
+						GUIControl,SettingsOfElement:text,GUISettingsOfElement%tempParameterID%,% value
 				}
 				else
-					GUIControl,SettingsOfElement:choose,GUISettingsOfElement%tempParameterID%,% value
+				{
+					ToolTip value %value%
+					if (value > 0 and value <= this.par_choices.MaxIndex())
+						GUIControl,SettingsOfElement:choose,GUISettingsOfElement%tempParameterID%,% value
+					else
+					{
+						GUIControl,SettingsOfElement:text,GUISettingsOfElement%tempParameterID%,% value
+					}
+				}
 				
 				;Check content after setting
 				this.checkContent()

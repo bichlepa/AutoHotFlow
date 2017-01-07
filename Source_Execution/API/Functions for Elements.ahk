@@ -1,203 +1,47 @@
 ﻿
 ;This file provides functions which can be accessed while executing the elements.
+;Execution thread
 
 
-
-x_replaceVariables(Environment, String, pars ="")
+;Variable API functions:
+x_GetVariable(Environment, p_Varname, p_hidden = False)
 {
-	global
-	return Var_replaceVariables(Environment, String, pars)
+	return Var_Get(Environment, p_Varname, p_hidden )
 }
-x_EvaluateExpression(Environment, String)
+x_getVariableType(Environment, p_Varname, p_hidden = False)
 {
-	global
-	return Var_EvaluateExpression(Environment, String)
-}
-x_CheckVariableName(VarName)
-{
-	return Var_CheckName(VarName)
-}
-x_GetVariable(Environment, Varname, p_hidden = False)
-{
-	return Var_Get(Environment, Varname, p_hidden )
-}
-x_getVariableType(Environment, Varname, p_hidden = False)
-{
-	return Var_GetType(Environment, Varname, p_hidden )
+	return Var_GetType(Environment, p_Varname, p_hidden )
 }
 x_SetVariable(Environment, p_Varname, p_Value, p_destination="", p_hidden = False)
 {
 	global
 	return Var_Set(Environment, p_Varname, p_Value,  p_destination, p_hidden)
 }
-x_DeleteVariable(Environment, Varname, p_hidden = False)
+x_DeleteVariable(Environment, p_Varname, p_hidden = False)
 {
 	global
-	return Var_Delete(Environment, Varname, p_hidden)
+	return Var_Delete(Environment, p_Varname, p_hidden)
 }
 
-
-x_GetVariableLocation(Environment, Varname, p_hidden = False)
+x_GetVariableLocation(Environment, p_Varname, p_hidden = False)
 {
 	global
-	return Var_GetLocation(Environment, Varname, p_hidden)
+	return Var_GetLocation(Environment, p_Varname, p_hidden)
 }
 
-x_GetMyElementID(Environment)
-{
-	return Environment.elementID
-}
-
-
-x_GetMyFlowID(Environment)
-{
-	return Environment.FlowID
-}
-x_GetMyFlowName(Environment)
-{
-	global _flows
-	return _flows[Environment.FlowID].name
-}
-
-x_GetAllMyFlowTriggerNames(Environment)
-{
-	global _flows
-	elements:=Object()
-	for oneID, oneElement in _flows[Environment.FlowID].allElements
-	{
-		if (oneElement.type = "trigger")
-			elements.push(oneElement.name)
-	}
-	return elements
-}
-x_GetAllMyFlowManualTriggers(Environment)
-{
-	global _flows
-	elements:=Object()
-	for oneID, oneElement in _flows[Environment.FlowID].allElements
-	{
-		if (oneElement.class = "trigger_manual")
-			elements.push(objfullyclone(oneElement))
-	}
-	return elements
-}
-
-x_GetAllManualTriggersOfFlowByName(p_FlowName)
-{
-	global _Flows
-	elements:=Object()
-	
-	for forFlowID, forFlow in _Flows
-	{
-		if (forFlow.name = p_FlowName)
-		{
-			for oneID, oneElement in forFlow.allElements
-			{
-				if (oneElement.class = "trigger_manual")
-					elements.push(objfullyclone(oneElement))
-			}
-		}
-	}
-	
-	return elements
-}
-
-
-
-x_getAllElementsOfClass(Environment, p_Class)
-{
-	global _flows
-	
-	elements:=Object()
-	for oneID, oneElement in _flows[Environment.FlowID].allElements
-	{
-		if (oneElement.class = p_Class)
-			elements.push(objFullyClone(oneElement))
-	}
-	return elements
-}
-
-
-x_GetListOfFlowNames()
-{
-	global _flows
-	;Search for all flowNames
-	choices:=object()
-	for oneFlowID, oneFlow in _flows
-	{
-		choices.push(oneFlow.name)
-	}
-	return choices
-}
-
-
-x_GetMyUniqueExecutionID(Environment)
-{
-	return Environment.UniqueID
-}
-
-x_GetMyEnvironmentFromExecutionID(p_ExecutionID)
+x_replaceVariables(Environment, p_String, p_pars ="")
 {
 	global
-	return global_AllExecutionIDs[p_ExecutionID].environment
+	return Var_replaceVariables(Environment, p_String, p_pars)
 }
-x_SetExecutionValue(Environment, p_name, p_Value)
+x_EvaluateExpression(Environment, p_String)
 {
 	global
-	global_AllExecutionIDs[Environment.uniqueID].customValues[p_name]:=p_Value
+	return Var_EvaluateExpression(Environment, p_String, "Var_replaceVariables", "Var_Get")
 }
-x_GetExecutionValue(Environment, p_name)
+x_CheckVariableName(p_VarName)
 {
-	global
-	return global_AllExecutionIDs[Environment.uniqueID].customValues[p_name]
-}
-
-x_NewExecutionFunctionObject(Environment, p_ToCallFunction, params*)
-{
-	oneFunctionObject:=new Class_FunctionObject(Environment, p_ToCallFunction, params*)
-	
-	global_AllExecutionIDs[Environment.uniqueID].ExecutionFunctionObjects[p_ToCallFunction]:=oneFunctionObject
-	return oneFunctionObject
-}
-
-
-; Function object which can be created
-class Class_FunctionObject
-{
-    __New(Environment, ToCallFunction, params*) 
-	{
-		;~ d(params, "ih")
-        this.Environment := Environment
-        this.FunctionObject := ObjBindMethod(this, Call)
-		this.ToCallFunction := ToCallFunction
-		this.params := params
-		return this.FunctionObject
-    }
-   
-    Call(args*) 
-	{
-        ;~ d(args, "adf")
-		if not isobject(args)
-			args:=Object()
-		for oneparindex, onepar in this.params
-		{
-			args.push(onepar)
-		}
-		ToCallFunction:=this.ToCallFunction
-		%ToCallFunction%(this.Environment, args*)
-    }
-	
-	 __Call(method, args*) {
-        if (method = "")  ; For %fn%() or fn.()
-            return this.Call(args*)
-        if (IsObject(method))  ; If this function object is being used as a method.
-            return this.Call(method, args*)
-    }
-	
-	__delete()
-	{
-		MsgBox Class_FunctionObject __delete
-	}
+	return Var_CheckName(p_VarName)
 }
 
 
@@ -241,223 +85,20 @@ x_ImportInstanceVars(Environment, p_VarsToImport)
 	return Var_GetListOfInstanceVars(Environment)
 }
 
-x_FlowEnableByName(Environment, p_FlowName)
+
+
+;execution
+
+x_finish(Environment, p_Result, p_Message = "")
 {
-	global _Flows
-	for forFlowID, forFlow in _Flows
-	{
-		if (forFlow.name = p_FlowName)
-		{
-			API_Main_enableFlow(forFlow.id)
-		}
-	}
-
-}
-
-
-x_FlowDisableByName(Environment, p_FlowName)
-{
-	global _Flows
-	for forFlowID, forFlow in _Flows
-	{
-		if (forFlow.name = p_FlowName)
-		{
-			API_Main_disableFlow(forFlow.id)
-		}
-	}
-
-}
-
-
-x_TriggerEnableByName(Environment, p_FlowName, p_TriggerName="")
-{
-	global _Flows
-	for forFlowID, forFlow in _Flows
-	{
-		if (forFlow.name = p_FlowName)
-		{
-			for forelementID, forelement in forFlow.allElements
-			{
-				;~ d(forelement, p_TriggerName)
-				if (p_TriggerName = "")
-				{
-					if (forElement.class = "trigger_manual" and forElement.defaultTrigger = True)
-					{
-						;~ d(forElement)
-						API_Main_enableOneTrigger(forFlow.id, forelement.id)
-					}
-				}
-				else
-				{
-					if (forelement.class = "trigger_Manual" and forElement.pars.id = p_TriggerName)
-					{
-						;~ d(forElement)
-						API_Main_enableOneTrigger(forFlow.id, forelement.id)
-					}
-				}
-			}
-		}
-	}
-
-}
-x_TriggerDisableByName(Environment, p_FlowName, p_TriggerName="")
-{
-	global _Flows
-	for forFlowID, forFlow in _Flows
-	{
-		if (forFlow.name = p_FlowName)
-		{
-			for forelementID, forelement in forFlow.allElements
-			{
-				;~ d(forelement, p_TriggerName)
-				if (p_TriggerName = "")
-				{
-					if (forElement.class = "trigger_manual" and forElement.defaultTrigger = True)
-					{
-						;~ d(forElement)
-						API_Main_disableOneTrigger(forFlow.id, forelement.id)
-					}
-				}
-				else
-				{
-					if (forelement.class = "trigger_Manual" and forElement.pars.id = p_TriggerName)
-					{
-						;~ d(forElement)
-						API_Main_disableOneTrigger(forFlow.id, forelement.id)
-					}
-				}
-				
-			}
-		}
-	}
-
-}
-
-x_FlowExecuteByName(Environment, p_FlowName, p_TriggerName = "", p_Variables ="", p_CallBackFunction ="")
-{
-	global _Flows
-	global _share
-	random, randomnumber
-	_share.temp[randomnumber]:=Object()
-	_share.temp[randomnumber].CallBack:=p_CallBackFunction
+	finishExecutionOfElement(Environment, p_Result, p_Message)
 	
-	;Fill variables which will be passed
-			;~ _share.temp[randomnumber].varstoPass:=p_Variables
-	varsToPass:=p_Variables
-	_share.temp[randomnumber].varsToPass:=varsToPass
-	
-	for forFlowID, forFlow in _Flows
-	{
-		if (forFlow.name = p_FlowName)
-		{
-			;~ d(_share.temp)
-			if (p_TriggerName = "")
-			{
-				;~ d(p_FlowName)
-				API_Main_executeFlow(forFlow.id, "", randomnumber)
-				return
-			}
-			else
-			{
-				;~ d(p_FlowName " - " p_TriggerName)
-				for forelementID, forelement in forFlow.allElements
-				{
-					;~ d(forelement, p_TriggerName)
-					if forelement.class = "trigger_Manual"
-					{
-						if (forelement.pars.id = p_TriggerName)
-						{
-							;~ d(forFlow.id,forelementID)
-							API_Main_executeFlow(forFlow.id, forelementID, randomnumber)
-							return
-						}
-					}
-				}
-			}
-		}
-	}
-
-}
-x_FlowStopByName(Environment, p_FlowName)
-{
-	global _Flows
-	for forFlowID, forFlow in _Flows
-	{
-		if (forFlow.name = p_FlowName)
-		{
-			API_Main_stopFlow(forFlow.id)
-		}
-	}
-
-}
-x_isFlowEnabledByName(Environment, p_FlowName)
-{
-	global _Flows
-	for forFlowID, forFlow in _Flows
-	{
-		if (forFlow.name = p_FlowName)
-		{
-			return forFlow.enabled
-		}
-	}
-	return False
-}
-x_isTriggerEnabledByName(Environment, p_FlowName, p_TriggerName="")
-{
-	global _Flows
-	for forFlowID, forFlow in _Flows
-	{
-		if (forFlow.name = p_FlowName)
-		{
-			for forelementID, forelement in forFlow.allElements
-			{
-				;~ d(forelement, p_TriggerName)
-				if (p_TriggerName = "")
-				{
-					if (forElement.class = "trigger_manual" and forElement.defaultTrigger = True)
-					{
-						;~ d(forElement)
-						return forElement.enabled 
-					}
-				}
-				else
-				{
-					if (forelement.class = "trigger_Manual" and forElement.pars.id = p_TriggerName)
-					{
-						;~ d(forElement)
-						return forElement.enabled 
-					}
-				}
-				
-			}
-		}
-	}
-	return False
-}
-x_isFlowExecutingByName(Environment, p_FlowName)
-{
-	global _Flows
-	for forFlowID, forFlow in _Flows
-	{
-		if (forFlow.name = p_FlowName)
-		{
-			return forFlow.executing
-		}
-	}
-	return False
 }
 
-x_FlowExistsByName(Environment, p_FlowName)
+
+x_getEntryPoint(Environment) ;For loops
 {
-	global _Flows
-	for forFlowID, forFlow in _Flows
-	{
-		if (forFlow.name = p_FlowName)
-		{
-			return True
-		}
-	}
-	Return False
+	return Environment.ElementEntryPoint
 }
 
 
@@ -466,9 +107,82 @@ x_InstanceStop(Environment)
 	global _execution
 	
 	stopInstance(_execution.Instances[Environment.instanceID])
-	
-
 }
+
+
+x_GetMyUniqueExecutionID(Environment)
+{
+	return Environment.UniqueID
+}
+
+x_GetMyEnvironmentFromExecutionID(p_ExecutionID)
+{
+	global
+	return global_AllExecutionIDs[p_ExecutionID].environment
+}
+
+x_SetExecutionValue(Environment, p_name, p_Value)
+{
+	global
+	;~ d(Environment, p_name)
+	Environment.ElementExecutionValues[p_name]:=p_value
+	;~ global_AllExecutionIDs[Environment.uniqueID].customValues[p_name]:=p_Value
+}
+x_GetExecutionValue(Environment, p_name)
+{
+	global
+	;~ return global_AllExecutionIDs[Environment.uniqueID].customValues[p_name]
+	return Environment.ElementExecutionValues[p_name]
+}
+
+x_NewExecutionFunctionObject(Environment, p_ToCallFunction, params*)
+{
+	oneFunctionObject:=new Class_FunctionObject(Environment, p_ToCallFunction, params*)
+	
+	global_AllExecutionIDs[Environment.uniqueID].ExecutionFunctionObjects[p_ToCallFunction]:=oneFunctionObject
+	return oneFunctionObject
+}
+
+
+; Function object for function x_NewExecutionFunctionObject
+class Class_FunctionObject
+{
+    __New(Environment, ToCallFunction, params*) 
+	{
+		;~ d(params, "ih")
+        this.Environment := Environment
+        this.FunctionObject := ObjBindMethod(this, Call)
+		this.ToCallFunction := ToCallFunction
+		this.params := params
+		return this.FunctionObject
+    }
+   
+    Call(args*) 
+	{
+        ;~ d(args, "adf")
+		if not isobject(args)
+			args:=Object()
+		for oneparindex, onepar in this.params
+		{
+			args.push(onepar)
+		}
+		ToCallFunction:=this.ToCallFunction
+		%ToCallFunction%(this.Environment, args*)
+    }
+	
+	 __Call(method, args*) {
+        if (method = "")  ; For %fn%() or fn.()
+            return this.Call(args*)
+        if (IsObject(method))  ; If this function object is being used as a method.
+            return this.Call(method, args*)
+    }
+	
+	__delete()
+	{
+		MsgBox Class_FunctionObject __delete
+	}
+}
+
 
 x_GetThreadCountInCurrentInstance(Environment)
 {
@@ -484,15 +198,9 @@ x_GetThreadCountInCurrentInstance(Environment)
 	return count
 }
 
-x_GetFullPath(Environment, p_Path)
-{
-	global _Flows
-	path:=p_Path
-	if  DllCall("Shlwapi.dll\PathIsRelative","Str",path)
-		path:=_Flows[Environment.FlowID].flowsettings.workingdir "\" path
-	return path
-}
 
+
+;exeuction in other ahk thread
 x_ExecuteInNewAHKThread(Environment, p_functionObject, p_Code, p_VarsToImport, p_VarsToExport)
 {
 	global _share, global_AllExecutionIDs
@@ -526,7 +234,7 @@ x_ExecuteInNewAHKThread(Environment, p_functionObject, p_Code, p_VarsToImport, p
 	AhkThread("`n" preCode "`n" p_Code "`n" postCode)
 	
 }
-x_ExecuteInNewAHKThread_finishedExecution(p_ExecutionID)
+ExecuteInNewAHKThread_finishedExecution(p_ExecutionID) ;Not an api function
 {
 	global _share, global_AllExecutionIDs
 	Environment:=x_GetMyEnvironmentFromExecutionID(p_ExecutionID)
@@ -537,30 +245,11 @@ x_ExecuteInNewAHKThread_finishedExecution(p_ExecutionID)
 }
 
 
-x_log(Environment, LoggingText, loglevel = 2)
-{
-	global _flows
-	logger("f" loglevel, "Flow: " _flows[Environment.FlowID].name " (" Environment.FlowID ") - Element " _flows[Environment.FlowID].allElements[Environment.elementID].name " (" Environment.elementID "): " LoggingText)
-}
 
-
-;For elements
-x_finish(Environment, Result, Message = "")
-{
-	finishExecutionOfElement(Environment, Result, Message)
-	
-}
-
-;For loops
-x_getEntryPoint(Environment)
-{
-	return Environment.ElementEntryPoint
-}
 
 ;For triggers
-x_trigger(Environment, triggerVars="")
+x_trigger(Environment)
 {
-	Environment.triggerVars:=triggerVars
 	newInstance(Environment)
 }
 
@@ -576,35 +265,363 @@ x_disabled(Environment, Result, Message = "")
 }
 
 
-;While editing
 
-x_Par_Disable(Environment,p_ParameterID, p_TrueOrFalse = True)
+;get some information
+
+
+x_GetMyFlowID(Environment)
 {
-	;~ return ElementSettings.field.enable(p_ParameterID,not p_TrueOrFalse)
+	return Environment.FlowID
 }
-x_Par_Enable(Environment,p_ParameterID, p_TrueOrFalse = True)
+x_GetMyFlowName(Environment)
 {
-	;~ return ElementSettings.field.enable(p_ParameterID,p_TrueOrFalse)
+	global _flows
+	return _flows[Environment.FlowID].name
 }
-x_Par_SetValue(Environment,p_ParameterID, p_Value)
+
+x_GetMyElementID(Environment)
 {
-	;~ return ElementSettings.field.setvalue(p_Value,p_ParameterID)
+	return Environment.elementID
 }
-x_Par_GetValue(Environment,p_ParameterID)
+
+
+x_getFlowIDByName(p_FlowName)
 {
-	;~ return ElementSettings.field.getvalue(p_ParameterID)
+	global _flows
+	for forFlowID, forFlow in _Flows
+	{
+		if (forFlow.name = p_FlowName)
+		{
+			return forFlowID
+		}
+	}
 }
-x_Par_SetChoices(Environment,p_ParameterID, p_Choices)
+
+x_FlowExistsByName(p_FlowName)
 {
+	global _Flows
+	for forFlowID, forFlow in _Flows
+	{
+		if (forFlow.name = p_FlowName)
+		{
+			return True
+		}
+	}
+	return false
+}
+
+x_FlowExists(p_FlowID)
+{
+	global _Flows
+	if (_Flows[p_FlowID].id)
+		return true
+	else 
+		return false
+}
+
+
+x_isFlowEnabled(p_FlowID)
+{
+	global _Flows
+	if _flows[p_FlowID].enabled
+		return true
+	else
+		return False
+}
+
+
+
+x_isFlowExecuting(p_FlowID)
+{
+	global _Flows
+	if (_Flows[p_FlowID].executing)
+		return true
+	else
+		return False
+}
+
+
+x_FlowEnable(p_FlowID)
+{
+	global _Flows
+	if x_FlowExists(p_FlowID)
+		API_Main_enableFlow(p_FlowID)
+
+}
+
+
+x_FlowDisable(p_FlowID)
+{
+	global _Flows
+	if x_FlowExists(p_FlowID)
+		API_Main_disableFlow(p_FlowID)
 	
 }
 
-;everywhere
+x_FlowStop(p_FlowID)
+{
+	global _Flows
+	
+	if x_FlowExists(p_FlowID)
+		API_Main_stopFlow(p_FlowID)
+}
+
+x_GetListOfFlowNames()
+{
+	global _flows
+	;Search for all flowNames
+	choices:=object()
+	for oneFlowID, oneFlow in _flows
+	{
+		choices.push(oneFlow.name)
+	}
+	return choices
+}
+
+x_GetListOfFlowIDs()
+{
+	global _flows
+	;Search for all flowNames
+	choices:=object()
+	for oneFlowID, oneFlow in _flows
+	{
+		choices.push(oneFlowID)
+	}
+	return choices
+}
+
+
+
+
+
+x_getAllElementIDsOfType(p_FlowID, p_Type)
+{
+	global _flows
+	
+	elements:=Object()
+	for oneElementID, oneElement in _flows[p_FlowID].allElements
+	{
+		if (oneElement.class = p_Class)
+			elements.push(oneElementID)
+	}
+	return elements
+}
+
+x_getAllElementIDsOfClass(p_FlowID, p_Class)
+{
+	global _flows
+	
+	elements:=Object()
+	for oneElementID, oneElement in _flows[p_FlowID].allElements
+	{
+		if (oneElement.class = p_Class)
+			elements.push(oneElementID)
+	}
+	return elements
+}
+
+x_getElementPars(p_FlowID, p_ElementID)
+{
+	global _flows
+	return objfullyClone(_flows[p_FlowID].allElements[p_ElementID].pars)
+}
+x_getElementName(p_FlowID, p_ElementID)
+{
+	global _flows
+	return _flows[p_FlowID].allElements[p_ElementID].name
+}
+x_getElementClass(p_FlowID, p_ElementID)
+{
+	global _flows
+	return _flows[p_FlowID].allElements[p_ElementID].class
+}
+
+
+
+
+
+
+;Manual trigger
+x_ManualTriggerExist(p_FlowID, p_TriggerName = "")
+{
+	global _Flows
+	for forelementID, forelement in _flows[p_FlowID].allElements
+	{
+		;~ d(forelement, p_TriggerName)
+		if (p_TriggerName = "")
+		{
+			if (forElement.class = "trigger_manual" and forElement.defaultTrigger = True)
+			{
+				;~ d(forElement)
+				return true
+			}
+		}
+		else
+		{
+			if (forelement.class = "trigger_Manual" and forElement.pars.id = p_TriggerName)
+			{
+				;~ d(forElement)
+				return true
+			}
+		}
+		
+	}
+	return False
+}
+
+x_isManualTriggerEnabled(p_FlowID, p_TriggerName="")
+{
+	global _Flows
+	for forelementID, forelement in _flows[p_FlowID].allElements
+	{
+		;~ d(forelement, p_TriggerName)
+		if (p_TriggerName = "")
+		{
+			if (forElement.class = "trigger_manual" and forElement.defaultTrigger = True)
+			{
+				;~ d(forElement)
+				return forElement.enabled 
+			}
+		}
+		else
+		{
+			if (forelement.class = "trigger_Manual" and forElement.pars.id = p_TriggerName)
+			{
+				;~ d(forElement)
+				return forElement.enabled 
+			}
+		}
+		
+	}
+	return False
+}
+
+x_ManualTriggerEnable(p_FlowID, p_TriggerName="")
+{
+	global _Flows
+	
+	for forelementID, forelement in _flows[p_FlowID].allElements
+	{
+		;~ d(forelement, p_TriggerName)
+		if (p_TriggerName = "")
+		{
+			if (forElement.class = "trigger_manual" and forElement.defaultTrigger = True)
+			{
+				;~ d(forElement)
+				API_Main_enableOneTrigger(forFlow.id, forelement.id)
+			}
+		}
+		else
+		{
+			if (forelement.class = "trigger_Manual" and forElement.pars.id = p_TriggerName)
+			{
+				;~ d(forElement)
+				API_Main_enableOneTrigger(forFlow.id, forelement.id)
+			}
+		}
+	}
+
+}
+
+x_ManualTriggerDisable(p_FlowID, p_TriggerName="")
+{
+	global _Flows
+	for forelementID, forelement in _flows[p_FlowID].allElements
+	{
+		;~ d(forelement, p_TriggerName)
+		if (p_TriggerName = "")
+		{
+			if (forElement.class = "trigger_manual" and forElement.defaultTrigger = True)
+			{
+				;~ d(forElement)
+				API_Main_disableOneTrigger(forFlow.id, forelement.id)
+			}
+		}
+		else
+		{
+			if (forelement.class = "trigger_Manual" and forElement.pars.id = p_TriggerName)
+			{
+				;~ d(forElement)
+				API_Main_disableOneTrigger(forFlow.id, forelement.id)
+			}
+		}
+	}
+
+}
+
+x_ManualTriggerExecute(p_FlowID, p_TriggerName = "", p_Variables ="", p_CallBackFunction ="")
+{
+	global _Flows
+	global _share
+	random, randomnumber
+	_share.temp[randomnumber]:=Object()
+	_share.temp[randomnumber].CallBack:=p_CallBackFunction
+	
+	;Fill variables which will be passed
+			;~ _share.temp[randomnumber].varstoPass:=p_Variables
+	varsToPass:=p_Variables
+	_share.temp[randomnumber].varsToPass:=varsToPass
+	
+	
+	if x_FlowExists(p_FlowID)
+	{
+		
+		;~ d(_share.temp)
+		if (p_TriggerName = "")
+		{
+			;~ d(p_FlowName)
+			API_Main_executeFlow(p_FlowID, "", randomnumber)
+			return
+		}
+		else
+		{
+			;~ d(p_FlowName " - " p_TriggerName)
+			for forelementID, forelement in _flows[p_FlowID].allElements
+			{
+				;~ d(forelement, p_TriggerName)
+				if forelement.class = "trigger_Manual"
+				{
+					if (forelement.pars.id = p_TriggerName)
+					{
+						;~ d(forFlow.id,forelementID)
+						API_Main_executeFlow(p_FlowID, forelementID, randomnumber)
+						return
+					}
+				}
+			}
+		}
+	}
+}
+
+
+
+
+
+
+;While editing (not supported here)
+
+x_Par_Disable(Environment,p_ParameterID, p_TrueOrFalse = True)
+{
+}
+x_Par_Enable(Environment,p_ParameterID, p_TrueOrFalse = True)
+{
+}
+x_Par_SetValue(Environment,p_ParameterID, p_Value)
+{
+}
+x_Par_GetValue(Environment,p_ParameterID)
+{
+}
+x_Par_SetChoices(Environment,p_ParameterID, p_Choices)
+{
+}
+
+;common functions. Available everywhere
+
 x_randomPhrase()
 {
 	return randomPhrase()
 }
-
 
 x_ConvertObjToString(p_Value)
 {
@@ -619,4 +636,19 @@ x_ConvertStringToObj(p_Value)
 x_ConvertStringToObjOrObjToString(p_Value)
 {
 	return strobj(p_Value)
+}
+
+
+x_log(Environment, LoggingText, loglevel = 2)
+{
+	global _flows
+	logger("f" loglevel, "Flow: " _flows[Environment.FlowID].name " (" Environment.FlowID ") - Element " _flows[Environment.FlowID].allElements[Environment.elementID].name " (" Environment.elementID "): " LoggingText)
+}
+x_GetFullPath(Environment, p_Path)
+{
+	global _Flows
+	path:=p_Path
+	if  DllCall("Shlwapi.dll\PathIsRelative","Str",path)
+		path:=_Flows[Environment.FlowID].flowsettings.workingdir "\" path
+	return path
 }

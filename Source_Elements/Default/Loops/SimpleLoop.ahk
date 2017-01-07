@@ -26,7 +26,7 @@ Element_getParameters_Loop_SimpleLoop()
 	return ["Infinite", "repeatCount"]
 }
 
-Element_getParametrizationDetails_Loop_SimpleLoop()
+Element_getParametrizationDetails_Loop_SimpleLoop(Environment)
 {
 	parametersToEdit:=Object()
 	parametersToEdit.push({type: "Label", label: lang("Repeats")})
@@ -34,6 +34,17 @@ Element_getParametrizationDetails_Loop_SimpleLoop()
 	parametersToEdit.push({type: "Edit", id: "repeatCount", default: 5, content: "Expression", WarnIfEmpty: true})
 
 	return parametersToEdit
+}
+
+
+Element_GenerateName_Loop_SimpleLoop(Environment, ElementParameters)
+{
+	global
+	
+	if (ElementParameters.Infinite)
+		return lang("Simple loop") ": " lang("Infinite loop") 
+	else
+		return lang("Simple loop") ": " ElementParameters.repeatCount " " lang("Repeats") 
 }
 
 Element_run_Loop_SimpleLoop(Environment, ElementParameters)
@@ -86,17 +97,4 @@ Element_run_Loop_SimpleLoop(Environment, ElementParameters)
 		;~ return x_finish(Environment,"no")
 	
 
-}
-
-Element_GenerateName_Loop_SimpleLoop(Environment, ElementParameters)
-{
-	global
-	
-	if (ElementParameters.Infinite)
-		return lang("Simple loop") ": " lang("Infinite loop") 
-	else
-		return lang("Simple loop") ": " ElementParameters.repeatCount " " lang("Repeats") 
-	
-
-	
 }

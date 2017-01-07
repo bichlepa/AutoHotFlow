@@ -26,16 +26,20 @@ Element_getParameters_Action_Set_Flow_Status()
 	return [ "Enable", "ThisFlow", "flowName", "WhichTrigger", "triggerName"]
 }
 
-Element_getParametrizationDetails_Action_Set_Flow_Status()
+Element_getParametrizationDetails_Action_Set_Flow_Status(Environment)
 {
 	choicesFlows := x_GetListOfFlowNames()
-	allTriggers := x_GetAllMyFlowManualTriggers(Environment)
+	FlowID := x_GetMyFlowID(Environment)
+	myFlowName := x_GetMyFlowName(Environment)
+	
+	allTriggerIDs := x_getAllElementIDsOfClass(FlowID, "manual_trigger")
+	
 	choicesTriggers:=Object()
-	for oneID, oneTrigger in allTriggers
+	for oneIDIndex, oneTriggerID in allTriggerIDs
 	{
-		choicesTriggers.push(oneTrigger.pars.id)
+		elementPars:=x_getElementPars(FlowID, oneTriggerID)
+		choicesTriggers.push(elementPars.id)
 	}
-	myFlowName:= x_GetMyFlowName(Environment)
 	
 	parametersToEdit:=Object()
 	parametersToEdit.push({type: "Label", label: lang("New state")})
@@ -48,61 +52,6 @@ Element_getParametrizationDetails_Action_Set_Flow_Status()
 	parametersToEdit.push({type: "ComboBox", id: "triggerName", content: "String", WarnIfEmpty: true, result: "string", choices: choicesTriggers})
 
 	return parametersToEdit
-}
-
-Element_run_Action_Set_Flow_Status(Environment, ElementParameters)
-{
-	if (ElementParameters.ThisFlow)
-		FlowName:=x_GetMyFlowName(Environment)
-	else
-	{
-		FlowName := x_replaceVariables(Environment, ElementParameters.flowName)
-		
-		if not x_FlowExistsByName(Environment,FlowName)
-		{
-			return x_finish(Environment,"exception",lang("Flow '%1%' does not exist",FlowName))
-		}
-	}
-	
-	
-	if (ElementParameters.WhichTrigger = 1)
-	{
-		
-		if (ElementParameters.Enable = 1)
-			x_FlowEnableByName(Environment,FlowName)
-		else if (ElementParameters.Enable = 2)
-			x_FlowDisableByName(Environment,FlowName)
-		return x_finish(Environment,"normal")
-	
-	}
-	else 
-	{
-		if (ElementParameters.WhichTrigger = 2)
-		{
-			TriggerName := ""
-		}
-		else
-		{
-			TriggerName := x_replaceVariables(Environment, ElementParameters.triggerName)
-			if (TriggerName ="")
-			{
-				return x_finish(Environment,"exception",lang("Trigger name is empty",FlowName))
-			}
-		}
-		
-		
-		if (ElementParameters.Enable = 1)
-			x_TriggerEnableByName(Environment,FlowName,TriggerName)
-		else if (ElementParameters.Enable = 2)
-			x_TriggerDisableByName(Environment,FlowName,TriggerName)
-		return x_finish(Environment,"normal")
-		
-	}
-	
-	
-	
-	
-	return
 }
 
 Element_GenerateName_Action_Set_Flow_Status(Environment, ElementParameters)
@@ -152,16 +101,19 @@ Element_CheckSettings_Action_Set_Flow_Status(Environment, ElementParameters)
 		
 		if (ElementParameters.ThisFlow)
 		{
-			allTriggers := x_GetAllMyFlowManualTriggers(Environment)
+			FlowID := x_getMyFlowID(Environment)
 		}
 		else
 		{
-			allTriggers := x_GetAllManualTriggersOfFlowByName(ElementParameters.flowName)
+			FlowID := x_getFlowIDByName(ElementParameters.flowName)
 		}
+		allTriggerIDs := x_getAllElementIDsOfClass(FlowID, "manual_trigger")
+		
 		choicesTriggers:=Object()
-		for oneID, oneTrigger in allTriggers
+		for oneIndex, oneTriggerID in allTriggerIDs
 		{
-			choicesTriggers.push(oneTrigger.pars.id)
+			elementPars:=x_getElementPars(FlowID, oneTriggerID)
+			choicesTriggers.push(elementPars.id)
 		}
 		x_Par_SetChoices(Environment,"triggerName", choicesTriggers)
 		
@@ -178,4 +130,64 @@ Element_CheckSettings_Action_Set_Flow_Status(Environment, ElementParameters)
 		
 	}
 	
+}
+
+Element_run_Action_Set_Flow_Status(Environment, ElementParameters)
+{
+	if (ElementParameters.ThisFlow)
+		FlowName:=x_GetMyFlowName(Environment)
+	else
+	{
+		FlowName := x_replaceVariables(Environment, ElementParameters.flowName)
+		
+		if not x_FlowExistsByName(FlowName)
+		{
+			return x_finish(Environment,"exception",lang("Flow '%1%' does not exist",FlowName))
+		}
+	}
+	FlowID:=x_getFlowIDByName(FlowName)
+	
+	
+	if (ElementParameters.WhichTrigger = 1)
+	{
+		
+		if (ElementParameters.Enable = 1)
+			x_FlowEnable(FlowID)
+		else if (ElementParameters.Enable = 2)
+			x_FlowDisable(FlowID)
+		return x_finish(Environment,"normal")
+	
+	}
+	else 
+	{
+		if (ElementParameters.WhichTrigger = 2)
+		{
+			TriggerName := ""
+		}
+		else
+		{
+			TriggerName := x_replaceVariables(Environment, ElementParameters.triggerName)
+			if (TriggerName ="")
+			{
+				return x_finish(Environment,"exception",lang("Trigger name is empty",FlowName))
+			}
+		}
+		
+		if not x_ManualTriggerExist(FlowID, TriggerName)
+		{
+			return x_finish(Environment,"exception",lang("Trigger '%1%' in flow '%2%' does not exist",TriggerNameText, FlowName))
+		}
+		
+		if (ElementParameters.Enable = 1)
+			x_ManualTriggerEnable(FlowID,TriggerName)
+		else if (ElementParameters.Enable = 2)
+			x_ManualTriggerDisable(FlowID,TriggerName)
+		return x_finish(Environment,"normal")
+		
+	}
+	
+	
+	
+	
+	return
 }

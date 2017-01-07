@@ -31,7 +31,7 @@ Element_getParameters_Action_Tooltip()
 	return ["text", "duration", "Unit", "follow_mouse"]
 }
 
-Element_getParametrizationDetails_Action_Tooltip()
+Element_getParametrizationDetails_Action_Tooltip(Environment)
 {
 	parametersToEdit:=Object()
 	parametersToEdit.push({type: "Label", label: lang("Text_to_show")})
@@ -43,6 +43,25 @@ Element_getParametrizationDetails_Action_Tooltip()
 	parametersToEdit.push({type: "Checkbox", id: "follow_mouse", default: 1, label: lang("Follow_Mouse")})
 
 	return parametersToEdit
+}
+	
+Element_GenerateName_Action_Tooltip(Environment, ElementParameters)
+{
+	global
+	if (ElementParameters.Unit = 1)
+		duration:=ElementParameters.duration " " lang("ms #Milliseconds")
+	if (ElementParameters.Unit = 2)
+		duration:=ElementParameters.duration " " lang("s #Seconds")
+	if (ElementParameters.Unit = 3)
+		duration:=ElementParameters.duration " " lang("m #Minutes")
+	
+	if (ElementParameters.follow_mouse=1)
+		temptext:=lang("Follow_Mouse")
+	else
+		temptext=
+	return lang("Tooltip") ": " ElementParameters.text " - " duration " - " temptext
+	
+	
 }
 
 Element_run_Action_Tooltip(Environment, ElementParameters)
@@ -92,23 +111,4 @@ runActionTooltip_RemoveTooltip()
 Element_stop_Action_Tooltip(Environment, ElementParameters)
 {
 	runActionTooltip_RemoveTooltip()
-}
-	
-Element_GenerateName_Action_Tooltip(Environment, ElementParameters)
-{
-	global
-	if (ElementParameters.Unit = 1)
-		duration:=ElementParameters.duration " " lang("ms #Milliseconds")
-	if (ElementParameters.Unit = 2)
-		duration:=ElementParameters.duration " " lang("s #Seconds")
-	if (ElementParameters.Unit = 3)
-		duration:=ElementParameters.duration " " lang("m #Minutes")
-	
-	if (ElementParameters.follow_mouse=1)
-		temptext:=lang("Follow_Mouse")
-	else
-		temptext=
-	return lang("Tooltip") ": " ElementParameters.text " - " duration " - " temptext
-	
-	
 }
