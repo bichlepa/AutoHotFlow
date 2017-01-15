@@ -283,7 +283,7 @@ Class StrObj {		; String-object-file (data structures in YAML-like style). By Le
 		Equal := this.Equal
 		DerefValues := this.DerefValues
 		SmartIndentTrim := this.SmartIndentTrim
-		obj := [], KeyNames := [], Items := [], LastDepth := 0, CurNum := [0,0,0,0,0,0,0,0,0,0], IndentLen := StrLen(Indent)
+		obj := [], KeyNames := [], Items := [], LastDepth := 0, CurNum := [0,0,0,0,0,0,0,0,0,0,0,0,0], IndentLen := StrLen(Indent)
 		
 		;=== SmartIndentTrim ===
 		if (SmartIndentTrim = 1) {	; useful in [indented continuation sections] and [overindented text in .txt files] which contain YAML-like string
@@ -396,12 +396,18 @@ Class StrObj {		; String-object-file (data structures in YAML-like style). By Le
 			else if (CurLevel = 8)
 				obj[n.1][n.2][n.3][n.4][n.5][n.6][n.7][n.8] := value
 			else if (CurLevel = 9)
-				obj[n.1][n.2][n.3][n.4][n.5][n.6][n.7][n.8][n.9] := value	; etc
+				obj[n.1][n.2][n.3][n.4][n.5][n.6][n.7][n.8][n.9] := value	
+			else if (CurLevel = 10)
+				obj[n.1][n.2][n.3][n.4][n.5][n.6][n.7][n.8][n.9][n.10] := value	
+			else if (CurLevel = 11)
+				obj[n.1][n.2][n.3][n.4][n.5][n.6][n.7][n.8][n.9][n.10][n.11] := value	
+			else if (CurLevel = 12)
+				obj[n.1][n.2][n.3][n.4][n.5][n.6][n.7][n.8][n.9][n.10][n.11][n.12] := value	; etc
 		}
 		return obj
 	}
 	
-	ObjToStr(Obj, Depth=9, CurIndent="") {	; Converts object to YAML-like string.
+	ObjToStr(Obj, Depth=12, CurIndent="") {	; Converts object to YAML-like string.
 		For k,v in Obj
 		{
 			if (IsObject(v) = 1 and Depth>1 ) {

@@ -251,6 +251,13 @@ Var_GetLocation(Environment, p_Name, p_hidden=False)
 Var_Set(Environment, p_Name, p_Value, p_Destination="", p_hidden=False)
 {
 	global _execution
+	
+	if (isobject(p_Name))
+	{
+		;todo: allow paths in objects
+		p_Name := p_Name.1
+	}
+	
 	res:=Var_CheckName(p_Name,true)
 	if (res="empty")
 	{
@@ -283,10 +290,16 @@ Var_Set(Environment, p_Name, p_Value, p_Destination="", p_hidden=False)
 Var_Get(environment, p_Name, p_hidden = False)
 {
 	global _execution
+	;~ d(p_Name) 
 	tempvalue=
 	if (p_Name="")
 	{
 		logger("f0","Retrieving variable failed. The name is empty")
+	}
+	if (isobject(p_Name))
+	{
+		;todo: allow paths in objects
+		p_Name := p_Name.1
 	}
 	
 	tempLocation := Var_GetLocation(Environment, p_Name, p_hidden)

@@ -37,7 +37,7 @@ x_replaceVariables(Environment, p_String, p_pars ="")
 x_EvaluateExpression(Environment, p_String)
 {
 	global
-	return Var_EvaluateExpression(Environment, p_String, "Var_replaceVariables", "Var_Get")
+	return Var_EvaluateExpression(Environment, p_String, "Var_Get")
 }
 x_CheckVariableName(p_VarName)
 {
