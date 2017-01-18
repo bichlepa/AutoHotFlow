@@ -1,50 +1,4 @@
 ﻿
-global vars:={a: 2, b: 5}
-getvar(varname)
-{
-	return vars[varname]
-}
-
-;~ a:=1
-;~ if (a =1) 
-	 ;~ {c:=3}
-;~ else {c:=4}
-;~ a:=2
-;~ if (a ==1) 
-	 ;~ {d:=3}
-;~ else {d:=4}
-
-;~ MsgBox %a% %c% %d%
-
-;~ testExpr =
-;~ (
-;~ aasdf:=round(2)
-;~ bage:="hello" 4
-
-;~ if (bage = "hel" "o"  round(10/2-1))
-	
-	;~ cee:=1
-
-;~ else if bage = "hell" "o"  round(10/2-1) 
-;~ {
-	
-	;~ cee:="richtig" 
-	
-	;~ d:=2
-	
-;~ }
-;~ else cee:=3
-
-;~ str:="sd"
-;~ asdf:=object()
-;~ a`%str`%f.baba:=2
-;~ asdf.baba:=2
-;~ asdf["cab" "a"]:=asdf.baba + 3
-;~ )
-
-
-;~ testExpr := "(5<7)*5"
-
 
 Var_EvaluateExpression(environment,ExpressionString,  func_GetVariable)
 {
@@ -57,27 +11,41 @@ Var_EvaluateExpression(environment,ExpressionString,  func_GetVariable)
 	;~ MsgBox % A_LineNumber "`n" strobj(myinputstream) "`n~`n" myinputstream.peek()
 	;~ MsgBox % A_LineNumber "`n" strobj(myTokenstream) "`n~`n" myTokenstream.next()
 	;~ MsgBox % A_LineNumber "`n" strobj(myinputstream) "`n~`n" myinputstream.peek()
-	parsedCode:=new parse(myTokenstream, "expression")
+	myParser:=new parse(myTokenstream)
 	
+	parsedCode:=myParser.parse_expression_toplevel()
 	
-	FileDelete,result.txt
-	FileAppend,% ExpressionString "`n`n" ,result.txt,utf-8
-	FileAppend,% strobj(parsedCode) "`n`n",result.txt,utf-8
+	;~ FileDelete,result.txt
+	;~ FileAppend,% ExpressionString "`n`n" ,result.txt,utf-8
+	;~ FileAppend,% strobj(parsedCode) "`n`n",result.txt,utf-8
 	;~ MsgBox % strobj(parsedCode)
+	
 	
 	if (parsedCode.errors.MaxIndex())
 	{
-		MsgBox % "Do not execute because there are errors:`n" strobj(parsedCode.errors)
+		;~ d(parsedCode.errors)
+		;~ MsgBox % "Do not execute because there are errors:`n" parsedCode.errorsString
+		;generate readable string
+		string:=""
+		for oneindex, oneerror in parsedCode.errors
+		{
+			if (a_index!=1)
+				string.="`n`n"
+			string.=lang("line %1%, col %2%`n", oneerror.linenr, oneerror.colnr) 
+			string.=oneerror.line "`n"
+			string.=oneerror.description
+		}
+		
+		return {error: string}
 	}
 	else
 	{
-		env:=new environment()
-		result:=evaluate(parsedCode, env, func_GetVariable)
+		result:=evaluate(parsedCode, environment, func_GetVariable)
 		FileAppend,% strobj(env) "`n`n",result.txt,utf-8
 		;~ MsgBox % "result = " result "`n`n" strobj(env)
+		return {result: result}
 	}
 	
-	return result
 }
 
 
@@ -137,29 +105,31 @@ class inputStream
 			linestring:=substr(this.input,this.linestart) 
 		;~ posstring:=format("{1:" this.col -2 "s}"," ")
 		;~ MsgBox % this.col
-		posstring:=""
-		if (this.col >len+1)
-			posstring:=format("{1:" this.col -len-1 "s}"," ")
-		while(len>=a_index)
-			posstring.="^"
-		this.errors.push({description: msg, linenr: this.line, colnr: this.col, line: linestring, linepos: posstring})
-		gui,font,,consolas
-		gui,add,edit,readonly,% msg "`n`nline: " this.line "`ncol: " this.col "`n`n" linestring "`n" posstring
-		gui,add,button,gok vok w100 default,OK
-		guicontrol,focus,ok
-		gui,show
-		okpressed:=false
-		while(okpressed=false)
-			sleep 10
+		;~ posstring:=""
+		;~ if (this.col >len+1)
+			;~ posstring:=format("{1:" this.col -len-1 "s}"," ")
+		;~ while(len>=a_index)
+			;~ posstring.="^"
+		this.errors.push({description: msg, linenr: this.line, colnr: this.col, line: linestring})
+		
+		
+		;~ gui,font,,consolas
+		;~ gui,add,edit,readonly,% msg "`n`nline: " this.line "`ncol: " this.col "`n`n" linestring "`n" posstring
+		;~ gui,add,button,gok vok w100 default,OK
+		;~ guicontrol,focus,ok
+		;~ gui,show
+		;~ okpressed:=false
+		;~ while(okpressed=false)
+			;~ sleep 10
 		;~ MsgBox ,0, error while parsing, % msg "`n`nline: " this.line "`ncol: " this.col "`n`n" linestring "`n" posstring
-		ok:
-		gui,destroy
-		okpressed:=true
-		return
+		;~ ok:
+		;~ gui,destroy
+		;~ okpressed:=true
+		;~ return
 	}
 	getErrors()
 	{
-		return this.Errors
+		return this.errors
 	}
 }
 
@@ -451,6 +421,7 @@ class parse
 		this.precedence["*="] :=  1
 		this.precedence["||"] :=  2
 		this.precedence["&&"] :=  3
+		this.precedence["!"] :=  4
 		this.precedence["<"] :=  7
 		this.precedence[">"] :=  7
 		this.precedence["<="] :=  7
@@ -466,12 +437,6 @@ class parse
 		this.precedence["//"] :=  20
 		this.precedence["%"] :=  20
 		this.input:=input
-		if (whatParse="code")
-			return this.parse_code_toplevel()
-		else if (whatParse="expression")
-			return this.parse_expression_toplevel()
-		else
-			MsgBox I dont't know what to parse!
 			
 	}
 	
@@ -700,7 +665,7 @@ class parse
 				;~ }
 				;~ else
 				;~ {
-					;~ this.input.croak("Unexected token in variable path: `n"  strobj(tok) , strlen(tok.value) )
+					;~ this.input.croak("Unexpected token in variable path: `n"  strobj(tok) , strlen(tok.value) )
 				;~ }
 				
 			;~ }
@@ -766,8 +731,20 @@ class parse
 			nexttok:=this.input.peek()
 			if (nexttok.type = "var" || nexttok.type = "num" || nexttok.type = "str" )
 			{
-				tok := {type: "op", value: "."}
-				DoNotSkipToken:=True
+				if (nexttok.type = "var" && nexttok.path.maxindex()=1)
+				{
+					if (nexttok.path[1]="or")
+						tok := {type: "op", value: "||"}
+					if (nexttok.path[1]="and")
+						tok := {type: "op", value: "&&"}
+					if (nexttok.path[1]="not")
+						tok := {type: "op", value: "!"}
+				}
+				else
+				{
+					tok := {type: "op", value: "."}
+					DoNotSkipToken:=True
+				}
 			}
 		}
 		;~ MsgBox % strobj(tok)
@@ -836,7 +813,7 @@ class parse
 					;If not, there is something what is not expected. Tell error
 					expr:=""
 					;~ MsgBox % strobj(tok)
-					this.input.croak("Unexected token in expression: `n"  strobj(tok) , strlen(tok.value) )
+					this.input.croak("Unexpected token in expression: `n"  strobj(tok) , strlen(tok.value) )
 			;~ MsgBox % A_ThisFunc " @ " A_LineNumber "`n" strobj(expr) "`n~`n" strobj(this)
 				}
 			}
@@ -890,7 +867,7 @@ class parse
 				{
 					;If not, there is something what is not expected. Tell error
 					expr:=""
-					this.input.croak("Unexected token in code: `n"  strobj(tok) , strlen(tok.value) )
+					this.input.croak("Unexpected token in code: `n"  strobj(tok) , strlen(tok.value) )
 			;~ MsgBox % A_ThisFunc " @ " A_LineNumber "`n" strobj(expr) "`n~`n" strobj(this)
 				}
 			}
@@ -950,7 +927,15 @@ class parse
 	parse_expression_toplevel()
 	{
 		prog:=this.parse_expression(this.parse_expressionToken(),0)
+		if (!isobject(prog))
+			prog:=Object()
 		prog.errors:=this.getErrors()
+		
+		if (not this.input.eof())
+		{
+			tok:=this.input.peek()
+			this.input.croak("Unexpected token in code: `n"  strobj(tok) , strlen(tok.value) )
+		}
 		return prog
 		
 	}
@@ -959,81 +944,9 @@ class parse
 	{
 		return this.input.getErrors()
 	}
+	
 }
 
-
-class Environment
-{
-	__new()
-	{
-		this.vars:=Object()
-	}
-	
-	
-	lookup(name)
-	{
-		
-	}
-	get(name,warn:=true)
-	{
-		if (isobject(name))
-		{
-			result:=this.vars[name[1]]
-			if (this.vars.haskey(name[1]))
-				loop % name.maxindex() -1
-				{
-					result:=result[name[a_index+1]]
-				}
-			return result
-		}
-		else
-		{
-			if (this.vars.haskey(name))
-				return this.vars[name]
-			else
-			{
-				if (warn)
-					MsgBox Error. undefined variable %name%
-				return
-			}
-		}
-	}
-	set(name,value)
-	{
-		if (isobject(name))
-		{
-			result:=this.vars
-			pathstring:=""
-			lastindex:=0
-			loop % name.maxindex() -1
-			{
-				pathstring.=name[a_index]
-				if (result.haskey(name[a_index]))
-				{
-					result:=result[name[a_index]]
-				}
-				else
-				{
-					MsgBox Error. variable %pathstring% is not object 
-				}
-				lastindex:=A_Index
-				pathstring.="."
-			}
-			result[name[lastindex+1]]:=value
-			return result
-		}
-		else
-		{
-			this.vars[name] := value
-			return value
-		}
-	}
-	def(name, value)
-	{
-		this.vars[name] := value
-		return value
-	}
-}
 
 
 callfunc(path, args*)
@@ -1148,14 +1061,14 @@ class apply_op
 {
 	num(x)
 	{
-		if x is not number
-			MsgBox % "Error: Expected number but got " x
+		;~ if x is not number
+			;~ MsgBox % "Error: Expected number but got " x
 		return x
 	}
 	div(x)
 	{
-		if (this.num(x) = 0)
-			MsgBox % "Error: Divide by zero"
+		;~ if (this.num(x) = 0)
+			;~ MsgBox % "Error: Divide by zero"
 		return x
 	}
 	
@@ -1174,7 +1087,9 @@ class apply_op
 		if (op = "&&")
 			return a && b
 		if (op = "||")
-			return a || b
+			return a && b
+		if (op = "!")
+			return !b
 		if (op = "<")
 			return this.num(a) < this.num(b)
 		if (op = ">")

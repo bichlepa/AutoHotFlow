@@ -49,25 +49,40 @@ Element_GenerateName_Action_Beep(Environment, ElementParameters)
 
 Element_run_Action_Beep(Environment, ElementParameters)
 {
-	frequency:=x_evaluateExpression(Environment,ElementParameters.frequency)
-	duration:=x_evaluateExpression(Environment,ElementParameters.duration)
+	frequencyObj:=x_evaluateExpression(Environment,ElementParameters.frequency)
+	durationObj:=x_evaluateExpression(Environment,ElementParameters.duration)
 	
+	if (frequencyObj.error)
+	{
+		;On error, finish with exception and return
+		x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.frequency) "`n`n" frequencyObj.error) 
+		return
+	}
+	if (durationObj.error)
+	{
+		;On error, finish with exception and return
+		x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.duration)) "`n`n" durationObj.error
+		return
+	}
+	
+	frequency:=frequencyObj.result
+	duration:=frequencyObj.result
 	
 	if frequency is not number
 	{
 		;On error, finish with exception and return
-		x_finish(Environment, "exception", lang("%1% is not valid", lang("Frequency is not a number: '%1%'", frequency)))
+		x_finish(Environment, "exception",lang("Frequency is not a number: '%1%'", frequency))
 		return
 	}
-	if duration is not number
+	if duration.result is not number
 	{
 		;On error, finish with exception and return
-		x_finish(Environment, "exception", lang("%1% is not valid", lang("Frequency is not a number: '%1%'", duration)))
+		x_finish(Environment, "exception", lang("Frequency is not a number: '%1%'", duration))
 		return
 	}
 	
 	;Do the action
-	SoundBeep,% frequency,% duration
+	SoundBeep,% frequency.result,% duration.result
 	
 	;Always call v_finish() before return
 	x_finish(Environment, "normal")
