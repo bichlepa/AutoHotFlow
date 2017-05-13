@@ -138,7 +138,19 @@ Element_run_Action_New_List(Environment, ElementParameters)
 	else if (ElementParameters.InitialContent = 2) ;one element
 	{
 		if (ElementParameters.Expression = 2)
-			Value := x_EvaluateExpression(Environment, ElementParameters.VarValue)
+		{
+			evRes := x_EvaluateExpression(Environment, ElementParameters.VarValue)
+			if (evRes.error)
+			{
+				;On error, finish with exception and return
+				x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.VarValue) "`n`n" evRes.error) 
+				return
+			}
+			else
+			{
+				Value:=evRes.result
+			}
+		}
 		else
 			Value := x_replaceVariables(Environment, ElementParameters.VarValue)
 		
@@ -152,7 +164,19 @@ Element_run_Action_New_List(Environment, ElementParameters)
 		{
 			
 			if (ElementParameters.ExpressionPos = 2)
-				Position := x_EvaluateExpression(Environment, ElementParameters.Position)
+			{
+				evRes := x_EvaluateExpression(Environment, ElementParameters.Position)
+				if (evRes.error)
+				{
+					;On error, finish with exception and return
+					x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.Position) "`n`n" evRes.error) 
+					return
+				}
+				else
+				{
+					Position:=evRes.result
+				}
+			}
 			else
 				Position := x_replaceVariables(Environment, ElementParameters.Position)
 			

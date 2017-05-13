@@ -48,8 +48,6 @@ Element_run_Loop_Work_through_a_list(Environment, ElementParameters)
 	entryPoint := x_getEntryPoint(environment)
 	valueFound:=False
 	
-	if (not ElementParameters.Infinite)
-		repeatCount:=x_EvaluateExpression(Environment, ElementParameters.repeatCount)
 	
 	if (entryPoint = "Head") ;Initialize loop
 	{

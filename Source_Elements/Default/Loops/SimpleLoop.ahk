@@ -52,7 +52,19 @@ Element_run_Loop_SimpleLoop(Environment, ElementParameters)
 	entryPoint := x_getEntryPoint(environment)
 	
 	if (not ElementParameters.Infinite)
-		repeatCount:=x_EvaluateExpression(Environment, ElementParameters.repeatCount)
+	{
+		evRes := x_EvaluateExpression(Environment, ElementParameters.repeatCount)
+		if (evRes.error)
+		{
+			;On error, finish with exception and return
+			x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.repeatCount) "`n`n" evRes.error) 
+			return
+		}
+		else
+		{
+			repeatCount:=evRes.result
+		}
+	}
 	
 	if (entryPoint = "Head") ;Initialize loop
 	{
@@ -91,10 +103,5 @@ Element_run_Loop_SimpleLoop(Environment, ElementParameters)
 		x_finish(Environment, "exception", lang("No information whether the connection lead into head or tail"))
 	}
 
-	;~ if (x_EvaluateExpression(Environment,ElementParameters.Expression))
-		;~ return x_finish(Environment,"yes")
-	;~ else
-		;~ return x_finish(Environment,"no")
-	
 
 }

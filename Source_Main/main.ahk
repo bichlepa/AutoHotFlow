@@ -58,6 +58,9 @@ lang_Init(my_ScriptDir "\language", my_WorkingDir)
 #include source_Common\Defaults\Default values.ahk
 #include source_Common\variables\global variables.ahk
 #include source_Common\variables\code parser.ahk
+#include source_Common\variables\code evaluator.ahk
+#include source_Common\variables\code tokenizer.ahk
+#include source_Common\variables\expression evaluator.ahk
 
 AllElementClasses:=Object()
 AllTriggerClasses:=Object()
@@ -68,6 +71,7 @@ AllTriggerClasses:=Object()
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\Execute_Flow.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\New_List.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\New_Variable.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\Script.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\Select_file.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\Set_Flow_Status.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\Sleep.ahk

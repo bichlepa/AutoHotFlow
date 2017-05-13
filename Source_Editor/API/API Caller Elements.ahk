@@ -36,7 +36,7 @@ x_replaceVariables(Environment, p_String, p_pars ="")
 x_EvaluateExpression(Environment, p_String)
 {
 	global
-	return Var_EvaluateExpression(Environment, String, "Var_Get_Common")
+	return Var_EvaluateExpression(Environment, String, "Var_Get_Common", "Var_Get_Common")
 }
 x_CheckVariableName(p_VarName)
 {
@@ -492,5 +492,10 @@ x_GetFullPath(Environment, p_Path)
 
 
 x_FlowExistsByName(p_FlowName)
+{
+}
+
+
+x_EvaluateScript(Environment, p_script)
 {
 }

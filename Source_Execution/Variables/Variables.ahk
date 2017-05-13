@@ -290,8 +290,7 @@ Var_Set(Environment, p_Name, p_Value, p_Destination="", p_hidden=False)
 Var_Get(environment, p_Name, p_hidden = False)
 {
 	global _execution
-	;~ d(p_Name) 
-	tempvalue=
+	tempvalue= 
 	if (p_Name="")
 	{
 		logger("f0","Retrieving variable failed. The name is empty")
@@ -304,6 +303,7 @@ Var_Get(environment, p_Name, p_hidden = False)
 	
 	tempLocation := Var_GetLocation(Environment, p_Name, p_hidden)
 	
+	;~ d("-" p_Name "-" , p_hidden " --- " tempLocation) 
 	if (tempLocation)
 	{
 		logger("f3","Retrieving " tempLocation " variable '" p_Name "'")

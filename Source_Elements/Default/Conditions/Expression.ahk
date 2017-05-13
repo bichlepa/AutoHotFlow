@@ -44,11 +44,20 @@ Element_GenerateName_Condition_Expression(Environment, ElementParameters)
 
 Element_run_Condition_Expression(Environment, ElementParameters)
 {
-		
-	if (x_EvaluateExpression(Environment,ElementParameters.Expression))
-		return x_finish(Environment,"yes")
+	evRes:=x_EvaluateExpression(Environment,ElementParameters.Expression)
+	if (evRes.error)
+	{
+		;On error, finish with exception and return
+		x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.Expression) "`n`n" evRes.error) 
+		return
+	}
 	else
-		return x_finish(Environment,"no")
+	{
+		if (evRes.result)
+			return x_finish(Environment,"yes")
+		else
+			return x_finish(Environment,"no")
+	}
 	
 
 }

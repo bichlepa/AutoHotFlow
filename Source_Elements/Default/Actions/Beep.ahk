@@ -50,7 +50,6 @@ Element_GenerateName_Action_Beep(Environment, ElementParameters)
 Element_run_Action_Beep(Environment, ElementParameters)
 {
 	frequencyObj:=x_evaluateExpression(Environment,ElementParameters.frequency)
-	durationObj:=x_evaluateExpression(Environment,ElementParameters.duration)
 	
 	if (frequencyObj.error)
 	{
@@ -58,14 +57,15 @@ Element_run_Action_Beep(Environment, ElementParameters)
 		x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.frequency) "`n`n" frequencyObj.error) 
 		return
 	}
+	frequency:=frequencyObj.result
+	
+	durationObj:=x_evaluateExpression(Environment,ElementParameters.duration)
 	if (durationObj.error)
 	{
 		;On error, finish with exception and return
 		x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.duration)) "`n`n" durationObj.error
 		return
 	}
-	
-	frequency:=frequencyObj.result
 	duration:=frequencyObj.result
 	
 	if frequency is not number

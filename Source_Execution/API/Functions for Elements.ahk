@@ -37,8 +37,15 @@ x_replaceVariables(Environment, p_String, p_pars ="")
 x_EvaluateExpression(Environment, p_String)
 {
 	global
-	return Var_EvaluateExpression(Environment, p_String, "Var_Get")
+	return Var_EvaluateExpression(Environment, p_String, "Var_Get", "Var_Set")
 }
+
+x_EvaluateScript(Environment, p_script)
+{
+	var_evaluateScript(Environment, p_script, "Var_Get", "Var_Set")
+}
+
+
 x_CheckVariableName(p_VarName)
 {
 	return Var_CheckName(p_VarName)

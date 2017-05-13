@@ -57,7 +57,19 @@ Element_run_Action_Trace_Point(Environment, ElementParameters)
 	;~ d(ElementParameters, "element parameters")
 	ID := x_replaceVariables(Environment, ElementParameters.ID)
 	LogMessage := x_replaceVariables(Environment, ElementParameters.LogMessage)
-	StopCondition := x_evaluateExpression(Environment, ElementParameters.StopCondition)
+	
+	evRes := x_EvaluateExpression(Environment, ElementParameters.StopCondition)
+	if (evRes.error)
+	{
+		;On error, finish with exception and return
+		x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.StopCondition) "`n`n" evRes.error) 
+		return
+	}
+	else
+	{
+		StopCondition:=evRes.result
+	}
+	
 	elementID:=x_GetMyElementID(Environment)
 	
 	x_log(Environment, LogMessage, 0)
