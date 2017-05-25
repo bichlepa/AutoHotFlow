@@ -16,7 +16,7 @@ class class_evaluator
 		this.func_GetVariable:=func_GetVariable
 		this.func_SetVariable:=func_SetVariable
 		
-		this.evalnext(parsedCode)
+		return this.evalnext(parsedCode)
 	} 
 	
 	evalnext(exp)
