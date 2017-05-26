@@ -1,7 +1,10 @@
 ﻿var_evaluateScript(env, p_script, func_GetVariable, func_SetVariable)
 {
+		;~ d(p_script)
 	tokens:=tokenizer(p_script)
+		;~ d(tokens)
 	parsedCode:=class_parser.parse(tokens)
+		;~ d(parsedCode)
 	class_evaluator.evaluate(parsedCode,env,func_GetVariable, func_SetVariable)
 }
 
@@ -15,13 +18,13 @@ class class_evaluator
 		this.env:=env
 		this.func_GetVariable:=func_GetVariable
 		this.func_SetVariable:=func_SetVariable
-		
-		return this.evalnext(parsedCode)
+		res := this.evalnext(parsedCode)
+		return res
 	} 
 	
 	evalnext(exp)
 	{
-		
+		;~ d(exp, "evalnext start")
 		if (exp.type = "num" or exp.type = "str")
 		{
 			return exp.value
@@ -68,7 +71,7 @@ class class_evaluator
 				func_setVariable:=this.func_setVariable
 				value:=%func_GetVariable%(this.env,path)
 				value:=this.assign(exp.operator, value, this.evalnext(exp.right))
-				return %func_setVariable%(this.env,path) ;TODO
+				return %func_setVariable%(this.env,path, value)
 				
 			}
 		}
@@ -218,10 +221,10 @@ class class_evaluator
 	
 	croak(description, token = "")
 	{
-		wholelinehighlighted:=substr(this.token.wholeline,1,this.token.col-1) " -> " this.token.value " <- " substr(this.token.wholeline, this.token.col + strlen(this.token.value))
-		error:={description: description, line: this.token.line, col: this.token.col, pos: this.token.pos, wholeline: this.token.wholeline, value: this.token.value, wholelinehighlighted: wholelinehighlighted}
-		this.token.errors.push(error)
-		this.errors.push(error)
+		wholelinehighlighted:=substr(token.wholeline,1,this.token.col-1) " -> " token.value " <- " substr(token.wholeline, token.col + strlen(token.value))
+		error:={description: description, line: token.line, col: token.col, pos: token.pos, wholeline: token.wholeline, value: token.value, wholelinehighlighted: wholelinehighlighted}
+		token.errors.push(error)
+		errors.push(error)
 		MsgBox % strobj(error)
 	}
 }

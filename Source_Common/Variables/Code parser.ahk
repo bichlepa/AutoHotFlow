@@ -69,6 +69,7 @@ class class_parser
 		this.tokens:=tokens
 		this.errors:=Object()
 		this.Index:=0
+		this.eof:=0
 		this.next()
 		this.parsedTokens:=Object()
 		

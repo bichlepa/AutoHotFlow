@@ -4,6 +4,7 @@ Var_EvaluateExpression(environment,ExpressionString,  func_GetVariable, func_Set
 {
 	;~ MsgBox %testExpr%
 	tokens:=tokenizer(ExpressionString)
+	;~ d(tokens)
 	parsedCode:=class_parser.parse(tokens, "expression")
 	
 	;~ FileDelete,result.txt

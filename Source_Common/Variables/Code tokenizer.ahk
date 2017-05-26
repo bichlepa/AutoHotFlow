@@ -45,7 +45,7 @@
 		;continue parsing a new token
 		if (mode = 1) ;variable name or keyword
 		{
-			if ((CharNumber > 0x7f) or (charNumber >= 0x41 and  charNumber <=0x5A or charNumber >= 0x61 and  charNumber <=0x7A) or (charNumber>=0x30 and charNumber<=0x39)) ;Unicode character or letter or number
+			if ((CharNumber > 0x7f) or (charNumber >= 0x41 and  charNumber <=0x5A or charNumber >= 0x61 and  charNumber <=0x7A) or (charNumber>=0x30 and charNumber<=0x39) or (charNumber = 0x5F)) ;Unicode character or letter or number or _
 			{
 				currToken.value.=Char
 			}
