@@ -38,8 +38,8 @@
 	
 	ChangeCategoryOK:
 	gui, changeCategory:Submit, nohide
-	d(IDOfName(ChangeCategoryList, "Category"))
-	changeFlowCategory(changeFlowCategory_FlowID, IDOfName(ChangeCategoryList, "Category"))
+	;~ d(API_Main_IDOfName(ChangeCategoryList, "Category"))
+	API_Main_ChangeFlowCategory(changeFlowCategory_FlowID, API_Main_IDOfName(ChangeCategoryList, "Category"))
 
 	gui, changeCategory:destroy
 	Enable_Manager_GUI()

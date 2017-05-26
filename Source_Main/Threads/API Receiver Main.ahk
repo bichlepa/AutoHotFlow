@@ -177,6 +177,105 @@ API_Call_Main_executeToggleFlow(par_FlowID)
 	;~ return retval
 ;~ }
 
+
+API_Call_Main_NewFlow(par_CategoryID)
+{
+	global
+	local retval
+	logger("t2", A_ThisFunc " call received")
+	
+	retval := NewFlow(par_CategoryID)
+	
+	logger("t2", A_ThisFunc " call finished")
+	return retval
+}
+
+API_Call_Main_NewCategory(par_CategoryID)
+{
+	global
+	local retval
+	logger("t2", A_ThisFunc " call received")
+	
+	retval := NewCategory(par_CategoryID)
+	
+	logger("t2", A_ThisFunc " call finished")
+	return retval
+}
+
+API_Call_Main_ChangeFlowCategory(par_FlowID, par_CategoryID)
+{
+	global
+	local retval
+	logger("t2", A_ThisFunc " call received")
+	
+	retval := ChangeFlowCategory(par_FlowID, par_CategoryID)
+	
+	logger("t2", A_ThisFunc " call finished")
+	return retval
+}
+
+
+API_Call_Main_UpdateFlowCategoryName(par_FlowID)
+{
+	global
+	local retval
+	logger("t2", A_ThisFunc " call received")
+	
+	retval := UpdateFlowCategoryName(par_FlowID)
+	
+	logger("t2", A_ThisFunc " call finished")
+	return retval
+}
+
+API_Call_Main_DuplicateFlow(par_FlowID)
+{
+	global
+	local retval
+	logger("t2", A_ThisFunc " call received")
+	
+	retval := DuplicateFlow(par_FlowID)
+	
+	logger("t2", A_ThisFunc " call finished")
+	return retval
+}
+
+API_Call_Main_DeleteFlow(par_FlowID)
+{
+	global
+	local retval
+	logger("t2", A_ThisFunc " call received")
+	
+	retval := DeleteFlow(par_FlowID)
+	
+	logger("t2", A_ThisFunc " call finished")
+	return retval
+}
+
+API_Call_Main_DeleteCategory(par_FlowID)
+{
+	global
+	local retval
+	logger("t2", A_ThisFunc " call received")
+	
+	retval := DeleteCategory(par_FlowID)
+	
+	logger("t2", A_ThisFunc " call finished")
+	return retval
+}
+
+API_Call_Main_IDOfName(par_name,par_Type)
+{
+	global
+	local retval
+	logger("t2", A_ThisFunc " call received")
+	
+	retval := IDOfName(par_name,par_Type)
+	
+	logger("t2", A_ThisFunc " call finished")
+	return retval
+}
+
+
 API_Call_Main_Element_New(p_FlowID, p_type="",p_elementID="")
 {
 	global

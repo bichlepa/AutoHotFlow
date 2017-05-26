@@ -21,7 +21,7 @@ init_Manager_GUI()
 
 	;Create main GUI
 	gui,font,s15
-	Gui, Add, TreeView, vTreeView_manager gTreeView_manager x10 y10 w300 h500 -ReadOnly AltSubmit ImageList%IconList%
+	Gui, Add, TreeView, vTreeView_manager gTreeView_manager x10 y10 w300 h500 -ReadOnly AltSubmit ImageList%IconList% hwndTreeView_manager_HWND
 	gui,font,s12
 	gui,add,Button,vButton_manager_NewCategory gButton_manager_NewCategory X330 yp w200 h30 , % lang("New_Category")
 	gui,add,Button,vButton_manager_NewFlow gButton_manager_NewFlow X+10 yp w200 h30, % lang("New_Flow")
@@ -176,6 +176,7 @@ updateFlowIcons_Manager_GUI()
 		}
 	}
 }
+
 TreeView_manager_AddEntry(par_Type, par_ID)
 {
 	global
@@ -249,7 +250,7 @@ TreeView_manager_Rename(par_Type, par_ID)
 	global
 	Gui, manager:default
 	TreeView_manager_Select(par_Type, par_ID)
-	controlsend, SysTreeView321, {F2}, % "ahk_id " _share.hwnds.Manager ;Rename Entry
+	controlsend, , {F2},ahk_id %TreeView_manager_HWND%
 }
 
 TreeView_manager_ChangeFlowCategory(par_ID)
@@ -278,88 +279,8 @@ TreeView_manager_ChangeFlowCategory(par_ID)
 	guicontrol, manager:focus, TreeView_manager
 }
 
-Button_manager_NewCategory(par_Type, par_ID)
-{
-	global
-	local newCategoryID
-	local newTV
-	
-	newCategoryID := NewCategory()
-	TreeView_manager_Rename("category", newCategoryID)
-}
 
-
-Button_manager_NewFlow()
-{
-	global
-	local tempSelectedTV
-	local tempSelectedID
-	local NewFlowID
-	
-	tempSelectedTV := TV_GetSelection()
-	if (tempSelectedTV != 0) ;If an element is selected
-	{
-		;Create new flow in the category of selected element
-		tempSelectedID := allTreeViewItems[tempSelectedTV].id
-		
-		if (allTreeViewItems[tempSelectedTV].type = "Category")
-		{
-			NewFlowID := NewFlow(tempSelectedID)
-		}
-		else if (allTreeViewItems[tempSelectedTV].type = "Flow")
-		{
-			NewFlowID := NewFlow(allTreeViewItems[TV_GetParent(tempSelectedTV)].id)
-		}
-		else
-		{
-			MsgBox,,Unexpected error, The type of selected element could not be resolved!
-		}
-		
-	}
-	else ;If nothing is selected
-	{
-		;Create a flow in category "uncategorized"
-		NewFlowID := NewFlow()
-	}
-	TreeView_manager_Rename("flow", NewFlowID)
-}
-
-Button_manager_ChangeCategory()
-{
-	global
-	local tempSelectedTV
-	tempSelectedTV := TV_GetSelection()
-	if (allTreeViewItems[tempselectedTV].type = "flow")
-	{
-		changeFlowCategory_GUI(allTreeViewItems[tempselectedTV].id)
-	}
-}
-
-
-
-Button_manager_Help()
-{
-	ui_showHelp()
-}
-
-Button_manager_EditFlow()
-{
-	global
-	API_Main_editFlow(allTreeViewItems[TV_GetSelection()].id)
-}
-
-Button_manager_RunFlow()
-{
-	global
-	API_Main_ExecuteToggleFlow(allTreeViewItems[TV_GetSelection()].id)
-}
-
-Button_manager_EnableFlow()
-{
-	global
-	API_Main_EnabletoggleFlow(allTreeViewItems[TV_GetSelection()].id)
-}
-
+;react on gui events on the treeview
 TreeView_manager()
 {
 	global
@@ -368,6 +289,7 @@ TreeView_manager()
 	local tempselectedType
 	local tempNewName
 	local tempitem
+	gui,manager:default
 	tempselectedTV := TV_GetSelection()
 	tempselectedID := allTreeViewItems[tempselectedTV].id
 	tempselectedType := allTreeViewItems[tempselectedTV].type
@@ -391,7 +313,7 @@ TreeView_manager()
 					return
 				}
 				;Do not rename if there another category with same name already exists
-				if ((IDOfName(tempNewName,"Category") != "") and (IDOfName(tempNewName,"Category") != tempselectedID))
+				if ((API_Main_IDOfName(tempNewName,"Category") != "") and (API_Main_IDOfName(tempNewName,"Category") != tempselectedID))
 				{
 					soundplay,*16
 					MsgBox, 16, % lang("Rename category"), % lang("A_category_with_name_%1%_already_exists", tempNewName)
@@ -407,7 +329,7 @@ TreeView_manager()
 				{
 					if (tempitem.category = tempselectedID)
 					{
-						UpdateFlowCategoryName(par_FlowID)
+						API_Main_UpdateFlowCategoryName(par_FlowID)
 						;~ d(tempitem)
 						API_Main_SaveFlowMetaData(tempitem.id)
 					}
@@ -431,7 +353,7 @@ TreeView_manager()
 					return
 				}
 				;Do not rename if there another category with same name already exists
-				if ((IDOfName(tempNewName,"flow") != "") and (IDOfName(tempNewName,"flow") != tempselectedID))
+				if ((API_Main_IDOfName(tempNewName,"flow") != "") and (API_Main_IDOfName(tempNewName,"flow") != tempselectedID))
 				{
 					soundplay,*16
 					MsgBox, 16, % lang("Rename flow"), % lang("A_flow_with_name_%1%_already_exists", tempNewName)
@@ -487,11 +409,173 @@ TreeView_manager()
 		else
 			guicontrol,,Button_manager_RunFlow,% lang("Run")
 	}
-
-
-
 }
 
+;Show context menu on right click of user in TreeView
+managerGuiContextMenu()
+{
+	global
+	; Launched in response to a right-click or press of the Apps key.
+	if A_GuiControl <> TreeView_manager  ;It displays the menu only for clicks inside the TreeView.
+		return
+	
+	;Find out what is selected
+	tempselectedTV := TV_GetSelection()
+	tempselectedID := allTreeViewItems[tempselectedTV].id
+	tempselectedType := allTreeViewItems[tempselectedTV].type
+	
+	;Build the menu
+	if (tempselectedType = "flow")
+	{
+		try menu,manager_menu,deleteall
+		menu,manager_menu,add,manager_menu_rename
+		menu,manager_menu,rename,manager_menu_rename,% lang("Rename flow")
+		menu,manager_menu,add,manager_menu_changeCategory
+		menu,manager_menu,rename,manager_menu_changeCategory,% lang("Change category")
+		menu,manager_menu,add,manager_menu_delete
+		menu,manager_menu,rename,manager_menu_delete,% lang("Delete flow")
+		menu,manager_menu,add,manager_menu_duplicate
+		menu,manager_menu,rename,manager_menu_duplicate,% lang("Duplicate flow")
+	}
+	else if (tempselectedType = "category")
+	{
+		try menu,manager_menu,deleteall
+		menu,manager_menu,add,manager_menu_rename
+		menu,manager_menu,rename,manager_menu_rename,% lang("Rename category")
+		menu,manager_menu,add,manager_menu_newFlow
+		menu,manager_menu,rename,manager_menu_newFlow,% lang("New flow")
+		menu,manager_menu,add,manager_menu_delete
+		menu,manager_menu,rename,manager_menu_delete,% lang("Delete category")
+	}
+	else
+		return
+	
+	; Show the menu at the provided coordinates, A_GuiX and A_GuiY.  These should be used
+	; because they provide correct coordinates even if the user pressed the Apps key:
+	Menu, manager_menu, Show, %A_GuiX%, %A_GuiY%
+return
+}
+
+manager_menu_delete()
+{
+	;Same as if user has pressed the button
+	Button_manager_DeleteFlow()
+}
+manager_menu_duplicate()
+{
+	global
+	gui,manager:default
+	
+	tempselectedTV := TV_GetSelection()
+	tempselectedID := allTreeViewItems[tempselectedTV].id
+	tempselectedType := allTreeViewItems[tempselectedTV].type
+	
+	if tempselectedType=flow ;this can only be performed on flows
+		API_Main_DuplicateFlow(tempselectedID)
+}
+manager_menu_rename()
+{
+	global
+	controlsend,, {f2},ahk_id %TreeView_manager_HWND%
+}
+manager_menu_newFlow()
+{
+	;Same as if user has pressed the button
+	Button_manager_NewFlow()
+}
+manager_menu_changeCategory()
+{
+	;Same as if user has pressed the button
+	Button_manager_ChangeCategory()
+}
+
+
+
+
+Button_manager_NewCategory(par_Type, par_ID)
+{
+	global
+	local newCategoryID
+	local newTV
+	gui,manager:default
+	
+	newCategoryID := API_Main_NewCategory()
+	TreeView_manager_Rename("category", newCategoryID)
+}
+
+
+Button_manager_NewFlow()
+{
+	global
+	local tempSelectedTV
+	local tempSelectedID
+	local NewFlowID
+	gui,manager:default
+	
+	tempSelectedTV := TV_GetSelection()
+	if (tempSelectedTV != 0) ;If an element is selected
+	{
+		;Create new flow in the category of selected element
+		tempSelectedID := allTreeViewItems[tempSelectedTV].id
+		
+		if (allTreeViewItems[tempSelectedTV].type = "Category")
+		{
+			NewFlowID := API_Main_NewFlow(tempSelectedID)
+		}
+		else if (allTreeViewItems[tempSelectedTV].type = "Flow")
+		{
+			NewFlowID := API_Main_NewFlow(allTreeViewItems[TV_GetParent(tempSelectedTV)].id)
+		}
+		else
+		{
+			MsgBox,,Unexpected error, The type of selected element could not be resolved!
+		}
+		
+	}
+	else ;If nothing is selected
+	{
+		;Create a flow in category "uncategorized"
+		NewFlowID := API_Main_NewFlow()
+	}
+	TreeView_manager_Rename("flow", NewFlowID)
+}
+
+Button_manager_ChangeCategory()
+{
+	global
+	local tempSelectedTV
+	gui,manager:default
+	tempSelectedTV := TV_GetSelection()
+	if (allTreeViewItems[tempselectedTV].type = "flow")
+	{
+		changeFlowCategory_GUI(allTreeViewItems[tempselectedTV].id)
+	}
+}
+
+
+
+Button_manager_Help()
+{
+	ui_showHelp()
+}
+
+Button_manager_EditFlow()
+{
+	global
+	API_Main_editFlow(allTreeViewItems[TV_GetSelection()].id)
+}
+
+Button_manager_RunFlow()
+{
+	global
+	API_Main_ExecuteToggleFlow(allTreeViewItems[TV_GetSelection()].id)
+}
+
+Button_manager_EnableFlow()
+{
+	global
+	API_Main_EnabletoggleFlow(allTreeViewItems[TV_GetSelection()].id)
+}
 
 ;Delete marked Item
 Button_manager_DeleteFlow()
@@ -503,10 +587,11 @@ Button_manager_DeleteFlow()
 	local temphasFlows
 	local tempUncategorizedID
 	local tempUncategorizedTV
+	gui,manager:default
 	tempselectedTV := TV_GetSelection()
 	tempselectedID := allTreeViewItems[tempselectedTV].id
 	tempselectedType := allTreeViewItems[tempselectedTV].type
-
+	
 	if tempselectedType=flow ;if a flow should be deleted
 	{
 		Disable_Manager_GUI()
@@ -517,7 +602,7 @@ Button_manager_DeleteFlow()
 		{
 			;delete
 			TreeView_manager_DeleteEntry("Flow", tempselectedID)
-			DeleteFlow(tempselectedID)
+			API_Main_DeleteFlow(tempselectedID)
 			
 		}
 		
@@ -551,7 +636,7 @@ Button_manager_DeleteFlow()
 				{
 					;Create the category uncategorized if it is not present and get the tv
 					
-					tempUncategorizedID := NewCategory(lang("uncategorized"))
+					tempUncategorizedID := API_Main_NewCategory(lang("uncategorized"))
 					tempUncategorizedTV := _share.allCategories[tempUncategorizedID].tv
 					;~ d(tempUncategorizedID)
 					for count, tempFlow in _flows ;Move all flows that were inside the category to uncategorized
@@ -559,7 +644,7 @@ Button_manager_DeleteFlow()
 						if (tempFlow.category = tempselectedID)
 						{
 							;~ d(tempFlow)
-							ChangeFlowCategory(tempFlow.id,tempUncategorizedID)
+							API_Main_ChangeFlowCategory(tempFlow.id,tempUncategorizedID)
 						}
 					}
 					
@@ -573,7 +658,7 @@ Button_manager_DeleteFlow()
 				
 			}
 			TreeView_manager_DeleteEntry("Category", tempselectedID)
-			DeleteCategory(tempselectedID)
+			API_Main_DeleteCategory(tempselectedID)
 		}
 	}
 	;debug()

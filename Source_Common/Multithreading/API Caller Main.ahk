@@ -182,6 +182,85 @@ API_Main_executeToggleFlow(par_FlowID)
 	;~ return retvalue
 ;~ }
 
+API_Main_NewFlow(par_CategoryID = "")
+{
+	global
+	local retvalue
+	logger("t2", A_ThisFunc " called")
+	retvalue :=  parentAHKThread.ahkFunction("API_Call_Main_NewFlow", par_CategoryID)
+	logger("t2", A_ThisFunc " finished")
+	return retvalue
+}
+
+API_Main_NewCategory(par_Newname = "")
+{
+	global
+	local retvalue
+	logger("t2", A_ThisFunc " called")
+	retvalue :=  parentAHKThread.ahkFunction("API_Call_Main_NewCategory", par_CategoryID)
+	logger("t2", A_ThisFunc " finished")
+	return retvalue
+}
+
+API_Main_ChangeFlowCategory(par_FlowID, par_CategoryID)
+{
+	global
+	local retvalue
+	logger("t2", A_ThisFunc " called")
+	retvalue :=  parentAHKThread.ahkFunction("API_Call_Main_ChangeFlowCategory", par_FlowID, par_CategoryID)
+	logger("t2", A_ThisFunc " finished")
+	return retvalue
+}
+
+API_Main_UpdateFlowCategoryName(par_FlowID)
+{
+	global
+	local retvalue
+	logger("t2", A_ThisFunc " called")
+	retvalue :=  parentAHKThread.ahkFunction("API_Call_Main_UpdateFlowCategoryName", par_FlowID)
+	logger("t2", A_ThisFunc " finished")
+	return retvalue
+}
+
+API_Main_DuplicateFlow(par_FlowID)
+{
+	global
+	local retvalue
+	logger("t2", A_ThisFunc " called")
+	retvalue :=  parentAHKThread.ahkFunction("API_Call_Main_DuplicateFlow", par_FlowID)
+	logger("t2", A_ThisFunc " finished")
+	return retvalue
+}
+
+API_Main_DeleteFlow(par_FlowID)
+{
+	global
+	local retvalue
+	logger("t2", A_ThisFunc " called")
+	retvalue :=  parentAHKThread.ahkFunction("API_Call_Main_DeleteFlow", par_FlowID)
+	logger("t2", A_ThisFunc " finished")
+	return retvalue
+}
+
+API_Main_DeleteCategory(par_FlowID)
+{
+	global
+	local retvalue
+	logger("t2", A_ThisFunc " called")
+	retvalue :=  parentAHKThread.ahkFunction("API_Call_Main_DeleteCategory", par_FlowID)
+	logger("t2", A_ThisFunc " finished")
+	return retvalue
+}
+
+API_Main_IDOfName(par_name,par_Type="")
+{
+	global
+	local retvalue
+	logger("t2", A_ThisFunc " called")
+	retvalue :=  parentAHKThread.ahkFunction("API_Call_Main_IDOfName", par_name,par_Type)
+	logger("t2", A_ThisFunc " finished")
+	return retvalue
+}
 
 
 API_Main_Element_New(p_FlowID, p_type="",p_elementID="")

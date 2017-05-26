@@ -24,7 +24,6 @@ lang_Init(my_ScriptDir "\language", my_WorkingDir)
 #include Source_Manager\User Interface\Change Category GUI.ahk
 #include Source_Manager\User Interface\Select language.ahk
 #include Source_Manager\User Interface\Global_Settings.ahk
-#include Source_Manager\Flows\Manage Flows.ahk
 #include Source_Manager\API\API receiver manager.ahk
 
 #include source_Common\variables\global variables.ahk

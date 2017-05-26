@@ -85,10 +85,10 @@ if not (a_iscompiled)
 	}
 	
 	;~ MsgBox %apifileEditor%
-	Filedelete, %A_WorkingDir%\source_Editor\api\api caller elements.ahk
-	Filedelete, %A_WorkingDir%\source_main\threads\api caller elements.ahk
-	FileAppend,%apifileEditor%, %A_WorkingDir%\source_Editor\api\api caller elements.ahk, utf-8
-	FileAppend,%apifileMain%, %A_WorkingDir%\source_main\threads\api caller elements.ahk, utf-8
+	Filedelete, %A_WorkingDir%\source_Editor\api\API Caller Elements.ahk
+	Filedelete, %A_WorkingDir%\source_main\threads\API Caller Elements.ahk
+	FileAppend,%apifileEditor%, %A_WorkingDir%\source_Editor\api\API Caller Elements.ahk, utf-8
+	FileAppend,%apifileMain%, %A_WorkingDir%\source_main\threads\API Caller Elements.ahk, utf-8
 	
 }
 

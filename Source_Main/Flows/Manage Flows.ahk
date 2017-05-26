@@ -257,6 +257,40 @@ DeleteFlow(par_ID)
 	_flows.delete(par_ID)
 }
 
+DuplicateFlow(par_ID)
+{
+	global
+	local newFlowid
+	
+	;Create the flow in the global variable
+	;~ d(NewName " - " tempcategoryid " - " Categoryname)
+	Loop
+	{
+		random,randomValue
+		newFlowid := lang("New flow") " " randomValue
+		if (not _flows.haskey(newFlowid))
+			break
+	}
+	
+	;copy and change some metadata
+	_flows[newFlowid] := objfullyclone(_flows[par_ID])
+	_flows[newFlowid].id := newFlowid
+	_flows[newFlowid].name .= " " lang("copy")
+	_flows[newFlowid].enabled := false
+	
+	;Create a new file
+	_flows[newFlowid].folder := my_WorkingDir "\Saved Flows"
+	_flows[newFlowid].filename := newFlowid
+	_flows[newFlowid].file := my_WorkingDir "\Saved Flows\" newFlowid ".ini"
+	filecopy,% _flows[par_ID].file, % _flows[newFlowid].file
+	
+	SaveFlowMetaData(newFlowid)
+
+	;Add TV entry
+	_flows[newFlowid].TV := API_manager_TreeView_AddEntry("Flow", newFlowid)
+
+}
+
 DeleteCategory(par_ID)
 {
 	global
