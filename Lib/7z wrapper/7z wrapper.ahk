@@ -9,13 +9,13 @@
 	flist:=""
 	for each, file in files
 		flist:= flist """" file """" " "
-	if FileExist(dPack)
-		FileDelete, %dPack%
+	;~ if FileExist(dPack)
+		;~ FileDelete, %dPack%
 	RunWait, %7z_exe% a %opts% "%dPack%" %flist%,,Hide UseErrorLevel
 	return 7z_error(ErrorLevel)
 }
 
-7z_extract(dPack,dFolder="",opts="") {
+7z_extract(dPack,opts="",dFolder="") {
 	global 7z_exe
 	if StrLen(dFolder)
 		out:="-o" . """" . dFolder . """"

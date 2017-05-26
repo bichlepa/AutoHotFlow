@@ -79,6 +79,7 @@ AllTriggerClasses:=Object()
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\Beep.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\Compress files.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\Execute_Flow.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\Extract files.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\New_List.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\New_Variable.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\Script.ahk
