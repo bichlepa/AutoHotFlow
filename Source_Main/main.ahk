@@ -35,7 +35,8 @@ lang_Init(my_ScriptDir "\language", my_WorkingDir)
 #include lib\ObjFullyClone\ObjFullyClone.ahk
 #include lib\Random Word List\Random Word List.ahk
 
-;Lib_includes_Start#include lib\7z wrapper\7z wrapper.ahk
+;Lib_includes_Start
+#include lib\7z wrapper\7z wrapper.ahk
 global_elementInclusions = 
 (
 #include lib\7z wrapper\7z wrapper.ahk
@@ -70,6 +71,7 @@ global_elementInclusions =
 #include source_Common\variables\code evaluator.ahk
 #include source_Common\variables\code tokenizer.ahk
 #include source_Common\variables\expression evaluator.ahk
+#include source_Common\flows\flows.ahk
 
 AllElementClasses:=Object()
 AllTriggerClasses:=Object()
@@ -110,6 +112,8 @@ Thread_StartManager()
 Thread_StartDraw()
 Thread_StartExecution()
 
+;The function findFlows() must run after the manager window ist initialised. This is temporary solved by this sleep
+sleep 100
 ;Find flows and activate some triggers
 FindFlows()
 return

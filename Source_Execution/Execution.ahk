@@ -33,6 +33,7 @@ lang_Init(my_ScriptDir "\language", my_WorkingDir)
 #include source_Common\Variables\code evaluator.ahk
 #include source_Common\Variables\expression evaluator.ahk
 #include source_Common\Multithreading\API Caller Main.ahk
+#include source_Common\flows\flows.ahk
 #include lib\Random Word List\Random Word List.ahk
 
 #include Source_Execution\execution task\execution task.ahk

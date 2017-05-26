@@ -32,7 +32,8 @@ init_Manager_GUI()
 	gui,add,Button,vButton_manager_EnableFlow gButton_manager_EnableFlow Disabled Y+30 x330 w200 h30, % lang("enable")
 	gui,add,Button,vButton_manager_RunFlow gButton_manager_RunFlow Disabled X+10 yp w200 h30,% lang("Run")
 
-	gui,add,Button,vButton_manager_SelectLanguage gButton_manager_SelectLanguage  X330 Y+100 w200 h30,% lang("Change_Language")
+	gui,add,Button,vButton_manager_Import_Export gButton_manager_Import_Export  X330 Y+30 w200 h30,% lang("Import and export")
+	gui,add,Button,vButton_manager_SelectLanguage gButton_manager_SelectLanguage  X330 Y+60 w200 h30,% lang("Change_Language")
 	gui,add,Button,vButton_manager_Help gButton_manager_Help X+10 yp w200 h30,% lang("Help")
 	gui,add,Button,vButton_manager_Settings gButton_manager_Settings  X330 Y+20 w200 h30,% lang("Settings")
 	gui,add,Button,vButton_manager_About gButton_manager_About  X330 Y+20 w200 h30,% lang("About AutoHotFlow")
@@ -313,7 +314,7 @@ TreeView_manager()
 					return
 				}
 				;Do not rename if there another category with same name already exists
-				if ((API_Main_IDOfName(tempNewName,"Category") != "") and (API_Main_IDOfName(tempNewName,"Category") != tempselectedID))
+				if ((FlowIDbyName(tempNewName,"Category") != "") and (FlowIDbyName(tempNewName,"Category") != tempselectedID))
 				{
 					soundplay,*16
 					MsgBox, 16, % lang("Rename category"), % lang("A_category_with_name_%1%_already_exists", tempNewName)
@@ -352,8 +353,18 @@ TreeView_manager()
 					TV_Modify(tempselectedTV, "", tempOldName)
 					return
 				}
+				;Do not rename if there are prohibited characters.
+				;reason: Flow names can be shown and selected in a listbox. When getting multiple flow names from the listbox, they are separated by |
+				if (instr(tempNewName,"|"))
+				{
+					soundplay,*16
+					MsgBox, 16, % lang("Rename flow"), % lang("Following characters are prohibited in a flow name: ""%1%""", "|")
+					;just remove that character
+					StringReplace, tempNewName, tempNewName, |,%a_space%, all
+					TV_Modify(tempselectedTV, "", tempNewName)
+				}
 				;Do not rename if there another category with same name already exists
-				if ((API_Main_IDOfName(tempNewName,"flow") != "") and (API_Main_IDOfName(tempNewName,"flow") != tempselectedID))
+				if ((FlowIDbyName(tempNewName,"flow") != "") and (FlowIDbyName(tempNewName,"flow") != tempselectedID))
 				{
 					soundplay,*16
 					MsgBox, 16, % lang("Rename flow"), % lang("A_flow_with_name_%1%_already_exists", tempNewName)
@@ -365,9 +376,9 @@ TreeView_manager()
 				_flows[tempselectedID].name := tempNewName
 				API_Main_SaveFlowMetaData(tempSelectedID)
 				
-				;TODO if editor is opened,
+				;TODO catch if editor is opened,
 				
-				;warn if the name begins with "D_"
+				;todo warn if the name begins with "D_"
 				
 				if (substr(tempNewName,1,2)="D_")
 					MsgBox, 48,% lang("Warning"),% lang("The name of the flow begins with %1%! Such flows will be deleted or overwritten on next update!","D_")
@@ -552,7 +563,10 @@ Button_manager_ChangeCategory()
 	}
 }
 
-
+Button_manager_Import_Export()
+{
+	import_and_export_gui()
+}
 
 Button_manager_Help()
 {

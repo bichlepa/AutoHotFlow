@@ -190,6 +190,19 @@ API_Call_Main_NewFlow(par_CategoryID)
 	return retval
 }
 
+API_Call_Main_InitFlow(par_Filepath)
+{
+	global
+	local retval
+	logger("t2", A_ThisFunc " call received")
+	
+	retval := InitFlow(par_Filepath)
+	
+	logger("t2", A_ThisFunc " call finished")
+	return retval
+}
+
+
 API_Call_Main_NewCategory(par_CategoryID)
 {
 	global
@@ -262,19 +275,6 @@ API_Call_Main_DeleteCategory(par_FlowID)
 	logger("t2", A_ThisFunc " call finished")
 	return retval
 }
-
-API_Call_Main_IDOfName(par_name,par_Type)
-{
-	global
-	local retval
-	logger("t2", A_ThisFunc " call received")
-	
-	retval := IDOfName(par_name,par_Type)
-	
-	logger("t2", A_ThisFunc " call finished")
-	return retval
-}
-
 
 API_Call_Main_Element_New(p_FlowID, p_type="",p_elementID="")
 {

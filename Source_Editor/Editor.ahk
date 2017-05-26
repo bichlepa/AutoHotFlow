@@ -53,6 +53,7 @@ lang_Init(my_ScriptDir "\language", my_WorkingDir)
 #include source_Common\variables\code evaluator.ahk
 #include source_Common\variables\code tokenizer.ahk
 #include source_Common\variables\expression evaluator.ahk
+#include source_Common\flows\flows.ahk
 
 AllElementClasses:=Object()
 AllTriggerClasses:=Object()

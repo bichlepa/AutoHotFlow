@@ -7,12 +7,6 @@ global_CategoryIDCounter = 1
 FindFlows()
 {
 	global
-	local FileFullPath
-	local tempflowName
-	local tempcategoryname
-	local tempflowenabled
-	local tempflowid
-	local newFlowID
 	
 	if not fileexist(my_WorkingDir "\Saved Flows")
 		FileCreateDir,%my_WorkingDir%\Saved Flows
@@ -20,64 +14,101 @@ FindFlows()
 	;Load existing Flows
 	loop %my_WorkingDir%\Saved Flows\*.ini
 	{
-		SplitPath, A_LoopFileFullPath,,ThisFlowFolder,,ThisFlowFilename
-	
-		;Compare file name and flow name 
-		iniread, tempflowName, %A_LoopFileFullPath%, general, name
-		
-		;Load Flow ID. If no id saved, set filename as flow ID (backward compatibility)
-		iniread, tempflowID, %A_LoopFileFullPath%, general, id, %ThisFlowFilename%
-		;~ MsgBox %A_LoopFileFullPath% %tempflowName%
-		
-		FileFullPath := A_LoopFileFullPath
-		
-		
-		
-		
-		;read flow information
-		iniread, tempcategoryname, %FileFullPath%, general, category, %a_space% 
-		iniread, tempflowenabled, %FileFullPath%, general, enabled, 0
-		
-		;MsgBox %FileFullPath% - %tempflowcategory%
-		
-		;Check category. Create new one if it does not exist yet
-		if (tempcategoryname != "")
-			tempCategoryID := NewCategory(tempcategoryname)
-		else
-			tempCategoryID := NewCategory(lang("Uncategorized"))
-
-		
-		;Add flow to the list
-		newFlowid:=tempflowID
-		_flows[newFlowid] := object()
-		
-		_flows[newFlowID].file := FileFullPath
-		_flows[newFlowID].Folder := ThisFlowFolder
-		_flows[newFlowID].FileName := ThisFlowFilename
-		
-		_flows[newFlowid].id := newFlowid
-		_flows[newFlowid].name := tempflowName
-		;~ _flows[newFlowid].defaultname := true
-		_flows[newFlowid].Type := "Flow"
-		_flows[newFlowid].category := tempCategoryID
-		UpdateFlowCategoryName(newFlowid)
-		
-		;~ d(_flows[newFlowid])
-		_flows[newFlowID].tv := API_manager_TreeView_AddEntry("Flow", newFlowid)
-		
-		_flows[newFlowID].draw := []
-		
-		
-		if (tempflowenabled != 0) ;Enable flow
-		{
-			loop, parse,tempflowenabled,|
-			{
-				;~ d(newFlowid, A_loopfield)
-				enableOneTrigger(newFlowID, A_LoopField, False)
-			}
-		}
+		InitFlow(A_LoopFileFullPath)
 	}
 	;~ d(_flows)
+}
+
+InitFlow(FileFullPath)
+{
+	global
+	local tempflowName
+	local tempcategoryname
+	local tempflowenabled
+	local tempflowid
+	local newFlowID
+	
+	SplitPath, FileFullPath,,ThisFlowFolder,,ThisFlowFilename
+
+	;Read information about flow 
+	iniread, tempflowName, %FileFullPath%, general, name
+	
+	;Load Flow ID. If no id saved, set filename as flow ID (backward compatibility)
+	iniread, tempflowID, %FileFullPath%, general, id, %ThisFlowFilename%
+	;~ MsgBox %A_LoopFileFullPath% %tempflowName%
+	
+	;read flow information
+	iniread, tempcategoryname, %FileFullPath%, general, category, %a_space% 
+	iniread, tempflowenabled, %FileFullPath%, general, enabled, 0
+	
+	;MsgBox %FileFullPath% - %tempflowcategory%
+	
+	;Check category. Create new one if it does not exist yet
+	if (tempcategoryname != "")
+		tempCategoryID := NewCategory(tempcategoryname)
+	else
+		tempCategoryID := NewCategory(lang("Uncategorized"))
+
+	;Make sure the flow ID does not exist yet. If it exists, generate a new one
+	
+	if _flows.haskey(tempflowID)
+	{
+		Loop
+		{
+			random,randomValue
+			tempflowID := lang("Flow") " " randomValue
+			if (not _flows.haskey(tempflowID))
+				break
+		}
+	}
+
+	;Do not allow two flows to have the same name. If a loaded flow has a name that an other flow already has, the flow will be renamed
+	Loop
+	{
+		if (FlowIDbyName(tempflowName, "flow"))
+		{
+			StringGetPos,posspace,tempflowName,%a_space%,R
+			tempFlowNumberInName:=substr(tempFlowName,posspace+2)
+			if tempFlowNumberInName is number
+				tempflowName:=substr(tempFlowName,1,posspace) " " tempFlowNumberInName+1
+			else
+				tempflowName:=tempFlowName " " 2
+		}
+		else
+			break
+	}
+	
+	;Add flow to the list
+	newFlowid:=tempflowID
+	_flows[newFlowid] := object()
+	
+	_flows[newFlowID].file := FileFullPath
+	_flows[newFlowID].Folder := ThisFlowFolder
+	_flows[newFlowID].FileName := ThisFlowFilename
+	
+	_flows[newFlowid].id := newFlowid
+	_flows[newFlowid].name := tempflowName
+	;~ _flows[newFlowid].defaultname := true
+	_flows[newFlowid].Type := "Flow"
+	_flows[newFlowid].category := tempCategoryID
+	UpdateFlowCategoryName(newFlowid)
+	
+	;~ d(_flows[newFlowid])
+	_flows[newFlowID].tv := API_manager_TreeView_AddEntry("Flow", newFlowid)
+	
+	_flows[newFlowID].draw := []
+	
+	
+	
+	if (tempflowenabled != 0) ;Enable flow
+	{
+		loop, parse,tempflowenabled,|
+		{
+			;~ d(newFlowid, A_loopfield)
+			enableOneTrigger(newFlowID, A_LoopField, False)
+		}
+	}
+	
 }
 
 ;Create a new file for a flow
@@ -98,18 +129,27 @@ NewFlow(par_CategoryID = "")
 		tempCategoryID := par_CategoryID
 	}
 	
-	;Create the flow in the global variable
-	;~ d(NewName " - " tempcategoryid " - " Categoryname)
+	;Generate a new unique ID
 	Loop
 	{
 		random,randomValue
-		newFlowid := lang("New flow") " " randomValue
+		newFlowid := lang("Flow") " " randomValue
 		if (not _flows.haskey(newFlowid))
 			break
 	}
+	;Generate a new unique flow name
+	randomValue:=1
+	Loop
+	{
+		tempflowName := lang("New flow") " " randomValue
+		if (not FlowIDbyName(tempflowName, "flow"))
+			break
+		randomValue+=1
+	}
+	;Create the flow in the global variable
 	_flows[newFlowid] := object()
 	_flows[newFlowid].id := newFlowid
-	_flows[newFlowid].name := newFlowid
+	_flows[newFlowid].name := tempflowName
 	_flows[newFlowid].Type := "Flow"
 	_flows[newFlowid].category := tempCategoryID
 	_flows[newFlowid].enabled := false
@@ -216,34 +256,6 @@ UpdateFlowCategoryName(par_FlowID)
 {
 	global
 	_flows[par_FlowID].categoryName := _share.allCategories[_flows[par_FlowID].category].name
-}
-
-IDOfName(par_name,Type="") ;Returns the id by name
-{
-	global
-	if ((type = "flow") or (type = ""))
-	{
-		for count, tempitem in _flows
-		{
-			if (tempitem.name = par_name)
-			{
-				return tempitem.id
-			}
-			
-		}
-	}
-	else if ((type = "category") or (type = ""))
-	{
-		for count, tempitem in _share.allCategories
-		{
-			if (tempitem.name = par_name)
-			{
-				return tempitem.id
-			}
-			
-		}
-	}
-	return 
 }
 
 

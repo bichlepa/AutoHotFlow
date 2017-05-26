@@ -192,6 +192,16 @@ API_Main_NewFlow(par_CategoryID = "")
 	return retvalue
 }
 
+API_Main_InitFlow(par_filepath)
+{
+	global
+	local retvalue
+	logger("t2", A_ThisFunc " called")
+	retvalue :=  parentAHKThread.ahkFunction("API_Call_Main_InitFlow", par_filepath)
+	logger("t2", A_ThisFunc " finished")
+	return retvalue
+}
+
 API_Main_NewCategory(par_Newname = "")
 {
 	global
@@ -248,16 +258,6 @@ API_Main_DeleteCategory(par_FlowID)
 	local retvalue
 	logger("t2", A_ThisFunc " called")
 	retvalue :=  parentAHKThread.ahkFunction("API_Call_Main_DeleteCategory", par_FlowID)
-	logger("t2", A_ThisFunc " finished")
-	return retvalue
-}
-
-API_Main_IDOfName(par_name,par_Type="")
-{
-	global
-	local retvalue
-	logger("t2", A_ThisFunc " called")
-	retvalue :=  parentAHKThread.ahkFunction("API_Call_Main_IDOfName", par_name,par_Type)
 	logger("t2", A_ThisFunc " finished")
 	return retvalue
 }
