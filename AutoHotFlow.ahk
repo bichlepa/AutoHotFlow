@@ -8,6 +8,13 @@ if not (a_iscompiled)
 {
 	;This is only executing while developing
 	
+	Libincludes=
+	(
+	#include lib\7z wrapper\7z wrapper.ahk
+	
+	)
+	Libincludes.= "global_elementInclusions = `n(`n" Libincludes "`n)`n"
+	
 	;Find all elements in folder Source_Elements
 	elementInclusions := "`n"
 	loop, files, %A_WorkingDir%\source_Elements\*.ahk, FR
@@ -25,6 +32,13 @@ if not (a_iscompiled)
 	posend-=1
 	;~ MsgBox % posend "-" SubStr(mainfilecontent,posend,100000)
 	mainfilecontent:=substr(mainfilecontent,1,posstart) elementInclusions SubStr(mainfilecontent,posend,100000)
+	
+	StringGetPos,posstart,mainfilecontent,;Lib_Includes_Start
+	posstart+= strlen(";Lib_Includes_Start") +1
+	stringgetpos,posend,mainfilecontent,;Lib_Includes_End
+	posend-=1
+	;~ MsgBox % posend "-" SubStr(mainfilecontent,posend,100000)
+	mainfilecontent:=substr(mainfilecontent,1,posstart) Libincludes SubStr(mainfilecontent,posend,100000)
 
 	;~ MsgBox %mainfilecontent%
 	FileDelete,source_main\main.ahk

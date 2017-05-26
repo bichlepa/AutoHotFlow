@@ -35,6 +35,15 @@ lang_Init(my_ScriptDir "\language", my_WorkingDir)
 #include lib\ObjFullyClone\ObjFullyClone.ahk
 #include lib\Random Word List\Random Word List.ahk
 
+;Lib_includes_Start#include lib\7z wrapper\7z wrapper.ahk
+global_elementInclusions = 
+(
+#include lib\7z wrapper\7z wrapper.ahk
+
+)
+
+;Lib_Includes_End
+
 #include Source_Main\Tray\Tray.ahk
 #include Source_Main\Globals\Global Variables.ahk
 #include Source_Main\Threads\Threads.ahk
@@ -68,6 +77,7 @@ AllTriggerClasses:=Object()
 
 ;Element_Includes_Start
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\Beep.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\Compress files.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\Execute_Flow.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\New_List.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\New_Variable.ahk
