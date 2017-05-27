@@ -18,7 +18,11 @@ onexit exit
 
 #include language\language.ahk
 ;initialize languages
-lang_Init(my_ScriptDir "\language", my_WorkingDir)
+_language:=Object()
+_language.dir:=my_ScriptDir "\language" ;Directory where the translations are stored
+lang_Init()
+
+lang_setLanguage(_settings.UILanguage)
 
 #include Source_Manager\User Interface\manager gui.ahk
 #include Source_Manager\User Interface\help.ahk

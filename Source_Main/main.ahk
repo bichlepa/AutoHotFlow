@@ -15,6 +15,10 @@ IfInString, my_WorkingDir, %A_ProgramFiles%
 		FileCreateDir, %my_WorkingDir%
 }
 
+;First of all initialize global variables and load the settings
+init_GlobalVars()
+load_settings()
+
 ; using working dir forbidden.
 ;The reason is that while any thread uses the command FileSelectFile, the working directory of the working directory of the whole process is changed to the path which is shown in the dialog.
 SetWorkingDir %a_temp%  
@@ -27,7 +31,10 @@ Global_ThisThreadID:="Main"
 #Include %A_ScriptDir%\..
 
 #include language\language.ahk
-lang_Init(my_ScriptDir "\language", my_WorkingDir)
+_language:=Object()
+_language.dir:=my_ScriptDir "\language" ;Directory where the translations are stored
+lang_Init()
+lang_setLanguage(_settings.UILanguage)
 
 #include lib\Object to file\String-object-file.ahk
 #include lib\Robert - Ini library\Robert - Ini library.ahk
@@ -35,8 +42,8 @@ lang_Init(my_ScriptDir "\language", my_WorkingDir)
 #include lib\ObjFullyClone\ObjFullyClone.ahk
 #include lib\Random Word List\Random Word List.ahk
 
-;Lib_includes_Start
-#include lib\7z wrapper\7z wrapper.ahk
+;Include libraries which may be used by the elements. This code is generated.
+;Lib_includes_Start#include lib\7z wrapper\7z wrapper.ahk
 global_elementInclusions = 
 (
 #include lib\7z wrapper\7z wrapper.ahk
@@ -45,6 +52,7 @@ global_elementInclusions =
 
 ;Lib_Includes_End
 
+;Include sourcecode
 #include Source_Main\Tray\Tray.ahk
 #include Source_Main\Globals\Global Variables.ahk
 #include Source_Main\Threads\Threads.ahk
@@ -62,6 +70,7 @@ global_elementInclusions =
 #include Source_Main\Flows\Manage Elements.ahk
 #include Source_Main\Flows\Flow actions.ahk
 #include Source_Main\Flows\states.ahk
+#include Source_Main\settings\settings.ahk
 
 #include source_Common\Debug\Debug.ahk
 #include source_Common\Debug\Logger.ahk
@@ -76,7 +85,8 @@ global_elementInclusions =
 AllElementClasses:=Object()
 AllTriggerClasses:=Object()
 
-
+;Includ elements. This code is generated
+;The elements must be included before the other treads are started
 ;Element_Includes_Start
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\Beep.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\Compress files.ahk
@@ -105,9 +115,8 @@ AllTriggerClasses:=Object()
 
 
 
-init_GlobalVars()
 
-
+;Start other threads
 Thread_StartManager()
 Thread_StartDraw()
 Thread_StartExecution()

@@ -17,7 +17,10 @@ OnExit,Exit
 #Include %A_ScriptDir%\..
 #include language\language.ahk ;Must be very first
 ;initialize languages
-lang_Init(my_ScriptDir "\language", my_WorkingDir)
+_language:=Object()
+_language.dir:=my_ScriptDir "\language" ;Directory where the translations are stored
+lang_Init()
+lang_setLanguage(_settings.UILanguage)
 
 #include Lib\Object to file\String-object-file.ahk
 #include Lib\ObjFullyClone\ObjFullyClone.ahk

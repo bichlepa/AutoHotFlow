@@ -107,4 +107,4 @@ if not (a_iscompiled)
 }
 
 ;At last run main.ahk
-run,autohotkey\autohotkey_h.exe source_main\main.ahk "%1%" "%2%" "%3%" "%4%" "%5%" "%6%" "%7%" "%8%" "%9%" "%10%"
+run,autohotkey\autohotkey_h.exe "%A_ScriptDir%\source_main\main.ahk" "%1%" "%2%" "%3%" "%4%" "%5%" "%6%" "%7%" "%8%" "%9%" "%10%"

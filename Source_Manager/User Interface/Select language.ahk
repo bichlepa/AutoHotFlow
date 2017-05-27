@@ -6,9 +6,9 @@ SelectLanguage_GUI()
 	Disable_Manager_GUI()
 	
 	stringalllangs=`n
-	for count, oneLang in _language.allLangs
+	for onecode, oneLang in _language.allLangs
 	{
-		stringalllangs.= oneLang " (" _language[oneLang].enlangname " - "  _language[oneLang].langname ")|"
+		stringalllangs.= oneLang " (" oneLang.enlangname " - "  oneLang.langname ")|"
 		
 	}
 	
@@ -44,9 +44,9 @@ SelectLanguage_GUI()
 	GuiLanguageChooseOK:
 	gui, language:Submit, nohide
 
-	IniWrite, % _language.allLangs[GuiLanguageChoose], %my_WorkingDir%\settings.ini, common, UILanguage
+	lang_setLanguage(GuiLanguageChoose)
+	IniWrite, % _language.lang, %my_WorkingDir%\settings.ini, common, UILanguage
 	iniread, UILang, %my_WorkingDir%\settings.ini, common, UILanguage
-	lang_LoadCurrentLanguage()
 
 	gui, language:destroy
 
