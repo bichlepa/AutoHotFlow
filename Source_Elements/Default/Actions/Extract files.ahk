@@ -60,8 +60,8 @@ CheckSettingsActionExtract_files(ID)
 Element_run_Action_Extract_files(Environment, ElementParameters)
 {
 	;~ d(ElementParameters, "element parameters")
-	Folder := x_replaceVariables(Environment, ElementParameters.Folder)
-	zipfile := x_replaceVariables(Environment, ElementParameters.zipfile)
+	Folder := x_GetFullPath(Environment, x_replaceVariables(Environment, ElementParameters.Folder))
+	zipfile := x_GetFullPath(Environment, x_replaceVariables(Environment, ElementParameters.zipfile))
 	zipformat := ElementParameters.zipformat
 	
 	result:=7z_extract(zipfile, "-t" zipformat, Folder)

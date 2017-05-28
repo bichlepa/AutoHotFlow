@@ -12,9 +12,13 @@ ui_SettingsOwFLow()
 	gui,-dpiscale
 	gui,font,s10 cnavy wbold
 	gui,add,text,x10 w300,% lang("Flow_execution_policy")
-	
 	gui,font,s8 cDefault wnorm
 	
+	if (flowobj.flowSettings.ExecutionPolicy="default")
+		tempchecked=1
+	else
+		tempchecked=0
+	gui,add,radio,w300 x10 Y+10 vGuiFlowSettingsDefault checked%tempchecked%,% lang("Use global setting")
 	if (flowobj.flowSettings.ExecutionPolicy="parallel")
 		tempchecked=1
 	else
@@ -39,7 +43,13 @@ ui_SettingsOwFLow()
 	gui,font,s10 cnavy wbold
 	gui,add,text,x10 w300 Y+15,% lang("Working directory")
 	gui,font,s8 cDefault wnorm
-	gui,add,Edit,w300 x10 Y+10 vGuiFlowSettingsWorkingDir,% flowobj.flowSettings.WorkingDir
+	
+	if (flowobj.flowSettings.DefaultWorkingDir=True)
+		tempchecked=1
+	else
+		tempchecked=0
+	gui,add,Checkbox,w300 x10 Y+10 vGuiFlowSettingsDefaultWorkingDir checked%tempchecked% gGuiFlowSettingsDefaultWorkingDir,% lang("Use global working dir")
+	gui,add,Edit,w300 x10 Y+10 vGuiFlowSettingsWorkingDir disabled%tempchecked%,% flowobj.flowSettings.WorkingDir
 	
 	
 	gui,font,s10 cnavy wbold
@@ -73,7 +83,19 @@ ui_SettingsOwFLow()
 	showlog()
 	return
 	
-	
+	GuiFlowSettingsDefaultWorkingDir:
+	gui,submit,NoHide
+	if GuiFlowSettingsDefaultWorkingDir
+	{
+		;todo: warum geht das nicht?
+		guicontrol, disable, GuiFlowSettingsWorkingDir
+	}
+	else
+	{
+		;todo: warum geht das nicht?
+		guicontrol, enable, GuiFlowSettingsWorkingDir
+	}
+	return
 	
 	GuiFlowSettingsOK:
 	GuiFlowSettingsStayOpen:=false
@@ -81,52 +103,31 @@ ui_SettingsOwFLow()
 	
 	gui,submit,NoHide
 	
-	
-	;~ d(variable)
-	;~ tempDir:=% variable.replaceVariables("",GuiFlowSettingsWorkingDir) ;if user entered a built in variable //TODO
-	tempDir := GuiFlowSettingsWorkingDir
-	if DllCall("Shlwapi.dll\PathIsRelative","Str",tempDir) ;if user did not enter an absolute path
+	;Check working directory
+	if (GuiFlowSettingsDefaultWorkingDir)
 	{
-		if GuiFlowSettingsWorkingDir!=  ;If user left it blank, he don't want to change it. if not...
+		newworkingdir:=checkNewWorkingDir(_settings.FlowWorkingDir, GuiFlowSettingsWorkingDir)
+		if not (newworkingdir)
 		{
-			MsgBox, 17, AutoHotFlow, % lang("The specified folder is not an absolute path!") "`n" lang("If you press '%1%', previous path will remain.",lang("OK"))
-			IfMsgBox cancel
-				return
+			return
+		}
+		if (newworkingdir != flowobj.flowSettings.WorkingDir)
+		{
+			someSettingChanged:=true
+			flowobj.flowSettings.WorkingDir :=newworkingdir
 		}
 	}
-	else
+	if (flowobj.flowSettings.DefaultWorkingDir != GuiFlowSettingsDefaultWorkingDir)
 	{
-		if not FileExist(GuiFlowSettingsWorkingDir)
-		{
-			MsgBox, 36, AutoHotFlow, % lang("The specified folder does not exist. Should it be created?") "`n" lang("Press '%1%', if you want to correct it.",lang("No"))
-			IfMsgBox Yes
-			{
-				FileCreateDir,%GuiFlowSettingsWorkingDir%
-				if errorlevel
-				{
-					MsgBox, 16, AutoHotFlow, % lang("The specified folder could not be created!")
-					return
-				}
-				else
-				{
-					flowobj.flowSettings.WorkingDir:=GuiFlowSettingsWorkingDir
-					someSettingChanged:=true
-				}
-				
-			}
-			else
-				return
-		}
-		else
-		{
-			flowobj.flowSettings.WorkingDir:=GuiFlowSettingsWorkingDir
-			someSettingChanged:=true
-		}
+		someSettingChanged:=true
+		flowobj.flowSettings.DefaultWorkingDir := GuiFlowSettingsDefaultWorkingDir
 	}
 	
 	
 	tempSettingFlowExecutionPolicyOld:=flowobj.flowSettings.ExecutionPolicy
 	
+	if GuiFlowSettingsDefault=1
+		tempExecutionPolicy:="default"
 	if GuiFlowSettingsParallel=1
 		tempExecutionPolicy:="parallel"
 	else if GuiFlowSettingsSkip=1
@@ -147,10 +148,9 @@ ui_SettingsOwFLow()
 		flowobj.flowSettings.LogToFile:=GuiFlowSettingsLogToFile
 		someSettingChanged:=true
 	}
-	
 	if someSettingChanged:=true
 	{
-		new state()
+		API_Main_State_New(flowobj.id)
 	}
 	gui,destroy
 	maingui.enable()

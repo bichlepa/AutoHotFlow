@@ -10,6 +10,18 @@
 	return retval
 }
 
+API_Call_Main_write_settings()
+{
+	global
+	local retval
+	logger("t2", A_ThisFunc " call received")
+	
+	retval := write_settings()
+	
+	logger("t2", A_ThisFunc " call finished")
+	return retval
+	
+}
 API_Call_Main_LoadFlow(par_FlowID)
 {
 	global

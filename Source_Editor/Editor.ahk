@@ -50,7 +50,8 @@ lang_setLanguage(_settings.UILanguage)
 #include source_Common\Multithreading\API Caller Main.ahk
 #include source_Common\Debug\Debug.ahk
 #include source_Common\Debug\Logger.ahk
-#include source_Common\Defaults\Default values.ahk
+#include source_Common\settings\Default values.ahk
+#include source_Common\settings\settings.ahk
 #include source_Common\Variables\global variables.ahk
 #include source_Common\Variables\code parser.ahk
 #include source_Common\variables\code evaluator.ahk

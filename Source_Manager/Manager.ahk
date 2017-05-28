@@ -27,7 +27,6 @@ lang_setLanguage(_settings.UILanguage)
 #include Source_Manager\User Interface\manager gui.ahk
 #include Source_Manager\User Interface\help.ahk
 #include Source_Manager\User Interface\Change Category GUI.ahk
-#include Source_Manager\User Interface\Select language.ahk
 #include Source_Manager\User Interface\Global_Settings.ahk
 #include Source_Manager\User Interface\import and export.ahk
 #include Source_Manager\API\API receiver manager.ahk
@@ -37,6 +36,7 @@ lang_setLanguage(_settings.UILanguage)
 #include source_Common\Debug\Logger.ahk
 #include source_Common\Multithreading\API Caller Main.ahk
 #include source_Common\flows\flows.ahk
+#include source_Common\settings\settings.ahk
 
 
 menu,tray, tip, Manager

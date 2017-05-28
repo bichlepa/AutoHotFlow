@@ -53,7 +53,7 @@ init_GlobalVars()
 		.markedElements	Contains an array of all element and connection IDs which are marked
 		
 		.FlowSettings		Contains all flow specific settings
-			.ExecutionPolicy	Defines what happens if a flow is triggered but already executing. Contains "wait", "skip", "stop" or "parallel"
+			.ExecutionPolicy	Defines what happens if a flow is triggered but already executing. Contains "default", "wait", "skip", "stop" or "parallel"
 			.FolderOfStaticVariables	;TODO
 			.LogToFile		Defines whether the logging of this flow should be written to file
 			.OffsetX		Current offset
@@ -90,6 +90,7 @@ init_GlobalVars()
 	
 	/* Content of _settings
 	_settings is an associative array of objects. Each object contains some informations:
+	;todo describe
 	*/
 	_settings := CriticalObject()
 	

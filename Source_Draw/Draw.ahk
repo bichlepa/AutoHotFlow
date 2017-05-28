@@ -41,7 +41,7 @@ lang_setLanguage(_settings.UILanguage)
 
 #include Source_Common\Debug\Debug.ahk
 #include source_Common\Debug\Logger.ahk
-#include Source_Common\Defaults\Default values.ahk
+#include Source_Common\settings\Default values.ahk
 
 parentAHKThread := AhkExported()
 

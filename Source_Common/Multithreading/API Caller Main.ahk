@@ -43,6 +43,17 @@ API_Main_Draw()
 }
 
 
+API_Main_write_settings()
+{
+	global
+	local retvalue
+	logger("t2", A_ThisFunc " called")
+	retvalue :=  parentAHKThread.ahkFunction("API_Call_Main_write_settings")
+	logger("t2", A_ThisFunc " finished")
+	return retvalue
+}
+
+
 API_Main_LoadFlow(par_FlowID)
 {
 	global

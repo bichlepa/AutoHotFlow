@@ -12,13 +12,17 @@ newInstance(p_Environment)
 		;find out whether the flow is running
 		if (_flows[p_Environment.FlowID].executing)
 		{
-			if (_flows[p_Environment.FlowID].flowSettings.ExecutionPolicy="skip")
+			if (_flows[p_Environment.FlowID].flowSettings.ExecutionPolicy = "default")
+				ExecutionPolicy:=_settings.FlowExecutionPolicy
+			else
+				ExecutionPolicy:=_flows[p_Environment.FlowID].flowSettings.ExecutionPolicy
+			if (ExecutionPolicy="skip")
 			{
 				logger("f1", "Execution of flow '" _flows[p_Environment.FlowID].name "' skipped, due to flow execution policy")
 				return
 				
 			}
-			else if (_flows[p_Environment.FlowID].flowSettings.ExecutionPolicy="stop")
+			else if (ExecutionPolicy="stop")
 			{
 				logger("f1", "Stopping flow '" _flows[p_Environment.FlowID].name "' in order to relaunch it, due to flow execution policy")
 				stopFlow(_flows[p_Environment.FlowID])

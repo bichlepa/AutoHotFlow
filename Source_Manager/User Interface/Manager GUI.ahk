@@ -23,22 +23,24 @@ init_Manager_GUI()
 	gui,font,s15
 	Gui, Add, TreeView, vTreeView_manager gTreeView_manager x10 y10 w300 h500 -ReadOnly AltSubmit ImageList%IconList% hwndTreeView_manager_HWND
 	gui,font,s12
-	gui,add,Button,vButton_manager_NewCategory gButton_manager_NewCategory X330 yp w200 h30 , % lang("New_Category")
-	gui,add,Button,vButton_manager_NewFlow gButton_manager_NewFlow X+10 yp w200 h30, % lang("New_Flow")
-	gui,add,Button,vButton_manager_ChangeCategory gButton_manager_ChangeCategory Disabled Y+30 x330 w200 h30, % lang("Change_category")
-	;gui,add,Button,vButtonCopyFlow gButtonCopyFlow Disabled X+10 yp w200 h30, % lang("Copy")
-	gui,add,Button,vButton_manager_EditFlow gButton_manager_EditFlow Disabled Y+30 x330 w200 h30, % lang("Edit")
-	gui,add,Button,vButton_manager_DeleteFlow gButton_manager_DeleteFlow Disabled X+10 yp w200 h30, % lang("delete")
-	gui,add,Button,vButton_manager_EnableFlow gButton_manager_EnableFlow Disabled Y+30 x330 w200 h30, % lang("enable")
-	gui,add,Button,vButton_manager_RunFlow gButton_manager_RunFlow Disabled X+10 yp w200 h30,% lang("Run")
+	gui,add,Button,vButton_manager_NewCategory gButton_manager_NewCategory X330 yp w200 h30
+	gui,add,Button,vButton_manager_NewFlow gButton_manager_NewFlow X+10 yp w200 h30
+	gui,add,Button,vButton_manager_ChangeCategory gButton_manager_ChangeCategory Disabled Y+20 x330 w130 h30
+	gui,add,Button,vButton_manager_DuplicateFlow gButton_manager_DuplicateFlow Disabled X+10 yp w130 h30
+	gui,add,Button,vButton_manager_DeleteFlow gButton_manager_DeleteFlow Disabled X+10 yp w130 h30
+	
+	gui,add,Button,vButton_manager_EditFlow gButton_manager_EditFlow Disabled Y+50 x330 w200 h30
+	gui,add,Button,vButton_manager_EnableFlow gButton_manager_EnableFlow Disabled Y+20 x330 w200 h30
+	gui,add,Button,vButton_manager_RunFlow gButton_manager_RunFlow Disabled X+10 yp w200 h30
 
-	gui,add,Button,vButton_manager_Import_Export gButton_manager_Import_Export  X330 Y+30 w200 h30,% lang("Import and export")
-	gui,add,Button,vButton_manager_SelectLanguage gButton_manager_SelectLanguage  X330 Y+60 w200 h30,% lang("Change_Language")
-	gui,add,Button,vButton_manager_Help gButton_manager_Help X+10 yp w200 h30,% lang("Help")
-	gui,add,Button,vButton_manager_Settings gButton_manager_Settings  X330 Y+20 w200 h30,% lang("Settings")
-	gui,add,Button,vButton_manager_About gButton_manager_About  X330 Y+20 w200 h30,% lang("About AutoHotFlow")
-	gui,add,Button,vButton_manager_ShowLog gButton_manager_ShowLog  X330 Y+20 w200 h30,% lang("Show log")
-	gui,add,Button,vButton_manager_Exit gButton_manager_Exit X+10 yp w200 h30,% lang("Exit")
+	gui,add,Button,vButton_manager_Settings gButton_manager_Settings  X330 Y+50 w200 h30
+	gui,add,Button,vButton_manager_Import_Export gButton_manager_Import_Export X330 Y+20 w200 h30
+	gui,add,Button,vButton_manager_About gButton_manager_About  X330 Y+20 w200 h30
+	gui,add,Button,vButton_manager_Help gButton_manager_Help X+10 yp w200 h30
+	gui,add,Button,vButton_manager_ShowLog gButton_manager_ShowLog  X330 Y+20 w200 h30
+	gui,add,Button,vButton_manager_Exit gButton_manager_Exit X+10 yp w200 h30
+
+	Refresh_Manager_GUI() ; write translated labels
 
 	gui,+hwndManagerGUIHWND
 	_share.hwnds.Manager := ManagerGUIHWND
@@ -64,12 +66,13 @@ Refresh_Manager_GUI()
 	guicontrol,,Button_manager_NewCategory , % lang("New_Category")
 	guicontrol,,Button_manager_NewFlow , % lang("New_Flow")
 	guicontrol,,Button_manager_ChangeCategory , % lang("Change_category")
-	guicontrol,,Button_manager_EditFlow , % lang("Edit")
+	guicontrol,,Button_manager_DuplicateFlow , % lang("Duplicate")
 	guicontrol,,Button_manager_DeleteFlow , % lang("delete")
+	guicontrol,,Button_manager_EditFlow , % lang("Edit")
 	guicontrol,,Button_manager_EnableFlow , % lang("enable")
 	guicontrol,,Button_manager_RunFlow ,% lang("Run")
 
-	guicontrol,,Button_manager_SelectLanguage ,% lang("Change_Language")
+	guicontrol,,Button_manager_Import_Export ,% lang("Import and export")
 	guicontrol,,Button_manager_Settings ,% lang("Settings")
 	guicontrol,,Button_manager_Help ,% lang("Help")
 	guicontrol,,Button_manager_ShowLog ,% lang("Show log")
@@ -401,6 +404,7 @@ TreeView_manager()
 			guicontrol,enable,Button_manager_EnableFlow
 			guicontrol,enable,Button_manager_ChangeCategory
 			guicontrol,enable,Button_manager_DeleteFlow
+			guicontrol,enable,Button_manager_DuplicateFlow
 		}
 		else
 		{
@@ -408,6 +412,7 @@ TreeView_manager()
 			guicontrol,Disable,Button_manager_RunFlow
 			guicontrol,Disable,Button_manager_EnableFlow
 			guicontrol,Disable,Button_manager_ChangeCategory
+			guicontrol,Disable,Button_manager_DuplicateFlow
 			guicontrol,enable,Button_manager_DeleteFlow
 		}
 		
@@ -474,15 +479,8 @@ manager_menu_delete()
 }
 manager_menu_duplicate()
 {
-	global
-	gui,manager:default
-	
-	tempselectedTV := TV_GetSelection()
-	tempselectedID := allTreeViewItems[tempselectedTV].id
-	tempselectedType := allTreeViewItems[tempselectedTV].type
-	
-	if tempselectedType=flow ;this can only be performed on flows
-		API_Main_DuplicateFlow(tempselectedID)
+	;Same as if user has pressed the button
+	Button_manager_DuplicateFlow()
 }
 manager_menu_rename()
 {
@@ -561,6 +559,18 @@ Button_manager_ChangeCategory()
 	{
 		changeFlowCategory_GUI(allTreeViewItems[tempselectedTV].id)
 	}
+}
+Button_manager_DuplicateFlow()
+{
+	global
+	gui,manager:default
+	
+	tempselectedTV := TV_GetSelection()
+	tempselectedID := allTreeViewItems[tempselectedTV].id
+	tempselectedType := allTreeViewItems[tempselectedTV].type
+	
+	if tempselectedType=flow ;this can only be performed on flows
+		API_Main_DuplicateFlow(tempselectedID)
 }
 
 Button_manager_Import_Export()
@@ -678,11 +688,6 @@ Button_manager_DeleteFlow()
 	;debug()
 	;~ removeUncategorizedCategoryIfPossible()
 	Enable_Manager_GUI()
-}
-
-Button_manager_SelectLanguage()
-{
-	SelectLanguage_GUI()
 }
 
 Button_manager_Settings()

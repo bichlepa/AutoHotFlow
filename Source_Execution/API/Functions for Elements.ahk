@@ -653,9 +653,18 @@ x_log(Environment, LoggingText, loglevel = 2)
 }
 x_GetFullPath(Environment, p_Path)
 {
-	global _Flows
+	global _Flows, _settings
 	path:=p_Path
 	if  DllCall("Shlwapi.dll\PathIsRelative","Str",path)
-		path:=_Flows[Environment.FlowID].flowsettings.workingdir "\" path
+	{
+		if (_Flows[Environment.FlowID].flowsettings.DefaultWorkingDir)
+		{
+			path:=_settings.FlowWorkingDir "\" path
+		}
+		else
+		{
+			path:=_Flows[Environment.FlowID].flowsettings.workingdir "\" path
+		}
+	}
 	return path
 }

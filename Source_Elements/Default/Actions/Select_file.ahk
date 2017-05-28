@@ -88,7 +88,7 @@ Element_run_Action_Select_file(Environment, ElementParameters)
 	;~ d(ElementParameters, "element parameters")
 	Varname := x_replaceVariables(Environment, ElementParameters.Varname)
 	title := x_replaceVariables(Environment, ElementParameters.title)
-	folder := x_replaceVariables(Environment, ElementParameters.folder)
+	folder := x_GetFullPath(Environment, x_replaceVariables(Environment, ElementParameters.folder))
 	filter := x_replaceVariables(Environment, ElementParameters.filter)
 	
 	options:=0

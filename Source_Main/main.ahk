@@ -36,6 +36,33 @@ _language.dir:=my_ScriptDir "\language" ;Directory where the translations are st
 lang_Init()
 lang_setLanguage(_settings.UILanguage)
 
+
+;if setting run as admin active
+if (_settings.runAsAdmin and not A_IsAdmin)
+{
+	FileRead,triedtostart,%a_temp%\autoHotflowTryToStartAsAdmin.txt
+	IfInString, triedtostart, 111
+	{
+		MsgBox, 52, , % lang("Several tries to start as administrator failed. Do you want to disable it?")
+		IfMsgBox yes
+		{
+			_settings.runAsAdmin:=false
+			write_settings()
+			skipstartAsAdmin :=true
+		}
+	}
+	if not skipstartAsAdmin
+	{
+		FileAppend,1,%a_temp%\autoHotflowTryToStartAsAdmin.txt
+		try Run *RunAs "%A_ScriptFullPath%" 
+		ExitApp
+	}
+	
+	;~ RunAsAdmin()
+}
+FileDelete,%a_temp%\autoHotflowTryToStartAsAdmin.txt
+
+
 #include lib\Object to file\String-object-file.ahk
 #include lib\Robert - Ini library\Robert - Ini library.ahk
 #include lib\ObjHasValue\ObjHasValue.ahk
@@ -43,7 +70,8 @@ lang_setLanguage(_settings.UILanguage)
 #include lib\Random Word List\Random Word List.ahk
 
 ;Include libraries which may be used by the elements. This code is generated.
-;Lib_includes_Start#include lib\7z wrapper\7z wrapper.ahk
+;Lib_includes_Start
+#include lib\7z wrapper\7z wrapper.ahk
 global_elementInclusions = 
 (
 #include lib\7z wrapper\7z wrapper.ahk
@@ -74,7 +102,8 @@ global_elementInclusions =
 
 #include source_Common\Debug\Debug.ahk
 #include source_Common\Debug\Logger.ahk
-#include source_Common\Defaults\Default values.ahk
+#include source_Common\Settings\Default values.ahk
+#include source_Common\Settings\Settings.ahk
 #include source_Common\variables\global variables.ahk
 #include source_Common\variables\code parser.ahk
 #include source_Common\variables\code evaluator.ahk

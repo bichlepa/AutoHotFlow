@@ -12,7 +12,11 @@ executionTask()
 		
 		for OneInstanceID, OneInstance in _execution.Instances
 		{
-			thisFlowExecutionPolicyIsWait:=(_flows[OneInstance.FlowID].flowSettings.ExecutionPolicy="wait")
+			if (_flows[p_Environment.FlowID].flowSettings.ExecutionPolicy = "default")
+				ExecutionPolicy:=_settings.FlowExecutionPolicy
+			else
+				ExecutionPolicy:=_flows[p_Environment.FlowID].flowSettings.ExecutionPolicy
+			thisFlowExecutionPolicyIsWait:=(ExecutionPolicy="wait")
 			
 			if (OneInstance.state="init")
 			{

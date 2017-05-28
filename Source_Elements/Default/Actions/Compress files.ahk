@@ -60,8 +60,8 @@ CheckSettingsActionCompress_files(ID)
 Element_run_Action_Compress_files(Environment, ElementParameters)
 {
 	;~ d(ElementParameters, "element parameters")
-	File := x_replaceVariables(Environment, ElementParameters.File)
-	zipfile := x_replaceVariables(Environment, ElementParameters.zipfile)
+	File := x_GetFullPath(Environment, x_replaceVariables(Environment, ElementParameters.File))
+	zipfile := x_GetFullPath(Environment, x_replaceVariables(Environment, ElementParameters.zipfile))
 	zipformat := ElementParameters.zipformat
 	
 	result:=7z_compress(zipfile, "-t" zipformat, file)
