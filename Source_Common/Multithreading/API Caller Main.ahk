@@ -218,7 +218,7 @@ API_Main_NewCategory(par_Newname = "")
 	global
 	local retvalue
 	logger("t2", A_ThisFunc " called")
-	retvalue :=  parentAHKThread.ahkFunction("API_Call_Main_NewCategory", par_CategoryID)
+	retvalue :=  parentAHKThread.ahkFunction("API_Call_Main_NewCategory", par_Newname)
 	logger("t2", A_ThisFunc " finished")
 	return retvalue
 }

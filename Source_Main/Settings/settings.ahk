@@ -12,6 +12,7 @@ load_settings()
 	settingsdefinitions.push({section: "common", key: "runAsAdmin", default: false})
 	settingsdefinitions.push({section: "flowSettings", key: "FlowExecutionPolicy", default: "parallel"})
 	settingsdefinitions.push({section: "flowSettings", key: "FlowWorkingDir", default: A_MyDocuments "\AutoHotFlow default working directory"})
+	settingsdefinitions.push({section: "appearance", key: "HideDemoFlows", default: False})
 	for oneindex, onesetting in settingsdefinitions
 	{
 		default:=onesetting.default

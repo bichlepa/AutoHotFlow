@@ -1,5 +1,5 @@
 ﻿
-global_CategoryIDCounter = 1
+global global_CategoryIDCounter = 1
 
 ;Find flows in folder "saved Flows" und show them in the tv.
 ;Additionally read the state of flow and activate it if it should be active
@@ -7,7 +7,6 @@ global_CategoryIDCounter = 1
 FindFlows()
 {
 	global
-	
 	if not fileexist(my_WorkingDir "\Saved Flows")
 		FileCreateDir,%my_WorkingDir%\Saved Flows
 	
@@ -16,7 +15,8 @@ FindFlows()
 	{
 		InitFlow(A_LoopFileFullPath)
 	}
-	;~ d(_flows)
+	_share.FlowsTreeViewNeedFullRefresh:=True
+	_share.FindFlows_Called:=True
 }
 
 InitFlow(FileFullPath)
@@ -24,8 +24,10 @@ InitFlow(FileFullPath)
 	global
 	local tempflowName
 	local tempcategoryname
+	local tempCategoryID
 	local tempflowenabled
 	local tempflowid
+	local tempdemo
 	local newFlowID
 	
 	SplitPath, FileFullPath,,ThisFlowFolder,,ThisFlowFilename
@@ -40,14 +42,16 @@ InitFlow(FileFullPath)
 	;read flow information
 	iniread, tempcategoryname, %FileFullPath%, general, category, %a_space% 
 	iniread, tempflowenabled, %FileFullPath%, general, enabled, 0
+	iniread, tempdemo, %FileFullPath%, general, demo, 0
 	
 	;MsgBox %FileFullPath% - %tempflowcategory%
 	
-	;Check category. Create new one if it does not exist yet
-	if (tempcategoryname != "")
-		tempCategoryID := NewCategory(tempcategoryname)
-	else
-		tempCategoryID := NewCategory(lang("Uncategorized"))
+	;Check category. Create new one if it does not exist yet. Demo flows don't need a dedicated category
+	if (not tempdemo)
+	{
+		if (tempcategoryname != "")
+			tempCategoryID := NewCategory(tempcategoryname)
+	}
 
 	;Make sure the flow ID does not exist yet. If it exists, generate a new one
 	
@@ -91,10 +95,15 @@ InitFlow(FileFullPath)
 	;~ _flows[newFlowid].defaultname := true
 	_flows[newFlowid].Type := "Flow"
 	_flows[newFlowid].category := tempCategoryID
+	_flows[newFlowid].demo := tempdemo
 	UpdateFlowCategoryName(newFlowid)
 	
 	;~ d(_flows[newFlowid])
-	_flows[newFlowID].tv := API_manager_TreeView_AddEntry("Flow", newFlowid)
+	if (_share.FindFlows_Called)
+	{
+		API_manager_TreeView_Refill()
+		API_manager_TreeView_Select("Flow", newFlowid)
+	}
 	
 	_flows[newFlowID].draw := []
 	
@@ -122,7 +131,11 @@ NewFlow(par_CategoryID = "")
 
 	if (par_CategoryID = "")
 	{
-		tempCategoryID := NewCategory(lang("Uncategorized"))
+		tempCategoryID := ""
+	}
+	else if (par_CategoryID = "uncategorized")
+	{
+		tempCategoryID := ""
 	}
 	else
 	{
@@ -164,8 +177,13 @@ NewFlow(par_CategoryID = "")
 
 	SaveFlowMetaData(newFlowid)
 
+
 	;Add TV entry
-	_flows[newFlowid].TV := API_manager_TreeView_AddEntry("Flow", newFlowid)
+	if (_share.FindFlows_Called)
+	{
+		API_manager_TreeView_Refill()
+		API_manager_TreeView_Select("Flow", newFlowid)
+	}
 
 	return newFlowid
 }
@@ -230,7 +248,11 @@ NewCategory(par_Newname = "")
 	_share.allCategories[newCategoryid].id := newCategoryid
 	_share.allCategories[newCategoryid].Name := Newname
 	_share.allCategories[newCategoryid].Type = Category
-	_share.allCategories[newCategoryid].TV := API_manager_TreeView_AddEntry("Category", newCategoryid)
+	if (_share.FindFlows_Called)
+	{
+		API_manager_TreeView_Refill()
+		API_manager_TreeView_Select("Flow", newFlowid)
+	}
 	;~ d(allCategories)
 	return newCategoryid
 }
@@ -239,7 +261,7 @@ ChangeFlowCategory(par_FlowID, par_CategoryID)
 {
 	global
 	
-	if (par_FlowID = "" or par_CategoryID = "")
+	if (par_FlowID = "")
 	{
 		MsgBox,,Unexpected error, 5616486132156
 	}
@@ -247,9 +269,12 @@ ChangeFlowCategory(par_FlowID, par_CategoryID)
 	_flows[par_FlowID].category := par_CategoryID
 	UpdateFlowCategoryName(par_FlowID)
 	SaveFlowMetaData(par_FlowID)
-	;~ d(_flows, par_FlowID)
-	;~ d(allCategories, par_CategoryID)
-	API_manager_TreeView_ChangeFlowCategory(par_FlowID)
+	
+	if (_share.FindFlows_Called)
+	{
+		API_manager_TreeView_Refill()
+		API_manager_TreeView_Select("Flow", newFlowid)
+	}
 }
 
 UpdateFlowCategoryName(par_FlowID)
@@ -266,7 +291,16 @@ DeleteFlow(par_ID)
 	
 	FileDelete,% _flows[par_ID].file
 	
+	parentcategory:=_flows[par_ID].category
+	
 	_flows.delete(par_ID)
+	
+	;Refresh treeview
+	if (_share.FindFlows_Called)
+	{
+		API_manager_TreeView_Refill()
+		API_manager_TreeView_Select("Category", parentcategory, "expand")
+	}
 }
 
 DuplicateFlow(par_ID)
@@ -299,7 +333,11 @@ DuplicateFlow(par_ID)
 	SaveFlowMetaData(newFlowid)
 
 	;Add TV entry
-	_flows[newFlowid].TV := API_manager_TreeView_AddEntry("Flow", newFlowid)
+	if (_share.FindFlows_Called)
+	{
+		API_manager_TreeView_Refill()
+		API_manager_TreeView_Select("Flow", newFlowid)
+	}
 
 }
 
@@ -307,4 +345,10 @@ DeleteCategory(par_ID)
 {
 	global
 	_share.allCategories.delete(par_ID)
+	
+	;Upadte TV entries
+	if (_share.FindFlows_Called)
+	{
+		API_manager_TreeView_Refill()
+	}
 }

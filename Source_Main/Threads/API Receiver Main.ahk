@@ -215,13 +215,13 @@ API_Call_Main_InitFlow(par_Filepath)
 }
 
 
-API_Call_Main_NewCategory(par_CategoryID)
+API_Call_Main_NewCategory(par_Newname)
 {
 	global
 	local retval
 	logger("t2", A_ThisFunc " call received")
 	
-	retval := NewCategory(par_CategoryID)
+	retval := NewCategory(par_Newname)
 	
 	logger("t2", A_ThisFunc " call finished")
 	return retval

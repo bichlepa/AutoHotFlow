@@ -21,13 +21,13 @@ init_Manager_GUI()
 
 	;Create main GUI
 	gui,font,s15
-	Gui, Add, TreeView, vTreeView_manager gTreeView_manager x10 y10 w300 h500 -ReadOnly AltSubmit ImageList%IconList% hwndTreeView_manager_HWND
+	Gui, Add, TreeView, vTreeView_manager gTreeView_manager x10 y10 w300 h500 -ReadOnly ImageList%IconList% hwndTreeView_manager_HWND
 	gui,font,s12
 	gui,add,Button,vButton_manager_NewCategory gButton_manager_NewCategory X330 yp w200 h30
 	gui,add,Button,vButton_manager_NewFlow gButton_manager_NewFlow X+10 yp w200 h30
 	gui,add,Button,vButton_manager_ChangeCategory gButton_manager_ChangeCategory Disabled Y+20 x330 w130 h30
 	gui,add,Button,vButton_manager_DuplicateFlow gButton_manager_DuplicateFlow Disabled X+10 yp w130 h30
-	gui,add,Button,vButton_manager_DeleteFlow gButton_manager_DeleteFlow Disabled X+10 yp w130 h30
+	gui,add,Button,vButton_manager_Delete gButton_manager_Delete Disabled X+10 yp w130 h30
 	
 	gui,add,Button,vButton_manager_EditFlow gButton_manager_EditFlow Disabled Y+50 x330 w200 h30
 	gui,add,Button,vButton_manager_EnableFlow gButton_manager_EnableFlow Disabled Y+20 x330 w200 h30
@@ -45,16 +45,18 @@ init_Manager_GUI()
 	gui,+hwndManagerGUIHWND
 	_share.hwnds.Manager := ManagerGUIHWND
 	
-	updateFlowIcons_Manager_GUI()
-	
+	;Set title. Do not show yet
 	if a_iscompiled
 	{
-		Gui, Show,hide, % "AutoHotFlow " lang("Manager")  ; Do not show window while loading flows. Otherway the treeview will not show the plus signs
+		Gui, Show,hide, % "AutoHotFlow " lang("Manager") 
 	}
 	else ;Helps me to find the uncompiled AHF instance
 	{
 		Gui, Show,hide, % "AutoHotFlow " lang("Manager") " - UNCOMPILED "
 	}
+	
+	hotkey, ifwinactive, ahk_id %ManagerGUIHWND%
+	hotkey, f5, TreeView_manager_Refill
 	
 	settimer, updateFlowIcons_Manager_GUI, 100
 }
@@ -67,7 +69,7 @@ Refresh_Manager_GUI()
 	guicontrol,,Button_manager_NewFlow , % lang("New_Flow")
 	guicontrol,,Button_manager_ChangeCategory , % lang("Change_category")
 	guicontrol,,Button_manager_DuplicateFlow , % lang("Duplicate")
-	guicontrol,,Button_manager_DeleteFlow , % lang("delete")
+	guicontrol,,Button_manager_Delete , % lang("delete")
 	guicontrol,,Button_manager_EditFlow , % lang("Edit")
 	guicontrol,,Button_manager_EnableFlow , % lang("enable")
 	guicontrol,,Button_manager_RunFlow ,% lang("Run")
@@ -78,9 +80,6 @@ Refresh_Manager_GUI()
 	guicontrol,,Button_manager_ShowLog ,% lang("Show log")
 	guicontrol,,Button_manager_About ,% lang("About AutoHotFlow")
 	guicontrol,,Button_manager_Exit ,% lang("Exit")
-
-	Gui, Show,, % "AutoHotFlow " lang("Manager")  ; Show the window and its TreeView.
-
 }
 
 Show_Manager_GUI()
@@ -114,6 +113,13 @@ updateFlowIcons_Manager_GUI()
 	static currentIcons:=Object()
 	static currentLabelButtonRun:=""
 	static currentLabelButtonEnable:=""
+	
+	if (_share.FlowsTreeViewNeedFullRefresh)
+	{
+		_share.FlowsTreeViewNeedFullRefresh:=false
+		TreeView_manager_Refill()
+	}
+	
 	Gui, manager:default
 	local forFlowID, forFlow, selectedFlow
 	for forFlowID, forFlow in _flows
@@ -181,19 +187,90 @@ updateFlowIcons_Manager_GUI()
 	}
 }
 
+TreeView_manager_Refill()
+{
+	global
+	local newTV
+	local oneflowID, oneflow, onecategoryID, onecategory
+	if not (ManagerGUIHWND)
+		return
+	Gui, manager:default
+	
+	tempselectedTV := TV_GetSelection()
+	tempselectedID := allTreeViewItems[tempselectedTV].id
+	tempselectedType := allTreeViewItems[tempselectedTV].type
+	
+	guicontrol, disable,TreeView_manager
+	;first delete everything
+	TV_Delete()
+	
+	;Add demo category if user wants to see it
+	if not (_settings.HideDemoFlows)
+		_share.demoCategoryTV:=TreeView_manager_AddEntry("Category", "demo")
+	_share.uncategorizedCategoryTV:=""
+	;go through all categories and add the tv elements
+	for onecategoryID, onecategory in _share.allCategories
+	{
+		onecategory.tv:=TreeView_manager_AddEntry("Category", onecategoryID)
+	}
+	
+	;go through all flows and add the tv elements
+	for oneflowID, oneflow in _flows
+	{
+		;Add uncategorized category if there are flows without a category
+		if ((not oneflow.category) and (not _share.uncategorizedCategoryTV) and (not oneflow.demo))
+		{
+			_share.uncategorizedCategoryTV:=TreeView_manager_AddEntry("Category", "uncategorized")
+		}
+			
+		;hide demo flows, if user wants
+		;~ MsgBox % _settings.HideDemoFlows " - " oneflow.demo
+		if not (_settings.HideDemoFlows && oneflow.demo)
+			oneflow.tv:=TreeView_manager_AddEntry("Flow", oneflowID)
+	}
+	
+	TreeView_manager_Select(tempselectedType, tempselectedID)
+	guicontrol, enable,TreeView_manager
+}
+
+
 TreeView_manager_AddEntry(par_Type, par_ID)
 {
 	global
-	Gui, manager:default
 	local newTV
-	local tempParentTV
+	if not (ManagerGUIHWND)
+		return
+	Gui, manager:default
+	
 	if (par_Type = "flow")
 	{
-		newTV := TV_Add(_flows[par_ID].name, _share.allCategories[_flows[par_ID].category].tv, Icon_Disabled)
+		if (_flows[par_ID].demo)
+		{
+			newTV := TV_Add(_flows[par_ID].name, _share.democategoryTV, Icon_Disabled)
+		}
+		else if (not _flows[par_ID].category)
+		{
+			newTV := TV_Add(_flows[par_ID].name, _share.uncategorizedCategoryTV, Icon_Disabled)
+		}
+		else
+		{
+			newTV := TV_Add(_flows[par_ID].name, _share.allCategories[_flows[par_ID].category].tv, Icon_Disabled)
+		}
 	}
 	else if (par_Type = "category")
 	{
-		newTV := TV_Add(_share.allCategories[par_ID].name, "", Icon_Folder)
+		if (par_ID = "demo")
+		{
+			newTV := TV_Add(lang("Demonstration"), "", Icon_Folder)
+		}
+		else if (par_ID = "uncategorized")
+		{
+			newTV := TV_Add(lang("Uncategorized"), "", Icon_Folder)
+		}
+		else
+		{
+			newTV := TV_Add(_share.allCategories[par_ID].name, "", Icon_Folder)
+		}
 	}
 	else
 		MsgBox unexpected error. 3546548486432
@@ -205,6 +282,8 @@ TreeView_manager_AddEntry(par_Type, par_ID)
 TreeView_manager_DeleteEntry(par_Type, par_ID)
 {
 	global
+	if not (ManagerGUIHWND)
+		return
 	Gui, manager:default
 	
 	if (par_Type = "flow")
@@ -214,6 +293,7 @@ TreeView_manager_DeleteEntry(par_Type, par_ID)
 			MsgBox unexpected error. 88989984942
 			return
 		}
+		
 		TV_Delete(_flows[par_ID].tv)
 		allTreeViewItems.delete(_flows[par_ID].tv)
 	}
@@ -234,9 +314,11 @@ TreeView_manager_DeleteEntry(par_Type, par_ID)
 	return
 }
 
-TreeView_manager_Select(par_Type, par_ID)
+TreeView_manager_Select(par_Type, par_ID, options = "")
 {
 	global
+	if not (ManagerGUIHWND)
+		return
 	Gui, manager:default
 	if (par_Type = "flow")
 	{
@@ -246,41 +328,20 @@ TreeView_manager_Select(par_Type, par_ID)
 	else if (par_Type = "category")
 	{
 		TV_Modify(_share.allCategories[par_ID].tv) ;Mark
+		IfInString,options, expand
+			TV_Modify(_share.allCategories[par_ID].tv, "expand") ;Expand the category
+			
 	}
 }
 
 TreeView_manager_Rename(par_Type, par_ID)
 {
 	global
+	if not (ManagerGUIHWND)
+		return
 	Gui, manager:default
 	TreeView_manager_Select(par_Type, par_ID)
 	controlsend, , {F2},ahk_id %TreeView_manager_HWND%
-}
-
-TreeView_manager_ChangeFlowCategory(par_ID)
-{
-	global
-	gui,manager:default
-	;~ d(_flows[par_ID])
-	;~ d(allTreeViewItems,_flows[par_ID].TV)
-	;~ d(_flows[par_ID],_share.allCategories[_flows[par_ID].category].tv)
-	if (_flows[par_ID].tv = "")
-	{
-		;~ d(_flows[par_ID],845646)
-		MsgBox unexpected error. 86486431861613
-		return
-	}
-			
-	res:=TV_Delete(_flows[par_ID].TV)
-	;~ d(_flows[par_ID].TV, res)
-	allTreeViewItems.delete(_flows[par_ID].TV)
-	_flows[par_ID].TV := TV_Add(_flows[par_ID].name, _share.allCategories[_flows[par_ID].category].tv, Icon_Disabled)
-	
-	allTreeViewItems[_flows[par_ID].TV] := {id: par_ID, type: "flow"}
-	;~ d(allTreeViewItems,_flows[par_ID].TV)
-	
-	TreeView_manager_Select("flow", par_ID)
-	guicontrol, manager:focus, TreeView_manager
 }
 
 
@@ -298,7 +359,7 @@ TreeView_manager()
 	tempselectedID := allTreeViewItems[tempselectedTV].id
 	tempselectedType := allTreeViewItems[tempselectedTV].type
 	
-	if A_GuiEvent =E ;If user has renamed an entry
+	if A_GuiEvent =e ;If user has renamed an entry
 	{
 		TV_GetText(tempNewName, tempselectedTV)
 		;~ d(tempNewName)
@@ -316,7 +377,7 @@ TreeView_manager()
 					TV_Modify(tempselectedTV, "", tempOldName)
 					return
 				}
-				;Do not rename if there another category with same name already exists
+				;Do not rename if another category with same name already exists
 				if ((FlowIDbyName(tempNewName,"Category") != "") and (FlowIDbyName(tempNewName,"Category") != tempselectedID))
 				{
 					soundplay,*16
@@ -325,15 +386,25 @@ TreeView_manager()
 					return
 				}
 				
+				if (tempselectedID = "uncategorized")
+				{
+					;create new category
+					newcategoryid:=API_Main_NewCategory(tempNewName)
+					tempselectedID:=""
+				}
+				else
+				{
+					newcategoryid:=tempselectedID
+				}
 				;rename
-				_share.allCategories[tempselectedID].name := tempNewName
+				_share.allCategories[newcategoryid].name := tempNewName
 				
 				;all flows of that category must be saved
-				for count, tempitem in _flows
+				for tempflowid, tempitem in _flows
 				{
 					if (tempitem.category = tempselectedID)
 					{
-						API_Main_UpdateFlowCategoryName(par_FlowID)
+						API_Main_ChangeFlowCategory(tempflowid, newcategoryid)
 						;~ d(tempitem)
 						API_Main_SaveFlowMetaData(tempitem.id)
 					}
@@ -403,7 +474,7 @@ TreeView_manager()
 			guicontrol,enable,Button_manager_RunFlow
 			guicontrol,enable,Button_manager_EnableFlow
 			guicontrol,enable,Button_manager_ChangeCategory
-			guicontrol,enable,Button_manager_DeleteFlow
+			guicontrol,enable,Button_manager_Delete
 			guicontrol,enable,Button_manager_DuplicateFlow
 		}
 		else
@@ -413,7 +484,7 @@ TreeView_manager()
 			guicontrol,Disable,Button_manager_EnableFlow
 			guicontrol,Disable,Button_manager_ChangeCategory
 			guicontrol,Disable,Button_manager_DuplicateFlow
-			guicontrol,enable,Button_manager_DeleteFlow
+			guicontrol,enable,Button_manager_Delete
 		}
 		
 		if (tempselectedType.enabled = true)
@@ -475,7 +546,7 @@ return
 manager_menu_delete()
 {
 	;Same as if user has pressed the button
-	Button_manager_DeleteFlow()
+	Button_manager_Delete()
 }
 manager_menu_duplicate()
 {
@@ -602,7 +673,7 @@ Button_manager_EnableFlow()
 }
 
 ;Delete marked Item
-Button_manager_DeleteFlow()
+Button_manager_Delete()
 {
 	global
 	local tempselectedTV
@@ -620,26 +691,46 @@ Button_manager_DeleteFlow()
 	{
 		Disable_Manager_GUI()
 		
-		;ask user for confirmation
-		MsgBox, 4, % lang("Confirm_deletion"),% lang("Do_you_really_want_to_delete_the_flow_%1%?",_flows[tempselectedID].name)
-		IfMsgBox,Yes
+		if (_flows[tempselectedID].demo)
 		{
-			;delete
-			TreeView_manager_DeleteEntry("Flow", tempselectedID)
-			API_Main_DeleteFlow(tempselectedID)
-			
+			MsgBox, 52, AutoHotFlow, % lang("You cannot delete the demonstration flows, but you can hide all of them.") "`n" lang("Do you want to do that now?")
+			IfMsgBox yes
+			{
+				_settings.HideDemoFlows:=true
+				TreeView_manager_Refill()
+				API_Main_write_settings()
+			}
+		}
+		else
+		{
+			;ask user for confirmation
+			MsgBox, 4, % lang("Confirm_deletion"),% lang("Do_you_really_want_to_delete_the_flow_%1%?",_flows[tempselectedID].name)
+			IfMsgBox,Yes
+			{
+				;delete
+				API_Main_DeleteFlow(tempselectedID)
+				
+			}
 		}
 		
 	}
 	else if tempselectedType=category ;if a category should be deleted
 	{
 		Disable_Manager_GUI()
-		if (lang("Uncategorized") = _share.allCategories[tempselectedID].name) ;Do not remove the uncategorized category, since there are flows
+		if (tempselectedID = "uncategorized") ;Do not remove the uncategorized category, since there are flows
 		{
 			soundplay,*16
 			MsgBox, 16, % lang("Delete category"), % lang("This_category_can_not_be_removed")
-			Enable_Manager_GUI()
-			return
+		}
+		else if (tempselectedID = "demo")
+		{
+			MsgBox, 52, AutoHotFlow, % lang("You cannot delete the demonstration category, but you can hide all demonstration flows.") "`n" lang("Do you want to do that now?")
+			IfMsgBox yes
+			{
+				_settings.HideDemoFlows:=true
+				TreeView_manager_Refill()
+				API_Main_write_settings()
+			}
 		}
 		else
 		{
@@ -659,30 +750,23 @@ Button_manager_DeleteFlow()
 				IfMsgBox,Yes
 				{
 					;Create the category uncategorized if it is not present and get the tv
-					
-					tempUncategorizedID := API_Main_NewCategory(lang("uncategorized"))
-					tempUncategorizedTV := _share.allCategories[tempUncategorizedID].tv
 					;~ d(tempUncategorizedID)
 					for count, tempFlow in _flows ;Move all flows that were inside the category to uncategorized
 					{
 						if (tempFlow.category = tempselectedID)
 						{
 							;~ d(tempFlow)
-							API_Main_ChangeFlowCategory(tempFlow.id,tempUncategorizedID)
+							API_Main_ChangeFlowCategory(tempFlow.id,"")
 						}
 					}
 					
+					API_Main_DeleteCategory(tempselectedID)
 				}
-				else
-				{
-					Enable_Manager_GUI()
-					return
-				}
-				
-				
 			}
-			TreeView_manager_DeleteEntry("Category", tempselectedID)
-			API_Main_DeleteCategory(tempselectedID)
+			else
+			{
+				API_Main_DeleteCategory(tempselectedID)
+			}
 		}
 	}
 	;debug()

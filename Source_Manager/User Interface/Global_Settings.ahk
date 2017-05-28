@@ -4,6 +4,7 @@ globalSettings_GUI()
 	global
 	local lnk_target
 	local stringalllangs
+	local needtorefreshflowtreeview
 	
 	Disable_Manager_GUI()
 	
@@ -34,12 +35,14 @@ globalSettings_GUI()
 	GuiFlowSettingsskip:=(_settings.FlowExecutionPolicy = "skip")
 	GuiFlowSettingsWait:=(_settings.FlowExecutionPolicy = "Wait")
 	GuiFlowSettingsStop:=(_settings.FlowExecutionPolicy = "Stop")
+	GuiSettingsHideDemoFlows:=(!!_settings.HideDemoFlows)
 	
 	;build the gui
 	gui,GlobalSettings:default
-	gui,add, tab3,vglobalsettingtab,% lang("General") "|" lang("Flow settings")
+	gui,add, tab3,vglobalsettingtab,% lang("General") "|" lang("Flow settings") "|" lang("Appearance")
 	globalsetting_tab_General:=1
 	globalsetting_tab_FlowSettings:=2
+	globalsetting_tab_Appearance:=3
 	
 	gui,tab, %globalsetting_tab_General%
 	gui,font,s10 cnavy wbold
@@ -65,6 +68,12 @@ globalSettings_GUI()
 	gui,add,text,xs Y+20  w300 Y+15,% lang("Working directory")
 	gui,font,s8 cDefault wnorm
 	gui,add,Edit,xs Y+10 w300 vGuiFlowSettingsWorkingDir,% _settings.FlowWorkingDir
+	
+	gui,tab, %globalsetting_tab_Appearance%
+	gui,font,s10 cnavy wbold
+	gui,add,text,xs ys+10 w300,% lang("Shown flows")
+	gui,font,s8 cDefault wnorm
+	gui,add,Checkbox,xs Y+10 w300 checked%GuiSettingsHideDemoFlows% vGuiSettingsHideDemoFlows ,% lang("Hide demonstration flows") 
 	
 	gui,tab
 	gui,add,Button,xs y300 w140 gGuiSettingsChooseOK vGuiSettingsChooseOK default,% lang("OK")
@@ -94,8 +103,12 @@ globalSettings_GUI()
 
 	;handle language setting
 	lang_setLanguage(GuiLanguageChoose)
-	_settings.UILanguage := _language.lang
-	Refresh_Manager_GUI()
+	if (_settings.UILanguage != _language.lang)
+	{
+		_settings.UILanguage := _language.lang
+		Refresh_Manager_GUI()
+		needtorefreshflowtreeview:=true
+	}
 
 	;handle autostart setting
 	if GuiSettingAutostart
@@ -107,14 +120,21 @@ globalSettings_GUI()
 		FileDelete,%A_Startup%\AutoHotFlow.lnk 
 	}
 	
+	;handle "hide demo flows" setting
+	if (_settings.HideDemoFlows != GuiSettingsHideDemoFlows)
+	{
+		needtorefreshflowtreeview:=true
+		_settings.HideDemoFlows := GuiSettingsHideDemoFlows
+	}
+	
 	;handle other settings
 	_settings.RunAsAdmin:=GuiSettingRunAsAdmin
-	_settings.FlowExecutionPolicy
 	
 	GuiFlowSettingsParallel ? _settings.FlowExecutionPolicy := "parallel"
 	GuiFlowSettingsskip ? _settings.FlowExecutionPolicy := "skip"
 	GuiFlowSettingsWait ? _settings.FlowExecutionPolicy := "Wait"
 	GuiFlowSettingsStop ? _settings.FlowExecutionPolicy := "Stop"
+	
 
 	;Write current settings to file
 	API_Main_write_settings()
@@ -128,6 +148,12 @@ globalSettings_GUI()
 			try Run *RunAs "%A_ScriptFullPath%" 
 			ExitApp
 		}
+	}
+	
+	;if Flow treeview needs to be refreshed
+	if needtorefreshflowtreeview
+	{
+		TreeView_manager_Refill()
 	}
 	
 	gui,GlobalSettings:destroy
