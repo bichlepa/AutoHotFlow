@@ -67,3 +67,5 @@ Temporary Items
 /Source_Main/-lib
 /Source_Main/*AutoHotkey.dll
 /Variables
+/StartupScriptLog.txt
+/test.ahk

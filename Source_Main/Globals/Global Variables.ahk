@@ -146,7 +146,8 @@ init_GlobalVars()
 			.Name			Category name.
 			.Type			Category Type. (Containing the string "Category")
 			.TV				Tree view ID. 
-		.log			Log content
+		.log			All logs
+		.log_XXX		Logs from a certain source. (XXX is the name of the source)
 		.my_ScriptDir		Directory which contains ahk script files, icons, language files, help files and AHK_H.exe
 		.my_WorkingDir		Directory which contains saved flows, log and settings file. It is same as my_ScriptDir if portable installation
 	*/

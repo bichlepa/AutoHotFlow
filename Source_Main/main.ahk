@@ -2,6 +2,8 @@
 ;#Warn  ; Recommended for catching common errors.
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
 
+global my_ScriptDir, my_WorkingDir
+
 SetWorkingDir %A_ScriptDir%\..  ; set working dir.
 my_ScriptDir = %A_WorkingDir%
 
@@ -36,6 +38,7 @@ _language.dir:=my_ScriptDir "\language" ;Directory where the translations are st
 lang_Init()
 lang_setLanguage(_settings.UILanguage)
 
+initLog()
 
 ;if setting run as admin active
 if (_settings.runAsAdmin and not A_IsAdmin)
@@ -70,7 +73,8 @@ FileDelete,%a_temp%\autoHotflowTryToStartAsAdmin.txt
 #include lib\Random Word List\Random Word List.ahk
 
 ;Include libraries which may be used by the elements. This code is generated.
-;Lib_includes_Start#include lib\7z wrapper\7z wrapper.ahk
+;Lib_includes_Start
+#include lib\7z wrapper\7z wrapper.ahk
 global_elementInclusions = 
 (
 #include lib\7z wrapper\7z wrapper.ahk
@@ -116,28 +120,28 @@ AllTriggerClasses:=Object()
 ;Includ elements. This code is generated
 ;The elements must be included before the other treads are started
 ;Element_Includes_Start
-#include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\Beep.ahk
-#include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\Compress files.ahk
-#include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\Execute_Flow.ahk
-#include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\Extract files.ahk
-#include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\New_List.ahk
-#include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\New_Variable.ahk
-#include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\Script.ahk
-#include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\Select_file.ahk
-#include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\Set_Flow_Status.ahk
-#include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\Sleep.ahk
-#include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\Stop_Flow.ahk
-#include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\Tooltip.ahk
-#include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\Trace_Point.ahk
-#include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Actions\Trace_Point_Check.ahk
-#include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Conditions\Debug_dialog.ahk
-#include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Conditions\Expression.ahk
-#include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Conditions\Flow_Enabled.ahk
-#include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Conditions\Flow_Running.ahk
-#include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Loops\SimpleLoop.ahk
-#include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Loops\Work_through_a_list.ahk
-#include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Triggers\Hotkey.ahk
-#include C:\Users\Paul\Documents\GitHub\AutoHotFlow\source_Elements\Default\Triggers\Manual.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Beep.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Compress files.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Execute_Flow.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Extract files.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\New_List.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\New_Variable.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Script.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Select_file.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Set_Flow_Status.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Sleep.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Stop_Flow.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Tooltip.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Trace_Point.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Trace_Point_Check.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Conditions\Debug_dialog.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Conditions\Expression.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Conditions\Flow_Enabled.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Conditions\Flow_Running.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Loops\SimpleLoop.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Loops\Work_through_a_list.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Triggers\Hotkey.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Triggers\Manual.ahk
 
 ;Element_Includes_End
 

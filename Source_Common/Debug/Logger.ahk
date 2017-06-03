@@ -13,7 +13,7 @@
 if not fileexist(my_workingdir "\Log")
 	FileCreateDir, % my_workingdir "\Log"
 
-logger(LogLevel,LoggingText)
+logger(LogLevel,LoggingText, logSource="common")
 {
 	global 
 	static LogCount
@@ -23,16 +23,14 @@ logger(LogLevel,LoggingText)
 	local state
 	local shouldLog:=false
 	_share.LogCount++
-	_share.logcountAfterTidy++
+	_share.logTidyCountdown--
 	
 	state=1
 	
 	Loop, parse, LogLevel
 	{
-		
 		If state=1
 		{
-			
 			if A_LoopField=a
 			{
 				
@@ -83,57 +81,144 @@ logger(LogLevel,LoggingText)
 		FormatTime,timestamp,a_now,yyyy MM dd HH:mm:ss
 		DebugLogLastEntry:="`n--- " timestamp " ~" Global_ThisThreadID "~ " LoggingText
 		_share.log.=DebugLogLastEntry
+		_share["log_" logSource].=DebugLogLastEntry
 		if (_settings.logtofile)
 		{
 			FileAppend,% DebugLogLastEntry,%my_workingdir%\Log\Log.txt,UTF-8
+			FileAppend,% DebugLogLastEntry,%my_workingdir%\Log\Log_%logSource%.txt,UTF-8
 		}
 	}
 	
-	if (_share.LogCount > 50)
-	{
-		;~ MsgBox % _share.log
-		templog:=_share.log
-		stringgetpos,templogpos,templog,`n,l50
-		_share.log:=substr(templog,templogpos+2)
-		;~ MsgBox % templogpos "`n" _share.log
-		
-		FileGetSize,temp,%my_workingdir%\Log\Log.txt,K
-		if temp>10000
-			FileMove,%my_workingdir%\Log\Log.txt,%my_workingdir%\Log\Log Old.txt,1
-		_share.logcountAfterTidy := 0
-	}
 }
 
 
 showlog()
 {
 	global 
-	local temph:=A_ScreenHeight*0.7
-	local tempw:=A_ScreenWidth*0.8
-	
+	GuiLogFontSize:=10
+	GuiLogTextFieldRows:=0
+	GuiLogButtonsHeigth:=30
 	gui,log:destroy
-	gui,log:add,edit, h%temph% w%tempw% ReadOnly vGuiLogTextField, % _share.log
-	gui,log:add,button,w%tempw% h30 Y+10 xp gGuiLogClose default,% lang("Close")
-	gui,log:show,,% lang("Log")
+	gui,log:font,s%GuiLogFontSize%
+	gui,log: add, dropdownlist, vGuiLogCategories gGuiLogrefreshText h%GuiLogButtonsHeigth%
+	gui,log: add, button,gGuiLogrefresh vGuiLogrefresh, % lang("Refresh")
+	gui,log:add,button,gGuiLogClose vGuiLogClose default,% lang("Close")
+	gui,log:add,edit, ReadOnly vGuiLogTextField Multi -wrap VScroll HScroll
+	gui,log:+resize
+	gui,log:+MinSize500x300
 	
-	DebugLogContentOld:=_share.log
-	SetTimer,refreshLogGUI,1000
+	DebugLogOldCount:=0
+	SetTimer,GuiLogrefreshText,100
+	gosub GuiLogrefresh
+	;~ gui,log:show,,% lang("Log")
 	
+	GuiLogSizeH:=A_ScreenHeight*0.7
+	GuiLogSizeW:=A_ScreenWidth*0.8
+	gui,log:show,w%GuiLogSizeW% h%GuiLogSizeH%,% lang("Log")
+	gosub LogGuiSizeinitial
+	
+	return
+	
+	LogGuiSize:
+	GuiLogSizeW:=A_GuiWidth
+	GuiLogSizeH:=A_GuiHeight
+	LogGuiSizeinitial:
+	GuiLogWidthText:=GuiLogSizeW - 20
+	GuiLogHeightText:=GuiLogSizeH - 20-GuiLogButtonsHeigth-10
+	GuiLogyText:=10+GuiLogButtonsHeigth+10
+	guicontrol,log:move,GuiLogCategories,x10 y10 w200 h%GuiLogButtonsHeigth%
+	guicontrol,log:move,GuiLogrefresh,x220 y10 w100 h%GuiLogButtonsHeigth%
+	guicontrol,log:move,GuiLogClose,x330 y10 w100 h%GuiLogButtonsHeigth%
+	guicontrol,log:move,GuiLogTextField,x10 y%GuiLogyText% w%GuiLogWidthText% h%GuiLogHeightText%
+	GuiLogTextFieldRows:=floor((GuiLogHeightText-10) / (GuiLogFontSize+6)) - 1
+	DebugLogOldCount:=0
+	gosub GuiLogrefreshText
 	return
 	
 	logguiclose:
 	GuiLogClose:
 	gui,log:destroy
-	SetTimer,refreshLogGUI,off
+	SetTimer,GuiLogrefreshText,off
 	return
 	
-	refreshLogGUI:
-	if not (DebugLogContentOld == _share.log)
+	GuiLogrefresh:
+	;find all log categories
+	GuiControlGet,GuiLogCategoriesOld,log:,GuiLogCategories
+	if (GuiLogCategoriesOld = "")
+		GuiLogCategoriesOld := "all"
+	GuiLogCategories:="|all"
+	for onekeyfromShare, onevalueFromShare in _share
 	{
-		DebugLogContentOld:=_share.log
-		GuiControl,log:,GuiLogTextField,% _share.log
+		if (substr(onekeyfromShare,1,4) = "log_")
+		{
+			GuiLogCategories.="|" substr(onekeyfromShare,5)
+		}
+	}
+	guicontrol,log:,GuiLogCategories,% GuiLogCategories
+	guicontrol,log:ChooseString,GuiLogCategories,% GuiLogCategoriesOld
+	
+	GuiLogrefreshText:
+	if not (DebugLogOldCount == _share.LogCount)
+	{
+		GuiControlGet,GuiLogCategories,log:,GuiLogCategories
+		
+		if (GuiLogCategories = "all")
+			DebugLogToShow:=_share.Log
+		else
+			DebugLogToShow:=_share["Log_" GuiLogCategories]
+		DebugLogOldCount:=_share.LogCount
+		StringGetPos,pos,DebugLogToShow,`n,R%GuiLogTextFieldRows%
+		if pos > -1
+		{
+			DebugLogToShow:= substr(DebugLogToShow,pos+2)
+		}
+		GuiControl,log:,GuiLogTextField,% DebugLogToShow
 	}
 	
 	return
 	
 }
+
+
+initLog()
+{
+	global
+	SetTimer, log_cleanup, 1000
+	_share.logTidyCountdown:=0
+	return
+}
+
+log_cleanup()
+{
+	global _share
+	if (_share.logTidyCountdown <= 0)
+	{
+		;~ MsgBox % _share.log
+		;~ templog:=_share.log
+		;~ stringgetpos,templogpos,templog,`n,l50
+		;~ _share.log:=substr(templog,templogpos+2)
+		;~ MsgBox % templogpos "`n" _share.log
+		
+		log_cleanup_toobigfiles:=Object()
+		loop, %my_workingdir%\Log\Log*.txt
+		{
+			If (substr(A_LoopFileFullPath,-7) = "_old.txt")
+				continue
+			FileGetSize,temp,%A_LoopFileFullPath%,K
+			if temp>100 ;if file size over 10 MB
+			{
+				log_cleanup_toobigfiles.push(A_LoopFileFullPath)
+			}
+		}
+		
+		for onebigfileindex, onebigfile in log_cleanup_toobigfiles
+		{
+			;Rename current log file and add "_old".
+			StringTrimRight, fullpath, onebigfile, 4 ;remove .txt
+			FileMove,%onebigfile%,%fullpath%_old.txt,1
+		}
+		_share.logTidyCountdown := 50
+	}
+}
+
+	
