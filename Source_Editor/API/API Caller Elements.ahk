@@ -420,7 +420,10 @@ x_Par_SetChoices(Environment,p_ParameterID, p_Choices)
 {
 	return ElementSettings.field.setChoices(p_Choices,p_ParameterID)
 }
-
+x_FirstCallOfCheckSettings(Environment)
+{
+	return Environment.FirstCallOfCheckSettings
+}
 
 ;common functions. Available everywhere
 x_randomPhrase()

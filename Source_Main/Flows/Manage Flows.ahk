@@ -91,6 +91,7 @@ InitFlow(FileFullPath)
 	_flows[newFlowID].FileName := ThisFlowFilename
 	
 	_flows[newFlowid].id := newFlowid
+	_flows[newFlowid].FlowID := newFlowid
 	_flows[newFlowid].name := tempflowName
 	;~ _flows[newFlowid].defaultname := true
 	_flows[newFlowid].Type := "Flow"

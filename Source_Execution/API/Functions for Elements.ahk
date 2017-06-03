@@ -581,6 +581,9 @@ x_Par_GetValue(Environment,p_ParameterID)
 x_Par_SetChoices(Environment,p_ParameterID, p_Choices)
 {
 }
+x_FirstCallOfCheckSettings(Environment)
+{
+}
 
 ;common functions. Available everywhere
 

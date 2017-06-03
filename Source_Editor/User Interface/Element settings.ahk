@@ -39,6 +39,9 @@ class ElementSettings
 		
 		EditGUIDisable()
 		
+		;block general update
+		generalUpdateRunning:=true
+		
 		;Create a scrollable Child GUI will almost all controls
 		gui,SettingsOfElement:default
 		gui +hwndSettingWindowHWND
@@ -52,6 +55,7 @@ class ElementSettings
 		;All elements have the parameter "name" and "StandardName"
 		ElementSettingsFields.push(new this.label({label: lang("name (name)")}))
 		ElementSettingsFields.push(new this.name({id: ["name", "StandardName"]}))
+		
 		
 		;Loop through all parameters
 		for index, parameter in parametersToEdit
@@ -190,10 +194,12 @@ class ElementSettings
 		
 		openingElementSettingsWindow:=false
 		
-		this.generalUpdate()
 		
 		gui,GUISettingsOfElementParent:show
 		
+		;release general update
+		generalUpdateRunning:=false
+		this.generalUpdate(True)
 		
 		if (wait=1 or wait="wait") ;Wait until user closes the window
 		{
@@ -511,7 +517,6 @@ class ElementSettings
 					{
 						if (oneid = parameterID)
 						{
-							;~ d(this, "setChoices call " parameterID)
 							onefield.setChoices(value, parameterID)
 							return value
 						}
@@ -1974,15 +1979,18 @@ class ElementSettings
 	
 	
 	;Update the name field, check settings
-	generalUpdate()
+	generalUpdate(firstCall=False)
 	{
 		global
 		if (generalUpdateRunning)
+		{
 			return
+		}
 		generalUpdateRunning:=True
 		GUISettingsOfElementRemoveInfoTooltip()
 		;~ ToolTip updakljö
 		allParamValues:=GUISettingsOfElementObject.getAllValues()
+		setelement.FirstCallOfCheckSettings:=firstCall
 		Element_CheckSettings_%setElementClass%(setElement, allParamValues) 
 		ElementSettingsNameField.updatename(allParamValues)
 		generalUpdateRunning:=False

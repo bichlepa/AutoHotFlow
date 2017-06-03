@@ -25,6 +25,8 @@ Element_New(p_FlowID, p_type="",p_elementID="")
 		tempElement.ID:="element" . format("{1:010u}",++_flows[p_FlowID].ElementIDCounter) 
 	else
 		tempElement.ID:=p_elementID
+	tempElement.ElementID:=tempElement.ID
+	tempElement.FlowID:=p_FlowID
 	
 	;~ d(p_elementID "--" tempElement.ID)
 	

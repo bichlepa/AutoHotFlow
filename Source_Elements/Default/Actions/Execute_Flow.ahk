@@ -98,7 +98,7 @@ Element_CheckSettings_Action_Execute_Flow(Environment, ElementParameters)
 	
 	x_Par_Disable(Environment,"flowName",ElementParameters.ThisFlow)
 	
-	if (oldParFlowName!=ElementParameters.flowName or oldParThisFlow!=ElementParameters.ThisFlow)
+	if (oldParFlowName!=ElementParameters.flowName or oldParThisFlow!=ElementParameters.ThisFlow or x_FirstCallOfCheckSettings(Environment))
 	{
 		oldParThisFlow:=ElementParameters.ThisFlow
 		oldParFlowName:=ElementParameters.flowName
@@ -111,7 +111,8 @@ Element_CheckSettings_Action_Execute_Flow(Environment, ElementParameters)
 		{
 			FlowID := x_getFlowIDByName(ElementParameters.flowName)
 		}
-		allTriggerIDs := x_getAllElementIDsOfClass(FlowID, "manual_trigger")
+		allTriggerIDs := x_getAllElementIDsOfClass(FlowID, "Trigger_manual")
+		;~ d(allTriggerIDs, FlowID)
 		
 		choicesTriggers:=Object()
 		for oneIndex, oneTriggerID in allTriggerIDs
@@ -179,7 +180,6 @@ Element_run_Action_Execute_Flow(Environment, ElementParameters)
 	
 	if not x_isManualTriggerEnabled(FlowID, TriggerName)
 	{
-		
 		if (ElementParameters.SkipDisabled)
 		{
 			return x_finish(Environment,"normal",lang("Trigger '%1%' in '%2%' is disabled",TriggerNameText, FlowNameText))
