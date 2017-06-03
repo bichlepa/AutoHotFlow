@@ -70,13 +70,12 @@ importexportGuiDropFiles()
 
 importExportGui_import(filepathZip)
 {
-	global my_workingdir
 	if (substr(filepathZip,-3) != ".ahf")
 	{
 		MsgBox % lang("Error. This is not an AutoHotFlow file")
 		return
 	}
-	filepathextractfolder:=my_workingdir "\tempimportflows"
+	filepathextractfolder:=_WorkingDir "\tempimportflows"
 	FileRemoveDir, % filepathextractfolder, 1
 	7z_extract(filepathZip, "-tzip", filepathextractfolder)
 	
@@ -102,7 +101,7 @@ importExportGui_import(filepathZip)
 		ThisFlowFilename:=A_LoopFileName
 		Loop
 		{
-			newFlowFullPath:=my_workingdir "\saved flows\" ThisFlowFilename
+			newFlowFullPath:=_WorkingDir "\saved flows\" ThisFlowFilename
 			if fileexist(newFlowFullPath)
 			{
 				random,randomnumber,0,1000
@@ -112,7 +111,7 @@ importExportGui_import(filepathZip)
 			else
 				break
 		}
-		newFlowFullPath:=my_workingdir "\saved flows\" ThisFlowFilename
+		newFlowFullPath:=_WorkingDir "\saved flows\" ThisFlowFilename
 		filecopy, %a_loopfilefullpath%,%newFlowFullPath%
 		if errorlevel
 		{

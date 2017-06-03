@@ -7,11 +7,11 @@ global global_CategoryIDCounter = 1
 FindFlows()
 {
 	global
-	if not fileexist(my_WorkingDir "\Saved Flows")
-		FileCreateDir,%my_WorkingDir%\Saved Flows
+	if not fileexist(_WorkingDir "\Saved Flows")
+		FileCreateDir,%_WorkingDir%\Saved Flows
 	
 	;Load existing Flows
-	loop %my_WorkingDir%\Saved Flows\*.ini
+	loop %_WorkingDir%\Saved Flows\*.ini
 	{
 		InitFlow(A_LoopFileFullPath)
 	}
@@ -170,9 +170,9 @@ NewFlow(par_CategoryID = "")
 	
 	;Create a new file but do not overwrite existing file. Change file name if necessary.
 	NewName := _flows[newFlowid].Name 
-	_flows[newFlowid].folder := my_WorkingDir "\Saved Flows"
+	_flows[newFlowid].folder := _WorkingDir "\Saved Flows"
 	_flows[newFlowid].filename := newFlowid
-	_flows[newFlowid].file := my_WorkingDir "\Saved Flows\" newFlowid ".ini"
+	_flows[newFlowid].file := _WorkingDir "\Saved Flows\" newFlowid ".ini"
 	
 
 	SaveFlowMetaData(newFlowid)
@@ -279,7 +279,6 @@ ChangeFlowCategory(par_FlowID, par_CategoryID)
 
 UpdateFlowCategoryName(par_FlowID)
 {
-	global
 	_flows[par_FlowID].categoryName := _share.allCategories[_flows[par_FlowID].category].name
 }
 
@@ -325,9 +324,9 @@ DuplicateFlow(par_ID)
 	_flows[newFlowid].enabled := false
 	
 	;Create a new file
-	_flows[newFlowid].folder := my_WorkingDir "\Saved Flows"
+	_flows[newFlowid].folder := _WorkingDir "\Saved Flows"
 	_flows[newFlowid].filename := newFlowid
-	_flows[newFlowid].file := my_WorkingDir "\Saved Flows\" newFlowid ".ini"
+	_flows[newFlowid].file := _WorkingDir "\Saved Flows\" newFlowid ".ini"
 	filecopy,% _flows[par_ID].file, % _flows[newFlowid].file
 	
 	SaveFlowMetaData(newFlowid)

@@ -1,6 +1,6 @@
 ﻿
 
-Menu, tray, Icon,%my_ScriptDir%\Icons\mainicon.ico
+Menu, tray, Icon,%_ScriptDir%\Icons\mainicon.ico
 if a_iscompiled
 {
 	Menu, tray, NoStandard

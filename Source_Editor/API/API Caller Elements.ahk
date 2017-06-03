@@ -13,29 +13,24 @@ x_getVariableType(Environment, p_Varname, p_hidden = False)
 }
 x_SetVariable(Environment, p_Varname, p_Value, p_destination="", p_hidden = False)
 {
-	global
 	return Var_Set_Common(Environment, p_Varname, p_Value,  p_destination, p_hidden)
 }
 x_DeleteVariable(Environment, p_Varname, p_hidden = False)
 {
-	global
 	return Var_Delete_Common(Environment, Varname, p_hidden)
 }
 
 x_GetVariableLocation(Environment, p_Varname, p_hidden = False)
 {
-	global
 	return Var_GetLocation_Common(Environment, Varname, p_hidden)
 }
 
 x_replaceVariables(Environment, p_String, p_pars ="")
 {
-	global
 	return Var_replaceVariables_Common(Environment, String, pars)
 }
 x_EvaluateExpression(Environment, p_String)
 {
-	global
 	return Var_EvaluateExpression(Environment, String, "Var_Get_Common", "Var_Get_Common")
 }
 x_CheckVariableName(p_VarName)
@@ -124,7 +119,6 @@ x_GetMyFlowID(Environment)
 }
 x_GetMyFlowName(Environment)
 {
-	global _flows
 	return _flows[Environment.FlowID].name
 }
 
@@ -135,7 +129,6 @@ x_GetMyElementID(Environment)
 
 x_getFlowIDByName(p_FlowName)
 {
-	global _flows
 	for forFlowID, forFlow in _Flows
 	{
 		if (forFlow.name = p_FlowName)
@@ -150,7 +143,6 @@ x_getFlowIDByName(p_FlowName)
 
 x_FlowExists(p_FlowID)
 {
-	global _Flows
 	if (_Flows[p_FlowID].id)
 		return true
 	else 
@@ -160,7 +152,6 @@ x_FlowExists(p_FlowID)
 
 x_isFlowEnabled(p_FlowID)
 {
-	global _Flows
 	if _flows[p_FlowID].enabled
 		return true
 	else
@@ -171,7 +162,6 @@ x_isFlowEnabled(p_FlowID)
 
 x_isFlowExecuting(p_FlowID)
 {
-	global _Flows
 	if (_Flows[p_FlowID].executing)
 		return true
 	else
@@ -181,7 +171,6 @@ x_isFlowExecuting(p_FlowID)
 
 x_FlowEnable(p_FlowID)
 {
-	global _Flows
 	if x_FlowExists(p_FlowID)
 		API_Main_enableFlow(p_FlowID)
 
@@ -190,7 +179,6 @@ x_FlowEnable(p_FlowID)
 
 x_FlowDisable(p_FlowID)
 {
-	global _Flows
 	if x_FlowExists(p_FlowID)
 		API_Main_disableFlow(p_FlowID)
 	
@@ -198,8 +186,6 @@ x_FlowDisable(p_FlowID)
 
 x_FlowStop(p_FlowID)
 {
-	global _Flows
-	
 	if x_FlowExists(p_FlowID)
 		API_Main_stopFlow(p_FlowID)
 }
@@ -207,7 +193,6 @@ x_FlowStop(p_FlowID)
 
 x_GetListOfFlowNames()
 {
-	global _flows
 	;Search for all flowNames
 	choices:=object()
 	for oneFlowID, oneFlow in _flows
@@ -219,7 +204,6 @@ x_GetListOfFlowNames()
 
 x_GetListOfFlowIDs()
 {
-	global _flows
 	;Search for all flowNames
 	choices:=object()
 	for oneFlowID, oneFlow in _flows
@@ -232,8 +216,6 @@ x_GetListOfFlowIDs()
 
 x_getAllElementIDsOfType(p_FlowID, p_Type)
 {
-	global _flows
-	
 	elements:=Object()
 	for oneElementID, oneElement in _flows[p_FlowID].allElements
 	{
@@ -245,8 +227,6 @@ x_getAllElementIDsOfType(p_FlowID, p_Type)
 
 x_getAllElementIDsOfClass(p_FlowID, p_Class)
 {
-	global _flows
-	
 	elements:=Object()
 	for oneElementID, oneElement in _flows[p_FlowID].allElements
 	{
@@ -258,17 +238,14 @@ x_getAllElementIDsOfClass(p_FlowID, p_Class)
 
 x_getElementPars(p_FlowID, p_ElementID)
 {
-	global _flows
 	return objfullyClone(_flows[p_FlowID].allElements[p_ElementID].pars)
 }
 x_getElementName(p_FlowID, p_ElementID)
 {
-	global _flows
 	return _flows[p_FlowID].allElements[p_ElementID].name
 }
 x_getElementClass(p_FlowID, p_ElementID)
 {
-	global _flows
 	return _flows[p_FlowID].allElements[p_ElementID].class
 }
 
@@ -276,7 +253,6 @@ x_getElementClass(p_FlowID, p_ElementID)
 ;Manual trigger
 x_ManualTriggerExist(p_FlowID, p_TriggerName = "")
 {
-	global _Flows
 	for forelementID, forelement in _flows[p_FlowID].allElements
 	{
 		;~ d(forelement, p_TriggerName)
@@ -303,7 +279,6 @@ x_ManualTriggerExist(p_FlowID, p_TriggerName = "")
 
 x_isManualTriggerEnabled(p_FlowID, p_TriggerName="")
 {
-	global _Flows
 	for forelementID, forelement in _flows[p_FlowID].allElements
 	{
 		;~ d(forelement, p_TriggerName)
@@ -330,8 +305,6 @@ x_isManualTriggerEnabled(p_FlowID, p_TriggerName="")
 
 x_ManualTriggerEnable(p_FlowID, p_TriggerName="")
 {
-	global _Flows
-	
 	for forelementID, forelement in _flows[p_FlowID].allElements
 	{
 		;~ d(forelement, p_TriggerName)
@@ -357,7 +330,6 @@ x_ManualTriggerEnable(p_FlowID, p_TriggerName="")
 
 x_ManualTriggerDisable(p_FlowID, p_TriggerName="")
 {
-	global _Flows
 	for forelementID, forelement in _flows[p_FlowID].allElements
 	{
 		;~ d(forelement, p_TriggerName)
@@ -383,8 +355,6 @@ x_ManualTriggerDisable(p_FlowID, p_TriggerName="")
 
 x_ManualTriggerExecute(p_FlowID, p_TriggerName = "", p_Variables ="", p_CallBackFunction ="")
 {
-	global _Flows
-	global _share
 	random, randomnumber
 	_share.temp[randomnumber]:=Object()
 	_share.temp[randomnumber].CallBack:=p_CallBackFunction
@@ -476,12 +446,10 @@ x_ConvertStringToObjOrObjToString(p_Value)
 
 x_log(Environment, LoggingText, loglevel = 2)
 {
-	global _flows
 	logger("f" loglevel, "Flow: " _flows[Environment.FlowID].name " (" Environment.FlowID ") - Element " _flows[Environment.FlowID].allElements[Environment.elementID].name " (" Environment.elementID "): " LoggingText)
 }
 x_GetFullPath(Environment, p_Path)
 {
-	global _Flows, _settings
 	path:=p_Path
 	if  DllCall("Shlwapi.dll\PathIsRelative","Str",path)
 	{

@@ -2,7 +2,7 @@
 
 executionTask()
 {
-	global _execution, _flows, _settings, currentState
+	global currentState
 	;TODO Vielleicht wird es zu Problemen kommen, wenn neue Instanzen hinzugefügt werden, während diese Schleife läuft
 	executingFlows:=Object()
 	

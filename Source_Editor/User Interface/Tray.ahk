@@ -29,7 +29,7 @@ initializeTrayBar()
 	menu, tray, add, Exit
 	menu, tray, rename, Exit,% lang("Exit")
 
-	menu tray,icon,%my_ScriptDir%\Icons\disabled.ico
+	menu tray,icon,%_ScriptDir%\Icons\disabled.ico
 	
 	menu,tray, tip,% lang("Flow") ": " _flows[flowid].name
 }

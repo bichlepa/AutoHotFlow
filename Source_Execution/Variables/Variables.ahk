@@ -44,7 +44,6 @@ ThreadVariable_Get(Environment,p_Name, p_hidden=False)
 }
 InstanceVariable_Get(Environment,p_Name, p_hidden=False)
 {
-	global _execution
 	if (p_hidden)
 		return _execution.instances[Environment.InstanceID].InstanceVarsHidden[p_Name]
 	else
@@ -70,8 +69,6 @@ ThreadVariable_Delete(Environment,p_Name, p_hidden=False)
 }
 InstanceVariable_Delete(Environment,p_Name, p_hidden=False)
 {
-	global _execution
-	
 	if (p_hidden)
 		_execution.instances[Environment.InstanceID].InstanceVarsHidden.delete(p_Name)
 	else
@@ -193,7 +190,7 @@ Var_RetrieveDestination(p_Name,p_Location,p_log=true)
 
 Var_GetLocation(Environment, p_Name, p_hidden=False)
 {
-	global _execution, my_workingdir, AllBuiltInVars, AllCustomBuiltInVars
+	global AllBuiltInVars, AllCustomBuiltInVars
 	if (p_hidden = false)
 	{
 		if (Environment.loopvars.haskey(p_Name))
@@ -216,11 +213,11 @@ Var_GetLocation(Environment, p_Name, p_hidden=False)
 		{
 			return "BuiltIn"
 		}
-		else if fileexist(my_workingdir "\Variables\" p_Name ".ahfvd")
+		else if fileexist(_WorkingDir "\Variables\" p_Name ".ahfvd")
 		{		
 			return "global"
 		}
-		else if fileexist(my_workingdir "\Variables\"  Environment.flowID "\" p_Name ".ahfvd")
+		else if fileexist(_WorkingDir "\Variables\"  Environment.flowID "\" p_Name ".ahfvd")
 		{		
 			return "static"
 		}
@@ -250,8 +247,6 @@ Var_GetLocation(Environment, p_Name, p_hidden=False)
 
 Var_Set(Environment, p_Name, p_Value, p_Destination="", p_hidden=False)
 {
-	global _execution
-	
 	if (isobject(p_Name))
 	{
 		;todo: allow paths in objects
@@ -289,7 +284,6 @@ Var_Set(Environment, p_Name, p_Value, p_Destination="", p_hidden=False)
 
 Var_Get(environment, p_Name, p_hidden = False)
 {
-	global _execution
 	tempvalue= 
 	if (p_Name="")
 	{

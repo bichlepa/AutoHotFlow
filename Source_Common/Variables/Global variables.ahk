@@ -1,18 +1,16 @@
 ﻿AllBuiltInVars:=" A_Space A_Tab A_YYYY A_Year A_MM A_Mon A_DD A_MDay A_MMMM A_MMM A_DDDD A_DDD A_WDay A_YDay A_Hour A_Min A_Sec A_MSec A_TickCount A_TimeIdle A_TimeIdlePhysical A_Temp A_OSVersion A_Is64bitOS A_PtrSize A_Language A_ComputerName A_UserName A_ScriptDir A_WinDir A_ProgramFiles A_AppData A_AppDataCommon A_Desktop A_DesktopCommon A_StartMenu A_StartMenuCommon A_Programs A_ProgramsCommon A_Startup A_StartupCommon A_MyDocuments A_IsAdmin A_ScreenWidth A_ScreenHeight A_ScreenDPI A_IPAddress1 A_IPAddress2 A_IPAddress3 A_IPAddress4 A_Cursor A_CaretX A_CaretY a_now A_NowUTC a_linefeed "
 AllCustomBuiltInVars:=" a_lf a_workingdir A_LanguageName a_NowString "
 
-if not fileexist(my_workingdir "\Variables")
-	FileCreateDir, % my_workingdir "\Variables"
+if not fileexist(_WorkingDir "\Variables")
+	FileCreateDir, % _WorkingDir "\Variables"
 
 
 StaticVariable_Set(Environment,p_Name,p_Value, p_hidden=False)
 {
-	global my_workingdir
-	
 	if (p_hidden)
 		MsgBox unexpected error! It is not possible to set a hidden static variable!
 	
-	path:=my_workingdir "\Variables\" Environment.flowID
+	path:=_WorkingDir "\Variables\" Environment.flowID
 	FileCreateDir,%path%
 	FileDelete,% path "\" p_Name ".ahfvd"
 	FileDelete,% path "\" p_Name ".ahfvar"
@@ -38,11 +36,10 @@ StaticVariable_Set(Environment,p_Name,p_Value, p_hidden=False)
 
 GlobalVariable_Set(Environment,p_Name,p_Value, p_hidden=False)
 {
-	global my_workingdir
 	if (p_hidden)
 		MsgBox unexpected error! It is not possible to set a hidden global variable!
 	
-	path:=my_workingdir "\Variables"
+	path:=_WorkingDir "\Variables"
 	FileDelete,% path "\" p_Name ".ahfvd"
 	FileDelete,% path "\" p_Name ".ahfvar"
 	content:=""
@@ -69,12 +66,10 @@ GlobalVariable_Set(Environment,p_Name,p_Value, p_hidden=False)
 
 StaticVariable_Get(Environment,p_Name, p_hidden=False)
 {
-	global my_workingdir
-	
 	if (p_hidden)
 		MsgBox unexpected error! There are no hidden static variables!
 	
-	path:=my_workingdir "\Variables\" Environment.flowID
+	path:=_WorkingDir "\Variables\" Environment.flowID
 	IniRead,vartype, % path "\" p_Name ".ahfvd", variable, type,%A_Space%
 	if (vartype = "")
 	{
@@ -96,12 +91,10 @@ StaticVariable_Get(Environment,p_Name, p_hidden=False)
 
 GlobalVariable_Get(Environment,p_Name, p_hidden=False)
 {
-	global my_workingdir
-	
 	if (p_hidden)
 		MsgBox unexpected error! There are no hidden global variables!
 	
-	path:=my_workingdir "\Variables"
+	path:=_WorkingDir "\Variables"
 	IniRead,vartype, % path "\" p_Name ".ahfvd", variable, type,%A_Space%
 	if (vartype = "")
 	{
@@ -193,24 +186,21 @@ BuiltInVariable_Get(Environment,p_Name, p_hidden=False)
 
 StaticVariable_Delete(Environment,p_Name)
 {
-	global my_workingdir
-	path:=my_workingdir "\Variables\" Environment.flowID
+	path:=_WorkingDir "\Variables\" Environment.flowID
 	FileDelete,% path "\" p_Name ".ahfvd"
 	FileDelete,% path "\" p_Name ".ahfvar"
 }
 GlobalVariable_Delete(Environment,p_Name)
 {
-	global my_workingdir
-	path:=my_workingdir "\Variables"
+	path:=_WorkingDir "\Variables"
 	FileDelete,% path "\" p_Name ".ahfvd"
 	FileDelete,% path "\" p_Name ".ahfvar"
 }
 
 Var_GetListOfStaticVars(environment)
 {
-	global my_workingdir
 	retobject:=Object()
-	path:=my_workingdir "\Variables\" Environment.flowID
+	path:=_WorkingDir "\Variables\" Environment.flowID
 	loop, files, %path%\*.ahfvd
 	{
 		StringReplace, varname, a_loopfilename, .ahfvd
@@ -220,9 +210,8 @@ Var_GetListOfStaticVars(environment)
 }
 Var_GetListOfGlobalVars(environment)
 {
-	global my_workingdir
 	retobject:=Object()
-	path:=my_workingdir "\Variables"
+	path:=_WorkingDir "\Variables"
 	loop, files, %path%\*.ahfvd
 	{
 		StringReplace, varname, a_loopfilename, .ahfvd
@@ -270,7 +259,7 @@ Var_RetrieveDestination_Common(p_Name,p_Location,p_log=true)
 
 Var_GetLocation_Common(Environment, p_Name, p_hidden=False)
 {
-	global my_workingdir, AllBuiltInVars, AllCustomBuiltInVars
+	global AllBuiltInVars, AllCustomBuiltInVars
 	if (p_hidden = false)
 	{
 		ifinstring,AllBuiltInVars, %A_Space%%p_Name%%A_Space%
@@ -281,11 +270,11 @@ Var_GetLocation_Common(Environment, p_Name, p_hidden=False)
 		{
 			return "BuiltIn"
 		}
-		else if fileexist(my_workingdir "\Variables\" p_Name ".ahfvd")
+		else if fileexist(_WorkingDir "\Variables\" p_Name ".ahfvd")
 		{		
 			return "global"
 		}
-		else if fileexist(my_workingdir "\Variables\"  Environment.flowID "\" p_Name ".ahfvd")
+		else if fileexist(_WorkingDir "\Variables\"  Environment.flowID "\" p_Name ".ahfvd")
 		{		
 			return "static"
 		}
@@ -308,7 +297,6 @@ Var_GetLocation_Common(Environment, p_Name, p_hidden=False)
 
 Var_Set_Common(Environment, p_Name, p_Value, p_Destination="", p_hidden=False)
 {
-	global _execution
 	res:=Var_CheckName(p_Name,true)
 	if (res="empty")
 	{
@@ -348,7 +336,6 @@ Var_Set_Common(Environment, p_Name, p_Value, p_Destination="", p_hidden=False)
 
 Var_Get_Common(environment, p_Name, p_hidden = False)
 {
-	global _execution
 	tempvalue=
 	if (p_Name="")
 	{

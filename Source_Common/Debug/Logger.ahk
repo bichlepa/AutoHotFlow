@@ -10,8 +10,8 @@
 ; 3: all logs
 
 
-if not fileexist(my_workingdir "\Log")
-	FileCreateDir, % my_workingdir "\Log"
+if not fileexist(_WorkingDir "\Log")
+	FileCreateDir, % _WorkingDir "\Log"
 
 logger(LogLevel,LoggingText, logSource="common")
 {
@@ -79,13 +79,13 @@ logger(LogLevel,LoggingText, logSource="common")
 	If shouldLog
 	{
 		FormatTime,timestamp,a_now,yyyy MM dd HH:mm:ss
-		DebugLogLastEntry:="`n--- " timestamp " ~" Global_ThisThreadID "~ " LoggingText
+		DebugLogLastEntry:="`n--- " timestamp " ~" _ahkThreadID "~ " LoggingText
 		_share.log.=DebugLogLastEntry
 		_share["log_" logSource].=DebugLogLastEntry
 		if (_settings.logtofile)
 		{
-			FileAppend,% DebugLogLastEntry,%my_workingdir%\Log\Log.txt,UTF-8
-			FileAppend,% DebugLogLastEntry,%my_workingdir%\Log\Log_%logSource%.txt,UTF-8
+			FileAppend,% DebugLogLastEntry,%_WorkingDir%\Log\Log.txt,UTF-8
+			FileAppend,% DebugLogLastEntry,%_WorkingDir%\Log\Log_%logSource%.txt,UTF-8
 		}
 	}
 	
@@ -100,7 +100,7 @@ showlog()
 	GuiLogButtonsHeigth:=30
 	gui,log:destroy
 	gui,log:font,s%GuiLogFontSize%
-	gui,log: add, dropdownlist, vGuiLogCategories gGuiLogrefreshText h%GuiLogButtonsHeigth%
+	gui,log: add, dropdownlist, vGuiLogCategories gGuiLogrefreshText 
 	gui,log: add, button,gGuiLogrefresh vGuiLogrefresh, % lang("Refresh")
 	gui,log:add,button,gGuiLogClose vGuiLogClose default,% lang("Close")
 	gui,log:add,edit, ReadOnly vGuiLogTextField Multi -wrap VScroll HScroll
@@ -190,7 +190,6 @@ initLog()
 
 log_cleanup()
 {
-	global _share
 	if (_share.logTidyCountdown <= 0)
 	{
 		;~ MsgBox % _share.log
@@ -200,7 +199,7 @@ log_cleanup()
 		;~ MsgBox % templogpos "`n" _share.log
 		
 		log_cleanup_toobigfiles:=Object()
-		loop, %my_workingdir%\Log\Log*.txt
+		loop, %_WorkingDir%\Log\Log*.txt
 		{
 			If (substr(A_LoopFileFullPath,-7) = "_old.txt")
 				continue

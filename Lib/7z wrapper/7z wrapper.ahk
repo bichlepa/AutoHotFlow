@@ -1,7 +1,7 @@
 ﻿;7z warpper - joedf
 ;modified by bichlepa
 
-7z_exe:=my_WorkingDir "\bin\7za.exe"
+7z_exe:=_WorkingDir "\bin\7za.exe"
 ;~ 7z_exe:="C:\Program Files\7-Zip\7z.exe"
 
 7z_compress(dPack, opts, files*) {

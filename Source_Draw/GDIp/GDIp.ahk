@@ -51,20 +51,20 @@ gdip_Init()
 	pBrushBackground := Gdip_BrushCreateSolid("0xFFeaf0ea") ;Almost white brush for background
 
 
-	pBitmapEdit := Gdip_CreateBitmapFromFile(my_ScriptDir "\Icons\edit.ico")
-	pBitmapPlus := Gdip_CreateBitmapFromFile(my_ScriptDir "\Icons\plus.ico")
-	pBitmapMove := Gdip_CreateBitmapFromFile(my_ScriptDir "\Icons\move.ico")
-	pBitmapTrash := Gdip_CreateBitmapFromFile(my_ScriptDir "\Icons\trash.ico")
-	pBitmapTrash := Gdip_CreateBitmapFromFile(my_ScriptDir "\Icons\trash.ico")
+	pBitmapEdit := Gdip_CreateBitmapFromFile(_ScriptDir "\Icons\edit.ico")
+	pBitmapPlus := Gdip_CreateBitmapFromFile(_ScriptDir "\Icons\plus.ico")
+	pBitmapMove := Gdip_CreateBitmapFromFile(_ScriptDir "\Icons\move.ico")
+	pBitmapTrash := Gdip_CreateBitmapFromFile(_ScriptDir "\Icons\trash.ico")
+	pBitmapTrash := Gdip_CreateBitmapFromFile(_ScriptDir "\Icons\trash.ico")
 	
-	pBitmapStarFilled := Gdip_CreateBitmapFromFile(my_ScriptDir "\Icons\e_star_filled.ico")
+	pBitmapStarFilled := Gdip_CreateBitmapFromFile(_ScriptDir "\Icons\e_star_filled.ico")
 	pBitmapStarFilled_W := Gdip_GetImageWidth(pBitmapStarFilled)
 	pBitmapStarFilled_H := Gdip_GetImageHeight(pBitmapStarFilled)
 	if (pBitmapStarFilled_H > pBitmapStarFilled_W)
 		pBitmapStarFilled_size := pBitmapStarFilled_H
 	else
 		pBitmapStarFilled_size := pBitmapStarFilled_W	
-	pBitmapStarEmpty := Gdip_CreateBitmapFromFile(my_ScriptDir "\Icons\e_star_Empty.ico")
+	pBitmapStarEmpty := Gdip_CreateBitmapFromFile(_ScriptDir "\Icons\e_star_Empty.ico")
 	pBitmapStarEmpty_W := Gdip_GetImageWidth(pBitmapStarEmpty)
 	pBitmapStarEmpty_H := Gdip_GetImageHeight(pBitmapStarEmpty)
 	if (pBitmapStarEmpty_H > pBitmapStarEmpty_W)
@@ -72,14 +72,14 @@ gdip_Init()
 	else
 		pBitmapStarEmpty_size := pBitmapStarEmpty_W
 	
-	pBitmapSwitchOn := Gdip_CreateBitmapFromFile(my_ScriptDir "\Icons\e_switch_on.ico")
+	pBitmapSwitchOn := Gdip_CreateBitmapFromFile(_ScriptDir "\Icons\e_switch_on.ico")
 	pBitmapSwitchOn_W := Gdip_GetImageWidth(pBitmapSwitchOn)
 	pBitmapSwitchOn_H := Gdip_GetImageHeight(pBitmapSwitchOn)
 	if (pBitmapSwitchOn_H > pBitmapSwitchOn_W)
 		pBitmapSwitchOn_size := pBitmapSwitchOn_H
 	else
 		pBitmapSwitchOn_size := pBitmapSwitchOn_W
-	pBitmapSwitchOff := Gdip_CreateBitmapFromFile(my_ScriptDir "\Icons\e_switch_off.ico")
+	pBitmapSwitchOff := Gdip_CreateBitmapFromFile(_ScriptDir "\Icons\e_switch_off.ico")
 	pBitmapSwitchOff_W := Gdip_GetImageWidth(pBitmapSwitchOff)
 	pBitmapSwitchOff_H := Gdip_GetImageHeight(pBitmapSwitchOff)
 	if (pBitmapSwitchOff_H > pBitmapSwitchOff_W)
@@ -1088,7 +1088,6 @@ gdip_DrawEverything(FlowObj)
 
 drawElementIcon(G, p_x, p_y, p_w, p_h ,path)
 {
-	global my_ScriptDir
 	static allElementIconBitmaps:=Object()
 	
 	if (allElementIconBitmaps.haskey(path))
@@ -1097,7 +1096,7 @@ drawElementIcon(G, p_x, p_y, p_w, p_h ,path)
 	}
 	else
 	{
-		BitmapIcon := Gdip_CreateBitmapFromFile(my_ScriptDir "\" path)
+		BitmapIcon := Gdip_CreateBitmapFromFile(_ScriptDir "\" path)
 		allElementIconBitmaps[path]:=BitmapIcon
 	}
 	

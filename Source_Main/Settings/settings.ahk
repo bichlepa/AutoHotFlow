@@ -2,9 +2,9 @@
 ;load settings from settings file. Must be called olny once
 load_settings()
 {
-	global my_workingdir, _settings, settingsdefinitions, filepathsettings
+	global settingsdefinitions, filepathsettings
 	
-	filepathsettings:= my_workingdir "\settings.ini"
+	filepathsettings:= _WorkingDir "\settings.ini"
 	
 	settingsdefinitions:=Object()
 	settingsdefinitions.push({section: "common", key: "developing", default: false})
@@ -31,7 +31,7 @@ load_settings()
 ;Write settings into settings file. Should be called whenever some settings are changed
 write_settings()
 {
-	global _settings, settingsdefinitions, filepathsettings
+	global settingsdefinitions, filepathsettings
 	for oneindex, onesetting in settingsdefinitions
 	{
 		Iniwrite, % _settings[onesetting.key], %filepathsettings%, % onesetting.section, % onesetting.key

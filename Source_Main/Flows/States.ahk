@@ -6,7 +6,7 @@ MAX_COUNT_OF_STATES:=100
 
 state_New(p_FlowID, stateID="", params="")
 {
-	global _flows, global_statesCounter
+	global global_statesCounter
 	UpdateConnectionLists(p_FlowID)
 	
 	if ! isobject(_flows[p_FlowID].states)
@@ -38,7 +38,6 @@ state_New(p_FlowID, stateID="", params="")
 
 state_Undo(p_FlowID)
 {
-	global _flows, my_workingdir
 	found:=false
 	restored:=false
 
@@ -69,15 +68,15 @@ state_Undo(p_FlowID)
 		foundbackupdate:=""
 		foundfilepath:=""
 		foundBackups:=Object()
-		;~ MsgBox %my_workingdir%\saved Flows\backup\%filename%_backup_*.ini
-		;~ loop, files, %my_workingdir%\savedFlows\backup\%filename%_backup_*.ini
+		;~ MsgBox %_WorkingDir%\saved Flows\backup\%filename%_backup_*.ini
+		;~ loop, files, %_WorkingDir%\savedFlows\backup\%filename%_backup_*.ini
 		currentStateDate:=_flows[p_FlowID].currentState
 		StringReplace,currentStateDate,currentStateDate,Backup_
 		if (errorlevel = 0)
 		{
 			currentStateIsFromBackup := True
 		}
-		loop, files, %my_workingdir%\saved Flows\backup\%filename%_backup_*.ini
+		loop, files, %_WorkingDir%\saved Flows\backup\%filename%_backup_*.ini
 		{
 			StringReplace,backupdate,a_loopfilename,%filename%_backup_
 			StringTrimRight,backupdate,backupdate,4
@@ -116,7 +115,6 @@ state_Undo(p_FlowID)
 
 state_Redo(p_FlowID)
 {
-	global _flows
 	found:=false
 	;~ MsgBox redo state %p_FlowID% 
 	;Try to find a newer state than the current and set it. This is only possible after user has done a redo and did not changed anything yet.
@@ -141,7 +139,6 @@ state_Redo(p_FlowID)
 
 states_Update(p_FlowID, p_StateID)
 {
-	global _flows
 	_flows[p_FlowID].states[p_StateID].allElements:=ObjFullyClone(_flows[p_FlowID].allElements)
 	
 	_flows[p_FlowID].states[p_StateID].allConnections:=ObjFullyClone(_flows[p_FlowID].allConnections)
@@ -151,7 +148,6 @@ states_Update(p_FlowID, p_StateID)
 }
 states_Restore(p_FlowID, p_StateID)
 {
-	global _flows
 	_flows[p_FlowID].allElements:=ObjFullyClone(_flows[p_FlowID].states[p_StateID].allElements)
 	_flows[p_FlowID].allConnections:=ObjFullyClone(_flows[p_FlowID].states[p_StateID].allConnections)
 	_flows[p_FlowID].allTriggers:=ObjFullyClone(_flows[p_FlowID].states[p_StateID].allTriggers)
@@ -184,13 +180,11 @@ states_Restore(p_FlowID, p_StateID)
 }
 state_RestoreCurrent(p_FlowID)
 {
-	global _flows
 	states_Restore(p_FlowID, _flows[p_FlowID].currentstate)
 }
 
 states_DeleteNewerThanCurrent(p_FlowID)
 {
-	global _flows
 	currentnumber:=substr(_flows[p_FlowID].currentState,StrLen("state")+1)
 	statesToRemove:=[]
 	for id, state in _flows[p_FlowID].states
@@ -210,7 +204,6 @@ states_DeleteNewerThanCurrent(p_FlowID)
 
 states_DeleteTooOld(p_FlowID)
 {
-	global _flows
 	if (_flows[p_FlowID].states.count() > MAX_COUNT_OF_STATES)
 	{
 		Loop % _flows[p_FlowID].states.count() - MAX_COUNT_OF_STATES

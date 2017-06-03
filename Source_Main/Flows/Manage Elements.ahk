@@ -14,7 +14,6 @@ GetListContainingElement(p_ElementID)
 ;Creates a new element and puts it in the array "allelements"
 Element_New(p_FlowID, p_type="",p_elementID="")
 {
-	global _flows
 	global GridX, Gridy
 	
 	;~ allElements:=_flows[p_FlowID].allElements
@@ -55,8 +54,6 @@ Element_New(p_FlowID, p_type="",p_elementID="")
 ;Sets the element type. It could later be possible to change the element type (e.g. change from type "action" to type "condition")
 Element_SetType(p_FlowID, p_elementID,p_elementType)
 {
-	global _flows
-	
 	allElements:=_flows[p_FlowID].allElements
 	
 	allElements[p_elementID].type:=p_elementType 
@@ -74,8 +71,6 @@ Element_SetType(p_FlowID, p_elementID,p_elementType)
 ;Sets the element class. This means it is possible to change the element type and subtype
 Element_SetClass(p_FlowID, p_elementID, p_elementClass)
 {
-	global _flows
-	
 	allElements:=_flows[p_FlowID].allElements
 	
 	;First set type
@@ -110,8 +105,6 @@ Element_SetClass(p_FlowID, p_elementID, p_elementClass)
 ;Is called when the element subtype is set. All parameters that are not set yet are set to the default parameters
 Element_setParameterDefaults(p_FlowID, p_elementID)
 {
-	global _flows
-	
 	allElements:=_flows[p_FlowID].allElements
 	
 	elementClass:=allElements[p_elementID].class
@@ -156,7 +149,6 @@ Element_setParameterDefaults(p_FlowID, p_elementID)
 
 Element_findDefaultTrigger(p_FlowID)
 {
-	global _flows
 	for oneID, oneElement in _flows[p_FlowID].allElements
 	{
 		if (oneElement.class = "trigger_manual")
@@ -169,7 +161,6 @@ Element_findDefaultTrigger(p_FlowID)
 
 Element_setDefaultTrigger(p_FlowID, p_elementID)
 {
-	global _flows
 	for oneID, oneElement in _flows[p_FlowID].allElements
 	{
 		if (oneElement.class = "trigger_manual")
@@ -191,8 +182,6 @@ Element_setDefaultTrigger(p_FlowID, p_elementID)
 ;Removes the element. It will be deleted from list of all elements and all connections which start or ends there will be deleted, too
 Element_Remove(p_FlowID, p_elementID)
 {
-	global _flows
-	
 	allElements:=_flows[p_FlowID].allElements
 	allConnections:=_flows[p_FlowID].allConnections
 	markedElements:=_flows[p_FlowID].markedElements
@@ -243,8 +232,6 @@ Element_Remove(p_FlowID, p_elementID)
 
 Connection_New(p_FlowID, p_elementID="")
 {
-	global _flows
-	
 	allConnections:=_flows[p_FlowID].allConnections
 	
 	tempElement:=CriticalObject()
@@ -271,8 +258,6 @@ Connection_New(p_FlowID, p_elementID="")
 ;Removes the connection. It will be deleted from list of all elements and all connections which start or ends there will be deleted, too
 Connection_Remove(p_FlowID, p_elementID)
 {
-	global _flows
-	
 	allConnections:=_flows[p_FlowID].allConnections
 	markedElements:=_flows[p_FlowID].markedElements
 	
@@ -305,8 +290,6 @@ Connection_Remove(p_FlowID, p_elementID)
 ;~ ;
 GetListContainingElement(p_FlowID, p_ElementID, p_returnPointer = false)
 {
-	global _flows
-	
 	if _flows[p_FlowID].allElements.HasKey(p_ElementID)
 		templist := _flows[p_FlowID].allElements
 	else if _flows[p_FlowID].allConnections.HasKey(p_ElementID)
@@ -319,7 +302,6 @@ GetListContainingElement(p_FlowID, p_ElementID, p_returnPointer = false)
 
 UpdateConnectionLists(p_FlowID)
 {
-	global _flows
 	for oneElementID, oneElement in _flows[p_FlowID].allElements
 	{
 		oneElement.fromConnections:=Object()

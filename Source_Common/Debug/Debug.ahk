@@ -7,7 +7,7 @@
 d(text,header="",wait=1)
 {
 	static
-	global dedit, dbutton, dbuttonShowGlobals, _settings
+	global dedit, dbutton, dbuttonShowGlobals
 	if not (_settings.developing)
 		return
 	
@@ -76,12 +76,11 @@ d(text,header="",wait=1)
 d_showGlobals(wait=1)
 {
 	static
-	global _flows, _settings, _execution, _GlobalVars, _share, allFlows
+	global allFlows
 	text:="Flows:`n"
 	text.=strobj(_flows) "`n`nSettings:`n"
 	text.=strobj(_settings) "`n`nExecution:`n"
-	text.=strobj(_execution) "`n`nGlobal variables:`n"
-	text.=strobj(_GlobalVars) "`n`nShare:`n"
+	text.=strobj(_execution) "`n`nShare:`n"
 	text.=strobj(_share) "`n`nAllFlows:`n"
 	;~ text.=strobj(allFlows)
 	

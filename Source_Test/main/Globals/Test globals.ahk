@@ -9,7 +9,6 @@ class main_Globals_TestSuite
 	Test_Vars_exist()
 	{
 		global
-		Yunit.assert(IsObject(_globalvars) == true)
 		Yunit.assert(IsObject(_flows) == true)
 		Yunit.assert(IsObject(_settings) == true)
 		Yunit.assert(IsObject(_execution) == true)

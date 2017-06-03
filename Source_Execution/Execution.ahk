@@ -3,8 +3,8 @@
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
 
 SetWorkingDir %A_ScriptDir%\..  ; set working dir.
-my_WorkingDir := _share.my_WorkingDir
-my_ScriptDir := _share.my_ScriptDir
+_WorkingDir := _share._WorkingDir
+_ScriptDir := _share._ScriptDir
 SetWorkingDir %a_temp%  ; using working dir forbidden.
 
 #Persistent
@@ -18,7 +18,7 @@ OnExit,Exit
 #include language\language.ahk ;Must be very first
 ;initialize languages
 _language:=Object()
-_language.dir:=my_ScriptDir "\language" ;Directory where the translations are stored
+_language.dir:=_ScriptDir "\language" ;Directory where the translations are stored
 lang_Init()
 lang_setLanguage(_settings.UILanguage)
 
@@ -65,7 +65,7 @@ return
 exit_all()
 {
 	global
-	API_Main_Thread_Stopped(Global_ThisThreadID "") 
+	API_Main_Thread_Stopped(_ahkThreadID "") 
 }
 
 

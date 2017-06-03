@@ -68,7 +68,6 @@ disableFlow(par_FlowID)
 
 enableOneTrigger(par_FlowID, par_TriggerID = "", save=True)
 {
-	global _flows
 	if (_flows[par_FlowID].loaded != true)
 	{
 		LoadFlow(par_FlowID)
@@ -87,7 +86,6 @@ disableOneTrigger(par_FlowID, par_TriggerID = "", save=True)
 
 ExecuteFlow(par_FlowID, par_TriggerID, par_PassedParsKey)
 {
-	global _flows
 	if (_flows[par_FlowID].loaded != true)
 	{
 		LoadFlow(par_FlowID)
@@ -97,7 +95,6 @@ ExecuteFlow(par_FlowID, par_TriggerID, par_PassedParsKey)
 
 ExecuteToggleFlow(par_FlowID)
 {
-	global _flows
 	if (_flows[par_FlowID].loaded != true)
 	{
 		LoadFlow(par_FlowID)
@@ -107,7 +104,6 @@ ExecuteToggleFlow(par_FlowID)
 
 TriggerFlow(par_FlowID, par_Reason)
 {
-	global _flows
 	if (_flows[par_FlowID].loaded != true)
 	{
 		LoadFlow(par_FlowID)

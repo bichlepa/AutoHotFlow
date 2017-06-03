@@ -6,7 +6,7 @@ ThreadIDCOunter:=0
 */
 newInstance(p_Environment)
 {
-	global _execution, InstanceIDCOunter, _flows
+	global InstanceIDCOunter
 	if (_flows[p_Environment.FlowID].flowSettings.ExecutionPolicy="skip" or _flows[p_Environment.FlowID].flowSettings.ExecutionPolicy="stop")
 	{
 		;find out whether the flow is running
@@ -82,7 +82,6 @@ Start all manual triggers
 startFlow(p_Flow, p_Trigger ="", p_params = "")
 {
 	static
-	global _flows
 	local TriggerFound:=false
 	;If not trigger assigned, trigger the default manual trigger (if any)
 	if (p_Trigger="")
@@ -123,8 +122,6 @@ startFlow(p_Flow, p_Trigger ="", p_params = "")
 
 stopFlow(p_Flow)
 {
-	global _execution, _flows
-	
 	instancesToDelete:=Object()
 	
 	for OneInstanceID, OneInstance in _execution.Instances
@@ -138,8 +135,6 @@ stopFlow(p_Flow)
 
 stopInstance(p_instance)
 {
-	global _execution, _flows
-	
 	for OneThreadID, OneThread in p_instance.threads
 	{
 		OneThread.oldstate := OneThread.state
@@ -266,8 +261,6 @@ removeInstance(p_instance)
 
 updateFlowExcutingStates()
 {
-	global _execution, _flows
-	
 	executingFlows:=Object()
 	for OneInstanceID, OneInstance in _execution.Instances
 	{

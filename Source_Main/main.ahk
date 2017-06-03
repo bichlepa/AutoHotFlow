@@ -2,39 +2,40 @@
 ;#Warn  ; Recommended for catching common errors.
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
 
-global my_ScriptDir, my_WorkingDir
+global _ScriptDir, _WorkingDir
+global _ahkThreadID:="Main"
 
 SetWorkingDir %A_ScriptDir%\..  ; set working dir.
-my_ScriptDir = %A_WorkingDir%
+_ScriptDir = %A_WorkingDir%
 
 ;if portable installation, the script dir is the working dir. 
 ;If installed in programs folder, it is a dir which is writable without admin rights
-my_WorkingDir = %A_WorkingDir%
-IfInString, my_WorkingDir, %A_ProgramFiles%
+_WorkingDir = %A_WorkingDir%
+IfInString, _WorkingDir, %A_ProgramFiles%
 {
-	my_WorkingDir = %A_AppData%\AutoHotFlow
-	if not fileexist(my_WorkingDir)
-		FileCreateDir, %my_WorkingDir%
+	_WorkingDir = %A_AppData%\AutoHotFlow
+	if not fileexist(_WorkingDir)
+		FileCreateDir, %_WorkingDir%
 }
 
 ;First of all initialize global variables and load the settings
-init_GlobalVars()
+gosub,init_GlobalVars
 load_settings()
+logger("a1", "startup")
 
 ; using working dir forbidden.
 ;The reason is that while any thread uses the command FileSelectFile, the working directory of the working directory of the whole process is changed to the path which is shown in the dialog.
 SetWorkingDir %a_temp%  
-;~ MsgBox %my_WorkingDir%
+;~ MsgBox %_WorkingDir%
 
 ;~ MsgBox %1% - %2% - %3% - %4% - %5%
 OnExit,exit
 
-Global_ThisThreadID:="Main"
 #Include %A_ScriptDir%\..
 
 #include language\language.ahk
 _language:=Object()
-_language.dir:=my_ScriptDir "\language" ;Directory where the translations are stored
+_language.dir:=_ScriptDir "\language" ;Directory where the translations are stored
 lang_Init()
 lang_setLanguage(_settings.UILanguage)
 
@@ -73,8 +74,7 @@ FileDelete,%a_temp%\autoHotflowTryToStartAsAdmin.txt
 #include lib\Random Word List\Random Word List.ahk
 
 ;Include libraries which may be used by the elements. This code is generated.
-;Lib_includes_Start
-#include lib\7z wrapper\7z wrapper.ahk
+;Lib_includes_Start#include lib\7z wrapper\7z wrapper.ahk
 global_elementInclusions = 
 (
 #include lib\7z wrapper\7z wrapper.ahk

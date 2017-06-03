@@ -1,7 +1,5 @@
 API_Call_Execution_startFlow(p_FlowID, par_TriggerID, par_PassedParsKey)
 {
-	global _flows, _share
-	
 	if (par_PassedParsKey!= "")
 	{
 		if (_share.temp.haskey(par_PassedParsKey))
@@ -20,26 +18,22 @@ API_Call_Execution_startFlow(p_FlowID, par_TriggerID, par_PassedParsKey)
 
 API_Call_Execution_EnableTriggers(p_FlowID)
 {
-	global _flows
 	retvalue := enableTriggers(_flows[p_FlowID])
 	return retvalue.id
 }
 API_Call_Execution_StopFlow(p_FlowID)
 {
-	global _flows
 	retvalue := stopFlow(_flows[p_FlowID])
 	return retvalue.id
 }
 API_Call_Execution_ExecuteToggleFlow(p_FlowID)
 {
-	global _flows
 	retvalue := ExecuteToggleFlow(_flows[p_FlowID])
 	return retvalue.id
 }
 
 API_Call_Execution_DisableTriggers(p_FlowID)
 {
-	global _flows
 	retvalue := disableTriggers(_flows[p_FlowID])
 	return retvalue.id
 }

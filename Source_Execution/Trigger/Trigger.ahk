@@ -3,7 +3,7 @@ EnabledTriggerIDCounter:=0
 
 enableTriggers(p_Flow)
 {
-	global _execution, EnabledTriggerIDCounter
+	global EnabledTriggerIDCounter
 	
 	logger("a2", "Going to enable Flow " p_Flow.name)
 	
@@ -36,7 +36,7 @@ enableOneTrigger(p_Flow, p_Trigger)
 
 justEnableOneTrigger(p_Flow, p_Trigger)
 {
-	global _execution, EnabledTriggerIDCounter
+	global EnabledTriggerIDCounter
 	
 	triggerEnvironment:=criticalObject()
 	triggerEnvironment.id:= "enabledTrigger" ++EnabledTriggerIDCounter
@@ -65,7 +65,7 @@ justEnableOneTrigger(p_Flow, p_Trigger)
 
 disableTriggers(p_Flow)
 {
-	global _execution, EnabledTriggerIDCounter
+	global EnabledTriggerIDCounter
 	
 	p_Flow.enabled:="Disabling"
 	logger("a2", "Going to disable Flow " p_Flow.name)
@@ -94,7 +94,6 @@ disableTriggers(p_Flow)
 }
 disableOneTrigger(p_Flow, p_Trigger)
 {
-	global _execution
 	p_Flow.enabled:="Disabling"
 	logger("a2", "Going to disable trigger " p_Trigger.ID " in Flow " p_Flow.name)
 	
@@ -119,8 +118,6 @@ disableOneTrigger(p_Flow, p_Trigger)
 
 justDisableOneTrigger(p_Flow, p_Trigger, p_EnabledTrigger)
 {
-	
-	global _execution
 	tempElementClass:=p_Trigger.Class
 	;~ d(forTrigger,"Element_disable_" tempElementClass)
 	if isfunc("Element_disable_" tempElementClass)
