@@ -41,6 +41,7 @@ newInstance(p_Environment)
 	newInstance:=CriticalObject()
 	newInstance.id:= "instance" ++InstanceIDCOunter
 	newInstance.FlowID := p_Environment.FlowID
+	newInstance.FlowName := p_Environment.FlowName
 	newInstance.state := "init"
 	newInstance.InstanceVars := CriticalObject()
 	newInstance.InstanceVarsHidden := CriticalObject()
@@ -107,6 +108,7 @@ startFlow(p_Flow, p_Trigger ="", p_params = "")
 	;~ d(p_Trigger)
 	environment:=Object()
 	environment.flowID:=p_Flow.id
+	environment.FlowName:=p_Flow.Name
 	environment.elementID:=p_Trigger.id
 	environment.params:=p_params
 	newInstance(environment)
@@ -212,6 +214,7 @@ newThread(p_Instance, p_ToCloneFromThread ="")
 		newThread.ThreadID := newThread.id
 		newThread.InstanceID := p_Instance.id
 		newThread.FlowID := p_Instance.FlowID
+		newThread.FlowName := p_Instance.FlowName
 		newThread.State := "finished" ;This means, the execution of the trigger has finished
 		
 		newThread.ElementPars := CriticalObject()

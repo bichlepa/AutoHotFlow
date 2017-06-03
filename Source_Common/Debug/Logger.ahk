@@ -95,14 +95,16 @@ logger(LogLevel,LoggingText, logSource="common")
 showlog()
 {
 	global 
-	GuiLogFontSize:=10
+	GuiLogFontSize:=8
 	GuiLogTextFieldRows:=0
 	GuiLogButtonsHeigth:=30
+	GuiLogMode:="update"
 	gui,log:destroy
 	gui,log:font,s%GuiLogFontSize%
-	gui,log: add, dropdownlist, vGuiLogCategories gGuiLogrefreshText 
+	gui,log: add, dropdownlist, vGuiLogCategories gGuiLogCategories
 	gui,log: add, button,gGuiLogrefresh vGuiLogrefresh, % lang("Refresh")
 	gui,log:add,button,gGuiLogClose vGuiLogClose default,% lang("Close")
+	gui,log:add,button,gGuiLogModeChange vGuiLogModeChange default,% lang("Show all logs")
 	gui,log:add,edit, ReadOnly vGuiLogTextField Multi -wrap VScroll HScroll
 	gui,log:+resize
 	gui,log:+MinSize500x300
@@ -129,6 +131,7 @@ showlog()
 	guicontrol,log:move,GuiLogCategories,x10 y10 w200 h%GuiLogButtonsHeigth%
 	guicontrol,log:move,GuiLogrefresh,x220 y10 w100 h%GuiLogButtonsHeigth%
 	guicontrol,log:move,GuiLogClose,x330 y10 w100 h%GuiLogButtonsHeigth%
+	guicontrol,log:move,GuiLogModeChange,x440 y10 w100 h%GuiLogButtonsHeigth%
 	guicontrol,log:move,GuiLogTextField,x10 y%GuiLogyText% w%GuiLogWidthText% h%GuiLogHeightText%
 	GuiLogTextFieldRows:=floor((GuiLogHeightText-10) / (GuiLogFontSize+6)) - 1
 	DebugLogOldCount:=0
@@ -139,6 +142,23 @@ showlog()
 	GuiLogClose:
 	gui,log:destroy
 	SetTimer,GuiLogrefreshText,off
+	return
+	
+	GuiLogModeChange:
+	if GuiLogMode = update
+	{
+		GuiLogMode = showall
+		SetTimer,GuiLogrefreshText,off
+	guicontrol,log:,GuiLogModeChange,% lang("Quick refresh")
+	}
+	else
+	{
+		GuiLogMode = update
+		SetTimer,GuiLogrefreshText,100
+	guicontrol,log:,GuiLogModeChange,% lang("Show all logs")
+	}
+	DebugLogOldCount:=0
+	gosub GuiLogrefreshText
 	return
 	
 	GuiLogrefresh:
@@ -156,6 +176,13 @@ showlog()
 	}
 	guicontrol,log:,GuiLogCategories,% GuiLogCategories
 	guicontrol,log:ChooseString,GuiLogCategories,% GuiLogCategoriesOld
+	gosub GuiLogrefreshText
+	return
+	
+	GuiLogCategories:
+	DebugLogOldCount:=0
+	gosub GuiLogrefreshText
+	return
 	
 	GuiLogrefreshText:
 	if not (DebugLogOldCount == _share.LogCount)
@@ -167,10 +194,17 @@ showlog()
 		else
 			DebugLogToShow:=_share["Log_" GuiLogCategories]
 		DebugLogOldCount:=_share.LogCount
-		StringGetPos,pos,DebugLogToShow,`n,R%GuiLogTextFieldRows%
-		if pos > -1
+		if GuiLogMode = update
 		{
-			DebugLogToShow:= substr(DebugLogToShow,pos+2)
+			StringGetPos,pos,DebugLogToShow,`n,R%GuiLogTextFieldRows%
+			if pos > -1
+			{
+				DebugLogToShow:= substr(DebugLogToShow,pos+2)
+			}
+		}
+		else
+		{
+			
 		}
 		GuiControl,log:,GuiLogTextField,% DebugLogToShow
 	}

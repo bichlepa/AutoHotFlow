@@ -238,7 +238,7 @@ Var_RetrieveDestination_Common(p_Name,p_Location,p_log=true)
 {
 	if (substr(p_Name,1,2)="A_") ;If variable name begins with A_
 	{
-		logger("f0","Setting built in variable '" p_Name "' failed. No permission given.")
+		return "error_noPermission"
 	}
 	else if (substr(p_Name,1,7)="global_")  ;If variable is global
 	{
@@ -250,7 +250,6 @@ Var_RetrieveDestination_Common(p_Name,p_Location,p_log=true)
 	}
 	else
 	{
-		logger("f0","Cannot set variable '" p_Name "' outside a running execution. It must be global or static.")
 		return "instance"
 	}
 }
@@ -287,7 +286,7 @@ Var_GetLocation_Common(Environment, p_Name, p_hidden=False)
 		}
 		else
 		{
-			logger("f0","Cannot get location hidden variable '" p_Name "' outside a running execution.")
+			logger("f0","Cannot get location of hidden variable '" p_Name "' outside a running execution.", Environment.flowname)
 		}
 	}
 	;~ d(Environment, "error-  " p_name)
@@ -301,13 +300,13 @@ Var_Set_Common(Environment, p_Name, p_Value, p_Destination="", p_hidden=False)
 	if (res="empty")
 	{
 		if (p_log=true or p_log="LOG")
-			logger("f0","Setting a variable failed. Its name is empty.")
+			logger("f0","Setting a variable failed. Its name is empty.", Environment.flowname)
 		return ;No result
 	}
 	else if (res="ForbiddenCharacter")
 	{
 		if (p_log=true or p_log="LOG")
-			logger("f0","Setting variable '" p_Name "' failed. It contains forbidden characters.")
+			logger("f0","Setting variable '" p_Name "' failed. It contains forbidden characters.", Environment.flowname)
 		return ;No result
 	}
 	
@@ -315,11 +314,11 @@ Var_Set_Common(Environment, p_Name, p_Value, p_Destination="", p_hidden=False)
 		destination:=Var_RetrieveDestination_Common(p_Name,p_Destination,"LOG")
 	else
 		destination:=p_Destination
-	if (destination!="")
+	if (destination!="" and not instr(destination, "error_"))
 	{
 		if (destination!="static" and destination!="global")
 		{
-			logger("f0","Setting variable '" p_Name "' failed. Destination is neither global nor static.")
+			logger("f0","Setting variable '" p_Name "' failed. Destination is neither global nor static.", Environment.flowname)
 		}
 		else
 		{
@@ -328,7 +327,14 @@ Var_Set_Common(Environment, p_Name, p_Value, p_Destination="", p_hidden=False)
 	}
 	else
 	{
-		logger("f0","Setting variable '" p_Name "' failed. Cannot retrieve destination.")
+		if (destination = "error_noPermission")
+		{
+			logger("f0","Setting variable '" p_Name "' failed. No permission.", Environment.flowname)
+		}
+		else
+		{
+			logger("f0","Setting variable '" p_Name "' failed. Cannot retrieve destination.", Environment.flowname)
+		}
 	}
 	;~ d(_execution.instances[Environment.InstanceID].InstanceVars,"instance vars set " p_Name)
 }
@@ -339,20 +345,20 @@ Var_Get_Common(environment, p_Name, p_hidden = False)
 	tempvalue=
 	if (p_Name="")
 	{
-		logger("f0","Retrieving variable failed. The name is empty")
+		logger("f0","Retrieving variable failed. The name is empty", Environment.flowname)
 	}
 	
 	tempLocation := Var_GetLocation_Common(Environment, p_Name, p_hidden)
 	
 	if (tempLocation)
 	{
-		logger("f3","Retrieving " tempLocation " variable '" p_Name "'")
+		logger("f3","Retrieving " tempLocation " variable '" p_Name "'", Environment.flowname)
 		tempVar := %tempLocation%Variable_Get(environment, p_Name, p_hidden)
 		return tempVar
 	}
 	else
 	{
-		logger("f0","Retrieving variable '" p_Name "' failed. It does not exist or is neither global nor static")
+		logger("f0","Retrieving variable '" p_Name "' failed. It does not exist or is neither global nor static", Environment.flowname)
 	}
 }
 
@@ -390,7 +396,6 @@ Var_CheckName(p_Name, tellWhy=false) ;Return 1 if valid. 0 if not
 	;Check whether the variable name is not empty
 	if p_Name=
 	{
-		;~ logger("f0","Setting a variable failed. Its name is empty.")
 		if tellWhy
 			return "Empty"
 		else
@@ -401,7 +406,6 @@ Var_CheckName(p_Name, tellWhy=false) ;Return 1 if valid. 0 if not
 		asdf%p_Name%:=1 
 	catch
 	{
-		;~ logger("f0","Setting variable '" p_Name "' failed. Name is invalid.")
 		if tellWhy
 			return "ForbiddenCharacter"
 		else

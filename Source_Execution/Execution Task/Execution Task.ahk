@@ -155,6 +155,12 @@ finishExecutionOfElement(Environment, Result, Message = "")
 	Environment.State:="finished"
 	Environment.result:=Result
 	Environment.message:=Message
+	
+	if (Environment.message)
+		logger("f2", "Execution of element " Environment.ElementID " finished with result " Environment.result " and message: " Environment.message, Environment.FlowName)
+	else
+		logger("f2", "Execution of element " Environment.ElementID " finished with result " Environment.result, Environment.FlowName)
+	
 	_flows[Environment.FlowID].allElements[Environment.ElementID].countRuns--
 	if (_flows[Environment.FlowID].allElements[Environment.ElementID].countRuns = 0)
 		_flows[Environment.FlowID].allElements[Environment.ElementID].state:="finished"

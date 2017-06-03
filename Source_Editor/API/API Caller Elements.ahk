@@ -446,7 +446,7 @@ x_ConvertStringToObjOrObjToString(p_Value)
 
 x_log(Environment, LoggingText, loglevel = 2)
 {
-	logger("f" loglevel, "Flow: " _flows[Environment.FlowID].name " (" Environment.FlowID ") - Element " _flows[Environment.FlowID].allElements[Environment.elementID].name " (" Environment.elementID "): " LoggingText)
+	logger("f" loglevel, "Element " _flows[Environment.FlowID].allElements[Environment.elementID].name " (" Environment.elementID "): " LoggingText, Environment.flowname)
 }
 x_GetFullPath(Environment, p_Path)
 {
