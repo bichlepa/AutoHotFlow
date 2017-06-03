@@ -7,12 +7,16 @@ load_settings()
 	filepathsettings:= my_workingdir "\settings.ini"
 	
 	settingsdefinitions:=Object()
-	settingsdefinitions.push({section: "common", key: "developing", default: ""})
+	settingsdefinitions.push({section: "common", key: "developing", default: false})
 	settingsdefinitions.push({section: "common", key: "UILanguage", default: ""})
 	settingsdefinitions.push({section: "common", key: "runAsAdmin", default: false})
 	settingsdefinitions.push({section: "flowSettings", key: "FlowExecutionPolicy", default: "parallel"})
 	settingsdefinitions.push({section: "flowSettings", key: "FlowWorkingDir", default: A_MyDocuments "\AutoHotFlow default working directory"})
 	settingsdefinitions.push({section: "appearance", key: "HideDemoFlows", default: False})
+	settingsdefinitions.push({section: "debug", key: "LogLevelFlow", default: 0})
+	settingsdefinitions.push({section: "debug", key: "LogLevelApp", default: 0})
+	settingsdefinitions.push({section: "debug", key: "LogLevelThread", default: 0})
+	settingsdefinitions.push({section: "debug", key: "LogToFile", default: False})
 	for oneindex, onesetting in settingsdefinitions
 	{
 		default:=onesetting.default

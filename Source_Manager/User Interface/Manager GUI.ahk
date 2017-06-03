@@ -369,6 +369,14 @@ TreeView_manager()
 			tempOldName := _share.allCategories[tempselectedID].name
 			if !(tempOldName == tempNewName) ;If user finished renaming entry and the name has changed
 			{
+				;Do not rename demonstration category
+				if (tempselectedID = "demo" and tempNewName != lang("Demonstration"))
+				{
+					soundplay,*16
+					MsgBox, 16, % lang("Rename category"), % lang("The demonstration category cannot be renamed")
+					TV_Modify(tempselectedTV, "", lang("Demonstration"))
+					return
+				}
 				;Do not rename if user has entered an empty name
 				if (tempNewName = "")
 				{

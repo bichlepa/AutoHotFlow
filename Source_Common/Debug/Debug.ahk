@@ -1,16 +1,16 @@
-﻿if not a_iscompiled
+﻿if (_settings.developing)
 {
 	hotkey, ^numpadenter, d_showGlobals
 	hotkey, ^numpadadd, d_showAnyVariable
-	
-
 }
-
 
 d(text,header="",wait=1)
 {
 	static
-	global dedit, dbutton, dbuttonShowGlobals
+	global dedit, dbutton, dbuttonShowGlobals, _settings
+	if not (_settings.developing)
+		return
+	
 	dfinished:=false
 	
 	if (isobject(text))

@@ -57,7 +57,6 @@ menu,tray, tip, Execution
 
 SetTimer,executionTask,10
 
-hotkey, ^NumpadMult, d_showAnyVariable
 return
 
 

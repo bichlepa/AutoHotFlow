@@ -9,10 +9,6 @@
 ; 2: more logs
 ; 3: all logs
 
-DebugLogLevelApp:=2
-DebugLogLevelFlow:=2
-DebugLogLevelThread:=1
-SettingFlowLogToFile:=true
 
 if not fileexist(my_workingdir "\Log")
 	FileCreateDir, % my_workingdir "\Log"
@@ -28,7 +24,7 @@ logger(LogLevel,LoggingText)
 	local shouldLog:=false
 	_share.LogCount++
 	_share.logcountAfterTidy++
-	;~ ToolTip,%LogLevel% - %DebugLogLevel%
+	
 	state=1
 	
 	Loop, parse, LogLevel
@@ -62,17 +58,17 @@ logger(LogLevel,LoggingText)
 				if lastfield=a
 				{
 					
-					if (A_LoopField <= DebugLogLevelApp)
+					if (A_LoopField <= _settings.LogLevelApp)
 						shouldLog:=true
 				}
 				else if lastfield=f
 				{
-					if (A_LoopField <= DebugLogLevelFlow)
+					if (A_LoopField <= _settings.LogLevelFlow)
 						shouldLog:=true
 				}
 				else if lastfield=t
 				{
-					if (A_LoopField <= DebugLogLevelThread)
+					if (A_LoopField <= _settings.LogLevelThread)
 						shouldLog:=true
 				}
 			}
@@ -87,7 +83,7 @@ logger(LogLevel,LoggingText)
 		FormatTime,timestamp,a_now,yyyy MM dd HH:mm:ss
 		DebugLogLastEntry:="`n--- " timestamp " ~" Global_ThisThreadID "~ " LoggingText
 		_share.log.=DebugLogLastEntry
-		if SettingFlowLogToFile
+		if (_settings.logtofile)
 		{
 			FileAppend,% DebugLogLastEntry,%my_workingdir%\Log\Log.txt,UTF-8
 		}
