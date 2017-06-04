@@ -54,12 +54,6 @@ ui_SettingsOwFLow()
 	
 	gui,font,s10 cnavy wbold
 	gui,add,text,x10 w300 Y+15,% lang("Debug options")
-	gui,font,s8 cDefault wnorm
-	if (flowobj.flowSettings.LogToFile=1)
-		tempchecked=1
-	else
-		tempchecked=0
-	gui,add,Checkbox,w300 x10 Y+10 vGuiFlowSettingsLogToFile checked%tempchecked% ,% lang("Log to file")
 	gui,add,button,w300 x10 h30 Y+10 gGuiFlowSettingsButtonShowLog,% lang("Show log")
 	
 	gui,add,button,w145 x10 h30 Y+20 gGuiFlowSettingsOK default,% lang("Save")
@@ -80,7 +74,7 @@ ui_SettingsOwFLow()
 	return
 	
 	GuiFlowSettingsButtonShowLog:
-	showlog()
+	showlog(flowobj.name)
 	return
 	
 	GuiFlowSettingsDefaultWorkingDir:
@@ -143,11 +137,6 @@ ui_SettingsOwFLow()
 		someSettingChanged:=true
 	}
 	
-	if (flowobj.flowSettings.LogToFile!=GuiFlowSettingsLogToFile)
-	{
-		flowobj.flowSettings.LogToFile:=GuiFlowSettingsLogToFile
-		someSettingChanged:=true
-	}
 	if someSettingChanged:=true
 	{
 		API_Main_State_New(flowobj.id)

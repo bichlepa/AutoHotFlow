@@ -92,22 +92,25 @@ logger(LogLevel,LoggingText, logSource="common")
 }
 
 
-showlog()
+showlog(whichone="all")
 {
 	global 
 	GuiLogFontSize:=8
 	GuiLogTextFieldRows:=0
 	GuiLogButtonsHeigth:=30
 	GuiLogMode:="update"
+	GuiLogCategory:=whichone
 	gui,log:destroy
 	gui,log:font,s%GuiLogFontSize%
-	gui,log: add, dropdownlist, vGuiLogCategories gGuiLogCategories
+	gui,log: add, dropdownlist, vGuiLogCategory gGuiLogCategory
 	gui,log: add, button,gGuiLogrefresh vGuiLogrefresh, % lang("Refresh")
 	gui,log:add,button,gGuiLogClose vGuiLogClose default,% lang("Close")
 	gui,log:add,button,gGuiLogModeChange vGuiLogModeChange default,% lang("Show all logs")
 	gui,log:add,edit, ReadOnly vGuiLogTextField Multi -wrap VScroll HScroll
 	gui,log:+resize
 	gui,log:+MinSize500x300
+	
+	GuiControl,log:ChooseString,GuiLogCategory, %whichone%
 	
 	DebugLogOldCount:=0
 	SetTimer,GuiLogrefreshText,100
@@ -128,7 +131,7 @@ showlog()
 	GuiLogWidthText:=GuiLogSizeW - 20
 	GuiLogHeightText:=GuiLogSizeH - 20-GuiLogButtonsHeigth-10
 	GuiLogyText:=10+GuiLogButtonsHeigth+10
-	guicontrol,log:move,GuiLogCategories,x10 y10 w200 h%GuiLogButtonsHeigth%
+	guicontrol,log:move,GuiLogCategory,x10 y10 w200 h%GuiLogButtonsHeigth%
 	guicontrol,log:move,GuiLogrefresh,x220 y10 w100 h%GuiLogButtonsHeigth%
 	guicontrol,log:move,GuiLogClose,x330 y10 w100 h%GuiLogButtonsHeigth%
 	guicontrol,log:move,GuiLogModeChange,x440 y10 w100 h%GuiLogButtonsHeigth%
@@ -163,23 +166,23 @@ showlog()
 	
 	GuiLogrefresh:
 	;find all log categories
-	GuiControlGet,GuiLogCategoriesOld,log:,GuiLogCategories
-	if (GuiLogCategoriesOld = "")
-		GuiLogCategoriesOld := "all"
-	GuiLogCategories:="|all"
+	GuiControlGet,GuiLogCategoryOld,log:,GuiLogCategory
+	if (GuiLogCategoryOld = "")
+		GuiLogCategoryOld := whichone
+	GuiLogCategory:="|all"
 	for onekeyfromShare, onevalueFromShare in _share
 	{
 		if (substr(onekeyfromShare,1,4) = "log_")
 		{
-			GuiLogCategories.="|" substr(onekeyfromShare,5)
+			GuiLogCategory.="|" substr(onekeyfromShare,5)
 		}
 	}
-	guicontrol,log:,GuiLogCategories,% GuiLogCategories
-	guicontrol,log:ChooseString,GuiLogCategories,% GuiLogCategoriesOld
+	guicontrol,log:,GuiLogCategory,% GuiLogCategory
+	guicontrol,log:ChooseString,GuiLogCategory,% GuiLogCategoryOld
 	gosub GuiLogrefreshText
 	return
 	
-	GuiLogCategories:
+	GuiLogCategory:
 	DebugLogOldCount:=0
 	gosub GuiLogrefreshText
 	return
@@ -187,12 +190,12 @@ showlog()
 	GuiLogrefreshText:
 	if not (DebugLogOldCount == _share.LogCount)
 	{
-		GuiControlGet,GuiLogCategories,log:,GuiLogCategories
+		GuiControlGet,GuiLogCategory,log:,GuiLogCategory
 		
-		if (GuiLogCategories = "all")
+		if (GuiLogCategory = "all")
 			DebugLogToShow:=_share.Log
 		else
-			DebugLogToShow:=_share["Log_" GuiLogCategories]
+			DebugLogToShow:=_share["Log_" GuiLogCategory]
 		DebugLogOldCount:=_share.LogCount
 		if GuiLogMode = update
 		{
