@@ -11,6 +11,12 @@ Element_getElementType_Action_Select_file()
 	return "action"
 }
 
+Element_getElementLevel_Action_Select_file()
+{
+	;"Beginner" or "Advanced" or "Programmer"
+	return "Beginner"
+}
+
 Element_getName_Action_Select_file()
 {
 	return lang("Select_file")

@@ -11,6 +11,12 @@ Element_getElementType_Loop_Work_through_a_list()
 	return "loop"
 }
 
+Element_getElementLevel_Loop_Work_through_a_list()
+{
+	;"Beginner" or "Advanced" or "Programmer"
+	return "Beginner"
+}
+
 Element_getName_Loop_Work_through_a_list()
 {
 	return lang("Work_through_a_list")

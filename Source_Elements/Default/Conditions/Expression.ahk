@@ -11,6 +11,12 @@ Element_getElementType_Condition_Expression()
 	return "condition"
 }
 
+Element_getElementLevel_Condition_Expression()
+{
+	;"Beginner" or "Advanced" or "Programmer"
+	return "Beginner"
+}
+
 Element_getName_Condition_Expression()
 {
 	return lang("Expression")

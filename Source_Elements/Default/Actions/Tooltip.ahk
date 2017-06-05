@@ -11,6 +11,12 @@ Element_getElementType_Action_Tooltip()
 	return "action"
 }
 
+Element_getElementLevel_Action_Tooltip()
+{
+	;"Beginner" or "Advanced" or "Programmer"
+	return "Beginner"
+}
+
 Element_getName_Action_Tooltip()
 {
 	return lang("Tooltip")

@@ -35,6 +35,10 @@ globalSettings_GUI()
 	GuiFlowSettingsskip:=(_settings.FlowExecutionPolicy = "skip")
 	GuiFlowSettingsWait:=(_settings.FlowExecutionPolicy = "Wait")
 	GuiFlowSettingsStop:=(_settings.FlowExecutionPolicy = "Stop")
+	GuiShowElementsBeginner:=(_settings.ShowElementsLevel = "Beginner")
+	GuiShowElementsAdvanced:=(_settings.ShowElementsLevel = "Advanced")
+	GuiShowElementsProgrammer:=(_settings.ShowElementsLevel = "Programmer")
+	;~ GuiShowElementsCustom:=(_settings.ShowElementsLevel = "Custom") ;TODO
 	GuiSettingsHideDemoFlows:=(!!_settings.HideDemoFlows)
 	GUIloglevelFlow:=_settings.LogLevelFlow
 	GUIloglevelApp:=_settings.LogLevelApp
@@ -79,6 +83,13 @@ globalSettings_GUI()
 	gui,add,text,xs ys w300,% lang("Shown flows")
 	gui,font,s8 cDefault wnorm
 	gui,add,Checkbox,xs Y+10 w300 checked%GuiSettingsHideDemoFlows% vGuiSettingsHideDemoFlows ,% lang("Hide demonstration flows") 
+	gui,font,s10 cnavy wbold
+	gui,add,text, xs Y+20 w300, % lang("Shown elements") 
+	gui,font,s8 cDefault wnorm
+	gui,add,radio,xs Y+10 w300 vGuiShowElementsBeginner checked%GuiShowElementsBeginner%,% lang("Beginner level")
+	gui,add,radio,xs Y+10 w300 vGuiShowElementsAdvanced checked%GuiShowElementsAdvanced%,% lang("Advanced level")
+	gui,add,radio,xs Y+10 w300 vGuiShowElementsProgrammer checked%GuiShowElementsProgrammer%,% lang("Programmer level")
+	;~ gui,add,radio,xs Y+10 w300 vGuiShowElementsCustom checked%GuiShowElementsCustom%,% lang("Custom") ;TODO
 		
 	gui,tab, %globalsetting_tab_Debugging%
 	gui,font,s10 cnavy wbold
@@ -189,6 +200,11 @@ globalSettings_GUI()
 	GuiFlowSettingsskip ? _settings.FlowExecutionPolicy := "skip"
 	GuiFlowSettingsWait ? _settings.FlowExecutionPolicy := "Wait"
 	GuiFlowSettingsStop ? _settings.FlowExecutionPolicy := "Stop"
+	
+	GuiShowElementsBeginner ? _settings.ShowElementsLevel := "Beginner"
+	GuiShowElementsAdvanced ? _settings.ShowElementsLevel := "Advanced"
+	GuiShowElementsProgrammer ? _settings.ShowElementsLevel := "Programmer"
+	;~ GuiShowElementsCustom ? _settings.ShowElementsLevel := "Custom" ;TODO
 	
 
 	;Write current settings to file

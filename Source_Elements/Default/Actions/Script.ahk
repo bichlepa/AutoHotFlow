@@ -11,6 +11,12 @@ Element_getElementType_Action_Script()
 	return "action"
 }
 
+Element_getElementLevel_Action_Script()
+{
+	;"Beginner" or "Advanced" or "Programmer"
+	return "Beginner"
+}
+
 Element_getName_Action_Script()
 {
 	return lang("Script")

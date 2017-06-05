@@ -11,6 +11,12 @@ Element_getElementType_Action_New_variable()
 	return "action"
 }
 
+Element_getElementLevel_Action_New_variable()
+{
+	;"Beginner" or "Advanced" or "Programmer"
+	return "Beginner"
+}
+
 Element_getName_Action_New_variable()
 {
 	return lang("New_variable")

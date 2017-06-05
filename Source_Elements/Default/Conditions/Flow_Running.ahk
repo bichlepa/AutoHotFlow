@@ -11,6 +11,12 @@ Element_getElementType_Condition_Flow_Running()
 	return "condition"
 }
 
+Element_getElementLevel_Condition_Flow_Running()
+{
+	;"Beginner" or "Advanced" or "Programmer"
+	return "Beginner"
+}
+
 Element_getName_Condition_Flow_Running()
 {
 	return lang("Flow_Executing")

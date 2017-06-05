@@ -11,6 +11,12 @@ Element_getElementType_Loop_SimpleLoop()
 	return "loop"
 }
 
+Element_getElementLevel_Loop_SimpleLoop()
+{
+	;"Beginner" or "Advanced" or "Programmer"
+	return "Beginner"
+}
+
 Element_getName_Loop_SimpleLoop()
 {
 	return lang("Simple loop")

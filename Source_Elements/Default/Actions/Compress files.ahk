@@ -11,6 +11,12 @@ Element_getElementType_Action_Compress_files()
 	return "action"
 }
 
+Element_getElementLevel_Action_Compress_files()
+{
+	;"Beginner" or "Advanced" or "Programmer"
+	return "Advanced"
+}
+
 Element_getName_Action_Compress_files()
 {
 	return lang("Compress_files")

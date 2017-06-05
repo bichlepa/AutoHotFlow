@@ -86,6 +86,8 @@ _flows is an associative array of objects. Each object contains some information
 		.allConnections
 		.allTriggers
 	.currentState	ID of current state
+	
+	.demo			True if the flow is a demonstration flow
 */
 global _flows := CriticalObject()
 

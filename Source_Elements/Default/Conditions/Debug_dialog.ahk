@@ -11,6 +11,12 @@ Element_getElementType_Condition_Debug_Dialog()
 	return "condition"
 }
 
+Element_getElementLevel_Condition_Debug_Dialog()
+{
+	;"Beginner" or "Advanced" or "Programmer"
+	return "Beginner"
+}
+
 Element_getName_Condition_Debug_Dialog()
 {
 	return lang("Debug_Dialog")

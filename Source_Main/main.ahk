@@ -172,11 +172,11 @@ ExitApp
 return
 
 exit:
-global exitingNow
+global _exitingNow
 
-if (exitingNow!=true)
+if (_exitingNow!=true)
 {
-	exitingNow:=true
+	_exitingNow:=true
 	
 	i_SaveUnsavedFlows()
 	

@@ -61,6 +61,7 @@ justEnableOneTrigger(p_Flow, p_Trigger)
 	{
 		logger("a0", "Trigger " triggerEnvironment.ElementID " cannot be enabled (missing implementation)")
 	}
+	p_Flow.enabled:=true
 }
 
 disableTriggers(p_Flow)

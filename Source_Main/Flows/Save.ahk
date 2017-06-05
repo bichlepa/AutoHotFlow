@@ -6,13 +6,21 @@ SaveFlowMetaData(FlowID)
 	global
 	local enabledFlows
 	
+	logger("a2","Saving meta data of flow " FlowName)
+	
 	if (_Flows[FlowID].file="")
 	{
 		;Do not save anything if flow does not exist. (Should not happen)
 		MsgBox unexpected error. should save flow "%FlowID%", but no flow file specified
 		return
 	}
-		
+	
+	if (_Flows[FlowID].demo and _settings.developing != True)
+	{
+		;A demo flow cannot be saved
+		logger("a0","Cannot save metadata of flow " FlowName ". It is a demonstation flow.")
+		return
+	}
 	
 	;~ d(_Flows[FlowID],FlowID)
 	if not fileexist(_Flows[FlowID].file)
@@ -22,12 +30,10 @@ SaveFlowMetaData(FlowID)
 	
 	IniWrite,% _Flows[FlowID].name,% _Flows[FlowID].file,general,name
 	IniWrite,% _Flows[FlowID].id,% _Flows[FlowID].file,general,ID
-	if (_Flows[FlowID].categoryname = lang("uncategorized"))
-		IniWrite,% "",% _Flows[FlowID].file,general,category ;If the flow has no category, do not save the category name
-	else
-		IniWrite,% _Flows[FlowID].categoryname,% _Flows[FlowID].file,general,category
+	IniWrite,% _Flows[FlowID].demo,% _Flows[FlowID].file,general,demo
+	IniWrite,% _Flows[FlowID].categoryname,% _Flows[FlowID].file,general,category
 	
-	if (shuttingDown<>true) ;Do not save if it is shutting down and disabling the flows
+	if (_exitingNow<>true) ;Do not save if it is shutting down and disabling the flows
 	{
 		enabledTriggers:=""
 		for oneID, oneElement in _Flows[FlowID].allElements
@@ -63,6 +69,16 @@ SaveFlow(FlowID)
 	;~ ToolTip(lang("saving"),100000)
 	
 	
+	if (_Flows[FlowID].demo and _settings.developing != True)
+	{
+		;A demo flow cannot be saved
+		logger("a0","Cannot save metadata of flow " FlowName ". It is a demonstation flow.")
+		if (_exitingNow != True)
+		{
+			MsgBox, 48, % lang("Save flow"), % lang("This flow cannot be saved because it is a demonstration flow.") " " lang("You may duplicate this flow first and then you can edit it.")
+		}
+		return
+	}
 	
 	enabledTriggers:=""
 	for oneID, oneElement in _Flows[FlowID].allElements
@@ -101,6 +117,7 @@ SaveFlow(FlowID)
 	RIni_AppendValue("iniSave", "general", "Offsetx", _flows[FlowID].flowSettings.Offsetx)
 	RIni_AppendValue("iniSave", "general", "Offsety", _flows[FlowID].flowSettings.Offsety)
 	RIni_AppendValue("iniSave", "general", "zoomFactor", _flows[FlowID].flowSettings.zoomFactor)
+	RIni_AppendValue("iniSave", "general", "demo", _flows[FlowID].demo)
 	
 		
 	

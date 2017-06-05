@@ -11,6 +11,12 @@ Element_getElementType_Trigger_Hotkey()
 	return "trigger"
 }
 
+Element_getElementLevel_Trigger_Hotkey()
+{
+	;"Beginner" or "Advanced" or "Programmer"
+	return "Beginner"
+}
+
 Element_getName_Trigger_Hotkey()
 {
 	return lang("Hotkey")

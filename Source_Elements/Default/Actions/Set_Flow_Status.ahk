@@ -11,6 +11,12 @@ Element_getElementType_Action_Set_Flow_Status()
 	return "action"
 }
 
+Element_getElementLevel_Action_Set_Flow_Status()
+{
+	;"Beginner" or "Advanced" or "Programmer"
+	return "Beginner"
+}
+
 Element_getName_Action_Set_Flow_Status()
 {
 	return lang("Set_Flow_Status")

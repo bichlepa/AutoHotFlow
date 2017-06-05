@@ -58,33 +58,13 @@ selectSubType(p_ElementID,wait="")
 	
 	;~ d(AllElementClasses)
 	
-	for forelementIndex, forElementClass in AllElementClasses
-	{
-		if (Element_getElementType_%forElementClass%() = setElementType)
-		{
-			matchingElementClasses.push(forElementClass)
-			tempcategory:=Element_getCategory_%forElementClass%()
-			
-			StringSplit,tempcategory,tempcategory,|
-			;MsgBox %tempElementCategory1%
-			loop %tempcategory0%
-			{
-				if not (objhasvalue(allCategories,tempcategory%a_index%))
-					allCategories.push(tempcategory%a_index%)
-			}
-		}
-	}
-	
-	if not (matchingElementClasses.MaxIndex()>0)
-		MsgBox,Internal Error: No elements found of type: %setElementType%
-	
 	EditGUIDisable()
 	gui,3:default
 	
 	gui,destroy
 	gui,-dpiscale
 	gui,font,s12
-	gui,add,text,,% lang("Which_%1% should be created?", lang(setElementType))
+	gui,add,text,,% lang("Which %1% should be created?", lang(setElementType))
 	gui,add,TreeView,w400 h500 vGuiElementChoose gGuiElementChoose AltSubmit
 	gui,add,Button,w250 gGuiElementChooseOK vGuiElementChooseOK default Disabled,% lang("OK")
 	gui,add,Button,w140 X+10 yp gGuiElementChooseCancel,% lang("Cancel")
@@ -93,10 +73,38 @@ selectSubType(p_ElementID,wait="")
 	TVID:=Object()
 	TVSubType:=Object()
 	TVClass:=Object()
-	for forindex, forcategory in allCategories ;add all categories to the treeview
+	
+	;Find out wich categories exist
+	for forelementIndex, forElementClass in AllElementClasses
+	{
+		if (Element_getElementType_%forElementClass%() = setElementType)
+		{
+			if (ShouldShowThatelementLevel(IsFunc("Element_getElementLevel_" forElementClass) ? Element_getElementLevel_%forElementClass%() : "Beginner")
+				OR setElement.class = forElementClass)
+			{
+				matchingElementClasses.push(forElementClass)
+				tempcategory:=Element_getCategory_%forElementClass%()
+				
+				StringSplit,tempcategory,tempcategory,|
+				;MsgBox %tempElementCategory1%
+				loop %tempcategory0%
+				{
+					if not (objhasvalue(allCategories,tempcategory%a_index%))
+						allCategories.push(tempcategory%a_index%)
+				}
+			}
+		}
+	}
+	
+	;add all categories to the treeview
+	for forindex, forcategory in allCategories 
 	{
 		tempcategoryTV%forindex%:=TV_Add(forcategory)
 	}
+	if not (matchingElementClasses.MaxIndex()>0)
+		MsgBox,Internal Error: No elements found of type: %setElementType%
+	
+	;add all elements to the treeview
 	for forelementIndex, forElementClass in matchingElementClasses
 	{
 		tempcategory:=Element_getCategory_%forElementClass%()
@@ -112,12 +120,16 @@ selectSubType(p_ElementID,wait="")
 				if (tempAnCategory = forcategory)
 					tempcategoryTV:=tempcategoryTV%forindex%
 			}
-			tempTV:=TV_Add(Element_getName_%forElementClass%(),tempcategoryTV)
-			TVnum[tempTV]:=forelementIndex
-			TVID[tempTV]:=setElementID
-			TVClass[tempTV]:=forElementClass
-			if (setElement.class=forElementClass) ;Select the current element type, if any
-				TV_Modify(tempTV) 
+			if (ShouldShowThatelementLevel(IsFunc("Element_getElementLevel_" forElementClass) ? Element_getElementLevel_%forElementClass%() : "Beginner")
+				OR setElement.class = forElementClass)
+			{
+				tempTV:=TV_Add(Element_getName_%forElementClass%(),tempcategoryTV)
+				TVnum[tempTV]:=forelementIndex
+				TVID[tempTV]:=setElementID
+				TVClass[tempTV]:=forElementClass
+				if (setElement.class=forElementClass) ;Select the current element type, if any
+					TV_Modify(tempTV) 
+			}
 		}
 		
 	}
@@ -442,5 +454,39 @@ selectContainerType(p_ElementID, wait="")
 	
 }
 
-
+ShouldShowThatElementLevel(elementlevel)
+{
+	if (_settings.ShowElementsLevel = "Beginner")
+	{
+		scoreFromSettings:=1
+	}
+	else if (_settings.ShowElementsLevel = "Advanced")
+	{
+		scoreFromSettings:=2
+	}
+	else if (_settings.ShowElementsLevel = "Programmer")
+	{
+		scoreFromSettings:=3
+	}
+	else if (_settings.ShowElementsLevel = "Custom")
+	{
+		;TODO
+	}
+	if (elementlevel = "Beginner")
+	{
+		score:=1
+	}
+	else if (elementlevel = "Advanced")
+	{
+		score:=2
+	}
+	else if (elementlevel = "Programmer")
+	{
+		score:=3
+	}
+	if (scoreFromSettings >=score)
+		return True
+	else
+		return False
+}
 

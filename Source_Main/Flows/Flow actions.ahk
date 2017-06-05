@@ -4,6 +4,11 @@
 	local FoundThreadID, oneThreadID, oneThread
 	;~ d(global_AllThreads)
 	
+	if (_flows[par_FlowID].demo and _settings.developing != True)
+	{
+		MsgBox, 48, % lang("Edit flow"), % lang("You are opening a demonstration flow for edit.") " " lang("Please be aware that a demonstration flow cannot be changed.") " " lang("You may duplicate this flow first and then you can edit it.")
+	}
+	
 	if (_flows[par_FlowID].loaded != true)
 	{
 		LoadFlow(par_FlowID)
@@ -25,8 +30,6 @@
 	if (FoundThreadID != "")
 	{
 		API_Editor_EditGUIshow(par_FlowID)
-		
-		
 	}
 	else
 	{

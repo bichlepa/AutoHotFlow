@@ -11,6 +11,12 @@ Element_getElementType_Action_Trace_Point_Check()
 	return "action"
 }
 
+Element_getElementLevel_Action_Trace_Point_Check()
+{
+	;"Beginner" or "Advanced" or "Programmer"
+	return "Programmer"
+}
+
 Element_getName_Action_Trace_Point_Check()
 {
 	return lang("Trace_Point_Check")

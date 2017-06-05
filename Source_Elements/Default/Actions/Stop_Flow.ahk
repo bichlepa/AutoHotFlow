@@ -11,6 +11,12 @@ Element_getElementType_Action_Stop_Flow()
 	return "action"
 }
 
+Element_getElementLevel_Action_Stop_Flow()
+{
+	;"Beginner" or "Advanced" or "Programmer"
+	return "Beginner"
+}
+
 Element_getName_Action_Stop_Flow()
 {
 	return lang("Stop_Flow")

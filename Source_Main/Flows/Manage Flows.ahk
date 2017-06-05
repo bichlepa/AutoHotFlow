@@ -108,13 +108,10 @@ InitFlow(FileFullPath)
 	
 	_flows[newFlowID].draw := []
 	
-	
-	
 	if (tempflowenabled != 0) ;Enable flow
 	{
 		loop, parse,tempflowenabled,|
 		{
-			;~ d(newFlowid, A_loopfield)
 			enableOneTrigger(newFlowID, A_LoopField, False)
 		}
 	}
@@ -323,6 +320,25 @@ DuplicateFlow(par_ID)
 	_flows[newFlowid].id := newFlowid
 	_flows[newFlowid].name .= " " lang("copy")
 	_flows[newFlowid].enabled := false
+	_flows[newFlowid].demo := false ;If user copies a demo flow, the copy is not a demo flow anymore and user can edit it
+	
+	;Do not allow two flows to have the same name. If a loaded flow has a name that an other flow already has, the flow will be renamed
+	tempflowName:=_flows[newFlowid].name
+	Loop
+	{
+		if (FlowIDbyName(tempflowName, "flow"))
+		{
+			StringGetPos,posspace,tempflowName,%a_space%,R
+			tempFlowNumberInName:=substr(tempFlowName,posspace+2)
+			if tempFlowNumberInName is number
+				tempflowName:=substr(tempFlowName,1,posspace) " " tempFlowNumberInName+1
+			else
+				tempflowName:=tempFlowName " " 2
+		}
+		else
+			break
+	}
+	_flows[newFlowid].name:=tempflowName
 	
 	;Create a new file
 	_flows[newFlowid].folder := _WorkingDir "\Saved Flows"

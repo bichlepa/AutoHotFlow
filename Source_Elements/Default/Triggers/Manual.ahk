@@ -11,6 +11,12 @@ Element_getElementType_Trigger_Manual()
 	return "trigger"
 }
 
+Element_getElementLevel_Trigger_Manual()
+{
+	;"Beginner" or "Advanced" or "Programmer"
+	return "Beginner"
+}
+
 Element_getName_Trigger_Manual()
 {
 	return lang("Manual")
