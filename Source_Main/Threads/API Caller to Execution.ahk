@@ -100,3 +100,17 @@ API_Execution_externalFlowFinish(par_UniqueID)
 	
 }
 
+;When a trigger has been using a separate thread in order to execute some code, this thread calls this function
+API_Execution_externalTrigger(par_UniqueID)
+{
+	global
+	local retvalue
+	logger("t2", A_ThisFunc " called")
+	
+	retvalue := AhkThreadExecution1.ahkFunction("API_Call_Execution_externalTrigger", par_UniqueID)
+	logger("t2", A_ThisFunc " finished")
+	
+	return retvalue
+	
+}
+

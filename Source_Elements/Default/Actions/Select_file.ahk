@@ -71,21 +71,21 @@ CheckSettingsActionSelect_file(ID)
 {
 	if (ElementParameters.MultiSelect = True)
 	{
-		x_Par_Disable(Environment,"SaveButton")
-		x_Par_SetValue(Environment,"SaveButton", False)
+		x_Par_Disable("SaveButton")
+		x_Par_SetValue("SaveButton", False)
 	}
 	else
 	{
-		x_Par_Enable(Environment,"SaveButton")
+		x_Par_Enable("SaveButton")
 	}
 	if (ElementParameters.SaveButton = True)
 	{
-		x_Par_Disable(Environment,"fileMustExist")
-		x_Par_SetValue(Environment,"fileMustExist", False)
+		x_Par_Disable("fileMustExist")
+		x_Par_SetValue("fileMustExist", False)
 	}
 	else
 	{
-		x_Par_Enable(Environment,"fileMustExist")
+		x_Par_Enable("fileMustExist")
 	}
 }
 

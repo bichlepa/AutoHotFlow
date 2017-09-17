@@ -9,8 +9,8 @@
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
 
 SetWorkingDir %A_ScriptDir%\..  ; set working dir.
-_WorkingDir := _share._WorkingDir
-_ScriptDir := _share._ScriptDir
+global _WorkingDir := _share._WorkingDir
+global _ScriptDir := _share._ScriptDir
 SetWorkingDir %a_temp%  ; using working dir forbidden.
 
 ;~ MsgBox %a_workingdir%

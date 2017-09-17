@@ -77,26 +77,26 @@ Element_CheckSettings_Action_Trace_Point_Check(Environment, ElementParameters)
 {
 	if (ElementParameters.MustPassTracepointsAll = True)
 	{
-		x_Par_Disable(Environment,"MustPassTracepoints")
-		x_Par_Disable(Environment,"MustNotPassTracepointsAll")
-		x_Par_SetValue(Environment,"MustNotPassTracepointsAll", False)
+		x_Par_Disable("MustPassTracepoints")
+		x_Par_Disable("MustNotPassTracepointsAll")
+		x_Par_SetValue("MustNotPassTracepointsAll", False)
 	}
 	else
 	{
-		x_Par_Enable(Environment,"MustPassTracepoints")
-		x_Par_Enable(Environment,"MustNotPassTracepointsAll")
+		x_Par_Enable("MustPassTracepoints")
+		x_Par_Enable("MustNotPassTracepointsAll")
 	}
 	
 	if (ElementParameters.MustNotPassTracepointsAll = True)
 	{
-		x_Par_Disable(Environment,"MustNotPassTracepoints")
-		x_Par_Disable(Environment,"MustPassTracepointsAll")
-		x_Par_SetValue(Environment,"MustPassTracepointsAll", False)
+		x_Par_Disable("MustNotPassTracepoints")
+		x_Par_Disable("MustPassTracepointsAll")
+		x_Par_SetValue("MustPassTracepointsAll", False)
 	}
 	else
 	{
-		x_Par_Enable(Environment,"MustNotPassTracepoints")
-		x_Par_Enable(Environment,"MustPassTracepointsAll")
+		x_Par_Enable("MustNotPassTracepoints")
+		x_Par_Enable("MustPassTracepointsAll")
 	}
 	
 	

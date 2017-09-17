@@ -3,8 +3,8 @@
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
 
 SetWorkingDir %A_ScriptDir%\..  ; set working dir.
-_WorkingDir := _share._WorkingDir
-_ScriptDir := _share._ScriptDir
+global _WorkingDir := _share._WorkingDir
+global _ScriptDir := _share._ScriptDir
 SetWorkingDir %a_temp%  ; using working dir forbidden.
 
 SetBatchLines -1
@@ -46,6 +46,7 @@ lang_setLanguage(_settings.UILanguage)
 #include Source_Editor\Elements\Clipboard.ahk
 #include Source_Editor\API\API receiver Editor.ahk
 #include Source_Editor\API\API Caller Elements.ahk
+#include Source_Editor\Assistants\Get window information.ahk
 
 #include source_Common\Multithreading\API Caller Main.ahk
 #include source_Common\Debug\Debug.ahk

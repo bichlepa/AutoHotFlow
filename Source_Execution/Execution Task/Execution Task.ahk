@@ -1,4 +1,5 @@
 ﻿global global_AllExecutionIDs:=Object()
+global global_AllActiveTriggerIDs:=Object()
 
 executionTask()
 {

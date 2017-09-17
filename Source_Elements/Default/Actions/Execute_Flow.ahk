@@ -84,25 +84,25 @@ Element_CheckSettings_Action_Execute_Flow(Environment, ElementParameters)
 	static oldParThisFlow
 	if (ElementParameters.WaitToFinish = False)
 	{
-		x_Par_Disable(Environment,"ReturnVariables")
-		x_Par_SetValue(Environment,"ReturnVariables", False)
+		x_Par_Disable("ReturnVariables")
+		x_Par_SetValue("ReturnVariables", False)
 	}
 	else
 	{
-		x_Par_Enable(Environment,"ReturnVariables")
+		x_Par_Enable("ReturnVariables")
 	}	
 	
 	if (ElementParameters.defaultTrigger = True)
 	{
-		x_Par_Disable(Environment,"triggerName")
-		x_Par_SetValue(Environment,"triggerName", "")
+		x_Par_Disable("triggerName")
+		x_Par_SetValue("triggerName", "")
 	}
 	else
 	{
-		x_Par_Enable(Environment,"triggerName")
+		x_Par_Enable("triggerName")
 	}	
 	
-	x_Par_Disable(Environment,"flowName",ElementParameters.ThisFlow)
+	x_Par_Disable("flowName",ElementParameters.ThisFlow)
 	
 	if (oldParFlowName!=ElementParameters.flowName or oldParThisFlow!=ElementParameters.ThisFlow or x_FirstCallOfCheckSettings(Environment))
 	{
@@ -126,7 +126,7 @@ Element_CheckSettings_Action_Execute_Flow(Environment, ElementParameters)
 			elementPars:=x_getElementPars(FlowID, oneTriggerID)
 			choicesTriggers.push(elementPars.id)
 		}
-		x_Par_SetChoices(Environment,"triggerName", choicesTriggers)
+		x_Par_SetChoices("triggerName", choicesTriggers)
 		
 		toChoose:=choicesTriggers[1]
 		for oneIndex, oneChoice in choicesTriggers
@@ -137,7 +137,7 @@ Element_CheckSettings_Action_Execute_Flow(Environment, ElementParameters)
 			}
 		}
 		;~ d(choicesTriggers, tochoose)
-		x_Par_SetValue(Environment,"triggerName", toChoose)
+		x_Par_SetValue("triggerName", toChoose)
 		
 	}
 	

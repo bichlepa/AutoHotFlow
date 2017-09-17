@@ -163,7 +163,7 @@ LoadFlow(FlowID, filepath="", params="")
 				;If element class is not installed, prepare a warning message
 				if not (ObjHasValue(AllElementClasses,loadElementClass))
 				{
-					;~ MsgBox % _flows[FlowID].allElements[loadElementID].Class "`n" loadElementPackage
+					;~ d(_flows[FlowID], FlowID " - " loadElementPackage)
 					if not (ObjHasValue(missingpackages,loadElementPackage))
 						missingpackages.push(loadElementPackage)
 				}
@@ -203,7 +203,11 @@ LoadFlow(FlowID, filepath="", params="")
 			if (_flows[FlowID].allElements[loadElementID].StandardName)
 			{
 				if (IsFunc("Element_GenerateName_" loadElementClass))
-					_flows[FlowID].allElements[loadElementID].Name:=Element_GenerateName_%loadElementClass%(_flows[FlowID].allElements[loadElementID],_flows[FlowID].allElements[loadElementID].pars)
+				{
+					Newname:=Element_GenerateName_%loadElementClass%(_flows[FlowID].allElements[loadElementID],_flows[FlowID].allElements[loadElementID].pars)
+					StringReplace,Newname,Newname,`n,%a_space%-%a_space%,all
+					_flows[FlowID].allElements[loadElementID].Name:=Newname
+				}
 			}
 		}
 		
@@ -318,7 +322,7 @@ LoadFlow(FlowID, filepath="", params="")
 			tempmissingpackageslist.=forvalue ", "
 		}
 		StringTrimRight,tempmissingpackageslist,tempmissingpackageslist,2
-		MsgBox % lang("Attention!") " " lang("This flow could not be loaded properly!") "`n" lang("Following packages are missing:") "`n`n" tempmissingpackageslist 
+		MsgBox % lang("Attention!") " " lang("The flow '%1%' could not be loaded properly!", _flows[FlowID].name) "`n" lang("Following packages are missing:") "`n`n" tempmissingpackageslist "`n`n" lang("Debug Info") ":`n" lang("Filename") ": " _flows[FlowID].FileName
 	}
 	;e_CorrectElementErrors("Loaded the saved flow")
 	RIni_Shutdown("IniFile")

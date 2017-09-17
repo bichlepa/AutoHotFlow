@@ -44,6 +44,7 @@ justEnableOneTrigger(p_Flow, p_Trigger)
 	triggerEnvironment.EnvironmentType:="trigger"
 	triggerEnvironment.vars:=Object()
 	triggerEnvironment.ElementID:=p_Trigger.id
+	triggerEnvironment.UniqueID:=p_Trigger.UniqueID
 	triggerEnvironment.ElementClass:=p_Trigger.class
 	triggerEnvironment.Pars:=ObjFullyClone(p_Trigger.pars)
 	

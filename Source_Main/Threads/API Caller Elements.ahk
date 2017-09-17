@@ -397,19 +397,19 @@ x_ManualTriggerExecute(p_FlowID, p_TriggerName = "", p_Variables ="", p_CallBack
 
 ;while editing (not supported here)
 
-x_Par_Disable(Environment,p_ParameterID, p_TrueOrFalse = True)
+x_Par_Disable(p_ParameterID, p_TrueOrFalse = True)
 {
 }
-x_Par_Enable(Environment,p_ParameterID, p_TrueOrFalse = True)
+x_Par_Enable(p_ParameterID, p_TrueOrFalse = True)
 {
 }
-x_Par_SetValue(Environment,p_ParameterID, p_Value)
+x_Par_SetValue(p_ParameterID, p_Value)
 {
 }
-x_Par_GetValue(Environment,p_ParameterID)
+x_Par_GetValue(p_ParameterID)
 {
 }
-x_Par_SetChoices(Environment,p_ParameterID, p_Choices)
+x_Par_SetChoices(p_ParameterID, p_Choices)
 {
 }
 x_FirstCallOfCheckSettings(Environment)
@@ -466,5 +466,25 @@ x_FlowExistsByName(p_FlowName)
 
 
 x_EvaluateScript(Environment, p_script)
+{
+}
+
+
+x_TriggerInNewAHKThread(Environment, p_Code, p_VarsToImport, p_VarsToExport)
+{
+}
+
+
+x_TriggerInNewAHKThread_GetExportedValues(Environment)
+{
+}
+
+
+x_TriggerInNewAHKThread_Stop(Environment)
+{
+}
+
+
+x_assistant_windowParameter(neededInfo = "")
 {
 }

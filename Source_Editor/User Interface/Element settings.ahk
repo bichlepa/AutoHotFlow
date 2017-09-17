@@ -1601,7 +1601,20 @@ class ElementSettings
 		clickOnButton()
 		{
 			global
-			gosub,% this.parameter.goto
+			logger("a3", "Element Settings: Evaluating g-label of button: " thisgoto)
+			local templabel:=this.parameter.goto
+			if (islabel(templabel))
+			{
+				gosub,% templabel
+			}
+			else if (isfunc(templabel))
+			{
+				%templabel%()
+			}
+			else
+			{
+				MsgBox Error on button click. Target label or function '%templabel%' does not exist.
+			}
 			return
 		}
 	}
@@ -2000,6 +2013,22 @@ class ElementSettings
 	
 	
 	
+
+	disable()
+	{
+		global
+		
+		gui,SettingsOfElement:+disabled
+	}
+
+	enable()
+	{
+		global
+		
+		gui,SettingsOfElement:-disabled
+		WinActivate, ahk_id %SettingWindowHWND%
+	}
+
 	
 	
 	

@@ -61,6 +61,18 @@ API_Call_Execution_disableOneTrigger(par_FlowID, par_TriggerID)
 	return retval
 }
 
+API_Call_Execution_externalTrigger(par_UniqueID)
+{
+	global
+	local retval
+	logger("t2", A_ThisFunc " call received")
+	
+	retval := ExecuteInNewAHKThread_trigger(par_UniqueID)
+	
+	logger("t2", A_ThisFunc " call finished")
+	return retval
+}
+
 API_Call_Execution_externalFlowFinish(par_UniqueID)
 {
 	global

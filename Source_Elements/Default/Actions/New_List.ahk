@@ -90,32 +90,32 @@ Element_CheckSettings_Action_New_List(Environment, ElementParameters)
 	
 	if (ElementParameters.InitialContent = 2) ;one element
 	{
-		x_Par_Enable(Environment,"VarValue")
-		x_Par_Enable(Environment,"WhichPosition")
-		x_Par_Enable(Environment,"Position", (ElementParameters.WhichPosition = 2))
+		x_Par_Enable("VarValue")
+		x_Par_Enable("WhichPosition")
+		x_Par_Enable("Position", (ElementParameters.WhichPosition = 2))
 	}
 	else
 	{
-		x_Par_Disable(Environment,"VarValue")
-		x_Par_Disable(Environment,"WhichPosition")
-		x_Par_Disable(Environment,"Position")
+		x_Par_Disable("VarValue")
+		x_Par_Disable("WhichPosition")
+		x_Par_Disable("Position")
 	}
 	
 	if (ElementParameters.InitialContent = 3) ;Multiple elements
 	{
-		x_Par_Enable(Environment,"VarValues")
-		x_Par_Enable(Environment,"DelimiterLinefeed")
-		x_Par_Enable(Environment,"DelimiterComma")
-		x_Par_Enable(Environment,"DelimiterSemicolon")
-		x_Par_Enable(Environment,"DelimiterSpace")
+		x_Par_Enable("VarValues")
+		x_Par_Enable("DelimiterLinefeed")
+		x_Par_Enable("DelimiterComma")
+		x_Par_Enable("DelimiterSemicolon")
+		x_Par_Enable("DelimiterSpace")
 	}
 	else
 	{
-		x_Par_Disable(Environment,"VarValues")
-		x_Par_Disable(Environment,"DelimiterLinefeed")
-		x_Par_Disable(Environment,"DelimiterComma")
-		x_Par_Disable(Environment,"DelimiterSemicolon")
-		x_Par_Disable(Environment,"DelimiterSpace")
+		x_Par_Disable("VarValues")
+		x_Par_Disable("DelimiterLinefeed")
+		x_Par_Disable("DelimiterComma")
+		x_Par_Disable("DelimiterSemicolon")
+		x_Par_Disable("DelimiterSpace")
 	}
 	
 	

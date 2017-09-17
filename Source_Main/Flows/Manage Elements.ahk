@@ -30,6 +30,7 @@ Element_New(p_FlowID, p_type="",p_elementID="")
 	
 	;~ d(p_elementID "--" tempElement.ID)
 	
+	tempElement.UniqueID:=p_FlowID "_" tempElement.ID
 	tempElement.ClickPriority:=500
 	;~ d(p_elementID "--" tempElement.ID "--" tempElement.ClickPriority)
 	tempElement.pars:=[]
@@ -241,6 +242,8 @@ Connection_New(p_FlowID, p_elementID="")
 		tempElement.ID:="Connection" . format("{1:010u}",++_flows[p_FlowID].ElementIDCounter) 
 	else
 		tempElement.ID:=p_elementID
+	
+	tempElement.UniqueID:=p_FlowID "_" tempElement.ID
 	
 	tempElement.ConnectionType:="normal"
 	tempElement.ClickPriority:=200

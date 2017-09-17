@@ -400,23 +400,23 @@ x_ManualTriggerExecute(p_FlowID, p_TriggerName = "", p_Variables ="", p_CallBack
 
 ;while editing
 
-x_Par_Disable(Environment,p_ParameterID, p_TrueOrFalse = True)
+x_Par_Disable(p_ParameterID, p_TrueOrFalse = True)
 {
 	return ElementSettings.field.enable(p_ParameterID,not p_TrueOrFalse)
 }
-x_Par_Enable(Environment,p_ParameterID, p_TrueOrFalse = True)
+x_Par_Enable(p_ParameterID, p_TrueOrFalse = True)
 {
 	return ElementSettings.field.enable(p_ParameterID,p_TrueOrFalse)
 }
-x_Par_SetValue(Environment,p_ParameterID, p_Value)
+x_Par_SetValue(p_ParameterID, p_Value)
 {
 	return ElementSettings.field.setvalue(p_Value,p_ParameterID)
 }
-x_Par_GetValue(Environment,p_ParameterID)
+x_Par_GetValue(p_ParameterID)
 {
 	return ElementSettings.field.getvalue(p_ParameterID)
 }
-x_Par_SetChoices(Environment,p_ParameterID, p_Choices)
+x_Par_SetChoices(p_ParameterID, p_Choices)
 {
 	return ElementSettings.field.setChoices(p_Choices,p_ParameterID)
 }
@@ -478,4 +478,27 @@ x_FlowExistsByName(p_FlowName)
 
 x_EvaluateScript(Environment, p_script)
 {
+}
+
+
+x_TriggerInNewAHKThread(Environment, p_Code, p_VarsToImport, p_VarsToExport)
+{
+}
+
+
+x_TriggerInNewAHKThread_GetExportedValues(Environment)
+{
+}
+
+
+x_TriggerInNewAHKThread_Stop(Environment)
+{
+}
+
+
+x_assistant_windowParameter(neededInfo = "")
+{
+	if not (neededInfo)
+		neededInfo:= {wintitle: "Wintitle", excludeTitle: "excludeTitle", winText: "winText", FindHiddenText: "FindHiddenText", ExcludeText: "ExcludeText", ahk_class: "ahk_class", ahk_exe: "ahk_exe", ahk_id: "ahk_id", ahk_pid: "ahk_pid", FindHiddenWindow: "FindHiddenWindow"}
+	assistant_GetWindowInformation(neededInfo)
 }

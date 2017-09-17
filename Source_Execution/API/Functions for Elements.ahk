@@ -213,6 +213,7 @@ x_ExecuteInNewAHKThread(Environment, p_functionObject, p_Code, p_VarsToImport, p
 	_share.temp[Environment.uniqueID].sharedObject.varsToExport:=p_VarsToExport
 	_share.temp[Environment.uniqueID].sharedObject.varsExported:=Object()
 	;~ d(_share.temp[Environment.uniqueID])
+	;~ d(environment)
 	preCode := "ahf_uniqueID :=""" Environment.uniqueID """`n"
 	preCode .= "ahf_sharedObject := CriticalObject(" (&_share.temp[Environment.uniqueID].sharedObject) ")`n"
 	preCode .= "onexit, ahf_onexit`n"
@@ -222,16 +223,20 @@ x_ExecuteInNewAHKThread(Environment, p_functionObject, p_Code, p_VarsToImport, p
 	preCode .= "  %ahf_varname%:=ahf_VarValue`n"
 	;~ preCode .= "  msgbox, %ahf_varname% - %ahf_VarValue%`n"
 	preCode .= "}`n"
+
 	postcode := "exitapp`n"
 	postcode .= "ahf_onexit:`n"
 	postcode .= "for ahf_varindex, ahf_varname in ahf_sharedObject.varsToExport`n{`n  ahf_sharedObject.varsExported[ahf_varname]:=%ahf_varname%`n}`n"
 	;~ postcode .= "msgbox %ahf_uniqueID%`n"
 	postcode .= "ahf_parentAHKThread.ahkFunction(""API_Execution_externalFlowFinish"", ahf_uniqueID)`n"
 	postcode .= "exitapp"
+	
+	
 	;~ d("`n" preCode "`n" p_Code "`n" postCode)
 	AhkThread("`n" preCode "`n" p_Code "`n" postCode)
 	
 }
+
 ExecuteInNewAHKThread_finishedExecution(p_ExecutionID) ;Not an api function
 {
 	global global_AllExecutionIDs
@@ -241,6 +246,62 @@ ExecuteInNewAHKThread_finishedExecution(p_ExecutionID) ;Not an api function
 	functionObject:=global_AllExecutionIDs[Environment.uniqueID].ExeInNewThread.functionObject
 	%functionObject%(_share.temp[Environment.uniqueID].sharedObject.varsExported)
 }
+;exeuction of a trigger in other ahk thread
+x_TriggerInNewAHKThread(Environment, p_Code, p_VarsToImport, p_VarsToExport)
+{
+	global _share, global_AllActiveTriggerIDs
+	if not isobject(global_AllActiveTriggerIDs[Environment.uniqueID])
+		global_AllActiveTriggerIDs[Environment.uniqueID]:=object()
+	global_AllActiveTriggerIDs[Environment.uniqueID].ExeInNewThread:=object()
+	global_AllActiveTriggerIDs[Environment.uniqueID].environment:=Environment
+	
+	_share.temp[Environment.uniqueID]:= Object()
+	_share.temp[Environment.uniqueID].sharedObject := CriticalObject()
+	_share.temp[Environment.uniqueID].sharedObject.varsToImport:=p_VarsToImport
+	_share.temp[Environment.uniqueID].sharedObject.varsToExport:=p_VarsToExport
+	_share.temp[Environment.uniqueID].sharedObject.varsExported:=Object()
+	;~ d(_share.temp[Environment.uniqueID])
+	preCode := "ahf_uniqueID :=""" Environment.uniqueID """`n"
+	preCode .= "ahf_sharedObject := CriticalObject(" (&_share.temp[Environment.uniqueID].sharedObject) ")`n"
+	preCode .= "ahf_parentAHKThread := AhkExported()`n"
+	preCode .= "for ahf_varname, ahf_varvalue in ahf_sharedObject.varsToImport`n"
+	preCode .= "{`n"
+	preCode .= "  %ahf_varname%:=ahf_VarValue`n"
+	;~ preCode .= "  msgbox, %ahf_varname% - %ahf_VarValue%`n"
+	preCode .= "}`n"
+	
+
+	postcode := "exitapp`n"
+	postcode .= "x_trigger()`n"
+	postcode .= "{`n"
+	postcode .= "global`n"
+	postcode .= "for ahf_varindex, ahf_varname in ahf_sharedObject.varsToExport`n{`n  ahf_sharedObject.varsExported[ahf_varname]:=%ahf_varname%`n}`n"
+	postcode .= "ahf_parentAHKThread.ahkFunction(""API_Execution_externalTrigger"", ahf_uniqueID)`n"
+	postcode .= "}`n"
+		
+	;~ d("`n" preCode "`n" p_Code "`n" postCode)
+	global_AllActiveTriggerIDs[Environment.uniqueID].ExeInNewThread.AHKThreadID:=AhkThread("`n" preCode "`n" p_Code "`n" postCode)
+	
+}
+x_TriggerInNewAHKThread_Stop(Environment)
+{
+	ahkthread_release(global_AllActiveTriggerIDs[Environment.uniqueID].ExeInNewThread.AHKThreadID)
+}
+ExecuteInNewAHKThread_trigger(p_uniqueID) ;Not an api function
+{
+	global _share
+	Environment:=global_AllActiveTriggerIDs[p_uniqueID].environment
+	;~ d(Environment, "öiohöio")
+	Environment.varsExportedFromExternalThread:=_share.temp[Environment.uniqueID].sharedObject.varsExported
+	
+	ElementClass:=Environment.ElementClass
+	x_trigger(Environment)
+}
+x_TriggerInNewAHKThread_GetExportedValues(Environment)
+{
+	return Environment.varsExportedFromExternalThread
+}
+
 
 
 
@@ -566,24 +627,30 @@ x_ManualTriggerExecute(p_FlowID, p_TriggerName = "", p_Variables ="", p_CallBack
 
 ;While editing (not supported here)
 
-x_Par_Disable(Environment,p_ParameterID, p_TrueOrFalse = True)
+x_Par_Disable(p_ParameterID, p_TrueOrFalse = True)
 {
 }
-x_Par_Enable(Environment,p_ParameterID, p_TrueOrFalse = True)
+x_Par_Enable(p_ParameterID, p_TrueOrFalse = True)
 {
 }
-x_Par_SetValue(Environment,p_ParameterID, p_Value)
+x_Par_SetValue(p_ParameterID, p_Value)
 {
 }
-x_Par_GetValue(Environment,p_ParameterID)
+x_Par_GetValue(p_ParameterID)
 {
 }
-x_Par_SetChoices(Environment,p_ParameterID, p_Choices)
+x_Par_SetChoices(p_ParameterID, p_Choices)
 {
 }
 x_FirstCallOfCheckSettings(Environment)
 {
 }
+
+;assistants
+x_assistant_windowParameter(neededInfo = "")
+{
+}
+
 
 ;common functions. Available everywhere
 

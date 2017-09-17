@@ -43,7 +43,7 @@ Element_getParametrizationDetails_Trigger_Manual(Environment)
 Element_GenerateName_Trigger_Manual(Environment, ElementParameters)
 {
 	global
-	return % lang("Manual") "`n" ElementParameters.id 
+	return % lang("Manual") "`n""" ElementParameters.id   """"
 }
 
 Element_enable_Trigger_Manual(Environment, ElementParameters)

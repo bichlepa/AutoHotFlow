@@ -1,4 +1,6 @@
-﻿goto jumpoverglobalvars
+﻿
+
+goto jumpoverglobalvars
 
 init_GlobalVars:
 ;_WorkingDir 	Working directory. To be used insted of a_WorkingDir. This variable is defined elsewhere
@@ -10,6 +12,7 @@ _flows is an associative array of objects. Each object contains some information
 	.name 			Flow name
 	.allElements	Associative array of Objects. Each object contains following values:
 		.ID				ID of the element. (Which is also the key)
+		.UniqueID		Unique ID of the trigger. (Currently contains the flow ID and the element ID)
 		.name			Element name
 		.type			Element type name
 		.subtype		Element subtype name
@@ -31,6 +34,7 @@ _flows is an associative array of objects. Each object contains some information
 		
 	.allConnections	Associative array of Objects. Each object contains following values:
 		.ID				ID of the connections. (Which is also the key)
+		.UniqueID		Unique ID of the trigger. (Currently contains the flow ID and the element ID)
 		.type			Contains string "Connection"
 		.ConnectionType	Connection type
 		.from			Element ID where the connection starts
@@ -44,7 +48,7 @@ _flows is an associative array of objects. Each object contains some information
 	
 	.allTriggers	Associative array of Objects. Each object contains following values:
 		.ID				ID of the trigger. (Which is also the key)
-		.ContainerID	Element ID containing the trigger
+		.UniqueID		Unique ID of the trigger. (Currently contains the flow ID and the element ID)
 		.class			Trigger class name. Equals to %type%_%subtype%
 		.type			Contains string "Trigger"
 		.par			Associative Array with the parameters of the trigger
@@ -160,6 +164,8 @@ _share.logcount := 0
 _share.logcountAfterTidy := 0
 _share.drawActive := 0 	;True if the draw thread is currently active
 _share.temp := criticalObject() 	;For temporary content
+_share._ScriptDir := _ScriptDir
+_share._WorkingDir := _WorkingDir 	
 
 global _ahkCriticalSection_Flows := CriticalSection() ;TODO: use it!
 

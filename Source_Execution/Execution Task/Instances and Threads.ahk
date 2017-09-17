@@ -49,6 +49,7 @@ newInstance(p_Environment)
 	_execution.Instances[newInstance.id]:=newInstance
 	newThread.ElementID := oneElementID
 	newThread.EnvironmentType := "thread"
+	newThread.varsExportedFromExternalThread := p_Environment.varsExportedFromExternalThread
 	finishExecutionOfElement(newThread, "Normal")
 	ThreadVariable_Set(newThread,"A_TriggerTime",a_now)
 	

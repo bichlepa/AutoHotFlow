@@ -6,11 +6,11 @@ global _ScriptDir, _WorkingDir
 global _ahkThreadID:="Main"
 
 SetWorkingDir %A_ScriptDir%\..  ; set working dir.
-_ScriptDir = %A_WorkingDir%
+global _ScriptDir := A_WorkingDir
 
 ;if portable installation, the script dir is the working dir. 
 ;If installed in programs folder, it is a dir which is writable without admin rights
-_WorkingDir = %A_WorkingDir%
+global _WorkingDir := A_WorkingDir
 IfInString, _WorkingDir, %A_ProgramFiles%
 {
 	_WorkingDir = %A_AppData%\AutoHotFlow
@@ -19,7 +19,7 @@ IfInString, _WorkingDir, %A_ProgramFiles%
 }
 
 ;First of all initialize global variables and load the settings
-gosub,init_GlobalVars
+gosub, init_GlobalVars
 load_settings()
 logger("a1", "startup")
 
@@ -74,7 +74,8 @@ FileDelete,%a_temp%\autoHotflowTryToStartAsAdmin.txt
 #include lib\Random Word List\Random Word List.ahk
 
 ;Include libraries which may be used by the elements. This code is generated.
-;Lib_includes_Start#include lib\7z wrapper\7z wrapper.ahk
+;Lib_includes_Start
+#include lib\7z wrapper\7z wrapper.ahk
 global_elementInclusions = 
 (
 #include lib\7z wrapper\7z wrapper.ahk
@@ -120,6 +121,7 @@ AllTriggerClasses:=Object()
 ;Includ elements. This code is generated
 ;The elements must be included before the other treads are started
 ;Element_Includes_Start
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\activate_Window.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Beep.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Compress files.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Execute_Flow.ahk
@@ -142,6 +144,7 @@ AllTriggerClasses:=Object()
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Loops\Work_through_a_list.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Triggers\Hotkey.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Triggers\Manual.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Triggers\Window_opens.ahk
 
 ;Element_Includes_End
 
