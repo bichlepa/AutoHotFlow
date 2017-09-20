@@ -13,7 +13,7 @@ Element_getElementType_Trigger_Window_Opens()
 
 Element_getName_Trigger_Window_Opens()
 {
-	return lang("Trigger_Window_Opens")
+	return lang("Window_Opens")
 }
 
 Element_getIconPath_Trigger_Window_Opens()
@@ -28,7 +28,7 @@ Element_getCategory_Trigger_Window_Opens()
 
 Element_getParameters_Trigger_Window_Opens()
 {
-	return ["TitleMatchMode", "Wintitle", "excludeTitle", "winText", "FindHiddenText", "ExcludeText", "ahk_class", "ahk_exe", "ahk_id", "ahk_pid", "FindHiddenWindow"]
+	return ["TitleMatchMode", "Wintitle", "excludeTitle", "winText", "FindHiddenText", "ExcludeText", "ahk_class", "ahk_exe", "ahk_id", "ahk_pid", "FindHiddenWindow", "NotTriggerOnEnable"]
 }
 
 Element_getParametrizationDetails_Trigger_Window_Opens(Environment)
@@ -56,7 +56,7 @@ Element_getParametrizationDetails_Trigger_Window_Opens(Environment)
 	parametersToEdit.push({type: "Label", label: lang("Hidden window")})
 	parametersToEdit.push({type: "Checkbox", id: "FindHiddenWindow", default: 0, label: lang("Detect hidden window")})
 	parametersToEdit.push({type: "Label", label: lang("Get_parameters")})
-	parametersToEdit.push({type: "button", goto: "Trigger_Window_Opens_GetWindowParameters", label: lang("Get_Parameters")})
+	parametersToEdit.push({type: "button", goto: "x_assistant_windowParameter", label: lang("Get_Parameters")})
 
 	parametersToEdit.push({type: "Label", label: lang("Options")})
 	parametersToEdit.push({type: "Checkbox", id: "NotTriggerOnEnable", default: 1, label: lang("Do not trigger if a matching window exists when enabling the trigger")})
@@ -130,9 +130,6 @@ Element_enable_Trigger_Window_Opens(Environment, ElementParameters)
 		x_enabled(Environment, "exception", lang("No window specified"))
 		return
 	}
-	
-	
-	SetTitleMatchMode,%tempTitleMatchMode%
 	
 	if ElementParameters.findhiddenwindow=0
 		tempFindHiddenWindows = off

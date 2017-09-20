@@ -74,8 +74,7 @@ FileDelete,%a_temp%\autoHotflowTryToStartAsAdmin.txt
 #include lib\Random Word List\Random Word List.ahk
 
 ;Include libraries which may be used by the elements. This code is generated.
-;Lib_includes_Start
-#include lib\7z wrapper\7z wrapper.ahk
+;Lib_includes_Start#include lib\7z wrapper\7z wrapper.ahk
 global_elementInclusions = 
 (
 #include lib\7z wrapper\7z wrapper.ahk
@@ -121,7 +120,9 @@ AllTriggerClasses:=Object()
 ;Includ elements. This code is generated
 ;The elements must be included before the other treads are started
 ;Element_Includes_Start
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Absolute_Number.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\activate_Window.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\AutoHotkey_script.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Beep.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Compress files.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Execute_Flow.ahk
