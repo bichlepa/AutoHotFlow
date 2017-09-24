@@ -34,7 +34,13 @@ Element_getCategory_Action_New_variable()
 
 Element_getParameters_Action_New_variable()
 {
-	return ["Varname", "expression", "VarValue"]
+	parametersToEdit:=Object()
+	
+	parametersToEdit.push({id: "Varname"})
+	parametersToEdit.push({id: "expression"})
+	parametersToEdit.push({id: "VarValue"})
+	
+	return parametersToEdit
 }
 
 Element_getParametrizationDetails_Action_New_variable(Environment)

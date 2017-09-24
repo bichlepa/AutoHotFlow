@@ -34,7 +34,21 @@ Element_getCategory_Action_Select_file()
 
 Element_getParameters_Action_Select_file()
 {
-	return ["Varname", "title", "folder", "filter", "MultiSelect", "SaveButton", "fileMustExist", "PathMustExist", "PromptNewFile", "PromptOverwriteFile", "NoShortcutTarget"]
+	parametersToEdit:=Object()
+	
+	parametersToEdit.push({id: "Varname"})
+	parametersToEdit.push({id: "title"})
+	parametersToEdit.push({id: "folder"})
+	parametersToEdit.push({id: "filter"})
+	parametersToEdit.push({id: "MultiSelect"})
+	parametersToEdit.push({id: "SaveButton"})
+	parametersToEdit.push({id: "fileMustExist"})
+	parametersToEdit.push({id: "PathMustExist"})
+	parametersToEdit.push({id: "PromptNewFile"})
+	parametersToEdit.push({id: "PromptOverwriteFile"})
+	parametersToEdit.push({id: "NoShortcutTarget"})
+	
+	return parametersToEdit
 }
 
 Element_getParametrizationDetails_Action_Select_file(Environment)

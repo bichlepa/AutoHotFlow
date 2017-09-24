@@ -34,7 +34,15 @@ Element_getCategory_Action_Trace_Point_Check()
 
 Element_getParameters_Action_Trace_Point_Check()
 {
-	return ["MustPassTracepointsAll", "MustPassTracepoints", "MustNotPassTracepointsAll", "MustNotPassTracepoints", "Wait"]
+	parametersToEdit:=Object()
+	
+	parametersToEdit.push({id: "MustPassTracepointsAll"})
+	parametersToEdit.push({id: "MustPassTracepoints"})
+	parametersToEdit.push({id: "MustNotPassTracepointsAll"})
+	parametersToEdit.push({id: "MustNotPassTracepoints"})
+	parametersToEdit.push({id: "Wait"})
+	
+	return parametersToEdit
 }
 
 Element_getParametrizationDetails_Action_Trace_Point_Check(Environment)

@@ -29,7 +29,11 @@ Element_getCategory_Condition_Flow_Running()
 
 Element_getParameters_Condition_Flow_Running()
 {
-	return ["flowName"]
+	parametersToEdit:=Object()
+	
+	parametersToEdit.push({id: "flowName"})
+	
+	return parametersToEdit
 }
 
 Element_getParametrizationDetails_Condition_Flow_Running(Environment)

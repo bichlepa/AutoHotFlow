@@ -34,7 +34,14 @@ Element_getCategory_Action_Tooltip()
 
 Element_getParameters_Action_Tooltip()
 {
-	return ["text", "duration", "Unit", "follow_mouse"]
+	parametersToEdit:=Object()
+	
+	parametersToEdit.push({id: "text"})
+	parametersToEdit.push({id: "duration"})
+	parametersToEdit.push({id: "Unit"})
+	parametersToEdit.push({id: "follow_mouse"})
+	
+	return parametersToEdit
 }
 
 Element_getParametrizationDetails_Action_Tooltip(Environment)

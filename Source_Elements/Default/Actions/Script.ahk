@@ -34,7 +34,11 @@ Element_getCategory_Action_Script()
 
 Element_getParameters_Action_Script()
 {
-	return ["Script"]
+	parametersToEdit:=Object()
+	
+	parametersToEdit.push({id: "Script"})
+	
+	return parametersToEdit
 }
 
 Element_getParametrizationDetails_Action_Script(Environment)

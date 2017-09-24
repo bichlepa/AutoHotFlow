@@ -45,7 +45,7 @@ Element_getIconPath_&ElementType&_&Name&()
 }
 
 ;How stable is this element? Experimental elements will be marked and can be hidden by user.
-Element_getStabilityLevel_Action_AutoHotKey_script()
+Element_getStabilityLevel_&ElementType&_&Name&()
 {
 	;"Stable" or "Experimental"
 	return "&stability&"
@@ -58,22 +58,57 @@ Element_getParameters_&ElementType&_&Name&()
 	parametersToEdit:=Object()
 	
 #if par_label 
-	parametersToEdit.push("par_radio")
+	parametersToEdit.push({id: "radio"})
 #endif
 #if par_checkbox 
-	parametersToEdit.push("par_checkbox")
+	parametersToEdit.push({id: "checkbox"})
 #endif
 #if par_editstring 
-	parametersToEdit.push("par_editstring")
+	parametersToEdit.push({id: "editstring"})
 #endif
 #if par_editExpression 
-	parametersToEdit.push("par_editExpression")
+	parametersToEdit.push({id: "editExpression"})
+#endif
+#if par_editStringOrExpression
+	parametersToEdit.push({id: "editStringOrExpression"})
+#endif
+#if par_editVariableName
+	parametersToEdit.push({id: "editVariableName"})
+#endif
+#if par_editMultiLine
+	parametersToEdit.push({id: "editMultiLine"})
+#endif
+#if par_editTwoExpressions
+	parametersToEdit.push({id: "editTwoExpressions1"})
+	parametersToEdit.push({id: "editTwoExpressions2"})
+#endif
+#if par_DropDownString
+	parametersToEdit.push({id: "DropDownString"})
+#endif
+#if par_ComboBoxString
+	parametersToEdit.push({id: "ComboBoxString"})
+#endif
+#if par_ListBoxString
+	parametersToEdit.push({id: "ListBoxString"})
 #endif
 #if par_file
-	parametersToEdit.push("par_file")
+	parametersToEdit.push({id: "file"})
+#endif
+#if par_folder
+	parametersToEdit.push({id: "folder"})
 #endif
 #if addWindowSelector 
-	parametersToEdit.push("TitleMatchMode", "Wintitle", "excludeTitle", "winText", "FindHiddenText", "ExcludeText", "ahk_class", "ahk_exe", "ahk_id", "ahk_pid", "FindHiddenWindow")
+	parametersToEdit.push({id: "TitleMatchMode"})
+	parametersToEdit.push({id: "Wintitle"})
+	parametersToEdit.push({id: "excludeTitle"})
+	parametersToEdit.push({id: "winText"})
+	parametersToEdit.push({id: "FindHiddenText"})
+	parametersToEdit.push({id: "ExcludeText"})
+	parametersToEdit.push({id: "ahk_class"})
+	parametersToEdit.push({id: "ahk_exe"})
+	parametersToEdit.push({id: "ahk_id"})
+	parametersToEdit.push({id: "ahk_pid"})
+	parametersToEdit.push({id: "FindHiddenWindow"})
 #endif
 	
 	return parametersToEdit
@@ -108,6 +143,9 @@ Element_getParametrizationDetails_&ElementType&_&Name&(Environment)
 #if par_editMultiLine
 	parametersToEdit.push({type: "edit", id: "editMultiLine", multiline: true})
 #endif
+#if par_editTwoExpressions
+	parametersToEdit.push({type: "Edit", id: ["editTwoExpressions1", "editTwoExpressions2"], default: [10, 20], content: "Expression", WarnIfEmpty: true})
+#endif
 #if par_DropDownString
 	parametersToEdit.push({type: "DropDown", id: "DropDownString", default: "jpg", choices: ["bmp", "jpg", "png"], result: "string"})
 #endif
@@ -117,11 +155,17 @@ Element_getParametrizationDetails_&ElementType&_&Name&(Environment)
 #if par_ListBoxString
 	parametersToEdit.push({type: "ListBox", id: "ListBoxString", result: "String", choices: ["bmp", "jpg", "png"], multi: True})
 #endif
+#if par_Slider
+	parametersToEdit.push({type: "Slider", id: "Slider", default: 2, options: "Range0-100 tooltip"})
+#endif
 #if par_file 
 	parametersToEdit.push({type: "File", id: "file", label: lang("Select a file")})
 #endif
 #if par_folder
 	parametersToEdit.push({type: "Folder", id: "folder", label: lang("Select a folder")})
+#endif
+#if par_button
+	parametersToEdit.push({type: "button", id: "button", goto: "&ElementType&_&Name&_ButtonClick", label: lang("Get coordinates")})
 #endif
 	
 #if addWindowSelector
@@ -148,7 +192,7 @@ Element_getParametrizationDetails_&ElementType&_&Name&(Environment)
 	parametersToEdit.push({type: "Label", label: lang("Hidden window"), size: "small"})
 	parametersToEdit.push({type: "Checkbox", id: "FindHiddenWindow", default: 0, label: lang("Detect hidden window")})
 	parametersToEdit.push({type: "Label", label: lang("Import window identification"), size: "small"})
-	parametersToEdit.push({type: "button", goto: "x_assistant_windowParameter", label: lang("Import window identification")})
+	parametersToEdit.push({type: "button", goto: "&ElementType&_&Name&_ButtonWindowAssistant", label: lang("Import window identification")})
 #endif
 	
 	return parametersToEdit
@@ -206,17 +250,20 @@ Element_CheckSettings_&ElementType&_&Name&(Environment, ElementParameters)
 Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 {
 #if par_checkbox 
+
 	checkboxValue := ElementParameters.checkbox
 #endif
 #if par_radio 
+
 	radioValue := ElementParameters.radio
 #endif
 #if par_editstring 
+
 	editstringValue := x_replaceVariables(Environment,ElementParameters.editstring)
 #endif
 #if par_editExpression 
+
 	evRes := x_evaluateExpression(Environment,ElementParameters.editExpression)
-	
 	if (evRes.error)
 	{
 		;On error, finish with exception and return
@@ -226,8 +273,7 @@ Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 	editExpressionValue:=evRes.result
 #endif
 #if par_editStringOrExpression 
-	editStringOrExpressionValueRaw := x_evaluateExpression(Environment,ElementParameters.editStringOrExpression)
-	
+
 	if (ElementParameters.Expression = 2)
 	{
 		evRes := x_EvaluateExpression(Environment, ElementParameters.editStringOrExpression)
@@ -244,12 +290,10 @@ Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 	}
 	else
 		editStringOrExpressionValue := x_replaceVariables(Environment, ElementParameters.editStringOrExpression)
-	
-	editExpressionValueEvaluated:=editExpressionValueEvaluatedObj.result
 #endif
 #if par_editVariableName
+
 	editVariableNameValue := x_replaceVariables(Environment, ElementParameters.editVariableName)
-	
 	if not x_CheckVariableName(editVariableNameValue)
 	{
 		;On error, finish with exception and return
@@ -258,29 +302,67 @@ Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 	}
 #endif
 #if par_editMultiLine
+
 	editMultiLineValue := x_replaceVariables(Environment, ElementParameters.editMultiLine)
 #endif
+#if par_editTwoExpressions
+
+	evRes := x_evaluateExpression(Environment,ElementParameters.editTwoExpressions1)
+	if (evRes.error)
+	{
+		;On error, finish with exception and return
+		x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.editTwoExpressions1) "`n`n" evRes.error) 
+		return
+	}
+	editTwoExpressions1Value:=evRes.result
+	evRes := x_evaluateExpression(Environment,ElementParameters.editTwoExpressions2)
+	if (evRes.error)
+	{
+		;On error, finish with exception and return
+		x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.editTwoExpressions2) "`n`n" evRes.error) 
+		return
+	}
+	editTwoExpressions2Value:=evRes.result
+#endif
 #if par_DropDownString 
+
 	DropDownStringValue := ElementParameters.DropDownString
 #endif
 #if par_ComboBoxString
+
 	ComboBoxStringValue := x_replaceVariables(Environment, ElementParameters.ComboBoxString) 
 #endif
 #if par_ListBoxString 
+
 	ListBoxStringValue:=ElementParameters.ListBoxString
 	for oneListBoxStringIndex, oneListBoxString in ListBoxStringValue
 	{
 		;Do anything with oneListBoxString
 	}
 #endif
+#if par_Slider
+
+	evRes := x_evaluateExpression(Environment,ElementParameters.Slider)
+	if (evRes.error)
+	{
+		;On error, finish with exception and return
+		x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.Slider) "`n`n" evRes.error) 
+		return
+	}
+	SliderValue:=evRes.result
+
+#endif
 #if par_file 
+
 	fileValue := x_GetFullPath(Environment, x_replaceVariables(Environment, ElementParameters.file))
 #endif
 #if par_folder
+
 	folderValue := x_GetFullPath(Environment, x_replaceVariables(Environment, ElementParameters.folder))
 #endif
 
 #if addWindowSelector
+
 	tempWinTitle:=x_replaceVariables(Environment, ElementParameters.Wintitle) 
 	tempWinText:=x_replaceVariables(Environment, ElementParameters.winText)
 	tempTitleMatchMode :=ElementParameters.TitleMatchMode
@@ -472,17 +554,20 @@ Element_enable_&ElementType&_&Name&(Environment, ElementParameters)
 {
 	
 #if par_checkbox 
+
 	checkboxValue := ElementParameters.checkbox
 #endif
 #if par_radio 
+
 	radioValue := ElementParameters.radio
 #endif
 #if par_editstring 
+
 	editstringValue := x_replaceVariables(Environment,ElementParameters.editstring)
 #endif
 #if par_editExpression 
+
 	evRes := x_evaluateExpression(Environment,ElementParameters.editExpression)
-	
 	if (evRes.error)
 	{
 		;On error, finish with exception and return
@@ -492,8 +577,8 @@ Element_enable_&ElementType&_&Name&(Environment, ElementParameters)
 	editExpressionValue:=evRes.result
 #endif
 #if par_editStringOrExpression 
+
 	editStringOrExpressionValueRaw := x_evaluateExpression(Environment,ElementParameters.editStringOrExpression)
-	
 	if (ElementParameters.Expression = 2)
 	{
 		evRes := x_EvaluateExpression(Environment, ElementParameters.editStringOrExpression)
@@ -510,8 +595,6 @@ Element_enable_&ElementType&_&Name&(Environment, ElementParameters)
 	}
 	else
 		editStringOrExpressionValue := x_replaceVariables(Environment, ElementParameters.editStringOrExpression)
-	
-	editExpressionValueEvaluated:=editExpressionValueEvaluatedObj.result
 #endif
 #if par_editVariableName
 	editVariableNameValue := x_replaceVariables(Environment, ElementParameters.editVariableName)
@@ -525,6 +608,25 @@ Element_enable_&ElementType&_&Name&(Environment, ElementParameters)
 #endif
 #if par_editMultiLine
 	editMultiLineValue := x_replaceVariables(Environment, ElementParameters.editMultiLine)
+#endif
+#if par_editTwoExpressions
+
+	evRes := x_evaluateExpression(Environment,ElementParameters.editTwoExpressions1)
+	if (evRes.error)
+	{
+		;On error, finish with exception and return
+		x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.editTwoExpressions1) "`n`n" evRes.error) 
+		return
+	}
+	editTwoExpressions1Value:=evRes.result
+	evRes := x_evaluateExpression(Environment,ElementParameters.editTwoExpressions2)
+	if (evRes.error)
+	{
+		;On error, finish with exception and return
+		x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.editTwoExpressions2) "`n`n" evRes.error) 
+		return
+	}
+	editTwoExpressions2Value:=evRes.result
 #endif
 #if par_DropDownString 
 	DropDownStringValue := ElementParameters.DropDownString
@@ -611,4 +713,18 @@ Element_disable_&ElementType&_&Name&(Environment, ElementParameters)
 	x_disabled(Environment, "normal", lang("I'm stopped."))
 }
 
+#endif
+
+#if par_button
+&ElementType&_&Name&_ButtonClick()
+{
+	MsgBox user clicked me
+}
+#endif
+
+#if addWindowSelector
+&ElementType&_&Name&_ButtonWindowAssistant()
+{
+	x_assistant_windowParameter({wintitle: "Wintitle", excludeTitle: "excludeTitle", winText: "winText", FindHiddenText: "FindHiddenText", ExcludeText: "ExcludeText", ahk_class: "ahk_class", ahk_exe: "ahk_exe", ahk_id: "ahk_id", ahk_pid: "ahk_pid", FindHiddenWindow: "FindHiddenWindow"})
+}
 #endif

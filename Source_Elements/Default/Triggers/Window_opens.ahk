@@ -28,7 +28,23 @@ Element_getCategory_Trigger_Window_Opens()
 
 Element_getParameters_Trigger_Window_Opens()
 {
-	return ["TitleMatchMode", "Wintitle", "excludeTitle", "winText", "FindHiddenText", "ExcludeText", "ahk_class", "ahk_exe", "ahk_id", "ahk_pid", "FindHiddenWindow", "NotTriggerOnEnable"]
+	parametersToEdit:=Object()
+	
+	parametersToEdit.push({id: "NotTriggerOnEnable"})
+	
+	parametersToEdit.push({id: "TitleMatchMode"})
+	parametersToEdit.push({id: "Wintitle"})
+	parametersToEdit.push({id: "excludeTitle"})
+	parametersToEdit.push({id: "winText"})
+	parametersToEdit.push({id: "FindHiddenText"})
+	parametersToEdit.push({id: "ExcludeText"})
+	parametersToEdit.push({id: "ahk_class"})
+	parametersToEdit.push({id: "ahk_exe"})
+	parametersToEdit.push({id: "ahk_id"})
+	parametersToEdit.push({id: "ahk_pid"})
+	parametersToEdit.push({id: "FindHiddenWindow"})
+	
+	return parametersToEdit
 }
 
 Element_getParametrizationDetails_Trigger_Window_Opens(Environment)
@@ -181,9 +197,4 @@ Element_disable_Trigger_Window_Opens(Environment, ElementParameters)
 {
 	x_TriggerInNewAHKThread_Stop(Environment)
 	x_disabled(Environment, "normal", lang("Stopped."))
-}
-
-Trigger_Window_Opens_GetWindowParameters()
-{
-	x_assistant_windowParameter()
 }

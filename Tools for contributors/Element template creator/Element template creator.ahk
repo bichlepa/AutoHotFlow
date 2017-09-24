@@ -28,7 +28,7 @@ gui,add,dropdownlist,yp %posx2% vElementType choose1 ggenerate, Action|Condition
 gui,add,text,%posx1% Y+20, Name
 gui,add,edit,yp %posx2% vName ggenerate w100, MyName
 gui,add,text,%posx1% Y+20, Category
-gui,add,dropdownlist,yp %posx2% vCategory choose1 ggenerate, Variable|Flow_control|Window|Sound|File|User_interaction|User_simulation|Debugging|Expert
+gui,add,dropdownlist,yp %posx2% vCategory choose1 ggenerate, Variable|Flow_control|Window|Sound|File|Drive|User_interaction|User_simulation|Debugging|Expert
 gui,add,text,%posx1% Y+20, Icon
 gui,add,dropdownlist,yp %posx2% vIcon choose1 ggenerate, % allicons
 gui,add,text,%posx1% Y+20, Stability
@@ -43,11 +43,14 @@ gui,add,checkbox,Y+10 %posx2% vpar_editExpression ggenerate, Edit (expression)
 gui,add,checkbox,Y+10 %posx2% vpar_editStringOrExpression ggenerate, Edit (string or expression)
 gui,add,checkbox,Y+10 %posx2% vpar_editVariableName ggenerate, Edit (variable name)
 gui,add,checkbox,Y+10 %posx2% vpar_editMultiLine ggenerate, Edit (multiline)
+gui,add,checkbox,Y+10 %posx2% vpar_editTwoExpressions ggenerate, Edit (two expressions)
 gui,add,checkbox,Y+10 %posx2% vpar_DropDownString ggenerate, DropDown (string)
 gui,add,checkbox,Y+10 %posx2% vpar_ComboBoxString ggenerate, ComboBox (string)
 gui,add,checkbox,Y+10 %posx2% vpar_ListBoxString ggenerate, ListBox (string)
+gui,add,checkbox,Y+10 %posx2% vpar_Slider ggenerate, Slider
 gui,add,checkbox,Y+10 %posx2% vpar_file ggenerate, File
 gui,add,checkbox,Y+10 %posx2% vpar_folder ggenerate, Folder
+gui,add,checkbox,Y+10 %posx2% vpar_button ggenerate, Button
 
 gui,add,text,%posx1% Y+20, Pre-coded features
 gui,add,checkbox,yp %posx2% vaddWindowSelector ggenerate, Add window selector

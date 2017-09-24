@@ -47,8 +47,8 @@ Element_getParameters_Action_Absolute_number()
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push("Varname")
-	parametersToEdit.push("VarValue")
+	parametersToEdit.push({id: "Varname"})
+	parametersToEdit.push({id: "VarValue"})
 	
 	return parametersToEdit
 }

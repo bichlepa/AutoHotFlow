@@ -34,7 +34,22 @@ Element_getCategory_Action_New_List()
 
 Element_getParameters_Action_New_List()
 {
-	return ["Varname", "InitialContent", "VarValue", "expression", "VarValues", "DelimiterLinefeed", "DelimiterComma", "DelimiterSemicolon", "DelimiterSpace", "WhichPosition", "Position", "expressionPos"]
+	parametersToEdit:=Object()
+	
+	parametersToEdit.push({id: "Varname"})
+	parametersToEdit.push({id: "InitialContent"})
+	parametersToEdit.push({id: "VarValue"})
+	parametersToEdit.push({id: "expression"})
+	parametersToEdit.push({id: "VarValues"})
+	parametersToEdit.push({id: "DelimiterLinefeed"})
+	parametersToEdit.push({id: "DelimiterComma"})
+	parametersToEdit.push({id: "DelimiterSemicolon"})
+	parametersToEdit.push({id: "DelimiterSpace"})
+	parametersToEdit.push({id: "WhichPosition"})
+	parametersToEdit.push({id: "Position"})
+	parametersToEdit.push({id: "expressionPos"})
+	
+	return parametersToEdit
 }
 
 Element_getParametrizationDetails_Action_New_List(Environment)

@@ -647,10 +647,12 @@ x_FirstCallOfCheckSettings(Environment)
 }
 
 ;assistants
-x_assistant_windowParameter(neededInfo = "")
+x_assistant_windowParameter(neededInfo)
 {
 }
-
+x_assistant_MouseTracker(neededInfo)
+{
+}
 
 ;common functions. Available everywhere
 

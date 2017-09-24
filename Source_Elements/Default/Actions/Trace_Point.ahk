@@ -34,7 +34,13 @@ Element_getCategory_Action_Trace_Point()
 
 Element_getParameters_Action_Trace_Point()
 {
-	return ["ID", "LogMessage", "StopCondition"]
+	parametersToEdit:=Object()
+	
+	parametersToEdit.push({id: "ID"})
+	parametersToEdit.push({id: "LogMessage"})
+	parametersToEdit.push({id: "StopCondition"})
+	
+	return parametersToEdit
 }
 
 Element_getParametrizationDetails_Action_Trace_Point(Environment)

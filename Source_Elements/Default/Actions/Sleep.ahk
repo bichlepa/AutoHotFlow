@@ -34,7 +34,12 @@ Element_getCategory_Action_Sleep()
 
 Element_getParameters_Action_Sleep()
 {
-	return ["duration", "Unit"]
+	parametersToEdit:=Object()
+	
+	parametersToEdit.push({id: "duration"})
+	parametersToEdit.push({id: "Unit"})
+	
+	return parametersToEdit
 }
 
 Element_getParametrizationDetails_Action_Sleep(Environment)

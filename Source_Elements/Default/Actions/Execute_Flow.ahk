@@ -29,7 +29,18 @@ Element_getCategory_Action_Execute_Flow()
 
 Element_getParameters_Action_Execute_Flow()
 {
-	return ["ThisFlow", "flowName", "DefaultTrigger", "triggerName", "SendLocalVars", "SkipDisabled", "WaitToFinish", "ReturnVariables"]
+	parametersToEdit:=Object()
+	
+	parametersToEdit.push({id: "ThisFlow"})
+	parametersToEdit.push({id: "flowName"})
+	parametersToEdit.push({id: "DefaultTrigger"})
+	parametersToEdit.push({id: "triggerName"})
+	parametersToEdit.push({id: "SendLocalVars"})
+	parametersToEdit.push({id: "SkipDisabled"})
+	parametersToEdit.push({id: "WaitToFinish"})
+	parametersToEdit.push({id: "ReturnVariables"})
+	
+	return parametersToEdit
 }
 
 Element_getParametrizationDetails_Action_Execute_Flow(Environment)

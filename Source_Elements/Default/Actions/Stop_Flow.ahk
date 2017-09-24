@@ -29,7 +29,11 @@ Element_getCategory_Action_Stop_Flow()
 
 Element_getParameters_Action_Stop_Flow()
 {
-	return ["flowName"]
+	parametersToEdit:=Object()
+	
+	parametersToEdit.push({id: "flowName"})
+	
+	return parametersToEdit
 }
 
 Element_getParametrizationDetails_Action_Stop_Flow(Environment)

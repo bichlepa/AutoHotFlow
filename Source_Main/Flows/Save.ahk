@@ -241,8 +241,9 @@ i_SaveParametersOfElement(saveElement,saveElementIniID,Savelocation="")
 	
 	parametersToSave:=Element_getParameters_%elementClass%()
 	
-	for index2, oneParID in parametersToSave
+	for index2, onePar in parametersToSave
 	{
+		oneParID := onePar.id
 		if (Savelocation="clipboard")
 		{
 			;TODO

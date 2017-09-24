@@ -485,6 +485,11 @@ x_TriggerInNewAHKThread_Stop(Environment)
 }
 
 
-x_assistant_windowParameter(neededInfo = "")
+x_assistant_windowParameter(neededInfo)
+{
+}
+
+
+x_assistant_MouseTracker(neededInfo)
 {
 }

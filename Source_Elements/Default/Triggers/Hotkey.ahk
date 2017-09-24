@@ -34,7 +34,25 @@ Element_getCategory_Trigger_Hotkey()
 
 Element_getParameters_Trigger_Hotkey()
 {
-	return ["hotkey", "BlockKey", "Wildcard", "WhenRelease", "UseWindow", "TitleMatchMode", "Wintitle", "winText", "FindHiddenText", "ahk_class", "ahk_exe", "ahk_id", "ahk_pid", "FindHiddenWindow"]
+	parametersToEdit:=Object()
+	
+	parametersToEdit.push({id: "hotkey"})
+	parametersToEdit.push({id: "BlockKey"})
+	parametersToEdit.push({id: "Wildcard"})
+	parametersToEdit.push({id: "WhenRelease"})
+	parametersToEdit.push({id: "UseWindow"})
+	
+	parametersToEdit.push({id: "TitleMatchMode"})
+	parametersToEdit.push({id: "Wintitle"})
+	parametersToEdit.push({id: "winText"})
+	parametersToEdit.push({id: "FindHiddenText"})
+	parametersToEdit.push({id: "ahk_class"})
+	parametersToEdit.push({id: "ahk_exe"})
+	parametersToEdit.push({id: "ahk_id"})
+	parametersToEdit.push({id: "ahk_pid"})
+	parametersToEdit.push({id: "FindHiddenWindow"})
+	
+	return parametersToEdit
 }
 
 Element_getParametrizationDetails_Trigger_Hotkey(Environment)

@@ -29,7 +29,11 @@ Element_getCategory_Trigger_Manual()
 
 Element_getParameters_Trigger_Manual()
 {
-	return ["ID"]
+	parametersToEdit:=Object()
+	
+	parametersToEdit.push({id: "ID"})
+	
+	return parametersToEdit
 }
 
 Element_getParametrizationDetails_Trigger_Manual(Environment)

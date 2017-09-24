@@ -34,7 +34,13 @@ Element_getCategory_Action_Extract_files()
 
 Element_getParameters_Action_Extract_files()
 {
-	return ["file", "zipfile", "zipformat"]
+	parametersToEdit:=Object()
+	
+	parametersToEdit.push({id: "file"})
+	parametersToEdit.push({id: "zipfile"})
+	parametersToEdit.push({id: "zipformat"})
+	
+	return parametersToEdit
 }
 
 Element_getParametrizationDetails_Action_Extract_files(Environment)

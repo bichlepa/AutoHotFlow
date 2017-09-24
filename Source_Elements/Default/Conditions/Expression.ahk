@@ -29,7 +29,11 @@ Element_getCategory_Condition_Expression()
 
 Element_getParameters_Condition_Expression()
 {
-	return ["expression"]
+	parametersToEdit:=Object()
+	
+	parametersToEdit.push({id: "expression"})
+	
+	return parametersToEdit
 }
 
 Element_getParametrizationDetails_Condition_Expression(Environment)

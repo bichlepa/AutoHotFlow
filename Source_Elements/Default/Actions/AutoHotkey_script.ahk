@@ -54,9 +54,9 @@ Element_getParameters_Action_AutoHotKey_script()
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push("script")
-	parametersToEdit.push("ExportVariables")
-	parametersToEdit.push("ImportVariables")
+	parametersToEdit.push({id: "script"})
+	parametersToEdit.push({id: "ExportVariables"})
+	parametersToEdit.push({id: "ImportVariables"})
 	
 	return parametersToEdit
 }
@@ -67,9 +67,9 @@ Element_getParametrizationDetails_Action_AutoHotKey_script(Environment)
 	parametersToEdit:=Object()
 	parametersToEdit.push({type: "Label", label: lang("AutoHotKey_script"), WarnIfEmpty: true})
 	parametersToEdit.push({type: "edit", id: "script", multiline: true})
-	parametersToEdit.push({type: "Label", label: lang("Variables_that_should_be_exported_prior_to_execution")})
+	parametersToEdit.push({type: "Label", label: lang("Variables_that_should_be_imported_to_script_prior_to_execution")})
 	parametersToEdit.push({type: "edit", id: "ExportVariables", multiline: true})
-	parametersToEdit.push({type: "Label", label: lang("Variables_that_should_be_imported_after_execution")})
+	parametersToEdit.push({type: "Label", label: lang("Variables_that_should_be_exported_from_script_after_execution")})
 	parametersToEdit.push({type: "edit", id: "ImportVariables", multiline: true})
 	
 	
@@ -100,8 +100,17 @@ Element_run_Action_AutoHotKey_script(Environment, ElementParameters)
 	ExportVariables := x_replaceVariables(Environment, ElementParameters.ExportVariables)
 	script := ElementParameters.script
 
-
 	;Write all local variables in the script
+	inputVars:=Object()
+	loop,parse,ImportVariables,|`,`n%a_space%
+	{
+		if not A_LoopField
+			continue
+		
+		inputVars[A_LoopField] := x_GetVariable(Environment, A_LoopField)
+	}
+	
+	;Get all local variables from the script
 	outputVars:=Object()
 	loop,parse,ExportVariables,|`,`n%a_space%
 	{
@@ -109,17 +118,8 @@ Element_run_Action_AutoHotKey_script(Environment, ElementParameters)
 			continue
 		outputVars.push(A_LoopField)
 	}
-	
-	;Get all local variables from the script
-	inputVars:=Object()
-	loop,parse,ImportVariables,|`,`n%a_space%
-	{
-		if not A_LoopField
-			continue
-		inputVars.push(A_LoopField)
-	}
 	outputVars.push("result", "resultmessage")
-
+	
 	
 	functionObject := x_NewExecutionFunctionObject(Environment, "Action_AutoHotKey_script_FinishExecution", ElementParameters)
 	x_SetExecutionValue(Environment, "functionObject", functionObject)

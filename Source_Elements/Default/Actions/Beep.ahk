@@ -34,7 +34,12 @@ Element_getCategory_Action_Beep()
 
 Element_getParameters_Action_Beep()
 {
-	return ["frequency", "duration"]
+	parametersToEdit:=Object()
+	
+	parametersToEdit.push({id: "frequency"})
+	parametersToEdit.push({id: "duration"})
+	
+	return parametersToEdit
 }
 
 Element_getParametrizationDetails_Action_Beep(Environment)

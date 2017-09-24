@@ -29,7 +29,12 @@ Element_getCategory_Loop_Work_through_a_list()
 
 Element_getParameters_Loop_Work_through_a_list()
 {
-	return ["Varname", "CopyFirst"]
+	parametersToEdit:=Object()
+	
+	parametersToEdit.push({id: "Varname"})
+	parametersToEdit.push({id: "CopyFirst"})
+	
+	return parametersToEdit
 }
 
 Element_getParametrizationDetails_Loop_Work_through_a_list(Environment)

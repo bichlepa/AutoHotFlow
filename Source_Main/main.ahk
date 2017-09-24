@@ -124,6 +124,9 @@ AllTriggerClasses:=Object()
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\activate_Window.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\AutoHotkey_script.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Beep.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Change_character_case.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Change_Drive_Label.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Click.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Compress files.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Execute_Flow.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Extract files.ahk

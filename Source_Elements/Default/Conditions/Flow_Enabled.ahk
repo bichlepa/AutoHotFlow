@@ -29,7 +29,14 @@ Element_getCategory_Condition_Flow_Enabled()
 
 Element_getParameters_Condition_Flow_Enabled()
 {
-	return ["ThisFlow", "flowName", "WhichTrigger", "triggerName"]
+	parametersToEdit:=Object()
+	
+	parametersToEdit.push({id: "ThisFlow"})
+	parametersToEdit.push({id: "flowName"})
+	parametersToEdit.push({id: "WhichTrigger"})
+	parametersToEdit.push({id: "triggerName"})
+	
+	return parametersToEdit
 }
 
 Element_getParametrizationDetails_Condition_Flow_Enabled(Environment)

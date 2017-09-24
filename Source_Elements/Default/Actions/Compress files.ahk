@@ -34,7 +34,13 @@ Element_getCategory_Action_Compress_files()
 
 Element_getParameters_Action_Compress_files()
 {
-	return ["file", "zipfile", "zipformat"]
+	parametersToEdit:=Object()
+	
+	parametersToEdit.push({id: "file"})
+	parametersToEdit.push({id: "zipfile"})
+	parametersToEdit.push({id: "zipformat"})
+	
+	return parametersToEdit
 }
 
 Element_getParametrizationDetails_Action_Compress_files(Environment)

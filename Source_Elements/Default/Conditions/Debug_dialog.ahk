@@ -34,7 +34,8 @@ Element_getCategory_Condition_Debug_Dialog()
 
 Element_getParameters_Condition_Debug_Dialog()
 {
-	return []
+	parametersToEdit:=Object()
+	return parametersToEdit
 }
 
 Element_getParametrizationDetails_Condition_Debug_Dialog(Environment)
