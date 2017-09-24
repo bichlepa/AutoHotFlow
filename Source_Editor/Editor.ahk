@@ -47,6 +47,7 @@ lang_setLanguage(_settings.UILanguage)
 #include Source_Editor\API\API receiver Editor.ahk
 #include Source_Editor\API\API Caller Elements.ahk
 #include Source_Editor\Assistants\Get window information.ahk
+#include Source_Editor\Assistants\Mouse Tracker.ahk
 
 #include source_Common\Multithreading\API Caller Main.ahk
 #include source_Common\Debug\Debug.ahk

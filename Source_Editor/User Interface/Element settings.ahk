@@ -168,7 +168,8 @@ class ElementSettings
 		;Make GUI autosizing
 		Gui, GUISettingsOfElementParent:Show, hide w%WSettingsParent%,% lang("Settings") " - " lang(setElementType) " - " Element_getName_%setElementClass%()
 		
-		
+		_share.hwnds["ElementSettingsChild" flowobj.id] :=SettingWindowHWND
+		_share.hwnds["ElementSettingsParent" flowobj.id] :=SettingWindowParentHWND
 		
 		;Calculate position to show the settings window in the middle of the main window
 		pos:=EditGUIGetPos()
@@ -1603,17 +1604,33 @@ class ElementSettings
 			global
 			logger("a3", "Element Settings: Evaluating g-label of button: " thisgoto)
 			local templabel:=this.parameter.goto
+			local countpars
 			if (islabel(templabel))
 			{
 				gosub,% templabel
 			}
-			else if (isfunc(templabel))
+			else 
 			{
-				%templabel%()
-			}
-			else
-			{
-				MsgBox Error on button click. Target label or function '%templabel%' does not exist.
+				countpars:=isfunc(templabel)
+				if (countpars)
+				{
+					if (countpars = 1) ;No mandantory parameters
+					{
+						%templabel%()
+					}
+					else if (countpars = 2) ;One mandantory parameters
+					{
+						%templabel%({flowID: flowobj.id, elementID: setElementID})
+					}
+					else
+					{
+						MsgBox Error on button click. Target function has too many mandantory parameters
+					}
+				}
+				else
+				{
+					MsgBox Error on button click. Target label or function '%templabel%' does not exist.
+				}
 			}
 			return
 		}

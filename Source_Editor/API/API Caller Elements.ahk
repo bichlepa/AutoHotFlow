@@ -249,6 +249,10 @@ x_getElementClass(p_FlowID, p_ElementID)
 	return _flows[p_FlowID].allElements[p_ElementID].class
 }
 
+x_getMyElementPars(Environment)
+{
+	return objfullyClone(_flows[Environment.flowID].allElements[Environment.FlowID].pars)
+}
 
 ;Manual trigger
 x_ManualTriggerExist(p_FlowID, p_TriggerName = "")
@@ -496,9 +500,12 @@ x_TriggerInNewAHKThread_Stop(Environment)
 }
 
 
-x_assistant_windowParameter(neededInfo = "")
+x_assistant_windowParameter(neededInfo)
 {
-	if not (neededInfo)
-		neededInfo:= {wintitle: "Wintitle", excludeTitle: "excludeTitle", winText: "winText", FindHiddenText: "FindHiddenText", ExcludeText: "ExcludeText", ahk_class: "ahk_class", ahk_exe: "ahk_exe", ahk_id: "ahk_id", ahk_pid: "ahk_pid", FindHiddenWindow: "FindHiddenWindow"}
 	assistant_GetWindowInformation(neededInfo)
+}
+
+x_assistant_MouseTracker(neededInfo)
+{
+	assistant_MouseTracker(neededInfo)
 }

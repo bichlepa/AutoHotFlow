@@ -33,8 +33,11 @@ ui_EnableElementSettingsWindow()
 	WinActivate,% "·AutoHotFlow· " lang("Settings")
 }
 
-
-
+ui_GetElementSettingsGUIPos()
+{
+	global 
+	WinGetPos,ElementSettingsGUIX,ElementSettingsGUIY,ElementSettingsGUIWidth,ElementSettingsGUIHeight,% "ahk_id " _share.hwnds["ElementSettingsParent" Flowobj.ID]
+}
 
 ;Select element subtype
 selectSubType(p_ElementID,wait="")
