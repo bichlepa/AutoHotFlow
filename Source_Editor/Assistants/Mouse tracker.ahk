@@ -129,6 +129,17 @@ assistant_MouseTracker_buttonOK()
 	}
 
 }
+
+assistant_MouseTrackerGuiEscape()
+{
+	assistant_MouseTracker_buttonCancel()
+}
+assistant_MouseTrackerGuiClose()
+{
+	assistant_MouseTracker_buttonCancel()
+}
+
+
 assistant_MouseTracker_buttonCancel()
 {
 	global

@@ -10,16 +10,55 @@ assistant_GetWindowInformation(neededInfo)
 	gui, assistant_GetWindowInformation:Default
 
 	gui,add,text,x10 w400 ,% lang("Select_a_window_which_you_want_to_import")
-	gui,add,text,X+10 ,% lang("Optinally select some text of a control in window")
-	gui,add,checkbox,x10 w400 vassistant_GetWindowInformation_CheckBoxFindHiddenWindows gassistant_GetWindowInformation_UpdateWindowlist,% lang("Detect hidden window")
-	gui,add,checkbox,X+10 w400 vassistant_GetWindowInformation_CheckBoxFindHiddenText gassistant_GetWindowInformation_ListBoxTitles checked,% lang("Detect hidden text")
+	if (assistant_GetWindowInformation_NeededInfo.winText)
+	{
+		gui,add,text,X+10 ,% lang("Optinally select some text of a control in window")
+	}
+	if (assistant_GetWindowInformation_NeededInfo.findhiddenwindow)
+	{
+		gui,add,checkbox,x10 w400 vassistant_GetWindowInformation_CheckBoxFindHiddenWindows gassistant_GetWindowInformation_UpdateWindowlist,% lang("Detect hidden window")
+	}
+	if (assistant_GetWindowInformation_NeededInfo.FindHiddenText)
+	{
+		gui,add,checkbox,X+10 w400 vassistant_GetWindowInformation_CheckBoxFindHiddenText gassistant_GetWindowInformation_ListBoxTitles checked,% lang("Detect hidden text")
+	}
 	gui,add,button,x10 w400 h30 gassistant_GetWindowInformation_UpdateWindowlist,% lang("Update window list")
 	gui,add,listbox,x10 w400 h500 AltSubmit vassistant_GetWindowInformation_ListBoxTitles gassistant_GetWindowInformation_ListBoxTitles
-	gui,add,listbox,w400 h500 X+10 vassistant_GetWindowInformation_ListBoxControlTexts
-	gui,add,checkbox,w400 vassistant_GetWindowInformation_CheckBoxImportUniqueIDs,% lang("Also_import_unique_IDs")
-
-	gui,add,button,w400 h30 default gassistant_GetWindowInformation_ButtonOK,% lang("OK")
+	if (assistant_GetWindowInformation_NeededInfo.winText)
+	{
+		gui,add,listbox,w400 h500 X+10 vassistant_GetWindowInformation_ListBoxControlTexts
+	}
+	if (assistant_GetWindowInformation_NeededInfo.ahk_id or assistant_GetWindowInformation_NeededInfo.ahk_pid)
+	{
+		gui,add,checkbox,w400 vassistant_GetWindowInformation_CheckBoxImportUniqueIDs,% lang("Also_import_unique_IDs")
+	}
 	
+	gui,add,text,w1 ,
+	if (assistant_GetWindowInformation_NeededInfo.Xpos)
+	{
+		gui,add,text,X+10 ,% lang("X")
+		gui,add,edit,X+10 w50 vassistant_GetWindowInformation_EditXPos
+	}
+	if (assistant_GetWindowInformation_NeededInfo.Ypos)
+	{
+		gui,add,text,X+10 ,% lang("Y")
+		gui,add,edit,X+10 w50 vassistant_GetWindowInformation_EditYPos
+	}
+	if (assistant_GetWindowInformation_NeededInfo.Width)
+	{
+		gui,add,text,X+10 ,% lang("Width")
+		gui,add,edit,X+10 w50 vassistant_GetWindowInformation_EditWidth
+	}
+	if (assistant_GetWindowInformation_NeededInfo.Height)
+	{
+		gui,add,text,X+10 ,% lang("Height")
+		gui,add,edit,X+10 w50 vassistant_GetWindowInformation_EditHeight
+	}
+	
+	gui,add,button,Y+10 xm w400 h30 default gassistant_GetWindowInformation_ButtonOK,% lang("OK")
+	
+	
+	;Fill values
 	if (assistant_GetWindowInformation_NeededInfo.findhiddenwindow)
 	{
 		tempValue:=x_Par_GetValue(assistant_GetWindowInformation_NeededInfo.findhiddenwindow)
@@ -30,6 +69,27 @@ assistant_GetWindowInformation(neededInfo)
 		tempValue:=x_Par_GetValue(assistant_GetWindowInformation_NeededInfo.findhiddentext)
 		guicontrol,,assistant_GetWindowInformation_CheckBoxFindHiddenText,%tempValue%
 	}
+	if (assistant_GetWindowInformation_NeededInfo.Xpos)
+	{
+		tempValue:=x_Par_GetValue(assistant_GetWindowInformation_NeededInfo.Xpos)
+		guicontrol,,assistant_GetWindowInformation_EditPosX,%tempValue%
+	}
+	if (assistant_GetWindowInformation_NeededInfo.Ypos)
+	{
+		tempValue:=x_Par_GetValue(assistant_GetWindowInformation_NeededInfo.Ypos)
+		guicontrol,,assistant_GetWindowInformation_EditPosY,%tempValue%
+	}
+	if (assistant_GetWindowInformation_NeededInfo.Width)
+	{
+		tempValue:=x_Par_GetValue(assistant_GetWindowInformation_NeededInfo.Width)
+		guicontrol,,assistant_GetWindowInformation_EditWidth,%tempValue%
+	}
+	if (assistant_GetWindowInformation_NeededInfo.Height)
+	{
+		tempValue:=x_Par_GetValue(assistant_GetWindowInformation_NeededInfo.Height)
+		guicontrol,,assistant_GetWindowInformation_EditHeight,%tempValue%
+	}
+	
 	
 	
 	assistant_GetWindowInformation_UpdateWindowlist()
@@ -37,13 +97,15 @@ assistant_GetWindowInformation(neededInfo)
 	if tempCountOfWindows>0
 	{
 		gui,+hwndassistant_GetWindowInformation_HWND
-		;Put the window in the center of the main window
-		gui,show,hide
-		wingetpos,tempParentX,tempParentY,tempParentW,tempParentH,ahk_id %SettingsGUIHWND%
 		
+		;Put the window in the center of the element settings window
+		gui,show,hide
+		ui_GetElementSettingsGUIPos()
+		DetectHiddenWindows,on
 		wingetpos,,,tempWidth,tempHeight,ahk_id %assistant_GetWindowInformation_HWND%
-		tempXpos:=round(tempParentX+tempParentW/2- tempWidth/2)
-		tempYpos:=round(tempParentY+tempParentH/2- tempHeight/2)
+		tempXpos:=round(ElementSettingsGUIX+ElementSettingsGUIWidth/2- tempWidth/2)
+		tempYpos:=round(ElementSettingsGUIY+ElementSettingsGUIHeight/2- tempHeight/2)
+	
 		;~ MsgBox %tempWidth% %assistant_GetWindowInformation_HWND%
 		gui,show,x%tempXpos% y%tempYpos%,% lang("Window assistant")
 		
@@ -72,35 +134,38 @@ assistant_GetWindowInformation_ListBoxTitles()
 	WinGetPos,tempwinx,tempwiny,tempwinw,tempwinh,% "ahk_id " tempWinID
 
 	ui_DrawShapeOnScreen(tempwinx,tempwiny,tempwinw,tempwinh,0,0,tempwinw,tempwinh)
-
-	;Get all controls of window
-	winget,tempControlList,ControlListHwnd,% "ahk_id " tempWinID
-	;~ ToolTip %tempControlList%
-	guicontrol,,assistant_GetWindowInformation_ListBoxControlTexts,|
-	loop,parse,tempControlList,`n
+	guicontrol,,assistant_GetWindowInformation_EditXPos, % tempwinx
+	guicontrol,,assistant_GetWindowInformation_EditYPos, % tempwiny
+	guicontrol,,assistant_GetWindowInformation_EditWidth, % tempwinw
+	guicontrol,,assistant_GetWindowInformation_EditHeight, % tempwinh
+	
+	
+	if (assistant_GetWindowInformation_NeededInfo.winText)
 	{
-		if not assistant_GetWindowInformation_CheckBoxFindHiddenText
+		;Get all controls of window
+		winget,tempControlList,ControlListHwnd,% "ahk_id " tempWinID
+		;~ ToolTip %tempControlList%
+		guicontrol,,assistant_GetWindowInformation_ListBoxControlTexts,|
+		loop,parse,tempControlList,`n
 		{
-			controlget,tempVisible,visible,,,ahk_id %a_loopfield%
-			if tempVisible
+			if not assistant_GetWindowInformation_CheckBoxFindHiddenText
+			{
+				controlget,tempVisible,visible,,,ahk_id %a_loopfield%
+				if tempVisible
+					continue
+			}
+			
+			ControlGetText,tempparText,,ahk_id %a_loopfield%
+			
+			if tempparText= ;Skip controls that have no text
 				continue
+			
+			StringReplace,tempparText,tempparText,`r
+			StringReplace,tempparText,tempparText,`n,¶
+			StringReplace,tempparText,tempparText,|,_
+			guicontrol,,assistant_GetWindowInformation_ListBoxControlTexts,%tempparText%
+			
 		}
-		
-		ControlGetText,tempparText,,ahk_id %a_loopfield%
-		
-		if tempparText= ;Skip controls that have no text
-			continue
-		
-		
-		;~ stringleft,tempparText,tempparText,100
-		
-		StringReplace,tempparText,tempparText,`r
-		StringReplace,tempparText,tempparText,`n,¶
-		StringReplace,tempparText,tempparText,|,_
-		guicontrol,,assistant_GetWindowInformation_ListBoxControlTexts,%tempparText%
-
-		
-		
 	}
 
 	SetTimer,ui_DeleteShapeOnScreen,-2000
@@ -139,7 +204,25 @@ assistant_GetWindowInformation_ButtonOK()
 		x_Par_SetValue(assistant_GetWindowInformation_NeededInfo.findhiddenwindow,assistant_GetWindowInformation_CheckBoxFindHiddenWindows)
 	if (assistant_GetWindowInformation_NeededInfo.findhiddentext)
 		x_Par_SetValue(assistant_GetWindowInformation_NeededInfo.findhiddentext,assistant_GetWindowInformation_CheckBoxFindHiddenText)
-
+	
+	if (assistant_GetWindowInformation_NeededInfo.Xpos)
+	{
+		x_Par_SetValue(assistant_GetWindowInformation_NeededInfo.Xpos,assistant_GetWindowInformation_EditXpos)
+	}
+	if (assistant_GetWindowInformation_NeededInfo.Ypos)
+	{
+		x_Par_SetValue(assistant_GetWindowInformation_NeededInfo.Ypos,assistant_GetWindowInformation_EditYpos)
+	}
+	if (assistant_GetWindowInformation_NeededInfo.Width)
+	{
+		x_Par_SetValue(assistant_GetWindowInformation_NeededInfo.Width,assistant_GetWindowInformation_EditWidth)
+	}
+	if (assistant_GetWindowInformation_NeededInfo.Height)
+	{
+		x_Par_SetValue(assistant_GetWindowInformation_NeededInfo.Height,assistant_GetWindowInformation_EditHeight)
+	}
+	
+	
 	if assistant_GetWindowInformation_CheckBoxImportUniqueIDs=1
 	{
 		WinGet,temp,pid,ahk_id %tempWinID%
@@ -235,6 +318,11 @@ assistant_GetWindowInformation_UpdateWindowlist()
 assistant_GetWindowInformation_GetWindowCoveredByMouse()
 {
 	global
+	
+	IfWinNotExist,ahk_id %SettingWindowHWND%
+	{
+		assistant_GetWindowInformationGuiClose()
+	}
 	
 	;get the mouse position and the control that is covered by the mouse
 	MouseGetPos,tempmousex,tempmousey,tempwinidundermouse,tempcontrol
