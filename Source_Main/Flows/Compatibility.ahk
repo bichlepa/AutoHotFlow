@@ -93,7 +93,7 @@ LoadFlowCheckCompability(p_List,p_ElementID,p_section,FlowCompabilityVersion)
 	{
 		if (p_List[p_ElementID].type="action" and p_List[p_ElementID].subtype="Set_Clipboard") 
 		{
-			temp:=RIni_GetKeyValue("IniFile", tempSection, "varname", "") 
+			temp:=RIni_GetKeyValue("IniFile", p_section, "varname", "") 
 			if temp
 			{
 				p_List[p_ElementID].pars.text:=temp
@@ -107,7 +107,7 @@ LoadFlowCheckCompability(p_List,p_ElementID,p_section,FlowCompabilityVersion)
 	{
 		if (p_List[p_ElementID].type="action" and p_List[p_ElementID].subtype="Play_Sound") 
 		{
-			temp:=RIni_GetKeyValue("IniFile", tempSection, "WhitchSound", "") 
+			temp:=RIni_GetKeyValue("IniFile", p_section, "WhitchSound", "") 
 			if temp
 			{
 				if temp<6
@@ -130,7 +130,7 @@ LoadFlowCheckCompability(p_List,p_ElementID,p_section,FlowCompabilityVersion)
 	{
 		if (p_List[p_ElementID].type="action" and p_List[p_ElementID].subtype="Input_Box") 
 		{
-			temp:=RIni_GetKeyValue("IniFile", tempSection, "text", "") 
+			temp:=RIni_GetKeyValue("IniFile", p_section, "text", "") 
 			p_List[p_ElementID].pars.message:=temp
 			p_List[p_ElementID].pars.IsTimeout:=0
 			p_List[p_ElementID].pars.OnlyNumbers:=0 
@@ -142,7 +142,7 @@ LoadFlowCheckCompability(p_List,p_ElementID,p_section,FlowCompabilityVersion)
 		}
 		if (p_List[p_ElementID].type="condition" and p_List[p_ElementID].subtype="Confirmation_Dialog") 
 		{
-			temp:=RIni_GetKeyValue("IniFile", tempSection, "question", "") 
+			temp:=RIni_GetKeyValue("IniFile", p_section, "question", "") 
 			p_List[p_ElementID].pars.message:=temp
 			p_List[p_ElementID].pars.IsTimeout:=0
 			p_List[p_ElementID].pars.ShowCancelButton:=0 
@@ -151,7 +151,7 @@ LoadFlowCheckCompability(p_List,p_ElementID,p_section,FlowCompabilityVersion)
 		}
 		if (p_List[p_ElementID].type="action" and p_List[p_ElementID].subtype="Message_Box") 
 		{
-			temp:=RIni_GetKeyValue("IniFile", tempSection, "text", "") 
+			temp:=RIni_GetKeyValue("IniFile", p_section, "text", "") 
 			p_List[p_ElementID].pars.message:=temp
 			p_List[p_ElementID].pars.IsTimeout:=0
 			p_List[p_ElementID].pars.IfDismiss:=2 ;Exception if dismiss
@@ -159,22 +159,28 @@ LoadFlowCheckCompability(p_List,p_ElementID,p_section,FlowCompabilityVersion)
 		}
 		
 	}
-	if FlowCompabilityVersion<9 ; 2017,01,04
+	if FlowCompabilityVersion<9 ; AutoHotFlow v1.0 release
 	{
 		if (p_List[p_ElementID].class="action_New_List") 
 		{
-			p_List[p_ElementID].pars.IsExpression:=RIni_GetKeyValue("IniFile", tempSection, "IsExpression", 1) 
-			p_List[p_ElementID].pars.WhichPosition:=RIni_GetKeyValue("IniFile", tempSection, "WhitchPosition", 1) 
-			
+			p_List[p_ElementID].pars.IsExpression:=RIni_GetKeyValue("IniFile", p_section, "IsExpression", 1) 
+			p_List[p_ElementID].pars.WhichPosition:=RIni_GetKeyValue("IniFile", p_section, "WhitchPosition", 1) 
 		}
-		
-	}
-	if FlowCompabilityVersion<10 ; 2017,09,25
-	{
 		if (p_List[p_ElementID].class="action_kill_window") 
 		{
 			p_List[p_ElementID].class :="action_close_window"
 			p_List[p_ElementID].WinCloseMethod :=2 ;Kill method
+		}
+		if (p_List[p_ElementID].class="action_copy_variable")
+		{
+			p_List[p_ElementID].class="action_new_variable"
+			p_List[p_ElementID].pars.VarValue:=RIni_GetKeyValue("IniFile", p_section, "OldVarname", "") 
+			p_List[p_ElementID].pars.expression:=1
+		}
+		if (p_List[p_ElementID].class="action_Recycle_file")
+		{
+			p_List[p_ElementID].class="action_Delete_file"
+			p_List[p_ElementID].file:=RIni_GetKeyValue("IniFile", p_section, "file", "") 
 		}
 		
 	}

@@ -57,7 +57,7 @@ Element_getParameters_&ElementType&_&Name&()
 {
 	parametersToEdit:=Object()
 	
-#if par_label 
+#if par_radio
 	parametersToEdit.push({id: "radio"})
 #endif
 #if par_checkbox 

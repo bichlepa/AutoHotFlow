@@ -107,6 +107,13 @@ Element_run_Action_Select_file(Environment, ElementParameters)
 {
 	;~ d(ElementParameters, "element parameters")
 	Varname := x_replaceVariables(Environment, ElementParameters.Varname)
+	if not x_CheckVariableName(varname)
+	{
+		;On error, finish with exception and return
+		x_finish(Environment, "exception", lang("%1% is not valid", lang("Ouput variable name '%1%'", varname)))
+		return
+	}
+	
 	title := x_replaceVariables(Environment, ElementParameters.title)
 	folder := x_GetFullPath(Environment, x_replaceVariables(Environment, ElementParameters.folder))
 	filter := x_replaceVariables(Environment, ElementParameters.filter)
