@@ -24,6 +24,8 @@ lang_setLanguage(_settings.UILanguage)
 
 #include Lib\Object to file\String-object-file.ahk
 #include Lib\ObjFullyClone\ObjFullyClone.ahk
+#include lib\Random Word List\Random Word List.ahk
+#include Lib\Eject by SKAN\Eject by SKAN.ahk
 
 ;~ #include Source_Draw\API\API receiver execution.ahk
 
@@ -37,7 +39,6 @@ lang_setLanguage(_settings.UILanguage)
 #include source_Common\Variables\expression evaluator.ahk
 #include source_Common\Multithreading\API Caller Main.ahk
 #include source_Common\flows\flows.ahk
-#include lib\Random Word List\Random Word List.ahk
 
 #include Source_Execution\execution task\execution task.ahk
 #include Source_Execution\API\functions for elements.ahk

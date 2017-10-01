@@ -208,6 +208,14 @@ LoadFlowCheckCompability(p_List,p_ElementID,p_section,FlowCompabilityVersion)
 				p_List[p_ElementID].pars.ExpressionPos := "string"
 			else if (p_List[p_ElementID].pars.ExpressionPos=2)
 				p_List[p_ElementID].pars.ExpressionPos := "expression"
+			if (p_List[p_ElementID].pars.ExpressionFrom=1)
+				p_List[p_ElementID].pars.ExpressionFrom := "string"
+			else if (p_List[p_ElementID].pars.ExpressionFrom=2)
+				p_List[p_ElementID].pars.ExpressionFrom := "expression"
+			if (p_List[p_ElementID].pars.ExpressionTo=1)
+				p_List[p_ElementID].pars.ExpressionTo := "string"
+			else if (p_List[p_ElementID].pars.ExpressionTo=2)
+				p_List[p_ElementID].pars.ExpressionTo := "expression"
 		}
 		if (p_List[p_ElementID].class="Action_Change_character_case")
 		{
@@ -321,6 +329,36 @@ LoadFlowCheckCompability(p_List,p_ElementID,p_section,FlowCompabilityVersion)
 			if (p_List[p_ElementID].pars.WhichPosition>= 1 and p_List[p_ElementID].pars.WhichPosition<=tempenum.MaxIndex())
 			{
 				p_List[p_ElementID].pars.WhichPosition:=tempenum[p_List[p_ElementID].pars.WhichPosition]
+			}
+		}
+		if (p_List[p_ElementID].class="Action_Eject_Drive")
+		{
+			tempenum:= ["ejectDrive", "RetractTray"]
+			if (p_List[p_ElementID].pars.WhatDo>= 1 and p_List[p_ElementID].pars.WhatDo<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.WhatDo:=tempenum[p_List[p_ElementID].pars.WhatDo]
+			}
+			tempenum:= ["LibraryEjectByScan", "DeviceIoControl", "builtIn"]
+			if (p_List[p_ElementID].pars.Method>= 1 and p_List[p_ElementID].pars.Method<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.Method:=tempenum[p_List[p_ElementID].pars.Method]
+			}
+		}
+		if (p_List[p_ElementID].class="Action_Empty_Recycle_Bin")
+		{
+			tempenum:= ["All", "Specified"]
+			if (p_List[p_ElementID].pars.AllDrives>= 1 and p_List[p_ElementID].pars.AllDrives<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.AllDrives:=tempenum[p_List[p_ElementID].pars.AllDrives]
+			}
+			p_List[p_ElementID].DriveLetter:=RIni_GetKeyValue("IniFile", p_section, "drive", "") 
+		}
+		if (p_List[p_ElementID].class="Action_Get_Drive_Information")
+		{
+			tempenum:= ["Label", "Type", "Status", "StatusCD", "Capacity", "FreeSpace", "FileSystem", "Serial"]
+			if (p_List[p_ElementID].pars.WhichInformation>= 1 and p_List[p_ElementID].pars.WhichInformation<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.WhichInformation:=tempenum[p_List[p_ElementID].pars.WhichInformation]
 			}
 		}
 	}

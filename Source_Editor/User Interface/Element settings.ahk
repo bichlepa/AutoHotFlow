@@ -1344,7 +1344,7 @@ class ElementSettings
 			else
 			{
 				gui,add,slider, w400 x10 %tempParameterOptions% hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID% ,% temp
-				this.components.push("vGUISettingsOfElement" tempParameterID)
+				this.components.push("GUISettingsOfElement" tempParameterID)
 				ElementSettingsFieldHWNDs[tempHWND]:=this
 				
 			}
@@ -1398,6 +1398,7 @@ class ElementSettings
 			else
 				tempAltSumbit=
 			tempChoises:=parameter.choices
+			tempEnums:=parameter.enum
 			
 			;loop through all choices. Find which one to select. Make a selection list which is capable for the gui,add command
 			tempAllChoices=
@@ -1407,6 +1408,12 @@ class ElementSettings
 				{
 					if (TempOneChoice=temp)
 						temptoChoose:=A_Index
+				}
+				else
+				{
+					if (temp = A_Index or temp = tempEnums[A_Index])
+						temptoChoose:=A_Index
+						
 				}
 				tempAllChoices.="|" TempOneChoice
 				
@@ -1426,7 +1433,7 @@ class ElementSettings
 			
 			temp:=base.getvalue()
 			if (this.parameter.result = "enum")
-				temp:=this.parameter.Enum[a_index]
+				temp:=this.parameter.Enum[temp]
 			
 			return temp
 		}

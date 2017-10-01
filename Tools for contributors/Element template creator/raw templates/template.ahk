@@ -434,6 +434,7 @@ Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 #endif
 #endif
 
+	x_SetVariable(Environment,Varname,VarValue) ;Example
 #if ElementType = action
 #if !addWindowSelector
 #if !addSeparateAhkThread
