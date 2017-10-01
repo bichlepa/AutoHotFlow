@@ -80,7 +80,7 @@ Element_getParametrizationDetails_Action_Move_Window(Environment)
 	parametersToEdit:=Object()
 	
 	parametersToEdit.push({type: "Label", label: lang("Event")})
-	parametersToEdit.push({type: "Radio", id: "WinMoveEvent", default: 1, choices: [lang("Maximize"), lang("Minimize"), lang("Restore"), lang("Move")]})
+	parametersToEdit.push({type: "Radio", id: "WinMoveEvent", default: 1, result: "enum", choices: [lang("Maximize"), lang("Minimize"), lang("Restore"), lang("Move")], enum: ["Maximize", "Minimize", "Restore", "Move"]})
 	parametersToEdit.push({type: "Label", label: lang("Coordinates") " (x,y)", size: "small"})
 	parametersToEdit.push({type: "Edit", id: ["Xpos", "Ypos"], content: "Expression", WarnIfEmpty: true})
 	parametersToEdit.push({type: "Label", label: lang("Width and height"), size: "small"})
@@ -239,20 +239,19 @@ Element_run_Action_Move_Window(Environment, ElementParameters)
 	if tempWinid
 	{
 		x_SetVariable(Environment,"A_WindowID",tempWinid,"Thread")
-		
-		if (WinMoveEvent = 1) ;Maximize
+		if (WinMoveEvent = "Maximize") ;Maximize
 		{
 			WinMaximize,ahk_id %tempWinid%
 		}
-		else if (WinMoveEvent = 2) ;Minimize
+		else if (WinMoveEvent = "Minimize") ;Minimize
 		{
 			WinMinimize,ahk_id %tempWinid%
 		}
-		else if (WinMoveEvent = 3) ;Restore
+		else if (WinMoveEvent = "Restore") ;Restore
 		{
 			WinRestore,ahk_id %tempWinid%
 		}
-		else if (WinMoveEvent = 4) ;Move
+		else if (WinMoveEvent = "Move") ;Move
 		{
 			WinMove, ahk_id %tempWinid%,,%Xpos%, %Ypos%, %Width%, %Height%
 		}

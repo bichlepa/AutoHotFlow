@@ -60,6 +60,9 @@ Element_getParameters_&ElementType&_&Name&()
 #if par_radio
 	parametersToEdit.push({id: "radio"})
 #endif
+#if par_radioEnum
+	parametersToEdit.push({id: "radioEnum"})
+#endif
 #if par_checkbox 
 	parametersToEdit.push({id: "checkbox"})
 #endif
@@ -123,7 +126,10 @@ Element_getParametrizationDetails_&ElementType&_&Name&(Environment)
 	parametersToEdit.push({type: "Label", label: lang("My label")})
 #endif
 #if par_radio 
-	parametersToEdit.push({type: "Radio", id: "radio", default: 1, choices: [lang("Choice %1%", 1), lang("Choice %1%", 2), lang("Choice %1%", 3)]})
+	parametersToEdit.push({type: "Radio", id: "radio", result: "number", default: 1, choices: [lang("Choice %1%", 1), lang("Choice %1%", 2), lang("Choice %1%", 3)]})
+#endif
+#if par_radioEnum
+	parametersToEdit.push({type: "Radio", id: "radioEnum", result: "enum", default: 1, choices: [lang("Cat"), lang("Dog"), lang("Bird")], enum: ["Cat", "Dog", "Bird"]})
 #endif
 #if par_checkbox 
 	parametersToEdit.push({type: "Checkbox", id: "checkbox", default: 0, label: lang("Label")})
@@ -135,13 +141,13 @@ Element_getParametrizationDetails_&ElementType&_&Name&(Environment)
 	parametersToEdit.push({type: "Edit", id: "editExpression", default: 123, content: "Expression", WarnIfEmpty: true})
 #endif
 #if par_editStringOrExpression 
-	parametersToEdit.push({type: "Edit", id: ["editStringOrExpression","expression"], default: ["MyVar",1], content: "StringOrExpression", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Edit", id: "editStringOrExpression", default: "MyVar", content: ["String", "Expression"], contentID: "expression", contentDefault: "string", WarnIfEmpty: true})
 #endif
 #if par_editVariableName
 	parametersToEdit.push({type: "Edit", id: "editVariableName", default: "NewVariable", content: "VariableName", WarnIfEmpty: true})
 #endif
 #if par_editMultiLine
-	parametersToEdit.push({type: "edit", id: "editMultiLine", multiline: true})
+	parametersToEdit.push({type: "multilineEdit", id: "editMultiLine", default: "", WarnIfEmpty: true})
 #endif
 #if par_editTwoExpressions
 	parametersToEdit.push({type: "Edit", id: ["editTwoExpressions1", "editTwoExpressions2"], default: [10, 20], content: "Expression", WarnIfEmpty: true})
@@ -256,6 +262,10 @@ Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 #if par_radio 
 
 	radioValue := ElementParameters.radio
+#endif
+#if par_radioEnum
+
+	radioEnumValue := ElementParameters.radioEnum
 #endif
 #if par_editstring 
 
@@ -560,6 +570,10 @@ Element_enable_&ElementType&_&Name&(Environment, ElementParameters)
 #if par_radio 
 
 	radioValue := ElementParameters.radio
+#endif
+#if par_radioEnum
+
+	radioEnumValue := ElementParameters.radioEnum
 #endif
 #if par_editstring 
 

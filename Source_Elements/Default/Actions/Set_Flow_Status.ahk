@@ -57,12 +57,12 @@ Element_getParametrizationDetails_Action_Set_Flow_Status(Environment)
 	
 	parametersToEdit:=Object()
 	parametersToEdit.push({type: "Label", label: lang("New state")})
-	parametersToEdit.push({type: "Radio", id: "Enable", default: 1, choices: [lang("Enable"), lang("Disable")]})
+	parametersToEdit.push({type: "Radio", id: "Enable", default: 1, result: "enum", choices: [lang("Enable"), lang("Disable")], enum: ["Enable", "Disable"]})
 	parametersToEdit.push({type: "Label", label: lang("Flow_name")})
 	parametersToEdit.push({type: "Checkbox", id: "ThisFlow", default: 1, label: lang("This flow (%1%)",myFlowName ) })
 	parametersToEdit.push({type: "ComboBox", id: "flowName", content: "String", WarnIfEmpty: true, result: "string", choices: choicesFlows})
-	parametersToEdit.push({type: "Label", label: lang("Trigger")})
-	parametersToEdit.push({type: "Radio", id: "WhichTrigger", default: 1, choices: [lang("Any trigger"), lang("Default trigger"), lang("Specific trigger")], label: lang("Which trigger") })
+	parametersToEdit.push({type: "Label", label: lang("Which trigger")})
+	parametersToEdit.push({type: "Radio", id: "WhichTrigger", default: 1, result: "enum", choices: [lang("Any trigger"), lang("Default trigger"), lang("Specific trigger")], enum: ["Any", "Default", "Specific"]})
 	parametersToEdit.push({type: "ComboBox", id: "triggerName", content: "String", WarnIfEmpty: true, result: "string", choices: choicesTriggers})
 
 	return parametersToEdit
@@ -70,7 +70,7 @@ Element_getParametrizationDetails_Action_Set_Flow_Status(Environment)
 
 Element_GenerateName_Action_Set_Flow_Status(Environment, ElementParameters)
 {
-	if (ElementParameters.Enable)
+	if (ElementParameters.Enable = "Enable")
 		enableString:=lang("Enable")
 	else
 		enableString:=lang("Disable")
@@ -79,9 +79,9 @@ Element_GenerateName_Action_Set_Flow_Status(Environment, ElementParameters)
 		FlowName:=lang("This flow")
 	else
 		FlowName:=ElementParameters.flowName
-	if (ElementParameters.WhichTrigger = 1)
+	if (ElementParameters.WhichTrigger = "Any")
 		TriggerName:=lang("Any trigger")
-	else if (ElementParameters.WhichTrigger = 2)
+	else if (ElementParameters.WhichTrigger = "Default")
 		TriggerName:=lang("Default trigger")
 	else
 		TriggerName:=ElementParameters.TriggerName
@@ -96,7 +96,7 @@ Element_CheckSettings_Action_Set_Flow_Status(Environment, ElementParameters)
 	static oldParFlowName
 	static oldParThisFlow
 	
-	if (ElementParameters.WhichTrigger != 3)
+	if (ElementParameters.WhichTrigger != "Specific")
 	{
 		x_Par_Disable("triggerName")
 		x_Par_SetValue("triggerName", "")
@@ -162,19 +162,19 @@ Element_run_Action_Set_Flow_Status(Environment, ElementParameters)
 	FlowID:=x_getFlowIDByName(FlowName)
 	
 	
-	if (ElementParameters.WhichTrigger = 1)
+	if (ElementParameters.WhichTrigger = "Any")
 	{
 		
-		if (ElementParameters.Enable = 1)
+		if (ElementParameters.Enable = "Enable")
 			x_FlowEnable(FlowID)
-		else if (ElementParameters.Enable = 2)
+		else if (ElementParameters.Enable = "Disable")
 			x_FlowDisable(FlowID)
 		return x_finish(Environment,"normal")
 	
 	}
 	else 
 	{
-		if (ElementParameters.WhichTrigger = 2)
+		if (ElementParameters.WhichTrigger = "Default")
 		{
 			TriggerName := ""
 		}

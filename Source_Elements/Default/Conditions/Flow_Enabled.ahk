@@ -61,8 +61,8 @@ Element_getParametrizationDetails_Condition_Flow_Enabled(Environment)
 	parametersToEdit.push({type: "Label", label: lang("Flow_name")})
 	parametersToEdit.push({type: "Checkbox", id: "ThisFlow", default: 1, label: lang("This flow (%1%)",myFlowName ) })
 	parametersToEdit.push({type: "ComboBox", id: "flowName", content: "String", WarnIfEmpty: true, result: "string", choices: choicesFlows})
-	parametersToEdit.push({type: "Label", label: lang("Trigger")})
-	parametersToEdit.push({type: "Radio", id: "WhichTrigger", default: 1, choices: [lang("Any trigger"), lang("Default trigger"), lang("Specific trigger")], label: lang("Which trigger") })
+	parametersToEdit.push({type: "Label", label: lang("Which Trigger")})
+	parametersToEdit.push({type: "Radio", id: "WhichTrigger", default: 1, result: "enum", choices: [lang("Any trigger"), lang("Default trigger"), lang("Specific trigger")], enum: ["Any", "Default", "Specific"]})
 	parametersToEdit.push({type: "ComboBox", id: "triggerName", content: "String", WarnIfEmpty: true, result: "string", choices: choicesTriggers})
 
 	return parametersToEdit
@@ -74,9 +74,9 @@ Element_GenerateName_Condition_Flow_Enabled(Environment, ElementParameters)
 		FlowName:=lang("This flow")
 	else
 		FlowName:=ElementParameters.flowName
-	if (ElementParameters.WhichTrigger = 1)
+	if (ElementParameters.WhichTrigger = "Any")
 		TriggerName:=lang("Any trigger")
-	else if (ElementParameters.WhichTrigger = 2)
+	else if (ElementParameters.WhichTrigger = "Default")
 		TriggerName:=lang("Default trigger")
 	else
 		TriggerName:=ElementParameters.TriggerName
@@ -89,7 +89,7 @@ Element_CheckSettings_Condition_Flow_Enabled(Environment, ElementParameters)
 	static oldParFlowName
 	static oldParThisFlow
 	
-	if (ElementParameters.WhichTrigger != 3)
+	if (ElementParameters.WhichTrigger != "Default trigger")
 	{
 		x_Par_Disable("triggerName")
 		x_Par_SetValue("triggerName", "")
@@ -156,7 +156,7 @@ Element_run_Condition_Flow_Enabled(Environment, ElementParameters)
 	}
 	FlowID:=x_getFlowIDByName(FlowName)
 	
-	if (ElementParameters.WhichTrigger = 1)
+	if (ElementParameters.WhichTrigger = "Any")
 	{
 		if x_isFlowEnabled(FlowID)
 		{
@@ -169,7 +169,7 @@ Element_run_Condition_Flow_Enabled(Environment, ElementParameters)
 	}
 	else 
 	{
-		if (ElementParameters.WhichTrigger = 2)
+		if (ElementParameters.WhichTrigger = "Default")
 		{
 			TriggerName := ""
 		}

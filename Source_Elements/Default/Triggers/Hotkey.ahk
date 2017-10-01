@@ -67,7 +67,7 @@ Element_getParametrizationDetails_Trigger_Hotkey(Environment)
 	parametersToEdit.push({type: "Checkbox", id: "WhenRelease", default: 0, label: lang("Trigger on release rather than press")})
 	parametersToEdit.push({type: "Label", label: lang("Window")})
 	parametersToEdit.push({type: "Label", size: "small", label: lang("Where should the hotkey be active?")})
-	parametersToEdit.push({type: "Radio", id: "UseWindow", default: 1, choices: [lang("Everywhere"), lang("Only active when the specified window is active"), lang("Only active whe the specified window exists")]})
+	parametersToEdit.push({type: "Radio", id: "UseWindow", default: 1, result: "enum", choices: [lang("Everywhere"), lang("Only active when the specified window is active"), lang("Only active whe the specified window exists")], enum: ["Everywhere", "WindowIsActive", "WindowExists"]})
 	parametersToEdit.push({type: "Label", size: "small", label: lang("Title_of_Window")})
 	parametersToEdit.push({type: "Radio", id: "TitleMatchMode", default: 1, choices: [lang("Start_with"), lang("Contain_anywhere"), lang("Exactly")]})
 	parametersToEdit.push({type: "Edit", id: "Wintitle", content: "String"})
@@ -103,7 +103,7 @@ Element_CheckSettings_Trigger_Hotkey(Environment, ElementParameters)
 	x_Par_Disable("WhenRelease", ElementParameters.BlockKey)
 	x_Par_Disable("BlockKey", ElementParameters.WhenRelease)
 	
-	showWindowPars:=ElementParameters.UseWindow =2 or ElementParameters.UseWindow=3
+	showWindowPars:=ElementParameters.UseWindow ="WindowIsActive" or ElementParameters.UseWindow="WindowExists"
 	x_Par_Enable("TitleMatchMode", showWindowPars)
 	x_Par_Enable("Wintitle", showWindowPars)
 	x_Par_Enable("excludeTitle", showWindowPars)
@@ -133,15 +133,15 @@ Element_enable_Trigger_Hotkey(Environment, ElementParameters)
 		x_finish(Environment, "exception", lang("The_Hotkey_is_not_set!"))
 		return
 	}
-	if (ElementParameters.BlockKey=0)
+	if (ElementParameters.BlockKey=False)
 		temphotkey=~%temphotkey%
-	if (ElementParameters.WhenRelease=1)
+	if (ElementParameters.WhenRelease=True)
 		temphotkey=%temphotkey% UP
-	if (ElementParameters.Wildcard=1)
+	if (ElementParameters.Wildcard=True)
 		temphotkey=*%temphotkey%
 	
 	
-	if (ElementParameters.UseWindow =2 or ElementParameters.UseWindow =3)
+	if (ElementParameters.UseWindow ="WindowIsActive" or ElementParameters.UseWindow ="WindowExists")
 	{
 		local tempWinTitle:=x_replaceVariables(Environment, ElementParameters.Wintitle) 
 		local tempWinText:=x_replaceVariables(Environment, ElementParameters.winText)
@@ -170,11 +170,11 @@ Element_enable_Trigger_Hotkey(Environment, ElementParameters)
 		
 		SetTitleMatchMode,%tempTitleMatchMode%
 		
-		if ElementParameters.findhiddenwindow=0
+		if (ElementParameters.findhiddenwindow=False)
 			DetectHiddenWindows off
 		else
 			DetectHiddenWindows on
-		if ElementParameters.findhiddentext=0
+		if (ElementParameters.findhiddentext=False)
 			DetectHiddenText off
 		else
 			DetectHiddenText on
@@ -182,9 +182,9 @@ Element_enable_Trigger_Hotkey(Environment, ElementParameters)
 
 
 	
-	if (ElementParameters.UseWindow =2)
+	if (ElementParameters.UseWindow ="WindowIsActive")
 		hotkey,IfWinActive,%tempwinstring%,%tempWinText% ;,%tempExcludeTitle%,%tempExcludeText%
-	else if (ElementParameters.UseWindow =3)
+	else if (ElementParameters.UseWindow ="WindowExists")
 		hotkey,IfWinExist,%tempwinstring%,%tempWinText% ;,%tempExcludeTitle%,%tempExcludeText%
 	else
 		hotkey,IfWinActive

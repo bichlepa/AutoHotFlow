@@ -73,19 +73,19 @@ Element_getParametrizationDetails_Action_Click(Environment)
 	parametersToEdit:=Object()
 	
 	parametersToEdit.push({type: "Label", label: lang("Which button")})
-	parametersToEdit.push({type: "DropDown", id: "Button", default: 1, choices: [lang("Left button"), lang("Right button"), lang("Middle Button"), lang("Wheel up"), lang("Wheel down"), lang("Wheel left"), lang("Wheel right"), lang("4th mouse button (back)"), lang("5th mouse button (forward)")], result: "number"})
+	parametersToEdit.push({type: "DropDown", id: "Button", default: 1, result: "enum", choices: [lang("Left button"), lang("Right button"), lang("Middle Button"), lang("Wheel up"), lang("Wheel down"), lang("Wheel left"), lang("Wheel right"), lang("4th mouse button (back)"), lang("5th mouse button (forward)")], enum: ["Left", "Right", "Middle", "WheelUp", "WheelDown", "WheelLeft", "WheelRight", "X1", "X2"]})
 	parametersToEdit.push({type: "Label", label: lang("Click count")})
 	parametersToEdit.push({type: "Edit", id: "ClickCount", default: 1, content: "Expression", WarnIfEmpty: true})
 	parametersToEdit.push({type: "Label", label: lang("Event")})
-	parametersToEdit.push({type: "Radio", id: "DownUp", default: 1, choices: [lang("Click (Down and up)"), lang("Keep down"), lang("Release only")]})
+	parametersToEdit.push({type: "Radio", id: "DownUp", default: 1, result: "enum", choices: [lang("Click (Down and up)"), lang("Keep down"), lang("Release only")], enum: ["Click", "D", "U"]})
 	parametersToEdit.push({type: "Label", label: lang("Mouse position")})
 	parametersToEdit.push({type: "Checkbox", id: "changePosition", default: 0, label: lang("Move mouse before clicking")})
-	parametersToEdit.push({type: "Radio", id: "CoordMode", default: 1, choices: [lang("Relative to screen"), lang("Relative to active window position"), lang("Relative to active window client position"), lang("Relative to current mouse position")]})
+	parametersToEdit.push({type: "Radio", id: "CoordMode", default: 1, result: "enum", choices: [lang("Relative to screen"), lang("Relative to active window position"), lang("Relative to active window client position"), lang("Relative to current mouse position")], enum: ["Screen", "Window", "Cilent", "Relative"]})
 	parametersToEdit.push({type: "Label", label: lang("Coordinates") lang("(x,y)"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: ["Xpos", "Ypos"], default: [10, 20], content: "Expression", WarnIfEmpty: true})
 	parametersToEdit.push({type: "button", id: "MouseTracker", goto: "ActionClickMouseTracker", label: lang("Get coordinates")})
 	parametersToEdit.push({type: "Label", label: lang("Method")})
-	parametersToEdit.push({type: "Radio", id: "SendMode", default: 1, choices: [lang("Input mode"), lang("Event mode"), lang("Play mode")]})
+	parametersToEdit.push({type: "Radio", id: "SendMode", default: 1, result: "enum", choices: [lang("Input mode"), lang("Event mode"), lang("Play mode")], enum: ["Input", "Event", "Play"]})
 	parametersToEdit.push({type: "Label", label: lang("Speed")})
 	parametersToEdit.push({type: "Slider", id: "speed", default: 2, options: "Range0-100 tooltip"})
 	
@@ -141,9 +141,9 @@ Element_run_Action_Click(Environment, ElementParameters)
 	;Parameter evaluation and check
 	changePosition := ElementParameters.changePosition
 
-	DownUpIdx := ElementParameters.DownUp
-	CoordModeIdx := ElementParameters.CoordMode
-	SendModeIdx := ElementParameters.SendMode
+	updownValue := ElementParameters.DownUp
+	CoordModeValue := ElementParameters.CoordMode
+	SendModeValue := ElementParameters.SendMode
 
 	evRes := x_evaluateExpression(Environment,ElementParameters.ClickCount)
 	if (evRes.error)
@@ -154,31 +154,18 @@ Element_run_Action_Click(Environment, ElementParameters)
 	}
 	ClickCount:=evRes.result
 
-	ButtonIdx := ElementParameters.Button
+	ButtonName := ElementParameters.Button
 
 	speed:=ElementParameters.speed
 
-
-	if ButtonIdx=1
-		ButtonName=Left
-	else if ButtonIdx=2
-		ButtonName=Right
-	else if ButtonIdx=3
-		ButtonName=Middle
-	else if ButtonIdx=4
-		ButtonName=WheelUp
-	else if ButtonIdx=5
-		ButtonName=WheelDown
-	else if ButtonIdx=6
-		ButtonName=WheelLeft
-	else if ButtonIdx=7
-		ButtonName=WheelRight
-	else if ButtonIdx=8
-		ButtonName=X1
-	else if ButtonIdx=9
-		ButtonName=X2
-	else
-		x_finish(Environment, "exception", lang("Mouse button index invalid: '%1%'", ElementParameters.button)) 
+	if (updownValue="click")
+		updownValue=
+	
+	if (CoordModeValue = "relative")
+	{
+		CoordModeValue := ""
+		relativeValue:="R"
+	}
 	
 	if changePosition
 	{
@@ -209,45 +196,10 @@ Element_run_Action_Click(Environment, ElementParameters)
 			x_finish(Environment, "exception", lang("%1% is not a number.",lang("Y position"))) 
 			return
 		}
-		
-		if CoordModeIdx=1
-			CoordModeValue= Screen
-		else if CoordModeIdx=2
-			CoordModeValue= Window
-		else if CoordModeIdx=3
-			CoordModeValue= Client
-
-		if CoordModeIdx=4
-			relativeValue=R
 	}
-
-	if SendModeIdx=1
-		SendmodeValue= Input
-	else if SendModeIdx=2
-		SendmodeValue= Event
-	else if SendModeIdx=3
-		SendmodeValue= Play
-	else
-		x_finish(Environment, "exception", lang("Send mode has invalid value: '%1%'", ElementParameters.button))
-	
-	if DownUpIdx=1
-		updownValue=
-	else if DownUpIdx=2
-		updownValue=D
-	else if DownUpIdx=3
-		updownValue=U
-	else
-		x_finish(Environment, "exception", lang("Send mode has invalid value: '%1%'", ElementParameters.button))
-	
-	if CoordModeIdx=1
-		CoordMode, Mouse, Screen
-	else if CoordModeIdx=2
-		CoordMode, Mouse, Window
-	else if CoordModeIdx=3
-		CoordMode, Mouse, Client
 		
 	;Action
-	SendMode, %SendmodeValue%
+	SendMode, %SendModeValue%
 	if changePosition=1
 	{
 		if not relativeValue

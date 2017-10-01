@@ -159,12 +159,14 @@ LoadFlowCheckCompability(p_List,p_ElementID,p_section,FlowCompabilityVersion)
 		}
 		
 	}
-	if FlowCompabilityVersion<9 ; AutoHotFlow v1.0 release
+	if FlowCompabilityVersion<11 ; AutoHotFlow v1.0 release
 	{
 		if (p_List[p_ElementID].class="action_New_List") 
 		{
-			p_List[p_ElementID].pars.IsExpression:=RIni_GetKeyValue("IniFile", p_section, "IsExpression", 1) 
-			p_List[p_ElementID].pars.WhichPosition:=RIni_GetKeyValue("IniFile", p_section, "WhitchPosition", 1) 
+			if not (p_List[p_ElementID].pars.IsExpression)
+				p_List[p_ElementID].pars.IsExpression:=RIni_GetKeyValue("IniFile", p_section, "IsExpression", 1) 
+			if not (p_List[p_ElementID].pars.WhichPosition)
+				p_List[p_ElementID].pars.WhichPosition:=RIni_GetKeyValue("IniFile", p_section, "WhitchPosition", 1) 
 		}
 		if (p_List[p_ElementID].class="action_kill_window") 
 		{
@@ -175,14 +177,152 @@ LoadFlowCheckCompability(p_List,p_ElementID,p_section,FlowCompabilityVersion)
 		{
 			p_List[p_ElementID].class="action_new_variable"
 			p_List[p_ElementID].pars.VarValue:=RIni_GetKeyValue("IniFile", p_section, "OldVarname", "") 
-			p_List[p_ElementID].pars.expression:=1
+			p_List[p_ElementID].pars.expression:="string"
 		}
 		if (p_List[p_ElementID].class="action_Recycle_file")
 		{
 			p_List[p_ElementID].class="action_Delete_file"
 			p_List[p_ElementID].file:=RIni_GetKeyValue("IniFile", p_section, "file", "") 
 		}
-		
+		if (p_List[p_ElementID].class="Action_Download_File")
+		{
+			if (p_List[p_ElementID].pars.isexpression=1)
+				p_List[p_ElementID].pars.isexpression := "rawString"
+			else if (p_List[p_ElementID].pars.expression=2)
+				p_List[p_ElementID].pars.isexpression := "string"
+			else if (p_List[p_ElementID].pars.expression=3)
+				p_List[p_ElementID].pars.isexpression := "expression"
+		}
+		else
+		{
+			;All elements with the parameter expression. The selection results now to an enum instead of number 1 or 2.
+			if (p_List[p_ElementID].pars.expression=1)
+				p_List[p_ElementID].pars.expression := "string"
+			else if (p_List[p_ElementID].pars.expression=2)
+				p_List[p_ElementID].pars.expression := "expression"
+			if (p_List[p_ElementID].pars.isExpression=1)
+				p_List[p_ElementID].pars.isExpression := "string"
+			else if (p_List[p_ElementID].pars.isExpression=2)
+				p_List[p_ElementID].pars.isExpression := "expression"
+			if (p_List[p_ElementID].pars.ExpressionPos=1)
+				p_List[p_ElementID].pars.ExpressionPos := "string"
+			else if (p_List[p_ElementID].pars.ExpressionPos=2)
+				p_List[p_ElementID].pars.ExpressionPos := "expression"
+		}
+		if (p_List[p_ElementID].class="Action_Change_character_case")
+		{
+			if (p_List[p_ElementID].pars.CharCase=1)
+				p_List[p_ElementID].pars.CharCase := "upper"
+			else if (p_List[p_ElementID].pars.CharCase=2)
+				p_List[p_ElementID].pars.CharCase := "lower"
+			else if (p_List[p_ElementID].pars.CharCase=3)
+				p_List[p_ElementID].pars.CharCase := "firstUP"
+		}
+		if (p_List[p_ElementID].class="Action_Change_character_case")
+		{
+			tempenum:= ["Left", "Right", "Middle", "WheelUp", "WheelDown", "WheelLeft", "WheelRight", "X1", "X2"]
+			if (p_List[p_ElementID].pars.Button>= 1 and p_List[p_ElementID].pars.Button<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.Button:=tempenum[p_List[p_ElementID].pars.Button]
+			}
+		}
+		if (p_List[p_ElementID].class="Action_Click")
+		{
+			tempenum:= ["Input", "Event", "Play"]
+			if (p_List[p_ElementID].pars.SendMode>= 1 and p_List[p_ElementID].pars.SendMode<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.SendMode:=tempenum[p_List[p_ElementID].pars.SendMode]
+			}
+			tempenum:= ["Screen", "Window", "Cilent", "Relative"]
+			if (p_List[p_ElementID].pars.CoordMode>= 1 and p_List[p_ElementID].pars.CoordMode<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.CoordMode:=tempenum[p_List[p_ElementID].pars.CoordMode]
+			}
+			tempenum:= ["Click", "D", "U"]
+			if (p_List[p_ElementID].pars.DownUp>= 1 and p_List[p_ElementID].pars.DownUp<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.DownUp:=tempenum[p_List[p_ElementID].pars.DownUp]
+			}
+		}
+		if (p_List[p_ElementID].class="Action_Move_Window")
+		{
+			tempenum:= ["Maximize", "Minimize", "Restore", "Move"]
+			if (p_List[p_ElementID].pars.WinMoveEvent>= 1 and p_List[p_ElementID].pars.WinMoveEvent<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.WinMoveEvent:=tempenum[p_List[p_ElementID].pars.WinMoveEvent]
+			}
+		}
+		if (p_List[p_ElementID].class="Action_New_List")
+		{
+			tempenum:= ["Empty", "One", "Multiple"]
+			if (p_List[p_ElementID].pars.InitialContent>= 1 and p_List[p_ElementID].pars.InitialContent<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.InitialContent:=tempenum[p_List[p_ElementID].pars.InitialContent]
+			}
+		}
+		if (p_List[p_ElementID].class="Action_New_List")
+		{
+			tempenum:= ["Any", "Default", "Specific"]
+			if (p_List[p_ElementID].pars.WhichTrigger>= 1 and p_List[p_ElementID].pars.WhichTrigger<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.WhichTrigger:=tempenum[p_List[p_ElementID].pars.WhichTrigger]
+			}
+			tempenum:= ["Enable", "Disable"]
+			if (p_List[p_ElementID].pars.Enable>= 1 and p_List[p_ElementID].pars.Enable<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.Enable:=tempenum[p_List[p_ElementID].pars.Enable]
+			}
+		}
+		if (p_List[p_ElementID].class="Condition_Flow_Enabled")
+		{
+			tempenum:= ["Any", "Default", "Specific"]
+			if (p_List[p_ElementID].pars.WhichTrigger>= 1 and p_List[p_ElementID].pars.WhichTrigger<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.WhichTrigger:=tempenum[p_List[p_ElementID].pars.WhichTrigger]
+			}
+		}
+		if (p_List[p_ElementID].class="Action_Sleep")
+		{
+			tempenum:= ["Milliseconds", "Seconds", "Minutes"]
+			if (p_List[p_ElementID].pars.Unit>= 1 and p_List[p_ElementID].pars.Unit<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.Unit:=tempenum[p_List[p_ElementID].pars.Unit]
+			}
+		}
+		if (p_List[p_ElementID].class="Action_Tooltip")
+		{
+			tempenum:= ["Milliseconds", "Seconds", "Minutes"]
+			if (p_List[p_ElementID].pars.Unit>= 1 and p_List[p_ElementID].pars.Unit<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.Unit:=tempenum[p_List[p_ElementID].pars.Unit]
+			}
+		}
+		if (p_List[p_ElementID].class="Trigger_Hotkey")
+		{
+			tempenum:= ["Everywhere", "WindowIsActive", "WindowExists"]
+			if (p_List[p_ElementID].pars.UseWindow>= 1 and p_List[p_ElementID].pars.UseWindow<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.UseWindow:=tempenum[p_List[p_ElementID].pars.UseWindow]
+			}
+		}
+		if (p_List[p_ElementID].class="Action_Delete_From_Ini")
+		{
+			tempenum:= ["DeleteKey", "DeleteSection"]
+			if (p_List[p_ElementID].pars.Action>= 1 and p_List[p_ElementID].pars.Action<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.Action:=tempenum[p_List[p_ElementID].pars.Action]
+			}
+		}
+		if (p_List[p_ElementID].class="Action_Delete_From_List")
+		{
+			if not (p_List[p_ElementID].pars.WhichPosition)
+				p_List[p_ElementID].pars.WhichPosition:=RIni_GetKeyValue("IniFile", p_section, "WhitchPosition", 2) 
+			tempenum:= ["DeleteKey", "DeleteSection"]
+			if (p_List[p_ElementID].pars.WhichPosition>= 1 and p_List[p_ElementID].pars.WhichPosition<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.WhichPosition:=tempenum[p_List[p_ElementID].pars.WhichPosition]
+			}
+		}
 	}
 	
 	if FlowCompabilityVersion<1000000000 ; Only for test cases. On release this should be empty

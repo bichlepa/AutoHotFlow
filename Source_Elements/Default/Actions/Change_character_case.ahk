@@ -70,9 +70,9 @@ Element_getParametrizationDetails_Action_Change_character_case(Environment)
 	parametersToEdit.push({type: "Label", label: lang("Output Variable_name")})
 	parametersToEdit.push({type: "Edit", id: "Varname", default: "NewVariable", content: "VariableName", WarnIfEmpty: true})
 	parametersToEdit.push({type: "Label", label:  lang("Input string")})
-	parametersToEdit.push({type: "Edit", id: "VarValue", default: ["Hello World",1], content: "StringOrExpression", contentParID: "expression", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Edit", id: "VarValue", default: "Hello World", content: ["String", "Expression"], contentID: "expression", contentDefault: "string", WarnIfEmpty: true})
 	parametersToEdit.push({type: "Label", label: lang("Which case (character case)")})
-	parametersToEdit.push({type: "Radio", id: "CharCase", default: 1, choices: [lang("Uppercase"), lang("Lowercase"), lang("Firt character of a word is uppercase")]})
+	parametersToEdit.push({type: "Radio", id: "CharCase", default: 1, choices: [lang("Uppercase"), lang("Lowercase"), lang("Firt character of a word is uppercase")], enum: ["upper", "lower", "firstUp"]})
 
 	return parametersToEdit
 }
@@ -108,7 +108,7 @@ Element_run_Action_Change_character_case(Environment, ElementParameters)
 		return
 	}
 	
-	if (ElementParameters.Expression = 2)
+	if (ElementParameters.Expression = "expression")
 	{
 		evRes := x_EvaluateExpression(Environment, ElementParameters.VarValue)
 		if (evRes.error)
@@ -127,11 +127,11 @@ Element_run_Action_Change_character_case(Environment, ElementParameters)
 	
 	CharCase := ElementParameters.CharCase
 	
-	if CharCase=1 ;Uppercase
+	if CharCase=upper ;Uppercase
 		StringUpper,VarValue,VarValue
-	else if CharCase=2 ;Lowercase
+	else if CharCase=lower ;Lowercase
 		StringLower,VarValue,VarValue
-	else if CharCase=3
+	else if CharCase=firstUp
 		StringUpper,VarValue,VarValue,T ;First character of a word is uppercase
 	x_SetVariable(Environment,Varname,VarValue)
 	

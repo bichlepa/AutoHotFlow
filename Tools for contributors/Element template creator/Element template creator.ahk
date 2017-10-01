@@ -37,7 +37,8 @@ gui,add,dropdownlist,yp %posx2% vstability choose1 ggenerate, % "Stable|Experime
 gui,add,text,%posx1% Y+20, Editor GUI contents
 gui,add,checkbox,yp %posx2% vpar_label ggenerate checked, Label
 gui,add,checkbox,Y+10 %posx2% vpar_checkbox ggenerate checked, Checkbox
-gui,add,checkbox,Y+10 %posx2% vpar_radio ggenerate, Radio
+gui,add,checkbox,Y+10 %posx2% vpar_radio ggenerate, Radio (Number)
+gui,add,checkbox,Y+10 %posx2% vpar_radioEnum ggenerate, Radio (Enum)
 gui,add,checkbox,Y+10 %posx2% vpar_editString ggenerate, Edit (string)
 gui,add,checkbox,Y+10 %posx2% vpar_editExpression ggenerate, Edit (expression)
 gui,add,checkbox,Y+10 %posx2% vpar_editStringOrExpression ggenerate, Edit (string or expression)

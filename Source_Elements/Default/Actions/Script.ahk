@@ -44,8 +44,8 @@ Element_getParameters_Action_Script()
 Element_getParametrizationDetails_Action_Script(Environment)
 {
 	parametersToEdit:=Object()
-	parametersToEdit.push({type: "Script", label: lang("Script")})
-	parametersToEdit.push({type: "Edit", id: "Script", default: "", content: "Script", WarnIfEmpty: false, multiline: true})
+	parametersToEdit.push({type: "label", label: lang("Script")})
+	parametersToEdit.push({type: "multilineEdit", id: "Script", default: "", WarnIfEmpty: true})
 
 	return parametersToEdit
 }

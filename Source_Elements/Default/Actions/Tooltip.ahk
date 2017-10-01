@@ -48,10 +48,10 @@ Element_getParametrizationDetails_Action_Tooltip(Environment)
 {
 	parametersToEdit:=Object()
 	parametersToEdit.push({type: "Label", label: lang("Text_to_show")})
-	parametersToEdit.push({type: "Edit", id: "text", default: lang("Message"), multiline: true, content: "String"})
+	parametersToEdit.push({type: "multilineEdit", id: "text", default:  lang("Message"), WarnIfEmpty: true})
 	parametersToEdit.push({type: "Label", label: lang("Duration")})
 	parametersToEdit.push({type: "Edit", id: "duration", default: 2, content: "Expression", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Radio", id: "Unit", default: 2, choices: [lang("Milliseconds"), lang("Seconds"), lang("Minutes")]})
+	parametersToEdit.push({type: "Radio", id: "Unit", default: 2, result: "enum", choices: [lang("Milliseconds"), lang("Seconds"), lang("Minutes")], enum: ["Milliseconds", "Seconds", "Minutes"]})
 	parametersToEdit.push({type: "Label", label: lang("Options")})
 	parametersToEdit.push({type: "Checkbox", id: "follow_mouse", default: 1, label: lang("Follow_Mouse")})
 
@@ -61,11 +61,11 @@ Element_getParametrizationDetails_Action_Tooltip(Environment)
 Element_GenerateName_Action_Tooltip(Environment, ElementParameters)
 {
 	global
-	if (ElementParameters.Unit = 1)
+	if (ElementParameters.Unit = "Milliseconds")
 		duration:=ElementParameters.duration " " lang("ms #Milliseconds")
-	if (ElementParameters.Unit = 2)
+	if (ElementParameters.Unit = "Seconds")
 		duration:=ElementParameters.duration " " lang("s #Seconds")
-	if (ElementParameters.Unit = 3)
+	if (ElementParameters.Unit = "Minutes")
 		duration:=ElementParameters.duration " " lang("m #Minutes")
 	
 	if (ElementParameters.follow_mouse=1)
@@ -90,11 +90,11 @@ Element_run_Action_Tooltip(Environment, ElementParameters)
 	if (ElementParameters.follow_mouse =1)
 		SetTimer,runActionTooltip_follow_mouse,10,,,13
 	
-	if (ElementParameters.Unit=1) ;Milliseconds
+	if (ElementParameters.Unit="Milliseconds") ;Milliseconds
 		tempDuration:=ElementParameters.duration
-	else if (ElementParameters.Unit=2) ;Seconds
+	else if (ElementParameters.Unit="Seconds") ;Seconds
 		tempDuration:=ElementParameters.duration * 1000
-	else if (ElementParameters.Unit=3) ;minutes
+	else if (ElementParameters.Unit="Minutes") ;minutes
 		tempDuration:=ElementParameters.duration * 60000
 	
 	

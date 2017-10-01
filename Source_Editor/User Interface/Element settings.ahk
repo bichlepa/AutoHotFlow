@@ -51,6 +51,7 @@ class ElementSettings
 		
 		;Get the parameter list
 		parametersToEdit:=Element_getParametrizationDetails_%setElementClass%({flowID: flowobj.id, elementID: setElementID})
+		parametersList:=Element_getParameters_%setElementClass%()
 		
 		;All elements have the parameter "name" and "StandardName"
 		ElementSettingsFields.push(new this.label({label: lang("name (name)")}))
@@ -68,6 +69,10 @@ class ElementSettings
 			else if (parameter.type="Edit")
 			{
 				ElementSettingsFields.push(new this.edit(parameter))
+			}
+			else if (parameter.type="multilineEdit")
+			{
+				ElementSettingsFields.push(new this.multilineEdit(parameter))
 			}
 			else if (parameter.type="Checkbox")
 			{
@@ -302,6 +307,16 @@ class ElementSettings
 				continue
 			;~ MsgBox % strobj(parameterID)
 			
+			;The edit control can also have parameter names which are specified in key "ContentID"
+			if (IsObject(oneField.parameter.ContentID))
+			{
+				tempParameterID.push(oneField.parameter.ContentID[1])
+			}
+			else if (parameter.ContentID)
+			{
+				tempParameterID.push(oneField.parameter.ContentID)
+			}
+					
 			
 			;Certain types of control consist of multiple controls and thus contain multiple parameters.
 			for ElementSaveindex2, oneID in parameterID
@@ -365,6 +380,15 @@ class ElementSettings
 			}
 			else if (parameter.id!="")
 				ElementSettingsFieldParIDs[parameter.id]:=this
+			if (isobject(parameter.contentid))
+			{
+				for index, onepar in parameter.contentid
+				{
+					ElementSettingsFieldParIDs[onepar]:=this
+				}
+			}
+			else if (parameter.contentid!="")
+				ElementSettingsFieldParIDs[parameter.contentid]:=this
 		}
 		
 		;Get value of a field. 
@@ -411,7 +435,17 @@ class ElementSettings
 					;make list of all available parameter ID of oneField object
 					tempParameterID:=oneField.parameter.id
 					if ((not isobject(tempParameterID)) and tempParameterID != "")
-					tempParameterID:=[tempParameterID]
+						tempParameterID:=[tempParameterID]
+					
+					;The edit control can also have parameter names which are specified in key "ContentID"
+					if (IsObject(oneField.parameter.ContentID))
+					{
+						tempParameterID.push(oneField.parameter.ContentID[1])
+					}
+					else if (parameter.ContentID)
+					{
+						tempParameterID.push(oneField.parameter.ContentID)
+					}
 					
 					for oneindex, oneid in tempParameterID
 					{
@@ -726,6 +760,7 @@ class ElementSettings
 			base.__new(parameter)
 			local tempAssigned, tempMakeNewGroup, tempChecked, temp, tempHWND
 			local tempParameterID:=parameter.id
+			local hasEnum
 			
 			gui,font,s8 cDefault wnorm
 			temp:=setElement.pars[tempParameterID] 
@@ -737,7 +772,7 @@ class ElementSettings
 				else
 					tempMakeNewGroup=
 				
-				if (temp=a_index)
+				if (temp=a_index or temp = parameter.Enum[a_index])
 				{
 					tempChecked=checked
 					tempAssigned:=true
@@ -771,7 +806,14 @@ class ElementSettings
 				guicontrolget,temp,SettingsOfElement:,GUISettingsOfElement%tempParameterID%%a_index%
 				if (temp=1)
 				{
-					temp:=A_Index
+					if (this.parameter.result = "enum")
+					{
+						temp:=this.parameter.Enum[a_index]
+					}
+					else
+					{
+						temp:=A_Index
+					}
 					break
 				}
 			}
@@ -781,7 +823,27 @@ class ElementSettings
 		setvalue(value)
 		{
 			global
+			local temp
 			local tempParameterID:=this.parameter.id
+			if not (value >= 1 and value <= this.parameter.choices.MaxIndex())
+			{
+				 ;This might be an enum value
+				if (IsObject(this.parameter.Enum))
+				{
+					loop % this.parameter.choices.MaxIndex()
+					{
+						if (this.parameter.Enum[a_index] = value)
+						{
+							temp := a_index
+							break
+						}
+					}
+				}
+			}
+			else
+			{
+				temp:=A_Index
+			}
 			GUIControl,SettingsOfElement:,GUISettingsOfElement%tempParameterID%%value%,1
 			return temp
 		}
@@ -795,198 +857,140 @@ class ElementSettings
 		{
 			global
 			base.__new(parameter)
-			local temp, temptext, tempIsMulti, tempXpos,tempEditwidth, tempHWND, tempContentTypeID, tempContentTypeNum, tempOneParameterID, tempchecked1, tempchecked2, tempassigned
-			if (not IsObject(parameter.id))
-				parameter.id:=[parameter.id]
+			local temp, temptext, tempIsMulti, tempXpos,tempEditwidth, tempHWND, tempContentTypeID, tempContentTypeNum, tempFirstParameterID, tempchecked1, tempchecked2, tempassigned, tempContentDefault
+			local tempwAvailable, tempw
+			local oneindex, onevalue
+			if (not IsObject(parameter.id)) ;convert to object if it is a string
+				parameter.id:=[parameter.id] 
 			local tempParameterID:=parameter.id
-		
+			local tempFirstParameterID:=parameter.id[1]
+			if (not IsObject(parameter.default)) ;convert to object if it is a string
+				parameter.default:=[parameter.default]
+			local tempParameterdefault:=parameter.default
+			if (not IsObject(parameter.content)) ;convert to object if it is a string
+				parameter.content:=[parameter.content]
+			local tempParameterContentType:=parameter.content
+			if (IsObject(parameter.contentID)) ;Convert to string if it is object
+				parameter.contentID:=parameter.contentID[1]
+			local tempParameterContentTypeID:=parameter.contentID
+			if (IsObject(parameter.contentDefault)) ;Convert to string if it is object
+				parameter.contentDefault:=parameter.contentDefault[1]
+			local tempParameterContentTypeDefault:=parameter.contentDefault
+			
+			this.warnIfEmpty:=parameter.WarnIfEmpty
+			
+			this.contentTypeLangs:={string: lang("This is a string"), rawString: lang("This is a raw string"), expression: lang("This is an expression"), VarName: lang("This is a variable name")}
+			this.currentContentType:=""
 			
 			gui,font,s8 cDefault wnorm
 			
-			if (tempParameterID.MaxIndex()=1 or parameter.content="StringOrExpression") ;if only one edit
+			if (parameter.content.MaxIndex() > 1) ;If the input type is selectable
 			{
-				tempOneParameterID:=tempParameterID[1]
-				tempContentTypeID:=tempParameterID[2]
-				
-				temptext:=setElement.pars[tempOneParameterID] ;get the saved parameter
-				
-				if parameter.multiline
-					tempIsMulti=h100 multi
-				else
-					tempIsMulti=r1
-				
-				if (parameter.content="StringOrExpression") ;Add two radios to select the element type
+				if (not parameter.contentID)
 				{
-					tempContentTypeNum:=setElement.pars[tempContentTypeID] ;get the saved parameter
-					tempassigned:=false
-					if tempContentTypeNum=1
-					{
-						tempchecked1=checked
-						tempassigned:=true
-					}
-					else
-						tempchecked1=
-					if tempContentTypeNum=2
-					{
-						tempchecked2=checked
-						tempassigned:=true
-					}
-					else
-						tempchecked2=
-					
-					gui,add,radio, w400 x10 %tempchecked1% Group hwndtempHWND gGUISettingsOfElementChangeRadio vGUISettingsOfElement%tempContentTypeID%1 ,% lang("This is a value")
-					this.components.push("GUISettingsOfElement" tempContentTypeID "1")
-					ElementSettingsFieldHWNDs[tempHWND]:=this
-					
-					gui,add,radio, w400 x10 %tempChecked2% hwndtempHWND gGUISettingsOfElementChangeRadio vGUISettingsOfElement%tempContentTypeID%2 ,% lang("This is a variable name or expression")
-					this.components.push("GUISettingsOfElement" tempContentTypeID "2")
-					ElementSettingsFieldHWNDs[tempHWND]:=this
-					
-					if (tempAssigned=false) ;Catch if a wrong value was saved and set to default value.
-					{
-						temp:=parameter.default[2]
-						guicontrol,SettingsOfElement:,GUISettingsOfElement%tempContentTypeID%%temp%,1
-					}
-					
-					varsToDelete.push("GUISettingsOfElement" tempContentTypeID "1")
-					varsToDelete.push("GUISettingsOfElement" tempContentTypeID "2")
+					MsgBox Error creating edit field: Multiple contents should be possible but the content ID is not specified.
+					return
 				}
 				
-				;Add picture, which will warn user if the entry is obviously invalid
-				gui,add,picture,x394 w16 h16 hwndtempHWND gGUISettingsOfElementClickOnWarningPic vGUISettingsOfElementWarningIconOf%tempOneParameterID%
-				this.components.push("GUISettingsOfElementWarningIconOf" tempOneParameterID)
-				ElementSettingsFieldHWNDs[tempHWND]:=this
-				this.warnIfEmpty:=parameter.WarnIfEmpty
-				
-				if (parameter.content="Expression")
+				tempContentTypeNum:=setElement.pars[tempParameterContentTypeID] ;get the saved parameter
+				if tempContentTypeNum is not number ;Get the index of the content type
 				{
-					;The info icon tells user which conent type it is
-					gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempOneParameterID%,%_ScriptDir%\icons\expression.ico
-					this.components.push("GUISettingsOfElementInfoIconOf" tempOneParameterID)
+					for oneindex, onevalue in parameter.content
+					{
+						if (onevalue = tempContentTypeNum)
+						{
+							tempContentTypeNum := oneindex
+							break
+						}
+					}
+				}
+				
+				tempAssigned:=false
+				loop % parameter.content.maxindex()
+				{
+					if a_index = 1
+						tempgrpStr:="Group"
+					else
+						tempgrpStr:=""
+					
+					if (a_index = tempContentTypeNum)
+					{
+						tempchecked:="checked"
+						tempAssigned:=true
+					}
+					else
+					{
+						tempchecked:=""
+					}
+					
+					gui,add,radio, w400 x10 %tempchecked% %tempgrpStr% hwndtempHWND gGUISettingsOfElementChangeRadio vGUISettingsOfElement%tempParameterContentTypeID%%A_Index% ,% this.contentTypeLangs[parameter.content[a_index]]
+					this.components.push("GUISettingsOfElement" tempParameterContentTypeID a_index)
 					ElementSettingsFieldHWNDs[tempHWND]:=this
 					
-					gui,add,edit,X+4 w360 %tempIsMulti% hwndtempHWND gGUISettingsOfElementCheckContent vGUISettingsOfElement%tempOneParameterID%,%temptext%
-					this.components.push("vGUISettingsOfElement" tempOneParameterID)
-					ElementSettingsFieldHWNDs[tempHWND]:=this
-					if parameter.useupdown
+					varsToDelete.push("GUISettingsOfElement" tempParameterContentTypeID a_index)
+				}
+				
+				if (tempAssigned=false) ;Catch if a wrong value or no was saved and set to default value.
+				{
+					tempContentDefault:=parameter.contentDefault
+					if not tempContentDefault
+						tempContentDefault:=1
+					this.setvalue(tempContentDefault,tempParameterContentTypeID)
+					this.ContentType:=this.getvalue(tempParameterContentTypeID)
+				}
+			}
+			else
+			{
+				this.ContentType:=parameter.content[1]
+			}
+			
+			;Add picture, which will warn user if the entry is obviously invalid
+			gui,add,picture,x394 w16 h16 hwndtempHWND gGUISettingsOfElementClickOnWarningPic vGUISettingsOfElementWarningIconOf%tempFirstParameterID%
+			this.components.push("GUISettingsOfElementWarningIconOf" tempFirstParameterID)
+			ElementSettingsFieldHWNDs[tempHWND]:=this
+			this.warnIfEmpty:=parameter.WarnIfEmpty
+			
+			
+			;The info icon tells user which conent type it is
+			tempselectedContentType:=parameter.content[1]
+			gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempFirstParameterID%,%_ScriptDir%\icons\%tempselectedContentType%.ico
+			this.components.push("GUISettingsOfElementInfoIconOf" tempFirstParameterID)
+			ElementSettingsFieldHWNDs[tempHWND]:=this
+			
+			
+			loop % parameter.id.MaxIndex()
+			{
+				tempOneParameterID:=parameter.id[a_index]
+				;Add the edit control(s)
+				tempwAvailable:=360
+				tempw:=(tempwAvailable - (4 * (parameter.id.MaxIndex() -1)) ) / parameter.id.MaxIndex()
+				temptext:=setElement.pars[tempOneParameterID]
+				
+				gui,add,edit,X+4 w%tempw% %tempIsMulti% r1 hwndtempHWND gGUISettingsOfElementCheckContent vGUISettingsOfElement%tempOneParameterID%,%temptext%
+				this.components.push("GUISettingsOfElement" tempOneParameterID)
+				ElementSettingsFieldHWNDs[tempHWND]:=this
+				
+				if (parameter.id.MaxIndex() = 1 and tempParameterContentType[1] = "expression")
+				{
+					;If this a single expression, user may want to add arrow keys
+					if (parameter.useupdown)
 					{
-						if parameter.range
+						if (parameter.range)
 							gui,add,updown,% "range" parameter.range
 						else
 							gui,add,updown
 						guicontrol,SettingsOfElement:,GUISettingsOfElement%tempOneParameterID%,%temptext%
 					}
-					this.ContentType:="Expression"
-					;~ GUISettingsOfElementContentType%tempOneParameterID%=Expression
-				}
-				else if (parameter.content="String")
-				{
-					gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempOneParameterID%,%_ScriptDir%\icons\string.ico
-					this.components.push("GUISettingsOfElementInfoIconOf" tempOneParameterID)
-					ElementSettingsFieldHWNDs[tempHWND]:=this
-					gui,add,edit,X+4 w360 %tempIsMulti% hwndtempHWND gGUISettingsOfElementCheckContent vGUISettingsOfElement%tempOneParameterID%,%temptext%
-					this.components.push("GUISettingsOfElement" tempOneParameterID)
-					ElementSettingsFieldHWNDs[tempHWND]:=this
-					
-					this.ContentType:="String"
-					;~ GUISettingsOfElementContentType%tempOneParameterID%=String
-				}
-				else if (parameter.content="VariableName")
-				{
-					gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempOneParameterID%,%_ScriptDir%\icons\VariableName.ico
-					this.components.push("GUISettingsOfElementInfoIconOf" tempOneParameterID)
-					ElementSettingsFieldHWNDs[tempHWND]:=this
-					gui,add,edit,X+4 w360 %tempIsMulti% hwndtempHWND gGUISettingsOfElementCheckContent vGUISettingsOfElement%tempOneParameterID%,%temptext%
-					this.components.push("GUISettingsOfElement" tempOneParameterID)
-					ElementSettingsFieldHWNDs[tempHWND]:=this
-					
-					this.ContentType:="VariableName"
-					;~ GUISettingsOfElementContentType%tempOneParameterID%=VariableName
-				}
-				else if (parameter.content="StringOrExpression")
-				{
-					
-					
-					if (tempContentTypeNum=1) 
-						gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempOneParameterID%,%_ScriptDir%\icons\string.ico
-					else ;If content is expression
-						gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempOneParameterID%,%_ScriptDir%\icons\expression.ico
-					this.components.push("GUISettingsOfElementInfoIconOf" tempOneParameterID)
-					ElementSettingsFieldHWNDs[tempHWND]:=this
-					
-					gui,add,edit,X+4 w360 %tempIsMulti% hwndtempHWND gGUISettingsOfElementCheckContent vGUISettingsOfElement%tempOneParameterID%,%temptext%
-					this.components.push("GUISettingsOfElement" tempOneParameterID)
-					ElementSettingsFieldHWNDs[tempHWND]:=this
-					
-					this.ContentType:="StringOrExpression"
-				}
-				else ;Text field without specified content type and without info icon
-				{
-					gui,add,edit,x10 yp w380 %tempIsMulti% hwndtempHWND gGUISettingsOfElementCheckContent vGUISettingsOfElement%tempOneParameterID%,%temptext%
-					this.components.push("GUISettingsOfElement" tempOneParameterID)
-					ElementSettingsFieldHWNDs[tempHWND]:=this
 				}
 				
-				this.checkContent()
-				
-				varsToDelete.push("GUISettingsOfElement" tempOneParameterID, "GUISettingsOfElementContentTypeRadio" tempOneParameterID, "GUISettingsOfElementInfoIconOf" tempOneParameterID, "GUISettingsOfElementWarningIconOf" tempOneParameterID)
-				
-				
+				varsToDelete.push("GUISettingsOfElement" tempOneParameterID)
 			}
-			else ;If multiple edits in one line
-			{
-				;~ MsgBox %tempEditwidth%
-				for tempIndex, tempOneParameterID in parameter.id
-				{
-					temptext:=setElement.pars[tempOneParameterID] ;get the saved parameter
-					
-					
-					if tempIndex=1
-					{
-						tempEditwidth:= round((380 - (10 * (parameter.id.MaxIndex()-1)))/parameter.id.MaxIndex())
-						tempXpos:="X+4"
-						if (parameter.content="Expression")
-						{
-							gui,add,picture,x10 w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempOneParameterID%,%_ScriptDir%\icons\expression.ico
-							this.components.push("GUISettingsOfElementInfoIconOf" tempOneParameterID)
-							ElementSettingsFieldHWNDs[tempHWND]:=this
-							tempXpos:="X+4"
-						}
-						else if (parameter.content="String")
-						{
-							gui,add,picture,x10 w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempOneParameterID%,%_ScriptDir%\icons\string.ico
-							this.components.push("GUISettingsOfElementInfoIconOf" tempOneParameterID)
-							ElementSettingsFieldHWNDs[tempHWND]:=this
-							tempXpos:="X+4"
-						}
-						else if (parameter.content="VariableName")
-						{
-							gui,add,picture,x10 w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempOneParameterID%,%_ScriptDir%\icons\VariableName.ico
-							this.components.push("GUISettingsOfElementInfoIconOf" tempOneParameterID)
-							ElementSettingsFieldHWNDs[tempHWND]:=this
-							tempXpos:="X+4"
-						}
-						else
-						{
-							tempEditwidth:= round((400 - (10 * (parameter.id.MaxIndex()-1)))/parameter.id.MaxIndex())
-							tempXpos:="x10"
-						}
-					}
-					else
-						tempXpos:="X+10"
-					;~ MsgBox %tempXpos%
-					gui,add,edit,%tempXpos% w%tempEditwidth% hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempOneParameterID%,%temptext%
-					this.components.push("GUISettingsOfElement" tempOneParameterID)
-					ElementSettingsFieldHWNDs[tempHWND]:=this
-					
-					this.ContentType:=this.parameter.content
-					
-					varsToDelete.push("GUISettingsOfElement" tempOneParameterID)
-					varsToDelete.push("GUISettingsOfElementContentType" tempOneParameterID)
-					varsToDelete.push("GUISettingsOfElementInfoIconOf" tempOneParameterID)
-				}
-				
-			}
+			
+			this.changeRadio()
+			
+			varsToDelete.push("GUISettingsOfElementInfoIconOf" tempFirstParameterID, "GUISettingsOfElementWarningIconOf" tempOneParameterID)
+			
+			
 		}
 		
 		
@@ -994,17 +998,19 @@ class ElementSettings
 		{
 			global
 			local temp, tempParameterID
-			if (parameterID!="" and parameterID=this.parameter.id[2] and this.parameter.content = "StringOrExpression")
+			if (parameterID and parameterID=this.parameter.contentID)
 			{
-				loop 2
+				loop % this.parameter.content.MaxIndex()
 				{
 					GUIControlGet,temp,SettingsOfElement:,GUISettingsOfElement%parameterID%%a_index%
 					if temp=1
 					{
-						temp:=a_index
+						temp := this.parameter.content[ a_index]
+						;~ d(temp ,a_index " - "  parameterID)
 						break
 					}
 				}
+				;~ d(temp ,parameterID "  return")
 				return temp
 			}
 			else
@@ -1018,142 +1024,294 @@ class ElementSettings
 				else
 					tempParameterID:=parameterID
 				GUIControlGet,temp,SettingsOfElement:,GUISettingsOfElement%tempParameterID%
-				;~ MsgBox -++-- %parameterID%
-				;~ MsgBox % "..." temp
 				return temp
 			}
 			
 		}
 		
-		checkContent()
+		setvalue(value, parameterID="")
 		{
 			global
-			local tempFoundPos, tempRadioVal, tempOneParamID, tempTextInControl, tempTextInControlReplaced
-			
-			tempRadioID:=this.parameter.id[2]
-			;~ GUIControlGet,tempRadioVal2,SettingsOfElement:,GUISettingsOfElement%tempRadioID%2
-			tempRadioVal:=this.getvalue(tempRadioID)
-			tempOneParamID:=this.parameter.id[1]
-			if tempOneParamID=
-				MsgBox error! tempOneParamID is empty. Code: 7625893756
-			
-			This.warningText:=""
-			if (this.enabled)
+			;~ d(this, "setvalue " parameterID)
+			local tempParameterID:=this.parameter.id
+			if parameterID=
 			{
-				tempTextInControl:=this.getvalue(tempOneParamID)
-				;~ MsgBox % tempTextInControl "`n" this.ContentType
-				if (this.ContentType="Expression" or (this.ContentType="StringOrExpression" and tempRadioVal=2))
-				{
-					
-					
-					IfInString,tempTextInControl,`%
-					{
-						guicontrol,SettingsOfElement:show,GUISettingsOfElementWarningIconOf%tempOneParamID%
-						guicontrol,SettingsOfElement:,GUISettingsOfElementWarningIconOf%tempOneParamID%,%_ScriptDir%\Icons\Question mark.ico
-						This.warningText:=lang("Note!") " " lang("This is an expression.") " " lang("You musn't use percent signs to add a variable's content.") "`n"
-					}
-				}
-				else if (this.ContentType="variablename")
-				{
-					tempTextInControlReplaced:=tempTextInControl
-					Loop
-					{
-						tempFoundPos:=RegExMatch(tempTextInControlReplaced, "U).*%(.+)%.*", tempVariablesToReplace)
-						if tempFoundPos=0
-							break
-						StringReplace,tempTextInControlReplaced,tempTextInControlReplaced,`%%tempVariablesToReplace1%`%,someVarName
-					}
-					;~ ToolTip( tempTextInControlReplaced " - " tempTextInControl)
-					try
-						asdf%tempTextInControlReplaced%:=1 
-					catch
-					{
-						guicontrol,SettingsOfElement:show,GUISettingsOfElementWarningIconOf%tempOneParamID%
-						guicontrol,SettingsOfElement:,GUISettingsOfElementWarningIconOf%tempOneParamID%,%_ScriptDir%\Icons\Exclamation mark.ico
-						This.warningText:=lang("Error!") " " lang("The variable name is not valid.") "`n"
-					}
-				}
+				tempParameterID:=this.parameter.id
+				if isobject(tempParameterID)
+					tempParameterID:=tempParameterID[1]
 				
-				if (this.WarnIfEmpty)
+				;~ d(this, "setvalue 1 " tempParameterID ": " value)
+				GUIControl,SettingsOfElement:,GUISettingsOfElement%tempParameterID%,% value
+				return
+			}
+			else if (parameterID=this.parameter.contentID)
+			{
+				if value is number
 				{
-					if tempTextInControl=
+					GUIControl,SettingsOfElement:,GUISettingsOfElement%parameterID%%value%,% 1
+				}
+				else
+				{
+					loop % this.parameter.content.MaxIndex()
 					{
-						guicontrol,SettingsOfElement:show,GUISettingsOfElementWarningIconOf%tempOneParamID%
-						guicontrol,SettingsOfElement:,GUISettingsOfElementWarningIconOf%tempOneParamID%,%_ScriptDir%\Icons\Exclamation mark.ico
-						This.warningText:=lang("Error!") " " lang("This field mustn't be empty!") "`n"
+						if (value := this.parameter.content[a_index])
+						{
+							GUIControl,SettingsOfElement:,GUISettingsOfElement%parameterID%%a_index%,% 1
+							break
+						}
 					}
 				}
 			}
 			else
 			{
-				guicontrol,SettingsOfElement:hide,GUISettingsOfElementWarningIconOf%tempOneParamID%
+				;Check whether current object has the requested parameter ID
+				for oneindex, oneid in this.parameter.id
+				{
+					if (parameterID = oneid)
+					{
+						GUIControl,SettingsOfElement:,GUISettingsOfElement%oneid%,% value
+						return
+					}
+				}
+				
 			}
-			;~ ToolTip(This.warningText)
+			
+			return
+		}
+		
+		checkContent()
+		{
+			global
+			local tempFoundPos, tempRadioID, tempRadioVal, tempOneParamID, tempTextInControl, tempTextInControlReplaced
+			local oneindex, oneparamID
+			
+			if (this.parameter.ContentID)
+			{
+				tempRadioID:=this.parameter.ContentID
+				tempRadioVal:=this.getvalue(tempRadioID)
+			}
+			else
+			{
+				tempRadioVal:=this.parameter.content[1]
+			}
+			tempFirstParamID:=this.parameter.id[1] ;This value is needed to get the icon controls
+			
+			This.warningText:=""
+			if (this.enabled)
+			{
+				if (tempRadioVal = "expression") ;The content is an expression.
+				{
+					for oneindex, oneparamID in this.parameter.id
+					{
+						tempTextInControl:=this.getvalue(oneparamID)
+						
+						;Warn if there are percent signs.
+						IfInString,tempTextInControl,`%
+						{
+							guicontrol,SettingsOfElement:show,GUISettingsOfElementWarningIconOf%tempFirstParamID%
+							guicontrol,SettingsOfElement:,GUISettingsOfElementWarningIconOf%tempFirstParamID%,%_ScriptDir%\Icons\Question mark.ico
+							This.warningText:=lang("Note!") " " lang("This is an expression.") " " lang("You mus not use percent signs to add a variable's content.") "`n" lang("But you can still use percent signs if the variable name or a part of it is stored in a variable.")
+						}
+					}
+				}
+				else if (tempRadioVal="variablename") ;the content is a variable name
+				{
+					for oneindex, oneparamID in this.parameter.id
+					{
+						tempTextInControl:=this.getvalue(oneparamID)
+						
+						;Check whether the variable name is correct (it does not contain forbitten characters)
+						
+						;At first replace all variables in the string by the string "someVarName"
+						tempTextInControlReplaced:=tempTextInControl
+						Loop
+						{
+							tempFoundPos:=RegExMatch(tempTextInControlReplaced, "U).*%(.+)%.*", tempVariablesToReplace)
+							if tempFoundPos=0
+								break
+							StringReplace,tempTextInControlReplaced,tempTextInControlReplaced,`%%tempVariablesToReplace1%`%,someVarName
+						}
+						
+						try
+						{
+							;now check whether the varible name is correct
+							asdf%tempTextInControlReplaced%:="" 
+						}
+						catch
+						{
+							;The variable name is not valid
+							guicontrol,SettingsOfElement:show,GUISettingsOfElementWarningIconOf%tempFirstParamID%
+							guicontrol,SettingsOfElement:,GUISettingsOfElementWarningIconOf%tempFirstParamID%,%_ScriptDir%\Icons\Exclamation mark.ico
+							This.warningText:=lang("Error!") " " lang("The variable name is not valid.") "`n"
+						}
+					}
+				}
+				
+				;If the control must not be empty, show error
+				if (this.parameter.WarnIfEmpty)
+				{
+					for oneindex, oneparamID in this.parameter.id
+					{
+						tempTextInControl:=this.getvalue(oneparamID)
+						if tempTextInControl=
+						{
+							guicontrol,SettingsOfElement:show,GUISettingsOfElementWarningIconOf%tempFirstParamID%
+							guicontrol,SettingsOfElement:,GUISettingsOfElementWarningIconOf%tempFirstParamID%,%_ScriptDir%\Icons\Exclamation mark.ico
+							This.warningText:=lang("Error!") " " lang("This field must not be empty!") "`n"
+						}
+					}
+				}
+			}
+			else
+			{
+				;This parameter and its controls are disabled. If so, hide all warnings.
+				guicontrol,SettingsOfElement:hide,GUISettingsOfElementWarningIconOf%tempFirstParamID%
+			}
+			
 			if (This.warningText="" and !openingElementSettingsWindow)
 			{
-				
-				guicontrol,SettingsOfElement:hide,GUISettingsOfElementWarningIconOf%tempOneParamID%
+				;If no warning are present, hide the picture
+				guicontrol,SettingsOfElement:hide,GUISettingsOfElementWarningIconOf%tempFirstParamID%
 			}
+			
 			GUISettingsOfElementObject.GeneralUpdate()
 		}
 		
+		;Show hint if user clicks on the info-picture
 		clickOnInfoPic()
 		{
 			global
-			local temp, tempOneParamID, tempRadioID
-			tempOneParamID:=this.parameter.id[1]
-			tempRadioID:=this.parameter.id[2]
+			local tempRadioID, tempRadioVal
 			
-			if (this.contenttype="Expression")
+			if (this.parameter.ContentID)
+			{
+				tempRadioID:=this.parameter.ContentID
+				tempRadioVal:=this.getvalue(tempRadioID)
+			}
+			else
+			{
+				tempRadioVal:=this.parameter.content[1]
+			}
+			
+			if (tempRadioVal="Expression")
 			{
 				ToolTip,% lang("This field contains an expression") "`n" lang("Examples") ":`n5`n5+3*6`nA_ScreenWidth`n(a=4) or (b=1)" ,,,11
 			}
-			if (this.contenttype="String")
+			if (tempRadioVal="String")
 			{
 				ToolTip,% lang("This field contains a string") "`n" lang("Examples") ":`nHello World`nMy name is %A_UserName%`nToday's date is %A_Now%" ,,,11
 			}
-			if (this.contenttype="VariableName") 
+			if (tempRadioVal="RawString")
+			{
+				ToolTip,% lang("This field contains a raw string") "`n" lang("You can't insert content of a variable here") "`n" lang("Examples") ":`nHello World" ,,,11
+			}
+			if (tempRadioVal="VariableName") 
 			{
 				ToolTip,% lang("This field contains a variable name") "`n" lang("Examples") ":`nVarname`nEntry1`nEntry%a_index%" ,,,11
-			}
-			if (this.contenttype="StringOrExpression") 
-			{
-				GUIControlGet,temp,SettingsOfElement:,GUISettingsOfElement%tempRadioID%1
-				if (temp=1)
-					ToolTip,% lang("This field contains a string") "`n" lang("Examples") ":`nHello World`nMy name is %A_UserName%`nToday's date is %A_Now%" ,,,11
-				else
-					ToolTip,% lang("This field contains an expression") "`n" lang("Examples") ":`n5`n5+3*6`nA_ScreenWidth`n(a=4) or (b=1)" ,,,11
 			}
 			settimer,GUISettingsOfElementRemoveInfoTooltip,-5000
 		}
 		
-		
+		;User has changed the radio button. Show the correct image
 		changeRadio()
 		{
 			global
-			local temp, tempGUIControl, tempContentTypeID
-			tempGUIControl:=this.parameter.id[1]
-			tempContentTypeID:=this.parameter.id[2]
-			
-			temp:=this.getvalue(tempContentTypeID)
+			local temp, tempGUIControl, tempRadioID, tempRadioVal
+			if (this.parameter.ContentID)
+			{
+				tempRadioID:=this.parameter.ContentID
+				tempRadioVal:=this.getvalue(tempRadioID)
+			}
+			else
+			{
+				tempRadioVal:=this.parameter.content[1]
+			}
+			tempFirstParamID:=this.parameter.id[1] ;This value is needed to get the icon controls
 			;~ GUIControlGet,temp,SettingsOfElement:,GUISettingsOfElement%tempContentTypeID%1
 			
-			if temp=1 ;String
+			if (tempRadioVal="string" or tempRadioVal="rawstring") 
 			{
-				guicontrol,SettingsOfElement:,GUISettingsOfElementInfoIconOf%tempGUIControl%,%_ScriptDir%\Icons\String.ico
-				
+				guicontrol,SettingsOfElement:,GUISettingsOfElementInfoIconOf%tempFirstParamID%,%_ScriptDir%\Icons\String.ico
 			}
-			else ;Expression
+			else if (tempRadioVal="expression") 
 			{
-				guicontrol,SettingsOfElement:,GUISettingsOfElementInfoIconOf%tempGUIControl%,%_ScriptDir%\Icons\Expression.ico
-				
+				guicontrol,SettingsOfElement:,GUISettingsOfElementInfoIconOf%tempFirstParamID%,%_ScriptDir%\Icons\Expression.ico
+			}
+			else if (tempRadioVal="variableName") 
+			{
+				guicontrol,SettingsOfElement:,GUISettingsOfElementInfoIconOf%tempFirstParamID%,%_ScriptDir%\Icons\VariableName.ico
 			}
 			
-			
-			GUISettingsOfElementObject.GeneralUpdate()
 			this.checkcontent()
 		}
 		
+	}
+	
+	class multilineEdit extends ElementSettings.field
+	{
+		__new(parameter)
+		{
+			global
+			base.__new(parameter)
+			local temp, temptext, tempParGray, tempHWND
+			local tempParameterID:=parameter.id
+			local tempParameterRows:=parameter.rows
+			if not tempParameterRows 
+				tempParameterRows:=5
+			temp:=setElement.pars[parameter.id] 
+			temptext:=setElement.pars[tempParameterID]
+			
+			gui,font,s8 cDefault wnorm
+			gui,add,edit,w380 x10 multi r%tempParameterRows% hwndtempHWND gGUISettingsOfElementCheckContent vGUISettingsOfElement%tempParameterID%,%temptext%
+			this.components.push("GUISettingsOfElement" tempParameterID)
+			ElementSettingsFieldHWNDs[tempHWND]:=this
+			
+			;Add picture, which will warn user if the entry is obviously invalid
+			gui,add,picture,X+4 w16 h16 hwndtempHWND gGUISettingsOfElementClickOnWarningPic vGUISettingsOfElementWarningIconOf%tempParameterID%
+			this.components.push("GUISettingsOfElementWarningIconOf" tempParameterID)
+			ElementSettingsFieldHWNDs[tempHWND]:=this
+			this.warnIfEmpty:=parameter.WarnIfEmpty
+			
+			varsToDelete.push("GUISettingsOfElement" tempParameterID, "GUISettingsOfElementWarningIconOf" tempParameterID)
+		}
+		checkContent()
+		{
+			global
+			local tempFoundPos, tempRadioID, tempRadioVal, tempOneParamID, tempTextInControl, tempTextInControlReplaced
+			local oneindex, oneparamID
+			
+			tempParamID:=this.parameter.id
+			
+			This.warningText:=""
+			if (this.enabled)
+			{
+				;If the control must not be empty, show error
+				if (this.parameter.WarnIfEmpty)
+				{
+					tempTextInControl:=this.getvalue(tempParamID)
+					if tempTextInControl=
+					{
+						guicontrol,SettingsOfElement:show,GUISettingsOfElementWarningIconOf%tempParamID%
+						guicontrol,SettingsOfElement:,GUISettingsOfElementWarningIconOf%tempParamID%,%_ScriptDir%\Icons\Exclamation mark.ico
+						This.warningText:=lang("Error!") " " lang("This field must not be empty!") "`n"
+					}
+					
+				}
+			}
+			else
+			{
+				;This parameter and its controls are disabled. If so, hide all warnings.
+				guicontrol,SettingsOfElement:hide,GUISettingsOfElementWarningIconOf%tempParamID%
+			}
+			
+			if (This.warningText="" and !openingElementSettingsWindow)
+			{
+				;If no warning are present, hide the picture
+				guicontrol,SettingsOfElement:hide,GUISettingsOfElementWarningIconOf%tempParamID%
+			}
+			
+			GUISettingsOfElementObject.GeneralUpdate()
+		}
 	}
 	
 	class slider extends ElementSettings.field
@@ -1229,10 +1387,10 @@ class ElementSettings
 			gui,font,s8 cDefault wnorm
 			temp:=setElement.pars[tempParameterID] 
 			
-			if (parameter.result != "number" and parameter.result != "string")
+			if (parameter.result != "number" and parameter.result != "string" and parameter.result != "enum")
 				MsgBox unexpected error: the parameter "result" of "DropDown" is unset or has unsupported value
 			
-			if (parameter.result="number")
+			if (parameter.result="number" or parameter.result="enum")
 			{
 				temptoChoose:=temp
 				tempAltSumbit=AltSubmit
@@ -1259,6 +1417,49 @@ class ElementSettings
 			this.components.push("GUISettingsOfElement" tempParameterID)
 			ElementSettingsFieldHWNDs[tempHWND]:=this
 			varsToDelete.push("GUISettingsOfElement" tempParameterID)
+		}
+		getvalue()
+		{
+			global
+			local temp
+			local tempParameterID:=this.parameter.id
+			
+			temp:=base.getvalue()
+			if (this.parameter.result = "enum")
+				temp:=this.parameter.Enum[a_index]
+			
+			return temp
+		}
+		setvalue(value)
+		{
+			global
+			local temp
+			local tempParameterID:=this.parameter.id
+			if not (value >= 1 and value <= this.parameter.choices.MaxIndex())
+			{
+				;This might be an enum value
+				if (IsObject(this.parameter.Enum))
+				{
+					loop % this.parameter.choices.MaxIndex()
+					{
+						if (this.parameter.Enum[a_index] = value)
+						{
+							temp := a_index
+							break
+						}
+					}
+				}
+				else
+				{
+					temp:=value
+				}
+			}
+			else
+			{
+				temp:=A_Index
+			}
+			GUIControl,SettingsOfElement:,GUISettingsOfElement%tempParameterID%%value%,1
+			return temp
 		}
 	}
 	
@@ -1979,9 +2180,9 @@ class ElementSettings
 		global
 		local tempOneParID, temponeValue
 		local tempPars:=Object()
-		;~ MsgBox % strobj(parametersToEdit)
 		for ElementSaveindex, parameter in parametersToEdit
 		{
+			;Get the keys which are specified in key "ID"
 			if not IsObject(parameter.id)
 				parameterID:=[parameter.id]
 			else
@@ -1991,6 +2192,16 @@ class ElementSettings
 				continue
 			;~ MsgBox % strobj(parameterID)
 			
+			;The edit control can also have parameter names which are specified in key "ContentID"
+			if (IsObject(parameter.ContentID))
+			{
+				parameterID.push(parameter.ContentID[1])
+			}
+			else if (parameter.ContentID)
+			{
+				parameterID.push(parameter.ContentID)
+			}
+			
 			
 			;Certain types of control consist of multiple controls and thus contain multiple parameters.
 			for ElementSaveindex2, oneID in parameterID
@@ -1998,7 +2209,7 @@ class ElementSettings
 				tempOneParID:=parameterID[ElementSaveindex2]
 				temponeValue:=ElementSettingsFieldParIDs[tempOneParID].getValue(tempOneParID)
 				tempPars[tempOneParID]:=temponeValue
-				
+				;~ d(temponeValue, tempOneParID)
 			
 			}
 			

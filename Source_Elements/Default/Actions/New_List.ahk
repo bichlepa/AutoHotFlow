@@ -58,17 +58,17 @@ Element_getParametrizationDetails_Action_New_List(Environment)
 	parametersToEdit.push({type: "Label", label: lang("Variable_name")})
 	parametersToEdit.push({type: "Edit", id: "Varname", default: "NewList", content: "VariableName", WarnIfEmpty: true})
 	parametersToEdit.push({type: "Label", label: lang("Number of elements")})
-	parametersToEdit.push({type: "Radio", id: "InitialContent", default: 1, choices: [lang("Empty list"), lang("Initialize with one element"), lang("Initialize with multiple elements")]})
+	parametersToEdit.push({type: "Radio", id: "InitialContent", default: 1, result: "enum", choices: [lang("Empty list"), lang("Initialize with one element"), lang("Initialize with multiple elements")], enum: ["Empty", "One", "Multiple"]})
 	parametersToEdit.push({type: "Label", label:  lang("Initial content")})
-	parametersToEdit.push({type: "Edit", id: ["VarValue","expression"], default: ["New element",1], content: "StringOrExpression", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Edit", id: "VarValues", default: "Element one`nElement two", multiline: true, content: "String", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Edit", id: "VarValue", default: "New element", content: ["String", "Expression"], contentID: "expression", contentDefault: "string", WarnIfEmpty: true})
+	parametersToEdit.push({type: "multilineEdit", id: "VarValues", default: "Element one`nElement two", WarnIfEmpty: true})
 	parametersToEdit.push({type: "Checkbox", id: "DelimiterLinefeed", default: 1, label: lang("Use linefeed as delimiter")})
 	parametersToEdit.push({type: "Checkbox", id: "DelimiterComma", default: 0, label: lang("Use comma as delimiter")})
 	parametersToEdit.push({type: "Checkbox", id: "DelimiterSemicolon", default: 0, label: lang("Use semicolon as delimiter")})
 	parametersToEdit.push({type: "Checkbox", id: "DelimiterSpace", default: 0, label: lang("Use space as delimiter")})
 	parametersToEdit.push({type: "Label", label: lang("Key")})
 	parametersToEdit.push({type: "Radio", id: "WhichPosition", default: 1, choices: [lang("Numerically as first element"), lang("Following key")]})
-	parametersToEdit.push({type: "Edit", id: ["Position","expressionPos"], default: ["keyName",1], content: "StringOrExpression", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Edit", id: "Position", default: "keyName", content: ["String", "Expression"], contentID: "expressionPos", contentDefault: "string", WarnIfEmpty: true})
 	
 
 	return parametersToEdit
@@ -76,11 +76,11 @@ Element_getParametrizationDetails_Action_New_List(Environment)
 
 Element_GenerateName_Action_New_List(Environment, ElementParameters)
 {
-	if ElementParameters.InitialContent=1
+	if ElementParameters.InitialContent=empty
 	{
 		Text.= lang("New empty list") " " ElementParameters.Varname
 	}
-	else if ElementParameters.InitialContent=2
+	else if ElementParameters.InitialContent=one
 	{
 		Text.= lang("New list %1% with initial content",ElementParameters.Varname) ": "
 		Text.=  ElementParameters.VarValue
@@ -103,7 +103,7 @@ Element_CheckSettings_Action_New_List(Environment, ElementParameters)
 	static oldParFlowName
 	static oldParThisFlow
 	
-	if (ElementParameters.InitialContent = 2) ;one element
+	if (ElementParameters.InitialContent = "one") ;one element
 	{
 		x_Par_Enable("VarValue")
 		x_Par_Enable("WhichPosition")
@@ -116,7 +116,7 @@ Element_CheckSettings_Action_New_List(Environment, ElementParameters)
 		x_Par_Disable("Position")
 	}
 	
-	if (ElementParameters.InitialContent = 3) ;Multiple elements
+	if (ElementParameters.InitialContent = "multiple") ;Multiple elements
 	{
 		x_Par_Enable("VarValues")
 		x_Par_Enable("DelimiterLinefeed")
@@ -152,13 +152,13 @@ Element_run_Action_New_List(Environment, ElementParameters)
 	
 	newList:=Object()
 	
-	if (ElementParameters.InitialContent = 1) ;empty list
+	if (ElementParameters.InitialContent = "empty")
 	{
 		x_SetVariable(Environment,Varname,newList)
 	}
-	else if (ElementParameters.InitialContent = 2) ;one element
+	else if (ElementParameters.InitialContent = "one") ;one element
 	{
-		if (ElementParameters.Expression = 2)
+		if (ElementParameters.Expression = "expression")
 		{
 			evRes := x_EvaluateExpression(Environment, ElementParameters.VarValue)
 			if (evRes.error)
@@ -184,7 +184,7 @@ Element_run_Action_New_List(Environment, ElementParameters)
 		else
 		{
 			
-			if (ElementParameters.ExpressionPos = 2)
+			if (ElementParameters.ExpressionPos = "expression")
 			{
 				evRes := x_EvaluateExpression(Environment, ElementParameters.Position)
 				if (evRes.error)
@@ -206,7 +206,7 @@ Element_run_Action_New_List(Environment, ElementParameters)
 		
 		x_SetVariable(Environment,Varname,newList)
 	}
-	else if (ElementParameters.InitialContent = 3) ;multiple elements
+	else if (ElementParameters.InitialContent = "multiple") 
 	{
 		Value := x_replaceVariables(Environment, ElementParameters.varvalues)
 		

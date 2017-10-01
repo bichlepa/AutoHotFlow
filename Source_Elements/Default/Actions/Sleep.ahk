@@ -47,7 +47,7 @@ Element_getParametrizationDetails_Action_Sleep(Environment)
 	parametersToEdit:=Object()
 	parametersToEdit.push({type: "Label", label:  lang("Duration")})
 	parametersToEdit.push({type: "edit", id: "Duration", default: 2, content: "Expression", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Radio", id: "Unit", default: 2, choices: [lang("Milliseconds"), lang("Seconds"), lang("Minutes")]})
+	parametersToEdit.push({type: "Radio", id: "Unit", default: 2, result: "enum", choices: [lang("Milliseconds"), lang("Seconds"), lang("Minutes")], enum: ["Milliseconds", "Seconds", "Minutes"]})
 
 	return parametersToEdit
 }
@@ -56,11 +56,11 @@ Element_GenerateName_Action_Sleep(Environment, ElementParameters)
 {
 	global
 	;~ d(ElementParameters)
-	if (ElementParameters.Unit = 1)
+	if (ElementParameters.Unit = "Milliseconds")
 		duration:=ElementParameters.duration " " lang("ms #Milliseconds")
-	if (ElementParameters.Unit = 2)
+	if (ElementParameters.Unit = "Seconds")
 		duration:=ElementParameters.duration " " lang("s #Seconds")
-	if (ElementParameters.Unit = 3)
+	if (ElementParameters.Unit = "Minutes")
 		duration:=ElementParameters.duration " " lang("m #Minutes")
 	
 	return lang("Sleep") ": " duration
@@ -71,11 +71,11 @@ Element_GenerateName_Action_Sleep(Environment, ElementParameters)
 Element_run_Action_Sleep(Environment, ElementParameters)
 {
 	
-	if (ElementParameters.Unit=1) ;Milliseconds
+	if (ElementParameters.Unit="Milliseconds") ;Milliseconds
 		tempDuration:=ElementParameters.duration
-	else if (ElementParameters.Unit=2) ;Seconds
+	else if (ElementParameters.Unit="Seconds") ;Seconds
 		tempDuration:=ElementParameters.duration * 1000
-	else if (ElementParameters.Unit=3) ;minutes
+	else if (ElementParameters.Unit="Minutes") ;minutes
 		tempDuration:=ElementParameters.duration * 60000
 	
 	functionObject:= x_NewExecutionFunctionObject(environment, "Action_Sleep_EndSleep", ElementParameters)
