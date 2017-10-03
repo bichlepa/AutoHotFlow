@@ -146,6 +146,7 @@ AllTriggerClasses:=Object()
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Exponentiation.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Extract files.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Get_Clipboard.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Get_control_text.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Get_Drive_Information.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Hide_window.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Move_File.ahk

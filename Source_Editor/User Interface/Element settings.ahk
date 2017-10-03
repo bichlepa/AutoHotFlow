@@ -844,7 +844,7 @@ class ElementSettings
 			{
 				temp:=A_Index
 			}
-			GUIControl,SettingsOfElement:,GUISettingsOfElement%tempParameterID%%value%,1
+			GUIControl,SettingsOfElement:,GUISettingsOfElement%tempParameterID%%temp%,1
 			return temp
 		}
 		

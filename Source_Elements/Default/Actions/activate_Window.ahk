@@ -115,42 +115,44 @@ Element_run_Action_Activate_Window(Environment, ElementParameters)
 {
 	local tempWinid
 	
-	local tempWinTitle:=x_replaceVariables(Environment,ElementParameters.Wintitle)
-	local tempWinText:=x_replaceVariables(Environment,ElementParameters.winText)
-	local tempExcludeTitle:=x_replaceVariables(Environment,ElementParameters.excludeTitle)
-	local tempExcludeText:=x_replaceVariables(Environment,ElementParameters.ExcludeText)
-	local tempTitleMatchMode :=ElementParameters.TitleMatchMode
-	local tempahk_class:=x_replaceVariables(Environment,ElementParameters.ahk_class)
-	local tempahk_exe:=x_replaceVariables(Environment,ElementParameters.ahk_exe)
-	local tempahk_id:=x_replaceVariables(Environment,ElementParameters.ahk_id)
-	local tempahk_pid:=x_replaceVariables(Environment,ElementParameters.ahk_pid)
+	tempWinTitle:=x_replaceVariables(Environment, ElementParameters.Wintitle) 
+	tempWinText:=x_replaceVariables(Environment, ElementParameters.winText)
+	tempTitleMatchMode :=ElementParameters.TitleMatchMode
+	tempahk_class:=x_replaceVariables(Environment, ElementParameters.ahk_class)
+	tempahk_exe:=x_replaceVariables(Environment, ElementParameters.ahk_exe)
+	tempahk_id:=x_replaceVariables(Environment, ElementParameters.ahk_id)
+	tempahk_pid:=x_replaceVariables(Environment, ElementParameters.ahk_pid)
 	
-	local tempwinstring:=tempWinTitle
-	if tempahk_class<>
-		tempwinstring=%tempwinstring% ahk_class %tempahk_class%
-	if tempahk_id<>
-		tempwinstring=%tempwinstring% ahk_id %tempahk_id%
-	if tempahk_pid<>
-		tempwinstring=%tempwinstring% ahk_pid %tempahk_pid%
-	if tempahk_exe<>
-		tempwinstring=%tempwinstring% ahk_exe %tempahk_exe%
-	if (tempwinstring="" and tempWinText="" and tempExcludeTitle = "" and tempExcludeText ="")
+	tempwinstring:=tempWinTitle
+	if tempahk_class
+		tempwinstring:=tempwinstring " ahk_class " tempahk_class
+	if tempahk_id
+		tempwinstring:=tempwinstring " ahk_id " tempahk_id
+	if tempahk_pid
+		tempwinstring:=tempwinstring " ahk_pid " tempahk_pid
+	if tempahk_exe
+		tempwinstring:=tempwinstring " ahk_exe " tempahk_exe
+	
+	;If no window specified, error
+	if (tempwinstring="" and tempWinText="")
 	{
-		x_finish(Environment, "exception", lang("Error! No window specified")) 
+		x_enabled(Environment, "exception", lang("No window specified"))
 		return
 	}
 	
+	if ElementParameters.findhiddenwindow=0
+		tempFindHiddenWindows = off
+	else
+		tempFindHiddenWindows = on
+	if ElementParameters.findhiddentext=0
+		tempfindhiddentext = off
+	else
+		tempfindhiddentext = on
+
 	SetTitleMatchMode,%tempTitleMatchMode%
-	
-	if (ElementParameters.findhiddenwindow=0)
-		DetectHiddenWindows off
-	else
-		DetectHiddenWindows on
-	if (ElementParameters.findhiddentext=0)
-		DetectHiddenText off
-	else
-		DetectHiddenText on
-	
+	DetectHiddenWindows,%tempFindHiddenWindows%
+	DetectHiddenText,%tempfindhiddentext%
+
 	tempWinid:=winexist(tempwinstring,tempWinText,tempExcludeTitle,tempExcludeText)
 	if tempWinid
 	{

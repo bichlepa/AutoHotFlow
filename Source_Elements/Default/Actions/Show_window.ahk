@@ -185,6 +185,10 @@ Element_run_Action_Show_Window(Environment, ElementParameters)
 	else
 		tempfindhiddentext = on
 
+	SetTitleMatchMode,%tempTitleMatchMode%
+	DetectHiddenWindows,%tempFindHiddenWindows%
+	DetectHiddenText,%tempfindhiddentext%
+	
 	tempWinid:=winexist(tempwinstring,tempWinText,tempExcludeTitle,tempExcludeText) ;Example code. Remove it
 	if tempWinid
 	{

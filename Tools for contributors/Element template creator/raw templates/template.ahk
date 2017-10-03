@@ -307,7 +307,7 @@ Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 	if not x_CheckVariableName(editVariableNameValue)
 	{
 		;On error, finish with exception and return
-		x_finish(Environment, "exception", lang("%1% is not valid", lang("Ouput variable name '%1%'", par_editVariableName)))
+		x_finish(Environment, "exception", lang("%1% is not valid", lang("Ouput variable name '%1%'", editVariableName)))
 		return
 	}
 #endif
@@ -407,21 +407,13 @@ Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 	else
 		tempfindhiddentext = on
 
+	SetTitleMatchMode,%tempTitleMatchMode%
+	DetectHiddenWindows,%tempFindHiddenWindows%
+	DetectHiddenText,%tempfindhiddentext%
+	
 #if !ElementType = Loop
 	tempWinid:=winexist(tempwinstring,tempWinText,tempExcludeTitle,tempExcludeText) ;Example code. Remove it
-	if tempWinid
-	{
-		x_SetVariable(Environment,"A_WindowID",tempWinid,"Thread") ;Example code. Remove it
-		;Do some actions here
-#if ElementType = action
-		x_finish(Environment, "normal")
-#endif
-#if ElementType = condition
-		x_finish(Environment, "yes")
-#endif
-		return
-	}
-	else
+	if not tempWinid
 	{
 #if ElementType = action
 		x_finish(Environment, "exception", lang("Error! Seeked window does not exist")) 
@@ -431,6 +423,16 @@ Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 #endif
 		return
 	}
+	
+	x_SetVariable(Environment,"A_WindowID",tempWinid,"Thread") ;Example code. Remove it
+	;Do some actions here
+#if ElementType = action
+	x_finish(Environment, "normal")
+#endif
+#if ElementType = condition
+	x_finish(Environment, "yes")
+#endif
+	
 #endif
 #endif
 
@@ -697,6 +699,10 @@ Element_enable_&ElementType&_&Name&(Environment, ElementParameters)
 		tempfindhiddentext = off
 	else
 		tempfindhiddentext = on
+
+	SetTitleMatchMode,%tempTitleMatchMode%
+	DetectHiddenWindows,%tempFindHiddenWindows%
+	DetectHiddenText,%tempfindhiddentext%
 	
 	tempWinid:=winexist(tempwinstring,tempWinText,tempExcludeTitle,tempExcludeText)
 	if not tempWinid

@@ -1,20 +1,20 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Action_Move_Window")
+AllElementClasses.push("Action_Get_Control_Text")
 
 ;Element type of the element
-Element_getElementType_Action_Move_Window()
+Element_getElementType_Action_Get_Control_Text()
 {
 	return "Action"
 }
 
 ;Name of the element
-Element_getName_Action_Move_Window()
+Element_getName_Action_Get_Control_Text()
 {
-	return lang("Move_Window")
+	return lang("Get_Control_Text")
 }
 
 ;Category of the element
-Element_getCategory_Action_Move_Window()
+Element_getCategory_Action_Get_Control_Text()
 {
 	return lang("Window")
 }
@@ -22,7 +22,7 @@ Element_getCategory_Action_Move_Window()
 ;This function returns the package of the element.
 ;This is a reserved function for future releases,
 ;where it will be possible to install additional add-ons which provide more elements.
-Element_getPackage_Action_Move_Window()
+Element_getPackage_Action_Get_Control_Text()
 {
 	return "default"
 }
@@ -30,19 +30,19 @@ Element_getPackage_Action_Move_Window()
 ;Minimum user experience to use this element.
 ;Elements which are complicated or rarely used by beginners should not be visible to them.
 ;This will help them to get started with AHF
-Element_getElementLevel_Action_Move_Window()
+Element_getElementLevel_Action_Get_Control_Text()
 {
 	;"Beginner" or "Advanced" or "Programmer"
 	return "Beginner"
 }
 
 ;Icon path which will be shown in the background of the element
-Element_getIconPath_Action_Move_Window()
+Element_getIconPath_Action_Get_Control_Text()
 {
 }
 
 ;How stable is this element? Experimental elements will be marked and can be hidden by user.
-Element_getStabilityLevel_Action_Move_Window()
+Element_getStabilityLevel_Action_Get_Control_Text()
 {
 	;"Stable" or "Experimental"
 	return "Stable"
@@ -50,15 +50,14 @@ Element_getStabilityLevel_Action_Move_Window()
 
 ;Returns a list of all parameters of the element.
 ;Only those parameters will be saved.
-Element_getParameters_Action_Move_Window()
+Element_getParameters_Action_Get_Control_Text()
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({id: "WinMoveEvent"})
-	parametersToEdit.push({id: "Xpos"})
-	parametersToEdit.push({id: "Ypos"})
-	parametersToEdit.push({id: "Width"})
-	parametersToEdit.push({id: "Height"})
+	parametersToEdit.push({id: "Varname"})
+	parametersToEdit.push({id: "IdentifyControlBy"})
+	parametersToEdit.push({id: "ControlTextMatchMode"})
+	parametersToEdit.push({id: "Control_identifier"})
 	parametersToEdit.push({id: "TitleMatchMode"})
 	parametersToEdit.push({id: "Wintitle"})
 	parametersToEdit.push({id: "excludeTitle"})
@@ -75,17 +74,19 @@ Element_getParameters_Action_Move_Window()
 }
 
 ;Returns an array of objects which describe all controls which will be shown in the element settings GUI
-Element_getParametrizationDetails_Action_Move_Window(Environment)
+Element_getParametrizationDetails_Action_Get_Control_Text(Environment)
 {
 	parametersToEdit:=Object()
+
+	parametersToEdit.push({type: "Label", label: lang("Output variable_name")})
+	parametersToEdit.push({type: "Edit", id: "Varname", default: "ControlText", content: "VariableName"})
 	
-	parametersToEdit.push({type: "Label", label: lang("Event")})
-	parametersToEdit.push({type: "Radio", id: "WinMoveEvent", default: 1, result: "enum", choices: [lang("Maximize"), lang("Minimize"), lang("Restore"), lang("Move")], enum: ["Maximize", "Minimize", "Restore", "Move"]})
-	parametersToEdit.push({type: "Label", label: lang("Coordinates") " (x,y)", size: "small"})
-	parametersToEdit.push({type: "Edit", id: ["Xpos", "Ypos"], content: "Expression", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("Width and height"), size: "small"})
-	parametersToEdit.push({type: "Edit", id: ["Width", "Height"], content: "Expression", WarnIfEmpty: true})
-	parametersToEdit.push({type: "button", id: "MouseTracker", goto: "Action_Move_Window_ButtonGetWinPosAssistant", label: lang("Grab coordinates from existing window")})
+	parametersToEdit.push({type: "Label", label: lang("Control_Identification")})
+	parametersToEdit.push({type: "Label", label: lang("Method_for_control_Identification"), size: "small"})
+	parametersToEdit.push({type: "Radio", id: "IdentifyControlBy", result: "enum", default: 2, choices: [lang("Text_in_control"), lang("Classname and instance number of the control"), lang("Unique control ID")], enum: ["Text", "Class", "ID"]})
+	parametersToEdit.push({type: "Label", id: "Label_Control_Identification", label: lang("Control_Identification"), size: "small"})
+	parametersToEdit.push({type: "Radio", id: "ControlTextMatchMode", default: 2, choices: [lang("Start_with"), lang("Contain_anywhere"), lang("Exactly")]})
+	parametersToEdit.push({type: "Edit", id: "Control_identifier", content: "String", WarnIfEmpty: true})
 	
 	parametersToEdit.push({type: "Label", label: lang("Window identification")})
 	parametersToEdit.push({type: "Label", label: lang("Title_of_Window"), size: "small"})
@@ -109,13 +110,13 @@ Element_getParametrizationDetails_Action_Move_Window(Environment)
 	parametersToEdit.push({type: "Label", label: lang("Hidden window"), size: "small"})
 	parametersToEdit.push({type: "Checkbox", id: "FindHiddenWindow", default: 0, label: lang("Detect hidden window")})
 	parametersToEdit.push({type: "Label", label: lang("Import window identification"), size: "small"})
-	parametersToEdit.push({type: "button", goto: "Action_Move_Window_ButtonWindowAssistant", label: lang("Import window identification")})
+	parametersToEdit.push({type: "button", goto: "Action_Get_Control_Text_ButtonWindowAssistant", label: lang("Import window identification")})
 	
 	return parametersToEdit
 }
 
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
-Element_GenerateName_Action_Move_Window(Environment, ElementParameters)
+Element_GenerateName_Action_Get_Control_Text(Environment, ElementParameters)
 {
 	
 	local tempNameString
@@ -143,14 +144,14 @@ Element_GenerateName_Action_Move_Window(Environment, ElementParameters)
 	if (ElementParameters.ahk_pid)
 		tempNameString:=tempNameString "`n" lang("Process_ID") ": " ElementParameters.ahk_pid
 	
-	return lang("Move_Window") ": " tempNameString
+	return lang("Get_Control_Text") ": " tempNameString
 }
 
 ;Called every time the user changes any parameter.
 ;This function allows to check the integrity of the parameters. For example you can:
 ;- Disable options which are not available because of other options
 ;- Correct misconfiguration
-Element_CheckSettings_Action_Move_Window(Environment, ElementParameters)
+Element_CheckSettings_Action_Get_Control_Text(Environment, ElementParameters)
 {	
 	
 }
@@ -158,48 +159,20 @@ Element_CheckSettings_Action_Move_Window(Environment, ElementParameters)
 
 ;Called when the element should execute.
 ;This is the most important function where you can code what the element acutally should do.
-Element_run_Action_Move_Window(Environment, ElementParameters)
+Element_run_Action_Get_Control_Text(Environment, ElementParameters)
 {
-	WinMoveEvent:=ElementParameters.WinMoveEvent
-	
-	if (WinMoveEvent = 4) ;Move window
+	Varname := x_replaceVariables(Environment, ElementParameters.Varname)
+	if not x_CheckVariableName(Varname)
 	{
-		evRes := x_evaluateExpression(Environment,ElementParameters.Xpos)
-		if (evRes.error)
-		{
-			;On error, finish with exception and return
-			x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.Xpos) "`n`n" evRes.error) 
-			return
-		}
-		Xpos:=evRes.result
-		
-		evRes := x_evaluateExpression(Environment,ElementParameters.Ypos)
-		if (evRes.error)
-		{
-			;On error, finish with exception and return
-			x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.Ypos) "`n`n" evRes.error) 
-			return
-		}
-		Ypos:=evRes.result
-		
-		evRes := x_evaluateExpression(Environment,ElementParameters.Width)
-		if (evRes.error)
-		{
-			;On error, finish with exception and return
-			x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.Width) "`n`n" evRes.error) 
-			return
-		}
-		Width:=evRes.result
-		
-		evRes := x_evaluateExpression(Environment,ElementParameters.Height)
-		if (evRes.error)
-		{
-			;On error, finish with exception and return
-			x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.Height) "`n`n" evRes.error) 
-			return
-		}
-		Height:=evRes.result
+		;On error, finish with exception and return
+		x_finish(Environment, "exception", lang("%1% is not valid", lang("Ouput variable name '%1%'", Varname)))
+		return
 	}
+
+	IdentifyControlBy := ElementParameters.IdentifyControlBy
+	ControlTextMatchMode := ElementParameters.ControlTextMatchMode
+
+	Control_identifier := x_replaceVariables(Environment,ElementParameters.Control_identifier)
 
 	tempWinTitle:=x_replaceVariables(Environment, ElementParameters.Wintitle) 
 	tempWinText:=x_replaceVariables(Environment, ElementParameters.winText)
@@ -234,64 +207,45 @@ Element_run_Action_Move_Window(Environment, ElementParameters)
 		tempfindhiddentext = off
 	else
 		tempfindhiddentext = on
-
+	
 	SetTitleMatchMode,%tempTitleMatchMode%
 	DetectHiddenWindows,%tempFindHiddenWindows%
 	DetectHiddenText,%tempfindhiddentext%
 	
 	tempWinid:=winexist(tempwinstring,tempWinText,tempExcludeTitle,tempExcludeText) ;Example code. Remove it
-	if tempWinid
-	{
-		x_SetVariable(Environment,"A_WindowID",tempWinid,"Thread")
-		if (WinMoveEvent = "Maximize") ;Maximize
-		{
-			WinMaximize,ahk_id %tempWinid%
-		}
-		else if (WinMoveEvent = "Minimize") ;Minimize
-		{
-			WinMinimize,ahk_id %tempWinid%
-		}
-		else if (WinMoveEvent = "Restore") ;Restore
-		{
-			WinRestore,ahk_id %tempWinid%
-		}
-		else if (WinMoveEvent = "Move") ;Move
-		{
-			WinMove, ahk_id %tempWinid%,,%Xpos%, %Ypos%, %Width%, %Height%
-		}
-		
-		x_finish(Environment, "normal")
-		return
-	}
-	else
+	if not tempWinid
 	{
 		x_finish(Environment, "exception", lang("Error! Seeked window does not exist")) 
 		return
 	}
-
 	
-
+	SetTitleMatchMode,%ControlTextMatchMode%
+	controlget,tempControlID,hwnd,,% Control_identifier,ahk_id %tempWinid%
+	if not tempControlID
+	{
+		x_finish(Environment, "exception", lang("Error! Seeked control does not exist in the specified windows")) 
+		return
+	}
+	ControlGetText,tempText,,ahk_id %tempControlID%
+	
+	x_SetVariable(Environment,Varname,tempText)
+	x_SetVariable(Environment,"A_WindowID",tempWinid,"Thread")
+	x_SetVariable(Environment,"A_ControlID",tempControlID,"Thread")
+	
+	x_finish(Environment, "normal")
+	return
 	
 }
 
 ;Called when the execution of the element should be stopped.
 ;If the task in Element_run_...() takes more than several seconds, then it is up to you to make it stoppable.
-Element_stop_Action_Move_Window(Environment, ElementParameters)
+Element_stop_Action_Get_Control_Text(Environment, ElementParameters)
 {
 	
 }
 
 
-
-
-
-
-Action_Move_Window_ButtonWindowAssistant()
+Action_Get_Control_Text_ButtonWindowAssistant()
 {
-	x_assistant_windowParameter({wintitle: "Wintitle", excludeTitle: "excludeTitle", winText: "winText", FindHiddenText: "FindHiddenText", ExcludeText: "ExcludeText", ahk_class: "ahk_class", ahk_exe: "ahk_exe", ahk_id: "ahk_id", ahk_pid: "ahk_pid", FindHiddenWindow: "FindHiddenWindow"})
-}
-
-Action_Move_Window_ButtonGetWinPosAssistant()
-{
-	x_assistant_windowParameter({Xpos: "Xpos", Ypos: "Ypos", Width: "Width", Height: "Height"})
+	x_assistant_windowParameter({wintitle: "Wintitle", excludeTitle: "excludeTitle", winText: "winText", FindHiddenText: "FindHiddenText", ExcludeText: "ExcludeText", ahk_class: "ahk_class", ahk_exe: "ahk_exe", ahk_id: "ahk_id", ahk_pid: "ahk_pid", FindHiddenWindow: "FindHiddenWindow", IdentifyControlBy: "IdentifyControlBy", ControlTextMatchMode: "ControlTextMatchMode", Control_identifier: "Control_identifier"})
 }
