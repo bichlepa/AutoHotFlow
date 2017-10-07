@@ -281,6 +281,11 @@ Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 		return
 	}
 	editExpressionValue:=evRes.result
+	if editExpressionValue is not number
+	{
+		x_finish(Environment, "exception", lang("%1% is not a number: %2%",lang("Expression value"), editExpressionValue))
+		return
+	}
 #endif
 #if par_editStringOrExpression 
 

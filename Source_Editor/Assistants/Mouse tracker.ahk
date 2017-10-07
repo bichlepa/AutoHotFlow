@@ -18,9 +18,21 @@ assistant_MouseTracker(neededInfo)
 		gui,add,radio,xm Y+10 group vassistant_MouseTracker_RadioCoordMode1 gassistant_MouseTracker_RadioCoordMode ,%  lang("Relative to screen")
 		gui,add,radio,xm Y+10 vassistant_MouseTracker_RadioCoordMode2 gassistant_MouseTracker_RadioCoordMode ,% lang("Relative to active window position")
 		gui,add,radio,xm Y+10 vassistant_MouseTracker_RadioCoordMode3 gassistant_MouseTracker_RadioCoordMode ,% lang("Relative to active window client position")
+		
+		assistant_MouseTracker_RadioCoordModeNames:=["Screen", "Window", "Client"]
+		
 		assistant_MouseTracker_RadioCoordMode := x_Par_GetValue(assistant_MouseTracker_NeededInfo.CoordMode)
 		if not (assistant_MouseTracker_RadioCoordMode >=1 && assistant_MouseTracker_RadioCoordMode <= 3)
-			assistant_MouseTracker_RadioCoordMode := 1
+		{
+			if (assistant_MouseTracker_RadioCoordMode=assistant_MouseTracker_RadioCoordModeNames[1])
+				assistant_MouseTracker_RadioCoordMode := 1
+			else if (assistant_MouseTracker_RadioCoordMode=assistant_MouseTracker_RadioCoordModeNames[2])
+				assistant_MouseTracker_RadioCoordMode := 2
+			else if (assistant_MouseTracker_RadioCoordMode=assistant_MouseTracker_RadioCoordModeNames[3])
+				assistant_MouseTracker_RadioCoordMode := 3
+			else 
+				assistant_MouseTracker_RadioCoordMode := 1
+		}
 		guicontrol,,assistant_MouseTracker_RadioCoordMode%assistant_MouseTracker_RadioCoordMode%, 1
 	}
 	else
@@ -44,7 +56,6 @@ assistant_MouseTracker(neededInfo)
 		gui,add,text,yp X+20, y
 		gui,add,edit,yp X+10 w50 vassistant_MouseTracker_EditPosY w100, %assistant_MouseTracker_EditPosY%
 		
-		assistant_MouseTracker_CoordModeNames:=["Screen", "Window", "Client"]
 	}
 
 	if (assistant_MouseTracker_NeededInfo.haskey("color"))
@@ -57,18 +68,36 @@ assistant_MouseTracker(neededInfo)
 		gui,add,edit,xm Y+10 vassistant_MouseTracker_ColorText readonly w100
 		if not (assistant_MouseTracker_ImportColor="yes")
 		;~ gui,add,ListView,yp x+10 w90 h20 vassistant_MouseTracker_Color
-		;~ ;We use an empty listView and manipulate the background color.
-		;~ gui,add,ListView,h200 w200 vassistant_MouseTracker_Color
+		;We use an empty listView and manipulate the background color.
+		gui,add,ListView,h100 w200 vassistant_MouseTracker_ColorPreview
 		
-		gui,font,wbold
-		gui,add,text,xm Y+20,% lang("Method for getting color")
-		gui,font,wnorm
-		gui,add,radio,xm Y+10 group vassistant_MouseTracker_Method1 gassistant_MouseTracker_RadioMethod,% lang("Default method")
-		gui,add,radio,xm Y+10 vassistant_MouseTracker_Method2 gassistant_MouseTracker_RadioMethod ,% lang("Alternative method")
-		gui,add,radio,xm Y+10 vassistant_MouseTracker_Method3 gassistant_MouseTracker_RadioMethod ,% lang("Slow method")
-		
-		assistant_MouseTracker_RadioColorGetMethodNames:=["", "alt", "slow"]
+		if (assistant_MouseTracker_NeededInfo.haskey("colorGetMethod"))
+		{
+			gui,font,wbold
+			gui,add,text,xm Y+20,% lang("Method for getting color")
+			gui,font,wnorm
+			gui,add,radio,xm Y+10 group vassistant_MouseTracker_RadioMethod1 gassistant_MouseTracker_RadioMethod,% lang("Default method")
+			gui,add,radio,xm Y+10 vassistant_MouseTracker_RadioMethod2 gassistant_MouseTracker_RadioMethod ,% lang("Alternative method")
+			gui,add,radio,xm Y+10 vassistant_MouseTracker_RadioMethod3 gassistant_MouseTracker_RadioMethod ,% lang("Slow method")
+			
+			assistant_MouseTracker_RadioMethodNames:=["default", "alt", "slow"]
+			
+			assistant_MouseTracker_RadioMethod := x_Par_GetValue(assistant_MouseTracker_NeededInfo.colorGetMethod)
+			if not (assistant_MouseTracker_RadioMethod >=1 && assistant_MouseTracker_RadioMethod <= 3)
+			{
+				if (assistant_MouseTracker_RadioMethod=assistant_MouseTracker_RadioMethodNames[1])
+					assistant_MouseTracker_RadioMethod := 1
+				else if (assistant_MouseTracker_RadioMethod=assistant_MouseTracker_RadioMethodNames[2])
+					assistant_MouseTracker_RadioMethod := 2
+				else if (assistant_MouseTracker_RadioMethod=assistant_MouseTracker_RadioMethodNames[3])
+					assistant_MouseTracker_RadioMethod := 3
+				else 
+					assistant_MouseTracker_RadioMethod := 1
+			}
+			guicontrol,,assistant_MouseTracker_RadioMethod%assistant_MouseTracker_RadioMethod%, 1
+		}
 	}
+	
 	
 	gui,add,Button,xm Y+20 w95 h25 vassistant_MouseTracker_ButtonOK gassistant_MouseTracker_buttonOK default,% lang("OK")
 	gui,add,Button,X+10 yp w95 h25 vassistant_MouseTracker_ButtonCancel gassistant_MouseTracker_buttonCancel,% lang("Cancel")
@@ -125,7 +154,11 @@ assistant_MouseTracker_buttonOK()
 	}
 	if (assistant_MouseTracker_NeededInfo.haskey("CoordMode"))
 	{
-		x_Par_SetValue(assistant_MouseTracker_NeededInfo.CoordMode,assistant_MouseTracker_RadioCoordMode)
+		x_Par_SetValue(assistant_MouseTracker_NeededInfo.CoordMode,assistant_MouseTracker_RadioCoordModeName)
+	}
+	if (assistant_MouseTracker_NeededInfo.haskey("colorGetMethod"))
+	{
+		x_Par_SetValue(assistant_MouseTracker_NeededInfo.colorGetMethod,assistant_MouseTracker_RadioMethodName)
 	}
 
 }
@@ -170,8 +203,8 @@ assistant_MouseTracker_Task()
 	}
 	
 	;get the mouse position and the window which is covered by the mouse
-	CoordMode,mouse,% assistant_MouseTracker_CoordModeName
-	CoordMode,pixel,% assistant_MouseTracker_CoordModeName
+	CoordMode,mouse,% assistant_MouseTracker_RadioCoordModeName
+	CoordMode,pixel,% assistant_MouseTracker_RadioCoordModeName
 	MouseGetPos,assistant_MouseTracker_MouseX,assistant_MouseTracker_MouseY,tempwinidundermouse,tempcontrol
 
 	;If user points to the gui of the assistant, do nothing
@@ -201,9 +234,9 @@ assistant_MouseTracker_Task()
 		
 		if (assistant_MouseTracker_NeededInfo.haskey("color"))
 		{
-			PixelGetColor,tempcolor,%assistant_MouseTracker_MouseX%,%assistant_MouseTracker_MouseY%,rgb %assistant_MouseTracker_Method%
+			PixelGetColor,tempcolor,%assistant_MouseTracker_MouseX%,%assistant_MouseTracker_MouseY%,rgb %assistant_MouseTracker_RadioMethodName%
 			guicontrol,assistant_MouseTracker:,assistant_MouseTracker_ColorText,%tempcolor%
-			guicontrol,assistant_MouseTracker: +background%tempcolor%,assistant_MouseTracker_Color
+			guicontrol,assistant_MouseTracker: +background%tempcolor%,assistant_MouseTracker_ColorPreview
 		}
 		
 		tempMovedMouse:=false
@@ -218,11 +251,11 @@ assistant_MouseTracker_RadioMethod()
 	gui,assistant_MouseTracker:submit,nohide
 	loop 3
 	{
-		if (assistant_MouseTracker_RadioColorGetMethod%a_index%)
-			assistant_MouseTracker_RadioColorGetMethod := A_Index
+		if (assistant_MouseTracker_RadioMethod%a_index%)
+			assistant_MouseTracker_RadioMethod := A_Index
 	}
 	
-	assistant_MouseTracker_RadioColorGetMethodName :=assistant_MouseTracker_RadioColorGetMethodNames[assistant_MouseTracker_RadioColorGetMethod]
+	assistant_MouseTracker_RadioMethodName :=assistant_MouseTracker_RadioMethodNames[assistant_MouseTracker_RadioMethod]
 	return
 }
 
@@ -235,7 +268,7 @@ assistant_MouseTracker_RadioCoordMode()
 		if (assistant_MouseTracker_RadioCoordMode%a_index%)
 			assistant_MouseTracker_RadioCoordMode := A_Index
 	}
-	assistant_MouseTracker_CoordModeName :=assistant_MouseTracker_CoordModeNames[assistant_MouseTracker_RadioCoordMode]
+	assistant_MouseTracker_RadioCoordModeName :=assistant_MouseTracker_RadioCoordModeNames[assistant_MouseTracker_RadioCoordMode]
 	return
 }
 

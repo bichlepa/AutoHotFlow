@@ -12,6 +12,10 @@ LoadFlowCheckCompabilityClass(p_List,p_ElementID,p_section)
 		{
 			p_List[p_ElementID].class="Action_Get_Screen_Settings"
 		}
+		if (p_List[p_ElementID].class="Action_Set_Monitor_Settings")
+		{
+			p_List[p_ElementID].class="Action_Set_Screen_Settings"
+		}
 	}
 	
 	if FlowCompabilityVersion<1000000000 ; Only for test cases. On release this should be empty
@@ -461,6 +465,31 @@ LoadFlowCheckCompability(p_List,p_ElementID,p_section,FlowCompabilityVersion)
 			{
 				p_List[p_ElementID].pars.NumberOfElements:=tempenum[p_List[p_ElementID].pars.NumberOfElements]
 			}
+		}
+		if (p_List[p_ElementID].class="Action_Get_mouse_position" )
+		{
+			tempenum:= ["Screen", "Window", "Cilent"]
+			if (p_List[p_ElementID].pars.CoordMode>= 1 and p_List[p_ElementID].pars.CoordMode<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.CoordMode:=tempenum[p_List[p_ElementID].pars.CoordMode]
+			}
+		}
+		if (p_List[p_ElementID].class="Action_Get_pixel_color")
+		{
+			tempenum:= ["Screen", "Window", "Cilent"]
+			if (p_List[p_ElementID].pars.CoordMode>= 1 and p_List[p_ElementID].pars.CoordMode<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.CoordMode:=tempenum[p_List[p_ElementID].pars.CoordMode]
+			}
+			tempenum:= ["Default", "Alt", "Slow"]
+			if (p_List[p_ElementID].pars.Method>= 1 and p_List[p_ElementID].pars.Method<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.Method:=tempenum[p_List[p_ElementID].pars.Method]
+			}
+			if (not p_List[p_ElementID].pars.Xpos)
+				p_List[p_ElementID].pars.Xpos:=RIni_GetKeyValue("IniFile", p_section, "CoordinateX", 10) 
+			if (not p_List[p_ElementID].pars.Ypos)
+				p_List[p_ElementID].pars.Ypos:=RIni_GetKeyValue("IniFile", p_section, "CoordinateY", 20) 
 		}
 	}
 	

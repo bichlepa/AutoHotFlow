@@ -158,11 +158,13 @@ Element_run_Action_Set_Screen_Settings(Environment, ElementParameters)
 		MonitorNumber:=evRes.result
 		if MonitorNumber is not integer
 		{
-			x_finish(Environment, "exception", lang("Screen number is not specified") )
+			x_finish(Environment, "exception", lang("Screen number is not a number") )
+			return
 		}
 		if not (MonitorNumber >= 1 and MonitorNumber <= NumberOfMonitors)
 		{
 			x_finish(Environment, "exception", lang("Screen %1% does not exist", MonitorNumber) ) 
+			return
 		}
 	}
 	
