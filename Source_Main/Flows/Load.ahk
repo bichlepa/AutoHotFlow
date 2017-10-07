@@ -158,6 +158,10 @@ LoadFlow(FlowID, filepath="", params="")
 				{
 					_flows[FlowID].allElements[loadElementID].Class := loadElementClass
 				}
+				
+				;Check the class
+				LoadFlowCheckCompabilityClass(_flows[FlowID].allElements,loadElementID,tempSection)
+				
 				loadElementClass:=_flows[FlowID].allElements[loadElementID].Class
 				
 				;If element class is not installed, prepare a warning message
@@ -168,7 +172,6 @@ LoadFlow(FlowID, filepath="", params="")
 						missingpackages.push(loadElementPackage)
 				}
 				
-				LoadFlowCheckCompabilitySubtype(_flows[FlowID].allElements,loadElementID,tempSection)
 				
 				if (loadElementType="loop")
 				{
@@ -374,10 +377,43 @@ LoadFlowParametersOfElement(FlowID,parList,parElementID,parlocation, parSection)
 		oneParameterID:=oneParameter.id
 		for index2, oneParameterDetail in parametersToloadDetails
 		{
-			if (oneParameterDetail.ID = oneParameterID)
+			if (oneParameterDetail.ID)
 			{
-				parameterDefault:=oneParameterDetail.default
-				break
+				if not isobject(oneParameterDetail.ID)
+				{
+					oneParameterDetail.ID :=[oneParameterDetail.ID]
+				}
+				if not isobject(oneParameterDetail.Default)
+				{
+					oneParameterDetail.Default :=[oneParameterDetail.Default]
+				}
+				for index3, OneID in oneParameterDetail.ID
+				{
+					if (OneID = oneParameterID)
+					{
+						parameterDefault:=oneParameterDetail.default[index3]
+						break
+					}
+				}
+			}
+			if (oneParameterDetail.ContentID)
+			{
+				if not isobject(oneParameterDetail.ContentID)
+				{
+					oneParameterDetail.ContentID :=[oneParameterDetail.ContentID]
+				}
+				if not isobject(oneParameterDetail.Default)
+				{
+					oneParameterDetail.ContentDefault :=[oneParameterDetail.ContentDefault]
+				}
+				for index3, OneID in oneParameterDetail.ContentID
+				{
+					if (OneID = oneParameterID)
+					{
+						parameterDefault:=oneParameterDetail.ContentDefault[index3]
+						break
+					}
+				}
 			}
 		}
 		;~ MsgBox % _flows[FlowID].CompabilityVersion

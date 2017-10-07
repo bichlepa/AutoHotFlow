@@ -1360,7 +1360,7 @@ class ElementSettings
 			local temp, tempGUIControl
 			tempGUIControl:=this.parameter.id
 			temp:=this.getValue()
-			this.setValue(temp,"SlideOf" tempGUIControl)
+			guicontrol,,% "GUISettingsOfElementSlideOf" tempGUIControl,%temp%
 			this.udpatename()
 		}
 		sliderChangeSlide()
@@ -1368,7 +1368,7 @@ class ElementSettings
 			global
 			local temp, tempGUIControl
 			tempGUIControl:=this.parameter.id
-			temp:=this.getValue("SlideOf" tempGUIControl)
+			guicontrolget,temp,,% "GUISettingsOfElementSlideOf" tempGUIControl
 			this.setValue(temp)
 			this.udpatename()
 		}

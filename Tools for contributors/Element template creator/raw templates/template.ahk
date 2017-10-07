@@ -365,6 +365,11 @@ Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 #if par_file 
 
 	fileValue := x_GetFullPath(Environment, x_replaceVariables(Environment, ElementParameters.file))
+	if not FileExist(fileValue)
+	{
+		x_finish(Environment, "exception", lang("%1% '%2%' does not exist.",lang("File"), fileValue)) 
+		return
+	}
 #endif
 #if par_folder
 
@@ -660,6 +665,11 @@ Element_enable_&ElementType&_&Name&(Environment, ElementParameters)
 #endif
 #if par_file 
 	fileValue := x_GetFullPath(Environment, x_replaceVariables(Environment, ElementParameters.file))
+	if not FileExist(fileValue)
+	{
+		x_finish(Environment, "exception", lang("%1% '%2%' does not exist.",lang("File"), fileValue)) 
+		return
+	}
 #endif
 #if par_folder
 	folderValue := x_GetFullPath(Environment, x_replaceVariables(Environment, ElementParameters.folder))

@@ -204,3 +204,8 @@ evalExpression(expression)
 		result := not result
 	return result
 }
+
+guiclose()
+{
+	ExitApp
+}

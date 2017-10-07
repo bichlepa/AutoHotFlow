@@ -1,43 +1,43 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Action_New_List")
+AllElementClasses.push("Action_Add_To_List")
 
-Element_getPackage_Action_New_List()
+Element_getPackage_Action_Add_To_List()
 {
 	return "default"
 }
 
-Element_getElementType_Action_New_List()
+Element_getElementType_Action_Add_To_List()
 {
 	return "action"
 }
 
-Element_getElementLevel_Action_New_List()
+Element_getElementLevel_Action_Add_To_List()
 {
 	;"Beginner" or "Advanced" or "Programmer"
 	return "Beginner"
 }
 
-Element_getName_Action_New_List()
+Element_getName_Action_Add_To_List()
 {
-	return lang("New_List")
+	return lang("Add_To_List")
 }
 
-Element_getIconPath_Action_New_List()
+Element_getIconPath_Action_Add_To_List()
 {
 	return "Source_elements\default\icons\New variable.png"
 }
 
-Element_getCategory_Action_New_List()
+Element_getCategory_Action_Add_To_List()
 {
 	return lang("Variable")
 }
 
-Element_getParameters_Action_New_List()
+Element_getParameters_Action_Add_To_List()
 {
 	parametersToEdit:=Object()
 	
 	parametersToEdit.push({id: "Varname"})
-	parametersToEdit.push({id: "InitialContent"})
+	parametersToEdit.push({id: "NumberOfElements"})
 	parametersToEdit.push({id: "VarValue"})
 	parametersToEdit.push({id: "expression"})
 	parametersToEdit.push({id: "VarValues"})
@@ -52,35 +52,35 @@ Element_getParameters_Action_New_List()
 	return parametersToEdit
 }
 
-Element_getParametrizationDetails_Action_New_List(Environment)
+Element_getParametrizationDetails_Action_Add_To_List(Environment)
 {
 	parametersToEdit:=Object()
 	parametersToEdit.push({type: "Label", label: lang("Variable_name")})
-	parametersToEdit.push({type: "Edit", id: "Varname", default: "NewList", content: "VariableName", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Edit", id: "Varname", default: "MyList", content: "VariableName", WarnIfEmpty: true})
 	parametersToEdit.push({type: "Label", label: lang("Number of elements")})
-	parametersToEdit.push({type: "Radio", id: "InitialContent", default: 1, result: "enum", choices: [lang("Empty list"), lang("Initialize with one element"), lang("Initialize with multiple elements")], enum: ["Empty", "One", "Multiple"]})
-	parametersToEdit.push({type: "Label", label:  lang("Initial content")})
-	parametersToEdit.push({type: "Edit", id: "VarValue", default: "New element", content: ["String", "Expression"], contentID: "expression", contentDefault: "string", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Radio", id: "NumberOfElements", default: 1, result: "enum", choices: [lang("Initialize with one element"), lang("Initialize with multiple elements")], enum: ["One", "Multiple"]})
+	parametersToEdit.push({type: "Label", label:  lang("Content to add")})
+	parametersToEdit.push({type: "Edit", id: "VarValue", default: "New element", content: ["String", "Expression"], contentID: "Expression", contentDefault: "string", WarnIfEmpty: true})
 	parametersToEdit.push({type: "multilineEdit", id: "VarValues", default: "Element one`nElement two", WarnIfEmpty: true})
 	parametersToEdit.push({type: "Checkbox", id: "DelimiterLinefeed", default: 1, label: lang("Use linefeed as delimiter")})
 	parametersToEdit.push({type: "Checkbox", id: "DelimiterComma", default: 0, label: lang("Use comma as delimiter")})
 	parametersToEdit.push({type: "Checkbox", id: "DelimiterSemicolon", default: 0, label: lang("Use semicolon as delimiter")})
 	parametersToEdit.push({type: "Checkbox", id: "DelimiterSpace", default: 0, label: lang("Use space as delimiter")})
 	parametersToEdit.push({type: "Label", label: lang("Key")})
-	parametersToEdit.push({type: "Radio", id: "WhichPosition", default: 1, result: "enum", choices: [lang("Numerically as first element"), lang("Following key")], enum: ["First", "Specified"]})
+	parametersToEdit.push({type: "Radio", id: "WhichPosition", default: 1, result: "enum", choices: [lang("First position"), lang("Last position"), lang("Following position or key")], enum: ["First", "Last", "Specified"]})
 	parametersToEdit.push({type: "Edit", id: "Position", default: "keyName", content: ["String", "Expression"], contentID: "expressionPos", contentDefault: "string", WarnIfEmpty: true})
 	
 
 	return parametersToEdit
 }
 
-Element_GenerateName_Action_New_List(Environment, ElementParameters)
+Element_GenerateName_Action_Add_To_List(Environment, ElementParameters)
 {
-	if (ElementParameters.InitialContent="empty")
+	if ElementParameters.InitialContent=empty
 	{
 		Text.= lang("New empty list") " " ElementParameters.Varname
 	}
-	else if (ElementParameters.InitialContent="one")
+	else if ElementParameters.InitialContent=one
 	{
 		Text.= lang("New list %1% with initial content",ElementParameters.Varname) ": "
 		Text.=  ElementParameters.VarValue
@@ -98,7 +98,7 @@ Element_GenerateName_Action_New_List(Environment, ElementParameters)
 }
 
 
-Element_CheckSettings_Action_New_List(Environment, ElementParameters)
+Element_CheckSettings_Action_Add_To_List(Environment, ElementParameters)
 {
 	
 	if (ElementParameters.InitialContent = "one") ;one element
@@ -134,7 +134,7 @@ Element_CheckSettings_Action_New_List(Environment, ElementParameters)
 	
 }
 
-Element_run_Action_New_List(Environment, ElementParameters)
+Element_run_Action_Add_To_List(Environment, ElementParameters)
 {
 	;~ d(ElementParameters, "element parameters")
 	Varname := x_replaceVariables(Environment, ElementParameters.Varname)
@@ -147,14 +147,23 @@ Element_run_Action_New_List(Environment, ElementParameters)
 		return
 	}
 	
+	myList:=x_getVariable(Environment,Varname)
 	
-	newList:=Object()
-	
-	if (ElementParameters.InitialContent = "empty")
+	if (!(IsObject(myList)))
 	{
-		x_SetVariable(Environment,Varname,newList)
+		if myList=
+		{
+			x_log(Environment, lang("Waring!") " " lang("Variable '%1%' is empty. A new list will be created.",Varname) ,1)
+			myList:=Object()
+		}
+		else
+		{
+			x_finish(Environment, "exception", lang("Variable '%1%' is not empty and does not contain a list.",Varname))
+			return
+		}
 	}
-	else if (ElementParameters.InitialContent = "one") ;one element
+	
+	if (ElementParameters.InitialContent = "one") ;one element
 	{
 		if (ElementParameters.Expression = "expression")
 		{
@@ -177,9 +186,13 @@ Element_run_Action_New_List(Environment, ElementParameters)
 		
 		if (ElementParameters.WhichPosition="First")
 		{
-			newList.push(Value)
+			myList.insertat(1, Value)
 		}
-		else
+		else if (ElementParameters.WhichPosition="Last")
+		{
+			myList.push(Value)
+		}
+		else if (ElementParameters.WhichPosition="Specified")
 		{
 			
 			if (ElementParameters.ExpressionPos = "expression")
@@ -206,10 +219,10 @@ Element_run_Action_New_List(Environment, ElementParameters)
 				return
 			}
 			
-			newList[Position] :=Value
+			myList[Position] :=Value
 		}
 		
-		x_SetVariable(Environment,Varname,newList)
+		x_SetVariable(Environment,Varname,myList)
 	}
 	else if (ElementParameters.InitialContent = "multiple") 
 	{
@@ -223,15 +236,60 @@ Element_run_Action_New_List(Environment, ElementParameters)
 			StringReplace,Value,Value,;,▬,all
 		if ElementParameters.DelimiterSpace
 			StringReplace,Value,Value,%A_Space%,▬,all
-		
-		loop,parse,Value,▬
+		if (ElementParameters.WhichPosition="First")
 		{
-			newList.push(A_LoopField)
+			loop,parse,Value,▬
+			{
+				myList.insertat(a_index, Value)
+			}
 		}
-		x_SetVariable(Environment,Varname,newList)
+		else if (ElementParameters.WhichPosition="Last")
+		{
+			loop,parse,Value,▬
+			{
+				myList.push(Value)
+			}
+		}
+		else if (ElementParameters.WhichPosition="Specified")
+		{
+			if (ElementParameters.ExpressionPos = "expression")
+			{
+				evRes := x_EvaluateExpression(Environment, ElementParameters.Position)
+				if (evRes.error)
+				{
+					;On error, finish with exception and return
+					x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.Position) "`n`n" evRes.error) 
+					return
+				}
+				else
+				{
+					Position:=evRes.result
+				}
+			}
+			else
+				Position := x_replaceVariables(Environment, ElementParameters.Position)
+			
+			if (position = "")
+			{
+				;On error, finish with exception and return
+				x_finish(Environment, "exception", lang("Position is not specified")) 
+				return
+			}
+			
+			if position is not Integer
+			{
+				x_finish(Environment, "exception", lang("Position is not a number: %1%", position)) 
+			}
+			
+			loop,parse,Value,▬
+			{
+				myList.Insert(Position+A_Index-1, A_LoopField)
+			}
+		}
+		x_SetVariable(Environment,Varname,myList)
 	}
 	
-		;~ d(newlist)
+		;~ d(myList)
 	
 	;Always call v_finish() before return
 	x_finish(Environment, "normal")

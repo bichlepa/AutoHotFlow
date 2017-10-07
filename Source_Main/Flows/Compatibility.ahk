@@ -1,5 +1,28 @@
 ﻿FlowCompabilityVersionOfApp:=10 ;This variable contains a number which will be incremented as soon an incompability appears. This will make it possible to identify old scripts and convert them. This value will be written in any saved flows.
 
+
+;Check the element class before its settings are loaded
+LoadFlowCheckCompabilityClass(p_List,p_ElementID,p_section)
+{
+	global
+	
+	if FlowCompabilityVersion<11 ; AutoHotFlow v1.0 release
+	{
+		if (p_List[p_ElementID].class="Action_Get_Monitor_Settings")
+		{
+			p_List[p_ElementID].class="Action_Get_Screen_Settings"
+		}
+	}
+	
+	if FlowCompabilityVersion<1000000000 ; Only for test cases. On release this should be empty
+	{
+		
+		
+		
+	}
+}
+
+;Check the element settings after they were loaded
 LoadFlowCheckCompability(p_List,p_ElementID,p_section,FlowCompabilityVersion)
 {
 	global
@@ -163,10 +186,22 @@ LoadFlowCheckCompability(p_List,p_ElementID,p_section,FlowCompabilityVersion)
 	{
 		if (p_List[p_ElementID].class="action_New_List") 
 		{
-			if not (p_List[p_ElementID].pars.IsExpression)
+			if not (p_List[p_ElementID].pars.Expression)
 				p_List[p_ElementID].pars.IsExpression:=RIni_GetKeyValue("IniFile", p_section, "IsExpression", 1) 
 			if not (p_List[p_ElementID].pars.WhichPosition)
 				p_List[p_ElementID].pars.WhichPosition:=RIni_GetKeyValue("IniFile", p_section, "WhitchPosition", 1) 
+		}
+		if (p_List[p_ElementID].class="action_Add_To_list") 
+		{
+			if not (p_List[p_ElementID].pars.Expression)
+				p_List[p_ElementID].pars.IsExpression:=RIni_GetKeyValue("IniFile", p_section, "IsExpression", 1) 
+			if not (p_List[p_ElementID].pars.WhichPosition)
+				p_List[p_ElementID].pars.WhichPosition:=RIni_GetKeyValue("IniFile", p_section, "WhitchPosition", 1) 
+		}
+		if (p_List[p_ElementID].class="Action_Get_Index_Of_Element_In_List") 
+		{
+			if not (p_List[p_ElementID].pars.Expression)
+				p_List[p_ElementID].pars.IsExpression:=RIni_GetKeyValue("IniFile", p_section, "isExpressionSearchContent", 1) 
 		}
 		if (p_List[p_ElementID].class="action_kill_window") 
 		{
@@ -267,8 +302,42 @@ LoadFlowCheckCompability(p_List,p_ElementID,p_section,FlowCompabilityVersion)
 			{
 				p_List[p_ElementID].pars.InitialContent:=tempenum[p_List[p_ElementID].pars.InitialContent]
 			}
+			tempenum:= ["First", "Specified"]
+			if (p_List[p_ElementID].pars.WhichPosition>= 1 and p_List[p_ElementID].pars.WhichPosition<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.WhichPosition:=tempenum[p_List[p_ElementID].pars.WhichPosition]
+			}
 		}
-		if (p_List[p_ElementID].class="Action_New_List")
+		if (p_List[p_ElementID].class="Action_Add_to_list")
+		{
+			tempenum:= ["One", "Multiple"]
+			if (p_List[p_ElementID].pars.NumberOfElements>= 1 and p_List[p_ElementID].pars.NumberOfElements<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.NumberOfElements:=tempenum[p_List[p_ElementID].pars.NumberOfElements]
+			}
+			tempenum:= ["First", "Last", "Specified"]
+			if (p_List[p_ElementID].pars.WhichPosition>= 1 and p_List[p_ElementID].pars.WhichPosition<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.WhichPosition:=tempenum[p_List[p_ElementID].pars.WhichPosition]
+			}
+		}
+		if (p_List[p_ElementID].class="Action_Get_From_List")
+		{
+			tempenum:= ["First", "Last", "Random", "Specified"]
+			if (p_List[p_ElementID].pars.WhichPosition>= 1 and p_List[p_ElementID].pars.WhichPosition<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.WhichPosition:=tempenum[p_List[p_ElementID].pars.WhichPosition]
+			}
+		}
+		if (p_List[p_ElementID].class="Action_Get_Index_Of_Element_In_List")
+		{
+			tempenum:= ["First", "Last", "Random", "Specified"]
+			if (p_List[p_ElementID].pars.WhichPosition>= 1 and p_List[p_ElementID].pars.WhichPosition<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.WhichPosition:=tempenum[p_List[p_ElementID].pars.WhichPosition]
+			}
+		}
+		if (p_List[p_ElementID].class="Action_Enbale_Flow")
 		{
 			tempenum:= ["Any", "Default", "Specific"]
 			if (p_List[p_ElementID].pars.WhichTrigger>= 1 and p_List[p_ElementID].pars.WhichTrigger<=tempenum.MaxIndex())
@@ -361,39 +430,46 @@ LoadFlowCheckCompability(p_List,p_ElementID,p_section,FlowCompabilityVersion)
 				p_List[p_ElementID].pars.WhichInformation:=tempenum[p_List[p_ElementID].pars.WhichInformation]
 			}
 		}
-	}
-	
-	if FlowCompabilityVersion<1000000000 ; Only for test cases. On release this should be empty
-	{
-		
-		
-		
-	}
-}
-
-
-
-LoadFlowCheckCompabilitySubtype(p_List,p_ElementID,p_section)
-{
-	global
-	if FlowCompabilityVersion<2 ; 2015,06
-	{
-		if (p_List[p_ElementID].type="condition" and p_List[p_ElementID].subtype="folder_exists") 
+		if (p_List[p_ElementID].class="Action_Get_File_Size")
 		{
-			
-			p_List[p_ElementID].subtype:="file_exists" ;File exists became File or folder exists, because they are the same.
-			p_List[p_ElementID].CompatibilityComment:="WasFolderExists" ;File exists became File or folder exists, because they are the same.
+			tempenum:= ["Bytes", "Kilobytes", "Megabytes"]
+			if (p_List[p_ElementID].pars.Unit>= 1 and p_List[p_ElementID].pars.Unit<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.Unit:=tempenum[p_List[p_ElementID].pars.Unit]
+			}
+		}
+		if (p_List[p_ElementID].class="Action_Get_Control_Text")
+		{
+			tempenum:= ["Text", "Class", "ID"]
+			if (p_List[p_ElementID].pars.IdentifyControlBy>= 1 and p_List[p_ElementID].pars.IdentifyControlBy<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.IdentifyControlBy:=tempenum[p_List[p_ElementID].pars.IdentifyControlBy]
+			}
+		}
+		if (p_List[p_ElementID].class="Action_Get_File_Time")
+		{
+			tempenum:= ["Modification", "Creation", "Access"]
+			if (p_List[p_ElementID].pars.TimeType>= 1 and p_List[p_ElementID].pars.TimeType<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.TimeType:=tempenum[p_List[p_ElementID].pars.TimeType]
+			}
+		}
+		if (p_List[p_ElementID].class="Action_Get_File_Time")
+		{
+			tempenum:= ["One", "Multiple"]
+			if (p_List[p_ElementID].pars.NumberOfElements>= 1 and p_List[p_ElementID].pars.NumberOfElements<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.NumberOfElements:=tempenum[p_List[p_ElementID].pars.NumberOfElements]
+			}
 		}
 	}
 	
-	
 	if FlowCompabilityVersion<1000000000 ; Only for test cases. On release this should be empty
 	{
 		
 		
 		
 	}
-	
 }
 
 
