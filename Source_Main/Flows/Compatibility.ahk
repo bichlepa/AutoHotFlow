@@ -491,6 +491,50 @@ LoadFlowCheckCompability(p_List,p_ElementID,p_section,FlowCompabilityVersion)
 			if (not p_List[p_ElementID].pars.Ypos)
 				p_List[p_ElementID].pars.Ypos:=RIni_GetKeyValue("IniFile", p_section, "CoordinateY", 20) 
 		}
+		if (p_List[p_ElementID].class="Action_HTTP_Request")
+		{
+			tempenum:= ["automatic", "custom"]
+			if (p_List[p_ElementID].pars.WhichContentType>= 1 and p_List[p_ElementID].pars.WhichContentType<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.WhichContentType:=tempenum[p_List[p_ElementID].pars.WhichContentType]
+			}
+			if (p_List[p_ElementID].pars.WhichContentLength>= 1 and p_List[p_ElementID].pars.WhichContentLength<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.WhichContentLength:=tempenum[p_List[p_ElementID].pars.WhichContentLength]
+			}
+			if (p_List[p_ElementID].pars.WhichMethod>= 1 and p_List[p_ElementID].pars.WhichMethod<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.WhichMethod:=tempenum[p_List[p_ElementID].pars.WhichMethod]
+			}
+			if (p_List[p_ElementID].pars.WhichUserAgent>= 1 and p_List[p_ElementID].pars.WhichUserAgent<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.WhichUserAgent:=tempenum[p_List[p_ElementID].pars.WhichUserAgent]
+			}
+			tempenum:= ["none", "automatic", "custom"]
+			if (p_List[p_ElementID].pars.WhichContentMD5>= 1 and p_List[p_ElementID].pars.WhichContentMD5<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.WhichContentMD5:=tempenum[p_List[p_ElementID].pars.WhichContentMD5]
+			}
+			if (p_List[p_ElementID].pars.WhichProxy>= 1 and p_List[p_ElementID].pars.WhichProxy<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.WhichProxy:=tempenum[p_List[p_ElementID].pars.WhichProxy]
+			}
+			tempenum:= ["Variable", "File"]
+			if (p_List[p_ElementID].pars.WhereToPutResponseData>= 1 and p_List[p_ElementID].pars.WhereToPutResponseData<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.WhereToPutResponseData:=tempenum[p_List[p_ElementID].pars.WhereToPutResponseData]
+			}
+			tempenum:= ["utf-8", "definedCharset", "definedCodepage"]
+			if (p_List[p_ElementID].pars.WhichCodepage>= 1 and p_List[p_ElementID].pars.WhichCodepage<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.WhichCodepage:=tempenum[p_List[p_ElementID].pars.WhichCodepage]
+			}
+			tempenum:= ["NoUpload", "Specified", "File"]
+			if (p_List[p_ElementID].pars.WhereToGetPostData>= 1 and p_List[p_ElementID].pars.WhereToGetPostData<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.WhereToGetPostData:=tempenum[p_List[p_ElementID].pars.WhereToGetPostData]
+			}
+		}
 	}
 	
 	if FlowCompabilityVersion<1000000000 ; Only for test cases. On release this should be empty

@@ -74,6 +74,8 @@ FileDelete,%a_temp%\autoHotflowTryToStartAsAdmin.txt
 #include lib\Random Word List\Random Word List.ahk
 #include Lib\Eject by SKAN\Eject by SKAN.ahk
 #include Lib\Class_Monitor\Class_Monitor.ahk
+#include Lib\HTTP Request\HTTPRequest.ahk
+#include Lib\HTTP Request\Uriencode.ahk
 
 ;Include libraries which may be used by the elements. This code is generated.
 ;Lib_includes_Start#include lib\7z wrapper\7z wrapper.ahk
@@ -160,7 +162,9 @@ AllTriggerClasses:=Object()
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Get_Screen_Settings.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Get_string_Length.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Get_Volume.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Hibernate_Computer.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Hide_window.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\HTTP_Request.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Move_File.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Move_Folder.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Move_window.ahk

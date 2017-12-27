@@ -27,6 +27,8 @@ lang_setLanguage(_settings.UILanguage)
 #include lib\Random Word List\Random Word List.ahk
 #include Lib\Eject by SKAN\Eject by SKAN.ahk
 #include Lib\Class_Monitor\Class_Monitor.ahk
+#include Lib\HTTP Request\HTTPRequest.ahk
+#include Lib\HTTP Request\Uriencode.ahk
 
 ;~ #include Source_Draw\API\API receiver execution.ahk
 

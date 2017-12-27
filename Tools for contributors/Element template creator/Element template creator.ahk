@@ -28,7 +28,7 @@ gui,add,dropdownlist,yp %posx2% vElementType choose1 ggenerate, Action|Condition
 gui,add,text,%posx1% Y+20, Name
 gui,add,edit,yp %posx2% vName ggenerate w100, MyName
 gui,add,text,%posx1% Y+20, Category
-gui,add,dropdownlist,yp %posx2% vCategory choose1 ggenerate, Variable|Flow_control|Window|Sound|File|Drive|User_interaction|User_simulation|Debugging|Expert
+gui,add,dropdownlist,yp %posx2% vCategory choose1 ggenerate, Variable|Flow_control|Window|Sound|File|Drive|User_interaction|User_simulation|Power|Internet|Debugging|Expert
 gui,add,text,%posx1% Y+20, Icon
 gui,add,dropdownlist,yp %posx2% vIcon choose1 ggenerate, % allicons
 gui,add,text,%posx1% Y+20, Stability

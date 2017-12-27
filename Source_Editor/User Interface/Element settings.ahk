@@ -603,7 +603,11 @@ class ElementSettings
 						{
 							guicontrol,SettingsOfElement:enable%enOrDis%,% component
 						}
-						this.enabled:=enOrDis
+						if (this.enabled != enOrDis)
+						{
+							this.enabled:=enOrDis
+							this.checkContent()
+						}
 						return
 					}
 				}
