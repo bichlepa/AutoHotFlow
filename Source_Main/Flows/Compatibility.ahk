@@ -535,6 +535,28 @@ LoadFlowCheckCompability(p_List,p_ElementID,p_section,FlowCompabilityVersion)
 				p_List[p_ElementID].pars.WhereToGetPostData:=tempenum[p_List[p_ElementID].pars.WhereToGetPostData]
 			}
 		}
+		if (p_List[p_ElementID].class="Action_Input_Box")
+		{
+			tempenum:= ["NoTimeout", "Timeout"]
+			if (p_List[p_ElementID].pars.IsTimeout>= 1 and p_List[p_ElementID].pars.IsTimeout<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.IsTimeout:=tempenum[p_List[p_ElementID].pars.IsTimeout]
+			}
+			tempenum:= ["Seconds", "Minutes", "Hours"]
+			if (p_List[p_ElementID].pars.Unit>= 1 and p_List[p_ElementID].pars.Unit<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.Unit:=tempenum[p_List[p_ElementID].pars.Unit]
+			}
+			tempenum:= ["Normal", "Exception"]
+			if (p_List[p_ElementID].pars.OnTimeout>= 1 and p_List[p_ElementID].pars.OnTimeout<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.OnTimeout:=tempenum[p_List[p_ElementID].pars.OnTimeout]
+			}
+			if (p_List[p_ElementID].pars.IfDismiss>= 1 and p_List[p_ElementID].pars.IfDismiss<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.IfDismiss:=tempenum[p_List[p_ElementID].pars.IfDismiss]
+			}
+		}
 	}
 	
 	if FlowCompabilityVersion<1000000000 ; Only for test cases. On release this should be empty
