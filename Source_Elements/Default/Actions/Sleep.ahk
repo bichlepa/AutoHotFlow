@@ -32,16 +32,6 @@ Element_getCategory_Action_Sleep()
 	return lang("Flow_control")
 }
 
-Element_getParameters_Action_Sleep()
-{
-	parametersToEdit:=Object()
-	
-	parametersToEdit.push({id: "duration"})
-	parametersToEdit.push({id: "Unit"})
-	
-	return parametersToEdit
-}
-
 Element_getParametrizationDetails_Action_Sleep(Environment)
 {
 	parametersToEdit:=Object()
@@ -70,6 +60,12 @@ Element_GenerateName_Action_Sleep(Environment, ElementParameters)
 
 Element_run_Action_Sleep(Environment, ElementParameters)
 {
+	ElementParameters:=x_AutoEvaluateParameters(Environment, ElementParameters)
+	if (EvaluatedParameters._error)
+	{
+		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
+		return
+	}
 	
 	if (ElementParameters.Unit="Milliseconds") ;Milliseconds
 		tempDuration:=ElementParameters.duration

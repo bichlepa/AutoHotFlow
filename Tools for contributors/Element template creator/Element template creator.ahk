@@ -56,6 +56,7 @@ gui,add,checkbox,Y+10 %posx2% vpar_button ggenerate, Button
 gui,add,text,%posx1% Y+20, Pre-coded features
 gui,add,checkbox,yp %posx2% vaddWindowSelector ggenerate, Add window selector
 gui,add,checkbox,Y+10 %posx2% vaddSeparateAhkThread ggenerate, Execute in separate ahk thread
+gui,add,checkbox,Y+10 %posx2% vaddCustomGUI ggenerate, Add custom GUI
 
 gui,show
 gosub,generate

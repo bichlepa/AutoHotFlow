@@ -37,6 +37,19 @@ x_CheckVariableName(p_VarName)
 	return Var_CheckName(VarName)
 }
 
+x_AutoEvaluateParameters(Environment, ElementParameters, p_skipList = "")
+{
+	return
+}
+x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, p_ParametersToEvaluate)
+{
+	return
+}
+x_EvalOneParameter(EvaluatedParameters, Environment, ElementParameters, oneParID, onePar = "")
+{
+	return
+}
+
 x_GetListOfAllVars(Environment)
 {
 	return Var_GetListOfAllVars_Common(Environment)

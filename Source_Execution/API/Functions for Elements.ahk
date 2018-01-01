@@ -46,6 +46,181 @@ x_CheckVariableName(p_VarName)
 	return Var_CheckName(p_VarName)
 }
 
+x_AutoEvaluateParameters(Environment, ElementParameters, p_skipList = "")
+{
+	elementClass:=_Flows[Environment.FlowID].allElements[Environment.ElementID].class
+	ParametrationDetails := Element_getParametrizationDetails(elementClass, Environment)
+	EvaluatedParameters:=Object()
+	
+	;~ d(Environment)
+	;~ d(ParametrationDetails, "ParametrationDetails "  elementClass)
+	
+	for oneParIndex, onePar in ParametrationDetails
+	{
+	;~ d(onePar, "onePar")
+		if (not onePar.id)
+		{
+			continue
+		}
+		if (not isObject(onePar.id))
+			parIDs:=[onePar.id]
+		else
+			parIDs:=onePar.id
+		
+		
+		for oneIndex, oneParID in parIDs
+		{
+			;~ d(oneParID, "oneParID")
+			if (onePar.type = "label" or onPar.type = "Button")
+			{
+				continue
+			}
+			
+			skipThis:=false
+			for oneSkipParIndex, oneSkipParID in p_skipList
+			{
+				if (oneSkipParID = oneParID)
+				{
+					skipThis:=true
+				}
+			}
+			if skipThis
+				continue
+			
+			x_EvalOneParameter(EvaluatedParameters, Environment, ElementParameters, oneParID, onePar)
+			if (EvaluatedParameters._error)
+				return EvaluatedParameters
+			
+		}
+	}
+	
+	return EvaluatedParameters
+}
+
+x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, p_ParametersToEvaluate)
+{
+	if not isobject(EvaluatedParameters)
+		EvaluatedParameters:=Object()
+	
+	elementClass:=_Flows[Environment.FlowID].allElements[Environment.ElementID].class
+	ParametrationDetails := Element_getParametrizationDetails(elementClass, Environment)
+	
+	for oneParIndex, onePar in ParametrationDetails
+	{
+	;~ d(onePar, "onePar")
+		if (not onePar.id)
+		{
+			continue
+		}
+		if (not isObject(onePar.id))
+			parIDs:=[onePar.id]
+		else
+			parIDs:=onePar.id
+		
+		
+		for oneIndex, oneParID in parIDs
+		{
+			;~ d(oneParID, "oneParID")
+			if (onePar.type = "label" or onPar.type = "Button")
+			{
+				continue
+			}
+			for onePartoEvalIndex, onePartoEval in p_ParametersToEvaluate
+			{
+				if (onePartoEval = oneParID)
+				{
+					;~ d(EvaluatedParameters, oneParID)
+					x_EvalOneParameter(EvaluatedParameters, Environment, ElementParameters, oneParID, onePar)
+					;~ d(EvaluatedParameters, oneParID " - ")
+					if (EvaluatedParameters._error)
+						return 
+					break
+				}
+			}
+			
+			
+		}
+	}
+}
+
+x_EvalOneParameter(EvaluatedParameters, Environment, ElementParameters, oneParID, onePar = "")
+{
+	if not (onePar)
+	{
+		elementClass:=_Flows[Environment.FlowID].allElements[Environment.ElementID].class
+		ParametrationDetails := Element_getParametrizationDetails(elementClass, Environment)
+		for oneParIndex, onePar2 in ParametrationDetails
+		{
+		;~ d(onePar, "onePar")
+			if (not onePar2.id)
+			{
+				continue
+			}
+			if (not isObject(onePar2.id))
+				parIDs:=[onePar2.id]
+			else
+				parIDs:=onePar2.id
+			
+			
+			for oneIndex, oneParID2 in parIDs
+			{
+				if (oneParID = oneParID2)
+				{
+					onePar := onePar2
+					break
+				}
+			}
+			if (onePar)
+				break
+		}
+	}
+	
+	
+	if (IsObject(onePar.content))
+	{
+		oneParContent:=ElementParameters[onePar.contentID]
+	}
+	else
+	{
+		oneParContent:=onePar.content
+	}
+	
+	if (oneParContent = "string")
+	{
+		EvaluatedParameters[oneParID] := x_replaceVariables(Environment,ElementParameters[oneParID])
+	}
+	else if (oneParContent = "expression")
+	{
+		evRes := x_evaluateExpression(Environment,ElementParameters[oneParID])
+		if (evRes.error)
+		{
+			EvaluatedParameters._error := true
+			EvaluatedParameters._errorMessage := lang("An error occured while parsing expression '%1%'", ElementParameters[oneParID]) "`n`n" evRes.error
+			return EvaluatedParameters
+		}
+		EvaluatedParameters[oneParID] := evRes.result
+	}
+	else if (oneParContent = "VariableName")
+	{
+		result := x_replaceVariables(Environment, ElementParameters[oneParID])
+		if not x_CheckVariableName(result)
+		{
+			EvaluatedParameters._error := true
+			EvaluatedParameters._errorMessage := lang("%1% is not valid", lang("Variable name '%1%'", result))
+			return EvaluatedParameters
+		}
+		EvaluatedParameters[oneParID] := result
+	}
+	else if (oneParContent = "RawString")
+	{
+		EvaluatedParameters[oneParID] := ElementParameters[oneParID]
+	}
+	else
+	{
+		EvaluatedParameters[oneParID] := ElementParameters[oneParID]
+	}
+	;~ d(EvaluatedParameters, oneParID " - "  oneParContent)
+}
 
 x_GetListOfAllVars(Environment)
 {
@@ -440,7 +615,7 @@ x_getAllElementIDsOfType(p_FlowID, p_Type)
 	elements:=Object()
 	for oneElementID, oneElement in _flows[p_FlowID].allElements
 	{
-		if (oneElement.class = p_Class)
+		if (oneElement.type = p_Type)
 			elements.push(oneElementID)
 	}
 	return elements

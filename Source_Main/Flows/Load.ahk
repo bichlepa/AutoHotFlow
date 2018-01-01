@@ -369,12 +369,13 @@ LoadFlowParametersOfElement(FlowID,parList,parElementID,parlocation, parSection)
 
 	loadElementClass:=parList[parElementID].class
 	;~ d(parList,parElementID) 
-	parametersToload:=Element_getParameters_%loadElementClass%()
-	parametersToloadDetails:=Element_getParametrizationDetails_%loadElementClass%({flowID: FlowID, elementID: parElementID})
-	;~ d(parametersToload)
-	for index, oneParameter in parametersToload
+	parametersToload:=Element_getParameters(loadElementClass, {flowID: FlowID, elementID: parElementID})
+	parametersToloadDetails:=Element_getParametrizationDetails(loadElementClass, {flowID: FlowID, elementID: parElementID})
+	;~ d(parametersToload,"parametersToload")
+	;~ d(parametersToloadDetails, "parametersToloadDetails")
+
+	for index, oneParameterID in parametersToload
 	{
-		oneParameterID:=oneParameter.id
 		for index2, oneParameterDetail in parametersToloadDetails
 		{
 			if (oneParameterDetail.ID)
@@ -437,6 +438,6 @@ LoadFlowParametersOfElement(FlowID,parList,parElementID,parlocation, parSection)
 			tempContent:=strobj(tempContent)
 		}
 		parList[parElementID].pars[oneParameterID]:=tempContent
-	
+		
 	}
 }

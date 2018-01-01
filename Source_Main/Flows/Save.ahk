@@ -152,7 +152,7 @@ SaveFlow(FlowID)
 			RIni_AppendValue("iniSave", saveElementIniID, "DefaultTrigger", saveElement.DefaultTrigger)	
 			
 		
-		i_SaveParametersOfElement(saveElement,saveElementIniID)
+		i_SaveParametersOfElement(saveElement,FlowID,saveElementIniID)
 		
 		
 	}
@@ -186,7 +186,7 @@ SaveFlow(FlowID)
 		RIni_AppendValue("iniSave", saveElementIniID, "subType", saveElement.subType)
 		RIni_AppendValue("iniSave", saveElementIniID, "name", saveElement.name)
 		
-		i_SaveParametersOfElement(saveElement,saveElementIniID)
+		i_SaveParametersOfElement(saveElement,FlowID,saveElementIniID)
 		
 	}
 	
@@ -225,7 +225,7 @@ SaveFlow(FlowID)
 	
 }
 
-i_SaveParametersOfElement(saveElement,saveElementIniID,Savelocation="")
+i_SaveParametersOfElement(saveElement,FlowID,saveElementIniID,Savelocation="")
 {
 	global
 	local parametersToSave
@@ -238,12 +238,12 @@ i_SaveParametersOfElement(saveElement,saveElementIniID,Savelocation="")
 	local OneID
 	local objectstring
 	local elementClass:=saveElement.class
+	local elementID:=saveElement.id
 	
-	parametersToSave:=Element_getParameters_%elementClass%()
+	parametersToSave:=Element_getParameters(elementClass, {flowID: FlowID, elementID: elementID})
 	
-	for index2, onePar in parametersToSave
+	for index2, oneParID in parametersToSave
 	{
-		oneParID := onePar.id
 		if (Savelocation="clipboard")
 		{
 			;TODO

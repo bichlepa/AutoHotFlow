@@ -64,6 +64,7 @@ lang_setLanguage(_settings.UILanguage)
 #include source_Common\variables\code tokenizer.ahk
 #include source_Common\variables\expression evaluator.ahk
 #include source_Common\flows\flows.ahk
+#include source_Common\Elements\Elements.ahk
 
 AllElementClasses:=Object()
 AllTriggerClasses:=Object()

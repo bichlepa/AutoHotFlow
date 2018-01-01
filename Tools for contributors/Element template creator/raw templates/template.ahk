@@ -450,9 +450,11 @@ Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 #if ElementType = action
 #if !addWindowSelector
 #if !addSeparateAhkThread
+#if !addCustomGUI
 	MsgBox Hello World
 	x_finish(Environment,"normal")
 	return
+#endif
 #endif
 #endif
 #endif
@@ -460,6 +462,7 @@ Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 #if ElementType = condition
 #if !addWindowSelector
 #if !addSeparateAhkThread
+#if !addCustomGUI
 	MsgBox, 4, Choose, Yes or no
 	IfMsgBox yes
 		x_finish(Environment,"yes")
@@ -470,6 +473,17 @@ Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 	
 #endif
 #endif
+#endif
+#endif
+
+#if addCustomGUI
+	guiID:=x_GetMyUniqueExecutionID(Environment)
+	gui,%guiID%:+label&ElementType&_&Name&_On
+	
+	gui,%guiID%:add,button,g&ElementType&_&Name&_ChangeButtonText, Change button text
+	gui,%guiID%:add,button,g&ElementType&_&Name&_OnClose, Close this window
+	
+	gui,%guiID%:show
 #endif
 
 #if addSeparateAhkThread
@@ -537,11 +551,30 @@ Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 #endif
 }
 
+#if addCustomGUI
+;Handle user input
+&ElementType&_&Name&_OnClose()
+{
+	Environment:=x_GetMyEnvironmentFromExecutionID(A_Gui)
+	gui,destroy
+	x_finish(Environment,"normal")
+}
+&ElementType&_&Name&_ChangeButtonText()
+{
+	guicontrol,,%A_GuiControl% ,Button text changed
+}
+
+#endif
+
 ;Called when the execution of the element should be stopped.
 ;If the task in Element_run_...() takes more than several seconds, then it is up to you to make it stoppable.
 Element_stop_&ElementType&_&Name&(Environment, ElementParameters)
 {
-	
+#if addCustomGUI
+	;Close window if currently opened
+	guiID:=x_GetMyUniqueExecutionID(Environment)
+	gui,%guiID%:destroy
+#endif
 }
 #endif
 

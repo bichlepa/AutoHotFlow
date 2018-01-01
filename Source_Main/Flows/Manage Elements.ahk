@@ -112,7 +112,7 @@ Element_setParameterDefaults(p_FlowID, p_elementID)
 	
 	elementClass:=allElements[p_elementID].class
 	
-	parameters:=Element_getParametrizationDetails_%elementClass%({flowID: p_FlowID, elementID: p_elementID})
+	parameters:=Element_getParametrizationDetails(elementClass, {flowID: p_FlowID, elementID: p_elementID})
 	;~ MsgBox % strobj(parameters) "`n" elementType "`n" elementSubType
 	for index, parameter in parameters
 	{

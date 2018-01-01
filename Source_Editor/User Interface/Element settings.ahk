@@ -50,9 +50,9 @@ class ElementSettings
 		CurrentlyActiveWindowHWND:=SettingWindowHWND
 		
 		;Get the parameter list
-		parametersToEdit:=Element_getParametrizationDetails_%setElementClass%({flowID: flowobj.id, elementID: setElementID})
-		parametersList:=Element_getParameters_%setElementClass%()
-		
+		parametersToEdit:=Element_getParametrizationDetails(setElementClass, {flowID: flowobj.id, elementID: setElementID})
+		parametersList:=Element_getParameters(setElementClass, {flowID: flowobj.id, elementID: setElementID})
+		;~ d(parametersList,"element settings")
 		;All elements have the parameter "name" and "StandardName"
 		ElementSettingsFields.push(new this.label({label: lang("name (name)")}))
 		ElementSettingsFields.push(new this.name({id: ["name", "StandardName"]}))

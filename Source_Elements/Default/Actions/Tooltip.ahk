@@ -32,23 +32,11 @@ Element_getCategory_Action_Tooltip()
 	return lang("User_interaction")
 }
 
-Element_getParameters_Action_Tooltip()
-{
-	parametersToEdit:=Object()
-	
-	parametersToEdit.push({id: "text"})
-	parametersToEdit.push({id: "duration"})
-	parametersToEdit.push({id: "Unit"})
-	parametersToEdit.push({id: "follow_mouse"})
-	
-	return parametersToEdit
-}
-
 Element_getParametrizationDetails_Action_Tooltip(Environment)
 {
 	parametersToEdit:=Object()
 	parametersToEdit.push({type: "Label", label: lang("Text_to_show")})
-	parametersToEdit.push({type: "multilineEdit", id: "text", default:  lang("Message"), WarnIfEmpty: true})
+	parametersToEdit.push({type: "multilineEdit", id: "text", default:  lang("Message"), content: "string",  WarnIfEmpty: true})
 	parametersToEdit.push({type: "Label", label: lang("Duration")})
 	parametersToEdit.push({type: "Edit", id: "duration", default: 2, content: "Expression", WarnIfEmpty: true})
 	parametersToEdit.push({type: "Radio", id: "Unit", default: 2, result: "enum", choices: [lang("Milliseconds"), lang("Seconds"), lang("Minutes")], enum: ["Milliseconds", "Seconds", "Minutes"]})
@@ -57,7 +45,7 @@ Element_getParametrizationDetails_Action_Tooltip(Environment)
 
 	return parametersToEdit
 }
-	
+
 Element_GenerateName_Action_Tooltip(Environment, ElementParameters)
 {
 	global
@@ -82,11 +70,19 @@ Element_run_Action_Tooltip(Environment, ElementParameters)
 	global runActionTooltip_Text=
 	global runActionTooltip_Oldx=
 	global runActionTooltip_Oldy=
-	runActionTooltip_Text:=x_replaceVariables(Environment,ElementParameters.text, "ConvertObjectToString")
-	if isobject(runActionTooltip_Text)
-		runActionTooltip_Text := x_ConvertObjToString(runActionTooltip_Text)
 	
-	ToolTip,%runActionTooltip_Text%,,,13
+	;Evaluate Parameters
+	ElementParameters:=x_AutoEvaluateParameters(Environment, ElementParameters, ["text"])
+	if (ElementParameters._error)
+	{
+		x_finish(Environment, "exception", ElementParameters._errorMessage) 
+		return
+	}
+	
+	runActionTooltip_Text:=x_replaceVariables(Environment,ElementParameters.text, "ConvertObjectToString")
+	
+	;Perform task
+	ToolTip,% runActionTooltip_Text,,,13
 	if (ElementParameters.follow_mouse =1)
 		SetTimer,runActionTooltip_follow_mouse,10,,,13
 	
@@ -96,7 +92,6 @@ Element_run_Action_Tooltip(Environment, ElementParameters)
 		tempDuration:=ElementParameters.duration * 1000
 	else if (ElementParameters.Unit="Minutes") ;minutes
 		tempDuration:=ElementParameters.duration * 60000
-	
 	
 	SetTimer,runActionTooltip_RemoveTooltip,-%tempDuration%
 	x_finish(Environment,"normal")
