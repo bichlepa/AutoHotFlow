@@ -87,6 +87,7 @@ Element_getParametrizationDetails_Action_Eject_Drive(Environment)
 	parametersToEdit.push({type: "Radio", id: "Method", default: "LibraryEjectByScan", result: "enum", choices: [lang("Method %1%",1), lang("Method %1%",2) " ("  lang("Force")  ")" , lang("Method %1%",3) " ("  lang("Only optical disc drive")  ")" ], enum: ["LibraryEjectByScan", "DeviceIoControl", "builtIn"]})
 	
 	
+	parametersToEdit.updateOnEdit:=true
 	return parametersToEdit
 }
 

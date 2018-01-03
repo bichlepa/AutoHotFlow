@@ -28,7 +28,7 @@ gui,add,dropdownlist,yp %posx2% vElementType choose1 ggenerate, Action|Condition
 gui,add,text,%posx1% Y+20, Name
 gui,add,edit,yp %posx2% vName ggenerate w100, MyName
 gui,add,text,%posx1% Y+20, Category
-gui,add,dropdownlist,yp %posx2% vCategory choose1 ggenerate, Variable|Flow_control|Window|Sound|File|Drive|User_interaction|User_simulation|Power|Internet|Debugging|Expert
+gui,add,dropdownlist,yp %posx2% vCategory choose1 ggenerate, Variable|Flow_control|Window|Sound|File|Drive|User_interaction|User_simulation|Power|Process|Internet|Debugging|Expert
 gui,add,text,%posx1% Y+20, Icon
 gui,add,dropdownlist,yp %posx2% vIcon choose1 ggenerate, % allicons
 gui,add,text,%posx1% Y+20, Stability
@@ -54,7 +54,8 @@ gui,add,checkbox,Y+10 %posx2% vpar_folder ggenerate, Folder
 gui,add,checkbox,Y+10 %posx2% vpar_button ggenerate, Button
 
 gui,add,text,%posx1% Y+20, Pre-coded features
-gui,add,checkbox,yp %posx2% vaddWindowSelector ggenerate, Add window selector
+gui,add,checkbox,yp %posx2% vcustomParameterEvaluation ggenerate, Custom parameter evaluation
+gui,add,checkbox,Y+10 %posx2% vaddWindowSelector ggenerate, Add window selector
 gui,add,checkbox,Y+10 %posx2% vaddSeparateAhkThread ggenerate, Execute in separate ahk thread
 gui,add,checkbox,Y+10 %posx2% vaddCustomGUI ggenerate, Add custom GUI
 

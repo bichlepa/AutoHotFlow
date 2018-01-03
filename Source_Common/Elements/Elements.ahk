@@ -4,11 +4,12 @@ Element_bufferedParameters:=Object()
 Element_getParametrizationDetails(elementClass, Environment)
 {
 	global Element_bufferedParametrationDetails
-	if not isobject(Element_bufferedParametrationDetails[elementClass])
+	if (not isobject(Element_bufferedParametrationDetails[elementClass]) 
+		or (Element_bufferedParametrationDetails[elementClass].updateOnEdit and Environment.updateOnEdit )) ;If the edit field is opened and the parameters must be reloaded
 	{
 		Element_bufferedParametrationDetails[elementClass]:=Element_getParametrizationDetails_%elementClass%(Environment)
 	}
-	return Element_bufferedParametrationDetails[elementClass]
+	return ObjFullyClone(Element_bufferedParametrationDetails[elementClass])
 }
 
 Element_getParameters(elementClass, Environment)
@@ -52,5 +53,5 @@ Element_getParameters(elementClass, Environment)
 		
 		Element_bufferedParameters[elementClass]:=tempObject
 	}
-	return Element_bufferedParameters[elementClass]
+	return ObjFullyClone(Element_bufferedParameters[elementClass])
 }

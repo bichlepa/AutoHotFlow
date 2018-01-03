@@ -51,72 +51,6 @@ Element_getStabilityLevel_&ElementType&_&Name&()
 	return "&stability&"
 }
 
-;Returns a list of all parameters of the element.
-;Only those parameters will be saved.
-Element_getParameters_&ElementType&_&Name&()
-{
-	parametersToEdit:=Object()
-	
-#if par_radio
-	parametersToEdit.push({id: "radio"})
-#endif
-#if par_radioEnum
-	parametersToEdit.push({id: "radioEnum"})
-#endif
-#if par_checkbox 
-	parametersToEdit.push({id: "checkbox"})
-#endif
-#if par_editstring 
-	parametersToEdit.push({id: "editstring"})
-#endif
-#if par_editExpression 
-	parametersToEdit.push({id: "editExpression"})
-#endif
-#if par_editStringOrExpression
-	parametersToEdit.push({id: "editStringOrExpression"})
-#endif
-#if par_editVariableName
-	parametersToEdit.push({id: "editVariableName"})
-#endif
-#if par_editMultiLine
-	parametersToEdit.push({id: "editMultiLine"})
-#endif
-#if par_editTwoExpressions
-	parametersToEdit.push({id: "editTwoExpressions1"})
-	parametersToEdit.push({id: "editTwoExpressions2"})
-#endif
-#if par_DropDownString
-	parametersToEdit.push({id: "DropDownString"})
-#endif
-#if par_ComboBoxString
-	parametersToEdit.push({id: "ComboBoxString"})
-#endif
-#if par_ListBoxString
-	parametersToEdit.push({id: "ListBoxString"})
-#endif
-#if par_file
-	parametersToEdit.push({id: "file"})
-#endif
-#if par_folder
-	parametersToEdit.push({id: "folder"})
-#endif
-#if addWindowSelector 
-	parametersToEdit.push({id: "TitleMatchMode"})
-	parametersToEdit.push({id: "Wintitle"})
-	parametersToEdit.push({id: "excludeTitle"})
-	parametersToEdit.push({id: "winText"})
-	parametersToEdit.push({id: "FindHiddenText"})
-	parametersToEdit.push({id: "ExcludeText"})
-	parametersToEdit.push({id: "ahk_class"})
-	parametersToEdit.push({id: "ahk_exe"})
-	parametersToEdit.push({id: "ahk_id"})
-	parametersToEdit.push({id: "ahk_pid"})
-	parametersToEdit.push({id: "FindHiddenWindow"})
-#endif
-	
-	return parametersToEdit
-}
-
 ;Returns an array of objects which describe all controls which will be shown in the element settings GUI
 Element_getParametrizationDetails_&ElementType&_&Name&(Environment)
 {
@@ -255,6 +189,13 @@ Element_CheckSettings_&ElementType&_&Name&(Environment, ElementParameters)
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 {
+	EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters)
+	if (EvaluatedParameters._error)
+	{
+		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
+		return
+	}
+#if customParameterEvaluation
 #if par_checkbox 
 
 	checkboxValue := ElementParameters.checkbox
@@ -380,49 +321,50 @@ Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 
 	folderValue := x_GetFullPath(Environment, x_replaceVariables(Environment, ElementParameters.folder))
 #endif
+#endif
 
 #if addWindowSelector
 
-	tempWinTitle:=x_replaceVariables(Environment, ElementParameters.Wintitle) 
-	tempWinText:=x_replaceVariables(Environment, ElementParameters.winText)
-	tempTitleMatchMode :=ElementParameters.TitleMatchMode
-	tempahk_class:=x_replaceVariables(Environment, ElementParameters.ahk_class)
-	tempahk_exe:=x_replaceVariables(Environment, ElementParameters.ahk_exe)
-	tempahk_id:=x_replaceVariables(Environment, ElementParameters.ahk_id)
-	tempahk_pid:=x_replaceVariables(Environment, ElementParameters.ahk_pid)
+	tempWinTitle:=EvaluatedParameters.Wintitle
+	tempWinText:=EvaluatedParameters.winText
+	tempTitleMatchMode :=EvaluatedParameters.TitleMatchMode
+	tempahk_class:=EvaluatedParameters.ahk_class
+	tempahk_exe:=EvaluatedParameters.ahk_exe
+	tempahk_id:= EvaluatedParameters.ahk_id
+	tempahk_pid:= EvaluatedParameters.ahk_pid
 	
-	tempwinstring:=tempWinTitle
-	if tempahk_class
-		tempwinstring:=tempwinstring " ahk_class " tempahk_class
-	if tempahk_id
-		tempwinstring:=tempwinstring " ahk_id " tempahk_id
-	if tempahk_pid
-		tempwinstring:=tempwinstring " ahk_pid " tempahk_pid
-	if tempahk_exe
-		tempwinstring:=tempwinstring " ahk_exe " tempahk_exe
+	tempwinstring:=EvaluatedParameters.Wintitle
+	if (EvaluatedParameters.ahk_class)
+		tempwinstring:=tempwinstring " ahk_class " EvaluatedParameters.ahk_class
+	if (EvaluatedParameters.ahk_id)
+		tempwinstring:=tempwinstring " ahk_id " EvaluatedParameters.ahk_id
+	if (EvaluatedParameters.ahk_pid)
+		tempwinstring:=tempwinstring " ahk_pid " EvaluatedParameters.ahk_pid
+	if (EvaluatedParameters.ahk_exe)
+		tempwinstring:=tempwinstring " ahk_exe " EvaluatedParameters.ahk_exe
 	
 	;If no window specified, error
-	if (tempwinstring="" and tempWinText="")
+	if (tempwinstring="" and EvaluatedParameters.winText="")
 	{
-		x_enabled(Environment, "exception", lang("No window specified"))
+		x_finish(Environment, "exception", lang("No window specified"))
 		return
 	}
 	
-	if ElementParameters.findhiddenwindow=0
+	if (ElementParameters.findhiddenwindow=0)
 		tempFindHiddenWindows = off
 	else
 		tempFindHiddenWindows = on
-	if ElementParameters.findhiddentext=0
+	if (ElementParameters.findhiddentext=0)
 		tempfindhiddentext = off
 	else
 		tempfindhiddentext = on
 
-	SetTitleMatchMode,%tempTitleMatchMode%
+	SetTitleMatchMode,% EvaluatedParameters.TitleMatchMode
 	DetectHiddenWindows,%tempFindHiddenWindows%
 	DetectHiddenText,%tempfindhiddentext%
 	
 #if !ElementType = Loop
-	tempWinid:=winexist(tempwinstring,tempWinText,tempExcludeTitle,tempExcludeText) ;Example code. Remove it
+	tempWinid:=winexist(tempwinstring,EvaluatedParameters.winText,EvaluatedParameters.ExcludeTitle,EvaluatedParameters.ExcludeText) ;Example code. Remove it
 	if not tempWinid
 	{
 #if ElementType = action
@@ -609,6 +551,13 @@ Element_stop_&ElementType&_&Name&(Environment, ElementParameters)
 Element_enable_&ElementType&_&Name&(Environment, ElementParameters)
 {
 	
+	EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters)
+	if (EvaluatedParameters._error)
+	{
+		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
+		return
+	}
+#if customParameterEvaluation
 #if par_checkbox 
 
 	checkboxValue := ElementParameters.checkbox
@@ -635,10 +584,14 @@ Element_enable_&ElementType&_&Name&(Environment, ElementParameters)
 		return
 	}
 	editExpressionValue:=evRes.result
+	if editExpressionValue is not number
+	{
+		x_finish(Environment, "exception", lang("%1% is not a number: %2%",lang("Expression value"), editExpressionValue))
+		return
+	}
 #endif
 #if par_editStringOrExpression 
 
-	editStringOrExpressionValueRaw := x_evaluateExpression(Environment,ElementParameters.editStringOrExpression)
 	if (ElementParameters.Expression = 2)
 	{
 		evRes := x_EvaluateExpression(Environment, ElementParameters.editStringOrExpression)
@@ -657,16 +610,17 @@ Element_enable_&ElementType&_&Name&(Environment, ElementParameters)
 		editStringOrExpressionValue := x_replaceVariables(Environment, ElementParameters.editStringOrExpression)
 #endif
 #if par_editVariableName
+
 	editVariableNameValue := x_replaceVariables(Environment, ElementParameters.editVariableName)
-	
 	if not x_CheckVariableName(editVariableNameValue)
 	{
 		;On error, finish with exception and return
-		x_finish(Environment, "exception", lang("%1% is not valid", lang("Ouput variable name '%1%'", varname)))
+		x_finish(Environment, "exception", lang("%1% is not valid", lang("Ouput variable name '%1%'", editVariableName)))
 		return
 	}
 #endif
 #if par_editMultiLine
+
 	editMultiLineValue := x_replaceVariables(Environment, ElementParameters.editMultiLine)
 #endif
 #if par_editTwoExpressions
@@ -689,19 +643,35 @@ Element_enable_&ElementType&_&Name&(Environment, ElementParameters)
 	editTwoExpressions2Value:=evRes.result
 #endif
 #if par_DropDownString 
+
 	DropDownStringValue := ElementParameters.DropDownString
 #endif
 #if par_ComboBoxString
+
 	ComboBoxStringValue := x_replaceVariables(Environment, ElementParameters.ComboBoxString) 
 #endif
 #if par_ListBoxString 
+
 	ListBoxStringValue:=ElementParameters.ListBoxString
 	for oneListBoxStringIndex, oneListBoxString in ListBoxStringValue
 	{
 		;Do anything with oneListBoxString
 	}
 #endif
+#if par_Slider
+
+	evRes := x_evaluateExpression(Environment,ElementParameters.Slider)
+	if (evRes.error)
+	{
+		;On error, finish with exception and return
+		x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.Slider) "`n`n" evRes.error) 
+		return
+	}
+	SliderValue:=evRes.result
+
+#endif
 #if par_file 
+
 	fileValue := x_GetFullPath(Environment, x_replaceVariables(Environment, ElementParameters.file))
 	if not FileExist(fileValue)
 	{
@@ -710,17 +680,20 @@ Element_enable_&ElementType&_&Name&(Environment, ElementParameters)
 	}
 #endif
 #if par_folder
+
 	folderValue := x_GetFullPath(Environment, x_replaceVariables(Environment, ElementParameters.folder))
+#endif
 #endif
 
 #if addWindowSelector
-	tempWinTitle:=x_replaceVariables(Environment, ElementParameters.Wintitle) 
-	tempWinText:=x_replaceVariables(Environment, ElementParameters.winText)
-	tempTitleMatchMode :=ElementParameters.TitleMatchMode
-	tempahk_class:=x_replaceVariables(Environment, ElementParameters.ahk_class)
-	tempahk_exe:=x_replaceVariables(Environment, ElementParameters.ahk_exe)
-	tempahk_id:=x_replaceVariables(Environment, ElementParameters.ahk_id)
-	tempahk_pid:=x_replaceVariables(Environment, ElementParameters.ahk_pid)
+
+	tempWinTitle:=EvaluatedParameters.Wintitle
+	tempWinText:=EvaluatedParameters.winText
+	tempTitleMatchMode :=EvaluatedParameters.TitleMatchMode
+	tempahk_class:=EvaluatedParameters.ahk_class
+	tempahk_exe:=EvaluatedParameters.ahk_exe
+	tempahk_id:= EvaluatedParameters.ahk_id
+	tempahk_pid:= EvaluatedParameters.ahk_pid
 	
 	tempwinstring:=tempWinTitle
 	if tempahk_class

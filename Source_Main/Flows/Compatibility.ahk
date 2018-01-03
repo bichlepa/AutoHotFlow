@@ -291,6 +291,19 @@ LoadFlowCheckCompability(p_List,p_ElementID,p_section,FlowCompabilityVersion)
 				p_List[p_ElementID].pars.DownUp:=tempenum[p_List[p_ElementID].pars.DownUp]
 			}
 		}
+		if (p_List[p_ElementID].class="Action_Move_Mouse")
+		{
+			tempenum:= ["Input", "Event", "Play"]
+			if (p_List[p_ElementID].pars.SendMode>= 1 and p_List[p_ElementID].pars.SendMode<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.SendMode:=tempenum[p_List[p_ElementID].pars.SendMode]
+			}
+			tempenum:= ["Screen", "Window", "Cilent", "Relative"]
+			if (p_List[p_ElementID].pars.CoordMode>= 1 and p_List[p_ElementID].pars.CoordMode<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.CoordMode:=tempenum[p_List[p_ElementID].pars.CoordMode]
+			}
+		}
 		if (p_List[p_ElementID].class="Action_Move_Window")
 		{
 			tempenum:= ["Maximize", "Minimize", "Restore", "Move"]
@@ -555,6 +568,104 @@ LoadFlowCheckCompability(p_List,p_ElementID,p_section,FlowCompabilityVersion)
 			if (p_List[p_ElementID].pars.IfDismiss>= 1 and p_List[p_ElementID].pars.IfDismiss<=tempenum.MaxIndex())
 			{
 				p_List[p_ElementID].pars.IfDismiss:=tempenum[p_List[p_ElementID].pars.IfDismiss]
+			}
+		}
+		if (p_List[p_ElementID].class="Action_Message_Box")
+		{
+			tempenum:= ["NoTimeout", "Timeout"]
+			if (p_List[p_ElementID].pars.IsTimeout>= 1 and p_List[p_ElementID].pars.IsTimeout<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.IsTimeout:=tempenum[p_List[p_ElementID].pars.IsTimeout]
+			}
+			tempenum:= ["Seconds", "Minutes", "Hours"]
+			if (p_List[p_ElementID].pars.Unit>= 1 and p_List[p_ElementID].pars.Unit<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.Unit:=tempenum[p_List[p_ElementID].pars.Unit]
+			}
+			tempenum:= ["Normal", "Exception"]
+			if (p_List[p_ElementID].pars.OnTimeout>= 1 and p_List[p_ElementID].pars.OnTimeout<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.OnTimeout:=tempenum[p_List[p_ElementID].pars.OnTimeout]
+			}
+			if (p_List[p_ElementID].pars.IfDismiss>= 1 and p_List[p_ElementID].pars.IfDismiss<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.IfDismiss:=tempenum[p_List[p_ElementID].pars.IfDismiss]
+			}
+		}
+		if (p_List[p_ElementID].class="Action_List_Drives")
+		{
+			tempenum:= ["Normal", "Exception"]
+			if (p_List[p_ElementID].pars.IfNothingFound>= 1 and p_List[p_ElementID].pars.IfNothingFound<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.IfNothingFound:=tempenum[p_List[p_ElementID].pars.IfNothingFound]
+			}
+			tempenum:= ["list", "string"]
+			if (p_List[p_ElementID].pars.OutputType>= 1 and p_List[p_ElementID].pars.OutputType<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.OutputType:=tempenum[p_List[p_ElementID].pars.OutputType]
+			}
+			tempenum:= ["all", "filter"]
+			if (p_List[p_ElementID].pars.WhetherDriveTypeFilter>= 1 and p_List[p_ElementID].pars.WhetherDriveTypeFilter<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.WhetherDriveTypeFilter:=tempenum[p_List[p_ElementID].pars.WhetherDriveTypeFilter]
+			}
+		}
+		if (p_List[p_ElementID].class="Action_Minimize_All_Windows")
+		{
+			tempenum:= ["Minimize", "Undo"]
+			if (p_List[p_ElementID].pars.WinMinimizeAllEvent>= 1 and p_List[p_ElementID].pars.WinMinimizeAllEvent<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.WinMinimizeAllEvent:=tempenum[p_List[p_ElementID].pars.WinMinimizeAllEvent]
+			}
+		}
+		if (p_List[p_ElementID].class="Action_New_Date")
+		{
+			tempenum:= ["Current", "Specified"]
+			if (p_List[p_ElementID].pars.WhichDate>= 1 and p_List[p_ElementID].pars.WhichDate<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.WhichDate:=tempenum[p_List[p_ElementID].pars.WhichDate]
+			}
+		}
+		if (p_List[p_ElementID].class="Action_Play_Sound")
+		{
+			tempenum:= ["SystemSound", "SoundFile"]
+			if (p_List[p_ElementID].pars.WhichSound>= 1 and p_List[p_ElementID].pars.WhichSound<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.WhichSound:=tempenum[p_List[p_ElementID].pars.WhichSound]
+			}
+		}
+		if (p_List[p_ElementID].class="Action_Read_From_File")
+		{
+			tempenum:= ["ANSI", "UTF-8", "UTF-16"]
+			if (p_List[p_ElementID].pars.Encoding>= 1 and p_List[p_ElementID].pars.Encoding<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.Encoding:=tempenum[p_List[p_ElementID].pars.Encoding]
+			}
+		}
+		if (p_List[p_ElementID].class="Action_Write_To_File")
+		{
+			tempenum:= ["ANSI", "UTF-8", "UTF-16"]
+			if (p_List[p_ElementID].pars.Encoding>= 1 and p_List[p_ElementID].pars.Encoding<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.Encoding:=tempenum[p_List[p_ElementID].pars.Encoding]
+			}
+			tempenum:= ["Append", "Overwrite"]
+			if (p_List[p_ElementID].pars.Overwrite>= 1 and p_List[p_ElementID].pars.Overwrite<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.Overwrite:=tempenum[p_List[p_ElementID].pars.Overwrite]
+			}
+		}
+		if (p_List[p_ElementID].class="Action_Read_From_Ini")
+		{
+			tempenum:= ["Key", "EntireSection", "SectionNames"]
+			if (p_List[p_ElementID].pars.Action>= 1 and p_List[p_ElementID].pars.Action<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.Action:=tempenum[p_List[p_ElementID].pars.Action]
+			}
+			tempenum:= ["Default", "Exception"]
+			if (p_List[p_ElementID].pars.WhenError>= 1 and p_List[p_ElementID].pars.WhenError<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.WhenError:=tempenum[p_List[p_ElementID].pars.WhenError]
 			}
 		}
 	}

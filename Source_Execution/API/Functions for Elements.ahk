@@ -187,9 +187,19 @@ x_EvalOneParameter(EvaluatedParameters, Environment, ElementParameters, oneParID
 	
 	if (oneParContent = "string")
 	{
-		EvaluatedParameters[oneParID] := x_replaceVariables(Environment,ElementParameters[oneParID])
+		result := x_replaceVariables(Environment,ElementParameters[oneParID])
+		if (onePar.WarnIfEmpty)
+		{
+			if (result = "")
+			{
+				EvaluatedParameters._error := true
+				EvaluatedParameters._errorMessage := lang("String '%1%' is empty", ElementParameters[oneParID])
+				return EvaluatedParameters
+			}
+		}
+		EvaluatedParameters[oneParID]:=result
 	}
-	else if (oneParContent = "expression")
+	else if (oneParContent = "expression" or oneParContent = "number")
 	{
 		evRes := x_evaluateExpression(Environment,ElementParameters[oneParID])
 		if (evRes.error)
@@ -197,6 +207,25 @@ x_EvalOneParameter(EvaluatedParameters, Environment, ElementParameters, oneParID
 			EvaluatedParameters._error := true
 			EvaluatedParameters._errorMessage := lang("An error occured while parsing expression '%1%'", ElementParameters[oneParID]) "`n`n" evRes.error
 			return EvaluatedParameters
+		}
+		if (onePar.WarnIfEmpty)
+		{
+			if (evRes.result = "")
+			{
+				EvaluatedParameters._error := true
+				EvaluatedParameters._errorMessage := lang("Result of expression '%1%' is empty", ElementParameters[oneParID])
+				return EvaluatedParameters
+			}
+		}
+		if (oneParContent = "number" and temp != "")
+		{
+			temp:=evRes.result
+			if temp is not number
+			{
+				EvaluatedParameters._error := true
+				EvaluatedParameters._errorMessage := lang("Result of expression '%1%' is not a number", ElementParameters[oneParID])
+				return EvaluatedParameters
+			}
 		}
 		EvaluatedParameters[oneParID] := evRes.result
 	}
@@ -500,7 +529,6 @@ x_disabled(Environment, Result, Message = "")
 
 ;get some information
 
-
 x_GetMyFlowID(Environment)
 {
 	return Environment.FlowID
@@ -644,9 +672,6 @@ x_getElementClass(p_FlowID, p_ElementID)
 {
 	return _flows[p_FlowID].allElements[p_ElementID].class
 }
-
-
-
 
 
 

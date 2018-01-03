@@ -48,25 +48,6 @@ Element_getStabilityLevel_Action_Click()
 	return "Stable"
 }
 
-;Returns a list of all parameters of the element.
-;Only those parameters will be saved.
-Element_getParameters_Action_Click()
-{
-	parametersToEdit:=Object()
-	
-	parametersToEdit.push({id: "Button"})
-	parametersToEdit.push({id: "ClickCount"})
-	parametersToEdit.push({id: "DownUp"})
-	parametersToEdit.push({id: "changePosition"})
-	parametersToEdit.push({id: "CoordMode"})
-	parametersToEdit.push({id: "Xpos"})
-	parametersToEdit.push({id: "Ypos"})
-	parametersToEdit.push({id: "SendMode"})
-	parametersToEdit.push({id: "speed"})
-	
-	return parametersToEdit
-}
-
 ;Returns an array of objects which describe all controls which will be shown in the element settings GUI
 Element_getParametrizationDetails_Action_Click(Environment)
 {
@@ -140,62 +121,42 @@ Element_CheckSettings_Action_Click(Environment, ElementParameters)
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Click(Environment, ElementParameters)
 {
-	;Parameter evaluation and check
-	changePosition := ElementParameters.changePosition
-
-	updownValue := ElementParameters.DownUp
-	CoordModeValue := ElementParameters.CoordMode
-	SendModeValue := ElementParameters.SendMode
-
-	evRes := x_evaluateExpression(Environment,ElementParameters.ClickCount)
-	if (evRes.error)
+	EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters, ["Xpos", "Ypos", "speed", "CoordMode"])
+	if (EvaluatedParameters._error)
 	{
-		;On error, finish with exception and return
-		x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.ClickCount) "`n`n" evRes.error) 
+		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
-	ClickCount:=evRes.result
 	
-	evRes := x_evaluateExpression(Environment,ElementParameters.delay)
-	if (evRes.error)
-	{
-		;On error, finish with exception and return
-		x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.delay) "`n`n" evRes.error) 
-		return
-	}
-	delay:=evRes.result
+	;Parameter evaluation and check
 
-	ButtonName := ElementParameters.Button
+	updownValue := EvaluatedParameters.DownUp
+	SendModeValue := EvaluatedParameters.SendMode
 
-	speed:=ElementParameters.speed
+	ClickCount:=EvaluatedParameters.ClickCount
+
+	delay:=EvaluatedParameters.delay
+
+	ButtonName := EvaluatedParameters.Button
+
 
 	if (updownValue="click")
 		updownValue=
 	
-	if (CoordModeValue = "relative")
-	{
-		CoordModeValue := ""
-		relativeValue:="R"
-	}
 	
-	if changePosition
+	if (EvaluatedParameters.changePosition)
 	{
-		evRes := x_evaluateExpression(Environment,ElementParameters.Xpos)
-		if (evRes.error)
+		x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["Xpos", "Ypos", "speed", "CoordMode"])
+		if (EvaluatedParameters._error)
 		{
-			;On error, finish with exception and return
-			x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.Xpos) "`n`n" evRes.error) 
+			x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 			return
 		}
-		Xpos:=evRes.result
-		evRes := x_evaluateExpression(Environment,ElementParameters.Ypos)
-		if (evRes.error)
-		{
-			;On error, finish with exception and return
-			x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.Ypos) "`n`n" evRes.error) 
-			return
-		}
-		Ypos:=evRes.result
+		
+		speed:=EvaluatedParameters.speed
+		CoordModeValue := EvaluatedParameters.CoordMode
+		Xpos:=EvaluatedParameters.Xpos
+		Ypos:=EvaluatedParameters.Ypos
 		
 		if Xpos is not number
 		{
@@ -207,6 +168,12 @@ Element_run_Action_Click(Environment, ElementParameters)
 			x_finish(Environment, "exception", lang("%1% is not a number.",lang("Y position"))) 
 			return
 		}
+		
+		if (CoordModeValue = "relative")
+		{
+			CoordModeValue := ""
+			relativeValue:="R"
+		}
 	}
 		
 	;Action
@@ -216,10 +183,9 @@ Element_run_Action_Click(Environment, ElementParameters)
 	else
 		SetMouseDelay,%delay%
 	
-	if changePosition
+	if (EvaluatedParameters.changePosition)
 	{
-		if CoordModeValue
-			CoordMode, Mouse, %CoordModeValue%
+		CoordMode, Mouse, %CoordModeValue%
 		MouseClick,%ButtonName%,% Xpos,% Ypos,% ClickCount,% speed,%updownValue%,%relativeValue%
 	}
 	else

@@ -50,7 +50,7 @@ class ElementSettings
 		CurrentlyActiveWindowHWND:=SettingWindowHWND
 		
 		;Get the parameter list
-		parametersToEdit:=Element_getParametrizationDetails(setElementClass, {flowID: flowobj.id, elementID: setElementID})
+		parametersToEdit:=Element_getParametrizationDetails(setElementClass, {flowID: flowobj.id, elementID: setElementID, updateOnEdit: true})
 		parametersList:=Element_getParameters(setElementClass, {flowID: flowobj.id, elementID: setElementID})
 		;~ d(parametersList,"element settings")
 		;All elements have the parameter "name" and "StandardName"
@@ -1103,7 +1103,7 @@ class ElementSettings
 			This.warningText:=""
 			if (this.enabled)
 			{
-				if (tempRadioVal = "expression") ;The content is an expression.
+				if (tempRadioVal = "expression" or tempRadioVal = "number") ;The content is an expression.
 				{
 					for oneindex, oneparamID in this.parameter.id
 					{
@@ -1199,7 +1199,11 @@ class ElementSettings
 			
 			if (tempRadioVal="Expression")
 			{
-				ToolTip,% lang("This field contains an expression") "`n" lang("Examples") ":`n5`n5+3*6`nA_ScreenWidth`n(a=4) or (b=1)" ,,,11
+				ToolTip,% lang("This field contains an expression") "`n" lang("Examples") ":`n5`n5+3*6`nA_ScreenWidth`n(a=4) or (b=1)`nStringContainingHello " " StringContainingWorld" ,,,11
+			}
+			if (tempRadioVal="Number")
+			{
+				ToolTip,% lang("This field contains an expression which must result to a number") "`n" lang("Examples") ":`n5`n5+3*6`nA_ScreenWidth" ,,,11
 			}
 			if (tempRadioVal="String")
 			{
@@ -1237,7 +1241,7 @@ class ElementSettings
 			{
 				guicontrol,SettingsOfElement:,GUISettingsOfElementInfoIconOf%tempFirstParamID%,%_ScriptDir%\Icons\String.ico
 			}
-			else if (tempRadioVal="expression") 
+			else if (tempRadioVal="expression" or tempRadioVal="number") 
 			{
 				guicontrol,SettingsOfElement:,GUISettingsOfElementInfoIconOf%tempFirstParamID%,%_ScriptDir%\Icons\Expression.ico
 			}
@@ -1271,7 +1275,8 @@ class ElementSettings
 			ElementSettingsFieldHWNDs[tempHWND]:=this
 			
 			;Add picture, which will warn user if the entry is obviously invalid
-			gui,add,picture,X+4 w16 h16 hwndtempHWND gGUISettingsOfElementClickOnWarningPic vGUISettingsOfElementWarningIconOf%tempParameterID%
+			gui,add,picture,X+4 w16 hp hwndtempHWND gGUISettingsOfElementClickOnWarningPic vGUISettingsOfElementWarningIconOf%tempParameterID%
+			guicontrol,move,GUISettingsOfElementWarningIconOf%tempParameterID%, h16 ;Workaround. Otherwise the next control would be overlapped with the multiline edit field
 			this.components.push("GUISettingsOfElementWarningIconOf" tempParameterID)
 			ElementSettingsFieldHWNDs[tempHWND]:=this
 			this.warnIfEmpty:=parameter.WarnIfEmpty
@@ -1531,6 +1536,19 @@ class ElementSettings
 				this.ContentType:="Expression"
 				;~ GUISettingsOfElementContentType%tempParameterID%=Expression
 			}
+			else if (parameter.content="Number")
+			{
+				;The info icon tells user which conent type it is
+				gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempParameterID%,%_ScriptDir%\icons\expression.ico
+				this.components.push("GUISettingsOfElementInfoIconOf" tempParameterID)
+				ElementSettingsFieldHWNDs[tempHWND]:=this
+				
+				gui,add,ComboBox, X+4 yp w360 hwndtempHWND %tempAltSumbit% gGUISettingsOfElementCheckContent vGUISettingsOfElement%tempParameterID% ,% tempAllChoices
+				this.components.push("vGUISettingsOfElement" tempParameterID)
+				ElementSettingsFieldHWNDs[tempHWND]:=this
+				this.ContentType:="Number"
+				;~ GUISettingsOfElementContentType%tempParameterID%=Expression
+			}
 			else if (parameter.content="String")
 			{
 				gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempParameterID%,%_ScriptDir%\icons\string.ico
@@ -1611,7 +1629,7 @@ class ElementSettings
 				}
 				else
 				{
-					ToolTip value %value%
+					;~ ToolTip value %value%
 					if (value > 0 and value <= this.par_choices.MaxIndex())
 						GUIControl,SettingsOfElement:choose,GUISettingsOfElement%tempParameterID%,% value
 					else
@@ -1684,10 +1702,8 @@ class ElementSettings
 			{
 				tempTextInControl:=this.getvalue(tempOneParamID)
 				;~ MsgBox % tempTextInControl "`n" this.ContentType
-				if (this.ContentType="Expression")
+				if (this.ContentType="Expression" or this.ContentType="Number")
 				{
-					
-					
 					IfInString,tempTextInControl,`%
 					{
 						guicontrol,SettingsOfElement:show,GUISettingsOfElementWarningIconOf%tempOneParamID%
@@ -1741,15 +1757,23 @@ class ElementSettings
 			local temp, tempOneParamID
 			tempOneParamID:=this.parameter.id
 			
-			if (this.contenttype="Expression")
+			if (tempRadioVal="Expression")
 			{
-				ToolTip,% lang("This field contains an expression") "`n" lang("Examples") ":`n5`n5+3*6`nA_ScreenWidth`n(a=4) or (b=1)" ,,,11
+				ToolTip,% lang("This field contains an expression") "`n" lang("Examples") ":`n5`n5+3*6`nA_ScreenWidth`n(a=4) or (b=1)`nStringContainingHello " " StringContainingWorld" ,,,11
 			}
-			if (this.contenttype="String")
+			if (tempRadioVal="Number")
+			{
+				ToolTip,% lang("This field contains an expression which must result to a number") "`n" lang("Examples") ":`n5`n5+3*6`nA_ScreenWidth" ,,,11
+			}
+			if (tempRadioVal="String")
 			{
 				ToolTip,% lang("This field contains a string") "`n" lang("Examples") ":`nHello World`nMy name is %A_UserName%`nToday's date is %A_Now%" ,,,11
 			}
-			if (this.contenttype="VariableName") 
+			if (tempRadioVal="RawString")
+			{
+				ToolTip,% lang("This field contains a raw string") "`n" lang("You can't insert content of a variable here") "`n" lang("Examples") ":`nHello World" ,,,11
+			}
+			if (tempRadioVal="VariableName") 
 			{
 				ToolTip,% lang("This field contains a variable name") "`n" lang("Examples") ":`nVarname`nEntry1`nEntry%a_index%" ,,,11
 			}
