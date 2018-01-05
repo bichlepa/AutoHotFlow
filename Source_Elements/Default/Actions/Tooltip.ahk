@@ -72,26 +72,25 @@ Element_run_Action_Tooltip(Environment, ElementParameters)
 	global runActionTooltip_Oldy=
 	
 	;Evaluate Parameters
-	ElementParameters:=x_AutoEvaluateParameters(Environment, ElementParameters, ["text"])
+	EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters, ["text"])
 	if (ElementParameters._error)
 	{
-		x_finish(Environment, "exception", ElementParameters._errorMessage) 
+		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
-	
 	runActionTooltip_Text:=x_replaceVariables(Environment,ElementParameters.text, "ConvertObjectToString")
 	
 	;Perform task
 	ToolTip,% runActionTooltip_Text,,,13
-	if (ElementParameters.follow_mouse =1)
+	if (EvaluatedParameters.follow_mouse =1)
 		SetTimer,runActionTooltip_follow_mouse,10,,,13
 	
-	if (ElementParameters.Unit="Milliseconds") ;Milliseconds
-		tempDuration:=ElementParameters.duration
-	else if (ElementParameters.Unit="Seconds") ;Seconds
-		tempDuration:=ElementParameters.duration * 1000
-	else if (ElementParameters.Unit="Minutes") ;minutes
-		tempDuration:=ElementParameters.duration * 60000
+	if (EvaluatedParameters.Unit="Milliseconds") ;Milliseconds
+		tempDuration:=EvaluatedParameters.duration
+	else if (EvaluatedParameters.Unit="Seconds") ;Seconds
+		tempDuration:=EvaluatedParameters.duration * 1000
+	else if (EvaluatedParameters.Unit="Minutes") ;minutes
+		tempDuration:=EvaluatedParameters.duration * 60000
 	
 	SetTimer,runActionTooltip_RemoveTooltip,-%tempDuration%
 	x_finish(Environment,"normal")

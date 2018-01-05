@@ -694,7 +694,7 @@ LoadFlowCheckCompability(p_List,p_ElementID,p_section,FlowCompabilityVersion)
 				p_List[p_ElementID].pars.WhichSizeSet:=tempenum[p_List[p_ElementID].pars.WhichSizeSet]
 			}
 		}
-		if (p_List[p_ElementID].class="Action_Search_Image")
+		if (p_List[p_ElementID].class="Action_Search_In_A_String")
 		{
 			tempenum:= ["FromLeft", "FromRight"]
 			if (p_List[p_ElementID].pars.LeftOrRight>= 1 and p_List[p_ElementID].pars.LeftOrRight<=tempenum.MaxIndex())
@@ -705,6 +705,69 @@ LoadFlowCheckCompability(p_List,p_ElementID,p_section,FlowCompabilityVersion)
 			if (p_List[p_ElementID].pars.CaseSensitive>= 1 and p_List[p_ElementID].pars.CaseSensitive<=tempenum.MaxIndex())
 			{
 				p_List[p_ElementID].pars.CaseSensitive:=tempenum[p_List[p_ElementID].pars.CaseSensitive]
+			}
+		}
+		if (p_List[p_ElementID].class="Action_Send_Keystrokes")
+		{
+			tempenum:= ["Input", "Event", "Play"]
+			if (p_List[p_ElementID].pars.SendMode>= 1 and p_List[p_ElementID].pars.SendMode<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.SendMode:=tempenum[p_List[p_ElementID].pars.SendMode]
+			}
+		}
+		if (p_List[p_ElementID].class="Action_Set_file_attributes")
+		{
+			tempenum:= ["Files", "FilesAndFolders", "Folders"]
+			if (p_List[p_ElementID].pars.OperateOnWhat>= 1 and p_List[p_ElementID].pars.OperateOnWhat<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.OperateOnWhat:=tempenum[p_List[p_ElementID].pars.OperateOnWhat]
+			}
+		}
+		if (p_List[p_ElementID].class="Action_Set_file_time")
+		{
+			tempenum:= ["Files", "FilesAndFolders", "Folders"]
+			if (p_List[p_ElementID].pars.OperateOnWhat>= 1 and p_List[p_ElementID].pars.OperateOnWhat<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.OperateOnWhat:=tempenum[p_List[p_ElementID].pars.OperateOnWhat]
+			}
+			tempenum:= ["Modification", "Creation", "Access"]
+			if (p_List[p_ElementID].pars.TimeType>= 1 and p_List[p_ElementID].pars.TimeType<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.TimeType:=tempenum[p_List[p_ElementID].pars.TimeType]
+			}
+		}
+		if (p_List[p_ElementID].class="Action_Set_Lock_Key")
+		{
+			tempenum:= ["CapsLock", "NumLock", "ScrollLock"]
+			if (p_List[p_ElementID].pars.WhichKey>= 1 and p_List[p_ElementID].pars.WhichKey<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.WhichKey:=tempenum[p_List[p_ElementID].pars.WhichKey]
+			}
+			tempenum:= ["On", "Off", "Toggle", "AlwaysOn", "AlwaysOff"]
+			if (p_List[p_ElementID].pars.Status>= 1 and p_List[p_ElementID].pars.Status<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.Status:=tempenum[p_List[p_ElementID].pars.Status]
+			}
+		}
+		if (p_List[p_ElementID].class="Action_Set_Process_Priority")
+		{
+			tempenum:= ["Low", "BelowNormal", "Normal", "AboveNormal", "High", "Realtime"]
+			if (p_List[p_ElementID].pars.Priority>= 1 and p_List[p_ElementID].pars.Priority<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.Priority:=tempenum[p_List[p_ElementID].pars.Priority]
+			}
+		}
+		if (p_List[p_ElementID].class="Action_Set_Process_Priority")
+		{
+			tempenum:= ["Mute", "Absolute", "Relative"]
+			if (p_List[p_ElementID].pars.Action>= 1 and p_List[p_ElementID].pars.Action<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.Action:=tempenum[p_List[p_ElementID].pars.Action]
+			}
+			tempenum:= ["On", "Off", "Toggle"]
+			if (p_List[p_ElementID].pars.Mute>= 1 and p_List[p_ElementID].pars.Mute<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.Mute:=tempenum[p_List[p_ElementID].pars.Mute]
 			}
 		}
 	}

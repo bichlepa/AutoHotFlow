@@ -30,6 +30,7 @@ lang_setLanguage(_settings.UILanguage)
 #include Lib\HTTP Request\HTTPRequest.ahk
 #include Lib\HTTP Request\Uriencode.ahk
 #include Lib\gdi+\gdip.ahk
+#include Lib\TTS\TTS by Learning One.ahk
 
 ;~ #include Source_Draw\API\API receiver execution.ahk
 

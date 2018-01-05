@@ -77,6 +77,7 @@ FileDelete,%a_temp%\autoHotflowTryToStartAsAdmin.txt
 #include Lib\HTTP Request\HTTPRequest.ahk
 #include Lib\HTTP Request\Uriencode.ahk
 #include Lib\gdi+\gdip.ahk
+#include Lib\TTS\TTS by Learning One.ahk
 
 ;Include libraries which may be used by the elements. This code is generated.
 ;Lib_includes_Start#include lib\7z wrapper\7z wrapper.ahk
@@ -198,10 +199,22 @@ AllTriggerClasses:=Object()
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Search_pixel.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Select_file.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Select_folder.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Send_Keystrokes.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Send_Keystrokes_To_Control.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Set_Clipboard.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Set_control_text.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Set_file_attributes.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Set_file_time.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Set_Flow_Status.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Set_Lock_Key.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Set_Process_Priority.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Set_Screen_Settings.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Set_Volume.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Show_window.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Shuffle_list.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Shutdown.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Sleep.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Speech_output.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Stop_Flow.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Stop_Sound.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Tooltip.ahk
