@@ -280,7 +280,7 @@ LoadFlowCheckCompability(p_List,p_ElementID,p_section,FlowCompabilityVersion)
 			{
 				p_List[p_ElementID].pars.SendMode:=tempenum[p_List[p_ElementID].pars.SendMode]
 			}
-			tempenum:= ["Screen", "Window", "Cilent", "Relative"]
+			tempenum:= ["Screen", "Window", "Client", "Relative"]
 			if (p_List[p_ElementID].pars.CoordMode>= 1 and p_List[p_ElementID].pars.CoordMode<=tempenum.MaxIndex())
 			{
 				p_List[p_ElementID].pars.CoordMode:=tempenum[p_List[p_ElementID].pars.CoordMode]
@@ -298,7 +298,7 @@ LoadFlowCheckCompability(p_List,p_ElementID,p_section,FlowCompabilityVersion)
 			{
 				p_List[p_ElementID].pars.SendMode:=tempenum[p_List[p_ElementID].pars.SendMode]
 			}
-			tempenum:= ["Screen", "Window", "Cilent", "Relative"]
+			tempenum:= ["Screen", "Window", "Client", "Relative"]
 			if (p_List[p_ElementID].pars.CoordMode>= 1 and p_List[p_ElementID].pars.CoordMode<=tempenum.MaxIndex())
 			{
 				p_List[p_ElementID].pars.CoordMode:=tempenum[p_List[p_ElementID].pars.CoordMode]
@@ -481,7 +481,7 @@ LoadFlowCheckCompability(p_List,p_ElementID,p_section,FlowCompabilityVersion)
 		}
 		if (p_List[p_ElementID].class="Action_Get_mouse_position" )
 		{
-			tempenum:= ["Screen", "Window", "Cilent"]
+			tempenum:= ["Screen", "Window", "Client"]
 			if (p_List[p_ElementID].pars.CoordMode>= 1 and p_List[p_ElementID].pars.CoordMode<=tempenum.MaxIndex())
 			{
 				p_List[p_ElementID].pars.CoordMode:=tempenum[p_List[p_ElementID].pars.CoordMode]
@@ -489,7 +489,7 @@ LoadFlowCheckCompability(p_List,p_ElementID,p_section,FlowCompabilityVersion)
 		}
 		if (p_List[p_ElementID].class="Action_Get_pixel_color")
 		{
-			tempenum:= ["Screen", "Window", "Cilent"]
+			tempenum:= ["Screen", "Window", "Client"]
 			if (p_List[p_ElementID].pars.CoordMode>= 1 and p_List[p_ElementID].pars.CoordMode<=tempenum.MaxIndex())
 			{
 				p_List[p_ElementID].pars.CoordMode:=tempenum[p_List[p_ElementID].pars.CoordMode]
@@ -666,6 +666,45 @@ LoadFlowCheckCompability(p_List,p_ElementID,p_section,FlowCompabilityVersion)
 			if (p_List[p_ElementID].pars.WhenError>= 1 and p_List[p_ElementID].pars.WhenError<=tempenum.MaxIndex())
 			{
 				p_List[p_ElementID].pars.WhenError:=tempenum[p_List[p_ElementID].pars.WhenError]
+			}
+		}
+		if (p_List[p_ElementID].class="Action_Screenshot")
+		{
+			tempenum:= ["Screen", "Region", "Window"]
+			if (p_List[p_ElementID].pars.WhichRegion>= 1 and p_List[p_ElementID].pars.WhichRegion<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.WhichRegion:=tempenum[p_List[p_ElementID].pars.WhichRegion]
+			}
+			tempenum:= ["Gdip_FromScreen", "Gdip_FromHWND", "Gdip_FromScreenCoordinates"]
+			if (p_List[p_ElementID].pars.Method>= 1 and p_List[p_ElementID].pars.Method<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.Method:=tempenum[p_List[p_ElementID].pars.Method]
+			}
+		}
+		if (p_List[p_ElementID].class="Action_Search_Image")
+		{
+			tempenum:= ["Screen", "Window", "Client"]
+			if (p_List[p_ElementID].pars.CoordMode>= 1 and p_List[p_ElementID].pars.CoordMode<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.CoordMode:=tempenum[p_List[p_ElementID].pars.CoordMode]
+			}
+			tempenum:= ["widthManually", "heightManually"]
+			if (p_List[p_ElementID].pars.WhichSizeSet>= 1 and p_List[p_ElementID].pars.WhichSizeSet<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.WhichSizeSet:=tempenum[p_List[p_ElementID].pars.WhichSizeSet]
+			}
+		}
+		if (p_List[p_ElementID].class="Action_Search_Image")
+		{
+			tempenum:= ["FromLeft", "FromRight"]
+			if (p_List[p_ElementID].pars.LeftOrRight>= 1 and p_List[p_ElementID].pars.LeftOrRight<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.LeftOrRight:=tempenum[p_List[p_ElementID].pars.LeftOrRight]
+			}
+			tempenum:= ["CaseInsensitive", "CaseSensitive"]
+			if (p_List[p_ElementID].pars.CaseSensitive>= 1 and p_List[p_ElementID].pars.CaseSensitive<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.CaseSensitive:=tempenum[p_List[p_ElementID].pars.CaseSensitive]
 			}
 		}
 	}

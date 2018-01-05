@@ -561,11 +561,44 @@ class ElementSettings
 			}
 		}
 		
-		setText(Text,index="")
+		setLabel(value, parameterID="")
 		{
 			global
 			local tempParameterID:=this.parameter.id
-			guicontrol,SettingsOfElement:text,GUISettingsOfElement%tempParameterID%%index%,% Text
+			if parameterID=
+			{
+				tempParameterID:=this.parameter.id
+				if isobject(tempParameterID)
+					tempParameterID:=tempParameterID[1]
+				
+				;~ MsgBox not implemented
+				;Not implemented here. must be implemented in the extended classes
+			}
+			else
+			{
+				tempParameterID:=this.parameter.id
+				if not isobject(tempParameterID)
+					tempParameterID:=[tempParameterID]
+				
+				;Find object which has the requested parameter ID and call it
+				for oneIndex, oneField in ElementSettingsFields
+				{
+					;make list of all available parameter ID of oneField object
+					tempParameterID:=oneField.parameter.id
+					if ((not isobject(tempParameterID)) and tempParameterID != "")
+						tempParameterID:=[tempParameterID]
+					
+					for oneindex, oneid in tempParameterID
+					{
+						if (oneid = parameterID)
+						{
+							onefield.setLabel(value, parameterID)
+							return value
+						}
+					}
+					
+				}
+			}
 		}
 		
 		enable(parameterID="",enOrDis=1)
@@ -729,7 +762,24 @@ class ElementSettings
 			}
 		}
 		
-		
+		setLabel(value, parameterID="")
+		{
+			global
+			local tempParameterID, 
+			local tempParameterID:=this.parameter.id
+			if parameterID=
+			{
+				tempParameterID:=this.parameter.id
+				if isobject(tempParameterID)
+					tempParameterID:=tempParameterID[1]
+			}
+			else
+				tempParameterID:=parameterID
+			
+			
+			GUIControl,SettingsOfElement:,GUISettingsOfElement%tempParameterID%,% value
+			return
+		}
 		
 	}
 	class checkbox extends ElementSettings.field
@@ -753,6 +803,25 @@ class ElementSettings
 			ElementSettingsFieldHWNDs[tempHWND]:=this
 			
 			varsToDelete.push("GUISettingsOfElement" tempParameterID)
+		}
+		
+		setLabel(value, parameterID="")
+		{
+			global
+			local tempParameterID, 
+			local tempParameterID:=this.parameter.id
+			if parameterID=
+			{
+				tempParameterID:=this.parameter.id
+				if isobject(tempParameterID)
+					tempParameterID:=tempParameterID[1]
+			}
+			else
+				tempParameterID:=parameterID
+			
+			
+			GUIControl,SettingsOfElement:text,GUISettingsOfElement%tempParameterID%,% value
+			return
 		}
 	}
 	
@@ -853,6 +922,24 @@ class ElementSettings
 		}
 		
 		
+		setLabel(value, parameterID="")
+		{
+			global
+			local tempParameterID, 
+			local tempParameterID:=this.parameter.id
+			if parameterID=
+			{
+				tempParameterID:=this.parameter.id
+				if isobject(tempParameterID)
+					tempParameterID:=tempParameterID[1]
+			}
+			else
+				tempParameterID:=parameterID
+			
+			
+			GUIControl,SettingsOfElement:text,GUISettingsOfElement%tempParameterID%,% value
+			return
+		}
 	}
 	
 	class edit extends ElementSettings.field

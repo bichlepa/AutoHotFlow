@@ -73,7 +73,7 @@ Element_getParametrizationDetails_Action_Get_Mouse_Position(Environment)
 	parametersToEdit.push({type: "Label", label: lang("Output variables") (lang("Position: x,y"))})
 	parametersToEdit.push({type: "Edit", id: ["varnameX", "varnameY"], default: ["posX", "posY"], content: "VariableName", WarnIfEmpty: true})
 	parametersToEdit.push({type: "Label", label: lang("Mouse position"), size: "small"})
-	parametersToEdit.push({type: "Radio", id: "CoordMode", default: 1, result: "enum", choices: [lang("Relative to screen"), lang("Relative to active window position"), lang("Relative to active window client position"), lang("Relative to current mouse position")], enum: ["Screen", "Window", "Cilent"]})
+	parametersToEdit.push({type: "Radio", id: "CoordMode", default: 1, result: "enum", choices: [lang("Relative to screen"), lang("Relative to active window position"), lang("Relative to active window client position"), lang("Relative to current mouse position")], enum: ["Screen", "Window", "Client"]})
 	
 	parametersToEdit.push({type: "Label", label: lang("Additional information")})
 	parametersToEdit.push({type: "Checkbox", id: "WhetherGetWindowID", default: 0, label: lang("Get window ID of the mouse")})

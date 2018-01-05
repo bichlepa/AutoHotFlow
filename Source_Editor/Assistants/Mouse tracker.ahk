@@ -43,18 +43,37 @@ assistant_MouseTracker(neededInfo)
 	
 	if (assistant_MouseTracker_NeededInfo.haskey("xpos") or assistant_MouseTracker_NeededInfo.haskey("ypos"))
 	{
+		
 		;Show GUI controls if the mouse position can be selected
 		gui,font,wbold
 		gui,add,text,xm Y+20,% lang("Coordinates")
 		gui,font,wnorm
 		;~ if (assistant_MouseTracker_ImportMousePos="optional")
 			;~ gui,add,checkbox,x10  w200  vassistant_MouseTracker_CheckBoxImportMousePos,% lang("Import mouse position")
+		if (assistant_MouseTracker_NeededInfo.haskey("xpos2") or assistant_MouseTracker_NeededInfo.haskey("ypos2"))
+		{
+			gui,add,radio,Y+10 xm w200 vassistant_MouseTracker_WhichPosSelector1 checked,% lang("First position")
+			gui,add,radio,Y+10 xm w200 vassistant_MouseTracker_WhichPosSelector2,% lang("Second position")
+		}
+			
 		assistant_MouseTracker_EditPosX := x_Par_GetValue(assistant_MouseTracker_NeededInfo.xpos)
 		assistant_MouseTracker_EditPosY := x_Par_GetValue(assistant_MouseTracker_NeededInfo.ypos)
+		
 		gui,add,text,xm Y+10, x
 		gui,add,edit,yp X+10 w50 vassistant_MouseTracker_EditPosX , %assistant_MouseTracker_EditPosX%
 		gui,add,text,yp X+20, y
 		gui,add,edit,yp X+10 w50 vassistant_MouseTracker_EditPosY w100, %assistant_MouseTracker_EditPosY%
+		
+		if (assistant_MouseTracker_NeededInfo.haskey("xpos2") or assistant_MouseTracker_NeededInfo.haskey("ypos2"))
+		{
+			assistant_MouseTracker_EditPosX2 := x_Par_GetValue(assistant_MouseTracker_NeededInfo.xpos2)
+			assistant_MouseTracker_EditPosY2 := x_Par_GetValue(assistant_MouseTracker_NeededInfo.ypos2)
+			
+			gui,add,text,xm Y+10, x2
+			gui,add,edit,yp X+10 w50 vassistant_MouseTracker_EditPosX2 , %assistant_MouseTracker_EditPosX2%
+			gui,add,text,yp X+20, y2
+			gui,add,edit,yp X+10 w50 vassistant_MouseTracker_EditPosY2 w100, %assistant_MouseTracker_EditPosY2%
+		}
 		
 	}
 
@@ -148,6 +167,14 @@ assistant_MouseTracker_buttonOK()
 	{
 		x_Par_SetValue(assistant_MouseTracker_NeededInfo.ypos,assistant_MouseTracker_EditPosY)
 	}
+	if (assistant_MouseTracker_NeededInfo.haskey("xpos2"))
+	{
+		x_Par_SetValue(assistant_MouseTracker_NeededInfo.xpos2,assistant_MouseTracker_EditPosX2)
+	}
+	if (assistant_MouseTracker_NeededInfo.haskey("ypos2"))
+	{
+		x_Par_SetValue(assistant_MouseTracker_NeededInfo.ypos2,assistant_MouseTracker_EditPosY2)
+	}
 	if (assistant_MouseTracker_NeededInfo.haskey("color"))
 	{
 		x_Par_SetValue(assistant_MouseTracker_NeededInfo.color,assistant_MouseTracker_ColorText)
@@ -223,13 +250,38 @@ assistant_MouseTracker_Task()
 		;User has moved the mouse and ahs left it at the position for some time
 		gui,assistant_MouseTracker:submit,nohide
 		
-		assistant_MouseTracker_MouseFoundX:=assistant_MouseTracker_MouseX
-		assistant_MouseTracker_MouseFoundY:=assistant_MouseTracker_MouseY
+		if (assistant_MouseTracker_WhichPosSelector2)
+		{
+			assistant_MouseTracker_MouseFoundX2:=assistant_MouseTracker_MouseX
+			assistant_MouseTracker_MouseFoundY2:=assistant_MouseTracker_MouseY
+		}
+		else
+		{
+			assistant_MouseTracker_MouseFoundX:=assistant_MouseTracker_MouseX
+			assistant_MouseTracker_MouseFoundY:=assistant_MouseTracker_MouseY
+		}
 		
 		if (assistant_MouseTracker_NeededInfo.haskey("xpos") or assistant_MouseTracker_NeededInfo.haskey("ypos"))
+		
 		{
-			guicontrol,assistant_MouseTracker:,assistant_MouseTracker_EditPosX,%assistant_MouseTracker_MouseFoundX%
-			guicontrol,assistant_MouseTracker:,assistant_MouseTracker_EditPosY,%assistant_MouseTracker_MouseFoundY%
+			if (assistant_MouseTracker_NeededInfo.haskey("xpos2") or assistant_MouseTracker_NeededInfo.haskey("ypos2"))
+			{
+				if (assistant_MouseTracker_WhichPosSelector1)
+				{
+					guicontrol,assistant_MouseTracker:,assistant_MouseTracker_EditPosX,%assistant_MouseTracker_MouseFoundX%
+					guicontrol,assistant_MouseTracker:,assistant_MouseTracker_EditPosY,%assistant_MouseTracker_MouseFoundY%
+				}
+				else if (assistant_MouseTracker_WhichPosSelector2)
+				{
+					guicontrol,assistant_MouseTracker:,assistant_MouseTracker_EditPosX2,%assistant_MouseTracker_MouseFoundX2%
+					guicontrol,assistant_MouseTracker:,assistant_MouseTracker_EditPosY2,%assistant_MouseTracker_MouseFoundY2%
+				}
+			}
+			else
+			{
+				guicontrol,assistant_MouseTracker:,assistant_MouseTracker_EditPosX,%assistant_MouseTracker_MouseFoundX%
+				guicontrol,assistant_MouseTracker:,assistant_MouseTracker_EditPosY,%assistant_MouseTracker_MouseFoundY%
+			}
 		}
 		
 		if (assistant_MouseTracker_NeededInfo.haskey("color"))

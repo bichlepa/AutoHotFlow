@@ -76,7 +76,7 @@ Element_getParametrizationDetails_Action_Drag_With_Mouse(Environment)
 	parametersToEdit.push({type: "DropDown", id: "Button", default: 1, result: "enum", choices: [lang("Left button"), lang("Right button"), lang("Middle Button"), lang("Wheel up"), lang("Wheel down"), lang("Wheel left"), lang("Wheel right"), lang("4th mouse button (back)"), lang("5th mouse button (forward)")], enum: ["Left", "Right", "Middle", "WheelUp", "WheelDown", "WheelLeft", "WheelRight", "X1", "X2"]})
 	
 	parametersToEdit.push({type: "Label", label: lang("Mouse position")})
-	parametersToEdit.push({type: "Radio", id: "CoordMode", default: 1, result: "enum", choices: [lang("Relative to screen"), lang("Relative to active window position"), lang("Relative to active window client position"), lang("Relative to current mouse position")], enum: ["Screen", "Window", "Cilent", "Relative"]})
+	parametersToEdit.push({type: "Radio", id: "CoordMode", default: 1, result: "enum", choices: [lang("Relative to screen"), lang("Relative to active window position"), lang("Relative to active window client position"), lang("Relative to current mouse position")], enum: ["Screen", "Window", "Client", "Relative"]})
 	parametersToEdit.push({type: "Label", label: lang("Start coordinates") " " lang("(x,y)"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: ["XposFrom", "YposFrom"], default: [10, 20], content: "Expression", WarnIfEmpty: true})
 	parametersToEdit.push({type: "button", id: "MouseTrackerFrom", goto: "Action_Drag_With_Mouse_MouseTracker_From", label: lang("Get coordinates")})

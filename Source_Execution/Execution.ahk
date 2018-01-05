@@ -29,6 +29,7 @@ lang_setLanguage(_settings.UILanguage)
 #include Lib\Class_Monitor\Class_Monitor.ahk
 #include Lib\HTTP Request\HTTPRequest.ahk
 #include Lib\HTTP Request\Uriencode.ahk
+#include Lib\gdi+\gdip.ahk
 
 ;~ #include Source_Draw\API\API receiver execution.ahk
 

@@ -425,6 +425,9 @@ x_Par_GetValue(p_ParameterID)
 x_Par_SetChoices(p_ParameterID, p_Choices)
 {
 }
+x_Par_SetLabel(p_ParameterID, p_Label)
+{
+}
 x_FirstCallOfCheckSettings(Environment)
 {
 }
@@ -460,16 +463,21 @@ x_GetFullPath(Environment, p_Path)
 	path:=p_Path
 	if  DllCall("Shlwapi.dll\PathIsRelative","Str",path)
 	{
-		if (_Flows[Environment.FlowID].flowsettings.DefaultWorkingDir)
-		{
-			path:=_settings.FlowWorkingDir "\" path
-		}
-		else
-		{
-			path:=_Flows[Environment.FlowID].flowsettings.workingdir "\" path
-		}
+		path := x_GetWorkingDir(Environment)
 	}
 	return path
+}
+
+x_GetWorkingDir(Environment)
+{
+	if (_Flows[Environment.FlowID].flowsettings.DefaultWorkingDir)
+	{
+		return _settings.FlowWorkingDir
+	}
+	else
+	{
+		return _Flows[Environment.FlowID].flowsettings.workingdir
+	}
 }
 
 
@@ -504,5 +512,8 @@ x_assistant_windowParameter(neededInfo)
 
 
 x_assistant_MouseTracker(neededInfo)
+{
+}
+x_assistant_ChooseColor(neededInfo)
 {
 }
