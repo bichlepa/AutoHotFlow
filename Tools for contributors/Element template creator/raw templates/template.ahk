@@ -189,6 +189,12 @@ Element_CheckSettings_&ElementType&_&Name&(Environment, ElementParameters)
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 {
+#if ElementType = Loop
+	entryPoint := x_getEntryPoint(environment)
+	
+	if (entryPoint = "Head") ;Initialize loop
+	{
+#endif
 	EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters)
 	if (EvaluatedParameters._error)
 	{
@@ -455,11 +461,7 @@ Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 	x_ExecuteInNewAHKThread(Environment, functionObject, code, inputVars, outputVars)
 #endif
 	
-#if ElementType = Loop
-	entryPoint := x_getEntryPoint(environment)
-	
-	if (entryPoint = "Head") ;Initialize loop
-	{
+
 		x_SetVariable(Environment, "A_Index", 1, "loop")
 		x_finish(Environment, "head")
 	}
@@ -468,9 +470,9 @@ Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 		index := x_GetVariable(Environment, "A_Index")
 		index++
 		
-		x_SetVariable(Environment, "A_Index", index, "loop")
 		if (true) ;add here a decision
 		{
+			x_SetVariable(Environment, "A_Index", index, "loop")
 			x_finish(Environment, "head") ;Continue with next iteration
 		}
 		else

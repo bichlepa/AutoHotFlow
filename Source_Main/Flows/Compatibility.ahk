@@ -770,6 +770,82 @@ LoadFlowCheckCompability(p_List,p_ElementID,p_section,FlowCompabilityVersion)
 				p_List[p_ElementID].pars.Mute:=tempenum[p_List[p_ElementID].pars.Mute]
 			}
 		}
+		if (p_List[p_ElementID].class="Action_Substring")
+		{
+			tempenum:= ["FromLeft", "FromRight", "Position"]
+			if (p_List[p_ElementID].pars.WhereToBegin>= 1 and p_List[p_ElementID].pars.WhereToBegin<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.WhereToBegin:=tempenum[p_List[p_ElementID].pars.WhereToBegin]
+			}
+			tempenum:= ["GoLeft", "GoRight"]
+			if (p_List[p_ElementID].pars.LeftOrRight>= 1 and p_List[p_ElementID].pars.LeftOrRight<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.LeftOrRight:=tempenum[p_List[p_ElementID].pars.LeftOrRight]
+			}
+		}
+		if (p_List[p_ElementID].class="Action_Trigonometry")
+		{
+			tempenum:= ["Sine", "Cosine", "Tangent", "Arcsine", "Arccosine", "Arctangent"]
+			if (p_List[p_ElementID].pars.Operation>= 1 and p_List[p_ElementID].pars.Operation<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.Operation:=tempenum[p_List[p_ElementID].pars.Operation]
+			}
+			tempenum:= ["Radian", "Degree"]
+			if (p_List[p_ElementID].pars.Unit>= 1 and p_List[p_ElementID].pars.Unit<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.Unit:=tempenum[p_List[p_ElementID].pars.Unit]
+			}
+		}
+		if (p_List[p_ElementID].class="Action_Trim_a_string")
+		{
+			tempenum:= ["Number", "Specified"]
+			if (p_List[p_ElementID].pars.TrimWhat>= 1 and p_List[p_ElementID].pars.TrimWhat<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.TrimWhat:=tempenum[p_List[p_ElementID].pars.TrimWhat]
+			}
+			tempenum:= ["SpacesAndTabs", "Specified"]
+			if (p_List[p_ElementID].pars.SpacesAndTabs>= 1 and p_List[p_ElementID].pars.SpacesAndTabs<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.SpacesAndTabs:=tempenum[p_List[p_ElementID].pars.SpacesAndTabs]
+			}
+		}
+		if (p_List[p_ElementID].class="Condition_File_Has_Attribute")
+		{
+			tempenum:= ["N", "R", "A", "S", "H", "D", "O", "C", "T"]
+			if (p_List[p_ElementID].pars.Attribute>= 1 and p_List[p_ElementID].pars.Attribute<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.Attribute:=tempenum[p_List[p_ElementID].pars.Attribute]
+			}
+		}
+		if (p_List[p_ElementID].class="Condition_List_Contains_Element")
+		{
+			tempenum:= ["Key", "Content"]
+			if (p_List[p_ElementID].pars.SearchWhat>= 1 and p_List[p_ElementID].pars.SearchWhat<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.SearchWhat:=tempenum[p_List[p_ElementID].pars.SearchWhat]
+			}
+		}
+		if (p_List[p_ElementID].class="Condition_String_Contains_Text")
+		{
+			tempenum:= ["Start", "End", "Anywhere"]
+			if (p_List[p_ElementID].pars.WhereToBegin>= 1 and p_List[p_ElementID].pars.WhereToBegin<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.WhereToBegin:=tempenum[p_List[p_ElementID].pars.WhereToBegin]
+			}
+			tempenum:= ["CaseInsensitive", "CaseSensitive"]
+			if (p_List[p_ElementID].pars.CaseSensitive>= 1 and p_List[p_ElementID].pars.CaseSensitive<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.CaseSensitive:=tempenum[p_List[p_ElementID].pars.CaseSensitive]
+			}
+		}
+		if (p_List[p_ElementID].class="Loop_Loop_Through_Files")
+		{
+			tempenum:= ["Files", "FilesAndFolders", "Folders"]
+			if (p_List[p_ElementID].pars.OperateOnWhat>= 1 and p_List[p_ElementID].pars.OperateOnWhat<=tempenum.MaxIndex())
+			{
+				p_List[p_ElementID].pars.OperateOnWhat:=tempenum[p_List[p_ElementID].pars.OperateOnWhat]
+			}
+		}
 	}
 	
 	if FlowCompabilityVersion<1000000000 ; Only for test cases. On release this should be empty
