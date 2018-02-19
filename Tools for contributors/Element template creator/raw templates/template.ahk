@@ -41,7 +41,7 @@ Element_getIconPath_&ElementType&_&Name&()
 {
 #if icon
 	return "Source_elements\default\icons\&icon&"
-#endif
+#endif ;icon
 }
 
 ;How stable is this element? Experimental elements will be marked and can be hidden by user.
@@ -58,55 +58,55 @@ Element_getParametrizationDetails_&ElementType&_&Name&(Environment)
 	
 #if par_label 
 	parametersToEdit.push({type: "Label", label: lang("My label")})
-#endif
+#endif ;par_label
 #if par_radio 
 	parametersToEdit.push({type: "Radio", id: "radio", result: "number", default: 1, choices: [lang("Choice %1%", 1), lang("Choice %1%", 2), lang("Choice %1%", 3)]})
-#endif
+#endif ;par_radio
 #if par_radioEnum
 	parametersToEdit.push({type: "Radio", id: "radioEnum", result: "enum", default: 1, choices: [lang("Cat"), lang("Dog"), lang("Bird")], enum: ["Cat", "Dog", "Bird"]})
-#endif
+#endif ;par_radioEnum
 #if par_checkbox 
 	parametersToEdit.push({type: "Checkbox", id: "checkbox", default: 0, label: lang("Label")})
-#endif
+#endif ;par_checkbox
 #if par_EditString 
 	parametersToEdit.push({type: "Edit", id: "editString", content: "String"})
-#endif
+#endif ;par_EditString
 #if par_editExpression 
 	parametersToEdit.push({type: "Edit", id: "editExpression", default: 123, content: "Expression", WarnIfEmpty: true})
-#endif
+#endif ;par_editExpression
 #if par_editStringOrExpression 
 	parametersToEdit.push({type: "Edit", id: "editStringOrExpression", default: "MyVar", content: ["String", "Expression"], contentID: "expression", contentDefault: "string", WarnIfEmpty: true})
 #endif
 #if par_editVariableName
 	parametersToEdit.push({type: "Edit", id: "editVariableName", default: "NewVariable", content: "VariableName", WarnIfEmpty: true})
-#endif
+#endif ;par_editVariableName
 #if par_editMultiLine
 	parametersToEdit.push({type: "multilineEdit", id: "editMultiLine", default: "", WarnIfEmpty: true})
-#endif
+#endif ;par_editMultiLine
 #if par_editTwoExpressions
 	parametersToEdit.push({type: "Edit", id: ["editTwoExpressions1", "editTwoExpressions2"], default: [10, 20], content: "Expression", WarnIfEmpty: true})
 #endif
 #if par_DropDownString
 	parametersToEdit.push({type: "DropDown", id: "DropDownString", default: "jpg", choices: ["bmp", "jpg", "png"], result: "string"})
-#endif
+#endif ;par_DropDownString
 #if par_ComboBoxString
 	parametersToEdit.push({type: "ComboBox", id: "ComboBoxString", content: "String", WarnIfEmpty: true, result: "string", choices: ["bmp", "jpg", "png"]})
-#endif
+#endif ;par_ComboBoxString
 #if par_ListBoxString
 	parametersToEdit.push({type: "ListBox", id: "ListBoxString", result: "String", choices: ["bmp", "jpg", "png"], multi: True})
-#endif
+#endif ;par_ListBoxString
 #if par_Slider
 	parametersToEdit.push({type: "Slider", id: "Slider", default: 2, options: "Range0-100 tooltip"})
-#endif
+#endif ;par_Slider
 #if par_file 
 	parametersToEdit.push({type: "File", id: "file", label: lang("Select a file")})
-#endif
+#endif ;par_file
 #if par_folder
 	parametersToEdit.push({type: "Folder", id: "folder", label: lang("Select a folder")})
-#endif
+#endif ;par_folder
 #if par_button
 	parametersToEdit.push({type: "button", id: "button", goto: "&ElementType&_&Name&_ButtonClick", label: lang("Get coordinates")})
-#endif
+#endif ;par_button
 	
 #if addWindowSelector
 	
@@ -133,7 +133,7 @@ Element_getParametrizationDetails_&ElementType&_&Name&(Environment)
 	parametersToEdit.push({type: "Checkbox", id: "FindHiddenWindow", default: 0, label: lang("Detect hidden window")})
 	parametersToEdit.push({type: "Label", label: lang("Import window identification"), size: "small"})
 	parametersToEdit.push({type: "button", goto: "&ElementType&_&Name&_ButtonWindowAssistant", label: lang("Import window identification")})
-#endif
+#endif ;addWindowSelector
 	
 	return parametersToEdit
 }
@@ -169,9 +169,9 @@ Element_GenerateName_&ElementType&_&Name&(Environment, ElementParameters)
 		tempNameString:=tempNameString "`n" lang("Process_ID") ": " ElementParameters.ahk_pid
 	
 	return lang("&Name&") ": " tempNameString
-#else
+#else ;addWindowSelector
 	return lang("&Name&") 
-#endif
+#endif ;addWindowSelector
 }
 
 ;Called every time the user changes any parameter.
@@ -194,7 +194,7 @@ Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 	
 	if (entryPoint = "Head") ;Initialize loop
 	{
-#endif
+#endif ;ElementType = Loop
 	EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters)
 	if (EvaluatedParameters._error)
 	{
@@ -205,19 +205,19 @@ Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 #if par_checkbox 
 
 	checkboxValue := ElementParameters.checkbox
-#endif
+#endif ;par_checkbox
 #if par_radio 
 
 	radioValue := ElementParameters.radio
-#endif
+#endif ;par_radio
 #if par_radioEnum
 
 	radioEnumValue := ElementParameters.radioEnum
-#endif
+#endif ;par_radioEnum
 #if par_editstring 
 
 	editstringValue := x_replaceVariables(Environment,ElementParameters.editstring)
-#endif
+#endif ;par_editstring
 #if par_editExpression 
 
 	evRes := x_evaluateExpression(Environment,ElementParameters.editExpression)
@@ -233,7 +233,7 @@ Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 		x_finish(Environment, "exception", lang("%1% is not a number: %2%",lang("Expression value"), editExpressionValue))
 		return
 	}
-#endif
+#endif ;par_editExpression
 #if par_editStringOrExpression 
 
 	if (ElementParameters.Expression = 2)
@@ -252,7 +252,7 @@ Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 	}
 	else
 		editStringOrExpressionValue := x_replaceVariables(Environment, ElementParameters.editStringOrExpression)
-#endif
+#endif ;par_editStringOrExpression
 #if par_editVariableName
 
 	editVariableNameValue := x_replaceVariables(Environment, ElementParameters.editVariableName)
@@ -262,11 +262,11 @@ Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 		x_finish(Environment, "exception", lang("%1% is not valid", lang("Ouput variable name '%1%'", editVariableName)))
 		return
 	}
-#endif
+#endif ;par_editVariableName
 #if par_editMultiLine
 
 	editMultiLineValue := x_replaceVariables(Environment, ElementParameters.editMultiLine)
-#endif
+#endif ;par_editMultiLine
 #if par_editTwoExpressions
 
 	evRes := x_evaluateExpression(Environment,ElementParameters.editTwoExpressions1)
@@ -285,15 +285,15 @@ Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 		return
 	}
 	editTwoExpressions2Value:=evRes.result
-#endif
+#endif ;par_editTwoExpressions
 #if par_DropDownString 
 
 	DropDownStringValue := ElementParameters.DropDownString
-#endif
+#endif ;par_DropDownString
 #if par_ComboBoxString
 
 	ComboBoxStringValue := x_replaceVariables(Environment, ElementParameters.ComboBoxString) 
-#endif
+#endif ;par_ComboBoxString
 #if par_ListBoxString 
 
 	ListBoxStringValue:=ElementParameters.ListBoxString
@@ -301,7 +301,7 @@ Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 	{
 		;Do anything with oneListBoxString
 	}
-#endif
+#endif ;par_ListBoxString
 #if par_Slider
 
 	evRes := x_evaluateExpression(Environment,ElementParameters.Slider)
@@ -313,7 +313,7 @@ Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 	}
 	SliderValue:=evRes.result
 
-#endif
+#endif ;par_Slider
 #if par_file 
 
 	fileValue := x_GetFullPath(Environment, x_replaceVariables(Environment, ElementParameters.file))
@@ -322,12 +322,12 @@ Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 		x_finish(Environment, "exception", lang("%1% '%2%' does not exist.",lang("File"), fileValue)) 
 		return
 	}
-#endif
+#endif ;par_file
 #if par_folder
 
 	folderValue := x_GetFullPath(Environment, x_replaceVariables(Environment, ElementParameters.folder))
-#endif
-#endif
+#endif ;par_folder
+#endif ;ElementType = action | condition | loop
 
 #if addWindowSelector
 
@@ -375,10 +375,10 @@ Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 	{
 #if ElementType = action
 		x_finish(Environment, "exception", lang("Error! Seeked window does not exist")) 
-#endif
+#endif ;ElementType = action
 #if ElementType = condition
 		x_finish(Environment, "no")
-#endif
+#endif ;ElementType = condition
 		return
 	}
 	
@@ -386,13 +386,13 @@ Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 	;Do some actions here
 #if ElementType = action
 	x_finish(Environment, "normal")
-#endif
+#endif ;ElementType = action
 #if ElementType = condition
 	x_finish(Environment, "yes")
-#endif
+#endif ;ElementType = condition
 	
-#endif
-#endif
+#endif ;addWindowSelector
+#endif ;!ElementType = Loop
 
 	x_SetVariable(Environment,Varname,VarValue) ;Example
 #if ElementType = action
@@ -402,10 +402,10 @@ Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 	MsgBox Hello World
 	x_finish(Environment,"normal")
 	return
-#endif
-#endif
-#endif
-#endif
+#endif ;!addCustomGUI
+#endif ;!addSeparateAhkThread
+#endif ;!addWindowSelector
+#endif ;ElementType = action
 	
 #if ElementType = condition
 #if !addWindowSelector
@@ -419,10 +419,10 @@ Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 		
 	return
 	
-#endif
-#endif
-#endif
-#endif
+#endif ;!addCustomGUI
+#endif ;!addSeparateAhkThread
+#endif ;!addWindowSelector
+#endif ;ElementType = condition
 
 #if addCustomGUI
 	guiID:=x_GetMyUniqueExecutionID(Environment)
@@ -432,7 +432,7 @@ Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 	gui,%guiID%:add,button,g&ElementType&_&Name&_OnClose, Close this window
 	
 	gui,%guiID%:show
-#endif
+#endif ;addCustomGUI
 
 #if addSeparateAhkThread
 	;Unfortunately we can't use the function lang() inside the exported code. But we can export them inside variables befor use.
@@ -459,9 +459,9 @@ Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 	x_SetExecutionValue(Environment, "functionObject", functionObject)
 	x_SetExecutionValue(Environment, "Varname", Varname)
 	x_ExecuteInNewAHKThread(Environment, functionObject, code, inputVars, outputVars)
-#endif
+#endif ;addSeparateAhkThread
 	
-
+#if ElementType = Loop
 		x_SetVariable(Environment, "A_Index", 1, "loop")
 		x_finish(Environment, "head")
 	}
@@ -491,8 +491,7 @@ Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 		;This should never happen, but I suggest to keep this code for catching bugs in AHF.
 		x_finish(Environment, "exception", lang("No information whether the connection leads into head or tail"))
 	}
-	
-#endif
+#endif ;ElementType = Loop
 }
 
 #if addCustomGUI
@@ -508,7 +507,7 @@ Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 	guicontrol,,%A_GuiControl% ,Button text changed
 }
 
-#endif
+#endif ;addCustomGUI
 
 ;Called when the execution of the element should be stopped.
 ;If the task in Element_run_...() takes more than several seconds, then it is up to you to make it stoppable.
@@ -518,9 +517,8 @@ Element_stop_&ElementType&_&Name&(Environment, ElementParameters)
 	;Close window if currently opened
 	guiID:=x_GetMyUniqueExecutionID(Environment)
 	gui,%guiID%:destroy
-#endif
+#endif ;addCustomGUI
 }
-#endif
 
 
 #if addSeparateAhkThread
@@ -545,8 +543,8 @@ Element_stop_&ElementType&_&Name&(Environment, ElementParameters)
 	}
 	
 }
-#endif
-
+#endif ;addSeparateAhkThread
+#endif ;ElementType = action | condition | loop
 
 #if ElementType = trigger
 ;Called when the trigger is activated
@@ -556,26 +554,26 @@ Element_enable_&ElementType&_&Name&(Environment, ElementParameters)
 	EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters)
 	if (EvaluatedParameters._error)
 	{
-		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
+		x_enabled(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
 #if customParameterEvaluation
 #if par_checkbox 
 
 	checkboxValue := ElementParameters.checkbox
-#endif
+#endif ;par_checkbox
 #if par_radio 
 
 	radioValue := ElementParameters.radio
-#endif
+#endif ;par_radio
 #if par_radioEnum
 
 	radioEnumValue := ElementParameters.radioEnum
-#endif
+#endif ;par_radioEnum
 #if par_editstring 
 
 	editstringValue := x_replaceVariables(Environment,ElementParameters.editstring)
-#endif
+#endif ;par_editstring
 #if par_editExpression 
 
 	evRes := x_evaluateExpression(Environment,ElementParameters.editExpression)
@@ -591,7 +589,7 @@ Element_enable_&ElementType&_&Name&(Environment, ElementParameters)
 		x_finish(Environment, "exception", lang("%1% is not a number: %2%",lang("Expression value"), editExpressionValue))
 		return
 	}
-#endif
+#endif ;par_editExpression
 #if par_editStringOrExpression 
 
 	if (ElementParameters.Expression = 2)
@@ -610,7 +608,7 @@ Element_enable_&ElementType&_&Name&(Environment, ElementParameters)
 	}
 	else
 		editStringOrExpressionValue := x_replaceVariables(Environment, ElementParameters.editStringOrExpression)
-#endif
+#endif ;par_editStringOrExpression
 #if par_editVariableName
 
 	editVariableNameValue := x_replaceVariables(Environment, ElementParameters.editVariableName)
@@ -620,11 +618,11 @@ Element_enable_&ElementType&_&Name&(Environment, ElementParameters)
 		x_finish(Environment, "exception", lang("%1% is not valid", lang("Ouput variable name '%1%'", editVariableName)))
 		return
 	}
-#endif
+#endif ;par_editVariableName
 #if par_editMultiLine
 
 	editMultiLineValue := x_replaceVariables(Environment, ElementParameters.editMultiLine)
-#endif
+#endif ;par_editMultiLine
 #if par_editTwoExpressions
 
 	evRes := x_evaluateExpression(Environment,ElementParameters.editTwoExpressions1)
@@ -643,15 +641,15 @@ Element_enable_&ElementType&_&Name&(Environment, ElementParameters)
 		return
 	}
 	editTwoExpressions2Value:=evRes.result
-#endif
+#endif ;par_editTwoExpressions
 #if par_DropDownString 
 
 	DropDownStringValue := ElementParameters.DropDownString
-#endif
+#endif ;par_DropDownString
 #if par_ComboBoxString
 
 	ComboBoxStringValue := x_replaceVariables(Environment, ElementParameters.ComboBoxString) 
-#endif
+#endif ;par_ComboBoxString
 #if par_ListBoxString 
 
 	ListBoxStringValue:=ElementParameters.ListBoxString
@@ -659,7 +657,7 @@ Element_enable_&ElementType&_&Name&(Environment, ElementParameters)
 	{
 		;Do anything with oneListBoxString
 	}
-#endif
+#endif ;par_ListBoxString
 #if par_Slider
 
 	evRes := x_evaluateExpression(Environment,ElementParameters.Slider)
@@ -671,21 +669,21 @@ Element_enable_&ElementType&_&Name&(Environment, ElementParameters)
 	}
 	SliderValue:=evRes.result
 
-#endif
+#endif ;par_Slider
 #if par_file 
 
 	fileValue := x_GetFullPath(Environment, x_replaceVariables(Environment, ElementParameters.file))
 	if not FileExist(fileValue)
 	{
-		x_finish(Environment, "exception", lang("%1% '%2%' does not exist.",lang("File"), fileValue)) 
+		x_enabled(Environment, "exception", lang("%1% '%2%' does not exist.",lang("File"), fileValue)) 
 		return
 	}
-#endif
+#endif ;par_file
 #if par_folder
 
 	folderValue := x_GetFullPath(Environment, x_replaceVariables(Environment, ElementParameters.folder))
-#endif
-#endif
+#endif ;par_folder
+#endif ;customParameterEvaluation
 
 #if addWindowSelector
 
@@ -735,40 +733,76 @@ Element_enable_&ElementType&_&Name&(Environment, ElementParameters)
 	}
 
 	x_SetExecutionValue(Environment, "windowID", tempWinid)
-#endif
+#endif ;addWindowSelector
 	
-	x_enabled(Environment, "normal", lang("I'm ready.",temphotkey))
-
+#if addSeparateAhkThread
+	inputVars:={key: "F12"} ;Variables which will be available in the external scriptExample
+	outputVars:=["returnValue"]
+	code =
+	( ` , LTrim %
+		loop
+		{
+			KeyWait,%key%,D ;Example
+			returnValue:="Hello " a_now ;Example
+			x_trigger()
+			KeyWait,%key% ;Example
+			
+		}
+	)
+	
+	x_TriggerInNewAHKThread(Environment, code, inputVars, outputVars)
+#else ;addWindowSelector
+	functionObject:= x_NewExecutionFunctionObject(environment, "&ElementType&_&Name&_Trigger", EvaluatedParameters)
+	x_SetExecutionValue(environment, "functionObject", functionObject)
+	SetTimer, % functionObject, -1000 ;Example
+	
+#endif ;else addSeparateAhkThread
+	x_enabled(Environment, "normal")
 }
+
+#if !addSeparateAhkThread
+;Function which triggers the flow
+&ElementType&_&Name&_Trigger(environment, EvaluatedParameters)
+{
+	x_trigger(Environment)
+}
+#endif ;!addSeparateAhkThread
 
 ;Called after the trigger has triggered.
 ;Here you can for example define the variables which are provided by the triggers.
 Element_postTrigger_&ElementType&_&Name&(Environment, ElementParameters)
 {
+#if addSeparateAhkThread
+	exportedValues:=x_TriggerInNewAHKThread_GetExportedValues(Environment)
+	x_SetVariable(Environment,"A_ReturnValue",exportedValues.returnValue,"Thread") ;Example
+#endif ;addSeparateAhkThread
+
 #if addWindowSelector
 	tempWinid:=x_getExecutionValue(Environment, "windowID")
 	x_SetVariable(Environment,"A_WindowID",tempWinid,"Thread")
-#endif
+#endif ;addWindowSelector
 }
 
 ;Called when the trigger should be disabled.
 Element_disable_&ElementType&_&Name&(Environment, ElementParameters)
 {
-	x_disabled(Environment, "normal", lang("I'm stopped."))
+	functionObject := x_GetExecutionValue(environment, "functionObject")
+	SetTimer, % functionObject, delete
+	x_disabled(Environment, "normal")
 }
 
-#endif
+#endif ;ElementType = trigger
 
 #if par_button
 &ElementType&_&Name&_ButtonClick()
 {
 	MsgBox user clicked me
 }
-#endif
+#endif ;par_button
 
 #if addWindowSelector
 &ElementType&_&Name&_ButtonWindowAssistant()
 {
 	x_assistant_windowParameter({wintitle: "Wintitle", excludeTitle: "excludeTitle", winText: "winText", FindHiddenText: "FindHiddenText", ExcludeText: "ExcludeText", ahk_class: "ahk_class", ahk_exe: "ahk_exe", ahk_id: "ahk_id", ahk_pid: "ahk_pid", FindHiddenWindow: "FindHiddenWindow"})
 }
-#endif
+#endif ;addWindowSelector

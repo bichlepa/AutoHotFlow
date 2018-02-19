@@ -45,6 +45,7 @@ lang_setLanguage(_settings.UILanguage)
 #include source_Common\Multithreading\API Caller Main.ahk
 #include source_Common\flows\flows.ahk
 #include source_Common\Elements\Elements.ahk
+#include source_Common\Other\Other.ahk
 
 #include Source_Execution\execution task\execution task.ahk
 #include Source_Execution\API\functions for elements.ahk

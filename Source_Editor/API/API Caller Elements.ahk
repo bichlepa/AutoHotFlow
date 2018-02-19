@@ -535,3 +535,14 @@ x_assistant_ChooseColor(neededInfo)
 {
 	assistant_ChooseColor(neededInfo)
 }
+
+
+x_GetAhfPath()
+{
+	return GetAhfPath()
+}
+
+x_isWindowsStartup()
+{
+	return _share.WindowStartup
+}

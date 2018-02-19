@@ -2,7 +2,19 @@
 ;#Warn  ; Recommended for catching common errors.
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
 SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
-;~ MsgBox %1% - %2% - %3% - %4% - %5%
+;~ MsgBox '%1%' - %2% - %3% - %4% - %5%
+command=%1%
+commandMessage=%2%
+if (command = "AHFCommand")
+{
+	DetectHiddenWindows,on
+	;~ MsgBox %A_ScriptDir% AHF_HIDDEN_COMMAND_WINDOW
+	IfWinExist,%A_ScriptDir% AHF_HIDDEN_COMMAND_WINDOW
+	{
+		ControlSetText,Edit1,%commandMessage%,%A_ScriptDir% AHF_HIDDEN_COMMAND_WINDOW
+		ExitApp
+	}
+}
 
 if not (a_iscompiled)
 {
@@ -108,3 +120,15 @@ if not (a_iscompiled)
 
 ;At last run main.ahk
 run,autohotkey\autohotkey_h.exe "%A_ScriptDir%\source_main\main.ahk" "%1%" "%2%" "%3%" "%4%" "%5%" "%6%" "%7%" "%8%" "%9%" "%10%"
+
+
+if (command = "AHFCommand")
+{
+	DetectHiddenWindows,on
+	WinWait,%A_ScriptDir% AHF_HIDDEN_COMMAND_WINDOW,,30
+	IfWinExist,%A_ScriptDir% AHF_HIDDEN_COMMAND_WINDOW
+	{
+		ControlSetText,Edit1,%commandMessage%
+		ExitApp
+	}
+}

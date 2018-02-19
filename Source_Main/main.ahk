@@ -23,6 +23,12 @@ gosub, init_GlobalVars
 load_settings()
 logger("a1", "startup")
 
+
+;If AutoHotFlow is started automatically on windows startup
+firstCommandLineParameter = %1%
+_share.WindowsStartup := (firstCommandLineParameter = "WindowsStartup")
+;~ d(_share.WindowsStartup, firstCommandLineParameter)
+
 ; using working dir forbidden.
 ;The reason is that while any thread uses the command FileSelectFile, the working directory of the working directory of the whole process is changed to the path which is shown in the dialog.
 SetWorkingDir %a_temp%  
@@ -80,7 +86,8 @@ FileDelete,%a_temp%\autoHotflowTryToStartAsAdmin.txt
 #include Lib\TTS\TTS by Learning One.ahk
 
 ;Include libraries which may be used by the elements. This code is generated.
-;Lib_includes_Start#include lib\7z wrapper\7z wrapper.ahk
+;Lib_includes_Start
+#include lib\7z wrapper\7z wrapper.ahk
 global_elementInclusions = 
 (
 #include lib\7z wrapper\7z wrapper.ahk
@@ -108,6 +115,7 @@ global_elementInclusions =
 #include Source_Main\Flows\Flow actions.ahk
 #include Source_Main\Flows\states.ahk
 #include Source_Main\settings\settings.ahk
+#include Source_Main\hidden window\hidden window.ahk
 
 #include source_Common\Debug\Debug.ahk
 #include source_Common\Debug\Logger.ahk
@@ -120,6 +128,7 @@ global_elementInclusions =
 #include source_Common\variables\expression evaluator.ahk
 #include source_Common\flows\flows.ahk
 #include source_Common\Elements\Elements.ahk
+#include source_Common\Other\Other.ahk
 
 AllElementClasses:=Object()
 AllTriggerClasses:=Object()
@@ -247,8 +256,15 @@ AllTriggerClasses:=Object()
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Loops\Parse_A_String.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Loops\SimpleLoop.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Loops\Work_through_a_list.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Triggers\Clipboard_Changes.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Triggers\Hotkey.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Triggers\Manual.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Triggers\Periodic_Timer.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Triggers\Process_closes.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Triggers\Process_starts.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Triggers\Shortcut.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Triggers\Start_up.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Triggers\Time_of_Day.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Triggers\Window_opens.ahk
 
 ;Element_Includes_End
@@ -263,6 +279,10 @@ Thread_StartExecution()
 
 ;Find flows and activate some triggers
 FindFlows()
+_share.WindowsStartup:=false
+
+;Initialize a hidden command window
+CreateHiddenCommandWindow()
 return
 
 

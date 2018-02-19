@@ -174,7 +174,8 @@ globalSettings_GUI()
 	;handle autostart setting
 	if GuiSettingAutostart
 	{
-		FileCreateShortcut,%A_ScriptFullPath%,%A_Startup%\AutoHotFlow.lnk ,,AutomaticStartup
+		MsgBox % GetAhfPath()
+		FileCreateShortcut,% GetAhfPath(),%A_Startup%\AutoHotFlow.lnk ,,WindowsStartup
 	}
 	else
 	{

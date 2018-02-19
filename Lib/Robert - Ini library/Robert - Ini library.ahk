@@ -740,10 +740,10 @@ RIni_GetKeyValue(RVar, Sec, Key, Default_Return="nothingNichtsНичего") ;Mo
 	If (%RVar%_All_%Sec%_Keys){
 		If (!InStr("`n" %RVar%_All_%Sec%_Keys, "`n" Key "`n"))
 			Return Default_Return = "nothingNichtsНичего" ? -3 : Default_Return
-		If (%RVar%_%Sec%_%Key%_Value != "")
+		;~ If (%RVar%_%Sec%_%Key%_Value != "")
 			Return %RVar%_%Sec%_%Key%_Value
-		Else
-			Return Default_Return
+		;~ Else
+			;~ Return Default_Return
 	} Else
 		Return Default_Return = "nothingNichtsНичего" ? -3 : Default_Return
 }

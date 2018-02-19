@@ -28,7 +28,7 @@ gui,add,dropdownlist,yp %posx2% vElementType choose1 ggenerate, Action|Condition
 gui,add,text,%posx1% Y+20, Name
 gui,add,edit,yp %posx2% vName ggenerate w100, MyName
 gui,add,text,%posx1% Y+20, Category
-gui,add,dropdownlist,yp %posx2% vCategory choose1 ggenerate, Variable|Flow_control|Window|Sound|Image|File|Drive|User_interaction|User_simulation|Power|Process|Internet|Debugging|Expert
+gui,add,dropdownlist,yp %posx2% vCategory choose1 ggenerate, Variable|Flow_control|Window|Sound|Image|File|Drive|User_interaction|User_simulation|Time|Power|Process|Internet|Debugging|Expert
 gui,add,text,%posx1% Y+20, Icon
 gui,add,dropdownlist,yp %posx2% vIcon choose1 ggenerate, % allicons
 gui,add,text,%posx1% Y+20, Stability
@@ -59,79 +59,62 @@ gui,add,checkbox,Y+10 %posx2% vaddWindowSelector ggenerate, Add window selector
 gui,add,checkbox,Y+10 %posx2% vaddSeparateAhkThread ggenerate, Execute in separate ahk thread
 gui,add,checkbox,Y+10 %posx2% vaddCustomGUI ggenerate, Add custom GUI
 
+gui,add,button,Y+30 %posx1% gReloadTemplate, Reload template
+
 gui,show
 gosub,generate
 return
+
+ReloadTemplate()
+{
+	global
+	FileRead,template, *t raw templates\template.ahk
+	gosub generate
+}
 
 generate:
 gui,submit,nohide
 
 mode:="grab"
 skipLevel:=0
+tree:=""
 generatedCode:=""
 loop,parse,template,`n
 {
 	oneline:=a_loopfield
 	onelineTrimmed:=trim(a_loopfield)
 	
-	if (mode = "grab")
+	IfInString,onelineTrimmed,#if
 	{
-		
-		IfInString,onelineTrimmed,#if
+		expression:=trim(substr(onelinetrimmed,instr(onelineTrimmed,"#if") + strlen("#if")))
+		if (evalExpression(expression))
 		{
-			expression:=trim(substr(onelinetrimmed,instr(onelineTrimmed,"#if") + strlen("#if")))
-			if (not evalExpression(expression))
-			{
-				mode := "skip"
-				skipLevel := 1
-			}
-		}
-		else IfInString,onelineTrimmed,#endif
-		{
-			
-		}
-		else IfInString,onelineTrimmed,#else
-		{
-			mode := "skip"
+			tree.="1"
 		}
 		else
 		{
-			generatedCode.=oneline "`n"
+			tree.="0"
 		}
+		;~ MsgBox #if in line %a_index%. Tree: %tree%
 	}
-	else if (mode = "skip")
+	else IfInString,onelineTrimmed,#endif
 	{
-		if (onelineTrimmed)
-		{
-			IfInString,onelineTrimmed,#if
-			{
-				;~ MsgBox skipLevel++
-				skipLevel++
-			}
-			else IfInString,onelineTrimmed, #endif
-			{
-				;~ MsgBox skipLevel--
-				skipLevel--
-			}
-			else IfInString,onelineTrimmed, #else
-			{
-				;~ MsgBox skipLevel--
-				if (skipLevel=1)
-				{
-					skipLevel--
-				}
-			}
-			if (skipLevel=0)
-			{
-				;~ MsgBox grab
-				mode := "grab"
-			}
-		}
+		StringTrimRight,tree,tree,1
+		;~ MsgBox #endif in line %a_index%. Tree: %tree%
+	}
+	else IfInString,onelineTrimmed,#else
+	{
+		StringRight,oneTreeItem,tree,1
+		StringTrimRight,tree,tree,1
+		tree.=!oneTreeItem
+		;~ MsgBox #else in line %a_index%. Tree: %tree%
 	}
 	else
 	{
-		MsgBox error öaosdifh
+		IfNotInString,tree,0
+			generatedCode.=oneline "`n"
 	}
+	
 	
 }
 

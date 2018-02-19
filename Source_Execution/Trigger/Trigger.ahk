@@ -55,14 +55,14 @@ justEnableOneTrigger(p_Flow, p_Trigger)
 	if isfunc("Element_enable_" tempElementClass)
 	{
 		Element_enable_%tempElementClass%(triggerEnvironment, triggerEnvironment.Pars)
-		p_Flow.allelements[p_Trigger.ID].enabled := true
-		p_Flow.draw.mustdraw := true
+		;~ p_Flow.allelements[p_Trigger.ID].enabled := true
+		;~ p_Flow.draw.mustdraw := true
 	}
 	else
 	{
 		logger("a0", "Trigger " triggerEnvironment.ElementID " cannot be enabled (missing implementation)")
 	}
-	p_Flow.enabled:=true
+	;~ p_Flow.enabled:=true
 }
 
 disableTriggers(p_Flow)
@@ -143,24 +143,32 @@ saveResultOfTriggerEnabling(Environment, Result, Message)
 	Environment.Message:=Message
 	if (Result = "normal")
 	{
-		Environment.enabled:=True
+		_flows[Environment.flowID].allElements[Environment.elementID].enabled:=True
 		if (Message = "")
 			logger("a2", "Trigger " triggerEnvironment.ElementID " enabled")
 		else
 			logger("a2", "Trigger " triggerEnvironment.ElementID " enabled (" Message ")")
 	}
-	else if (result = "error")
+	else if (result = "exception")
 	{
-		Environment.enabled:=False
+		_flows[Environment.flowID].allElements[Environment.elementID].enabled:=False
 		if (Message = "")
+		{
 			logger("a0", "Trigger " triggerEnvironment.ElementID " cannot be enabled")
+			MsgBox, 16, % lang("Exception occured") , % lang("%1% '%2%' (ID '%3%') cannot be enabled due to an exception.", lang(_flows[Environment.flowID].allElements[Environment.elementID].type), _flows[Environment.flowID].allElements[Environment.elementID].name, Environment.elementID)
+		}
 		else
+		{
 			logger("a0", "Trigger " triggerEnvironment.ElementID " cannot be enabled (" Message ")")
+			MsgBox, 16, % lang("Exception occured") , % lang("%1% '%2%' (ID '%3%') cannot be enabled due to an exception.", lang(_flows[Environment.flowID].allElements[Environment.elementID].type), _flows[Environment.flowID].allElements[Environment.elementID].name, Environment.elementID) "`n`n" Message
+		}
 	}
 	else
 	{
 		logger("a0", "Trigger " triggerEnvironment.ElementID " cannot be enabled (unknown result: " Result ")")
+		MsgBox, 16, % lang("Exception occured") , % lang("%1% '%2%' (ID '%3%') cannot be enabled." "`n" lang("Unknown result: %1%", Result), lang(_flows[Environment.flowID].allElements[Environment.elementID].type), _flows[Environment.flowID].allElements[Environment.elementID].name, Environment.elementID) "`n`n" Message
 	}
+	_flows[Environment.flowID].draw.mustdraw := true
 }
 
 saveResultOfTriggerDisabling(Environment, Result, Message)
@@ -169,7 +177,7 @@ saveResultOfTriggerDisabling(Environment, Result, Message)
 	Environment.Message:=Message
 	if (Result = "normal")
 	{
-		Environment.enabled:=False
+		_flows[Environment.flowID].allElements[Environment.elementID].enabled:=False
 		if (Message = "")
 			logger("a2", "Trigger " triggerEnvironment.ElementID " disabled")
 		else
@@ -179,12 +187,17 @@ saveResultOfTriggerDisabling(Environment, Result, Message)
 	{
 		;~ Environment.enabled:=True
 		if (Message = "")
+		{
 			logger("a0", "Trigger " triggerEnvironment.ElementID " cannot be disabled")
+			MsgBox, 16, % lang("Exception occured") , % lang("%1% '%2%' (ID '%3%') cannot be disabled due to an exception.", lang(_flows[Environment.flowID].allElements[Environment.elementID].type), _flows[Environment.flowID].allElements[Environment.elementID].name, Environment.elementID)
+		}
 		else
 			logger("a0", "Trigger " triggerEnvironment.ElementID " cannot be disabled (" Message ")")
+			MsgBox, 16, % lang("Exception occured") , % lang("%1% '%2%' (ID '%3%') cannot be disabled due to an exception.", lang(_flows[Environment.flowID].allElements[Environment.elementID].type), _flows[Environment.flowID].allElements[Environment.elementID].name, Environment.elementID) "`n`n" Message
 	}
 	else
 	{
 		logger("a0", "Trigger " triggerEnvironment.ElementID " cannot be disabled (unknown result: " Result ")")
 	}
+	_flows[Environment.flowID].draw.mustdraw := true
 }

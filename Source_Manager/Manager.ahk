@@ -3,8 +3,8 @@
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
 
 SetWorkingDir %A_ScriptDir%\..  ; set working dir.
-_WorkingDir := _share._WorkingDir
-_ScriptDir := _share._ScriptDir
+global _WorkingDir := _share._WorkingDir
+global _ScriptDir := _share._ScriptDir
 SetWorkingDir %a_temp%  ; using working dir forbidden.
 
 ;~ MsgBox %_WorkingDir%
@@ -37,6 +37,7 @@ lang_setLanguage(_settings.UILanguage)
 #include source_Common\Multithreading\API Caller Main.ahk
 #include source_Common\flows\flows.ahk
 #include source_Common\settings\settings.ahk
+#include source_Common\Other\Other.ahk
 
 
 menu,tray, tip, Manager

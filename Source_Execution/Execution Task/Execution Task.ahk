@@ -124,8 +124,7 @@ executionTask()
 						{
 							if (OneThread.result = "exception")
 							{
-								
-								MsgBox % "Element " OneThread.elementID " mit Fehler: `n`n" OneThread.message
+								MsgBox, 16, % lang("Exception occured") , % lang("%1% '%2%' (ID '%3%') ended with an exception.", lang(_flows[OneThread.flowID].allElements[OneThread.elementID].type), _flows[OneThread.flowID].allElements[OneThread.elementID].name, OneThread.elementID) "`n`n" OneThread.message
 							}
 							;~ d(OneThread, "remove thread")
 							removeThread(OneThread)

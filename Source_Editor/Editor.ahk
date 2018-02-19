@@ -67,6 +67,7 @@ lang_setLanguage(_settings.UILanguage)
 #include source_Common\variables\expression evaluator.ahk
 #include source_Common\flows\flows.ahk
 #include source_Common\Elements\Elements.ahk
+#include source_Common\Other\Other.ahk
 
 AllElementClasses:=Object()
 AllTriggerClasses:=Object()

@@ -114,10 +114,6 @@ class ElementSettings
 			{
 				ElementSettingsFields.push(new this.weekdays(parameter))
 			}
-			else if (parameter.type="TimeOfDay")
-			{
-				ElementSettingsFields.push(new this.TimeOfDay(parameter))
-			}
 			else if (parameter.type="DateAndTime")
 			{
 				ElementSettingsFields.push(new this.DateAndTime(parameter))
@@ -2017,10 +2013,8 @@ class ElementSettings
 			this.components.push("GUISettingsOfElementbutton" tempParameterID)
 			ElementSettingsFieldHWNDs[tempHWND]:=this
 			
-			varsToDelete.push("GUISettingsOfElementbuttonSelectFile__" tempParameterID)
-			varsToDelete.push("GUISettingsOfElement" tempParameterID "Prompt")
-			varsToDelete.push("GUISettingsOfElement" tempParameterID "Options")
-			varsToDelete.push("GUISettingsOfElement" tempParameterID "Filter")
+			varsToDelete.push("GUISettingsOfElementbutton" tempParameterID)
+			varsToDelete.push("GUISettingsOfElement" tempParameterID)
 		}
 		
 		clickOnButton()
@@ -2109,12 +2103,12 @@ class ElementSettings
 				tempParameterID:=this.parameter.id
 			else
 				tempParameterID:=parameterID
-			GUIControlGet,temp,SettingsOfElement:,GUISettingsOfElement%tempParameterID%
 			
 			temp:=""
 			loop 7
 			{
-				if (GUISettingsOfElement%tempParameterID%%a_index%=1)
+				GUIControlGet,tempValue,SettingsOfElement:,GUISettingsOfElement%tempParameterID%%a_index%
+				if (tempValue=1)
 				{
 					temp.=A_Index
 				}
@@ -2154,6 +2148,42 @@ class ElementSettings
 			this.udpatename()
 		}
 		
+	}
+	
+	class DateAndTime extends ElementSettings.field
+	{
+		__new(parameter)
+		{
+			global
+			base.__new(parameter)
+			local temp, tempHWND
+			local tempParameterID:=parameter.id
+			local tempFormat:=parameter.format
+			if (tempFormat = "Time")
+			{
+				tempFormat := "Time"
+			}
+			else if (tempFormat = "Date")
+			{
+				tempFormat := "LongDate"
+			}
+			else if (tempFormat = "DateTime")
+			{
+				tempFormat := % "'" lang("Date") ":' " lang("MM/dd/yy") "   '" lang("Time") ":' " lang("HH:mm:ss")
+			}
+			
+			gui,font,s8 cDefault wnorm
+			temp:=setElement.pars[tempParameterID] 
+			if temp=
+			{
+				temp=%a_now%
+			}
+			gui,add,DateTime,w400 x10 choose%temp% gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID% ,% tempFormat
+			this.components.push("GUISettingsOfElement" tempParameterID)
+			ElementSettingsFieldHWNDs[tempHWND]:=this
+			
+			varsToDelete.push("GUISettingsOfElement" tempParameterID)
+		}
 	}
 	
 	class listbox extends ElementSettings.field

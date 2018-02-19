@@ -185,7 +185,7 @@ x_EvalOneParameter(EvaluatedParameters, Environment, ElementParameters, oneParID
 		oneParContent:=onePar.content
 	}
 	
-	if (oneParContent = "string")
+	if (onePar.type = "file" or onepar.type = "folder")
 	{
 		result := x_replaceVariables(Environment,ElementParameters[oneParID])
 		if (onePar.WarnIfEmpty)
@@ -197,56 +197,93 @@ x_EvalOneParameter(EvaluatedParameters, Environment, ElementParameters, oneParID
 				return EvaluatedParameters
 			}
 		}
-		EvaluatedParameters[oneParID]:=result
-	}
-	else if (oneParContent = "expression" or oneParContent = "number")
-	{
-		evRes := x_evaluateExpression(Environment,ElementParameters[oneParID])
-		if (evRes.error)
-		{
-			EvaluatedParameters._error := true
-			EvaluatedParameters._errorMessage := lang("An error occured while parsing expression '%1%'", ElementParameters[oneParID]) "`n`n" evRes.error
-			return EvaluatedParameters
-		}
-		if (onePar.WarnIfEmpty)
-		{
-			if (evRes.result = "")
-			{
-				EvaluatedParameters._error := true
-				EvaluatedParameters._errorMessage := lang("Result of expression '%1%' is empty", ElementParameters[oneParID])
-				return EvaluatedParameters
-			}
-		}
-		if (oneParContent = "number" and temp != "")
-		{
-			temp:=evRes.result
-			if temp is not number
-			{
-				EvaluatedParameters._error := true
-				EvaluatedParameters._errorMessage := lang("Result of expression '%1%' is not a number", ElementParameters[oneParID])
-				return EvaluatedParameters
-			}
-		}
-		EvaluatedParameters[oneParID] := evRes.result
-	}
-	else if (oneParContent = "VariableName")
-	{
-		result := x_replaceVariables(Environment, ElementParameters[oneParID])
-		if not x_CheckVariableName(result)
-		{
-			EvaluatedParameters._error := true
-			EvaluatedParameters._errorMessage := lang("%1% is not valid", lang("Variable name '%1%'", result))
-			return EvaluatedParameters
-		}
-		EvaluatedParameters[oneParID] := result
-	}
-	else if (oneParContent = "RawString")
-	{
-		EvaluatedParameters[oneParID] := ElementParameters[oneParID]
+		EvaluatedParameters[oneParID]:=x_GetFullPath(Environment, result)
 	}
 	else
 	{
-		EvaluatedParameters[oneParID] := ElementParameters[oneParID]
+		if (oneParContent = "string")
+		{
+			result := x_replaceVariables(Environment,ElementParameters[oneParID])
+			if (onePar.WarnIfEmpty)
+			{
+				if (result = "")
+				{
+					EvaluatedParameters._error := true
+					EvaluatedParameters._errorMessage := lang("String '%1%' is empty", ElementParameters[oneParID])
+					return EvaluatedParameters
+				}
+			}
+			EvaluatedParameters[oneParID]:=result
+		}
+		else if (oneParContent = "expression" or oneParContent = "number")
+		{
+			evRes := x_evaluateExpression(Environment,ElementParameters[oneParID])
+			if (evRes.error)
+			{
+				EvaluatedParameters._error := true
+				EvaluatedParameters._errorMessage := lang("An error occured while parsing expression '%1%'", ElementParameters[oneParID]) "`n`n" evRes.error
+				return EvaluatedParameters
+			}
+			if (onePar.WarnIfEmpty)
+			{
+				if (evRes.result = "")
+				{
+					EvaluatedParameters._error := true
+					EvaluatedParameters._errorMessage := lang("Result of expression '%1%' is empty", ElementParameters[oneParID])
+					return EvaluatedParameters
+				}
+			}
+			if (oneParContent = "number")
+			{
+				temp:=evRes.result
+				if temp is not number
+				{
+					EvaluatedParameters._error := true
+					EvaluatedParameters._errorMessage := lang("Result of expression '%1%' is not a number", ElementParameters[oneParID])
+					return EvaluatedParameters
+				}
+			}
+			EvaluatedParameters[oneParID] := evRes.result
+		}
+		else if (oneParContent = "VariableName")
+		{
+			result := x_replaceVariables(Environment, ElementParameters[oneParID])
+			if not x_CheckVariableName(result)
+			{
+				EvaluatedParameters._error := true
+				EvaluatedParameters._errorMessage := lang("%1% is not valid", lang("Variable name '%1%'", result))
+				return EvaluatedParameters
+			}
+			EvaluatedParameters[oneParID] := result
+		}
+		else if (oneParContent = "RawString")
+		{
+			result := ElementParameters[oneParID]
+			if (onePar.WarnIfEmpty)
+			{
+				if (result = "")
+				{
+					EvaluatedParameters._error := true
+					EvaluatedParameters._errorMessage := lang("Parameter '%1%' is empty", ElementParameters[oneParID])
+					return EvaluatedParameters
+				}
+			}
+			EvaluatedParameters[oneParID] := result
+		}
+		else
+		{
+			result := ElementParameters[oneParID]
+			if (onePar.WarnIfEmpty)
+			{
+				if (result = "")
+				{
+					EvaluatedParameters._error := true
+					EvaluatedParameters._errorMessage := lang("Parameter '%1%' is empty", ElementParameters[oneParID])
+					return EvaluatedParameters
+				}
+			}
+			EvaluatedParameters[oneParID] := result
+		}
 	}
 	;~ d(EvaluatedParameters, oneParID " - "  oneParContent)
 }
@@ -907,4 +944,14 @@ x_GetWorkingDir(Environment)
 	{
 		return _Flows[Environment.FlowID].flowsettings.workingdir
 	}
+}
+
+x_GetAhfPath()
+{
+	return GetAhfPath()
+}
+
+x_isWindowsStartup()
+{
+	return _share.WindowsStartup
 }

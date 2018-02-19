@@ -426,8 +426,8 @@ LoadFlowParametersOfElement(FlowID,parList,parElementID,parlocation, parSection)
 			
 		if (tempContent=="ẺⱤᶉӧɼ") ;If a parameter is not set (maybe because some new parameters were added to this element after Update of AHF)
 		{
-			;~ MsgBox % "." strobj(parElement)
 			tempContent:=parameterDefault
+			;~ d(oneParameterDetail, oneParameterID " - " tempContent)
 		}
 		StringReplace, tempContent, tempContent, |¶,`n, All
 		if (substr(tempContent,1,3) = "ῸВĴ")
