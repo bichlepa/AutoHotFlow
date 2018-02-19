@@ -176,6 +176,8 @@ Element_run_Action_Get_Control_Text(Environment, ElementParameters)
 
 	tempWinTitle:=x_replaceVariables(Environment, ElementParameters.Wintitle) 
 	tempWinText:=x_replaceVariables(Environment, ElementParameters.winText)
+	tempExcludeTitle:=EvaluatedParameters.ExcludeTitle
+	tempExcludeText:=EvaluatedParameters.ExcludeText
 	tempTitleMatchMode :=ElementParameters.TitleMatchMode
 	tempahk_class:=x_replaceVariables(Environment, ElementParameters.ahk_class)
 	tempahk_exe:=x_replaceVariables(Environment, ElementParameters.ahk_exe)

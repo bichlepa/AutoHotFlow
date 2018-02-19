@@ -333,6 +333,8 @@ Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 
 	tempWinTitle:=EvaluatedParameters.Wintitle
 	tempWinText:=EvaluatedParameters.winText
+	tempExcludeTitle:=EvaluatedParameters.ExcludeTitle
+	tempExcludeText:=EvaluatedParameters.ExcludeText
 	tempTitleMatchMode :=EvaluatedParameters.TitleMatchMode
 	tempahk_class:=EvaluatedParameters.ahk_class
 	tempahk_exe:=EvaluatedParameters.ahk_exe
@@ -689,6 +691,8 @@ Element_enable_&ElementType&_&Name&(Environment, ElementParameters)
 
 	tempWinTitle:=EvaluatedParameters.Wintitle
 	tempWinText:=EvaluatedParameters.winText
+	tempExcludeTitle:=EvaluatedParameters.ExcludeTitle
+	tempExcludeText:=EvaluatedParameters.ExcludeText
 	tempTitleMatchMode :=EvaluatedParameters.TitleMatchMode
 	tempahk_class:=EvaluatedParameters.ahk_class
 	tempahk_exe:=EvaluatedParameters.ahk_exe

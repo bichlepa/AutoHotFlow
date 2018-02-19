@@ -138,6 +138,8 @@ Element_run_Condition_Window_Exists(Environment, ElementParameters)
 
 	tempWinTitle:=EvaluatedParameters.Wintitle
 	tempWinText:=EvaluatedParameters.winText
+	tempExcludeTitle:=EvaluatedParameters.ExcludeTitle
+	tempExcludeText:=EvaluatedParameters.ExcludeText
 	tempTitleMatchMode :=EvaluatedParameters.TitleMatchMode
 	tempahk_class:=EvaluatedParameters.ahk_class
 	tempahk_exe:=EvaluatedParameters.ahk_exe

@@ -86,8 +86,7 @@ FileDelete,%a_temp%\autoHotflowTryToStartAsAdmin.txt
 #include Lib\TTS\TTS by Learning One.ahk
 
 ;Include libraries which may be used by the elements. This code is generated.
-;Lib_includes_Start
-#include lib\7z wrapper\7z wrapper.ahk
+;Lib_includes_Start#include lib\7z wrapper\7z wrapper.ahk
 global_elementInclusions = 
 (
 #include lib\7z wrapper\7z wrapper.ahk
@@ -265,6 +264,10 @@ AllTriggerClasses:=Object()
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Triggers\Shortcut.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Triggers\Start_up.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Triggers\Time_of_Day.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Triggers\User_Idle_Time.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Triggers\Window_closes.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Triggers\Window_gets_active.ahk
+#include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Triggers\Window_gets_inactive.ahk
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Triggers\Window_opens.ahk
 
 ;Element_Includes_End

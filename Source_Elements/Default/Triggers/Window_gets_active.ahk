@@ -1,32 +1,32 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Trigger_Window_Opens")
+AllElementClasses.push("Trigger_Window_Gets_Active")
 
-Element_getPackage_Trigger_Window_Opens()
+Element_getPackage_Trigger_Window_Gets_Active()
 {
 	return "default"
 }
 
-Element_getElementType_Trigger_Window_Opens()
+Element_getElementType_Trigger_Window_Gets_Active()
 {
 	return "trigger"
 }
 
-Element_getName_Trigger_Window_Opens()
+Element_getName_Trigger_Window_Gets_Active()
 {
-	return lang("Window_Opens")
+	return lang("Window_Gets_Active")
 }
 
-Element_getIconPath_Trigger_Window_Opens()
+Element_getIconPath_Trigger_Window_Gets_Active()
 {
 	;~ return "Source_elements\default\icons\keyboard.png"
 }
 
-Element_getCategory_Trigger_Window_Opens()
+Element_getCategory_Trigger_Window_Gets_Active()
 {
 	return lang("Window")
 }
 
-Element_getParameters_Trigger_Window_Opens()
+Element_getParameters_Trigger_Window_Gets_Active()
 {
 	parametersToEdit:=Object()
 	
@@ -47,7 +47,7 @@ Element_getParameters_Trigger_Window_Opens()
 	return parametersToEdit
 }
 
-Element_getParametrizationDetails_Trigger_Window_Opens(Environment)
+Element_getParametrizationDetails_Trigger_Window_Gets_Active(Environment)
 {
 	
 	parametersToEdit:=Object()
@@ -80,7 +80,7 @@ Element_getParametrizationDetails_Trigger_Window_Opens(Environment)
 	return parametersToEdit
 }
 
-Element_GenerateName_Trigger_Window_Opens(Environment, ElementParameters)
+Element_GenerateName_Trigger_Window_Gets_Active(Environment, ElementParameters)
 {
 	global
 	local tempNameString
@@ -108,17 +108,17 @@ Element_GenerateName_Trigger_Window_Opens(Environment, ElementParameters)
 	if (ElementParameters.ahk_pid)
 		tempNameString:=tempNameString "`n" lang("Process_ID") ": " ElementParameters.ahk_pid
 	
-	return lang("Window_Opens") ": " tempNameString
+	return lang("Window_Gets_Active") ": " tempNameString
 	
 	
 }
 
-Element_CheckSettings_Trigger_Window_Opens(Environment, ElementParameters)
+Element_CheckSettings_Trigger_Window_Gets_Active(Environment, ElementParameters)
 {	
 	
 }
 
-Element_enable_Trigger_Window_Opens(Environment, ElementParameters)
+Element_enable_Trigger_Window_Gets_Active(Environment, ElementParameters)
 {
 	EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters)
 	if (EvaluatedParameters._error)
@@ -173,14 +173,14 @@ Element_enable_Trigger_Window_Opens(Environment, ElementParameters)
 		DetectHiddenWindows,%findhiddenwindow%
 		if (NotTriggerOnEnable)
 		{
-			WinWaitClose %winstring%, %wintext%, , %excludeTitle%, %excludeText%
+			WinWaitNotActive %winstring%, %wintext%, , %excludeTitle%, %excludeText%
 		}
 		loop
 		{
-			WinWait,%winstring%, %wintext%, , %excludeTitle%, %excludeText%
+			WinWaitActive,%winstring%, %wintext%, , %excludeTitle%, %excludeText%
 			winget,windowID,ID
 			x_trigger()
-			WinWaitClose %winstring%, %wintext%, , %excludeTitle%, %excludeText%
+			WinWaitNotActive %winstring%, %wintext%, , %excludeTitle%, %excludeText%
 			
 		}
 	
@@ -193,14 +193,14 @@ Element_enable_Trigger_Window_Opens(Environment, ElementParameters)
 
 }
 
-Element_postTrigger_Trigger_Window_Opens(Environment, ElementParameters)
+Element_postTrigger_Trigger_Window_Gets_Active(Environment, ElementParameters)
 {
 	exportedValues:=x_TriggerInNewAHKThread_GetExportedValues(Environment)
 	x_SetVariable(Environment, "a_WindowID", exportedValues.windowID, "Thread")
 }
 
 
-Element_disable_Trigger_Window_Opens(Environment, ElementParameters)
+Element_disable_Trigger_Window_Gets_Active(Environment, ElementParameters)
 {
 	x_TriggerInNewAHKThread_Stop(Environment)
 	x_disabled(Environment, "normal", lang("Stopped."))

@@ -1,40 +1,36 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Action_Activate_Window")
+AllElementClasses.push("Trigger_Window_Gets_Inactive")
 
-Element_getPackage_Action_Activate_Window()
+Element_getPackage_Trigger_Window_Gets_Inactive()
 {
 	return "default"
 }
 
-Element_getElementType_Action_Activate_Window()
+Element_getElementType_Trigger_Window_Gets_Inactive()
 {
-	return "action"
+	return "trigger"
 }
 
-Element_getElementLevel_Action_Activate_Window()
+Element_getName_Trigger_Window_Gets_Inactive()
 {
-	;"Beginner" or "Advanced" or "Programmer"
-	return "Beginner"
+	return lang("Window_Gets_Inactive")
 }
 
-Element_getName_Action_Activate_Window()
+Element_getIconPath_Trigger_Window_Gets_Inactive()
 {
-	return lang("Activate_Window")
+	;~ return "Source_elements\default\icons\keyboard.png"
 }
 
-Element_getIconPath_Action_Activate_Window()
-{
-	;~ return "Source_elements\default\icons\Bullhorn.png"
-}
-
-Element_getCategory_Action_Activate_Window()
+Element_getCategory_Trigger_Window_Gets_Inactive()
 {
 	return lang("Window")
 }
 
-Element_getParameters_Action_Activate_Window()
+Element_getParameters_Trigger_Window_Gets_Inactive()
 {
 	parametersToEdit:=Object()
+	
+	parametersToEdit.push({id: "NotTriggerOnEnable"})
 	
 	parametersToEdit.push({id: "TitleMatchMode"})
 	parametersToEdit.push({id: "Wintitle"})
@@ -51,27 +47,28 @@ Element_getParameters_Action_Activate_Window()
 	return parametersToEdit
 }
 
-Element_getParametrizationDetails_Action_Activate_Window(Environment)
-{	
+Element_getParametrizationDetails_Trigger_Window_Gets_Inactive(Environment)
+{
+	
 	parametersToEdit:=Object()
 	parametersToEdit.push({type: "Label", label: lang("Title_of_Window")})
 	parametersToEdit.push({type: "Radio", id: "TitleMatchMode", default: 1, choices: [lang("Start_with"), lang("Contain_anywhere"), lang("Exactly")]})
-	parametersToEdit.push({type: "edit", id: "Wintitle", content: "String"})
+	parametersToEdit.push({type: "Edit", id: "Wintitle", content: "String"})
 	parametersToEdit.push({type: "Label", label: lang("Exclude_title")})
-	parametersToEdit.push({type: "edit", id: "excludeTitle", content: "String"})
+	parametersToEdit.push({type: "Edit", id: "excludeTitle", content: "String"})
 	parametersToEdit.push({type: "Label", label: lang("Text_of_a_control_in_Window")})
-	parametersToEdit.push({type: "edit", id: "winText", content: "String"})
+	parametersToEdit.push({type: "Edit", id: "winText", content: "String"})
 	parametersToEdit.push({type: "Checkbox", id: "FindHiddenText", default: 0, label: lang("Detect hidden text")})
 	parametersToEdit.push({type: "Label", label: lang("Exclude_text_of_a_control_in_window")})
-	parametersToEdit.push({type: "edit", id: "ExcludeText", content: "String"})
+	parametersToEdit.push({type: "Edit", id: "ExcludeText", content: "String"})
 	parametersToEdit.push({type: "Label", label: lang("Window_Class")})
-	parametersToEdit.push({type: "edit", id: "ahk_class", content: "String"})
+	parametersToEdit.push({type: "Edit", id: "ahk_class", content: "String"})
 	parametersToEdit.push({type: "Label", label: lang("Process_Name")})
-	parametersToEdit.push({type: "edit", id: "ahk_exe", content: "String"})
+	parametersToEdit.push({type: "Edit", id: "ahk_exe", content: "String"})
 	parametersToEdit.push({type: "Label", label: lang("Unique_window_ID")})
-	parametersToEdit.push({type: "edit", id: "ahk_id", content: "String"})
+	parametersToEdit.push({type: "Edit", id: "ahk_id", content: "String"})
 	parametersToEdit.push({type: "Label", label: lang("Unique_Process_ID")})
-	parametersToEdit.push({type: "edit", id: "ahk_pid", content: "String"})
+	parametersToEdit.push({type: "Edit", id: "ahk_pid", content: "String"})
 	parametersToEdit.push({type: "Label", label: lang("Hidden window")})
 	parametersToEdit.push({type: "Checkbox", id: "FindHiddenWindow", default: 0, label: lang("Detect hidden window")})
 	parametersToEdit.push({type: "Label", label: lang("Get_parameters")})
@@ -80,8 +77,9 @@ Element_getParametrizationDetails_Action_Activate_Window(Environment)
 	return parametersToEdit
 }
 
-Element_GenerateName_Action_Activate_Window(Environment, ElementParameters)
+Element_GenerateName_Trigger_Window_Gets_Inactive(Environment, ElementParameters)
 {
+	global
 	local tempNameString
 	if (ElementParameters.Wintitle)
 	{
@@ -107,33 +105,44 @@ Element_GenerateName_Action_Activate_Window(Environment, ElementParameters)
 	if (ElementParameters.ahk_pid)
 		tempNameString:=tempNameString "`n" lang("Process_ID") ": " ElementParameters.ahk_pid
 	
-	return lang("Activate_Window") ": " tempNameString
+	return lang("Window_Gets_Inactive") ": " tempNameString
+	
 	
 }
 
-Element_run_Action_Activate_Window(Environment, ElementParameters)
-{
-	local tempWinid
+Element_CheckSettings_Trigger_Window_Gets_Inactive(Environment, ElementParameters)
+{	
 	
-	tempWinTitle:=x_replaceVariables(Environment, ElementParameters.Wintitle) 
-	tempWinText:=x_replaceVariables(Environment, ElementParameters.winText)
+}
+
+Element_enable_Trigger_Window_Gets_Inactive(Environment, ElementParameters)
+{
+	EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters)
+	if (EvaluatedParameters._error)
+	{
+		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
+		return
+	}
+
+	tempWinTitle:=EvaluatedParameters.Wintitle
+	tempWinText:=EvaluatedParameters.winText
 	tempExcludeTitle:=EvaluatedParameters.ExcludeTitle
 	tempExcludeText:=EvaluatedParameters.ExcludeText
-	tempTitleMatchMode :=ElementParameters.TitleMatchMode
-	tempahk_class:=x_replaceVariables(Environment, ElementParameters.ahk_class)
-	tempahk_exe:=x_replaceVariables(Environment, ElementParameters.ahk_exe)
-	tempahk_id:=x_replaceVariables(Environment, ElementParameters.ahk_id)
-	tempahk_pid:=x_replaceVariables(Environment, ElementParameters.ahk_pid)
+	tempTitleMatchMode :=EvaluatedParameters.TitleMatchMode
+	tempahk_class:=EvaluatedParameters.ahk_class
+	tempahk_exe:=EvaluatedParameters.ahk_exe
+	tempahk_id:= EvaluatedParameters.ahk_id
+	tempahk_pid:= EvaluatedParameters.ahk_pid
 	
-	tempwinstring:=tempWinTitle
-	if tempahk_class
-		tempwinstring:=tempwinstring " ahk_class " tempahk_class
-	if tempahk_id
-		tempwinstring:=tempwinstring " ahk_id " tempahk_id
-	if tempahk_pid
-		tempwinstring:=tempwinstring " ahk_pid " tempahk_pid
-	if tempahk_exe
-		tempwinstring:=tempwinstring " ahk_exe " tempahk_exe
+	tempwinstring=%tempWinTitle%
+	if tempahk_class<>
+		tempwinstring=%tempwinstring% ahk_class %tempahk_class%
+	if tempahk_id<>
+		tempwinstring=%tempwinstring% ahk_id %tempahk_id%
+	if tempahk_pid<>
+		tempwinstring=%tempwinstring% ahk_pid %tempahk_pid%
+	if tempahk_exe<>
+		tempwinstring=%tempwinstring% ahk_exe %tempahk_exe%
 	
 	;If no window specified, error
 	if (tempwinstring="" and tempWinText="")
@@ -150,22 +159,42 @@ Element_run_Action_Activate_Window(Environment, ElementParameters)
 		tempfindhiddentext = off
 	else
 		tempfindhiddentext = on
+	
+	inputVars:={winstring: tempwinstring, wintext: tempWinText, excludeTitle: tempExcludeTitle, excludeText: tempExcludeText, titlematchmode: tempTitleMatchMode, findhiddenwindow: tempFindHiddenWindows, findhiddentext: tempfindhiddentext}
+	outputVars:=["windowID"]
+	code =
+	( ` , LTrim %
+	
+		SetTitleMatchMode,%titlematchmode%
+		DetectHiddenText,%findhiddentext%
+		DetectHiddenWindows,%findhiddenwindow%
+		loop
+		{
+			WinWaitActive,%winstring%, %wintext%, , %excludeTitle%, %excludeText%
+			winget,windowID,ID
+			WinWaitNotActive %winstring%, %wintext%, , %excludeTitle%, %excludeText%
+			x_trigger()
+			
+		}
+	
+	)
+	
+	
+	x_TriggerInNewAHKThread(Environment, code, inputVars, outputVars)
+	
+	x_enabled(Environment, "normal", lang("Waiting for defined window to appear.",temphotkey))
 
-	SetTitleMatchMode,%tempTitleMatchMode%
-	DetectHiddenWindows,%tempFindHiddenWindows%
-	DetectHiddenText,%tempfindhiddentext%
+}
 
-	tempWinid:=winexist(tempwinstring,tempWinText,tempExcludeTitle,tempExcludeText)
-	if tempWinid
-	{
-		x_SetVariable(Environment,"A_WindowID",tempWinid,"Thread")
-		WinActivate,ahk_id %tempWinid%
-		x_finish(Environment, "normal")
-		return
-	}
-	else
-	{
-		x_finish(Environment, "exception", lang("Error! Seeked window does not exist")) 
-		return
-	}
+Element_postTrigger_Trigger_Window_Gets_Inactive(Environment, ElementParameters)
+{
+	exportedValues:=x_TriggerInNewAHKThread_GetExportedValues(Environment)
+	x_SetVariable(Environment, "a_WindowID", exportedValues.windowID, "Thread")
+}
+
+
+Element_disable_Trigger_Window_Gets_Inactive(Environment, ElementParameters)
+{
+	x_TriggerInNewAHKThread_Stop(Environment)
+	x_disabled(Environment, "normal", lang("Stopped."))
 }
