@@ -139,19 +139,44 @@ state_Redo(p_FlowID)
 
 states_Update(p_FlowID, p_StateID)
 {
-	_flows[p_FlowID].states[p_StateID].allElements:=ObjFullyClone(_flows[p_FlowID].allElements)
+	;Find out whether there are changes in trigger parameters. If so, the trigger must be disabled and reenabled again
+	changedTriggers := findTriggersWhichHaveBeenChanged(p_FlowID, _flows[p_FlowID].currentState)
 	
+	for oneIndex, oneelementID in changedTriggers
+	{
+		disableOneTrigger(p_FlowID, oneelementID, false)
+	}
+	
+	_flows[p_FlowID].states[p_StateID].allElements:=ObjFullyClone(_flows[p_FlowID].allElements)
 	_flows[p_FlowID].states[p_StateID].allConnections:=ObjFullyClone(_flows[p_FlowID].allConnections)
 	_flows[p_FlowID].states[p_StateID].allTriggers:=ObjFullyClone(_flows[p_FlowID].allTriggers)
 	_flows[p_FlowID].states[p_StateID].Settings:=ObjFullyClone(_flows[p_FlowID].Settings)
 	
+	for oneIndex, oneelementID in changedTriggers
+	{
+		enableOneTrigger(p_FlowID, oneelementID, false)
+	}
 }
+
 states_Restore(p_FlowID, p_StateID)
 {
+	;Find out whether there are changes in trigger parameters. If so, the trigger must be disabled and reenabled again
+	changedTriggers := findTriggersWhichHaveBeenChanged(p_FlowID, _flows[p_FlowID].currentState)
+	
+	for oneIndex, oneelementID in changedTriggers
+	{
+		disableOneTrigger(p_FlowID, oneelementID, false)
+	}
+	
 	_flows[p_FlowID].allElements:=ObjFullyClone(_flows[p_FlowID].states[p_StateID].allElements)
 	_flows[p_FlowID].allConnections:=ObjFullyClone(_flows[p_FlowID].states[p_StateID].allConnections)
 	_flows[p_FlowID].allTriggers:=ObjFullyClone(_flows[p_FlowID].states[p_StateID].allTriggers)
 	_flows[p_FlowID].Settings:=ObjFullyClone(_flows[p_FlowID].states[p_StateID].Settings)
+	
+	for oneIndex, oneelementID in changedTriggers
+	{
+		enableOneTrigger(p_FlowID, oneelementID, false)
+	}
 	
 	;Restore marked elements
 	for tempID, tempObj in _flows[p_FlowID].allElements
@@ -217,4 +242,33 @@ states_DeleteTooOld(p_FlowID)
 		}
 	}
 	
+}
+
+
+findTriggersWhichHaveBeenChanged(p_FlowID, p_StateID)
+{
+	;Find out whether there are changes in trigger parameters.
+	changedTriggers:=Object()
+	for oneelementID, oneelement in _flows[p_FlowID].allElements
+	{
+		if (oneelement.type = "trigger" and oneelement.enabled = true)
+		{
+			secondElement:=_flows[p_FlowID].states[p_StateID].allElements[oneelementID]
+			differenceFound:=false
+				;~ d(oneelement)
+				;~ d(secondElement)
+			
+			differenceFound := !ObjFullyCompare_oneDir(oneelement.pars, secondElement.pars)
+			
+			if (oneelement.class != secondElement.class)
+			{
+				differenceFound:=true
+			}
+			if (differenceFound)
+			{
+				changedTriggers.push(oneelementID)
+			}
+		}
+	}
+	return changedTriggers
 }

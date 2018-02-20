@@ -18,7 +18,6 @@ _flows is an associative array of objects. Each object contains some information
 		.subtype		Element subtype name
 		.class			Element class name. Equals to %type%_%subtype%
 		.pars			Associative Array with the parameters of the element
-		.triggers		If element contains triggers, this will be an array of trigger IDs TODO: remove this line
 		.fromConnections	A list of connection IDs which start from the element
 		.toConnections	A list of connection IDs which end on the element
 		
