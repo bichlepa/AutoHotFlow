@@ -5,7 +5,6 @@ _ahkCriticalSectionExecution := CriticalSection()
 global_CriticalSectionGlobalVars := CriticalSection()
 
 
-;~ global_elementInclusions := "`n"
 loop, files, %_ScriptDir%\source_Elements\*.ahk, FR
 {
 	if not (substr(A_LoopFileName,1,1)=="_")
@@ -30,7 +29,7 @@ Thread_StartManager()
 }
 
 
-Thread_StoppAll()
+Thread_StopAll()
 {
 	global
 	local threadsCopy

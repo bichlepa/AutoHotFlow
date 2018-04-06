@@ -2,15 +2,19 @@
 ;#Warn  ; Recommended for catching common errors.
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
 
-global _ScriptDir, _WorkingDir
+;Using working dir forbidden.
+;The reason is that while any thread uses the command FileSelectFile, the working directory of the working directory of the whole process is changed to the path which is shown in the dialog.
+SetWorkingDir %a_temp%  
+
+;Set some super global variables
 global _ahkThreadID:="Main"
 
-SetWorkingDir %A_ScriptDir%\..  ; set working dir.
-global _ScriptDir := A_WorkingDir
+SetWorkingDir %A_ScriptDir%\..  ; set working dir, which should be the path of AutoHotFlow.ahk/exe
+global _ScriptDir := A_ScriptDir "\.." ;The directory of AutoHotFlow.ahk/exe
 
 ;if portable installation, the script dir is the working dir. 
 ;If installed in programs folder, it is a dir which is writable without admin rights
-global _WorkingDir := A_WorkingDir
+global _WorkingDir := _ScriptDir
 IfInString, _WorkingDir, %A_ProgramFiles%
 {
 	_WorkingDir = %A_AppData%\AutoHotFlow
@@ -18,38 +22,34 @@ IfInString, _WorkingDir, %A_ProgramFiles%
 		FileCreateDir, %_WorkingDir%
 }
 
-;First of all initialize global variables and load the settings
+;Initialize global variables and load the settings
 gosub, init_GlobalVars
 load_settings()
-logger("a1", "startup")
 
-
-;If AutoHotFlow is started automatically on windows startup
+;If AutoHotFlow is started automatically on windows startup.
+;This information is passed by command line parameter of the link which is stored in the autorun folder.
 firstCommandLineParameter = %1%
 _share.WindowsStartup := (firstCommandLineParameter = "WindowsStartup")
-;~ d(_share.WindowsStartup, firstCommandLineParameter)
 
-; using working dir forbidden.
-;The reason is that while any thread uses the command FileSelectFile, the working directory of the working directory of the whole process is changed to the path which is shown in the dialog.
-SetWorkingDir %a_temp%  
-;~ MsgBox %_WorkingDir%
+#Include %A_ScriptDir%\.. ;Include path is the directory of AutoHotFlow.ahk/exe
 
-;~ MsgBox %1% - %2% - %3% - %4% - %5%
-OnExit,exit
-
-#Include %A_ScriptDir%\..
-
+;Initialize language.ahk
 #include language\language.ahk
 _language:=Object()
 _language.dir:=_ScriptDir "\language" ;Directory where the translations are stored
 lang_Init()
 lang_setLanguage(_settings.UILanguage)
 
+;The logger will allow to log messages
 initLog()
+logger("a1", "startup")
 
-;if setting run as admin active
+OnExit,exit ;This will allow to save unsaved flows if AutoHotFlow is closed
+
+;if setting run as admin active, try to gain administrator rights
 if (_settings.runAsAdmin and not A_IsAdmin)
 {
+	;User a file to catch if gaining administrator rights fails multiple times
 	FileRead,triedtostart,%a_temp%\autoHotflowTryToStartAsAdmin.txt
 	IfInString, triedtostart, 111
 	{
@@ -64,32 +64,38 @@ if (_settings.runAsAdmin and not A_IsAdmin)
 	if not skipstartAsAdmin
 	{
 		FileAppend,1,%a_temp%\autoHotflowTryToStartAsAdmin.txt
-		try Run *RunAs "%A_ScriptFullPath%" 
+		try Run *RunAs "%A_ScriptFullPath%" ;Run as admin. See https://autohotkey.com/docs/commands/Run.htm#RunAs
 		ExitApp
 	}
 	
 	;~ RunAsAdmin()
 }
+ ;If we reach that line, either no administartor rights are needed, or administrator rights are granted. Therefore remove that file.
 FileDelete,%a_temp%\autoHotflowTryToStartAsAdmin.txt
 
-
+;Some library function includes
 #include lib\Object to file\String-object-file.ahk
 #include lib\Robert - Ini library\Robert - Ini library.ahk
 #include lib\ObjHasValue\ObjHasValue.ahk
 #include lib\ObjFullyClone\ObjFullyClone.ahk
 #include lib\Random Word List\Random Word List.ahk
-#include Lib\Eject by SKAN\Eject by SKAN.ahk
-#include Lib\Class_Monitor\Class_Monitor.ahk
-#include Lib\HTTP Request\HTTPRequest.ahk
-#include Lib\HTTP Request\Uriencode.ahk
 #include Lib\gdi+\gdip.ahk
-#include Lib\TTS\TTS by Learning One.ahk
 
 ;Include libraries which may be used by the elements. This code is generated.
 ;Lib_includes_Start#include lib\7z wrapper\7z wrapper.ahk
+	#include Lib\TTS\TTS by Learning One.ahk
+	#include Lib\Eject by SKAN\Eject by SKAN.ahk
+	#include Lib\Class_Monitor\Class_Monitor.ahk
+	#include Lib\HTTP Request\HTTPRequest.ahk
+	#include Lib\HTTP Request\Uriencode.ahk
 global_elementInclusions = 
 (
 #include lib\7z wrapper\7z wrapper.ahk
+	#include Lib\TTS\TTS by Learning One.ahk
+	#include Lib\Eject by SKAN\Eject by SKAN.ahk
+	#include Lib\Class_Monitor\Class_Monitor.ahk
+	#include Lib\HTTP Request\HTTPRequest.ahk
+	#include Lib\HTTP Request\Uriencode.ahk
 
 )
 
@@ -129,10 +135,11 @@ global_elementInclusions =
 #include source_Common\Elements\Elements.ahk
 #include source_Common\Other\Other.ahk
 
+;Those two variables are filled by the elements when they are included
 AllElementClasses:=Object()
 AllTriggerClasses:=Object()
 
-;Includ elements. This code is generated
+;Include elements. This code is generated
 ;The elements must be included before the other treads are started
 ;Element_Includes_Start
 #include C:\Users\Paul\Documents\GitHub\AutoHotFlow v1\source_Elements\Default\Actions\Absolute_Number.ahk
@@ -275,42 +282,45 @@ AllTriggerClasses:=Object()
 
 
 
-;Start other threads
+;Start other threads. Multi-threading gain the performance hevily
+;and execution of flows does not influence the GUI performance.
 Thread_StartManager()
 Thread_StartDraw()
 Thread_StartExecution()
 
-;Find flows and activate some triggers
+;Find saved flows and activate triggers of active flows
 FindFlows()
+
+;Now the triggers "Startup" have triggered. We don't need this flag anymore.
 _share.WindowsStartup:=false
 
-;Initialize a hidden command window
+;Initialize a hidden command window. This window is able to receive commands from other processes.
+;The first purpose is that the script AutoHotFlow.ahk/exe can send commands if a shortcut of the trigger "shortcut" is opened.
 CreateHiddenCommandWindow()
 return
 
 
 
-ExitApp
-
-;Beendet AutoHotFlow. Kann von allen Threads aufgerufen werden
+;This function can be called by all threads. It will close AutoHotFlow.
 exit()
 {
-	SetTimer,exitt,10
+	;Only set timer in order to return. This is needed if the function is called from other thread.
+	SetTimer,exitLabel,10
 }
 
-exitt:
-ExitApp
+exitLabel:
+ExitApp ;Because we used "OnExit,exit" this command will cause the label "exit" to execute. 
 return
 
 exit:
-global _exitingNow
+global _exitingNow ;Make this variable super global
 
-if (_exitingNow!=true)
+if (_exitingNow!=true) ;Prevent multiple execution of this code by setting this flag
 {
 	_exitingNow:=true
 	
-	i_SaveUnsavedFlows()
+	i_SaveUnsavedFlows() ;Save unsaved flows.
 	
-	Thread_StoppAll()
+	Thread_StopAll() ;Stop all other threads
 }
 ExitApp

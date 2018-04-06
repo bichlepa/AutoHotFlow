@@ -3,12 +3,15 @@
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
 SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 ;~ MsgBox '%1%' - %2% - %3% - %4% - %5%
+
+;Handle a command line parameter if any
 command=%1%
 commandMessage=%2%
 if (command = "AHFCommand")
 {
 	DetectHiddenWindows,on
-	;~ MsgBox %A_ScriptDir% AHF_HIDDEN_COMMAND_WINDOW
+	
+	;If an instance of AutoHotFlow already exists, pass the command to the hidden window of AutoHotFlow
 	IfWinExist,%A_ScriptDir% AHF_HIDDEN_COMMAND_WINDOW
 	{
 		ControlSetText,Edit1,%commandMessage%,%A_ScriptDir% AHF_HIDDEN_COMMAND_WINDOW
@@ -19,15 +22,23 @@ if (command = "AHFCommand")
 if not (a_iscompiled)
 {
 	;This is only executing while developing
+	;Here, some source files are automatically modified
 	
+	;Those includes are needed by the elements
+	;They will be inserted in main.ahk and from there in editor.ahk and execution.ahk
 	Libincludes=
 	(
 	#include lib\7z wrapper\7z wrapper.ahk
+	#include Lib\TTS\TTS by Learning One.ahk
+	#include Lib\Eject by SKAN\Eject by SKAN.ahk
+	#include Lib\Class_Monitor\Class_Monitor.ahk
+	#include Lib\HTTP Request\HTTPRequest.ahk
+	#include Lib\HTTP Request\Uriencode.ahk
 	
 	)
 	Libincludes.= "global_elementInclusions = `n(`n" Libincludes "`n)`n"
 	
-	;Find all elements in folder Source_Elements
+	;Find all elements in folder Source_Elements to include them in main.ahk later
 	elementInclusions := "`n"
 	loop, files, %A_WorkingDir%\source_Elements\*.ahk, FR
 	{
@@ -42,20 +53,20 @@ if not (a_iscompiled)
 	posstart+= strlen(";Element_Includes_Start") +1
 	stringgetpos,posend,mainfilecontent,;Element_Includes_End
 	posend-=1
-	;~ MsgBox % posend "-" SubStr(mainfilecontent,posend,100000)
-	mainfilecontent:=substr(mainfilecontent,1,posstart) elementInclusions SubStr(mainfilecontent,posend,100000)
+	mainfilecontent:=substr(mainfilecontent,1,posstart) elementInclusions SubStr(mainfilecontent,posend)
 	
 	StringGetPos,posstart,mainfilecontent,;Lib_Includes_Start
 	posstart+= strlen(";Lib_Includes_Start") +1
 	stringgetpos,posend,mainfilecontent,;Lib_Includes_End
 	posend-=1
-	;~ MsgBox % posend "-" SubStr(mainfilecontent,posend,100000)
-	mainfilecontent:=substr(mainfilecontent,1,posstart) Libincludes SubStr(mainfilecontent,posend,100000)
+	mainfilecontent:=substr(mainfilecontent,1,posstart) Libincludes SubStr(mainfilecontent,posend)
 
-	;~ MsgBox %mainfilecontent%
 	FileDelete,source_main\main.ahk
 	FileAppend,%mainfilecontent%,source_main\main.ahk
 
+	;The element API functions are written three times for each of those threads: main, execution, editor
+	;If a new API function is created for the thread execution,
+	;this code automatically adds empty API functions for the other threads
 
 	;Find all element API functions
 	FileRead,apifileExecution,*t %A_WorkingDir%\source_Execution\api\Functions for elements.ahk
@@ -70,7 +81,6 @@ if not (a_iscompiled)
 			StringLeft, funcname, oneLine, % pos1
 			StringTrimLeft, pars, oneline, % pos1
 			allFunctions.push({line: oneLine, Name: funcname, pars: pars})
-			
 		}
 	}
 	FileRead,apifileEditor,*t %A_WorkingDir%\source_Editor\api\api caller elements.ahk
@@ -101,13 +111,11 @@ if not (a_iscompiled)
 				StringReplace, apifile, apifile,% function,% oneFuncion.name oneFuncion.pars
 			}
 			
-			
 			if a_index = 1
 				apifileEditor:=apiFile
 			else if a_index=2
 				apifileMain:=apiFile
 		}
-		
 	}
 	
 	;~ MsgBox %apifileEditor%
@@ -118,10 +126,11 @@ if not (a_iscompiled)
 	
 }
 
-;At last run main.ahk
+;At last run main.ahk passing all command line parameters which were passed to this script
 run,autohotkey\autohotkey_h.exe "%A_ScriptDir%\source_main\main.ahk" "%1%" "%2%" "%3%" "%4%" "%5%" "%6%" "%7%" "%8%" "%9%" "%10%"
 
-
+;If there is a command which must be processed by AutoHotFlow, pass it after it has started
+;TODO: Main.ahk should process the command itself.
 if (command = "AHFCommand")
 {
 	DetectHiddenWindows,on

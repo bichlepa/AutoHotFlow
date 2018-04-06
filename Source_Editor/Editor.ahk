@@ -31,11 +31,6 @@ lang_setLanguage(_settings.UILanguage)
 #include lib\objhasvalue\objhasvalue.ahk
 #include lib\ObjFullyClone\ObjFullyClone.ahk
 #include lib\Random Word List\Random Word List.ahk
-#include Lib\Eject by SKAN\Eject by SKAN.ahk
-#include Lib\Class_Monitor\Class_Monitor.ahk
-#include Lib\HTTP Request\HTTPRequest.ahk
-#include Lib\HTTP Request\Uriencode.ahk
-#include Lib\TTS\TTS by Learning One.ahk
 
 #include Source_Editor\User Interface\Editor GUI.ahk
 #include Source_Editor\User Interface\Editor GUI user input.ahk

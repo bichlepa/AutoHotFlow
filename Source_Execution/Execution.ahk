@@ -25,12 +25,7 @@ lang_setLanguage(_settings.UILanguage)
 #include Lib\Object to file\String-object-file.ahk
 #include Lib\ObjFullyClone\ObjFullyClone.ahk
 #include lib\Random Word List\Random Word List.ahk
-#include Lib\Eject by SKAN\Eject by SKAN.ahk
-#include Lib\Class_Monitor\Class_Monitor.ahk
-#include Lib\HTTP Request\HTTPRequest.ahk
-#include Lib\HTTP Request\Uriencode.ahk
 #include Lib\gdi+\gdip.ahk
-#include Lib\TTS\TTS by Learning One.ahk
 
 ;~ #include Source_Draw\API\API receiver execution.ahk
 
