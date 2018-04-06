@@ -102,8 +102,8 @@ InitFlow(FileFullPath)
 	;~ d(_flows[newFlowid])
 	if (_share.FindFlows_Called)
 	{
-		API_manager_TreeView_Refill()
-		API_manager_TreeView_Select("Flow", newFlowid)
+		_share.managerTasks.refillTree:=true
+		_share.managerTasks.select:="Flow:" newFlowid
 	}
 	
 	_flows[newFlowID].draw := []
@@ -179,8 +179,8 @@ NewFlow(par_CategoryID = "")
 	;Add TV entry
 	if (_share.FindFlows_Called)
 	{
-		API_manager_TreeView_Refill()
-		API_manager_TreeView_Select("Flow", newFlowid)
+		_share.managerTasks.refillTree:=true
+		_share.managerTasks.select:="Flow:" newFlowid
 	}
 
 	return newFlowid
@@ -248,8 +248,8 @@ NewCategory(par_Newname = "")
 	_share.allCategories[newCategoryid].Type = Category
 	if (_share.FindFlows_Called)
 	{
-		API_manager_TreeView_Refill()
-		API_manager_TreeView_Select("Flow", newFlowid)
+		_share.managerTasks.refillTree:=true
+		_share.managerTasks.select:="Flow:" newFlowid
 	}
 	;~ d(allCategories)
 	return newCategoryid
@@ -270,8 +270,8 @@ ChangeFlowCategory(par_FlowID, par_CategoryID)
 	
 	if (_share.FindFlows_Called)
 	{
-		API_manager_TreeView_Refill()
-		API_manager_TreeView_Select("Flow", newFlowid)
+		_share.managerTasks.refillTree:=true
+		_share.managerTasks.select:="Flow:" newFlowid
 	}
 }
 
@@ -295,8 +295,8 @@ DeleteFlow(par_ID)
 	;Refresh treeview
 	if (_share.FindFlows_Called)
 	{
-		API_manager_TreeView_Refill()
-		API_manager_TreeView_Select("Category", parentcategory, "expand")
+		_share.managerTasks.refillTree:=true
+		_share.managerTasks.select:="Category:" parentcategory ":expand"
 	}
 }
 
@@ -351,8 +351,8 @@ DuplicateFlow(par_ID)
 	;Add TV entry
 	if (_share.FindFlows_Called)
 	{
-		API_manager_TreeView_Refill()
-		API_manager_TreeView_Select("Flow", newFlowid)
+		_share.managerTasks.refillTree:=true
+		_share.managerTasks.select:="Flow:" newFlowid
 	}
 
 }
@@ -365,6 +365,37 @@ DeleteCategory(par_ID)
 	;Upadte TV entries
 	if (_share.FindFlows_Called)
 	{
-		API_manager_TreeView_Refill()
+		_share.managerTasks.refillTree:=true
+		_share.managerTasks.select:="Flow:" newFlowid
 	}
+}
+
+
+FlowIDbyName(par_name,Type="") ;Returns the id by name
+{
+	global
+	if ((type = "flow") or (type = ""))
+	{
+		for count, tempitem in _flows
+		{
+			if (tempitem.name = par_name)
+			{
+				;~ MsgBox % tempitem.id " - " tempitem.name
+				return tempitem.id
+			}
+			
+		}
+	}
+	else if ((type = "category") or (type = ""))
+	{
+		for count, tempitem in _share.allCategories
+		{
+			if (tempitem.name = par_name)
+			{
+				return tempitem.id
+			}
+			
+		}
+	}
+	return 
 }

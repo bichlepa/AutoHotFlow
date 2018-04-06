@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Trigger_Window_Closes")
+x_RegisterElementClass("Trigger_Window_Closes")
 
 Element_getPackage_Trigger_Window_Closes()
 {

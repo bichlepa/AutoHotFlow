@@ -209,7 +209,7 @@ globalSettings_GUI()
 	
 
 	;Write current settings to file
-	API_Main_write_settings()
+	write_settings()
 	
 	;if user has selected "run as admin"
 	if (_settings.runAsAdmin and not A_IsAdmin)

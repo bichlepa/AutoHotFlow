@@ -2,6 +2,10 @@
 ;This file provides functions which can be accessed while executing the elements.
 ;Execution thread
 
+x_RegisterElementClass(p_class)
+{
+	;Only in main thread
+}
 
 ;Variable API functions:
 x_GetVariable(Environment, p_Varname, p_hidden = False)
@@ -634,19 +638,19 @@ x_isFlowExecuting(p_FlowID)
 x_FlowEnable(p_FlowID)
 {
 	if x_FlowExists(p_FlowID)
-		API_Main_enableFlow(p_FlowID)
+		enableFlow(p_FlowID)
 }
 
 x_FlowDisable(p_FlowID)
 {
 	if x_FlowExists(p_FlowID)
-		API_Main_disableFlow(p_FlowID)
+		disableFlow(p_FlowID)
 }
 
 x_FlowStop(p_FlowID)
 {
 	if x_FlowExists(p_FlowID)
-		API_Main_stopFlow(p_FlowID)
+		stopFlow(p_FlowID)
 }
 
 x_GetListOfFlowNames()
@@ -775,7 +779,7 @@ x_ManualTriggerEnable(p_FlowID, p_TriggerName="")
 			if (forElement.class = "trigger_manual" and forElement.defaultTrigger = True)
 			{
 				;~ d(forElement)
-				API_Main_enableOneTrigger(forFlow.id, forelement.id)
+				enableOneTrigger(forFlow.id, forelement.id)
 			}
 		}
 		else
@@ -783,7 +787,7 @@ x_ManualTriggerEnable(p_FlowID, p_TriggerName="")
 			if (forelement.class = "trigger_Manual" and forElement.pars.id = p_TriggerName)
 			{
 				;~ d(forElement)
-				API_Main_enableOneTrigger(forFlow.id, forelement.id)
+				enableOneTrigger(forFlow.id, forelement.id)
 			}
 		}
 	}
@@ -800,7 +804,7 @@ x_ManualTriggerDisable(p_FlowID, p_TriggerName="")
 			if (forElement.class = "trigger_manual" and forElement.defaultTrigger = True)
 			{
 				;~ d(forElement)
-				API_Main_disableOneTrigger(forFlow.id, forelement.id)
+				disableOneTrigger(forFlow.id, forelement.id)
 			}
 		}
 		else
@@ -808,7 +812,7 @@ x_ManualTriggerDisable(p_FlowID, p_TriggerName="")
 			if (forelement.class = "trigger_Manual" and forElement.pars.id = p_TriggerName)
 			{
 				;~ d(forElement)
-				API_Main_disableOneTrigger(forFlow.id, forelement.id)
+				disableOneTrigger(forFlow.id, forelement.id)
 			}
 		}
 	}
@@ -818,14 +822,10 @@ x_ManualTriggerDisable(p_FlowID, p_TriggerName="")
 x_ManualTriggerExecute(p_FlowID, p_TriggerName = "", p_Variables ="", p_CallBackFunction ="")
 {
 	random, randomnumber
-	_share.temp[randomnumber]:=Object()
-	_share.temp[randomnumber].CallBack:=p_CallBackFunction
 	
-	;Fill variables which will be passed
-			;~ _share.temp[randomnumber].varstoPass:=p_Variables
-	varsToPass:=p_Variables
-	_share.temp[randomnumber].varsToPass:=varsToPass
-	
+	params:=Object()
+	params.VarsToPass:=p_Variables
+	params.CallBack:=p_CallBackFunction
 	
 	if x_FlowExists(p_FlowID)
 	{
@@ -834,7 +834,7 @@ x_ManualTriggerExecute(p_FlowID, p_TriggerName = "", p_Variables ="", p_CallBack
 		if (p_TriggerName = "")
 		{
 			;~ d(p_FlowName)
-			API_Main_executeFlow(p_FlowID, "", randomnumber)
+			startFlow(p_FlowID, "", params)
 			return
 		}
 		else
@@ -848,7 +848,7 @@ x_ManualTriggerExecute(p_FlowID, p_TriggerName = "", p_Variables ="", p_CallBack
 					if (forelement.pars.id = p_TriggerName)
 					{
 						;~ d(forFlow.id,forelementID)
-						API_Main_executeFlow(p_FlowID, forelementID, randomnumber)
+						startFlow(p_FlowID, forelementID, params)
 						return
 					}
 				}

@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Condition_Flow_Running")
+x_RegisterElementClass("Condition_Flow_Running")
 
 Element_getPackage_Condition_Flow_Running()
 {

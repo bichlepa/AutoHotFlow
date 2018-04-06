@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Action_Trace_Point_Check")
+x_RegisterElementClass("Action_Trace_Point_Check")
 
 Element_getPackage_Action_Trace_Point_Check()
 {

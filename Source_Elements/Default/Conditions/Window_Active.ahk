@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Condition_Window_Active")
+x_RegisterElementClass("Condition_Window_Active")
 
 ;Element type of the element
 Element_getElementType_Condition_Window_Active()

@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Action_Substring")
+x_RegisterElementClass("Action_Substring")
 
 ;Element type of the element
 Element_getElementType_Action_Substring()

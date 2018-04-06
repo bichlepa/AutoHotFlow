@@ -15,6 +15,11 @@ onexit exit
 #Include %A_ScriptDir%\..
 #include lib\Object to file\String-object-file.ahk
 #include lib\7z wrapper\7z wrapper.ahk
+#include lib\Robert - Ini library\Robert - Ini library.ahk
+#include lib\ObjFullyClone\ObjFullyClone.ahk
+#include lib\ObjHasValue\ObjHasValue.ahk
+#include lib\Random Word List\Random Word List.ahk
+#include lib\GDI+\GDIp.ahk
 
 #include language\language.ahk
 ;initialize languages
@@ -24,28 +29,76 @@ lang_Init()
 
 lang_setLanguage(_settings.UILanguage)
 
+#include Source_Common\Flows\Save.ahk
+#include Source_Common\Flows\load.ahk
+#include Source_Common\Flows\Compatibility.ahk
+#include Source_Common\Flows\Manage Flows.ahk
+#include Source_Common\Flows\Flow actions.ahk
+#include Source_Common\Flows\states.ahk
+#include Source_Common\Elements\Manage Elements.ahk
+#include source_Common\Elements\Elements.ahk
 #include Source_Manager\User Interface\manager gui.ahk
 #include Source_Manager\User Interface\help.ahk
 #include Source_Manager\User Interface\Change Category GUI.ahk
 #include Source_Manager\User Interface\Global_Settings.ahk
 #include Source_Manager\User Interface\import and export.ahk
-#include Source_Manager\API\API receiver manager.ahk
 
 #include source_Common\variables\global variables.ahk
 #include source_Common\Debug\Debug.ahk
 #include source_Common\Debug\Logger.ahk
-#include source_Common\Multithreading\API Caller Main.ahk
-#include source_Common\flows\flows.ahk
 #include source_Common\settings\settings.ahk
 #include source_Common\Other\Other.ahk
+#include source_Common\Variables\global variables.ahk
+#include source_Common\Variables\code parser.ahk
+#include source_Common\variables\code evaluator.ahk
+#include source_Common\variables\code tokenizer.ahk
+#include source_Common\variables\expression evaluator.ahk
 
+#include source_Common\Multithreading\API Caller to Main.ahk
+#include Source_Common\Multithreading\API Caller to Draw.ahk
+#include Source_Common\Multithreading\API Caller to Editor.ahk
+#include Source_Common\Multithreading\API Caller to Execution.ahk
+#include Source_Common\Multithreading\API for Elements.ahk
+
+;PlaceholderIncludesOfElements
 
 menu,tray, tip, Manager
 init_Manager_GUI()
 Show_Manager_GUI()
 
-
+SetTimer,queryTasks,100
 return
+
+queryTasks()
+{
+	global
+	Loop
+	{
+		oneTask:=_share.manager.Tasks.removeat(1)
+		if (oneTask)
+		{
+			name:=oneTask.name
+			if (name="TreeView_Refill")
+			{
+				TreeView_manager_Refill()
+			}
+			if (name="TreeView_AddEntry")
+			{
+				TreeView_manager_AddEntry(oneTask.type, oneTask.id)
+			}
+			if (name="TreeView_Select")
+			{
+				TreeView_manager_Select(oneTask.type, oneTask.id, oneTask.options)
+			}
+			if (name="ShowWindow")
+			{
+				Show_Manager_GUI()
+			}
+		}
+		else
+			break
+	}
+}
 
 exit_all()
 {

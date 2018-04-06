@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Action_Write_To_File")
+x_RegisterElementClass("Action_Write_To_File")
 
 ;Element type of the element
 Element_getElementType_Action_Write_To_File()

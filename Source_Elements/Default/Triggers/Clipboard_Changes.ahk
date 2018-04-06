@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Trigger_Clipboard_Changes")
+x_RegisterElementClass("Trigger_Clipboard_Changes")
 
 ;Element type of the element
 Element_getElementType_Trigger_Clipboard_Changes()

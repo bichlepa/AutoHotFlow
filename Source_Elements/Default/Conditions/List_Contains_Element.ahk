@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Condition_List_Contains_Element")
+x_RegisterElementClass("Condition_List_Contains_Element")
 
 ;Element type of the element
 Element_getElementType_Condition_List_Contains_Element()

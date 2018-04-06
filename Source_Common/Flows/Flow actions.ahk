@@ -33,7 +33,7 @@
 	}
 	else
 	{
-		Thread_StartEditor(par_FlowID)
+		API_Main_StartEditor(par_FlowID)
 	}
 }
 
@@ -87,7 +87,7 @@ disableOneTrigger(par_FlowID, par_TriggerID = "", save=True)
 		SaveFlowMetaData(par_FlowID)
 }
 
-ExecuteFlow(par_FlowID, par_TriggerID, par_PassedParsKey)
+ExecuteFlow(par_FlowID, par_TriggerID="", par_PassedParsKey="")
 {
 	if (_flows[par_FlowID].loaded != true)
 	{

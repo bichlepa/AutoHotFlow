@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Action_Speech_output")
+x_RegisterElementClass("Action_Speech_output")
 
 ;Element type of the element
 Element_getElementType_Action_Speech_output()

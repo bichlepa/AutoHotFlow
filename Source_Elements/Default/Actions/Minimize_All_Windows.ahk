@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Action_Minimize_all_windows")
+x_RegisterElementClass("Action_Minimize_all_windows")
 
 ;Element type of the element
 Element_getElementType_Action_Minimize_all_windows()

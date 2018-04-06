@@ -60,7 +60,12 @@ EditorGUIInit()
 	OnMessage(0x06,"WindowGetsActive",1)
 	OnMessage(0x03,"WindowGetsMoved",1)
 }
-	
+
+API_Editor_EditGUIshow(FlowID) ;Api function which is used in common code
+{
+	EditGUIshow()
+}
+
 EditGUIshow()
 {
 	global
@@ -80,7 +85,7 @@ EditGUIshow()
 	Editor_guiAlreadyShown:=true
 	;sleep 10
 	;MsgBox % hwn " - "   this.hwnd	" -  " this.test
-	;~ settimer,API_Main_Draw,-20
+	;~ settimer,API_Draw_Draw,-20
 	;~ ui_UpdateStatusbartext()
 }
 
@@ -106,7 +111,7 @@ EditGUIEnable()
 	DetectHiddenWindows,on
 	CurrentlyMainGuiIsDisabled:=false
 	
-	API_Main_Draw()
+	API_Draw_Draw()
 }
 
 
@@ -120,13 +125,13 @@ EditGUIGetPos()
 
 WindowGetsActive()
 {
-SetTimer,API_Main_Draw,-1
+SetTimer,API_Draw_Draw,-1
 
 }
 
 WindowGetsMoved()
 {
-SetTimer,API_Main_Draw,-1
+SetTimer,API_Draw_Draw,-1
 
 }
 
@@ -274,7 +279,7 @@ ui_OnLanguageChange()
 {
 	global _share
 	global _flows
-	API_Main_Draw()
+	API_Draw_Draw()
 	DetectHiddenWindows off
 	WinGetTitle,temp,% "ahk_id " _share.hwnds["editGUI" FlowID]
 	IfWinExist,% temp
@@ -307,7 +312,7 @@ SB_SetParts(a_guiwidth)
 
 _flows[FlowID].draw.heightofguipic := heightofguipic
 _flows[FlowID].draw.widthofguipic := widthofguipic
-API_Main_Draw()
+API_Draw_Draw()
 return
 
 GetClientSize(hwnd, ByRef w, ByRef h)

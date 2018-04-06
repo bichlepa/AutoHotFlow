@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Trigger_User_Idle_Time")
+x_RegisterElementClass("Trigger_User_Idle_Time")
 
 ;Element type of the element
 Element_getElementType_Trigger_User_Idle_Time()

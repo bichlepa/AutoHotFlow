@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Condition_Key_Is_Down")
+x_RegisterElementClass("Condition_Key_Is_Down")
 
 ;Element type of the element
 Element_getElementType_Condition_Key_Is_Down()

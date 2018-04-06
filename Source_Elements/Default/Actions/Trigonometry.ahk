@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Action_Trigonometry")
+x_RegisterElementClass("Action_Trigonometry")
 
 ;Element type of the element
 Element_getElementType_Action_Trigonometry()

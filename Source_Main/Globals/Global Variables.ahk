@@ -166,6 +166,12 @@ _share.temp := criticalObject() 	;For temporary content
 _share._ScriptDir := _ScriptDir
 _share._WorkingDir := _WorkingDir 	
 
+_share.main := CriticalObject()
+_share.main.Tasks := CriticalObject()
+
+;Those two variables are filled by the elements when they are included
+_share.AllElementClasses:=CriticalObject()
+
 global _ahkCriticalSection_Flows := CriticalSection() ;TODO: use it!
 
 return

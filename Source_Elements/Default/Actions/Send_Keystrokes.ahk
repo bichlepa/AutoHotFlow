@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Action_Send_keystrokes")
+x_RegisterElementClass("Action_Send_keystrokes")
 
 ;Element type of the element
 Element_getElementType_Action_Send_keystrokes()

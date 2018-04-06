@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Trigger_Time_Of_Day")
+x_RegisterElementClass("Trigger_Time_Of_Day")
 
 ;Element type of the element
 Element_getElementType_Trigger_Time_Of_Day()

@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Action_Select_Folder")
+x_RegisterElementClass("Action_Select_Folder")
 
 Element_getPackage_Action_Select_Folder()
 {

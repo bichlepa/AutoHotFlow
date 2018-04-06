@@ -4,25 +4,14 @@
 	local retvalue
 	logger("t2", A_ThisFunc " called")
 	
-	retvalue := AhkThreadManager.ahkFunction("API_Call_manager_TreeView_Refill")
+	_share.manager.tasks.push({name: "TreeView_Refill"})
+	
 	logger("t2", A_ThisFunc " finished")
 	
 	return retvalue
 	
 }
 
-;~ API_manager_TreeView_ChangeFlowCategory(par_ID)
-;~ {
-	;~ global
-	;~ local retvalue
-	;~ logger("t2", A_ThisFunc " called")
-	
-	;~ retvalue := AhkThreadManager.ahkFunction("API_Call_manager_TreeView_ChangeFlowCategory", par_ID)
-	;~ logger("t2", A_ThisFunc " finished")
-	
-	;~ return retvalue
-	
-;~ }
 
 API_manager_TreeView_AddEntry(par_Type, par_ID)
 {
@@ -30,7 +19,8 @@ API_manager_TreeView_AddEntry(par_Type, par_ID)
 	local retvalue
 	logger("t2", A_ThisFunc " called")
 	
-	retvalue := AhkThreadManager.ahkFunction("API_Call_manager_TreeView_AddEntry", par_Type, par_ID)
+	_share.manager.tasks.push({name: "TreeView_AddEntry", type:par_Type, id: par_ID})
+	
 	logger("t2", A_ThisFunc " finished")
 	
 	return retvalue
@@ -42,7 +32,8 @@ API_manager_TreeView_Select(par_Type, par_ID, par_options = "")
 	local retvalue
 	logger("t2", A_ThisFunc " called")
 	
-	retvalue := AhkThreadManager.ahkFunction("API_Call_manager_TreeView_Select", par_Type, par_ID, par_options)
+	_share.manager.tasks.push({name: "TreeView_Select", type:par_Type, id: par_ID, options: par_options})
+	
 	logger("t2", A_ThisFunc " finished")
 	
 	return retvalue
@@ -54,7 +45,8 @@ API_Manager_ShowWindow()
 	local retvalue
 	logger("t2", A_ThisFunc " called")
 	
-	retvalue := AhkThreadManager.ahkFunction("API_Call_Manager_ShowWindow")
+	_share.manager.tasks.push({name: "ShowWindow"})
+	
 	logger("t2", A_ThisFunc " finished")
 	
 	return retvalue

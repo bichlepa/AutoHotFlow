@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Trigger_Window_Gets_Active")
+x_RegisterElementClass("Trigger_Window_Gets_Active")
 
 Element_getPackage_Trigger_Window_Gets_Active()
 {

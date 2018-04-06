@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Action_Run")
+x_RegisterElementClass("Action_Run")
 
 ;Element type of the element
 Element_getElementType_Action_Run()

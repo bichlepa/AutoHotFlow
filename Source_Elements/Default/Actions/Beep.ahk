@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Action_Beep")
+x_RegisterElementClass("Action_Beep")
 
 Element_getPackage_Action_Beep()
 {

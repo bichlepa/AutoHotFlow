@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Loop_Work_through_a_list")
+x_RegisterElementClass("Loop_Work_through_a_list")
 
 Element_getPackage_Loop_Work_through_a_list()
 {

@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Loop_Condition")
+x_RegisterElementClass("Loop_Condition")
 
 ;Element type of the element
 Element_getElementType_Loop_Condition()

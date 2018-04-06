@@ -139,7 +139,7 @@ ui_SettingsOwFLow()
 	
 	if someSettingChanged:=true
 	{
-		API_Main_State_New(flowobj.id)
+		State_New(flowobj.id)
 	}
 	gui,destroy
 	maingui.enable()

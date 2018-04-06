@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Action_Reboot_Computer")
+x_RegisterElementClass("Action_Reboot_Computer")
 
 ;Element type of the element
 Element_getElementType_Action_Reboot_Computer()

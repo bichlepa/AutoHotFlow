@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Action_Stop_Flow")
+x_RegisterElementClass("Action_Stop_Flow")
 
 Element_getPackage_Action_Stop_Flow()
 {

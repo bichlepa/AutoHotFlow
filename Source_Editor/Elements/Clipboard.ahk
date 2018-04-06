@@ -139,7 +139,7 @@ loadFromClipboard()
 		tempCountLoadedElements++
 		
 		
-		NewElementID:=API_Main_element_New(FlowID) ;Do not pass Element ID
+		NewElementID:=element_New(FlowID) ;Do not pass Element ID
 		_flows[FlowID].allElements[NewElementID] := objfullyclone(loadElement)
 		_flows[FlowID].allElements[NewElementID].OldID := loadElementID ;Save the old ID in order to be able to assign the correct elements to the connections
 		_flows[FlowID].allElements[NewElementID].id := NewElementID ;Correct the ID
@@ -168,7 +168,7 @@ loadFromClipboard()
 		;~ d(_flows[FlowID].allElements[NewElementID])
 		
 		
-		NewElementID:=API_Main_connection_new(FlowID)
+		NewElementID:=connection_new(FlowID)
 		_flows[FlowID].allConnections[NewElementID] := objfullyclone(loadElement)
 		
 		_flows[FlowID].allConnections[NewElementID].id := NewElementID ;Correct the ID
@@ -219,8 +219,8 @@ loadFromClipboard()
 	}
 	
 	
-	API_Main_State_New(FlowID)
-	API_Main_Draw()
+	State_New(FlowID)
+	API_Draw_Draw()
 
 }
 

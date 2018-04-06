@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Action_Extract_files")
+x_RegisterElementClass("Action_Extract_files")
 
 Element_getPackage_Action_Extract_files()
 {

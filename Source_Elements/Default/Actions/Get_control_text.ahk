@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Action_Get_Control_Text")
+x_RegisterElementClass("Action_Get_Control_Text")
 
 ;Element type of the element
 Element_getElementType_Action_Get_Control_Text()

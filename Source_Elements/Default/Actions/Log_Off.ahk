@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Action_Log_Off")
+x_RegisterElementClass("Action_Log_Off")
 
 ;Element type of the element
 Element_getElementType_Action_Log_Off()

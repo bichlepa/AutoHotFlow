@@ -1,6 +1,11 @@
 ﻿;This file provides functions which can be accessed while executing the elements.
-;Editor thread
 
+
+x_RegisterElementClass(p_class)
+{
+	if (_ahkThreadID = "main")
+		Element_Register_Element_Class(p_class)
+}
 
 ;Variable API functions:
 x_GetVariable(Environment, p_Varname, p_hidden = False)
@@ -31,7 +36,7 @@ x_replaceVariables(Environment, p_String, p_pars ="")
 }
 x_EvaluateExpression(Environment, p_String)
 {
-	return Var_EvaluateExpression(Environment, String, "Var_Get_Common", "Var_Get_Common")
+	return Var_EvaluateExpression(Environment, String, "Var_Get_Common", "Var_Set_Common")
 }
 x_CheckVariableName(p_VarName)
 {
@@ -184,7 +189,7 @@ x_isFlowExecuting(p_FlowID)
 x_FlowEnable(p_FlowID)
 {
 	if x_FlowExists(p_FlowID)
-		API_Main_enableFlow(p_FlowID)
+		enableFlow(p_FlowID)
 
 }
 
@@ -192,14 +197,14 @@ x_FlowEnable(p_FlowID)
 x_FlowDisable(p_FlowID)
 {
 	if x_FlowExists(p_FlowID)
-		API_Main_disableFlow(p_FlowID)
+		disableFlow(p_FlowID)
 	
 }
 
 x_FlowStop(p_FlowID)
 {
 	if x_FlowExists(p_FlowID)
-		API_Main_stopFlow(p_FlowID)
+		stopFlow(p_FlowID)
 }
 
 
@@ -329,7 +334,7 @@ x_ManualTriggerEnable(p_FlowID, p_TriggerName="")
 			if (forElement.class = "trigger_manual" and forElement.defaultTrigger = True)
 			{
 				;~ d(forElement)
-				API_Main_enableOneTrigger(forFlow.id, forelement.id)
+				enableOneTrigger(forFlow.id, forelement.id)
 			}
 		}
 		else
@@ -337,7 +342,7 @@ x_ManualTriggerEnable(p_FlowID, p_TriggerName="")
 			if (forelement.class = "trigger_Manual" and forElement.pars.id = p_TriggerName)
 			{
 				;~ d(forElement)
-				API_Main_enableOneTrigger(forFlow.id, forelement.id)
+				enableOneTrigger(forFlow.id, forelement.id)
 			}
 		}
 	}
@@ -354,7 +359,7 @@ x_ManualTriggerDisable(p_FlowID, p_TriggerName="")
 			if (forElement.class = "trigger_manual" and forElement.defaultTrigger = True)
 			{
 				;~ d(forElement)
-				API_Main_disableOneTrigger(forFlow.id, forelement.id)
+				disableOneTrigger(forFlow.id, forelement.id)
 			}
 		}
 		else
@@ -362,7 +367,7 @@ x_ManualTriggerDisable(p_FlowID, p_TriggerName="")
 			if (forelement.class = "trigger_Manual" and forElement.pars.id = p_TriggerName)
 			{
 				;~ d(forElement)
-				API_Main_disableOneTrigger(forFlow.id, forelement.id)
+				disableOneTrigger(forFlow.id, forelement.id)
 			}
 		}
 	}
@@ -388,7 +393,7 @@ x_ManualTriggerExecute(p_FlowID, p_TriggerName = "", p_Variables ="", p_CallBack
 		if (p_TriggerName = "")
 		{
 			;~ d(p_FlowName)
-			API_Main_executeFlow(p_FlowID, "", randomnumber)
+			executeFlow(p_FlowID, "", randomnumber)
 			return
 		}
 		else
@@ -402,7 +407,7 @@ x_ManualTriggerExecute(p_FlowID, p_TriggerName = "", p_Variables ="", p_CallBack
 					if (forelement.pars.id = p_TriggerName)
 					{
 						;~ d(forFlow.id,forelementID)
-						API_Main_executeFlow(p_FlowID, forelementID, randomnumber)
+						executeFlow(p_FlowID, forelementID, randomnumber)
 						return
 					}
 				}
@@ -418,31 +423,38 @@ x_ManualTriggerExecute(p_FlowID, p_TriggerName = "", p_Variables ="", p_CallBack
 
 x_Par_Disable(p_ParameterID, p_TrueOrFalse = True)
 {
-	return ElementSettings.field.enable(p_ParameterID,not p_TrueOrFalse)
+	if (instr(_ahkThreadID,"Editor"))
+		return ElementSettings.field.enable(p_ParameterID,not p_TrueOrFalse)
 }
 x_Par_Enable(p_ParameterID, p_TrueOrFalse = True)
 {
-	return ElementSettings.field.enable(p_ParameterID,p_TrueOrFalse)
+	if (instr(_ahkThreadID,"Editor"))
+		return ElementSettings.field.enable(p_ParameterID,p_TrueOrFalse)
 }
 x_Par_SetValue(p_ParameterID, p_Value)
 {
-	return ElementSettings.field.setvalue(p_Value,p_ParameterID)
+	if (instr(_ahkThreadID,"Editor"))
+		return ElementSettings.field.setvalue(p_Value,p_ParameterID)
 }
 x_Par_GetValue(p_ParameterID)
 {
-	return ElementSettings.field.getvalue(p_ParameterID)
+	if (instr(_ahkThreadID,"Editor"))
+		return ElementSettings.field.getvalue(p_ParameterID)
 }
 x_Par_SetChoices(p_ParameterID, p_Choices)
 {
-	return ElementSettings.field.setChoices(p_Choices,p_ParameterID)
+	if (instr(_ahkThreadID,"Editor"))
+		return ElementSettings.field.setChoices(p_Choices,p_ParameterID)
 }
 x_Par_SetLabel(p_ParameterID, p_Label)
 {
-	return ElementSettings.field.setLabel(p_Label,p_ParameterID)
+	if (instr(_ahkThreadID,"Editor"))
+		return ElementSettings.field.setLabel(p_Label,p_ParameterID)
 }
 x_FirstCallOfCheckSettings(Environment)
 {
-	return Environment.FirstCallOfCheckSettings
+	if (instr(_ahkThreadID,"Editor"))
+		return Environment.FirstCallOfCheckSettings
 }
 
 ;common functions. Available everywhere
@@ -523,17 +535,26 @@ x_TriggerInNewAHKThread_Stop(Environment)
 
 x_assistant_windowParameter(neededInfo)
 {
-	assistant_GetWindowInformation(neededInfo)
+	if (instr(_ahkThreadID,"Editor"))
+	{
+		assistant_GetWindowInformation%nothing%(neededInfo)
+	}
 }
 
 x_assistant_MouseTracker(neededInfo)
 {
-	assistant_MouseTracker(neededInfo)
+	if (instr(_ahkThreadID,"Editor"))
+	{
+		assistant_MouseTracker%nothing%(neededInfo)
+	}
 }
 
 x_assistant_ChooseColor(neededInfo)
 {
-	assistant_ChooseColor(neededInfo)
+	if (instr(_ahkThreadID,"Editor"))
+	{
+		assistant_ChooseColor%nothing%(neededInfo)
+	}
 }
 
 

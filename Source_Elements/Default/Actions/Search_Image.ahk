@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Action_Search_Image")
+x_RegisterElementClass("Action_Search_Image")
 
 ;Element type of the element
 Element_getElementType_Action_Search_Image()

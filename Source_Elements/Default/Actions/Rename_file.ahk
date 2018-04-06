@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Action_Rename_File")
+x_RegisterElementClass("Action_Rename_File")
 
 ;Element type of the element
 Element_getElementType_Action_Rename_File()

@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Action_Tooltip")
+x_RegisterElementClass("Action_Tooltip")
 
 Element_getPackage_Action_Tooltip()
 {

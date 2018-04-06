@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Action_Square_Root")
+x_RegisterElementClass("Action_Square_Root")
 
 ;Element type of the element
 Element_getElementType_Action_Square_Root()

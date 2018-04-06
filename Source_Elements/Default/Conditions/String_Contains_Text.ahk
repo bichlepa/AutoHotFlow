@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Condition_String_Contains_Text")
+x_RegisterElementClass("Condition_String_Contains_Text")
 
 ;Element type of the element
 Element_getElementType_Condition_String_Contains_Text()

@@ -397,7 +397,7 @@ TreeView_manager()
 				if (tempselectedID = "uncategorized")
 				{
 					;create new category
-					newcategoryid:=API_Main_NewCategory(tempNewName)
+					newcategoryid:=NewCategory(tempNewName)
 					tempselectedID:=""
 				}
 				else
@@ -412,9 +412,9 @@ TreeView_manager()
 				{
 					if (tempitem.category = tempselectedID)
 					{
-						API_Main_ChangeFlowCategory(tempflowid, newcategoryid)
+						ChangeFlowCategory(tempflowid, newcategoryid)
 						;~ d(tempitem)
-						API_Main_SaveFlowMetaData(tempitem.id)
+						SaveFlowMetaData(tempitem.id)
 					}
 					
 				}
@@ -456,7 +456,7 @@ TreeView_manager()
 				
 				;rename
 				_flows[tempselectedID].name := tempNewName
-				API_Main_SaveFlowMetaData(tempSelectedID)
+				SaveFlowMetaData(tempSelectedID)
 				
 				;TODO catch if editor is opened,
 				
@@ -587,7 +587,7 @@ Button_manager_NewCategory(par_Type, par_ID)
 	local newTV
 	gui,manager:default
 	
-	newCategoryID := API_Main_NewCategory()
+	newCategoryID := NewCategory()
 	TreeView_manager_Rename("category", newCategoryID)
 }
 
@@ -608,11 +608,11 @@ Button_manager_NewFlow()
 		
 		if (allTreeViewItems[tempSelectedTV].type = "Category")
 		{
-			NewFlowID := API_Main_NewFlow(tempSelectedID)
+			NewFlowID := NewFlow(tempSelectedID)
 		}
 		else if (allTreeViewItems[tempSelectedTV].type = "Flow")
 		{
-			NewFlowID := API_Main_NewFlow(allTreeViewItems[TV_GetParent(tempSelectedTV)].id)
+			NewFlowID := NewFlow(allTreeViewItems[TV_GetParent(tempSelectedTV)].id)
 		}
 		else
 		{
@@ -623,7 +623,7 @@ Button_manager_NewFlow()
 	else ;If nothing is selected
 	{
 		;Create a flow in category "uncategorized"
-		NewFlowID := API_Main_NewFlow()
+		NewFlowID := NewFlow()
 	}
 	TreeView_manager_Rename("flow", NewFlowID)
 }
@@ -649,7 +649,7 @@ Button_manager_DuplicateFlow()
 	tempselectedType := allTreeViewItems[tempselectedTV].type
 	
 	if tempselectedType=flow ;this can only be performed on flows
-		API_Main_DuplicateFlow(tempselectedID)
+		DuplicateFlow(tempselectedID)
 }
 
 Button_manager_Import_Export()
@@ -665,19 +665,19 @@ Button_manager_Help()
 Button_manager_EditFlow()
 {
 	global
-	API_Main_editFlow(allTreeViewItems[TV_GetSelection()].id)
+	editFlow(allTreeViewItems[TV_GetSelection()].id)
 }
 
 Button_manager_RunFlow()
 {
 	global
-	API_Main_ExecuteToggleFlow(allTreeViewItems[TV_GetSelection()].id)
+	ExecuteToggleFlow(allTreeViewItems[TV_GetSelection()].id)
 }
 
 Button_manager_EnableFlow()
 {
 	global
-	API_Main_EnabletoggleFlow(allTreeViewItems[TV_GetSelection()].id)
+	EnabletoggleFlow(allTreeViewItems[TV_GetSelection()].id)
 }
 
 ;Delete marked Item
@@ -706,7 +706,7 @@ Button_manager_Delete()
 			{
 				_settings.HideDemoFlows:=true
 				TreeView_manager_Refill()
-				API_Main_write_settings()
+				write_settings()
 			}
 		}
 		else
@@ -716,7 +716,7 @@ Button_manager_Delete()
 			IfMsgBox,Yes
 			{
 				;delete
-				API_Main_DeleteFlow(tempselectedID)
+				DeleteFlow(tempselectedID)
 				
 			}
 		}
@@ -737,7 +737,7 @@ Button_manager_Delete()
 			{
 				_settings.HideDemoFlows:=true
 				TreeView_manager_Refill()
-				API_Main_write_settings()
+				write_settings()
 			}
 		}
 		else
@@ -764,16 +764,16 @@ Button_manager_Delete()
 						if (tempFlow.category = tempselectedID)
 						{
 							;~ d(tempFlow)
-							API_Main_ChangeFlowCategory(tempFlow.id,"")
+							ChangeFlowCategory(tempFlow.id,"")
 						}
 					}
 					
-					API_Main_DeleteCategory(tempselectedID)
+					DeleteCategory(tempselectedID)
 				}
 			}
 			else
 			{
-				API_Main_DeleteCategory(tempselectedID)
+				DeleteCategory(tempselectedID)
 			}
 		}
 	}

@@ -51,7 +51,7 @@ if (FlowObj.markedElement != "") ;if a single element is marked
 			UserDidMajorChange:=true
 		if (ret!="aborted")
 		{
-			API_Main_State_New(FlowID) ;make a new state. If user presses Ctrl+Z, the change will be undone
+			State_New(FlowID) ;make a new state. If user presses Ctrl+Z, the change will be undone
 		}
 		
 	}
@@ -64,7 +64,7 @@ if (FlowObj.markedElement != "") ;if a single element is marked
 			UserDidMajorChange:=true
 		if (ret!="aborted" and ret!="0 changes" )
 		{
-			API_Main_State_New(FlowID) ;make a new state. If user presses Ctrl+Z, the change will be undone
+			State_New(FlowID) ;make a new state. If user presses Ctrl+Z, the change will be undone
 		}
 	}
 	
@@ -130,13 +130,13 @@ else if (clickedElement="MenuCreateNewAction" or clickedElement="MenuCreateNewCo
 {
 	;~ ToolTip %clickedElement%
 	if (clickedElement="MenuCreateNewAction")
-		tempNew:=API_Main_Element_New(FlowID, "action")
+		tempNew:=Element_New(FlowID, "action")
 	else if (clickedElement="MenuCreateNewCondition")
-		tempNew:=API_Main_Element_New(FlowID, "Condition")
+		tempNew:=Element_New(FlowID, "Condition")
 	else if (clickedElement="MenuCreateNewLoop")
-		tempNew:=API_Main_Element_New(FlowID, "Loop")
+		tempNew:=Element_New(FlowID, "Loop")
 	else if (clickedElement="MenuCreateNewTrigger")
-		tempNew:=API_Main_Element_New(FlowID, "Trigger")
+		tempNew:=Element_New(FlowID, "Trigger")
 	else
 	{
 		MsgBox unexpected internal ERROR! A new element should be created. But I don't known which one!
@@ -188,7 +188,7 @@ else if (clickedElement="PlusButton" or clickedElement="PlusButton2") ;user clic
 {
 	IfInString,markedElement,Connection ;The selected element is connection
 	{
-		tempConnection2:=API_Main_Connection_New(FlowID) ;Create new connection
+		tempConnection2:=Connection_New(FlowID) ;Create new connection
 		
 		ret:=ui_MoveConnection(markedElement,tempConnection2,allConnections[markedElement].from, allConnections[markedElement].to)
 		if ret=aborted
@@ -198,7 +198,7 @@ else if (clickedElement="PlusButton" or clickedElement="PlusButton2") ;user clic
 	}
 	else ;The selected element is either action, condition or trigger or loop
 	{
-		tempConnection1:=API_Main_Connection_New(FlowID) ;Create new connection
+		tempConnection1:=Connection_New(FlowID) ;Create new connection
 		
 		;~ d(FlowObj.allConnections[tempConnection1], tempConnection2)
 		
@@ -240,7 +240,7 @@ else if (clickedElement="MoveButton1") ;if a connection is selected and user mov
 
 	
 	;e_CorrectElementErrors("Code: 3186165186456.")
-	;~ API_Main_Draw()
+	;~ API_Draw_Draw()
 
 }
 else if (clickedElement="MoveButton2") ;if a connection is selected and user moved the lower Part of it
@@ -256,7 +256,7 @@ else if (clickedElement="MoveButton2") ;if a connection is selected and user mov
 	
 	
 	;e_CorrectElementErrors("Code: 1365415616.")
-	;~ API_Main_Draw()
+	;~ API_Draw_Draw()
 	
 	
 
@@ -277,11 +277,11 @@ else if (clickedElement="TrashButton") ;if something is selected and user clicks
 	
 	IfMsgBox yes
 	{
-		API_Main_Element_Remove(FlowID, FlowObj.markedElement)
+		Element_Remove(FlowID, FlowObj.markedElement)
 		UserDidMajorChange:=true
 	}
 	CreateMarkedList()
-	;~ API_Main_Draw()
+	;~ API_Draw_Draw()
 	;e_CorrectElementErrors("Code: 231684866.")
 }
 else if (clickedElement="EditButton")  ;if something is selected and user clicks on the edit button
@@ -310,18 +310,18 @@ else if (clickedElement="EditButton")  ;if something is selected and user clicks
 else if (clickedElement="SwitchOnButton")  ;if something is selected and user clicks on the button
 {
 	
-	API_Main_disableOneTrigger(flowObj.id, markedElement)
+	disableOneTrigger(flowObj.id, markedElement)
 	
 
 }
 else if (clickedElement="SwitchOffButton")  ;if something is selected and user clicks on the button
 {
-	API_Main_enableOneTrigger(flowObj.id, markedElement)
+	enableOneTrigger(flowObj.id, markedElement)
 
 }
 else if (clickedElement="StarEmptyButton")  ;if something is selected and user clicks on the button
 {
-	API_Main_setDefaultTrigger(flowObj.id, markedElement)
+	Element_setDefaultTrigger(flowObj.id, markedElement)
 	UserDidMinorChange:=true
 }
 else if (clickedElement="StarFilledButton")  ;if something is selected and user clicks on the button
@@ -405,17 +405,17 @@ tempList:=""
 
 if (UserCancelledAction=true)
 {
-	API_Main_State_RestoreCurrent(FlowID)
+	State_RestoreCurrent(FlowID)
 	CreateMarkedList()
 }
 else if (UserDidMajorChange or UserDidMinorChange)
 {
-	API_Main_State_New(FlowID) ;make a new state. If user presses Ctrl+Z, the change will be undone
+	State_New(FlowID) ;make a new state. If user presses Ctrl+Z, the change will be undone
 }
 else if (UserDidMinorChange)
-	API_Main_State_New(FlowID) ;make a new state. If user presses Ctrl+Z, the change will be undone
+	State_New(FlowID) ;make a new state. If user presses Ctrl+Z, the change will be undone
 
-API_Main_Draw() 
+API_Draw_Draw() 
 workingOnClick:=false
 
 return
@@ -579,7 +579,7 @@ ui_moveSelectedElements(option="")
 	
 	UserClickedRbutton:=false
 	
-	UserCurrentlyMovesAnElement:=true ;Prevents that, if user scroll simultanously, the scroll function will call API_Main_Draw().
+	UserCurrentlyMovesAnElement:=true ;Prevents that, if user scroll simultanously, the scroll function will call API_Draw_Draw().
 	if (markedElement!= "" && FlowObj.allElements[toMoveEelement].type = "loop" && partOfclickedElement>=3) ;If a loop is selected and user moves its tail
 	{
 		oldHeightOfVerticalBar:=FlowObj.allElements[toMoveEelement].HeightOfVerticalBar
@@ -600,7 +600,7 @@ ui_moveSelectedElements(option="")
 					if (FlowObj.allElements[toMoveEelement].HeightOfVerticalBar!=oldHeightOfVerticalBar)
 						clickMoved:=true
 					
-					API_Main_Draw()
+					API_Draw_Draw()
 				}
 				
 				
@@ -612,7 +612,7 @@ ui_moveSelectedElements(option="")
 				
 				FlowObj.allElements[toMoveEelement].HeightOfVerticalBar:=oldHeightOfVerticalBar
 				MovementAborted:=true
-				API_Main_Draw()
+				API_Draw_Draw()
 				break
 			}
 			
@@ -628,7 +628,7 @@ ui_moveSelectedElements(option="")
 					FlowObj.allElements[toMoveEelement].HeightOfVerticalBar:= Gridy*2
 				howMuchMoved++
 				
-				API_Main_Draw()
+				API_Draw_Draw()
 			}
 			else ;If mouse is not currently moving
 			{
@@ -670,7 +670,7 @@ ui_moveSelectedElements(option="")
 							clickMoved:=true
 					}
 					
-					API_Main_Draw()
+					API_Draw_Draw()
 				}
 				
 				
@@ -687,7 +687,7 @@ ui_moveSelectedElements(option="")
 				}
 				MovementAborted:=true
 				;~ SoundBeep
-				API_Main_Draw()
+				API_Draw_Draw()
 				break
 			}
 			
@@ -708,7 +708,7 @@ ui_moveSelectedElements(option="")
 				}
 				
 				howMuchMoved++
-				API_Main_Draw()
+				API_Draw_Draw()
 			}
 			else ;If mouse is not currently moving
 			{
@@ -827,7 +827,7 @@ ui_scrollwithMouse(button="lbutton")
 	{
 		ui_UpdateStatusbartext("pos")
 		if (UserCurrentlyMovesAnElement!=true)
-			API_Main_Draw()
+			API_Draw_Draw()
 		SetTimer,ScrollWithMouseTimer,off
 		return
 	}
@@ -846,8 +846,8 @@ ui_scrollwithMouse(button="lbutton")
 		FlowObj.flowSettings.Offsety:=newposy
 		
 		ui_UpdateStatusbartext("pos")
-		if (UserCurrentlyMovesAnElement!=true) ;it is true if user currently pulls something else and scrolls simultanously. Calling API_Main_Draw() while an other instance of it is interrupted can cause problems
-			API_Main_Draw()
+		if (UserCurrentlyMovesAnElement!=true) ;it is true if user currently pulls something else and scrolls simultanously. Calling API_Draw_Draw() while an other instance of it is interrupted can cause problems
+			API_Draw_Draw()
 		Scrollhasscrolled:=true
 		;~ ToolTip scroll
 	}
@@ -907,7 +907,7 @@ ui_MoveConnection(connection1="", connection2="", element1="", element2="")
 	{
 		;~ SoundBeep
 		if (ui_detectMovementWithoutBlocking()) ;check, whether user has moved mouse
-			API_Main_Draw()
+			API_Draw_Draw()
 		if (untilRelease and !getkeystate("lbutton","P") or !untilRelease and getkeystate("lbutton","P")) ;if user finishes moving
 		{
 			break
@@ -935,7 +935,7 @@ ui_MoveConnection(connection1="", connection2="", element1="", element2="")
 	
 	if (clickedElement="") ;If user pulled the end of the connection to empty space. Create new element
 	{
-		newElement:=API_Main_Element_New(FlowID)
+		newElement:=Element_New(FlowID)
 		newElementCreated:=true
 		
 		ret:=selectContainerType(newElement,"wait")
@@ -1008,7 +1008,7 @@ ui_MoveConnection(connection1="", connection2="", element1="", element2="")
 		;else keep the new or modified connection marked
 		
 	}
-	API_Main_Draw()
+	API_Draw_Draw()
 	return
 	
 	ui_MoveConnectionCheckAndCorrect:
@@ -1164,7 +1164,7 @@ markedElementscopy:=FlowObj.markedElements.clone()
 for markindex, markelement in markedElementscopy
 {
 	
-	API_Main_Element_Remove(FlowID, markelement)
+	Element_Remove(FlowID, markelement)
 	
 
 }
@@ -1172,9 +1172,9 @@ CreateMarkedList()
 markedElementscopy:=""
 tempList:=""
 ;e_CorrectElementErrors("Code: 354546841.")
-API_Main_State_New(FlowID)
+State_New(FlowID)
 ui_UpdateStatusbartext()
-API_Main_Draw()
+API_Draw_Draw()
 return
 
 
@@ -1209,7 +1209,7 @@ FlowObj.flowSettings.offsetx:=  FlowObj.flowSettings.offsetx + mx5old - mx5new
 FlowObj.flowSettings.offsety:= FlowObj.flowSettings.offsety + my5old  - my5new
 
 ui_UpdateStatusbartext("pos")
-API_Main_Draw()
+API_Draw_Draw()
 
 return
 
@@ -1246,7 +1246,7 @@ FlowObj.flowSettings.offsetx:=  FlowObj.flowSettings.offsetx + mx5old - mx5new
 FlowObj.flowSettings.offsety:= FlowObj.flowSettings.offsety + my5old  - my5new
 ui_UpdateStatusbartext("pos")
 
-API_Main_Draw()
+API_Draw_Draw()
 
 return
 
@@ -1265,14 +1265,14 @@ if ret=0
 		}
 		else ;remove all marked elements
 		{
-			API_Main_Element_Remove(FlowID, markelement)
+			Element_Remove(FlowID, markelement)
 		}
 	}
 	markedElementscopy:=""
 	
-	API_Main_State_New(FlowID)
+	State_New(FlowID)
 	ui_UpdateStatusbartext()
-	API_Main_Draw()
+	API_Draw_Draw()
 }
 ;ToolTip("Control + X pressed")
 return
@@ -1303,7 +1303,7 @@ if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of t
 	ui_ActionWhenMainGUIDisabled()
 	return
 }
-API_Main_saveFlow(FlowID)
+saveFlow(FlowID)
 return
 
 ctrl_z:
@@ -1312,9 +1312,9 @@ if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of t
 	ui_ActionWhenMainGUIDisabled()
 	return
 }
-API_Main_State_Undo(FlowID)
+State_Undo(FlowID)
 CreateMarkedList()
-API_Main_Draw()
+API_Draw_Draw()
 return
 ctrl_y:
 if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of the main gui are disabled
@@ -1322,8 +1322,8 @@ if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of t
 	ui_ActionWhenMainGUIDisabled()
 	return
 }
-API_Main_State_Redo(FlowID)
-API_Main_Draw()
+State_Redo(FlowID)
+API_Draw_Draw()
 return
 
 ctrl_a:
@@ -1334,7 +1334,7 @@ if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of t
 }
 UnmarkEverything()
 MarkEverything()
-API_Main_Draw()
+API_Draw_Draw()
 return
 
 

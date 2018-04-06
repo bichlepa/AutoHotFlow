@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Trigger_Periodic_Timer")
+x_RegisterElementClass("Trigger_Periodic_Timer")
 
 ;Element type of the element
 Element_getElementType_Trigger_Periodic_Timer()

@@ -59,7 +59,7 @@ selectSubType(p_ElementID,wait="")
 	;~ d(setElement, p_ID)
 	NowResultEditingElement:=""
 	
-	;~ d(AllElementClasses)
+	;~ d(_share.AllElementClasses)
 	
 	EditGUIDisable()
 	gui,3:default
@@ -78,7 +78,7 @@ selectSubType(p_ElementID,wait="")
 	TVClass:=Object()
 	
 	;Find out wich categories exist
-	for forelementIndex, forElementClass in AllElementClasses
+	for forelementIndex, forElementClass in _share.AllElementClasses
 	{
 		if (Element_getElementType_%forElementClass%() = setElementType)
 		{
@@ -180,8 +180,8 @@ selectSubType(p_ElementID,wait="")
 	if (setElement.class="" and setElement.Type!="Trigger")
 	{
 		;~ d(setelement)
-		API_Main_Element_Remove(FlowID, setElement.id)
-		;~ API_Main_Draw()
+		Element_Remove(FlowID, setElement.id)
+		;~ API_Draw_Draw()
 	}
 	NowResultEditingElement=aborted
 	EditGUIEnable()
@@ -211,7 +211,7 @@ selectSubType(p_ElementID,wait="")
 	gui,destroy
 	EditGUIEnable()
 	
-	API_Main_Element_SetClass(FlowID,setElementID,TVClass[GuiElementChoosedTV])
+	Element_SetClass(FlowID,setElementID,TVClass[GuiElementChoosedTV])
 
 	
 	;MsgBox,%setElementID% %GuiElementChoose%
@@ -414,7 +414,7 @@ selectContainerType(p_ElementID, wait="")
 			else 
 			{
 				if (NowResultEditingElement!="aborted")
-					API_Main_Element_SetType(FlowID,setElementID,NowResultEditingElement)
+					Element_SetType(FlowID,setElementID,NowResultEditingElement)
 				break
 			}
 		}

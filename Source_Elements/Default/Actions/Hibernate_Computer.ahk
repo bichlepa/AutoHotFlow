@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Action_Hibernate_Computer")
+x_RegisterElementClass("Action_Hibernate_Computer")
 
 ;Element type of the element
 Element_getElementType_Action_Hibernate_Computer()

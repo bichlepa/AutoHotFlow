@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Action_Sleep")
+x_RegisterElementClass("Action_Sleep")
 
 Element_getPackage_Action_Sleep()
 {

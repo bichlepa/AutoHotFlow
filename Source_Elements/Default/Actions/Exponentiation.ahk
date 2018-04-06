@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Action_Exponentiation")
+x_RegisterElementClass("Action_Exponentiation")
 
 ;Element type of the element
 Element_getElementType_Action_Exponentiation()

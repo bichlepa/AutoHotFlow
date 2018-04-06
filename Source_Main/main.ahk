@@ -105,23 +105,22 @@ global_elementInclusions =
 #include Source_Main\Tray\Tray.ahk
 #include Source_Main\Globals\Global Variables.ahk
 #include Source_Main\Threads\Threads.ahk
-#include Source_Main\Threads\API Caller to Manager.ahk
-#include Source_Main\Threads\API Caller to Draw.ahk
-#include Source_Main\Threads\API Caller to Editor.ahk
-#include Source_Main\Threads\API Caller to Execution.ahk
-#include Source_Main\Threads\API Caller Elements.ahk
-#include Source_Main\Threads\API Receiver Main.ahk
 
-#include Source_Main\Flows\Save.ahk
-#include Source_Main\Flows\load.ahk
-#include Source_Main\Flows\Compatibility.ahk
-#include Source_Main\Flows\Manage Flows.ahk
-#include Source_Main\Flows\Manage Elements.ahk
-#include Source_Main\Flows\Flow actions.ahk
-#include Source_Main\Flows\states.ahk
-#include Source_Main\settings\settings.ahk
+#include Source_Common\Multithreading\API Caller to Manager.ahk
+#include Source_Common\Multithreading\API Caller to Draw.ahk
+#include Source_Common\Multithreading\API Caller to Editor.ahk
+#include Source_Common\Multithreading\API Caller to Execution.ahk
+#include Source_Common\Multithreading\API for Elements.ahk
+;~ #include Source_Main\Threads\API Receiver Main.ahk
+
 #include Source_Main\hidden window\hidden window.ahk
 
+#include Source_Common\Flows\Save.ahk
+#include Source_Common\Flows\load.ahk
+#include Source_Common\Flows\Compatibility.ahk
+#include Source_Common\Flows\Manage Flows.ahk
+#include Source_Common\Flows\Flow actions.ahk
+#include Source_Common\Flows\states.ahk
 #include source_Common\Debug\Debug.ahk
 #include source_Common\Debug\Logger.ahk
 #include source_Common\Settings\Default values.ahk
@@ -131,13 +130,9 @@ global_elementInclusions =
 #include source_Common\variables\code evaluator.ahk
 #include source_Common\variables\code tokenizer.ahk
 #include source_Common\variables\expression evaluator.ahk
-#include source_Common\flows\flows.ahk
+#include Source_Common\Elements\Manage Elements.ahk
 #include source_Common\Elements\Elements.ahk
 #include source_Common\Other\Other.ahk
-
-;Those two variables are filled by the elements when they are included
-AllElementClasses:=Object()
-AllTriggerClasses:=Object()
 
 ;Include elements. This code is generated
 ;The elements must be included before the other treads are started
@@ -297,7 +292,36 @@ _share.WindowsStartup:=false
 ;Initialize a hidden command window. This window is able to receive commands from other processes.
 ;The first purpose is that the script AutoHotFlow.ahk/exe can send commands if a shortcut of the trigger "shortcut" is opened.
 CreateHiddenCommandWindow()
+
+SetTimer,queryTasks,100
 return
+
+queryTasks()
+{
+	global
+	Loop
+	{
+		oneTask:=_share.main.Tasks.removeat(1)
+		if (oneTask)
+		{
+			name:=oneTask.name
+			if (name="exit")
+			{
+				exitapp
+			}
+			if (name="ahkThreadStopped")
+			{
+				thread_Stopped(oneTask.ThreadID)
+			}
+			if (name="StartEditor")
+			{
+				Thread_StartEditor(oneTask.FlowID)
+			}
+		}
+		else
+			break
+	}
+}
 
 
 

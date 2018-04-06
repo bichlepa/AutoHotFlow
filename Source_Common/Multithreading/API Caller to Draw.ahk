@@ -6,7 +6,8 @@ API_Draw_Draw()
 	local retvalue
 	logger("t2", A_ThisFunc " called")
 	
-	retvalue := AhkThreadDraw.ahkFunction("API_Call_Draw_Draw")
+	_flows[FlowID].draw.mustDraw := true
+	
 	logger("t2", A_ThisFunc " finished")
 	
 	return retvalue

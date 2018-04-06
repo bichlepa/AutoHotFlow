@@ -31,6 +31,7 @@ lang_setLanguage(_settings.UILanguage)
 #include lib\objhasvalue\objhasvalue.ahk
 #include lib\ObjFullyClone\ObjFullyClone.ahk
 #include lib\Random Word List\Random Word List.ahk
+#include lib\Robert - Ini library\Robert - Ini library.ahk
 
 #include Source_Editor\User Interface\Editor GUI.ahk
 #include Source_Editor\User Interface\Editor GUI user input.ahk
@@ -44,13 +45,18 @@ lang_setLanguage(_settings.UILanguage)
 #include Source_Editor\User Interface\Tray.ahk
 #include Source_Editor\Elements\Mark elements.ahk
 #include Source_Editor\Elements\Clipboard.ahk
-#include Source_Editor\API\API receiver Editor.ahk
-#include Source_Editor\API\API Caller Elements.ahk
 #include Source_Editor\Assistants\Get window information.ahk
 #include Source_Editor\Assistants\Mouse Tracker.ahk
 #include Source_Editor\Assistants\Choose color.ahk
 
-#include source_Common\Multithreading\API Caller Main.ahk
+#include Source_Common\Flows\Save.ahk
+#include Source_Common\Flows\load.ahk
+#include Source_Common\Flows\Compatibility.ahk
+#include Source_Common\Flows\Manage Flows.ahk
+#include Source_Common\Flows\Flow actions.ahk
+#include Source_Common\Flows\states.ahk
+#include Source_Common\Elements\Manage Elements.ahk
+#include source_Common\Elements\Elements.ahk
 #include source_Common\Debug\Debug.ahk
 #include source_Common\Debug\Logger.ahk
 #include source_Common\settings\Default values.ahk
@@ -60,12 +66,15 @@ lang_setLanguage(_settings.UILanguage)
 #include source_Common\variables\code evaluator.ahk
 #include source_Common\variables\code tokenizer.ahk
 #include source_Common\variables\expression evaluator.ahk
-#include source_Common\flows\flows.ahk
-#include source_Common\Elements\Elements.ahk
 #include source_Common\Other\Other.ahk
 
-AllElementClasses:=Object()
-AllTriggerClasses:=Object()
+#include source_Common\Multithreading\API Caller to Main.ahk
+#include Source_Common\Multithreading\API Caller to Manager.ahk
+#include Source_Common\Multithreading\API Caller to Draw.ahk
+#include Source_Common\Multithreading\API Caller to Execution.ahk
+#include Source_Common\Multithreading\API for Elements.ahk
+
+
 ;PlaceholderIncludesOfElements
 
 parentAHKThread := AhkExported()
@@ -79,7 +88,29 @@ initializeTrayBar()
 
 FlowObj := _flows[FlowID]
 
+SetTimer,queryTasks,100
 return
+
+
+queryTasks()
+{
+	global
+	Loop
+	{
+		oneTask:=_share["editor" FlowID].Tasks.removeat(1)
+		if (oneTask)
+		{
+			name:=oneTask.name
+			if (name="EditGUIshow")
+			{
+				EditGUIshow()
+			}
+		}
+		else
+			break
+	}
+}
+
 
 
 exit_all()

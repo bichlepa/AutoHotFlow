@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Action_Get_From_List")
+x_RegisterElementClass("Action_Get_From_List")
 
 Element_getPackage_Action_Get_From_List()
 {

@@ -1,6 +1,12 @@
 ﻿;This file provides functions which can be accessed while executing the elements.
 ;main thread
 
+;Register Element classes
+x_RegisterElementClass(p_class)
+{
+	Element_Register_Element_Class(p_class)
+}
+
 ;Variable API functions:
 x_GetVariable(Environment, p_Varname, p_hidden = False)
 {

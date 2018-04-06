@@ -31,7 +31,7 @@ if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of t
 	ui_ActionWhenMainGUIDisabled()
 	return
 }
-API_Main_saveFlow(FlowID)
+saveFlow(FlowID)
 return
 
 
@@ -39,16 +39,16 @@ return
 
 ui_Menu_MenuStart:
 
-API_Main_executeFlow(FlowID)
+executeFlow(FlowID)
 
 return
 
 ui_Menu_MenuStop:
-API_Main_StopFlow(FlowID)
+StopFlow(FlowID)
 return
 
 ui_Menu_Enable:
-API_Main_enableToggleFlow(FlowID)
+enableToggleFlow(FlowID)
 return
 
 ui_Menu_Undo:

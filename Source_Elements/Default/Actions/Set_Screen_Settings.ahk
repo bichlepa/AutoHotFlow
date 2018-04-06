@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Action_Set_Screen_Settings")
+x_RegisterElementClass("Action_Set_Screen_Settings")
 
 ;Element type of the element
 Element_getElementType_Action_Set_Screen_Settings()

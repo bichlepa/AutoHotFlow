@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Trigger_Hotkey")
+x_RegisterElementClass("Trigger_Hotkey")
 
 Element_getPackage_Trigger_Hotkey()
 {

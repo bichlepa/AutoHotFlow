@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Action_Script")
+x_RegisterElementClass("Action_Script")
 
 Element_getPackage_Action_Script()
 {

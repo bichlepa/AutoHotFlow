@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Action_New_variable")
+x_RegisterElementClass("Action_New_variable")
 
 Element_getPackage_Action_New_variable()
 {

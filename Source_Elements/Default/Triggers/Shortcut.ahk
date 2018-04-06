@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Trigger_Shortcut")
+x_RegisterElementClass("Trigger_Shortcut")
 
 ;Element type of the element
 Element_getElementType_Trigger_Shortcut()

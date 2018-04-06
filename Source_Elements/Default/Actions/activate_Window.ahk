@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Action_Activate_Window")
+x_RegisterElementClass("Action_Activate_Window")
 
 Element_getPackage_Action_Activate_Window()
 {

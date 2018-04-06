@@ -120,7 +120,7 @@ importExportGui_import(filepathZip)
 		}
 		
 		;show flow in the manager
-		API_Main_InitFlow(newFlowFullPath)
+		InitFlow(newFlowFullPath)
 	}
 	
 	FileRemoveDir, % filepathextractfolder, 1

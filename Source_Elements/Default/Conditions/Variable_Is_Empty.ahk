@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Condition_Variable_Is_Empty")
+x_RegisterElementClass("Condition_Variable_Is_Empty")
 
 ;Element type of the element
 Element_getElementType_Condition_Variable_Is_Empty()

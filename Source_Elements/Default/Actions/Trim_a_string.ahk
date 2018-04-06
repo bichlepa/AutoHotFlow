@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Action_Trim_a_string")
+x_RegisterElementClass("Action_Trim_a_string")
 
 ;Element type of the element
 Element_getElementType_Action_Trim_a_string()

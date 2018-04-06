@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Condition_Expression")
+x_RegisterElementClass("Condition_Expression")
 
 Element_getPackage_Condition_Expression()
 {

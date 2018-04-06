@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Action_Set_Process_Priority")
+x_RegisterElementClass("Action_Set_Process_Priority")
 
 ;Element type of the element
 Element_getElementType_Action_Set_Process_Priority()

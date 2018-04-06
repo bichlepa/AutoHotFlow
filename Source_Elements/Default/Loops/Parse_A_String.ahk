@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Loop_Parse_A_String")
+x_RegisterElementClass("Loop_Parse_A_String")
 
 ;Element type of the element
 Element_getElementType_Loop_Parse_A_String()

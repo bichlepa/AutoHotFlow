@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Trigger_Manual")
+x_RegisterElementClass("Trigger_Manual")
 
 Element_getPackage_Trigger_Manual()
 {

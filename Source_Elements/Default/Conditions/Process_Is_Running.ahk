@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Condition_Process_Is_Running")
+x_RegisterElementClass("Condition_Process_Is_Running")
 
 ;Element type of the element
 Element_getElementType_Condition_Process_Is_Running()

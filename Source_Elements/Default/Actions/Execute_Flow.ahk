@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Action_Execute_Flow")
+x_RegisterElementClass("Action_Execute_Flow")
 
 Element_getPackage_Action_Execute_Flow()
 {

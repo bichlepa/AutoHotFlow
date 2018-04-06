@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Action_Compress_files")
+x_RegisterElementClass("Action_Compress_files")
 
 Element_getPackage_Action_Compress_files()
 {

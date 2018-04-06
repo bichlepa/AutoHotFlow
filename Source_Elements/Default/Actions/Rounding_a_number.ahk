@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Action_Rounding_A_Number")
+x_RegisterElementClass("Action_Rounding_A_Number")
 
 ;Element type of the element
 Element_getElementType_Action_Rounding_A_Number()

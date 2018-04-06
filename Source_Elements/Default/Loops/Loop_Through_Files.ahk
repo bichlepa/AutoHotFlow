@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Loop_Loop_Through_Files")
+x_RegisterElementClass("Loop_Loop_Through_Files")
 
 ;Element type of the element
 Element_getElementType_Loop_Loop_Through_Files()

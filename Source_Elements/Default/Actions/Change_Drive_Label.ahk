@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Action_Change_Drive_Label")
+x_RegisterElementClass("Action_Change_Drive_Label")
 
 ;Element type of the element
 Element_getElementType_Action_Change_Drive_Label()

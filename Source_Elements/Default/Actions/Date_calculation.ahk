@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Action_Date_Calculation")
+x_RegisterElementClass("Action_Date_Calculation")
 
 ;Element type of the element
 Element_getElementType_Action_Date_Calculation()

@@ -36,8 +36,7 @@ lang_setLanguage(_settings.UILanguage)
 #include Lib\ObjFullyClone\ObjFullyClone.ahk
 
 #include Source_Draw\GDIp\gdip.ahk
-#include Source_Draw\API\API receiver draw.ahk
-#include source_Common\Multithreading\API Caller Main.ahk
+#include source_Common\Multithreading\API Caller to Main.ahk
 
 #include Source_Common\Debug\Debug.ahk
 #include source_Common\Debug\Logger.ahk

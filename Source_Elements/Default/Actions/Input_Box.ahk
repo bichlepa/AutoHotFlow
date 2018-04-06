@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Action_Input_Box")
+x_RegisterElementClass("Action_Input_Box")
 
 ;Element type of the element
 Element_getElementType_Action_Input_Box()

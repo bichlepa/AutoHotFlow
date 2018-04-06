@@ -349,7 +349,7 @@ class ElementSettings
 		
 		
 		
-		API_Main_Draw()
+		API_Draw_Draw()
 		GUISettingsOfElementObject.close()
 		return
 		

@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Condition_Debug_Dialog")
+x_RegisterElementClass("Condition_Debug_Dialog")
 
 Element_getPackage_Condition_Debug_Dialog()
 {

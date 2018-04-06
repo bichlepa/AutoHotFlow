@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("&ElementType&_&Name&")
+x_RegisterElementClass("&ElementType&_&Name&")
 
 ;Element type of the element
 Element_getElementType_&ElementType&_&Name&()

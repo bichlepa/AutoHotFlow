@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Action_Set_Flow_Status")
+x_RegisterElementClass("Action_Set_Flow_Status")
 
 Element_getPackage_Action_Set_Flow_Status()
 {

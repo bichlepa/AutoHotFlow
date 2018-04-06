@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Action_Close_Window")
+x_RegisterElementClass("Action_Close_Window")
 
 ;Element type of the element
 Element_getElementType_Action_Close_Window()

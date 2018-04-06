@@ -165,7 +165,7 @@ LoadFlow(FlowID, filepath="", params="")
 				loadElementClass:=_flows[FlowID].allElements[loadElementID].Class
 				
 				;If element class is not installed, prepare a warning message
-				if not (ObjHasValue(AllElementClasses,loadElementClass))
+				if not (ObjHasValue(_share.AllElementClasses,loadElementClass))
 				{
 					;~ d(_flows[FlowID], FlowID " - " loadElementPackage)
 					if not (ObjHasValue(missingpackages,loadElementPackage))
@@ -257,7 +257,7 @@ LoadFlow(FlowID, filepath="", params="")
 			
 			
 			;If element class is not installed, prepare a warning message
-			if not (ObjHasValue(AllTriggerClasses,loadElementClass))
+			if not (ObjHasValue(AllElementClasses,loadElementClass))
 			{
 				;~ MsgBox % _flows[FlowID].allElements[loadElementID].Class "`n" loadElementPackage
 				if not (ObjHasValue(missingpackages,loadElementPackage))
@@ -371,8 +371,8 @@ LoadFlowParametersOfElement(FlowID,parList,parElementID,parlocation, parSection)
 	;~ d(parList,parElementID) 
 	parametersToload:=Element_getParameters(loadElementClass, {flowID: FlowID, elementID: parElementID})
 	parametersToloadDetails:=Element_getParametrizationDetails(loadElementClass, {flowID: FlowID, elementID: parElementID})
-	;~ d(parametersToload,"parametersToload")
-	;~ d(parametersToloadDetails, "parametersToloadDetails")
+	;~ d(parametersToload,"parametersToload " parElementID)
+	;~ d(parametersToloadDetails, "parametersToloadDetails " parElementID)
 
 	for index, oneParameterID in parametersToload
 	{

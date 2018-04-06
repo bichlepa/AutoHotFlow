@@ -1,5 +1,35 @@
 EnabledTriggerIDCounter:=0
 
+enableFlow(par_FlowID)
+{
+	global
+	local oneTriggerID, oneTrigger
+	if (_flows[par_FlowID].loaded != true)
+	{
+		LoadFlow(par_FlowID)
+	}
+	enableTriggers(par_FlowID)
+	SaveFlowMetaData(par_FlowID)
+}
+enableToggleFlow(par_FlowID)
+{
+	global
+	
+	if (_flows[par_FlowID].enabled != true)
+	{
+		enableFlow(par_FlowID)
+	}
+	else
+	{
+		disableFlow(par_FlowID)
+	}
+}
+
+disableFlow(par_FlowID)
+{
+	disableTriggers(par_FlowID)
+	SaveFlowMetaData(par_FlowID)
+}
 
 enableTriggers(p_Flow)
 {
@@ -22,7 +52,7 @@ enableTriggers(p_Flow)
 	;~ d(p_flow)
 }
 
-enableOneTrigger(p_Flow, p_Trigger)
+enableOneTrigger(p_Flow, p_Trigger, p_save=true)
 {
 	logger("a2", "Going to enable trigger " p_Trigger.ID " in flow " p_Flow.name)
 	
@@ -31,6 +61,9 @@ enableOneTrigger(p_Flow, p_Trigger)
 	justEnableOneTrigger(p_Flow, p_Trigger)
 	
 	p_Flow.enabled:=true
+	if (p_save)
+		SaveFlowMetaData(p_Flow.id)
+	
 	logger("a1", "Trigger " p_Trigger.ID " in flow " p_Flow.name " enabled")
 }
 
@@ -94,7 +127,7 @@ disableTriggers(p_Flow)
 	p_Flow.enabled:=false
 	;~ d(p_flow)
 }
-disableOneTrigger(p_Flow, p_Trigger)
+disableOneTrigger(p_Flow, p_Trigger, p_save=true)
 {
 	p_Flow.enabled:="Disabling"
 	logger("a2", "Going to disable trigger " p_Trigger.ID " in Flow " p_Flow.name)
@@ -112,10 +145,13 @@ disableOneTrigger(p_Flow, p_Trigger)
 	}
 	
 	
-	
 	logger("a2", "Trigger " p_Trigger.ID " in Flow " p_Flow.name " disabled")
 	if (otherTriggersInThisFlowEnabled = False)
+	{
 		p_Flow.enabled:=false
+	}
+	if (p_save)
+		SaveFlowMetaData(p_Flow.id)
 }
 
 justDisableOneTrigger(p_Flow, p_Trigger, p_EnabledTrigger)

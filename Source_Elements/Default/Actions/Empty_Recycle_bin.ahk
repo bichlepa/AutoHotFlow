@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Action_Empty_Recycle_Bin")
+x_RegisterElementClass("Action_Empty_Recycle_Bin")
 
 ;Element type of the element
 Element_getElementType_Action_Empty_Recycle_Bin()

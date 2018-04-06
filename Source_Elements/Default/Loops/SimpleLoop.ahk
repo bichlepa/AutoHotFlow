@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Loop_SimpleLoop")
+x_RegisterElementClass("Loop_SimpleLoop")
 
 Element_getPackage_Loop_SimpleLoop()
 {

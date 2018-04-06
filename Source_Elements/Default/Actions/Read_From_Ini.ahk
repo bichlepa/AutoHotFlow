@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Action_Read_From_Ini")
+x_RegisterElementClass("Action_Read_From_Ini")
 
 ;Element type of the element
 Element_getElementType_Action_Read_From_Ini()

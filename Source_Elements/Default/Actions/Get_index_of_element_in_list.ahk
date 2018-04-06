@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Action_Get_Index_Of_Element_In_List")
+x_RegisterElementClass("Action_Get_Index_Of_Element_In_List")
 
 Element_getPackage_Action_Get_Index_Of_Element_In_List()
 {

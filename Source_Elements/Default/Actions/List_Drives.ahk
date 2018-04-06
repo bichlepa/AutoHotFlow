@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Action_List_drives")
+x_RegisterElementClass("Action_List_drives")
 
 ;Element type of the element
 Element_getElementType_Action_List_drives()

@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Condition_File_Has_Attribute")
+x_RegisterElementClass("Condition_File_Has_Attribute")
 
 ;Element type of the element
 Element_getElementType_Condition_File_Has_Attribute()

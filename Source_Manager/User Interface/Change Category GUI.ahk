@@ -46,7 +46,7 @@
 	ChangeCategoryOK:
 	gui, changeCategory:Submit, nohide
 	;~ d(FlowIDbyName(ChangeCategoryList, "Category"))
-	API_Main_ChangeFlowCategory(changeFlowCategory_FlowID, FlowIDbyName(ChangeCategoryList, "Category"))
+	ChangeFlowCategory(changeFlowCategory_FlowID, FlowIDbyName(ChangeCategoryList, "Category"))
 
 	gui, changeCategory:destroy
 	Enable_Manager_GUI()
@@ -57,8 +57,8 @@
 	
 	if ChangeCategoryNewName
 	{
-		newcategoryid:=API_Main_NewCategory(ChangeCategoryNewName)
-		API_Main_ChangeFlowCategory(changeFlowCategory_FlowID, newcategoryid)
+		newcategoryid:=NewCategory(ChangeCategoryNewName)
+		ChangeFlowCategory(changeFlowCategory_FlowID, newcategoryid)
 		gui, changeCategory:destroy
 		Enable_Manager_GUI()
 	}

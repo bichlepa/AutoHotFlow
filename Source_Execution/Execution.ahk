@@ -26,8 +26,21 @@ lang_setLanguage(_settings.UILanguage)
 #include Lib\ObjFullyClone\ObjFullyClone.ahk
 #include lib\Random Word List\Random Word List.ahk
 #include Lib\gdi+\gdip.ahk
+#include lib\ObjHasValue\ObjHasValue.ahk
+#include lib\Robert - Ini library\Robert - Ini library.ahk
 
 ;~ #include Source_Draw\API\API receiver execution.ahk
+
+;~ #include Source_Common\Flows\Manage Flows.ahk
+;~ #include Source_Common\Elements\Manage Elements.ahk
+#include Source_Common\Flows\Save.ahk
+#include Source_Common\Flows\load.ahk
+#include Source_Common\Flows\Compatibility.ahk
+#include Source_Common\Flows\Manage Flows.ahk
+;~ #include Source_Common\Flows\Flow actions.ahk
+#include Source_Common\Flows\states.ahk
+#include Source_Common\Elements\Manage Elements.ahk
+#include source_Common\Elements\Elements.ahk
 
 #include Source_Common\Debug\Debug.ahk
 #include source_Common\Debug\Logger.ahk
@@ -37,20 +50,18 @@ lang_setLanguage(_settings.UILanguage)
 #include source_Common\Variables\code tokenizer.ahk
 #include source_Common\Variables\code evaluator.ahk
 #include source_Common\Variables\expression evaluator.ahk
-#include source_Common\Multithreading\API Caller Main.ahk
-#include source_Common\flows\flows.ahk
-#include source_Common\Elements\Elements.ahk
 #include source_Common\Other\Other.ahk
 
 #include Source_Execution\execution task\execution task.ahk
-#include Source_Execution\API\functions for elements.ahk
+#include Source_Execution\API\API for elements.ahk
 #include Source_Execution\execution task\instances and threads.ahk
-#include Source_Execution\API\API receiver Execution.ahk
 #include Source_Execution\Variables\Variables.ahk
 #include Source_Execution\Trigger\Trigger.ahk
 
-AllElementClasses:=Object()
-AllTriggerClasses:=Object()
+#include source_Common\Multithreading\API Caller to Main.ahk
+#include Source_Common\Multithreading\API Caller to Manager.ahk
+#include Source_Common\Multithreading\API Caller to Draw.ahk
+#include Source_Common\Multithreading\API Caller to Editor.ahk
 
 ;PlaceholderIncludesOfElements
 
@@ -60,7 +71,92 @@ menu,tray, tip, Execution
 
 SetTimer,executionTask,10
 
+SetTimer,queryTasks,100
 return
+
+queryTasks()
+{
+	global
+	Loop
+	{
+		oneTask:=_share.execution.Tasks.removeat(1)
+		if (oneTask)
+		{
+			name:=oneTask.name
+			
+			if (name = "startFlow")
+			{
+				startFlow(_flows[oneTask.FlowID], _flows[oneTask.FlowID].allElements[oneTask.TriggerID], oneTask.params)
+			}
+			else if (name = "enableTriggers")
+			{
+				enableTriggers(_flows[oneTask.FlowID])
+			}
+			if (name = "StopFlow")
+			{
+				StopFlow(_flows[oneTask.FlowID])
+			}
+			if (name = "ExecuteToggleFlow")
+			{
+				ExecuteToggleFlow(_flows[oneTask.FlowID])
+			}
+			if (name = "DisableTriggers")
+			{
+				DisableTriggers(_flows[oneTask.FlowID])
+			}
+			if (name = "enableOneTrigger")
+			{
+				enableOneTrigger(_flows[oneTask.FlowID], _flows[oneTask.FlowID].allelements[oneTask.TriggerID])
+			}
+			if (name = "disableOneTrigger")
+			{
+				disableOneTrigger(_flows[oneTask.FlowID], _flows[oneTask.FlowID].allelements[oneTask.TriggerID])
+			}
+			if (name = "externalFlowFinish")
+			{
+				ExecuteInNewAHKThread_finishedExecution(_flows[oneTask.UniqueID])
+			}
+			if (name = "externalTrigger")
+			{
+				ExecuteInNewAHKThread_trigger(_flows[oneTask.UniqueID])
+			}
+			
+			;~ if (isfunc(name))
+			;~ {
+				;~ if (oneTask.HasKey(par1))
+				;~ {
+					;~ if (oneTask.HasKey(par2))
+					;~ {
+						;~ %name%(par1)
+						;~ if (oneTask.HasKey(par3))
+						;~ {
+							;~ if (oneTask.HasKey(par4))
+							;~ {
+								;~ %name%(par1, par2, par3, par4)
+							;~ }
+							;~ else
+								;~ %name%(par1, par2, par3)
+						;~ }
+						;~ else
+							;~ %name%(par1, par2)
+					;~ }
+					;~ else
+						;~ %name%(par1)
+				;~ }
+				;~ else
+					;~ %name%()
+			;~ }
+			
+			if (name="abc")
+			{
+				MsgBox "abc"
+			}
+		}
+		else
+			break
+	}
+	
+}
 
 
 

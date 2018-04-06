@@ -17,11 +17,15 @@ Thread_StartManager()
 	local ExecutionThreadCode
 	local threadID
 	
+	_share.manager := CriticalObject()
+	_share.manager.Tasks := CriticalObject()
 	
 	threadID := "Manager"
 	logger("t1", "Starting manager thread. ID: " threadID)
 	FileRead,ExecutionThreadCode,% _ScriptDir "\Source_Manager\Manager.ahk"
 	;~ MsgBox %ExecutionThreadCode%
+	StringReplace,ExecutionThreadCode,ExecutionThreadCode,;PlaceholderIncludesOfElements,% global_elementInclusions
+	
 	AhkThread%threadID% := AhkThread("global _ahkCriticalSection_Flows := CriticalSection("_ahkCriticalSection_Flows ")`n global _flows := CriticalObject(" (&_flows) ") `n global _settings := CriticalObject(" (&_settings) ") `n global _execution := CriticalObject(" (&_execution) ") `n global _share := CriticalObject(" (&_share) ")`n global _language := CriticalObject(" (&_language) ") `n global _ahkThreadID := """ threadID """`n" ExecutionThreadCode)
 	
 	global_AllThreads[threadID] := {permanent: true, type: "Manager"}
@@ -43,11 +47,19 @@ Thread_StopAll()
 	}
 }
 
+API_Main_StartEditor(par_FlowID) ;API Function
+{
+	Thread_StartEditor(par_FlowID)
+}
 Thread_StartEditor(par_FlowID)
 {
 	global
 	local ExecutionThreadCode
 	local threadID
+	
+	_share["editor" par_FlowID]:= CriticalObject()
+	_share["editor" par_FlowID].Tasks := CriticalObject()
+	
 	threadID := "Editor" global_EditorThreadIDCounter++
 	logger("t1", "Starting editor thread. ID: " threadID)
 	FileRead,ExecutionThreadCode,% _ScriptDir "\Source_Editor\Editor.ahk"
@@ -65,6 +77,10 @@ Thread_StartDraw()
 	global
 	local ExecutionThreadCode
 	local threadID
+	
+	_share.draw := CriticalObject()
+	_share.draw.Tasks := CriticalObject()
+	
 	threadID := "Draw"
 	logger("t1", "Starting draw thread. ID: " threadID)
 	FileRead,ExecutionThreadCode,% _ScriptDir "\Source_Draw\Draw.ahk"
@@ -79,6 +95,10 @@ Thread_StartExecution()
 	global
 	local ExecutionThreadCode
 	local threadID
+	
+	_share.execution := CriticalObject()
+	_share.execution.Tasks := CriticalObject()
+	
 	threadID := "Execution" global_ExecutionThreadIDCounter++
 	logger("t1", "Starting execution thread. ID: " threadID)
 	FileRead,ExecutionThreadCode,% _ScriptDir "\Source_Execution\execution.ahk"

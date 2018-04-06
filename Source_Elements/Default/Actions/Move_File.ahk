@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Action_Move_File")
+x_RegisterElementClass("Action_Move_File")
 
 ;Element type of the element
 Element_getElementType_Action_Move_File()

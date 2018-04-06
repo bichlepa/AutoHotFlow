@@ -1,5 +1,5 @@
 ;Always add this element class name to the global list
-AllElementClasses.push("Trigger_Process_Closes")
+x_RegisterElementClass("Trigger_Process_Closes")
 
 ;Element type of the element
 Element_getElementType_Trigger_Process_Closes()

@@ -11,7 +11,7 @@ SaveFlowMetaData(FlowID)
 	if (_Flows[FlowID].file="")
 	{
 		;Do not save anything if flow does not exist. (Should not happen)
-		MsgBox unexpected error. should save flow "%FlowID%", but no flow file specified
+		MsgBox unexpected error. should save metadata of flow "%FlowID%", but no flow file specified
 		return
 	}
 	

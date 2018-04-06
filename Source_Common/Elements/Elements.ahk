@@ -1,12 +1,19 @@
 ﻿Element_bufferedParametrationDetails:=Object()
 Element_bufferedParameters:=Object()
 
+Element_Register_Element_Class(p_class)
+{
+	_share.AllElementClasses.push(p_class)
+}
+
 Element_getParametrizationDetails(elementClass, Environment)
 {
 	global Element_bufferedParametrationDetails
 	if (not isobject(Element_bufferedParametrationDetails[elementClass]) 
 		or (Element_bufferedParametrationDetails[elementClass].updateOnEdit and Environment.updateOnEdit )) ;If the edit field is opened and the parameters must be reloaded
 	{
+		if not IsFunc("Element_getParametrizationDetails_" elementClass)
+			MsgBox unexpected error function Element_getParametrizationDetails_%elementClass% does not exist
 		Element_bufferedParametrationDetails[elementClass]:=Element_getParametrizationDetails_%elementClass%(Environment)
 	}
 	return ObjFullyClone(Element_bufferedParametrationDetails[elementClass])

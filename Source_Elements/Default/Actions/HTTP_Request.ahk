@@ -1,5 +1,5 @@
 ﻿;Always add this element class name to the global list
-AllElementClasses.push("Action_HTTP_Request")
+x_RegisterElementClass("Action_HTTP_Request")
 
 ;Element type of the element
 Element_getElementType_Action_HTTP_Request()
