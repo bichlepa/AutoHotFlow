@@ -516,7 +516,7 @@ gdip_DrawEverything(FlowObj)
 		;msgbox,x%lin1x% y%lin1y% w%lin1w% h%lin1h%
 
 		
-		allConnections[drawID].CountOfParts:=0
+		DrawResult.elements[drawID]:=Object()
 		
 		loop 5
 		{
@@ -544,14 +544,14 @@ gdip_DrawEverything(FlowObj)
 			;~ ToolTip % drawElement.CountOfParts
 			
 			;Define area of parts
-			allConnections[drawID]["part" a_index "x1"]:=((lin%a_index%x-20-Offsetx)*zoomFactor)
-			allConnections[drawID]["part" a_index "y1"]:=((lin%a_index%y-20-Offsety)*zoomFactor)
-			allConnections[drawID]["part" a_index "x2"]:=((lin%a_index%x+lin%a_index%w+20-Offsetx)*zoomFactor)
-			allConnections[drawID]["part" a_index "y2"]:=((lin%a_index%y+lin%a_index%h+20-Offsety)*zoomFactor)
+			DrawResult.elements[drawID]["part" a_index "x1"]:=((lin%a_index%x-20-Offsetx)*zoomFactor)
+			DrawResult.elements[drawID]["part" a_index "y1"]:=((lin%a_index%y-20-Offsety)*zoomFactor)
+			DrawResult.elements[drawID]["part" a_index "x2"]:=((lin%a_index%x+lin%a_index%w+20-Offsetx)*zoomFactor)
+			DrawResult.elements[drawID]["part" a_index "y2"]:=((lin%a_index%y+lin%a_index%h+20-Offsety)*zoomFactor)
 			
 			;~ drawElement.ClickPriority:=200
 		}
-		allConnections[drawID].CountOfParts:=5
+		DrawResult.elements[drawID].CountOfParts:=5
 	}
 	
 
@@ -862,11 +862,11 @@ gdip_DrawEverything(FlowObj)
 		;Move Button
 		if (tempElList[markedElement].type = "connection")
 		{
-			middlePointOfMoveButton1X:=((tempElList[markedElement].part1x1 +  tempElList[markedElement].part1x2)/2  ) / zoomFactor 
-			middlePointOfMoveButton1Y:=(tempElList[markedElement].part1y1 ) / zoomFactor +20
+			middlePointOfMoveButton1X:=((DrawResult.elements[markedElement].part1x1 +  DrawResult.elements[markedElement].part1x2)/2  ) / zoomFactor 
+			middlePointOfMoveButton1Y:=(DrawResult.elements[markedElement].part1y1 ) / zoomFactor +20
 			
-			middlePointOfMoveButton2X:=((tempElList[markedElement].part5x1 +  tempElList[markedElement].part5x2)/2  ) / zoomFactor 
-			middlePointOfMoveButton2Y:=(tempElList[markedElement].part5y2 ) / zoomFactor  -20
+			middlePointOfMoveButton2X:=((DrawResult.elements[markedElement].part5x1 +  DrawResult.elements[markedElement].part5x2)/2  ) / zoomFactor 
+			middlePointOfMoveButton2Y:=(DrawResult.elements[markedElement].part5y2 ) / zoomFactor  -20
 			
 			
 			
@@ -892,8 +892,8 @@ gdip_DrawEverything(FlowObj)
 		else if (tempElList[markedElement].type = "connection")
 		{
 			
-			middlePointOfEditButtonX:=((tempElList[markedElement].part3x1 +  tempElList[markedElement].part3x2)/2  ) / zoomFactor - SizeOfButtons*1.3
-			middlePointOfEditButtonY:=((tempElList[markedElement].part3y1 + tempElList[markedElement].part3y2) /2   ) / zoomFactor 
+			middlePointOfEditButtonX:=((DrawResult.elements[markedElement].part3x1 +  DrawResult.elements[markedElement].part3x2)/2  ) / zoomFactor - SizeOfButtons*1.3
+			middlePointOfEditButtonY:=((DrawResult.elements[markedElement].part3y1 + DrawResult.elements[markedElement].part3y2) /2   ) / zoomFactor 
 		}
 		Gdip_DrawImage(G, pBitmapEdit, (middlePointOfEditButtonX - (SizeOfButtons*0.5) )*zoomFactor, ( middlePointOfEditButtonY - (SizeOfButtons*0.5)) *zoomFactor, SizeOfButtons*zoomFactor, SizeOfButtons*zoomFactor , 0, 0, 48, 48)
 		EditButtonExist:=true
@@ -904,8 +904,8 @@ gdip_DrawEverything(FlowObj)
 		{
 			if (tempElList[markedElement].type = "connection")
 			{
-				middlePointOfTrashButtonX:=((tempElList[markedElement].part3x1 + tempElList[markedElement].part3x2)/2) / zoomFactor + SizeOfButtons*1.3
-				middlePointOfTrashButtonY:=((tempElList[markedElement].part3y1 + tempElList[markedElement].part3y2)/2) / zoomFactor 
+				middlePointOfTrashButtonX:=((DrawResult.elements[markedElement].part3x1 + DrawResult.elements[markedElement].part3x2)/2) / zoomFactor + SizeOfButtons*1.3
+				middlePointOfTrashButtonY:=((DrawResult.elements[markedElement].part3y1 + DrawResult.elements[markedElement].part3y2)/2) / zoomFactor 
 			}
 			else
 			{
@@ -919,8 +919,8 @@ gdip_DrawEverything(FlowObj)
 		;Plus Button
 		if (tempElList[markedElement].type = "connection")
 		{
-			middlePointOfPlusButtonX:=((tempElList[markedElement].part3x1 +  tempElList[markedElement].part3x2)/2  ) / zoomFactor 
-			middlePointOfPlusButtonY:=((tempElList[markedElement].part3y1 + tempElList[markedElement].part3y2 )/2  ) / zoomFactor 
+			middlePointOfPlusButtonX:=((DrawResult.elements[markedElement].part3x1 +  DrawResult.elements[markedElement].part3x2)/2  ) / zoomFactor 
+			middlePointOfPlusButtonY:=((DrawResult.elements[markedElement].part3y1 + DrawResult.elements[markedElement].part3y2 )/2  ) / zoomFactor 
 			Gdip_DrawImage(G, pBitmapPlus, (middlePointOfPlusButtonX - (SizeOfButtons*0.5) )*zoomFactor, ( middlePointOfPlusButtonY - (SizeOfButtons*0.5)) *zoomFactor, SizeOfButtons*zoomFactor, SizeOfButtons*zoomFactor , 0, 0, 48, 48)
 			PlusButtonExist:=true
 		}

@@ -324,7 +324,7 @@ Var_GetLocation_Common(Environment, p_Name, p_hidden=False)
 	{
 		if (p_hidden != true and p_hidden != "hidden")
 		{
-			MsgBox unexpected error while retrieving variable location of %p_Name%: The parameter p_hidden has unsupported value: %p_hiden%
+			MsgBox unexpected error while retrieving variable location of %p_Name%: The parameter p_hidden has unsupported value: %p_hidden%
 		}
 		else
 		{

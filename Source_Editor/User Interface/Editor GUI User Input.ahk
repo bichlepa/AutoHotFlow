@@ -527,10 +527,11 @@ ui_findElementUnderMouse(par_mode="default")
 		elementHighestPriority=0 ;The highest priority decides which element will be selected. The priority reduces a little bit when the element was selected, and increases every time the user clicks on it but something else is selected. This way it is possible to click through the elements whith are beneath each other.
 		for forID, forElement in FlowObj.allconnections
 		{
+			drawResults:=FlowObj.DrawResult.elements[forID]
 			;~ MsgBox % forID " - " forElement.CountOfParts 
-			Loop % forElement.CountOfParts ;Connections consist of multiple parts
+			Loop % drawResults.CountOfParts ;Connections consist of multiple parts
 			{
-				if (forElement["part" a_index "x1"] < mx and forElement["part" a_index "y1"] < my and forElement["part" a_index "x2"] > mx and forElement["part" a_index "y2"] > my)
+				if (drawResults["part" a_index "x1"] < mx and drawResults["part" a_index "y1"] < my and drawResults["part" a_index "x2"] > mx and drawResults["part" a_index "y2"] > my)
 				{
 					if (elementHighestPriority < forElement.ClickPriority) ;find the element with highest priority
 					{
