@@ -67,17 +67,30 @@ drawTask()
 	
 	Loop
 	{
+		EnterCriticalSection(_cs.flows)
+		
 		somethingdrawn:= false
+		flowParamsCloned:=""
 		for flowID, flowParams in _flows
 		{
 			if (flowParams.draw.mustDraw = true)
 			{
 				flowParams.draw.mustDraw := false
-				gdip_DrawEverything(flowParams)
-				somethingdrawn:=true
+				
+				;~ flowParamsCloned:=flowParams
+				flowParamsCloned:=ObjFullyClone(flowParams)
 			}
-			
 		}
+		
+		LeaveCriticalSection(_cs.flows)
+		
+		if flowParamsCloned
+		{
+			gdip_DrawEverything(flowParamsCloned)
+			somethingdrawn:=true
+		}
+			
+		
 		if (somethingdrawn = false)
 		{
 			SetTimer,drawTask,10

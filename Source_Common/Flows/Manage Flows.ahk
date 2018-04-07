@@ -30,6 +30,8 @@ InitFlow(FileFullPath)
 	local tempdemo
 	local newFlowID
 	
+	EnterCriticalSection(_cs.flows)
+	
 	SplitPath, FileFullPath,,ThisFlowFolder,,ThisFlowFilename
 
 	;Read information about flow 
@@ -106,7 +108,7 @@ InitFlow(FileFullPath)
 		_share.managerTasks.select:="Flow:" newFlowid
 	}
 	
-	_flows[newFlowID].draw := []
+	_flows[newFlowID].draw := CriticalObject()
 	
 	if (tempflowenabled != 0) ;Enable flow
 	{
@@ -116,6 +118,7 @@ InitFlow(FileFullPath)
 		}
 	}
 	
+	LeaveCriticalSection(_cs.flows)
 }
 
 ;Create a new file for a flow
@@ -124,6 +127,8 @@ NewFlow(par_CategoryID = "")
 	global
 	local newFlowid
 	local tempCategoryID
+	
+	EnterCriticalSection(_cs.flows)
 	
 	;If category ID not given, move to Category "Uncategorized"
 
@@ -183,6 +188,8 @@ NewFlow(par_CategoryID = "")
 		_share.managerTasks.select:="Flow:" newFlowid
 	}
 
+	LeaveCriticalSection(_cs.flows)
+	
 	return newFlowid
 }
 
@@ -195,6 +202,8 @@ NewCategory(par_Newname = "")
 	local Newname
 	local tempNewname
 	local tempindex
+	
+	EnterCriticalSection(_cs.flows)
 	
 	;~ d(par_Newname)
 	if (par_Newname = "") ;If a new category should be created and the name is not given
@@ -234,6 +243,7 @@ NewCategory(par_Newname = "")
 			{
 				;If it already exists, return the id
 				;~ d(tempitem)
+				LeaveCriticalSection(_cs.flows)
 				return tempitem.id
 			}
 			;MsgBox,%tempcategoryexist% 
@@ -252,12 +262,17 @@ NewCategory(par_Newname = "")
 		_share.managerTasks.select:="Flow:" newFlowid
 	}
 	;~ d(allCategories)
+	
+	LeaveCriticalSection(_cs.flows)
+	
 	return newCategoryid
 }
 
 ChangeFlowCategory(par_FlowID, par_CategoryID)
 {
 	global
+	
+	EnterCriticalSection(_cs.flows)
 	
 	if (par_FlowID = "")
 	{
@@ -273,11 +288,15 @@ ChangeFlowCategory(par_FlowID, par_CategoryID)
 		_share.managerTasks.refillTree:=true
 		_share.managerTasks.select:="Flow:" newFlowid
 	}
+	
+	LeaveCriticalSection(_cs.flows)
 }
 
 UpdateFlowCategoryName(par_FlowID)
 {
+	EnterCriticalSection(_cs.flows)
 	_flows[par_FlowID].categoryName := _share.allCategories[_flows[par_FlowID].category].name
+	LeaveCriticalSection(_cs.flows)
 }
 
 
@@ -285,6 +304,8 @@ DeleteFlow(par_ID)
 {
 	global
 	;TODO: Close editor and stop flow execution
+	
+	EnterCriticalSection(_cs.flows)
 	
 	FileDelete,% _flows[par_ID].file
 	
@@ -298,12 +319,16 @@ DeleteFlow(par_ID)
 		_share.managerTasks.refillTree:=true
 		_share.managerTasks.select:="Category:" parentcategory ":expand"
 	}
+	
+	LeaveCriticalSection(_cs.flows)
 }
 
 DuplicateFlow(par_ID)
 {
 	global
 	local newFlowid
+	
+	EnterCriticalSection(_cs.flows)
 	
 	;Create the flow in the global variable
 	;~ d(NewName " - " tempcategoryid " - " Categoryname)
@@ -355,11 +380,15 @@ DuplicateFlow(par_ID)
 		_share.managerTasks.select:="Flow:" newFlowid
 	}
 
+	LeaveCriticalSection(_cs.flows)
 }
 
 DeleteCategory(par_ID)
 {
 	global
+	
+	EnterCriticalSection(_cs.flows)
+	
 	_share.allCategories.delete(par_ID)
 	
 	;Upadte TV entries
@@ -368,12 +397,15 @@ DeleteCategory(par_ID)
 		_share.managerTasks.refillTree:=true
 		_share.managerTasks.select:="Flow:" newFlowid
 	}
+	
+	LeaveCriticalSection(_cs.flows)
 }
 
 
 FlowIDbyName(par_name,Type="") ;Returns the id by name
 {
-	global
+	EnterCriticalSection(_cs.flows)
+	
 	if ((type = "flow") or (type = ""))
 	{
 		for count, tempitem in _flows
@@ -381,7 +413,8 @@ FlowIDbyName(par_name,Type="") ;Returns the id by name
 			if (tempitem.name = par_name)
 			{
 				;~ MsgBox % tempitem.id " - " tempitem.name
-				return tempitem.id
+				retval:= tempitem.id
+				break
 			}
 			
 		}
@@ -392,10 +425,14 @@ FlowIDbyName(par_name,Type="") ;Returns the id by name
 		{
 			if (tempitem.name = par_name)
 			{
-				return tempitem.id
+				retval:= tempitem.id
+				break
 			}
 			
 		}
 	}
-	return 
+	
+	LeaveCriticalSection(_cs.flows)
+	
+	return retval
 }

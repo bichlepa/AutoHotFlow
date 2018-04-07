@@ -70,6 +70,9 @@ ui_SettingsOwFLow()
 return
 
 ui_Menu_CheckLoop:
+
+EnterCriticalSection(_cs.flows)
+
 if (menu_bar_IsEnabled != FlowObj.enabled)
 {
 	if (FlowObj.enabled = True)
@@ -84,6 +87,7 @@ if (menu_bar_IsEnabled != FlowObj.enabled)
 	}
 	
 }
+LeaveCriticalSection(_cs.flows)
 
 return
 

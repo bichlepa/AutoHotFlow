@@ -146,13 +146,18 @@ x_GetMyElementID(Environment)
 
 x_getFlowIDByName(p_FlowName)
 {
+	EnterCriticalSection(_cs.flows)
+	
 	for forFlowID, forFlow in _Flows
 	{
 		if (forFlow.name = p_FlowName)
 		{
-			return forFlowID
+			retval:= forFlowID
 		}
 	}
+	
+	LeaveCriticalSection(_cs.flows)
+	return retval
 }
 
 
@@ -210,52 +215,75 @@ x_FlowStop(p_FlowID)
 
 x_GetListOfFlowNames()
 {
+	EnterCriticalSection(_cs.flows)
+	
 	;Search for all flowNames
 	choices:=object()
 	for oneFlowID, oneFlow in _flows
 	{
 		choices.push(oneFlow.name)
 	}
+	
+	LeaveCriticalSection(_cs.flows)
+	
 	return choices
 }
 
 x_GetListOfFlowIDs()
 {
+	EnterCriticalSection(_cs.flows)
+	
 	;Search for all flowNames
 	choices:=object()
 	for oneFlowID, oneFlow in _flows
 	{
 		choices.push(oneFlowID)
 	}
+	
+	LeaveCriticalSection(_cs.flows)
+	
 	return choices
 }
 
 
 x_getAllElementIDsOfType(p_FlowID, p_Type)
 {
+	EnterCriticalSection(_cs.flows)
+	
 	elements:=Object()
 	for oneElementID, oneElement in _flows[p_FlowID].allElements
 	{
 		if (oneElement.class = p_Class)
 			elements.push(oneElementID)
 	}
+	
+	LeaveCriticalSection(_cs.flows)
+	
 	return elements
 }
 
 x_getAllElementIDsOfClass(p_FlowID, p_Class)
 {
+	EnterCriticalSection(_cs.flows)
+	
 	elements:=Object()
 	for oneElementID, oneElement in _flows[p_FlowID].allElements
 	{
 		if (oneElement.class = p_Class)
 			elements.push(oneElementID)
 	}
+	
+	LeaveCriticalSection(_cs.flows)
+	
 	return elements
 }
 
 x_getElementPars(p_FlowID, p_ElementID)
 {
-	return objfullyClone(_flows[p_FlowID].allElements[p_ElementID].pars)
+	EnterCriticalSection(_cs.flows)
+	retval:=objfullyClone(_flows[p_FlowID].allElements[p_ElementID].pars)
+	LeaveCriticalSection(_cs.flows)
+	return retval
 }
 x_getElementName(p_FlowID, p_ElementID)
 {
@@ -268,12 +296,18 @@ x_getElementClass(p_FlowID, p_ElementID)
 
 x_getMyElementPars(Environment)
 {
-	return objfullyClone(_flows[Environment.flowID].allElements[Environment.FlowID].pars)
+	EnterCriticalSection(_cs.flows)
+	retval:=objfullyClone(_flows[Environment.flowID].allElements[Environment.FlowID].pars)
+	LeaveCriticalSection(_cs.flows)
+	return retval
 }
 
 ;Manual trigger
 x_ManualTriggerExist(p_FlowID, p_TriggerName = "")
 {
+	EnterCriticalSection(_cs.flows)
+	
+	result:=false
 	for forelementID, forelement in _flows[p_FlowID].allElements
 	{
 		;~ d(forelement, p_TriggerName)
@@ -282,7 +316,8 @@ x_ManualTriggerExist(p_FlowID, p_TriggerName = "")
 			if (forElement.class = "trigger_manual" and forElement.defaultTrigger = True)
 			{
 				;~ d(forElement)
-				return true
+				result :=true
+				break
 			}
 		}
 		else
@@ -290,16 +325,21 @@ x_ManualTriggerExist(p_FlowID, p_TriggerName = "")
 			if (forelement.class = "trigger_Manual" and forElement.pars.id = p_TriggerName)
 			{
 				;~ d(forElement)
-				return true
+				result :=true
+				break
 			}
 		}
 		
 	}
-	return False
+	LeaveCriticalSection(_cs.flows)
+	return result
 }
 
 x_isManualTriggerEnabled(p_FlowID, p_TriggerName="")
 {
+	EnterCriticalSection(_cs.flows)
+	
+	result:=false
 	for forelementID, forelement in _flows[p_FlowID].allElements
 	{
 		;~ d(forelement, p_TriggerName)
@@ -308,7 +348,8 @@ x_isManualTriggerEnabled(p_FlowID, p_TriggerName="")
 			if (forElement.class = "trigger_manual" and forElement.defaultTrigger = True)
 			{
 				;~ d(forElement)
-				return forElement.enabled 
+				result:=forElement.enabled
+				break
 			}
 		}
 		else
@@ -316,16 +357,20 @@ x_isManualTriggerEnabled(p_FlowID, p_TriggerName="")
 			if (forelement.class = "trigger_Manual" and forElement.pars.id = p_TriggerName)
 			{
 				;~ d(forElement)
-				return forElement.enabled 
+				result:=forElement.enabled
+				break
 			}
 		}
 		
 	}
-	return False
+	
+	LeaveCriticalSection(_cs.flows)
+	return result
 }
 
 x_ManualTriggerEnable(p_FlowID, p_TriggerName="")
 {
+	EnterCriticalSection(_cs.flows)
 	for forelementID, forelement in _flows[p_FlowID].allElements
 	{
 		;~ d(forelement, p_TriggerName)
@@ -346,11 +391,13 @@ x_ManualTriggerEnable(p_FlowID, p_TriggerName="")
 			}
 		}
 	}
+	LeaveCriticalSection(_cs.flows)
 
 }
 
 x_ManualTriggerDisable(p_FlowID, p_TriggerName="")
 {
+	EnterCriticalSection(_cs.flows)
 	for forelementID, forelement in _flows[p_FlowID].allElements
 	{
 		;~ d(forelement, p_TriggerName)
@@ -372,19 +419,14 @@ x_ManualTriggerDisable(p_FlowID, p_TriggerName="")
 		}
 	}
 
+	LeaveCriticalSection(_cs.flows)
 }
 
 x_ManualTriggerExecute(p_FlowID, p_TriggerName = "", p_Variables ="", p_CallBackFunction ="")
 {
-	random, randomnumber
-	_share.temp[randomnumber]:=Object()
-	_share.temp[randomnumber].CallBack:=p_CallBackFunction
-	
-	;Fill variables which will be passed
-			;~ _share.temp[randomnumber].varstoPass:=p_Variables
-	varsToPass:=p_Variables
-	_share.temp[randomnumber].varsToPass:=varsToPass
-	
+	params:=Object()
+	params.VarsToPass:=p_Variables
+	params.CallBack:=p_CallBackFunction
 	
 	if x_FlowExists(p_FlowID)
 	{
@@ -393,12 +435,13 @@ x_ManualTriggerExecute(p_FlowID, p_TriggerName = "", p_Variables ="", p_CallBack
 		if (p_TriggerName = "")
 		{
 			;~ d(p_FlowName)
-			executeFlow(p_FlowID, "", randomnumber)
+			executeFlow(p_FlowID, "", params)
 			return
 		}
 		else
 		{
 			;~ d(p_FlowName " - " p_TriggerName)
+			EnterCriticalSection(_cs.flows)
 			for forelementID, forelement in _flows[p_FlowID].allElements
 			{
 				;~ d(forelement, p_TriggerName)
@@ -407,11 +450,13 @@ x_ManualTriggerExecute(p_FlowID, p_TriggerName = "", p_Variables ="", p_CallBack
 					if (forelement.pars.id = p_TriggerName)
 					{
 						;~ d(forFlow.id,forelementID)
-						executeFlow(p_FlowID, forelementID, randomnumber)
+						LeaveCriticalSection(_cs.flows)
+						executeFlow(p_FlowID, forelementID, params)
 						return
 					}
 				}
 			}
+			LeaveCriticalSection(_cs.flows)
 		}
 	}
 }

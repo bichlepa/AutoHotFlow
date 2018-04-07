@@ -7,6 +7,8 @@ if not fileexist(_WorkingDir "\Variables")
 
 StaticVariable_Set(Environment,p_Name,p_Value, p_hidden=False)
 {
+	EnterCriticalSection(_cs.execution)
+	
 	if (p_hidden)
 		MsgBox unexpected error! It is not possible to set a hidden static variable!
 	
@@ -32,10 +34,13 @@ StaticVariable_Set(Environment,p_Name,p_Value, p_hidden=False)
 		FileAppend,% p_Value,% path "\" p_Name ".ahfvar"
 	}
 	
+	LeaveCriticalSection(_cs.execution)
 }
 
 GlobalVariable_Set(Environment,p_Name,p_Value, p_hidden=False)
 {
+	EnterCriticalSection(_cs.execution)
+	
 	if (p_hidden)
 		MsgBox unexpected error! It is not possible to set a hidden global variable!
 	
@@ -60,12 +65,15 @@ GlobalVariable_Set(Environment,p_Name,p_Value, p_hidden=False)
 		FileAppend,% p_Value,% path "\" p_Name ".ahfvar"
 	}
 	
+	LeaveCriticalSection(_cs.execution)
 }
 
 
 
 StaticVariable_Get(Environment,p_Name, p_hidden=False)
 {
+	EnterCriticalSection(_cs.execution)
+	
 	if (p_hidden)
 		MsgBox unexpected error! There are no hidden static variables!
 	
@@ -73,24 +81,30 @@ StaticVariable_Get(Environment,p_Name, p_hidden=False)
 	IniRead,vartype, % path "\" p_Name ".ahfvd", variable, type,%A_Space%
 	if (vartype = "")
 	{
-		return 
+		;variable not found. Nothing to return
 	}
 	else 
 	{
 		FileRead,varcontent, % path "\" p_Name ".ahfvar"
 		if (vartype = "object")
 		{
-			return strobj(varcontent)
+			retval:= strobj(varcontent)
 		}
 		else
 		{
-			return varcontent
+			retval:= varcontent
 		}
 	}
+	
+	LeaveCriticalSection(_cs.execution)
+	
+	return retval
 }
 
 GlobalVariable_Get(Environment,p_Name, p_hidden=False)
 {
+	EnterCriticalSection(_cs.execution)
+	
 	if (p_hidden)
 		MsgBox unexpected error! There are no hidden global variables!
 	
@@ -98,20 +112,24 @@ GlobalVariable_Get(Environment,p_Name, p_hidden=False)
 	IniRead,vartype, % path "\" p_Name ".ahfvd", variable, type,%A_Space%
 	if (vartype = "")
 	{
-		return 
+		;variable not found. Nothing to return
 	}
 	else 
 	{
 		FileRead,varcontent, % path "\" p_Name ".ahfvar"
 		if (vartype = "object")
 		{
-			return strobj(varcontent)
+			retval:= strobj(varcontent)
 		}
 		else
 		{
-			return varcontent
+			retval:= varcontent
 		}
 	}
+	
+	LeaveCriticalSection(_cs.execution)
+	
+	return retval
 }
 
 
@@ -119,6 +137,7 @@ GlobalVariable_Get(Environment,p_Name, p_hidden=False)
 BuiltInVariable_Get(Environment,p_Name, p_hidden=False)
 {
 	global AllBuiltInVars
+	
 	if (p_hidden)
 		MsgBox unexpected error! There are no hidden built-in variables!
 	;If no thread and loop variable found, try to find a built in variable if (p_Name="A_YWeek") ;Separate the week.
@@ -186,19 +205,29 @@ BuiltInVariable_Get(Environment,p_Name, p_hidden=False)
 
 StaticVariable_Delete(Environment,p_Name)
 {
+	EnterCriticalSection(_cs.execution)
+	
 	path:=_WorkingDir "\Variables\" Environment.flowID
 	FileDelete,% path "\" p_Name ".ahfvd"
 	FileDelete,% path "\" p_Name ".ahfvar"
+	
+	LeaveCriticalSection(_cs.execution)
 }
 GlobalVariable_Delete(Environment,p_Name)
 {
+	EnterCriticalSection(_cs.execution)
+	
 	path:=_WorkingDir "\Variables"
 	FileDelete,% path "\" p_Name ".ahfvd"
 	FileDelete,% path "\" p_Name ".ahfvar"
+	
+	LeaveCriticalSection(_cs.execution)
 }
 
 Var_GetListOfStaticVars(environment)
 {
+	EnterCriticalSection(_cs.execution)
+	
 	retobject:=Object()
 	path:=_WorkingDir "\Variables\" Environment.flowID
 	loop, files, %path%\*.ahfvd
@@ -206,10 +235,15 @@ Var_GetListOfStaticVars(environment)
 		StringReplace, varname, a_loopfilename, .ahfvd
 		retobject.push(varname)
 	}
+	
+	LeaveCriticalSection(_cs.execution)
+	
 	return retobject
 }
 Var_GetListOfGlobalVars(environment)
 {
+	EnterCriticalSection(_cs.execution)
+	
 	retobject:=Object()
 	path:=_WorkingDir "\Variables"
 	loop, files, %path%\*.ahfvd
@@ -217,11 +251,16 @@ Var_GetListOfGlobalVars(environment)
 		StringReplace, varname, a_loopfilename, .ahfvd
 		retobject.push(varname)
 	}
+	
+	LeaveCriticalSection(_cs.execution)
+	
 	return retobject
 }
 
 Var_GetListOfAllVars_Common(environment)
 {
+	EnterCriticalSection(_cs.execution)
+	
 	retobject:=Object()
 	for index, varname in Var_GetListOfStaticVars(environment)
 	{
@@ -231,6 +270,9 @@ Var_GetListOfAllVars_Common(environment)
 	{
 		retobject.push(varname)
 	}
+	
+	LeaveCriticalSection(_cs.execution)
+	
 	return retobject
 }
 

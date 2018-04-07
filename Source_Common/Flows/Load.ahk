@@ -8,11 +8,14 @@ LoadFlow(FlowID, filepath="", params="")
 	local AllSections, tempSection, tempContainerID, missingpackages, tempName
 	local AnyTriggerLoaded, OutdatedMainTriggerContainerData
 	
+	EnterCriticalSection(_cs.flows)
+	
 	OutdatedMainTriggerContainerData:=Object()
 	
 	if (FlowID="")
 	{
 		MsgBox internal error! A flow should be loaded but no FlowID is empty!
+		LeaveCriticalSection(_cs.flows)
 		return
 	}
 	
@@ -21,6 +24,7 @@ LoadFlow(FlowID, filepath="", params="")
 		if (_flows[FlowID].loaded)
 		{
 			MsgBox unexpected error. Flow %FlowID% should be loaded but it was already loaded
+			LeaveCriticalSection(_cs.flows)
 			return
 		}
 	}
@@ -28,6 +32,7 @@ LoadFlow(FlowID, filepath="", params="")
 	if (currentlyLoadingFlow = true)
 	{
 		MsgBox unexpected error. a flow is already currently loading
+		LeaveCriticalSection(_cs.flows)
 		return
 	}
 	currentlyLoadingFlow:=true
@@ -337,12 +342,16 @@ LoadFlow(FlowID, filepath="", params="")
 	}
 	
 	currentlyLoadingFlow:=false
+	LeaveCriticalSection(_cs.flows)
 }
 
 loadFlowGeneralParameters(FlowID)
 {
 	global
 	local temp
+	
+	EnterCriticalSection(_cs.flows)
+	
 	_flows[FlowID].flowSettings.Offsetx:=RIni_GetKeyValue("IniFile", "general", "Offsetx", default_OffsetX)
 	_flows[FlowID].flowSettings.Offsety:=RIni_GetKeyValue("IniFile", "general", "Offsety", default_OffsetY)
 	_flows[FlowID].flowSettings.zoomFactor:=RIni_GetKeyValue("IniFile", "general", "zoomFactor", default_ZoomFactor)
@@ -358,6 +367,7 @@ loadFlowGeneralParameters(FlowID)
 		}
 	}
 	
+	LeaveCriticalSection(_cs.flows)
 }
 
 

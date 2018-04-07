@@ -279,6 +279,7 @@ global_elementInclusions =
 
 ;Start other threads. Multi-threading gain the performance hevily
 ;and execution of flows does not influence the GUI performance.
+Thread_init()
 Thread_StartManager()
 Thread_StartDraw()
 Thread_StartExecution()
@@ -293,6 +294,7 @@ _share.WindowsStartup:=false
 ;The first purpose is that the script AutoHotFlow.ahk/exe can send commands if a shortcut of the trigger "shortcut" is opened.
 CreateHiddenCommandWindow()
 
+;Do some tasks which were commissioned from other threads 
 SetTimer,queryTasks,100
 return
 

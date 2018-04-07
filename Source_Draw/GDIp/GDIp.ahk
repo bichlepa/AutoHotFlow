@@ -203,13 +203,18 @@ gdip_DrawEverything(FlowObj)
 	;~ G := Gdip_GraphicsFromImage(pBitmap)
 	;~ Gdip_SetSmoothingMode(G, 4)
 	
-	FlowObj.draw.VisibleArea := Object()
-	FlowObj.draw.VisibleArea.X1:=Offsetx
-	FlowObj.draw.VisibleArea.Y1:=Offsety
-	FlowObj.draw.VisibleArea.X2:=Offsetx+widthofguipic/zoomFactor
-	FlowObj.draw.VisibleArea.Y2:=Offsety+heightofguipic/zoomFactor
-	FlowObj.draw.VisibleArea.W:=VisibleArea.X2-VisibleArea.X1
-	FlowObj.draw.VisibleArea.H:=VisibleArea.Y2-VisibleArea.Y1
+	VisibleArea := Object()
+	VisibleArea.X1:=Offsetx
+	VisibleArea.Y1:=Offsety
+	VisibleArea.X2:=Offsetx+widthofguipic/zoomFactor
+	VisibleArea.Y2:=Offsety+heightofguipic/zoomFactor
+	VisibleArea.W:=VisibleArea.X2-VisibleArea.X1
+	VisibleArea.H:=VisibleArea.Y2-VisibleArea.Y1
+	
+	DrawResult:=Object()
+	DrawResult.elements:=Object()
+	
+	DrawResult.VisibleArea:=VisibleArea
 	
 	if (zoomFactor>1.0) 
 	{
@@ -657,12 +662,13 @@ gdip_DrawEverything(FlowObj)
 			
 			;MsgBox,% "x" (drawElement.x*zoomFactor +4) "y" (drawElement.y*zoomFactor+4) TextOptions Font (180*zoomFactor-8) (135*zoomFactor-8)
 			;Define area of parts
-			allElements[drawID].part1x1:=((drawElement.x-Offsetx)*zoomFactor)
-			allElements[drawID].part1y1:=((drawElement.y-Offsety)*zoomFactor)
-			allElements[drawID].part1x2:=((drawElement.x+ElementWidth-Offsetx)*zoomFactor)
-			allElements[drawID].part1y2:=((drawElement.y+ElementHeight-Offsety)*zoomFactor)
+			DrawResult.elements[drawID]:=Object()
+			DrawResult.elements[drawID].part1x1:=((drawElement.x-Offsetx)*zoomFactor)
+			DrawResult.elements[drawID].part1y1:=((drawElement.y-Offsety)*zoomFactor)
+			DrawResult.elements[drawID].part1x2:=((drawElement.x+ElementWidth-Offsetx)*zoomFactor)
+			DrawResult.elements[drawID].part1y2:=((drawElement.y+ElementHeight-Offsety)*zoomFactor)
 			;MsgBox,% "x1 " drawElement.part1x1 " y1 " drawElement.part1y1 " x2 " drawElement.part1x2 "y2" drawElement.part1y2
-			allElements[drawID].CountOfParts:=1
+			DrawResult.elements[drawID].CountOfParts:=1
 			;~ drawElement.ClickPriority:=500
 			
 		}
@@ -699,11 +705,12 @@ gdip_DrawEverything(FlowObj)
 			
 			
 			;Define area of parts
-			allElements[drawID].part1x1:=((drawElement.x-Offsetx)*zoomFactor)
-			allElements[drawID].part1y1:=((drawElement.y-Offsety)*zoomFactor)
-			allElements[drawID].part1x2:=((drawElement.x+ElementWidth-Offsetx)*zoomFactor)
-			allElements[drawID].part1y2:=((drawElement.y+ElementHeight-Offsety)*zoomFactor)
-			allElements[drawID].CountOfParts:=1
+			DrawResult.elements[drawID]:=Object()
+			DrawResult.elements[drawID].part1x1:=((drawElement.x-Offsetx)*zoomFactor)
+			DrawResult.elements[drawID].part1y1:=((drawElement.y-Offsety)*zoomFactor)
+			DrawResult.elements[drawID].part1x2:=((drawElement.x+ElementWidth-Offsetx)*zoomFactor)
+			DrawResult.elements[drawID].part1y2:=((drawElement.y+ElementHeight-Offsety)*zoomFactor)
+			DrawResult.elements[drawID].CountOfParts:=1
 			;~ drawElement.ClickPriority:=500
 			
 			
@@ -737,11 +744,12 @@ gdip_DrawEverything(FlowObj)
 				Gdip_FillroundedRectangle(G, pBrushLastRunning, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y-Offsety)*zoomFactor), (ElementWidth*zoomFactor), (ElementHeight*zoomFactor),(30*zoomFactor))
 			}
 			;Define area of parts
-			allElements[drawID].part1x1:=((drawElement.x-Offsetx)*zoomFactor)
-			allElements[drawID].part1y1:=((drawElement.y-Offsety)*zoomFactor)
-			allElements[drawID].part1x2:=((drawElement.x+ElementWidth-Offsetx)*zoomFactor)
-			allElements[drawID].part1y2:=((drawElement.y+ElementHeight-Offsety)*zoomFactor)
-			allElements[drawID].CountOfParts:=1
+			DrawResult.elements[drawID]:=Object()
+			DrawResult.elements[drawID].part1x1:=((drawElement.x-Offsetx)*zoomFactor)
+			DrawResult.elements[drawID].part1y1:=((drawElement.y-Offsety)*zoomFactor)
+			DrawResult.elements[drawID].part1x2:=((drawElement.x+ElementWidth-Offsetx)*zoomFactor)
+			DrawResult.elements[drawID].part1y2:=((drawElement.y+ElementHeight-Offsety)*zoomFactor)
+			DrawResult.elements[drawID].CountOfParts:=1
 			;~ drawElement.ClickPriority:=500
 		}
 		
@@ -790,23 +798,24 @@ gdip_DrawEverything(FlowObj)
 				Gdip_FillRectangle(G, pBrushLastRunning, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y+ElementHeight+drawElement.HeightOfVerticalBar-Offsety)*zoomFactor), ((ElementWidth)*zoomFactor), ((ElementHeight/3)*zoomFactor))
 			}
 			;Define area of parts
-			allElements[drawID].part1x1:=((drawElement.x-Offsetx)*zoomFactor)
-			allElements[drawID].part1y1:=((drawElement.y-Offsety)*zoomFactor)
-			allElements[drawID].part1x2:=((drawElement.x+ElementWidth-Offsetx)*zoomFactor)
-			allElements[drawID].part1y2:=((drawElement.y+ElementHeight-Offsety)*zoomFactor)
-			allElements[drawID].part2x1:=((drawElement.x-Offsetx)*zoomFactor)
-			allElements[drawID].part2y1:=((drawElement.y+ElementHeight-Offsety)*zoomFactor)
-			allElements[drawID].part2x2:=((drawElement.x+ElementWidth/8-Offsetx)*zoomFactor)
-			allElements[drawID].part2y2:=((drawElement.y+ElementHeight+drawElement.HeightOfVerticalBar-Offsety)*zoomFactor)
-			allElements[drawID].part3x1:=((drawElement.x-Offsetx)*zoomFactor)
-			allElements[drawID].part3y1:=((drawElement.y+ElementHeight+drawElement.HeightOfVerticalBar-Offsety)*zoomFactor)
-			allElements[drawID].part3x2:=((drawElement.x+ElementWidth*3/4-Offsetx)*zoomFactor)
-			allElements[drawID].part3y2:=((drawElement.y+ElementHeight*4/3+drawElement.HeightOfVerticalBar-Offsety)*zoomFactor)
-			allElements[drawID].part4x1:=((drawElement.x+ElementWidth*3/4-Offsetx)*zoomFactor)
-			allElements[drawID].part4y1:=((drawElement.y+ElementHeight+drawElement.HeightOfVerticalBar-Offsety)*zoomFactor)
-			allElements[drawID].part4x2:=((drawElement.x+ElementWidth-Offsetx)*zoomFactor)
-			allElements[drawID].part4y2:=((drawElement.y+ElementHeight*4/3+drawElement.HeightOfVerticalBar-Offsety)*zoomFactor)
-			allElements[drawID].CountOfParts:=4
+			DrawResult.elements[drawID]:=Object()
+			DrawResult.elements[drawID].part1x1:=((drawElement.x-Offsetx)*zoomFactor)
+			DrawResult.elements[drawID].part1y1:=((drawElement.y-Offsety)*zoomFactor)
+			DrawResult.elements[drawID].part1x2:=((drawElement.x+ElementWidth-Offsetx)*zoomFactor)
+			DrawResult.elements[drawID].part1y2:=((drawElement.y+ElementHeight-Offsety)*zoomFactor)
+			DrawResult.elements[drawID].part2x1:=((drawElement.x-Offsetx)*zoomFactor)
+			DrawResult.elements[drawID].part2y1:=((drawElement.y+ElementHeight-Offsety)*zoomFactor)
+			DrawResult.elements[drawID].part2x2:=((drawElement.x+ElementWidth/8-Offsetx)*zoomFactor)
+			DrawResult.elements[drawID].part2y2:=((drawElement.y+ElementHeight+drawElement.HeightOfVerticalBar-Offsety)*zoomFactor)
+			DrawResult.elements[drawID].part3x1:=((drawElement.x-Offsetx)*zoomFactor)
+			DrawResult.elements[drawID].part3y1:=((drawElement.y+ElementHeight+drawElement.HeightOfVerticalBar-Offsety)*zoomFactor)
+			DrawResult.elements[drawID].part3x2:=((drawElement.x+ElementWidth*3/4-Offsetx)*zoomFactor)
+			DrawResult.elements[drawID].part3y2:=((drawElement.y+ElementHeight*4/3+drawElement.HeightOfVerticalBar-Offsety)*zoomFactor)
+			DrawResult.elements[drawID].part4x1:=((drawElement.x+ElementWidth*3/4-Offsetx)*zoomFactor)
+			DrawResult.elements[drawID].part4y1:=((drawElement.y+ElementHeight+drawElement.HeightOfVerticalBar-Offsety)*zoomFactor)
+			DrawResult.elements[drawID].part4x2:=((drawElement.x+ElementWidth-Offsetx)*zoomFactor)
+			DrawResult.elements[drawID].part4y2:=((drawElement.y+ElementHeight*4/3+drawElement.HeightOfVerticalBar-Offsety)*zoomFactor)
+			DrawResult.elements[drawID].CountOfParts:=4
 			;~ drawElement.ClickPriority:=500
 		}
 		
@@ -1014,52 +1023,53 @@ gdip_DrawEverything(FlowObj)
 	Gdip_TextToGraphics(G, lang("Create new trigger"), "x" ((NewElementIconWidth *3.7)*zoomFactor+4) " y" ((NewElementIconHeight * 0.1)*zoomFactor+4) " vCenter " TextOptions , Font, ((NewElementIconWidth)*zoomFactor-8), ((NewElementIconHeight)*zoomFactor-8))
 	
 
-	FlowObj.draw.PlusButtonExist:=PlusButtonExist
-	FlowObj.draw.PlusButton2Exist:=PlusButton2Exist
-	FlowObj.draw.TrashButtonExist:=TrashButtonExist
-	FlowObj.draw.EditButtonExist:=EditButtonExist
-	FlowObj.draw.MoveButton1Exist:=MoveButton1Exist
-	FlowObj.draw.MoveButton2Exist:=MoveButton2Exist	
-	FlowObj.draw.SwitchOnButtonExist:=SwitchOnButtonExist
-	FlowObj.draw.SwitchOffButtonExist:=SwitchOffButtonExist
-	FlowObj.draw.StarFilledButtonExist:=StarFilledButtonExist
-	FlowObj.draw.StarEmptyButtonExist:=StarEmptyButtonExist
+	DrawResult.PlusButtonExist:=PlusButtonExist
+	DrawResult.PlusButton2Exist:=PlusButton2Exist
+	DrawResult.TrashButtonExist:=TrashButtonExist
+	DrawResult.EditButtonExist:=EditButtonExist
+	DrawResult.MoveButton1Exist:=MoveButton1Exist
+	DrawResult.MoveButton2Exist:=MoveButton2Exist	
+	DrawResult.SwitchOnButtonExist:=SwitchOnButtonExist
+	DrawResult.SwitchOffButtonExist:=SwitchOffButtonExist
+	DrawResult.StarFilledButtonExist:=StarFilledButtonExist
+	DrawResult.StarEmptyButtonExist:=StarEmptyButtonExist
 	
-	FlowObj.draw.middlePointOfPlusButtonX:=middlePointOfPlusButtonX * zoomFactor
-	FlowObj.draw.middlePointOfPlusButton2X:=middlePointOfPlusButton2X * zoomFactor
-	FlowObj.draw.middlePointOfEditButtonX:=middlePointOfEditButtonX * zoomFactor
-	FlowObj.draw.middlePointOfTrashButtonX:=middlePointOfTrashButtonX * zoomFactor
-	FlowObj.draw.middlePointOfMoveButton2X:=middlePointOfMoveButton2X * zoomFactor
-	FlowObj.draw.middlePointOfMoveButton1X:=middlePointOfMoveButton1X * zoomFactor
-	FlowObj.draw.middlePointOfPlusButtonY:=middlePointOfPlusButtonY * zoomFactor
-	FlowObj.draw.middlePointOfPlusButton2Y:=middlePointOfPlusButton2Y * zoomFactor
-	FlowObj.draw.middlePointOfEditButtonY:=middlePointOfEditButtonY * zoomFactor
-	FlowObj.draw.middlePointOfTrashButtonY:=middlePointOfTrashButtonY * zoomFactor
-	FlowObj.draw.middlePointOfMoveButton2Y:=middlePointOfMoveButton2Y * zoomFactor
-	FlowObj.draw.middlePointOfMoveButton1Y:=middlePointOfMoveButton1Y * zoomFactor
-	FlowObj.draw.PosOfSwitchOffButtonX1:=PosOfSwitchOffButtonX1 * zoomFactor
-	FlowObj.draw.PosOfSwitchOffButtonX2:=PosOfSwitchOffButtonX2 * zoomFactor
-	FlowObj.draw.PosOfSwitchOffButtonY1:=PosOfSwitchOffButtonY1 * zoomFactor
-	FlowObj.draw.PosOfSwitchOffButtonY2:=PosOfSwitchOffButtonY2	* zoomFactor
-	FlowObj.draw.PosOfSwitchOnButtonX1:=PosOfSwitchOnButtonX1 * zoomFactor
-	FlowObj.draw.PosOfSwitchOnButtonX2:=PosOfSwitchOnButtonX2 * zoomFactor
-	FlowObj.draw.PosOfSwitchOnButtonY1:=PosOfSwitchOnButtonY1 * zoomFactor
-	FlowObj.draw.PosOfSwitchOnButtonY2:=PosOfSwitchOnButtonY2 * zoomFactor
-	FlowObj.draw.PosOfStarEmptyButtonX1:=PosOfStarEmptyButtonX1 * zoomFactor
-	FlowObj.draw.PosOfStarEmptyButtonX2:=PosOfStarEmptyButtonX2 * zoomFactor
-	FlowObj.draw.PosOfStarEmptyButtonY1:=PosOfStarEmptyButtonY1 * zoomFactor
-	FlowObj.draw.PosOfStarEmptyButtonY2:=PosOfStarEmptyButtonY2	* zoomFactor
-	FlowObj.draw.PosOfStarFilledButtonX1:=PosOfStarFilledButtonX1 * zoomFactor
-	FlowObj.draw.PosOfStarFilledButtonX2:=PosOfStarFilledButtonX2 * zoomFactor
-	FlowObj.draw.PosOfStarFilledButtonY1:=PosOfStarFilledButtonY1 * zoomFactor
-	FlowObj.draw.PosOfStarFilledButtonY2:=PosOfStarFilledButtonY2 * zoomFactor
-	
-	
-	FlowObj.draw.NewElementIconWidth:=NewElementIconWidth * zoomFactor
-	FlowObj.draw.NewElementIconHeight:=NewElementIconHeight * zoomFactor
+	DrawResult.middlePointOfPlusButtonX:=middlePointOfPlusButtonX * zoomFactor
+	DrawResult.middlePointOfPlusButton2X:=middlePointOfPlusButton2X * zoomFactor
+	DrawResult.middlePointOfEditButtonX:=middlePointOfEditButtonX * zoomFactor
+	DrawResult.middlePointOfTrashButtonX:=middlePointOfTrashButtonX * zoomFactor
+	DrawResult.middlePointOfMoveButton2X:=middlePointOfMoveButton2X * zoomFactor
+	DrawResult.middlePointOfMoveButton1X:=middlePointOfMoveButton1X * zoomFactor
+	DrawResult.middlePointOfPlusButtonY:=middlePointOfPlusButtonY * zoomFactor
+	DrawResult.middlePointOfPlusButton2Y:=middlePointOfPlusButton2Y * zoomFactor
+	DrawResult.middlePointOfEditButtonY:=middlePointOfEditButtonY * zoomFactor
+	DrawResult.middlePointOfTrashButtonY:=middlePointOfTrashButtonY * zoomFactor
+	DrawResult.middlePointOfMoveButton2Y:=middlePointOfMoveButton2Y * zoomFactor
+	DrawResult.middlePointOfMoveButton1Y:=middlePointOfMoveButton1Y * zoomFactor
+	DrawResult.PosOfSwitchOffButtonX1:=PosOfSwitchOffButtonX1 * zoomFactor
+	DrawResult.PosOfSwitchOffButtonX2:=PosOfSwitchOffButtonX2 * zoomFactor
+	DrawResult.PosOfSwitchOffButtonY1:=PosOfSwitchOffButtonY1 * zoomFactor
+	DrawResult.PosOfSwitchOffButtonY2:=PosOfSwitchOffButtonY2	* zoomFactor
+	DrawResult.PosOfSwitchOnButtonX1:=PosOfSwitchOnButtonX1 * zoomFactor
+	DrawResult.PosOfSwitchOnButtonX2:=PosOfSwitchOnButtonX2 * zoomFactor
+	DrawResult.PosOfSwitchOnButtonY1:=PosOfSwitchOnButtonY1 * zoomFactor
+	DrawResult.PosOfSwitchOnButtonY2:=PosOfSwitchOnButtonY2 * zoomFactor
+	DrawResult.PosOfStarEmptyButtonX1:=PosOfStarEmptyButtonX1 * zoomFactor
+	DrawResult.PosOfStarEmptyButtonX2:=PosOfStarEmptyButtonX2 * zoomFactor
+	DrawResult.PosOfStarEmptyButtonY1:=PosOfStarEmptyButtonY1 * zoomFactor
+	DrawResult.PosOfStarEmptyButtonY2:=PosOfStarEmptyButtonY2	* zoomFactor
+	DrawResult.PosOfStarFilledButtonX1:=PosOfStarFilledButtonX1 * zoomFactor
+	DrawResult.PosOfStarFilledButtonX2:=PosOfStarFilledButtonX2 * zoomFactor
+	DrawResult.PosOfStarFilledButtonY1:=PosOfStarFilledButtonY1 * zoomFactor
+	DrawResult.PosOfStarFilledButtonY2:=PosOfStarFilledButtonY2 * zoomFactor
 	
 	
+	DrawResult.NewElementIconWidth:=NewElementIconWidth * zoomFactor
+	DrawResult.NewElementIconHeight:=NewElementIconHeight * zoomFactor
 	
+	EnterCriticalSection(_cs.flows)
+	_flows[FlowObj.id].DrawResult:=DrawResult
+	LeaveCriticalSection(_cs.flows)
 	;~ Gdip_TextToGraphics(G, OnTopLabel, "x10 y0 " TextOptionsTopLabel, Font, widthofguipic, heightofguipic)
 	
 	

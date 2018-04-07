@@ -1,14 +1,17 @@
 ﻿global_EditorThreadIDCounter = 1
 global_ExecutionThreadIDCounter = 1
 global_AllThreads := CriticalObject()
-_ahkCriticalSectionExecution := CriticalSection()
-global_CriticalSectionGlobalVars := CriticalSection()
-
+global global_CommonAhkCodeForAllThreads:=""
 
 loop, files, %_ScriptDir%\source_Elements\*.ahk, FR
 {
 	if not (substr(A_LoopFileName,1,1)=="_")
 		global_elementInclusions .= "#include " A_LoopFileFullPath "`n"
+}
+
+Thread_init()
+{
+	global_CommonAhkCodeForAllThreads:="global _cs := CriticalObject(" (&_cs) ")`n global _flows := CriticalObject(" (&_flows) ") `n global _settings := CriticalObject(" (&_settings) ") `n global _execution := CriticalObject(" (&_execution) ") `n global _share := CriticalObject(" (&_share) ")`n global _language := CriticalObject(" (&_language) ") `n"
 }
 
 Thread_StartManager()
@@ -26,7 +29,7 @@ Thread_StartManager()
 	;~ MsgBox %ExecutionThreadCode%
 	StringReplace,ExecutionThreadCode,ExecutionThreadCode,;PlaceholderIncludesOfElements,% global_elementInclusions
 	
-	AhkThread%threadID% := AhkThread("global _ahkCriticalSection_Flows := CriticalSection("_ahkCriticalSection_Flows ")`n global _flows := CriticalObject(" (&_flows) ") `n global _settings := CriticalObject(" (&_settings) ") `n global _execution := CriticalObject(" (&_execution) ") `n global _share := CriticalObject(" (&_share) ")`n global _language := CriticalObject(" (&_language) ") `n global _ahkThreadID := """ threadID """`n" ExecutionThreadCode)
+	AhkThread%threadID% := AhkThread(global_CommonAhkCodeForAllThreads "`n global _ahkThreadID := """ threadID """`n" ExecutionThreadCode)
 	
 	global_AllThreads[threadID] := {permanent: true, type: "Manager"}
 	logger("t1", "Manager thread started")
@@ -66,7 +69,7 @@ Thread_StartEditor(par_FlowID)
 	;~ MsgBox %ExecutionThreadCode%
 	StringReplace,ExecutionThreadCode,ExecutionThreadCode,;PlaceholderIncludesOfElements,% global_elementInclusions
 	
-	AhkThread%threadID% := AhkThread("global _ahkCriticalSection_Flows := CriticalSection("_ahkCriticalSection_Flows ")`n global _flows := CriticalObject(" (&_flows) ") `n global _settings := CriticalObject(" (&_settings) ") `n global _execution := CriticalObject(" (&_execution) ") `n global _share := CriticalObject(" (&_share) ")`n global _language := CriticalObject(" (&_language) ") `n global _ahkThreadID := """ threadID """`n global FlowID := """ par_FlowID """`n"  ExecutionThreadCode)
+	AhkThread%threadID% := AhkThread(global_CommonAhkCodeForAllThreads "`n global _ahkThreadID := """ threadID """`n global FlowID := """ par_FlowID """`n"  ExecutionThreadCode)
 	
 	global_AllThreads[threadID] := {permanent: false, type: "Editor", flowID: par_FlowID}
 	logger("t1", "Editor thread started")
@@ -85,7 +88,7 @@ Thread_StartDraw()
 	logger("t1", "Starting draw thread. ID: " threadID)
 	FileRead,ExecutionThreadCode,% _ScriptDir "\Source_Draw\Draw.ahk"
 	;~ MsgBox %ExecutionThreadCode%
-	AhkThread%threadID% := AhkThread("global _ahkCriticalSection_Flows := CriticalSection("_ahkCriticalSection_Flows ")`n global _flows := CriticalObject(" (&_flows) ") `n global _settings := CriticalObject(" (&_settings) ") `n global _execution := CriticalObject(" (&_execution) ") `n global _share := CriticalObject(" (&_share) ")`n global _language := CriticalObject(" (&_language) ") `n global _ahkThreadID := """ threadID """`n" ExecutionThreadCode)
+	AhkThread%threadID% := AhkThread(global_CommonAhkCodeForAllThreads "`n global _ahkThreadID := """ threadID """`n" ExecutionThreadCode)
 	global_AllThreads[threadID] := {permanent: true, type: "Draw"}
 	logger("t1", "Draw thread started")
 }
@@ -104,7 +107,7 @@ Thread_StartExecution()
 	FileRead,ExecutionThreadCode,% _ScriptDir "\Source_Execution\execution.ahk"
 	StringReplace,ExecutionThreadCode,ExecutionThreadCode,;PlaceholderIncludesOfElements,% global_elementInclusions
 	;~ MsgBox %ExecutionThreadCode%
-	AhkThread%threadID% := AhkThread("global _ahkCriticalSection_Flows := CriticalSection("_ahkCriticalSection_Flows ")`n global _flows := CriticalObject(" (&_flows) ") `n global _settings := CriticalObject(" (&_settings) ") `n global _execution := CriticalObject(" (&_execution) ") `n global _share := CriticalObject(" (&_share) ")`n global _language := CriticalObject(" (&_language) ")`n global _ahkThreadID := """ threadID """`n" ExecutionThreadCode)
+	AhkThread%threadID% := AhkThread(global_CommonAhkCodeForAllThreads "`n global _ahkThreadID := """ threadID """`n" ExecutionThreadCode)
 	
 	global_AllThreads[threadID] := {permanent: true, type: "Execution"}
 	logger("t1", "Execution thread started")

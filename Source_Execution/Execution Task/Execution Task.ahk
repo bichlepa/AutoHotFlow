@@ -17,7 +17,6 @@ executionTask()
 				ExecutionPolicy:=_settings.FlowExecutionPolicy
 			else
 				ExecutionPolicy:=_flows[p_Environment.FlowID].flowSettings.ExecutionPolicy
-			thisFlowExecutionPolicyIsWait:=(ExecutionPolicy="wait")
 			
 			if (OneInstance.state="init")
 			{
@@ -26,12 +25,12 @@ executionTask()
 			else
 			{
 				;If only one instance is allowed in this flow, and other should wait
-				if (thisFlowExecutionPolicyIsWait)
+				if (ExecutionPolicy="wait")
 				{
 					if (executingFlows.haskey(OneInstance.flowID))
 					{
-						if (thisFlowExecutionPolicyIsWait)
-							continue
+						;Do not execute this instance
+						continue
 					}
 					executingFlows[OneInstance.flowID]:=True
 				}

@@ -16,6 +16,7 @@ Element_New(p_FlowID, p_type="",p_elementID="")
 {
 	global GridX, Gridy
 	
+	EnterCriticalSection(_cs.flows)
 	;~ allElements:=_flows[p_FlowID].allElements
 	
 	tempElement:=CriticalObject()
@@ -51,12 +52,14 @@ Element_New(p_FlowID, p_type="",p_elementID="")
 	
 	Element_SetType(p_FlowID, tempElement.ID,p_type)
 	
+	LeaveCriticalSection(_cs.flows)
 	return tempElement.ID
 }
 
 ;Sets the element type. It could later be possible to change the element type (e.g. change from type "action" to type "condition")
 Element_SetType(p_FlowID, p_elementID,p_elementType)
 {
+	EnterCriticalSection(_cs.flows)
 	allElements:=_flows[p_FlowID].allElements
 	
 	allElements[p_elementID].type:=p_elementType 
@@ -69,11 +72,13 @@ Element_SetType(p_FlowID, p_elementID,p_elementType)
 	{
 		allElements[p_elementID].heightOfVerticalBar:=150
 	}
+	LeaveCriticalSection(_cs.flows)
 }
 
 ;Sets the element class. This means it is possible to change the element type and subtype
 Element_SetClass(p_FlowID, p_elementID, p_elementClass)
 {
+	EnterCriticalSection(_cs.flows)
 	allElements:=_flows[p_FlowID].allElements
 	
 	;First set type
@@ -103,11 +108,13 @@ Element_SetClass(p_FlowID, p_elementID, p_elementClass)
 	allElements[p_elementID].name:=Element_GenerateName_%p_elementClass%(allElements[p_elementID], allElements[p_elementID].pars)
 	
 
+	LeaveCriticalSection(_cs.flows)
 }
 
 ;Is called when the element subtype is set. All parameters that are not set yet are set to the default parameters
 Element_setParameterDefaults(p_FlowID, p_elementID)
 {
+	EnterCriticalSection(_cs.flows)
 	allElements:=_flows[p_FlowID].allElements
 	
 	elementClass:=allElements[p_elementID].class
@@ -148,22 +155,31 @@ Element_setParameterDefaults(p_FlowID, p_elementID)
 	}
 	
 	
+	LeaveCriticalSection(_cs.flows)
 }
 
 Element_findDefaultTrigger(p_FlowID)
 {
+	EnterCriticalSection(_cs.flows)
 	for oneID, oneElement in _flows[p_FlowID].allElements
 	{
 		if (oneElement.class = "trigger_manual")
 		{
 			if (oneElement.defaultTrigger)
-				return oneID
+			{
+				retval:= oneID
+				break
+			}
 		}
 	}
+	
+	LeaveCriticalSection(_cs.flows)
+	return retval
 }
 
 Element_setDefaultTrigger(p_FlowID, p_elementID)
 {
+	EnterCriticalSection(_cs.flows)
 	for oneID, oneElement in _flows[p_FlowID].allElements
 	{
 		if (oneElement.class = "trigger_manual")
@@ -179,12 +195,14 @@ Element_setDefaultTrigger(p_FlowID, p_elementID)
 			}
 		}
 	}
+	LeaveCriticalSection(_cs.flows)
 }
 
 
 ;Removes the element. It will be deleted from list of all elements and all connections which start or ends there will be deleted, too
 Element_Remove(p_FlowID, p_elementID)
 {
+	EnterCriticalSection(_cs.flows)
 	allElements:=_flows[p_FlowID].allElements
 	allConnections:=_flows[p_FlowID].allConnections
 	markedElements:=_flows[p_FlowID].markedElements
@@ -193,41 +211,41 @@ Element_Remove(p_FlowID, p_elementID)
 	IfInString,p_elementID,connection
 	{
 		Connection_Remove(p_FlowID, p_elementID)
-		return
 	}
-	
-	
-	
-	;remove the element from list of all elements
-	for forID, forElement in allElements
+	else
 	{
-		if (forID=p_elementID)
+		;remove the element from list of all elements
+		for forID, forElement in allElements
 		{
-			allElements.delete(forID)
-			break
+			if (forID=p_elementID)
+			{
+				allElements.delete(forID)
+				break
+			}
 		}
-	}
-	
-	;~ ;If the element is marked, unmark it
-	;~ for forID, forElement in markedElements
-	;~ {
-		;~ if (forID=p_elementID)
+		
+		;~ ;If the element is marked, unmark it
+		;~ for forID, forElement in markedElements
 		;~ {
-			;~ UnmarkEverything(p_FlowID) ;Unmark all elements
-			;~ break
+			;~ if (forID=p_elementID)
+			;~ {
+				;~ UnmarkEverything(p_FlowID) ;Unmark all elements
+				;~ break
+			;~ }
 		;~ }
-	;~ }
-	
-	;remove the connections which end or start at the element ;TODO: if removing an element with only one connection from and one connection to the element, keep one connection
-	copyAllConnections:=allConnections.clone()
-	for forID, forElement in copyAllConnections
-	{
-		if ((forElement.from=p_elementID) or (forElement.to=p_elementID))
+		
+		;remove the connections which end or start at the element ;TODO: if removing an element with only one connection from and one connection to the element, keep one connection
+		copyAllConnections:=allConnections.clone()
+		for forID, forElement in copyAllConnections
 		{
-			Connection_Remove(p_FlowID, forID)
+			if ((forElement.from=p_elementID) or (forElement.to=p_elementID))
+			{
+				Connection_Remove(p_FlowID, forID)
+			}
 		}
 	}
 	
+	LeaveCriticalSection(_cs.flows)
 }
 
 
@@ -235,6 +253,7 @@ Element_Remove(p_FlowID, p_elementID)
 
 Connection_New(p_FlowID, p_elementID="")
 {
+	EnterCriticalSection(_cs.flows)
 	allConnections:=_flows[p_FlowID].allConnections
 	
 	tempElement:=CriticalObject()
@@ -256,6 +275,7 @@ Connection_New(p_FlowID, p_elementID="")
 	
 	allConnections[tempElement.id]:=tempElement
 	
+	LeaveCriticalSection(_cs.flows)
 	return tempElement.ID
 }
 
@@ -263,6 +283,7 @@ Connection_New(p_FlowID, p_elementID="")
 ;Removes the connection. It will be deleted from list of all elements and all connections which start or ends there will be deleted, too
 Connection_Remove(p_FlowID, p_elementID)
 {
+	EnterCriticalSection(_cs.flows)
 	allConnections:=_flows[p_FlowID].allConnections
 	markedElements:=_flows[p_FlowID].markedElements
 	
@@ -289,16 +310,19 @@ Connection_Remove(p_FlowID, p_elementID)
 	;~ }
 	
 	;~ API_editor_CreateMarkedList(p_FlowID)
+	LeaveCriticalSection(_cs.flows)
 }
 
 
 ;~ ;
 GetListContainingElement(p_FlowID, p_ElementID, p_returnPointer = false)
 {
+	EnterCriticalSection(_cs.flows)
 	if _flows[p_FlowID].allElements.HasKey(p_ElementID)
 		templist := _flows[p_FlowID].allElements
 	else if _flows[p_FlowID].allConnections.HasKey(p_ElementID)
 		templist := _flows[p_FlowID].allConnections
+	LeaveCriticalSection(_cs.flows)
 	if (p_returnPointer)
 		return &templist
 	else
@@ -307,6 +331,7 @@ GetListContainingElement(p_FlowID, p_ElementID, p_returnPointer = false)
 
 UpdateConnectionLists(p_FlowID)
 {
+	EnterCriticalSection(_cs.flows)
 	for oneElementID, oneElement in _flows[p_FlowID].allElements
 	{
 		oneElement.fromConnections:=Object()
@@ -317,4 +342,5 @@ UpdateConnectionLists(p_FlowID)
 		_flows[p_FlowID].allElements[oneConnection.from].fromConnections.push(oneConnectionID)
 		_flows[p_FlowID].allElements[oneConnection.to].toConnections.push(oneConnectionID)
 	}
+	LeaveCriticalSection(_cs.flows)
 }

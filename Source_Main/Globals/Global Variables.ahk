@@ -172,7 +172,10 @@ _share.main.Tasks := CriticalObject()
 ;Those two variables are filled by the elements when they are included
 _share.AllElementClasses:=CriticalObject()
 
-global _ahkCriticalSection_Flows := CriticalSection() ;TODO: use it!
+global _cs := CriticalObject() ;Variable containing all critical sections
+_cs.flows := CriticalSection() ;Protect access to _Flows
+_cs.execution := CriticalSection() ;Protect access to _Execution and global / static variables
+_cs.debug := CriticalSection() ;Protect access to Debug files
 
 return
 

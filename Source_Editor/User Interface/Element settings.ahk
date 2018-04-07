@@ -59,6 +59,7 @@ class ElementSettings
 		
 		
 		;Loop through all parameters
+		EnterCriticalSection(_cs.flows)
 		for index, parameter in parametersToEdit
 		{
 			;Add one or a group of controls. This is done dynamically, dependent on the parameters
@@ -124,6 +125,7 @@ class ElementSettings
 			}
 			
 		}
+		LeaveCriticalSection(_cs.flows)
 		
 		
 		
@@ -277,6 +279,8 @@ class ElementSettings
 		
 		
 		GUISettingsOfElementSave:
+		EnterCriticalSection(_cs.flows)
+		
 		GUISettingsOfElementobject.generalUpdate()
 		;~ gui,SettingsOfElement:submit
 		if (setElement.type="trigger" and triggersEnabled=true) ;When editing a trigger, disable Triggers and enable them afterwards
@@ -329,9 +333,10 @@ class ElementSettings
 			
 			}
 			
-			
-			
 		}
+		
+		LeaveCriticalSection(_cs.flows)
+		
 		temponeValue:=""
 		
 		ui_closeHelp() 

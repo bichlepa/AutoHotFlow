@@ -425,6 +425,9 @@ ui_findElementUnderMouse(par_mode="default")
 {
 	global
 	local tempList
+	local drawResults
+	
+	EnterCriticalSection(_cs.flows)
 	
 	clickedElement:=""
 	elementHighestPriority:=""
@@ -435,42 +438,42 @@ ui_findElementUnderMouse(par_mode="default")
 	{
 		
 		;look whether user wants to create a new element (click on a field on top left corner)
-		if ((0 < mx) and (0 < my) and ((FlowObj.draw.NewElementIconWidth * 1.2)  > mx) and ((FlowObj.draw.NewElementIconHeight * 1.2) > my))
+		if ((0 < mx) and (0 < my) and ((FlowObj.DrawResult.NewElementIconWidth * 1.2)  > mx) and ((FlowObj.DrawResult.NewElementIconHeight * 1.2) > my))
 			clickedElement = MenuCreateNewAction
-		if (((FlowObj.draw.NewElementIconWidth * 1.2) < mx) and (0 < my) and ((FlowObj.draw.NewElementIconWidth * 1.2 * 2)  > mx) and ((FlowObj.draw.NewElementIconHeight * 1.2) > my))
+		if (((FlowObj.DrawResult.NewElementIconWidth * 1.2) < mx) and (0 < my) and ((FlowObj.DrawResult.NewElementIconWidth * 1.2 * 2)  > mx) and ((FlowObj.DrawResult.NewElementIconHeight * 1.2) > my))
 			clickedElement = MenuCreateNewCondition
-		if (((FlowObj.draw.NewElementIconWidth * 1.2 * 2) < mx) and (0 < my) and ((FlowObj.draw.NewElementIconWidth * 1.2 * 3)  > mx) and ((FlowObj.draw.NewElementIconHeight * 1.2) > my))
+		if (((FlowObj.DrawResult.NewElementIconWidth * 1.2 * 2) < mx) and (0 < my) and ((FlowObj.DrawResult.NewElementIconWidth * 1.2 * 3)  > mx) and ((FlowObj.DrawResult.NewElementIconHeight * 1.2) > my))
 			clickedElement = MenuCreateNewLoop
-		if (((FlowObj.draw.NewElementIconWidth * 1.2 * 3) < mx) and (0 < my) and ((FlowObj.draw.NewElementIconWidth * 1.2 * 4)  > mx) and ((FlowObj.draw.NewElementIconHeight * 1.2) > my))
+		if (((FlowObj.DrawResult.NewElementIconWidth * 1.2 * 3) < mx) and (0 < my) and ((FlowObj.DrawResult.NewElementIconWidth * 1.2 * 4)  > mx) and ((FlowObj.DrawResult.NewElementIconHeight * 1.2) > my))
 			clickedElement = MenuCreateNewTrigger
 	
 
-		;~ ToolTip % share.PlusButtonExist " -" FlowObj.draw.middlePointOfPlusButtonX
+		;~ ToolTip % share.PlusButtonExist " -" FlowObj.DrawResult.middlePointOfPlusButtonX
 		;~ ToolTip( "gsdd" Sqrt((middlePointOfPlusButtonX - mx)*(middlePointOfPlusButtonX - mx) + (middlePointOfPlusButtonY - my)*(middlePointOfPlusButtonY - my)) "`n middlePointOfPlusButtonX " middlePointOfPlusButtonX "`n middlePointOfPlusButtonY " middlePointOfPlusButtonY)
 		;Look whether user clicked a button
-		if (FlowObj.draw.PlusButtonExist=true and Sqrt((FlowObj.draw.middlePointOfPlusButtonX - mx) * (FlowObj.draw.middlePointOfPlusButtonX - mx) + (FlowObj.draw.middlePointOfPlusButtonY - my) * (FlowObj.draw.middlePointOfPlusButtonY - my)) < default_SizeOfButtons/2)
+		if (FlowObj.DrawResult.PlusButtonExist=true and Sqrt((FlowObj.DrawResult.middlePointOfPlusButtonX - mx) * (FlowObj.DrawResult.middlePointOfPlusButtonX - mx) + (FlowObj.DrawResult.middlePointOfPlusButtonY - my) * (FlowObj.DrawResult.middlePointOfPlusButtonY - my)) < default_SizeOfButtons/2)
 			clickedElement = PlusButton
-		else if (FlowObj.draw.PlusButton2Exist=true and Sqrt((FlowObj.draw.middlePointOfPlusButton2X - mx) * (FlowObj.draw.middlePointOfPlusButton2X - mx) + (FlowObj.draw.middlePointOfPlusButton2Y - my) * (FlowObj.draw.middlePointOfPlusButton2Y - my)) < default_SizeOfButtons/2)
+		else if (FlowObj.DrawResult.PlusButton2Exist=true and Sqrt((FlowObj.DrawResult.middlePointOfPlusButton2X - mx) * (FlowObj.DrawResult.middlePointOfPlusButton2X - mx) + (FlowObj.DrawResult.middlePointOfPlusButton2Y - my) * (FlowObj.DrawResult.middlePointOfPlusButton2Y - my)) < default_SizeOfButtons/2)
 			clickedElement = PlusButton2
-		else if (FlowObj.draw.EditButtonExist=true and Sqrt((FlowObj.draw.middlePointOfEditButtonX  - mx) * (FlowObj.draw.middlePointOfEditButtonX - mx) + (FlowObj.draw.middlePointOfEditButtonY  - my) * (FlowObj.draw.middlePointOfEditButtonY  - my)) < default_SizeOfButtons/2)
+		else if (FlowObj.DrawResult.EditButtonExist=true and Sqrt((FlowObj.DrawResult.middlePointOfEditButtonX  - mx) * (FlowObj.DrawResult.middlePointOfEditButtonX - mx) + (FlowObj.DrawResult.middlePointOfEditButtonY  - my) * (FlowObj.DrawResult.middlePointOfEditButtonY  - my)) < default_SizeOfButtons/2)
 			clickedElement = EditButton
-		else if (FlowObj.draw.TrashButtonExist=true and Sqrt((FlowObj.draw.middlePointOfTrashButtonX - mx) * (FlowObj.draw.middlePointOfTrashButtonX - mx) + (FlowObj.draw.middlePointOfTrashButtonY - my) * (FlowObj.draw.middlePointOfTrashButtonY - my)) < default_SizeOfButtons/2)
+		else if (FlowObj.DrawResult.TrashButtonExist=true and Sqrt((FlowObj.DrawResult.middlePointOfTrashButtonX - mx) * (FlowObj.DrawResult.middlePointOfTrashButtonX - mx) + (FlowObj.DrawResult.middlePointOfTrashButtonY - my) * (FlowObj.DrawResult.middlePointOfTrashButtonY - my)) < default_SizeOfButtons/2)
 			clickedElement = TrashButton
-		else if (FlowObj.draw.MoveButton2Exist=true and Sqrt((FlowObj.draw.middlePointOfMoveButton2X - mx) * (FlowObj.draw.middlePointOfMoveButton2X - mx) + (FlowObj.draw.middlePointOfMoveButton2Y - my) * (FlowObj.draw.middlePointOfMoveButton2Y - my)) < default_SizeOfButtons/2)
+		else if (FlowObj.DrawResult.MoveButton2Exist=true and Sqrt((FlowObj.DrawResult.middlePointOfMoveButton2X - mx) * (FlowObj.DrawResult.middlePointOfMoveButton2X - mx) + (FlowObj.DrawResult.middlePointOfMoveButton2Y - my) * (FlowObj.DrawResult.middlePointOfMoveButton2Y - my)) < default_SizeOfButtons/2)
 			clickedElement = MoveButton2
-		else if (FlowObj.draw.MoveButton1Exist=true and Sqrt((FlowObj.draw.middlePointOfMoveButton1X - mx) * (FlowObj.draw.middlePointOfMoveButton1X - mx) + (FlowObj.draw.middlePointOfMoveButton1Y - my) * (FlowObj.draw.middlePointOfMoveButton1Y - my)) < default_SizeOfButtons/2)
+		else if (FlowObj.DrawResult.MoveButton1Exist=true and Sqrt((FlowObj.DrawResult.middlePointOfMoveButton1X - mx) * (FlowObj.DrawResult.middlePointOfMoveButton1X - mx) + (FlowObj.DrawResult.middlePointOfMoveButton1Y - my) * (FlowObj.DrawResult.middlePointOfMoveButton1Y - my)) < default_SizeOfButtons/2)
 			clickedElement = MoveButton1		
-		else if (FlowObj.draw.SwitchOnButtonExist=true and (FlowObj.draw.PosOfSwitchOnButtonX1 < mx) and (FlowObj.draw.PosOfSwitchOnButtonX2 > mx) and (FlowObj.draw.PosOfSwitchOnButtonY1 < my) and (FlowObj.draw.PosOfSwitchOnButtonY2 > my) )
+		else if (FlowObj.DrawResult.SwitchOnButtonExist=true and (FlowObj.DrawResult.PosOfSwitchOnButtonX1 < mx) and (FlowObj.DrawResult.PosOfSwitchOnButtonX2 > mx) and (FlowObj.DrawResult.PosOfSwitchOnButtonY1 < my) and (FlowObj.DrawResult.PosOfSwitchOnButtonY2 > my) )
 			clickedElement = SwitchOnButton	
-		else if (FlowObj.draw.SwitchOffButtonExist=true and (FlowObj.draw.PosOfSwitchOffButtonX1 < mx) and (FlowObj.draw.PosOfSwitchOffButtonX2 > mx) and (FlowObj.draw.PosOfSwitchOffButtonY1 < my) and (FlowObj.draw.PosOfSwitchOffButtonY2 > my) )
+		else if (FlowObj.DrawResult.SwitchOffButtonExist=true and (FlowObj.DrawResult.PosOfSwitchOffButtonX1 < mx) and (FlowObj.DrawResult.PosOfSwitchOffButtonX2 > mx) and (FlowObj.DrawResult.PosOfSwitchOffButtonY1 < my) and (FlowObj.DrawResult.PosOfSwitchOffButtonY2 > my) )
 			clickedElement = SwitchOffButton		
-		else if (FlowObj.draw.StarFilledButtonExist=true and (FlowObj.draw.PosOfStarFilledButtonX1 < mx) and (FlowObj.draw.PosOfStarFilledButtonX2 > mx) and (FlowObj.draw.PosOfStarFilledButtonY1 < my) and (FlowObj.draw.PosOfStarFilledButtonY2 > my) )
+		else if (FlowObj.DrawResult.StarFilledButtonExist=true and (FlowObj.DrawResult.PosOfStarFilledButtonX1 < mx) and (FlowObj.DrawResult.PosOfStarFilledButtonX2 > mx) and (FlowObj.DrawResult.PosOfStarFilledButtonY1 < my) and (FlowObj.DrawResult.PosOfStarFilledButtonY2 > my) )
 			clickedElement = StarFilledButton	
-		else if (FlowObj.draw.StarEmptyButtonExist=true and (FlowObj.draw.PosOfStarEmptyButtonX1 < mx) and (FlowObj.draw.PosOfStarEmptyButtonX2 > mx) and (FlowObj.draw.PosOfStarEmptyButtonY1 < my) and (FlowObj.draw.PosOfStarEmptyButtonY2 > my) )
+		else if (FlowObj.DrawResult.StarEmptyButtonExist=true and (FlowObj.DrawResult.PosOfStarEmptyButtonX1 < mx) and (FlowObj.DrawResult.PosOfStarEmptyButtonX2 > mx) and (FlowObj.DrawResult.PosOfStarEmptyButtonY1 < my) and (FlowObj.DrawResult.PosOfStarEmptyButtonY2 > my) )
 			clickedElement = StarEmptyButton
 	}
 	;~ ToolTip %par_mode% -- %clickedElement%
-	;~ d(FlowObj.draw, mx "  -  " my " - " Sqrt((FlowObj.draw.middlePointOfPlusButtonX - mx) * (FlowObj.draw.middlePointOfPlusButtonX - mx) + (FlowObj.draw.middlePointOfPlusButtonY - my) * (FlowObj.draw.middlePointOfPlusButtonY - my)))
+	;~ d(FlowObj.DrawResult, mx "  -  " my " - " Sqrt((FlowObj.DrawResult.middlePointOfPlusButtonX - mx) * (FlowObj.DrawResult.middlePointOfPlusButtonX - mx) + (FlowObj.DrawResult.middlePointOfPlusButtonY - my) * (FlowObj.DrawResult.middlePointOfPlusButtonY - my)))
 	;search for an element
 	if (clickedElement="")
 	{
@@ -478,12 +481,12 @@ ui_findElementUnderMouse(par_mode="default")
 		MarkedElementLowestPriority=100000
 		for forID, forElement in FlowObj.allElements
 		{
-			
-			Loop % forElement.CountOfParts ;Some elements consist of multiple parts
+			drawResults:=FlowObj.DrawResult.elements[forID]
+			Loop % drawResults.CountOfParts ;Some elements consist of multiple parts
 			{
 				;~ ToolTip(strobj(forElement),10000)
 				;~ MsgBox %mx% %my%
-				if (forElement["part" a_index "x1"] < mx and forElement["part" a_index "y1"] < my and forElement["part" a_index "x2"] > mx and forElement["part" a_index "y2"] > my)
+				if (drawResults["part" a_index "x1"] < mx and drawResults["part" a_index "y1"] < my and drawResults["part" a_index "x2"] > mx and drawResults["part" a_index "y2"] > my)
 				{
 					if (elementHighestPriority < forElement.ClickPriority) ;Find the element with highest priority
 					{
@@ -548,6 +551,9 @@ ui_findElementUnderMouse(par_mode="default")
 			FlowObj.allConnections[clickedElement].ClickPriority:=190
 		;~ }
 	}
+	
+	LeaveCriticalSection(_cs.flows)
+	
 	return clickedElement
 }
 
@@ -1125,6 +1131,7 @@ ui_MoveConnection(connection1="", connection2="", element1="", element2="")
 		else
 			tempElement:=Connection2
 		
+		EnterCriticalSection(_cs.flows)
 		for forID, forElement in FlowObj.allConnections
 		{
 			;~ d(strobj(tempElement) "`n`n" strobj(forElement), "wait")
@@ -1140,6 +1147,8 @@ ui_MoveConnection(connection1="", connection2="", element1="", element2="")
 				}
 			}
 		}
+		
+		LeaveCriticalSection(_cs.flows)
 		
 	}
 	

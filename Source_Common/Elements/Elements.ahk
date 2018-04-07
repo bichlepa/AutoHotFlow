@@ -1,11 +1,14 @@
-﻿Element_bufferedParametrationDetails:=Object()
+﻿;In order to save execution time, the returned parametratopmDetails are cached in those objects
+Element_bufferedParametrationDetails:=Object()
 Element_bufferedParameters:=Object()
 
+;Only called from main thread. Fills a list of all available element classes
 Element_Register_Element_Class(p_class)
 {
 	_share.AllElementClasses.push(p_class)
 }
 
+;Returns a list of all parametration details
 Element_getParametrizationDetails(elementClass, Environment)
 {
 	global Element_bufferedParametrationDetails
@@ -13,7 +16,10 @@ Element_getParametrizationDetails(elementClass, Environment)
 		or (Element_bufferedParametrationDetails[elementClass].updateOnEdit and Environment.updateOnEdit )) ;If the edit field is opened and the parameters must be reloaded
 	{
 		if not IsFunc("Element_getParametrizationDetails_" elementClass)
+		{
+			logger("a0", "unexpected error function Element_getParametrizationDetails_" elementClass " does not exist")
 			MsgBox unexpected error function Element_getParametrizationDetails_%elementClass% does not exist
+		}
 		Element_bufferedParametrationDetails[elementClass]:=Element_getParametrizationDetails_%elementClass%(Environment)
 	}
 	return ObjFullyClone(Element_bufferedParametrationDetails[elementClass])

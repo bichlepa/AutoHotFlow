@@ -122,6 +122,9 @@ updateFlowIcons_Manager_GUI()
 	
 	Gui, manager:default
 	local forFlowID, forFlow, selectedFlow
+	
+	EnterCriticalSection(_cs.flows)
+	
 	for forFlowID, forFlow in _flows
 	{
 		if (forFlow.executing = True)
@@ -185,6 +188,8 @@ updateFlowIcons_Manager_GUI()
 			currentLabelButtonRun := "Enable"
 		}
 	}
+	
+	LeaveCriticalSection(_cs.flows)
 }
 
 TreeView_manager_Refill()
@@ -214,6 +219,7 @@ TreeView_manager_Refill()
 		onecategory.tv:=TreeView_manager_AddEntry("Category", onecategoryID)
 	}
 	
+	EnterCriticalSection(_cs.flows)
 	;go through all flows and add the tv elements
 	for oneflowID, oneflow in _flows
 	{
@@ -228,6 +234,7 @@ TreeView_manager_Refill()
 		if not (_settings.HideDemoFlows && oneflow.demo)
 			oneflow.tv:=TreeView_manager_AddEntry("Flow", oneflowID)
 	}
+	LeaveCriticalSection(_cs.flows)
 	
 	TreeView_manager_Select(tempselectedType, tempselectedID)
 	guicontrol, enable,TreeView_manager
@@ -408,6 +415,8 @@ TreeView_manager()
 				_share.allCategories[newcategoryid].name := tempNewName
 				
 				;all flows of that category must be saved
+				EnterCriticalSection(_cs.flows)
+				
 				for tempflowid, tempitem in _flows
 				{
 					if (tempitem.category = tempselectedID)
@@ -418,6 +427,8 @@ TreeView_manager()
 					}
 					
 				}
+				
+				LeaveCriticalSection(_cs.flows)
 				;~ tooltip(lang("Renamed"))
 				
 			}

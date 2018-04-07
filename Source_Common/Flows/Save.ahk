@@ -6,12 +6,15 @@ SaveFlowMetaData(FlowID)
 	global
 	local enabledFlows
 	
+	EnterCriticalSection(_cs.flows)
+	
 	logger("a2","Saving meta data of flow " FlowName)
 	
 	if (_Flows[FlowID].file="")
 	{
 		;Do not save anything if flow does not exist. (Should not happen)
 		MsgBox unexpected error. should save metadata of flow "%FlowID%", but no flow file specified
+		LeaveCriticalSection(_cs.flows)
 		return
 	}
 	
@@ -19,6 +22,7 @@ SaveFlowMetaData(FlowID)
 	{
 		;A demo flow cannot be saved
 		logger("a0","Cannot save metadata of flow " FlowName ". It is a demonstation flow.")
+		LeaveCriticalSection(_cs.flows)
 		return
 	}
 	
@@ -48,8 +52,9 @@ SaveFlowMetaData(FlowID)
 		}
 		
 		IniWrite,% enabledTriggers,% _Flows[FlowID].file,general,enabled
-		
 	}
+	
+	LeaveCriticalSection(_cs.flows)
 }
 
 SaveFlow(FlowID)
@@ -68,6 +73,7 @@ SaveFlow(FlowID)
 	logger("a1","Saving flow " FlowName)
 	;~ ToolTip(lang("saving"),100000)
 	
+	EnterCriticalSection(_cs.flows)
 	
 	if (_Flows[FlowID].demo and _settings.developing != True)
 	{
@@ -77,6 +83,7 @@ SaveFlow(FlowID)
 		{
 			MsgBox, 48, % lang("Save flow"), % lang("This flow cannot be saved because it is a demonstration flow.") " " lang("You may duplicate this flow first and then you can edit it.")
 		}
+		LeaveCriticalSection(_cs.flows)
 		return
 	}
 	
@@ -223,6 +230,7 @@ SaveFlow(FlowID)
 	saved=yes
 	busy:=false
 	
+	LeaveCriticalSection(_cs.flows)
 }
 
 i_SaveParametersOfElement(saveElement,FlowID,saveElementIniID,Savelocation="")
@@ -274,6 +282,9 @@ i_SaveParametersOfElement(saveElement,FlowID,saveElementIniID,Savelocation="")
 i_SaveUnsavedFlows()
 {
 	global _flows
+	
+	EnterCriticalSection(_cs.flows)
+	
 	for tempID, tempflow in _flows
 	{
 		if (tempflow.currentState != tempflow.savedState)
@@ -283,4 +294,5 @@ i_SaveUnsavedFlows()
 		
 	}
 	
+	LeaveCriticalSection(_cs.flows)
 }

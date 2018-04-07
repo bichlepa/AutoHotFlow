@@ -4,50 +4,53 @@ MarkOne(p_ID,additional:=false)
 	global _flows
 	global FlowID
 	
+	EnterCriticalSection(_cs.flows)
+	
 	markedElements:=_flows[FlowID].markedElements
 	allConnections:=_flows[FlowID].allConnections
 	allElements:=_flows[FlowID].allElements
 	
 	
 	;~ ToolTip,% p_id " - " additional
-	if (p_ID="")
-		return
-	
-	
-	if (additional=false)
+	if (p_ID!="")
 	{
-		UnmarkEverything(false)
-		
-		;Mark one element
-		if p_ID contains connection
+		if (additional=false)
 		{
-			_flows[FlowID].allConnections[p_ID].marked:=true
+			UnmarkEverything(false)
+			
+			;Mark one element
+			if p_ID contains connection
+			{
+				_flows[FlowID].allConnections[p_ID].marked:=true
+			}
+			else
+			{
+				_flows[FlowID].allElements[p_ID].marked:=true
+			}
+			
+			
 		}
-		else
+		else ;if (additional=true)
 		{
-			_flows[FlowID].allElements[p_ID].marked:=true
+			if p_ID contains connection
+			{
+				_flows[FlowID].allConnections[p_ID].marked:=!(_flows[FlowID].allConnections[p_ID].marked)
+			}
+			else
+			{
+				_flows[FlowID].allElements[p_ID].marked:=!(_flows[FlowID].allElements[p_ID].marked)
+			}
+			
+			
 		}
 		
+		CreateMarkedList()
 		
+		;~ ToolTip("-" p_ID "-" tempList[p_ID].marked "-" markedElement )
+		;~ ui_UpdateStatusbartext()
 	}
-	else ;if (additional=true)
-	{
-		if p_ID contains connection
-		{
-			_flows[FlowID].allConnections[p_ID].marked:=!(_flows[FlowID].allConnections[p_ID].marked)
-		}
-		else
-		{
-			_flows[FlowID].allElements[p_ID].marked:=!(_flows[FlowID].allElements[p_ID].marked)
-		}
-		
-		
-	}
-	
-	CreateMarkedList()
 
-	;~ ToolTip("-" p_ID "-" tempList[p_ID].marked "-" markedElement )
-	;~ ui_UpdateStatusbartext()
+	LeaveCriticalSection(_cs.flows)
 }
 
 ;Unmark all elements and connections
@@ -56,12 +59,11 @@ UnmarkEverything(CreateList=true)
 	global _flows 
 	global FlowID 
 	
+	EnterCriticalSection(_cs.flows)
+	
 	markedElements:=_flows[FlowID].markedElements
 	allConnections:=_flows[FlowID].allConnections
 	allElements:=_flows[FlowID].allElements
-	
-	
-	
 	
 	for forID, forElement in allElements ;Add all marked elements into array
 	{
@@ -76,12 +78,15 @@ UnmarkEverything(CreateList=true)
 		CreateMarkedList()
 	;~ ui_UpdateStatusbartext()
 	
+	LeaveCriticalSection(_cs.flows)
 }
 
 MarkEverything()
 {
 	global _flows
 	global FlowID
+	
+	EnterCriticalSection(_cs.flows)
 	
 	markedElements:=_flows[FlowID].markedElements
 	allConnections:=_flows[FlowID].allConnections
@@ -101,6 +106,8 @@ MarkEverything()
 	CreateMarkedList()
 	
 	;~ ui_UpdateStatusbartext()	
+	
+	LeaveCriticalSection(_cs.flows)
 }
 
 CreateMarkedList()
@@ -108,6 +115,9 @@ CreateMarkedList()
 	global
 	;~ SoundBeep
 	local markedElementsClone
+	
+	EnterCriticalSection(_cs.flows)
+	
 	markedElements:=_flows[FlowID].markedElements
 	allConnections:=_flows[FlowID].allConnections
 	allElements:=_flows[FlowID].allElements
@@ -141,4 +151,5 @@ CreateMarkedList()
 		;~ ToolTip no element
 		_flows[FlowID].markedElement:=""
 	}
+	LeaveCriticalSection(_cs.flows)
 }
