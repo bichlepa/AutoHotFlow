@@ -331,7 +331,7 @@ queryTasks()
 exit()
 {
 	;Only set timer in order to return. This is needed if the function is called from other thread.
-	SetTimer,exitLabel,10
+	SetTimer,exitLabel,-10
 }
 
 exitLabel:

@@ -11,7 +11,7 @@ SetWorkingDir %a_temp%  ; using working dir forbidden.
 #NoTrayIcon
 
 parentAHKThread := AhkExported()
-onexit exit
+OnExit,Exit
 #Include %A_ScriptDir%\..
 #include lib\Object to file\String-object-file.ahk
 #include lib\7z wrapper\7z wrapper.ahk
@@ -100,15 +100,6 @@ queryTasks()
 	}
 }
 
-exit_all()
-{
-	global
-	API_Main_Exit()
-}
-
 exit:
-if (exiting != true)
-exit_all()
-exiting := true
-exitapp
+API_Main_Thread_Stopped(_ahkThreadID)
 return

@@ -809,7 +809,7 @@ Button_manager_ShowLog()
 
 Button_manager_Exit()
 {
-	exit_all()
+	API_Main_Exit()
 }
 
 

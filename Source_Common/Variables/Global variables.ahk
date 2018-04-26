@@ -336,7 +336,7 @@ Var_GetLocation_Common(Environment, p_Name, p_hidden=False)
 }
 
 
-Var_Set_Common(Environment, p_Name, p_Value, p_Destination="", p_hidden=False)
+Var_Set_Common(Environment, p_Name, p_Value, p_Destination="", p_hidden=False, p_log=true)
 {
 	res:=Var_CheckName(p_Name,true)
 	if (res="empty")

@@ -36,20 +36,6 @@ Thread_StartManager()
 }
 
 
-Thread_StopAll()
-{
-	global
-	local threadsCopy
-	logger("t1", "Stopping all threads")
-	threadsCopy := global_Allthreads.clone()
-	for threadID, threadpars in threadsCopy
-	{
-		global_Allthreads.delete(threadID)
-		if (AhkThread%threadID%.ahkReady())
-			AhkThread%threadID%.ahkterminate(-1)
-	}
-}
-
 API_Main_StartEditor(par_FlowID) ;API Function
 {
 	Thread_StartEditor(par_FlowID)
@@ -113,9 +99,38 @@ Thread_StartExecution()
 	logger("t1", "Execution thread started")
 }
 
+Thread_StopAll()
+{
+	global
+	local threadsCopy
+	local threadID
+	logger("t1", "Stopping all threads")
+	threadsCopy := global_Allthreads.clone()
+	
+	
+	;~ EnterCriticalSection(_cs.flows)
+	;~ EnterCriticalSection(_cs.execution)
+	for threadID, threadpars in threadsCopy
+	{
+		;~ global_Allthreads.delete(threadID)
+		if (AhkThread%threadID%.ahkReady())
+		{
+			;~ MsgBox terminating %threadID%
+			AhkThread%threadID%.ahkterminate(-100)
+			if (AhkThread%threadID%.ahkReady())
+			{
+				MsgBox close of thread %threadID% failed
+			}
+		}
+	}
+	;~ LeaveCriticalSection(_cs.flows)
+	;~ LeaveCriticalSection(_cs.execution)
+}
+
 Thread_Stopped(par_ThreadID)
 {
 	global
+	ToolTip thread stopped: %par_ThreadID%
 	global_Allthreads.delete(par_ThreadID)
 	logger("t1", "Thread " par_ThreadID "stopped")
 	;~ d(global_Allthreads, "thread " par_ThreadID " beendet")

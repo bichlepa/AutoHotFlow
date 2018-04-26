@@ -164,7 +164,7 @@ queryTasks()
 exit_all()
 {
 	global
-	API_Main_Thread_Stopped(_ahkThreadID "") 
+	API_Main_Thread_Stopped(_ahkThreadID) 
 }
 
 

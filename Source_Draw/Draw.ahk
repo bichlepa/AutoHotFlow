@@ -64,7 +64,6 @@ drawTask()
 	local temp
 	local somethingdrawn
 	
-	
 	Loop
 	{
 		EnterCriticalSection(_cs.flows)
@@ -102,16 +101,7 @@ drawTask()
 }
 
 
-exit_all()
-{
-	global
-	API_Main_Thread_Stopped(_ahkThreadID "" "")
-}
-
-
 exit:
-if (exiting != true)
-exit_all()
-exiting := true
-exitapp
+API_Main_Thread_Stopped(_ahkThreadID "" "")
 return
+
