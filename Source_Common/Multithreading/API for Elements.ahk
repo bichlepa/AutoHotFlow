@@ -442,6 +442,7 @@ x_ManualTriggerExecute(p_FlowID, p_TriggerName = "", p_Variables ="", p_CallBack
 		{
 			;~ d(p_FlowName " - " p_TriggerName)
 			EnterCriticalSection(_cs.flows)
+			foundElementID:=""
 			for forelementID, forelement in _flows[p_FlowID].allElements
 			{
 				;~ d(forelement, p_TriggerName)
@@ -449,14 +450,21 @@ x_ManualTriggerExecute(p_FlowID, p_TriggerName = "", p_Variables ="", p_CallBack
 				{
 					if (forelement.pars.id = p_TriggerName)
 					{
-						;~ d(forFlow.id,forelementID)
-						LeaveCriticalSection(_cs.flows)
-						executeFlow(p_FlowID, forelementID, params)
-						return
+						foundElementID:=forelementID
+						break
 					}
 				}
 			}
 			LeaveCriticalSection(_cs.flows)
+
+			if foundElementID
+			{
+				executeFlow(p_FlowID, foundElementID, params)
+			}
+			else
+			{
+				;todo: log error
+			}
 		}
 	}
 }

@@ -202,6 +202,7 @@ NewCategory(par_Newname = "")
 	local Newname
 	local tempNewname
 	local tempindex
+	local retval
 	
 	EnterCriticalSection(_cs.flows)
 	
@@ -242,26 +243,27 @@ NewCategory(par_Newname = "")
 			if (tempitem.name = Newname)
 			{
 				;If it already exists, return the id
-				;~ d(tempitem)
-				LeaveCriticalSection(_cs.flows)
-				return tempitem.id
+				retval:= tempitem.id
+				break
 			}
 			;MsgBox,%tempcategoryexist% 
 		}
 	}
-	
-	;Add the category to the list
-	newCategoryid := "category" global_CategoryIDCounter++
-	_share.allCategories[newCategoryid] := object()
-	_share.allCategories[newCategoryid].id := newCategoryid
-	_share.allCategories[newCategoryid].Name := Newname
-	_share.allCategories[newCategoryid].Type = Category
-	if (_share.FindFlows_Called)
+	if not retval
 	{
-		_share.managerTasks.refillTree:=true
-		_share.managerTasks.select:="Flow:" newFlowid
+		;Add the category to the list
+		newCategoryid := "category" global_CategoryIDCounter++
+		_share.allCategories[newCategoryid] := object()
+		_share.allCategories[newCategoryid].id := newCategoryid
+		_share.allCategories[newCategoryid].Name := Newname
+		_share.allCategories[newCategoryid].Type = Category
+		if (_share.FindFlows_Called)
+		{
+			_share.managerTasks.refillTree:=true
+			_share.managerTasks.select:="Flow:" newFlowid
+		}
+		;~ d(allCategories)
 	}
-	;~ d(allCategories)
 	
 	LeaveCriticalSection(_cs.flows)
 	

@@ -4,13 +4,17 @@ global global_AllActiveTriggerIDs:=Object()
 executionTask()
 {
 	global currentState
-	;TODO Vielleicht wird es zu Problemen kommen, wenn neue Instanzen hinzugefügt werden, während diese Schleife läuft
+
 	executingFlows:=Object()
 	
 	Loop
 	{
+		EnterCriticalSection(_cs.flows)
+		EnterCriticalSection(_cs.execution)
 		somethingexecuted:=false
+		ExecutionNextTasks:=Object()
 		
+		;Find out which elements need to be executed. Also manage finished elements and prepare them if needed
 		for OneInstanceID, OneInstance in _execution.Instances
 		{
 			if (_flows[p_Environment.FlowID].flowSettings.ExecutionPolicy = "default")
@@ -29,7 +33,7 @@ executionTask()
 				{
 					if (executingFlows.haskey(OneInstance.flowID))
 					{
-						;Do not execute this instance
+						;Do not execute this instance yet
 						continue
 					}
 					executingFlows[OneInstance.flowID]:=True
@@ -60,7 +64,10 @@ executionTask()
 						global_AllExecutionIDs[OneThread.UniqueID].Environment:=OneThread
 						;~ d(global_AllExecutionIDs, OneThread.UniqueID)
 						if Isfunc("Element_run_" oneElementClass )
-							Element_run_%oneElementClass%(OneThread, OneThread.elementpars) ;OneThread is the environment for element execution
+						{
+							;Add the element to the queue. It will be executed later
+							ExecutionNextTasks.push({func: "Element_run_" oneElementClass, thread: OneThread})
+						}
 						else
 							MsgBox Unexpected error! Function for running element does not exist: Element_run_%oneElementClass%
 						
@@ -142,6 +149,17 @@ executionTask()
 				}
 			}
 		}
+		
+		LeaveCriticalSection(_cs.execution)
+		LeaveCriticalSection(_cs.flows)
+
+		;Actually execute the elements which are queued for execution
+		for oneExecutionTaskIndex, oneExecutionTask in ExecutionNextTasks
+		{
+			func:=oneExecutionTask.func
+			%func%(oneExecutionTask.thread, oneExecutionTask.thread.elementpars) ;OneThread is the environment for element execution
+		}				
+
 		if (somethingexecuted=False)
 			break
 	}
@@ -151,6 +169,9 @@ executionTask()
 finishExecutionOfElement(Environment, Result, Message = "")
 {
 	global
+	EnterCriticalSection(_cs.flows)
+	EnterCriticalSection(_cs.execution)
+
 	Environment.State:="finished"
 	Environment.result:=Result
 	Environment.message:=Message
@@ -175,5 +196,7 @@ finishExecutionOfElement(Environment, Result, Message = "")
 	{
 		ThreadVariable_Set(Environment,"a_ErrorMessage",Message)
 	}
+	LeaveCriticalSection(_cs.execution)
+	LeaveCriticalSection(_cs.flows)
 	;~ d(Environment, message)
 }

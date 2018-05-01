@@ -19,6 +19,7 @@ if (command = "AHFCommand")
 	}
 }
 
+
 if not (a_iscompiled)
 {
 	;This is only executing while developing

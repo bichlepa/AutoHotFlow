@@ -1,12 +1,13 @@
-﻿InstanceIDCOunter:=0
-ThreadIDCOunter:=0
-
+﻿global global_InstanceIDCOunter:=0
+global global_ThreadIDCOunter:=0
 
 /* Starts a new execution instance
 */
 newInstance(p_Environment)
 {
-	global InstanceIDCOunter
+	EnterCriticalSection(_cs.flows)
+	EnterCriticalSection(_cs.execution)
+
 	if (_flows[p_Environment.FlowID].flowSettings.ExecutionPolicy="skip" or _flows[p_Environment.FlowID].flowSettings.ExecutionPolicy="stop")
 	{
 		;find out whether the flow is running
@@ -35,46 +36,50 @@ newInstance(p_Environment)
 	if oneElementID=
 	{
 		MsgBox Internal Error in newInstance(): trigger element ID unknown
-		return
 	}
-	
-	newInstance:=CriticalObject()
-	newInstance.id:= "instance" ++InstanceIDCOunter
-	newInstance.FlowID := p_Environment.FlowID
-	newInstance.FlowName := p_Environment.FlowName
-	newInstance.state := "init"
-	newInstance.InstanceVars := CriticalObject()
-	newInstance.InstanceVarsHidden := CriticalObject()
-	newThread := newThread(newInstance)
-	_execution.Instances[newInstance.id]:=newInstance
-	newThread.ElementID := oneElementID
-	newThread.EnvironmentType := "thread"
-	newThread.varsExportedFromExternalThread := p_Environment.varsExportedFromExternalThread
-	finishExecutionOfElement(newThread, "Normal")
-	ThreadVariable_Set(newThread,"A_TriggerTime",a_now)
-	
-	if (p_Environment.params.varstoPass)
+	else
 	{
-		;~ d(p_Environment.params.varstoPass, "ioöhöio")
-		for onevarName, oneVar in p_Environment.params.varstoPass
+		
+		newInstance:=CriticalObject()
+		newInstance.id:= "instance" ++global_InstanceIDCOunter
+		newInstance.FlowID := p_Environment.FlowID
+		newInstance.FlowName := p_Environment.FlowName
+		newInstance.state := "init"
+		newInstance.InstanceVars := CriticalObject()
+		newInstance.InstanceVarsHidden := CriticalObject()
+		newThread := newThread(newInstance)
+		_execution.Instances[newInstance.id]:=newInstance
+		newThread.ElementID := oneElementID
+		newThread.EnvironmentType := "thread"
+		newThread.varsExportedFromExternalThread := p_Environment.varsExportedFromExternalThread
+		finishExecutionOfElement(newThread, "Normal")
+		ThreadVariable_Set(newThread,"A_TriggerTime",a_now)
+		
+		if (p_Environment.params.varstoPass)
 		{
-			InstanceVariable_Set(newThread, onevarName, oneVar)
+			;~ d(p_Environment.params.varstoPass, "ioöhöio")
+			for onevarName, oneVar in p_Environment.params.varstoPass
+			{
+				InstanceVariable_Set(newThread, onevarName, oneVar)
+			}
 		}
+		
+		if (p_Environment.params.CallBack)
+		{
+			newInstance.callBack := p_Environment.params.CallBack
+		}
+		
+		ElementClass:=p_Environment.ElementClass
+		if (isfunc("Element_postTrigger_" ElementClass))
+		{
+			Element_postTrigger_%ElementClass%(newThread, p_Environment.pars)
+		}
+		newInstance.state := "running"
+		
+		updateFlowExcutingStates()
 	}
-	
-	if (p_Environment.params.CallBack)
-	{
-		newInstance.callBack := p_Environment.params.CallBack
-	}
-	
-	ElementClass:=p_Environment.ElementClass
-	if (isfunc("Element_postTrigger_" ElementClass))
-	{
-		Element_postTrigger_%ElementClass%(newThread, p_Environment.pars)
-	}
-	newInstance.state := "running"
-	
-	updateFlowExcutingStates()
+	LeaveCriticalSection(_cs.execution)
+	LeaveCriticalSection(_cs.flows)
 	return newInstance
 }
 
@@ -84,7 +89,10 @@ Start all manual triggers
 startFlow(p_Flow, p_Trigger ="", p_params = "")
 {
 	static
-	local TriggerFound:=false
+
+	EnterCriticalSection(_cs.flows)
+	EnterCriticalSection(_cs.execution)
+
 	;If not trigger assigned, trigger the default manual trigger (if any)
 	if (p_Trigger="")
 	{
@@ -93,28 +101,31 @@ startFlow(p_Flow, p_Trigger ="", p_params = "")
 			if (oneElement.class = "trigger_manual" and oneElement.defaultTrigger = True)
 			{
 				p_Trigger := oneElement
-				TriggerFound:=True
 			}
 			
 		}
-		if not TriggerFound
-		{
-			gui,hintThatNoManualTriggerAvailable:destroy
-			gui,hintThatNoManualTriggerAvailable:add, text, w200 , % lang("There is no manual trigger available")
-			gui,hintThatNoManualTriggerAvailable:add, button, default w100 x50 Y+10 h30 ghintThatNoManualTriggerAvailableGuiClose , % lang("OK")
-			gui,hintThatNoManualTriggerAvailable:show,,AutoHotFlow
-			return
-		}
 	}
-	;~ d(p_Trigger)
-	environment:=Object()
-	environment.flowID:=p_Flow.id
-	environment.FlowName:=p_Flow.Name
-	environment.elementID:=p_Trigger.id
-	environment.params:=p_params
-	newInstance(environment)
+	if (p_Trigger)
+	{
+		;~ d(p_Trigger)
+		environment:=Object()
+		environment.flowID:=p_Flow.id
+		environment.FlowName:=p_Flow.Name
+		environment.elementID:=p_Trigger.id
+		environment.params:=p_params
+		newInstance(environment)
+	}
 	
+	LeaveCriticalSection(_cs.execution)
+	LeaveCriticalSection(_cs.flows)
 	
+	if not p_Trigger
+	{
+		gui,hintThatNoManualTriggerAvailable:destroy
+		gui,hintThatNoManualTriggerAvailable:add, text, w200 , % lang("There is no manual trigger available")
+		gui,hintThatNoManualTriggerAvailable:add, button, default w100 x50 Y+10 h30 ghintThatNoManualTriggerAvailableGuiClose , % lang("OK")
+		gui,hintThatNoManualTriggerAvailable:show,,AutoHotFlow
+	}	
 	return
 	
 	hintThatNoManualTriggerAvailableGuiClose:
@@ -125,6 +136,9 @@ startFlow(p_Flow, p_Trigger ="", p_params = "")
 
 stopFlow(p_Flow)
 {
+	EnterCriticalSection(_cs.flows)
+	EnterCriticalSection(_cs.execution)
+
 	instancesToDelete:=Object()
 	
 	for OneInstanceID, OneInstance in _execution.Instances
@@ -134,10 +148,15 @@ stopFlow(p_Flow)
 			stopInstance(OneInstance)
 		}
 	}
+	LeaveCriticalSection(_cs.execution)
+	LeaveCriticalSection(_cs.flows)
 }
 
 stopInstance(p_instance)
 {
+	EnterCriticalSection(_cs.flows)
+	EnterCriticalSection(_cs.execution)
+
 	for OneThreadID, OneThread in p_instance.threads
 	{
 		OneThread.oldstate := OneThread.state
@@ -166,7 +185,6 @@ stopInstance(p_instance)
 		}
 	}
 	
-	
 	if (p_instance.callback)
 	{
 		tempCallBackfunc:=p_instance.callback
@@ -176,12 +194,17 @@ stopInstance(p_instance)
 	_execution.Instances.delete(p_instance.id)
 	
 	updateFlowExcutingStates()
+	
+	LeaveCriticalSection(_cs.execution)
+	LeaveCriticalSection(_cs.flows)
 }
 
 
 executeToggleFlow(p_Flow)
 {
-	;~ d(p_Flow)
+	EnterCriticalSection(_cs.flows)
+	EnterCriticalSection(_cs.execution)
+
 	if (p_Flow.executing)
 	{
 		stopFlow(p_Flow)
@@ -191,6 +214,8 @@ executeToggleFlow(p_Flow)
 		startFlow(p_Flow)
 	}
 	
+	LeaveCriticalSection(_cs.execution)
+	LeaveCriticalSection(_cs.flows)
 }
 
 /* Starts a new execution thread inside the given instance
@@ -198,20 +223,22 @@ if p_ToCloneFromThread is given, the thread will be cloned
 */
 newThread(p_Instance, p_ToCloneFromThread ="")
 {
-	global ThreadIDCOunter
+	EnterCriticalSection(_cs.flows)
+	EnterCriticalSection(_cs.execution)
+
 	if IsObject(p_ToCloneFromThread)
 	{
 		;Do a clone of the thread
 		newThread := objfullyclone(p_ToCloneFromThread)
 		;Assign another thread id
-		newThread.id := "thread" ++ThreadIDCOunter
+		newThread.id := "thread" ++global_ThreadIDCOunter
 		newThread.ThreadID := newThread.id
 	}
 	else
 	{
 		;Create a new thread which starts at the trigger
 		newThread := CriticalObject()
-		newThread.id := "thread" ++ThreadIDCOunter
+		newThread.id := "thread" ++global_ThreadIDCOunter
 		newThread.ThreadID := newThread.id
 		newThread.InstanceID := p_Instance.id
 		newThread.FlowID := p_Instance.FlowID
@@ -231,26 +258,33 @@ newThread(p_Instance, p_ToCloneFromThread ="")
 	}
 	
 	p_Instance.threads[newThread.id]:=newThread
+
+	LeaveCriticalSection(_cs.execution)
+	LeaveCriticalSection(_cs.flows)
 	return newThread
 }
 
 removeThread(p_thread)
 {
 	global 
-	;~ d(_execution.Instances[p_thread.Instanceid], "going to remove " p_thread.id)
+	EnterCriticalSection(_cs.flows)
+	EnterCriticalSection(_cs.execution)
+
 	_execution.Instances[p_thread.Instanceid].threads.delete(p_thread.id)
 	if (_execution.Instances[p_thread.Instanceid].threads.count() = 0)
 	{
 		removeInstance(_execution.Instances[p_thread.Instanceid])
 	}
-	;~ d(_execution.Instances[p_thread.Instanceid], "removed " p_thread.id)
+	LeaveCriticalSection(_cs.execution)
+	LeaveCriticalSection(_cs.flows)
 }
 
 removeInstance(p_instance)
 {
 	global
 	local tempCallBackfunc
-	;~ d(_execution, "going to remove " p_instance.id)
+	EnterCriticalSection(_cs.flows)
+	EnterCriticalSection(_cs.execution)
 	
 	if (p_instance.callback)
 	{
@@ -259,12 +293,17 @@ removeInstance(p_instance)
 	}
 	
 	_execution.Instances.delete(p_instance.id)
-	;~ d(_execution, "removed " p_instance.id)
 	updateFlowExcutingStates()
+
+	LeaveCriticalSection(_cs.execution)
+	LeaveCriticalSection(_cs.flows)
 }
 
 updateFlowExcutingStates()
 {
+	EnterCriticalSection(_cs.flows)
+	EnterCriticalSection(_cs.execution)
+
 	executingFlows:=Object()
 	for OneInstanceID, OneInstance in _execution.Instances
 	{
@@ -281,4 +320,7 @@ updateFlowExcutingStates()
 			OneFlow.executing:=False
 		}
 	}
+
+	LeaveCriticalSection(_cs.execution)
+	LeaveCriticalSection(_cs.flows)
 }

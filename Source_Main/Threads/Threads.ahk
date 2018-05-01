@@ -123,14 +123,13 @@ Thread_StopAll()
 			}
 		}
 	}
-	;~ LeaveCriticalSection(_cs.flows)
 	;~ LeaveCriticalSection(_cs.execution)
+	;~ LeaveCriticalSection(_cs.flows)
 }
 
 Thread_Stopped(par_ThreadID)
 {
 	global
-	ToolTip thread stopped: %par_ThreadID%
 	global_Allthreads.delete(par_ThreadID)
 	logger("t1", "Thread " par_ThreadID "stopped")
 	;~ d(global_Allthreads, "thread " par_ThreadID " beendet")

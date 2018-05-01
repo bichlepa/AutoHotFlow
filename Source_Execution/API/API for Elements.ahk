@@ -52,16 +52,15 @@ x_CheckVariableName(p_VarName)
 
 x_AutoEvaluateParameters(Environment, ElementParameters, p_skipList = "")
 {
+	EnterCriticalSection(_cs.flows)
+	EnterCriticalSection(_cs.execution)
+
 	elementClass:=_Flows[Environment.FlowID].allElements[Environment.ElementID].class
 	ParametrationDetails := Element_getParametrizationDetails(elementClass, Environment)
 	EvaluatedParameters:=Object()
 	
-	;~ d(Environment)
-	;~ d(ParametrationDetails, "ParametrationDetails "  elementClass)
-	
 	for oneParIndex, onePar in ParametrationDetails
 	{
-	;~ d(onePar, "onePar")
 		if (not onePar.id)
 		{
 			continue
@@ -71,38 +70,44 @@ x_AutoEvaluateParameters(Environment, ElementParameters, p_skipList = "")
 		else
 			parIDs:=onePar.id
 		
-		
 		for oneIndex, oneParID in parIDs
 		{
-			;~ d(oneParID, "oneParID")
+			;Label and button cannot be evaluated
 			if (onePar.type = "label" or onPar.type = "Button")
 			{
 				continue
 			}
 			
+			;skip parameter if it is in the passed skip list
 			skipThis:=false
 			for oneSkipParIndex, oneSkipParID in p_skipList
 			{
 				if (oneSkipParID = oneParID)
 				{
-					skipThis:=true
+					continue
 				}
 			}
-			if skipThis
-				continue
 			
 			x_EvalOneParameter(EvaluatedParameters, Environment, ElementParameters, oneParID, onePar)
 			if (EvaluatedParameters._error)
-				return EvaluatedParameters
+			{
+				;Stop evaluating if an error occurs
+				break
+			}
 			
 		}
 	}
 	
+	LeaveCriticalSection(_cs.execution)
+	LeaveCriticalSection(_cs.flows)
 	return EvaluatedParameters
 }
 
 x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, p_ParametersToEvaluate)
 {
+	EnterCriticalSection(_cs.flows)
+	EnterCriticalSection(_cs.execution)
+
 	if not isobject(EvaluatedParameters)
 		EvaluatedParameters:=Object()
 	
@@ -111,7 +116,6 @@ x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementPara
 	
 	for oneParIndex, onePar in ParametrationDetails
 	{
-	;~ d(onePar, "onePar")
 		if (not onePar.id)
 		{
 			continue
@@ -121,41 +125,41 @@ x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementPara
 		else
 			parIDs:=onePar.id
 		
-		
 		for oneIndex, oneParID in parIDs
 		{
-			;~ d(oneParID, "oneParID")
+			;Label and button cannot be evaluated
 			if (onePar.type = "label" or onPar.type = "Button")
 			{
 				continue
 			}
+
 			for onePartoEvalIndex, onePartoEval in p_ParametersToEvaluate
 			{
 				if (onePartoEval = oneParID)
 				{
-					;~ d(EvaluatedParameters, oneParID)
 					x_EvalOneParameter(EvaluatedParameters, Environment, ElementParameters, oneParID, onePar)
-					;~ d(EvaluatedParameters, oneParID " - ")
-					if (EvaluatedParameters._error)
-						return 
 					break
 				}
 			}
-			
-			
+			;Stop evaluating if an error occurs
+			if (EvaluatedParameters._error)
+				break
 		}
 	}
+	LeaveCriticalSection(_cs.execution)
+	LeaveCriticalSection(_cs.flows)
 }
 
 x_EvalOneParameter(EvaluatedParameters, Environment, ElementParameters, oneParID, onePar = "")
 {
+	EnterCriticalSection(_cs.flows)
+	EnterCriticalSection(_cs.execution)
 	if not (onePar)
 	{
 		elementClass:=_Flows[Environment.FlowID].allElements[Environment.ElementID].class
 		ParametrationDetails := Element_getParametrizationDetails(elementClass, Environment)
 		for oneParIndex, onePar2 in ParametrationDetails
 		{
-		;~ d(onePar, "onePar")
 			if (not onePar2.id)
 			{
 				continue
@@ -198,7 +202,6 @@ x_EvalOneParameter(EvaluatedParameters, Environment, ElementParameters, oneParID
 			{
 				EvaluatedParameters._error := true
 				EvaluatedParameters._errorMessage := lang("String '%1%' is empty", ElementParameters[oneParID])
-				return EvaluatedParameters
 			}
 		}
 		EvaluatedParameters[oneParID]:=x_GetFullPath(Environment, result)
@@ -214,7 +217,6 @@ x_EvalOneParameter(EvaluatedParameters, Environment, ElementParameters, oneParID
 				{
 					EvaluatedParameters._error := true
 					EvaluatedParameters._errorMessage := lang("String '%1%' is empty", ElementParameters[oneParID])
-					return EvaluatedParameters
 				}
 			}
 			EvaluatedParameters[oneParID]:=result
@@ -226,7 +228,6 @@ x_EvalOneParameter(EvaluatedParameters, Environment, ElementParameters, oneParID
 			{
 				EvaluatedParameters._error := true
 				EvaluatedParameters._errorMessage := lang("An error occured while parsing expression '%1%'", ElementParameters[oneParID]) "`n`n" evRes.error
-				return EvaluatedParameters
 			}
 			if (onePar.WarnIfEmpty)
 			{
@@ -234,7 +235,6 @@ x_EvalOneParameter(EvaluatedParameters, Environment, ElementParameters, oneParID
 				{
 					EvaluatedParameters._error := true
 					EvaluatedParameters._errorMessage := lang("Result of expression '%1%' is empty", ElementParameters[oneParID])
-					return EvaluatedParameters
 				}
 			}
 			if (oneParContent = "number")
@@ -244,7 +244,6 @@ x_EvalOneParameter(EvaluatedParameters, Environment, ElementParameters, oneParID
 				{
 					EvaluatedParameters._error := true
 					EvaluatedParameters._errorMessage := lang("Result of expression '%1%' is not a number", ElementParameters[oneParID])
-					return EvaluatedParameters
 				}
 			}
 			EvaluatedParameters[oneParID] := evRes.result
@@ -256,7 +255,6 @@ x_EvalOneParameter(EvaluatedParameters, Environment, ElementParameters, oneParID
 			{
 				EvaluatedParameters._error := true
 				EvaluatedParameters._errorMessage := lang("%1% is not valid", lang("Variable name '%1%'", result))
-				return EvaluatedParameters
 			}
 			EvaluatedParameters[oneParID] := result
 		}
@@ -269,7 +267,6 @@ x_EvalOneParameter(EvaluatedParameters, Environment, ElementParameters, oneParID
 				{
 					EvaluatedParameters._error := true
 					EvaluatedParameters._errorMessage := lang("Parameter '%1%' is empty", ElementParameters[oneParID])
-					return EvaluatedParameters
 				}
 			}
 			EvaluatedParameters[oneParID] := result
@@ -283,13 +280,14 @@ x_EvalOneParameter(EvaluatedParameters, Environment, ElementParameters, oneParID
 				{
 					EvaluatedParameters._error := true
 					EvaluatedParameters._errorMessage := lang("Parameter '%1%' is empty", ElementParameters[oneParID])
-					return EvaluatedParameters
 				}
 			}
 			EvaluatedParameters[oneParID] := result
 		}
 	}
-	;~ d(EvaluatedParameters, oneParID " - "  oneParContent)
+	LeaveCriticalSection(_cs.execution)
+	LeaveCriticalSection(_cs.flows)
+	return EvaluatedParameters
 }
 
 x_GetListOfAllVars(Environment)
@@ -367,23 +365,24 @@ x_GetMyEnvironmentFromExecutionID(p_ExecutionID)
 
 x_SetExecutionValue(Environment, p_name, p_Value)
 {
-	global
-	;~ d(Environment, p_name)
+	EnterCriticalSection(_cs.execution)
 	Environment.ElementExecutionValues[p_name]:=p_value
-	;~ global_AllExecutionIDs[Environment.uniqueID].customValues[p_name]:=p_Value
+	LeaveCriticalSection(_cs.execution)
 }
 x_GetExecutionValue(Environment, p_name)
 {
-	global
-	;~ return global_AllExecutionIDs[Environment.uniqueID].customValues[p_name]
-	return Environment.ElementExecutionValues[p_name]
+	EnterCriticalSection(_cs.execution)
+	retval:=Environment.ElementExecutionValues[p_name]
+	LeaveCriticalSection(_cs.execution)
+	return retval
 }
 
 x_NewExecutionFunctionObject(Environment, p_ToCallFunction, params*)
 {
+	EnterCriticalSection(_cs.execution)
 	oneFunctionObject:=new Class_FunctionObject(Environment, p_ToCallFunction, params*)
-	
 	global_AllExecutionIDs[Environment.uniqueID].ExecutionFunctionObjects[p_ToCallFunction]:=oneFunctionObject
+	LeaveCriticalSection(_cs.execution)
 	return oneFunctionObject
 }
 
@@ -430,6 +429,7 @@ class Class_FunctionObject
 
 x_GetThreadCountInCurrentInstance(Environment)
 {
+	EnterCriticalSection(_cs.execution)
 	count:=0
 	for oneinstanceID, oneInstance in _execution.Instances
 	{
@@ -438,6 +438,7 @@ x_GetThreadCountInCurrentInstance(Environment)
 			count++
 		}
 	}
+	LeaveCriticalSection(_cs.execution)
 	return count
 }
 
@@ -447,6 +448,9 @@ x_GetThreadCountInCurrentInstance(Environment)
 x_ExecuteInNewAHKThread(Environment, p_functionObject, p_Code, p_VarsToImport, p_VarsToExport)
 {
 	global global_AllExecutionIDs
+
+	EnterCriticalSection(_cs.execution)
+
 	if not isobject(global_AllExecutionIDs[Environment.uniqueID])
 		global_AllExecutionIDs[Environment.uniqueID]:=object()
 	global_AllExecutionIDs[Environment.uniqueID].ExeInNewThread:=object()
@@ -477,6 +481,7 @@ x_ExecuteInNewAHKThread(Environment, p_functionObject, p_Code, p_VarsToImport, p
 	postcode .= "exitapp"
 	
 	
+	LeaveCriticalSection(_cs.execution)
 	;~ d("`n" preCode "`n" p_Code "`n" postCode)
 	AhkThread("`n" preCode "`n" p_Code "`n" postCode)
 	
@@ -485,16 +490,21 @@ x_ExecuteInNewAHKThread(Environment, p_functionObject, p_Code, p_VarsToImport, p
 ExecuteInNewAHKThread_finishedExecution(p_ExecutionID) ;Not an api function
 {
 	global global_AllExecutionIDs
+	EnterCriticalSection(_cs.execution)
+
 	Environment:=x_GetMyEnvironmentFromExecutionID(p_ExecutionID)
-	;~ d(_share.temp[Environment.uniqueID],Environment.uniqueID)
-	;~ d(global_AllExecutionIDs[Environment.uniqueID],Environment.uniqueID)
 	functionObject:=global_AllExecutionIDs[Environment.uniqueID].ExeInNewThread.functionObject
-	%functionObject%(_share.temp[Environment.uniqueID].sharedObject.varsExported)
+	varsExported:=_share.temp[Environment.uniqueID].sharedObject.varsExported
+
+	LeaveCriticalSection(_cs.execution)
+	%functionObject%(varsExported)
 }
 ;exeuction of a trigger in other ahk thread
 x_TriggerInNewAHKThread(Environment, p_Code, p_VarsToImport, p_VarsToExport)
 {
 	global _share, global_AllActiveTriggerIDs
+	EnterCriticalSection(_cs.execution)
+
 	if not isobject(global_AllActiveTriggerIDs[Environment.uniqueID])
 		global_AllActiveTriggerIDs[Environment.uniqueID]:=object()
 	global_AllActiveTriggerIDs[Environment.uniqueID].ExeInNewThread:=object()
@@ -524,26 +534,39 @@ x_TriggerInNewAHKThread(Environment, p_Code, p_VarsToImport, p_VarsToExport)
 	postcode .= "ahf_parentAHKThread.ahkFunction(""API_Execution_externalTrigger"", ahf_uniqueID)`n"
 	postcode .= "}`n"
 		
+	LeaveCriticalSection(_cs.execution)
 	;~ d("`n" preCode "`n" p_Code "`n" postCode)
-	global_AllActiveTriggerIDs[Environment.uniqueID].ExeInNewThread.AHKThreadID:=AhkThread("`n" preCode "`n" p_Code "`n" postCode)
+	AHKThreadID:=AhkThread("`n" preCode "`n" p_Code "`n" postCode)
+
+	EnterCriticalSection(_cs.execution)
+	global_AllActiveTriggerIDs[Environment.uniqueID].ExeInNewThread.AHKThreadID:=AHKThreadID
+	LeaveCriticalSection(_cs.execution)
 	
 }
 x_TriggerInNewAHKThread_Stop(Environment)
 {
+	EnterCriticalSection(_cs.execution)
+	AHKThreadID:=global_AllActiveTriggerIDs[Environment.uniqueID].ExeInNewThread.AHKThreadID
+	LeaveCriticalSection(_cs.execution)
 	ahkthread_release(global_AllActiveTriggerIDs[Environment.uniqueID].ExeInNewThread.AHKThreadID)
 }
 ExecuteInNewAHKThread_trigger(p_uniqueID) ;Not an api function
 {
 	global _share
+	EnterCriticalSection(_cs.execution)
 	Environment:=global_AllActiveTriggerIDs[p_uniqueID].environment
 	;~ d(Environment, "öiohöio")
 	Environment.varsExportedFromExternalThread:=_share.temp[Environment.uniqueID].sharedObject.varsExported
-	
 	ElementClass:=Environment.ElementClass
+
+	LeaveCriticalSection(_cs.execution)
 	x_trigger(Environment)
 }
 x_TriggerInNewAHKThread_GetExportedValues(Environment)
 {
+	EnterCriticalSection(_cs.execution)
+	retval:=Environment.varsExportedFromExternalThread
+	LeaveCriticalSection(_cs.execution)
 	return Environment.varsExportedFromExternalThread
 }
 
@@ -576,7 +599,10 @@ x_GetMyFlowID(Environment)
 }
 x_GetMyFlowName(Environment)
 {
-	return _flows[Environment.FlowID].name
+	EnterCriticalSection(_cs.flows)
+	retval:=_flows[Environment.FlowID].name
+	LeaveCriticalSection(_cs.flows)
+	return retval
 }
 
 x_GetMyElementID(Environment)
@@ -887,6 +913,7 @@ x_ManualTriggerExecute(p_FlowID, p_TriggerName = "", p_Variables ="", p_CallBack
 		{
 			;~ d(p_FlowName " - " p_TriggerName)
 			EnterCriticalSection(_cs.flows)
+			foundElementID:=""
 			for forelementID, forelement in _flows[p_FlowID].allElements
 			{
 				;~ d(forelement, p_TriggerName)
@@ -894,14 +921,21 @@ x_ManualTriggerExecute(p_FlowID, p_TriggerName = "", p_Variables ="", p_CallBack
 				{
 					if (forelement.pars.id = p_TriggerName)
 					{
-						;~ d(forFlow.id,forelementID)
-						LeaveCriticalSection(_cs.flows)
-						startFlow(p_FlowID, forelementID, params)
-						return
+						foundElementID:=forelementID
+						break
 					}
 				}
 			}
 			LeaveCriticalSection(_cs.flows)
+
+			if foundElementID
+			{
+				startFlow(p_FlowID, foundElementID, params)
+			}
+			else
+			{
+				;todo: log error
+			}
 		}
 	}
 }
@@ -985,14 +1019,17 @@ x_GetFullPath(Environment, p_Path)
 
 x_GetWorkingDir(Environment)
 {
+	EnterCriticalSection(_cs.flows)
 	if (_Flows[Environment.FlowID].flowsettings.DefaultWorkingDir)
 	{
-		return _settings.FlowWorkingDir
+		retval:= _settings.FlowWorkingDir
 	}
 	else
 	{
-		return _Flows[Environment.FlowID].flowsettings.workingdir
+		retval:= _Flows[Environment.FlowID].flowsettings.workingdir
 	}
+	LeaveCriticalSection(_cs.flows)
+	return retval
 }
 
 x_GetAhfPath()

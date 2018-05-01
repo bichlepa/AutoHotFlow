@@ -8,14 +8,11 @@ LoadFlow(FlowID, filepath="", params="")
 	local AllSections, tempSection, tempContainerID, missingpackages, tempName
 	local AnyTriggerLoaded, OutdatedMainTriggerContainerData
 	
-	EnterCriticalSection(_cs.flows)
-	
 	OutdatedMainTriggerContainerData:=Object()
 	
 	if (FlowID="")
 	{
 		MsgBox internal error! A flow should be loaded but no FlowID is empty!
-		LeaveCriticalSection(_cs.flows)
 		return
 	}
 	
@@ -24,7 +21,6 @@ LoadFlow(FlowID, filepath="", params="")
 		if (_flows[FlowID].loaded)
 		{
 			MsgBox unexpected error. Flow %FlowID% should be loaded but it was already loaded
-			LeaveCriticalSection(_cs.flows)
 			return
 		}
 	}
@@ -32,9 +28,11 @@ LoadFlow(FlowID, filepath="", params="")
 	if (currentlyLoadingFlow = true)
 	{
 		MsgBox unexpected error. a flow is already currently loading
-		LeaveCriticalSection(_cs.flows)
 		return
 	}
+
+	EnterCriticalSection(_cs.flows)
+
 	currentlyLoadingFlow:=true
 	
 	IfInString, params, keepPosition
