@@ -30,7 +30,6 @@ newInstance(p_Environment)
 			}
 		}
 	}
-	
 	;Search for the matching trigger element
 	oneElementID:=p_Environment.elementID
 	if oneElementID=
@@ -107,7 +106,6 @@ startFlow(p_Flow, p_Trigger ="", p_params = "")
 	}
 	if (p_Trigger)
 	{
-		;~ d(p_Trigger)
 		environment:=Object()
 		environment.flowID:=p_Flow.id
 		environment.FlowName:=p_Flow.Name

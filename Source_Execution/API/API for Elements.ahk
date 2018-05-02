@@ -906,7 +906,7 @@ x_ManualTriggerExecute(p_FlowID, p_TriggerName = "", p_Variables ="", p_CallBack
 		if (p_TriggerName = "")
 		{
 			;~ d(p_FlowName)
-			startFlow(p_FlowID, "", params)
+			startFlow(_flows[p_FlowID], "", params)
 			return
 		}
 		else
@@ -921,16 +921,16 @@ x_ManualTriggerExecute(p_FlowID, p_TriggerName = "", p_Variables ="", p_CallBack
 				{
 					if (forelement.pars.id = p_TriggerName)
 					{
-						foundElementID:=forelementID
+						foundElement:=forelement
 						break
 					}
 				}
 			}
 			LeaveCriticalSection(_cs.flows)
 
-			if foundElementID
+			if foundElement
 			{
-				startFlow(p_FlowID, foundElementID, params)
+				startFlow(_flows[p_FlowID], foundElement, params)
 			}
 			else
 			{
