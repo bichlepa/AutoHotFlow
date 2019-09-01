@@ -1,4 +1,4 @@
-#Discontinued because of problems which I can't solve. [Read this post.](http://github.com)
+# Discontinued because of problems which I can't solve. [Read this post.](http://github.com)
 
 This script is designed to make programming and automation easy as never before! Just pull in some elements in the graphical interface and set up some triggers. Ready! :smile:
 
