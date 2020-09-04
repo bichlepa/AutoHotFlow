@@ -14,7 +14,6 @@ parentAHKThread := AhkExported()
 OnExit,Exit
 #Include %A_ScriptDir%\..
 #include lib\Object to file\String-object-file.ahk
-#include lib\7z wrapper\7z wrapper.ahk
 #include lib\Robert - Ini library\Robert - Ini library.ahk
 #include lib\ObjFullyClone\ObjFullyClone.ahk
 #include lib\ObjHasValue\ObjHasValue.ahk
@@ -48,7 +47,6 @@ lang_setLanguage(_settings.UILanguage)
 #include source_Common\Debug\Logger.ahk
 #include source_Common\settings\settings.ahk
 #include source_Common\Other\Other.ahk
-#include source_Common\Variables\global variables.ahk
 #include source_Common\Variables\code parser.ahk
 #include source_Common\variables\code evaluator.ahk
 #include source_Common\variables\code tokenizer.ahk
