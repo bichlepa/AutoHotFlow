@@ -84,10 +84,10 @@ logger(LogLevel,LoggingText, logSource="common")
 		_share["log_" logSource].=DebugLogLastEntry
 		if (_settings.logtofile)
 		{
-			EnterCriticalSection(_cs.debug)
+			EnterCriticalSection(_cs_debug)
 			FileAppend,% DebugLogLastEntry,%_WorkingDir%\Log\Log.txt,UTF-8
 			FileAppend,% DebugLogLastEntry,%_WorkingDir%\Log\Log_%logSource%.txt,UTF-8
-			LeaveCriticalSection(_cs.debug)
+			LeaveCriticalSection(_cs_debug)
 		}
 	}
 	

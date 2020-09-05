@@ -71,7 +71,7 @@ return
 
 ui_Menu_CheckLoop:
 
-EnterCriticalSection(_cs.flows)
+EnterCriticalSection(_cs_flows)
 
 if (menu_bar_IsEnabled != FlowObj.enabled)
 {
@@ -87,7 +87,7 @@ if (menu_bar_IsEnabled != FlowObj.enabled)
 	}
 	
 }
-LeaveCriticalSection(_cs.flows)
+LeaveCriticalSection(_cs_flows)
 
 return
 

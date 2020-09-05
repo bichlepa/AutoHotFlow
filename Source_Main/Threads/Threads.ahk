@@ -11,7 +11,8 @@ loop, files, %_ScriptDir%\source_Elements\*.ahk, FR
 
 Thread_init()
 {
-	global_CommonAhkCodeForAllThreads:="global _cs := objfullyclone(CriticalObject(" (&_cs) "))`n global _flows := CriticalObject(" (&_flows) ") `n global _settings := CriticalObject(" (&_settings) ") `n global _execution := CriticalObject(" (&_execution) ") `n global _share := CriticalObject(" (&_share) ")`n global _language := CriticalObject(" (&_language) ") `n"
+	global_CommonAhkCodeForAllThreads:="global _cs_flows := " _cs_flows "`n global _cs_execution := " _cs_execution "`n global _cs_debug := " _cs_debug "`n "
+	global_CommonAhkCodeForAllThreads.="global _flows := CriticalObject(" (&_flows) ") `n global _settings := CriticalObject(" (&_settings) ") `n global _execution := CriticalObject(" (&_execution) ") `n global _share := CriticalObject(" (&_share) ")`n global _language := CriticalObject(" (&_language) ") `n"
 
 }
 
@@ -28,7 +29,7 @@ Thread_StartManager()
 	logger("t1", "Starting manager thread. ID: " threadID)
 	FileRead,ExecutionThreadCode,% _ScriptDir "\Source_Manager\Manager.ahk"
 	;~ MsgBox %ExecutionThreadCode%
-	StringReplace,ExecutionThreadCode,ExecutionThreadCode,;PlaceholderIncludesOfElements,% global_elementInclusions
+	StringReplace,ExecutionThreadCode,ExecutionThreadCode, % ";PlaceholderIncludesOfElements",% global_elementInclusions
 	
 	AhkThread%threadID% := AhkThread(global_CommonAhkCodeForAllThreads "`n global _ahkThreadID := """ threadID """`n" ExecutionThreadCode)
 	
@@ -54,7 +55,7 @@ Thread_StartEditor(par_FlowID)
 	logger("t1", "Starting editor thread. ID: " threadID)
 	FileRead,ExecutionThreadCode,% _ScriptDir "\Source_Editor\Editor.ahk"
 	;~ MsgBox %ExecutionThreadCode%
-	StringReplace,ExecutionThreadCode,ExecutionThreadCode,;PlaceholderIncludesOfElements,% global_elementInclusions
+	StringReplace,ExecutionThreadCode,ExecutionThreadCode, % ";PlaceholderIncludesOfElements",% global_elementInclusions
 	
 	AhkThread%threadID% := AhkThread(global_CommonAhkCodeForAllThreads "`n global _ahkThreadID := """ threadID """`n global FlowID := """ par_FlowID """`n"  ExecutionThreadCode)
 	
@@ -92,7 +93,7 @@ Thread_StartExecution()
 	threadID := "Execution" global_ExecutionThreadIDCounter++
 	logger("t1", "Starting execution thread. ID: " threadID)
 	FileRead,ExecutionThreadCode,% _ScriptDir "\Source_Execution\execution.ahk"
-	StringReplace,ExecutionThreadCode,ExecutionThreadCode,;PlaceholderIncludesOfElements,% global_elementInclusions
+	StringReplace,ExecutionThreadCode,ExecutionThreadCode, % ";PlaceholderIncludesOfElements",% global_elementInclusions
 	;~ MsgBox %ExecutionThreadCode%
 	AhkThread%threadID% := AhkThread(global_CommonAhkCodeForAllThreads "`n global _ahkThreadID := """ threadID """`n" ExecutionThreadCode)
 	
@@ -109,8 +110,8 @@ Thread_StopAll()
 	threadsCopy := global_Allthreads.clone()
 	
 	
-	;~ EnterCriticalSection(_cs.flows)
-	;~ EnterCriticalSection(_cs.execution)
+	;~ EnterCriticalSection(_cs_flows)
+	;~ EnterCriticalSection(_cs_execution)
 	for threadID, threadpars in threadsCopy
 	{
 		;~ global_Allthreads.delete(threadID)
@@ -124,8 +125,8 @@ Thread_StopAll()
 			}
 		}
 	}
-	;~ LeaveCriticalSection(_cs.execution)
-	;~ LeaveCriticalSection(_cs.flows)
+	;~ LeaveCriticalSection(_cs_execution)
+	;~ LeaveCriticalSection(_cs_flows)
 }
 
 Thread_Stopped(par_ThreadID)

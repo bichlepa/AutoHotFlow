@@ -70,15 +70,22 @@ _flows is an associative array of objects. Each object contains some information
 	.category 		Flow category ID (Internal ID, which is not the name)
 	.categoryName 	Flow category name
 	.tv 			Flow tree view ID
+	.ElementIDCounter	Counter which ensured that every new element ID is unique
+	.CompatibilityVersion	Version number of the save file format
 	
+	.loaded         True if flow is loaded
 	.enabled 		True if flow is enabled
 	.executing 		True if flow is running
+	.
 	.countOfExecutions	
 	.countOfWaitingExecutions
 	
+	.file			File path of the flow
 	.Folder			Folder path of the flow
 	.FileName		File name of the flow
 	
+
+
 	.draw			Object containing some informations for the draw thread:
 		.mustDraw		True if something has changed and the flow must be redrawn
 	.Type			Flow type (currently containing "Flow")
@@ -172,10 +179,9 @@ _share.main.Tasks := CriticalObject()
 ;Those two variables are filled by the elements when they are included
 _share.AllElementClasses:=CriticalObject()
 
-global _cs := CriticalObject() ;Variable containing all critical sections
-_cs.flows := CriticalSection() ;Protect access to _Flows
-_cs.execution := CriticalSection() ;Protect access to _Execution and global / static variables
-_cs.debug := CriticalSection() ;Protect access to Debug files
+global _cs_flows := CriticalSection() ;Protect access to _Flows
+global _cs_execution := CriticalSection() ;Protect access to _Execution and global / static variables
+global _cs_debug := CriticalSection() ;Protect access to Debug files
 
 return
 

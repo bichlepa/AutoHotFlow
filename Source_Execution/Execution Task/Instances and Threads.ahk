@@ -5,8 +5,8 @@ global global_ThreadIDCOunter:=0
 */
 newInstance(p_Environment)
 {
-	EnterCriticalSection(_cs.flows)
-	EnterCriticalSection(_cs.execution)
+	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_execution)
 
 	if (_flows[p_Environment.FlowID].flowSettings.ExecutionPolicy="skip" or _flows[p_Environment.FlowID].flowSettings.ExecutionPolicy="stop")
 	{
@@ -77,8 +77,8 @@ newInstance(p_Environment)
 		
 		updateFlowExcutingStates()
 	}
-	LeaveCriticalSection(_cs.execution)
-	LeaveCriticalSection(_cs.flows)
+	LeaveCriticalSection(_cs_execution)
+	LeaveCriticalSection(_cs_flows)
 	return newInstance
 }
 
@@ -89,8 +89,8 @@ startFlow(p_Flow, p_Trigger ="", p_params = "")
 {
 	static
 
-	EnterCriticalSection(_cs.flows)
-	EnterCriticalSection(_cs.execution)
+	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_execution)
 
 	;If not trigger assigned, trigger the default manual trigger (if any)
 	if (p_Trigger="")
@@ -114,8 +114,8 @@ startFlow(p_Flow, p_Trigger ="", p_params = "")
 		newInstance(environment)
 	}
 	
-	LeaveCriticalSection(_cs.execution)
-	LeaveCriticalSection(_cs.flows)
+	LeaveCriticalSection(_cs_execution)
+	LeaveCriticalSection(_cs_flows)
 	
 	if not p_Trigger
 	{
@@ -134,8 +134,8 @@ startFlow(p_Flow, p_Trigger ="", p_params = "")
 
 stopFlow(p_Flow)
 {
-	EnterCriticalSection(_cs.flows)
-	EnterCriticalSection(_cs.execution)
+	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_execution)
 
 	instancesToDelete:=Object()
 	
@@ -146,14 +146,14 @@ stopFlow(p_Flow)
 			stopInstance(OneInstance)
 		}
 	}
-	LeaveCriticalSection(_cs.execution)
-	LeaveCriticalSection(_cs.flows)
+	LeaveCriticalSection(_cs_execution)
+	LeaveCriticalSection(_cs_flows)
 }
 
 stopInstance(p_instance)
 {
-	EnterCriticalSection(_cs.flows)
-	EnterCriticalSection(_cs.execution)
+	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_execution)
 
 	for OneThreadID, OneThread in p_instance.threads
 	{
@@ -193,15 +193,15 @@ stopInstance(p_instance)
 	
 	updateFlowExcutingStates()
 	
-	LeaveCriticalSection(_cs.execution)
-	LeaveCriticalSection(_cs.flows)
+	LeaveCriticalSection(_cs_execution)
+	LeaveCriticalSection(_cs_flows)
 }
 
 
 executeToggleFlow(p_Flow)
 {
-	EnterCriticalSection(_cs.flows)
-	EnterCriticalSection(_cs.execution)
+	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_execution)
 
 	if (p_Flow.executing)
 	{
@@ -212,8 +212,8 @@ executeToggleFlow(p_Flow)
 		startFlow(p_Flow)
 	}
 	
-	LeaveCriticalSection(_cs.execution)
-	LeaveCriticalSection(_cs.flows)
+	LeaveCriticalSection(_cs_execution)
+	LeaveCriticalSection(_cs_flows)
 }
 
 /* Starts a new execution thread inside the given instance
@@ -221,8 +221,8 @@ if p_ToCloneFromThread is given, the thread will be cloned
 */
 newThread(p_Instance, p_ToCloneFromThread ="")
 {
-	EnterCriticalSection(_cs.flows)
-	EnterCriticalSection(_cs.execution)
+	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_execution)
 
 	if IsObject(p_ToCloneFromThread)
 	{
@@ -257,32 +257,32 @@ newThread(p_Instance, p_ToCloneFromThread ="")
 	
 	p_Instance.threads[newThread.id]:=newThread
 
-	LeaveCriticalSection(_cs.execution)
-	LeaveCriticalSection(_cs.flows)
+	LeaveCriticalSection(_cs_execution)
+	LeaveCriticalSection(_cs_flows)
 	return newThread
 }
 
 removeThread(p_thread)
 {
 	global 
-	EnterCriticalSection(_cs.flows)
-	EnterCriticalSection(_cs.execution)
+	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_execution)
 
 	_execution.Instances[p_thread.Instanceid].threads.delete(p_thread.id)
 	if (_execution.Instances[p_thread.Instanceid].threads.count() = 0)
 	{
 		removeInstance(_execution.Instances[p_thread.Instanceid])
 	}
-	LeaveCriticalSection(_cs.execution)
-	LeaveCriticalSection(_cs.flows)
+	LeaveCriticalSection(_cs_execution)
+	LeaveCriticalSection(_cs_flows)
 }
 
 removeInstance(p_instance)
 {
 	global
 	local tempCallBackfunc
-	EnterCriticalSection(_cs.flows)
-	EnterCriticalSection(_cs.execution)
+	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_execution)
 	
 	if (p_instance.callback)
 	{
@@ -293,14 +293,14 @@ removeInstance(p_instance)
 	_execution.Instances.delete(p_instance.id)
 	updateFlowExcutingStates()
 
-	LeaveCriticalSection(_cs.execution)
-	LeaveCriticalSection(_cs.flows)
+	LeaveCriticalSection(_cs_execution)
+	LeaveCriticalSection(_cs_flows)
 }
 
 updateFlowExcutingStates()
 {
-	EnterCriticalSection(_cs.flows)
-	EnterCriticalSection(_cs.execution)
+	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_execution)
 
 	executingFlows:=Object()
 	for OneInstanceID, OneInstance in _execution.Instances
@@ -319,6 +319,6 @@ updateFlowExcutingStates()
 		}
 	}
 
-	LeaveCriticalSection(_cs.execution)
-	LeaveCriticalSection(_cs.flows)
+	LeaveCriticalSection(_cs_execution)
+	LeaveCriticalSection(_cs_flows)
 }

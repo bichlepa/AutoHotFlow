@@ -30,7 +30,7 @@ InitFlow(FileFullPath)
 	local tempdemo
 	local newFlowID
 	
-	EnterCriticalSection(_cs.flows)
+	EnterCriticalSection(_cs_flows)
 	
 	SplitPath, FileFullPath,,ThisFlowFolder,,ThisFlowFilename
 
@@ -118,7 +118,7 @@ InitFlow(FileFullPath)
 		}
 	}
 	
-	LeaveCriticalSection(_cs.flows)
+	LeaveCriticalSection(_cs_flows)
 }
 
 ;Create a new file for a flow
@@ -128,7 +128,7 @@ NewFlow(par_CategoryID = "")
 	local newFlowid
 	local tempCategoryID
 	
-	EnterCriticalSection(_cs.flows)
+	EnterCriticalSection(_cs_flows)
 	
 	;If category ID not given, move to Category "Uncategorized"
 
@@ -188,7 +188,7 @@ NewFlow(par_CategoryID = "")
 		_share.managerTasks.select:="Flow:" newFlowid
 	}
 
-	LeaveCriticalSection(_cs.flows)
+	LeaveCriticalSection(_cs_flows)
 	
 	return newFlowid
 }
@@ -204,7 +204,7 @@ NewCategory(par_Newname = "")
 	local tempindex
 	local retval
 	
-	EnterCriticalSection(_cs.flows)
+	EnterCriticalSection(_cs_flows)
 	
 	;~ d(par_Newname)
 	if (par_Newname = "") ;If a new category should be created and the name is not given
@@ -265,7 +265,7 @@ NewCategory(par_Newname = "")
 		;~ d(allCategories)
 	}
 	
-	LeaveCriticalSection(_cs.flows)
+	LeaveCriticalSection(_cs_flows)
 	
 	return newCategoryid
 }
@@ -274,7 +274,7 @@ ChangeFlowCategory(par_FlowID, par_CategoryID)
 {
 	global
 	
-	EnterCriticalSection(_cs.flows)
+	EnterCriticalSection(_cs_flows)
 	
 	if (par_FlowID = "")
 	{
@@ -291,14 +291,14 @@ ChangeFlowCategory(par_FlowID, par_CategoryID)
 		_share.managerTasks.select:="Flow:" newFlowid
 	}
 	
-	LeaveCriticalSection(_cs.flows)
+	LeaveCriticalSection(_cs_flows)
 }
 
 UpdateFlowCategoryName(par_FlowID)
 {
-	EnterCriticalSection(_cs.flows)
+	EnterCriticalSection(_cs_flows)
 	_flows[par_FlowID].categoryName := _share.allCategories[_flows[par_FlowID].category].name
-	LeaveCriticalSection(_cs.flows)
+	LeaveCriticalSection(_cs_flows)
 }
 
 
@@ -307,7 +307,7 @@ DeleteFlow(par_ID)
 	global
 	;TODO: Close editor and stop flow execution
 	
-	EnterCriticalSection(_cs.flows)
+	EnterCriticalSection(_cs_flows)
 	
 	FileDelete,% _flows[par_ID].file
 	
@@ -322,7 +322,7 @@ DeleteFlow(par_ID)
 		_share.managerTasks.select:="Category:" parentcategory ":expand"
 	}
 	
-	LeaveCriticalSection(_cs.flows)
+	LeaveCriticalSection(_cs_flows)
 }
 
 DuplicateFlow(par_ID)
@@ -330,7 +330,7 @@ DuplicateFlow(par_ID)
 	global
 	local newFlowid
 	
-	EnterCriticalSection(_cs.flows)
+	EnterCriticalSection(_cs_flows)
 	
 	;Create the flow in the global variable
 	;~ d(NewName " - " tempcategoryid " - " Categoryname)
@@ -382,14 +382,14 @@ DuplicateFlow(par_ID)
 		_share.managerTasks.select:="Flow:" newFlowid
 	}
 
-	LeaveCriticalSection(_cs.flows)
+	LeaveCriticalSection(_cs_flows)
 }
 
 DeleteCategory(par_ID)
 {
 	global
 	
-	EnterCriticalSection(_cs.flows)
+	EnterCriticalSection(_cs_flows)
 	
 	_share.allCategories.delete(par_ID)
 	
@@ -400,13 +400,13 @@ DeleteCategory(par_ID)
 		_share.managerTasks.select:="Flow:" newFlowid
 	}
 	
-	LeaveCriticalSection(_cs.flows)
+	LeaveCriticalSection(_cs_flows)
 }
 
 
 FlowIDbyName(par_name,Type="") ;Returns the id by name
 {
-	EnterCriticalSection(_cs.flows)
+	EnterCriticalSection(_cs_flows)
 	
 	if ((type = "flow") or (type = ""))
 	{
@@ -434,7 +434,7 @@ FlowIDbyName(par_name,Type="") ;Returns the id by name
 		}
 	}
 	
-	LeaveCriticalSection(_cs.flows)
+	LeaveCriticalSection(_cs_flows)
 	
 	return retval
 }

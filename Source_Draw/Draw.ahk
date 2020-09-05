@@ -66,7 +66,7 @@ drawTask()
 	
 	Loop
 	{
-		EnterCriticalSection(_cs.flows)
+		EnterCriticalSection(_cs_flows)
 		
 		somethingdrawn:= false
 		flowParamsCloned:=""
@@ -81,7 +81,7 @@ drawTask()
 			}
 		}
 		
-		LeaveCriticalSection(_cs.flows)
+		LeaveCriticalSection(_cs_flows)
 		
 		if flowParamsCloned
 		{

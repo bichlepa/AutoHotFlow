@@ -427,7 +427,7 @@ ui_findElementUnderMouse(par_mode="default")
 	local tempList
 	local drawResults
 	
-	EnterCriticalSection(_cs.flows)
+	EnterCriticalSection(_cs_flows)
 	
 	clickedElement:=""
 	elementHighestPriority:=""
@@ -553,7 +553,7 @@ ui_findElementUnderMouse(par_mode="default")
 		;~ }
 	}
 	
-	LeaveCriticalSection(_cs.flows)
+	LeaveCriticalSection(_cs_flows)
 	
 	return clickedElement
 }
@@ -1132,7 +1132,7 @@ ui_MoveConnection(connection1="", connection2="", element1="", element2="")
 		else
 			tempElement:=Connection2
 		
-		EnterCriticalSection(_cs.flows)
+		EnterCriticalSection(_cs_flows)
 		for forID, forElement in FlowObj.allConnections
 		{
 			;~ d(strobj(tempElement) "`n`n" strobj(forElement), "wait")
@@ -1149,7 +1149,7 @@ ui_MoveConnection(connection1="", connection2="", element1="", element2="")
 			}
 		}
 		
-		LeaveCriticalSection(_cs.flows)
+		LeaveCriticalSection(_cs_flows)
 		
 	}
 	

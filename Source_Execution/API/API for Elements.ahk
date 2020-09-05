@@ -52,8 +52,8 @@ x_CheckVariableName(p_VarName)
 
 x_AutoEvaluateParameters(Environment, ElementParameters, p_skipList = "")
 {
-	EnterCriticalSection(_cs.flows)
-	EnterCriticalSection(_cs.execution)
+	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_execution)
 
 	elementClass:=_Flows[Environment.FlowID].allElements[Environment.ElementID].class
 	ParametrationDetails := Element_getParametrizationDetails(elementClass, Environment)
@@ -98,15 +98,15 @@ x_AutoEvaluateParameters(Environment, ElementParameters, p_skipList = "")
 		}
 	}
 	
-	LeaveCriticalSection(_cs.execution)
-	LeaveCriticalSection(_cs.flows)
+	LeaveCriticalSection(_cs_execution)
+	LeaveCriticalSection(_cs_flows)
 	return EvaluatedParameters
 }
 
 x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, p_ParametersToEvaluate)
 {
-	EnterCriticalSection(_cs.flows)
-	EnterCriticalSection(_cs.execution)
+	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_execution)
 
 	if not isobject(EvaluatedParameters)
 		EvaluatedParameters:=Object()
@@ -146,14 +146,14 @@ x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementPara
 				break
 		}
 	}
-	LeaveCriticalSection(_cs.execution)
-	LeaveCriticalSection(_cs.flows)
+	LeaveCriticalSection(_cs_execution)
+	LeaveCriticalSection(_cs_flows)
 }
 
 x_EvalOneParameter(EvaluatedParameters, Environment, ElementParameters, oneParID, onePar = "")
 {
-	EnterCriticalSection(_cs.flows)
-	EnterCriticalSection(_cs.execution)
+	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_execution)
 	if not (onePar)
 	{
 		elementClass:=_Flows[Environment.FlowID].allElements[Environment.ElementID].class
@@ -285,8 +285,8 @@ x_EvalOneParameter(EvaluatedParameters, Environment, ElementParameters, oneParID
 			EvaluatedParameters[oneParID] := result
 		}
 	}
-	LeaveCriticalSection(_cs.execution)
-	LeaveCriticalSection(_cs.flows)
+	LeaveCriticalSection(_cs_execution)
+	LeaveCriticalSection(_cs_flows)
 	return EvaluatedParameters
 }
 
@@ -365,24 +365,24 @@ x_GetMyEnvironmentFromExecutionID(p_ExecutionID)
 
 x_SetExecutionValue(Environment, p_name, p_Value)
 {
-	EnterCriticalSection(_cs.execution)
+	EnterCriticalSection(_cs_execution)
 	Environment.ElementExecutionValues[p_name]:=p_value
-	LeaveCriticalSection(_cs.execution)
+	LeaveCriticalSection(_cs_execution)
 }
 x_GetExecutionValue(Environment, p_name)
 {
-	EnterCriticalSection(_cs.execution)
+	EnterCriticalSection(_cs_execution)
 	retval:=Environment.ElementExecutionValues[p_name]
-	LeaveCriticalSection(_cs.execution)
+	LeaveCriticalSection(_cs_execution)
 	return retval
 }
 
 x_NewExecutionFunctionObject(Environment, p_ToCallFunction, params*)
 {
-	EnterCriticalSection(_cs.execution)
+	EnterCriticalSection(_cs_execution)
 	oneFunctionObject:=new Class_FunctionObject(Environment, p_ToCallFunction, params*)
 	global_AllExecutionIDs[Environment.uniqueID].ExecutionFunctionObjects[p_ToCallFunction]:=oneFunctionObject
-	LeaveCriticalSection(_cs.execution)
+	LeaveCriticalSection(_cs_execution)
 	return oneFunctionObject
 }
 
@@ -429,7 +429,7 @@ class Class_FunctionObject
 
 x_GetThreadCountInCurrentInstance(Environment)
 {
-	EnterCriticalSection(_cs.execution)
+	EnterCriticalSection(_cs_execution)
 	count:=0
 	for oneinstanceID, oneInstance in _execution.Instances
 	{
@@ -438,7 +438,7 @@ x_GetThreadCountInCurrentInstance(Environment)
 			count++
 		}
 	}
-	LeaveCriticalSection(_cs.execution)
+	LeaveCriticalSection(_cs_execution)
 	return count
 }
 
@@ -449,7 +449,7 @@ x_ExecuteInNewAHKThread(Environment, p_functionObject, p_Code, p_VarsToImport, p
 {
 	global global_AllExecutionIDs
 
-	EnterCriticalSection(_cs.execution)
+	EnterCriticalSection(_cs_execution)
 
 	if not isobject(global_AllExecutionIDs[Environment.uniqueID])
 		global_AllExecutionIDs[Environment.uniqueID]:=object()
@@ -481,7 +481,7 @@ x_ExecuteInNewAHKThread(Environment, p_functionObject, p_Code, p_VarsToImport, p
 	postcode .= "exitapp"
 	
 	
-	LeaveCriticalSection(_cs.execution)
+	LeaveCriticalSection(_cs_execution)
 	;~ d("`n" preCode "`n" p_Code "`n" postCode)
 	AhkThread("`n" preCode "`n" p_Code "`n" postCode)
 	
@@ -490,20 +490,20 @@ x_ExecuteInNewAHKThread(Environment, p_functionObject, p_Code, p_VarsToImport, p
 ExecuteInNewAHKThread_finishedExecution(p_ExecutionID) ;Not an api function
 {
 	global global_AllExecutionIDs
-	EnterCriticalSection(_cs.execution)
+	EnterCriticalSection(_cs_execution)
 
 	Environment:=x_GetMyEnvironmentFromExecutionID(p_ExecutionID)
 	functionObject:=global_AllExecutionIDs[Environment.uniqueID].ExeInNewThread.functionObject
 	varsExported:=_share.temp[Environment.uniqueID].sharedObject.varsExported
 
-	LeaveCriticalSection(_cs.execution)
+	LeaveCriticalSection(_cs_execution)
 	%functionObject%(varsExported)
 }
 ;exeuction of a trigger in other ahk thread
 x_TriggerInNewAHKThread(Environment, p_Code, p_VarsToImport, p_VarsToExport)
 {
 	global _share, global_AllActiveTriggerIDs
-	EnterCriticalSection(_cs.execution)
+	EnterCriticalSection(_cs_execution)
 
 	if not isobject(global_AllActiveTriggerIDs[Environment.uniqueID])
 		global_AllActiveTriggerIDs[Environment.uniqueID]:=object()
@@ -534,39 +534,39 @@ x_TriggerInNewAHKThread(Environment, p_Code, p_VarsToImport, p_VarsToExport)
 	postcode .= "ahf_parentAHKThread.ahkFunction(""API_Execution_externalTrigger"", ahf_uniqueID)`n"
 	postcode .= "}`n"
 		
-	LeaveCriticalSection(_cs.execution)
+	LeaveCriticalSection(_cs_execution)
 	;~ d("`n" preCode "`n" p_Code "`n" postCode)
 	AHKThreadID:=AhkThread("`n" preCode "`n" p_Code "`n" postCode)
 
-	EnterCriticalSection(_cs.execution)
+	EnterCriticalSection(_cs_execution)
 	global_AllActiveTriggerIDs[Environment.uniqueID].ExeInNewThread.AHKThreadID:=AHKThreadID
-	LeaveCriticalSection(_cs.execution)
+	LeaveCriticalSection(_cs_execution)
 	
 }
 x_TriggerInNewAHKThread_Stop(Environment)
 {
-	EnterCriticalSection(_cs.execution)
+	EnterCriticalSection(_cs_execution)
 	AHKThreadID:=global_AllActiveTriggerIDs[Environment.uniqueID].ExeInNewThread.AHKThreadID
-	LeaveCriticalSection(_cs.execution)
+	LeaveCriticalSection(_cs_execution)
 	ahkthread_release(global_AllActiveTriggerIDs[Environment.uniqueID].ExeInNewThread.AHKThreadID)
 }
 ExecuteInNewAHKThread_trigger(p_uniqueID) ;Not an api function
 {
 	global _share
-	EnterCriticalSection(_cs.execution)
+	EnterCriticalSection(_cs_execution)
 	Environment:=global_AllActiveTriggerIDs[p_uniqueID].environment
 	;~ d(Environment, "öiohöio")
 	Environment.varsExportedFromExternalThread:=_share.temp[Environment.uniqueID].sharedObject.varsExported
 	ElementClass:=Environment.ElementClass
 
-	LeaveCriticalSection(_cs.execution)
+	LeaveCriticalSection(_cs_execution)
 	x_trigger(Environment)
 }
 x_TriggerInNewAHKThread_GetExportedValues(Environment)
 {
-	EnterCriticalSection(_cs.execution)
+	EnterCriticalSection(_cs_execution)
 	retval:=Environment.varsExportedFromExternalThread
-	LeaveCriticalSection(_cs.execution)
+	LeaveCriticalSection(_cs_execution)
 	return Environment.varsExportedFromExternalThread
 }
 
@@ -599,9 +599,9 @@ x_GetMyFlowID(Environment)
 }
 x_GetMyFlowName(Environment)
 {
-	EnterCriticalSection(_cs.flows)
+	EnterCriticalSection(_cs_flows)
 	retval:=_flows[Environment.FlowID].name
-	LeaveCriticalSection(_cs.flows)
+	LeaveCriticalSection(_cs_flows)
 	return retval
 }
 
@@ -613,7 +613,7 @@ x_GetMyElementID(Environment)
 
 x_getFlowIDByName(p_FlowName)
 {
-	EnterCriticalSection(_cs.flows)
+	EnterCriticalSection(_cs_flows)
 	
 	for forFlowID, forFlow in _Flows
 	{
@@ -623,13 +623,13 @@ x_getFlowIDByName(p_FlowName)
 		}
 	}
 	
-	LeaveCriticalSection(_cs.flows)
+	LeaveCriticalSection(_cs_flows)
 	return retval
 }
 
 x_FlowExistsByName(p_FlowName)
 {
-	EnterCriticalSection(_cs.flows)
+	EnterCriticalSection(_cs_flows)
 	
 	retval:=false
 	for forFlowID, forFlow in _Flows
@@ -640,7 +640,7 @@ x_FlowExistsByName(p_FlowName)
 		}
 	}
 	
-	LeaveCriticalSection(_cs.flows)
+	LeaveCriticalSection(_cs_flows)
 	return retval
 }
 
@@ -692,7 +692,7 @@ x_FlowStop(p_FlowID)
 x_GetListOfFlowNames()
 {
 	;Search for all flowNames
-	EnterCriticalSection(_cs.flows)
+	EnterCriticalSection(_cs_flows)
 	
 	choices:=object()
 	for oneFlowID, oneFlow in _flows
@@ -700,14 +700,14 @@ x_GetListOfFlowNames()
 		choices.push(oneFlow.name)
 	}
 	
-	LeaveCriticalSection(_cs.flows)
+	LeaveCriticalSection(_cs_flows)
 	return choices
 }
 
 x_GetListOfFlowIDs()
 {
 	;Search for all flowNames
-	EnterCriticalSection(_cs.flows)
+	EnterCriticalSection(_cs_flows)
 	
 	choices:=object()
 	for oneFlowID, oneFlow in _flows
@@ -715,7 +715,7 @@ x_GetListOfFlowIDs()
 		choices.push(oneFlowID)
 	}
 	
-	LeaveCriticalSection(_cs.flows)
+	LeaveCriticalSection(_cs_flows)
 	return choices
 }
 
@@ -725,7 +725,7 @@ x_GetListOfFlowIDs()
 
 x_getAllElementIDsOfType(p_FlowID, p_Type)
 {
-	EnterCriticalSection(_cs.flows)
+	EnterCriticalSection(_cs_flows)
 	
 	elements:=Object()
 	for oneElementID, oneElement in _flows[p_FlowID].allElements
@@ -734,13 +734,13 @@ x_getAllElementIDsOfType(p_FlowID, p_Type)
 			elements.push(oneElementID)
 	}
 	
-	LeaveCriticalSection(_cs.flows)
+	LeaveCriticalSection(_cs_flows)
 	return elements
 }
 
 x_getAllElementIDsOfClass(p_FlowID, p_Class)
 {
-	EnterCriticalSection(_cs.flows)
+	EnterCriticalSection(_cs_flows)
 	
 	elements:=Object()
 	for oneElementID, oneElement in _flows[p_FlowID].allElements
@@ -749,15 +749,15 @@ x_getAllElementIDsOfClass(p_FlowID, p_Class)
 			elements.push(oneElementID)
 	}
 	
-	LeaveCriticalSection(_cs.flows)
+	LeaveCriticalSection(_cs_flows)
 	return elements
 }
 
 x_getElementPars(p_FlowID, p_ElementID)
 {
-	EnterCriticalSection(_cs.flows)
+	EnterCriticalSection(_cs_flows)
 	retval:=objfullyClone(_flows[p_FlowID].allElements[p_ElementID].pars)
-	LeaveCriticalSection(_cs.flows)
+	LeaveCriticalSection(_cs_flows)
 	return retval
 }
 x_getElementName(p_FlowID, p_ElementID)
@@ -774,7 +774,7 @@ x_getElementClass(p_FlowID, p_ElementID)
 ;Manual trigger
 x_ManualTriggerExist(p_FlowID, p_TriggerName = "")
 {
-	EnterCriticalSection(_cs.flows)
+	EnterCriticalSection(_cs_flows)
 	
 	result:=false
 	for forelementID, forelement in _flows[p_FlowID].allElements
@@ -800,13 +800,13 @@ x_ManualTriggerExist(p_FlowID, p_TriggerName = "")
 		}
 		
 	}
-	LeaveCriticalSection(_cs.flows)
+	LeaveCriticalSection(_cs_flows)
 	return result
 }
 
 x_isManualTriggerEnabled(p_FlowID, p_TriggerName="")
 {
-	EnterCriticalSection(_cs.flows)
+	EnterCriticalSection(_cs_flows)
 	
 	result:=false
 	for forelementID, forelement in _flows[p_FlowID].allElements
@@ -833,13 +833,13 @@ x_isManualTriggerEnabled(p_FlowID, p_TriggerName="")
 		
 	}
 	
-	LeaveCriticalSection(_cs.flows)
+	LeaveCriticalSection(_cs_flows)
 	return result
 }
 
 x_ManualTriggerEnable(p_FlowID, p_TriggerName="")
 {
-	EnterCriticalSection(_cs.flows)
+	EnterCriticalSection(_cs_flows)
 	for forelementID, forelement in _flows[p_FlowID].allElements
 	{
 		;~ d(forelement, p_TriggerName)
@@ -860,13 +860,13 @@ x_ManualTriggerEnable(p_FlowID, p_TriggerName="")
 			}
 		}
 	}
-	LeaveCriticalSection(_cs.flows)
+	LeaveCriticalSection(_cs_flows)
 
 }
 
 x_ManualTriggerDisable(p_FlowID, p_TriggerName="")
 {
-	EnterCriticalSection(_cs.flows)
+	EnterCriticalSection(_cs_flows)
 	
 	for forelementID, forelement in _flows[p_FlowID].allElements
 	{
@@ -889,7 +889,7 @@ x_ManualTriggerDisable(p_FlowID, p_TriggerName="")
 		}
 	}
 
-	LeaveCriticalSection(_cs.flows)
+	LeaveCriticalSection(_cs_flows)
 
 }
 
@@ -912,7 +912,7 @@ x_ManualTriggerExecute(p_FlowID, p_TriggerName = "", p_Variables ="", p_CallBack
 		else
 		{
 			;~ d(p_FlowName " - " p_TriggerName)
-			EnterCriticalSection(_cs.flows)
+			EnterCriticalSection(_cs_flows)
 			foundElementID:=""
 			for forelementID, forelement in _flows[p_FlowID].allElements
 			{
@@ -926,7 +926,7 @@ x_ManualTriggerExecute(p_FlowID, p_TriggerName = "", p_Variables ="", p_CallBack
 					}
 				}
 			}
-			LeaveCriticalSection(_cs.flows)
+			LeaveCriticalSection(_cs_flows)
 
 			if foundElement
 			{
@@ -1019,7 +1019,7 @@ x_GetFullPath(Environment, p_Path)
 
 x_GetWorkingDir(Environment)
 {
-	EnterCriticalSection(_cs.flows)
+	EnterCriticalSection(_cs_flows)
 	if (_Flows[Environment.FlowID].flowsettings.DefaultWorkingDir)
 	{
 		retval:= _settings.FlowWorkingDir
@@ -1028,7 +1028,7 @@ x_GetWorkingDir(Environment)
 	{
 		retval:= _Flows[Environment.FlowID].flowsettings.workingdir
 	}
-	LeaveCriticalSection(_cs.flows)
+	LeaveCriticalSection(_cs_flows)
 	return retval
 }
 

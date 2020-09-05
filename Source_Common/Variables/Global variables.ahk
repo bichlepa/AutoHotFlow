@@ -7,7 +7,7 @@ if not fileexist(_WorkingDir "\Variables")
 
 StaticVariable_Set(Environment,p_Name,p_Value, p_hidden=False)
 {
-	EnterCriticalSection(_cs.execution)
+	EnterCriticalSection(_cs_execution)
 	
 	if (p_hidden)
 		MsgBox unexpected error! It is not possible to set a hidden static variable!
@@ -34,12 +34,12 @@ StaticVariable_Set(Environment,p_Name,p_Value, p_hidden=False)
 		FileAppend,% p_Value,% path "\" p_Name ".ahfvar"
 	}
 	
-	LeaveCriticalSection(_cs.execution)
+	LeaveCriticalSection(_cs_execution)
 }
 
 GlobalVariable_Set(Environment,p_Name,p_Value, p_hidden=False)
 {
-	EnterCriticalSection(_cs.execution)
+	EnterCriticalSection(_cs_execution)
 	
 	if (p_hidden)
 		MsgBox unexpected error! It is not possible to set a hidden global variable!
@@ -65,14 +65,14 @@ GlobalVariable_Set(Environment,p_Name,p_Value, p_hidden=False)
 		FileAppend,% p_Value,% path "\" p_Name ".ahfvar"
 	}
 	
-	LeaveCriticalSection(_cs.execution)
+	LeaveCriticalSection(_cs_execution)
 }
 
 
 
 StaticVariable_Get(Environment,p_Name, p_hidden=False)
 {
-	EnterCriticalSection(_cs.execution)
+	EnterCriticalSection(_cs_execution)
 	
 	if (p_hidden)
 		MsgBox unexpected error! There are no hidden static variables!
@@ -96,14 +96,14 @@ StaticVariable_Get(Environment,p_Name, p_hidden=False)
 		}
 	}
 	
-	LeaveCriticalSection(_cs.execution)
+	LeaveCriticalSection(_cs_execution)
 	
 	return retval
 }
 
 GlobalVariable_Get(Environment,p_Name, p_hidden=False)
 {
-	EnterCriticalSection(_cs.execution)
+	EnterCriticalSection(_cs_execution)
 	
 	if (p_hidden)
 		MsgBox unexpected error! There are no hidden global variables!
@@ -127,7 +127,7 @@ GlobalVariable_Get(Environment,p_Name, p_hidden=False)
 		}
 	}
 	
-	LeaveCriticalSection(_cs.execution)
+	LeaveCriticalSection(_cs_execution)
 	
 	return retval
 }
@@ -205,28 +205,28 @@ BuiltInVariable_Get(Environment,p_Name, p_hidden=False)
 
 StaticVariable_Delete(Environment,p_Name)
 {
-	EnterCriticalSection(_cs.execution)
+	EnterCriticalSection(_cs_execution)
 	
 	path:=_WorkingDir "\Variables\" Environment.flowID
 	FileDelete,% path "\" p_Name ".ahfvd"
 	FileDelete,% path "\" p_Name ".ahfvar"
 	
-	LeaveCriticalSection(_cs.execution)
+	LeaveCriticalSection(_cs_execution)
 }
 GlobalVariable_Delete(Environment,p_Name)
 {
-	EnterCriticalSection(_cs.execution)
+	EnterCriticalSection(_cs_execution)
 	
 	path:=_WorkingDir "\Variables"
 	FileDelete,% path "\" p_Name ".ahfvd"
 	FileDelete,% path "\" p_Name ".ahfvar"
 	
-	LeaveCriticalSection(_cs.execution)
+	LeaveCriticalSection(_cs_execution)
 }
 
 Var_GetListOfStaticVars(environment)
 {
-	EnterCriticalSection(_cs.execution)
+	EnterCriticalSection(_cs_execution)
 	
 	retobject:=Object()
 	path:=_WorkingDir "\Variables\" Environment.flowID
@@ -236,13 +236,13 @@ Var_GetListOfStaticVars(environment)
 		retobject.push(varname)
 	}
 	
-	LeaveCriticalSection(_cs.execution)
+	LeaveCriticalSection(_cs_execution)
 	
 	return retobject
 }
 Var_GetListOfGlobalVars(environment)
 {
-	EnterCriticalSection(_cs.execution)
+	EnterCriticalSection(_cs_execution)
 	
 	retobject:=Object()
 	path:=_WorkingDir "\Variables"
@@ -252,14 +252,14 @@ Var_GetListOfGlobalVars(environment)
 		retobject.push(varname)
 	}
 	
-	LeaveCriticalSection(_cs.execution)
+	LeaveCriticalSection(_cs_execution)
 	
 	return retobject
 }
 
 Var_GetListOfAllVars_Common(environment)
 {
-	EnterCriticalSection(_cs.execution)
+	EnterCriticalSection(_cs_execution)
 	
 	retobject:=Object()
 	for index, varname in Var_GetListOfStaticVars(environment)
@@ -271,7 +271,7 @@ Var_GetListOfAllVars_Common(environment)
 		retobject.push(varname)
 	}
 	
-	LeaveCriticalSection(_cs.execution)
+	LeaveCriticalSection(_cs_execution)
 	
 	return retobject
 }

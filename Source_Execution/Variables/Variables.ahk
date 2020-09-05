@@ -2,30 +2,30 @@
 
 LoopVariable_Set(Environment,p_Name,p_Value, p_hidden=False)
 {
-	EnterCriticalSection(_cs.execution)
+	EnterCriticalSection(_cs_execution)
 	if (p_hidden)
 		Environment.loopvarsHidden[p_Name]:=p_Value
 	else
 		Environment.loopvars[p_Name]:=p_Value
-	LeaveCriticalSection(_cs.execution)
+	LeaveCriticalSection(_cs_execution)
 }
 ThreadVariable_Set(Environment,p_Name,p_Value,p_hidden=False)
 {
-	EnterCriticalSection(_cs.execution)
+	EnterCriticalSection(_cs_execution)
 	if (p_hidden)
 		Environment.threadvarsHidden[p_Name]:=p_Value
 	else
 		Environment.threadvars[p_Name]:=p_Value
-	LeaveCriticalSection(_cs.execution)
+	LeaveCriticalSection(_cs_execution)
 }
 InstanceVariable_Set(Environment,p_Name,p_Value,p_hidden=False)
 {
-	EnterCriticalSection(_cs.execution)
+	EnterCriticalSection(_cs_execution)
 	if (p_hidden)
 		_execution.instances[Environment.InstanceID].InstanceVarsHidden[p_Name]:=p_Value
 	else
 		_execution.instances[Environment.InstanceID].InstanceVars[p_Name]:=p_Value
-	LeaveCriticalSection(_cs.execution)
+	LeaveCriticalSection(_cs_execution)
 	
 }
 
@@ -34,101 +34,101 @@ InstanceVariable_Set(Environment,p_Name,p_Value,p_hidden=False)
 
 LoopVariable_Get(Environment,p_Name, p_hidden=False)
 {
-	EnterCriticalSection(_cs.execution)
+	EnterCriticalSection(_cs_execution)
 	if (p_hidden)
 		return Environment.loopvarsHidden[p_Name]
 	else
 		return Environment.loopvars[p_Name]
-	LeaveCriticalSection(_cs.execution)
+	LeaveCriticalSection(_cs_execution)
 }
 ThreadVariable_Get(Environment,p_Name, p_hidden=False)
 {
-	EnterCriticalSection(_cs.execution)
+	EnterCriticalSection(_cs_execution)
 	if (p_hidden)
 		return Environment.threadvarsHidden[p_Name]
 	else
 		return Environment.threadvars[p_Name]
-	LeaveCriticalSection(_cs.execution)
+	LeaveCriticalSection(_cs_execution)
 	
 }
 InstanceVariable_Get(Environment,p_Name, p_hidden=False)
 {
-	EnterCriticalSection(_cs.execution)
+	EnterCriticalSection(_cs_execution)
 	if (p_hidden)
 		return _execution.instances[Environment.InstanceID].InstanceVarsHidden[p_Name]
 	else
 		return _execution.instances[Environment.InstanceID].InstanceVars[p_Name]
-	LeaveCriticalSection(_cs.execution)
+	LeaveCriticalSection(_cs_execution)
 }
 
 
 LoopVariable_Delete(Environment,p_Name, p_hidden=False)
 {
-	EnterCriticalSection(_cs.execution)
+	EnterCriticalSection(_cs_execution)
 	if (p_hidden)
 		Environment.loopvarsHidden.delete(p_Name)
 	else
 		Environment.loopvars.delete(p_Name)
-	LeaveCriticalSection(_cs.execution)
+	LeaveCriticalSection(_cs_execution)
 }
 ThreadVariable_Delete(Environment,p_Name, p_hidden=False)
 {
-	EnterCriticalSection(_cs.execution)
+	EnterCriticalSection(_cs_execution)
 	if (p_hidden)
 		Environment.threadvarsHidden.delete(p_Name)
 	else
 		Environment.threadvars.delete(p_Name)
-	LeaveCriticalSection(_cs.execution)
+	LeaveCriticalSection(_cs_execution)
 	
 }
 InstanceVariable_Delete(Environment,p_Name, p_hidden=False)
 {
-	EnterCriticalSection(_cs.execution)
+	EnterCriticalSection(_cs_execution)
 	if (p_hidden)
 		_execution.instances[Environment.InstanceID].InstanceVarsHidden.delete(p_Name)
 	else
 		_execution.instances[Environment.InstanceID].InstanceVars.delete(p_Name)
-	LeaveCriticalSection(_cs.execution)
+	LeaveCriticalSection(_cs_execution)
 	
 }
 
 
 Var_GetListOfLoopVars(environment)
 {
-	EnterCriticalSection(_cs.execution)
+	EnterCriticalSection(_cs_execution)
 	retobject:=Object()
 	for varname, varcontent in Environment.loopvars
 	{
 		retobject.push(varname)
 	}
-	LeaveCriticalSection(_cs.execution)
+	LeaveCriticalSection(_cs_execution)
 	return retobject
 }
 Var_GetListOfThreadVars(environment)
 {
-	EnterCriticalSection(_cs.execution)
+	EnterCriticalSection(_cs_execution)
 	retobject:=Object()
 	for varname, varcontent in Environment.threadvars
 	{
 		retobject.push(varname)
 	}
-	LeaveCriticalSection(_cs.execution)
+	LeaveCriticalSection(_cs_execution)
 	return retobject
 }
 Var_GetListOfInstanceVars(environment)
 {
-	EnterCriticalSection(_cs.execution)
+	EnterCriticalSection(_cs_execution)
 	retobject:=Object()
 	for varname, varcontent in _execution.instances[Environment.InstanceID].InstanceVars
 	{
 		retobject.push(varname)
 	}
-	LeaveCriticalSection(_cs.execution)
+	LeaveCriticalSection(_cs_execution)
 	return retobject
 }
 Var_GetListOfAllVars(environment)
 {
-	EnterCriticalSection(_cs.execution)
+	EnterCriticalSection(_cs_execution)
 	retobject:=Object()
 	for index, varname in Var_GetListOfLoopVars(environment)
 	{
@@ -150,28 +150,28 @@ Var_GetListOfAllVars(environment)
 	{
 		retobject.push(varname)
 	}
-	LeaveCriticalSection(_cs.execution)
+	LeaveCriticalSection(_cs_execution)
 	return retobject
 }
 
 
 LoopVariable_AddToStack(Environment)
 {
-	EnterCriticalSection(_cs.execution)
+	EnterCriticalSection(_cs_execution)
 	;Write current loopvars to stack
 	Environment.loopvarsStack.push(objFullyClone(Environment.loopvars))
 	Environment.loopvarsStackHidden.push(objFullyClone(Environment.loopvarsHidden))
 	
-	LeaveCriticalSection(_cs.execution)
+	LeaveCriticalSection(_cs_execution)
 }
 LoopVariable_RestoreFromStack(Environment)
 {
-	EnterCriticalSection(_cs.execution)
+	EnterCriticalSection(_cs_execution)
 	;Restore loopvars from stack
 	Environment.loopvars:=objFullyClone(Environment.loopvarsStack.pop())
 	Environment.loopvarsHidden:=objFullyClone(Environment.loopvarsStackHidden.pop())
 	
-	LeaveCriticalSection(_cs.execution)
+	LeaveCriticalSection(_cs_execution)
 }
 
 
@@ -210,7 +210,7 @@ Var_RetrieveDestination(p_Name,p_Location)
 Var_GetLocation(Environment, p_Name, p_hidden=False)
 {
 	global AllBuiltInVars, AllCustomBuiltInVars
-	EnterCriticalSection(_cs.execution)
+	EnterCriticalSection(_cs_execution)
 	retval:=""
 	if (p_hidden = false)
 	{
@@ -262,7 +262,7 @@ Var_GetLocation(Environment, p_Name, p_hidden=False)
 			retval:= "instance"
 		}
 	}
-	LeaveCriticalSection(_cs.execution)
+	LeaveCriticalSection(_cs_execution)
 	return retval
 	;~ d(Environment, "error-  " p_name)
 	;Todo: static and global variables

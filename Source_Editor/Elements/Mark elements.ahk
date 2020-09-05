@@ -4,7 +4,7 @@ MarkOne(p_ID,additional:=false)
 	global _flows
 	global FlowID
 	
-	EnterCriticalSection(_cs.flows)
+	EnterCriticalSection(_cs_flows)
 	
 	markedElements:=_flows[FlowID].markedElements
 	allConnections:=_flows[FlowID].allConnections
@@ -50,7 +50,7 @@ MarkOne(p_ID,additional:=false)
 		;~ ui_UpdateStatusbartext()
 	}
 
-	LeaveCriticalSection(_cs.flows)
+	LeaveCriticalSection(_cs_flows)
 }
 
 ;Unmark all elements and connections
@@ -59,7 +59,7 @@ UnmarkEverything(CreateList=true)
 	global _flows 
 	global FlowID 
 	
-	EnterCriticalSection(_cs.flows)
+	EnterCriticalSection(_cs_flows)
 	
 	markedElements:=_flows[FlowID].markedElements
 	allConnections:=_flows[FlowID].allConnections
@@ -78,7 +78,7 @@ UnmarkEverything(CreateList=true)
 		CreateMarkedList()
 	;~ ui_UpdateStatusbartext()
 	
-	LeaveCriticalSection(_cs.flows)
+	LeaveCriticalSection(_cs_flows)
 }
 
 MarkEverything()
@@ -86,7 +86,7 @@ MarkEverything()
 	global _flows
 	global FlowID
 	
-	EnterCriticalSection(_cs.flows)
+	EnterCriticalSection(_cs_flows)
 	
 	markedElements:=_flows[FlowID].markedElements
 	allConnections:=_flows[FlowID].allConnections
@@ -107,7 +107,7 @@ MarkEverything()
 	
 	;~ ui_UpdateStatusbartext()	
 	
-	LeaveCriticalSection(_cs.flows)
+	LeaveCriticalSection(_cs_flows)
 }
 
 CreateMarkedList()
@@ -116,7 +116,7 @@ CreateMarkedList()
 	;~ SoundBeep
 	local markedElementsClone
 	
-	EnterCriticalSection(_cs.flows)
+	EnterCriticalSection(_cs_flows)
 	
 	markedElements:=_flows[FlowID].markedElements
 	allConnections:=_flows[FlowID].allConnections
@@ -151,5 +151,5 @@ CreateMarkedList()
 		;~ ToolTip no element
 		_flows[FlowID].markedElement:=""
 	}
-	LeaveCriticalSection(_cs.flows)
+	LeaveCriticalSection(_cs_flows)
 }

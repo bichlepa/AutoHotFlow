@@ -9,8 +9,8 @@ executionTask()
 	
 	Loop
 	{
-		EnterCriticalSection(_cs.flows)
-		EnterCriticalSection(_cs.execution)
+		EnterCriticalSection(_cs_flows)
+		EnterCriticalSection(_cs_execution)
 		somethingexecuted:=false
 		ExecutionNextTasks:=Object()
 		
@@ -150,8 +150,8 @@ executionTask()
 			}
 		}
 		
-		LeaveCriticalSection(_cs.execution)
-		LeaveCriticalSection(_cs.flows)
+		LeaveCriticalSection(_cs_execution)
+		LeaveCriticalSection(_cs_flows)
 
 		;Actually execute the elements which are queued for execution
 		for oneExecutionTaskIndex, oneExecutionTask in ExecutionNextTasks
@@ -169,8 +169,8 @@ executionTask()
 finishExecutionOfElement(Environment, Result, Message = "")
 {
 	global
-	EnterCriticalSection(_cs.flows)
-	EnterCriticalSection(_cs.execution)
+	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_execution)
 
 	Environment.State:="finished"
 	Environment.result:=Result
@@ -196,7 +196,7 @@ finishExecutionOfElement(Environment, Result, Message = "")
 	{
 		ThreadVariable_Set(Environment,"a_ErrorMessage",Message)
 	}
-	LeaveCriticalSection(_cs.execution)
-	LeaveCriticalSection(_cs.flows)
+	LeaveCriticalSection(_cs_execution)
+	LeaveCriticalSection(_cs_flows)
 	;~ d(Environment, message)
 }

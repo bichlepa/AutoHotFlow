@@ -3,8 +3,8 @@ EnabledTriggerIDCounter:=0
 enableFlow(par_FlowID)
 {
 	global
-	EnterCriticalSection(_cs.flows)
-	EnterCriticalSection(_cs.execution)
+	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_execution)
 
 	local oneTriggerID, oneTrigger
 	if (_flows[par_FlowID].loaded != true)
@@ -14,14 +14,14 @@ enableFlow(par_FlowID)
 	enableTriggers(par_FlowID)
 	SaveFlowMetaData(par_FlowID)
 
-	LeaveCriticalSection(_cs.execution)
-	LeaveCriticalSection(_cs.flows)
+	LeaveCriticalSection(_cs_execution)
+	LeaveCriticalSection(_cs_flows)
 }
 enableToggleFlow(par_FlowID)
 {
 	global
-	EnterCriticalSection(_cs.flows)
-	EnterCriticalSection(_cs.execution)
+	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_execution)
 	
 	if (_flows[par_FlowID].enabled != true)
 	{
@@ -31,8 +31,8 @@ enableToggleFlow(par_FlowID)
 	{
 		disableFlow(par_FlowID)
 	}
-	LeaveCriticalSection(_cs.execution)
-	LeaveCriticalSection(_cs.flows)
+	LeaveCriticalSection(_cs_execution)
+	LeaveCriticalSection(_cs_flows)
 }
 
 disableFlow(par_FlowID)
@@ -44,8 +44,8 @@ disableFlow(par_FlowID)
 enableTriggers(p_Flow)
 {
 	global EnabledTriggerIDCounter
-	EnterCriticalSection(_cs.flows)
-	EnterCriticalSection(_cs.execution)
+	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_execution)
 	
 	logger("a2", "Going to enable Flow " p_Flow.name)
 	
@@ -59,16 +59,16 @@ enableTriggers(p_Flow)
 		
 	}
 	p_Flow.enabled:=true
-	LeaveCriticalSection(_cs.execution)
-	LeaveCriticalSection(_cs.flows)
+	LeaveCriticalSection(_cs_execution)
+	LeaveCriticalSection(_cs_flows)
 	
 	logger("a1", "Flow " p_Flow.name " enabled")
 }
 
 enableOneTrigger(p_Flow, p_Trigger, p_save=true)
 {
-	EnterCriticalSection(_cs.flows)
-	EnterCriticalSection(_cs.execution)
+	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_execution)
 
 	logger("a2", "Going to enable trigger " p_Trigger.ID " in flow " p_Flow.name)
 	
@@ -82,15 +82,15 @@ enableOneTrigger(p_Flow, p_Trigger, p_save=true)
 	
 	logger("a1", "Trigger " p_Trigger.ID " in flow " p_Flow.name " enabled")
 	
-	LeaveCriticalSection(_cs.execution)
-	LeaveCriticalSection(_cs.flows)
+	LeaveCriticalSection(_cs_execution)
+	LeaveCriticalSection(_cs_flows)
 }
 
 justEnableOneTrigger(p_Flow, p_Trigger)
 {
 	global EnabledTriggerIDCounter
-	EnterCriticalSection(_cs.flows)
-	EnterCriticalSection(_cs.execution)
+	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_execution)
 	
 	triggerEnvironment:=criticalObject()
 	triggerEnvironment.id:= "enabledTrigger" ++EnabledTriggerIDCounter
@@ -114,15 +114,15 @@ justEnableOneTrigger(p_Flow, p_Trigger)
 		logger("a0", "Trigger " triggerEnvironment.ElementID " cannot be enabled (missing implementation)")
 	}
 
-	LeaveCriticalSection(_cs.execution)
-	LeaveCriticalSection(_cs.flows)
+	LeaveCriticalSection(_cs_execution)
+	LeaveCriticalSection(_cs_flows)
 }
 
 disableTriggers(p_Flow)
 {
 	global EnabledTriggerIDCounter
-	EnterCriticalSection(_cs.flows)
-	EnterCriticalSection(_cs.execution)
+	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_execution)
 	
 	p_Flow.enabled:="Disabling"
 	logger("a2", "Going to disable Flow " p_Flow.name)
@@ -146,13 +146,13 @@ disableTriggers(p_Flow)
 	logger("a1", "Flow " p_Flow.name " disabled")
 	p_Flow.enabled:=false
 
-	LeaveCriticalSection(_cs.execution)
-	LeaveCriticalSection(_cs.flows)
+	LeaveCriticalSection(_cs_execution)
+	LeaveCriticalSection(_cs_flows)
 }
 disableOneTrigger(p_Flow, p_Trigger, p_save=true)
 {
-	EnterCriticalSection(_cs.flows)
-	EnterCriticalSection(_cs.execution)
+	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_execution)
 
 	p_Flow.enabled:="Disabling"
 	logger("a2", "Going to disable trigger " p_Trigger.ID " in Flow " p_Flow.name)
@@ -178,14 +178,14 @@ disableOneTrigger(p_Flow, p_Trigger, p_save=true)
 	if (p_save)
 		SaveFlowMetaData(p_Flow.id)
 		
-	LeaveCriticalSection(_cs.execution)
-	LeaveCriticalSection(_cs.flows)
+	LeaveCriticalSection(_cs_execution)
+	LeaveCriticalSection(_cs_flows)
 }
 
 justDisableOneTrigger(p_Flow, p_Trigger, p_EnabledTrigger)
 {
-	EnterCriticalSection(_cs.flows)
-	EnterCriticalSection(_cs.execution)
+	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_execution)
 
 	tempElementClass:=p_Trigger.Class
 	;~ d(forTrigger,"Element_disable_" tempElementClass)
@@ -203,8 +203,8 @@ justDisableOneTrigger(p_Flow, p_Trigger, p_EnabledTrigger)
 	_execution.triggers.delete(p_EnabledTrigger.id)
 	;~ d(_execution)
 	
-	LeaveCriticalSection(_cs.execution)
-	LeaveCriticalSection(_cs.flows)
+	LeaveCriticalSection(_cs_execution)
+	LeaveCriticalSection(_cs_flows)
 }
 
 saveResultOfTriggerEnabling(Environment, Result, Message)

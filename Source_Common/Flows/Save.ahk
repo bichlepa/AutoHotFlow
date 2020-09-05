@@ -22,7 +22,7 @@ SaveFlowMetaData(FlowID)
 		return
 	}
 	
-	EnterCriticalSection(_cs.flows)
+	EnterCriticalSection(_cs_flows)
 
 	;~ d(_Flows[FlowID],FlowID)
 	if not fileexist(_Flows[FlowID].file)
@@ -52,7 +52,7 @@ SaveFlowMetaData(FlowID)
 		IniWrite,% enabledTriggers,% _Flows[FlowID].file,general,enabled
 	}
 	
-	LeaveCriticalSection(_cs.flows)
+	LeaveCriticalSection(_cs_flows)
 }
 
 SaveFlow(FlowID)
@@ -83,7 +83,7 @@ SaveFlow(FlowID)
 		return
 	}
 	
-	EnterCriticalSection(_cs.flows)
+	EnterCriticalSection(_cs_flows)
 
 	enabledTriggers:=""
 	for oneID, oneElement in _Flows[FlowID].allElements
@@ -228,7 +228,7 @@ SaveFlow(FlowID)
 	saved=yes
 	busy:=false
 	
-	LeaveCriticalSection(_cs.flows)
+	LeaveCriticalSection(_cs_flows)
 }
 
 i_SaveParametersOfElement(saveElement,FlowID,saveElementIniID,Savelocation="")
@@ -281,7 +281,7 @@ i_SaveUnsavedFlows()
 {
 	global _flows
 	
-	EnterCriticalSection(_cs.flows)
+	EnterCriticalSection(_cs_flows)
 	
 	for tempID, tempflow in _flows
 	{
@@ -292,5 +292,5 @@ i_SaveUnsavedFlows()
 		
 	}
 	
-	LeaveCriticalSection(_cs.flows)
+	LeaveCriticalSection(_cs_flows)
 }
