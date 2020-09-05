@@ -59,7 +59,7 @@ class ElementSettings
 		
 		
 		;Loop through all parameters
-		EnterCriticalSection(_cs_flows)
+		EnterCriticalSection(_cs_shared)
 		for index, parameter in parametersToEdit
 		{
 			;Add one or a group of controls. This is done dynamically, dependent on the parameters
@@ -125,7 +125,7 @@ class ElementSettings
 			}
 			
 		}
-		LeaveCriticalSection(_cs_flows)
+		LeaveCriticalSection(_cs_shared)
 		
 		
 		
@@ -279,7 +279,7 @@ class ElementSettings
 		
 		
 		GUISettingsOfElementSave:
-		EnterCriticalSection(_cs_flows)
+		EnterCriticalSection(_cs_shared)
 		
 		GUISettingsOfElementobject.generalUpdate()
 		;~ gui,SettingsOfElement:submit
@@ -335,7 +335,7 @@ class ElementSettings
 			
 		}
 		
-		LeaveCriticalSection(_cs_flows)
+		LeaveCriticalSection(_cs_shared)
 		
 		temponeValue:=""
 		

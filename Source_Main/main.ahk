@@ -111,6 +111,7 @@ global_elementInclusions =
 #include Source_Common\Multithreading\API Caller to Editor.ahk
 #include Source_Common\Multithreading\API Caller to Execution.ahk
 #include Source_Common\Multithreading\API for Elements.ahk
+#include Source_Common\Multithreading\Shared Variables.ahk
 ;~ #include Source_Main\Threads\API Receiver Main.ahk
 
 #include Source_Main\hidden window\hidden window.ahk

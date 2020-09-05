@@ -146,6 +146,8 @@ global _execution := CriticalObject()
 _execution.Instances := CriticalObject()
 _execution.triggers := CriticalObject()
 
+global _language := CriticalObject()
+
 /* Content of _share
 _share contains some values:
 	.allCategories	Internal array which contains all categories: Each entry contains following:
@@ -159,10 +161,7 @@ _share contains some values:
 	.WorkingDir		Directory which contains saved flows, log and settings file. It is same as ScriptDir if portable installation
 */
 global _share := CriticalObject()
-_share._ScriptDir := _ScriptDir
-_share._WorkingDir := _ScriptDir
 
-global _language := CriticalObject()
 
 _share.hwnds := Object()
 _share.log := ""
@@ -171,7 +170,8 @@ _share.logcountAfterTidy := 0
 _share.drawActive := 0 	;True if the draw thread is currently active
 _share.temp := criticalObject() 	;For temporary content
 _share._ScriptDir := _ScriptDir
-_share._WorkingDir := _WorkingDir 	
+_share._WorkingDir := _WorkingDir 
+_share.CategoryIDCounter := 1	
 
 _share.main := CriticalObject()
 _share.main.Tasks := CriticalObject()
@@ -179,7 +179,7 @@ _share.main.Tasks := CriticalObject()
 ;Those two variables are filled by the elements when they are included
 _share.AllElementClasses:=CriticalObject()
 
-global _cs_flows := CriticalSection() ;Protect access to _Flows
+global _cs_shared := CriticalSection() ;Protect access to _Flows
 global _cs_execution := CriticalSection() ;Protect access to _Execution and global / static variables
 global _cs_debug := CriticalSection() ;Protect access to Debug files
 

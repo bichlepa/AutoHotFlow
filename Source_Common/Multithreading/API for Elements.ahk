@@ -146,7 +146,7 @@ x_GetMyElementID(Environment)
 
 x_getFlowIDByName(p_FlowName)
 {
-	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_shared)
 	
 	for forFlowID, forFlow in _Flows
 	{
@@ -156,7 +156,7 @@ x_getFlowIDByName(p_FlowName)
 		}
 	}
 	
-	LeaveCriticalSection(_cs_flows)
+	LeaveCriticalSection(_cs_shared)
 	return retval
 }
 
@@ -215,7 +215,7 @@ x_FlowStop(p_FlowID)
 
 x_GetListOfFlowNames()
 {
-	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_shared)
 	
 	;Search for all flowNames
 	choices:=object()
@@ -224,14 +224,14 @@ x_GetListOfFlowNames()
 		choices.push(oneFlow.name)
 	}
 	
-	LeaveCriticalSection(_cs_flows)
+	LeaveCriticalSection(_cs_shared)
 	
 	return choices
 }
 
 x_GetListOfFlowIDs()
 {
-	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_shared)
 	
 	;Search for all flowNames
 	choices:=object()
@@ -240,7 +240,7 @@ x_GetListOfFlowIDs()
 		choices.push(oneFlowID)
 	}
 	
-	LeaveCriticalSection(_cs_flows)
+	LeaveCriticalSection(_cs_shared)
 	
 	return choices
 }
@@ -248,7 +248,7 @@ x_GetListOfFlowIDs()
 
 x_getAllElementIDsOfType(p_FlowID, p_Type)
 {
-	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_shared)
 	
 	elements:=Object()
 	for oneElementID, oneElement in _flows[p_FlowID].allElements
@@ -257,14 +257,14 @@ x_getAllElementIDsOfType(p_FlowID, p_Type)
 			elements.push(oneElementID)
 	}
 	
-	LeaveCriticalSection(_cs_flows)
+	LeaveCriticalSection(_cs_shared)
 	
 	return elements
 }
 
 x_getAllElementIDsOfClass(p_FlowID, p_Class)
 {
-	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_shared)
 	
 	elements:=Object()
 	for oneElementID, oneElement in _flows[p_FlowID].allElements
@@ -273,16 +273,16 @@ x_getAllElementIDsOfClass(p_FlowID, p_Class)
 			elements.push(oneElementID)
 	}
 	
-	LeaveCriticalSection(_cs_flows)
+	LeaveCriticalSection(_cs_shared)
 	
 	return elements
 }
 
 x_getElementPars(p_FlowID, p_ElementID)
 {
-	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_shared)
 	retval:=objfullyClone(_flows[p_FlowID].allElements[p_ElementID].pars)
-	LeaveCriticalSection(_cs_flows)
+	LeaveCriticalSection(_cs_shared)
 	return retval
 }
 x_getElementName(p_FlowID, p_ElementID)
@@ -296,16 +296,16 @@ x_getElementClass(p_FlowID, p_ElementID)
 
 x_getMyElementPars(Environment)
 {
-	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_shared)
 	retval:=objfullyClone(_flows[Environment.flowID].allElements[Environment.FlowID].pars)
-	LeaveCriticalSection(_cs_flows)
+	LeaveCriticalSection(_cs_shared)
 	return retval
 }
 
 ;Manual trigger
 x_ManualTriggerExist(p_FlowID, p_TriggerName = "")
 {
-	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_shared)
 	
 	result:=false
 	for forelementID, forelement in _flows[p_FlowID].allElements
@@ -331,13 +331,13 @@ x_ManualTriggerExist(p_FlowID, p_TriggerName = "")
 		}
 		
 	}
-	LeaveCriticalSection(_cs_flows)
+	LeaveCriticalSection(_cs_shared)
 	return result
 }
 
 x_isManualTriggerEnabled(p_FlowID, p_TriggerName="")
 {
-	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_shared)
 	
 	result:=false
 	for forelementID, forelement in _flows[p_FlowID].allElements
@@ -364,13 +364,13 @@ x_isManualTriggerEnabled(p_FlowID, p_TriggerName="")
 		
 	}
 	
-	LeaveCriticalSection(_cs_flows)
+	LeaveCriticalSection(_cs_shared)
 	return result
 }
 
 x_ManualTriggerEnable(p_FlowID, p_TriggerName="")
 {
-	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_shared)
 	for forelementID, forelement in _flows[p_FlowID].allElements
 	{
 		;~ d(forelement, p_TriggerName)
@@ -391,13 +391,13 @@ x_ManualTriggerEnable(p_FlowID, p_TriggerName="")
 			}
 		}
 	}
-	LeaveCriticalSection(_cs_flows)
+	LeaveCriticalSection(_cs_shared)
 
 }
 
 x_ManualTriggerDisable(p_FlowID, p_TriggerName="")
 {
-	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_shared)
 	for forelementID, forelement in _flows[p_FlowID].allElements
 	{
 		;~ d(forelement, p_TriggerName)
@@ -419,7 +419,7 @@ x_ManualTriggerDisable(p_FlowID, p_TriggerName="")
 		}
 	}
 
-	LeaveCriticalSection(_cs_flows)
+	LeaveCriticalSection(_cs_shared)
 }
 
 x_ManualTriggerExecute(p_FlowID, p_TriggerName = "", p_Variables ="", p_CallBackFunction ="")
@@ -441,7 +441,7 @@ x_ManualTriggerExecute(p_FlowID, p_TriggerName = "", p_Variables ="", p_CallBack
 		else
 		{
 			;~ d(p_FlowName " - " p_TriggerName)
-			EnterCriticalSection(_cs_flows)
+			EnterCriticalSection(_cs_shared)
 			foundElementID:=""
 			for forelementID, forelement in _flows[p_FlowID].allElements
 			{
@@ -455,7 +455,7 @@ x_ManualTriggerExecute(p_FlowID, p_TriggerName = "", p_Variables ="", p_CallBack
 					}
 				}
 			}
-			LeaveCriticalSection(_cs_flows)
+			LeaveCriticalSection(_cs_shared)
 
 			if foundElementID
 			{

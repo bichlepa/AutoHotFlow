@@ -73,6 +73,7 @@ lang_setLanguage(_settings.UILanguage)
 #include Source_Common\Multithreading\API Caller to Draw.ahk
 #include Source_Common\Multithreading\API Caller to Execution.ahk
 #include Source_Common\Multithreading\API for Elements.ahk
+#include Source_Common\Multithreading\Shared Variables.ahk
 
 
 ;PlaceholderIncludesOfElements

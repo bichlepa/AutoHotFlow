@@ -5,7 +5,7 @@
 	local toreturn
 	
 
-	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_shared)
 	
 	ToolTip(lang("saving to clipboard"),100000)
 	logger("a2","Saving elements to clipboard")
@@ -82,7 +82,7 @@
 	
 	;~ d(_share.clipboard)
 	
-	LeaveCriticalSection(_cs_flows)
+	LeaveCriticalSection(_cs_shared)
 	
 	;~ RIni_Shutdown("ClipboardSaveFile")
 	return toreturn
@@ -107,7 +107,7 @@ loadFromClipboard()
 	local tempClipboardconnectionList
 	local tempCountLoadedElements=0
 	
-	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_shared)
 	
 	
 	ClipboardFlowFilename:=flow.ClipboardFilePath
@@ -224,7 +224,7 @@ loadFromClipboard()
 	
 	State_New(FlowID)
 	
-	LeaveCriticalSection(_cs_flows)
+	LeaveCriticalSection(_cs_shared)
 	
 	API_Draw_Draw()
 

@@ -1067,9 +1067,9 @@ gdip_DrawEverything(FlowObj)
 	DrawResult.NewElementIconWidth:=NewElementIconWidth * zoomFactor
 	DrawResult.NewElementIconHeight:=NewElementIconHeight * zoomFactor
 	
-	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_shared)
 	_flows[FlowObj.id].DrawResult:=DrawResult
-	LeaveCriticalSection(_cs_flows)
+	LeaveCriticalSection(_cs_shared)
 	;~ Gdip_TextToGraphics(G, OnTopLabel, "x10 y0 " TextOptionsTopLabel, Font, widthofguipic, heightofguipic)
 	
 	

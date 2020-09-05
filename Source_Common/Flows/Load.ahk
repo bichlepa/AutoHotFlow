@@ -31,7 +31,7 @@ LoadFlow(FlowID, filepath="", params="")
 		return
 	}
 
-	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_shared)
 
 	currentlyLoadingFlow:=true
 	
@@ -340,7 +340,7 @@ LoadFlow(FlowID, filepath="", params="")
 	}
 	
 	currentlyLoadingFlow:=false
-	LeaveCriticalSection(_cs_flows)
+	LeaveCriticalSection(_cs_shared)
 }
 
 loadFlowGeneralParameters(FlowID)
@@ -348,7 +348,7 @@ loadFlowGeneralParameters(FlowID)
 	global
 	local temp
 	
-	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_shared)
 	
 	_flows[FlowID].flowSettings.Offsetx:=RIni_GetKeyValue("IniFile", "general", "Offsetx", default_OffsetX)
 	_flows[FlowID].flowSettings.Offsety:=RIni_GetKeyValue("IniFile", "general", "Offsety", default_OffsetY)
@@ -365,7 +365,7 @@ loadFlowGeneralParameters(FlowID)
 		}
 	}
 	
-	LeaveCriticalSection(_cs_flows)
+	LeaveCriticalSection(_cs_shared)
 }
 
 

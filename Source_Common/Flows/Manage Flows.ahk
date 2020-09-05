@@ -1,5 +1,4 @@
 ﻿
-global global_CategoryIDCounter = 1
 
 ;Find flows in folder "saved Flows" und show them in the tv.
 ;Additionally read the state of flow and activate it if it should be active
@@ -15,8 +14,8 @@ FindFlows()
 	{
 		InitFlow(A_LoopFileFullPath)
 	}
-	_share.FlowsTreeViewNeedFullRefresh:=True
-	_share.FindFlows_Called:=True
+	_setShared("FindFlows_Called",True)
+	API_manager_TreeView_Refill()
 }
 
 InitFlow(FileFullPath)
@@ -29,8 +28,6 @@ InitFlow(FileFullPath)
 	local tempflowid
 	local tempdemo
 	local newFlowID
-	
-	EnterCriticalSection(_cs_flows)
 	
 	SplitPath, FileFullPath,,ThisFlowFolder,,ThisFlowFilename
 
@@ -57,13 +54,13 @@ InitFlow(FileFullPath)
 
 	;Make sure the flow ID does not exist yet. If it exists, generate a new one
 	
-	if _flows.haskey(tempflowID)
+	if _existsFlow(tempflowID)
 	{
 		Loop
 		{
 			random,randomValue
 			tempflowID := lang("Flow") " " randomValue
-			if (not _flows.haskey(tempflowID))
+			if (not _existsFlow(tempflowID))
 				break
 		}
 	}
@@ -86,30 +83,28 @@ InitFlow(FileFullPath)
 	
 	;Add flow to the list
 	newFlowid:=tempflowID
-	_flows[newFlowid] := object()
+	newFlow := Object()
 	
-	_flows[newFlowID].file := FileFullPath
-	_flows[newFlowID].Folder := ThisFlowFolder
-	_flows[newFlowID].FileName := ThisFlowFilename
+	newFlow.file := FileFullPath
+	newFlow.Folder := ThisFlowFolder
+	newFlow.FileName := ThisFlowFilename
 	
-	_flows[newFlowid].id := newFlowid
-	_flows[newFlowid].FlowID := newFlowid
-	_flows[newFlowid].name := tempflowName
-	;~ _flows[newFlowid].defaultname := true
-	_flows[newFlowid].Type := "Flow"
-	_flows[newFlowid].category := tempCategoryID
-	_flows[newFlowid].demo := tempdemo
+	newFlow.id := newFlowid
+	newFlow.FlowID := newFlowid
+	newFlow.name := tempflowName
+	;~ newFlow.defaultname := true
+	newFlow.Type := "Flow"
+	newFlow.category := tempCategoryID
+	newFlow.demo := tempdemo
+	
+	;~ d(newFlow)
+	
+	newFlow.draw := Object()
+	
+	_setFlow(newFlowid, newFlow)
+
 	UpdateFlowCategoryName(newFlowid)
-	
-	;~ d(_flows[newFlowid])
-	if (_share.FindFlows_Called)
-	{
-		_share.managerTasks.refillTree:=true
-		_share.managerTasks.select:="Flow:" newFlowid
-	}
-	
-	_flows[newFlowID].draw := CriticalObject()
-	
+
 	if (tempflowenabled != 0) ;Enable flow
 	{
 		loop, parse,tempflowenabled,|
@@ -117,8 +112,12 @@ InitFlow(FileFullPath)
 			enableOneTrigger(newFlowID, A_LoopField, False)
 		}
 	}
-	
-	LeaveCriticalSection(_cs_flows)
+
+	if (_getShared("FindFlows_Called"))
+	{
+		API_manager_TreeView_Refill()
+		API_manager_TreeView_Select("Flow", newFlowid)
+	}
 }
 
 ;Create a new file for a flow
@@ -127,8 +126,6 @@ NewFlow(par_CategoryID = "")
 	global
 	local newFlowid
 	local tempCategoryID
-	
-	EnterCriticalSection(_cs_flows)
 	
 	;If category ID not given, move to Category "Uncategorized"
 
@@ -150,7 +147,7 @@ NewFlow(par_CategoryID = "")
 	{
 		random,randomValue
 		newFlowid := lang("Flow") " " randomValue
-		if (not _flows.haskey(newFlowid))
+		if (not _existsFlow(newFlowid))
 			break
 	}
 	;Generate a new unique flow name
@@ -163,32 +160,31 @@ NewFlow(par_CategoryID = "")
 		randomValue+=1
 	}
 	;Create the flow in the global variable
-	_flows[newFlowid] := object()
-	_flows[newFlowid].id := newFlowid
-	_flows[newFlowid].name := tempflowName
-	_flows[newFlowid].Type := "Flow"
-	_flows[newFlowid].category := tempCategoryID
-	_flows[newFlowid].enabled := false
-	UpdateFlowCategoryName(newFlowid)
+	newFlow := object()
+	newFlow.id := newFlowid
+	newFlow.name := tempflowName
+	newFlow.Type := "Flow"
+	newFlow.category := tempCategoryID
+	newFlow.enabled := false
 	
 	;Create a new file but do not overwrite existing file. Change file name if necessary.
-	NewName := _flows[newFlowid].Name 
-	_flows[newFlowid].folder := _WorkingDir "\Saved Flows"
-	_flows[newFlowid].filename := newFlowid
-	_flows[newFlowid].file := _WorkingDir "\Saved Flows\" newFlowid ".ini"
+	NewName := newFlow.Name 
+	newFlow.folder := _WorkingDir "\Saved Flows"
+	newFlow.filename := newFlowid
+	newFlow.file := _WorkingDir "\Saved Flows\" newFlowid ".ini"
 	
+	_setFlow(newFlowid, newFlow)
 
+	UpdateFlowCategoryName(newFlowid)
 	SaveFlowMetaData(newFlowid)
 
 
 	;Add TV entry
-	if (_share.FindFlows_Called)
+	if (_getShared("FindFlows_Called"))
 	{
-		_share.managerTasks.refillTree:=true
-		_share.managerTasks.select:="Flow:" newFlowid
+		API_manager_TreeView_Refill()
+		API_manager_TreeView_Select("Flow", newFlowid)
 	}
-
-	LeaveCriticalSection(_cs_flows)
 	
 	return newFlowid
 }
@@ -203,8 +199,6 @@ NewCategory(par_Newname = "")
 	local tempNewname
 	local tempindex
 	local retval
-	
-	EnterCriticalSection(_cs_flows)
 	
 	;~ d(par_Newname)
 	if (par_Newname = "") ;If a new category should be created and the name is not given
@@ -252,20 +246,20 @@ NewCategory(par_Newname = "")
 	if not retval
 	{
 		;Add the category to the list
-		newCategoryid := "category" global_CategoryIDCounter++
-		_share.allCategories[newCategoryid] := object()
-		_share.allCategories[newCategoryid].id := newCategoryid
-		_share.allCategories[newCategoryid].Name := Newname
-		_share.allCategories[newCategoryid].Type = Category
-		if (_share.FindFlows_Called)
+		newCategoryid := "category" _getAndIncrementShared("CategoryIDCounter")
+		newCategory := object()
+		newCategory.id := newCategoryid
+		newCategory.Name := Newname
+		newCategory.Type := "Category"
+		_setCategory(newCategoryid, newCategory)
+
+		if (_getShared("FindFlows_Called"))
 		{
-			_share.managerTasks.refillTree:=true
-			_share.managerTasks.select:="Flow:" newFlowid
+			API_manager_TreeView_Refill()
+			API_manager_TreeView_Select("Flow", newFlowid)
 		}
 		;~ d(allCategories)
 	}
-	
-	LeaveCriticalSection(_cs_flows)
 	
 	return newCategoryid
 }
@@ -274,31 +268,28 @@ ChangeFlowCategory(par_FlowID, par_CategoryID)
 {
 	global
 	
-	EnterCriticalSection(_cs_flows)
-	
 	if (par_FlowID = "")
 	{
 		MsgBox,,Unexpected error, 5616486132156
 	}
 	
-	_flows[par_FlowID].category := par_CategoryID
+	_setFlowProperty(par_FlowID, "category", par_CategoryID)
 	UpdateFlowCategoryName(par_FlowID)
 	SaveFlowMetaData(par_FlowID)
 	
-	if (_share.FindFlows_Called)
+	if (_getShared("FindFlows_Called"))
 	{
-		_share.managerTasks.refillTree:=true
-		_share.managerTasks.select:="Flow:" newFlowid
+		API_manager_TreeView_Refill()
+		API_manager_TreeView_Select("Flow", newFlowid)
 	}
-	
-	LeaveCriticalSection(_cs_flows)
 }
 
 UpdateFlowCategoryName(par_FlowID)
 {
-	EnterCriticalSection(_cs_flows)
-	_flows[par_FlowID].categoryName := _share.allCategories[_flows[par_FlowID].category].name
-	LeaveCriticalSection(_cs_flows)
+	categoryID := _getFlowProperty(par_FlowID, "category")
+	categoryName := _getCategoryProperty(par_FlowID, "name")
+
+	_setFlowProperty(par_FlowID, "categoryName",categoryName)
 }
 
 
@@ -307,50 +298,47 @@ DeleteFlow(par_ID)
 	global
 	;TODO: Close editor and stop flow execution
 	
-	EnterCriticalSection(_cs_flows)
 	
-	FileDelete,% _flows[par_ID].file
+	FileDelete,% _getFlowProperty(par_ID, "file")
 	
-	parentcategory:=_flows[par_ID].category
+	;parentcategory:=_flows[par_ID].category
 	
-	_flows.delete(par_ID)
+	_deleteFlow(par_ID)
 	
 	;Refresh treeview
-	if (_share.FindFlows_Called)
+	if (_getShared("FindFlows_Called"))
 	{
-		_share.managerTasks.refillTree:=true
-		_share.managerTasks.select:="Category:" parentcategory ":expand"
+		API_manager_TreeView_Refill()
+		API_manager_TreeView_Select("Flow", newFlowid)
 	}
 	
-	LeaveCriticalSection(_cs_flows)
 }
 
 DuplicateFlow(par_ID)
 {
 	global
 	local newFlowid
-	
-	EnterCriticalSection(_cs_flows)
+
 	
 	;Create the flow in the global variable
 	;~ d(NewName " - " tempcategoryid " - " Categoryname)
 	Loop
 	{
 		random,randomValue
-		newFlowid := lang("New flow") " " randomValue
-		if (not _flows.haskey(newFlowid))
+		newFlowid := lang("Flow") " " randomValue
+		if (not  _existsFlow(newFlowid))
 			break
 	}
 	
 	;copy and change some metadata
-	_flows[newFlowid] := objfullyclone(_flows[par_ID])
-	_flows[newFlowid].id := newFlowid
-	_flows[newFlowid].name .= " " lang("copy")
-	_flows[newFlowid].enabled := false
-	_flows[newFlowid].demo := false ;If user copies a demo flow, the copy is not a demo flow anymore and user can edit it
+	newFlow := _getFlow(par_ID)
+	newFlow.id := newFlowid
+	newFlow.name .= " " lang("copy")
+	newFlow.enabled := false
+	newFlow.demo := false ;If user copies a demo flow, the copy is not a demo flow anymore and user can edit it
 	
 	;Do not allow two flows to have the same name. If a loaded flow has a name that an other flow already has, the flow will be renamed
-	tempflowName:=_flows[newFlowid].name
+	tempflowName:=newFlow.name
 	Loop
 	{
 		if (FlowIDbyName(tempflowName, "flow"))
@@ -365,48 +353,49 @@ DuplicateFlow(par_ID)
 		else
 			break
 	}
-	_flows[newFlowid].name:=tempflowName
+	newFlow.name:=tempflowName
 	
 	;Create a new file
-	_flows[newFlowid].folder := _WorkingDir "\Saved Flows"
-	_flows[newFlowid].filename := newFlowid
-	_flows[newFlowid].file := _WorkingDir "\Saved Flows\" newFlowid ".ini"
-	filecopy,% _flows[par_ID].file, % _flows[newFlowid].file
+	oldFile:=newFlow.file
+	newFlow.folder := _WorkingDir "\Saved Flows"
+	newFlow.filename := newFlowid
+	newFlow.file := _WorkingDir "\Saved Flows\" newFlowid ".ini"
+
+	_setFlow(newFlowid, newFlow)
+
+	filecopy,% oldFile, % newFlow.file
 	
 	SaveFlowMetaData(newFlowid)
 
 	;Add TV entry
-	if (_share.FindFlows_Called)
+	if (_getShared("FindFlows_Called"))
 	{
-		_share.managerTasks.refillTree:=true
-		_share.managerTasks.select:="Flow:" newFlowid
+		API_manager_TreeView_Refill()
+		API_manager_TreeView_Select("Flow", newFlowid)
 	}
 
-	LeaveCriticalSection(_cs_flows)
 }
 
 DeleteCategory(par_ID)
 {
 	global
 	
-	EnterCriticalSection(_cs_flows)
 	
-	_share.allCategories.delete(par_ID)
+	_deleteCategory(par_ID)
 	
 	;Upadte TV entries
-	if (_share.FindFlows_Called)
+	if (_getShared("FindFlows_Called"))
 	{
-		_share.managerTasks.refillTree:=true
-		_share.managerTasks.select:="Flow:" newFlowid
+		API_manager_TreeView_Refill()
+		API_manager_TreeView_Select("Flow", newFlowid)
 	}
 	
-	LeaveCriticalSection(_cs_flows)
 }
 
 
 FlowIDbyName(par_name,Type="") ;Returns the id by name
 {
-	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_shared) ; TODO, Move access to _flows to "Shared Variables.ahk"
 	
 	if ((type = "flow") or (type = ""))
 	{
@@ -434,7 +423,7 @@ FlowIDbyName(par_name,Type="") ;Returns the id by name
 		}
 	}
 	
-	LeaveCriticalSection(_cs_flows)
+	LeaveCriticalSection(_cs_shared)
 	
 	return retval
 }

@@ -8,7 +8,7 @@ state_New(p_FlowID, stateID="", params="")
 {
 	global global_statesCounter
 	
-	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_shared)
 	EnterCriticalSection(_cs_execution)
 	
 	UpdateConnectionLists(p_FlowID)
@@ -39,7 +39,7 @@ state_New(p_FlowID, stateID="", params="")
 		_flows[p_FlowID].currentState:=newState.ID
 	
 	LeaveCriticalSection(_cs_execution)
-	LeaveCriticalSection(_cs_flows)
+	LeaveCriticalSection(_cs_shared)
 }
 
 state_Undo(p_FlowID)
@@ -47,7 +47,7 @@ state_Undo(p_FlowID)
 	found:=false
 	restored:=false
 	
-	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_shared)
 	EnterCriticalSection(_cs_execution)
 
 	;~ MsgBox undo state %p_FlowID%  
@@ -122,12 +122,12 @@ state_Undo(p_FlowID)
 	}
 	
 	LeaveCriticalSection(_cs_execution)
-	LeaveCriticalSection(_cs_flows)
+	LeaveCriticalSection(_cs_shared)
 }
 
 state_Redo(p_FlowID)
 {
-	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_shared)
 	EnterCriticalSection(_cs_execution)
 	
 	found:=false
@@ -151,13 +151,13 @@ state_Redo(p_FlowID)
 	}
 	
 	LeaveCriticalSection(_cs_execution)
-	LeaveCriticalSection(_cs_flows)
+	LeaveCriticalSection(_cs_shared)
 }
 
 
 states_Update(p_FlowID, p_StateID)
 {
-	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_shared)
 	EnterCriticalSection(_cs_execution)
 	
 	;Find out whether there are changes in trigger parameters. If so, the trigger must be disabled and reenabled again
@@ -179,12 +179,12 @@ states_Update(p_FlowID, p_StateID)
 	}
 	
 	LeaveCriticalSection(_cs_execution)
-	LeaveCriticalSection(_cs_flows)
+	LeaveCriticalSection(_cs_shared)
 }
 
 states_Restore(p_FlowID, p_StateID)
 {
-	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_shared)
 	EnterCriticalSection(_cs_execution)
 	
 	;Find out whether there are changes in trigger parameters. If so, the trigger must be disabled and reenabled again
@@ -230,23 +230,23 @@ states_Restore(p_FlowID, p_StateID)
 	}
 	
 	LeaveCriticalSection(_cs_execution)
-	LeaveCriticalSection(_cs_flows)
+	LeaveCriticalSection(_cs_shared)
 	
 }
 state_RestoreCurrent(p_FlowID)
 {
-	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_shared)
 	EnterCriticalSection(_cs_execution)
 	
 	states_Restore(p_FlowID, _flows[p_FlowID].currentstate)
 	
 	LeaveCriticalSection(_cs_execution)
-	LeaveCriticalSection(_cs_flows)
+	LeaveCriticalSection(_cs_shared)
 }
 
 states_DeleteNewerThanCurrent(p_FlowID)
 {
-	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_shared)
 	EnterCriticalSection(_cs_execution)
 	
 	currentnumber:=substr(_flows[p_FlowID].currentState,StrLen("state")+1)
@@ -265,12 +265,12 @@ states_DeleteNewerThanCurrent(p_FlowID)
 	}
 	
 	LeaveCriticalSection(_cs_execution)
-	LeaveCriticalSection(_cs_flows)
+	LeaveCriticalSection(_cs_shared)
 }
 
 states_DeleteTooOld(p_FlowID)
 {
-	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_shared)
 	EnterCriticalSection(_cs_execution)
 	
 	if (_flows[p_FlowID].states.count() > MAX_COUNT_OF_STATES)
@@ -287,13 +287,13 @@ states_DeleteTooOld(p_FlowID)
 	}
 	
 	LeaveCriticalSection(_cs_execution)
-	LeaveCriticalSection(_cs_flows)
+	LeaveCriticalSection(_cs_shared)
 }
 
 
 findTriggersWhichHaveBeenChanged(p_FlowID, p_StateID)
 {
-	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_shared)
 	EnterCriticalSection(_cs_execution)
 	
 	;Find out whether there are changes in trigger parameters.
@@ -321,7 +321,7 @@ findTriggersWhichHaveBeenChanged(p_FlowID, p_StateID)
 	}
 	
 	LeaveCriticalSection(_cs_execution)
-	LeaveCriticalSection(_cs_flows)
+	LeaveCriticalSection(_cs_shared)
 	
 	return changedTriggers
 }

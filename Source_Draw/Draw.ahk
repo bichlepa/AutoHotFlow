@@ -37,6 +37,7 @@ lang_setLanguage(_settings.UILanguage)
 
 #include Source_Draw\GDIp\gdip.ahk
 #include source_Common\Multithreading\API Caller to Main.ahk
+#include Source_Common\Multithreading\Shared Variables.ahk
 
 #include Source_Common\Debug\Debug.ahk
 #include source_Common\Debug\Logger.ahk
@@ -66,7 +67,7 @@ drawTask()
 	
 	Loop
 	{
-		EnterCriticalSection(_cs_flows)
+		EnterCriticalSection(_cs_shared)
 		
 		somethingdrawn:= false
 		flowParamsCloned:=""
@@ -81,7 +82,7 @@ drawTask()
 			}
 		}
 		
-		LeaveCriticalSection(_cs_flows)
+		LeaveCriticalSection(_cs_shared)
 		
 		if flowParamsCloned
 		{

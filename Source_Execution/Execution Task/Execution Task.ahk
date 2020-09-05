@@ -9,7 +9,7 @@ executionTask()
 	
 	Loop
 	{
-		EnterCriticalSection(_cs_flows)
+		EnterCriticalSection(_cs_shared)
 		EnterCriticalSection(_cs_execution)
 		somethingexecuted:=false
 		ExecutionNextTasks:=Object()
@@ -151,7 +151,7 @@ executionTask()
 		}
 		
 		LeaveCriticalSection(_cs_execution)
-		LeaveCriticalSection(_cs_flows)
+		LeaveCriticalSection(_cs_shared)
 
 		;Actually execute the elements which are queued for execution
 		for oneExecutionTaskIndex, oneExecutionTask in ExecutionNextTasks
@@ -169,7 +169,7 @@ executionTask()
 finishExecutionOfElement(Environment, Result, Message = "")
 {
 	global
-	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_shared)
 	EnterCriticalSection(_cs_execution)
 
 	Environment.State:="finished"
@@ -197,6 +197,6 @@ finishExecutionOfElement(Environment, Result, Message = "")
 		ThreadVariable_Set(Environment,"a_ErrorMessage",Message)
 	}
 	LeaveCriticalSection(_cs_execution)
-	LeaveCriticalSection(_cs_flows)
+	LeaveCriticalSection(_cs_shared)
 	;~ d(Environment, message)
 }

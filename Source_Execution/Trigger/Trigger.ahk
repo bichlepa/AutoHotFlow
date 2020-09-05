@@ -3,7 +3,7 @@ EnabledTriggerIDCounter:=0
 enableFlow(par_FlowID)
 {
 	global
-	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_shared)
 	EnterCriticalSection(_cs_execution)
 
 	local oneTriggerID, oneTrigger
@@ -15,12 +15,12 @@ enableFlow(par_FlowID)
 	SaveFlowMetaData(par_FlowID)
 
 	LeaveCriticalSection(_cs_execution)
-	LeaveCriticalSection(_cs_flows)
+	LeaveCriticalSection(_cs_shared)
 }
 enableToggleFlow(par_FlowID)
 {
 	global
-	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_shared)
 	EnterCriticalSection(_cs_execution)
 	
 	if (_flows[par_FlowID].enabled != true)
@@ -32,7 +32,7 @@ enableToggleFlow(par_FlowID)
 		disableFlow(par_FlowID)
 	}
 	LeaveCriticalSection(_cs_execution)
-	LeaveCriticalSection(_cs_flows)
+	LeaveCriticalSection(_cs_shared)
 }
 
 disableFlow(par_FlowID)
@@ -44,7 +44,7 @@ disableFlow(par_FlowID)
 enableTriggers(p_Flow)
 {
 	global EnabledTriggerIDCounter
-	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_shared)
 	EnterCriticalSection(_cs_execution)
 	
 	logger("a2", "Going to enable Flow " p_Flow.name)
@@ -60,14 +60,14 @@ enableTriggers(p_Flow)
 	}
 	p_Flow.enabled:=true
 	LeaveCriticalSection(_cs_execution)
-	LeaveCriticalSection(_cs_flows)
+	LeaveCriticalSection(_cs_shared)
 	
 	logger("a1", "Flow " p_Flow.name " enabled")
 }
 
 enableOneTrigger(p_Flow, p_Trigger, p_save=true)
 {
-	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_shared)
 	EnterCriticalSection(_cs_execution)
 
 	logger("a2", "Going to enable trigger " p_Trigger.ID " in flow " p_Flow.name)
@@ -83,13 +83,13 @@ enableOneTrigger(p_Flow, p_Trigger, p_save=true)
 	logger("a1", "Trigger " p_Trigger.ID " in flow " p_Flow.name " enabled")
 	
 	LeaveCriticalSection(_cs_execution)
-	LeaveCriticalSection(_cs_flows)
+	LeaveCriticalSection(_cs_shared)
 }
 
 justEnableOneTrigger(p_Flow, p_Trigger)
 {
 	global EnabledTriggerIDCounter
-	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_shared)
 	EnterCriticalSection(_cs_execution)
 	
 	triggerEnvironment:=criticalObject()
@@ -115,13 +115,13 @@ justEnableOneTrigger(p_Flow, p_Trigger)
 	}
 
 	LeaveCriticalSection(_cs_execution)
-	LeaveCriticalSection(_cs_flows)
+	LeaveCriticalSection(_cs_shared)
 }
 
 disableTriggers(p_Flow)
 {
 	global EnabledTriggerIDCounter
-	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_shared)
 	EnterCriticalSection(_cs_execution)
 	
 	p_Flow.enabled:="Disabling"
@@ -147,11 +147,11 @@ disableTriggers(p_Flow)
 	p_Flow.enabled:=false
 
 	LeaveCriticalSection(_cs_execution)
-	LeaveCriticalSection(_cs_flows)
+	LeaveCriticalSection(_cs_shared)
 }
 disableOneTrigger(p_Flow, p_Trigger, p_save=true)
 {
-	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_shared)
 	EnterCriticalSection(_cs_execution)
 
 	p_Flow.enabled:="Disabling"
@@ -179,12 +179,12 @@ disableOneTrigger(p_Flow, p_Trigger, p_save=true)
 		SaveFlowMetaData(p_Flow.id)
 		
 	LeaveCriticalSection(_cs_execution)
-	LeaveCriticalSection(_cs_flows)
+	LeaveCriticalSection(_cs_shared)
 }
 
 justDisableOneTrigger(p_Flow, p_Trigger, p_EnabledTrigger)
 {
-	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_shared)
 	EnterCriticalSection(_cs_execution)
 
 	tempElementClass:=p_Trigger.Class
@@ -204,7 +204,7 @@ justDisableOneTrigger(p_Flow, p_Trigger, p_EnabledTrigger)
 	;~ d(_execution)
 	
 	LeaveCriticalSection(_cs_execution)
-	LeaveCriticalSection(_cs_flows)
+	LeaveCriticalSection(_cs_shared)
 }
 
 saveResultOfTriggerEnabling(Environment, Result, Message)

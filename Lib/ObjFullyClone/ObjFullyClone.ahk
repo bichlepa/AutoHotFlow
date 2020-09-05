@@ -4,10 +4,15 @@
 ;Thanks to fincs
 ObjFullyClone(obj)
 {
-	nobj := obj.Clone()
-	for k,v in nobj
-		if IsObject(v)
-			nobj[k] := A_ThisFunc.(v)
+	if IsObject(obj)
+	{
+		nobj := obj.Clone()
+		for k,v in nobj
+			if IsObject(v)
+				nobj[k] := A_ThisFunc.(v)
+	}
+	else
+		nobj := obj
 	return nobj
 }
 

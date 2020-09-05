@@ -5,7 +5,7 @@ global global_ThreadIDCOunter:=0
 */
 newInstance(p_Environment)
 {
-	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_shared)
 	EnterCriticalSection(_cs_execution)
 
 	if (_flows[p_Environment.FlowID].flowSettings.ExecutionPolicy="skip" or _flows[p_Environment.FlowID].flowSettings.ExecutionPolicy="stop")
@@ -78,7 +78,7 @@ newInstance(p_Environment)
 		updateFlowExcutingStates()
 	}
 	LeaveCriticalSection(_cs_execution)
-	LeaveCriticalSection(_cs_flows)
+	LeaveCriticalSection(_cs_shared)
 	return newInstance
 }
 
@@ -89,7 +89,7 @@ startFlow(p_Flow, p_Trigger ="", p_params = "")
 {
 	static
 
-	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_shared)
 	EnterCriticalSection(_cs_execution)
 
 	;If not trigger assigned, trigger the default manual trigger (if any)
@@ -115,7 +115,7 @@ startFlow(p_Flow, p_Trigger ="", p_params = "")
 	}
 	
 	LeaveCriticalSection(_cs_execution)
-	LeaveCriticalSection(_cs_flows)
+	LeaveCriticalSection(_cs_shared)
 	
 	if not p_Trigger
 	{
@@ -134,7 +134,7 @@ startFlow(p_Flow, p_Trigger ="", p_params = "")
 
 stopFlow(p_Flow)
 {
-	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_shared)
 	EnterCriticalSection(_cs_execution)
 
 	instancesToDelete:=Object()
@@ -147,12 +147,12 @@ stopFlow(p_Flow)
 		}
 	}
 	LeaveCriticalSection(_cs_execution)
-	LeaveCriticalSection(_cs_flows)
+	LeaveCriticalSection(_cs_shared)
 }
 
 stopInstance(p_instance)
 {
-	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_shared)
 	EnterCriticalSection(_cs_execution)
 
 	for OneThreadID, OneThread in p_instance.threads
@@ -194,13 +194,13 @@ stopInstance(p_instance)
 	updateFlowExcutingStates()
 	
 	LeaveCriticalSection(_cs_execution)
-	LeaveCriticalSection(_cs_flows)
+	LeaveCriticalSection(_cs_shared)
 }
 
 
 executeToggleFlow(p_Flow)
 {
-	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_shared)
 	EnterCriticalSection(_cs_execution)
 
 	if (p_Flow.executing)
@@ -213,7 +213,7 @@ executeToggleFlow(p_Flow)
 	}
 	
 	LeaveCriticalSection(_cs_execution)
-	LeaveCriticalSection(_cs_flows)
+	LeaveCriticalSection(_cs_shared)
 }
 
 /* Starts a new execution thread inside the given instance
@@ -221,7 +221,7 @@ if p_ToCloneFromThread is given, the thread will be cloned
 */
 newThread(p_Instance, p_ToCloneFromThread ="")
 {
-	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_shared)
 	EnterCriticalSection(_cs_execution)
 
 	if IsObject(p_ToCloneFromThread)
@@ -258,14 +258,14 @@ newThread(p_Instance, p_ToCloneFromThread ="")
 	p_Instance.threads[newThread.id]:=newThread
 
 	LeaveCriticalSection(_cs_execution)
-	LeaveCriticalSection(_cs_flows)
+	LeaveCriticalSection(_cs_shared)
 	return newThread
 }
 
 removeThread(p_thread)
 {
 	global 
-	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_shared)
 	EnterCriticalSection(_cs_execution)
 
 	_execution.Instances[p_thread.Instanceid].threads.delete(p_thread.id)
@@ -274,14 +274,14 @@ removeThread(p_thread)
 		removeInstance(_execution.Instances[p_thread.Instanceid])
 	}
 	LeaveCriticalSection(_cs_execution)
-	LeaveCriticalSection(_cs_flows)
+	LeaveCriticalSection(_cs_shared)
 }
 
 removeInstance(p_instance)
 {
 	global
 	local tempCallBackfunc
-	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_shared)
 	EnterCriticalSection(_cs_execution)
 	
 	if (p_instance.callback)
@@ -294,12 +294,12 @@ removeInstance(p_instance)
 	updateFlowExcutingStates()
 
 	LeaveCriticalSection(_cs_execution)
-	LeaveCriticalSection(_cs_flows)
+	LeaveCriticalSection(_cs_shared)
 }
 
 updateFlowExcutingStates()
 {
-	EnterCriticalSection(_cs_flows)
+	EnterCriticalSection(_cs_shared)
 	EnterCriticalSection(_cs_execution)
 
 	executingFlows:=Object()
@@ -320,5 +320,5 @@ updateFlowExcutingStates()
 	}
 
 	LeaveCriticalSection(_cs_execution)
-	LeaveCriticalSection(_cs_flows)
+	LeaveCriticalSection(_cs_shared)
 }
