@@ -12,7 +12,7 @@ _flows is an associative array of objects. Each object contains some information
 	.name 			Flow name
 	.allElements	Associative array of Objects. Each object contains following values:
 		.ID				ID of the element. (Which is also the key)
-		.UniqueID		Unique ID of the trigger. (Currently contains the flow ID and the element ID)
+		.UniqueID		Unique ID of the element. (Currently contains the flow ID and the element ID)
 		.name			Element name
 		.type			Element type name
 		.subtype		Element subtype name
@@ -28,12 +28,13 @@ _flows is an associative array of objects. Each object contains some information
 		.ClickPriority	If multiple elements hover each other, this value makes it possible to click through the elements 
 		
 		.state			Execution state of the element
+		.enabled		True if this is a trigger and is enabled
 		.countRuns		Count of Threads which are currently running this element
 		.lastrun		Timestamp of last execution (a_tickcount)
 		
 	.allConnections	Associative array of Objects. Each object contains following values:
 		.ID				ID of the connections. (Which is also the key)
-		.UniqueID		Unique ID of the trigger. (Currently contains the flow ID and the element ID)
+		.UniqueID		Unique ID of the connection. (Currently contains the flow ID and the element ID)
 		.type			Contains string "Connection"
 		.ConnectionType	Connection type
 		.from			Element ID where the connection starts
@@ -44,16 +45,6 @@ _flows is an associative array of objects. Each object contains some information
 		
 		.state			Execution state of the element
 		.lastrun		Timestamp of last execution (a_tickcount)
-	
-	.allTriggers	Associative array of Objects. Each object contains following values:
-		.ID				ID of the trigger. (Which is also the key)
-		.UniqueID		Unique ID of the trigger. (Currently contains the flow ID and the element ID)
-		.class			Trigger class name. Equals to %type%_%subtype%
-		.type			Contains string "Trigger"
-		.par			Associative Array with the parameters of the trigger
-		
-		.state			Execution state of the element
-		.enabled		True if trigger is enabled
 	
 	.markedElements	Contains an array of all element and connection IDs which are marked
 	

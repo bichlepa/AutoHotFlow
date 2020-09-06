@@ -14,7 +14,7 @@ _getShared(path)
 _getAndIncrementShared(path)
 {
 	EnterCriticalSection(_cs_shared)
-    value:=_share[path]++
+    value:=++_share[path]
 	LeaveCriticalSection(_cs_shared)
     return value
 }
@@ -61,6 +61,13 @@ _existsFlow(FlowID)
 	LeaveCriticalSection(_cs_shared)
     return result
 }
+_getAndIncrementFlowProperty(FlowID, path)
+{
+	EnterCriticalSection(_cs_shared)
+    value:=++_flows[FlowID][path]
+	LeaveCriticalSection(_cs_shared)
+    return value
+}
 
 _getCategory(categoryid)
 {
@@ -97,15 +104,97 @@ _setCategoryProperty(FlowID, path, value)
 	LeaveCriticalSection(_cs_shared)
 }
 
+_getElement(FlowID, ElementID)
+{
+	EnterCriticalSection(_cs_shared)
+    element:=ObjFullyClone(_flows[FlowID].allElements[ElementID])
+	LeaveCriticalSection(_cs_shared)
+    return element
+}
+_setElement(FlowID, ElementID, element)
+{
+	EnterCriticalSection(_cs_shared)
+    _flows[FlowID].allElements[ElementID] := ObjFullyClone(element)
+	LeaveCriticalSection(_cs_shared)
+}
+_deleteElement(FlowID, ElementID)
+{
+	EnterCriticalSection(_cs_shared)
+    _flows[FlowID].allElements.delete(ElementID)
+	LeaveCriticalSection(_cs_shared)
+}
+_getElementProperty(FlowID, ElementID, path)
+{
+	EnterCriticalSection(_cs_shared)
+    objectPath:=parseObjectPath(_flows[FlowID].allElements[ElementID], path)
+    value:=ObjFullyClone(objectPath[1][objectPath[2]])
+	LeaveCriticalSection(_cs_shared)
+    return value
+}
+_setElementProperty(FlowID, ElementID, path, value)
+{
+	EnterCriticalSection(_cs_shared)
+    objectPath:=parseObjectPath(_flows[FlowID].allElements[ElementID], path)
+    objectPath[1][objectPath[2]] := ObjFullyClone(value)
+	LeaveCriticalSection(_cs_shared)
+}
+_existsElement(FlowID, ElementID)
+{
+	EnterCriticalSection(_cs_shared)
+    result := _flows[FlowID].allElements.haskey(ElementID)
+	LeaveCriticalSection(_cs_shared)
+    return result
+}
 
+_getConnection(FlowID, ConnectionID)
+{
+	EnterCriticalSection(_cs_shared)
+    Connection:=ObjFullyClone(_flows[FlowID].allConnections[ConnectionID])
+	LeaveCriticalSection(_cs_shared)
+    return Connection
+}
+_setConnection(FlowID, ConnectionID, Connection)
+{
+	EnterCriticalSection(_cs_shared)
+    _flows[FlowID].allConnections[ConnectionID] := ObjFullyClone(Connection)
+	LeaveCriticalSection(_cs_shared)
+}
+_deleteConnection(FlowID, ConnectionID)
+{
+	EnterCriticalSection(_cs_shared)
+    _flows[FlowID].allConnections.delete(ConnectionID)
+	LeaveCriticalSection(_cs_shared)
+}
+_getConnectionProperty(FlowID, ConnectionID, path)
+{
+	EnterCriticalSection(_cs_shared)
+    objectPath:=parseObjectPath(_flows[FlowID].allConnections[ConnectionID], path)
+    value:=ObjFullyClone(objectPath[1][objectPath[2]])
+	LeaveCriticalSection(_cs_shared)
+    return value
+}
+_setConnectionProperty(FlowID, ConnectionID, path, value)
+{
+	EnterCriticalSection(_cs_shared)
+    objectPath:=parseObjectPath(_flows[FlowID].allConnections[ConnectionID], path)
+    objectPath[1][objectPath[2]] := ObjFullyClone(value)
+	LeaveCriticalSection(_cs_shared)
+}
+_existsConnection(FlowID, ConnectionID)
+{
+	EnterCriticalSection(_cs_shared)
+    result := _flows[FlowID].allConnections.haskey(ConnectionID)
+	LeaveCriticalSection(_cs_shared)
+    return result
+}
 
 parseObjectPath(obj, path)
 {
     loop,parse,path,% "."
     {
-        lastPathElement:=A_LoopField
+        lastPathPart:=A_LoopField
         objLast:=obj
         obj:=obj[A_LoopField]
     }
-    return [objLast, lastPathElement]
+    return [objLast, lastPathPart]
 }

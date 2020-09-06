@@ -77,7 +77,11 @@ d_showGlobals(wait=1)
 {
 	static
 	global allFlows
-	text:="Flows:`n"
+	text:=""
+	; text.="Call stack:`n"
+	; text.=CallStack(10)
+	text.="Flows:`n"
+	
 	text.=strobj(_flows) "`n`nSettings:`n"
 	text.=strobj(_settings) "`n`nExecution:`n"
 	text.=strobj(_execution) "`n`nShare:`n"
@@ -85,6 +89,7 @@ d_showGlobals(wait=1)
 	;~ text.=strobj(allFlows)
 	
 	;~ MsgBox % strobj(_flows)
+	Clipboard := text
 	
 	gui,dGlobals:destroy
 	gui,dGlobals:margin,5,5
@@ -151,4 +156,19 @@ d_showAnyVariable()
 		d(%split1%[split2][split3], varname)
 	else if (split0 = 4)
 		d(%split1%[split2][split3][split4], varname)
+}
+
+CallStack(deepness = 5, printLines = 1)
+{
+	loop % deepness
+	{
+		lvl := -1 - deepness + A_Index
+		oEx := Exception("", lvl)
+		oExPrev := Exception("", lvl - 1)
+		FileReadLine, line, % oEx.file, % oEx.line
+		if(oEx.What = lvl)
+			continue
+		stack .= (stack ? "`n" : "") "File '" oEx.file "', Line " oEx.line (oExPrev.What = lvl-1 ? "" : ", in " oExPrev.What) (printLines ? ":`n" line : "") "`n"
+	}
+	return stack
 }

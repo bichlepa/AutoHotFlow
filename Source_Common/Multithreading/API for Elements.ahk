@@ -136,7 +136,7 @@ x_GetMyFlowID(Environment)
 }
 x_GetMyFlowName(Environment)
 {
-	return _flows[Environment.FlowID].name
+	return _getFlowProperty(Environment.FlowID, "name")
 }
 
 x_GetMyElementID(Environment)
