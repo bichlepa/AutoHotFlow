@@ -1,21 +1,21 @@
-﻿var_evaluateScript(env, p_script, func_GetVariable, func_SetVariable)
+﻿var_evaluateScript(environment, p_script, func_GetVariable, func_SetVariable)
 {
 		;~ d(p_script)
 	tokens:=tokenizer(p_script)
 		;~ d(tokens)
 	parsedCode:=class_parser.parse(tokens)
 		;~ d(parsedCode)
-	class_evaluator.evaluate(parsedCode,env,func_GetVariable, func_SetVariable)
+	class_evaluator.evaluate(parsedCode, environment, func_GetVariable, func_SetVariable)
 }
 
 
 
 class class_evaluator
 {
-	evaluate(parsedCode,env,func_GetVariable, func_SetVariable)
+	evaluate(parsedCode, environment, func_GetVariable, func_SetVariable)
 	{
 		this.parsedCode:=parsedCode
-		this.env:=env
+		this.environment:=environment
 		this.func_GetVariable:=func_GetVariable
 		this.func_SetVariable:=func_SetVariable
 		res := this.evalnext(parsedCode)
@@ -39,7 +39,7 @@ class class_evaluator
 			}
 			func_GetVariable:=this.func_GetVariable
 			;~ d(path, func_GetVariable)
-			varValue:=%func_GetVariable%(this.env,path)
+			varValue:=%func_GetVariable%(this.environment,path)
 			;~ d(path, varValue)
 			;~ d(path, func_GetVariable)
 			return varValue
@@ -69,9 +69,9 @@ class class_evaluator
 				}
 				func_GetVariable:=this.func_GetVariable
 				func_setVariable:=this.func_setVariable
-				value:=%func_GetVariable%(this.env,path)
+				value:=%func_GetVariable%(this.environment,path)
 				value:=this.assign(exp.operator, value, this.evalnext(exp.right))
-				return %func_setVariable%(this.env,path, value)
+				return %func_setVariable%(this.environment,path, value)
 				
 			}
 		}

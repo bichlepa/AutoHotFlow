@@ -18,6 +18,19 @@ _getAndIncrementShared(path)
 	LeaveCriticalSection(_cs_shared)
     return value
 }
+_setSettings(path, value)
+{
+	EnterCriticalSection(_cs_shared)
+    _settings[path] := ObjFullyClone(value)
+	LeaveCriticalSection(_cs_shared)
+}
+_getSettings(path)
+{
+	EnterCriticalSection(_cs_shared)
+    value:=ObjFullyClone(_settings[path])
+	LeaveCriticalSection(_cs_shared)
+    return value
+}
 
 
 _getFlow(FlowID)
@@ -54,6 +67,13 @@ _setFlowProperty(FlowID, path, value)
     objectPath[1][objectPath[2]] := ObjFullyClone(value)
 	LeaveCriticalSection(_cs_shared)
 }
+_getAndIncrementFlowProperty(FlowID, path)
+{
+	EnterCriticalSection(_cs_shared)
+    value:=++_flows[FlowID][path]
+	LeaveCriticalSection(_cs_shared)
+    return value
+}
 _existsFlow(FlowID)
 {
 	EnterCriticalSection(_cs_shared)
@@ -61,12 +81,30 @@ _existsFlow(FlowID)
 	LeaveCriticalSection(_cs_shared)
     return result
 }
-_getAndIncrementFlowProperty(FlowID, path)
+_getFlowIdByName(FlowName)
 {
 	EnterCriticalSection(_cs_shared)
-    value:=++_flows[FlowID][path]
+    for forFlowID, forFlow in _Flows
+	{
+		if (forFlow.name = FlowName)
+		{
+			retval:= forFlowID
+            break
+		}
+	}
 	LeaveCriticalSection(_cs_shared)
-    return value
+    return retval
+}
+_getAllFlowIds()
+{
+	EnterCriticalSection(_cs_shared)
+    allFlows:=[]
+    for forFlowID, forFlow in _Flows
+	{
+		allFlows.push(forFlowID)
+	}
+	LeaveCriticalSection(_cs_shared)
+    return allFlows
 }
 
 _getCategory(categoryid)
@@ -102,6 +140,20 @@ _setCategoryProperty(FlowID, path, value)
     objectPath:=parseObjectPath(_share.allCategories[categoryid], path)
     objectPath[1][objectPath[2]] := ObjFullyClone(value)
 	LeaveCriticalSection(_cs_shared)
+}
+_getCategoryIdByName(CategoryName)
+{
+	EnterCriticalSection(_cs_shared)
+    for forCategoryID, forCategory in _share.allCategories
+	{
+		if (forCategory.name = CategoryName)
+		{
+			retval:= forCategoryID
+            break
+		}
+	}
+	LeaveCriticalSection(_cs_shared)
+    return retval
 }
 
 _getElement(FlowID, ElementID)
@@ -144,6 +196,17 @@ _existsElement(FlowID, ElementID)
     result := _flows[FlowID].allElements.haskey(ElementID)
 	LeaveCriticalSection(_cs_shared)
     return result
+}
+_getAllElementIds(FlowID)
+{
+	EnterCriticalSection(_cs_shared)
+    allElementIDs:=[]
+    for forElementID, forElement in _flows[FlowID].allElements
+	{
+		allElementIDs.push(forElementID)
+	}
+	LeaveCriticalSection(_cs_shared)
+    return allElementIDs
 }
 
 _getConnection(FlowID, ConnectionID)

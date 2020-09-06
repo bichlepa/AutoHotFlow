@@ -146,17 +146,7 @@ x_GetMyElementID(Environment)
 
 x_getFlowIDByName(p_FlowName)
 {
-	EnterCriticalSection(_cs_shared)
-	
-	for forFlowID, forFlow in _Flows
-	{
-		if (forFlow.name = p_FlowName)
-		{
-			retval:= forFlowID
-		}
-	}
-	
-	LeaveCriticalSection(_cs_shared)
+	_getFlowIdByName(p_FlowName)
 	return retval
 }
 
@@ -165,7 +155,8 @@ x_getFlowIDByName(p_FlowName)
 
 x_FlowExists(p_FlowID)
 {
-	if (_Flows[p_FlowID].id)
+	
+	if (_existsFlow(p_FlowID))
 		return true
 	else 
 		return false
@@ -174,7 +165,7 @@ x_FlowExists(p_FlowID)
 
 x_isFlowEnabled(p_FlowID)
 {
-	if _flows[p_FlowID].enabled
+	if _getFlowProperty(p_FlowID, "enabled")
 		return true
 	else
 		return False
@@ -184,7 +175,7 @@ x_isFlowEnabled(p_FlowID)
 
 x_isFlowExecuting(p_FlowID)
 {
-	if (_Flows[p_FlowID].executing)
+	if (_getFlowProperty(p_FlowID, "executing"))
 		return true
 	else
 		return False
@@ -218,46 +209,35 @@ x_GetListOfFlowNames()
 	EnterCriticalSection(_cs_shared)
 	
 	;Search for all flowNames
-	choices:=object()
-	for oneFlowID, oneFlow in _flows
+	allFlowIDs := _getAllFlowIds()
+	allFlowNames := []
+	for oneIndex, oneFlowID in allFlowIDs
 	{
-		choices.push(oneFlow.name)
+		allFlowNames.push(_getFlowProperty(oneFlowID, "name"))
 	}
 	
 	LeaveCriticalSection(_cs_shared)
 	
-	return choices
+	return allFlowNames
 }
 
 x_GetListOfFlowIDs()
 {
-	EnterCriticalSection(_cs_shared)
-	
-	;Search for all flowNames
-	choices:=object()
-	for oneFlowID, oneFlow in _flows
-	{
-		choices.push(oneFlowID)
-	}
-	
-	LeaveCriticalSection(_cs_shared)
-	
-	return choices
+	return _getAllFlowIds()
 }
 
 
 x_getAllElementIDsOfType(p_FlowID, p_Type)
 {
-	EnterCriticalSection(_cs_shared)
 	
+	allElementIDs := _getAllElementIds(p_FlowID)
+
 	elements:=Object()
-	for oneElementID, oneElement in _flows[p_FlowID].allElements
+	for oneElementIndex, oneElementID in allElementIDs
 	{
-		if (oneElement.class = p_Class)
+		if (_getElementProperty(p_FlowID, oneElementID, "type") = p_Type)
 			elements.push(oneElementID)
 	}
-	
-	LeaveCriticalSection(_cs_shared)
 	
 	return elements
 }
@@ -266,10 +246,12 @@ x_getAllElementIDsOfClass(p_FlowID, p_Class)
 {
 	EnterCriticalSection(_cs_shared)
 	
+	allElementIDs := _getAllElementIds(p_FlowID)
+
 	elements:=Object()
-	for oneElementID, oneElement in _flows[p_FlowID].allElements
+	for oneElementIndex, oneElementID in allElementIDs
 	{
-		if (oneElement.class = p_Class)
+		if (_getElementProperty(p_FlowID, oneElementID, "class") = p_Class)
 			elements.push(oneElementID)
 	}
 	
@@ -280,26 +262,20 @@ x_getAllElementIDsOfClass(p_FlowID, p_Class)
 
 x_getElementPars(p_FlowID, p_ElementID)
 {
-	EnterCriticalSection(_cs_shared)
-	retval:=objfullyClone(_flows[p_FlowID].allElements[p_ElementID].pars)
-	LeaveCriticalSection(_cs_shared)
-	return retval
+	return _getElementProperty(p_FlowID, p_ElementID, "pars")
 }
 x_getElementName(p_FlowID, p_ElementID)
 {
-	return _flows[p_FlowID].allElements[p_ElementID].name
+	return _getElementProperty(p_FlowID, p_ElementID, "name")
 }
 x_getElementClass(p_FlowID, p_ElementID)
 {
-	return _flows[p_FlowID].allElements[p_ElementID].class
+	return _getElementProperty(p_FlowID, p_ElementID, "class")
 }
 
 x_getMyElementPars(Environment)
 {
-	EnterCriticalSection(_cs_shared)
-	retval:=objfullyClone(_flows[Environment.flowID].allElements[Environment.FlowID].pars)
-	LeaveCriticalSection(_cs_shared)
-	return retval
+	return _getElementProperty(Environment.flowID, Environment.elementID, "pars")
 }
 
 ;Manual trigger
@@ -307,13 +283,14 @@ x_ManualTriggerExist(p_FlowID, p_TriggerName = "")
 {
 	EnterCriticalSection(_cs_shared)
 	
-	result:=false
-	for forelementID, forelement in _flows[p_FlowID].allElements
+	allElementIDs := _getAllElementIds(p_FlowID)
+	result := false
+	for forelementIndex, forelementID in allElementIDs
 	{
 		;~ d(forelement, p_TriggerName)
 		if (p_TriggerName = "")
 		{
-			if (forElement.class = "trigger_manual" and forElement.defaultTrigger = True)
+			if (_getElementProperty(p_FlowID, forelementID, "class") = "trigger_manual" and _getElementProperty(p_FlowID, forelementID, "defaultTrigger") = True)
 			{
 				;~ d(forElement)
 				result :=true
@@ -322,7 +299,7 @@ x_ManualTriggerExist(p_FlowID, p_TriggerName = "")
 		}
 		else
 		{
-			if (forelement.class = "trigger_Manual" and forElement.pars.id = p_TriggerName)
+			if (_getElementProperty(p_FlowID, forelementID, "class") = "trigger_Manual" and _getElementProperty(p_FlowID, forelementID, "pars.id") = p_TriggerName)
 			{
 				;~ d(forElement)
 				result :=true
@@ -339,25 +316,26 @@ x_isManualTriggerEnabled(p_FlowID, p_TriggerName="")
 {
 	EnterCriticalSection(_cs_shared)
 	
+	allElementIDs := _getAllElementIds(p_FlowID)
 	result:=false
-	for forelementID, forelement in _flows[p_FlowID].allElements
+	for forelementIndex, forelementID in allElementIDs
 	{
 		;~ d(forelement, p_TriggerName)
 		if (p_TriggerName = "")
 		{
-			if (forElement.class = "trigger_manual" and forElement.defaultTrigger = True)
+			if (_getElementProperty(p_FlowID, forelementID, "class") = "trigger_manual" and _getElementProperty(p_FlowID, forelementID, "defaultTrigger") = True)
 			{
 				;~ d(forElement)
-				result:=forElement.enabled
+				result:=_getElementProperty(p_FlowID, forelementID, "enabled")
 				break
 			}
 		}
 		else
 		{
-			if (forelement.class = "trigger_Manual" and forElement.pars.id = p_TriggerName)
+			if (_getElementProperty(p_FlowID, forelementID, "class") = "trigger_Manual" and _getElementProperty(p_FlowID, forelementID, "pars.id") = p_TriggerName)
 			{
 				;~ d(forElement)
-				result:=forElement.enabled
+				result:=_getElementProperty(p_FlowID, forelementID, "enabled")
 				break
 			}
 		}
@@ -371,23 +349,25 @@ x_isManualTriggerEnabled(p_FlowID, p_TriggerName="")
 x_ManualTriggerEnable(p_FlowID, p_TriggerName="")
 {
 	EnterCriticalSection(_cs_shared)
-	for forelementID, forelement in _flows[p_FlowID].allElements
+
+	allElementIDs := _getAllElementIds(p_FlowID)
+	for forelementIndex, forelementID in allElementIDs
 	{
 		;~ d(forelement, p_TriggerName)
 		if (p_TriggerName = "")
 		{
-			if (forElement.class = "trigger_manual" and forElement.defaultTrigger = True)
+			if (_getElementProperty(p_FlowID, forelementID, "class") = "trigger_manual" and _getElementProperty(p_FlowID, forelementID, "defaultTrigger") = True)
 			{
 				;~ d(forElement)
-				enableOneTrigger(forFlow.id, forelement.id)
+				enableOneTrigger(p_FlowID, forelementID)
 			}
 		}
 		else
 		{
-			if (forelement.class = "trigger_Manual" and forElement.pars.id = p_TriggerName)
+			if (_getElementProperty(p_FlowID, forelementID, "class") = "trigger_Manual" and _getElementProperty(p_FlowID, forelementID, "pars.id") = p_TriggerName)
 			{
 				;~ d(forElement)
-				enableOneTrigger(forFlow.id, forelement.id)
+				enableOneTrigger(p_FlowID, forelementID)
 			}
 		}
 	}
@@ -398,23 +378,25 @@ x_ManualTriggerEnable(p_FlowID, p_TriggerName="")
 x_ManualTriggerDisable(p_FlowID, p_TriggerName="")
 {
 	EnterCriticalSection(_cs_shared)
-	for forelementID, forelement in _flows[p_FlowID].allElements
+	
+	allElementIDs := _getAllElementIds(p_FlowID)
+	for forelementIndex, forelementID in allElementIDs
 	{
 		;~ d(forelement, p_TriggerName)
 		if (p_TriggerName = "")
 		{
-			if (forElement.class = "trigger_manual" and forElement.defaultTrigger = True)
+			if (_getElementProperty(p_FlowID, forelementID, "class") = "trigger_manual" and _getElementProperty(p_FlowID, forelementID, "defaultTrigger") = True)
 			{
 				;~ d(forElement)
-				disableOneTrigger(forFlow.id, forelement.id)
+				disableOneTrigger(p_FlowID, forelementID)
 			}
 		}
 		else
 		{
-			if (forelement.class = "trigger_Manual" and forElement.pars.id = p_TriggerName)
+			if (_getElementProperty(p_FlowID, forelementID, "class") = "trigger_Manual" and _getElementProperty(p_FlowID, forelementID, "pars.id") = p_TriggerName)
 			{
 				;~ d(forElement)
-				disableOneTrigger(forFlow.id, forelement.id)
+				disableOneTrigger(p_FlowID, forelementID)
 			}
 		}
 	}
@@ -428,7 +410,7 @@ x_ManualTriggerExecute(p_FlowID, p_TriggerName = "", p_Variables ="", p_CallBack
 	params.VarsToPass:=p_Variables
 	params.CallBack:=p_CallBackFunction
 	
-	if x_FlowExists(p_FlowID)
+	if _existsFlow(p_FlowID)
 	{
 		
 		;~ d(_share.temp)
@@ -442,17 +424,15 @@ x_ManualTriggerExecute(p_FlowID, p_TriggerName = "", p_Variables ="", p_CallBack
 		{
 			;~ d(p_FlowName " - " p_TriggerName)
 			EnterCriticalSection(_cs_shared)
+			allElementIDs := _getAllElementIds(p_FlowID)
 			foundElementID:=""
-			for forelementID, forelement in _flows[p_FlowID].allElements
+			for forelementIndex, forelementID in allElementIDs
 			{
 				;~ d(forelement, p_TriggerName)
-				if forelement.class = "trigger_Manual"
+				if (_getElementProperty(p_FlowID, forelementID, "class") = "trigger_Manual" and _getElementProperty(p_FlowID, forelementID, "pars.id") = p_TriggerName)
 				{
-					if (forelement.pars.id = p_TriggerName)
-					{
-						foundElementID:=forelementID
-						break
-					}
+					foundElementID:=forelementID
+					break
 				}
 			}
 			LeaveCriticalSection(_cs_shared)
@@ -463,7 +443,7 @@ x_ManualTriggerExecute(p_FlowID, p_TriggerName = "", p_Variables ="", p_CallBack
 			}
 			else
 			{
-				;todo: log error
+				logger("f0", "Cannot trigger a manual trigger in flow '" _getFlowProperty(p_FlowID, "name") "'. Trigger '" p_TriggerName "' not found")
 			}
 		}
 	}
@@ -507,7 +487,7 @@ x_Par_SetLabel(p_ParameterID, p_Label)
 x_FirstCallOfCheckSettings(Environment)
 {
 	if (instr(_ahkThreadID,"Editor"))
-		return Environment.FirstCallOfCheckSettings
+		return Environment.FirstCallOfCheckSettings ; TODO
 }
 
 ;common functions. Available everywhere
@@ -534,7 +514,7 @@ x_ConvertStringToObjOrObjToString(p_Value)
 
 x_log(Environment, LoggingText, loglevel = 2)
 {
-	logger("f" loglevel, "Element " _flows[Environment.FlowID].allElements[Environment.elementID].name " (" Environment.elementID "): " LoggingText, Environment.flowname)
+	logger("f" loglevel, "Element " _getElementProperty(Environment.FlowID, Environment.elementID, "name") " (" Environment.elementID "): " LoggingText, _getFlowProperty(Environment.FlowID, "name"))
 }
 
 x_GetFullPath(Environment, p_Path)
@@ -549,13 +529,13 @@ x_GetFullPath(Environment, p_Path)
 
 x_GetWorkingDir(Environment)
 {
-	if (_Flows[Environment.FlowID].flowsettings.DefaultWorkingDir)
+	if (_getFlowProperty(Environment.FlowID, "flowsettings.DefaultWorkingDir"))
 	{
-		return _settings.FlowWorkingDir
+		return _getSettings("FlowWorkingDir")
 	}
 	else
 	{
-		return _Flows[Environment.FlowID].flowsettings.workingdir
+		return _getFlowProperty(Environment.FlowID, "flowsettings.workingdir")
 	}
 }
 
@@ -618,5 +598,5 @@ x_GetAhfPath()
 
 x_isWindowsStartup()
 {
-	return _share.WindowStartup
+	return _getShared("WindowsStartup")
 }

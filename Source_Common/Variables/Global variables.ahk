@@ -328,7 +328,7 @@ Var_GetLocation_Common(Environment, p_Name, p_hidden=False)
 		}
 		else
 		{
-			logger("f0","Cannot get location of hidden variable '" p_Name "' outside a running execution.", Environment.flowname)
+			logger("f0","Cannot get location of hidden variable '" p_Name "' outside a running execution.", Environment.flowID)
 		}
 	}
 	;~ d(Environment, "error-  " p_name)
@@ -342,13 +342,13 @@ Var_Set_Common(Environment, p_Name, p_Value, p_Destination="", p_hidden=False, p
 	if (res="empty")
 	{
 		if (p_log=true or p_log="LOG")
-			logger("f0","Setting a variable failed. Its name is empty.", Environment.flowname)
+			logger("f0","Setting a variable failed. Its name is empty.", Environment.flowID)
 		return ;No result
 	}
 	else if (res="ForbiddenCharacter")
 	{
 		if (p_log=true or p_log="LOG")
-			logger("f0","Setting variable '" p_Name "' failed. It contains forbidden characters.", Environment.flowname)
+			logger("f0","Setting variable '" p_Name "' failed. It contains forbidden characters.", Environment.flowID)
 		return ;No result
 	}
 	
@@ -360,7 +360,7 @@ Var_Set_Common(Environment, p_Name, p_Value, p_Destination="", p_hidden=False, p
 	{
 		if (destination!="static" and destination!="global")
 		{
-			logger("f0","Setting variable '" p_Name "' failed. Destination is neither global nor static.", Environment.flowname)
+			logger("f0","Setting variable '" p_Name "' failed. Destination is neither global nor static.", Environment.flowID)
 		}
 		else
 		{
@@ -371,11 +371,11 @@ Var_Set_Common(Environment, p_Name, p_Value, p_Destination="", p_hidden=False, p
 	{
 		if (destination = "error_noPermission")
 		{
-			logger("f0","Setting variable '" p_Name "' failed. No permission.", Environment.flowname)
+			logger("f0","Setting variable '" p_Name "' failed. No permission.", Environment.flowID)
 		}
 		else
 		{
-			logger("f0","Setting variable '" p_Name "' failed. Cannot retrieve destination.", Environment.flowname)
+			logger("f0","Setting variable '" p_Name "' failed. Cannot retrieve destination.", Environment.flowID)
 		}
 	}
 	;~ d(_execution.instances[Environment.InstanceID].InstanceVars,"instance vars set " p_Name)
@@ -387,20 +387,20 @@ Var_Get_Common(environment, p_Name, p_hidden = False)
 	tempvalue=
 	if (p_Name="")
 	{
-		logger("f0","Retrieving variable failed. The name is empty", Environment.flowname)
+		logger("f0","Retrieving variable failed. The name is empty", Environment.flowID)
 	}
 	
 	tempLocation := Var_GetLocation_Common(Environment, p_Name, p_hidden)
 	
 	if (tempLocation)
 	{
-		logger("f3","Retrieving " tempLocation " variable '" p_Name "'", Environment.flowname)
+		logger("f3","Retrieving " tempLocation " variable '" p_Name "'", Environment.flowID)
 		tempVar := %tempLocation%Variable_Get(environment, p_Name, p_hidden)
 		return tempVar
 	}
 	else
 	{
-		logger("f0","Retrieving variable '" p_Name "' failed. It does not exist or is neither global nor static", Environment.flowname)
+		logger("f0","Retrieving variable '" p_Name "' failed. It does not exist or is neither global nor static", Environment.flowID)
 	}
 }
 

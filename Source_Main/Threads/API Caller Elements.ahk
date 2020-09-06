@@ -532,5 +532,5 @@ x_GetAhfPath()
 
 x_isWindowsStartup()
 {
-	return _share.WindowStartup
+	return _share.WindowsStartup
 }

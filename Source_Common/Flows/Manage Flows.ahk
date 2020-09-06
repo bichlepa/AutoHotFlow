@@ -395,35 +395,14 @@ DeleteCategory(par_ID)
 
 FlowIDbyName(par_name,Type="") ;Returns the id by name
 {
-	EnterCriticalSection(_cs_shared) ; TODO, Move access to _flows to "Shared Variables.ahk"
-	
 	if ((type = "flow") or (type = ""))
 	{
-		for count, tempitem in _flows
-		{
-			if (tempitem.name = par_name)
-			{
-				;~ MsgBox % tempitem.id " - " tempitem.name
-				retval:= tempitem.id
-				break
-			}
-			
-		}
+		retval := _getFlowIdByName(par_name)
 	}
-	else if ((type = "category") or (type = ""))
+	if (not retval and (type = "category") or (type = ""))
 	{
-		for count, tempitem in _share.allCategories
-		{
-			if (tempitem.name = par_name)
-			{
-				retval:= tempitem.id
-				break
-			}
-			
-		}
+		retval := _getCategoryIdByName(par_name)
 	}
-	
-	LeaveCriticalSection(_cs_shared)
 	
 	return retval
 }
