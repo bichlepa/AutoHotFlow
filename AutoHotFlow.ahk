@@ -69,61 +69,61 @@ if not (a_iscompiled)
 	;If a new API function is created for the thread execution,
 	;this code automatically adds empty API functions for the other threads
 
-	;Find all element API functions
-	FileRead,apifileExecution,*t %A_WorkingDir%\source_Execution\api\Functions for elements.ahk
+	; ;Find all element API functions
+	; FileRead,apifileExecution,*t %A_WorkingDir%\source_Execution\api\Functions for elements.ahk
 	
-	allFUnctions:=Object()
-	loop, parse, apifileExecution, `n
-	{
-		oneLine:=a_loopfield
-		if (substr(oneLine,1,2) = "x_")
-		{
-			stringgetpos,pos1,oneLine,(
-			StringLeft, funcname, oneLine, % pos1
-			StringTrimLeft, pars, oneline, % pos1
-			allFunctions.push({line: oneLine, Name: funcname, pars: pars})
-		}
-	}
-	FileRead,apifileEditor,*t %A_WorkingDir%\source_Editor\api\api caller elements.ahk
-	FileRead,apifileMain,*t %A_WorkingDir%\source_main\threads\api caller elements.ahk
+	; allFUnctions:=Object()
+	; loop, parse, apifileExecution, `n
+	; {
+	; 	oneLine:=a_loopfield
+	; 	if (substr(oneLine,1,2) = "x_")
+	; 	{
+	; 		stringgetpos,pos1,oneLine,(
+	; 		StringLeft, funcname, oneLine, % pos1
+	; 		StringTrimLeft, pars, oneline, % pos1
+	; 		allFunctions.push({line: oneLine, Name: funcname, pars: pars})
+	; 	}
+	; }
+	; FileRead,apifileEditor,*t %A_WorkingDir%\source_Editor\api\api caller elements.ahk
+	; FileRead,apifileMain,*t %A_WorkingDir%\source_main\threads\api caller elements.ahk
 	
-	for oneIndex, oneFuncion in allFunctions
-	{
-		loop 2
-		{
-			if a_index = 1
-				apiFile:=apifileEditor
-			else if a_index=2
-				apiFile:=apifileMain
+	; for oneIndex, oneFuncion in allFunctions
+	; {
+	; 	loop 2
+	; 	{
+	; 		if a_index = 1
+	; 			apiFile:=apifileEditor
+	; 		else if a_index=2
+	; 			apiFile:=apifileMain
 			
-			StringGetPos, posfunc, apifile, % oneFuncion.name
-			if (posfunc = -1)
-			{
-				apifile.="`n`n" oneFuncion.name oneFuncion.pars "`n{`n}`n"
-			}
-			else
-			{
-				StringGetPos, posfuncend,apifile,`n,,%posfunc%
-				function:=substr(apifile, posfunc +1, posfuncend-posfunc)
-				stringgetpos, pospars, function, (
-				stringleft,funcname, function, %pospars%
-				StringTrimLeft,funcpars , function,%pospars%
+	; 		StringGetPos, posfunc, apifile, % oneFuncion.name
+	; 		if (posfunc = -1)
+	; 		{
+	; 			apifile.="`n`n" oneFuncion.name oneFuncion.pars "`n{`n}`n"
+	; 		}
+	; 		else
+	; 		{
+	; 			StringGetPos, posfuncend,apifile,`n,,%posfunc%
+	; 			function:=substr(apifile, posfunc +1, posfuncend-posfunc)
+	; 			stringgetpos, pospars, function, (
+	; 			stringleft,funcname, function, %pospars%
+	; 			StringTrimLeft,funcpars , function,%pospars%
 				
-				StringReplace, apifile, apifile,% function,% oneFuncion.name oneFuncion.pars
-			}
+	; 			StringReplace, apifile, apifile,% function,% oneFuncion.name oneFuncion.pars
+	; 		}
 			
-			if a_index = 1
-				apifileEditor:=apiFile
-			else if a_index=2
-				apifileMain:=apiFile
-		}
-	}
+	; 		if a_index = 1
+	; 			apifileEditor:=apiFile
+	; 		else if a_index=2
+	; 			apifileMain:=apiFile
+	; 	}
+	; }
 	
-	;~ MsgBox %apifileEditor%
-	Filedelete, %A_WorkingDir%\source_Editor\api\API Caller Elements.ahk
-	Filedelete, %A_WorkingDir%\source_main\threads\API Caller Elements.ahk
-	FileAppend,%apifileEditor%, %A_WorkingDir%\source_Editor\api\API Caller Elements.ahk, utf-8
-	FileAppend,%apifileMain%, %A_WorkingDir%\source_main\threads\API Caller Elements.ahk, utf-8
+	; ;~ MsgBox %apifileEditor%
+	; Filedelete, %A_WorkingDir%\source_Editor\api\API Caller Elements.ahk
+	; Filedelete, %A_WorkingDir%\source_main\threads\API Caller Elements.ahk
+	; FileAppend,%apifileEditor%, %A_WorkingDir%\source_Editor\api\API Caller Elements.ahk, utf-8
+	; FileAppend,%apifileMain%, %A_WorkingDir%\source_main\threads\API Caller Elements.ahk, utf-8
 	
 }
 

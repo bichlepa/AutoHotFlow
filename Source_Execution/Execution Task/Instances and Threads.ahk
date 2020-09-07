@@ -85,7 +85,7 @@ newInstance(p_Environment)
 /**
 Start all manual triggers
 */
-startFlow(p_Flow, p_Trigger ="", p_params = "")
+startFlow(p_FlowID, p_TriggerID ="", p_params = "")
 {
 	static
 
@@ -93,23 +93,24 @@ startFlow(p_Flow, p_Trigger ="", p_params = "")
 	EnterCriticalSection(_cs_execution)
 
 	;If not trigger assigned, trigger the default manual trigger (if any)
-	if (p_Trigger="")
+	if (p_TriggerID="")
 	{
-		for oneElementID, oneElement in p_Flow.allElements
+		allElementIDs := _getAllElementIds(p_FlowID)
+		for forelementIndex, forelementID in allElementIDs
 		{
-			if (oneElement.class = "trigger_manual" and oneElement.defaultTrigger = True)
+			if (_getElementProperty(p_FlowID, forelementID, "class") = "trigger_Manual" and _getElementProperty(p_FlowID, forelementID, "defaultTrigger") = True)
 			{
-				p_Trigger := oneElement
+				p_TriggerID := forelementID
 			}
 			
 		}
 	}
-	if (p_Trigger)
+	if (p_TriggerID)
 	{
 		environment:=Object()
-		environment.flowID:=p_Flow.id
-		environment.FlowName:=p_Flow.Name
-		environment.elementID:=p_Trigger.id
+		environment.flowID:=p_FlowID
+		environment.FlowName:=_getFlowProperty(p_FlowID, "Name") ; todo: löschen
+		environment.elementID:=p_TriggerID
 		environment.params:=p_params
 		newInstance(environment)
 	}
@@ -117,10 +118,10 @@ startFlow(p_Flow, p_Trigger ="", p_params = "")
 	LeaveCriticalSection(_cs_execution)
 	LeaveCriticalSection(_cs_shared)
 	
-	if not p_Trigger
+	if not p_TriggerID
 	{
 		gui,hintThatNoManualTriggerAvailable:destroy
-		gui,hintThatNoManualTriggerAvailable:add, text, w200 , % lang("There is no manual trigger available")
+		gui,hintThatNoManualTriggerAvailable:add, text, w200 , % lang("There is no default manual trigger available")
 		gui,hintThatNoManualTriggerAvailable:add, button, default w100 x50 Y+10 h30 ghintThatNoManualTriggerAvailableGuiClose , % lang("OK")
 		gui,hintThatNoManualTriggerAvailable:show,,AutoHotFlow
 	}	
@@ -143,53 +144,55 @@ stopFlow(p_Flow)
 	{
 		if (OneInstance.FlowID == p_Flow.id)
 		{
-			stopInstance(OneInstance)
+			stopInstance(OneInstance.ID)
 		}
 	}
 	LeaveCriticalSection(_cs_execution)
 	LeaveCriticalSection(_cs_shared)
 }
 
-stopInstance(p_instance)
+stopInstance(p_instanceID)
 {
 	EnterCriticalSection(_cs_shared)
 	EnterCriticalSection(_cs_execution)
 
-	for OneThreadID, OneThread in p_instance.threads
+	instance := _getInstance(p_instanceID)
+	for OneThreadID, OneThread in instance.threads
 	{
+		; Werte auch in der lokalen Kopie setzen, weil wir damit weiterarbeiten
 		OneThread.oldstate := OneThread.state
 		OneThread.state := "stopping"
+		_setThreadProperty(p_instanceID, OneThreadID, "oldstate", OneThread.oldstate)
+		_setThreadProperty(p_instanceID, OneThreadID, "state", OneThread.state)
 	}
 	
-	for OneThreadID, OneThread in p_instance.threads
+	for OneThreadID, OneThread in instance.threads
 	{
 		if (OneThread.oldstate = "running" )
 		{
 			oneElement:=_flows[OneThread.flowID].allElements[OneThread.elementID]
-			oneElementClass:=oneElement.class
-			oneElement.countRuns--
-			if (oneElement.countRuns = 0)
-				oneElement.state:="finished"
-			oneElement.lastrun:=a_tickcount
-			
-			
+			oneElementClass:=_getElementProperty(OneThread.FlowID, OneThread.ElementID, "class")
+			oneElementCountRuns := _getAndIncrementElementProperty(OneThread.FlowID, OneThread.ElementID, "countRuns", -1)
+			if (oneElementCountRuns = 0)
+				_setElementProperty(OneThread.FlowID, OneThread.ElementID, "state", "finished")
+			_setElementProperty(OneThread.FlowID, OneThread.ElementID, "lastrun", a_tickcount)
 			
 			global_AllExecutionIDs.delete(OneThread.uniqueID)
 			
 			if Isfunc("Element_stop_" oneElementClass )
-				Element_stop_%oneElementClass%(OneThread, OneThread.elementpars)
+				Element_stop_%oneElementClass%({FlowID: OneThread.FlowID, ElementID: OneThread.ElementID, InstanceID: OneThread.InstanceID, ThreadID: OneThread.ID}, OneThread.elementpars)
 			
-			_flows[OneThread.flowID].draw.mustDraw:=true
+			_setFlowProperty(OneThread.flowID, "draw.mustDraw", true)
 		}
 	}
 	
-	if (p_instance.callback)
+	if (instance.callback)
 	{
-		tempCallBackfunc:=p_instance.callback
-		%tempCallBackfunc%("stopped", p_instance.InstanceVars)
+		tempCallBackfunc := instance.callback
+		%tempCallBackfunc%("stopped", instance.InstanceVars)
 	}
 	
-	_execution.Instances.delete(p_instance.id)
+	_deleteInstance(p_instanceID)
 	
 	updateFlowExcutingStates()
 	
@@ -209,7 +212,7 @@ executeToggleFlow(p_Flow)
 	}
 	else
 	{
-		startFlow(p_Flow)
+		startFlow(p_Flow.ID)
 	}
 	
 	LeaveCriticalSection(_cs_execution)

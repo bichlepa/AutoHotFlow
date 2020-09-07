@@ -106,6 +106,7 @@ global_elementInclusions =
 #include Source_Main\Tray\Tray.ahk
 #include Source_Main\Globals\Global Variables.ahk
 #include Source_Main\Threads\Threads.ahk
+#include Source_Main\Api\API for Elements.ahk
 
 #include Source_Common\Multithreading\API Caller to Manager.ahk
 #include Source_Common\Multithreading\API Caller to Draw.ahk

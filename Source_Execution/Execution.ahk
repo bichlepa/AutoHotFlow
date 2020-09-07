@@ -62,6 +62,7 @@ lang_setLanguage(_settings.UILanguage)
 #include Source_Common\Multithreading\API Caller to Manager.ahk
 #include Source_Common\Multithreading\API Caller to Draw.ahk
 #include Source_Common\Multithreading\API Caller to Editor.ahk
+#include Source_Common\Multithreading\API for Elements.ahk
 #include Source_Common\Multithreading\Shared Variables.ahk
 
 ;PlaceholderIncludesOfElements
@@ -87,7 +88,7 @@ queryTasks()
 			
 			if (name = "startFlow")
 			{
-				startFlow(_flows[oneTask.FlowID], _flows[oneTask.FlowID].allElements[oneTask.TriggerID], oneTask.params)
+				startFlow(oneTask.FlowID, _flows[oneTask.FlowID].allElements[oneTask.TriggerID], oneTask.params)
 			}
 			else if (name = "enableTriggers")
 			{

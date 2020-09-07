@@ -1,3 +1,8 @@
+;This module contains the access function for all shared data between the ahk-Threads
+;There are a few other functions which can access the shared data, too:
+;x_TriggerInNewAHKThread
+;x_ExecuteInNewAHKThread
+
 _setShared(path, value)
 {
 	EnterCriticalSection(_cs_shared)
@@ -10,6 +15,21 @@ _getShared(path)
     value:=ObjFullyClone(_share[path])
 	LeaveCriticalSection(_cs_shared)
     return value
+}
+_getSharedProperty(path)
+{
+	EnterCriticalSection(_cs_shared)
+    objectPath:=parseObjectPath(_share, path)
+    value:=ObjFullyClone(objectPath[1][objectPath[2]])
+	LeaveCriticalSection(_cs_shared)
+    return value
+}
+_setSharedProperty(path, value)
+{
+	EnterCriticalSection(_cs_shared)
+    objectPath:=parseObjectPath(_share, path)
+    objectPath[1][objectPath[2]] := ObjFullyClone(value)
+	LeaveCriticalSection(_cs_shared)
 }
 _getAndIncrementShared(path)
 {
@@ -190,6 +210,14 @@ _setElementProperty(FlowID, ElementID, path, value)
     objectPath[1][objectPath[2]] := ObjFullyClone(value)
 	LeaveCriticalSection(_cs_shared)
 }
+_getAndIncrementElementProperty(FlowID, ElementID, path, incrementValue = 1)
+{
+	EnterCriticalSection(_cs_shared)
+	_flows[FlowID].allElements[ElementID][path] += incrementValue
+    value :=_flows[FlowID].allElements[ElementID][path]
+	LeaveCriticalSection(_cs_shared)
+    return value
+}
 _existsElement(FlowID, ElementID)
 {
 	EnterCriticalSection(_cs_shared)
@@ -250,6 +278,118 @@ _existsConnection(FlowID, ConnectionID)
 	LeaveCriticalSection(_cs_shared)
     return result
 }
+
+
+_getInstance(InstanceID)
+{
+	EnterCriticalSection(_cs_shared)
+    instance := ObjFullyClone(_execution.instances[InstanceID])
+	LeaveCriticalSection(_cs_shared)
+    return instance
+}
+_setInstance(InstanceID, Instance)
+{
+	EnterCriticalSection(_cs_shared)
+    _execution.instances[InstanceID] := ObjFullyClone(Instance)
+	LeaveCriticalSection(_cs_shared)
+}
+_deleteInstance(InstanceID)
+{
+	EnterCriticalSection(_cs_shared)
+    _execution.instances.delete(InstanceID)
+	LeaveCriticalSection(_cs_shared)
+}
+_getInstanceProperty(InstanceID, path)
+{
+	EnterCriticalSection(_cs_shared)
+    objectPath:=parseObjectPath(_execution.instances[InstanceID], path)
+    value:=ObjFullyClone(objectPath[1][objectPath[2]])
+	LeaveCriticalSection(_cs_shared)
+    return value
+}
+_setInstanceProperty(InstanceID, path, value)
+{
+	EnterCriticalSection(_cs_shared)
+    objectPath:=parseObjectPath(_execution.instances[InstanceID], path)
+    objectPath[1][objectPath[2]] := ObjFullyClone(value)
+	LeaveCriticalSection(_cs_shared)
+}
+_existsInstance(InstanceID)
+{
+	EnterCriticalSection(_cs_shared)
+    result := _execution.instances.haskey(InstanceID)
+	LeaveCriticalSection(_cs_shared)
+    return result
+}
+_getAllInstanceIds()
+{
+	EnterCriticalSection(_cs_shared)
+    allInstanceIDs:=[]
+    for forInstanceID, forInstance in _execution.instances
+	{
+		allInstanceIDs.push(forInstanceID)
+	}
+	LeaveCriticalSection(_cs_shared)
+    return allInstanceIDs
+}
+
+
+_getThread(InstanceID, ThreadID)
+{
+	EnterCriticalSection(_cs_shared)
+    Thread := ObjFullyClone(_execution.instances[InstanceID].threads[ThreadID])
+	LeaveCriticalSection(_cs_shared)
+    return Thread
+}
+_setThread(InstanceID, ThreadID, Thread)
+{
+	EnterCriticalSection(_cs_shared)
+    _execution.instances[InstanceID].threads[ThreadID] := ObjFullyClone(Thread)
+	LeaveCriticalSection(_cs_shared)
+}
+_deleteThread(InstanceID, ThreadID)
+{
+	EnterCriticalSection(_cs_shared)
+    _execution.instances[InstanceID].threads.delete(ThreadID)
+	LeaveCriticalSection(_cs_shared)
+}
+_getThreadProperty(InstanceID, ThreadID, path)
+{
+	EnterCriticalSection(_cs_shared)
+    objectPath:=parseObjectPath(_execution.instances[InstanceID].threads[ThreadID], path)
+    value:=ObjFullyClone(objectPath[1][objectPath[2]])
+	LeaveCriticalSection(_cs_shared)
+    return value
+}
+_setThreadProperty(InstanceID, ThreadID, path, value)
+{
+	EnterCriticalSection(_cs_shared)
+    objectPath:=parseObjectPath(_execution.instances[InstanceID].threads[ThreadID], path)
+    objectPath[1][objectPath[2]] := ObjFullyClone(value)
+	LeaveCriticalSection(_cs_shared)
+}
+_existsThread(InstanceID, ThreadID)
+{
+	EnterCriticalSection(_cs_shared)
+    result := _execution.instances[InstanceID].threads.haskey(ThreadID)
+	LeaveCriticalSection(_cs_shared)
+    return result
+}
+_getAllThreadIds(InstanceID)
+{
+	EnterCriticalSection(_cs_shared)
+    allThreadIDs:=[]
+    for forThreadID, forThread in _execution.instances[InstanceID].threads
+	{
+		allThreadIDs.push(forThreadID)
+	}
+	LeaveCriticalSection(_cs_shared)
+    return allThreadIDs
+}
+
+
+
+
 
 parseObjectPath(obj, path)
 {

@@ -1,169 +1,184 @@
 ﻿;This file provides functions which can be accessed while executing the elements.
 
-
-x_RegisterElementClass(p_class)
+; only in main
+xx_RegisterElementClass(p_class)
 {
-	if (_ahkThreadID = "main")
-		Element_Register_Element_Class(p_class)
 }
 
 ;Variable API functions:
-x_GetVariable(Environment, p_Varname, p_hidden = False)
+xx_GetVariable(Environment, p_Varname, p_hidden = False)
 {
 	return Var_Get_Common(Environment, Varname, p_hidden )
 }
-x_getVariableType(Environment, p_Varname, p_hidden = False)
+xx_getVariableType(Environment, p_Varname, p_hidden = False)
 {
 	return Var_GetType_Common(Environment, Varname, p_hidden )
 }
-x_SetVariable(Environment, p_Varname, p_Value, p_destination="", p_hidden = False)
+xx_SetVariable(Environment, p_Varname, p_Value, p_destination="", p_hidden = False)
 {
 	return Var_Set_Common(Environment, p_Varname, p_Value,  p_destination, p_hidden)
 }
-x_DeleteVariable(Environment, p_Varname, p_hidden = False)
+xx_DeleteVariable(Environment, p_Varname, p_hidden = False)
 {
 	return Var_Delete_Common(Environment, Varname, p_hidden)
 }
 
-x_GetVariableLocation(Environment, p_Varname, p_hidden = False)
+xx_GetVariableLocation(Environment, p_Varname, p_hidden = False)
 {
 	return Var_GetLocation_Common(Environment, Varname, p_hidden)
 }
 
-x_replaceVariables(Environment, p_String, p_pars ="")
+xx_replaceVariables(Environment, p_String, p_pars ="")
 {
 	return Var_replaceVariables_Common(Environment, String, pars)
 }
-x_EvaluateExpression(Environment, p_String)
+xx_EvaluateExpression(Environment, p_String)
 {
 	return Var_EvaluateExpression(Environment, String, "Var_Get_Common", "Var_Set_Common")
 }
-x_CheckVariableName(p_VarName)
+xx_CheckVariableName(p_VarName)
 {
 	return Var_CheckName(VarName)
 }
 
-x_AutoEvaluateParameters(Environment, ElementParameters, p_skipList = "")
+; only in execution
+xx_AutoEvaluateParameters(Environment, ElementParameters, p_skipList = "")
 {
-	return
 }
-x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, p_ParametersToEvaluate)
+xx_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, p_ParametersToEvaluate)
 {
-	return
 }
-x_EvalOneParameter(EvaluatedParameters, Environment, ElementParameters, oneParID, onePar = "")
+xx_EvalOneParameter(EvaluatedParameters, Environment, ElementParameters, oneParID, onePar = "")
 {
-	return
 }
 
-x_GetListOfAllVars(Environment)
+
+xx_GetListOfAllVars(Environment)
 {
 	return Var_GetListOfAllVars_Common(Environment)
 }
-x_GetListOfLoopVars(Environment)
+
+
+; only in execution
+xx_GetListOfLoopVars(Environment)
 {
 }
-x_GetListOfThreadVars(Environment)
+xx_GetListOfThreadVars(Environment)
 {
 }
-x_GetListOfInstanceVars(Environment)
+xx_GetListOfInstanceVars(Environment)
 {
 }
-x_GetListOfStaticVars(Environment)
+
+
+xx_GetListOfStaticVars(Environment)
 {
 	return Var_GetListOfStaticVars(Environment)
 }
-x_GetListOfGlobalVars(Environment)
+xx_GetListOfGlobalVars(Environment)
 {
 	return Var_GetListOfGlobalVars(Environment)
 }
-x_ExportAllInstanceVars(Environment)
+
+
+; only in execution
+xx_ExportAllInstanceVars(Environment)
 {
 }
-x_ImportInstanceVars(Environment, p_VarsToImport)
+xx_ImportInstanceVars(Environment, p_VarsToImport)
 {
 }
 
-;Execution (not supported here)
-
-x_finish(Environment, p_Result, p_Message = "")
+; only in execution
+xx_finish(Environment, p_Result, p_Message = "")
 {
 }
-x_getEntryPoint(Environment) ;For loops
+xx_getEntryPoint(Environment) ;For loops
 {
 }
-x_InstanceStop(Environment)
+xx_InstanceStop(Environment)
 {
 }
-x_GetMyUniqueExecutionID(Environment)
+xx_GetMyUniqueExecutionID(Environment)
 {
 }
-x_GetMyEnvironmentFromExecutionID(p_ExecutionID)
+xx_GetMyEnvironmentFromExecutionID(p_ExecutionID)
 {
 }
-x_SetExecutionValue(Environment, p_name, p_Value)
+xx_SetExecutionValue(Environment, p_name, p_Value)
 {
 }
-x_GetExecutionValue(Environment, p_name)
+xx_GetExecutionValue(Environment, p_name)
 {
 }
-x_NewExecutionFunctionObject(Environment, p_ToCallFunction, params*)
+xx_NewExecutionFunctionObject(Environment, p_ToCallFunction, params*)
 {
 }
-x_GetThreadCountInCurrentInstance(Environment)
+xx_GetThreadCountInCurrentInstance(Environment)
 {
 }
-x_ExecuteInNewAHKThread(Environment, p_functionObject, p_Code, p_VarsToImport, p_VarsToExport)
+xx_ExecuteInNewAHKThread(Environment, p_functionObject, p_Code, p_VarsToImport, p_VarsToExport)
 {
 }
-;Trigger functions (not supported here)
-x_trigger(Environment)
+; only in execution
+xx_trigger(Environment)
 {
 }
-x_enabled(Environment, Result, Message = "")
+xx_enabled(Environment, Result, Message = "")
 {
 }
-x_disabled(Environment, Result, Message = "")
+xx_disabled(Environment, Result, Message = "")
 {
 }
 
 
 ;get some information
-
-x_GetMyFlowID(Environment)
+xx_GetMyFlowID(Environment)
 {
 	return Environment.FlowID
 }
-x_GetMyFlowName(Environment)
+xx_GetMyFlowName(Environment)
 {
 	return _getFlowProperty(Environment.FlowID, "name")
 }
 
-x_GetMyElementID(Environment)
+xx_GetMyElementID(Environment)
 {
 	return Environment.elementID
 }
 
-x_getFlowIDByName(p_FlowName)
+xx_getFlowIDByName(p_FlowName)
 {
-	_getFlowIdByName(p_FlowName)
+	return _getFlowIdByName(p_FlowName)
+}
+
+xx_FlowExistsByName(p_FlowName)
+{
+	EnterCriticalSection(_cs_shared)
+	
+	;Search for all flowNames
+	allFlowIDs := _getAllFlowIds()
+	allFlowNames := []
+	retval:=false
+	for oneIndex, oneFlowID in allFlowIDs
+	{
+		if (_getFlowProperty(oneFlowID, "name") == p_FlowName)
+		{
+			retval:= True
+			break
+		}
+	}
+	
+	LeaveCriticalSection(_cs_shared)
 	return retval
 }
 
-
-
-
-x_FlowExists(p_FlowID)
+xx_FlowExists(p_FlowID)
 {
-	
-	if (_existsFlow(p_FlowID))
-		return true
-	else 
-		return false
+	return _existsFlow(p_FlowID)
 }
 
-
-x_isFlowEnabled(p_FlowID)
+xx_isFlowEnabled(p_FlowID)
 {
 	if _getFlowProperty(p_FlowID, "enabled")
 		return true
@@ -171,9 +186,7 @@ x_isFlowEnabled(p_FlowID)
 		return False
 }
 
-
-
-x_isFlowExecuting(p_FlowID)
+xx_isFlowExecuting(p_FlowID)
 {
 	if (_getFlowProperty(p_FlowID, "executing"))
 		return true
@@ -181,30 +194,28 @@ x_isFlowExecuting(p_FlowID)
 		return False
 }
 
-
-x_FlowEnable(p_FlowID)
+xx_FlowEnable(p_FlowID)
 {
-	if x_FlowExists(p_FlowID)
+	if xx_FlowExists(p_FlowID)
 		enableFlow(p_FlowID)
 
 }
 
-
-x_FlowDisable(p_FlowID)
+xx_FlowDisable(p_FlowID)
 {
-	if x_FlowExists(p_FlowID)
+	if xx_FlowExists(p_FlowID)
 		disableFlow(p_FlowID)
 	
 }
 
-x_FlowStop(p_FlowID)
+xx_FlowStop(p_FlowID)
 {
-	if x_FlowExists(p_FlowID)
+	if xx_FlowExists(p_FlowID)
 		stopFlow(p_FlowID)
 }
 
 
-x_GetListOfFlowNames()
+xx_GetListOfFlowNames()
 {
 	EnterCriticalSection(_cs_shared)
 	
@@ -221,15 +232,15 @@ x_GetListOfFlowNames()
 	return allFlowNames
 }
 
-x_GetListOfFlowIDs()
+xx_GetListOfFlowIDs()
 {
 	return _getAllFlowIds()
 }
 
 
-x_getAllElementIDsOfType(p_FlowID, p_Type)
+xx_getAllElementIDsOfType(p_FlowID, p_Type)
 {
-	
+	EnterCriticalSection(_cs_shared)
 	allElementIDs := _getAllElementIds(p_FlowID)
 
 	elements:=Object()
@@ -239,10 +250,11 @@ x_getAllElementIDsOfType(p_FlowID, p_Type)
 			elements.push(oneElementID)
 	}
 	
+	LeaveCriticalSection(_cs_shared)
 	return elements
 }
 
-x_getAllElementIDsOfClass(p_FlowID, p_Class)
+xx_getAllElementIDsOfClass(p_FlowID, p_Class)
 {
 	EnterCriticalSection(_cs_shared)
 	
@@ -260,26 +272,26 @@ x_getAllElementIDsOfClass(p_FlowID, p_Class)
 	return elements
 }
 
-x_getElementPars(p_FlowID, p_ElementID)
+xx_getElementPars(p_FlowID, p_ElementID)
 {
 	return _getElementProperty(p_FlowID, p_ElementID, "pars")
 }
-x_getElementName(p_FlowID, p_ElementID)
+xx_getElementName(p_FlowID, p_ElementID)
 {
 	return _getElementProperty(p_FlowID, p_ElementID, "name")
 }
-x_getElementClass(p_FlowID, p_ElementID)
+xx_getElementClass(p_FlowID, p_ElementID)
 {
 	return _getElementProperty(p_FlowID, p_ElementID, "class")
 }
 
-x_getMyElementPars(Environment)
+xx_getMyElementPars(Environment)
 {
 	return _getElementProperty(Environment.flowID, Environment.elementID, "pars")
 }
 
 ;Manual trigger
-x_ManualTriggerExist(p_FlowID, p_TriggerName = "")
+xx_ManualTriggerExist(p_FlowID, p_TriggerName = "")
 {
 	EnterCriticalSection(_cs_shared)
 	
@@ -312,7 +324,7 @@ x_ManualTriggerExist(p_FlowID, p_TriggerName = "")
 	return result
 }
 
-x_isManualTriggerEnabled(p_FlowID, p_TriggerName="")
+xx_isManualTriggerEnabled(p_FlowID, p_TriggerName="")
 {
 	EnterCriticalSection(_cs_shared)
 	
@@ -346,7 +358,7 @@ x_isManualTriggerEnabled(p_FlowID, p_TriggerName="")
 	return result
 }
 
-x_ManualTriggerEnable(p_FlowID, p_TriggerName="")
+xx_ManualTriggerEnable(p_FlowID, p_TriggerName="")
 {
 	EnterCriticalSection(_cs_shared)
 
@@ -375,7 +387,7 @@ x_ManualTriggerEnable(p_FlowID, p_TriggerName="")
 
 }
 
-x_ManualTriggerDisable(p_FlowID, p_TriggerName="")
+xx_ManualTriggerDisable(p_FlowID, p_TriggerName="")
 {
 	EnterCriticalSection(_cs_shared)
 	
@@ -404,7 +416,7 @@ x_ManualTriggerDisable(p_FlowID, p_TriggerName="")
 	LeaveCriticalSection(_cs_shared)
 }
 
-x_ManualTriggerExecute(p_FlowID, p_TriggerName = "", p_Variables ="", p_CallBackFunction ="")
+xx_ManualTriggerExecute(p_FlowID, p_TriggerName = "", p_Variables ="", p_CallBackFunction ="")
 {
 	params:=Object()
 	params.VarsToPass:=p_Variables
@@ -416,13 +428,13 @@ x_ManualTriggerExecute(p_FlowID, p_TriggerName = "", p_Variables ="", p_CallBack
 		;~ d(_share.temp)
 		if (p_TriggerName = "")
 		{
-			;~ d(p_FlowName)
+			; not trigger name specified. trigger the default trigger
 			executeFlow(p_FlowID, "", params)
 			return
 		}
 		else
 		{
-			;~ d(p_FlowName " - " p_TriggerName)
+			; trigger name specified. Find out the ElementID of the trigger
 			EnterCriticalSection(_cs_shared)
 			allElementIDs := _getAllElementIds(p_FlowID)
 			foundElementID:=""
@@ -439,6 +451,7 @@ x_ManualTriggerExecute(p_FlowID, p_TriggerName = "", p_Variables ="", p_CallBack
 
 			if foundElementID
 			{
+				; Trigger now
 				executeFlow(p_FlowID, foundElementID, params)
 			}
 			else
@@ -452,82 +465,66 @@ x_ManualTriggerExecute(p_FlowID, p_TriggerName = "", p_Variables ="", p_CallBack
 
 
 
-;while editing
+;only in editor
 
-x_Par_Disable(p_ParameterID, p_TrueOrFalse = True)
+xx_Par_Disable(p_ParameterID, p_TrueOrFalse = True)
 {
-	if (instr(_ahkThreadID,"Editor"))
-		return ElementSettings.field.enable(p_ParameterID,not p_TrueOrFalse)
 }
-x_Par_Enable(p_ParameterID, p_TrueOrFalse = True)
+xx_Par_Enable(p_ParameterID, p_TrueOrFalse = True)
 {
-	if (instr(_ahkThreadID,"Editor"))
-		return ElementSettings.field.enable(p_ParameterID,p_TrueOrFalse)
 }
-x_Par_SetValue(p_ParameterID, p_Value)
+xx_Par_SetValue(p_ParameterID, p_Value)
 {
-	if (instr(_ahkThreadID,"Editor"))
-		return ElementSettings.field.setvalue(p_Value,p_ParameterID)
 }
-x_Par_GetValue(p_ParameterID)
+xx_Par_GetValue(p_ParameterID)
 {
-	if (instr(_ahkThreadID,"Editor"))
-		return ElementSettings.field.getvalue(p_ParameterID)
 }
-x_Par_SetChoices(p_ParameterID, p_Choices)
+xx_Par_SetChoices(p_ParameterID, p_Choices)
 {
-	if (instr(_ahkThreadID,"Editor"))
-		return ElementSettings.field.setChoices(p_Choices,p_ParameterID)
 }
-x_Par_SetLabel(p_ParameterID, p_Label)
+xx_Par_SetLabel(p_ParameterID, p_Label)
 {
-	if (instr(_ahkThreadID,"Editor"))
-		return ElementSettings.field.setLabel(p_Label,p_ParameterID)
 }
-x_FirstCallOfCheckSettings(Environment)
+xx_FirstCallOfCheckSettings(Environment)
 {
-	if (instr(_ahkThreadID,"Editor"))
-		return Environment.FirstCallOfCheckSettings ; TODO
 }
 
 ;common functions. Available everywhere
-x_randomPhrase()
+xx_randomPhrase()
 {
 	return randomPhrase()
 }
-x_ConvertObjToString(p_Value)
+xx_ConvertObjToString(p_Value)
 {
 	if IsObject(p_Value)
 		return strobj(p_Value)
 }
-x_ConvertStringToObj(p_Value)
+xx_ConvertStringToObj(p_Value)
 {
 	if not IsObject(p_Value)
 		return strobj(p_Value)
 }
-x_ConvertStringToObjOrObjToString(p_Value)
+xx_ConvertStringToObjOrObjToString(p_Value)
 {
 	return strobj(p_Value)
 }
 
-
-
-x_log(Environment, LoggingText, loglevel = 2)
+xx_log(Environment, LoggingText, loglevel = 2)
 {
 	logger("f" loglevel, "Element " _getElementProperty(Environment.FlowID, Environment.elementID, "name") " (" Environment.elementID "): " LoggingText, _getFlowProperty(Environment.FlowID, "name"))
 }
 
-x_GetFullPath(Environment, p_Path)
+xx_GetFullPath(Environment, p_Path)
 {
 	path:=p_Path
 	if  DllCall("Shlwapi.dll\PathIsRelative","Str",path)
 	{
-		path := x_GetWorkingDir(Environment)
+		path := xx_GetWorkingDir(Environment)
 	}
 	return path
 }
 
-x_GetWorkingDir(Environment)
+xx_GetWorkingDir(Environment)
 {
 	if (_getFlowProperty(Environment.FlowID, "flowsettings.DefaultWorkingDir"))
 	{
@@ -541,62 +538,46 @@ x_GetWorkingDir(Environment)
 
 
 
-x_FlowExistsByName(p_FlowName)
+; only in execution
+xx_EvaluateScript(Environment, p_script)
 {
 }
 
 
-x_EvaluateScript(Environment, p_script)
+xx_TriggerInNewAHKThread(Environment, p_Code, p_VarsToImport, p_VarsToExport)
 {
 }
 
 
-x_TriggerInNewAHKThread(Environment, p_Code, p_VarsToImport, p_VarsToExport)
+xx_TriggerInNewAHKThread_GetExportedValues(Environment)
 {
 }
 
 
-x_TriggerInNewAHKThread_GetExportedValues(Environment)
+xx_TriggerInNewAHKThread_Stop(Environment)
 {
 }
 
-
-x_TriggerInNewAHKThread_Stop(Environment)
+; only in editor
+xx_assistant_windowParameter(neededInfo)
 {
 }
 
-
-x_assistant_windowParameter(neededInfo)
+xx_assistant_MouseTracker(neededInfo)
 {
-	if (instr(_ahkThreadID,"Editor"))
-	{
-		assistant_GetWindowInformation%nothing%(neededInfo)
-	}
 }
 
-x_assistant_MouseTracker(neededInfo)
+xx_assistant_ChooseColor(neededInfo)
 {
-	if (instr(_ahkThreadID,"Editor"))
-	{
-		assistant_MouseTracker%nothing%(neededInfo)
-	}
 }
 
-x_assistant_ChooseColor(neededInfo)
-{
-	if (instr(_ahkThreadID,"Editor"))
-	{
-		assistant_ChooseColor%nothing%(neededInfo)
-	}
-}
-
-
-x_GetAhfPath()
+;common
+xx_GetAhfPath()
 {
 	return GetAhfPath()
 }
 
-x_isWindowsStartup()
+xx_isWindowsStartup()
 {
 	return _getShared("WindowsStartup")
 }

@@ -7,7 +7,7 @@ x_RegisterElementClass(p_class)
 	;Only in main thread
 }
 
-;Variable API functions:
+;Variable API functions: different in execution
 x_GetVariable(Environment, p_Varname, p_hidden = False)
 {
 	return Var_Get(Environment, p_Varname, p_hidden )
@@ -55,7 +55,7 @@ x_AutoEvaluateParameters(Environment, ElementParameters, p_skipList = "")
 	EnterCriticalSection(_cs_shared)
 	EnterCriticalSection(_cs_execution)
 
-	elementClass:=_Flows[Environment.FlowID].allElements[Environment.ElementID].class
+	elementClass:=_getElementProperty(Environment.FlowID, Environment.ElementID, "class")
 	ParametrationDetails := Element_getParametrizationDetails(elementClass, Environment)
 	EvaluatedParameters:=Object()
 	
@@ -111,7 +111,7 @@ x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementPara
 	if not isobject(EvaluatedParameters)
 		EvaluatedParameters:=Object()
 	
-	elementClass:=_Flows[Environment.FlowID].allElements[Environment.ElementID].class
+	elementClass:=_getElementProperty(Environment.FlowID, Environment.ElementID, "class")
 	ParametrationDetails := Element_getParametrizationDetails(elementClass, Environment)
 	
 	for oneParIndex, onePar in ParametrationDetails
@@ -156,7 +156,7 @@ x_EvalOneParameter(EvaluatedParameters, Environment, ElementParameters, oneParID
 	EnterCriticalSection(_cs_execution)
 	if not (onePar)
 	{
-		elementClass:=_Flows[Environment.FlowID].allElements[Environment.ElementID].class
+		elementClass:=_getElementProperty(Environment.FlowID, Environment.ElementID, "class")
 		ParametrationDetails := Element_getParametrizationDetails(elementClass, Environment)
 		for oneParIndex, onePar2 in ParametrationDetails
 		{
@@ -318,20 +318,17 @@ x_GetListOfGlobalVars(Environment)
 
 x_ExportAllInstanceVars(Environment)
 {
-	return objfullyclone(_execution.instances[Environment.InstanceID].InstanceVars)
+	return _getInstanceProperty(Environment.InstanceID, "InstanceVars")
 }
 x_ImportInstanceVars(Environment, p_VarsToImport)
 {
 	for onevarName, oneVar in p_VarsToImport
 	{
-		InstanceVariable_Set(Environment,onevarName,oneVar)
+		InstanceVariable_Set(Environment, onevarName, oneVar)
 	}
 	return Var_GetListOfInstanceVars(Environment)
 }
 
-
-
-;execution
 
 x_finish(Environment, p_Result, p_Message = "")
 {
@@ -340,21 +337,21 @@ x_finish(Environment, p_Result, p_Message = "")
 }
 
 
-x_getEntryPoint(Environment) ;For loops
+x_getEntryPoint(Environment)
 {
-	return Environment.ElementEntryPoint
+	return _getThreadProperty(Environment.InstanceID, Environment.ThreadID, "ElementEntryPoint")
 }
 
 
 x_InstanceStop(Environment)
 {
-	stopInstance(_execution.Instances[Environment.instanceID])
+	stopInstance(Environment.instanceID)
 }
 
 
 x_GetMyUniqueExecutionID(Environment)
 {
-	return Environment.UniqueID
+	return _getThreadProperty(Environment.InstanceID, Environment.ThreadID, "UniqueID")
 }
 
 x_GetMyEnvironmentFromExecutionID(p_ExecutionID)
@@ -366,13 +363,13 @@ x_GetMyEnvironmentFromExecutionID(p_ExecutionID)
 x_SetExecutionValue(Environment, p_name, p_Value)
 {
 	EnterCriticalSection(_cs_execution)
-	Environment.ElementExecutionValues[p_name]:=p_value
+	_setThreadProperty(Environment.InstanceID, Environment.ThreadID, "ElementExecutionValues." p_name, p_value)
 	LeaveCriticalSection(_cs_execution)
 }
 x_GetExecutionValue(Environment, p_name)
 {
 	EnterCriticalSection(_cs_execution)
-	retval:=Environment.ElementExecutionValues[p_name]
+	retval := _getThreadProperty(Environment.InstanceID, Environment.ThreadID, "ElementExecutionValues." p_name)
 	LeaveCriticalSection(_cs_execution)
 	return retval
 }
@@ -381,7 +378,8 @@ x_NewExecutionFunctionObject(Environment, p_ToCallFunction, params*)
 {
 	EnterCriticalSection(_cs_execution)
 	oneFunctionObject:=new Class_FunctionObject(Environment, p_ToCallFunction, params*)
-	global_AllExecutionIDs[Environment.uniqueID].ExecutionFunctionObjects[p_ToCallFunction]:=oneFunctionObject
+	uniqueID := _getThreadProperty(Environment.InstanceID, Environment.ThreadID, "uniqueID")
+	global_AllExecutionIDs[uniqueID].ExecutionFunctionObjects[p_ToCallFunction]:=oneFunctionObject
 	LeaveCriticalSection(_cs_execution)
 	return oneFunctionObject
 }
@@ -430,10 +428,12 @@ class Class_FunctionObject
 x_GetThreadCountInCurrentInstance(Environment)
 {
 	EnterCriticalSection(_cs_execution)
+
+	allThreadIDs := _getAllThreadIds(Environment.InstanceID)
 	count:=0
-	for oneinstanceID, oneInstance in _execution.Instances
+	for oneinstanceIndex, oneInstanceID in allThreadIDs
 	{
-		if (oneInstance.ID = Environment.InstanceID)
+		if (oneInstanceID = Environment.InstanceID)
 		{
 			count++
 		}
@@ -450,33 +450,36 @@ x_ExecuteInNewAHKThread(Environment, p_functionObject, p_Code, p_VarsToImport, p
 	global global_AllExecutionIDs
 
 	EnterCriticalSection(_cs_execution)
+	uniqueID := _getThreadProperty(Environment.InstanceID, Environment.ThreadID, "uniqueID")
 
-	if not isobject(global_AllExecutionIDs[Environment.uniqueID])
-		global_AllExecutionIDs[Environment.uniqueID]:=object()
-	global_AllExecutionIDs[Environment.uniqueID].ExeInNewThread:=object()
-	global_AllExecutionIDs[Environment.uniqueID].ExeInNewThread.functionObject:=p_functionObject
+	if not isobject(global_AllExecutionIDs[uniqueID])
+		global_AllExecutionIDs[uniqueID]:=object()
+	global_AllExecutionIDs[uniqueID].ExeInNewThread:=object()
+	global_AllExecutionIDs[uniqueID].ExeInNewThread.functionObject:=p_functionObject
 	
-	_share.temp[Environment.uniqueID]:= Object()
-	_share.temp[Environment.uniqueID].sharedObject := CriticalObject()
-	_share.temp[Environment.uniqueID].sharedObject.varsToImport:=p_VarsToImport
-	_share.temp[Environment.uniqueID].sharedObject.varsToExport:=p_VarsToExport
-	_share.temp[Environment.uniqueID].sharedObject.varsExported:=Object()
-	;~ d(_share.temp[Environment.uniqueID])
-	;~ d(environment)
-	preCode := "ahf_uniqueID :=""" Environment.uniqueID """`n"
-	preCode .= "ahf_sharedObject := CriticalObject(" (&_share.temp[Environment.uniqueID].sharedObject) ")`n"
+	_share.temp[uniqueID]:= Object()
+	_share.temp[uniqueID].sharedObject := CriticalObject()
+	_share.temp[uniqueID].sharedObject.varsToImport:=p_VarsToImport
+	_share.temp[uniqueID].sharedObject.varsToExport:=p_VarsToExport
+	_share.temp[uniqueID].sharedObject.varsExported:=Object()
+	
+	preCode := "ahf_uniqueID :=""" uniqueID """`n"
+	preCode .= "ahf_cs_shared := " _cs_shared "`n"
+	preCode .= "ahf_sharedObject := CriticalObject(" (&_share.temp[uniqueID].sharedObject) ")`n"
 	preCode .= "onexit, ahf_onexit`n"
 	preCode .= "ahf_parentAHKThread := AhkExported()`n"
+	preCode .= "EnterCriticalSection(ahf_cs_shared)`n"
 	preCode .= "for ahf_varname, ahf_varvalue in ahf_sharedObject.varsToImport`n"
 	preCode .= "{`n"
 	preCode .= "  %ahf_varname%:=ahf_VarValue`n"
-	;~ preCode .= "  msgbox, %ahf_varname% - %ahf_VarValue%`n"
 	preCode .= "}`n"
+	preCode .= "LeaveCriticalSection(ahf_cs_shared)`n"
 
 	postcode := "exitapp`n"
 	postcode .= "ahf_onexit:`n"
+	postcode .= "EnterCriticalSection(ahf_cs_shared)`n"
 	postcode .= "for ahf_varindex, ahf_varname in ahf_sharedObject.varsToExport`n{`n  ahf_sharedObject.varsExported[ahf_varname]:=%ahf_varname%`n}`n"
-	;~ postcode .= "msgbox %ahf_uniqueID%`n"
+	postcode .= "LeaveCriticalSection(ahf_cs_shared)`n"
 	postcode .= "ahf_parentAHKThread.ahkFunction(""API_Execution_externalFlowFinish"", ahf_uniqueID)`n"
 	postcode .= "exitapp"
 	
@@ -493,71 +496,77 @@ ExecuteInNewAHKThread_finishedExecution(p_ExecutionID) ;Not an api function
 	EnterCriticalSection(_cs_execution)
 
 	Environment:=x_GetMyEnvironmentFromExecutionID(p_ExecutionID)
-	functionObject:=global_AllExecutionIDs[Environment.uniqueID].ExeInNewThread.functionObject
-	varsExported:=_share.temp[Environment.uniqueID].sharedObject.varsExported
+	uniqueID := _getThreadProperty(Environment.InstanceID, Environment.ThreadID, "uniqueID")
+	functionObject:=global_AllExecutionIDs[uniqueID].ExeInNewThread.functionObject
+	varsExported:=_share.temp[uniqueID].sharedObject.varsExported
 
 	LeaveCriticalSection(_cs_execution)
 	%functionObject%(varsExported)
 }
+
 ;exeuction of a trigger in other ahk thread
 x_TriggerInNewAHKThread(Environment, p_Code, p_VarsToImport, p_VarsToExport)
 {
 	global _share, global_AllActiveTriggerIDs
 	EnterCriticalSection(_cs_execution)
+	uniqueID := _getThreadProperty(Environment.InstanceID, Environment.ThreadID, "uniqueID")
 
-	if not isobject(global_AllActiveTriggerIDs[Environment.uniqueID])
-		global_AllActiveTriggerIDs[Environment.uniqueID]:=object()
-	global_AllActiveTriggerIDs[Environment.uniqueID].ExeInNewThread:=object()
-	global_AllActiveTriggerIDs[Environment.uniqueID].environment:=Environment
+	if not isobject(global_AllActiveTriggerIDs[uniqueID])
+		global_AllActiveTriggerIDs[uniqueID]:=object()
+	global_AllActiveTriggerIDs[uniqueID].ExeInNewThread:=object()
+	global_AllActiveTriggerIDs[uniqueID].environment:=Environment
 	
-	_share.temp[Environment.uniqueID]:= Object()
-	_share.temp[Environment.uniqueID].sharedObject := CriticalObject()
-	_share.temp[Environment.uniqueID].sharedObject.varsToImport:=p_VarsToImport
-	_share.temp[Environment.uniqueID].sharedObject.varsToExport:=p_VarsToExport
-	_share.temp[Environment.uniqueID].sharedObject.varsExported:=Object()
-	;~ d(_share.temp[Environment.uniqueID])
-	preCode := "ahf_uniqueID :=""" Environment.uniqueID """`n"
-	preCode .= "ahf_sharedObject := CriticalObject(" (&_share.temp[Environment.uniqueID].sharedObject) ")`n"
+	_share.temp[uniqueID]:= Object()
+	_share.temp[uniqueID].sharedObject := CriticalObject()
+	_share.temp[uniqueID].sharedObject.varsToImport:=p_VarsToImport
+	_share.temp[uniqueID].sharedObject.varsToExport:=p_VarsToExport
+	_share.temp[uniqueID].sharedObject.varsExported:=Object()
+	
+	preCode := "ahf_uniqueID :=""" uniqueID """`n"
+	preCode .= "ahf_cs_shared := " _cs_shared "`n"
+	preCode .= "ahf_sharedObject := CriticalObject(" (&_share.temp[uniqueID].sharedObject) ")`n"
 	preCode .= "ahf_parentAHKThread := AhkExported()`n"
+	preCode .= "EnterCriticalSection(ahf_cs_shared)`n"
 	preCode .= "for ahf_varname, ahf_varvalue in ahf_sharedObject.varsToImport`n"
 	preCode .= "{`n"
 	preCode .= "  %ahf_varname%:=ahf_VarValue`n"
-	;~ preCode .= "  msgbox, %ahf_varname% - %ahf_VarValue%`n"
 	preCode .= "}`n"
+	preCode .= "LeaveCriticalSection(ahf_cs_shared)`n"
 	
 
 	postcode := "exitapp`n"
 	postcode .= "x_trigger()`n"
 	postcode .= "{`n"
 	postcode .= "global`n"
+	postcode .= "EnterCriticalSection(ahf_cs_shared)`n"
 	postcode .= "for ahf_varindex, ahf_varname in ahf_sharedObject.varsToExport`n{`n  ahf_sharedObject.varsExported[ahf_varname]:=%ahf_varname%`n}`n"
+	postcode .= "LeaveCriticalSection(ahf_cs_shared)`n"
 	postcode .= "ahf_parentAHKThread.ahkFunction(""API_Execution_externalTrigger"", ahf_uniqueID)`n"
 	postcode .= "}`n"
 		
 	LeaveCriticalSection(_cs_execution)
-	;~ d("`n" preCode "`n" p_Code "`n" postCode)
 	AHKThreadID:=AhkThread("`n" preCode "`n" p_Code "`n" postCode)
 
 	EnterCriticalSection(_cs_execution)
-	global_AllActiveTriggerIDs[Environment.uniqueID].ExeInNewThread.AHKThreadID:=AHKThreadID
+	global_AllActiveTriggerIDs[uniqueID].ExeInNewThread.AHKThreadID:=AHKThreadID
 	LeaveCriticalSection(_cs_execution)
 	
 }
 x_TriggerInNewAHKThread_Stop(Environment)
 {
 	EnterCriticalSection(_cs_execution)
-	AHKThreadID:=global_AllActiveTriggerIDs[Environment.uniqueID].ExeInNewThread.AHKThreadID
+	uniqueID := _getThreadProperty(Environment.InstanceID, Environment.ThreadID, "uniqueID")
+	AHKThreadID:=global_AllActiveTriggerIDs[uniqueID].ExeInNewThread.AHKThreadID
 	LeaveCriticalSection(_cs_execution)
-	ahkthread_release(global_AllActiveTriggerIDs[Environment.uniqueID].ExeInNewThread.AHKThreadID)
+	ahkthread_release(global_AllActiveTriggerIDs[uniqueID].ExeInNewThread.AHKThreadID)
 }
 ExecuteInNewAHKThread_trigger(p_uniqueID) ;Not an api function
 {
 	global _share
 	EnterCriticalSection(_cs_execution)
 	Environment:=global_AllActiveTriggerIDs[p_uniqueID].environment
-	;~ d(Environment, "öiohöio")
-	Environment.varsExportedFromExternalThread:=_share.temp[Environment.uniqueID].sharedObject.varsExported
-	ElementClass:=Environment.ElementClass
+	varsExportedFromExternalThread :=_getSharedProperty("temp." Environment.uniqueID ".sharedObject.varsExported")
+	_setThreadProperty(Environment.InstanceID, Environment.ThreadID, "varsExportedFromExternalThread", varsExportedFromExternalThread)
 
 	LeaveCriticalSection(_cs_execution)
 	x_trigger(Environment)
@@ -565,9 +574,9 @@ ExecuteInNewAHKThread_trigger(p_uniqueID) ;Not an api function
 x_TriggerInNewAHKThread_GetExportedValues(Environment)
 {
 	EnterCriticalSection(_cs_execution)
-	retval:=Environment.varsExportedFromExternalThread
+	retval := _getThreadProperty(Environment.InstanceID, Environment.ThreadID, "varsExportedFromExternalThread")
 	LeaveCriticalSection(_cs_execution)
-	return Environment.varsExportedFromExternalThread
+	return retval
 }
 
 
@@ -595,449 +604,225 @@ x_disabled(Environment, Result, Message = "")
 
 x_GetMyFlowID(Environment)
 {
-	return Environment.FlowID
+	return xx_GetMyFlowID(Environment)
 }
 x_GetMyFlowName(Environment)
 {
-	EnterCriticalSection(_cs_shared)
-	retval:=_flows[Environment.FlowID].name
-	LeaveCriticalSection(_cs_shared)
-	return retval
+	return xx_GetMyFlowName(Environment)
 }
 
 x_GetMyElementID(Environment)
 {
-	return Environment.elementID
+	return xx_GetMyElementID(Environment)
 }
-
 
 x_getFlowIDByName(p_FlowName)
 {
-	EnterCriticalSection(_cs_shared)
-	
-	for forFlowID, forFlow in _Flows
-	{
-		if (forFlow.name = p_FlowName)
-		{
-			retval:= forFlowID
-		}
-	}
-	
-	LeaveCriticalSection(_cs_shared)
-	return retval
+	return xx_getFlowIDByName(p_FlowName)
 }
+
+
 
 x_FlowExistsByName(p_FlowName)
 {
-	EnterCriticalSection(_cs_shared)
-	
-	retval:=false
-	for forFlowID, forFlow in _Flows
-	{
-		if (forFlow.name = p_FlowName)
-		{
-			retval:= True
-		}
-	}
-	
-	LeaveCriticalSection(_cs_shared)
-	return retval
+	return xx_FlowExistsByName(p_FlowName)
 }
 
 x_FlowExists(p_FlowID)
 {
-	if (_Flows[p_FlowID].id)
-		return true
-	else 
-		return false
+	return xx_FlowExists(p_FlowID)
 }
 
 
 x_isFlowEnabled(p_FlowID)
 {
-	if _flows[p_FlowID].enabled
-		return true
-	else
-		return False
+	return xx_isFlowEnabled(p_FlowID)
 }
+
+
 
 x_isFlowExecuting(p_FlowID)
 {
-	if (_Flows[p_FlowID].executing)
-		return true
-	else
-		return False
+	return xx_isFlowExecuting(p_FlowID)
 }
-
 
 
 x_FlowEnable(p_FlowID)
 {
-	if x_FlowExists(p_FlowID)
-		enableFlow(p_FlowID)
+	return xx_FlowEnable(p_FlowID)
+
 }
+
 
 x_FlowDisable(p_FlowID)
 {
-	if x_FlowExists(p_FlowID)
-		disableFlow(p_FlowID)
+	return xx_FlowDisable(p_FlowID)
+	
 }
 
 x_FlowStop(p_FlowID)
 {
-	if x_FlowExists(p_FlowID)
-		stopFlow(p_FlowID)
+	return xx_FlowStop(p_FlowID)
 }
+
 
 x_GetListOfFlowNames()
 {
-	;Search for all flowNames
-	EnterCriticalSection(_cs_shared)
-	
-	choices:=object()
-	for oneFlowID, oneFlow in _flows
-	{
-		choices.push(oneFlow.name)
-	}
-	
-	LeaveCriticalSection(_cs_shared)
-	return choices
+	return xx_GetListOfFlowNames()
 }
 
 x_GetListOfFlowIDs()
 {
-	;Search for all flowNames
-	EnterCriticalSection(_cs_shared)
-	
-	choices:=object()
-	for oneFlowID, oneFlow in _flows
-	{
-		choices.push(oneFlowID)
-	}
-	
-	LeaveCriticalSection(_cs_shared)
-	return choices
+	return xx_GetListOfFlowIDs()
 }
-
-
-
 
 
 x_getAllElementIDsOfType(p_FlowID, p_Type)
 {
-	EnterCriticalSection(_cs_shared)
-	
-	elements:=Object()
-	for oneElementID, oneElement in _flows[p_FlowID].allElements
-	{
-		if (oneElement.type = p_Type)
-			elements.push(oneElementID)
-	}
-	
-	LeaveCriticalSection(_cs_shared)
-	return elements
+	return xx_getAllElementIDsOfType(p_FlowID, p_Type)
 }
 
 x_getAllElementIDsOfClass(p_FlowID, p_Class)
 {
-	EnterCriticalSection(_cs_shared)
-	
-	elements:=Object()
-	for oneElementID, oneElement in _flows[p_FlowID].allElements
-	{
-		if (oneElement.class = p_Class)
-			elements.push(oneElementID)
-	}
-	
-	LeaveCriticalSection(_cs_shared)
-	return elements
+	return xx_getAllElementIDsOfClass(p_FlowID, p_Class)
 }
 
 x_getElementPars(p_FlowID, p_ElementID)
 {
-	EnterCriticalSection(_cs_shared)
-	retval:=objfullyClone(_flows[p_FlowID].allElements[p_ElementID].pars)
-	LeaveCriticalSection(_cs_shared)
-	return retval
+	return xx_getElementPars(p_FlowID, p_ElementID)
 }
 x_getElementName(p_FlowID, p_ElementID)
 {
-	return _flows[p_FlowID].allElements[p_ElementID].name
+	return xx_getElementName(p_FlowID, p_ElementID)
 }
 x_getElementClass(p_FlowID, p_ElementID)
 {
-	return _flows[p_FlowID].allElements[p_ElementID].class
+	return xx_getElementClass(p_FlowID, p_ElementID)
+}
+
+x_getMyElementPars(Environment)
+{
+	return xx_getMyElementPars(Environment)
 }
 
 
-
-;Manual trigger
 x_ManualTriggerExist(p_FlowID, p_TriggerName = "")
 {
-	EnterCriticalSection(_cs_shared)
-	
-	result:=false
-	for forelementID, forelement in _flows[p_FlowID].allElements
-	{
-		;~ d(forelement, p_TriggerName)
-		if (p_TriggerName = "")
-		{
-			if (forElement.class = "trigger_manual" and forElement.defaultTrigger = True)
-			{
-				;~ d(forElement)
-				result :=true
-				break
-			}
-		}
-		else
-		{
-			if (forelement.class = "trigger_Manual" and forElement.pars.id = p_TriggerName)
-			{
-				;~ d(forElement)
-				result :=true
-				break
-			}
-		}
-		
-	}
-	LeaveCriticalSection(_cs_shared)
-	return result
+	return xx_ManualTriggerExist(p_FlowID, p_TriggerName)
 }
 
 x_isManualTriggerEnabled(p_FlowID, p_TriggerName="")
 {
-	EnterCriticalSection(_cs_shared)
-	
-	result:=false
-	for forelementID, forelement in _flows[p_FlowID].allElements
-	{
-		;~ d(forelement, p_TriggerName)
-		if (p_TriggerName = "")
-		{
-			if (forElement.class = "trigger_manual" and forElement.defaultTrigger = True)
-			{
-				;~ d(forElement)
-				result:=forElement.enabled
-				break
-			}
-		}
-		else
-		{
-			if (forelement.class = "trigger_Manual" and forElement.pars.id = p_TriggerName)
-			{
-				;~ d(forElement)
-				result:=forElement.enabled
-				break
-			}
-		}
-		
-	}
-	
-	LeaveCriticalSection(_cs_shared)
-	return result
+	return xx_isManualTriggerEnabled(p_FlowID, p_TriggerName)
 }
 
 x_ManualTriggerEnable(p_FlowID, p_TriggerName="")
 {
-	EnterCriticalSection(_cs_shared)
-	for forelementID, forelement in _flows[p_FlowID].allElements
-	{
-		;~ d(forelement, p_TriggerName)
-		if (p_TriggerName = "")
-		{
-			if (forElement.class = "trigger_manual" and forElement.defaultTrigger = True)
-			{
-				;~ d(forElement)
-				enableOneTrigger(forFlow.id, forelement.id)
-			}
-		}
-		else
-		{
-			if (forelement.class = "trigger_Manual" and forElement.pars.id = p_TriggerName)
-			{
-				;~ d(forElement)
-				enableOneTrigger(forFlow.id, forelement.id)
-			}
-		}
-	}
-	LeaveCriticalSection(_cs_shared)
-
+	return xx_ManualTriggerEnable(p_FlowID, p_TriggerName)
 }
 
 x_ManualTriggerDisable(p_FlowID, p_TriggerName="")
 {
-	EnterCriticalSection(_cs_shared)
-	
-	for forelementID, forelement in _flows[p_FlowID].allElements
-	{
-		;~ d(forelement, p_TriggerName)
-		if (p_TriggerName = "")
-		{
-			if (forElement.class = "trigger_manual" and forElement.defaultTrigger = True)
-			{
-				;~ d(forElement)
-				disableOneTrigger(forFlow.id, forelement.id)
-			}
-		}
-		else
-		{
-			if (forelement.class = "trigger_Manual" and forElement.pars.id = p_TriggerName)
-			{
-				;~ d(forElement)
-				disableOneTrigger(forFlow.id, forelement.id)
-			}
-		}
-	}
-
-	LeaveCriticalSection(_cs_shared)
-
+	return xx_ManualTriggerDisable(p_FlowID, p_TriggerName)
 }
 
 x_ManualTriggerExecute(p_FlowID, p_TriggerName = "", p_Variables ="", p_CallBackFunction ="")
 {
-	params:=Object()
-	params.VarsToPass:=p_Variables
-	params.CallBack:=p_CallBackFunction
-	
-	if x_FlowExists(p_FlowID)
-	{
-		
-		;~ d(_share.temp)
-		if (p_TriggerName = "")
-		{
-			;~ d(p_FlowName)
-			startFlow(_flows[p_FlowID], "", params)
-			return
-		}
-		else
-		{
-			;~ d(p_FlowName " - " p_TriggerName)
-			EnterCriticalSection(_cs_shared)
-			foundElementID:=""
-			for forelementID, forelement in _flows[p_FlowID].allElements
-			{
-				;~ d(forelement, p_TriggerName)
-				if forelement.class = "trigger_Manual"
-				{
-					if (forelement.pars.id = p_TriggerName)
-					{
-						foundElement:=forelement
-						break
-					}
-				}
-			}
-			LeaveCriticalSection(_cs_shared)
-
-			if foundElement
-			{
-				startFlow(_flows[p_FlowID], foundElement, params)
-			}
-			else
-			{
-				;todo: log error
-			}
-		}
-	}
+	return xx_ManualTriggerExecute(p_FlowID, p_TriggerName, p_Variables, p_CallBackFunction)
+}
+executeFlow(p_FlowID, p_TriggerID, p_params)
+{
+	startFlow(p_FlowID, p_TriggerID, p_params)
 }
 
 
-
-
-
-
-;While editing (not supported here)
 
 x_Par_Disable(p_ParameterID, p_TrueOrFalse = True)
 {
+	return xx_Par_Disable(p_ParameterID, p_TrueOrFalse)
 }
 x_Par_Enable(p_ParameterID, p_TrueOrFalse = True)
 {
+	return xx_Par_Enable(p_ParameterID, p_TrueOrFalse)
 }
 x_Par_SetValue(p_ParameterID, p_Value)
 {
+	return xx_Par_SetValue(p_ParameterID, p_Value)
 }
 x_Par_GetValue(p_ParameterID)
 {
+	return xx_Par_GetValue(p_ParameterID)
 }
 x_Par_SetChoices(p_ParameterID, p_Choices)
 {
+	return xx_Par_SetChoices(p_ParameterID, p_Choices)
 }
 x_Par_SetLabel(p_ParameterID, p_Label)
 {
+	return xx_Par_SetLabel(p_ParameterID, p_Label)
 }
 x_FirstCallOfCheckSettings(Environment)
 {
+	return xx_FirstCallOfCheckSettings(Environment)
 }
-
-;assistants
-x_assistant_windowParameter(neededInfo)
-{
-}
-x_assistant_MouseTracker(neededInfo)
-{
-}
-x_assistant_ChooseColor(neededInfo)
-{
-}
-
-;common functions. Available everywhere
 
 x_randomPhrase()
 {
-	return randomPhrase()
+	return xx_randomPhrase()
 }
-
 x_ConvertObjToString(p_Value)
 {
-	if IsObject(p_Value)
-		return strobj(p_Value)
+	return xx_ConvertObjToString(p_Value)
 }
 x_ConvertStringToObj(p_Value)
 {
-	if not IsObject(p_Value)
-		return strobj(p_Value)
+	return xx_ConvertStringToObj(p_Value)
 }
 x_ConvertStringToObjOrObjToString(p_Value)
 {
-	return strobj(p_Value)
+	return xx_ConvertStringToObjOrObjToString(p_Value)
 }
+
 
 
 x_log(Environment, LoggingText, loglevel = 2)
 {
-	logger("f" loglevel, "Element " _flows[Environment.FlowID].allElements[Environment.elementID].name " (" Environment.elementID "): " LoggingText, Environment.flowname)
+	return xx_log(Environment, LoggingText, loglevel)
 }
+
 x_GetFullPath(Environment, p_Path)
 {
-	path:=p_Path
-	if  DllCall("Shlwapi.dll\PathIsRelative","Str",path)
-	{
-		path := x_GetWorkingDir(Environment) "\" path
-	}
-	return path
+	return xx_GetFullPath(Environment, p_Path)
 }
 
 x_GetWorkingDir(Environment)
 {
-	EnterCriticalSection(_cs_shared)
-	if (_Flows[Environment.FlowID].flowsettings.DefaultWorkingDir)
-	{
-		retval:= _settings.FlowWorkingDir
-	}
-	else
-	{
-		retval:= _Flows[Environment.FlowID].flowsettings.workingdir
-	}
-	LeaveCriticalSection(_cs_shared)
-	return retval
+	return xx_GetWorkingDir(Environment)
 }
+
+
+x_assistant_windowParameter(neededInfo)
+{
+	return xx_assistant_windowParameter(neededInfo)
+}
+
+x_assistant_MouseTracker(neededInfo)
+{
+	return xx_assistant_MouseTracker(neededInfo)
+}
+
+x_assistant_ChooseColor(neededInfo)
+{
+	return xx_assistant_ChooseColor(neededInfo)
+}
+
 
 x_GetAhfPath()
 {
-	return GetAhfPath()
+	return xx_GetAhfPath()
 }
 
 x_isWindowsStartup()
 {
-	return _share.WindowsStartup
+	return xx_isWindowsStartup()
 }

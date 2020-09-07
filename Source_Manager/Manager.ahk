@@ -41,6 +41,7 @@ lang_setLanguage(_settings.UILanguage)
 #include Source_Manager\User Interface\Change Category GUI.ahk
 #include Source_Manager\User Interface\Global_Settings.ahk
 #include Source_Manager\User Interface\import and export.ahk
+#include Source_Manager\Api\API for Elements.ahk
 
 #include source_Common\variables\global variables.ahk
 #include source_Common\Debug\Debug.ahk

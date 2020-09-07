@@ -48,6 +48,7 @@ lang_setLanguage(_settings.UILanguage)
 #include Source_Editor\Assistants\Get window information.ahk
 #include Source_Editor\Assistants\Mouse Tracker.ahk
 #include Source_Editor\Assistants\Choose color.ahk
+#include Source_Editor\Api\API for Elements.ahk
 
 #include Source_Common\Flows\Save.ahk
 #include Source_Common\Flows\load.ahk
