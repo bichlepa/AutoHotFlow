@@ -332,7 +332,7 @@ x_ImportInstanceVars(Environment, p_VarsToImport)
 
 x_finish(Environment, p_Result, p_Message = "")
 {
-	finishExecutionOfElement(Environment, p_Result, p_Message)
+	finishExecutionOfElement(Environment.InstanceID, Environment.ThreadID, p_Result, p_Message)
 	
 }
 
@@ -363,13 +363,13 @@ x_GetMyEnvironmentFromExecutionID(p_ExecutionID)
 x_SetExecutionValue(Environment, p_name, p_Value)
 {
 	EnterCriticalSection(_cs_execution)
-	_setThreadProperty(Environment.InstanceID, Environment.ThreadID, "ElementExecutionValues." p_name, p_value)
+	_setThreadProperty(Environment.InstanceID, Environment.ThreadID, "ElementExecutionValues." p_name, p_value, false)
 	LeaveCriticalSection(_cs_execution)
 }
 x_GetExecutionValue(Environment, p_name)
 {
 	EnterCriticalSection(_cs_execution)
-	retval := _getThreadProperty(Environment.InstanceID, Environment.ThreadID, "ElementExecutionValues." p_name)
+	retval := _getThreadProperty(Environment.InstanceID, Environment.ThreadID, "ElementExecutionValues." p_name, false)
 	LeaveCriticalSection(_cs_execution)
 	return retval
 }
@@ -390,7 +390,6 @@ class Class_FunctionObject
 {
     __New(Environment, ToCallFunction, params*) 
 	{
-		;~ d(params, "ih")
         this.Environment := Environment
         this.FunctionObject := ObjBindMethod(this, Call)
 		this.ToCallFunction := ToCallFunction
@@ -565,7 +564,7 @@ ExecuteInNewAHKThread_trigger(p_uniqueID) ;Not an api function
 	global _share
 	EnterCriticalSection(_cs_execution)
 	Environment:=global_AllActiveTriggerIDs[p_uniqueID].environment
-	varsExportedFromExternalThread :=_getSharedProperty("temp." Environment.uniqueID ".sharedObject.varsExported")
+	varsExportedFromExternalThread :=_getSharedProperty("temp." p_uniqueID ".sharedObject.varsExported")
 	_setThreadProperty(Environment.InstanceID, Environment.ThreadID, "varsExportedFromExternalThread", varsExportedFromExternalThread)
 
 	LeaveCriticalSection(_cs_execution)

@@ -2,7 +2,7 @@
 import_and_export_gui()
 {
 	global
-	local oneFlowID, oneFlow, import_and_export_choices, import_and_export_choices_string
+	local oneFlowID, oneFlow
 	IfWinExist, ahk_id %ImportExportHWND%
 	{
 		gui,importexport:show
@@ -23,10 +23,8 @@ import_and_export_gui()
 	gui, add, button,x10 Y+10 w200 h30 gexportFlowsExportNow,% lang("Export now")
 	
 	;Search for all flowNames
-	import_and_export_choices:=object()
 	for oneFlowID, oneFlow in _flows
 	{
-		import_and_export_choices.push(oneFlow.name)
 		guicontrol,,exportFlowsListViewFlowsSelection,% oneFlow.name
 	}
 	

@@ -1,6 +1,6 @@
-﻿global_EditorThreadIDCounter = 1
-global_ExecutionThreadIDCounter = 1
-global_AllThreads := CriticalObject()
+﻿global global_EditorThreadIDCounter = 1
+global global_ExecutionThreadIDCounter = 1
+global global_AllThreads := CriticalObject()
 global global_CommonAhkCodeForAllThreads:=""
 
 loop, files, %_ScriptDir%\source_Elements\*.ahk, FR

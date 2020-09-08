@@ -51,6 +51,19 @@ _getSettings(path)
 	LeaveCriticalSection(_cs_shared)
     return value
 }
+_setTask(path, value)
+{
+	EnterCriticalSection(_cs_shared)
+    _share[path].Tasks.push(value)
+	LeaveCriticalSection(_cs_shared)
+}
+_getTask(path)
+{
+	EnterCriticalSection(_cs_shared)
+    value:=_share[path].Tasks.removeat(1)
+	LeaveCriticalSection(_cs_shared)
+    return value
+}
 
 
 _getFlow(FlowID)
@@ -237,6 +250,17 @@ _getAllElementIds(FlowID)
     return allElementIDs
 }
 
+_getElementFromState(FlowID, ElementID, state = "")
+{
+	EnterCriticalSection(_cs_shared)
+	if not state
+		state := _flows[FlowID].currentState
+
+    element:=ObjFullyClone(_flows[FlowID].states[state].allElements[ElementID])
+	LeaveCriticalSection(_cs_shared)
+    return element
+}
+
 _getConnection(FlowID, ConnectionID)
 {
 	EnterCriticalSection(_cs_shared)
@@ -279,6 +303,16 @@ _existsConnection(FlowID, ConnectionID)
     return result
 }
 
+_getConnectionFromState(FlowID, ConnectionID, state = "")
+{
+	EnterCriticalSection(_cs_shared)
+	if not state
+		state := _flows[FlowID].currentState
+
+    Connection:=ObjFullyClone(_flows[FlowID].states[state].allConnections[ConnectionID])
+	LeaveCriticalSection(_cs_shared)
+    return Connection
+}
 
 _getInstance(InstanceID)
 {
@@ -299,20 +333,53 @@ _deleteInstance(InstanceID)
     _execution.instances.delete(InstanceID)
 	LeaveCriticalSection(_cs_shared)
 }
-_getInstanceProperty(InstanceID, path)
+_getInstanceProperty(InstanceID, path, clone = true)
 {
 	EnterCriticalSection(_cs_shared)
     objectPath:=parseObjectPath(_execution.instances[InstanceID], path)
-    value:=ObjFullyClone(objectPath[1][objectPath[2]])
+	if (clone)
+    	value:=ObjFullyClone(objectPath[1][objectPath[2]])
+	Else
+    	value:=objectPath[1][objectPath[2]]
 	LeaveCriticalSection(_cs_shared)
     return value
 }
-_setInstanceProperty(InstanceID, path, value)
+_setInstanceProperty(InstanceID, path, value, clone = true)
 {
 	EnterCriticalSection(_cs_shared)
     objectPath:=parseObjectPath(_execution.instances[InstanceID], path)
-    objectPath[1][objectPath[2]] := ObjFullyClone(value)
+	if (clone)
+    	objectPath[1][objectPath[2]] := ObjFullyClone(value)
+	Else
+		objectPath[1][objectPath[2]] := value
 	LeaveCriticalSection(_cs_shared)
+}
+_deleteInstanceProperty(InstanceID, path)
+{
+	EnterCriticalSection(_cs_shared)
+    objectPath:=parseObjectPath(_execution.instances[InstanceID], path)
+    objectPath[1].delete(objectPath[2])
+	LeaveCriticalSection(_cs_shared)
+}
+_getInstancePropertyObjectIdList(InstanceID, path)
+{
+	EnterCriticalSection(_cs_shared)
+    objectPath:=parseObjectPath(_execution.instances[InstanceID], path)
+	result:=[]
+	for key, value in objectPath[1][objectPath[2]]
+	{
+		result.push(key)
+	}
+	LeaveCriticalSection(_cs_shared)
+	return result
+}
+_existsInstanceProperty(InstanceID, path)
+{
+	EnterCriticalSection(_cs_shared)
+    objectPath:=parseObjectPath(_execution.instances[InstanceID], path)
+    result := objectPath[1].haskey(objectPath[2])
+	LeaveCriticalSection(_cs_shared)
+    return result
 }
 _existsInstance(InstanceID)
 {
@@ -353,20 +420,53 @@ _deleteThread(InstanceID, ThreadID)
     _execution.instances[InstanceID].threads.delete(ThreadID)
 	LeaveCriticalSection(_cs_shared)
 }
-_getThreadProperty(InstanceID, ThreadID, path)
+_getThreadProperty(InstanceID, ThreadID, path, clone = true)
 {
 	EnterCriticalSection(_cs_shared)
     objectPath:=parseObjectPath(_execution.instances[InstanceID].threads[ThreadID], path)
-    value:=ObjFullyClone(objectPath[1][objectPath[2]])
+	if (clone)
+    	value:=ObjFullyClone(objectPath[1][objectPath[2]])
+	Else
+		value:=objectPath[1][objectPath[2]]
 	LeaveCriticalSection(_cs_shared)
     return value
 }
-_setThreadProperty(InstanceID, ThreadID, path, value)
+_setThreadProperty(InstanceID, ThreadID, path, value, clone = true)
 {
 	EnterCriticalSection(_cs_shared)
     objectPath:=parseObjectPath(_execution.instances[InstanceID].threads[ThreadID], path)
-    objectPath[1][objectPath[2]] := ObjFullyClone(value)
+	if (clone)
+    	objectPath[1][objectPath[2]] := ObjFullyClone(value)
+	Else
+    	objectPath[1][objectPath[2]] := value
 	LeaveCriticalSection(_cs_shared)
+}
+_deleteThreadProperty(InstanceID, ThreadID, path)
+{
+	EnterCriticalSection(_cs_shared)
+    objectPath:=parseObjectPath(_execution.instances[InstanceID].threads[ThreadID], path)
+    objectPath[1].delete(objectPath[2])
+	LeaveCriticalSection(_cs_shared)
+}
+_getThreadPropertyObjectIdList(InstanceID, ThreadID, path)
+{
+	EnterCriticalSection(_cs_shared)
+    objectPath:=parseObjectPath(_execution.instances[InstanceID].threads[ThreadID], path)
+	result:=[]
+	for key, value in objectPath[1][objectPath[2]]
+	{
+		result.push(key)
+	}
+	LeaveCriticalSection(_cs_shared)
+	return result
+}
+_existsThreadProperty(InstanceID, ThreadID, path)
+{
+	EnterCriticalSection(_cs_shared)
+    objectPath:=parseObjectPath(_execution.instances[InstanceID].threads[ThreadID], path)
+    result := objectPath[1].haskey(objectPath[2])
+	LeaveCriticalSection(_cs_shared)
+    return result
 }
 _existsThread(InstanceID, ThreadID)
 {
@@ -388,6 +488,58 @@ _getAllThreadIds(InstanceID)
 }
 
 
+_getTrigger(TriggerID)
+{
+	EnterCriticalSection(_cs_shared)
+    Trigger := ObjFullyClone(_execution.Triggers[TriggerID])
+	LeaveCriticalSection(_cs_shared)
+    return Trigger
+}
+_setTrigger(TriggerID, Trigger)
+{
+	EnterCriticalSection(_cs_shared)
+    _execution.Triggers[TriggerID] := ObjFullyClone(Trigger)
+	LeaveCriticalSection(_cs_shared)
+}
+_deleteTrigger(TriggerID)
+{
+	EnterCriticalSection(_cs_shared)
+    _execution.Triggers.delete(TriggerID)
+	LeaveCriticalSection(_cs_shared)
+}
+_getTriggerProperty(TriggerID, path)
+{
+	EnterCriticalSection(_cs_shared)
+    objectPath:=parseObjectPath(_execution.Triggers[TriggerID], path)
+    value:=ObjFullyClone(objectPath[1][objectPath[2]])
+	LeaveCriticalSection(_cs_shared)
+    return value
+}
+_setTriggerProperty(TriggerID, path, value)
+{
+	EnterCriticalSection(_cs_shared)
+    objectPath:=parseObjectPath(_execution.Triggers[TriggerID], path)
+    objectPath[1][objectPath[2]] := ObjFullyClone(value)
+	LeaveCriticalSection(_cs_shared)
+}
+_existsTrigger(TriggerID)
+{
+	EnterCriticalSection(_cs_shared)
+    result := _execution.Triggers.haskey(TriggerID)
+	LeaveCriticalSection(_cs_shared)
+    return result
+}
+_getAllTriggerIds()
+{
+	EnterCriticalSection(_cs_shared)
+    allTriggerIDs:=[]
+    for forTriggerID, forTrigger in _execution.Triggers
+	{
+		allTriggerIDs.push(forTriggerID)
+	}
+	LeaveCriticalSection(_cs_shared)
+    return allTriggerIDs
+}
 
 
 

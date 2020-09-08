@@ -81,46 +81,46 @@ queryTasks()
 	global
 	Loop
 	{
-		oneTask:=_share.execution.Tasks.removeat(1)
+		oneTask := _getTask("execution")
 		if (oneTask)
 		{
 			name:=oneTask.name
 			
 			if (name = "startFlow")
 			{
-				startFlow(oneTask.FlowID, _flows[oneTask.FlowID].allElements[oneTask.TriggerID], oneTask.params)
+				startFlow(oneTask.FlowID, oneTask.TriggerID, oneTask.params)
 			}
 			else if (name = "enableTriggers")
 			{
-				enableTriggers(_flows[oneTask.FlowID])
+				enableTriggers(oneTask.FlowID)
 			}
 			if (name = "StopFlow")
 			{
-				StopFlow(_flows[oneTask.FlowID])
+				StopFlow(oneTask.FlowID)
 			}
 			if (name = "ExecuteToggleFlow")
 			{
-				ExecuteToggleFlow(_flows[oneTask.FlowID])
+				ExecuteToggleFlow(oneTask.FlowID)
 			}
 			if (name = "DisableTriggers")
 			{
-				DisableTriggers(_flows[oneTask.FlowID])
+				DisableTriggers(oneTask.FlowID)
 			}
 			if (name = "enableOneTrigger")
 			{
-				enableOneTrigger(_flows[oneTask.FlowID], _flows[oneTask.FlowID].allelements[oneTask.TriggerID])
+				enableOneTrigger(oneTask.FlowID, oneTask.TriggerID)
 			}
 			if (name = "disableOneTrigger")
 			{
-				disableOneTrigger(_flows[oneTask.FlowID], _flows[oneTask.FlowID].allelements[oneTask.TriggerID])
+				disableOneTrigger(oneTask.FlowID, oneTask.TriggerID)
 			}
 			if (name = "externalFlowFinish")
 			{
-				ExecuteInNewAHKThread_finishedExecution(_flows[oneTask.UniqueID])
+				ExecuteInNewAHKThread_finishedExecution(oneTask.UniqueID)
 			}
 			if (name = "externalTrigger")
 			{
-				ExecuteInNewAHKThread_trigger(_flows[oneTask.UniqueID])
+				ExecuteInNewAHKThread_trigger(oneTask.UniqueID)
 			}
 			
 			;~ if (isfunc(name))

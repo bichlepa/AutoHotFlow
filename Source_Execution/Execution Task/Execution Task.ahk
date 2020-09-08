@@ -13,14 +13,15 @@ executionTask()
 		EnterCriticalSection(_cs_execution)
 		somethingexecuted:=false
 		ExecutionNextTasks:=Object()
-		
 		;Find out which elements need to be executed. Also manage finished elements and prepare them if needed
-		for OneInstanceID, OneInstance in _execution.Instances
+		instances:=_getAllInstanceIds()
+		for OneInstanceIndex, OneInstanceID in instances
 		{
-			if (_flows[p_Environment.FlowID].flowSettings.ExecutionPolicy = "default")
-				ExecutionPolicy:=_settings.FlowExecutionPolicy
-			else
-				ExecutionPolicy:=_flows[p_Environment.FlowID].flowSettings.ExecutionPolicy
+			OneInstance := _getInstance(OneInstanceID)
+			; d(OneInstance)
+			ExecutionPolicy := _getFlowProperty(OneInstance.FlowID, "ExecutionPolicy")
+			if (ExecutionPolicy = "default")
+				ExecutionPolicy:=_getSettings("FlowExecutionPolicy")
 			
 			if (OneInstance.state="init")
 			{
@@ -40,33 +41,39 @@ executionTask()
 				}
 				
 				;look in which state the thread is and perform an action
-				for OneThreadID, OneThread in OneInstance.threads
+				threads := _getAllThreadIds(OneInstanceID)
+				for OneThreadIndex, OneThreadID in threads
 				{
-					;~ d(OneThread, "Schleifenstart: for OneInstance.threads")
+					OneThread := _getThread(OneInstanceID, OneThreadID)
+					; d(OneThread, "Schleifenstart: for OneInstance.threads")
 					if (OneThread.state="starting") ;The element execution is ready to be started
 					{
 						;Execute the element.
-						oneElement:=_flows[OneThread.flowID].allElements[OneThread.elementID]
-						oneElementClass:=oneElement.class
-						OneThread.ElementPars:=objfullyclone(oneElement.pars)
 						
-						OneThread.state:="running"
-						oneElement.state:="running"
-						oneElement.countRuns++
+						; We take the data from the dataset of the current state. Otherwise it can cause trouble if user is editing the flow while it is executing.
+						currentFinishedElement := _getElementFromState(OneThread.flowID, OneThread.ElementID)
+
+						oneElementClass := currentFinishedElement.class
 						
-						_flows[OneThread.flowID].draw.mustDraw:=true
-						;~ d(oneElement, "ausführen: " oneElement.id)
-						;~ d(OneThread, "ausführen: " oneElement.id)
+						_setThreadProperty(OneInstanceID, OneThreadID, "state", "running")
+						_setThreadProperty(OneInstanceID, OneThreadID, "ElementPars", currentFinishedElement.pars)
+
+						_setElementProperty(OneThread.flowID, OneThread.elementID, "state", "running")
+						_getAndIncrementElementProperty(OneThread.flowID, OneThread.elementID, "countRuns")
 						
-						OneThread.UniqueID:= OneThread.instanceID "_" OneThread.threadID "_" OneThread.elementID "_" A_TickCount
-						OneThread.ElementExecutionValues:=Object()
+						_setFlowProperty(OneThread.flowID, "draw.mustDraw", true)
+						
+						UniqueID := OneThread.instanceID "_" OneThread.threadID "_" OneThread.elementID "_" A_TickCount
+						_setThreadProperty(OneInstanceID, OneThreadID, "UniqueID", UniqueID)
+						_setThreadProperty(OneInstanceID, OneThreadID, "ElementExecutionValues", Object())
+
 						global_AllExecutionIDs[OneThread.UniqueID]:=Object()
-						global_AllExecutionIDs[OneThread.UniqueID].Environment:=OneThread
+						global_AllExecutionIDs[OneThread.UniqueID].Environment:={instanceID: OneInstanceID, threadID: OneThreadID, flowID: OneThread.flowID, elementID: OneThread.elementID}
 						;~ d(global_AllExecutionIDs, OneThread.UniqueID)
 						if Isfunc("Element_run_" oneElementClass )
 						{
 							;Add the element to the queue. It will be executed later
-							ExecutionNextTasks.push({func: "Element_run_" oneElementClass, thread: OneThread})
+							ExecutionNextTasks.push({func: "Element_run_" oneElementClass, Environment: {instanceID: OneInstanceID, threadID: OneThreadID, flowID: OneThread.flowID, elementID: OneThread.elementID}})
 						}
 						else
 							MsgBox Unexpected error! Function for running element does not exist: Element_run_%oneElementClass%
@@ -75,7 +82,7 @@ executionTask()
 					}
 					else if (OneThread.state="running") ;The element execution is currently running
 					{
-						;If the element execution takes longer, this will check whether the element has finished
+						;The element execution takes longer. We will wait
 						
 					}
 					else if (OneThread.state="finished") ;The element execution has finished
@@ -85,13 +92,14 @@ executionTask()
 						;Find connections
 						AnyConnectionFound:=False
 						
-						currentState := _flows[OneThread.flowID].states[_flows[OneThread.flowID].currentState]
-						currentFinishedElement := currentState.allElements[OneThread.ElementID]
-						
+						; We take the data from the dataset of the current state. Otherwise it can cause trouble if user is editing the flow while it is executing.
+						currentFinishedElement := _getElementFromState(OneThread.flowID, OneThread.ElementID)
+						; d(currentFinishedElement, "currentFinishedElement")
 						;~ d(_flows[OneThread.flowID].states[currentState].allElements[OneThread.elementID], "element " OneThread.elementID) 
 						for oneConnectionIndex, oneConnectionID in currentFinishedElement.FromConnections
 						{
-							currentConnection := currentState.allConnections[oneConnectionID]
+							currentConnection := _getConnectionFromState(OneThread.flowID, oneConnectionID)
+							; d(currentConnection, "currentConnection " OneThread.result)
 							;~ d(_flows[OneThread.flowID].allConnections[oneConnectionID], "connection found: " oneConnectionID)
 							if ((currentConnection.ConnectionType = OneThread.result) or (currentFinishedElement.type = "Loop") and currentConnection.fromPart = OneThread.result)
 							{
@@ -102,26 +110,25 @@ executionTask()
 								}
 								
 								
-								NextThread := OneThread
+								NextThreadID := OneThreadID
 								if (AnyConnectionFound=True)
 								{
 									;On other than first connection first clone the thread
-									NextThread := newThread(OneInstance, OneThread)
+									NextThreadID := newThread(OneInstanceID, OneThreadID)
 									;~ d(NextThread, "cloned thread")
 								}
 								;assign the next element to this thread
-								NextThread.ElementID := currentConnection.to
-								NextThread.ElementEntryPoint := currentConnection.toPart
-								currentStartingElement := currentState.allElements[NextThread.ElementID]
+								_setThreadProperty(OneInstanceID, NextThreadID, "ElementID", currentConnection.to)
+								_setThreadProperty(OneInstanceID, NextThreadID, "ElementEntryPoint", currentConnection.toPart)
+								currentStartingElement := _getElementFromState(OneThread.flowID, currentConnection.to)
 								
 								;If entering a loop
-								if (currentStartingElement.type = "loop" and NextThread.ElementEntryPoint = "head")
+								if (currentStartingElement.type = "loop" and _getThreadProperty(OneInstanceID, NextThreadID, "ElementEntryPoint") = "head")
 								{
-									LoopVariable_AddToStack(NextThread)
+									LoopVariable_AddToStack(NextThreadID)
 								}
 								
-								
-								NextThread.state:="starting"
+								_setThreadProperty(OneInstanceID, NextThreadID, "state", "starting")
 								
 								AnyConnectionFound:=True
 							}
@@ -130,10 +137,10 @@ executionTask()
 						{
 							if (OneThread.result = "exception")
 							{
-								MsgBox, 16, % lang("Exception occured") , % lang("%1% '%2%' (ID '%3%') ended with an exception.", lang(_flows[OneThread.flowID].allElements[OneThread.elementID].type), _flows[OneThread.flowID].allElements[OneThread.elementID].name, OneThread.elementID) "`n`n" OneThread.message
+								MsgBox, 16, % lang("Exception occured") , % lang("%1% '%2%' (ID '%3%') ended with an exception.", lang(_getThreadProperty(OneThread.flowID, OneThread.elementID, "type")), _getThreadProperty(OneThread.flowID, OneThread.elementID, "name"), OneThread.elementID) "`n`n" OneThread.message
 							}
-							;~ d(OneThread, "remove thread")
-							removeThread(OneThread)
+							; d(OneThread, "remove thread")
+							removeThread(OneThread.InstanceID, OneThread.ID)
 						}
 						somethingexecuted:=true
 					}
@@ -157,7 +164,7 @@ executionTask()
 		for oneExecutionTaskIndex, oneExecutionTask in ExecutionNextTasks
 		{
 			func:=oneExecutionTask.func
-			%func%(oneExecutionTask.thread, oneExecutionTask.thread.elementpars) ;OneThread is the environment for element execution
+			%func%(oneExecutionTask.Environment, _getThreadProperty(oneExecutionTask.environment.InstanceID, oneExecutionTask.environment.ThreadID, "elementpars"))
 		}				
 
 		if (somethingexecuted=False)
@@ -166,35 +173,38 @@ executionTask()
 	
 }
 
-finishExecutionOfElement(Environment, Result, Message = "")
+finishExecutionOfElement(p_InstanceID, p_ThreadID, p_Result, p_Message = "")
 {
-	global
 	EnterCriticalSection(_cs_shared)
 	EnterCriticalSection(_cs_execution)
 
-	Environment.State:="finished"
-	Environment.result:=Result
-	Environment.message:=Message
+	_setThreadProperty(p_InstanceID, p_ThreadID, "State", "finished")
+	_setThreadProperty(p_InstanceID, p_ThreadID, "result", p_Result)
+	_setThreadProperty(p_InstanceID, p_ThreadID, "message", p_Message)
+	ElementID := _getThreadProperty(p_InstanceID, p_ThreadID, "ElementID")
+	FlowID := _getThreadProperty(p_InstanceID, p_ThreadID, "FlowID")
+	FlowName := _getFlowProperty(FlowID, "Name")
 	
-	if (Environment.message)
-		logger("f2", "Execution of element " Environment.ElementID " finished with result " Environment.result " and message: " Environment.message, Environment.FlowName)
+	if (p_Message)
+		logger("f2", "Execution of element " ElementID " finished with result " p_Result " and message: " p_Message, FlowName)
 	else
-		logger("f2", "Execution of element " Environment.ElementID " finished with result " Environment.result, Environment.FlowName)
+		logger("f2", "Execution of element " ElementID " finished with result " p_Result, FlowName)
 	
-	_flows[Environment.FlowID].allElements[Environment.ElementID].countRuns--
-	if (_flows[Environment.FlowID].allElements[Environment.ElementID].countRuns = 0)
-		_flows[Environment.FlowID].allElements[Environment.ElementID].state:="finished"
-	_flows[Environment.FlowID].allElements[Environment.ElementID].lastrun:=a_tickcount
-	_flows[Environment.FlowID].draw.mustDraw:=true
+	countRuns := _getAndIncrementElementProperty(FlowID, ElementID, "countRuns", -1)
+	if (countRuns = 0)
+		_setElementProperty(FlowID, ElementID, "state", "finished")
+	_setElementProperty(FlowID, ElementID, "lastrun", a_tickcount)
+	_setFlowProperty(FlowID, "draw.mustDraw", true)
 	
 	;~ d(global_AllExecutionIDs, Environment.uniqueID)
-	global_AllExecutionIDs.delete(Environment.uniqueID)
-	Environment.UniqueID:=""
-	Environment.ElementExecutionValues:=""
+	uniqueID := _getThreadProperty(p_InstanceID, p_ThreadID, "uniqueID")
+	global_AllExecutionIDs.delete(uniqueID)
+	_setThreadProperty(p_InstanceID, p_ThreadID, "uniqueID", "")
+	_setThreadProperty(p_InstanceID, p_ThreadID, "ElementExecutionValues", "")
 	
 	if (result = "Exception")
 	{
-		ThreadVariable_Set(Environment,"a_ErrorMessage",Message)
+		ThreadVariable_Set({instanceID: p_InstanceID, threadID: p_ThreadID, flowID: FlowID, elementID: ElementID}, "a_ErrorMessage", p_Message)
 	}
 	LeaveCriticalSection(_cs_execution)
 	LeaveCriticalSection(_cs_shared)

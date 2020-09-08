@@ -4,27 +4,27 @@ LoopVariable_Set(Environment,p_Name,p_Value, p_hidden=False)
 {
 	EnterCriticalSection(_cs_execution)
 	if (p_hidden)
-		Environment.loopvarsHidden[p_Name]:=p_Value
+		_setThreadProperty(Environment.InstanceID, Environment.ThreadID, "loopvarsHidden." p_Name, p_Value)
 	else
-		Environment.loopvars[p_Name]:=p_Value
+		_setThreadProperty(Environment.InstanceID, Environment.ThreadID, "loopvars." p_Name, p_Value)
 	LeaveCriticalSection(_cs_execution)
 }
 ThreadVariable_Set(Environment,p_Name,p_Value,p_hidden=False)
 {
 	EnterCriticalSection(_cs_execution)
 	if (p_hidden)
-		Environment.threadvarsHidden[p_Name]:=p_Value
+		_setThreadProperty(Environment.InstanceID, Environment.ThreadID, "threadvarsHidden." p_Name, p_Value)
 	else
-		Environment.threadvars[p_Name]:=p_Value
+		_setThreadProperty(Environment.InstanceID, Environment.ThreadID, "threadvars." p_Name, p_Value)
 	LeaveCriticalSection(_cs_execution)
 }
 InstanceVariable_Set(Environment,p_Name,p_Value,p_hidden=False)
 {
 	EnterCriticalSection(_cs_execution)
 	if (p_hidden)
-		_execution.instances[Environment.InstanceID].InstanceVarsHidden[p_Name]:=p_Value
+		_setInstanceProperty(Environment.InstanceID, "InstanceVarsHidden." p_Name, p_Value)
 	else
-		_execution.instances[Environment.InstanceID].InstanceVars[p_Name]:=p_Value
+		_setInstanceProperty(Environment.InstanceID, "InstanceVars." p_Name, p_Value)
 	LeaveCriticalSection(_cs_execution)
 	
 }
@@ -36,18 +36,18 @@ LoopVariable_Get(Environment,p_Name, p_hidden=False)
 {
 	EnterCriticalSection(_cs_execution)
 	if (p_hidden)
-		return Environment.loopvarsHidden[p_Name]
+		return _getThreadProperty(Environment.InstanceID, Environment.ThreadID, "loopvarsHidden." p_Name)
 	else
-		return Environment.loopvars[p_Name]
+		return _getThreadProperty(Environment.InstanceID, Environment.ThreadID, "loopvars." p_Name)
 	LeaveCriticalSection(_cs_execution)
 }
 ThreadVariable_Get(Environment,p_Name, p_hidden=False)
 {
 	EnterCriticalSection(_cs_execution)
 	if (p_hidden)
-		return Environment.threadvarsHidden[p_Name]
+		return  _getThreadProperty(Environment.InstanceID, Environment.ThreadID, "threadvarsHidden." p_Name)
 	else
-		return Environment.threadvars[p_Name]
+		return _getThreadProperty(Environment.InstanceID, Environment.ThreadID, "threadvars." p_Name)
 	LeaveCriticalSection(_cs_execution)
 	
 }
@@ -55,9 +55,9 @@ InstanceVariable_Get(Environment,p_Name, p_hidden=False)
 {
 	EnterCriticalSection(_cs_execution)
 	if (p_hidden)
-		return _execution.instances[Environment.InstanceID].InstanceVarsHidden[p_Name]
+		return _getInstanceProperty(Environment.InstanceID, "InstanceVarsHidden." p_Name)
 	else
-		return _execution.instances[Environment.InstanceID].InstanceVars[p_Name]
+		return _getInstanceProperty(Environment.InstanceID, "InstanceVars." p_Name)
 	LeaveCriticalSection(_cs_execution)
 }
 
@@ -66,18 +66,18 @@ LoopVariable_Delete(Environment,p_Name, p_hidden=False)
 {
 	EnterCriticalSection(_cs_execution)
 	if (p_hidden)
-		Environment.loopvarsHidden.delete(p_Name)
+		_deleteThreadProperty(Environment.InstanceID, Environment.ThreadID, "loopvarsHidden." p_Name)
 	else
-		Environment.loopvars.delete(p_Name)
+		_deleteThreadProperty(Environment.InstanceID, Environment.ThreadID, "loopvars." p_Name)
 	LeaveCriticalSection(_cs_execution)
 }
 ThreadVariable_Delete(Environment,p_Name, p_hidden=False)
 {
 	EnterCriticalSection(_cs_execution)
 	if (p_hidden)
-		Environment.threadvarsHidden.delete(p_Name)
+		_deleteThreadProperty(Environment.InstanceID, Environment.ThreadID, "threadvarsHidden." p_Name)
 	else
-		Environment.threadvars.delete(p_Name)
+		_deleteThreadProperty(Environment.InstanceID, Environment.ThreadID, "threadvars." p_Name)
 	LeaveCriticalSection(_cs_execution)
 	
 }
@@ -85,9 +85,9 @@ InstanceVariable_Delete(Environment,p_Name, p_hidden=False)
 {
 	EnterCriticalSection(_cs_execution)
 	if (p_hidden)
-		_execution.instances[Environment.InstanceID].InstanceVarsHidden.delete(p_Name)
+		_deleteInstanceProperty(Environment.InstanceID, "InstanceVarsHidden." p_Name)
 	else
-		_execution.instances[Environment.InstanceID].InstanceVars.delete(p_Name)
+		_deleteInstanceProperty(Environment.InstanceID, "InstanceVars." p_Name)
 	LeaveCriticalSection(_cs_execution)
 	
 }
@@ -96,33 +96,21 @@ InstanceVariable_Delete(Environment,p_Name, p_hidden=False)
 Var_GetListOfLoopVars(environment)
 {
 	EnterCriticalSection(_cs_execution)
-	retobject:=Object()
-	for varname, varcontent in Environment.loopvars
-	{
-		retobject.push(varname)
-	}
+	retobject := _getThreadPropertyObjectIdList(Environment.InstanceID, Environment.ThreadID, "loopvars")
 	LeaveCriticalSection(_cs_execution)
 	return retobject
 }
 Var_GetListOfThreadVars(environment)
 {
 	EnterCriticalSection(_cs_execution)
-	retobject:=Object()
-	for varname, varcontent in Environment.threadvars
-	{
-		retobject.push(varname)
-	}
+	retobject := _getThreadPropertyObjectIdList(Environment.InstanceID, Environment.ThreadID, "threadvars")
 	LeaveCriticalSection(_cs_execution)
 	return retobject
 }
 Var_GetListOfInstanceVars(environment)
 {
 	EnterCriticalSection(_cs_execution)
-	retobject:=Object()
-	for varname, varcontent in _execution.instances[Environment.InstanceID].InstanceVars
-	{
-		retobject.push(varname)
-	}
+	retobject := _getInstancePropertyObjectIdList(Environment.InstanceID, "InstanceVars")
 	LeaveCriticalSection(_cs_execution)
 	return retobject
 }
@@ -159,8 +147,16 @@ LoopVariable_AddToStack(Environment)
 {
 	EnterCriticalSection(_cs_execution)
 	;Write current loopvars to stack
-	Environment.loopvarsStack.push(objFullyClone(Environment.loopvars))
-	Environment.loopvarsStackHidden.push(objFullyClone(Environment.loopvarsHidden))
+	; TODO: This code is inefficient
+	loopVars := _getThreadProperty(Environment.InstanceID, Environment.ThreadID, "loopvars")
+	loopvarsStack := _getThreadProperty(Environment.InstanceID, Environment.ThreadID, "loopvarsStack")
+	loopvarsStack.push(loopvars)
+	_setThreadProperty(Environment.InstanceID, Environment.ThreadID, "loopvarsStack", loopvarsStack)
+
+	loopVars := _getThreadProperty(Environment.InstanceID, Environment.ThreadID, "loopvarsHidden")
+	loopvarsStack := _getThreadProperty(Environment.InstanceID, Environment.ThreadID, "loopvarsStackHidden")
+	loopvarsStack.push(loopvars)
+	_setThreadProperty(Environment.InstanceID, Environment.ThreadID, "loopvarsStackHidden", loopvarsStack)
 	
 	LeaveCriticalSection(_cs_execution)
 }
@@ -168,9 +164,18 @@ LoopVariable_RestoreFromStack(Environment)
 {
 	EnterCriticalSection(_cs_execution)
 	;Restore loopvars from stack
-	Environment.loopvars:=objFullyClone(Environment.loopvarsStack.pop())
-	Environment.loopvarsHidden:=objFullyClone(Environment.loopvarsStackHidden.pop())
-	
+
+	; TODO: This code is inefficient
+	loopvarsStack := _getThreadProperty(Environment.InstanceID, Environment.ThreadID, "loopvarsStack")
+	loopVars := loopvarsStack.pop()
+	_setThreadProperty(Environment.InstanceID, Environment.ThreadID, "loopvars", loopvars)
+	_setThreadProperty(Environment.InstanceID, Environment.ThreadID, "loopvarsStack", loopvarsStack)
+
+	loopvarsStack := _getThreadProperty(Environment.InstanceID, Environment.ThreadID, "loopvarsStackHidden")
+	loopVars := loopvarsStack.pop()
+	_setThreadProperty(Environment.InstanceID, Environment.ThreadID, "loopvarsHidden", loopvars)
+	_setThreadProperty(Environment.InstanceID, Environment.ThreadID, "loopvarsStackHidden", loopvarsStack)
+
 	LeaveCriticalSection(_cs_execution)
 }
 
@@ -214,15 +219,15 @@ Var_GetLocation(Environment, p_Name, p_hidden=False)
 	retval:=""
 	if (p_hidden = false)
 	{
-		if (Environment.loopvars.haskey(p_Name))
+		if (_existsThreadProperty(Environment.InstanceID, Environment.ThreadID, "loopvars." p_Name))
 		{
 			retval:= "Loop"
 		}
-		else if (Environment.threadvars.haskey(p_Name))
+		else if (_existsThreadProperty(Environment.InstanceID, Environment.ThreadID, "threadvars." p_Name))
 		{
 			retval:= "Thread"
 		}
-		else if (_execution.instances[Environment.InstanceID].InstanceVars.haskey(p_Name))
+		else if (_existsInstanceProperty(Environment.InstanceID, "InstanceVars." p_Name))
 		{
 			retval:= "instance"
 		}
@@ -235,11 +240,11 @@ Var_GetLocation(Environment, p_Name, p_hidden=False)
 			retval:= "BuiltIn"
 		}
 		else if fileexist(_WorkingDir "\Variables\" p_Name ".ahfvd")
-		{		
+		{
 			retval:= "global"
 		}
 		else if fileexist(_WorkingDir "\Variables\"  Environment.flowID "\" p_Name ".ahfvd")
-		{		
+		{
 			retval:= "static"
 		}
 	}
@@ -249,15 +254,15 @@ Var_GetLocation(Environment, p_Name, p_hidden=False)
 		{
 			MsgBox unexpected error while retrieving variable location of %p_Name%: The parameter p_hidden has unsupported value: %p_hiden%
 		}
-		if (Environment.loopvarsHidden.haskey(p_Name))
+		if (_existsThreadProperty(Environment.InstanceID, Environment.ThreadID, "loopvarsHidden." p_Name))
 		{
 			retval:= "Loop"
 		}
-		else if (Environment.threadvarsHidden.haskey(p_Name))
+		else if (_existsThreadProperty(Environment.InstanceID, Environment.ThreadID, "threadvarsHidden." p_Name))
 		{
 			retval:= "Thread"
 		}
-		else if (_execution.instances[Environment.InstanceID].InstanceVarsHidden.haskey(p_Name))
+		else if (_existsInstanceProperty(Environment.InstanceID, "InstanceVarsHidden." p_Name))
 		{
 			retval:= "instance"
 		}
@@ -270,45 +275,47 @@ Var_GetLocation(Environment, p_Name, p_hidden=False)
 
 Var_Set(Environment, p_Name, p_Value, p_Destination="", p_hidden=False)
 {
+	flowname := _getFlowProperty(Environment.FlowID, "name")
+	
 	if (isobject(p_Name))
 	{
 		;todo: allow paths in objects
 		p_Name := p_Name.1
 	}
 	
-	res:=Var_CheckName(p_Name,true)
+	res:=Var_CheckName(p_Name, true)
 	if (res="empty")
 	{
-		logger("f0","Setting a variable failed. Its name is empty.", Environment.flowname)
+		logger("f0","Setting a variable failed. Its name is empty.", flowname)
 		return ;No result
 	}
 	else if (res="ForbiddenCharacter")
 	{
-		logger("f0","Setting variable '" p_Name "' failed. It contains forbidden characters.", Environment.flowname)
+		logger("f0","Setting variable '" p_Name "' failed. It contains forbidden characters.", flowname)
 		return ;No result
 	}
 	
 	if (p_Destination="")
-		destination:=Var_RetrieveDestination(p_Name,p_Destination)
+		destination:=Var_RetrieveDestination(p_Name, p_Destination)
 	else
 		destination:=p_Destination
 	if (destination!="" and not instr(destination, "error_"))
 	{
-		%destination%Variable_Set(environment,p_Name,p_Value,p_hidden)
+		%destination%Variable_Set(environment, p_Name, p_Value, p_hidden)
 	}
 	else
 	{
 		if (destination = "error_noPermission")
 		{
-			logger("f0","Setting variable '" p_Name "' failed. No permission.", Environment.flowname)
+			logger("f0","Setting variable '" p_Name "' failed. No permission.", flowname)
 		}
 		else if (destination = "error_NotStartWith_A")
 		{
-			logger("f0","Setting variable '" p_Name "' failed. It does not start with a_.", Environment.flowname)
+			logger("f0","Setting variable '" p_Name "' failed. It does not start with a_.", flowname)
 		}
 		else
 		{
-			logger("f0","Setting variable '" p_Name "' failed. Cannot retrieve destination.", Environment.flowname)
+			logger("f0","Setting variable '" p_Name "' failed. Cannot retrieve destination.", flowname)
 		}
 	}
 	;~ d(_execution.instances[Environment.InstanceID].InstanceVars,"instance vars set " p_Name)
@@ -316,10 +323,12 @@ Var_Set(Environment, p_Name, p_Value, p_Destination="", p_hidden=False)
 
 Var_Get(environment, p_Name, p_hidden = False)
 {
+	flowname := _getFlowProperty(Environment.FlowID, "name")
+
 	tempvalue= 
 	if (p_Name="")
 	{
-		logger("f0","Retrieving variable failed. The name is empty", Environment.flowname)
+		logger("f0","Retrieving variable failed. The name is empty", flowname)
 	}
 	if (isobject(p_Name))
 	{
@@ -332,14 +341,14 @@ Var_Get(environment, p_Name, p_hidden = False)
 	;~ d("-" p_Name "-" , p_hidden " --- " tempLocation) 
 	if (tempLocation)
 	{
-		logger("f3","Retrieving " tempLocation " variable '" p_Name "'", Environment.flowname)
+		logger("f3","Retrieving " tempLocation " variable '" p_Name "'", flowname)
 		tempVar := %tempLocation%Variable_Get(environment, p_Name, p_hidden)
 		;~ d(tempVar, tempLocation)
 		return tempVar
 	}
 	else
 	{
-		logger("f0","Retrieving variable '" p_Name "' failed. It does not exist", Environment.flowname)
+		logger("f0","Retrieving variable '" p_Name "' failed. It does not exist", flowname)
 	}
 }
 

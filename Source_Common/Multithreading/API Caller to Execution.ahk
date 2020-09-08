@@ -4,7 +4,7 @@
 	local retvalue
 	logger("t2", A_ThisFunc " called")
 	
-	_share.execution.tasks.push({name: "startFlow", flowID: p_FlowID, TriggerID: par_TriggerID, Params: p_Params})
+	_setTask("execution", {name: "startFlow", flowID: p_FlowID, TriggerID: par_TriggerID, Params: p_Params})
 	
 	logger("t2", A_ThisFunc " finished")
 	return
@@ -16,7 +16,7 @@ API_Execution_EnableTriggers(p_FlowID)
 	local retvalue
 	logger("t2", A_ThisFunc " called")
 	
-	_share.execution.tasks.push({name: "EnableTriggers", flowID: p_FlowID})
+	_setTask("execution", {name: "EnableTriggers", flowID: p_FlowID})
 	
 	logger("t2", A_ThisFunc " finished")
 	return
@@ -28,7 +28,7 @@ API_Execution_StopFlow(p_FlowID)
 	local retvalue
 	logger("t2", A_ThisFunc " called")
 	
-	_share.execution.tasks.push({name: "StopFlow", flowID: p_FlowID})
+	_setTask("execution", {name: "StopFlow", flowID: p_FlowID})
 	
 	logger("t2", A_ThisFunc " finished")
 	return
@@ -39,7 +39,7 @@ API_Execution_ExecuteToggleFlow(p_FlowID)
 	local retvalue
 	logger("t2", A_ThisFunc " called")
 	
-	_share.execution.tasks.push({name: "ExecuteToggleFlow", flowID: p_FlowID})
+	_setTask("execution", {name: "ExecuteToggleFlow", flowID: p_FlowID})
 	
 	logger("t2", A_ThisFunc " finished")
 	return
@@ -51,7 +51,7 @@ API_Execution_DisableTriggers(p_FlowID)
 	local retvalue
 	logger("t2", A_ThisFunc " called")
 	
-	_share.execution.tasks.push({name: "DisableTriggers", flowID: p_FlowID})
+	_setTask("execution", {name: "DisableTriggers", flowID: p_FlowID})
 	
 	logger("t2", A_ThisFunc " finished")
 	return
@@ -64,7 +64,7 @@ API_Execution_enableOneTrigger(par_FlowID, par_TriggerID)
 	local retvalue
 	logger("t2", A_ThisFunc " called")
 	
-	_share.execution.tasks.push({name: "enableOneTrigger", flowID: par_FlowID, triggerID: par_TriggerID})
+	_setTask("execution", {name: "enableOneTrigger", flowID: par_FlowID, triggerID: par_TriggerID})
 	
 	logger("t2", A_ThisFunc " finished")
 	return
@@ -76,7 +76,7 @@ API_Execution_disableOneTrigger(par_FlowID, par_TriggerID)
 	local retvalue
 	logger("t2", A_ThisFunc " called")
 	
-	_share.execution.tasks.push({name: "disableOneTrigger", flowID: par_FlowID, triggerID: par_TriggerID})
+	_setTask("execution", {name: "disableOneTrigger", flowID: par_FlowID, triggerID: par_TriggerID})
 	
 	logger("t2", A_ThisFunc " finished")
 	return
@@ -89,7 +89,7 @@ API_Execution_externalFlowFinish(par_UniqueID)
 	local retvalue
 	logger("t2", A_ThisFunc " called")
 	
-	_share.execution.tasks.push({name: "externalFlowFinish", uniqueID: par_UniqueID})
+	_setTask("execution", {name: "externalFlowFinish", uniqueID: par_UniqueID})
 	
 	logger("t2", A_ThisFunc " finished")
 	return
@@ -102,7 +102,7 @@ API_Execution_externalTrigger(par_UniqueID)
 	local retvalue
 	logger("t2", A_ThisFunc " called")
 	
-	_share.execution.tasks.push({name: "externalTrigger", uniqueID: par_UniqueID})
+	_setTask("execution", {name: "externalTrigger", uniqueID: par_UniqueID})
 	
 	logger("t2", A_ThisFunc " finished")
 	return

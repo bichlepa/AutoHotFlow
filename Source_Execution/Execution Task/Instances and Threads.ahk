@@ -3,31 +3,31 @@ global global_ThreadIDCOunter:=0
 
 /* Starts a new execution instance
 */
-newInstance(p_Environment)
+newInstance(p_Environment, p_params = "")
 {
 	EnterCriticalSection(_cs_shared)
 	EnterCriticalSection(_cs_execution)
 
-	if (_flows[p_Environment.FlowID].flowSettings.ExecutionPolicy="skip" or _flows[p_Environment.FlowID].flowSettings.ExecutionPolicy="stop")
+	executing := _getFlowProperty(p_Environment.FlowID, "executing")
+
+
+	;find out whether the flow is running
+	if (executing)
 	{
-		;find out whether the flow is running
-		if (_flows[p_Environment.FlowID].executing)
+		ExecutionPolicy := _getFlowProperty(p_Environment.FlowID, "flowSettings.ExecutionPolicy")
+		if (ExecutionPolicy = "default")
+			ExecutionPolicy:=_getSettings("FlowExecutionPolicy")
+
+		if (ExecutionPolicy="skip")
 		{
-			if (_flows[p_Environment.FlowID].flowSettings.ExecutionPolicy = "default")
-				ExecutionPolicy:=_settings.FlowExecutionPolicy
-			else
-				ExecutionPolicy:=_flows[p_Environment.FlowID].flowSettings.ExecutionPolicy
-			if (ExecutionPolicy="skip")
-			{
-				logger("f1", "Execution of flow '" _flows[p_Environment.FlowID].name "' skipped, due to flow execution policy")
-				return
-				
-			}
-			else if (ExecutionPolicy="stop")
-			{
-				logger("f1", "Stopping flow '" _flows[p_Environment.FlowID].name "' in order to relaunch it, due to flow execution policy")
-				stopFlow(_flows[p_Environment.FlowID])
-			}
+			logger("f1", "Execution of flow '" _getFlowProperty(p_Environment.FlowID, "name") "' skipped, due to flow execution policy")
+			return
+			
+		}
+		else if (ExecutionPolicy="stop")
+		{
+			logger("f1", "Stopping flow '" _getFlowProperty(p_Environment.FlowID, "name") "' in order to relaunch it, due to flow execution policy")
+			stopFlow(p_Environment.FlowID)
 		}
 	}
 	;Search for the matching trigger element
@@ -39,41 +39,49 @@ newInstance(p_Environment)
 	else
 	{
 		
-		newInstance:=CriticalObject()
-		newInstance.id:= "instance" ++global_InstanceIDCOunter
+		newInstance:=Object()
+		newInstanceId := "instance" ++global_InstanceIDCOunter
+		newInstance.id:= newInstanceId
 		newInstance.FlowID := p_Environment.FlowID
-		newInstance.FlowName := p_Environment.FlowName
+		newInstance.FlowName :=  _getFlowProperty(p_Environment.FlowID, "name")
 		newInstance.state := "init"
-		newInstance.InstanceVars := CriticalObject()
-		newInstance.InstanceVarsHidden := CriticalObject()
-		newThread := newThread(newInstance)
-		_execution.Instances[newInstance.id]:=newInstance
-		newThread.ElementID := oneElementID
-		newThread.EnvironmentType := "thread"
-		newThread.varsExportedFromExternalThread := p_Environment.varsExportedFromExternalThread
-		finishExecutionOfElement(newThread, "Normal")
-		ThreadVariable_Set(newThread,"A_TriggerTime",a_now)
-		
-		if (p_Environment.params.varstoPass)
+		newInstance.InstanceVars := Object()
+		newInstance.InstanceVarsHidden := Object()
+		_setInstance(newInstanceId, newInstance)
+
+		if (p_params.CallBack)
 		{
-			;~ d(p_Environment.params.varstoPass, "ioöhöio")
-			for onevarName, oneVar in p_Environment.params.varstoPass
+			_setInstanceProperty(newInstanceId, "CallBack", p_params.CallBack, false)
+		}
+		
+
+		newThreadID := newThread(newInstanceId)
+		_setThreadProperty(newInstanceId, newThreadID, "ElementID", oneElementID)
+		if (p_Environment.threadID)
+		{
+			; The previous thread may have some information which we want to import to the new thread
+			varsExportedFromExternalThread := _getThreadProperty(p_Environment.InstanceId, p_Environment.ThreadID, "varsExportedFromExternalThread")
+			_setThreadProperty(newInstanceId, newThreadID, "varsExportedFromExternalThread", varsExportedFromExternalThread)
+			
+			varstoPass := _getThreadProperty(p_Environment.InstanceId, p_Environment.ThreadID, "params.varstoPass")
+			if (varstoPass)
 			{
-				InstanceVariable_Set(newThread, onevarName, oneVar)
+				for onevarName, oneVar in varstoPass
+				{
+					InstanceVariable_Set(newThread, onevarName, oneVar)
+				}
 			}
 		}
+		finishExecutionOfElement(newInstanceId, newThreadID, "Normal")
+		ThreadVariable_Set(newThreadID, "A_TriggerTime", a_now)
 		
-		if (p_Environment.params.CallBack)
-		{
-			newInstance.callBack := p_Environment.params.CallBack
-		}
 		
-		ElementClass:=p_Environment.ElementClass
+		ElementClass:=_getElementProperty(p_Environment.FlowID, p_Environment.ElementID, "class")
 		if (isfunc("Element_postTrigger_" ElementClass))
 		{
-			Element_postTrigger_%ElementClass%(newThread, p_Environment.pars)
+			Element_postTrigger_%ElementClass%(newThread, p_params)
 		}
-		newInstance.state := "running"
+		_setInstanceProperty(newInstanceId, "state", "running")
 		
 		updateFlowExcutingStates()
 	}
@@ -109,10 +117,8 @@ startFlow(p_FlowID, p_TriggerID ="", p_params = "")
 	{
 		environment:=Object()
 		environment.flowID:=p_FlowID
-		environment.FlowName:=_getFlowProperty(p_FlowID, "Name") ; todo: löschen
 		environment.elementID:=p_TriggerID
-		environment.params:=p_params
-		newInstance(environment)
+		newInstance(environment, p_params)
 	}
 	
 	LeaveCriticalSection(_cs_execution)
@@ -133,18 +139,17 @@ startFlow(p_FlowID, p_TriggerID ="", p_params = "")
 	return
 }
 
-stopFlow(p_Flow)
+stopFlow(p_FlowID)
 {
 	EnterCriticalSection(_cs_shared)
 	EnterCriticalSection(_cs_execution)
-
-	instancesToDelete:=Object()
 	
-	for OneInstanceID, OneInstance in _execution.Instances
+	InstanceIDs := _getAllInstanceIds()
+	for OneInstanceIndex, OneInstanceID in InstanceIDs
 	{
-		if (OneInstance.FlowID == p_Flow.id)
+		if (_getInstanceProperty(OneInstanceID, "FlowID") == p_FlowID)
 		{
-			stopInstance(OneInstance.ID)
+			stopInstance(OneInstanceID)
 		}
 	}
 	LeaveCriticalSection(_cs_execution)
@@ -201,18 +206,18 @@ stopInstance(p_instanceID)
 }
 
 
-executeToggleFlow(p_Flow)
+executeToggleFlow(p_FlowID)
 {
 	EnterCriticalSection(_cs_shared)
 	EnterCriticalSection(_cs_execution)
 
-	if (p_Flow.executing)
+	if (_getFlowProperty(FlowID, "executing"))
 	{
-		stopFlow(p_Flow)
+		stopFlow(p_FlowID)
 	}
 	else
 	{
-		startFlow(p_Flow.ID)
+		startFlow(p_FlowID)
 	}
 	
 	LeaveCriticalSection(_cs_execution)
@@ -222,15 +227,15 @@ executeToggleFlow(p_Flow)
 /* Starts a new execution thread inside the given instance
 if p_ToCloneFromThread is given, the thread will be cloned
 */
-newThread(p_Instance, p_ToCloneFromThread ="")
+newThread(p_InstanceID, p_ToCloneFromThreadID ="")
 {
 	EnterCriticalSection(_cs_shared)
 	EnterCriticalSection(_cs_execution)
 
-	if IsObject(p_ToCloneFromThread)
+	if (p_ToCloneFromThreadID)
 	{
 		;Do a clone of the thread
-		newThread := objfullyclone(p_ToCloneFromThread)
+		newThread := _getThread(p_InstanceID, p_ToCloneFromThreadID)
 		;Assign another thread id
 		newThread.id := "thread" ++global_ThreadIDCOunter
 		newThread.ThreadID := newThread.id
@@ -238,62 +243,60 @@ newThread(p_Instance, p_ToCloneFromThread ="")
 	else
 	{
 		;Create a new thread which starts at the trigger
-		newThread := CriticalObject()
+		newThread := Object()
 		newThread.id := "thread" ++global_ThreadIDCOunter
 		newThread.ThreadID := newThread.id
-		newThread.InstanceID := p_Instance.id
-		newThread.FlowID := p_Instance.FlowID
-		newThread.FlowName := p_Instance.FlowName
+		newThread.InstanceID :=p_InstanceID
+		newThread.FlowID := _getInstanceProperty(p_InstanceID, "FlowID")
 		newThread.State := "finished" ;This means, the execution of the trigger has finished
 		
-		newThread.ElementPars := CriticalObject()
+		newThread.ElementPars := Object()
 		newThread.Result := "Normal"
-		newThread.threadVars := CriticalObject()
-		newThread.threadVarsHidden := CriticalObject()
-		newThread.loopVars := CriticalObject()
-		newThread.loopVarsHidden := CriticalObject()
-		newThread.loopVarsStack := CriticalObject()
-		newThread.loopVarsStackHidden := CriticalObject()
+		newThread.threadVars := Object()
+		newThread.threadVarsHidden := Object()
+		newThread.loopVars := Object()
+		newThread.loopVarsHidden := Object()
+		newThread.loopVarsStack := Object()
+		newThread.loopVarsStackHidden := Object()
 		
 		;~ newThread.ElementID ; Will not be set in this function
 	}
 	
-	p_Instance.threads[newThread.id]:=newThread
+	_setThread(p_InstanceID, newThread.id, newThread)
 
 	LeaveCriticalSection(_cs_execution)
 	LeaveCriticalSection(_cs_shared)
-	return newThread
+	return newThread.ID
 }
 
-removeThread(p_thread)
+removeThread(p_instanceID, p_threadID)
 {
 	global 
 	EnterCriticalSection(_cs_shared)
 	EnterCriticalSection(_cs_execution)
 
-	_execution.Instances[p_thread.Instanceid].threads.delete(p_thread.id)
-	if (_execution.Instances[p_thread.Instanceid].threads.count() = 0)
+	_deleteThread(p_instanceID, p_threadID)
+	if (_getAllThreadIds(p_instanceID).count() = 0)
 	{
-		removeInstance(_execution.Instances[p_thread.Instanceid])
+		removeInstance(p_instanceID)
 	}
 	LeaveCriticalSection(_cs_execution)
 	LeaveCriticalSection(_cs_shared)
 }
 
-removeInstance(p_instance)
+removeInstance(p_instanceID)
 {
 	global
 	local tempCallBackfunc
 	EnterCriticalSection(_cs_shared)
 	EnterCriticalSection(_cs_execution)
-	
-	if (p_instance.callback)
+	tempCallBackfunc := _getInstanceProperty(p_InstanceID, "callback", false)
+	if (tempCallBackfunc)
 	{
-		tempCallBackfunc:=p_instance.callback
-		%tempCallBackfunc%("finished", objfullyclone(p_instance.InstanceVars))
+		%tempCallBackfunc%("finished", _getInstanceProperty(p_InstanceID, "InstanceVars"))
 	}
 	
-	_execution.Instances.delete(p_instance.id)
+	_deleteInstance(p_instanceID)
 	updateFlowExcutingStates()
 
 	LeaveCriticalSection(_cs_execution)
@@ -306,19 +309,21 @@ updateFlowExcutingStates()
 	EnterCriticalSection(_cs_execution)
 
 	executingFlows:=Object()
-	for OneInstanceID, OneInstance in _execution.Instances
+	Instances := _getAllInstanceIds()
+	for OneInstanceIndex, OneInstanceID in Instances
 	{
-		executingFlows[OneInstance.flowID]:=True
+		executingFlows[_getInstanceProperty(p_InstanceID, "flowID")]:=True
 	}
-	for OneFlowID, OneFlow in _flows
+	Flows := _getAllFlowIds()
+	for OneFlowIndex, OneFlowID in Flows
 	{
 		if (executingFlows.haskey(OneFlowID))
 		{
-			OneFlow.executing:=True
+			_setFlowProperty(OneFlowID, "executing", True)
 		}
 		else
 		{
-			OneFlow.executing:=False
+			_setFlowProperty(OneFlowID, "executing", False)
 		}
 	}
 
