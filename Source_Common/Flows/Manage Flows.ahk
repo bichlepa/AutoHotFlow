@@ -100,6 +100,7 @@ InitFlow(FileFullPath)
 	;~ d(newFlow)
 	
 	newFlow.draw := Object()
+	newFlow.states := Object()
 	
 	_setFlow(newFlowid, newFlow)
 
@@ -172,6 +173,7 @@ NewFlow(par_CategoryID = "")
 	newFlow.folder := _WorkingDir "\Saved Flows"
 	newFlow.filename := newFlowid
 	newFlow.file := _WorkingDir "\Saved Flows\" newFlowid ".ini"
+	newFlow.states := Object()
 	
 	_setFlow(newFlowid, newFlow)
 

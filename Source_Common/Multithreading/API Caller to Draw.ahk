@@ -6,7 +6,7 @@ API_Draw_Draw()
 	local retvalue
 	logger("t2", A_ThisFunc " called")
 	
-	_flows[FlowID].draw.mustDraw := true
+	_setFlowProperty(FlowID, "draw.mustDraw", true)
 	
 	logger("t2", A_ThisFunc " finished")
 	

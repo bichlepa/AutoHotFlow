@@ -1,21 +1,19 @@
 ﻿
-MAX_COUNT_OF_BACKUPS:=10
+global MAX_COUNT_OF_BACKUPS:=10
 
 SaveFlowMetaData(FlowID)
 {
-	global
-	local enabledFlows
-	
+	flow := _getFlow(FlowID)
+	FlowName := flow.name
 	logger("a2","Saving meta data of flow " FlowName)
-	
-	if (_Flows[FlowID].file="")
+	if (flow.file="")
 	{
 		;Do not save anything if flow does not exist. (Should not happen)
 		MsgBox unexpected error. should save metadata of flow "%FlowID%", but no flow file specified
 		return
 	}
 	
-	if (_Flows[FlowID].demo and _settings.developing != True)
+	if (flow.demo and _getSettings("developing") != True)
 	{
 		;A demo flow cannot be saved
 		logger("a0","Cannot save metadata of flow " FlowName ". It is a demonstation flow.")
@@ -24,21 +22,21 @@ SaveFlowMetaData(FlowID)
 	
 	EnterCriticalSection(_cs_shared)
 
-	;~ d(_Flows[FlowID],FlowID)
-	if not fileexist(_Flows[FlowID].file)
+	;~ d(flow,FlowID)
+	if not fileexist(flow.file)
 	{
-		IniWrite,% FlowCompabilityVersionOfApp,% _Flows[FlowID].file,general,FlowCompabilityVersion
+		IniWrite,% FlowCompabilityVersionOfApp,% flow.file,general,FlowCompabilityVersion
 	}
 	
-	IniWrite,% _Flows[FlowID].name,% _Flows[FlowID].file,general,name
-	IniWrite,% _Flows[FlowID].id,% _Flows[FlowID].file,general,ID
-	IniWrite,% _Flows[FlowID].demo,% _Flows[FlowID].file,general,demo
-	IniWrite,% _Flows[FlowID].categoryname,% _Flows[FlowID].file,general,category
+	IniWrite,% flow.name,% flow.file,general,name
+	IniWrite,% flow.id,% flow.file,general,ID
+	IniWrite,% flow.demo,% flow.file,general,demo
+	IniWrite,% flow.categoryname,% flow.file,general,category
 	
 	if (_exitingNow<>true) ;Do not save if it is shutting down and disabling the flows
 	{
 		enabledTriggers:=""
-		for oneID, oneElement in _Flows[FlowID].allElements
+		for oneID, oneElement in flow.allElements
 		{
 			if (oneElement.type = "trigger" and oneElement.enabled)
 			{
@@ -49,7 +47,7 @@ SaveFlowMetaData(FlowID)
 			}
 		}
 		
-		IniWrite,% enabledTriggers,% _Flows[FlowID].file,general,enabled
+		IniWrite,% enabledTriggers,% flow.file,general,enabled
 	}
 	
 	LeaveCriticalSection(_cs_shared)
@@ -57,22 +55,14 @@ SaveFlowMetaData(FlowID)
 
 SaveFlow(FlowID)
 {
-	global
-	local elementCounter=0
-	local triggerCounter=0
-	local conncetionCounter=0
-	local countBackupsToDelete=0
-	local presentBackupFiles=Object()
-	local ThisFlowFilepath, ThisFlowFolder, ThisFlowFilename
-	local saveElementType, saveElement, saveElementID, saveElementIniID
-	local oneID, oneElement, enabledTriggers
-	;~ MsgBox %FlowID%
-	;~ ui_DisableMainGUI()
+	flow := _getFlow(FlowID)
+	FlowName := flow.name
+
 	logger("a1","Saving flow " FlowName)
 	;~ ToolTip(lang("saving"),100000)
 	
 	
-	if (_Flows[FlowID].demo and _settings.developing != True)
+	if (flow.demo and _getSettings("developing") != True)
 	{
 		;A demo flow cannot be saved
 		logger("a0","Cannot save metadata of flow " FlowName ". It is a demonstation flow.")
@@ -86,7 +76,7 @@ SaveFlow(FlowID)
 	EnterCriticalSection(_cs_shared)
 
 	enabledTriggers:=""
-	for oneID, oneElement in _Flows[FlowID].allElements
+	for oneID, oneElement in flow.allElements
 	{
 		if (oneElement.type = "trigger" and oneElement.enabled)
 		{
@@ -98,9 +88,9 @@ SaveFlow(FlowID)
 	}
 	
 	
-	ThisFlowFilepath := _flows[FlowID].file
-	ThisFlowFolder := _flows[FlowID].Folder
-	ThisFlowFilename :=_flows[FlowID].FileName
+	ThisFlowFilepath := flow.file
+	ThisFlowFolder := flow.Folder
+	ThisFlowFilename :=flow.FileName
 	
 	FileCreateDir,%ThisFlowFolder%
 	
@@ -110,32 +100,25 @@ SaveFlow(FlowID)
 	RIni_Create("iniSave")
 	
 	RIni_AddSection("iniSave","general")
-	RIni_AppendValue("iniSave", "general", "name", _flows[FlowID].flowSettings.Name)
-	RIni_AppendValue("iniSave", "general", "category", _share.allCategories[_flows[FlowID].category].Name )
-	RIni_AppendValue("iniSave", "general", "ID", _flows[FlowID].id )
-	RIni_AppendValue("iniSave", "general", "count", _flows[FlowID].ElementIDCounter)
-	RIni_AppendValue("iniSave", "general", "SettingFlowExecutionPolicy", _flows[FlowID].flowSettings.ExecutionPolicy)
-	RIni_AppendValue("iniSave", "general", "SettingWorkingDir", _flows[FlowID].flowSettings.WorkingDir)
-	RIni_AppendValue("iniSave", "general", "SettingDefaultWorkingDir", _flows[FlowID].flowSettings.DefaultWorkingDir)
+	RIni_AppendValue("iniSave", "general", "name", flow.flowSettings.Name)
+	RIni_AppendValue("iniSave", "general", "category", _getCategoryProperty(flow.category, "Name") )
+	RIni_AppendValue("iniSave", "general", "ID", flow.id )
+	RIni_AppendValue("iniSave", "general", "count", flow.ElementIDCounter)
+	RIni_AppendValue("iniSave", "general", "SettingFlowExecutionPolicy", flow.flowSettings.ExecutionPolicy)
+	RIni_AppendValue("iniSave", "general", "SettingWorkingDir", flow.flowSettings.WorkingDir)
+	RIni_AppendValue("iniSave", "general", "SettingDefaultWorkingDir", flow.flowSettings.DefaultWorkingDir)
 	RIni_AppendValue("iniSave", "general", "FlowCompabilityVersion", FlowCompabilityVersionOfApp)
-	RIni_AppendValue("iniSave", "general", "Static variables folder", _flows[FlowID].flowSettings.FolderOfStaticVariables)
-	RIni_AppendValue("iniSave", "general", "Offsetx", _flows[FlowID].flowSettings.Offsetx)
-	RIni_AppendValue("iniSave", "general", "Offsety", _flows[FlowID].flowSettings.Offsety)
-	RIni_AppendValue("iniSave", "general", "zoomFactor", _flows[FlowID].flowSettings.zoomFactor)
-	RIni_AppendValue("iniSave", "general", "demo", _flows[FlowID].demo)
+	RIni_AppendValue("iniSave", "general", "Static variables folder", flow.flowSettings.FolderOfStaticVariables)
+	RIni_AppendValue("iniSave", "general", "Offsetx", flow.flowSettings.Offsetx)
+	RIni_AppendValue("iniSave", "general", "Offsety", flow.flowSettings.Offsety)
+	RIni_AppendValue("iniSave", "general", "zoomFactor", flow.flowSettings.zoomFactor)
+	RIni_AppendValue("iniSave", "general", "demo", flow.demo)
 	
 		
 	
 	RIni_AppendValue("iniSave", "general", "enabled", enabledTriggers)
-	
-	saveCopyOfallElements:=objfullyclone(_flows[FlowID].allElements)
-	saveCopyOfallConnections:=objfullyclone(_flows[FlowID].allConnections)
-	saveCopyOfallTriggers:=objfullyclone(_flows[FlowID].allTriggers) 
 
-	
-
-	
-	for saveElementID, saveElement in saveCopyOfallElements
+	for saveElementID, saveElement in flow.allElements
 	{
 		saveElementIniID := "element" ++elementCounter
 		RIni_AddSection("iniSave", saveElementIniID)
@@ -162,7 +145,7 @@ SaveFlow(FlowID)
 		
 	}
 	
-	for saveElementID, saveElement in saveCopyOfallConnections
+	for saveElementID, saveElement in flow.allConnections
 	{
 		saveElementIniID := "connection" ++conncetionCounter
 		RIni_AddSection("iniSave", saveElementIniID)
@@ -181,7 +164,7 @@ SaveFlow(FlowID)
 	}
 	
 	
-	for saveElementID, saveElement in saveCopyOfallTriggers
+	for saveElementID, saveElement in flow.allTriggers
 	{
 		saveElementIniID := "trigger" ++triggerCounter
 		RIni_AddSection("iniSave", saveElementIniID)
@@ -223,28 +206,15 @@ SaveFlow(FlowID)
 	;~ ToolTip(lang("saved"))
 	;~ ui_EnableMainGUI()
 	
-	_flows[FlowID].savedState:=_flows[FlowID].currentState
-	
-	saved=yes
-	busy:=false
+	_setFlowProperty(FlowID, "savedState", flow.currentState)
 	
 	LeaveCriticalSection(_cs_shared)
 }
 
 i_SaveParametersOfElement(saveElement,FlowID,saveElementIniID,Savelocation="")
 {
-	global
-	local parametersToSave
-	local index
-	local index2
-	local parameter
-	local parameterID
-	local parameterDefault
-	local SaveContent
-	local OneID
-	local objectstring
-	local elementClass:=saveElement.class
-	local elementID:=saveElement.id
+	elementClass:=saveElement.class
+	elementID:=saveElement.id
 	
 	parametersToSave:=Element_getParameters(elementClass, {flowID: FlowID, elementID: elementID})
 	
@@ -279,13 +249,12 @@ i_SaveParametersOfElement(saveElement,FlowID,saveElementIniID,Savelocation="")
 
 i_SaveUnsavedFlows()
 {
-	global _flows
-	
 	EnterCriticalSection(_cs_shared)
 	
-	for tempID, tempflow in _flows
+	flowIDs := _getAllFlowIds()
+	for oneIndex, oneFlowID in flowIDs
 	{
-		if (tempflow.currentState != tempflow.savedState)
+		if (_getFlowProperty(FlowID, "currentState") != _getFlowProperty(FlowID, "savedState"))
 		{
 			SaveFlow(tempID)
 		}

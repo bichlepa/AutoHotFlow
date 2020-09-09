@@ -3,8 +3,8 @@
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
 
 SetWorkingDir %A_ScriptDir%\..  ; set working dir.
-global _WorkingDir := _share._WorkingDir
-global _ScriptDir := _share._ScriptDir
+global _WorkingDir := _getShared("_WorkingDir")
+global _ScriptDir := _getShared("_ScriptDir")
 SetWorkingDir %a_temp%  ; using working dir forbidden.
 
 #Persistent
@@ -20,7 +20,7 @@ OnExit,Exit
 _language:=Object()
 _language.dir:=_ScriptDir "\language" ;Directory where the translations are stored
 lang_Init()
-lang_setLanguage(_settings.UILanguage)
+lang_setLanguage(_getSettings("UILanguage"))
 
 #include Lib\Object to file\String-object-file.ahk
 #include Lib\ObjFullyClone\ObjFullyClone.ahk

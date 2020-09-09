@@ -9,8 +9,8 @@
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
 
 SetWorkingDir %A_ScriptDir%\..  ; set working dir.
-global _WorkingDir := _share._WorkingDir
-global _ScriptDir := _share._ScriptDir
+global _WorkingDir := _getShared("_WorkingDir")
+global _ScriptDir := _getShared("_ScriptDir")
 SetWorkingDir %a_temp%  ; using working dir forbidden.
 
 ;~ MsgBox %a_workingdir%
@@ -29,7 +29,7 @@ OnExit,Exit
 _language:=Object()
 _language.dir:=_ScriptDir "\language" ;Directory where the translations are stored
 lang_Init()
-lang_setLanguage(_settings.UILanguage)
+lang_setLanguage(_getSettings("UILanguage"))
 
 #include Lib\gdi+\gdip.ahk
 #include Lib\Object to file\String-object-file.ahk
@@ -57,36 +57,33 @@ Draw()
 {
 	global
 	SetTimer,drawTask,10
-	_share.drawActive:=true
 }
 
 drawTask()
 {
-	local temp
-	local somethingdrawn
-	
 	Loop
 	{
 		EnterCriticalSection(_cs_shared)
 		
 		somethingdrawn:= false
 		flowParamsCloned:=""
-		for flowID, flowParams in _flows
+		_getAllFlowIds()
+		for flowIndex, flowID in _getAllFlowIds()
 		{
-			if (flowParams.draw.mustDraw = true)
+			if (_getFlowProperty(FlowID, "draw.mustDraw") = true)
 			{
-				flowParams.draw.mustDraw := false
+				_setFlowProperty(FlowID, "draw.mustDraw", false)
 				
-				;~ flowParamsCloned:=flowParams
-				flowParamsCloned:=ObjFullyClone(flowParams)
+				flow:=_getFlow(flowID)
+				break
 			}
 		}
 		
 		LeaveCriticalSection(_cs_shared)
 		
-		if flowParamsCloned
+		if flow
 		{
-			gdip_DrawEverything(flowParamsCloned)
+			gdip_DrawEverything(flow)
 			somethingdrawn:=true
 		}
 			
@@ -94,7 +91,6 @@ drawTask()
 		if (somethingdrawn = false)
 		{
 			SetTimer,drawTask,10
-			_share.drawActive:=false
 			break
 		}
 	}

@@ -12,7 +12,7 @@ API_Editor_EditGUIshow(par_FlowID)
 	{
 		if (threadpars.flowID = par_FlowID)
 		{
-			_share["editor" par_FlowID].tasks.push({name: "EditGUIshow"})
+			_setTask("editor" par_FlowID, {name: "EditGUIshow"})
 			break
 		}
 	}

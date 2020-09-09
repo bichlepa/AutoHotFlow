@@ -22,8 +22,9 @@ logger(LogLevel,LoggingText, logSource="common")
 	local lastfield
 	local state
 	local shouldLog:=false
-	_share.LogCount++
-	_share.logTidyCountdown--
+
+	_getAndIncrementShared("LogCount")
+	_getAndIncrementShared("logTidyCountdown", -1)
 	
 	state=1
 	
@@ -56,17 +57,17 @@ logger(LogLevel,LoggingText, logSource="common")
 				if lastfield=a
 				{
 					
-					if (A_LoopField <= _settings.LogLevelApp)
+					if (A_LoopField <= _getSettings("LogLevelApp"))
 						shouldLog:=true
 				}
 				else if lastfield=f
 				{
-					if (A_LoopField <= _settings.LogLevelFlow)
+					if (A_LoopField <= _getSettings("LogLevelFlow"))
 						shouldLog:=true
 				}
 				else if lastfield=t
 				{
-					if (A_LoopField <= _settings.LogLevelThread)
+					if (A_LoopField <= _getSettings("LogLevelThread"))
 						shouldLog:=true
 				}
 			}
@@ -80,9 +81,9 @@ logger(LogLevel,LoggingText, logSource="common")
 	{
 		FormatTime,timestamp,a_now,yyyy MM dd HH:mm:ss
 		DebugLogLastEntry:="`n--- " timestamp " ~" _ahkThreadID "~ " LoggingText
-		_share.log.=DebugLogLastEntry
-		_share["log_" logSource].=DebugLogLastEntry
-		if (_settings.logtofile)
+		_appendToShared("log", DebugLogLastEntry)
+		_appendToShared("log_" logSource, DebugLogLastEntry)
+		if (_getSettings("logtofile"))
 		{
 			EnterCriticalSection(_cs_debug)
 			FileAppend,% DebugLogLastEntry,%_WorkingDir%\Log\Log.txt,UTF-8
@@ -172,11 +173,12 @@ showlog(whichone="all")
 	if (GuiLogCategoryOld = "")
 		GuiLogCategoryOld := whichone
 	GuiLogCategory:="|all"
-	for onekeyfromShare, onevalueFromShare in _share
+	shareKeys := _getAllSharedKeys()
+	for oneShareKeysIndex, oneShareKey in shareKeys
 	{
-		if (substr(onekeyfromShare,1,4) = "log_")
+		if (substr(oneShareKey,1,4) = "log_")
 		{
-			GuiLogCategory.="|" substr(onekeyfromShare,5)
+			GuiLogCategory.="|" substr(oneShareKey,5)
 		}
 	}
 	guicontrol,log:,GuiLogCategory,% GuiLogCategory
@@ -190,15 +192,15 @@ showlog(whichone="all")
 	return
 	
 	GuiLogrefreshText:
-	if not (DebugLogOldCount == _share.LogCount)
+	if not (DebugLogOldCount == _getShared("LogCount"))
 	{
 		GuiControlGet,GuiLogCategory,log:,GuiLogCategory
 		
 		if (GuiLogCategory = "all")
-			DebugLogToShow:=_share.Log
+			DebugLogToShow:=_getShared("Log")
 		else
-			DebugLogToShow:=_share["Log_" GuiLogCategory]
-		DebugLogOldCount:=_share.LogCount
+			DebugLogToShow:=_getShared("Log_" GuiLogCategory)
+		DebugLogOldCount:=_getShared("LogCount")
 		if GuiLogMode = update
 		{
 			StringGetPos,pos,DebugLogToShow,`n,R%GuiLogTextFieldRows%
@@ -223,13 +225,13 @@ initLog()
 {
 	global
 	SetTimer, log_cleanup, 1000
-	_share.logTidyCountdown:=0
+	_setShared("logTidyCountdown", 0)
 	return
 }
 
 log_cleanup()
 {
-	if (_share.logTidyCountdown <= 0)
+	if (_getShared("logTidyCountdown") <= 0)
 	{
 		;~ MsgBox % _share.log
 		;~ templog:=_share.log
@@ -237,6 +239,7 @@ log_cleanup()
 		;~ _share.log:=substr(templog,templogpos+2)
 		;~ MsgBox % templogpos "`n" _share.log
 		
+		EnterCriticalSection(_cs_debug)
 		log_cleanup_toobigfiles:=Object()
 		loop, %_WorkingDir%\Log\Log*.txt
 		{
@@ -255,7 +258,8 @@ log_cleanup()
 			StringTrimRight, fullpath, onebigfile, 4 ;remove .txt
 			FileMove,%onebigfile%,%fullpath%_old.txt,1
 		}
-		_share.logTidyCountdown := 50
+		LeaveCriticalSection(_cs_debug)
+		_setShared("logTidyCountdown", 50)
 	}
 }
 

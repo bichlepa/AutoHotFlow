@@ -121,7 +121,8 @@ gdip_DrawEverything(FlowObj)
 
 	;~ WinGetTitle,temp,% "ahk_id " mainguihwnd
 	;~ ToolTip %temp%
-	IfWinExist,% "ahk_id " _share.hwnds["editGUI" FlowID]
+	winHWND := _getSharedProperty("hwnds.editGUI" FlowID)
+	IfWinExist,% "ahk_id " winHWND
 	{
 		;~ d(FlowObj)
 		Offsetx:=FlowObj.flowSettings.Offsetx
@@ -178,7 +179,7 @@ gdip_DrawEverything(FlowObj)
 	if (FlowObj.draw.DrawMoveButtonUnderMouse = true ) ; or tempFromEl="MOUSE" or tempToEl="MOUSE")
 	{
 		MouseGetPos,tempmx,tempmy,tempmwin,,2 ;Get the mouse position
-		if (tempmwin=_share.hwnds["editGUI" FlowID])
+		if (tempmwin = winHWND)
 		{
 			;~ SoundBeep 200
 			GDImx:=tempmx
@@ -1067,15 +1068,14 @@ gdip_DrawEverything(FlowObj)
 	DrawResult.NewElementIconWidth:=NewElementIconWidth * zoomFactor
 	DrawResult.NewElementIconHeight:=NewElementIconHeight * zoomFactor
 	
-	EnterCriticalSection(_cs_shared)
-	_flows[FlowObj.id].DrawResult:=DrawResult
-	LeaveCriticalSection(_cs_shared)
+	_setFlowProperty(flowID, "DrawResult", DrawResult)
 	;~ Gdip_TextToGraphics(G, OnTopLabel, "x10 y0 " TextOptionsTopLabel, Font, widthofguipic, heightofguipic)
 	
 	
 	;~ MsgBox %mainguiHwnddc%
 	;Show the image
-	BitBlt(_share.hwnds["editGUIDC" FlowID], 0, 0, widthofguipic, heightofguipic, hdc, 0, 0)
+	winDC := _getSharedProperty("hwnds.editGUIDC" FlowID)
+	BitBlt(winDC, 0, 0, widthofguipic, heightofguipic, hdc, 0, 0)
 
 	; Now the bitmap may be deleted
 	DeleteObject(hbm)
@@ -1089,7 +1089,9 @@ gdip_DrawEverything(FlowObj)
 	
 	
 	if (AnyRecentlyRunElementFound)
-		_flows[flowID].draw.mustDraw:=true
+	{
+		_setFlowProperty(flowID, "draw.mustDraw", true)
+	}
 	
 	
 	Return

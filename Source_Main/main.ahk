@@ -30,7 +30,7 @@ load_settings()
 ;If AutoHotFlow is started automatically on windows startup.
 ;This information is passed by command line parameter of the link which is stored in the autorun folder.
 firstCommandLineParameter = %1%
-_share.WindowsStartup := (firstCommandLineParameter = "WindowsStartup")
+_setShared("WindowsStartup", (firstCommandLineParameter = "WindowsStartup"))
 
 #Include %A_ScriptDir%\.. ;Include path is the directory of AutoHotFlow.ahk/exe
 
@@ -48,7 +48,7 @@ logger("a1", "startup")
 OnExit,exit ;This will allow to save unsaved flows if AutoHotFlow is closed
 
 ;if setting run as admin active, try to gain administrator rights
-if (_settings.runAsAdmin and not A_IsAdmin)
+if (_getSettings("runAsAdmin") and not A_IsAdmin)
 {
 	;User a file to catch if gaining administrator rights fails multiple times
 	FileRead,triedtostart,%a_temp%\autoHotflowTryToStartAsAdmin.txt
@@ -57,7 +57,7 @@ if (_settings.runAsAdmin and not A_IsAdmin)
 		MsgBox, 52, , % lang("Several tries to start as administrator failed. Do you want to disable it?")
 		IfMsgBox yes
 		{
-			_settings.runAsAdmin:=false
+			_setSettings("runAsAdmin", false)
 			write_settings()
 			skipstartAsAdmin :=true
 		}
@@ -291,7 +291,7 @@ Thread_StartExecution()
 FindFlows()
 
 ;Now the triggers "Startup" have triggered. We don't need this flag anymore.
-_share.WindowsStartup:=false
+_setShared("WindowsStartup", false)
 
 ;Initialize a hidden command window. This window is able to receive commands from other processes.
 ;The first purpose is that the script AutoHotFlow.ahk/exe can send commands if a shortcut of the trigger "shortcut" is opened.
@@ -306,7 +306,7 @@ queryTasks()
 	global
 	Loop
 	{
-		oneTask:=_share.main.Tasks.removeat(1)
+		oneTask := _getTask("main")
 		if (oneTask)
 		{
 			name:=oneTask.name

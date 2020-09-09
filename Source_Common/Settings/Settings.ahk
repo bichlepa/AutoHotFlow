@@ -24,7 +24,7 @@ load_settings()
 		if default = 
 			default := " "
 		IniRead, temp, %filepathsettings%, % onesetting.section, % onesetting.key, % default
-		_settings[onesetting.key]:=temp
+		_setSettings(onesetting.key, temp)
 	}
 	;~ d(_settings)
 }
@@ -35,7 +35,7 @@ write_settings()
 	global settingsdefinitions, filepathsettings
 	for oneindex, onesetting in settingsdefinitions
 	{
-		Iniwrite, % _settings[onesetting.key], %filepathsettings%, % onesetting.section, % onesetting.key
+		Iniwrite, % _getSettings(onesetting.key), %filepathsettings%, % onesetting.section, % onesetting.key
 	}
 }
 

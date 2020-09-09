@@ -2,13 +2,6 @@
 ;Can be called from other threads
 LoadFlow(FlowID, filepath="", params="")
 {
-	global
-
-	local FinishedSaving, tempValue, FlowCompabilityVersion, ID_count, index1, index2
-	local loadElement, loadElementID, loadElementType, loadElementTriggerContainer, loadElementClass
-	local AllSections, tempSection, tempContainerID, missingpackages, tempName
-	local AnyTriggerLoaded
-	
 	if (FlowID="")
 	{
 		MsgBox internal error! A flow should be loaded but FlowID is empty!
@@ -248,9 +241,6 @@ LoadFlow(FlowID, filepath="", params="")
 
 loadFlowGeneralParameters(flowID)
 {
-	global
-	local temp
-	
 	EnterCriticalSection(_cs_shared)
 	
 	flowSettings := _getFlowProperty(FlowID, "flowSettings")
@@ -279,9 +269,6 @@ loadFlowGeneralParameters(flowID)
 ;Loads the parameters of an element or trigger from the ini file
 LoadFlowParametersOfElement(p_flowID,p_ElementID,p_Location, p_Section)
 {
-	global
-	local parametersToload, index, index2, oneParameterDetail, parameter, parameterID, parameterDefault, tempContent, OneID, loadElementType, loadElementsubType
-
 	loadElementClass := _getElementProperty(p_flowID, p_ElementID, "class")
 	parametersToload := Element_getParameters(loadElementClass, {flowID: p_flowID, elementID: p_ElementID})
 	parametersToloadDetails := Element_getParametrizationDetails(loadElementClass, {flowID: p_flowID, elementID: p_ElementID})

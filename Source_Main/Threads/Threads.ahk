@@ -22,8 +22,8 @@ Thread_StartManager()
 	local ExecutionThreadCode
 	local threadID
 	
-	_share.manager := CriticalObject()
-	_share.manager.Tasks := CriticalObject()
+	_setSharedProperty("manager", object())
+	_setSharedProperty("manager.Tasks", object())
 	
 	threadID := "Manager"
 	logger("t1", "Starting manager thread. ID: " threadID)
@@ -48,8 +48,8 @@ Thread_StartEditor(par_FlowID)
 	local ExecutionThreadCode
 	local threadID
 	
-	_share["editor" par_FlowID]:= CriticalObject()
-	_share["editor" par_FlowID].Tasks := CriticalObject()
+	_setSharedProperty("editor" par_FlowID, object())
+	_setSharedProperty("editor" par_FlowID ".Tasks", object())
 	
 	threadID := "Editor" global_EditorThreadIDCounter++
 	logger("t1", "Starting editor thread. ID: " threadID)
@@ -69,8 +69,8 @@ Thread_StartDraw()
 	local ExecutionThreadCode
 	local threadID
 	
-	_share.draw := CriticalObject()
-	_share.draw.Tasks := CriticalObject()
+	_setSharedProperty("draw", object())
+	_setSharedProperty("draw.Tasks", object())
 	
 	threadID := "Draw"
 	logger("t1", "Starting draw thread. ID: " threadID)
@@ -87,8 +87,8 @@ Thread_StartExecution()
 	local ExecutionThreadCode
 	local threadID
 	
-	_share.execution := CriticalObject()
-	_share.execution.Tasks := CriticalObject()
+	_setSharedProperty("execution", object())
+	_setSharedProperty("execution.Tasks", object())
 	
 	threadID := "Execution" global_ExecutionThreadIDCounter++
 	logger("t1", "Starting execution thread. ID: " threadID)
