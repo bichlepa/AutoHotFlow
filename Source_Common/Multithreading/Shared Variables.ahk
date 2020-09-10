@@ -231,6 +231,17 @@ _getCategoryIdByName(CategoryName)
 	LeaveCriticalSection(_cs_shared)
     return retval
 }
+_getAllCategoryIds()
+{
+	EnterCriticalSection(_cs_shared)
+    allCategories:=[]
+    for forCategoryID, forCategory in _share.allCategories
+	{
+		allCategories.push(forFlowID)
+	}
+	LeaveCriticalSection(_cs_shared)
+    return allCategories
+}
 
 _getElement(FlowID, ElementID)
 {
@@ -265,6 +276,14 @@ _setElementProperty(FlowID, ElementID, path, value)
     objectPath:=parseObjectPath(_flows[FlowID].allElements[ElementID], path)
     objectPath[1][objectPath[2]] := ObjFullyClone(value)
 	LeaveCriticalSection(_cs_shared)
+}
+_deleteElementProperty(FlowID, ElementID, path)
+{
+	EnterCriticalSection(_cs_shared)
+    objectPath:=parseObjectPath(_flows[FlowID].allElements[ElementID], path)
+    objectPath[1].delete(objectPath[2])
+	LeaveCriticalSection(_cs_shared)
+    return value
 }
 _getAndIncrementElementProperty(FlowID, ElementID, path, incrementValue = 1)
 {
@@ -338,6 +357,23 @@ _setConnectionProperty(FlowID, ConnectionID, path, value)
     objectPath[1][objectPath[2]] := ObjFullyClone(value)
 	LeaveCriticalSection(_cs_shared)
 }
+_deleteConnectionProperty(FlowID, ConnectionID, path)
+{
+	EnterCriticalSection(_cs_shared)
+    objectPath:=parseObjectPath(_flows[FlowID].allConnections[ConnectionID], path)
+    objectPath[1].delete(objectPath[2])
+	LeaveCriticalSection(_cs_shared)
+    return value
+}
+_getAndIncrementConnectionProperty(FlowID, ConnectionID, path, incrementValue = 1)
+{
+	EnterCriticalSection(_cs_shared)
+	_flows[FlowID].allConnections[ConnectionID][path] += incrementValue
+    value :=_flows[FlowID].allConnections[ConnectionID][path]
+	LeaveCriticalSection(_cs_shared)
+    return value
+}
+
 _existsConnection(FlowID, ConnectionID)
 {
 	EnterCriticalSection(_cs_shared)

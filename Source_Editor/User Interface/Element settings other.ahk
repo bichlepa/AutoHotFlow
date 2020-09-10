@@ -36,7 +36,8 @@ ui_EnableElementSettingsWindow()
 ui_GetElementSettingsGUIPos()
 {
 	global 
-	WinGetPos,ElementSettingsGUIX,ElementSettingsGUIY,ElementSettingsGUIWidth,ElementSettingsGUIHeight,% "ahk_id " _share.hwnds["ElementSettingsParent" Flowobj.ID]
+	local tempHWND := _getShared("hwnds.ElementSettingsParent" Flowobj.ID)
+	WinGetPos,ElementSettingsGUIX,ElementSettingsGUIY,ElementSettingsGUIWidth,ElementSettingsGUIHeight,% "ahk_id " tempHWND
 }
 
 ;Select element subtype
@@ -45,21 +46,19 @@ selectSubType(p_ElementID,wait="")
 	global
 	static NowResultEditingElement
 	setElementID:=p_ElementID
-	if isobject(flowObj.allElements[setElementID])
-		setElement:=flowObj.allElements[setElementID]
-	else if isobject(flowObj.allTriggers[setElementID])
-		setElement:=flowObj.allTriggers[setElementID]
-	else
-		MsgBox Internal Error in selectSubType()! `n The element was not found
+	
 	;~ d(setelement)
-	setElementType:=setElement.type 
+	setElementType:= _getElementProperty(FlowID, setElementID, "type")
+	setElementClass:= _getElementProperty(FlowID, setElementID, "Class")
+	setElementName:= _getElementProperty(FlowID, setElementID, "Name")
+	setElementPars:= _getElementProperty(FlowID, setElementID, "pars")
+
 	local matchingElementClasses:=Object()
 	local allCategories:=Object()
 	local tempcategory
 	;~ d(setElement, p_ID)
 	NowResultEditingElement:=""
 	
-	;~ d(_share.AllElementClasses)
 	
 	EditGUIDisable()
 	gui,3:default
@@ -78,12 +77,12 @@ selectSubType(p_ElementID,wait="")
 	TVClass:=Object()
 	
 	;Find out wich categories exist
-	for forelementIndex, forElementClass in _share.AllElementClasses
+	for forelementIndex, forElementClass in _getShared("AllElementClasses")
 	{
 		if (Element_getElementType_%forElementClass%() = setElementType)
 		{
 			if (ShouldShowThatelementLevel(IsFunc("Element_getElementLevel_" forElementClass) ? Element_getElementLevel_%forElementClass%() : "Beginner")
-				OR setElement.class = forElementClass)
+				OR setElementClass = forElementClass)
 			{
 				matchingElementClasses.push(forElementClass)
 				tempcategory:=Element_getCategory_%forElementClass%()
@@ -124,13 +123,13 @@ selectSubType(p_ElementID,wait="")
 					tempcategoryTV:=tempcategoryTV%forindex%
 			}
 			if (ShouldShowThatelementLevel(IsFunc("Element_getElementLevel_" forElementClass) ? Element_getElementLevel_%forElementClass%() : "Beginner")
-				OR setElement.class = forElementClass)
+				OR setElementClass = forElementClass)
 			{
 				tempTV:=TV_Add(Element_getName_%forElementClass%(),tempcategoryTV)
 				TVnum[tempTV]:=forelementIndex
 				TVID[tempTV]:=setElementID
 				TVClass[tempTV]:=forElementClass
-				if (setElement.class=forElementClass) ;Select the current element type, if any
+				if (setElementClass=forElementClass) ;Select the current element type, if any
 					TV_Modify(tempTV) 
 			}
 		}
@@ -160,8 +159,8 @@ selectSubType(p_ElementID,wait="")
 			{
 				if (NowResultEditingElement!="aborted")
 				{
-					setElement.subtype:=NowResultEditingElement
-					setElement.setUnsetDefaults()
+					_setElementProperty(FlowID, ElementID, "subtype", NowResultEditingElement)
+					; setElement.setUnsetDefaults() TODO: Did I forget this function on last refactoring?
 				}
 				break
 			}
@@ -177,10 +176,10 @@ selectSubType(p_ElementID,wait="")
 	GuiElementChooseCancel:
 	gui,3:default
 	gui,destroy
-	if (setElement.class="" and setElement.Type!="Trigger")
+	if (setElementClass="" and setElementType!="Trigger")
 	{
 		;~ d(setelement)
-		Element_Remove(FlowID, setElement.id)
+		Element_Remove(FlowID, setElementId)
 		;~ API_Draw_Draw()
 	}
 	NowResultEditingElement=aborted
@@ -234,7 +233,7 @@ selectSubType(p_ElementID,wait="")
 selectConnectionType(p_ElementID,wait="")
 {
 	global 
-	static NowResultEditingElement, setElement, temp_from, ConnectionType
+	static NowResultEditingElement, temp_from, ConnectionType
 	
 	NowResultEditingElement:=""
 	
@@ -367,7 +366,7 @@ selectContainerType(p_ElementID, wait="")
 	static NowResultEditingElement
 	NowResultEditingElement:=""
 	setElementID:=p_ElementID
-	setElement:=flowObj.allElements[setElementID]
+	setElementType:= _getElementProperty(FlowID, setElementID, "type")
 	EditGUIDisable()
 	gui, 8:default
 	
@@ -376,7 +375,7 @@ selectContainerType(p_ElementID, wait="")
 	gui,add,text,,% lang("Select_element_type")
 		
 	
-	if (setElement.type="Action" or setElement.type="")
+	if (setElementType="Action" or setElementType="")
 	{
 		gui,add,Button,w100 h50 gGuiElementTypeChooseAction gGuiElementTypeChooseAction default,% lang("Action")
 		gui,add,Button,w100 h50 X+10 gGuiElementTypeChooseCondition gGuiElementTypeChooseCondition,% lang("Condition")

@@ -31,7 +31,7 @@ initializeTrayBar()
 
 	menu tray,icon,%_ScriptDir%\Icons\disabled.ico
 	
-	menu,tray, tip,% lang("Flow") ": " _flows[flowid].name
+	menu,tray, tip,% lang("Flow") ": " _getFlowProperty(FlowID, "name")
 }
 
 

@@ -9,13 +9,13 @@
 	
 	Disable_Manager_GUI()
 	tempCategoryList=
-	for count, tempCategory in _share.allCategories
+	for count, tempCategory in _getShared("allCategories")
 	{
 		tempCategoryList:=tempCategoryList tempCategory.name "|"
 	}
 	
 	gui,font,s10
-	gui,changeCategory:add,text,xm ym ,% lang("Where_should_%1%_be_moved?",_Flows[par_selectedID].name)
+	gui,changeCategory:add,text,xm ym ,% lang("Where_should_%1%_be_moved?", _getFlowProperty(par_selectedID, "name"))
 	gui,changeCategory:add,ListBox, xm Y+10 vChangeCategoryList gChangeCategoryList w300 h300 , % tempCategoryList
 	
 	gui,changeCategory:add,edit, xm Y+10 w200 vChangeCategoryNewName

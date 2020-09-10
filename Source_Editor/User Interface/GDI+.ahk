@@ -1,7 +1,7 @@
 ﻿;Formula for x-position: 0+n*35  	;Width: 35*4=140
 ;Formula for y-position: 17,5+n*35	;Height: 35*3=105
 
-_flows[FlowID].draw.VisibleArea:=[]
+_setFlowProperty(FlowID, "draw.VisibleArea", [])
 ;~ OnTopLabel=
 
 
@@ -41,7 +41,7 @@ goto,jumpoverUIDRaw
 
 
 ui_regularUpdateIfWinMoved:
-WinGetPos,winx,winy,,,% "ahk_id " _share.hwnds["editGUI" FlowID]
+WinGetPos,winx,winy,,,% "ahk_id " _MainGuihwnd
 if (winx!=winxold and winy!=winyOld)
 {
 	winxold:=winx

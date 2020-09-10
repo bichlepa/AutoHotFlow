@@ -75,7 +75,7 @@ queryTasks()
 	global
 	Loop
 	{
-		oneTask:=_share.manager.Tasks.removeat(1)
+		oneTask:=_getTask("manager")
 		if (oneTask)
 		{
 			name:=oneTask.name

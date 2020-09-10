@@ -1,15 +1,8 @@
 ﻿;mark an element or connection. If parameter additional is true, mark it additionally to others
 MarkOne(p_ID,additional:=false)
 {
-	global _flows
-	global FlowID
 	
 	EnterCriticalSection(_cs_shared)
-	
-	markedElements:=_flows[FlowID].markedElements
-	allConnections:=_flows[FlowID].allConnections
-	allElements:=_flows[FlowID].allElements
-	
 	
 	;~ ToolTip,% p_id " - " additional
 	if (p_ID!="")
@@ -21,11 +14,11 @@ MarkOne(p_ID,additional:=false)
 			;Mark one element
 			if p_ID contains connection
 			{
-				_flows[FlowID].allConnections[p_ID].marked:=true
+				_setConnectionProperty(FlowID, p_ID, "marked", true)
 			}
 			else
 			{
-				_flows[FlowID].allElements[p_ID].marked:=true
+				_setElementProperty(FlowID, p_ID, "marked", true)
 			}
 			
 			
@@ -34,11 +27,11 @@ MarkOne(p_ID,additional:=false)
 		{
 			if p_ID contains connection
 			{
-				_flows[FlowID].allConnections[p_ID].marked:=!(_flows[FlowID].allConnections[p_ID].marked)
+				_setConnectionProperty(FlowID, p_ID, "marked", !_getConnectionProperty(FlowID, p_ID, "marked"))
 			}
 			else
 			{
-				_flows[FlowID].allElements[p_ID].marked:=!(_flows[FlowID].allElements[p_ID].marked)
+				_setElementProperty(FlowID, p_ID, "marked", !_getElementProperty(FlowID, p_ID, "marked"))
 			}
 			
 			
@@ -61,17 +54,13 @@ UnmarkEverything(CreateList=true)
 	
 	EnterCriticalSection(_cs_shared)
 	
-	markedElements:=_flows[FlowID].markedElements
-	allConnections:=_flows[FlowID].allConnections
-	allElements:=_flows[FlowID].allElements
-	
-	for forID, forElement in allElements ;Add all marked elements into array
+	for forIndex, forElementID in _getAllElementIds(FlowID) ;Add all marked elements into array
 	{
-		allElements[forID].marked:=false
+		_setElementProperty(FlowID, forElementID, "marked", false)
 	}
-	for forID, forElement in allConnections ;Add all marked elements into array
+	for forIndex, forConnectionID in _getAllConnectionIds(FlowID) ;Add all marked elements into array
 	{
-		allConnections[forID].marked:=false
+		_setConnectionProperty(FlowID, forConnectionID, "marked", false)
 	}
 	
 	if (CreateList)
@@ -88,19 +77,13 @@ MarkEverything()
 	
 	EnterCriticalSection(_cs_shared)
 	
-	markedElements:=_flows[FlowID].markedElements
-	allConnections:=_flows[FlowID].allConnections
-	allElements:=_flows[FlowID].allElements
-	
-	
-	
-	for forID, forElement in allElements ;Add all marked elements into array
+	for forIndex, forElementID in _getAllElementIds(FlowID) ;Add all marked elements into array
 	{
-		allElements[forID].marked:=true
+		_setElementProperty(FlowID, forElementID, "marked", true)
 	}
-	for forID, forElement in allConnections ;Add all marked elements into array
+	for forIndex, forConnectionID in _getAllConnectionIds(FlowID) ;Add all marked elements into array
 	{
-		allElements[forID].marked:=true
+		_setConnectionProperty(FlowID, forConnectionID, "marked", false)
 	}
 	
 	CreateMarkedList()
@@ -112,44 +95,34 @@ MarkEverything()
 
 CreateMarkedList()
 {
-	global
-	;~ SoundBeep
-	local markedElementsClone
-	
 	EnterCriticalSection(_cs_shared)
 	
-	markedElements:=_flows[FlowID].markedElements
-	allConnections:=_flows[FlowID].allConnections
-	allElements:=_flows[FlowID].allElements
-	
-	markedElementsClone:=markedElements.clone() 
-	for forID, forElement in markedElementsClone
+	markedElements:=[]
+
+	for forIndex, forElementID in _getAllElementIds(FlowID) ;Add all marked elements into array
 	{
-		markedElements.delete(forID)
-	} 
-	
-	for forID, forElement in allElements ;Add all marked elements into array
-	{
-		if (allElements[forID].marked=true)
-			markedElements[forID]:=forID
+		if (_getElementProperty(FlowID, forElementID, "marked"))
+			markedElements[forElementID]:=forElementID
 	}
-	for forID, forElement in allConnections ;Add all marked elements into array
+	for forIndex, forConnectionID in _getAllConnectionIds(FlowID) ;Add all marked elements into array
 	{
-		if (allConnections[forID].marked=true)
-			markedElements[forID]:=forID
+		if (_getConnectionProperty(FlowID, forConnectionID, "marked"))
+			markedElements[forConnectionID]:=forConnectionID
 	}
 	
 	if (markedElements.count()=1)
 	{
 		for forID, forID2 in markedElements
 		{
-			_flows[FlowID].markedElement:=forID
+			_setFlowProperty(FlowID, "markedElement", forID)
 		}
 	}
 	else
 	{
 		;~ ToolTip no element
-		_flows[FlowID].markedElement:=""
+		_setFlowProperty(FlowID, "markedElement", "")
 	}
+	
+	_setFlowProperty(FlowID, "markedElements", markedElements)
 	LeaveCriticalSection(_cs_shared)
 }

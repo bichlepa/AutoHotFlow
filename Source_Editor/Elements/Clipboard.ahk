@@ -1,69 +1,42 @@
 ﻿SaveToClipboard()
 {
-	global
-	local tempsaveCounter=0
-	local toreturn
-	
-
 	EnterCriticalSection(_cs_shared)
 	
 	ToolTip(lang("saving to clipboard"),100000)
 	logger("a2","Saving elements to clipboard")
 	
-	_share.clipboard:=Object()
-	_share.clipboard.allElements:=Object()
-	_share.clipboard.allConnections:=Object()
+
+	newClipboard:=Object()
+	newClipboard.allElements:=Object()
+	newClipboard.allConnections:=Object()
 	;~ RIni_Shutdown("ClipboardSaveFile")
 	;~ Rini_Create("ClipboardSaveFile")
 	
-	for saveElementID, saveElement in FlowObj.allElements
+	
+	for forIndex, forElementID in _getAllElementIds(FlowID)
 	{
 		;~ d(saveElement,1)
-		if (saveElement.marked!=true) ;Save only marked elements to clipboard
+		marked := _getElementProperty(FlowID, forElementID, "marked")
+		if (marked != true) ;Save only marked elements to clipboard
 			continue
 		
-		_share.clipboard.allElements[saveElementID]:= objfullyclone(saveElement) 
+		newClipboard.allElements[forElementID]:= _getElement(FlowID, forElementID)
 		tempsaveCounter++
-		;~ saveSection:="element" a_index
-		;~ RIni_SetKeyValue("ClipboardSaveFile", saveSection,"ID", saveElementID)
-		;~ RIni_SetKeyValue("ClipboardSaveFile", saveSection,"Type", saveElement.type)
-		
-		;~ RIni_SetKeyValue("ClipboardSaveFile", saveSection,"x", saveElement.x)
-		;~ RIni_SetKeyValue("ClipboardSaveFile", saveSection,"y", saveElement.y)
-		;~ saveElementname:=saveElement.name
-		;~ StringReplace, saveElementname, saveElementname, `n,|¶, All ;Convert a linefeed to |¶. Otherwise the next lines will not be readable. 
-		;~ RIni_SetKeyValue("ClipboardSaveFile", saveSection,"name", saveElementname)
-		;~ RIni_SetKeyValue("ClipboardSaveFile", saveSection,"subType", saveElement.subType)
-		
-		;~ if (saveElementType="loop")
-		;~ {
-			;~ RIni_SetKeyValue("ClipboardSaveFile", saveSection,"HeightOfVerticalBar", saveElement.HeightOfVerticalBar)
-		;~ }
-		
-		;~ i_SaveParametersOfElement(saveElement,saveSection,"ClipboardSaveFile")
-		
 	}
 	
-	for saveElementID, saveElement in FlowObj.allConnections
+	for forIndex, forConnectionID in _getAllConnectionIds(FlowID) 
 	{
+		from := _getConnectionProperty(FlowID, forConnectionID, "saveElement.from")
+		to := _getConnectionProperty(FlowID, forConnectionID, "saveElement.to")
+		fromMarked := _getElementProperty(FlowID, from, "marked")
+		toMarked := _getElementProperty(FlowID, to, "marked")
 		;A connection is saved to clipboard if its connected elements are both marked
-		if (!(FlowObj.allelements[saveElement.to].marked=true and FlowObj.allelements[saveElement.from].marked=true) )
+		if (!(fromMarked=true and toMarked=true) )
 		{
 			continue
 		}
-		_share.clipboard.allConnections[saveElementID]:= objfullyclone(saveElement) 
+		newClipboard.allConnections[saveElementID]:= _getConnection(FlowID, forConnectionID)
 		tempsaveCounter++
-		;~ saveSection:="Connection" a_index
-		;~ RIni_SetKeyValue("ClipboardSaveFile", saveSection,"ID", saveElementID)
-		;~ RIni_SetKeyValue("ClipboardSaveFile", saveSection,"Type", saveElement.type)
-		
-		;~ RIni_SetKeyValue("ClipboardSaveFile", saveSection,"from", saveElement.from)
-		;~ RIni_SetKeyValue("ClipboardSaveFile", saveSection,"to", saveElement.to)
-		;~ RIni_SetKeyValue("ClipboardSaveFile", saveSection,"ConnectionType", saveElement.ConnectionType)
-		;~ if (saveElement.frompart)
-			;~ RIni_SetKeyValue("ClipboardSaveFile", saveSection,"fromPart", saveElement.frompart)
-		;~ if (saveElement.toPart)
-			;~ RIni_SetKeyValue("ClipboardSaveFile", saveSection,"toPart", saveElement.toPart)
 	}
 	;~ MsgBox %tempsaveCounter%
 	if (tempsaveCounter>0)
@@ -80,7 +53,7 @@
 		toreturn:= -1
 	}
 	
-	;~ d(_share.clipboard)
+	_setShared("clipboard", newClipboard)
 	
 	LeaveCriticalSection(_cs_shared)
 	
@@ -91,22 +64,6 @@
 
 loadFromClipboard()
 {
-	global
-	local TempMouseX
-	local TempMouseY
-	local TempControl
-	local tempWin
-	local tempOffsetX
-	local tempOffsetY
-	local tempPosUnderMouseX
-	local tempPosUnderMouseY
-	local tempOffsetAlreadySet
-	local tempfound
-	local tempx
-	local tempy
-	local tempClipboardconnectionList
-	local tempCountLoadedElements=0
-	
 	EnterCriticalSection(_cs_shared)
 	
 	
@@ -119,12 +76,15 @@ loadFromClipboard()
 	UnmarkEverything()  ;Unmark all elements
 	
 	;Find mouse position and find out whether the mouse is hovering the editor
+	winHWND:= _getSharedProperty("hwnds.editGUI" FlowID)
 	MouseGetPos,TempMouseX,TempMouseY,tempWin,TempControl,2
-	;~ d("tempWin: " tempWin " - " _share.hwnds["editGUI" FlowID] "`nTempControl: " TempControl " - " _share.hwnds["editGUIDC" FlowID])
-	If (tempWin= _share.hwnds["editGUI" FlowID])
+	If (tempWin = winHWND)
 	{
-		tempPosUnderMouseX:=((TempMouseX)/FlowObj.flowSettings.zoomFactor)+FlowObj.flowSettings.offsetx
-		tempPosUnderMouseY:=((TempMouseY)/FlowObj.flowSettings.zoomFactor)+FlowObj.flowSettings.offsety
+		zoomFactor := _getFlowProperty(FlowID, "flowSettings.zoomFactor") 
+		offsetx := _getFlowProperty(FlowID, "flowSettings.offsetx") 
+		offsety := _getFlowProperty(FlowID, "flowSettings.offsetx") 
+		tempPosUnderMouseX:=((TempMouseX)/zoomFactor)+offsetx
+		tempPosUnderMouseY:=((TempMouseY)/zoomFactor)+offsety
 		;~ d(tempPosUnderMouseX " - " tempPosUnderMouseY)
 	}
 	else ;Insert in the middle of the screen
@@ -134,19 +94,19 @@ loadFromClipboard()
 	}
 	
 	tempClipboardconnectionList:=Object()
+	tempClipboardElementList:=Object()
 	UnmarkEverything()
 	
+	clipboardContent := _getShared("clipboard")
 	;~ AllSections:=RIni_GetSections("ClipboardLoadFile")	
-	for loadElementID, loadElement in _share.clipboard.allElements
+	for loadElementID, loadElement in clipboardContent.allElements
 	{
 		tempCountLoadedElements++
 		
 		
 		NewElementID:=element_New(FlowID) ;Do not pass Element ID
-		_flows[FlowID].allElements[NewElementID] := objfullyclone(loadElement)
-		_flows[FlowID].allElements[NewElementID].OldID := loadElementID ;Save the old ID in order to be able to assign the correct elements to the connections
-		_flows[FlowID].allElements[NewElementID].id := NewElementID ;Correct the ID
-		
+		_setElement(FlowID, NewElementID, loadElement)
+		_setElementProperty(FlowID, NewElementID, "id", NewElementID) ;Correct the ID
 		
 		;Correct position.
 		if (not tempOffsetX) ;On first iteration, find out where was the position of the first element and put it near to the mouse
@@ -156,62 +116,36 @@ loadFromClipboard()
 			;~ d(tempPosUnderMouseX " - " loadElement.X " - " 0.5*default_ElementWidth " = " tempOffsetX "`n" tempPosUnderMouseY " - " loadElement.Y " - " 0.5*default_ElementHeight " = " tempOffsetY)
 		}
 		;Correct the position. Each element should have the same relative position to each other as in the flow where they were copied from
-		_flows[FlowID].allElements[NewElementID].x:=ui_FitGridX(loadElement.X+tempOffsetX) 
-		_flows[FlowID].allElements[NewElementID].y:=ui_FitGridY(loadElement.Y+tempOffsetY) 
+		_setElementProperty(FlowID, NewElementID, "x", ui_FitGridX(loadElement.X+tempOffsetX))
+		_setElementProperty(FlowID, NewElementID, "y", ui_FitGridY(loadElement.Y+tempOffsetY))
 		
+		tempClipboardElementList[loadElementID] := NewElementID ;Save new element IDs in order to be able to assign the correct elements to the connections
 		
 		markOne(NewElementID,true)
 	}
 		
 	;~ AllSections:=RIni_GetSections("ClipboardLoadFile")	
-	for loadElementID, loadElement in _share.clipboard.allConnections
+	for loadElementID, loadElement in clipboardContent.allConnections
 	{
 		tempCountLoadedElements++
 		
 		;~ d(_flows[FlowID].allElements[NewElementID])
 		
 		
-		NewElementID:=connection_new(FlowID)
-		_flows[FlowID].allConnections[NewElementID] := objfullyclone(loadElement)
+		NewElementID := connection_new(FlowID)
+		_setConnection(FlowID, NewElementID, loadElement)
+		_setElementProperty(FlowID, NewElementID, "id", NewElementID) ;Correct the ID
+		_setElementProperty(FlowID, NewElementID, "to", tempClipboardElementList[loadElement.to]) ;Correct connected element ID
+		_setElementProperty(FlowID, NewElementID, "from", tempClipboardElementList[loadElement.from]) ;Correct connected element ID
 		
-		_flows[FlowID].allConnections[NewElementID].id := NewElementID ;Correct the ID
-		
-		tempClipboardconnectionList.push(NewElementID) ;Save new connection in order to be able to assign the correct elements to the connections
+		tempClipboardconnectionList.push(NewElementID) ;Save new connection IDs in order to be able to assign the correct elements to the connections
 		
 		markOne(NewElementID,true)
-		
-		
-		
 	}
-	
-	;Assign the correct elements to the connections
-	for index, tempConnectionID in tempClipboardconnectionList
-	{
-		for tempID, tempElement in _flows[FlowID].allElements
-		{
-			if (tempElement.oldID)
-			{
-				;~ d(_flows[FlowID].allConnections[tempConnectionID],tempElement.OldID)
-				if (_flows[FlowID].allConnections[tempConnectionID].to = tempElement.OldID)
-				{
-					_flows[FlowID].allConnections[tempConnectionID].to := tempElement.id
-				}
-				if (_flows[FlowID].allConnections[tempConnectionID].from = tempElement.OldID)
-				{
-					_flows[FlowID].allConnections[tempConnectionID].from := tempElement.id
-				}
-			}
-		}
-	}
-	
-	for tempID, tempElement in _flows[FlowID].allElements ;remove the oldIDs otherwise it will cause errors on next paste
-	{
-		_flows[FlowID].allElements[tempID].delete("oldID")
-	}
-	
+
 	if tempCountLoadedElements>0
 	{
-		new state()
+		State_New(FlowID)
 		ToolTip(lang("Loaded %1% elements from clipboard",index1),1000)
 		logger("a2","Loaded " index1 " elements from clipboard")
 	}
@@ -220,9 +154,6 @@ loadFromClipboard()
 		ToolTip(lang("No elements found in clipboard"),1000)
 		logger("a2","No elements found in clipboard")
 	}
-	
-	
-	State_New(FlowID)
 	
 	LeaveCriticalSection(_cs_shared)
 	

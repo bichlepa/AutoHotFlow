@@ -3,8 +3,8 @@
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
 
 SetWorkingDir %A_ScriptDir%\..  ; set working dir.
-global _WorkingDir := _share._WorkingDir
-global _ScriptDir := _share._ScriptDir
+global _WorkingDir := _getShared("_WorkingDir")
+global _ScriptDir := _getShared("_ScriptDir")
 SetWorkingDir %a_temp%  ; using working dir forbidden.
 
 SetBatchLines -1
@@ -24,7 +24,7 @@ OnExit,Exit
 _language:=Object()
 _language.dir:=_ScriptDir "\language" ;Directory where the translations are stored
 lang_Init()
-lang_setLanguage(_settings.UILanguage)
+lang_setLanguage(_getSettings("UILanguage"))
 
 #include lib\Object to file\String-object-file.ahk
 #include lib\GDI+\GDIp.ahk
@@ -87,9 +87,6 @@ EditorGUIInit()
 EditGUIshow()
 initializeTrayBar()
 
-
-FlowObj := _flows[FlowID]
-
 SetTimer,queryTasks,100
 return
 
@@ -99,7 +96,7 @@ queryTasks()
 	global
 	Loop
 	{
-		oneTask:=_share["editor" FlowID].Tasks.removeat(1)
+		oneTask:=_getTask("editor" FlowID)
 		if (oneTask)
 		{
 			name:=oneTask.name

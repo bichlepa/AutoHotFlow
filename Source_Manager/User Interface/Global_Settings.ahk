@@ -30,20 +30,20 @@ globalSettings_GUI()
 	}
 	
 	;Prepare other settings
-	GuiSettingRunAsAdmin:=(!!_settings.RunAsAdmin)
-	GuiFlowSettingsParallel:=(_settings.FlowExecutionPolicy = "parallel")
-	GuiFlowSettingsskip:=(_settings.FlowExecutionPolicy = "skip")
-	GuiFlowSettingsWait:=(_settings.FlowExecutionPolicy = "Wait")
-	GuiFlowSettingsStop:=(_settings.FlowExecutionPolicy = "Stop")
-	GuiShowElementsBeginner:=(_settings.ShowElementsLevel = "Beginner")
-	GuiShowElementsAdvanced:=(_settings.ShowElementsLevel = "Advanced")
-	GuiShowElementsProgrammer:=(_settings.ShowElementsLevel = "Programmer")
-	;~ GuiShowElementsCustom:=(_settings.ShowElementsLevel = "Custom") ;TODO
-	GuiSettingsHideDemoFlows:=(!!_settings.HideDemoFlows)
-	GUIloglevelFlow:=_settings.LogLevelFlow
-	GUIloglevelApp:=_settings.LogLevelApp
-	GUIloglevelThread:=_settings.LogLevelThread
-	GUIlogToFile:=(!!_settings.LogToFile)
+	GuiSettingRunAsAdmin := (!!_getSettings("RunAsAdmin"))
+	GuiFlowSettingsParallel := (_getSettings("FlowExecutionPolicy") = "parallel")
+	GuiFlowSettingsskip := (_getSettings("FlowExecutionPolicy") = "skip")
+	GuiFlowSettingsWait := (_getSettings("FlowExecutionPolicy") = "Wait")
+	GuiFlowSettingsStop := (_getSettings("FlowExecutionPolicy") = "Stop")
+	GuiShowElementsBeginner := (_getSettings("ShowElementsLevel") = "Beginner")
+	GuiShowElementsAdvanced := (_getSettings("ShowElementsLevel") = "Advanced")
+	GuiShowElementsProgrammer := (_getSettings("ShowElementsLevel") = "Programmer")
+	;~ GuiShowElementsCustom:=(_getSettings("ShowElementsLevel") = "Custom") ;TODO
+	GuiSettingsHideDemoFlows := (!!_getSettings("HideDemoFlows"))
+	GUIloglevelFlow := _getSettings("LogLevelFlow")
+	GUIloglevelApp := _getSettings("LogLevelApp")
+	GUIloglevelThread := _getSettings("LogLevelThread")
+	GUIlogToFile := (!!_getSettings("LogToFile"))
 	
 	;build the gui
 	gui,GlobalSettings:default
@@ -76,7 +76,7 @@ globalSettings_GUI()
 	gui,font,s10 cnavy wbold
 	gui,add,text,xs Y+20  w300 Y+15,% lang("Working directory")
 	gui,font,s8 cDefault wnorm
-	gui,add,Edit,xs Y+10 w300 vGuiFlowSettingsWorkingDir,% _settings.FlowWorkingDir
+	gui,add,Edit,xs Y+10 w300 vGuiFlowSettingsWorkingDir,% _getSettings("FlowWorkingDir")
 	
 	gui,tab, %globalsetting_tab_Appearance%
 	gui,font,s10 cnavy wbold
@@ -98,10 +98,10 @@ globalSettings_GUI()
 	gui,add,text,xs Y+10 w100,% lang("Flow") 
 	gui,add,slider,X+10 yp w60 range0-3 vGUIloglevelFlow gGuiSettingsupdatesomeinfo AltSubmit TickInterval1,%GUIloglevelFlow%
 	gui,add,text,X+10 yp w100 vGUIloglevelFlowtext
-	gui,add,text,xs Y+20 w100,% _settings.developing ?  lang("App") : lang("Internal")  " 1"
+	gui,add,text,xs Y+20 w100,% _getSettings("developing") ?  lang("App") : lang("Internal")  " 1"
 	gui,add,slider,X+10 yp w60 range0-3 vGUIloglevelApp gGuiSettingsupdatesomeinfo AltSubmit TickInterval1,%GUIloglevelApp%
 	gui,add,text,X+10 yp w100 vGUIloglevelApptext
-	gui,add,text,xs Y+20 w100,% _settings.developing ?  lang("Thread") : lang("Internal")  " 2"
+	gui,add,text,xs Y+20 w100,% _getSettings("developing") ?  lang("Thread") : lang("Internal")  " 2"
 	gui,add,slider,X+10 yp w60 range0-3 vGUIloglevelThread gGuiSettingsupdatesomeinfo AltSubmit TickInterval1,%GUIloglevelThread%
 	gui,add,text,X+10 yp w100 vGUIloglevelThreadtext
 	gui,add,Checkbox,xs Y+20 w300 checked%GUIlogToFile% vGUIlogToFile ,% lang("Log to file")
@@ -153,20 +153,20 @@ globalSettings_GUI()
 	gui,GlobalSettings:Submit,nohide
 
 	;Check working directory
-	newworkingdir:=checkNewWorkingDir(_settings.FlowWorkingDir, GuiFlowSettingsWorkingDir)
+	newworkingdir:=checkNewWorkingDir(_getSettings("FlowWorkingDir"), GuiFlowSettingsWorkingDir)
 	if not (newworkingdir)
 	{
 		guicontrol, choose, globalsettingtab, %globalsetting_tab_FlowSettings%
 		guicontrol, focus, GuiFlowSettingsWorkingDir
 		return
 	}
-	_settings.FlowWorkingDir :=newworkingdir
+	_setSettings("FlowWorkingDir", newworkingdir)
 
 	;handle language setting
 	lang_setLanguage(GuiLanguageChoose)
-	if (_settings.UILanguage != _language.lang)
+	if (_getSettings("UILanguage") != _language.lang)
 	{
-		_settings.UILanguage := _language.lang
+		_setSettings("UILanguage", _language.lang)
 		Refresh_Manager_GUI()
 		needtorefreshflowtreeview:=true
 	}
@@ -183,36 +183,36 @@ globalSettings_GUI()
 	}
 	
 	;handle "hide demo flows" setting
-	if (_settings.HideDemoFlows != GuiSettingsHideDemoFlows)
+	if (_getSettings("HideDemoFlows") != GuiSettingsHideDemoFlows)
 	{
 		needtorefreshflowtreeview:=true
-		_settings.HideDemoFlows := GuiSettingsHideDemoFlows
+		_setSettings("HideDemoFlows", GuiSettingsHideDemoFlows)
 	}
 	
 	;handle other settings
-	_settings.RunAsAdmin:=GuiSettingRunAsAdmin
-	_settings.logtofile:=GUIlogToFile
-	_settings.loglevelFlow:=GUIloglevelFlow
-	_settings.loglevelApp:=GUIloglevelApp
-	_settings.loglevelThread:=GUIloglevelThread
-	_settings.logToFile:=GUIlogToFile
+	_setSettings("RunAsAdmin", GuiSettingRunAsAdmin)
+	_setSettings("logtofile", GUIlogToFile)
+	_setSettings("loglevelFlow", GUIloglevelFlow)
+	_setSettings("loglevelApp", GUIloglevelApp)
+	_setSettings("loglevelThread", GUIloglevelThread)
+	_setSettings("logToFile", GUIlogToFile)
 	
-	GuiFlowSettingsParallel ? _settings.FlowExecutionPolicy := "parallel"
-	GuiFlowSettingsskip ? _settings.FlowExecutionPolicy := "skip"
-	GuiFlowSettingsWait ? _settings.FlowExecutionPolicy := "Wait"
-	GuiFlowSettingsStop ? _settings.FlowExecutionPolicy := "Stop"
+	GuiFlowSettingsParallel ? _setSettings("FlowExecutionPolicy", "parallel")
+	GuiFlowSettingsskip ? _setSettings("FlowExecutionPolicy", "skip")
+	GuiFlowSettingsWait ? _setSettings("FlowExecutionPolicy", "Wait")
+	GuiFlowSettingsStop ? _setSettings("FlowExecutionPolicy", "Stop")
 	
-	GuiShowElementsBeginner ? _settings.ShowElementsLevel := "Beginner"
-	GuiShowElementsAdvanced ? _settings.ShowElementsLevel := "Advanced"
-	GuiShowElementsProgrammer ? _settings.ShowElementsLevel := "Programmer"
-	;~ GuiShowElementsCustom ? _settings.ShowElementsLevel := "Custom" ;TODO
+	GuiShowElementsBeginner ? _setSettings("ShowElementsLevel", "Beginner")
+	GuiShowElementsAdvanced ? _setSettings("ShowElementsLevel", "Advanced")
+	GuiShowElementsProgrammer ? _setSettings("ShowElementsLevel", "Programmer")
+	;~ GuiShowElementsCustom ? _setSettings("ShowElementsLevel", "Custom") ;TODO
 	
 
 	;Write current settings to file
 	write_settings()
 	
 	;if user has selected "run as admin"
-	if (_settings.runAsAdmin and not A_IsAdmin)
+	if (_getSettings("runAsAdmin") and not A_IsAdmin)
 	{
 		MsgBox, 36, , % lang("You have selected ""%1%"" do you want to restart in order to enable this setting?", lang("Run as admin") )
 		IfMsgBox yes

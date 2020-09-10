@@ -1,8 +1,8 @@
 ﻿
-ui_SettingsOwFLow()
+ui_SettingsOfFlow()
 {
 	static
-	global maingui, CurrentlyActiveWindowHWND, variable, flowobj
+	global maingui, CurrentlyActiveWindowHWND, variable
 	local pos, tempchecked, tempXpos, tempYpos, tempDir, tempSettingFlowExecutionPolicyOld
 	
 	maingui.disable()
@@ -14,27 +14,29 @@ ui_SettingsOwFLow()
 	gui,add,text,x10 w300,% lang("Flow_execution_policy")
 	gui,font,s8 cDefault wnorm
 	
-	if (flowobj.flowSettings.ExecutionPolicy="default")
+	local executionPolicy := _getFlowProperty(FlowID, "flowSettings.ExecutionPolicy")
+
+	if (executionPolicy="default")
 		tempchecked=1
 	else
 		tempchecked=0
 	gui,add,radio,w300 x10 Y+10 vGuiFlowSettingsDefault checked%tempchecked%,% lang("Use global setting")
-	if (flowobj.flowSettings.ExecutionPolicy="parallel")
+	if (executionPolicy="parallel")
 		tempchecked=1
 	else
 		tempchecked=0
 	gui,add,radio,w300 x10 Y+10 vGuiFlowSettingsParallel checked%tempchecked%,% lang("Parallel_execution_of_multiple_instances")
-	if (flowobj.flowSettings.ExecutionPolicy="skip")
+	if (executionPolicy="skip")
 		tempchecked=1
 	else
 		tempchecked=0
 	gui,add,radio,w300 x10 Y+10 vGuiFlowSettingsSkip checked%tempchecked% ,% lang("Skip_execution_when_an_instance_is_already_executing")
-	if (flowobj.flowSettings.ExecutionPolicy="wait")
+	if (executionPolicy="wait")
 		tempchecked=1
 	else
 		tempchecked=0
 	gui,add,radio,w300 x10 Y+10 vGuiFlowSettingsWait  checked%tempchecked%,% lang("Wait_until_the_currently_executing_instance_has_finished")
-	if (flowobj.flowSettings.ExecutionPolicy="stop")
+	if (executionPolicy="stop")
 		tempchecked=1
 	else
 		tempchecked=0
@@ -44,12 +46,12 @@ ui_SettingsOwFLow()
 	gui,add,text,x10 w300 Y+15,% lang("Working directory")
 	gui,font,s8 cDefault wnorm
 	
-	if (flowobj.flowSettings.DefaultWorkingDir=True)
+	if (_getFlowProperty(FlowID, "flowSettings.DefaultWorkingDir") = True)
 		tempchecked=1
 	else
 		tempchecked=0
 	gui,add,Checkbox,w300 x10 Y+10 vGuiFlowSettingsDefaultWorkingDir checked%tempchecked% gGuiFlowSettingsDefaultWorkingDir,% lang("Use global working dir")
-	gui,add,Edit,w300 x10 Y+10 vGuiFlowSettingsWorkingDir disabled%tempchecked%,% flowobj.flowSettings.WorkingDir
+	gui,add,Edit,w300 x10 Y+10 vGuiFlowSettingsWorkingDir disabled%tempchecked%,% _getFlowProperty(FlowID, "flowSettings.WorkingDir")
 	
 	
 	gui,font,s10 cnavy wbold
@@ -74,7 +76,7 @@ ui_SettingsOwFLow()
 	return
 	
 	GuiFlowSettingsButtonShowLog:
-	showlog(flowobj.name)
+	showlog(_getFlowProperty(FlowID, "Name"))
 	return
 	
 	GuiFlowSettingsDefaultWorkingDir:
@@ -100,25 +102,22 @@ ui_SettingsOwFLow()
 	;Check working directory
 	if (GuiFlowSettingsDefaultWorkingDir)
 	{
-		newworkingdir:=checkNewWorkingDir(_settings.FlowWorkingDir, GuiFlowSettingsWorkingDir)
+		newworkingdir := checkNewWorkingDir(_settings.FlowWorkingDir, GuiFlowSettingsWorkingDir)
 		if not (newworkingdir)
 		{
 			return
 		}
-		if (newworkingdir != flowobj.flowSettings.WorkingDir)
+		if (newworkingdir != _getFlowProperty(FlowID, "flowSettings.WorkingDir"))
 		{
 			someSettingChanged:=true
-			flowobj.flowSettings.WorkingDir :=newworkingdir
+			_setFlowProperty(FlowID, "flowSettings.WorkingDir", newworkingdir)
 		}
 	}
-	if (flowobj.flowSettings.DefaultWorkingDir != GuiFlowSettingsDefaultWorkingDir)
+	if (_getFlowProperty(FlowID, "flowSettings.DefaultWorkingDir") != GuiFlowSettingsDefaultWorkingDir)
 	{
 		someSettingChanged:=true
-		flowobj.flowSettings.DefaultWorkingDir := GuiFlowSettingsDefaultWorkingDir
+		_setFlowProperty(FlowID, "flowSettings.DefaultWorkingDir", GuiFlowSettingsDefaultWorkingDir)
 	}
-	
-	
-	tempSettingFlowExecutionPolicyOld:=flowobj.flowSettings.ExecutionPolicy
 	
 	if GuiFlowSettingsDefault=1
 		tempExecutionPolicy:="default"
@@ -131,15 +130,15 @@ ui_SettingsOwFLow()
 	else if GuiFlowSettingsStop=1
 		tempExecutionPolicy:="stop"
 	
-	if (flowobj.flowSettings.ExecutionPolicy!=tempExecutionPolicy)
+	if (_getFlowProperty(FlowID, "flowSettings.ExecutionPolicy") != tempExecutionPolicy)
 	{
-		flowobj.flowSettings.ExecutionPolicy:=tempExecutionPolicy
+		_setFlowProperty(FlowID, "flowSettings.ExecutionPolicy", tempExecutionPolicy)
 		someSettingChanged:=true
 	}
 	
 	if someSettingChanged:=true
 	{
-		State_New(flowobj.id)
+		State_New(FlowID)
 	}
 	gui,destroy
 	maingui.enable()

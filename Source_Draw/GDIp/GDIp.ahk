@@ -119,7 +119,6 @@ gdip_DrawEverything(FlowObj)
 	FlowID:=FlowObj.id
 	
 
-	;~ WinGetTitle,temp,% "ahk_id " mainguihwnd
 	;~ ToolTip %temp%
 	winHWND := _getSharedProperty("hwnds.editGUI" FlowID)
 	IfWinExist,% "ahk_id " winHWND
@@ -1072,7 +1071,6 @@ gdip_DrawEverything(FlowObj)
 	;~ Gdip_TextToGraphics(G, OnTopLabel, "x10 y0 " TextOptionsTopLabel, Font, widthofguipic, heightofguipic)
 	
 	
-	;~ MsgBox %mainguiHwnddc%
 	;Show the image
 	winDC := _getSharedProperty("hwnds.editGUIDC" FlowID)
 	BitBlt(winDC, 0, 0, widthofguipic, heightofguipic, hdc, 0, 0)

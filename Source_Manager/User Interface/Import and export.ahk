@@ -23,9 +23,9 @@ import_and_export_gui()
 	gui, add, button,x10 Y+10 w200 h30 gexportFlowsExportNow,% lang("Export now")
 	
 	;Search for all flowNames
-	for oneFlowID, oneFlow in _flows
+	for oneFlowIndex, oneFlowID in _getAllFlowIDs()
 	{
-		guicontrol,,exportFlowsListViewFlowsSelection,% oneFlow.name
+		guicontrol,,exportFlowsListViewFlowsSelection,% _getFlowProperty(oneFlowID, "name")
 	}
 	
 	
@@ -49,7 +49,7 @@ exportFlowsExportNow()
 	filedelete,%filepathexport%
 	loop,parse,exportFlowsListViewFlowsSelection,|
 	{
-		filepathflow:=_flows[FlowIDbyName(A_LoopField)].file
+		filepathflow := _getFlowProperty(FlowIDbyName(A_LoopField), "file")
 		7z_compress(filepathexport, "-tzip", filepathflow)
 	}
 	

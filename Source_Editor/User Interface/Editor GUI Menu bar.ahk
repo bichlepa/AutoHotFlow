@@ -66,28 +66,27 @@ if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of t
 	ui_ActionWhenMainGUIDisabled()
 	return
 }
-ui_SettingsOwFLow()
+ui_SettingsOfFlow()
 return
 
 ui_Menu_CheckLoop:
 
-EnterCriticalSection(_cs_shared)
+tempEnabled := _getFlowProperty(FlowID, "enabled")
 
-if (menu_bar_IsEnabled != FlowObj.enabled)
+if (menu_bar_IsEnabled != tempEnabled)
 {
-	if (FlowObj.enabled = True)
+	if (tempEnabled = True)
 	{
 		menu_bar_IsEnabled := True
 		try Menu, MyMenu,rename,% lang("Enable"),% lang("Disable")
 	}
-	else if (FlowObj.enabled = false)
+	else if (tempEnabled = false)
 	{
 		menu_bar_IsEnabled := False
 		try Menu, MyMenu,rename,% lang("Disable"),% lang("Enable")
 	}
 	
 }
-LeaveCriticalSection(_cs_shared)
 
 return
 

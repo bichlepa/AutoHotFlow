@@ -43,7 +43,7 @@ init_Manager_GUI()
 	Refresh_Manager_GUI() ; write translated labels
 
 	gui,+hwndManagerGUIHWND
-	_share.hwnds.Manager := ManagerGUIHWND
+	_setSharedProperty("hwnds.Manager", ManagerGUIHWND)
 	
 	;Set title. Do not show yet
 	if a_iscompiled
@@ -104,7 +104,7 @@ Enable_Manager_GUI()
 {
 	global
 	gui,manager:-disabled
-	WinActivate,% "ahk_id " _share.hwnds.Manager 
+	WinActivate,% "ahk_id " _getSharedProperty("hwnds.Manager")
 }
 
 updateFlowIcons_Manager_GUI()
@@ -114,9 +114,9 @@ updateFlowIcons_Manager_GUI()
 	static currentLabelButtonRun:=""
 	static currentLabelButtonEnable:=""
 	
-	if (_share.FlowsTreeViewNeedFullRefresh)
+	if (_getShared("FlowsTreeViewNeedFullRefresh"))
 	{
-		_share.FlowsTreeViewNeedFullRefresh:=false
+		_setShared("FlowsTreeViewNeedFullRefresh", false)
 		TreeView_manager_Refill()
 	}
 	
@@ -125,21 +125,22 @@ updateFlowIcons_Manager_GUI()
 	
 	EnterCriticalSection(_cs_shared)
 	
-	for forFlowID, forFlow in _flows
+	for forFlowIndex, forFlowID in _getAllFlowIds()
 	{
-		if (forFlow.executing = True)
+		local flowTV := _getFlowProperty(forFlowID, "tv")
+		if (_getFlowProperty(forFlowID, "executing") = True)
 		{
 			if (currentIcons[forFlowID]!=Icon_Running)
 			{
-				TV_Modify(forFlow.tv, Icon_Running)
+				TV_Modify(flowTV, Icon_Running)
 				currentIcons[forFlowID]:=Icon_Running
 			}
 		}
-		else if (forFlow.enabled = true)
+		else if (_getFlowProperty(forFlowID, "enabled") = true)
 		{
 			if (currentIcons[forFlowID]!=Icon_Enabled)
 			{
-				TV_Modify(forFlow.tv, Icon_Enabled)
+				TV_Modify(flowTV, Icon_Enabled)
 				currentIcons[forFlowID]:=Icon_Enabled
 			}
 		}
@@ -147,16 +148,15 @@ updateFlowIcons_Manager_GUI()
 		{
 			if (currentIcons[forFlowID]!=Icon_Disabled)
 			{
-				TV_Modify(forFlow.tv, Icon_Disabled)
+				TV_Modify(flowTV, Icon_Disabled)
 				currentIcons[forFlowID]:=Icon_Disabled
 			}
 		}
 		
 	}
 	
-	
-	selectedFlow:=_flows[allTreeViewItems[TV_GetSelection()].id]
-	if (selectedFlow.executing = True)
+	local selectedFlowID := allTreeViewItems[TV_GetSelection()].id
+	if (_getFlowProperty(selectedFlowID, "executing") = True)
 	{
 		if (currentLabelButtonRun != "stop")
 		{
@@ -172,7 +172,7 @@ updateFlowIcons_Manager_GUI()
 			currentLabelButtonRun := "Run"
 		}
 	}
-	if (selectedFlow.enabled = True)
+	if (_getFlowProperty(selectedFlowID, "enabled") = True)
 	{
 		if (currentLabelButtonRun != "disable")
 		{
@@ -196,7 +196,7 @@ TreeView_manager_Refill()
 {
 	global
 	local newTV
-	local oneflowID, oneflow, onecategoryID, onecategory
+	local oneflowID, onecategoryID, onecategory
 	if not (ManagerGUIHWND)
 		return
 	Gui, manager:default
@@ -210,30 +210,42 @@ TreeView_manager_Refill()
 	TV_Delete()
 	
 	;Add demo category if user wants to see it
-	if not (_settings.HideDemoFlows)
-		_share.demoCategoryTV:=TreeView_manager_AddEntry("Category", "demo")
-	_share.uncategorizedCategoryTV:=""
-	;go through all categories and add the tv elements
-	for onecategoryID, onecategory in _share.allCategories
+	local HideDemoFlows := _getSettings("HideDemoFlows")
+	if not (HideDemoFlows)
 	{
-		onecategory.tv:=TreeView_manager_AddEntry("Category", onecategoryID)
+		local demoCategoryTV := TreeView_manager_AddEntry("Category", "demo")
+		_setShared("demoCategoryTV", demoCategoryTV)
+	}
+	_setShared("uncategorizedCategoryTV", "")
+
+	;go through all categories and add the tv elements
+	for onecategoryIndex, onecategoryID in _getAllCategoryIds()
+	{
+		local categoryTV := TreeView_manager_AddEntry("Category", onecategoryID)
+		_setCategoryProperty(onecategoryID, "tv", categoryTV)
 	}
 	
 	EnterCriticalSection(_cs_shared)
 	;go through all flows and add the tv elements
-	for oneflowID, oneflow in _flows
+	local uncategorizedCategoryTV
+	for oneflowIndex, oneflowID in _getAllFlowIds()
 	{
+		local oneFlowCategory := _getFlowProperty(oneflowID, "category")
+		local oneFlowDemo := _getFlowProperty(oneflowID, "demo")
 		;Add uncategorized category if there are flows without a category
-		if ((not oneflow.category) and (not _share.uncategorizedCategoryTV) and (not oneflow.demo))
+		if ((not oneFlowCategory) and (not uncategorizedCategoryTV) and (not oneFlowDemo))
 		{
-			_share.uncategorizedCategoryTV:=TreeView_manager_AddEntry("Category", "uncategorized")
+			uncategorizedCategoryTV:=TreeView_manager_AddEntry("Category", "uncategorized")
 		}
 			
 		;hide demo flows, if user wants
 		;~ MsgBox % _settings.HideDemoFlows " - " oneflow.demo
-		if not (_settings.HideDemoFlows && oneflow.demo)
+		if not (HideDemoFlows && oneFlowDemo)
+		{
 			oneflow.tv:=TreeView_manager_AddEntry("Flow", oneflowID)
+		}
 	}
+	_setShared("uncategorizedCategoryTV", uncategorizedCategoryTV)
 	LeaveCriticalSection(_cs_shared)
 	
 	TreeView_manager_Select(tempselectedType, tempselectedID)
@@ -251,17 +263,20 @@ TreeView_manager_AddEntry(par_Type, par_ID)
 	
 	if (par_Type = "flow")
 	{
-		if (_flows[par_ID].demo)
+		local flowName := _getFlowProperty(par_ID, "name")
+
+		if (_getFlowProperty(par_ID, "demo"))
 		{
-			newTV := TV_Add(_flows[par_ID].name, _share.democategoryTV, Icon_Disabled)
+			newTV := TV_Add(flowName, _getShared("democategoryTV"), Icon_Disabled)
 		}
-		else if (not _flows[par_ID].category)
+		else if (not _getFlowProperty(par_ID, "category"))
 		{
-			newTV := TV_Add(_flows[par_ID].name, _share.uncategorizedCategoryTV, Icon_Disabled)
+			newTV := TV_Add(flowName, _getShared("uncategorizedCategoryTV"), Icon_Disabled)
 		}
 		else
 		{
-			newTV := TV_Add(_flows[par_ID].name, _share.allCategories[_flows[par_ID].category].tv, Icon_Disabled)
+			local categoryID := _getFlowProperty(par_ID, "category")
+			newTV := TV_Add(flowName, _getCategoryProperty(categoryID, "tv"))
 		}
 	}
 	else if (par_Type = "category")
@@ -276,7 +291,7 @@ TreeView_manager_AddEntry(par_Type, par_ID)
 		}
 		else
 		{
-			newTV := TV_Add(_share.allCategories[par_ID].name, "", Icon_Folder)
+			newTV := TV_Add(_getCategoryProperty(par_ID, "name"), "", Icon_Folder)
 		}
 	}
 	else
@@ -295,24 +310,26 @@ TreeView_manager_DeleteEntry(par_Type, par_ID)
 	
 	if (par_Type = "flow")
 	{
-		if (_flows[par_ID].tv = "")
+		local flowTV := _getFlowProperty(par_ID, "tv")
+		if (flowTV = "")
 		{
 			MsgBox unexpected error. 88989984942
 			return
 		}
 		
-		TV_Delete(_flows[par_ID].tv)
-		allTreeViewItems.delete(_flows[par_ID].tv)
+		TV_Delete(flowTV)
+		allTreeViewItems.delete(flowTV)
 	}
 	else if (par_Type = "category")
 	{
-		if (_share.allCategories[par_ID].tv = "")
+		local categoryTV := _getCategoryProperty(par_ID, "tv")
+		if (categoryTV = "")
 		{
 			MsgBox unexpected error. 88989984943
 			return
 		}
-		TV_Delete(_share.allCategories[par_ID].tv)
-		allTreeViewItems.delete(_share.allCategories[par_ID].tv)
+		TV_Delete(categoryTV)
+		allTreeViewItems.delete(categoryTV)
 	}
 	else
 		MsgBox unexpected error. 165864846
@@ -329,14 +346,16 @@ TreeView_manager_Select(par_Type, par_ID, options = "")
 	Gui, manager:default
 	if (par_Type = "flow")
 	{
-		TV_Modify(_share.allCategories[_flows[par_ID].category].tv, "expand") ;Expand the category
-		TV_Modify(_flows[par_ID].tv) ;Mark
+		local categoryID := _getFlowProperty(par_ID, "category")
+		TV_Modify(_getCategoryProperty(categoryID, "tv"), "expand") ;Expand the category
+		TV_Modify(_getFlowProperty(par_ID, "tv")) ;Mark
 	}
 	else if (par_Type = "category")
 	{
-		TV_Modify(_share.allCategories[par_ID].tv) ;Mark
+		local categoryTV := _getCategoryProperty(par_ID, "tv")
+		TV_Modify(categoryTV) ;Mark
 		IfInString,options, expand
-			TV_Modify(_share.allCategories[par_ID].tv, "expand") ;Expand the category
+			TV_Modify(categoryTV, "expand") ;Expand the category
 			
 	}
 }
@@ -361,6 +380,7 @@ TreeView_manager()
 	local tempselectedType
 	local tempNewName
 	local tempitem
+	local tempflowid
 	gui,manager:default
 	tempselectedTV := TV_GetSelection()
 	tempselectedID := allTreeViewItems[tempselectedTV].id
@@ -371,9 +391,9 @@ TreeView_manager()
 		TV_GetText(tempNewName, tempselectedTV)
 		;~ d(tempNewName)
 		
-		if tempselectedType = category ;If the item is a category
+		if (tempselectedType = "category") ;If the item is a category
 		{
-			tempOldName := _share.allCategories[tempselectedID].name
+			tempOldName := _getCategoryProperty(tempselectedID, "name")
 			if !(tempOldName == tempNewName) ;If user finished renaming entry and the name has changed
 			{
 				;Do not rename demonstration category
@@ -412,18 +432,18 @@ TreeView_manager()
 					newcategoryid:=tempselectedID
 				}
 				;rename
-				_share.allCategories[newcategoryid].name := tempNewName
+				_setCategoryProperty(newcategoryid, "name", tempNewName)
 				
 				;all flows of that category must be saved
 				EnterCriticalSection(_cs_shared)
 				
-				for tempflowid, tempitem in _flows
+				for tempflowIndex, tempflowId in _getAllFlowIds()
 				{
-					if (tempitem.category = tempselectedID)
+					if (_getFlowProperty(tempflowId, "category") = tempselectedID)
 					{
 						ChangeFlowCategory(tempflowid, newcategoryid)
 						;~ d(tempitem)
-						SaveFlowMetaData(tempitem.id)
+						SaveFlowMetaData(tempflowid)
 					}
 					
 				}
@@ -433,9 +453,9 @@ TreeView_manager()
 				
 			}
 		}
-		else if tempselectedType = flow ;If the item is a flow
+		else if (tempselectedType = "flow") ;If the item is a flow
 		{
-			tempOldName := _flows[tempselectedID].name
+			tempOldName := _getFlowProperty(tempselectedID, "name")
 			if !(tempOldName == tempNewName) ;If user finished renaming entry and the name has changed
 			{
 				;Do not rename if user has entered an empty name
@@ -466,7 +486,7 @@ TreeView_manager()
 				}
 				
 				;rename
-				_flows[tempselectedID].name := tempNewName
+				_setFlowProperty(tempselectedID, "name", tempNewName)
 				SaveFlowMetaData(tempSelectedID)
 				
 				;TODO catch if editor is opened,
@@ -710,12 +730,12 @@ Button_manager_Delete()
 	{
 		Disable_Manager_GUI()
 		
-		if (_flows[tempselectedID].demo)
+		if (_getFlowProperty(tempselectedID, "name"))
 		{
 			MsgBox, 52, AutoHotFlow, % lang("You cannot delete the demonstration flows, but you can hide all of them.") "`n" lang("Do you want to do that now?")
 			IfMsgBox yes
 			{
-				_settings.HideDemoFlows:=true
+				_setSettings("HideDemoFlows", true)
 				TreeView_manager_Refill()
 				write_settings()
 			}
@@ -723,7 +743,7 @@ Button_manager_Delete()
 		else
 		{
 			;ask user for confirmation
-			MsgBox, 4, % lang("Confirm_deletion"),% lang("Do_you_really_want_to_delete_the_flow_%1%?",_flows[tempselectedID].name)
+			MsgBox, 4, % lang("Confirm_deletion"),% lang("Do_you_really_want_to_delete_the_flow_%1%?", _getFlowProperty(tempselectedID, "name"))
 			IfMsgBox,Yes
 			{
 				;delete
@@ -746,7 +766,7 @@ Button_manager_Delete()
 			MsgBox, 52, AutoHotFlow, % lang("You cannot delete the demonstration category, but you can hide all demonstration flows.") "`n" lang("Do you want to do that now?")
 			IfMsgBox yes
 			{
-				_settings.HideDemoFlows:=true
+				_setSettings("HideDemoFlows", true)
 				TreeView_manager_Refill()
 				write_settings()
 			}
@@ -755,9 +775,9 @@ Button_manager_Delete()
 		{
 			;Check, whether the category has flows
 			temphasFlows := false
-			for count, oneFlow in _flows
+			for oneFlowIndex, oneFlowID in _getAllFlowIds()
 			{
-				if (oneFlow.category = tempselectedID)
+				if (_getFlowProperty(oneFlowID, "category") = tempselectedID)
 					temphasFlows := true
 			}
 			
@@ -765,17 +785,18 @@ Button_manager_Delete()
 			{
 				;If there are flows inside the category
 				;ask user for confirmation
-				MsgBox, 4, % lang("Confirm_deletion"),% lang("Do_you_really_want_to_delete_the_category_%1%?",_share.allCategories[tempselectedID].name) "`n" lang("All_flows_of_that_category_will_be_moved_into_the_category",lang("Uncategorized")) ;confirm by user 
+				local tempCategoryName := _getCategoryProperty(tempselectedID, "name")
+				MsgBox, 4, % lang("Confirm_deletion"),% lang("Do_you_really_want_to_delete_the_category_%1%?", tempCategoryName) "`n" lang("All_flows_of_that_category_will_be_moved_into_the_category",lang("Uncategorized")) ;confirm by user 
 				IfMsgBox,Yes
 				{
 					;Create the category uncategorized if it is not present and get the tv
 					;~ d(tempUncategorizedID)
-					for count, tempFlow in _flows ;Move all flows that were inside the category to uncategorized
+					for tempFlowIndex, tempFlowID in _getAllFlowIds() ;Move all flows that were inside the category to uncategorized
 					{
-						if (tempFlow.category = tempselectedID)
+						if (_getFlowProperty(oneFlowID, "category") = tempselectedID)
 						{
 							;~ d(tempFlow)
-							ChangeFlowCategory(tempFlow.id,"")
+							ChangeFlowCategory(tempFlowID,"")
 						}
 					}
 					

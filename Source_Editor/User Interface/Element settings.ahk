@@ -8,7 +8,7 @@ temp:=lang("Loop")
 class ElementSettings
 {
 	;Open GUI for settings parameters of an element.
-	open(p_ID,wait="", alreadyChangedSomething = 0)
+	open(setElementID, wait="", alreadyChangedSomething = 0)
 	{
 		global
 		local temp, tempYPos, tempXPos, tempEditwidth, tempIsDefault, tempAssigned, tempChecked, tempMakeNewGroup, temptoChoose, tempAltSumbit, tempChoises, tempAllChoices, tempParameterOptions, tempres, tempelement
@@ -16,15 +16,14 @@ class ElementSettings
 		;~ MsgBox % strobj(newElement)
 		GUISettingsOfElementObject:=this
 		static NowResultEditingElement, somethingchanged, temponeValue
-		;~ static setElement, setElementID, setElementType, setElementsubType
+		;~ static setElementID, setElementType, setElementsubType
 		static Parameterwait
-		this.element:=p_ID
-		setElement:=flowObj.allElements[p_ID]
-		setElementID:=setElement.id
-		setElementType:=setElement.Type
-		setElementClass:=setElement.Class
+		this.element:=setElementID
+		setElementType:= _getElementProperty(FlowID, setElementID, "type")
+		setElementClass:= _getElementProperty(FlowID, setElementID, "Class")
+		setElementName:= _getElementProperty(FlowID, setElementID, "Name")
+		setElementPars:= _getElementProperty(FlowID, setElementID, "pars")
 		Parameterwait:=wait
-		;~ MsgBox % strobj(setElement)
 		
 		
 		NowResultEditingElement:=""
@@ -50,8 +49,8 @@ class ElementSettings
 		CurrentlyActiveWindowHWND:=SettingWindowHWND
 		
 		;Get the parameter list
-		parametersToEdit:=Element_getParametrizationDetails(setElementClass, {flowID: flowobj.id, elementID: setElementID, updateOnEdit: true})
-		parametersList:=Element_getParameters(setElementClass, {flowID: flowobj.id, elementID: setElementID})
+		parametersToEdit:=Element_getParametrizationDetails(setElementClass, {flowID: FlowID, elementID: setElementID, updateOnEdit: true})
+		parametersList:=Element_getParameters(setElementClass, {flowID: FlowID, elementID: setElementID})
 		;~ d(parametersList,"element settings")
 		;All elements have the parameter "name" and "StandardName"
 		ElementSettingsFields.push(new this.label({label: lang("name (name)")}))
@@ -59,7 +58,6 @@ class ElementSettings
 		
 		
 		;Loop through all parameters
-		EnterCriticalSection(_cs_shared)
 		for index, parameter in parametersToEdit
 		{
 			;Add one or a group of controls. This is done dynamically, dependent on the parameters
@@ -125,7 +123,6 @@ class ElementSettings
 			}
 			
 		}
-		LeaveCriticalSection(_cs_shared)
 		
 		
 		
@@ -171,8 +168,8 @@ class ElementSettings
 		;Make GUI autosizing
 		Gui, GUISettingsOfElementParent:Show, hide w%WSettingsParent%,% lang("Settings") " - " lang(setElementType) " - " Element_getName_%setElementClass%()
 		
-		_share.hwnds["ElementSettingsChild" flowobj.id] :=SettingWindowHWND
-		_share.hwnds["ElementSettingsParent" flowobj.id] :=SettingWindowParentHWND
+		_setShared("hwnds.ElementSettingsChild" FlowID, SettingWindowHWND)
+		_setShared("hwnds.ElementSettingsParent" FlowID, SettingWindowParentHWND)
 		
 		;Calculate position to show the settings window in the middle of the main window
 		pos:=EditGUIGetPos()
@@ -225,10 +222,10 @@ class ElementSettings
 		ui_closeHelp() 
 		EditGUIEnable()
 		
-		tempres:=selectSubType(setElement.id, "wait")
+		tempres:=selectSubType(setElementId, "wait")
 		if tempres!=aborted
 		{
-			NowResultEditingElement:= ElementSettings.open(setelement.id,Parameterwait, true)
+			NowResultEditingElement:= ElementSettings.open(setelementId,Parameterwait, true)
 		}
 		else 
 		{
@@ -242,7 +239,7 @@ class ElementSettings
 		IfWinExist,ahk_id %GUIHelpHWND%
 			ui_closeHelp()
 		else
-			ui_showHelp(setElement.type "\" setElement.class)
+			ui_showHelp(setElementType "\" setElementClass)
 		return
 		
 		
@@ -253,15 +250,16 @@ class ElementSettings
 		SettingsOfElementParentEscape:
 		GUISettingsOfElementCancel:
 		;~ ToolTip %a_thislabel%
-		if (setElement.name="Νew Соntainȩr" or setElement.name="Νew Triggȩr") ;Delete the element if it was newly created
+		if (setElementName="Νew Соntainȩr" or setElementName="Νew Triggȩr") ;Delete the element if it was newly created
 		{
-			setElement.remove()
+			_deleteElement(FlowID, setElementID)
 		}
 		
+		previousSubType := _getElementProperty(FlowID, setElementID, "previousSubType")
 		if (element.previousSubType) ;restore previous subtype of element if it was changed recently
 		{
-			setElement.SubType:=element.previousSubType
-			element.previousSubType:=""
+			_setElementProperty(FlowID, setElementID, "SubType", previousSubType)
+			_deleteElementProperty(FlowID, setElementID, "previousSubType")
 		}
 		
 		ui_closeHelp() 
@@ -283,7 +281,8 @@ class ElementSettings
 		
 		GUISettingsOfElementobject.generalUpdate()
 		;~ gui,SettingsOfElement:submit
-		if (setElement.type="trigger" and triggersEnabled=true) ;When editing a trigger, disable Triggers and enable them afterwards
+		
+		if (setElementType="trigger" and triggersEnabled=true) ;When editing a trigger, disable Triggers and enable them afterwards
 		{
 			tempReenablethen:=true
 			;r_EnableFlow() ;TODO ;Disable flow
@@ -293,8 +292,9 @@ class ElementSettings
 		
 		;Save the parameters
 		somethingchanged:=alreadyChangedSomething ;will be incremented if a change will be detected
-		setElement.Name:=ElementSettingsNameField.getValue("Name")
-		setElement.StandardName:=ElementSettingsNameField.getValue("StandardName")
+		_setElementProperty(FlowID, setElementID, "Name", ElementSettingsNameField.getValue("Name"))
+		_setElementProperty(FlowID, setElementID, "StandardName", ElementSettingsNameField.getValue("StandardName"))
+		
 		;~ MsgBox % strobj(parametersToEdit)
 		for ElementSaveindex, parameter in parametersToEdit
 		{
@@ -323,11 +323,12 @@ class ElementSettings
 			{
 				tempOneParID:=parameterID[ElementSaveindex2]
 				temponeValue:=ElementSettingsFieldParIDs[tempOneParID].getValue(tempOneParID)
-				if (setElement.pars[tempOneParID]!=temponeValue)
+				tempOldValue := _getElementProperty(FlowID, setElementID, "pars." tempOneParID)
+				if (tempOldValue!=temponeValue)
 					somethingchanged++
-				setElement.pars[tempOneParID]:=temponeValue
+
+				_setElementProperty(FlowID, setElementID, "pars." tempOneParID, temponeValue)
 				
-				;~ MsgBox,1,, % tempOneParID "`n`n" ElementSaveindex  "-" ElementSaveindex2 "`n`n" strobj(ElementSettingsFieldParIDs[tempOneParID]) "`n`n" strobj(setElement)
 				;~ IfMsgBox cancel
 					;~ MsgBox % strobj(ElementSettingsFieldParIDs)
 			
@@ -696,13 +697,13 @@ class ElementSettings
 			ElementSettingsNameField:=this
 			
 			gui,font,s8 cDefault wnorm
-			tempchecked:=setElement["StandardName"] 
-			;~ temptext:=setElement.pars["Name"] 
+			
+			tempchecked:= _getElementProperty(FlowID, setElementID, "StandardName")
 			
 			gui,add,checkbox, x10 hwndtempHWND checked%tempchecked% vGUISettingsOfElementStandardName gGUISettingsOfElementCheckStandardName,% lang("Standard_name")
 			this.components.push("GUISettingsOfElementStandardName")
 			ElementSettingsFieldHWNDs[tempHWND]:=this
-			gui,add,edit,w400 x10 Multi r5 hwndtempHWND vGUISettingsOfElementName gGUISettingsOfElementGeneralUpdate,% setElement.name
+			gui,add,edit,w400 x10 Multi r5 hwndtempHWND vGUISettingsOfElementName gGUISettingsOfElementGeneralUpdate,% setElementName
 			this.components.push("GUISettingsOfElementName")
 			ElementSettingsFieldHWNDs[tempHWND]:=this
 			
@@ -721,7 +722,7 @@ class ElementSettings
 			if (this.getvalue("StandardName")=1)
 			{
 				this.disable("Name")
-				Newname:=Element_GenerateName_%setElementClass%(setElement, p_CurrentPars) 
+				Newname:=Element_GenerateName_%setElementClass%({flowID: FlowID, ElementID: setElementID}, p_CurrentPars) 
 				StringReplace,Newname,Newname,`n,%a_space%-%a_space%,all
 				this.setvalue(Newname, "Name")
 			}
@@ -793,7 +794,7 @@ class ElementSettings
 			local tempParameterID:=parameter.id
 			
 			gui,font,s8 cDefault wnorm
-			temp:=setElement.pars[parameter.id] 
+			temp:=setElementPars[parameter.id] 
 			temptext:=parameter.label
 			if parameter.gray
 				tempParGray=check3
@@ -837,7 +838,7 @@ class ElementSettings
 			local hasEnum
 			
 			gui,font,s8 cDefault wnorm
-			temp:=setElement.pars[tempParameterID] 
+			temp:=setElementPars[tempParameterID] 
 			tempAssigned:=false
 			for tempindex, tempRadioLabel in parameter.choices
 			{
@@ -984,7 +985,7 @@ class ElementSettings
 					return
 				}
 				
-				tempContentTypeNum:=setElement.pars[tempParameterContentTypeID] ;get the saved parameter
+				tempContentTypeNum:=setElementPars[tempParameterContentTypeID] ;get the saved parameter
 				if tempContentTypeNum is not number ;Get the index of the content type
 				{
 					for oneindex, onevalue in parameter.content
@@ -1056,7 +1057,7 @@ class ElementSettings
 				;Add the edit control(s)
 				tempwAvailable:=360
 				tempw:=(tempwAvailable - (4 * (parameter.id.MaxIndex() -1)) ) / parameter.id.MaxIndex()
-				temptext:=setElement.pars[tempOneParameterID]
+				temptext:=setElementPars[tempOneParameterID]
 				
 				gui,add,edit,X+4 w%tempw% %tempIsMulti% r1 hwndtempHWND gGUISettingsOfElementCheckContent vGUISettingsOfElement%tempOneParameterID%,%temptext%
 				this.components.push("GUISettingsOfElement" tempOneParameterID)
@@ -1354,8 +1355,8 @@ class ElementSettings
 			local tempParameterRows:=parameter.rows
 			if not tempParameterRows 
 				tempParameterRows:=5
-			temp:=setElement.pars[parameter.id] 
-			temptext:=setElement.pars[tempParameterID]
+			temp:=setElementPars[parameter.id] 
+			temptext:=setElementPars[tempParameterID]
 			
 			gui,font,s8 cDefault wnorm
 			gui,add,edit,w380 x10 multi r%tempParameterRows% hwndtempHWND gGUISettingsOfElementCheckContent vGUISettingsOfElement%tempParameterID%,%temptext%
@@ -1421,7 +1422,7 @@ class ElementSettings
 			local tempParameterID:=parameter.id
 			
 			gui,font,s8 cDefault wnorm
-			temp:=setElement.pars[tempParameterID] 
+			temp:=setElementPars[tempParameterID] 
 			
 			tempParameterOptions:=parameter.options
 			if (parameter.allowExpression=true)
@@ -1482,7 +1483,7 @@ class ElementSettings
 			local tempParameterID:=parameter.id
 			
 			gui,font,s8 cDefault wnorm
-			temp:=setElement.pars[tempParameterID] 
+			temp:=setElementPars[tempParameterID] 
 			
 			if (parameter.result != "number" and parameter.result != "string" and parameter.result != "enum")
 				MsgBox unexpected error: the parameter "result" of "DropDown" is unset or has unsupported value
@@ -1579,7 +1580,7 @@ class ElementSettings
 			local tempParameterID:=parameter.id
 			
 			gui,font,s8 cDefault wnorm
-			tempChosen:=setElement.pars[tempParameterID] 
+			tempChosen:=setElementPars[tempParameterID] 
 			temptoChooseText := tempChosen
 			if (parameter.result="number")
 			{
@@ -1879,7 +1880,7 @@ class ElementSettings
 			local tempParameterID:=parameter.id
 			
 			gui,font,s8 cDefault wnorm
-			temp:=setElement.pars[tempParameterID] 
+			temp:=setElementPars[tempParameterID] 
 			
 			gui,add,edit,w300 x10 hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID%,%temp%
 			this.components.push("GUISettingsOfElement" tempParameterID)
@@ -1944,7 +1945,7 @@ class ElementSettings
 					}
 					else if (countpars = 2) ;One mandantory parameters
 					{
-						%templabel%({flowID: flowobj.id, elementID: setElementID})
+						%templabel%({flowID: FlowID, elementID: setElementID})
 					}
 					else
 					{
@@ -1970,7 +1971,7 @@ class ElementSettings
 			local tempParameterID:=parameter.id
 			
 			gui,font,s8 cDefault wnorm
-			temp:=setElement.pars[tempParameterID] 
+			temp:=setElementPars[tempParameterID] 
 			
 			gui,add,edit,w370 x10 hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID%,%temp%
 			this.components.push("GUISettingsOfElement" tempParameterID)
@@ -2008,7 +2009,7 @@ class ElementSettings
 			local tempParameterID:=parameter.id
 			
 			gui,font,s8 cDefault wnorm
-			temp:=setElement.pars[tempParameterID] 
+			temp:=setElementPars[tempParameterID] 
 			
 			
 			gui,add,edit,w370 x10 hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID%,%temp%
@@ -2049,7 +2050,7 @@ class ElementSettings
 			local tempParameterID:=parameter.id
 			
 			gui,font,s8 cDefault wnorm
-			temp:=setElement.pars[tempParameterID] 
+			temp:=setElementPars[tempParameterID] 
 			
 			gui,add,checkbox,w45 x10 hwndtempHWND gGUISettingsOfElementWeekdays vGUISettingsOfElement%tempParameterID%2,% lang("Mon (Short for Monday")
 			this.components.push("GUISettingsOfElement" tempParameterID "2")
@@ -2178,7 +2179,7 @@ class ElementSettings
 			}
 			
 			gui,font,s8 cDefault wnorm
-			temp:=setElement.pars[tempParameterID] 
+			temp:=setElementPars[tempParameterID] 
 			if temp=
 			{
 				temp=%a_now%
@@ -2201,7 +2202,7 @@ class ElementSettings
 			local tempParameterID:=parameter.id
 			
 			gui,font,s8 cDefault wnorm
-			tempChosen:=setElement.pars[tempParameterID] 
+			tempChosen:=setElementPars[tempParameterID] 
 			tempChoices:=parameter.choices
 			this.choices:=tempChoices
 			tempChoicesString:=""
@@ -2388,8 +2389,8 @@ class ElementSettings
 		GUISettingsOfElementRemoveInfoTooltip()
 		;~ ToolTip updakljö
 		allParamValues:=GUISettingsOfElementObject.getAllValues()
-		setelement.FirstCallOfCheckSettings:=firstCall
-		Element_CheckSettings_%setElementClass%(setElement, allParamValues) 
+		_setElementProperty(FlowID, setElementID, "FirstCallOfCheckSettings", firstCall) .FirstCallOfCheckSettings:=firstCall
+		Element_CheckSettings_%setElementClass%({FlowID: FlowID, ElementID: setElementID}, allParamValues) 
 		ElementSettingsNameField.updatename(allParamValues)
 		generalUpdateRunning:=False
 	}
