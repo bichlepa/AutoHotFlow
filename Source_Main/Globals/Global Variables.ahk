@@ -134,8 +134,8 @@ _execution is an associative array of values:
 	
 */
 global _execution := CriticalObject()
-_execution.Instances := CriticalObject()
-_execution.triggers := CriticalObject()
+_execution.Instances := Object()
+_execution.triggers := Object()
 
 global _language := CriticalObject()
 
@@ -158,19 +158,18 @@ _share.hwnds := Object()
 _share.log := ""
 _share.logcount := 0
 _share.logcountAfterTidy := 0
-_share.temp := criticalObject() 	;For temporary content
+_share.temp := Object() 	;For temporary content
 _share._ScriptDir := _ScriptDir
 _share._WorkingDir := _WorkingDir 
 _share.CategoryIDCounter := 1	
 
-_share.main := CriticalObject()
-_share.main.Tasks := CriticalObject()
+_share.main := Object()
+_share.main.Tasks := Object()
 
 ;Those two variables are filled by the elements when they are included
-_share.AllElementClasses:=CriticalObject()
+_share.AllElementClasses:=Object()
 
-global _cs_shared := CriticalSection() ;Protect access to _Flows
-global _cs_execution := CriticalSection() ;Protect access to _Execution and global / static variables
+global _cs_shared := CriticalSection() ;Protect access to all variables which are shared between the ahk threads
 global _cs_debug := CriticalSection() ;Protect access to Debug files
 
 return

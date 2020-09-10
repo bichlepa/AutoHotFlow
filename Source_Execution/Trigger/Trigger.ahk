@@ -3,7 +3,6 @@ global EnabledTriggerIDCounter:=0
 enableFlow(p_FlowID)
 {
 	EnterCriticalSection(_cs_shared)
-	EnterCriticalSection(_cs_execution)
 
 	if (_getFlowProperty(p_FlowID, "loaded") != true)
 	{
@@ -12,13 +11,11 @@ enableFlow(p_FlowID)
 	enableTriggers(p_FlowID)
 	SaveFlowMetaData(p_FlowID)
 
-	LeaveCriticalSection(_cs_execution)
 	LeaveCriticalSection(_cs_shared)
 }
 enableToggleFlow(p_FlowID)
 {
 	EnterCriticalSection(_cs_shared)
-	EnterCriticalSection(_cs_execution)
 	
 	if (_getFlowProperty(p_FlowID, "enabled") != true)
 	{
@@ -28,7 +25,6 @@ enableToggleFlow(p_FlowID)
 	{
 		disableFlow(p_FlowID)
 	}
-	LeaveCriticalSection(_cs_execution)
 	LeaveCriticalSection(_cs_shared)
 }
 
@@ -41,7 +37,6 @@ disableFlow(p_FlowID)
 enableTriggers(p_FlowID)
 {
 	EnterCriticalSection(_cs_shared)
-	EnterCriticalSection(_cs_execution)
 	
 	logger("a2", "Going to enable Flow " p_Flow.name)
 	
@@ -55,7 +50,6 @@ enableTriggers(p_FlowID)
 		}
 	}
 	_setFlowProperty(p_FlowID, "enabled", true)
-	LeaveCriticalSection(_cs_execution)
 	LeaveCriticalSection(_cs_shared)
 	
 	logger("a1", "Flow " _getFlowProperty(p_FlowID, "name") " enabled")
@@ -64,7 +58,6 @@ enableTriggers(p_FlowID)
 enableOneTrigger(p_FlowID, p_ElementID, p_save=true)
 {
 	EnterCriticalSection(_cs_shared)
-	EnterCriticalSection(_cs_execution)
 
 	FlowName := _getFlowProperty(p_FlowID, "name")
 	logger("a2", "Going to enable trigger " p_ElementID " in flow " FlowName)
@@ -79,14 +72,12 @@ enableOneTrigger(p_FlowID, p_ElementID, p_save=true)
 	
 	logger("a1", "Trigger " p_ElementID " in flow " FlowName " enabled")
 	
-	LeaveCriticalSection(_cs_execution)
 	LeaveCriticalSection(_cs_shared)
 }
 
 justEnableOneTrigger(p_FlowID, p_ElementID)
 {
 	EnterCriticalSection(_cs_shared)
-	EnterCriticalSection(_cs_execution)
 	
 	triggerEnvironment:=criticalObject()
 	triggerEnvironment.id:= "enabledTrigger" ++EnabledTriggerIDCounter
@@ -106,14 +97,12 @@ justEnableOneTrigger(p_FlowID, p_ElementID)
 		logger("a0", "Trigger " p_ElementID " cannot be enabled (missing implementation)")
 	}
 
-	LeaveCriticalSection(_cs_execution)
 	LeaveCriticalSection(_cs_shared)
 }
 
 disableTriggers(p_FlowID)
 {
 	EnterCriticalSection(_cs_shared)
-	EnterCriticalSection(_cs_execution)
 
 	FlowName := _getFlowProperty(p_FlowID, "name")
 	logger("a2", "Going to disable Flow " FlowName)
@@ -135,13 +124,11 @@ disableTriggers(p_FlowID)
 	logger("a1", "Flow " FlowName " disabled")
 	_setFlowProperty(p_FlowID, "enabled", false)
 
-	LeaveCriticalSection(_cs_execution)
 	LeaveCriticalSection(_cs_shared)
 }
 disableOneTrigger(p_FlowID, p_ElementID, p_save = true)
 {
 	EnterCriticalSection(_cs_shared)
-	EnterCriticalSection(_cs_execution)
 	FlowName := _getFlowProperty(p_FlowID, "name")
 
 	logger("a2", "Going to disable trigger " p_ElementID " in Flow " FlowName)
@@ -169,14 +156,12 @@ disableOneTrigger(p_FlowID, p_ElementID, p_save = true)
 	if (p_save)
 		SaveFlowMetaData(p_FlowID)
 		
-	LeaveCriticalSection(_cs_execution)
 	LeaveCriticalSection(_cs_shared)
 }
 
 justDisableOneTrigger(p_Flow, p_ElementID, p_EnabledTriggerID)
 {
 	EnterCriticalSection(_cs_shared)
-	EnterCriticalSection(_cs_execution)
 
 	tempElementClass := _getElementProperty(p_FlowID, p_ElementID, "class")
 	triggerPars := _getTriggerProperty(TriggerID, "Pars")
@@ -193,7 +178,6 @@ justDisableOneTrigger(p_Flow, p_ElementID, p_EnabledTriggerID)
 	}
 	_deleteTrigger(p_EnabledTriggerID)
 	
-	LeaveCriticalSection(_cs_execution)
 	LeaveCriticalSection(_cs_shared)
 }
 

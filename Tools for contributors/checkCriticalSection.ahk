@@ -16,7 +16,7 @@ loop,files,%a_scriptdir%\..\*.ahk,RF
 			IfInString,a_loopfield,EnterCriticalSection(
 			{
 				newSection:=substr(a_loopfield,strlen("EnterCriticalSection(")+1,instr(a_loopfield,")")-strlen("EnterCriticalSection(")-1)
-				;~ MsgBox %A_LoopFileFullPath%`n%a_index%: %a_loopfield%`n%newSection% 
+				; MsgBox %A_LoopFileFullPath%`n%a_index%: %a_loopfield%`n%newSection% 
 				for oneIndex, oneCriticalSection in criticalSections
 				{
 					if oneCriticalSection = newSection
@@ -44,8 +44,10 @@ loop,files,%a_scriptdir%\..\*.ahk,RF
 				;~ MsgBox %A_LoopFileFullPath%`n%a_index%: %a_loopfield%`n%newSection% 
 			}
 			
-			If (substr(a_loopfield,strlen("return")) = "return")
+			If (substr(a_loopfield,1,strlen("return")) = "return")
 			{
+				; maxIndex := criticalSections.maxindex()
+				; MsgBox %A_LoopFileFullPath%`n%a_index%: %a_loopfield%`n%maxIndex% 
 				if (criticalSections.maxindex())
 				{
 					activeCriticalSection:=""

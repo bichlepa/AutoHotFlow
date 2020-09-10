@@ -36,7 +36,7 @@ ui_EnableElementSettingsWindow()
 ui_GetElementSettingsGUIPos()
 {
 	global 
-	local tempHWND := _getShared("hwnds.ElementSettingsParent" Flowobj.ID)
+	local tempHWND := _getShared("hwnds.ElementSettingsParent" FlowID)
 	WinGetPos,ElementSettingsGUIX,ElementSettingsGUIY,ElementSettingsGUIWidth,ElementSettingsGUIHeight,% "ahk_id " tempHWND
 }
 
@@ -238,10 +238,9 @@ selectConnectionType(p_ElementID,wait="")
 	NowResultEditingElement:=""
 	
 	setElementID:=p_ElementID
-	setElement:=flowObj.allConnections[setElementID]
-	temp_from:=flowObj.allelements[setElement.from]
-	ConnectionType:=setElement.Type
-	
+	setElementType:= _getConnectionProperty(FlowID, setElementID, "type")
+	setElementFrom:= _getConnectionProperty(FlowID, setElementID, "from")
+	setElementFromType:= _getElementProperty(FlowID, setElementFrom, "type")
 	
 	EditGUIDisable()
 	gui, 7:default
@@ -249,15 +248,15 @@ selectConnectionType(p_ElementID,wait="")
 	gui,add,text,,% lang("Select_Connection_type")
 		
 	
-	if (temp_from.type="Condition")
+	if (setElementFromType="Condition")
 	{
-		if (setElement.Type="exception")
+		if (setElementType="exception")
 		{
 			gui,add,Button,w100 h50 gGuiConnectionChooseTrue vGuiConnectionChooseTrue ,% lang("Yes")
 			gui,add,Button,w100 h50 X+10 gGuiConnectionChooseFalse vGuiConnectionChooseFalse,% lang("No")
 			gui,add,Button,w100 h50 X+10 gGuiConnectionChooseException vGuiConnectionChooseException default,% lang("Exception")
 		}
-		else if (setElement.Type="no")
+		else if (setElementType="no")
 		{
 			gui,add,Button,w100 h50 gGuiConnectionChooseTrue vGuiConnectionChooseTrue ,% lang("Yes")
 			gui,add,Button,w100 h50 X+10 gGuiConnectionChooseFalse vGuiConnectionChooseFalse default,% lang("No")
@@ -276,7 +275,7 @@ selectConnectionType(p_ElementID,wait="")
 	}
 	else
 	{
-		if (setElement.Type="exception")
+		if (setElementType="exception")
 		{
 			gui,add,Button,w100 h50 gGuiConnectionChooseNormal vGuiConnectionChooseNormal,% lang("Normal")
 			gui,add,Button,w100 h50 X+10 gGuiConnectionChooseException vGuiConnectionChooseException default,% lang("Exception")
@@ -313,7 +312,9 @@ selectConnectionType(p_ElementID,wait="")
 			else 
 			{
 				if (NowResultEditingElement!="aborted")
-					setElement.ConnectionType:=NowResultEditingElement
+				{
+					_setConnectionProperty(FlowID, setElementID, "ConnectionType", NowResultEditingElement)
+				}
 				break
 			}
 		}
@@ -332,28 +333,28 @@ selectConnectionType(p_ElementID,wait="")
 	gui,destroy
 	EditGUIEnable()
 	NowResultEditingElement:="yes"
-	setElement.ConnectionType:=NowResultEditingElement
+	_setConnectionProperty(FlowID, setElementID, "ConnectionType", NowResultEditingElement)
 	return
 	
 	GuiConnectionChooseFalse:
 	gui,destroy
 	EditGUIEnable()
 	NowResultEditingElement:="no"
-	setElement.ConnectionType:=NowResultEditingElement
+	_setConnectionProperty(FlowID, setElementID, "ConnectionType", NowResultEditingElement)
 	return 
 	
 	GuiConnectionChooseException:
 	gui,destroy
 	EditGUIEnable()
 	NowResultEditingElement:="exception"
-	setElement.ConnectionType:=NowResultEditingElement
+	_setConnectionProperty(FlowID, setElementID, "ConnectionType", NowResultEditingElement)
 	return 
 	
 	GuiConnectionChooseNormal:
 	gui,destroy
 	EditGUIEnable()
 	NowResultEditingElement:="normal"
-	setElement.ConnectionType:=NowResultEditingElement
+	_setConnectionProperty(FlowID, setElementID, "ConnectionType", NowResultEditingElement)
 	return 
 	
 	

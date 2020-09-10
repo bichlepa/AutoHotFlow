@@ -16,13 +16,13 @@ Element_New(p_FlowID, p_type="",p_elementID="")
 {
 	global GridX, Gridy
 	
-	EnterCriticalSection(_cs_shared) ; We get, change and store a flow in this function. keep this critical section to ensure data integrity
-
 	if not p_FlowID
 	{
 		MsgBox internal error! A new element should be created but FlowID is empty!
 		return
 	}
+
+	EnterCriticalSection(_cs_shared) ; We get, change and store a flow in this function. keep this critical section to ensure data integrity
 
 	tempElement:=Object()
 	;~ tempElement:=[]
@@ -63,13 +63,13 @@ Element_New(p_FlowID, p_type="",p_elementID="")
 ;Sets the element type. It could later be possible to change the element type (e.g. change from type "action" to type "condition")
 Element_SetType(p_flowID, p_ElementID, p_elementType)
 {
-	EnterCriticalSection(_cs_shared) ; We get, change and store an element in this function. keep this critical section to ensure data integrity
-	
 	if not p_ElementID
 	{
 		MsgBox internal error! A new element type should be set but ElementID is empty!
 		return
 	}
+
+	EnterCriticalSection(_cs_shared) ; We get, change and store an element in this function. keep this critical section to ensure data integrity
 
 	_setElementProperty(p_FlowID, p_elementID, "type", p_elementType)
 	_setElementProperty(p_FlowID, p_elementID, "class", "")  ;After changing the element type only, the class is unset 
@@ -86,14 +86,13 @@ Element_SetType(p_flowID, p_ElementID, p_elementType)
 ;Sets the element class. This means it is possible to change the element type and subtype
 Element_SetClass(p_FlowID, p_ElementID, p_elementClass)
 {
-	EnterCriticalSection(_cs_shared) ; We get, change and store an element in this function. keep this critical section to ensure data integrity
-
 	if not p_ElementID
 	{
 		MsgBox internal error! A new element class should be set but ElementID is empty!
 		return
 	}
 
+	EnterCriticalSection(_cs_shared) ; We get, change and store an element in this function. keep this critical section to ensure data integrity
 	
 	;First set type
 	if not isfunc("Element_getElementType_" p_elementClass)
@@ -128,17 +127,15 @@ Element_SetClass(p_FlowID, p_ElementID, p_elementClass)
 ;Is called when the element subtype is set. All parameters that are not set yet are set to the default parameters
 Element_setParameterDefaults(p_FlowID, p_elementID)
 {
-	EnterCriticalSection(_cs_shared)  ; We get, change and store an element in this function. keep this critical section to ensure data integrity
-
 	if not p_ElementID
 	{
 		MsgBox internal error! A element parameter defaults should be set but ElementID is empty!
 		return
 	}
+
+	EnterCriticalSection(_cs_shared)  ; We get, change and store an element in this function. keep this critical section to ensure data integrity
+
 	elementClass:=_getElementProperty(p_FlowID, p_elementID, "class")
-	MsgBox % p_FlowID
-	MsgBox % p_elementID
-	MsgBox % elementClass
 	parameters:=Element_getParametrizationDetails(elementClass, {flowID: p_FlowID, elementID: p_elementID})
 	;~ MsgBox % strobj(parameters) "`n" elementType "`n" elementSubType
 	ElementParsObject:=_getElementProperty(p_FlowID, p_elementID, "pars")
@@ -206,13 +203,13 @@ Element_findDefaultTrigger(p_FlowID)
 
 Element_setDefaultTrigger(p_FlowID, p_elementID)
 {
-	EnterCriticalSection(_cs_shared) ; We get, change and store a flow in this function. keep this critical section to ensure data integrity
-
 	if not p_FlowID
 	{
 		MsgBox internal error! A new element should be created but FlowID is empty!
 		return
 	}
+
+	EnterCriticalSection(_cs_shared) ; We get, change and store a flow in this function. keep this critical section to ensure data integrity
 
 	allElements := _getFlowProperty(p_FlowID, "allElements")
 	for oneID, oneElement in allElements
@@ -239,13 +236,13 @@ Element_setDefaultTrigger(p_FlowID, p_elementID)
 ;Removes the element. It will be deleted from list of all elements and all connections which start or ends there will be deleted, too
 Element_Remove(p_FlowID, p_elementID)
 {
-	EnterCriticalSection(_cs_shared) ; We get, change and store a flow in this function. keep this critical section to ensure data integrity
-
 	if not p_FlowID
 	{
 		MsgBox internal error! A new element should be created but FlowID is empty!
 		return
 	}
+
+	EnterCriticalSection(_cs_shared) ; We get, change and store a flow in this function. keep this critical section to ensure data integrity
 
 	; allElements:=_getFlowProperty(p_FlowID, "allElements")
 	; markedElements:=_getFlowProperty(p_FlowID, "markedElements")
@@ -289,14 +286,14 @@ Element_Remove(p_FlowID, p_elementID)
 
 Connection_New(p_FlowID, p_elementID="")
 {
-	EnterCriticalSection(_cs_shared) ; We get, change and store a flow in this function. keep this critical section to ensure data integrity
-	
 	if not p_FlowID
 	{
 		MsgBox internal error! A new element should be created but FlowID is empty!
 		return
 	}
 
+	EnterCriticalSection(_cs_shared) ; We get, change and store a flow in this function. keep this critical section to ensure data integrity
+	
 	tempElement:=Object()
 	if (p_elementID="")
 		tempElement.ID:="Connection" . format("{1:010u}",_getAndIncrementFlowProperty(p_FlowID,"ElementIDCounter")) 
@@ -324,13 +321,13 @@ Connection_New(p_FlowID, p_elementID="")
 ;Removes the connection. It will be deleted from list of all elements and all connections which start or ends there will be deleted, too
 Connection_Remove(p_FlowID, p_elementID)
 {
-	EnterCriticalSection(_cs_shared) ; We get, change and store a flow in this function. keep this critical section to ensure data integrity
-
 	if not p_FlowID
 	{
 		MsgBox internal error! A new element should be created but FlowID is empty!
 		return
 	}
+
+	EnterCriticalSection(_cs_shared) ; We get, change and store a flow in this function. keep this critical section to ensure data integrity
 
 	;remove the element from list of all connections
 	_deleteConnection(p_FlowID, forID)
@@ -367,14 +364,14 @@ Connection_Remove(p_FlowID, p_elementID)
 
 UpdateConnectionLists(p_FlowID)
 {
-	EnterCriticalSection(_cs_shared) ; We get, change and store a flow in this function. keep this critical section to ensure data integrity
-	
 	if not p_FlowID
 	{
 		MsgBox internal error! A new element should be created but FlowID is empty!
 		return
 	}
 
+	EnterCriticalSection(_cs_shared) ; We get, change and store a flow in this function. keep this critical section to ensure data integrity
+	
 	allElements := _getFlowProperty(p_FlowID, "allElements")
 	allConnections := _getFlowProperty(p_FlowID, "allConnections")
 	for oneElementID, oneElement in allElements

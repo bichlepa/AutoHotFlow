@@ -24,11 +24,18 @@ _getSharedProperty(path)
 	LeaveCriticalSection(_cs_shared)
     return value
 }
-_setSharedProperty(path, value)
+_setSharedProperty(path, value, clone = true)
 {
 	EnterCriticalSection(_cs_shared)
     objectPath:=parseObjectPath(_share, path)
-    objectPath[1][objectPath[2]] := ObjFullyClone(value)
+	if (clone)
+	{
+    	objectPath[1][objectPath[2]] := ObjFullyClone(value)
+	}
+	Else
+	{
+    	objectPath[1][objectPath[2]] := value
+	}
 	LeaveCriticalSection(_cs_shared)
 }
 _getAndIncrementShared(path, incrementValue = 1)

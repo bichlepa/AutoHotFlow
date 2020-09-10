@@ -5,7 +5,9 @@ Element_bufferedParameters:=Object()
 ;Only called from main thread. Fills a list of all available element classes
 Element_Register_Element_Class(p_class)
 {
-	_share.AllElementClasses.push(p_class)
+	AllElementClasses := _getSharedProperty("AllElementClasses")
+	AllElementClasses.push(p_class)
+	_setSharedProperty("AllElementClasses", AllElementClasses)
 }
 
 ;Returns a list of all parametration details

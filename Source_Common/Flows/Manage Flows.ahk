@@ -214,10 +214,10 @@ NewCategory(par_Newname = "")
 		{
 			tempfound := false
 			tempindex := a_index
-			for tempcount, tempitem in _share.allCategories
+			for tempcount, tempCategoryID in _getAllCategoryIds()
 			{
 				;~ d( tempitem,Newname)
-				if (tempitem.name = tempNewname)
+				if (_getCategoryProperty(tempCategoryID, "name") = tempNewname)
 				{
 					tempNewname := Newname " " tempindex
 					tempfound := true
@@ -234,12 +234,12 @@ NewCategory(par_Newname = "")
 	else ;If the name is given, check wheter a category exists
 	{
 		Newname := par_Newname
-		for tempcount, tempitem in _share.allCategories
+		for tempcount, tempCategoryID in _getAllCategoryIds()
 		{
-			if (tempitem.name = Newname)
+			if (_getCategoryProperty(tempCategoryID, "name") = Newname)
 			{
 				;If it already exists, return the id
-				retval:= tempitem.id
+				retval:= tempCategoryID
 				break
 			}
 			;MsgBox,%tempcategoryexist% 

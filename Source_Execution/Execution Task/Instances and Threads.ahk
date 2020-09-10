@@ -6,7 +6,6 @@ global global_ThreadIDCOunter:=0
 newInstance(p_Environment, p_params = "")
 {
 	EnterCriticalSection(_cs_shared)
-	EnterCriticalSection(_cs_execution)
 
 	executing := _getFlowProperty(p_Environment.FlowID, "executing")
 
@@ -21,7 +20,7 @@ newInstance(p_Environment, p_params = "")
 		if (ExecutionPolicy="skip")
 		{
 			logger("f1", "Execution of flow '" _getFlowProperty(p_Environment.FlowID, "name") "' skipped, due to flow execution policy")
-			return
+			skipped := true
 			
 		}
 		else if (ExecutionPolicy="stop")
@@ -30,62 +29,65 @@ newInstance(p_Environment, p_params = "")
 			stopFlow(p_Environment.FlowID)
 		}
 	}
-	;Search for the matching trigger element
-	oneElementID:=p_Environment.elementID
-	if oneElementID=
+	
+	if (not skipped)
 	{
-		MsgBox Internal Error in newInstance(): trigger element ID unknown
-	}
-	else
-	{
-		
-		newInstance:=Object()
-		newInstanceId := "instance" ++global_InstanceIDCOunter
-		newInstance.id:= newInstanceId
-		newInstance.FlowID := p_Environment.FlowID
-		newInstance.FlowName :=  _getFlowProperty(p_Environment.FlowID, "name")
-		newInstance.state := "init"
-		newInstance.InstanceVars := Object()
-		newInstance.InstanceVarsHidden := Object()
-		_setInstance(newInstanceId, newInstance)
-
-		if (p_params.CallBack)
+		;Search for the matching trigger element
+		oneElementID:=p_Environment.elementID
+		if oneElementID=
 		{
-			_setInstanceProperty(newInstanceId, "CallBack", p_params.CallBack, false)
+			MsgBox Internal Error in newInstance(): trigger element ID unknown
 		}
-		
-
-		newThreadID := newThread(newInstanceId)
-		_setThreadProperty(newInstanceId, newThreadID, "ElementID", oneElementID)
-		if (p_Environment.threadID)
+		else
 		{
-			; The previous thread may have some information which we want to import to the new thread
-			varsExportedFromExternalThread := _getThreadProperty(p_Environment.InstanceId, p_Environment.ThreadID, "varsExportedFromExternalThread")
-			_setThreadProperty(newInstanceId, newThreadID, "varsExportedFromExternalThread", varsExportedFromExternalThread)
 			
-			varstoPass := _getThreadProperty(p_Environment.InstanceId, p_Environment.ThreadID, "params.varstoPass")
-			if (varstoPass)
+			newInstance:=Object()
+			newInstanceId := "instance" ++global_InstanceIDCOunter
+			newInstance.id:= newInstanceId
+			newInstance.FlowID := p_Environment.FlowID
+			newInstance.FlowName :=  _getFlowProperty(p_Environment.FlowID, "name")
+			newInstance.state := "init"
+			newInstance.InstanceVars := Object()
+			newInstance.InstanceVarsHidden := Object()
+			_setInstance(newInstanceId, newInstance)
+
+			if (p_params.CallBack)
 			{
-				for onevarName, oneVar in varstoPass
+				_setInstanceProperty(newInstanceId, "CallBack", p_params.CallBack, false)
+			}
+			
+
+			newThreadID := newThread(newInstanceId)
+			_setThreadProperty(newInstanceId, newThreadID, "ElementID", oneElementID)
+			if (p_Environment.threadID)
+			{
+				; The previous thread may have some information which we want to import to the new thread
+				varsExportedFromExternalThread := _getThreadProperty(p_Environment.InstanceId, p_Environment.ThreadID, "varsExportedFromExternalThread")
+				_setThreadProperty(newInstanceId, newThreadID, "varsExportedFromExternalThread", varsExportedFromExternalThread)
+				
+				varstoPass := _getThreadProperty(p_Environment.InstanceId, p_Environment.ThreadID, "params.varstoPass")
+				if (varstoPass)
 				{
-					InstanceVariable_Set(newThread, onevarName, oneVar)
+					for onevarName, oneVar in varstoPass
+					{
+						InstanceVariable_Set(newThread, onevarName, oneVar)
+					}
 				}
 			}
+			finishExecutionOfElement(newInstanceId, newThreadID, "Normal")
+			ThreadVariable_Set(newThreadID, "A_TriggerTime", a_now)
+			
+			
+			ElementClass:=_getElementProperty(p_Environment.FlowID, p_Environment.ElementID, "class")
+			if (isfunc("Element_postTrigger_" ElementClass))
+			{
+				Element_postTrigger_%ElementClass%(newThread, p_params)
+			}
+			_setInstanceProperty(newInstanceId, "state", "running")
+			
+			updateFlowExcutingStates()
 		}
-		finishExecutionOfElement(newInstanceId, newThreadID, "Normal")
-		ThreadVariable_Set(newThreadID, "A_TriggerTime", a_now)
-		
-		
-		ElementClass:=_getElementProperty(p_Environment.FlowID, p_Environment.ElementID, "class")
-		if (isfunc("Element_postTrigger_" ElementClass))
-		{
-			Element_postTrigger_%ElementClass%(newThread, p_params)
-		}
-		_setInstanceProperty(newInstanceId, "state", "running")
-		
-		updateFlowExcutingStates()
 	}
-	LeaveCriticalSection(_cs_execution)
 	LeaveCriticalSection(_cs_shared)
 	return newInstance
 }
@@ -98,7 +100,6 @@ startFlow(p_FlowID, p_TriggerID ="", p_params = "")
 	static
 
 	EnterCriticalSection(_cs_shared)
-	EnterCriticalSection(_cs_execution)
 
 	;If not trigger assigned, trigger the default manual trigger (if any)
 	if (p_TriggerID="")
@@ -121,7 +122,6 @@ startFlow(p_FlowID, p_TriggerID ="", p_params = "")
 		newInstance(environment, p_params)
 	}
 	
-	LeaveCriticalSection(_cs_execution)
 	LeaveCriticalSection(_cs_shared)
 	
 	if not p_TriggerID
@@ -142,7 +142,6 @@ startFlow(p_FlowID, p_TriggerID ="", p_params = "")
 stopFlow(p_FlowID)
 {
 	EnterCriticalSection(_cs_shared)
-	EnterCriticalSection(_cs_execution)
 	
 	InstanceIDs := _getAllInstanceIds()
 	for OneInstanceIndex, OneInstanceID in InstanceIDs
@@ -152,14 +151,12 @@ stopFlow(p_FlowID)
 			stopInstance(OneInstanceID)
 		}
 	}
-	LeaveCriticalSection(_cs_execution)
 	LeaveCriticalSection(_cs_shared)
 }
 
 stopInstance(p_instanceID)
 {
 	EnterCriticalSection(_cs_shared)
-	EnterCriticalSection(_cs_execution)
 
 	instance := _getInstance(p_instanceID)
 	for OneThreadID, OneThread in instance.threads
@@ -201,7 +198,6 @@ stopInstance(p_instanceID)
 	
 	updateFlowExcutingStates()
 	
-	LeaveCriticalSection(_cs_execution)
 	LeaveCriticalSection(_cs_shared)
 }
 
@@ -209,7 +205,6 @@ stopInstance(p_instanceID)
 executeToggleFlow(p_FlowID)
 {
 	EnterCriticalSection(_cs_shared)
-	EnterCriticalSection(_cs_execution)
 
 	if (_getFlowProperty(FlowID, "executing"))
 	{
@@ -220,7 +215,6 @@ executeToggleFlow(p_FlowID)
 		startFlow(p_FlowID)
 	}
 	
-	LeaveCriticalSection(_cs_execution)
 	LeaveCriticalSection(_cs_shared)
 }
 
@@ -230,7 +224,6 @@ if p_ToCloneFromThread is given, the thread will be cloned
 newThread(p_InstanceID, p_ToCloneFromThreadID ="")
 {
 	EnterCriticalSection(_cs_shared)
-	EnterCriticalSection(_cs_execution)
 
 	if (p_ToCloneFromThreadID)
 	{
@@ -264,7 +257,6 @@ newThread(p_InstanceID, p_ToCloneFromThreadID ="")
 	
 	_setThread(p_InstanceID, newThread.id, newThread)
 
-	LeaveCriticalSection(_cs_execution)
 	LeaveCriticalSection(_cs_shared)
 	return newThread.ID
 }
@@ -273,14 +265,12 @@ removeThread(p_instanceID, p_threadID)
 {
 	global 
 	EnterCriticalSection(_cs_shared)
-	EnterCriticalSection(_cs_execution)
 
 	_deleteThread(p_instanceID, p_threadID)
 	if (_getAllThreadIds(p_instanceID).count() = 0)
 	{
 		removeInstance(p_instanceID)
 	}
-	LeaveCriticalSection(_cs_execution)
 	LeaveCriticalSection(_cs_shared)
 }
 
@@ -289,7 +279,6 @@ removeInstance(p_instanceID)
 	global
 	local tempCallBackfunc
 	EnterCriticalSection(_cs_shared)
-	EnterCriticalSection(_cs_execution)
 	tempCallBackfunc := _getInstanceProperty(p_InstanceID, "callback", false)
 	if (tempCallBackfunc)
 	{
@@ -299,14 +288,12 @@ removeInstance(p_instanceID)
 	_deleteInstance(p_instanceID)
 	updateFlowExcutingStates()
 
-	LeaveCriticalSection(_cs_execution)
 	LeaveCriticalSection(_cs_shared)
 }
 
 updateFlowExcutingStates()
 {
 	EnterCriticalSection(_cs_shared)
-	EnterCriticalSection(_cs_execution)
 
 	executingFlows:=Object()
 	Instances := _getAllInstanceIds()
@@ -327,6 +314,5 @@ updateFlowExcutingStates()
 		}
 	}
 
-	LeaveCriticalSection(_cs_execution)
 	LeaveCriticalSection(_cs_shared)
 }
