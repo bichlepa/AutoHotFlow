@@ -47,7 +47,7 @@ if (winx!=winxold and winy!=winyOld)
 	winxold:=winx
 	winyOld:=winy
 	
-	API_Draw_Draw()
+	API_Draw_Draw(FlowID)
 	
 }
 
@@ -144,7 +144,7 @@ ui_DeleteShapeOnScreen()
 
 
 ui_Draw:
-API_Draw_Draw()
+API_Draw_Draw(FlowID)
 return
 jumpoverUIDRaw:
 temp= ;Do nothing

@@ -56,7 +56,6 @@ state_Undo(p_FlowID)
 			_setFlowProperty(p_FlowID, "currentState", previousState)
 			break
 		}
-		;~ MsgBox % stateid " current: " _flows[p_FlowID].currentState
 		found:=true
 		previousState:=stateid
 	}

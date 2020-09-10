@@ -87,7 +87,6 @@ EditGUIshow()
 	Editor_guiAlreadyShown:=true
 	;sleep 10
 	;MsgBox % hwn " - "   this.hwnd	" -  " this.test
-	;~ settimer,API_Draw_Draw,-20
 	;~ ui_UpdateStatusbartext()
 }
 
@@ -113,7 +112,7 @@ EditGUIEnable()
 	DetectHiddenWindows,on
 	CurrentlyMainGuiIsDisabled:=false
 	
-	API_Draw_Draw()
+	API_Draw_Draw(FlowID)
 }
 
 
@@ -127,13 +126,13 @@ EditGUIGetPos()
 
 WindowGetsActive()
 {
-SetTimer,API_Draw_Draw,-1
+	API_Draw_Draw(FlowID)
 
 }
 
 WindowGetsMoved()
 {
-SetTimer,API_Draw_Draw,-1
+	API_Draw_Draw(FlowID)
 
 }
 
@@ -271,7 +270,7 @@ ui_OnLanguageChange()
 {
 	global 
 	local temp
-	API_Draw_Draw()
+	API_Draw_Draw(FlowID)
 	DetectHiddenWindows off
 	WinGetTitle,temp,% "ahk_id " _MainGuihwnd
 	
@@ -306,7 +305,7 @@ SB_SetParts(a_guiwidth)
 
 _setFlowProperty(FlowID, "draw.heightofguipic", heightofguipic)
 _setFlowProperty(FlowID, "draw.widthofguipic", widthofguipic)
-API_Draw_Draw()
+API_Draw_Draw(FlowID)
 return
 
 GetClientSize(hwnd, ByRef w, ByRef h)

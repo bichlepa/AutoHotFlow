@@ -49,9 +49,6 @@ MarkOne(p_ID,additional:=false)
 ;Unmark all elements and connections
 UnmarkEverything(CreateList=true)
 {
-	global _flows 
-	global FlowID 
-	
 	EnterCriticalSection(_cs_shared)
 	
 	for forIndex, forElementID in _getAllElementIds(FlowID) ;Add all marked elements into array
@@ -72,9 +69,6 @@ UnmarkEverything(CreateList=true)
 
 MarkEverything()
 {
-	global _flows
-	global FlowID
-	
 	EnterCriticalSection(_cs_shared)
 	
 	for forIndex, forElementID in _getAllElementIds(FlowID) ;Add all marked elements into array

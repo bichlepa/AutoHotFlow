@@ -180,7 +180,7 @@ selectSubType(p_ElementID,wait="")
 	{
 		;~ d(setelement)
 		Element_Remove(FlowID, setElementId)
-		;~ API_Draw_Draw()
+		;~ API_Draw_Draw(FlowID)
 	}
 	NowResultEditingElement=aborted
 	EditGUIEnable()

@@ -170,7 +170,6 @@ _share.main.Tasks := Object()
 _share.AllElementClasses:=Object()
 
 global _cs_shared := CriticalSection() ;Protect access to all variables which are shared between the ahk threads
-global _cs_debug := CriticalSection() ;Protect access to Debug files
 
 return
 

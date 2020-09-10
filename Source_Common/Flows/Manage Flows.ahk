@@ -303,8 +303,6 @@ DeleteFlow(par_ID)
 	
 	FileDelete,% _getFlowProperty(par_ID, "file")
 	
-	;parentcategory:=_flows[par_ID].category
-	
 	_deleteFlow(par_ID)
 	
 	;Refresh treeview

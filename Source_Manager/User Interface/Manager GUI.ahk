@@ -239,7 +239,6 @@ TreeView_manager_Refill()
 		}
 			
 		;hide demo flows, if user wants
-		;~ MsgBox % _settings.HideDemoFlows " - " oneflow.demo
 		if not (HideDemoFlows && oneFlowDemo)
 		{
 			oneflow.tv:=TreeView_manager_AddEntry("Flow", oneflowID)

@@ -4,17 +4,17 @@
 	local FoundThreadID, oneThreadID, oneThread
 	;~ d(global_AllThreads)
 	
-	if (_flows[par_FlowID].demo and _settings.developing != True)
+	if (_getFlowProperty(par_FlowID, "demo") and _getSettings("developing") != True)
 	{
 		MsgBox, 48, % lang("Edit flow"), % lang("You are opening a demonstration flow for edit.") " " lang("Please be aware that a demonstration flow cannot be changed.") " " lang("You may duplicate this flow first and then you can edit it.")
 	}
 	
-	if (_flows[par_FlowID].loaded != true)
+	if (_getFlowProperty(par_FlowID, "loaded") != true)
 	{
 		LoadFlow(par_FlowID)
 	}
 	
-	;Check whether there is already a Editor opened for that flow
+	;Check whether there is already a Editor opened for that flow TODO: This code must be in main thread
 	FoundThreadID := ""
 	for oneThreadID, oneThread in global_AllThreads
 	{
@@ -41,7 +41,7 @@ enableFlow(par_FlowID)
 {
 	global
 	local oneTriggerID, oneTrigger
-	if (_flows[par_FlowID].loaded != true)
+	if (_getFlowProperty(par_FlowID, "loaded") != true)
 	{
 		LoadFlow(par_FlowID)
 	}
@@ -53,7 +53,7 @@ enableToggleFlow(par_FlowID)
 {
 	global
 	
-	if (_flows[par_FlowID].enabled != true)
+	if (_getFlowProperty(par_FlowID, "loaded") != true)
 	{
 		enableFlow(par_FlowID)
 	}
@@ -71,7 +71,7 @@ disableFlow(par_FlowID)
 
 enableOneTrigger(par_FlowID, par_TriggerID = "", save=True)
 {
-	if (_flows[par_FlowID].loaded != true)
+	if (_getFlowProperty(par_FlowID, "loaded") != true)
 	{
 		LoadFlow(par_FlowID)
 	}
@@ -89,7 +89,7 @@ disableOneTrigger(par_FlowID, par_TriggerID = "", save=True)
 
 ExecuteFlow(par_FlowID, par_TriggerID="", par_PassedParsKey="")
 {
-	if (_flows[par_FlowID].loaded != true)
+	if (_getFlowProperty(par_FlowID, "loaded") != true)
 	{
 		LoadFlow(par_FlowID)
 	}
@@ -98,7 +98,7 @@ ExecuteFlow(par_FlowID, par_TriggerID="", par_PassedParsKey="")
 
 ExecuteToggleFlow(par_FlowID)
 {
-	if (_flows[par_FlowID].loaded != true)
+	if (_getFlowProperty(par_FlowID, "loaded") != true)
 	{
 		LoadFlow(par_FlowID)
 	}
@@ -107,7 +107,7 @@ ExecuteToggleFlow(par_FlowID)
 
 TriggerFlow(par_FlowID, par_Reason)
 {
-	if (_flows[par_FlowID].loaded != true)
+	if (_getFlowProperty(par_FlowID, "loaded") != true)
 	{
 		LoadFlow(par_FlowID)
 	}

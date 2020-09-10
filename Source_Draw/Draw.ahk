@@ -70,7 +70,8 @@ drawTask()
 		_getAllFlowIds()
 		for flowIndex, flowID in _getAllFlowIds()
 		{
-			if (_getFlowProperty(FlowID, "draw.mustDraw") = true)
+			mustDraw := _getFlowProperty(FlowID, "draw.mustDraw")
+			if (mustDraw = true)
 			{
 				_setFlowProperty(FlowID, "draw.mustDraw", false)
 				
@@ -86,7 +87,6 @@ drawTask()
 			gdip_DrawEverything(flow)
 			somethingdrawn:=true
 		}
-			
 		
 		if (somethingdrawn = false)
 		{

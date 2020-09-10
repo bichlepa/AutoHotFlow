@@ -50,7 +50,6 @@ LoadFlow(FlowID, filepath="", params="")
 	missingpackages :=Object()
 	logger("a1", "Loading flow from file: " ThisFlowFilePath)
 	
-		;~ d(_flows, FlowID)
 	IfnotExist,%ThisFlowFolder%\%ThisFlowFilename%.ini
 	{
 		logger("a0", "ERROR! Flow file " ThisFlowFolder "\ "ThisFlowFilename ".ini" " does not exist!")
@@ -194,7 +193,7 @@ LoadFlow(FlowID, filepath="", params="")
 			loadElement.ToPart:=RIni_GetKeyValue("IniFile", tempSection, "ToPart", "")
 			loadElement := _setConnection(FlowID, loadElementID, loadElement)
 			
-			LoadFlowCheckCompabilityElement(FlowID, loadElementID, tempSection, _flows[FlowID].CompabilityVersion)
+			LoadFlowCheckCompabilityElement(FlowID, loadElementID, tempSection, _getFlowProperty(FlowID, "CompabilityVersion"))
 		}
 		else
 		{

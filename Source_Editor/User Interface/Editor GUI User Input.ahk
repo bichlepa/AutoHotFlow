@@ -249,7 +249,7 @@ else if (clickedElement="MoveButton1") ;if a connection is selected and user mov
 
 	
 	;e_CorrectElementErrors("Code: 3186165186456.")
-	;~ API_Draw_Draw()
+	;~ API_Draw_Draw(FlowID)
 
 }
 else if (clickedElement="MoveButton2") ;if a connection is selected and user moved the lower Part of it
@@ -266,7 +266,7 @@ else if (clickedElement="MoveButton2") ;if a connection is selected and user mov
 	
 	
 	;e_CorrectElementErrors("Code: 1365415616.")
-	;~ API_Draw_Draw()
+	;~ API_Draw_Draw(FlowID)
 	
 	
 
@@ -294,7 +294,7 @@ else if (clickedElement="TrashButton") ;if something is selected and user clicks
 		UserDidMajorChange:=true
 	}
 	CreateMarkedList()
-	;~ API_Draw_Draw()
+	;~ API_Draw_Draw(FlowID)
 	;e_CorrectElementErrors("Code: 231684866.")
 }
 else if (clickedElement="EditButton")  ;if something is selected and user clicks on the edit button
@@ -428,7 +428,7 @@ else if (UserDidMajorChange or UserDidMinorChange)
 else if (UserDidMinorChange)
 	State_New(FlowID) ;make a new state. If user presses Ctrl+Z, the change will be undone
 
-API_Draw_Draw() 
+API_Draw_Draw(FlowID) 
 workingOnClick:=false
 
 return
@@ -640,7 +640,7 @@ ui_moveSelectedElements(option="")
 					if (newHeightOfVerticalBar != oldHeightOfVerticalBar)
 						clickMoved:=true
 					
-					API_Draw_Draw()
+					API_Draw_Draw(FlowID)
 				}
 				
 				
@@ -651,7 +651,7 @@ ui_moveSelectedElements(option="")
 			{
 				_setElementProperty(FlowID, toMoveEelement, "HeightOfVerticalBar", oldHeightOfVerticalBar)
 				MovementAborted:=true
-				API_Draw_Draw()
+				API_Draw_Draw(FlowID)
 				break
 			}
 			
@@ -670,7 +670,7 @@ ui_moveSelectedElements(option="")
 
 				howMuchMoved++
 				
-				API_Draw_Draw()
+				API_Draw_Draw(FlowID)
 			}
 			else ;If mouse is not currently moving
 			{
@@ -713,7 +713,7 @@ ui_moveSelectedElements(option="")
 							clickMoved:=true
 					}
 					
-					API_Draw_Draw()
+					API_Draw_Draw(FlowID)
 				}
 				
 				
@@ -729,7 +729,7 @@ ui_moveSelectedElements(option="")
 				}
 				MovementAborted:=true
 				;~ SoundBeep
-				API_Draw_Draw()
+				API_Draw_Draw(FlowID)
 				break
 			}
 			
@@ -753,7 +753,7 @@ ui_moveSelectedElements(option="")
 				}
 				
 				howMuchMoved++
-				API_Draw_Draw()
+				API_Draw_Draw(FlowID)
 			}
 			else ;If mouse is not currently moving
 			{
@@ -868,7 +868,7 @@ ui_scrollwithMouse(button="lbutton")
 	{
 		ui_UpdateStatusbartext("pos")
 		if (UserCurrentlyMovesAnElement!=true)
-			API_Draw_Draw()
+			API_Draw_Draw(FlowID)
 		SetTimer,ScrollWithMouseTimer,off
 		return
 	}
@@ -887,7 +887,7 @@ ui_scrollwithMouse(button="lbutton")
 		
 		ui_UpdateStatusbartext("pos")
 		if (UserCurrentlyMovesAnElement!=true) ;it is true if user currently pulls something else and scrolls simultanously. Calling API_Draw_Draw() while an other instance of it is interrupted can cause problems
-			API_Draw_Draw()
+			API_Draw_Draw(FlowID)
 		Scrollhasscrolled:=true
 		;~ ToolTip scroll
 	}
@@ -965,7 +965,7 @@ ui_MoveConnection(connection1="", connection2="", element1="", element2="")
 	{
 		;~ SoundBeep
 		if (ui_detectMovementWithoutBlocking()) ;check, whether user has moved mouse
-			API_Draw_Draw()
+			API_Draw_Draw(FlowID)
 
 		if (untilRelease and !getkeystate("lbutton","P") or !untilRelease and getkeystate("lbutton","P")) ;if user finishes moving
 		{
@@ -1088,7 +1088,7 @@ ui_MoveConnection(connection1="", connection2="", element1="", element2="")
 		;else keep the new or modified connection marked
 		
 	}
-	API_Draw_Draw()
+	API_Draw_Draw(FlowID)
 	return
 	
 	ui_MoveConnectionCheckAndCorrect:
@@ -1296,7 +1296,7 @@ CreateMarkedList()
 ;e_CorrectElementErrors("Code: 354546841.")
 State_New(FlowID)
 ui_UpdateStatusbartext()
-API_Draw_Draw()
+API_Draw_Draw(FlowID)
 return
 
 
@@ -1340,7 +1340,7 @@ _setFlowProperty(FlowID, "flowSettings.offsetx", tempZoomOffsetX)
 _setFlowProperty(FlowID, "flowSettings.offsety", tempZoomOffsetY)
 
 ui_UpdateStatusbartext("pos")
-API_Draw_Draw()
+API_Draw_Draw(FlowID)
 
 return
 
@@ -1383,7 +1383,7 @@ _setFlowProperty(FlowID, "flowSettings.offsety", tempZoomOffsetY)
 
 ui_UpdateStatusbartext("pos")
 
-API_Draw_Draw()
+API_Draw_Draw(FlowID)
 
 return
 
@@ -1404,7 +1404,7 @@ if (ret = 0)
 	
 	State_New(FlowID)
 	ui_UpdateStatusbartext()
-	API_Draw_Draw()
+	API_Draw_Draw(FlowID)
 }
 ;ToolTip("Control + X pressed")
 return
@@ -1446,7 +1446,7 @@ if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of t
 }
 State_Undo(FlowID)
 CreateMarkedList()
-API_Draw_Draw()
+API_Draw_Draw(FlowID)
 return
 ctrl_y:
 if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of the main gui are disabled
@@ -1455,7 +1455,7 @@ if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of t
 	return
 }
 State_Redo(FlowID)
-API_Draw_Draw()
+API_Draw_Draw(FlowID)
 return
 
 ctrl_a:
@@ -1466,7 +1466,7 @@ if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of t
 }
 UnmarkEverything()
 MarkEverything()
-API_Draw_Draw()
+API_Draw_Draw(FlowID)
 return
 
 

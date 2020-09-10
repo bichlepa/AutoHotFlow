@@ -347,21 +347,6 @@ Connection_Remove(p_FlowID, p_elementID)
 }
 
 
-;~ ;
-; GetListContainingElement(p_FlowID, p_ElementID, p_returnPointer = false)
-; {
-; 	EnterCriticalSection(_cs_shared)
-; 	if _flows[p_FlowID].allElements.HasKey(p_ElementID)
-; 		templist := _flows[p_FlowID].allElements
-; 	else if _flows[p_FlowID].allConnections.HasKey(p_ElementID)
-; 		templist := _flows[p_FlowID].allConnections
-; 	LeaveCriticalSection(_cs_shared)
-; 	if (p_returnPointer)
-; 		return &templist
-; 	else
-; 		return templist
-; }
-
 UpdateConnectionLists(p_FlowID)
 {
 	if not p_FlowID

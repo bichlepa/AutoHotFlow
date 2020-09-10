@@ -93,13 +93,9 @@ executionTask()
 						
 						; We take the data from the dataset of the current state. Otherwise it can cause trouble if user is editing the flow while it is executing.
 						currentFinishedElement := _getElementFromState(OneThread.flowID, OneThread.ElementID)
-						; d(currentFinishedElement, "currentFinishedElement")
-						;~ d(_flows[OneThread.flowID].states[currentState].allElements[OneThread.elementID], "element " OneThread.elementID) 
 						for oneConnectionIndex, oneConnectionID in currentFinishedElement.FromConnections
 						{
 							currentConnection := _getConnectionFromState(OneThread.flowID, oneConnectionID)
-							; d(currentConnection, "currentConnection " OneThread.result)
-							;~ d(_flows[OneThread.flowID].allConnections[oneConnectionID], "connection found: " oneConnectionID)
 							if ((currentConnection.ConnectionType = OneThread.result) or (currentFinishedElement.type = "Loop") and currentConnection.fromPart = OneThread.result)
 							{
 								;If leaving a loop
@@ -114,7 +110,6 @@ executionTask()
 								{
 									;On other than first connection first clone the thread
 									NextThreadID := newThread(OneInstanceID, OneThreadID)
-									;~ d(NextThread, "cloned thread")
 								}
 								;assign the next element to this thread
 								_setThreadProperty(OneInstanceID, NextThreadID, "ElementID", currentConnection.to)
@@ -138,7 +133,6 @@ executionTask()
 							{
 								MsgBox, 16, % lang("Exception occured") , % lang("%1% '%2%' (ID '%3%') ended with an exception.", lang(_getThreadProperty(OneThread.flowID, OneThread.elementID, "type")), _getThreadProperty(OneThread.flowID, OneThread.elementID, "name"), OneThread.elementID) "`n`n" OneThread.message
 							}
-							; d(OneThread, "remove thread")
 							removeThread(OneThread.InstanceID, OneThread.ID)
 						}
 						somethingexecuted:=true

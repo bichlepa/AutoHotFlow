@@ -41,8 +41,6 @@ Element_getParameters_Condition_Flow_Enabled()
 
 Element_getParametrizationDetails_Condition_Flow_Enabled(Environment)
 {
-	global _flows
-	
 	choicesFlows := x_GetListOfFlowNames()
 	
 	FlowID := x_GetMyFlowID(Environment)

@@ -172,7 +172,6 @@ stopInstance(p_instanceID)
 	{
 		if (OneThread.oldstate = "running" )
 		{
-			oneElement:=_flows[OneThread.flowID].allElements[OneThread.elementID]
 			oneElementClass:=_getElementProperty(OneThread.FlowID, OneThread.ElementID, "class")
 			oneElementCountRuns := _getAndIncrementElementProperty(OneThread.FlowID, OneThread.ElementID, "countRuns", -1)
 			if (oneElementCountRuns = 0)

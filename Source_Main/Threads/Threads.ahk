@@ -11,7 +11,7 @@ loop, files, %_ScriptDir%\source_Elements\*.ahk, FR
 
 Thread_init()
 {
-	global_CommonAhkCodeForAllThreads:="global _cs_shared := " _cs_shared "`n global _cs_debug := " _cs_debug "`n "
+	global_CommonAhkCodeForAllThreads:="global _cs_shared := " _cs_shared "`n "
 	global_CommonAhkCodeForAllThreads.="global _flows := CriticalObject(" (&_flows) ") `n global _settings := CriticalObject(" (&_settings) ") `n global _execution := CriticalObject(" (&_execution) ") `n global _share := CriticalObject(" (&_share) ")`n global _language := CriticalObject(" (&_language) ") `n"
 
 }

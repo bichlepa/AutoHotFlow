@@ -129,8 +129,6 @@ loadFromClipboard()
 	{
 		tempCountLoadedElements++
 		
-		;~ d(_flows[FlowID].allElements[NewElementID])
-		
 		
 		NewElementID := connection_new(FlowID)
 		_setConnection(FlowID, NewElementID, loadElement)
@@ -157,7 +155,7 @@ loadFromClipboard()
 	
 	LeaveCriticalSection(_cs_shared)
 	
-	API_Draw_Draw()
+	API_Draw_Draw(FlowID)
 
 }
 
