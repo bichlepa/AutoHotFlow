@@ -11,7 +11,11 @@ SetWorkingDir %a_temp%  ; using working dir forbidden.
 #NoTrayIcon
 
 parentAHKThread := AhkExported()
+global _ahkThreadID
+
 OnExit,Exit
+_exiting := false
+
 #Include %A_ScriptDir%\..
 #include lib\Object to file\String-object-file.ahk
 #include lib\Robert - Ini library\Robert - Ini library.ahk
@@ -102,5 +106,5 @@ queryTasks()
 }
 
 exit:
-API_Main_Thread_Stopped(_ahkThreadID)
+global _exiting := true
 return

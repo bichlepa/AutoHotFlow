@@ -3,30 +3,84 @@
 ;x_TriggerInNewAHKThread
 ;x_ExecuteInNewAHKThread
 
-_setShared(path, value)
+criticalSectionCounter := 0
+
+	
+; exit routine inside _EnterCriticalSection:
+; when the application closes, the main thread informs all threads that they must stop
+; We have to make sure, that the threads close, while not blocking the critical section.
+; to do so, each thread keeps track whether it blocks the critical section (with variable criticalSectionCounter)
+; Whenever the is going to block or unblock the critical section, it checks whether it has to stop.
+; If so, the thread sends a message to main thread that it can now be killed and at same time stops the pseudo ahk thread
+_EnterCriticalSection()
+{
+	global criticalSectionCounter
+	global API_Main_Thread_Stopped_sent
+	
+	; if below exit code already executed, do not enter critical section
+	if API_Main_Thread_Stopped_sent
+	{
+		exit  ; stop the pseudo-ahk-thread
+	}
+
+	EnterCriticalSection(_cs_shared)
+	if (criticalSectionCounter == 0 and (_share.exiting or _exiting) and not _ahkThreadID="Main")
+	{
+		; send the message to main only once
+		if not API_Main_Thread_Stopped_sent
+		{
+			API_Main_Thread_Stopped_sent := true
+			API_Main_Thread_Stopped(_ahkThreadID)
+		}
+
+		; Leave critical section 
+		LeaveCriticalSection(_cs_shared)
+		exit ; stop the pseudo-ahk-thread
+	}
+
+	criticalSectionCounter++
+}
+
+_LeaveCriticalSection()
+{
+	global criticalSectionCounter
+	criticalSectionCounter--
+	
+	LeaveCriticalSection(_cs_shared)
+}
+
+_isExiting()
 {
 	EnterCriticalSection(_cs_shared)
-    _share[path] := ObjFullyClone(value)
+	exiting := _share.exiting
 	LeaveCriticalSection(_cs_shared)
+	return exiting
+}
+
+_setShared(path, value)
+{
+	_EnterCriticalSection()
+    _share[path] := ObjFullyClone(value)
+	_LeaveCriticalSection()
 }
 _getShared(path)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     value:=ObjFullyClone(_share[path])
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
     return value
 }
 _getSharedProperty(path)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     objectPath:=parseObjectPath(_share, path)
     value:=ObjFullyClone(objectPath[1][objectPath[2]])
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
     return value
 }
 _setSharedProperty(path, value, clone = true)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     objectPath:=parseObjectPath(_share, path)
 	if (clone)
 	{
@@ -36,125 +90,125 @@ _setSharedProperty(path, value, clone = true)
 	{
     	objectPath[1][objectPath[2]] := value
 	}
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 }
 _getAndIncrementShared(path, incrementValue = 1)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     _share[path] += incrementValue
     value:=_share[path]
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
     return value
 }
 _appendToShared(path, appendValue)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     _share[path] .= appendValue
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 }
 _getAllSharedKeys()
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     allKeys:=[]
     for forKey, forValue in _share
 	{
 		allKeys.push(forKey)
 	}
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
     return allKeys
 }
 
 
 _setSettings(path, value)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     _settings[path] := ObjFullyClone(value)
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 }
 _getSettings(path)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     value:=ObjFullyClone(_settings[path])
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
     return value
 }
 _setTask(path, value)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     _share[path].Tasks.push(value)
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 }
 _getTask(path)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     value:=_share[path].Tasks.removeat(1)
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
     return value
 }
 
 
 _getFlow(FlowID)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     flow:=ObjFullyClone(_flows[FlowID])
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
     return flow
 }
 _setFlow(FlowID, flow)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     _flows[FlowID] := ObjFullyClone(flow)
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 }
 _deleteFlow(FlowID)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     _flows.delete(FlowID)
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 }
 _getFlowProperty(FlowID, path)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     objectPath:=parseObjectPath(_flows[FlowID], path)
     value:=ObjFullyClone(objectPath[1][objectPath[2]])
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
     return value
 }
 _setFlowProperty(FlowID, path, value, clone = true)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     objectPath:=parseObjectPath(_flows[FlowID], path)
 	if (clone)
     	objectPath[1][objectPath[2]] := ObjFullyClone(value)
 	Else
 		objectPath[1][objectPath[2]] := value
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 }
 _deleteFlowProperty(FlowID, path)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     objectPath:=parseObjectPath(_flows[FlowID], path)
     objectPath[1].delete(objectPath[2])
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
     return value
 }
 _getAndIncrementFlowProperty(FlowID, path)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     value:=++_flows[FlowID][path]
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
     return value
 }
 _existsFlow(FlowID)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     result := _flows.haskey(FlowID)
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
     return result
 }
 _getFlowIdByName(FlowName)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     for forFlowID, forFlow in _Flows
 	{
 		if (forFlow.name = FlowName)
@@ -163,77 +217,77 @@ _getFlowIdByName(FlowName)
             break
 		}
 	}
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
     return retval
 }
 _getAllFlowIds()
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     allFlows:=[]
     for forFlowID, forFlow in _Flows
 	{
 		allFlows.push(forFlowID)
 	}
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
     return allFlows
 }
 _getAllFlowPropertyKeys(FlowID, path)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     objectPath:=parseObjectPath(_flows[FlowID], path)
     allKeys:=[]
     for forKey, forValue in objectPath[1][objectPath[2]]
 	{
 		allKeys.push(forKey)
 	}
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
     return allKeys
 }
 
 _getCategory(CategoryId)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     category:=ObjFullyClone(_share.allCategories[CategoryId])
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
     return category
 }
 _setCategory(CategoryId, newCategory)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     _share.allCategories[CategoryId] := ObjFullyClone(newCategory)
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 }
 _deleteCategory(CategoryId)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     _share.allCategories.delete(CategoryId)
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 }
 _getCategoryProperty(CategoryId, path)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     objectPath:=parseObjectPath(_share.allCategories[CategoryId], path)
     value:=ObjFullyClone(objectPath[1][objectPath[2]])
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
     return value
 }
 _setCategoryProperty(CategoryId, path, value)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     objectPath:=parseObjectPath(_share.allCategories[CategoryId], path)
     objectPath[1][objectPath[2]] := ObjFullyClone(value)
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 }
 _existsCategory(CategoryId)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     result := _share.allCategories.haskey(CategoryId)
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
     return result
 }
 _getCategoryIdByName(CategoryName)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     for forCategoryID, forCategory in _share.allCategories
 	{
 		if (forCategory.name = CategoryName)
@@ -242,406 +296,406 @@ _getCategoryIdByName(CategoryName)
             break
 		}
 	}
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
     return retval
 }
 _getAllCategoryIds()
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     allCategories:=[]
     for forCategoryID, forCategory in _share.allCategories
 	{
 		allCategories.push(forCategoryID)
 	}
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
     return allCategories
 }
 
 _getElement(FlowID, ElementID)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     element:=ObjFullyClone(_flows[FlowID].allElements[ElementID])
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
     return element
 }
 _setElement(FlowID, ElementID, element)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     _flows[FlowID].allElements[ElementID] := ObjFullyClone(element)
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 }
 _deleteElement(FlowID, ElementID)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     _flows[FlowID].allElements.delete(ElementID)
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 }
 _getElementProperty(FlowID, ElementID, path)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     objectPath:=parseObjectPath(_flows[FlowID].allElements[ElementID], path)
     value:=ObjFullyClone(objectPath[1][objectPath[2]])
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
     return value
 }
 _setElementProperty(FlowID, ElementID, path, value)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     objectPath:=parseObjectPath(_flows[FlowID].allElements[ElementID], path)
     objectPath[1][objectPath[2]] := ObjFullyClone(value)
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 }
 _deleteElementProperty(FlowID, ElementID, path)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     objectPath:=parseObjectPath(_flows[FlowID].allElements[ElementID], path)
     objectPath[1].delete(objectPath[2])
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
     return value
 }
 _getAndIncrementElementProperty(FlowID, ElementID, path, incrementValue = 1)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
 	_flows[FlowID].allElements[ElementID][path] += incrementValue
     value :=_flows[FlowID].allElements[ElementID][path]
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
     return value
 }
 _existsElement(FlowID, ElementID)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     result := _flows[FlowID].allElements.haskey(ElementID)
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
     return result
 }
 _getAllElementIds(FlowID)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     allElementIDs:=[]
     for forElementID, forElement in _flows[FlowID].allElements
 	{
 		allElementIDs.push(forElementID)
 	}
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
     return allElementIDs
 }
 
 _getElementFromState(FlowID, ElementID, state = "")
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
 	if not state
 		state := _flows[FlowID].currentState
 
     element:=ObjFullyClone(_flows[FlowID].states[state].allElements[ElementID])
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
     return element
 }
 
 _getConnection(FlowID, ConnectionID)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     Connection:=ObjFullyClone(_flows[FlowID].allConnections[ConnectionID])
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
     return Connection
 }
 _setConnection(FlowID, ConnectionID, Connection)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     _flows[FlowID].allConnections[ConnectionID] := ObjFullyClone(Connection)
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 }
 _deleteConnection(FlowID, ConnectionID)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     _flows[FlowID].allConnections.delete(ConnectionID)
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 }
 _getConnectionProperty(FlowID, ConnectionID, path)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     objectPath:=parseObjectPath(_flows[FlowID].allConnections[ConnectionID], path)
     value:=ObjFullyClone(objectPath[1][objectPath[2]])
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
     return value
 }
 _setConnectionProperty(FlowID, ConnectionID, path, value)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     objectPath:=parseObjectPath(_flows[FlowID].allConnections[ConnectionID], path)
     objectPath[1][objectPath[2]] := ObjFullyClone(value)
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 }
 _deleteConnectionProperty(FlowID, ConnectionID, path)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     objectPath:=parseObjectPath(_flows[FlowID].allConnections[ConnectionID], path)
     objectPath[1].delete(objectPath[2])
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
     return value
 }
 _getAndIncrementConnectionProperty(FlowID, ConnectionID, path, incrementValue = 1)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
 	_flows[FlowID].allConnections[ConnectionID][path] += incrementValue
     value :=_flows[FlowID].allConnections[ConnectionID][path]
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
     return value
 }
 
 _existsConnection(FlowID, ConnectionID)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     result := _flows[FlowID].allConnections.haskey(ConnectionID)
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
     return result
 }
 _getAllConnectionIds(FlowID)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     allConnectionIDs:=[]
     for forConnectionID, forConnection in _flows[FlowID].allConnections
 	{
 		allConnectionIDs.push(forConnectionID)
 	}
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
     return allConnectionIDs
 }
 
 _getConnectionFromState(FlowID, ConnectionID, state = "")
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
 	if not state
 		state := _flows[FlowID].currentState
 
     Connection:=ObjFullyClone(_flows[FlowID].states[state].allConnections[ConnectionID])
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
     return Connection
 }
 
 _getInstance(InstanceID)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     instance := ObjFullyClone(_execution.instances[InstanceID])
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
     return instance
 }
 _setInstance(InstanceID, Instance)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     _execution.instances[InstanceID] := ObjFullyClone(Instance)
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 }
 _deleteInstance(InstanceID)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     _execution.instances.delete(InstanceID)
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 }
 _getInstanceProperty(InstanceID, path, clone = true)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     objectPath:=parseObjectPath(_execution.instances[InstanceID], path)
 	if (clone)
     	value:=ObjFullyClone(objectPath[1][objectPath[2]])
 	Else
     	value:=objectPath[1][objectPath[2]]
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
     return value
 }
 _setInstanceProperty(InstanceID, path, value, clone = true)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     objectPath:=parseObjectPath(_execution.instances[InstanceID], path)
 	if (clone)
     	objectPath[1][objectPath[2]] := ObjFullyClone(value)
 	Else
 		objectPath[1][objectPath[2]] := value
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 }
 _deleteInstanceProperty(InstanceID, path)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     objectPath:=parseObjectPath(_execution.instances[InstanceID], path)
     objectPath[1].delete(objectPath[2])
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 }
 _getInstancePropertyObjectIdList(InstanceID, path)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     objectPath:=parseObjectPath(_execution.instances[InstanceID], path)
 	result:=[]
 	for key, value in objectPath[1][objectPath[2]]
 	{
 		result.push(key)
 	}
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 	return result
 }
 _existsInstanceProperty(InstanceID, path)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     objectPath:=parseObjectPath(_execution.instances[InstanceID], path)
     result := objectPath[1].haskey(objectPath[2])
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
     return result
 }
 _existsInstance(InstanceID)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     result := _execution.instances.haskey(InstanceID)
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
     return result
 }
 _getAllInstanceIds()
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     allInstanceIDs:=[]
     for forInstanceID, forInstance in _execution.instances
 	{
 		allInstanceIDs.push(forInstanceID)
 	}
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
     return allInstanceIDs
 }
 
 
 _getThread(InstanceID, ThreadID)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     Thread := ObjFullyClone(_execution.instances[InstanceID].threads[ThreadID])
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
     return Thread
 }
 _setThread(InstanceID, ThreadID, Thread)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     _execution.instances[InstanceID].threads[ThreadID] := ObjFullyClone(Thread)
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 }
 _deleteThread(InstanceID, ThreadID)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     _execution.instances[InstanceID].threads.delete(ThreadID)
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 }
 _getThreadProperty(InstanceID, ThreadID, path, clone = true)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     objectPath:=parseObjectPath(_execution.instances[InstanceID].threads[ThreadID], path)
 	if (clone)
     	value:=ObjFullyClone(objectPath[1][objectPath[2]])
 	Else
 		value:=objectPath[1][objectPath[2]]
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
     return value
 }
 _setThreadProperty(InstanceID, ThreadID, path, value, clone = true)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     objectPath:=parseObjectPath(_execution.instances[InstanceID].threads[ThreadID], path)
 	if (clone)
     	objectPath[1][objectPath[2]] := ObjFullyClone(value)
 	Else
     	objectPath[1][objectPath[2]] := value
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 }
 _deleteThreadProperty(InstanceID, ThreadID, path)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     objectPath:=parseObjectPath(_execution.instances[InstanceID].threads[ThreadID], path)
     objectPath[1].delete(objectPath[2])
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 }
 _getThreadPropertyObjectIdList(InstanceID, ThreadID, path)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     objectPath:=parseObjectPath(_execution.instances[InstanceID].threads[ThreadID], path)
 	result:=[]
 	for key, value in objectPath[1][objectPath[2]]
 	{
 		result.push(key)
 	}
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 	return result
 }
 _existsThreadProperty(InstanceID, ThreadID, path)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     objectPath:=parseObjectPath(_execution.instances[InstanceID].threads[ThreadID], path)
     result := objectPath[1].haskey(objectPath[2])
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
     return result
 }
 _existsThread(InstanceID, ThreadID)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     result := _execution.instances[InstanceID].threads.haskey(ThreadID)
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
     return result
 }
 _getAllThreadIds(InstanceID)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     allThreadIDs:=[]
     for forThreadID, forThread in _execution.instances[InstanceID].threads
 	{
 		allThreadIDs.push(forThreadID)
 	}
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
     return allThreadIDs
 }
 
 
 _getTrigger(TriggerID)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     Trigger := ObjFullyClone(_execution.Triggers[TriggerID])
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
     return Trigger
 }
 _setTrigger(TriggerID, Trigger)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     _execution.Triggers[TriggerID] := ObjFullyClone(Trigger)
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 }
 _deleteTrigger(TriggerID)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     _execution.Triggers.delete(TriggerID)
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 }
 _getTriggerProperty(TriggerID, path)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     objectPath:=parseObjectPath(_execution.Triggers[TriggerID], path)
     value:=ObjFullyClone(objectPath[1][objectPath[2]])
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
     return value
 }
 _setTriggerProperty(TriggerID, path, value)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     objectPath:=parseObjectPath(_execution.Triggers[TriggerID], path)
     objectPath[1][objectPath[2]] := ObjFullyClone(value)
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 }
 _existsTrigger(TriggerID)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     result := _execution.Triggers.haskey(TriggerID)
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
     return result
 }
 _getAllTriggerIds()
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
     allTriggerIDs:=[]
     for forTriggerID, forTrigger in _execution.Triggers
 	{
 		allTriggerIDs.push(forTriggerID)
 	}
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
     return allTriggerIDs
 }
 

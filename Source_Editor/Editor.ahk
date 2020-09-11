@@ -11,7 +11,7 @@ SetBatchLines -1
 #SingleInstance off
 CoordMode,mouse,client
 ;FileEncoding,UTF-8
-OnExit,Exit
+;OnExit,Exi
 
 ;Following variables will be present (and some others)
 ;Global_ThisFlowID
@@ -112,17 +112,7 @@ queryTasks()
 
 
 
-exit_all()
-{
-	global
-	API_Main_Thread_Stopped(_ahkThreadID)
-	deinitializeTrayBar()
-}
-
 
 exit:
-if (exiting != true)
-exit_all()
-exiting := true
-exitapp
+global _exiting := true
 return

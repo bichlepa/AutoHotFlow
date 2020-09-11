@@ -441,7 +441,7 @@ ui_findElementUnderMouse(par_mode="default")
 	local drawResultFlow, drawResultElement
 	local clickPriority, marked
 	
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
 	
 	clickedElement:=""
 	elementHighestPriority:=""
@@ -581,7 +581,7 @@ ui_findElementUnderMouse(par_mode="default")
 		
 	}
 	
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 	
 	return clickedElement
 }

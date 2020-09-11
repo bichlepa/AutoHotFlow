@@ -161,6 +161,7 @@ _share.temp := Object() 	;For temporary content
 _share._ScriptDir := _ScriptDir
 _share._WorkingDir := _WorkingDir 
 _share.CategoryIDCounter := 1	
+_share.Exiting := false
 
 _share.main := Object()
 _share.main.Tasks := Object()

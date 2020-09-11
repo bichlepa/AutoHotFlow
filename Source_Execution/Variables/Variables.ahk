@@ -2,30 +2,30 @@
 
 LoopVariable_Set(Environment,p_Name,p_Value, p_hidden=False)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
 	if (p_hidden)
 		_setThreadProperty(Environment.InstanceID, Environment.ThreadID, "loopvarsHidden." p_Name, p_Value)
 	else
 		_setThreadProperty(Environment.InstanceID, Environment.ThreadID, "loopvars." p_Name, p_Value)
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 }
 ThreadVariable_Set(Environment,p_Name,p_Value,p_hidden=False)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
 	if (p_hidden)
 		_setThreadProperty(Environment.InstanceID, Environment.ThreadID, "threadvarsHidden." p_Name, p_Value)
 	else
 		_setThreadProperty(Environment.InstanceID, Environment.ThreadID, "threadvars." p_Name, p_Value)
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 }
 InstanceVariable_Set(Environment,p_Name,p_Value,p_hidden=False)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
 	if (p_hidden)
 		_setInstanceProperty(Environment.InstanceID, "InstanceVarsHidden." p_Name, p_Value)
 	else
 		_setInstanceProperty(Environment.InstanceID, "InstanceVars." p_Name, p_Value)
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 	
 }
 
@@ -34,92 +34,92 @@ InstanceVariable_Set(Environment,p_Name,p_Value,p_hidden=False)
 
 LoopVariable_Get(Environment,p_Name, p_hidden=False)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
 	if (p_hidden)
 		value := _getThreadProperty(Environment.InstanceID, Environment.ThreadID, "loopvarsHidden." p_Name)
 	else
 		value := _getThreadProperty(Environment.InstanceID, Environment.ThreadID, "loopvars." p_Name)
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 	return value
 }
 ThreadVariable_Get(Environment,p_Name, p_hidden=False)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
 	if (p_hidden)
 		value := _getThreadProperty(Environment.InstanceID, Environment.ThreadID, "threadvarsHidden." p_Name)
 	else
 		value := _getThreadProperty(Environment.InstanceID, Environment.ThreadID, "threadvars." p_Name)
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 	return value
 	
 }
 InstanceVariable_Get(Environment,p_Name, p_hidden=False)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
 	if (p_hidden)
 		value := _getInstanceProperty(Environment.InstanceID, "InstanceVarsHidden." p_Name)
 	else
 		value := _getInstanceProperty(Environment.InstanceID, "InstanceVars." p_Name)
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 	return value
 }
 
 
 LoopVariable_Delete(Environment,p_Name, p_hidden=False)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
 	if (p_hidden)
 		_deleteThreadProperty(Environment.InstanceID, Environment.ThreadID, "loopvarsHidden." p_Name)
 	else
 		_deleteThreadProperty(Environment.InstanceID, Environment.ThreadID, "loopvars." p_Name)
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 }
 ThreadVariable_Delete(Environment,p_Name, p_hidden=False)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
 	if (p_hidden)
 		_deleteThreadProperty(Environment.InstanceID, Environment.ThreadID, "threadvarsHidden." p_Name)
 	else
 		_deleteThreadProperty(Environment.InstanceID, Environment.ThreadID, "threadvars." p_Name)
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 	
 }
 InstanceVariable_Delete(Environment,p_Name, p_hidden=False)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
 	if (p_hidden)
 		_deleteInstanceProperty(Environment.InstanceID, "InstanceVarsHidden." p_Name)
 	else
 		_deleteInstanceProperty(Environment.InstanceID, "InstanceVars." p_Name)
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 	
 }
 
 
 Var_GetListOfLoopVars(environment)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
 	retobject := _getThreadPropertyObjectIdList(Environment.InstanceID, Environment.ThreadID, "loopvars")
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 	return retobject
 }
 Var_GetListOfThreadVars(environment)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
 	retobject := _getThreadPropertyObjectIdList(Environment.InstanceID, Environment.ThreadID, "threadvars")
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 	return retobject
 }
 Var_GetListOfInstanceVars(environment)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
 	retobject := _getInstancePropertyObjectIdList(Environment.InstanceID, "InstanceVars")
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 	return retobject
 }
 Var_GetListOfAllVars(environment)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
 	retobject:=Object()
 	for index, varname in Var_GetListOfLoopVars(environment)
 	{
@@ -141,14 +141,14 @@ Var_GetListOfAllVars(environment)
 	{
 		retobject.push(varname)
 	}
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 	return retobject
 }
 
 
 LoopVariable_AddToStack(Environment)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
 	;Write current loopvars to stack
 	; TODO: This code is inefficient
 	loopVars := _getThreadProperty(Environment.InstanceID, Environment.ThreadID, "loopvars")
@@ -161,11 +161,11 @@ LoopVariable_AddToStack(Environment)
 	loopvarsStack.push(loopvars)
 	_setThreadProperty(Environment.InstanceID, Environment.ThreadID, "loopvarsStackHidden", loopvarsStack)
 	
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 }
 LoopVariable_RestoreFromStack(Environment)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
 	;Restore loopvars from stack
 
 	; TODO: This code is inefficient
@@ -179,7 +179,7 @@ LoopVariable_RestoreFromStack(Environment)
 	_setThreadProperty(Environment.InstanceID, Environment.ThreadID, "loopvarsHidden", loopvars)
 	_setThreadProperty(Environment.InstanceID, Environment.ThreadID, "loopvarsStackHidden", loopvarsStack)
 
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 }
 
 
@@ -218,7 +218,7 @@ Var_RetrieveDestination(p_Name,p_Location)
 Var_GetLocation(Environment, p_Name, p_hidden=False)
 {
 	global AllBuiltInVars, AllCustomBuiltInVars
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
 	retval:=""
 	if (p_hidden = false)
 	{
@@ -270,7 +270,7 @@ Var_GetLocation(Environment, p_Name, p_hidden=False)
 			retval:= "instance"
 		}
 	}
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 	return retval
 	;~ d(Environment, "error-  " p_name)
 	;Todo: static and global variables

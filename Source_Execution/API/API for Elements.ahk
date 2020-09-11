@@ -52,7 +52,7 @@ x_CheckVariableName(p_VarName)
 
 x_AutoEvaluateParameters(Environment, ElementParameters, p_skipList = "")
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
 
 	elementClass:=_getElementProperty(Environment.FlowID, Environment.ElementID, "class")
 	ParametrationDetails := Element_getParametrizationDetails(elementClass, Environment)
@@ -97,13 +97,13 @@ x_AutoEvaluateParameters(Environment, ElementParameters, p_skipList = "")
 		}
 	}
 	
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 	return EvaluatedParameters
 }
 
 x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, p_ParametersToEvaluate)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
 
 	if not isobject(EvaluatedParameters)
 		EvaluatedParameters:=Object()
@@ -143,12 +143,12 @@ x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementPara
 				break
 		}
 	}
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 }
 
 x_EvalOneParameter(EvaluatedParameters, Environment, ElementParameters, oneParID, onePar = "")
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
 	if not (onePar)
 	{
 		elementClass:=_getElementProperty(Environment.FlowID, Environment.ElementID, "class")
@@ -280,7 +280,7 @@ x_EvalOneParameter(EvaluatedParameters, Environment, ElementParameters, oneParID
 			EvaluatedParameters[oneParID] := result
 		}
 	}
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 	return EvaluatedParameters
 }
 
@@ -356,25 +356,25 @@ x_GetMyEnvironmentFromExecutionID(p_ExecutionID)
 
 x_SetExecutionValue(Environment, p_name, p_Value)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
 	_setThreadProperty(Environment.InstanceID, Environment.ThreadID, "ElementExecutionValues." p_name, p_value, false)
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 }
 x_GetExecutionValue(Environment, p_name)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
 	retval := _getThreadProperty(Environment.InstanceID, Environment.ThreadID, "ElementExecutionValues." p_name, false)
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 	return retval
 }
 
 x_NewExecutionFunctionObject(Environment, p_ToCallFunction, params*)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
 	oneFunctionObject:=new Class_FunctionObject(Environment, p_ToCallFunction, params*)
 	uniqueID := _getThreadProperty(Environment.InstanceID, Environment.ThreadID, "uniqueID")
 	global_AllExecutionIDs[uniqueID].ExecutionFunctionObjects[p_ToCallFunction]:=oneFunctionObject
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 	return oneFunctionObject
 }
 
@@ -420,7 +420,7 @@ class Class_FunctionObject
 
 x_GetThreadCountInCurrentInstance(Environment)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
 
 	allThreadIDs := _getAllThreadIds(Environment.InstanceID)
 	count:=0
@@ -431,7 +431,7 @@ x_GetThreadCountInCurrentInstance(Environment)
 			count++
 		}
 	}
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 	return count
 }
 
@@ -442,7 +442,7 @@ x_ExecuteInNewAHKThread(Environment, p_functionObject, p_Code, p_VarsToImport, p
 {
 	global global_AllExecutionIDs
 
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
 	uniqueID := _getThreadProperty(Environment.InstanceID, Environment.ThreadID, "uniqueID")
 
 	if not isobject(global_AllExecutionIDs[uniqueID])
@@ -477,7 +477,7 @@ x_ExecuteInNewAHKThread(Environment, p_functionObject, p_Code, p_VarsToImport, p
 	postcode .= "exitapp"
 	
 	
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 	;~ d("`n" preCode "`n" p_Code "`n" postCode)
 	AhkThread("`n" preCode "`n" p_Code "`n" postCode)
 	
@@ -486,14 +486,14 @@ x_ExecuteInNewAHKThread(Environment, p_functionObject, p_Code, p_VarsToImport, p
 ExecuteInNewAHKThread_finishedExecution(p_ExecutionID) ;Not an api function
 {
 	global global_AllExecutionIDs
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
 
 	Environment:=x_GetMyEnvironmentFromExecutionID(p_ExecutionID)
 	uniqueID := _getThreadProperty(Environment.InstanceID, Environment.ThreadID, "uniqueID")
 	functionObject:=global_AllExecutionIDs[uniqueID].ExeInNewThread.functionObject
 	varsExported:=_getSharedProperty("temp." uniqueID ".sharedObject.varsExported")
 
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 	%functionObject%(varsExported)
 }
 
@@ -501,7 +501,7 @@ ExecuteInNewAHKThread_finishedExecution(p_ExecutionID) ;Not an api function
 x_TriggerInNewAHKThread(Environment, p_Code, p_VarsToImport, p_VarsToExport)
 {
 	global global_AllActiveTriggerIDs
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
 	uniqueID := _getThreadProperty(Environment.InstanceID, Environment.ThreadID, "uniqueID")
 
 	if not isobject(global_AllActiveTriggerIDs[uniqueID])
@@ -537,7 +537,7 @@ x_TriggerInNewAHKThread(Environment, p_Code, p_VarsToImport, p_VarsToExport)
 	postcode .= "ahf_parentAHKThread.ahkFunction(""API_Execution_externalTrigger"", ahf_uniqueID)`n"
 	postcode .= "}`n"
 		
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 	AHKThreadID:=AhkThread("`n" preCode "`n" p_Code "`n" postCode)
 
 	global_AllActiveTriggerIDs[uniqueID].ExeInNewThread.AHKThreadID:=AHKThreadID
@@ -545,27 +545,27 @@ x_TriggerInNewAHKThread(Environment, p_Code, p_VarsToImport, p_VarsToExport)
 }
 x_TriggerInNewAHKThread_Stop(Environment)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
 	uniqueID := _getThreadProperty(Environment.InstanceID, Environment.ThreadID, "uniqueID")
 	AHKThreadID:=global_AllActiveTriggerIDs[uniqueID].ExeInNewThread.AHKThreadID
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 	ahkthread_release(global_AllActiveTriggerIDs[uniqueID].ExeInNewThread.AHKThreadID)
 }
 ExecuteInNewAHKThread_trigger(p_uniqueID) ;Not an api function
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
 	Environment:=global_AllActiveTriggerIDs[p_uniqueID].environment
 	varsExportedFromExternalThread :=_getSharedProperty("temp." p_uniqueID ".sharedObject.varsExported")
 	_setThreadProperty(Environment.InstanceID, Environment.ThreadID, "varsExportedFromExternalThread", varsExportedFromExternalThread)
 
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 	x_trigger(Environment)
 }
 x_TriggerInNewAHKThread_GetExportedValues(Environment)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
 	retval := _getThreadProperty(Environment.InstanceID, Environment.ThreadID, "varsExportedFromExternalThread")
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 	return retval
 }
 

@@ -85,10 +85,10 @@ logger(LogLevel,LoggingText, logSource="common")
 		_appendToShared("log_" logSource, DebugLogLastEntry)
 		if (_getSettings("logtofile"))
 		{
-			EnterCriticalSection(_cs_shared)
+			_EnterCriticalSection()
 			FileAppend,% DebugLogLastEntry,%_WorkingDir%\Log\Log.txt,UTF-8
 			FileAppend,% DebugLogLastEntry,%_WorkingDir%\Log\Log_%logSource%.txt,UTF-8
-			LeaveCriticalSection(_cs_shared)
+			_LeaveCriticalSection()
 		}
 	}
 	
@@ -239,7 +239,7 @@ log_cleanup()
 		;~ _share.log:=substr(templog,templogpos+2)
 		;~ MsgBox % templogpos "`n" _share.log
 		
-		EnterCriticalSection(_cs_shared)
+		_EnterCriticalSection()
 		log_cleanup_toobigfiles:=Object()
 		loop, %_WorkingDir%\Log\Log*.txt
 		{
@@ -258,7 +258,7 @@ log_cleanup()
 			StringTrimRight, fullpath, onebigfile, 4 ;remove .txt
 			FileMove,%onebigfile%,%fullpath%_old.txt,1
 		}
-		LeaveCriticalSection(_cs_shared)
+		_LeaveCriticalSection()
 		_setShared("logTidyCountdown", 50)
 	}
 }

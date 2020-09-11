@@ -20,7 +20,7 @@ SaveFlowMetaData(FlowID)
 		return
 	}
 	
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
 
 	;~ d(flow,FlowID)
 	if not fileexist(flow.file)
@@ -50,11 +50,12 @@ SaveFlowMetaData(FlowID)
 		IniWrite,% enabledTriggers,% flow.file,general,enabled
 	}
 	
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 }
 
 SaveFlow(FlowID)
 {
+	; TODO: get flow from current state
 	flow := _getFlow(FlowID)
 	FlowName := flow.name
 
@@ -66,14 +67,11 @@ SaveFlow(FlowID)
 	{
 		;A demo flow cannot be saved
 		logger("a0","Cannot save metadata of flow " FlowName ". It is a demonstation flow.")
-		if (_exitingNow != True)
-		{
-			MsgBox, 48, % lang("Save flow"), % lang("This flow cannot be saved because it is a demonstration flow.") " " lang("You may duplicate this flow first and then you can edit it.")
-		}
+		MsgBox, 48, % lang("Save flow"), % lang("This flow cannot be saved because it is a demonstration flow.") " " lang("You may duplicate this flow first and then you can edit it.")
 		return
 	}
 	
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
 
 	enabledTriggers:=""
 	for oneID, oneElement in flow.allElements
@@ -208,7 +206,7 @@ SaveFlow(FlowID)
 	
 	_setFlowProperty(FlowID, "savedState", flow.currentState)
 	
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 }
 
 i_SaveParametersOfElement(saveElement,FlowID,saveElementIniID,Savelocation="")
@@ -249,17 +247,17 @@ i_SaveParametersOfElement(saveElement,FlowID,saveElementIniID,Savelocation="")
 
 i_SaveUnsavedFlows()
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
 	
 	flowIDs := _getAllFlowIds()
 	for oneIndex, oneFlowID in flowIDs
 	{
-		if (_getFlowProperty(FlowID, "currentState") != _getFlowProperty(FlowID, "savedState"))
+		if (_getFlowProperty(FlowID, "currentState") != _getFlowProperty(FlowID, "savedState") and not _getFlowProperty(FlowID, "demo"))
 		{
 			SaveFlow(tempID)
 		}
 		
 	}
 	
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 }

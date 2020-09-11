@@ -1,6 +1,6 @@
 ﻿SaveToClipboard()
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
 	
 	ToolTip(lang("saving to clipboard"),100000)
 	logger("a2","Saving elements to clipboard")
@@ -55,7 +55,7 @@
 	
 	_setShared("clipboard", newClipboard)
 	
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 	
 	;~ RIni_Shutdown("ClipboardSaveFile")
 	return toreturn
@@ -64,7 +64,7 @@
 
 loadFromClipboard()
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
 	
 	
 	ClipboardFlowFilename:=flow.ClipboardFilePath
@@ -153,7 +153,7 @@ loadFromClipboard()
 		logger("a2","No elements found in clipboard")
 	}
 	
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 	
 	API_Draw_Draw(FlowID)
 

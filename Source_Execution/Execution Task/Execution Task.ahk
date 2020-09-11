@@ -9,7 +9,7 @@ executionTask()
 	
 	Loop
 	{
-		EnterCriticalSection(_cs_shared)
+		_EnterCriticalSection()
 		somethingexecuted:=false
 		ExecutionNextTasks:=Object()
 		;Find out which elements need to be executed. Also manage finished elements and prepare them if needed
@@ -150,7 +150,7 @@ executionTask()
 			}
 		}
 		
-		LeaveCriticalSection(_cs_shared)
+		_LeaveCriticalSection()
 
 		;Actually execute the elements which are queued for execution
 		for oneExecutionTaskIndex, oneExecutionTask in ExecutionNextTasks
@@ -167,7 +167,7 @@ executionTask()
 
 finishExecutionOfElement(p_InstanceID, p_ThreadID, p_Result, p_Message = "")
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
 
 	_setThreadProperty(p_InstanceID, p_ThreadID, "State", "finished")
 	_setThreadProperty(p_InstanceID, p_ThreadID, "result", p_Result)
@@ -197,6 +197,6 @@ finishExecutionOfElement(p_InstanceID, p_ThreadID, p_Result, p_Message = "")
 	{
 		ThreadVariable_Set({instanceID: p_InstanceID, threadID: p_ThreadID, flowID: FlowID, elementID: ElementID}, "a_ErrorMessage", p_Message)
 	}
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 	;~ d(Environment, message)
 }

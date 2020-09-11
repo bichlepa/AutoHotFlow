@@ -134,7 +134,7 @@ updateFlowIcons_Manager_GUI()
 	
 	Gui, manager:default
 	
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
 	
 	; loop throuth all flows and set the icons
 	local forFlowID, forFlowIndex
@@ -203,7 +203,7 @@ updateFlowIcons_Manager_GUI()
 		}
 	}
 	
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 }
 
 ; Dismisses the treeview and refills it
@@ -244,7 +244,7 @@ TreeView_manager_Refill()
 		_setCategoryProperty(onecategoryID, "tv", categoryTV)
 	}
 	
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
 	;go through all flows and add the tv elements
 	local uncategorizedCategoryTV
 	local oneflowIndex, oneflowID
@@ -269,7 +269,7 @@ TreeView_manager_Refill()
 		}
 	}
 
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 
 	guicontrol, enable,TreeView_manager
 }

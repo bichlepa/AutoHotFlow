@@ -163,16 +163,8 @@ queryTasks()
 
 
 
-exit_all()
-{
-	global
-	API_Main_Thread_Stopped(_ahkThreadID) 
-}
 
 
 exit:
-if (exiting != true)
-exit_all()
-exiting := true
-exitapp
+global _exiting := true
 return

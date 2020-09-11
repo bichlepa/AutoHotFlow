@@ -277,7 +277,7 @@ class ElementSettings
 		
 		
 		GUISettingsOfElementSave:
-		EnterCriticalSection(_cs_shared)
+		_EnterCriticalSection()
 		
 		GUISettingsOfElementobject.generalUpdate()
 		;~ gui,SettingsOfElement:submit
@@ -336,7 +336,7 @@ class ElementSettings
 			
 		}
 		
-		LeaveCriticalSection(_cs_shared)
+		_LeaveCriticalSection()
 		
 		temponeValue:=""
 		

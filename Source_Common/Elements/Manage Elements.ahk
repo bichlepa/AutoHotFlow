@@ -22,7 +22,7 @@ Element_New(p_FlowID, p_type="",p_elementID="")
 		return
 	}
 
-	EnterCriticalSection(_cs_shared) ; We get, change and store a flow in this function. keep this critical section to ensure data integrity
+	_EnterCriticalSection() ; We get, change and store a flow in this function. keep this critical section to ensure data integrity
 
 	tempElement:=Object()
 	;~ tempElement:=[]
@@ -56,7 +56,7 @@ Element_New(p_FlowID, p_type="",p_elementID="")
 
 	Element_SetType(p_FlowID, tempElement.ID, p_type)
 	
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 	return tempElement.ID
 }
 
@@ -69,7 +69,7 @@ Element_SetType(p_flowID, p_ElementID, p_elementType)
 		return
 	}
 
-	EnterCriticalSection(_cs_shared) ; We get, change and store an element in this function. keep this critical section to ensure data integrity
+	_EnterCriticalSection() ; We get, change and store an element in this function. keep this critical section to ensure data integrity
 
 	_setElementProperty(p_FlowID, p_elementID, "type", p_elementType)
 	_setElementProperty(p_FlowID, p_elementID, "class", "")  ;After changing the element type only, the class is unset 
@@ -80,7 +80,7 @@ Element_SetType(p_flowID, p_ElementID, p_elementType)
 		_setElementProperty(p_FlowID, p_elementID, "heightOfVerticalBar", 150) 
 	}
 	
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 }
 
 ;Sets the element class. This means it is possible to change the element type and subtype
@@ -92,7 +92,7 @@ Element_SetClass(p_FlowID, p_ElementID, p_elementClass)
 		return
 	}
 
-	EnterCriticalSection(_cs_shared) ; We get, change and store an element in this function. keep this critical section to ensure data integrity
+	_EnterCriticalSection() ; We get, change and store an element in this function. keep this critical section to ensure data integrity
 	
 	;First set type
 	if not isfunc("Element_getElementType_" p_elementClass)
@@ -121,7 +121,7 @@ Element_SetClass(p_FlowID, p_ElementID, p_elementClass)
 	{
 		Element_setDefaultTrigger(p_FlowID, p_elementID)
 	}
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 }
 
 ;Is called when the element subtype is set. All parameters that are not set yet are set to the default parameters
@@ -133,7 +133,7 @@ Element_setParameterDefaults(p_FlowID, p_elementID)
 		return
 	}
 
-	EnterCriticalSection(_cs_shared)  ; We get, change and store an element in this function. keep this critical section to ensure data integrity
+	_EnterCriticalSection()  ; We get, change and store an element in this function. keep this critical section to ensure data integrity
 
 	elementClass:=_getElementProperty(p_FlowID, p_elementID, "class")
 	parameters:=Element_getParametrizationDetails(elementClass, {flowID: p_FlowID, elementID: p_elementID})
@@ -173,7 +173,7 @@ Element_setParameterDefaults(p_FlowID, p_elementID)
 	}
 	_setElementProperty(p_FlowID, p_elementID, "pars", ElementParsObject)
 	
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 }
 
 Element_findDefaultTrigger(p_FlowID)
@@ -209,7 +209,7 @@ Element_setDefaultTrigger(p_FlowID, p_elementID)
 		return
 	}
 
-	EnterCriticalSection(_cs_shared) ; We get, change and store a flow in this function. keep this critical section to ensure data integrity
+	_EnterCriticalSection() ; We get, change and store a flow in this function. keep this critical section to ensure data integrity
 
 	allElements := _getFlowProperty(p_FlowID, "allElements")
 	for oneID, oneElement in allElements
@@ -229,7 +229,7 @@ Element_setDefaultTrigger(p_FlowID, p_elementID)
 	}
 	_setFlowProperty(p_FlowID, "allElements", allElements)
 
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 }
 
 
@@ -242,7 +242,7 @@ Element_Remove(p_FlowID, p_elementID)
 		return
 	}
 
-	EnterCriticalSection(_cs_shared) ; We get, change and store a flow in this function. keep this critical section to ensure data integrity
+	_EnterCriticalSection() ; We get, change and store a flow in this function. keep this critical section to ensure data integrity
 
 	; allElements:=_getFlowProperty(p_FlowID, "allElements")
 	; markedElements:=_getFlowProperty(p_FlowID, "markedElements")
@@ -278,7 +278,7 @@ Element_Remove(p_FlowID, p_elementID)
 		}
 	}
 	
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 }
 
 
@@ -292,7 +292,7 @@ Connection_New(p_FlowID, p_elementID="")
 		return
 	}
 
-	EnterCriticalSection(_cs_shared) ; We get, change and store a flow in this function. keep this critical section to ensure data integrity
+	_EnterCriticalSection() ; We get, change and store a flow in this function. keep this critical section to ensure data integrity
 	
 	tempElement:=Object()
 	if (p_elementID="")
@@ -313,7 +313,7 @@ Connection_New(p_FlowID, p_elementID="")
 	
 	_setConnection(p_FlowID, tempElement.ID, tempElement)
 	
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 	return tempElement.ID
 }
 
@@ -327,7 +327,7 @@ Connection_Remove(p_FlowID, p_elementID)
 		return
 	}
 
-	EnterCriticalSection(_cs_shared) ; We get, change and store a flow in this function. keep this critical section to ensure data integrity
+	_EnterCriticalSection() ; We get, change and store a flow in this function. keep this critical section to ensure data integrity
 
 	;remove the element from list of all connections
 	_deleteConnection(p_FlowID, forID)
@@ -343,7 +343,7 @@ Connection_Remove(p_FlowID, p_elementID)
 	;~ }
 	
 	;~ API_editor_CreateMarkedList(p_FlowID)
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 }
 
 
@@ -355,7 +355,7 @@ UpdateConnectionLists(p_FlowID)
 		return
 	}
 
-	EnterCriticalSection(_cs_shared) ; We get, change and store a flow in this function. keep this critical section to ensure data integrity
+	_EnterCriticalSection() ; We get, change and store a flow in this function. keep this critical section to ensure data integrity
 	
 	allElements := _getFlowProperty(p_FlowID, "allElements")
 	allConnections := _getFlowProperty(p_FlowID, "allConnections")
@@ -372,5 +372,5 @@ UpdateConnectionLists(p_FlowID)
 
 	_setFlowProperty(p_FlowID, "allElements", allElements)
 
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 }

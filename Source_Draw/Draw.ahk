@@ -63,7 +63,7 @@ drawTask()
 {
 	Loop
 	{
-		EnterCriticalSection(_cs_shared)
+		_EnterCriticalSection()
 		
 		somethingdrawn:= false
 		flowParamsCloned:=""
@@ -80,7 +80,7 @@ drawTask()
 			}
 		}
 		
-		LeaveCriticalSection(_cs_shared)
+		_LeaveCriticalSection()
 		
 		if flow
 		{
@@ -99,6 +99,5 @@ drawTask()
 
 
 exit:
-API_Main_Thread_Stopped(_ahkThreadID "" "")
 return
 

@@ -111,6 +111,7 @@ global_elementInclusions =
 #include Source_Main\Threads\Threads.ahk
 #include Source_Main\Api\API for Elements.ahk
 
+#include Source_Common\Multithreading\API Caller to Main.ahk
 #include Source_Common\Multithreading\API Caller to Manager.ahk
 #include Source_Common\Multithreading\API Caller to Draw.ahk
 #include Source_Common\Multithreading\API Caller to Editor.ahk
@@ -346,14 +347,20 @@ ExitApp ;Because we used "OnExit,exit" this command will cause the label "exit" 
 return
 
 exit:
-global _exitingNow ;Make this variable super global
 
-if (_exitingNow!=true) ;Prevent multiple execution of this code by setting this flag
+if (_isExiting() != true) ;Prevent multiple execution of this code by setting this flag
 {
-	_exitingNow:=true
-	
 	i_SaveUnsavedFlows() ;Save unsaved flows.
-	
-	Thread_StopAll() ;Stop all other threads
+
+	; tell other ahk threads that they must close
+	; (especially stop entering critical sections. If a thread exits while it is in a critical section, other threads will freeze)
+	EnterCriticalSection(_cs_shared)
+	_share.exiting := true
+	LeaveCriticalSection(_cs_shared)
+
+	; before we start killing the threads, we will give them some time to close
+	settimer,exit,5000
+	return
 }
+Thread_StopAll() ;Kill all other threads
 ExitApp

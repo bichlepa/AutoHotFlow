@@ -2,7 +2,7 @@
 MarkOne(p_ID,additional:=false)
 {
 	
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
 	
 	;~ ToolTip,% p_id " - " additional
 	if (p_ID!="")
@@ -43,13 +43,13 @@ MarkOne(p_ID,additional:=false)
 		;~ ui_UpdateStatusbartext()
 	}
 
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 }
 
 ;Unmark all elements and connections
 UnmarkEverything(CreateList=true)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
 	
 	for forIndex, forElementID in _getAllElementIds(FlowID) ;Add all marked elements into array
 	{
@@ -64,12 +64,12 @@ UnmarkEverything(CreateList=true)
 		CreateMarkedList()
 	;~ ui_UpdateStatusbartext()
 	
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 }
 
 MarkEverything()
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
 	
 	for forIndex, forElementID in _getAllElementIds(FlowID) ;Add all marked elements into array
 	{
@@ -84,12 +84,12 @@ MarkEverything()
 	
 	;~ ui_UpdateStatusbartext()	
 	
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 }
 
 CreateMarkedList()
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
 	
 	markedElements:=[]
 
@@ -118,5 +118,5 @@ CreateMarkedList()
 	}
 	
 	_setFlowProperty(FlowID, "markedElements", markedElements)
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 }

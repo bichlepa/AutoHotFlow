@@ -1,5 +1,4 @@
 ﻿global global_EditorThreadIDCounter = 1
-global global_ExecutionThreadIDCounter = 1
 global global_AllThreads := CriticalObject()
 global global_CommonAhkCodeForAllThreads:=""
 
@@ -32,16 +31,14 @@ Thread_StartManager()
 	StringReplace,ExecutionThreadCode,ExecutionThreadCode, % ";PlaceholderIncludesOfElements",% global_elementInclusions
 	
 	AhkThread%threadID% := AhkThread(global_CommonAhkCodeForAllThreads "`n global _ahkThreadID := """ threadID """`n" ExecutionThreadCode)
+	AhkThread%threadID%.ahkassign("_ahkThreadID",threadID)
 	
 	global_AllThreads[threadID] := {permanent: true, type: "Manager"}
 	logger("t1", "Manager thread started")
 }
 
 
-API_Main_StartEditor(par_FlowID) ;API Function
-{
-	Thread_StartEditor(par_FlowID)
-}
+
 Thread_StartEditor(par_FlowID)
 {
 	global
@@ -58,6 +55,7 @@ Thread_StartEditor(par_FlowID)
 	StringReplace,ExecutionThreadCode,ExecutionThreadCode, % ";PlaceholderIncludesOfElements",% global_elementInclusions
 	
 	AhkThread%threadID% := AhkThread(global_CommonAhkCodeForAllThreads "`n global _ahkThreadID := """ threadID """`n global FlowID := """ par_FlowID """`n"  ExecutionThreadCode)
+	AhkThread%threadID%.ahkassign("_ahkThreadID",threadID)
 	
 	global_AllThreads[threadID] := {permanent: false, type: "Editor", flowID: par_FlowID}
 	logger("t1", "Editor thread started")
@@ -77,6 +75,8 @@ Thread_StartDraw()
 	FileRead,ExecutionThreadCode,% _ScriptDir "\Source_Draw\Draw.ahk"
 	;~ MsgBox %ExecutionThreadCode%
 	AhkThread%threadID% := AhkThread(global_CommonAhkCodeForAllThreads "`n global _ahkThreadID := """ threadID """`n" ExecutionThreadCode)
+	AhkThread%threadID%.ahkassign("_ahkThreadID",threadID)
+
 	global_AllThreads[threadID] := {permanent: true, type: "Draw"}
 	logger("t1", "Draw thread started")
 }
@@ -90,17 +90,20 @@ Thread_StartExecution()
 	_setSharedProperty("execution", object())
 	_setSharedProperty("execution.Tasks", object())
 	
-	threadID := "Execution" global_ExecutionThreadIDCounter++
+	threadID := "Execution"
 	logger("t1", "Starting execution thread. ID: " threadID)
 	FileRead,ExecutionThreadCode,% _ScriptDir "\Source_Execution\execution.ahk"
 	StringReplace,ExecutionThreadCode,ExecutionThreadCode, % ";PlaceholderIncludesOfElements",% global_elementInclusions
 	;~ MsgBox %ExecutionThreadCode%
 	AhkThread%threadID% := AhkThread(global_CommonAhkCodeForAllThreads "`n global _ahkThreadID := """ threadID """`n" ExecutionThreadCode)
+	AhkThread%threadID%.ahkassign("_ahkThreadID",threadID)
 	
 	global_AllThreads[threadID] := {permanent: true, type: "Execution"}
 	logger("t1", "Execution thread started")
 }
 
+; stop all threads. This should only be called, if the threads were not able to stop themself
+; there is no guarantee, that this code will properly close the threads, it may cause a crash
 Thread_StopAll()
 {
 	global
@@ -109,28 +112,43 @@ Thread_StopAll()
 	logger("t1", "Stopping all threads")
 	threadsCopy := global_Allthreads.clone()
 	
-	
-	;~ EnterCriticalSection(_cs_shared)
 	for threadID, threadpars in threadsCopy
 	{
 		;~ global_Allthreads.delete(threadID)
 		if (AhkThread%threadID%.ahkReady())
 		{
-			;~ MsgBox terminating %threadID%
-			AhkThread%threadID%.ahkterminate(-100)
+			logger("t1", "Killing thread " threadID)
+			AhkThread%threadID%.ahkterminate(100)
 			if (AhkThread%threadID%.ahkReady())
 			{
-				MsgBox close of thread %threadID% failed
+				logger("t0", "Killing thread " threadID " failed")
 			}
 		}
 	}
-	;~ LeaveCriticalSection(_cs_shared)
 }
 
+; Terminates a thread wich requested the main thread to terminate it
 Thread_Stopped(par_ThreadID)
 {
 	global
+	; delete the thread from list
 	global_Allthreads.delete(par_ThreadID)
+
+	; terminate thread
+	AhkThread%par_ThreadID%.ahkterminate(100)
 	logger("t1", "Thread " par_ThreadID "stopped")
-	;~ d(global_Allthreads, "thread " par_ThreadID " beendet")
+	
+	; check whether the thread list is empty
+	local oneKey, oneValue
+	for oneKey, oneValue in global_Allthreads
+	{
+		break
+	}
+
+	if (not oneKey)
+	{
+		; if thread list is empty, close the application immetiately
+		; the thread list can only get empty if AHF is going to close
+		exitapp
+	}
 }

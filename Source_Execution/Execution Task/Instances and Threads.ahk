@@ -5,7 +5,7 @@ global global_ThreadIDCOunter:=0
 */
 newInstance(p_Environment, p_params = "")
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
 
 	executing := _getFlowProperty(p_Environment.FlowID, "executing")
 
@@ -88,7 +88,7 @@ newInstance(p_Environment, p_params = "")
 			updateFlowExcutingStates()
 		}
 	}
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 	return newInstance
 }
 
@@ -99,7 +99,7 @@ startFlow(p_FlowID, p_TriggerID ="", p_params = "")
 {
 	static
 
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
 
 	;If not trigger assigned, trigger the default manual trigger (if any)
 	if (p_TriggerID="")
@@ -122,7 +122,7 @@ startFlow(p_FlowID, p_TriggerID ="", p_params = "")
 		newInstance(environment, p_params)
 	}
 	
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 	
 	if not p_TriggerID
 	{
@@ -141,7 +141,7 @@ startFlow(p_FlowID, p_TriggerID ="", p_params = "")
 
 stopFlow(p_FlowID)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
 	
 	InstanceIDs := _getAllInstanceIds()
 	for OneInstanceIndex, OneInstanceID in InstanceIDs
@@ -151,12 +151,12 @@ stopFlow(p_FlowID)
 			stopInstance(OneInstanceID)
 		}
 	}
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 }
 
 stopInstance(p_instanceID)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
 
 	instance := _getInstance(p_instanceID)
 	for OneThreadID, OneThread in instance.threads
@@ -197,13 +197,13 @@ stopInstance(p_instanceID)
 	
 	updateFlowExcutingStates()
 	
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 }
 
 
 executeToggleFlow(p_FlowID)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
 
 	if (_getFlowProperty(FlowID, "executing"))
 	{
@@ -214,7 +214,7 @@ executeToggleFlow(p_FlowID)
 		startFlow(p_FlowID)
 	}
 	
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 }
 
 /* Starts a new execution thread inside the given instance
@@ -222,7 +222,7 @@ if p_ToCloneFromThread is given, the thread will be cloned
 */
 newThread(p_InstanceID, p_ToCloneFromThreadID ="")
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
 
 	if (p_ToCloneFromThreadID)
 	{
@@ -256,28 +256,28 @@ newThread(p_InstanceID, p_ToCloneFromThreadID ="")
 	
 	_setThread(p_InstanceID, newThread.id, newThread)
 
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 	return newThread.ID
 }
 
 removeThread(p_instanceID, p_threadID)
 {
 	global 
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
 
 	_deleteThread(p_instanceID, p_threadID)
 	if (_getAllThreadIds(p_instanceID).count() = 0)
 	{
 		removeInstance(p_instanceID)
 	}
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 }
 
 removeInstance(p_instanceID)
 {
 	global
 	local tempCallBackfunc
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
 	tempCallBackfunc := _getInstanceProperty(p_InstanceID, "callback", false)
 	if (tempCallBackfunc)
 	{
@@ -287,12 +287,12 @@ removeInstance(p_instanceID)
 	_deleteInstance(p_instanceID)
 	updateFlowExcutingStates()
 
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 }
 
 updateFlowExcutingStates()
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
 
 	executingFlows:=Object()
 	Instances := _getAllInstanceIds()
@@ -313,5 +313,5 @@ updateFlowExcutingStates()
 		}
 	}
 
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 }

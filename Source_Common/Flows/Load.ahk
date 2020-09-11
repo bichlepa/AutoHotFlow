@@ -25,7 +25,7 @@ LoadFlow(FlowID, filepath="", params="")
 
 	currentlyLoadingFlow:=true
 	
-	EnterCriticalSection(_cs_shared)  ; We get, change and store an element in this function. keep this critical section to ensure data integrity
+	_EnterCriticalSection()  ; We get, change and store an element in this function. keep this critical section to ensure data integrity
 
 	IfInString, params, keepPosition
 	{
@@ -234,13 +234,13 @@ LoadFlow(FlowID, filepath="", params="")
 		_setFlowProperty(FlowID, "savedState", _getFlowProperty(FlowID, "currentState"))
 	}
 	
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 	currentlyLoadingFlow:=false
 }
 
 loadFlowGeneralParameters(flowID)
 {
-	EnterCriticalSection(_cs_shared)
+	_EnterCriticalSection()
 	
 	flowSettings := _getFlowProperty(FlowID, "flowSettings")
 
@@ -250,7 +250,7 @@ loadFlowGeneralParameters(flowID)
 	flowSettings.Name:=RIni_GetKeyValue("IniFile", "general", "name", "")
 	flowSettings.FolderOfStaticVariables:=RIni_GetKeyValue("IniFile", "general", "FolderOfStaticVariables", ThisFlowFolder "\Static variables\" ThisFlowFilename)
 	_setFlowProperty(FlowID, "flowSettings", flowSettings)
-	LeaveCriticalSection(_cs_shared)
+	_LeaveCriticalSection()
 	
 	if not fileexist(.flowSettings.FolderOfStaticVariables)
 	{
