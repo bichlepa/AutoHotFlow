@@ -153,14 +153,15 @@ globalSettings_GUI()
 	gui,GlobalSettings:Submit,nohide
 
 	;Check working directory
-	newworkingdir:=checkNewWorkingDir(_getSettings("FlowWorkingDir"), GuiFlowSettingsWorkingDir)
-	if not (newworkingdir)
+	checkNewWorkingDir(GuiFlowSettingsWorkingDir)
+	if not (checkNewWorkingDir(GuiFlowSettingsWorkingDir))
 	{
+
 		guicontrol, choose, globalsettingtab, %globalsetting_tab_FlowSettings%
 		guicontrol, focus, GuiFlowSettingsWorkingDir
 		return
 	}
-	_setSettings("FlowWorkingDir", newworkingdir)
+	_setSettings("FlowWorkingDir", GuiFlowSettingsWorkingDir)
 
 	;handle language setting
 	lang_setLanguage(GuiLanguageChoose)

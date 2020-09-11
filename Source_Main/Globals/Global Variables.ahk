@@ -59,7 +59,6 @@ _flows is an associative array of objects. Each object contains some information
 	
 	;Internal values
 	.category 		Flow category ID (Internal ID, which is not the name)
-	.categoryName 	Flow category name
 	.tv 			Flow tree view ID
 	.ElementIDCounter	Counter which ensured that every new element ID is unique
 	.CompatibilityVersion	Version number of the save file format

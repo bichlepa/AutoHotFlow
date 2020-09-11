@@ -14,8 +14,6 @@ FindFlows()
 	{
 		InitFlow(A_LoopFileFullPath)
 	}
-	_setShared("FindFlows_Called",True)
-	API_manager_TreeView_Refill()
 }
 
 InitFlow(FileFullPath)
@@ -48,8 +46,13 @@ InitFlow(FileFullPath)
 	;Check category. Create new one if it does not exist yet. Demo flows don't need a dedicated category
 	if (not tempdemo)
 	{
-		if (tempcategoryname != "")
-			tempCategoryID := NewCategory(tempcategoryname)
+		if (tempcategoryname)
+		{
+			; category is set. Create category if it does not exist
+			tempCategoryID := _getCategoryIdByName(tempcategoryname)
+			if (not tempCategoryID)
+				tempCategoryID := NewCategory(tempcategoryname)
+		}
 	}
 
 	;Make sure the flow ID does not exist yet. If it exists, generate a new one
@@ -68,7 +71,7 @@ InitFlow(FileFullPath)
 	;Do not allow two flows to have the same name. If a loaded flow has a name that an other flow already has, the flow will be renamed
 	Loop
 	{
-		if (FlowIDbyName(tempflowName, "flow"))
+		if (_getFlowIdByName(tempflowName))
 		{
 			StringGetPos,posspace,tempflowName,%a_space%,R
 			tempFlowNumberInName:=substr(tempFlowName,posspace+2)
@@ -104,8 +107,6 @@ InitFlow(FileFullPath)
 	
 	_setFlow(newFlowid, newFlow)
 
-	UpdateFlowCategoryName(newFlowid)
-
 	if (tempflowenabled != 0) ;Enable flow
 	{
 		loop, parse,tempflowenabled,|
@@ -114,11 +115,7 @@ InitFlow(FileFullPath)
 		}
 	}
 
-	if (_getShared("FindFlows_Called"))
-	{
-		API_manager_TreeView_Refill()
-		API_manager_TreeView_Select("Flow", newFlowid)
-	}
+	return newFlowid
 }
 
 ;Create a new file for a flow
@@ -156,7 +153,7 @@ NewFlow(par_CategoryID = "")
 	Loop
 	{
 		tempflowName := lang("New flow") " " randomValue
-		if (not FlowIDbyName(tempflowName, "flow"))
+		if (not _getFlowIdByName(tempflowName))
 			break
 		randomValue+=1
 	}
@@ -177,17 +174,8 @@ NewFlow(par_CategoryID = "")
 	
 	_setFlow(newFlowid, newFlow)
 
-	UpdateFlowCategoryName(newFlowid)
 	SaveFlowMetaData(newFlowid)
 
-
-	;Add TV entry
-	if (_getShared("FindFlows_Called"))
-	{
-		API_manager_TreeView_Refill()
-		API_manager_TreeView_Select("Flow", newFlowid)
-	}
-	
 	return newFlowid
 }
 
@@ -266,6 +254,7 @@ NewCategory(par_Newname = "")
 	return newCategoryid
 }
 
+
 ChangeFlowCategory(par_FlowID, par_CategoryID)
 {
 	global
@@ -276,24 +265,8 @@ ChangeFlowCategory(par_FlowID, par_CategoryID)
 	}
 	
 	_setFlowProperty(par_FlowID, "category", par_CategoryID)
-	UpdateFlowCategoryName(par_FlowID)
 	SaveFlowMetaData(par_FlowID)
-	
-	if (_getShared("FindFlows_Called"))
-	{
-		API_manager_TreeView_Refill()
-		API_manager_TreeView_Select("Flow", newFlowid)
-	}
 }
-
-UpdateFlowCategoryName(par_FlowID)
-{
-	categoryID := _getFlowProperty(par_FlowID, "category")
-	categoryName := _getCategoryProperty(par_FlowID, "name")
-
-	_setFlowProperty(par_FlowID, "categoryName",categoryName)
-}
-
 
 DeleteFlow(par_ID)
 {
@@ -304,14 +277,6 @@ DeleteFlow(par_ID)
 	FileDelete,% _getFlowProperty(par_ID, "file")
 	
 	_deleteFlow(par_ID)
-	
-	;Refresh treeview
-	if (_getShared("FindFlows_Called"))
-	{
-		API_manager_TreeView_Refill()
-		API_manager_TreeView_Select("Flow", newFlowid)
-	}
-	
 }
 
 DuplicateFlow(par_ID)
@@ -341,7 +306,7 @@ DuplicateFlow(par_ID)
 	tempflowName:=newFlow.name
 	Loop
 	{
-		if (FlowIDbyName(tempflowName, "flow"))
+		if (_getFlowIdByName(tempflowName))
 		{
 			StringGetPos,posspace,tempflowName,%a_space%,R
 			tempFlowNumberInName:=substr(tempFlowName,posspace+2)
@@ -367,13 +332,7 @@ DuplicateFlow(par_ID)
 	
 	SaveFlowMetaData(newFlowid)
 
-	;Add TV entry
-	if (_getShared("FindFlows_Called"))
-	{
-		API_manager_TreeView_Refill()
-		API_manager_TreeView_Select("Flow", newFlowid)
-	}
-
+	return newFlowid
 }
 
 DeleteCategory(par_ID)
@@ -382,27 +341,4 @@ DeleteCategory(par_ID)
 	
 	
 	_deleteCategory(par_ID)
-	
-	;Upadte TV entries
-	if (_getShared("FindFlows_Called"))
-	{
-		API_manager_TreeView_Refill()
-		API_manager_TreeView_Select("Flow", newFlowid)
-	}
-	
-}
-
-
-FlowIDbyName(par_name,Type="") ;Returns the id by name
-{
-	if ((type = "flow") or (type = ""))
-	{
-		retval := _getFlowIdByName(par_name)
-	}
-	if (not retval and (type = "category") or (type = ""))
-	{
-		retval := _getCategoryIdByName(par_name)
-	}
-	
-	return retval
 }

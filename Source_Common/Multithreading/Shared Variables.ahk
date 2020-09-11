@@ -224,6 +224,13 @@ _setCategoryProperty(CategoryId, path, value)
     objectPath[1][objectPath[2]] := ObjFullyClone(value)
 	LeaveCriticalSection(_cs_shared)
 }
+_existsCategory(CategoryId)
+{
+	EnterCriticalSection(_cs_shared)
+    result := _share.allCategories.haskey(CategoryId)
+	LeaveCriticalSection(_cs_shared)
+    return result
+}
 _getCategoryIdByName(CategoryName)
 {
 	EnterCriticalSection(_cs_shared)
@@ -244,7 +251,7 @@ _getAllCategoryIds()
     allCategories:=[]
     for forCategoryID, forCategory in _share.allCategories
 	{
-		allCategories.push(forFlowID)
+		allCategories.push(forCategoryID)
 	}
 	LeaveCriticalSection(_cs_shared)
     return allCategories

@@ -31,7 +31,7 @@ SaveFlowMetaData(FlowID)
 	IniWrite,% flow.name,% flow.file,general,name
 	IniWrite,% flow.id,% flow.file,general,ID
 	IniWrite,% flow.demo,% flow.file,general,demo
-	IniWrite,% flow.categoryname,% flow.file,general,category
+	IniWrite,% _getCategoryProperty(flow.category, "name"), % flow.file,general,category
 	
 	if (_exitingNow<>true) ;Do not save if it is shutting down and disabling the flows
 	{

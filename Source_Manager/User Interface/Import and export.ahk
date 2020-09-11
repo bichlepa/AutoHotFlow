@@ -49,7 +49,7 @@ exportFlowsExportNow()
 	filedelete,%filepathexport%
 	loop,parse,exportFlowsListViewFlowsSelection,|
 	{
-		filepathflow := _getFlowProperty(FlowIDbyName(A_LoopField), "file")
+		filepathflow := _getFlowProperty(_getFlowIdByName(A_LoopField), "file")
 		7z_compress(filepathexport, "-tzip", filepathflow)
 	}
 	
@@ -82,7 +82,7 @@ importExportGui_import(filepathZip)
 		
 		;check whether there are flows with same name. Ask user if he wants to import them anyway
 		IniRead, newflowname, %a_loopfilefullpath% , general, name
-		if (flowIDbyName(newflowname))
+		if (_getFlowIdByName(newflowname))
 		{
 			MsgBox, 67, % lang("Import Flows"), % lang("A flow with name ""%1%"" already exists.", newflowname) " " lang("Do you want to import it anyway?")
 			IfMsgBox,no
@@ -118,7 +118,10 @@ importExportGui_import(filepathZip)
 		}
 		
 		;show flow in the manager
-		InitFlow(newFlowFullPath)
+		newFlowID := InitFlow(newFlowFullPath)
+		TreeView_manager_Refill()
+		TreeView_manager_Select("Flow", newFlowid)
+		
 	}
 	
 	FileRemoveDir, % filepathextractfolder, 1

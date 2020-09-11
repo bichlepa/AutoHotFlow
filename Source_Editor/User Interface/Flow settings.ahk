@@ -102,15 +102,14 @@ ui_SettingsOfFlow()
 	;Check working directory
 	if (GuiFlowSettingsDefaultWorkingDir)
 	{
-		newworkingdir := checkNewWorkingDir(_settings.FlowWorkingDir, GuiFlowSettingsWorkingDir)
-		if not (newworkingdir)
+		if not (checkNewWorkingDir(GuiFlowSettingsWorkingDir))
 		{
 			return
 		}
-		if (newworkingdir != _getFlowProperty(FlowID, "flowSettings.WorkingDir"))
+		if (GuiFlowSettingsWorkingDir != _getFlowProperty(FlowID, "flowSettings.WorkingDir"))
 		{
 			someSettingChanged:=true
-			_setFlowProperty(FlowID, "flowSettings.WorkingDir", newworkingdir)
+			_setFlowProperty(FlowID, "flowSettings.WorkingDir", GuiFlowSettingsWorkingDir)
 		}
 	}
 	if (_getFlowProperty(FlowID, "flowSettings.DefaultWorkingDir") != GuiFlowSettingsDefaultWorkingDir)

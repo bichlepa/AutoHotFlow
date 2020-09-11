@@ -46,7 +46,9 @@
 	ChangeCategoryOK:
 	gui, changeCategory:Submit, nohide
 	;~ d(FlowIDbyName(ChangeCategoryList, "Category"))
-	ChangeFlowCategory(changeFlowCategory_FlowID, FlowIDbyName(ChangeCategoryList, "Category"))
+	ChangeFlowCategory(changeFlowCategory_FlowID, _getCategoryIdByName(ChangeCategoryList))
+	TreeView_manager_Refill()
+	TreeView_manager_Select("Flow", changeFlowCategory_FlowID)
 
 	gui, changeCategory:destroy
 	Enable_Manager_GUI()
@@ -60,6 +62,8 @@
 		newcategoryid:=NewCategory(ChangeCategoryNewName)
 		ChangeFlowCategory(changeFlowCategory_FlowID, newcategoryid)
 		gui, changeCategory:destroy
+		TreeView_manager_Refill()
+		TreeView_manager_Select("Flow", changeFlowCategory_FlowID)
 		Enable_Manager_GUI()
 	}
 	return

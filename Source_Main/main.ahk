@@ -47,6 +47,9 @@ logger("a1", "startup")
 
 OnExit,exit ;This will allow to save unsaved flows if AutoHotFlow is closed
 
+; check the settings
+check_settings()
+
 ;if setting run as admin active, try to gain administrator rights
 if (_getSettings("runAsAdmin") and not A_IsAdmin)
 {
@@ -289,6 +292,7 @@ Thread_StartExecution()
 
 ;Find saved flows and activate triggers of active flows
 FindFlows()
+API_manager_TreeView_Refill()
 
 ;Now the triggers "Startup" have triggered. We don't need this flag anymore.
 _setShared("WindowsStartup", false)
