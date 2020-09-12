@@ -28,7 +28,7 @@ Thread_StartManager()
 	logger("t1", "Starting manager thread. ID: " threadID)
 	FileRead,ExecutionThreadCode,% _ScriptDir "\Source_Manager\Manager.ahk"
 	;~ MsgBox %ExecutionThreadCode%
-	StringReplace,ExecutionThreadCode,ExecutionThreadCode, % ";PlaceholderIncludesOfElements",% global_elementInclusions
+	StringReplace,ExecutionThreadCode,ExecutionThreadCode, % ";PlaceholderIncludesOfElements",% global_libInclusionsForThreads global_elementInclusionsForThreads
 	
 	AhkThread%threadID% := AhkThread(global_CommonAhkCodeForAllThreads "`n global _ahkThreadID := """ threadID """`n" ExecutionThreadCode)
 	AhkThread%threadID%.ahkassign("_ahkThreadID",threadID)
@@ -52,7 +52,7 @@ Thread_StartEditor(par_FlowID)
 	logger("t1", "Starting editor thread. ID: " threadID)
 	FileRead,ExecutionThreadCode,% _ScriptDir "\Source_Editor\Editor.ahk"
 	;~ MsgBox %ExecutionThreadCode%
-	StringReplace,ExecutionThreadCode,ExecutionThreadCode, % ";PlaceholderIncludesOfElements",% global_elementInclusions
+	StringReplace,ExecutionThreadCode,ExecutionThreadCode, % ";PlaceholderIncludesOfElements",% global_libInclusionsForThreads global_elementInclusionsForThreads
 	
 	AhkThread%threadID% := AhkThread(global_CommonAhkCodeForAllThreads "`n global _ahkThreadID := """ threadID """`n global FlowID := """ par_FlowID """`n"  ExecutionThreadCode)
 	AhkThread%threadID%.ahkassign("_ahkThreadID",threadID)
