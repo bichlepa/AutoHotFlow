@@ -473,7 +473,7 @@ x_ExecuteInNewAHKThread(Environment, p_functionObject, p_Code, p_VarsToImport, p
 	postcode .= "EnterCriticalSection(ahf_cs_shared)`n"
 	postcode .= "for ahf_varindex, ahf_varname in ahf_sharedObject.varsToExport`n{`n  ahf_sharedObject.varsExported[ahf_varname]:=%ahf_varname%`n}`n"
 	postcode .= "LeaveCriticalSection(ahf_cs_shared)`n"
-	postcode .= "ahf_parentAHKThread.ahkFunction(""API_Execution_externalFlowFinish"", ahf_uniqueID)`n"
+	postcode .= "ahf_parentAHKThread.ahkFunction(""API_Execution_externaElementFinish"", ahf_uniqueID)`n"
 	postcode .= "exitapp"
 	
 	

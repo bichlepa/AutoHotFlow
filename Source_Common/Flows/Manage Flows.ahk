@@ -243,11 +243,6 @@ NewCategory(par_Newname = "")
 		newCategory.Type := "Category"
 		_setCategory(newCategoryid, newCategory)
 
-		if (_getShared("FindFlows_Called"))
-		{
-			API_manager_TreeView_Refill()
-			API_manager_TreeView_Select("Flow", newFlowid)
-		}
 		;~ d(allCategories)
 	}
 	

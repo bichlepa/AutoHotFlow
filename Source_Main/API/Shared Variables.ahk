@@ -1,8 +1,8 @@
 ﻿
 
-goto jumpoverglobalvars
+goto jumpoversharedvars
 
-init_GlobalVars:
+init_SharedVars:
 ;_WorkingDir 	Working directory. To be used insted of a_WorkingDir. This variable is defined elsewhere
 ;_ScriptDir		Script directory. To be used insted of a_ScriptDir. This variable is defined elsewhere
 
@@ -173,5 +173,5 @@ global _cs_shared := CriticalSection() ;Protect access to all variables which ar
 
 return
 
-jumpoverglobalvars:
+jumpoversharedvars:
 temp=

@@ -160,7 +160,10 @@ executionTask()
 		}				
 
 		if (somethingexecuted=False)
+		{
+			SetTimer,executionTask,-10
 			break
+		}
 	}
 	
 }

@@ -8,7 +8,7 @@ criticalSectionCounter := 0
 	
 ; exit routine inside _EnterCriticalSection:
 ; when the application closes, the main thread informs all threads that they must stop
-; We have to make sure, that the threads close, while not blocking the critical section.
+; We have to make sure, that the threads close, while not blocking the critical section (excluding main thread).
 ; to do so, each thread keeps track whether it blocks the critical section (with variable criticalSectionCounter)
 ; Whenever the is going to block or unblock the critical section, it checks whether it has to stop.
 ; If so, the thread sends a message to main thread that it can now be killed and at same time stops the pseudo ahk thread

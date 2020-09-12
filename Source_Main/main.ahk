@@ -1,18 +1,18 @@
 #NoEnv  ; Recommended for performance and compatibility with future AutoHotkey releases.
 ;#Warn  ; Recommended for catching common errors.
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
+
+; We only want to have one instance of AHF
 #SingleInstance,  force
 
 ;Using working dir forbidden.
 ;The reason is that while any thread uses the command FileSelectFile, the working directory of the working directory of the whole process is changed to the path which is shown in the dialog.
 SetWorkingDir %a_temp%  
 
-;Set some super global variables
-global _ahkThreadID:="Main"
-
-SetWorkingDir %A_ScriptDir%\..  ; set working dir, which should be the path of AutoHotFlow.ahk/exe
+; Set the variable _ScriptDir which is acutally the root folder of AHF. If installed, it is the installation folder.
 global _ScriptDir := A_ScriptDir "\.." ;The directory of AutoHotFlow.ahk/exe
 
+; Set the variable _WorkingDir which we will always use instead of a_workingDir
 ;if portable installation, the script dir is the working dir. 
 ;If installed in programs folder, it is a dir which is writable without admin rights
 global _WorkingDir := _ScriptDir
@@ -23,18 +23,27 @@ IfInString, _WorkingDir, %A_ProgramFiles%
 		FileCreateDir, %_WorkingDir%
 }
 
-;Initialize global variables and load the settings
-gosub, init_GlobalVars
+; Make the variable _ahkThreadID super global.
+global _ahkThreadID:="Main"
+
+; On call of ExitApp, we will start the exit routine
+OnExit,Exit
+global _exiting := false
+
+;Initialize shared variables
+gosub, init_SharedVars
+
+; load global settings
 load_settings()
 
 ;If AutoHotFlow is started automatically on windows startup.
 ;This information is passed by command line parameter of the link which is stored in the autorun folder.
+; The shared variable WindowsStartup is evaluated by the trigger "start up"
 firstCommandLineParameter = %1%
 _setShared("WindowsStartup", (firstCommandLineParameter = "WindowsStartup"))
 
-#Include %A_ScriptDir%\.. ;Include path is the directory of AutoHotFlow.ahk/exe
-
-;Initialize language.ahk
+; include language module
+#Include %A_ScriptDir%\..
 #include language\language.ahk
 _language:=Object()
 _language.dir:=_ScriptDir "\language" ;Directory where the translations are stored
@@ -45,15 +54,13 @@ lang_setLanguage(_settings.UILanguage)
 initLog()
 logger("a1", "startup")
 
-OnExit,exit ;This will allow to save unsaved flows if AutoHotFlow is closed
-
 ; check the settings
 check_settings()
 
 ;if setting run as admin active, try to gain administrator rights
 if (_getSettings("runAsAdmin") and not A_IsAdmin)
 {
-	;User a file to catch if gaining administrator rights fails multiple times
+	;Use a file to catch if gaining administrator rights fails multiple times
 	FileRead,triedtostart,%a_temp%\autoHotflowTryToStartAsAdmin.txt
 	IfInString, triedtostart, 111
 	{
@@ -67,14 +74,13 @@ if (_getSettings("runAsAdmin") and not A_IsAdmin)
 	}
 	if not skipstartAsAdmin
 	{
+		; Restart with administrator rights
 		FileAppend,1,%a_temp%\autoHotflowTryToStartAsAdmin.txt
 		try Run *RunAs "%A_ScriptFullPath%" ;Run as admin. See https://autohotkey.com/docs/commands/Run.htm#RunAs
 		ExitApp
 	}
-	
-	;~ RunAsAdmin()
 }
- ;If we reach that line, either no administartor rights are needed, or administrator rights are granted. Therefore remove that file.
+;If we reach that line, either no administartor rights are needed, or administrator rights are granted. Therefore remove that file.
 FileDelete,%a_temp%\autoHotflowTryToStartAsAdmin.txt
 
 ;Some library function includes
@@ -86,7 +92,8 @@ FileDelete,%a_temp%\autoHotflowTryToStartAsAdmin.txt
 #include Lib\gdi+\gdip.ahk
 
 ;Include libraries which may be used by the elements. This code is generated.
-;Lib_includes_Start#include lib\7z wrapper\7z wrapper.ahk
+;Lib_includes_Start
+#include lib\7z wrapper\7z wrapper.ahk
 	#include Lib\TTS\TTS by Learning One.ahk
 	#include Lib\Eject by SKAN\Eject by SKAN.ahk
 	#include Lib\Class_Monitor\Class_Monitor.ahk
@@ -105,11 +112,12 @@ global_elementInclusions =
 
 ;Lib_Includes_End
 
-;Include sourcecode
+; include all the other source code
 #include Source_Main\Tray\Tray.ahk
 #include Source_Main\Globals\Global Variables.ahk
 #include Source_Main\Threads\Threads.ahk
 #include Source_Main\Api\API for Elements.ahk
+#include Source_Main\hidden window\hidden window.ahk
 
 #include Source_Common\Multithreading\API Caller to Main.ahk
 #include Source_Common\Multithreading\API Caller to Manager.ahk
@@ -118,9 +126,6 @@ global_elementInclusions =
 #include Source_Common\Multithreading\API Caller to Execution.ahk
 #include Source_Common\Multithreading\API for Elements.ahk
 #include Source_Common\Multithreading\Shared Variables.ahk
-;~ #include Source_Main\Threads\API Receiver Main.ahk
-
-#include Source_Main\hidden window\hidden window.ahk
 
 #include Source_Common\Flows\Save.ahk
 #include Source_Common\Flows\load.ahk
@@ -282,30 +287,31 @@ global_elementInclusions =
 ;Element_Includes_End
 
 
-
-
-;Start other threads. Multi-threading gain the performance hevily
-;and execution of flows does not influence the GUI performance.
+;Start other threads. Multi-threading gain the performance heavily
+;and execution of flows does not lower the GUI performance.
 Thread_init()
 Thread_StartManager()
 Thread_StartDraw()
 Thread_StartExecution()
 
-;Find saved flows and activate triggers of active flows
+;Find saved flows and enable triggers depending on the settings
 FindFlows()
+
+;Refill the treeview of the manager
 API_manager_TreeView_Refill()
 
-;Now the triggers "Startup" have triggered. We don't need this flag anymore.
+;Now since the triggers "Start up" have triggered. We don't need this flag anymore.
 _setShared("WindowsStartup", false)
 
 ;Initialize a hidden command window. This window is able to receive commands from other processes.
 ;The first purpose is that the script AutoHotFlow.ahk/exe can send commands if a shortcut of the trigger "shortcut" is opened.
 CreateHiddenCommandWindow()
 
-;Do some tasks which were commissioned from other threads 
+; check regularly for new tasks which we get through shared variable
 SetTimer,queryTasks,100
 return
 
+; Checks for new tasks which can be sent to this AHK thread by writing the task instructions in a shared variable
 queryTasks()
 {
 	global
@@ -317,40 +323,36 @@ queryTasks()
 			name:=oneTask.name
 			if (name="exit")
 			{
+				; The app should exit. start the exit routine
 				exitapp
 			}
 			if (name="ahkThreadStopped")
 			{
+				; An ahk thread has stopped, clean up after that
 				thread_Stopped(oneTask.ThreadID)
 			}
 			if (name="StartEditor")
 			{
+				; The editor for a flow should be opened
 				Thread_StartEditor(oneTask.FlowID)
 			}
 		}
 		else
+		{
+			; There is no task in shared memory. We can now return and save the cpu time until next timer event
 			break
+		}
 	}
 }
 
 
-
-;This function can be called by all threads. It will close AutoHotFlow.
-exit()
-{
-	;Only set timer in order to return. This is needed if the function is called from other thread.
-	SetTimer,exitLabel,-10
-}
-
-exitLabel:
-ExitApp ;Because we used "OnExit,exit" this command will cause the label "exit" to execute. 
-return
-
+; Start the exit routine
 exit:
-
-if (_isExiting() != true) ;Prevent multiple execution of this code by setting this flag
+if (_exiting != true) ;Prevent multiple execution of this code by setting this flag
 {
-	i_SaveUnsavedFlows() ;Save unsaved flows.
+	_exiting := true
+	;Save unsaved flows.
+	i_SaveUnsavedFlows()
 
 	; tell other ahk threads that they must close
 	; (especially stop entering critical sections. If a thread exits while it is in a critical section, other threads will freeze)
@@ -358,7 +360,7 @@ if (_isExiting() != true) ;Prevent multiple execution of this code by setting th
 	_share.exiting := true
 	LeaveCriticalSection(_cs_shared)
 
-	; before we start killing the threads, we will give them some time to close
+	; before we start killing the threads (which is error prone), we will give them some time to close
 	settimer,exit,5000
 	return
 }

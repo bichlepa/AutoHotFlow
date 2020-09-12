@@ -83,13 +83,13 @@ API_Execution_disableOneTrigger(par_FlowID, par_TriggerID)
 }
 
 ;When an element has been using a separate thread in order to execute some code, this thread calls this function
-API_Execution_externalFlowFinish(par_UniqueID)
+API_Execution_externaElementFinish(par_UniqueID)
 {
 	global
 	local retvalue
 	logger("t2", A_ThisFunc " called")
 	
-	_setTask("execution", {name: "externalFlowFinish", uniqueID: par_UniqueID})
+	_setTask("execution", {name: "externalElementFinish", uniqueID: par_UniqueID})
 	
 	logger("t2", A_ThisFunc " finished")
 	return

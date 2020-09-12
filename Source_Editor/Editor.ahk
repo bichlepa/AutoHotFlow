@@ -2,30 +2,31 @@
 ;~ #Warn  ; Recommended for catching common errors.
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
 
-SetWorkingDir %A_ScriptDir%\..  ; set working dir.
-global _WorkingDir := _getShared("_WorkingDir")
-global _ScriptDir := _getShared("_ScriptDir")
-SetWorkingDir %a_temp%  ; using working dir forbidden.
-
+; faster execution
 SetBatchLines -1
-#SingleInstance off
+
+; Get working dir for AutoHotFlow from shared variable.
+; It is the directory where the flows and global variables are saved
+; (not to be confused with the working dir in the settings of AutoHotFlow)
+global _WorkingDir := _getShared("_WorkingDir")
+; Get script dir for AutoHotFlow from shared variable.
+global _ScriptDir := _getShared("_ScriptDir")
+; using working dir forbidden, because in other parts of the code we use the commands FileSelectFolder and FileSelectFile
+; While any thread uses those commands, the working directory of the whole process is changed to the path which is shown in the dialog.
+SetWorkingDir %a_temp%
+
+; Set the default coord mode for mouse interactions
 CoordMode,mouse,client
-;FileEncoding,UTF-8
-;OnExit,Exi
 
-;Following variables will be present (and some others)
-;Global_ThisFlowID
-;_ahkThreadID
+; Make the variable _ahkThreadID super global. This variable will be set by the main thread after this thread is created.
+global _ahkThreadID
 
+; On call of ExitApp, we will start the exit routine
+OnExit,Exit
+global _exiting := false
 
+; Include libraries
 #Include %A_ScriptDir%\..
-#include language\language.ahk ;Must be very first
-;initialize languages
-_language:=Object()
-_language.dir:=_ScriptDir "\language" ;Directory where the translations are stored
-lang_Init()
-lang_setLanguage(_getSettings("UILanguage"))
-
 #include lib\Object to file\String-object-file.ahk
 #include lib\GDI+\GDIp.ahk
 #include lib\objhasvalue\objhasvalue.ahk
@@ -33,6 +34,15 @@ lang_setLanguage(_getSettings("UILanguage"))
 #include lib\Random Word List\Random Word List.ahk
 #include lib\Robert - Ini library\Robert - Ini library.ahk
 
+; include language module
+#include language\language.ahk ;Must be very first
+;initialize languages
+_language:=Object()
+_language.dir:=_ScriptDir "\language" ;Directory where the translations are stored
+lang_Init()
+lang_setLanguage(_getSettings("UILanguage"))
+
+; include all the other source code
 #include Source_Editor\User Interface\Editor GUI.ahk
 #include Source_Editor\User Interface\Editor GUI user input.ahk
 #include Source_Editor\User Interface\Editor GUI menu bar.ahk
@@ -76,21 +86,19 @@ lang_setLanguage(_getSettings("UILanguage"))
 #include Source_Common\Multithreading\API for Elements.ahk
 #include Source_Common\Multithreading\Shared Variables.ahk
 
-
+; Include the source code of the elements. The includes will be pasted here by the main thread.
 ;PlaceholderIncludesOfElements
 
-parentAHKThread := AhkExported()
-
-
-
+; initialize and show the editor gui
 EditorGUIInit()
 EditGUIshow()
 initializeTrayBar()
 
+; check regularly for new tasks which we get through shared variable
 SetTimer,queryTasks,100
 return
 
-
+; Checks for new tasks which can be sent to this AHK thread by writing the task instructions in a shared variable
 queryTasks()
 {
 	global
@@ -102,17 +110,19 @@ queryTasks()
 			name:=oneTask.name
 			if (name="EditGUIshow")
 			{
+				; the editor gui should be shown
 				EditGUIshow()
 			}
 		}
 		else
+		{
+			; There is no task in shared memory. We can now return and save the cpu time until next timer event
 			break
+		}
 	}
 }
 
-
-
-
+; Start the exit routine
 exit:
 global _exiting := true
 return
