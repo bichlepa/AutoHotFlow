@@ -30,11 +30,17 @@ global _ahkThreadID:="Main"
 OnExit,Exit
 global _exiting := false
 
+
 ;Initialize shared variables
 gosub, init_SharedVars
 
 ; load global settings
 load_settings()
+
+;initialize logger
+init_logger()
+log_enableRegularCleanup()
+logger("a1", "startup")
 
 ;If AutoHotFlow is started automatically on windows startup.
 ;This information is passed by command line parameter of the link which is stored in the autorun folder.
@@ -49,10 +55,6 @@ _language:=Object()
 _language.dir:=_ScriptDir "\language" ;Directory where the translations are stored
 lang_Init()
 lang_setLanguage(_settings.UILanguage)
-
-;The logger will allow to log messages
-initLog()
-logger("a1", "startup")
 
 ; check the settings
 check_settings()

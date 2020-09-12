@@ -4,6 +4,7 @@
 	hotkey, ^numpadadd, d_showAnyVariable
 }
 
+; shows the contents of a text or an object
 d(text,header="",wait=1)
 {
 	static
@@ -72,7 +73,7 @@ d(text,header="",wait=1)
 	return
 }
 
-
+; shows all global variables in a gui
 d_showGlobals(wait=1)
 {
 	static

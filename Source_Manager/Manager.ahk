@@ -25,6 +25,9 @@ global _ahkThreadID
 OnExit,Exit
 global _exiting := false
 
+;initialize logger
+init_logger()
+
 ; Include libraries
 #Include %A_ScriptDir%\..
 #include lib\Object to file\String-object-file.ahk

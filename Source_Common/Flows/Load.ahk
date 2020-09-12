@@ -1,5 +1,5 @@
 ﻿
-;Can be called from other threads
+;load a flow
 LoadFlow(FlowID, filepath="", params="")
 {
 	if (FlowID="")
@@ -88,7 +88,7 @@ LoadFlow(FlowID, filepath="", params="")
 		}
 	}
 	
-	loadFlowGeneralParameters(flowID)
+	loadFlowMetaData(flowID)
 	
 	IfInString, params, keepPosition
 	{
@@ -238,7 +238,7 @@ LoadFlow(FlowID, filepath="", params="")
 	currentlyLoadingFlow:=false
 }
 
-loadFlowGeneralParameters(flowID)
+loadFlowMetaData(flowID)
 {
 	_EnterCriticalSection()
 	

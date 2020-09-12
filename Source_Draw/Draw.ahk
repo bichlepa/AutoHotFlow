@@ -24,6 +24,9 @@ SetWorkingDir %a_temp%
 OnExit,Exit
 global _exiting := false
 
+;initialize logger
+init_logger()
+
 ; Include libraries
 #Include %A_ScriptDir%\..
 #include Lib\gdi+\gdip.ahk
