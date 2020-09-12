@@ -1,4 +1,4 @@
-#NoEnv  ; Recommended for performance and compatibility with future AutoHotkey releases.
+﻿#NoEnv  ; Recommended for performance and compatibility with future AutoHotkey releases.
 ;#Warn  ; Recommended for catching common errors.
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
 
@@ -92,21 +92,21 @@ FileDelete,%a_temp%\autoHotflowTryToStartAsAdmin.txt
 #include Lib\gdi+\gdip.ahk
 
 ;Include libraries which may be used by the elements. This code is generated.
-;Lib_includes_Start
-#include lib\7z wrapper\7z wrapper.ahk
-	#include Lib\TTS\TTS by Learning One.ahk
-	#include Lib\Eject by SKAN\Eject by SKAN.ahk
-	#include Lib\Class_Monitor\Class_Monitor.ahk
-	#include Lib\HTTP Request\HTTPRequest.ahk
-	#include Lib\HTTP Request\Uriencode.ahk
-global_elementInclusions = 
+;Lib_includes_Start#include source_Elements\Default\lib\TTS\TTS by Learning One.ahk
+#include source_Elements\Default\lib\7z wrapper\7z wrapper.ahk
+#include source_Elements\Default\lib\Eject by SKAN\Eject by SKAN.ahk
+#include source_Elements\Default\lib\Class_Monitor\Class_Monitor.ahk
+#include source_Elements\Default\lib\HTTP Request\HTTPRequest.ahk
+#include source_Elements\Default\lib\HTTP Request\Uriencode.ahk
+
+global_libInclusionsForThreads = 
 (
-#include lib\7z wrapper\7z wrapper.ahk
-	#include Lib\TTS\TTS by Learning One.ahk
-	#include Lib\Eject by SKAN\Eject by SKAN.ahk
-	#include Lib\Class_Monitor\Class_Monitor.ahk
-	#include Lib\HTTP Request\HTTPRequest.ahk
-	#include Lib\HTTP Request\Uriencode.ahk
+#include source_Elements\Default\lib\TTS\TTS by Learning One.ahk
+#include source_Elements\Default\lib\7z wrapper\7z wrapper.ahk
+#include source_Elements\Default\lib\Eject by SKAN\Eject by SKAN.ahk
+#include source_Elements\Default\lib\Class_Monitor\Class_Monitor.ahk
+#include source_Elements\Default\lib\HTTP Request\HTTPRequest.ahk
+#include source_Elements\Default\lib\HTTP Request\Uriencode.ahk
 
 )
 
@@ -114,7 +114,7 @@ global_elementInclusions =
 
 ; include all the other source code
 #include Source_Main\Tray\Tray.ahk
-#include Source_Main\Globals\Global Variables.ahk
+#include Source_Main\Api\Shared Variables.ahk
 #include Source_Main\Threads\Threads.ahk
 #include Source_Main\Api\API for Elements.ahk
 #include Source_Main\hidden window\hidden window.ahk
@@ -148,141 +148,279 @@ global_elementInclusions =
 
 ;Include elements. This code is generated
 ;The elements must be included before the other treads are started
-;Element_Includes_Start
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Absolute_Number.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\activate_Window.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Add_to_list.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\AutoHotkey_script.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Beep.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Change_character_case.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Change_Drive_Label.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Click.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Close_Window.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Compress files.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Copy_file.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Copy_folder.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Create_folder.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Date_calculation.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Delete_file.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Delete_folder.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Delete_From_Ini.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Delete_from_list.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Download_file.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Drag_with_mouse.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Eject_Drive.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Empty_Recycle_bin.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Execute_Flow.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Exponentiation.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Extract files.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Get_Clipboard.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Get_control_text.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Get_Drive_Information.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Get_file_attributes.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Get_file_size.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Get_file_time.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Get_from_list.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Get_index_of_element_in_list.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Get_mouse_position.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Get_pixel_color.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Get_Screen_Settings.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Get_string_Length.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Get_Volume.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Hibernate_Computer.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Hide_window.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\HTTP_Request.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Input_Box.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Kill_Process.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\List_Drives.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Lock_Computer.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Lock_Or_Unlcock_Drive.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Log_Off.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Message_Box.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Minimize_All_Windows.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Move_File.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Move_Folder.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Move_Mouse.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Move_window.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\New_Date.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\New_List.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\New_Variable.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Play_Sound.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Random_Number.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Read_From_File.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Read_From_Ini.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Reboot_Computer.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Rename_file.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Rename_Folder.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Rounding_a_number.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Run.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Screenshot.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Script.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Search_Image.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Search_in_a_string.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Search_pixel.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Select_file.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Select_folder.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Send_Keystrokes.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Send_Keystrokes_To_Control.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Set_Clipboard.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Set_control_text.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Set_file_attributes.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Set_file_time.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Set_Flow_Status.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Set_Lock_Key.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Set_Process_Priority.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Set_Screen_Settings.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Set_Volume.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Show_window.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Shuffle_list.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Shutdown.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Sleep.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Speech_output.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Split_a_string.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Square_Root.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Stop_Flow.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Stop_Sound.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Substring.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Suspend_Computer.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Tooltip.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Trace_Point.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Trace_Point_Check.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Trigonometry.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Trim_a_string.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Write_To_File.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Actions\Write_to_ini.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Conditions\Confirmation_Dialog.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Conditions\Debug_dialog.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Conditions\Expression.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Conditions\File_Exists.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Conditions\File_Has_Attribute.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Conditions\Flow_Enabled.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Conditions\Flow_Running.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Conditions\Key_Is_Down.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Conditions\List_Contains_Element.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Conditions\Process_Is_Running.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Conditions\String_Contains_Text.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Conditions\Variable_Is_Empty.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Conditions\Window_Active.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Conditions\Window_Exists.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Loops\Condition.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Loops\Loop_Through_Files.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Loops\Parse_A_String.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Loops\SimpleLoop.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Loops\Work_through_a_list.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Triggers\Clipboard_Changes.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Triggers\Hotkey.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Triggers\Manual.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Triggers\Periodic_Timer.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Triggers\Process_closes.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Triggers\Process_starts.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Triggers\Shortcut.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Triggers\Start_up.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Triggers\Time_of_Day.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Triggers\User_Idle_Time.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Triggers\Window_closes.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Triggers\Window_gets_active.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Triggers\Window_gets_inactive.ahk
-#include C:\Users\bichl\Documents\git\AutoHotFlow\source_Elements\Default\Triggers\Window_opens.ahk
+;Element_Includes_Start#include source_Elements\Default\Actions\New_Variable.ahk
+#include source_Elements\Default\Actions\Random_Number.ahk
+#include source_Elements\Default\Actions\Absolute_Number.ahk
+#include source_Elements\Default\Actions\Square_Root.ahk
+#include source_Elements\Default\Actions\Trigonometry.ahk
+#include source_Elements\Default\Actions\Rounding_a_number.ahk
+#include source_Elements\Default\Actions\Exponentiation.ahk
+#include source_Elements\Default\Actions\Change_character_case.ahk
+#include source_Elements\Default\Actions\Get_string_Length.ahk
+#include source_Elements\Default\Actions\Trim_a_string.ahk
+#include source_Elements\Default\Actions\Split_a_string.ahk
+#include source_Elements\Default\Actions\Substring.ahk
+#include source_Elements\Default\Actions\Search_in_a_string.ahk
+#include source_Elements\Default\Actions\Add_to_list.ahk
+#include source_Elements\Default\Actions\Get_from_list.ahk
+#include source_Elements\Default\Actions\Get_index_of_element_in_list.ahk
+#include source_Elements\Default\Actions\Delete_from_list.ahk
+#include source_Elements\Default\Actions\New_List.ahk
+#include source_Elements\Default\Actions\Shuffle_list.ahk
+#include source_Elements\Default\Actions\Date_calculation.ahk
+#include source_Elements\Default\Actions\New_Date.ahk
+#include source_Elements\Default\Actions\Script.ahk
+#include source_Elements\Default\Actions\Get_Clipboard.ahk
+#include source_Elements\Default\Actions\Set_Clipboard.ahk
+#include source_Elements\Default\Actions\Input_Box.ahk
+#include source_Elements\Default\Actions\Message_Box.ahk
+#include source_Elements\Default\Actions\Tooltip.ahk
+#include source_Elements\Default\Actions\Eject_Drive.ahk
+#include source_Elements\Default\Actions\Change_Drive_Label.ahk
+#include source_Elements\Default\Actions\Get_Drive_Information.ahk
+#include source_Elements\Default\Actions\Lock_Or_Unlcock_Drive.ahk
+#include source_Elements\Default\Actions\List_Drives.ahk
+#include source_Elements\Default\Actions\Compress_files.ahk
+#include source_Elements\Default\Actions\Extract_files.ahk
+#include source_Elements\Default\Actions\Copy_file.ahk
+#include source_Elements\Default\Actions\Copy_folder.ahk
+#include source_Elements\Default\Actions\Create_folder.ahk
+#include source_Elements\Default\Actions\Delete_file.ahk
+#include source_Elements\Default\Actions\Delete_folder.ahk
+#include source_Elements\Default\Actions\Empty_Recycle_bin.ahk
+#include source_Elements\Default\Actions\Get_file_attributes.ahk
+#include source_Elements\Default\Actions\Get_file_size.ahk
+#include source_Elements\Default\Actions\Get_file_time.ahk
+#include source_Elements\Default\Actions\Move_File.ahk
+#include source_Elements\Default\Actions\Move_Folder.ahk
+#include source_Elements\Default\Actions\Rename_file.ahk
+#include source_Elements\Default\Actions\Rename_Folder.ahk
+#include source_Elements\Default\Actions\Select_file.ahk
+#include source_Elements\Default\Actions\Select_folder.ahk
+#include source_Elements\Default\Actions\Set_file_attributes.ahk
+#include source_Elements\Default\Actions\Set_file_time.ahk
+#include source_Elements\Default\Actions\Write_To_File.ahk
+#include source_Elements\Default\Actions\Read_From_File.ahk
+#include source_Elements\Default\Actions\Read_From_Ini.ahk
+#include source_Elements\Default\Actions\Delete_From_Ini.ahk
+#include source_Elements\Default\Actions\Write_to_ini.ahk
+#include source_Elements\Default\Actions\Download_file.ahk
+#include source_Elements\Default\Actions\HTTP_Request.ahk
+#include source_Elements\Default\Actions\Get_Screen_Settings.ahk
+#include source_Elements\Default\Actions\Set_Screen_Settings.ahk
+#include source_Elements\Default\Actions\Get_pixel_color.ahk
+#include source_Elements\Default\Actions\Search_pixel.ahk
+#include source_Elements\Default\Actions\Screenshot.ahk
+#include source_Elements\Default\Actions\Search_Image.ahk
+#include source_Elements\Default\Actions\activate_Window.ahk
+#include source_Elements\Default\Actions\Close_Window.ahk
+#include source_Elements\Default\Actions\Hide_window.ahk
+#include source_Elements\Default\Actions\Minimize_All_Windows.ahk
+#include source_Elements\Default\Actions\Move_window.ahk
+#include source_Elements\Default\Actions\Get_control_text.ahk
+#include source_Elements\Default\Actions\Set_control_text.ahk
+#include source_Elements\Default\Actions\Show_window.ahk
+#include source_Elements\Default\Actions\Click.ahk
+#include source_Elements\Default\Actions\Drag_with_mouse.ahk
+#include source_Elements\Default\Actions\Get_mouse_position.ahk
+#include source_Elements\Default\Actions\Move_Mouse.ahk
+#include source_Elements\Default\Actions\Send_Keystrokes.ahk
+#include source_Elements\Default\Actions\Send_Keystrokes_To_Control.ahk
+#include source_Elements\Default\Actions\Set_Lock_Key.ahk
+#include source_Elements\Default\Actions\Play_Sound.ahk
+#include source_Elements\Default\Actions\Beep.ahk
+#include source_Elements\Default\Actions\Get_Volume.ahk
+#include source_Elements\Default\Actions\Set_Volume.ahk
+#include source_Elements\Default\Actions\Speech_output.ahk
+#include source_Elements\Default\Actions\Stop_Sound.ahk
+#include source_Elements\Default\Actions\Run.ahk
+#include source_Elements\Default\Actions\Kill_Process.ahk
+#include source_Elements\Default\Actions\Set_Process_Priority.ahk
+#include source_Elements\Default\Actions\Hibernate_Computer.ahk
+#include source_Elements\Default\Actions\Lock_Computer.ahk
+#include source_Elements\Default\Actions\Log_Off.ahk
+#include source_Elements\Default\Actions\Reboot_Computer.ahk
+#include source_Elements\Default\Actions\Shutdown.ahk
+#include source_Elements\Default\Actions\Suspend_Computer.ahk
+#include source_Elements\Default\Actions\Sleep.ahk
+#include source_Elements\Default\Actions\Trace_Point.ahk
+#include source_Elements\Default\Actions\Trace_Point_Check.ahk
+#include source_Elements\Default\Actions\Execute_Flow.ahk
+#include source_Elements\Default\Actions\Set_Flow_Status.ahk
+#include source_Elements\Default\Actions\Stop_Flow.ahk
+#include source_Elements\Default\Actions\AutoHotkey_script.ahk
+#include source_Elements\Default\Conditions\Expression.ahk
+#include source_Elements\Default\Conditions\Variable_Is_Empty.ahk
+#include source_Elements\Default\Conditions\List_Contains_Element.ahk
+#include source_Elements\Default\Conditions\String_Contains_Text.ahk
+#include source_Elements\Default\Conditions\File_Exists.ahk
+#include source_Elements\Default\Conditions\File_Has_Attribute.ahk
+#include source_Elements\Default\Conditions\Confirmation_Dialog.ahk
+#include source_Elements\Default\Conditions\Debug_dialog.ahk
+#include source_Elements\Default\Conditions\Key_Is_Down.ahk
+#include source_Elements\Default\Conditions\Window_Active.ahk
+#include source_Elements\Default\Conditions\Window_Exists.ahk
+#include source_Elements\Default\Conditions\Process_Is_Running.ahk
+#include source_Elements\Default\Conditions\Flow_Enabled.ahk
+#include source_Elements\Default\Conditions\Flow_Running.ahk
+#include source_Elements\Default\Loops\SimpleLoop.ahk
+#include source_Elements\Default\Loops\Condition.ahk
+#include source_Elements\Default\Loops\Parse_A_String.ahk
+#include source_Elements\Default\Loops\Work_through_a_list.ahk
+#include source_Elements\Default\Loops\Loop_Through_Files.ahk
+#include source_Elements\Default\Triggers\Manual.ahk
+#include source_Elements\Default\Triggers\Periodic_Timer.ahk
+#include source_Elements\Default\Triggers\Time_of_Day.ahk
+#include source_Elements\Default\Triggers\User_Idle_Time.ahk
+#include source_Elements\Default\Triggers\Clipboard_Changes.ahk
+#include source_Elements\Default\Triggers\Hotkey.ahk
+#include source_Elements\Default\Triggers\Shortcut.ahk
+#include source_Elements\Default\Triggers\Window_closes.ahk
+#include source_Elements\Default\Triggers\Window_gets_active.ahk
+#include source_Elements\Default\Triggers\Window_gets_inactive.ahk
+#include source_Elements\Default\Triggers\Window_opens.ahk
+#include source_Elements\Default\Triggers\Process_closes.ahk
+#include source_Elements\Default\Triggers\Process_starts.ahk
+#include source_Elements\Default\Triggers\Start_up.ahk
+
+global_elementInclusionsForThreads = 
+(
+#include source_Elements\Default\Actions\New_Variable.ahk
+#include source_Elements\Default\Actions\Random_Number.ahk
+#include source_Elements\Default\Actions\Absolute_Number.ahk
+#include source_Elements\Default\Actions\Square_Root.ahk
+#include source_Elements\Default\Actions\Trigonometry.ahk
+#include source_Elements\Default\Actions\Rounding_a_number.ahk
+#include source_Elements\Default\Actions\Exponentiation.ahk
+#include source_Elements\Default\Actions\Change_character_case.ahk
+#include source_Elements\Default\Actions\Get_string_Length.ahk
+#include source_Elements\Default\Actions\Trim_a_string.ahk
+#include source_Elements\Default\Actions\Split_a_string.ahk
+#include source_Elements\Default\Actions\Substring.ahk
+#include source_Elements\Default\Actions\Search_in_a_string.ahk
+#include source_Elements\Default\Actions\Add_to_list.ahk
+#include source_Elements\Default\Actions\Get_from_list.ahk
+#include source_Elements\Default\Actions\Get_index_of_element_in_list.ahk
+#include source_Elements\Default\Actions\Delete_from_list.ahk
+#include source_Elements\Default\Actions\New_List.ahk
+#include source_Elements\Default\Actions\Shuffle_list.ahk
+#include source_Elements\Default\Actions\Date_calculation.ahk
+#include source_Elements\Default\Actions\New_Date.ahk
+#include source_Elements\Default\Actions\Script.ahk
+#include source_Elements\Default\Actions\Get_Clipboard.ahk
+#include source_Elements\Default\Actions\Set_Clipboard.ahk
+#include source_Elements\Default\Actions\Input_Box.ahk
+#include source_Elements\Default\Actions\Message_Box.ahk
+#include source_Elements\Default\Actions\Tooltip.ahk
+#include source_Elements\Default\Actions\Eject_Drive.ahk
+#include source_Elements\Default\Actions\Change_Drive_Label.ahk
+#include source_Elements\Default\Actions\Get_Drive_Information.ahk
+#include source_Elements\Default\Actions\Lock_Or_Unlcock_Drive.ahk
+#include source_Elements\Default\Actions\List_Drives.ahk
+#include source_Elements\Default\Actions\Compress_files.ahk
+#include source_Elements\Default\Actions\Extract_files.ahk
+#include source_Elements\Default\Actions\Copy_file.ahk
+#include source_Elements\Default\Actions\Copy_folder.ahk
+#include source_Elements\Default\Actions\Create_folder.ahk
+#include source_Elements\Default\Actions\Delete_file.ahk
+#include source_Elements\Default\Actions\Delete_folder.ahk
+#include source_Elements\Default\Actions\Empty_Recycle_bin.ahk
+#include source_Elements\Default\Actions\Get_file_attributes.ahk
+#include source_Elements\Default\Actions\Get_file_size.ahk
+#include source_Elements\Default\Actions\Get_file_time.ahk
+#include source_Elements\Default\Actions\Move_File.ahk
+#include source_Elements\Default\Actions\Move_Folder.ahk
+#include source_Elements\Default\Actions\Rename_file.ahk
+#include source_Elements\Default\Actions\Rename_Folder.ahk
+#include source_Elements\Default\Actions\Select_file.ahk
+#include source_Elements\Default\Actions\Select_folder.ahk
+#include source_Elements\Default\Actions\Set_file_attributes.ahk
+#include source_Elements\Default\Actions\Set_file_time.ahk
+#include source_Elements\Default\Actions\Write_To_File.ahk
+#include source_Elements\Default\Actions\Read_From_File.ahk
+#include source_Elements\Default\Actions\Read_From_Ini.ahk
+#include source_Elements\Default\Actions\Delete_From_Ini.ahk
+#include source_Elements\Default\Actions\Write_to_ini.ahk
+#include source_Elements\Default\Actions\Download_file.ahk
+#include source_Elements\Default\Actions\HTTP_Request.ahk
+#include source_Elements\Default\Actions\Get_Screen_Settings.ahk
+#include source_Elements\Default\Actions\Set_Screen_Settings.ahk
+#include source_Elements\Default\Actions\Get_pixel_color.ahk
+#include source_Elements\Default\Actions\Search_pixel.ahk
+#include source_Elements\Default\Actions\Screenshot.ahk
+#include source_Elements\Default\Actions\Search_Image.ahk
+#include source_Elements\Default\Actions\activate_Window.ahk
+#include source_Elements\Default\Actions\Close_Window.ahk
+#include source_Elements\Default\Actions\Hide_window.ahk
+#include source_Elements\Default\Actions\Minimize_All_Windows.ahk
+#include source_Elements\Default\Actions\Move_window.ahk
+#include source_Elements\Default\Actions\Get_control_text.ahk
+#include source_Elements\Default\Actions\Set_control_text.ahk
+#include source_Elements\Default\Actions\Show_window.ahk
+#include source_Elements\Default\Actions\Click.ahk
+#include source_Elements\Default\Actions\Drag_with_mouse.ahk
+#include source_Elements\Default\Actions\Get_mouse_position.ahk
+#include source_Elements\Default\Actions\Move_Mouse.ahk
+#include source_Elements\Default\Actions\Send_Keystrokes.ahk
+#include source_Elements\Default\Actions\Send_Keystrokes_To_Control.ahk
+#include source_Elements\Default\Actions\Set_Lock_Key.ahk
+#include source_Elements\Default\Actions\Play_Sound.ahk
+#include source_Elements\Default\Actions\Beep.ahk
+#include source_Elements\Default\Actions\Get_Volume.ahk
+#include source_Elements\Default\Actions\Set_Volume.ahk
+#include source_Elements\Default\Actions\Speech_output.ahk
+#include source_Elements\Default\Actions\Stop_Sound.ahk
+#include source_Elements\Default\Actions\Run.ahk
+#include source_Elements\Default\Actions\Kill_Process.ahk
+#include source_Elements\Default\Actions\Set_Process_Priority.ahk
+#include source_Elements\Default\Actions\Hibernate_Computer.ahk
+#include source_Elements\Default\Actions\Lock_Computer.ahk
+#include source_Elements\Default\Actions\Log_Off.ahk
+#include source_Elements\Default\Actions\Reboot_Computer.ahk
+#include source_Elements\Default\Actions\Shutdown.ahk
+#include source_Elements\Default\Actions\Suspend_Computer.ahk
+#include source_Elements\Default\Actions\Sleep.ahk
+#include source_Elements\Default\Actions\Trace_Point.ahk
+#include source_Elements\Default\Actions\Trace_Point_Check.ahk
+#include source_Elements\Default\Actions\Execute_Flow.ahk
+#include source_Elements\Default\Actions\Set_Flow_Status.ahk
+#include source_Elements\Default\Actions\Stop_Flow.ahk
+#include source_Elements\Default\Actions\AutoHotkey_script.ahk
+#include source_Elements\Default\Conditions\Expression.ahk
+#include source_Elements\Default\Conditions\Variable_Is_Empty.ahk
+#include source_Elements\Default\Conditions\List_Contains_Element.ahk
+#include source_Elements\Default\Conditions\String_Contains_Text.ahk
+#include source_Elements\Default\Conditions\File_Exists.ahk
+#include source_Elements\Default\Conditions\File_Has_Attribute.ahk
+#include source_Elements\Default\Conditions\Confirmation_Dialog.ahk
+#include source_Elements\Default\Conditions\Debug_dialog.ahk
+#include source_Elements\Default\Conditions\Key_Is_Down.ahk
+#include source_Elements\Default\Conditions\Window_Active.ahk
+#include source_Elements\Default\Conditions\Window_Exists.ahk
+#include source_Elements\Default\Conditions\Process_Is_Running.ahk
+#include source_Elements\Default\Conditions\Flow_Enabled.ahk
+#include source_Elements\Default\Conditions\Flow_Running.ahk
+#include source_Elements\Default\Loops\SimpleLoop.ahk
+#include source_Elements\Default\Loops\Condition.ahk
+#include source_Elements\Default\Loops\Parse_A_String.ahk
+#include source_Elements\Default\Loops\Work_through_a_list.ahk
+#include source_Elements\Default\Loops\Loop_Through_Files.ahk
+#include source_Elements\Default\Triggers\Manual.ahk
+#include source_Elements\Default\Triggers\Periodic_Timer.ahk
+#include source_Elements\Default\Triggers\Time_of_Day.ahk
+#include source_Elements\Default\Triggers\User_Idle_Time.ahk
+#include source_Elements\Default\Triggers\Clipboard_Changes.ahk
+#include source_Elements\Default\Triggers\Hotkey.ahk
+#include source_Elements\Default\Triggers\Shortcut.ahk
+#include source_Elements\Default\Triggers\Window_closes.ahk
+#include source_Elements\Default\Triggers\Window_gets_active.ahk
+#include source_Elements\Default\Triggers\Window_gets_inactive.ahk
+#include source_Elements\Default\Triggers\Window_opens.ahk
+#include source_Elements\Default\Triggers\Process_closes.ahk
+#include source_Elements\Default\Triggers\Process_starts.ahk
+#include source_Elements\Default\Triggers\Start_up.ahk
+
+)
 
 ;Element_Includes_End
 

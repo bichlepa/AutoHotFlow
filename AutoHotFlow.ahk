@@ -4,6 +4,10 @@ SendMode Input  ; Recommended for new scripts due to its superior speed and reli
 SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 ;~ MsgBox '%1%' - %2% - %3% - %4% - %5%
 
+FileEncoding utf-8
+
+#include lib\Json\Jxon.ahk
+
 ;Handle a command line parameter if any
 command=%1%
 commandMessage=%2%
@@ -24,28 +28,28 @@ if not (a_iscompiled)
 {
 	;This is only executing while developing
 	;Here, some source files are automatically modified
+	Libincludes := ""
+	elementInclusions := ""
+	loop, files, source_Elements\*manifest.json, FR
+	{
+		fileread,fileContent,% A_LoopFileFullPath
+		fileContent := Jxon_Load(fileContent)
+
+		for oneLibraryIndex, oneLibrary in fileContent.libraries
+		{
+			Libincludes .= "#include " A_LoopFileDir "\" oneLibrary "`n"
+		}
+
+		for oneElementIndex, oneElement in fileContent.elements
+		{
+			elementInclusions .= "#include " A_LoopFileDir "\" oneElement "`n"
+		}
+	}
 	
 	;Those includes are needed by the elements
 	;They will be inserted in main.ahk and from there in editor.ahk and execution.ahk
-	Libincludes=
-	(
-	#include lib\7z wrapper\7z wrapper.ahk
-	#include Lib\TTS\TTS by Learning One.ahk
-	#include Lib\Eject by SKAN\Eject by SKAN.ahk
-	#include Lib\Class_Monitor\Class_Monitor.ahk
-	#include Lib\HTTP Request\HTTPRequest.ahk
-	#include Lib\HTTP Request\Uriencode.ahk
-	
-	)
-	Libincludes.= "global_elementInclusions = `n(`n" Libincludes "`n)`n"
-	
-	;Find all elements in folder Source_Elements to include them in main.ahk later
-	elementInclusions := "`n"
-	loop, files, %A_WorkingDir%\source_Elements\*.ahk, FR
-	{
-		if not (substr(A_LoopFileName,1,1)=="_")
-			elementInclusions .= "#include " A_LoopFileFullPath "`n"
-	}
+	Libincludes.= "`nglobal_libInclusionsForThreads = `n(`n" Libincludes "`n)`n"
+	elementInclusions.= "`nglobal_elementInclusionsForThreads = `n(`n" elementInclusions "`n)`n"
 
 	;Replace the includes in the file main.ahk
 	FileRead,mainfilecontent,source_main\main.ahk
