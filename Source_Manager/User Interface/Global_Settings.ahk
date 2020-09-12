@@ -1,4 +1,5 @@
 ﻿
+; opens a settings gui for global parameters
 globalSettings_GUI()
 {
 	global
@@ -6,6 +7,7 @@ globalSettings_GUI()
 	local stringalllangs
 	local needtorefreshflowtreeview
 	
+	; Disables the main manager gui
 	Disable_Manager_GUI()
 	
 	;first gather some information
@@ -16,8 +18,11 @@ globalSettings_GUI()
 	IfExist, %A_Startup%\AutoHotFlow.lnk 
 	{
 		FileGetShortcut, %A_Startup%\AutoHotFlow.lnk , lnk_target
-		if (lnk_target = A_ScriptFullPath)
+		if (lnk_target = GetAhfPath())
+		{
+			AutoStartEnabledForThisAHF=1
 			GuiSettingAutostart=1
+		}
 	}
 	
 	;Prepare data for language dropdown
@@ -38,7 +43,6 @@ globalSettings_GUI()
 	GuiShowElementsBeginner := (_getSettings("ShowElementsLevel") = "Beginner")
 	GuiShowElementsAdvanced := (_getSettings("ShowElementsLevel") = "Advanced")
 	GuiShowElementsProgrammer := (_getSettings("ShowElementsLevel") = "Programmer")
-	;~ GuiShowElementsCustom:=(_getSettings("ShowElementsLevel") = "Custom") ;TODO
 	GuiSettingsHideDemoFlows := (!!_getSettings("HideDemoFlows"))
 	GUIloglevelFlow := _getSettings("LogLevelFlow")
 	GUIloglevelApp := _getSettings("LogLevelApp")
@@ -47,15 +51,19 @@ globalSettings_GUI()
 	
 	;build the gui
 	gui,GlobalSettings:default
+
+	; Create tabs
 	gui,add, tab3,vglobalsettingtab,% lang("General") "|" lang("Flow settings") "|" lang("Appearance") "|" lang("Debugging")
+	; Define tab indices
 	globalsetting_tab_General:=1
 	globalsetting_tab_FlowSettings:=2
 	globalsetting_tab_Appearance:=3
 	globalsetting_tab_Debugging:=4
 	
+	; Build tab: general settings
 	gui,tab, %globalsetting_tab_General%
 	gui,font,s10 cnavy wbold
-	gui,add, text, X+10 Y+10 w300 section, % lang("Select_Language.")
+	gui,add, text, X+10 Y+10 w300 section, % lang("Select Language.")
 	gui,font,s8 cDefault wnorm
 	gui,add, DropDownList, xs Y+10 w300 AltSubmit vGuiLanguageChoose choose%GuiLanguageChoose%, %stringalllangs%
 	gui,font,s10 cnavy wbold
@@ -64,9 +72,10 @@ globalSettings_GUI()
 	gui,add,Checkbox,xs Y+10 w300 checked%GuiSettingAutostart% vGuiSettingAutostart ,% lang("Start with windows") 
 	gui,add,Checkbox,xs Y+10 w300 checked%GuiSettingRunAsAdmin% vGuiSettingRunAsAdmin ,% lang("Run as admin") 
 	
+	; Build tab: flow settings
 	gui,tab, %globalsetting_tab_FlowSettings%
 	gui,font,s10 cnavy wbold
-	gui,add,text,xs ys w300,% lang("Flow_execution_policy")
+	gui,add,text,xs ys w300,% lang("Flow execution policy")
 	gui,font,s8 cDefault wnorm
 	gui,add,radio,xs Y+10 w300 vGuiFlowSettingsParallel checked%GuiFlowSettingsParallel%,% lang("Parallel_execution_of_multiple_instances")
 	gui,add,radio,xs Y+10 w300 Y+10 vGuiFlowSettingsSkip checked%GuiFlowSettingsskip% ,% lang("Skip_execution_when_an_instance_is_already_executing")
@@ -78,6 +87,7 @@ globalSettings_GUI()
 	gui,font,s8 cDefault wnorm
 	gui,add,Edit,xs Y+10 w300 vGuiFlowSettingsWorkingDir,% _getSettings("FlowWorkingDir")
 	
+	; Build tab: apperance
 	gui,tab, %globalsetting_tab_Appearance%
 	gui,font,s10 cnavy wbold
 	gui,add,text,xs ys w300,% lang("Shown flows")
@@ -89,8 +99,8 @@ globalSettings_GUI()
 	gui,add,radio,xs Y+10 w300 vGuiShowElementsBeginner checked%GuiShowElementsBeginner%,% lang("Beginner level")
 	gui,add,radio,xs Y+10 w300 vGuiShowElementsAdvanced checked%GuiShowElementsAdvanced%,% lang("Advanced level")
 	gui,add,radio,xs Y+10 w300 vGuiShowElementsProgrammer checked%GuiShowElementsProgrammer%,% lang("Programmer level")
-	;~ gui,add,radio,xs Y+10 w300 vGuiShowElementsCustom checked%GuiShowElementsCustom%,% lang("Custom") ;TODO
 		
+	; Build tab: debugging
 	gui,tab, %globalsetting_tab_Debugging%
 	gui,font,s10 cnavy wbold
 	gui,add,text,xs ys w300,% lang("Logging")
@@ -106,16 +116,20 @@ globalSettings_GUI()
 	gui,add,text,X+10 yp w100 vGUIloglevelThreadtext
 	gui,add,Checkbox,xs Y+20 w300 checked%GUIlogToFile% vGUIlogToFile ,% lang("Log to file")
 	
+	; Add buttons to all tabs
 	gui,tab
 	gui,add,Button,xs y300 w140 gGuiSettingsChooseOK vGuiSettingsChooseOK default,% lang("OK")
 	gui,add,Button,X+10 yp w140 gGuiSettingsChooseCancel,% lang("Cancel")
 	
+	; Show gui
 	gui,show,,% lang("Settings")
 	
+	; Update some additional information in gui
 	gosub,GuiSettingsupdatesomeinfo
 	return
 	
 	GuiSettingsupdatesomeinfo:
+	; Update the text when log level changes
 	if (GUIloglevelFlow == 0)
 		GuiControl,,GUIloglevelFlowText,% lang("Only errors")
 	if (GUIloglevelFlow == 1)
@@ -143,24 +157,32 @@ globalSettings_GUI()
 	
 	return
 	
+	; User closes the window
 	GlobalSettingsguiclose:
 	GuiSettingsChooseCancel:
-	Enable_Manager_GUI()
+
+	; destroy the settings gui
 	gui,GlobalSettings:destroy
+
+	; enable manager gui
+	Enable_Manager_GUI()
 	return
 
+	; User wants to apply settings and close the window
 	GuiSettingsChooseOK:
+
+	; Update gui variables
 	gui,GlobalSettings:Submit,nohide
 
-	;Check working directory
-	checkNewWorkingDir(GuiFlowSettingsWorkingDir)
+	;Check working directory and show warnings if directory is invalid
 	if not (checkNewWorkingDir(GuiFlowSettingsWorkingDir))
 	{
-
+		;let the user edit the working directory
 		guicontrol, choose, globalsettingtab, %globalsetting_tab_FlowSettings%
 		guicontrol, focus, GuiFlowSettingsWorkingDir
 		return
 	}
+	; Working directory is ok, save it
 	_setSettings("FlowWorkingDir", GuiFlowSettingsWorkingDir)
 
 	;handle language setting
@@ -168,19 +190,24 @@ globalSettings_GUI()
 	if (_getSettings("UILanguage") != _language.lang)
 	{
 		_setSettings("UILanguage", _language.lang)
+		; Update labels in manager window TODO: Also update labels in all other windows
 		Refresh_Manager_GUI()
 		needtorefreshflowtreeview:=true
 	}
-
+	
 	;handle autostart setting
 	if GuiSettingAutostart
 	{
-		MsgBox % GetAhfPath()
+		; Create shortcut
 		FileCreateShortcut,% GetAhfPath(),%A_Startup%\AutoHotFlow.lnk ,,WindowsStartup
 	}
 	else
 	{
-		FileDelete,%A_Startup%\AutoHotFlow.lnk 
+		; Delete shortcut if it is showing to current ahf path
+		if (AutoStartEnabledForThisAHF)
+		{
+			FileDelete,%A_Startup%\AutoHotFlow.lnk 
+		}
 	}
 	
 	;handle "hide demo flows" setting
@@ -206,9 +233,7 @@ globalSettings_GUI()
 	GuiShowElementsBeginner ? _setSettings("ShowElementsLevel", "Beginner")
 	GuiShowElementsAdvanced ? _setSettings("ShowElementsLevel", "Advanced")
 	GuiShowElementsProgrammer ? _setSettings("ShowElementsLevel", "Programmer")
-	;~ GuiShowElementsCustom ? _setSettings("ShowElementsLevel", "Custom") ;TODO
 	
-
 	;Write current settings to file
 	write_settings()
 	
@@ -218,7 +243,7 @@ globalSettings_GUI()
 		MsgBox, 36, , % lang("You have selected ""%1%"" do you want to restart in order to enable this setting?", lang("Run as admin") )
 		IfMsgBox yes
 		{
-			try Run *RunAs "%A_ScriptFullPath%" 
+			try Run *RunAs "%A_ScriptFullPath%" ;Run as admin. See https://autohotkey.com/docs/commands/Run.htm#RunAs
 			ExitApp
 		}
 	}
@@ -229,7 +254,10 @@ globalSettings_GUI()
 		TreeView_manager_Refill()
 	}
 	
+	; Destroy settings window
 	gui,GlobalSettings:destroy
+
+	; Enable manager gui
 	Enable_Manager_GUI()
 	return
 }

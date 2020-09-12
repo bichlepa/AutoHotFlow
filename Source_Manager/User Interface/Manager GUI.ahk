@@ -112,6 +112,7 @@ Enable_Manager_GUI()
 {
 	global
 	gui,manager:-disabled
+	; somehow the manager gui goes to background if it it reenabled. Activate it as workaround
 	WinActivate,% "ahk_id " _getSharedProperty("hwnds.Manager")
 }
 
