@@ -1,5 +1,5 @@
 ﻿
-ui_showHelp(helpFile)
+ui_showHelp(elementID)
 {
 	global
 	local helpfilepath
@@ -16,18 +16,21 @@ ui_showHelp(helpFile)
 	
 	Gui, Help:Destroy
 	gui,Help:-dpiscale
-	
-	;~ MsgBox %helpFile%
-	helpfilepath=%_ScriptDir%\Help\%UILang%\%helpFile%.html
-	;~ MsgBox %helpfilepath%
-	IfNotExist, %_ScriptDir%\Help\%UILang%\%helpFile%.html
+	local elementType:= _getElementProperty(FlowID, elementID, "type")
+	local elementClass:= _getElementProperty(FlowID, elementID, "Class")
+	local elementHelpFilepath := elementType "s\" StrReplace(elementClass, elementType "_")
+
+	local uiLang := _getSettings("UILanguage")
+	helpfilepath=%_ScriptDir%\Help\%UILang%\%elementHelpFilepath%.html
+	ToolTip, % helpfilepath
+	IfNotExist, %helpfilepath%
 	{
-		IfNotExist, %_ScriptDir%\Help\en\%helpFile%.html
+		helpfilepath=%_ScriptDir%\Help\en\%elementHelpFilepath%.html
+		IfNotExist, %helpfilepath%
 		{
 			MsgBox, 16, % lang("Error"),% lang("No help file was found")
 			Return
 		}
-		helpfilepath=%_ScriptDir%\Help\en\%helpFile%.html
 	}
 	
 	Gui, Help:Add, ActiveX, x0 y0 w720 h490 vHB, Shell.Explorer

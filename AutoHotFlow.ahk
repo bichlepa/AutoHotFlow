@@ -26,10 +26,19 @@ if (command = "AHFCommand")
 
 if not (a_iscompiled)
 {
+	allElementTypes := ["actions", "conditions", "loops", "triggers"]
+	availableHelpFileLanguages := []
+
+	loop, files, Help\*, D
+	{
+		availableHelpFileLanguages.push(A_LoopFileName)
+	}
+
 	;This is only executing while developing
 	;Here, some source files are automatically modified
 	Libincludes := ""
 	elementInclusions := ""
+	helpFiles := ""
 	loop, files, source_Elements\*manifest.json, FR
 	{
 		fileread,fileContent,% A_LoopFileFullPath
@@ -40,10 +49,55 @@ if not (a_iscompiled)
 			Libincludes .= "#include " A_LoopFileDir "\" oneLibrary "`n"
 		}
 
-		for oneElementIndex, oneElement in fileContent.elements
+		for oneElementTypeIndex, oneElementType in allElementTypes
 		{
-			elementInclusions .= "#include " A_LoopFileDir "\" oneElement "`n"
+			for oneElementIndex, oneElement in fileContent[oneElementType]
+			{
+				elementInclusions .= "#include " A_LoopFileDir "\" oneElementType "\" oneElement "`n"
+			}
 		}
+		
+		; Create the help file menu index and copy help files
+
+		for oneLanguageIndex, oneLanguage in availableHelpFileLanguages
+		{
+			fileRead, helpFileMenuTemplate, help\%oneLanguage%\Menu - template.html
+			fileRead, helpFileMenuTemplateOneEntry, help\%oneLanguage%\Menu - template of one entry.html
+
+			for oneElementTypeIndex, oneElementType in allElementTypes
+			{
+				FileCreateDir, help\%oneLanguage%\%oneElementType%
+
+				helpFileMenuEntries := ""
+				for oneElementIndex, oneElement in fileContent[oneElementType]
+				{
+					oneElementWithoutExtension := substr(oneElement, 1, -4)
+					helpFileName:= oneElementWithoutExtension ".html"
+					helpFilePathDestination := "help\" oneLanguage "\" oneElementType "\" helpFileName
+					helpFilePathSource := A_LoopFileDir "\" helpFilePathDestination
+					if (FileExist(helpFilePathSource))
+					{
+						FileCopy, % helpFilePathSource, % helpFilePathDestination , 1
+
+						fileread, helpFile, % helpFilePathDestination
+						startPos := instr(helpFile, "<h1")
+						startPos := instr(helpFile, ">", ,startPos) + strlen(">")
+						stopPos := instr(helpFile, "</h1>", ,startPos)
+						oneElementName := trim(substr(helpFile, startPos, stopPos - startPos), "`r`n`t ")
+						helpFileMenuOneEntry := helpFileMenuTemplateOneEntry
+						helpFileMenuOneEntry := StrReplace(helpFileMenuOneEntry, "%path%", oneElementType "\" helpFileName)
+						helpFileMenuOneEntry := StrReplace(helpFileMenuOneEntry, "%name%", oneElementName)
+						helpFileMenuEntries .= helpFileMenuOneEntry
+					}
+				}
+
+				helpFileMenuTemplate := StrReplace(helpFileMenuTemplate, "%" oneElementType "%", helpFileMenuEntries)
+			}
+
+			Filedelete, help\%oneLanguage%\Menu.html
+			FileAppend, % helpFileMenuTemplate, help\%oneLanguage%\Menu.html
+		}
+		
 	}
 	
 	;Those includes are needed by the elements
@@ -68,6 +122,8 @@ if not (a_iscompiled)
 
 	FileDelete,source_main\main.ahk
 	FileAppend,%mainfilecontent%,source_main\main.ahk
+
+
 
 	;The element API functions are written three times for each of those threads: main, execution, editor
 	;If a new API function is created for the thread execution,

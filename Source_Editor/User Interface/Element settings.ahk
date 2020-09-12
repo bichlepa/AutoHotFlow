@@ -25,11 +25,7 @@ class ElementSettings
 		setElementPars:= _getElementProperty(FlowID, setElementID, "pars")
 		Parameterwait:=wait
 		
-		
 		NowResultEditingElement:=""
-		
-		
-		
 		
 		static varsToDelete:=[] ;TODO: maybe unnecessary
 		ElementSettingsFields:={} ;global. contains the fields which will be shown in the GUI. Each field is a bunch of controls
@@ -235,11 +231,10 @@ class ElementSettings
 		return
 		
 		GUISettingsOfElementHelp:
-		
 		IfWinExist,ahk_id %GUIHelpHWND%
 			ui_closeHelp()
 		else
-			ui_showHelp(setElementType "\" setElementClass)
+			ui_showHelp(setElementID)
 		return
 		
 		

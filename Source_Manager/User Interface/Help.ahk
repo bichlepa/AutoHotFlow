@@ -1,4 +1,5 @@
 ﻿
+; Show help file for AHF.
 ui_showHelp()
 {
 	global
@@ -6,19 +7,20 @@ ui_showHelp()
 	Gui, Help:Destroy
 	
 	gui,Help:-dpiscale
-	helpfilepath=Help\%UILang%\index.html
-	;~ MsgBox %helpfilepath%
-	IfNotExist, Help\%UILang%\index.html
+
+	local uiLang := _getSettings("UILanguage")
+	helpfilepath = %_scriptDir%\Help\%UILang%\index.html
+	IfNotExist, %_scriptDir%\Help\%UILang%\index.html
 	{
-		IfNotExist, Help\en\index.html
+		IfNotExist, %_scriptDir%\Help\en\index.html
 		{
 			MsgBox, 16, % lang("Error"),% lang("No help file was found")
 			Return
 		}
-		helpfilepath=Help\en\index.html
+		helpfilepath=%_scriptDir%\Help\en\index.html
 	}
 	Gui, Help:Add, ActiveX, x0 y0 w720 h490 vHB, Shell.Explorer
-	HB.Navigate(A_ScriptDir . "\" helpfilepath)
+	HB.Navigate(helpfilepath)
 	Gui, Help: +ToolWindow 
 	Gui, Help:Color, FFFFFF
 	Gui, Help: +resize

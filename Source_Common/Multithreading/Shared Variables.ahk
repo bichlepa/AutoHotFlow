@@ -22,7 +22,7 @@ _EnterCriticalSection()
 	{
 		exit  ; stop the pseudo-ahk-thread
 	}
-
+	Critical on
 	EnterCriticalSection(_cs_shared)
 	if (criticalSectionCounter == 0 and (_share.exiting or _exiting) and not _ahkThreadID="Main")
 	{
@@ -47,6 +47,7 @@ _LeaveCriticalSection()
 	criticalSectionCounter--
 	
 	LeaveCriticalSection(_cs_shared)
+	Critical off
 }
 
 _isExiting()
