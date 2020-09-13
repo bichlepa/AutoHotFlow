@@ -94,7 +94,8 @@ FileDelete,%a_temp%\autoHotflowTryToStartAsAdmin.txt
 #include Lib\gdi+\gdip.ahk
 
 ;Include libraries which may be used by the elements. This code is generated.
-;Lib_includes_Start#include source_Elements\Default\lib\TTS\TTS by Learning One.ahk
+;Lib_includes_Start
+#include source_Elements\Default\lib\TTS\TTS by Learning One.ahk
 #include source_Elements\Default\lib\7z wrapper\7z wrapper.ahk
 #include source_Elements\Default\lib\Eject by SKAN\Eject by SKAN.ahk
 #include source_Elements\Default\lib\Class_Monitor\Class_Monitor.ahk
@@ -150,7 +151,8 @@ global_libInclusionsForThreads =
 
 ;Include elements. This code is generated
 ;The elements must be included before the other treads are started
-;Element_Includes_Start#include source_Elements\Default\actions\New_Variable.ahk
+;Element_Includes_Start
+#include source_Elements\Default\actions\New_Variable.ahk
 #include source_Elements\Default\actions\Random_Number.ahk
 #include source_Elements\Default\actions\Absolute_Number.ahk
 #include source_Elements\Default\actions\Square_Root.ahk
@@ -487,6 +489,7 @@ queryTasks()
 
 
 ; Start the exit routine
+FinallyExit:
 exit:
 if (_exiting != true) ;Prevent multiple execution of this code by setting this flag
 {

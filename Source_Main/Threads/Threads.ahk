@@ -136,6 +136,7 @@ Thread_Stopped(par_ThreadID)
 
 	; terminate thread
 	AhkThread%par_ThreadID%.ahkterminate(100)
+	AhkThread%par_ThreadID% := ""
 	logger("t1", "Thread " par_ThreadID "stopped")
 	
 	; check whether the thread list is empty

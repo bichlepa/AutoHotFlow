@@ -41,7 +41,7 @@ goto,jumpoverUIDRaw
 
 
 ui_regularUpdateIfWinMoved:
-WinGetPos,winx,winy,,,% "ahk_id " _MainGuihwnd
+WinGetPos,winx,winy,,,% "ahk_id " _EditorGuiHwnd
 if (winx!=winxold and winy!=winyOld)
 {
 	winxold:=winx

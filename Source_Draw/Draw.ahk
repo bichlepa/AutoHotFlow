@@ -68,6 +68,7 @@ drawTask()
 		somethingdrawn:= false
 		flowParamsCloned:=""
 		_getAllFlowIds()
+		flow:=""
 		for flowIndex, flowID in _getAllFlowIds()
 		{
 			mustDraw := _getFlowProperty(FlowID, "draw.mustDraw")
@@ -102,5 +103,10 @@ drawTask()
 
 ; Start the exit routine
 exit:
-return
+global _exiting := true
+exit
 
+
+
+FinallyExit:
+ExitApp

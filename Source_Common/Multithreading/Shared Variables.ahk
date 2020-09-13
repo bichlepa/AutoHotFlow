@@ -35,7 +35,8 @@ _EnterCriticalSection()
 
 		; Leave critical section 
 		LeaveCriticalSection(_cs_shared)
-		exit ; stop the pseudo-ahk-thread
+		onexit, FinallyExit
+		exitapp ; stop the pseudo-ahk-thread
 	}
 
 	criticalSectionCounter++
@@ -47,7 +48,8 @@ _LeaveCriticalSection()
 	criticalSectionCounter--
 	
 	LeaveCriticalSection(_cs_shared)
-	Critical off
+	if (criticalSectionCounter = 0)
+		Critical off
 }
 
 _isExiting()

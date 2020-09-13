@@ -155,3 +155,6 @@ queryTasks()
 exit:
 global _exiting := true
 return
+
+FinallyExit:
+ExitApp

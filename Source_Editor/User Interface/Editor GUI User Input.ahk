@@ -1,77 +1,103 @@
-﻿
+﻿; TODO; put everything inside functions and remove this goto
 goto,jumpoverclickstuff
 
-ui_leftmousebuttonclick:
-ui_rightmousebuttonclick:
-IfWinnotActive,% "ahk_id " _MainGuihwnd
+ui_leftmousebuttonclick()
 {
-	return
+	ui_mouseCick("left")
+}
+ui_rightmousebuttonclick()
+{
+	ui_mouseCick("right")
 }
 
-CoordMode,mouse,client
-MouseGetPos,mx,my,temphwnd
-
-if a_thislabel =ui_rightmousebuttonclick
+ui_mouseCick(button)
 {
-	if workingOnClick
-		if (ui_detectMovement(,"rbutton"))
+	global CurrentlyMainGuiIsDisabled
+	global workingOnClick
+	global UserClickedRbutton
+
+	If CurrentlyMainGuiIsDisabled
+	{
+		; Prevent interaction with disable gui
+		ui_ActionWhenMainGUIDisabled()
+		return
+	}
+
+	if (button = "right")
+	{
+		if workingOnClick
+		{
+			; TODO: evaluate right clicks in the pseudo-thread which is busy with the user action
+
+			; we are already busy with a user action.
+			; We will find out whether user clicks or drags the right button.
+			if (ui_detectMovement(,"rbutton"))
+			{
+				; user drags with the right mouse button. We will scroll
+				ui_scrollwithMouse("rbutton")
+			}
+			else
+			{
+				; User did only a click. We will inform the other pseudo-thread about this user action
+				UserClickedRbutton:=true
+			}
+		}
+		else
+		{	
+			; Scroll with using right mouse button
 			ui_scrollwithMouse("rbutton")
-		else
-			UserClickedRbutton:=true
-	else
-		ui_scrollwithMouse("rbutton")
-}
-else
-{
-	SetTimer,clickonpicture,-1 ;Go to label clickonpicture in order to react on user click.
-}
-
-return
-
-ui_leftmousebuttondoubleclick:
-
-UserDidMajorChange:=false
-UserDidMinorChange:=false
-UserCancelledAction:=false
-
-if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of the main gui are disabled
-{
-	ui_ActionWhenMainGUIDisabled()
-	return
-}
-tempMarkedElement := _getFlowProperty(FlowID, "markedElement")
-if (tempMarkedElement != "") ;if a single element is marked
-{
-	
-	if instr(tempMarkedElement, "connection")
-	{
-		ret:=selectConnectionType(tempMarkedElement,"wait") ;Change connection type
-		if ret=aborted
-			UserCancelledAction:=true
-		else
-			UserDidMajorChange:=true
-		if (ret!="aborted")
-		{
-			State_New(FlowID) ;make a new state. If user presses Ctrl+Z, the change will be undone
 		}
-		
 	}
 	else
 	{
-		ret:=ElementSettings.open(tempMarkedElement,"wait") ;open settings of the marked element
-		if ret=aborted
-			UserCancelledAction:=true
-		else
-			UserDidMajorChange:=true
-		if (ret!="aborted" and ret!="0 changes" )
-		{
-			State_New(FlowID) ;make a new state. If user presses Ctrl+Z, the change will be undone
-		}
+		; user clicked with the left mouse button
+		; Go to label clickonpicture in order to react on user click.
+		SetTimer,clickonpicture,-1 
+	}
+}
+
+; user did a double click with left mouse button
+ui_leftmousebuttondoubleclick()
+{
+	global CurrentlyMainGuiIsDisabled
+
+	if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of the main gui are disabled
+	{
+		ui_ActionWhenMainGUIDisabled()
+		return
 	}
 	
+	; track changes with those variables
+	UserDidMajorChange:=false
+	UserDidMinorChange:=false
+	UserCancelledAction:=false
+
+	; get marked element
+	markedElement := _getFlowProperty(FlowID, "markedElement")
+	if (markedElement != "") ;if a single element is marked
+	{
+		if instr(markedElement, "connection")
+		{
+			 ;Change connection type and wait for results
+			ret:=selectConnectionType(markedElement,"wait")
+			if (ret = "aborted")
+				UserCancelledAction:=true
+			else if (ret!="0 changes")
+				UserDidMajorChange:=true
+		}
+		else
+		{
+			;Change element settings and wait for results
+			ret:=ElementSettings.open(markedElement,"wait")
+			if (ret = "aborted")
+				UserCancelledAction:=true
+			else if (ret!="0 changes")
+				UserDidMajorChange:=true
+		}
+
+		endworkingOnClick(UserDidMinorChange, UserDidMajorChange, UserCancelledAction)
+	}
 }
-tempList:=""
-goto,endworkingOnClick
 return
 
 clickOnPicture: ;react on clicks of the user
@@ -397,10 +423,6 @@ else if (clickedElement!="") ;if user clicked on an element
 
 
 }
-
-goto, endworkingOnClick
-endworkingOnClick:
-
 ;Delete temporary vars
 tempElement1:=""
 tempElement2:=""
@@ -416,22 +438,31 @@ tempOldConnection1from:=""
 tempOldConnection1to:=""
 tempList:=""
 
-if (UserCancelledAction=true)
-{
-	State_RestoreCurrent(FlowID)
-	CreateMarkedList()
-}
-else if (UserDidMajorChange or UserDidMinorChange)
-{
-	State_New(FlowID) ;make a new state. If user presses Ctrl+Z, the change will be undone
-}
-else if (UserDidMinorChange)
-	State_New(FlowID) ;make a new state. If user presses Ctrl+Z, the change will be undone
-
-API_Draw_Draw(FlowID) 
-workingOnClick:=false
-
+endworkingOnClick(UserDidMinorChange, UserDidMajorChange, UserCancelledAction)
 return
+
+endworkingOnClick(minorChange, majorChange, cancelled)
+{
+	global workingOnClick
+	if (cancelled)
+	{
+		State_RestoreCurrent(FlowID)
+		CreateMarkedList()
+	}
+	else if (majorChange or minorChange)
+	{
+		State_New(FlowID) ;make a new state. If user presses Ctrl+Z, the change will be undone
+	}
+	else if (minorChange)
+	{
+		State_New(FlowID) ;make a new state. If user presses Ctrl+Z, the change will be undone
+	}
+
+	API_Draw_Draw(FlowID) 
+
+	workingOnClick:=false
+	return
+}
 
 
 ui_findElementUnderMouse(par_mode="default")
@@ -1303,7 +1334,7 @@ return
 
 ;Zoom
 ctrl_wheeldown:
-IfWinNotActive,% "ahk_id " _MainGuihwnd
+IfWinNotActive,% "ahk_id " _EditorGuiHwnd
 	return
 ;Get the mouse position
 MouseGetPos,mx5,my5 
@@ -1345,7 +1376,7 @@ API_Draw_Draw(FlowID)
 return
 
 ctrl_wheelup:
-IfWinNotActive,% "ahk_id " _MainGuihwnd
+IfWinNotActive,% "ahk_id " _EditorGuiHwnd
 	return
 
 MouseGetPos,mx5,my5 ;Get the mouse position

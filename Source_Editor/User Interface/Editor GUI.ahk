@@ -1,43 +1,43 @@
-﻿
+﻿; Create the main gui. Do not show yet
 EditorGUIInit()
 {
 	global
 
-	;Create the main gui
+	;We use this variable to indicate whether the main gui is disabled
 	CurrentlyMainGuiIsDisabled:=false
 	
+	; Create the gui. It is empty, since the draw thread will paint the picture inside the gui
 	gui,MainGUI:default
-	gui,-dpiscale
-	;~ gui,add,picture,vPicFlow hwndPicFlowHWND x0 y0 0xE hidden gclickOnPicture ;No picture needed anymore
+	gui,-dpiscale ; DPI Scaling would cause diffilcuties when calculating mouse coordinates
+	; Add a statsu bar
 	gui,add,StatusBar,hwnd_StatusbarHWND
 	_setSharedProperty("hwnds.editGUIStatusbar" FlowID, _StatusbarHWND)
 	_setSharedProperty("hwnds.editGUIStatusbar" Global_ThisThreadID, _StatusbarHWND)
-	gui,add,hotkey,hidden hwnd_EditControlHWND ;To avoid error sound when user presses keys while this window is open
+
+	; Add an hidden control, to avoid error sound when user presses keys while this window is open
+	gui,add,hotkey,hidden hwnd_EditControlHWND
 	_setSharedProperty("hwnds.editGUIEditControl" FlowID, _EditControlHWND)
 	_setSharedProperty("hwnds.editGUIEditControl" Global_ThisThreadID, _EditControlHWND)
 	gui +resize
 
-	;This is needed by GDI+
+	;Store information which is needed by the draw thread
+	gui,+Hwnd_EditorGuiHwnd
+	_setSharedProperty("hwnds.editGUI" FlowID, _EditorGuiHwnd)
+	_setSharedProperty("hwnds.editGUI" Global_ThisThreadID, _EditorGuiHwnd)
+	_setSharedProperty("hwnds.editGUIDC" FlowID, GetDC(_EditorGuiHwnd))
+	_setSharedProperty("hwnds.editGUIDC" Global_ThisThreadID, GetDC(_EditorGuiHwnd))
+	
+	; find out the height of the status bar, so we can calculate the available space for the rendered picture
 	gui +lastfound
-	gui,+Hwnd_MainGuihwnd
-
-	_setSharedProperty("hwnds.editGUI" FlowID, _MainGuihwnd)
-	_setSharedProperty("hwnds.editGUI" Global_ThisThreadID, _MainGuihwnd)
-	
-	_setSharedProperty("hwnds.editGUIDC" FlowID, GetDC(_MainGuihwnd))
-	_setSharedProperty("hwnds.editGUIDC" Global_ThisThreadID, GetDC(_MainGuihwnd))
-	
 	ControlGetPos,,,,StatusBarHeight,,ahk_id %_StatusbarHWND%
 	EditGUI_StatusBarHeight:=StatusBarHeight
 	
-	
+	; Initialize the menu bar
 	initializeMenuBar()
 	ui_UpdateStatusbartext()
-	;~ MsgBox %StatusBarHeight%
 	
-	;Set some hotkeys that are needed in main window 
-	hotkey,IfWinActive,% "ahk_id " _MainGuihwnd
-	;~ hotkey,^x,ctrl_x
+	;Set some hotkeys that are needed in editor gui
+	hotkey,IfWinActive,% "ahk_id " _EditorGuiHwnd
 	
 	hotkey,^c,ctrl_c
 	hotkey,^v,ctrl_v
@@ -46,11 +46,10 @@ EditorGUIInit()
 	hotkey,^y,ctrl_y
 	hotkey,^a,ctrl_a
 	
-	;~ hotkey,esc,esc
-	;~ hotkey,del,del
-	
-	;React on user input
+	;React on key
 	OnMessage(0x100,"keyPressed",1)
+
+	;React on mouse events
 	OnMessage(0x203,"leftmousebuttondoubleclick",1)
 	OnMessage(0x201,"leftmousebuttonclick",1)
 	OnMessage(0x204,"rightmousebuttonclick",1)
@@ -61,124 +60,144 @@ EditorGUIInit()
 	OnMessage(0x03,"WindowGetsMoved",1)
 }
 
+; Show editor.
+; this function is called from file a common module, which is also used by the manager thread.
+; For Manager thread this function is defined in the "API Caller to Editor". The editor thread does not need to use the api.
 API_Editor_EditGUIshow(FlowID) ;Api function which is used in common code
 {
 	EditGUIshow()
 }
 
+; show editor
 EditGUIshow()
 {
 	global
-	local tempwidth, tempheight, MonitorPrimary
 
-	SysGet, MonitorPrimary, MonitorPrimary
-	SysGet, MonitorWorkArea, MonitorWorkArea,%MonitorPrimary% 
-	tempwidth:=round((MonitorWorkArearight - MonitorWorkArealeft)*0.9)
-	tempheight:=round((MonitorWorkAreabottom -MonitorWorkAreatop)*0.9)
+
+	; show window
 	flowName := _getFlowProperty(FlowID, "Name")
 	if (Editor_guiAlreadyShown=true)
 	{
-		gui, MainGUI:show, w%widthofguipic%,% "·AutoHotFlow· " lang("Editor") " - " flowName ;Added  w%widthofguipic% to trigger the guisize label
+		 ;Added  w%widthofguipic% to trigger the guisize label
+		gui, MainGUI:show, w%widthofguipic%,% "·AutoHotFlow· " lang("Editor") " - " flowName
 	}
 	else
 	{
+		; This is the first time we show the window
+
+		; get the work area of the primary monitor
+		local MonitorPrimary
+		SysGet, MonitorPrimary, MonitorPrimary
+		SysGet, MonitorWorkArea, MonitorWorkArea,%MonitorPrimary% 
+
+		; Make window fill almost the whole screen
+		local tempwidth:=round((MonitorWorkArearight - MonitorWorkArealeft)*0.9)
+		local tempheight:=round((MonitorWorkAreabottom -MonitorWorkAreatop)*0.9)
+
+		; show window
 		gui, MainGUI:show,  w%tempwidth% h%tempheight%,% "·AutoHotFlow· " lang("Editor") " - " flowName
 	}
 	Editor_guiAlreadyShown:=true
-	;sleep 10
-	;MsgBox % hwn " - "   this.hwnd	" -  " this.test
-	;~ ui_UpdateStatusbartext()
 }
 
+; disable editor
 EditGUIDisable()
 {
 	global
-	;~ gui,MainGUI:+disabled
+	; We don't disable the gui itself, but we will block user input now using this variable
 	CurrentlyMainGuiIsDisabled:=true
 }
 
+; Enable editor
 EditGUIEnable()
 {
 	global
-	;~ gui,MainGUI:-disabled
 	
 	;Activate window if it is not hidden
 	DetectHiddenWindows,off
-	IfWinExist,% "ahk_id " _MainGuihwnd
+	IfWinExist,% "ahk_id " _EditorGuiHwnd
 	{
 		DetectHiddenWindows,on
-		WinActivate,% "ahk_id " _MainGuihwnd
+		WinActivate,% "ahk_id " _EditorGuiHwnd
 	}
 	DetectHiddenWindows,on
 	CurrentlyMainGuiIsDisabled:=false
 	
+	; redraw picture
 	API_Draw_Draw(FlowID)
 }
 
 
-;Get the position of main gui and store it into global variables
+;Get the position of main gui
 EditGUIGetPos()
 {
 	global
-	WinGetPos,MainGUIX,MainGUIY,MainGUIWidth,MainGUIHeight,% "ahk_id " _MainGuihwnd
+	local MainGUIX, MainGUIY, MainGUIWidth, MainGUIHeight
+	WinGetPos, MainGUIX, MainGUIY, MainGUIWidth, MainGUIHeight, % "ahk_id " _EditorGuiHwnd
 	return {x: MainGUIX, y: MainGUIY, w: MainGUIWidth, h: MainGUIHeight}
 }
 
+; react if window gets active
 WindowGetsActive()
 {
+	; redraw the picture
 	API_Draw_Draw(FlowID)
-
 }
 
+; react if window gets moved
 WindowGetsMoved()
 {
+	; redraw the picture
 	API_Draw_Draw(FlowID)
-
 }
 
+; user clicked with left mouse button
 leftmousebuttonclick(wpar,lpar,msg,hwn)
 {
 	global 
-	if (hwn!=_MainGuihwnd and hwn!=_StatusbarHWND)
+	if (hwn!=_EditorGuiHwnd and hwn!=_StatusbarHWND)
 	{
+		; react only if user interacted with the main gui
 		return
 	}
 	SetTimer, ui_leftmousebuttonclick,-1
 }
 
+; user clicked with right mouse button
 rightmousebuttonclick(wpar,lpar,msg,hwn)
 {
 	global 
-		;~ SoundBeep 3000
-	if (hwn!=_MainGuihwnd and hwn!=_StatusbarHWND)
+	if (hwn!=_EditorGuiHwnd and hwn!=_StatusbarHWND)
 	{
-		;~ SoundBeep 3000
+		; react only if user interacted with the main gui
 		return
 	}
 	SetTimer, ui_rightmousebuttonclick,-1
 }
 
-
+; user double clicked with left mouse button
 leftmousebuttondoubleclick(wpar,lpar,msg,hwn)
 {
-	global flowID
-	;~ ToolTip  %hwn% d
-	if (hwn!=_MainGuihwnd  and hwn!=_StatusbarHWND)
+	global
+	if (hwn != _EditorGuiHwnd  and hwn != _StatusbarHWND)
+	{
+		; react only if user interacted with the main gui
 		return
+	}
 	SetTimer, ui_leftmousebuttondoubleclick,-1
 }
 
-
-
-keyPressed(wpar,lpar,msg,hwn)
+; react if user presses a key TODO, do we actually use this or the hotkeys?
+keyPressed(wpar, lpar, msg, hwn)
 {
 	global
 	
-	if (hwn!=_EditControlHWND and hwn!=_StatusbarHWND and hwn!=_MainGuihwnd)
+	if (hwn!=_EditControlHWND and hwn!=_StatusbarHWND and hwn!=_EditorGuiHwnd)
+	{
+		; react only if user interacted with the main gui
 		return
-	;~ ToolTip %wpar% - %lpar% - %msg% - %hwn%
+	}
 	wpar2:=wpar
-	;~ ToolTip % format("{1:#X} - {2:#X} - ",wpar2,lpar)
 	
 	if (wpar=0x53)
 	{
@@ -205,39 +224,37 @@ keyPressed(wpar,lpar,msg,hwn)
 	}
 }
 
-mousewheelmove(wpar,lpar,msg,hwn)
+; React on mouse wheel movement
+mousewheelmove(wpar, lpar, msg, hwn)
 {
 	global
-	local wpar2
-	if (hwn!=_EditControlHWND and hwn!=_StatusbarHWND and hwn!=_MainGuihwnd)
+	if (hwn!=_EditControlHWND and hwn!=_StatusbarHWND and hwn!=_EditorGuiHwnd)
+	{
+		; react only if user interacted with the main gui
 		return
-	wpar2:=wpar
-	if wpar=7864328
-		SetTimer, ctrl_wheelup,-1 
-	else if wpar=4287102984
-		SetTimer, ctrl_wheeldown,-1 
+	}
+	if (wpar = 7864328)
+		SetTimer, ctrl_wheelup, -1 
+	else if (wpar = 4287102984)
+		SetTimer, ctrl_wheeldown, -1 
 }
 
-
-
+; When user tries to interact with disabled gui, enable the child gui
 ui_ActionWhenMainGUIDisabled()
 {
 	global
-	SoundPlay,*16
-	;~ MsgBox % CurrentlyActiveWindowHWND
-	if nowexiting
-		WinActivate,ahk_id %ExitMessageBoxHWND%
-	else
-		WinActivate,ahk_id %CurrentlyActiveWindowHWND%
+	SoundPlay,*16 ; Play the warn sound
+	WinActivate,ahk_id %CurrentlyActiveWindowHWND%
 }
 
-
+; Update the status bar text
 ui_UpdateStatusbartext(which="")
 {
 	global
-	local elementtext
-	if (which="pos" or which ="")
+	static elementtext
+	if (which!="pos")
 	{
+		; update element text if not only the position needs to be updated
 		markedElements := _getFlowProperty(FlowID, "markedElements")
 		if (markedElements.count()=0)
 		{
@@ -251,28 +268,28 @@ ui_UpdateStatusbartext(which="")
 		{
 			elementtext:=lang("%1% marked elements", markedElements.count())
 		}
-		gui,maingui:default
-		offsetx := _getFlowProperty(FlowID, "flowSettings.offsetx")
-		offsety := _getFlowProperty(FlowID, "flowSettings.offsety")
-		zoomFactor := _getFlowProperty(FlowID, "flowSettings.zoomFactor")
-		sb_SetText("Offset: x " Round(offsetx) " y " Round(offsety) "   |   Zoom: " Round(zoomFactor,2 )  "   |   " elementtext  ,1)
 	}
+	; get position informations
+	offsetx := _getFlowProperty(FlowID, "flowSettings.offsetx")
+	offsety := _getFlowProperty(FlowID, "flowSettings.offsety")
+	zoomFactor := _getFlowProperty(FlowID, "flowSettings.zoomFactor")
+
+	; update status bar text
+	gui,maingui:default
+	sb_SetText("Offset: x " Round(offsetx) " y " Round(offsety) "   |   Zoom: " Round(zoomFactor,2 )  "   |   " elementtext  ,1)
 }
 
-;Get the position of main gui and store it into global variables
-ui_GetMainGUIPos()
-{
-	global 
-	WinGetPos,MainGUIX,MainGUIY,MainGUIWidth,MainGUIHeight,% "ahk_id " _MainGuihwnd
-}
-
+; Updates the localized labels TODO: it is not finished and is never called
 ui_OnLanguageChange()
 {
 	global 
 	local temp
+
+	; Redraw the flow
 	API_Draw_Draw(FlowID)
+
 	DetectHiddenWindows off
-	WinGetTitle,temp,% "ahk_id " _MainGuihwnd
+	WinGetTitle, temp, % "ahk_id " _EditorGuiHwnd
 	
 	flowName := _getFlowProperty(FlowID, "Name")
 	IfWinExist,% temp
@@ -280,34 +297,30 @@ ui_OnLanguageChange()
 	else
 		gui,MainGUI:show,hide,% "·AutoHotFlow· " lang("Editor") " - " flowName 
 	
-	;Help! I want that the menus are renamed when the language changes.
+	;TODO Renamed the menus when the language changes.
 	;~ initializeTrayBar()
 	;~ initializeMenuBar()
 }
 
 
-goto,jumpOverGUIJumpLabels
+ ;redraw the picture when GUI is resized
+MainGUIguisize()
+{
+	global EditGUI_StatusBarHeight
+	; adjust the status bar
+	SB_SetParts(a_guiwidth)
 
+	; calculate and share the available space for the picture 
+	heightofguipic:=a_guiheight - EditGUI_StatusBarHeight
+	widthofguipic:=a_guiwidth
+	_setFlowProperty(FlowID, "draw.heightofguipic", heightofguipic)
+	_setFlowProperty(FlowID, "draw.widthofguipic", widthofguipic)
 
+	; Redraw the picture
+	API_Draw_Draw(FlowID)
+}
 
-
-
-MainGUIguisize: ;resize the picture when GUI is resized
-;MsgBox w%A_guiwidth%  %a_guiheight%
-GuiControl,move,PicFlow,w%A_guiwidth%  h%a_guiheight%
-heightofguipic:=a_guiheight - EditGUI_StatusBarHeight
-
-widthofguipic:=a_guiwidth
-guicontrolget,guipic,pos,PicFlow ;get the picture position. -> gx, gy
-
-;SB_SetParts(a_guiwidth*0.2,a_guiwidth*0.5,a_guiwidth*0.3)
-SB_SetParts(a_guiwidth)
-
-_setFlowProperty(FlowID, "draw.heightofguipic", heightofguipic)
-_setFlowProperty(FlowID, "draw.widthofguipic", widthofguipic)
-API_Draw_Draw(FlowID)
-return
-
+; returns the gui client size
 GetClientSize(hwnd, ByRef w, ByRef h)
 {
     VarSetCapacity(rc, 16)
@@ -317,4 +330,3 @@ GetClientSize(hwnd, ByRef w, ByRef h)
 }
 
 
-jumpOverGUIJumpLabels:
