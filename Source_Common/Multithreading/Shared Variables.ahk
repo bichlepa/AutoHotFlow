@@ -195,10 +195,11 @@ _deleteFlowProperty(FlowID, path)
 	_LeaveCriticalSection()
     return value
 }
-_getAndIncrementFlowProperty(FlowID, path)
+_getAndIncrementFlowProperty(FlowID, path, incrementValue = 1)
 {
 	_EnterCriticalSection()
-    value:=++_flows[FlowID][path]
+    _flows[FlowID][path] += incrementValue
+    value:=_flows[FlowID][path]
 	_LeaveCriticalSection()
     return value
 }

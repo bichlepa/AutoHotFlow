@@ -206,11 +206,11 @@ states_Restore(p_FlowID, p_StateID)
 	}
 	
 	;Restore marked elements
-	markedelements := _getFlowProperty(p_FlowID,  "markedelements")
+	selectedElements := _getFlowProperty(p_FlowID,  "selectedElements")
 	allElementIDs := _getAllElementIds(p_FlowID)
 	for forIndex, forElementID in allElementIDs
 	{
-		if markedelements.haskey(forElementID)
+		if selectedElements.haskey(forElementID)
 		{
 			_setElementProperty(p_FlowID, forElementID, "marked", True)
 		}
@@ -222,7 +222,7 @@ states_Restore(p_FlowID, p_StateID)
 	allConnectionIDs := _getAllConnectionIds(p_FlowID)
 	for forIndex, forConnectionID in allConnectionIDs
 	{
-		if markedelements.haskey(forConnectionID)
+		if selectedElements.haskey(forConnectionID)
 		{
 			_setConnectionProperty(p_FlowID, forConnectionID, "marked", True)
 		}

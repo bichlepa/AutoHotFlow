@@ -27,20 +27,20 @@ ui_mouseCick(button)
 	{
 		if workingOnClick
 		{
-			; TODO: evaluate right clicks in the pseudo-thread which is busy with the user action
+			; ; TODO: evaluate right clicks in the pseudo-thread which is busy with the user action
 
-			; we are already busy with a user action.
-			; We will find out whether user clicks or drags the right button.
-			if (ui_detectMovement(,"rbutton"))
-			{
-				; user drags with the right mouse button. We will scroll
-				ui_scrollwithMouse("rbutton")
-			}
-			else
-			{
-				; User did only a click. We will inform the other pseudo-thread about this user action
-				UserClickedRbutton:=true
-			}
+			; ; we are already busy with a user action.
+			; ; We will find out whether user clicks or drags the right button.
+			; if (ui_detectMovement(,"rbutton"))
+			; {
+			; 	; user drags with the right mouse button. We will scroll
+			; 	ui_scrollwithMouse("rbutton")
+			; }
+			; else
+			; {
+			; 	; User did only a click. We will inform the other pseudo-thread about this user action
+			; 	UserClickedRbutton:=true
+			; }
 		}
 		else
 		{	
@@ -68,642 +68,704 @@ ui_leftmousebuttondoubleclick()
 	}
 	
 	; track changes with those variables
-	UserDidMajorChange:=false
-	UserDidMinorChange:=false
+	UserChangedSomething:=false
 	UserCancelledAction:=false
 
 	; get marked element
-	markedElement := _getFlowProperty(FlowID, "markedElement")
-	if (markedElement != "") ;if a single element is marked
+	selectedElement := _getFlowProperty(FlowID, "selectedElement")
+	if (selectedElement != "") ;if a single element is marked
 	{
-		if instr(markedElement, "connection")
+		if instr(selectedElement, "connection")
 		{
 			 ;Change connection type and wait for results
-			ret:=selectConnectionType(markedElement,"wait")
+			ret:=selectConnectionType(selectedElement,"wait")
 			if (ret = "aborted")
 				UserCancelledAction:=true
 			else if (ret!="0 changes")
-				UserDidMajorChange:=true
+				UserChangedSomething:=true
 		}
 		else
 		{
 			;Change element settings and wait for results
-			ret:=ElementSettings.open(markedElement,"wait")
+			ret:=ElementSettings.open(selectedElement,"wait")
 			if (ret = "aborted")
 				UserCancelledAction:=true
 			else if (ret!="0 changes")
-				UserDidMajorChange:=true
+				UserChangedSomething:=true
 		}
 
-		endworkingOnClick(UserDidMinorChange, UserDidMajorChange, UserCancelledAction)
+		; if something was changed, handle last steps
+		endworkingOnClick(UserChangedSomething, UserCancelledAction)
 	}
 }
 return
 
-clickOnPicture: ;react on clicks of the user
-
-
-
-if (workingOnClick=true) ;Ignore if a click of user is already processed
-	return
-workingOnClick:=true
-
-
-MouseGetPos,mx,my ;Get the mouse position
-GetKeyState,ControlKeyState,control
-
-UserDidMajorChange:=false
-UserDidMinorChange:=false
-UserCancelledAction:=false
-
-markedElement := _getFlowProperty(FlowID, "markedElement")
-markedElements := _getFlowProperty(FlowID, "markedElements")
-
-clickedElement:=ui_findElementUnderMouse()
-;~ d(clickedElement)
-if ( clickedElement="") ;If nothing was selected (click on nowhere). -> Scroll
+ ;react on left mouse clicks of the user
+clickOnPicture() ;react on clicks of the user
 {
+	global workingOnClick
+	global CurrentlyMainGuiIsDisabled
+	global default_ElementWidth, default_ElementHeight
+
+	;Ignore if a click of user is already processed
+	if (workingOnClick)
+		return
+	; make sure, we only process one click of user
+	workingOnClick := true
 	
-	;~ MsgBox %clickMoved% %CurrentlyMainGuiIsDisabled%
-	if (ui_detectMovement()=false) ;If the background wasn't moved, unmark elements.
+	;Get the mouse position
+	MouseGetPos,mx,my
+
+	;Find out whether user presses the control key
+	GetKeyState,ControlKeyState,control
+
+	; track changes with those variables
+	UserChangedSomething := false
+	UserCancelledAction := false
+
+	; get marked elements
+	selectedElement := _getFlowProperty(FlowID, "selectedElement")
+	selectedElements := _getFlowProperty(FlowID, "selectedElements")
+
+	; get element user clicked on
+	clickedItem := ui_findElementUnderMouse(mx, my)
+	clickedElement := clickedItem.element
+	partOfclickedElement := clickedItem.part
+	if (not clickedElement) ;If user clicke on empty space.
 	{
-		if (CurrentlyMainGuiIsDisabled=false)
+		; detect whether user drags with mouse
+		if (ui_detectMovement()=false)
 		{
-			if (markedElements.count()) ;if at least one element is marked
+			; user did not drag mouse.
+			; if uses presses control key, do nothing
+			if (ControlKeyState!="d")
 			{
-				if (ControlKeyState!="d")
+				; Unmark all elements
+				if (selectedElements.count())
 				{
-					UnmarkEverything()
+					UnSelectEverything()
 					ui_UpdateStatusbartext()
 				}
 			}
 		}
-		else  ;Ignore if GUI is disable
+		else
 		{
-			ui_ActionWhenMainGUIDisabled()
+			; user drags with mouse. Start scrolling
+			ui_scrollwithMouse()
 		}
 	}
-	else
+	else if (clickedElement="MenuCreateNewAction" or clickedElement="MenuCreateNewCondition" or clickedElement="MenuCreateNewLoop" or clickedElement="MenuCreateNewTrigger") ;User click either on "Create new action" or ".. condtion" in the drawn menu
 	{
-		ui_scrollwithMouse()
-	}
-	
-}
-else if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of the main gui are disabled
-{
-	ui_ActionWhenMainGUIDisabled()
-	
-}
-else if (clickedElement="MenuCreateNewAction" or clickedElement="MenuCreateNewCondition" or clickedElement="MenuCreateNewLoop" or clickedElement="MenuCreateNewTrigger") ;User click either on "Create new action" or ".. condtion" in the drawn menu
-{
-	;~ ToolTip %clickedElement%
-	if (clickedElement="MenuCreateNewAction")
-		tempNew:=Element_New(FlowID, "action")
-	else if (clickedElement="MenuCreateNewCondition")
-		tempNew:=Element_New(FlowID, "Condition")
-	else if (clickedElement="MenuCreateNewLoop")
-		tempNew:=Element_New(FlowID, "Loop")
-	else if (clickedElement="MenuCreateNewTrigger")
-		tempNew:=Element_New(FlowID, "Trigger")
-	else
-	{
-		MsgBox unexpected internal ERROR! A new element should be created. But I don't known which one!
-		return 
-	}
-	
-	;function ui_moveSelectedElements() needs the following four lines of code
-	clickedElement:=tempNew
-	
-	tempZoomFactor := _getFlowProperty(FlowID, "flowSettings.zoomfactor")
-	tempOffsetX := _getFlowProperty(FlowID, "flowSettings.offsetx")
-	tempOffsetY := _getFlowProperty(FlowID, "flowSettings.offsety")
-	_setElementProperty(FlowID, clickedElement, "x", (mx)/tempZoomFactor + tempOffsetX - default_ElementWidth/2)
-	_setElementProperty(FlowID, clickedElement, "x", (my)/tempZoomFactor + tempOffsetY - default_ElementHeight/2)
-
-	MarkOne(clickedElement)
-	if (ui_detectMovement()) ;If user moves the mouse
-	{
-		ret:=ui_moveSelectedElements() ;move the element. Stop moving when user releases the mouse button
-	}
-	else
-	{
-		ret:=ui_moveSelectedElements("InvertLbutton") ;move the element. Stop moving when user clicks
-	}
-	if (ret.Aborted) ;if user cancelled movement
-	{
-		UserCancelledAction:=true
-	}
-	else
-	{
-		ret:=selectSubType(clickedElement,"wait")
-		if ret=aborted
+		; user clicked on the icon for creating a new element
+		; create the new element
+		if (clickedElement = "MenuCreateNewAction")
+			newElement:=Element_New(FlowID, "action")
+		else if (clickedElement = "MenuCreateNewCondition")
+			newElement:=Element_New(FlowID, "Condition")
+		else if (clickedElement = "MenuCreateNewLoop")
+			newElement:=Element_New(FlowID, "Loop")
+		else if (clickedElement = "MenuCreateNewTrigger")
+			newElement:=Element_New(FlowID, "Trigger")
+		else
 		{
+			throw exception("unexpected internal ERROR! A new element should be created. But I don't known which one!")
+			return 
+		}
+		
+		; place the element under the mouse cursor
+		tempZoomFactor := _getFlowProperty(FlowID, "flowSettings.zoomfactor")
+		tempOffsetX := _getFlowProperty(FlowID, "flowSettings.offsetx")
+		tempOffsetY := _getFlowProperty(FlowID, "flowSettings.offsety")
+		_setElementProperty(FlowID, newElement, "x", (mx)/tempZoomFactor + tempOffsetX - default_ElementWidth/2)
+		_setElementProperty(FlowID, newElement, "y", (my)/tempZoomFactor + tempOffsetY - default_ElementHeight/2)
+
+		; select the element
+		SelectOneItem(newElement)
+		; user may hold mouse button down while dragging or klick, move and klick again
+		if (ui_detectMovement()) ;If user moves the mouse while holding the mouse button
+		{
+			;move the element. Stop moving when user releases the mouse button
+			ret:=ui_moveSelectedElements(newElement)
+		}
+		else
+		{
+			;move the element. Stop moving when user clicks
+			ret:=ui_moveSelectedElements(newElement,, "InvertLbutton")
+		}
+		if (ret.Aborted) ;if user cancelled movement
+		{
+			; this will undo the action later
 			UserCancelledAction:=true
 		}
 		else
 		{
-			ret:=ElementSettings.open(clickedElement,"wait") ;open settings of element
-			;~ MsgBox % strobj(tempnew)
-			if ret=aborted
+			; select element subtype and wait for result
+			ret := selectSubType(newElement,"wait")
+			if (ret="aborted")
 			{
+				; this will undo the action later
 				UserCancelledAction:=true
 			}
 			else
-				UserDidMajorChange:=true
-		}
-	}
-	
-	
-	;e_CorrectElementErrors("Code: 3053165186.")
-}
-else if (clickedElement="PlusButton" or clickedElement="PlusButton2") ;user click on plus button
-{
-	IfInString,markedElement,Connection ;The selected element is connection
-	{
-		tempConnection2:=Connection_New(FlowID) ;Create new connection
-		
-		tempFrom := _getConnectionProperty(FlowID, markedElement, "from")
-		tempTo := _getConnectionProperty(FlowID, markedElement, "to")
-		ret:=ui_MoveConnection(markedElement,tempConnection2, tempFrom, tempTo)
-		if ret=aborted
-			UserCancelledAction:=true
-		else 
-			UserDidMajorChange:=true
-	}
-	else ;The selected element is either action, condition or trigger or loop
-	{
-		tempConnection1:=Connection_New(FlowID) ;Create new connection
-		
-		tempType := _getElementProperty(FlowID, markedElement, "type")
-		if (tempType = "loop")
-		{
-			if (clickedElement="PlusButton")
 			{
-				_setConnectionProperty(FlowID, tempConnection1, "frompart", "HEAD")
-			}
-			else if (clickedElement="PlusButton2")
-			{
-				_setConnectionProperty(FlowID, tempConnection1, "frompart", "TAIL")
+				;open settings of element
+				ret := ElementSettings.open(newElement,"wait")
+				if (ret="aborted")
+				{
+					; this will undo the action later
+					UserCancelledAction:=true
+				}
+				else
+				{
+					; it doesnt matter, whether user did changes in the editor or not, since it is a new element
+					UserChangedSomething:=true
+				}
 			}
 		}
-		
-		ret:=ui_MoveConnection(tempConnection1, ,markedElement )
-		if ret=aborted
-			UserCancelledAction:=true
-		else 
-			UserDidMajorChange:=true
-		
 	}
-	
-	
-	;e_CorrectElementErrors("Code: 2389423789.")
-	;ElementSettings.new(clickedElement) ;open settings of element
-	
-}
-else if (clickedElement="MoveButton1") ;if a connection is selected and user moved the upper Part of it
-{
-	
-	tempTo := _getConnectionProperty(FlowID, markedElement, "to")
-
-	ret:=ui_MoveConnection(,markedElement ,,tempTo )
-	if ret=aborted
-		UserCancelledAction:=true
-	else 
-		UserDidMajorChange:=true
-	
-	
-
-	
-	;e_CorrectElementErrors("Code: 3186165186456.")
-	;~ API_Draw_Draw(FlowID)
-
-}
-else if (clickedElement="MoveButton2") ;if a connection is selected and user moved the lower Part of it
-{
-	
-	tempFrom := _getConnectionProperty(FlowID, markedElement, "from")
-	ret:=ui_MoveConnection(markedElement ,,tempFrom )
-	if ret=aborted
-		UserCancelledAction:=true
-	else
-		UserDidMajorChange:=true
-	
-	
-	
-	
-	;e_CorrectElementErrors("Code: 1365415616.")
-	;~ API_Draw_Draw(FlowID)
-	
-	
-
-}
-else if (clickedElement="TrashButton") ;if something is selected and user clicks on the trash button
-{
-	
-	if markedElement contains connection
+	else if (clickedElement = "PlusButton" or clickedElement = "PlusButton2") ;user click on plus button
 	{
-		tempType := _getConnectionProperty(FlowID, markedElement, "type")
-
-		MsgBox, 4, % lang("Delete Object") , % lang("Do you really want to delete the %1%?", tempType, "`n")
-	}
-	else
-	{
-		tempType := _getElementProperty(FlowID, markedElement, "type")
-		tempName := _getElementProperty(FlowID, markedElement, "name")
-		
-		MsgBox, 4, % lang("Delete Object") , % lang("Do you really want to delete the %1% %2%?",lang(tempType), "`n" tempName "`n")
-	}
-	
-	IfMsgBox yes
-	{
-		Element_Remove(FlowID, markedElement)
-		UserDidMajorChange:=true
-	}
-	CreateMarkedList()
-	;~ API_Draw_Draw(FlowID)
-	;e_CorrectElementErrors("Code: 231684866.")
-}
-else if (clickedElement="EditButton")  ;if something is selected and user clicks on the edit button
-{
-	if markedElement contains connection
-	{
-		ret:=selectConnectionType(markedElement,"wait")
-		if ret=aborted
-			UserCancelledAction:=true
-		else
-			UserDidMajorChange:=true
-		
-	}
-	else
-	{
-		ret:=ElementSettings.open(markedElement,"wait") ;open settings of the marked element
-		
-		if (ret="aborted" )
-			UserCancelledAction:=true
-		else if (ret!="0 changes" )
-			UserDidMajorChange:=true
-	}
-	
-
-}
-else if (clickedElement="SwitchOnButton")  ;if something is selected and user clicks on the button
-{
-	
-	disableOneTrigger(FlowID, markedElement)
-	
-
-}
-else if (clickedElement="SwitchOffButton")  ;if something is selected and user clicks on the button
-{
-	enableOneTrigger(FlowID, markedElement)
-
-}
-else if (clickedElement="StarEmptyButton")  ;if something is selected and user clicks on the button
-{
-	Element_setDefaultTrigger(FlowID, markedElement)
-	UserDidMinorChange:=true
-}
-else if (clickedElement="StarFilledButton")  ;if something is selected and user clicks on the button
-{
-	;Nothing to do
-
-}
-else if (clickedElement!="") ;if user clicked on an element
-{
-	if markedElement contains connection
-	{
-		if (ControlKeyState="d")
+		IfInString, selectedElement, Connection ;The selected element is connection
 		{
-			MarkOne(clickedElement,true)  ;mark multiple elements
+			;Create a new connection
+			tempConnection2 := Connection_New(FlowID)
 			
-		}
-		else
-			MarkOne(clickedElement) ;mark one element and unmark others
-		
-	}
-	else
-	{
-		if (!ui_detectMovement()) ;If user did not move the mouse
-		{	
-			if (ControlKeyState="d") ;if user presses Control key
+			; get the elements where the connection starts and stops
+			tempFrom := _getConnectionProperty(FlowID, selectedElement, "from")
+			tempTo := _getConnectionProperty(FlowID, selectedElement, "to")
+
+			;Create a new connection
+			tempConnection2 := Connection_New(FlowID)
+
+			; move both connections
+			ret:=ui_MoveConnection(selectedElement,tempConnection2, tempFrom, tempTo)
+			if (ret="aborted")
 			{
-				MarkOne(clickedElement,true) ;mark multiple elements
+				; this will undo the action later
+				UserCancelledAction:=true
 			}
 			else
-				MarkOne(clickedElement) ;mark one element and unmark others
+			{
+				UserChangedSomething:=true
+			} 
+		}
+		else ;The selected element is either action, condition or trigger or loop
+		{
+			;Create new connection
+			tempConnection1 := Connection_New(FlowID)
+			
+			; check whether the connection is a loop
+			tempType := _getElementProperty(FlowID, selectedElement, "type")
+			if (tempType = "loop")
+			{
+				if (clickedElement="PlusButton")
+				{
+					; User clicked the first plus button. The connections starts from the head of the loop
+					_setConnectionProperty(FlowID, tempConnection1, "frompart", "HEAD")
+				}
+				else if (clickedElement="PlusButton2")
+				{
+					; User clicked the second plus button. The connections starts from the tail of the loop
+					_setConnectionProperty(FlowID, tempConnection1, "frompart", "TAIL")
+				}
+			}
+			
+			; move the connection
+			ret:=ui_MoveConnection(tempConnection1, ,selectedElement )
+			if (ret="aborted")
+			{
+				; this will undo the action later
+				UserCancelledAction:=true
+			}
+			else
+			{
+				UserChangedSomething:=true
+			}
+			
+		}
+	}
+	else if (clickedElement = "MoveButton1") ;if a connection is selected and user wants to move the start of connection
+	{
+		; get the element at the end of the connection
+		tempTo := _getConnectionProperty(FlowID, selectedElement, "to")
+
+		; move the connection
+		ret := ui_MoveConnection(, selectedElement, , tempTo )
+		if (ret = "aborted")
+		{
+			; this will undo the action later
+			UserCancelledAction:=true
+		}
+		else
+		{
+			UserChangedSomething:=true
+		}
+	}
+	else if (clickedElement="MoveButton2") ;if a connection is selected and user wants to move the end of connection
+	{
+		; get the element at the start of the connection
+		tempFrom := _getConnectionProperty(FlowID, selectedElement, "from")
+
+		; move the connection
+		ret:=ui_MoveConnection(selectedElement ,,tempFrom )
+		if (ret = "aborted")
+		{
+			; this will undo the action later
+			UserCancelledAction:=true
+		}
+		else
+		{
+			UserChangedSomething:=true
+		}
+	}
+	else if (clickedElement="TrashButton") ;if something is selected and user clicks on the trash button
+	{
+		; check whether the selected item is connection or element
+		if instr(selectedElement, "connection")
+		{
+			; The item is a connection
+
+			; Confirm deletion
+			tempType := _getConnectionProperty(FlowID, selectedElement, "type")
+			MsgBox, 4, % lang("Delete Object") , % lang("Do you really want to delete the %1%?", tempType, "`n")
+		}
+		else
+		{
+			; The item is an element
+			
+			; Confirm deletion
+			tempType := _getElementProperty(FlowID, selectedElement, "type")
+			tempName := _getElementProperty(FlowID, selectedElement, "name")
+			MsgBox, 4, % lang("Delete Object") , % lang("Do you really want to delete the %1% '%2%'?",lang(tempType), "`n" tempName "`n")
+		}
+		
+		IfMsgBox yes ; did user agree?
+		{
+			; delete selected item
+			Element_Remove(FlowID, selectedElement)
+			UserChangedSomething:=true
+		}
+		
+		; since we deleted the selected element, recreate the selected list
+		UpdateSelectedItemsList()
+	}
+	else if (clickedElement="EditButton")  ;if something is selected and user clicks on the edit button
+	{
+		; check whether the selected item is connection or element
+		if instr(selectedElement, "connection")
+		{
+			; select connection type
+			ret := selectConnectionType(selectedElement,"wait")
+			if (ret = "aborted")
+			{
+				; this will undo the action later
+				UserCancelledAction:=true
+			}
+			else
+			{
+				UserChangedSomething:=true
+			}
+		}
+		else
+		{
+			;open settings of the selected element
+			ret := ElementSettings.open(selectedElement,"wait") 
+			if (ret = "aborted")
+			{
+				; this will undo the action later
+				UserCancelledAction:=true
+			}
+			else if (ret!="0 changes" )
+			{
+				; user did some changes in the properties
+				UserChangedSomething:=true
+			}
+		}
+		
+
+	}
+	else if (clickedElement="SwitchOnButton")  ;if a trigger is selected and user clicks on the switch on button
+	{
+		; disable the trigger
+		disableOneTrigger(FlowID, selectedElement)
+	}
+	else if (clickedElement="SwitchOffButton")  ;if a trigger is selected and user clicks on the switch off button
+	{
+		; enable the trigger
+		enableOneTrigger(FlowID, selectedElement)
+	}
+	else if (clickedElement="StarEmptyButton")  ;if a manual trigger is selected and user clicks on the empty star button
+	{
+		; Set this trigger as default
+		Element_setDefaultTrigger(FlowID, selectedElement)
+		UserChangedSomething := true
+	}
+	else if (clickedElement="StarFilledButton")  ;if a manual trigger is selected and user clicks on the filled start button
+	{
+		;Nothing to do, since a flow always must have a default trigger (if it has a manual trigger )
+	}
+	else if (clickedElement!="") ;if user clicked on an element
+	{
+		; check whether user moves the mouse
+		if (!ui_detectMovement()) ;If user did not move the mouse
+		{
+			if (ControlKeyState="d") ;if user presses Control key
+			{
+				; if user holds the control button
+				; select or unselect the clicked item additionally
+				SelectOneItem(clickedElement,true)
+			}
+			else
+			{
+				; select the clicked item and unselect others
+				SelectOneItem(clickedElement) ;mark one element and unmark others
+			}
 		}
 		else ;If user moves the mouse
 		{
-			if (markedElementWithLowestPriority!="") ;If the element under the mouse is already marked
-				ret:=ui_moveSelectedElements() ;move the elements
-			else if ((ControlKeyState!="d")) ;if no elements are marked and user does not press the control key
+			if !instr(selectedElement, "connection") ; do nothing if user drags a connection
 			{
-				MarkOne(clickedElement) ;select the element (and unselect others)
-				ret:=ui_moveSelectedElements() ;Move it
+				if (_getElementProperty(FlowID, clickedElement, "marked")) ;If the element under the mouse is already selected
+				{
+					;move the selected elements
+					ret := ui_moveSelectedElements(clickedElement, partOfclickedElement)
+				}
+				else if ((ControlKeyState!="d")) ;if clicked element is not selected and user does not press the control key
+				{
+					; select the clicked item and unselect others
+					SelectOneItem(clickedElement)
+					;move the selected element
+					ret := ui_moveSelectedElements(clickedElement, partOfclickedElement)
+				}
+				else ;if clicked element is not selected and user presses Control key
+				{
+					; select the clicked item additionally
+					SelectOneItem(clickedElement,true) 
+					;move the selected elements
+					ret := ui_moveSelectedElements(clickedElement, partOfclickedElement)
+				}
+				
+				if (ret.aborted)
+				{
+					; this will undo the action later
+					UserCancelledAction:=true
+				}
+				else if (ret.moved = true) ;if user actually moved the elements
+				{
+					UserChangedSomething := true
+				}
 			}
-			else
-			{
-				MarkOne(clickedElement,true) ;select the element (additionally to others)
-				ret:=ui_moveSelectedElements() ;Move it
-			}
-			
-			if (ret.moved=true) ;if user actually moved the elements
-			{
-				UserDidMinorChange:=true
-			}
-			
-			
-			
 		}
+		; update the satus bar text, which shows the selected element
+		ui_UpdateStatusbartext()
 	}
-	
-	
-	
-	ui_UpdateStatusbartext()
 
-
+	; User finished the interaction.
+	; do last needed tasks after that.
+	endworkingOnClick(UserChangedSomething, UserCancelledAction)	
 }
-;Delete temporary vars
-tempElement1:=""
-tempElement2:=""
-tempElement3:=""
-tempConnection1:=""
-tempConnection2:=""
-clickedElement:=""
-elementHighestPriority:=""
-markedelementWithLowestPriority:=""
-markedelementLowestPriority:=""
-tempNew:=""
-tempOldConnection1from:=""
-tempOldConnection1to:=""
-tempList:=""
 
-endworkingOnClick(UserDidMinorChange, UserDidMajorChange, UserCancelledAction)
 return
 
-endworkingOnClick(minorChange, majorChange, cancelled)
+; Called when user finished an interaction with the gui
+; If user made a change, we need to make a new state
+; If user cancelled the action, we need to undo andy already made changes
+endworkingOnClick(changedSomething, cancelled)
 {
 	global workingOnClick
-	if (cancelled)
+	if (cancelled) ; user cancelled the action
 	{
+		; restorr the current state and undo all eventual changes from user
 		State_RestoreCurrent(FlowID)
-		CreateMarkedList()
+		UpdateSelectedItemsList()
 	}
-	else if (majorChange or minorChange)
+	else if (changedSomething) ; user change something
 	{
-		State_New(FlowID) ;make a new state. If user presses Ctrl+Z, the change will be undone
-	}
-	else if (minorChange)
-	{
-		State_New(FlowID) ;make a new state. If user presses Ctrl+Z, the change will be undone
+		;make a new state. If user presses Ctrl+Z, the change will be undone
+		State_New(FlowID)
 	}
 
+	; redraw the gui
 	API_Draw_Draw(FlowID) 
 
-	workingOnClick:=false
+	; now we can handle a new interaction
+	workingOnClick := false
 	return
 }
 
-
-ui_findElementUnderMouse(par_mode="default")
+; find the element which is under the mouse. Called when user clicks on the picture
+ui_findElementUnderMouse(mx, my, par_filter="", par_priority="highest")
 {
-	global
-	local tempList
-	local drawResultFlow, drawResultElement
-	local clickPriority, marked
-	
-	_EnterCriticalSection()
-	
-	clickedElement:=""
-	elementHighestPriority:=""
-	MarkedElementWithLowestPriority:=""
-	MarkedElementLowestPriority:=""
+	global default_SizeOfButtons
 
+	clickedElement:=""
+	partOfclickedElement:=""
+	elementBestPriority:=""
+	selectedElementWithLowestPriority:=""
+	selectedElementLowestPriority:=""
+
+	; get the information about the locations of the elements in the picture
 	drawResultFlow := _getFlowProperty(FlowID, "DrawResult")
 
-	if (par_mode="default")
+	; define what we search for
+	mode_searchForButtons := true
+	mode_searchForElements := true
+	mode_searchForConnections := true
+	if (par_filter = "OnlyElements")
 	{
-		
-		;look whether user wants to create a new element (click on a field on top left corner)
+		mode_searchForButtons := false
+		mode_searchForConnections := false
+	}
+
+	if (mode_searchForButtons)
+	{
+		;check whether user wants to create a new element (click on a field on top left corner)
 		if ((0 < mx) and (0 < my) and ((drawResultFlow.NewElementIconWidth * 1.2)  > mx) and ((drawResultFlow.NewElementIconHeight * 1.2) > my))
-			clickedElement = MenuCreateNewAction
+			clickedElement := "MenuCreateNewAction"
 		if (((drawResultFlow.NewElementIconWidth * 1.2) < mx) and (0 < my) and ((drawResultFlow.NewElementIconWidth * 1.2 * 2)  > mx) and ((drawResultFlow.NewElementIconHeight * 1.2) > my))
-			clickedElement = MenuCreateNewCondition
+			clickedElement := "MenuCreateNewCondition"
 		if (((drawResultFlow.NewElementIconWidth * 1.2 * 2) < mx) and (0 < my) and ((drawResultFlow.NewElementIconWidth * 1.2 * 3)  > mx) and ((drawResultFlow.NewElementIconHeight * 1.2) > my))
-			clickedElement = MenuCreateNewLoop
+			clickedElement := "MenuCreateNewLoop"
 		if (((drawResultFlow.NewElementIconWidth * 1.2 * 3) < mx) and (0 < my) and ((drawResultFlow.NewElementIconWidth * 1.2 * 4)  > mx) and ((drawResultFlow.NewElementIconHeight * 1.2) > my))
-			clickedElement = MenuCreateNewTrigger
+			clickedElement := "MenuCreateNewTrigger"
 	
 
-		;~ ToolTip % share.PlusButtonExist " -" drawResultFlow.middlePointOfPlusButtonX
-		;~ ToolTip( "gsdd" Sqrt((middlePointOfPlusButtonX - mx)*(middlePointOfPlusButtonX - mx) + (middlePointOfPlusButtonY - my)*(middlePointOfPlusButtonY - my)) "`n middlePointOfPlusButtonX " middlePointOfPlusButtonX "`n middlePointOfPlusButtonY " middlePointOfPlusButtonY)
-		;Look whether user clicked a button
-		if (drawResultFlow.PlusButtonExist=true and Sqrt((drawResultFlow.middlePointOfPlusButtonX - mx) * (drawResultFlow.middlePointOfPlusButtonX - mx) + (drawResultFlow.middlePointOfPlusButtonY - my) * (drawResultFlow.middlePointOfPlusButtonY - my)) < default_SizeOfButtons/2)
-			clickedElement = PlusButton
-		else if (drawResultFlow.PlusButton2Exist=true and Sqrt((drawResultFlow.middlePointOfPlusButton2X - mx) * (drawResultFlow.middlePointOfPlusButton2X - mx) + (drawResultFlow.middlePointOfPlusButton2Y - my) * (drawResultFlow.middlePointOfPlusButton2Y - my)) < default_SizeOfButtons/2)
-			clickedElement = PlusButton2
-		else if (drawResultFlow.EditButtonExist=true and Sqrt((drawResultFlow.middlePointOfEditButtonX  - mx) * (drawResultFlow.middlePointOfEditButtonX - mx) + (drawResultFlow.middlePointOfEditButtonY  - my) * (drawResultFlow.middlePointOfEditButtonY  - my)) < default_SizeOfButtons/2)
-			clickedElement = EditButton
-		else if (drawResultFlow.TrashButtonExist=true and Sqrt((drawResultFlow.middlePointOfTrashButtonX - mx) * (drawResultFlow.middlePointOfTrashButtonX - mx) + (drawResultFlow.middlePointOfTrashButtonY - my) * (drawResultFlow.middlePointOfTrashButtonY - my)) < default_SizeOfButtons/2)
-			clickedElement = TrashButton
-		else if (drawResultFlow.MoveButton2Exist=true and Sqrt((drawResultFlow.middlePointOfMoveButton2X - mx) * (drawResultFlow.middlePointOfMoveButton2X - mx) + (drawResultFlow.middlePointOfMoveButton2Y - my) * (drawResultFlow.middlePointOfMoveButton2Y - my)) < default_SizeOfButtons/2)
-			clickedElement = MoveButton2
-		else if (drawResultFlow.MoveButton1Exist=true and Sqrt((drawResultFlow.middlePointOfMoveButton1X - mx) * (drawResultFlow.middlePointOfMoveButton1X - mx) + (drawResultFlow.middlePointOfMoveButton1Y - my) * (drawResultFlow.middlePointOfMoveButton1Y - my)) < default_SizeOfButtons/2)
-			clickedElement = MoveButton1		
-		else if (drawResultFlow.SwitchOnButtonExist=true and (drawResultFlow.PosOfSwitchOnButtonX1 < mx) and (drawResultFlow.PosOfSwitchOnButtonX2 > mx) and (drawResultFlow.PosOfSwitchOnButtonY1 < my) and (drawResultFlow.PosOfSwitchOnButtonY2 > my) )
-			clickedElement = SwitchOnButton	
-		else if (drawResultFlow.SwitchOffButtonExist=true and (drawResultFlow.PosOfSwitchOffButtonX1 < mx) and (drawResultFlow.PosOfSwitchOffButtonX2 > mx) and (drawResultFlow.PosOfSwitchOffButtonY1 < my) and (drawResultFlow.PosOfSwitchOffButtonY2 > my) )
-			clickedElement = SwitchOffButton		
-		else if (drawResultFlow.StarFilledButtonExist=true and (drawResultFlow.PosOfStarFilledButtonX1 < mx) and (drawResultFlow.PosOfStarFilledButtonX2 > mx) and (drawResultFlow.PosOfStarFilledButtonY1 < my) and (drawResultFlow.PosOfStarFilledButtonY2 > my) )
-			clickedElement = StarFilledButton	
-		else if (drawResultFlow.StarEmptyButtonExist=true and (drawResultFlow.PosOfStarEmptyButtonX1 < mx) and (drawResultFlow.PosOfStarEmptyButtonX2 > mx) and (drawResultFlow.PosOfStarEmptyButtonY1 < my) and (drawResultFlow.PosOfStarEmptyButtonY2 > my) )
-			clickedElement = StarEmptyButton
+		;check whether user clicked a button near to the selected element
+		if (drawResultFlow.PlusButtonExist and Sqrt((drawResultFlow.middlePointOfPlusButtonX - mx) * (drawResultFlow.middlePointOfPlusButtonX - mx) + (drawResultFlow.middlePointOfPlusButtonY - my) * (drawResultFlow.middlePointOfPlusButtonY - my)) < default_SizeOfButtons/2)
+			clickedElement := "PlusButton"
+		else if (drawResultFlow.PlusButton2Exist and Sqrt((drawResultFlow.middlePointOfPlusButton2X - mx) * (drawResultFlow.middlePointOfPlusButton2X - mx) + (drawResultFlow.middlePointOfPlusButton2Y - my) * (drawResultFlow.middlePointOfPlusButton2Y - my)) < default_SizeOfButtons/2)
+			clickedElement := "PlusButton2"
+		else if (drawResultFlow.EditButtonExist and Sqrt((drawResultFlow.middlePointOfEditButtonX  - mx) * (drawResultFlow.middlePointOfEditButtonX - mx) + (drawResultFlow.middlePointOfEditButtonY  - my) * (drawResultFlow.middlePointOfEditButtonY  - my)) < default_SizeOfButtons/2)
+			clickedElement := "EditButton"
+		else if (drawResultFlow.TrashButtonExist and Sqrt((drawResultFlow.middlePointOfTrashButtonX - mx) * (drawResultFlow.middlePointOfTrashButtonX - mx) + (drawResultFlow.middlePointOfTrashButtonY - my) * (drawResultFlow.middlePointOfTrashButtonY - my)) < default_SizeOfButtons/2)
+			clickedElement := "TrashButton"
+		else if (drawResultFlow.MoveButton2Exist and Sqrt((drawResultFlow.middlePointOfMoveButton2X - mx) * (drawResultFlow.middlePointOfMoveButton2X - mx) + (drawResultFlow.middlePointOfMoveButton2Y - my) * (drawResultFlow.middlePointOfMoveButton2Y - my)) < default_SizeOfButtons/2)
+			clickedElement := "MoveButton2"
+		else if (drawResultFlow.MoveButton1Exist and Sqrt((drawResultFlow.middlePointOfMoveButton1X - mx) * (drawResultFlow.middlePointOfMoveButton1X - mx) + (drawResultFlow.middlePointOfMoveButton1Y - my) * (drawResultFlow.middlePointOfMoveButton1Y - my)) < default_SizeOfButtons/2)
+			clickedElement := "MoveButton1"		
+		else if (drawResultFlow.SwitchOnButtonExist and (drawResultFlow.PosOfSwitchOnButtonX1 < mx) and (drawResultFlow.PosOfSwitchOnButtonX2 > mx) and (drawResultFlow.PosOfSwitchOnButtonY1 < my) and (drawResultFlow.PosOfSwitchOnButtonY2 > my) )
+			clickedElement := "SwitchOnButton"	
+		else if (drawResultFlow.SwitchOffButtonExist and (drawResultFlow.PosOfSwitchOffButtonX1 < mx) and (drawResultFlow.PosOfSwitchOffButtonX2 > mx) and (drawResultFlow.PosOfSwitchOffButtonY1 < my) and (drawResultFlow.PosOfSwitchOffButtonY2 > my) )
+			clickedElement := "SwitchOffButton"		
+		else if (drawResultFlow.StarFilledButtonExist and (drawResultFlow.PosOfStarFilledButtonX1 < mx) and (drawResultFlow.PosOfStarFilledButtonX2 > mx) and (drawResultFlow.PosOfStarFilledButtonY1 < my) and (drawResultFlow.PosOfStarFilledButtonY2 > my) )
+			clickedElement := "StarFilledButton"	
+		else if (drawResultFlow.StarEmptyButtonExist and (drawResultFlow.PosOfStarEmptyButtonX1 < mx) and (drawResultFlow.PosOfStarEmptyButtonX2 > mx) and (drawResultFlow.PosOfStarEmptyButtonY1 < my) and (drawResultFlow.PosOfStarEmptyButtonY2 > my) )
+			clickedElement := "StarEmptyButton"
 	}
-	;~ ToolTip %par_mode% -- %clickedElement%
-	;~ d(drawResultFlow, mx "  -  " my " - " Sqrt((drawResultFlow.middlePointOfPlusButtonX - mx) * (drawResultFlow.middlePointOfPlusButtonX - mx) + (drawResultFlow.middlePointOfPlusButtonY - my) * (drawResultFlow.middlePointOfPlusButtonY - my)))
-	;search for an element
-	if (clickedElement="")
+	
+	;nothing found yet, search for an element under the mouse cursor
+	if (mode_searchForElements and not clickedElement)
 	{
-		elementHighestPriority=0 ;The highest priority decides which element will be selected. The priority reduces a little bit when the element was selected, and increases every time the user clicks on it but something else is selected. This way it is possible to click through the elements which overlap each other.
-		MarkedElementLowestPriority=100000
+		;The highest priority decides which element will be selected.
+		;The priority reduces a little bit when the element was selected, and increases every time the user clicks on it but something else is selected.
+		;This way it is possible to click through the elements which overlap each other.
+		elementBestPriority := par_priority = "highest" ? 0 : 1000000
+
+		; loop though all elements
 		for forElementIndex, forElementID in _getAllElementIds(FlowID)
 		{
-			drawResultElement:=drawResultFlow.elements[forElementID]
+			; get the position data of the element
+			drawResultElement := drawResultFlow.elements[forElementID]
+			; get additional data
 			clickPriority := _getElementProperty(FlowId, forElementID, "ClickPriority")
 			marked := _getElementProperty(FlowId, forElementID, "marked")
 
-			Loop % drawResultElement.CountOfParts ;Some elements consist of multiple parts
+			;Some elements consist of multiple parts, so we need to loop through all of them
+			found := false
+			Loop % drawResultElement.CountOfParts
 			{
-				;~ ToolTip(strobj(forElement),10000)
-				;~ MsgBox %mx% %my%
+				; check position
 				if (drawResultElement["part" a_index "x1"] < mx and drawResultElement["part" a_index "y1"] < my and drawResultElement["part" a_index "x2"] > mx and drawResultElement["part" a_index "y2"] > my)
 				{
-					if (elementHighestPriority < clickPriority) ;Find the element with highest priority
-					{
-						;~ SoundBeep , % forElement.ClickPriority
-						elementHighestPriority:=clickPriority
-						partOfclickedElement:=A_Index
-						clickedElement:=forElementID
-					}
-					if (marked = true and MarkedElementLowestPriority > clickPriority) ;Find a marked element with lowest priority
-					{
-						MarkedElementLowestPriority:=clickPriority
-						partOfmarkedElementWithLowestPriority:=A_Index
-						MarkedElementWithLowestPriority:=forElementID
-					}
-					
+					; element is under the mouse cursor
+					found := true
+					foundPart := A_Index
 				}
 			}
-			if (par_mode="default")
+			if (found) ; if this element is under the mouse cursor
 			{
-				if (clickPriority < 500 and clickPriority >= 490) ;Increase priority if element has low priority.
+				;Check whether we already found an other element with higher priority
+				if ((par_priority = "highest" and elementBestPriority < clickPriority) or (par_priority = "lowest" and elementBestPriority > clickPriority))
 				{
-					_getAndIncrementElementProperty(FlowID, forElementID, "ClickPriority")
+					elementBestPriority := clickPriority
+					partOfclickedElement := foundPart
+					clickedElement := forElementID
 				}
 			}
-		}
-		
-		
-		if (par_mode="default" and clickedElement != "")
-		{
-			clickPriority := _getElementProperty(FlowId, clickedElement, "ClickPriority")
-			if (clickPriority<=500 and clickPriority >=490) ;reduce the priority of selected element
+
+			;Increase priority
+			if (clickPriority < 500)
 			{
-				_setElementProperty(FlowID, clickedElement, "ClickPriority", 490)
+				_getAndIncrementElementProperty(FlowID, forElementID, "ClickPriority")
 			}
 		}
-		;msgbox,clickedElement. : clickHighestPriority
+		
+		; set the priority of the found element to a lower value
+		if (clickedElement != "")
+		{
+			_setElementProperty(FlowID, clickedElement, "ClickPriority", 490)
+		}
 	}
 	
 	
-	;search for a connection
-	if (par_mode="default" and clickedElement="")
+	;nothing found yet, search for a connection under the mouse cursor
+	if (mode_searchForConnections and clickedElement="")
 	{
-		elementHighestPriority := 0 ;The highest priority decides which element will be selected. The priority reduces a little bit when the element was selected, and increases every time the user clicks on it but something else is selected. This way it is possible to click through the elements whith are beneath each other.
+		; Same as elements, we select the element with highest priority
+		elementBestPriority := par_priority = "highest" ? 0 : 1000000
 		
+		; loop though all connections
 		for forElementIndex, forElementID in _getAllConnectionIds(FlowID)
 		{
+			; get the position data of the element
 			drawResultElement:=drawResultFlow.elements[forElementID]
 
-			clickPriority := _getElementProperty(FlowId, forElementID, "ClickPriority")
+			; get additional data
+			clickPriority := _getConnectionProperty(FlowId, forElementID, "ClickPriority")
 
-			;~ MsgBox % forID " - " forElement.CountOfParts 
-			Loop % drawResultElement.CountOfParts ;Connections consist of multiple parts
+			;Connections consist of multiple parts, so we need to loop through all of them
+			found := false
+			Loop % drawResultElement.CountOfParts
 			{
+				; check position
 				if (drawResultElement["part" a_index "x1"] < mx and drawResultElement["part" a_index "y1"] < my and drawResultElement["part" a_index "x2"] > mx and drawResultElement["part" a_index "y2"] > my)
 				{
-					if (elementHighestPriority < clickPriority) ;find the element with highest priority
-					{
-						elementHighestPriority:=clickPriority
-						partOfclickedElement:=A_Index
-						clickedElement:=forElementID
-					}
-					
+					; connection is under the mouse cursor
+					found := true
+					foundPart := A_Index
 				}
 			}
-			;~ ToolTip, % forElement.ClickPriority 
-			if (clickPriority < 200 and clickPriority >= 190) ;Increase priority if element has low priority. 
+			
+			if (found) ; if this connection is under the mouse cursor
+			{
+				;Check whether we already found an other connection with higher priority
+				if ((par_priority = "highest" and elementBestPriority < clickPriority) or (par_priority = "lowest" and elementBestPriority > clickPriority))
+				{
+					elementBestPriority := clickPriority
+					partOfclickedElement := foundPart
+					clickedElement := forElementID
+				}
+			}
+
+			;Increase priority
+			if (clickPriority < 200) ;Increase priority if connection has low priority. 
 			{
 				_getAndIncrementConnectionProperty(FlowID, forElementID, "ClickPriority")
 			}
 		}
 		
-		_setConnectionProperty(FlowID, clickedElement, "ClickPriority", 190)
-		
+		; set the priority of the found connection to a lower value
+		if (clickedElement)
+		{
+			_setConnectionProperty(FlowID, clickedElement, "ClickPriority", 190)
+		}
+
 	}
 	
-	_LeaveCriticalSection()
-	
-	return clickedElement
+	return {element: clickedElement, part: partOfclickedElement}
 }
 
-
-ui_moveSelectedElements(option="")
+; move the selected elements
+ui_moveSelectedElements(clickedElement, partOfclickedElement = "", option="")
 {
-	global
-	local oldHeightOfVerticalBar, k, clickMoved, howMuchMoved, newmx1, newmy1, newmx, newmy, newposy, newposx
-	local forElement, forIndex
-	
-	local toMoveEelement
-	if (markedElementWithLowestPriority != "")
-		toMoveEelement := markedElementWithLowestPriority
-	else
-		toMoveEelement := clickedElement
+	global default_Gridy
 
-	;~ ToolTip move %toMoveEelement%
-	local MovementAborted := false
-	local oldposx := _getElementProperty(FlowID, toMoveEelement, "x") ;Store the old position of the element
-	local firstposx := oldposx
-	local firstoffsetx := _getFlowProperty(FlowID, "flowSettings.offsetx")
-	local firstmx := mx
-	local oldposy := _getElementProperty(FlowID, toMoveEelement, "y") ;Store the old position of the element
-	local firstposy := oldposy
-	local firstoffsety := _getFlowProperty(FlowID, "flowSettings.offsety")
-	local firstmy := my
-	local elementType := _getElementProperty(FlowID, toMoveEelement, "type") 
-	;~ ToolTip move %clickedElement%
-	clickMoved:=false
-	howMuchMoved:=0
+	; get some information about the location of the element
+	oldposx := _getElementProperty(FlowID, clickedElement, "x") ;Store the old position of the element
+	firstposx := oldposx
+	firstoffsetx := _getFlowProperty(FlowID, "flowSettings.offsetx")
+	firstmx := mx
+	oldposy := _getElementProperty(FlowID, clickedElement, "y") ;Store the old position of the element
+	firstposy := oldposy
+	firstoffsety := _getFlowProperty(FlowID, "flowSettings.offsety")
+	firstmy := my
+	elementType := _getElementProperty(FlowID, clickedElement, "type") 
+
+	; get the initial mouse position
+	MouseGetPos, firstmx, firstmy
+
+	; create variables which will be returned
+	moved:=false
 	MovementAborted:=false
 	
-	UserClickedRbutton:=false
-	
-	UserCurrentlyMovesAnElement:=true ;Prevents that, if user scroll simultanously, the scroll function will call API_Draw_Draw().
-	if (markedElement!= "" && elementType = "loop" && partOfclickedElement>=3) ;If a loop is selected and user moves its tail
+	; check whether we need to move the tail of a loop.
+	; if the loop is the only selected element && this is a loop && user clicked on the tail (which is part 3 & 4)
+	if (_getFlowProperty(FlowID, "selectedElement") = clickedElement && elementType = "loop" && partOfclickedElement>=3)
 	{
-		local oldHeightOfVerticalBar := _getElementProperty(FlowID, toMoveEelement, "HeightOfVerticalBar")
-		local newHeightOfVerticalBar
+		; get old height of the vertical bar
+		oldHeightOfVerticalBar := _getElementProperty(FlowID, clickedElement, "HeightOfVerticalBar")
 		
-		UserClickedRbutton:=false
 		Loop ;Move element(s)
 		{
-			
-			GetKeyState,k,lbutton,p ;When mouse releases, the element(s) will be fittet to the Grid
-			if (option!= "InvertLbutton" and k!="d" or option= "InvertLbutton" and k="d")
+			; check whether user holds the left mouse button (or does not if inverted)
+			lbuttonDown := getkeystate("lbutton","P")
+			if (option != "InvertLbutton" and !lbuttonDown or option = "InvertLbutton" and lbuttonDown)
 			{
-				if howMuchMoved>0
+				; user released the mouse button. We kan drop the elements now
+				;Fit the element position to grid
+				newHeightOfVerticalBar := _getElementProperty(FlowID, clickedElement, "HeightOfVerticalBar")
+				newHeightOfVerticalBar := ui_FitGridx(newHeightOfVerticalBar)
+				_setElementProperty(FlowID, clickedElement, "HeightOfVerticalBar", newHeightOfVerticalBar)
+				
+				; check whether the position has changed after all
+				if (newHeightOfVerticalBar != oldHeightOfVerticalBar)
+					moved := true
+				
+				; redraw the picture
+				API_Draw_Draw(FlowID)
+			
+				break
+			}
+			; check whether user holds escape button to cancel the movement
+			if (getkeystate("esc","P"))
+			{
+				; set the return value, which should trigger an undo later
+				moved := false
+				MovementAborted := true
+				break
+			}
+			; check whether user holds the right button to either cancel the movement or to scroll
+			if (getkeystate("rbutton", "P")) ;If user cancels movement, move back
+			{
+				if (ui_detectMovement(,"rbutton"))
 				{
-					;Fit to grid
-					newHeightOfVerticalBar := _getElementProperty(FlowID, toMoveEelement, "HeightOfVerticalBar")
-					newHeightOfVerticalBar := ui_FitGridx(newHeightOfVerticalBar)
-					_setElementProperty(FlowID, toMoveEelement, "HeightOfVerticalBar", newHeightOfVerticalBar)
-					
-					if (newHeightOfVerticalBar != oldHeightOfVerticalBar)
-						clickMoved:=true
-					
-					API_Draw_Draw(FlowID)
+					; user drags with the right mouse button. We will scroll
+					ui_scrollwithMouse("rbutton")
 				}
-				
-				
-				break
-				
-			}
-			if (UserClickedRbutton or getkeystate("esc","P")) ;If user cancels movement, move back
-			{
-				_setElementProperty(FlowID, toMoveEelement, "HeightOfVerticalBar", oldHeightOfVerticalBar)
-				MovementAborted:=true
-				API_Draw_Draw(FlowID)
-				break
+				else
+				{
+					; user did not drag. We will cancel movement
+					; set the return value, which should trigger an undo later
+					moved := false
+					MovementAborted := true
+					break
+				}
 			}
 			
-			MouseGetPos,newmx,newmy ;get mouse position and calculate the new position of the element
-			if (newmx!=oldposx OR newmy!=oldposy) ;If mouse is currently moving
+			;get mouse position and calculate the new position of the element
+			MouseGetPos, newmx, newmy
+			if (newmx != oldposx OR newmy != oldposy) ;If mouse position has changed
 			{
-				oldposx:=newmx
-				oldposy:=newmy
-				local zoomfactor := _getFlowProperty(FlowID, "flowSettings.zoomfactor")
-				local offsety := _getFlowProperty(FlowID, "flowSettings.offsety")
-				
-				newHeightOfVerticalBar := (oldHeightOfVerticalBar + (newmy - my) / zoomfactor) - firstoffsety + offsety
-				if (newHeightOfVerticalBar < Gridy*2)
-					newHeightOfVerticalBar := Gridy*2
-				_setElementProperty(FlowID, toMoveEelement, "HeightOfVerticalBar", newHeightOfVerticalBar)
+				; keep old mouse position in mind
+				oldposx := newmx
+				oldposy := newmy
 
-				howMuchMoved++
+				; get zoom factor and offset (user can change that while he is moving the elements)
+				zoomfactor := _getFlowProperty(FlowID, "flowSettings.zoomfactor")
+				offsety := _getFlowProperty(FlowID, "flowSettings.offsety")
 				
+				; calculate the new height of the vertical bar
+				newHeightOfVerticalBar := (oldHeightOfVerticalBar + (newmy - firstmy) / zoomfactor) - firstoffsety + offsety
+				if (newHeightOfVerticalBar < default_Gridy*2)
+					newHeightOfVerticalBar := default_Gridy*2
+
+				; write the new height
+				_setElementProperty(FlowID, clickedElement, "HeightOfVerticalBar", newHeightOfVerticalBar)
+				
+				; redraw
 				API_Draw_Draw(FlowID)
 			}
-			else ;If mouse is not currently moving
+			else ;If mouse is currently not moving
 			{
 				sleep,10 ;Save processor load
 			}
@@ -711,93 +773,108 @@ ui_moveSelectedElements(option="")
 		}
 		
 	}
-	else
+	else ; we do not move a loop tail, so we move the elements normally
 	{
-		local markedElements := _getFlowProperty(FlowID, "markedElements")
-		local oldElementsPos := object()
+		; get all selected elements
+		selectedElements := _getFlowProperty(FlowID, "selectedElements")
 
-		for forIndex, forElementID in markedElements  ;Preparing to move
+		; save the old positions of all elements
+		oldElementsPos := object()
+		for forIndex, forElementID in selectedElements  ;Preparing to move
 		{
 			oldElementsPos[forElementID] := Object()
 			oldElementsPos[forElementID].x := _getElementProperty(FlowID, forElementID, "x")
 			oldElementsPos[forElementID].y := _getElementProperty(FlowID, forElementID, "y")
 		}
 
-		UserClickedRbutton:=false
 		Loop ;Move element(s)
 		{
-			
-			GetKeyState,k,lbutton,p ;When mouse releases, the element(s) will be fittet to the Grid
-			if (option!= "InvertLbutton" and k!="d" or option= "InvertLbutton" and k="d")
+			; check whether user holds the left mouse button (or does not if inverted)
+			lbuttonDown := getkeystate("lbutton","P")
+			if (option != "InvertLbutton" and !lbuttonDown or option = "InvertLbutton" and lbuttonDown)
 			{
-				if howMuchMoved>0
+				; user released the mouse button. We kan drop the elements now
+				;loop through all selected elements
+				for forIndex, forElementID in selectedElements
 				{
-					;Fit to grid
-					for forIndex, forElementID in markedElements
-					{
-						newposx := ui_FitGridX(newposx)
-						newposy := ui_FitGridX(newposy)
-						_setElementProperty(FlowID, forElementID, "x", newposx)
-						_setElementProperty(FlowID, forElementID, "y", newposy)
-						
-						if (oldElementsPos[forElementID].x != newposx or oldElementsPos[forElementID].y != newposy)
-							clickMoved:=true
-					}
-					
-					API_Draw_Draw(FlowID)
-				}
-				
-				
-				break
-				
-			}
-			if (UserClickedRbutton or getkeystate("esc","P")) ;If user cancels movement, move back
-			{
-				for forIndex, forElementID in markedElements
-				{
-					_setElementProperty(FlowID, forElementID, "x", oldElementsPos[forElementID].x)
-					_setElementProperty(FlowID, forElementID, "y", oldElementsPos[forElementID].y)
-				}
-				MovementAborted:=true
-				;~ SoundBeep
-				API_Draw_Draw(FlowID)
-				break
-			}
-			
-			MouseGetPos,newmx,newmy ;get mouse position and calculate the new position of the element
-			
-			if (newmx!=oldposx OR newmy!=oldposy) ;If mouse is currently moving
-			{
-				local zoomfactor := _getFlowProperty(FlowID, "flowSettings.zoomfactor")
-				local offsetx := _getFlowProperty(FlowID, "flowSettings.offsetx")
-				local offsety := _getFlowProperty(FlowID, "flowSettings.offsety")
-
-				oldposx:=newmx
-				oldposy:=newmy
-				for forIndex, forElementID in markedElements
-				{
-					newposx:=(oldElementsPos[forElementID].x + (newmx - firstmx) / zoomfactor) - firstoffsetx + offsetx
-					newposy:=(oldElementsPos[forElementID].y + (newmy - firstmy) / zoomfactor) - firstoffsety + offsety
+					;Fit the element position to grid
+					newposx := ui_FitGridX(_getElementProperty(FlowID, forElementID, "x"))
+					newposy := ui_FitGridX(_getElementProperty(FlowID, forElementID, "y"))
 					_setElementProperty(FlowID, forElementID, "x", newposx)
 					_setElementProperty(FlowID, forElementID, "y", newposy)
 					
+					; check whether the position has changed after all
+					if (oldElementsPos[forElementID].x != newposx or oldElementsPos[forElementID].y != newposy)
+						moved := true
 				}
 				
-				howMuchMoved++
+				; redraw the picture
+				API_Draw_Draw(FlowID)
+				
+				break
+			}
+			
+			; check whether user holds escape button to cancel the movement
+			if (getkeystate("esc","P"))
+			{
+				; set the return value, which should trigger an undo later
+				moved := false
+				MovementAborted := true
+				break
+			}
+			; check whether user holds the right button to either cancel the movement or to scroll
+			if (getkeystate("rbutton","P")) ;If user cancels movement, move back
+			{
+				if (ui_detectMovement(,"rbutton"))
+				{
+					; user drags with the right mouse button. We will scroll
+					ui_scrollwithMouse("rbutton")
+				}
+				else
+				{
+					; user did not drag. We will cancel movement
+					; set the return value, which should trigger an undo later
+					moved := false
+					MovementAborted := true
+					break
+				}
+			}
+			
+			;get mouse position and calculate the new position of the element
+			MouseGetPos, newmx, newmy ;get mouse position and calculate the new position of the element
+			if (newmx != oldposx OR newmy != oldposy) ;If mouse is currently moving
+			{
+				; keep old mouse position in mind
+				oldposx:=newmx
+				oldposy:=newmy
+				
+				; get zoom factor and offset (user can change that while he is moving the elements)
+				zoomfactor := _getFlowProperty(FlowID, "flowSettings.zoomfactor")
+				offsetx := _getFlowProperty(FlowID, "flowSettings.offsetx")
+				offsety := _getFlowProperty(FlowID, "flowSettings.offsety")
+				;loop through all selected elements to move them all
+				for forIndex, forElementID in selectedElements
+				{
+					; calculate the new position of the element
+					newposx := (oldElementsPos[forElementID].x + (newmx - firstmx) / zoomfactor) - firstoffsetx + offsetx
+					newposy := (oldElementsPos[forElementID].y + (newmy - firstmy) / zoomfactor) - firstoffsety + offsety
+					
+					; write the new position of the element
+					_setElementProperty(FlowID, forElementID, "x", newposx)
+					_setElementProperty(FlowID, forElementID, "y", newposy)
+				}
+
+				; redraw
 				API_Draw_Draw(FlowID)
 			}
 			else ;If mouse is not currently moving
 			{
 				sleep,10 ;Save processor load
 			}
-			
-			
 		}
 		
-		;~ ToolTip end move
 	}
-	UserCurrentlyMovesAnElement:=false
-	return {moved:clickMoved, HowMuchMoved:howMuchMoved, Aborted: MovementAborted}
+	return {moved:moved, Aborted: MovementAborted}
 }
 
 ui_detectMovement(threshold=2,button="lbutton")
@@ -831,7 +908,7 @@ ui_detectMovement(threshold=2,button="lbutton")
 		
 		sleep,10 ;Save processor load
 	}
-	return clickMoved
+	return false
 	
 }
 
@@ -861,73 +938,58 @@ ui_detectMovementWithoutBlocking(threshold=1)
 	
 }
 
-
-ui_scrollwithMouse(button="lbutton")
+; scroll the screen with the mouse
+ui_scrollwithMouse(ScrollButton="lbutton")
 {
-	global
-	local newmy
-	local newmy
-	local newposx
-	local newposy
-	local oldposx
-	local oldposy
-	local howMuchMoved
+	;Store the first offset position
+	zoomfactor := _getFlowProperty(FlowID, "flowSettings.zoomfactor")
+	firstOffsetx := _getFlowProperty(FlowID, "flowSettings.offsetx")
+	firstOffsety := _getFlowProperty(FlowID, "flowSettings.offsety")
+	
+	;Get the initial mouse position
+	MouseGetPos, firstmx, firstmy
 
-	 ;Store the first offset position
-	ScrollZoomfactor := _getFlowProperty(FlowID, "flowSettings.zoomfactor")
-	ScrollFirstPosx := _getFlowProperty(FlowID, "flowSettings.offsetx")
-	ScrollFirstPosy := _getFlowProperty(FlowID, "flowSettings.offsety")
-
-	local mx
-	local my
+	somethingScrolled := false
 	
-	MouseGetPos,mx,my ;Get the mouse position
-	
-	ScrollFirstmx:=mx
-	ScrollFirstmy:=my
-	
-	ScrollButton:=button
-	
-	SetTimer,ScrollWithMouseTimer,30
-	
-	return
-	
-	ScrollWithMouseTimer:
-	;~ SoundBeep 500
-	;~ GetKeyState,LbuttonKeyState,%ScrollButton%,p
-	if (not getkeystate(ScrollButton))
+	loop
 	{
-		ui_UpdateStatusbartext("pos")
-		if (UserCurrentlyMovesAnElement!=true)
+		; check whether user released the button
+		if (not getkeystate(ScrollButton))
+		{
+			; user released the button. Stop scrolling
+			; redraw and update status bar
+			ui_UpdateStatusbartext("pos")
 			API_Draw_Draw(FlowID)
-		SetTimer,ScrollWithMouseTimer,off
-		return
-	}
-	
-	MouseGetPos,newmx,newmy ;Get mouse position and calculate
-	newposx:=(ScrollFirstPosx-(newmx-ScrollFirstmx)/ScrollZoomfactor)
-	newposy:=(ScrollFirstPosy-(newmy-ScrollFirstmy)/ScrollZoomfactor)
-	
-	if (newposx!=ScrollOldPosx OR newposy!=ScrollOldPosy) ;If mouse is moving currently
-	{
-		;~ SoundBeep 1000
-		ScrollOldPosx:=newposx
-		ScrollOldPosy:=newposy
-		_setFlowProperty(FlowID, "flowSettings.Offsetx", newposx)
-		_setFlowProperty(FlowID, "flowSettings.Offsety", newposy)
+			break
+		}
 		
-		ui_UpdateStatusbartext("pos")
-		if (UserCurrentlyMovesAnElement!=true) ;it is true if user currently pulls something else and scrolls simultanously. Calling API_Draw_Draw() while an other instance of it is interrupted can cause problems
+		;Get mouse position and calculate
+		MouseGetPos,newmx,newmy
+
+		; calculate the new offsets
+		newOffsetx := (firstOffsetx - (newmx - firstmx) / zoomfactor)
+		newOffsety := (firstOffsety - (newmy - firstmy) / zoomfactor)
+		
+		if (newposx != oldOffsetx OR newOffsety != oldOffsety) ;If mouse is moving currently
+		{
+			; keep the new offset in mind
+			oldOffsetx := newOffsetx
+			oldOffsety := newOffsety
+
+			; write the new offset
+			_setFlowProperty(FlowID, "flowSettings.Offsetx", newOffsetx)
+			_setFlowProperty(FlowID, "flowSettings.Offsety", newOffsety)
+			
+			; redraw and update status bar
+			ui_UpdateStatusbartext("pos")
 			API_Draw_Draw(FlowID)
-		Scrollhasscrolled:=true
-		;~ ToolTip scroll
+
+			somethingScrolled := true
+		}
+		sleep,10 ;Save processor load
 	}
-	;~ else
-		;~ ToolTip noscroll
 	
-	
-	return
-	
+	return somethingScrolled
 }
 
 
@@ -941,12 +1003,12 @@ ui_MoveConnection(connection1="", connection2="", element1="", element2="")
 	local tempx, tempy, zoomfactor, offsetx, offsety
 	
 	;move elements to mouse
-	UnmarkEverything()
+	UnSelectEverything()
 	if (connection1!="")
-		markOne(connection1)
+		SelectOneItem(connection1)
 	
 	if (connection2!="")
-		markOne(connection2,true)
+		SelectOneItem(connection2,true)
 	
 	connection1From := _getConnectionProperty(FlowID, connection1, "from")
 	connection1To := _getConnectionProperty(FlowID, connection1, "to")
@@ -978,7 +1040,6 @@ ui_MoveConnection(connection1="", connection2="", element1="", element2="")
 		connection1To := "MOUSE"  ;The end position should follow the mouse
 	}
 	
-	;~ ToolTip(strobj(connection1) "`n`n" strobj(connection2),10000)
 	_setFlowProperty(FlowID, "draw.DrawMoveButtonUnderMouse", true)
 	
 	if (ui_detectMovement()) ;If user moves the mouse
@@ -989,7 +1050,6 @@ ui_MoveConnection(connection1="", connection2="", element1="", element2="")
 	;Wait until user releases the mouse and add an element there
 	;The connections follow the mouse
 	UserClickedRbutton:=false
-	UserCurrentlyMovesAnElement:=true
 
 	; Wait until user defines the designated position
 	Loop
@@ -1010,7 +1070,6 @@ ui_MoveConnection(connection1="", connection2="", element1="", element2="")
 		sleep 10 ;reduce CPU load
 		
 	}
-	UserCurrentlyMovesAnElement:=false
 	
 	_setFlowProperty(FlowID, "draw.DrawMoveButtonUnderMouse", false)
 	
@@ -1020,7 +1079,9 @@ ui_MoveConnection(connection1="", connection2="", element1="", element2="")
 	MouseGetPos,mx,my ;Get the mouse position
 	
 	
-	ui_findElementUnderMouse("OnlyElements") ;Search an element beneath the mouse.
+	clickedItem := ui_findElementUnderMouse(mx, my, "OnlyElements", "lowest") ;Search an element beneath the mouse.
+	clickedElement := clickedElement.element
+	partOfclickedElement := clickedElement.part
 	
 	
 	if (clickedElement="") ;If user pulled the end of the connection to empty space. Create new element
@@ -1061,7 +1122,7 @@ ui_MoveConnection(connection1="", connection2="", element1="", element2="")
 		if abortAddingElement
 			return "aborted"
 		
-		MarkOne(newElement)
+		SelectOneItem(newElement)
 		clickedElement:=newElement
 		
 		ret:=selectSubType(newElement,"Wait")
@@ -1115,7 +1176,7 @@ ui_MoveConnection(connection1="", connection2="", element1="", element2="")
 			return "aborted"
 		
 		if (Connection1!="" and Connection2!="") ;if user has split a connection and connected an other element inbetween
-			markOne(NewElement)
+			SelectOneItem(NewElement)
 		;else keep the new or modified connection marked
 		
 	}
@@ -1319,11 +1380,11 @@ if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of t
 }
 
  ;remove all marked elements
-for markindex, markelement in _getFlowProperty(FlowID, "markedElements") 
+for markindex, markelement in _getFlowProperty(FlowID, "selectedElements") 
 {
 	Element_Remove(FlowID, markelement)
 }
-CreateMarkedList()
+UpdateSelectedItemsList()
 ;e_CorrectElementErrors("Code: 354546841.")
 State_New(FlowID)
 ui_UpdateStatusbartext()
@@ -1424,20 +1485,19 @@ ret := SaveToClipboard()
 if (ret = 0)
 { 	
 	;Delete all marked elements
-	markedElementscopy := _getFlowProperty(FlowID, "markedElements") 
+	selectedElementscopy := _getFlowProperty(FlowID, "selectedElements") 
 
-	for markID, markelement in _getFlowProperty(FlowID, "markedElements") 
+	for markID, markelement in _getFlowProperty(FlowID, "selectedElements") 
 	{
 		;remove all marked elements
 		Element_Remove(FlowID, markelement)
 	}
-	markedElementscopy:=""
+	selectedElementscopy:=""
 	
 	State_New(FlowID)
 	ui_UpdateStatusbartext()
 	API_Draw_Draw(FlowID)
 }
-;ToolTip("Control + X pressed")
 return
 
 ctrl_c:
@@ -1446,7 +1506,6 @@ if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of t
 	ui_ActionWhenMainGUIDisabled()
 	return
 }
-;ToolTip("Control + C pressed")
 SaveToClipboard()
 return
 
@@ -1456,7 +1515,6 @@ if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of t
 	ui_ActionWhenMainGUIDisabled()
 	return
 }
-;ToolTip("Control + V pressed")
 loadFromClipboard()
 return
 
@@ -1476,7 +1534,7 @@ if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of t
 	return
 }
 State_Undo(FlowID)
-CreateMarkedList()
+UpdateSelectedItemsList()
 API_Draw_Draw(FlowID)
 return
 ctrl_y:
@@ -1495,8 +1553,8 @@ if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of t
 	ui_ActionWhenMainGUIDisabled()
 	return
 }
-UnmarkEverything()
-MarkEverything()
+UnSelectEverything()
+SelectEverything()
 API_Draw_Draw(FlowID)
 return
 

@@ -255,18 +255,18 @@ ui_UpdateStatusbartext(which="")
 	if (which!="pos")
 	{
 		; update element text if not only the position needs to be updated
-		markedElements := _getFlowProperty(FlowID, "markedElements")
-		if (markedElements.count()=0)
+		selectedElements := _getFlowProperty(FlowID, "selectedElements")
+		if (selectedElements.count()=0)
 		{
 			elementtext:=lang("%1% elements", _getAllElementIds(FlowID).count())
 		}
-		else if (markedElements.count()=1)
+		else if (selectedElements.count()=1)
 		{
-			elementtext:=lang("1 marked element: %1%",_getFlowProperty(FlowID, "markedElement"))
+			elementtext:=lang("1 marked element: %1%",_getFlowProperty(FlowID, "selectedElement"))
 		}
 		else
 		{
-			elementtext:=lang("%1% marked elements", markedElements.count())
+			elementtext:=lang("%1% marked elements", selectedElements.count())
 		}
 	}
 	; get position informations

@@ -74,7 +74,7 @@ LoadFlow(FlowID, filepath="", params="")
 	flowSettings.WorkingDir:=RIni_GetKeyValue("IniFile", "general", "SettingWorkingDir", _settings.FlowWorkingDir)
 	
 	_setFlowProperty(FlowID, "flowSettings", flowSettings)
-	_setFlowProperty(FlowID, "markedElements", Object())
+	_setFlowProperty(FlowID, "selectedElements", Object())
 	IfNotInString, params, keepDraw
 		_setFlowProperty(FlowID, "draw", Object())
 

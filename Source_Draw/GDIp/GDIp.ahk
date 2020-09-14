@@ -134,8 +134,8 @@ gdip_DrawEverything(FlowObj)
 		;~ ToolTip draw Offsetx %Offsetx%
 		widthofguipic:=FlowObj.draw.widthofguipic
 		heightofguipic:=FlowObj.draw.heightofguipic
-		markedElement:=FlowObj.markedElement
-		;~ ToolTip % strobj(markedElement)
+		selectedElement:=FlowObj.selectedElement
+		;~ ToolTip % strobj(selectedElement)
 		;Check whether the zoomfactor is inside the allowed bounds
 		if (zoomFactor<zoomFactorMin)
 			zoomFactor:=zoomFactorMin
@@ -147,7 +147,7 @@ gdip_DrawEverything(FlowObj)
 		allConnections:=FlowObj.allConnections
 		allElements:=FlowObj.allElements
 		allTriggers:=FlowObj.allTriggers
-		markedElements:=FlowObj.markedElements
+		selectedElements:=FlowObj.selectedElements
 	}
 	else
 	{
@@ -836,23 +836,23 @@ gdip_DrawEverything(FlowObj)
 	SwitchOnButtonExist:=false
 	SwitchOffButtonExist:=false
 	
-	if (FlowObj.markedElements.count()=1)
+	if (FlowObj.selectedElements.count()=1)
 	{
-		for tempID, tempID2 in FlowObj.markedElements
+		for tempID, tempID2 in FlowObj.selectedElements
 		{
-			markedElement:=tempID
+			selectedElement:=tempID
 		}
 	}
 	else
 	{
-		markedElement=
+		selectedElement=
 	}
 	
-	;~ MsgBox % share.markedelementscount
-	if (markedElement!="" and FlowObj.draw.DrawMoveButtonUnderMouse!=true) ;  and FlowObj.draw.UserCurrentlyMovesAnElement!=true)
+	;~ MsgBox % share.selectedElementscount
+	if (selectedElement!="" and FlowObj.draw.DrawMoveButtonUnderMouse!=true) ;  and FlowObj.draw.UserCurrentlyMovesAnElement!=true)
 	{
 		;~ SoundBeep
-		IfInString,markedElement,connection
+		IfInString,selectedElement,connection
 			tempElList:=allConnections
 		else
 			tempElList:=allElements
@@ -860,13 +860,13 @@ gdip_DrawEverything(FlowObj)
 		
 		
 		;Move Button
-		if (tempElList[markedElement].type = "connection")
+		if (tempElList[selectedElement].type = "connection")
 		{
-			middlePointOfMoveButton1X:=((DrawResult.elements[markedElement].part1x1 +  DrawResult.elements[markedElement].part1x2)/2  ) / zoomFactor 
-			middlePointOfMoveButton1Y:=(DrawResult.elements[markedElement].part1y1 ) / zoomFactor +20
+			middlePointOfMoveButton1X:=((DrawResult.elements[selectedElement].part1x1 +  DrawResult.elements[selectedElement].part1x2)/2  ) / zoomFactor 
+			middlePointOfMoveButton1Y:=(DrawResult.elements[selectedElement].part1y1 ) / zoomFactor +20
 			
-			middlePointOfMoveButton2X:=((DrawResult.elements[markedElement].part5x1 +  DrawResult.elements[markedElement].part5x2)/2  ) / zoomFactor 
-			middlePointOfMoveButton2Y:=(DrawResult.elements[markedElement].part5y2 ) / zoomFactor  -20
+			middlePointOfMoveButton2X:=((DrawResult.elements[selectedElement].part5x1 +  DrawResult.elements[selectedElement].part5x2)/2  ) / zoomFactor 
+			middlePointOfMoveButton2Y:=(DrawResult.elements[selectedElement].part5y2 ) / zoomFactor  -20
 			
 			
 			
@@ -882,73 +882,73 @@ gdip_DrawEverything(FlowObj)
 		}
 		
 		;Edit Button
-		;~ MsgBox % strobj(tempElList[markedElement])
-		if ((tempElList[markedElement].type = "action" or  tempElList[markedElement].type = "condition" or tempElList[markedElement].type = "trigger" or tempElList[markedElement].type = "loop"))
+		;~ MsgBox % strobj(tempElList[selectedElement])
+		if ((tempElList[selectedElement].type = "action" or  tempElList[selectedElement].type = "condition" or tempElList[selectedElement].type = "trigger" or tempElList[selectedElement].type = "loop"))
 		{
-			middlePointOfEditButtonX:=tempElList[markedElement].x - ElementWidth *0.125 - SizeOfButtons*0.2 - Offsetx
-			middlePointOfEditButtonY:=tempElList[markedElement].y +ElementWidth *0.375 - Offsety
+			middlePointOfEditButtonX:=tempElList[selectedElement].x - ElementWidth *0.125 - SizeOfButtons*0.2 - Offsetx
+			middlePointOfEditButtonY:=tempElList[selectedElement].y +ElementWidth *0.375 - Offsety
 			
 		}
-		else if (tempElList[markedElement].type = "connection")
+		else if (tempElList[selectedElement].type = "connection")
 		{
 			
-			middlePointOfEditButtonX:=((DrawResult.elements[markedElement].part3x1 +  DrawResult.elements[markedElement].part3x2)/2  ) / zoomFactor - SizeOfButtons*1.3
-			middlePointOfEditButtonY:=((DrawResult.elements[markedElement].part3y1 + DrawResult.elements[markedElement].part3y2) /2   ) / zoomFactor 
+			middlePointOfEditButtonX:=((DrawResult.elements[selectedElement].part3x1 +  DrawResult.elements[selectedElement].part3x2)/2  ) / zoomFactor - SizeOfButtons*1.3
+			middlePointOfEditButtonY:=((DrawResult.elements[selectedElement].part3y1 + DrawResult.elements[selectedElement].part3y2) /2   ) / zoomFactor 
 		}
 		Gdip_DrawImage(G, pBitmapEdit, (middlePointOfEditButtonX - (SizeOfButtons*0.5) )*zoomFactor, ( middlePointOfEditButtonY - (SizeOfButtons*0.5)) *zoomFactor, SizeOfButtons*zoomFactor, SizeOfButtons*zoomFactor , 0, 0, 48, 48)
 		EditButtonExist:=true
 		
 		
 		;Trash Button
-		if (tempElList[markedElement].type="action" or  tempElList[markedElement].type = "condition" or tempElList[markedElement].type = "trigger" or tempElList[markedElement].type = "connection" or tempElList[markedElement].type = "loop")
+		if (tempElList[selectedElement].type="action" or  tempElList[selectedElement].type = "condition" or tempElList[selectedElement].type = "trigger" or tempElList[selectedElement].type = "connection" or tempElList[selectedElement].type = "loop")
 		{
-			if (tempElList[markedElement].type = "connection")
+			if (tempElList[selectedElement].type = "connection")
 			{
-				middlePointOfTrashButtonX:=((DrawResult.elements[markedElement].part3x1 + DrawResult.elements[markedElement].part3x2)/2) / zoomFactor + SizeOfButtons*1.3
-				middlePointOfTrashButtonY:=((DrawResult.elements[markedElement].part3y1 + DrawResult.elements[markedElement].part3y2)/2) / zoomFactor 
+				middlePointOfTrashButtonX:=((DrawResult.elements[selectedElement].part3x1 + DrawResult.elements[selectedElement].part3x2)/2) / zoomFactor + SizeOfButtons*1.3
+				middlePointOfTrashButtonY:=((DrawResult.elements[selectedElement].part3y1 + DrawResult.elements[selectedElement].part3y2)/2) / zoomFactor 
 			}
 			else
 			{
-				middlePointOfTrashButtonX:=tempElList[markedElement].x + ElementWidth *9/8 + SizeOfButtons*0.2 - Offsetx
-				middlePointOfTrashButtonY:=tempElList[markedElement].y +ElementWidth *0.375 - Offsety
+				middlePointOfTrashButtonX:=tempElList[selectedElement].x + ElementWidth *9/8 + SizeOfButtons*0.2 - Offsetx
+				middlePointOfTrashButtonY:=tempElList[selectedElement].y +ElementWidth *0.375 - Offsety
 			}
 			Gdip_DrawImage(G, pBitmapTrash, (middlePointOfTrashButtonX - (SizeOfButtons*0.5) )*zoomFactor, ( middlePointOfTrashButtonY - (SizeOfButtons*0.5)) *zoomFactor, SizeOfButtons*zoomFactor, SizeOfButtons*zoomFactor , 0, 0, 48, 48)
 			TrashButtonExist:=true
 		}
 		
 		;Plus Button
-		if (tempElList[markedElement].type = "connection")
+		if (tempElList[selectedElement].type = "connection")
 		{
-			middlePointOfPlusButtonX:=((DrawResult.elements[markedElement].part3x1 +  DrawResult.elements[markedElement].part3x2)/2  ) / zoomFactor 
-			middlePointOfPlusButtonY:=((DrawResult.elements[markedElement].part3y1 + DrawResult.elements[markedElement].part3y2 )/2  ) / zoomFactor 
+			middlePointOfPlusButtonX:=((DrawResult.elements[selectedElement].part3x1 +  DrawResult.elements[selectedElement].part3x2)/2  ) / zoomFactor 
+			middlePointOfPlusButtonY:=((DrawResult.elements[selectedElement].part3y1 + DrawResult.elements[selectedElement].part3y2 )/2  ) / zoomFactor 
 			Gdip_DrawImage(G, pBitmapPlus, (middlePointOfPlusButtonX - (SizeOfButtons*0.5) )*zoomFactor, ( middlePointOfPlusButtonY - (SizeOfButtons*0.5)) *zoomFactor, SizeOfButtons*zoomFactor, SizeOfButtons*zoomFactor , 0, 0, 48, 48)
 			PlusButtonExist:=true
 		}
-		else if ((tempElList[markedElement].type = "action" or  tempElList[markedElement].type = "condition" or tempElList[markedElement].type = "trigger" or tempElList[markedElement].type = "loop"))
+		else if ((tempElList[selectedElement].type = "action" or  tempElList[selectedElement].type = "condition" or tempElList[selectedElement].type = "trigger" or tempElList[selectedElement].type = "loop"))
 		{
-			middlePointOfPlusButtonX:=tempElList[markedElement].x + ElementWidth *0.5 - Offsetx
-			middlePointOfPlusButtonY:=tempElList[markedElement].y +ElementWidth *7/8 + SizeOfButtons*0.2 - Offsety
+			middlePointOfPlusButtonX:=tempElList[selectedElement].x + ElementWidth *0.5 - Offsetx
+			middlePointOfPlusButtonY:=tempElList[selectedElement].y +ElementWidth *7/8 + SizeOfButtons*0.2 - Offsety
 			Gdip_DrawImage(G, pBitmapPlus, (middlePointOfPlusButtonX - (SizeOfButtons*0.5) )*zoomFactor, ( middlePointOfPlusButtonY - (SizeOfButtons*0.5)) *zoomFactor, SizeOfButtons*zoomFactor, SizeOfButtons*zoomFactor , 0, 0, 48, 48)
 			PlusButtonExist:=true
 		}
-		if (tempElList[markedElement].type = "loop") ;Additional plus button for loop
+		if (tempElList[selectedElement].type = "loop") ;Additional plus button for loop
 		{
-			middlePointOfPlusButton2X:=tempElList[markedElement].x + ElementWidth *0.5 - Offsetx
-			middlePointOfPlusButton2Y:=tempElList[markedElement].y +ElementWidth /8 + ElementHeight*4/3+tempElList[markedElement].HeightOfVerticalBar + SizeOfButtons*0.2 - Offsety
+			middlePointOfPlusButton2X:=tempElList[selectedElement].x + ElementWidth *0.5 - Offsetx
+			middlePointOfPlusButton2Y:=tempElList[selectedElement].y +ElementWidth /8 + ElementHeight*4/3+tempElList[selectedElement].HeightOfVerticalBar + SizeOfButtons*0.2 - Offsety
 			Gdip_DrawImage(G, pBitmapPlus, (middlePointOfPlusButton2X - (SizeOfButtons*0.5) )*zoomFactor, ( middlePointOfPlusButton2Y - (SizeOfButtons*0.5)) *zoomFactor, SizeOfButtons*zoomFactor, SizeOfButtons*zoomFactor , 0, 0, 48, 48)
 			PlusButton2Exist:=true
 			
 		}
 		
 		;Switch on or off Button
-		;~ MsgBox % strobj(tempElList[markedElement])
-		if (tempElList[markedElement].type = "trigger" )
+		;~ MsgBox % strobj(tempElList[selectedElement])
+		if (tempElList[selectedElement].type = "trigger" )
 		{
-			if (tempElList[markedElement].enabled)
+			if (tempElList[selectedElement].enabled)
 			{
-				PosOfSwitchOnButtonX1:=tempElList[markedElement].x + ElementWidth *0.8 - SizeOfButtons*0.5 - Offsetx
+				PosOfSwitchOnButtonX1:=tempElList[selectedElement].x + ElementWidth *0.8 - SizeOfButtons*0.5 - Offsetx
 				PosOfSwitchOnButtonX2:=PosOfSwitchOnButtonX1 + (SizeOfButtons * pBitmapSwitchOn_W / pBitmapSwitchOn_size)
-				PosOfSwitchOnButtonY1:=tempElList[markedElement].y + ElementHeight *0.25 - SizeOfButtons*0.5 - Offsety			
+				PosOfSwitchOnButtonY1:=tempElList[selectedElement].y + ElementHeight *0.25 - SizeOfButtons*0.5 - Offsety			
 				PosOfSwitchOnButtonY2:=PosOfSwitchOnButtonY1 + (SizeOfButtons * pBitmapSwitchOn_H / pBitmapSwitchOn_size)
 				Gdip_DrawImage(G, pBitmapSwitchOn, (PosOfSwitchOnButtonX1 )*zoomFactor, (PosOfSwitchOnButtonY1) *zoomFactor, (PosOfSwitchOnButtonX2 - PosOfSwitchOnButtonX1) *zoomFactor, (PosOfSwitchOnButtonY2 - PosOfSwitchOnButtonY1) *zoomFactor , 0, 0, pBitmapSwitchOn_w,pBitmapSwitchOn_H)
 				SwitchOnButtonExist:=true
@@ -956,9 +956,9 @@ gdip_DrawEverything(FlowObj)
 			}
 			else
 			{
-				PosOfSwitchOffButtonX1:=tempElList[markedElement].x + ElementWidth *0.8 - SizeOfButtons*0.5 - Offsetx
+				PosOfSwitchOffButtonX1:=tempElList[selectedElement].x + ElementWidth *0.8 - SizeOfButtons*0.5 - Offsetx
 				PosOfSwitchOffButtonX2:=PosOfSwitchOffButtonX1 + (SizeOfButtons * pBitmapSwitchOff_W / pBitmapSwitchOff_size)
-				PosOfSwitchOffButtonY1:=tempElList[markedElement].y + ElementHeight *0.25 - SizeOfButtons*0.5 - Offsety			
+				PosOfSwitchOffButtonY1:=tempElList[selectedElement].y + ElementHeight *0.25 - SizeOfButtons*0.5 - Offsety			
 				PosOfSwitchOffButtonY2:=PosOfSwitchOffButtonY1 + (SizeOfButtons * pBitmapSwitchOff_H / pBitmapSwitchOff_size)
 				Gdip_DrawImage(G, pBitmapSwitchOff, (PosOfSwitchOffButtonX1 )*zoomFactor, (PosOfSwitchOffButtonY1) *zoomFactor, (PosOfSwitchOffButtonX2 - PosOfSwitchOffButtonX1) *zoomFactor, (PosOfSwitchOffButtonY2 - PosOfSwitchOffButtonY1) *zoomFactor , 0, 0, pBitmapSwitchOff_w, pBitmapSwitchOff_H)
 				SwitchOffButtonExist:=true
@@ -966,14 +966,14 @@ gdip_DrawEverything(FlowObj)
 		}
 		
 		;Start filled or empty Button
-		;~ MsgBox % strobj(tempElList[markedElement])
-		if (tempElList[markedElement].class = "trigger_manual" )
+		;~ MsgBox % strobj(tempElList[selectedElement])
+		if (tempElList[selectedElement].class = "trigger_manual" )
 		{
-			if (tempElList[markedElement].defaultTrigger)
+			if (tempElList[selectedElement].defaultTrigger)
 			{
-				PosOfStarFilledButtonX1:=tempElList[markedElement].x + ElementWidth *0.15 - SizeOfButtons*0.5 - Offsetx
+				PosOfStarFilledButtonX1:=tempElList[selectedElement].x + ElementWidth *0.15 - SizeOfButtons*0.5 - Offsetx
 				PosOfStarFilledButtonX2:=PosOfStarFilledButtonX1 + (SizeOfButtons * pBitmapStarFilled_W / pBitmapStarFilled_size)
-				PosOfStarFilledButtonY1:=tempElList[markedElement].y + ElementHeight *0.20 - SizeOfButtons*0.5 - Offsety			
+				PosOfStarFilledButtonY1:=tempElList[selectedElement].y + ElementHeight *0.20 - SizeOfButtons*0.5 - Offsety			
 				PosOfStarFilledButtonY2:=PosOfStarFilledButtonY1 + (SizeOfButtons * pBitmapStarFilled_H / pBitmapStarFilled_size)
 				Gdip_DrawImage(G, pBitmapStarFilled, (PosOfStarFilledButtonX1 )*zoomFactor, (PosOfStarFilledButtonY1) *zoomFactor, (PosOfStarFilledButtonX2 - PosOfStarFilledButtonX1) *zoomFactor, (PosOfStarFilledButtonY2 - PosOfStarFilledButtonY1) *zoomFactor , 0, 0, pBitmapStarFilled_w,pBitmapStarFilled_H)
 				StarFilledButtonExist:=true
@@ -981,9 +981,9 @@ gdip_DrawEverything(FlowObj)
 			}
 			else
 			{
-				PosOfStarEmptyButtonX1:=tempElList[markedElement].x + ElementWidth *0.15 - SizeOfButtons*0.5 - Offsetx
+				PosOfStarEmptyButtonX1:=tempElList[selectedElement].x + ElementWidth *0.15 - SizeOfButtons*0.5 - Offsetx
 				PosOfStarEmptyButtonX2:=PosOfStarEmptyButtonX1 + (SizeOfButtons * pBitmapStarEmpty_W / pBitmapStarEmpty_size)
-				PosOfStarEmptyButtonY1:=tempElList[markedElement].y + ElementHeight *0.20 - SizeOfButtons*0.5 - Offsety			
+				PosOfStarEmptyButtonY1:=tempElList[selectedElement].y + ElementHeight *0.20 - SizeOfButtons*0.5 - Offsety			
 				PosOfStarEmptyButtonY2:=PosOfStarEmptyButtonY1 + (SizeOfButtons * pBitmapStarEmpty_H / pBitmapStarEmpty_size)
 				Gdip_DrawImage(G, pBitmapStarEmpty, (PosOfStarEmptyButtonX1 )*zoomFactor, (PosOfStarEmptyButtonY1) *zoomFactor, (PosOfStarEmptyButtonX2 - PosOfStarEmptyButtonX1) *zoomFactor, (PosOfStarEmptyButtonY2 - PosOfStarEmptyButtonY1) *zoomFactor , 0, 0, pBitmapStarEmpty_w, pBitmapStarEmpty_H)
 				StarEmptyButtonExist:=true

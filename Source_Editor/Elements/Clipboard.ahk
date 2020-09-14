@@ -73,7 +73,7 @@ loadFromClipboard()
 	
 	logger("a2","Loading elements from clipboard")
 	ToolTip(lang("loading from clipboard"),100000)
-	UnmarkEverything()  ;Unmark all elements
+	UnSelectEverything()  ;Unmark all elements
 	
 	;Find mouse position and find out whether the mouse is hovering the editor
 	winHWND:= _getSharedProperty("hwnds.editGUI" FlowID)
@@ -95,7 +95,7 @@ loadFromClipboard()
 	
 	tempClipboardconnectionList:=Object()
 	tempClipboardElementList:=Object()
-	UnmarkEverything()
+	UnSelectEverything()
 	
 	clipboardContent := _getShared("clipboard")
 	;~ AllSections:=RIni_GetSections("ClipboardLoadFile")	
@@ -121,7 +121,7 @@ loadFromClipboard()
 		
 		tempClipboardElementList[loadElementID] := NewElementID ;Save new element IDs in order to be able to assign the correct elements to the connections
 		
-		markOne(NewElementID,true)
+		SelectOneItem(NewElementID,true)
 	}
 		
 	;~ AllSections:=RIni_GetSections("ClipboardLoadFile")	
@@ -138,7 +138,7 @@ loadFromClipboard()
 		
 		tempClipboardconnectionList.push(NewElementID) ;Save new connection IDs in order to be able to assign the correct elements to the connections
 		
-		markOne(NewElementID,true)
+		SelectOneItem(NewElementID,true)
 	}
 
 	if tempCountLoadedElements>0

@@ -1,5 +1,5 @@
 ﻿;mark an element or connection. If parameter additional is true, mark it additionally to others
-MarkOne(p_ID,additional:=false)
+SelectOneItem(p_ID,additional:=false)
 {
 	
 	_EnterCriticalSection()
@@ -9,7 +9,7 @@ MarkOne(p_ID,additional:=false)
 	{
 		if (additional=false)
 		{
-			UnmarkEverything(false)
+			UnSelectEverything(false)
 			
 			;Mark one element
 			if p_ID contains connection
@@ -37,9 +37,9 @@ MarkOne(p_ID,additional:=false)
 			
 		}
 		
-		CreateMarkedList()
+		UpdateSelectedItemsList()
 		
-		;~ ToolTip("-" p_ID "-" tempList[p_ID].marked "-" markedElement )
+		;~ ToolTip("-" p_ID "-" tempList[p_ID].marked "-" selectedElement )
 		;~ ui_UpdateStatusbartext()
 	}
 
@@ -47,7 +47,7 @@ MarkOne(p_ID,additional:=false)
 }
 
 ;Unmark all elements and connections
-UnmarkEverything(CreateList=true)
+UnSelectEverything(CreateList=true)
 {
 	_EnterCriticalSection()
 	
@@ -61,13 +61,13 @@ UnmarkEverything(CreateList=true)
 	}
 	
 	if (CreateList)
-		CreateMarkedList()
+		UpdateSelectedItemsList()
 	;~ ui_UpdateStatusbartext()
 	
 	_LeaveCriticalSection()
 }
 
-MarkEverything()
+SelectEverything()
 {
 	_EnterCriticalSection()
 	
@@ -80,43 +80,43 @@ MarkEverything()
 		_setConnectionProperty(FlowID, forConnectionID, "marked", false)
 	}
 	
-	CreateMarkedList()
+	UpdateSelectedItemsList()
 	
 	;~ ui_UpdateStatusbartext()	
 	
 	_LeaveCriticalSection()
 }
 
-CreateMarkedList()
+UpdateSelectedItemsList()
 {
 	_EnterCriticalSection()
 	
-	markedElements:=[]
+	selectedElements:=[]
 
 	for forIndex, forElementID in _getAllElementIds(FlowID) ;Add all marked elements into array
 	{
 		if (_getElementProperty(FlowID, forElementID, "marked"))
-			markedElements[forElementID]:=forElementID
+			selectedElements[forElementID]:=forElementID
 	}
 	for forIndex, forConnectionID in _getAllConnectionIds(FlowID) ;Add all marked elements into array
 	{
 		if (_getConnectionProperty(FlowID, forConnectionID, "marked"))
-			markedElements[forConnectionID]:=forConnectionID
+			selectedElements[forConnectionID]:=forConnectionID
 	}
 	
-	if (markedElements.count()=1)
+	if (selectedElements.count()=1)
 	{
-		for forID, forID2 in markedElements
+		for forID, forID2 in selectedElements
 		{
-			_setFlowProperty(FlowID, "markedElement", forID)
+			_setFlowProperty(FlowID, "selectedElement", forID)
 		}
 	}
 	else
 	{
 		;~ ToolTip no element
-		_setFlowProperty(FlowID, "markedElement", "")
+		_setFlowProperty(FlowID, "selectedElement", "")
 	}
 	
-	_setFlowProperty(FlowID, "markedElements", markedElements)
+	_setFlowProperty(FlowID, "selectedElements", selectedElements)
 	_LeaveCriticalSection()
 }

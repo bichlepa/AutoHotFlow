@@ -3,22 +3,22 @@ Element_New(p_type,p_elementID)
 Element_SetType(p_elementID,p_elementType)
 Element_setParameterDefaults(p_elementID)
 Element_Remove(p_elementID)
-MarkOne(p_ID,false)
-UnmarkEverything()
-MarkEverything()
+SelectOneItem(p_ID,false)
+UnSelectEverything()
+SelectEverything()
 Connection_New(p_elementID)
 Connection_Remove(p_elementID)
 GetListContainingElement(p_ElementID)
 */
 
 ;Creates a new element and puts it in the array "allelements"
-Element_New(p_FlowID, p_type="",p_elementID="")
+Element_New(p_FlowID, p_type="", p_elementID="")
 {
 	global GridX, Gridy
 	
 	if not p_FlowID
 	{
-		MsgBox internal error! A new element should be created but FlowID is empty!
+		throw exception("internal error! A new element should be created but FlowID is empty", -1)
 		return
 	}
 
@@ -26,7 +26,7 @@ Element_New(p_FlowID, p_type="",p_elementID="")
 
 	tempElement:=Object()
 	;~ tempElement:=[]
-	
+
 	if (p_elementID="")
 		tempElement.ID:="element" . format("{1:010u}",_getAndIncrementFlowProperty(p_FlowID,"ElementIDCounter")) 
 	else
@@ -53,7 +53,6 @@ Element_New(p_FlowID, p_type="",p_elementID="")
 	tempElement.y:=0
 	
 	_setElement(p_FlowID, tempElement.ID, tempElement)
-
 	Element_SetType(p_FlowID, tempElement.ID, p_type)
 	
 	_LeaveCriticalSection()
@@ -245,7 +244,7 @@ Element_Remove(p_FlowID, p_elementID)
 	_EnterCriticalSection() ; We get, change and store a flow in this function. keep this critical section to ensure data integrity
 
 	; allElements:=_getFlowProperty(p_FlowID, "allElements")
-	; markedElements:=_getFlowProperty(p_FlowID, "markedElements")
+	; selectedElements:=_getFlowProperty(p_FlowID, "selectedElements")
 	
 	;If the element is a connection, call function to delete connection
 	IfInString,p_elementID,connection
@@ -258,11 +257,11 @@ Element_Remove(p_FlowID, p_elementID)
 		_deleteElement(p_FlowID, forID)
 		
 		;~ ;If the element is marked, unmark it TODO
-		;~ for forID, forElement in markedElements
+		;~ for forID, forElement in selectedElements
 		;~ {
 			;~ if (forID=p_elementID)
 			;~ {
-				;~ UnmarkEverything(p_FlowID) ;Unmark all elements
+				;~ UnSelectEverything(p_FlowID) ;Unmark all elements
 				;~ break
 			;~ }
 		;~ }
@@ -333,16 +332,16 @@ Connection_Remove(p_FlowID, p_elementID)
 	_deleteConnection(p_FlowID, forID)
 	
 	;If the element is marked, unmark it TODO
-	;~ for forID, forElement in markedElements
+	;~ for forID, forElement in selectedElements
 	;~ {
 		;~ if (forID=p_elementID)
 		;~ {
-			;~ UnmarkEverything(p_FlowID) ;Unmark all elements
+			;~ UnSelectEverything(p_FlowID) ;Unmark all elements
 			;~ break
 		;~ }
 	;~ }
 	
-	;~ API_editor_CreateMarkedList(p_FlowID)
+	;~ API_editor_UpdateSelectedItemsList(p_FlowID)
 	_LeaveCriticalSection()
 }
 
