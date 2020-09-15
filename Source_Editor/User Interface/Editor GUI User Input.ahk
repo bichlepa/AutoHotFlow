@@ -238,7 +238,7 @@ clickOnPicture() ;react on clicks of the user
 			tempConnection2 := Connection_New(FlowID)
 
 			; move both connections
-			ret:=ui_MoveConnection(selectedElement,tempConnection2, tempFrom, tempTo)
+			ret:=ui_MoveConnection(selectedElement, tempFrom, tempConnection2, tempTo)
 			if (ret="aborted")
 			{
 				; this will undo the action later
@@ -254,7 +254,7 @@ clickOnPicture() ;react on clicks of the user
 			;Create new connection
 			tempConnection1 := Connection_New(FlowID)
 			
-			; check whether the connection is a loop
+			; check whether the selected element is a loop
 			tempType := _getElementProperty(FlowID, selectedElement, "type")
 			if (tempType = "loop")
 			{
@@ -271,7 +271,7 @@ clickOnPicture() ;react on clicks of the user
 			}
 			
 			; move the connection
-			ret:=ui_MoveConnection(tempConnection1, ,selectedElement )
+			ret := ui_MoveConnection(tempConnection1, selectedElement)
 			if (ret="aborted")
 			{
 				; this will undo the action later
@@ -290,7 +290,7 @@ clickOnPicture() ;react on clicks of the user
 		tempTo := _getConnectionProperty(FlowID, selectedElement, "to")
 
 		; move the connection
-		ret := ui_MoveConnection(, selectedElement, , tempTo )
+		ret := ui_MoveConnection(, , selectedElement, tempTo)
 		if (ret = "aborted")
 		{
 			; this will undo the action later
@@ -307,7 +307,7 @@ clickOnPicture() ;react on clicks of the user
 		tempFrom := _getConnectionProperty(FlowID, selectedElement, "from")
 
 		; move the connection
-		ret:=ui_MoveConnection(selectedElement ,,tempFrom )
+		ret:=ui_MoveConnection(selectedElement, tempFrom)
 		if (ret = "aborted")
 		{
 			; this will undo the action later
@@ -698,7 +698,7 @@ ui_moveSelectedElements(clickedElement, partOfclickedElement = "", option="")
 		Loop ;Move element(s)
 		{
 			; check whether user holds the left mouse button (or does not if inverted)
-			lbuttonDown := getkeystate("lbutton","P")
+			lbuttonDown := getkeystate("lbutton")
 			if (option != "InvertLbutton" and !lbuttonDown or option = "InvertLbutton" and lbuttonDown)
 			{
 				; user released the mouse button. We kan drop the elements now
@@ -717,7 +717,7 @@ ui_moveSelectedElements(clickedElement, partOfclickedElement = "", option="")
 				break
 			}
 			; check whether user holds escape button to cancel the movement
-			if (getkeystate("esc","P"))
+			if (getkeystate("esc"))
 			{
 				; set the return value, which should trigger an undo later
 				moved := false
@@ -725,7 +725,7 @@ ui_moveSelectedElements(clickedElement, partOfclickedElement = "", option="")
 				break
 			}
 			; check whether user holds the right button to either cancel the movement or to scroll
-			if (getkeystate("rbutton", "P")) ;If user cancels movement, move back
+			if (getkeystate("rbutton")) ;If user cancels movement, move back
 			{
 				if (ui_detectMovement(,"rbutton"))
 				{
@@ -790,7 +790,7 @@ ui_moveSelectedElements(clickedElement, partOfclickedElement = "", option="")
 		Loop ;Move element(s)
 		{
 			; check whether user holds the left mouse button (or does not if inverted)
-			lbuttonDown := getkeystate("lbutton","P")
+			lbuttonDown := getkeystate("lbutton")
 			if (option != "InvertLbutton" and !lbuttonDown or option = "InvertLbutton" and lbuttonDown)
 			{
 				; user released the mouse button. We kan drop the elements now
@@ -815,7 +815,7 @@ ui_moveSelectedElements(clickedElement, partOfclickedElement = "", option="")
 			}
 			
 			; check whether user holds escape button to cancel the movement
-			if (getkeystate("esc","P"))
+			if (getkeystate("esc"))
 			{
 				; set the return value, which should trigger an undo later
 				moved := false
@@ -823,7 +823,7 @@ ui_moveSelectedElements(clickedElement, partOfclickedElement = "", option="")
 				break
 			}
 			; check whether user holds the right button to either cancel the movement or to scroll
-			if (getkeystate("rbutton","P")) ;If user cancels movement, move back
+			if (getkeystate("rbutton")) ;If user cancels movement, move back
 			{
 				if (ui_detectMovement(,"rbutton"))
 				{
@@ -877,39 +877,47 @@ ui_moveSelectedElements(clickedElement, partOfclickedElement = "", option="")
 	return {moved:moved, Aborted: MovementAborted}
 }
 
-ui_detectMovement(threshold=2,button="lbutton")
+; detects whether user moves the mouse.
+; it returns when user either moves the mouse or releases the button
+; the threshold defines how many times a change of the mouse position needs to be detected until it returns (it's not the distance)
+ui_detectMovement(threshold=2, button="lbutton")
 {
-	
-	MouseGetPos,xold,yold ;get mouse position and calculate the new position of the element
-	Loop ;Wait until it moves or the mouse button is released
+	howMuchMoved := 0
+
+	;get intial mouse position
+	MouseGetPos,xold,yold
+
+	;check mouse position all the time
+	Loop 
 	{
-		
-		GetKeyState,k,%button%,p ;When mouse releases, return false
-		if (k!="d")
+		; check whether user still holds the mouse
+		if (not getkeystate(button))
 		{
+			; user released the mouse, so no movement detected
 			return false
-			
 		}
-		MouseGetPos,xnew,ynew ;get mouse position and calculate the new position of the element
+
+		;get mouse position
+		MouseGetPos,xnew,ynew 
 		
-		if (xnew!=xold OR yold!=ynew) ;If mouse is currently moving
+		; check whether mouse has moved
+		if (xnew!=xold OR yold!=ynew) 
 		{
+			; mouse has moved, update old mouse position
 			yold:=ynew
 			xold:=xnew
 			
+			; increase and compare counter
 			howMuchMoved++
-			if (howMuchMoved>threshold)
+			if (howMuchMoved >= threshold)
 			{
-				
+				; counter has been reached. User moves the mouse
 				return true
 			}
 		}
 		
-		
 		sleep,10 ;Save processor load
 	}
-	return false
-	
 }
 
 ui_detectMovementWithoutBlocking(threshold=1)
@@ -993,202 +1001,319 @@ ui_scrollwithMouse(ScrollButton="lbutton")
 }
 
 
-;Moves one or multiple connections to an other element or create a new element
-;Return value: "aborted" or ""
-ui_MoveConnection(connection1="", connection2="", element1="", element2="")
+; Lets the user move one or multiple connections.
+; The user can move it either to an other element or to an empty space, which will create a new element
+; Return value: "aborted" if user cancelled action
+; any of the parameters can be empty, but not all at once. Following combinations are possible:
+; connection1 & element1 given: move the end of the connection
+; connection2 & element2 given: move the start of the connection
+; all parameters given: move the end of the first conncection and the start of the second connection.
+;   It is used to split an existing connection. The connection which is going to be split must be connection1 and the new one connection2.
+ui_MoveConnection(connection1 = "", element1 = "", connection2 = "", element2 = "")
 {
-	global
-	local abortAddingElement, ret, untilRelease, tempElement
-	local mx2, my2, newElementCreated, NewElementPart
-	local tempx, tempy, zoomfactor, offsetx, offsety
-	
-	;move elements to mouse
+	global default_ElementWidth, default_ElementHeight
+
+	; unselect everything and select the defined connections
 	UnSelectEverything()
-	if (connection1!="")
+	if (connection1)
 		SelectOneItem(connection1)
-	
-	if (connection2!="")
-		SelectOneItem(connection2,true)
-	
-	connection1From := _getConnectionProperty(FlowID, connection1, "from")
-	connection1To := _getConnectionProperty(FlowID, connection1, "to")
-	connection1FromPart := _getConnectionProperty(FlowID, connection1, "fromPart")
-	connection1ToPart := _getConnectionProperty(FlowID, connection1, "toPart")
-
-	connection2From := _getConnectionProperty(FlowID, connection2, "from")
-	connection2To := _getConnectionProperty(FlowID, connection2, "to")
-	connection2FromPart := _getConnectionProperty(FlowID, connection2, "fromPart")
-	connection2ToPart := _getConnectionProperty(FlowID, connection2, "toPart")
-
 	if (connection2)
-	{
-
-		connection2From := "MOUSE" ;The start position should follow the mouse
-		connection2To := element2  ; End the connection to element2 (needet if this is a new connection or if a connection was split)
-
-		; If a connection was split, set the part of the element, where the conneciton ends
-		if (connection1)
-		{
-			connection2ToPart := connection1ToPart
-			connection1ToPart := ""
-		}
-	}
+		SelectOneItem(connection2, true)
 	
+	; if connection 1 is defined
 	if (connection1)
 	{
-		connection1From := element1 ; Start the connection from element1 (needet if this is a new connection)
-		connection1To := "MOUSE"  ;The end position should follow the mouse
+		;The end of the connection should follow the mouse
+		_setConnectionProperty(FlowID, connection1, "to", "MOUSE")
+		; Start the connection from element1 (needed if this is a new connection)
+		_setConnectionProperty(FlowID, connection1, "from", element1)
 	}
 	
+	; if connection 2 is defined
+	if (connection2)
+	{
+		;The start of the connection should follow the mouse
+		_setConnectionProperty(FlowID, connection2, "from", "MOUSE")
+		; End the connection to element2 (needed if this is a new connection or if a connection was split)
+		_setConnectionProperty(FlowID, connection2, "to", element2)
+	}
+	
+	; If both connections defined, a connection was split
+	if (connection1 and connection2)
+	{
+		; since connection1 is the old connection, connection2 has now to end, where connection1 has ended before.
+		connection1toPart := _getElementProperty(FlowID, connection1, "toPart")
+		_setConnectionProperty(FlowID, connection2, "toPart", connection1toPart)
+		; delete the part information from connection 1
+		_deleteConnectionProperty(FlowID, connection1, "toPart")
+	}
+	
+	; we want to draw a plus icon under the mouse to hide the lose ends of the connections
 	_setFlowProperty(FlowID, "draw.DrawMoveButtonUnderMouse", true)
 	
+	; check whether user moves the mouse
 	if (ui_detectMovement()) ;If user moves the mouse
 		untilRelease:=true ;move until user releases mouse
 	else
 		untilRelease:=false ;move untli user clicks
-	
-	;Wait until user releases the mouse and add an element there
-	;The connections follow the mouse
-	UserClickedRbutton:=false
 
-	; Wait until user defines the designated position
-	Loop
+	Loop ;Move connection(s)
 	{
-		;~ SoundBeep
-		if (ui_detectMovementWithoutBlocking()) ;check, whether user has moved mouse
-			API_Draw_Draw(FlowID)
-
-		if (untilRelease and !getkeystate("lbutton","P") or !untilRelease and getkeystate("lbutton","P")) ;if user finishes moving
+		; check whether user holds the left mouse button (or does not if inverted)
+		lbuttonDown := getkeystate("lbutton")
+		if (untilRelease and !lbuttonDown or not untilRelease and lbuttonDown)
 		{
+			; user released the mouse button. We kan drop the connections now
+			
+			; we will handle everything after the end of the loop
 			break
 		}
-		if ( UserClickedRbutton or getkeystate("esc","P")) ;if user aborts moving
-		{
-			abortAddingElement:=true
-			break
-		}
-		sleep 10 ;reduce CPU load
 		
+		; check whether user holds escape button to cancel the movement
+		if (getkeystate("esc"))
+		{
+			; set the return value, which should trigger an undo later
+			moved := false
+			MovementAborted := true
+			break
+		}
+		; check whether user holds the right button to either cancel the movement or to scroll
+		if (getkeystate("rbutton")) ;If user cancels movement, move back
+		{
+			if (ui_detectMovement(,"rbutton"))
+			{
+				; user drags with the right mouse button. We will scroll
+				ui_scrollwithMouse("rbutton")
+			}
+			else
+			{
+				; user did not drag. We will cancel movement
+				; set the return value, which should trigger an undo later
+				moved := false
+				MovementAborted := true
+				break
+			}
+		}
+		
+		;get mouse position
+		MouseGetPos, mx, my
+		if (mx != oldposx OR my != oldposy) ;If mouse is currently moving
+		{
+			; keep old mouse position in mind
+			oldposx:=mx
+			oldposy:=my
+			
+			; redraw
+			API_Draw_Draw(FlowID)
+		}
+		else ;If mouse is not currently moving
+		{
+			sleep,10 ;Save processor load
+		}
 	}
+
 	
+	; we can stop to draw the move button now
 	_setFlowProperty(FlowID, "draw.DrawMoveButtonUnderMouse", false)
 	
-	if (abortAddingElement)
-		return "aborted"
-	
-	MouseGetPos,mx,my ;Get the mouse position
-	
-	
-	clickedItem := ui_findElementUnderMouse(mx, my, "OnlyElements", "lowest") ;Search an element beneath the mouse.
-	clickedElement := clickedElement.element
-	partOfclickedElement := clickedElement.part
-	
-	
-	if (clickedElement="") ;If user pulled the end of the connection to empty space. Create new element
+	if (MovementAborted)
 	{
-		local newElement := Element_New(FlowID)
-		local newElementCreated := true
+		; since user cancelled the movement, we can return now
+		return "aborted"
+	}
+	
+	;Search for an element under the mouse cursor. Do not get one from the background
+	clickedItem := ui_findElementUnderMouse(mx, my, "OnlyElements", "lowest")
+	clickedElement := clickedItem.element
+	clickedElementPart := clickedItem.part
+	
+	; did user move the connection to an element?
+	if (not clickedElement) 
+	{
+		;User pulled the end of the connection to empty space. Create new element
+
+		; create new element
+		clickedElement := Element_New(FlowID)
+		newElementCreated := true
 		
-		ret := selectContainerType(newElement,"wait")
-		if (ret="aborted") ;If user did not select the container type
+		; set user choose element type
+		ret := selectContainerType(clickedElement, "wait")
+		if (ret = "aborted")
 		{
+			; user cancelled
 			return "aborted"
 		}
 
+		; calculate and set the position of the new element
 		zoomfactor := _getFlowProperty(FlowID, "flowSettings.zoomfactor")
 		offsetx := _getFlowProperty(FlowID, "flowSettings.offsetx")
 		offsety := _getFlowProperty(FlowID, "flowSettings.offsety")
 
-		tempx := (mx) / zoomfactor + offsety - default_ElementWidth / 2
+		tempx := (mx) / zoomfactor + Offsetx - default_ElementWidth / 2
 		tempy := (my) / zoomfactor + offsety  - default_ElementHeight / 2
 		tempx := ui_FitGridX(tempx)
 		tempy := ui_FitGridX(tempy)
-		_setElementProperty(FlowID, newElement, "x", tempx)
-		_setElementProperty(FlowID, newElement, "y", tempy)
+		_setElementProperty(FlowID, clickedElement, "x", tempx)
+		_setElementProperty(FlowID, clickedElement, "y", tempy)
 		
-		if (connection1!="")
+		if (connection1)
 		{
-			connection1To := newElement
-			_setConnectionProperty(FlowID, connection1, "to", newElement)
+			; the first connection (if any) will end at the new element
+			connection1To := clickedElement
+			_setConnectionProperty(FlowID, connection1, "to", clickedElement)
 		}
 		
-		if (connection2!="")
+		if (connection2)
 		{
-			connection2From := newElement
-			_setConnectionProperty(FlowID, connection2, "from", newElement)
+			; the second connection (if any) will start at the new element
+			connection2From := clickedElement
+			_setConnectionProperty(FlowID, connection2, "from", clickedElement)
 		}
 		
+		; let user define other propierties of the connections, if needed
 		gosub, ui_MoveConnectionCheckAndCorrect
-		if abortAddingElement
-			return "aborted"
-		
-		SelectOneItem(newElement)
-		clickedElement:=newElement
-		
-		ret:=selectSubType(newElement,"Wait")
-		if (ret="aborted") ;If user aborted
+		if MovementAborted
 		{
+			; user cancelled
 			return "aborted"
 		}
-			
-		ret:=ElementSettings.open(newElement,"Wait") ;open settings of element
-		if (ret="aborted") ;If user aborted
+		
+		; select the new element
+		SelectOneItem(clickedElement)
+		
+		; since we have a new element, user can now edit its settings
+		; select subtype
+		ret := selectSubType(clickedElement, "Wait")
+		if (ret = "aborted") ;If user aborted
 		{
+			; user cancelled
+			return "aborted"
+		}
+		
+		;open settings of element
+		ret := ElementSettings.open(clickedElement, "Wait")
+		if (ret = "aborted") ;If user aborted
+		{
+			; user cancelled
 			return "aborted"
 		}
 		
 	}
 	else ;If user pulled the end of the connection to an existing element
 	{
-		;~ SoundBeep 600
-		local NewElement := clickedElement
-		local NewElementPart := partOfclickedElement
-		local newElementCreated := false
+		; we didn't create a new element (we need this information later)
+		newElementCreated := false
 		
-		if (connection1!="")
+		if (connection1 != "")
 		{
-			connection1To := newElement
-			_setConnectionProperty(FlowID, connection1, "to", newElement)
+			; the first connection (if any) will end at the clicked element
+			connection1To := clickedElement
+			_setConnectionProperty(FlowID, connection1, "to", clickedElement)
 		}
 		
-		if (connection2!="")
+		if (connection2 != "")
 		{
-			connection2From := newElement
-			_setConnectionProperty(FlowID, connection2, "from", newElement)
+			; the second connection (if any) will start at the clicked element
+			connection2From := clickedElement
+			_setConnectionProperty(FlowID, connection2, "from", clickedElement)
 		}
-
-		elementType := _getElementProperty(FlowID, NewElement, "Type")
 
 		;Check whether Connection is possible
+		elementType := _getElementProperty(FlowID, clickedElement, "Type")
 		if (elementType = "Trigger" && connection1)
 		{
+			; user dragged the end of connection1 to a trigger
 			Msgbox,% lang("You_cannot_connect_to_trigger!")
 			return "aborted"
 		}
-		if (NewElement = Element1 OR NewElement = Element2)
+		if (clickedElement = Element1 OR clickedElement = Element2)
 		{
+			; user created a loop with only one element within it
 			Msgbox,% lang("The_Connection_cannot_start_and_end_on_the_same_element!")
 			return "aborted"
 		}
 		
+		; let user define other propierties of the connections, if needed
 		gosub, ui_MoveConnectionCheckAndCorrect
-		if abortAddingElement
+		if MovementAborted
+		{
+			; user cancelled
 			return "aborted"
+		}
 		
-		if (Connection1!="" and Connection2!="") ;if user has split a connection and connected an other element inbetween
-			SelectOneItem(NewElement)
-		;else keep the new or modified connection marked
+		if (Connection1!="" and Connection2!="") 
+		{
+			;if user has split a connection and moved it to an existing element
+			; select the element
+			SelectOneItem(clickedElement)
+		}
+		;else keep the new or modified connection selected
 		
 	}
+
+	; redraw
 	API_Draw_Draw(FlowID)
 	return
 	
+	; let user define other propierties of the connections, if needed
 	ui_MoveConnectionCheckAndCorrect:
 	
+		
+	; Check whether connection 1 ends at a loop or connection 2 starts at a loop
+	elementType := _getElementProperty(FlowID, clickedElement, "Type")
+	if (elementType = "Loop") ;If user pulled to a loop, assign parts
+	{
+		if newElementCreated
+		{
+			 ;If a new connection was created, define default parts
+			_setConnectionProperty(FlowID, connection1, "toPart", "HEAD")
+			_setConnectionProperty(FlowID, connection2, "fromPart", "TAIL")
+		}
+		else ;If user has pulled to an existing loop, decide depending on which part he dropped it
+		{
+			if (Connection1!="" and Connection2!="")
+			{
+				;both connections is defined. assign default parts
+				_setConnectionProperty(FlowID, connection1, "toPart", "HEAD")
+				_setConnectionProperty(FlowID, connection2, "fromPart", "TAIL")
+			}
+			else
+			{
+				; only one connection is defined
+				if (clickedElementPart=1 or clickedElementPart=2) ; head or side part of the loop
+				{
+					; set the start or end of the connection to head
+					_setConnectionProperty(FlowID, connection1, "toPart", "HEAD")
+					_setConnectionProperty(FlowID, connection2, "fromPart", "HEAD")
+				}
+				else if (clickedElementPart=3) ; tail of the loop
+				{
+					; set the start or end of the connection to tail
+					_setConnectionProperty(FlowID, connection1, "toPart", "TAIL")
+					_setConnectionProperty(FlowID, connection2, "fromPart", "TAIL")
+				}
+				else if (clickedElementPart=4) ; the break field in the tail of the loop
+				{
+					; set the end of the connection1 (if any) to break
+					; since connection2 (if any) can't start from break, assign it to tail
+					_setConnectionProperty(FlowID, connection1, "toPart", "BREAK" )
+					_setConnectionProperty(FlowID, connection2, "fromPart", "TAIL")
+				}
+			}
+		}
+	}
+	else ;if user did not pull to the loop, delete part informations
+	{
+		_deleteConnectionProperty(FlowID, Connection1, "toPart")
+		_deleteConnectionProperty(FlowID, Connection2, "fromPart")
+	}
+
 	if (Connection1 != "") ;If connection 1 exists
 	{
-		local elementType := _getElementProperty(FlowID, connection1From, "Type")
-		local connectionType := _getConnectionProperty(FlowID, connection1, "connectiontype")
+		; get some information
+		connection1From := _getConnectionProperty(FlowID, Connection1, "from")
+		elementType := _getElementProperty(FlowID, connection1From, "Type")
+		connectionType := _getConnectionProperty(FlowID, connection1, "connectiontype")
 
 		if (elementType = "Condition" )
 		{
@@ -1197,15 +1322,22 @@ ui_MoveConnection(connection1="", connection2="", element1="", element2="")
 				and connectionType != "no" 
 				and connectionType != "yes") 
 			{
+				; the connection type is not suitable. let user select a new one
 				ret := selectConnectionType(Connection1, "wait")
 				if (ret = "aborted")
-					abortAddingElement := True
+				{
+					; user cancelled
+					MovementAborted := True
+					return ; back to the gosub call
+				}
 			}
 		}
-		else ;if pulled to anything else, check whether it is normal or exception
+		else 
 		{
+			;if pulled to anything else, check whether it is normal or exception
 			if (connectionType != "normal" and connectionType != "exception")
 			{
+				; set connection type to normal silently
 				_setConnectionProperty(FlowID, connection1, "connectiontype", "normal")
 			}
 		}
@@ -1213,8 +1345,9 @@ ui_MoveConnection(connection1="", connection2="", element1="", element2="")
 	
 	if (Connection2 != "") ;If connection 2 exists
 	{
-		local elementType := _getElementProperty(FlowID, connection2From, "Type")
-		local connectionType := _getConnectionProperty(FlowID, connection2, "connectiontype")
+		; get some information
+		elementType := _getElementProperty(FlowID, connection2From, "Type")
+		connectionType := _getConnectionProperty(FlowID, connection2, "connectiontype")
 
 		if (elementType = "Condition")
 		{
@@ -1223,147 +1356,86 @@ ui_MoveConnection(connection1="", connection2="", element1="", element2="")
 				and connectionType != "no" 
 				and connectionType != "yes")
 			{
-				ret:=selectConnectionType(Connection2,"wait")
-				if (ret="aborted")
-					abortAddingElement := True
+				; the connection type is not suitable. let user select a new one
+				ret:=selectConnectionType(Connection2, "wait")
+				if (ret = "aborted")
+				{
+					; user cancelled
+					MovementAborted := True
+					return ; back to the gosub call
+				}
 			}
 		}
-		else ;if pulled to anything else, check whether it is normal or exception
+		else
 		{
+			;if pulled to anything else, check whether it is normal or exception
 			if (connectionType != "normal" and connectionType != "exception")
 			{
+				; set connection type to normal silently
 				_setConnectionProperty(FlowID, connection2, "connectiontype", "normal")
 			}
 		}
 	}
-	
-	
-	local element2Type := _getElementProperty(FlowID, Element2, "Type")
-	local connection2toPart := _getElementProperty(FlowID, connection2, "toPart")
-	local connection1toPart := _getElementProperty(FlowID, connection1, "toPart")
-	; TODO: Is this really needed? Or is this ancient uneeded code?
-	if (element2Type = "Loop") ;If the second element is a loop. The information about the connected part is not yet in the second connection.
-	{
-		if (not connection2toPart) ;If no part assigned to connection
-		{
-			if (Connection1 != "") ;If a second connection exist. Thus it was previously connected to the loop
-				_setConnectionProperty(FlowID, connection2, "toPart", connection1toPart)
-			else
-				_setConnectionProperty(FlowID, connection2, "toPart", "HEAD")  ;connect to head
-		}
-	}
-	else
-		_deleteConnectionProperty(FlowID, connection2, "toPart")  ; Delete part information if set
-	
 
-	local elementType := _getElementProperty(FlowID, newElement, "Type")
-	local connection2fromPart := _getElementProperty(FlowID, connection2, "fromPart")
-	local connection1toPart := _getElementProperty(FlowID, connection1, "toPart")
+	;Check whether user created an already existing connection
+	; gather informations
+	Connection1Type := _getConnectionProperty(FlowID, Connection1, "ConnectionType")
+	Connection2Type := _getConnectionProperty(FlowID, Connection2, "ConnectionType")
+	Connection1From := _getConnectionProperty(FlowID, Connection1, "from")
+	Connection2From := _getConnectionProperty(FlowID, Connection2, "from")
+	Connection1To := _getConnectionProperty(FlowID, Connection1, "to")
+	Connection2To := _getConnectionProperty(FlowID, Connection2, "to")
+	Connection1FromPart := _getConnectionProperty(FlowID, Connection1, "fromPart")
+	Connection2FromPart := _getConnectionProperty(FlowID, Connection2, "fromPart")
+	Connection1ToPart := _getConnectionProperty(FlowID, Connection1, "toPart")
+	Connection2ToPart := _getConnectionProperty(FlowID, Connection2, "toPart")
 
-	if (elementType = "Loop") ;If user pulled to a loop, assign parts
+	for forIndex, forConnectionID in _getAllConnectionIds(FlowID)
 	{
-		if newElementCreated ;If a new one was created, define default parts
+		forConnectionFrom := _getConnectionProperty(FlowID, forConnectionID, "from")
+		forConnectionTo := _getConnectionProperty(FlowID, forConnectionID, "to")
+
+		if (forConnectionID != Connection1)
 		{
-			_setConnectionProperty(FlowID, connection1, "toPart", "HEAD")
-			_setConnectionProperty(FlowID, connection2, "fromPart", "TAIL")
-		}
-		else ;If user has pulled to an existing loop, decide depending on which part he dropped it
-		{
-			if (Connection1!="" and Connection2!="") ;assign default if both connections exist
+			if (Connection1From = forConnectionFrom and Connection1To = forConnectionTo)
 			{
-				_setConnectionProperty(FlowID, connection1, "toPart", "HEAD")
-				_setConnectionProperty(FlowID, connection2, "fromPart", "TAIL")
-			}
-			else
-			{
-				if (NewElementPart=1 or NewElementPart=2) 
+				forConnectionType := _getConnectionProperty(FlowID, forConnectionID, "ConnectionType")
+
+				if (Connection1Type = forConnectionType)
 				{
-					_setConnectionProperty(FlowID, connection1, "toPart", "HEAD")
-					_setConnectionProperty(FlowID, connection2, "fromPart", "HEAD")
-				}
-				else if (NewElementPart=3) 
-				{
-					_setConnectionProperty(FlowID, connection1, "toPart", "TAIL")
-					_setConnectionProperty(FlowID, connection2, "fromPart", "TAIL")
-				}
-				else if (NewElementPart=4) 
-				{
-					_setConnectionProperty(FlowID, connection1, "toPart", "BREAK" )
-					_setConnectionProperty(FlowID, connection2, "fromPart", "TAIL")
-				}
-			}
-		}
-	}
-	else ;if not, delete part informations, if any
-	{
-		_deleteConnectionProperty(FlowID, Connection1, "toPart")
-		_deleteConnectionProperty(FlowID, Connection2, "fromPart")
-	}
-
-	
-	local element1Type := _getElementProperty(FlowID, Element1, "Type")
-	local connection1fromPart := _getElementProperty(FlowID, connection1, "fromPart")
-	if (element1Type = "Loop") ;If the first element is a loop
-	{
-		if (not connection1fromPart) ;If no part assigned to connection
-		{
-			_setConnectionProperty(FlowID, connection1, "fromPart", "TAIL") ;connect to tail
-		}
-	}
-	else
-		_deleteConnectionProperty(FlowID, Connection2, "topart") ;Delete part information if set
-	
-	;Check whether a connection already exists
-	Loop 2
-	{
-		if (a_index=1)
-			tempElement:=Connection1
-		else
-			tempElement:=Connection2
-
-		local Conneection1Type := _getConnectionProperty(FlowID, Connection1, "ConnectionType")
-		local Conneection2Type := _getConnectionProperty(FlowID, Connection2, "ConnectionType")
-		local Conneection1From := _getConnectionProperty(FlowID, Connection1, "from")
-		local Conneection2From := _getConnectionProperty(FlowID, Connection2, "from")
-		local Conneection1To := _getConnectionProperty(FlowID, Connection1, "to")
-		local Conneection2To := _getConnectionProperty(FlowID, Connection2, "to")
-
-		local forIndex, forConnectionID
-		for forIndex, forConnectionID in _getAllConnectionIds(FlowID)
-		{
-			if (forConnectionID != tempElement)
-			{
-				local forConnectionFrom := _getConnectionProperty(FlowID, tempElement, "from")
-				local forConnectionTo := _getConnectionProperty(FlowID, tempElement, "from")
-
-				if (Conneection1From = forConnectionFrom and Conneection1To = forConnectionTo )
-				{
-					local forConnectionType := _getConnectionProperty(FlowID, tempElement, "ConnectionType")
-
-					if (Conneection1Type = forConnectionType)
+					forConnectionFromPart := _getConnectionProperty(FlowID, forConnectionID, "fromPart")
+					forConnectionToPart := _getConnectionProperty(FlowID, forConnectionID, "toPart")
+					if (Connection1FromPart = forConnectionFromPart and Connection1ToPart = forConnectionToPart)
 					{
 						msgbox,% lang("This_Connection_Already_Exists!")
-						abortAddingElement:=true
-					}
-				}
-
-				if (Conneection2From = forConnectionFrom and Conneection2To = forConnectionTo )
-				{
-					local forConnectionType := _getConnectionProperty(FlowID, tempElement, "ConnectionType")
-
-					if (Conneection2Type = forConnectionType)
-					{
-						msgbox,% lang("This_Connection_Already_Exists!")
-						abortAddingElement:=true
+						MovementAborted:=true
+						return ; back to the gosub call
 					}
 				}
 			}
 		}
+		if (forConnectionID != Connection2)
+		{
+			if (Connection2From = forConnectionFrom and Connection2To = forConnectionTo )
+			{
+				forConnectionType := _getConnectionProperty(FlowID, forConnectionID, "ConnectionType")
+
+				if (Connection2Type = forConnectionType)
+				{
+					forConnectionFromPart := _getConnectionProperty(FlowID, forConnectionID, "fromPart")
+					forConnectionToPart := _getConnectionProperty(FlowID, forConnectionID, "toPart")
+					if (Connection1FromPart = forConnectionFromPart and Connection1ToPart = forConnectionToPart)
+					{
+						msgbox,% lang("This_Connection_Already_Exists!")
+						MovementAborted:=true
+						return ; back to the gosub call
+					}
+				}
+			}
+		}
+	}
 		
-	}
-	
-	return
-
+	return ; back to the gosub call
 }
 
 ; TODO: activate Hotkeys only for the window hwnd.

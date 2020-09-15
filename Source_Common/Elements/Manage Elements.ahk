@@ -329,7 +329,7 @@ Connection_Remove(p_FlowID, p_elementID)
 	_EnterCriticalSection() ; We get, change and store a flow in this function. keep this critical section to ensure data integrity
 
 	;remove the element from list of all connections
-	_deleteConnection(p_FlowID, forID)
+	_deleteConnection(p_FlowID, p_elementID)
 	
 	;If the element is marked, unmark it TODO
 	;~ for forID, forElement in selectedElements
