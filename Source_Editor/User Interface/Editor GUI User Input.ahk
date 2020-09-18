@@ -1,20 +1,19 @@
-﻿; TODO; put everything inside functions and remove this goto
-goto,jumpoverclickstuff
-
+﻿; react on left mouse click
 ui_leftmousebuttonclick()
 {
 	ui_mouseCick("left")
 }
+; react on right mouse click
 ui_rightmousebuttonclick()
 {
 	ui_mouseCick("right")
 }
 
+; react on a mouse click
 ui_mouseCick(button)
 {
 	global CurrentlyMainGuiIsDisabled
 	global workingOnClick
-	global UserClickedRbutton
 
 	If CurrentlyMainGuiIsDisabled
 	{
@@ -23,36 +22,23 @@ ui_mouseCick(button)
 		return
 	}
 
-	if (button = "right")
+	if workingOnClick
 	{
-		if workingOnClick
-		{
-			; ; TODO: evaluate right clicks in the pseudo-thread which is busy with the user action
-
-			; ; we are already busy with a user action.
-			; ; We will find out whether user clicks or drags the right button.
-			; if (ui_detectMovement(,"rbutton"))
-			; {
-			; 	; user drags with the right mouse button. We will scroll
-			; 	ui_scrollwithMouse("rbutton")
-			; }
-			; else
-			; {
-			; 	; User did only a click. We will inform the other pseudo-thread about this user action
-			; 	UserClickedRbutton:=true
-			; }
-		}
-		else
-		{	
-			; Scroll with using right mouse button
-			ui_scrollwithMouse("rbutton")
-		}
+		; we are already busy with an other user action. Ignore this event
 	}
 	else
 	{
-		; user clicked with the left mouse button
-		; Go to label clickonpicture in order to react on user click.
-		SetTimer,clickonpicture,-1 
+		if (button = "right")
+		{
+			; Scroll with using right mouse button
+			ui_scrollwithMouse("rbutton")
+		}
+		else
+		{
+			; user clicked with the left mouse button
+			; Go to label clickonpicture in order to react on user click.
+			SetTimer,clickonpicture,-1 
+		}
 	}
 }
 
@@ -98,7 +84,6 @@ ui_leftmousebuttondoubleclick()
 		endworkingOnClick(UserChangedSomething, UserCancelledAction)
 	}
 }
-return
 
  ;react on left mouse clicks of the user
 clickOnPicture() ;react on clicks of the user
@@ -464,8 +449,6 @@ clickOnPicture() ;react on clicks of the user
 	; do last needed tasks after that.
 	endworkingOnClick(UserChangedSomething, UserCancelledAction)	
 }
-
-return
 
 ; Called when user finished an interaction with the gui
 ; If user made a change, we need to make a new state
@@ -1438,199 +1421,179 @@ ui_MoveConnection(connection1 = "", element1 = "", connection2 = "", element2 = 
 	return ; back to the gosub call
 }
 
-; TODO: activate Hotkeys only for the window hwnd.
-#IfWinActive ·AutoHotFlow· Editor ;Hotkeys
-
-esc:
-return
-
-del: ;delete marked element
-if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of the main gui are disabled
+; when user pressed "delete", delete selected element
+key_del()
 {
-	ui_ActionWhenMainGUIDisabled()
-	return
-}
-
- ;remove all marked elements
-for markindex, markelement in _getFlowProperty(FlowID, "selectedElements") 
-{
-	Element_Remove(FlowID, markelement)
-}
-UpdateSelectedItemsList()
-;e_CorrectElementErrors("Code: 354546841.")
-State_New(FlowID)
-ui_UpdateStatusbartext()
-API_Draw_Draw(FlowID)
-return
-
-
-
-;Zoom
-ctrl_wheeldown:
-IfWinNotActive,% "ahk_id " _EditorGuiHwnd
-	return
-;Get the mouse position
-MouseGetPos,mx5,my5 
-
-
-tempZoomZoomFactor := _getFlowProperty(FlowID, "flowSettings.zoomfactor")
-tempZoomOffsetX := _getFlowProperty(FlowID, "flowSettings.offsetx")
-tempZoomOffsetY := _getFlowProperty(FlowID, "flowSettings.offsety")
-
-;Get coordinates where the mouse points to
-mx5old := mx5 / tempZoomZoomFactor
-my5old := my5 / tempZoomZoomFactor
-
-
-;Change zoom factor
-zoomFactorOld := tempZoomZoomFactor
-
-tempZoomZoomFactor := tempZoomZoomFactor / 1.1
-if (tempZoomZoomFactor < default_zoomFactorMin)
-{
-	tempZoomZoomFactor := default_zoomFactorMin
-}
-
-;Get new position where the mouse points to
-mx5new := mx5 / tempZoomZoomFactor
-my5new := my5 / tempZoomZoomFactor
-
-;Move everything, so the mouse will still point at the same position
-tempZoomOffsetX :=  tempZoomOffsetX + mx5old - mx5new 
-tempZoomOffsetY := tempZoomOffsetY + my5old  - my5new
-
-_setFlowProperty(FlowID, "flowSettings.zoomfactor", tempZoomZoomFactor)
-_setFlowProperty(FlowID, "flowSettings.offsetx", tempZoomOffsetX)
-_setFlowProperty(FlowID, "flowSettings.offsety", tempZoomOffsetY)
-
-ui_UpdateStatusbartext("pos")
-API_Draw_Draw(FlowID)
-
-return
-
-ctrl_wheelup:
-IfWinNotActive,% "ahk_id " _EditorGuiHwnd
-	return
-
-MouseGetPos,mx5,my5 ;Get the mouse position
-
-tempZoomZoomFactor := _getFlowProperty(FlowID, "flowSettings.zoomfactor")
-tempZoomOffsetX := _getFlowProperty(FlowID, "flowSettings.offsetx")
-tempZoomOffsetY := _getFlowProperty(FlowID, "flowSettings.offsety")
-
-;Get coordinates where the mouse points to
-mx5old := mx5 / tempZoomZoomFactor
-my5old := my5 / tempZoomZoomFactor
-
-;Change zoom factor
-zoomFactorOld:=tempZoomZoomFactor
-
-tempZoomZoomFactor := tempZoomZoomFactor * 1.1
-if (tempZoomZoomFactor > default_zoomFactorMax)
-{
-	tempZoomZoomFactor := default_zoomFactorMax
-}
-
-;Get new position where the mouse points to
-mx5new := mx5 / tempZoomZoomFactor
-my5new := my5 / tempZoomZoomFactor
-
-
-;Move everything, so the mouse will still point at the same position
-
-tempZoomOffsetX := tempZoomOffsetX + mx5old - mx5new 
-tempZoomOffsetY := tempZoomOffsetY + my5old - my5new
-
-_setFlowProperty(FlowID, "flowSettings.zoomfactor", tempZoomZoomFactor)
-_setFlowProperty(FlowID, "flowSettings.offsetx", tempZoomOffsetX)
-_setFlowProperty(FlowID, "flowSettings.offsety", tempZoomOffsetY)
-
-ui_UpdateStatusbartext("pos")
-
-API_Draw_Draw(FlowID)
-
-return
-
-
-ctrl_x:
-ret := SaveToClipboard()
-if (ret = 0)
-{ 	
-	;Delete all marked elements
-	selectedElementscopy := _getFlowProperty(FlowID, "selectedElements") 
-
-	for markID, markelement in _getFlowProperty(FlowID, "selectedElements") 
+	;remove all selected elements
+	for index, selectedElement in _getFlowProperty(FlowID, "selectedElements") 
 	{
-		;remove all marked elements
-		Element_Remove(FlowID, markelement)
+		Element_Remove(FlowID, selectedElement)
 	}
-	selectedElementscopy:=""
+	; we have deleted the selected elements and need to update some variables
+	UpdateSelectedItemsList()
 	
+	; we changed something, so create a new state
 	State_New(FlowID)
+
+	; redraw
 	ui_UpdateStatusbartext()
 	API_Draw_Draw(FlowID)
-}
-return
-
-ctrl_c:
-if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of the main gui are disabled
-{
-	ui_ActionWhenMainGUIDisabled()
 	return
 }
-SaveToClipboard()
-return
 
-ctrl_v:
-if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of the main gui are disabled
+
+;Zoom out
+ctrl_wheeldown()
 {
-	ui_ActionWhenMainGUIDisabled()
+	ctrl_wheel("down")
+}
+;Zoom in
+ctrl_wheelup()
+{
+	ctrl_wheel("up")
+}
+
+; zoom in or out
+ctrl_wheel(direction)
+{
+	global default_zoomFactorMin, default_zoomFactorMax
+
+	; get some info about the position and the zoom factor
+	tempZoomZoomFactor := _getFlowProperty(FlowID, "flowSettings.zoomfactor")
+	tempZoomOffsetX := _getFlowProperty(FlowID, "flowSettings.offsetx")
+	tempZoomOffsetY := _getFlowProperty(FlowID, "flowSettings.offsety")
+
+	;Get the mouse position
+	MouseGetPos,mx5,my5 
+
+	;Get coordinates where the mouse points to
+	mx5old := mx5 / tempZoomZoomFactor
+	my5old := my5 / tempZoomZoomFactor
+
+	;Change zoom factor
+	zoomFactorOld := tempZoomZoomFactor
+
+	if (direction = "up")
+	{
+		; zoom in
+		tempZoomZoomFactor := tempZoomZoomFactor * 1.1
+		if (tempZoomZoomFactor > default_zoomFactorMax)
+		{
+			; prevent that user zooms too far in
+			tempZoomZoomFactor := default_zoomFactorMax
+		}
+	}		
+	else if (direction = "down")
+	{
+		; zoom out
+		tempZoomZoomFactor := tempZoomZoomFactor / 1.1
+		if (tempZoomZoomFactor < default_zoomFactorMin)
+		{
+			; prevent that user zooms too far out
+			tempZoomZoomFactor := default_zoomFactorMin
+		}
+	}
+
+	;Get new position where the mouse points to
+	mx5new := mx5 / tempZoomZoomFactor
+	my5new := my5 / tempZoomZoomFactor
+
+	;Move everything, so the mouse will still point at the same position
+	tempZoomOffsetX :=  tempZoomOffsetX + mx5old - mx5new 
+	tempZoomOffsetY := tempZoomOffsetY + my5old  - my5new
+
+	; write the info about the position and the zoom factor
+	_setFlowProperty(FlowID, "flowSettings.zoomfactor", tempZoomZoomFactor)
+	_setFlowProperty(FlowID, "flowSettings.offsetx", tempZoomOffsetX)
+	_setFlowProperty(FlowID, "flowSettings.offsety", tempZoomOffsetY)
+
+	; redraw
+	ui_UpdateStatusbartext("pos")
+	API_Draw_Draw(FlowID)
+
+}
+
+; user pressed ctrl + x. Cut selected elements
+key_ctrl_x()
+{
+	; save selected elements to clipboard
+	ret := SaveToClipboard()
+	if (ret = 0)
+	{ 	
+		;Delete all selected elements
+		for markID, markelement in _getFlowProperty(FlowID, "selectedElements") 
+		{
+			Element_Remove(FlowID, markelement)
+		}
+		
+		; we changed something. Make new state
+		State_New(FlowID)
+
+		; redraw
+		ui_UpdateStatusbartext()
+		API_Draw_Draw(FlowID)
+	}
+}
+
+; user pressed ctrl + x. Copy selected elements
+key_ctrl_c()
+{
+	SaveToClipboard()
+}
+
+; user pressed ctrl + v. Paste selected elements
+key_ctrl_v()
+{
+	loadFromClipboard()
 	return
 }
-loadFromClipboard()
-return
 
-ctrl_s:
-if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of the main gui are disabled
+; user pressed ctrl + s. Save flow
+key_ctrl_s()
 {
-	ui_ActionWhenMainGUIDisabled()
+	saveFlow(FlowID)
 	return
 }
-saveFlow(FlowID)
-return
 
-ctrl_z:
-if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of the main gui are disabled
+; user pressed ctrl + z. Undo a change
+key_ctrl_z()
 {
-	ui_ActionWhenMainGUIDisabled()
+	; undo a change
+	State_Undo(FlowID)
+
+	; update selected elements (if elements were removed)
+	UpdateSelectedItemsList()
+
+	; redraw
+	ui_UpdateStatusbartext()
+	API_Draw_Draw(FlowID)
 	return
 }
-State_Undo(FlowID)
-UpdateSelectedItemsList()
-API_Draw_Draw(FlowID)
-return
-ctrl_y:
-if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of the main gui are disabled
+
+; user pressed ctrl + y. Redo a change
+key_ctrl_y()
 {
-	ui_ActionWhenMainGUIDisabled()
+	; redo a change
+	State_Redo(FlowID)
+	
+	; update selected elements (if elements were removed)
+	UpdateSelectedItemsList()
+
+	; redraw
+	ui_UpdateStatusbartext()
+	API_Draw_Draw(FlowID)
 	return
 }
-State_Redo(FlowID)
-API_Draw_Draw(FlowID)
-return
 
-ctrl_a:
-if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of the main gui are disabled
+; user pressed ctrl + a. Select all elements
+key_ctrl_a()
 {
-	ui_ActionWhenMainGUIDisabled()
+	; select all elements
+	SelectEverything()
+
+	; redraw
+	ui_UpdateStatusbartext()
+	API_Draw_Draw(FlowID)
 	return
 }
-UnSelectEverything()
-SelectEverything()
-API_Draw_Draw(FlowID)
-return
 
-
-
-jumpoverclickstuff:
-temp=

@@ -36,16 +36,6 @@ EditorGUIInit()
 	initializeMenuBar()
 	ui_UpdateStatusbartext()
 	
-	;Set some hotkeys that are needed in editor gui
-	hotkey,IfWinActive,% "ahk_id " _EditorGuiHwnd
-	
-	hotkey,^c,ctrl_c
-	hotkey,^v,ctrl_v
-	hotkey,^s,ctrl_s
-	hotkey,^z,ctrl_z
-	hotkey,^y,ctrl_y
-	hotkey,^a,ctrl_a
-	
 	;React on key
 	OnMessage(0x100,"keyPressed",1)
 
@@ -197,30 +187,52 @@ keyPressed(wpar, lpar, msg, hwn)
 		; react only if user interacted with the main gui
 		return
 	}
+	
+	if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of the main gui are disabled
+	{
+		ui_ActionWhenMainGUIDisabled()
+		return
+	}
 	wpar2:=wpar
 	
-	if (wpar=0x53)
+	if (wpar=0x41)
 	{
 		if getkeystate("ctrl")
-			SetTimer, ctrl_s,-1
+			SetTimer, key_ctrl_a,-1
 	}
 	if (wpar=0x43)
 	{
 		if getkeystate("ctrl")
-			SetTimer, ctrl_c,-1
+			SetTimer, key_ctrl_c,-1
+	}
+	if (wpar=0x53)
+	{
+		if getkeystate("ctrl")
+			SetTimer, key_ctrl_s,-1
 	}
 	if (wpar=0x56)
 	{
 		if getkeystate("ctrl")
-			SetTimer, ctrl_v,-1
+			SetTimer, key_ctrl_v,-1
 	}
-	if (wpar=0x1b)
+	if (wpar=0x58)
 	{
-		SetTimer, esc,-1
+		if getkeystate("ctrl")
+			SetTimer, key_ctrl_x,-1
+	}
+	if (wpar=0x59)
+	{
+		if getkeystate("ctrl")
+			SetTimer, key_ctrl_y,-1
+	}
+	if (wpar=0x5A)
+	{
+		if getkeystate("ctrl")
+			SetTimer, key_ctrl_z,-1
 	}
 	if (wpar=0x2e)
 	{
-		SetTimer, del,-1
+		SetTimer, key_del,-1
 	}
 }
 
@@ -228,6 +240,19 @@ keyPressed(wpar, lpar, msg, hwn)
 mousewheelmove(wpar, lpar, msg, hwn)
 {
 	global
+	
+	if (hwn!=_EditControlHWND and hwn!=_StatusbarHWND and hwn!=_EditorGuiHwnd)
+	{
+		; react only if user interacted with the main gui
+		return
+	}
+	
+	if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of the main gui are disabled
+	{
+		ui_ActionWhenMainGUIDisabled()
+		return
+	}
+
 	if (hwn!=_EditControlHWND and hwn!=_StatusbarHWND and hwn!=_EditorGuiHwnd)
 	{
 		; react only if user interacted with the main gui

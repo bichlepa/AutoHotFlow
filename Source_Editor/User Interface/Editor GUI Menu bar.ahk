@@ -1,11 +1,11 @@
 ﻿
 ;this is the menu on top of the main window
-;Help! I want that the menu are renamed when the language changes.
+;TODO Rename menu when the language changes.
 initializeMenuBar()
 {
 	global
-	;~ try menu,MyMenu,deleteall
 	
+	; create menu elements
 	Menu, MyMenu,add,% lang("Save"),ui_Menu_save
 	Menu, MyMenu,add,% lang("Run"),ui_Menu_MenuStart
 	Menu, MyMenu,add,% lang("Stop"),ui_Menu_MenuStop
@@ -16,80 +16,125 @@ initializeMenuBar()
 	Menu, MyMenu,add,% lang("Settings"),ui_Menu_Settings
 	Menu, MyMenu,add,% lang("Exit"),Exit
 
+	; show them in the main gui
 	Gui, Maingui:menu, MyMenu
-}
-
-SetTimer, ui_Menu_CheckLoop, 10
-
-goto,überspringendsfasdg
-
-
-
-ui_Menu_save:
-if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of the main gui are disabled
-{
-	ui_ActionWhenMainGUIDisabled()
-	return
-}
-saveFlow(FlowID)
-return
-
-
-
-
-ui_Menu_MenuStart:
-
-executeFlow(FlowID)
-
-return
-
-ui_Menu_MenuStop:
-StopFlow(FlowID)
-return
-
-ui_Menu_Enable:
-enableToggleFlow(FlowID)
-return
-
-ui_Menu_Undo:
-gosub, ctrl_z
-return
-
-ui_Menu_Redo:
-gosub, ctrl_y
-return
-
-
-ui_Menu_Settings:
-if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of the main gui are disabled
-{
-	ui_ActionWhenMainGUIDisabled()
-	return
-}
-ui_SettingsOfFlow()
-return
-
-ui_Menu_CheckLoop:
-
-tempEnabled := _getFlowProperty(FlowID, "enabled")
-
-if (menu_bar_IsEnabled != tempEnabled)
-{
-	if (tempEnabled = True)
-	{
-		menu_bar_IsEnabled := True
-		try Menu, MyMenu,rename,% lang("Enable"),% lang("Disable")
-	}
-	else if (tempEnabled = false)
-	{
-		menu_bar_IsEnabled := False
-		try Menu, MyMenu,rename,% lang("Disable"),% lang("Enable")
-	}
 	
+	; set timer which continuously updates the menu
+	SetTimer, ui_Menu_CheckLoop, 10	
 }
 
-return
 
 
-überspringendsfasdg:
-sleep,1
+; user wants to save
+ui_Menu_save()
+{
+	global CurrentlyMainGuiIsDisabled
+	if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of the main gui are disabled
+	{
+		ui_ActionWhenMainGUIDisabled()
+		return
+	}
+	saveFlow(FlowID)
+}
+
+; user wants to start flow
+ui_Menu_MenuStart()
+{
+	global CurrentlyMainGuiIsDisabled
+	if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of the main gui are disabled
+	{
+		ui_ActionWhenMainGUIDisabled()
+		return
+	}
+	executeFlow(FlowID)
+}
+
+; user wants to stop flow
+ui_Menu_MenuStop()
+{
+	global CurrentlyMainGuiIsDisabled
+	if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of the main gui are disabled
+	{
+		ui_ActionWhenMainGUIDisabled()
+		return
+	}
+	StopFlow(FlowID)
+}
+
+; user wants to enable or disable flow
+ui_Menu_Enable()
+{
+	global CurrentlyMainGuiIsDisabled
+	if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of the main gui are disabled
+	{
+		ui_ActionWhenMainGUIDisabled()
+		return
+	}
+	enableToggleFlow(FlowID)
+}
+
+; user wants to undo a change
+ui_Menu_Undo()
+{
+	global CurrentlyMainGuiIsDisabled
+	if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of the main gui are disabled
+	{
+		ui_ActionWhenMainGUIDisabled()
+		return
+	}
+	; save as if user presses the hotkey
+	key_ctrl_z()
+}
+
+; user wants to redo a change
+ui_Menu_Redo()
+{
+	global CurrentlyMainGuiIsDisabled
+	if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of the main gui are disabled
+	{
+		ui_ActionWhenMainGUIDisabled()
+		return
+	}
+	; save as if user presses the hotkey
+	key_ctrl_y()
+}
+
+; user wants to change flow settings
+ui_Menu_Settings()
+{
+	global CurrentlyMainGuiIsDisabled
+	if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of the main gui are disabled
+	{
+		ui_ActionWhenMainGUIDisabled()
+		return
+	}
+	; open flow settings
+	ui_SettingsOfFlow()
+}
+
+; regular check of the flow state. Depending on that we will update the text in the menu
+ui_Menu_CheckLoop()
+{
+	static menu_bar_IsEnabled
+
+	; get information whether flow is enabled
+	tempEnabled := _getFlowProperty(FlowID, "enabled")
+
+	; check whether something changed
+	if (menu_bar_IsEnabled != tempEnabled)
+	{
+		; something changed, update the label of the menu element
+		if (tempEnabled = True)
+		{
+			menu_bar_IsEnabled := True
+			try Menu, MyMenu,rename,% lang("Enable"),% lang("Disable")
+		}
+		else if (tempEnabled = false)
+		{
+			menu_bar_IsEnabled := False
+			try Menu, MyMenu,rename,% lang("Disable"),% lang("Enable")
+		}
+		
+	}
+}
+

@@ -254,7 +254,7 @@ Element_Remove(p_FlowID, p_elementID)
 	else
 	{
 		;remove the element from list of all elements
-		_deleteElement(p_FlowID, forID)
+		_deleteElement(p_FlowID, p_elementID)
 		
 		;~ ;If the element is marked, unmark it TODO
 		;~ for forID, forElement in selectedElements
