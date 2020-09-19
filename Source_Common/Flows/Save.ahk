@@ -254,7 +254,7 @@ i_SaveUnsavedFlows()
 	{
 		if (_getFlowProperty(FlowID, "currentState") != _getFlowProperty(FlowID, "savedState") and not _getFlowProperty(FlowID, "demo"))
 		{
-			SaveFlow(tempID)
+			SaveFlow(oneFlowID)
 		}
 		
 	}

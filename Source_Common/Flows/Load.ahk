@@ -1,25 +1,38 @@
 ﻿
-;load a flow
-LoadFlow(FlowID, filepath="", params="")
+;load all flow information from file (additionally to meta data)
+;FlowID is needed
+;if p_filepath is not set, the path in flow object is taken (this is the usual case)
+;p_params: a string which can contain following strings:
+; - keepPosition: do not load element positions
+; - keepDraw: do not overwrite the object with the draw results
+; - loadAgain: if a flow is already loaded, this parameter will suppress the error message and load anyway
+; - noNewState: does not create a new state when loaded
+LoadFlow(FlowID, p_filepath = "", p_params = "")
 {
+	global default_OffsetX, default_OffsetY, default_ZoomFactor
+	global currentlyLoadingFlow
+
+	; cath some bugs
 	if (FlowID="")
 	{
-		MsgBox internal error! A flow should be loaded but FlowID is empty!
+		throw Exception("unexpected error! A flow should be loaded but FlowID is empty!")
 		return
 	}
 	
-	ifnotinstring,params,LoadAgain
+	; a flow cannot be loaded twice (anyway it can be loaded again if p_params contains "loadAgain")
+	ifnotinstring, p_params, LoadAgain
 	{
 		if (_getFlowProperty(FlowID, "loaded"))
 		{
-			MsgBox unexpected error. Flow %FlowID% should be loaded but it was already loaded
+			throw Exception("unexpected error. Flow %FlowID% should be loaded but it was already loaded")
 			return
 		}
 	}
 	
+	; ensure that only one flow is loading at time
 	if (currentlyLoadingFlow = true)
 	{
-		MsgBox unexpected error. a flow is already currently loading
+		throw Exception("unexpected error. a flow is already currently loading")
 		return
 	}
 
@@ -27,57 +40,88 @@ LoadFlow(FlowID, filepath="", params="")
 	
 	_EnterCriticalSection()  ; We get, change and store an element in this function. keep this critical section to ensure data integrity
 
-	IfInString, params, keepPosition
+	; if we need to keep position, copy the position data, to restore it later
+	IfInString, p_params, keepPosition
 	{
-		oldPosition:=objFullyClone(_getFlowProperty(FlowID, "flowSettings"))
+		oldPosition := objFullyClone(_getFlowProperty(FlowID, "flowSettings"))
 	}
 	
 	
-	if (filepath="")
+	if (p_filepath="")
 	{
+		; file path is not passed to this function. Take the path from flow object (this is the usual case)
 		ThisFlowFilepath := _getFlowProperty(FlowID, "file")
 		ThisFlowFolder := _getFlowProperty(FlowID, "Folder")
 		ThisFlowFilename := _getFlowProperty(FlowID, "FileName")
 	}
 	else
 	{
-		ThisFlowFilepath:=filepath
-		SplitPath, ThisFlowFilepath,,ThisFlowFolder,,ThisFlowFilename
+		; file path is passed, take this path
+		ThisFlowFilepath := p_filepath
+		SplitPath, ThisFlowFilepath, , ThisFlowFolder, , ThisFlowFilename
 	}
 	
-	;~ MsgBox %ThisFlowFilepath% - %ThisFlowFolder% - %ThisFlowFilename%
-	
+	; if we load a flow and do not find some element impelementations, probably a package is missing. We will write missing packages here and warn user later
 	missingpackages :=Object()
+
 	logger("a1", "Loading flow from file: " ThisFlowFilePath)
 	
+	; check whether the file exists
 	IfnotExist,%ThisFlowFolder%\%ThisFlowFilename%.ini
 	{
 		logger("a0", "ERROR! Flow file " ThisFlowFolder "\ "ThisFlowFilename ".ini" " does not exist!")
 		MsgBox % "ERROR! Flow file " ThisFlowFolder "\" ThisFlowFilename ".ini" " does not exist!"
+		return
 	}
 	
 	
-	;read ini file
-	
-	res:=RIni_Read("IniFile",ThisFlowFilepath)
+	;open ini file for read
+	res := RIni_Read("IniFile", ThisFlowFilepath)
 	if res
-		MsgBox Failed to load the ini file. Error code: %res%
-	
-	flowSettings:=Object()
-	IfNotInString, params,keepDraw
-	;~ d(flow)
-	AllSections:=RIni_GetSections("IniFile")
+	{
+		; there was an error
+		logger("a0", "ERROR! Failed to load the ini file. Error code: " res)
+		MsgBox  % "ERROR! Failed to load the ini file. Error code: " res
+		return
+	}
+
+	; load flow settings. If not present in file, set default values
+	flowSettings := Object()
 	_setFlowProperty(FlowID, "CompabilityVersion", RIni_GetKeyValue("IniFile", "general", "FlowCompabilityVersion", 0))
 	_setFlowProperty(FlowID, "ElementIDCounter", RIni_GetKeyValue("IniFile", "general", "count", 1))
-	flowSettings.ExecutionPolicy:=RIni_GetKeyValue("IniFile", "general", "SettingFlowExecutionPolicy", "default")
-	flowSettings.DefaultWorkingDir:=RIni_GetKeyValue("IniFile", "general", "SettingDefaultWorkingDir", True)
-	flowSettings.WorkingDir:=RIni_GetKeyValue("IniFile", "general", "SettingWorkingDir", _settings.FlowWorkingDir)
+	flowSettings.ExecutionPolicy := RIni_GetKeyValue("IniFile", "general", "SettingFlowExecutionPolicy", "default")
+	flowSettings.DefaultWorkingDir := RIni_GetKeyValue("IniFile", "general", "SettingDefaultWorkingDir", True)
+	flowSettings.WorkingDir := RIni_GetKeyValue("IniFile", "general", "SettingWorkingDir", _getSettings("path"))
 	
+	; load meta data ( which are general information which either is need by the manager or is often changed)
+	flowSettings.Offsetx := RIni_GetKeyValue("IniFile", "general", "Offsetx", default_OffsetX)
+	flowSettings.Offsety := RIni_GetKeyValue("IniFile", "general", "Offsety", default_OffsetY)
+	flowSettings.zoomFactor := RIni_GetKeyValue("IniFile", "general", "zoomFactor", default_ZoomFactor)
+	flowSettings.Name := RIni_GetKeyValue("IniFile", "general", "name", "")
+
+	; load and chack folder with static variables
+	flowSettings.FolderOfStaticVariables := RIni_GetKeyValue("IniFile", "general", "FolderOfStaticVariables", ThisFlowFolder "\Static variables\" ThisFlowFilename)
+	if not fileexist(flowSettings.FolderOfStaticVariables)
+	{
+		FileCreateDir,% flowSettings.FolderOfStaticVariables
+		if not fileexist(flowSettings.FolderOfStaticVariables)
+		{
+			logger("a0","Error! The working folder '" flowSettings.FolderOfStaticVariables "' does not exist and could not be created.")
+			MsgBox % lang("Error!") "`n" lang("The working folder '%1%' does not exist and could not be created", flowSettings.FolderOfStaticVariables)
+		}
+	}
+
+	; write loaded flow settings
 	_setFlowProperty(FlowID, "flowSettings", flowSettings)
+
+	; create object which will contain selected elements
 	_setFlowProperty(FlowID, "selectedElements", Object())
-	IfNotInString, params, keepDraw
+
+	; create object which will contain draw results
+	IfNotInString, p_params, keepDraw
 		_setFlowProperty(FlowID, "draw", Object())
 
+	; check working directory
 	if not fileexist(flowSettings.WorkingDir)
 	{
 		logger("a1","Working directory of the flow does not exist. Creating it now.")
@@ -88,65 +132,81 @@ LoadFlow(FlowID, filepath="", params="")
 		}
 	}
 	
-	loadFlowMetaData(flowID)
 	
-	IfInString, params, keepPosition
+	; restore position, if requested
+	IfInString, p_params, keepPosition
 	{
 		_setFlowProperty(FlowID, "flowSettings.Offsetx", oldPosition.Offsetx)
 		_setFlowProperty(FlowID, "flowSettings.Offsety", oldPosition.Offsety)
 		_setFlowProperty(FlowID, "flowSettings.zoomFactor", oldPosition.zoomFactor)
 	}
 	
-	
 	;Loop through all ellements and load them
-	loop,parse,AllSections,`,
+	AllSections := RIni_GetSections("IniFile")
+	loop, parse, AllSections, `,
 	{
-		if a_loopfield=general
+		oneSection := A_LoopField
+
+		; the section "general" does not contain an element or connection
+		if (oneSection = "general")
 			continue
-		tempSection := A_LoopField
 		
-		loadElementID := RIni_GetKeyValue("IniFile", tempSection, "ID", "")
-		if (loadElementID="")
+		; get element ID
+		loadElementID := RIni_GetKeyValue("IniFile", oneSection, "ID", "")
+		if (loadElementID = "")
 		{
-			logger("a0","Error! Could not read the ID of an element " tempSection ". This element will not be loaded")
+			; the the element id must be defined in file. if not, skip it
+			logger("a0","Error! Could not read the ID of an element " oneSection ". This element will not be loaded")
 			continue
 		}
-		loadElementClass := RIni_GetKeyValue("IniFile", tempSection, "Class", "")
-		loadElementType := RIni_GetKeyValue("IniFile", tempSection, "Type", "")
-		loadElementPackage := RIni_GetKeyValue("IniFile", tempSection, "Package", "Unknown")
+
+		; get more informations
+		loadElementType := RIni_GetKeyValue("IniFile", oneSection, "Type", "")
+		loadElementPackage := RIni_GetKeyValue("IniFile", oneSection, "Package", "Unknown")
 		
-		IfInString, tempSection ,element
+		; check wheter it is an element or a connection
+		IfInString, oneSection, element
 		{
-			;~ d(loadElementID,loadElementType)
-			element_New(FlowID, loadElementType,loadElementID) ;Pass element ID, so it will be the same as the last time
+			; this is an element.
+			; create the new element keeping its ID
+			element_New(FlowID, loadElementType, loadElementID)
+
+			; we will change many properties, so get the whole element object
 			loadElement := _getElement(FlowID, loadElementID)
 			
-			tempValue:=RIni_GetKeyValue("IniFile", tempSection, "name", "")
+			; get element name
+			tempValue := RIni_GetKeyValue("IniFile", oneSection, "name", "")
 			StringReplace, tempValue, tempValue, |¶,`n, All
-			loadElement.Name:=tempValue
+			loadElement.Name := tempValue
 			
-			loadElement.StandardName:=RIni_GetKeyValue("IniFile", tempSection, "StandardName", "1")
-			loadElement.x:=RIni_GetKeyValue("IniFile", tempSection, "x", 200)
-			loadElement.y:=RIni_GetKeyValue("IniFile", tempSection, "y", 200)
-			IsDefaultTriger:=RIni_GetKeyValue("IniFile", tempSection, "DefaultTrigger", False) 
-			loadElement.Class := loadElementClass
+			; get more common element properties
+			loadElement.StandardName := RIni_GetKeyValue("IniFile", oneSection, "StandardName", "1")
+			loadElement.x := RIni_GetKeyValue("IniFile", oneSection, "x", 200)
+			loadElement.y := RIni_GetKeyValue("IniFile", oneSection, "y", 200)
+			IsDefaultTriger := RIni_GetKeyValue("IniFile", oneSection, "DefaultTrigger", False) 
+			loadElement.Class := RIni_GetKeyValue("IniFile", oneSection, "Class", "")
 			
-			if (loadElementType="loop")
+			if (loadElementType = "loop")
 			{
-				loadElement.HeightOfVerticalBar := RIni_GetKeyValue("IniFile", tempSection, "HeightOfVerticalBar", 200)
+				; get loop specific properties
+				loadElement.HeightOfVerticalBar := RIni_GetKeyValue("IniFile", oneSection, "HeightOfVerticalBar", 200)
 			}
 
-			loadElement.icon:=Element_getIconPath_%loadElementClass%()
+			; get element icon
+			loadElement.icon := Element_getIconPath_%loadElementClass%()
+
+			; write the whole changed element object
 			_setElement(FlowID, loadElementID, loadElement)
 
 			;Check the class (compatibility to old savefiles)
-			LoadFlowCheckCompabilityClass(flowID, loadElementID, tempSection)
+			LoadFlowCheckCompabilityClass(flowID, loadElementID, oneSection)
 			loadElementClass := _getElementProperty(FlowID, loadElementID, "class")
 			
-			;If element class is not installed, prepare a warning message
+			;Check whether we have the implementation of the element class
 			AllElementClasses := _getShared("AllElementClasses")
 			if not (ObjHasValue(AllElementClasses, loadElementClass))
 			{
+				; we do not have the implementation. A package is missing. Warn user later
 				if not (ObjHasValue(missingpackages, loadElementPackage))
 					missingpackages.push(loadElementPackage)
 			}
@@ -154,7 +214,6 @@ LoadFlow(FlowID, filepath="", params="")
 			; If there is one manual trigger, one of them must be manual. Following code ensures this
 			if (loadElementType="trigger")
 			{
-				;Set default trigger
 				if (loadElement.Class = "trigger_manual")
 				{
 					if (IsDefaultTriger = True or Element_findDefaultTrigger(FlowID) = "")
@@ -162,60 +221,87 @@ LoadFlow(FlowID, filepath="", params="")
 						Element_setDefaultTrigger(FlowID, loadElementID)
 					}
 				}
-				AnyTriggerLoaded:=true
+				; we loaded a trigger. Remember this
+				AnyTriggerLoaded := true
 			}
 
 			;Get the list of all parameters and read all parameters from ini
-			LoadFlowParametersOfElement(flowID,loadElementID,"IniFile",tempSection)
+			LoadFlowParametersOfElement(flowID, loadElementID, "IniFile", oneSection)
 			
-			LoadFlowCheckCompabilityElement(flowID,loadElementID, tempSection, _getFlowProperty(FlowID, "CompabilityVersion"))
+			; Ensure backward compatibility
+			LoadFlowCheckCompabilityElement(flowID,loadElementID, oneSection, _getFlowProperty(FlowID, "CompabilityVersion"))
 			
-			;If default name is selected, generate the name of the element
-			if (_getElementProperty(FlowID, ElementID, "StandardName"))
+			;If property "default name" is enabled, regenerate the name of the element
+			if (_getElementProperty(FlowID, loadElementID, "StandardName"))
 			{
 				if (IsFunc("Element_GenerateName_" loadElementClass))
 				{
-					Newname:=Element_GenerateName_%loadElementClass%({flowID: flowID, elementID: loadElementID},  _getElementProperty(FlowID, loadElementID, "pars"))
+					Newname := Element_GenerateName_%loadElementClass%({flowID: flowID, elementID: loadElementID},  _getElementProperty(FlowID, loadElementID, "pars"))
 					StringReplace, Newname, Newname, `n, %a_space%-%a_space%, all
-					_setElementProperty(FlowID, ElementID, "Name", Newname)
+					_setElementProperty(FlowID, loadElementID, "Name", Newname)
 				}
 			}
 		}
-		else IfInString,tempSection,connection
+		else IfInString,oneSection,connection
 		{
+			; this is a connection.
+			; create a new connection and keep its ID
 			connection_new(FlowID, loadElementID)
+
+			; we will change many properties, so get the whole connection object
 			loadElement := _getConnection(FlowID, loadElementID)
 			
-			loadElement.from:=RIni_GetKeyValue("IniFile", tempSection, "from", "")
-			loadElement.to:=RIni_GetKeyValue("IniFile", tempSection, "to", "")
-			loadElement.ConnectionType:=RIni_GetKeyValue("IniFile", tempSection, "ConnectionType", "")
-			loadElement.fromPart:=RIni_GetKeyValue("IniFile", tempSection, "fromPart", "")
-			loadElement.ToPart:=RIni_GetKeyValue("IniFile", tempSection, "ToPart", "")
+			; load element properties
+			loadElement.from:=RIni_GetKeyValue("IniFile", oneSection, "from", "")
+			loadElement.to:=RIni_GetKeyValue("IniFile", oneSection, "to", "")
+			loadElement.ConnectionType:=RIni_GetKeyValue("IniFile", oneSection, "ConnectionType", "")
+			loadElement.fromPart:=RIni_GetKeyValue("IniFile", oneSection, "fromPart", "")
+			loadElement.ToPart:=RIni_GetKeyValue("IniFile", oneSection, "ToPart", "")
+
+			; write the whole changed connection object
 			loadElement := _setConnection(FlowID, loadElementID, loadElement)
 			
-			LoadFlowCheckCompabilityElement(FlowID, loadElementID, tempSection, _getFlowProperty(FlowID, "CompabilityVersion"))
+			; ensure backward compatibility
+			LoadFlowCheckCompabilityConnection(FlowID, loadElementID, oneSection, _getFlowProperty(FlowID, "CompabilityVersion"))
 		}
 		else
 		{
-			logger("a1","Flow " flowSettings.Name " error on loading: unknown section: '" tempSection "'.")
+			; the section name is invalid
+			logger("a1","Flow " flowSettings.Name " error on loading: unknown section: '" oneSection "'.")
 		}
-		
 	}
+
+	; does the flow contain any trigger?
 	if not AnyTriggerLoaded
 	{
+		; if not, this might be an empty flow. Create a new manual trigger
 		loadElementID := element_New(FlowID, "trigger")
-		Element_SetClass(FlowID, loadElementID, "Trigger_Manual")
+		loadElementClass := "Trigger_Manual"
+		Element_SetClass(FlowID, loadElementID, loadElementClass)
+
+		;Load default parameters for the new trigger (well knowin that it is not in file)
+		LoadFlowParametersOfElement(flowID, loadElementID, "IniFile", "notExistingDummyName")
+		Newname := Element_GenerateName_%loadElementClass%({flowID: flowID, elementID: loadElementID},  _getElementProperty(FlowID, loadElementID, "pars"))
+		StringReplace, Newname, Newname, `n, %a_space%-%a_space%, all
+		_setElementProperty(FlowID, loadElementID, "Name", Newname)
 	}
+
+	; ensure backward compatibility
 	LoadFlowCheckCompabilityFlow(flowID, _getFlowProperty(FlowID, "CompabilityVersion"))
 	
-	
+	; write time when we loaded the flow
 	if not (_getFlowProperty(FlowID, "firstLoadedTime"))
 		_setFlowProperty(FlowID, "firstLoadedTime", a_now)
+
+	; the flow is now loaded, write this info
 	_setFlowProperty(FlowID, "loaded", true)
+
 	logger("a1","Flow " flowSettings.Name " was loaded.")
 	
-	if (missingpackages.length()>0)
-	{ 
+	; did we find missing packages
+	if (missingpackages.length() > 0)
+	{
+		; warn user about the missing packages
 		tempmissingpackageslist := ""
 		for forkey, forvalue in missingpackages
 		{
@@ -225,12 +311,13 @@ LoadFlow(FlowID, filepath="", params="")
 		MsgBox % lang("Attention!") " " lang("The flow '%1%' could not be loaded properly!" _getFlowProperty(FlowID, "name")) "`n" lang("Following packages are missing:") "`n`n" tempmissingpackageslist "`n`n" lang("Debug Info") ":`n" lang("Filename") ": " ThisFlowFilepath
 	}
 	
+	; close ini file
 	RIni_Shutdown("IniFile")
 	
-	IfnotInString, params, NoNewState
+	; create a new state (can be suppressed with paraemter)
+	IfnotInString, p_params, NoNewState
 	{
 		state_New(FlowID)
-
 		_setFlowProperty(FlowID, "savedState", _getFlowProperty(FlowID, "currentState"))
 	}
 	
@@ -238,40 +325,18 @@ LoadFlow(FlowID, filepath="", params="")
 	currentlyLoadingFlow:=false
 }
 
-loadFlowMetaData(flowID)
-{
-	_EnterCriticalSection()
-	
-	flowSettings := _getFlowProperty(FlowID, "flowSettings")
-
-	flowSettings.Offsetx:=RIni_GetKeyValue("IniFile", "general", "Offsetx", default_OffsetX)
-	flowSettings.Offsety:=RIni_GetKeyValue("IniFile", "general", "Offsety", default_OffsetY)
-	flowSettings.zoomFactor:=RIni_GetKeyValue("IniFile", "general", "zoomFactor", default_ZoomFactor)
-	flowSettings.Name:=RIni_GetKeyValue("IniFile", "general", "name", "")
-	flowSettings.FolderOfStaticVariables:=RIni_GetKeyValue("IniFile", "general", "FolderOfStaticVariables", ThisFlowFolder "\Static variables\" ThisFlowFilename)
-	_setFlowProperty(FlowID, "flowSettings", flowSettings)
-	_LeaveCriticalSection()
-	
-	if not fileexist(.flowSettings.FolderOfStaticVariables)
-	{
-		FileCreateDir,% flowSettings.FolderOfStaticVariables
-		if not fileexist(flowSettings.FolderOfStaticVariables)
-		{
-			logger("a0","Error! The working folder '" flowSettings.FolderOfStaticVariables "' does not exist and could not be created.")
-			MsgBox % lang("Error!") "`n" lang("The working folder '%1%' does not exist and could not be created", flowSettings.FolderOfStaticVariables)
-		}
-	}
-	
-}
-
 
 ;Loads the parameters of an element or trigger from the ini file
-LoadFlowParametersOfElement(p_flowID,p_ElementID,p_Location, p_Section)
+LoadFlowParametersOfElement(p_flowID, p_ElementID, p_Location, p_Section)
 {
+	; get element class
 	loadElementClass := _getElementProperty(p_flowID, p_ElementID, "class")
+
+	; get informations about the parameter which we need to load
 	parametersToload := Element_getParameters(loadElementClass, {flowID: p_flowID, elementID: p_ElementID})
 	parametersToloadDetails := Element_getParametrizationDetails(loadElementClass, {flowID: p_flowID, elementID: p_ElementID})
 
+	; get object with the element parameters
 	pars := _getElementProperty(p_flowID, p_ElementID, "pars")
 
 	; Loop through list of all parameters which must be loaded
@@ -319,13 +384,11 @@ LoadFlowParametersOfElement(p_flowID,p_ElementID,p_Location, p_Section)
 				}
 			}
 		}
-		tempContent:=RIni_GetKeyValue(p_Location, p_Section, "par_" oneParameterID, "ẺⱤᶉӧɼ")
-			
-			
-		if (tempContent=="ẺⱤᶉӧɼ") ;If a parameter is not set (maybe because some new parameters were added to this element after Update of AHF)
-		{
-			tempContent:=parameterDefault
-		}
+
+		; get parameter from savefile, if not found, set default value
+		tempContent := RIni_GetKeyValue(p_Location, p_Section, "par_" oneParameterID, parameterDefault)
+		
+		; replace some characters which are forbidden in an ini file
 		StringReplace, tempContent, tempContent, |¶,`n, All
 		if (substr(tempContent,1,3) = "ῸВĴ")
 		{
@@ -334,8 +397,11 @@ LoadFlowParametersOfElement(p_flowID,p_ElementID,p_Location, p_Section)
 			StringReplace, tempContent, tempContent, ₸ÅḆ, % a_tab
 			tempContent:=strobj(tempContent)
 		}
+
+		; write parameter in object
 		pars[oneParameterID] := tempContent
-		
 	}
+
+	; write object with element parameters
 	_setElementProperty(p_flowID, p_ElementID, "pars", pars)
 }

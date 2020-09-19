@@ -865,6 +865,10 @@ LoadFlowCheckCompabilityElement(p_FlowID, p_ElementID, p_section, FlowCompabilit
 	}
 }
 
+LoadFlowCheckCompabilityConnection(p_FlowID, p_ConnectionID, p_section, FlowCompabilityVersion)
+{
+
+}
 
 LoadFlowCheckCompabilityFlow(p_FlowID, p_FlowCompabilityVersion)
 {

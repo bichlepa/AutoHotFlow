@@ -65,6 +65,7 @@ lang_setLanguage(_getSettings("UILanguage"))
 #include source_Common\Debug\Debug.ahk
 #include source_Common\Debug\Logger.ahk
 #include source_Common\settings\settings.ahk
+#include source_Common\settings\default values.ahk
 #include source_Common\Other\Other.ahk
 #include source_Common\Variables\code parser.ahk
 #include source_Common\variables\code evaluator.ahk
