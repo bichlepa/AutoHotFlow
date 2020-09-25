@@ -27,15 +27,6 @@ Element_getCategory_Trigger_Manual()
 	return lang("User_interaction")
 }
 
-Element_getParameters_Trigger_Manual()
-{
-	parametersToEdit:=Object()
-	
-	parametersToEdit.push({id: "ID"})
-	
-	return parametersToEdit
-}
-
 Element_getParametrizationDetails_Trigger_Manual(Environment)
 {
 	parametersToEdit:=Object()
