@@ -26,27 +26,6 @@ Element_getCategory_Trigger_Window_Opens()
 	return lang("Window")
 }
 
-Element_getParameters_Trigger_Window_Opens()
-{
-	parametersToEdit:=Object()
-	
-	parametersToEdit.push({id: "NotTriggerOnEnable"})
-	
-	parametersToEdit.push({id: "TitleMatchMode"})
-	parametersToEdit.push({id: "Wintitle"})
-	parametersToEdit.push({id: "excludeTitle"})
-	parametersToEdit.push({id: "winText"})
-	parametersToEdit.push({id: "FindHiddenText"})
-	parametersToEdit.push({id: "ExcludeText"})
-	parametersToEdit.push({id: "ahk_class"})
-	parametersToEdit.push({id: "ahk_exe"})
-	parametersToEdit.push({id: "ahk_id"})
-	parametersToEdit.push({id: "ahk_pid"})
-	parametersToEdit.push({id: "FindHiddenWindow"})
-	
-	return parametersToEdit
-}
-
 Element_getParametrizationDetails_Trigger_Window_Opens(Environment)
 {
 	

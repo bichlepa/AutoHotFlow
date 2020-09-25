@@ -48,19 +48,6 @@ Element_getStabilityLevel_Action_Download_File()
 	return "Stable"
 }
 
-;Returns a list of all parameters of the element.
-;Only those parameters will be saved.
-Element_getParameters_Action_Download_File()
-{
-	parametersToEdit:=Object()
-	
-	parametersToEdit.push({id: "URL"})
-	parametersToEdit.push({id: "IsExpression"})
-	parametersToEdit.push({id: "file"})
-	
-	return parametersToEdit
-}
-
 ;Returns an array of objects which describe all controls which will be shown in the element settings GUI
 Element_getParametrizationDetails_Action_Download_File(Environment)
 {

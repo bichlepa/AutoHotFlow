@@ -40,18 +40,6 @@ Element_getElementLevel_Action_Get_Clipboard()
 Element_getIconPath_Action_Get_Clipboard()
 {
 }
-
-;Returns a list of all parameters of the element.
-;Only those parameters will be saved.
-Element_getParameters_Action_Get_Clipboard()
-{
-	parametersToEdit:=Object()
-	
-	parametersToEdit.push({id: "Varname"})
-	
-	return parametersToEdit
-}
-
 ;Returns an array of objects which describe all controls which will be shown in the element settings GUI
 Element_getParametrizationDetails_Action_Get_Clipboard(Environment)
 {

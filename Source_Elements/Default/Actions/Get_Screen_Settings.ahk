@@ -48,41 +48,6 @@ Element_getStabilityLevel_Action_Get_Screen_Settings()
 	return "Experimental"
 }
 
-;Returns a list of all parameters of the element.
-;Only those parameters will be saved.
-Element_getParameters_Action_Get_Screen_Settings()
-{
-	parametersToEdit:=Object()
-	
-	parametersToEdit.push({id: "MonitorNumber"})
-	parametersToEdit.push({id: "VarnameBrightness"})
-	parametersToEdit.push({id: "VarnameBrightnessMin"})
-	parametersToEdit.push({id: "VarnameBrightnessMax"})
-	parametersToEdit.push({id: "VarnameContrast"})
-	parametersToEdit.push({id: "VarnameContrastMin"})
-	parametersToEdit.push({id: "VarnameContrastMax"})
-	parametersToEdit.push({id: "VarnameRedGain"})
-	parametersToEdit.push({id: "VarnameRedGainMin"})
-	parametersToEdit.push({id: "VarnameRedGainMax"})
-	parametersToEdit.push({id: "VarnameGreenGain"})
-	parametersToEdit.push({id: "VarnameGreenGainMin"})
-	parametersToEdit.push({id: "VarnameGreenGainMax"})
-	parametersToEdit.push({id: "VarnameBlueGain"})
-	parametersToEdit.push({id: "VarnameBlueGainMin"})
-	parametersToEdit.push({id: "VarnameBlueGainMax"})
-	parametersToEdit.push({id: "VarnameReddrive"})
-	parametersToEdit.push({id: "VarnameReddriveMin"})
-	parametersToEdit.push({id: "VarnameReddriveMax"})
-	parametersToEdit.push({id: "VarnameGreendrive"})
-	parametersToEdit.push({id: "VarnameGreendriveMin"})
-	parametersToEdit.push({id: "VarnameGreendriveMax"})
-	parametersToEdit.push({id: "VarnameBluedrive"})
-	parametersToEdit.push({id: "VarnameBluedriveMin"})
-	parametersToEdit.push({id: "VarnameBluedriveMax"})
-	parametersToEdit.push({id: "VarnameColorTemperature"})
-	
-	return parametersToEdit
-}
 
 ;Returns an array of objects which describe all controls which will be shown in the element settings GUI
 Element_getParametrizationDetails_Action_Get_Screen_Settings(Environment)

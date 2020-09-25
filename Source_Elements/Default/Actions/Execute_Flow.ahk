@@ -27,22 +27,6 @@ Element_getCategory_Action_Execute_Flow()
 	return lang("Flow_control")
 }
 
-Element_getParameters_Action_Execute_Flow()
-{
-	parametersToEdit:=Object()
-	
-	parametersToEdit.push({id: "ThisFlow"})
-	parametersToEdit.push({id: "flowName"})
-	parametersToEdit.push({id: "DefaultTrigger"})
-	parametersToEdit.push({id: "triggerName"})
-	parametersToEdit.push({id: "SendLocalVars"})
-	parametersToEdit.push({id: "SkipDisabled"})
-	parametersToEdit.push({id: "WaitToFinish"})
-	parametersToEdit.push({id: "ReturnVariables"})
-	
-	return parametersToEdit
-}
-
 Element_getParametrizationDetails_Action_Execute_Flow(Environment)
 {
 	choicesFlows := x_GetListOfFlowNames()

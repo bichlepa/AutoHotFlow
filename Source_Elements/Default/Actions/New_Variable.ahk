@@ -32,17 +32,6 @@ Element_getCategory_Action_New_variable()
 	return lang("Variable")
 }
 
-Element_getParameters_Action_New_variable()
-{
-	parametersToEdit:=Object()
-	
-	parametersToEdit.push({id: "Varname"})
-	parametersToEdit.push({id: "expression"})
-	parametersToEdit.push({id: "VarValue"})
-	
-	return parametersToEdit
-}
-
 Element_getParametrizationDetails_Action_New_variable(Environment)
 {
 	parametersToEdit:=Object()

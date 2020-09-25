@@ -32,16 +32,6 @@ Element_getCategory_Action_Beep()
 	return lang("Sound")
 }
 
-Element_getParameters_Action_Beep()
-{
-	parametersToEdit:=Object()
-	
-	parametersToEdit.push({id: "frequency"})
-	parametersToEdit.push({id: "duration"})
-	
-	return parametersToEdit
-}
-
 Element_getParametrizationDetails_Action_Beep(Environment)
 {
 	;~ d( x_GetListOfAllVars(environment))

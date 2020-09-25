@@ -48,25 +48,6 @@ Element_getStabilityLevel_Action_Drag_With_Mouse()
 	return "Stable"
 }
 
-;Returns a list of all parameters of the element.
-;Only those parameters will be saved.
-Element_getParameters_Action_Drag_With_Mouse()
-{
-	parametersToEdit:=Object()
-	
-	parametersToEdit.push({id: "Button"})
-	parametersToEdit.push({id: "CoordMode"})
-	parametersToEdit.push({id: "XposFrom"})
-	parametersToEdit.push({id: "Xpos"})
-	parametersToEdit.push({id: "Ypos"})
-	parametersToEdit.push({id: "YposFrom"})
-	parametersToEdit.push({id: "SendMode"})
-	parametersToEdit.push({id: "speed"})
-	parametersToEdit.push({id: "delay"})
-	
-	return parametersToEdit
-}
-
 ;Returns an array of objects which describe all controls which will be shown in the element settings GUI
 Element_getParametrizationDetails_Action_Drag_With_Mouse(Environment)
 {

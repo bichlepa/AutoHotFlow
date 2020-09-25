@@ -48,31 +48,6 @@ Element_getStabilityLevel_Action_Get_Control_Text()
 	return "Stable"
 }
 
-;Returns a list of all parameters of the element.
-;Only those parameters will be saved.
-Element_getParameters_Action_Get_Control_Text()
-{
-	parametersToEdit:=Object()
-	
-	parametersToEdit.push({id: "Varname"})
-	parametersToEdit.push({id: "IdentifyControlBy"})
-	parametersToEdit.push({id: "ControlTextMatchMode"})
-	parametersToEdit.push({id: "Control_identifier"})
-	parametersToEdit.push({id: "TitleMatchMode"})
-	parametersToEdit.push({id: "Wintitle"})
-	parametersToEdit.push({id: "excludeTitle"})
-	parametersToEdit.push({id: "winText"})
-	parametersToEdit.push({id: "FindHiddenText"})
-	parametersToEdit.push({id: "ExcludeText"})
-	parametersToEdit.push({id: "ahk_class"})
-	parametersToEdit.push({id: "ahk_exe"})
-	parametersToEdit.push({id: "ahk_id"})
-	parametersToEdit.push({id: "ahk_pid"})
-	parametersToEdit.push({id: "FindHiddenWindow"})
-	
-	return parametersToEdit
-}
-
 ;Returns an array of objects which describe all controls which will be shown in the element settings GUI
 Element_getParametrizationDetails_Action_Get_Control_Text(Environment)
 {
@@ -84,7 +59,7 @@ Element_getParametrizationDetails_Action_Get_Control_Text(Environment)
 	parametersToEdit.push({type: "Label", label: lang("Control_Identification")})
 	parametersToEdit.push({type: "Label", label: lang("Method_for_control_Identification"), size: "small"})
 	parametersToEdit.push({type: "Radio", id: "IdentifyControlBy", result: "enum", default: 2, choices: [lang("Text_in_control"), lang("Classname and instance number of the control"), lang("Unique control ID")], enum: ["Text", "Class", "ID"]})
-	parametersToEdit.push({type: "Label", id: "Label_Control_Identification", label: lang("Control_Identification"), size: "small"})
+	parametersToEdit.push({type: "Label", label: lang("Control_Identification"), size: "small"})
 	parametersToEdit.push({type: "Radio", id: "ControlTextMatchMode", default: 2, choices: [lang("Start_with"), lang("Contain_anywhere"), lang("Exactly")]})
 	parametersToEdit.push({type: "Edit", id: "Control_identifier", content: "String", WarnIfEmpty: true})
 	

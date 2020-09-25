@@ -48,44 +48,6 @@ Element_getStabilityLevel_Action_HTTP_Request()
 	return "Stable"
 }
 
-;Returns a list of all parameters of the element.
-;Only those parameters will be saved.
-Element_getParameters_Action_HTTP_Request()
-{
-	parametersToEdit:=Object()
-	
-	parametersToEdit.push({id: "URL"})
-	parametersToEdit.push({id: "WhereToGetPostData"})
-	parametersToEdit.push({id: "PostData"})
-	parametersToEdit.push({id: "URIEncodePostData"})
-	parametersToEdit.push({id: "WhichCodepage"})
-	parametersToEdit.push({id: "Codepage"})
-	parametersToEdit.push({id: "InputFile"})
-	parametersToEdit.push({id: "RequestHeaders"})
-	parametersToEdit.push({id: "URIEncodeRequestHeaders"})
-	parametersToEdit.push({id: "WhereToPutResponseData"})
-	parametersToEdit.push({id: "ResponseDataVar"})
-	parametersToEdit.push({id: "OutputFile"})
-	parametersToEdit.push({id: "ResponseHeadersVar"})
-	parametersToEdit.push({id: "WhichContentType"})
-	parametersToEdit.push({id: "Contenttype"})
-	parametersToEdit.push({id: "WhichContentLength"})
-	parametersToEdit.push({id: "ContentLength"})
-	parametersToEdit.push({id: "WhichContentMD5"})
-	parametersToEdit.push({id: "ContentMD5"})
-	parametersToEdit.push({id: "WhichMethod"})
-	parametersToEdit.push({id: "Method"})
-	parametersToEdit.push({id: "WhichUserAgent"})
-	parametersToEdit.push({id: "UserAgent"})
-	parametersToEdit.push({id: "Flags"})
-	parametersToEdit.push({id: "WhichProxy"})
-	parametersToEdit.push({id: "Proxy"})
-	parametersToEdit.push({id: "WhetherBypassProxy"})
-	parametersToEdit.push({id: "BypassProxy"})
-	
-	return parametersToEdit
-}
-
 ;Returns an array of objects which describe all controls which will be shown in the element settings GUI
 Element_getParametrizationDetails_Action_HTTP_Request(Environment)
 {

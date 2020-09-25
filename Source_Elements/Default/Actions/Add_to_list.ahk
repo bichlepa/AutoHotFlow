@@ -32,26 +32,6 @@ Element_getCategory_Action_Add_To_List()
 	return lang("Variable")
 }
 
-Element_getParameters_Action_Add_To_List()
-{
-	parametersToEdit:=Object()
-	
-	parametersToEdit.push({id: "Varname"})
-	parametersToEdit.push({id: "NumberOfElements"})
-	parametersToEdit.push({id: "VarValue"})
-	parametersToEdit.push({id: "expression"})
-	parametersToEdit.push({id: "VarValues"})
-	parametersToEdit.push({id: "DelimiterLinefeed"})
-	parametersToEdit.push({id: "DelimiterComma"})
-	parametersToEdit.push({id: "DelimiterSemicolon"})
-	parametersToEdit.push({id: "DelimiterSpace"})
-	parametersToEdit.push({id: "WhichPosition"})
-	parametersToEdit.push({id: "Position"})
-	parametersToEdit.push({id: "expressionPos"})
-	
-	return parametersToEdit
-}
-
 Element_getParametrizationDetails_Action_Add_To_List(Environment)
 {
 	parametersToEdit:=Object()

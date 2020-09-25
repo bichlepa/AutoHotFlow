@@ -48,32 +48,6 @@ Element_getStabilityLevel_Action_Move_Window()
 	return "Stable"
 }
 
-;Returns a list of all parameters of the element.
-;Only those parameters will be saved.
-Element_getParameters_Action_Move_Window()
-{
-	parametersToEdit:=Object()
-	
-	parametersToEdit.push({id: "WinMoveEvent"})
-	parametersToEdit.push({id: "Xpos"})
-	parametersToEdit.push({id: "Ypos"})
-	parametersToEdit.push({id: "Width"})
-	parametersToEdit.push({id: "Height"})
-	parametersToEdit.push({id: "TitleMatchMode"})
-	parametersToEdit.push({id: "Wintitle"})
-	parametersToEdit.push({id: "excludeTitle"})
-	parametersToEdit.push({id: "winText"})
-	parametersToEdit.push({id: "FindHiddenText"})
-	parametersToEdit.push({id: "ExcludeText"})
-	parametersToEdit.push({id: "ahk_class"})
-	parametersToEdit.push({id: "ahk_exe"})
-	parametersToEdit.push({id: "ahk_id"})
-	parametersToEdit.push({id: "ahk_pid"})
-	parametersToEdit.push({id: "FindHiddenWindow"})
-	
-	return parametersToEdit
-}
-
 ;Returns an array of objects which describe all controls which will be shown in the element settings GUI
 Element_getParametrizationDetails_Action_Move_Window(Environment)
 {

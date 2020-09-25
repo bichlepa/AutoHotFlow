@@ -44,6 +44,8 @@ d(text,header="",wait=1)
 	gui,d:show,h%dh% w%dw%,%header%
 	
 	if (wait=1 or wait="wait")
+	{
+		Critical, Off
 		Loop
 		{
 			if (dfinished=true)
@@ -51,6 +53,7 @@ d(text,header="",wait=1)
 			else
 				sleep 100
 		}
+	}
 		
 	return
 	dClose:

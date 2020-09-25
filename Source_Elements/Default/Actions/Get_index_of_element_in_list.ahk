@@ -32,18 +32,6 @@ Element_getCategory_Action_Get_Index_Of_Element_In_List()
 	return lang("Variable")
 }
 
-Element_getParameters_Action_Get_Index_Of_Element_In_List()
-{
-	parametersToEdit:=Object()
-	
-	parametersToEdit.push({id: "Varname"})
-	parametersToEdit.push({id: "ListName"})
-	parametersToEdit.push({id: "SearchContent"})
-	parametersToEdit.push({id: "expression"})
-	
-	return parametersToEdit
-}
-
 Element_getParametrizationDetails_Action_Get_Index_Of_Element_In_List(Environment)
 {
 	parametersToEdit:=Object()

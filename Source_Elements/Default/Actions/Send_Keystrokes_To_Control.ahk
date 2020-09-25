@@ -61,7 +61,7 @@ Element_getParametrizationDetails_Action_Send_Keystrokes_To_Control(Environment)
 	parametersToEdit.push({type: "Label", label: lang("Control_Identification")})
 	parametersToEdit.push({type: "Label", label: lang("Method_for_control_Identification"), size: "small"})
 	parametersToEdit.push({type: "Radio", id: "IdentifyControlBy", result: "enum", default: 2, choices: [lang("Text_in_control"), lang("Classname and instance number of the control"), lang("Unique control ID")], enum: ["Text", "Class", "ID"]})
-	parametersToEdit.push({type: "Label", id: "Label_Control_Identification", label: lang("Control_Identification"), size: "small"})
+	parametersToEdit.push({type: "Label", label: lang("Control_Identification"), size: "small"})
 	parametersToEdit.push({type: "Radio", id: "ControlTextMatchMode", default: 2, choices: [lang("Start_with"), lang("Contain_anywhere"), lang("Exactly")]})
 	parametersToEdit.push({type: "Edit", id: "Control_identifier", content: "String", WarnIfEmpty: true})
 	

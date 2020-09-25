@@ -48,20 +48,6 @@ Element_getStabilityLevel_Action_Change_character_case()
 	return "Stable"
 }
 
-;Returns a list of all parameters of the element.
-;Only those parameters will be saved.
-Element_getParameters_Action_Change_character_case()
-{
-	parametersToEdit:=Object()
-	
-	parametersToEdit.push({id: "Varname"})
-	parametersToEdit.push({id: "VarValue"})
-	parametersToEdit.push({id: "expression"})
-	parametersToEdit.push({id: "CharCase"})
-	
-	return parametersToEdit
-}
-
 ;Returns an array of objects which describe all controls which will be shown in the element settings GUI
 Element_getParametrizationDetails_Action_Change_character_case(Environment)
 {

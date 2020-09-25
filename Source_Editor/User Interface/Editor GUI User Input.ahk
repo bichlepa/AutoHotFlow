@@ -1526,6 +1526,9 @@ key_ctrl_x()
 			Element_Remove(FlowID, markelement)
 		}
 		
+		; we have deleted the selected elements and need to update some variables
+		UpdateSelectedItemsList()
+		
 		; we changed something. Make new state
 		State_New(FlowID)
 

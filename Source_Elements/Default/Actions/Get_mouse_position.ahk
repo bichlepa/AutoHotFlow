@@ -48,23 +48,6 @@ Element_getStabilityLevel_Action_Get_Mouse_Position()
 	return "Stable"
 }
 
-;Returns a list of all parameters of the element.
-;Only those parameters will be saved.
-Element_getParameters_Action_Get_Mouse_Position()
-{
-	parametersToEdit:=Object()
-	
-	parametersToEdit.push({id: "varnameX"})
-	parametersToEdit.push({id: "varnameY"})
-	parametersToEdit.push({id: "CoordMode"})
-	parametersToEdit.push({id: "WhetherGetWindowID"})
-	parametersToEdit.push({id: "varnameWindowID"})
-	parametersToEdit.push({id: "WhetherGetControlID"})
-	parametersToEdit.push({id: "varnameControlID"})
-	
-	return parametersToEdit
-}
-
 ;Returns an array of objects which describe all controls which will be shown in the element settings GUI
 Element_getParametrizationDetails_Action_Get_Mouse_Position(Environment)
 {

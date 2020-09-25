@@ -1,65 +1,63 @@
-﻿/* Prototypes
-Element_New(p_type,p_elementID)
-Element_SetType(p_elementID,p_elementType)
-Element_setParameterDefaults(p_elementID)
-Element_Remove(p_elementID)
-SelectOneItem(p_ID,false)
-UnSelectEverything()
-SelectEverything()
-Connection_New(p_elementID)
-Connection_Remove(p_elementID)
-GetListContainingElement(p_ElementID)
-*/
-
+﻿
 ;Creates a new element and puts it in the array "allelements"
 Element_New(p_FlowID, p_type="", p_elementID="")
 {
-	global GridX, Gridy
-	
 	if not p_FlowID
 	{
+		; todo: make all such unexpected errors throw an exception.
 		throw exception("internal error! A new element should be created but FlowID is empty", -1)
 		return
 	}
 
-	_EnterCriticalSection() ; We get, change and store a flow in this function. keep this critical section to ensure data integrity
+	_EnterCriticalSection() ; enter this critical section to ensure data integrity
 
-	tempElement:=Object()
-	;~ tempElement:=[]
+	; create an empty element object
+	newElement := Object()
 
-	if (p_elementID="")
-		tempElement.ID:="element" . format("{1:010u}",_getAndIncrementFlowProperty(p_FlowID,"ElementIDCounter")) 
+	if (not p_elementID)
+	{
+		; element ID is empty, so we generate a new unique one
+		newElement.ID := "element" . format("{1:010u}", _getAndIncrementFlowProperty(p_FlowID,"ElementIDCounter")) 
+	}
 	else
-		tempElement.ID:=p_elementID
-	tempElement.ElementID:=tempElement.ID
-	tempElement.FlowID:=p_FlowID
-	
-	;~ d(p_elementID "--" tempElement.ID)
-	
-	tempElement.UniqueID:=p_FlowID "_" tempElement.ID
-	tempElement.ClickPriority:=500
-	;~ d(p_elementID "--" tempElement.ID "--" tempElement.ClickPriority)
-	tempElement.pars:=[]
-	
-	tempElement.StandardName:=True
-	tempElement.lastrun:=0
-	tempElement.marked:=false
-	tempElement.state:="idle"
-	tempElement.countRuns:=0
-	tempElement.enabled:=False
+	{
+		; element ID is set, we use it
+		newElement.ID := p_elementID
+	}
+
+	; this ID is unique for all flows
+	newElement.UniqueID := p_FlowID "_" newElement.ID
+
+	; create empty object for parameters
+	newElement.pars:=[]
+
+	; set some default properties
+	newElement.ClickPriority := 500
+	newElement.StandardName := True
+	newElement.lastrun := 0
+	newElement.marked := false
+	newElement.state := "idle"
+	newElement.countRuns := 0
+	newElement.enabled := False
 	
 	;Assign default position, although it is commonly not needed
-	tempElement.x:=0
-	tempElement.y:=0
+	newElement.x := 0
+	newElement.y := 0
 	
-	_setElement(p_FlowID, tempElement.ID, tempElement)
-	Element_SetType(p_FlowID, tempElement.ID, p_type)
+	; write element object
+	_setElement(p_FlowID, newElement.ID, newElement)
+
+	; set element type, is parameter is passed
+	if (p_type)
+		Element_SetType(p_FlowID, newElement.ID, p_type)
 	
 	_LeaveCriticalSection()
-	return tempElement.ID
+
+	return newElement.ID
 }
 
-;Sets the element type. It could later be possible to change the element type (e.g. change from type "action" to type "condition")
+; Sets the element type.
+; It might later be possible to change the element type (e.g. change from type "action" to type "condition")
 Element_SetType(p_flowID, p_ElementID, p_elementType)
 {
 	if not p_ElementID
@@ -68,13 +66,17 @@ Element_SetType(p_flowID, p_ElementID, p_elementType)
 		return
 	}
 
-	_EnterCriticalSection() ; We get, change and store an element in this function. keep this critical section to ensure data integrity
+	_EnterCriticalSection() ; enter this critical section to ensure data integrity
 
+	; set the element type
 	_setElementProperty(p_FlowID, p_elementID, "type", p_elementType)
-	_setElementProperty(p_FlowID, p_elementID, "class", "")  ;After changing the element type only, the class is unset 
-	
-	_setElementProperty(p_FlowID, p_elementID, "name", "Νew Соntainȩr") 
-	if (p_elementType="Loop")
+	;After changing the element type only, the class is unset 
+	_setElementProperty(p_FlowID, p_elementID, "class", "")
+	; since the class is not set, the name is unset too
+	_setElementProperty(p_FlowID, p_elementID, "name", "") 
+
+	; define default propoerties depending on the element type
+	if (p_elementType = "Loop")
 	{
 		_setElementProperty(p_FlowID, p_elementID, "heightOfVerticalBar", 150) 
 	}
@@ -82,7 +84,7 @@ Element_SetType(p_flowID, p_ElementID, p_elementType)
 	_LeaveCriticalSection()
 }
 
-;Sets the element class. This means it is possible to change the element type and subtype
+;Sets the element class. With this it is possible to change the type and subtype in one step.
 Element_SetClass(p_FlowID, p_ElementID, p_elementClass)
 {
 	if not p_ElementID
@@ -91,39 +93,53 @@ Element_SetClass(p_FlowID, p_ElementID, p_elementClass)
 		return
 	}
 
-	_EnterCriticalSection() ; We get, change and store an element in this function. keep this critical section to ensure data integrity
-	
-	;First set type
 	if not isfunc("Element_getElementType_" p_elementClass)
 	{
 		MsgBox internal error! Function Element_getElementType_%p_elementClass% missing.
+		return
 	}
-	if (_getElementProperty(p_FlowID, p_elementID, "type") !=Element_getElementType_%p_elementClass%())
+
+	_EnterCriticalSection() ; enter this critical section to ensure data integrity
+	
+	;Set element type if it has changed
+	if (_getElementProperty(p_FlowID, p_elementID, "type") != Element_getElementType_%p_elementClass%())
 	{
 		Element_SetType(p_FlowID, p_elementID, Element_getElementType_%p_elementClass%())
 	}
 	
-	;Then set class
+	;Set element class
 	_setElementProperty(p_FlowID, p_elementID, "class", p_elementClass)
 	_setElementProperty(p_FlowID, p_elementID, "icon", Element_getIconPath_%p_elementClass%())
 	
 	;Set new parameter Defaults
 	Element_setParameterDefaults(p_FlowID, p_elementID)
 	
-	; Set the element name (which depends on the element parameters)
-	newName:=Element_GenerateName_%p_elementClass%(allElements[p_elementID], allElements[p_elementID].pars)
-	_setElementProperty(p_FlowID, p_elementID, "name", newName)
+	; Set the default element name (if default name is enabled)
+	if (_getElementProperty(p_FlowID, p_elementID, "StandardName"))
+	{
+		newName := Element_GenerateName_%p_elementClass%(allElements[p_elementID], allElements[p_elementID].pars)
+		_setElementProperty(p_FlowID, p_elementID, "name", newName)
+	}
 	
-	
-	;If element is trigger_manual: Set the trigger as default if no other is already default
-	if (p_elementClass = "trigger_manual" and Element_findDefaultTrigger(p_FlowID)="")
+	;If element is of class trigger_manual: Set the trigger as default if no other is already default
+	if (p_elementClass = "trigger_manual" and Element_findDefaultTrigger(p_FlowID) = "")
 	{
 		Element_setDefaultTrigger(p_FlowID, p_elementID)
 	}
+
 	_LeaveCriticalSection()
 }
 
-;Is called when the element subtype is set. All parameters that are not set yet are set to the default parameters
+; Is called when the element class is set. All parameters that are not yet set will be set to the default values.
+; We only overwrite the unset parameters. 
+; After a change of element class, the unused parameters of the class will stay in the object, but they won't appear in the savefile and will get lost after a restart of AHF.
+; This is a feature for following usecases:
+; - User changes element class and both elements have similar parameters. Then the element parameters will be transferred to the new class.
+;   For example: user wants two elements: "show window" and "hide window" and they should operate on same window.
+;   So he configures the element "show window". Then he makes a copy of it and then changes class to "hide window".
+;   Since the parameters are equal, he does not need to re-enter the parameters in the settings window.
+; - User changes by mistake the element class which has different parameters.
+;   He may now undo last change but he also may change the element class back and the old parameters will appear again.
 Element_setParameterDefaults(p_FlowID, p_elementID)
 {
 	if not p_ElementID
@@ -132,49 +148,61 @@ Element_setParameterDefaults(p_FlowID, p_elementID)
 		return
 	}
 
-	_EnterCriticalSection()  ; We get, change and store an element in this function. keep this critical section to ensure data integrity
+	_EnterCriticalSection() ; enter this critical section to ensure data integrity
 
-	elementClass:=_getElementProperty(p_FlowID, p_elementID, "class")
-	parameters:=Element_getParametrizationDetails(elementClass, {flowID: p_FlowID, elementID: p_elementID})
-	;~ MsgBox % strobj(parameters) "`n" elementType "`n" elementSubType
-	ElementParsObject:=_getElementProperty(p_FlowID, p_elementID, "pars")
-	for index, parameter in parameters
+	; get parametration details
+	elementClass := _getElementProperty(p_FlowID, p_elementID, "class")
+	ParametrizationDetails := Element_getParametrizationDetails(elementClass, {flowID: p_FlowID, elementID: p_elementID})
+	
+	; get alredy configured parameters (if available)
+	ElementParsObject := _getElementProperty(p_FlowID, p_elementID, "pars")
+
+	; loop through all parametration details and create a list of all parameters and their defauls
+	parametersAndTheirDefaults := []
+	for index, oneParameter in ParametrizationDetails
 	{
-		
-		if not IsObject(parameter.id)
-			parameterID:=[parameter.id]
-		else
-			parameterID:=parameter.id
-		if not IsObject(parameter.default)
-			parameterdefault:=[parameter.default]
-		else
-			parameterdefault:=parameter.default
-	
-		if (parameterID[1]="" or parameter.type="label" or parameter.type="SmallLabel") ;If this is only a label for the edit fielt etc. Do nothing
-			continue
-		
-		;~ MsgBox % strobj(parameter)
-		;Certain types of control consist of multiple controls and thus contain multiple parameters.
-		for index2, oneID in parameterID
+		; the value in key "ID" can either contain a single ID or an array of IDs. Convert single ID into an array for easy user later
+		if (oneParameter.id)
 		{
-			;~ MsgBox % oneID "  -  " index2 " - " parameterdefault[index2]
-			if (ElementParsObject[oneID]="")
+			if (not IsObject(oneParameter.id))
 			{
-				tempContent:=parameterdefault[index2]
-				
-				StringReplace, tempContent, tempContent, |¶,`n, All
-				ElementParsObject[oneID]:=tempContent
+				parametersAndTheirDefaults.push({ID: oneParameter.id, Default: oneParameter.default})
 			}
-			
+			else
+			{
+				for index, oneID in oneParameter.id
+				{
+					parametersAndTheirDefaults.push({ID: oneID, Default: oneParameter.default[index]})
+				}
+			}
 		}
-		
-	
+
+		; the value in key "ContentID" can only contain a single ID
+		if (oneParameter.ContentID)
+		{
+			if (not IsObject(oneParameter.id))
+			{
+				parametersAndTheirDefaults.push({ID: oneParameter.ContentID, Default: oneParameter.ContentDefault})
+			}
+		}
 	}
+	
+	;Apply all found default parameters if they are unset.
+	for index, oneParameter in parametersAndTheirDefaults
+	{
+		if (ElementParsObject[oneParameter.ID] = "")
+		{
+			ElementParsObject[oneParameter.ID] := oneParameter.Default
+		}
+	}
+
+	; write parameter object
 	_setElementProperty(p_FlowID, p_elementID, "pars", ElementParsObject)
 	
 	_LeaveCriticalSection()
 }
 
+; find the default manual trigger
 Element_findDefaultTrigger(p_FlowID)
 {
 	if not p_FlowID
@@ -183,23 +211,27 @@ Element_findDefaultTrigger(p_FlowID)
 		return
 	}
 	
-	allElements := _getFlowProperty(p_FlowID, "allElements")
-
-	for oneID, oneElement in allElements
+	; loop through all elements
+	allElementsIDs := _getAllElementIds(p_FlowID)
+	for oneID, oneElementID in allElementsIDs
 	{
-		if (oneElement.class = "trigger_manual")
+		; we only need manual trigger
+		if (_getElementProperty(p_FlowID, oneElementID, "class") = "trigger_manual")
 		{
-			if (oneElement.defaultTrigger)
+			; is this the default trigger?
+			if (_getElementProperty(p_FlowID, oneElementID, "defaultTrigger"))
 			{
-				retval:= oneID
-				break
+				; yes, return the ID
+				return oneElementID
 			}
 		}
 	}
 	
-	return retval
+	; we did not find a default manual trigger
+	return 
 }
 
+; set default trigger
 Element_setDefaultTrigger(p_FlowID, p_elementID)
 {
 	if not p_FlowID
@@ -208,31 +240,33 @@ Element_setDefaultTrigger(p_FlowID, p_elementID)
 		return
 	}
 
-	_EnterCriticalSection() ; We get, change and store a flow in this function. keep this critical section to ensure data integrity
+	_EnterCriticalSection() ; enter this critical section to ensure data integrity
 
-	allElements := _getFlowProperty(p_FlowID, "allElements")
-	for oneID, oneElement in allElements
+	; loop through all elements
+	allElementsIDs := _getAllElementIds(p_FlowID)
+	for oneID, oneElementID in allElementsIDs
 	{
-		if (oneElement.class = "trigger_manual")
+		; we only need manual trigger
+		if (_getElementProperty(p_FlowID, oneElementID, "class") = "trigger_manual")
 		{
-	;~ MsgBox %p_FlowID% %p_elementID%
-			if (oneID = p_elementID )
+			if (oneElementID = p_elementID )
 			{
-				oneElement.defaultTrigger:=True
+				; enable set the propert "defaultTrigger" for the defined trigger
+				_setElementProperty(p_FlowID, oneElementID, "defaultTrigger", True)
 			}
 			else
 			{
-				oneElement.defaultTrigger:=False
+				; disable set the propert "defaultTrigger" for all other manual triggers
+				_setElementProperty(p_FlowID, oneElementID, "defaultTrigger", false)
 			}
 		}
 	}
-	_setFlowProperty(p_FlowID, "allElements", allElements)
 
 	_LeaveCriticalSection()
 }
 
 
-;Removes the element. It will be deleted from list of all elements and all connections which start or ends there will be deleted, too
+;Removes the element or connection. It will be deleted from list of all elements and all connections which start or end there will be deleted, too
 Element_Remove(p_FlowID, p_elementID)
 {
 	if not p_FlowID
@@ -241,13 +275,10 @@ Element_Remove(p_FlowID, p_elementID)
 		return
 	}
 
-	_EnterCriticalSection() ; We get, change and store a flow in this function. keep this critical section to ensure data integrity
+	_EnterCriticalSection() ; enter this critical section to ensure data integrity
 
-	; allElements:=_getFlowProperty(p_FlowID, "allElements")
-	; selectedElements:=_getFlowProperty(p_FlowID, "selectedElements")
-	
 	;If the element is a connection, call function to delete connection
-	IfInString,p_elementID,connection
+	IfInString, p_elementID, connection
 	{
 		Connection_Remove(p_FlowID, p_elementID)
 	}
@@ -256,23 +287,14 @@ Element_Remove(p_FlowID, p_elementID)
 		;remove the element from list of all elements
 		_deleteElement(p_FlowID, p_elementID)
 		
-		;~ ;If the element is marked, unmark it TODO
-		;~ for forID, forElement in selectedElements
-		;~ {
-			;~ if (forID=p_elementID)
-			;~ {
-				;~ UnSelectEverything(p_FlowID) ;Unmark all elements
-				;~ break
-			;~ }
-		;~ }
-		
-		;remove the connections which end or start at the element ;TODO: if removing an element with only one connection from and one connection to the element, keep one connection
-		allConnections:=_getFlowProperty(p_FlowID, "allConnections")
-		for forElementID, forElement in allConnections
+		;remove the connections which end or start at the element
+		allConnectionIDs := _getAllConnectionIDs(p_FlowID)
+		for oneID, oneConnectionID in allConnectionIDs
 		{
-			if ((forElement.from=p_elementID) or (forElement.to=p_elementID))
+			if ((_getConnectionProperty(p_FlowID, oneConnectionID, "from") = p_elementID) 
+				or (_getConnectionProperty(p_FlowID, oneConnectionID, "to") = p_elementID))
 			{
-				Connection_Remove(p_FlowID, forElementID)
+				Connection_Remove(p_FlowID, oneConnectionID)
 			}
 		}
 	}
@@ -280,45 +302,54 @@ Element_Remove(p_FlowID, p_elementID)
 	_LeaveCriticalSection()
 }
 
-
-
-
-Connection_New(p_FlowID, p_elementID="")
+; create a new connection
+Connection_New(p_FlowID, p_connectionID="")
 {
 	if not p_FlowID
 	{
-		MsgBox internal error! A new element should be created but FlowID is empty!
+		MsgBox internal error! A new connection should be created but FlowID is empty!
 		return
 	}
 
-	_EnterCriticalSection() ; We get, change and store a flow in this function. keep this critical section to ensure data integrity
+	_EnterCriticalSection() ; enter this critical section to ensure data integrity
 	
-	tempElement:=Object()
-	if (p_elementID="")
-		tempElement.ID:="Connection" . format("{1:010u}",_getAndIncrementFlowProperty(p_FlowID,"ElementIDCounter")) 
+	; create an empty connection object
+	newConnection := Object()
+	
+	if (not p_connectionID)
+	{
+		; connection ID is empty, so we generate a new unique one
+		newConnection.ID := "connection" . format("{1:010u}", _getAndIncrementFlowProperty(p_FlowID,"ElementIDCounter")) 
+	}
 	else
-		tempElement.ID:=p_elementID
+	{
+		; connection ID is set, we use it
+		newConnection.ID := p_connectionID
+	}
 	
-	tempElement.UniqueID:=p_FlowID "_" tempElement.ID
+	; this ID is unique for all flows
+	newConnection.UniqueID := p_FlowID "_" newConnection.ID
 	
-	tempElement.ConnectionType:="normal"
-	tempElement.ClickPriority:=200
+	; set some default properties
+	newConnection.ConnectionType := "normal"
+	newConnection.ClickPriority := 200
 	
-	tempElement.marked:=false
-	tempElement.state:="idle"
-	tempElement.type:="Connection"
-	tempElement.frompart:=""
-	tempElement.topart:=""
+	newConnection.marked := false
+	newConnection.state := "idle"
+	newConnection.type := "Connection"
+	newConnection.frompart := ""
+	newConnection.topart := ""
 	
-	_setConnection(p_FlowID, tempElement.ID, tempElement)
+	; write connection object
+	_setConnection(p_FlowID, newConnection.ID, newConnection)
 	
 	_LeaveCriticalSection()
-	return tempElement.ID
+	return newConnection.ID
 }
 
 
-;Removes the connection. It will be deleted from list of all elements and all connections which start or ends there will be deleted, too
-Connection_Remove(p_FlowID, p_elementID)
+;Removes the connection.
+Connection_Remove(p_FlowID, p_connectionID)
 {
 	if not p_FlowID
 	{
@@ -326,26 +357,16 @@ Connection_Remove(p_FlowID, p_elementID)
 		return
 	}
 
-	_EnterCriticalSection() ; We get, change and store a flow in this function. keep this critical section to ensure data integrity
+	_EnterCriticalSection() ; enter this critical section to ensure data integrity
 
-	;remove the element from list of all connections
-	_deleteConnection(p_FlowID, p_elementID)
+	;remove the connection from list of all connections
+	_deleteConnection(p_FlowID, p_connectionID)
 	
-	;If the element is marked, unmark it TODO
-	;~ for forID, forElement in selectedElements
-	;~ {
-		;~ if (forID=p_elementID)
-		;~ {
-			;~ UnSelectEverything(p_FlowID) ;Unmark all elements
-			;~ break
-		;~ }
-	;~ }
-	
-	;~ API_editor_UpdateSelectedItemsList(p_FlowID)
 	_LeaveCriticalSection()
 }
 
-
+; updates the list of connection from and to all elements.
+; This increases performance during execution
 UpdateConnectionLists(p_FlowID)
 {
 	if not p_FlowID
@@ -354,22 +375,36 @@ UpdateConnectionLists(p_FlowID)
 		return
 	}
 
-	_EnterCriticalSection() ; We get, change and store a flow in this function. keep this critical section to ensure data integrity
+	_EnterCriticalSection() ; enter this critical section to ensure data integrity
 	
-	allElements := _getFlowProperty(p_FlowID, "allElements")
-	allConnections := _getFlowProperty(p_FlowID, "allConnections")
-	for oneElementID, oneElement in allElements
+	;Loop through all connections and create a list with all elements that have connections
+	allConnectionIDs := _getAllConnectionIDs(p_FlowID)
+	connectedElementsFrom := []
+	connectedElementsTo := []
+	for oneID, oneConnectionID in allConnectionIDs
 	{
-		oneElement.fromConnections := Object()
-		oneElement.toConnections := Object()
-	}
-	for oneConnectionID, oneConnection in allConnections
-	{
-		allElements[oneConnection.from].fromConnections.push(oneConnectionID)
-		allElements[oneConnection.to].toConnections.push(oneConnectionID)
+		oneFrom := _getConnectionProperty(p_FlowID, oneConnectionID, "from")
+		if (not connectedElementsFrom[oneFrom])
+		{
+			connectedElementsFrom[oneFrom] := []
+		}
+		connectedElementsFrom[oneFrom].push(oneConnectionID)
+
+		oneTo := _getConnectionProperty(p_FlowID, oneConnectionID, "to")
+		if (not connectedElementsTo[oneTo])
+		{
+			connectedElementsTo[oneTo] := []
+		}
+		connectedElementsTo[oneTo].push(oneConnectionID)
 	}
 
-	_setFlowProperty(p_FlowID, "allElements", allElements)
+	; update the connection lists in the element objects
+	allElementsIDs := _getAllElementIds(p_FlowID)
+	for oneID, oneElementID in allElementsIDs
+	{
+		_setElementProperty(p_FlowID, oneElementID, "fromConnections", connectedElementsFrom[oneElementID])
+		_setElementProperty(p_FlowID, oneElementID, "toConnections", connectedElementsTo[oneElementID])
+	}
 
 	_LeaveCriticalSection()
 }

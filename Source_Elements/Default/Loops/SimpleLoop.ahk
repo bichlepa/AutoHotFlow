@@ -27,16 +27,6 @@ Element_getCategory_Loop_SimpleLoop()
 	return lang("General")
 }
 
-Element_getParameters_Loop_SimpleLoop()
-{
-	parametersToEdit:=Object()
-	
-	parametersToEdit.push({id: "Infinite"})
-	parametersToEdit.push({id: "repeatCount"})
-	
-	return parametersToEdit
-}
-
 Element_getParametrizationDetails_Loop_SimpleLoop(Environment)
 {
 	parametersToEdit:=Object()

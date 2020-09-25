@@ -27,19 +27,6 @@ Element_getCategory_Action_Set_Flow_Status()
 	return lang("Flow_control")
 }
 
-Element_getParameters_Action_Set_Flow_Status()
-{
-	parametersToEdit:=Object()
-	
-	parametersToEdit.push({id: "Enable"})
-	parametersToEdit.push({id: "ThisFlow"})
-	parametersToEdit.push({id: "flowName"})
-	parametersToEdit.push({id: "WhichTrigger"})
-	parametersToEdit.push({id: "triggerName"})
-	
-	return parametersToEdit
-}
-
 Element_getParametrizationDetails_Action_Set_Flow_Status(Environment)
 {
 	choicesFlows := x_GetListOfFlowNames()

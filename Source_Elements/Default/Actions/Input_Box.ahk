@@ -48,33 +48,6 @@ Element_getStabilityLevel_Action_Input_Box()
 	return "Stable"
 }
 
-;Returns a list of all parameters of the element.
-;Only those parameters will be saved.
-Element_getParameters_Action_Input_Box()
-{
-	parametersToEdit:=Object()
-	
-	parametersToEdit.push("Varname")
-	parametersToEdit.push("title")
-	parametersToEdit.push("message")
-	parametersToEdit.push("OnlyNumbers")
-	parametersToEdit.push("MaskUserInput")
-	parametersToEdit.push("MultilineEdit")
-	parametersToEdit.push("MultilineEditRows")
-	parametersToEdit.push("defaultText")
-	parametersToEdit.push("ButtonLabel")
-	parametersToEdit.push("IsTimeout")
-	parametersToEdit.push("TimeoutUnits")
-	parametersToEdit.push("Unit")
-	parametersToEdit.push("OnTimeout")
-	parametersToEdit.push("Width")
-	parametersToEdit.push("Height")
-	parametersToEdit.push("ShowCancelButton")
-	parametersToEdit.push("ButtonLabelCancel")
-	parametersToEdit.push("IfDismiss")
-	return parametersToEdit
-}
-
 ;Returns an array of objects which describe all controls which will be shown in the element settings GUI
 Element_getParametrizationDetails_Action_Input_Box(Environment)
 {

@@ -32,20 +32,6 @@ Element_getCategory_Action_Select_Folder()
 	return lang("User_interaction") "|" lang("Files")
 }
 
-Element_getParameters_Action_Select_Folder()
-{
-	parametersToEdit:=Object()
-	
-	parametersToEdit.push({id: "Varname"})
-	parametersToEdit.push({id: "title"})
-	parametersToEdit.push({id: "folder"})
-	parametersToEdit.push({id: "AllowUpward"})
-	parametersToEdit.push({id: "ButtonNewFolder"})
-	parametersToEdit.push({id: "EditField"})
-	
-	return parametersToEdit
-}
-
 Element_getParametrizationDetails_Action_Select_Folder(Environment)
 {
 	parametersToEdit:=Object()

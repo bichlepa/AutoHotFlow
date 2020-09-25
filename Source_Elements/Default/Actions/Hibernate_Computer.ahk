@@ -48,16 +48,6 @@ Element_getStabilityLevel_Action_Hibernate_Computer()
 	return "Stable"
 }
 
-;Returns a list of all parameters of the element.
-;Only those parameters will be saved.
-Element_getParameters_Action_Hibernate_Computer()
-{
-	parametersToEdit:=Object()
-	
-	
-	return parametersToEdit
-}
-
 ;Returns an array of objects which describe all controls which will be shown in the element settings GUI
 Element_getParametrizationDetails_Action_Hibernate_Computer(Environment)
 {

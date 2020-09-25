@@ -27,15 +27,6 @@ Element_getCategory_Condition_Flow_Running()
 	return lang("Flow_control")
 }
 
-Element_getParameters_Condition_Flow_Running()
-{
-	parametersToEdit:=Object()
-	
-	parametersToEdit.push({id: "flowName"})
-	
-	return parametersToEdit
-}
-
 Element_getParametrizationDetails_Condition_Flow_Running(Environment)
 {
 	choices := x_GetListOfFlowNames()

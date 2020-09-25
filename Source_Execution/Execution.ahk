@@ -131,7 +131,7 @@ queryTasks()
 			if (name = "disableOneTrigger")
 			{
 				; a single trigger of a flow should be disabled
-				disableOneTrigger(oneTask.FlowID, oneTask.TriggerID)
+				disableOneTrigger(oneTask.FlowID, oneTask.TriggerID, oneTask.save)
 			}
 			if (name = "externalElementFinish")
 			{

@@ -48,36 +48,6 @@ Element_getStabilityLevel_Action_Set_Screen_Settings()
 	return "Experimental"
 }
 
-;Returns a list of all parameters of the element.
-;Only those parameters will be saved.
-Element_getParameters_Action_Set_Screen_Settings()
-{
-	parametersToEdit:=Object()
-	
-	parametersToEdit.push({id: "AllMonitors"})
-	parametersToEdit.push({id: "MonitorNumber"})
-	parametersToEdit.push({id: "WhetherChangeBrightness"})
-	parametersToEdit.push({id: "brightness"})
-	parametersToEdit.push({id: "WhetherChangeContrast"})
-	parametersToEdit.push({id: "contrast"})
-	parametersToEdit.push({id: "WhetherSetRedGain"})
-	parametersToEdit.push({id: "RedGain"})
-	parametersToEdit.push({id: "WhetherSetGreenGain"})
-	parametersToEdit.push({id: "GreenGain"})
-	parametersToEdit.push({id: "WhetherSetBlueGain"})
-	parametersToEdit.push({id: "BlueGain"})
-	parametersToEdit.push({id: "WhetherSetRedDrive"})
-	parametersToEdit.push({id: "RedDrive"})
-	parametersToEdit.push({id: "WhetherSetGreenDrive"})
-	parametersToEdit.push({id: "GreenDrive"})
-	parametersToEdit.push({id: "WhetherSetBlueDrive"})
-	parametersToEdit.push({id: "BlueDrive"})
-	parametersToEdit.push({id: "WhetherChangeColorTemperature"})
-	parametersToEdit.push({id: "ColorTemperature"})
-	
-	return parametersToEdit
-}
-
 ;Returns an array of objects which describe all controls which will be shown in the element settings GUI
 Element_getParametrizationDetails_Action_Set_Screen_Settings(Environment)
 {

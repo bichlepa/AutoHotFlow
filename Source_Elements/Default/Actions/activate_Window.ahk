@@ -32,25 +32,6 @@ Element_getCategory_Action_Activate_Window()
 	return lang("Window")
 }
 
-Element_getParameters_Action_Activate_Window()
-{
-	parametersToEdit:=Object()
-	
-	parametersToEdit.push({id: "TitleMatchMode"})
-	parametersToEdit.push({id: "Wintitle"})
-	parametersToEdit.push({id: "excludeTitle"})
-	parametersToEdit.push({id: "winText"})
-	parametersToEdit.push({id: "FindHiddenText"})
-	parametersToEdit.push({id: "ExcludeText"})
-	parametersToEdit.push({id: "ahk_class"})
-	parametersToEdit.push({id: "ahk_exe"})
-	parametersToEdit.push({id: "ahk_id"})
-	parametersToEdit.push({id: "ahk_pid"})
-	parametersToEdit.push({id: "FindHiddenWindow"})
-	
-	return parametersToEdit
-}
-
 Element_getParametrizationDetails_Action_Activate_Window(Environment)
 {	
 	parametersToEdit:=Object()

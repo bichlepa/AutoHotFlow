@@ -32,18 +32,6 @@ Element_getCategory_Action_Get_From_List()
 	return lang("Variable")
 }
 
-Element_getParameters_Action_Get_From_List()
-{
-	parametersToEdit:=Object()
-	
-	parametersToEdit.push({id: "Varname"})
-	parametersToEdit.push({id: "ListName"})
-	parametersToEdit.push({id: "Position"})
-	parametersToEdit.push({id: "expressionPos"})
-	
-	return parametersToEdit
-}
-
 Element_getParametrizationDetails_Action_Get_From_List(Environment)
 {
 	parametersToEdit:=Object()

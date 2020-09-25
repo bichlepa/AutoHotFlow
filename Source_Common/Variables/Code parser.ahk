@@ -231,8 +231,6 @@ class class_parser
 	;parse an expression. Parameters are the already parsed part of the expression and my current precendence
 	parse_expression(left,my_prec, percentIsEnd = false)
 	{
-		if (this.token.line = 2)
-			sleep 1
 		this.skip_whitespace(false)
 		
 		;check whether the next token is a operation

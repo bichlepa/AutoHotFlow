@@ -48,19 +48,6 @@ Element_getStabilityLevel_Action_Copy_Folder()
 	return "Stable"
 }
 
-;Returns a list of all parameters of the element.
-;Only those parameters will be saved.
-Element_getParameters_Action_Copy_Folder()
-{
-	parametersToEdit:=Object()
-	
-	parametersToEdit.push({id: "Overwrite"})
-	parametersToEdit.push({id: "folder"})
-	parametersToEdit.push({id: "destFolder"})
-	
-	return parametersToEdit
-}
-
 ;Returns an array of objects which describe all controls which will be shown in the element settings GUI
 Element_getParametrizationDetails_Action_Copy_Folder(Environment)
 {

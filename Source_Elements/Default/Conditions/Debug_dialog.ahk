@@ -32,12 +32,6 @@ Element_getCategory_Condition_Debug_Dialog()
 	return lang("Debugging")
 }
 
-Element_getParameters_Condition_Debug_Dialog()
-{
-	parametersToEdit:=Object()
-	return parametersToEdit
-}
-
 Element_getParametrizationDetails_Condition_Debug_Dialog(Environment)
 {
 	parametersToEdit:=Object()

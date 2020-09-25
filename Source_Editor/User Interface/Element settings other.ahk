@@ -154,7 +154,7 @@ selectSubType(p_ElementID,wait="")
 		Loop
 		{
 			if (NowResultEditingElement="")
-				sleep 100
+				sleep 10
 			else 
 			{
 				if (NowResultEditingElement!="aborted")
@@ -308,7 +308,7 @@ selectConnectionType(p_ElementID,wait="")
 		Loop
 		{
 			if (NowResultEditingElement="")
-				sleep 100
+				sleep 10
 			else 
 			{
 				if (NowResultEditingElement!="aborted")
@@ -410,7 +410,7 @@ selectContainerType(p_ElementID, wait="")
 		Loop
 		{
 			if (NowResultEditingElement="")
-				sleep 100
+				sleep 10
 			else 
 			{
 				if (NowResultEditingElement!="aborted")

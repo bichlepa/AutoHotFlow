@@ -1,8 +1,4 @@
-﻿;In order to save execution time, the returned parametratopmDetails are cached in those objects
-Element_bufferedParametrationDetails:=Object()
-Element_bufferedParameters:=Object()
-
-;Only called from main thread. Fills a list of all available element classes
+﻿;Only called from main thread. Fills a list of all available element classes
 Element_Register_Element_Class(p_class)
 {
 	AllElementClasses := _getSharedProperty("AllElementClasses")
@@ -10,54 +6,84 @@ Element_Register_Element_Class(p_class)
 	_setSharedProperty("AllElementClasses", AllElementClasses)
 }
 
-;Returns a list of all parametration details
+; Returns parametration details of an element class.
+; the result of the actual call of the element function is buffered to save execution time
 Element_getParametrizationDetails(elementClass, Environment)
 {
-	global Element_bufferedParametrationDetails
-	if (not isobject(Element_bufferedParametrationDetails[elementClass]) 
+	; we will use this static variable to buffer the results of the call, since they never change.
+	static Element_bufferedParametrationDetails
+	if (not isobject(Element_bufferedParametrationDetails))
+		Element_bufferedParametrationDetails := Object()
+
+	; check whether the result of the call is already buffered
+	if (not isobject(Element_bufferedParametrationDetails[elementClass])
 		or (Element_bufferedParametrationDetails[elementClass].updateOnEdit and Environment.updateOnEdit )) ;If the edit field is opened and the parameters must be reloaded
 	{
+		; it is not buffered. Call the element function
 		if not IsFunc("Element_getParametrizationDetails_" elementClass)
 		{
-			logger("a0", "unexpected error function Element_getParametrizationDetails_" elementClass " does not exist")
-			MsgBox unexpected error function Element_getParametrizationDetails_%elementClass% does not exist
+			; if this happens, the element is not properly implemented
+			logger("a0", "unexpected error! function Element_getParametrizationDetails_" elementClass " does not exist")
+			throw exception("unexpected error! function Element_getParametrizationDetails_" elementClass " does not exist")
+			return
 		}
-		Element_bufferedParametrationDetails[elementClass]:=Element_getParametrizationDetails_%elementClass%(Environment)
+
+		; call the element funciton and buffer the result
+		Element_bufferedParametrationDetails[elementClass] := Element_getParametrizationDetails_%elementClass%(Environment)
 	}
+	; return the buffered result
 	return ObjFullyClone(Element_bufferedParametrationDetails[elementClass])
 }
 
+; Returns a list of all parameter IDs.
+; the result of the actual call of the element function is buffered to save execution time
 Element_getParameters(elementClass, Environment)
 {
-	global Element_bufferedParameters
-	if not isobject(Element_bufferedParameters[elementClass])
+	; we will use this static variable to buffer the results of the call, since they never change.
+	static Element_bufferedParameters
+	if (not isobject(Element_bufferedParameters))
+		Element_bufferedParameters := Object()
+	
+	; check whether the result of the call is already buffered
+	if (not isobject(Element_bufferedParameters[elementClass]))
 	{
-		tempObject:=Object()
-		ParametrizationDetails:=Element_getParametrizationDetails(elementClass, Environment)
+		; it is not buffered. Create list of all parameter IDs.
+		tempObject := Object()
+
+		; get parametration details.
+		ParametrizationDetails := Element_getParametrizationDetails(elementClass, Environment)
+
+		; find all parameter IDs in the paraemetration details
 		for index, oneParameterDetail in ParametrizationDetails
 		{
+			; the value in key "ID" can contain parameter IDs
 			if (oneParameterDetail.ID)
 			{
 				if not isobject(oneParameterDetail.ID)
 				{
+					; the value contains a single parameter ID. Add it.
 					tempObject.push(oneParameterDetail.ID)
 				}
 				else
 				{
+					; The value contains a list of parameter IDs. Add them all.
 					for index3, OneID in oneParameterDetail.ID
 					{
 						tempObject.push(OneID)
 					}
 				}
 			}
+			; the value in key "ContentID" can contain parameter IDs
 			if (oneParameterDetail.ContentID)
 			{
 				if not isobject(oneParameterDetail.ContentID)
 				{
+					; the value contains a single parameter ID. Add it.
 					tempObject.push(oneParameterDetail.ContentID)
 				}
 				else
 				{
+					; The value contains a list of parameter IDs. Add them all.
 					for index3, OneID in oneParameterDetail.ContentID
 					{
 						tempObject.push(OneID)
@@ -65,8 +91,11 @@ Element_getParameters(elementClass, Environment)
 				}
 			}
 		}
-		
+
+		; buffer the result
 		Element_bufferedParameters[elementClass]:=tempObject
 	}
+
+	; return the buffered result
 	return ObjFullyClone(Element_bufferedParameters[elementClass])
 }

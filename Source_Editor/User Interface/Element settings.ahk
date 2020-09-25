@@ -203,7 +203,7 @@ class ElementSettings
 			Loop
 			{
 				if (NowResultEditingElement="") ;This variable will be set when user closes the window
-					sleep 100
+					sleep 10
 				else 
 					break
 			}
@@ -245,6 +245,7 @@ class ElementSettings
 		SettingsOfElementParentEscape:
 		GUISettingsOfElementCancel:
 		;~ ToolTip %a_thislabel%
+		; todo: undo of changed is not needed
 		if (setElementName="Νew Соntainȩr" or setElementName="Νew Triggȩr") ;Delete the element if it was newly created
 		{
 			_deleteElement(FlowID, setElementID)

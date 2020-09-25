@@ -41,19 +41,6 @@ Element_getIconPath_Action_Exponentiation()
 {
 }
 
-;Returns a list of all parameters of the element.
-;Only those parameters will be saved.
-Element_getParameters_Action_Exponentiation()
-{
-	parametersToEdit:=Object()
-	
-	parametersToEdit.push({id: "Varname"})
-	parametersToEdit.push({id: "VarValue"})
-	parametersToEdit.push({id: "Exponent"})
-	
-	return parametersToEdit
-}
-
 ;Returns an array of objects which describe all controls which will be shown in the element settings GUI
 Element_getParametrizationDetails_Action_Exponentiation(Environment)
 {
