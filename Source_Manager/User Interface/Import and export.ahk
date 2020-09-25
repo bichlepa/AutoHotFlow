@@ -176,7 +176,7 @@ importExportGui_import(filepathZip)
 		}
 		
 		;show flow in the manager
-		newFlowID := InitFlow(newFlowFullPath)
+		InitFlow(newFlowFullPath)
 		TreeView_manager_Refill()
 		TreeView_manager_Select("Flow", newFlowid)
 		

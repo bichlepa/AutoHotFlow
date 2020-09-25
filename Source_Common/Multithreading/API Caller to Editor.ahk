@@ -8,15 +8,20 @@ API_Editor_EditGUIshow(par_FlowID)
 	local retvalue
 	logger("t2", A_ThisFunc " called")
 	
-	for threadID, threadpars in global_Allthreads
-	{
-		if (threadpars.flowID = par_FlowID)
-		{
-			_setTask("editor" par_FlowID, {name: "EditGUIshow"})
-			break
-		}
-	}
+	_setTask("editor" par_FlowID, {name: "EditGUIshow"})
 	
+	logger("t2", A_ThisFunc " finished")
+	return retvalue
+}
+
+API_Editor_Exit(par_flowID)
+{
+	global
+	
+	local retvalue
+	logger("t2", A_ThisFunc " called")
+	
+	_setTask("editor" par_FlowID, {name: "exit"})
 	
 	logger("t2", A_ThisFunc " finished")
 	return retvalue

@@ -93,7 +93,8 @@ newInstance(p_Environment, p_params = "")
 }
 
 /**
-Start all manual triggers
+Start execution of the flow
+; todo: descriobe p_params
 */
 startFlow(p_FlowID, p_TriggerID ="", p_params = "")
 {

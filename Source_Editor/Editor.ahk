@@ -116,6 +116,12 @@ queryTasks()
 				; the editor gui should be shown
 				EditGUIshow()
 			}
+			if (name="exit")
+			{
+				ToolTip, % "exit " flowID
+				; the editor gui should be closed. We close the thread
+				ExitApp
+			}
 		}
 		else
 		{
@@ -124,6 +130,17 @@ queryTasks()
 		}
 	}
 }
+
+; Functions which are defined in api Caller to Editor.
+API_Editor_EditGUIshow(FlowID) ;Api function which is used in common code
+{
+	EditGUIshow()
+}
+API_Editor_Exit(par_flowID)
+{
+	ExitApp
+}
+
 
 ; Start the exit routine
 exit:

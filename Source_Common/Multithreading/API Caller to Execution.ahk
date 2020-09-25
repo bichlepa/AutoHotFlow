@@ -58,13 +58,13 @@ API_Execution_DisableTriggers(p_FlowID)
 }
 
 
-API_Execution_enableOneTrigger(par_FlowID, par_TriggerID)
+API_Execution_enableOneTrigger(par_FlowID, par_TriggerID, par_save = true)
 {
 	global
 	local retvalue
 	logger("t2", A_ThisFunc " called")
 	
-	_setTask("execution", {name: "enableOneTrigger", flowID: par_FlowID, triggerID: par_TriggerID})
+	_setTask("execution", {name: "enableOneTrigger", flowID: par_FlowID, triggerID: par_TriggerID, save: par_save})
 	
 	logger("t2", A_ThisFunc " finished")
 	return

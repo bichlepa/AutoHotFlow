@@ -50,13 +50,6 @@ EditorGUIInit()
 	OnMessage(0x03,"WindowGetsMoved",1)
 }
 
-; Show editor.
-; this function is called from file a common module, which is also used by the manager thread.
-; For Manager thread this function is defined in the "API Caller to Editor". The editor thread does not need to use the api.
-API_Editor_EditGUIshow(FlowID) ;Api function which is used in common code
-{
-	EditGUIshow()
-}
 
 ; show editor
 EditGUIshow()
@@ -332,6 +325,8 @@ ui_OnLanguageChange()
 MainGUIguisize()
 {
 	global EditGUI_StatusBarHeight
+	global heightofguipic
+	global widthofguipic
 	; adjust the status bar
 	SB_SetParts(a_guiwidth)
 

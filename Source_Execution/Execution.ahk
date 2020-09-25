@@ -73,6 +73,7 @@ lang_setLanguage(_getSettings("UILanguage"))
 #include Source_Common\Multithreading\API Caller to Manager.ahk
 #include Source_Common\Multithreading\API Caller to Draw.ahk
 #include Source_Common\Multithreading\API Caller to Editor.ahk
+#include Source_Common\Multithreading\API Caller to Execution.ahk
 #include Source_Common\Multithreading\API for Elements.ahk
 #include Source_Common\Multithreading\Shared Variables.ahk
 
@@ -125,7 +126,7 @@ queryTasks()
 			if (name = "enableOneTrigger")
 			{
 				; a single trigger of a flow should be enabled
-				enableOneTrigger(oneTask.FlowID, oneTask.TriggerID)
+				enableOneTrigger(oneTask.FlowID, oneTask.TriggerID, oneTask.save)
 			}
 			if (name = "disableOneTrigger")
 			{

@@ -39,26 +39,47 @@ Thread_StartManager()
 
 
 
-Thread_StartEditor(par_FlowID)
+Thread_StartEditor(p_FlowID)
 {
 	global
 	local ExecutionThreadCode
 	local threadID
 	
-	_setSharedProperty("editor" par_FlowID, object())
-	_setSharedProperty("editor" par_FlowID ".Tasks", object())
 	
-	threadID := "Editor" global_EditorThreadIDCounter++
-	logger("t1", "Starting editor thread. ID: " threadID)
-	FileRead,ExecutionThreadCode,% _ScriptDir "\Source_Editor\Editor.ahk"
-	;~ MsgBox %ExecutionThreadCode%
-	StringReplace,ExecutionThreadCode,ExecutionThreadCode, % ";PlaceholderIncludesOfElements",% global_libInclusionsForThreads global_elementInclusionsForThreads
-	
-	AhkThread%threadID% := AhkThread(global_CommonAhkCodeForAllThreads "`n global _ahkThreadID := """ threadID """`n global FlowID := """ par_FlowID """`n"  ExecutionThreadCode)
-	AhkThread%threadID%.ahkassign("_ahkThreadID",threadID)
-	
-	global_AllThreads[threadID] := {permanent: false, type: "Editor", flowID: par_FlowID}
-	logger("t1", "Editor thread started")
+	;Check whether there is already a Editor opened for that flow. If so, just open the editor window
+	FoundThreadID := ""
+	for oneThreadID, oneThread in global_AllThreads
+	{
+		if (oneThread.type = "editor")
+		{
+			if (oneThread.FlowID = p_FlowID)
+			{
+				FoundThreadID:= oneThreadID
+				break
+			}
+		}
+	}
+	if (FoundThreadID != "")
+	{
+		API_Editor_EditGUIshow(p_FlowID)
+	}
+	Else
+	{
+		_setSharedProperty("editor" p_FlowID, object())
+		_setSharedProperty("editor" p_FlowID ".Tasks", object())
+		
+		threadID := "Editor" global_EditorThreadIDCounter++
+		logger("t1", "Starting editor thread. ID: " threadID)
+		FileRead,ExecutionThreadCode,% _ScriptDir "\Source_Editor\Editor.ahk"
+		;~ MsgBox %ExecutionThreadCode%
+		StringReplace,ExecutionThreadCode,ExecutionThreadCode, % ";PlaceholderIncludesOfElements",% global_libInclusionsForThreads global_elementInclusionsForThreads
+		
+		AhkThread%threadID% := AhkThread(global_CommonAhkCodeForAllThreads "`n global _ahkThreadID := """ threadID """`n global FlowID := """ p_FlowID """`n"  ExecutionThreadCode)
+		AhkThread%threadID%.ahkassign("_ahkThreadID",threadID)
+		
+		global_AllThreads[threadID] := {permanent: false, type: "Editor", flowID: p_FlowID}
+		logger("t1", "Editor thread started")
+	}
 }
 
 Thread_StartDraw()

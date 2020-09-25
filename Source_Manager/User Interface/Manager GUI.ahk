@@ -683,6 +683,7 @@ Button_manager_NewFlow()
 	; get the selected element tv id.
 	local tempSelectedTV := TV_GetSelection()
 	local NewFlowID
+	local tempSelectedID
 	if (tempSelectedTV != 0) ;If an element is selected
 	{
 		;Create new flow in the category of selected element
@@ -691,12 +692,19 @@ Button_manager_NewFlow()
 		if (allTreeViewItems[tempSelectedTV].type = "Category")
 		{
 			; a category is selected. Insert the new flow in this category
-			NewFlowID := NewFlow(tempSelectedID)
+			if (tempSelectedID = "uncategorized")
+				NewFlowID := NewFlow() ; do not pass the "uncategorized" category. It means, that the flow does not have a category
+			else
+				NewFlowID := NewFlow(tempSelectedID)
 		}
 		else if (allTreeViewItems[tempSelectedTV].type = "Flow")
 		{
 			; a flow is selected. Insert the new flow in its category
-			NewFlowID := NewFlow(allTreeViewItems[TV_GetParent(tempSelectedTV)].id)
+			tempSelectedID := allTreeViewItems[TV_GetParent(tempSelectedTV)].id
+			if (tempSelectedID = "uncategorized")
+				NewFlowID := NewFlow() ; do not pass the "uncategorized" category. It means, that the flow does not have a category
+			else
+				NewFlowID := NewFlow(tempSelectedID)
 		}
 		else
 		{

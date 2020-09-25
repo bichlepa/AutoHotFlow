@@ -1,130 +1,116 @@
-﻿editFlow(par_FlowID)
+﻿
+; open flow editor to edit the defined flow
+editFlow(p_FlowID)
 {
-	global
-	local FoundThreadID, oneThreadID, oneThread
-	;~ d(global_AllThreads)
-	
-	if (_getFlowProperty(par_FlowID, "demo") and _getSettings("developing") != True)
+	; warn user if he opens a demo flow (suppress warding during development)
+	if (_getFlowProperty(p_FlowID, "demo") and _getSettings("developing") != True)
 	{
 		MsgBox, 48, % lang("Edit flow"), % lang("You are opening a demonstration flow for edit.") " " lang("Please be aware that a demonstration flow cannot be changed.") " " lang("You may duplicate this flow first and then you can edit it.")
 	}
 	
-	if (_getFlowProperty(par_FlowID, "loaded") != true)
+	; load flow if it is not loaded yet
+	if (_getFlowProperty(p_FlowID, "loaded") != true)
 	{
-		LoadFlow(par_FlowID)
+		LoadFlow(p_FlowID)
 	}
 	
-	;Check whether there is already a Editor opened for that flow TODO: This code must be in main thread
-	FoundThreadID := ""
-	for oneThreadID, oneThread in global_AllThreads
+	; open the editor
+	API_Main_StartEditor(p_FlowID)
+}
+
+; enable all triggers in a flow
+enableFlow(p_FlowID)
+{
+	; load flow if it is not loaded yet
+	if (_getFlowProperty(p_FlowID, "loaded") != true)
 	{
-		if (oneThread.type = "editor")
-		{
-			if (oneThread.FlowID = par_FlowID)
-			{
-				FoundThreadID:= oneThreadID
-				break
-			}
-		}
+		LoadFlow(p_FlowID)
 	}
-	if (FoundThreadID != "")
+	
+	; enable the triggers
+	API_Execution_EnableTriggers(p_FlowID)
+}
+
+; changes the flow enable state
+enableToggleFlow(p_FlowID)
+{
+	if (not _getFlowProperty(p_FlowID, "enabled"))
 	{
-		API_Editor_EditGUIshow(par_FlowID)
+		; flow is disabled, enable it
+		enableFlow(p_FlowID)
 	}
 	else
 	{
-		API_Main_StartEditor(par_FlowID)
+		; flow is enabled, disable it
+		disableFlow(p_FlowID)
 	}
 }
 
-enableFlow(par_FlowID)
+; disable all triggers in a flow
+disableFlow(p_FlowID)
 {
-	global
-	local oneTriggerID, oneTrigger
-	if (_getFlowProperty(par_FlowID, "loaded") != true)
+	; disable the triggers
+	API_Execution_DisableTriggers(p_FlowID)
+}
+
+; enable only one trigger
+enableOneTrigger(p_FlowID, p_TriggerID = "", p_save=True)
+{
+	; load flow if it is not loaded yet
+	if (_getFlowProperty(p_FlowID, "loaded") != true)
 	{
-		LoadFlow(par_FlowID)
+		LoadFlow(p_FlowID)
 	}
-	
-	API_Execution_EnableTriggers(par_FlowID)
-	SaveFlowMetaData(par_FlowID)
+
+	; enable the trigger
+	API_Execution_enableOneTrigger(p_FlowID, p_TriggerID, p_save)
 }
-enableToggleFlow(par_FlowID)
+
+; disable only one trigger
+disableOneTrigger(p_FlowID, p_TriggerID = "", p_save=True)
 {
-	global
-	
-	if (_getFlowProperty(par_FlowID, "loaded") != true)
+	; disable the trigger
+	API_Execution_disableOneTrigger(p_FlowID, p_TriggerID, p_save)
+}
+
+; execute a flow
+; trigp_TriggerID: TriggerID is optional. If not set, the default manual trigger will be triggered
+; p_params: more parameters (see comment to startFlow() in "Instances and Treads.ahk")
+ExecuteFlow(p_FlowID, p_TriggerID="", p_params="")
+{
+	; load flow if it is not loaded yet
+	if (_getFlowProperty(p_FlowID, "loaded") != true)
 	{
-		enableFlow(par_FlowID)
+		LoadFlow(p_FlowID)
 	}
-	else
+
+	; execute the flow
+	API_Execution_startFlow(p_FlowID, p_TriggerID, p_params)
+}
+
+; change execution state
+; if flow is executing, it will be stopped.
+; if flow is not executing, the default main trigger will be triggered (if any)
+ExecuteToggleFlow(p_FlowID)
+{
+	; load flow if it is not loaded yet
+	if (_getFlowProperty(p_FlowID, "loaded") != true)
 	{
-		disableFlow(par_FlowID)
+		LoadFlow(p_FlowID)
 	}
+
+	; change execution state
+	API_Execution_ExecuteToggleFlow(p_FlowID)
 }
 
-disableFlow(par_FlowID)
+; Stop the execution of a flow
+StopFlow(p_FlowID)
 {
-	API_Execution_DisableTriggers(par_FlowID)
-	SaveFlowMetaData(par_FlowID)
+	API_Execution_StopFlow(p_FlowID)
 }
 
-enableOneTrigger(par_FlowID, par_TriggerID = "", save=True)
-{
-	if (_getFlowProperty(par_FlowID, "loaded") != true)
-	{
-		LoadFlow(par_FlowID)
-	}
-	API_Execution_enableOneTrigger(par_FlowID, par_TriggerID)
-	if (save)
-		SaveFlowMetaData(par_FlowID)
-}
-
-disableOneTrigger(par_FlowID, par_TriggerID = "", save=True)
-{
-	API_Execution_disableOneTrigger(par_FlowID, par_TriggerID)
-	if (save)
-		SaveFlowMetaData(par_FlowID)
-}
-
-ExecuteFlow(par_FlowID, par_TriggerID="", par_PassedParsKey="")
-{
-	if (_getFlowProperty(par_FlowID, "loaded") != true)
-	{
-		LoadFlow(par_FlowID)
-	}
-	API_Execution_startFlow(par_FlowID, par_TriggerID, par_PassedParsKey)
-}
-
-ExecuteToggleFlow(par_FlowID)
-{
-	if (_getFlowProperty(par_FlowID, "loaded") != true)
-	{
-		LoadFlow(par_FlowID)
-	}
-	API_Execution_ExecuteToggleFlow(par_FlowID)
-}
-
-TriggerFlow(par_FlowID, par_Reason)
-{
-	if (_getFlowProperty(par_FlowID, "loaded") != true)
-	{
-		LoadFlow(par_FlowID)
-	}
-	API_Execution_startFlow(par_FlowID)
-}
-
-StopFlow(par_FlowID)
-{
-	API_Execution_StopFlow(par_FlowID)
-}
-
+; Stop the execution of all flow (todo: implement and use on exit)
 StopAllFlows()
-{
-	MsgBox The function %A_ThisFunc% is not implemented yet
-}
-
-StopFlowInstance(par_FlowID, par_InstanceID)
 {
 	MsgBox The function %A_ThisFunc% is not implemented yet
 }
