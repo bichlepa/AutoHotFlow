@@ -97,6 +97,9 @@ InitFlow(FileFullPath)
 	; create empty objects for later use
 	newFlow.draw := Object()
 	newFlow.states := Object()
+
+	; create initial counter values
+	newFlow.statesCounter := 0
 	
 	; Set flow object
 	_setFlow(newFlowid, newFlow)
