@@ -40,7 +40,7 @@ Element_New(p_FlowID, p_type="", p_elementID="")
 	newElement.countRuns := 0
 	newElement.enabled := False
 	
-	;Assign default position, although it is commonly not needed
+	;Assign default position
 	newElement.x := 0
 	newElement.y := 0
 	
@@ -117,7 +117,7 @@ Element_SetClass(p_FlowID, p_ElementID, p_elementClass)
 	; Set the default element name (if default name is enabled)
 	if (_getElementProperty(p_FlowID, p_elementID, "StandardName"))
 	{
-		newName := Element_GenerateName_%p_elementClass%(allElements[p_elementID], allElements[p_elementID].pars)
+		newName := Element_GenerateName_%p_elementClass%({flowID: p_FlowID, elementID: p_ElementID}, _getElementProperty(p_FlowID, p_ElementID, "pars"))
 		_setElementProperty(p_FlowID, p_elementID, "name", newName)
 	}
 	
@@ -207,7 +207,7 @@ Element_findDefaultTrigger(p_FlowID)
 {
 	if not p_FlowID
 	{
-		MsgBox internal error! A new element should be created but FlowID is empty!
+		throw exception("internal error! Should find default trigger, but FlowID is empty", -1)
 		return
 	}
 	
@@ -236,7 +236,7 @@ Element_setDefaultTrigger(p_FlowID, p_elementID)
 {
 	if not p_FlowID
 	{
-		MsgBox internal error! A new element should be created but FlowID is empty!
+		throw exception("internal error! Should set default trigger, but FlowID is empty", -1)
 		return
 	}
 
@@ -271,7 +271,7 @@ Element_Remove(p_FlowID, p_elementID)
 {
 	if not p_FlowID
 	{
-		MsgBox internal error! A new element should be created but FlowID is empty!
+		throw exception("internal error! Should remove an element, but FlowID is empty", -1)
 		return
 	}
 
@@ -353,7 +353,7 @@ Connection_Remove(p_FlowID, p_connectionID)
 {
 	if not p_FlowID
 	{
-		MsgBox internal error! A new element should be created but FlowID is empty!
+		throw exception("internal error! Should remove a connection, but FlowID is empty", -1)
 		return
 	}
 
@@ -371,7 +371,7 @@ UpdateConnectionLists(p_FlowID)
 {
 	if not p_FlowID
 	{
-		MsgBox internal error! A new element should be created but FlowID is empty!
+		throw exception("internal error! Should update connection lists, but FlowID is empty", -1)
 		return
 	}
 

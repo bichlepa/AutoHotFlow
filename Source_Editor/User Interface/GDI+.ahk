@@ -1,7 +1,6 @@
 ﻿;Formula for x-position: 0+n*35  	;Width: 35*4=140
 ;Formula for y-position: 17,5+n*35	;Height: 35*3=105
 
-_setFlowProperty(FlowID, "draw.VisibleArea", [])
 ;~ OnTopLabel=
 
 

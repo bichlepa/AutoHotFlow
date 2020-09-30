@@ -8,6 +8,13 @@ SetBatchLines -1
 ; The manager should not have an own tray icon
 #NoTrayIcon
 
+; Make the variable _ahkThreadID super global. This variable will be set by the main thread after this thread is created.
+global _ahkThreadID
+
+; On call of ExitApp, we will start the exit routine
+OnExit,Exit
+global _exiting := false
+
 ; Get working dir for AutoHotFlow from shared variable.
 ; It is the directory where the flows and global variables are saved
 ; (not to be confused with the working dir in the settings of AutoHotFlow)
@@ -16,15 +23,8 @@ global _WorkingDir := _getShared("_WorkingDir")
 global _ScriptDir := _getShared("_ScriptDir")
 ; using working dir forbidden, because in other parts of the code we use the commands FileSelectFolder and FileSelectFile
 ; While any thread uses those commands, the working directory of the whole process is changed to the path which is shown in the dialog.
-SetWorkingDir %a_temp%
+; SetWorkingDir %a_temp% working dir is only set in main thread. Otherwise it causes errors if another thread is currently including files
 
-
-; Make the variable _ahkThreadID super global. This variable will be set by the main thread after this thread is created.
-global _ahkThreadID
-
-; On call of ExitApp, we will start the exit routine
-OnExit,Exit
-global _exiting := false
 
 ; Include libraries
 #Include %A_ScriptDir%\..
@@ -34,6 +34,7 @@ global _exiting := false
 #include Lib\gdi+\gdip.ahk
 #include lib\ObjHasValue\ObjHasValue.ahk
 #include lib\Robert - Ini library\Robert - Ini library.ahk
+#include lib\Json\Jxon.ahk
 
 ; include language module
 #include language\language.ahk ;Must be very first
@@ -55,13 +56,13 @@ lang_setLanguage(_getSettings("UILanguage"))
 
 #include Source_Common\Debug\Debug.ahk
 #include source_Common\Debug\Logger.ahk
-#include Source_Common\settings\Default values.ahk
 #include source_Common\variables\Global variables.ahk
 #include source_Common\Variables\code parser.ahk
 #include source_Common\Variables\code tokenizer.ahk
 #include source_Common\Variables\code evaluator.ahk
 #include source_Common\Variables\expression evaluator.ahk
 #include source_Common\Other\Other.ahk
+#include source_Common\Other\Design.ahk
 
 #include Source_Execution\execution task\execution task.ahk
 #include Source_Execution\API\API for elements.ahk

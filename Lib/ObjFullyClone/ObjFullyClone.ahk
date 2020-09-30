@@ -33,3 +33,27 @@ ObjFullyCompare_oneDir(obj1, obj2)
 	}
 	return true
 }
+
+; deeply merges content of obj2 in obj1
+ObjFullyMerge(obj1, obj2)
+{
+	for k,v in obj2
+	{
+		if (isobject(v))
+		{
+			if (isobject(obj1[k]))
+			{
+				ObjFullyMerge(obj1[k], v)
+			}
+			else
+			{
+				obj1[k] := ObjFullyClone(v)
+			}
+		}
+		else
+		{
+			obj1[k] := v
+		}
+	}
+	return obj1
+}

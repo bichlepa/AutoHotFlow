@@ -16,7 +16,7 @@ global _WorkingDir := _getShared("_WorkingDir")
 global _ScriptDir := _getShared("_ScriptDir")
 ; using working dir forbidden, because in other parts of the code we use the commands FileSelectFolder and FileSelectFile
 ; While any thread uses those commands, the working directory of the whole process is changed to the path which is shown in the dialog.
-SetWorkingDir %a_temp%
+; SetWorkingDir %a_temp% working dir is only set in main thread. Otherwise it causes errors if another thread is currently including files
 
 #Persistent
 
@@ -48,7 +48,7 @@ lang_setLanguage(_getSettings("UILanguage"))
 
 #include Source_Common\Debug\Debug.ahk
 #include source_Common\Debug\Logger.ahk
-#include Source_Common\settings\Default values.ahk
+#include source_Common\Other\Design.ahk
 
 ; intialize gdip
 gdip_Init()

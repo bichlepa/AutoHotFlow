@@ -458,7 +458,7 @@ endworkingOnClick(changedSomething, cancelled)
 	global workingOnClick
 	if (cancelled) ; user cancelled the action
 	{
-		; restorr the current state and undo all eventual changes from user
+		; restore the current state and undo all eventual changes from user
 		State_RestoreCurrent(FlowID)
 		UpdateSelectedItemsList()
 	}

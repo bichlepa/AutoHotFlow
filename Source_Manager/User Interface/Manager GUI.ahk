@@ -4,6 +4,8 @@
 init_Manager_GUI()
 {
 	global
+
+	logger("a2", "initializing manager GUI")
 	
 	allItems:=object()
 	
@@ -718,6 +720,15 @@ Button_manager_NewFlow()
 		;Create a flow in category "uncategorized"
 		NewFlowID := NewFlow()
 	}
+	; initialize the new flow
+	initNewFlow(NewFlowID)
+	
+	; create a new state
+	state_New(NewFlowID)
+	_setFlowProperty(NewFlowID, "savedState", _getFlowProperty(NewFlowID, "currentState"))
+
+	; save newly created flow 
+	SaveFlowMetaData(NewFlowID)
 	
 	; insert the flow in the tree view (todo: do it without a full refill)
 	TreeView_manager_Refill()

@@ -30,7 +30,6 @@ global _ahkThreadID:="Main"
 OnExit,Exit
 global _exiting := false
 
-
 ;Initialize shared variables
 gosub, init_SharedVars
 
@@ -92,6 +91,7 @@ FileDelete,%a_temp%\autoHotflowTryToStartAsAdmin.txt
 #include lib\ObjFullyClone\ObjFullyClone.ahk
 #include lib\Random Word List\Random Word List.ahk
 #include Lib\gdi+\gdip.ahk
+#include lib\Json\Jxon.ahk
 
 ;Include libraries which may be used by the elements. This code is generated.
 ;Lib_includes_Start
@@ -138,7 +138,6 @@ global_libInclusionsForThreads =
 #include Source_Common\Flows\states.ahk
 #include source_Common\Debug\Debug.ahk
 #include source_Common\Debug\Logger.ahk
-#include source_Common\Settings\Default values.ahk
 #include source_Common\Settings\Settings.ahk
 #include source_Common\variables\global variables.ahk
 #include source_Common\variables\code parser.ahk
@@ -148,6 +147,7 @@ global_libInclusionsForThreads =
 #include Source_Common\Elements\Manage Elements.ahk
 #include source_Common\Elements\Elements.ahk
 #include source_Common\Other\Other.ahk
+#include source_Common\Other\Design.ahk
 
 ;Include elements. This code is generated
 ;The elements must be included before the other treads are started
@@ -428,7 +428,6 @@ global_elementInclusionsForThreads =
 
 ;Element_Includes_End
 
-
 ;Start other threads. Multi-threading gain the performance heavily
 ;and execution of flows does not lower the GUI performance.
 Thread_init()
@@ -448,7 +447,6 @@ _setShared("WindowsStartup", false)
 ;Initialize a hidden command window. This window is able to receive commands from other processes.
 ;The first purpose is that the script AutoHotFlow.ahk/exe can send commands if a shortcut of the trigger "shortcut" is opened.
 CreateHiddenCommandWindow()
-
 ; check regularly for new tasks which we get through shared variable
 SetTimer,queryTasks,100
 return
@@ -504,7 +502,7 @@ if (_exiting != true) ;Prevent multiple execution of this code by setting this f
 	LeaveCriticalSection(_cs_shared)
 
 	; before we start killing the threads (which is error prone), we will give them some time to close
-	settimer,exit,5000
+	settimer,exit,4000
 	return
 }
 Thread_StopAll() ;Kill all other threads

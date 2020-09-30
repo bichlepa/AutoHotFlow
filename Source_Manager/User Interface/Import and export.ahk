@@ -106,10 +106,11 @@ importExportGui_import(filepathZip)
 	7z_extract(filepathZip, "-tzip", filepathextractfolder)
 	
 	; check all extracted files
-	loop, %filepathextractfolder%\*.ini
+	loop, %filepathextractfolder%\*.json
 	{
 		
 		;check whether there are flows with same name. Ask user if he wants to import them anyway
+		; todo: change to json
 		IniRead, newflowname, %a_loopfilefullpath% , general, name, %a_space%
 		if not newflowname
 		{
@@ -162,7 +163,7 @@ importExportGui_import(filepathZip)
 			{
 				random,randomnumber,0,1000
 				
-				ThisFlowFilename:= substr(ThisFlowFilename,1,strlen(ThisFlowFilename)-4) "_" randomnumber ".ini"
+				ThisFlowFilename:= substr(ThisFlowFilename,1,strlen(ThisFlowFilename)-4) "_" randomnumber ".json"
 			}
 			else
 				break
@@ -176,7 +177,7 @@ importExportGui_import(filepathZip)
 		}
 		
 		;show flow in the manager
-		InitFlow(newFlowFullPath)
+		loadFlow(newFlowFullPath)
 		TreeView_manager_Refill()
 		TreeView_manager_Select("Flow", newFlowid)
 		

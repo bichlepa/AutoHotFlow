@@ -27,14 +27,14 @@ Thread_StartManager()
 	threadID := "Manager"
 	logger("t1", "Starting manager thread. ID: " threadID)
 	FileRead,ExecutionThreadCode,% _ScriptDir "\Source_Manager\Manager.ahk"
-	;~ MsgBox %ExecutionThreadCode%
 	StringReplace,ExecutionThreadCode,ExecutionThreadCode, % ";PlaceholderIncludesOfElements",% global_libInclusionsForThreads global_elementInclusionsForThreads
-	
+
 	AhkThread%threadID% := AhkThread(global_CommonAhkCodeForAllThreads "`n global _ahkThreadID := """ threadID """`n" ExecutionThreadCode)
 	AhkThread%threadID%.ahkassign("_ahkThreadID",threadID)
 	
 	global_AllThreads[threadID] := {permanent: true, type: "Manager"}
 	logger("t1", "Manager thread started")
+		return threadID
 }
 
 
@@ -71,14 +71,14 @@ Thread_StartEditor(p_FlowID)
 		threadID := "Editor" global_EditorThreadIDCounter++
 		logger("t1", "Starting editor thread. ID: " threadID)
 		FileRead,ExecutionThreadCode,% _ScriptDir "\Source_Editor\Editor.ahk"
-		;~ MsgBox %ExecutionThreadCode%
 		StringReplace,ExecutionThreadCode,ExecutionThreadCode, % ";PlaceholderIncludesOfElements",% global_libInclusionsForThreads global_elementInclusionsForThreads
-		
+
 		AhkThread%threadID% := AhkThread(global_CommonAhkCodeForAllThreads "`n global _ahkThreadID := """ threadID """`n global FlowID := """ p_FlowID """`n"  ExecutionThreadCode)
 		AhkThread%threadID%.ahkassign("_ahkThreadID",threadID)
 		
 		global_AllThreads[threadID] := {permanent: false, type: "Editor", flowID: p_FlowID}
 		logger("t1", "Editor thread started")
+		return threadID
 	}
 }
 
@@ -94,12 +94,13 @@ Thread_StartDraw()
 	threadID := "Draw"
 	logger("t1", "Starting draw thread. ID: " threadID)
 	FileRead,ExecutionThreadCode,% _ScriptDir "\Source_Draw\Draw.ahk"
-	;~ MsgBox %ExecutionThreadCode%
+
 	AhkThread%threadID% := AhkThread(global_CommonAhkCodeForAllThreads "`n global _ahkThreadID := """ threadID """`n" ExecutionThreadCode)
 	AhkThread%threadID%.ahkassign("_ahkThreadID",threadID)
 
 	global_AllThreads[threadID] := {permanent: true, type: "Draw"}
 	logger("t1", "Draw thread started")
+		return threadID
 }
 
 Thread_StartExecution()
@@ -115,12 +116,13 @@ Thread_StartExecution()
 	logger("t1", "Starting execution thread. ID: " threadID)
 	FileRead,ExecutionThreadCode,% _ScriptDir "\Source_Execution\execution.ahk"
 	StringReplace,ExecutionThreadCode,ExecutionThreadCode, % ";PlaceholderIncludesOfElements",% global_elementInclusions
-	;~ MsgBox %ExecutionThreadCode%
+
 	AhkThread%threadID% := AhkThread(global_CommonAhkCodeForAllThreads "`n global _ahkThreadID := """ threadID """`n" ExecutionThreadCode)
 	AhkThread%threadID%.ahkassign("_ahkThreadID",threadID)
 	
 	global_AllThreads[threadID] := {permanent: true, type: "Execution"}
 	logger("t1", "Execution thread started")
+		return threadID
 }
 
 ; stop all threads. This should only be called, if the threads were not able to stop themself

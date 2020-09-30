@@ -5,16 +5,6 @@ SendMode Input  ; Recommended for new scripts due to its superior speed and reli
 ; faster execution
 SetBatchLines -1
 
-; Get working dir for AutoHotFlow from shared variable.
-; It is the directory where the flows and global variables are saved
-; (not to be confused with the working dir in the settings of AutoHotFlow)
-global _WorkingDir := _getShared("_WorkingDir")
-; Get script dir for AutoHotFlow from shared variable.
-global _ScriptDir := _getShared("_ScriptDir")
-; using working dir forbidden, because in other parts of the code we use the commands FileSelectFolder and FileSelectFile
-; While any thread uses those commands, the working directory of the whole process is changed to the path which is shown in the dialog.
-SetWorkingDir %a_temp%
-
 ; Set the default coord mode for mouse interactions
 CoordMode,mouse,client
 
@@ -24,6 +14,16 @@ global _ahkThreadID
 ; On call of ExitApp, we will start the exit routine
 OnExit,Exit
 global _exiting := false
+
+; Get working dir for AutoHotFlow from shared variable.
+; It is the directory where the flows and global variables are saved
+; (not to be confused with the working dir in the settings of AutoHotFlow)
+global _WorkingDir := _getShared("_WorkingDir")
+; Get script dir for AutoHotFlow from shared variable.
+global _ScriptDir := _getShared("_ScriptDir")
+; using working dir forbidden, because in other parts of the code we use the commands FileSelectFolder and FileSelectFile
+; While any thread uses those commands, the working directory of the whole process is changed to the path which is shown in the dialog.
+; SetWorkingDir %a_temp% working dir is only set in main thread. Otherwise it causes errors if another thread is currently including files
 
 ;initialize logger
 init_logger()
@@ -36,6 +36,7 @@ init_logger()
 #include lib\ObjFullyClone\ObjFullyClone.ahk
 #include lib\Random Word List\Random Word List.ahk
 #include lib\Robert - Ini library\Robert - Ini library.ahk
+#include lib\Json\Jxon.ahk
 
 ; include language module
 #include language\language.ahk ;Must be very first
@@ -73,7 +74,6 @@ lang_setLanguage(_getSettings("UILanguage"))
 #include source_Common\Elements\Elements.ahk
 #include source_Common\Debug\Debug.ahk
 #include source_Common\Debug\Logger.ahk
-#include source_Common\settings\Default values.ahk
 #include source_Common\settings\settings.ahk
 #include source_Common\Variables\global variables.ahk
 #include source_Common\Variables\code parser.ahk
@@ -81,6 +81,7 @@ lang_setLanguage(_getSettings("UILanguage"))
 #include source_Common\variables\code tokenizer.ahk
 #include source_Common\variables\expression evaluator.ahk
 #include source_Common\Other\Other.ahk
+#include source_Common\Other\Design.ahk
 
 #include source_Common\Multithreading\API Caller to Main.ahk
 #include Source_Common\Multithreading\API Caller to Manager.ahk

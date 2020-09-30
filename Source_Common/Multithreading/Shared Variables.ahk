@@ -135,6 +135,19 @@ _getSettings(path)
 	_LeaveCriticalSection()
     return value
 }
+_getAllSettings()
+{
+	_EnterCriticalSection()
+    retval := ObjFullyClone(_settings)
+	_LeaveCriticalSection()
+	return retval
+}
+_setAllSettings(value)
+{
+	_EnterCriticalSection()
+    _settings := ObjFullyClone(value)
+	_LeaveCriticalSection()
+}
 _setTask(path, value)
 {
 	_EnterCriticalSection()

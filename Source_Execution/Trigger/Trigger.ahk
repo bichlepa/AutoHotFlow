@@ -4,10 +4,6 @@ enableFlow(p_FlowID)
 {
 	_EnterCriticalSection()
 
-	if (_getFlowProperty(p_FlowID, "loaded") != true)
-	{
-		LoadFlow(p_FlowID)
-	}
 	enableTriggers(p_FlowID)
 	SaveFlowMetaData(p_FlowID)
 

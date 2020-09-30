@@ -1,50 +1,68 @@
-﻿
-
-initSettingsDefinitions()
+﻿; returns file path of settings file
+getSettingsFilePath()
 {
-	global 
-	filepathsettings:= _WorkingDir "\settings.ini"
+	return _WorkingDir "\settings.json"
+}
 
-	settingsdefinitions:=Object()
-	settingsdefinitions.push({section: "common", key: "developing", default: false})
-	settingsdefinitions.push({section: "common", key: "UILanguage", default: ""})
-	settingsdefinitions.push({section: "common", key: "runAsAdmin", default: false})
-	settingsdefinitions.push({section: "flowSettings", key: "FlowExecutionPolicy", default: "parallel"})
-	settingsdefinitions.push({section: "flowSettings", key: "FlowWorkingDir", default: A_MyDocuments "\AutoHotFlow"})
-	settingsdefinitions.push({section: "appearance", key: "HideDemoFlows", default: False})
-	settingsdefinitions.push({section: "appearance", key: "ShowElementsLevel", default: "Beginner"})
-	settingsdefinitions.push({section: "debug", key: "LogLevelFlow", default: 0})
-	settingsdefinitions.push({section: "debug", key: "LogLevelApp", default: 0})
-	settingsdefinitions.push({section: "debug", key: "LogLevelThread", default: 0})
-	settingsdefinitions.push({section: "debug", key: "LogToFile", default: False})
+; returns default working directory of flows (during execution)
+getDefaultSettings()
+{
+	; define default settings
+	settings := {}
+	settings.UILanguage := "en"
+	settings.runAsAdmin := false
+	settings.FlowExecutionPolicy := "parallel"
+	settings.FlowWorkingDir := A_MyDocuments "\AutoHotFlow"
+	settings.HideDemoFlows := False
+	settings.ShowElementsLevel := "Beginner"
+	settings.LogLevelFlow := 0
+	settings.LogLevelApp := 0
+	settings.LogLevelThread := 0
+	settings.LogToFile := false
+
+	return settings
 }
 
 ;load settings from settings file. Must be called olny once
 load_settings()
 {
-	global settingsdefinitions, filepathsettings
-	
-	if not settingsdefinitions
-		initSettingsDefinitions()
+	; define default settings (if settings file does not exist or if some additional settings were added on recent update)
+	settings := getDefaultSettings()
 
-	for oneindex, onesetting in settingsdefinitions
-	{
-		default:=onesetting.default
-		if default = 
-			default := " "
-		IniRead, temp, %filepathsettings%, % onesetting.section, % onesetting.key, % default
-		_setSettings(onesetting.key, temp)
-	}
+	; read settings and convert them to object
+	FileRead, settingsFromFile, % getSettingsFilePath()
+	settingsFromFile := Jxon_Load(settingsFromFile)
+
+	; overwrite the default settings with the settings from file
+	settings := ObjFullyMerge(settings, settingsFromFile)
+	
+	; set settings object
+	_setAllSettings(settings)
 }
 
+
+;Write settings into settings file. Should be called whenever some settings are changed
+write_settings()
+{
+	filedelete, % getSettingsFilePath()
+	fileappend, % Jxon_Dump(_getAllSettings(), 2), % getSettingsFilePath()
+}
+
+; checks some settings
 check_settings()
 {
+	; check working directory
 	workingDir := _getSettings("FlowWorkingDir")
 	if (not checkNewWorkingDir(workingDir, false))
 	{
-		defaultValue := A_MyDocuments "\AutoHotFlow"
+		; working directory is invalid. Try to set default working directory
+		defaultSettings := getDefaultSettings()
+		defaultValue := defaultSettings.FlowWorkingDir
+
+		; check the default working directory
 		if (checkNewWorkingDir(defaultValue, false))
 		{
+			; the default working directory is OK. Change the setting and show an alert to user
 			_setSettings("FlowWorkingDir", defaultValue)
 			write_settings()
 			MsgBox, 17, AutoHotFlow, % lang("The default working directory was not found and cannot be created!") "`n" lang("It was changed to the default value") "`n" defaultValue
@@ -56,105 +74,73 @@ check_settings()
 	}
 }
 
-;Write settings into settings file. Should be called whenever some settings are changed
-write_settings()
-{
-	global settingsdefinitions, filepathsettings
-
-	if not settingsdefinitions
-		initSettingsDefinitions()
-
-	for oneindex, onesetting in settingsdefinitions
-	{
-		Iniwrite, % _getSettings(onesetting.key), %filepathsettings%, % onesetting.section, % onesetting.key
-	}
-}
-
+; checks the default working directory of flows.
+; if interactive is false, not alerts will be shown
+; if valid, returns true
 checkNewWorkingDir(NewWorkingDir, interactive = true)
 {
+	; check whether the working dir is empty
 	if (NewWorkingDir = "")
 	{
 		if (interactive)
 		{
-			MsgBox, 17, AutoHotFlow, % lang("The specified folder is empty!") "`n" lang("If you press '%1%', previous path will remain.",lang("OK"))
-			IfMsgBox cancel
-				return
-			else
-				return
+			MsgBox, 16, AutoHotFlow, % lang("The specified folder is empty!")
 		}
-		else
-			return
+		return false
 	}
+	; check whether the working directory is relative
 	if DllCall("Shlwapi.dll\PathIsRelative","Str",NewWorkingDir) ;if user did not enter an absolute path
 	{
-		if NewWorkingDir!=  ;If user left it blank, he don't want to change it. if not...
+		if (interactive)
 		{
-			if (interactive)
-			{
-				MsgBox, 17, AutoHotFlow, % lang("The specified folder is not an absolute path!") "`n" lang("If you press '%1%', previous path will remain.",lang("OK"))
-				IfMsgBox cancel
-					return
-				else
-					return
-			}
-			else
-				return
+			MsgBox, 16, AutoHotFlow, % lang("The specified folder is not an absolute path!")
 		}
+		return false	
 	}
-	else
+
+	; check whether the specified folder exists
+	fileattr := FileExist(NewWorkingDir)
+	if not fileattr
 	{
-		fileattr := FileExist(NewWorkingDir)
-		if not fileattr
+		; the folder does not exist
+		if (interactive)
 		{
-			if (interactive)
-			{
-				MsgBox, 36, AutoHotFlow, % lang("The specified folder does not exist. Should it be created?") "`n" lang("Press '%1%', if you want to correct it.",lang("No"))
-				IfMsgBox Yes
-				{
-					FileCreateDir,%NewWorkingDir%
-					if errorlevel
-					{
-						MsgBox, 16, AutoHotFlow, % lang("The specified folder could not be created!")
-						return
-					}
-					
-				}
-				else
-					return
-			}
-			else
+			; ask user whether he wants to create the not existing folder
+			MsgBox, 36, AutoHotFlow, % lang("The specified folder does not exist. Should it be created?") "`n" lang("Press '%1%', if you want to correct it.", lang("Yes"))
+			IfMsgBox Yes
 			{
 				FileCreateDir,%NewWorkingDir%
 				if errorlevel
 				{
-					return
+					MsgBox, 16, AutoHotFlow, % lang("The specified folder could not be created!")
+					return false
 				}
-				else
-					return true
-			}
-		}
-		else if not instr(fileattr,"D")
-		{
-			if (interactive)
-			{
-				MsgBox, 17, AutoHotFlow, % lang("The specified path exists but it is a file. It must be a folder!") "`n" lang("Press '%1%', if you want to correct it.",lang("Cancel"))
-				IfMsgBox Yes
-				{
-					FileCreateDir,%NewWorkingDir%
-					if errorlevel
-					{
-						MsgBox, 16, AutoHotFlow, % lang("The specified folder could not be created!")
-						return
-					}
-					
-				}
-				else
-					return
 			}
 			else
-				return
+				return false
+		}
+		else
+		{
+			; try to create the not existing folder
+			FileCreateDir,%NewWorkingDir%
+			if errorlevel
+			{
+				return false
+			}
 		}
 	}
+	else if not instr(fileattr,"D")
+	{
+		; the specified path is a file
+		if (interactive)
+		{
+			MsgBox, 16, AutoHotFlow, % lang("The specified path exists but it is a file. It must be a folder!")
+		}
+		return false
+	}
 	
+	; todo: check write permissions
+
+	; working dir is ok
 	return true
 }

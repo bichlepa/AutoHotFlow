@@ -8,12 +8,6 @@ editFlow(p_FlowID)
 		MsgBox, 48, % lang("Edit flow"), % lang("You are opening a demonstration flow for edit.") " " lang("Please be aware that a demonstration flow cannot be changed.") " " lang("You may duplicate this flow first and then you can edit it.")
 	}
 	
-	; load flow if it is not loaded yet
-	if (_getFlowProperty(p_FlowID, "loaded") != true)
-	{
-		LoadFlow(p_FlowID)
-	}
-	
 	; open the editor
 	API_Main_StartEditor(p_FlowID)
 }
@@ -21,12 +15,6 @@ editFlow(p_FlowID)
 ; enable all triggers in a flow
 enableFlow(p_FlowID)
 {
-	; load flow if it is not loaded yet
-	if (_getFlowProperty(p_FlowID, "loaded") != true)
-	{
-		LoadFlow(p_FlowID)
-	}
-	
 	; enable the triggers
 	API_Execution_EnableTriggers(p_FlowID)
 }
@@ -56,12 +44,6 @@ disableFlow(p_FlowID)
 ; enable only one trigger
 enableOneTrigger(p_FlowID, p_TriggerID = "", p_save=True)
 {
-	; load flow if it is not loaded yet
-	if (_getFlowProperty(p_FlowID, "loaded") != true)
-	{
-		LoadFlow(p_FlowID)
-	}
-
 	; enable the trigger
 	API_Execution_enableOneTrigger(p_FlowID, p_TriggerID, p_save)
 }
@@ -78,12 +60,6 @@ disableOneTrigger(p_FlowID, p_TriggerID = "", p_save=True)
 ; p_params: more parameters (see comment to startFlow() in "Instances and Treads.ahk")
 ExecuteFlow(p_FlowID, p_TriggerID="", p_params="")
 {
-	; load flow if it is not loaded yet
-	if (_getFlowProperty(p_FlowID, "loaded") != true)
-	{
-		LoadFlow(p_FlowID)
-	}
-
 	; execute the flow
 	API_Execution_startFlow(p_FlowID, p_TriggerID, p_params)
 }
@@ -93,12 +69,6 @@ ExecuteFlow(p_FlowID, p_TriggerID="", p_params="")
 ; if flow is not executing, the default main trigger will be triggered (if any)
 ExecuteToggleFlow(p_FlowID)
 {
-	; load flow if it is not loaded yet
-	if (_getFlowProperty(p_FlowID, "loaded") != true)
-	{
-		LoadFlow(p_FlowID)
-	}
-
 	; change execution state
 	API_Execution_ExecuteToggleFlow(p_FlowID)
 }
