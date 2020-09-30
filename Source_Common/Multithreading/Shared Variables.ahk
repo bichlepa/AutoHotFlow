@@ -36,7 +36,7 @@ _EnterCriticalSection()
 		; Leave critical section 
 		LeaveCriticalSection(_cs_shared)
 		onexit, FinallyExit
-		exitapp ; stop the pseudo-ahk-thread
+		exitapp ; stop the ahk thread
 	}
 
 	criticalSectionCounter++
@@ -151,13 +151,13 @@ _setAllSettings(value)
 _setTask(path, value)
 {
 	_EnterCriticalSection()
-    _share[path].Tasks.push(value)
+    _share.Tasks[path].push(value)
 	_LeaveCriticalSection()
 }
 _getTask(path)
 {
 	_EnterCriticalSection()
-    value:=_share[path].Tasks.removeat(1)
+    value:=_share.Tasks[path].removeat(1)
 	_LeaveCriticalSection()
     return value
 }

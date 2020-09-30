@@ -94,6 +94,7 @@ FileDelete,%a_temp%\autoHotflowTryToStartAsAdmin.txt
 #include lib\Json\Jxon.ahk
 
 ;Include libraries which may be used by the elements. This code is generated.
+global global_libInclusionsForThreads, global_elementInclusionsForThreads
 ;Lib_includes_Start
 #include source_Elements\Default\lib\TTS\TTS by Learning One.ahk
 #include source_Elements\Default\lib\7z wrapper\7z wrapper.ahk
@@ -447,6 +448,16 @@ _setShared("WindowsStartup", false)
 ;Initialize a hidden command window. This window is able to receive commands from other processes.
 ;The first purpose is that the script AutoHotFlow.ahk/exe can send commands if a shortcut of the trigger "shortcut" is opened.
 CreateHiddenCommandWindow()
+
+;Check whether there is a command passed with the start parameters
+command = %1%
+commandMessage = %2%
+if (command = "AHFCommand")
+{
+	; we process the command as if it was passed in the hidden command window
+	HiddenCommandWindowProcessMessage(commandMessage)
+}
+
 ; check regularly for new tasks which we get through shared variable
 SetTimer,queryTasks,100
 return
@@ -474,7 +485,14 @@ queryTasks()
 			if (name="StartEditor")
 			{
 				; The editor for a flow should be opened
-				Thread_StartEditor(oneTask.FlowID)
+				if (ThreadEditor_exists(oneTask.FlowID))
+				{
+					API_Editor_EditGUIshow(oneTask.FlowID)
+				}
+				Else
+				{
+					Thread_StartEditor(oneTask.FlowID)
+				}
 			}
 		}
 		else
@@ -502,8 +520,8 @@ if (_exiting != true) ;Prevent multiple execution of this code by setting this f
 	LeaveCriticalSection(_cs_shared)
 
 	; before we start killing the threads (which is error prone), we will give them some time to close
-	settimer,exit,4000
+	settimer, exit, 4000
 	return
 }
-Thread_StopAll() ;Kill all other threads
+Thread_KillAll() ;Kill all other threads
 ExitApp

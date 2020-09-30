@@ -7,8 +7,8 @@ SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 FileEncoding utf-8
 
 ;Handle a command line parameter if any
-command=%1%
-commandMessage=%2%
+command = %1%
+commandMessage = %2%
 if (command = "AHFCommand")
 {
 	DetectHiddenWindows,on
@@ -24,16 +24,3 @@ if (command = "AHFCommand")
 
 ;At last run main.ahk passing all command line parameters which were passed to this script
 run,autohotkey\autohotkey.exe "%A_ScriptDir%\source_main\main.ahk" "%1%" "%2%" "%3%" "%4%" "%5%" "%6%" "%7%" "%8%" "%9%" "%10%"
-
-;If there is a command which must be processed by AutoHotFlow, pass it after it has started
-;TODO: Main.ahk should process the command itself.
-if (command = "AHFCommand")
-{
-	DetectHiddenWindows,on
-	WinWait,%A_ScriptDir% AHF_HIDDEN_COMMAND_WINDOW,,30
-	IfWinExist,%A_ScriptDir% AHF_HIDDEN_COMMAND_WINDOW
-	{
-		ControlSetText,Edit1,%commandMessage%
-		ExitApp
-	}
-}

@@ -163,8 +163,8 @@ _share._WorkingDir := _WorkingDir
 _share.CategoryIDCounter := 1	
 _share.Exiting := false
 
-_share.main := Object()
-_share.main.Tasks := Object()
+_share.tasks := Object()
+_share.Tasks.main := Object()
 
 ;Those two variables are filled by the elements when they are included
 _share.AllElementClasses:=Object()

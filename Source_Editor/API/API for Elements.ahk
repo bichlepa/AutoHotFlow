@@ -274,38 +274,31 @@ x_ManualTriggerExecute(p_FlowID, p_TriggerName = "", p_Variables ="", p_CallBack
 ; only in editor
 x_Par_Disable(p_ParameterID, p_TrueOrFalse = True)
 {
-	if (instr(_ahkThreadID,"Editor"))
-		return ElementSettings.field.enable(p_ParameterID,not p_TrueOrFalse)
+	return ElementSettings.field.enable(p_ParameterID,not p_TrueOrFalse)
 }
 x_Par_Enable(p_ParameterID, p_TrueOrFalse = True)
 {
-	if (instr(_ahkThreadID,"Editor"))
-		return ElementSettings.field.enable(p_ParameterID,p_TrueOrFalse)
+	return ElementSettings.field.enable(p_ParameterID,p_TrueOrFalse)
 }
 x_Par_SetValue(p_ParameterID, p_Value)
 {
-	if (instr(_ahkThreadID,"Editor"))
-		return ElementSettings.field.setvalue(p_Value,p_ParameterID)
+	return ElementSettings.field.setvalue(p_Value,p_ParameterID)
 }
 x_Par_GetValue(p_ParameterID)
 {
-	if (instr(_ahkThreadID,"Editor"))
-		return ElementSettings.field.getvalue(p_ParameterID)
+	return ElementSettings.field.getvalue(p_ParameterID)
 }
 x_Par_SetChoices(p_ParameterID, p_Choices)
 {
-	if (instr(_ahkThreadID,"Editor"))
-		return ElementSettings.field.setChoices(p_Choices,p_ParameterID)
+	return ElementSettings.field.setChoices(p_Choices,p_ParameterID)
 }
 x_Par_SetLabel(p_ParameterID, p_Label)
 {
-	if (instr(_ahkThreadID,"Editor"))
-		return ElementSettings.field.setLabel(p_Label,p_ParameterID)
+	return ElementSettings.field.setLabel(p_Label,p_ParameterID)
 }
 x_FirstCallOfCheckSettings(Environment)
 {
-	if (instr(_ahkThreadID,"Editor"))
-		return _getElementProperty(Environment.FlowID, Environment.ElementID, "FirstCallOfCheckSettings")
+	return _getElementProperty(Environment.FlowID, Environment.ElementID, "FirstCallOfCheckSettings")
 }
 
 
@@ -372,26 +365,17 @@ x_TriggerInNewAHKThread_Stop(Environment)
 ; only in editor
 x_assistant_windowParameter(neededInfo)
 {
-	if (instr(_ahkThreadID,"Editor"))
-	{
-		assistant_GetWindowInformation%nothing%(neededInfo)
-	}
+	assistant_GetWindowInformation%nothing%(neededInfo)
 }
 
 x_assistant_MouseTracker(neededInfo)
 {
-	if (instr(_ahkThreadID,"Editor"))
-	{
-		assistant_MouseTracker%nothing%(neededInfo)
-	}
+	assistant_MouseTracker%nothing%(neededInfo)
 }
 
 x_assistant_ChooseColor(neededInfo)
 {
-	if (instr(_ahkThreadID,"Editor"))
-	{
-		assistant_ChooseColor%nothing%(neededInfo)
-	}
+	assistant_ChooseColor%nothing%(neededInfo)
 }
 
 

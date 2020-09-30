@@ -3,10 +3,9 @@
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
 SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 
-criticalSections:=Object()
-
 loop,files,%a_scriptdir%\..\*.ahk,RF
 {
+	criticalSections:=Object()
 	if (a_loopfilename=a_scriptname)
 		continue
 	FileRead,fileContent,%a_loopfilefullpath%

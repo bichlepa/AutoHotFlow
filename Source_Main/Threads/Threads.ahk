@@ -1,52 +1,169 @@
-﻿global global_EditorThreadIDCounter = 1
-global global_AllThreads := CriticalObject()
+﻿; define some super-global variables
+global global_EditorThreadIDCounter = 1
+global global_AllThreads := Object()
 global global_CommonAhkCodeForAllThreads:=""
+global global_elementInclusions := ""
 
-loop, files, %_ScriptDir%\source_Elements\*.ahk, FR
-{
-	if not (substr(A_LoopFileName,1,1)=="_")
-		global_elementInclusions .= "#include " A_LoopFileFullPath "`n"
-}
-
+; initialize some variables
 Thread_init()
 {
-	global_CommonAhkCodeForAllThreads:="global _cs_shared := " _cs_shared "`n "
-	global_CommonAhkCodeForAllThreads.="global _flows := CriticalObject(" (&_flows) ") `n global _settings := CriticalObject(" (&_settings) ") `n global _execution := CriticalObject(" (&_execution) ") `n global _share := CriticalObject(" (&_share) ")`n global _language := CriticalObject(" (&_language) ") `n"
+	; initialize the code which will be inserted in all threads
+	; it contains the references to the critical sections and critical variables which are shared among all threads
+	global_CommonAhkCodeForAllThreads := "global _cs_shared := " _cs_shared "`n "
+	global_CommonAhkCodeForAllThreads .= "global _flows := CriticalObject(" (&_flows) ") `n global _settings := CriticalObject(" (&_settings) ") `n global _execution := CriticalObject(" (&_execution) ") `n global _share := CriticalObject(" (&_share) ")`n global _language := CriticalObject(" (&_language) ") `n"
 
 }
 
+; start the manager thread
 Thread_StartManager()
 {
-	global
-	local ExecutionThreadCode
-	local threadID
+	; prepare variable which will be used to pass tasks or information to this thread
+	_setSharedProperty("tasks.manager", object())
 	
-	_setSharedProperty("manager", object())
-	_setSharedProperty("manager.Tasks", object())
-	
+	; define thread ID
 	threadID := "Manager"
 	logger("t1", "Starting manager thread. ID: " threadID)
-	FileRead,ExecutionThreadCode,% _ScriptDir "\Source_Manager\Manager.ahk"
-	StringReplace,ExecutionThreadCode,ExecutionThreadCode, % ";PlaceholderIncludesOfElements",% global_libInclusionsForThreads global_elementInclusionsForThreads
 
-	AhkThread%threadID% := AhkThread(global_CommonAhkCodeForAllThreads "`n global _ahkThreadID := """ threadID """`n" ExecutionThreadCode)
-	AhkThread%threadID%.ahkassign("_ahkThreadID",threadID)
+	; read source file
+	FileRead, ExecutionThreadCode, % _ScriptDir "\Source_Manager\Manager.ahk"
+
+	; replace placeholders
+	StringReplace, ExecutionThreadCode, ExecutionThreadCode, % ";PlaceholderIncludesOfElements",% global_libInclusionsForThreads global_elementInclusionsForThreads
+
+	; start the new thread
+	newThread := AhkThread(global_CommonAhkCodeForAllThreads "`n global _ahkThreadID := """ threadID """`n" ExecutionThreadCode)
 	
-	global_AllThreads[threadID] := {permanent: true, type: "Manager"}
+	; write thread ID to the list of all threads
+	global_AllThreads[threadID] := {permanent: true, type: "Manager", thread: newThread}
+
 	logger("t1", "Manager thread started")
-		return threadID
+	return threadID
 }
 
-
-
+; start an editor thread
 Thread_StartEditor(p_FlowID)
 {
+	; prepare variable which will be used to pass tasks or information to this thread
+	_setSharedProperty("tasks." "editor" p_FlowID, object())
+	
+	; define thread ID
+	threadID := "Editor" global_EditorThreadIDCounter++
+	logger("t1", "Starting editor thread. ID: " threadID)
+
+	; read source file
+	FileRead,ExecutionThreadCode,% _ScriptDir "\Source_Editor\Editor.ahk"
+
+	; replace placeholders
+	StringReplace,ExecutionThreadCode,ExecutionThreadCode, % ";PlaceholderIncludesOfElements",% global_libInclusionsForThreads global_elementInclusionsForThreads
+
+	; start the new thread
+	newThread := AhkThread(global_CommonAhkCodeForAllThreads "`n global _ahkThreadID := """ threadID """`n global FlowID := """ p_FlowID """`n"  ExecutionThreadCode)
+	
+	; write thread ID to the list of all threads
+	global_AllThreads[threadID] := {permanent: false, type: "Editor", flowID: p_FlowID, thread: newThread}
+
+	logger("t1", "Editor thread started")
+	return threadID
+}
+
+; start the draw thread
+Thread_StartDraw()
+{
+	; prepare variable which will be used to pass tasks or information to this thread
+	_setSharedProperty("tasks.draw", object())
+	
+	; define thread ID
+	threadID := "Draw"
+	logger("t1", "Starting draw thread. ID: " threadID)
+
+	; read source file
+	FileRead,ExecutionThreadCode,% _ScriptDir "\Source_Draw\Draw.ahk"
+
+	; start the new thread
+	newThread := AhkThread(global_CommonAhkCodeForAllThreads "`n global _ahkThreadID := """ threadID """`n" ExecutionThreadCode)
+	
+	; write thread ID to the list of all threads
+	global_AllThreads[threadID] := {permanent: true, type: "Draw", thread: newThread}
+
+	logger("t1", "Draw thread started")
+	return threadID
+}
+
+; start the execution thread
+Thread_StartExecution()
+{
+	; prepare variable which will be used to pass tasks or information to this thread
+	_setSharedProperty("tasks.execution", object())
+	
+	; define thread ID
+	threadID := "Execution"
+	logger("t1", "Starting execution thread. ID: " threadID)
+
+	; read source file
+	FileRead,ExecutionThreadCode,% _ScriptDir "\Source_Execution\execution.ahk"
+	
+	; replace placeholders
+	StringReplace,ExecutionThreadCode,ExecutionThreadCode, % ";PlaceholderIncludesOfElements",% global_libInclusionsForThreads global_elementInclusionsForThreads
+
+	; start the new thread
+	newThread := AhkThread(global_CommonAhkCodeForAllThreads "`n global _ahkThreadID := """ threadID """`n" ExecutionThreadCode)
+	
+	; write thread ID to the list of all threads
+	global_AllThreads[threadID] := {permanent: true, type: "Execution", thread: newThread}
+
+	logger("t1", "Execution thread started")
+	return threadID
+}
+
+; kill all threads. This should only be called, if the threads were not able to stop themself
+; there is no guarantee, that this code will properly close the threads, it may cause a crash
+Thread_KillAll()
+{
 	global
-	local ExecutionThreadCode
+	local threadsCopy
 	local threadID
+
+	logger("t1", "Killing all threads")
+	threadsCopy := global_Allthreads.clone()
 	
-	
-	;Check whether there is already a Editor opened for that flow. If so, just open the editor window
+	for threadID, threadpars in threadsCopy
+	{
+		if (threadpars.thread.ahkReady())
+		{
+			logger("t1", "Killing thread " threadID)
+			threadpars.thread.ahkterminate(100)
+			if (threadpars.thread.ahkReady())
+			{
+				logger("t0", "Killing thread " threadID " failed")
+			}
+		}
+	}
+}
+
+; called when a thread has terminated itself
+Thread_Stopped(par_ThreadID)
+{
+	global 
+	; delete the thread from list
+	global_Allthreads.delete(par_ThreadID)
+
+	; check whether the thread list is empty
+	for oneKey, oneValue in global_Allthreads
+	{
+		break
+	}
+
+	if (not oneKey)
+	{
+		; if thread list is empty, close the application immediately
+		; the thread list can only get empty if AHF is going to close
+		exitapp
+	}
+}
+
+;Check whether there is already a Editor opened for that flow.
+ThreadEditor_exists(p_FlowID)
+{
 	FoundThreadID := ""
 	for oneThreadID, oneThread in global_AllThreads
 	{
@@ -59,120 +176,5 @@ Thread_StartEditor(p_FlowID)
 			}
 		}
 	}
-	if (FoundThreadID != "")
-	{
-		API_Editor_EditGUIshow(p_FlowID)
-	}
-	Else
-	{
-		_setSharedProperty("editor" p_FlowID, object())
-		_setSharedProperty("editor" p_FlowID ".Tasks", object())
-		
-		threadID := "Editor" global_EditorThreadIDCounter++
-		logger("t1", "Starting editor thread. ID: " threadID)
-		FileRead,ExecutionThreadCode,% _ScriptDir "\Source_Editor\Editor.ahk"
-		StringReplace,ExecutionThreadCode,ExecutionThreadCode, % ";PlaceholderIncludesOfElements",% global_libInclusionsForThreads global_elementInclusionsForThreads
-
-		AhkThread%threadID% := AhkThread(global_CommonAhkCodeForAllThreads "`n global _ahkThreadID := """ threadID """`n global FlowID := """ p_FlowID """`n"  ExecutionThreadCode)
-		AhkThread%threadID%.ahkassign("_ahkThreadID",threadID)
-		
-		global_AllThreads[threadID] := {permanent: false, type: "Editor", flowID: p_FlowID}
-		logger("t1", "Editor thread started")
-		return threadID
-	}
-}
-
-Thread_StartDraw()
-{
-	global
-	local ExecutionThreadCode
-	local threadID
-	
-	_setSharedProperty("draw", object())
-	_setSharedProperty("draw.Tasks", object())
-	
-	threadID := "Draw"
-	logger("t1", "Starting draw thread. ID: " threadID)
-	FileRead,ExecutionThreadCode,% _ScriptDir "\Source_Draw\Draw.ahk"
-
-	AhkThread%threadID% := AhkThread(global_CommonAhkCodeForAllThreads "`n global _ahkThreadID := """ threadID """`n" ExecutionThreadCode)
-	AhkThread%threadID%.ahkassign("_ahkThreadID",threadID)
-
-	global_AllThreads[threadID] := {permanent: true, type: "Draw"}
-	logger("t1", "Draw thread started")
-		return threadID
-}
-
-Thread_StartExecution()
-{
-	global
-	local ExecutionThreadCode
-	local threadID
-	
-	_setSharedProperty("execution", object())
-	_setSharedProperty("execution.Tasks", object())
-	
-	threadID := "Execution"
-	logger("t1", "Starting execution thread. ID: " threadID)
-	FileRead,ExecutionThreadCode,% _ScriptDir "\Source_Execution\execution.ahk"
-	StringReplace,ExecutionThreadCode,ExecutionThreadCode, % ";PlaceholderIncludesOfElements",% global_elementInclusions
-
-	AhkThread%threadID% := AhkThread(global_CommonAhkCodeForAllThreads "`n global _ahkThreadID := """ threadID """`n" ExecutionThreadCode)
-	AhkThread%threadID%.ahkassign("_ahkThreadID",threadID)
-	
-	global_AllThreads[threadID] := {permanent: true, type: "Execution"}
-	logger("t1", "Execution thread started")
-		return threadID
-}
-
-; stop all threads. This should only be called, if the threads were not able to stop themself
-; there is no guarantee, that this code will properly close the threads, it may cause a crash
-Thread_StopAll()
-{
-	global
-	local threadsCopy
-	local threadID
-	logger("t1", "Stopping all threads")
-	threadsCopy := global_Allthreads.clone()
-	
-	for threadID, threadpars in threadsCopy
-	{
-		;~ global_Allthreads.delete(threadID)
-		if (AhkThread%threadID%.ahkReady())
-		{
-			logger("t1", "Killing thread " threadID)
-			AhkThread%threadID%.ahkterminate(100)
-			if (AhkThread%threadID%.ahkReady())
-			{
-				logger("t0", "Killing thread " threadID " failed")
-			}
-		}
-	}
-}
-
-; Terminates a thread wich requested the main thread to terminate it
-Thread_Stopped(par_ThreadID)
-{
-	global
-	; delete the thread from list
-	global_Allthreads.delete(par_ThreadID)
-
-	; terminate thread
-	AhkThread%par_ThreadID%.ahkterminate(100)
-	AhkThread%par_ThreadID% := ""
-	logger("t1", "Thread " par_ThreadID "stopped")
-	
-	; check whether the thread list is empty
-	local oneKey, oneValue
-	for oneKey, oneValue in global_Allthreads
-	{
-		break
-	}
-
-	if (not oneKey)
-	{
-		; if thread list is empty, close the application immetiately
-		; the thread list can only get empty if AHF is going to close
-		exitapp
-	}
+	return (FoundThreadID != "")
 }

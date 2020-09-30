@@ -10,13 +10,15 @@ API_Main_Exit()
 	logger("t2", A_ThisFunc " finished")
 	return retvalue
 }
+
 API_Main_Thread_Stopped(par_ThreadID)
 {
 	global
 	local retvalue
 	
+	; do not use _setTask() because we cannot use _EnterCriticalSection() anymore
 	EnterCriticalSection(_cs_shared)
-    _share["main"].Tasks.push({name: "ahkThreadStopped", threadID: par_ThreadID})
+    _share.Tasks["main"].push({name: "ahkThreadStopped", threadID: par_ThreadID})
 	LeaveCriticalSection(_cs_shared)
 	
 	return retvalue

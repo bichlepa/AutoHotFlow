@@ -145,6 +145,7 @@ API_Editor_Exit(par_flowID)
 
 ; Start the exit routine
 exit:
+logger("t1", "editor thread for " flowID " is going to exit")
 global _exiting := true
 return
 

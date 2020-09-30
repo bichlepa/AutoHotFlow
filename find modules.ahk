@@ -86,8 +86,8 @@ if not (a_iscompiled)
 	
 	;Those includes are needed by the elements
 	;They will be inserted in main.ahk and from there in editor.ahk and execution.ahk
-	Libincludes.= "`nglobal_libInclusionsForThreads = `n(`n" Libincludes "`n)`n"
-	elementInclusions.= "`nglobal_elementInclusionsForThreads = `n(`n" elementInclusions "`n)`n"
+	Libincludes.= "`nglobal global_libInclusionsForThreads = `n(`n" Libincludes "`n)`n"
+	elementInclusions.= "`nglobal global_elementInclusionsForThreads = `n(`n" elementInclusions "`n)`n"
 
 	;Replace the includes in the file main.ahk
 	FileRead,mainfilecontent,source_main\main.ahk
