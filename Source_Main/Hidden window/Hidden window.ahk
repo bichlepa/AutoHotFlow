@@ -35,7 +35,7 @@ HiddenCommandWindowProcessMessage(message)
 	; process known commands
 	if (messageParsed[1] = "trigger")
 	{
-		API_Execution_startFlow(messageParsed[2], messageParsed[3])
+		API_Execution_ExecuteFlow(messageParsed[2], messageParsed[3])
 	}
 	Else
 	{

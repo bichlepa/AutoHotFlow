@@ -108,13 +108,15 @@ importExportGui_import(filepathZip)
 	; check all extracted files
 	loop, %filepathextractfolder%\*.json
 	{
-		
 		;check whether there are flows with same name. Ask user if he wants to import them anyway
-		; todo: change to json
-		IniRead, newflowname, %a_loopfilefullpath% , general, name, %a_space%
+		fileread, fileContent, %a_loopfilefullpath% 
+		fileContent := Jxon_Load(fileContent)
+		newflowname := fileContent.name
 		if not newflowname
 		{
+			logger("a1", "Imported flow in file " newflowname " is invalid.")
 			MsgBox, % lang("Imported flow in file ""%1%"" is invalid.", newflowname)
+			Continue
 		}
 		if (_getFlowIdByName(newflowname))
 		{
@@ -130,7 +132,7 @@ importExportGui_import(filepathZip)
 				{
 					break
 				}
-				; append a number to the flow name
+				; User wants to automatically change flow name. append a number to the flow name
 				Loop
 				{
 					if (_getFlowIdByName(newflowname))
@@ -146,7 +148,9 @@ importExportGui_import(filepathZip)
 						break
 				}
 				; rename the flow
-				IniWrite, % newflowname, %a_loopfilefullpath% , general, name
+				fileContent.name := newflowname
+				FileDelete, %a_loopfilefullpath% 
+				FileAppend, % Jxon_Dump(fileContent), %a_loopfilefullpath%
 			}
 			else IfMsgBox,cancel
 			{
@@ -158,17 +162,17 @@ importExportGui_import(filepathZip)
 		ThisFlowFilename := A_LoopFileName
 		Loop
 		{
-			newFlowFullPath:=_WorkingDir "\saved flows\" ThisFlowFilename
+			newFlowFullPath := _WorkingDir "\saved flows\" ThisFlowFilename
 			if fileexist(newFlowFullPath)
 			{
-				random,randomnumber,0,1000
+				random, randomnumber, 0, 1000
 				
-				ThisFlowFilename:= substr(ThisFlowFilename,1,strlen(ThisFlowFilename)-4) "_" randomnumber ".json"
+				ThisFlowFilename := substr(ThisFlowFilename,1,strlen(ThisFlowFilename)-4) "_" randomnumber ".json"
 			}
 			else
 				break
 		}
-		newFlowFullPath:=_WorkingDir "\saved flows\" ThisFlowFilename
+		newFlowFullPath := _WorkingDir "\saved flows\" ThisFlowFilename
 		filecopy, %a_loopfilefullpath%,%newFlowFullPath%
 		if errorlevel
 		{
@@ -180,7 +184,6 @@ importExportGui_import(filepathZip)
 		loadFlow(newFlowFullPath)
 		TreeView_manager_Refill()
 		TreeView_manager_Select("Flow", newFlowid)
-		
 	}
 	
 	; remove the temporary folder

@@ -1,4 +1,4 @@
-﻿;This file provides functions which can be accessed while executing the elements.
+﻿;This file provides functions which can be accessed by the code inside the elements.
 
 
 x_RegisterElementClass(p_class)
@@ -49,9 +49,9 @@ x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementPara
 {
 	return xx_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, p_ParametersToEvaluate)
 }
-x_EvalOneParameter(EvaluatedParameters, Environment, ElementParameters, oneParID, onePar = "")
+x_AutoEvaluateOneParameter(EvaluatedParameters, Environment, ElementParameters, oneParID, onePar = "")
 {
-	return xx_EvalOneParameter(EvaluatedParameters, Environment, ElementParameters, oneParID, onePar)
+	return xx_AutoEvaluateOneParameter(EvaluatedParameters, Environment, ElementParameters, oneParID, onePar)
 }
 
 x_GetListOfAllVars(Environment)
@@ -272,30 +272,37 @@ x_ManualTriggerExecute(p_FlowID, p_TriggerName = "", p_Variables ="", p_CallBack
 }
 
 ; only in editor
+; disable the gui elements for a parameter in the gui
 x_Par_Disable(p_ParameterID, p_TrueOrFalse = True)
 {
 	return ElementSettings.field.enable(p_ParameterID,not p_TrueOrFalse)
 }
+; enable the edit elements for a parameter in the gui
 x_Par_Enable(p_ParameterID, p_TrueOrFalse = True)
 {
 	return ElementSettings.field.enable(p_ParameterID,p_TrueOrFalse)
 }
+; set a parameter value in the gui
 x_Par_SetValue(p_ParameterID, p_Value)
 {
 	return ElementSettings.field.setvalue(p_Value,p_ParameterID)
 }
+; get a parameter value from the gui
 x_Par_GetValue(p_ParameterID)
 {
 	return ElementSettings.field.getvalue(p_ParameterID)
 }
+; set choices of a dropdown for a parameter in the gui
 x_Par_SetChoices(p_ParameterID, p_Choices)
 {
 	return ElementSettings.field.setChoices(p_Choices,p_ParameterID)
 }
+; set a label value in the gui
 x_Par_SetLabel(p_ParameterID, p_Label)
 {
 	return ElementSettings.field.setLabel(p_Label,p_ParameterID)
 }
+; returns whether the call of the element function "Element_CheckSettings_...()" is performed the first time after opening the element parametration gui
 x_FirstCallOfCheckSettings(Environment)
 {
 	return _getElementProperty(Environment.FlowID, Environment.ElementID, "FirstCallOfCheckSettings")
@@ -313,10 +320,6 @@ x_ConvertObjToString(p_Value)
 x_ConvertStringToObj(p_Value)
 {
 	return xx_ConvertStringToObj(p_Value)
-}
-x_ConvertStringToObjOrObjToString(p_Value)
-{
-	return xx_ConvertStringToObjOrObjToString(p_Value)
 }
 
 
@@ -363,19 +366,22 @@ x_TriggerInNewAHKThread_Stop(Environment)
 }
 
 ; only in editor
+; opens the assistant for easy retrieving of window parameter
 x_assistant_windowParameter(neededInfo)
 {
-	assistant_GetWindowInformation%nothing%(neededInfo)
+	assistant_GetWindowInformation(neededInfo)
 }
 
+; opens the assistant for easy retrieving of mouse coordinates
 x_assistant_MouseTracker(neededInfo)
 {
-	assistant_MouseTracker%nothing%(neededInfo)
+	assistant_MouseTracker(neededInfo)
 }
 
+; opens the assistant for easy choose of a color
 x_assistant_ChooseColor(neededInfo)
 {
-	assistant_ChooseColor%nothing%(neededInfo)
+	assistant_ChooseColor(neededInfo)
 }
 
 

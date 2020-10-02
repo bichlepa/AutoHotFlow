@@ -230,7 +230,7 @@ saveResultOfTriggerDisabling(trigger, Result, Message)
 		else
 			logger("a2", "Trigger " trigger.ElementID " disabled (" Message ")")
 	}
-	else if (result = "error")
+	else if (result = "exception")
 	{
 		ElementName := _getElementProperty(trigger.flowID, trigger.elementID, "name")
 		if (Message = "")

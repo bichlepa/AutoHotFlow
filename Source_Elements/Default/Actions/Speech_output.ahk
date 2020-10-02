@@ -120,14 +120,14 @@ Element_run_Action_Speech_output(Environment, ElementParameters)
 	;Do the speech output
 	try
 	{
-		ActionSpeech_Output_Queue:=Object() ;Delete the queue if any
+		ActionSpeech_Output_Queue := Object() ;Delete the queue if any
 		if (ActionSpeech_Output_CurrentReadingVoice)
 		{
 			TTS(ActionSpeech_Output_CreatedVoices[VoiceIdentification], "Stop")
 		}
 		TTS(ActionSpeech_Output_CreatedVoices[VoiceIdentification], "Speak", EvaluatedParameters.text)
-		ActionSpeech_Output_CurrentExecution:=x_GetMyUniqueExecutionID(environment)
-		ActionSpeech_Output_CurrentReadingVoice:=VoiceIdentification
+		ActionSpeech_Output_CurrentExecution := x_GetMyUniqueExecutionID(environment)
+		ActionSpeech_Output_CurrentReadingVoice := VoiceIdentification
 	}
 	catch
 	{

@@ -1,6 +1,8 @@
-﻿;This file provides functions which can be accessed while executing the elements.
+﻿;This file provides functions which can be accessed by the code inside the elements.
+
 
 ; only in main
+; elements have to call this function on startup in order to register the element classes
 x_RegisterElementClass(p_class)
 {
 	Element_Register_Element_Class(p_class)
@@ -51,9 +53,9 @@ x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementPara
 {
 	return xx_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, p_ParametersToEvaluate)
 }
-x_EvalOneParameter(EvaluatedParameters, Environment, ElementParameters, oneParID, onePar = "")
+x_AutoEvaluateOneParameter(EvaluatedParameters, Environment, ElementParameters, oneParID, onePar = "")
 {
-	return xx_EvalOneParameter(EvaluatedParameters, Environment, ElementParameters, oneParID, onePar)
+	return xx_AutoEvaluateOneParameter(EvaluatedParameters, Environment, ElementParameters, oneParID, onePar)
 }
 
 x_GetListOfAllVars(Environment)
@@ -315,10 +317,7 @@ x_ConvertStringToObj(p_Value)
 {
 	return xx_ConvertStringToObj(p_Value)
 }
-x_ConvertStringToObjOrObjToString(p_Value)
-{
-	return xx_ConvertStringToObjOrObjToString(p_Value)
-}
+
 
 
 

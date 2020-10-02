@@ -1,110 +1,74 @@
-﻿API_Execution_startFlow(p_FlowID, par_TriggerID ="", p_Params = "")
+﻿;This file is included by all threads which want to communicate to execution thread
+
+; tells the execution thread that it should start a flow
+API_Execution_ExecuteFlow(p_FlowID, par_TriggerID ="", p_Params = "")
 {
-	global
-	local retvalue
-	logger("t2", A_ThisFunc " called")
+	logger("t2", A_ThisFunc " called from thread", _ahkThreadID)
 	
-	_setTask("execution", {name: "startFlow", flowID: p_FlowID, TriggerID: par_TriggerID, Params: p_Params})
-	
-	logger("t2", A_ThisFunc " finished")
-	return
+	_setTask("execution", {name: "ExecuteFlow", flowID: p_FlowID, TriggerID: par_TriggerID, Params: p_Params})
 }
 
+; tells the execution thread that it should enable all triggers of a flow
 API_Execution_EnableTriggers(p_FlowID)
 {
-	global
-	local retvalue
-	logger("t2", A_ThisFunc " called")
+	logger("t2", A_ThisFunc " called from thread", _ahkThreadID)
 	
 	_setTask("execution", {name: "EnableTriggers", flowID: p_FlowID})
-	
-	logger("t2", A_ThisFunc " finished")
-	return
 }
 
+; tells the execution thread that it should stop the execution of a flow
 API_Execution_StopFlow(p_FlowID)
 {
-	global
-	local retvalue
-	logger("t2", A_ThisFunc " called")
+	logger("t2", A_ThisFunc " called from thread", _ahkThreadID)
 	
 	_setTask("execution", {name: "StopFlow", flowID: p_FlowID})
-	
-	logger("t2", A_ThisFunc " finished")
-	return
 }
+
+; tells the execution thread that it should start or stop a flow
 API_Execution_ExecuteToggleFlow(p_FlowID)
 {
-	global
-	local retvalue
-	logger("t2", A_ThisFunc " called")
+	logger("t2", A_ThisFunc " called from thread", _ahkThreadID)
 	
 	_setTask("execution", {name: "ExecuteToggleFlow", flowID: p_FlowID})
-	
-	logger("t2", A_ThisFunc " finished")
-	return
 }
 
+; tells the execution thread that it should disable all triggers of a flow
 API_Execution_DisableTriggers(p_FlowID)
 {
-	global
-	local retvalue
-	logger("t2", A_ThisFunc " called")
+	logger("t2", A_ThisFunc " called from thread", _ahkThreadID)
 	
 	_setTask("execution", {name: "DisableTriggers", flowID: p_FlowID})
-	
-	logger("t2", A_ThisFunc " finished")
-	return
 }
 
-
+; tells the execution thread that it should enable a single trigger
 API_Execution_enableOneTrigger(par_FlowID, par_TriggerID, par_save = true)
 {
-	global
-	local retvalue
-	logger("t2", A_ThisFunc " called")
+	logger("t2", A_ThisFunc " called from thread", _ahkThreadID)
 	
 	_setTask("execution", {name: "enableOneTrigger", flowID: par_FlowID, triggerID: par_TriggerID, save: par_save})
-	
-	logger("t2", A_ThisFunc " finished")
-	return
 }
 
+; tells the execution thread that it should disable a single trigger
 API_Execution_disableOneTrigger(par_FlowID, par_TriggerID, par_save = true)
 {
-	global
-	local retvalue
-	logger("t2", A_ThisFunc " called")
+	logger("t2", A_ThisFunc " called from thread", _ahkThreadID)
 	
 	_setTask("execution", {name: "disableOneTrigger", flowID: par_FlowID, triggerID: par_TriggerID, save: par_save})
-	
-	logger("t2", A_ThisFunc " finished")
-	return
 }
 
 ;When an element has been using a separate thread in order to execute some code, this thread calls this function
 API_Execution_externaElementFinish(par_UniqueID)
 {
-	global
-	local retvalue
-	logger("t2", A_ThisFunc " called")
+	logger("t2", A_ThisFunc " called from thread", _ahkThreadID)
 	
 	_setTask("execution", {name: "externalElementFinish", uniqueID: par_UniqueID})
-	
-	logger("t2", A_ThisFunc " finished")
-	return
 }
 
 ;When a trigger has been using a separate thread in order to execute some code, this thread calls this function
 API_Execution_externalTrigger(par_UniqueID)
 {
-	global
-	local retvalue
-	logger("t2", A_ThisFunc " called")
+	logger("t2", A_ThisFunc " called from thread", _ahkThreadID)
 	
 	_setTask("execution", {name: "externalTrigger", uniqueID: par_UniqueID})
-	
-	logger("t2", A_ThisFunc " finished")
-	return
 }
 

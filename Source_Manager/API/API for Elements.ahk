@@ -48,9 +48,9 @@ x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementPara
 {
 	return xx_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, p_ParametersToEvaluate)
 }
-x_EvalOneParameter(EvaluatedParameters, Environment, ElementParameters, oneParID, onePar = "")
+x_AutoEvaluateOneParameter(EvaluatedParameters, Environment, ElementParameters, oneParID, onePar = "")
 {
-	return xx_EvalOneParameter(EvaluatedParameters, Environment, ElementParameters, oneParID, onePar)
+	return xx_AutoEvaluateOneParameter(EvaluatedParameters, Environment, ElementParameters, oneParID, onePar)
 }
 
 x_GetListOfAllVars(Environment)
@@ -311,10 +311,6 @@ x_ConvertObjToString(p_Value)
 x_ConvertStringToObj(p_Value)
 {
 	return xx_ConvertStringToObj(p_Value)
-}
-x_ConvertStringToObjOrObjToString(p_Value)
-{
-	return xx_ConvertStringToObjOrObjToString(p_Value)
 }
 
 

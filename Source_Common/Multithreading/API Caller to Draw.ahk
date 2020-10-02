@@ -1,14 +1,9 @@
-﻿;This file contains functions inside the main thread. Those functions call other functions in the thread "Draw"
+﻿;This file is included by all threads which want to communicate to draw thread
 
+; tells the draw thread that it needs to redraw the image in the editor for a flow
 API_Draw_Draw(p_FlowID)
 {
-	global
-	local retvalue
-	logger("t2", A_ThisFunc " called")
+	logger("t2", A_ThisFunc " called from thread", _ahkThreadID)
 	
 	_setFlowProperty(p_FlowID, "draw.mustDraw", true)
-	
-	logger("t2", A_ThisFunc " finished")
-	
-	return retvalue
 }

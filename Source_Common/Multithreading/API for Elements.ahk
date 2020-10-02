@@ -1,41 +1,50 @@
-﻿;This file provides functions which can be accessed while executing the elements.
+﻿;This file provides functions which can be accessed by the code inside the elements.
 
 ; only in main
 xx_RegisterElementClass(p_class)
 {
 }
 
-;Variable API functions:
+;Variable API functions.
+
+; get a variable
 xx_GetVariable(Environment, p_Varname, p_hidden = False)
 {
 	return Var_Get_Common(Environment, Varname, p_hidden )
 }
+; get a variable type
 xx_getVariableType(Environment, p_Varname, p_hidden = False)
 {
 	return Var_GetType_Common(Environment, Varname, p_hidden )
 }
+; set a variable
 xx_SetVariable(Environment, p_Varname, p_Value, p_destination="", p_hidden = False)
 {
 	return Var_Set_Common(Environment, p_Varname, p_Value,  p_destination, p_hidden)
 }
+; delete a variable
 xx_DeleteVariable(Environment, p_Varname, p_hidden = False)
 {
 	return Var_Delete_Common(Environment, Varname, p_hidden)
 }
 
+; Get a variable location
 xx_GetVariableLocation(Environment, p_Varname, p_hidden = False)
 {
 	return Var_GetLocation_Common(Environment, Varname, p_hidden)
 }
 
+; Replace variables which are encased by percent signs
 xx_replaceVariables(Environment, p_String, p_pars ="")
 {
 	return Var_replaceVariables_Common(Environment, String, pars)
 }
+; evaluate an expression
 xx_EvaluateExpression(Environment, p_String)
 {
 	return Var_EvaluateExpression(Environment, String, "Var_Get_Common", "Var_Set_Common")
 }
+; checks a variable name, whether it is valid
 xx_CheckVariableName(p_VarName)
 {
 	return Var_CheckName(VarName)
@@ -48,11 +57,11 @@ xx_AutoEvaluateParameters(Environment, ElementParameters, p_skipList = "")
 xx_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, p_ParametersToEvaluate)
 {
 }
-xx_EvalOneParameter(EvaluatedParameters, Environment, ElementParameters, oneParID, onePar = "")
+xx_AutoEvaluateOneParameter(EvaluatedParameters, Environment, ElementParameters, oneParID, onePar = "")
 {
 }
 
-
+; get list of all variables
 xx_GetListOfAllVars(Environment)
 {
 	return Var_GetListOfAllVars_Common(Environment)
@@ -70,11 +79,12 @@ xx_GetListOfInstanceVars(Environment)
 {
 }
 
-
+; get list of all static variables
 xx_GetListOfStaticVars(Environment)
 {
 	return Var_GetListOfStaticVars(Environment)
 }
+; get list of all global variables
 xx_GetListOfGlobalVars(Environment)
 {
 	return Var_GetListOfGlobalVars(Environment)
@@ -93,7 +103,7 @@ xx_ImportInstanceVars(Environment, p_VarsToImport)
 xx_finish(Environment, p_Result, p_Message = "")
 {
 }
-xx_getEntryPoint(Environment) ;For loops
+xx_getEntryPoint(Environment)
 {
 }
 xx_InstanceStop(Environment)
@@ -120,7 +130,6 @@ xx_GetThreadCountInCurrentInstance(Environment)
 xx_ExecuteInNewAHKThread(Environment, p_functionObject, p_Code, p_VarsToImport, p_VarsToExport)
 {
 }
-; only in execution
 xx_trigger(Environment)
 {
 }
@@ -132,26 +141,29 @@ xx_disabled(Environment, Result, Message = "")
 }
 
 
-;get some information
+; get flow ID from the environment variable
 xx_GetMyFlowID(Environment)
 {
 	return Environment.FlowID
 }
+; get flow name from the environment variable
 xx_GetMyFlowName(Environment)
 {
 	return _getFlowProperty(Environment.FlowID, "name")
 }
-
+; get element ID from the environment variable
 xx_GetMyElementID(Environment)
 {
 	return Environment.elementID
 }
 
+; get the flow name of given flow ID
 xx_getFlowIDByName(p_FlowName)
 {
 	return _getFlowIdByName(p_FlowName)
 }
 
+; checks whether flow with a specific name exists
 xx_FlowExistsByName(p_FlowName)
 {
 	_EnterCriticalSection()
@@ -173,11 +185,13 @@ xx_FlowExistsByName(p_FlowName)
 	return retval
 }
 
+; checks whether flow with a specific ID exists
 xx_FlowExists(p_FlowID)
 {
 	return _existsFlow(p_FlowID)
 }
 
+; get the flow enabling state
 xx_isFlowEnabled(p_FlowID)
 {
 	if _getFlowProperty(p_FlowID, "enabled")
@@ -186,6 +200,7 @@ xx_isFlowEnabled(p_FlowID)
 		return False
 }
 
+; get the flow execution state
 xx_isFlowExecuting(p_FlowID)
 {
 	if (_getFlowProperty(p_FlowID, "executing"))
@@ -194,6 +209,7 @@ xx_isFlowExecuting(p_FlowID)
 		return False
 }
 
+; enables a flow
 xx_FlowEnable(p_FlowID)
 {
 	if xx_FlowExists(p_FlowID)
@@ -201,6 +217,7 @@ xx_FlowEnable(p_FlowID)
 
 }
 
+; disables a flow
 xx_FlowDisable(p_FlowID)
 {
 	if xx_FlowExists(p_FlowID)
@@ -208,13 +225,14 @@ xx_FlowDisable(p_FlowID)
 	
 }
 
+; stops a flow
 xx_FlowStop(p_FlowID)
 {
 	if xx_FlowExists(p_FlowID)
 		stopFlow(p_FlowID)
 }
 
-
+; get a list of all flow names
 xx_GetListOfFlowNames()
 {
 	_EnterCriticalSection()
@@ -232,12 +250,13 @@ xx_GetListOfFlowNames()
 	return allFlowNames
 }
 
+; get a list of all flow IDs
 xx_GetListOfFlowIDs()
 {
 	return _getAllFlowIds()
 }
 
-
+; get all Element IDs in a flow of a specific type
 xx_getAllElementIDsOfType(p_FlowID, p_Type)
 {
 	_EnterCriticalSection()
@@ -254,6 +273,7 @@ xx_getAllElementIDsOfType(p_FlowID, p_Type)
 	return elements
 }
 
+; get all element IDs in a flow of a specific class
 xx_getAllElementIDsOfClass(p_FlowID, p_Class)
 {
 	_EnterCriticalSection()
@@ -272,113 +292,123 @@ xx_getAllElementIDsOfClass(p_FlowID, p_Class)
 	return elements
 }
 
+; get all parameters of an element
 xx_getElementPars(p_FlowID, p_ElementID)
 {
 	return _getElementProperty(p_FlowID, p_ElementID, "pars")
 }
+; get the name of an element
 xx_getElementName(p_FlowID, p_ElementID)
 {
 	return _getElementProperty(p_FlowID, p_ElementID, "name")
 }
+; get the class of an element
 xx_getElementClass(p_FlowID, p_ElementID)
 {
 	return _getElementProperty(p_FlowID, p_ElementID, "class")
 }
-
+; get the parameters of the current element
 xx_getMyElementPars(Environment)
 {
 	return _getElementProperty(Environment.flowID, Environment.elementID, "pars")
 }
 
-;Manual trigger
+; checks whether a manual trigger exists
+; if p_TriggerName is empty, it defaults to the default manual trigger of the flow
 xx_ManualTriggerExist(p_FlowID, p_TriggerName = "")
 {
 	_EnterCriticalSection()
 	
+	; get all element IDs and loop throuth them
 	allElementIDs := _getAllElementIds(p_FlowID)
 	result := false
 	for forelementIndex, forelementID in allElementIDs
 	{
-		;~ d(forelement, p_TriggerName)
-		if (p_TriggerName = "")
+		if (p_TriggerName)
 		{
-			if (_getElementProperty(p_FlowID, forelementID, "class") = "trigger_manual" and _getElementProperty(p_FlowID, forelementID, "defaultTrigger") = True)
+			; trigger name is set, find the trigger with that name
+			if (_getElementProperty(p_FlowID, forelementID, "class") = "trigger_Manual" and _getElementProperty(p_FlowID, forelementID, "pars.id") = p_TriggerName)
 			{
-				;~ d(forElement)
 				result :=true
 				break
 			}
 		}
 		else
 		{
-			if (_getElementProperty(p_FlowID, forelementID, "class") = "trigger_Manual" and _getElementProperty(p_FlowID, forelementID, "pars.id") = p_TriggerName)
+			; trigger name is not set, find the default trigger
+			if (_getElementProperty(p_FlowID, forelementID, "class") = "trigger_manual" and _getElementProperty(p_FlowID, forelementID, "defaultTrigger") = True)
 			{
-				;~ d(forElement)
 				result :=true
 				break
 			}
 		}
-		
 	}
 	_LeaveCriticalSection()
 	return result
 }
 
+; checks whether a specific manual trigger is enabled
+; if p_TriggerName is empty, it defaults to the default manual trigger of the flow
 xx_isManualTriggerEnabled(p_FlowID, p_TriggerName="")
 {
 	_EnterCriticalSection()
 	
+	; get all element IDs and loop throuth them
 	allElementIDs := _getAllElementIds(p_FlowID)
 	result:=false
 	for forelementIndex, forelementID in allElementIDs
 	{
-		;~ d(forelement, p_TriggerName)
-		if (p_TriggerName = "")
+		if (p_TriggerName )
 		{
-			if (_getElementProperty(p_FlowID, forelementID, "class") = "trigger_manual" and _getElementProperty(p_FlowID, forelementID, "defaultTrigger") = True)
+			; trigger name is set, find the trigger with that name
+			if (_getElementProperty(p_FlowID, forelementID, "class") = "trigger_Manual" and _getElementProperty(p_FlowID, forelementID, "pars.id") = p_TriggerName)
 			{
-				;~ d(forElement)
-				result:=_getElementProperty(p_FlowID, forelementID, "enabled")
+				; we found the trigger, check whether it is enabled
+				result := _getElementProperty(p_FlowID, forelementID, "enabled")
 				break
 			}
 		}
 		else
 		{
-			if (_getElementProperty(p_FlowID, forelementID, "class") = "trigger_Manual" and _getElementProperty(p_FlowID, forelementID, "pars.id") = p_TriggerName)
+			; trigger name is not set, find the default trigger
+			if (_getElementProperty(p_FlowID, forelementID, "class") = "trigger_manual" and _getElementProperty(p_FlowID, forelementID, "defaultTrigger") = True)
 			{
-				;~ d(forElement)
-				result:=_getElementProperty(p_FlowID, forelementID, "enabled")
+				; we found the trigger, check whether it is enabled
+				result := _getElementProperty(p_FlowID, forelementID, "enabled")
 				break
 			}
 		}
-		
 	}
 	
 	_LeaveCriticalSection()
 	return result
 }
 
+; enable a specific manual trigger
+; if p_TriggerName is empty, it defaults to the default manual trigger of the flow
 xx_ManualTriggerEnable(p_FlowID, p_TriggerName="")
 {
 	_EnterCriticalSection()
 
+	; get all element IDs and loop throuth them
 	allElementIDs := _getAllElementIds(p_FlowID)
 	for forelementIndex, forelementID in allElementIDs
 	{
-		;~ d(forelement, p_TriggerName)
-		if (p_TriggerName = "")
+		if (p_TriggerName)
 		{
-			if (_getElementProperty(p_FlowID, forelementID, "class") = "trigger_manual" and _getElementProperty(p_FlowID, forelementID, "defaultTrigger") = True)
+			; trigger name is set, find the trigger with that name
+			if (_getElementProperty(p_FlowID, forelementID, "class") = "trigger_Manual" and _getElementProperty(p_FlowID, forelementID, "pars.id") = p_TriggerName)
 			{
-				;~ d(forElement)
+				; we found the trigger, enable it
 				enableOneTrigger(p_FlowID, forelementID)
 			}
 		}
 		else
 		{
-			if (_getElementProperty(p_FlowID, forelementID, "class") = "trigger_Manual" and _getElementProperty(p_FlowID, forelementID, "pars.id") = p_TriggerName)
+			; trigger name is not set, find the default trigger
+			if (_getElementProperty(p_FlowID, forelementID, "class") = "trigger_manual" and _getElementProperty(p_FlowID, forelementID, "defaultTrigger") = True)
 			{
-				;~ d(forElement)
+				; we found the trigger, enable it
 				enableOneTrigger(p_FlowID, forelementID)
 			}
 		}
@@ -387,27 +417,31 @@ xx_ManualTriggerEnable(p_FlowID, p_TriggerName="")
 
 }
 
+; disable a specific manual trigger
+; if p_TriggerName is empty, it defaults to the default manual trigger of the flow
 xx_ManualTriggerDisable(p_FlowID, p_TriggerName="")
 {
 	_EnterCriticalSection()
 	
+	; get all element IDs and loop throuth them
 	allElementIDs := _getAllElementIds(p_FlowID)
 	for forelementIndex, forelementID in allElementIDs
 	{
-		;~ d(forelement, p_TriggerName)
-		if (p_TriggerName = "")
+		if (p_TriggerName)
 		{
-			if (_getElementProperty(p_FlowID, forelementID, "class") = "trigger_manual" and _getElementProperty(p_FlowID, forelementID, "defaultTrigger") = True)
+			; trigger name is set, find the trigger with that name
+			if (_getElementProperty(p_FlowID, forelementID, "class") = "trigger_Manual" and _getElementProperty(p_FlowID, forelementID, "pars.id") = p_TriggerName)
 			{
-				;~ d(forElement)
+				; we found the trigger, disable it
 				disableOneTrigger(p_FlowID, forelementID)
 			}
 		}
 		else
 		{
-			if (_getElementProperty(p_FlowID, forelementID, "class") = "trigger_Manual" and _getElementProperty(p_FlowID, forelementID, "pars.id") = p_TriggerName)
+			; trigger name is not set, find the default trigger
+			if (_getElementProperty(p_FlowID, forelementID, "class") = "trigger_manual" and _getElementProperty(p_FlowID, forelementID, "defaultTrigger") = True)
 			{
-				;~ d(forElement)
+				; we found the trigger, disable it
 				disableOneTrigger(p_FlowID, forelementID)
 			}
 		}
@@ -416,48 +450,53 @@ xx_ManualTriggerDisable(p_FlowID, p_TriggerName="")
 	_LeaveCriticalSection()
 }
 
+
+; execute a specific manual trigger
+; if p_TriggerName is empty, it defaults to the default manual trigger of the flow
 xx_ManualTriggerExecute(p_FlowID, p_TriggerName = "", p_Variables ="", p_CallBackFunction ="")
 {
-	params:=Object()
-	params.VarsToPass:=p_Variables
-	params.CallBack:=p_CallBackFunction
+	; when starting to execute the trigger, we will pass some variables in that object.
+	params := Object()
+	params.VarsToPass := p_Variables
+	params.CallBack := p_CallBackFunction
 	
-	if _existsFlow(p_FlowID)
+	; check first, whether flow exists
+	if (not _existsFlow(p_FlowID))
 	{
-		
-		;~ d(_share.temp)
-		if (p_TriggerName = "")
+		logger("f0", "cannot execute manual trigger. Flow with ID " p_FlowID " does not exists.")
+		return
+	}
+	
+	if (p_TriggerName = "")
+	{
+		; not trigger name specified. trigger the default trigger
+		executeFlow(p_FlowID, "", params)
+		return
+	}
+	else
+	{
+		; trigger name specified. Find out the ElementID of the trigger
+		_EnterCriticalSection()
+		allElementIDs := _getAllElementIds(p_FlowID)
+		foundElementID:=""
+		for forelementIndex, forelementID in allElementIDs
 		{
-			; not trigger name specified. trigger the default trigger
-			executeFlow(p_FlowID, "", params)
-			return
+			if (_getElementProperty(p_FlowID, forelementID, "class") = "trigger_Manual" and _getElementProperty(p_FlowID, forelementID, "pars.id") = p_TriggerName)
+			{
+				foundElementID:=forelementID
+				break
+			}
+		}
+		_LeaveCriticalSection()
+
+		if foundElementID
+		{
+			; we found the trigger. We can trigger it now.
+			executeFlow(p_FlowID, foundElementID, params)
 		}
 		else
 		{
-			; trigger name specified. Find out the ElementID of the trigger
-			_EnterCriticalSection()
-			allElementIDs := _getAllElementIds(p_FlowID)
-			foundElementID:=""
-			for forelementIndex, forelementID in allElementIDs
-			{
-				;~ d(forelement, p_TriggerName)
-				if (_getElementProperty(p_FlowID, forelementID, "class") = "trigger_Manual" and _getElementProperty(p_FlowID, forelementID, "pars.id") = p_TriggerName)
-				{
-					foundElementID:=forelementID
-					break
-				}
-			}
-			_LeaveCriticalSection()
-
-			if foundElementID
-			{
-				; Trigger now
-				executeFlow(p_FlowID, foundElementID, params)
-			}
-			else
-			{
-				logger("f0", "Cannot trigger a manual trigger in flow '" _getFlowProperty(p_FlowID, "name") "'. Trigger '" p_TriggerName "' not found")
-			}
+			logger("f0", "Cannot trigger a manual trigger in flow '" _getFlowProperty(p_FlowID, "name") "'. Trigger '" p_TriggerName "' not found")
 		}
 	}
 }
@@ -466,7 +505,6 @@ xx_ManualTriggerExecute(p_FlowID, p_TriggerName = "", p_Variables ="", p_CallBac
 
 
 ;only in editor
-
 xx_Par_Disable(p_ParameterID, p_TrueOrFalse = True)
 {
 }
@@ -489,31 +527,31 @@ xx_FirstCallOfCheckSettings(Environment)
 {
 }
 
-;common functions. Available everywhere
+; returns a random phrase which can be used to create rememberable IDs
 xx_randomPhrase()
 {
 	return randomPhrase()
 }
+; converts an object to a json string
 xx_ConvertObjToString(p_Value)
 {
 	if IsObject(p_Value)
-		return strobj(p_Value)
+		return Jxon_Dump(p_Value, 2)
 }
+; convert an json string to an object
 xx_ConvertStringToObj(p_Value)
 {
 	if not IsObject(p_Value)
-		return strobj(p_Value)
-}
-xx_ConvertStringToObjOrObjToString(p_Value)
-{
-	return strobj(p_Value)
+		return Jxon_Load(p_Value)
 }
 
+; write a log message
 xx_log(Environment, LoggingText, loglevel = 2)
 {
 	logger("f" loglevel, "Element " _getElementProperty(Environment.FlowID, Environment.elementID, "name") " (" Environment.elementID "): " LoggingText, _getFlowProperty(Environment.FlowID, "name"))
 }
 
+; get full file path. If path is relative, the flow working directory will be added. If it is already absolute, it will be returded unchanged.
 xx_GetFullPath(Environment, p_Path)
 {
 	path:=p_Path
@@ -524,6 +562,7 @@ xx_GetFullPath(Environment, p_Path)
 	return path
 }
 
+; get working directory of the flow
 xx_GetWorkingDir(Environment)
 {
 	if (_getFlowProperty(Environment.FlowID, "flowsettings.DefaultWorkingDir"))
@@ -571,13 +610,14 @@ xx_assistant_ChooseColor(neededInfo)
 {
 }
 
-;common
+; returns the root path of AutoHotFlow
 xx_GetAhfPath()
 {
 	return GetAhfPath()
 }
 
+; only in execution
 xx_isWindowsStartup()
 {
-	return _getShared("WindowsStartup")
+	return false
 }

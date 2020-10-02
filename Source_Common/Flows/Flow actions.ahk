@@ -57,11 +57,11 @@ disableOneTrigger(p_FlowID, p_TriggerID = "", p_save=True)
 
 ; execute a flow
 ; trigp_TriggerID: TriggerID is optional. If not set, the default manual trigger will be triggered
-; p_params: more parameters (see comment to startFlow() in "Instances and Treads.ahk")
+; p_params: more parameters (see comment to ExecuteFlow() in "Instances and Treads.ahk")
 ExecuteFlow(p_FlowID, p_TriggerID="", p_params="")
 {
 	; execute the flow
-	API_Execution_startFlow(p_FlowID, p_TriggerID, p_params)
+	API_Execution_ExecuteFlow(p_FlowID, p_TriggerID, p_params)
 }
 
 ; change execution state
