@@ -30,6 +30,9 @@ global _ahkThreadID:="Main"
 OnExit,Exit
 global _exiting := false
 
+; set default file encoding
+FileEncoding utf-8
+
 ;Initialize shared variables
 gosub, init_SharedVars
 

@@ -64,14 +64,14 @@ Element_run_Loop_Work_through_a_list(Environment, ElementParameters)
 		index:=1
 		x_SetVariable(Environment, "A_Index", index, "loop")
 		
-		x_SetVariable(Environment, "A_LoopUseCopiedList", ElementParameters.CopyFirst, "loop", "hidden")
+		x_SetVariable(Environment, "A_LoopUseCopiedList", ElementParameters.CopyFirst, "loop", true)
 		if (ElementParameters.CopyFirst)
 		{
-			x_SetVariable(Environment, "A_LoopCurrentList", varContentList, "loop", "hidden")
+			x_SetVariable(Environment, "A_LoopCurrentList", varContentList, "loop", true)
 		}
 		else
 		{
-			x_SetVariable(Environment, "A_LoopUseVarName", varname, "loop", "hidden")
+			x_SetVariable(Environment, "A_LoopUseVarName", varname, "loop", true)
 		}
 		
 		;Set first element
@@ -91,15 +91,15 @@ Element_run_Loop_Work_through_a_list(Environment, ElementParameters)
 	else if (entryPoint = "Tail") ;Continue loop
 	{
 		index := x_GetVariable(Environment, "A_Index")
-		copiedFirst := x_GetVariable(Environment, "A_LoopUseCopiedList", "hidden")
+		copiedFirst := x_GetVariable(Environment, "A_LoopUseCopiedList", true)
 		index++
 		if (copiedFirst)
 		{
-			varContentList := x_GetVariable(Environment, "A_LoopCurrentList", "hidden")
+			varContentList := x_GetVariable(Environment, "A_LoopCurrentList", true)
 		}
 		else
 		{
-			varName := x_GetVariable(Environment, "A_LoopUseVarName", "hidden")
+			varName := x_GetVariable(Environment, "A_LoopUseVarName", true)
 			varContentList := x_GetVariable(Environment, varName)
 		}
 		

@@ -145,10 +145,10 @@ LoadFlow(p_filepath)
 	; TODO: check flow settings.
 
 	; check working directory
-	if not fileexist(flowSettings.WorkingDir)
+	if not fileexist(_getSettings("WorkingDir"))
 	{
 		logger("a1","Working directory of the flow does not exist. Creating it now.")
-		FileCreateDir,% flowSettings.WorkingDir
+		FileCreateDir,% _getSettings("WorkingDir")
 		if errorlevel
 		{
 			logger("a0","Error! Working directory couldn't be created.")

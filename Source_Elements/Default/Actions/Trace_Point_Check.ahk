@@ -145,7 +145,7 @@ Element_run_Action_Trace_Point_Check(Environment, ElementParameters)
 	
 	;Either not needed to wait or only one thread remained
 	
-	passed_Tracepoints := x_GetVariable(Environment, "passed_Tracepoints", "hidden")
+	passed_Tracepoints := x_GetVariable(Environment, "passed_Tracepoints", true)
 	;~ d(passed_Tracepoints)
 	TracePointsMustPassedButNotPassed:=Object()
 	for oneMustPassIndex, oneMustPassTracePoint in allTracePointMustPass

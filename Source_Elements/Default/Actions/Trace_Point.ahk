@@ -74,7 +74,7 @@ Element_run_Action_Trace_Point(Environment, ElementParameters)
 	elementID:=x_GetMyElementID(Environment)
 	
 	x_log(Environment, LogMessage, 0)
-	passed_Tracepoints := x_GetVariable(Environment, "passed_Tracepoints", "hidden")
+	passed_Tracepoints := x_GetVariable(Environment, "passed_Tracepoints", true)
 	if not IsObject(passed_Tracepoints)
 	{
 		passed_Tracepoints:=Object()
@@ -82,7 +82,7 @@ Element_run_Action_Trace_Point(Environment, ElementParameters)
 	passed_Tracepoints.push(ID " (" elementID ")")
 	
 
-	x_SetVariable(Environment, "passed_Tracepoints", passed_Tracepoints,, "hidden")
+	x_SetVariable(Environment, "passed_Tracepoints", passed_Tracepoints,, true)
 	
 	if (stopcondition)
 	{

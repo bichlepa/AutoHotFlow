@@ -37,9 +37,17 @@ class class_evaluator
 				;~ MsgBox % strobj(onepath)
 				path.push(this.evalnext(onepath))
 			}
+
+			pathDotted := ""
+			for oneindex, onepath in path
+			{
+				if (a_index != 1)
+					pathDotted .= "."
+				pathDotted .= onepath
+			}
 			func_GetVariable:=this.func_GetVariable
 			;~ d(path, func_GetVariable)
-			varValue:=%func_GetVariable%(this.environment,path)
+			varValue := %func_GetVariable%(this.environment,pathDotted)
 			;~ d(path, varValue)
 			;~ d(path, func_GetVariable)
 			return varValue
@@ -67,11 +75,19 @@ class class_evaluator
 				{
 					path.push(this.evalnext(onepath))
 				}
+
+				pathDotted := ""
+				for oneindex, onepath in path
+				{
+					if (a_index != 1)
+						pathDotted .= "."
+					pathDotted .= onepath
+				}
 				func_GetVariable:=this.func_GetVariable
 				func_setVariable:=this.func_setVariable
-				value:=%func_GetVariable%(this.environment,path)
+				value:=%func_GetVariable%(this.environment,pathDotted)
 				value:=this.assign(exp.operator, value, this.evalnext(exp.right))
-				return %func_setVariable%(this.environment,path, value)
+				return %func_setVariable%(this.environment,pathDotted, value)
 				
 			}
 		}

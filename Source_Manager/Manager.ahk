@@ -25,8 +25,12 @@ global _ScriptDir := _getShared("_ScriptDir")
 ; While any thread uses those commands, the working directory of the whole process is changed to the path which is shown in the dialog.
 ; SetWorkingDir %a_temp% working dir is only set in main thread. Otherwise it causes errors if another thread is currently including files
 
+; set default file encoding
+FileEncoding utf-8
+
 ;initialize logger
 init_logger()
+
 ; Include libraries
 #Include %A_ScriptDir%\..
 #include lib\Object to file\String-object-file.ahk
