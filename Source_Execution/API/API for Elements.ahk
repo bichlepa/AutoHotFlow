@@ -41,12 +41,12 @@ x_replaceVariables(Environment, p_String, p_pars ="")
 ; evaluate an expression
 x_EvaluateExpression(Environment, p_String)
 {
-	return Var_EvaluateExpression(Environment, p_String, "Var_Get", "Var_Set")
+	return Var_EvaluateExpression(Environment, p_String, false)
 }
 ; execute an AHF scriopt
 x_EvaluateScript(Environment, p_script)
 {
-	var_evaluateScript(Environment, p_script, "Var_Get", "Var_Set")
+	var_evaluateScript(Environment, p_script, false)
 }
 
 ; checks a variable name, whether it is valid

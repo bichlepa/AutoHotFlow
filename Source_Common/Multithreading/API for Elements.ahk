@@ -42,7 +42,7 @@ xx_replaceVariables(Environment, p_String, p_pars ="")
 ; evaluate an expression
 xx_EvaluateExpression(Environment, p_String)
 {
-	return Var_EvaluateExpression(Environment, String, "Var_Get_Common", "Var_Set_Common")
+	return Var_EvaluateExpression(Environment, String, true)
 }
 ; checks a variable name, whether it is valid
 xx_CheckVariableName(p_VarName)

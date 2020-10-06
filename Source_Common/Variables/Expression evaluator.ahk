@@ -1,42 +1,38 @@
 ﻿
-
-Var_EvaluateExpression(environment,ExpressionString,  func_GetVariable, func_SetVariable)
+; evaluate an expression
+; useCommonFunctions: if false we will use functions "var_get" and "var_set", if true, we will use "var_get_common" and "var_set_common"
+Var_EvaluateExpression(environment, ExpressionString, useCommonFunctions)
 {
-	;~ MsgBox %testExpr%
-	tokens:=tokenizer(ExpressionString)
-	;~ d(tokens)
-	parsedCode:=class_parser.parse(tokens, "expression")
+	; step 1: tokenize the code
+	tokens := tokenizer(ExpressionString)
 	
-	;~ FileDelete,result.txt
-	;~ FileAppend,% ExpressionString "`n`n" ,result.txt,utf-8
-	;~ FileAppend,% strobj(parsedCode) "`n`n",result.txt,utf-8
-	;~ MsgBox % strobj(parsedCode)
+	; step 2: parse the tokenized code
+	parsedCode := class_parser.parse(tokens, "expression")
 	
-	
+	; check for returned error
 	if (parsedCode.errors.MaxIndex())
 	{
-		;~ d(parsedCode.errors)
-		;~ MsgBox % "Do not execute because there are errors:`n" parsedCode.errorsString
+		; there were errors. return a readable string
 		;generate readable string
-		string:=""
+		string := ""
 		for oneindex, oneerror in parsedCode.errors
 		{
-			if (a_index!=1)
-				string.="`n`n"
-			string.=lang("line %1%, col %2%`n", oneerror.linenr, oneerror.colnr) 
-			string.=oneerror.line "`n"
-			string.=oneerror.description
+			if (a_index != 1)
+				string .= "`n`n"
+			string .= lang("line %1%, col %2%`n", oneerror.line, oneerror.col) 
+			string .= oneerror.wholeline "`n"
+			string .= oneerror.description
 		}
 		
 		return {error: string}
 	}
 	else
 	{
-		result:=class_evaluator.evaluate(parsedCode, environment, func_GetVariable, func_SetVariable)
-		;~ MsgBox %result%
+		; there was no error
+		; step 3: evaluate the tokenized code
+		result := class_evaluator.evaluate(parsedCode, environment, useCommonFunctions)
 		
-		;~ MsgBox % "result = " result "`n`n" strobj(env)
+		; return the evaluated expression
 		return {result: result}
 	}
-	
 }
