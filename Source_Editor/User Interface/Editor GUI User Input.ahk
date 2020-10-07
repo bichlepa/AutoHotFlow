@@ -19,25 +19,29 @@ ui_mouseCick(button)
 	{
 		; Prevent interaction with disable gui
 		ui_ActionWhenMainGUIDisabled()
+		logger("a3", button " mouse button click detected. Skipping. Main GUI is disabled.", FlowID)
 		return
 	}
 
 	if workingOnClick
 	{
 		; we are already busy with an other user action. Ignore this event
+		logger("a3", button " mouse button click detected. Skipping. We are already processing a user input.", FlowID)
 	}
 	else
 	{
 		if (button = "right")
 		{
 			; Scroll with using right mouse button
+			logger("a3", button " mouse button click detected. Going to scroll with mouse.", FlowID)
 			ui_scrollwithMouse("rbutton")
 		}
 		else
 		{
 			; user clicked with the left mouse button
 			; Go to label clickonpicture in order to react on user click.
-			SetTimer,clickonpicture,-1 
+			logger("a3", button " mouse button click detected. Going to process the click.", FlowID)
+			SetTimer, clickonpicture, -1 
 		}
 	}
 }
@@ -50,38 +54,48 @@ ui_leftmousebuttondoubleclick()
 	if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of the main gui are disabled
 	{
 		ui_ActionWhenMainGUIDisabled()
+		logger("a3", "left mouse button double click detected. Skipping. Main GUI is disabled.", FlowID)
 		return
 	}
+	logger("a3", "left mouse button double click detected. Going to process double click.", FlowID)
 	
 	; track changes with those variables
-	UserChangedSomething:=false
-	UserCancelledAction:=false
+	UserChangedSomething := false
+	UserCancelledAction := false
 
-	; get marked element
+	; get selected element
 	selectedElement := _getFlowProperty(FlowID, "selectedElement")
-	if (selectedElement != "") ;if a single element is marked
+	if (selectedElement) ;if a single element is marked
 	{
 		if instr(selectedElement, "connection")
 		{
+			logger("a3", "a single selected connection found: " selectedElement ". Going to change chonnection type", FlowID)
+
 			 ;Change connection type and wait for results
-			ret:=selectConnectionType(selectedElement,"wait")
+			ret := selectConnectionType(selectedElement, "wait")
 			if (ret = "aborted")
-				UserCancelledAction:=true
-			else if (ret!="0 changes")
-				UserChangedSomething:=true
+				UserCancelledAction := true
+			else if (ret != "0 changes")
+				UserChangedSomething := true
 		}
 		else
 		{
+			logger("a3", "a single selected element found: " selectedElement ". Going to edit element settings", FlowID)
+
 			;Change element settings and wait for results
-			ret:=ElementSettings.open(selectedElement,"wait")
+			ret := ElementSettings.open(selectedElement, "wait")
 			if (ret = "aborted")
-				UserCancelledAction:=true
-			else if (ret!="0 changes")
-				UserChangedSomething:=true
+				UserCancelledAction := true
+			else if (ret != "0 changes")
+				UserChangedSomething := true
 		}
 
 		; if something was changed, handle last steps
 		endworkingOnClick(UserChangedSomething, UserCancelledAction)
+	}
+	Else
+	{
+		logger("a3", "no single selected connection or element found", FlowID)
 	}
 }
 
@@ -90,19 +104,22 @@ clickOnPicture() ;react on clicks of the user
 {
 	global workingOnClick
 	global CurrentlyMainGuiIsDisabled
-	global default_ElementWidth, default_ElementHeight
 
 	;Ignore if a click of user is already processed
 	if (workingOnClick)
+	{
+		logger("a3", "do not process click on picture. We are already processing a user input.", FlowID)
 		return
+	}
+	
 	; make sure, we only process one click of user
 	workingOnClick := true
 	
 	;Get the mouse position
-	MouseGetPos,mx,my
+	MouseGetPos, mx, my
 
 	;Find out whether user presses the control key
-	GetKeyState,ControlKeyState,control
+	GetKeyState, ControlKeyState, control
 
 	; track changes with those variables
 	UserChangedSomething := false
@@ -116,15 +133,20 @@ clickOnPicture() ;react on clicks of the user
 	clickedItem := ui_findElementUnderMouse(mx, my)
 	clickedElement := clickedItem.element
 	partOfclickedElement := clickedItem.part
+	
 	if (not clickedElement) ;If user clicke on empty space.
 	{
+		logger("a3", "user clicked on an empty space. Going to detect movement", FlowID)
+
 		; detect whether user drags with mouse
 		if (ui_detectMovement()=false)
 		{
+			logger("a3", "no movement detected. control key state: " ControlKeyState, FlowID)
 			; user did not drag mouse.
 			; if uses presses control key, do nothing
-			if (ControlKeyState!="d")
+			if (ControlKeyState != "d")
 			{
+				logger("a3", "unmark elements", FlowID)
 				; Unmark all elements
 				if (selectedElements.count())
 				{
@@ -135,83 +157,104 @@ clickOnPicture() ;react on clicks of the user
 		}
 		else
 		{
+			logger("a3", "movement detected. Start scrolling", FlowID)
 			; user drags with mouse. Start scrolling
 			ui_scrollwithMouse()
 		}
 	}
-	else if (clickedElement="MenuCreateNewAction" or clickedElement="MenuCreateNewCondition" or clickedElement="MenuCreateNewLoop" or clickedElement="MenuCreateNewTrigger") ;User click either on "Create new action" or ".. condtion" in the drawn menu
+	else if (clickedElement = "MenuCreateNewAction" or clickedElement = "MenuCreateNewCondition" or clickedElement = "MenuCreateNewLoop" or clickedElement = "MenuCreateNewTrigger") ;User click either on "Create new action" or ".. condtion" in the drawn menu
 	{
+		logger("a3", "user clicked on the new element menu " clickedElement, FlowID)
+
 		; user clicked on the icon for creating a new element
 		; create the new element
 		if (clickedElement = "MenuCreateNewAction")
-			newElement:=Element_New(FlowID, "action")
+			newElement := Element_New(FlowID, "action")
 		else if (clickedElement = "MenuCreateNewCondition")
-			newElement:=Element_New(FlowID, "Condition")
+			newElement := Element_New(FlowID, "Condition")
 		else if (clickedElement = "MenuCreateNewLoop")
-			newElement:=Element_New(FlowID, "Loop")
+			newElement := Element_New(FlowID, "Loop")
 		else if (clickedElement = "MenuCreateNewTrigger")
-			newElement:=Element_New(FlowID, "Trigger")
+			newElement := Element_New(FlowID, "Trigger")
 		else
 		{
 			throw exception("unexpected internal ERROR! A new element should be created. But I don't known which one!")
 			return 
 		}
 		
+		logger("a3", "new element created: " newElement, FlowID)
+
 		; place the element under the mouse cursor
 		tempZoomFactor := _getFlowProperty(FlowID, "flowSettings.zoomfactor")
 		tempOffsetX := _getFlowProperty(FlowID, "flowSettings.offsetx")
 		tempOffsetY := _getFlowProperty(FlowID, "flowSettings.offsety")
-		_setElementProperty(FlowID, newElement, "x", (mx)/tempZoomFactor + tempOffsetX - default_ElementWidth/2)
-		_setElementProperty(FlowID, newElement, "y", (my)/tempZoomFactor + tempOffsetY - default_ElementHeight/2)
+		_setElementProperty(FlowID, newElement, "x", mx / tempZoomFactor + tempOffsetX - default_ElementWidth / 2)
+		_setElementProperty(FlowID, newElement, "y", my / tempZoomFactor + tempOffsetY - default_ElementHeight / 2)
 
 		; select the element
 		SelectOneItem(newElement)
+
 		; user may hold mouse button down while dragging or klick, move and klick again
 		if (ui_detectMovement()) ;If user moves the mouse while holding the mouse button
 		{
+			logger("a3", "user moved mouse right after creating the new element. Stop moving when user releases the mouse button", FlowID)
+
 			;move the element. Stop moving when user releases the mouse button
-			ret:=ui_moveSelectedElements(newElement)
+			ret := ui_moveSelectedElements(newElement)
 		}
 		else
 		{
+			logger("a3", "user released mouse button right after creating the new element. Stop moving when user presses the mouse button", FlowID)
+
 			;move the element. Stop moving when user clicks
-			ret:=ui_moveSelectedElements(newElement,, "InvertLbutton")
+			ret := ui_moveSelectedElements(newElement, , "InvertLbutton")
 		}
 		if (ret.Aborted) ;if user cancelled movement
 		{
+			logger("a3", "user cancelled movement", FlowID)
 			; this will undo the action later
-			UserCancelledAction:=true
+			UserCancelledAction := true
 		}
 		else
 		{
+			logger("a3", "user finished movement. Going to select sub type of element", FlowID)
+
 			; select element subtype and wait for result
 			ret := selectSubType(newElement,"wait")
-			if (ret="aborted")
+			if (ret = "aborted")
 			{
+				logger("a3", "user aborted element type selection", FlowID)
 				; this will undo the action later
-				UserCancelledAction:=true
+				UserCancelledAction := true
 			}
 			else
 			{
+				logger("a3", "user finished element type selection. Going to open element settings", FlowID)
 				;open settings of element
 				ret := ElementSettings.open(newElement,"wait")
-				if (ret="aborted")
+				if (ret = "aborted")
 				{
+					logger("a3", "user aborted editing element settings", FlowID)
 					; this will undo the action later
-					UserCancelledAction:=true
+					UserCancelledAction := true
 				}
 				else
 				{
+					logger("a3", "user finished editing element settings", FlowID)
 					; it doesnt matter, whether user did changes in the editor or not, since it is a new element
-					UserChangedSomething:=true
+					UserChangedSomething := true
 				}
 			}
 		}
 	}
 	else if (clickedElement = "PlusButton" or clickedElement = "PlusButton2") ;user click on plus button
 	{
+		logger("a3", "user clicked on a plus button: " clickedElement, FlowID)
+
 		IfInString, selectedElement, Connection ;The selected element is connection
 		{
+			logger("a3", "connection " selectedElement " is selected. Going to create a new connection and move them", FlowID)
+
 			;Create a new connection
 			tempConnection2 := Connection_New(FlowID)
 			
@@ -223,19 +266,23 @@ clickOnPicture() ;react on clicks of the user
 			tempConnection2 := Connection_New(FlowID)
 
 			; move both connections
-			ret:=ui_MoveConnection(selectedElement, tempFrom, tempConnection2, tempTo)
-			if (ret="aborted")
+			ret := ui_MoveConnection(selectedElement, tempFrom, tempConnection2, tempTo)
+			if (ret = "aborted")
 			{
+				logger("a3", "user aborted moving connections", FlowID)
 				; this will undo the action later
-				UserCancelledAction:=true
+				UserCancelledAction := true
 			}
 			else
 			{
-				UserChangedSomething:=true
+				logger("a3", "user finished moving connections", FlowID)
+				UserChangedSomething := true
 			} 
 		}
 		else ;The selected element is either action, condition or trigger or loop
 		{
+			logger("a3", "element " selectedElement " is selected. Going to create a new connection and move it", FlowID)
+
 			;Create new connection
 			tempConnection1 := Connection_New(FlowID)
 			
@@ -243,12 +290,13 @@ clickOnPicture() ;react on clicks of the user
 			tempType := _getElementProperty(FlowID, selectedElement, "type")
 			if (tempType = "loop")
 			{
-				if (clickedElement="PlusButton")
+				logger("a3", "selected element is a loop. Define frompart of connection", FlowID)
+				if (clickedElement = "PlusButton")
 				{
 					; User clicked the first plus button. The connections starts from the head of the loop
 					_setConnectionProperty(FlowID, tempConnection1, "frompart", "HEAD")
 				}
-				else if (clickedElement="PlusButton2")
+				else if (clickedElement = "PlusButton2")
 				{
 					; User clicked the second plus button. The connections starts from the tail of the loop
 					_setConnectionProperty(FlowID, tempConnection1, "frompart", "TAIL")
@@ -257,20 +305,23 @@ clickOnPicture() ;react on clicks of the user
 			
 			; move the connection
 			ret := ui_MoveConnection(tempConnection1, selectedElement)
-			if (ret="aborted")
+			if (ret = "aborted")
 			{
+				logger("a3", "user aborted moving connection", FlowID)
 				; this will undo the action later
 				UserCancelledAction:=true
 			}
 			else
 			{
+				logger("a3", "user finished moving connection", FlowID)
 				UserChangedSomething:=true
 			}
-			
 		}
 	}
 	else if (clickedElement = "MoveButton1") ;if a connection is selected and user wants to move the start of connection
 	{
+		logger("a3", "user clicked on the move button 1 of connection " selectedElement ". Going to move the start of the connection", FlowID)
+		
 		; get the element at the end of the connection
 		tempTo := _getConnectionProperty(FlowID, selectedElement, "to")
 
@@ -278,37 +329,45 @@ clickOnPicture() ;react on clicks of the user
 		ret := ui_MoveConnection(, , selectedElement, tempTo)
 		if (ret = "aborted")
 		{
+			logger("a3", "user aborted moving connection", FlowID)
 			; this will undo the action later
-			UserCancelledAction:=true
+			UserCancelledAction := true
 		}
 		else
 		{
-			UserChangedSomething:=true
+			logger("a3", "user finished moving connection", FlowID)
+			UserChangedSomething := true
 		}
 	}
-	else if (clickedElement="MoveButton2") ;if a connection is selected and user wants to move the end of connection
+	else if (clickedElement = "MoveButton2") ;if a connection is selected and user wants to move the end of connection
 	{
+		logger("a3", "user clicked on the move button 2 of connection " selectedElement ". Going to move the end of the connection", FlowID)
+
 		; get the element at the start of the connection
 		tempFrom := _getConnectionProperty(FlowID, selectedElement, "from")
 
 		; move the connection
-		ret:=ui_MoveConnection(selectedElement, tempFrom)
+		ret := ui_MoveConnection(selectedElement, tempFrom)
 		if (ret = "aborted")
 		{
+			logger("a3", "user aborted moving connection", FlowID)
 			; this will undo the action later
-			UserCancelledAction:=true
+			UserCancelledAction := true
 		}
 		else
 		{
-			UserChangedSomething:=true
+			logger("a3", "user finished moving connection", FlowID)
+			UserChangedSomething := true
 		}
 	}
-	else if (clickedElement="TrashButton") ;if something is selected and user clicks on the trash button
+	else if (clickedElement = "TrashButton") ;if something is selected and user clicks on the trash button
 	{
+
 		; check whether the selected item is connection or element
 		if instr(selectedElement, "connection")
 		{
 			; The item is a connection
+			logger("a3", "user clicked on trash button of connection " selectedElement ". Going to delete it", FlowID)
 
 			; Confirm deletion
 			tempType := _getConnectionProperty(FlowID, selectedElement, "type")
@@ -317,6 +376,7 @@ clickOnPicture() ;react on clicks of the user
 		else
 		{
 			; The item is an element
+			logger("a3", "user clicked on trash button of element " selectedElement ". Going to delete it", FlowID)
 			
 			; Confirm deletion
 			tempType := _getElementProperty(FlowID, selectedElement, "type")
@@ -326,9 +386,16 @@ clickOnPicture() ;react on clicks of the user
 		
 		IfMsgBox yes ; did user agree?
 		{
+			logger("a3", "user confirmed deletion of element or connection", FlowID)
+
 			; delete selected item
 			Element_Remove(FlowID, selectedElement)
-			UserChangedSomething:=true
+			UserChangedSomething := true
+		}
+		Else
+		{
+			
+			logger("a3", "user aborted deletion of element or connection", FlowID)
 		}
 		
 		; since we deleted the selected element, recreate the selected list
@@ -336,72 +403,91 @@ clickOnPicture() ;react on clicks of the user
 	}
 	else if (clickedElement="EditButton")  ;if something is selected and user clicks on the edit button
 	{
+
 		; check whether the selected item is connection or element
 		if instr(selectedElement, "connection")
 		{
+			logger("a3", "user clicked on the edit button of connection " selectedElement ". Going to edit its type", FlowID)
+
 			; select connection type
 			ret := selectConnectionType(selectedElement,"wait")
 			if (ret = "aborted")
 			{
+				logger("a3", "user aborted changing connection type", FlowID)
 				; this will undo the action later
-				UserCancelledAction:=true
+				UserCancelledAction := true
 			}
 			else
 			{
-				UserChangedSomething:=true
+				logger("a3", "user finished changing connection type", FlowID)
+				UserChangedSomething := true
 			}
 		}
 		else
 		{
+			logger("a3", "user clicked on the edit button of element " selectedElement ". Going to edit its parameters", FlowID)
+
 			;open settings of the selected element
 			ret := ElementSettings.open(selectedElement,"wait") 
 			if (ret = "aborted")
 			{
+				logger("a3", "user aborted changing element parameters", FlowID)
 				; this will undo the action later
 				UserCancelledAction:=true
 			}
 			else if (ret!="0 changes" )
 			{
+				logger("a3", "user finished changing element parameters", FlowID)
 				; user did some changes in the properties
 				UserChangedSomething:=true
 			}
 		}
-		
-
 	}
-	else if (clickedElement="SwitchOnButton")  ;if a trigger is selected and user clicks on the switch on button
+	else if (clickedElement = "SwitchOnButton")  ;if a trigger is selected and user clicks on the switch on button
 	{
+		logger("a3", "user clicked on the switch on button of trigger " selectedElement ". Going to disable the trigger", FlowID)
+
 		; disable the trigger
 		disableOneTrigger(FlowID, selectedElement)
 	}
-	else if (clickedElement="SwitchOffButton")  ;if a trigger is selected and user clicks on the switch off button
+	else if (clickedElement = "SwitchOffButton")  ;if a trigger is selected and user clicks on the switch off button
 	{
+		logger("a3", "user clicked on the switch off button of trigger " selectedElement ". Going to enable the trigger", FlowID)
+
 		; enable the trigger
 		enableOneTrigger(FlowID, selectedElement)
 	}
-	else if (clickedElement="StarEmptyButton")  ;if a manual trigger is selected and user clicks on the empty star button
+	else if (clickedElement = "StarEmptyButton")  ;if a manual trigger is selected and user clicks on the empty star button
 	{
+		logger("a3", "user clicked on the empty star button of manual trigger " selectedElement ". Going to set this trigger as default", FlowID)
+
 		; Set this trigger as default
 		Element_setDefaultTrigger(FlowID, selectedElement)
 		UserChangedSomething := true
 	}
-	else if (clickedElement="StarFilledButton")  ;if a manual trigger is selected and user clicks on the filled start button
+	else if (clickedElement = "StarFilledButton")  ;if a manual trigger is selected and user clicks on the filled start button
 	{
+		logger("a3", "user clicked on the filled star button of manual trigger " selectedElement ". Nothing to do", FlowID)
+
 		;Nothing to do, since a flow always must have a default trigger (if it has a manual trigger )
 	}
-	else if (clickedElement!="") ;if user clicked on an element
+	else if (clickedElement != "") ;if user clicked on an element
 	{
+		logger("a3", "user clicked on the element or connection " selectedElement ". Going to detect mouse movement", FlowID)
+
 		; check whether user moves the mouse
 		if (!ui_detectMovement()) ;If user did not move the mouse
 		{
-			if (ControlKeyState="d") ;if user presses Control key
+			if (ControlKeyState = "d") ;if user presses Control key
 			{
+				logger("a3", "user did not move the mouse and holds the control key. Going to toggle select the item", FlowID)
 				; if user holds the control button
 				; select or unselect the clicked item additionally
 				SelectOneItem(clickedElement,true)
 			}
 			else
 			{
+				logger("a3", "user did not move the mouse and holds the control key. Going to select the item while unselecting others", FlowID)
 				; select the clicked item and unselect others
 				SelectOneItem(clickedElement) ;mark one element and unmark others
 			}
@@ -410,13 +496,23 @@ clickOnPicture() ;react on clicks of the user
 		{
 			if !instr(selectedElement, "connection") ; do nothing if user drags a connection
 			{
+				logger("a3", "user started moving the mouse. He clicked on a connection. Nothing to do.", FlowID)
+			}
+			Else
+			{
+				logger("a3", "user started moving the mouse. He clicked on an element. Going to move the element(s)", FlowID)
+
 				if (_getElementProperty(FlowID, clickedElement, "marked")) ;If the element under the mouse is already selected
 				{
+					logger("a3", "Element is already selected. Move the selected elements", FlowID)
+
 					;move the selected elements
 					ret := ui_moveSelectedElements(clickedElement, partOfclickedElement)
 				}
-				else if ((ControlKeyState!="d")) ;if clicked element is not selected and user does not press the control key
+				else if ((ControlKeyState != "d")) ;if clicked element is not selected and user does not press the control key
 				{
+					logger("a3", "Element is not selected and user does not hold the control key. Select it exclusively and move the selected element", FlowID)
+
 					; select the clicked item and unselect others
 					SelectOneItem(clickedElement)
 					;move the selected element
@@ -424,19 +520,23 @@ clickOnPicture() ;react on clicks of the user
 				}
 				else ;if clicked element is not selected and user presses Control key
 				{
+					logger("a3", "Element is not selected and user holds the control key. Select it additionally and move the selected elements", FlowID)
+
 					; select the clicked item additionally
-					SelectOneItem(clickedElement,true) 
+					SelectOneItem(clickedElement, true) 
 					;move the selected elements
 					ret := ui_moveSelectedElements(clickedElement, partOfclickedElement)
 				}
 				
 				if (ret.aborted)
 				{
+					logger("a3", "user aborted moving the elements", FlowID)
 					; this will undo the action later
-					UserCancelledAction:=true
+					UserCancelledAction := true
 				}
 				else if (ret.moved = true) ;if user actually moved the elements
 				{
+					logger("a3", "user finished moving the elements", FlowID)
 					UserChangedSomething := true
 				}
 			}
@@ -458,12 +558,15 @@ endworkingOnClick(changedSomething, cancelled)
 	global workingOnClick
 	if (cancelled) ; user cancelled the action
 	{
+		logger("a2", "User cancelled an action, restore current state", FlowID)
 		; restore the current state and undo all eventual changes from user
 		State_RestoreCurrent(FlowID)
 		UpdateSelectedItemsList()
 	}
 	else if (changedSomething) ; user change something
 	{
+		logger("a2", "User changed something, create a new state", FlowID)
+
 		;make a new state. If user presses Ctrl+Z, the change will be undone
 		State_New(FlowID)
 	}
@@ -477,7 +580,7 @@ endworkingOnClick(changedSomething, cancelled)
 }
 
 ; find the element which is under the mouse. Called when user clicks on the picture
-ui_findElementUnderMouse(mx, my, par_filter="", par_priority="highest")
+ui_findElementUnderMouse(mx, my, par_filter="", par_priority = "highest")
 {
 	global default_SizeOfButtons
 

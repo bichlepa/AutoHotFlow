@@ -9,7 +9,6 @@ LoadFlow(p_filepath)
 	SplitPath, ThisFlowFilepath, , ThisFlowFolder, , ThisFlowFilename
 
 	logger("a1", "Loading flow from file: " ThisFlowFilePath)
-
 	
 	; check whether the file exists
 	IfnotExist,% ThisFlowFilepath

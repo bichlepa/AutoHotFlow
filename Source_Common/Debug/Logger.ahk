@@ -23,7 +23,6 @@ logger(LogLevel, LoggingText, logSource="common")
 	{
 		if (logCategory="a")
 		{
-			
 			if (logSeverity <= _getSettings("LogLevelApp"))
 				shouldLog:=true
 		}
@@ -47,7 +46,7 @@ logger(LogLevel, LoggingText, logSource="common")
 
 		; Append current time
 		FormatTime,timestamp,a_now,yyyy MM dd HH:mm:ss
-		LoggingText:="`n--- " timestamp " ~" _ahkThreadID "~ " LoggingText
+		LoggingText:="`n--- " timestamp " ~" _ahkThreadID "~" logSource "~ " LoggingText
 
 		; add the logging text to the shared variable
 		_appendToShared("log", LoggingText)

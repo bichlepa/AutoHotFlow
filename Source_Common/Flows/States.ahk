@@ -10,8 +10,8 @@ global MAX_COUNT_OF_STATES := 100
 state_New(p_FlowID)
 {
 	_EnterCriticalSection()
+	logger("a2", "going to create a new state", p_FlowID)
 	
-
 	; if a new state was created, something was changed. Often the connection list has to be updated
 	UpdateConnectionLists(p_FlowID)
 	
@@ -35,6 +35,8 @@ state_New(p_FlowID)
 ; restore a previous state (perform an undo action)
 state_Undo(p_FlowID)
 {
+	logger("a2", "going to perform an undo", p_FlowID)
+
 	found := false
 	restored := false
 	
@@ -53,6 +55,7 @@ state_Undo(p_FlowID)
 			restored := True
 			states_Restore(p_FlowID, previousState)
 			_setFlowProperty(p_FlowID, "currentState", previousState)
+			logger("a3", "current state is now " previousState, p_FlowID)
 			break
 		}
 
@@ -66,6 +69,8 @@ state_Undo(p_FlowID)
 ; restore a next state (perform a redo action)
 state_Redo(p_FlowID)
 {
+	logger("a2", "going to perform a redo", p_FlowID)
+
 	_EnterCriticalSection()
 	
 	currentState := _getFlowProperty(p_FlowID, "currentState")
@@ -79,6 +84,7 @@ state_Redo(p_FlowID)
 			; restore the state after the current state
 			states_Restore(p_FlowID, stateID)
 			_setFlowProperty(p_FlowID, "currentState", stateID)
+			logger("a3", "current state is now " stateID, p_FlowID)
 			break
 		}
 		if (stateID =  currentState)
@@ -94,14 +100,14 @@ state_Redo(p_FlowID)
 
 ; update a state. 
 ; It will make a full copy of the current flow settings and elements
-states_Update(p_FlowID, p_newStateID, p_previousStateID = "")
+states_Update(p_FlowID, p_StateID, p_previousStateID = "")
 {
 	_EnterCriticalSection()
+	logger("a2", "Going to update state  " p_StateID, p_FlowID)
 	
 	; get current (resp. previous) state ID
 	currentState := _getFlowProperty(p_FlowID, "currentState")
 
-	
 	if (currentState)
 	{
 		;Find out whether there are changes in trigger parameters. If so, the trigger must be disabled and reenabled again
@@ -110,6 +116,7 @@ states_Update(p_FlowID, p_newStateID, p_previousStateID = "")
 		; disable all found changed enabled triggers
 		for oneIndex, oneelementID in changedTriggers
 		{
+			logger("a3", "updating state: Going to temporarely disable changed trigger " oneelementID, p_FlowID)
 			; disable one trigger. Do not save the disabled state
 			disableOneTrigger(p_FlowID, oneelementID, false)
 		}
@@ -118,20 +125,21 @@ states_Update(p_FlowID, p_newStateID, p_previousStateID = "")
 
 	; copy all elements, connections and settings
 	allElements := _getFlowProperty(p_FlowID, "allElements")
-	_setFlowProperty(p_FlowID, "states." p_newStateID ".allElements", allElements, false)
+	_setFlowProperty(p_FlowID, "states." p_StateID ".allElements", allElements, false)
 
 	allConnections := _getFlowProperty(p_FlowID, "allConnections")
-	_setFlowProperty(p_FlowID, "states." p_newStateID ".allConnections", allConnections, false)
+	_setFlowProperty(p_FlowID, "states." p_StateID ".allConnections", allConnections, false)
 
 	Settings := _getFlowProperty(p_FlowID, "Settings")
-	_setFlowProperty(p_FlowID, "states." p_newStateID ".Settings", Settings, false)
+	_setFlowProperty(p_FlowID, "states." p_StateID ".Settings", Settings, false)
 	
 	; save current state
-	_setFlowProperty(p_FlowID, "currentState", p_newStateID)
+	_setFlowProperty(p_FlowID, "currentState", p_StateID)
 
 	; if we have disabled some triggers, because they were changed on this state change, we will reenable them again
 	for oneIndex, oneelementID in changedTriggers
 	{
+		logger("a3", "updating state: Going to reenable changed trigger " oneelementID, p_FlowID)
 		enableOneTrigger(p_FlowID, oneelementID, false)
 	}
 	
@@ -143,6 +151,7 @@ states_Update(p_FlowID, p_newStateID, p_previousStateID = "")
 states_Restore(p_FlowID, p_StateID)
 {
 	_EnterCriticalSection()
+	logger("a2", "Going to restore state  " p_StateID, p_FlowID)
 	
 	; get current (resp. previous) state ID
 	currentState := _getFlowProperty(p_FlowID, "currentState")
@@ -153,6 +162,7 @@ states_Restore(p_FlowID, p_StateID)
 	; disable all found changed enabled triggers
 	for oneIndex, oneelementID in changedTriggers
 	{
+		logger("a3", "restoring state: Going to temporarely disable changed trigger " oneelementID, p_FlowID)
 		; disable one trigger. Do not save the disabled state
 		disableOneTrigger(p_FlowID, oneelementID, false)
 	}
@@ -166,11 +176,12 @@ states_Restore(p_FlowID, p_StateID)
 	_setFlowProperty(p_FlowID, "Settings", Settings, false)
 	
 	; save current state
-	_setFlowProperty(p_FlowID, "currentState", p_newStateID)
+	_setFlowProperty(p_FlowID, "currentState", p_StateID)
 
 	; if we have disabled some triggers, because they were changed on this state change, we will reenable them again
 	for oneIndex, oneelementID in changedTriggers
 	{
+		logger("a3", "restoring state: Going to reenable changed trigger " oneelementID, p_FlowID)
 		enableOneTrigger(p_FlowID, oneelementID, false)
 	}
 	
@@ -212,6 +223,8 @@ state_RestoreCurrent(p_FlowID)
 	; get current state ID
 	currentState := _getFlowProperty(p_FlowID, "currentState")
 
+	logger("a2", "going to restore current state " currentState, p_FlowID)
+
 	; restore current state
 	states_Restore(p_FlowID, currentState)
 	
@@ -233,6 +246,8 @@ states_DeleteNewerThanCurrent(p_FlowID)
 	{
 		if (found)
 		{
+			logger("a3", "delete state " stateID " which is newer than current", p_FlowID)
+
 			; we found a state that is newer than the current one. Delete it
 			_deleteFlowProperty(p_FlowID, "states." stateID)
 		}
@@ -260,6 +275,7 @@ states_DeleteTooOld(p_FlowID)
 		; delete all states which are too old
 		Loop % allStateIds.count() - MAX_COUNT_OF_STATES
 		{
+			logger("a3", "delete state " stateID " which is too old", p_FlowID)
 			_deleteFlowProperty(p_FlowID, "states." allStateIds[a_index])
 		}
 	}

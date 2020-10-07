@@ -270,7 +270,8 @@ ui_UpdateStatusbartext(which="")
 {
 	global
 	static elementtext
-	if (which!="pos")
+
+	if (which != "pos")
 	{
 		; update element text if not only the position needs to be updated
 		selectedElements := _getFlowProperty(FlowID, "selectedElements")

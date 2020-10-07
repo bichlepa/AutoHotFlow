@@ -1,4 +1,5 @@
-﻿GetAhfPath()
+﻿; Returns the path of AHF
+GetAhfPath()
 {
 	if fileexist(_ScriptDir "\AutoHotFlow.exe")
 	{
