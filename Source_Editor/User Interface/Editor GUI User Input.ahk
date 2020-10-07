@@ -12,10 +12,9 @@ ui_rightmousebuttonclick()
 ; react on a mouse click
 ui_mouseCick(button)
 {
-	global CurrentlyMainGuiIsDisabled
 	global workingOnClick
 
-	If CurrentlyMainGuiIsDisabled
+	If global_CurrentlyMainGuiIsDisabled
 	{
 		; Prevent interaction with disable gui
 		ui_ActionWhenMainGUIDisabled()
@@ -49,9 +48,7 @@ ui_mouseCick(button)
 ; user did a double click with left mouse button
 ui_leftmousebuttondoubleclick()
 {
-	global CurrentlyMainGuiIsDisabled
-
-	if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of the main gui are disabled
+	if global_CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of the main gui are disabled
 	{
 		ui_ActionWhenMainGUIDisabled()
 		logger("a3", "left mouse button double click detected. Skipping. Main GUI is disabled.", FlowID)
@@ -103,7 +100,6 @@ ui_leftmousebuttondoubleclick()
 clickOnPicture() ;react on clicks of the user
 {
 	global workingOnClick
-	global CurrentlyMainGuiIsDisabled
 
 	;Ignore if a click of user is already processed
 	if (workingOnClick)
@@ -494,7 +490,7 @@ clickOnPicture() ;react on clicks of the user
 		}
 		else ;If user moves the mouse
 		{
-			if !instr(selectedElement, "connection") ; do nothing if user drags a connection
+			if instr(selectedElement, "connection") ; do nothing if user drags a connection
 			{
 				logger("a3", "user started moving the mouse. He clicked on a connection. Nothing to do.", FlowID)
 			}

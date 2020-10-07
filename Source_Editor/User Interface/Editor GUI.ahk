@@ -1,10 +1,13 @@
-﻿; Create the main gui. Do not show yet
+﻿global global_CurrentlyMainGuiIsDisabled
+global global_CurrentlyActiveWindowHWND
+
+; Create the main gui. Do not show yet
 EditorGUIInit()
 {
 	global
 
 	;We use this variable to indicate whether the main gui is disabled
-	CurrentlyMainGuiIsDisabled:=false
+	global_CurrentlyMainGuiIsDisabled:=false
 	
 	; Create the gui. It is empty, since the draw thread will paint the picture inside the gui
 	gui,MainGUI:default
@@ -88,7 +91,7 @@ EditGUIDisable()
 {
 	global
 	; We don't disable the gui itself, but we will block user input now using this variable
-	CurrentlyMainGuiIsDisabled:=true
+	global_CurrentlyMainGuiIsDisabled:=true
 }
 
 ; Enable editor
@@ -104,7 +107,7 @@ EditGUIEnable()
 		WinActivate,% "ahk_id " _EditorGuiHwnd
 	}
 	DetectHiddenWindows,on
-	CurrentlyMainGuiIsDisabled:=false
+	global_CurrentlyMainGuiIsDisabled:=false
 	
 	; redraw picture
 	API_Draw_Draw(FlowID)
@@ -170,7 +173,7 @@ leftmousebuttondoubleclick(wpar,lpar,msg,hwn)
 	SetTimer, ui_leftmousebuttondoubleclick,-1
 }
 
-; react if user presses a key TODO, do we actually use this or the hotkeys?
+; react if user presses a key
 keyPressed(wpar, lpar, msg, hwn)
 {
 	global
@@ -181,13 +184,13 @@ keyPressed(wpar, lpar, msg, hwn)
 		return
 	}
 	
-	if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of the main gui are disabled
+	if global_CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of the main gui are disabled
 	{
 		ui_ActionWhenMainGUIDisabled()
 		return
 	}
-	wpar2:=wpar
 	
+	; wpar defines the hotkey
 	if (wpar=0x41)
 	{
 		if getkeystate("ctrl")
@@ -240,7 +243,7 @@ mousewheelmove(wpar, lpar, msg, hwn)
 		return
 	}
 	
-	if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of the main gui are disabled
+	if global_CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of the main gui are disabled
 	{
 		ui_ActionWhenMainGUIDisabled()
 		return
@@ -260,9 +263,8 @@ mousewheelmove(wpar, lpar, msg, hwn)
 ; When user tries to interact with disabled gui, enable the child gui
 ui_ActionWhenMainGUIDisabled()
 {
-	global
 	SoundPlay,*16 ; Play the warn sound
-	WinActivate,ahk_id %CurrentlyActiveWindowHWND%
+	WinActivate,ahk_id %global_CurrentlyActiveWindowHWND%
 }
 
 ; Update the status bar text

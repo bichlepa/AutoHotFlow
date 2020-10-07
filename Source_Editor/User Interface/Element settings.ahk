@@ -1,9 +1,11 @@
-﻿;Needed translations:
-temp:=lang("Trigger")
-temp:=lang("Action")
-temp:=lang("Condition")
-temp:=lang("Loop")
+﻿;Needed translations which we will use indirectly. Those calls will make the lang crawler to add them to the translation list.
+temp := lang("Trigger")
+temp := lang("Action")
+temp := lang("Condition")
+temp := lang("Loop")
 
+global global_SettingWindowParentHWND
+global global_global_SettingWindowHWND
 
 class ElementSettings
 {
@@ -12,110 +14,110 @@ class ElementSettings
 	{
 		global
 		local temp, tempYPos, tempXPos, tempEditwidth, tempIsDefault, tempAssigned, tempChecked, tempMakeNewGroup, temptoChoose, tempAltSumbit, tempChoises, tempAllChoices, tempParameterOptions, tempres, tempelement
-		;~ MsgBox agews
-		;~ MsgBox % strobj(newElement)
-		GUISettingsOfElementObject:=this
-		static NowResultEditingElement, somethingchanged, temponeValue
-		;~ static setElementID, setElementType, setElementsubType
-		static Parameterwait
-		this.element:=setElementID
-		setElementType:= _getElementProperty(FlowID, setElementID, "type")
-		setElementClass:= _getElementProperty(FlowID, setElementID, "Class")
-		setElementName:= _getElementProperty(FlowID, setElementID, "Name")
-		setElementPars:= _getElementProperty(FlowID, setElementID, "pars")
-		Parameterwait:=wait
+
+		this.changes := alreadyChangedSomething ;will be incremented if a change will be detected
+
+		this.element := setElementID
+
+		; create some global variables
+		this.elementType := _getElementProperty(FlowID, this.element, "type")
+		this.elementClass := _getElementProperty(FlowID, this.element, "Class")
+		this.elementName := _getElementProperty(FlowID, this.element, "Name")
+		this.elementPars := _getElementProperty(FlowID, this.element, "pars")
+
+		this.wait := wait
 		
-		NowResultEditingElement:=""
+		NowResultEditingElement := ""
 		
-		static varsToDelete:=[] ;TODO: maybe unnecessary
-		ElementSettingsFields:={} ;global. contains the fields which will be shown in the GUI. Each field is a bunch of controls
-		ElementSettingsFieldHWNDs:={} ;global. Contains the field hwnds and the field object. Needed for responding user input
-		ElementSettingsFieldParIDs:={} ;global. Contains the field hwnds and the field object. Needed for responding user input
+		this.fields:={} ;global. contains the fields which will be shown in the GUI. Each field is a bunch of controls
+		this.fieldHWNDs:={} ;global. Contains the field hwnds and the field object. Needed for responding user input
+		this.fieldParIDs:={} ;global. Contains the field hwnds and the field object. Needed for responding user input
 		
 		EditGUIDisable()
 		
 		;block general update
-		generalUpdateRunning:=true
+		this.initializing := true
+		this.generalUpdateRunning:=true
 		
 		;Create a scrollable Child GUI will almost all controls
-		gui,SettingsOfElement:default
-		gui +hwndSettingWindowHWND
+		gui,GUISettingsOfElement:default
+		gui +hwndglobal_SettingWindowHWND
 		gui +vscroll
 		gui,-DPIScale
-		CurrentlyActiveWindowHWND:=SettingWindowHWND
+
+		global_CurrentlyActiveWindowHWND:=global_SettingWindowHWND
 		
 		;Get the parameter list
-		parametersToEdit:=Element_getParametrizationDetails(setElementClass, {flowID: FlowID, elementID: setElementID, updateOnEdit: true})
-		parametersList:=Element_getParameters(setElementClass, {flowID: FlowID, elementID: setElementID})
-		;~ d(parametersList,"element settings")
+		this.parametersToEdit:=Element_getParametrizationDetails(this.elementClass, {flowID: FlowID, elementID: this.elementID, updateOnEdit: true})
+
 		;All elements have the parameter "name" and "StandardName"
-		ElementSettingsFields.push(new this.label({label: lang("name (name)")}))
-		ElementSettingsFields.push(new this.name({id: ["name", "StandardName"]}))
+		this.fields.push(new this.label({label: lang("name (name)")}))
+		this.fields.push(new this.name({id: ["name", "StandardName"]}))
 		
 		
 		;Loop through all parameters
-		for index, parameter in parametersToEdit
+		for index, parameter in this.parametersToEdit
 		{
 			;Add one or a group of controls. This is done dynamically, dependent on the parameters
 			if (parameter.type="Label")
 			{
-				ElementSettingsFields.push(new this.label(parameter))
+				this.fields.push(new this.label(parameter))
 			}
 			else if (parameter.type="Edit")
 			{
-				ElementSettingsFields.push(new this.edit(parameter))
+				this.fields.push(new this.edit(parameter))
 			}
 			else if (parameter.type="multilineEdit")
 			{
-				ElementSettingsFields.push(new this.multilineEdit(parameter))
+				this.fields.push(new this.multilineEdit(parameter))
 			}
 			else if (parameter.type="Checkbox")
 			{
-				ElementSettingsFields.push(new this.checkbox(parameter))
+				this.fields.push(new this.checkbox(parameter))
 			}
 			else if (parameter.type="Radio")
 			{
-				ElementSettingsFields.push(new this.radio(parameter))
+				this.fields.push(new this.radio(parameter))
 			}
 			else if (parameter.type="Slider")
 			{
-				ElementSettingsFields.push(new this.slider(parameter))
+				this.fields.push(new this.slider(parameter))
 			}
 			else if (parameter.type="DropDown")
 			{
-				ElementSettingsFields.push(new this.DropDown(parameter))
+				this.fields.push(new this.DropDown(parameter))
 			}
 			else if (parameter.type="ComboBox")
 			{
-				ElementSettingsFields.push(new this.ComboBox(parameter))
+				this.fields.push(new this.ComboBox(parameter))
 			}
 			else if (parameter.type="Hotkey")
 			{
-				ElementSettingsFields.push(new this.Hotkey(parameter))
+				this.fields.push(new this.Hotkey(parameter))
 			}
 			else if (parameter.type="Button")
 			{
-				ElementSettingsFields.push(new this.Button(parameter))
+				this.fields.push(new this.Button(parameter))
 			}
 			else if (parameter.type="File")
 			{
-				ElementSettingsFields.push(new this.file(parameter))
+				this.fields.push(new this.file(parameter))
 			}
 			else if (parameter.type="Folder")
 			{
-				ElementSettingsFields.push(new this.folder(parameter))
+				this.fields.push(new this.folder(parameter))
 			}
 			else if (parameter.type="weekdays")
 			{
-				ElementSettingsFields.push(new this.weekdays(parameter))
+				this.fields.push(new this.weekdays(parameter))
 			}
 			else if (parameter.type="DateAndTime")
 			{
-				ElementSettingsFields.push(new this.DateAndTime(parameter))
+				this.fields.push(new this.DateAndTime(parameter))
 			}
 			else if (parameter.type="listbox")
 			{
-				ElementSettingsFields.push(new this.listbox(parameter))
+				this.fields.push(new this.listbox(parameter))
 			}
 			
 		}
@@ -128,19 +130,19 @@ class ElementSettings
 		gui, GUISettingsOfElementParent:-DPIScale
 		Gui, GUISettingsOfElementParent:Margin, 0, 20
 		gui,GUISettingsOfElementParent:+resize
-		gui,GUISettingsOfElementParent:+hwndSettingWindowParentHWND
-		gui,GUISettingsOfElementParent:+LabelSettingsOfElementParent
+		gui,GUISettingsOfElementParent:+hwndglobal_SettingWindowParentHWND
+		gui,GUISettingsOfElementParent:+LabelGUISettingsOfElementParent
 		
 		;Make the child window appear inside the parent window
-		Gui, SettingsOfElement:-Caption
-		Gui, SettingsOfElement:+parentGUISettingsOfElementParent
-		gui, SettingsOfElement:show,x0 y20
+		Gui, GUISettingsOfElement:-Caption
+		Gui, GUISettingsOfElement:+parentGUISettingsOfElementParent
+		gui, GUISettingsOfElement:show,x0 y20
 		
 		
 		;Get the size of the child window
-		WinGetPos, , , WsettingsChild, HsettingsChild,% "ahk_id " SettingWindowHWND
-		Winmove,% "ahk_id " SettingWindowHWND, ,, , % WsettingsChild + 10, % HsettingsChild
-		WinGetPos, , , WsettingsChild, HsettingsChild,% "ahk_id " SettingWindowHWND
+		WinGetPos, , , WsettingsChild, HsettingsChild,% "ahk_id " global_SettingWindowHWND
+		Winmove,% "ahk_id " global_SettingWindowHWND, ,, , % WsettingsChild + 10, % HsettingsChild
+		WinGetPos, , , WsettingsChild, HsettingsChild,% "ahk_id " global_SettingWindowHWND
 		
 		;Calculate the position of controls which are outside the child window (this is temporary calculation. it will be recalculated in the size-routine)
 		YsettingsButtoPos := HsettingsChild + 30
@@ -156,22 +158,24 @@ class ElementSettings
 		
 		;add buttons
 		gui,GUISettingsOfElementParent:font,s8 cDefault wnorm
-		gui, GUISettingsOfElementParent:add,button, w370 x10 y10 gGUISettingsOfElementSelectType h20,% lang("%1%_type:_%2%",lang(setElementType),Element_getName_%setElementClass%())
+		setElementClass := this.elementClass
+		gui, GUISettingsOfElementParent:add,button, w370 x10 y10 gGUISettingsOfElementSelectType h20,% lang("%1%_type:_%2%",lang(this.elementType),Element_getName_%setElementClass%())
 		gui, GUISettingsOfElementParent:add,button, w20 X+10 yp h20 gGUISettingsOfElementHelp vGUISettingsOfElementHelp,?
 		;~ guicontrol,focus,GUISettingsOfElementHelp
 		Gui, GUISettingsOfElementParent:Add, Button, gGUISettingsOfElementSave vButtonSave w145 x10 h30 y%YsettingsButtoPos%,% lang("Save")
 		Gui, GUISettingsOfElementParent:Add, Button, gGUISettingsOfElementCancel vButtonCancel default w145 h30 yp X+10,% lang("Cancel")
 		;Make GUI autosizing
-		Gui, GUISettingsOfElementParent:Show, hide w%WSettingsParent%,% lang("Settings") " - " lang(setElementType) " - " Element_getName_%setElementClass%()
+		setElementClass := this.elementClass
+		Gui, GUISettingsOfElementParent:Show, hide w%WSettingsParent%,% lang("Settings") " - " lang(this.elementType) " - " Element_getName_%setElementClass%()
 		
-		_setShared("hwnds.ElementSettingsChild" FlowID, SettingWindowHWND)
-		_setShared("hwnds.ElementSettingsParent" FlowID, SettingWindowParentHWND)
+		_setShared("hwnds.ElementSettingsChild" FlowID, global_SettingWindowHWND)
+		_setShared("hwnds.ElementSettingsParent" FlowID, global_SettingWindowParentHWND)
 		
 		;Calculate position to show the settings window in the middle of the main window
 		pos:=EditGUIGetPos()
 		tempHeight:=round(pos.h-100) ;This will be the max height. If child gui is larger, it must be scrolled
 		DetectHiddenWindows,on
-		WinGetPos,ElSetingGUIX,ElSetingGUIY,ElSetingGUIW,ElSetingGUIH,ahk_id %SettingWindowParentHWND%
+		WinGetPos,ElSetingGUIX,ElSetingGUIY,ElSetingGUIW,ElSetingGUIH,ahk_id %global_SettingWindowParentHWND%
 		if (ElSetingGUIH < tempHeight)
 			tempHeight := ElSetingGUIH
 		tempXpos:=round(pos.x+pos.w/2- ElSetingGUIW/2)
@@ -182,20 +186,20 @@ class ElementSettings
 		
 		
 		;position lower buttons
-		wingetpos,,,ElSetingGUIW,ElSetingGUIH, ahk_id %SettingWindowParentHWND%
-		WinMove,ahk_id %SettingWindowParentHWND%,,,,% ElSetingGUIW,% ElSetingGUIH+1 ;make the autosize function trigger, which resizes and moves the scrollgui
+		wingetpos,,,ElSetingGUIW,ElSetingGUIH, ahk_id %global_SettingWindowParentHWND%
+		WinMove,ahk_id %global_SettingWindowParentHWND%,,,,% ElSetingGUIW,% ElSetingGUIH+1 ;make the autosize function trigger, which resizes and moves the scrollgui
 		
 		
 		
-		CurrentlyActiveWindowHWND:=SettingWindowParentHWND
+		global_CurrentlyActiveWindowHWND:=global_SettingWindowParentHWND
 		
-		openingElementSettingsWindow:=false
+		this.initializing:=false
 		
 		
 		gui,GUISettingsOfElementParent:show
 		
 		;release general update
-		generalUpdateRunning:=false
+		this.generalUpdateRunning:=false
 		this.generalUpdate(True)
 		
 		if (wait=1 or wait="wait") ;Wait until user closes the window
@@ -213,15 +217,15 @@ class ElementSettings
 		
 		;If user wants to change the subtype of the element
 		GUISettingsOfElementSelectType:
-		gui,SettingsOfElement:destroy
+		gui,GUISettingsOfElement:destroy
 		gui,GUISettingsOfElementParent:destroy
 		ui_closeHelp() 
 		EditGUIEnable()
 		
-		tempres:=selectSubType(setElementId, "wait")
+		tempres:=selectSubType(ElementSettings.element, "wait")
 		if tempres!=aborted
 		{
-			NowResultEditingElement:= ElementSettings.open(setelementId,Parameterwait, true)
+			NowResultEditingElement:= ElementSettings.open(ElementSettings.element, ElementSettings.wait, true)
 		}
 		else 
 		{
@@ -234,40 +238,40 @@ class ElementSettings
 		IfWinExist,ahk_id %GUIHelpHWND%
 			ui_closeHelp()
 		else
-			ui_showHelp(setElementID)
+			ui_showHelp(ElementSettings.element)
 		return
 		
 		
 		
 		
 		
-		SettingsOfElementParentClose:
-		SettingsOfElementParentEscape:
+		GUISettingsOfElementParentClose:
+		GUISettingsOfElementParentEscape:
 		GUISettingsOfElementCancel:
 		;~ ToolTip %a_thislabel%
 		; todo: undo of changed is not needed
-		if (setElementName="Νew Соntainȩr" or setElementName="Νew Triggȩr") ;Delete the element if it was newly created
+		if (ElementSettings.elementName="Νew Соntainȩr" or ElementSettings.elementName="Νew Triggȩr") ;Delete the element if it was newly created
 		{
-			_deleteElement(FlowID, setElementID)
+			_deleteElement(FlowID, ElementSettings.element)
 		}
 		
-		previousSubType := _getElementProperty(FlowID, setElementID, "previousSubType")
+		previousSubType := _getElementProperty(FlowID, ElementSettings.element, "previousSubType")
 		if (element.previousSubType) ;restore previous subtype of element if it was changed recently
 		{
-			_setElementProperty(FlowID, setElementID, "SubType", previousSubType)
-			_deleteElementProperty(FlowID, setElementID, "previousSubType")
+			_setElementProperty(FlowID, ElementSettings.element, "SubType", previousSubType)
+			_deleteElementProperty(FlowID, ElementSettings.element, "previousSubType")
 		}
 		
 		ui_closeHelp() 
 		
-		gui,SettingsOfElement:destroy
+		gui,GUISettingsOfElement:destroy
 		gui,GUISettingsOfElementParent:destroy
 		
 		GUISettingsOfElementRemoveInfoTooltip()
 		
 		EditGUIEnable()
 		NowResultEditingElement:="aborted"
-		GUISettingsOfElementObject.close()
+		ElementSettings.close()
 		return
 		
 		
@@ -275,10 +279,10 @@ class ElementSettings
 		GUISettingsOfElementSave:
 		_EnterCriticalSection()
 		
-		GUISettingsOfElementobject.generalUpdate()
-		;~ gui,SettingsOfElement:submit
+		ElementSettings.generalUpdate()
+		;~ gui,GUISettingsOfElement:submit
 		
-		if (setElementType="trigger" and triggersEnabled=true) ;When editing a trigger, disable Triggers and enable them afterwards
+		if (ElementSettings.elementType="trigger" and triggersEnabled=true) ;When editing a trigger, disable Triggers and enable them afterwards
 		{
 			tempReenablethen:=true
 			;r_EnableFlow() ;TODO ;Disable flow
@@ -287,12 +291,11 @@ class ElementSettings
 			tempReenablethen:=false
 		
 		;Save the parameters
-		somethingchanged:=alreadyChangedSomething ;will be incremented if a change will be detected
-		_setElementProperty(FlowID, setElementID, "Name", ElementSettingsNameField.getValue("Name"))
-		_setElementProperty(FlowID, setElementID, "StandardName", ElementSettingsNameField.getValue("StandardName"))
+		_setElementProperty(FlowID, ElementSettings.element, "Name", ElementSettingsNameField.getValue("Name"))
+		_setElementProperty(FlowID, ElementSettings.element, "StandardName", ElementSettingsNameField.getValue("StandardName"))
 		
 		;~ MsgBox % strobj(parametersToEdit)
-		for ElementSaveindex, parameter in parametersToEdit
+		for ElementSaveindex, parameter in ElementSettings.parametersToEdit
 		{
 			if not IsObject(parameter.id)
 				parameterID:=[parameter.id]
@@ -318,15 +321,13 @@ class ElementSettings
 			for ElementSaveindex2, oneID in parameterID
 			{
 				tempOneParID:=parameterID[ElementSaveindex2]
-				temponeValue:=ElementSettingsFieldParIDs[tempOneParID].getValue(tempOneParID)
-				tempOldValue := _getElementProperty(FlowID, setElementID, "pars." tempOneParID)
+				temponeValue:=ElementSettings.fieldParIDs[tempOneParID].getValue(tempOneParID)
+				tempOldValue := _getElementProperty(FlowID, ElementSettings.element, "pars." tempOneParID)
 				if (tempOldValue!=temponeValue)
-					somethingchanged++
+					ElementSettings.changes++
 
-				_setElementProperty(FlowID, setElementID, "pars." tempOneParID, temponeValue)
+				_setElementProperty(FlowID, ElementSettings.element, "pars." tempOneParID, temponeValue)
 				
-				;~ IfMsgBox cancel
-					;~ MsgBox % strobj(ElementSettingsFieldParIDs)
 			
 			}
 			
@@ -337,14 +338,14 @@ class ElementSettings
 		temponeValue:=""
 		
 		ui_closeHelp() 
-		gui,SettingsOfElement:destroy
+		gui,GUISettingsOfElement:destroy
 		gui,GUISettingsOfElementParent:destroy
 		GUISettingsOfElementRemoveInfoTooltip()
 		
 		EditGUIEnable()
 		
 
-		NowResultEditingElement:=somethingchanged " Changes"
+		NowResultEditingElement:=ElementSettings.changes " Changes"
 		
 		;if (tempReenablethen) ;TODO
 			;r_EnableFlow()
@@ -352,7 +353,7 @@ class ElementSettings
 		
 		
 		API_Draw_Draw(FlowID)
-		GUISettingsOfElementObject.close()
+		ElementSettings.close()
 		return
 		
 	}
@@ -373,20 +374,20 @@ class ElementSettings
 			{
 				for index, onepar in parameter.id
 				{
-					ElementSettingsFieldParIDs[onepar]:=this
+					ElementSettings.fieldParIDs[onepar]:=this
 				}
 			}
 			else if (parameter.id!="")
-				ElementSettingsFieldParIDs[parameter.id]:=this
+				ElementSettings.fieldParIDs[parameter.id]:=this
 			if (isobject(parameter.contentid))
 			{
 				for index, onepar in parameter.contentid
 				{
-					ElementSettingsFieldParIDs[onepar]:=this
+					ElementSettings.fieldParIDs[onepar]:=this
 				}
 			}
 			else if (parameter.contentid!="")
-				ElementSettingsFieldParIDs[parameter.contentid]:=this
+				ElementSettings.fieldParIDs[parameter.contentid]:=this
 		}
 		
 		;Get value of a field. 
@@ -406,7 +407,7 @@ class ElementSettings
 					tempParameterID:=tempParameterID[1]
 				
 				;~ d(this, "getvalue 1 " tempParameterID)
-				GUIControlGet,temp,SettingsOfElement:,GUISettingsOfElement%tempParameterID%
+				GUIControlGet,temp,GUISettingsOfElement:,GUISettingsOfElement%tempParameterID%
 				return temp
 			}
 			else
@@ -423,12 +424,12 @@ class ElementSettings
 					{
 						;if so, get value
 						;~ d(this, "getvalue 2 " parameterID)
-						GUIControlGet,temp,SettingsOfElement:,GUISettingsOfElement%oneid%
+						GUIControlGet,temp,GUISettingsOfElement:,GUISettingsOfElement%oneid%
 						return temp
 					}
 				}
 				;Find object which has the requested parameter ID and call it
-				for oneIndex, oneField in ElementSettingsFields
+				for oneIndex, oneField in ElementSettings.fields
 				{
 					;make list of all available parameter ID of oneField object
 					tempParameterID:=oneField.parameter.id
@@ -472,7 +473,7 @@ class ElementSettings
 					tempParameterID:=tempParameterID[1]
 				
 				;~ d(this, "setvalue 1 " tempParameterID ": " value)
-				GUIControl,SettingsOfElement:,GUISettingsOfElement%tempParameterID%,% value
+				GUIControl,GUISettingsOfElement:,GUISettingsOfElement%tempParameterID%,% value
 				return
 			}
 			else
@@ -489,12 +490,12 @@ class ElementSettings
 					{
 						;if so, set value
 						;~ d(this, "setvalue 2 " parameterID)
-						GUIControl,SettingsOfElement:,GUISettingsOfElement%oneid%,% value
+						GUIControl,GUISettingsOfElement:,GUISettingsOfElement%oneid%,% value
 						return
 					}
 				}
 				;Find object which has the requested parameter ID and call it
-				for oneIndex, oneField in ElementSettingsFields
+				for oneIndex, oneField in ElementSettings.fields
 				{
 					;make list of all available parameter ID of oneField object
 					tempParameterID:=oneField.parameter.id
@@ -539,7 +540,7 @@ class ElementSettings
 					tempParameterID:=[tempParameterID]
 				
 				;Find object which has the requested parameter ID and call it
-				for oneIndex, oneField in ElementSettingsFields
+				for oneIndex, oneField in ElementSettings.fields
 				{
 					;make list of all available parameter ID of oneField object
 					tempParameterID:=oneField.parameter.id
@@ -579,7 +580,7 @@ class ElementSettings
 					tempParameterID:=[tempParameterID]
 				
 				;Find object which has the requested parameter ID and call it
-				for oneIndex, oneField in ElementSettingsFields
+				for oneIndex, oneField in ElementSettings.fields
 				{
 					;make list of all available parameter ID of oneField object
 					tempParameterID:=oneField.parameter.id
@@ -611,7 +612,7 @@ class ElementSettings
 				;enable all components
 				for index, component in this.components
 				{
-					guicontrol,SettingsOfElement:enable%enOrDis%,% component
+					guicontrol,GUISettingsOfElement:enable%enOrDis%,% component
 				}
 				this.enabled:=enOrDis
 			}
@@ -632,7 +633,7 @@ class ElementSettings
 						;enable all components
 						for index, component in this.components
 						{
-							guicontrol,SettingsOfElement:enable%enOrDis%,% component
+							guicontrol,GUISettingsOfElement:enable%enOrDis%,% component
 						}
 						if (this.enabled != enOrDis)
 						{
@@ -643,7 +644,7 @@ class ElementSettings
 					}
 				}
 				;Find object which has the requested parameter ID and call it
-				for oneIndex, oneField in ElementSettingsFields
+				for oneIndex, oneField in ElementSettings.fields
 				{
 					;make list of all available parameter ID of oneField object
 					tempParameterID:=oneField.parameter.id
@@ -694,17 +695,15 @@ class ElementSettings
 			
 			gui,font,s8 cDefault wnorm
 			
-			tempchecked:= _getElementProperty(FlowID, setElementID, "StandardName")
+			tempchecked:= _getElementProperty(FlowID, ElementSettings.element, "StandardName")
 			
 			gui,add,checkbox, x10 hwndtempHWND checked%tempchecked% vGUISettingsOfElementStandardName gGUISettingsOfElementCheckStandardName,% lang("Standard_name")
 			this.components.push("GUISettingsOfElementStandardName")
-			ElementSettingsFieldHWNDs[tempHWND]:=this
-			gui,add,edit,w400 x10 Multi r5 hwndtempHWND vGUISettingsOfElementName gGUISettingsOfElementGeneralUpdate,% setElementName
+			ElementSettings.fieldHWNDs[tempHWND]:=this
+			gui,add,edit,w400 x10 Multi r5 hwndtempHWND vGUISettingsOfElementName gGUISettingsOfElementGeneralUpdate,% ElementSettings.elementName
 			this.components.push("GUISettingsOfElementName")
-			ElementSettingsFieldHWNDs[tempHWND]:=this
+			ElementSettings.fieldHWNDs[tempHWND]:=this
 			
-			varsToDelete.push("GUISettingsOfElementCheckStandardName")
-			varsToDelete.push("GUISettingsOfElementEditName")
 			
 		}
 		
@@ -713,12 +712,13 @@ class ElementSettings
 		{
 			global
 			local Newname
-			if (openingElementSettingsWindow=true)
+			if (ElementSettings.initializing=true)
 				return
 			if (this.getvalue("StandardName")=1)
 			{
 				this.disable("Name")
-				Newname:=Element_GenerateName_%setElementClass%({flowID: FlowID, ElementID: setElementID}, p_CurrentPars) 
+				setElementClass := ElementSettings.elementClass
+				Newname:=Element_GenerateName_%setElementClass%({flowID: FlowID, ElementID: ElementSettings.element}, p_CurrentPars) 
 				StringReplace,Newname,Newname,`n,%a_space%-%a_space%,all
 				this.setvalue(Newname, "Name")
 			}
@@ -751,7 +751,6 @@ class ElementSettings
 			if (tempParameterID!="")
 			{
 				gui,add,text,x10 w400 %tempYPos% vGUISettingsOfElement%tempParameterID% ,% parameter.label
-				varsToDelete.push("GUISettingsOfElement" tempParameterID)
 				this.components.push("GUISettingsOfElement" tempParameterID)
 			}
 			else
@@ -775,7 +774,7 @@ class ElementSettings
 				tempParameterID:=parameterID
 			
 			
-			GUIControl,SettingsOfElement:,GUISettingsOfElement%tempParameterID%,% value
+			GUIControl,GUISettingsOfElement:,GUISettingsOfElement%tempParameterID%,% value
 			return
 		}
 		
@@ -790,7 +789,7 @@ class ElementSettings
 			local tempParameterID:=parameter.id
 			
 			gui,font,s8 cDefault wnorm
-			temp:=setElementPars[parameter.id] 
+			temp:=ElementSettings.elementPars[parameter.id] 
 			temptext:=parameter.label
 			if parameter.gray
 				tempParGray=check3
@@ -798,9 +797,8 @@ class ElementSettings
 				tempParGray=
 			gui,add,checkbox,w400 x10 %tempParGray% checked%temp% hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID%,%temptext%
 			this.components.push("GUISettingsOfElement" tempParameterID)
-			ElementSettingsFieldHWNDs[tempHWND]:=this
+			ElementSettings.fieldHWNDs[tempHWND]:=this
 			
-			varsToDelete.push("GUISettingsOfElement" tempParameterID)
 		}
 		
 		setLabel(value, parameterID="")
@@ -818,7 +816,7 @@ class ElementSettings
 				tempParameterID:=parameterID
 			
 			
-			GUIControl,SettingsOfElement:text,GUISettingsOfElement%tempParameterID%,% value
+			GUIControl,GUISettingsOfElement:text,GUISettingsOfElement%tempParameterID%,% value
 			return
 		}
 	}
@@ -834,7 +832,7 @@ class ElementSettings
 			local hasEnum
 			
 			gui,font,s8 cDefault wnorm
-			temp:=setElementPars[tempParameterID] 
+			temp:=ElementSettings.elementPars[tempParameterID] 
 			tempAssigned:=false
 			for tempindex, tempRadioLabel in parameter.choices
 			{
@@ -853,16 +851,15 @@ class ElementSettings
 					
 				gui,add,radio, w400 x10 %tempChecked% %tempMakeNewGroup% hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID%%a_index% ,% tempRadioLabel
 				this.components.push("GUISettingsOfElement" tempParameterID a_index)
-				ElementSettingsFieldHWNDs[tempHWND]:=this
+				ElementSettings.fieldHWNDs[tempHWND]:=this
 				
-				varsToDelete.push("GUISettingsOfElement" tempParameterID a_index)
 			}
 			if (tempAssigned=false) ;Catch if a wrong value was saved and set to default value. 
 			;TODO: is this a good idea? If this happens and user opens the settings window, he might erroneously thing that everything is ok.
 			{
 				
 				temp:=parameter.default
-				guicontrol,SettingsOfElement:,GUISettingsOfElement%tempParameterID%%temp%,1
+				guicontrol,GUISettingsOfElement:,GUISettingsOfElement%tempParameterID%%temp%,1
 			}
 		}
 		
@@ -874,7 +871,7 @@ class ElementSettings
 			
 			loop % this.parameter.choices.MaxIndex()
 			{
-				guicontrolget,temp,SettingsOfElement:,GUISettingsOfElement%tempParameterID%%a_index%
+				guicontrolget,temp,GUISettingsOfElement:,GUISettingsOfElement%tempParameterID%%a_index%
 				if (temp=1)
 				{
 					if (this.parameter.result = "enum")
@@ -915,7 +912,7 @@ class ElementSettings
 			{
 				temp:=A_Index
 			}
-			GUIControl,SettingsOfElement:,GUISettingsOfElement%tempParameterID%%temp%,1
+			GUIControl,GUISettingsOfElement:,GUISettingsOfElement%tempParameterID%%temp%,1
 			return temp
 		}
 		
@@ -935,7 +932,7 @@ class ElementSettings
 				tempParameterID:=parameterID
 			
 			
-			GUIControl,SettingsOfElement:text,GUISettingsOfElement%tempParameterID%,% value
+			GUIControl,GUISettingsOfElement:text,GUISettingsOfElement%tempParameterID%,% value
 			return
 		}
 	}
@@ -981,7 +978,7 @@ class ElementSettings
 					return
 				}
 				
-				tempContentTypeNum:=setElementPars[tempParameterContentTypeID] ;get the saved parameter
+				tempContentTypeNum:=ElementSettings.elementPars[tempParameterContentTypeID] ;get the saved parameter
 				if tempContentTypeNum is not number ;Get the index of the content type
 				{
 					for oneindex, onevalue in parameter.content
@@ -1014,9 +1011,8 @@ class ElementSettings
 					
 					gui,add,radio, w400 x10 %tempchecked% %tempgrpStr% hwndtempHWND gGUISettingsOfElementChangeRadio vGUISettingsOfElement%tempParameterContentTypeID%%A_Index% ,% this.contentTypeLangs[parameter.content[a_index]]
 					this.components.push("GUISettingsOfElement" tempParameterContentTypeID a_index)
-					ElementSettingsFieldHWNDs[tempHWND]:=this
+					ElementSettings.fieldHWNDs[tempHWND]:=this
 					
-					varsToDelete.push("GUISettingsOfElement" tempParameterContentTypeID a_index)
 				}
 				
 				if (tempAssigned=false) ;Catch if a wrong value or no was saved and set to default value.
@@ -1036,7 +1032,7 @@ class ElementSettings
 			;Add picture, which will warn user if the entry is obviously invalid
 			gui,add,picture,x394 w16 h16 hwndtempHWND gGUISettingsOfElementClickOnWarningPic vGUISettingsOfElementWarningIconOf%tempFirstParameterID%
 			this.components.push("GUISettingsOfElementWarningIconOf" tempFirstParameterID)
-			ElementSettingsFieldHWNDs[tempHWND]:=this
+			ElementSettings.fieldHWNDs[tempHWND]:=this
 			this.warnIfEmpty:=parameter.WarnIfEmpty
 			
 			
@@ -1044,7 +1040,7 @@ class ElementSettings
 			tempselectedContentType:=parameter.content[1]
 			gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempFirstParameterID%,%_ScriptDir%\icons\%tempselectedContentType%.ico
 			this.components.push("GUISettingsOfElementInfoIconOf" tempFirstParameterID)
-			ElementSettingsFieldHWNDs[tempHWND]:=this
+			ElementSettings.fieldHWNDs[tempHWND]:=this
 			
 			
 			loop % parameter.id.MaxIndex()
@@ -1053,11 +1049,11 @@ class ElementSettings
 				;Add the edit control(s)
 				tempwAvailable:=360
 				tempw:=(tempwAvailable - (4 * (parameter.id.MaxIndex() -1)) ) / parameter.id.MaxIndex()
-				temptext:=setElementPars[tempOneParameterID]
+				temptext:=ElementSettings.elementPars[tempOneParameterID]
 				
 				gui,add,edit,X+4 w%tempw% %tempIsMulti% r1 hwndtempHWND gGUISettingsOfElementCheckContent vGUISettingsOfElement%tempOneParameterID%,%temptext%
 				this.components.push("GUISettingsOfElement" tempOneParameterID)
-				ElementSettingsFieldHWNDs[tempHWND]:=this
+				ElementSettings.fieldHWNDs[tempHWND]:=this
 				
 				if (parameter.id.MaxIndex() = 1 and tempParameterContentType[1] = "expression")
 				{
@@ -1068,16 +1064,12 @@ class ElementSettings
 							gui,add,updown,% "range" parameter.range
 						else
 							gui,add,updown
-						guicontrol,SettingsOfElement:,GUISettingsOfElement%tempOneParameterID%,%temptext%
+						guicontrol,GUISettingsOfElement:,GUISettingsOfElement%tempOneParameterID%,%temptext%
 					}
 				}
-				
-				varsToDelete.push("GUISettingsOfElement" tempOneParameterID)
 			}
 			
 			this.changeRadio()
-			
-			varsToDelete.push("GUISettingsOfElementInfoIconOf" tempFirstParameterID, "GUISettingsOfElementWarningIconOf" tempOneParameterID)
 			
 			
 		}
@@ -1091,7 +1083,7 @@ class ElementSettings
 			{
 				loop % this.parameter.content.MaxIndex()
 				{
-					GUIControlGet,temp,SettingsOfElement:,GUISettingsOfElement%parameterID%%a_index%
+					GUIControlGet,temp,GUISettingsOfElement:,GUISettingsOfElement%parameterID%%a_index%
 					if temp=1
 					{
 						temp := this.parameter.content[ a_index]
@@ -1112,7 +1104,7 @@ class ElementSettings
 				}
 				else
 					tempParameterID:=parameterID
-				GUIControlGet,temp,SettingsOfElement:,GUISettingsOfElement%tempParameterID%
+				GUIControlGet,temp,GUISettingsOfElement:,GUISettingsOfElement%tempParameterID%
 				return temp
 			}
 			
@@ -1130,14 +1122,14 @@ class ElementSettings
 					tempParameterID:=tempParameterID[1]
 				
 				;~ d(this, "setvalue 1 " tempParameterID ": " value)
-				GUIControl,SettingsOfElement:,GUISettingsOfElement%tempParameterID%,% value
+				GUIControl,GUISettingsOfElement:,GUISettingsOfElement%tempParameterID%,% value
 				return
 			}
 			else if (parameterID=this.parameter.contentID)
 			{
 				if value is number
 				{
-					GUIControl,SettingsOfElement:,GUISettingsOfElement%parameterID%%value%,% 1
+					GUIControl,GUISettingsOfElement:,GUISettingsOfElement%parameterID%%value%,% 1
 				}
 				else
 				{
@@ -1145,7 +1137,7 @@ class ElementSettings
 					{
 						if (value := this.parameter.content[a_index])
 						{
-							GUIControl,SettingsOfElement:,GUISettingsOfElement%parameterID%%a_index%,% 1
+							GUIControl,GUISettingsOfElement:,GUISettingsOfElement%parameterID%%a_index%,% 1
 							break
 						}
 					}
@@ -1158,7 +1150,7 @@ class ElementSettings
 				{
 					if (parameterID = oneid)
 					{
-						GUIControl,SettingsOfElement:,GUISettingsOfElement%oneid%,% value
+						GUIControl,GUISettingsOfElement:,GUISettingsOfElement%oneid%,% value
 						return
 					}
 				}
@@ -1197,8 +1189,8 @@ class ElementSettings
 						;Warn if there are percent signs.
 						IfInString,tempTextInControl,`%
 						{
-							guicontrol,SettingsOfElement:show,GUISettingsOfElementWarningIconOf%tempFirstParamID%
-							guicontrol,SettingsOfElement:,GUISettingsOfElementWarningIconOf%tempFirstParamID%,%_ScriptDir%\Icons\Question mark.ico
+							guicontrol,GUISettingsOfElement:show,GUISettingsOfElementWarningIconOf%tempFirstParamID%
+							guicontrol,GUISettingsOfElement:,GUISettingsOfElementWarningIconOf%tempFirstParamID%,%_ScriptDir%\Icons\Question mark.ico
 							This.warningText:=lang("Note!") " " lang("This is an expression.") " " lang("You mus not use percent signs to add a variable's content.") "`n" lang("But you can still use percent signs if the variable name or a part of it is stored in a variable.")
 						}
 					}
@@ -1229,8 +1221,8 @@ class ElementSettings
 						catch
 						{
 							;The variable name is not valid
-							guicontrol,SettingsOfElement:show,GUISettingsOfElementWarningIconOf%tempFirstParamID%
-							guicontrol,SettingsOfElement:,GUISettingsOfElementWarningIconOf%tempFirstParamID%,%_ScriptDir%\Icons\Exclamation mark.ico
+							guicontrol,GUISettingsOfElement:show,GUISettingsOfElementWarningIconOf%tempFirstParamID%
+							guicontrol,GUISettingsOfElement:,GUISettingsOfElementWarningIconOf%tempFirstParamID%,%_ScriptDir%\Icons\Exclamation mark.ico
 							This.warningText:=lang("Error!") " " lang("The variable name is not valid.") "`n"
 						}
 					}
@@ -1244,8 +1236,8 @@ class ElementSettings
 						tempTextInControl:=this.getvalue(oneparamID)
 						if tempTextInControl=
 						{
-							guicontrol,SettingsOfElement:show,GUISettingsOfElementWarningIconOf%tempFirstParamID%
-							guicontrol,SettingsOfElement:,GUISettingsOfElementWarningIconOf%tempFirstParamID%,%_ScriptDir%\Icons\Exclamation mark.ico
+							guicontrol,GUISettingsOfElement:show,GUISettingsOfElementWarningIconOf%tempFirstParamID%
+							guicontrol,GUISettingsOfElement:,GUISettingsOfElementWarningIconOf%tempFirstParamID%,%_ScriptDir%\Icons\Exclamation mark.ico
 							This.warningText:=lang("Error!") " " lang("This field must not be empty!") "`n"
 						}
 					}
@@ -1254,16 +1246,16 @@ class ElementSettings
 			else
 			{
 				;This parameter and its controls are disabled. If so, hide all warnings.
-				guicontrol,SettingsOfElement:hide,GUISettingsOfElementWarningIconOf%tempFirstParamID%
+				guicontrol,GUISettingsOfElement:hide,GUISettingsOfElementWarningIconOf%tempFirstParamID%
 			}
 			
-			if (This.warningText="" and !openingElementSettingsWindow)
+			if (This.warningText="" and !ElementSettings.initializing)
 			{
 				;If no warning are present, hide the picture
-				guicontrol,SettingsOfElement:hide,GUISettingsOfElementWarningIconOf%tempFirstParamID%
+				guicontrol,GUISettingsOfElement:hide,GUISettingsOfElementWarningIconOf%tempFirstParamID%
 			}
 			
-			GUISettingsOfElementObject.GeneralUpdate()
+			ElementSettings.GeneralUpdate()
 		}
 		
 		;Show hint if user clicks on the info-picture
@@ -1320,19 +1312,19 @@ class ElementSettings
 				tempRadioVal:=this.parameter.content[1]
 			}
 			tempFirstParamID:=this.parameter.id[1] ;This value is needed to get the icon controls
-			;~ GUIControlGet,temp,SettingsOfElement:,GUISettingsOfElement%tempContentTypeID%1
+			;~ GUIControlGet,temp,GUISettingsOfElement:,GUISettingsOfElement%tempContentTypeID%1
 			
 			if (tempRadioVal="string" or tempRadioVal="rawstring") 
 			{
-				guicontrol,SettingsOfElement:,GUISettingsOfElementInfoIconOf%tempFirstParamID%,%_ScriptDir%\Icons\String.ico
+				guicontrol,GUISettingsOfElement:,GUISettingsOfElementInfoIconOf%tempFirstParamID%,%_ScriptDir%\Icons\String.ico
 			}
 			else if (tempRadioVal="expression" or tempRadioVal="number") 
 			{
-				guicontrol,SettingsOfElement:,GUISettingsOfElementInfoIconOf%tempFirstParamID%,%_ScriptDir%\Icons\Expression.ico
+				guicontrol,GUISettingsOfElement:,GUISettingsOfElementInfoIconOf%tempFirstParamID%,%_ScriptDir%\Icons\Expression.ico
 			}
 			else if (tempRadioVal="variableName") 
 			{
-				guicontrol,SettingsOfElement:,GUISettingsOfElementInfoIconOf%tempFirstParamID%,%_ScriptDir%\Icons\VariableName.ico
+				guicontrol,GUISettingsOfElement:,GUISettingsOfElementInfoIconOf%tempFirstParamID%,%_ScriptDir%\Icons\VariableName.ico
 			}
 			
 			this.checkcontent()
@@ -1351,22 +1343,20 @@ class ElementSettings
 			local tempParameterRows:=parameter.rows
 			if not tempParameterRows 
 				tempParameterRows:=5
-			temp:=setElementPars[parameter.id] 
-			temptext:=setElementPars[tempParameterID]
+			temp:=ElementSettings.elementPars[parameter.id] 
+			temptext:=ElementSettings.elementPars[tempParameterID]
 			
 			gui,font,s8 cDefault wnorm
 			gui,add,edit,w380 x10 multi r%tempParameterRows% hwndtempHWND gGUISettingsOfElementCheckContent vGUISettingsOfElement%tempParameterID%,%temptext%
 			this.components.push("GUISettingsOfElement" tempParameterID)
-			ElementSettingsFieldHWNDs[tempHWND]:=this
+			ElementSettings.fieldHWNDs[tempHWND]:=this
 			
 			;Add picture, which will warn user if the entry is obviously invalid
 			gui,add,picture,X+4 w16 hp hwndtempHWND gGUISettingsOfElementClickOnWarningPic vGUISettingsOfElementWarningIconOf%tempParameterID%
 			guicontrol,move,GUISettingsOfElementWarningIconOf%tempParameterID%, h16 ;Workaround. Otherwise the next control would be overlapped with the multiline edit field
 			this.components.push("GUISettingsOfElementWarningIconOf" tempParameterID)
-			ElementSettingsFieldHWNDs[tempHWND]:=this
+			ElementSettings.fieldHWNDs[tempHWND]:=this
 			this.warnIfEmpty:=parameter.WarnIfEmpty
-			
-			varsToDelete.push("GUISettingsOfElement" tempParameterID, "GUISettingsOfElementWarningIconOf" tempParameterID)
 		}
 		checkContent()
 		{
@@ -1385,8 +1375,8 @@ class ElementSettings
 					tempTextInControl:=this.getvalue(tempParamID)
 					if tempTextInControl=
 					{
-						guicontrol,SettingsOfElement:show,GUISettingsOfElementWarningIconOf%tempParamID%
-						guicontrol,SettingsOfElement:,GUISettingsOfElementWarningIconOf%tempParamID%,%_ScriptDir%\Icons\Exclamation mark.ico
+						guicontrol,GUISettingsOfElement:show,GUISettingsOfElementWarningIconOf%tempParamID%
+						guicontrol,GUISettingsOfElement:,GUISettingsOfElementWarningIconOf%tempParamID%,%_ScriptDir%\Icons\Exclamation mark.ico
 						This.warningText:=lang("Error!") " " lang("This field must not be empty!") "`n"
 					}
 					
@@ -1395,16 +1385,16 @@ class ElementSettings
 			else
 			{
 				;This parameter and its controls are disabled. If so, hide all warnings.
-				guicontrol,SettingsOfElement:hide,GUISettingsOfElementWarningIconOf%tempParamID%
+				guicontrol,GUISettingsOfElement:hide,GUISettingsOfElementWarningIconOf%tempParamID%
 			}
 			
-			if (This.warningText="" and !openingElementSettingsWindow)
+			if (This.warningText="" and !ElementSettings.initializing)
 			{
 				;If no warning are present, hide the picture
-				guicontrol,SettingsOfElement:hide,GUISettingsOfElementWarningIconOf%tempParamID%
+				guicontrol,GUISettingsOfElement:hide,GUISettingsOfElementWarningIconOf%tempParamID%
 			}
 			
-			GUISettingsOfElementObject.GeneralUpdate()
+			ElementSettings.GeneralUpdate()
 		}
 	}
 	
@@ -1418,20 +1408,20 @@ class ElementSettings
 			local tempParameterID:=parameter.id
 			
 			gui,font,s8 cDefault wnorm
-			temp:=setElementPars[tempParameterID] 
+			temp:=ElementSettings.elementPars[tempParameterID] 
 			
 			tempParameterOptions:=parameter.options
 			if (parameter.allowExpression=true)
 			{
 				gui,add,picture,x10 w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempParameterID%,%_ScriptDir%\icons\expression.ico
 				this.components.push("GUISettingsOfElementInfoIconOf" tempParameterID)
-				ElementSettingsFieldHWNDs[tempHWND]:=this
+				ElementSettings.fieldHWNDs[tempHWND]:=this
 				gui,add,edit,X+6 w190 hwndtempHWND gGUISettingsOfElementSliderChangeEdit vGUISettingsOfElement%tempParameterID%,%temp%
 				this.components.push("GUISettingsOfElement" tempParameterID)
-				ElementSettingsFieldHWNDs[tempHWND]:=this
+				ElementSettings.fieldHWNDs[tempHWND]:=this
 				gui,add,slider, w180 X+10 %tempParameterOptions%  hwndtempHWND gGUISettingsOfElementSliderChangeSlide vGUISettingsOfElementSlideOf%tempParameterID% ,% temp
 				this.components.push("GUISettingsOfElementSlideOf" tempParameterID)
-				ElementSettingsFieldHWNDs[tempHWND]:=this
+				ElementSettings.fieldHWNDs[tempHWND]:=this
 				
 				this.contentType:="Expression"
 			}
@@ -1439,13 +1429,9 @@ class ElementSettings
 			{
 				gui,add,slider, w400 x10 %tempParameterOptions% hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID% ,% temp
 				this.components.push("GUISettingsOfElement" tempParameterID)
-				ElementSettingsFieldHWNDs[tempHWND]:=this
+				ElementSettings.fieldHWNDs[tempHWND]:=this
 				
 			}
-			
-			varsToDelete.push("GUISettingsOfElement" tempParameterID)
-			varsToDelete.push("GUISettingsOfElementInfoIconOf" tempParameterID)
-			varsToDelete.push("GUISettingsOfElementSlideOf" tempParameterID)
 		}
 		
 		sliderChangeEdit()
@@ -1479,7 +1465,7 @@ class ElementSettings
 			local tempParameterID:=parameter.id
 			
 			gui,font,s8 cDefault wnorm
-			temp:=setElementPars[tempParameterID] 
+			temp:=ElementSettings.elementPars[tempParameterID] 
 			
 			if (parameter.result != "number" and parameter.result != "string" and parameter.result != "enum")
 				MsgBox unexpected error: the parameter "result" of "DropDown" is unset or has unsupported value
@@ -1516,8 +1502,7 @@ class ElementSettings
 			StringTrimLeft,tempAllChoices,tempAllChoices,1
 			gui,add,DropDownList, w400 x10 %tempAltSumbit% choose%temptoChoose% hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID% ,% tempAllChoices
 			this.components.push("GUISettingsOfElement" tempParameterID)
-			ElementSettingsFieldHWNDs[tempHWND]:=this
-			varsToDelete.push("GUISettingsOfElement" tempParameterID)
+			ElementSettings.fieldHWNDs[tempHWND]:=this
 		}
 		getvalue()
 		{
@@ -1559,7 +1544,7 @@ class ElementSettings
 			{
 				temp:=A_Index
 			}
-			GUIControl,SettingsOfElement:,GUISettingsOfElement%tempParameterID%%value%,1
+			GUIControl,GUISettingsOfElement:,GUISettingsOfElement%tempParameterID%%value%,1
 			return temp
 		}
 	}
@@ -1576,7 +1561,7 @@ class ElementSettings
 			local tempParameterID:=parameter.id
 			
 			gui,font,s8 cDefault wnorm
-			tempChosen:=setElementPars[tempParameterID] 
+			tempChosen:=ElementSettings.elementPars[tempParameterID] 
 			temptoChooseText := tempChosen
 			if (parameter.result="number")
 			{
@@ -1605,7 +1590,7 @@ class ElementSettings
 			;Add picture, which will warn user if the entry is obviously invalid
 			gui,add,picture,x394 w16 h16 hwndtempHWND gGUISettingsOfElementClickOnWarningPic vGUISettingsOfElementWarningIconOf%tempParameterID%
 			this.components.push("GUISettingsOfElementWarningIconOf" tempParameterID)
-			ElementSettingsFieldHWNDs[tempHWND]:=this
+			ElementSettings.fieldHWNDs[tempHWND]:=this
 			this.warnIfEmpty:=parameter.WarnIfEmpty
 			
 			if (parameter.content="Expression")
@@ -1613,11 +1598,11 @@ class ElementSettings
 				;The info icon tells user which conent type it is
 				gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempParameterID%,%_ScriptDir%\icons\expression.ico
 				this.components.push("GUISettingsOfElementInfoIconOf" tempParameterID)
-				ElementSettingsFieldHWNDs[tempHWND]:=this
+				ElementSettings.fieldHWNDs[tempHWND]:=this
 				
 				gui,add,ComboBox, X+4 yp w360 hwndtempHWND %tempAltSumbit% gGUISettingsOfElementCheckContent vGUISettingsOfElement%tempParameterID% ,% tempAllChoices
 				this.components.push("vGUISettingsOfElement" tempParameterID)
-				ElementSettingsFieldHWNDs[tempHWND]:=this
+				ElementSettings.fieldHWNDs[tempHWND]:=this
 				this.ContentType:="Expression"
 				;~ GUISettingsOfElementContentType%tempParameterID%=Expression
 			}
@@ -1626,11 +1611,11 @@ class ElementSettings
 				;The info icon tells user which conent type it is
 				gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempParameterID%,%_ScriptDir%\icons\expression.ico
 				this.components.push("GUISettingsOfElementInfoIconOf" tempParameterID)
-				ElementSettingsFieldHWNDs[tempHWND]:=this
+				ElementSettings.fieldHWNDs[tempHWND]:=this
 				
 				gui,add,ComboBox, X+4 yp w360 hwndtempHWND %tempAltSumbit% gGUISettingsOfElementCheckContent vGUISettingsOfElement%tempParameterID% ,% tempAllChoices
 				this.components.push("vGUISettingsOfElement" tempParameterID)
-				ElementSettingsFieldHWNDs[tempHWND]:=this
+				ElementSettings.fieldHWNDs[tempHWND]:=this
 				this.ContentType:="Number"
 				;~ GUISettingsOfElementContentType%tempParameterID%=Expression
 			}
@@ -1638,11 +1623,11 @@ class ElementSettings
 			{
 				gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempParameterID%,%_ScriptDir%\icons\string.ico
 				this.components.push("GUISettingsOfElementInfoIconOf" tempParameterID)
-				ElementSettingsFieldHWNDs[tempHWND]:=this
+				ElementSettings.fieldHWNDs[tempHWND]:=this
 				
 				gui,add,ComboBox, X+4 yp w360 hwndtempHWND %tempAltSumbit% gGUISettingsOfElementCheckContent vGUISettingsOfElement%tempParameterID% ,% tempAllChoices
 				this.components.push("GUISettingsOfElement" tempParameterID)
-				ElementSettingsFieldHWNDs[tempHWND]:=this
+				ElementSettings.fieldHWNDs[tempHWND]:=this
 				
 				this.ContentType:="String"
 				;~ GUISettingsOfElementContentType%tempParameterID%=String
@@ -1651,11 +1636,11 @@ class ElementSettings
 			{
 				gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempParameterID%,%_ScriptDir%\icons\VariableName.ico
 				this.components.push("GUISettingsOfElementInfoIconOf" tempParameterID)
-				ElementSettingsFieldHWNDs[tempHWND]:=this
+				ElementSettings.fieldHWNDs[tempHWND]:=this
 				
 				gui,add,ComboBox, X+4 yp w360 hwndtempHWND %tempAltSumbit% gGUISettingsOfElementCheckContent vGUISettingsOfElement%tempParameterID% ,% tempAllChoices
 				this.components.push("GUISettingsOfElement" tempParameterID)
-				ElementSettingsFieldHWNDs[tempHWND]:=this
+				ElementSettings.fieldHWNDs[tempHWND]:=this
 				
 				this.ContentType:="VariableName"
 				;~ GUISettingsOfElementContentType%tempParameterID%=VariableName
@@ -1664,13 +1649,11 @@ class ElementSettings
 			{
 				gui,add,ComboBox, x10 yp w380 hwndtempHWND %tempAltSumbit%  gGUISettingsOfElementCheckContent vGUISettingsOfElement%tempParameterID% ,% tempAllChoices
 				this.components.push("GUISettingsOfElement" tempParameterID)
-				ElementSettingsFieldHWNDs[tempHWND]:=this
+				ElementSettings.fieldHWNDs[tempHWND]:=this
 			}
 			
 			this.setvalue(tempChosen)
-			;~ guicontrol,SettingsOfElement:text,GUISettingsOfElement%tempParameterID%,% temptoChooseText
-			
-			varsToDelete.push("GUISettingsOfElement" tempParameterID, "GUISettingsOfElementContentTypeRadio" tempParameterID, "GUISettingsOfElementInfoIconOf" tempParameterID, "GUISettingsOfElementWarningIconOf" tempParameterID)
+			;~ guicontrol,GUISettingsOfElement:text,GUISettingsOfElement%tempParameterID%,% temptoChooseText
 			
 		}
 		
@@ -1681,7 +1664,7 @@ class ElementSettings
 			local tempParameterID:=this.parameter.id
 			
 			
-			guicontrolget,temp,SettingsOfElement:,GUISettingsOfElement%tempParameterID%
+			guicontrolget,temp,GUISettingsOfElement:,GUISettingsOfElement%tempParameterID%
 			;~ ToolTip asdöfio  - %temp% - %tempParameterID%
 			return temp
 		}
@@ -1704,22 +1687,22 @@ class ElementSettings
 					{
 						if (tempLabelChoice = value)
 						{
-							GUIControl,SettingsOfElement:Choose,GUISettingsOfElement%tempParameterID%,% tempindexChoice
+							GUIControl,GUISettingsOfElement:Choose,GUISettingsOfElement%tempParameterID%,% tempindexChoice
 							somethingChosen:=true
 							break
 						}
 					}
 					if (somethingChosen!=true)
-						GUIControl,SettingsOfElement:text,GUISettingsOfElement%tempParameterID%,% value
+						GUIControl,GUISettingsOfElement:text,GUISettingsOfElement%tempParameterID%,% value
 				}
 				else
 				{
 					;~ ToolTip value %value%
 					if (value > 0 and value <= this.par_choices.MaxIndex())
-						GUIControl,SettingsOfElement:choose,GUISettingsOfElement%tempParameterID%,% value
+						GUIControl,GUISettingsOfElement:choose,GUISettingsOfElement%tempParameterID%,% value
 					else
 					{
-						GUIControl,SettingsOfElement:text,GUISettingsOfElement%tempParameterID%,% value
+						GUIControl,GUISettingsOfElement:text,GUISettingsOfElement%tempParameterID%,% value
 					}
 				}
 				
@@ -1728,7 +1711,7 @@ class ElementSettings
 			}
 			else
 			{
-				for oneIndex, oneField in ElementSettingsFields
+				for oneIndex, oneField in ElementSettings.fields
 				{
 					if (oneField.parameter.id = parameterID)
 						onefield.setvalue(value)
@@ -1769,7 +1752,7 @@ class ElementSettings
 			}
 			this.par_choices:=value
 			
-			GUIControl,SettingsOfElement:,GUISettingsOfElement%tempParameterID%,% tempAllChoices
+			GUIControl,GUISettingsOfElement:,GUISettingsOfElement%tempParameterID%,% tempAllChoices
 			return
 		}
 		
@@ -1791,8 +1774,8 @@ class ElementSettings
 				{
 					IfInString,tempTextInControl,`%
 					{
-						guicontrol,SettingsOfElement:show,GUISettingsOfElementWarningIconOf%tempOneParamID%
-						guicontrol,SettingsOfElement:,GUISettingsOfElementWarningIconOf%tempOneParamID%,%_ScriptDir%\Icons\Question mark.ico
+						guicontrol,GUISettingsOfElement:show,GUISettingsOfElementWarningIconOf%tempOneParamID%
+						guicontrol,GUISettingsOfElement:,GUISettingsOfElementWarningIconOf%tempOneParamID%,%_ScriptDir%\Icons\Question mark.ico
 						This.warningText:=lang("Note!") " " lang("This is an expression.") " " lang("You musn't use percent signs to add a variable's content.") "`n"
 					}
 				}
@@ -1811,8 +1794,8 @@ class ElementSettings
 						asdf%tempTextInControlReplaced%:=1 
 					catch
 					{
-						guicontrol,SettingsOfElement:show,GUISettingsOfElementWarningIconOf%tempOneParamID%
-						guicontrol,SettingsOfElement:,GUISettingsOfElementWarningIconOf%tempOneParamID%,%_ScriptDir%\Icons\Exclamation mark.ico
+						guicontrol,GUISettingsOfElement:show,GUISettingsOfElementWarningIconOf%tempOneParamID%
+						guicontrol,GUISettingsOfElement:,GUISettingsOfElementWarningIconOf%tempOneParamID%,%_ScriptDir%\Icons\Exclamation mark.ico
 						This.warningText:=lang("Error!") " " lang("The variable name is not valid.") "`n"
 					}
 				}
@@ -1821,19 +1804,19 @@ class ElementSettings
 				{
 					if tempTextInControl=
 					{
-						guicontrol,SettingsOfElement:show,GUISettingsOfElementWarningIconOf%tempOneParamID%
-						guicontrol,SettingsOfElement:,GUISettingsOfElementWarningIconOf%tempOneParamID%,%_ScriptDir%\Icons\Exclamation mark.ico
+						guicontrol,GUISettingsOfElement:show,GUISettingsOfElementWarningIconOf%tempOneParamID%
+						guicontrol,GUISettingsOfElement:,GUISettingsOfElementWarningIconOf%tempOneParamID%,%_ScriptDir%\Icons\Exclamation mark.ico
 						This.warningText:=lang("Error!") " " lang("This field mustn't be empty!") "`n"
 					}
 				}
 			}
 			;~ ToolTip(This.warningText)
-			if (This.warningText="" and !openingElementSettingsWindow)
+			if (This.warningText="" and !ElementSettings.initializing)
 			{
 				
-				guicontrol,SettingsOfElement:hide,GUISettingsOfElementWarningIconOf%tempOneParamID%
+				guicontrol,GUISettingsOfElement:hide,GUISettingsOfElementWarningIconOf%tempOneParamID%
 			}
-			GUISettingsOfElementObject.GeneralUpdate()
+			ElementSettings.GeneralUpdate()
 		}
 		
 		clickOnInfoPic()
@@ -1876,17 +1859,14 @@ class ElementSettings
 			local tempParameterID:=parameter.id
 			
 			gui,font,s8 cDefault wnorm
-			temp:=setElementPars[tempParameterID] 
+			temp:=ElementSettings.elementPars[tempParameterID] 
 			
 			gui,add,edit,w300 x10 hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID%,%temp%
 			this.components.push("GUISettingsOfElement" tempParameterID)
-			ElementSettingsFieldHWNDs[tempHWND]:=this
+			ElementSettings.fieldHWNDs[tempHWND]:=this
 			gui,add,hotkey,w90 X+10 hwndtempHWND gGUISettingsOfElementHotkey vGUISettingsOfElement%tempParameterID%hotkey,%temp%
 			this.components.push("GUISettingsOfElementHotkey" tempParameterID)
-			ElementSettingsFieldHWNDs[tempHWND]:=this
-			
-			varsToDelete.push("GUISettingsOfElement" tempParameterID)
-			varsToDelete.push("GUISettingsOfElementHotkey" tempParameterID)
+			ElementSettings.fieldHWNDs[tempHWND]:=this
 		}
 		
 		changeHotkey()
@@ -1915,9 +1895,7 @@ class ElementSettings
 			temp:=parameter.goto
 			gui,add,button,w400 x10 hwndtempHWND gGUISettingsOfElementButton vGUISettingsOfElement%tempParameterID%,% parameter.label
 			this.components.push("GUISettingsOfElement" tempParameterID)
-			ElementSettingsFieldHWNDs[tempHWND]:=this
-			
-			varsToDelete.push("GUISettingsOfElement" tempParameterID)
+			ElementSettings.fieldHWNDs[tempHWND]:=this
 		}
 		
 		clickOnButton()
@@ -1941,7 +1919,7 @@ class ElementSettings
 					}
 					else if (countpars = 2) ;One mandantory parameters
 					{
-						%templabel%({flowID: FlowID, elementID: setElementID})
+						%templabel%({flowID: FlowID, elementID: ElementSettings.element})
 					}
 					else
 					{
@@ -1967,18 +1945,15 @@ class ElementSettings
 			local tempParameterID:=parameter.id
 			
 			gui,font,s8 cDefault wnorm
-			temp:=setElementPars[tempParameterID] 
+			temp:=ElementSettings.elementPars[tempParameterID] 
 			
 			gui,add,edit,w370 x10 hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID%,%temp%
 			this.components.push("GUISettingsOfElement" tempParameterID)
-			ElementSettingsFieldHWNDs[tempHWND]:=this
+			ElementSettings.fieldHWNDs[tempHWND]:=this
 			
 			gui,add,button,w20 X+10 hwndtempHWND gGUISettingsOfElementButton vGUISettingsOfElementbutton%tempParameterID%,...
 			this.components.push("GUISettingsOfElementbutton" tempParameterID)
-			ElementSettingsFieldHWNDs[tempHWND]:=this
-			
-			varsToDelete.push("GUISettingsOfElementbutton" tempParameterID)
-			varsToDelete.push("GUISettingsOfElement" tempParameterID)
+			ElementSettings.fieldHWNDs[tempHWND]:=this
 		}
 		clickOnButton()
 		{
@@ -2005,18 +1980,15 @@ class ElementSettings
 			local tempParameterID:=parameter.id
 			
 			gui,font,s8 cDefault wnorm
-			temp:=setElementPars[tempParameterID] 
+			temp:=ElementSettings.elementPars[tempParameterID] 
 			
 			
 			gui,add,edit,w370 x10 hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID%,%temp%
 			this.components.push("GUISettingsOfElement" tempParameterID)
-			ElementSettingsFieldHWNDs[tempHWND]:=this
+			ElementSettings.fieldHWNDs[tempHWND]:=this
 			gui,add,button,w20 X+10 hwndtempHWND gGUISettingsOfElementButton vGUISettingsOfElementbutton%tempParameterID%,...
 			this.components.push("GUISettingsOfElementbutton" tempParameterID)
-			ElementSettingsFieldHWNDs[tempHWND]:=this
-			
-			varsToDelete.push("GUISettingsOfElementbutton" tempParameterID)
-			varsToDelete.push("GUISettingsOfElement" tempParameterID)
+			ElementSettings.fieldHWNDs[tempHWND]:=this
 		}
 		
 		clickOnButton()
@@ -2046,29 +2018,29 @@ class ElementSettings
 			local tempParameterID:=parameter.id
 			
 			gui,font,s8 cDefault wnorm
-			temp:=setElementPars[tempParameterID] 
+			temp:=ElementSettings.elementPars[tempParameterID] 
 			
 			gui,add,checkbox,w45 x10 hwndtempHWND gGUISettingsOfElementWeekdays vGUISettingsOfElement%tempParameterID%2,% lang("Mon (Short for Monday")
 			this.components.push("GUISettingsOfElement" tempParameterID "2")
-			ElementSettingsFieldHWNDs[tempHWND]:=this
+			ElementSettings.fieldHWNDs[tempHWND]:=this
 			gui,add,checkbox,w45 X+10 hwndtempHWND gGUISettingsOfElementWeekdays vGUISettingsOfElement%tempParameterID%3,% lang("Tue (Short for Tuesday")
 			this.components.push("GUISettingsOfElement" tempParameterID "3")
-			ElementSettingsFieldHWNDs[tempHWND]:=this
+			ElementSettings.fieldHWNDs[tempHWND]:=this
 			gui,add,checkbox,w45 X+10 hwndtempHWND gGUISettingsOfElementWeekdays vGUISettingsOfElement%tempParameterID%4,% lang("Wed (Short for Wednesday")
 			this.components.push("GUISettingsOfElement" tempParameterID "4")
-			ElementSettingsFieldHWNDs[tempHWND]:=this
+			ElementSettings.fieldHWNDs[tempHWND]:=this
 			gui,add,checkbox,w45 X+10 hwndtempHWND gGUISettingsOfElementWeekdays vGUISettingsOfElement%tempParameterID%5,% lang("Thu (Short for Thursday")
 			this.components.push("GUISettingsOfElement" tempParameterID "5")
-			ElementSettingsFieldHWNDs[tempHWND]:=this
+			ElementSettings.fieldHWNDs[tempHWND]:=this
 			gui,add,checkbox,w45 X+10 hwndtempHWND gGUISettingsOfElementWeekdays vGUISettingsOfElement%tempParameterID%6,% lang("Fri (Short for Friday")
 			this.components.push("GUISettingsOfElement" tempParameterID "6")
-			ElementSettingsFieldHWNDs[tempHWND]:=this
+			ElementSettings.fieldHWNDs[tempHWND]:=this
 			gui,add,checkbox,w45 X+10 hwndtempHWND gGUISettingsOfElementWeekdays vGUISettingsOfElement%tempParameterID%7,% lang("Sat (Short for Saturday")
 			this.components.push("GUISettingsOfElement" tempParameterID "7")
-			ElementSettingsFieldHWNDs[tempHWND]:=this
+			ElementSettings.fieldHWNDs[tempHWND]:=this
 			gui,add,checkbox,w45 X+10 hwndtempHWND gGUISettingsOfElementWeekdays vGUISettingsOfElement%tempParameterID%1,% lang("Sun (Short for Sunday") ;Sunday is 1
 			this.components.push("GUISettingsOfElement" tempParameterID "1")
-			ElementSettingsFieldHWNDs[tempHWND]:=this
+			ElementSettings.fieldHWNDs[tempHWND]:=this
 			
 			IfInString,temp,1
 				guicontrol,,GUISettingsOfElement%tempParameterID%1,1
@@ -2086,15 +2058,6 @@ class ElementSettings
 				guicontrol,,GUISettingsOfElement%tempParameterID%7,1
 			
 			;~ GUISettingsOfElement%tempParameterID%:=temp
-			
-			varsToDelete.push("GUISettingsOfElement" tempParameterID)
-			varsToDelete.push("GUISettingsOfElement" tempParameterID1)
-			varsToDelete.push("GUISettingsOfElement" tempParameterID2)
-			varsToDelete.push("GUISettingsOfElement" tempParameterID3)
-			varsToDelete.push("GUISettingsOfElement" tempParameterID4)
-			varsToDelete.push("GUISettingsOfElement" tempParameterID5)
-			varsToDelete.push("GUISettingsOfElement" tempParameterID6)
-			varsToDelete.push("GUISettingsOfElement" tempParameterID7)
 		}
 		
 		getvalue(parameterID="")
@@ -2109,7 +2072,7 @@ class ElementSettings
 			temp:=""
 			loop 7
 			{
-				GUIControlGet,tempValue,SettingsOfElement:,GUISettingsOfElement%tempParameterID%%a_index%
+				GUIControlGet,tempValue,GUISettingsOfElement:,GUISettingsOfElement%tempParameterID%%a_index%
 				if (tempValue=1)
 				{
 					temp.=A_Index
@@ -2128,19 +2091,19 @@ class ElementSettings
 				tempParameterID:=parameterID
 			
 			IfInString,value,1
-				guicontrol,SettingsOfElement:,GUISettingsOfElement%tempParameterID%1,1
+				guicontrol,GUISettingsOfElement:,GUISettingsOfElement%tempParameterID%1,1
 			IfInString,value,2
-				guicontrol,SettingsOfElement:,GUISettingsOfElement%tempParameterID%2,1
+				guicontrol,GUISettingsOfElement:,GUISettingsOfElement%tempParameterID%2,1
 			IfInString,value,3
-				guicontrol,SettingsOfElement:,GUISettingsOfElement%tempParameterID%3,1
+				guicontrol,GUISettingsOfElement:,GUISettingsOfElement%tempParameterID%3,1
 			IfInString,value,4
-				guicontrol,SettingsOfElement:,GUISettingsOfElement%tempParameterID%4,1
+				guicontrol,GUISettingsOfElement:,GUISettingsOfElement%tempParameterID%4,1
 			IfInString,value,5
-				guicontrol,SettingsOfElement:,GUISettingsOfElement%tempParameterID%5,1
+				guicontrol,GUISettingsOfElement:,GUISettingsOfElement%tempParameterID%5,1
 			IfInString,value,6
-				guicontrol,SettingsOfElement:,GUISettingsOfElement%tempParameterID%6,1
+				guicontrol,GUISettingsOfElement:,GUISettingsOfElement%tempParameterID%6,1
 			IfInString,value,7
-				guicontrol,SettingsOfElement:,GUISettingsOfElement%tempParameterID%7,1
+				guicontrol,GUISettingsOfElement:,GUISettingsOfElement%tempParameterID%7,1
 			
 			return
 		}
@@ -2175,16 +2138,14 @@ class ElementSettings
 			}
 			
 			gui,font,s8 cDefault wnorm
-			temp:=setElementPars[tempParameterID] 
+			temp:=ElementSettings.elementPars[tempParameterID] 
 			if temp=
 			{
 				temp=%a_now%
 			}
 			gui,add,DateTime,w400 x10 choose%temp% gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID% ,% tempFormat
 			this.components.push("GUISettingsOfElement" tempParameterID)
-			ElementSettingsFieldHWNDs[tempHWND]:=this
-			
-			varsToDelete.push("GUISettingsOfElement" tempParameterID)
+			ElementSettings.fieldHWNDs[tempHWND]:=this
 		}
 	}
 	
@@ -2198,7 +2159,7 @@ class ElementSettings
 			local tempParameterID:=parameter.id
 			
 			gui,font,s8 cDefault wnorm
-			tempChosen:=setElementPars[tempParameterID] 
+			tempChosen:=ElementSettings.elementPars[tempParameterID] 
 			tempChoices:=parameter.choices
 			this.choices:=tempChoices
 			tempChoicesString:=""
@@ -2233,9 +2194,7 @@ class ElementSettings
 			gui,add,listbox,w400 x10 %tempMulti% %tempSort% %tempAltSubmit% hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID%,%tempChoicesString%
 			
 			this.components.push("GUISettingsOfElement" tempParameterID)
-			ElementSettingsFieldHWNDs[tempHWND]:=this
-			
-			varsToDelete.push("GUISettingsOfElement" tempParameterID)
+			ElementSettings.fieldHWNDs[tempHWND]:=this
 			
 			this.setvalue(tempChosen)
 		}
@@ -2253,7 +2212,7 @@ class ElementSettings
 			else
 				tempParameterID:=parameterID
 			
-			GUIControlGet,tempChosen,SettingsOfElement:,GUISettingsOfElement%tempParameterID%
+			GUIControlGet,tempChosen,GUISettingsOfElement:,GUISettingsOfElement%tempParameterID%
 			
 			tempChosenObj:=Object()
 			loop,parse,tempChosen,|
@@ -2309,7 +2268,7 @@ class ElementSettings
 					{
 						if (tempLabelChoice = tempLabelChosen)
 						{
-							GUIControl,SettingsOfElement:Choose,GUISettingsOfElement%tempParameterID%,% tempindexChoice
+							GUIControl,GUISettingsOfElement:Choose,GUISettingsOfElement%tempParameterID%,% tempindexChoice
 						}
 					}
 				}
@@ -2318,7 +2277,7 @@ class ElementSettings
 			{
 				for tempindexChosen, tempNumberChosen in value
 				{
-					GUIControl,SettingsOfElement:Choose,GUISettingsOfElement%tempParameterID%,% tempNumberChosen
+					GUIControl,GUISettingsOfElement:Choose,GUISettingsOfElement%tempParameterID%,% tempNumberChosen
 				}
 			}
 			return
@@ -2334,7 +2293,7 @@ class ElementSettings
 		global
 		local tempOneParID, temponeValue
 		local tempPars:=Object()
-		for ElementSaveindex, parameter in parametersToEdit
+		for ElementSaveindex, parameter in ElementSettings.parametersToEdit
 		{
 			;Get the keys which are specified in key "ID"
 			if not IsObject(parameter.id)
@@ -2361,7 +2320,7 @@ class ElementSettings
 			for ElementSaveindex2, oneID in parameterID
 			{
 				tempOneParID:=parameterID[ElementSaveindex2]
-				temponeValue:=ElementSettingsFieldParIDs[tempOneParID].getValue(tempOneParID)
+				temponeValue:=ElementSettings.fieldParIDs[tempOneParID].getValue(tempOneParID)
 				tempPars[tempOneParID]:=temponeValue
 				;~ d(temponeValue, tempOneParID)
 			
@@ -2377,18 +2336,19 @@ class ElementSettings
 	generalUpdate(firstCall=False)
 	{
 		global
-		if (generalUpdateRunning)
+		if (ElementSettings.generalUpdateRunning)
 		{
 			return
 		}
-		generalUpdateRunning:=True
+		ElementSettings.generalUpdateRunning:=True
 		GUISettingsOfElementRemoveInfoTooltip()
 		;~ ToolTip updakljö
-		allParamValues:=GUISettingsOfElementObject.getAllValues()
-		_setElementProperty(FlowID, setElementID, "FirstCallOfCheckSettings", firstCall) .FirstCallOfCheckSettings:=firstCall
-		Element_CheckSettings_%setElementClass%({FlowID: FlowID, ElementID: setElementID}, allParamValues) 
+		allParamValues:=ElementSettings.getAllValues()
+		_setElementProperty(FlowID, ElementSettings.element, "FirstCallOfCheckSettings", firstCall) .FirstCallOfCheckSettings:=firstCall
+		setElementClass := ElementSettings.elementClass
+		Element_CheckSettings_%setElementClass%({FlowID: FlowID, ElementID: ElementSettings.element}, allParamValues) 
 		ElementSettingsNameField.updatename(allParamValues)
-		generalUpdateRunning:=False
+		ElementSettings.generalUpdateRunning:=False
 	}
 	
 	
@@ -2400,15 +2360,15 @@ class ElementSettings
 	{
 		global
 		
-		gui,SettingsOfElement:+disabled
+		gui,GUISettingsOfElement:+disabled
 	}
 
 	enable()
 	{
 		global
 		
-		gui,SettingsOfElement:-disabled
-		WinActivate, ahk_id %SettingWindowHWND%
+		gui,GUISettingsOfElement:-disabled
+		WinActivate, ahk_id %global_SettingWindowHWND%
 	}
 
 	
@@ -2418,14 +2378,13 @@ class ElementSettings
 	close()
 	{
 		global
-		GUISettingsOfElementObject:=""
-		ElementSettingsFields:=""
-		ElementSettingsFieldHWNDs:=""
-		ElementSettingsFieldParIDs:=""
-		setElementID:=""
-		setElementType:=""
-		setElementClass:=""
-		setElement:=""
+		this.fields:=""
+		this.fieldHWNDs:=""
+		this.fieldParIDs:=""
+		this.ElementID:=""
+		this.ElementType:=""
+		this.ElementClass:=""
+		this.ElementPars:=""
 		ElementSettingsNameField:=""
 		EditGUIEnable()
 	}
@@ -2440,7 +2399,7 @@ class ElementSettings
 
 
 ;Called when the GUI is resized by user
-SettingsOfElementParentSize(GuiHwnd, EventInfo, Width, Height)
+GUISettingsOfElementParentSize(GuiHwnd, EventInfo, Width, Height)
 {
 	global
 	
@@ -2448,12 +2407,12 @@ SettingsOfElementParentSize(GuiHwnd, EventInfo, Width, Height)
 	{
 		;~ GuiHwnd+=0
 		SetWinDelay,0
-		GetClientSize(SettingWindowParentHWND, ElSetingGUIW, ElSetingGUIH) ;Sometimes for any reason the width and height parameters are not correct. therefore get the gui size again
+		GetClientSize(global_SettingWindowParentHWND, ElSetingGUIW, ElSetingGUIH) ;Sometimes for any reason the width and height parameters are not correct. therefore get the gui size again
 		guicontrol, GUISettingsOfElementParent:move,ButtonSave,% "y" ElSetingGUIH-40
 		guicontrol, GUISettingsOfElementParent:move,ButtonCancel,% "y" ElSetingGUIH-40
-		winmove,% "ahk_id " SettingWindowHWND,  , 0, 30,  ,% ElSetingGUIH-90
+		winmove,% "ahk_id " global_SettingWindowHWND,  , 0, 30,  ,% ElSetingGUIH-90
 		;~ if not a_iscompiled
-			;~ ToolTip %GuiHwnd% %Width% %Height% - %ElSetingGUIW% %ElSetingGUIH% - %SettingWindowHWND% %SettingWindowParentHWND%
+			;~ ToolTip %GuiHwnd% %Width% %Height% - %ElSetingGUIW% %ElSetingGUIH% - %global_SettingWindowHWND% %global_SettingWindowParentHWND%
 	}
 	Return
 }
@@ -2463,7 +2422,7 @@ SettingsOfElementParentSize(GuiHwnd, EventInfo, Width, Height)
 GUISettingsOfElementChangeRadio(CtrlHwnd, GuiEvent="", EventInfo="", ErrorLevell="")
 {
 	global
-	ElementSettingsFieldHWNDs[CtrlHwnd].ChangeRadio()
+	ElementSettings.fieldHWNDs[CtrlHwnd].ChangeRadio()
 	
 	return
 }
@@ -2471,7 +2430,7 @@ GUISettingsOfElementChangeRadio(CtrlHwnd, GuiEvent="", EventInfo="", ErrorLevell
 GUISettingsOfElementCheckContent(CtrlHwnd, GuiEvent="", EventInfo="", ErrorLevell="")
 {
 	global
-	ElementSettingsFieldHWNDs[CtrlHwnd].checkcontent()
+	ElementSettings.fieldHWNDs[CtrlHwnd].checkcontent()
 	
 	return
 }
@@ -2480,21 +2439,21 @@ GUISettingsOfElementCheckContent(CtrlHwnd, GuiEvent="", EventInfo="", ErrorLevel
 GUISettingsOfElementCheckStandardName(CtrlHwnd, GuiEvent="", EventInfo="", ErrorLevell="")
 {
 	global
-	GUISettingsOfElementObject.GeneralUpdate()
-	;~ ElementSettingsFieldHWNDs[CtrlHwnd].UpdateName()
+	ElementSettings.GeneralUpdate()
+	;~ ElementSettings.fieldHWNDs[CtrlHwnd].UpdateName()
 }
 
 GUISettingsOfElementGeneralUpdate(CtrlHwnd, GuiEvent="", EventInfo="", ErrorLevell="")
 {
 	global
-	GUISettingsOfElementObject.GeneralUpdate()
+	ElementSettings.GeneralUpdate()
 	return
 }
 
 GUISettingsOfElementClickOnWarningPic(CtrlHwnd, GuiEvent="", EventInfo="", ErrorLevell="")
 {
 	global
-	ElementSettingsFieldHWNDs[CtrlHwnd].ClickOnWarningPic()
+	ElementSettings.fieldHWNDs[CtrlHwnd].ClickOnWarningPic()
 	return
 }
 GUISettingsOfElementRemoveInfoTooltip()
@@ -2505,7 +2464,7 @@ GUISettingsOfElementRemoveInfoTooltip()
 GUISettingsOfElementClickOnInfoPic(CtrlHwnd, GuiEvent="", EventInfo="", ErrorLevell="")
 {
 	global
-	ElementSettingsFieldHWNDs[CtrlHwnd].ClickOnInfoPic()
+	ElementSettings.fieldHWNDs[CtrlHwnd].ClickOnInfoPic()
 	
 	return
 }
@@ -2514,7 +2473,7 @@ GUISettingsOfElementClickOnInfoPic(CtrlHwnd, GuiEvent="", EventInfo="", ErrorLev
 GUISettingsOfElementSliderChangeEdit(CtrlHwnd, GuiEvent="", EventInfo="", ErrorLevell="")
 {
 	global
-	ElementSettingsFieldHWNDs[CtrlHwnd].SliderChangeEdit()
+	ElementSettings.fieldHWNDs[CtrlHwnd].SliderChangeEdit()
 	return
 }
 
@@ -2522,7 +2481,7 @@ GUISettingsOfElementSliderChangeEdit(CtrlHwnd, GuiEvent="", EventInfo="", ErrorL
 GUISettingsOfElementSliderChangeSlide(CtrlHwnd, GuiEvent="", EventInfo="", ErrorLevell="")
 {
 	global
-	ElementSettingsFieldHWNDs[CtrlHwnd].SliderChangeSlide()
+	ElementSettings.fieldHWNDs[CtrlHwnd].SliderChangeSlide()
 	return
 }
 
@@ -2530,14 +2489,14 @@ GUISettingsOfElementSliderChangeSlide(CtrlHwnd, GuiEvent="", EventInfo="", Error
 GUISettingsOfElementHotkey(CtrlHwnd, GuiEvent="", EventInfo="", ErrorLevell="")
 {
 	global
-	ElementSettingsFieldHWNDs[CtrlHwnd].ChangeHotkey()
+	ElementSettings.fieldHWNDs[CtrlHwnd].ChangeHotkey()
 	return
 }
 
 GUISettingsOfElementButton(CtrlHwnd, GuiEvent="", EventInfo="", ErrorLevell="")
 {
 	global
-	ElementSettingsFieldHWNDs[CtrlHwnd].ClickOnButton()
+	ElementSettings.fieldHWNDs[CtrlHwnd].ClickOnButton()
 	return
 	
 	
@@ -2545,7 +2504,7 @@ GUISettingsOfElementButton(CtrlHwnd, GuiEvent="", EventInfo="", ErrorLevell="")
 GUISettingsOfElementWeekdays(CtrlHwnd, GuiEvent="", EventInfo="", ErrorLevell="")
 {
 	global
-	ElementSettingsFieldHWNDs[CtrlHwnd].ChangeWeekdays()
+	ElementSettings.fieldHWNDs[CtrlHwnd].ChangeWeekdays()
 	return
 	
 	

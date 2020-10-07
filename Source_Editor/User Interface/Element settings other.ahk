@@ -1,62 +1,46 @@
 ﻿
-/* prototypes
-selectContainerType(parelement, "wait")
-selectConnectionType(parelement,"wait")
-selectSubType(parElement,"wait")
-ElementSettings.open(newElement,"wait")
-selectTrigger(parelement, "wait")
-*/
 
-
-
-
-
-
-
-
-
-
-
-;Called, when some additional functions are used, e.g. get window informations
+; disable element settings GUI
+; Called, when some additional functions are used, e.g. get window informations
 ui_disableElementSettingsWindow()
 {
 	global
 	
-	gui,SettingsOfElement:+disabled
+	gui,GUISettingsOfElement:+disabled
 }
 
+; enable element settings GUI
 ui_EnableElementSettingsWindow()
 {
 	global
-	
-	gui,SettingsOfElement:-disabled
-	WinActivate,% "·AutoHotFlow· " lang("Settings")
+	gui,GUISettingsOfElement:-disabled
 }
 
+; get the position of the element settings GUI
 ui_GetElementSettingsGUIPos()
 {
 	global 
 	local tempHWND := _getShared("hwnds.ElementSettingsParent" FlowID)
-	WinGetPos,ElementSettingsGUIX,ElementSettingsGUIY,ElementSettingsGUIWidth,ElementSettingsGUIHeight,% "ahk_id " tempHWND
+	WinGetPos, ElementSettingsGUIX, ElementSettingsGUIY, ElementSettingsGUIWidth, ElementSettingsGUIHeight, % "ahk_id " tempHWND
 }
 
 ;Select element subtype
-selectSubType(p_ElementID,wait="")
+selectSubType(p_ElementID, wait="")
 {
 	global
 	static NowResultEditingElement
-	setElementID:=p_ElementID
 	
 	;~ d(setelement)
-	setElementType:= _getElementProperty(FlowID, setElementID, "type")
-	setElementClass:= _getElementProperty(FlowID, setElementID, "Class")
-	setElementName:= _getElementProperty(FlowID, setElementID, "Name")
-	setElementPars:= _getElementProperty(FlowID, setElementID, "pars")
+	global_setElementID:=p_ElementID
+	global_setElementType:= _getElementProperty(FlowID, global_setElementID, "type")
+	global_setElementClass:= _getElementProperty(FlowID, global_setElementID, "Class")
+	global_setElementName:= _getElementProperty(FlowID, global_setElementID, "Name")
+	global_setElementPars:= _getElementProperty(FlowID, global_setElementID, "pars")
 
 	local matchingElementClasses:=Object()
 	local allCategories:=Object()
 	local tempcategory
-	;~ d(setElement, p_ID)
+	
 	NowResultEditingElement:=""
 	
 	
@@ -66,7 +50,7 @@ selectSubType(p_ElementID,wait="")
 	gui,destroy
 	gui,-dpiscale
 	gui,font,s12
-	gui,add,text,,% lang("Which %1% should be created?", lang(setElementType))
+	gui,add,text,,% lang("Which %1% should be created?", lang(global_setElementType))
 	gui,add,TreeView,w400 h500 vGuiElementChoose gGuiElementChoose AltSubmit
 	gui,add,Button,w250 gGuiElementChooseOK vGuiElementChooseOK default Disabled,% lang("OK")
 	gui,add,Button,w140 X+10 yp gGuiElementChooseCancel,% lang("Cancel")
@@ -79,10 +63,10 @@ selectSubType(p_ElementID,wait="")
 	;Find out wich categories exist
 	for forelementIndex, forElementClass in _getShared("AllElementClasses")
 	{
-		if (Element_getElementType_%forElementClass%() = setElementType)
+		if (Element_getElementType_%forElementClass%() = global_setElementType)
 		{
 			if (ShouldShowThatelementLevel(IsFunc("Element_getElementLevel_" forElementClass) ? Element_getElementLevel_%forElementClass%() : "Beginner")
-				OR setElementClass = forElementClass)
+				OR global_setElementClass = forElementClass)
 			{
 				matchingElementClasses.push(forElementClass)
 				tempcategory:=Element_getCategory_%forElementClass%()
@@ -104,7 +88,7 @@ selectSubType(p_ElementID,wait="")
 		tempcategoryTV%forindex%:=TV_Add(forcategory)
 	}
 	if not (matchingElementClasses.MaxIndex()>0)
-		MsgBox,Internal Error: No elements found of type: %setElementType%
+		MsgBox,Internal Error: No elements found of type: %global_setElementType%
 	
 	;add all elements to the treeview
 	for forelementIndex, forElementClass in matchingElementClasses
@@ -123,13 +107,13 @@ selectSubType(p_ElementID,wait="")
 					tempcategoryTV:=tempcategoryTV%forindex%
 			}
 			if (ShouldShowThatelementLevel(IsFunc("Element_getElementLevel_" forElementClass) ? Element_getElementLevel_%forElementClass%() : "Beginner")
-				OR setElementClass = forElementClass)
+				OR global_setElementClass = forElementClass)
 			{
 				tempTV:=TV_Add(Element_getName_%forElementClass%(),tempcategoryTV)
 				TVnum[tempTV]:=forelementIndex
-				TVID[tempTV]:=setElementID
+				TVID[tempTV]:=global_setElementID
 				TVClass[tempTV]:=forElementClass
-				if (setElementClass=forElementClass) ;Select the current element type, if any
+				if (global_setElementClass=forElementClass) ;Select the current element type, if any
 					TV_Modify(tempTV) 
 			}
 		}
@@ -139,7 +123,7 @@ selectSubType(p_ElementID,wait="")
 	
 	;Put the window in the center of the main window
 	gui,+hwndSettingsHWND
-	CurrentlyActiveWindowHWND:=SettingsHWND
+	global_CurrentlyActiveWindowHWND:=SettingsHWND
 	gui,show,hide
 	pos:=EditGUIGetPos()
 	DetectHiddenWindows,on
@@ -176,10 +160,9 @@ selectSubType(p_ElementID,wait="")
 	GuiElementChooseCancel:
 	gui,3:default
 	gui,destroy
-	if (setElementClass="" and setElementType!="Trigger")
+	if (global_setElementClass="" and global_setElementType!="Trigger")
 	{
-		;~ d(setelement)
-		Element_Remove(FlowID, setElementId)
+		Element_Remove(FlowID, global_setElementId)
 		;~ API_Draw_Draw(FlowID)
 	}
 	NowResultEditingElement=aborted
@@ -210,17 +193,13 @@ selectSubType(p_ElementID,wait="")
 	gui,destroy
 	EditGUIEnable()
 	
-	Element_SetClass(FlowID,setElementID,TVClass[GuiElementChoosedTV])
+	Element_SetClass(FlowID,global_setElementID,TVClass[GuiElementChoosedTV])
 
-	
-	;MsgBox,%setElementID% %GuiElementChoose%
 	
 	
 	NowResultEditingElement:=TVClass[GuiElementChoosedTV]
 	
-	;~ MsgBox %setElementID%
 	EditGUIEnable()
-	;~ ElementSettings.open(setElementID,wait)
 	
 	return 
 	
@@ -237,9 +216,9 @@ selectConnectionType(p_ElementID,wait="")
 	
 	NowResultEditingElement:=""
 	
-	setElementID:=p_ElementID
-	setElementType:= _getConnectionProperty(FlowID, setElementID, "type")
-	setElementFrom:= _getConnectionProperty(FlowID, setElementID, "from")
+	global_setElementID:=p_ElementID
+	global_setElementType:= _getConnectionProperty(FlowID, global_setElementID, "type")
+	setElementFrom:= _getConnectionProperty(FlowID, global_setElementID, "from")
 	setElementFromType:= _getElementProperty(FlowID, setElementFrom, "type")
 	
 	EditGUIDisable()
@@ -250,13 +229,13 @@ selectConnectionType(p_ElementID,wait="")
 	
 	if (setElementFromType="Condition")
 	{
-		if (setElementType="exception")
+		if (global_setElementType="exception")
 		{
 			gui,add,Button,w100 h50 gGuiConnectionChooseTrue vGuiConnectionChooseTrue ,% lang("Yes")
 			gui,add,Button,w100 h50 X+10 gGuiConnectionChooseFalse vGuiConnectionChooseFalse,% lang("No")
 			gui,add,Button,w100 h50 X+10 gGuiConnectionChooseException vGuiConnectionChooseException default,% lang("Exception")
 		}
-		else if (setElementType="no")
+		else if (global_setElementType="no")
 		{
 			gui,add,Button,w100 h50 gGuiConnectionChooseTrue vGuiConnectionChooseTrue ,% lang("Yes")
 			gui,add,Button,w100 h50 X+10 gGuiConnectionChooseFalse vGuiConnectionChooseFalse default,% lang("No")
@@ -275,7 +254,7 @@ selectConnectionType(p_ElementID,wait="")
 	}
 	else
 	{
-		if (setElementType="exception")
+		if (global_setElementType="exception")
 		{
 			gui,add,Button,w100 h50 gGuiConnectionChooseNormal vGuiConnectionChooseNormal,% lang("Normal")
 			gui,add,Button,w100 h50 X+10 gGuiConnectionChooseException vGuiConnectionChooseException default,% lang("Exception")
@@ -293,7 +272,7 @@ selectConnectionType(p_ElementID,wait="")
 	gui,add,Button,w90 Y+10 gGuiConnectionChooseCancel,% lang("Cancel")
 	;Put the window in the center of the main window
 	gui,+hwndSettingsHWND
-	CurrentlyActiveWindowHWND:=SettingsHWND
+	global_CurrentlyActiveWindowHWND:=SettingsHWND
 	gui,show,hide
 	pos:=EditGUIGetPos()
 	DetectHiddenWindows,on
@@ -313,7 +292,7 @@ selectConnectionType(p_ElementID,wait="")
 			{
 				if (NowResultEditingElement!="aborted")
 				{
-					_setConnectionProperty(FlowID, setElementID, "ConnectionType", NowResultEditingElement)
+					_setConnectionProperty(FlowID, global_setElementID, "ConnectionType", NowResultEditingElement)
 				}
 				break
 			}
@@ -333,28 +312,28 @@ selectConnectionType(p_ElementID,wait="")
 	gui,destroy
 	EditGUIEnable()
 	NowResultEditingElement:="yes"
-	_setConnectionProperty(FlowID, setElementID, "ConnectionType", NowResultEditingElement)
+	_setConnectionProperty(FlowID, global_setElementID, "ConnectionType", NowResultEditingElement)
 	return
 	
 	GuiConnectionChooseFalse:
 	gui,destroy
 	EditGUIEnable()
 	NowResultEditingElement:="no"
-	_setConnectionProperty(FlowID, setElementID, "ConnectionType", NowResultEditingElement)
+	_setConnectionProperty(FlowID, global_setElementID, "ConnectionType", NowResultEditingElement)
 	return 
 	
 	GuiConnectionChooseException:
 	gui,destroy
 	EditGUIEnable()
 	NowResultEditingElement:="exception"
-	_setConnectionProperty(FlowID, setElementID, "ConnectionType", NowResultEditingElement)
+	_setConnectionProperty(FlowID, global_setElementID, "ConnectionType", NowResultEditingElement)
 	return 
 	
 	GuiConnectionChooseNormal:
 	gui,destroy
 	EditGUIEnable()
 	NowResultEditingElement:="normal"
-	_setConnectionProperty(FlowID, setElementID, "ConnectionType", NowResultEditingElement)
+	_setConnectionProperty(FlowID, global_setElementID, "ConnectionType", NowResultEditingElement)
 	return 
 	
 	
@@ -366,8 +345,8 @@ selectContainerType(p_ElementID, wait="")
 	global 
 	static NowResultEditingElement
 	NowResultEditingElement:=""
-	setElementID:=p_ElementID
-	setElementType:= _getElementProperty(FlowID, setElementID, "type")
+	global_setElementID:=p_ElementID
+	global_setElementType:= _getElementProperty(FlowID, global_setElementID, "type")
 	EditGUIDisable()
 	gui, 8:default
 	
@@ -376,7 +355,7 @@ selectContainerType(p_ElementID, wait="")
 	gui,add,text,,% lang("Select_element_type")
 		
 	
-	if (setElementType="Action" or setElementType="")
+	if (global_setElementType="Action" or global_setElementType="")
 	{
 		gui,add,Button,w100 h50 gGuiElementTypeChooseAction gGuiElementTypeChooseAction default,% lang("Action")
 		gui,add,Button,w100 h50 X+10 gGuiElementTypeChooseCondition gGuiElementTypeChooseCondition,% lang("Condition")
@@ -395,7 +374,7 @@ selectContainerType(p_ElementID, wait="")
 	gui,add,Button,w90  Y+10 gGuiElementTypeChooseCancel,% lang("Cancel")
 	;Put the window in the center of the main window
 	gui,+hwndSettingsHWND
-	CurrentlyActiveWindowHWND:=SettingsHWND
+	global_CurrentlyActiveWindowHWND:=SettingsHWND
 	gui,show,hide
 	pos:=EditGUIGetPos()
 	DetectHiddenWindows,on
@@ -414,7 +393,7 @@ selectContainerType(p_ElementID, wait="")
 			else 
 			{
 				if (NowResultEditingElement!="aborted")
-					Element_SetType(FlowID,setElementID,NowResultEditingElement)
+					Element_SetType(FlowID, global_setElementID,NowResultEditingElement)
 				break
 			}
 		}

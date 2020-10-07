@@ -1,4 +1,4 @@
-{
+﻿{
   "allConnections": {
     "Connection0000000351": {
       "ConnectionType": "normal",
@@ -405,10 +405,10 @@
       "name": "Pause: 0 s #Seconds",
       "package": "action",
       "pars": {
-        "Duration": 0,
+        "Duration": "0",
         "Unit": "Seconds"
       },
-      "StandardName": 1,
+      "StandardName": "1",
       "type": "action",
       "x": 105,
       "y": "-297.500000"
@@ -434,11 +434,11 @@
       "name": "Neue Variable - counter = counter +1",
       "package": "default",
       "pars": {
-        "expression": "expression",
+        "expression": "Expression",
         "Varname": "counter",
         "VarValue": "counter +1"
       },
-      "StandardName": 1,
+      "StandardName": "1",
       "type": "action",
       "x": 105,
       "y": "-157.500000"
@@ -461,14 +461,14 @@
     "element0000000440": {
       "class": "Action_New_variable",
       "ID": "element0000000440",
-      "name": "Neue Variable - counter = counter +1",
+      "name": "Neue Variable - counter = counter +12",
       "package": "default",
       "pars": {
-        "expression": "expression",
+        "expression": "Expression",
         "Varname": "counter",
-        "VarValue": "counter +1"
+        "VarValue": "counter +12"
       },
-      "StandardName": 1,
+      "StandardName": "1",
       "type": "action",
       "x": 280,
       "y": "-157.500000"
@@ -483,7 +483,7 @@
         "LogMessage": "hello",
         "StopCondition": "counter != 3"
       },
-      "StandardName": 1,
+      "StandardName": "1",
       "type": "action",
       "x": 455,
       "y": "-17.500000"
@@ -699,8 +699,8 @@
     "ExecutionPolicy": "parallel",
     "FolderOfStaticVariables": "C:\\Users\\bichl\\Documents\\git\\AutoHotFlow\\Saved Flows\\Static variables\\Huge test script",
     "Name": "Huge test script",
-    "Offsetx": "-1385.093093",
-    "Offsety": "6.890310",
+    "Offsetx": "-1163.779249",
+    "Offsety": "-789.178892",
     "WorkingDir": "C:\\Users\\Paul\\Documents\\AutoHotFlow default working direction",
     "zoomFactor": "0.605475"
   },

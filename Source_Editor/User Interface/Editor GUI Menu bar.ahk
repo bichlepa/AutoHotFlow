@@ -28,8 +28,7 @@ initializeMenuBar()
 ; user wants to save
 ui_Menu_save()
 {
-	global CurrentlyMainGuiIsDisabled
-	if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of the main gui are disabled
+	if global_CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of the main gui are disabled
 	{
 		ui_ActionWhenMainGUIDisabled()
 		return
@@ -40,8 +39,7 @@ ui_Menu_save()
 ; user wants to start flow
 ui_Menu_MenuStart()
 {
-	global CurrentlyMainGuiIsDisabled
-	if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of the main gui are disabled
+	if global_CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of the main gui are disabled
 	{
 		ui_ActionWhenMainGUIDisabled()
 		return
@@ -52,8 +50,7 @@ ui_Menu_MenuStart()
 ; user wants to stop flow
 ui_Menu_MenuStop()
 {
-	global CurrentlyMainGuiIsDisabled
-	if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of the main gui are disabled
+	if global_CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of the main gui are disabled
 	{
 		ui_ActionWhenMainGUIDisabled()
 		return
@@ -64,8 +61,7 @@ ui_Menu_MenuStop()
 ; user wants to enable or disable flow
 ui_Menu_Enable()
 {
-	global CurrentlyMainGuiIsDisabled
-	if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of the main gui are disabled
+	if global_CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of the main gui are disabled
 	{
 		ui_ActionWhenMainGUIDisabled()
 		return
@@ -76,8 +72,7 @@ ui_Menu_Enable()
 ; user wants to undo a change
 ui_Menu_Undo()
 {
-	global CurrentlyMainGuiIsDisabled
-	if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of the main gui are disabled
+	if global_CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of the main gui are disabled
 	{
 		ui_ActionWhenMainGUIDisabled()
 		return
@@ -89,8 +84,7 @@ ui_Menu_Undo()
 ; user wants to redo a change
 ui_Menu_Redo()
 {
-	global CurrentlyMainGuiIsDisabled
-	if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of the main gui are disabled
+	if global_CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of the main gui are disabled
 	{
 		ui_ActionWhenMainGUIDisabled()
 		return
@@ -102,8 +96,7 @@ ui_Menu_Redo()
 ; user wants to change flow settings
 ui_Menu_Settings()
 {
-	global CurrentlyMainGuiIsDisabled
-	if CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of the main gui are disabled
+	if global_CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of the main gui are disabled
 	{
 		ui_ActionWhenMainGUIDisabled()
 		return

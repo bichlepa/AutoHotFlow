@@ -40,10 +40,10 @@ ui_showHelp(elementID)
 	Gui, Help: +resize
 	
 	;find out whether the settings window is opened
-	IfWinExist, % "ahk_id " SettingWindowParentHWND
+	IfWinExist, % "ahk_id " global_SettingWindowParentHWND
 	{
 		;Position the window right to the settings window
-		WinGetPos,tempx,tempy,tempw,temph,% "ahk_id " SettingWindowParentHWND
+		WinGetPos,tempx,tempy,tempw,temph,% "ahk_id " global_SettingWindowParentHWND
 		
 		helpx:=tempw+tempx
 		helph:=temph
@@ -57,7 +57,7 @@ ui_showHelp(elementID)
 		{
 			tempx:= VirtualWidth - helpw - tempw -10
 			;~ MsgBox %A_ScreenWidth% - %widthhelp% - %tempw% 
-			WinMove,% "ahk_id " SettingWindowParentHWND,,%tempx%
+			WinMove,% "ahk_id " global_SettingWindowParentHWND,,%tempx%
 			helpx:=VirtualWidth - helpw -10
 		}
 		

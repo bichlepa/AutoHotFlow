@@ -224,7 +224,7 @@ assistant_MouseTracker_Task()
 {
 	global
 
-	IfWinNotExist,ahk_id %SettingWindowHWND%
+	IfWinNotExist,ahk_id %global_SettingWindowHWND%
 	{
 		assistant_MouseTracker_buttonCancel()
 	}

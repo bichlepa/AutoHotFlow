@@ -2,7 +2,7 @@
 ui_SettingsOfFlow()
 {
 	static
-	global maingui, CurrentlyActiveWindowHWND, variable
+	global maingui, variable
 	local pos, tempchecked, tempXpos, tempYpos, tempDir, tempSettingFlowExecutionPolicyOld
 	
 	maingui.disable()
@@ -64,7 +64,7 @@ ui_SettingsOfFlow()
 
 	;Put the window in the center of the main window
 	gui,+hwndSettingsHWND
-	CurrentlyActiveWindowHWND:=SettingsHWND
+	global_CurrentlyActiveWindowHWND:=SettingsHWND
 	gui,show,hide
 	DetectHiddenWindows,on
 	

@@ -288,7 +288,7 @@ assistant_GetWindowInformation_ButtonOK()
 
 	gui,assistant_GetWindowInformation:submit
 	gui,assistant_GetWindowInformation:destroy
-	gui,SettingsOfElement:default
+	gui,GUISettingsOfElement:default
 	tempWinID:=assistant_GetWindowInformation_AllWinIDs[assistant_GetWindowInformation_ListBoxTitles]
 	WinGetTitle,temp,ahk_id %tempWinID%
 	if (assistant_GetWindowInformation_NeededInfo.Wintitle)
@@ -397,7 +397,7 @@ assistant_GetWindowInformation_GetWindowCoveredByMouse()
 	local tempmousex, tempmousey, tempwinidundermouse, tempcontrolUnderMouse, found, title, classe
 	local newWindowSelected, newindex
 	
-	IfWinNotExist,ahk_id %SettingWindowHWND%
+	IfWinNotExist,ahk_id %global_SettingWindowHWND%
 	{
 		assistant_GetWindowInformationGuiClose()
 	}
