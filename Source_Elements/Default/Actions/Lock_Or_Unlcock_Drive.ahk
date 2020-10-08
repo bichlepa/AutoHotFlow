@@ -69,7 +69,7 @@ Element_getParametrizationDetails_Action_Lock_Or_Unlock_Drive(Environment)
 	parametersToEdit.push({type: "Label", label: lang("Action")})
 	parametersToEdit.push({type: "Radio", id: "WhatDo", default: 1, choices: [lang("Lock drive"), lang("Unlock drive")], result: "enum", enum: ["Lock", "Unlock"]})
 	
-	parametersToEdit.push({type: "Label", id: "DriveLetterLabel", label: lang("Drive letter")})
+	parametersToEdit.push({type: "Label", label: lang("Drive letter")})
 	parametersToEdit.push({type: "ComboBox", id: "DriveLetter", content: "string", default: defaultdrive, choices: listOfdrives, result: "name"})
 	
 	parametersToEdit.updateOnEdit:=true

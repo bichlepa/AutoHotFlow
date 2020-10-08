@@ -20,15 +20,14 @@ ui_EnableElementSettingsWindow()
 ui_GetElementSettingsGUIPos()
 {
 	global 
-	local tempHWND := _getShared("hwnds.ElementSettingsParent" FlowID)
-	WinGetPos, ElementSettingsGUIX, ElementSettingsGUIY, ElementSettingsGUIWidth, ElementSettingsGUIHeight, % "ahk_id " tempHWND
+	WinGetPos, ElementSettingsGUIX, ElementSettingsGUIY, ElementSettingsGUIWidth, ElementSettingsGUIHeight, % "ahk_id " global_SettingWindowParentHWND
 }
 
 ;Select element subtype
-selectSubType(p_ElementID, wait="")
+selectSubType(p_ElementID, wait = false)
 {
 	global
-	static NowResultEditingElement
+	static global_resultEditingElement
 	
 	;~ d(setelement)
 	global_setElementID:=p_ElementID
@@ -41,7 +40,7 @@ selectSubType(p_ElementID, wait="")
 	local allCategories:=Object()
 	local tempcategory
 	
-	NowResultEditingElement:=""
+	global_resultEditingElement:=""
 	
 	
 	EditGUIDisable()
@@ -133,17 +132,17 @@ selectSubType(p_ElementID, wait="")
 	;~ d(TVnum)
 	gui,show,x%tempXpos% y%tempYpos%
 	
-	if (wait=1 or wait="wait")
+	if (wait)
 	{
 		Loop
 		{
-			if (NowResultEditingElement="")
+			if (global_resultEditingElement="")
 				sleep 10
 			else 
 			{
-				if (NowResultEditingElement!="aborted")
+				if (global_resultEditingElement!="aborted")
 				{
-					_setElementProperty(FlowID, ElementID, "subtype", NowResultEditingElement)
+					_setElementProperty(FlowID, ElementID, "subtype", global_resultEditingElement)
 					; setElement.setUnsetDefaults() TODO: Did I forget this function on last refactoring?
 				}
 				break
@@ -154,7 +153,7 @@ selectSubType(p_ElementID, wait="")
 	}
 	
 	;~ MsgBox
-	return NowResultEditingElement
+	return global_resultEditingElement
 
 	3guiclose:
 	GuiElementChooseCancel:
@@ -165,7 +164,7 @@ selectSubType(p_ElementID, wait="")
 		Element_Remove(FlowID, global_setElementId)
 		;~ API_Draw_Draw(FlowID)
 	}
-	NowResultEditingElement=aborted
+	global_resultEditingElement=aborted
 	EditGUIEnable()
 	return
 	GuiElementChoose:
@@ -197,7 +196,7 @@ selectSubType(p_ElementID, wait="")
 
 	
 	
-	NowResultEditingElement:=TVClass[GuiElementChoosedTV]
+	global_resultEditingElement:=TVClass[GuiElementChoosedTV]
 	
 	EditGUIEnable()
 	
@@ -209,12 +208,12 @@ selectSubType(p_ElementID, wait="")
 
 
 ;Select connection type
-selectConnectionType(p_ElementID,wait="")
+selectConnectionType(p_ElementID, wait = false)
 {
 	global 
-	static NowResultEditingElement, temp_from, ConnectionType
+	static global_resultEditingElement, temp_from, ConnectionType
 	
-	NowResultEditingElement:=""
+	global_resultEditingElement:=""
 	
 	global_setElementID:=p_ElementID
 	global_setElementType:= _getConnectionProperty(FlowID, global_setElementID, "type")
@@ -282,69 +281,69 @@ selectConnectionType(p_ElementID,wait="")
 	;~ d(pos, tempWidth "-" tempHeight "-" tempXpos "-" tempYpos "#" SettingsHWND)
 	gui,show,x%tempXpos% y%tempYpos%
 	
-	if (wait=1 or wait="wait")
+	if (wait)
 	{
 		Loop
 		{
-			if (NowResultEditingElement="")
+			if (global_resultEditingElement="")
 				sleep 10
 			else 
 			{
-				if (NowResultEditingElement!="aborted")
+				if (global_resultEditingElement!="aborted")
 				{
-					_setConnectionProperty(FlowID, global_setElementID, "ConnectionType", NowResultEditingElement)
+					_setConnectionProperty(FlowID, global_setElementID, "ConnectionType", global_resultEditingElement)
 				}
 				break
 			}
 		}
 	}
-	return NowResultEditingElement
+	return global_resultEditingElement
 	
 	
 	7guiclose:
 	GuiConnectionChooseCancel:
 	gui,destroy
 	EditGUIEnable()
-	NowResultEditingElement:="aborted"
+	global_resultEditingElement:="aborted"
 	return 
 	
 	GuiConnectionChooseTrue:
 	gui,destroy
 	EditGUIEnable()
-	NowResultEditingElement:="yes"
-	_setConnectionProperty(FlowID, global_setElementID, "ConnectionType", NowResultEditingElement)
+	global_resultEditingElement:="yes"
+	_setConnectionProperty(FlowID, global_setElementID, "ConnectionType", global_resultEditingElement)
 	return
 	
 	GuiConnectionChooseFalse:
 	gui,destroy
 	EditGUIEnable()
-	NowResultEditingElement:="no"
-	_setConnectionProperty(FlowID, global_setElementID, "ConnectionType", NowResultEditingElement)
+	global_resultEditingElement:="no"
+	_setConnectionProperty(FlowID, global_setElementID, "ConnectionType", global_resultEditingElement)
 	return 
 	
 	GuiConnectionChooseException:
 	gui,destroy
 	EditGUIEnable()
-	NowResultEditingElement:="exception"
-	_setConnectionProperty(FlowID, global_setElementID, "ConnectionType", NowResultEditingElement)
+	global_resultEditingElement:="exception"
+	_setConnectionProperty(FlowID, global_setElementID, "ConnectionType", global_resultEditingElement)
 	return 
 	
 	GuiConnectionChooseNormal:
 	gui,destroy
 	EditGUIEnable()
-	NowResultEditingElement:="normal"
-	_setConnectionProperty(FlowID, global_setElementID, "ConnectionType", NowResultEditingElement)
+	global_resultEditingElement:="normal"
+	_setConnectionProperty(FlowID, global_setElementID, "ConnectionType", global_resultEditingElement)
 	return 
 	
 	
 }
 
 ;Select container type
-selectContainerType(p_ElementID, wait="")
+selectContainerType(p_ElementID, wait = false)
 {
 	global 
-	static NowResultEditingElement
-	NowResultEditingElement:=""
+	static global_resultEditingElement
+	global_resultEditingElement:=""
 	global_setElementID:=p_ElementID
 	global_setElementType:= _getElementProperty(FlowID, global_setElementID, "type")
 	EditGUIDisable()
@@ -384,22 +383,22 @@ selectContainerType(p_ElementID, wait="")
 	
 	gui,show,x%tempXpos% y%tempYpos%
 	
-	if (wait=1 or wait="wait")
+	if (wait)
 	{
 		Loop
 		{
-			if (NowResultEditingElement="")
+			if (global_resultEditingElement="")
 				sleep 10
 			else 
 			{
-				if (NowResultEditingElement!="aborted")
-					Element_SetType(FlowID, global_setElementID,NowResultEditingElement)
+				if (global_resultEditingElement!="aborted")
+					Element_SetType(FlowID, global_setElementID,global_resultEditingElement)
 				break
 			}
 		}
 	}
 	
-	return NowResultEditingElement
+	return global_resultEditingElement
 	
 	
 	8guiclose:
@@ -407,28 +406,28 @@ selectContainerType(p_ElementID, wait="")
 	gui,destroy
 	EditGUIEnable()
 	gui,MainGUI:default
-	NowResultEditingElement:="aborted"
+	global_resultEditingElement:="aborted"
 	return 
 	
 	GuiElementTypeChooseAction:
 	gui,destroy
 	EditGUIEnable()
 	gui,MainGUI:default
-	NowResultEditingElement:="action"
+	global_resultEditingElement:="action"
 	return
 	
 	GuiElementTypeChooseCondition:
 	gui,destroy
 	EditGUIEnable()
 	gui,MainGUI:default
-	NowResultEditingElement:="condition"
+	global_resultEditingElement:="condition"
 	return
 	
 	GuiElementTypeChooseLoop:
 	gui,destroy
 	EditGUIEnable()
 	gui,MainGUI:default
-	NowResultEditingElement:="loop"
+	global_resultEditingElement:="loop"
 	return 
 	
 	

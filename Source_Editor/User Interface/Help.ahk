@@ -1,4 +1,5 @@
-﻿
+﻿global global_GUIHelpHWND
+
 ui_showHelp(elementID)
 {
 	global
@@ -22,7 +23,6 @@ ui_showHelp(elementID)
 
 	local uiLang := _getSettings("UILanguage")
 	helpfilepath=%_ScriptDir%\Help\%UILang%\%elementHelpFilepath%.html
-	ToolTip, % helpfilepath
 	IfNotExist, %helpfilepath%
 	{
 		helpfilepath=%_ScriptDir%\Help\en\%elementHelpFilepath%.html
@@ -69,7 +69,7 @@ ui_showHelp(elementID)
 		Gui, Help:Show, w720,% lang("Help")
 	}
 	
-	Gui, Help:+HwndGUIHelpHWND
+	Gui, Help:+Hwndglobal_GUIHelpHWND
 	Return
 	
 	Helpguiclose:

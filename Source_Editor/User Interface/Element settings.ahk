@@ -6,59 +6,67 @@ temp := lang("Loop")
 
 global global_SettingWindowParentHWND
 global global_global_SettingWindowHWND
+global global_resultEditingElement
 
 class ElementSettings
 {
-	;Open GUI for settings parameters of an element.
-	open(setElementID, wait="", alreadyChangedSomething = 0)
+	; Open GUI for settings parameters of an element.
+	; wait: if true, the call returns only when user finishes or cancels.
+	; alreadyChangedSomething: if set, on return, the value will be added to the count of detected changes
+	; returns "aborted" or "xx changes". xx is the count of detected changes.
+	open(setElementID, wait = false, alreadyChangedSomething = 0)
 	{
 		global
 		local temp, tempYPos, tempXPos, tempEditwidth, tempIsDefault, tempAssigned, tempChecked, tempMakeNewGroup, temptoChoose, tempAltSumbit, tempChoises, tempAllChoices, tempParameterOptions, tempres, tempelement
 
-		this.changes := alreadyChangedSomething ;will be incremented if a change will be detected
+		;will be incremented if a change will be detected
+		this.changes := alreadyChangedSomething
 
+		; save some information about the element which we will need repeadetely
 		this.element := setElementID
-
-		; create some global variables
 		this.elementType := _getElementProperty(FlowID, this.element, "type")
 		this.elementClass := _getElementProperty(FlowID, this.element, "Class")
 		this.elementName := _getElementProperty(FlowID, this.element, "Name")
 		this.elementPars := _getElementProperty(FlowID, this.element, "pars")
 
+		; save the "wait" option
 		this.wait := wait
 		
-		NowResultEditingElement := ""
+		; initialize the edit result value
+		global_resultEditingElement := ""
 		
-		this.fields:={} ;global. contains the fields which will be shown in the GUI. Each field is a bunch of controls
-		this.fieldHWNDs:={} ;global. Contains the field hwnds and the field object. Needed for responding user input
-		this.fieldParIDs:={} ;global. Contains the field hwnds and the field object. Needed for responding user input
+		this.fields := {} ;contains the fields which will be shown in the GUI. Each field is a bunch of controls
+		this.fieldHWNDs := {} ;Contains the field hwnds and the field object. Needed for responding user input
+		this.fieldParIDs := {} ;Contains the field hwnds and the field object. Needed for responding user input
 		
+		; disable editor gui
 		EditGUIDisable()
 		
-		;block general update
+		;block some update while the gui is initialized
 		this.initializing := true
-		this.generalUpdateRunning:=true
+		this.generalUpdateRunning := true
 		
-		;Create a scrollable Child GUI will almost all controls
-		gui,GUISettingsOfElement:default
-		gui +hwndglobal_SettingWindowHWND
-		gui +vscroll
-		gui,-DPIScale
+		; speed up gui creation dramatically
+		SetWinDelay, 0
 
-		global_CurrentlyActiveWindowHWND:=global_SettingWindowHWND
+		;Create a scrollable Child GUI will almost all controls
+		gui, GUISettingsOfElement: default
+		gui, +hwndglobal_SettingWindowHWND
+		gui, +vscroll
+		gui, -DPIScale
 		
 		;Get the parameter list
-		this.parametersToEdit:=Element_getParametrizationDetails(this.elementClass, {flowID: FlowID, elementID: this.elementID, updateOnEdit: true})
+		this.parametersToEdit := Element_getParametrizationDetails(this.elementClass, {flowID: FlowID, elementID: this.elementID, updateOnEdit: true})
 
-		;All elements have the parameter "name" and "StandardName"
+		; add first gui elements
+		; All elements have the parameter "name" and "StandardName"
 		this.fields.push(new this.label({label: lang("name (name)")}))
 		this.fields.push(new this.name({id: ["name", "StandardName"]}))
-		
 		
 		;Loop through all parameters
 		for index, parameter in this.parametersToEdit
 		{
-			;Add one or a group of controls. This is done dynamically, dependent on the parameters
+			;Add one or a group of controls. This is done dynamically, dependending on the parameters
 			if (parameter.type="Label")
 			{
 				this.fields.push(new this.label(parameter))
@@ -119,246 +127,227 @@ class ElementSettings
 			{
 				this.fields.push(new this.listbox(parameter))
 			}
-			
 		}
 		
+		; Create the parent window which contains some always visible controls (which can't be scrolled away)
+		Gui, GUISettingsOfElementParent: New
+		gui, GUISettingsOfElementParent: -DPIScale
+		Gui, GUISettingsOfElementParent: Margin, 0, 20
+		gui, GUISettingsOfElementParent: +resize
+		gui, GUISettingsOfElementParent: +hwndglobal_SettingWindowParentHWND
+		gui, GUISettingsOfElementParent: +LabelGUISettingsOfElementParent
 		
-		
-		
-		; Create the parent window which contains some always visible controls (which are not scrolled away)
-		Gui, GUISettingsOfElementParent:New
-		gui, GUISettingsOfElementParent:-DPIScale
-		Gui, GUISettingsOfElementParent:Margin, 0, 20
-		gui,GUISettingsOfElementParent:+resize
-		gui,GUISettingsOfElementParent:+hwndglobal_SettingWindowParentHWND
-		gui,GUISettingsOfElementParent:+LabelGUISettingsOfElementParent
-		
-		;Make the child window appear inside the parent window
-		Gui, GUISettingsOfElement:-Caption
-		Gui, GUISettingsOfElement:+parentGUISettingsOfElementParent
-		gui, GUISettingsOfElement:show,x0 y20
-		
+		;Make the scrollable child window appear inside the parent window
+		Gui, GUISettingsOfElement: -Caption
+		Gui, GUISettingsOfElement: +parentGUISettingsOfElementParent
+		gui, GUISettingsOfElement: show, x0 y20
 		
 		;Get the size of the child window
-		WinGetPos, , , WsettingsChild, HsettingsChild,% "ahk_id " global_SettingWindowHWND
-		Winmove,% "ahk_id " global_SettingWindowHWND, ,, , % WsettingsChild + 10, % HsettingsChild
-		WinGetPos, , , WsettingsChild, HsettingsChild,% "ahk_id " global_SettingWindowHWND
+		WinGetPos, , , WsettingsChild, HsettingsChild, % "ahk_id " global_SettingWindowHWND
+		Winmove, % "ahk_id " global_SettingWindowHWND, , , , % WsettingsChild + 10, % HsettingsChild
+		WinGetPos, , , WsettingsChild, HsettingsChild, % "ahk_id " global_SettingWindowHWND
 		
 		;Calculate the position of controls which are outside the child window (this is temporary calculation. it will be recalculated in the size-routine)
 		YsettingsButtoPos := HsettingsChild + 30
-		HSettingsParent:=HsettingsChild + 90
-		WSettingsParent:=WsettingsChild
-		;~ MsgBox %HSettingsParent% - %WSettingsParent% , %YsettingsButtoPos%
+		HSettingsParent := HsettingsChild + 90
+		WSettingsParent := WsettingsChild
 		
-		;Define minimal and maximal size of the parent window
-		gui,GUISettingsOfElementParent:+minsize%WSettingsParent%x200 ;Ensure constant width.
-		gui,GUISettingsOfElementParent:+maxsize%WSettingsParent%x%HSettingsParent%
+		;Define minimal and maximal size of the parent window. Ensure constant width.
+		gui, GUISettingsOfElementParent: +minsize%WSettingsParent%x200
+		gui, GUISettingsOfElementParent: +maxsize%WSettingsParent%x%HSettingsParent%
 		
-		
-		
-		;add buttons
-		gui,GUISettingsOfElementParent:font,s8 cDefault wnorm
+		;add the always visible buttons
 		setElementClass := this.elementClass
-		gui, GUISettingsOfElementParent:add,button, w370 x10 y10 gGUISettingsOfElementSelectType h20,% lang("%1%_type:_%2%",lang(this.elementType),Element_getName_%setElementClass%())
-		gui, GUISettingsOfElementParent:add,button, w20 X+10 yp h20 gGUISettingsOfElementHelp vGUISettingsOfElementHelp,?
-		;~ guicontrol,focus,GUISettingsOfElementHelp
-		Gui, GUISettingsOfElementParent:Add, Button, gGUISettingsOfElementSave vButtonSave w145 x10 h30 y%YsettingsButtoPos%,% lang("Save")
-		Gui, GUISettingsOfElementParent:Add, Button, gGUISettingsOfElementCancel vButtonCancel default w145 h30 yp X+10,% lang("Cancel")
-		;Make GUI autosizing
-		setElementClass := this.elementClass
-		Gui, GUISettingsOfElementParent:Show, hide w%WSettingsParent%,% lang("Settings") " - " lang(this.elementType) " - " Element_getName_%setElementClass%()
+		gui, GUISettingsOfElementParent:font, s8 cDefault wnorm
+		; button for changing element type
+		gui, GUISettingsOfElementParent: add, button, w370 x10 y10 gGUISettingsOfElementSelectType h20, % lang("%1%_type:_%2%", lang(this.elementType) ,Element_getName_%setElementClass%())
+		; button for getting help
+		gui, GUISettingsOfElementParent: add, button, w20 X+10 yp h20 gGUISettingsOfElementHelp vGUISettingsOfElementHelp, ?
+		; save button
+		Gui, GUISettingsOfElementParent: Add, Button, gGUISettingsOfElementSave vButtonSave w145 x10 h30 y%YsettingsButtoPos%,% lang("Save")
+		; cancel button
+		Gui, GUISettingsOfElementParent: Add, Button, gGUISettingsOfElementCancel vButtonCancel default w145 h30 yp X+10,% lang("Cancel")
+
+		; we want to get the size of the created gui. Following line allows that
+		Gui, GUISettingsOfElementParent: Show, hide w%WSettingsParent%,% lang("Settings") " - " lang(this.elementType) " - " Element_getName_%setElementClass%()
 		
-		_setShared("hwnds.ElementSettingsChild" FlowID, global_SettingWindowHWND)
-		_setShared("hwnds.ElementSettingsParent" FlowID, global_SettingWindowParentHWND)
-		
-		;Calculate position to show the settings window in the middle of the main window
-		pos:=EditGUIGetPos()
-		tempHeight:=round(pos.h-100) ;This will be the max height. If child gui is larger, it must be scrolled
-		DetectHiddenWindows,on
-		WinGetPos,ElSetingGUIX,ElSetingGUIY,ElSetingGUIW,ElSetingGUIH,ahk_id %global_SettingWindowParentHWND%
+		;Calculate gui position. We want to show the settings window in the middle of the main window
+		pos := EditGUIGetPos()
+		tempHeight := round(pos.h - 100) ;This will be the max height. If child gui is larger, its content will be scrollable
+		DetectHiddenWindows, on
+		WinGetPos, ElSetingGUIX, ElSetingGUIY, ElSetingGUIW, ElSetingGUIH, ahk_id %global_SettingWindowParentHWND%
 		if (ElSetingGUIH < tempHeight)
 			tempHeight := ElSetingGUIH
-		tempXpos:=round(pos.x+pos.w/2- ElSetingGUIW/2)
-		tempYpos:=round(pos.y+pos.h/2- tempHeight/2)
+		tempXpos := round(pos.x + (pos.w / 2) - (ElSetingGUIW / 2))
+		tempYpos := round(pos.y + (pos.h / 2) - (tempHeight / 2))
 		
-		;move Parent window
-		gui,GUISettingsOfElementParent:show,% "x" tempXpos " y" tempYpos " h" tempHeight " hide" 
+		;move gui to the calculated position
+		gui, GUISettingsOfElementParent: show, % "x" tempXpos " y" tempYpos " h" tempHeight " hide" 
 		
+		 ;make the autosize function trigger, which resizes and moves the scrollgui. This will update the position of lower buttons
+		wingetpos, , , ElSetingGUIW, ElSetingGUIH, ahk_id %global_SettingWindowParentHWND%
+		WinMove, ahk_id %global_SettingWindowParentHWND%, , , , % ElSetingGUIW, % ElSetingGUIH + 1
 		
-		;position lower buttons
-		wingetpos,,,ElSetingGUIW,ElSetingGUIH, ahk_id %global_SettingWindowParentHWND%
-		WinMove,ahk_id %global_SettingWindowParentHWND%,,,,% ElSetingGUIW,% ElSetingGUIH+1 ;make the autosize function trigger, which resizes and moves the scrollgui
+		; save the currently active gui
+		global_CurrentlyActiveWindowHWND := global_SettingWindowParentHWND
 		
+		; show the gui
+		gui, GUISettingsOfElementParent:show
 		
-		
-		global_CurrentlyActiveWindowHWND:=global_SettingWindowParentHWND
-		
-		this.initializing:=false
-		
-		
-		gui,GUISettingsOfElementParent:show
-		
-		;release general update
+		;Initialization done. Do a general update as last step
+		this.initializing := false
 		this.generalUpdateRunning:=false
 		this.generalUpdate(True)
 		
-		if (wait=1 or wait="wait") ;Wait until user closes the window
+		if (this.wait) 
 		{
+			;We have to wait until user closes the window
+			;Wait until global_resultEditingElement is set
 			Loop
 			{
-				if (NowResultEditingElement="") ;This variable will be set when user closes the window
+				if (global_resultEditingElement = "")
 					sleep 10
 				else 
 					break
 			}
+			return global_resultEditingElement
 		}
-		return NowResultEditingElement
-		
-		
-		;If user wants to change the subtype of the element
-		GUISettingsOfElementSelectType:
-		gui,GUISettingsOfElement:destroy
-		gui,GUISettingsOfElementParent:destroy
-		ui_closeHelp() 
-		EditGUIEnable()
-		
-		tempres:=selectSubType(ElementSettings.element, "wait")
-		if tempres!=aborted
+		Else
 		{
-			NowResultEditingElement:= ElementSettings.open(ElementSettings.element, ElementSettings.wait, true)
+			;We don't need to wait until user closes the window
+			return
+		}
+		
+		
+		
+	}
+
+	;If user clicks on the button to change the element class
+	GUISettingsOfElementSelectType()
+	{
+		; close the element settings gui
+		ElementSettings.close()
+		
+		; let user select the sub type and wait until he finishes
+		tempres := selectSubType(ElementSettings.element, true)
+		if (tempres != "aborted")
+		{
+			; reopen the element settings window
+			global_resultEditingElement := ElementSettings.open(ElementSettings.element, ElementSettings.wait, 1)
 		}
 		else 
 		{
-			NowResultEditingElement:="aborted"
-			return
+			; if user aborted
+			global_resultEditingElement := "aborted"
+			return global_resultEditingElement
 		}
 		return
+	}
 		
-		GUISettingsOfElementHelp:
-		IfWinExist,ahk_id %GUIHelpHWND%
+	; if user clicks on the help button
+	GUISettingsOfElementHelp()
+	{
+		; find out whether the help is currently shown
+		IfWinExist,ahk_id %global_GUIHelpHWND%
+		{
+			; help is currently shown. Hide it
 			ui_closeHelp()
+		}
 		else
+		{
+			; help is currently not shown. Show it
 			ui_showHelp(ElementSettings.element)
+		}
 		return
-		
-		
-		
-		
-		
-		GUISettingsOfElementParentClose:
-		GUISettingsOfElementParentEscape:
-		GUISettingsOfElementCancel:
-		;~ ToolTip %a_thislabel%
-		; todo: undo of changed is not needed
-		if (ElementSettings.elementName="Νew Соntainȩr" or ElementSettings.elementName="Νew Triggȩr") ;Delete the element if it was newly created
-		{
-			_deleteElement(FlowID, ElementSettings.element)
-		}
-		
-		previousSubType := _getElementProperty(FlowID, ElementSettings.element, "previousSubType")
-		if (element.previousSubType) ;restore previous subtype of element if it was changed recently
-		{
-			_setElementProperty(FlowID, ElementSettings.element, "SubType", previousSubType)
-			_deleteElementProperty(FlowID, ElementSettings.element, "previousSubType")
-		}
-		
-		ui_closeHelp() 
-		
-		gui,GUISettingsOfElement:destroy
-		gui,GUISettingsOfElementParent:destroy
-		
-		GUISettingsOfElementRemoveInfoTooltip()
-		
-		EditGUIEnable()
-		NowResultEditingElement:="aborted"
+	}
+	
+	; if user cancels editing the element settings
+	GUISettingsOfElementCancel()
+	{
+		; close the element settings gui
 		ElementSettings.close()
-		return
 		
-		
-		
-		GUISettingsOfElementSave:
-		_EnterCriticalSection()
-		
+		global_resultEditingElement := "aborted"
+		return global_resultEditingElement
+	}
+
+	; user clicks on the save button
+	GUISettingsOfElementSave()
+	{
+		; do a general update (just in case)
 		ElementSettings.generalUpdate()
-		;~ gui,GUISettingsOfElement:submit
 		
-		if (ElementSettings.elementType="trigger" and triggersEnabled=true) ;When editing a trigger, disable Triggers and enable them afterwards
+		;If editing a trigger, disable it (and enable it afterwards)
+		if (ElementSettings.elementType = "trigger" and _getElementProperty(FlowID, ElementSettings.element, "enabled") = true)
 		{
-			tempReenablethen:=true
-			;r_EnableFlow() ;TODO ;Disable flow
+			tempReenablethen := true
+			disableOneTrigger(FlowID, ElementSettings.element, false)
 		}
 		else
-			tempReenablethen:=false
+			tempReenablethen := false
 		
 		;Save the parameters
-		_setElementProperty(FlowID, ElementSettings.element, "Name", ElementSettingsNameField.getValue("Name"))
-		_setElementProperty(FlowID, ElementSettings.element, "StandardName", ElementSettingsNameField.getValue("StandardName"))
+		_setElementProperty(FlowID, ElementSettings.element, "Name", ElementSettings.NameField.getValue("Name"))
+		_setElementProperty(FlowID, ElementSettings.element, "StandardName", ElementSettings.NameField.getValue("StandardName"))
 		
-		;~ MsgBox % strobj(parametersToEdit)
 		for ElementSaveindex, parameter in ElementSettings.parametersToEdit
 		{
+			; create a list of all parameters
 			if not IsObject(parameter.id)
-				parameterID:=[parameter.id]
+				parameterIDs := [parameter.id]
 			else
-				parameterID:=parameter.id
-			;~ MsgBox % strobj(parameterID)
-			if (parameterID[1]="" or parameter.type="label" or parameter.type="SmallLabel") ;If this is only a label do nothing
+				parameterIDs := parameter.id
+				
+			; If this is only a label do nothing
+			if (not parameterIDs[1] or parameter.type = "label" or parameter.type = "SmallLabel")
 				continue
-			;~ MsgBox % strobj(parameterID)
 			
-			;The edit control can also have parameter names which are specified in key "ContentID"
+			;The edit control can also have parameter names which are specified in key "ContentID" add them to list
 			if (IsObject(oneField.parameter.ContentID))
 			{
-				tempParameterID.push(oneField.parameter.ContentID[1])
+				for oneIndex, oneContentID in oneField.parameter.ContentID
+				{
+					parameterIDs.push(oneContentID)
+				}
 			}
 			else if (parameter.ContentID)
 			{
-				tempParameterID.push(oneField.parameter.ContentID)
+				parameterIDs.push(oneField.parameter.ContentID)
 			}
-					
 			
-			;Certain types of control consist of multiple controls and thus contain multiple parameters.
-			for ElementSaveindex2, oneID in parameterID
+			; save parameters
+			for ElementSaveindex2, oneID in parameterIDs
 			{
-				tempOneParID:=parameterID[ElementSaveindex2]
-				temponeValue:=ElementSettings.fieldParIDs[tempOneParID].getValue(tempOneParID)
-				tempOldValue := _getElementProperty(FlowID, ElementSettings.element, "pars." tempOneParID)
-				if (tempOldValue!=temponeValue)
-					ElementSettings.changes++
+				tempOneParID := parameterIDs[ElementSaveindex2]
 
-				_setElementProperty(FlowID, ElementSettings.element, "pars." tempOneParID, temponeValue)
-				
-			
+				; get value from gui
+				temponeValue := ElementSettings.fieldParIDs[tempOneParID].getValue(tempOneParID)
+
+				; find out whether there were some changes
+				tempOldValue := _getElementProperty(FlowID, ElementSettings.element, "pars." tempOneParID)
+				if (tempOldValue != temponeValue)
+				{
+					; change detected
+					ElementSettings.changes++
+					; write changed value
+					_setElementProperty(FlowID, ElementSettings.element, "pars." tempOneParID, temponeValue)
+				}
 			}
-			
 		}
 		
-		_LeaveCriticalSection()
+		;If editing a trigger which we have disabled previously, reenable it
+		if (tempReenablethen)
+		{
+			enableOneTrigger(FlowID, ElementSettings.element, false)
+		}
 		
-		temponeValue:=""
-		
-		ui_closeHelp() 
-		gui,GUISettingsOfElement:destroy
-		gui,GUISettingsOfElementParent:destroy
-		GUISettingsOfElementRemoveInfoTooltip()
-		
-		EditGUIEnable()
-		
-
-		NowResultEditingElement:=ElementSettings.changes " Changes"
-		
-		;if (tempReenablethen) ;TODO
-			;r_EnableFlow()
-		
-		
-		
-		API_Draw_Draw(FlowID)
+		; close the element settings gui
 		ElementSettings.close()
-		return
 		
+		; return count of changes
+		global_resultEditingElement := ElementSettings.changes " Changes"
+		return global_resultEditingElement
 	}
-	
-	
 	
 	
 	;The fields will be added to the GUI. This class contains common methods
@@ -691,7 +680,7 @@ class ElementSettings
 			base.__new(parameter)
 			local tempchecked, temptext, tempParGray, tempHWND
 			local tempParameterID:=parameter.id
-			ElementSettingsNameField:=this
+			ElementSettings.NameField:=this
 			
 			gui,font,s8 cDefault wnorm
 			
@@ -737,7 +726,7 @@ class ElementSettings
 			global
 			base.__new(parameter)
 			local tempYPos
-			local tempParameterID:=parameter.id
+			local tempParameterID:=parameter.labelid
 			if (parameter.size="small")
 			{
 				gui,font,s8 cDefault wbold
@@ -763,10 +752,10 @@ class ElementSettings
 		{
 			global
 			local tempParameterID, 
-			local tempParameterID:=this.parameter.id
+			local tempParameterID:=this.parameter.labelid
 			if parameterID=
 			{
-				tempParameterID:=this.parameter.id
+				tempParameterID:=this.parameter.labelid
 				if isobject(tempParameterID)
 					tempParameterID:=tempParameterID[1]
 			}
@@ -2333,70 +2322,91 @@ class ElementSettings
 	
 	
 	;Update the name field, check settings
-	generalUpdate(firstCall=False)
+	; firstCall: if set, the call x_FirstCallOfCheckSettings() of the element api will return true
+	generalUpdate(firstCall = False)
 	{
 		global
+
+		; prevent multiple general updates at once (part 1)
 		if (ElementSettings.generalUpdateRunning)
 		{
 			return
 		}
-		ElementSettings.generalUpdateRunning:=True
+		ElementSettings.generalUpdateRunning := True
+
+		; remove tooltip (if any) todo: why?
 		GUISettingsOfElementRemoveInfoTooltip()
-		;~ ToolTip updakljö
-		allParamValues:=ElementSettings.getAllValues()
-		_setElementProperty(FlowID, ElementSettings.element, "FirstCallOfCheckSettings", firstCall) .FirstCallOfCheckSettings:=firstCall
+		
+		; save the firstCall property. x_FirstCallOfCheckSettings() will return true
+		_setElementProperty(FlowID, ElementSettings.element, "FirstCallOfCheckSettings", firstCall)
+
+		; get all parameter values
+		allParamValues := ElementSettings.getAllValues()
+
+		; let the element function Element_CheckSettings_xxx check the settings
 		setElementClass := ElementSettings.elementClass
-		Element_CheckSettings_%setElementClass%({FlowID: FlowID, ElementID: ElementSettings.element}, allParamValues) 
-		ElementSettingsNameField.updatename(allParamValues)
-		ElementSettings.generalUpdateRunning:=False
+		Element_CheckSettings_%setElementClass%({FlowID: FlowID, ElementID: ElementSettings.element}, allParamValues)
+		
+		; update the element name
+		ElementSettings.NameField.updatename(allParamValues)
+		
+		; prevent multiple general updates at once (part 2)
+		ElementSettings.generalUpdateRunning := False
 	}
 	
-	
-	
-	
-	
-
+	; disable the element settings gui
 	disable()
 	{
 		global
 		
-		gui,GUISettingsOfElement:+disabled
+		gui, GUISettingsOfElement: +disabled
 	}
 
+	; enable the element setting gui
 	enable()
 	{
 		global
 		
-		gui,GUISettingsOfElement:-disabled
+		gui, GUISettingsOfElement: -disabled
 		WinActivate, ahk_id %global_SettingWindowHWND%
 	}
-
 	
-	
-	
-	;Delete some variables on exit
+	; Close element settings gui
 	close()
 	{
 		global
-		this.fields:=""
-		this.fieldHWNDs:=""
-		this.fieldParIDs:=""
-		this.ElementID:=""
-		this.ElementType:=""
-		this.ElementClass:=""
-		this.ElementPars:=""
-		ElementSettingsNameField:=""
+		
+		; close help (if shown)
+		ui_closeHelp() 
+		
+		; destroy the element settings gui
+		gui, GUISettingsOfElement: destroy
+		gui, GUISettingsOfElementParent: destroy
+		
+		; remove any tooltip (if shown)
+		GUISettingsOfElementRemoveInfoTooltip()
+		
+		; enable editor gui
 		EditGUIEnable()
+
+		; delete some variables
+		this.fields := ""
+		this.fieldHWNDs := ""
+		this.fieldParIDs := ""
+		this.ElementID := ""
+		this.ElementType := ""
+		this.ElementClass := ""
+		this.ElementPars := ""
+		this.NameField := ""
 	}
-
-
-
-	
 }
 
 
-
-
+; removes any tooltip (if shown)
+GUISettingsOfElementRemoveInfoTooltip()
+{
+	ToolTip,,,,11
+}
 
 ;Called when the GUI is resized by user
 GUISettingsOfElementParentSize(GuiHwnd, EventInfo, Width, Height)
@@ -2405,108 +2415,88 @@ GUISettingsOfElementParentSize(GuiHwnd, EventInfo, Width, Height)
 	
 	If (EventInfo <> 1) ;if not minimized
 	{
-		;~ GuiHwnd+=0
-		SetWinDelay,0
-		GetClientSize(global_SettingWindowParentHWND, ElSetingGUIW, ElSetingGUIH) ;Sometimes for any reason the width and height parameters are not correct. therefore get the gui size again
-		guicontrol, GUISettingsOfElementParent:move,ButtonSave,% "y" ElSetingGUIH-40
-		guicontrol, GUISettingsOfElementParent:move,ButtonCancel,% "y" ElSetingGUIH-40
-		winmove,% "ahk_id " global_SettingWindowHWND,  , 0, 30,  ,% ElSetingGUIH-90
-		;~ if not a_iscompiled
-			;~ ToolTip %GuiHwnd% %Width% %Height% - %ElSetingGUIW% %ElSetingGUIH% - %global_SettingWindowHWND% %global_SettingWindowParentHWND%
+		; faster execution
+		SetWinDelay, 0
+
+		; Sometimes for some reason the width and height parameters are not correct. therefore get the gui size again
+		GetClientSize(global_SettingWindowParentHWND, ElSetingGUIW, ElSetingGUIH)
+
+		; move buttons save and cancel
+		guicontrol, GUISettingsOfElementParent: move, ButtonSave, % "y" ElSetingGUIH - 40
+		guicontrol, GUISettingsOfElementParent: move, ButtonCancel, % "y" ElSetingGUIH - 40
+
+		; change size of the inner scrollable gui
+		winmove, % "ahk_id " global_SettingWindowHWND, , 0, 30, , % ElSetingGUIH - 90
 	}
-	Return
 }
 
 
-;This and following functions will be called if user changes some value
+; forward some glabel calls
+GUISettingsOfElementSelectType()
+{
+	ElementSettings.GUISettingsOfElementSelectType()
+}
+GUISettingsOfElementHelp()
+{
+	ElementSettings.GUISettingsOfElementHelp()
+}
+GUISettingsOfElementParentClose()
+{
+	ElementSettings.GUISettingsOfElementCancel()
+}
+GUISettingsOfElementParentEscape()
+{
+	ElementSettings.GUISettingsOfElementCancel()
+}
+GUISettingsOfElementCancel()
+{
+	ElementSettings.GUISettingsOfElementCancel()
+}
+GUISettingsOfElementSave()
+{
+	ElementSettings.GUISettingsOfElementSave()
+}
 GUISettingsOfElementChangeRadio(CtrlHwnd, GuiEvent="", EventInfo="", ErrorLevell="")
 {
-	global
 	ElementSettings.fieldHWNDs[CtrlHwnd].ChangeRadio()
-	
-	return
 }
-
 GUISettingsOfElementCheckContent(CtrlHwnd, GuiEvent="", EventInfo="", ErrorLevell="")
 {
-	global
 	ElementSettings.fieldHWNDs[CtrlHwnd].checkcontent()
-	
-	return
 }
-
-
 GUISettingsOfElementCheckStandardName(CtrlHwnd, GuiEvent="", EventInfo="", ErrorLevell="")
 {
-	global
 	ElementSettings.GeneralUpdate()
-	;~ ElementSettings.fieldHWNDs[CtrlHwnd].UpdateName()
 }
-
 GUISettingsOfElementGeneralUpdate(CtrlHwnd, GuiEvent="", EventInfo="", ErrorLevell="")
 {
-	global
 	ElementSettings.GeneralUpdate()
-	return
 }
-
 GUISettingsOfElementClickOnWarningPic(CtrlHwnd, GuiEvent="", EventInfo="", ErrorLevell="")
 {
-	global
 	ElementSettings.fieldHWNDs[CtrlHwnd].ClickOnWarningPic()
-	return
-}
-GUISettingsOfElementRemoveInfoTooltip()
-{
-	ToolTip,,,,11
-	return
 }
 GUISettingsOfElementClickOnInfoPic(CtrlHwnd, GuiEvent="", EventInfo="", ErrorLevell="")
 {
-	global
 	ElementSettings.fieldHWNDs[CtrlHwnd].ClickOnInfoPic()
-	
-	return
 }
-
-
 GUISettingsOfElementSliderChangeEdit(CtrlHwnd, GuiEvent="", EventInfo="", ErrorLevell="")
 {
-	global
 	ElementSettings.fieldHWNDs[CtrlHwnd].SliderChangeEdit()
-	return
 }
-
-
 GUISettingsOfElementSliderChangeSlide(CtrlHwnd, GuiEvent="", EventInfo="", ErrorLevell="")
 {
-	global
 	ElementSettings.fieldHWNDs[CtrlHwnd].SliderChangeSlide()
-	return
-}
-
-	
+}	
 GUISettingsOfElementHotkey(CtrlHwnd, GuiEvent="", EventInfo="", ErrorLevell="")
 {
-	global
 	ElementSettings.fieldHWNDs[CtrlHwnd].ChangeHotkey()
-	return
 }
-
 GUISettingsOfElementButton(CtrlHwnd, GuiEvent="", EventInfo="", ErrorLevell="")
 {
-	global
 	ElementSettings.fieldHWNDs[CtrlHwnd].ClickOnButton()
-	return
-	
-	
 }
 GUISettingsOfElementWeekdays(CtrlHwnd, GuiEvent="", EventInfo="", ErrorLevell="")
 {
-	global
 	ElementSettings.fieldHWNDs[CtrlHwnd].ChangeWeekdays()
-	return
-	
-	
 }
-

@@ -69,7 +69,7 @@ ui_leftmousebuttondoubleclick()
 			logger("a3", "a single selected connection found: " selectedElement ". Going to change chonnection type", FlowID)
 
 			 ;Change connection type and wait for results
-			ret := selectConnectionType(selectedElement, "wait")
+			ret := selectConnectionType(selectedElement, true)
 			if (ret = "aborted")
 				UserCancelledAction := true
 			else if (ret != "0 changes")
@@ -80,7 +80,7 @@ ui_leftmousebuttondoubleclick()
 			logger("a3", "a single selected element found: " selectedElement ". Going to edit element settings", FlowID)
 
 			;Change element settings and wait for results
-			ret := ElementSettings.open(selectedElement, "wait")
+			ret := ElementSettings.open(selectedElement, true)
 			if (ret = "aborted")
 				UserCancelledAction := true
 			else if (ret != "0 changes")
@@ -216,7 +216,7 @@ clickOnPicture() ;react on clicks of the user
 			logger("a3", "user finished movement. Going to select sub type of element", FlowID)
 
 			; select element subtype and wait for result
-			ret := selectSubType(newElement,"wait")
+			ret := selectSubType(newElement, true)
 			if (ret = "aborted")
 			{
 				logger("a3", "user aborted element type selection", FlowID)
@@ -227,7 +227,7 @@ clickOnPicture() ;react on clicks of the user
 			{
 				logger("a3", "user finished element type selection. Going to open element settings", FlowID)
 				;open settings of element
-				ret := ElementSettings.open(newElement,"wait")
+				ret := ElementSettings.open(newElement, true)
 				if (ret = "aborted")
 				{
 					logger("a3", "user aborted editing element settings", FlowID)
@@ -406,7 +406,7 @@ clickOnPicture() ;react on clicks of the user
 			logger("a3", "user clicked on the edit button of connection " selectedElement ". Going to edit its type", FlowID)
 
 			; select connection type
-			ret := selectConnectionType(selectedElement,"wait")
+			ret := selectConnectionType(selectedElement, true)
 			if (ret = "aborted")
 			{
 				logger("a3", "user aborted changing connection type", FlowID)
@@ -424,7 +424,7 @@ clickOnPicture() ;react on clicks of the user
 			logger("a3", "user clicked on the edit button of element " selectedElement ". Going to edit its parameters", FlowID)
 
 			;open settings of the selected element
-			ret := ElementSettings.open(selectedElement,"wait") 
+			ret := ElementSettings.open(selectedElement, true) 
 			if (ret = "aborted")
 			{
 				logger("a3", "user aborted changing element parameters", FlowID)
@@ -1219,7 +1219,7 @@ ui_MoveConnection(connection1 = "", element1 = "", connection2 = "", element2 = 
 		newElementCreated := true
 		
 		; set user choose element type
-		ret := selectContainerType(clickedElement, "wait")
+		ret := selectContainerType(clickedElement, true)
 		if (ret = "aborted")
 		{
 			; user cancelled
@@ -1265,7 +1265,7 @@ ui_MoveConnection(connection1 = "", element1 = "", connection2 = "", element2 = 
 		
 		; since we have a new element, user can now edit its settings
 		; select subtype
-		ret := selectSubType(clickedElement, "Wait")
+		ret := selectSubType(clickedElement, true)
 		if (ret = "aborted") ;If user aborted
 		{
 			; user cancelled
@@ -1273,7 +1273,7 @@ ui_MoveConnection(connection1 = "", element1 = "", connection2 = "", element2 = 
 		}
 		
 		;open settings of element
-		ret := ElementSettings.open(clickedElement, "Wait")
+		ret := ElementSettings.open(clickedElement, true)
 		if (ret = "aborted") ;If user aborted
 		{
 			; user cancelled
@@ -1405,7 +1405,7 @@ ui_MoveConnection(connection1 = "", element1 = "", connection2 = "", element2 = 
 				and connectionType != "yes") 
 			{
 				; the connection type is not suitable. let user select a new one
-				ret := selectConnectionType(Connection1, "wait")
+				ret := selectConnectionType(Connection1, true)
 				if (ret = "aborted")
 				{
 					; user cancelled
@@ -1439,7 +1439,7 @@ ui_MoveConnection(connection1 = "", element1 = "", connection2 = "", element2 = 
 				and connectionType != "yes")
 			{
 				; the connection type is not suitable. let user select a new one
-				ret:=selectConnectionType(Connection2, "wait")
+				ret:=selectConnectionType(Connection2, true)
 				if (ret = "aborted")
 				{
 					; user cancelled

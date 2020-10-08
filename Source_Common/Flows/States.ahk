@@ -50,7 +50,6 @@ state_Undo(p_FlowID)
 		;If this is the current state and a previous state was found
 		if (stateid = currentState and previousState)
 		{
-			ToolTip restore %previousState%
 			;Restore previous state
 			restored := True
 			states_Restore(p_FlowID, previousState)
