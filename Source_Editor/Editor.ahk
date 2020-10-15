@@ -28,6 +28,9 @@ global _ScriptDir := _getShared("_ScriptDir")
 ; set default file encoding
 FileEncoding utf-8
 
+; speed up gui and changes dramatically
+SetWinDelay, 0
+
 ;initialize logger
 init_logger()
 

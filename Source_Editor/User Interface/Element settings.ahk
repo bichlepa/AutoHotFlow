@@ -36,8 +36,8 @@ class ElementSettings
 		global_resultEditingElement := ""
 		
 		this.fields := {} ;contains the fields which will be shown in the GUI. Each field is a bunch of controls
-		this.fieldHWNDs := {} ;Contains the field hwnds and the field object. Needed for responding user input
-		this.fieldParIDs := {} ;Contains the field hwnds and the field object. Needed for responding user input
+		this.fieldHWNDs := {} ;Contains the field objects of all field related controls hwnds. Needed for responding user input
+		this.fieldParIDs := {} ;Contains the field objects of all parameter IDs. Needed for responding user input
 		
 		; disable editor gui
 		EditGUIDisable()
@@ -45,9 +45,6 @@ class ElementSettings
 		;block some update while the gui is initialized
 		this.initializing := true
 		this.generalUpdateRunning := true
-		
-		; speed up gui creation dramatically
-		SetWinDelay, 0
 
 		;Create a scrollable Child GUI will almost all controls
 		gui, GUISettingsOfElement: default
@@ -66,7 +63,7 @@ class ElementSettings
 		;Loop through all parameters
 		for index, parameter in this.parametersToEdit
 		{
-			;Add one or a group of controls. This is done dynamically, dependending on the parameters
+			;Add one or a group of controls. This is done dynamically, dependending on the parameter types
 			if (parameter.type="Label")
 			{
 				this.fields.push(new this.label(parameter))
@@ -158,7 +155,7 @@ class ElementSettings
 		
 		;add the always visible buttons
 		setElementClass := this.elementClass
-		gui, GUISettingsOfElementParent:font, s8 cDefault wnorm
+		gui, GUISettingsOfElementParent: font, s8 cDefault wnorm
 		; button for changing element type
 		gui, GUISettingsOfElementParent: add, button, w370 x10 y10 gGUISettingsOfElementSelectType h20, % lang("%1%_type:_%2%", lang(this.elementType) ,Element_getName_%setElementClass%())
 		; button for getting help
@@ -217,9 +214,6 @@ class ElementSettings
 			;We don't need to wait until user closes the window
 			return
 		}
-		
-		
-		
 	}
 
 	;If user clicks on the button to change the element class
@@ -290,48 +284,20 @@ class ElementSettings
 		_setElementProperty(FlowID, ElementSettings.element, "Name", ElementSettings.NameField.getValue("Name"))
 		_setElementProperty(FlowID, ElementSettings.element, "StandardName", ElementSettings.NameField.getValue("StandardName"))
 		
-		for ElementSaveindex, parameter in ElementSettings.parametersToEdit
+		; get all parameter values
+		allParamValues := ElementSettings.getAllValues()
+
+		; save the parameter values
+		for oneID, oneValue in allParamValues
 		{
-			; create a list of all parameters
-			if not IsObject(parameter.id)
-				parameterIDs := [parameter.id]
-			else
-				parameterIDs := parameter.id
-				
-			; If this is only a label do nothing
-			if (not parameterIDs[1] or parameter.type = "label" or parameter.type = "SmallLabel")
-				continue
-			
-			;The edit control can also have parameter names which are specified in key "ContentID" add them to list
-			if (IsObject(oneField.parameter.ContentID))
+			; find out whether there were some changes
+			tempOldValue := _getElementProperty(FlowID, ElementSettings.element, "pars." oneID)
+			if (tempOldValue != oneValue)
 			{
-				for oneIndex, oneContentID in oneField.parameter.ContentID
-				{
-					parameterIDs.push(oneContentID)
-				}
-			}
-			else if (parameter.ContentID)
-			{
-				parameterIDs.push(oneField.parameter.ContentID)
-			}
-			
-			; save parameters
-			for ElementSaveindex2, oneID in parameterIDs
-			{
-				tempOneParID := parameterIDs[ElementSaveindex2]
-
-				; get value from gui
-				temponeValue := ElementSettings.fieldParIDs[tempOneParID].getValue(tempOneParID)
-
-				; find out whether there were some changes
-				tempOldValue := _getElementProperty(FlowID, ElementSettings.element, "pars." tempOneParID)
-				if (tempOldValue != temponeValue)
-				{
-					; change detected
-					ElementSettings.changes++
-					; write changed value
-					_setElementProperty(FlowID, ElementSettings.element, "pars." tempOneParID, temponeValue)
-				}
+				; change detected
+				ElementSettings.changes++
+				; write changed value
+				_setElementProperty(FlowID, ElementSettings.element, "pars." oneID, oneValue)
 			}
 		}
 		
@@ -349,62 +315,91 @@ class ElementSettings
 		return global_resultEditingElement
 	}
 	
-	
-	;The fields will be added to the GUI. This class contains common methods
+	; the following classes are a set of controls (= fields) which are used to display different parameter types
+	; This class contains common methods which are used by many controls
 	class field
 	{
+		; on creation of a field
+		; parameter: informations about the parameter
 		__new(parameter)
 		{
 			global
-			this.parameter:=parameter
-			this.components:=[]
-			this.enabled:=1
-			if (isobject(parameter.id))
+			local index, onepar
+
+			; save informations about the parameter
+			this.parameter := parameter
+			; this variable will contain the list of all controls
+			this.components := []
+			; this variable will contain the enabled state of the field
+			this.enabled := 1
+			; this variable will contain all parameter IDs of the field
+			this.parameterIds := []
+
+			; some parameters can be a string or an object. Convert them to consistent type.
+			;convert to object if it is a string
+			if (parameter.id and not IsObject(parameter.id))
+				parameter.id := [parameter.id] 
+
+			;convert to object if it is a string
+			if (parameter.default and not IsObject(parameter.default))
+				parameter.default := [parameter.default]
+			
+			;convert to object if it is a string	
+			if (parameter.content and not IsObject(parameter.content))
+				parameter.content := [parameter.content]
+			
+			;Convert to string if it is object
+			if (IsObject(parameter.contentID))
+				parameter.contentID := parameter.contentID[1]
+			
+			;Convert to string if it is object
+			if (IsObject(parameter.contentDefault))
+				parameter.contentDefault := parameter.contentDefault[1]
+					
+
+			; add to the list fieldParIDs all parameter IDs and link them to this field
+			for index, onepar in parameter.id
 			{
-				for index, onepar in parameter.id
-				{
-					ElementSettings.fieldParIDs[onepar]:=this
-				}
+				ElementSettings.fieldParIDs[onepar] := this
+				this.parameterIds.push(onePar)
 			}
-			else if (parameter.id!="")
-				ElementSettings.fieldParIDs[parameter.id]:=this
-			if (isobject(parameter.contentid))
+			
+			; repeat for content IDs
+			if (parameter.contentid)
 			{
-				for index, onepar in parameter.contentid
-				{
-					ElementSettings.fieldParIDs[onepar]:=this
-				}
+				ElementSettings.fieldParIDs[parameter.contentid] := this
+				this.parameterIds.push(parameter.contentid)
 			}
-			else if (parameter.contentid!="")
-				ElementSettings.fieldParIDs[parameter.contentid]:=this
 		}
 		
-		;Get value of a field. 
-		;If parameterID is empty, the first (or the only) parameter of the field will be retrieved
-		;If parameterID is set, this function will check whether the curernt object instance has the parameterID and then get it,
-		;otherwise it will find the object which contains the parameterID and call its getvalue() function.
-		getvalue(parameterID="")
+		; Get value of a field. 
+		; If parameterID is empty, the first (or the only) parameter of the field will be retrieved
+		; If parameterID is set, this function will check whether the curernt class instance has the parameterID and then get it,
+		;     otherwise it will find the object which contains the parameterID and call its getvalue() function.
+		getvalue(parameterID = "")
 		{
 			global
-			;~ d(this, "getvalue " parameterID)
 			local temp, tempParameterID, value, oneindex, oneid, oneField
-			if parameterID=
+			if (not parameterID)
 			{
-				;Set value of first parameter it
-				tempParameterID:=this.parameter.id
-				if isobject(tempParameterID)
-					tempParameterID:=tempParameterID[1]
+				; Get first parameter ID
+				tempParameterID := this.parameterIDs[1]
 				
-				;~ d(this, "getvalue 1 " tempParameterID)
-				GUIControlGet,temp,GUISettingsOfElement:,GUISettingsOfElement%tempParameterID%
+				if (tempParameterID) ; if this field has a paramter ID
+				{
+					; get value from gui control
+					GUIControlGet, temp, GUISettingsOfElement:, GUISettingsOfElement%tempParameterID%
+				}
+				Else
+				{
+					logger("a0", "cannot get value of field which has no parameter ID. (field class: " this.__Class ")", flowID)
+				}
 				return temp
 			}
 			else
 			{
-				;make list of all available parameter ID of this object
-				tempParameterID:=this.parameter.id
-				if ((not isobject(tempParameterID)) and tempParameterID != "")
-					tempParameterID:=[tempParameterID]
+				; make list of all available parameter IDs of this object
+				tempParameterID := this.parameter.id
 				
 				;Check whether current object has the requested parameter ID
 				for oneindex, oneid in tempParameterID
@@ -412,65 +407,51 @@ class ElementSettings
 					if (parameterID = oneid)
 					{
 						;if so, get value
-						;~ d(this, "getvalue 2 " parameterID)
-						GUIControlGet,temp,GUISettingsOfElement:,GUISettingsOfElement%oneid%
+						GUIControlGet, temp, GUISettingsOfElement:, GUISettingsOfElement%oneid%
 						return temp
 					}
 				}
-				;Find object which has the requested parameter ID and call it
-				for oneIndex, oneField in ElementSettings.fields
+				; the current object has not the requested parameter ID
+				; Find field which has the requested parameter ID and call it
+				foundField := ElementSettings.fieldParIDs[parameterID]
+				if (foundField)
 				{
-					;make list of all available parameter ID of oneField object
-					tempParameterID:=oneField.parameter.id
-					if ((not isobject(tempParameterID)) and tempParameterID != "")
-						tempParameterID:=[tempParameterID]
-					
-					;The edit control can also have parameter names which are specified in key "ContentID"
-					if (IsObject(oneField.parameter.ContentID))
-					{
-						tempParameterID.push(oneField.parameter.ContentID[1])
-					}
-					else if (parameter.ContentID)
-					{
-						tempParameterID.push(oneField.parameter.ContentID)
-					}
-					
-					for oneindex, oneid in tempParameterID
-					{
-						if (oneid = parameterID)
-						{
-							;~ d(this, "getvalue call " parameterID)
-							value:=onefield.getvalue(parameterID)
-							return value
-						}
-					}
-					
+					return foundField.getvalue(parameterID)
 				}
+
+				; if we are here, we did not find a field for this parameter ID
+				logger("a0", "cannot get value of field, since parameter ID ''" parameterID "'' was not found. (field class: " this.__Class ")", flowID)
 			}
 			return 
 		}
 		
-		setvalue(value, parameterID="")
+		; Set value of a field. 
+		; If parameterID is empty, the first (or the only) parameter of the field will be set
+		; If parameterID is set, this function will check whether the curernt class instance has the parameterID and then set it,
+		;     otherwise it will find the object which contains the parameterID and call its setvalue() function.
+		setvalue(value, parameterID = "")
 		{
 			global
-			;~ d(this, "setvalue " parameterID)
-			local tempParameterID:=this.parameter.id
-			if parameterID=
+			local foundField, tempParameterID, oneindex, oneid
+			if (not parameterID)
 			{
-				tempParameterID:=this.parameter.id
-				if isobject(tempParameterID)
-					tempParameterID:=tempParameterID[1]
+				; Get first parameter ID
+				tempParameterID := this.parameterIDs[1]
 				
-				;~ d(this, "setvalue 1 " tempParameterID ": " value)
-				GUIControl,GUISettingsOfElement:,GUISettingsOfElement%tempParameterID%,% value
-				return
+				if (tempParameterID) ; if this field has a paramter ID
+				{
+					; set value in gui control
+					GUIControl, GUISettingsOfElement:, GUISettingsOfElement%tempParameterID%, % value
+				}
+				Else
+				{
+					logger("a0", "cannot set value of field which has no parameter ID. (field class: " this.__Class ")", flowID)
+				}
 			}
 			else
 			{
 				;make list of all available parameter ID of this object
-				tempParameterID:=this.parameter.id
-				if ((not isobject(tempParameterID)) and tempParameterID != "")
-					tempParameterID:=[tempParameterID]
+				tempParameterID := this.parameter.id
 				
 				;Check whether current object has the requested parameter ID
 				for oneindex, oneid in tempParameterID
@@ -478,497 +459,596 @@ class ElementSettings
 					if (parameterID = oneid)
 					{
 						;if so, set value
-						;~ d(this, "setvalue 2 " parameterID)
-						GUIControl,GUISettingsOfElement:,GUISettingsOfElement%oneid%,% value
+						GUIControl, GUISettingsOfElement:, GUISettingsOfElement%oneid%, % value
 						return
 					}
 				}
-				;Find object which has the requested parameter ID and call it
-				for oneIndex, oneField in ElementSettings.fields
+
+				; the current object has not the requested parameter ID
+				; Find field which has the requested parameter ID and call it
+				foundField := ElementSettings.fieldParIDs[parameterID]
+				if (foundField)
 				{
-					;make list of all available parameter ID of oneField object
-					tempParameterID:=oneField.parameter.id
-					if ((not isobject(tempParameterID)) and tempParameterID != "")
-					tempParameterID:=[tempParameterID]
-					
-					for oneindex, oneid in tempParameterID
-					{
-						if (oneid = parameterID)
-						{
-							;~ d(this, "setvalue call " parameterID)
-							value:=onefield.setvalue(value, parameterID)
-							return value
-						}
-					}
-					
+					foundField.setvalue(value, parameterID)
+					return
 				}
-				
+
+				; if we are here, we did not find a field for this parameter ID
+				logger("a0", "cannot set value of field, since parameter ID ''" parameterID "'' was not found. (field class: " this.__Class ")", flowID)
 			}
-			
-			return
 		}
 		
 		
-		setChoices(value, parameterID="")
+		; Set choices of a field (dropdown, etc)
+		; If parameterID is empty, the choices for the first (or the only) parameter of the field will be set
+		; If parameterID is set, this function will check whether the curernt class instance has the parameterID and then set it,
+		;     otherwise it will find the object which contains the parameterID and call its setChoices() function.
+		setChoices(value, parameterID = "")
 		{
 			global
-			local tempParameterID:=this.parameter.id
-			if parameterID=
+			local foundField
+			if (not parameterID)
 			{
-				tempParameterID:=this.parameter.id
-				if isobject(tempParameterID)
-					tempParameterID:=tempParameterID[1]
-				
-				;~ MsgBox not implemented
-				;Not implemented here. must be implemented in the extended classes
+				logger("a0", "cannot set choices of current field. It is not implemented for this field type. (field class: " this.__Class ")", flowID)
 			}
 			else
 			{
-				tempParameterID:=this.parameter.id
-				if not isobject(tempParameterID)
-					tempParameterID:=[tempParameterID]
-				
-				;Find object which has the requested parameter ID and call it
-				for oneIndex, oneField in ElementSettings.fields
+				; the current object has not the requested parameter ID
+				; Find field which has the requested parameter ID and call it
+				foundField := ElementSettings.fieldParIDs[parameterID]
+				if (foundField)
 				{
-					;make list of all available parameter ID of oneField object
-					tempParameterID:=oneField.parameter.id
-					if ((not isobject(tempParameterID)) and tempParameterID != "")
-						tempParameterID:=[tempParameterID]
-					
-					for oneindex, oneid in tempParameterID
-					{
-						if (oneid = parameterID)
-						{
-							onefield.setChoices(value, parameterID)
-							return value
-						}
-					}
-					
+					foundField.setChoices(value, parameterID)
 				}
+
+				; if we are here, we did not find a field for this parameter ID
+				logger("a0", "cannot set choices of field, since parameter ID ''" parameterID "'' was not found. (field class: " this.__Class ")", flowID)
 			}
 		}
 		
-		setLabel(value, parameterID="")
+		; Set label of a field
+		; If parameterID is empty, the choices for the first (or the only) parameter of the field will be set
+		; If parameterID is set, this function will check whether the curernt class instance has the parameterID and then set it,
+		;     otherwise it will find the object which contains the parameterID and call its setChoices() function.
+		setLabel(value, parameterID = "")
 		{
 			global
-			local tempParameterID:=this.parameter.id
-			if parameterID=
+			local foundField
+			if (not parameterID)
 			{
-				tempParameterID:=this.parameter.id
-				if isobject(tempParameterID)
-					tempParameterID:=tempParameterID[1]
-				
-				;~ MsgBox not implemented
-				;Not implemented here. must be implemented in the extended classes
+				logger("a0", "cannot set label of current field. It is not implemented for this field type. (field class: " this.__Class ")", flowID)
 			}
 			else
 			{
-				tempParameterID:=this.parameter.id
-				if not isobject(tempParameterID)
-					tempParameterID:=[tempParameterID]
-				
-				;Find object which has the requested parameter ID and call it
-				for oneIndex, oneField in ElementSettings.fields
+				; the current object has not the requested parameter ID
+				; Find field which has the requested parameter ID and call it
+				foundField := ElementSettings.fieldParIDs[parameterID]
+				if (foundField)
 				{
-					;make list of all available parameter ID of oneField object
-					tempParameterID:=oneField.parameter.id
-					if ((not isobject(tempParameterID)) and tempParameterID != "")
-						tempParameterID:=[tempParameterID]
-					
-					for oneindex, oneid in tempParameterID
-					{
-						if (oneid = parameterID)
-						{
-							onefield.setLabel(value, parameterID)
-							return value
-						}
-					}
-					
+					foundField.setLabel(value, parameterID)
+					return
 				}
+
+				; if we are here, we did not find a field for this parameter ID
+				logger("a0", "cannot set label of field, since parameter ID ''" parameterID "'' was not found. (field class: " this.__Class ")", flowID)
 			}
 		}
 		
-		enable(parameterID="",enOrDis=1)
+		; enable a field
+		; If parameterID is empty, all controls of this field will be enabled
+		; If parameterID is set, this function will check whether the curernt class instance has the parameterID and then enable all controls of this field,
+		;     otherwise it will find the object which contains the parameterID and call its enable() function.
+		enable(parameterID = "", enOrDis = 1)
 		{
 			global
+			local tempParameterID, index, component, oneid, oneField
 			
-			;~ d(this, "enable " parameterID)
 			;if parameterID is empty, disable all components
-			if parameterID=
+			if (not parameterID)
 			{
-				;~ d(this, "enable 1 " parameterID)
-				;enable all components
+				;enable all components of this field
 				for index, component in this.components
 				{
-					guicontrol,GUISettingsOfElement:enable%enOrDis%,% component
+					guicontrol, GUISettingsOfElement:enable%enOrDis%, % component
 				}
-				this.enabled:=enOrDis
+
+				; save enabling state and check content
+				if (this.enabled != enOrDis)
+				{
+					this.enabled := enOrDis
+					this.checkContent()
+				}
 			}
 			else
 			{
 				;make list of all available parameter ID of this object
-				tempParameterID:=this.parameter.id
-				if ((not isobject(tempParameterID)) and tempParameterID != "")
-					tempParameterID:=[tempParameterID]
+				tempParameterID := this.parameter.id
 				
 				;Check whether current object has the requested parameter ID
 				for oneindex, oneid in tempParameterID
 				{
 					if (parameterID = oneid)
 					{
-						;if so, get value
-						;~ d(this, "enable 2 " parameterID)
-						;enable all components
+						;if so, enable all components
 						for index, component in this.components
 						{
-							guicontrol,GUISettingsOfElement:enable%enOrDis%,% component
+							guicontrol, GUISettingsOfElement: enable%enOrDis%, % component
 						}
+
+						; save enabling state and check content
 						if (this.enabled != enOrDis)
 						{
-							this.enabled:=enOrDis
+							this.enabled := enOrDis
 							this.checkContent()
 						}
 						return
 					}
 				}
-				;Find object which has the requested parameter ID and call it
-				for oneIndex, oneField in ElementSettings.fields
+
+				; the current object has not the requested parameter ID
+				; Find field which has the requested parameter ID and call it
+				foundField := ElementSettings.fieldParIDs[parameterID]
+				if (foundField)
 				{
-					;make list of all available parameter ID of oneField object
-					tempParameterID:=oneField.parameter.id
-					if ((not isobject(tempParameterID)) and tempParameterID != "")
-						tempParameterID:=[tempParameterID]
-					
-					for oneindex, oneid in tempParameterID
-					{
-						if (oneid = parameterID)
-						{
-							;~ d(this, "enable call " parameterID)
-							value:=onefield.enable(parameterID, enOrDis)
-							return value
-						}
-					}
-					
+					foundField.enable(parameterID, enOrDis)
 				}
-				
+
+				; if we are here, we did not find a field for this parameter ID
+				tempString := enOrDis ? "enable" : "disable"
+				logger("a0", "cannot " tempString " a field, since parameter ID ''" parameterID "'' was not found. (field class: " this.__Class ")", flowID)
 			}
-			
-			;~ d(this, "enable end " parameterID)
 		}
-		disable(parameterID="")
+
+		; disable a field. Uses enable() function
+		disable(parameterID = "")
 		{
-			this.enable(parameterID,0)
+			this.enable(parameterID, 0)
+		}
+
+		; returns true, if parameter is in the parmeter ID list of this control
+		hasParameterID(parameterID)
+		{
+			for oneIndex, oneParameterID in this.parameterIds
+			{
+				if (parameterID = oneParameterID)
+					return true
+			}
+			return false
+		}
+
+		; check content of the fields
+		checkContent()
+		{
+			; not implemented
 		}
 		
-		
+		; called if user clicks on a warning picture. It shows a tooltip with the current warning text
 		ClickOnWarningPic()
 		{
-			;~ MsgBox gaga 
-			ToolTip,% this.warningtext,,,11
-			settimer,GUISettingsOfElementRemoveInfoTooltip,-5000
+			ToolTip, % this.warningtext, , , 11
+			settimer, GUISettingsOfElementRemoveInfoTooltip, -5000
 		}
 		
 	}
 	
-	
+	; field which contains the element name
+	; this field will be created for every element and there can only be one field of this class
 	class name extends ElementSettings.field
 	{
 		__new(parameter)
 		{
 			global
+			; reuse base new() function
 			base.__new(parameter)
 			local tempchecked, temptext, tempParGray, tempHWND
-			local tempParameterID:=parameter.id
-			ElementSettings.NameField:=this
+			local tempParameterID := parameter.id
+
+			; save this object to a varaible, so it can be found from outside.
+			ElementSettings.NameField := this
 			
-			gui,font,s8 cDefault wnorm
+			; create the gui elements
+			gui, font, s8 cDefault wnorm
 			
-			tempchecked:= _getElementProperty(FlowID, ElementSettings.element, "StandardName")
-			
-			gui,add,checkbox, x10 hwndtempHWND checked%tempchecked% vGUISettingsOfElementStandardName gGUISettingsOfElementCheckStandardName,% lang("Standard_name")
+			; add the checkbox for the parameter "StandardName"
+			tempchecked := _getElementProperty(FlowID, ElementSettings.element, "StandardName")
+			gui,add,checkbox, x10 hwndtempHWND checked%tempchecked% vGUISettingsOfElementStandardName gGUISettingsOfElementCheckStandardName, % lang("Standard_name")
 			this.components.push("GUISettingsOfElementStandardName")
-			ElementSettings.fieldHWNDs[tempHWND]:=this
+			ElementSettings.fieldHWNDs[tempHWND] := this
+
+			; add the checkbox for the parameter "name"
 			gui,add,edit,w400 x10 Multi r5 hwndtempHWND vGUISettingsOfElementName gGUISettingsOfElementGeneralUpdate,% ElementSettings.elementName
 			this.components.push("GUISettingsOfElementName")
-			ElementSettings.fieldHWNDs[tempHWND]:=this
-			
-			
+			ElementSettings.fieldHWNDs[tempHWND] := this
 		}
 		
-		
+		; change the name of the element
+		; p_CurrentPar: all parameters of the element, since the name will be generated out of those parameters
 		updateName(p_CurrentPars)
 		{
 			global
-			local Newname
-			if (ElementSettings.initializing=true)
+			local Newname, setElementClass
+
+			; skip this action, if the element settings window is currently initialized
+			if (ElementSettings.initializing = true)
 				return
-			if (this.getvalue("StandardName")=1)
+
+			; check the paraemter StandardName
+			if (this.getvalue("StandardName") = 1)
 			{
+				; the default name is enabled. We will disable the name field and generate the name
 				this.disable("Name")
 				setElementClass := ElementSettings.elementClass
-				Newname:=Element_GenerateName_%setElementClass%({flowID: FlowID, ElementID: ElementSettings.element}, p_CurrentPars) 
-				StringReplace,Newname,Newname,`n,%a_space%-%a_space%,all
+				Newname := Element_GenerateName_%setElementClass%({flowID: FlowID, ElementID: ElementSettings.element}, p_CurrentPars) 
+				; the element function may return some linefeeds. We will replace them.
+				StringReplace, Newname, Newname, `n, %a_space%-%a_space%, all
 				this.setvalue(Newname, "Name")
 			}
 			else
+			{
+				; the default name is disabled. We will enable the name field, so the user can edit it
 				this.enable("Name")
-			return
+			}
+		}
+
+		; enable or disable the name field. Never disable the "StandardName" checkbox
+		enable(parameterID = "", enOrDis = 1)
+		{
+			global
+			local tempParameterID, index, component, oneid, oneField
 			
+			;if parameterID is empty, disable all components
+			if (not parameterID)
+			{
+				; enable the name field
+				guicontrol, GUISettingsOfElement: enable%enOrDis%, GUISettingsOfElementName
+			}
+			else
+			{
+				;make list of all available parameter ID of this object
+				tempParameterID := this.parameter.id
+				
+				;Check whether current object has the requested parameter ID
+				for oneindex, oneid in tempParameterID
+				{
+					if (parameterID = oneid)
+					{
+						; if so, enable the name field
+						guicontrol, GUISettingsOfElement: enable%enOrDis%, GUISettingsOfElementName
+						return
+					}
+				}
+			}
 		}
 	}
 
-	
+	; field which contains a label
 	class label extends ElementSettings.field
 	{
 		__new(parameter)
 		{
 			global
+			; reuse base new() function
 			base.__new(parameter)
+
 			local tempYPos
-			local tempParameterID:=parameter.labelid
-			if (parameter.size="small")
+			local tempParameterID := parameter.labelid
+
+			; modify the style depending on the parameter property "small"
+			if (parameter.size = "small")
 			{
-				gui,font,s8 cDefault wbold
-				tempYPos=
+				gui, font, s8 cDefault wbold
+				tempYPos := ""
 			}
 			else
 			{
-				gui,font,s10 cnavy wbold
-				tempYPos=Y+15
+				gui, font, s10 cnavy wbold
+				tempYPos := "Y+15"
 			}
-			if (tempParameterID!="")
+
+			; do we have a label ID?
+			if (tempParameterID)
 			{
-				gui,add,text,x10 w400 %tempYPos% vGUISettingsOfElement%tempParameterID% ,% parameter.label
+				; we have a label ID, it will allow the use of "setLabel" function 
+				gui, add, text, x10 w400 %tempYPos% vGUISettingsOfElement%tempParameterID%, % parameter.label
 				this.components.push("GUISettingsOfElement" tempParameterID)
 			}
 			else
 			{
-				gui,add,text,x10 w400 %tempYPos%,% parameter.label
+				; we don't have a label ID, we won't be able to use setLabel() function. This is usual case, since most labels are static.
+				gui, add, text, x10 w400 %tempYPos%, % parameter.label
 			}
 		}
 		
-		setLabel(value, parameterID="")
+		; Set label value.
+		; If parameterID is empty and this field has a label ID, the label of this field will be used.
+		; If parameterID is set, this function will check whether the current class instance has the parameterID and then set it,
+		;     otherwise it will find the object which contains the parameterID and call its setLabel() function.
+		setLabel(value, parameterID = "")
 		{
 			global
-			local tempParameterID, 
-			local tempParameterID:=this.parameter.labelid
-			if parameterID=
+			if (not parameterID)
 			{
-				tempParameterID:=this.parameter.labelid
-				if isobject(tempParameterID)
-					tempParameterID:=tempParameterID[1]
+				; paraemter ID is empty. Use the first parameter ID
+				parameterID := this.parameterIds[1]
+				if (not parameterID)
+				{
+					logger("a0", "cannot set label. Parameter ID '" parameterID "' is not in list (field class: " this.__Class ")")
+					return
+				}
 			}
-			else
-				tempParameterID:=parameterID
-			
-			
-			GUIControl,GUISettingsOfElement:,GUISettingsOfElement%tempParameterID%,% value
+			Else
+			{
+				; parameter ID is set. Check whether it exists in the parameter list of this field
+				if (not this.hasParameterID(parameterID))
+				{
+					logger("a0", "cannot set label. Parameter ID '" parameterID "' is not in list (field class: " this.__Class ", first paramter ID: " this.parameterIds[1] ")")
+					return
+				}
+			}
+
+			; change label
+			GUIControl, GUISettingsOfElement:, GUISettingsOfElement%parameterID%, % value
 			return
 		}
-		
 	}
+
+	; field which contains a checkbox
 	class checkbox extends ElementSettings.field
 	{
 		__new(parameter)
 		{
 			global
+			; reuse base new() function
 			base.__new(parameter)
-			local temp, temptext, tempParGray, tempHWND
-			local tempParameterID:=parameter.id
 			
-			gui,font,s8 cDefault wnorm
-			temp:=ElementSettings.elementPars[parameter.id] 
-			temptext:=parameter.label
-			if parameter.gray
-				tempParGray=check3
+			local tempChecked, temptext, tempParGray, tempHWND
+			local tempParameterID := this.parameterIDs[1]
+			
+			; get the parametr properties
+			tempChecked := ElementSettings.elementPars[tempParameterID] 
+			temptext := parameter.label
+			if (parameter.gray)
+				tempParGray := "check3"
 			else
-				tempParGray=
-			gui,add,checkbox,w400 x10 %tempParGray% checked%temp% hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID%,%temptext%
+				tempParGray := ""
+
+			; create the gui elements
+			gui, font, s8 cDefault wnorm
+			gui, add, checkbox, w400 x10 %tempParGray% checked%tempChecked% hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID%, %temptext%
 			this.components.push("GUISettingsOfElement" tempParameterID)
-			ElementSettings.fieldHWNDs[tempHWND]:=this
-			
+			ElementSettings.fieldHWNDs[tempHWND] := this
 		}
 		
-		setLabel(value, parameterID="")
+		; change the label of the checkbox
+		setLabel(value, parameterID = "")
 		{
 			global
-			local tempParameterID, 
-			local tempParameterID:=this.parameter.id
-			if parameterID=
+			if (not parameterID)
 			{
-				tempParameterID:=this.parameter.id
-				if isobject(tempParameterID)
-					tempParameterID:=tempParameterID[1]
+				; paraemter ID is empty. Use the first parameter ID
+				parameterID := this.parameterIds[1]
+				if (not parameterID)
+				{
+					logger("a0", "cannot set label. Parameter ID '" parameterID "' is not in list (field class: " this.__Class ")")
+					return
+				}
 			}
-			else
-				tempParameterID:=parameterID
+			Else
+			{
+				; parameter ID is set. Check whether it exists in the parameter list of this field
+				if (not this.hasParameterID(parameterID))
+				{
+					logger("a0", "cannot set label. Parameter ID '" parameterID "' is not in list (field class: " this.__Class ", first paramter ID: " this.parameterIds[1] ")")
+					return
+				}
+			}
 			
-			
-			GUIControl,GUISettingsOfElement:text,GUISettingsOfElement%tempParameterID%,% value
+			; change label
+			GUIControl, GUISettingsOfElement:text, GUISettingsOfElement%parameterID%, % value
 			return
 		}
 	}
 	
+	; field which contains some radio buttons
 	class radio extends ElementSettings.field
 	{
 		__new(parameter)
 		{
 			global
+			; reuse base new() function
 			base.__new(parameter)
+
 			local tempAssigned, tempMakeNewGroup, tempChecked, temp, tempHWND
-			local tempParameterID:=parameter.id
 			local hasEnum
+			local tempParameterID := this.parameterIDs[1]
 			
-			gui,font,s8 cDefault wnorm
-			temp:=ElementSettings.elementPars[tempParameterID] 
-			tempAssigned:=false
+			; set font style
+			gui, font, s8 cDefault wnorm
+
+			; get value
+			temp := ElementSettings.elementPars[tempParameterID] 
+			tempAssigned := false
 			for tempindex, tempRadioLabel in parameter.choices
 			{
-				if a_index=1
-					tempMakeNewGroup=Group
+				; we need to make a new group on first iteration (required if gui contains multiple radio fields)
+				if (a_index = 1)
+					tempMakeNewGroup := "Group"
 				else
-					tempMakeNewGroup=
+					tempMakeNewGroup := ""
 				
-				if (temp=a_index or temp = parameter.Enum[a_index])
+				; find the checked option
+				if ((temp = a_index) or (temp = parameter.Enum[a_index]))
 				{
-					tempChecked=checked
-					tempAssigned:=true
+					tempChecked := "checked"
+					tempAssigned := true
 				}
 				else
-					tempChecked=
-					
-				gui,add,radio, w400 x10 %tempChecked% %tempMakeNewGroup% hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID%%a_index% ,% tempRadioLabel
+					tempChecked := ""
+				
+				; add a radio button
+				gui, add, radio, w400 x10 %tempChecked% %tempMakeNewGroup% hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID%%a_index% , % tempRadioLabel
 				this.components.push("GUISettingsOfElement" tempParameterID a_index)
-				ElementSettings.fieldHWNDs[tempHWND]:=this
-				
+				ElementSettings.fieldHWNDs[tempHWND] := this
 			}
-			if (tempAssigned=false) ;Catch if a wrong value was saved and set to default value. 
-			;TODO: is this a good idea? If this happens and user opens the settings window, he might erroneously thing that everything is ok.
+			if (tempAssigned = false) ;Catch if a wrong value was saved and set to default value. 
 			{
-				
-				temp:=parameter.default
-				guicontrol,GUISettingsOfElement:,GUISettingsOfElement%tempParameterID%%temp%,1
+				logger("a0", "none radio button was activated. Value '" temp "' is not in choices (field class: " this.__Class ")")
 			}
 		}
 		
+		; get the value of the radio field.
+		; if the parameter type is enum, it will return the enum value. Else it will return the index.
 		getvalue()
 		{
 			global
 			local temp
-			local tempParameterID:=this.parameter.id
+			; Get first parameter ID
+			local tempParameterID := this.parameterIDs[1]
 			
+			; this field has multiple radio button controls. Find the selected one.
 			loop % this.parameter.choices.MaxIndex()
 			{
-				guicontrolget,temp,GUISettingsOfElement:,GUISettingsOfElement%tempParameterID%%a_index%
-				if (temp=1)
+				; get value from radio button
+				guicontrolget, temp, GUISettingsOfElement:, GUISettingsOfElement%tempParameterID%%a_index%
+				if (temp = 1)
 				{
+					; the current radio button is selected.
 					if (this.parameter.result = "enum")
 					{
-						temp:=this.parameter.Enum[a_index]
+						; the result type is "enum" we will return the enumeration value
+						temp := this.parameter.Enum[a_index]
 					}
 					else
 					{
-						temp:=A_Index
+						; We will return the index
+						temp := A_Index
 					}
 					break
 				}
+				; else continue with next radio button
 			}
 			
 			return temp
 		}
+
+		; set the value of radio field
 		setvalue(value)
 		{
 			global
 			local temp
-			local tempParameterID:=this.parameter.id
+			; Get first parameter ID
+			local tempParameterID := this.parameterIDs[1]
+
 			if not (value >= 1 and value <= this.parameter.choices.MaxIndex())
 			{
-				 ;This might be an enum value
+				; Value is not a valid index. This might be an enum value. Check whether the enumeration is enabled
+				local success := false
 				if (IsObject(this.parameter.Enum))
 				{
+					; we have an enumeration. Try to find value in choices
 					loop % this.parameter.choices.MaxIndex()
 					{
 						if (this.parameter.Enum[a_index] = value)
 						{
+							; value is one of the enumeration. We will set the corresponding index
 							temp := a_index
+							success := true
 							break
 						}
 					}
 				}
+
+				if (not success)
+				{
+					logger("a0", "cannot set value. Value '" value "' is neither a valid index nor a valid enumeration value (field class: " this.__Class ", first paramter ID: " this.parameterIds[1] ")")
+				}
 			}
 			else
 			{
-				temp:=A_Index
+				; the value is a valid index. We will set it.
+				temp := value
 			}
-			GUIControl,GUISettingsOfElement:,GUISettingsOfElement%tempParameterID%%temp%,1
+
+			; set the correct radio button
+			GUIControl, GUISettingsOfElement:, GUISettingsOfElement%tempParameterID%%temp%, 1
 			return temp
 		}
 		
-		
-		setLabel(value, parameterID="")
+		; change the label of a radio button
+		setLabel(value, parameterID = "")
 		{
 			global
-			local tempParameterID, 
-			local tempParameterID:=this.parameter.id
-			if parameterID=
+			if (not parameterID)
 			{
-				tempParameterID:=this.parameter.id
-				if isobject(tempParameterID)
-					tempParameterID:=tempParameterID[1]
+				; paraemter ID is empty. Use the first parameter ID
+				parameterID := this.parameterIds[1]
+				if (not parameterID)
+				{
+					logger("a0", "cannot set label. Parameter ID '" parameterID "' is not in list (field class: " this.__Class ")")
+					return
+				}
 			}
-			else
-				tempParameterID:=parameterID
+			Else
+			{
+				; parameter ID is set. Check whether it exists in the parameter list of this field
+				if (not this.hasParameterID(parameterID))
+				{
+					logger("a0", "cannot set label. Parameter ID '" parameterID "' is not in list (field class: " this.__Class ", first paramter ID: " this.parameterIds[1] ")")
+					return
+				}
+			}
 			
-			
+			; change label
 			GUIControl,GUISettingsOfElement:text,GUISettingsOfElement%tempParameterID%,% value
 			return
 		}
 	}
 	
+	; field which contains an edit element.
 	class edit extends ElementSettings.field
 	{
 		__new(parameter)
 		{
 			global
+			; reuse base new() function
 			base.__new(parameter)
+
 			local temp, temptext, tempIsMulti, tempXpos,tempEditwidth, tempHWND, tempContentTypeID, tempContentTypeNum, tempFirstParameterID, tempchecked1, tempchecked2, tempassigned, tempContentDefault
 			local tempwAvailable, tempw
 			local oneindex, onevalue
-			if (not IsObject(parameter.id)) ;convert to object if it is a string
-				parameter.id:=[parameter.id] 
-			local tempParameterID:=parameter.id
-			local tempFirstParameterID:=parameter.id[1]
-			if (not IsObject(parameter.default)) ;convert to object if it is a string
-				parameter.default:=[parameter.default]
-			local tempParameterdefault:=parameter.default
-			if (not IsObject(parameter.content)) ;convert to object if it is a string
-				parameter.content:=[parameter.content]
-			local tempParameterContentType:=parameter.content
-			if (IsObject(parameter.contentID)) ;Convert to string if it is object
-				parameter.contentID:=parameter.contentID[1]
-			local tempParameterContentTypeID:=parameter.contentID
-			if (IsObject(parameter.contentDefault)) ;Convert to string if it is object
-				parameter.contentDefault:=parameter.contentDefault[1]
-			local tempParameterContentTypeDefault:=parameter.contentDefault
+
+			; copy some paramters in local variables
+			local tempParameterID := parameter.id
+			local tempFirstParameterID := parameter.id[1]
+			local tempParameterdefault := parameter.default
+			local tempParameterContentType := parameter.content
+			local tempParameterContentTypeID := parameter.contentID
+			local tempParameterContentTypeDefault := parameter.contentDefault
 			
-			this.warnIfEmpty:=parameter.WarnIfEmpty
+			; prepare some strings for the content type radio
+			this.contentTypeLangs := {string: lang("This is a string"), rawString: lang("This is a raw string"), expression: lang("This is an expression"), VarName: lang("This is a variable name")}
+			this.currentContentType := ""
 			
-			this.contentTypeLangs:={string: lang("This is a string"), rawString: lang("This is a raw string"), expression: lang("This is an expression"), VarName: lang("This is a variable name")}
-			this.currentContentType:=""
+			; create the gui elements
+			gui, font, s8 cDefault wnorm
 			
-			gui,font,s8 cDefault wnorm
-			
-			if (parameter.content.MaxIndex() > 1) ;If the input type is selectable
+			; Is the input type selectable?
+			if (parameter.content.MaxIndex() > 1)
 			{
-				if (not parameter.contentID)
+				; the input type is selectable. We will need to add some radio buttons
+				if (not tempParameterContentTypeID)
 				{
+					; catch bug in the element implementation
 					MsgBox Error creating edit field: Multiple contents should be possible but the content ID is not specified.
+					logger("a0", "cannot create edit field. Multiple contents should be possible but the content ID is not specified (field class: " this.__Class ", first paramter ID: " this.parameterIds[1] ")")
 					return
 				}
 				
-				tempContentTypeNum:=ElementSettings.elementPars[tempParameterContentTypeID] ;get the saved parameter
-				if tempContentTypeNum is not number ;Get the index of the content type
+				; get the value of the content type parameter
+				tempContentTypeNum := ElementSettings.elementPars[tempParameterContentTypeID]
+
+				; Get the index of the content type
+				if tempContentTypeNum is not number
 				{
 					for oneindex, onevalue in parameter.content
 					{
@@ -980,254 +1060,243 @@ class ElementSettings
 					}
 				}
 				
-				tempAssigned:=false
+				tempAssigned := false
 				loop % parameter.content.maxindex()
 				{
+					; we need to make a new group on first iteration (required if gui contains multiple radio fields)
 					if a_index = 1
-						tempgrpStr:="Group"
+						tempgrpStr := "Group"
 					else
-						tempgrpStr:=""
+						tempgrpStr := ""
 					
+					; find the checked option
 					if (a_index = tempContentTypeNum)
 					{
-						tempchecked:="checked"
-						tempAssigned:=true
+						tempchecked := "checked"
+						tempAssigned := true
 					}
 					else
 					{
-						tempchecked:=""
+						tempchecked := ""
 					}
 					
-					gui,add,radio, w400 x10 %tempchecked% %tempgrpStr% hwndtempHWND gGUISettingsOfElementChangeRadio vGUISettingsOfElement%tempParameterContentTypeID%%A_Index% ,% this.contentTypeLangs[parameter.content[a_index]]
+					; add a radio button
+					gui, add, radio, w400 x10 %tempchecked% %tempgrpStr% hwndtempHWND gGUISettingsOfElementChangeRadio vGUISettingsOfElement%tempParameterContentTypeID%%A_Index%, % this.contentTypeLangs[parameter.content[a_index]]
 					this.components.push("GUISettingsOfElement" tempParameterContentTypeID a_index)
-					ElementSettings.fieldHWNDs[tempHWND]:=this
-					
+					ElementSettings.fieldHWNDs[tempHWND] := this
 				}
 				
-				if (tempAssigned=false) ;Catch if a wrong value or no was saved and set to default value.
+				if (not tempAssigned) ;Catch if a wrong value or no was saved and set to default value.
 				{
-					tempContentDefault:=parameter.contentDefault
-					if not tempContentDefault
-						tempContentDefault:=1
-					this.setvalue(tempContentDefault,tempParameterContentTypeID)
-					this.ContentType:=this.getvalue(tempParameterContentTypeID)
+					logger("a0", "none radio button was activated. Content type value '" tempContentTypeNum "' is not in choices (field class: " this.__Class ")")
 				}
 			}
 			else
 			{
-				this.ContentType:=parameter.content[1]
+				; we have only one content type (or none)
+				this.currentContentType := parameter.content[1]
 			}
 			
-			;Add picture, which will warn user if the entry is obviously invalid
-			gui,add,picture,x394 w16 h16 hwndtempHWND gGUISettingsOfElementClickOnWarningPic vGUISettingsOfElementWarningIconOf%tempFirstParameterID%
+			; Add picture, which will warn user if the entry is obviously invalid
+			gui, add, picture, x394 w16 h16 hwndtempHWND gGUISettingsOfElementClickOnWarningPic vGUISettingsOfElementWarningIconOf%tempFirstParameterID%
 			this.components.push("GUISettingsOfElementWarningIconOf" tempFirstParameterID)
-			ElementSettings.fieldHWNDs[tempHWND]:=this
-			this.warnIfEmpty:=parameter.WarnIfEmpty
+			ElementSettings.fieldHWNDs[tempHWND] := this
 			
-			
-			;The info icon tells user which conent type it is
-			tempselectedContentType:=parameter.content[1]
-			gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempFirstParameterID%,%_ScriptDir%\icons\%tempselectedContentType%.ico
+			;The info icon tells user which content type it is
+			tempcurrentContentType := this.currentContentType
+			gui, add, picture, x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempFirstParameterID%, %_ScriptDir%\icons\%tempcurrentContentType%.ico
 			this.components.push("GUISettingsOfElementInfoIconOf" tempFirstParameterID)
-			ElementSettings.fieldHWNDs[tempHWND]:=this
+			ElementSettings.fieldHWNDs[tempHWND] := this
 			
-			
+			; Add the edit control(s)
 			loop % parameter.id.MaxIndex()
 			{
-				tempOneParameterID:=parameter.id[a_index]
-				;Add the edit control(s)
-				tempwAvailable:=360
-				tempw:=(tempwAvailable - (4 * (parameter.id.MaxIndex() -1)) ) / parameter.id.MaxIndex()
-				temptext:=ElementSettings.elementPars[tempOneParameterID]
-				
-				gui,add,edit,X+4 w%tempw% %tempIsMulti% r1 hwndtempHWND gGUISettingsOfElementCheckContent vGUISettingsOfElement%tempOneParameterID%,%temptext%
+				tempOneParameterID := parameter.id[a_index]
+
+				; calculate the width of the control. It depends on the count of IDs
+				tempwAvailable := 360
+				tempw := (tempwAvailable - (4 * (parameter.id.MaxIndex() -1))) / parameter.id.MaxIndex()
+
+				; create the controls
+				temptext := ElementSettings.elementPars[tempOneParameterID]
+				gui, add, edit, X+4 w%tempw% %tempIsMulti% r1 hwndtempHWND gGUISettingsOfElementCheckContent vGUISettingsOfElement%tempOneParameterID%, %temptext%
 				this.components.push("GUISettingsOfElement" tempOneParameterID)
-				ElementSettings.fieldHWNDs[tempHWND]:=this
+				ElementSettings.fieldHWNDs[tempHWND] := this
 				
 				if (parameter.id.MaxIndex() = 1 and tempParameterContentType[1] = "expression")
 				{
-					;If this a single expression, user may want to add arrow keys
+					;If we have a single expression, it may have some arrow keys
 					if (parameter.useupdown)
 					{
 						if (parameter.range)
-							gui,add,updown,% "range" parameter.range
+							gui, add, updown, % "range" parameter.range
 						else
-							gui,add,updown
-						guicontrol,GUISettingsOfElement:,GUISettingsOfElement%tempOneParameterID%,%temptext%
+							gui, add, updown
+						guicontrol, GUISettingsOfElement:, GUISettingsOfElement%tempOneParameterID%, %temptext%
 					}
 				}
 			}
 			
-			this.changeRadio()
-			
-			
+			; update the content type icon
+			this.updateContentTypePicture()
 		}
 		
-		
-		getvalue(parameterID="")
+		; get value of the edit field
+		getvalue(parameterID = "")
 		{
 			global
 			local temp, tempParameterID
-			if (parameterID and parameterID=this.parameter.contentID)
+
+			if (parameterID and parameterID = this.parameter.contentID)
 			{
+				; we want to have the contentID parameter. Get value from radio buttons
 				loop % this.parameter.content.MaxIndex()
 				{
-					GUIControlGet,temp,GUISettingsOfElement:,GUISettingsOfElement%parameterID%%a_index%
-					if temp=1
+					; get value from radio button
+					GUIControlGet, temp, GUISettingsOfElement:, GUISettingsOfElement%parameterID%%a_index%
+					if (temp = 1)
 					{
-						temp := this.parameter.content[ a_index]
-						;~ d(temp ,a_index " - "  parameterID)
+						; the current radio button is selected.
+						temp := this.parameter.content[a_index]
 						break
 					}
+					; else continue with next radio button
 				}
-				;~ d(temp ,parameterID "  return")
 				return temp
 			}
 			else
 			{
-				if parameterID=
-				{
-					tempParameterID:=this.parameter.id
-					if IsObject(tempParameterID)
-						tempParameterID:=tempParameterID[1]
-				}
-				else
-					tempParameterID:=parameterID
-				GUIControlGet,temp,GUISettingsOfElement:,GUISettingsOfElement%tempParameterID%
-				return temp
+				; we want other parameter. We can reuse the base function
+				return base.getvalue(parameterID)
 			}
-			
 		}
 		
-		setvalue(value, parameterID="")
+		; set the value of the edit field
+		setvalue(value, parameterID = "")
 		{
 			global
-			;~ d(this, "setvalue " parameterID)
-			local tempParameterID:=this.parameter.id
-			if parameterID=
+			
+			if (parameterID and parameterID = this.parameter.contentID)
 			{
-				tempParameterID:=this.parameter.id
-				if isobject(tempParameterID)
-					tempParameterID:=tempParameterID[1]
-				
-				;~ d(this, "setvalue 1 " tempParameterID ": " value)
-				GUIControl,GUISettingsOfElement:,GUISettingsOfElement%tempParameterID%,% value
-				return
-			}
-			else if (parameterID=this.parameter.contentID)
-			{
-				if value is number
+				if not (value >= 1 and value <= this.parameter.content.MaxIndex())
 				{
-					GUIControl,GUISettingsOfElement:,GUISettingsOfElement%parameterID%%value%,% 1
-				}
-				else
-				{
+					; Value is not a valid index. This might be an enum value. Try to find value in choices
 					loop % this.parameter.content.MaxIndex()
 					{
-						if (value := this.parameter.content[a_index])
+						if (this.parameter.content[a_index] = value)
 						{
-							GUIControl,GUISettingsOfElement:,GUISettingsOfElement%parameterID%%a_index%,% 1
+							; value is one of the enumeration. We will set the corresponding index
+							temp := a_index
+							success := true
 							break
 						}
 					}
+
+					if (not success)
+					{
+						logger("a0", "cannot set content type value. Value '" value "' is neither a valid index nor a valid enumeration value (field class: " this.__Class ", content paramter ID: " this.parameter.contentID ")")
+					}
 				}
+				else
+				{
+					; the value is a valid index. We will set it.
+					temp := value
+				}
+				
+				; set the correct radio button
+				GUIControl, GUISettingsOfElement:, GUISettingsOfElement%parameterID%%temp%, 1
 			}
 			else
 			{
-				;Check whether current object has the requested parameter ID
-				for oneindex, oneid in this.parameter.id
-				{
-					if (parameterID = oneid)
-					{
-						GUIControl,GUISettingsOfElement:,GUISettingsOfElement%oneid%,% value
-						return
-					}
-				}
-				
+				; we want to set other parameter. We can reuse the base function
+				base.setvalue(value, parameterID)
 			}
-			
-			return
 		}
 		
+		; check the content of the edit field and show warning picture if there is and error
 		checkContent()
 		{
 			global
-			local tempFoundPos, tempRadioID, tempRadioVal, tempOneParamID, tempTextInControl, tempTextInControlReplaced
+			local tempFoundPos, tempRadioVal, tempOneParamID, tempTextInControl, tempTextInControlReplaced
 			local oneindex, oneparamID
 			
+			; get the current content type
 			if (this.parameter.ContentID)
 			{
-				tempRadioID:=this.parameter.ContentID
-				tempRadioVal:=this.getvalue(tempRadioID)
+				tempRadioVal := this.getvalue(this.parameter.ContentID)
 			}
 			else
 			{
-				tempRadioVal:=this.parameter.content[1]
+				tempRadioVal := this.parameter.content[1]
 			}
-			tempFirstParamID:=this.parameter.id[1] ;This value is needed to get the icon controls
+			; This value is needed to get the icon controls
+			tempFirstParamID := this.parameter.id[1]
 			
-			This.warningText:=""
+			; delete the warning text. If an error will be found, we will set the warning text
+			This.warningText := ""
 			if (this.enabled)
 			{
-				if (tempRadioVal = "expression" or tempRadioVal = "number") ;The content is an expression.
+				if (tempRadioVal = "expression" or tempRadioVal = "number")
 				{
+					;The content is an expression.
 					for oneindex, oneparamID in this.parameter.id
 					{
-						tempTextInControl:=this.getvalue(oneparamID)
+						tempTextInControl := this.getvalue(oneparamID)
 						
 						;Warn if there are percent signs.
-						IfInString,tempTextInControl,`%
+						IfInString, tempTextInControl, `%
 						{
-							guicontrol,GUISettingsOfElement:show,GUISettingsOfElementWarningIconOf%tempFirstParamID%
-							guicontrol,GUISettingsOfElement:,GUISettingsOfElementWarningIconOf%tempFirstParamID%,%_ScriptDir%\Icons\Question mark.ico
-							This.warningText:=lang("Note!") " " lang("This is an expression.") " " lang("You mus not use percent signs to add a variable's content.") "`n" lang("But you can still use percent signs if the variable name or a part of it is stored in a variable.")
+							guicontrol, GUISettingsOfElement:show, GUISettingsOfElementWarningIconOf%tempFirstParamID%
+							guicontrol, GUISettingsOfElement:, GUISettingsOfElementWarningIconOf%tempFirstParamID%, %_ScriptDir%\Icons\Question mark.ico
+							This.warningText := lang("Note!") " " lang("This is an expression.") " " lang("You mus not use percent signs to add a variable's content.") "`n" lang("But you can still use percent signs if the variable name or a part of it is stored in a variable.")
 						}
 					}
 				}
-				else if (tempRadioVal="variablename") ;the content is a variable name
+				else if (tempRadioVal = "variablename")
 				{
+					;the content is a variable name
 					for oneindex, oneparamID in this.parameter.id
 					{
-						tempTextInControl:=this.getvalue(oneparamID)
+						tempTextInControl := this.getvalue(oneparamID)
 						
 						;Check whether the variable name is correct (it does not contain forbitten characters)
 						
 						;At first replace all variables in the string by the string "someVarName"
-						tempTextInControlReplaced:=tempTextInControl
+						tempTextInControlReplaced := tempTextInControl
 						Loop
 						{
-							tempFoundPos:=RegExMatch(tempTextInControlReplaced, "U).*%(.+)%.*", tempVariablesToReplace)
-							if tempFoundPos=0
+							tempFoundPos := RegExMatch(tempTextInControlReplaced, "U).*%(.+)%.*", tempVariablesToReplace)
+							if (tempFoundPos = 0)
 								break
-							StringReplace,tempTextInControlReplaced,tempTextInControlReplaced,`%%tempVariablesToReplace1%`%,someVarName
+							StringReplace, tempTextInControlReplaced,tempTextInControlReplaced, `%%tempVariablesToReplace1%`%, someVarName
 						}
 						
 						try
 						{
 							;now check whether the varible name is correct
-							asdf%tempTextInControlReplaced%:="" 
+							asdf%tempTextInControlReplaced% := "" 
 						}
 						catch
 						{
 							;The variable name is not valid
-							guicontrol,GUISettingsOfElement:show,GUISettingsOfElementWarningIconOf%tempFirstParamID%
-							guicontrol,GUISettingsOfElement:,GUISettingsOfElementWarningIconOf%tempFirstParamID%,%_ScriptDir%\Icons\Exclamation mark.ico
-							This.warningText:=lang("Error!") " " lang("The variable name is not valid.") "`n"
+							guicontrol, GUISettingsOfElement:show, GUISettingsOfElementWarningIconOf%tempFirstParamID%
+							guicontrol, GUISettingsOfElement:, GUISettingsOfElementWarningIconOf%tempFirstParamID%, %_ScriptDir%\Icons\Exclamation mark.ico
+							This.warningText := lang("Error!") " " lang("The variable name is not valid.") "`n"
 						}
 					}
 				}
 				
-				;If the control must not be empty, show error
 				if (this.parameter.WarnIfEmpty)
 				{
+					; the control must not be empty. Check that
 					for oneindex, oneparamID in this.parameter.id
 					{
-						tempTextInControl:=this.getvalue(oneparamID)
-						if tempTextInControl=
+						tempTextInControl := this.getvalue(oneparamID)
+						if (tempTextInControl = "")
 						{
-							guicontrol,GUISettingsOfElement:show,GUISettingsOfElementWarningIconOf%tempFirstParamID%
-							guicontrol,GUISettingsOfElement:,GUISettingsOfElementWarningIconOf%tempFirstParamID%,%_ScriptDir%\Icons\Exclamation mark.ico
-							This.warningText:=lang("Error!") " " lang("This field must not be empty!") "`n"
+							guicontrol, GUISettingsOfElement:show, GUISettingsOfElementWarningIconOf%tempFirstParamID%
+							guicontrol, GUISettingsOfElement:, GUISettingsOfElementWarningIconOf%tempFirstParamID%, %_ScriptDir%\Icons\Exclamation mark.ico
+							This.warningText := lang("Error!") " " lang("This field must not be empty!") "`n"
 						}
 					}
 				}
@@ -1235,15 +1304,16 @@ class ElementSettings
 			else
 			{
 				;This parameter and its controls are disabled. If so, hide all warnings.
-				guicontrol,GUISettingsOfElement:hide,GUISettingsOfElementWarningIconOf%tempFirstParamID%
+				guicontrol, GUISettingsOfElement:hide, GUISettingsOfElementWarningIconOf%tempFirstParamID%
 			}
 			
-			if (This.warningText="" and !ElementSettings.initializing)
+			if (This.warningText = "" and not ElementSettings.initializing)
 			{
 				;If no warning are present, hide the picture
-				guicontrol,GUISettingsOfElement:hide,GUISettingsOfElementWarningIconOf%tempFirstParamID%
+				guicontrol, GUISettingsOfElement:hide, GUISettingsOfElementWarningIconOf%tempFirstParamID%
 			}
 			
+			; do a general update after that
 			ElementSettings.GeneralUpdate()
 		}
 		
@@ -1251,74 +1321,77 @@ class ElementSettings
 		clickOnInfoPic()
 		{
 			global
-			local tempRadioID, tempRadioVal
+			local tempRadioVal
 			
+			; get the current content type
 			if (this.parameter.ContentID)
 			{
-				tempRadioID:=this.parameter.ContentID
-				tempRadioVal:=this.getvalue(tempRadioID)
+				tempRadioVal := this.getvalue(this.parameter.ContentID)
 			}
 			else
 			{
-				tempRadioVal:=this.parameter.content[1]
+				tempRadioVal := this.parameter.content[1]
 			}
 			
-			if (tempRadioVal="Expression")
+			; show a tooltip which describes the current content type
+			if (tempRadioVal = "Expression")
 			{
-				ToolTip,% lang("This field contains an expression") "`n" lang("Examples") ":`n5`n5+3*6`nA_ScreenWidth`n(a=4) or (b=1)`nStringContainingHello " " StringContainingWorld" ,,,11
+				ToolTip, % lang("This field contains an expression") "`n" lang("Examples") ":`n5`n5+3*6`nA_ScreenWidth`n(a=4) or (b=1)`nStringContainingHello " " StringContainingWorld" ,,, 11
 			}
-			if (tempRadioVal="Number")
+			if (tempRadioVal = "Number")
 			{
-				ToolTip,% lang("This field contains an expression which must result to a number") "`n" lang("Examples") ":`n5`n5+3*6`nA_ScreenWidth" ,,,11
+				ToolTip, % lang("This field contains an expression which must result to a number") "`n" lang("Examples") ":`n5`n5+3*6`nA_ScreenWidth" ,,, 11
 			}
-			if (tempRadioVal="String")
+			if (tempRadioVal = "String")
 			{
-				ToolTip,% lang("This field contains a string") "`n" lang("Examples") ":`nHello World`nMy name is %A_UserName%`nToday's date is %A_Now%" ,,,11
+				ToolTip, % lang("This field contains a string") "`n" lang("Examples") ":`nHello World`nMy name is %A_UserName%`nToday's date is %A_Now%" ,,, 11
 			}
-			if (tempRadioVal="RawString")
+			if (tempRadioVal = "RawString")
 			{
-				ToolTip,% lang("This field contains a raw string") "`n" lang("You can't insert content of a variable here") "`n" lang("Examples") ":`nHello World" ,,,11
+				ToolTip, % lang("This field contains a raw string") "`n" lang("You can't insert content of a variable here") "`n" lang("Examples") ":`nHello World" ,,, 11
 			}
-			if (tempRadioVal="VariableName") 
+			if (tempRadioVal = "VariableName") 
 			{
-				ToolTip,% lang("This field contains a variable name") "`n" lang("Examples") ":`nVarname`nEntry1`nEntry%a_index%" ,,,11
+				ToolTip, % lang("This field contains a variable name") "`n" lang("Examples") ":`nVarname`nEntry1`nEntry%a_index%" ,,, 11
 			}
-			settimer,GUISettingsOfElementRemoveInfoTooltip,-5000
+			settimer, GUISettingsOfElementRemoveInfoTooltip, -5000
 		}
 		
 		;User has changed the radio button. Show the correct image
-		changeRadio()
+		updateContentTypePicture()
 		{
 			global
 			local temp, tempGUIControl, tempRadioID, tempRadioVal
+
+			; get the current content type
 			if (this.parameter.ContentID)
 			{
-				tempRadioID:=this.parameter.ContentID
-				tempRadioVal:=this.getvalue(tempRadioID)
+				tempRadioVal := this.getvalue(this.parameter.ContentID)
 			}
 			else
 			{
-				tempRadioVal:=this.parameter.content[1]
+				tempRadioVal := this.parameter.content[1]
 			}
-			tempFirstParamID:=this.parameter.id[1] ;This value is needed to get the icon controls
-			;~ GUIControlGet,temp,GUISettingsOfElement:,GUISettingsOfElement%tempContentTypeID%1
+			;This value is needed to get the icon controls
+			tempFirstParamID := this.parameter.id[1]
 			
-			if (tempRadioVal="string" or tempRadioVal="rawstring") 
+			; update the icon picture depending on the current content type
+			if (tempRadioVal = "string" or tempRadioVal = "rawstring") 
 			{
-				guicontrol,GUISettingsOfElement:,GUISettingsOfElementInfoIconOf%tempFirstParamID%,%_ScriptDir%\Icons\String.ico
+				guicontrol, GUISettingsOfElement:,GUISettingsOfElementInfoIconOf%tempFirstParamID%, %_ScriptDir%\Icons\String.ico
 			}
-			else if (tempRadioVal="expression" or tempRadioVal="number") 
+			else if (tempRadioVal = "expression" or tempRadioVal = "number") 
 			{
-				guicontrol,GUISettingsOfElement:,GUISettingsOfElementInfoIconOf%tempFirstParamID%,%_ScriptDir%\Icons\Expression.ico
+				guicontrol, GUISettingsOfElement:, GUISettingsOfElementInfoIconOf%tempFirstParamID%, %_ScriptDir%\Icons\Expression.ico
 			}
-			else if (tempRadioVal="variableName") 
+			else if (tempRadioVal = "variableName") 
 			{
-				guicontrol,GUISettingsOfElement:,GUISettingsOfElementInfoIconOf%tempFirstParamID%,%_ScriptDir%\Icons\VariableName.ico
+				guicontrol, GUISettingsOfElement:,GUISettingsOfElementInfoIconOf%tempFirstParamID%, %_ScriptDir%\Icons\VariableName.ico
 			}
 			
+			; since user changed the content type, we need to check the content
 			this.checkcontent()
 		}
-		
 	}
 	
 	class multilineEdit extends ElementSettings.field
@@ -1789,7 +1862,7 @@ class ElementSettings
 					}
 				}
 				
-				if (this.WarnIfEmpty)
+				if (this.parameter.WarnIfEmpty)
 				{
 					if tempTextInControl=
 					{
@@ -2288,11 +2361,11 @@ class ElementSettings
 			if not IsObject(parameter.id)
 				parameterID:=[parameter.id]
 			else
-				parameterID:=parameter.id
+				parameterID:=objFullyClone(parameter.id)
 			;~ MsgBox % strobj(parameterID)
 			if (parameterID[1]="" or parameter.type="label" or parameter.type="SmallLabel") ;If this is only a label do nothing
 				continue
-			;~ MsgBox % strobj(parameterID)
+			;MsgBox % strobj(parameterID)
 			
 			;The edit control can also have parameter names which are specified in key "ContentID"
 			if (IsObject(parameter.ContentID))
@@ -2303,14 +2376,14 @@ class ElementSettings
 			{
 				parameterID.push(parameter.ContentID)
 			}
+			;MsgBox % strobj(parameterID)
 			
 			
 			;Certain types of control consist of multiple controls and thus contain multiple parameters.
 			for ElementSaveindex2, oneID in parameterID
 			{
-				tempOneParID:=parameterID[ElementSaveindex2]
-				temponeValue:=ElementSettings.fieldParIDs[tempOneParID].getValue(tempOneParID)
-				tempPars[tempOneParID]:=temponeValue
+				temponeValue:=ElementSettings.fieldParIDs[oneID].getValue(oneID)
+				tempPars[oneID]:=temponeValue
 				;~ d(temponeValue, tempOneParID)
 			
 			}
@@ -2458,7 +2531,7 @@ GUISettingsOfElementSave()
 }
 GUISettingsOfElementChangeRadio(CtrlHwnd, GuiEvent="", EventInfo="", ErrorLevell="")
 {
-	ElementSettings.fieldHWNDs[CtrlHwnd].ChangeRadio()
+	ElementSettings.fieldHWNDs[CtrlHwnd].updateContentTypePicture()
 }
 GUISettingsOfElementCheckContent(CtrlHwnd, GuiEvent="", EventInfo="", ErrorLevell="")
 {

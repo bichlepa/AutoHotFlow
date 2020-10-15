@@ -24,6 +24,9 @@ global _ScriptDir := _getShared("_ScriptDir")
 OnExit,Exit
 global _exiting := false
 
+; speed up gui and changes dramatically
+SetWinDelay, 0
+
 ;initialize logger
 init_logger()
 
