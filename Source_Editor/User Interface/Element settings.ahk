@@ -1616,7 +1616,7 @@ class ElementSettings
 				}
 
 				; Add the current choise to the string
-				tempAllChoices. = "|" TempOneChoice
+				tempAllChoices .= "|" TempOneChoice
 			}
 			StringTrimLeft, tempAllChoices, tempAllChoices, 1
 			
@@ -1660,7 +1660,7 @@ class ElementSettings
 			if (parameter.result = "number")
 			{
 				; select the value with given index
-				GUIControl, GUISettingsOfElement:choose, GUISettingsOfElement%tempParameterID%%, value
+				GUIControl, GUISettingsOfElement:choose, GUISettingsOfElement%tempParameterID%, value
 			}
 			else if (parameter.result = "enum")
 			{
@@ -1674,12 +1674,12 @@ class ElementSettings
 					}
 				}
 				; select the value with found index
-				GUIControl, GUISettingsOfElement:choose, GUISettingsOfElement%tempParameterID%%, value
+				GUIControl, GUISettingsOfElement:choose, GUISettingsOfElement%tempParameterID%, value
 			}
 			else if (parameter.result = "string")
 			{
 				; select the value with given string
-				GUIControl, GUISettingsOfElement:chooseString, GUISettingsOfElement%tempParameterID%%, value
+				GUIControl, GUISettingsOfElement:chooseString, GUISettingsOfElement%tempParameterID%, value
 			}
 		}
 	}
@@ -2650,27 +2650,36 @@ GUISettingsOfElementWeekdays(CtrlHwnd, GuiEvent="", EventInfo="", ErrorLevell=""
 	GUISettingsOfElementAddTask("ChangeWeekdays", CtrlHwnd)
 }
 
+; ensure a quick return time on user input, to ensure that we do not miss something
+; fill the task which results from the user input in a list
 GUISettingsOfElementAddTask(task, hwnd)
 {
 	if (not task or not hwnd)
 		throw exception("GUISettingsOfElementAddTask: task or hand is empty")
 
+	; check whether the task already exist in list. We do not need duplicates
 	for oneIndex, oneTask in ElementSettings.tasks
 	{
 		if (oneTask.task = task and oneTask.hwnd = hwnd)
 			return
 	}
 
+	; add the task to the list
 	ElementSettings.tasks.push({task: task, hwnd: hwnd})
+
+	; set timer to react on the user input
 	settimer, GUISettingsOfElementTaskTimer, 1
 }
 
+; timer function where the user input is processed
 GUISettingsOfElementTaskTimer()
 {
+	; get a task from the list
 	oneTask := ElementSettings.tasks.pop()
 
 	if (oneTask)
 	{
+		; we got a task. We can now perform the task
 		if (oneTask.task = "CheckContent")
 		{
 			ElementSettings.fieldHWNDs[oneTask.hwnd].checkcontent()
@@ -2718,6 +2727,7 @@ GUISettingsOfElementTaskTimer()
 	}
 	Else
 	{
-		settimer, GUISettingsOfElementTaskTimer, 1000
+		; the task list is empty, we can stop the timer.
+		settimer, GUISettingsOfElementTaskTimer, off
 	}
 }
