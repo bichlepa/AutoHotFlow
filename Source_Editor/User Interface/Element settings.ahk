@@ -618,12 +618,6 @@ class ElementSettings
 			}
 			return false
 		}
-
-		; check content of the fields
-		checkContent()
-		{
-			; not implemented
-		}
 		
 		; called if user clicks on a warning picture. It shows a tooltip with the current warning text
 		ClickOnWarningPic()
@@ -735,7 +729,7 @@ class ElementSettings
 			global
 			; copy some parameters in local variables
 			local tempFirstParameterID := parameter.id[1]
-
+			
 			; create the control on the left side
 			gui, add, picture, x10 w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempFirstParameterID%
 			this.components.push("GUISettingsOfElementInfoIconOf" tempFirstParameterID)
@@ -776,7 +770,6 @@ class ElementSettings
 		setvalue(value, parameterID = "") ; override
 		{
 			global
-			
 			if (parameterID and parameterID = this.parameter.contentID)
 			{
 				if not (value >= 1 and value <= this.parameter.content.MaxIndex())
@@ -812,6 +805,9 @@ class ElementSettings
 				; we want to set other parameter. We can reuse the base function
 				base.setvalue(value, parameterID)
 			}
+
+			;Check content after setting it
+			this.checkContent()
 		}
 		
 		; check the content of the edit field and show warning picture if there is an error
@@ -908,7 +904,7 @@ class ElementSettings
 				guicontrol, GUISettingsOfElement:hide, GUISettingsOfElementWarningIconOf%tempFirstParamID%
 			}
 			
-			if (This.warningText = "" and not ElementSettings.initializing)
+			if (not This.warningText)
 			{
 				;If no warning are present, hide the picture
 				guicontrol, GUISettingsOfElement:hide, GUISettingsOfElementWarningIconOf%tempFirstParamID%
@@ -1168,6 +1164,8 @@ class ElementSettings
 			base.__new(parameter)
 			
 			local tempChecked, temptext, tempParGray, tempHWND
+
+			; copy some paramters in local variables
 			local tempParameterID := this.parameterIDs[1]
 			
 			; get the parametr properties
@@ -1226,6 +1224,8 @@ class ElementSettings
 
 			local tempAssigned, tempMakeNewGroup, tempChecked, temp, tempHWND
 			local hasEnum
+
+			; copy some paramters in local variables
 			local tempParameterID := this.parameterIDs[1]
 			
 			; set font style
@@ -1529,7 +1529,7 @@ class ElementSettings
 		{
 			global
 			local temp
-
+			
 			; copy some parameters in local variables
 			local tempParameterID := this.parameter.id[1]
 
@@ -1595,7 +1595,7 @@ class ElementSettings
 			}
 			else
 			{
-				; the return value of the dropDown should be the selected index
+				; the return value of the dropDown should be the string
 				tempAltSumbit := ""
 			}
 			
@@ -1634,9 +1634,6 @@ class ElementSettings
 		{
 			global
 			local temp
-
-			; copy some paramters in local variables
-			local tempParameterID := this.parameter.id[1]
 			
 			; reuse the base function
 			temp := base.getvalue()
@@ -1684,389 +1681,290 @@ class ElementSettings
 		}
 	}
 	
-	
-	
-	class ComboBox extends ElementSettings.field
+	; field which contains a combobox.
+	class ComboBox extends ElementSettings.fieldWithContentType
 	{
 		__new(parameter)
 		{
 			global
+			; reuse base new() function
 			base.__new(parameter)
-			local temp, temptoChoose,tempAltSumbit,tempChoises,tempAllChoices, tempHWND
-			local tempParameterID:=parameter.id[1]
+
+			local temp, temptoChoose,tempAltSumbit,tempHWND
 			
-			gui,font,s8 cDefault wnorm
-			tempChosen:=ElementSettings.elementPars[tempParameterID] 
-			temptoChooseText := tempChosen
-			if (parameter.result="number")
+			; copy some paramters in local variables
+			local tempParameterID := parameter.id[1]
+
+			; get the current value
+			local tempValue := ElementSettings.elementPars[tempParameterID] 
+
+			; the choices can be set after the control was created. We will save the initial value
+			this.par_choices := parameter.choices
+			
+			; decide, whether we will need altSubmit
+			if (parameter.result = "number")
 			{
-				tempAltSumbit=AltSubmit
+				; the return value of the combobox should be the selected index. We will need altsubmit
+				tempAltSumbit := "AltSubmit"
 			}
 			else
-				tempAltSumbit=
-			tempChoises:=parameter.choices
-			
-			;loop through all choices. Find which one to select. Make a selection list which is capable for the gui,add command
-			tempAllChoices=
-			for tempIndex, TempOneChoice in tempChoises
 			{
-				if (parameter.result="number")
+				; the return value of the dropDown should be the string
+				tempAltSumbit := ""
+			}
+
+			;loop through all choices. Find which one to select. Make a selection list which is suitable for the gui,add command
+			local tempAllChoices := ""
+			local temptoChooseText := tempValue
+			for tempIndex, TempOneChoice in this.par_choices
+			{
+				if (parameter.result = "number")
 				{
-					if (TempOneChoice=tempChosen)
-						temptoChooseText:=TempOneChoice
+					if (TempOneChoice = tempValue)
+					{
+						; the value is a valid index. We will write the string in the combobox
+						temptoChooseText := TempOneChoice
+					}
 				}
-				tempAllChoices.="|" TempOneChoice
-				
+				tempAllChoices .= "|" TempOneChoice
 			}
-			StringTrimLeft,tempAllChoices,tempAllChoices,1
-			this.par_result:=parameter.result
-			this.par_choices:=parameter.choices
+			StringTrimLeft, tempAllChoices, tempAllChoices, 1
 			
-			;Add picture, which will warn user if the entry is obviously invalid
-			gui,add,picture,x394 w16 h16 hwndtempHWND gGUISettingsOfElementClickOnWarningPic vGUISettingsOfElementWarningIconOf%tempParameterID%
-			this.components.push("GUISettingsOfElementWarningIconOf" tempParameterID)
-			ElementSettings.fieldHWNDs[tempHWND]:=this
-			this.warnIfEmpty:=parameter.WarnIfEmpty
+			; create the gui elements
+			gui, font, s8 cDefault wnorm
+
+			; add content type selector (if input type is selectable)
+			this.addContentTypeSelectorControls()
 			
-			if (parameter.content="Expression")
-			{
-				;The info icon tells user which conent type it is
-				gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempParameterID%,%_ScriptDir%\icons\expression.ico
-				this.components.push("GUISettingsOfElementInfoIconOf" tempParameterID)
-				ElementSettings.fieldHWNDs[tempHWND]:=this
-				
-				gui,add,ComboBox, X+4 yp w360 hwndtempHWND %tempAltSumbit% gGUISettingsOfElementCheckContent vGUISettingsOfElement%tempParameterID% ,% tempAllChoices
-				this.components.push("vGUISettingsOfElement" tempParameterID)
-				ElementSettings.fieldHWNDs[tempHWND]:=this
-				this.ContentType:="Expression"
-				;~ GUISettingsOfElementContentType%tempParameterID%=Expression
-			}
-			else if (parameter.content="Number")
-			{
-				;The info icon tells user which conent type it is
-				gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempParameterID%,%_ScriptDir%\icons\expression.ico
-				this.components.push("GUISettingsOfElementInfoIconOf" tempParameterID)
-				ElementSettings.fieldHWNDs[tempHWND]:=this
-				
-				gui,add,ComboBox, X+4 yp w360 hwndtempHWND %tempAltSumbit% gGUISettingsOfElementCheckContent vGUISettingsOfElement%tempParameterID% ,% tempAllChoices
-				this.components.push("vGUISettingsOfElement" tempParameterID)
-				ElementSettings.fieldHWNDs[tempHWND]:=this
-				this.ContentType:="Number"
-				;~ GUISettingsOfElementContentType%tempParameterID%=Expression
-			}
-			else if (parameter.content="String")
-			{
-				gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempParameterID%,%_ScriptDir%\icons\string.ico
-				this.components.push("GUISettingsOfElementInfoIconOf" tempParameterID)
-				ElementSettings.fieldHWNDs[tempHWND]:=this
-				
-				gui,add,ComboBox, X+4 yp w360 hwndtempHWND %tempAltSumbit% gGUISettingsOfElementCheckContent vGUISettingsOfElement%tempParameterID% ,% tempAllChoices
-				this.components.push("GUISettingsOfElement" tempParameterID)
-				ElementSettings.fieldHWNDs[tempHWND]:=this
-				
-				this.ContentType:="String"
-				;~ GUISettingsOfElementContentType%tempParameterID%=String
-			}
-			else if (parameter.content="VariableName")
-			{
-				gui,add,picture,x10 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempParameterID%,%_ScriptDir%\icons\VariableName.ico
-				this.components.push("GUISettingsOfElementInfoIconOf" tempParameterID)
-				ElementSettings.fieldHWNDs[tempHWND]:=this
-				
-				gui,add,ComboBox, X+4 yp w360 hwndtempHWND %tempAltSumbit% gGUISettingsOfElementCheckContent vGUISettingsOfElement%tempParameterID% ,% tempAllChoices
-				this.components.push("GUISettingsOfElement" tempParameterID)
-				ElementSettings.fieldHWNDs[tempHWND]:=this
-				
-				this.ContentType:="VariableName"
-				;~ GUISettingsOfElementContentType%tempParameterID%=VariableName
-			}
-			else ;Text field without specified content type and without info icon
-			{
-				gui,add,ComboBox, x10 yp w380 hwndtempHWND %tempAltSumbit%  gGUISettingsOfElementCheckContent vGUISettingsOfElement%tempParameterID% ,% tempAllChoices
-				this.components.push("GUISettingsOfElement" tempParameterID)
-				ElementSettings.fieldHWNDs[tempHWND]:=this
-			}
+			;The info icon tells user which content type it is
+			this.addContentTypeInfoIconControl()
+
+			; create the control
+			gui, add, ComboBox, X+4 w360 hwndtempHWND %tempAltSumbit% gGUISettingsOfElementCheckContent vGUISettingsOfElement%tempParameterID%, % tempAllChoices
+			this.components.push("GUISettingsOfElement" tempParameterID)
+			ElementSettings.fieldHWNDs[tempHWND] := this
+
+			; Add picture, which will warn user if the content is invalid
+			this.addErrorWarnIconControl()
 			
-			this.setvalue(tempChosen)
-			;~ guicontrol,GUISettingsOfElement:text,GUISettingsOfElement%tempParameterID%,% temptoChooseText
-			
+			; update the content type icon
+			this.updateContentTypePicture()
+
+			; set the value
+			this.setvalue(tempValue)
 		}
 		
-		getvalue()
-		{
-			global
-			local temp
-			local tempParameterID:=this.parameter.id[1]
-			
-			
-			guicontrolget,temp,GUISettingsOfElement:,GUISettingsOfElement%tempParameterID%
-			;~ ToolTip asdöfio  - %temp% - %tempParameterID%
-			return temp
-		}
-		
-		setvalue(value, parameterID="")
+		; set the value of the combobox
+		setvalue(value, parameterID = "")
 		{
 			global
 			local tempLabelChoice, tempindexChoice, somethingChosen
-			local tempParameterID:=this.parameter.id
-			if parameterID=
+
+			; copy some paramters in local variables
+			local tempParameterID := this.parameter.id[1]
+
+			if (parameterID = tempParameterID or not parameterID)
 			{
-				tempParameterID:=this.parameter.id
-				if isobject(tempParameterID)
-					tempParameterID:=tempParameterID[1]
-				
-				
-				if (this.par_result="string")
+				; we want to set the value of the control.
+				; Since the value can be the index of a choice, we need special implementation
+
+				if (parameter.result = "number")
 				{
-					for tempindexChoice, tempLabelChoice in this.par_choices
-					{
-						if (tempLabelChoice = value)
-						{
-							GUIControl,GUISettingsOfElement:Choose,GUISettingsOfElement%tempParameterID%,% tempindexChoice
-							somethingChosen:=true
-							break
-						}
-					}
-					if (somethingChosen!=true)
-						GUIControl,GUISettingsOfElement:text,GUISettingsOfElement%tempParameterID%,% value
-				}
-				else
-				{
-					;~ ToolTip value %value%
+					; the result type is "number", so probably the value is an index of one choice
 					if (value > 0 and value <= this.par_choices.MaxIndex())
-						GUIControl,GUISettingsOfElement:choose,GUISettingsOfElement%tempParameterID%,% value
+					{
+						; the value is a valid index. We will set it.
+						GUIControl, GUISettingsOfElement:choose, GUISettingsOfElement%tempParameterID%, % value
+					}
 					else
 					{
-						GUIControl,GUISettingsOfElement:text,GUISettingsOfElement%tempParameterID%,% value
+						; the value is not a valid index. We will set the string
+						GUIControl, GUISettingsOfElement:text, GUISettingsOfElement%tempParameterID%, % value
 					}
 				}
+				Else
+				{
+					; the result type is not "number", so we will set the string
+					GUIControl, GUISettingsOfElement:text, GUISettingsOfElement%tempParameterID%, % value
+				}
 				
-				;Check content after setting
+				;Check content after setting it
 				this.checkContent()
 			}
 			else
 			{
-				for oneIndex, oneField in ElementSettings.fields
-				{
-					if (oneField.parameter.id[1] = parameterID)
-						onefield.setvalue(value)
-				}
+				; reuse the base function
+				base.setvalue(value, parameterID)
 			}
-			
-			return
 		}
 		
-		setChoices(value, parameterID="")
+		; change the available choices of the combobox
+		setChoices(value)
 		{
 			global
-			local tempParameterID, 
-			local tempParameterID:=this.parameter.id
-			if parameterID=
-			{
-				tempParameterID:=this.parameter.id
-				if isobject(tempParameterID)
-					tempParameterID:=tempParameterID[1]
-			}
-			else
-				tempParameterID:=parameterID
+
+			; copy some paramters in local variables
+			local tempParameterID := this.parameter.id[1]
 			
-			
-			tempAllChoices=|
+			; the value contains an array of choices. We need to convert it to delimited string
+			tempAllChoices := ""
 			for tempIndex, TempOneChoice in value
 			{
-				if (parameter.result="string")
-				{
-					if (TempOneChoice=temp)
-						temptoChoose:=A_Index
-				}
-				if (tempAllChoices="|")
-					tempAllChoices.=TempOneChoice
-				else
-					tempAllChoices.="|" TempOneChoice
-				
+				tempAllChoices .= "|" TempOneChoice
 			}
-			this.par_choices:=value
+
+			; keep the choices in variable
+			this.par_choices := value
 			
-			GUIControl,GUISettingsOfElement:,GUISettingsOfElement%tempParameterID%,% tempAllChoices
+			; set the choices in control
+			GUIControl, GUISettingsOfElement:, GUISettingsOfElement%tempParameterID%, % tempAllChoices
 			return
-		}
-		
-		checkContent()
-		{
-			global
-			local tempFoundPos, tempRadioVal, tempOneParamID, tempTextInControl, tempTextInControlReplaced
-			
-			tempOneParamID:=this.parameter.id[1]
-			if tempOneParamID=
-				MsgBox error! tempOneParamID is empty. Code: 561684861
-			
-			This.warningText:=""
-			if (this.enabled)
-			{
-				tempTextInControl:=this.getvalue(tempOneParamID)
-				;~ MsgBox % tempTextInControl "`n" this.ContentType
-				if (this.ContentType="Expression" or this.ContentType="Number")
-				{
-					IfInString,tempTextInControl,`%
-					{
-						guicontrol,GUISettingsOfElement:show,GUISettingsOfElementWarningIconOf%tempOneParamID%
-						guicontrol,GUISettingsOfElement:,GUISettingsOfElementWarningIconOf%tempOneParamID%,%_ScriptDir%\Icons\Question mark.ico
-						This.warningText:=lang("Note!") " " lang("This is an expression.") " " lang("You musn't use percent signs to add a variable's content.") "`n"
-					}
-				}
-				else if (this.ContentType="variablename")
-				{
-					tempTextInControlReplaced:=tempTextInControl
-					Loop
-					{
-						tempFoundPos:=RegExMatch(tempTextInControlReplaced, "U).*%(.+)%.*", tempVariablesToReplace)
-						if tempFoundPos=0
-							break
-						StringReplace,tempTextInControlReplaced,tempTextInControlReplaced,`%%tempVariablesToReplace1%`%,someVarName
-					}
-					;~ ToolTip( tempTextInControlReplaced " - " tempTextInControl)
-					try
-						asdf%tempTextInControlReplaced%:=1 
-					catch
-					{
-						guicontrol,GUISettingsOfElement:show,GUISettingsOfElementWarningIconOf%tempOneParamID%
-						guicontrol,GUISettingsOfElement:,GUISettingsOfElementWarningIconOf%tempOneParamID%,%_ScriptDir%\Icons\Exclamation mark.ico
-						This.warningText:=lang("Error!") " " lang("The variable name is not valid.") "`n"
-					}
-				}
-				
-				if (this.parameter.WarnIfEmpty)
-				{
-					if tempTextInControl=
-					{
-						guicontrol,GUISettingsOfElement:show,GUISettingsOfElementWarningIconOf%tempOneParamID%
-						guicontrol,GUISettingsOfElement:,GUISettingsOfElementWarningIconOf%tempOneParamID%,%_ScriptDir%\Icons\Exclamation mark.ico
-						This.warningText:=lang("Error!") " " lang("This field mustn't be empty!") "`n"
-					}
-				}
-			}
-			;~ ToolTip(This.warningText)
-			if (This.warningText="" and !ElementSettings.initializing)
-			{
-				
-				guicontrol,GUISettingsOfElement:hide,GUISettingsOfElementWarningIconOf%tempOneParamID%
-			}
-			ElementSettings.GeneralUpdate()
-		}
-		
-		clickOnInfoPic()
-		{
-			global
-			local temp, tempOneParamID
-			tempOneParamID:=this.parameter.id[1]
-			
-			if (tempRadioVal="Expression")
-			{
-				ToolTip,% lang("This field contains an expression") "`n" lang("Examples") ":`n5`n5+3*6`nA_ScreenWidth`n(a=4) or (b=1)`nStringContainingHello " " StringContainingWorld" ,,,11
-			}
-			if (tempRadioVal="Number")
-			{
-				ToolTip,% lang("This field contains an expression which must result to a number") "`n" lang("Examples") ":`n5`n5+3*6`nA_ScreenWidth" ,,,11
-			}
-			if (tempRadioVal="String")
-			{
-				ToolTip,% lang("This field contains a string") "`n" lang("Examples") ":`nHello World`nMy name is %A_UserName%`nToday's date is %A_Now%" ,,,11
-			}
-			if (tempRadioVal="RawString")
-			{
-				ToolTip,% lang("This field contains a raw string") "`n" lang("You can't insert content of a variable here") "`n" lang("Examples") ":`nHello World" ,,,11
-			}
-			if (tempRadioVal="VariableName") 
-			{
-				ToolTip,% lang("This field contains a variable name") "`n" lang("Examples") ":`nVarname`nEntry1`nEntry%a_index%" ,,,11
-			}
-			settimer,GUISettingsOfElementRemoveInfoTooltip,-5000
 		}
 	}
 	
+	; field which contains a hotkey.
 	class Hotkey extends ElementSettings.field
 	{
 		__new(parameter)
 		{
 			global
+			; reuse base new() function
 			base.__new(parameter)
-			local temp, tempHWND
-			local tempParameterID:=parameter.id[1]
+
+			local tempValue, tempHWND
+
+			; copy some paramters in local variables
+			local tempParameterID := parameter.id[1]
+			tempValue := ElementSettings.elementPars[tempParameterID]
+
+			; this variable helps us to prevent that the glabels of both controls run in circles
+			this.hotkeyControlValue := tempValue
 			
-			gui,font,s8 cDefault wnorm
-			temp:=ElementSettings.elementPars[tempParameterID] 
+			; create the gui elements
+			gui, font, s8 cDefault wnorm
 			
-			gui,add,edit,w300 x10 hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID%,%temp%
+			; add edit field, where use can enter any hotkey definition
+			gui, add, edit, w300 x10 hwndtempHWND gGUISettingsOfElementCheckContent vGUISettingsOfElement%tempParameterID%, %tempValue%
 			this.components.push("GUISettingsOfElement" tempParameterID)
-			ElementSettings.fieldHWNDs[tempHWND]:=this
-			gui,add,hotkey,w90 X+10 hwndtempHWND gGUISettingsOfElementHotkey vGUISettingsOfElement%tempParameterID%hotkey,%temp%
+			ElementSettings.fieldHWNDs[tempHWND] := this
+
+			; add hotkey field, where use can quickier define hotkeys
+			gui, add, hotkey, w90 X+10 hwndtempHWND gGUISettingsOfElementHotkey vGUISettingsOfElement%tempParameterID%hotkey, %tempValue%
 			this.components.push("GUISettingsOfElementHotkey" tempParameterID)
-			ElementSettings.fieldHWNDs[tempHWND]:=this
+			ElementSettings.fieldHWNDs[tempHWND] := this
 		}
 		
+		; update the hotkey control if value has changed
+		checkContent()
+		{
+			global
+			; copy some parameters in local variables
+			local tempParameterID := this.parameter.id[1]
+
+			; get the value
+			local tempValue := this.getvalue()
+
+			; set the value in the hotkey control
+			if (this.hotkeyControlValue != tempValue)
+			{
+				this.hotkeyControlValue := tempValue
+				GUIControl, GUISettingsOfElement:, GUISettingsOfElement%tempParameterID%hotkey, % tempValue
+			}
+		}
+
+		; update the value in controls
+		setvalue(value) ; override
+		{
+			; reuse the base function
+			base.setvalue(value)
+
+			; check the changed content
+			this.checkContent()
+		}
+
+		; react if user changes the value in the hotkey field
 		changeHotkey()
 		{
 			global
-			local temp, tempGUIControl
-			tempGUIControl:=this.parameter.id[1]
-			temp:=this.getValue("Hotkey" tempGUIControl)
+			local temp
+
+			; copy some parameters in local variables
+			local tempParameterID := this.parameter.id[1]
+
+			; get value from hotkey control
+			GUIControlGet, temp, GUISettingsOfElement:, GUISettingsOfElement%tempParameterID%hotkey
+			this.hotkeyControlValue := temp
+
+			; set hotkey in the edit control
 			this.setValue(temp)
-			this.udpatename()
-			return
-			
 		}
 	}
 	
+	; field which contains a button.
 	class Button extends ElementSettings.field
 	{
 		__new(parameter)
 		{
 			global
+			; reuse base new() function
 			base.__new(parameter)
+
 			local temp, tempHWND
-			local tempParameterID:=parameter.id[1]
 			
-			gui,font,s8 cDefault wnorm
-			temp:=parameter.goto
-			gui,add,button,w400 x10 hwndtempHWND gGUISettingsOfElementButton vGUISettingsOfElement%tempParameterID%,% parameter.label
+			; copy some paramters in local variables
+			local tempParameterID := parameter.id[1]
+			
+			; create the gui elements
+			gui, font, s8 cDefault wnorm
+
+			; add the button control
+			gui, add, button, w400 x10 hwndtempHWND gGUISettingsOfElementButton vGUISettingsOfElement%tempParameterID%, % parameter.label
 			this.components.push("GUISettingsOfElement" tempParameterID)
-			ElementSettings.fieldHWNDs[tempHWND]:=this
+			ElementSettings.fieldHWNDs[tempHWND] := this
 		}
 		
+		; react if user clicks on the button
 		clickOnButton()
 		{
 			global
-			logger("a3", "Element Settings: Evaluating g-label of button: " thisgoto)
-			local templabel:=this.parameter.goto
-			local countpars
+			logger("a3", "Element Settings: Evaluating g-label of button: " this.parameter.goto)
+			
+			; copy some paramters in local variables
+			local templabel := this.parameter.goto
+
+			; check whether the goto parameter points to a valid label
 			if (islabel(templabel))
 			{
-				gosub,% templabel
+				; the goto parameter is a label. Gosub this label
+				gosub, % templabel
 			}
 			else 
 			{
-				countpars:=isfunc(templabel)
+				; the goto parameter is not a label. check whether the goto parameter points to a valid function
+				local countpars := isfunc(templabel)
 				if (countpars)
 				{
+					; the goto parameter is a function. Check its parameter count
 					if (countpars = 1) ;No mandantory parameters
 					{
+						; the function has no parameters. Call it.
 						%templabel%()
 					}
-					else if (countpars = 2) ;One mandantory parameters
+					else if (countpars = 2) ;One mandantory parameter
 					{
+						; the function has one mandantory parameter. Pass the environment variable
 						%templabel%({flowID: FlowID, elementID: ElementSettings.element})
 					}
 					else
 					{
-						MsgBox Error on button click. Target function has too many mandantory parameters
+						logger("a0", "Parameter 'goto' ''" this.parameter.goto "'' points to a function which has too many parameters. (field class: " this.__Class ")", flowID)
 					}
 				}
 				else
 				{
-					MsgBox Error on button click. Target label or function '%templabel%' does not exist.
+					logger("a0", "Parameter 'goto' ''" this.parameter.goto "'' does not point to any valid label or function. (field class: " this.__Class ")", flowID)
 				}
 			}
-			return
 		}
 	}
 	
