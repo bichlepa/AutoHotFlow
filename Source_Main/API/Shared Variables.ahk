@@ -24,7 +24,7 @@ _flows is an associative array of objects. Each object contains some information
 		.x	.y			Position
 		.heightOfVerticalBar	If element is a loop
 		.StandardName	Setting whether the name should be generated (True) or manually set by user (False)
-		.marked			True if element is marked
+		.selected			True if element is selected
 		.ClickPriority	If multiple elements hover each other, this value makes it possible to click through the elements 
 		
 		.state			Execution state of the element
@@ -40,13 +40,13 @@ _flows is an associative array of objects. Each object contains some information
 		.from			Element ID where the connection starts
 		.to				Element ID where the connection ends
 		
-		.marked			True if connection is marked
+		.selected			True if connection is selected
 		.ClickPriority	If multiple elements hover each other, this value makes it possible to click through the elements
 		
 		.state			Execution state of the element
 		.lastrun		Timestamp of last execution (a_tickcount)
 	
-	.selectedElements	Contains an array of all element and connection IDs which are marked
+	.selectedElements	Contains an array of all element and connection IDs which are selected
 	
 	.FlowSettings		Contains all flow specific settings
 		.ExecutionPolicy	Defines what happens if a flow is triggered but already executing. Contains "default", "wait", "skip", "stop" or "parallel"

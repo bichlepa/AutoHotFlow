@@ -283,11 +283,11 @@ ui_UpdateStatusbartext(which="")
 		}
 		else if (selectedElements.count()=1)
 		{
-			elementtext:=lang("1 marked element: %1%",_getFlowProperty(FlowID, "selectedElement"))
+			elementtext:=lang("1 selected element: %1%",_getFlowProperty(FlowID, "selectedElement"))
 		}
 		else
 		{
-			elementtext:=lang("%1% marked elements", selectedElements.count())
+			elementtext:=lang("%1% selected elements", selectedElements.count())
 		}
 	}
 	; get position informations

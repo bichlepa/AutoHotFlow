@@ -62,7 +62,7 @@ ui_leftmousebuttondoubleclick()
 
 	; get selected element
 	selectedElement := _getFlowProperty(FlowID, "selectedElement")
-	if (selectedElement) ;if a single element is marked
+	if (selectedElement) ;if a single element is selected
 	{
 		if instr(selectedElement, "connection")
 		{
@@ -121,7 +121,7 @@ clickOnPicture() ;react on clicks of the user
 	UserChangedSomething := false
 	UserCancelledAction := false
 
-	; get marked elements
+	; get selected elements
 	selectedElement := _getFlowProperty(FlowID, "selectedElement")
 	selectedElements := _getFlowProperty(FlowID, "selectedElements")
 
@@ -142,8 +142,8 @@ clickOnPicture() ;react on clicks of the user
 			; if uses presses control key, do nothing
 			if (ControlKeyState != "d")
 			{
-				logger("a3", "unmark elements", FlowID)
-				; Unmark all elements
+				logger("a3", "unselect elements", FlowID)
+				; Unselect all elements
 				if (selectedElements.count())
 				{
 					UnSelectEverything()
@@ -479,13 +479,13 @@ clickOnPicture() ;react on clicks of the user
 				logger("a3", "user did not move the mouse and holds the control key. Going to toggle select the item", FlowID)
 				; if user holds the control button
 				; select or unselect the clicked item additionally
-				SelectOneItem(clickedElement,true)
+				SelectOneItem(clickedElement, true)
 			}
 			else
 			{
 				logger("a3", "user did not move the mouse and holds the control key. Going to select the item while unselecting others", FlowID)
 				; select the clicked item and unselect others
-				SelectOneItem(clickedElement) ;mark one element and unmark others
+				SelectOneItem(clickedElement) ;select one element and unselect others
 			}
 		}
 		else ;If user moves the mouse
@@ -498,7 +498,7 @@ clickOnPicture() ;react on clicks of the user
 			{
 				logger("a3", "user started moving the mouse. He clicked on an element. Going to move the element(s)", FlowID)
 
-				if (_getElementProperty(FlowID, clickedElement, "marked")) ;If the element under the mouse is already selected
+				if (_getElementProperty(FlowID, clickedElement, "selected")) ;If the element under the mouse is already selected
 				{
 					logger("a3", "Element is already selected. Move the selected elements", FlowID)
 
@@ -650,7 +650,7 @@ ui_findElementUnderMouse(mx, my, par_filter="", par_priority = "highest")
 			drawResultElement := drawResultFlow.elements[forElementID]
 			; get additional data
 			clickPriority := _getElementProperty(FlowId, forElementID, "ClickPriority")
-			marked := _getElementProperty(FlowId, forElementID, "marked")
+			selected := _getElementProperty(FlowId, forElementID, "selected")
 
 			;Some elements consist of multiple parts, so we need to loop through all of them
 			found := false
@@ -1620,9 +1620,9 @@ key_ctrl_x()
 	if (ret = 0)
 	{ 	
 		;Delete all selected elements
-		for markID, markelement in _getFlowProperty(FlowID, "selectedElements") 
+		for selectedElementID, selectedElement in _getFlowProperty(FlowID, "selectedElements") 
 		{
-			Element_Remove(FlowID, markelement)
+			Element_Remove(FlowID, selectedElement)
 		}
 		
 		; we have deleted the selected elements and need to update some variables

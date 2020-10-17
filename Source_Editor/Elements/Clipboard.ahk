@@ -1,161 +1,184 @@
-﻿SaveToClipboard()
+﻿; save all selected elements to clipboard.
+SaveToClipboard()
 {
 	_EnterCriticalSection()
 	
-	ToolTip(lang("saving to clipboard"),100000)
 	logger("a2","Saving elements to clipboard")
 	
-
-	newClipboard:=Object()
-	newClipboard.allElements:=Object()
-	newClipboard.allConnections:=Object()
-	;~ RIni_Shutdown("ClipboardSaveFile")
-	;~ Rini_Create("ClipboardSaveFile")
+	; create object where we will write the elements into
+	newClipboard := Object()
+	newClipboard.allElements := Object()
+	newClipboard.allConnections := Object()
 	
-	
+	; loop through all elements
 	for forIndex, forElementID in _getAllElementIds(FlowID)
 	{
-		;~ d(saveElement,1)
-		marked := _getElementProperty(FlowID, forElementID, "marked")
-		if (marked != true) ;Save only marked elements to clipboard
+		selected := _getElementProperty(FlowID, forElementID, "selected")
+		if (not selected) 
+		{
+			; Skip elements which are not selected
 			continue
+		}
 		
-		newClipboard.allElements[forElementID]:= _getElement(FlowID, forElementID)
+		; copy the selected element to clipboard
+		newClipboard.allElements[forElementID] := _getElement(FlowID, forElementID)
 		tempsaveCounter++
 	}
 	
+	; loop through all connections
 	for forIndex, forConnectionID in _getAllConnectionIds(FlowID) 
 	{
-		from := _getConnectionProperty(FlowID, forConnectionID, "saveElement.from")
-		to := _getConnectionProperty(FlowID, forConnectionID, "saveElement.to")
-		fromMarked := _getElementProperty(FlowID, from, "marked")
-		toMarked := _getElementProperty(FlowID, to, "marked")
-		;A connection is saved to clipboard if its connected elements are both marked
-		if (!(fromMarked=true and toMarked=true) )
+		; get some connection information
+		from := _getConnectionProperty(FlowID, forConnectionID, "from")
+		to := _getConnectionProperty(FlowID, forConnectionID, "to")
+		fromselected := _getElementProperty(FlowID, from, "selected")
+		toselected := _getElementProperty(FlowID, to, "selected")
+
+		; A connection will be saved to clipboard if its connected elements are both selected
+		if (not (fromselected and toselected))
 		{
 			continue
 		}
-		newClipboard.allConnections[saveElementID]:= _getConnection(FlowID, forConnectionID)
+
+		; both elements are selected. We will copy the connection to clipboard
+		newClipboard.allConnections[forConnectionID] := _getConnection(FlowID, forConnectionID)
 		tempsaveCounter++
 	}
-	;~ MsgBox %tempsaveCounter%
-	if (tempsaveCounter>0)
+	
+	if (tempsaveCounter > 0)
 	{
-		logger("a2","Saved %1% elements to clipboard")
-		ToolTip(lang("Saved %1% elements to clipboard",tempsaveCounter))
-		toreturn:=0 ;No errors. The return value is needed if user presses Ctrl + x. Now all marked elements will be deleted
+		logger("a2", "Saved %1% elements to clipboard")
+		ToolTip(lang("Saved %1% elements to clipboard", tempsaveCounter))
+		toreturn := 0 ;No errors. The return value is needed if user presses Ctrl + x. Now all selected elements will be deleted
 		
 	}
 	else
 	{
-		logger("a2","No elements saved to clipboard")
-		ToolTip(lang("No elements selected",saveCounter))
-		toreturn:= -1
+		logger("a2", "No elements saved to clipboard")
+		ToolTip(lang("No elements selected"))
+		toreturn := -1
 	}
 	
+	; write elements to clipboard
+	; we don't actually use clipboard. Instead use shared variable
 	_setShared("clipboard", newClipboard)
 	
 	_LeaveCriticalSection()
-	
-	;~ RIni_Shutdown("ClipboardSaveFile")
 	return toreturn
 }
 
-
+; load elements from clipboard
 loadFromClipboard()
 {
 	_EnterCriticalSection()
 	
-	
-	ClipboardFlowFilename:=flow.ClipboardFilePath
-	;~ RIni_Shutdown("ClipboardLoadFile")
-	;~ res:=RIni_Read("ClipboardLoadFile",flow.ClipboardFilePath)
-	
 	logger("a2","Loading elements from clipboard")
-	ToolTip(lang("loading from clipboard"),100000)
-	UnSelectEverything()  ;Unmark all elements
-	
-	;Find mouse position and find out whether the mouse is hovering the editor
-	winHWND:= _getSharedProperty("hwnds.editGUI" FlowID)
-	MouseGetPos,TempMouseX,TempMouseY,tempWin,TempControl,2
-	If (tempWin = winHWND)
-	{
-		zoomFactor := _getFlowProperty(FlowID, "flowSettings.zoomFactor") 
-		offsetx := _getFlowProperty(FlowID, "flowSettings.offsetx") 
-		offsety := _getFlowProperty(FlowID, "flowSettings.offsetx") 
-		tempPosUnderMouseX:=((TempMouseX)/zoomFactor)+offsetx
-		tempPosUnderMouseY:=((TempMouseY)/zoomFactor)+offsety
-		;~ d(tempPosUnderMouseX " - " tempPosUnderMouseY)
-	}
-	else ;Insert in the middle of the screen
-	{
-		tempPosUnderMouseX:=(visibleArea.x1+visiblearea.w/2)
-		tempPosUnderMouseY:=(visibleArea.y1+visiblearea.h/2)
-	}
-	
-	tempClipboardconnectionList:=Object()
-	tempClipboardElementList:=Object()
+
+	;Unselect all elements
 	UnSelectEverything()
 	
-	clipboardContent := _getShared("clipboard")
-	;~ AllSections:=RIni_GetSections("ClipboardLoadFile")	
+	;Find mouse position and find out whether the mouse is hovering the editor
+	winHWND := _getSharedProperty("hwnds.editGUI" FlowID)
+	MouseGetPos, TempMouseX, TempMouseY, tempWin, TempControl, 2
+	If (tempWin = winHWND)
+	{
+		; mouse is hovering the editor. We will paste the elements under the mouse
+		zoomFactor := _getFlowProperty(FlowID, "flowSettings.zoomFactor") 
+		offsetx := _getFlowProperty(FlowID, "flowSettings.offsetx") 
+		offsety := _getFlowProperty(FlowID, "flowSettings.offsety") 
+		tempPosUnderMouseX := (TempMouseX / zoomFactor) + offsetx
+		tempPosUnderMouseY := (TempMouseY / zoomFactor) + offsety
+	}
+	else
+	{
+		; mouse is not hovering the editor. We will paste the elements in the middle of the editor
+		visibleArea := _getFlowProperty(FlowID, "DrawResult.visiblearea") 
+		tempPosUnderMouseX := (visibleArea.x1 + visiblearea.w / 2)
+		tempPosUnderMouseY := (visibleArea.y1 + visiblearea.h / 2)
+	}
+	
+	
+	; get elements from clipboard
+	; we don't actually use clipboard. Instead use shared variable
+	clipboardContent := _getShared("clipboard")	
+
+	; we will write all pasted elements to this list which will help us to paste the connections later
+	tempClipboardElementList := Object()
+
+	; paste all copied elements
 	for loadElementID, loadElement in clipboardContent.allElements
 	{
 		tempCountLoadedElements++
 		
-		
-		NewElementID:=element_New(FlowID) ;Do not pass Element ID
+		; Create new element. Do not pass Element ID, we want to get a new one
+		NewElementID := element_New(FlowID)
+
+		; write all element properties to the new element
 		_setElement(FlowID, NewElementID, loadElement)
-		_setElementProperty(FlowID, NewElementID, "id", NewElementID) ;Correct the ID
+
+		; Restore the element ID, since we just overwrote it
+		_setElementProperty(FlowID, NewElementID, "id", NewElementID)
 		
-		;Correct position.
-		if (not tempOffsetX) ;On first iteration, find out where was the position of the first element and put it near to the mouse
+		;Save new element IDs in order to be able to assign the correct elements to the connections
+		tempClipboardElementList[loadElementID] := NewElementID
+		
+		if (not tempOffsetX)
 		{
-			tempOffsetX:=ui_FitGridX(tempPosUnderMouseX - loadElement.X - 0.5 * default_ElementWidth) 
-			tempOffsetY:=ui_FitGridY(tempPosUnderMouseY - loadElement.Y - 0.5 * default_ElementHeight)
-			;~ d(tempPosUnderMouseX " - " loadElement.X " - " 0.5*default_ElementWidth " = " tempOffsetX "`n" tempPosUnderMouseY " - " loadElement.Y " - " 0.5*default_ElementHeight " = " tempOffsetY)
+			;On first iteration, calculate the difference between the position of copied element and the designated pasting position
+			tempOffsetX := ui_FitGridX(tempPosUnderMouseX - loadElement.X - 0.5 * default_ElementWidth) 
+			tempOffsetY := ui_FitGridY(tempPosUnderMouseY - loadElement.Y - 0.5 * default_ElementHeight)
 		}
 		;Correct the position. Each element should have the same relative position to each other as in the flow where they were copied from
-		_setElementProperty(FlowID, NewElementID, "x", ui_FitGridX(loadElement.X+tempOffsetX))
-		_setElementProperty(FlowID, NewElementID, "y", ui_FitGridY(loadElement.Y+tempOffsetY))
-		
-		tempClipboardElementList[loadElementID] := NewElementID ;Save new element IDs in order to be able to assign the correct elements to the connections
-		
-		SelectOneItem(NewElementID,true)
+		_setElementProperty(FlowID, NewElementID, "x", ui_FitGridX(loadElement.X + tempOffsetX))
+		_setElementProperty(FlowID, NewElementID, "y", ui_FitGridY(loadElement.Y + tempOffsetY))
+
+		; select the pasted element
+		_setElementProperty(FlowID, NewElementID, "selected", false)
+		SelectOneItem(NewElementID, true)
 	}
-		
-	;~ AllSections:=RIni_GetSections("ClipboardLoadFile")	
+
+	; paste all copied connections
 	for loadElementID, loadElement in clipboardContent.allConnections
 	{
 		tempCountLoadedElements++
 		
-		
+		; Create new element. Do not pass Element ID, we want to get a new one
 		NewElementID := connection_new(FlowID)
+
+		; write all element properties to the new element
 		_setConnection(FlowID, NewElementID, loadElement)
-		_setElementProperty(FlowID, NewElementID, "id", NewElementID) ;Correct the ID
-		_setElementProperty(FlowID, NewElementID, "to", tempClipboardElementList[loadElement.to]) ;Correct connected element ID
-		_setElementProperty(FlowID, NewElementID, "from", tempClipboardElementList[loadElement.from]) ;Correct connected element ID
 		
-		tempClipboardconnectionList.push(NewElementID) ;Save new connection IDs in order to be able to assign the correct elements to the connections
-		
-		SelectOneItem(NewElementID,true)
+		; Restore the element ID, since we just overwrote it
+		_setConnectionProperty(FlowID, NewElementID, "id", NewElementID)
+
+		; Correct the element IDs in parameters "to" and "from"
+		_setConnectionProperty(FlowID, NewElementID, "to", tempClipboardElementList[loadElement.to])
+		_setConnectionProperty(FlowID, NewElementID, "from", tempClipboardElementList[loadElement.from])
+
+		; select the pasted element
+		_setConnectionProperty(FlowID, NewElementID, "selected", false)
+		SelectOneItem(NewElementID, true)
 	}
 
-	if tempCountLoadedElements>0
+	if (tempCountLoadedElements > 0)
 	{
+		; we pasted some elements.
+		; Create a new state
 		State_New(FlowID)
-		ToolTip(lang("Loaded %1% elements from clipboard",index1),1000)
-		logger("a2","Loaded " index1 " elements from clipboard")
+
+		ToolTip(lang("Loaded %1% elements from clipboard", tempCountLoadedElements), 1000)
+		logger("a2","Loaded " tempCountLoadedElements " elements from clipboard")
+		
+		; redraw
+		API_Draw_Draw(FlowID)
 	}
 	else
 	{
+		; we did not paste any elements
 		ToolTip(lang("No elements found in clipboard"),1000)
 		logger("a2","No elements found in clipboard")
 	}
 	
 	_LeaveCriticalSection()
-	
-	API_Draw_Draw(FlowID)
-
 }
 

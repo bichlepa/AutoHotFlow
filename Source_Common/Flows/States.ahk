@@ -191,11 +191,11 @@ states_Restore(p_FlowID, p_StateID)
 	{
 		if (selectedElements.haskey(forElementID))
 		{
-			_setElementProperty(p_FlowID, forElementID, "marked", True)
+			_setElementProperty(p_FlowID, forElementID, "selected", True)
 		}
 		else
 		{
-			_setElementProperty(p_FlowID, forElementID, "marked", False)
+			_setElementProperty(p_FlowID, forElementID, "selected", False)
 		}
 	}
 	allConnectionIDs := _getAllConnectionIds(p_FlowID)
@@ -203,11 +203,11 @@ states_Restore(p_FlowID, p_StateID)
 	{
 		if (selectedElements.haskey(forConnectionID))
 		{
-			_setConnectionProperty(p_FlowID, forConnectionID, "marked", True)
+			_setConnectionProperty(p_FlowID, forConnectionID, "selected", True)
 		}
 		else
 		{
-			_setConnectionProperty(p_FlowID, forConnectionID, "marked", False)
+			_setConnectionProperty(p_FlowID, forConnectionID, "selected", False)
 		}
 	}
 	

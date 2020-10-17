@@ -35,7 +35,7 @@ Element_New(p_FlowID, p_type="", p_elementID="")
 	newElement.ClickPriority := 500
 	newElement.StandardName := True
 	newElement.lastrun := 0
-	newElement.marked := false
+	newElement.selected := false
 	newElement.state := "idle"
 	newElement.countRuns := 0
 	newElement.enabled := False
@@ -334,7 +334,7 @@ Connection_New(p_FlowID, p_connectionID="")
 	newConnection.ConnectionType := "normal"
 	newConnection.ClickPriority := 200
 	
-	newConnection.marked := false
+	newConnection.selected := false
 	newConnection.state := "idle"
 	newConnection.type := "Connection"
 	newConnection.frompart := ""

@@ -37,13 +37,13 @@ gdip_Init()
 
 	; Create some brushes
 	pPenBlack := Gdip_CreatePen("0xff000000",2) ;Black pen
-	pPenMarkLin := Gdip_CreatePen("0xff00aa00",2) ;Green pen 
+	pPenSelectLin := Gdip_CreatePen("0xff00aa00",2) ;Green pen 
 	pPenRunningLin := Gdip_CreatePen("0xaaff0000",2) ;Red pen, transparent
 	pPenRed := Gdip_CreatePen("0xffaa0000",2) ;Red pen
 	pPenGrey := Gdip_CreatePen("0xffaaaaff",2) ;Grey pen
 	pBrushBlack := Gdip_BrushCreateSolid("0xff000000") ;Black brush
-	pBrushUnmark := Gdip_BrushCreateSolid("0xfffafafa") ;White brush
-	pBrushMark := Gdip_BrushCreateSolid("0x5000ff00") ;Green brush, transparent
+	pBrushUnselected := Gdip_BrushCreateSolid("0xfffafafa") ;White brush
+	pBrushSelect := Gdip_BrushCreateSolid("0x5000ff00") ;Green brush, transparent
 	pBrushEnabled := Gdip_BrushCreateSolid("0x500000ff") ;Blue brush, transparent
 	pBrushRunning := Gdip_BrushCreateSolid("0x50ff0000") ;Red brush, transparent
 	pBrushLastRunning := Gdip_BrushCreateSolid("0x10ff0000") ;Red brush, very transparent
@@ -97,8 +97,8 @@ gdip_Init()
 gdip_DrawEverything(FlowObj)
 {
 	global
-	local TextOptions, TextOptionsmarked, TextOptionsRunning,TextOptionsLeft,TextOptionsLeftmarked, TextOptionsLeftRunning, TextOptionsRight, TextOptionsRightmarked, TextOptionsRightRunning, TextOptionsSmall, hbm, hdc, obm, G
-	local TextOptionsmarkedThis, TextOptionsRunningThis, TextOptionsThis
+	local TextOptions, TextOptionsselected, TextOptionsRunning,TextOptionsLeft,TextOptionsLeftselected, TextOptionsLeftRunning, TextOptionsRight, TextOptionsRightselected, TextOptionsRightRunning, TextOptionsSmall, hbm, hdc, obm, G
+	local TextOptionsselectedThis, TextOptionsRunningThis, TextOptionsThis
 	local tempy, tempx, tempx1, tempxCount, tempyCount, tempmx, tempmy, tempmwin
 	local tempFromEl, tempToEl, StartPosx, StartPosy, GDIStartPosxOld, GDIStartPosYOld, aimPosx, aimPosy, GDIAimPosX, GDIAimPosY
 	;~ local GDImx, GDImy ;keep global
@@ -157,15 +157,15 @@ gdip_DrawEverything(FlowObj)
 		
 	
 	TextOptions:=" s" (textSize*zoomFactor) " Center cff000000  Bold"
-	TextOptionsmarked:=" s" (textSize*zoomFactor) " Center cff00aa00  Bold"
+	TextOptionsselected:=" s" (textSize*zoomFactor) " Center cff00aa00  Bold"
 	TextOptionsRunning:=" s" (textSize*zoomFactor) " Center cffaa0000  Bold"
 
 	TextOptionsLeft:=" s" (textSize*zoomFactor) " Left cff000000  Bold"
-	TextOptionsLeftmarked:=" s" (textSize*zoomFactor) " Left cff00aa00  Bold"
+	TextOptionsLeftselected:=" s" (textSize*zoomFactor) " Left cff00aa00  Bold"
 	TextOptionsLeftRunning:=" s" (textSize*zoomFactor) " Left cffaa0000  Bold"
 
 	TextOptionsRight:=" s" (textSize*zoomFactor) " Right cff000000  Bold"
-	TextOptionsRightmarked:=" s" (textSize*zoomFactor) " Right  cff00aa00  Bold"
+	TextOptionsRightselected:=" s" (textSize*zoomFactor) " Right  cff00aa00  Bold"
 	TextOptionsRightRunning:=" s" (textSize*zoomFactor) " Right  cffaa0000  Bold"
 
 	TextOptionsSmall:=" s" (textSize*0.7*zoomFactor) " Center cff000000  Bold"
@@ -244,7 +244,7 @@ gdip_DrawEverything(FlowObj)
 	for drawID, tempelement in allConnections
 	{
 		;~ MsgBox %index%
-		if (tempelement.marked)
+		if (tempelement.selected)
 			tempElementList2[drawID]:=allConnections[drawID].clone()
 		else
 			tempElementList[drawID]:=allConnections[drawID].clone()
@@ -477,7 +477,7 @@ gdip_DrawEverything(FlowObj)
 			{
 				textx:=aimPosx-ElementWidth/2
 				textw:=ElementWidth/2-3
-				TextOptionsmarkedThis:=TextOptionsRightmarked
+				TextOptionsselectedThis:=TextOptionsRightselected
 				TextOptionsRunningThis:=TextOptionsRightRunning
 				TextOptionsThis:=TextOptionsRight
 			}
@@ -485,7 +485,7 @@ gdip_DrawEverything(FlowObj)
 			{
 				textx:=aimPosx+5
 				textw:=ElementWidth/2
-				TextOptionsmarkedThis:=TextOptionsLeftmarked
+				TextOptionsselectedThis:=TextOptionsLeftselected
 				TextOptionsRunningThis:=TextOptionsLeftRunning
 				TextOptionsThis:=TextOptionsLeft
 			}
@@ -496,8 +496,8 @@ gdip_DrawEverything(FlowObj)
 			
 			
 			
-			if (drawElement.marked=true)
-				Gdip_TextToGraphics(G, drawElement.ConnectionType, "x" ((textx-Offsetx)*zoomFactor) " y" ((texty-Offsety)*zoomFactor) TextOptionsmarkedThis , Font, (textw*zoomFactor), (texth*zoomFactor))
+			if (drawElement.selected=true)
+				Gdip_TextToGraphics(G, drawElement.ConnectionType, "x" ((textx-Offsetx)*zoomFactor) " y" ((texty-Offsety)*zoomFactor) TextOptionsselectedThis , Font, (textw*zoomFactor), (texth*zoomFactor))
 			if (tempElementHasRecentlyRun) ;If element has recently run
 			{
 				Gdip_TextToGraphics(G, drawElement.ConnectionType, "x" ((textx-Offsetx)*zoomFactor) " y" ((texty-Offsety)*zoomFactor) TextOptionsRunningThis , Font, (textw*zoomFactor), (texth*zoomFactor))
@@ -510,7 +510,7 @@ gdip_DrawEverything(FlowObj)
 		
 		
 		
-		;MsgBox,% marked
+		;MsgBox,% selected
 		;msgbox,x%lin3x% y%lin3y% w%lin3w% h%lin3h%`nx%lin4x% y%lin4y% w%lin4w% h%lin4h%
 		;msgbox,x%lin1x% y%lin1y% w%lin1w% h%lin1h%
 
@@ -521,8 +521,8 @@ gdip_DrawEverything(FlowObj)
 		{
 			if (drawElement.ConnectionType="exception")
 			{
-				if (drawElement.marked=true)
-					Gdip_DrawLine(G, pPenMarkLin, ((lin%a_index%x-Offsetx)*zoomFactor), ((lin%a_index%y-Offsety)*zoomFactor), ((lin%a_index%x+lin%a_index%w-Offsetx)*zoomFactor) , ((lin%a_index%y+lin%a_index%h-Offsety)*zoomFactor))
+				if (drawElement.selected=true)
+					Gdip_DrawLine(G, pPenSelectLin, ((lin%a_index%x-Offsetx)*zoomFactor), ((lin%a_index%y-Offsety)*zoomFactor), ((lin%a_index%x+lin%a_index%w-Offsetx)*zoomFactor) , ((lin%a_index%y+lin%a_index%h-Offsety)*zoomFactor))
 				else
 					Gdip_DrawLine(G, pPenRed , ((lin%a_index%x-Offsetx)*zoomFactor), ((lin%a_index%y-Offsety)*zoomFactor), ((lin%a_index%x+lin%a_index%w-Offsetx)*zoomFactor) , ((lin%a_index%y+lin%a_index%h-Offsety)*zoomFactor))
 				if (tempElementHasRecentlyRun) ;If element has recently run
@@ -532,8 +532,8 @@ gdip_DrawEverything(FlowObj)
 			}
 			else
 			{
-				if (drawElement.marked=true)
-					Gdip_DrawLine(G, pPenMarkLin, ((lin%a_index%x-Offsetx)*zoomFactor), ((lin%a_index%y-Offsety)*zoomFactor), ((lin%a_index%x+lin%a_index%w-Offsetx)*zoomFactor) , ((lin%a_index%y+lin%a_index%h-Offsety)*zoomFactor))
+				if (drawElement.selected=true)
+					Gdip_DrawLine(G, pPenSelectLin, ((lin%a_index%x-Offsetx)*zoomFactor), ((lin%a_index%y-Offsety)*zoomFactor), ((lin%a_index%x+lin%a_index%w-Offsetx)*zoomFactor) , ((lin%a_index%y+lin%a_index%h-Offsety)*zoomFactor))
 				else
 					Gdip_DrawLine(G, pPenBlack, ((lin%a_index%x-Offsetx)*zoomFactor), ((lin%a_index%y-Offsety)*zoomFactor), ((lin%a_index%x+lin%a_index%w-Offsetx)*zoomFactor) , ((lin%a_index%y+lin%a_index%h-Offsety)*zoomFactor))
 				if (tempElementHasRecentlyRun)
@@ -560,7 +560,7 @@ gdip_DrawEverything(FlowObj)
 	tempElementList2:=[]
 	for tempID, tempelement in allElements
 	{
-		if (tempelement.marked)
+		if (tempelement.selected)
 			tempElementList2[tempID]:=allElements[tempID].clone()
 		else
 			tempElementList[tempID]:=allElements[tempID].clone()
@@ -595,7 +595,7 @@ gdip_DrawEverything(FlowObj)
 				continue
 			}
 			
-			Gdip_FillRoundedRectangle(G, pBrushUnmark, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y-Offsety)*zoomFactor), ((ElementWidth)*zoomFactor), ((ElementHeight)*zoomFactor),(30*zoomFactor))
+			Gdip_FillRoundedRectangle(G, pBrushUnselected, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y-Offsety)*zoomFactor), ((ElementWidth)*zoomFactor), ((ElementHeight)*zoomFactor),(30*zoomFactor))
 			Gdip_DrawroundedRectangle(G, pPenGrey, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y-Offsety)*zoomFactor), ((ElementWidth)*zoomFactor), ((ElementHeight)*zoomFactor),(30*zoomFactor))
 			
 			if (drawElement.icon)
@@ -605,9 +605,9 @@ gdip_DrawEverything(FlowObj)
 			
 			
 			Gdip_TextToGraphics(G, drawElement.name, "x" ((drawElement.x-Offsetx)*zoomFactor +4) " y" ((drawElement.y-Offsety)*zoomFactor+4) " vCenter " TextOptions , Font, ((ElementWidth)*zoomFactor-8), ((ElementHeight)*zoomFactor-8))
-			;~ ToolTip % drawElement.id " - " drawElement.marked
-			if (drawElement.marked=true)
-				Gdip_FillroundedRectangle(G, pBrushMark, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y-Offsety)*zoomFactor), ((ElementWidth)*zoomFactor), ((ElementHeight)*zoomFactor),(30*zoomFactor))
+			;~ ToolTip % drawElement.id " - " drawElement.selected
+			if (drawElement.selected=true)
+				Gdip_FillroundedRectangle(G, pBrushSelect, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y-Offsety)*zoomFactor), ((ElementWidth)*zoomFactor), ((ElementHeight)*zoomFactor),(30*zoomFactor))
 			
 			if (drawElement.enabled)
 			{
@@ -679,7 +679,7 @@ gdip_DrawEverything(FlowObj)
 				continue
 			}
 			
-			Gdip_FillRectangle(G, pBrushUnmark, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y-Offsety)*zoomFactor), ((ElementWidth)*zoomFactor), ((ElementHeight)*zoomFactor))
+			Gdip_FillRectangle(G, pBrushUnselected, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y-Offsety)*zoomFactor), ((ElementWidth)*zoomFactor), ((ElementHeight)*zoomFactor))
 			Gdip_DrawRectangle(G, pPenGrey, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y-Offsety)*zoomFactor), ((ElementWidth)*zoomFactor), ((ElementHeight)*zoomFactor))
 			
 			if (drawElement.icon)
@@ -689,8 +689,8 @@ gdip_DrawEverything(FlowObj)
 			
 			;Gdip_TextToGraphics(G, drawElement.name, "x" ((drawElement.x-Offsetx)*zoomFactor +4) "y" ((drawElement.y-Offsety)*zoomFactor+4) TextOptions , Font, ((ElementWidth)*zoomFactor-8), ((ElementHeight)*zoomFactor-8))
 			Gdip_TextToGraphics(G, drawElement.name, "x" ((drawElement.x-Offsetx)*zoomFactor +4) " y" ((drawElement.y-Offsety)*zoomFactor+4) " vCenter " TextOptions , Font, ((ElementWidth)*zoomFactor-8), (ElementHeight*zoomFactor-8))
-			if (drawElement.marked=true)
-				Gdip_FillRectangle(G, pBrushMark, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y-Offsety)*zoomFactor), (ElementWidth*zoomFactor), (ElementHeight*zoomFactor))
+			if (drawElement.selected=true)
+				Gdip_FillRectangle(G, pBrushSelect, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y-Offsety)*zoomFactor), (ElementWidth*zoomFactor), (ElementHeight*zoomFactor))
 			if (drawElement.state="running") ;If element is running
 			{
 				Gdip_FillRectangle(G, pBrushRunning, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y-Offsety)*zoomFactor), (ElementWidth*zoomFactor), (ElementHeight*zoomFactor))
@@ -699,7 +699,7 @@ gdip_DrawEverything(FlowObj)
 			{
 				Gdip_FillRectangle(G, pBrushLastRunning, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y-Offsety)*zoomFactor), (ElementWidth*zoomFactor), (ElementHeight*zoomFactor))
 			}
-			;MsgBox, % element "`n" drawElement.marked
+			;MsgBox, % element "`n" drawElement.selected
 			
 			
 			
@@ -721,8 +721,8 @@ gdip_DrawEverything(FlowObj)
 				continue
 			}
 			
-			Gdip_FillRoundedRectangle(G, pBrushUnmark, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y-Offsety)*zoomFactor), (ElementWidth*zoomFactor), (ElementHeight*zoomFactor),(30*zoomFactor))
-			;Gdip_FillPolygon(G, pBrushUnmark,((drawElement.x+ElementWidth/2)*zoomFactor) "," ((drawElement.y+0)*zoomFactor) "|" ((drawElement.x+ElementWidth)*zoomFactor) "," ((drawElement.y+ElementHeight/2)*zoomFactor) "|" ((drawElement.x+ElementWidth/2)*zoomFactor) "," ((drawElement.y+ElementHeight)*zoomFactor) "|" ((drawElement.x+0)*zoomFactor) "," ((drawElement.y+ElementHeight/2)*zoomFactor) "|" ((drawElement.x+ElementWidth/2)*zoomFactor) "," ((drawElement.y+0)*zoomFactor))
+			Gdip_FillRoundedRectangle(G, pBrushUnselected, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y-Offsety)*zoomFactor), (ElementWidth*zoomFactor), (ElementHeight*zoomFactor),(30*zoomFactor))
+			;Gdip_FillPolygon(G, pBrushUnselected,((drawElement.x+ElementWidth/2)*zoomFactor) "," ((drawElement.y+0)*zoomFactor) "|" ((drawElement.x+ElementWidth)*zoomFactor) "," ((drawElement.y+ElementHeight/2)*zoomFactor) "|" ((drawElement.x+ElementWidth/2)*zoomFactor) "," ((drawElement.y+ElementHeight)*zoomFactor) "|" ((drawElement.x+0)*zoomFactor) "," ((drawElement.y+ElementHeight/2)*zoomFactor) "|" ((drawElement.x+ElementWidth/2)*zoomFactor) "," ((drawElement.y+0)*zoomFactor))
 			Gdip_DrawLines(G, pPenGrey,((drawElement.x+ElementWidth/2-Offsetx)*zoomFactor) "," ((drawElement.y+0-Offsety)*zoomFactor) "|" ((drawElement.x+ElementWidth-Offsetx)*zoomFactor) "," ((drawElement.y+ElementHeight/2-Offsety)*zoomFactor) "|" ((drawElement.x+ElementWidth/2-Offsetx)*zoomFactor) "," ((drawElement.y+ElementHeight-Offsety)*zoomFactor) "|" ((drawElement.x+0-Offsetx)*zoomFactor) "," ((drawElement.y+ElementHeight/2-Offsety)*zoomFactor) "|" ((drawElement.x+ElementWidth/2-Offsetx)*zoomFactor) "," ((drawElement.y+0-Offsety)*zoomFactor))
 			
 			if (drawElement.icon)
@@ -731,8 +731,8 @@ gdip_DrawEverything(FlowObj)
 			}
 			
 			Gdip_TextToGraphics(G, drawElement.name, "x" ((drawElement.x-Offsetx)*zoomFactor +4) " y" ((drawElement.y-Offsety)*zoomFactor+4) " vCenter " TextOptions , Font, (ElementWidth*zoomFactor-8), (ElementHeight*zoomFactor-8))
-			if (drawElement.marked=true)
-				Gdip_FillroundedRectangle(G, pBrushMark, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y-Offsety)*zoomFactor), (ElementWidth*zoomFactor), (ElementHeight*zoomFactor),(30*zoomFactor))
+			if (drawElement.selected=true)
+				Gdip_FillroundedRectangle(G, pBrushSelect, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y-Offsety)*zoomFactor), (ElementWidth*zoomFactor), (ElementHeight*zoomFactor),(30*zoomFactor))
 			
 			if (drawElement.state="Running") ;If element is running
 			{
@@ -760,9 +760,9 @@ gdip_DrawEverything(FlowObj)
 			}
 			
 			
-			Gdip_FillRectangle(G, pBrushUnmark, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y-Offsety)*zoomFactor), ((ElementWidth)*zoomFactor), ((ElementHeight)*zoomFactor))
-			Gdip_FillRectangle(G, pBrushUnmark, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y+ElementHeight-Offsety)*zoomFactor), ((ElementWidth/8)*zoomFactor), ((drawElement.HeightOfVerticalBar)*zoomFactor))
-			Gdip_FillRectangle(G, pBrushUnmark, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y+ElementHeight+drawElement.HeightOfVerticalBar-Offsety)*zoomFactor), ((ElementWidth)*zoomFactor), ((ElementHeight/3)*zoomFactor))
+			Gdip_FillRectangle(G, pBrushUnselected, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y-Offsety)*zoomFactor), ((ElementWidth)*zoomFactor), ((ElementHeight)*zoomFactor))
+			Gdip_FillRectangle(G, pBrushUnselected, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y+ElementHeight-Offsety)*zoomFactor), ((ElementWidth/8)*zoomFactor), ((drawElement.HeightOfVerticalBar)*zoomFactor))
+			Gdip_FillRectangle(G, pBrushUnselected, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y+ElementHeight+drawElement.HeightOfVerticalBar-Offsety)*zoomFactor), ((ElementWidth)*zoomFactor), ((ElementHeight/3)*zoomFactor))
 			Gdip_FillRectangle(G, pBrushRunning,  ((drawElement.x+(ElementWidth *3/4)-Offsetx)*zoomFactor), ((drawElement.y+ElementHeight+drawElement.HeightOfVerticalBar-Offsety)*zoomFactor), ((ElementWidth *1/4)*zoomFactor), ((ElementHeight/3)*zoomFactor)) ;Break field
 			
 			Gdip_DrawLines(G, pPenGrey,((drawElement.x+0-Offsetx)*zoomFactor) "," ((drawElement.y+0-Offsety)*zoomFactor) "|" ((drawElement.x+ElementWidth-Offsetx)*zoomFactor) "," ((drawElement.y+0-Offsety)*zoomFactor) "|" ((drawElement.x+ElementWidth-Offsetx)*zoomFactor) "," ((drawElement.y+ElementHeight-Offsety)*zoomFactor) "|" ((drawElement.x+ElementWidth/8-Offsetx)*zoomFactor) "," ((drawElement.y+ElementHeight-Offsety)*zoomFactor) "|" ((drawElement.x+ElementWidth/8-Offsetx)*zoomFactor) "," ((drawElement.y+ElementHeight+drawElement.HeightOfVerticalBar-Offsety)*zoomFactor) "|" ((drawElement.x+ElementWidth-Offsetx)*zoomFactor) "," ((drawElement.y+ElementHeight+drawElement.HeightOfVerticalBar-Offsety)*zoomFactor) "|" ((drawElement.x+ElementWidth-Offsetx)*zoomFactor) "," ((drawElement.y+ElementHeight*4/3+drawElement.HeightOfVerticalBar-Offsety)*zoomFactor) "|" ((drawElement.x-Offsetx)*zoomFactor) "," ((drawElement.y+ElementHeight*4/3+drawElement.HeightOfVerticalBar-Offsety)*zoomFactor) "|" ((drawElement.x+0-Offsetx)*zoomFactor) "," ((drawElement.y+0-Offsety)*zoomFactor) )
@@ -774,12 +774,12 @@ gdip_DrawEverything(FlowObj)
 			
 			Gdip_TextToGraphics(G, drawElement.name, "x" ((drawElement.x-Offsetx)*zoomFactor +4) " y" ((drawElement.y-Offsety)*zoomFactor+4) " vCenter " TextOptions , Font, (ElementWidth*zoomFactor-8), (ElementHeight*zoomFactor-8))
 			Gdip_TextToGraphics(G, "break", "x" ((drawElement.x+(ElementWidth *3/4)-Offsetx)*zoomFactor ) " y" ((drawElement.y+ElementHeight+drawElement.HeightOfVerticalBar-Offsety)*zoomFactor) " vCenter " TextOptionsSmall , Font, (ElementWidth*1/4*zoomFactor), (ElementHeight*1/3*zoomFactor)) ;Break text
-			if (drawElement.marked=true)
+			if (drawElement.selected=true)
 			{
-				;~ Gdip_FillRectangle(G, pBrushMark, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y-Offsety)*zoomFactor), (ElementWidth*zoomFactor), (ElementHeight*zoomFactor))
-				Gdip_FillRectangle(G, pBrushMark, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y-Offsety)*zoomFactor), ((ElementWidth)*zoomFactor), ((ElementHeight)*zoomFactor))
-				Gdip_FillRectangle(G, pBrushMark, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y+ElementHeight-Offsety)*zoomFactor), ((ElementWidth/8)*zoomFactor), ((drawElement.HeightOfVerticalBar)*zoomFactor))
-				Gdip_FillRectangle(G, pBrushMark, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y+ElementHeight+drawElement.HeightOfVerticalBar-Offsety)*zoomFactor), ((ElementWidth)*zoomFactor), ((ElementHeight/3)*zoomFactor))
+				;~ Gdip_FillRectangle(G, pBrushSelect, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y-Offsety)*zoomFactor), (ElementWidth*zoomFactor), (ElementHeight*zoomFactor))
+				Gdip_FillRectangle(G, pBrushSelect, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y-Offsety)*zoomFactor), ((ElementWidth)*zoomFactor), ((ElementHeight)*zoomFactor))
+				Gdip_FillRectangle(G, pBrushSelect, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y+ElementHeight-Offsety)*zoomFactor), ((ElementWidth/8)*zoomFactor), ((drawElement.HeightOfVerticalBar)*zoomFactor))
+				Gdip_FillRectangle(G, pBrushSelect, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y+ElementHeight+drawElement.HeightOfVerticalBar-Offsety)*zoomFactor), ((ElementWidth)*zoomFactor), ((ElementHeight/3)*zoomFactor))
 			}
 			
 			if (drawElement.state="running") ;If element is running
@@ -1002,10 +1002,10 @@ gdip_DrawEverything(FlowObj)
 	}
 	
 	;At the end draw the menu bar
-	Gdip_FillRectangle(G, pBrushUnmark, ((0)*zoomFactor), ((0)*zoomFactor), ((NewElementIconWidth *1.2)*zoomFactor *4), ((NewElementIconHeight * 1.2)*zoomFactor)) ;Draw a white area
+	Gdip_FillRectangle(G, pBrushUnselected, ((0)*zoomFactor), ((0)*zoomFactor), ((NewElementIconWidth *1.2)*zoomFactor *4), ((NewElementIconHeight * 1.2)*zoomFactor)) ;Draw a white area
 	
 	;Draw an action
-	;Gdip_FillRectangle(G, pBrushUnmark, ((ElementWidth *0.1)*zoomFactor), ((ElementHeight * 0.1)*zoomFactor), ((ElementWidth )*zoomFactor), ((ElementHeight )*zoomFactor))
+	;Gdip_FillRectangle(G, pBrushUnselected, ((ElementWidth *0.1)*zoomFactor), ((ElementHeight * 0.1)*zoomFactor), ((ElementWidth )*zoomFactor), ((ElementHeight )*zoomFactor))
 	Gdip_DrawRectangle(G, pPenGrey, (((NewElementIconWidth *0.1))*zoomFactor), (((NewElementIconHeight * 0.1))*zoomFactor), ((NewElementIconWidth)*zoomFactor), ((NewElementIconHeight)*zoomFactor))
 	Gdip_TextToGraphics(G, lang("Create new action"), "x" ((NewElementIconWidth *0.1)*zoomFactor+4) " y" ((NewElementIconHeight * 0.1)*zoomFactor+4) " vCenter " TextOptions , Font, ((NewElementIconWidth)*zoomFactor-8), ((NewElementIconHeight)*zoomFactor-8))
 	

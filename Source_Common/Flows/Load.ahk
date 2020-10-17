@@ -114,7 +114,7 @@ LoadFlow(p_filepath)
 		_setElementProperty(FlowID, oneElementID, "ClickPriority", 500)
 		_setElementProperty(FlowID, oneElementID, "UniqueID", flowID "_" oneElementID)
 		_setElementProperty(FlowID, oneElementID, "lastrun", 0)
-		_setElementProperty(FlowID, oneElementID, "marked", false)
+		_setElementProperty(FlowID, oneElementID, "selected", false)
 		_setElementProperty(FlowID, oneElementID, "state", "idle")
 		_setElementProperty(FlowID, oneElementID, "countRuns", 0)
 

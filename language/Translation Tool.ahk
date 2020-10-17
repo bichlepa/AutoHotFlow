@@ -309,7 +309,7 @@ updateTreeView()
 gui,2:destroy
 return
 
-;Mark all elements which are complete
+;Select all elements which are complete
 
 ButtonFindUntranslated:
 gui,main:default

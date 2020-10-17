@@ -9,30 +9,12 @@ If !pToken := Gdip_Startup()
 }
 
 
-
-Font := "Arial"
-
-; Create some brushes
-pPenBlack := Gdip_CreatePen("0xff000000",2) ;Black pen
-pPenMarkLin := Gdip_CreatePen("0xff00aa00",2) ;Green pen 
-pPenRunningLin := Gdip_CreatePen("0xaaff0000",2) ;Red pen, transparent
-pPenRed := Gdip_CreatePen("0xffaa0000",2) ;Red pen
-pPenGrey := Gdip_CreatePen("0xffaaaaff",2) ;Grey pen
-pBrushBlack := Gdip_BrushCreateSolid("0xff000000") ;Black brush
-pBrushUnmark := Gdip_BrushCreateSolid("0xfffafafa") ;White brush
-pBrushMark := Gdip_BrushCreateSolid("0x5000ff00") ;Green brush, transparent
-pBrushRunning := Gdip_BrushCreateSolid("0x50ff0000") ;Red brush, transparent
-pBrushLastRunning := Gdip_BrushCreateSolid("0x10ff0000") ;Red brush, very transparent
-pBrushBackground := Gdip_BrushCreateSolid("0xFFeaf0ea") ;Almost white brush for background
-
-
-
-
-;Fit the position of an element to the grid
+;Fit the position of an element to the grid (x coordinate)
 ui_FitgridX(pos)
 {
 	return round((pos / default_gridX)) * default_gridX
 }
+;Fit the position of an element to the grid (y coordinate)
 ui_FitgridY(pos)
 {
 	return round((pos / default_gridY)) * default_gridY
