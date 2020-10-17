@@ -63,13 +63,13 @@ ui_SettingsOfFlow()
 	
 
 	;Put the window in the center of the main window
-	gui,+hwndSettingsHWND
-	global_CurrentlyActiveWindowHWND:=SettingsHWND
+	gui,+hwndglobal_SettingWindowHWND
+	global_CurrentlyActiveWindowHWND:=global_SettingWindowHWND
 	gui,show,hide
 	DetectHiddenWindows,on
 	
 	pos:=EditGUIGetPos()
-	wingetpos,,,tempWidth,tempHeight,ahk_id %SettingsHWND%
+	wingetpos,,,tempWidth,tempHeight,ahk_id %global_SettingWindowHWND%
 	tempXpos:=round(pos.x+pos.w/2- tempWidth/2)
 	tempYpos:=round(pos.y+pos.h/2- tempHeight/2)
 	gui,show,x%tempXpos% y%tempYpos%

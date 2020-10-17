@@ -5,16 +5,14 @@ temp := lang("Condition")
 temp := lang("Loop")
 
 global global_SettingWindowParentHWND
-global global_global_SettingWindowHWND
-global global_resultEditingElement
+global global_SettingWindowHWND
 
 class ElementSettings
 {
 	; Open GUI for settings parameters of an element.
-	; wait: if true, the call returns only when user finishes or cancels.
 	; alreadyChangedSomething: if set, on return, the value will be added to the count of detected changes
 	; returns "aborted" or "xx changes". xx is the count of detected changes.
-	open(setElementID, wait = false, alreadyChangedSomething = 0)
+	open(setElementID, alreadyChangedSomething = 0)
 	{
 		global
 		local temp, tempYPos, tempXPos, tempEditwidth, tempIsDefault, tempAssigned, tempChecked, tempMakeNewGroup, temptoChoose, tempAltSumbit, tempChoises, tempAllChoices, tempParameterOptions, tempres, tempelement
@@ -31,9 +29,6 @@ class ElementSettings
 
 		; save the "wait" option
 		this.wait := wait
-		
-		; initialize the edit result value
-		global_resultEditingElement := ""
 		
 		this.fields := {} ;contains the fields which will be shown in the GUI. Each field is a bunch of controls
 		this.fieldHWNDs := {} ;Contains the field objects of all field related controls hwnds. Needed for responding user input
@@ -196,27 +191,20 @@ class ElementSettings
 		
 		;Initialization done. Do a general update as last step
 		this.initializing := false
-		this.generalUpdateRunning:=false
+		this.generalUpdateRunning := false
 		this.generalUpdate(True)
 		
-		if (this.wait) 
+		;We have to wait until user closes the window
+		;Wait until this.result is set
+		this.result := ""
+		Loop
 		{
-			;We have to wait until user closes the window
-			;Wait until global_resultEditingElement is set
-			Loop
-			{
-				if (global_resultEditingElement = "")
-					sleep 10
-				else 
-					break
-			}
-			return global_resultEditingElement
+			if (this.result = "")
+				sleep 10
+			else 
+				break
 		}
-		Else
-		{
-			;We don't need to wait until user closes the window
-			return
-		}
+		return this.result
 	}
 
 	;If user clicks on the button to change the element class
@@ -226,26 +214,24 @@ class ElementSettings
 		ElementSettings.close()
 		
 		; let user select the sub type and wait until he finishes
-		tempres := selectSubType(ElementSettings.element, true)
+		tempres := ElementSettingsElementClassSelector.open(ElementSettings.element)
 		if (tempres != "aborted")
 		{
 			; reopen the element settings window
-			global_resultEditingElement := ElementSettings.open(ElementSettings.element, ElementSettings.wait, 1)
+			ElementSettings.open(ElementSettings.element, 1)
 		}
 		else 
 		{
 			; if user aborted
-			global_resultEditingElement := "aborted"
-			return global_resultEditingElement
+			this.result := "aborted"
 		}
-		return
 	}
 		
 	; if user clicks on the help button
 	GUISettingsOfElementHelp()
 	{
 		; find out whether the help is currently shown
-		IfWinExist,ahk_id %global_GUIHelpHWND%
+		IfWinExist, ahk_id %global_GUIHelpHWND%
 		{
 			; help is currently shown. Hide it
 			ui_closeHelp()
@@ -264,8 +250,7 @@ class ElementSettings
 		; close the element settings gui
 		ElementSettings.close()
 		
-		global_resultEditingElement := "aborted"
-		return global_resultEditingElement
+		this.result := "aborted"
 	}
 
 	; user clicks on the save button
@@ -314,8 +299,8 @@ class ElementSettings
 		ElementSettings.close()
 		
 		; return count of changes
-		global_resultEditingElement := ElementSettings.changes " Changes"
-		return global_resultEditingElement
+		this.result := ElementSettings.changes " Changes"
+		return
 	}
 	
 	; the following classes are a set of controls (= fields) which are used to display different parameter types
@@ -479,6 +464,9 @@ class ElementSettings
 				; if we are here, we did not find a field for this parameter ID
 				logger("a0", "cannot set value of field, since parameter ID ''" parameterID "'' was not found. (field class: " this.__Class ")", flowID)
 			}
+
+			; update some general values (e.g. element name)
+			elementSettings.generalUpdate()
 		}
 		
 		
@@ -1264,7 +1252,7 @@ class ElementSettings
 		
 		; get the value of the radio field.
 		; if the parameter type is enum, it will return the enum value. Else it will return the index.
-		getvalue() ; override
+		getvalue(parameterID = "") ; override
 		{
 			global
 			local temp
@@ -1298,7 +1286,7 @@ class ElementSettings
 		}
 
 		; set the value of radio field
-		setvalue(value) ; override
+		setvalue(value, parameterID = "") ; override
 		{
 			global
 			local temp
@@ -1626,17 +1614,17 @@ class ElementSettings
 			; add the dropdown control
 			gui, add, DropDownList, w400 x10 %tempAltSumbit% choose%temptoChoose% hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID%, % tempAllChoices
 			this.components.push("GUISettingsOfElement" tempParameterID)
-			ElementSettings.fieldHWNDs[tempHWND]:=this
+			ElementSettings.fieldHWNDs[tempHWND] := this
 		}
 
 		; get the value of the dropdown
-		getvalue() ; override
+		getvalue(parameterID = "") ; override
 		{
 			global
 			local temp
 			
 			; reuse the base function
-			temp := base.getvalue()
+			temp := base.getvalue(parameterID)
 
 			; if we should return the enum value as result, convert the index to enum string 
 			if (this.parameter.result = "enum")
@@ -1646,7 +1634,7 @@ class ElementSettings
 		}
 
 		; set the value of the dropdown
-		setvalue(value) ; override
+		setvalue(value, parameterID = "") ; override
 		{
 			global
 
@@ -1713,19 +1701,10 @@ class ElementSettings
 				tempAltSumbit := ""
 			}
 
-			;loop through all choices. Find which one to select. Make a selection list which is suitable for the gui,add command
+			;loop through all choices. Make a selection list which is suitable for the gui,add command
 			local tempAllChoices := ""
-			local temptoChooseText := tempValue
 			for tempIndex, TempOneChoice in this.par_choices
 			{
-				if (parameter.result = "number")
-				{
-					if (TempOneChoice = tempValue)
-					{
-						; the value is a valid index. We will write the string in the combobox
-						temptoChooseText := TempOneChoice
-					}
-				}
 				tempAllChoices .= "|" TempOneChoice
 			}
 			StringTrimLeft, tempAllChoices, tempAllChoices, 1
@@ -1873,7 +1852,7 @@ class ElementSettings
 		}
 
 		; update the value in controls
-		setvalue(value) ; override
+		setvalue(value, parameterID = "") ; override
 		{
 			; reuse the base function
 			base.setvalue(value)
@@ -1968,195 +1947,212 @@ class ElementSettings
 		}
 	}
 	
+	; field which contains a file path.
 	class file extends ElementSettings.field
 	{
 		__new(parameter)
 		{
 			global
+			; reuse base new() function
 			base.__new(parameter)
-			local temp, tempHWND
-			local tempParameterID:=parameter.id[1]
+
+			local tempHWND
 			
-			gui,font,s8 cDefault wnorm
-			temp:=ElementSettings.elementPars[tempParameterID] 
+			; copy some paramters in local variables
+			local tempParameterID := parameter.id[1]
+
+			; get the current value
+			tempValue := ElementSettings.elementPars[tempParameterID] 
 			
-			gui,add,edit,w370 x10 hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID%,%temp%
+			; create the gui elements
+			gui, font, s8 cDefault wnorm
+			
+			; create an edit control
+			gui, add, edit, w370 x10 hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID%, %tempValue%
 			this.components.push("GUISettingsOfElement" tempParameterID)
-			ElementSettings.fieldHWNDs[tempHWND]:=this
+			ElementSettings.fieldHWNDs[tempHWND] := this
 			
-			gui,add,button,w20 X+10 hwndtempHWND gGUISettingsOfElementButton vGUISettingsOfElementbutton%tempParameterID%,...
+			; create a button control, which will open the file select dialog
+			gui, add, button, w20 X+10 hwndtempHWND gGUISettingsOfElementButton vGUISettingsOfElementbutton%tempParameterID%, ...
 			this.components.push("GUISettingsOfElementbutton" tempParameterID)
-			ElementSettings.fieldHWNDs[tempHWND]:=this
+			ElementSettings.fieldHWNDs[tempHWND] := this
 		}
+
+		; react if user clicks on the file select button
 		clickOnButton()
 		{
 			global
 			local tempfile, tempGUIControl
-			tempGUIControl:=this.parameter.id[1]
 			
-			FileSelectFile,tempfile,% this.parameter.options,% this.getvalue(),% this.parameter.prompt,% this.parameter.filter
+			; open the file select dialog
+			FileSelectFile, tempfile, % this.parameter.options, % this.getvalue() ,% this.parameter.prompt, % this.parameter.filter
 			
 			if not errorlevel
+			{
+				; user has selected a file. Update the value
 				this.setvalue(tempfile)
-			this.udpatename()
-			return
+			}
 		}
 	}
 	
+	; field which contains a folder path.
 	class folder extends ElementSettings.field
 	{
 		__new(parameter)
 		{
 			global
+
+			; reuse base new() function
 			base.__new(parameter)
-			local temp, tempHWND
-			local tempParameterID:=parameter.id[1]
+
+			local tempHWND
+
+			; copy some paramters in local variables
+			local tempParameterID := parameter.id[1]
 			
-			gui,font,s8 cDefault wnorm
-			temp:=ElementSettings.elementPars[tempParameterID] 
+			; get the current value
+			tempValue := ElementSettings.elementPars[tempParameterID]
+
+			; create the gui elements
+			gui, font, s8 cDefault wnorm
 			
-			
-			gui,add,edit,w370 x10 hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID%,%temp%
+			; create an edit control
+			gui, add, edit, w370 x10 hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID%, %temp%
 			this.components.push("GUISettingsOfElement" tempParameterID)
-			ElementSettings.fieldHWNDs[tempHWND]:=this
-			gui,add,button,w20 X+10 hwndtempHWND gGUISettingsOfElementButton vGUISettingsOfElementbutton%tempParameterID%,...
+			ElementSettings.fieldHWNDs[tempHWND] := this
+
+			; create a button control, which will open the folder select dialog
+			gui, add, button, w20 X+10 hwndtempHWND gGUISettingsOfElementButton vGUISettingsOfElementbutton%tempParameterID%, ...
 			this.components.push("GUISettingsOfElementbutton" tempParameterID)
-			ElementSettings.fieldHWNDs[tempHWND]:=this
+			ElementSettings.fieldHWNDs[tempHWND] := this
 		}
 		
+		; react if user clicks on the folder select button
 		clickOnButton()
 		{
 			global
-			local tempfile, tempGUIControl
-			tempGUIControl:=this.parameter.id[1]
+			local tempfile
 			
-			FileSelectFolder,tempfile,% "*" this.getvalue(),this.parameter.options,% this.parameter.prompt
+			; open the folder select dialog
+			FileSelectFolder, tempfile, % "*" this.getvalue(), this.parameter.options, % this.parameter.prompt
 			
 			if not errorlevel
+			{
+				; user has selected a folder. Update the value
 				this.setvalue(tempfile)
-			this.udpatename()
-			return
-			
+			}
 		}
 	}
 	
-	
+	; field which allows user to select weekdays.
 	class weekdays extends ElementSettings.field
 	{
 		__new(parameter)
 		{
 			global
+			; reuse base new() function
 			base.__new(parameter)
+
 			local temp, tempHWND
-			local tempParameterID:=parameter.id[1]
+
+			; copy some paramters in local variables
+			local tempParameterID := parameter.id[1]
+
+			; get the current value
+			tempValue := ElementSettings.elementPars[tempParameterID] 
 			
-			gui,font,s8 cDefault wnorm
-			temp:=ElementSettings.elementPars[tempParameterID] 
+			; create the gui elements
+			gui, font, s8 cDefault wnorm
 			
-			gui,add,checkbox,w45 x10 hwndtempHWND gGUISettingsOfElementWeekdays vGUISettingsOfElement%tempParameterID%2,% lang("Mon (Short for Monday")
+			; create an checkboxes for each weekday
+			gui, add, checkbox, w45 x10 hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID%2, % lang("Mon (Short for Monday")
 			this.components.push("GUISettingsOfElement" tempParameterID "2")
-			ElementSettings.fieldHWNDs[tempHWND]:=this
-			gui,add,checkbox,w45 X+10 hwndtempHWND gGUISettingsOfElementWeekdays vGUISettingsOfElement%tempParameterID%3,% lang("Tue (Short for Tuesday")
+			ElementSettings.fieldHWNDs[tempHWND] := this
+			gui, add, checkbox, w45 X+10 hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID%3, % lang("Tue (Short for Tuesday")
 			this.components.push("GUISettingsOfElement" tempParameterID "3")
-			ElementSettings.fieldHWNDs[tempHWND]:=this
-			gui,add,checkbox,w45 X+10 hwndtempHWND gGUISettingsOfElementWeekdays vGUISettingsOfElement%tempParameterID%4,% lang("Wed (Short for Wednesday")
+			ElementSettings.fieldHWNDs[tempHWND] := this
+			gui, add, checkbox, w45 X+10 hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID%4, % lang("Wed (Short for Wednesday")
 			this.components.push("GUISettingsOfElement" tempParameterID "4")
-			ElementSettings.fieldHWNDs[tempHWND]:=this
-			gui,add,checkbox,w45 X+10 hwndtempHWND gGUISettingsOfElementWeekdays vGUISettingsOfElement%tempParameterID%5,% lang("Thu (Short for Thursday")
+			ElementSettings.fieldHWNDs[tempHWND] := this
+			gui, add, checkbox, w45 X+10 hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID%5, % lang("Thu (Short for Thursday")
 			this.components.push("GUISettingsOfElement" tempParameterID "5")
-			ElementSettings.fieldHWNDs[tempHWND]:=this
-			gui,add,checkbox,w45 X+10 hwndtempHWND gGUISettingsOfElementWeekdays vGUISettingsOfElement%tempParameterID%6,% lang("Fri (Short for Friday")
+			ElementSettings.fieldHWNDs[tempHWND] := this
+			gui, add, checkbox, w45 X+10 hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID%6, % lang("Fri (Short for Friday")
 			this.components.push("GUISettingsOfElement" tempParameterID "6")
-			ElementSettings.fieldHWNDs[tempHWND]:=this
-			gui,add,checkbox,w45 X+10 hwndtempHWND gGUISettingsOfElementWeekdays vGUISettingsOfElement%tempParameterID%7,% lang("Sat (Short for Saturday")
+			ElementSettings.fieldHWNDs[tempHWND] := this
+			gui, add, checkbox, w45 X+10 hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID%7, % lang("Sat (Short for Saturday")
 			this.components.push("GUISettingsOfElement" tempParameterID "7")
-			ElementSettings.fieldHWNDs[tempHWND]:=this
-			gui,add,checkbox,w45 X+10 hwndtempHWND gGUISettingsOfElementWeekdays vGUISettingsOfElement%tempParameterID%1,% lang("Sun (Short for Sunday") ;Sunday is 1
+			ElementSettings.fieldHWNDs[tempHWND] := this
+			gui, add, checkbox, w45 X+10 hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID%1, % lang("Sun (Short for Sunday") ;Sunday is 1
 			this.components.push("GUISettingsOfElement" tempParameterID "1")
-			ElementSettings.fieldHWNDs[tempHWND]:=this
+			ElementSettings.fieldHWNDs[tempHWND] := this
 			
-			IfInString,temp,1
-				guicontrol,,GUISettingsOfElement%tempParameterID%1,1
-			IfInString,temp,2
-				guicontrol,,GUISettingsOfElement%tempParameterID%2,1
-			IfInString,temp,3
-				guicontrol,,GUISettingsOfElement%tempParameterID%3,1
-			IfInString,temp,4
-				guicontrol,,GUISettingsOfElement%tempParameterID%4,1
-			IfInString,temp,5
-				guicontrol,,GUISettingsOfElement%tempParameterID%5,1
-			IfInString,temp,6
-				guicontrol,,GUISettingsOfElement%tempParameterID%6,1
-			IfInString,temp,7
-				guicontrol,,GUISettingsOfElement%tempParameterID%7,1
-			
-			;~ GUISettingsOfElement%tempParameterID%:=temp
-		}
-		
-		getvalue(parameterID="")
-		{
-			global
-			local temp, tempParameterID
-			if parameterID=
-				tempParameterID:=this.parameter.id[1]
-			else
-				tempParameterID:=parameterID
-			
-			temp:=""
-			loop 7
+			; check checkboxes with selected weekdays
+			loop 7 ; loop through all weekdays
 			{
-				GUIControlGet,tempValue,GUISettingsOfElement:,GUISettingsOfElement%tempParameterID%%a_index%
-				if (tempValue=1)
+				IfInString, tempValue, %a_index%
 				{
-					temp.=A_Index
+					; weekday is in tempValue. Select the checkbox
+					guicontrol, , GUISettingsOfElement%tempParameterID%%a_index%, 1
 				}
 			}
-			return temp
 		}
 		
-		setvalue(value, parameterID="")
+		; get selected weekdays
+		getvalue(parameterID = "") ; override
 		{
 			global
-			local tempParameterID:=this.parameter.id[1]
-			if parameterID=
-				tempParameterID:=this.parameter.id[1]
-			else
-				tempParameterID:=parameterID
-			
-			IfInString,value,1
-				guicontrol,GUISettingsOfElement:,GUISettingsOfElement%tempParameterID%1,1
-			IfInString,value,2
-				guicontrol,GUISettingsOfElement:,GUISettingsOfElement%tempParameterID%2,1
-			IfInString,value,3
-				guicontrol,GUISettingsOfElement:,GUISettingsOfElement%tempParameterID%3,1
-			IfInString,value,4
-				guicontrol,GUISettingsOfElement:,GUISettingsOfElement%tempParameterID%4,1
-			IfInString,value,5
-				guicontrol,GUISettingsOfElement:,GUISettingsOfElement%tempParameterID%5,1
-			IfInString,value,6
-				guicontrol,GUISettingsOfElement:,GUISettingsOfElement%tempParameterID%6,1
-			IfInString,value,7
-				guicontrol,GUISettingsOfElement:,GUISettingsOfElement%tempParameterID%7,1
-			
-			return
+
+			; copy some paramters in local variables
+			local tempParameterID := parameter.id[1]
+
+			; Prepare result value
+			local tempResult := ""
+			loop 7 ; loop through all weekdays
+			{
+				; get the checkbox value
+				GUIControlGet, tempValue, GUISettingsOfElement:, GUISettingsOfElement%tempParameterID%%a_index%
+				if (tempValue = 1)
+				{
+					; value is selected. Append the index to the result value
+					tempResult .= A_Index
+				}
+			}
+			return tempResult
 		}
 		
-		changeweekdays() ;TODO remove if no more action necessary
+		; set selected weekdays
+		setvalue(value, parameterID = "")
 		{
-			this.udpatename()
+			global
+			; copy some paramters in local variables
+			local tempParameterID := parameter.id[1]
+
+			; check checkboxes with selected weekdays
+			loop 7 ; loop through all weekdays
+			{
+				; Select the checkbox if weekday is in value. Unselect otherwise
+				guicontrol, GUISettingsOfElement:, GUISettingsOfElement%tempParameterID%%a_index%, % (InStr(value, a_index) != 0)
+			}
 		}
-		
 	}
 	
+	; field which allows user to select date and / or time.
 	class DateAndTime extends ElementSettings.field
 	{
 		__new(parameter)
 		{
 			global
+			; reuse base new() function
 			base.__new(parameter)
-			local temp, tempHWND
-			local tempParameterID:=parameter.id[1]
-			local tempFormat:=parameter.format
+
+			local tempHWND
+
+			; copy some paramters in local variables
+			local tempParameterID := parameter.id[1]
+			local tempFormat := parameter.format
+
+			; convert the tempFormat if it has a specific value
 			if (tempFormat = "Time")
 			{
 				tempFormat := "Time"
@@ -2170,196 +2166,173 @@ class ElementSettings
 				tempFormat := % "'" lang("Date") ":' " lang("MM/dd/yy") "   '" lang("Time") ":' " lang("HH:mm:ss")
 			}
 			
-			gui,font,s8 cDefault wnorm
-			temp:=ElementSettings.elementPars[tempParameterID] 
-			if temp=
+			; get the current value
+			tempValue := ElementSettings.elementPars[tempParameterID] 
+			; set to current time, if current value is empty
+			if (tempValue = "")
 			{
-				temp=%a_now%
+				tempValue := a_now
 			}
-			gui,add,DateTime,w400 x10 choose%temp% gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID% ,% tempFormat
+
+			; create the gui elements
+			gui, font, s8 cDefault wnorm
+
+			; create an datetime control
+			gui, add, DateTime, w400 x10 choose%temp% gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID% ,% tempFormat
 			this.components.push("GUISettingsOfElement" tempParameterID)
-			ElementSettings.fieldHWNDs[tempHWND]:=this
+			ElementSettings.fieldHWNDs[tempHWND] := this
 		}
 	}
 	
+	; field which contains a dropdown.
 	class listbox extends ElementSettings.field
 	{
 		__new(parameter)
 		{
 			global
+
+			; reuse base new() function
 			base.__new(parameter)
-			local tempHWND, tempSort, tempMulti, tempChoices, tempChosen, tempChosenNumbers, tempAltSubmit, tempChoicesString
-			local tempParameterID:=parameter.id[1]
+
+			local tempHWND, tempSort, tempMulti, tempChosenNumbers, tempAltSubmit, tempChoicesString
+
+			; copy some paramters in local variables
+			local tempParameterID := parameter.id[1]
 			
-			gui,font,s8 cDefault wnorm
-			tempChosen:=ElementSettings.elementPars[tempParameterID] 
-			tempChoices:=parameter.choices
-			this.choices:=tempChoices
-			tempChoicesString:=""
-			for tempindex, tempLabel in this.choices
+			local tempChosen := ElementSettings.elementPars[tempParameterID] 
+			local tempChoices := parameter.choices
+
+			; the choices can be set after the control was created. We will save the initial value
+			this.par_choices := tempChoices
+
+			;loop through all choices. Make a selection list which is suitable for the gui,add command
+			local tempAllChoices := ""
+			for tempIndex, TempOneChoice in this.par_choices
 			{
-				if (tempChoicesString = "")
-					tempChoicesString:=tempLabel
-				else
-					tempChoicesString.= "|" tempLabel
+				tempAllChoices .= "|" TempOneChoice
 			}
+			StringTrimLeft, tempAllChoices, tempAllChoices, 1
 			
-			if (parameter.multi )
-				tempMulti:="multi"
-			else
-				tempMulti:=""
-			if (parameter.Sort )
-				tempSort:="Sort"
-			else
-				tempSort:=""
-			if (parameter.result = "string")
-			{
-				this.par_result:="string"
-				this.choices:=tempChoices
-				tempAltSubmit:=""
-			}
-			else
+			; decide whether we need the multi keyword
+			local tempMulti := ""
+			if (parameter.multi)
+				tempMulti :="multi"
+
+			; decide whether we need the sort keyword
+			local tempSort := ""
+			if (parameter.Sort)
+				tempSort :="Sort"
+
+			; decide whether we need the altSubmit keyword
+			tempAltSubmit := ""
+			if (parameter.result != "number")
 			{
 				tempAltSubmit:="altSubmit"
-				this.par_result:="number"
 			}
 			
-			gui,add,listbox,w400 x10 %tempMulti% %tempSort% %tempAltSubmit% hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID%,%tempChoicesString%
-			
+			; create the gui elements
+			gui, font, s8 cDefault wnorm
+
+			; add the listbox control
+			gui, add, listbox, w400 x10 %tempMulti% %tempSort% %tempAltSubmit% hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID%, %tempAllChoices%
 			this.components.push("GUISettingsOfElement" tempParameterID)
-			ElementSettings.fieldHWNDs[tempHWND]:=this
+			ElementSettings.fieldHWNDs[tempHWND] := this
 			
+			; set the value
 			this.setvalue(tempChosen)
 		}
 		
-		getvalue(parameterID="")
+		; get value of the listbox
+		getvalue(parameterID = "") ; override
 		{
 			global
-			local tempChosen, tempChosenObj, tempChosenStrings, tempParameterID, tempChoices
-			if parameterID=
-			{
-				tempParameterID:=this.parameter.id
-				if isobject(tempParameterID)
-					tempParameterID:=tempParameterID[1]
-			}
-			else
-				tempParameterID:=parameterID
+			local tempChosen
+
+			; copy some paramters in local variables
+			local tempParameterID := this.parameter.id[1]
 			
-			GUIControlGet,tempChosen,GUISettingsOfElement:,GUISettingsOfElement%tempParameterID%
+			; get the chosen value
+			GUIControlGet, tempChosen, GUISettingsOfElement:, GUISettingsOfElement%tempParameterID%
 			
-			tempChosenObj:=Object()
-			loop,parse,tempChosen,|
+			; convert the pipe delimited string to array
+			local tempChosenObj := Object()
+			loop, parse, tempChosen, |
 			{
 				tempChosenObj.push(A_LoopField)
 			}
-			;~ if (this.par_result="string")
-			;~ {
-				;~ tempChoices:=this.choices
-				;~ tempChosenNumbers:="|" tempChosen "|" 
-				
-				;~ tempChosenStrings:=""
-				;~ loop,parse,tempChoices,|
-				;~ {
-					;~ MsgBox %tempChosenNumbers% - %a_index%
-					;~ IfInString, tempChosenNumbers, "|" a_index "|"
-					;~ {
-						;~ if (tempChosenStrings!="")
-							;~ tempChosenStrings .= "|" A_LoopField
-						;~ else
-							;~ tempChosenStrings:=A_LoopField
-					;~ }
-				;~ }
-				;~ d(tempChosenStrings, tempChosen)
-				;~ return tempChosenStrings
-			;~ }
-			;~ else
-			;~ {
-				return tempChosenObj
-			;~ }
-			
+
+			return tempChosenObj
 		}
 		
-		setvalue(value, parameterID="")
+		; set value of the listbox
+		setvalue(value, parameterID = "") ; override
 		{
 			global
 			local tempChosenNumbers, tempChoices, tempChosenStrings, tempChosen
-			local tempParameterID:=this.parameter.id[1]
-			if parameterID=
+
+			; copy some paramters in local variables
+			local tempParameterID := this.parameter.id[1]
+		
+			; first deselect all entries
+			GuiControl, GUISettingsOfElement:Choose, GUISettingsOfElement%tempParameterID%, 0
+
+			if (this.par_result = "string")
 			{
-				tempParameterID:=this.parameter.id[1]
-				if isobject(tempParameterID)
-					tempParameterID:=tempParameterID[1]
-			}
-			else
-				tempParameterID:=parameterID
-			
-			if (this.par_result="string")
-			{
+				; we need to select all strings in list "value"
+				local found := false
 				for tempindexChosen, tempLabelChosen in value
 				{
 					for tempindexChoice, tempLabelChoice in this.choices
 					{
 						if (tempLabelChoice = tempLabelChosen)
 						{
-							GUIControl,GUISettingsOfElement:Choose,GUISettingsOfElement%tempParameterID%,% tempindexChoice
+							GUIControl, GUISettingsOfElement:Choose, GUISettingsOfElement%tempParameterID%, % tempindexChoice
+							found := true
 						}
 					}
+				}
+
+				if not found
+				{
+					logger("a0", "cannot set value. Value '" value "' is not in list (field class: " this.__Class ", first paramter ID: " this.parameterIds[1] ")")
 				}
 			}
 			else
 			{
+				; we need to select all indices in list "value"
 				for tempindexChosen, tempNumberChosen in value
 				{
-					GUIControl,GUISettingsOfElement:Choose,GUISettingsOfElement%tempParameterID%,% tempNumberChosen
+					GUIControl, GUISettingsOfElement:Choose, GUISettingsOfElement%tempParameterID%, % tempNumberChosen
 				}
 			}
-			return
+
+			; update some general values (e.g. element name)
+			elementSettings.generalUpdate()
 		}
-		
 	}
 	
-	
-	
+
+
 	;Get all values which are currently edited.
 	getAllValues()
 	{
 		global
-		local tempOneParID, temponeValue
-		local tempPars:=Object()
-		for ElementSaveindex, parameter in ElementSettings.parametersToEdit
+		local oneFieldIndex, oneField, oneParameterIndex, oneParameterID
+
+		; prepare return value
+		local tempPars := Object()
+
+		; loop through all fields
+		for oneFieldIndex, oneField in this.fields
 		{
-			;Get the keys which are specified in key "ID"
-			if not IsObject(parameter.id)
-				parameterID:=[parameter.id]
-			else
-				parameterID:=objFullyClone(parameter.id)
-			;~ MsgBox % strobj(parameterID)
-			if (parameterID[1]="" or parameter.type="label" or parameter.type="SmallLabel") ;If this is only a label do nothing
-				continue
-			;MsgBox % strobj(parameterID)
-			
-			;The edit control can also have parameter names which are specified in key "ContentID"
-			if (IsObject(parameter.ContentID))
+			; loop through all parameter IDs in the field
+			for oneParameterIndex, oneParameterID in oneField.parameterIds
 			{
-				parameterID.push(parameter.ContentID[1])
+				; get the parameter value from the field
+				tempPars[oneParameterID] := oneField.getValue(oneParameterID)
 			}
-			else if (parameter.ContentID)
-			{
-				parameterID.push(parameter.ContentID)
-			}
-			;MsgBox % strobj(parameterID)
-			
-			
-			;Certain types of control consist of multiple controls and thus contain multiple parameters.
-			for ElementSaveindex2, oneID in parameterID
-			{
-				temponeValue:=ElementSettings.fieldParIDs[oneID].getValue(oneID)
-				tempPars[oneID]:=temponeValue
-				;~ d(temponeValue, tempOneParID)
-			
-			}
-			
 		}
+
 		return tempPars
 	}
 	
@@ -2543,10 +2516,6 @@ GUISettingsOfElementButton(CtrlHwnd, GuiEvent="", EventInfo="", ErrorLevell="")
 {
 	GUISettingsOfElementAddTask("ClickOnButton", CtrlHwnd)
 }
-GUISettingsOfElementWeekdays(CtrlHwnd, GuiEvent="", EventInfo="", ErrorLevell="")
-{
-	GUISettingsOfElementAddTask("ChangeWeekdays", CtrlHwnd)
-}
 
 ; ensure a quick return time on user input, to ensure that we do not miss something
 ; fill the task which results from the user input in a list
@@ -2613,10 +2582,6 @@ GUISettingsOfElementTaskTimer()
 		else if (oneTask.task = "ClickOnButton")
 		{
 			ElementSettings.fieldHWNDs[oneTask.hwnd].ClickOnButton()
-		}
-		else if (oneTask.task = "ChangeWeekdays")
-		{
-			ElementSettings.fieldHWNDs[oneTask.hwnd].ChangeWeekdays()
 		}
 		Else
 		{

@@ -6,14 +6,14 @@ ui_disableElementSettingsWindow()
 {
 	global
 	
-	gui,GUISettingsOfElement:+disabled
+	gui, GUISettingsOfElement: +disabled
 }
 
 ; enable element settings GUI
 ui_EnableElementSettingsWindow()
 {
 	global
-	gui,GUISettingsOfElement:-disabled
+	gui, GUISettingsOfElement: -disabled
 }
 
 ; get the position of the element settings GUI
@@ -23,449 +23,504 @@ ui_GetElementSettingsGUIPos()
 	WinGetPos, ElementSettingsGUIX, ElementSettingsGUIY, ElementSettingsGUIWidth, ElementSettingsGUIHeight, % "ahk_id " global_SettingWindowParentHWND
 }
 
-;Select element subtype
-selectSubType(p_ElementID, wait = false)
+; opens a gui where user can select the element class
+class ElementSettingsElementClassSelector
 {
-	global
-	static global_resultEditingElement
-	
-	;~ d(setelement)
-	global_setElementID:=p_ElementID
-	global_setElementType:= _getElementProperty(FlowID, global_setElementID, "type")
-	global_setElementClass:= _getElementProperty(FlowID, global_setElementID, "Class")
-	global_setElementName:= _getElementProperty(FlowID, global_setElementID, "Name")
-	global_setElementPars:= _getElementProperty(FlowID, global_setElementID, "pars")
-
-	local matchingElementClasses:=Object()
-	local allCategories:=Object()
-	local tempcategory
-	
-	global_resultEditingElement:=""
-	
-	
-	EditGUIDisable()
-	gui,3:default
-	
-	gui,destroy
-	gui,-dpiscale
-	gui,font,s12
-	gui,add,text,,% lang("Which %1% should be created?", lang(global_setElementType))
-	gui,add,TreeView,w400 h500 vGuiElementChoose gGuiElementChoose AltSubmit
-	gui,add,Button,w250 gGuiElementChooseOK vGuiElementChooseOK default Disabled,% lang("OK")
-	gui,add,Button,w140 X+10 yp gGuiElementChooseCancel,% lang("Cancel")
-	
-	TVnum:=Object()
-	TVID:=Object()
-	TVSubType:=Object()
-	TVClass:=Object()
-	
-	;Find out wich categories exist
-	for forelementIndex, forElementClass in _getShared("AllElementClasses")
+	open(p_ElementID)
 	{
-		if (Element_getElementType_%forElementClass%() = global_setElementType)
+		global
+		local forelementIndex, forElementClass, tempElementCategories, forindex, forcategory, tempOneCategory, tempcategoryTV, tempTV
+		
+		; save some information about the element which we will need repeadetely
+		this.elementID := p_ElementID
+		this.elementType := _getElementProperty(FlowID, this.elementID, "type")
+		this.elementClass := _getElementProperty(FlowID, this.elementID, "Class")
+		this.elementName := _getElementProperty(FlowID, this.elementID, "Name")
+		this.elementPars := _getElementProperty(FlowID, this.elementID, "pars")
+
+		; disable editor gui
+		EditGUIDisable()
+
+		; create gui with a treeview and two buttons
+		gui, ElementClassSelector: default
+		gui, destroy
+		gui, -dpiscale
+		gui, font, s12
+		gui, add, text, , % lang("Which %1% should be created?", lang(this.elementType))
+		gui, add, TreeView, w400 h500 vElementClassSelectorChoose gElementClassSelectorChoose AltSubmit
+		gui, add, Button, w250 gElementClassSelectorOK vElementClassSelectorOK default Disabled, % lang("OK")
+		gui, add, Button, w140 X+10 yp gElementClassSelectorCancel,% lang("Cancel")
+		gui, +hwndglobal_SettingWindowHWND
+		global_CurrentlyActiveWindowHWND := global_SettingWindowHWND
+		
+		; prepare variables which will contain element data for each TV ID
+		this.TVelementIndex := Object()
+		this.TVelementID := Object()
+		this.TVelementClass := Object()
+		
+		; Find all matching element classes and create a list of categories
+		local matchingElementClasses := Object()
+		local allCategories := Object()
+		; loop through all element classes
+		for forelementIndex, forElementClass in _getShared("AllElementClasses")
 		{
-			if (ShouldShowThatelementLevel(IsFunc("Element_getElementLevel_" forElementClass) ? Element_getElementLevel_%forElementClass%() : "Beginner")
-				OR global_setElementClass = forElementClass)
+			; check element type
+			if (Element_getElementType_%forElementClass%() = this.elementType)
 			{
-				matchingElementClasses.push(forElementClass)
-				tempcategory:=Element_getCategory_%forElementClass%()
-				
-				StringSplit,tempcategory,tempcategory,|
-				;MsgBox %tempElementCategory1%
-				loop %tempcategory0%
+				; check required user experience level of this element. Always the selected element regardless of its required level
+				if (ShouldShowThatelementLevel(Element_getElementLevel_%forElementClass%())
+					OR this.elementClass = forElementClass)
 				{
-					if not (objhasvalue(allCategories,tempcategory%a_index%))
-						allCategories.push(tempcategory%a_index%)
+					; add the element class to the list
+					matchingElementClasses.push(forElementClass)
+
+					; add all categories of that element class to the list
+					tempElementCategories := Element_getCategory_%forElementClass%()
+					if (not tempElementCategories)
+					{
+						throw exception("Internal Error: No category defined in element class " forElementClass)
+					}
+
+					; there can be multiple categories which are separated by pipes
+					loop, parse, tempElementCategories, |
+					{
+						if not (objhasvalue(allCategories, A_LoopField))
+						{
+							allCategories.push(A_LoopField)
+						}
+					}
 				}
 			}
 		}
-	}
-	
-	;add all categories to the treeview
-	for forindex, forcategory in allCategories 
-	{
-		tempcategoryTV%forindex%:=TV_Add(forcategory)
-	}
-	if not (matchingElementClasses.MaxIndex()>0)
-		MsgBox,Internal Error: No elements found of type: %global_setElementType%
-	
-	;add all elements to the treeview
-	for forelementIndex, forElementClass in matchingElementClasses
-	{
-		tempcategory:=Element_getCategory_%forElementClass%()
-		;MsgBox %tempElementCategory%
-		StringSplit,tempcategory,tempcategory,|
-		;MsgBox %tempElementCategory1%
-		loop %tempcategory0%
+		
+		if (not matchingElementClasses.MaxIndex() > 0)
 		{
-			;MsgBox %tempElementCategory1%
-			tempAnCategory:=tempcategory%A_Index%
-			for forindex, forcategory in allCategories
+			throw exception("Internal Error: No matching elements classes found of type: " this.elementType)
+		}
+		if (not allCategories.MaxIndex() > 0)
+		{
+			throw exception("Internal Error: No matching elements categories found of type: " this.elementType)
+		}
+		
+		; add all categories to the treeview
+		categoryTVs := object()
+		for forindex, forcategory in allCategories 
+		{
+			categoryTVs.push(TV_Add(forcategory))
+		}
+		
+		; add all elements to the treeview
+		for forelementIndex, forElementClass in matchingElementClasses
+		{
+			; loop through all categories of the element
+			tempElementCategories := Element_getCategory_%forElementClass%()
+			loop, parse, tempElementCategories, |
 			{
-				if (tempAnCategory = forcategory)
-					tempcategoryTV:=tempcategoryTV%forindex%
-			}
-			if (ShouldShowThatelementLevel(IsFunc("Element_getElementLevel_" forElementClass) ? Element_getElementLevel_%forElementClass%() : "Beginner")
-				OR global_setElementClass = forElementClass)
-			{
-				tempTV:=TV_Add(Element_getName_%forElementClass%(),tempcategoryTV)
-				TVnum[tempTV]:=forelementIndex
-				TVID[tempTV]:=global_setElementID
-				TVClass[tempTV]:=forElementClass
-				if (global_setElementClass=forElementClass) ;Select the current element type, if any
-					TV_Modify(tempTV) 
+				tempOneCategory := A_LoopField
+
+				; get the category TV ID
+				for forindex, forcategory in allCategories
+				{
+					if (tempOneCategory = forcategory)
+						tempcategoryTV := categoryTVs[forindex]
+				}
+
+				; add the element class to the category in TV
+				tempTV := TV_Add(Element_getName_%forElementClass%(), tempcategoryTV)
+
+				; save informations about the just created TV ID
+				this.TVelementIndex[tempTV] := forelementIndex
+				this.TVelementID[tempTV] := this.elementID
+				this.TVelementClass[tempTV] := forElementClass
+
+				; If current element has already a class, select it
+				if (this.elementClass = forElementClass) 
+					TV_Modify(tempTV)
 			}
 		}
 		
-	}
-	
-	
-	;Put the window in the center of the main window
-	gui,+hwndSettingsHWND
-	global_CurrentlyActiveWindowHWND:=SettingsHWND
-	gui,show,hide
-	pos:=EditGUIGetPos()
-	DetectHiddenWindows,on
-	wingetpos,,,tempWidth,tempHeight,ahk_id %SettingsHWND%
-	tempXpos:=round(pos.x+pos.w/2- tempWidth/2)
-	tempYpos:=round(pos.y+pos.h/2- tempHeight/2)
-	;~ d(TVnum)
-	gui,show,x%tempXpos% y%tempYpos%
-	
-	if (wait)
-	{
+		; Calculate gui position. We want to show the settings window in the middle of the main window
+		gui, show, hide
+		pos := EditGUIGetPos()
+		DetectHiddenWindows, on
+		local tempWidth, tempHeight
+		wingetpos, , , tempWidth, tempHeight, ahk_id %global_SettingWindowHWND%
+		local tempXpos := round(pos.x + pos.w / 2 - tempWidth / 2)
+		local tempYpos := round(pos.y + pos.h / 2 - tempHeight / 2)
+
+		; move gui to the calculated position
+		gui, show, x%tempXpos% y%tempYpos%
+		
+		; We have to wait until user closes the window
+		; Wait until this.result is set
+		this.result := ""
 		Loop
 		{
-			if (global_resultEditingElement="")
+			if (this.result = "")
 				sleep 10
 			else 
 			{
-				if (global_resultEditingElement!="aborted")
-				{
-					_setElementProperty(FlowID, ElementID, "subtype", global_resultEditingElement)
-					; setElement.setUnsetDefaults() TODO: Did I forget this function on last refactoring?
-				}
-				break
+				return this.result
 			}
 		}
+	}
+
+	; react if user chooses something
+	ElementClassSelectorChoose()
+	{
+		global
+		local GuiElementChoosedTV
+
+		if (A_GuiEvent = "DoubleClick")
+		{
+			; apply selection and close window on double click
+			ElementSettingsElementClassSelector.ElementClassSelectorOK()
+			return
+		}
+
+		; get selected TV element
+		gui, ElementClassSelector: default
+		GuiElementChoosedTV := TV_GetSelection()
 		
+		; enable button "ok" if a class is selected
+		if (this.TVelementIndex[GuiElementChoosedTV] > 0)
+			GuiControl, enable, ElementClassSelectorOK
+		else
+			GuiControl, disable, ElementClassSelectorOK
+	}
+
+	; react if user clicks on cancel button
+	ElementClassSelectorCancel()
+	{
+		; destroy gui and enable editor gui
+		gui, ElementClassSelector: default
+		gui, destroy
 		EditGUIEnable()
-	}
-	
-	;~ MsgBox
-	return global_resultEditingElement
 
-	3guiclose:
-	GuiElementChooseCancel:
-	gui,3:default
-	gui,destroy
-	if (global_setElementClass="" and global_setElementType!="Trigger")
+		; set result
+		this.result := "aborted"
+	}
+
+	; react if user clicks on OK button
+	ElementClassSelectorOK()
 	{
-		Element_Remove(FlowID, global_setElementId)
-		;~ API_Draw_Draw(FlowID)
-	}
-	global_resultEditingElement=aborted
-	EditGUIEnable()
-	return
-	GuiElementChoose:
-	gui,3:default
-	if A_GuiEvent =DoubleClick 
-		goto GuiElementChooseOK
-	GuiElementChoosedTV:=TV_GetSelection()
-	;~ ToolTip %GuiElementChoosedTV%
-	gui,submit,nohide
-	if TVnum[GuiElementChoosedTV]>0	
-		GuiControl,enable,GuiElementChooseOK
-	else
-		GuiControl,disable,GuiElementChooseOK
-	
-	return
-	GuiElementChooseOK:
-	
-	gui,3:default
-	gui,Submit,nohide
-	GuiElementChoosedTV:=TV_GetSelection()
-	TV_GetText(GuiElementChoosedText, TV_GetSelection())
-	GuiElementChoosedID:=TVID[GuiElementChoosedTV]
-	if GuiElementChoosedID=
-		return
-	gui,destroy
-	EditGUIEnable()
-	
-	Element_SetClass(FlowID,global_setElementID,TVClass[GuiElementChoosedTV])
+		global
+		local GuiElementChoosedTV, GuiElementChoosedID
 
-	
-	
-	global_resultEditingElement:=TVClass[GuiElementChoosedTV]
-	
-	EditGUIEnable()
-	
-	return 
-	
+		; get selected TV element
+		gui, ElementClassSelector: default
+		GuiElementChoosedTV := TV_GetSelection()
+		GuiElementChoosedClass := this.TVelementClass[GuiElementChoosedTV]
+
+		; return if nothing chose. This can happen if user makes a double click on a category
+		if not GuiElementChoosedClass
+			return
+		
+		; destroy gui and enable editor gui
+		gui,destroy
+		EditGUIEnable()
+
+		; set element class
+		Element_SetClass(FlowID, this.elementID, GuiElementChoosedClass)
+
+		; set result to selected element class
+		this.result := GuiElementChoosedClass
+	}
+}
+
+; forward some glabel calls
+ElementClassSelectorChoose()
+{
+	ElementSettingsElementClassSelector.ElementClassSelectorChoose()
+}
+ElementClassSelectorguiclose()
+{
+	ElementSettingsElementClassSelector.ElementClassSelectorCancel()
+}
+ElementClassSelectorCancel()
+{
+	ElementSettingsElementClassSelector.ElementClassSelectorCancel()
+}
+ElementClassSelectorOK()
+{
+	ElementSettingsElementClassSelector.ElementClassSelectorOK()
 }
 
 
-
-
-;Select connection type
-selectConnectionType(p_ElementID, wait = false)
+; opens a gui where user can select the connection type
+class ElementSettingsConnectionTypeSelector
 {
-	global 
-	static global_resultEditingElement, temp_from, ConnectionType
-	
-	global_resultEditingElement:=""
-	
-	global_setElementID:=p_ElementID
-	global_setElementType:= _getConnectionProperty(FlowID, global_setElementID, "type")
-	setElementFrom:= _getConnectionProperty(FlowID, global_setElementID, "from")
-	setElementFromType:= _getElementProperty(FlowID, setElementFrom, "type")
-	
-	EditGUIDisable()
-	gui, 7:default
-	gui,font,s12
-	gui,add,text,,% lang("Select_Connection_type")
-		
-	
-	if (setElementFromType="Condition")
+	open(p_connectionID)
 	{
-		if (global_setElementType="exception")
-		{
-			gui,add,Button,w100 h50 gGuiConnectionChooseTrue vGuiConnectionChooseTrue ,% lang("Yes")
-			gui,add,Button,w100 h50 X+10 gGuiConnectionChooseFalse vGuiConnectionChooseFalse,% lang("No")
-			gui,add,Button,w100 h50 X+10 gGuiConnectionChooseException vGuiConnectionChooseException default,% lang("Exception")
-		}
-		else if (global_setElementType="no")
-		{
-			gui,add,Button,w100 h50 gGuiConnectionChooseTrue vGuiConnectionChooseTrue ,% lang("Yes")
-			gui,add,Button,w100 h50 X+10 gGuiConnectionChooseFalse vGuiConnectionChooseFalse default,% lang("No")
-			gui,add,Button,w100 h50 X+10 gGuiConnectionChooseException vGuiConnectionChooseException ,% lang("Exception")
-		}
-		else
-		{
-			gui,add,Button,w100 h50 gGuiConnectionChooseTrue vGuiConnectionChooseTrue default,% lang("Yes")
-			gui,add,Button,w100 h50 X+10 gGuiConnectionChooseFalse vGuiConnectionChooseFalse,% lang("No")
-			gui,add,Button,w100 h50 X+10 gGuiConnectionChooseException vGuiConnectionChooseException ,% lang("Exception")
-		}
+		global 
 		
-		
-		
-		
-	}
-	else
-	{
-		if (global_setElementType="exception")
-		{
-			gui,add,Button,w100 h50 gGuiConnectionChooseNormal vGuiConnectionChooseNormal,% lang("Normal")
-			gui,add,Button,w100 h50 X+10 gGuiConnectionChooseException vGuiConnectionChooseException default,% lang("Exception")
-		}
-		else
-		{
-			gui,add,Button,w100 h50 gGuiConnectionChooseNormal vGuiConnectionChooseNormal default,% lang("Normal")
-			gui,add,Button,w100 h50 X+10 gGuiConnectionChooseException vGuiConnectionChooseException ,% lang("Exception")
-		}
-		
+		; save some information about the connection which we will need repeadetely
+		this.connectionID := p_connectionID
 
+		; get some further information about the connection
+		local setConnectionType := _getConnectionProperty(FlowID, this.connectionID, "connectionType")
+		local setConnectionFrom := _getConnectionProperty(FlowID, this.connectionID, "from")
+		local setConnectionFromType := _getElementProperty(FlowID, setconnectionFrom, "type")
 		
-	}
-	
-	gui,add,Button,w90 Y+10 gGuiConnectionChooseCancel,% lang("Cancel")
-	;Put the window in the center of the main window
-	gui,+hwndSettingsHWND
-	global_CurrentlyActiveWindowHWND:=SettingsHWND
-	gui,show,hide
-	pos:=EditGUIGetPos()
-	DetectHiddenWindows,on
-	wingetpos,,,tempWidth,tempHeight,ahk_id %SettingsHWND%
-	tempXpos:=round(pos.x+pos.w/2- tempWidth/2)
-	tempYpos:=round(pos.y+pos.h/2- tempHeight/2)
-	;~ d(pos, tempWidth "-" tempHeight "-" tempXpos "-" tempYpos "#" SettingsHWND)
-	gui,show,x%tempXpos% y%tempYpos%
-	
-	if (wait)
-	{
-		Loop
+		; disable editor gui
+		EditGUIDisable()
+
+		; create gui
+		gui, ConnectionTypeSelector: default
+		gui, font, s12
+		gui, add, text, , % lang("Select_Connection_type")
+			
+		; depending on the element type from which the connection starts, we need different buttons
+		if (setconnectionFromType = "Condition")
 		{
-			if (global_resultEditingElement="")
-				sleep 10
-			else 
+			; we have a condition. Add the buttons "exception", "no" and "yes"
+			gui, add, Button, w100 h50 gConnectionTypeSelectorButton vConnectionTypeSelectorButtonYes default, % lang("Yes")
+			gui, add, Button, w100 h50 X+10 gConnectionTypeSelectorButton vConnectionTypeSelectorButtonNo, % lang("No")
+			gui, add, Button, w100 h50 X+10 gConnectionTypeSelectorButton vConnectionTypeSelectorButtonException, % lang("Exception")
+			
+			; if connection type is set, set the corresponding button as default. Otherwise keep "yes" as default
+			if (setConnectionType = "exception")
 			{
-				if (global_resultEditingElement!="aborted")
-				{
-					_setConnectionProperty(FlowID, global_setElementID, "ConnectionType", global_resultEditingElement)
-				}
-				break
+				guicontrol, +default, ConnectionTypeSelectorButtonException
+			}
+			else if (setConnectionType = "no")
+			{
+				guicontrol, +default, ConnectionTypeSelectorButtonNo
 			}
 		}
-	}
-	return global_resultEditingElement
-	
-	
-	7guiclose:
-	GuiConnectionChooseCancel:
-	gui,destroy
-	EditGUIEnable()
-	global_resultEditingElement:="aborted"
-	return 
-	
-	GuiConnectionChooseTrue:
-	gui,destroy
-	EditGUIEnable()
-	global_resultEditingElement:="yes"
-	_setConnectionProperty(FlowID, global_setElementID, "ConnectionType", global_resultEditingElement)
-	return
-	
-	GuiConnectionChooseFalse:
-	gui,destroy
-	EditGUIEnable()
-	global_resultEditingElement:="no"
-	_setConnectionProperty(FlowID, global_setElementID, "ConnectionType", global_resultEditingElement)
-	return 
-	
-	GuiConnectionChooseException:
-	gui,destroy
-	EditGUIEnable()
-	global_resultEditingElement:="exception"
-	_setConnectionProperty(FlowID, global_setElementID, "ConnectionType", global_resultEditingElement)
-	return 
-	
-	GuiConnectionChooseNormal:
-	gui,destroy
-	EditGUIEnable()
-	global_resultEditingElement:="normal"
-	_setConnectionProperty(FlowID, global_setElementID, "ConnectionType", global_resultEditingElement)
-	return 
-	
-	
-}
-
-;Select container type
-selectContainerType(p_ElementID, wait = false)
-{
-	global 
-	static global_resultEditingElement
-	global_resultEditingElement:=""
-	global_setElementID:=p_ElementID
-	global_setElementType:= _getElementProperty(FlowID, global_setElementID, "type")
-	EditGUIDisable()
-	gui, 8:default
-	
-
-	gui,font,s12
-	gui,add,text,,% lang("Select_element_type")
+		else
+		{
+			; we have anything else. Add the buttons "exception", "normal"
+			gui, add, Button, w100 h50 gConnectionTypeSelectorButton vConnectionTypeSelectorButtonNormal default, % lang("Normal")
+			gui, add, Button, w100 h50 X+10 gConnectionTypeSelectorButton vConnectionTypeSelectorButtonException, % lang("Exception")
+			
+			; if connection type is set, set the corresponding button as default. Otherwise keep "normal" as default
+			if (setConnectionType = "exception")
+			{
+				guicontrol, +default, ConnectionTypeSelectorButtonException
+			}
+		}
 		
-	
-	if (global_setElementType="Action" or global_setElementType="")
-	{
-		gui,add,Button,w100 h50 gGuiElementTypeChooseAction gGuiElementTypeChooseAction default,% lang("Action")
-		gui,add,Button,w100 h50 X+10 gGuiElementTypeChooseCondition gGuiElementTypeChooseCondition,% lang("Condition")
-		gui,add,Button,w100 h50 X+10 gGuiElementTypeChooseLoop gGuiElementTypeChooseLoop,% lang("Loop")
-		
-	}
-	else
-	{
-		gui,add,Button,w100 h50 gGuiElementTypeChooseAction gGuiElementTypeChooseAction ,% lang("Action")
-		gui,add,Button,w100 h50 X+10  gGuiElementTypeChooseCondition gGuiElementTypeChooseCondition default,% lang("Condition")
-		gui,add,Button,w100 h50 X+10 gGuiElementTypeChooseLoop gGuiElementTypeChooseLoop,% lang("Loop")
+		; add a cancel button
+		gui, add, Button, w90 Y+10 gConnectionTypeSelectorButtonCancel, % lang("Cancel")
 
+		gui, +hwndglobal_SettingWindowHWND
+		global_CurrentlyActiveWindowHWND := global_SettingWindowHWND
+
+		; Calculate gui position. We want to show the settings window in the middle of the main window
+		gui, show, hide
+		pos := EditGUIGetPos()
+		DetectHiddenWindows, on
+		local tempWidth, tempHeight
+		wingetpos, , , tempWidth, tempHeight, ahk_id %global_SettingWindowHWND%
+		local tempXpos := round(pos.x + pos.w / 2 - tempWidth / 2)
+		local tempYpos := round(pos.y + pos.h / 2 - tempHeight / 2)
 		
-	}
-	
-	gui,add,Button,w90  Y+10 gGuiElementTypeChooseCancel,% lang("Cancel")
-	;Put the window in the center of the main window
-	gui,+hwndSettingsHWND
-	global_CurrentlyActiveWindowHWND:=SettingsHWND
-	gui,show,hide
-	pos:=EditGUIGetPos()
-	DetectHiddenWindows,on
-	wingetpos,,,tempWidth,tempHeight,ahk_id %SettingsHWND%
-	tempXpos:=round(pos.x+pos.w/2- tempWidth/2)
-	tempYpos:=round(pos.y+pos.h/2- tempHeight/2)
-	
-	gui,show,x%tempXpos% y%tempYpos%
-	
-	if (wait)
-	{
+		; move gui to the calculated position
+		gui, show, x%tempXpos% y%tempYpos%
+		
+		; We have to wait until user closes the window
+		; Wait until this.result is set
+		this.result := ""
 		Loop
 		{
-			if (global_resultEditingElement="")
+			if (this.result = "")
 				sleep 10
 			else 
 			{
-				if (global_resultEditingElement!="aborted")
-					Element_SetType(FlowID, global_setElementID,global_resultEditingElement)
-				break
+				return this.result
 			}
 		}
 	}
 	
-	return global_resultEditingElement
-	
-	
-	8guiclose:
-	GuiElementTypeChooseCancel:
-	gui,destroy
-	EditGUIEnable()
-	gui,MainGUI:default
-	global_resultEditingElement:="aborted"
-	return 
-	
-	GuiElementTypeChooseAction:
-	gui,destroy
-	EditGUIEnable()
-	gui,MainGUI:default
-	global_resultEditingElement:="action"
-	return
-	
-	GuiElementTypeChooseCondition:
-	gui,destroy
-	EditGUIEnable()
-	gui,MainGUI:default
-	global_resultEditingElement:="condition"
-	return
-	
-	GuiElementTypeChooseLoop:
-	gui,destroy
-	EditGUIEnable()
-	gui,MainGUI:default
-	global_resultEditingElement:="loop"
-	return 
-	
-	
-	
-	
+	; react if user chooses a connection type
+	ConnectionTypeSelectorButton()
+	{
+		; get the result from the button ID
+		StringReplace, result, A_GuiControl, ConnectionTypeSelectorButton
+
+		; set connection type
+		_setConnectionProperty(FlowID, this.connectionID, "ConnectionType", result)
+
+		; destroy gui and enable editor gui
+		gui,destroy
+		EditGUIEnable()
+
+		; set result to the connection type
+		this.result := result
+	}
+
+	; react if user cancels
+	ConnectionTypeSelectorCancel()
+	{
+		; destroy gui and enable editor gui
+		gui,destroy
+		EditGUIEnable()
+		
+		; set result
+		this.result:="aborted"
+	}
 }
 
+; forward some glabel calls
+ConnectionTypeSelectorButton()
+{
+	ElementSettingsConnectionTypeSelector.ConnectionTypeSelectorButton()
+}
+ConnectionTypeSelectorguiclose()
+{
+	ElementSettingsConnectionTypeSelector.ConnectionTypeSelectorCancel()
+}
+ConnectionTypeSelectorButtonCancel()
+{
+	ElementSettingsConnectionTypeSelector.ConnectionTypeSelectorCancel()
+}
+
+
+; opens a gui where user can select the element container type
+class ElementSettingsContainerTypeSelector
+{
+	open(p_ElementID)
+	{
+		global
+
+		; save some information about the connection which we will need repeadetely
+		this.elementID := p_ElementID
+
+		; get some further information about the element
+		setElementType := _getElementProperty(FlowID, this.elementID, "type")
+
+		; disable editor gui
+		EditGUIDisable()
+		
+		; create gui
+		gui, ContainerTypeSelector: default
+		gui, font ,s12
+		gui, add, text, , % lang("Select_element_type")
+			
+		; add the buttons
+		gui, add, Button, w100 h50 gContainerTypeSelectorButton vContainerTypeSelectorButtonAction default, % lang("Action")
+		gui, add, Button, w100 h50 X+10 gContainerTypeSelectorButton vContainerTypeSelectorButtonCondition, % lang("Condition")
+		gui, add, Button, w100 h50 X+10 gContainerTypeSelectorButton vContainerTypeSelectorButtonLoop ,% lang("Loop")
+
+		; if element container type is set, set the corresponding button as default. Otherwise keep "Action" as default
+		if (setElementType = "Condition")
+		{
+			guicontrol, +default, ContainerTypeSelectorButtonCondition
+		}
+		if (setElementType = "Loop")
+		{
+			guicontrol, +default, ContainerTypeSelectorButtonLoop
+		}
+		
+		; add a cancel button
+		gui,add,Button,w90  Y+10 gContainerTypeSelectorButtonCancel,% lang("Cancel")
+
+		gui, +hwndglobal_SettingWindowHWND
+		global_CurrentlyActiveWindowHWND := global_SettingWindowHWND
+
+		; Calculate gui position. We want to show the settings window in the middle of the main window
+		gui, show, hide
+		pos := EditGUIGetPos()
+		DetectHiddenWindows, on
+		local tempWidth, tempHeight
+		wingetpos, , , tempWidth, tempHeight, ahk_id %global_SettingWindowHWND%
+		local tempXpos := round(pos.x + pos.w / 2 - tempWidth / 2)
+		local tempYpos := round(pos.y + pos.h / 2 - tempHeight / 2)
+		
+		; move gui to the calculated position
+		gui, show, x%tempXpos% y%tempYpos%
+		
+		this.result := ""
+		Loop
+		{
+			if (this.result = "")
+				sleep 10
+			else 
+			{
+				return this.result
+			}
+		}
+	}
+		
+	; react if user chooses a element container type
+	ContainerTypeSelectorButton()
+	{
+		; get the result from the button ID
+		StringReplace, result, A_GuiControl, ContainerTypeSelectorButton
+
+		; set connection type
+		Element_SetType(FlowID, this.elementID, result)
+
+		; destroy gui and enable editor gui
+		gui,destroy
+		EditGUIEnable()
+
+		; set result to the connection type
+		this.result := result
+	}
+
+	; react if user cancels
+	ContainerTypeSelectorCancel()
+	{
+		; destroy gui and enable editor gui
+		gui,destroy
+		EditGUIEnable()
+		
+		; set result
+		this.result:="aborted"
+	}
+}
+
+; forward some glabel calls
+ContainerTypeSelectorButton()
+{
+	ElementSettingsContainerTypeSelector.ContainerTypeSelectorButton()
+}
+ContainerTypeSelectorguiclose()
+{
+	ElementSettingsContainerTypeSelector.ContainerTypeSelectorCancel()
+}
+ContainerTypeSelectorButtonCancel()
+{
+	ElementSettingsContainerTypeSelector.ContainerTypeSelectorCancel()
+}
+
+
+; returns whether something should be shown to the user depending on its required user experience level
+; if elementlevel is empty or invalid, it defaults to "beginner"
 ShouldShowThatElementLevel(elementlevel)
 {
+	; convert level from settings to number
 	if (_settings.ShowElementsLevel = "Beginner")
 	{
-		scoreFromSettings:=1
+		scoreFromSettings := 1
 	}
 	else if (_settings.ShowElementsLevel = "Advanced")
 	{
-		scoreFromSettings:=2
+		scoreFromSettings := 2
 	}
 	else if (_settings.ShowElementsLevel = "Programmer")
 	{
-		scoreFromSettings:=3
+		scoreFromSettings := 3
 	}
-	else if (_settings.ShowElementsLevel = "Custom")
-	{
-		;TODO
-	}
+	
+	; convert level from elementlevel to number
 	if (elementlevel = "Beginner")
 	{
-		score:=1
+		score := 1
 	}
 	else if (elementlevel = "Advanced")
 	{
-		score:=2
+		score := 2
 	}
 	else if (elementlevel = "Programmer")
 	{
-		score:=3
+		score := 3
 	}
-	if (scoreFromSettings >=score)
+
+	; compare numbers
+	if (scoreFromSettings >= score)
 		return True
 	else
 		return False

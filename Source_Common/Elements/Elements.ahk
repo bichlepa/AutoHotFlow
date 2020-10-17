@@ -24,7 +24,7 @@ Element_getParametrizationDetails(elementClass, Environment)
 		{
 			; if this happens, the element is not properly implemented
 			logger("a0", "unexpected error! function Element_getParametrizationDetails_" elementClass " does not exist")
-			throw exception("unexpected error! function Element_getParametrizationDetails_" elementClass " does not exist")
+			throw exception("unexpected error! function Element_getParametrizationDetails_" elementClass " does not exist", -1)
 			return
 		}
 
