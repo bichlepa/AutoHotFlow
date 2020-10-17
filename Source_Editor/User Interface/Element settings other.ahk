@@ -141,7 +141,7 @@ class ElementSettingsElementClassSelector
 		
 		; Calculate gui position. We want to show the settings window in the middle of the main window
 		gui, show, hide
-		pos := EditGUIGetPos()
+		local pos := EditGUIGetPos()
 		DetectHiddenWindows, on
 		local tempWidth, tempHeight
 		wingetpos, , , tempWidth, tempHeight, ahk_id %global_SettingWindowHWND%
@@ -309,7 +309,7 @@ class ElementSettingsConnectionTypeSelector
 
 		; Calculate gui position. We want to show the settings window in the middle of the main window
 		gui, show, hide
-		pos := EditGUIGetPos()
+		local pos := EditGUIGetPos()
 		DetectHiddenWindows, on
 		local tempWidth, tempHeight
 		wingetpos, , , tempWidth, tempHeight, ahk_id %global_SettingWindowHWND%
@@ -421,7 +421,7 @@ class ElementSettingsContainerTypeSelector
 
 		; Calculate gui position. We want to show the settings window in the middle of the main window
 		gui, show, hide
-		pos := EditGUIGetPos()
+		local pos := EditGUIGetPos()
 		DetectHiddenWindows, on
 		local tempWidth, tempHeight
 		wingetpos, , , tempWidth, tempHeight, ahk_id %global_SettingWindowHWND%

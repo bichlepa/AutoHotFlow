@@ -1,38 +1,47 @@
-﻿goto,JumpoverTooltiplabels
-
-
-removetooltip:
-ToolTip
-return
-
-JumpoverTooltiplabels:
-temp= ;Do nothing
-
-ToolTip(text="",duration=1000)
+﻿
+; show a tooltip which follows the mouse
+ToolTip(text = "", duration = 1000)
 {
 	global
 	
-	ToolTip_text:=text
-	ToolTip_duration:=duration
-	ToolTip,%ToolTip_text%
-	SetTimer,Tooltip_follow_mouse,10
+	; save tooltip and duration parameters to global variables
+	ToolTip_text := text
+	ToolTip_duration := duration
+	Tooltip_Oldx := ""
+	Tooltip_Oldy := ""
+
+	; show tooltip
+	gosub, Tooltip_follow_mouse
+
+	; set up timer which will move the tooltip with mouse
+	SetTimer, Tooltip_follow_mouse, 10
 	
-	SetTimer,Tooltip_RemoveTooltip,-%ToolTip_duration%
+	; set up timer which will disable the tooltip
+	SetTimer, Tooltip_RemoveTooltip, -%ToolTip_duration%
 	
 	return
+
+	; timer label which will move the tooltip with mouse
 	Tooltip_follow_mouse:
-	MouseGetPos,tempTooltipx,tempTooltipy
-	if (tempTooltipOldx!=tempTooltipx or tempTooltipOldy!=tempTooltipy)
+	; get mouse position
+	MouseGetPos, tempTooltipx, tempTooltipy
+
+	; check whether the mouse has moved
+	if (Tooltip_Oldx != tempTooltipx or Tooltip_Oldy != tempTooltipy)
 	{
-		ToolTip,%ToolTip_text%
-		tempTooltipOldx:=tempTooltipx
-		tempTooltipOldy:=tempTooltipy
+		; mouse has moved. Recreate the tooltip.
+		ToolTip, %ToolTip_text%
+		Tooltip_Oldx := tempTooltipx
+		Tooltip_Oldy := tempTooltipy
 	}
 	return
+
+	; timer label which will remove the tooltip
 	Tooltip_RemoveTooltip:
-	SetTimer,Tooltip_follow_mouse,off
+	; disable timer
+	SetTimer, Tooltip_follow_mouse, off
+	; hide tooltip
 	ToolTip
 	return
-	
 }
 

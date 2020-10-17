@@ -1,5 +1,6 @@
 ﻿global global_GUIHelpHWND
 
+; show help near the current settings window
 ui_showHelp(elementID)
 {
 	global
@@ -15,78 +16,93 @@ ui_showHelp(elementID)
 	local VirtualWidth
 	local VirtualHeight
 	
-	Gui, Help:Destroy
-	gui,Help:-dpiscale
-	local elementType:= _getElementProperty(FlowID, elementID, "type")
-	local elementClass:= _getElementProperty(FlowID, elementID, "Class")
-	local elementHelpFilepath := elementType "s\" StrReplace(elementClass, elementType "_")
+	; destroy help gui (if present)
+	Gui, Help: Destroy
+	gui, Help: -dpiscale
 
+	; copy some information to local variables
+	local elementType := _getElementProperty(FlowID, elementID, "type")
+	local elementClass := _getElementProperty(FlowID, elementID, "Class")
+	local elementHelpFilepath := elementType "s\" StrReplace(elementClass, elementType "_")
 	local uiLang := _getSettings("UILanguage")
-	helpfilepath=%_ScriptDir%\Help\%UILang%\%elementHelpFilepath%.html
+
+	; calculate help file path
+	helpfilepath := _ScriptDir "\Help\" UILang "\" elementHelpFilepath ".html"
 	IfNotExist, %helpfilepath%
 	{
-		helpfilepath=%_ScriptDir%\Help\en\%elementHelpFilepath%.html
+		; help file path in current language does not exist. Try to find english help file
+		helpfilepath := _ScriptDir "\Help\en\" elementHelpFilepath ".html"
 		IfNotExist, %helpfilepath%
 		{
-			MsgBox, 16, % lang("Error"),% lang("No help file was found")
+			; no help file found.
+			MsgBox, 16, % lang("Error"), % lang("No help file was found")
 			Return
 		}
 	}
 	
-	Gui, Help:Add, ActiveX, x0 y0 w720 h490 vHB, Shell.Explorer
+	; create gui with a browser window inside
+	Gui, Help: Add, ActiveX, x0 y0 w720 h490 vHB, Shell.Explorer
 	HB.Navigate(helpfilepath)
 	Gui, Help: +ToolWindow 
-	Gui, Help:Color, FFFFFF
+	Gui, Help: Color, FFFFFF
 	Gui, Help: +resize
 	
 	;find out whether the settings window is opened
 	IfWinExist, % "ahk_id " global_SettingWindowParentHWND
 	{
-		;Position the window right to the settings window
-		WinGetPos,tempx,tempy,tempw,temph,% "ahk_id " global_SettingWindowParentHWND
+		; Settings window exists
+
+		; Position the window right to the settings window
+		WinGetPos, tempx, tempy, tempw, temph, % "ahk_id " global_SettingWindowParentHWND
 		
-		helpx:=tempw+tempx
-		helph:=temph
-		helpy:=tempy
-		helpw:=720
-		;~ MsgBox %A_ScreenWidth% - %helpw% - %tempw% 
+		helpx := tempw + tempx
+		helph := temph
+		helpy := tempy
+		helpw := 720
 		
 		;Check whether the settings window is on the righthand side and needs to be moved
 		SysGet, VirtualWidth, 78
-		if ((VirtualWidth-helpx)<helpw)
+		if ((VirtualWidth - helpx) < helpw)
 		{
-			tempx:= VirtualWidth - helpw - tempw -10
-			;~ MsgBox %A_ScreenWidth% - %widthhelp% - %tempw% 
-			WinMove,% "ahk_id " global_SettingWindowParentHWND,,%tempx%
-			helpx:=VirtualWidth - helpw -10
+			; settings window needs to be moved
+			tempx := VirtualWidth - helpw - tempw - 10
+			
+			WinMove, % "ahk_id " global_SettingWindowParentHWND, , %tempx%
+			helpx := VirtualWidth - helpw - 10
 		}
 		
 		;show gui
-		Gui, Help:Show, x%helpx% y%helpy% w%helpw% h%helph%,% lang("Help")
+		Gui, Help: Show, x%helpx% y%helpy% w%helpw% h%helph%, % lang("Help")
 	}
 	else
 	{
-		Gui, Help:Show, w720,% lang("Help")
+		; Settings window does not exist. Show it in the middle of the screen
+		Gui, Help: Show, w720, % lang("Help")
 	}
 	
-	Gui, Help:+Hwndglobal_GUIHelpHWND
+	Gui, Help: +Hwndglobal_GUIHelpHWND
 	Return
 	
+	; react if user closes the help window
 	Helpguiclose:
-	;~ SoundBeep
-	Gui, Help:Destroy
+	; destroy help window
+	Gui, Help: Destroy
 	return
 	
+	; react if user resizes the help window
 	helpguisize:
-	guicontrol, move, HB ,w%A_GuiWidth% h%A_GuiHeight%
+	; adjust the size of the built in browser
+	guicontrol, move, HB, w%A_GuiWidth% h%A_GuiHeight%
 	return
 	
 }
 
+; closes the help gui
 ui_closeHelp()
 {
 	global
-	Gui, Help:Destroy
+	; destroy help window
+	Gui, Help: Destroy
 }
 
 

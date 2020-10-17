@@ -8,7 +8,6 @@ gdip_Init()
 	;Initialize values at the beginning
 	GridX:=default_GridX
 	Gridy:=default_Gridy
-	GridyOffset:=default_GridyOffset
 	ElementWidth:=default_ElementWidth
 	ElementHeight:=default_ElementHeight
 	NewElementIconWidth:=default_NewElementIconWidth

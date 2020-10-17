@@ -1,57 +1,48 @@
 ﻿
-
-if A_IsCompiled
+; disable default tooltip controls if AHF is compiled
+if (not _getSettings("developing"))
 {
 	menu, tray, NoStandard
 }
-else
-{
 
-	
-}
-
-;Help! I want that the menu are renamed when the language changes.
+; initialize tray menu
+;TODO I want that the menu will be renamed when the language changes.
 initializeTrayBar()
 {
 	global
-	try menu,tray,deleteall
+	try menu, tray, deleteall
 	
-	menu, tray, add,  Show
-	menu, tray, Default, Show
-	Tray_OldShowName=Show
+	menu, tray, add,  tray_show
+	menu, tray, rename, tray_show, % lang("Show")
 
-	menu, tray, add, ui_Menu_MenuStart
-	menu, tray, rename, ui_Menu_MenuStart,% lang("Run")
+	menu, tray, add, tray_start
+	menu, tray, rename, tray_start, % lang("Run")
 
-	menu, tray, add, ui_Menu_Enable
-	menu, tray, rename, ui_Menu_Enable,% lang("Enable")
+	menu, tray, add, tray_enable
+	menu, tray, rename, tray_enable, % lang("Enable")
 
 	menu, tray, add, Exit
-	menu, tray, rename, Exit,% lang("Exit")
+	menu, tray, rename, Exit, % lang("Exit")
 
-	menu tray,icon,%_ScriptDir%\Icons\disabled.ico
+	menu, tray, icon, %_ScriptDir%\Icons\disabled.ico
 	
-	menu,tray, tip,% lang("Flow") ": " _getFlowProperty(FlowID, "name")
+	menu, tray, tip, % lang("Flow") ": " _getFlowProperty(FlowID, "name")
 }
 
-
-deinitializeTrayBar()
+; react if user clicks on "show" entry
+tray_show()
 {
-	global
-	try menu,tray,deleteall
+	EditGUIshow()
 }
 
+; react if user clicks on "start" entry
+tray_start()
+{
+	executeFlow(FlowID)
+}
 
-goto,JumpOverTrayStuff
-
-
-
-Show:
-EditGUIshow()
-
-return
-
-
-
-JumpOverTrayStuff:
-temp= ;Do nothing
+; react if user clicks on "enable" entry
+tray_enable()
+{
+	enableToggleFlow(FlowID)
+}

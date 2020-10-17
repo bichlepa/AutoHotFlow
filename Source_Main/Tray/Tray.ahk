@@ -1,6 +1,6 @@
 ﻿
 ; change the tray icon
-Menu, tray, Icon,%_ScriptDir%\Icons\mainicon.ico
+Menu, tray, Icon, %_ScriptDir%\Icons\mainicon.ico
 
 ; create tray menu
 if a_iscompiled
@@ -16,7 +16,7 @@ else
 
 ; add entry to show manager gui and set it to default (action on double click)
 Menu, tray, add, % lang("Show Manager"), onTrayMenuShowManagerGUI
-Menu, tray, default,% lang("Show Manager")
+Menu, tray, default, % lang("Show Manager")
 
 ; add entry to exit AHF
 Menu, tray, add, % lang("Close"), exit

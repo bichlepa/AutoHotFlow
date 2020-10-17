@@ -13,6 +13,5 @@ global default_NewElementIconHeight = 75
 global default_NewElementIconWidth = 100
 global default_ElementHeight = 105
 global default_ElementWidth = 140
-global default_GridyOffset = 17.5
 global default_Gridy = 35
 global default_Gridx = 35

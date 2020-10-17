@@ -50,14 +50,7 @@ init_Manager_GUI()
 	_setSharedProperty("hwnds.Manager", ManagerGUIHWND)
 	
 	;Set title. Do not show yet
-	if a_iscompiled
-	{
-		Gui, Show,hide, % "AutoHotFlow " lang("Manager") 
-	}
-	else ;Helps me to find the uncompiled AHF instance
-	{
-		Gui, Show,hide, % "AutoHotFlow " lang("Manager") " - UNCOMPILED "
-	}
+	Gui, Show, hide, % "AutoHotFlow " lang("Manager") 
 	
 	; enable hotkeys
 	hotkey, ifwinactive, ahk_id %ManagerGUIHWND%

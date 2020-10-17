@@ -1,9 +1,4 @@
-﻿;Formula for x-position: 0+n*35  	;Width: 35*4=140
-;Formula for y-position: 17,5+n*35	;Height: 35*3=105
-
-;~ OnTopLabel=
-
-
+﻿
 ; Thanks to tic (Tariq Porter) for his GDI+ Library
 ; http://www.autohotkey.com/forum/viewtopic.php?t=32238
 ; Start gdi+
@@ -15,7 +10,7 @@ If !pToken := Gdip_Startup()
 
 
 
-Font:="Arial"
+Font := "Arial"
 
 ; Create some brushes
 pPenBlack := Gdip_CreatePen("0xff000000",2) ;Black pen
@@ -33,58 +28,32 @@ pBrushBackground := Gdip_BrushCreateSolid("0xFFeaf0ea") ;Almost white brush for 
 
 
 
-goto,jumpoverUIDRaw
-
-
-
-
-
-ui_regularUpdateIfWinMoved:
-WinGetPos,winx,winy,,,% "ahk_id " _EditorGuiHwnd
-if (winx!=winxold and winy!=winyOld)
-{
-	winxold:=winx
-	winyOld:=winy
-	
-	API_Draw_Draw(FlowID)
-	
-}
-
-return
-
 ;Fit the position of an element to the grid
-ui_FitgridX(pos){
-	global
-	;MsgBox % round((pos/gridX))*gridX "  --  " pos
-	return round((pos/default_gridX))*default_gridX
-}
-ui_FitgridY(pos){
-	global
-	return round(((pos-default_gridyOffset)/default_gridY))*default_gridY + default_gridyOffset
-}
-
-
-
-
-
-ui_DrawShapeOnScreen(WindowPosx,WindowPosy,WindowWidth,WindowHeight,ControlPosx,ControlPosy,ControlWidth,ControlHeight)
+ui_FitgridX(pos)
 {
-	; Set the width and height we want as our drawing area, to draw everything in. This will be the dimensions of our bitmap
-	
-	;MsgBox WindowPosx %WindowPosx% WindowPosy %WindowPosy% WindowWidth %WindowWidth% WindowHeight %WindowHeight% %ControlPosx% %ControlPosy% %ControlWidth% %ControlHeight%
-	
+	return round((pos / default_gridX)) * default_gridX
+}
+ui_FitgridY(pos)
+{
+	return round((pos / default_gridY)) * default_gridY
+}
+
+
+; draw a shape on screen. Can be userd to highlight something on screen.
+ui_DrawShapeOnScreen(WindowPosx, WindowPosy, WindowWidth, WindowHeight, ControlPosx, ControlPosy, ControlWidth, ControlHeight)
+{
 	Gui, 6: Destroy
 	; Create a layered window (+E0x80000 : must be used for UpdateLayeredWindow to work!) that is always on top (+AlwaysOnTop), has no taskbar entry or caption
 	Gui, 6: -Caption +E0x80000 +LastFound +AlwaysOnTop +ToolWindow +OwnDialogs
 
 	; Show the window
-	Gui, 6: Show,  NA
+	Gui, 6: Show, NA
 
 	; Get a handle to this window we have created in order to update it later
 	hwnd1 := WinExist()
 
 	; Create a gdi bitmap with width and height of what we are going to draw into it. This is the entire drawing area for everything
-	hbm := CreateDIBSection(WindowWidth,WindowHeight)
+	hbm := CreateDIBSection(WindowWidth, WindowHeight)
 
 	; Get a device context compatible with the screen
 	hdc := CreateCompatibleDC()
@@ -101,7 +70,8 @@ ui_DrawShapeOnScreen(WindowPosx,WindowPosy,WindowWidth,WindowHeight,ControlPosx,
 	; Create a fully opaque red pen (ARGB = Transparency, red, green, blue) of width 3 (the thickness the pen will draw at) to draw a circle
 	pPen := Gdip_CreatePen(0xffff0000, 3)
 
-	pBrushRed := Gdip_BrushCreateSolid("0x10ff0000") ;Red brush, very transparent
+	;Red brush, very transparent
+	pBrushRed := Gdip_BrushCreateSolid("0x10ff0000")
 	
 	; Draw a rectangle onto the graphics of the bitmap using the pen just created
 	; Draws the rectangle from coordinates (250,80) a rectangle of 300x200 and outline width of 10 (specified when creating the pen)
@@ -115,7 +85,6 @@ ui_DrawShapeOnScreen(WindowPosx,WindowPosy,WindowWidth,WindowHeight,ControlPosx,
 	; So this will position our gui at (0,0) with the Width and Height specified earlier
 	UpdateLayeredWindow(hwnd1, hdc, WindowPosx, WindowPosy, WindowWidth, WindowHeight)
 
-
 	; Select the object back into the hdc
 	SelectObject(hdc, obm)
 
@@ -128,22 +97,12 @@ ui_DrawShapeOnScreen(WindowPosx,WindowPosy,WindowWidth,WindowHeight,ControlPosx,
 	; The graphics may now be deleted
 	Gdip_DeleteGraphics(G)
 	
- 
-	WinSet, ExStyle, +0x20, % "ahk_id " hwnd1 ;Make window click through
-
-
-
+	;Make window click through
+	WinSet, ExStyle, +0x20, % "ahk_id " hwnd1
 }
 
+; remove shape from screen
 ui_DeleteShapeOnScreen()
 {
 	Gui, 6: Destroy
 }
-
-
-
-ui_Draw:
-API_Draw_Draw(FlowID)
-return
-jumpoverUIDRaw:
-temp= ;Do nothing

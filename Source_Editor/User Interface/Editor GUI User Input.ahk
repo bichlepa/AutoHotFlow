@@ -881,7 +881,7 @@ ui_moveSelectedElements(clickedElement, partOfclickedElement = "", option="")
 				{
 					;Fit the element position to grid
 					newposx := ui_FitGridX(_getElementProperty(FlowID, forElementID, "x"))
-					newposy := ui_FitGridX(_getElementProperty(FlowID, forElementID, "y"))
+					newposy := ui_FitGridY(_getElementProperty(FlowID, forElementID, "y"))
 					_setElementProperty(FlowID, forElementID, "x", newposx)
 					_setElementProperty(FlowID, forElementID, "y", newposy)
 					
@@ -1234,7 +1234,7 @@ ui_MoveConnection(connection1 = "", element1 = "", connection2 = "", element2 = 
 		tempx := (mx) / zoomfactor + Offsetx - default_ElementWidth / 2
 		tempy := (my) / zoomfactor + offsety  - default_ElementHeight / 2
 		tempx := ui_FitGridX(tempx)
-		tempy := ui_FitGridX(tempy)
+		tempy := ui_FitGridY(tempy)
 		_setElementProperty(FlowID, clickedElement, "x", tempx)
 		_setElementProperty(FlowID, clickedElement, "y", tempy)
 		
