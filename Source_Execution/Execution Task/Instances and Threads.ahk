@@ -46,7 +46,7 @@ newInstance(p_Environment, p_params = "")
 			newInstance.id:= newInstanceId
 			newInstance.FlowID := p_Environment.FlowID
 			newInstance.FlowName :=  _getFlowProperty(p_Environment.FlowID, "name")
-			newInstance.state := "init"
+			newInstance.state := "running"
 			newInstance.InstanceVars := Object()
 			newInstance.InstanceVarsHidden := Object()
 			_setInstance(newInstanceId, newInstance)
@@ -83,7 +83,6 @@ newInstance(p_Environment, p_params = "")
 			{
 				Element_postTrigger_%ElementClass%(newThread, p_params)
 			}
-			_setInstanceProperty(newInstanceId, "state", "running")
 			
 			updateFlowExcutingStates()
 		}
@@ -299,7 +298,7 @@ updateFlowExcutingStates()
 	Instances := _getAllInstanceIds()
 	for OneInstanceIndex, OneInstanceID in Instances
 	{
-		executingFlows[_getInstanceProperty(p_InstanceID, "flowID")]:=True
+		executingFlows[_getInstanceProperty(OneInstanceID, "flowID")]:=True
 	}
 	Flows := _getAllFlowIds()
 	for OneFlowIndex, OneFlowID in Flows

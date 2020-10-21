@@ -83,11 +83,12 @@ lang_setLanguage(_getSettings("UILanguage"))
 ; Include the source code of the elements. The includes will be pasted here by the main thread.
 ;PlaceholderIncludesOfElements
 
-; Call the main routine of this thread shortly after start
-SetTimer,executionTask,-100
 
 ; check regularly for new tasks which we get through shared variable
-SetTimer,queryTasks,100
+SetTimer, queryTasks, 10
+
+; start executing elements
+executionTask()
 return
 
 ; Checks for new tasks which can be sent to this AHK thread by writing the task instructions in a shared variable

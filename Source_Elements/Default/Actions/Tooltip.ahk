@@ -101,6 +101,7 @@ Element_run_Action_Tooltip(Environment, ElementParameters)
 runActionTooltip_follow_mouse()
 {
 	global runActionTooltip_Text
+	static runActionTooltip_Oldy, runActionTooltip_Oldx
 	MouseGetPos,runActionTooltip_MouseX,runActionTooltip_MouseY
 	if !(runActionTooltip_Oldy=runActionTooltip_Mousey and runActionTooltip_Oldx=runActionTooltip_MouseX)
 	{

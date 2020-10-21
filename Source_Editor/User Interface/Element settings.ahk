@@ -17,6 +17,11 @@ class ElementSettings
 		global
 		local temp, tempYPos, tempXPos, tempEditwidth, tempIsDefault, tempAssigned, tempChecked, tempMakeNewGroup, temptoChoose, tempAltSumbit, tempChoises, tempAllChoices, tempParameterOptions, tempres, tempelement
 
+		if not setElementID
+		{
+			throw exception("cannot open element settings. The element ID is empty", -1)
+		}
+
 		;will be incremented if a change will be detected
 		this.changes := alreadyChangedSomething
 
@@ -26,6 +31,15 @@ class ElementSettings
 		this.elementClass := _getElementProperty(FlowID, this.element, "Class")
 		this.elementName := _getElementProperty(FlowID, this.element, "Name")
 		this.elementPars := _getElementProperty(FlowID, this.element, "pars")
+
+		if (not this.elementType)
+		{
+			throw exception("cannot open element settings. The element type of element ID '" setElementID "' is empty", -1)
+		}
+		if (not this.elementClass)
+		{
+			throw exception("cannot open element settings. The element class of element ID '" setElementID "' is empty", -1)
+		}
 
 		; save the "wait" option
 		this.wait := wait

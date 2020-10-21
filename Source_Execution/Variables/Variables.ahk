@@ -171,43 +171,43 @@ Var_GetListOfAllVars(environment)
 ;   then, when entering the innser loop, hide the variables of the outer loop and then create new variables.
 ;   The variables of outer loop won't be accessible from inner loop.
 ;   When leaving the inner loop, we have to make the variables of the outer loop visible.
-LoopVariable_AddToStack(Environment)
+LoopVariable_AddToStack(p_InstanceID, p_ThreadID)
 {
 	_EnterCriticalSection()
 	;Write current loopvars to stack
 	; TODO: This code is inefficient
-	loopVars := _getThreadProperty(Environment.InstanceID, Environment.ThreadID, "loopvars")
-	loopvarsStack := _getThreadProperty(Environment.InstanceID, Environment.ThreadID, "loopvarsStack")
+	loopVars := _getThreadProperty(p_InstanceID, p_ThreadID, "loopvars")
+	loopvarsStack := _getThreadProperty(p_InstanceID, p_ThreadID, "loopvarsStack")
 	loopvarsStack.push(loopvars)
-	_setThreadProperty(Environment.InstanceID, Environment.ThreadID, "loopvarsStack", loopvarsStack)
+	_setThreadProperty(p_InstanceID, p_ThreadID, "loopvarsStack", loopvarsStack)
 
 	;also, write hidden loopvars to stack
-	loopVars := _getThreadProperty(Environment.InstanceID, Environment.ThreadID, "loopvarsHidden")
-	loopvarsStack := _getThreadProperty(Environment.InstanceID, Environment.ThreadID, "loopvarsStackHidden")
+	loopVars := _getThreadProperty(p_InstanceID, p_ThreadID, "loopvarsHidden")
+	loopvarsStack := _getThreadProperty(p_InstanceID, p_ThreadID, "loopvarsStackHidden")
 	loopvarsStack.push(loopvars)
-	_setThreadProperty(Environment.InstanceID, Environment.ThreadID, "loopvarsStackHidden", loopvarsStack)
+	_setThreadProperty(p_InstanceID, p_ThreadID, "loopvarsStackHidden", loopvarsStack)
 	
 	_LeaveCriticalSection()
 }
 
 ; restore loop variables from stack (when leaving an inner loop)
-LoopVariable_RestoreFromStack(Environment)
+LoopVariable_RestoreFromStack(p_InstanceID, p_ThreadID)
 {
 	_EnterCriticalSection()
 
 	; TODO: This code is inefficient
 
 	;Restore loopvars from stack
-	loopvarsStack := _getThreadProperty(Environment.InstanceID, Environment.ThreadID, "loopvarsStack")
+	loopvarsStack := _getThreadProperty(p_InstanceID, p_ThreadID, "loopvarsStack")
 	loopVars := loopvarsStack.pop()
-	_setThreadProperty(Environment.InstanceID, Environment.ThreadID, "loopvars", loopvars)
-	_setThreadProperty(Environment.InstanceID, Environment.ThreadID, "loopvarsStack", loopvarsStack)
+	_setThreadProperty(p_InstanceID, p_ThreadID, "loopvars", loopvars)
+	_setThreadProperty(p_InstanceID, p_ThreadID, "loopvarsStack", loopvarsStack)
 
 	;also, restore hidden loopvars from stack
-	loopvarsStack := _getThreadProperty(Environment.InstanceID, Environment.ThreadID, "loopvarsStackHidden")
+	loopvarsStack := _getThreadProperty(p_InstanceID, p_ThreadID, "loopvarsStackHidden")
 	loopVars := loopvarsStack.pop()
-	_setThreadProperty(Environment.InstanceID, Environment.ThreadID, "loopvarsHidden", loopvars)
-	_setThreadProperty(Environment.InstanceID, Environment.ThreadID, "loopvarsStackHidden", loopvarsStack)
+	_setThreadProperty(p_InstanceID, p_ThreadID, "loopvarsHidden", loopvars)
+	_setThreadProperty(p_InstanceID, p_ThreadID, "loopvarsStackHidden", loopvarsStack)
 
 	_LeaveCriticalSection()
 }

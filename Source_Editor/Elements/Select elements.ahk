@@ -106,7 +106,8 @@ UpdateSelectedItemsList()
 	if (selectedElements.count() = 1)
 	{
 		; we have a single selected element. Write it into flow variable selectedElement
-		_setFlowProperty(FlowID, "selectedElement", selectedElements[1])
+		for oneSelectedElement in selectedElements
+			_setFlowProperty(FlowID, "selectedElement", oneSelectedElement)
 	}
 	else
 	{

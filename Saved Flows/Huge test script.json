@@ -461,12 +461,12 @@
     "element0000000440": {
       "class": "Action_New_variable",
       "ID": "element0000000440",
-      "name": "Neue Variable - counter = counter +12",
+      "name": "Neue Variable - counter = counter +1",
       "package": "default",
       "pars": {
         "expression": "Expression",
         "Varname": "counter",
-        "VarValue": "counter +12"
+        "VarValue": "counter +1"
       },
       "StandardName": "1",
       "type": "action",
@@ -699,8 +699,8 @@
     "ExecutionPolicy": "parallel",
     "FolderOfStaticVariables": "C:\\Users\\bichl\\Documents\\git\\AutoHotFlow\\Saved Flows\\Static variables\\Huge test script",
     "Name": "Huge test script",
-    "Offsetx": "-1163.779249",
-    "Offsety": "-789.178892",
+    "Offsetx": "-853.279229",
+    "Offsety": "-445.646954",
     "WorkingDir": "C:\\Users\\Paul\\Documents\\AutoHotFlow default working direction",
     "zoomFactor": "0.605475"
   },
