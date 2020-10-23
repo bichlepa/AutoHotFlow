@@ -125,10 +125,6 @@ Thread_StartExecution()
 ; there is no guarantee, that this code will properly close the threads, it may cause a crash
 Thread_KillAll()
 {
-	global
-	local threadsCopy
-	local threadID
-
 	logger("t1", "Killing all threads")
 	threadsCopy := global_Allthreads.clone()
 	
@@ -149,7 +145,6 @@ Thread_KillAll()
 ; called when a thread has terminated itself
 Thread_Stopped(par_ThreadID)
 {
-	global 
 	; delete the thread from list
 	global_Allthreads.delete(par_ThreadID)
 
