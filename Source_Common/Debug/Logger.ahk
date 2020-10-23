@@ -15,8 +15,12 @@ init_logger()
 ; 1: major logs
 ; 2: more logs
 ; 3: all logs
-logger(LogLevel, LoggingText, logSource="common")
+logger(LogLevel, LoggingText, logSource = "common", showGui = false)
 {
+	if (showGui)
+	{
+		showLogGui(LoggingText)
+	}
 	logCategory := substr(LogLevel,1,1)
 	logSeverity := substr(LogLevel,2,1)
 	if logSeverity is number
@@ -287,3 +291,19 @@ log_cleanup()
 }
 
 	
+; logs and shows an error message to the user
+; todo: show a list of messages. if window is opened, append it to list.
+showLogGui(message)
+{
+	global
+	gui, guiErrorMessage:destroy
+	gui, guiErrorMessage:add, text, w400, % message
+	gui, guiErrorMessage:add, button, default w100 x50 Y+10 h30 gguiErrorMessageGuiClose, % lang("OK")
+	gui, guiErrorMessage:show, , AutoHotFlow
+	return
+	
+	guiErrorMessageGuiClose:
+	
+	gui, guiErrorMessage:destroy
+	return
+}

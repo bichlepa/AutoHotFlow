@@ -102,7 +102,6 @@ StaticVariable_Get(Environment, p_Name, p_hidden = False)
 	if (not metaData.type)
 	{
 		logger("f0", "error getting static variable type of " p_Name)
-		return
 	}
 	else 
 	{
@@ -141,7 +140,6 @@ GlobalVariable_Get(Environment,p_Name, p_hidden = False)
 	if (not metaData.type)
 	{
 		logger("f0", "error getting global variable type of " p_Name)
-		return
 	}
 	else 
 	{
