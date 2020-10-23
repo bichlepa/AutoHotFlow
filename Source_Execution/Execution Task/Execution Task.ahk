@@ -157,7 +157,7 @@ executionTask()
 								; we have an exception which was not handled by a matching connection. Show error message to user
 								oneThreadMessage := _getThreadProperty(OneInstanceID, OneThreadID, "message")
 								oneThreadFlowName := _getFlowProperty(oneThreadFlowID, "Name")
-								oneThreadLoggingText := lang("%1% '%2%' (ID '%3%') ended with an exception.", lang(_getElementProperty(oneThreadFlowID, OneThreadElementID, "type")), _getElementProperty(oneThreadFlowID, OneThreadElementID, "name"), OneThreadElementID) "`n`n" OneThreadMessage
+								oneThreadLoggingText := lang("%1% '%2%' (ID '%3%') ended with an exception.", lang(_getElementProperty(oneThreadFlowID, OneThreadElementID, "type")), _getElementProperty(oneThreadFlowID, OneThreadElementID, "name"), OneThreadElementID) " - " OneThreadMessage
 								logger("f0", oneThreadLoggingText, oneThreadFlowName, true)
 							}
 

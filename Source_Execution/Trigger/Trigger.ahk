@@ -1,68 +1,91 @@
-global EnabledTriggerIDCounter:=0
+global EnabledTriggerIDCounter := 0
 
+; enable a flow and thus enable all triggers
 enableFlow(p_FlowID)
 {
 	_EnterCriticalSection()
 
+	; enable all triggers
 	enableTriggers(p_FlowID)
+
+	; save changed enabling state
 	SaveFlowMetaData(p_FlowID)
 
 	_LeaveCriticalSection()
 }
+
+; toggle the enable state of the flow
+; enable if flow is disabled. Disable flow if flow is enabled.
 enableToggleFlow(p_FlowID)
 {
 	_EnterCriticalSection()
 	
 	if (_getFlowProperty(p_FlowID, "enabled") != true)
 	{
+		; flow is disabled. Enable it
 		enableFlow(p_FlowID)
 	}
 	else
 	{
+		; flow is enabled. Disable it
 		disableFlow(p_FlowID)
 	}
 	_LeaveCriticalSection()
 }
 
+; disable a flow
 disableFlow(p_FlowID)
 {
+	; disable all triggers
 	disableTriggers(p_FlowID)
+	
+	; save changed enabling state
 	SaveFlowMetaData(p_FlowID)
 }
 
+; enable all triggers of a flow
 enableTriggers(p_FlowID)
 {
 	_EnterCriticalSection()
 	
-	logger("a2", "Going to enable Flow " p_Flow.name)
+	FlowName := _getFlowProperty(p_FlowID, "name")
+	logger("a2", "Going to enable Flow " FlowName)
 	
-	_setFlowProperty(p_FlowID, "enabled", "Enabling")
+	; loop through all triggers
 	allElements := _getAllElementIds(p_FlowID)
 	for forElementIndex, forElementID in allElements
 	{
 		if (_getElementProperty(p_FlowID, forElementID, "type") = "trigger")
 		{
+			; enable the trigger
 			justEnableOneTrigger(p_FlowID, forElementID)
 		}
 	}
+
+	logger("a1", "Flow " FlowName " disabled")
+
+	; set the flow property "enabled" to "true"
 	_setFlowProperty(p_FlowID, "enabled", true)
 	_LeaveCriticalSection()
 	
 	logger("a1", "Flow " _getFlowProperty(p_FlowID, "name") " enabled")
 }
 
-enableOneTrigger(p_FlowID, p_ElementID, p_save=true)
+; enable a single trigger
+enableOneTrigger(p_FlowID, p_ElementID, p_save = true)
 {
 	_EnterCriticalSection()
 
 	FlowName := _getFlowProperty(p_FlowID, "name")
 	logger("a2", "Going to enable trigger " p_ElementID " in flow " FlowName)
 	
-	_setFlowProperty(p_FlowID, "enabled", "Enabling")
-	
+	; enable the trigger
 	justEnableOneTrigger(p_FlowID, p_ElementID)
 	
+	; set the flow property "enabled" to "true"
 	_setFlowProperty(p_FlowID, "enabled", true)
+	
+	; save changed enabling state if requested
 	if (p_save)
 		SaveFlowMetaData(p_FlowID)
 	
@@ -71,22 +94,28 @@ enableOneTrigger(p_FlowID, p_ElementID, p_save=true)
 	_LeaveCriticalSection()
 }
 
+; enable a single trigger (reusable code)
 justEnableOneTrigger(p_FlowID, p_ElementID)
 {
 	_EnterCriticalSection()
 	
-	triggerEnvironment:=criticalObject()
-	triggerEnvironment.id:= "enabledTrigger" ++EnabledTriggerIDCounter
-	triggerEnvironment.flowID:=p_FlowID
-	triggerEnvironment.ElementID:=p_ElementID
-	triggerEnvironment.Pars := _getElementProperty(p_FlowID, p_ElementID, "Pars")
+	; add the current trigger to the list of all enabled triggers
+
+	; create a trigger object with some informations
+	newEnabledTrigger := criticalObject()
+	newEnabledTrigger.id := "enabledTrigger" ++EnabledTriggerIDCounter
+	newEnabledTrigger.flowID := p_FlowID
+	newEnabledTrigger.ElementID := p_ElementID
+	newEnabledTrigger.Pars := _getElementProperty(p_FlowID, p_ElementID, "Pars")
 	
-	_setTrigger(triggerEnvironment.id, triggerEnvironment)
+	_setTrigger(newEnabledTrigger.id, newEnabledTrigger)
 	
-	tempElementClass:=_getElementProperty(p_FlowID, p_ElementID, "class")
+	; call the element function to enable the trigger
+	tempElementClass := _getElementProperty(p_FlowID, p_ElementID, "class")
 	if isfunc("Element_enable_" tempElementClass)
 	{
-		Element_enable_%tempElementClass%(triggerEnvironment, triggerEnvironment.Pars)
+		environment := {flowID: newEnabledTrigger.FlowID, elementID: newEnabledTrigger.elementID}
+		Element_enable_%tempElementClass%(environment, newEnabledTrigger.Pars)
 	}
 	else
 	{
@@ -96,6 +125,7 @@ justEnableOneTrigger(p_FlowID, p_ElementID)
 	_LeaveCriticalSection()
 }
 
+; disable all triggers of a flow
 disableTriggers(p_FlowID)
 {
 	_EnterCriticalSection()
@@ -103,68 +133,90 @@ disableTriggers(p_FlowID)
 	FlowName := _getFlowProperty(p_FlowID, "name")
 	logger("a2", "Going to disable Flow " FlowName)
 	
-	_setFlowProperty(p_FlowID, "enabled", "Disabling")
-	tempToDisableTriggers:=Object()
-	
+	; loop through all active triggers
 	triggers := _getAllTriggerIds()
 	for forEnabledTriggerIndex, forEnabledTriggerID in triggers
 	{
-		forFlowID:=_getTriggerProperty(forEnabledTriggerID, "flowID")
+		; check whether the enabled trigger belongs to the current flow
+		forFlowID := _getTriggerProperty(forEnabledTriggerID, "flowID")
 		if (forFlowID = p_FlowID)
 		{
-			forElementID:=_getTriggerProperty(forEnabledTriggerID, "flowID")
+			; disable the trigger
+			forElementID := _getTriggerProperty(forEnabledTriggerID, "elementID")
 			justDisableOneTrigger(p_FlowID, forElementID, forEnabledTriggerID)
 		}
 	}
 
 	logger("a1", "Flow " FlowName " disabled")
+	
+	; set the flow property "enabled" to "false"
 	_setFlowProperty(p_FlowID, "enabled", false)
 
 	_LeaveCriticalSection()
 }
+
+; disable a single trigger
 disableOneTrigger(p_FlowID, p_ElementID, p_save = true)
 {
 	_EnterCriticalSection()
+	
 	FlowName := _getFlowProperty(p_FlowID, "name")
-
 	logger("a2", "Going to disable trigger " p_ElementID " in Flow " FlowName)
 	
 	otherTriggersInThisFlowEnabled := False
+
+	; loop through all active triggers
 	triggers := _getAllTriggerIds()
 	for forEnabledTriggerIndex, forEnabledTriggerID in triggers
 	{
-		forFlowID:=_getTriggerProperty(forEnabledTriggerID, "flowID")
+		; check whether the enabled trigger belongs to the current flow
+		forFlowID := _getTriggerProperty(forEnabledTriggerID, "flowID")
 		if (forFlowID = p_FlowID)
 		{
-			forElementID:=_getTriggerProperty(forEnabledTriggerID, "flowID")
+			; check whether the enabled trigger belongs to the current element
+			forElementID := _getTriggerProperty(forEnabledTriggerID, "elementID")
 			if (forElementID = p_ElementID)
+			{
+				; disable the trigger
 				justDisableOneTrigger(p_FlowID, p_ElementID, forEnabledTriggerID)
-			else 
-				otherTriggersInThisFlowEnabled:=true
+			}
+			else
+			{
+				; track whether there is an other enabled trigger in this flow
+				otherTriggersInThisFlowEnabled := true
+			}
 		}
 	}
 	
 	logger("a2", "Trigger " p_ElementID " in Flow " FlowName " disabled")
+
 	if (otherTriggersInThisFlowEnabled = False)
 	{
+		; if there is no other enabled trigger in this flow, set the flow property "enabled" to "false"
 		_setFlowProperty(p_FlowID, "enabled", false)
 	}
+	
+	; save changed enabling state if requested
 	if (p_save)
 		SaveFlowMetaData(p_FlowID)
 		
 	_LeaveCriticalSection()
 }
 
+; disable a single trigger (reusable code)
 justDisableOneTrigger(p_Flow, p_ElementID, p_EnabledTriggerID)
 {
 	_EnterCriticalSection()
 
+	; get some informations
 	tempElementClass := _getElementProperty(p_FlowID, p_ElementID, "class")
-	triggerPars := _getTriggerProperty(TriggerID, "Pars")
-	;~ d(forTrigger,"Element_disable_" tempElementClass)
+	triggerPars := _getTriggerProperty(TriggerID, "pars")
+
+	; call the element function to disable the trigger
 	if isfunc("Element_disable_" tempElementClass)
 	{
-		Element_disable_%tempElementClass%(p_EnabledTriggerID, triggerPars)
+		environment := {flowID: p_FlowID, elementID: p_ElementID}
+		Element_disable_%tempElementClass%(environment, triggerPars)
 		_setElementProperty(p_FlowID, p_ElementID, "enabled", false)
 		_setFlowProperty(p_FlowID, "draw.mustdraw", false)
 	}
@@ -172,81 +224,108 @@ justDisableOneTrigger(p_Flow, p_ElementID, p_EnabledTriggerID)
 	{
 		logger("a0", "Trigger " p_ElementID " cannot be disabled (missing implementation)")
 	}
+
+	; delete the enabled trigger
 	_deleteTrigger(p_EnabledTriggerID)
 	
 	_LeaveCriticalSection()
 }
 
-saveResultOfTriggerEnabling(trigger, Result, Message)
+; update the enabling state of the trigger after the trigger was enabled
+; it is called by the element api
+saveResultOfTriggerEnabling(environment, Result, Message)
 {
 	_EnterCriticalSection()
+	
+	FlowName := _getFlowProperty(environment.FlowID, "name")
 
-	trigger.result:=Result
-	trigger.Message:=Message
+	; check the result
 	if (Result = "normal")
 	{
-		_setElementProperty(trigger.flowID, trigger.elementID, "enabled", True)
+		; set the enabling sate of the element
+		_setElementProperty(environment.flowID, environment.elementID, "enabled", True)
+		
+		; log the event
 		if (Message = "")
-			logger("a2", "Trigger " trigger.ElementID " enabled")
+			logger("a2", "Trigger " environment.ElementID " enabled", FlowName)
 		else
-			logger("a2", "Trigger " trigger.ElementID " enabled (" Message ")")
+			logger("a2", "Trigger " environment.ElementID " enabled (" Message ")", FlowName)
 	}
 	else if (result = "exception")
 	{
-		_setElementProperty(trigger.flowID, trigger.elementID, "enabled", False)
-		ElementName := _getElementProperty(trigger.flowID, trigger.elementID, "name")
+		; set the enabling sate of the element
+		_setElementProperty(environment.flowID, environment.elementID, "enabled", False)
+
+		; log the event and show a message
+		ElementName := _getElementProperty(environment.flowID, environment.elementID, "name")
 		if (Message = "")
 		{
-			logger("a0", "Trigger " trigger.ElementID " cannot be enabled")
-			MsgBox, 16, % lang("Exception occured") , % lang("%1% '%2%' (ID '%3%') cannot be enabled due to an exception.", lang("Trigger"), ElementName, trigger.elementID)
+			loggerMessage := lang("%1% '%2%' (ID '%3%') cannot be enabled due to an exception.", lang("Trigger"), ElementName, environment.elementID)
+			logger("a0", loggerMessage, FlowName, true)
 		}
 		else
 		{
-			logger("a0", "Trigger " trigger.ElementID " cannot be enabled (" Message ")")
-			MsgBox, 16, % lang("Exception occured") , % lang("%1% '%2%' (ID '%3%') cannot be enabled due to an exception.", lang("Trigger"), ElementName, trigger.elementID) "`n`n" Message
+			loggerMessage := lang("%1% '%2%' (ID '%3%') cannot be enabled due to an exception.", lang("Trigger"), ElementName, environment.elementID) " - " Message
+			logger("a0", loggerMessage, FlowName, true)
 		}
 	}
 	else
 	{
-		logger("a0", "Trigger " trigger.ElementID " cannot be enabled (unknown result: " Result ")")
-		MsgBox, 16, % lang("Exception occured") , % lang("%1% '%2%' (ID '%3%') cannot be enabled." "`n" lang("Unknown result: %1%", Result), lang("Trigger"), ElementName, trigger.elementID) "`n`n" Message
+		; log the event and show a message
+		loggerMessage := lang("%1% '%2%' (ID '%3%') cannot be enabled." "`n" lang("Unknown result: %1%", Result), lang("Trigger"), ElementName, environment.elementID) "`n`n" Message
+		logger("a0", loggerMessage, flowName, true)
 	}
-	_setFlowProperty(trigger.flowID, "draw.mustdraw", true)
+
+	; redraw flow
+	_setFlowProperty(environment.flowID, "draw.mustdraw", true)
 
 	_LeaveCriticalSection()
 }
 
+; update the enabling state of the trigger after a trigger was disabled
+; it is called by the element api
 saveResultOfTriggerDisabling(trigger, Result, Message)
 {
 	_EnterCriticalSection()
 
-	trigger.result:=Result
-	trigger.Message:=Message
+	FlowName := _getFlowProperty(environment.FlowID, "name")
+
+	; check the result
 	if (Result = "normal")
 	{
-		_setElementProperty(trigger.flowID, trigger.elementID, "enabled", False)
+		; set the enabling sate of the element
+		_setElementProperty(environment.flowID, environment.elementID, "enabled", False)
+
+		; log the event
 		if (Message = "")
-			logger("a2", "Trigger " trigger.ElementID " disabled")
+			logger("a2", "Trigger " environment.ElementID " disabled", FlowName)
 		else
-			logger("a2", "Trigger " trigger.ElementID " disabled (" Message ")")
+			logger("a2", "Trigger " environment.ElementID " disabled (" Message ")", FlowName)
 	}
 	else if (result = "exception")
 	{
-		ElementName := _getElementProperty(trigger.flowID, trigger.elementID, "name")
+		; log the event and show a message
+		ElementName := _getElementProperty(environment.flowID, environment.elementID, "name")
 		if (Message = "")
 		{
-			logger("a0", "Trigger " trigger.ElementID " cannot be disabled")
-			MsgBox, 16, % lang("Exception occured") , % lang("%1% '%2%' (ID '%3%') cannot be disabled due to an exception.", lang("Trigger"), ElementName, trigger.elementID)
+			loggerMessage := lang("%1% '%2%' (ID '%3%') cannot be disabled due to an exception.", lang("Trigger"), ElementName, environment.elementID)
+			logger("a0", loggerMessage, FlowName, true)
 		}
 		else
-			logger("a0", "Trigger " trigger.ElementID " cannot be disabled (" Message ")")
-			MsgBox, 16, % lang("Exception occured") , % lang("%1% '%2%' (ID '%3%') cannot be disabled due to an exception.", lang("Trigger"), ElementName, trigger.elementID) "`n`n" Message
+		{
+			loggerMessage := lang("%1% '%2%' (ID '%3%') cannot be disabled due to an exception.", lang("Trigger"), ElementName, environment.elementID) " - " Message
+			logger("a0", loggerMessage, FlowName, true)
+		}
 	}
 	else
 	{
-		logger("a0", "Trigger " trigger.ElementID " cannot be disabled (unknown result: " Result ")")
+		; log the event and show a message
+		loggerMessage := lang("%1% '%2%' (ID '%3%') cannot be disabled." "`n" lang("Unknown result: %1%", Result), lang("Trigger"), ElementName, environment.elementID) "`n`n" Message
+		logger("a0", loggerMessage, flowName, true)
 	}
-	_setFlowProperty(trigger.flowID, "draw.mustdraw", true)
+	
+	; redraw flow
+	_setFlowProperty(environment.flowID, "draw.mustdraw", true)
 
 	_LeaveCriticalSection()
 }
