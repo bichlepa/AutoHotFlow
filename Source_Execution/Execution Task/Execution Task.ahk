@@ -236,15 +236,18 @@ executionTask()
 		if (not somethingexecuted)
 		{
 			oneExecutionTask := ExecutionNextTasks.pop()
-			func := oneExecutionTask.func
-			%func%(oneExecutionTask.Environment, _getThreadProperty(oneExecutionTask.environment.InstanceID, oneExecutionTask.environment.ThreadID, "elementpars"))
-			somethingexecuted := true
+			if (oneExecutionTask)
+			{
+				func := oneExecutionTask.func
+				%func%(oneExecutionTask.Environment, _getThreadProperty(oneExecutionTask.environment.InstanceID, oneExecutionTask.environment.ThreadID, "elementpars"))
+				somethingexecuted := true
+			}
 		}		
 
 		if (not somethingexecuted)
 		{
 			; we had nothing to do. Do a sleep to save CPU time
-			sleep, 10
+			sleep, 100
 		}
 	}
 	

@@ -66,7 +66,7 @@ Element_getParametrizationDetails_Action_AutoHotKey_script(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_AutoHotKey_script(Environment, ElementParameters)
 {
-	return lang("AutoHotKey_script") 
+	return lang("AutoHotKey_script") "`n" substr(ElementParameters.script, 1, 50)
 }
 
 ;Called every time the user changes any parameter.
@@ -119,7 +119,7 @@ Element_run_Action_AutoHotKey_script(Environment, ElementParameters)
 ;If the task in Element_run_...() takes more than several seconds, then it is up to you to make it stoppable.
 Element_stop_Action_AutoHotKey_script(Environment, ElementParameters)
 {
-	
+	x_ExecuteInNewAHKThread_Stop(Environment)
 }
 
 
@@ -129,19 +129,19 @@ Action_AutoHotKey_script_FinishExecution(Environment, values, ElementParameters)
 	{
 		x_SetVariable(Environment, onevaluekey, onevalue)
 	}
-	if (values.result!="exception") ;we ignore any values other than "exception"
+	if (values.result != "exception") ;we ignore any values other than "exception"
 	{
-		x_finish(Environment,"normal", values.message)
+		x_finish(Environment, "normal", values.message)
 	}
 	else
 	{
 		if (values.message)
 		{
-			x_finish(Environment,"exception", values.message)
+			x_finish(Environment, "exception", values.message)
 		}
 		else
 		{
-			x_finish(Environment,"exception", "Unknown error")
+			x_finish(Environment, "exception", "Unknown error")
 		}
 	}
 	

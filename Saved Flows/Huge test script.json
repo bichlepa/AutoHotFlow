@@ -67,20 +67,6 @@
       "to": "element0000000431",
       "type": "Connection"
     },
-    "Connection0000000434": {
-      "ConnectionType": "normal",
-      "from": "element0000000431",
-      "ID": "Connection0000000434",
-      "to": "element0000000436",
-      "type": "Connection"
-    },
-    "Connection0000000437": {
-      "ConnectionType": "normal",
-      "from": "element0000000436",
-      "ID": "Connection0000000437",
-      "to": "element0000000433",
-      "type": "Connection"
-    },
     "Connection0000000442": {
       "ConnectionType": "normal",
       "from": "element0000000440",
@@ -93,20 +79,6 @@
       "from": "element0000000429",
       "ID": "Connection0000000443",
       "to": "element0000000440",
-      "type": "Connection"
-    },
-    "Connection0000000446": {
-      "ConnectionType": "normal",
-      "from": "element0000000445",
-      "ID": "Connection0000000446",
-      "to": "element0000000444",
-      "type": "Connection"
-    },
-    "Connection0000000447": {
-      "ConnectionType": "normal",
-      "from": "element0000000350",
-      "ID": "Connection0000000447",
-      "to": "element0000000445",
       "type": "Connection"
     },
     "Connection0000000448": {
@@ -210,6 +182,34 @@
       "ID": "Connection0000000497",
       "to": "element0000000352",
       "type": "Connection"
+    },
+    "connection0000000514": {
+      "ConnectionType": "normal",
+      "from": "element0000000350",
+      "ID": "connection0000000514",
+      "to": "element0000000513",
+      "type": "Connection"
+    },
+    "connection0000000515": {
+      "ConnectionType": "normal",
+      "from": "element0000000513",
+      "ID": "connection0000000515",
+      "to": "element0000000444",
+      "type": "Connection"
+    },
+    "connection0000000516": {
+      "ConnectionType": "normal",
+      "from": "element0000000431",
+      "ID": "connection0000000516",
+      "to": "element0000000507",
+      "type": "Connection"
+    },
+    "connection0000000517": {
+      "ConnectionType": "normal",
+      "from": "element0000000507",
+      "ID": "connection0000000517",
+      "to": "element0000000433",
+      "type": "Connection"
     }
   },
   "allElements": {
@@ -224,8 +224,8 @@
       },
       "StandardName": 1,
       "type": "action",
-      "x": 455,
-      "y": "-297.500000"
+      "x": "455",
+      "y": "-280"
     },
     "element0000000352": {
       "class": "Action_Trace_Point_Check",
@@ -242,8 +242,8 @@
       },
       "StandardName": 1,
       "type": "action",
-      "x": 350,
-      "y": "857.500000"
+      "x": "350",
+      "y": "875"
     },
     "element0000000375": {
       "class": "Trigger_Manual",
@@ -257,8 +257,8 @@
       },
       "StandardName": 1,
       "type": "Trigger",
-      "x": 385,
-      "y": "-577.500000"
+      "x": "385",
+      "y": "-560"
     },
     "element0000000385": {
       "class": "Action_New_List",
@@ -281,8 +281,8 @@
       },
       "StandardName": 1,
       "type": "action",
-      "x": 770,
-      "y": "-87.500000"
+      "x": "770",
+      "y": "-70"
     },
     "element0000000391": {
       "class": "Loop_Work_through_a_list",
@@ -296,8 +296,8 @@
       },
       "StandardName": 1,
       "type": "Loop",
-      "x": 980,
-      "y": "52.500000"
+      "x": "980",
+      "y": "70"
     },
     "element0000000404": {
       "class": "Action_New_List",
@@ -320,8 +320,8 @@
       },
       "StandardName": "1",
       "type": "action",
-      "x": 770,
-      "y": "-227.500000"
+      "x": "770",
+      "y": "-210"
     },
     "element0000000408": {
       "class": "Loop_Work_through_a_list",
@@ -335,8 +335,8 @@
       },
       "StandardName": 1,
       "type": "loop",
-      "x": 1610,
-      "y": "647.500000"
+      "x": "1610",
+      "y": "665"
     },
     "element0000000409": {
       "class": "Action_Tooltip",
@@ -351,8 +351,8 @@
       },
       "StandardName": 1,
       "type": "action",
-      "x": 1645,
-      "y": "927.500000"
+      "x": "1645",
+      "y": "945"
     },
     "element0000000414": {
       "class": "Action_Tooltip",
@@ -367,8 +367,8 @@
       },
       "StandardName": 1,
       "type": "action",
-      "x": 1400,
-      "y": "1137.500000"
+      "x": "1400",
+      "y": "1155"
     },
     "element0000000428": {
       "class": "Action_New_variable",
@@ -382,8 +382,8 @@
       },
       "StandardName": 1,
       "type": "action",
-      "x": 385,
-      "y": "-437.500000"
+      "x": "385",
+      "y": "-420"
     },
     "element0000000429": {
       "class": "Action_Sleep",
@@ -396,8 +396,8 @@
       },
       "StandardName": 1,
       "type": "action",
-      "x": 280,
-      "y": "-297.500000"
+      "x": "280",
+      "y": "-280"
     },
     "element0000000431": {
       "class": "Action_Sleep",
@@ -410,8 +410,8 @@
       },
       "StandardName": "1",
       "type": "action",
-      "x": 105,
-      "y": "-297.500000"
+      "x": "105",
+      "y": "-280"
     },
     "element0000000433": {
       "class": "Action_Trace_Point",
@@ -425,23 +425,8 @@
       },
       "StandardName": 1,
       "type": "action",
-      "x": 105,
-      "y": "-17.500000"
-    },
-    "element0000000436": {
-      "class": "Action_New_variable",
-      "ID": "element0000000436",
-      "name": "Neue Variable - counter = counter +1",
-      "package": "default",
-      "pars": {
-        "expression": "Expression",
-        "Varname": "counter",
-        "VarValue": "counter +1"
-      },
-      "StandardName": "1",
-      "type": "action",
-      "x": 105,
-      "y": "-157.500000"
+      "x": "105",
+      "y": "0"
     },
     "element0000000439": {
       "class": "Action_Trace_Point",
@@ -455,8 +440,8 @@
       },
       "StandardName": 1,
       "type": "action",
-      "x": 280,
-      "y": "-17.500000"
+      "x": "280",
+      "y": "0"
     },
     "element0000000440": {
       "class": "Action_New_variable",
@@ -470,8 +455,8 @@
       },
       "StandardName": "1",
       "type": "action",
-      "x": 280,
-      "y": "-157.500000"
+      "x": "280",
+      "y": "-140"
     },
     "element0000000444": {
       "class": "Action_Trace_Point",
@@ -485,23 +470,8 @@
       },
       "StandardName": "1",
       "type": "action",
-      "x": 455,
-      "y": "-17.500000"
-    },
-    "element0000000445": {
-      "class": "Action_New_variable",
-      "ID": "element0000000445",
-      "name": "Neue Variable - counter = counter +1",
-      "package": "default",
-      "pars": {
-        "expression": "expression",
-        "Varname": "counter",
-        "VarValue": "counter +1"
-      },
-      "StandardName": 1,
-      "type": "action",
-      "x": 455,
-      "y": "-157.500000"
+      "x": "455",
+      "y": "0"
     },
     "element0000000450": {
       "class": "Action_Tooltip",
@@ -531,8 +501,8 @@
       },
       "StandardName": 1,
       "type": "action",
-      "x": 1400,
-      "y": "367.500000"
+      "x": "1400",
+      "y": "385"
     },
     "element0000000455": {
       "class": "Action_Tooltip",
@@ -547,8 +517,8 @@
       },
       "StandardName": 1,
       "type": "action",
-      "x": 1190,
-      "y": "332.500000"
+      "x": "1190",
+      "y": "350"
     },
     "element0000000465": {
       "class": "Action_Trace_Point",
@@ -562,8 +532,8 @@
       },
       "StandardName": 1,
       "type": "action",
-      "x": 1855,
-      "y": "857.500000"
+      "x": "1855",
+      "y": "875"
     },
     "element0000000480": {
       "class": "Trigger_Manual",
@@ -577,8 +547,8 @@
       },
       "StandardName": 1,
       "type": "Trigger",
-      "x": -455,
-      "y": "-297.500000"
+      "x": "-455",
+      "y": "-280"
     },
     "element0000000485": {
       "class": "Action_Execute_Flow",
@@ -597,8 +567,8 @@
       },
       "StandardName": 1,
       "type": "action",
-      "x": 805,
-      "y": "1452.500000"
+      "x": "805",
+      "y": "1470"
     },
     "element0000000489": {
       "class": "Action_Sleep",
@@ -611,8 +581,8 @@
       },
       "StandardName": 1,
       "type": "action",
-      "x": -455,
-      "y": "-122.500000"
+      "x": "-455",
+      "y": "-105"
     },
     "element0000000490": {
       "class": "Trigger_Manual",
@@ -626,8 +596,8 @@
       },
       "StandardName": 1,
       "type": "Trigger",
-      "x": -1085,
-      "y": "-577.500000"
+      "x": "-1085",
+      "y": "-560"
     },
     "element0000000492": {
       "class": "Action_Beep",
@@ -640,8 +610,8 @@
       },
       "StandardName": 1,
       "type": "action",
-      "x": -1085,
-      "y": "-402.500000"
+      "x": "-1085",
+      "y": "-385"
     },
     "element0000000494": {
       "class": "Action_Beep",
@@ -654,8 +624,8 @@
       },
       "StandardName": 1,
       "type": "action",
-      "x": -1225,
-      "y": "-262.500000"
+      "x": "-1225",
+      "y": "-245"
     },
     "element0000000496": {
       "class": "Action_Beep",
@@ -668,8 +638,8 @@
       },
       "StandardName": 1,
       "type": "action",
-      "x": -1365,
-      "y": "-157.500000"
+      "x": "-1365",
+      "y": "-140"
     },
     "element0000000498": {
       "class": "Action_Execute_Flow",
@@ -688,19 +658,68 @@
       },
       "StandardName": 1,
       "type": "action",
-      "x": 805,
-      "y": "1592.500000"
+      "x": "805",
+      "y": "1610"
+    },
+    "element0000000503": {
+      "class": "Action_Get_Mouse_Position",
+      "ID": "element0000000503",
+      "name": "Hole Mausposition",
+      "package": "default",
+      "pars": {
+        "CoordMode": "Screen",
+        "varnameControlID": "controlID",
+        "varnameWindowID": "windowID",
+        "varnameX": "posX",
+        "varnameY": "posY",
+        "WhetherGetControlID": 0,
+        "WhetherGetWindowID": 0
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "-525",
+      "y": "245"
+    },
+    "element0000000507": {
+      "class": "Action_AutoHotKey_script",
+      "ID": "element0000000507",
+      "name": "AutoHotKey Skript - counter += 1",
+      "package": "default",
+      "pars": {
+        "ExportVariables": "counter",
+        "ImportVariables": "counter",
+        "Script": "counter += 1"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "105",
+      "y": "-140"
+    },
+    "element0000000513": {
+      "class": "Action_New_variable",
+      "ID": "element0000000513",
+      "name": "Neue Variable - counter = counter +1",
+      "package": "default",
+      "pars": {
+        "expression": "Expression",
+        "Varname": "counter",
+        "VarValue": "counter +1"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "455",
+      "y": "-140"
     }
   },
   "category": "AHF Test",
-  "ElementIDCounter": "501",
+  "ElementIDCounter": "517",
   "flowSettings": {
     "DefaultWorkingDir": 1,
     "ExecutionPolicy": "parallel",
     "FolderOfStaticVariables": "C:\\Users\\bichl\\Documents\\git\\AutoHotFlow\\Saved Flows\\Static variables\\Huge test script",
     "Name": "Huge test script",
-    "Offsetx": "-853.279229",
-    "Offsety": "-445.646954",
+    "Offsetx": "-1693.941519",
+    "Offsety": "-822.210808",
     "WorkingDir": "C:\\Users\\Paul\\Documents\\AutoHotFlow default working direction",
     "zoomFactor": "0.605475"
   },

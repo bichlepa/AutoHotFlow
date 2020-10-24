@@ -127,6 +127,10 @@ x_ExecuteInNewAHKThread(Environment, p_functionObject, p_Code, p_VarsToImport, p
 {
 	return xx_ExecuteInNewAHKThread(Environment, p_functionObject, p_Code, p_VarsToImport, p_VarsToExport)
 }
+x_ExecuteInNewAHKThread_stop(Environment)
+{
+	return xx_ExecuteInNewAHKThread_stop(Environment)
+}
 
 x_trigger(Environment)
 {

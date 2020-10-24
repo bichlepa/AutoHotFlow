@@ -130,6 +130,9 @@ xx_GetThreadCountInCurrentInstance(Environment)
 xx_ExecuteInNewAHKThread(Environment, p_functionObject, p_Code, p_VarsToImport, p_VarsToExport)
 {
 }
+xx_ExecuteInNewAHKThread_Stop(Environment)
+{
+}
 xx_trigger(Environment)
 {
 }

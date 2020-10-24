@@ -474,18 +474,18 @@ queryTasks()
 		oneTask := _getTask("main")
 		if (oneTask)
 		{
-			name:=oneTask.name
-			if (name="exit")
+			name := oneTask.name
+			if (name = "exit")
 			{
 				; The app should exit. start the exit routine
 				exitapp
 			}
-			if (name="ahkThreadStopped")
+			if (name = "ahkThreadStopped")
 			{
 				; An ahk thread has stopped, clean up after that
 				thread_Stopped(oneTask.ThreadID)
 			}
-			if (name="StartEditor")
+			if (name = "StartEditor")
 			{
 				; The editor for a flow should be opened
 				if (ThreadEditor_exists(oneTask.FlowID))
@@ -496,6 +496,22 @@ queryTasks()
 				{
 					Thread_StartEditor(oneTask.FlowID)
 				}
+			}
+			if (name = "StartElementAhkThread")
+			{
+				Thread_StartElemenThread(oneTask.UniqueID, oneTask.code)
+			}
+			if (name = "StopElementAhkThread")
+			{
+				Thread_StopElemenThread(oneTask.UniqueID)
+			}
+			if (name = "elementAhkThreadStopped")
+			{
+				thread_Stopped("element_" oneTask.UniqueID)
+			}
+			if (name = "elementAhkThreadTrigger")
+			{
+				API_Execution_externalTrigger(oneTask.UniqueID)
 			}
 		}
 		else

@@ -543,11 +543,13 @@ x_ExecuteInNewAHKThread(Environment, p_functionObject, p_Code, p_VarsToImport, p
 	
 	; define some code which will be appended before p_Code
 	; make code persistent
-	preCode := "#persistent`n"
+	preCode := ""
+	preCode .= "#persistent`n"
+	preCode .= "#NoTrayIcon`n"
 	; on exit, go to the exit routine
 	preCode .= "onexit, ahf_onexit`n"
 	; we will need the unique ID for the callback function
-	preCode := "ahf_uniqueID :=""" uniqueID """`n"
+	preCode .= "ahf_uniqueID :=""" uniqueID """`n"
 	; get the critical section
 	preCode .= "ahf_cs_shared := " _cs_shared "`n"
 	; get the shared object
@@ -563,24 +565,35 @@ x_ExecuteInNewAHKThread(Environment, p_functionObject, p_Code, p_VarsToImport, p
 	preCode .= "LeaveCriticalSection(ahf_cs_shared)`n"
 
 	; define some code which will be appended after p_Code
+	postcode := ""
 	; always exit app if p_Code reaches the end
-	postcode := "exitapp`n"
+	postcode .= "exitapp`n"
 	; label which will be executed on call of exitapp
 	postcode .= "ahf_onexit:`n"
+	
 	; set all variables from p_VarsToExport. since we access a shared variable, use critical section
 	postcode .= "EnterCriticalSection(ahf_cs_shared)`n"
-	postcode .= "for ahf_varindex, ahf_varname in ahf_sharedObject.varsToExport`n{`n  ahf_sharedObject.varsExported[ahf_varname]:=%ahf_varname%`n}`n"
+	postcode .= "for ahf_varindex, ahf_varname in ahf_sharedObject.varsToExport`n{`n  ahf_sharedObject.varsExported[ahf_varname] := %ahf_varname%`n}`n"
 	postcode .= "LeaveCriticalSection(ahf_cs_shared)`n"
 	; call a function from parent thread to notify it that it has finished
-	postcode .= "ahf_parentAHKThread.ahkFunction(""API_Execution_externaElementFinish"", ahf_uniqueID)`n"
+	postcode .= "ahf_parentAHKThread.ahkFunction(""API_Main_ElementThread_Stopped"", ahf_uniqueID)`n"
 	; finally exit the thread
 	postcode .= "exitapp"
 	_LeaveCriticalSection()
-
-	; finally start the new ahk thread
-	AhkThread("`n" preCode "`n" p_Code "`n" postCode)
 	
-	; todo: if the execution of a flow is stops, exit the created thread
+	; finally start the new ahk thread
+	API_Main_StartElementAhkThread(uniqueID, "`n" preCode "`n" p_Code "`n" postCode)
+}
+
+; stops the ahk thread of a element which used x_ExecuteInNewAHKThread() when it was started
+; todo: implement a more clean exit where the thread gets a signal and then stops itself
+x_ExecuteInNewAHKThread_Stop(Environment)
+{
+	; get the unique ID
+	uniqueID := _getThreadProperty(Environment.InstanceID, Environment.ThreadID, "uniqueID")
+
+	; tell the main thread to stop the element ahk thread
+	API_Main_StopElementAhkThread(uniqueID)
 }
 
 ; is called when the code which was executing a new ahk-thread using x_ExecuteInNewAHKThread() finishes
@@ -590,7 +603,7 @@ ExecuteInNewAHKThread_finishedExecution(p_ExecutionID)
 	; get the environment variable
 	Environment := x_GetMyEnvironmentFromExecutionID(p_ExecutionID)
 	; get the function object
-	functionObject:=global_AllExecutionIDs[p_ExecutionID].ExeInNewThread.functionObject
+	functionObject := global_AllExecutionIDs[p_ExecutionID].ExeInNewThread.functionObject
 	; get the exported variables
 	varsExported := _getSharedProperty("temp." p_ExecutionID ".sharedObject.varsExported")
 	_LeaveCriticalSection()
@@ -622,9 +635,11 @@ x_TriggerInNewAHKThread(Environment, p_Code, p_VarsToImport, p_VarsToExport)
 	
 	; define some code which will be appended before p_Code
 	; make code persistent
-	preCode := "#persistent`n"
+	preCode := ""
+	preCode .= "#persistent`n"
+	preCode .= "#NoTrayIcon`n"
 	; we will need the unique ID for the callback function
-	preCode := "ahf_uniqueID :=""" uniqueID """`n"
+	preCode .= "ahf_uniqueID :=""" uniqueID """`n"
 	; get the critical section
 	preCode .= "ahf_cs_shared := " _cs_shared "`n"
 	; get the shared object
@@ -639,8 +654,10 @@ x_TriggerInNewAHKThread(Environment, p_Code, p_VarsToImport, p_VarsToExport)
 	preCode .= "}`n"
 	preCode .= "LeaveCriticalSection(ahf_cs_shared)`n"
 	
+	; define some code which will be appended after p_Code
+	postcode := ""
 	; return if code reaches the end
-	postcode := "return`n"
+	postcode .= "return`n"
 	; define function which needs to be called in order to trigger the trigger
 	postcode .= "x_trigger()`n"
 	postcode .= "{`n"
@@ -650,16 +667,16 @@ x_TriggerInNewAHKThread(Environment, p_Code, p_VarsToImport, p_VarsToExport)
 	postcode .= "for ahf_varindex, ahf_varname in ahf_sharedObject.varsToExport`n{`n  ahf_sharedObject.varsExported[ahf_varname]:=%ahf_varname%`n}`n"
 	postcode .= "LeaveCriticalSection(ahf_cs_shared)`n"
 	; call a function from parent thread to notify it that it has finished
-	postcode .= "ahf_parentAHKThread.ahkFunction(""API_Execution_externalTrigger"", ahf_uniqueID)`n"
+	postcode .= "ahf_parentAHKThread.ahkFunction(""API_Main_ElementThread_Trigger"", ahf_uniqueID)`n"
 	postcode .= "}`n"
 		
 	_LeaveCriticalSection()
 
 	; start the new ahk thread
-	AHKThreadID := AhkThread("`n" preCode "`n" p_Code "`n" postCode)
+	API_Main_StartElementAhkThread(uniqueID, "`n" preCode "`n" p_Code "`n" postCode)
 
 	; remember the thread ID in order to be able to stop the external thread when the trigger is disabled
-	global_AllActiveTriggerIDs[uniqueID].ExeInNewThread.AHKThreadID:=AHKThreadID
+	global_AllActiveTriggerIDs[uniqueID].ExeInNewThread.AHKThread := AHKThread
 }
 
 ; stops the ahk thread of a trigger which used x_TriggerInNewAHKThread() when it was enabled
@@ -669,11 +686,9 @@ x_TriggerInNewAHKThread_Stop(Environment)
 	_EnterCriticalSection()
 	; get the unique ID
 	uniqueID := _getThreadProperty(Environment.InstanceID, Environment.ThreadID, "uniqueID")
-	; get the thread ID
-	AHKThreadID := global_AllActiveTriggerIDs[uniqueID].ExeInNewThread.AHKThreadID
-	_LeaveCriticalSection()
-	; stop the thread
-	ahkthread_release(global_AllActiveTriggerIDs[uniqueID].ExeInNewThread.AHKThreadID)
+
+	; tell the main thread to stop the element ahk thread
+	API_Main_StopElementAhkThread(uniqueID)
 }
 
 ; called when a trigger which is running in an separate ahk-thread triggers

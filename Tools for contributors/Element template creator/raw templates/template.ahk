@@ -520,6 +520,9 @@ Element_stop_&ElementType&_&Name&(Environment, ElementParameters)
 	guiID:=x_GetMyUniqueExecutionID(Environment)
 	gui,%guiID%:destroy
 #endif ;addCustomGUI
+#if addSeparateAhkThread
+	x_ExecuteInNewAHKThread_Stop(Environment)
+#endif ;addSeparateAhkThread
 }
 
 

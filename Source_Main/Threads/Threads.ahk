@@ -121,6 +121,33 @@ Thread_StartExecution()
 	return threadID
 }
 
+
+Thread_StartElemenThread(uniqueID, code)
+{
+	threadID := "element_" uniqueID
+	logger("t1", "Starting element thread. ID: " threadID)
+	newThread := AhkThread(code)
+
+	global_AllThreads[threadID] := {permanent: true, type: "Element", thread: newThread, uniqueID: uniqueID}
+
+	logger("t1", "Element thread started")
+}
+Thread_StopElemenThread(uniqueID)
+{
+	threadID := "element_" uniqueID
+
+	threadpars := global_AllThreads[threadID]
+	if (threadpars.thread.ahkReady())
+	{
+		logger("t1", "Killing thread " threadID)
+		threadpars.thread.ahkterminate(100)
+		if (threadpars.thread.ahkReady())
+		{
+			logger("t0", "Killing thread " threadID " failed")
+		}
+	}
+}
+
 ; kill all threads. This should only be called, if the threads were not able to stop themself
 ; there is no guarantee, that this code will properly close the threads, it may cause a crash
 Thread_KillAll()
@@ -145,6 +172,12 @@ Thread_KillAll()
 ; called when a thread has terminated itself
 Thread_Stopped(par_ThreadID)
 {
+	; if an external thread stopped, we have to inform the execution task about it
+	if (global_Allthreads[par_ThreadID].type = "element")
+	{
+		API_Execution_externaElementFinish(global_Allthreads[par_ThreadID].uniqueID)
+	}
+
 	; delete the thread from list
 	global_Allthreads.delete(par_ThreadID)
 

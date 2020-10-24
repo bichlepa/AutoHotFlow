@@ -5,9 +5,9 @@
   "HideDemoFlows": 0,
   "LogLevelApp": "3",
   "LogLevelFlow": "3",
-  "LogLevelThread": "1",
+  "LogLevelThread": "3",
   "LogToFile": "1",
   "runAsAdmin": "0",
-  "ShowElementsLevel": "Beginner",
+  "ShowElementsLevel": "Programmer",
   "UILanguage": "de"
 }

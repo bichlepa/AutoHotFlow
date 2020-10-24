@@ -24,7 +24,7 @@ _EnterCriticalSection()
 	}
 	Critical on
 	EnterCriticalSection(_cs_shared)
-	if (criticalSectionCounter == 0 and (_share.exiting or _exiting) and not _ahkThreadID="Main")
+	if (criticalSectionCounter == 0 and (_share.exiting or _exiting) and not _ahkThreadID = "Main")
 	{
 		; send the message to main only once
 		if not API_Main_Thread_Stopped_sent

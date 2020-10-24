@@ -720,7 +720,7 @@ class ElementSettings
 			local tempFirstParameterID := parameter.id[1]
 
 			; create the control on the right side
-			gui, add, picture, x394 yp w16 h16 hwndtempHWND gGUISettingsOfElementClickOnWarningPic vGUISettingsOfElementWarningIconOf%tempFirstParameterID%
+			gui, add, picture, x394 Y+-16 w16 h16 hwndtempHWND gGUISettingsOfElementClickOnWarningPic vGUISettingsOfElementWarningIconOf%tempFirstParameterID%
 			this.components.push("GUISettingsOfElementWarningIconOf" tempFirstParameterID)
 			ElementSettings.fieldHWNDs[tempHWND] := this
 		}
