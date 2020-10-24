@@ -356,14 +356,14 @@ assistant_GetWindowInformation_ButtonOK()
 		if (assistant_GetWindowInformation_NeededInfo.ahk_pid)
 			x_Par_SetValue(assistant_GetWindowInformation_NeededInfo.ahk_pid,temp)
 		if (assistant_GetWindowInformation_NeededInfo.ahk_id)
-			x_Par_SetValue(assistant_GetWindowInformation_NeededInfo.ahk_pid,tempWinID)
+			x_Par_SetValue(assistant_GetWindowInformation_NeededInfo.ahk_id,tempWinID)
 	}
 	else
 	{
 		if (assistant_GetWindowInformation_NeededInfo.ahk_pid)
 			x_Par_SetValue(assistant_GetWindowInformation_NeededInfo.ahk_pid,"")
 		if (assistant_GetWindowInformation_NeededInfo.ahk_id)
-			x_Par_SetValue(assistant_GetWindowInformation_NeededInfo.ahk_pid,"")
+			x_Par_SetValue(assistant_GetWindowInformation_NeededInfo.ahk_id,"")
 		
 	}
 	ui_DeleteShapeOnScreen()

@@ -1,31 +1,54 @@
 ﻿;Always add this element class name to the global list
 x_RegisterElementClass("Trigger_Window_Closes")
 
-Element_getPackage_Trigger_Window_Closes()
-{
-	return "default"
-}
-
+;Element type of the element
 Element_getElementType_Trigger_Window_Closes()
 {
 	return "trigger"
 }
 
+;Element type of the element
 Element_getName_Trigger_Window_Closes()
 {
 	return lang("Window_Closes")
 }
 
-Element_getIconPath_Trigger_Window_Closes()
-{
-	;~ return "Source_elements\default\icons\keyboard.png"
-}
-
+;Category of the element
 Element_getCategory_Trigger_Window_Closes()
 {
 	return lang("Window")
 }
 
+;This function returns the package of the element.
+;This is a reserved function for future releases,
+;where it will be possible to install additional add-ons which provide more elements.
+Element_getPackage_Trigger_Window_Closes()
+{
+	return "default"
+}
+
+;Minimum user experience to use this element.
+;Elements which are complicated or rarely used by beginners should not be visible to them.
+;This will help them to get started with AHF
+Element_getElementLevel_Trigger_Window_Closes()
+{
+	;"Beginner" or "Advanced" or "Programmer"
+	return "Beginner"
+}
+
+;Icon path which will be shown in the background of the element
+Element_getIconPath_Trigger_Window_Closes()
+{
+}
+
+;How stable is this element? Experimental elements will be marked and can be hidden by user.
+Element_getStabilityLevel_Trigger_Window_Closes()
+{
+	;"Stable" or "Experimental"
+	return "Stable"
+}
+
+;Returns an array of objects which describe all controls which will be shown in the element settings GUI
 Element_getParametrizationDetails_Trigger_Window_Closes(Environment)
 {
 	
@@ -51,11 +74,12 @@ Element_getParametrizationDetails_Trigger_Window_Closes(Environment)
 	parametersToEdit.push({type: "Label", label: lang("Hidden window")})
 	parametersToEdit.push({type: "Checkbox", id: "FindHiddenWindow", default: 0, label: lang("Detect hidden window")})
 	parametersToEdit.push({type: "Label", label: lang("Get_parameters")})
-	parametersToEdit.push({type: "button", goto: "x_assistant_windowParameter", label: lang("Get_Parameters")})
+	parametersToEdit.push({type: "button", goto: "Trigger_Window_Closes_ButtonWindowAssistant", label: lang("Get_Parameters")})
 	
 	return parametersToEdit
 }
 
+;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Trigger_Window_Closes(Environment, ElementParameters)
 {
 	global
@@ -89,11 +113,16 @@ Element_GenerateName_Trigger_Window_Closes(Environment, ElementParameters)
 	
 }
 
+;Called every time the user changes any parameter.
+;This function allows to check the integrity of the parameters. For example you can:
+;- Disable options which are not available because of other options
+;- Correct misconfiguration
 Element_CheckSettings_Trigger_Window_Closes(Environment, ElementParameters)
 {	
 	
 }
 
+;Called when the trigger is activated
 Element_enable_Trigger_Window_Closes(Environment, ElementParameters)
 {
 	EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters)
@@ -165,6 +194,8 @@ Element_enable_Trigger_Window_Closes(Environment, ElementParameters)
 
 }
 
+;Called after the trigger has triggered.
+;Here you can for example define the variables which are provided by the triggers.
 Element_postTrigger_Trigger_Window_Closes(Environment, ElementParameters)
 {
 	exportedValues:=x_TriggerInNewAHKThread_GetExportedValues(Environment)
@@ -172,8 +203,16 @@ Element_postTrigger_Trigger_Window_Closes(Environment, ElementParameters)
 }
 
 
+;Called when the trigger should be disabled.
 Element_disable_Trigger_Window_Closes(Environment, ElementParameters)
 {
 	x_TriggerInNewAHKThread_Stop(Environment)
 	x_disabled(Environment, "normal", lang("Stopped."))
+}
+
+
+; opens the assistant for getting window information
+Trigger_Window_Closes_ButtonWindowAssistant()
+{
+	x_assistant_windowParameter({wintitle: "Wintitle", excludeTitle: "excludeTitle", winText: "winText", FindHiddenText: "FindHiddenText", ExcludeText: "ExcludeText", ahk_class: "ahk_class", ahk_exe: "ahk_exe", ahk_id: "ahk_id", ahk_pid: "ahk_pid", FindHiddenWindow: "FindHiddenWindow"})
 }

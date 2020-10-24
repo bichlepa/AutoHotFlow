@@ -104,11 +104,13 @@ Element_getParametrizationDetails_Action_Screenshot(Environment)
 	return parametersToEdit
 }
 
+; opens the assistant for getting window information
 Action_Screenshot_ButtonWindowAssistant()
 {
 	x_assistant_windowParameter({wintitle: "Wintitle", excludeTitle: "excludeTitle", winText: "winText", FindHiddenText: "FindHiddenText", ExcludeText: "ExcludeText", ahk_class: "ahk_class", ahk_exe: "ahk_exe", ahk_id: "ahk_id", ahk_pid: "ahk_pid", FindHiddenWindow: "FindHiddenWindow"})
 }
 
+; opens the assistant for getting coordinates
 Action_Screenshot_ButtonMouseTracker()
 {
 	x_assistant_MouseTracker({ImportMousePos:"Yes",CoordMode:"CoordMode",xpos:"xpos",ypos:"ypos"})

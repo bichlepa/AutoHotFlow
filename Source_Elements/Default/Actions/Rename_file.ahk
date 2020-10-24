@@ -78,7 +78,6 @@ Element_CheckSettings_Action_Rename_File(Environment, ElementParameters)
 	
 }
 
-
 ;Called when the element should execute.
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Rename_File(Environment, ElementParameters)
@@ -144,9 +143,4 @@ Element_stop_Action_Rename_File(Environment, ElementParameters)
 {
 	
 }
-
-
-
-
-
 

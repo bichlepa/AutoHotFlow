@@ -41,6 +41,13 @@ Element_getIconPath_Action_Get_Volume()
 {
 }
 
+;How stable is this element? Experimental elements will be marked and can be hidden by user.
+Element_getStabilityLevel_Action_Get_Volume()
+{
+	;"Stable" or "Experimental"
+	return "Stable"
+}
+
 ;Returns an array of objects which describe all controls which will be shown in the element settings GUI
 Element_getParametrizationDetails_Action_Get_Volume(Environment)
 {

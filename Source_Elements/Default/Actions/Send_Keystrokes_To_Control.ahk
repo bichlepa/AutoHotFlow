@@ -221,7 +221,7 @@ Element_stop_Action_Send_Keystrokes_To_Control(Environment, ElementParameters)
 }
 
 
-
+; opens the assistant for getting window information
 Action_Send_Keystrokes_To_Control_ButtonWindowAssistant()
 {
 	x_assistant_windowParameter({wintitle: "Wintitle", excludeTitle: "excludeTitle", winText: "winText", FindHiddenText: "FindHiddenText", ExcludeText: "ExcludeText", ahk_class: "ahk_class", ahk_exe: "ahk_exe", ahk_id: "ahk_id", ahk_pid: "ahk_pid", FindHiddenWindow: "FindHiddenWindow", IdentifyControlBy: "IdentifyControlBy", ControlTextMatchMode: "ControlTextMatchMode", Control_identifier: "Control_identifier"})

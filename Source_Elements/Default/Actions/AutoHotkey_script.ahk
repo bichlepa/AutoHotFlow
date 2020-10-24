@@ -36,16 +36,16 @@ Element_getElementLevel_Action_AutoHotKey_script()
 	return "Programmer"
 }
 
+;Icon path which will be shown in the background of the element
+Element_getIconPath_Action_AutoHotKey_script()
+{
+}
+
 ;How stable is this element? Experimental elements will be marked and can be hidden by user.
 Element_getStabilityLevel_Action_AutoHotKey_script()
 {
 	;"Stable" or "Experimental"
 	return "Experimental"
-}
-
-;Icon path which will be shown in the background of the element
-Element_getIconPath_Action_AutoHotKey_script()
-{
 }
 
 ;Returns an array of objects which describe all controls which will be shown in the element settings GUI

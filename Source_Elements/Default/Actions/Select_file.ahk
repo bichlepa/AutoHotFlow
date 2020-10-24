@@ -1,37 +1,54 @@
 ﻿;Always add this element class name to the global list
 x_RegisterElementClass("Action_Select_file")
 
-Element_getPackage_Action_Select_file()
-{
-	return "default"
-}
-
+;Element type of the element
 Element_getElementType_Action_Select_file()
 {
 	return "action"
 }
 
+;Name of the element
+Element_getName_Action_Select_file()
+{
+	return lang("Select_file")
+}
+
+;Category of the element
+Element_getCategory_Action_Select_file()
+{
+	return lang("User_interaction") "|" lang("Files")
+}
+
+;This function returns the package of the element.
+;This is a reserved function for future releases,
+;where it will be possible to install additional add-ons which provide more elements.
+Element_getPackage_Action_Select_file()
+{
+	return "default"
+}
+
+;Minimum user experience to use this element.
+;Elements which are complicated or rarely used by beginners should not be visible to them.
+;This will help them to get started with AHF
 Element_getElementLevel_Action_Select_file()
 {
 	;"Beginner" or "Advanced" or "Programmer"
 	return "Beginner"
 }
 
-Element_getName_Action_Select_file()
-{
-	return lang("Select_file")
-}
-
+;Icon path which will be shown in the background of the element
 Element_getIconPath_Action_Select_file()
 {
-	return "Source_elements\default\icons\New variable.png"
 }
 
-Element_getCategory_Action_Select_file()
+;How stable is this element? Experimental elements will be marked and can be hidden by user.
+Element_getStabilityLevel_Action_Select_file()
 {
-	return lang("User_interaction") "|" lang("Files")
+	;"Stable" or "Experimental"
+	return "Stable"
 }
 
+;Returns an array of objects which describe all controls which will be shown in the element settings GUI
 Element_getParametrizationDetails_Action_Select_file(Environment)
 {
 	parametersToEdit:=Object()
@@ -55,6 +72,7 @@ Element_getParametrizationDetails_Action_Select_file(Environment)
 	return parametersToEdit
 }
 
+;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Select_file(Environment, ElementParameters)
 {
 	global
@@ -62,7 +80,11 @@ Element_GenerateName_Action_Select_file(Environment, ElementParameters)
 	
 }
 
-CheckSettingsActionSelect_file(ID)
+;Called every time the user changes any parameter.
+;This function allows to check the integrity of the parameters. For example you can:
+;- Disable options which are not available because of other options
+;- Correct misconfiguration
+Element_CheckSettings_Action_Select_file(ID)
 {
 	if (ElementParameters.MultiSelect = True)
 	{
@@ -84,6 +106,8 @@ CheckSettingsActionSelect_file(ID)
 	}
 }
 
+;Called when the element should execute.
+;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Select_file(Environment, ElementParameters)
 {
 	;~ d(ElementParameters, "element parameters")
@@ -152,6 +176,15 @@ Element_run_Action_Select_file(Environment, ElementParameters)
 	x_SetExecutionValue(Environment, "Varname", Varname)
 	x_ExecuteInNewAHKThread(Environment, functionObject, code, inputVars, outputVars)
 }
+
+;Called when the execution of the element should be stopped.
+;If the task in Element_run_...() takes more than several seconds, then it is up to you to make it stoppable.
+Element_stop_Action_Select_file(Environment, ElementParameters)
+{
+	; TODO stop ahk thread
+}
+
+
 
 Action_Select_file_FinishExecution(Environment, values, ElementParameters)
 {

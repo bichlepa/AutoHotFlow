@@ -198,10 +198,7 @@ Element_stop_Condition_Window_Exists(Environment, ElementParameters)
 }
 
 
-
-
-
-
+; opens the assistant for getting window information
 Condition_Window_Exists_ButtonWindowAssistant()
 {
 	x_assistant_windowParameter({wintitle: "Wintitle", excludeTitle: "excludeTitle", winText: "winText", FindHiddenText: "FindHiddenText", ExcludeText: "ExcludeText", ahk_class: "ahk_class", ahk_exe: "ahk_exe", ahk_id: "ahk_id", ahk_pid: "ahk_pid", FindHiddenWindow: "FindHiddenWindow"})

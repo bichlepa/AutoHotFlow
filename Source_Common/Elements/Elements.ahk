@@ -2,6 +2,52 @@
 Element_Register_Element_Class(p_class)
 {
 	AllElementClasses := _getSharedProperty("AllElementClasses")
+
+	if (not isFunc("Element_getElementType_" p_class))
+	{
+		logger("A0", "Element class " p_class " is not fully implemented. Missing function: Element_getParametrizationDetails_" p_class "()", ,true)
+		return
+	}
+	elementType := Element_getElementType_%p_class%()
+	requiredFunctions := []
+	requiredFunctions.push("Element_getElementType_")
+	requiredFunctions.push("Element_getName_")
+	requiredFunctions.push("Element_getCategory_")
+	requiredFunctions.push("Element_getPackage_")
+	requiredFunctions.push("Element_getElementLevel_")
+	requiredFunctions.push("Element_getIconPath_")
+	requiredFunctions.push("Element_getStabilityLevel_")
+	requiredFunctions.push("Element_getParametrizationDetails_")
+	requiredFunctions.push("Element_GenerateName_")
+	requiredFunctions.push("Element_CheckSettings_")
+
+	if (elementType = "action" or elementType = "condition" or elementType = "loop")
+	{
+		requiredFunctions.push("Element_run_")
+		requiredFunctions.push("Element_stop_")
+	}
+	else if (elementType = "trigger")
+	{
+		requiredFunctions.push("Element_enable_")
+		requiredFunctions.push("Element_postTrigger_")
+		requiredFunctions.push("Element_disable_")
+	}
+	Else
+	{
+		logger("A0", "Element class " p_class " is of not supported type: " elementType, ,true)
+		return
+	}
+
+	for oneindex, oneRequiredFunction in requiredFunctions
+	{
+		if (not isFunc(oneRequiredFunction p_class))
+		{
+			logger("A0", "Element class " p_class " is not fully implemented. Missing function: " oneRequiredFunction p_class "()", ,true)
+			return
+		}
+	}
+
+
 	AllElementClasses.push(p_class)
 	_setSharedProperty("AllElementClasses", AllElementClasses)
 }

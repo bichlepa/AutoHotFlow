@@ -76,8 +76,6 @@ Element_CheckSettings_Trigger_Shortcut(Environment, ElementParameters)
 	
 }
 
-
-
 ;Called when the trigger is activated
 Element_enable_Trigger_Shortcut(Environment, ElementParameters)
 {

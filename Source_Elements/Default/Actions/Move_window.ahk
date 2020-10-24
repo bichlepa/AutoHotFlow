@@ -259,14 +259,13 @@ Element_stop_Action_Move_Window(Environment, ElementParameters)
 
 
 
-
-
-
+; opens the assistant for getting window information
 Action_Move_Window_ButtonWindowAssistant()
 {
 	x_assistant_windowParameter({wintitle: "Wintitle", excludeTitle: "excludeTitle", winText: "winText", FindHiddenText: "FindHiddenText", ExcludeText: "ExcludeText", ahk_class: "ahk_class", ahk_exe: "ahk_exe", ahk_id: "ahk_id", ahk_pid: "ahk_pid", FindHiddenWindow: "FindHiddenWindow"})
 }
 
+; opens the assistant for getting coordinates
 Action_Move_Window_ButtonGetWinPosAssistant()
 {
 	x_assistant_windowParameter({Xpos: "Xpos", Ypos: "Ypos", Width: "Width", Height: "Height"})
