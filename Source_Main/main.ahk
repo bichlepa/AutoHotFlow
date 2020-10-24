@@ -441,6 +441,7 @@ Thread_StartExecution()
 
 ;Find saved flows and enable triggers depending on the settings
 FindFlows()
+EnableLoadedFlows()
 
 ;Refill the treeview of the manager
 API_manager_TreeView_Refill()
@@ -499,7 +500,7 @@ queryTasks()
 			}
 			if (name = "StartElementAhkThread")
 			{
-				Thread_StartElemenThread(oneTask.UniqueID, oneTask.code)
+				Thread_StartElemenThread(oneTask.UniqueID, oneTask.code, oneTask.notifyWhenStopped)
 			}
 			if (name = "StopElementAhkThread")
 			{
@@ -531,6 +532,9 @@ if (_exiting != true) ;Prevent multiple execution of this code by setting this f
 	_exiting := true
 	;Save unsaved flows.
 	i_SaveUnsavedFlows()
+
+	; stop all element threads
+	Thread_stopAllElementThreads()
 
 	; tell other ahk threads that they must close
 	; (especially stop entering critical sections. If a thread exits while it is in a critical section, other threads will freeze)

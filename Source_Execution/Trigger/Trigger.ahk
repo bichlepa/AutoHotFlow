@@ -62,13 +62,15 @@ enableTriggers(p_FlowID)
 		}
 	}
 
-	logger("a1", "Flow " FlowName " disabled")
-
 	; set the flow property "enabled" to "true"
 	_setFlowProperty(p_FlowID, "enabled", true)
+
+	; save changed enabling state
+	SaveFlowMetaData(p_FlowID)
+
 	_LeaveCriticalSection()
 	
-	logger("a1", "Flow " _getFlowProperty(p_FlowID, "name") " enabled")
+	logger("a1", "Flow " FlowName " enabled")
 }
 
 ; enable a single trigger
@@ -147,12 +149,15 @@ disableTriggers(p_FlowID)
 		}
 	}
 
-	logger("a1", "Flow " FlowName " disabled")
-	
 	; set the flow property "enabled" to "false"
 	_setFlowProperty(p_FlowID, "enabled", false)
 
+	; save changed enabling state
+	SaveFlowMetaData(p_FlowID)
+
 	_LeaveCriticalSection()
+
+	logger("a1", "Flow " FlowName " disabled")
 }
 
 ; disable a single trigger
@@ -204,7 +209,7 @@ disableOneTrigger(p_FlowID, p_ElementID, p_save = true)
 }
 
 ; disable a single trigger (reusable code)
-justDisableOneTrigger(p_Flow, p_ElementID, p_EnabledTriggerID)
+justDisableOneTrigger(p_FlowID, p_ElementID, p_EnabledTriggerID)
 {
 	_EnterCriticalSection()
 
@@ -218,11 +223,11 @@ justDisableOneTrigger(p_Flow, p_ElementID, p_EnabledTriggerID)
 		environment := {flowID: p_FlowID, elementID: p_ElementID}
 		Element_disable_%tempElementClass%(environment, triggerPars)
 		_setElementProperty(p_FlowID, p_ElementID, "enabled", false)
-		_setFlowProperty(p_FlowID, "draw.mustdraw", false)
+		_setFlowProperty(p_FlowID, "draw.mustdraw", true)
 	}
 	else
 	{
-		logger("a0", "Trigger " p_ElementID " cannot be disabled (missing implementation)")
+		logger("a0", "Trigger " p_ElementID " of class " tempElementClass " cannot be disabled (missing implementation)")
 	}
 
 	; delete the enabled trigger

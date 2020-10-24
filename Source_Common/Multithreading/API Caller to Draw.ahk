@@ -3,7 +3,7 @@
 ; tells the draw thread that it needs to redraw the image in the editor for a flow
 API_Draw_Draw(p_FlowID)
 {
-	logger("t2", A_ThisFunc " called from thread", _ahkThreadID)
+	logger("t3", A_ThisFunc " called from thread", _ahkThreadID)
 	
 	_setFlowProperty(p_FlowID, "draw.mustDraw", true)
 }

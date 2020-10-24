@@ -1,4 +1,5 @@
-﻿allTreeViewItems := Object()
+﻿global global_allTreeViewItems := Object()
+global global_Treeview_currentIcons := Object()
 
 ; Initialize the manager gui. Does not show it.
 init_Manager_GUI()
@@ -115,9 +116,8 @@ Enable_Manager_GUI()
 updateFlowIcons_Manager_GUI()
 {
 	global 
-	static currentIcons:=Object()
-	static currentLabelButtonRun:=""
-	static currentLabelButtonEnable:=""
+	static currentLabelButtonRun := ""
+	static currentLabelButtonEnable := ""
 	
 	;TODO: Skip if manger gui is hidden
 
@@ -139,33 +139,33 @@ updateFlowIcons_Manager_GUI()
 		local flowTV := _getFlowProperty(forFlowID, "tv")
 		if (_getFlowProperty(forFlowID, "executing") = True)
 		{
-			if (currentIcons[forFlowID]!=Icon_Running)
+			if (global_Treeview_currentIcons[forFlowID] != Icon_Running)
 			{
 				TV_Modify(flowTV, Icon_Running)
-				currentIcons[forFlowID]:=Icon_Running
+				global_Treeview_currentIcons[forFlowID] := Icon_Running
 			}
 		}
 		else if (_getFlowProperty(forFlowID, "enabled") = true)
 		{
-			if (currentIcons[forFlowID]!=Icon_Enabled)
+			if (global_Treeview_currentIcons[forFlowID] != Icon_Enabled)
 			{
 				TV_Modify(flowTV, Icon_Enabled)
-				currentIcons[forFlowID]:=Icon_Enabled
+				global_Treeview_currentIcons[forFlowID] := Icon_Enabled
 			}
 		}
 		else
 		{
-			if (currentIcons[forFlowID]!=Icon_Disabled)
+			if (global_Treeview_currentIcons[forFlowID] != Icon_Disabled)
 			{
 				TV_Modify(flowTV, Icon_Disabled)
-				currentIcons[forFlowID]:=Icon_Disabled
+				global_Treeview_currentIcons[forFlowID] := Icon_Disabled
 			}
 		}
 		
 	}
 	
 	; If a flow is selected, change tha labels of some buttons
-	local selectedFlowID := allTreeViewItems[TV_GetSelection()].id
+	local selectedFlowID := global_allTreeViewItems[TV_GetSelection()].id
 	if (_getFlowProperty(selectedFlowID, "executing") = True)
 	{
 		if (currentLabelButtonRun != "stop")
@@ -214,8 +214,8 @@ TreeView_manager_Refill()
 	
 	; Before deleting the tree view, get the selected item, in order to reselect it later
 	local tempselectedTV := TV_GetSelection()
-	local tempselectedID := allTreeViewItems[tempselectedTV].id
-	local tempselectedType := allTreeViewItems[tempselectedTV].type
+	local tempselectedID := global_allTreeViewItems[tempselectedTV].id
+	local tempselectedType := global_allTreeViewItems[tempselectedTV].type
 	
 	; Disable gui to prevent errors if user interacts with the gui during the update
 	guicontrol, disable,TreeView_manager
@@ -267,7 +267,10 @@ TreeView_manager_Refill()
 
 	_LeaveCriticalSection()
 
-	guicontrol, enable,TreeView_manager
+	; the icons need to be reassigned after a refill
+	global_Treeview_currentIcons := []
+
+	guicontrol, enable, TreeView_manager
 }
 
 ;Add an entry to the tree view
@@ -331,7 +334,7 @@ TreeView_manager_AddEntry(par_Type, par_ID)
 	}
 
 	; Add the tree view entry to a list for later use
-	allTreeViewItems[newTV] := {id: par_ID, type: par_Type}
+	global_allTreeViewItems[newTV] := {id: par_ID, type: par_Type}
 	return newTV
 }
 
@@ -409,8 +412,8 @@ TreeView_manager()
 
 	; get information about the selected item
 	local tempselectedTV := TV_GetSelection()
-	local tempselectedID := allTreeViewItems[tempselectedTV].id
-	local tempselectedType := allTreeViewItems[tempselectedTV].type
+	local tempselectedID := global_allTreeViewItems[tempselectedTV].id
+	local tempselectedType := global_allTreeViewItems[tempselectedTV].type
 	
 	if (A_GuiEvent = "e") ;If user has renamed an entry
 	{
@@ -568,8 +571,8 @@ managerGuiContextMenu()
 	
 	;Find out what is selected
 	tempselectedTV := TV_GetSelection()
-	tempselectedID := allTreeViewItems[tempselectedTV].id
-	tempselectedType := allTreeViewItems[tempselectedTV].type
+	tempselectedID := global_allTreeViewItems[tempselectedTV].id
+	tempselectedType := global_allTreeViewItems[tempselectedTV].type
 	
 	;Build the menu
 	if (tempselectedType = "flow")
@@ -644,8 +647,8 @@ KeyReload()
 
 	;Find out what is selected in order to reselect it later
 	local tempselectedTV := TV_GetSelection()
-	local tempselectedID := allTreeViewItems[tempselectedTV].id
-	local tempselectedType := allTreeViewItems[tempselectedTV].type
+	local tempselectedID := global_allTreeViewItems[tempselectedTV].id
+	local tempselectedType := global_allTreeViewItems[tempselectedTV].type
 	
 	; refill the tree view
 	TreeView_manager_Refill()
@@ -682,9 +685,9 @@ Button_manager_NewFlow()
 	if (tempSelectedTV != 0) ;If an element is selected
 	{
 		;Create new flow in the category of selected element
-		local tempSelectedID := allTreeViewItems[tempSelectedTV].id
+		local tempSelectedID := global_allTreeViewItems[tempSelectedTV].id
 		
-		if (allTreeViewItems[tempSelectedTV].type = "Category")
+		if (global_allTreeViewItems[tempSelectedTV].type = "Category")
 		{
 			; a category is selected. Insert the new flow in this category
 			if (tempSelectedID = "uncategorized")
@@ -692,10 +695,10 @@ Button_manager_NewFlow()
 			else
 				NewFlowID := NewFlow(tempSelectedID)
 		}
-		else if (allTreeViewItems[tempSelectedTV].type = "Flow")
+		else if (global_allTreeViewItems[tempSelectedTV].type = "Flow")
 		{
 			; a flow is selected. Insert the new flow in its category
-			tempSelectedID := allTreeViewItems[TV_GetParent(tempSelectedTV)].id
+			tempSelectedID := global_allTreeViewItems[TV_GetParent(tempSelectedTV)].id
 			if (tempSelectedID = "uncategorized")
 				NewFlowID := NewFlow() ; do not pass the "uncategorized" category. It means, that the flow does not have a category
 			else
@@ -740,10 +743,10 @@ Button_manager_ChangeCategory()
 	; get the selected tv item
 	local tempSelectedTV := TV_GetSelection()
 
-	if (allTreeViewItems[tempselectedTV].type = "flow") ;this can only be performed on flows
+	if (global_allTreeViewItems[tempselectedTV].type = "flow") ;this can only be performed on flows
 	{
 		; change the category of the selected flow
-		changeFlowCategory_GUI(allTreeViewItems[tempselectedTV].id)
+		changeFlowCategory_GUI(global_allTreeViewItems[tempselectedTV].id)
 	}
 	else
 	{
@@ -760,8 +763,8 @@ Button_manager_DuplicateFlow()
 	
 	; get information of the selected tv item
 	local tempselectedTV := TV_GetSelection()
-	local tempselectedID := allTreeViewItems[tempselectedTV].id
-	local tempselectedType := allTreeViewItems[tempselectedTV].type
+	local tempselectedID := global_allTreeViewItems[tempselectedTV].id
+	local tempselectedType := global_allTreeViewItems[tempselectedTV].type
 	
 	if (tempselectedType = "flow") ;this can only be performed on flows
 	{
@@ -799,7 +802,7 @@ Button_manager_EditFlow()
 {
 	global
 	;open flow editor
-	editFlow(allTreeViewItems[TV_GetSelection()].id)
+	editFlow(global_allTreeViewItems[TV_GetSelection()].id)
 }
 
 ; when user clicks on button "run flow"
@@ -807,7 +810,7 @@ Button_manager_RunFlow()
 {
 	global
 	; start or stop flow
-	ExecuteToggleFlow(allTreeViewItems[TV_GetSelection()].id)
+	ExecuteToggleFlow(global_allTreeViewItems[TV_GetSelection()].id)
 }
 
 ; when user clicks on button "enable flow"
@@ -815,7 +818,7 @@ Button_manager_EnableFlow()
 {
 	global
 	; enable or disable flow
-	EnabletoggleFlow(allTreeViewItems[TV_GetSelection()].id)
+	EnabletoggleFlow(global_allTreeViewItems[TV_GetSelection()].id)
 }
 
 ; when user clicks on button "delete"
@@ -827,8 +830,8 @@ Button_manager_Delete()
 
 	; get information about the selected item
 	local tempselectedTV := TV_GetSelection()
-	local tempselectedID := allTreeViewItems[tempselectedTV].id
-	local tempselectedType := allTreeViewItems[tempselectedTV].type
+	local tempselectedID := global_allTreeViewItems[tempselectedTV].id
+	local tempselectedType := global_allTreeViewItems[tempselectedTV].type
 	
 	if (tempselectedType = "flow") ;if a flow should be deleted
 	{

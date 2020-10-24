@@ -26,11 +26,11 @@ API_Main_StartEditor(par_FlowID)
 
 ; tells the main thread that it has to start a new element AHK thread
 ; such threads are used for some triggers and elements
-API_Main_StartElementAhkThread(par_UniqueID, par_code)
+API_Main_StartElementAhkThread(par_UniqueID, par_code, par_notifyWhenStopped)
 {
 	logger("t2", A_ThisFunc " called from thread", _ahkThreadID)
 	
-	_setTask("main", {name: "StartElementAhkThread", uniqueID: par_UniqueID, code: par_code})
+	_setTask("main", {name: "StartElementAhkThread", uniqueID: par_UniqueID, code: par_code, notifyWhenStopped: par_notifyWhenStopped})
 }
 
 ; tells the main thread that it has to stop an element AHK thread

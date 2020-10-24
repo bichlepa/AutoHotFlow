@@ -52,6 +52,29 @@ FindFlows()
 	}
 }
 
+; enables all triggers which should be enabled
+; should be called after the flows werde loaded
+EnableLoadedFlows()
+{
+	allFlowIDs := _getAllFlowIds()
+	; loop through all flows
+	for oneFlowIndex, oneFlowID in allFlowIDs
+	{
+		; loop through all elements
+		allElementIDs := _getAllElementIds(oneFlowID)
+		for oneElementIndex, oneElementID in allElementIDs
+		{
+			; check whether this is an enabled trigger
+			oneElementEnabled := _getElementProperty(oneFLowID, oneElementID, "enabled")
+			if (oneElementEnabled)
+			{
+				; enable the trigger without saving its state
+				enableOneTrigger(oneFlowID, oneElementID, false)
+			}
+		}
+	}
+}
+
 ;Create a new flow. Also create a new file for a flow
 ; returns the new flow ID
 NewFlow(p_CategoryID = "", p_flowID = "")

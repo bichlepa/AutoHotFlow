@@ -121,29 +121,77 @@ Thread_StartExecution()
 	return threadID
 }
 
-
-Thread_StartElemenThread(uniqueID, code)
+; start an element thread
+Thread_StartElemenThread(uniqueID, code, notifyWhenStopped)
 {
 	threadID := "element_" uniqueID
 	logger("t1", "Starting element thread. ID: " threadID)
-	newThread := AhkThread(code)
 
-	global_AllThreads[threadID] := {permanent: true, type: "Element", thread: newThread, uniqueID: uniqueID}
+	newThread := AhkThread(code)
+	global_AllThreads[threadID] := {permanent: true, type: "Element", thread: newThread, uniqueID: uniqueID, notifyWhenStopped: notifyWhenStopped}
 
 	logger("t1", "Element thread started")
 }
+
+
+; stop an element thread
 Thread_StopElemenThread(uniqueID)
 {
 	threadID := "element_" uniqueID
+	
+	logger("t1", "Stopping element thread. ID: " threadID)
 
 	threadpars := global_AllThreads[threadID]
-	if (threadpars.thread.ahkReady())
+
+	; notify the element hat it should stop
+	threadpars.thread.ahkFunction("ahf_exitapp")
+
+	; prepare for killing the thread, if it does not stop itself
+	settimer, Thread_KillElemenThreadIfNotStopped, -500
+	threadpars.thread.kill := true
+}
+
+; kill element thread if it is not stopped
+Thread_KillElemenThreadIfNotStopped()
+{
+	; loop through all threads
+	threadsCopy := global_Allthreads.clone()
+	for threadID, threadpars in threadsCopy
 	{
-		logger("t1", "Killing thread " threadID)
-		threadpars.thread.ahkterminate(100)
-		if (threadpars.thread.ahkReady())
+		; check whether the thread needs to be killed
+		if (threadpars.thread.kill)
 		{
-			logger("t0", "Killing thread " threadID " failed")
+			; check whether the thread still runs
+			if (threadpars.thread.ahkReady())
+			{
+				; kill the thread
+				logger("t1", "Killing thread " threadID)
+				threadpars.thread.ahkterminate(100)
+				if (threadpars.thread.ahkReady())
+				{
+					logger("t0", "Killing thread " threadID " failed")
+				}
+			}
+		}
+	}
+}
+
+; stop all element threads
+Thread_stopAllElementThreads()
+{
+	logger("t1", "Stopping all element threads")
+	threadsCopy := global_Allthreads.clone()
+	for threadID, threadpars in threadsCopy
+	{
+		; only perform on element threads
+		if (threadpars.type = "element")
+		{
+			; check whether the thread still runs
+			if (threadpars.thread.ahkReady())
+			{
+				; notify the element hat it should stop
+				threadpars.thread.ahkFunction("ahf_exitapp")
+			}
 		}
 	}
 }
@@ -171,11 +219,16 @@ Thread_KillAll()
 
 ; called when a thread has terminated itself
 Thread_Stopped(par_ThreadID)
-{
+{	
+	logger("t1", "Thread  " par_ThreadID " stopped")
+
 	; if an external thread stopped, we have to inform the execution task about it
 	if (global_Allthreads[par_ThreadID].type = "element")
 	{
-		API_Execution_externaElementFinish(global_Allthreads[par_ThreadID].uniqueID)
+		if (global_Allthreads[par_ThreadID].notifyWhenStopped)
+		{
+			API_Execution_externaElementFinish(global_Allthreads[par_ThreadID].uniqueID)
+		}
 	}
 
 	; delete the thread from list
