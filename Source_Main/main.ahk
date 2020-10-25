@@ -290,6 +290,7 @@ global_libInclusionsForThreads =
 #include source_Elements\Default\triggers\Process_closes.ahk
 #include source_Elements\Default\triggers\Process_starts.ahk
 #include source_Elements\Default\triggers\Start_up.ahk
+#include source_Elements\Default\triggers\AutoHotkey_Script.ahk
 
 global_elementInclusionsForThreads = 
 (
@@ -427,6 +428,7 @@ global_elementInclusionsForThreads =
 #include source_Elements\Default\triggers\Process_closes.ahk
 #include source_Elements\Default\triggers\Process_starts.ahk
 #include source_Elements\Default\triggers\Start_up.ahk
+#include source_Elements\Default\triggers\AutoHotkey_Script.ahk
 
 )
 
@@ -512,7 +514,7 @@ queryTasks()
 			}
 			if (name = "elementAhkThreadTrigger")
 			{
-				API_Execution_externalTrigger(oneTask.UniqueID)
+				API_Execution_externalTrigger(oneTask.UniqueID, oneTask.iteration)
 			}
 		}
 		else

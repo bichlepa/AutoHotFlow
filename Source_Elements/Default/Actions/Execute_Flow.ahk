@@ -223,7 +223,7 @@ Element_run_Action_Execute_Flow(Environment, ElementParameters)
 	
 	if (ElementParameters.SendLocalVars = True)
 	{
-		Variables:=x_ExportAllInstanceVars(Environment)
+		Variables := x_ExportAllInstanceVars(Environment)
 	}
 	if (ElementParameters.WaitToFinish)
 	{
@@ -253,7 +253,6 @@ Element_stop_Action_Execute_Flow(Environment, ElementParameters)
 ; if parameter WaitToFinish is set, this funciton will be called when the remote flow finishes
 Action_Execute_Flow_FunctionExecutionFinished(Environment, p_result, p_variables, ElementParameters)
 {
-	functionObject:=x_getExecutionValue(Environment, "functionObject")
 	if (ElementParameters.ReturnVariables)
 		x_ImportInstanceVars(Environment, p_variables)
 	return x_finish(Environment,"normal")

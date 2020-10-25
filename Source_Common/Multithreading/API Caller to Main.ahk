@@ -52,8 +52,8 @@ API_Main_ElementThread_Stopped(par_UniqueID)
 
 ; tells the main thread that an element (of type trigger) AHK thread wants to trigger a flow
 ; this function is called from the external AHK thread
-API_Main_ElementThread_Trigger(par_UniqueID)
+API_Main_ElementThread_Trigger(par_UniqueID, par_iteration)
 {
 	logger("t2", A_ThisFunc " called from thread", _ahkThreadID)
-	_setTask("main", {name: "elementAhkThreadTrigger", uniqueID: par_UniqueID})
+	_setTask("main", {name: "elementAhkThreadTrigger", uniqueID: par_UniqueID, iteration: par_iteration})
 }

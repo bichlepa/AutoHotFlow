@@ -176,6 +176,7 @@
         "Process_closes.ahk",
         "Process_starts.ahk",
 
-        "Start_up.ahk"
+        "Start_up.ahk",
+        "AutoHotkey_Script.ahk"
     ]
 }

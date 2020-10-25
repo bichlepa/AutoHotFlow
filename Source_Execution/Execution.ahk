@@ -145,7 +145,7 @@ queryTasks()
 			if (name = "externalTrigger")
 			{
 				; an external trigger which is executing in a separate ahk thread has triggered
-				ExecuteInNewAHKThread_trigger(oneTask.UniqueID)
+				ExecuteInNewAHKThread_trigger(oneTask.UniqueID, oneTask.iteration)
 			}
 		}
 		else

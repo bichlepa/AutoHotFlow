@@ -2,7 +2,7 @@
 global global_ThreadIdCounter := 0
 
 ; Starts a new execution instance
-newInstance(p_Environment, p_params = "")
+newInstance(p_Environment, p_params = "", p_instanceProperties = "")
 {
 	_EnterCriticalSection()
 
@@ -67,26 +67,25 @@ newInstance(p_Environment, p_params = "")
 			; create a first thread
 			newThreadID := newThread(newInstanceId)
 			_setThreadProperty(newInstanceId, newThreadID, "ElementID", oneElementID)
-			if (p_Environment.threadID)
+			
+			; We may need to import some instance variables
+			if (p_params.varstoPass)
 			{
-				; if we have a thread ID in the environment, that means that this instance was startet from an other thread (in this or an other flow)
-				; The other thread may have some information which we want to import to the new thread
-
-				; todo: what are those vars?
-				varsExportedFromExternalThread := _getThreadProperty(p_Environment.InstanceId, p_Environment.ThreadID, "varsExportedFromExternalThread")
-				_setThreadProperty(newInstanceId, newThreadID, "varsExportedFromExternalThread", varsExportedFromExternalThread)
-				
-				; We may need to import some variables from the other thread
-				varstoPass := _getThreadProperty(p_Environment.InstanceId, p_Environment.ThreadID, "params.varstoPass")
-				if (varstoPass)
+				for onevarName, oneValue in p_params.varstoPass
 				{
-					for onevarName, oneValue in varstoPass
-					{
-						InstanceVariable_Set(newThread, onevarName, oneValue)
-					}
+					InstanceVariable_Set({instanceID: newInstanceId, threadID: newThreadID}, onevarName, oneValue)
 				}
 			}
-
+			
+			; We may need to import some variables
+			if (p_instanceProperties)
+			{
+				for onevarName, oneValue in p_instanceProperties
+				{
+					_setInstanceProperty(newInstanceId, onevarName, oneValue)
+				}
+			}
+			
 			; to start the execution of elements which are connected to the trigger, we will reuse code which is executed when an element finishes it execution.
 			finishExecutionOfElement(newInstanceId, newThreadID, "Normal")
 
@@ -99,7 +98,7 @@ newInstance(p_Environment, p_params = "")
 			ElementClass := _getElementProperty(p_Environment.FlowID, p_Environment.ElementID, "class")
 			if (isfunc("Element_postTrigger_" ElementClass))
 			{
-				Element_postTrigger_%ElementClass%(newThread, p_params)
+				Element_postTrigger_%ElementClass%({instanceID: newInstanceId, threadID: newThreadID}, p_params)
 			}
 			
 			; updates the "executing" property of the flow

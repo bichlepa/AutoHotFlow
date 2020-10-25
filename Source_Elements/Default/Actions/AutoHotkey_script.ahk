@@ -55,9 +55,9 @@ Element_getParametrizationDetails_Action_AutoHotKey_script(Environment)
 	parametersToEdit.push({type: "Label", label: lang("AutoHotKey_script"), WarnIfEmpty: true})
 	parametersToEdit.push({type: "multilineEdit", id: "Script", default: "", WarnIfEmpty: false})
 	parametersToEdit.push({type: "Label", label: lang("Variables_that_should_be_imported_to_script_prior_to_execution")})
-	parametersToEdit.push({type: "edit", id: "ExportVariables", multiline: true})
-	parametersToEdit.push({type: "Label", label: lang("Variables_that_should_be_exported_from_script_after_execution")})
 	parametersToEdit.push({type: "edit", id: "ImportVariables", multiline: true})
+	parametersToEdit.push({type: "Label", label: lang("Variables_that_should_be_exported_from_script_after_execution")})
+	parametersToEdit.push({type: "edit", id: "ExportVariables", multiline: true})
 	
 	
 	return parametersToEdit
@@ -111,7 +111,7 @@ Element_run_Action_AutoHotKey_script(Environment, ElementParameters)
 	functionObject := x_NewExecutionFunctionObject(Environment, "Action_AutoHotKey_script_FinishExecution", ElementParameters)
 	x_SetExecutionValue(Environment, "functionObject", functionObject)
 	x_SetExecutionValue(Environment, "Varname", Varname)
-	x_ExecuteInNewAHKThread(Environment, functionObject, ElementParameters.script, inputVars, outputVars)
+	x_ExecuteInNewAHKThread(Environment, functionObject, script, inputVars, outputVars)
 	
 }
 

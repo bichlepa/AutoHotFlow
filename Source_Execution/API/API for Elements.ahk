@@ -657,12 +657,12 @@ x_TriggerInNewAHKThread(Environment, p_Code, p_VarsToImport, p_VarsToExport)
 	; We will need the parent thread (the execution thread) in order to directly call a function there
 	preCode .= "ahf_parentAHKThread := AhkExported()`n"
 	; set all variables from p_VarsToImport. since we access a shared variable, use critical section
-	;preCode .= "EnterCriticalSection(ahf_cs_shared)`n"
+	preCode .= "EnterCriticalSection(ahf_cs_shared)`n"
 	preCode .= "for ahf_varname, ahf_varvalue in ahf_sharedObject.varsToImport`n"
 	preCode .= "{`n"
-	preCode .= "  %ahf_varname%:=ahf_VarValue`n"
+	preCode .= "  %ahf_varname% := ahf_VarValue`n"
 	preCode .= "}`n"
-	;preCode .= "LeaveCriticalSection(ahf_cs_shared)`n"
+	preCode .= "LeaveCriticalSection(ahf_cs_shared)`n"
 	
 	; define some code which will be appended after p_Code
 	postcode := ""
@@ -671,13 +671,20 @@ x_TriggerInNewAHKThread(Environment, p_Code, p_VarsToImport, p_VarsToExport)
 	; define function which needs to be called in order to trigger the trigger
 	postcode .= "x_trigger()`n"
 	postcode .= "{`n"
-	postcode .= "global`n"
+	postcode .= "global`n"^
+	; we will write values from each trigger event separated. For this we need those variables
+	postcode .= "static ahf_iteration := 0`n"
+	postcode .= "local thisIteration := ++ahf_iteration`n"
+	postcode .= "ahf_sharedObject.varsExported[thisIteration] := []`n"
 	; set all variables from p_VarsToExport. since we access a shared variable, use critical section
-	;postcode .= "EnterCriticalSection(ahf_cs_shared)`n"
-	postcode .= "for ahf_varindex, ahf_varname in ahf_sharedObject.varsToExport`n{`n  ahf_sharedObject.varsExported[ahf_varname]:=%ahf_varname%`n}`n"
-	;postcode .= "LeaveCriticalSection(ahf_cs_shared)`n"
+	postcode .= "EnterCriticalSection(ahf_cs_shared)`n"
+	postcode .= "for ahf_varindex, ahf_varname in ahf_sharedObject.varsToExport`n"
+	postcode .= "{`n"
+	postcode .= "  ahf_sharedObject.varsExported[thisIteration][ahf_varname] := %ahf_varname%`n"
+	postcode .= "}`n"
+	postcode .= "LeaveCriticalSection(ahf_cs_shared)`n"
 	; call a function from parent thread to notify it that it has finished
-	postcode .= "ahf_parentAHKThread.ahkFunction(""API_Main_ElementThread_Trigger"", ahf_uniqueID)`n"
+	postcode .= "ahf_parentAHKThread.ahkFunction(""API_Main_ElementThread_Trigger"", ahf_uniqueID, thisIteration)`n"
 	postcode .= "}`n"
 	; define function ahf_exitapp which will be called if the thread needs to be stopped
 	postcode .= "ahf_exitapp()`n{`nsettimer, ahf_exitapp_Label, -1000`n}`n"
@@ -707,28 +714,26 @@ x_TriggerInNewAHKThread_Stop(Environment)
 }
 
 ; called when a trigger which is running in an separate ahk-thread triggers
-ExecuteInNewAHKThread_trigger(p_uniqueID)
+ExecuteInNewAHKThread_trigger(p_uniqueID, p_iteration)
 {
 	_EnterCriticalSection()
 	; get the environment variable.
 	Environment := global_AllActiveTriggerIDs[p_uniqueID].environment
 	; get the variables which the trigger has passed.
 	; TODO: Does it work, if trigger tirggers multiple times at once?
-	varsExportedFromExternalThread := _getSharedProperty("temp." p_uniqueID ".sharedObject.varsExported")
-	; TODO: what?? does the enviroment variable contain einstance and thread ID? 
-	_setThreadProperty(Environment.InstanceID, Environment.ThreadID, "varsExportedFromExternalThread", varsExportedFromExternalThread)
-
+	varsExportedFromExternalThread := _getSharedProperty("temp." p_uniqueID ".sharedObject.varsExported." p_iteration)
+	
 	_LeaveCriticalSection()
 
 	; trigger the trigger
-	x_trigger(Environment)
+	instanceID := newInstance(Environment, , {varsExportedFromExternalThread: varsExportedFromExternalThread})
 }
 
 ; TODO: Does it work, if trigger tirggers multiple times at once?
 x_TriggerInNewAHKThread_GetExportedValues(Environment)
 {
 	_EnterCriticalSection()
-	retval := _getThreadProperty(Environment.InstanceID, Environment.ThreadID, "varsExportedFromExternalThread")
+	retval := _getInstanceProperty(Environment.InstanceID, "varsExportedFromExternalThread")
 	_LeaveCriticalSection()
 	return retval
 }

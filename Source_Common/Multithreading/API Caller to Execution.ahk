@@ -65,10 +65,10 @@ API_Execution_externaElementFinish(par_UniqueID)
 }
 
 ;When a trigger has been using a separate thread in order to execute some code, this thread calls this function
-API_Execution_externalTrigger(par_UniqueID)
+API_Execution_externalTrigger(par_UniqueID, par_iteration)
 {
 	logger("t2", A_ThisFunc " called from thread", _ahkThreadID)
 	
-	_setTask("execution", {name: "externalTrigger", uniqueID: par_UniqueID})
+	_setTask("execution", {name: "externalTrigger", uniqueID: par_UniqueID, iteration: par_iteration})
 }
 
