@@ -1,5 +1,6 @@
 ﻿global global_AllExecutionIDs := Object()
 global global_AllActiveTriggerIDs := Object()
+global global_AllActiveTriggerUniqueIDs := Object()
 
 ; execution task processing which never returns
 executionTask()
@@ -235,7 +236,7 @@ executionTask()
 		;   and we only execute one element at time
 		if (not somethingexecuted)
 		{
-			oneExecutionTask := ExecutionNextTasks.pop()
+			oneExecutionTask := ExecutionNextTasks.removeat(1)
 			if (oneExecutionTask)
 			{
 				func := oneExecutionTask.func

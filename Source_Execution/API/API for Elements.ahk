@@ -622,13 +622,14 @@ x_TriggerInNewAHKThread(Environment, p_Code, p_VarsToImport, p_VarsToExport)
 	_EnterCriticalSection()
 
 	; get unique ID of the element
-	uniqueID := Environment.flowID "_" Environment.ElementID
+	Random, randomValue
+	uniqueID := Environment.flowID "_" Environment.ElementID "_" randomValue
 
 	; write some information in the global variable
-	if not isobject(global_AllActiveTriggerIDs[uniqueID])
-		global_AllActiveTriggerIDs[uniqueID] := object()
+	global_AllActiveTriggerIDs[uniqueID] := object()
 	global_AllActiveTriggerIDs[uniqueID].ExeInNewThread := object()
 	global_AllActiveTriggerIDs[uniqueID].environment := Environment
+	global_AllActiveTriggerUniqueIDs[Environment.flowID "_" Environment.ElementID] := uniqueID
 	
 	; create a shared object which will be shared with the new ahk thread
 	sharedObject := CriticalObject()
@@ -699,7 +700,7 @@ x_TriggerInNewAHKThread(Environment, p_Code, p_VarsToImport, p_VarsToExport)
 x_TriggerInNewAHKThread_Stop(Environment)
 {
 	; get the unique ID
-	uniqueID := Environment.flowID "_" Environment.ElementID
+	uniqueID := global_AllActiveTriggerUniqueIDs[Environment.flowID "_" Environment.ElementID]
 
 	; tell the main thread to stop the element ahk thread
 	API_Main_StopElementAhkThread(uniqueID)

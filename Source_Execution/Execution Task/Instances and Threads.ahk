@@ -43,7 +43,7 @@ newInstance(p_Environment, p_params = "")
 		oneElementID := p_Environment.elementID
 		if not oneElementID
 		{
-			throw exception("trigger element ID unknown")
+			throw exception("trigger element ID unknown: " oneElementID, -1)
 		}
 		else
 		{
