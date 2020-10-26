@@ -88,13 +88,6 @@
       "to": "element0000000404",
       "type": "Connection"
     },
-    "Connection0000000449": {
-      "ConnectionType": "normal",
-      "from": "element0000000352",
-      "ID": "Connection0000000449",
-      "to": "element0000000450",
-      "type": "Connection"
-    },
     "Connection0000000452": {
       "ConnectionType": "normal",
       "from": "element0000000451",
@@ -266,6 +259,13 @@
       "ID": "connection0000000532",
       "to": "element0000000528",
       "type": "Connection"
+    },
+    "connection0000000550": {
+      "ConnectionType": "normal",
+      "from": "element0000000352",
+      "ID": "connection0000000550",
+      "to": "element0000000549",
+      "type": "Connection"
     }
   },
   "allElements": {
@@ -289,7 +289,9 @@
       "name": "Trace_Point_Check",
       "package": "default",
       "pars": {
-        "MustNotPassTracepoints": {},
+        "MustNotPassTracepoints": [
+          "Tracepoint red box (element0000000551)"
+        ],
         "MustNotPassTracepointsAll": 0,
         "MustPassTracepoints": {},
         "MustPassTracepointsAll": 1
@@ -527,22 +529,6 @@
       "x": "455",
       "y": "0"
     },
-    "element0000000450": {
-      "class": "Action_Tooltip",
-      "ID": "element0000000450",
-      "name": "Tooltip: Test successfully finished - 2 s #Seconds - Der Maus folgen",
-      "package": "action",
-      "pars": {
-        "duration": 2,
-        "follow_mouse": 1,
-        "text": "Test successfully finished",
-        "Unit": "Seconds"
-      },
-      "StandardName": 1,
-      "type": "action",
-      "x": "-105",
-      "y": "1715"
-    },
     "element0000000451": {
       "class": "Action_Trace_Point",
       "ID": "element0000000451",
@@ -716,25 +702,6 @@
       "x": "350",
       "y": "1645"
     },
-    "element0000000503": {
-      "class": "Action_Get_Mouse_Position",
-      "ID": "element0000000503",
-      "name": "Hole Mausposition",
-      "package": "default",
-      "pars": {
-        "CoordMode": "Screen",
-        "varnameControlID": "controlID",
-        "varnameWindowID": "windowID",
-        "varnameX": "posX",
-        "varnameY": "posY",
-        "WhetherGetControlID": 0,
-        "WhetherGetWindowID": 0
-      },
-      "StandardName": "1",
-      "type": "action",
-      "x": "-525",
-      "y": "245"
-    },
     "element0000000507": {
       "class": "Action_AutoHotKey_script",
       "ID": "element0000000507",
@@ -825,17 +792,48 @@
       "type": "Action",
       "x": "630",
       "y": "1610"
+    },
+    "element0000000549": {
+      "class": "Action_Tooltip",
+      "ID": "element0000000549",
+      "name": "Tooltip: Test ended successfully - 2 s #Seconds - Der Maus folgen",
+      "package": "action",
+      "pars": {
+        "duration": 2,
+        "follow_mouse": 1,
+        "text": "Test ended successfully",
+        "Unit": "Seconds"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "-210",
+      "y": "1785"
+    },
+    "element0000000551": {
+      "class": "Action_Trace_Point",
+      "ID": "element0000000551",
+      "name": "Trace_Point - Tracepoint red box",
+      "package": "default",
+      "pars": {
+        "ID": "Tracepoint red box",
+        "LogMessage": "",
+        "StopCondition": ""
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "-385",
+      "y": "1610"
     }
   },
   "category": "AHF Test",
-  "ElementIDCounter": "535",
+  "ElementIDCounter": "551",
   "flowSettings": {
     "DefaultWorkingDir": 1,
     "ExecutionPolicy": "parallel",
     "FolderOfStaticVariables": "C:\\Users\\bichl\\Documents\\git\\AutoHotFlow\\Saved Flows\\Static variables\\Huge test script",
     "Name": "Huge test script",
-    "Offsetx": "-1391.699476",
-    "Offsety": "-676.870372",
+    "Offsetx": "-1566.768634",
+    "Offsety": "302.525970",
     "WorkingDir": "C:\\Users\\Paul\\Documents\\AutoHotFlow default working direction",
     "zoomFactor": "0.605475"
   },

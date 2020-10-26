@@ -538,12 +538,12 @@
       "class": "Trigger_AutoHotkey_Script",
       "enabled": "1",
       "ID": "element0000000055",
-      "name": "AutoHotKey Skript - iteration:= 1 - loop - { - x_trigger() - sleep 10000 - }",
+      "name": "AutoHotKey Skript - iteration:= 0 - loop - { - iteration++ - x_trigger() - sleep",
       "package": "default",
       "pars": {
         "ExportVariables": "iteration",
         "ImportVariables": "",
-        "Script": "iteration:= 1\nloop\n{\nx_trigger()\nsleep 10000\n}"
+        "Script": "iteration:= 0\nloop\n{\niteration++\nx_trigger()\nsleep 10000\n}"
       },
       "StandardName": "1",
       "type": "Trigger",
@@ -568,7 +568,7 @@
     }
   },
   "category": "AHF Test",
-  "ElementIDCounter": "57",
+  "ElementIDCounter": "86",
   "flowSettings": {
     "DefaultWorkingDir": 1,
     "ExecutionPolicy": "default",

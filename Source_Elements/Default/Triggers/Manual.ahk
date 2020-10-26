@@ -54,7 +54,7 @@ Element_getParametrizationDetails_Trigger_Manual(Environment)
 {
 	parametersToEdit:=Object()
 	parametersToEdit.push({type: "Label", label: lang("ID")})
-	parametersToEdit.push({type: "Edit", id: "ID", content: "String",  default: "Trigger " x_randomPhrase()})
+	parametersToEdit.push({type: "Edit", id: "ID", content: "String",  default: "ṳᦵṩḗ╥"})
 	return parametersToEdit
 }
 
@@ -71,7 +71,8 @@ Element_GenerateName_Trigger_Manual(Environment, ElementParameters)
 ;- Correct misconfiguration
 Element_CheckSettings_Trigger_Manual(Environment, ElementParameters)
 {	
-	
+	if (ElementParameters.ID = "ṳᦵṩḗ╥")
+		x_Par_SetValue("ID", "Trigger " x_randomPhrase())
 }
 
 

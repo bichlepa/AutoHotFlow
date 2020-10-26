@@ -496,18 +496,9 @@ class Class_FunctionObject
 x_GetThreadCountInCurrentInstance(Environment)
 {
 	_EnterCriticalSection()
-
 	allThreadIDs := _getAllThreadIds(Environment.InstanceID)
-	count := 0
-	for oneinstanceIndex, oneInstanceID in allThreadIDs
-	{
-		if (oneInstanceID = Environment.InstanceID)
-		{
-			count++
-		}
-	}
 	_LeaveCriticalSection()
-	return count
+	return allThreadIDs.count()
 }
 
 

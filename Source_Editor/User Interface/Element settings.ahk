@@ -2218,6 +2218,7 @@ class ElementSettings
 
 			; the choices can be set after the control was created. We will save the initial value
 			this.par_choices := tempChoices
+			this.par_result := parameter.result
 
 			;loop through all choices. Make a selection list which is suitable for the gui,add command
 			local tempAllChoices := ""
@@ -2241,7 +2242,7 @@ class ElementSettings
 			tempAltSubmit := ""
 			if (parameter.result != "number")
 			{
-				tempAltSubmit:="altSubmit"
+				tempAltSubmit := "altSubmit"
 			}
 			
 			; create the gui elements
@@ -2272,8 +2273,17 @@ class ElementSettings
 			local tempChosenObj := Object()
 			loop, parse, tempChosen, |
 			{
-				tempChosenObj.push(A_LoopField)
+				if (this.par_result = "string")
+				{
+					; we need to write the strings
+					tempChosenObj.push(this.par_choices[A_LoopField])
+				}
+				Else
+				{
+					tempChosenObj.push(A_LoopField)
+				}
 			}
+
 
 			return tempChosenObj
 		}

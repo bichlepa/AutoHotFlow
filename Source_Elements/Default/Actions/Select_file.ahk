@@ -45,7 +45,7 @@ Element_getIconPath_Action_Select_file()
 Element_getStabilityLevel_Action_Select_file()
 {
 	;"Stable" or "Experimental"
-	return "Stable"
+	return "Experimental"
 }
 
 ;Returns an array of objects which describe all controls which will be shown in the element settings GUI

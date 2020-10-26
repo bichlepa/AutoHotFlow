@@ -54,29 +54,26 @@ Element_getStabilityLevel_Action_Trace_Point_Check()
 ;Returns an array of objects which describe all controls which will be shown in the element settings GUI
 Element_getParametrizationDetails_Action_Trace_Point_Check(Environment)
 {
-	
-	FlowID:=x_GetMyFlowID(Environment)
-	
+	; get all trace points of the flow
+	FlowID := x_GetMyFlowID(Environment)
 	allTracePointElementIDs := x_getAllElementIDsOfClass(FlowID, "Action_Trace_Point")
-	;~ d(allTracePointElements)
-	allTracePointIDs:=Object()
+	allTracePointIDs := Object()
 	for oneIndex, oneElementID in allTracePointElementIDs 
 	{
-		elementpars:=x_getElementPars(FlowID, oneElementID)
-		;~ d(elementpars)
+		elementpars := x_getElementPars(FlowID, oneElementID)
 		allTracePointIDs.push(elementpars.id " (" oneElementID ")")
 	}
 	
-	parametersToEdit:=Object()
+	parametersToEdit := Object()
 	parametersToEdit.push({type: "Label", label: lang("Tracepoints which must be passed")})
 	parametersToEdit.push({type: "Checkbox", id: "MustPassTracepointsAll", default: 0, label: lang("All tracepoints")})
 	parametersToEdit.push({type: "ListBox", id: "MustPassTracepoints", result: "String", choices: allTracePointIDs, multi: True})
 	parametersToEdit.push({type: "Label", label: lang("Tracepoints which must not be passed")})
 	parametersToEdit.push({type: "Checkbox", id: "MustNotPassTracepointsAll", default: 0, label: lang("All tracepoints")})
 	parametersToEdit.push({type: "ListBox", id: "MustNotPassTracepoints", result: "String", choices: allTracePointIDs, multi: True})
-	;~ parametersToEdit.push({type: "Label", label: lang("Options")}) ;TODO
-	;~ parametersToEdit.push({type: "Checkbox", id: "Wait", default: 0, label: lang("Wait until all other threads have finished")})
 	
+	; we want that this function is called every time when the element editor is opened
+	parametersToEdit.updateOnEdit := true
 
 	return parametersToEdit
 }
@@ -126,87 +123,97 @@ Element_CheckSettings_Action_Trace_Point_Check(Environment, ElementParameters)
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Trace_Point_Check(Environment, ElementParameters)
 {
-	;~ d(ElementParameters, "element parameters")
-	FlowID:=x_GetMyFlowID(Environment)
-	if (ElementParameters.MustPassTracepointsAll or ElementParameters.MustNotPassTracepointsAll)
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
+	if (EvaluatedParameters._error)
 	{
-		allTracePointElementIDs := x_getAllElementIDsOfClass(FlowID, "Action_Trace_Point")
+		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
+		return
 	}
+
+	; get flow ID
+	FlowID := x_GetMyFlowID(Environment)
+
+	; get all tracepoints which must not have been passed
 	if (ElementParameters.MustPassTracepointsAll)
 	{
-		allTracePointMustPass:=Object()
+		; get all element IDs of tracepoint actions
+		allTracePointElementIDs := x_getAllElementIDsOfClass(FlowID, "Action_Trace_Point")
+
+		; write all tracepoints IDs with their element IDs to variable allTracePointMustPass
+		allTracePointMustPass := Object()
 		for oneIndex, oneElementID in allTracePointElementIDs 
 		{
-			elementpars:=x_getElementPars(FlowID, oneElementID)
+			elementpars := x_getElementPars(FlowID, oneElementID)
 			allTracePointMustPass.push(elementpars.id " (" oneElementID ")")
 		}
 	}
 	else
 	{
+		; get the list of all element which must pass
 		allTracePointMustPass := ElementParameters.MustPassTracepoints
 	}
+	
+	; get all tracepoints which must not have been passed
 	if (ElementParameters.MustNotPassTracepointsAll)
 	{
-		allTracePointMustNotPass:=Object()
+		; get all element IDs of tracepoint actions
+		allTracePointElementIDs := x_getAllElementIDsOfClass(FlowID, "Action_Trace_Point")
+		
+		; write all tracepoints IDs with their element IDs to variable allTracePointMustNotPass
+		allTracePointMustNotPass := Object()
 		for oneIndex, oneElementID in allTracePointElementIDs 
 		{
-			elementpars:=x_getElementPars(FlowID, oneElementID)
+			elementpars := x_getElementPars(FlowID, oneElementID)
 			allTracePointMustNotPass.push(elementpars.id " (" oneElementID ")")
 		}
 	}
 	else
 	{
+		; get the list of all element which must not pass
 		allTracePointMustNotPass := ElementParameters.MustNotPassTracepoints
 	}
 	
-	;~ if (ElementParameters.wait)
-	;~ {
-		;~ threadCount:=x_GetThreadCountInCurrentInstance(Environment)
-		;~ if threadCount > 1
-		;~ {
-			;~ ;Wait until all other threads finish
-			
-			;~ return
-		;~ }
-	;~ }
-	
-	;Either not needed to wait or only one thread remained
-	
+	; get the hidden variable passed_Tracepoints. It contains all passed tracepoints
 	passed_Tracepoints := x_GetVariable(Environment, "passed_Tracepoints", true)
-	;~ d(passed_Tracepoints)
-	TracePointsMustPassedButNotPassed:=Object()
+	
+	; check, whether some tracepoins were not passed which must have been passed
+	TracePointsMustPassedButNotPassed := Object()
 	for oneMustPassIndex, oneMustPassTracePoint in allTracePointMustPass
 	{
-		found:=False
-		;Ignore Tracepoints which are selected as Must not be passed
+		found := False
+		; Ignore Tracepoints which are selected as Must not be passed
 		if (ElementParameters.MustPassTracepointsAll)
 		{
 			for oneMustNotPassIndex, oneMustNotPassTracePoint in allTracePointMustNotPass
 			{
 				if (oneMustNotPassTracePoint = oneMustPassTracePoint)
 				{
-					found:=True
+					found := True
 				}
 			}
 		}
+		; check whether the tracepoint was passed
 		for onePassedIndex, onePassedTracePoint in passed_Tracepoints
 		{
 			if (onePassedTracePoint = oneMustPassTracePoint)
 			{
-				found:=True
+				found := True
 			}
 		}
 		if (found = False)
 		{
+			; tracepoint was not passed. Add it to the list
 			TracePointsMustPassedButNotPassed.push(oneMustPassTracePoint)
 		}
 	}
 	
-	TracePointsMustNotPassedButPassed:=Object()
+	; check, whether some tracepoins were passed which must not have been passed
+	TracePointsMustNotPassedButPassed := Object()
 	for oneMustNotPassIndex, oneMustNotPassTracePoint in allTracePointMustNotPass
 	{
-		found:=False
-		ignore:=False
+		found := False
+		ignore := False
 		if (ElementParameters.MustNotPassTracepointsAll)
 		{
 			;Ignore Tracepoints which are selected as Must be passed
@@ -214,62 +221,64 @@ Element_run_Action_Trace_Point_Check(Environment, ElementParameters)
 			{
 				if (oneMustNotPassTracePoint = oneMustPassTracePoint)
 				{
-					ignore:=True
+					ignore := True
 				}
 			}
 		}
 		if (ignore = False)
 		{
+			; check whether the tracepoint was passed
 			for onePassedIndex, onePassedTracePoint in passed_Tracepoints
 			{
 				if (onePassedTracePoint = oneMustNotPassTracePoint)
 				{
-					found:=True
+					found := True
 				}
 			}
 		}
 		if (found = True)
 		{
+			; checkpoint was passed. Add it to the list
 			TracePointsMustNotPassedButPassed.push(oneMustNotPassTracePoint)
 		}
 	}
 	
 	if (TracePointsMustPassedButNotPassed.maxindex() <1 and TracePointsMustNotPassedButPassed.maxindex() <1)
 	{
+		; there were no violations
 		x_finish(Environment, "normal")
 	}
 	else
 	{
-		message:=""
-		if (TracePointsMustPassedButNotPassed.maxindex() >=1)
+		; there were violations. Generate error message and finish with exception.
+		message := ""
+		if (TracePointsMustPassedButNotPassed.maxindex() >= 1)
 		{
-			tempString:=""
+			tempString := ""
 			for oneIndex, oneTracePoint in TracePointsMustPassedButNotPassed
 			{
-				if (tempString!="")
-					tempString.=", "
-				tempString.=oneTracePoint
+				if (tempString != "")
+					tempString .= ", "
+				tempString .= oneTracePoint
 			}
 			message.= lang("%1% tracepoints were not passed which must have been passed: %2%.", TracePointsMustNotPassedButPassed.maxindex(), tempString) " "
 		}
-		if (TracePointsMustNotPassedButPassed.maxindex() >=1)
+		if (TracePointsMustNotPassedButPassed.maxindex() >= 1)
 		{
-			tempString:=""
+			tempString := ""
 			for oneIndex, oneTracePoint in TracePointsMustNotPassedButPassed
 			{
-				if (tempString!="")
-					tempString.=", "
-				tempString.=oneTracePoint
+				if (tempString != "")
+					tempString .= ", "
+				tempString .= oneTracePoint
 			}
 			message.= lang("%1% tracepoints were passed which must not have been passed: %2%.", TracePointsMustNotPassedButPassed.maxindex(), tempString)
 			
 		}
-		messate:=trim(message)
+		messate := trim(message)
 		x_finish(Environment, "exception", message)
 	}
 	
-	
-	;Always call v_finish() before return
 	return
 }
 
@@ -277,6 +286,6 @@ Element_run_Action_Trace_Point_Check(Environment, ElementParameters)
 ;If the task in Element_run_...() takes more than several seconds, then it is up to you to make it stoppable.
 Element_stop_Action_Trace_Point_Check(Environment, ElementParameters)
 {
-	
+	; nothing to do
 }
 

@@ -13,12 +13,9 @@ randomNoun()
 {
 	global RandomWordList_Adjectives, RandomWordList_Nouns
 	random, randomvalue, 1, % RandomWordList_Nouns.maxindex()
-	return % RandomWordList_Adjectives[randomvalue]
+	return % RandomWordList_Nouns[randomvalue]
 }
 randomPhrase()
 {
-	global RandomWordList_Adjectives, RandomWordList_Nouns
-	random, randomvalue1, 1, % RandomWordList_Adjectives.maxindex()
-	random, randomvalue2, 1, % RandomWordList_Nouns.maxindex()
-	return % RandomWordList_Adjectives[randomvalue1] " " RandomWordList_Nouns[randomvalue2]
+	return randomAdjective() " " randomNoun()
 }

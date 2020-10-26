@@ -54,7 +54,7 @@ Element_getParametrizationDetails_Action_Trace_Point(Environment)
 {
 	parametersToEdit:=Object()
 	parametersToEdit.push({type: "Label", label: lang("ID")})
-	parametersToEdit.push({type: "Edit", id: "ID", content: "String",  default: x_randomPhrase()})
+	parametersToEdit.push({type: "Edit", id: "ID", content: "rawstring",  default: "ṳᦵṩḗ╥"})
 	parametersToEdit.push({type: "Label", label: lang("Log message")})
 	parametersToEdit.push({type: "Edit", id: "LogMessage", default: "", content: "String", WarnIfEmpty: false})
 	parametersToEdit.push({type: "Label", label: lang("Stop condition")})
@@ -78,53 +78,55 @@ Element_GenerateName_Action_Trace_Point(Environment, ElementParameters)
 ;- Correct misconfiguration
 Element_CheckSettings_Action_Trace_Point(Environment, ElementParameters)
 {	
-	
+	; generate a random ID
+	if (ElementParameters.ID = "ṳᦵṩḗ╥")
+		x_Par_SetValue("ID", "Tracepoint " x_randomPhrase())
 }
 
 ;Called when the element should execute.
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Trace_Point(Environment, ElementParameters)
 {
-	;~ d(ElementParameters, "element parameters")
-	ID := x_replaceVariables(Environment, ElementParameters.ID)
-	LogMessage := x_replaceVariables(Environment, ElementParameters.LogMessage)
-	
-	evRes := x_EvaluateExpression(Environment, ElementParameters.StopCondition)
-	if (evRes.error)
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
+	if (EvaluatedParameters._error)
 	{
-		;On error, finish with exception and return
-		x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.StopCondition) "`n`n" evRes.error) 
+		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
-	else
+
+	; write the log message
+	if (EvaluatedParameters.LogMessage)
 	{
-		StopCondition:=evRes.result
+		x_log(Environment, EvaluatedParameters.LogMessage, 0)
 	}
+
+	; get own element ID
+	elementID := x_GetMyElementID(Environment)
 	
-	elementID:=x_GetMyElementID(Environment)
-	
-	x_log(Environment, LogMessage, 0)
+	; get hidden variable "passed_Tracepoints" and write there the current trace point
+	; include the element ID to make the trace point unique
 	passed_Tracepoints := x_GetVariable(Environment, "passed_Tracepoints", true)
 	if not IsObject(passed_Tracepoints)
 	{
-		passed_Tracepoints:=Object()
+		passed_Tracepoints := Object()
 	}
-	passed_Tracepoints.push(ID " (" elementID ")")
-	
-
+	passed_Tracepoints.push(EvaluatedParameters.ID " (" elementID ")")
 	x_SetVariable(Environment, "passed_Tracepoints", passed_Tracepoints,, true)
 	
-	if (stopcondition)
+	; Check the stop condition
+	if (EvaluatedParameters.stopcondition)
 	{
-		x_finish(Environment, "exception", lang("Stopping execution because stop Condition " ElementParameters.StopCondition " is not false"))
+		; stop condition is true. Finish element and stop the execution
+		x_finish(Environment, "exception", lang("Stopping execution because stop Condition " EvaluatedParameters.StopCondition " is not false"))
 		x_InstanceStop(Environment)
 	}
 	else
 	{
+		; stop condition is not true. finish
 		x_finish(Environment, "normal")
 	}
 	
-	;Always call v_finish() before return
 	return
 }
 
@@ -132,6 +134,6 @@ Element_run_Action_Trace_Point(Environment, ElementParameters)
 ;If the task in Element_run_...() takes more than several seconds, then it is up to you to make it stoppable.
 Element_stop_Action_Trace_Point(Environment, ElementParameters)
 {
-	
+	; nothing to do
 }
 
