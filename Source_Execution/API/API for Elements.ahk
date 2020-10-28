@@ -417,6 +417,24 @@ x_GetExecutionValue(Environment, p_name)
 	return retval
 }
 
+; set a variable which will be available during the execution of the element
+x_SetTriggerValue(Environment, p_name, p_Value)
+{
+	_EnterCriticalSection()
+	_setTriggerProperty(Environment.TriggerID, "triggerValues." p_name, p_value, false)
+	_LeaveCriticalSection()
+}
+; get a variable which is available during the execution of the element
+x_GetTriggerValue(Environment, p_name)
+{
+	_EnterCriticalSection()
+	retval := _getTriggerProperty(Environment.TriggerID, "triggerValues." p_name, false)
+	_LeaveCriticalSection()
+	return retval
+}
+
+
+
 ; returns a function object which calls a defined function with the defined parameters.
 ; the returned function object itself has no parameters and thus can be used as a callback function for times etc.
 ; it is used to route a callback (which has no parameters) to a function with parameters.
@@ -425,7 +443,7 @@ x_GetExecutionValue(Environment, p_name)
 ; Usecases:
 ; - settimer callbacks, which will be routed to the desired function
 ; - callback of an external AHK thread (use with x_ExecuteInNewAHKThread())
-x_NewExecutionFunctionObject(Environment, p_ToCallFunction, params*)
+x_NewFunctionObject(Environment, p_ToCallFunction, params*)
 {
 	_EnterCriticalSection()
 	; create a new function object
@@ -440,7 +458,7 @@ x_NewExecutionFunctionObject(Environment, p_ToCallFunction, params*)
 }
 
 
-; Function object for function x_NewExecutionFunctionObject
+; Function object for function x_NewFunctionObject
 class Class_FunctionObject
 {
     __New(Environment, ToCallFunction, params*) 
@@ -466,7 +484,7 @@ class Class_FunctionObject
 		; Add parameters which were passed to as "params*" when the function object was created (if any)
 		for oneparindex, onepar in this.params
 		{
-			args.push(onepar)
+			args.insertat(1, onepar)
 		}
 
 		; get the function name
@@ -711,7 +729,6 @@ ExecuteInNewAHKThread_trigger(p_uniqueID, p_iteration)
 	; get the environment variable.
 	Environment := global_AllActiveTriggerIDs[p_uniqueID].environment
 	; get the variables which the trigger has passed.
-	; TODO: Does it work, if trigger tirggers multiple times at once?
 	varsExportedFromExternalThread := _getSharedProperty("temp." p_uniqueID ".sharedObject.varsExported." p_iteration)
 	
 	_LeaveCriticalSection()
@@ -720,7 +737,7 @@ ExecuteInNewAHKThread_trigger(p_uniqueID, p_iteration)
 	instanceID := newInstance(Environment, , {varsExportedFromExternalThread: varsExportedFromExternalThread})
 }
 
-; TODO: Does it work, if trigger tirggers multiple times at once?
+; Does it work, if trigger tirggers multiple times at once?
 x_TriggerInNewAHKThread_GetExportedValues(Environment)
 {
 	_EnterCriticalSection()
@@ -735,9 +752,9 @@ x_TriggerInNewAHKThread_GetExportedValues(Environment)
 
 ; only in nexecution
 ; trigger a trigger and create a new instance
-x_trigger(Environment)
+x_trigger(Environment, params = "")
 {
-	newInstance(Environment)
+	newInstance(Environment, params)
 }
 
 ; must be called when the trigger was enabled.

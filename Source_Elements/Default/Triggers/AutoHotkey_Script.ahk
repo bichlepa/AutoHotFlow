@@ -109,6 +109,9 @@ Element_enable_Trigger_AutoHotkey_Script(Environment, ElementParameters)
 	
 	x_TriggerInNewAHKThread(Environment, script, inputVars, outputVars)
 	x_enabled(Environment, "normal")
+	
+	; return true, if trigger was enabled
+	return true
 }
 
 

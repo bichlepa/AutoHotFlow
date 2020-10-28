@@ -682,19 +682,25 @@ _deleteTrigger(TriggerID)
     _execution.Triggers.delete(TriggerID)
 	_LeaveCriticalSection()
 }
-_getTriggerProperty(TriggerID, path)
+_getTriggerProperty(TriggerID, path, clone = true)
 {
 	_EnterCriticalSection()
     objectPath:=parseObjectPath(_execution.Triggers[TriggerID], path)
-    value:=ObjFullyClone(objectPath[1][objectPath[2]])
+	if (clone)
+    	value:=ObjFullyClone(objectPath[1][objectPath[2]])
+	Else
+		value:=objectPath[1][objectPath[2]]
 	_LeaveCriticalSection()
     return value
 }
-_setTriggerProperty(TriggerID, path, value)
+_setTriggerProperty(TriggerID, path, value, clone = true)
 {
 	_EnterCriticalSection()
     objectPath:=parseObjectPath(_execution.Triggers[TriggerID], path)
-    objectPath[1][objectPath[2]] := ObjFullyClone(value)
+	if (clone)
+    	objectPath[1][objectPath[2]] := ObjFullyClone(value)
+	Else
+    	objectPath[1][objectPath[2]] := value
 	_LeaveCriticalSection()
 }
 _existsTrigger(TriggerID)

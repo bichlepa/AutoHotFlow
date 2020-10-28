@@ -73,6 +73,9 @@ Element_CheckSettings_Trigger_Manual(Environment, ElementParameters)
 {	
 	if (ElementParameters.ID = "ṳᦵṩḗ╥")
 		x_Par_SetValue("ID", "Trigger " x_randomPhrase())
+	
+	; return true, if trigger was enabled
+	return true
 }
 
 

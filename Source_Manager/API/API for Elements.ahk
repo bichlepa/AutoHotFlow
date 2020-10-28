@@ -115,9 +115,17 @@ x_GetExecutionValue(Environment, p_name)
 {
 	return xx_GetExecutionValue(Environment, p_name)
 }
-x_NewExecutionFunctionObject(Environment, p_ToCallFunction, params*)
+x_SetTriggerValue(Environment, p_name, p_Value)
 {
-	return xx_NewExecutionFunctionObject(Environment, p_ToCallFunction, params*)
+	return xx_SetTriggerValue(Environment, p_name, p_Value)
+}
+x_GetTriggerValue(Environment, p_name)
+{
+	return xx_GetTriggerValue(Environment, p_name)
+}
+x_NewFunctionObject(Environment, p_ToCallFunction, params*)
+{
+	return xx_NewFunctionObject(Environment, p_ToCallFunction, params*)
 }
 x_GetThreadCountInCurrentInstance(Environment)
 {
@@ -132,9 +140,9 @@ x_ExecuteInNewAHKThread_stop(Environment)
 	return xx_ExecuteInNewAHKThread_stop(Environment)
 }
 
-x_trigger(Environment)
+x_trigger(Environment, params = "")
 {
-	return xx_trigger(Environment)
+	return xx_trigger(Environment, params)
 }
 x_enabled(Environment, Result, Message = "")
 {

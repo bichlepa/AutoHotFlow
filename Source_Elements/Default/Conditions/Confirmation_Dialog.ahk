@@ -247,7 +247,7 @@ Element_run_Condition_Confirmation_Dialog(Environment, ElementParameters)
 	;Set timer if a timeout is set
 	if (EvaluatedParameters.isTimeout = "Timeout")
 	{
-		functionObject:= x_NewExecutionFunctionObject(environment, "Condition_Confirmation_Dialog_TimeoutTimer",x_GetMyUniqueExecutionID(Environment)) ;Pass the current unique ID
+		functionObject:= x_NewFunctionObject(environment, "Condition_Confirmation_Dialog_TimeoutTimer",x_GetMyUniqueExecutionID(Environment)) ;Pass the current unique ID
 		x_SetExecutionValue(Environment, "HWNDTimeoutText",HWNDTimeoutText)
 		x_SetExecutionValue(Environment, "OnTimeout",EvaluatedParameters.OnTimeout)
 		x_SetExecutionValue(Environment, "functionObjectTimer",functionObjectTimer)

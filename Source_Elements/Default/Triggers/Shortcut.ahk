@@ -102,6 +102,8 @@ Element_enable_Trigger_Shortcut(Environment, ElementParameters)
 	}
 	
 	x_enabled(Environment, "normal")
+	; return true, if trigger was enabled
+	return true
 }
 
 ;Function which triggers the flow

@@ -131,7 +131,7 @@ Element_enable_Trigger_Hotkey(Environment, ElementParameters)
 	local temphotkey:=ElementParameters.hotkey
 	if temphotkey=
 	{
-		x_finish(Environment, "exception", lang("The_Hotkey_is_not_set!"))
+		x_enabled(Environment, "exception", lang("The_Hotkey_is_not_set!"))
 		return
 	}
 	if (ElementParameters.BlockKey=False)
@@ -192,8 +192,8 @@ Element_enable_Trigger_Hotkey(Environment, ElementParameters)
 	
 	
 	
-	functionObject:= x_NewExecutionFunctionObject(environment, "Element_trigger_Trigger_Hotkey", ElementParameters)
-	x_SetExecutionValue(Environment, "hotkey", temphotkey)
+	functionObject:= x_NewFunctionObject(environment, "Element_trigger_Trigger_Hotkey", ElementParameters)
+	x_SetTriggerValue(Environment, "hotkey", temphotkey)
 
 	hotkey,%temphotkey%,% functionObject, UseErrorLevel on
 	if ErrorLevel
@@ -204,8 +204,8 @@ Element_enable_Trigger_Hotkey(Environment, ElementParameters)
 	
 	x_enabled(Environment, "normal", lang("The hotkey %1% was set.",temphotkey))
 
-	
-	
+	; return true, if trigger was enabled
+	return true
 }
 
 ; function which will be called when the hotkey is pressed
@@ -225,7 +225,7 @@ Element_postTrigger_Trigger_Hotkey(Environment, ElementParameters)
 ;Called when the trigger should be disabled.
 Element_disable_Trigger_Hotkey(Environment, ElementParameters)
 {
-	temphotkey:=x_getExecutionValue(Environment, "hotkey")
+	temphotkey:=x_getTriggerValue(Environment, "hotkey")
 	hotkey,%temphotkey%,off
 	x_disabled(Environment, "normal",  lang("The hotkey %1% was unset.",temphotkey))
 

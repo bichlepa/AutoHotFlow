@@ -104,7 +104,7 @@ Element_run_Action_Sleep(Environment, ElementParameters)
 	else if (ElementParameters.Unit="Minutes") ;minutes
 		tempDuration:=ElementParameters.duration * 60000
 	
-	functionObject:= x_NewExecutionFunctionObject(environment, "Action_Sleep_EndSleep", ElementParameters)
+	functionObject:= x_NewFunctionObject(environment, "Action_Sleep_EndSleep", ElementParameters)
 	x_SetExecutionValue(Environment, "functionObject", functionObject)
 	
 	SetTimer,% functionObject,-%tempDuration%

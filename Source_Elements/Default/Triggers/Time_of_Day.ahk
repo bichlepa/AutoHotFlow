@@ -99,12 +99,14 @@ Element_enable_Trigger_Time_Of_Day(Environment, ElementParameters)
 	}
 		
 	
-	functionObject:= x_NewExecutionFunctionObject(environment, "Trigger_Time_Of_Day_Trigger", EvaluatedParameters)
-	x_SetExecutionValue(environment, "functionObject", functionObject)
+	functionObject:= x_NewFunctionObject(environment, "Trigger_Time_Of_Day_Trigger", EvaluatedParameters)
+	x_SetTriggerValue(environment, "functionObject", functionObject)
 	SetTimer, % functionObject, % - remainingSeconds * 1000
 	;~ MsgBox % - remainingSeconds * 1000 " - " EvaluatedParameters.WeekDays " - " EvaluatedParameters.Time
 	
 	x_enabled(Environment, "normal")
+	; return true, if trigger was enabled
+	return true
 }
 
 Trigger_Time_Of_Day_Trigger_FindNextTimestamp(WeekDays, TimeOfDay)
@@ -157,8 +159,7 @@ Element_postTrigger_Trigger_Time_Of_Day(Environment, ElementParameters)
 ;Called when the trigger should be disabled.
 Element_disable_Trigger_Time_Of_Day(Environment, ElementParameters)
 {
-	functionObject := x_GetExecutionValue(environment, "functionObject")
-	x_SetExecutionValue(environment, "functionObject", "")
+	functionObject := x_GetTriggerValue(environment, "functionObject")
 	SetTimer, % functionObject, delete
 	;~ MsgBox aggrweg
 	x_disabled(Environment, "normal")

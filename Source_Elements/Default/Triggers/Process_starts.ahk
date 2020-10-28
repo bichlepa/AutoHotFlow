@@ -83,7 +83,7 @@ Element_enable_Trigger_Process_starts(Environment, ElementParameters)
 	EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters)
 	if (EvaluatedParameters._error)
 	{
-		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
+		x_enabled(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
 
@@ -102,6 +102,8 @@ Element_enable_Trigger_Process_starts(Environment, ElementParameters)
 	
 	x_TriggerInNewAHKThread(Environment, code, inputVars, outputVars)
 	x_enabled(Environment, "normal")
+	; return true, if trigger was enabled
+	return true
 }
 
 

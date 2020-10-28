@@ -228,7 +228,7 @@ Element_run_Action_Execute_Flow(Environment, ElementParameters)
 	if (ElementParameters.WaitToFinish)
 	{
 		
-		functionObject:= x_NewExecutionFunctionObject(environment, "Action_Execute_Flow_FunctionExecutionFinished", ElementParameters)
+		functionObject:= x_NewFunctionObject(environment, "Action_Execute_Flow_FunctionExecutionFinished", ElementParameters)
 		x_SetExecutionValue(Environment, "hotkey", temphotkey)
 		x_ManualTriggerExecute(FlowID, TriggerName, Variables, functionObject)
 		

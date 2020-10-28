@@ -171,7 +171,7 @@ Element_run_Action_Select_file(Environment, ElementParameters)
 	)
 	;Translations: lang("User dismissed the dialog without selecting a file or system refused to show the dialog.")
 	
-	functionObject := x_NewExecutionFunctionObject(Environment, "Action_Select_file_FinishExecution", ElementParameters)
+	functionObject := x_NewFunctionObject(Environment, "Action_Select_file_FinishExecution", ElementParameters)
 	x_SetExecutionValue(Environment, "functionObject", functionObject)
 	x_SetExecutionValue(Environment, "Varname", Varname)
 	x_ExecuteInNewAHKThread(Environment, functionObject, code, inputVars, outputVars)

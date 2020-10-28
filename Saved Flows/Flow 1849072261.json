@@ -124,7 +124,7 @@
     "element0000000001": {
       "class": "Trigger_Manual",
       "DefaultTrigger": "1",
-      "enabled": "1",
+      "enabled": "0",
       "ID": "element0000000001",
       "name": "Manual - \"Trigger boring eye\"",
       "package": "default",
@@ -226,7 +226,7 @@
     },
     "element0000000020": {
       "class": "Trigger_Window_Gets_Active",
-      "enabled": "1",
+      "enabled": "0",
       "ID": "element0000000020",
       "name": "Fenster wird aktiviert:  - Title begins with: AutoHotkey Help - Fensterklasse: HH Parent - Prozess: hh.exe",
       "package": "default",
@@ -386,7 +386,7 @@
     },
     "element0000000049": {
       "class": "Trigger_Window_Gets_Active",
-      "enabled": "1",
+      "enabled": "0",
       "ID": "element0000000049",
       "name": "Fenster wird aktiviert:  - Title begins with: AutoHotkey Help - Fensterklasse: HH Parent - Prozess: hh.exe",
       "package": "default",
@@ -411,7 +411,7 @@
     },
     "element0000000050": {
       "class": "Trigger_Window_Gets_Active",
-      "enabled": "1",
+      "enabled": "0",
       "ID": "element0000000050",
       "name": "Fenster wird aktiviert:  - Title begins with: AutoHotkey Help - Fensterklasse: HH Parent - Prozess: hh.exe",
       "package": "default",
@@ -436,7 +436,7 @@
     },
     "element0000000051": {
       "class": "Trigger_Window_Gets_Active",
-      "enabled": "1",
+      "enabled": "0",
       "ID": "element0000000051",
       "name": "Fenster wird aktiviert:  - Title begins with: AutoHotkey Help - Fensterklasse: HH Parent - Prozess: hh.exe",
       "package": "default",
@@ -461,7 +461,7 @@
     },
     "element0000000052": {
       "class": "Trigger_Window_Gets_Active",
-      "enabled": "1",
+      "enabled": "0",
       "ID": "element0000000052",
       "name": "Fenster wird aktiviert:  - Title begins with: AutoHotkey Help - Fensterklasse: HH Parent - Prozess: hh.exe",
       "package": "default",
@@ -486,7 +486,7 @@
     },
     "element0000000053": {
       "class": "Trigger_Window_Gets_Active",
-      "enabled": "1",
+      "enabled": "0",
       "ID": "element0000000053",
       "name": "Fenster wird aktiviert:  - Title begins with: AutoHotkey Help - Fensterklasse: HH Parent - Prozess: hh.exe",
       "package": "default",
@@ -511,7 +511,7 @@
     },
     "element0000000054": {
       "class": "Trigger_Window_Gets_Active",
-      "enabled": "1",
+      "enabled": "0",
       "ID": "element0000000054",
       "name": "Fenster wird aktiviert:  - Title begins with: AutoHotkey Help - Fensterklasse: HH Parent - Prozess: hh.exe",
       "package": "default",
@@ -536,7 +536,7 @@
     },
     "element0000000055": {
       "class": "Trigger_AutoHotkey_Script",
-      "enabled": "1",
+      "enabled": "0",
       "ID": "element0000000055",
       "name": "AutoHotKey Skript - iteration:= 0 - loop - { - iteration++ - x_trigger() - sleep",
       "package": "default",

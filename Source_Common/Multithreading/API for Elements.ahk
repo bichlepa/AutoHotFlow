@@ -118,10 +118,16 @@ xx_GetMyEnvironmentFromExecutionID(p_ExecutionID)
 xx_SetExecutionValue(Environment, p_name, p_Value)
 {
 }
+xx_GetTriggerValue(Environment, p_name)
+{
+}
+xx_SetTriggerValue(Environment, p_name, p_Value)
+{
+}
 xx_GetExecutionValue(Environment, p_name)
 {
 }
-xx_NewExecutionFunctionObject(Environment, p_ToCallFunction, params*)
+xx_NewFunctionObject(Environment, p_ToCallFunction, params*)
 {
 }
 xx_GetThreadCountInCurrentInstance(Environment)
@@ -133,7 +139,7 @@ xx_ExecuteInNewAHKThread(Environment, p_functionObject, p_Code, p_VarsToImport, 
 xx_ExecuteInNewAHKThread_Stop(Environment)
 {
 }
-xx_trigger(Environment)
+xx_trigger(Environment, params = "")
 {
 }
 xx_enabled(Environment, Result, Message = "")
@@ -460,8 +466,8 @@ xx_ManualTriggerExecute(p_FlowID, p_TriggerName = "", p_Variables ="", p_CallBac
 {
 	; when starting to execute the trigger, we will pass some variables in that object.
 	params := Object()
-	params.VarsToPass := p_Variables
-	params.CallBack := p_CallBackFunction
+	params.ahf_VarsToPass := p_Variables
+	params.ahf_CallBack := p_CallBackFunction
 	
 	; check first, whether flow exists
 	if (not _existsFlow(p_FlowID))

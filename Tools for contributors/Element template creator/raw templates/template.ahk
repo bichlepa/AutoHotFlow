@@ -457,7 +457,7 @@ Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 	;We want later to translate the text inside message. Add the text here inside comments, so the translation tool can find it.
 	;Translations: lang("User dismissed the dialog.")
 	 
-	functionObject := x_NewExecutionFunctionObject(Environment, "&ElementType&_&Name&_FinishExecution", ElementParameters)
+	functionObject := x_NewFunctionObject(Environment, "&ElementType&_&Name&_FinishExecution", ElementParameters)
 	x_SetExecutionValue(Environment, "functionObject", functionObject)
 	x_SetExecutionValue(Environment, "Varname", Varname)
 	x_ExecuteInNewAHKThread(Environment, functionObject, code, inputVars, outputVars)
@@ -739,7 +739,7 @@ Element_enable_&ElementType&_&Name&(Environment, ElementParameters)
 		return
 	}
 
-	x_SetExecutionValue(Environment, "windowID", tempWinid)
+	x_SetTriggerValue(Environment, "windowID", tempWinid)
 #endif ;addWindowSelector
 	
 #if addSeparateAhkThread
@@ -759,8 +759,8 @@ Element_enable_&ElementType&_&Name&(Environment, ElementParameters)
 	
 	x_TriggerInNewAHKThread(Environment, code, inputVars, outputVars)
 #else ;addWindowSelector
-	functionObject:= x_NewExecutionFunctionObject(environment, "&ElementType&_&Name&_Trigger", EvaluatedParameters)
-	x_SetExecutionValue(environment, "functionObject", functionObject)
+	functionObject:= x_NewFunctionObject(environment, "&ElementType&_&Name&_Trigger", EvaluatedParameters)
+	x_SetTriggerValue(environment, "functionObject", functionObject)
 	SetTimer, % functionObject, -1000 ;Example
 	
 #endif ;else addSeparateAhkThread
@@ -793,7 +793,7 @@ Element_postTrigger_&ElementType&_&Name&(Environment, ElementParameters)
 ;Called when the trigger should be disabled.
 Element_disable_&ElementType&_&Name&(Environment, ElementParameters)
 {
-	functionObject := x_GetExecutionValue(environment, "functionObject")
+	functionObject := x_GetTriggerValue(environment, "functionObject")
 	SetTimer, % functionObject, delete
 	x_disabled(Environment, "normal")
 }

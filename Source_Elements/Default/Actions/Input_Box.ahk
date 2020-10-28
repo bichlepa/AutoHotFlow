@@ -319,7 +319,7 @@ Element_run_Action_Input_Box(Environment, ElementParameters)
 	;Set timer if a timeout is set
 	if (EvaluatedParameters.isTimeout = "Timeout")
 	{
-		functionObject:= x_NewExecutionFunctionObject(environment, "Action_Input_Box_TimeoutTimer",x_GetMyUniqueExecutionID(Environment)) ;Pass the current unique ID
+		functionObject:= x_NewFunctionObject(environment, "Action_Input_Box_TimeoutTimer",x_GetMyUniqueExecutionID(Environment)) ;Pass the current unique ID
 		x_SetExecutionValue(Environment, "HWNDTimeoutText",HWNDTimeoutText)
 		x_SetExecutionValue(Environment, "OnTimeout",EvaluatedParameters.OnTimeout)
 		x_SetExecutionValue(Environment, "functionObjectTimer",functionObjectTimer)

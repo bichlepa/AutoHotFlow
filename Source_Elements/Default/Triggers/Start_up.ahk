@@ -82,6 +82,9 @@ Element_enable_Trigger_Start_up(Environment, ElementParameters)
 	x_enabled(Environment, "normal")
 	if (x_isWindowsStartup())
 		x_trigger(Environment)
+		
+	; return true, if trigger was enabled
+	return true
 }
 
 ;Called after the trigger has triggered.

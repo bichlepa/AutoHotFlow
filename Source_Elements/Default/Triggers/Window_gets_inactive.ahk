@@ -52,7 +52,7 @@ Element_getStabilityLevel_Trigger_Window_Gets_Inactive()
 Element_getParametrizationDetails_Trigger_Window_Gets_Inactive(Environment)
 {
 	
-	parametersToEdit:=Object()
+	parametersToEdit := Object()
 	parametersToEdit.push({type: "Label", label: lang("Title_of_Window")})
 	parametersToEdit.push({type: "Radio", id: "TitleMatchMode", default: 1, choices: [lang("Start_with"), lang("Contain_anywhere"), lang("Exactly")]})
 	parametersToEdit.push({type: "Edit", id: "Wintitle", content: "String"})
@@ -76,37 +76,40 @@ Element_getParametrizationDetails_Trigger_Window_Gets_Inactive(Environment)
 	parametersToEdit.push({type: "Label", label: lang("Get_parameters")})
 	parametersToEdit.push({type: "button", goto: "Trigger_Window_Gets_Inactive_ButtonWindowAssistant", label: lang("Get_Parameters")})
 	
+	parametersToEdit.push({type: "Label", label: lang("Options")})
+	parametersToEdit.push({type: "Label", label: lang("Check interval"), size: "small"})
+	parametersToEdit.push({type: "Edit", id: "interval", content: "Number", default: 100, WarnIfEmpty: true})
+	
 	return parametersToEdit
 }
 
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Trigger_Window_Gets_Inactive(Environment, ElementParameters)
 {
-	global
-	local tempNameString
+	tempNameString := ""
 	if (ElementParameters.Wintitle)
 	{
-		if (ElementParameters.TitleMatchMode=1)
-			tempNameString:=tempNameString "`n" lang("Title begins with") ": " ElementParameters.Wintitle
-		else if (ElementParameters.TitleMatchMode=2)
-			tempNameString:=tempNameString "`n" lang("Title includes") ": " ElementParameters.Wintitle
-		else if (ElementParameters.TitleMatchMode=3)
-			tempNameString:=tempNameString "`n" lang("Title is exatly") ": " ElementParameters.Wintitle
+		if (ElementParameters.TitleMatchMode = 1)
+			tempNameString := tempNameString "`n" lang("Title begins with") ": " ElementParameters.Wintitle
+		else if (ElementParameters.TitleMatchMode = 2)
+			tempNameString := tempNameString "`n" lang("Title includes") ": " ElementParameters.Wintitle
+		else if (ElementParameters.TitleMatchMode = 3)
+			tempNameString := tempNameString "`n" lang("Title is exatly") ": " ElementParameters.Wintitle
 	}
 	if (ElementParameters.excludeTitle)
-		tempNameString:=tempNameString "`n" lang("Exclude_title") ": " ElementParameters.excludeTitle
+		tempNameString := tempNameString "`n" lang("Exclude_title") ": " ElementParameters.excludeTitle
 	if (ElementParameters.winText)
-		tempNameString:=tempNameString "`n" lang("Control_text") ": " ElementParameters.winText
+		tempNameString := tempNameString "`n" lang("Control_text") ": " ElementParameters.winText
 	if (ElementParameters.ExcludeText)
-		tempNameString:=tempNameString "`n" lang("Exclude_control_text") ": " ElementParameters.ExcludeText
+		tempNameString := tempNameString "`n" lang("Exclude_control_text") ": " ElementParameters.ExcludeText
 	if (ElementParameters.ahk_class)
-		tempNameString:=tempNameString "`n" lang("Window_Class") ": " ElementParameters.ahk_class
+		tempNameString := tempNameString "`n" lang("Window_Class") ": " ElementParameters.ahk_class
 	if (ElementParameters.ahk_exe)
-		tempNameString:=tempNameString "`n" lang("Process") ": " ElementParameters.ahk_exe
+		tempNameString := tempNameString "`n" lang("Process") ": " ElementParameters.ahk_exe
 	if (ElementParameters.ahk_id)
-		tempNameString:=tempNameString "`n" lang("Window_ID") ": " ElementParameters.ahk_id
+		tempNameString := tempNameString "`n" lang("Window_ID") ": " ElementParameters.ahk_id
 	if (ElementParameters.ahk_pid)
-		tempNameString:=tempNameString "`n" lang("Process_ID") ": " ElementParameters.ahk_pid
+		tempNameString := tempNameString "`n" lang("Process_ID") ": " ElementParameters.ahk_pid
 	
 	return lang("Window_Gets_Inactive") ": " tempNameString
 	
@@ -125,88 +128,92 @@ Element_CheckSettings_Trigger_Window_Gets_Inactive(Environment, ElementParameter
 ;Called when the trigger is activated
 Element_enable_Trigger_Window_Gets_Inactive(Environment, ElementParameters)
 {
-	EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters)
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
 	if (EvaluatedParameters._error)
 	{
-		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
+		x_enabled(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
 
-	tempWinTitle:=EvaluatedParameters.Wintitle
-	tempWinText:=EvaluatedParameters.winText
-	tempExcludeTitle:=EvaluatedParameters.ExcludeTitle
-	tempExcludeText:=EvaluatedParameters.ExcludeText
-	tempTitleMatchMode :=EvaluatedParameters.TitleMatchMode
-	tempahk_class:=EvaluatedParameters.ahk_class
-	tempahk_exe:=EvaluatedParameters.ahk_exe
-	tempahk_id:= EvaluatedParameters.ahk_id
-	tempahk_pid:= EvaluatedParameters.ahk_pid
+	; check interval
+	if (not (EvaluatedParameters.interval > 0))
+	{
+		x_enabled(Environment, "exception", lang("Parameter '%1%' has invalid value: %2%", "interval", tempinterval)) 
+		return
+	}
 	
-	tempwinstring=%tempWinTitle%
-	if tempahk_class<>
-		tempwinstring=%tempwinstring% ahk_class %tempahk_class%
-	if tempahk_id<>
-		tempwinstring=%tempwinstring% ahk_id %tempahk_id%
-	if tempahk_pid<>
-		tempwinstring=%tempwinstring% ahk_pid %tempahk_pid%
-	if tempahk_exe<>
-		tempwinstring=%tempwinstring% ahk_exe %tempahk_exe%
+	; create wintitle argument for WinActive() Call
+	EvaluatedParameters.winstring := EvaluatedParameters.Wintitle
+	if (EvaluatedParameters.ahk_class != "")
+		EvaluatedParameters.winstring .= " ahk_class " EvaluatedParameters.ahk_class
+	if (EvaluatedParameters.ahk_id != "")
+		EvaluatedParameters.winstring .= " ahk_id " EvaluatedParameters.ahk_id
+	if (EvaluatedParameters.ahk_pid != "")
+		EvaluatedParameters.winstring .= " ahk_pid " EvaluatedParameters.ahk_pid
+	if (EvaluatedParameters.ahk_exe != "")
+		EvaluatedParameters.winstring .= " ahk_exe " EvaluatedParameters.ahk_exe
 	
 	;If no window specified, error
-	if (tempwinstring="" and tempWinText="")
+	if (EvaluatedParameters.winstring = "" and EvaluatedParameters.winText = "")
 	{
 		x_enabled(Environment, "exception", lang("No window specified"))
 		return
 	}
 	
-	if ElementParameters.findhiddenwindow=0
-		tempFindHiddenWindows = off
-	else
-		tempFindHiddenWindows = on
-	if ElementParameters.findhiddentext=0
-		tempfindhiddentext = off
-	else
-		tempfindhiddentext = on
-	
-	inputVars:={winstring: tempwinstring, wintext: tempWinText, excludeTitle: tempExcludeTitle, excludeText: tempExcludeText, titlematchmode: tempTitleMatchMode, findhiddenwindow: tempFindHiddenWindows, findhiddentext: tempfindhiddentext}
-	outputVars:=["windowID"]
-	code =
-	( ` , LTrim %
-	
-		SetTitleMatchMode,%titlematchmode%
-		DetectHiddenText,%findhiddentext%
-		DetectHiddenWindows,%findhiddenwindow%
-		loop
-		{
-			WinWaitActive,%winstring%, %wintext%, , %excludeTitle%, %excludeText%
-			winget,windowID,ID
-			WinWaitNotActive %winstring%, %wintext%, , %excludeTitle%, %excludeText%
-			x_trigger()
-			
-		}
-	
-	)
-	
-	
-	x_TriggerInNewAHKThread(Environment, code, inputVars, outputVars)
-	
-	x_enabled(Environment, "normal", lang("Waiting for defined window to appear.",temphotkey))
+	; check findhiddentext and findhiddenwindow parameter. Convert them to string
+	switch (ElementParameters.findhiddentext)
+	{
+	case 0:
+		EvaluatedParameters.findhiddentext := "off"
+	case 1:
+		EvaluatedParameters.findhiddentext := "on"
+	default:
+		x_enabled(Environment, "exception", lang("Parameter '%1%' has invalid value: %2%", "findhiddentext", EvaluatedParameters.findhiddentext)) 
+	}
+	switch (ElementParameters.findhiddenwindow)
+	{
+	case 0:
+		EvaluatedParameters.findhiddenwindow := "off"
+	case 1:
+		EvaluatedParameters.findhiddenwindow := "on"
+	default:
+		x_enabled(Environment, "exception", lang("Parameter '%1%' has invalid value: %2%", "findhiddenwindow", EvaluatedParameters.findhiddenwindow)) 
+	}
 
+	; We will set a timer which regularely checks the active window.
+	; create a function object
+	functionObject := x_NewFunctionObject(environment, "Trigger_Window_Gets_Inactive_TimerLabel", EvaluatedParameters)
+	x_SetTriggerValue(Environment, "functionObject", functionObject)
+
+	; make the first call immediately
+	%functionObject%(true)
+
+	; enable the timer
+	SetTimer, % functionObject, % EvaluatedParameters.interval
+
+	; finish and return true
+	x_enabled(Environment, "normal")
+	return true
 }
 
 ;Called after the trigger has triggered.
 ;Here you can for example define the variables which are provided by the triggers.
-Element_postTrigger_Trigger_Window_Gets_Inactive(Environment, ElementParameters)
+Element_postTrigger_Trigger_Window_Gets_Inactive(Environment, parameters)
 {
-	exportedValues:=x_TriggerInNewAHKThread_GetExportedValues(Environment)
-	x_SetVariable(Environment, "a_WindowID", exportedValues.windowID, "Thread")
+	; set the a_windowID variable
+	x_SetVariable(Environment, "a_WindowID", parameters.windowID, "Thread")
 }
 
 
 ;Called when the trigger should be disabled.
 Element_disable_Trigger_Window_Gets_Inactive(Environment, ElementParameters)
 {
-	x_TriggerInNewAHKThread_Stop(Environment)
+	; get the function object and disable the timer
+	functionObject := x_getTriggerValue(Environment, "functionObject")
+	SetTimer, % functionObject, off
+
+	; finish
 	x_disabled(Environment, "normal", lang("Stopped."))
 }
 
@@ -215,4 +222,39 @@ Element_disable_Trigger_Window_Gets_Inactive(Environment, ElementParameters)
 Trigger_Window_Gets_Inactive_ButtonWindowAssistant()
 {
 	x_assistant_windowParameter({wintitle: "Wintitle", excludeTitle: "excludeTitle", winText: "winText", FindHiddenText: "FindHiddenText", ExcludeText: "ExcludeText", ahk_class: "ahk_class", ahk_exe: "ahk_exe", ahk_id: "ahk_id", ahk_pid: "ahk_pid", FindHiddenWindow: "FindHiddenWindow"})
+}
+
+
+; function which will be regularey called
+Trigger_Window_Gets_Inactive_TimerLabel(Environment, parameters, fistCall = false)
+{
+	; set some properties before calling WinActive()
+	SetTitleMatchMode, % parameters.titlematchmode
+	DetectHiddenText, % parameters.findhiddentext
+	DetectHiddenWindows, % parameters.findhiddenwindow
+
+	if (fistCall)
+	{
+		; on first call, we need to skip the trigger if the window is already not active
+		parameters.currentWindowID := WinActive(parameters.winstring, parameters.WinText, parameters.ExcludeTitle, parameters.ExcludeText)
+	}
+
+	; call WinActive(). it will return the window ID if the window exists
+	windowID := WinActive(parameters.winstring, parameters.WinText, parameters.ExcludeTitle, parameters.ExcludeText)
+
+	; compare the windowID with the last found window 
+	if (windowID != parameters.currentWindowID)
+	{
+		if ((windowID != parameters.currentWindowID) and parameters.currentWindowID)
+		{
+			; if we are here, no window was found that maches the criteria.
+			; But on last call we had a matching window
+
+			; trigger and pass the windowID, so we can set the a_windowID variable later
+			x_trigger(Environment, {windowID: parameters.currentWindowID})
+		}
+		
+		; the result has changed. Save the changed value.
+		parameters.currentWindowID := windowID
+	}
 }

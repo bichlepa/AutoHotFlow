@@ -86,7 +86,7 @@ Element_enable_Trigger_Periodic_Timer(Environment, ElementParameters)
 	EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters)
 	if (EvaluatedParameters._error)
 	{
-		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
+		x_enabled(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
 	
@@ -101,12 +101,14 @@ Element_enable_Trigger_Periodic_Timer(Environment, ElementParameters)
 		Intervall_S *= 1000 * 60
 	}
 	
-	functionObject:= x_NewExecutionFunctionObject(environment, "Trigger_Periodic_Timer_Trigger", EvaluatedParameters)
-	x_SetExecutionValue(environment, "functionObject", functionObject)
+	functionObject:= x_NewFunctionObject(environment, "Trigger_Periodic_Timer_Trigger", EvaluatedParameters)
+	x_SetTriggerValue(environment, "functionObject", functionObject)
 	SetTimer, % functionObject, % Intervall_S
 	
 	x_enabled(Environment, "normal")
-
+	
+	; return true, if trigger was enabled
+	return true
 }
 
 ;Function which triggers the flow
@@ -124,7 +126,7 @@ Element_postTrigger_Trigger_Periodic_Timer(Environment, ElementParameters)
 ;Called when the trigger should be disabled.
 Element_disable_Trigger_Periodic_Timer(Environment, ElementParameters)
 {
-	functionObject := x_GetExecutionValue(environment, "functionObject")
+	functionObject := x_GetTriggerValue(environment, "functionObject")
 	SetTimer, % functionObject, delete
 	x_disabled(Environment, "normal")
 }

@@ -103,11 +103,13 @@ Element_enable_Trigger_User_Idle_Time(Environment, ElementParameters)
 		x_log("e1", "Specified user idle time must be at least 100ms. Current value: " tempDuration " ms")
 		return
 	}
-	functionObject:= x_NewExecutionFunctionObject(environment, "Trigger_User_Idle_Time_Trigger", EvaluatedParameters, tempDuration)
-	x_SetExecutionValue(environment, "functionObject", functionObject)
+	functionObject:= x_NewFunctionObject(environment, "Trigger_User_Idle_Time_Trigger", EvaluatedParameters, tempDuration)
+	x_SetTriggerValue(environment, "functionObject", functionObject)
 	SetTimer, % functionObject, -1
 	
 	x_enabled(Environment, "normal")
+	; return true, if trigger was enabled
+	return true
 }
 
 ;Function which triggers the flow
@@ -165,7 +167,7 @@ Element_postTrigger_Trigger_User_Idle_Time(Environment, ElementParameters)
 ;Called when the trigger should be disabled.
 Element_disable_Trigger_User_Idle_Time(Environment, ElementParameters)
 {
-	functionObject := x_GetExecutionValue(environment, "functionObject")
+	functionObject := x_GetTriggerValue(environment, "functionObject")
 	SetTimer, % functionObject, delete
 	x_disabled(Environment, "normal")
 }

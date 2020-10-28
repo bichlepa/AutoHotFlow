@@ -135,7 +135,7 @@ Element_run_Action_Speech_output(Environment, ElementParameters)
 		return
 	}
 	
-	functionObject:= x_NewExecutionFunctionObject(environment, "Action_Speech_Output_Task", VoiceIdentification)
+	functionObject:= x_NewFunctionObject(environment, "Action_Speech_Output_Task", VoiceIdentification)
 	x_SetExecutionValue(Environment, "functionObject", functionObject)
 	x_SetExecutionValue(Environment, "VoiceIdentification", VoiceIdentification)
 	if (EvaluatedParameters.WaitUntilCurrentFinishes)

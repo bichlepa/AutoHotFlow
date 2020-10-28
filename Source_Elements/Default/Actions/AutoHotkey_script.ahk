@@ -108,7 +108,7 @@ Element_run_Action_AutoHotKey_script(Environment, ElementParameters)
 	outputVars.push("result", "resultmessage")
 	
 	
-	functionObject := x_NewExecutionFunctionObject(Environment, "Action_AutoHotKey_script_FinishExecution", ElementParameters)
+	functionObject := x_NewFunctionObject(Environment, "Action_AutoHotKey_script_FinishExecution", ElementParameters)
 	x_SetExecutionValue(Environment, "functionObject", functionObject)
 	x_SetExecutionValue(Environment, "Varname", Varname)
 	x_ExecuteInNewAHKThread(Environment, functionObject, script, inputVars, outputVars)
