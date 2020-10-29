@@ -378,6 +378,29 @@ _getAndIncrementElementProperty(FlowID, ElementID, path, incrementValue = 1)
 	_LeaveCriticalSection()
     return value
 }
+_getElementInfo(FlowID, ElementID, path)
+{
+	_EnterCriticalSection()
+    objectPath:=parseObjectPath(_flows[FlowID].allElements[ElementID].info, path)
+    value:=ObjFullyClone(objectPath[1][objectPath[2]])
+	_LeaveCriticalSection()
+    return value
+}
+_setElementInfo(FlowID, ElementID, path, value)
+{
+	_EnterCriticalSection()
+    objectPath:=parseObjectPath(_flows[FlowID].allElements[ElementID].info, path)
+    objectPath[1][objectPath[2]] := ObjFullyClone(value)
+	_LeaveCriticalSection()
+}
+_getAndIncrementElementInfo(FlowID, ElementID, path, incrementValue = 1)
+{
+	_EnterCriticalSection()
+	_flows[FlowID].allElements[ElementID].info[path] += incrementValue
+    value :=_flows[FlowID].allElements[ElementID].info[path]
+	_LeaveCriticalSection()
+    return value
+}
 _existsElement(FlowID, ElementID)
 {
 	_EnterCriticalSection()
@@ -459,6 +482,29 @@ _getAndIncrementConnectionProperty(FlowID, ConnectionID, path, incrementValue = 
     return value
 }
 
+_getConnectionInfo(FlowID, ConnectionID, path)
+{
+	_EnterCriticalSection()
+    objectPath:=parseObjectPath(_flows[FlowID].allConnections[ConnectionID].info, path)
+    value:=ObjFullyClone(objectPath[1][objectPath[2]])
+	_LeaveCriticalSection()
+    return value
+}
+_setConnectionInfo(FlowID, ConnectionID, path, value)
+{
+	_EnterCriticalSection()
+    objectPath:=parseObjectPath(_flows[FlowID].allConnections[ConnectionID].info, path)
+    objectPath[1][objectPath[2]] := ObjFullyClone(value)
+	_LeaveCriticalSection()
+}
+_getAndIncrementConnectionInfo(FlowID, ConnectionID, path, incrementValue = 1)
+{
+	_EnterCriticalSection()
+	_flows[FlowID].allConnections[ConnectionID].info[path] += incrementValue
+    value :=_flows[FlowID].allConnections[ConnectionID].info[path]
+	_LeaveCriticalSection()
+    return value
+}
 _existsConnection(FlowID, ConnectionID)
 {
 	_EnterCriticalSection()

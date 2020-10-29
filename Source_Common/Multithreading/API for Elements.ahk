@@ -373,7 +373,7 @@ xx_isManualTriggerEnabled(p_FlowID, p_TriggerName="")
 			if (_getElementProperty(p_FlowID, forelementID, "class") = "trigger_Manual" and _getElementProperty(p_FlowID, forelementID, "pars.id") = p_TriggerName)
 			{
 				; we found the trigger, check whether it is enabled
-				result := _getElementProperty(p_FlowID, forelementID, "enabled")
+				result := _getElementInfo(p_FlowID, forelementID, "enabled")
 				break
 			}
 		}
@@ -383,7 +383,7 @@ xx_isManualTriggerEnabled(p_FlowID, p_TriggerName="")
 			if (_getElementProperty(p_FlowID, forelementID, "class") = "trigger_manual" and _getElementProperty(p_FlowID, forelementID, "defaultTrigger") = True)
 			{
 				; we found the trigger, check whether it is enabled
-				result := _getElementProperty(p_FlowID, forelementID, "enabled")
+				result := _getElementInfo(p_FlowID, forelementID, "enabled")
 				break
 			}
 		}

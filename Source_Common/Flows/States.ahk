@@ -166,8 +166,12 @@ states_Restore(p_FlowID, p_StateID)
 		disableOneTrigger(p_FlowID, oneelementID, false)
 	}
 	
-	; copy all elements, connections and settings
+	; copy all elements, connections and settings. Keep the info property in each element
 	allElements := _getFlowProperty(p_FlowID, "states." p_StateID ".allElements")
+	for oneElementID, oneElement in allElements
+	{
+		oneElement.info := _getElementProperty(p_FlowID, oneElementID, "info")
+	}
 	_setFlowProperty(p_FlowID, "allElements", allElements, false)
 	allConnections := _getFlowProperty(p_FlowID, "states." p_StateID ".allConnections")
 	_setFlowProperty(p_FlowID, "allConnections", allConnections, false)
@@ -191,11 +195,11 @@ states_Restore(p_FlowID, p_StateID)
 	{
 		if (selectedElements.haskey(forElementID))
 		{
-			_setElementProperty(p_FlowID, forElementID, "selected", True)
+			_setElementInfo(p_FlowID, forElementID, "selected", True)
 		}
 		else
 		{
-			_setElementProperty(p_FlowID, forElementID, "selected", False)
+			_setElementInfo(p_FlowID, forElementID, "selected", False)
 		}
 	}
 	allConnectionIDs := _getAllConnectionIds(p_FlowID)
@@ -203,11 +207,11 @@ states_Restore(p_FlowID, p_StateID)
 	{
 		if (selectedElements.haskey(forConnectionID))
 		{
-			_setConnectionProperty(p_FlowID, forConnectionID, "selected", True)
+			_setConnectionInfo(p_FlowID, forConnectionID, "selected", True)
 		}
 		else
 		{
-			_setConnectionProperty(p_FlowID, forConnectionID, "selected", False)
+			_setConnectionInfo(p_FlowID, forConnectionID, "selected", False)
 		}
 	}
 	
@@ -297,7 +301,7 @@ findEnabledTriggersWhichHaveBeenChanged(p_FlowID, p_StateID)
 		elementType := _getElementProperty(p_FlowID, oneelementID, "type")
 		if (elementType = "trigger") ; we only need triggers
 		{
-			elementEnabled := _getElementProperty(p_FlowID, oneelementID, "enabled")
+			elementEnabled := _getElementInfo(p_FlowID, oneelementID, "enabled")
 			if (elementEnabled = true) ; we only need enabled triggers
 			{
 				; get trigger properties in working copy

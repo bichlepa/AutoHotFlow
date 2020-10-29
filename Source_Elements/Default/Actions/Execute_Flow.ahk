@@ -251,7 +251,7 @@ Element_stop_Action_Execute_Flow(Environment, ElementParameters)
 }
 
 ; if parameter WaitToFinish is set, this funciton will be called when the remote flow finishes
-Action_Execute_Flow_FunctionExecutionFinished(Environment, p_result, p_variables, ElementParameters)
+Action_Execute_Flow_FunctionExecutionFinished(Environment, ElementParameters, p_result, p_variables)
 {
 	if (ElementParameters.ReturnVariables)
 		x_ImportInstanceVars(Environment, p_variables)

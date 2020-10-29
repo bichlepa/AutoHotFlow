@@ -65,7 +65,7 @@ EnableLoadedFlows()
 		for oneElementIndex, oneElementID in allElementIDs
 		{
 			; check whether this is an enabled trigger
-			oneElementEnabled := _getElementProperty(oneFLowID, oneElementID, "enabled")
+			oneElementEnabled := _getElementInfo(oneFLowID, oneElementID, "enabled")
 			if (oneElementEnabled)
 			{
 				; enable the trigger without saving its state

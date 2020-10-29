@@ -123,7 +123,7 @@ Element_stop_Action_AutoHotKey_script(Environment, ElementParameters)
 }
 
 
-Action_AutoHotKey_script_FinishExecution(Environment, values, ElementParameters)
+Action_AutoHotKey_script_FinishExecution(Environment, ElementParameters, values)
 {
 	for onevaluekey, onevalue in values
 	{

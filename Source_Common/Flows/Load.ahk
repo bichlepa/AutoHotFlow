@@ -78,7 +78,7 @@ LoadFlow(p_filepath)
 	_setFlow(FlowID, flow)
 	
 	; if we load a flow and do not find some element impelementations, probably a package is missing. We will write missing packages here and warn user later
-	missingpackages :=Object()
+	missingpackages := Object()
 	AllElementClasses := _getShared("AllElementClasses")
 
 	; Perform some tasks to all loaded elements
@@ -111,12 +111,16 @@ LoadFlow(p_filepath)
 		_setElementProperty(FlowID, oneElementID, "icon", icon)
 
 		; add some default element values
-		_setElementProperty(FlowID, oneElementID, "ClickPriority", 500)
 		_setElementProperty(FlowID, oneElementID, "UniqueID", flowID "_" oneElementID)
-		_setElementProperty(FlowID, oneElementID, "lastrun", 0)
-		_setElementProperty(FlowID, oneElementID, "selected", false)
-		_setElementProperty(FlowID, oneElementID, "state", "idle")
-		_setElementProperty(FlowID, oneElementID, "countRuns", 0)
+		_setElementProperty(FlowID, oneElementID, "info", object())
+		_setElementInfo(FlowID, oneElementID, "selected", false)
+		_setElementInfo(FlowID, oneElementID, "state", "idle")
+		_setElementInfo(FlowID, oneElementID, "countRuns", 0)
+		_setElementInfo(FlowID, oneElementID, "lastrun", 0)
+		_setElementInfo(FlowID, oneElementID, "ClickPriority", 500)
+		; move "enabled" property to info object
+		_setElementInfo(FlowID, oneElementID, "enabled", _getElementProperty(FlowID, oneElementID, "enabled"))
+		_deleteElementProperty(FlowID, oneElementID, "enabled")
 
 		; TODO: check whether we have one default manual trigger (if there are any manual trigger)
 
@@ -132,7 +136,10 @@ LoadFlow(p_filepath)
 		LoadFlowCheckCompabilityConnection(FlowID, oneConnectionID, _getFlowProperty(FlowID, "CompabilityVersion"))
 	
 		; add some default element values
-		_setConnectionProperty(FlowID, oneConnectionID, "ClickPriority", 200)
+		_setConnectionProperty(FlowID, oneConnectionID, "info", object())
+		_setConnectionInfo(FlowID, oneConnectionID, "selected", false)
+		_setConnectionInfo(FlowID, oneConnectionID, "state", "idle")
+		_setConnectionInfo(FlowID, oneConnectionID, "ClickPriority", 200)
 	}
 
 	if not (_getFlowProperty(FlowID, "firstLoadedTime"))

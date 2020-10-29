@@ -32,13 +32,16 @@ Element_New(p_FlowID, p_type="", p_elementID="")
 	newElement.pars:=[]
 
 	; set some default properties
-	newElement.ClickPriority := 500
 	newElement.StandardName := True
-	newElement.lastrun := 0
-	newElement.selected := false
-	newElement.state := "idle"
-	newElement.countRuns := 0
-	newElement.enabled := False
+
+	; set som initial info (which are not changed on undo/redo actions)
+	newElement.info := object()
+	newElement.info.enabled := False
+	newElement.info.selected := false
+	newElement.info.state := "idle"
+	newElement.info.countRuns := 0
+	newElement.info.lastrun := 0
+	newElement.info.ClickPriority := 500
 	
 	;Assign default position
 	newElement.x := 0
@@ -332,14 +335,17 @@ Connection_New(p_FlowID, p_connectionID="")
 	
 	; set some default properties
 	newConnection.ConnectionType := "normal"
-	newConnection.ClickPriority := 200
 	
-	newConnection.selected := false
-	newConnection.state := "idle"
 	newConnection.type := "Connection"
 	newConnection.frompart := ""
 	newConnection.topart := ""
 	
+	; set som initial info (which are not changed on undo/redo actions)
+	newConnection.info := object()
+	newConnection.info.selected := false
+	newConnection.info.state := "idle"
+	newConnection.info.ClickPriority := 500
+
 	; write connection object
 	_setConnection(p_FlowID, newConnection.ID, newConnection)
 	

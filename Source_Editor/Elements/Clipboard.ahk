@@ -13,7 +13,7 @@ SaveToClipboard()
 	; loop through all elements
 	for forIndex, forElementID in _getAllElementIds(FlowID)
 	{
-		selected := _getElementProperty(FlowID, forElementID, "selected")
+		selected := _getElementInfo(FlowID, forElementID, "selected")
 		if (not selected) 
 		{
 			; Skip elements which are not selected
@@ -22,6 +22,10 @@ SaveToClipboard()
 		
 		; copy the selected element to clipboard
 		newClipboard.allElements[forElementID] := _getElement(FlowID, forElementID)
+
+		; clear info object
+		newClipboard.allElements[forElementID].info := object()
+
 		tempsaveCounter++
 	}
 	
@@ -31,8 +35,8 @@ SaveToClipboard()
 		; get some connection information
 		from := _getConnectionProperty(FlowID, forConnectionID, "from")
 		to := _getConnectionProperty(FlowID, forConnectionID, "to")
-		fromselected := _getElementProperty(FlowID, from, "selected")
-		toselected := _getElementProperty(FlowID, to, "selected")
+		fromselected := _getElementInfo(FlowID, from, "selected")
+		toselected := _getElementInfo(FlowID, to, "selected")
 
 		; A connection will be saved to clipboard if its connected elements are both selected
 		if (not (fromselected and toselected))
@@ -42,6 +46,10 @@ SaveToClipboard()
 
 		; both elements are selected. We will copy the connection to clipboard
 		newClipboard.allConnections[forConnectionID] := _getConnection(FlowID, forConnectionID)
+		
+		; clear info object
+		newClipboard.allConnections[forConnectionID].info := object()
+		
 		tempsaveCounter++
 	}
 	
@@ -133,7 +141,7 @@ loadFromClipboard()
 		_setElementProperty(FlowID, NewElementID, "y", ui_FitGridY(loadElement.Y + tempOffsetY))
 
 		; select the pasted element
-		_setElementProperty(FlowID, NewElementID, "selected", false)
+		_setElementInfo(FlowID, NewElementID, "selected", false)
 		SelectOneItem(NewElementID, true)
 	}
 
@@ -156,7 +164,7 @@ loadFromClipboard()
 		_setConnectionProperty(FlowID, NewElementID, "from", tempClipboardElementList[loadElement.from])
 
 		; select the pasted element
-		_setConnectionProperty(FlowID, NewElementID, "selected", false)
+		_setConnectionInfo(FlowID, NewElementID, "selected", false)
 		SelectOneItem(NewElementID, true)
 	}
 

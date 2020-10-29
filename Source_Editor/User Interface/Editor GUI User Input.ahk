@@ -498,7 +498,7 @@ clickOnPicture() ;react on clicks of the user
 			{
 				logger("a3", "user started moving the mouse. He clicked on an element. Going to move the element(s)", FlowID)
 
-				if (_getElementProperty(FlowID, clickedElement, "selected")) ;If the element under the mouse is already selected
+				if (_getElementInfo(FlowID, clickedElement, "selected")) ;If the element under the mouse is already selected
 				{
 					logger("a3", "Element is already selected. Move the selected elements", FlowID)
 
@@ -649,8 +649,8 @@ ui_findElementUnderMouse(mx, my, par_filter="", par_priority = "highest")
 			; get the position data of the element
 			drawResultElement := drawResultFlow.elements[forElementID]
 			; get additional data
-			clickPriority := _getElementProperty(FlowId, forElementID, "ClickPriority")
-			selected := _getElementProperty(FlowId, forElementID, "selected")
+			clickPriority := _getElementInfo(FlowId, forElementID, "ClickPriority")
+			selected := _getElementInfo(FlowId, forElementID, "selected")
 
 			;Some elements consist of multiple parts, so we need to loop through all of them
 			found := false
@@ -678,14 +678,14 @@ ui_findElementUnderMouse(mx, my, par_filter="", par_priority = "highest")
 			;Increase priority
 			if (clickPriority < 500)
 			{
-				_getAndIncrementElementProperty(FlowID, forElementID, "ClickPriority")
+				_getAndIncrementElementInfo(FlowID, forElementID, "ClickPriority")
 			}
 		}
 		
 		; set the priority of the found element to a lower value
 		if (clickedElement != "")
 		{
-			_setElementProperty(FlowID, clickedElement, "ClickPriority", 490)
+			_setElementInfo(FlowID, clickedElement, "ClickPriority", 490)
 		}
 	}
 	
@@ -703,7 +703,7 @@ ui_findElementUnderMouse(mx, my, par_filter="", par_priority = "highest")
 			drawResultElement:=drawResultFlow.elements[forElementID]
 
 			; get additional data
-			clickPriority := _getConnectionProperty(FlowId, forElementID, "ClickPriority")
+			clickPriority := _getConnectionInfo(FlowId, forElementID, "ClickPriority")
 
 			;Connections consist of multiple parts, so we need to loop through all of them
 			found := false
@@ -732,14 +732,14 @@ ui_findElementUnderMouse(mx, my, par_filter="", par_priority = "highest")
 			;Increase priority
 			if (clickPriority < 200) ;Increase priority if connection has low priority. 
 			{
-				_getAndIncrementConnectionProperty(FlowID, forElementID, "ClickPriority")
+				_getAndIncrementConnectionInfo(FlowID, forElementID, "ClickPriority")
 			}
 		}
 		
 		; set the priority of the found connection to a lower value
 		if (clickedElement)
 		{
-			_setConnectionProperty(FlowID, clickedElement, "ClickPriority", 190)
+			_setConnectionInfo(FlowID, clickedElement, "ClickPriority", 190)
 		}
 
 	}

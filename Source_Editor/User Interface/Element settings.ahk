@@ -274,7 +274,7 @@ class ElementSettings
 		ElementSettings.generalUpdate()
 		
 		;If editing a trigger, disable it (and enable it afterwards)
-		if (ElementSettings.elementType = "trigger" and _getElementProperty(FlowID, ElementSettings.element, "enabled") = true)
+		if (ElementSettings.elementType = "trigger" and _getElementInfo(FlowID, ElementSettings.element, "enabled") = true)
 		{
 			tempReenablethen := true
 			disableOneTrigger(FlowID, ElementSettings.element, false)

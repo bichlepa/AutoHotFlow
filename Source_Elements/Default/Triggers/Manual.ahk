@@ -84,7 +84,9 @@ Element_enable_Trigger_Manual(Environment, ElementParameters)
 {
 	global
 	x_enabled(Environment, "normal", "The manual trigger can now be triggered by other flows.")
-
+	
+	; return true, if trigger was enabled
+	return true
 }
 
 ;Called after the trigger has triggered.

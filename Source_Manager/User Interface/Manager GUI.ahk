@@ -550,11 +550,11 @@ TreeView_manager()
 		}
 		
 		; Update some button labels
-		if (tempselectedType.enabled = true)
+		if (_getFlowProperty(tempselectedID, "enabled") = true)
 			guicontrol,,Button_manager_EnableFlow,% lang("Disable")
 		else
 			guicontrol,,Button_manager_EnableFlow,% lang("Enable")
-		if (tempselectedType.running = true)
+		if (_getFlowProperty(tempselectedID, "running") = true)
 			guicontrol,,Button_manager_RunFlow,% lang("Stop")
 		else
 			guicontrol,,Button_manager_RunFlow,% lang("Run")

@@ -72,8 +72,8 @@ executionTask()
 						_setThreadProperty(OneInstanceID, OneThreadID, "ElementPars", currentFinishedElement.pars)
 
 						; change some element properties for proper rendering
-						_setElementProperty(OneThreadFlowID, OneThreadElementID, "state", "running")
-						_getAndIncrementElementProperty(OneThreadFlowID, OneThreadElementID, "countRuns")
+						_setElementInfo(OneThreadFlowID, OneThreadElementID, "state", "running")
+						_getAndIncrementElementInfo(OneThreadFlowID, OneThreadElementID, "countRuns")
 						_setFlowProperty(OneThreadFlowID, "draw.mustDraw", true)
 						
 						; generate a unique ID and prepare object for temporary values during execution
@@ -195,12 +195,12 @@ executionTask()
 						oneElementClass := _getElementProperty(OneThread.FlowID, OneThread.ElementID, "class")
 						
 						; make sure, the element is highlighted properly
-						oneElementCountRuns := _getAndIncrementElementProperty(OneThread.FlowID, OneThread.ElementID, "countRuns", -1)
+						oneElementCountRuns := _getAndIncrementElementInfo(OneThread.FlowID, OneThread.ElementID, "countRuns", -1)
 						if (oneElementCountRuns = 0)
 						{
-							_setElementProperty(OneThread.FlowID, OneThread.ElementID, "state", "finished")
+							_setElementInfo(OneThread.FlowID, OneThread.ElementID, "state", "finished")
 						}
-						_setElementProperty(OneThread.FlowID, OneThread.ElementID, "lastrun", a_tickcount)
+						_setElementInfo(OneThread.FlowID, OneThread.ElementID, "lastrun", a_tickcount)
 						_setFlowProperty(OneThread.flowID, "draw.mustDraw", true)
 						
 						; some elements have a function which can be called if the element is stopped. Call it
@@ -285,10 +285,10 @@ finishExecutionOfElement(p_InstanceID, p_ThreadID, p_Result, p_Message = "")
 			logger("f2", "Execution of element " ElementID " finished with result " p_Result, FlowName)
 		
 		; make sure, the element is highlighted properly
-		countRuns := _getAndIncrementElementProperty(FlowID, ElementID, "countRuns", -1)
+		countRuns := _getAndIncrementElementInfo(FlowID, ElementID, "countRuns", -1)
 		if (countRuns = 0)
-			_setElementProperty(FlowID, ElementID, "state", "finished")
-		_setElementProperty(FlowID, ElementID, "lastrun", a_tickcount)
+			_setElementInfo(FlowID, ElementID, "state", "finished")
+		_setElementInfo(FlowID, ElementID, "lastrun", a_tickcount)
 		_setFlowProperty(FlowID, "draw.mustDraw", true)
 		
 		; delete some temporary variables

@@ -197,13 +197,6 @@
       "to": "element0000000507",
       "type": "Connection"
     },
-    "connection0000000517": {
-      "ConnectionType": "normal",
-      "from": "element0000000507",
-      "ID": "connection0000000517",
-      "to": "element0000000433",
-      "type": "Connection"
-    },
     "connection0000000519": {
       "ConnectionType": "normal",
       "from": "",
@@ -265,6 +258,13 @@
       "from": "element0000000352",
       "ID": "connection0000000550",
       "to": "element0000000549",
+      "type": "Connection"
+    },
+    "connection0000000555": {
+      "ConnectionType": "normal",
+      "from": "element0000000507",
+      "ID": "connection0000000555",
+      "to": "element0000000433",
       "type": "Connection"
     }
   },
@@ -826,14 +826,14 @@
     }
   },
   "category": "AHF Test",
-  "ElementIDCounter": "551",
+  "ElementIDCounter": "555",
   "flowSettings": {
     "DefaultWorkingDir": 1,
     "ExecutionPolicy": "parallel",
     "FolderOfStaticVariables": "C:\\Users\\bichl\\Documents\\git\\AutoHotFlow\\Saved Flows\\Static variables\\Huge test script",
     "Name": "Huge test script",
-    "Offsetx": "-1566.768634",
-    "Offsety": "302.525970",
+    "Offsetx": "-1304.164892",
+    "Offsety": "-1008.841138",
     "WorkingDir": "C:\\Users\\Paul\\Documents\\AutoHotFlow default working direction",
     "zoomFactor": "0.605475"
   },

@@ -244,7 +244,7 @@ gdip_DrawEverything(FlowObj)
 	for drawID, tempelement in allConnections
 	{
 		;~ MsgBox %index%
-		if (tempelement.selected)
+		if (tempelement.Info.selected)
 			tempElementList2[drawID]:=allConnections[drawID].clone()
 		else
 			tempElementList[drawID]:=allConnections[drawID].clone()
@@ -264,10 +264,10 @@ gdip_DrawEverything(FlowObj)
 		
 		;Check whether element was recently running. This will paint it slightly red
 		tempElementHasRecentlyRun:=false
-		if (drawElement.lastRun>0) ;If element has recently run
+		if (drawElement.info.lastRun>0) ;If element has recently run
 		{
 			;~ ToolTip % drawElement.lastRun
-			if ((a_tickcount-drawElement.lastRun)<1000)
+			if ((a_tickcount-drawElement.info.lastRun)<1000)
 			{
 				tempElementHasRecentlyRun:=true
 				AnyRecentlyRunElementFound:=true
@@ -496,7 +496,7 @@ gdip_DrawEverything(FlowObj)
 			
 			
 			
-			if (drawElement.selected=true)
+			if (drawElement.Info.selected=true)
 				Gdip_TextToGraphics(G, drawElement.ConnectionType, "x" ((textx-Offsetx)*zoomFactor) " y" ((texty-Offsety)*zoomFactor) TextOptionsselectedThis , Font, (textw*zoomFactor), (texth*zoomFactor))
 			if (tempElementHasRecentlyRun) ;If element has recently run
 			{
@@ -521,7 +521,7 @@ gdip_DrawEverything(FlowObj)
 		{
 			if (drawElement.ConnectionType="exception")
 			{
-				if (drawElement.selected=true)
+				if (drawElement.Info.selected=true)
 					Gdip_DrawLine(G, pPenSelectLin, ((lin%a_index%x-Offsetx)*zoomFactor), ((lin%a_index%y-Offsety)*zoomFactor), ((lin%a_index%x+lin%a_index%w-Offsetx)*zoomFactor) , ((lin%a_index%y+lin%a_index%h-Offsety)*zoomFactor))
 				else
 					Gdip_DrawLine(G, pPenRed , ((lin%a_index%x-Offsetx)*zoomFactor), ((lin%a_index%y-Offsety)*zoomFactor), ((lin%a_index%x+lin%a_index%w-Offsetx)*zoomFactor) , ((lin%a_index%y+lin%a_index%h-Offsety)*zoomFactor))
@@ -532,7 +532,7 @@ gdip_DrawEverything(FlowObj)
 			}
 			else
 			{
-				if (drawElement.selected=true)
+				if (drawElement.Info.selected=true)
 					Gdip_DrawLine(G, pPenSelectLin, ((lin%a_index%x-Offsetx)*zoomFactor), ((lin%a_index%y-Offsety)*zoomFactor), ((lin%a_index%x+lin%a_index%w-Offsetx)*zoomFactor) , ((lin%a_index%y+lin%a_index%h-Offsety)*zoomFactor))
 				else
 					Gdip_DrawLine(G, pPenBlack, ((lin%a_index%x-Offsetx)*zoomFactor), ((lin%a_index%y-Offsety)*zoomFactor), ((lin%a_index%x+lin%a_index%w-Offsetx)*zoomFactor) , ((lin%a_index%y+lin%a_index%h-Offsety)*zoomFactor))
@@ -560,7 +560,7 @@ gdip_DrawEverything(FlowObj)
 	tempElementList2:=[]
 	for tempID, tempelement in allElements
 	{
-		if (tempelement.selected)
+		if (tempelement.Info.selected)
 			tempElementList2[tempID]:=allElements[tempID].clone()
 		else
 			tempElementList[tempID]:=allElements[tempID].clone()
@@ -573,16 +573,16 @@ gdip_DrawEverything(FlowObj)
 	{
 		;Check whether element was recently running. This will paint it slightly red
 		tempElementHasRecentlyRun:=false
-		if (drawElement.lastRun>0) ;If element has recently run
+		if (drawElement.info.lastRun>0) ;If element has recently run
 		{
-			if (a_tickcount-drawElement.lastRun<1000)
+			if (a_tickcount-drawElement.info.lastRun<1000)
 			{
 				
 				tempElementHasRecentlyRun:=true
 				AnyRecentlyRunElementFound:=true
 			}
 			else
-				allElements[drawID].delete(lastRun)
+				_setElementInfo(flowID, drawID, "lastRun", 0)
 		}
 		
 		;~ MsgBox % strobj(drawelement)
@@ -605,11 +605,11 @@ gdip_DrawEverything(FlowObj)
 			
 			
 			Gdip_TextToGraphics(G, drawElement.name, "x" ((drawElement.x-Offsetx)*zoomFactor +4) " y" ((drawElement.y-Offsety)*zoomFactor+4) " vCenter " TextOptions , Font, ((ElementWidth)*zoomFactor-8), ((ElementHeight)*zoomFactor-8))
-			;~ ToolTip % drawElement.id " - " drawElement.selected
-			if (drawElement.selected=true)
+			;~ ToolTip % drawElement.id " - " drawElement.Info.selected
+			if (drawElement.Info.selected=true)
 				Gdip_FillroundedRectangle(G, pBrushSelect, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y-Offsety)*zoomFactor), ((ElementWidth)*zoomFactor), ((ElementHeight)*zoomFactor),(30*zoomFactor))
 			
-			if (drawElement.enabled)
+			if (drawElement.Info.enabled)
 			{
 				tempX1:=drawElement.x + ElementWidth *0.8 - SizeOfButtons*0.5 - Offsetx
 				tempX2:=tempX1 + (SizeOfButtons * pBitmapSwitchOn_W / pBitmapSwitchOn_size)
@@ -650,7 +650,7 @@ gdip_DrawEverything(FlowObj)
 			
 			
 			
-			if (drawElement.state="Running") ;If element is running
+			if (drawElement.Info.state="Running") ;If element is running
 			{
 				Gdip_FillroundedRectangle(G, pBrushRunning, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y-Offsety)*zoomFactor), ((ElementWidth)*zoomFactor), ((ElementHeight)*zoomFactor),(30*zoomFactor))
 			}
@@ -689,9 +689,9 @@ gdip_DrawEverything(FlowObj)
 			
 			;Gdip_TextToGraphics(G, drawElement.name, "x" ((drawElement.x-Offsetx)*zoomFactor +4) "y" ((drawElement.y-Offsety)*zoomFactor+4) TextOptions , Font, ((ElementWidth)*zoomFactor-8), ((ElementHeight)*zoomFactor-8))
 			Gdip_TextToGraphics(G, drawElement.name, "x" ((drawElement.x-Offsetx)*zoomFactor +4) " y" ((drawElement.y-Offsety)*zoomFactor+4) " vCenter " TextOptions , Font, ((ElementWidth)*zoomFactor-8), (ElementHeight*zoomFactor-8))
-			if (drawElement.selected=true)
+			if (drawElement.Info.selected=true)
 				Gdip_FillRectangle(G, pBrushSelect, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y-Offsety)*zoomFactor), (ElementWidth*zoomFactor), (ElementHeight*zoomFactor))
-			if (drawElement.state="running") ;If element is running
+			if (drawElement.Info.state="running") ;If element is running
 			{
 				Gdip_FillRectangle(G, pBrushRunning, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y-Offsety)*zoomFactor), (ElementWidth*zoomFactor), (ElementHeight*zoomFactor))
 			}
@@ -731,10 +731,10 @@ gdip_DrawEverything(FlowObj)
 			}
 			
 			Gdip_TextToGraphics(G, drawElement.name, "x" ((drawElement.x-Offsetx)*zoomFactor +4) " y" ((drawElement.y-Offsety)*zoomFactor+4) " vCenter " TextOptions , Font, (ElementWidth*zoomFactor-8), (ElementHeight*zoomFactor-8))
-			if (drawElement.selected=true)
+			if (drawElement.Info.selected=true)
 				Gdip_FillroundedRectangle(G, pBrushSelect, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y-Offsety)*zoomFactor), (ElementWidth*zoomFactor), (ElementHeight*zoomFactor),(30*zoomFactor))
 			
-			if (drawElement.state="Running") ;If element is running
+			if (drawElement.Info.state="Running") ;If element is running
 			{
 				Gdip_FillroundedRectangle(G, pBrushRunning, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y-Offsety)*zoomFactor), (ElementWidth*zoomFactor), (ElementHeight*zoomFactor),(30*zoomFactor))
 			}
@@ -774,7 +774,7 @@ gdip_DrawEverything(FlowObj)
 			
 			Gdip_TextToGraphics(G, drawElement.name, "x" ((drawElement.x-Offsetx)*zoomFactor +4) " y" ((drawElement.y-Offsety)*zoomFactor+4) " vCenter " TextOptions , Font, (ElementWidth*zoomFactor-8), (ElementHeight*zoomFactor-8))
 			Gdip_TextToGraphics(G, "break", "x" ((drawElement.x+(ElementWidth *3/4)-Offsetx)*zoomFactor ) " y" ((drawElement.y+ElementHeight+drawElement.HeightOfVerticalBar-Offsety)*zoomFactor) " vCenter " TextOptionsSmall , Font, (ElementWidth*1/4*zoomFactor), (ElementHeight*1/3*zoomFactor)) ;Break text
-			if (drawElement.selected=true)
+			if (drawElement.Info.selected=true)
 			{
 				;~ Gdip_FillRectangle(G, pBrushSelect, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y-Offsety)*zoomFactor), (ElementWidth*zoomFactor), (ElementHeight*zoomFactor))
 				Gdip_FillRectangle(G, pBrushSelect, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y-Offsety)*zoomFactor), ((ElementWidth)*zoomFactor), ((ElementHeight)*zoomFactor))
@@ -782,7 +782,7 @@ gdip_DrawEverything(FlowObj)
 				Gdip_FillRectangle(G, pBrushSelect, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y+ElementHeight+drawElement.HeightOfVerticalBar-Offsety)*zoomFactor), ((ElementWidth)*zoomFactor), ((ElementHeight/3)*zoomFactor))
 			}
 			
-			if (drawElement.state="running") ;If element is running
+			if (drawElement.Info.state="running") ;If element is running
 			{
 				;Gdip_FillRectangle(G, pBrushRunning, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y-Offsety)*zoomFactor), (ElementWidth*zoomFactor), (ElementHeight*zoomFactor))
 				Gdip_FillRectangle(G, pBrushRunning, ((drawElement.x-Offsetx)*zoomFactor), ((drawElement.y-Offsety)*zoomFactor), ((ElementWidth)*zoomFactor), ((ElementHeight)*zoomFactor))
@@ -943,7 +943,7 @@ gdip_DrawEverything(FlowObj)
 		;~ MsgBox % strobj(tempElList[selectedElement])
 		if (tempElList[selectedElement].type = "trigger" )
 		{
-			if (tempElList[selectedElement].enabled)
+			if (tempElList[selectedElement].Info.enabled)
 			{
 				PosOfSwitchOnButtonX1:=tempElList[selectedElement].x + ElementWidth *0.8 - SizeOfButtons*0.5 - Offsetx
 				PosOfSwitchOnButtonX2:=PosOfSwitchOnButtonX1 + (SizeOfButtons * pBitmapSwitchOn_W / pBitmapSwitchOn_size)

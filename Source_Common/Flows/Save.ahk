@@ -69,7 +69,7 @@ SaveFlow(FlowID)
 		if (forElement.class = "trigger_manual")
 			saveElement.DefaultTrigger := forElement.DefaultTrigger
 		if (forElement.type = "trigger")
-			saveElement.enabled := _getElementProperty(FlowID, forElementID, "enabled")
+			saveElement.enabled := _getElementInfo(FlowID, forElementID, "enabled")
 		
 		; write the package which is needed for this element.
 		; usecase: if a flow will be exported and imported in an other installation of AHF

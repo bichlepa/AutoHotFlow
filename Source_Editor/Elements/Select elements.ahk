@@ -16,11 +16,11 @@ SelectOneItem(p_ID, additional := false)
 		; Select one element
 		if p_ID contains connection
 		{
-			_setConnectionProperty(FlowID, p_ID, "selected", true)
+			_setConnectionInfo(FlowID, p_ID, "selected", true)
 		}
 		else
 		{
-			_setElementProperty(FlowID, p_ID, "selected", true)
+			_setElementInfo(FlowID, p_ID, "selected", true)
 		}
 	}
 	else ;if (additional=true)
@@ -28,11 +28,11 @@ SelectOneItem(p_ID, additional := false)
 		; Select one element (additionally, unselect if selected)
 		if p_ID contains connection
 		{
-			_setConnectionProperty(FlowID, p_ID, "selected", !_getConnectionProperty(FlowID, p_ID, "selected"))
+			_setConnectionInfo(FlowID, p_ID, "selected", !_getConnectionInfo(FlowID, p_ID, "selected"))
 		}
 		else
 		{
-			_setElementProperty(FlowID, p_ID, "selected", !_getElementProperty(FlowID, p_ID, "selected"))
+			_setElementInfo(FlowID, p_ID, "selected", !_getElementInfo(FlowID, p_ID, "selected"))
 		}
 	}
 	
@@ -48,11 +48,11 @@ UnSelectEverything(CreateList = true)
 	
 	for forIndex, forElementID in _getAllElementIds(FlowID) 
 	{
-		_setElementProperty(FlowID, forElementID, "selected", false)
+		_setElementInfo(FlowID, forElementID, "selected", false)
 	}
 	for forIndex, forConnectionID in _getAllConnectionIds(FlowID) ;Add all selected elements into array
 	{
-		_setConnectionProperty(FlowID, forConnectionID, "selected", false)
+		_setConnectionInfo(FlowID, forConnectionID, "selected", false)
 	}
 	
 	if (CreateList)
@@ -69,12 +69,12 @@ SelectEverything()
 	;Select all elements
 	for forIndex, forElementID in _getAllElementIds(FlowID)
 	{
-		_setElementProperty(FlowID, forElementID, "selected", true)
+		_setElementInfo(FlowID, forElementID, "selected", true)
 	}
 	;Select all connections
 	for forIndex, forConnectionID in _getAllConnectionIds(FlowID)
 	{
-		_setConnectionProperty(FlowID, forConnectionID, "selected", false)
+		_setConnectionInfo(FlowID, forConnectionID, "selected", false)
 	}
 	
 	UpdateSelectedItemsList()
@@ -92,13 +92,13 @@ UpdateSelectedItemsList()
 	;Add all selected elements into array
 	for forIndex, forElementID in _getAllElementIds(FlowID) 
 	{
-		if (_getElementProperty(FlowID, forElementID, "selected"))
+		if (_getElementInfo(FlowID, forElementID, "selected"))
 			selectedElements[forElementID] := forElementID
 	}
 	;Add all selected connections into array
 	for forIndex, forConnectionID in _getAllConnectionIds(FlowID)
 	{
-		if (_getConnectionProperty(FlowID, forConnectionID, "selected"))
+		if (_getConnectionInfo(FlowID, forConnectionID, "selected"))
 			selectedElements[forConnectionID] := forConnectionID
 	}
 	

@@ -206,7 +206,7 @@ justDisableOneTrigger(p_FlowID, p_ElementID, p_EnabledTriggerID)
 	Element_disable_%tempElementClass%(environment, triggerPars)
 
 	; update visual data
-	_setElementProperty(p_FlowID, p_ElementID, "enabled", false)
+	_setElementInfo(p_FlowID, p_ElementID, "enabled", false)
 	_setFlowProperty(p_FlowID, "draw.mustdraw", true)
 
 	; delete the enabled trigger
@@ -226,7 +226,7 @@ saveResultOfTriggerEnabling(environment, Result, Message)
 	if (Result = "normal")
 	{
 		; set the enabling sate of the element
-		_setElementProperty(environment.flowID, environment.elementID, "enabled", True)
+		_setElementInfo(environment.flowID, environment.elementID, "enabled", True)
 		
 		; log the event
 		if (Message = "")
@@ -237,7 +237,7 @@ saveResultOfTriggerEnabling(environment, Result, Message)
 	else if (result = "exception")
 	{
 		; set the enabling sate of the element
-		_setElementProperty(environment.flowID, environment.elementID, "enabled", False)
+		_setElementInfo(environment.flowID, environment.elementID, "enabled", False)
 
 		; log the event and show a message
 		ElementName := _getElementProperty(environment.flowID, environment.elementID, "name")
@@ -277,7 +277,7 @@ saveResultOfTriggerDisabling(trigger, Result, Message)
 	if (Result = "normal")
 	{
 		; set the enabling sate of the element
-		_setElementProperty(environment.flowID, environment.elementID, "enabled", False)
+		_setElementInfo(environment.flowID, environment.elementID, "enabled", False)
 
 		; log the event
 		if (Message = "")
