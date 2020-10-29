@@ -10,7 +10,8 @@
         "lib\\Eject by SKAN\\Eject by SKAN.ahk",
         "lib\\Class_Monitor\\Class_Monitor.ahk",
         "lib\\HTTP Request\\HTTPRequest.ahk",
-        "lib\\HTTP Request\\Uriencode.ahk"
+        "lib\\HTTP Request\\Uriencode.ahk",
+        "lib\\Process list\\getProcessList.ahk"
     ],
     "actions": [
         "New_Variable.ahk",

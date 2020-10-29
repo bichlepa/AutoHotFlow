@@ -235,7 +235,7 @@ Trigger_Window_Gets_Inactive_TimerLabel(Environment, parameters, fistCall = fals
 
 	if (fistCall)
 	{
-		; on first call, we need to skip the trigger if the window is already not active
+		; on first call, we need to create an initial list of windows
 		parameters.currentWindowID := WinActive(parameters.winstring, parameters.WinText, parameters.ExcludeTitle, parameters.ExcludeText)
 	}
 

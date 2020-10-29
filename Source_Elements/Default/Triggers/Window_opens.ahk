@@ -268,7 +268,7 @@ Trigger_Window_Opens_TimerLabel(Environment, parameters, fistCall = false)
 	{
 		if (not parameters.currentWinList.hasKey(oneWindowID))
 		{
-			; a window is missing now. Call the trigger
+			; a new window found. Call the trigger
 			x_trigger(Environment, {windowID: oneWindowID})
 		}
 	}

@@ -53,8 +53,13 @@ Element_getParametrizationDetails_Trigger_Process_starts(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: lang("Process name or ID")})
-	parametersToEdit.push({type: "Edit", id: "ProcessName", content: "String", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: lang("Process name")})
+	parametersToEdit.push({type: "Edit", id: "ProcessName", content: "String"})
+	
+	parametersToEdit.push({type: "Label", label: lang("Options")})
+	parametersToEdit.push({type: "Checkbox", id: "NotTriggerOnEnable", default: 1, label: lang("Do not trigger if a matching window exists when enabling the trigger")})
+	parametersToEdit.push({type: "Label", label: lang("Check interval"), size: "small"})
+	parametersToEdit.push({type: "Edit", id: "interval", content: "Number", default: 1000, WarnIfEmpty: true})
 	
 	return parametersToEdit
 }
@@ -79,49 +84,86 @@ Element_CheckSettings_Trigger_Process_starts(Environment, ElementParameters)
 ;Called when the trigger is activated
 Element_enable_Trigger_Process_starts(Environment, ElementParameters)
 {
-	
-	EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters)
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
 	if (EvaluatedParameters._error)
 	{
 		x_enabled(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
 
-	
-	inputVars:={ProcessName: EvaluatedParameters.ProcessName} ;Variables which will be available in the external scriptExample
-	outputVars:=["processID"]
-	code =
-	( ` , LTrim %
-		loop
-		{
-			process,wait,%ProcessName%
-			x_trigger()
-			process,waitclose,%ProcessName%
-		}
-	)
-	
-	x_TriggerInNewAHKThread(Environment, code, inputVars, outputVars)
+	; check interval
+	if (not (EvaluatedParameters.interval > 0))
+	{
+		x_enabled(Environment, "exception", lang("Parameter '%1%' has invalid value: %2%", "interval", tempinterval)) 
+		return
+	}
+
+	; We will set a timer which regularely checks the processes
+	; create a function object
+	functionObject := x_NewFunctionObject(environment, "Trigger_Process_Opens_TimerLabel", EvaluatedParameters)
+	x_SetTriggerValue(Environment, "functionObject", functionObject)
+
+	; make the first call immediately
+	%functionObject%(true)
+
+	; enable the timer
+	SetTimer, % functionObject, % EvaluatedParameters.interval
+
+	; finish and return true
 	x_enabled(Environment, "normal")
-	; return true, if trigger was enabled
 	return true
 }
 
 
 ;Called after the trigger has triggered.
 ;Here you can for example define the variables which are provided by the triggers.
-Element_postTrigger_Trigger_Process_starts(Environment, ElementParameters)
+Element_postTrigger_Trigger_Process_starts(Environment, parameters)
 {
-	exportedValues:=x_TriggerInNewAHKThread_GetExportedValues(Environment)
-	x_SetVariable(Environment,"a_pid",exportedValues.processID,"Thread")
+	x_SetVariable(Environment, "a_processID", parameters.processID, "Thread")
+	x_SetVariable(Environment, "a_processName", parameters.processName, "Thread")
 }
 
 ;Called when the trigger should be disabled.
 Element_disable_Trigger_Process_starts(Environment, ElementParameters)
 {
-	functionObject := x_GetExecutionValue(environment, "functionObject")
-	SetTimer, % functionObject, delete
+	; get the function object and disable the timer
+	functionObject := x_getTriggerValue(Environment, "functionObject")
+	SetTimer, % functionObject, off
+
+	; finish
 	x_disabled(Environment, "normal")
 }
 
+
+; function which will be regularey called
+Trigger_Process_Opens_TimerLabel(Environment, parameters, fistCall = false)
+{
+	if (fistCall)
+	{
+		; on first call, check NotTriggerOnEnable parameter
+		if (parameters.NotTriggerOnEnable)
+		{
+			; we must not trigger on enable. So create an initial list of processes
+			parameters.currentProcesses := getProcessList(parameters.ProcessName)
+		}
+	}
+
+	; get a list of all matching processes
+	currentProcesses := getProcessList(parameters.ProcessName)
+
+	; check whether some elements appeared
+	for oneProcessID, oneProcessName in currentProcesses
+	{
+		if (not parameters.currentProcesses.hasKey(oneProcessID))
+		{
+			; a new process found. Call the trigger
+			x_trigger(Environment, {processID: oneProcessID, processName: oneProcessName})
+		}
+	}
+	
+	; the result has changed. Save the changed value.
+	parameters.currentProcesses := currentProcesses
+}
 
 
