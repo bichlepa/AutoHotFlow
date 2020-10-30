@@ -55,9 +55,9 @@ Element_getParametrizationDetails_Trigger_User_Idle_Time(Environment)
 	
 	parametersToEdit.push({type: "Label", label: lang("Period of time")})
 	parametersToEdit.push({type: "edit", id: "Interval", default: 10, content: "Expression", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Radio", id: "Unit", default: 2, result: "enum", choices: [lang("Seconds"), lang("Minutes"), lang("Hours")], enum: ["Seconds", "Minutes", "Hours"]})
+	parametersToEdit.push({type: "Radio", id: "Unit", default: 2, result: "enum", choices: [lang("MilliSeconds"), lang("Seconds"), lang("Minutes"), lang("Hours")], enum: ["MilliSeconds", "Seconds", "Minutes", "Hours"]})
 	parametersToEdit.push({type: "Label", label: lang("Method")})
-	parametersToEdit.push({type: "Radio", id: "Method", default: 1, result: "enum", choices: [lang("Method %1%", 1), lang("Method %1%", 2)], enum: ["TimeIdle", "TimeIdlePhysical"]})
+	parametersToEdit.push({type: "Radio", id: "Method", default: 1, result: "enum", choices: [lang("Method: %1%", lang("Default")), lang("Method: %1%", lang("Physical"))], enum: ["TimeIdle", "TimeIdlePhysical"]})
 
 	return parametersToEdit
 }
@@ -82,78 +82,60 @@ Element_CheckSettings_Trigger_User_Idle_Time(Environment, ElementParameters)
 ;Called when the trigger is activated
 Element_enable_Trigger_User_Idle_Time(Environment, ElementParameters)
 {
-	
-	EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters)
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
 	if (EvaluatedParameters._error)
 	{
 		x_enabled(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
-	
-	if (ElementParameters.Unit="Seconds") ;Milliseconds
-		tempDuration:=ElementParameters.Interval * 1000
-	else if (ElementParameters.Unit="Minutes") ;Seconds
-		tempDuration:=ElementParameters.Interval * 1000 * 60
-	else if (ElementParameters.Unit="Hours") ;minutes
-		tempDuration:=ElementParameters.Interval * 1000 * 60 * 60
-	
-	if (tempDuration < 100)
+
+	; check the interval
+	if (not (EvaluatedParameters.Interval > 0))
 	{
-		x_log("e1", "Specified user idle time must be at least 100ms. Current value: " tempDuration " ms")
+		x_enabled(Environment, "exception", lang("Parameter '%1%' has invalid value: %2%", "interval", Interval)) 
 		return
 	}
-	functionObject:= x_NewFunctionObject(environment, "Trigger_User_Idle_Time_Trigger", EvaluatedParameters, tempDuration)
+	
+	; check unit and increase interval if needed
+	Interval := EvaluatedParameters.Interval
+	switch (EvaluatedParameters.Unit)
+	{
+	case "MilliSeconds":
+		Interval *= 1 ; nothing to do
+	case "Seconds":
+		Interval *= 1000
+	case "Minutes":
+		Interval *= 1000 * 60
+	case "Hours":
+		Interval *= 1000 * 60 * 60
+	default:
+		x_enabled(Environment, "exception", lang("Parameter '%1%' has invalid value: %2%", "Unit", EvaluatedParameters.Unit)) 
+		return
+	}
+
+	; save the calculated interval
+	EvaluatedParameters.calculatedInterval := Interval
+
+	; check method
+	switch (EvaluatedParameters.method)
+	{
+	case "TimeIdle":
+	case "TimeIdlePhysical":
+	default:
+		x_enabled(Environment, "exception", lang("Parameter '%1%' has invalid value: %2%", "method", EvaluatedParameters.method)) 
+		return
+	}
+
+	; We will set a timer which regularely triggers.
+	; create a function object
+	functionObject := x_NewFunctionObject(environment, "Trigger_User_Idle_Time_Trigger", EvaluatedParameters)
 	x_SetTriggerValue(environment, "functionObject", functionObject)
 	SetTimer, % functionObject, -1
 	
+	; finish and return true
 	x_enabled(Environment, "normal")
-	; return true, if trigger was enabled
 	return true
-}
-
-;Function which triggers the flow
-Trigger_User_Idle_Time_Trigger(environment, EvaluatedParameters, par_Duration)
-{
-	userIsAlreadyIdle := x_GetExecutionValue(environment, "UserIsIdle")
-	functionObject := x_GetExecutionValue(environment, "functionObject")
-	
-	if (EvaluatedParameters.method = "TimeIdle")
-		userIdleTime:=A_TimeIdle
-	else if (EvaluatedParameters.method = "TimeIdlePhysical")
-		userIdleTime:=A_TimeIdlePhysical
-	else
-	{
-		x_log("e1", "Method for getting the user idle time is not specified")
-		return
-	}
-	
-	remainingTime:=par_Duration - userIdleTime
-	
-	if (userIsAlreadyIdle)
-	{
-		if (remainingTime > 0)
-		{
-			x_SetExecutionValue(environment, "UserIsIdle", false)
-			SetTimer,% functionObject, % - remainingTime
-		}
-		else
-		{
-			SetTimer,% functionObject, % - par_Duration / 2
-		}
-	}
-	else
-	{
-		if (remainingTime <= 0)
-		{
-			x_SetExecutionValue(environment, "UserIsIdle", true)
-			x_trigger(Environment)
-			SetTimer,% functionObject, % - par_Duration / 2
-		}
-		else
-		{
-			SetTimer,% functionObject, % - remainingTime
-		}
-	}
 }
 
 ;Called after the trigger has triggered.
@@ -166,10 +148,74 @@ Element_postTrigger_Trigger_User_Idle_Time(Environment, ElementParameters)
 ;Called when the trigger should be disabled.
 Element_disable_Trigger_User_Idle_Time(Environment, ElementParameters)
 {
-	functionObject := x_GetTriggerValue(environment, "functionObject")
-	SetTimer, % functionObject, delete
-	x_disabled(Environment, "normal")
+	; get the function object and disable the timer
+	functionObject := x_getTriggerValue(Environment, "functionObject")
+	SetTimer, % functionObject, off
+
+	; finish
+	x_disabled(Environment, "normal", lang("Stopped."))
 }
 
 
+;Function which checks the idle time and triggers the flow
+Trigger_User_Idle_Time_Trigger(environment, EvaluatedParameters)
+{
+	; we will need the function object, so we can update the timer
+	functionObject := x_getTriggerValue(Environment, "functionObject")
+	
+	; get current idle time
+	switch (EvaluatedParameters.method)
+	{
+	case "TimeIdle":
+		userIdleTime := A_TimeIdle
+	case "TimeIdlePhysical":
+		userIdleTime := A_TimeIdlePhysical
+	default:
+		x_log("e0", "Method for getting the user idle time is invlaid: " EvaluatedParameters.method)
+		return
+	}
 
+	; calculate the remaining time until we have to trigger
+	remainingTime := EvaluatedParameters.calculatedInterval - userIdleTime
+	
+	; check current state
+	if (EvaluatedParameters.currentlyUserIsIdle)
+	{
+		; we are in state after we triggered and we are waiting until the user is not idle anymore
+		if (remainingTime > 0)
+		{
+			; user is not idle anymore
+			EvaluatedParameters.currentlyUserIsIdle := false
+
+			; check again after the remaining time
+			SetTimer, % functionObject, % - remainingTime
+		}
+		else
+		{
+			; user is still idle
+			; check again after half of the timeout time
+			SetTimer, % functionObject, % - EvaluatedParameters.calculatedInterval / 2
+		}
+	}
+	else
+	{
+		; we are in state where we are waiting until the idle time reaches the timeout
+		if (remainingTime > 0)
+		{
+			; user is still not idle
+			; check again after the remaining time
+			SetTimer, % functionObject, % - remainingTime
+		}
+		else
+		{
+			; user just became idle
+			EvaluatedParameters.currentlyUserIsIdle := true
+
+			; trigger
+			x_trigger(Environment)
+
+			; check again after half of the timeout time
+			SetTimer, % functionObject, % - EvaluatedParameters.calculatedInterval / 2
+		}
+	}
+}

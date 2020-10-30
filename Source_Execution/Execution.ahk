@@ -25,6 +25,12 @@ global _ScriptDir := _getShared("_ScriptDir")
 ; While any thread uses those commands, the working directory of the whole process is changed to the path which is shown in the dialog.
 ; SetWorkingDir %a_temp% working dir is only set in main thread. Otherwise it causes errors if another thread is currently including files
 
+; some triggeers need keyboard and mouse hooks.
+; Install them at the beginning for consistent behaviour
+; it also affects the A_TimeIdlePhysical variable
+#InstallMouseHook
+#InstallKeybdHook
+
 ; set default file encoding
 FileEncoding utf-8
 

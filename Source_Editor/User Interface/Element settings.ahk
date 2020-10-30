@@ -717,7 +717,7 @@ class ElementSettings
 		{
 			global
 			; copy some parameters in local variables
-			local tempFirstParameterID := parameter.id[1]
+			local tempFirstParameterID := this.parameter.id[1]
 
 			; create the control on the right side
 			gui, add, picture, x394 Y+-16 w16 h16 hwndtempHWND gGUISettingsOfElementClickOnWarningPic vGUISettingsOfElementWarningIconOf%tempFirstParameterID%
@@ -730,7 +730,7 @@ class ElementSettings
 		{
 			global
 			; copy some parameters in local variables
-			local tempFirstParameterID := parameter.id[1]
+			local tempFirstParameterID := this.parameter.id[1]
 			
 			; create the control on the left side
 			gui, add, picture, x10 w16 h16 hwndtempHWND gGUISettingsOfElementClickOnInfoPic vGUISettingsOfElementInfoIconOf%tempFirstParameterID%
@@ -2079,28 +2079,28 @@ class ElementSettings
 			gui, font, s8 cDefault wnorm
 			
 			; create an checkboxes for each weekday
-			gui, add, checkbox, w45 x10 hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID%2, % lang("Mon (Short for Monday")
+			gui, add, checkbox, w45 x10 hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID%2, % lang("Mon #Short for Monday")
 			this.components.push("GUISettingsOfElement" tempParameterID "2")
 			ElementSettings.fieldHWNDs[tempHWND] := this
-			gui, add, checkbox, w45 X+10 hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID%3, % lang("Tue (Short for Tuesday")
+			gui, add, checkbox, w45 X+10 hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID%3, % lang("Tue #Short for Tuesday")
 			this.components.push("GUISettingsOfElement" tempParameterID "3")
 			ElementSettings.fieldHWNDs[tempHWND] := this
-			gui, add, checkbox, w45 X+10 hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID%4, % lang("Wed (Short for Wednesday")
+			gui, add, checkbox, w45 X+10 hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID%4, % lang("Wed #Short for Wednesday")
 			this.components.push("GUISettingsOfElement" tempParameterID "4")
 			ElementSettings.fieldHWNDs[tempHWND] := this
-			gui, add, checkbox, w45 X+10 hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID%5, % lang("Thu (Short for Thursday")
+			gui, add, checkbox, w45 X+10 hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID%5, % lang("Thu #Short for Thursday")
 			this.components.push("GUISettingsOfElement" tempParameterID "5")
 			ElementSettings.fieldHWNDs[tempHWND] := this
-			gui, add, checkbox, w45 X+10 hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID%6, % lang("Fri (Short for Friday")
+			gui, add, checkbox, w45 X+10 hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID%6, % lang("Fri #Short for Friday")
 			this.components.push("GUISettingsOfElement" tempParameterID "6")
 			ElementSettings.fieldHWNDs[tempHWND] := this
-			gui, add, checkbox, w45 X+10 hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID%7, % lang("Sat (Short for Saturday")
+			gui, add, checkbox, w45 X+10 hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID%7, % lang("Sat #Short for Saturday")
 			this.components.push("GUISettingsOfElement" tempParameterID "7")
 			ElementSettings.fieldHWNDs[tempHWND] := this
-			gui, add, checkbox, w45 X+10 hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID%1, % lang("Sun (Short for Sunday") ;Sunday is 1
+			gui, add, checkbox, w45 X+10 hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID%1, % lang("Sun #Short for Sunday") ;Sunday is 1
 			this.components.push("GUISettingsOfElement" tempParameterID "1")
 			ElementSettings.fieldHWNDs[tempHWND] := this
-			
+
 			; check checkboxes with selected weekdays
 			loop 7 ; loop through all weekdays
 			{
@@ -2118,7 +2118,7 @@ class ElementSettings
 			global
 
 			; copy some paramters in local variables
-			local tempParameterID := parameter.id[1]
+			local tempParameterID := this.parameter.id[1]
 
 			; Prepare result value
 			local tempResult := ""
@@ -2126,7 +2126,8 @@ class ElementSettings
 			{
 				; get the checkbox value
 				GUIControlGet, tempValue, GUISettingsOfElement:, GUISettingsOfElement%tempParameterID%%a_index%
-				if (tempValue = 1)
+
+				if (tempValue)
 				{
 					; value is selected. Append the index to the result value
 					tempResult .= A_Index
@@ -2140,7 +2141,7 @@ class ElementSettings
 		{
 			global
 			; copy some paramters in local variables
-			local tempParameterID := parameter.id[1]
+			local tempParameterID := this.parameter.id[1]
 
 			; check checkboxes with selected weekdays
 			loop 7 ; loop through all weekdays
@@ -2182,6 +2183,7 @@ class ElementSettings
 			
 			; get the current value
 			tempValue := ElementSettings.elementPars[tempParameterID] 
+			
 			; set to current time, if current value is empty
 			if (tempValue = "")
 			{
@@ -2192,7 +2194,7 @@ class ElementSettings
 			gui, font, s8 cDefault wnorm
 
 			; create an datetime control
-			gui, add, DateTime, w400 x10 choose%temp% gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID% ,% tempFormat
+			gui, add, DateTime, w400 x10 choose%tempValue% gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID% ,% tempFormat
 			this.components.push("GUISettingsOfElement" tempParameterID)
 			ElementSettings.fieldHWNDs[tempHWND] := this
 		}

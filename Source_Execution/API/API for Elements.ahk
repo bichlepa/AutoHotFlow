@@ -306,7 +306,7 @@ x_AutoEvaluateOneParameter(EvaluatedParameters, Environment, ElementParameters, 
 				if (result = "")
 				{
 					EvaluatedParameters._error := true
-					EvaluatedParameters._errorMessage := lang("Parameter '%1%' is empty", ElementParameters[oneParID])
+					EvaluatedParameters._errorMessage := lang("Parameter '%1%' is empty", oneParID)
 				}
 			}
 			EvaluatedParameters[oneParID] := result
@@ -315,7 +315,7 @@ x_AutoEvaluateOneParameter(EvaluatedParameters, Environment, ElementParameters, 
 		{
 			; content type has an uknown value. add a warning
 			EvaluatedParameters._error := true
-			EvaluatedParameters._errorMessage := lang("Parameter '%1%' has unsupported content type", ElementParameters[oneParID])
+			EvaluatedParameters._errorMessage := lang("Parameter '%1%' has unsupported content type", oneParID)
 		}
 	}
 	_LeaveCriticalSection()

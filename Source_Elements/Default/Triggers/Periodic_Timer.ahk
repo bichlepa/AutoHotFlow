@@ -88,7 +88,7 @@ Element_enable_Trigger_Periodic_Timer(Environment, ElementParameters)
 	}
 	
 	; check the interval
-	if (not (Interval > 0))
+	if (not (EvaluatedParameters.Interval > 0))
 	{
 		x_enabled(Environment, "exception", lang("Parameter '%1%' has invalid value: %2%", "interval", Interval)) 
 		return

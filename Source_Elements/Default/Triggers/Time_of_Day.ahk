@@ -53,7 +53,6 @@ Element_getParametrizationDetails_Trigger_Time_Of_Day(Environment)
 {
 	parametersToEdit:=Object()
 	
-	
 	parametersToEdit.push({type: "Label", label: lang("Weekdays")})
 	parametersToEdit.push({type: "Weekdays", id: "WeekDays", default: "1234567", WarnIfEmpty: "true"})
 	parametersToEdit.push({type: "Label", label: lang("Time of day")})
@@ -82,14 +81,15 @@ Element_CheckSettings_Trigger_Time_Of_Day(Environment, ElementParameters)
 ;Called when the trigger is activated
 Element_enable_Trigger_Time_Of_Day(Environment, ElementParameters)
 {
-	
-	EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters)
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
 	if (EvaluatedParameters._error)
 	{
 		x_enabled(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
 	
+	; calculate next trigger time
 	remainingSeconds := Trigger_Time_Of_Day_Trigger_FindNextTimestamp(EvaluatedParameters.WeekDays, EvaluatedParameters.Time)
 	if (remainingSeconds = "")
 	{
@@ -97,56 +97,15 @@ Element_enable_Trigger_Time_Of_Day(Environment, ElementParameters)
 		x_log(Environment, "WeekDays: " EvaluatedParameters.WeekDays ", Time: " EvaluatedParameters.Time, 1)
 		return
 	}
-		
-	
-	functionObject:= x_NewFunctionObject(environment, "Trigger_Time_Of_Day_Trigger", EvaluatedParameters)
+
+	; We will set a timer which triggers on the next trigger time.
+	functionObject := x_NewFunctionObject(environment, "Trigger_Time_Of_Day_Trigger", EvaluatedParameters)
 	x_SetTriggerValue(environment, "functionObject", functionObject)
 	SetTimer, % functionObject, % - remainingSeconds * 1000
-	;~ MsgBox % - remainingSeconds * 1000 " - " EvaluatedParameters.WeekDays " - " EvaluatedParameters.Time
 	
+	; finish and return true
 	x_enabled(Environment, "normal")
-	; return true, if trigger was enabled
 	return true
-}
-
-Trigger_Time_Of_Day_Trigger_FindNextTimestamp(WeekDays, TimeOfDay)
-{
-	;Find the next timestamp, where the trigger should start
-	FormatTime,TimeWithoutDate,% TimeOfDay,HHmmss
-	NewTime:=A_YYYY . A_MM . A_DD . TimeWithoutDate ;Create a new time and date
-	loop 8 ;Go through all days of week
-	{
-		if a_index != 1
-			EnvAdd,NewTime,% 1,days
-		remainingSeconds:=NewTime
-		EnvSub,remainingSeconds,a_now,seconds
-		if (remainingSeconds>0 ) ;Catch if the time is already passed. This may occure in the first loop
-		{
-			FormatTime,oneDayOfWeek,%NewTime%,WDay ;find out the weekday of the new day
-			;~ MsgBox % tempDayOfWeek "   " %ElementID%WeekDays "    " TriggerTime_of_dayNewTime
-			IfInString,WeekDays,% oneDayOfWeek
-			{
-				return remainingSeconds
-			}
-		}
-	}
-}
-
-;Function which triggers the flow
-Trigger_Time_Of_Day_Trigger(environment, EvaluatedParameters)
-{
-	remainingSeconds := Trigger_Time_Of_Day_Trigger_FindNextTimestamp(EvaluatedParameters.WeekDays, EvaluatedParameters.Time)
-	if (remainingSeconds = "")
-	{
-		x_log(Environment, lang("Can't calculate next trigger time"),0) 
-		x_log(Environment, "WeekDays: " EvaluatedParameters.WeekDays ", Time: " EvaluatedParameters.Time, 1)
-		return
-	}
-	
-	functionObject := x_GetExecutionValue(environment, "functionObject")
-	SetTimer, % functionObject, % - remainingSeconds * 1000
-	;~ MsgBox asdf e %remainingSeconds%
-	x_trigger(Environment)
 }
 
 ;Called after the trigger has triggered.
@@ -159,11 +118,65 @@ Element_postTrigger_Trigger_Time_Of_Day(Environment, ElementParameters)
 ;Called when the trigger should be disabled.
 Element_disable_Trigger_Time_Of_Day(Environment, ElementParameters)
 {
-	functionObject := x_GetTriggerValue(environment, "functionObject")
-	SetTimer, % functionObject, delete
-	;~ MsgBox aggrweg
-	x_disabled(Environment, "normal")
+	; get the function object and disable the timer
+	functionObject := x_getTriggerValue(Environment, "functionObject")
+	SetTimer, % functionObject, off
+
+	; finish
+	x_disabled(Environment, "normal", lang("Stopped."))
 }
 
 
 
+;Find the next timestamp, when the trigger should start
+Trigger_Time_Of_Day_Trigger_FindNextTimestamp(WeekDays, TimeOfDay)
+{
+	; create an AHK timestamp with todays date and the set time of day
+	FormatTime, TimeWithoutDate, % TimeOfDay, HHmmss
+	NewTime := A_YYYY . A_MM . A_DD . TimeWithoutDate ;Create a new time and date
+
+	loop 8 ;Go through all days of week
+	{
+		; add one day on each iteration (not at first iteration)
+		if a_index != 1
+			EnvAdd, NewTime, 1, days
+		
+		; calculate remaining time
+		remainingSeconds := NewTime
+		EnvSub, remainingSeconds, a_now, seconds
+
+		;Catch if the time is already passed. This may occure in the first loop iteration
+		if (remainingSeconds > 0)
+		{
+			; get the weekday number of the new day
+			FormatTime, oneDayOfWeek, %NewTime%, WDay
+
+			; check whether the weekday is checked
+			IfInString, WeekDays, % oneDayOfWeek
+			{
+				; weekday is checked. Return this time
+				return remainingSeconds
+			}
+		}
+	}
+}
+
+;Function which triggers the flow
+Trigger_Time_Of_Day_Trigger(environment, EvaluatedParameters)
+{
+	; calculate the next trigger time
+	remainingSeconds := Trigger_Time_Of_Day_Trigger_FindNextTimestamp(EvaluatedParameters.WeekDays, EvaluatedParameters.Time)
+	if (remainingSeconds = "")
+	{
+		x_log(Environment, lang("Can't calculate next trigger time"), 0) 
+		x_log(Environment, "WeekDays: " EvaluatedParameters.WeekDays ", Time: " EvaluatedParameters.Time, 1)
+		return
+	}
+	
+	; update the timer to the next trigger time
+	functionObject := x_GetTriggerValue(environment, "functionObject")
+	SetTimer, % functionObject, % - remainingSeconds * 1000
+	
+	; trigger the flow
+	x_trigger(Environment)
+}
