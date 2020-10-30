@@ -216,7 +216,7 @@ Element_disable_Trigger_Window_Closes(Environment, ElementParameters)
 	SetTimer, % functionObject, off
 
 	; finish
-	x_disabled(Environment, "normal", lang("Stopped."))
+	x_disabled(Environment, "normal")
 }
 
 

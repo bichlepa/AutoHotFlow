@@ -98,7 +98,8 @@ newInstance(p_Environment, p_params = "", p_instanceProperties = "")
 			ElementClass := _getElementProperty(p_Environment.FlowID, p_Environment.ElementID, "class")
 			if (isfunc("Element_postTrigger_" ElementClass))
 			{
-				Element_postTrigger_%ElementClass%({instanceID: newInstanceId, threadID: newThreadID}, p_params)
+				elementParams := _getElementProperty(p_Environment.FlowID, p_Environment.ElementID, "pars")
+				Element_postTrigger_%ElementClass%({instanceID: newInstanceId, threadID: newThreadID}, elementParams)
 			}
 			
 			; updates the "executing" property of the flow

@@ -78,20 +78,23 @@ Element_CheckSettings_Trigger_Clipboard_Changes(Environment, ElementParameters)
 ;Called when the trigger is activated
 Element_enable_Trigger_Clipboard_Changes(Environment, ElementParameters)
 {
-	EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters)
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
 	if (EvaluatedParameters._error)
 	{
 		x_enabled(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
 	
-	functionObject:= x_NewFunctionObject(environment, "Trigger_Clipboard_Changes_Trigger", EvaluatedParameters)
+	; create a function object
+	functionObject := x_NewFunctionObject(environment, "Trigger_Clipboard_Changes_Trigger", EvaluatedParameters)
 	x_SetTriggerValue(environment, "functionObject", functionObject)
+	
+	; call function object every time the clipboard changes
 	OnClipboardChange(functionObject)
 	
+	; finish and return true
 	x_enabled(Environment, "normal")
-
-	; return true, if trigger was enabled
 	return true
 }
 
@@ -110,8 +113,11 @@ Element_postTrigger_Trigger_Clipboard_Changes(Environment, ElementParameters)
 ;Called when the trigger should be disabled.
 Element_disable_Trigger_Clipboard_Changes(Environment, ElementParameters)
 {
-	functionObject := x_GetTriggerValue(environment, "functionObject")
-	OnClipboardChange(functionObject,0)
+	; get the function object and disable the call on clipboard change
+	functionObject := x_getTriggerValue(Environment, "functionObject")
+	OnClipboardChange(functionObject, 0)
+
+	; finish
 	x_disabled(Environment, "normal")
 }
 

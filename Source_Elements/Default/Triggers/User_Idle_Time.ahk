@@ -153,7 +153,7 @@ Element_disable_Trigger_User_Idle_Time(Environment, ElementParameters)
 	SetTimer, % functionObject, off
 
 	; finish
-	x_disabled(Environment, "normal", lang("Stopped."))
+	x_disabled(Environment, "normal")
 }
 
 

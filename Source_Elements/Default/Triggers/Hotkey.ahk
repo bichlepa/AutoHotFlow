@@ -62,7 +62,7 @@ Element_getParametrizationDetails_Trigger_Hotkey(Environment)
 	parametersToEdit.push({type: "Checkbox", id: "WhenRelease", default: 0, label: lang("Trigger on release rather than press")})
 	parametersToEdit.push({type: "Label", label: lang("Window")})
 	parametersToEdit.push({type: "Label", size: "small", label: lang("Where should the hotkey be active?")})
-	parametersToEdit.push({type: "Radio", id: "UseWindow", default: 1, result: "enum", choices: [lang("Everywhere"), lang("Only active when the specified window is active"), lang("Only active whe the specified window exists")], enum: ["Everywhere", "WindowIsActive", "WindowExists"]})
+	parametersToEdit.push({type: "Radio", id: "UseWindow", default: 1, result: "enum", choices: [lang("Everywhere"), lang("Only active when the specified window is active"), lang("Only active whe the specified window exists"), lang("Only active when the specified window is not active"), lang("Only active whe the specified window does not exist")], enum: ["Everywhere", "WindowIsActive", "WindowExists", "WindowIsNotActive", "WindowNotExists"]})
 	parametersToEdit.push({type: "Label", size: "small", label: lang("Title_of_Window")})
 	parametersToEdit.push({type: "Radio", id: "TitleMatchMode", default: 1, choices: [lang("Start_with"), lang("Contain_anywhere"), lang("Exactly")]})
 	parametersToEdit.push({type: "Edit", id: "Wintitle", content: "String"})
@@ -80,7 +80,7 @@ Element_getParametrizationDetails_Trigger_Hotkey(Environment)
 	parametersToEdit.push({type: "Label", size: "small", label: lang("Hidden window")})
 	parametersToEdit.push({type: "Checkbox", id: "FindHiddenWindow", default: 0, label: lang("Detect hidden window")})
 	parametersToEdit.push({type: "Label", size: "small", label: lang("Get_parameters")})
-	parametersToEdit.push({type: "button", id: "GetWindowInformation", goto: "Trigger_Window_Opens_GetWindowParameters", label: lang("Get_Parameters")})
+	parametersToEdit.push({type: "button", id: "GetWindowInformation", goto: "Trigger_Hotkey_ButtonWindowAssistant", label: lang("Get_Parameters")})
 
 	
 	return parametersToEdit
@@ -103,7 +103,11 @@ Element_CheckSettings_Trigger_Hotkey(Environment, ElementParameters)
 	x_Par_Disable("WhenRelease", ElementParameters.BlockKey)
 	x_Par_Disable("BlockKey", ElementParameters.WhenRelease)
 	
-	showWindowPars:=ElementParameters.UseWindow ="WindowIsActive" or ElementParameters.UseWindow="WindowExists"
+	; only show window parameters if window is used
+	showWindowPars := ElementParameters.UseWindow = "WindowIsActive"
+		or ElementParameters.UseWindow = "WindowExists"
+		or ElementParameters.UseWindow = "WindowNotExists"
+		or ElementParameters.UseWindow = "WindowIsNotActive"
 	x_Par_Enable("TitleMatchMode", showWindowPars)
 	x_Par_Enable("Wintitle", showWindowPars)
 	x_Par_Enable("excludeTitle", showWindowPars)
@@ -122,111 +126,141 @@ Element_CheckSettings_Trigger_Hotkey(Environment, ElementParameters)
 ;Called when the trigger is activated
 Element_enable_Trigger_Hotkey(Environment, ElementParameters)
 {
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
+	if (EvaluatedParameters._error)
+	{
+		x_enabled(Environment, "exception", EvaluatedParameters._errorMessage) 
+		return
+	}
 	
-	global
-	
-	local success:=false
-	local functionObject
-	
-	local temphotkey:=ElementParameters.hotkey
-	if temphotkey=
+	; check hotkey
+	fullHotkey := EvaluatedParameters.hotkey
+	if (fullHotkey = "")
 	{
 		x_enabled(Environment, "exception", lang("The_Hotkey_is_not_set!"))
 		return
 	}
-	if (ElementParameters.BlockKey=False)
-		temphotkey=~%temphotkey%
-	if (ElementParameters.WhenRelease=True)
-		temphotkey=%temphotkey% UP
-	if (ElementParameters.Wildcard=True)
-		temphotkey=*%temphotkey%
+
+	; append keywords to hotkey if required
+	if (not EvaluatedParameters.BlockKey)
+		fullHotkey := "~" fullHotkey
+	if (EvaluatedParameters.WhenRelease)
+		fullHotkey := fullHotkey " UP"
+	if (EvaluatedParameters.Wildcard)
+		fullHotkey := "*" fullHotkey
+
+	; save fully modified hotkey
+	EvaluatedParameters.fullHotkey := fullHotkey
 	
-	
-	if (ElementParameters.UseWindow ="WindowIsActive" or ElementParameters.UseWindow ="WindowExists")
+	if (EvaluatedParameters.UseWindow = "WindowIsActive"
+		or EvaluatedParameters.UseWindow = "WindowExists"
+		or EvaluatedParameters.UseWindow = "WindowNotExists"
+		or EvaluatedParameters.UseWindow = "WindowIsNotActive")
 	{
-		local tempWinTitle:=x_replaceVariables(Environment, ElementParameters.Wintitle) 
-		local tempWinText:=x_replaceVariables(Environment, ElementParameters.winText)
-		local tempTitleMatchMode :=ElementParameters.TitleMatchMode
-		local tempahk_class:=x_replaceVariables(Environment, ElementParameters.ahk_class)
-		local tempahk_exe:=x_replaceVariables(Environment, ElementParameters.ahk_exe)
-		local tempahk_id:=x_replaceVariables(Environment, ElementParameters.ahk_id)
-		local tempahk_pid:=x_replaceVariables(Environment, ElementParameters.ahk_pid)
+		; create wintitle argument for WinActive() Call
+		EvaluatedParameters.winstring := EvaluatedParameters.Wintitle
+		if (EvaluatedParameters.ahk_class != "")
+			EvaluatedParameters.winstring .= " ahk_class " EvaluatedParameters.ahk_class
+		if (EvaluatedParameters.ahk_id != "")
+			EvaluatedParameters.winstring .= " ahk_id " EvaluatedParameters.ahk_id
+		if (EvaluatedParameters.ahk_pid != "")
+			EvaluatedParameters.winstring .= " ahk_pid " EvaluatedParameters.ahk_pid
+		if (EvaluatedParameters.ahk_exe != "")
+			EvaluatedParameters.winstring .= " ahk_exe " EvaluatedParameters.ahk_exe
 		
 		;If no window specified, error
-		if (tempwinstring="" and tempWinText="")
+		if (EvaluatedParameters.winstring = "" and EvaluatedParameters.winText = "")
 		{
-			x_enabled(Environment, "exception", lang("The hotkey %1% cannot be set!",temphotkey) " " lang("No window specified"))
+			x_enabled(Environment, "exception", lang("No window specified"))
+			return
+		}
+	
+		; check findhiddentext and findhiddenwindow parameter. Convert them to string
+		switch (EvaluatedParameters.findhiddentext)
+		{
+		case 0:
+			EvaluatedParameters.findhiddentext := "off"
+		case 1:
+			EvaluatedParameters.findhiddentext := "on"
+		default:
+			x_enabled(Environment, "exception", lang("Parameter '%1%' has invalid value: %2%", "findhiddentext", EvaluatedParameters.findhiddentext))
+			return
+		}
+		switch (EvaluatedParameters.findhiddenwindow)
+		{
+		case 0:
+			EvaluatedParameters.findhiddenwindow := "off"
+		case 1:
+			EvaluatedParameters.findhiddenwindow := "on"
+		default:
+			x_enabled(Environment, "exception", lang("Parameter '%1%' has invalid value: %2%", "findhiddenwindow", EvaluatedParameters.findhiddenwindow))
 			return
 		}
 		
-		tempwinstring=%tempWinTitle%
-		if tempahk_class<>
-			tempwinstring=%tempwinstring% ahk_class %tempahk_class%
-		if tempahk_id<>
-			tempwinstring=%tempwinstring% ahk_id %tempahk_id%
-		if tempahk_pid<>
-			tempwinstring=%tempwinstring% ahk_pid %tempahk_pid%
-		if tempahk_exe<>
-			tempwinstring=%tempwinstring% ahk_exe %tempahk_exe%
-		
-		SetTitleMatchMode,%tempTitleMatchMode%
-		
-		if (ElementParameters.findhiddenwindow=False)
-			DetectHiddenWindows off
-		else
-			DetectHiddenWindows on
-		if (ElementParameters.findhiddentext=False)
-			DetectHiddenText off
-		else
-			DetectHiddenText on
+		; set the desired window properties
+		SetTitleMatchMode, % EvaluatedParameters.titlematchmode
+		DetectHiddenText, % EvaluatedParameters.findhiddentext
+		DetectHiddenWindows, % EvaluatedParameters.findhiddenwindow
 	}
 
 
-	
-	if (ElementParameters.UseWindow ="WindowIsActive")
-		hotkey,IfWinActive,%tempwinstring%,%tempWinText% ;,%tempExcludeTitle%,%tempExcludeText%
-	else if (ElementParameters.UseWindow ="WindowExists")
-		hotkey,IfWinExist,%tempwinstring%,%tempWinText% ;,%tempExcludeTitle%,%tempExcludeText%
+	; Turn on context sensitivity if required
+	if (EvaluatedParameters.UseWindow = "WindowIsActive")
+		hotkey, IfWinActive, % EvaluatedParameters.winstring, % EvaluatedParameters.WinText
+	else if (EvaluatedParameters.UseWindow = "WindowExists")
+		hotkey, ifwinexist, % EvaluatedParameters.winstring, % EvaluatedParameters.WinText
+	else if (EvaluatedParameters.UseWindow = "WindowIsNotActive")
+		hotkey, IfWinNotActive, % EvaluatedParameters.winstring, % EvaluatedParameters.WinText
+	else if (EvaluatedParameters.UseWindow = "WindowNotExists")
+		hotkey, ifwinNotexist, % EvaluatedParameters.winstring, % EvaluatedParameters.WinText
 	else
-		hotkey,IfWinActive
+		hotkey, IfWinActive ; turn off context sensitivity
 	
-	
-	
-	functionObject:= x_NewFunctionObject(environment, "Element_trigger_Trigger_Hotkey", ElementParameters)
-	x_SetTriggerValue(Environment, "hotkey", temphotkey)
+	; create a function object
+	functionObject:= x_NewFunctionObject(environment, "Trigger_Hotkey_Trigger", EvaluatedParameters)
+	x_SetTriggerValue(Environment, "functionObject", functionObject)
+	x_SetTriggerValue(Environment, "fullHotkey", fullHotkey)
 
-	hotkey,%temphotkey%,% functionObject, UseErrorLevel on
+	; enable the hotkey
+	hotkey, % EvaluatedParameters.fullHotkey, % functionObject, UseErrorLevel on
 	if ErrorLevel
 	{
-		x_enabled(Environment, "exception", lang("The hotkey %1% cannot be set!",temphotkey))
+		x_enabled(Environment, "exception", lang("The hotkey %1% cannot be set!", fullHotkey))
+		return
 	}
 
-	
-	x_enabled(Environment, "normal", lang("The hotkey %1% was set.",temphotkey))
-
-	; return true, if trigger was enabled
+	; finish and return true
+	x_enabled(Environment, "normal", lang("The hotkey %1% was set.", fullHotkey))
 	return true
 }
-
-; function which will be called when the hotkey is pressed
-Element_trigger_Trigger_Hotkey(Environment, ElementParameters)
-{
-	x_trigger(Environment)
-}
-
 ;Called after the trigger has triggered.
 ;Here you can for example define the variables which are provided by the triggers.
 Element_postTrigger_Trigger_Hotkey(Environment, ElementParameters)
 {
-	x_SetVariable(Environment, "A_Hotkey", ElementParameters.hotkey,"thread")
+	x_SetVariable(Environment, "A_Hotkey", ElementParameters.hotkey, "thread")
 }
 
 
 ;Called when the trigger should be disabled.
 Element_disable_Trigger_Hotkey(Environment, ElementParameters)
 {
-	temphotkey:=x_getTriggerValue(Environment, "hotkey")
-	hotkey,%temphotkey%,off
-	x_disabled(Environment, "normal",  lang("The hotkey %1% was unset.",temphotkey))
+	; disable the hotkey
+	fullHotkey := x_getTriggerValue(Environment, "fullHotkey")
+	hotkey, % fullHotkey, off
 
+	; finish
+	x_disabled(Environment, "normal")
+}
+
+; opens the assistant for getting window information
+Trigger_Hotkey_ButtonWindowAssistant()
+{
+	x_assistant_windowParameter({wintitle: "Wintitle", winText: "winText", FindHiddenText: "FindHiddenText", ahk_class: "ahk_class", ahk_exe: "ahk_exe", ahk_id: "ahk_id", ahk_pid: "ahk_pid", FindHiddenWindow: "FindHiddenWindow"})
+}
+
+; function which will be called when the hotkey is pressed
+Trigger_Hotkey_Trigger(Environment, ElementParameters)
+{
+	x_trigger(Environment)
 }

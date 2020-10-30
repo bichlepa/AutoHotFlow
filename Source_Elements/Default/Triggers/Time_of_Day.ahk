@@ -123,7 +123,7 @@ Element_disable_Trigger_Time_Of_Day(Environment, ElementParameters)
 	SetTimer, % functionObject, off
 
 	; finish
-	x_disabled(Environment, "normal", lang("Stopped."))
+	x_disabled(Environment, "normal")
 }
 
 
