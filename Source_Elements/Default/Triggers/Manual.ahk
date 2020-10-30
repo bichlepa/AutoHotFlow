@@ -54,14 +54,14 @@ Element_getParametrizationDetails_Trigger_Manual(Environment)
 {
 	parametersToEdit:=Object()
 	parametersToEdit.push({type: "Label", label: lang("ID")})
-	parametersToEdit.push({type: "Edit", id: "ID", content: "String",  default: "ṳᦵṩḗ╥"})
+	parametersToEdit.push({type: "Edit", id: "ID", content: "String",  default: "Trigger " x_randomPhrase()})
+	parametersToEdit.updateOnEdit := true
 	return parametersToEdit
 }
 
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Trigger_Manual(Environment, ElementParameters)
 {
-	global
 	return % lang("Manual") "`n""" ElementParameters.id   """"
 }
 
@@ -71,20 +71,15 @@ Element_GenerateName_Trigger_Manual(Environment, ElementParameters)
 ;- Correct misconfiguration
 Element_CheckSettings_Trigger_Manual(Environment, ElementParameters)
 {	
-	if (ElementParameters.ID = "ṳᦵṩḗ╥")
-		x_Par_SetValue("ID", "Trigger " x_randomPhrase())
-	
-	; return true, if trigger was enabled
-	return true
+
 }
 
 
 ;Called when the trigger is activated
 Element_enable_Trigger_Manual(Environment, ElementParameters)
 {
-	global
-	x_enabled(Environment, "normal", "The manual trigger can now be triggered by other flows.")
-	
+	x_enabled(Environment, "normal")
+
 	; return true, if trigger was enabled
 	return true
 }
@@ -99,7 +94,7 @@ Element_postTrigger_Trigger_Manual(Environment, ElementParameters)
 ;Called when the trigger should be disabled.
 Element_disable_Trigger_Manual(Environment, ElementParameters)
 {
-	x_disabled(Environment, "normal", "The manual trigger cannot anymore be triggered by other flows.")
+	x_disabled(Environment, "normal")
 
 }
 

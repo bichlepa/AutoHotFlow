@@ -65,7 +65,7 @@ class ElementSettings
 		gui, -DPIScale
 		
 		;Get the parameter list
-		this.parametersToEdit := Element_getParametrizationDetails(this.elementClass, {flowID: FlowID, elementID: this.elementID, updateOnEdit: true})
+		this.parametersToEdit := Element_getParametrizationDetails(this.elementClass, {flowID: FlowID, elementID: this.elementID}, true)
 
 		; add first gui elements
 		; All elements have the parameter "name" and "StandardName"

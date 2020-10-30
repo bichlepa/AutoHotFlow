@@ -51,10 +51,7 @@ Element_getStabilityLevel_Trigger_Start_up()
 ;Returns an array of objects which describe all controls which will be shown in the element settings GUI
 Element_getParametrizationDetails_Trigger_Start_up(Environment)
 {
-	parametersToEdit:=Object()
-	
-	
-	
+	parametersToEdit := Object()
 	return parametersToEdit
 }
 
@@ -78,8 +75,10 @@ Element_CheckSettings_Trigger_Start_up(Environment, ElementParameters)
 ;Called when the trigger is activated
 Element_enable_Trigger_Start_up(Environment, ElementParameters)
 {
-	
+	; enable the trigger
 	x_enabled(Environment, "normal")
+
+	; if we have windows startup, trigger right now
 	if (x_isWindowsStartup())
 		x_trigger(Environment)
 		

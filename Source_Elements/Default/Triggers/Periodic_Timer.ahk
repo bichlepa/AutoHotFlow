@@ -54,7 +54,7 @@ Element_getParametrizationDetails_Trigger_Periodic_Timer(Environment)
 	parametersToEdit:=Object()
 	
 	parametersToEdit.push({type: "label", label:  lang("Time interval")})
-	parametersToEdit.push({type: "edit", id: "Intervall_S", default: 10, content: "Number", WarnIfEmpty: true})
+	parametersToEdit.push({type: "edit", id: "Interval", default: 10, content: "Number", WarnIfEmpty: true})
 	parametersToEdit.push({type: "Radio", id: "Unit", choices: [lang("Milliseconds"), lang("Seconds"), lang("Minutes")], default: 2, result: "enum", enum: ["MilliSeconds", "Seconds", "Minutes"]})
 	
 	return parametersToEdit
@@ -76,45 +76,48 @@ Element_CheckSettings_Trigger_Periodic_Timer(Environment, ElementParameters)
 }
 
 
-
-
-
-
 ;Called when the trigger is activated
 Element_enable_Trigger_Periodic_Timer(Environment, ElementParameters)
 {
-	EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters)
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
 	if (EvaluatedParameters._error)
 	{
 		x_enabled(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
 	
-	Intervall_S:=EvaluatedParameters.Intervall_S
-	
-	if (EvaluatedParameters.Unit = "Seconds")
+	; check the interval
+	if (not (Interval > 0))
 	{
-		Intervall_S *= 1000
-	}
-	else if (EvaluatedParameters.Unit = "Minutes")
-	{
-		Intervall_S *= 1000 * 60
+		x_enabled(Environment, "exception", lang("Parameter '%1%' has invalid value: %2%", "interval", Interval)) 
+		return
 	}
 	
-	functionObject:= x_NewFunctionObject(environment, "Trigger_Periodic_Timer_Trigger", EvaluatedParameters)
+	; check unit and increase interval if needed
+	Interval := EvaluatedParameters.Interval
+	switch (EvaluatedParameters.Unit)
+	{
+	case "MilliSeconds":
+		Interval *= 1 ; nothing to do
+	case "Seconds":
+		Interval *= 1000
+	case "Minutes":
+		Interval *= 1000 * 60
+	default:
+		x_enabled(Environment, "exception", lang("Parameter '%1%' has invalid value: %2%", "Unit", EvaluatedParameters.Unit)) 
+		return
+	}
+	
+	; We will set a timer which regularely triggers.
+	; create a function object
+	functionObject := x_NewFunctionObject(environment, "Trigger_Periodic_Timer_Trigger", EvaluatedParameters)
 	x_SetTriggerValue(environment, "functionObject", functionObject)
-	SetTimer, % functionObject, % Intervall_S
+	SetTimer, % functionObject, % Interval
 	
+	; finish and return true
 	x_enabled(Environment, "normal")
-	
-	; return true, if trigger was enabled
 	return true
-}
-
-;Function which triggers the flow
-Trigger_Periodic_Timer_Trigger(environment, EvaluatedParameters)
-{
-	x_trigger(Environment)
 }
 
 ;Called after the trigger has triggered.
@@ -126,10 +129,16 @@ Element_postTrigger_Trigger_Periodic_Timer(Environment, ElementParameters)
 ;Called when the trigger should be disabled.
 Element_disable_Trigger_Periodic_Timer(Environment, ElementParameters)
 {
+	; stop the timer
 	functionObject := x_GetTriggerValue(environment, "functionObject")
 	SetTimer, % functionObject, delete
+
 	x_disabled(Environment, "normal")
 }
 
-
+; Timer Function which triggers the flow
+Trigger_Periodic_Timer_Trigger(environment, EvaluatedParameters)
+{
+	x_trigger(Environment)
+}
 

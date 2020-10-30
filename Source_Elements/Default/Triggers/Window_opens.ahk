@@ -138,7 +138,7 @@ Element_enable_Trigger_Window_Opens(Environment, ElementParameters)
 	; check interval
 	if (not (EvaluatedParameters.interval > 0))
 	{
-		x_enabled(Environment, "exception", lang("Parameter '%1%' has invalid value: %2%", "interval", tempinterval)) 
+		x_enabled(Environment, "exception", lang("Parameter '%1%' has invalid value: %2%", "interval", EvaluatedParameters.interval)) 
 		return
 	}
 
@@ -168,7 +168,8 @@ Element_enable_Trigger_Window_Opens(Environment, ElementParameters)
 	case 1:
 		EvaluatedParameters.findhiddentext := "on"
 	default:
-		x_enabled(Environment, "exception", lang("Parameter '%1%' has invalid value: %2%", "findhiddentext", EvaluatedParameters.findhiddentext)) 
+		x_enabled(Environment, "exception", lang("Parameter '%1%' has invalid value: %2%", "findhiddentext", EvaluatedParameters.findhiddentext))
+		return
 	}
 	switch (ElementParameters.findhiddenwindow)
 	{
@@ -177,7 +178,8 @@ Element_enable_Trigger_Window_Opens(Environment, ElementParameters)
 	case 1:
 		EvaluatedParameters.findhiddenwindow := "on"
 	default:
-		x_enabled(Environment, "exception", lang("Parameter '%1%' has invalid value: %2%", "findhiddenwindow", EvaluatedParameters.findhiddenwindow)) 
+		x_enabled(Environment, "exception", lang("Parameter '%1%' has invalid value: %2%", "findhiddenwindow", EvaluatedParameters.findhiddenwindow))
+		return
 	}
 
 	; if there is no matching window on first call of the function object, we will not trigger

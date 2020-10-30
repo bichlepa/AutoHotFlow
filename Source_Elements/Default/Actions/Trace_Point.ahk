@@ -54,11 +54,14 @@ Element_getParametrizationDetails_Action_Trace_Point(Environment)
 {
 	parametersToEdit:=Object()
 	parametersToEdit.push({type: "Label", label: lang("ID")})
-	parametersToEdit.push({type: "Edit", id: "ID", content: "rawstring",  default: "ṳᦵṩḗ╥"})
+	parametersToEdit.push({type: "Edit", id: "ID", content: "rawstring",  default: "Tracepoint " x_randomPhrase()})
 	parametersToEdit.push({type: "Label", label: lang("Log message")})
 	parametersToEdit.push({type: "Edit", id: "LogMessage", default: "", content: "String", WarnIfEmpty: false})
 	parametersToEdit.push({type: "Label", label: lang("Stop condition")})
 	parametersToEdit.push({type: "Edit", id: "StopCondition", default: "", content: "Expression", WarnIfEmpty: false})
+
+	; we want a unique random phrase for each element. Therefore it will alwa
+	parametersToEdit.updateOnEdit := true
 	
 
 	return parametersToEdit

@@ -54,7 +54,7 @@ Element_Register_Element_Class(p_class)
 
 ; Returns parametration details of an element class.
 ; the result of the actual call of the element function is buffered to save execution time
-Element_getParametrizationDetails(elementClass, Environment)
+Element_getParametrizationDetails(elementClass, Environment, updateIfRequired = false)
 {
 	; we will use this static variable to buffer the results of the call, since they never change.
 	static Element_bufferedParametrationDetails
@@ -63,7 +63,7 @@ Element_getParametrizationDetails(elementClass, Environment)
 
 	; check whether the result of the call is already buffered
 	if (not isobject(Element_bufferedParametrationDetails[elementClass])
-		or (Element_bufferedParametrationDetails[elementClass].updateOnEdit and Environment.updateOnEdit )) ;If the edit field is opened and the parameters must be reloaded
+		or (Element_bufferedParametrationDetails[elementClass].updateOnEdit and updateIfRequired )) ;If the edit field is opened and the parameters must be reloaded
 	{
 		; it is not buffered. Call the element function
 		if not IsFunc("Element_getParametrizationDetails_" elementClass)

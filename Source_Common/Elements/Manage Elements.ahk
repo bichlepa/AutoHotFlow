@@ -155,7 +155,7 @@ Element_setParameterDefaults(p_FlowID, p_elementID)
 
 	; get parametration details
 	elementClass := _getElementProperty(p_FlowID, p_elementID, "class")
-	ParametrizationDetails := Element_getParametrizationDetails(elementClass, {flowID: p_FlowID, elementID: p_elementID})
+	ParametrizationDetails := Element_getParametrizationDetails(elementClass, {flowID: p_FlowID, elementID: p_elementID}, true)
 	
 	; get alredy configured parameters (if available)
 	ElementParsObject := _getElementProperty(p_FlowID, p_elementID, "pars")
@@ -348,7 +348,7 @@ Connection_New(p_FlowID, p_connectionID="")
 
 	; write connection object
 	_setConnection(p_FlowID, newConnection.ID, newConnection)
-	
+
 	_LeaveCriticalSection()
 	return newConnection.ID
 }

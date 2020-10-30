@@ -54,12 +54,11 @@ Element_getParametrizationDetails_Trigger_User_Idle_Time(Environment)
 	parametersToEdit:=Object()
 	
 	parametersToEdit.push({type: "Label", label: lang("Period of time")})
-	parametersToEdit.push({type: "edit", id: "Intervall_S", default: 10, content: "Expression", WarnIfEmpty: true})
+	parametersToEdit.push({type: "edit", id: "Interval", default: 10, content: "Expression", WarnIfEmpty: true})
 	parametersToEdit.push({type: "Radio", id: "Unit", default: 2, result: "enum", choices: [lang("Seconds"), lang("Minutes"), lang("Hours")], enum: ["Seconds", "Minutes", "Hours"]})
 	parametersToEdit.push({type: "Label", label: lang("Method")})
 	parametersToEdit.push({type: "Radio", id: "Method", default: 1, result: "enum", choices: [lang("Method %1%", 1), lang("Method %1%", 2)], enum: ["TimeIdle", "TimeIdlePhysical"]})
 
-	
 	return parametersToEdit
 }
 
@@ -92,11 +91,11 @@ Element_enable_Trigger_User_Idle_Time(Environment, ElementParameters)
 	}
 	
 	if (ElementParameters.Unit="Seconds") ;Milliseconds
-		tempDuration:=ElementParameters.Intervall_S * 1000
+		tempDuration:=ElementParameters.Interval * 1000
 	else if (ElementParameters.Unit="Minutes") ;Seconds
-		tempDuration:=ElementParameters.Intervall_S * 1000 * 60
+		tempDuration:=ElementParameters.Interval * 1000 * 60
 	else if (ElementParameters.Unit="Hours") ;minutes
-		tempDuration:=ElementParameters.Intervall_S * 1000 * 60 * 60
+		tempDuration:=ElementParameters.Interval * 1000 * 60 * 60
 	
 	if (tempDuration < 100)
 	{
