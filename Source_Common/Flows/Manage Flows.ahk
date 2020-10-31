@@ -196,7 +196,7 @@ DuplicateFlow(par_ID)
 			indexString := " " a_index
 		}
 		; increment the number after the flow name, until we get a name that does not exist yet
-		newflowName := newFlow.name " " lang("copy") indexString
+		newflowName := newFlow.name " " lang("copy #verb") indexString
 		if (not _getFlowIdByName(newflowName))
 			break
 	}

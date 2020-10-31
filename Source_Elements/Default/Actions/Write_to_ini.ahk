@@ -10,13 +10,13 @@ Element_getElementType_Action_Write_to_ini()
 ;Name of the element
 Element_getName_Action_Write_to_ini()
 {
-	return lang("Write_to_ini")
+	return x_lang("Write_to_ini")
 }
 
 ;Category of the element
 Element_getCategory_Action_Write_to_ini()
 {
-	return lang("File")
+	return x_lang("File")
 }
 
 ;This function returns the package of the element.
@@ -53,13 +53,13 @@ Element_getParametrizationDetails_Action_Write_to_ini(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: lang("Value")})
+	parametersToEdit.push({type: "Label", label: x_lang("Value")})
 	parametersToEdit.push({type: "Edit", id: "Value", default: "value", content: "String"})
-	parametersToEdit.push({type: "Label", label: lang("Select an .ini file")})
-	parametersToEdit.push({type: "File", id: "file", label: lang("Select an .ini file")})
-	parametersToEdit.push({type: "Label", label: lang("Section")})
+	parametersToEdit.push({type: "Label", label: x_lang("Select an .ini file")})
+	parametersToEdit.push({type: "File", id: "file", label: x_lang("Select an .ini file")})
+	parametersToEdit.push({type: "Label", label: x_lang("Section")})
 	parametersToEdit.push({type: "Edit", id: "Section", default: "section", content: "String", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("Key")})
+	parametersToEdit.push({type: "Label", label: x_lang("Key")})
 	parametersToEdit.push({type: "Edit", id: "Key", default: "key", content: "String", WarnIfEmpty: true})
 	
 	return parametersToEdit
@@ -68,7 +68,7 @@ Element_getParametrizationDetails_Action_Write_to_ini(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Write_to_ini(Environment, ElementParameters)
 {
-	return lang("Write_to_ini") 
+	return x_lang("Write_to_ini") 
 }
 
 ;Called every time the user changes any parameter.
@@ -98,7 +98,7 @@ Element_run_Action_Write_to_ini(Environment, ElementParameters)
 	
 	if ErrorLevel
 	{
-		x_finish(Environment, "exception", lang("Could not write value '%1%' to ini file '%2%', section '%3%', key '%4%'",EvaluatedParameters.Value,file,EvaluatedParameters.section,EvaluatedParameters.key)) 
+		x_finish(Environment, "exception", x_lang("Could not write value '%1%' to ini file '%2%', section '%3%', key '%4%'",EvaluatedParameters.Value,file,EvaluatedParameters.section,EvaluatedParameters.key)) 
 		return
 		
 	}

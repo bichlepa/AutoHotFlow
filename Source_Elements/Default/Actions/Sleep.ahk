@@ -10,13 +10,13 @@ Element_getElementType_Action_Sleep()
 ;Name of the element
 Element_getName_Action_Sleep()
 {
-	return lang("Sleep")
+	return x_lang("Sleep")
 }
 
 ;Category of the element
 Element_getCategory_Action_Sleep()
 {
-	return lang("Flow_control")
+	return x_lang("Flow_control")
 }
 
 ;This function returns the package of the element.
@@ -53,9 +53,9 @@ Element_getStabilityLevel_Action_Sleep()
 Element_getParametrizationDetails_Action_Sleep(Environment)
 {
 	parametersToEdit:=Object()
-	parametersToEdit.push({type: "Label", label:  lang("Duration")})
+	parametersToEdit.push({type: "Label", label:  x_lang("Duration")})
 	parametersToEdit.push({type: "edit", id: "Duration", default: 2, content: "Expression", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Radio", id: "Unit", default: 2, result: "enum", choices: [lang("Milliseconds"), lang("Seconds"), lang("Minutes")], enum: ["Milliseconds", "Seconds", "Minutes"]})
+	parametersToEdit.push({type: "Radio", id: "Unit", default: 2, result: "enum", choices: [x_lang("Milliseconds"), x_lang("Seconds"), x_lang("Minutes")], enum: ["Milliseconds", "Seconds", "Minutes"]})
 
 	return parametersToEdit
 }
@@ -66,13 +66,13 @@ Element_GenerateName_Action_Sleep(Environment, ElementParameters)
 	global
 	;~ d(ElementParameters)
 	if (ElementParameters.Unit = "Milliseconds")
-		duration:=ElementParameters.duration " " lang("ms #Milliseconds")
+		duration:=ElementParameters.duration " " x_lang("ms #Milliseconds")
 	if (ElementParameters.Unit = "Seconds")
-		duration:=ElementParameters.duration " " lang("s #Seconds")
+		duration:=ElementParameters.duration " " x_lang("s #Seconds")
 	if (ElementParameters.Unit = "Minutes")
-		duration:=ElementParameters.duration " " lang("m #Minutes")
+		duration:=ElementParameters.duration " " x_lang("m #Minutes")
 	
-	return lang("Sleep") ": " duration
+	return x_lang("Sleep") ": " duration
 	
 	
 }

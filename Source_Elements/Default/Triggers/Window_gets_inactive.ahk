@@ -10,13 +10,13 @@ Element_getElementType_Trigger_Window_Gets_Inactive()
 ;Name of the element
 Element_getName_Trigger_Window_Gets_Inactive()
 {
-	return lang("Window_Gets_Inactive")
+	return x_lang("Window_Gets_Inactive")
 }
 
 ;Category of the element
 Element_getCategory_Trigger_Window_Gets_Inactive()
 {
-	return lang("Window")
+	return x_lang("Window")
 }
 
 ;This function returns the package of the element.
@@ -53,31 +53,31 @@ Element_getParametrizationDetails_Trigger_Window_Gets_Inactive(Environment)
 {
 	
 	parametersToEdit := Object()
-	parametersToEdit.push({type: "Label", label: lang("Title_of_Window")})
-	parametersToEdit.push({type: "Radio", id: "TitleMatchMode", default: 1, choices: [lang("Start_with"), lang("Contain_anywhere"), lang("Exactly")]})
+	parametersToEdit.push({type: "Label", label: x_lang("Title_of_Window")})
+	parametersToEdit.push({type: "Radio", id: "TitleMatchMode", default: 1, choices: [x_lang("Start_with"), x_lang("Contain_anywhere"), x_lang("Exactly")]})
 	parametersToEdit.push({type: "Edit", id: "Wintitle", content: "String"})
-	parametersToEdit.push({type: "Label", label: lang("Exclude_title")})
+	parametersToEdit.push({type: "Label", label: x_lang("Exclude_title")})
 	parametersToEdit.push({type: "Edit", id: "excludeTitle", content: "String"})
-	parametersToEdit.push({type: "Label", label: lang("Text_of_a_control_in_Window")})
+	parametersToEdit.push({type: "Label", label: x_lang("Text_of_a_control_in_Window")})
 	parametersToEdit.push({type: "Edit", id: "winText", content: "String"})
-	parametersToEdit.push({type: "Checkbox", id: "FindHiddenText", default: 0, label: lang("Detect hidden text")})
-	parametersToEdit.push({type: "Label", label: lang("Exclude_text_of_a_control_in_window")})
+	parametersToEdit.push({type: "Checkbox", id: "FindHiddenText", default: 0, label: x_lang("Detect hidden text")})
+	parametersToEdit.push({type: "Label", label: x_lang("Exclude_text_of_a_control_in_window")})
 	parametersToEdit.push({type: "Edit", id: "ExcludeText", content: "String"})
-	parametersToEdit.push({type: "Label", label: lang("Window_Class")})
+	parametersToEdit.push({type: "Label", label: x_lang("Window_Class")})
 	parametersToEdit.push({type: "Edit", id: "ahk_class", content: "String"})
-	parametersToEdit.push({type: "Label", label: lang("Process_Name")})
+	parametersToEdit.push({type: "Label", label: x_lang("Process_Name")})
 	parametersToEdit.push({type: "Edit", id: "ahk_exe", content: "String"})
-	parametersToEdit.push({type: "Label", label: lang("Unique_window_ID")})
+	parametersToEdit.push({type: "Label", label: x_lang("Unique_window_ID")})
 	parametersToEdit.push({type: "Edit", id: "ahk_id", content: "String"})
-	parametersToEdit.push({type: "Label", label: lang("Unique_Process_ID")})
+	parametersToEdit.push({type: "Label", label: x_lang("Unique_Process_ID")})
 	parametersToEdit.push({type: "Edit", id: "ahk_pid", content: "String"})
-	parametersToEdit.push({type: "Label", label: lang("Hidden window")})
-	parametersToEdit.push({type: "Checkbox", id: "FindHiddenWindow", default: 0, label: lang("Detect hidden window")})
-	parametersToEdit.push({type: "Label", label: lang("Get_parameters")})
-	parametersToEdit.push({type: "button", goto: "Trigger_Window_Gets_Inactive_ButtonWindowAssistant", label: lang("Get_Parameters")})
+	parametersToEdit.push({type: "Label", label: x_lang("Hidden window")})
+	parametersToEdit.push({type: "Checkbox", id: "FindHiddenWindow", default: 0, label: x_lang("Detect hidden window")})
+	parametersToEdit.push({type: "Label", label: x_lang("Get_parameters")})
+	parametersToEdit.push({type: "button", goto: "Trigger_Window_Gets_Inactive_ButtonWindowAssistant", label: x_lang("Get_Parameters")})
 	
-	parametersToEdit.push({type: "Label", label: lang("Options")})
-	parametersToEdit.push({type: "Label", label: lang("Check interval"), size: "small"})
+	parametersToEdit.push({type: "Label", label: x_lang("Options")})
+	parametersToEdit.push({type: "Label", label: x_lang("Check interval"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: "interval", content: "Number", default: 100, WarnIfEmpty: true})
 	
 	return parametersToEdit
@@ -90,28 +90,28 @@ Element_GenerateName_Trigger_Window_Gets_Inactive(Environment, ElementParameters
 	if (ElementParameters.Wintitle)
 	{
 		if (ElementParameters.TitleMatchMode = 1)
-			tempNameString := tempNameString "`n" lang("Title begins with") ": " ElementParameters.Wintitle
+			tempNameString := tempNameString "`n" x_lang("Title begins with") ": " ElementParameters.Wintitle
 		else if (ElementParameters.TitleMatchMode = 2)
-			tempNameString := tempNameString "`n" lang("Title includes") ": " ElementParameters.Wintitle
+			tempNameString := tempNameString "`n" x_lang("Title includes") ": " ElementParameters.Wintitle
 		else if (ElementParameters.TitleMatchMode = 3)
-			tempNameString := tempNameString "`n" lang("Title is exatly") ": " ElementParameters.Wintitle
+			tempNameString := tempNameString "`n" x_lang("Title is exatly") ": " ElementParameters.Wintitle
 	}
 	if (ElementParameters.excludeTitle)
-		tempNameString := tempNameString "`n" lang("Exclude_title") ": " ElementParameters.excludeTitle
+		tempNameString := tempNameString "`n" x_lang("Exclude_title") ": " ElementParameters.excludeTitle
 	if (ElementParameters.winText)
-		tempNameString := tempNameString "`n" lang("Control_text") ": " ElementParameters.winText
+		tempNameString := tempNameString "`n" x_lang("Control_text") ": " ElementParameters.winText
 	if (ElementParameters.ExcludeText)
-		tempNameString := tempNameString "`n" lang("Exclude_control_text") ": " ElementParameters.ExcludeText
+		tempNameString := tempNameString "`n" x_lang("Exclude_control_text") ": " ElementParameters.ExcludeText
 	if (ElementParameters.ahk_class)
-		tempNameString := tempNameString "`n" lang("Window_Class") ": " ElementParameters.ahk_class
+		tempNameString := tempNameString "`n" x_lang("Window_Class") ": " ElementParameters.ahk_class
 	if (ElementParameters.ahk_exe)
-		tempNameString := tempNameString "`n" lang("Process") ": " ElementParameters.ahk_exe
+		tempNameString := tempNameString "`n" x_lang("Process") ": " ElementParameters.ahk_exe
 	if (ElementParameters.ahk_id)
-		tempNameString := tempNameString "`n" lang("Window_ID") ": " ElementParameters.ahk_id
+		tempNameString := tempNameString "`n" x_lang("Window_ID") ": " ElementParameters.ahk_id
 	if (ElementParameters.ahk_pid)
-		tempNameString := tempNameString "`n" lang("Process_ID") ": " ElementParameters.ahk_pid
+		tempNameString := tempNameString "`n" x_lang("Process_ID") ": " ElementParameters.ahk_pid
 	
-	return lang("Window_Gets_Inactive") ": " tempNameString
+	return x_lang("Window_Gets_Inactive") ": " tempNameString
 	
 	
 }
@@ -139,7 +139,7 @@ Element_enable_Trigger_Window_Gets_Inactive(Environment, ElementParameters)
 	; check interval
 	if (not (EvaluatedParameters.interval > 0))
 	{
-		x_enabled(Environment, "exception", lang("Parameter '%1%' has invalid value: %2%", "interval", EvaluatedParameters.interval)) 
+		x_enabled(Environment, "exception", x_lang("Parameter '%1%' has invalid value: %2%", "interval", EvaluatedParameters.interval)) 
 		return
 	}
 	
@@ -157,7 +157,7 @@ Element_enable_Trigger_Window_Gets_Inactive(Environment, ElementParameters)
 	;If no window specified, error
 	if (EvaluatedParameters.winstring = "" and EvaluatedParameters.winText = "")
 	{
-		x_enabled(Environment, "exception", lang("No window specified"))
+		x_enabled(Environment, "exception", x_lang("No window specified"))
 		return
 	}
 	
@@ -169,7 +169,7 @@ Element_enable_Trigger_Window_Gets_Inactive(Environment, ElementParameters)
 	case 1:
 		EvaluatedParameters.findhiddentext := "on"
 	default:
-		x_enabled(Environment, "exception", lang("Parameter '%1%' has invalid value: %2%", "findhiddentext", EvaluatedParameters.findhiddentext))
+		x_enabled(Environment, "exception", x_lang("Parameter '%1%' has invalid value: %2%", "findhiddentext", EvaluatedParameters.findhiddentext))
 		return
 	}
 	switch (ElementParameters.findhiddenwindow)
@@ -179,7 +179,7 @@ Element_enable_Trigger_Window_Gets_Inactive(Environment, ElementParameters)
 	case 1:
 		EvaluatedParameters.findhiddenwindow := "on"
 	default:
-		x_enabled(Environment, "exception", lang("Parameter '%1%' has invalid value: %2%", "findhiddenwindow", EvaluatedParameters.findhiddenwindow))
+		x_enabled(Environment, "exception", x_lang("Parameter '%1%' has invalid value: %2%", "findhiddenwindow", EvaluatedParameters.findhiddenwindow))
 		return
 	}
 

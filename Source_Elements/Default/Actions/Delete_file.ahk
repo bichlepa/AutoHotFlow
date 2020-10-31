@@ -10,13 +10,13 @@ Element_getElementType_Action_Delete_File()
 ;Name of the element
 Element_getName_Action_Delete_File()
 {
-	return lang("Delete_File")
+	return x_lang("Delete_File")
 }
 
 ;Category of the element
 Element_getCategory_Action_Delete_File()
 {
-	return lang("File")
+	return x_lang("File")
 }
 
 ;This function returns the package of the element.
@@ -53,10 +53,10 @@ Element_getParametrizationDetails_Action_Delete_File(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: lang("Source file")})
-	parametersToEdit.push({type: "File", id: "file", label: lang("Select a file")})
-	parametersToEdit.push({type: "Label", label: lang("Delete method")})
-	parametersToEdit.push({type: "Radio", id: "deleteFileMethod", default: "Recycle", result: "enum", choices: [lang("Delete"), lang("Recycle")], enum: ["Delete", "Recycle"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Source file")})
+	parametersToEdit.push({type: "File", id: "file", label: x_lang("Select a file")})
+	parametersToEdit.push({type: "Label", label: x_lang("Delete method")})
+	parametersToEdit.push({type: "Radio", id: "deleteFileMethod", default: "Recycle", result: "enum", choices: [x_lang("Delete"), x_lang("Recycle")], enum: ["Delete", "Recycle"]})
 	
 	return parametersToEdit
 }
@@ -64,7 +64,7 @@ Element_getParametrizationDetails_Action_Delete_File(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Delete_File(Environment, ElementParameters)
 {
-	return lang("Delete_File") 
+	return x_lang("Delete_File") 
 }
 
 ;Called every time the user changes any parameter.
@@ -87,7 +87,7 @@ Element_run_Action_Delete_File(Environment, ElementParameters)
 
 	if not FileExist(file)
 	{
-		x_finish(Environment, "exception", lang("%1% '%2%' does not exist.",lang("File"), file)) 
+		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.",x_lang("File"), file)) 
 		return
 	}
 
@@ -97,7 +97,7 @@ Element_run_Action_Delete_File(Environment, ElementParameters)
 		
 		if errorlevel ;Indecates that files could not be copied
 		{
-			x_finish(Environment, "exception", lang("%1% files could not be deleted (Filepattern: '%2%')",temperror, file)) 
+			x_finish(Environment, "exception", x_lang("%1% files could not be deleted (Filepattern: '%2%')",temperror, file)) 
 			return
 		}
 	}
@@ -106,7 +106,7 @@ Element_run_Action_Delete_File(Environment, ElementParameters)
 		FileRecycle, % file
 		if errorlevel ;Indecates that files could not be copied
 		{
-			x_finish(Environment, "exception", lang("Some files could not be recycled (Filepattern: '%2%')",temperror, file)) 
+			x_finish(Environment, "exception", x_lang("Some files could not be recycled (Filepattern: '%2%')",temperror, file)) 
 			return
 		}
 	}

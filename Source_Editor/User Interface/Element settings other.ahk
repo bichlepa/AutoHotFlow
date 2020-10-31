@@ -268,7 +268,7 @@ class ElementSettingsConnectionTypeSelector
 		; create gui
 		gui, ConnectionTypeSelector: default
 		gui, font, s12
-		gui, add, text, , % lang("Select_Connection_type")
+		gui, add, text, , % lang("Select connection type")
 			
 		; depending on the element type from which the connection starts, we need different buttons
 		if (setconnectionFromType = "Condition")

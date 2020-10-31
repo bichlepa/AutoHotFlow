@@ -10,13 +10,13 @@ Element_getElementType_Action_Input_Box()
 ;Name of the element
 Element_getName_Action_Input_Box()
 {
-	return lang("Input_Box")
+	return x_lang("Input_Box")
 }
 
 ;Category of the element
 Element_getCategory_Action_Input_Box()
 {
-	return lang("User_interaction")
+	return x_lang("User_interaction")
 }
 
 ;This function returns the package of the element.
@@ -52,38 +52,38 @@ Element_getStabilityLevel_Action_Input_Box()
 Element_getParametrizationDetails_Action_Input_Box(Environment)
 {
 	parametersToEdit:=Object()
-	parametersToEdit.push({type: "Label", label: lang("Output variable name")})
+	parametersToEdit.push({type: "Label", label: x_lang("Output variable name")})
 	parametersToEdit.push({type: "Edit", id: "Varname", default: "UserInput", content: "VariableName", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("Title")})
-	parametersToEdit.push({type: "Edit", id: "title", default: lang("Title"), content: "String", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("Message")})
-	parametersToEdit.push({type: "Edit", id: "message", default: lang("Please, write something"), multiline: true, content: "String"})
-	parametersToEdit.push({type: "Label", label: lang("Edit field")})
-	parametersToEdit.push({type: "Checkbox", id: "OnlyNumbers", default: 0, label: lang("Only allow numbers")})
-	parametersToEdit.push({type: "Checkbox", id: "MaskUserInput", default: 0, label: lang("Mask user's input")})
-	parametersToEdit.push({type: "Checkbox", id: "MultilineEdit", default: 0, label: lang("Use a multiline edit field")})
-	parametersToEdit.push({type: "Label", label: lang("Count of lines"), size: "small"})
+	parametersToEdit.push({type: "Label", label: x_lang("Title")})
+	parametersToEdit.push({type: "Edit", id: "title", default: x_lang("Title"), content: "String", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: x_lang("Message")})
+	parametersToEdit.push({type: "Edit", id: "message", default: x_lang("Please, write something"), multiline: true, content: "String"})
+	parametersToEdit.push({type: "Label", label: x_lang("Edit field")})
+	parametersToEdit.push({type: "Checkbox", id: "OnlyNumbers", default: 0, label: x_lang("Only allow numbers")})
+	parametersToEdit.push({type: "Checkbox", id: "MaskUserInput", default: 0, label: x_lang("Mask user's input")})
+	parametersToEdit.push({type: "Checkbox", id: "MultilineEdit", default: 0, label: x_lang("Use a multiline edit field")})
+	parametersToEdit.push({type: "Label", label: x_lang("Count of lines"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: "MultilineEditRows", default: 4, content: "Expression", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("Default value"), size: "small"})
+	parametersToEdit.push({type: "Label", label: x_lang("Default value"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: "defaultText", default: "", multiline: true, content: "String"})
-	parametersToEdit.push({type: "Label", label: lang("Button Text")})
-	parametersToEdit.push({type: "Edit", id: "ButtonLabel", default: lang("OK"), content: "String", WarnIfEmpty: true })
-	parametersToEdit.push({type: "Label", label: lang("Timeout")})
-	parametersToEdit.push({type: "Radio", id: "IsTimeout", default: 1, result: "enum", choices: [lang("No timeout"), lang("Define timeout")], enum: ["NoTimeout", "Timeout"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Button Text")})
+	parametersToEdit.push({type: "Edit", id: "ButtonLabel", default: x_lang("OK"), content: "String", WarnIfEmpty: true })
+	parametersToEdit.push({type: "Label", label: x_lang("Timeout")})
+	parametersToEdit.push({type: "Radio", id: "IsTimeout", default: 1, result: "enum", choices: [x_lang("No timeout"), x_lang("Define timeout")], enum: ["NoTimeout", "Timeout"]})
 	parametersToEdit.push({type: "Edit", id: "TimeoutUnits", default: 10, content: "Expression", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Radio", id: "Unit", default: "Seconds", result: "enum", choices: [lang("Seconds"), lang("Minutes"), lang("Hours")], enum: ["Seconds", "Minutes", "Hours"]})
-	parametersToEdit.push({type: "Label", label: lang("Result on timeout"), size: "small"})
-	parametersToEdit.push({type: "Radio", id: "OnTimeout", default: "Normal", result: "enum", choices: [lang("Normal") " - " lang("Make output variable empty"), lang("Throw exception")], enum: ["Normal", "Exception"]})
-	parametersToEdit.push({type: "Label", label: lang("Width and height")})
-	;~ parametersToEdit.push({type: "Radio", id: "Size", default: 1, choices: [lang("Automatic"), lang("Define width and height")]}) ;No automatic size yet
-	;~ parametersToEdit.push({type: "Label", label: lang("Width, height"), size: "small"})
+	parametersToEdit.push({type: "Radio", id: "Unit", default: "Seconds", result: "enum", choices: [x_lang("Seconds"), x_lang("Minutes"), x_lang("Hours")], enum: ["Seconds", "Minutes", "Hours"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Result on timeout"), size: "small"})
+	parametersToEdit.push({type: "Radio", id: "OnTimeout", default: "Normal", result: "enum", choices: [x_lang("Normal") " - " x_lang("Make output variable empty"), x_lang("Throw exception")], enum: ["Normal", "Exception"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Width and height")})
+	;~ parametersToEdit.push({type: "Radio", id: "Size", default: 1, choices: [x_lang("Automatic"), x_lang("Define width and height")]}) ;No automatic size yet
+	;~ parametersToEdit.push({type: "Label", label: x_lang("Width, height"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: ["Width", "Height"], default: [300, 250], content: "Expression", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("Cancelling")})
-	parametersToEdit.push({type: "Checkbox", id: "ShowCancelButton", default: 0, label: lang("Show cancel button")})
-	parametersToEdit.push({type: "Label", label: lang("Button text"), size: "small"})
-	parametersToEdit.push({type: "Edit", id: "ButtonLabelCancel", default: lang("Cancel"), content: "String", WarnIfEmpty: true })
-	parametersToEdit.push({type: "Label", label: lang("Result if cancelled"), size: "small"})
-	parametersToEdit.push({type: "Radio", id: "IfDismiss", default: "Normal", result: "enum", choices: [lang("Normal") " - " lang("Make output variable empty"), lang("Throw exception")], enum: ["Normal", "Exception"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Cancelling")})
+	parametersToEdit.push({type: "Checkbox", id: "ShowCancelButton", default: 0, label: x_lang("Show cancel button")})
+	parametersToEdit.push({type: "Label", label: x_lang("Button text"), size: "small"})
+	parametersToEdit.push({type: "Edit", id: "ButtonLabelCancel", default: x_lang("Cancel"), content: "String", WarnIfEmpty: true })
+	parametersToEdit.push({type: "Label", label: x_lang("Result if cancelled"), size: "small"})
+	parametersToEdit.push({type: "Radio", id: "IfDismiss", default: "Normal", result: "enum", choices: [x_lang("Normal") " - " x_lang("Make output variable empty"), x_lang("Throw exception")], enum: ["Normal", "Exception"]})
 	
 	return parametersToEdit
 }
@@ -93,10 +93,10 @@ Element_GenerateName_Action_Input_Box(Environment, ElementParameters)
 {
 	if (strlen(ElementParameters.message)>100)
 	{
-		return lang("Input_box") ": " ElementParameters.title " - " substr(ElementParameters.message,1,100) " ... "
+		return x_lang("Input_box") ": " ElementParameters.title " - " substr(ElementParameters.message,1,100) " ... "
 	}
 	else
-		return lang("Input_box") ": " ElementParameters.title " - " ElementParameters.message
+		return x_lang("Input_box") ": " ElementParameters.title " - " ElementParameters.message
 }
 
 ;Called every time the user changes any parameter.
@@ -182,12 +182,12 @@ Element_run_Action_Input_Box(Environment, ElementParameters)
 	
 	if width is not number
 	{
-		x_finish(Environment, "exception", lang("%1% is not a number.",lang("Width '%1%'",width))) 
+		x_finish(Environment, "exception", x_lang("%1% is not a number.",x_lang("Width '%1%'",width))) 
 		return
 	}
 	if height is not number
 	{
-		x_finish(Environment, "exception", lang("%1% is not a number.",lang("Height '%1%'",height))) 
+		x_finish(Environment, "exception", x_lang("%1% is not a number.",x_lang("Height '%1%'",height))) 
 		return
 	}
 	
@@ -204,7 +204,7 @@ Element_run_Action_Input_Box(Environment, ElementParameters)
 		TimeoutUnits:=ElementParameters.TimeoutUnits
 		if TimeoutUnits is not number
 		{
-			x_finish(Environment, "exception", lang("%1% is not a number.",lang("Timeout '%1%'",TimeoutUnits))) 
+			x_finish(Environment, "exception", x_lang("%1% is not a number.",x_lang("Timeout '%1%'",TimeoutUnits))) 
 			return
 		}
 		
@@ -241,7 +241,7 @@ Element_run_Action_Input_Box(Environment, ElementParameters)
 		
 		if MultilineEditRows is not number
 		{
-			x_finish(Environment, "exception", lang("%1% is not a number.",lang("Row count '%1%'",MultilineEditRows))) 
+			x_finish(Environment, "exception", x_lang("%1% is not a number.",x_lang("Row count '%1%'",MultilineEditRows))) 
 			return
 		}
 		tempRows:="r" MultilineEditRows
@@ -351,7 +351,7 @@ Action_Input_Box_OnClose()
 	
 	if (IfDismiss = "exception")
 	{
-		x_finish(Environment,"exception", lang("User closed the dialog"))
+		x_finish(Environment,"exception", x_lang("User closed the dialog"))
 	}
 	else
 	{
@@ -370,7 +370,7 @@ ActionInput_BoxButtonCancel()
 	
 	if (IfDismiss = "exception")
 	{
-		x_finish(Environment,"exception", lang("User cancelled the dialog"))
+		x_finish(Environment,"exception", x_lang("User cancelled the dialog"))
 	}
 	else
 	{
@@ -403,7 +403,7 @@ Action_Input_Box_TimeoutTimer(Environment, uniqueID)
 		x_SetVariable(Environment,"A_UserAction", "Timeout", "thread")
 		if (OnTimeout = "Exception")
 		{
-			x_finish(Environment,"exception", lang("Timeout reached"))
+			x_finish(Environment,"exception", x_lang("Timeout reached"))
 		}
 		else
 		{
@@ -415,7 +415,7 @@ Action_Input_Box_TimeoutTimer(Environment, uniqueID)
 	else
 	{
 		;End of timeout not reached. Update the text in the GUI.
-		guicontrol,%guiID%:,% HWNDTimeoutText,% (remainingTime // 1000) " " lang("Seconds")
+		guicontrol,%guiID%:,% HWNDTimeoutText,% (remainingTime // 1000) " " x_lang("Seconds")
 		
 		;Calculate how many milliseconds we need to wait until the next full second is reached and update timer.
 		nextTimerTime:=mod(remainingTime,1000)

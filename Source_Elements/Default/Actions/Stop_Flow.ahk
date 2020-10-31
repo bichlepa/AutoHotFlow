@@ -10,13 +10,13 @@ Element_getElementType_Action_Stop_Flow()
 ;Name of the element
 Element_getName_Action_Stop_Flow()
 {
-	return lang("Stop_Flow")
+	return x_lang("Stop_Flow")
 }
 
 ;Category of the element
 Element_getCategory_Action_Stop_Flow()
 {
-	return lang("Flow_control")
+	return x_lang("Flow_control")
 }
 
 ;This function returns the package of the element.
@@ -52,7 +52,7 @@ Element_getStabilityLevel_Action_Stop_Flow()
 Element_getParametrizationDetails_Action_Stop_Flow(Environment)
 {
 	parametersToEdit:=Object()
-	parametersToEdit.push({type: "Label", label: lang("Flow_name")})
+	parametersToEdit.push({type: "Label", label: x_lang("Flow_name")})
 	parametersToEdit.push({type: "Edit", id: "flowName", content: "String", WarnIfEmpty: true})
 
 	return parametersToEdit
@@ -61,7 +61,7 @@ Element_getParametrizationDetails_Action_Stop_Flow(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Stop_Flow(Environment, ElementParameters)
 {
-	return % lang("Stop_Flow") ": " ElementParameters.flowName
+	return % x_lang("Stop_Flow") ": " ElementParameters.flowName
 	
 }
 
@@ -89,7 +89,7 @@ Element_run_Action_Stop_Flow(Environment, ElementParameters)
 	}
 	else
 	{
-		return x_finish(Environment,"exception",lang("Flow '%1%' does not exist",FlowName))
+		return x_finish(Environment,"exception",x_lang("Flow '%1%' does not exist",FlowName))
 	}
 	return
 }

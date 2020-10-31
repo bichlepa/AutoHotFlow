@@ -10,13 +10,13 @@ Element_getElementType_Action_Search_Image()
 ;Name of the element
 Element_getName_Action_Search_Image()
 {
-	return lang("Search_Image")
+	return x_lang("Search_Image")
 }
 
 ;Category of the element
 Element_getCategory_Action_Search_Image()
 {
-	return lang("Image")
+	return x_lang("Image")
 }
 
 ;This function returns the package of the element.
@@ -53,35 +53,35 @@ Element_getParametrizationDetails_Action_Search_Image(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: lang("Output variables") (x, y)})
+	parametersToEdit.push({type: "Label", label: x_lang("Output variables") (x, y)})
 	parametersToEdit.push({type: "Edit", id: ["varnameX", "varnameY"], default: ["ImagePosX", "ImagePosY"], content: "VariableName", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("Screen region")})
-	parametersToEdit.push({type: "Radio", id: "CoordMode", default: 1, result: "enum", choices: [lang("Relative to screen"), lang("Relative to active window position"), lang("Relative to active window client position")], enum: ["Screen", "Window", "Client"]})
-	parametersToEdit.push({type: "Checkbox", id: "WholeScreen", default: 0, label: lang("Whole screen")})
-	parametersToEdit.push({type: "Checkbox", id: "AllScreens", default: 0, label: lang("All screens")})
-	parametersToEdit.push({type: "Label", label: lang("Upper left corner") (x1, y1), size: "small"})
+	parametersToEdit.push({type: "Label", label: x_lang("Screen region")})
+	parametersToEdit.push({type: "Radio", id: "CoordMode", default: 1, result: "enum", choices: [x_lang("Relative to screen"), x_lang("Relative to active window position"), x_lang("Relative to active window client position")], enum: ["Screen", "Window", "Client"]})
+	parametersToEdit.push({type: "Checkbox", id: "WholeScreen", default: 0, label: x_lang("Whole screen")})
+	parametersToEdit.push({type: "Checkbox", id: "AllScreens", default: 0, label: x_lang("All screens")})
+	parametersToEdit.push({type: "Label", label: x_lang("Upper left corner") (x1, y1), size: "small"})
 	parametersToEdit.push({type: "Edit", id: ["x1", "y1"], default: [10, 20], content: "Number", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("Lower right corner") (x2, y2), size: "small"})
+	parametersToEdit.push({type: "Label", label: x_lang("Lower right corner") (x2, y2), size: "small"})
 	parametersToEdit.push({type: "Edit", id: ["x2", "y2"], default: [600, 700], content: "Number", WarnIfEmpty: true})
-	parametersToEdit.push({type: "button", id: "GetCoordinates", goto: "Action_Search_Image_Button_MouseTracker", label: lang("Get coordinates")})
-	parametersToEdit.push({type: "Label", label: lang("Image file path")})
-	parametersToEdit.push({type: "File", id: "file", label: lang("Select a file"), options: 8, filter: lang("Images and icons") " (*.gif; *.jpg; *.bmp; *.ico; *.cur; *.ani; *.png; *.tif; *.exif; *.wmf; *.emf; *.exe; *.dll; *.cpl; *.scr)"})
-	parametersToEdit.push({type: "Label", label: lang("File with multiple icons")})
-	parametersToEdit.push({type: "Checkbox", id: "SetIconNumber", default: 0, label: lang("Set icon number")})
+	parametersToEdit.push({type: "button", id: "GetCoordinates", goto: "Action_Search_Image_Button_MouseTracker", label: x_lang("Get coordinates")})
+	parametersToEdit.push({type: "Label", label: x_lang("Image file path")})
+	parametersToEdit.push({type: "File", id: "file", label: x_lang("Select a file"), options: 8, filter: x_lang("Images and icons") " (*.gif; *.jpg; *.bmp; *.ico; *.cur; *.ani; *.png; *.tif; *.exif; *.wmf; *.emf; *.exe; *.dll; *.cpl; *.scr)"})
+	parametersToEdit.push({type: "Label", label: x_lang("File with multiple icons")})
+	parametersToEdit.push({type: "Checkbox", id: "SetIconNumber", default: 0, label: x_lang("Set icon number")})
 	parametersToEdit.push({type: "Edit", id: "IconNumber", default: 1, content: "Number", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("Variation")})
+	parametersToEdit.push({type: "Label", label: x_lang("Variation")})
 	parametersToEdit.push({type: "Slider", id: "variation", content: "Number", default: 0, options: "Range0-255 TickInterval10 tooltip"})
-	parametersToEdit.push({type: "Label", label: lang("Transparent color")})
-	parametersToEdit.push({type: "Checkbox", id: "makeTransparent", default: 0, label: lang("Make a color of image transparent")})
-	parametersToEdit.push({type: "Label", label: lang("Color name or RGB value"), size: "small"})
+	parametersToEdit.push({type: "Label", label: x_lang("Transparent color")})
+	parametersToEdit.push({type: "Checkbox", id: "makeTransparent", default: 0, label: x_lang("Make a color of image transparent")})
+	parametersToEdit.push({type: "Label", label: x_lang("Color name or RGB value"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: "transparent", content: "String", WarnIfEmpty: true})
-	parametersToEdit.push({type: "button", id: "ChooseColor", goto: "Action_Search_Image_Button_ChooseColor", label: lang("Choose color")})
-	parametersToEdit.push({type: "button", id: "GetColor", goto: "Action_Search_Image_Button_GetColorFromScreen", label: lang("Get color from screen")})
-	parametersToEdit.push({type: "Label", label: lang("Scale image")})
-	parametersToEdit.push({type: "Checkbox", id: "ScaleImage", default: 0, label: lang("Scale image")})
-	parametersToEdit.push({type: "Checkbox", id: "PreserveAspectRatio", default: 0, label: lang("Preserve aspect ratio")})
-	parametersToEdit.push({type: "Radio", id: "WhichSizeSet", default: 1, choices: [lang("Set width manually and set height automatically"), lang("Set height manually and set width automatically")], result: "enum", enum: ["widthManually", "heightManually"]})
-	parametersToEdit.push({type: "Label", label: lang("width, height"), size: "small"})
+	parametersToEdit.push({type: "button", id: "ChooseColor", goto: "Action_Search_Image_Button_ChooseColor", label: x_lang("Choose color")})
+	parametersToEdit.push({type: "button", id: "GetColor", goto: "Action_Search_Image_Button_GetColorFromScreen", label: x_lang("Get color from screen")})
+	parametersToEdit.push({type: "Label", label: x_lang("Scale image")})
+	parametersToEdit.push({type: "Checkbox", id: "ScaleImage", default: 0, label: x_lang("Scale image")})
+	parametersToEdit.push({type: "Checkbox", id: "PreserveAspectRatio", default: 0, label: x_lang("Preserve aspect ratio")})
+	parametersToEdit.push({type: "Radio", id: "WhichSizeSet", default: 1, choices: [x_lang("Set width manually and set height automatically"), x_lang("Set height manually and set width automatically")], result: "enum", enum: ["widthManually", "heightManually"]})
+	parametersToEdit.push({type: "Label", label: x_lang("width, height"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: ["ImageWidth", "ImageHeight"], content: "Number", WarnIfEmpty: true})
 
 	
@@ -104,7 +104,7 @@ Action_Search_Image_Button_GetColorFromScreen()
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Search_Image(Environment, ElementParameters)
 {
-	return lang("Search_Image") 
+	return x_lang("Search_Image") 
 }
 
 ;Called every time the user changes any parameter.
@@ -115,17 +115,17 @@ Element_CheckSettings_Action_Search_Image(Environment, ElementParameters)
 {	
 	if (ElementParameters.CoordMode = "Screen")
 	{
-		x_par_SetLabel("WholeScreen", lang("Whole screen"))
+		x_par_SetLabel("WholeScreen", x_lang("Whole screen"))
 		x_par_Enable("AllScreens", ElementParameters.WholeScreen)
 	}
 	else if (ElementParameters.CoordMode = "Window")
 	{
-		x_par_SetLabel("WholeScreen", lang("Whole window"))
+		x_par_SetLabel("WholeScreen", x_lang("Whole window"))
 		x_par_Disable("AllScreens")
 	}
 	else
 	{
-		x_par_SetLabel("WholeScreen", lang("Whole window client"))
+		x_par_SetLabel("WholeScreen", x_lang("Whole window client"))
 		x_par_Disable("AllScreens")
 	}
 	
@@ -366,18 +366,18 @@ Element_run_Action_Search_Image(Environment, ElementParameters)
 	{
 		if not fileexist(tempPath)
 		{
-			x_finish(Environment, "exception", lang("File '%1%' does not exist",tempPath)) 
+			x_finish(Environment, "exception", x_lang("File '%1%' does not exist",tempPath)) 
 			return
 		}
 		else
 		{
-			x_finish(Environment, "exception", lang("File '%1%' could not be read",tempPath)) 
+			x_finish(Environment, "exception", x_lang("File '%1%' could not be read",tempPath)) 
 			return
 		}
 	}
 	if ErrorLevel=1
 	{
-		x_finish(Environment, "exception", lang("Image was not found on screen",tempPath)) 
+		x_finish(Environment, "exception", x_lang("Image was not found on screen",tempPath)) 
 		return
 		
 	}

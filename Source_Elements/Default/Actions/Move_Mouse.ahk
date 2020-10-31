@@ -10,13 +10,13 @@ Element_getElementType_Action_Move_Mouse()
 ;Name of the element
 Element_getName_Action_Move_Mouse()
 {
-	return lang("Move_Mouse")
+	return x_lang("Move_Mouse")
 }
 
 ;Category of the element
 Element_getCategory_Action_Move_Mouse()
 {
-	return lang("User_simulation")
+	return x_lang("User_simulation")
 }
 
 ;This function returns the package of the element.
@@ -53,16 +53,16 @@ Element_getParametrizationDetails_Action_Move_Mouse(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: lang("Mouse position")})
-	parametersToEdit.push({type: "Radio", id: "CoordMode", default: 1, result: "enum", choices: [lang("Relative to screen"), lang("Relative to active window position"), lang("Relative to active window client position"), lang("Relative to current mouse position")], enum: ["Screen", "Window", "Client", "Relative"]})
-	parametersToEdit.push({type: "Label", label: lang("Coordinates") lang("(x,y)"), size: "small"})
+	parametersToEdit.push({type: "Label", label: x_lang("Mouse position")})
+	parametersToEdit.push({type: "Radio", id: "CoordMode", default: 1, result: "enum", choices: [x_lang("Relative to screen"), x_lang("Relative to active window position"), x_lang("Relative to active window client position"), x_lang("Relative to current mouse position")], enum: ["Screen", "Window", "Client", "Relative"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Coordinates") x_lang("(x,y)"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: ["Xpos", "Ypos"], default: [10, 20], content: "Expression", WarnIfEmpty: true})
-	parametersToEdit.push({type: "button", id: "MouseTracker", goto: "ActionMove_MouseMouseTracker", label: lang("Get coordinates")})
-	parametersToEdit.push({type: "Label", label: lang("Method")})
-	parametersToEdit.push({type: "Radio", id: "SendMode", default: 1, result: "enum", choices: [lang("Input mode"), lang("Event mode"), lang("Play mode")], enum: ["Input", "Event", "Play"]})
-	parametersToEdit.push({type: "Label", label: lang("Speed")})
+	parametersToEdit.push({type: "button", id: "MouseTracker", goto: "ActionMove_MouseMouseTracker", label: x_lang("Get coordinates")})
+	parametersToEdit.push({type: "Label", label: x_lang("Method")})
+	parametersToEdit.push({type: "Radio", id: "SendMode", default: 1, result: "enum", choices: [x_lang("Input mode"), x_lang("Event mode"), x_lang("Play mode")], enum: ["Input", "Event", "Play"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Speed")})
 	parametersToEdit.push({type: "Slider", id: "speed", default: 2, options: "Range0-100 tooltip"})
-	parametersToEdit.push({type: "Label", label: lang("Delay in ms")})
+	parametersToEdit.push({type: "Label", label: x_lang("Delay in ms")})
 	parametersToEdit.push({type: "Edit", id: "delay", default: 10, content: "Expression", WarnIfEmpty: true})
 	
 	
@@ -76,7 +76,7 @@ ActionMove_MouseMouseTracker()
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Move_Mouse(Environment, ElementParameters)
 {
-	return lang("Move_Mouse") 
+	return x_lang("Move_Mouse") 
 }
 
 ;Called every time the user changes any parameter.
@@ -123,12 +123,12 @@ Element_run_Action_Move_Mouse(Environment, ElementParameters)
 	
 	if Xpos is not number
 	{
-		x_finish(Environment, "exception", lang("%1% is not a number.",lang("X position"))) 
+		x_finish(Environment, "exception", x_lang("%1% is not a number.",x_lang("X position"))) 
 		return
 	}
 	if Ypos is not number
 	{
-		x_finish(Environment, "exception", lang("%1% is not a number.",lang("Y position"))) 
+		x_finish(Environment, "exception", x_lang("%1% is not a number.",x_lang("Y position"))) 
 		return
 	}
 	

@@ -46,12 +46,12 @@ assistant_GetWindowInformation(neededInfo)
 	gui,add,text,w1 Y+10 xm,
 	if (assistant_GetWindowInformation_NeededInfo.Xpos)
 	{
-		gui,add,text,X+10 yp,% lang("X")
+		gui,add,text,X+10 yp,% lang("X #coordinate")
 		gui,add,edit,X+10 yp w50 vassistant_GetWindowInformation_EditXPos
 	}
 	if (assistant_GetWindowInformation_NeededInfo.Ypos)
 	{
-		gui,add,text,X+10 yp ,% lang("Y")
+		gui,add,text,X+10 yp ,% lang("Y #coordinate")
 		gui,add,edit,X+10 yp w50 vassistant_GetWindowInformation_EditYPos
 	}
 	if (assistant_GetWindowInformation_NeededInfo.Width)

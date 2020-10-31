@@ -10,13 +10,13 @@ Element_getElementType_Action_Substring()
 ;Name of the element
 Element_getName_Action_Substring()
 {
-	return lang("Substring")
+	return x_lang("Substring")
 }
 
 ;Category of the element
 Element_getCategory_Action_Substring()
 {
-	return lang("Variable")
+	return x_lang("Variable")
 }
 
 ;This function returns the package of the element.
@@ -53,17 +53,17 @@ Element_getParametrizationDetails_Action_Substring(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: lang("Output variable_name")})
+	parametersToEdit.push({type: "Label", label: x_lang("Output variable_name")})
 	parametersToEdit.push({type: "Edit", id: "Varname", default: "NewVariable", content: "VariableName", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label:  lang("Input string")})
+	parametersToEdit.push({type: "Label", label:  x_lang("Input string")})
 	parametersToEdit.push({type: "Edit", id: "VarValue", default: "Hello World", content: ["String", "Expression"], contentID: "expression", contentDefault: "string", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("Start position")})
-	parametersToEdit.push({type: "Radio", id: "WhereToBegin", default: 1, choices: [lang("Begin from left"), lang("Begin from right"), lang("Start from following position")], result: "enum", enum: ["FromLeft", "FromRight", "Position"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Start position")})
+	parametersToEdit.push({type: "Radio", id: "WhereToBegin", default: 1, choices: [x_lang("Begin from left"), x_lang("Begin from right"), x_lang("Start from following position")], result: "enum", enum: ["FromLeft", "FromRight", "Position"]})
 	parametersToEdit.push({type: "Edit", id: "StartPos", default: 1, content: "Number", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("Count of characters")})
-	parametersToEdit.push({type: "CheckBox", id: "UntilTheEnd", default: 0, label: lang("Until the end")})
+	parametersToEdit.push({type: "Label", label: x_lang("Count of characters")})
+	parametersToEdit.push({type: "CheckBox", id: "UntilTheEnd", default: 0, label: x_lang("Until the end")})
 	parametersToEdit.push({type: "Edit", id: "Length", default: 5, content: "Number", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Radio", id: "LeftOrRight", default: 1, choices: [lang("Go left"), lang("Go right")], result: "enum", enum: ["GoLeft", "GoRight"]})
+	parametersToEdit.push({type: "Radio", id: "LeftOrRight", default: 1, choices: [x_lang("Go left"), x_lang("Go right")], result: "enum", enum: ["GoLeft", "GoRight"]})
 	
 	
 	return parametersToEdit
@@ -72,7 +72,7 @@ Element_getParametrizationDetails_Action_Substring(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Substring(Environment, ElementParameters)
 {
-	return lang("Substring") 
+	return x_lang("Substring") 
 }
 
 ;Called every time the user changes any parameter.

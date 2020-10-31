@@ -10,13 +10,13 @@ Element_getElementType_Action_Get_String_Length()
 ;Name of the element
 Element_getName_Action_Get_String_Length()
 {
-	return lang("Get_String_Length")
+	return x_lang("Get_String_Length")
 }
 
 ;Category of the element
 Element_getCategory_Action_Get_String_Length()
 {
-	return lang("Variable")
+	return x_lang("Variable")
 }
 
 ;This function returns the package of the element.
@@ -53,9 +53,9 @@ Element_getParametrizationDetails_Action_Get_String_Length(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: lang("Output variable name")})
+	parametersToEdit.push({type: "Label", label: x_lang("Output variable name")})
 	parametersToEdit.push({type: "Edit", id: "Varname", default: "NewLength", content: "VariableName", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label:  lang("Input string")})
+	parametersToEdit.push({type: "Label", label:  x_lang("Input string")})
 	parametersToEdit.push({type: "Edit", id: "VarValue", default: "Hello World", content: ["String", "Expression"], contentID: "expression", contentDefault: "string", WarnIfEmpty: true})
 	
 	return parametersToEdit
@@ -64,7 +64,7 @@ Element_getParametrizationDetails_Action_Get_String_Length(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Get_String_Length(Environment, ElementParameters)
 {
-	return lang("Get_String_Length") "`n" ElementParameters.Varname " = |" ElementParameters.VarValue "|"
+	return x_lang("Get_String_Length") "`n" ElementParameters.Varname " = |" ElementParameters.VarValue "|"
 }
 
 ;Called every time the user changes any parameter.
@@ -86,7 +86,7 @@ Element_run_Action_Get_String_Length(Environment, ElementParameters)
 	if not x_CheckVariableName(Varname)
 	{
 		;On error, finish with exception and return
-		x_finish(Environment, "exception", lang("%1% is not valid", lang("Ouput variable name '%1%'", varname)))
+		x_finish(Environment, "exception", x_lang("%1% is not valid", x_lang("Ouput variable name '%1%'", varname)))
 		return
 	}
 
@@ -96,7 +96,7 @@ Element_run_Action_Get_String_Length(Environment, ElementParameters)
 		if (evRes.error)
 		{
 			;On error, finish with exception and return
-			x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.VarValue) "`n`n" evRes.error) 
+			x_finish(Environment, "exception", x_lang("An error occured while parsing expression '%1%'", ElementParameters.VarValue) "`n`n" evRes.error) 
 			return
 		}
 		else

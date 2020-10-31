@@ -10,13 +10,13 @@ Element_getElementType_Condition_String_Contains_Text()
 ;Name of the element
 Element_getName_Condition_String_Contains_Text()
 {
-	return lang("String_Contains_Text")
+	return x_lang("String_Contains_Text")
 }
 
 ;Category of the element
 Element_getCategory_Condition_String_Contains_Text()
 {
-	return lang("Variable")
+	return x_lang("Variable")
 }
 
 ;This function returns the package of the element.
@@ -53,14 +53,14 @@ Element_getParametrizationDetails_Condition_String_Contains_Text(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label:  lang("Input string")})
+	parametersToEdit.push({type: "Label", label:  x_lang("Input string")})
 	parametersToEdit.push({type: "Edit", id: "VarValue", default: "Hello World", content: ["String", "Expression"], contentID: "Expression", ContentDefault: "String", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label:  lang("Text to search")})
+	parametersToEdit.push({type: "Label", label:  x_lang("Text to search")})
 	parametersToEdit.push({type: "Edit", id: "SearchText", default: "World", content: ["String", "Expression"], contentID: "IsExpressionSearchText", ContentDefault: "String", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("Search text position")})
-	parametersToEdit.push({type: "Radio", id: "WhereToBegin", default: 3, choices: [lang("Starts with"), lang("Ends with"), lang("Contains anywhere")], result: "enum", enum: ["Start", "End", "Anywhere"]})
-	parametersToEdit.push({type: "Label", label: lang("Case sensitivity")})
-	parametersToEdit.push({type: "Radio", id: "CaseSensitive", default: 1, choices: [lang("Case insensitive"), lang("Case sensitive")], result: "enum", enum: ["CaseInsensitive", "CaseSensitive"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Search text position")})
+	parametersToEdit.push({type: "Radio", id: "WhereToBegin", default: 3, choices: [x_lang("Starts with"), x_lang("Ends with"), x_lang("Contains anywhere")], result: "enum", enum: ["Start", "End", "Anywhere"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Case sensitivity")})
+	parametersToEdit.push({type: "Radio", id: "CaseSensitive", default: 1, choices: [x_lang("Case insensitive"), x_lang("Case sensitive")], result: "enum", enum: ["CaseInsensitive", "CaseSensitive"]})
 	
 	return parametersToEdit
 }
@@ -68,7 +68,7 @@ Element_getParametrizationDetails_Condition_String_Contains_Text(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Condition_String_Contains_Text(Environment, ElementParameters)
 {
-	return lang("String_Contains_Text") 
+	return x_lang("String_Contains_Text") 
 }
 
 ;Called every time the user changes any parameter.

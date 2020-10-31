@@ -10,13 +10,13 @@ Element_getElementType_Action_Copy_Folder()
 ;Name of the element
 Element_getName_Action_Copy_Folder()
 {
-	return lang("Copy_Folder")
+	return x_lang("Copy_Folder")
 }
 
 ;Category of the element
 Element_getCategory_Action_Copy_Folder()
 {
-	return lang("File")
+	return x_lang("File")
 }
 
 ;This function returns the package of the element.
@@ -53,12 +53,12 @@ Element_getParametrizationDetails_Action_Copy_Folder(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: lang("Source folder")})
-	parametersToEdit.push({type: "Folder", id: "folder", label: lang("Select a folder")})
-	parametersToEdit.push({type: "Label", label: lang("Destination file or folder")})
-	parametersToEdit.push({type: "Folder", id: "destFolder", label: lang("Select a folder")})
-	parametersToEdit.push({type: "Label", label: lang("Overwrite")})
-	parametersToEdit.push({type: "Checkbox", id: "Overwrite", default: 0, label: lang("Overwrite existing files")})
+	parametersToEdit.push({type: "Label", label: x_lang("Source folder")})
+	parametersToEdit.push({type: "Folder", id: "folder", label: x_lang("Select a folder")})
+	parametersToEdit.push({type: "Label", label: x_lang("Destination file or folder")})
+	parametersToEdit.push({type: "Folder", id: "destFolder", label: x_lang("Select a folder")})
+	parametersToEdit.push({type: "Label", label: x_lang("Overwrite")})
+	parametersToEdit.push({type: "Checkbox", id: "Overwrite", default: 0, label: x_lang("Overwrite existing files")})
 	
 	return parametersToEdit
 }
@@ -66,7 +66,7 @@ Element_getParametrizationDetails_Action_Copy_Folder(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Copy_Folder(Environment, ElementParameters)
 {
-	return lang("Copy_Folder") 
+	return x_lang("Copy_Folder") 
 }
 
 ;Called every time the user changes any parameter.
@@ -92,19 +92,19 @@ Element_run_Action_Copy_Folder(Environment, ElementParameters)
 
 	if not FileExist(folderFrom)
 	{
-		x_finish(Environment, "exception", lang("%1% '%2%' does not exist.",lang("Source folder"), folderFrom)) 
+		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.",x_lang("Source folder"), folderFrom)) 
 		return
 	}
 	if not FileExist(destFolder)
 	{
-		x_finish(Environment, "exception", lang("%1% '%2%' does not exist.",lang("Destination folder"), destFolder)) 
+		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.",x_lang("Destination folder"), destFolder)) 
 		return
 	}
 
 	FileCopyDir,% folderFrom,% destFolder,% Overwrite
 	if errorlevel ;Indecates that files could not be copied
 	{
-		x_finish(Environment, "exception", lang("Folder '%1%' could not be copied to '%2%'",folderFrom, destFolder)) 
+		x_finish(Environment, "exception", x_lang("Folder '%1%' could not be copied to '%2%'",folderFrom, destFolder)) 
 		return
 	}
 	

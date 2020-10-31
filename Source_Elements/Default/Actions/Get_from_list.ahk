@@ -10,13 +10,13 @@ Element_getElementType_Action_Get_From_List()
 ;Name of the element
 Element_getName_Action_Get_From_List()
 {
-	return lang("Get_From_List")
+	return x_lang("Get_From_List")
 }
 
 ;Category of the element
 Element_getCategory_Action_Get_From_List()
 {
-	return lang("Variable")
+	return x_lang("Variable")
 }
 
 ;This function returns the package of the element.
@@ -53,12 +53,12 @@ Element_getStabilityLevel_Action_Get_From_List()
 Element_getParametrizationDetails_Action_Get_From_List(Environment)
 {
 	parametersToEdit:=Object()
-	parametersToEdit.push({type: "Label", label: lang("Output variable name")})
+	parametersToEdit.push({type: "Label", label: x_lang("Output variable name")})
 	parametersToEdit.push({type: "Edit", id: "Varname", default: "NewVariable", content: "VariableName", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("Input list")})
+	parametersToEdit.push({type: "Label", label: x_lang("Input list")})
 	parametersToEdit.push({type: "Edit", id: "ListName", default: "MyList", content: "expression", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("Key or position")})
-	parametersToEdit.push({type: "Radio", id: "WhichPosition", default: 1, result: "enum", choices: [lang("First position"), lang("Last position"), lang("Random position"), lang("Following position or key")], enum: ["First", "Last", "Random", "Specified"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Key or position")})
+	parametersToEdit.push({type: "Radio", id: "WhichPosition", default: 1, result: "enum", choices: [x_lang("First position"), x_lang("Last position"), x_lang("Random position"), x_lang("Following position or key")], enum: ["First", "Last", "Random", "Specified"]})
 	parametersToEdit.push({type: "Edit", id: "Position", default: "keyName", content: ["String", "Expression"], contentID: "expressionPos", contentDefault: "string", WarnIfEmpty: true})
 	
 
@@ -68,7 +68,7 @@ Element_getParametrizationDetails_Action_Get_From_List(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Get_From_List(Environment, ElementParameters)
 {
-	return lang("Get_From_List")
+	return x_lang("Get_From_List")
 }
 
 ;Called every time the user changes any parameter.
@@ -91,7 +91,7 @@ Element_run_Action_Get_From_List(Environment, ElementParameters)
 	if not x_CheckVariableName(varname)
 	{
 		;On error, finish with exception and return
-		x_finish(Environment, "exception", lang("%1% is not valid", lang("Ouput variable name '%1%'", varname)))
+		x_finish(Environment, "exception", x_lang("%1% is not valid", x_lang("Ouput variable name '%1%'", varname)))
 		return
 	}
 	
@@ -100,7 +100,7 @@ Element_run_Action_Get_From_List(Environment, ElementParameters)
 	if (evRes.error)
 	{
 		;On error, finish with exception and return
-		x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.ListName) "`n`n" evRes.error) 
+		x_finish(Environment, "exception", x_lang("An error occured while parsing expression '%1%'", ElementParameters.ListName) "`n`n" evRes.error) 
 		return
 	}
 	ListName:=evRes.result
@@ -109,7 +109,7 @@ Element_run_Action_Get_From_List(Environment, ElementParameters)
 	
 	if (!(IsObject(myList)))
 	{
-		x_finish(Environment, "exception", lang("Variable '%1%' does not contain a list.",myList))
+		x_finish(Environment, "exception", x_lang("Variable '%1%' does not contain a list.",myList))
 		return
 	}
 	
@@ -118,7 +118,7 @@ Element_run_Action_Get_From_List(Environment, ElementParameters)
 		minindex:=myList.MinIndex()
 		if minindex=
 		{
-			x_finish(Environment, "exception", lang("The list '%1%' does not contain an integer key.",ListName))
+			x_finish(Environment, "exception", x_lang("The list '%1%' does not contain an integer key.",ListName))
 			return
 		}
 		
@@ -129,7 +129,7 @@ Element_run_Action_Get_From_List(Environment, ElementParameters)
 		maxindex:=myList.MaxIndex()
 		if maxindex=
 		{
-			x_finish(Environment, "exception", lang("The list '%1%' does not contain an integer key.",ListName))
+			x_finish(Environment, "exception", x_lang("The list '%1%' does not contain an integer key.",ListName))
 			return
 		}
 		
@@ -140,7 +140,7 @@ Element_run_Action_Get_From_List(Environment, ElementParameters)
 		minindex:=tempObject.MinIndex()
 		if minindex=
 		{
-			x_finish(Environment, "exception", lang("The list '%1%' does not contain an integer key.",ListName))
+			x_finish(Environment, "exception", x_lang("The list '%1%' does not contain an integer key.",ListName))
 			return
 		}
 		maxindex:=tempObject.MaxIndex()
@@ -156,7 +156,7 @@ Element_run_Action_Get_From_List(Environment, ElementParameters)
 			if (evRes.error)
 			{
 				;On error, finish with exception and return
-				x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.Position) "`n`n" evRes.error) 
+				x_finish(Environment, "exception", x_lang("An error occured while parsing expression '%1%'", ElementParameters.Position) "`n`n" evRes.error) 
 				return
 			}
 			else
@@ -170,13 +170,13 @@ Element_run_Action_Get_From_List(Environment, ElementParameters)
 		if (position = "")
 		{
 			;On error, finish with exception and return
-			x_finish(Environment, "exception", lang("Position is not specified")) 
+			x_finish(Environment, "exception", x_lang("Position is not specified")) 
 			return
 		}
 		
 		if (not myList.HasKey(Position))
 		{
-			x_finish(Environment, "exception", lang("The list '%1%' does not contain the key '%2%'.",ListName,Position)) 
+			x_finish(Environment, "exception", x_lang("The list '%1%' does not contain the key '%2%'.",ListName,Position)) 
 			return
 		}
 		

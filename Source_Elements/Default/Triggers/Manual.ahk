@@ -10,13 +10,13 @@ Element_getElementType_Trigger_Manual()
 ;Name of the element
 Element_getName_Trigger_Manual()
 {
-	return lang("Manual")
+	return x_lang("Manual")
 }
 
 ;Category of the element
 Element_getCategory_Trigger_Manual()
 {
-	return lang("User_interaction")
+	return x_lang("User_interaction")
 }
 
 ;This function returns the package of the element.
@@ -53,7 +53,7 @@ Element_getStabilityLevel_Trigger_Manual()
 Element_getParametrizationDetails_Trigger_Manual(Environment)
 {
 	parametersToEdit:=Object()
-	parametersToEdit.push({type: "Label", label: lang("ID")})
+	parametersToEdit.push({type: "Label", label: x_lang("ID")})
 	parametersToEdit.push({type: "Edit", id: "ID", content: "String",  default: "Trigger " x_randomPhrase()})
 	parametersToEdit.updateOnEdit := true
 	return parametersToEdit
@@ -62,7 +62,7 @@ Element_getParametrizationDetails_Trigger_Manual(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Trigger_Manual(Environment, ElementParameters)
 {
-	return % lang("Manual") "`n""" ElementParameters.id   """"
+	return % x_lang("Manual") "`n""" ElementParameters.id   """"
 }
 
 ;Called every time the user changes any parameter.

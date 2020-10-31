@@ -10,13 +10,13 @@ Element_getElementType_Condition_Debug_Dialog()
 ;Name of the element
 Element_getName_Condition_Debug_Dialog()
 {
-	return lang("Debug_Dialog")
+	return x_lang("Debug_Dialog")
 }
 
 ;Category of the element
 Element_getCategory_Condition_Debug_Dialog()
 {
-	return lang("Debugging")
+	return x_lang("Debugging")
 }
 
 ;This function returns the package of the element.
@@ -61,7 +61,7 @@ Element_getParametrizationDetails_Condition_Debug_Dialog(Environment)
 Element_GenerateName_Condition_Debug_Dialog(Environment, ElementParameters)
 {
 	global
-	return % lang("Debug_dialog")
+	return % x_lang("Debug_dialog")
 	
 }
 
@@ -85,7 +85,7 @@ Element_run_Condition_Debug_Dialog(Environment, ElementParameters)
 	
 	;Create GUI
 	gui,%tempGUIID%:+LabelDebug_DialogGUI ;This label leads to a jump label beneath. It's needed if user closes the window
-	gui,%tempGUIID%:add,text,x10 , % lang("Local variables")
+	gui,%tempGUIID%:add,text,x10 , % x_lang("Local variables")
 	
 	gui,%tempGUIID%:add,listbox, x10 w200 h200 vCondition_Debug_DialogAllVars%tempGUIID% gCondition_Debug_DialogAllVars ,%tempVariableNames% 
 	
@@ -93,11 +93,11 @@ Element_run_Condition_Debug_Dialog(Environment, ElementParameters)
 	
 	
 	gui,%tempGUIID%:add,edit,X+10 w200 yp h200 vCondition_Debug_DialogEditField%tempGUIID% gCondition_Debug_DialogEditField
-	gui,%tempGUIID%:add,button,x10 w150 h30 gCondition_Debug_DialogButtonUpdateVariableList,% lang("Update variable list")
-	gui,%tempGUIID%:add,button,X+20 w150 h30 gCondition_Debug_DialogButtonDeleteVariable vCondition_Debug_DialogButtonDeleteVariable Disabled,% lang("Delete variable")
-	gui,%tempGUIID%:add,button,X+20 w150 h30 vCondition_Debug_DialogButtonChangeValue gCondition_Debug_DialogButtonChangeValue Disabled,% lang("Change value")
-	gui,%tempGUIID%:add,button,x10 w150 h30 gCondition_Debug_DialogButtonYes,% lang("Yes")
-	gui,%tempGUIID%:add,button,X+10 yp w150 h30 gCondition_Debug_DialogButtonNo,% lang("No")
+	gui,%tempGUIID%:add,button,x10 w150 h30 gCondition_Debug_DialogButtonUpdateVariableList,% x_lang("Update variable list")
+	gui,%tempGUIID%:add,button,X+20 w150 h30 gCondition_Debug_DialogButtonDeleteVariable vCondition_Debug_DialogButtonDeleteVariable Disabled,% x_lang("Delete variable")
+	gui,%tempGUIID%:add,button,X+20 w150 h30 vCondition_Debug_DialogButtonChangeValue gCondition_Debug_DialogButtonChangeValue Disabled,% x_lang("Change value")
+	gui,%tempGUIID%:add,button,x10 w150 h30 gCondition_Debug_DialogButtonYes,% x_lang("Yes")
+	gui,%tempGUIID%:add,button,X+10 yp w150 h30 gCondition_Debug_DialogButtonNo,% x_lang("No")
 	gui,%tempGUIID%:show, ,% tempTitle
 	
 	;Add the label to the list of all GUI labels, so it can be found.
@@ -123,7 +123,7 @@ Element_run_Condition_Debug_Dialog(Environment, ElementParameters)
 		if (substr(tempVarName,1,2)="a_")
 		{
 			if a_index=1
-				tempVariableNames.= "--- " lang("Loop variables") " ---|"
+				tempVariableNames.= "--- " x_lang("Loop variables") " ---|"
 			tempVariableNames.=tempVarName "|"
 		}
 	}
@@ -133,7 +133,7 @@ Element_run_Condition_Debug_Dialog(Environment, ElementParameters)
 		if (substr(tempVarName,1,2)="a_")
 		{
 			if a_index=1
-				tempVariableNames.= "--- " lang("Thread variables") " ---|"
+				tempVariableNames.= "--- " x_lang("Thread variables") " ---|"
 			tempVariableNames.=tempVarName "|"
 		}
 	}
@@ -141,19 +141,19 @@ Element_run_Condition_Debug_Dialog(Environment, ElementParameters)
 	for tempIndex, tempVarName in x_GetListOfInstanceVars(environment)
 	{
 		if a_index=1
-			tempVariableNames.= "--- " lang("Instance variables") " ---|"
+			tempVariableNames.= "--- " x_lang("Instance variables") " ---|"
 		tempVariableNames.=tempVarName "|"
 	}
 	for tempIndex, tempVarName in x_GetListOfStaticVars(environment)
 	{
 		if a_index=1
-			tempVariableNames.= "--- " lang("Static variables") " ---|"
+			tempVariableNames.= "--- " x_lang("Static variables") " ---|"
 		tempVariableNames.=tempVarName "|"
 	}
 	for tempIndex, tempVarName in x_GetListOfGlobalVars(environment)
 	{
 		if a_index=1
-			tempVariableNames.= "--- " lang("Global variables") " ---|"
+			tempVariableNames.= "--- " x_lang("Global variables") " ---|"
 		tempVariableNames.=tempVarName "|"
 	}
 	
@@ -225,7 +225,7 @@ Element_run_Condition_Debug_Dialog(Environment, ElementParameters)
 		x_SetVariable(Environment, tempvarname, tempNewVarContent, tempLocation)
 		
 	}
-	;~ ToolTip(lang("Variable is set"),1000)
+	;~ ToolTip(x_lang("Variable is set"),1000)
 	;~ MsgBox % tempVarContent
 	return
 	
@@ -252,7 +252,7 @@ Element_run_Condition_Debug_Dialog(Environment, ElementParameters)
 	guicontrol,%a_gui%:,Condition_Debug_DialogEditField%a_gui%
 	GuiControl,%a_gui%:Disable,Condition_Debug_DialogButtonDeleteVariable
 	GuiControl,%a_gui%:disable,Condition_Debug_DialogEditField%a_gui%,%tempVarContent%
-	;~ ToolTip(lang("Variable deleted"),1000)
+	;~ ToolTip(x_lang("Variable deleted"),1000)
 	;~ MsgBox % tempVarContent
 	return
 	

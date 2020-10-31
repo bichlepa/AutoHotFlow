@@ -10,13 +10,13 @@ Element_getElementType_Action_Log_Off()
 ;Name of the element
 Element_getName_Action_Log_Off()
 {
-	return lang("Log_Off")
+	return x_lang("Log_Off")
 }
 
 ;Category of the element
 Element_getCategory_Action_Log_Off()
 {
-	return lang("Power")
+	return x_lang("Power")
 }
 
 ;This function returns the package of the element.
@@ -61,7 +61,7 @@ Element_getParametrizationDetails_Action_Log_Off(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Log_Off(Environment, ElementParameters)
 {
-	return lang("Log_Off") 
+	return x_lang("Log_Off") 
 }
 
 ;Called every time the user changes any parameter.

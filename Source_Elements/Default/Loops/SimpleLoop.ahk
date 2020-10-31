@@ -10,13 +10,13 @@ Element_getElementType_Loop_SimpleLoop()
 ;Name of the element
 Element_getName_Loop_SimpleLoop()
 {
-	return lang("Simple loop")
+	return x_lang("Simple loop")
 }
 
 ;Category of the element
 Element_getCategory_Loop_SimpleLoop()
 {
-	return lang("General")
+	return x_lang("General")
 }
 
 ;This function returns the package of the element.
@@ -52,8 +52,8 @@ Element_getStabilityLevel_Loop_SimpleLoop()
 Element_getParametrizationDetails_Loop_SimpleLoop(Environment)
 {
 	parametersToEdit:=Object()
-	parametersToEdit.push({type: "Label", label: lang("Repeats")})
-	parametersToEdit.push({type: "Checkbox", id: "Infinite", default: 0, label: lang("Endless loop")})
+	parametersToEdit.push({type: "Label", label: x_lang("Repeats")})
+	parametersToEdit.push({type: "Checkbox", id: "Infinite", default: 0, label: x_lang("Endless loop")})
 	parametersToEdit.push({type: "Edit", id: "repeatCount", default: 5, content: "Expression", WarnIfEmpty: true})
 
 	return parametersToEdit
@@ -65,9 +65,9 @@ Element_GenerateName_Loop_SimpleLoop(Environment, ElementParameters)
 	global
 	
 	if (ElementParameters.Infinite)
-		return lang("Simple loop") ": " lang("Infinite loop") 
+		return x_lang("Simple loop") ": " x_lang("Infinite loop") 
 	else
-		return lang("Simple loop") ": " ElementParameters.repeatCount " " lang("Repeats") 
+		return x_lang("Simple loop") ": " ElementParameters.repeatCount " " x_lang("Repeats") 
 }
 
 ;Called every time the user changes any parameter.
@@ -91,7 +91,7 @@ Element_run_Loop_SimpleLoop(Environment, ElementParameters)
 		if (evRes.error)
 		{
 			;On error, finish with exception and return
-			x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.repeatCount) "`n`n" evRes.error) 
+			x_finish(Environment, "exception", x_lang("An error occured while parsing expression '%1%'", ElementParameters.repeatCount) "`n`n" evRes.error) 
 			return
 		}
 		else
@@ -134,7 +134,7 @@ Element_run_Loop_SimpleLoop(Environment, ElementParameters)
 	}
 	else
 	{
-		x_finish(Environment, "exception", lang("No information whether the connection lead into head or tail"))
+		x_finish(Environment, "exception", x_lang("No information whether the connection lead into head or tail"))
 	}
 
 

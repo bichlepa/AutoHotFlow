@@ -10,13 +10,13 @@ Element_getElementType_Action_Write_To_File()
 ;Name of the element
 Element_getName_Action_Write_To_File()
 {
-	return lang("Write_To_File")
+	return x_lang("Write_To_File")
 }
 
 ;Category of the element
 Element_getCategory_Action_Write_To_File()
 {
-	return lang("File")
+	return x_lang("File")
 }
 
 ;This function returns the package of the element.
@@ -53,18 +53,18 @@ Element_getParametrizationDetails_Action_Write_To_File(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: lang("Text_to_write")})
+	parametersToEdit.push({type: "Label", label: x_lang("Text_to_write")})
 	parametersToEdit.push({type: "Edit", id: "text", multiline: true, content: ["String", "Expression"], contentID: "Expression", contentDefault: "string", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("File path")})
-	parametersToEdit.push({type: "File", id: "file", label: lang("Select a file"), options: 8})
-	parametersToEdit.push({type: "Label", label: lang("Append or overwrite")})
-	parametersToEdit.push({type: "Radio", id: "Overwrite", default: 1, choices: [lang("Append"), lang("Overwrite")], result: "enum", enum: ["Append", "Overwrite"]})
-	parametersToEdit.push({type: "Label", label: lang("Encoding")})
-	parametersToEdit.push({type: "Radio", id: "Encoding", default: "UTF-8", choices: [lang("System default ANSI codepage"), lang("Unicode UTF-8"), lang("Unicode UTF-16"), lang("Other")], result: "enum", enum: ["ansi", "UTF-8", "UTF-16", "other"]})
-	parametersToEdit.push({type: "Checkbox", id: "WithBOM", default: 0, label: lang("Add byte order mark (BOM)")})
+	parametersToEdit.push({type: "Label", label: x_lang("File path")})
+	parametersToEdit.push({type: "File", id: "file", label: x_lang("Select a file"), options: 8})
+	parametersToEdit.push({type: "Label", label: x_lang("Append or overwrite")})
+	parametersToEdit.push({type: "Radio", id: "Overwrite", default: 1, choices: [x_lang("Append"), x_lang("Overwrite")], result: "enum", enum: ["Append", "Overwrite"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Encoding")})
+	parametersToEdit.push({type: "Radio", id: "Encoding", default: "UTF-8", choices: [x_lang("System default ANSI codepage"), x_lang("Unicode UTF-8"), x_lang("Unicode UTF-16"), x_lang("Other")], result: "enum", enum: ["ansi", "UTF-8", "UTF-16", "other"]})
+	parametersToEdit.push({type: "Checkbox", id: "WithBOM", default: 0, label: x_lang("Add byte order mark (BOM)")})
 	parametersToEdit.push({type: "Edit", id: "CodePageIdentifier", default: "", content: "String", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("Linefeed")})
-	parametersToEdit.push({type: "Checkbox", id: "Linefeed", default: 1, label: lang("Replace single linefeeds with carriage return and linefeed")})
+	parametersToEdit.push({type: "Label", label: x_lang("Linefeed")})
+	parametersToEdit.push({type: "Checkbox", id: "Linefeed", default: 1, label: x_lang("Replace single linefeeds with carriage return and linefeed")})
 	
 	return parametersToEdit
 }
@@ -72,7 +72,7 @@ Element_getParametrizationDetails_Action_Write_To_File(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Write_To_File(Environment, ElementParameters)
 {
-	return lang("Write_To_File") 
+	return x_lang("Write_To_File") 
 }
 
 ;Called every time the user changes any parameter.
@@ -144,7 +144,7 @@ Element_run_Action_Write_To_File(Environment, ElementParameters)
 			FileDelete,% filepath
 			if errorlevel
 			{
-				x_finish(Environment, "exception",  lang("File '%1%' could not be deleted",filepath) )
+				x_finish(Environment, "exception",  x_lang("File '%1%' could not be deleted",filepath) )
 				return
 			}
 		}
@@ -154,7 +154,7 @@ Element_run_Action_Write_To_File(Environment, ElementParameters)
 	
 	if ErrorLevel
 	{
-		x_finish(Environment,"exception", lang("File '%1%' could not be written",filepath))
+		x_finish(Environment,"exception", x_lang("File '%1%' could not be written",filepath))
 		return
 	}
 	

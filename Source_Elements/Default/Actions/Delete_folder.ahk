@@ -10,13 +10,13 @@ Element_getElementType_Action_Delete_Folder()
 ;Name of the element
 Element_getName_Action_Delete_Folder()
 {
-	return lang("Delete_Folder")
+	return x_lang("Delete_Folder")
 }
 
 ;Category of the element
 Element_getCategory_Action_Delete_Folder()
 {
-	return lang("File")
+	return x_lang("File")
 }
 
 ;This function returns the package of the element.
@@ -53,10 +53,10 @@ Element_getParametrizationDetails_Action_Delete_Folder(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: lang("Source file")})
-	parametersToEdit.push({type: "File", id: "Folder", label: lang("Select a folder")})
-	parametersToEdit.push({type: "Label", label: lang("Delete method")})
-	parametersToEdit.push({type: "Checkbox", id: "ifEmpty", default: 0, label: lang("Remove only if the folder is empty")})
+	parametersToEdit.push({type: "Label", label: x_lang("Source file")})
+	parametersToEdit.push({type: "File", id: "Folder", label: x_lang("Select a folder")})
+	parametersToEdit.push({type: "Label", label: x_lang("Delete method")})
+	parametersToEdit.push({type: "Checkbox", id: "ifEmpty", default: 0, label: x_lang("Remove only if the folder is empty")})
 	
 	return parametersToEdit
 }
@@ -64,7 +64,7 @@ Element_getParametrizationDetails_Action_Delete_Folder(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Delete_Folder(Environment, ElementParameters)
 {
-	return lang("Delete_Folder") 
+	return x_lang("Delete_Folder") 
 }
 
 ;Called every time the user changes any parameter.
@@ -87,7 +87,7 @@ Element_run_Action_Delete_Folder(Environment, ElementParameters)
 
 	if not FileExist(Folder)
 	{
-		x_finish(Environment, "exception", lang("%1% '%2%' does not exist.",lang("Folder"), Folder)) 
+		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.",x_lang("Folder"), Folder)) 
 		return
 	}
 
@@ -102,7 +102,7 @@ Element_run_Action_Delete_Folder(Environment, ElementParameters)
 	
 	if errorlevel ;Indecates that files could not be copied
 	{
-		x_finish(Environment, "exception", lang("%1% folders could not be deleted (Filepattern: '%2%')",temperror, Folder)) 
+		x_finish(Environment, "exception", x_lang("%1% folders could not be deleted (Filepattern: '%2%')",temperror, Folder)) 
 		return
 	}
 	

@@ -10,13 +10,13 @@ Element_getElementType_Condition_Flow_Enabled()
 ;Name of the element
 Element_getName_Condition_Flow_Enabled()
 {
-	return lang("Flow_Enabled")
+	return x_lang("Flow_Enabled")
 }
 
 ;Category of the element
 Element_getCategory_Condition_Flow_Enabled()
 {
-	return lang("Flow_control")
+	return x_lang("Flow_control")
 }
 
 ;This function returns the package of the element.
@@ -66,11 +66,11 @@ Element_getParametrizationDetails_Condition_Flow_Enabled(Environment)
 	}
 	
 	parametersToEdit:=Object()
-	parametersToEdit.push({type: "Label", label: lang("Flow_name")})
-	parametersToEdit.push({type: "Checkbox", id: "ThisFlow", default: 1, label: lang("This flow (%1%)",myFlowName ) })
+	parametersToEdit.push({type: "Label", label: x_lang("Flow_name")})
+	parametersToEdit.push({type: "Checkbox", id: "ThisFlow", default: 1, label: x_lang("This flow (%1%)",myFlowName ) })
 	parametersToEdit.push({type: "ComboBox", id: "flowName", content: "String", WarnIfEmpty: true, result: "string", choices: choicesFlows})
-	parametersToEdit.push({type: "Label", label: lang("Which Trigger")})
-	parametersToEdit.push({type: "Radio", id: "WhichTrigger", default: 1, result: "enum", choices: [lang("Any trigger"), lang("Default trigger"), lang("Specific trigger")], enum: ["Any", "Default", "Specific"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Which Trigger")})
+	parametersToEdit.push({type: "Radio", id: "WhichTrigger", default: 1, result: "enum", choices: [x_lang("Any trigger"), x_lang("Default trigger"), x_lang("Specific trigger")], enum: ["Any", "Default", "Specific"]})
 	parametersToEdit.push({type: "ComboBox", id: "triggerName", content: "String", WarnIfEmpty: true, result: "string", choices: choicesTriggers})
 
 	return parametersToEdit
@@ -80,16 +80,16 @@ Element_getParametrizationDetails_Condition_Flow_Enabled(Environment)
 Element_GenerateName_Condition_Flow_Enabled(Environment, ElementParameters)
 {
 	if (ElementParameters.ThisFlow = True)
-		FlowName:=lang("This flow")
+		FlowName:=x_lang("This flow")
 	else
 		FlowName:=ElementParameters.flowName
 	if (ElementParameters.WhichTrigger = "Any")
-		TriggerName:=lang("Any trigger")
+		TriggerName:=x_lang("Any trigger")
 	else if (ElementParameters.WhichTrigger = "Default")
-		TriggerName:=lang("Default trigger")
+		TriggerName:=x_lang("Default trigger")
 	else
 		TriggerName:=ElementParameters.TriggerName
-	return % lang("Flow_enabled") ": " FlowName " - " TriggerName
+	return % x_lang("Flow_enabled") ": " FlowName " - " TriggerName
 	
 }
 
@@ -166,7 +166,7 @@ Element_run_Condition_Flow_Enabled(Environment, ElementParameters)
 		
 		if not x_FlowExistsByName(FlowName)
 		{
-			return x_finish(Environment,"exception",lang("Flow '%1%' does not exist",FlowName))
+			return x_finish(Environment,"exception",x_lang("Flow '%1%' does not exist",FlowName))
 		}
 	}
 	FlowID:=x_getFlowIDByName(FlowName)
@@ -193,7 +193,7 @@ Element_run_Condition_Flow_Enabled(Environment, ElementParameters)
 			TriggerName := x_replaceVariables(Environment, ElementParameters.triggerName)
 			if (TriggerName ="")
 			{
-				return x_finish(Environment,"exception",lang("Trigger name is empty",FlowName))
+				return x_finish(Environment,"exception",x_lang("Trigger name is empty",FlowName))
 			}
 		}
 		

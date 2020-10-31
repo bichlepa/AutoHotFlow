@@ -10,13 +10,13 @@ Element_getElementType_Action_Reboot_Computer()
 ;Name of the element
 Element_getName_Action_Reboot_Computer()
 {
-	return lang("Reboot_Computer")
+	return x_lang("Reboot_Computer")
 }
 
 ;Category of the element
 Element_getCategory_Action_Reboot_Computer()
 {
-	return lang("Power")
+	return x_lang("Power")
 }
 
 ;This function returns the package of the element.
@@ -61,7 +61,7 @@ Element_getParametrizationDetails_Action_Reboot_Computer(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Reboot_Computer(Environment, ElementParameters)
 {
-	return lang("Reboot_Computer") 
+	return x_lang("Reboot_Computer") 
 }
 
 ;Called every time the user changes any parameter.

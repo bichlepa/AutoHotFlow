@@ -10,13 +10,13 @@ Element_getElementType_Action_Read_From_File()
 ;Name of the element
 Element_getName_Action_Read_From_File()
 {
-	return lang("Read_From_File")
+	return x_lang("Read_From_File")
 }
 
 ;Category of the element
 Element_getCategory_Action_Read_From_File()
 {
-	return lang("File")
+	return x_lang("File")
 }
 
 ;This function returns the package of the element.
@@ -53,19 +53,19 @@ Element_getParametrizationDetails_Action_Read_From_File(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: lang("Output variable name")})
+	parametersToEdit.push({type: "Label", label: x_lang("Output variable name")})
 	parametersToEdit.push({type: "Edit", id: "varname", default: "FileText", content: "VariableName", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("File path")})
-	parametersToEdit.push({type: "File", id: "file", label: lang("Select a file"), options: 8})
-	parametersToEdit.push({type: "Label", label: lang("Encoding")})
-	parametersToEdit.push({type: "Radio", id: "Encoding", default: "UTF-8", choices: [lang("Raw data"), lang("System default ANSI codepage"), lang("Unicode UTF-8"), lang("Unicode UTF-16"), lang("Other")], result: "enum", enum: ["raw", "ANSI", "UTF-8", "UTF-16", "other"]})
-	parametersToEdit.push({type: "Checkbox", id: "WithBOM", default: 0, label: lang("File has byte order mark (BOM)")})
+	parametersToEdit.push({type: "Label", label: x_lang("File path")})
+	parametersToEdit.push({type: "File", id: "file", label: x_lang("Select a file"), options: 8})
+	parametersToEdit.push({type: "Label", label: x_lang("Encoding")})
+	parametersToEdit.push({type: "Radio", id: "Encoding", default: "UTF-8", choices: [x_lang("Raw data"), x_lang("System default ANSI codepage"), x_lang("Unicode UTF-8"), x_lang("Unicode UTF-16"), x_lang("Other")], result: "enum", enum: ["raw", "ANSI", "UTF-8", "UTF-16", "other"]})
+	parametersToEdit.push({type: "Checkbox", id: "WithBOM", default: 0, label: x_lang("File has byte order mark (BOM)")})
 	parametersToEdit.push({type: "Edit", id: "CodePageIdentifier", default: "", content: "String", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("Size limit")})
-	parametersToEdit.push({type: "Checkbox", id: "EnableSizeLimit", default: 0, label: lang("Enable size limit")})
+	parametersToEdit.push({type: "Label", label: x_lang("Size limit")})
+	parametersToEdit.push({type: "Checkbox", id: "EnableSizeLimit", default: 0, label: x_lang("Enable size limit")})
 	parametersToEdit.push({type: "Edit", id: "SizeLimit", default: "1024", content: "Expression", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("Linefeed")})
-	parametersToEdit.push({type: "Checkbox", id: "Linefeed", default: 1, label: lang("Replace carriage return and linefeed with single linefeeds")})
+	parametersToEdit.push({type: "Label", label: x_lang("Linefeed")})
+	parametersToEdit.push({type: "Checkbox", id: "Linefeed", default: 1, label: x_lang("Replace carriage return and linefeed with single linefeeds")})
 	
 	
 	return parametersToEdit
@@ -74,7 +74,7 @@ Element_getParametrizationDetails_Action_Read_From_File(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Read_From_File(Environment, ElementParameters)
 {
-	return lang("Read_From_File") 
+	return x_lang("Read_From_File") 
 }
 
 ;Called every time the user changes any parameter.
@@ -157,12 +157,12 @@ Element_run_Action_Read_From_File(Environment, ElementParameters)
 	{
 		if not fileexist(filepath)
 		{
-			x_finish(Environment,"exception", lang("File '%1%' does not exist",filepath))
+			x_finish(Environment,"exception", x_lang("File '%1%' does not exist",filepath))
 			return
 		}
 		else
 		{
-			x_finish(Environment,"exception", lang("File '%1%' could not be read",filepath))
+			x_finish(Environment,"exception", x_lang("File '%1%' could not be read",filepath))
 			return
 		}
 	}

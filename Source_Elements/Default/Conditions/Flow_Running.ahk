@@ -10,13 +10,13 @@ Element_getElementType_Condition_Flow_Running()
 ;Name of the element
 Element_getName_Condition_Flow_Running()
 {
-	return lang("Flow_Executing")
+	return x_lang("Flow_Executing")
 }
 
 ;Category of the element
 Element_getCategory_Condition_Flow_Running()
 {
-	return lang("Flow_control")
+	return x_lang("Flow_control")
 }
 
 ;This function returns the package of the element.
@@ -54,7 +54,7 @@ Element_getParametrizationDetails_Condition_Flow_Running(Environment)
 	choices := x_GetListOfFlowNames()
 	
 	parametersToEdit:=Object()
-	parametersToEdit.push({type: "Label", label: lang("Flow_name")})
+	parametersToEdit.push({type: "Label", label: x_lang("Flow_name")})
 	parametersToEdit.push({type: "ComboBox", id: "flowName", content: "String", WarnIfEmpty: true, result: "string", choices: choices})
 
 	return parametersToEdit
@@ -64,7 +64,7 @@ Element_getParametrizationDetails_Condition_Flow_Running(Environment)
 Element_GenerateName_Condition_Flow_Running(Environment, ElementParameters)
 {
 	global
-	return % lang("Flow_Executing") " - " ElementParameters.flowName
+	return % x_lang("Flow_Executing") " - " ElementParameters.flowName
 	
 }
 
@@ -96,7 +96,7 @@ Element_run_Condition_Flow_Running(Environment, ElementParameters)
 	}
 	else
 	{
-		return x_finish(Environment,"exception",lang("Flow '%1%' does not exist",FlowName))
+		return x_finish(Environment,"exception",x_lang("Flow '%1%' does not exist",FlowName))
 	}
 	
 }

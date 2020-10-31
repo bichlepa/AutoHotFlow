@@ -10,13 +10,13 @@ Element_getElementType_Action_Minimize_all_windows()
 ;Name of the element
 Element_getName_Action_Minimize_all_windows()
 {
-	return lang("Minimize_all_windows")
+	return x_lang("Minimize_all_windows")
 }
 
 ;Category of the element
 Element_getCategory_Action_Minimize_all_windows()
 {
-	return lang("Window")
+	return x_lang("Window")
 }
 
 ;This function returns the package of the element.
@@ -53,8 +53,8 @@ Element_getParametrizationDetails_Action_Minimize_all_windows(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: lang("Event")})
-	parametersToEdit.push({type: "Radio", id: "WinMinimizeAllEvent", default: "Minimize", choices: [lang("Minimize all windows"), lang("Undo")], result: "enum", enum: ["Minimize", "Undo"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Event")})
+	parametersToEdit.push({type: "Radio", id: "WinMinimizeAllEvent", default: "Minimize", choices: [x_lang("Minimize all windows"), x_lang("Undo")], result: "enum", enum: ["Minimize", "Undo"]})
 	
 	
 	return parametersToEdit
@@ -63,7 +63,7 @@ Element_getParametrizationDetails_Action_Minimize_all_windows(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Minimize_all_windows(Environment, ElementParameters)
 {
-	return lang("Minimize_all_windows") 
+	return x_lang("Minimize_all_windows") 
 }
 
 ;Called every time the user changes any parameter.

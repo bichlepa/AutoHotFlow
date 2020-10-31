@@ -10,13 +10,13 @@ Element_getElementType_Action_Get_Control_Text()
 ;Name of the element
 Element_getName_Action_Get_Control_Text()
 {
-	return lang("Get_Control_Text")
+	return x_lang("Get_Control_Text")
 }
 
 ;Category of the element
 Element_getCategory_Action_Get_Control_Text()
 {
-	return lang("Window")
+	return x_lang("Window")
 }
 
 ;This function returns the package of the element.
@@ -53,39 +53,39 @@ Element_getParametrizationDetails_Action_Get_Control_Text(Environment)
 {
 	parametersToEdit:=Object()
 
-	parametersToEdit.push({type: "Label", label: lang("Output variable_name")})
+	parametersToEdit.push({type: "Label", label: x_lang("Output variable_name")})
 	parametersToEdit.push({type: "Edit", id: "Varname", default: "ControlText", content: "VariableName"})
 	
-	parametersToEdit.push({type: "Label", label: lang("Control_Identification")})
-	parametersToEdit.push({type: "Label", label: lang("Method_for_control_Identification"), size: "small"})
-	parametersToEdit.push({type: "Radio", id: "IdentifyControlBy", result: "enum", default: 2, choices: [lang("Text_in_control"), lang("Classname and instance number of the control"), lang("Unique control ID")], enum: ["Text", "Class", "ID"]})
-	parametersToEdit.push({type: "Label", label: lang("Control_Identification"), size: "small"})
-	parametersToEdit.push({type: "Radio", id: "ControlTextMatchMode", default: 2, choices: [lang("Start_with"), lang("Contain_anywhere"), lang("Exactly")]})
+	parametersToEdit.push({type: "Label", label: x_lang("Control_Identification")})
+	parametersToEdit.push({type: "Label", label: x_lang("Method_for_control_Identification"), size: "small"})
+	parametersToEdit.push({type: "Radio", id: "IdentifyControlBy", result: "enum", default: 2, choices: [x_lang("Text_in_control"), x_lang("Classname and instance number of the control"), x_lang("Unique control ID")], enum: ["Text", "Class", "ID"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Control_Identification"), size: "small"})
+	parametersToEdit.push({type: "Radio", id: "ControlTextMatchMode", default: 2, choices: [x_lang("Start_with"), x_lang("Contain_anywhere"), x_lang("Exactly")]})
 	parametersToEdit.push({type: "Edit", id: "Control_identifier", content: "String", WarnIfEmpty: true})
 	
-	parametersToEdit.push({type: "Label", label: lang("Window identification")})
-	parametersToEdit.push({type: "Label", label: lang("Title_of_Window"), size: "small"})
-	parametersToEdit.push({type: "Radio", id: "TitleMatchMode", default: 1, choices: [lang("Start_with"), lang("Contain_anywhere"), lang("Exactly")]})
+	parametersToEdit.push({type: "Label", label: x_lang("Window identification")})
+	parametersToEdit.push({type: "Label", label: x_lang("Title_of_Window"), size: "small"})
+	parametersToEdit.push({type: "Radio", id: "TitleMatchMode", default: 1, choices: [x_lang("Start_with"), x_lang("Contain_anywhere"), x_lang("Exactly")]})
 	parametersToEdit.push({type: "Edit", id: "Wintitle", content: "String"})
-	parametersToEdit.push({type: "Label", label: lang("Exclude_title"), size: "small"})
+	parametersToEdit.push({type: "Label", label: x_lang("Exclude_title"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: "excludeTitle", content: "String"})
-	parametersToEdit.push({type: "Label", label: lang("Text_of_a_control_in_Window"), size: "small"})
+	parametersToEdit.push({type: "Label", label: x_lang("Text_of_a_control_in_Window"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: "winText", content: "String"})
-	parametersToEdit.push({type: "Checkbox", id: "FindHiddenText", default: 0, label: lang("Detect hidden text")})
-	parametersToEdit.push({type: "Label", label: lang("Exclude_text_of_a_control_in_window"), size: "small"})
+	parametersToEdit.push({type: "Checkbox", id: "FindHiddenText", default: 0, label: x_lang("Detect hidden text")})
+	parametersToEdit.push({type: "Label", label: x_lang("Exclude_text_of_a_control_in_window"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: "ExcludeText", content: "String"})
-	parametersToEdit.push({type: "Label", label: lang("Window_Class"), size: "small"})
+	parametersToEdit.push({type: "Label", label: x_lang("Window_Class"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: "ahk_class", content: "String"})
-	parametersToEdit.push({type: "Label", label: lang("Process_Name"), size: "small"})
+	parametersToEdit.push({type: "Label", label: x_lang("Process_Name"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: "ahk_exe", content: "String"})
-	parametersToEdit.push({type: "Label", label: lang("Unique_window_ID"), size: "small"})
+	parametersToEdit.push({type: "Label", label: x_lang("Unique_window_ID"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: "ahk_id", content: "String"})
-	parametersToEdit.push({type: "Label", label: lang("Unique_Process_ID"), size: "small"})
+	parametersToEdit.push({type: "Label", label: x_lang("Unique_Process_ID"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: "ahk_pid", content: "String"})
-	parametersToEdit.push({type: "Label", label: lang("Hidden window"), size: "small"})
-	parametersToEdit.push({type: "Checkbox", id: "FindHiddenWindow", default: 0, label: lang("Detect hidden window")})
-	parametersToEdit.push({type: "Label", label: lang("Import window identification"), size: "small"})
-	parametersToEdit.push({type: "button", goto: "Action_Get_Control_Text_ButtonWindowAssistant", label: lang("Import window identification")})
+	parametersToEdit.push({type: "Label", label: x_lang("Hidden window"), size: "small"})
+	parametersToEdit.push({type: "Checkbox", id: "FindHiddenWindow", default: 0, label: x_lang("Detect hidden window")})
+	parametersToEdit.push({type: "Label", label: x_lang("Import window identification"), size: "small"})
+	parametersToEdit.push({type: "button", goto: "Action_Get_Control_Text_ButtonWindowAssistant", label: x_lang("Import window identification")})
 	
 	return parametersToEdit
 }
@@ -98,28 +98,28 @@ Element_GenerateName_Action_Get_Control_Text(Environment, ElementParameters)
 	if (ElementParameters.Wintitle)
 	{
 		if (ElementParameters.TitleMatchMode=1)
-			tempNameString:=tempNameString "`n" lang("Title begins with") ": " ElementParameters.Wintitle
+			tempNameString:=tempNameString "`n" x_lang("Title begins with") ": " ElementParameters.Wintitle
 		else if (ElementParameters.TitleMatchMode=2)
-			tempNameString:=tempNameString "`n" lang("Title includes") ": " ElementParameters.Wintitle
+			tempNameString:=tempNameString "`n" x_lang("Title includes") ": " ElementParameters.Wintitle
 		else if (ElementParameters.TitleMatchMode=3)
-			tempNameString:=tempNameString "`n" lang("Title is exatly") ": " ElementParameters.Wintitle
+			tempNameString:=tempNameString "`n" x_lang("Title is exatly") ": " ElementParameters.Wintitle
 	}
 	if (ElementParameters.excludeTitle)
-		tempNameString:=tempNameString "`n" lang("Exclude_title") ": " ElementParameters.excludeTitle
+		tempNameString:=tempNameString "`n" x_lang("Exclude_title") ": " ElementParameters.excludeTitle
 	if (ElementParameters.winText)
-		tempNameString:=tempNameString "`n" lang("Control_text") ": " ElementParameters.winText
+		tempNameString:=tempNameString "`n" x_lang("Control_text") ": " ElementParameters.winText
 	if (ElementParameters.ExcludeText)
-		tempNameString:=tempNameString "`n" lang("Exclude_control_text") ": " ElementParameters.ExcludeText
+		tempNameString:=tempNameString "`n" x_lang("Exclude_control_text") ": " ElementParameters.ExcludeText
 	if (ElementParameters.ahk_class)
-		tempNameString:=tempNameString "`n" lang("Window_Class") ": " ElementParameters.ahk_class
+		tempNameString:=tempNameString "`n" x_lang("Window_Class") ": " ElementParameters.ahk_class
 	if (ElementParameters.ahk_exe)
-		tempNameString:=tempNameString "`n" lang("Process") ": " ElementParameters.ahk_exe
+		tempNameString:=tempNameString "`n" x_lang("Process") ": " ElementParameters.ahk_exe
 	if (ElementParameters.ahk_id)
-		tempNameString:=tempNameString "`n" lang("Window_ID") ": " ElementParameters.ahk_id
+		tempNameString:=tempNameString "`n" x_lang("Window_ID") ": " ElementParameters.ahk_id
 	if (ElementParameters.ahk_pid)
-		tempNameString:=tempNameString "`n" lang("Process_ID") ": " ElementParameters.ahk_pid
+		tempNameString:=tempNameString "`n" x_lang("Process_ID") ": " ElementParameters.ahk_pid
 	
-	return lang("Get_Control_Text") ": " tempNameString
+	return x_lang("Get_Control_Text") ": " tempNameString
 }
 
 ;Called every time the user changes any parameter.
@@ -140,7 +140,7 @@ Element_run_Action_Get_Control_Text(Environment, ElementParameters)
 	if not x_CheckVariableName(Varname)
 	{
 		;On error, finish with exception and return
-		x_finish(Environment, "exception", lang("%1% is not valid", lang("Ouput variable name '%1%'", Varname)))
+		x_finish(Environment, "exception", x_lang("%1% is not valid", x_lang("Ouput variable name '%1%'", Varname)))
 		return
 	}
 
@@ -172,7 +172,7 @@ Element_run_Action_Get_Control_Text(Environment, ElementParameters)
 	;If no window specified, error
 	if (tempwinstring="" and tempWinText="")
 	{
-		x_enabled(Environment, "exception", lang("No window specified"))
+		x_enabled(Environment, "exception", x_lang("No window specified"))
 		return
 	}
 	
@@ -192,7 +192,7 @@ Element_run_Action_Get_Control_Text(Environment, ElementParameters)
 	tempWinid:=winexist(tempwinstring,tempWinText,tempExcludeTitle,tempExcludeText) ;Example code. Remove it
 	if not tempWinid
 	{
-		x_finish(Environment, "exception", lang("Error! Seeked window does not exist")) 
+		x_finish(Environment, "exception", x_lang("Error! Seeked window does not exist")) 
 		return
 	}
 	
@@ -200,7 +200,7 @@ Element_run_Action_Get_Control_Text(Environment, ElementParameters)
 	controlget,tempControlID,hwnd,,% Control_identifier,ahk_id %tempWinid%
 	if not tempControlID
 	{
-		x_finish(Environment, "exception", lang("Error! Seeked control does not exist in the specified windows")) 
+		x_finish(Environment, "exception", x_lang("Error! Seeked control does not exist in the specified windows")) 
 		return
 	}
 	ControlGetText,tempText,,ahk_id %tempControlID%

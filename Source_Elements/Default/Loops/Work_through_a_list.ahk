@@ -10,13 +10,13 @@ Element_getElementType_Loop_Work_through_a_list()
 ;Name of the element
 Element_getName_Loop_Work_through_a_list()
 {
-	return lang("Work_through_a_list")
+	return x_lang("Work_through_a_list")
 }
 
 ;Category of the element
 Element_getCategory_Loop_Work_through_a_list()
 {
-	return lang("Variable")
+	return x_lang("Variable")
 }
 
 ;This function returns the package of the element.
@@ -52,10 +52,10 @@ Element_getStabilityLevel_Loop_Work_through_a_list()
 Element_getParametrizationDetails_Loop_Work_through_a_list(Environment)
 {
 	parametersToEdit:=Object()
-	parametersToEdit.push({type: "Label", label: lang("Variable_name")})
+	parametersToEdit.push({type: "Label", label: x_lang("Variable_name")})
 	parametersToEdit.push({type: "Edit", id: "Varname", default: "List", content: "VariableName", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("Performance")})
-	parametersToEdit.push({type: "Checkbox", id: "CopyFirst", default: 1, label: lang("Copy list before first iteration")})
+	parametersToEdit.push({type: "Label", label: x_lang("Performance")})
+	parametersToEdit.push({type: "Checkbox", id: "CopyFirst", default: 1, label: x_lang("Copy list before first iteration")})
 
 	return parametersToEdit
 }
@@ -64,7 +64,7 @@ Element_getParametrizationDetails_Loop_Work_through_a_list(Environment)
 Element_GenerateName_Loop_Work_through_a_list(Environment, ElementParameters)
 {
 	global
-	return lang("Work_through_a_list") ": " ElementParameters.Varname 
+	return x_lang("Work_through_a_list") ": " ElementParameters.Varname 
 }
 
 ;Called every time the user changes any parameter.
@@ -91,7 +91,7 @@ Element_run_Loop_Work_through_a_list(Environment, ElementParameters)
 		
 		if not isobject(varContentList)
 		{
-			x_finish(Environment, "exception", lang("Variable '%1%' does not contain a list.",varname))
+			x_finish(Environment, "exception", x_lang("Variable '%1%' does not contain a list.",varname))
 			return
 		}
 		
@@ -163,7 +163,7 @@ Element_run_Loop_Work_through_a_list(Environment, ElementParameters)
 	}
 	else
 	{
-		x_finish(Environment, "exception", lang("No information whether the connection lead into head or tail"))
+		x_finish(Environment, "exception", x_lang("No information whether the connection lead into head or tail"))
 	}
 
 

@@ -10,13 +10,13 @@ Element_getElementType_Condition_Variable_Is_Empty()
 ;Name of the element
 Element_getName_Condition_Variable_Is_Empty()
 {
-	return lang("Variable_Is_Empty")
+	return x_lang("Variable_Is_Empty")
 }
 
 ;Category of the element
 Element_getCategory_Condition_Variable_Is_Empty()
 {
-	return lang("Variable")
+	return x_lang("Variable")
 }
 
 ;This function returns the package of the element.
@@ -61,7 +61,7 @@ Element_getParametrizationDetails_Condition_Variable_Is_Empty(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Condition_Variable_Is_Empty(Environment, ElementParameters)
 {
-	return lang("Variable_Is_Empty") 
+	return x_lang("Variable_Is_Empty") 
 }
 
 ;Called every time the user changes any parameter.
@@ -71,7 +71,7 @@ Element_GenerateName_Condition_Variable_Is_Empty(Environment, ElementParameters)
 Element_CheckSettings_Condition_Variable_Is_Empty(Environment, ElementParameters)
 {	
 	
-	parametersToEdit.push({type: "Label", label:  lang("Variable name")})
+	parametersToEdit.push({type: "Label", label:  x_lang("Variable name")})
 	parametersToEdit.push({type: "Edit", id: "VarName", default: "Varname", content: "VariableName", WarnIfEmpty: true})
 }
 

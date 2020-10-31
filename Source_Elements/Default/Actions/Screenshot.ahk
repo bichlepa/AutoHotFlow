@@ -10,13 +10,13 @@ Element_getElementType_Action_Screenshot()
 ;Name of the element
 Element_getName_Action_Screenshot()
 {
-	return lang("Screenshot")
+	return x_lang("Screenshot")
 }
 
 ;Category of the element
 Element_getCategory_Action_Screenshot()
 {
-	return lang("Image")
+	return x_lang("Image")
 }
 
 ;This function returns the package of the element.
@@ -54,52 +54,52 @@ Element_getParametrizationDetails_Action_Screenshot(Environment)
 	parametersToEdit:=Object()
 	
 	
-	parametersToEdit.push({type: "Label", label: lang("Output")})
-	;~ parametersToEdit.push({type: "Radio", id: "WhichOutput", default: 1, choices: [lang("Write image into a variable"), lang("Write image to file")]}) ;TODO later
+	parametersToEdit.push({type: "Label", label: x_lang("Output")})
+	;~ parametersToEdit.push({type: "Radio", id: "WhichOutput", default: 1, choices: [x_lang("Write image into a variable"), x_lang("Write image to file")]}) ;TODO later
 	;~ parametersToEdit.push({type: "Edit", id: "varname", default: "Screenshot", content: "VariableName", WarnIfEmpty: true})
-	parametersToEdit.push({type: "File", id: "file", label: lang("Select a file"), options: 8, filter: lang("Image") " (*.bmp; *.dib; *.rle; *.jpg; *.jpeg; *.jpe; *.jfif; *.gif; *.tif; *.tiff; *.png)"})
+	parametersToEdit.push({type: "File", id: "file", label: x_lang("Select a file"), options: 8, filter: x_lang("Image") " (*.bmp; *.dib; *.rle; *.jpg; *.jpeg; *.jpe; *.jfif; *.gif; *.tif; *.tiff; *.png)"})
 	
 	
-	parametersToEdit.push({type: "Label", label: lang("Screen region")})
-	parametersToEdit.push({type: "Radio", id: "WhichRegion", default: 1, choices: [lang("Whole screen"), lang("Defined region"), lang("Specified window")], result: "enum", enum: ["Screen", "Region", "Window"]})
-	parametersToEdit.push({type: "Label", label: lang("Which screen")})
-	parametersToEdit.push({type: "Checkbox", id: "AllScreens", default: 1, label: lang("All screens")})
+	parametersToEdit.push({type: "Label", label: x_lang("Screen region")})
+	parametersToEdit.push({type: "Radio", id: "WhichRegion", default: 1, choices: [x_lang("Whole screen"), x_lang("Defined region"), x_lang("Specified window")], result: "enum", enum: ["Screen", "Region", "Window"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Which screen")})
+	parametersToEdit.push({type: "Checkbox", id: "AllScreens", default: 1, label: x_lang("All screens")})
 	parametersToEdit.push({type: "Edit", id: "ScreenNumber", default: 1, content: "Number", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("Coordinates") (x1, y1)})
-	parametersToEdit.push({type: "Label", label: lang("Upper left corner") (x1, y1), size: "small"})
+	parametersToEdit.push({type: "Label", label: x_lang("Coordinates") (x1, y1)})
+	parametersToEdit.push({type: "Label", label: x_lang("Upper left corner") (x1, y1), size: "small"})
 	parametersToEdit.push({type: "Edit", id: ["x1", "y1"], default: [10, 20], content: "Number", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("Lower right corner") (x2, y2), size: "small"})
+	parametersToEdit.push({type: "Label", label: x_lang("Lower right corner") (x2, y2), size: "small"})
 	parametersToEdit.push({type: "Edit", id: ["x2", "y2"], default: [600, 700], content: "Number", WarnIfEmpty: true})
-	parametersToEdit.push({type: "button", id: "GetCoordinates", goto: "Action_Screenshot_ButtonMouseTracker", label: lang("Get coordinates")})
+	parametersToEdit.push({type: "button", id: "GetCoordinates", goto: "Action_Screenshot_ButtonMouseTracker", label: x_lang("Get coordinates")})
 	
-	parametersToEdit.push({type: "Label", label: lang("Window identification")})
-	parametersToEdit.push({type: "Checkbox", id: "UseActiveWindow", default: 1, label: lang("Use active window")})
-	parametersToEdit.push({type: "Label", label: lang("Title_of_Window"), size: "small"})
-	parametersToEdit.push({type: "Radio", id: "TitleMatchMode", default: 1, choices: [lang("Start_with"), lang("Contain_anywhere"), lang("Exactly")]})
+	parametersToEdit.push({type: "Label", label: x_lang("Window identification")})
+	parametersToEdit.push({type: "Checkbox", id: "UseActiveWindow", default: 1, label: x_lang("Use active window")})
+	parametersToEdit.push({type: "Label", label: x_lang("Title_of_Window"), size: "small"})
+	parametersToEdit.push({type: "Radio", id: "TitleMatchMode", default: 1, choices: [x_lang("Start_with"), x_lang("Contain_anywhere"), x_lang("Exactly")]})
 	parametersToEdit.push({type: "Edit", id: "Wintitle", content: "String"})
-	parametersToEdit.push({type: "Label", label: lang("Exclude_title"), size: "small"})
+	parametersToEdit.push({type: "Label", label: x_lang("Exclude_title"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: "excludeTitle", content: "String"})
-	parametersToEdit.push({type: "Label", label: lang("Text_of_a_control_in_Window"), size: "small"})
+	parametersToEdit.push({type: "Label", label: x_lang("Text_of_a_control_in_Window"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: "winText", content: "String"})
-	parametersToEdit.push({type: "Checkbox", id: "FindHiddenText", default: 0, label: lang("Detect hidden text")})
-	parametersToEdit.push({type: "Label", label: lang("Exclude_text_of_a_control_in_window"), size: "small"})
+	parametersToEdit.push({type: "Checkbox", id: "FindHiddenText", default: 0, label: x_lang("Detect hidden text")})
+	parametersToEdit.push({type: "Label", label: x_lang("Exclude_text_of_a_control_in_window"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: "ExcludeText", content: "String"})
-	parametersToEdit.push({type: "Label", label: lang("Window_Class"), size: "small"})
+	parametersToEdit.push({type: "Label", label: x_lang("Window_Class"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: "ahk_class", content: "String"})
-	parametersToEdit.push({type: "Label", label: lang("Process_Name"), size: "small"})
+	parametersToEdit.push({type: "Label", label: x_lang("Process_Name"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: "ahk_exe", content: "String"})
-	parametersToEdit.push({type: "Label", label: lang("Unique_window_ID"), size: "small"})
+	parametersToEdit.push({type: "Label", label: x_lang("Unique_window_ID"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: "ahk_id", content: "String"})
-	parametersToEdit.push({type: "Label", label: lang("Unique_Process_ID"), size: "small"})
+	parametersToEdit.push({type: "Label", label: x_lang("Unique_Process_ID"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: "ahk_pid", content: "String"})
-	parametersToEdit.push({type: "Label", label: lang("Hidden window"), size: "small"})
-	parametersToEdit.push({type: "Checkbox", id: "FindHiddenWindow", default: 0, label: lang("Detect hidden window")})
-	parametersToEdit.push({type: "Label", label: lang("Import window identification"), size: "small"})
-	parametersToEdit.push({type: "button", id: "GetWindow", goto: "Action_Screenshot_ButtonWindowAssistant", label: lang("Import window identification")})
+	parametersToEdit.push({type: "Label", label: x_lang("Hidden window"), size: "small"})
+	parametersToEdit.push({type: "Checkbox", id: "FindHiddenWindow", default: 0, label: x_lang("Detect hidden window")})
+	parametersToEdit.push({type: "Label", label: x_lang("Import window identification"), size: "small"})
+	parametersToEdit.push({type: "button", id: "GetWindow", goto: "Action_Screenshot_ButtonWindowAssistant", label: x_lang("Import window identification")})
 	
 	
-	parametersToEdit.push({type: "Label", label: lang("Method")})
-	parametersToEdit.push({type: "Radio", id: "Method", default: 1, choices: [lang("Method %1%",1), lang("Method %1%",2), lang("Method %1%",3) " - " lang("Works only if window visible")], result: "enum", enum: ["Gdip_FromScreen", "Gdip_FromHWND", "Gdip_FromScreenCoordinates"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Method")})
+	parametersToEdit.push({type: "Radio", id: "Method", default: 1, choices: [x_lang("Method %1%",1), x_lang("Method %1%",2), x_lang("Method %1%",3) " - " x_lang("Works only if window visible")], result: "enum", enum: ["Gdip_FromScreen", "Gdip_FromHWND", "Gdip_FromScreenCoordinates"]})
 	
 	return parametersToEdit
 }
@@ -119,7 +119,7 @@ Action_Screenshot_ButtonMouseTracker()
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Screenshot(Environment, ElementParameters)
 {
-	return lang("Screenshot") 
+	return x_lang("Screenshot") 
 }
 
 ;Called every time the user changes any parameter.
@@ -257,7 +257,7 @@ Element_run_Action_Screenshot(Environment, ElementParameters)
 		pBitmap:=Gdip_BitmapFromScreen(parameterRegion)
 		if pBitmap=-1
 		{
-			x_finish(Environment, "exception", lang("Can't make screenshot from screen %1%", ScreenNumber)) 
+			x_finish(Environment, "exception", x_lang("Can't make screenshot from screen %1%", ScreenNumber)) 
 			return
 		}
 	}
@@ -275,7 +275,7 @@ Element_run_Action_Screenshot(Environment, ElementParameters)
 		pBitmap:=Gdip_BitmapFromScreen(parameterRegion)
 		if pBitmap=-1
 		{
-			x_finish(Environment, "exception", lang("Coordinates are invalid") ": x" EvaluatedParameters.x1 "-" EvaluatedParameters.y1 " y" EvaluatedParameters.x2 "-" EvaluatedParameters.y2 ) 
+			x_finish(Environment, "exception", x_lang("Coordinates are invalid") ": x" EvaluatedParameters.x1 "-" EvaluatedParameters.y1 " y" EvaluatedParameters.x2 "-" EvaluatedParameters.y2 ) 
 			return
 		}
 	}
@@ -286,7 +286,7 @@ Element_run_Action_Screenshot(Environment, ElementParameters)
 			tempWinid:=winexist("A")
 			if not tempWinid
 			{
-				x_finish(Environment, "exception", lang("Error! No active window found!")) 
+				x_finish(Environment, "exception", x_lang("Error! No active window found!")) 
 				return
 			}
 		}
@@ -320,7 +320,7 @@ Element_run_Action_Screenshot(Environment, ElementParameters)
 			;If no window specified, error
 			if (tempwinstring="" and EvaluatedParameters.winText="")
 			{
-				x_finish(Environment, "exception", lang("No window specified"))
+				x_finish(Environment, "exception", x_lang("No window specified"))
 				return
 			}
 			
@@ -340,7 +340,7 @@ Element_run_Action_Screenshot(Environment, ElementParameters)
 			tempWinid:=winexist(tempwinstring,EvaluatedParameters.winText,EvaluatedParameters.ExcludeTitle,EvaluatedParameters.ExcludeText)
 			if not tempWinid
 			{
-				x_finish(Environment, "exception", lang("Error! Seeked window does not exist")) 
+				x_finish(Environment, "exception", x_lang("Error! Seeked window does not exist")) 
 				return
 			}
 		}
@@ -350,7 +350,7 @@ Element_run_Action_Screenshot(Environment, ElementParameters)
 			pBitmap:=Gdip_BitmapFromScreen("hwnd:" tempWinid)
 			if pBitmap=-1
 			{
-				x_finish(Environment, "exception", lang("Can't make screenshot from window")) 
+				x_finish(Environment, "exception", x_lang("Can't make screenshot from window")) 
 				return
 				
 			}
@@ -360,7 +360,7 @@ Element_run_Action_Screenshot(Environment, ElementParameters)
 			pBitmap:=Gdip_BitmapFromHWND(tempWinid)
 			if pBitmap=-1
 			{
-				x_finish(Environment, "exception", lang("Can't make screenshot from window")) 
+				x_finish(Environment, "exception", x_lang("Can't make screenshot from window")) 
 				return
 				
 			}
@@ -371,7 +371,7 @@ Element_run_Action_Screenshot(Environment, ElementParameters)
 			pBitmap:=Gdip_BitmapFromScreen(x1 "|" y1 "|" x2 "|" y2 )
 			if pBitmap=-1
 			{
-				x_finish(Environment, "exception", lang("Can't make screenshot from window")) 
+				x_finish(Environment, "exception", x_lang("Can't make screenshot from window")) 
 				return
 				
 			}
@@ -385,27 +385,27 @@ Element_run_Action_Screenshot(Environment, ElementParameters)
 	;~ MsgBox %result%
 	if result=-1
 	{
-		x_finish(Environment, "exception", lang("Can't save screenshot to file '%1%'", EvaluatedParameters.file) ": " lang("Wrong extension")) 
+		x_finish(Environment, "exception", x_lang("Can't save screenshot to file '%1%'", EvaluatedParameters.file) ": " x_lang("Wrong extension")) 
 		return
 	}
 	else if result=-2
 	{
-		x_finish(Environment, "exception", lang("Can't save screenshot to file '%1%'", EvaluatedParameters.file) ": " lang("Could not get a list of encoders on system.")) 
+		x_finish(Environment, "exception", x_lang("Can't save screenshot to file '%1%'", EvaluatedParameters.file) ": " x_lang("Could not get a list of encoders on system.")) 
 		return
 	}
 	else if result=-3
 	{
-		x_finish(Environment, "exception", lang("Can't save screenshot to file '%1%'", EvaluatedParameters.file) ": " lang("Could not find matching encoder for specified file format.")) 
+		x_finish(Environment, "exception", x_lang("Can't save screenshot to file '%1%'", EvaluatedParameters.file) ": " x_lang("Could not find matching encoder for specified file format.")) 
 		return
 	}
 	else if result=-4
 	{
-		x_finish(Environment, "exception", lang("Can't save screenshot to file '%1%'", EvaluatedParameters.file) ": " lang("Could not get WideChar name of output file.")) 
+		x_finish(Environment, "exception", x_lang("Can't save screenshot to file '%1%'", EvaluatedParameters.file) ": " x_lang("Could not get WideChar name of output file.")) 
 		return
 	}
 	else if result=-5
 	{
-		x_finish(Environment, "exception", lang("Can't save screenshot to file '%1%'", EvaluatedParameters.file) ": " lang("Could not save file to disk.")) 
+		x_finish(Environment, "exception", x_lang("Can't save screenshot to file '%1%'", EvaluatedParameters.file) ": " x_lang("Could not save file to disk.")) 
 		return
 	}
 

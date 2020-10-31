@@ -10,13 +10,13 @@ Element_getElementType_Trigger_Hotkey()
 ;Name of the element
 Element_getName_Trigger_Hotkey()
 {
-	return lang("Hotkey")
+	return x_lang("Hotkey")
 }
 
 ;Category of the element
 Element_getCategory_Trigger_Hotkey()
 {
-	return lang("User_interaction")
+	return x_lang("User_interaction")
 }
 
 ;This function returns the package of the element.
@@ -54,33 +54,33 @@ Element_getParametrizationDetails_Trigger_Hotkey(Environment)
 {
 	
 	parametersToEdit:=Object()
-	parametersToEdit.push({type: "Label", label: lang("Hotkey")})
+	parametersToEdit.push({type: "Label", label: x_lang("Hotkey")})
 	parametersToEdit.push({type: "Hotkey", id: "hotkey"})
-	parametersToEdit.push({type: "Label", label: lang("Options")})
-	parametersToEdit.push({type: "Checkbox", id: "BlockKey", default: 1, label: lang("Block_key")})
-	parametersToEdit.push({type: "Checkbox", id: "Wildcard", default: 0, label: lang("Trigger even if other keys are already held down")})
-	parametersToEdit.push({type: "Checkbox", id: "WhenRelease", default: 0, label: lang("Trigger on release rather than press")})
-	parametersToEdit.push({type: "Label", label: lang("Window")})
-	parametersToEdit.push({type: "Label", size: "small", label: lang("Where should the hotkey be active?")})
-	parametersToEdit.push({type: "Radio", id: "UseWindow", default: 1, result: "enum", choices: [lang("Everywhere"), lang("Only active when the specified window is active"), lang("Only active whe the specified window exists"), lang("Only active when the specified window is not active"), lang("Only active whe the specified window does not exist")], enum: ["Everywhere", "WindowIsActive", "WindowExists", "WindowIsNotActive", "WindowNotExists"]})
-	parametersToEdit.push({type: "Label", size: "small", label: lang("Title_of_Window")})
-	parametersToEdit.push({type: "Radio", id: "TitleMatchMode", default: 1, choices: [lang("Start_with"), lang("Contain_anywhere"), lang("Exactly")]})
+	parametersToEdit.push({type: "Label", label: x_lang("Options")})
+	parametersToEdit.push({type: "Checkbox", id: "BlockKey", default: 1, label: x_lang("Block_key")})
+	parametersToEdit.push({type: "Checkbox", id: "Wildcard", default: 0, label: x_lang("Trigger even if other keys are already held down")})
+	parametersToEdit.push({type: "Checkbox", id: "WhenRelease", default: 0, label: x_lang("Trigger on release rather than press")})
+	parametersToEdit.push({type: "Label", label: x_lang("Window")})
+	parametersToEdit.push({type: "Label", size: "small", label: x_lang("Where should the hotkey be active?")})
+	parametersToEdit.push({type: "Radio", id: "UseWindow", default: 1, result: "enum", choices: [x_lang("Everywhere"), x_lang("Only active when the specified window is active"), x_lang("Only active whe the specified window exists"), x_lang("Only active when the specified window is not active"), x_lang("Only active whe the specified window does not exist")], enum: ["Everywhere", "WindowIsActive", "WindowExists", "WindowIsNotActive", "WindowNotExists"]})
+	parametersToEdit.push({type: "Label", size: "small", label: x_lang("Title_of_Window")})
+	parametersToEdit.push({type: "Radio", id: "TitleMatchMode", default: 1, choices: [x_lang("Start_with"), x_lang("Contain_anywhere"), x_lang("Exactly")]})
 	parametersToEdit.push({type: "Edit", id: "Wintitle", content: "String"})
-	parametersToEdit.push({type: "Label", size: "small", label: lang("Text_of_a_control_in_Window")})
+	parametersToEdit.push({type: "Label", size: "small", label: x_lang("Text_of_a_control_in_Window")})
 	parametersToEdit.push({type: "Edit", id: "winText", content: "String"})
-	parametersToEdit.push({type: "Checkbox", id: "FindHiddenText", default: 0, label: lang("Detect hidden text")})
-	parametersToEdit.push({type: "Label", size: "small", label: lang("Window_Class")})
+	parametersToEdit.push({type: "Checkbox", id: "FindHiddenText", default: 0, label: x_lang("Detect hidden text")})
+	parametersToEdit.push({type: "Label", size: "small", label: x_lang("Window_Class")})
 	parametersToEdit.push({type: "Edit", id: "ahk_class", content: "String"})
-	parametersToEdit.push({type: "Label", size: "small", label: lang("Process_Name")})
+	parametersToEdit.push({type: "Label", size: "small", label: x_lang("Process_Name")})
 	parametersToEdit.push({type: "Edit", id: "ahk_exe", content: "String"})
-	parametersToEdit.push({type: "Label", size: "small", label: lang("Unique_window_ID")})
+	parametersToEdit.push({type: "Label", size: "small", label: x_lang("Unique_window_ID")})
 	parametersToEdit.push({type: "Edit", id: "ahk_id", content: "String"})
-	parametersToEdit.push({type: "Label", size: "small", label: lang("Unique_Process_ID")})
+	parametersToEdit.push({type: "Label", size: "small", label: x_lang("Unique_Process_ID")})
 	parametersToEdit.push({type: "Edit", id: "ahk_pid", content: "String"})
-	parametersToEdit.push({type: "Label", size: "small", label: lang("Hidden window")})
-	parametersToEdit.push({type: "Checkbox", id: "FindHiddenWindow", default: 0, label: lang("Detect hidden window")})
-	parametersToEdit.push({type: "Label", size: "small", label: lang("Get_parameters")})
-	parametersToEdit.push({type: "button", id: "GetWindowInformation", goto: "Trigger_Hotkey_ButtonWindowAssistant", label: lang("Get_Parameters")})
+	parametersToEdit.push({type: "Label", size: "small", label: x_lang("Hidden window")})
+	parametersToEdit.push({type: "Checkbox", id: "FindHiddenWindow", default: 0, label: x_lang("Detect hidden window")})
+	parametersToEdit.push({type: "Label", size: "small", label: x_lang("Get_parameters")})
+	parametersToEdit.push({type: "button", id: "GetWindowInformation", goto: "Trigger_Hotkey_ButtonWindowAssistant", label: x_lang("Get_Parameters")})
 
 	
 	return parametersToEdit
@@ -90,7 +90,7 @@ Element_getParametrizationDetails_Trigger_Hotkey(Environment)
 Element_GenerateName_Trigger_Hotkey(Environment, ElementParameters)
 {
 	global
-	return % lang("Hotkey") " - " ElementParameters.Hotkey 
+	return % x_lang("Hotkey") " - " ElementParameters.Hotkey 
 	
 }
 
@@ -138,7 +138,7 @@ Element_enable_Trigger_Hotkey(Environment, ElementParameters)
 	fullHotkey := EvaluatedParameters.hotkey
 	if (fullHotkey = "")
 	{
-		x_enabled(Environment, "exception", lang("The_Hotkey_is_not_set!"))
+		x_enabled(Environment, "exception", x_lang("The_Hotkey_is_not_set!"))
 		return
 	}
 
@@ -172,7 +172,7 @@ Element_enable_Trigger_Hotkey(Environment, ElementParameters)
 		;If no window specified, error
 		if (EvaluatedParameters.winstring = "" and EvaluatedParameters.winText = "")
 		{
-			x_enabled(Environment, "exception", lang("No window specified"))
+			x_enabled(Environment, "exception", x_lang("No window specified"))
 			return
 		}
 	
@@ -184,7 +184,7 @@ Element_enable_Trigger_Hotkey(Environment, ElementParameters)
 		case 1:
 			EvaluatedParameters.findhiddentext := "on"
 		default:
-			x_enabled(Environment, "exception", lang("Parameter '%1%' has invalid value: %2%", "findhiddentext", EvaluatedParameters.findhiddentext))
+			x_enabled(Environment, "exception", x_lang("Parameter '%1%' has invalid value: %2%", "findhiddentext", EvaluatedParameters.findhiddentext))
 			return
 		}
 		switch (EvaluatedParameters.findhiddenwindow)
@@ -194,7 +194,7 @@ Element_enable_Trigger_Hotkey(Environment, ElementParameters)
 		case 1:
 			EvaluatedParameters.findhiddenwindow := "on"
 		default:
-			x_enabled(Environment, "exception", lang("Parameter '%1%' has invalid value: %2%", "findhiddenwindow", EvaluatedParameters.findhiddenwindow))
+			x_enabled(Environment, "exception", x_lang("Parameter '%1%' has invalid value: %2%", "findhiddenwindow", EvaluatedParameters.findhiddenwindow))
 			return
 		}
 		
@@ -226,12 +226,12 @@ Element_enable_Trigger_Hotkey(Environment, ElementParameters)
 	hotkey, % EvaluatedParameters.fullHotkey, % functionObject, UseErrorLevel on
 	if ErrorLevel
 	{
-		x_enabled(Environment, "exception", lang("The hotkey %1% cannot be set!", fullHotkey))
+		x_enabled(Environment, "exception", x_lang("The hotkey %1% cannot be set!", fullHotkey))
 		return
 	}
 
 	; finish and return true
-	x_enabled(Environment, "normal", lang("The hotkey %1% was set.", fullHotkey))
+	x_enabled(Environment, "normal", x_lang("The hotkey %1% was set.", fullHotkey))
 	return true
 }
 ;Called after the trigger has triggered.

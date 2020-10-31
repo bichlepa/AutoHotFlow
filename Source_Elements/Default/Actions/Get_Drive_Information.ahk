@@ -10,13 +10,13 @@ Element_getElementType_Action_Get_Drive_Information()
 ;Name of the element
 Element_getName_Action_Get_Drive_Information()
 {
-	return lang("Get_Drive_Information")
+	return x_lang("Get_Drive_Information")
 }
 
 ;Category of the element
 Element_getCategory_Action_Get_Drive_Information()
 {
-	return lang("Drive")
+	return x_lang("Drive")
 }
 
 ;This function returns the package of the element.
@@ -64,16 +64,16 @@ Element_getParametrizationDetails_Action_Get_Drive_Information(Environment)
 		
 	}
 	
-	parametersToEdit.push({type: "Label", label: lang("Output variable name")})
+	parametersToEdit.push({type: "Label", label: x_lang("Output variable name")})
 	parametersToEdit.push({type: "Edit", id: "Varname", default: "DriveInfo", content: "VariableName", WarnIfEmpty: true})
 	
-	parametersToEdit.push({type: "Label", label: lang("Which information")})
-	parametersToEdit.push({type: "dropdown", id: "WhichInformation", default: 1, result: "enum", choices: [lang("Label"), lang("Type"), lang("Status"), lang("Status of optical disc drive"), lang("Capacity"), lang("Free disk space"), lang("File system"), lang("Serial number")], enum: ["Label", "Type", "Status", "StatusCD", "Capacity", "FreeSpace", "FileSystem", "Serial"] })
+	parametersToEdit.push({type: "Label", label: x_lang("Which information")})
+	parametersToEdit.push({type: "dropdown", id: "WhichInformation", default: 1, result: "enum", choices: [x_lang("Label"), x_lang("Type"), x_lang("Status"), x_lang("Status of optical disc drive"), x_lang("Capacity"), x_lang("Free disk space"), x_lang("File system"), x_lang("Serial number")], enum: ["Label", "Type", "Status", "StatusCD", "Capacity", "FreeSpace", "FileSystem", "Serial"] })
 	
-	parametersToEdit.push({type: "Label", label: lang("Drive letter")})
+	parametersToEdit.push({type: "Label", label: x_lang("Drive letter")})
 	parametersToEdit.push({type: "ComboBox", id: "DriveLetter", content: "String", WarnIfEmpty: true, result: "string", default: defaultdrive, choices: listOfdrives})
-	parametersToEdit.push({type: "Label", label: lang("Path")})
-	parametersToEdit.push({type: "Folder", id: "folder", label: lang("Select a folder")})
+	parametersToEdit.push({type: "Label", label: x_lang("Path")})
+	parametersToEdit.push({type: "Folder", id: "folder", label: x_lang("Select a folder")})
 	
 	
 	return parametersToEdit
@@ -82,7 +82,7 @@ Element_getParametrizationDetails_Action_Get_Drive_Information(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Get_Drive_Information(Environment, ElementParameters)
 {
-	return lang("Get_Drive_Information") 
+	return x_lang("Get_Drive_Information") 
 }
 
 ;Called every time the user changes any parameter.
@@ -113,7 +113,7 @@ Element_run_Action_Get_Drive_Information(Environment, ElementParameters)
 	if not x_CheckVariableName(Varname)
 	{
 		;On error, finish with exception and return
-		x_finish(Environment, "exception", lang("%1% is not valid", lang("Ouput variable name '%1%'", varname)))
+		x_finish(Environment, "exception", x_lang("%1% is not valid", x_lang("Ouput variable name '%1%'", varname)))
 		return
 	}
 	
@@ -124,7 +124,7 @@ Element_run_Action_Get_Drive_Information(Environment, ElementParameters)
 
 		if not Path
 		{
-			x_finish(Environment,"exception", lang("Drive is not specified"))
+			x_finish(Environment,"exception", x_lang("Drive is not specified"))
 			return
 		}
 	}
@@ -134,7 +134,7 @@ Element_run_Action_Get_Drive_Information(Environment, ElementParameters)
 		
 		if not FileExist(Path)
 		{
-			x_finish(Environment, "exception", lang("%1% '%2%' does not exist.",lang("Folder"), Path)) 
+			x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.",x_lang("Folder"), Path)) 
 			return
 		}
 	}
@@ -149,7 +149,7 @@ Element_run_Action_Get_Drive_Information(Environment, ElementParameters)
 	}
 	if ErrorLevel
 	{
-		x_finish(Environment,"exception", lang("Could not be get drive information from '%1%'",Path))
+		x_finish(Environment,"exception", x_lang("Could not be get drive information from '%1%'",Path))
 		return
 	}
 	

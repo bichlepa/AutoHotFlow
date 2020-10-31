@@ -10,13 +10,13 @@ Element_getElementType_Action_New_List()
 ;Name of the element
 Element_getName_Action_New_List()
 {
-	return lang("New_List")
+	return x_lang("New_List")
 }
 
 ;Category of the element
 Element_getCategory_Action_New_List()
 {
-	return lang("Variable")
+	return x_lang("Variable")
 }
 
 ;This function returns the package of the element.
@@ -53,19 +53,19 @@ Element_getStabilityLevel_Action_New_List()
 Element_getParametrizationDetails_Action_New_List(Environment)
 {
 	parametersToEdit:=Object()
-	parametersToEdit.push({type: "Label", label: lang("Variable_name")})
+	parametersToEdit.push({type: "Label", label: x_lang("Variable_name")})
 	parametersToEdit.push({type: "Edit", id: "Varname", default: "NewList", content: "VariableName", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("Number of elements")})
-	parametersToEdit.push({type: "Radio", id: "InitialContent", default: 1, result: "enum", choices: [lang("Empty list"), lang("Initialize with one element"), lang("Initialize with multiple elements")], enum: ["Empty", "One", "Multiple"]})
-	parametersToEdit.push({type: "Label", label:  lang("Initial content")})
+	parametersToEdit.push({type: "Label", label: x_lang("Number of elements")})
+	parametersToEdit.push({type: "Radio", id: "InitialContent", default: 1, result: "enum", choices: [x_lang("Empty list"), x_lang("Initialize with one element"), x_lang("Initialize with multiple elements")], enum: ["Empty", "One", "Multiple"]})
+	parametersToEdit.push({type: "Label", label:  x_lang("Initial content")})
 	parametersToEdit.push({type: "Edit", id: "VarValue", default: "New element", content: ["String", "Expression"], contentID: "expression", contentDefault: "string", WarnIfEmpty: true})
 	parametersToEdit.push({type: "multilineEdit", id: "VarValues", default: "Element one`nElement two", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Checkbox", id: "DelimiterLinefeed", default: 1, label: lang("Use linefeed as delimiter")})
-	parametersToEdit.push({type: "Checkbox", id: "DelimiterComma", default: 0, label: lang("Use comma as delimiter")})
-	parametersToEdit.push({type: "Checkbox", id: "DelimiterSemicolon", default: 0, label: lang("Use semicolon as delimiter")})
-	parametersToEdit.push({type: "Checkbox", id: "DelimiterSpace", default: 0, label: lang("Use space as delimiter")})
-	parametersToEdit.push({type: "Label", label: lang("Key")})
-	parametersToEdit.push({type: "Radio", id: "WhichPosition", default: 1, result: "enum", choices: [lang("Numerically as first element"), lang("Following key")], enum: ["First", "Specified"]})
+	parametersToEdit.push({type: "Checkbox", id: "DelimiterLinefeed", default: 1, label: x_lang("Use linefeed as delimiter")})
+	parametersToEdit.push({type: "Checkbox", id: "DelimiterComma", default: 0, label: x_lang("Use comma as delimiter")})
+	parametersToEdit.push({type: "Checkbox", id: "DelimiterSemicolon", default: 0, label: x_lang("Use semicolon as delimiter")})
+	parametersToEdit.push({type: "Checkbox", id: "DelimiterSpace", default: 0, label: x_lang("Use space as delimiter")})
+	parametersToEdit.push({type: "Label", label: x_lang("Key")})
+	parametersToEdit.push({type: "Radio", id: "WhichPosition", default: 1, result: "enum", choices: [x_lang("Numerically as first element"), x_lang("Following key")], enum: ["First", "Specified"]})
 	parametersToEdit.push({type: "Edit", id: "Position", default: "keyName", content: ["String", "Expression"], contentID: "expressionPos", contentDefault: "string", WarnIfEmpty: true})
 	
 
@@ -77,17 +77,17 @@ Element_GenerateName_Action_New_List(Environment, ElementParameters)
 {
 	if (ElementParameters.InitialContent="empty")
 	{
-		Text.= lang("New empty list") " " ElementParameters.Varname
+		Text.= x_lang("New empty list") " " ElementParameters.Varname
 	}
 	else if (ElementParameters.InitialContent="one")
 	{
-		Text.= lang("New list %1% with initial content",ElementParameters.Varname) ": "
+		Text.= x_lang("New list %1% with initial content",ElementParameters.Varname) ": "
 		Text.=  ElementParameters.VarValue
 		
 	}
 	else
 	{
-		Text.= lang("New list %1% with initial content",ElementParameters.Varname) ": "
+		Text.= x_lang("New list %1% with initial content",ElementParameters.Varname) ": "
 		Text.=  ElementParameters.VarValues
 		
 	}
@@ -147,7 +147,7 @@ Element_run_Action_New_List(Environment, ElementParameters)
 	if not x_CheckVariableName(varname)
 	{
 		;On error, finish with exception and return
-		x_finish(Environment, "exception", lang("%1% is not valid", lang("Ouput variable name '%1%'", varname)))
+		x_finish(Environment, "exception", x_lang("%1% is not valid", x_lang("Ouput variable name '%1%'", varname)))
 		return
 	}
 	
@@ -166,7 +166,7 @@ Element_run_Action_New_List(Environment, ElementParameters)
 			if (evRes.error)
 			{
 				;On error, finish with exception and return
-				x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.VarValue) "`n`n" evRes.error) 
+				x_finish(Environment, "exception", x_lang("An error occured while parsing expression '%1%'", ElementParameters.VarValue) "`n`n" evRes.error) 
 				return
 			}
 			else
@@ -192,7 +192,7 @@ Element_run_Action_New_List(Environment, ElementParameters)
 				if (evRes.error)
 				{
 					;On error, finish with exception and return
-					x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.Position) "`n`n" evRes.error) 
+					x_finish(Environment, "exception", x_lang("An error occured while parsing expression '%1%'", ElementParameters.Position) "`n`n" evRes.error) 
 					return
 				}
 				else
@@ -206,7 +206,7 @@ Element_run_Action_New_List(Environment, ElementParameters)
 			if (position = "")
 			{
 				;On error, finish with exception and return
-				x_finish(Environment, "exception", lang("Position is not specified")) 
+				x_finish(Environment, "exception", x_lang("Position is not specified")) 
 				return
 			}
 			

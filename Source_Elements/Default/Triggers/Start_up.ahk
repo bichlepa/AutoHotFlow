@@ -10,13 +10,13 @@ Element_getElementType_Trigger_Start_up()
 ;Name of the element
 Element_getName_Trigger_Start_up()
 {
-	return lang("Start_up")
+	return x_lang("Start_up")
 }
 
 ;Category of the element
 Element_getCategory_Trigger_Start_up()
 {
-	return lang("Power")
+	return x_lang("Power")
 }
 
 ;This function returns the package of the element.
@@ -58,7 +58,7 @@ Element_getParametrizationDetails_Trigger_Start_up(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Trigger_Start_up(Environment, ElementParameters)
 {
-	return lang("Start_up") 
+	return x_lang("Start_up") 
 }
 
 ;Called every time the user changes any parameter.

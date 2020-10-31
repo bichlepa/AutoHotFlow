@@ -10,13 +10,13 @@ Element_getElementType_Trigger_User_Idle_Time()
 ;Name of the element
 Element_getName_Trigger_User_Idle_Time()
 {
-	return lang("User_Idle_Time")
+	return x_lang("User_Idle_Time")
 }
 
 ;Category of the element
 Element_getCategory_Trigger_User_Idle_Time()
 {
-	return lang("User_interaction")
+	return x_lang("User_interaction")
 }
 
 ;This function returns the package of the element.
@@ -53,11 +53,11 @@ Element_getParametrizationDetails_Trigger_User_Idle_Time(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: lang("Period of time")})
+	parametersToEdit.push({type: "Label", label: x_lang("Period of time")})
 	parametersToEdit.push({type: "edit", id: "Interval", default: 10, content: "Expression", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Radio", id: "Unit", default: 2, result: "enum", choices: [lang("MilliSeconds"), lang("Seconds"), lang("Minutes"), lang("Hours")], enum: ["MilliSeconds", "Seconds", "Minutes", "Hours"]})
-	parametersToEdit.push({type: "Label", label: lang("Method")})
-	parametersToEdit.push({type: "Radio", id: "Method", default: 1, result: "enum", choices: [lang("Method: %1%", lang("Default")), lang("Method: %1%", lang("Physical"))], enum: ["TimeIdle", "TimeIdlePhysical"]})
+	parametersToEdit.push({type: "Radio", id: "Unit", default: 2, result: "enum", choices: [x_lang("MilliSeconds"), x_lang("Seconds"), x_lang("Minutes"), x_lang("Hours")], enum: ["MilliSeconds", "Seconds", "Minutes", "Hours"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Method")})
+	parametersToEdit.push({type: "Radio", id: "Method", default: 1, result: "enum", choices: [x_lang("Method: %1%", x_lang("Default")), x_lang("Method: %1%", x_lang("Physical"))], enum: ["TimeIdle", "TimeIdlePhysical"]})
 
 	return parametersToEdit
 }
@@ -65,7 +65,7 @@ Element_getParametrizationDetails_Trigger_User_Idle_Time(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Trigger_User_Idle_Time(Environment, ElementParameters)
 {
-	return lang("User_Idle_Time") 
+	return x_lang("User_Idle_Time") 
 }
 
 ;Called every time the user changes any parameter.
@@ -93,7 +93,7 @@ Element_enable_Trigger_User_Idle_Time(Environment, ElementParameters)
 	; check the interval
 	if (not (EvaluatedParameters.Interval > 0))
 	{
-		x_enabled(Environment, "exception", lang("Parameter '%1%' has invalid value: %2%", "interval", Interval)) 
+		x_enabled(Environment, "exception", x_lang("Parameter '%1%' has invalid value: %2%", "interval", Interval)) 
 		return
 	}
 	
@@ -110,7 +110,7 @@ Element_enable_Trigger_User_Idle_Time(Environment, ElementParameters)
 	case "Hours":
 		Interval *= 1000 * 60 * 60
 	default:
-		x_enabled(Environment, "exception", lang("Parameter '%1%' has invalid value: %2%", "Unit", EvaluatedParameters.Unit)) 
+		x_enabled(Environment, "exception", x_lang("Parameter '%1%' has invalid value: %2%", "Unit", EvaluatedParameters.Unit)) 
 		return
 	}
 
@@ -123,7 +123,7 @@ Element_enable_Trigger_User_Idle_Time(Environment, ElementParameters)
 	case "TimeIdle":
 	case "TimeIdlePhysical":
 	default:
-		x_enabled(Environment, "exception", lang("Parameter '%1%' has invalid value: %2%", "method", EvaluatedParameters.method)) 
+		x_enabled(Environment, "exception", x_lang("Parameter '%1%' has invalid value: %2%", "method", EvaluatedParameters.method)) 
 		return
 	}
 

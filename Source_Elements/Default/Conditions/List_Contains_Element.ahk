@@ -10,13 +10,13 @@ Element_getElementType_Condition_List_Contains_Element()
 ;Name of the element
 Element_getName_Condition_List_Contains_Element()
 {
-	return lang("List_Contains_Element")
+	return x_lang("List_Contains_Element")
 }
 
 ;Category of the element
 Element_getCategory_Condition_List_Contains_Element()
 {
-	return lang("User_interaction")
+	return x_lang("User_interaction")
 }
 
 ;This function returns the package of the element.
@@ -53,13 +53,13 @@ Element_getParametrizationDetails_Condition_List_Contains_Element(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: lang("List name")})
+	parametersToEdit.push({type: "Label", label: x_lang("List name")})
 	parametersToEdit.push({type: "Edit", id: "InputList", default: "List", content: "Expression", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("Search for what")})
-	parametersToEdit.push({type: "Radio", id: "SearchWhat", default: 2, choices: [lang("Search for an index or key"), lang("Search for an element with a specific content")], result: "enum", enum: ["Key", "Content"]})
-	parametersToEdit.push({type: "Label", label: lang("Key or index")})
+	parametersToEdit.push({type: "Label", label: x_lang("Search for what")})
+	parametersToEdit.push({type: "Radio", id: "SearchWhat", default: 2, choices: [x_lang("Search for an index or key"), x_lang("Search for an element with a specific content")], result: "enum", enum: ["Key", "Content"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Key or index")})
 	parametersToEdit.push({type: "Edit", id: "Position", default: 1, content: ["String", "Expression"], contentID: "isExpressionPosition", contentDefault: "String", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("Seeked content")})
+	parametersToEdit.push({type: "Label", label: x_lang("Seeked content")})
 	parametersToEdit.push({type: "Edit", id: "SearchContent", default: "", content: ["String", "Expression"], contentID: "isExpressionSearchContent", contentDefault: "String", WarnIfEmpty: true})
 	
 	return parametersToEdit
@@ -68,7 +68,7 @@ Element_getParametrizationDetails_Condition_List_Contains_Element(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Condition_List_Contains_Element(Environment, ElementParameters)
 {
-	return lang("List_Contains_Element") 
+	return x_lang("List_Contains_Element") 
 }
 
 ;Called every time the user changes any parameter.
@@ -110,7 +110,7 @@ Element_run_Condition_List_Contains_Element(Environment, ElementParameters)
 	SearchPosition:=EvaluatedParameters.Position
 	if not IsObject(InputList)
 	{
-		x_finish(Environment, "exception", lang("Variable '%1%' does not contain a list.",ElementParameters.InputList)) 
+		x_finish(Environment, "exception", x_lang("Variable '%1%' does not contain a list.",ElementParameters.InputList)) 
 		return
 	}
 	

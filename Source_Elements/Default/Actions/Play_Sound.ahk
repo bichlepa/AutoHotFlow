@@ -10,13 +10,13 @@ Element_getElementType_Action_Play_Sound()
 ;Name of the element
 Element_getName_Action_Play_Sound()
 {
-	return lang("Play_Sound")
+	return x_lang("Play_Sound")
 }
 
 ;Category of the element
 Element_getCategory_Action_Play_Sound()
 {
-	return lang("Sound")
+	return x_lang("Sound")
 }
 
 ;This function returns the package of the element.
@@ -59,12 +59,12 @@ Element_getParametrizationDetails_Action_Play_Sound(Environment)
 		listOfSysSounds.push(a_loopfilename)
 	}
 	
-	parametersToEdit.push({type: "Label", label: lang("Select sound")})
-	parametersToEdit.push({type: "Radio", id: "WhichSound", default: 1, choices: [lang("System sound"), lang("Sound file")], result: "enum", enum: ["SystemSound", "SoundFile"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Select sound")})
+	parametersToEdit.push({type: "Radio", id: "WhichSound", default: 1, choices: [x_lang("System sound"), x_lang("Sound file")], result: "enum", enum: ["SystemSound", "SoundFile"]})
 	parametersToEdit.push({type: "dropdown", id: "systemSound", default: "tada.wav", choices: listOfSysSounds, result: "string"})
-	parametersToEdit.push({type: "File", id: "soundfile", label: lang("Select a sound file"), options: 1})
-	parametersToEdit.push({type: "Label", label: lang("Preview")})
-	parametersToEdit.push({type: "button", id: "stopSoundNow",  goto: "Action_Play_Sound_StopSoundNow", label: lang("Stop playback now")})
+	parametersToEdit.push({type: "File", id: "soundfile", label: x_lang("Select a sound file"), options: 1})
+	parametersToEdit.push({type: "Label", label: x_lang("Preview")})
+	parametersToEdit.push({type: "button", id: "stopSoundNow",  goto: "Action_Play_Sound_StopSoundNow", label: x_lang("Stop playback now")})
 	
 	parametersToEdit.updateOnEdit:=True
 	return parametersToEdit
@@ -78,7 +78,7 @@ Action_Play_Sound_StopSoundNow()
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Play_Sound(Environment, ElementParameters)
 {
-	return lang("Play_Sound") 
+	return x_lang("Play_Sound") 
 }
 
 ;Called every time the user changes any parameter.
@@ -138,7 +138,7 @@ Element_run_Action_Play_Sound(Environment, ElementParameters)
 	}
 	if errorlevel
 	{
-		x_finish(Environment,"exception", lang("Sound could not be played"))
+		x_finish(Environment,"exception", x_lang("Sound could not be played"))
 		return
 	}
 	

@@ -10,13 +10,13 @@ Element_getElementType_Action_Rounding_A_Number()
 ;Name of the element
 Element_getName_Action_Rounding_A_Number()
 {
-	return lang("Rounding_A_Number")
+	return x_lang("Rounding_A_Number")
 }
 
 ;Category of the element
 Element_getCategory_Action_Rounding_A_Number()
 {
-	return lang("Variable")
+	return x_lang("Variable")
 }
 
 ;This function returns the package of the element.
@@ -54,14 +54,14 @@ Element_getParametrizationDetails_Action_Rounding_A_Number(Environment)
 	parametersToEdit:=Object()
 	
 	
-	parametersToEdit.push({type: "Label", label: lang("Output variable_name")})
+	parametersToEdit.push({type: "Label", label: x_lang("Output variable_name")})
 	parametersToEdit.push({type: "Edit", id: "Varname", default: "NewVariable", content: "VariableName", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label:  lang("Input number")})
+	parametersToEdit.push({type: "Label", label:  x_lang("Input number")})
 	parametersToEdit.push({type: "Edit", id: "VarValue", default: 1.2345, content: "Number", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label:  lang("Places after comma")})
+	parametersToEdit.push({type: "Label", label:  x_lang("Places after comma")})
 	parametersToEdit.push({type: "Edit", id: "Places", default: 0, content: "Number", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("Operation")})
-	parametersToEdit.push({type: "Radio", id: "Roundingtype", default: 1, choices: [lang("Round normally"), lang("Round up"), lang("Round down")], result: "enum", enum: ["round", "roundUp", "roundDown"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Operation")})
+	parametersToEdit.push({type: "Radio", id: "Roundingtype", default: 1, choices: [x_lang("Round normally"), x_lang("Round up"), x_lang("Round down")], result: "enum", enum: ["round", "roundUp", "roundDown"]})
 	
 	return parametersToEdit
 }
@@ -69,7 +69,7 @@ Element_getParametrizationDetails_Action_Rounding_A_Number(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Rounding_A_Number(Environment, ElementParameters)
 {
-	return lang("Rounding_A_Number") 
+	return x_lang("Rounding_A_Number") 
 }
 
 ;Called every time the user changes any parameter.

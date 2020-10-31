@@ -10,13 +10,13 @@ Element_getElementType_Trigger_Shortcut()
 ;Name of the element
 Element_getName_Trigger_Shortcut()
 {
-	return lang("Shortcut")
+	return x_lang("Shortcut")
 }
 
 ;Category of the element
 Element_getCategory_Trigger_Shortcut()
 {
-	return lang("User_interaction")
+	return x_lang("User_interaction")
 }
 
 ;This function returns the package of the element.
@@ -53,10 +53,10 @@ Element_getParametrizationDetails_Trigger_Shortcut(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: lang("Path of the Shortcut")})
-	parametersToEdit.push({type: "File", id: "ShortCutPath", default: "%A_Desktop%\" lang("Flow") " " x_GetMyFlowName(Environment) ".lnk" , label: lang("Set_the_Shortcut_path"), options: 8, filter: lang("Shortcut") " (*.lnk)"})
-	parametersToEdit.push({type: "Label", label: lang("Options")})
-	parametersToEdit.push({type: "CheckBox", id: "RemoveShortcutOnDisabling", default: 1, label: lang("Remove_shortcut_when_disabling")})
+	parametersToEdit.push({type: "Label", label: x_lang("Path of the Shortcut")})
+	parametersToEdit.push({type: "File", id: "ShortCutPath", default: "%A_Desktop%\" x_lang("Flow") " " x_GetMyFlowName(Environment) ".lnk" , label: x_lang("Set_the_Shortcut_path"), options: 8, filter: x_lang("Shortcut") " (*.lnk)"})
+	parametersToEdit.push({type: "Label", label: x_lang("Options")})
+	parametersToEdit.push({type: "CheckBox", id: "RemoveShortcutOnDisabling", default: 1, label: x_lang("Remove_shortcut_when_disabling")})
 	
 	return parametersToEdit
 }
@@ -64,7 +64,7 @@ Element_getParametrizationDetails_Trigger_Shortcut(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Trigger_Shortcut(Environment, ElementParameters)
 {
-	return lang("Shortcut") 
+	return x_lang("Shortcut") 
 }
 
 ;Called every time the user changes any parameter.
@@ -97,7 +97,7 @@ Element_enable_Trigger_Shortcut(Environment, ElementParameters)
 	FileCreateShortcut,% ahfPath,% EvaluatedParameters.ShortCutPath,,% "AHFCommand ""Trigger|" x_GetMyFlowID(Environment) "|" x_GetMyElementID(Environment) """"
 	if errorlevel
 	{
-		x_enabled(Environment, "exception", lang("Can't create shortcut in path '%1%'", ShortCutPath))
+		x_enabled(Environment, "exception", x_lang("Can't create shortcut in path '%1%'", ShortCutPath))
 		return
 	}
 	

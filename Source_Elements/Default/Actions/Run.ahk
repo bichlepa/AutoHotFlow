@@ -10,13 +10,13 @@ Element_getElementType_Action_Run()
 ;Name of the element
 Element_getName_Action_Run()
 {
-	return lang("Run")
+	return x_lang("Run")
 }
 
 ;Category of the element
 Element_getCategory_Action_Run()
 {
-	return lang("Process")
+	return x_lang("Process")
 }
 
 ;This function returns the package of the element.
@@ -53,7 +53,7 @@ Element_getParametrizationDetails_Action_Run(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: lang("Target")})
+	parametersToEdit.push({type: "Label", label: x_lang("Target")})
 	parametersToEdit.push({type: "Edit", id: "ToRun", content: ["String", "RawString"], contentID: "ToRunContent", WarnIfEmpty: true})
 	
 	
@@ -63,7 +63,7 @@ Element_getParametrizationDetails_Action_Run(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Run(Environment, ElementParameters)
 {
-	return lang("Run") 
+	return x_lang("Run") 
 }
 
 ;Called every time the user changes any parameter.
@@ -97,7 +97,7 @@ Element_run_Action_Run(Environment, ElementParameters)
 		run, % EvaluatedParameters.ToRun,% workingDir, UseErrorLevel,ActionRuntempPid ;Try tu run it without the working direction (relative path)
 		if (ErrorLevel)
 		{
-			x_finish(Environment,"exception", lang("Can't run '%1%'",EvaluatedParameters.ToRun))
+			x_finish(Environment,"exception", x_lang("Can't run '%1%'",EvaluatedParameters.ToRun))
 			return
 		}
 	}

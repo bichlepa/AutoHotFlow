@@ -10,13 +10,13 @@ Element_getElementType_Action_Lock_Or_Unlock_Drive()
 ;Name of the element
 Element_getName_Action_Lock_Or_Unlock_Drive()
 {
-	return lang("Lock_Or_Unlock_Drive")
+	return x_lang("Lock_Or_Unlock_Drive")
 }
 
 ;Category of the element
 Element_getCategory_Action_Lock_Or_Unlock_Drive()
 {
-	return lang("Drive")
+	return x_lang("Drive")
 }
 
 ;This function returns the package of the element.
@@ -66,10 +66,10 @@ Element_getParametrizationDetails_Action_Lock_Or_Unlock_Drive(Environment)
 	}
 	
 	
-	parametersToEdit.push({type: "Label", label: lang("Action")})
-	parametersToEdit.push({type: "Radio", id: "WhatDo", default: 1, choices: [lang("Lock drive"), lang("Unlock drive")], result: "enum", enum: ["Lock", "Unlock"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Action")})
+	parametersToEdit.push({type: "Radio", id: "WhatDo", default: 1, choices: [x_lang("Lock drive"), x_lang("Unlock drive")], result: "enum", enum: ["Lock", "Unlock"]})
 	
-	parametersToEdit.push({type: "Label", label: lang("Drive letter")})
+	parametersToEdit.push({type: "Label", label: x_lang("Drive letter")})
 	parametersToEdit.push({type: "ComboBox", id: "DriveLetter", content: "string", default: defaultdrive, choices: listOfdrives, result: "name"})
 	
 	parametersToEdit.updateOnEdit:=true
@@ -80,7 +80,7 @@ Element_getParametrizationDetails_Action_Lock_Or_Unlock_Drive(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Lock_Or_Unlock_Drive(Environment, ElementParameters)
 {
-	return lang("Lock_Or_Unlock_Drive") 
+	return x_lang("Lock_Or_Unlock_Drive") 
 }
 
 ;Called every time the user changes any parameter.

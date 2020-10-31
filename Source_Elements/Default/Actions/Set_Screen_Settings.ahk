@@ -10,13 +10,13 @@ Element_getElementType_Action_Set_Screen_Settings()
 ;Name of the element
 Element_getName_Action_Set_Screen_Settings()
 {
-	return lang("Set_Screen_Settings")
+	return x_lang("Set_Screen_Settings")
 }
 
 ;Category of the element
 Element_getCategory_Action_Set_Screen_Settings()
 {
-	return lang("Image")
+	return x_lang("Image")
 }
 
 ;This function returns the package of the element.
@@ -55,40 +55,40 @@ Element_getParametrizationDetails_Action_Set_Screen_Settings(Environment)
 	
 	NumberOfMonitors := DllCall("user32.dll\GetSystemMetrics", "Int", 80)                  ; Get the number of display monitors on a desktop.
 
-	parametersToEdit.push({type: "Label", label: lang("Which monitor")})
-	parametersToEdit.push({type: "Checkbox", id: "AllMonitors", default: 0, label: lang("All monitors")})
+	parametersToEdit.push({type: "Label", label: x_lang("Which monitor")})
+	parametersToEdit.push({type: "Checkbox", id: "AllMonitors", default: 0, label: x_lang("All monitors")})
 	parametersToEdit.push({type: "edit", id: "MonitorNumber", default: 1, content: "Expression", WarnIfEmpty: true, UseUpDown: true, range: "1-" NumberOfMonitors})
 	
-	parametersToEdit.push({type: "Label", label:  lang("Brightness")})
-	parametersToEdit.push({type: "Checkbox", id: "WhetherChangeBrightness", default: 1, label: lang("Change brightness")})
+	parametersToEdit.push({type: "Label", label:  x_lang("Brightness")})
+	parametersToEdit.push({type: "Checkbox", id: "WhetherChangeBrightness", default: 1, label: x_lang("Change brightness")})
 	parametersToEdit.push({type: "Slider", id: "brightness", default: 100, options: "Range0-100 tooltip tickinterval10", AllowExpression: true})
 	
-	parametersToEdit.push({type: "Label", label:  lang("Contrast")})
-	parametersToEdit.push({type: "Checkbox", id: "WhetherChangeContrast", default: 0, label: lang("Change contrast")})
+	parametersToEdit.push({type: "Label", label:  x_lang("Contrast")})
+	parametersToEdit.push({type: "Checkbox", id: "WhetherChangeContrast", default: 0, label: x_lang("Change contrast")})
 	parametersToEdit.push({type: "Slider", id: "contrast", default: 50, options: "Range0-100 tooltip tickinterval10", AllowExpression: true})
 	
-	;~ parametersToEdit.push({type: "Label", label:  lang("Gamma") " (" lang("Affects all monitors") ")" })
-	;~ parametersToEdit.push({type: "Checkbox", id: "WhetherChangeGamma", default: 0, label: lang("Change gamma")})
+	;~ parametersToEdit.push({type: "Label", label:  x_lang("Gamma") " (" x_lang("Affects all monitors") ")" })
+	;~ parametersToEdit.push({type: "Checkbox", id: "WhetherChangeGamma", default: 0, label: x_lang("Change gamma")})
 	;~ parametersToEdit.push({type: "Slider", id: "gamma", default: 128, options: "Range0-255 tooltip tickinterval128", AllowExpression: true})
 	
-	parametersToEdit.push({type: "Label", label:  lang("Color gain") })
-	parametersToEdit.push({type: "Checkbox", id: "WhetherSetRedGain", default: 0, label: lang("Change red gain value")})
+	parametersToEdit.push({type: "Label", label:  x_lang("Color gain") })
+	parametersToEdit.push({type: "Checkbox", id: "WhetherSetRedGain", default: 0, label: x_lang("Change red gain value")})
 	parametersToEdit.push({type: "Slider", id: "RedGain", default: 128, options: "Range0-100 tooltip tickinterval10", AllowExpression: true})
-	parametersToEdit.push({type: "Checkbox", id: "WhetherSetGreenGain", default: 0, label: lang("Change green gain value")})
+	parametersToEdit.push({type: "Checkbox", id: "WhetherSetGreenGain", default: 0, label: x_lang("Change green gain value")})
 	parametersToEdit.push({type: "Slider", id: "GreenGain", default: 128, options: "Range0-100 tooltip tickinterval10", AllowExpression: true})
-	parametersToEdit.push({type: "Checkbox", id: "WhetherSetBlueGain", default: 0, label: lang("Change blue gain value")})
+	parametersToEdit.push({type: "Checkbox", id: "WhetherSetBlueGain", default: 0, label: x_lang("Change blue gain value")})
 	parametersToEdit.push({type: "Slider", id: "BlueGain", default: 128, options: "Range0-100 tooltip tickinterval10", AllowExpression: true})
 	
-	parametersToEdit.push({type: "Label", label:  lang("Color drive") })
-	parametersToEdit.push({type: "Checkbox", id: "WhetherSetRedDrive", default: 0, label: lang("Change red drive value")})
+	parametersToEdit.push({type: "Label", label:  x_lang("Color drive") })
+	parametersToEdit.push({type: "Checkbox", id: "WhetherSetRedDrive", default: 0, label: x_lang("Change red drive value")})
 	parametersToEdit.push({type: "Slider", id: "RedDrive", default: 128, options: "Range0-100 tooltip tickinterval10", AllowExpression: true})
-	parametersToEdit.push({type: "Checkbox", id: "WhetherSetGreenDrive", default: 0, label: lang("Change green drive value")})
+	parametersToEdit.push({type: "Checkbox", id: "WhetherSetGreenDrive", default: 0, label: x_lang("Change green drive value")})
 	parametersToEdit.push({type: "Slider", id: "GreenDrive", default: 128, options: "Range0-100 tooltip tickinterval10", AllowExpression: true})
-	parametersToEdit.push({type: "Checkbox", id: "WhetherSetBlueDrive", default: 0, label: lang("Change blue drive value")})
+	parametersToEdit.push({type: "Checkbox", id: "WhetherSetBlueDrive", default: 0, label: x_lang("Change blue drive value")})
 	parametersToEdit.push({type: "Slider", id: "BlueDrive", default: 128, options: "Range0-100 tooltip tickinterval10", AllowExpression: true})
 	
-	parametersToEdit.push({type: "Label", label:  lang("Color temperature")})
-	parametersToEdit.push({type: "Checkbox", id: "WhetherChangeColorTemperature", default: 0, label: lang("Change color temperature")})
+	parametersToEdit.push({type: "Label", label:  x_lang("Color temperature")})
+	parametersToEdit.push({type: "Checkbox", id: "WhetherChangeColorTemperature", default: 0, label: x_lang("Change color temperature")})
 	parametersToEdit.push({type: "DropDown", id: "ColorTemperature", default: 1, choices: ["4000 K.", "5000 K.", "6500 K.", "7500 K.", "8200 K.", "9300 K.", "10000 K.", "115000 K."], result: "number"})
 	return parametersToEdit
 }
@@ -96,7 +96,7 @@ Element_getParametrizationDetails_Action_Set_Screen_Settings(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Set_Screen_Settings(Environment, ElementParameters)
 {
-	return lang("Set_Screen_Settings") 
+	return x_lang("Set_Screen_Settings") 
 }
 
 ;Called every time the user changes any parameter.
@@ -122,18 +122,18 @@ Element_run_Action_Set_Screen_Settings(Environment, ElementParameters)
 		if (evRes.error)
 		{
 			;On error, finish with exception and return
-			x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.MonitorNumber) "`n`n" evRes.error) 
+			x_finish(Environment, "exception", x_lang("An error occured while parsing expression '%1%'", ElementParameters.MonitorNumber) "`n`n" evRes.error) 
 			return
 		}
 		MonitorNumber:=evRes.result
 		if MonitorNumber is not integer
 		{
-			x_finish(Environment, "exception", lang("Screen number is not a number") )
+			x_finish(Environment, "exception", x_lang("Screen number is not a number") )
 			return
 		}
 		if not (MonitorNumber >= 1 and MonitorNumber <= NumberOfMonitors)
 		{
-			x_finish(Environment, "exception", lang("Screen %1% does not exist", MonitorNumber) ) 
+			x_finish(Environment, "exception", x_lang("Screen %1% does not exist", MonitorNumber) ) 
 			return
 		}
 	}
@@ -154,14 +154,14 @@ Element_run_Action_Set_Screen_Settings(Environment, ElementParameters)
 			if (evRes.error)
 			{
 				;On error, finish with exception and return
-				x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters[oneParValue]) "`n`n" evRes.error) 
+				x_finish(Environment, "exception", x_lang("An error occured while parsing expression '%1%'", ElementParameters[oneParValue]) "`n`n" evRes.error) 
 				return
 			}
 			%oneParValue%:=evRes.result
 			if %oneParValue% is not number
 			{
 				;On error, finish with exception and return
-				x_finish(Environment, "exception", lang("%1% '%2%' is not a number.",lang(oneParNameString), %oneParValue%))
+				x_finish(Environment, "exception", x_lang("%1% '%2%' is not a number.",x_lang(oneParNameString), %oneParValue%))
 				return
 			}
 			
@@ -172,7 +172,7 @@ Element_run_Action_Set_Screen_Settings(Environment, ElementParameters)
 	
 	if not (anyVarNameSpecified)
 	{
-		x_finish(Environment, "exception", lang("No value specified"))
+		x_finish(Environment, "exception", x_lang("No value specified"))
 		return
 	}
 	
@@ -188,7 +188,7 @@ Element_run_Action_Set_Screen_Settings(Environment, ElementParameters)
 			result:=class_monitor.SetMonitorBrightness(displaynumber,brightness)
 			if (substr(result,1,1)="*")
 			{
-				x_finish(Environment, "exception", lang("Couldn't set screen setting '%1%' on screen %2%",lang("brightness"), displaynumber) ".`n" lang("Error code: %1%",result))
+				x_finish(Environment, "exception", x_lang("Couldn't set screen setting '%1%' on screen %2%",x_lang("brightness"), displaynumber) ".`n" x_lang("Error code: %1%",result))
 				return
 			}
 		}
@@ -197,7 +197,7 @@ Element_run_Action_Set_Screen_Settings(Environment, ElementParameters)
 			result:=class_monitor.SetMonitorContrast(displaynumber,contrast)
 			if (substr(result,1,1)="*")
 			{
-				x_finish(Environment, "exception", lang("Couldn't set screen setting '%1%' on screen %2%",lang("contrast"), displaynumber) ".`n" lang("Error code: %1%",result))
+				x_finish(Environment, "exception", x_lang("Couldn't set screen setting '%1%' on screen %2%",x_lang("contrast"), displaynumber) ".`n" x_lang("Error code: %1%",result))
 				return
 			}
 		}
@@ -207,7 +207,7 @@ Element_run_Action_Set_Screen_Settings(Environment, ElementParameters)
 			result:=class_monitor.SetMonitorRedGreenOrBlueGain(displaynumber,0,RedGain)
 			if (substr(result,1,1)="*")
 			{
-				x_finish(Environment, "exception", lang("Couldn't set screen setting '%1%' on screen %2%",lang("red gain"), displaynumber) ".`n" lang("Error code: %1%",result))
+				x_finish(Environment, "exception", x_lang("Couldn't set screen setting '%1%' on screen %2%",x_lang("red gain"), displaynumber) ".`n" x_lang("Error code: %1%",result))
 				return
 			}
 		}
@@ -216,7 +216,7 @@ Element_run_Action_Set_Screen_Settings(Environment, ElementParameters)
 			result:=class_monitor.SetMonitorRedGreenOrBlueGain(displaynumber,1,GreenGain)
 			if (substr(result,1,1)="*")
 			{
-				x_finish(Environment, "exception", lang("Couldn't set screen setting '%1%' on screen %2%",lang("green gain"), displaynumber) ".`n" lang("Error code: %1%",result))
+				x_finish(Environment, "exception", x_lang("Couldn't set screen setting '%1%' on screen %2%",x_lang("green gain"), displaynumber) ".`n" x_lang("Error code: %1%",result))
 				return
 			}
 		}
@@ -225,7 +225,7 @@ Element_run_Action_Set_Screen_Settings(Environment, ElementParameters)
 			result:=class_monitor.SetMonitorRedGreenOrBlueGain(displaynumber,2,BlueGain)
 			if (substr(result,1,1)="*")
 			{
-				x_finish(Environment, "exception", lang("Couldn't set screen setting '%1%' on screen %2%",lang("blue gain"), displaynumber) ".`n" lang("Error code: %1%",result))
+				x_finish(Environment, "exception", x_lang("Couldn't set screen setting '%1%' on screen %2%",x_lang("blue gain"), displaynumber) ".`n" x_lang("Error code: %1%",result))
 				return
 			}
 		}
@@ -234,7 +234,7 @@ Element_run_Action_Set_Screen_Settings(Environment, ElementParameters)
 			result:=class_monitor.SetMonitorRedGreenOrBlueDrive(displaynumber,0,RedDrive)
 			if (substr(result,1,1)="*")
 			{
-				x_finish(Environment, "exception", lang("Couldn't set screen setting '%1%' on screen %2%",lang("red drive"), displaynumber) ".`n" lang("Error code: %1%",result))
+				x_finish(Environment, "exception", x_lang("Couldn't set screen setting '%1%' on screen %2%",x_lang("red drive"), displaynumber) ".`n" x_lang("Error code: %1%",result))
 				return
 			}
 		}
@@ -243,7 +243,7 @@ Element_run_Action_Set_Screen_Settings(Environment, ElementParameters)
 			result:=class_monitor.SetMonitorRedGreenOrBlueDrive(displaynumber,1,GreenDrive)
 			if (substr(result,1,1)="*")
 			{
-				x_finish(Environment, "exception", lang("Couldn't set screen setting '%1%' on screen %2%",lang("green drive"), displaynumber) ".`n" lang("Error code: %1%",result))
+				x_finish(Environment, "exception", x_lang("Couldn't set screen setting '%1%' on screen %2%",x_lang("green drive"), displaynumber) ".`n" x_lang("Error code: %1%",result))
 				return
 			}
 		}
@@ -252,7 +252,7 @@ Element_run_Action_Set_Screen_Settings(Environment, ElementParameters)
 			result:=class_monitor.SetMonitorRedGreenOrBlueDrive(displaynumber,2,BlueDrive)
 			if (substr(result,1,1)="*")
 			{
-				x_finish(Environment, "exception", lang("Couldn't set screen setting '%1%' on screen %2%",lang("blue drive"), displaynumber) ".`n" lang("Error code: %1%",result))
+				x_finish(Environment, "exception", x_lang("Couldn't set screen setting '%1%' on screen %2%",x_lang("blue drive"), displaynumber) ".`n" x_lang("Error code: %1%",result))
 				return
 			}
 		}
@@ -261,7 +261,7 @@ Element_run_Action_Set_Screen_Settings(Environment, ElementParameters)
 			result:=class_monitor.SetMonitorColorTemperature(displaynumber,ColorTemperature)
 			if (substr(result,1,1)="*")
 			{
-				x_finish(Environment, "exception", lang("Couldn't set screen setting '%1%' on screen %2%",lang("color temperature"), displaynumber) ".`n" lang("Error code: %1%",result))
+				x_finish(Environment, "exception", x_lang("Couldn't set screen setting '%1%' on screen %2%",x_lang("color temperature"), displaynumber) ".`n" x_lang("Error code: %1%",result))
 				return
 			}
 		}

@@ -10,13 +10,13 @@ Element_getElementType_Action_Trim_a_string()
 ;Name of the element
 Element_getName_Action_Trim_a_string()
 {
-	return lang("Trim_a_string")
+	return x_lang("Trim_a_string")
 }
 
 ;Category of the element
 Element_getCategory_Action_Trim_a_string()
 {
-	return lang("Variable")
+	return x_lang("Variable")
 }
 
 ;This function returns the package of the element.
@@ -53,19 +53,19 @@ Element_getParametrizationDetails_Action_Trim_a_string(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: lang("Output variable_name")})
+	parametersToEdit.push({type: "Label", label: x_lang("Output variable_name")})
 	parametersToEdit.push({type: "Edit", id: "Varname", default: "NewVariable", content: "VariableName", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label:  lang("Input string")})
+	parametersToEdit.push({type: "Label", label:  x_lang("Input string")})
 	parametersToEdit.push({type: "Edit", id: "VarValue", default: "Hello World", content: ["String", "Expression"], contentID: "expression", contentDefault: "String", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("Operation")})
-	parametersToEdit.push({type: "Radio", id: "TrimWhat", default: 1, choices: [lang("Remove a number of characters"), lang("Remove specific caracters")], result: "enum", enum: ["Number", "Specified"]})
-	parametersToEdit.push({type: "Label", label: lang("Remove from which side")})
-	parametersToEdit.push({type: "CheckBox", id: "LeftSide", default: 1, label: lang("Left-hand side")})
-	parametersToEdit.push({type: "CheckBox", id: "RightSide", default: 0, label: lang("Right-hand side")})
-	parametersToEdit.push({type: "Label", label: lang("Count of characters")})
+	parametersToEdit.push({type: "Label", label: x_lang("Operation")})
+	parametersToEdit.push({type: "Radio", id: "TrimWhat", default: 1, choices: [x_lang("Remove a number of characters"), x_lang("Remove specific caracters")], result: "enum", enum: ["Number", "Specified"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Remove from which side")})
+	parametersToEdit.push({type: "CheckBox", id: "LeftSide", default: 1, label: x_lang("Left-hand side")})
+	parametersToEdit.push({type: "CheckBox", id: "RightSide", default: 0, label: x_lang("Right-hand side")})
+	parametersToEdit.push({type: "Label", label: x_lang("Count of characters")})
 	parametersToEdit.push({type: "Edit", id: "Length", default: 6, content: "Number", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("Which characters")})
-	parametersToEdit.push({type: "Radio", id: "SpacesAndTabs", default: 1, choices: [lang("Spaces and tabs"), lang("Following characters")], result: "enum", enum: ["SpacesAndTabs", "Specified"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Which characters")})
+	parametersToEdit.push({type: "Radio", id: "SpacesAndTabs", default: 1, choices: [x_lang("Spaces and tabs"), x_lang("Following characters")], result: "enum", enum: ["SpacesAndTabs", "Specified"]})
 	parametersToEdit.push({type: "Edit", id: "OmitChars", default: "%a_space%%a_tab%", content: "String"})
 	
 	return parametersToEdit
@@ -74,7 +74,7 @@ Element_getParametrizationDetails_Action_Trim_a_string(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Trim_a_string(Environment, ElementParameters)
 {
-	return lang("Trim_a_string") 
+	return x_lang("Trim_a_string") 
 }
 
 ;Called every time the user changes any parameter.

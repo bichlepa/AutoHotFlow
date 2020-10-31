@@ -10,13 +10,13 @@ Element_getElementType_Action_Create_Folder()
 ;Name of the element
 Element_getName_Action_Create_Folder()
 {
-	return lang("Create_Folder")
+	return x_lang("Create_Folder")
 }
 
 ;Category of the element
 Element_getCategory_Action_Create_Folder()
 {
-	return lang("File")
+	return x_lang("File")
 }
 
 ;This function returns the package of the element.
@@ -53,8 +53,8 @@ Element_getParametrizationDetails_Action_Create_Folder(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: lang("Source folder")})
-	parametersToEdit.push({type: "File", id: "folder", label: lang("Select a folder")})
+	parametersToEdit.push({type: "Label", label: x_lang("Source folder")})
+	parametersToEdit.push({type: "File", id: "folder", label: x_lang("Select a folder")})
 	
 	return parametersToEdit
 }
@@ -62,7 +62,7 @@ Element_getParametrizationDetails_Action_Create_Folder(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Create_Folder(Environment, ElementParameters)
 {
-	return lang("Create_Folder") 
+	return x_lang("Create_Folder") 
 }
 
 ;Called every time the user changes any parameter.
@@ -87,7 +87,7 @@ Element_run_Action_Create_Folder(Environment, ElementParameters)
 	FileCreateDir,% folder
 	if errorlevel 
 	{
-		x_finish(Environment, "exception", lang("Folder '%1%' could not be created",folder)) 
+		x_finish(Environment, "exception", x_lang("Folder '%1%' could not be created",folder)) 
 		return
 	}
 	

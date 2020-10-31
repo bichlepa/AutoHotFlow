@@ -6,15 +6,15 @@ initializeMenuBar()
 	global
 	
 	; create menu elements
-	Menu, MyMenu,add,% lang("Save"),ui_Menu_save
-	Menu, MyMenu,add,% lang("Run"),ui_Menu_MenuStart
-	Menu, MyMenu,add,% lang("Stop"),ui_Menu_MenuStop
+	Menu, MyMenu,add,% lang("Save #verb"),ui_Menu_save
+	Menu, MyMenu,add,% lang("Run #verb"),ui_Menu_MenuStart
+	Menu, MyMenu,add,% lang("Stop #verb"),ui_Menu_MenuStop
 	Menu, MyMenu,add,%  lang("Enable"),ui_Menu_Enable
 	Menu, EditMenu,add,% "↶ " lang("Undo"),ui_Menu_Undo
 	Menu, EditMenu,add,% "↷ " lang("Redo"),ui_Menu_Redo
-	Menu, MyMenu,add,% lang("Edit"),:EditMenu
+	Menu, MyMenu,add,% lang("Edit #verb"),:EditMenu
 	Menu, MyMenu,add,% lang("Settings"),ui_Menu_Settings
-	Menu, MyMenu,add,% lang("Exit"),Exit
+	Menu, MyMenu,add,% lang("Exit #verb"),Exit
 
 	; show them in the main gui
 	Gui, Maingui:menu, MyMenu

@@ -10,13 +10,13 @@ Element_getElementType_Action_Random_number()
 ;Name of the element
 Element_getName_Action_Random_number()
 {
-	return lang("Random_number")
+	return x_lang("Random_number")
 }
 
 ;Category of the element
 Element_getCategory_Action_Random_number()
 {
-	return lang("Variable")
+	return x_lang("Variable")
 }
 
 ;This function returns the package of the element.
@@ -52,11 +52,11 @@ Element_getStabilityLevel_Action_Random_number()
 Element_getParametrizationDetails_Action_Random_number(Environment)
 {
 	parametersToEdit:=Object()
-	parametersToEdit.push({type: "Label", label: lang("Variable_name")})
+	parametersToEdit.push({type: "Label", label: x_lang("Variable_name")})
 	parametersToEdit.push({type: "Edit", id: "Varname", default: "NewVariable", content: "VariableName", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label:  lang("Minimum value")})
+	parametersToEdit.push({type: "Label", label:  x_lang("Minimum value")})
 	parametersToEdit.push({type: "Edit", id: "MinValue", default: 0, content: "Expression", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label:  lang("Maximum value")})
+	parametersToEdit.push({type: "Label", label:  x_lang("Maximum value")})
 	parametersToEdit.push({type: "Edit", id: "MaxValue", default: 100, content: "Expression", WarnIfEmpty: true})
 	
 	return parametersToEdit
@@ -65,7 +65,7 @@ Element_getParametrizationDetails_Action_Random_number(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Random_number(Environment, ElementParameters)
 {
-	return lang("Random_number") 
+	return x_lang("Random_number") 
 }
 
 ;Called every time the user changes any parameter.

@@ -10,13 +10,13 @@ Element_getElementType_Action_Search_in_a_string()
 ;Name of the element
 Element_getName_Action_Search_in_a_string()
 {
-	return lang("Search_in_a_string")
+	return x_lang("Search_in_a_string")
 }
 
 ;Category of the element
 Element_getCategory_Action_Search_in_a_string()
 {
-	return lang("Variable")
+	return x_lang("Variable")
 }
 
 ;This function returns the package of the element.
@@ -53,19 +53,19 @@ Element_getParametrizationDetails_Action_Search_in_a_string(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: lang("Output variable")})
+	parametersToEdit.push({type: "Label", label: x_lang("Output variable")})
 	parametersToEdit.push({type: "Edit", id: "Varname", default: "NewPosition", content: "VariableName", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label:  lang("Input string")})
+	parametersToEdit.push({type: "Label", label:  x_lang("Input string")})
 	parametersToEdit.push({type: "Edit", id: "VarValue", default: "Hello World", content: ["String", "Expression"], contentID: "Expression", ContentDefault: "String", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label:  lang("Text to search")})
+	parametersToEdit.push({type: "Label", label:  x_lang("Text to search")})
 	parametersToEdit.push({type: "Edit", id: "SearchText", default: "World", content: ["String", "Expression"], contentID: "IsExpressionSearchText", ContentDefault: "String", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("Which occurence")})
+	parametersToEdit.push({type: "Label", label: x_lang("Which occurence")})
 	parametersToEdit.push({type: "Edit", id: "OccurenceNumber", default: 1, content: "Number", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Radio", id: "LeftOrRight", default: 1, choices: [lang("From left"), lang("From right")], result: "enum", enum: ["FromLeft", "FromRight"]})
-	parametersToEdit.push({type: "Label", label: lang("Start position")})
+	parametersToEdit.push({type: "Radio", id: "LeftOrRight", default: 1, choices: [x_lang("From left"), x_lang("From right")], result: "enum", enum: ["FromLeft", "FromRight"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Start position")})
 	parametersToEdit.push({type: "Edit", id: "Offset", default: 1, content: "Number", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("Case sensitivity")})
-	parametersToEdit.push({type: "Radio", id: "CaseSensitive", default: 1, choices: [lang("Case insensitive"), lang("Case sensitive")], result: "enum", enum: ["CaseInsensitive", "CaseSensitive"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Case sensitivity")})
+	parametersToEdit.push({type: "Radio", id: "CaseSensitive", default: 1, choices: [x_lang("Case insensitive"), x_lang("Case sensitive")], result: "enum", enum: ["CaseInsensitive", "CaseSensitive"]})
 	
 	return parametersToEdit
 }
@@ -73,7 +73,7 @@ Element_getParametrizationDetails_Action_Search_in_a_string(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Search_in_a_string(Environment, ElementParameters)
 {
-	return lang("Search_in_a_string") 
+	return x_lang("Search_in_a_string") 
 }
 
 ;Called every time the user changes any parameter.
@@ -122,7 +122,7 @@ Element_run_Action_Search_in_a_string(Environment, ElementParameters)
 	if errorlevel ;If no string was found
 	{
 		x_SetVariable(Environment,EvaluatedParameters.Varname,"") 
-		x_finish(Environment, "exception",lang("Searched text not found")) 
+		x_finish(Environment, "exception",x_lang("Searched text not found")) 
 		return
 	}
 	else

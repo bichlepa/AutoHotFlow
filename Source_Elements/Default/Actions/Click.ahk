@@ -10,13 +10,13 @@ Element_getElementType_Action_Click()
 ;Name of the element
 Element_getName_Action_Click()
 {
-	return lang("Click")
+	return x_lang("Click")
 }
 
 ;Category of the element
 Element_getCategory_Action_Click()
 {
-	return lang("User_simulation")
+	return x_lang("User_simulation")
 }
 
 ;This function returns the package of the element.
@@ -53,23 +53,23 @@ Element_getParametrizationDetails_Action_Click(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: lang("Which button")})
-	parametersToEdit.push({type: "DropDown", id: "Button", default: 1, result: "enum", choices: [lang("Left button"), lang("Right button"), lang("Middle Button"), lang("Wheel up"), lang("Wheel down"), lang("Wheel left"), lang("Wheel right"), lang("4th mouse button (back)"), lang("5th mouse button (forward)")], enum: ["Left", "Right", "Middle", "WheelUp", "WheelDown", "WheelLeft", "WheelRight", "X1", "X2"]})
-	parametersToEdit.push({type: "Label", label: lang("Click count")})
+	parametersToEdit.push({type: "Label", label: x_lang("Which button")})
+	parametersToEdit.push({type: "DropDown", id: "Button", default: 1, result: "enum", choices: [x_lang("Left button"), x_lang("Right button"), x_lang("Middle Button"), x_lang("Wheel up"), x_lang("Wheel down"), x_lang("Wheel left"), x_lang("Wheel right"), x_lang("4th mouse button (back)"), x_lang("5th mouse button (forward)")], enum: ["Left", "Right", "Middle", "WheelUp", "WheelDown", "WheelLeft", "WheelRight", "X1", "X2"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Click count")})
 	parametersToEdit.push({type: "Edit", id: "ClickCount", default: 1, content: "Expression", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("Event")})
-	parametersToEdit.push({type: "Radio", id: "DownUp", default: 1, result: "enum", choices: [lang("Click (Down and up)"), lang("Keep down"), lang("Release only")], enum: ["Click", "D", "U"]})
-	parametersToEdit.push({type: "Label", label: lang("Mouse position")})
-	parametersToEdit.push({type: "Checkbox", id: "changePosition", default: 0, label: lang("Move mouse before clicking")})
-	parametersToEdit.push({type: "Radio", id: "CoordMode", default: 1, result: "enum", choices: [lang("Relative to screen"), lang("Relative to active window position"), lang("Relative to active window client position"), lang("Relative to current mouse position")], enum: ["Screen", "Window", "Client", "Relative"]})
-	parametersToEdit.push({type: "Label", label: lang("Coordinates") lang("(x,y)"), size: "small"})
+	parametersToEdit.push({type: "Label", label: x_lang("Event")})
+	parametersToEdit.push({type: "Radio", id: "DownUp", default: 1, result: "enum", choices: [x_lang("Click (Down and up)"), x_lang("Keep down"), x_lang("Release only")], enum: ["Click", "D", "U"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Mouse position")})
+	parametersToEdit.push({type: "Checkbox", id: "changePosition", default: 0, label: x_lang("Move mouse before clicking")})
+	parametersToEdit.push({type: "Radio", id: "CoordMode", default: 1, result: "enum", choices: [x_lang("Relative to screen"), x_lang("Relative to active window position"), x_lang("Relative to active window client position"), x_lang("Relative to current mouse position")], enum: ["Screen", "Window", "Client", "Relative"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Coordinates") x_lang("(x,y)"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: ["Xpos", "Ypos"], default: [10, 20], content: "Expression", WarnIfEmpty: true})
-	parametersToEdit.push({type: "button", id: "MouseTracker", goto: "ActionClickMouseTracker", label: lang("Get coordinates")})
-	parametersToEdit.push({type: "Label", label: lang("Method")})
-	parametersToEdit.push({type: "Radio", id: "SendMode", default: 1, result: "enum", choices: [lang("Input mode"), lang("Event mode"), lang("Play mode")], enum: ["Input", "Event", "Play"]})
-	parametersToEdit.push({type: "Label", label: lang("Speed")})
+	parametersToEdit.push({type: "button", id: "MouseTracker", goto: "ActionClickMouseTracker", label: x_lang("Get coordinates")})
+	parametersToEdit.push({type: "Label", label: x_lang("Method")})
+	parametersToEdit.push({type: "Radio", id: "SendMode", default: 1, result: "enum", choices: [x_lang("Input mode"), x_lang("Event mode"), x_lang("Play mode")], enum: ["Input", "Event", "Play"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Speed")})
 	parametersToEdit.push({type: "Slider", id: "speed", default: 2, options: "Range0-100 tooltip"})
-	parametersToEdit.push({type: "Label", label: lang("Delay in ms")})
+	parametersToEdit.push({type: "Label", label: x_lang("Delay in ms")})
 	parametersToEdit.push({type: "Edit", id: "delay", default: 10, content: "Expression", WarnIfEmpty: true})
 	
 	
@@ -83,7 +83,7 @@ ActionClickMouseTracker()
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Click(Environment, ElementParameters)
 {
-	return lang("Click") 
+	return x_lang("Click") 
 }
 
 ;Called every time the user changes any parameter.
@@ -160,12 +160,12 @@ Element_run_Action_Click(Environment, ElementParameters)
 		
 		if Xpos is not number
 		{
-			x_finish(Environment, "exception", lang("%1% is not a number.",lang("X position"))) 
+			x_finish(Environment, "exception", x_lang("%1% is not a number.",x_lang("X position"))) 
 			return
 		}
 		if Ypos is not number
 		{
-			x_finish(Environment, "exception", lang("%1% is not a number.",lang("Y position"))) 
+			x_finish(Environment, "exception", x_lang("%1% is not a number.",x_lang("Y position"))) 
 			return
 		}
 		

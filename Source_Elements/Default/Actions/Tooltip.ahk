@@ -10,13 +10,13 @@ Element_getElementType_Action_Tooltip()
 ;Name of the element
 Element_getName_Action_Tooltip()
 {
-	return lang("Tooltip")
+	return x_lang("Tooltip")
 }
 
 ;Category of the element
 Element_getCategory_Action_Tooltip()
 {
-	return lang("User_interaction")
+	return x_lang("User_interaction")
 }
 
 ;This function returns the package of the element.
@@ -53,13 +53,13 @@ Element_getStabilityLevel_Action_Tooltip()
 Element_getParametrizationDetails_Action_Tooltip(Environment)
 {
 	parametersToEdit:=Object()
-	parametersToEdit.push({type: "Label", label: lang("Text_to_show")})
-	parametersToEdit.push({type: "multilineEdit", id: "text", default:  lang("Message"), content: "string",  WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("Duration")})
+	parametersToEdit.push({type: "Label", label: x_lang("Text_to_show")})
+	parametersToEdit.push({type: "multilineEdit", id: "text", default:  x_lang("Message"), content: "string",  WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: x_lang("Duration")})
 	parametersToEdit.push({type: "Edit", id: "duration", default: 2, content: "Expression", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Radio", id: "Unit", default: 2, result: "enum", choices: [lang("Milliseconds"), lang("Seconds"), lang("Minutes")], enum: ["Milliseconds", "Seconds", "Minutes"]})
-	parametersToEdit.push({type: "Label", label: lang("Options")})
-	parametersToEdit.push({type: "Checkbox", id: "follow_mouse", default: 1, label: lang("Follow_Mouse")})
+	parametersToEdit.push({type: "Radio", id: "Unit", default: 2, result: "enum", choices: [x_lang("Milliseconds"), x_lang("Seconds"), x_lang("Minutes")], enum: ["Milliseconds", "Seconds", "Minutes"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Options")})
+	parametersToEdit.push({type: "Checkbox", id: "follow_mouse", default: 1, label: x_lang("Follow_Mouse")})
 
 	return parametersToEdit
 }
@@ -69,17 +69,17 @@ Element_GenerateName_Action_Tooltip(Environment, ElementParameters)
 {
 	global
 	if (ElementParameters.Unit = "Milliseconds")
-		duration:=ElementParameters.duration " " lang("ms #Milliseconds")
+		duration:=ElementParameters.duration " " x_lang("ms #Milliseconds")
 	if (ElementParameters.Unit = "Seconds")
-		duration:=ElementParameters.duration " " lang("s #Seconds")
+		duration:=ElementParameters.duration " " x_lang("s #Seconds")
 	if (ElementParameters.Unit = "Minutes")
-		duration:=ElementParameters.duration " " lang("m #Minutes")
+		duration:=ElementParameters.duration " " x_lang("m #Minutes")
 	
 	if (ElementParameters.follow_mouse=1)
-		temptext:=lang("Follow_Mouse")
+		temptext:=x_lang("Follow_Mouse")
 	else
 		temptext=
-	return lang("Tooltip") ": " ElementParameters.text " - " duration " - " temptext
+	return x_lang("Tooltip") ": " ElementParameters.text " - " duration " - " temptext
 	
 	
 }

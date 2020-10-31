@@ -10,13 +10,13 @@ Element_getElementType_Action_Set_file_time()
 ;Name of the element
 Element_getName_Action_Set_file_time()
 {
-	return lang("Set_file_time")
+	return x_lang("Set_file_time")
 }
 
 ;Category of the element
 Element_getCategory_Action_Set_file_time()
 {
-	return lang("File")
+	return x_lang("File")
 }
 
 ;This function returns the package of the element.
@@ -53,15 +53,15 @@ Element_getParametrizationDetails_Action_Set_file_time(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: lang("New time") " (" lang("Date format") ")"})
+	parametersToEdit.push({type: "Label", label: x_lang("New time") " (" x_lang("Date format") ")"})
 	parametersToEdit.push({type: "Edit", id: "time", content: "String", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("Select file")})
-	parametersToEdit.push({type: "File", id: "file", label: lang("Select a file"), options: 8})
-	parametersToEdit.push({type: "Label", label: lang("Which time")})
-	parametersToEdit.push({type: "Radio", id: "TimeType", result: "enum", default: 1, choices: [lang("Modification time"), lang("Creation time"), lang("Last access time")], enum: ["Modification", "Creation", "Access"]})
-	parametersToEdit.push({type: "Label", label: lang("Options")})
-	parametersToEdit.push({type: "Radio", id: "OperateOnWhat", default: 1, choices: [lang("Operate on files"), lang("Operate on files and folders"), lang("Operate on folders")], result: "enum", enum: ["Files", "FilesAndFolders", "Folders"]})
-	parametersToEdit.push({type: "Checkbox", id: "Recurse", default: 0, label: lang("Recurse subfolders into")})
+	parametersToEdit.push({type: "Label", label: x_lang("Select file")})
+	parametersToEdit.push({type: "File", id: "file", label: x_lang("Select a file"), options: 8})
+	parametersToEdit.push({type: "Label", label: x_lang("Which time")})
+	parametersToEdit.push({type: "Radio", id: "TimeType", result: "enum", default: 1, choices: [x_lang("Modification time"), x_lang("Creation time"), x_lang("Last access time")], enum: ["Modification", "Creation", "Access"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Options")})
+	parametersToEdit.push({type: "Radio", id: "OperateOnWhat", default: 1, choices: [x_lang("Operate on files"), x_lang("Operate on files and folders"), x_lang("Operate on folders")], result: "enum", enum: ["Files", "FilesAndFolders", "Folders"]})
+	parametersToEdit.push({type: "Checkbox", id: "Recurse", default: 0, label: x_lang("Recurse subfolders into")})
 	
 	
 	return parametersToEdit
@@ -70,7 +70,7 @@ Element_getParametrizationDetails_Action_Set_file_time(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Set_file_time(Environment, ElementParameters)
 {
-	return lang("Set_file_time") 
+	return x_lang("Set_file_time") 
 }
 
 ;Called every time the user changes any parameter.
@@ -98,7 +98,7 @@ Element_run_Action_Set_file_time(Environment, ElementParameters)
 	
 	if temptime is not time
 	{
-		x_finish(Environment, "exception", lang("Timestamp '%1%' is not valid", temptime)) 
+		x_finish(Environment, "exception", x_lang("Timestamp '%1%' is not valid", temptime)) 
 		return
 	}
 	
@@ -119,12 +119,12 @@ Element_run_Action_Set_file_time(Environment, ElementParameters)
 	{
 		if not fileexist(tempPath)
 		{
-			x_finish(Environment, "exception", lang("File '%1%' does not exist",tempPath))
+			x_finish(Environment, "exception", x_lang("File '%1%' does not exist",tempPath))
 			return
 		}
 		else
 		{
-			x_finish(Environment, "exception", lang("Attributes of file '%1%' could not be changed",tempPath)) 
+			x_finish(Environment, "exception", x_lang("Attributes of file '%1%' could not be changed",tempPath)) 
 			return
 		}
 	}

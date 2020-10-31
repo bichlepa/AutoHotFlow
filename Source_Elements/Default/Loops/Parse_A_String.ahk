@@ -10,13 +10,13 @@ Element_getElementType_Loop_Parse_A_String()
 ;Name of the element
 Element_getName_Loop_Parse_A_String()
 {
-	return lang("Parse_A_String")
+	return x_lang("Parse_A_String")
 }
 
 ;Category of the element
 Element_getCategory_Loop_Parse_A_String()
 {
-	return lang("Variable")
+	return x_lang("Variable")
 }
 
 ;This function returns the package of the element.
@@ -54,11 +54,11 @@ Element_getParametrizationDetails_Loop_Parse_A_String(Environment)
 	parametersToEdit:=Object()
 	
 	
-	parametersToEdit.push({type: "Label", label:  lang("Input string")})
+	parametersToEdit.push({type: "Label", label:  x_lang("Input string")})
 	parametersToEdit.push({type: "Edit", id: "VarValue", default: "Hello real world, Hello virtual world", content: ["String", "Expression"], contentID: "Expression", ContentDefault: "String", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("Delimiter characters")})
+	parametersToEdit.push({type: "Label", label: x_lang("Delimiter characters")})
 	parametersToEdit.push({type: "Edit", id: "Delimiters", default: ",", content: "String", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("Omit characters")})
+	parametersToEdit.push({type: "Label", label: x_lang("Omit characters")})
 	parametersToEdit.push({type: "Edit", id: "OmitChars", default: "%a_space%%a_tab%", content: "String"})
 	
 	return parametersToEdit
@@ -67,7 +67,7 @@ Element_getParametrizationDetails_Loop_Parse_A_String(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Loop_Parse_A_String(Environment, ElementParameters)
 {
-	return lang("Parse_A_String") 
+	return x_lang("Parse_A_String") 
 }
 
 ;Called every time the user changes any parameter.
@@ -142,7 +142,7 @@ Element_run_Loop_Parse_A_String(Environment, ElementParameters)
 	else
 	{
 		;This should never happen, but I suggest to keep this code for catching bugs in AHF.
-		x_finish(Environment, "exception", lang("No information whether the connection leads into head or tail"))
+		x_finish(Environment, "exception", x_lang("No information whether the connection leads into head or tail"))
 	}
 	
 }

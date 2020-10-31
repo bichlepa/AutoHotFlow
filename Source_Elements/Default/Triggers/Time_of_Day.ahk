@@ -10,13 +10,13 @@ Element_getElementType_Trigger_Time_Of_Day()
 ;Name of the element
 Element_getName_Trigger_Time_Of_Day()
 {
-	return lang("Time_Of_Day")
+	return x_lang("Time_Of_Day")
 }
 
 ;Category of the element
 Element_getCategory_Trigger_Time_Of_Day()
 {
-	return lang("Time")
+	return x_lang("Time")
 }
 
 ;This function returns the package of the element.
@@ -53,9 +53,9 @@ Element_getParametrizationDetails_Trigger_Time_Of_Day(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: lang("Weekdays")})
+	parametersToEdit.push({type: "Label", label: x_lang("Weekdays")})
 	parametersToEdit.push({type: "Weekdays", id: "WeekDays", default: "1234567", WarnIfEmpty: "true"})
-	parametersToEdit.push({type: "Label", label: lang("Time of day")})
+	parametersToEdit.push({type: "Label", label: x_lang("Time of day")})
 	parametersToEdit.push({type: "DateAndTime", id: "Time", default: a_now, format: "Time"})
 	
 	return parametersToEdit
@@ -64,7 +64,7 @@ Element_getParametrizationDetails_Trigger_Time_Of_Day(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Trigger_Time_Of_Day(Environment, ElementParameters)
 {
-	return lang("Time_Of_Day") 
+	return x_lang("Time_Of_Day") 
 }
 
 ;Called every time the user changes any parameter.
@@ -93,7 +93,7 @@ Element_enable_Trigger_Time_Of_Day(Environment, ElementParameters)
 	remainingSeconds := Trigger_Time_Of_Day_Trigger_FindNextTimestamp(EvaluatedParameters.WeekDays, EvaluatedParameters.Time)
 	if (remainingSeconds = "")
 	{
-		x_enabled(Environment, "exception", lang("Can't calculate next trigger time"))
+		x_enabled(Environment, "exception", x_lang("Can't calculate next trigger time"))
 		x_log(Environment, "WeekDays: " EvaluatedParameters.WeekDays ", Time: " EvaluatedParameters.Time, 1)
 		return
 	}
@@ -168,7 +168,7 @@ Trigger_Time_Of_Day_Trigger(environment, EvaluatedParameters)
 	remainingSeconds := Trigger_Time_Of_Day_Trigger_FindNextTimestamp(EvaluatedParameters.WeekDays, EvaluatedParameters.Time)
 	if (remainingSeconds = "")
 	{
-		x_log(Environment, lang("Can't calculate next trigger time"), 0) 
+		x_log(Environment, x_lang("Can't calculate next trigger time"), 0) 
 		x_log(Environment, "WeekDays: " EvaluatedParameters.WeekDays ", Time: " EvaluatedParameters.Time, 1)
 		return
 	}

@@ -10,13 +10,13 @@ Element_getElementType_Action_Stop_Sound()
 ;Name of the element
 Element_getName_Action_Stop_Sound()
 {
-	return lang("Stop_Sound")
+	return x_lang("Stop_Sound")
 }
 
 ;Category of the element
 Element_getCategory_Action_Stop_Sound()
 {
-	return lang("Sound")
+	return x_lang("Sound")
 }
 
 ;This function returns the package of the element.
@@ -61,7 +61,7 @@ Element_getParametrizationDetails_Action_Stop_Sound(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Stop_Sound(Environment, ElementParameters)
 {
-	return lang("Stop_Sound") 
+	return x_lang("Stop_Sound") 
 }
 
 ;Called every time the user changes any parameter.

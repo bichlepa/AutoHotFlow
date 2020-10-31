@@ -10,13 +10,13 @@ Element_getElementType_Action_Delete_From_List()
 ;Name of the element
 Element_getName_Action_Delete_From_List()
 {
-	return lang("Delete_From_List")
+	return x_lang("Delete_From_List")
 }
 
 ;Category of the element
 Element_getCategory_Action_Delete_From_List()
 {
-	return lang("Variable")
+	return x_lang("Variable")
 }
 
 ;This function returns the package of the element.
@@ -53,10 +53,10 @@ Element_getParametrizationDetails_Action_Delete_From_List(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: lang("Variable_name")})
+	parametersToEdit.push({type: "Label", label: x_lang("Variable_name")})
 	parametersToEdit.push({type: "Edit", id: "Varname", default: "NewList", content: "VariableName", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("Which element")})
-	parametersToEdit.push({type: "Radio", id: "WhichPosition", result: "enum", default: 2, choices: [lang("First element"), lang("Last element"), lang("Following element or key")], enum: ["First", "Last", "Specific"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Which element")})
+	parametersToEdit.push({type: "Radio", id: "WhichPosition", result: "enum", default: 2, choices: [x_lang("First element"), x_lang("Last element"), x_lang("Following element or key")], enum: ["First", "Last", "Specific"]})
 	parametersToEdit.push({type: "Edit", id: "Position", default: 2, content: "Expression", WarnIfEmpty: true})
 	
 	return parametersToEdit
@@ -65,7 +65,7 @@ Element_getParametrizationDetails_Action_Delete_From_List(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Delete_From_List(Environment, ElementParameters)
 {
-	return lang("Delete_From_List") 
+	return x_lang("Delete_From_List") 
 }
 
 ;Called every time the user changes any parameter.
@@ -87,7 +87,7 @@ Element_run_Action_Delete_From_List(Environment, ElementParameters)
 	if not x_CheckVariableName(Varname)
 	{
 		;On error, finish with exception and return
-		x_finish(Environment, "exception", lang("%1% is not valid", lang("Ouput variable name '%1%'", Varname)))
+		x_finish(Environment, "exception", x_lang("%1% is not valid", x_lang("Ouput variable name '%1%'", Varname)))
 		return
 	}
 	
@@ -98,7 +98,7 @@ Element_run_Action_Delete_From_List(Environment, ElementParameters)
 	
 	if not IsObject(tempObject)
 	{
-		x_finish(Environment, "exception", lang("Variable '%1%' does not contain a list.",Varname)) 
+		x_finish(Environment, "exception", x_lang("Variable '%1%' does not contain a list.",Varname)) 
 		return
 	}
 
@@ -107,7 +107,7 @@ Element_run_Action_Delete_From_List(Environment, ElementParameters)
 		index:=tempObject.MinIndex()
 		if index=
 		{
-			x_finish(Environment, "exception", lang("The list '%1%' does not contain an integer key.",varname)) 
+			x_finish(Environment, "exception", x_lang("The list '%1%' does not contain an integer key.",varname)) 
 			return
 		}
 		
@@ -118,7 +118,7 @@ Element_run_Action_Delete_From_List(Environment, ElementParameters)
 		index:=tempObject.MaxIndex()
 		if index=
 		{
-			x_finish(Environment, "exception", lang("The list '%1%' does not contain an integer key.",varname)) 
+			x_finish(Environment, "exception", x_lang("The list '%1%' does not contain an integer key.",varname)) 
 			return
 		}
 		tempObject.delete(index)
@@ -129,19 +129,19 @@ Element_run_Action_Delete_From_List(Environment, ElementParameters)
 		if (evRes.error)
 		{
 			;On error, finish with exception and return
-			x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.Position) "`n`n" evRes.error) 
+			x_finish(Environment, "exception", x_lang("An error occured while parsing expression '%1%'", ElementParameters.Position) "`n`n" evRes.error) 
 			return
 		}
 		Position:=evRes.result
 		
 		if (not Position)
 		{
-			x_finish(Environment, "exception", lang("%1% is not secified.",lang("Position")))
+			x_finish(Environment, "exception", x_lang("%1% is not secified.",x_lang("Position")))
 			return
 		}
 		if (not tempObject.HasKey(Position))
 		{
-			x_finish(Environment, "exception", lang("The list '%1%' does not contain the key '%2%'.",varname,Position))
+			x_finish(Environment, "exception", x_lang("The list '%1%' does not contain the key '%2%'.",varname,Position))
 			return
 		}
 		tempObject.Remove(Position)

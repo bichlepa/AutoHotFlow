@@ -10,13 +10,13 @@ Element_getElementType_Action_Get_File_Time()
 ;Name of the element
 Element_getName_Action_Get_File_Time()
 {
-	return lang("Get_File_Time")
+	return x_lang("Get_File_Time")
 }
 
 ;Category of the element
 Element_getCategory_Action_Get_File_Time()
 {
-	return lang("File")
+	return x_lang("File")
 }
 
 ;This function returns the package of the element.
@@ -53,12 +53,12 @@ Element_getParametrizationDetails_Action_Get_File_Time(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: lang("Output variable name")})
+	parametersToEdit.push({type: "Label", label: x_lang("Output variable name")})
 	parametersToEdit.push({type: "Edit", id: "varname", default: "FileSize", content: "VariableName", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("File path")})
-	parametersToEdit.push({type: "File", id: "file", label: lang("Select a file")})
-	parametersToEdit.push({type: "Label", label: lang("Unit")})
-	parametersToEdit.push({type: "Radio", id: "TimeType", result: "enum", default: 1, choices: [lang("Modification time"), lang("Creation time"), lang("Last access time")], enum: ["Modification", "Creation", "Access"]})
+	parametersToEdit.push({type: "Label", label: x_lang("File path")})
+	parametersToEdit.push({type: "File", id: "file", label: x_lang("Select a file")})
+	parametersToEdit.push({type: "Label", label: x_lang("Unit")})
+	parametersToEdit.push({type: "Radio", id: "TimeType", result: "enum", default: 1, choices: [x_lang("Modification time"), x_lang("Creation time"), x_lang("Last access time")], enum: ["Modification", "Creation", "Access"]})
 	
 	return parametersToEdit
 }
@@ -66,7 +66,7 @@ Element_getParametrizationDetails_Action_Get_File_Time(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Get_File_Time(Environment, ElementParameters)
 {
-	return lang("Get_File_Time") 
+	return x_lang("Get_File_Time") 
 }
 
 ;Called every time the user changes any parameter.
@@ -87,14 +87,14 @@ Element_run_Action_Get_File_Time(Environment, ElementParameters)
 	if not x_CheckVariableName(varname)
 	{
 		;On error, finish with exception and return
-		x_finish(Environment, "exception", lang("%1% is not valid", lang("Ouput variable name '%1%'", varname)))
+		x_finish(Environment, "exception", x_lang("%1% is not valid", x_lang("Ouput variable name '%1%'", varname)))
 		return
 	}
 
 	file := x_GetFullPath(Environment, x_replaceVariables(Environment, ElementParameters.file))
 	if not FileExist(file)
 	{
-		x_finish(Environment, "exception", lang("%1% '%2%' does not exist.",lang("File"), file)) 
+		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.",x_lang("File"), file)) 
 		return
 	}
 	
@@ -109,7 +109,7 @@ Element_run_Action_Get_File_Time(Environment, ElementParameters)
 	FileGetTime,result,% file,% TimeTypePar
 	if ErrorLevel
 	{
-		x_finish(Environment, "exception", lang("Couldn't get file time of file '%1%'",file)) 
+		x_finish(Environment, "exception", x_lang("Couldn't get file time of file '%1%'",file)) 
 		return
 	}
 	

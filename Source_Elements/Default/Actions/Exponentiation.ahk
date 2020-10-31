@@ -10,13 +10,13 @@ Element_getElementType_Action_Exponentiation()
 ;Name of the element
 Element_getName_Action_Exponentiation()
 {
-	return lang("Exponentiation")
+	return x_lang("Exponentiation")
 }
 
 ;Category of the element
 Element_getCategory_Action_Exponentiation()
 {
-	return lang("Variable")
+	return x_lang("Variable")
 }
 
 ;This function returns the package of the element.
@@ -53,11 +53,11 @@ Element_getParametrizationDetails_Action_Exponentiation(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: lang("Output_Variable_name")})
+	parametersToEdit.push({type: "Label", label: x_lang("Output_Variable_name")})
 	parametersToEdit.push({type: "edit", id: "Varname", default: "NewVariable", content: "VariableName", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label:  lang("Input number")})
+	parametersToEdit.push({type: "Label", label:  x_lang("Input number")})
 	parametersToEdit.push({type: "edit", id: "VarValue", default: 3, content: "Expression", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label:  lang("Exponent")})
+	parametersToEdit.push({type: "Label", label:  x_lang("Exponent")})
 	parametersToEdit.push({type: "Edit", id: "Exponent", default: 2, content: "Expression", WarnIfEmpty: true})
 	
 	
@@ -67,7 +67,7 @@ Element_getParametrizationDetails_Action_Exponentiation(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Exponentiation(Environment, ElementParameters)
 {
-	return lang("Exponentiation") "`n" ElementParameters.Varname " = " ElementParameters.VarValue "^" ElementParameters.Exponent
+	return x_lang("Exponentiation") "`n" ElementParameters.Varname " = " ElementParameters.VarValue "^" ElementParameters.Exponent
 }
 
 ;Called every time the user changes any parameter.
@@ -89,7 +89,7 @@ Element_run_Action_Exponentiation(Environment, ElementParameters)
 	if not x_CheckVariableName(Varname)
 	{
 		;On error, finish with exception and return
-		x_finish(Environment, "exception", lang("%1% is not valid", lang("Ouput variable name '%1%'", varname)))
+		x_finish(Environment, "exception", x_lang("%1% is not valid", x_lang("Ouput variable name '%1%'", varname)))
 		return
 	}
 
@@ -97,7 +97,7 @@ Element_run_Action_Exponentiation(Environment, ElementParameters)
 	if (evRes.error)
 	{
 		;On error, finish with exception and return
-		x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.VarValue) "`n`n" evRes.error) 
+		x_finish(Environment, "exception", x_lang("An error occured while parsing expression '%1%'", ElementParameters.VarValue) "`n`n" evRes.error) 
 		return
 	}
 	VarValue:=evRes.result
@@ -106,7 +106,7 @@ Element_run_Action_Exponentiation(Environment, ElementParameters)
 	if (evRes.error)
 	{
 		;On error, finish with exception and return
-		x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.Exponent) "`n`n" evRes.error) 
+		x_finish(Environment, "exception", x_lang("An error occured while parsing expression '%1%'", ElementParameters.Exponent) "`n`n" evRes.error) 
 		return
 	}
 	Exponent:=evRes.result

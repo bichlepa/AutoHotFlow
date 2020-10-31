@@ -10,13 +10,13 @@ Element_getElementType_Action_Set_Flow_Status()
 ;Name of the element
 Element_getName_Action_Set_Flow_Status()
 {
-	return lang("Set_Flow_Status")
+	return x_lang("Set_Flow_Status")
 }
 
 ;Category of the element
 Element_getCategory_Action_Set_Flow_Status()
 {
-	return lang("Flow_control")
+	return x_lang("Flow_control")
 }
 
 ;This function returns the package of the element.
@@ -65,13 +65,13 @@ Element_getParametrizationDetails_Action_Set_Flow_Status(Environment)
 	}
 	
 	parametersToEdit:=Object()
-	parametersToEdit.push({type: "Label", label: lang("New state")})
-	parametersToEdit.push({type: "Radio", id: "Enable", default: 1, result: "enum", choices: [lang("Enable"), lang("Disable")], enum: ["Enable", "Disable"]})
-	parametersToEdit.push({type: "Label", label: lang("Flow_name")})
-	parametersToEdit.push({type: "Checkbox", id: "ThisFlow", default: 1, label: lang("This flow (%1%)",myFlowName ) })
+	parametersToEdit.push({type: "Label", label: x_lang("New state")})
+	parametersToEdit.push({type: "Radio", id: "Enable", default: 1, result: "enum", choices: [x_lang("Enable"), x_lang("Disable")], enum: ["Enable", "Disable"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Flow_name")})
+	parametersToEdit.push({type: "Checkbox", id: "ThisFlow", default: 1, label: x_lang("This flow (%1%)",myFlowName ) })
 	parametersToEdit.push({type: "ComboBox", id: "flowName", content: "String", WarnIfEmpty: true, result: "string", choices: choicesFlows})
-	parametersToEdit.push({type: "Label", label: lang("Which trigger")})
-	parametersToEdit.push({type: "Radio", id: "WhichTrigger", default: 1, result: "enum", choices: [lang("Any trigger"), lang("Default trigger"), lang("Specific trigger")], enum: ["Any", "Default", "Specific"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Which trigger")})
+	parametersToEdit.push({type: "Radio", id: "WhichTrigger", default: 1, result: "enum", choices: [x_lang("Any trigger"), x_lang("Default trigger"), x_lang("Specific trigger")], enum: ["Any", "Default", "Specific"]})
 	parametersToEdit.push({type: "ComboBox", id: "triggerName", content: "String", WarnIfEmpty: true, result: "string", choices: choicesTriggers})
 
 	return parametersToEdit
@@ -81,21 +81,21 @@ Element_getParametrizationDetails_Action_Set_Flow_Status(Environment)
 Element_GenerateName_Action_Set_Flow_Status(Environment, ElementParameters)
 {
 	if (ElementParameters.Enable = "Enable")
-		enableString:=lang("Enable")
+		enableString:=x_lang("Enable")
 	else
-		enableString:=lang("Disable")
+		enableString:=x_lang("Disable")
 	
 	if (ElementParameters.ThisFlow = True)
-		FlowName:=lang("This flow")
+		FlowName:=x_lang("This flow")
 	else
 		FlowName:=ElementParameters.flowName
 	if (ElementParameters.WhichTrigger = "Any")
-		TriggerName:=lang("Any trigger")
+		TriggerName:=x_lang("Any trigger")
 	else if (ElementParameters.WhichTrigger = "Default")
-		TriggerName:=lang("Default trigger")
+		TriggerName:=x_lang("Default trigger")
 	else
 		TriggerName:=ElementParameters.TriggerName
-	return % lang("Set_Flow_Status") " - " enableString ": " FlowName " - " TriggerName
+	return % x_lang("Set_Flow_Status") " - " enableString ": " FlowName " - " TriggerName
 	
 	
 }
@@ -172,7 +172,7 @@ Element_run_Action_Set_Flow_Status(Environment, ElementParameters)
 		
 		if not x_FlowExistsByName(FlowName)
 		{
-			return x_finish(Environment,"exception",lang("Flow '%1%' does not exist",FlowName))
+			return x_finish(Environment,"exception",x_lang("Flow '%1%' does not exist",FlowName))
 		}
 	}
 	FlowID:=x_getFlowIDByName(FlowName)
@@ -199,13 +199,13 @@ Element_run_Action_Set_Flow_Status(Environment, ElementParameters)
 			TriggerName := x_replaceVariables(Environment, ElementParameters.triggerName)
 			if (TriggerName ="")
 			{
-				return x_finish(Environment,"exception",lang("Trigger name is empty",FlowName))
+				return x_finish(Environment,"exception",x_lang("Trigger name is empty",FlowName))
 			}
 		}
 		
 		if not x_ManualTriggerExist(FlowID, TriggerName)
 		{
-			return x_finish(Environment,"exception",lang("Trigger '%1%' in flow '%2%' does not exist",TriggerNameText, FlowName))
+			return x_finish(Environment,"exception",x_lang("Trigger '%1%' in flow '%2%' does not exist",TriggerNameText, FlowName))
 		}
 		
 		if (ElementParameters.Enable = 1)

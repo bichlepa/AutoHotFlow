@@ -934,6 +934,10 @@ x_FirstCallOfCheckSettings(Environment)
 	return xx_FirstCallOfCheckSettings(Environment)
 }
 
+x_lang(key, params*)
+{
+	return xx_lang(key, params*)
+}
 x_randomPhrase()
 {
 	return xx_randomPhrase()

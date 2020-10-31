@@ -536,6 +536,11 @@ xx_FirstCallOfCheckSettings(Environment)
 {
 }
 
+; returns a translated string
+xx_lang(key, params*)
+{
+	return lang(key, params*)
+}
 ; returns a random phrase which can be used to create rememberable IDs
 xx_randomPhrase()
 {

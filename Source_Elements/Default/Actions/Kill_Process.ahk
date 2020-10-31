@@ -10,13 +10,13 @@ Element_getElementType_Action_Kill_Process()
 ;Name of the element
 Element_getName_Action_Kill_Process()
 {
-	return lang("Kill_Process")
+	return x_lang("Kill_Process")
 }
 
 ;Category of the element
 Element_getCategory_Action_Kill_Process()
 {
-	return lang("Process")
+	return x_lang("Process")
 }
 
 ;This function returns the package of the element.
@@ -53,7 +53,7 @@ Element_getParametrizationDetails_Action_Kill_Process(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: lang("Process name or ID")})
+	parametersToEdit.push({type: "Label", label: x_lang("Process name or ID")})
 	parametersToEdit.push({type: "Edit", id: "ProcessName", content: "String", WarnIfEmpty: true})
 	
 	
@@ -63,7 +63,7 @@ Element_getParametrizationDetails_Action_Kill_Process(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Kill_Process(Environment, ElementParameters)
 {
-	return lang("Kill_Process") 
+	return x_lang("Kill_Process") 
 }
 
 ;Called every time the user changes any parameter.
@@ -94,12 +94,12 @@ Element_run_Action_Kill_Process(Environment, ElementParameters)
 		Process,exist,% EvaluatedParameters.ProcessName
 		if (ErrorLevel=0)
 		{
-			x_finish(Environment,"exception", lang("Process '%1%' does not exist", EvaluatedParameters.ProcessName))
+			x_finish(Environment,"exception", x_lang("Process '%1%' does not exist", EvaluatedParameters.ProcessName))
 			
 		}
 		else
 		{
-			x_finish(Environment,"exception", lang("Process '%1%' could not be closed", EvaluatedParameters.ProcessName))
+			x_finish(Environment,"exception", x_lang("Process '%1%' could not be closed", EvaluatedParameters.ProcessName))
 			
 		}
 

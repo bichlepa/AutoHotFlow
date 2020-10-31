@@ -10,13 +10,13 @@ Element_getElementType_Action_Trigonometry()
 ;Name of the element
 Element_getName_Action_Trigonometry()
 {
-	return lang("Trigonometry")
+	return x_lang("Trigonometry")
 }
 
 ;Category of the element
 Element_getCategory_Action_Trigonometry()
 {
-	return lang("Variable")
+	return x_lang("Variable")
 }
 
 ;This function returns the package of the element.
@@ -53,14 +53,14 @@ Element_getParametrizationDetails_Action_Trigonometry(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: lang("Output Variable_name")})
+	parametersToEdit.push({type: "Label", label: x_lang("Output Variable_name")})
 	parametersToEdit.push({type: "Edit", id: "Varname", default: "NewVariable", content: "VariableName", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label:  lang("Input number")})
+	parametersToEdit.push({type: "Label", label:  x_lang("Input number")})
 	parametersToEdit.push({type: "Edit", id: "VarValue", default: 0.5, content: "Number", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label:  lang("Operation")})
-	parametersToEdit.push({type: "Radio", id: "Operation", default: 2, choices: [lang("Sine"), lang("Cosine"), lang("Tangent"), lang("Arcsine"), lang("Arccosine"), lang("Arctangent")], result: "enum", enum: ["Sine", "Cosine", "Tangent", "Arcsine", "Arccosine", "Arctangent"]})
-	parametersToEdit.push({type: "Label", label:  lang("Unit")})
-	parametersToEdit.push({type: "Radio", id: "Unit", default: 1, choices: [lang("Radian"), lang("Degree")], result: "enum", enum: ["Radian", "Degree"]})
+	parametersToEdit.push({type: "Label", label:  x_lang("Operation")})
+	parametersToEdit.push({type: "Radio", id: "Operation", default: 2, choices: [x_lang("Sine"), x_lang("Cosine"), x_lang("Tangent"), x_lang("Arcsine"), x_lang("Arccosine"), x_lang("Arctangent")], result: "enum", enum: ["Sine", "Cosine", "Tangent", "Arcsine", "Arccosine", "Arctangent"]})
+	parametersToEdit.push({type: "Label", label:  x_lang("Unit")})
+	parametersToEdit.push({type: "Radio", id: "Unit", default: 1, choices: [x_lang("Radian"), x_lang("Degree")], result: "enum", enum: ["Radian", "Degree"]})
 	
 	return parametersToEdit
 }
@@ -68,7 +68,7 @@ Element_getParametrizationDetails_Action_Trigonometry(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Trigonometry(Environment, ElementParameters)
 {
-	return lang("Trigonometry") 
+	return x_lang("Trigonometry") 
 }
 
 ;Called every time the user changes any parameter.

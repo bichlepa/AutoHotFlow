@@ -1311,7 +1311,7 @@ ui_MoveConnection(connection1 = "", element1 = "", connection2 = "", element2 = 
 		if (clickedElement = Element1 OR clickedElement = Element2)
 		{
 			; user created a loop with only one element within it
-			Msgbox,% lang("The_Connection_cannot_start_and_end_on_the_same_element!")
+			Msgbox,% lang("The_connection_cannot_start_and_end_on_the_same_element!")
 			return "aborted"
 		}
 		
@@ -1489,7 +1489,7 @@ ui_MoveConnection(connection1 = "", element1 = "", connection2 = "", element2 = 
 					forConnectionToPart := _getConnectionProperty(FlowID, forConnectionID, "toPart")
 					if (Connection1FromPart = forConnectionFromPart and Connection1ToPart = forConnectionToPart)
 					{
-						msgbox,% lang("This_Connection_Already_Exists!")
+						msgbox,% lang("This_connection_already_exists!")
 						MovementAborted:=true
 						return ; back to the gosub call
 					}
@@ -1508,7 +1508,7 @@ ui_MoveConnection(connection1 = "", element1 = "", connection2 = "", element2 = 
 					forConnectionToPart := _getConnectionProperty(FlowID, forConnectionID, "toPart")
 					if (Connection1FromPart = forConnectionFromPart and Connection1ToPart = forConnectionToPart)
 					{
-						msgbox,% lang("This_Connection_Already_Exists!")
+						msgbox,% lang("This_connection_already_exists!")
 						MovementAborted:=true
 						return ; back to the gosub call
 					}

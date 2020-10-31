@@ -10,13 +10,13 @@ Element_getElementType_Action_Send_keystrokes()
 ;Name of the element
 Element_getName_Action_Send_keystrokes()
 {
-	return lang("Send_keystrokes")
+	return x_lang("Send_keystrokes")
 }
 
 ;Category of the element
 Element_getCategory_Action_Send_keystrokes()
 {
-	return lang("User_simulation")
+	return x_lang("User_simulation")
 }
 
 ;This function returns the package of the element.
@@ -54,11 +54,11 @@ Element_getParametrizationDetails_Action_Send_keystrokes(Environment)
 	parametersToEdit:=Object()
 	
 	
-	parametersToEdit.push({type: "Label", label: lang("Keys_or_text_to_send")})
-	parametersToEdit.push({type: "Checkbox", id: "RawMode", default: 0, label: lang("Raw mode")})
+	parametersToEdit.push({type: "Label", label: x_lang("Keys_or_text_to_send")})
+	parametersToEdit.push({type: "Checkbox", id: "RawMode", default: 0, label: x_lang("Raw mode")})
 	parametersToEdit.push({type: "Edit", id: "KeysToSend", content: ["RawString", "String"], contentID: "KeysToSendContentType", ContentDefault: "String", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("Send mode")})
-	parametersToEdit.push({type: "Radio", id: "SendMode", default: 1, choices: [lang("Input mode"), lang("Event mode"), lang("Play mode")], result: "enum", enum: ["Input", "Event", "Play"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Send mode")})
+	parametersToEdit.push({type: "Radio", id: "SendMode", default: 1, choices: [x_lang("Input mode"), x_lang("Event mode"), x_lang("Play mode")], result: "enum", enum: ["Input", "Event", "Play"]})
 	
 	return parametersToEdit
 }
@@ -66,7 +66,7 @@ Element_getParametrizationDetails_Action_Send_keystrokes(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Send_keystrokes(Environment, ElementParameters)
 {
-	return lang("Send_keystrokes") 
+	return x_lang("Send_keystrokes") 
 }
 
 ;Called every time the user changes any parameter.

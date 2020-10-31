@@ -10,13 +10,13 @@ Element_getElementType_Action_Rename_Folder()
 ;Name of the element
 Element_getName_Action_Rename_Folder()
 {
-	return lang("Rename_Folder")
+	return x_lang("Rename_Folder")
 }
 
 ;Category of the element
 Element_getCategory_Action_Rename_Folder()
 {
-	return lang("File")
+	return x_lang("File")
 }
 
 ;This function returns the package of the element.
@@ -53,10 +53,10 @@ Element_getParametrizationDetails_Action_Rename_Folder(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: lang("Source folder")})
-	parametersToEdit.push({type: "Folder", id: "folder", label: lang("Select a folder")})
-	parametersToEdit.push({type: "Label", label: lang("Destination file or folder")})
-	parametersToEdit.push({type: "Edit", id: "newName", default: lang("Renamed"), content: "String", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: x_lang("Source folder")})
+	parametersToEdit.push({type: "Folder", id: "folder", label: x_lang("Select a folder")})
+	parametersToEdit.push({type: "Label", label: x_lang("Destination file or folder")})
+	parametersToEdit.push({type: "Edit", id: "newName", default: x_lang("Renamed"), content: "String", WarnIfEmpty: true})
 	
 	return parametersToEdit
 }
@@ -64,7 +64,7 @@ Element_getParametrizationDetails_Action_Rename_Folder(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Rename_Folder(Environment, ElementParameters)
 {
-	return lang("Rename_Folder") 
+	return x_lang("Rename_Folder") 
 }
 
 ;Called every time the user changes any parameter.
@@ -88,17 +88,17 @@ Element_run_Action_Rename_Folder(Environment, ElementParameters)
 
 	if not FileExist(folderFrom)
 	{
-		x_finish(Environment, "exception", lang("%1% '%2%' does not exist.",lang("Source folder"), folderFrom)) 
+		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.",x_lang("Source folder"), folderFrom)) 
 		return
 	}
 	if not newName
 	{
-		x_finish(Environment, "exception", lang("%1% is not specified.",lang("New folder name"))) 
+		x_finish(Environment, "exception", x_lang("%1% is not specified.",x_lang("New folder name"))) 
 		return
 	}
 	if (not instr(FileExist(fileFrom),"D"))
 	{
-		x_finish(Environment, "exception", lang("%1% '%2%' is not a folder.",lang("Source folder"), fileFrom)) 
+		x_finish(Environment, "exception", x_lang("%1% '%2%' is not a folder.",x_lang("Source folder"), fileFrom)) 
 		return
 	}
 
@@ -109,7 +109,7 @@ Element_run_Action_Rename_Folder(Environment, ElementParameters)
 	
 	if errorlevel ;Indecates that files could not be copied
 	{
-		x_finish(Environment, "exception", lang("Folder '%1%' could not be renamed to '%2%'",folderFrom, newFolderPath)) 
+		x_finish(Environment, "exception", x_lang("Folder '%1%' could not be renamed to '%2%'",folderFrom, newFolderPath)) 
 		return
 	}
 	

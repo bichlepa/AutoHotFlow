@@ -10,13 +10,13 @@ Element_getElementType_Action_HTTP_Request()
 ;Name of the element
 Element_getName_Action_HTTP_Request()
 {
-	return lang("HTTP_Request")
+	return x_lang("HTTP_Request")
 }
 
 ;Category of the element
 Element_getCategory_Action_HTTP_Request()
 {
-	return lang("Internet")
+	return x_lang("Internet")
 }
 
 ;This function returns the package of the element.
@@ -53,62 +53,62 @@ Element_getParametrizationDetails_Action_HTTP_Request(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: lang("URL")})
+	parametersToEdit.push({type: "Label", label: x_lang("URL")})
 	parametersToEdit.push({type: "Edit", id: "URL", default: "http://www.example.com", content: ["RawString", "String", "Expression"], contentID: "IsExpression", contentDefault: "string", WarnIfEmpty: true})
 	
-	parametersToEdit.push({type: "Label", label: lang("Post data")})
-	parametersToEdit.push({type: "Radio", id: "WhereToGetPostData", default: 1, result: "Enum", choices: [lang("Do not upload any data"), lang("Use follwing post data"), lang("Use file as source (upload)")], enum: ["NoUpload", "Specified", "File"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Post data")})
+	parametersToEdit.push({type: "Radio", id: "WhereToGetPostData", default: 1, result: "Enum", choices: [x_lang("Do not upload any data"), x_lang("Use follwing post data"), x_lang("Use file as source (upload)")], enum: ["NoUpload", "Specified", "File"]})
 	parametersToEdit.push({type: "Edit", id: "PostData", default: "", multiline: true, content: "String"})
-	parametersToEdit.push({type: "Checkbox", id: "URIEncodePostData", default: 0, label: lang("URI encode post data")})
-	parametersToEdit.push({type: "Label", label: lang("Charset"), size: "small"})
-	parametersToEdit.push({type: "Radio", id: "WhichCodepage", default: 1, result: "Enum", choices: [lang("Use UTF-8 charset"), lang("Define charset"), lang("Define codepage")], enum: ["utf-8", "definedCharset", "definedCodepage"]})
+	parametersToEdit.push({type: "Checkbox", id: "URIEncodePostData", default: 0, label: x_lang("URI encode post data")})
+	parametersToEdit.push({type: "Label", label: x_lang("Charset"), size: "small"})
+	parametersToEdit.push({type: "Radio", id: "WhichCodepage", default: 1, result: "Enum", choices: [x_lang("Use UTF-8 charset"), x_lang("Define charset"), x_lang("Define codepage")], enum: ["utf-8", "definedCharset", "definedCodepage"]})
 	parametersToEdit.push({type: "Edit", id: "Codepage", default: "", content: "String", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("File path"), size: "small"})
-	parametersToEdit.push({type: "File", id: "InputFile", label: lang("Select file")})
+	parametersToEdit.push({type: "Label", label: x_lang("File path"), size: "small"})
+	parametersToEdit.push({type: "File", id: "InputFile", label: x_lang("Select file")})
 	
-	parametersToEdit.push({type: "Label", label: lang("Request headers")})
+	parametersToEdit.push({type: "Label", label: x_lang("Request headers")})
 	parametersToEdit.push({type: "Edit", id: "RequestHeaders", default: "", multiline: true, content: "String"})
-	parametersToEdit.push({type: "Checkbox", id: "URIEncodeRequestHeaders", default: 0, label: lang("URI encode request headers")})
+	parametersToEdit.push({type: "Checkbox", id: "URIEncodeRequestHeaders", default: 0, label: x_lang("URI encode request headers")})
 	
-	parametersToEdit.push({type: "Label", label: lang("Response data")})
-	parametersToEdit.push({type: "Radio", id: "WhereToPutResponseData", default: 1, result: "Enum", choices: [lang("Write response data to a variable"), lang("Write response data to file (download)")], enum: ["Variable", "File"]})
-	parametersToEdit.push({type: "Label", label: lang("Output variable"), size: "small"})
+	parametersToEdit.push({type: "Label", label: x_lang("Response data")})
+	parametersToEdit.push({type: "Radio", id: "WhereToPutResponseData", default: 1, result: "Enum", choices: [x_lang("Write response data to a variable"), x_lang("Write response data to file (download)")], enum: ["Variable", "File"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Output variable"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: "ResponseDataVar", default: "HTTPResponseData", content: "VariableName"})
 	;~ parametersToEdit.push({type: "Checkbox", id: "KeepBinary", default: 0, label: langeeee("Don't convert to codepage of AHF. Keep binary instead.")}) ;TODO Binary data
-	parametersToEdit.push({type: "Label", label: lang("File path"), size: "small"})
-	parametersToEdit.push({type: "File", id: "OutputFile", default: "HTTPResponseData.html", label: lang("Select file")})
+	parametersToEdit.push({type: "Label", label: x_lang("File path"), size: "small"})
+	parametersToEdit.push({type: "File", id: "OutputFile", default: "HTTPResponseData.html", label: x_lang("Select file")})
 	
-	parametersToEdit.push({type: "Label", label: lang("Response headers")})
+	parametersToEdit.push({type: "Label", label: x_lang("Response headers")})
 	parametersToEdit.push({type: "Edit", id: "ResponseHeadersVar", default: "HTTPResponseHeaders", content: "VariableName"})
 	
-	parametersToEdit.push({type: "Label", label: lang("Content type")})
-	parametersToEdit.push({type: "Radio", id: "WhichContentType", default: 1, result: "Enum", choices: [lang("Automatic"), lang("Custom")], enum: ["automatic", "custom"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Content type")})
+	parametersToEdit.push({type: "Radio", id: "WhichContentType", default: 1, result: "Enum", choices: [x_lang("Automatic"), x_lang("Custom")], enum: ["automatic", "custom"]})
 	parametersToEdit.push({type: "Edit", id: "Contenttype", default: "", content: "String", WarnIfEmpty: true})
 	
-	parametersToEdit.push({type: "Label", label: lang("Content length")})
-	parametersToEdit.push({type: "Radio", id: "WhichContentLength", default: 1, result: "Enum", choices: [lang("Automatic"), lang("Custom")], enum: ["automatic", "custom"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Content length")})
+	parametersToEdit.push({type: "Radio", id: "WhichContentLength", default: 1, result: "Enum", choices: [x_lang("Automatic"), x_lang("Custom")], enum: ["automatic", "custom"]})
 	parametersToEdit.push({type: "Edit", id: "ContentLength", default: "", content: "expression", WarnIfEmpty: true})
 	
-	parametersToEdit.push({type: "Label", label: lang("Content MD5")})
-	parametersToEdit.push({type: "Radio", id: "WhichContentMD5", default: 1, result: "Enum", choices: [lang("Do not use"), lang("Automatic"), lang("Custom")], enum: ["none", "automatic", "custom"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Content MD5")})
+	parametersToEdit.push({type: "Radio", id: "WhichContentMD5", default: 1, result: "Enum", choices: [x_lang("Do not use"), x_lang("Automatic"), x_lang("Custom")], enum: ["none", "automatic", "custom"]})
 	parametersToEdit.push({type: "Edit", id: "ContentMD5", default: "", content: "String", WarnIfEmpty: true})
 	
-	parametersToEdit.push({type: "Label", label: lang("Method")})
-	parametersToEdit.push({type: "Radio", id: "WhichMethod", default: 1, result: "Enum", choices: [lang("Automatic"), lang("Custom")], enum: ["automatic", "custom"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Method")})
+	parametersToEdit.push({type: "Radio", id: "WhichMethod", default: 1, result: "Enum", choices: [x_lang("Automatic"), x_lang("Custom")], enum: ["automatic", "custom"]})
 	parametersToEdit.push({type: "DropDown", id: "Method", default: "GET", result: "enum", choices: ["GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS", "TRACE"], enum: ["GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS", "TRACE"]})
 	
-	parametersToEdit.push({type: "Label", label: lang("User agent")})
-	parametersToEdit.push({type: "Radio", id: "WhichUserAgent", default: 1, result: "Enum", choices: [lang("Automatic"), lang("Custom")], enum: ["automatic", "custom"]})
+	parametersToEdit.push({type: "Label", label: x_lang("User agent")})
+	parametersToEdit.push({type: "Radio", id: "WhichUserAgent", default: 1, result: "Enum", choices: [x_lang("Automatic"), x_lang("Custom")], enum: ["automatic", "custom"]})
 	parametersToEdit.push({type: "Edit", id: "UserAgent", default: "", content: "String", WarnIfEmpty: true})
 	
-	parametersToEdit.push({type: "Label", label: lang("Flags")})
+	parametersToEdit.push({type: "Label", label: x_lang("Flags")})
 	parametersToEdit.push({type: "Edit", id: "Flags", default: "", multiline: true, content: "String"})
 	
-	parametersToEdit.push({type: "Label", label: lang("Proxy")})
-	parametersToEdit.push({type: "Radio", id: "WhichProxy", default: 1, result: "Enum", choices: [lang("No proxy"), lang("Automatic"), lang("Custom")], enum: ["none", "automatic", "custom"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Proxy")})
+	parametersToEdit.push({type: "Radio", id: "WhichProxy", default: 1, result: "Enum", choices: [x_lang("No proxy"), x_lang("Automatic"), x_lang("Custom")], enum: ["none", "automatic", "custom"]})
 	parametersToEdit.push({type: "Edit", id: "Proxy", default: "", content: "String", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("Bypass proxy"), size: "small"})
-	parametersToEdit.push({type: "Checkbox", id: "WhetherBypassProxy", default: 0, label: lang("Don't use proxy to access following website")})
+	parametersToEdit.push({type: "Label", label: x_lang("Bypass proxy"), size: "small"})
+	parametersToEdit.push({type: "Checkbox", id: "WhetherBypassProxy", default: 0, label: x_lang("Don't use proxy to access following website")})
 	parametersToEdit.push({type: "Edit", id: "BypassProxy", default: "", content: "String", WarnIfEmpty: true})
 	
 	
@@ -118,7 +118,7 @@ Element_getParametrizationDetails_Action_HTTP_Request(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_HTTP_Request(Environment, ElementParameters)
 {
-	return lang("HTTP_Request") 
+	return x_lang("HTTP_Request") 
 }
 
 ;Called every time the user changes any parameter.
@@ -251,7 +251,7 @@ Element_run_Action_HTTP_Request(Environment, ElementParameters)
 		if (evRes.error)
 		{
 			;On error, finish with exception and return
-			x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.URL) "`n`n" evRes.error) 
+			x_finish(Environment, "exception", x_lang("An error occured while parsing expression '%1%'", ElementParameters.URL) "`n`n" evRes.error) 
 			return
 		}
 		else
@@ -271,14 +271,14 @@ Element_run_Action_HTTP_Request(Environment, ElementParameters)
 	if not x_CheckVariableName(ResponseDataVar)
 	{
 		;On error, finish with exception and return
-		x_finish(Environment, "exception", lang("%1% is not valid", lang("Ouput variable name '%1%'", ResponseDataVar)))
+		x_finish(Environment, "exception", x_lang("%1% is not valid", x_lang("Ouput variable name '%1%'", ResponseDataVar)))
 		return
 	}
 	ResponseHeadersVar := x_replaceVariables(Environment, ElementParameters.ResponseHeadersVar)
 	if not x_CheckVariableName(ResponseHeadersVar)
 	{
 		;On error, finish with exception and return
-		x_finish(Environment, "exception", lang("%1% is not valid", lang("Ouput variable name '%1%'", ResponseHeadersVar)))
+		x_finish(Environment, "exception", x_lang("%1% is not valid", x_lang("Ouput variable name '%1%'", ResponseHeadersVar)))
 		return
 	}
 	
@@ -306,7 +306,7 @@ Element_run_Action_HTTP_Request(Environment, ElementParameters)
 		InputFile := x_GetFullPath(Environment, x_replaceVariables(Environment, ElementParameters.InputFile))
 		if not FileExist(InputFile)
 		{
-			x_finish(Environment, "exception", lang("%1% '%2%' does not exist.",lang("Source file"), InputFile)) 
+			x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.",x_lang("Source file"), InputFile)) 
 			return
 		}
 		
@@ -326,7 +326,7 @@ Element_run_Action_HTTP_Request(Environment, ElementParameters)
 			if (evRes.error)
 			{
 				;On error, finish with exception and return
-				x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.Contentlength) "`n`n" evRes.error) 
+				x_finish(Environment, "exception", x_lang("An error occured while parsing expression '%1%'", ElementParameters.Contentlength) "`n`n" evRes.error) 
 				return
 			}
 			else
@@ -354,7 +354,7 @@ Element_run_Action_HTTP_Request(Environment, ElementParameters)
 		SplitPath,OutputFile,,OutputFileDir
 		if not InStr(FileExist(OutputFileDir), "D") ;Check whether directory exists
 		{
-			x_finish(Environment, "exception", lang("%1% '%2%' does not exist.",lang("Destination folder"), OutputFileDir)) 
+			x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.",x_lang("Destination folder"), OutputFileDir)) 
 			return
 		}
 		Options.="SaveAs: " OutputFile "`n"

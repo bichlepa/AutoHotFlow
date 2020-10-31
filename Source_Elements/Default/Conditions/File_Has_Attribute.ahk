@@ -10,13 +10,13 @@ Element_getElementType_Condition_File_Has_Attribute()
 ;Name of the element
 Element_getName_Condition_File_Has_Attribute()
 {
-	return lang("File_Has_Attribute")
+	return x_lang("File_Has_Attribute")
 }
 
 ;Category of the element
 Element_getCategory_Condition_File_Has_Attribute()
 {
-	return lang("File")
+	return x_lang("File")
 }
 
 ;This function returns the package of the element.
@@ -53,10 +53,10 @@ Element_getParametrizationDetails_Condition_File_Has_Attribute(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: lang("File path")})
-	parametersToEdit.push({type: "File", id: "file", label: lang("Select a file")})
-	parametersToEdit.push({type: "Label", label: lang("Which attribute")})
-	parametersToEdit.push({type: "Radio", id: "Attribute", default: 1, choices: [lang("Normal"), lang("Read only"), lang("Archive"), lang("System"), lang("Hidden"), lang("Directory"), lang("Offline"), lang("Compressed"), lang("Temporary")], result: "enum", enum: ["N", "R", "A", "S", "H", "D", "O", "C", "T"]})
+	parametersToEdit.push({type: "Label", label: x_lang("File path")})
+	parametersToEdit.push({type: "File", id: "file", label: x_lang("Select a file")})
+	parametersToEdit.push({type: "Label", label: x_lang("Which attribute")})
+	parametersToEdit.push({type: "Radio", id: "Attribute", default: 1, choices: [x_lang("Normal"), x_lang("Read only"), x_lang("Archive"), x_lang("System"), x_lang("Hidden"), x_lang("Directory"), x_lang("Offline"), x_lang("Compressed"), x_lang("Temporary")], result: "enum", enum: ["N", "R", "A", "S", "H", "D", "O", "C", "T"]})
 	
 	return parametersToEdit
 }
@@ -64,7 +64,7 @@ Element_getParametrizationDetails_Condition_File_Has_Attribute(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Condition_File_Has_Attribute(Environment, ElementParameters)
 {
-	return lang("File_Has_Attribute") 
+	return x_lang("File_Has_Attribute") 
 }
 
 ;Called every time the user changes any parameter.
@@ -97,12 +97,12 @@ Element_run_Condition_File_Has_Attribute(Environment, ElementParameters)
 	{
 		if not fileexist(tempPath)
 		{
-			x_finish(Environment, "exception", lang("File '%1%' does not exist",file)) 
+			x_finish(Environment, "exception", x_lang("File '%1%' does not exist",file)) 
 			return
 		}
 		else
 		{
-			x_finish(Environment, "exception", lang("Attributes of file '%1%' could not be read",file)) 
+			x_finish(Environment, "exception", x_lang("Attributes of file '%1%' could not be read",file)) 
 			return
 		}
 	}

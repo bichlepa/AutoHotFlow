@@ -10,13 +10,13 @@ Element_getElementType_Action_New_variable()
 ;Name of the element
 Element_getName_Action_New_variable()
 {
-	return lang("New_variable")
+	return x_lang("New_variable")
 }
 
 ;Category of the element
 Element_getCategory_Action_New_variable()
 {
-	return lang("Variable")
+	return x_lang("Variable")
 }
 
 ;This function returns the package of the element.
@@ -53,9 +53,9 @@ Element_getStabilityLevel_Action_New_variable()
 Element_getParametrizationDetails_Action_New_variable(Environment)
 {
 	parametersToEdit:=Object()
-	parametersToEdit.push({type: "Label", label: lang("Variable_name")})
+	parametersToEdit.push({type: "Label", label: x_lang("Variable_name")})
 	parametersToEdit.push({type: "Edit", id: "Varname", default: "NewVariable", content: "VariableName", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label:  lang("Value")})
+	parametersToEdit.push({type: "Label", label:  x_lang("Value")})
 	parametersToEdit.push({type: "Edit", id: "VarValue", default: "New element", content: ["String", "Expression"], contentID: "expression", contentDefault: "string", WarnIfEmpty: true})
 
 	return parametersToEdit
@@ -65,7 +65,7 @@ Element_getParametrizationDetails_Action_New_variable(Environment)
 Element_GenerateName_Action_New_variable(Environment, ElementParameters)
 {
 	global
-	return % lang("New_variable") " - " ElementParameters.Varname " = " ElementParameters.VarValue
+	return % x_lang("New_variable") " - " ElementParameters.Varname " = " ElementParameters.VarValue
 	
 }
 
@@ -89,7 +89,7 @@ Element_run_Action_New_variable(Environment, ElementParameters)
 	if not x_CheckVariableName(varname)
 	{
 		;On error, finish with exception and return
-		x_finish(Environment, "exception", lang("%1% is not valid", lang("Ouput variable name '%1%'", varname)))
+		x_finish(Environment, "exception", x_lang("%1% is not valid", x_lang("Ouput variable name '%1%'", varname)))
 		return
 	}
 	
@@ -99,7 +99,7 @@ Element_run_Action_New_variable(Environment, ElementParameters)
 		if (evRes.error)
 		{
 			;On error, finish with exception and return
-			x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.VarValue) "`n`n" evRes.error) 
+			x_finish(Environment, "exception", x_lang("An error occured while parsing expression '%1%'", ElementParameters.VarValue) "`n`n" evRes.error) 
 			return
 		}
 		else

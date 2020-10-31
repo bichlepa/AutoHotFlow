@@ -10,13 +10,13 @@ Element_getElementType_Action_Rename_File()
 ;Name of the element
 Element_getName_Action_Rename_File()
 {
-	return lang("Rename_File")
+	return x_lang("Rename_File")
 }
 
 ;Category of the element
 Element_getCategory_Action_Rename_File()
 {
-	return lang("File")
+	return x_lang("File")
 }
 
 ;This function returns the package of the element.
@@ -53,12 +53,12 @@ Element_getParametrizationDetails_Action_Rename_File(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: lang("Source file")})
-	parametersToEdit.push({type: "File", id: "file", label: lang("Select a file")})
-	parametersToEdit.push({type: "Label", label: lang("New file name")})
-	parametersToEdit.push({type: "Edit", id: "newName", default: lang("Renamed") ".txt", content: "String", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("Overwrite")})
-	parametersToEdit.push({type: "Checkbox", id: "Overwrite", default: 0, label: lang("Overwrite existing files")})
+	parametersToEdit.push({type: "Label", label: x_lang("Source file")})
+	parametersToEdit.push({type: "File", id: "file", label: x_lang("Select a file")})
+	parametersToEdit.push({type: "Label", label: x_lang("New file name")})
+	parametersToEdit.push({type: "Edit", id: "newName", default: x_lang("Renamed") ".txt", content: "String", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: x_lang("Overwrite")})
+	parametersToEdit.push({type: "Checkbox", id: "Overwrite", default: 0, label: x_lang("Overwrite existing files")})
 	
 	return parametersToEdit
 }
@@ -66,7 +66,7 @@ Element_getParametrizationDetails_Action_Rename_File(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Rename_File(Environment, ElementParameters)
 {
-	return lang("Rename_File") 
+	return x_lang("Rename_File") 
 }
 
 ;Called every time the user changes any parameter.
@@ -91,17 +91,17 @@ Element_run_Action_Rename_File(Environment, ElementParameters)
 
 	if not FileExist(fileFrom)
 	{
-		x_finish(Environment, "exception", lang("%1% '%2%' does not exist.",lang("Source file"), fileFrom)) 
+		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.",x_lang("Source file"), fileFrom)) 
 		return
 	}
 	if not newName
 	{
-		x_finish(Environment, "exception", lang("%1% is not specified.",lang("New file name"))) 
+		x_finish(Environment, "exception", x_lang("%1% is not specified.",x_lang("New file name"))) 
 		return
 	}
 	if (instr(FileExist(fileFrom),"D"))
 	{
-		x_finish(Environment, "exception", lang("%1% '%2%' is a folder.",lang("Source file"), fileFrom)) 
+		x_finish(Environment, "exception", x_lang("%1% '%2%' is a folder.",x_lang("Source file"), fileFrom)) 
 		return
 	}
 
@@ -115,12 +115,12 @@ Element_run_Action_Rename_File(Environment, ElementParameters)
 	{
 		if errorlevel ;Indecates that files could not be copied
 		{
-			x_finish(Environment, "exception", lang("%1% files could not be renamed from '%2%' to '%3%'",temperror, fileFrom, newFilePath)) 
+			x_finish(Environment, "exception", x_lang("%1% files could not be renamed from '%2%' to '%3%'",temperror, fileFrom, newFilePath)) 
 			return
 		}
 		else
 		{
-			x_finish(Environment, "exception", lang("No files found (%1%)", fileFrom)) 
+			x_finish(Environment, "exception", x_lang("No files found (%1%)", fileFrom)) 
 			return
 		}
 	}
@@ -128,7 +128,7 @@ Element_run_Action_Rename_File(Environment, ElementParameters)
 	{
 		if errorlevel ;Indecates that files could not be copied
 		{
-			x_finish(Environment, "exception", lang("%1% files could not be renamed from '%2%' to '%3%'",temperror, fileFrom, newFilePath)) 
+			x_finish(Environment, "exception", x_lang("%1% files could not be renamed from '%2%' to '%3%'",temperror, fileFrom, newFilePath)) 
 			return
 		}
 	}

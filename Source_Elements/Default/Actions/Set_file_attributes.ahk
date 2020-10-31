@@ -10,13 +10,13 @@ Element_getElementType_Action_Set_file_attributes()
 ;Name of the element
 Element_getName_Action_Set_file_attributes()
 {
-	return lang("Set_file_attributes")
+	return x_lang("Set_file_attributes")
 }
 
 ;Category of the element
 Element_getCategory_Action_Set_file_attributes()
 {
-	return lang("File")
+	return x_lang("File")
 }
 
 ;This function returns the package of the element.
@@ -53,18 +53,18 @@ Element_getParametrizationDetails_Action_Set_file_attributes(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: lang("Select file")})
-	parametersToEdit.push({type: "File", id: "file", label: lang("Select a file")})
-	parametersToEdit.push({type: "Label", label: lang("Attributes")})
-	parametersToEdit.push({type: "CheckBox", id: "ReadOnly", default: -1, label: lang("Read only"), gray: true})
-	parametersToEdit.push({type: "CheckBox", id: "Archive", default: -1, label: lang("Archive"), gray: true})
-	parametersToEdit.push({type: "CheckBox", id: "System", default: -1, label: lang("System"), gray: true})
-	parametersToEdit.push({type: "CheckBox", id: "Hidden", default: -1, label: lang("Hidden"), gray: true})
-	parametersToEdit.push({type: "CheckBox", id: "Offline", default: -1, label: lang("Offline"), gray: true})
-	parametersToEdit.push({type: "CheckBox", id: "Temporary", default: -1, label: lang("Temporary"), gray: true})
-	parametersToEdit.push({type: "Label", label: lang("Options")})
-	parametersToEdit.push({type: "Radio", id: "OperateOnWhat", default: 1, choices: [lang("Operate on files"), lang("Operate on files and folders"), lang("Operate on folders")], result: "enum", enum: ["Files", "FilesAndFolders", "Folders"]})
-	parametersToEdit.push({type: "Checkbox", id: "Recurse", default: 0, label: lang("Recurse subfolders into")})
+	parametersToEdit.push({type: "Label", label: x_lang("Select file")})
+	parametersToEdit.push({type: "File", id: "file", label: x_lang("Select a file")})
+	parametersToEdit.push({type: "Label", label: x_lang("Attributes")})
+	parametersToEdit.push({type: "CheckBox", id: "ReadOnly", default: -1, label: x_lang("Read only"), gray: true})
+	parametersToEdit.push({type: "CheckBox", id: "Archive", default: -1, label: x_lang("Archive"), gray: true})
+	parametersToEdit.push({type: "CheckBox", id: "System", default: -1, label: x_lang("System"), gray: true})
+	parametersToEdit.push({type: "CheckBox", id: "Hidden", default: -1, label: x_lang("Hidden"), gray: true})
+	parametersToEdit.push({type: "CheckBox", id: "Offline", default: -1, label: x_lang("Offline"), gray: true})
+	parametersToEdit.push({type: "CheckBox", id: "Temporary", default: -1, label: x_lang("Temporary"), gray: true})
+	parametersToEdit.push({type: "Label", label: x_lang("Options")})
+	parametersToEdit.push({type: "Radio", id: "OperateOnWhat", default: 1, choices: [x_lang("Operate on files"), x_lang("Operate on files and folders"), x_lang("Operate on folders")], result: "enum", enum: ["Files", "FilesAndFolders", "Folders"]})
+	parametersToEdit.push({type: "Checkbox", id: "Recurse", default: 0, label: x_lang("Recurse subfolders into")})
 	
 	
 	return parametersToEdit
@@ -73,7 +73,7 @@ Element_getParametrizationDetails_Action_Set_file_attributes(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Set_file_attributes(Environment, ElementParameters)
 {
-	return lang("Set_file_attributes") 
+	return x_lang("Set_file_attributes") 
 }
 
 ;Called every time the user changes any parameter.
@@ -139,12 +139,12 @@ Element_run_Action_Set_file_attributes(Environment, ElementParameters)
 	{
 		if not fileexist(tempPath)
 		{
-			x_finish(Environment, "exception", lang("File '%1%' does not exist",tempPath))
+			x_finish(Environment, "exception", x_lang("File '%1%' does not exist",tempPath))
 			return
 		}
 		else
 		{
-			x_finish(Environment, "exception", lang("Attributes of file '%1%' could not be changed",tempPath)) 
+			x_finish(Environment, "exception", x_lang("Attributes of file '%1%' could not be changed",tempPath)) 
 			return
 		}
 	}

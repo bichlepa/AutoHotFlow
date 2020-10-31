@@ -10,13 +10,13 @@ Element_getElementType_Action_Download_File()
 ;Name of the element
 Element_getName_Action_Download_File()
 {
-	return lang("Download_File")
+	return x_lang("Download_File")
 }
 
 ;Category of the element
 Element_getCategory_Action_Download_File()
 {
-	return lang("File")
+	return x_lang("File")
 }
 
 ;This function returns the package of the element.
@@ -52,10 +52,10 @@ Element_getStabilityLevel_Action_Download_File()
 Element_getParametrizationDetails_Action_Download_File(Environment)
 {
 	parametersToEdit:=Object()
-	parametersToEdit.push({type: "Label", label: lang("URL")})
+	parametersToEdit.push({type: "Label", label: x_lang("URL")})
 	parametersToEdit.push({type: "Edit", id: "URL", default: "http://www.example.com", content: ["RawString", "String", "Expression"], contentID: "IsExpression", contentDefault: "string", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("File path")})
-	parametersToEdit.push({type: "File", id: "file", label: lang("Select file"), default: "%A_Desktop%\Downloaded example.html"})
+	parametersToEdit.push({type: "Label", label: x_lang("File path")})
+	parametersToEdit.push({type: "File", id: "file", label: x_lang("Select file"), default: "%A_Desktop%\Downloaded example.html"})
 	
 	
 	return parametersToEdit
@@ -64,7 +64,7 @@ Element_getParametrizationDetails_Action_Download_File(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Download_File(Environment, ElementParameters)
 {
-	return lang("Download_File") 
+	return x_lang("Download_File") 
 }
 
 ;Called every time the user changes any parameter.
@@ -88,7 +88,7 @@ Element_run_Action_Download_File(Environment, ElementParameters)
 		if (evRes.error)
 		{
 			;On error, finish with exception and return
-			x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.URL) "`n`n" evRes.error) 
+			x_finish(Environment, "exception", x_lang("An error occured while parsing expression '%1%'", ElementParameters.URL) "`n`n" evRes.error) 
 			return
 		}
 		else
@@ -106,7 +106,7 @@ Element_run_Action_Download_File(Environment, ElementParameters)
 	URLDownloadToFile,%URL%,%file%
 	if ErrorLevel
 	{
-		x_finish(Environment, "exception", lang("Couldn't download file") )
+		x_finish(Environment, "exception", x_lang("Couldn't download file") )
 		return
 	}
 

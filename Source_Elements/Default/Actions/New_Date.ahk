@@ -10,13 +10,13 @@ Element_getElementType_Action_New_Date()
 ;Name of the element
 Element_getName_Action_New_Date()
 {
-	return lang("New_Date")
+	return x_lang("New_Date")
 }
 
 ;Category of the element
 Element_getCategory_Action_New_Date()
 {
-	return lang("Variable")
+	return x_lang("Variable")
 }
 
 ;This function returns the package of the element.
@@ -53,10 +53,10 @@ Element_getParametrizationDetails_Action_New_Date(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: lang("Variable_name")})
+	parametersToEdit.push({type: "Label", label: x_lang("Variable_name")})
 	parametersToEdit.push({type: "Edit", id: "Varname", default: "NewDate", content: "VariableName", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label:  lang("Date")})
-	parametersToEdit.push({type: "Radio", id: "WhichDate", default: 2, choices: [lang("Current date and time"), lang("Specified date")], result: "enum", enum: ["Current", "Specified"]})
+	parametersToEdit.push({type: "Label", label:  x_lang("Date")})
+	parametersToEdit.push({type: "Radio", id: "WhichDate", default: 2, choices: [x_lang("Current date and time"), x_lang("Specified date")], result: "enum", enum: ["Current", "Specified"]})
 	parametersToEdit.push({type: "Dateandtime", id: "Date"})
 	
 	return parametersToEdit
@@ -65,7 +65,7 @@ Element_getParametrizationDetails_Action_New_Date(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_New_Date(Environment, ElementParameters)
 {
-	return lang("New_Date") 
+	return x_lang("New_Date") 
 }
 
 ;Called every time the user changes any parameter.
@@ -98,7 +98,7 @@ Element_run_Action_New_Date(Environment, ElementParameters)
 		tempdate:=EvaluatedParameters.date
 		if tempdate is not time
 		{
-			x_finish(Environment,"exception", lang("%1% is not valid",lang("Value '%1%'",tempdate)) )
+			x_finish(Environment,"exception", x_lang("%1% is not valid",x_lang("Value '%1%'",tempdate)) )
 			return
 		}
 		x_SetVariable(Environment,EvaluatedParameters.Varname,EvaluatedParameters.date)

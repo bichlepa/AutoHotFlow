@@ -10,13 +10,13 @@ Element_getElementType_Action_Execute_Flow()
 ;Name of the element
 Element_getName_Action_Execute_Flow()
 {
-	return lang("Execute_Flow")
+	return x_lang("Execute_Flow")
 }
 
 ;Category of the element
 Element_getCategory_Action_Execute_Flow()
 {
-	return lang("Flow_control")
+	return x_lang("Flow_control")
 }
 
 ;This function returns the package of the element.
@@ -66,17 +66,17 @@ Element_getParametrizationDetails_Action_Execute_Flow(Environment)
 	}
 	
 	parametersToEdit:=Object()
-	parametersToEdit.push({type: "Label", label: lang("Flow_name")})
-	parametersToEdit.push({type: "Checkbox", id: "ThisFlow", default: 1, label: lang("This flow (%1%)",myFlowName ) })
+	parametersToEdit.push({type: "Label", label: x_lang("Flow_name")})
+	parametersToEdit.push({type: "Checkbox", id: "ThisFlow", default: 1, label: x_lang("This flow (%1%)",myFlowName ) })
 	parametersToEdit.push({type: "ComboBox", id: "flowName", content: "String", WarnIfEmpty: true, result: "string", choices: choicesFlows})
-	parametersToEdit.push({type: "Label", label: lang("Trigger")})
-	parametersToEdit.push({type: "Checkbox", id: "DefaultTrigger", default: 1, label: lang("Default trigger") })
+	parametersToEdit.push({type: "Label", label: x_lang("Trigger")})
+	parametersToEdit.push({type: "Checkbox", id: "DefaultTrigger", default: 1, label: x_lang("Default trigger") })
 	parametersToEdit.push({type: "ComboBox", id: "triggerName", content: "String", WarnIfEmpty: true, result: "string", choices: choicesTriggers})
-	parametersToEdit.push({type: "Label", label:  lang("Options")})
-	parametersToEdit.push({type: "Checkbox", id: "SendLocalVars", default: 1, label: lang("Send local variables")})
-	parametersToEdit.push({type: "Checkbox", id: "SkipDisabled", default: 0, label: lang("Skip disabled flows without error")})
-	parametersToEdit.push({type: "Checkbox", id: "WaitToFinish", default: 0, label: lang("Wait for called flow to finish")})
-	parametersToEdit.push({type: "Checkbox", id: "ReturnVariables", default: 0, label: lang("Return local variables to the calling flow")})
+	parametersToEdit.push({type: "Label", label:  x_lang("Options")})
+	parametersToEdit.push({type: "Checkbox", id: "SendLocalVars", default: 1, label: x_lang("Send local variables")})
+	parametersToEdit.push({type: "Checkbox", id: "SkipDisabled", default: 0, label: x_lang("Skip disabled flows without error")})
+	parametersToEdit.push({type: "Checkbox", id: "WaitToFinish", default: 0, label: x_lang("Wait for called flow to finish")})
+	parametersToEdit.push({type: "Checkbox", id: "ReturnVariables", default: 0, label: x_lang("Return local variables to the calling flow")})
 
 	return parametersToEdit
 }
@@ -85,14 +85,14 @@ Element_getParametrizationDetails_Action_Execute_Flow(Environment)
 Element_GenerateName_Action_Execute_Flow(Environment, ElementParameters)
 {
 	if (ElementParameters.ThisFlow = True)
-		FlowName:=lang("This flow")
+		FlowName:=x_lang("This flow")
 	else
 		FlowName:=ElementParameters.flowName
 	if (ElementParameters.defaultTrigger = True)
-		TriggerName:=lang("Default trigger")
+		TriggerName:=x_lang("Default trigger")
 	else
 		TriggerName:=ElementParameters.TriggerName
-	return % lang("Execute_Flow") ": " FlowName " - " TriggerName
+	return % x_lang("Execute_Flow") ": " FlowName " - " TriggerName
 	
 }
 
@@ -172,7 +172,7 @@ Element_run_Action_Execute_Flow(Environment, ElementParameters)
 	if (ElementParameters.ThisFlow)
 	{
 		FlowName:=x_GetMyFlowName(Environment)
-		FlowNameText:=lang("This flow")
+		FlowNameText:=x_lang("This flow")
 	}
 	else
 	{
@@ -181,7 +181,7 @@ Element_run_Action_Execute_Flow(Environment, ElementParameters)
 		
 		if not x_FlowExistsByName(FlowName)
 		{
-			return x_finish(Environment,"exception",lang("Flow '%1%' does not exist",FlowName))
+			return x_finish(Environment,"exception",x_lang("Flow '%1%' does not exist",FlowName))
 		}
 	}
 	FlowID:=x_getFlowIDByName(FlowName)
@@ -191,7 +191,7 @@ Element_run_Action_Execute_Flow(Environment, ElementParameters)
 	if (ElementParameters.DefaultTrigger)
 	{
 		TriggerName := ""
-		TriggerNameText:=lang("Default trigger")
+		TriggerNameText:=x_lang("Default trigger")
 	}
 	else
 	{
@@ -199,24 +199,24 @@ Element_run_Action_Execute_Flow(Environment, ElementParameters)
 		TriggerNameText:=TriggerName
 		if (TriggerName ="")
 		{
-			return x_finish(Environment,"exception",lang("Trigger name is empty",FlowName))
+			return x_finish(Environment,"exception",x_lang("Trigger name is empty",FlowName))
 		}
 	}
 	
 	if not x_ManualTriggerExist(FlowID, TriggerName)
 	{
-		return x_finish(Environment,"exception",lang("Trigger '%1%' in flow '%2%' does not exist",TriggerNameText, FlowName))
+		return x_finish(Environment,"exception",x_lang("Trigger '%1%' in flow '%2%' does not exist",TriggerNameText, FlowName))
 	}
 	
 	if not x_isManualTriggerEnabled(FlowID, TriggerName)
 	{
 		if (ElementParameters.SkipDisabled)
 		{
-			return x_finish(Environment,"normal",lang("Trigger '%1%' in '%2%' is disabled",TriggerNameText, FlowNameText))
+			return x_finish(Environment,"normal",x_lang("Trigger '%1%' in '%2%' is disabled",TriggerNameText, FlowNameText))
 		}
 		else
 		{
-			return x_finish(Environment,"exception",lang("Trigger '%1%' in '%2%' is disabled",TriggerNameText, FlowNameText))
+			return x_finish(Environment,"exception",x_lang("Trigger '%1%' in '%2%' is disabled",TriggerNameText, FlowNameText))
 		}
 	}
 	

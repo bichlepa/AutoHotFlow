@@ -10,13 +10,13 @@ Element_getElementType_Action_Absolute_number()
 ;Name of the element
 Element_getName_Action_Absolute_number()
 {
-	return lang("Absolute_number")
+	return x_lang("Absolute_number")
 }
 
 ;Category of the element
 Element_getCategory_Action_Absolute_number()
 {
-	return lang("Variable")
+	return x_lang("Variable")
 }
 
 ;This function returns the package of the element.
@@ -53,9 +53,9 @@ Element_getParametrizationDetails_Action_Absolute_number(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: lang("Output_Variable_name")})
+	parametersToEdit.push({type: "Label", label: x_lang("Output_Variable_name")})
 	parametersToEdit.push({type: "edit", id: "Varname", default: "NewVariable", content: "VariableName", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label:  lang("Input number")})
+	parametersToEdit.push({type: "Label", label:  x_lang("Input number")})
 	parametersToEdit.push({type: "edit", id: "VarValue", default: -2, content: "Expression", WarnIfEmpty: true})
 	
 	
@@ -65,7 +65,7 @@ Element_getParametrizationDetails_Action_Absolute_number(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Absolute_number(Environment, ElementParameters)
 {
-	return lang("Absolute_number") "`n" ElementParameters.Varname " = |" ElementParameters.VarValue "|"
+	return x_lang("Absolute_number") "`n" ElementParameters.Varname " = |" ElementParameters.VarValue "|"
 }
 
 ;Called every time the user changes any parameter.
@@ -87,7 +87,7 @@ Element_run_Action_Absolute_number(Environment, ElementParameters)
 	if not x_CheckVariableName(Varname)
 	{
 		;On error, finish with exception and return
-		x_finish(Environment, "exception", lang("%1% is not valid", lang("Ouput variable name '%1%'", varname)))
+		x_finish(Environment, "exception", x_lang("%1% is not valid", x_lang("Ouput variable name '%1%'", varname)))
 		return
 	}
 
@@ -96,7 +96,7 @@ Element_run_Action_Absolute_number(Environment, ElementParameters)
 	if (evRes.error)
 	{
 		;On error, finish with exception and return
-		x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.VarValue) "`n`n" evRes.error) 
+		x_finish(Environment, "exception", x_lang("An error occured while parsing expression '%1%'", ElementParameters.VarValue) "`n`n" evRes.error) 
 		return
 	}
 	VarValue:=evRes.result

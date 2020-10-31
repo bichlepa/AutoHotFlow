@@ -10,13 +10,13 @@ Element_getElementType_Action_Get_Pixel_Color()
 ;Name of the element
 Element_getName_Action_Get_Pixel_Color()
 {
-	return lang("Get_Pixel_Color")
+	return x_lang("Get_Pixel_Color")
 }
 
 ;Category of the element
 Element_getCategory_Action_Get_Pixel_Color()
 {
-	return lang("image")
+	return x_lang("image")
 }
 
 ;This function returns the package of the element.
@@ -53,20 +53,20 @@ Element_getParametrizationDetails_Action_Get_Pixel_Color(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: lang("Output variables")})
-	parametersToEdit.push({type: "Checkbox", id: "OutputRGB", default: 1, label: lang("Write RGB value in output variable")})
-	parametersToEdit.push({type: "Checkbox", id: "OutputSeparate", default: 0, label: lang("Write each color in separate variable")})
-	parametersToEdit.push({type: "Label", label: lang("RGB value"), size: "small"})
+	parametersToEdit.push({type: "Label", label: x_lang("Output variables")})
+	parametersToEdit.push({type: "Checkbox", id: "OutputRGB", default: 1, label: x_lang("Write RGB value in output variable")})
+	parametersToEdit.push({type: "Checkbox", id: "OutputSeparate", default: 0, label: x_lang("Write each color in separate variable")})
+	parametersToEdit.push({type: "Label", label: x_lang("RGB value"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: "varnameRGB", default: "ColorRBG", content: "VariableName", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("Red, green, blue"), size: "small"})
+	parametersToEdit.push({type: "Label", label: x_lang("Red, green, blue"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: ["varnameR", "varnameG", "varnameB"], default: ["ColorRed", "ColorBlue", "ColorGreen"], content: "VariableName", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("Position")})
-	parametersToEdit.push({type: "Radio", id: "CoordMode", default: 1, result: "enum", choices: [lang("Relative to screen"), lang("Relative to active window position"), lang("Relative to active window client position")], enum: ["Screen", "Window", "Client"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Position")})
+	parametersToEdit.push({type: "Radio", id: "CoordMode", default: 1, result: "enum", choices: [x_lang("Relative to screen"), x_lang("Relative to active window position"), x_lang("Relative to active window client position")], enum: ["Screen", "Window", "Client"]})
 	parametersToEdit.push({type: "Label", label: "x, y", size: "small"})
 	parametersToEdit.push({type: "Edit", id: ["Xpos", "Ypos"], default: [10, 20], content: "Expression", WarnIfEmpty: true})
-	parametersToEdit.push({type: "button", id: "MouseTracker", goto: "Action_Get_Pixel_Color_MouseTracker", label: lang("Get coordinates")})
-	parametersToEdit.push({type: "Label", label: lang("Method")})
-	parametersToEdit.push({type: "Radio", id: "Method", default: 1, choices: [lang("Default method"), lang("Alternative method"), lang("Slow method")], enum: ["Default", "Alt", "Slow"]})
+	parametersToEdit.push({type: "button", id: "MouseTracker", goto: "Action_Get_Pixel_Color_MouseTracker", label: x_lang("Get coordinates")})
+	parametersToEdit.push({type: "Label", label: x_lang("Method")})
+	parametersToEdit.push({type: "Radio", id: "Method", default: 1, choices: [x_lang("Default method"), x_lang("Alternative method"), x_lang("Slow method")], enum: ["Default", "Alt", "Slow"]})
 	
 	return parametersToEdit
 }
@@ -79,7 +79,7 @@ Action_Get_Pixel_Color_MouseTracker()
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Get_Pixel_Color(Environment, ElementParameters)
 {
-	return lang("Get_Pixel_Color") 
+	return x_lang("Get_Pixel_Color") 
 }
 
 ;Called every time the user changes any parameter.
@@ -104,7 +104,7 @@ Element_run_Action_Get_Pixel_Color(Environment, ElementParameters)
 		if not x_CheckVariableName(varnameRGB)
 		{
 			;On error, finish with exception and return
-			x_finish(Environment, "exception", lang("%1% is not valid", lang("Ouput variable name '%1%'", varnameRGB)))
+			x_finish(Environment, "exception", x_lang("%1% is not valid", x_lang("Ouput variable name '%1%'", varnameRGB)))
 			return
 		}
 	}
@@ -115,21 +115,21 @@ Element_run_Action_Get_Pixel_Color(Environment, ElementParameters)
 		if not x_CheckVariableName(varnameR)
 		{
 			;On error, finish with exception and return
-			x_finish(Environment, "exception", lang("%1% is not valid", lang("Ouput variable name '%1%'", varnameR)))
+			x_finish(Environment, "exception", x_lang("%1% is not valid", x_lang("Ouput variable name '%1%'", varnameR)))
 			return
 		}
 		varnameG := x_replaceVariables(Environment, ElementParameters.varnameG)
 		if not x_CheckVariableName(varnameG)
 		{
 			;On error, finish with exception and return
-			x_finish(Environment, "exception", lang("%1% is not valid", lang("Ouput variable name '%1%'", varnameG)))
+			x_finish(Environment, "exception", x_lang("%1% is not valid", x_lang("Ouput variable name '%1%'", varnameG)))
 			return
 		}
 		varnameB := x_replaceVariables(Environment, ElementParameters.varnameB)
 		if not x_CheckVariableName(varnameB)
 		{
 			;On error, finish with exception and return
-			x_finish(Environment, "exception", lang("%1% is not valid", lang("Ouput variable name '%1%'", varnameB)))
+			x_finish(Environment, "exception", x_lang("%1% is not valid", x_lang("Ouput variable name '%1%'", varnameB)))
 			return
 		}
 	}
@@ -141,7 +141,7 @@ Element_run_Action_Get_Pixel_Color(Environment, ElementParameters)
 	if (evRes.error)
 	{
 		;On error, finish with exception and return
-		x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.Xpos) "`n`n" evRes.error) 
+		x_finish(Environment, "exception", x_lang("An error occured while parsing expression '%1%'", ElementParameters.Xpos) "`n`n" evRes.error) 
 		return
 	}
 	Xpos:=evRes.result
@@ -149,19 +149,19 @@ Element_run_Action_Get_Pixel_Color(Environment, ElementParameters)
 	if (evRes.error)
 	{
 		;On error, finish with exception and return
-		x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.Ypos) "`n`n" evRes.error) 
+		x_finish(Environment, "exception", x_lang("An error occured while parsing expression '%1%'", ElementParameters.Ypos) "`n`n" evRes.error) 
 		return
 	}
 	Ypos:=evRes.result
 	
 	if Xpos is not number
 	{
-		x_finish(Environment, "exception", lang("%1% is not a number.",lang("X position"))) 
+		x_finish(Environment, "exception", x_lang("%1% is not a number.",x_lang("X position"))) 
 		return
 	}
 	if Ypos is not number
 	{
-		x_finish(Environment, "exception", lang("%1% is not a number.",lang("Y position"))) 
+		x_finish(Environment, "exception", x_lang("%1% is not a number.",x_lang("Y position"))) 
 		return
 	}
 	
@@ -174,7 +174,7 @@ Element_run_Action_Get_Pixel_Color(Environment, ElementParameters)
 	if ErrorLevel
 	{
 		;On error, finish with exception and return
-		x_finish(Environment, "exception", lang("Could not get pixel color from coordinates x%1% y%2%.", Xpos, Ypos)) 
+		x_finish(Environment, "exception", x_lang("Could not get pixel color from coordinates x%1% y%2%.", Xpos, Ypos)) 
 		return
 	}
 	

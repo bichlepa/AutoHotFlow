@@ -10,13 +10,13 @@ Element_getElementType_Loop_Condition()
 ;Name of the element
 Element_getName_Loop_Condition()
 {
-	return lang("Condition")
+	return x_lang("Condition")
 }
 
 ;Category of the element
 Element_getCategory_Loop_Condition()
 {
-	return lang("Variable")
+	return x_lang("Variable")
 }
 
 ;This function returns the package of the element.
@@ -53,9 +53,9 @@ Element_getParametrizationDetails_Loop_Condition(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: lang("Condition")})
+	parametersToEdit.push({type: "Label", label: x_lang("Condition")})
 	parametersToEdit.push({type: "Edit", id: "Expression", default: "a_index <= 5", content: "Expression", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Checkbox", id: "EvaluateOnFirstIteration", default: 1, label: lang("Evaluate on first iteration")})
+	parametersToEdit.push({type: "Checkbox", id: "EvaluateOnFirstIteration", default: 1, label: x_lang("Evaluate on first iteration")})
 	
 	return parametersToEdit
 }
@@ -63,7 +63,7 @@ Element_getParametrizationDetails_Loop_Condition(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Loop_Condition(Environment, ElementParameters)
 {
-	return lang("Condition") 
+	return x_lang("Condition") 
 }
 
 ;Called every time the user changes any parameter.
@@ -127,7 +127,7 @@ Element_run_Loop_Condition(Environment, ElementParameters)
 	else
 	{
 		;This should never happen, but I suggest to keep this code for catching bugs in AHF.
-		x_finish(Environment, "exception", lang("No information whether the connection leads into head or tail"))
+		x_finish(Environment, "exception", x_lang("No information whether the connection leads into head or tail"))
 	}
 	
 }

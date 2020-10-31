@@ -1,11 +1,38 @@
 ﻿#NoEnv  ; Recommended for performance and compatibility with future AutoHotkey releases.
 ; #Warn  ; Enable warnings to assist with detecting common errors.
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
-SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
-#Include language.ahk
+SetWorkingDir %A_ScriptDir%\basic  ; Ensures a consistent starting directory.
+;#Include language.ahk
 
 ;parameters
 mainlanguagecode:="en"
+
+SplitPath, A_ScriptDir, , OutDir
+
+paths := "language\basic"
+
+loop, files, % OutDir "\source_elements\*", D
+{
+	if fileexist(a_loopfilepath "\language")
+	{
+		paths .= "|" StrReplace(a_loopfilepath, OutDir "\") "\language"
+	}
+}
+
+gui, selectPath: default
+gui, add, text, w400, Please choose your working directory`nYou can either edit the translations of the base application or of an element package
+gui, add, ListBox, w400 vguipathListbox choose1, % paths
+gui, add, button, w400 h30 gguiPathButtonOK, OK
+
+gui,show
+return
+
+guiPathButtonOK:
+gui, submit
+SetWorkingDir, % OutDir "\" guipathListbox
+gui, destroy
+
+
 
 
 gui,main:default
@@ -33,6 +60,9 @@ gui,font,s8
 gui,+hwndMainGuiHWND
 
 LV_Modify(2, "Select") ;Zweite Sprache auswählen
+
+
+
 loadLanguageList()
 updateTreeView()
 ;~ gui,+resize ;TODO
@@ -406,3 +436,6 @@ return
 NewLangCancel:
 gui,2:destroy
 return
+
+mainguiclose:
+exitapp

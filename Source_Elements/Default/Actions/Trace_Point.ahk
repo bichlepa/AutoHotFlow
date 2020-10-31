@@ -10,13 +10,13 @@ Element_getElementType_Action_Trace_Point()
 ;Name of the element
 Element_getName_Action_Trace_Point()
 {
-	return lang("Trace_Point")
+	return x_lang("Trace_Point")
 }
 
 ;Category of the element
 Element_getCategory_Action_Trace_Point()
 {
-	return lang("Debugging")
+	return x_lang("Debugging")
 }
 
 ;This function returns the package of the element.
@@ -53,11 +53,11 @@ Element_getStabilityLevel_Action_Trace_Point()
 Element_getParametrizationDetails_Action_Trace_Point(Environment)
 {
 	parametersToEdit:=Object()
-	parametersToEdit.push({type: "Label", label: lang("ID")})
+	parametersToEdit.push({type: "Label", label: x_lang("ID")})
 	parametersToEdit.push({type: "Edit", id: "ID", content: "rawstring",  default: "Tracepoint " x_randomPhrase()})
-	parametersToEdit.push({type: "Label", label: lang("Log message")})
+	parametersToEdit.push({type: "Label", label: x_lang("Log message")})
 	parametersToEdit.push({type: "Edit", id: "LogMessage", default: "", content: "String", WarnIfEmpty: false})
-	parametersToEdit.push({type: "Label", label: lang("Stop condition")})
+	parametersToEdit.push({type: "Label", label: x_lang("Stop condition")})
 	parametersToEdit.push({type: "Edit", id: "StopCondition", default: "", content: "Expression", WarnIfEmpty: false})
 
 	; we want a unique random phrase for each element. Therefore it will alwa
@@ -71,7 +71,7 @@ Element_getParametrizationDetails_Action_Trace_Point(Environment)
 Element_GenerateName_Action_Trace_Point(Environment, ElementParameters)
 {
 	global
-	return % lang("Trace_Point") " - " ElementParameters.ID 
+	return % x_lang("Trace_Point") " - " ElementParameters.ID 
 	
 }
 
@@ -121,7 +121,7 @@ Element_run_Action_Trace_Point(Environment, ElementParameters)
 	if (EvaluatedParameters.stopcondition)
 	{
 		; stop condition is true. Finish element and stop the execution
-		x_finish(Environment, "exception", lang("Stopping execution because stop Condition " EvaluatedParameters.StopCondition " is not false"))
+		x_finish(Environment, "exception", x_lang("Stopping execution because stop Condition '%1%' is not false", EvaluatedParameters.StopCondition))
 		x_InstanceStop(Environment)
 	}
 	else

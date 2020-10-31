@@ -86,8 +86,8 @@ showlog(whichone="all")
 	gui,log: add, dropdownlist, xm Y+5 w100 vGuiLogCategory gGuiLogCategory
 	gui,log: add, text, X+10 ym w100, % lang("View mode")
 	gui,log: add, dropdownlist, xp Y+5 w100 vGuiLogViewMode gGuiLogViewMode choose1, % "" lang("Quick refresh") "|" lang("Show all logs")
-	gui,log: add, button,X+10 ym h%GuiLogButtonsHeigth% gGuiLogrefresh vGuiLogrefresh, % lang("Refresh")
-	gui,log:add,button, X+10 ym h%GuiLogButtonsHeigth% gGuiLogClose vGuiLogClose default,% lang("Close")
+	gui,log: add, button,X+10 ym h%GuiLogButtonsHeigth% gGuiLogrefresh vGuiLogrefresh, % lang("Refresh #verb")
+	gui,log:add,button, X+10 ym h%GuiLogButtonsHeigth% gGuiLogClose vGuiLogClose default,% lang("Close #verb")
 	gui,log:add,edit, xm Y+10 ReadOnly vGuiLogTextField Multi -wrap VScroll HScroll
 	gui,log:+resize
 	gui,log:+MinSize500x300

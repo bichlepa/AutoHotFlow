@@ -45,7 +45,7 @@ exportFlowsExportNow()
 	; If user did not select anything, stop
 	if not exportFlowsListViewFlowsSelection
 	{
-		MsgBox % lang("please first select at least one flow")
+		MsgBox % lang("Please select at least one flow at first")
 		return
 	}
 	
@@ -115,12 +115,12 @@ importExportGui_import(filepathZip)
 		if not newflowname
 		{
 			logger("a1", "Imported flow in file " newflowname " is invalid.")
-			MsgBox, % lang("Imported flow in file ""%1%"" is invalid.", newflowname)
+			MsgBox, % lang("Imported flow in file '%1%' is invalid.", newflowname)
 			Continue
 		}
 		if (_getFlowIdByName(newflowname))
 		{
-			MsgBox, 67, % lang("Import Flows"), % lang("A flow with name ""%1%"" already exists.", newflowname) " " lang("Do you want to overwrite it?")
+			MsgBox, 67, % lang("Import Flows"), % lang("A flow with name '%1%' already exists.", newflowname) " " lang("Do you want to overwrite it?")
 			IfMsgBox,no
 			{
 				MsgBox, 67, % lang("Import Flows"), % lang("Do you want to rename the flow and import it afterwards?")

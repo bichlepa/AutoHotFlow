@@ -10,13 +10,13 @@ Element_getElementType_Action_Split_a_string()
 ;Name of the element
 Element_getName_Action_Split_a_string()
 {
-	return lang("Split_a_string")
+	return x_lang("Split_a_string")
 }
 
 ;Category of the element
 Element_getCategory_Action_Split_a_string()
 {
-	return lang("Variable")
+	return x_lang("Variable")
 }
 
 ;This function returns the package of the element.
@@ -53,13 +53,13 @@ Element_getParametrizationDetails_Action_Split_a_string(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: lang("Output list name")})
+	parametersToEdit.push({type: "Label", label: x_lang("Output list name")})
 	parametersToEdit.push({type: "Edit", id: "Varname", default: "NewList", content: "VariableName", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label:  lang("Input string")})
+	parametersToEdit.push({type: "Label", label:  x_lang("Input string")})
 	parametersToEdit.push({type: "Edit", id: "VarValue", default: "Hello real world, Hello virtual world", content: ["String", "Expression"], contentID: "expression", contentDefault: "String", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("Delimiter characters")})
+	parametersToEdit.push({type: "Label", label: x_lang("Delimiter characters")})
 	parametersToEdit.push({type: "Edit", id: "Delimiters", default: ",", content: "String", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("Omit characters")})
+	parametersToEdit.push({type: "Label", label: x_lang("Omit characters")})
 	parametersToEdit.push({type: "Edit", id: "OmitChars", default: "%a_space%%a_tab%", content: "String", WarnIfEmpty: true})
 	
 	return parametersToEdit
@@ -68,7 +68,7 @@ Element_getParametrizationDetails_Action_Split_a_string(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Split_a_string(Environment, ElementParameters)
 {
-	return lang("Split_a_string") 
+	return x_lang("Split_a_string") 
 }
 
 ;Called every time the user changes any parameter.

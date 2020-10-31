@@ -10,13 +10,13 @@ Element_getElementType_Action_Set_Lock_Key()
 ;Name of the element
 Element_getName_Action_Set_Lock_Key()
 {
-	return lang("Set_Lock_Key")
+	return x_lang("Set_Lock_Key")
 }
 
 ;Category of the element
 Element_getCategory_Action_Set_Lock_Key()
 {
-	return lang("User_simulation")
+	return x_lang("User_simulation")
 }
 
 ;This function returns the package of the element.
@@ -53,10 +53,10 @@ Element_getParametrizationDetails_Action_Set_Lock_Key(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: lang("Which lock key")})
-	parametersToEdit.push({type: "Radio", id: "WhichKey", default: 1, choices: [lang("Caps lock"), lang("Num lock"), lang("Scroll lock")], result: "enum", enum: ["CapsLock", "NumLock", "ScrollLock"]})
-	parametersToEdit.push({type: "Label", label: lang("Status to set")})
-	parametersToEdit.push({type: "Radio", id: "Status", default: 1, choices: [lang("On"), lang("Off"), lang("Toggle"), lang("Always on"), lang("Always off")], result: "enum", enum: ["On", "Off", "Toggle", "AlwaysOn", "AlwaysOff"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Which lock key")})
+	parametersToEdit.push({type: "Radio", id: "WhichKey", default: 1, choices: [x_lang("Caps lock"), x_lang("Num lock"), x_lang("Scroll lock")], result: "enum", enum: ["CapsLock", "NumLock", "ScrollLock"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Status to set")})
+	parametersToEdit.push({type: "Radio", id: "Status", default: 1, choices: [x_lang("On"), x_lang("Off"), x_lang("Toggle"), x_lang("Always on"), x_lang("Always off")], result: "enum", enum: ["On", "Off", "Toggle", "AlwaysOn", "AlwaysOff"]})
 	
 	return parametersToEdit
 }
@@ -64,7 +64,7 @@ Element_getParametrizationDetails_Action_Set_Lock_Key(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Set_Lock_Key(Environment, ElementParameters)
 {
-	return lang("Set_Lock_Key") 
+	return x_lang("Set_Lock_Key") 
 }
 
 ;Called every time the user changes any parameter.

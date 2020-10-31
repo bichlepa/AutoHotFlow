@@ -10,13 +10,13 @@ Element_getElementType_Action_AutoHotKey_script()
 ;Name of the element
 Element_getName_Action_AutoHotKey_script()
 {
-	return lang("AutoHotKey_script")
+	return x_lang("AutoHotKey_script")
 }
 
 ;Category of the element
 Element_getCategory_Action_AutoHotKey_script()
 {
-	return lang("Expert")
+	return x_lang("Expert")
 }
 
 ;This function returns the package of the element.
@@ -52,11 +52,11 @@ Element_getStabilityLevel_Action_AutoHotKey_script()
 Element_getParametrizationDetails_Action_AutoHotKey_script(Environment)
 {
 	parametersToEdit:=Object()
-	parametersToEdit.push({type: "Label", label: lang("AutoHotKey_script"), WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: x_lang("AutoHotKey_script"), WarnIfEmpty: true})
 	parametersToEdit.push({type: "multilineEdit", id: "Script", default: "", WarnIfEmpty: false})
-	parametersToEdit.push({type: "Label", label: lang("Variables_that_should_be_imported_to_script_prior_to_execution")})
+	parametersToEdit.push({type: "Label", label: x_lang("Variables_that_should_be_imported_to_script_prior_to_execution")})
 	parametersToEdit.push({type: "edit", id: "ImportVariables", multiline: true})
-	parametersToEdit.push({type: "Label", label: lang("Variables_that_should_be_exported_from_script_after_execution")})
+	parametersToEdit.push({type: "Label", label: x_lang("Variables_that_should_be_exported_from_script_after_execution")})
 	parametersToEdit.push({type: "edit", id: "ExportVariables", multiline: true})
 	
 	
@@ -66,7 +66,7 @@ Element_getParametrizationDetails_Action_AutoHotKey_script(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_AutoHotKey_script(Environment, ElementParameters)
 {
-	return lang("AutoHotKey_script") "`n" substr(ElementParameters.script, 1, 50)
+	return x_lang("AutoHotKey_script") "`n" substr(ElementParameters.script, 1, 50)
 }
 
 ;Called every time the user changes any parameter.

@@ -10,13 +10,13 @@ Element_getElementType_Action_Extract_files()
 ;Name of the element
 Element_getName_Action_Extract_files()
 {
-	return lang("Extract_files")
+	return x_lang("Extract_files")
 }
 
 ;Category of the element
 Element_getCategory_Action_Extract_files()
 {
-	return lang("Files")
+	return x_lang("Files")
 }
 
 ;This function returns the package of the element.
@@ -52,12 +52,12 @@ Element_getStabilityLevel_Action_Extract_files()
 Element_getParametrizationDetails_Action_Extract_files(Environment)
 {
 	parametersToEdit:=Object()
-	parametersToEdit.push({type: "Label", label: lang("Source archive")})
-	parametersToEdit.push({type: "File", id: "zipfile", label: lang("Select a zip file"), filter: lang("Archive") " (.zip; .7z; .xz; .gz; .gzip; .tgz; .bz2; .bzip2; tbz2; tbz; tar; .z; .taz; .lzma)"})
-	parametersToEdit.push({type: "Label", label: lang("Destination folder")})
-	parametersToEdit.push({type: "Folder", id: "folder", label: lang("Select a folder")})
-	parametersToEdit.push({type: "Label", label: lang("Options")})
-	parametersToEdit.push({type: "Label", label: lang("Format"), size: "small"})
+	parametersToEdit.push({type: "Label", label: x_lang("Source archive")})
+	parametersToEdit.push({type: "File", id: "zipfile", label: x_lang("Select a zip file"), filter: x_lang("Archive") " (.zip; .7z; .xz; .gz; .gzip; .tgz; .bz2; .bzip2; tbz2; tbz; tar; .z; .taz; .lzma)"})
+	parametersToEdit.push({type: "Label", label: x_lang("Destination folder")})
+	parametersToEdit.push({type: "Folder", id: "folder", label: x_lang("Select a folder")})
+	parametersToEdit.push({type: "Label", label: x_lang("Options")})
+	parametersToEdit.push({type: "Label", label: x_lang("Format"), size: "small"})
 	parametersToEdit.push({type: "DropDown", id: "zipformat", default: "*", choices: ["*", "7z", "zip", "xz", "tar", "gzip", "BZIP2", "Z", "lzma"], result: "string"})
 	
 	return parametersToEdit
@@ -67,7 +67,7 @@ Element_getParametrizationDetails_Action_Extract_files(Environment)
 Element_GenerateName_Action_Extract_files(Environment, ElementParameters)
 {
 	global
-	return % lang("Extract_files") " - " ElementParameters.zipfile " - " ElementParameters.Folder
+	return % x_lang("Extract_files") " - " ElementParameters.zipfile " - " ElementParameters.Folder
 	
 }
 

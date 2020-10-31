@@ -10,13 +10,13 @@ Element_getElementType_Trigger_Periodic_Timer()
 ;Name of the element
 Element_getName_Trigger_Periodic_Timer()
 {
-	return lang("Periodic_Timer")
+	return x_lang("Periodic_Timer")
 }
 
 ;Category of the element
 Element_getCategory_Trigger_Periodic_Timer()
 {
-	return lang("Time")
+	return x_lang("Time")
 }
 
 ;This function returns the package of the element.
@@ -53,9 +53,9 @@ Element_getParametrizationDetails_Trigger_Periodic_Timer(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "label", label:  lang("Time interval")})
+	parametersToEdit.push({type: "label", label:  x_lang("Time interval")})
 	parametersToEdit.push({type: "edit", id: "Interval", default: 10, content: "Number", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Radio", id: "Unit", choices: [lang("Milliseconds"), lang("Seconds"), lang("Minutes")], default: 2, result: "enum", enum: ["MilliSeconds", "Seconds", "Minutes"]})
+	parametersToEdit.push({type: "Radio", id: "Unit", choices: [x_lang("Milliseconds"), x_lang("Seconds"), x_lang("Minutes")], default: 2, result: "enum", enum: ["MilliSeconds", "Seconds", "Minutes"]})
 	
 	return parametersToEdit
 }
@@ -63,7 +63,7 @@ Element_getParametrizationDetails_Trigger_Periodic_Timer(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Trigger_Periodic_Timer(Environment, ElementParameters)
 {
-	return lang("Periodic_Timer") 
+	return x_lang("Periodic_Timer") 
 }
 
 ;Called every time the user changes any parameter.
@@ -90,7 +90,7 @@ Element_enable_Trigger_Periodic_Timer(Environment, ElementParameters)
 	; check the interval
 	if (not (EvaluatedParameters.Interval > 0))
 	{
-		x_enabled(Environment, "exception", lang("Parameter '%1%' has invalid value: %2%", "interval", Interval)) 
+		x_enabled(Environment, "exception", x_lang("Parameter '%1%' has invalid value: %2%", "interval", Interval)) 
 		return
 	}
 	
@@ -105,7 +105,7 @@ Element_enable_Trigger_Periodic_Timer(Environment, ElementParameters)
 	case "Minutes":
 		Interval *= 1000 * 60
 	default:
-		x_enabled(Environment, "exception", lang("Parameter '%1%' has invalid value: %2%", "Unit", EvaluatedParameters.Unit)) 
+		x_enabled(Environment, "exception", x_lang("Parameter '%1%' has invalid value: %2%", "Unit", EvaluatedParameters.Unit)) 
 		return
 	}
 	

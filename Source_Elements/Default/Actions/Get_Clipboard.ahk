@@ -10,13 +10,13 @@ Element_getElementType_Action_Get_Clipboard()
 ;Name of the element
 Element_getName_Action_Get_Clipboard()
 {
-	return lang("Get_Clipboard")
+	return x_lang("Get_Clipboard")
 }
 
 ;Category of the element
 Element_getCategory_Action_Get_Clipboard()
 {
-	return lang("Variable")
+	return x_lang("Variable")
 }
 
 ;This function returns the package of the element.
@@ -53,7 +53,7 @@ Element_getParametrizationDetails_Action_Get_Clipboard(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: lang("Output_Variable_name")})
+	parametersToEdit.push({type: "Label", label: x_lang("Output_Variable_name")})
 	parametersToEdit.push({type: "edit", id: "Varname", default: "NewVariable", content: "VariableName", WarnIfEmpty: true})
 	
 	
@@ -63,7 +63,7 @@ Element_getParametrizationDetails_Action_Get_Clipboard(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Get_Clipboard(Environment, ElementParameters)
 {
-	return lang("Get_Clipboard") "`n" ElementParameters.Varname " = " ElementParameters.VarValue "^" ElementParameters.Exponent
+	return x_lang("Get_Clipboard") "`n" ElementParameters.Varname " = " ElementParameters.VarValue "^" ElementParameters.Exponent
 }
 
 ;Called every time the user changes any parameter.
@@ -85,7 +85,7 @@ Element_run_Action_Get_Clipboard(Environment, ElementParameters)
 	if not x_CheckVariableName(Varname)
 	{
 		;On error, finish with exception and return
-		x_finish(Environment, "exception", lang("%1% is not valid", lang("Ouput variable name '%1%'", varname)))
+		x_finish(Environment, "exception", x_lang("%1% is not valid", x_lang("Ouput variable name '%1%'", varname)))
 		return
 	}
 	

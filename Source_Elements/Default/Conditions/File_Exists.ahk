@@ -10,13 +10,13 @@ Element_getElementType_Condition_File_Exists()
 ;Name of the element
 Element_getName_Condition_File_Exists()
 {
-	return lang("File_Exists")
+	return x_lang("File_Exists")
 }
 
 ;Category of the element
 Element_getCategory_Condition_File_Exists()
 {
-	return lang("File")
+	return x_lang("File")
 }
 
 ;This function returns the package of the element.
@@ -54,8 +54,8 @@ Element_getParametrizationDetails_Condition_File_Exists(Environment)
 	parametersToEdit:=Object()
 	
 	
-	parametersToEdit.push({type: "Label", label: lang("File pattern")})
-	parametersToEdit.push({type: "File", id: "file", label: lang("Select a file")})
+	parametersToEdit.push({type: "Label", label: x_lang("File pattern")})
+	parametersToEdit.push({type: "File", id: "file", label: x_lang("Select a file")})
 	
 	return parametersToEdit
 }
@@ -63,7 +63,7 @@ Element_getParametrizationDetails_Condition_File_Exists(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Condition_File_Exists(Environment, ElementParameters)
 {
-	return lang("File_Exists") 
+	return x_lang("File_Exists") 
 }
 
 ;Called every time the user changes any parameter.

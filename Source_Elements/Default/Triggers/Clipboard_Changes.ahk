@@ -10,13 +10,13 @@ Element_getElementType_Trigger_Clipboard_Changes()
 ;Name of the element
 Element_getName_Trigger_Clipboard_Changes()
 {
-	return lang("Clipboard_Changes")
+	return x_lang("Clipboard_Changes")
 }
 
 ;Category of the element
 Element_getCategory_Trigger_Clipboard_Changes()
 {
-	return lang("Variable")
+	return x_lang("Variable")
 }
 
 ;This function returns the package of the element.
@@ -60,7 +60,7 @@ Element_getParametrizationDetails_Trigger_Clipboard_Changes(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Trigger_Clipboard_Changes(Environment, ElementParameters)
 {
-	return lang("Clipboard_Changes") 
+	return x_lang("Clipboard_Changes") 
 }
 
 ;Called every time the user changes any parameter.

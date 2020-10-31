@@ -10,13 +10,13 @@ Element_getElementType_Action_Empty_Recycle_Bin()
 ;Name of the element
 Element_getName_Action_Empty_Recycle_Bin()
 {
-	return lang("Empty_Recycle_Bin")
+	return x_lang("Empty_Recycle_Bin")
 }
 
 ;Category of the element
 Element_getCategory_Action_Empty_Recycle_Bin()
 {
-	return lang("Drive")
+	return x_lang("Drive")
 }
 
 ;This function returns the package of the element.
@@ -64,8 +64,8 @@ Element_getParametrizationDetails_Action_Empty_Recycle_Bin(Environment)
 		
 	}
 	
-	parametersToEdit.push({type: "Label", label: lang("Which drive")})
-	parametersToEdit.push({type: "Radio", id: "AllDrives", default: 1, result: "enum", choices: [lang("All drives"), lang("Specified drive")], enum: ["All", "Specified"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Which drive")})
+	parametersToEdit.push({type: "Radio", id: "AllDrives", default: 1, result: "enum", choices: [x_lang("All drives"), x_lang("Specified drive")], enum: ["All", "Specified"]})
 	parametersToEdit.push({type: "ComboBox", id: "DriveLetter", content: "String", WarnIfEmpty: true, result: "string", default: defaultdrive, choices: listOfdrives})
 	
 	
@@ -75,7 +75,7 @@ Element_getParametrizationDetails_Action_Empty_Recycle_Bin(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Empty_Recycle_Bin(Environment, ElementParameters)
 {
-	return lang("Empty_Recycle_Bin") 
+	return x_lang("Empty_Recycle_Bin") 
 }
 
 ;Called every time the user changes any parameter.
@@ -104,7 +104,7 @@ Element_run_Action_Empty_Recycle_Bin(Environment, ElementParameters)
 
 	if not DriveLetter
 	{
-		x_finish(Environment,"exception", lang("Drive is not specified"))
+		x_finish(Environment,"exception", x_lang("Drive is not specified"))
 		return
 	}
 	
@@ -115,7 +115,7 @@ Element_run_Action_Empty_Recycle_Bin(Environment, ElementParameters)
 	
 	if ErrorLevel
 	{
-		x_finish(Environment,"exception", lang("Recycle bin could not be emptied."))
+		x_finish(Environment,"exception", x_lang("Recycle bin could not be emptied."))
 		return
 	}
 	

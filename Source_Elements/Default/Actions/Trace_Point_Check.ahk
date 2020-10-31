@@ -10,13 +10,13 @@ Element_getElementType_Action_Trace_Point_Check()
 ;Name of the element
 Element_getName_Action_Trace_Point_Check()
 {
-	return lang("Trace_Point_Check")
+	return x_lang("Trace_Point_Check")
 }
 
 ;Category of the element
 Element_getCategory_Action_Trace_Point_Check()
 {
-	return lang("Debugging")
+	return x_lang("Debugging")
 }
 
 ;This function returns the package of the element.
@@ -65,11 +65,11 @@ Element_getParametrizationDetails_Action_Trace_Point_Check(Environment)
 	}
 	
 	parametersToEdit := Object()
-	parametersToEdit.push({type: "Label", label: lang("Tracepoints which must be passed")})
-	parametersToEdit.push({type: "Checkbox", id: "MustPassTracepointsAll", default: 0, label: lang("All tracepoints")})
+	parametersToEdit.push({type: "Label", label: x_lang("Tracepoints which must be passed")})
+	parametersToEdit.push({type: "Checkbox", id: "MustPassTracepointsAll", default: 0, label: x_lang("All tracepoints")})
 	parametersToEdit.push({type: "ListBox", id: "MustPassTracepoints", result: "String", choices: allTracePointIDs, multi: True})
-	parametersToEdit.push({type: "Label", label: lang("Tracepoints which must not be passed")})
-	parametersToEdit.push({type: "Checkbox", id: "MustNotPassTracepointsAll", default: 0, label: lang("All tracepoints")})
+	parametersToEdit.push({type: "Label", label: x_lang("Tracepoints which must not be passed")})
+	parametersToEdit.push({type: "Checkbox", id: "MustNotPassTracepointsAll", default: 0, label: x_lang("All tracepoints")})
 	parametersToEdit.push({type: "ListBox", id: "MustNotPassTracepoints", result: "String", choices: allTracePointIDs, multi: True})
 	
 	; we want that this function is called every time when the element editor is opened
@@ -82,7 +82,7 @@ Element_getParametrizationDetails_Action_Trace_Point_Check(Environment)
 Element_GenerateName_Action_Trace_Point_Check(Environment, ElementParameters)
 {
 	global
-	return % lang("Trace_Point_Check")
+	return % x_lang("Trace_Point_Check")
 	
 }
 
@@ -261,7 +261,7 @@ Element_run_Action_Trace_Point_Check(Environment, ElementParameters)
 					tempString .= ", "
 				tempString .= oneTracePoint
 			}
-			message.= lang("%1% tracepoints were not passed which must have been passed: %2%.", TracePointsMustNotPassedButPassed.maxindex(), tempString) " "
+			message.= x_lang("%1% tracepoints were not passed which must have been passed: %2%.", TracePointsMustNotPassedButPassed.maxindex(), tempString) " "
 		}
 		if (TracePointsMustNotPassedButPassed.maxindex() >= 1)
 		{
@@ -272,7 +272,7 @@ Element_run_Action_Trace_Point_Check(Environment, ElementParameters)
 					tempString .= ", "
 				tempString .= oneTracePoint
 			}
-			message.= lang("%1% tracepoints were passed which must not have been passed: %2%.", TracePointsMustNotPassedButPassed.maxindex(), tempString)
+			message.= x_lang("%1% tracepoints were passed which must not have been passed: %2%.", TracePointsMustNotPassedButPassed.maxindex(), tempString)
 			
 		}
 		messate := trim(message)

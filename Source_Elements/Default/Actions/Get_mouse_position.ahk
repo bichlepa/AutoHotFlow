@@ -10,13 +10,13 @@ Element_getElementType_Action_Get_Mouse_Position()
 ;Name of the element
 Element_getName_Action_Get_Mouse_Position()
 {
-	return lang("Get_Mouse_Position")
+	return x_lang("Get_Mouse_Position")
 }
 
 ;Category of the element
 Element_getCategory_Action_Get_Mouse_Position()
 {
-	return lang("User_interaction")
+	return x_lang("User_interaction")
 }
 
 ;This function returns the package of the element.
@@ -53,15 +53,15 @@ Element_getParametrizationDetails_Action_Get_Mouse_Position(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: lang("Output variables") (lang("Position: x,y"))})
+	parametersToEdit.push({type: "Label", label: x_lang("Output variables") (x_lang("Position: x,y"))})
 	parametersToEdit.push({type: "Edit", id: ["varnameX", "varnameY"], default: ["posX", "posY"], content: "VariableName", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("Mouse position"), size: "small"})
-	parametersToEdit.push({type: "Radio", id: "CoordMode", default: 1, result: "enum", choices: [lang("Relative to screen"), lang("Relative to active window position"), lang("Relative to active window client position"), lang("Relative to current mouse position")], enum: ["Screen", "Window", "Client"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Mouse position"), size: "small"})
+	parametersToEdit.push({type: "Radio", id: "CoordMode", default: 1, result: "enum", choices: [x_lang("Relative to screen"), x_lang("Relative to active window position"), x_lang("Relative to active window client position"), x_lang("Relative to current mouse position")], enum: ["Screen", "Window", "Client"]})
 	
-	parametersToEdit.push({type: "Label", label: lang("Additional information")})
-	parametersToEdit.push({type: "Checkbox", id: "WhetherGetWindowID", default: 0, label: lang("Get window ID of the mouse")})
+	parametersToEdit.push({type: "Label", label: x_lang("Additional information")})
+	parametersToEdit.push({type: "Checkbox", id: "WhetherGetWindowID", default: 0, label: x_lang("Get window ID of the mouse")})
 	parametersToEdit.push({type: "Edit", id: "varnameWindowID", default: "windowID", content: "VariableName", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Checkbox", id: "WhetherGetControlID", default: 0, label: lang("Get control ID of the mouse")})
+	parametersToEdit.push({type: "Checkbox", id: "WhetherGetControlID", default: 0, label: x_lang("Get control ID of the mouse")})
 	parametersToEdit.push({type: "Edit", id: "varnameControlID", default: "controlID", content: "VariableName", WarnIfEmpty: true})
 	
 	return parametersToEdit
@@ -70,7 +70,7 @@ Element_getParametrizationDetails_Action_Get_Mouse_Position(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Get_Mouse_Position(Environment, ElementParameters)
 {
-	return lang("Get_Mouse_Position") 
+	return x_lang("Get_Mouse_Position") 
 }
 
 ;Called every time the user changes any parameter.
@@ -91,7 +91,7 @@ Element_run_Action_Get_Mouse_Position(Environment, ElementParameters)
 	if not x_CheckVariableName(varnameX)
 	{
 		;On error, finish with exception and return
-		x_finish(Environment, "exception", lang("%1% is not valid", lang("Ouput variable name '%1%'", varnameX)))
+		x_finish(Environment, "exception", x_lang("%1% is not valid", x_lang("Ouput variable name '%1%'", varnameX)))
 		return
 	}
 	
@@ -99,7 +99,7 @@ Element_run_Action_Get_Mouse_Position(Environment, ElementParameters)
 	if not x_CheckVariableName(varnameY)
 	{
 		;On error, finish with exception and return
-		x_finish(Environment, "exception", lang("%1% is not valid", lang("Ouput variable name '%1%'", varnameY)))
+		x_finish(Environment, "exception", x_lang("%1% is not valid", x_lang("Ouput variable name '%1%'", varnameY)))
 		return
 	}
 	
@@ -110,7 +110,7 @@ Element_run_Action_Get_Mouse_Position(Environment, ElementParameters)
 		if not x_CheckVariableName(varnameWindowID)
 		{
 			;On error, finish with exception and return
-			x_finish(Environment, "exception", lang("%1% is not valid", lang("Ouput variable name '%1%'", varnameWindowID)))
+			x_finish(Environment, "exception", x_lang("%1% is not valid", x_lang("Ouput variable name '%1%'", varnameWindowID)))
 			return
 		}
 	}
@@ -121,7 +121,7 @@ Element_run_Action_Get_Mouse_Position(Environment, ElementParameters)
 		if not x_CheckVariableName(varnameControlID)
 		{
 			;On error, finish with exception and return
-			x_finish(Environment, "exception", lang("%1% is not valid", lang("Ouput variable name '%1%'", varnameControlID)))
+			x_finish(Environment, "exception", x_lang("%1% is not valid", x_lang("Ouput variable name '%1%'", varnameControlID)))
 			return
 		}
 	}

@@ -70,18 +70,18 @@ Refresh_Manager_GUI()
 	guicontrol,,Button_manager_NewCategory , % lang("New_Category")
 	guicontrol,,Button_manager_NewFlow , % lang("New_Flow")
 	guicontrol,,Button_manager_ChangeCategory , % lang("Change_category")
-	guicontrol,,Button_manager_DuplicateFlow , % lang("Duplicate")
-	guicontrol,,Button_manager_Delete , % lang("delete")
-	guicontrol,,Button_manager_EditFlow , % lang("Edit")
+	guicontrol,,Button_manager_DuplicateFlow , % lang("Duplicate #verb")
+	guicontrol,,Button_manager_Delete , % lang("Delete")
+	guicontrol,,Button_manager_EditFlow , % lang("Edit #verb")
 	guicontrol,,Button_manager_EnableFlow , % lang("enable")
-	guicontrol,,Button_manager_RunFlow ,% lang("Run")
+	guicontrol,,Button_manager_RunFlow ,% lang("Run #verb")
 
 	guicontrol,,Button_manager_Import_Export ,% lang("Import and export")
 	guicontrol,,Button_manager_Settings ,% lang("Settings")
 	guicontrol,,Button_manager_Help ,% lang("Help")
 	guicontrol,,Button_manager_ShowLog ,% lang("Show log")
 	guicontrol,,Button_manager_About ,% lang("About AutoHotFlow")
-	guicontrol,,Button_manager_Exit ,% lang("Exit")
+	guicontrol,,Button_manager_Exit ,% lang("Exit #verb")
 }
 
 ; Show the manager gui
@@ -170,7 +170,7 @@ updateFlowIcons_Manager_GUI()
 	{
 		if (currentLabelButtonRun != "stop")
 		{
-			guicontrol,,Button_manager_RunFlow ,% lang("Stop")
+			guicontrol,,Button_manager_RunFlow ,% lang("Stop #verb")
 			currentLabelButtonRun := "Stop"
 		}
 	}
@@ -178,7 +178,7 @@ updateFlowIcons_Manager_GUI()
 	{
 		if (currentLabelButtonRun != "Run")
 		{
-			guicontrol,,Button_manager_RunFlow ,% lang("Run")
+			guicontrol,,Button_manager_RunFlow ,% lang("Run #verb")
 			currentLabelButtonRun := "Run"
 		}
 	}
@@ -500,7 +500,7 @@ TreeView_manager()
 				if (instr(tempNewName,"|"))
 				{
 					soundplay,*16
-					MsgBox, 16, % lang("Rename flow"), % lang("Following characters are prohibited in a flow name: ""%1%""", "|")
+					MsgBox, 16, % lang("Rename flow"), % lang("Following characters are prohibited in a flow name: '%1%'", "|")
 					;just remove that character
 					StringReplace, tempNewName, tempNewName, |,%a_space%, all
 					TV_Modify(tempselectedTV, "", tempNewName)
@@ -509,7 +509,7 @@ TreeView_manager()
 				if (_getFlowIdByName(tempNewName) != "")
 				{
 					soundplay,*16
-					MsgBox, 16, % lang("Rename flow"), % lang("A_flow_with_name_%1%_already_exists", tempNewName)
+					MsgBox, 16, % lang("Rename flow"), % lang("A flow with name '%1%' already exists.", tempNewName)
 					TV_Modify(tempselectedTV, "", tempOldName)
 					return
 				}
@@ -555,9 +555,9 @@ TreeView_manager()
 		else
 			guicontrol,,Button_manager_EnableFlow,% lang("Enable")
 		if (_getFlowProperty(tempselectedID, "running") = true)
-			guicontrol,,Button_manager_RunFlow,% lang("Stop")
+			guicontrol,,Button_manager_RunFlow,% lang("Stop #verb")
 		else
-			guicontrol,,Button_manager_RunFlow,% lang("Run")
+			guicontrol,,Button_manager_RunFlow,% lang("Run #verb")
 	}
 }
 
@@ -855,7 +855,7 @@ Button_manager_Delete()
 		else
 		{
 			;ask user for confirmation
-			MsgBox, 4, % lang("Confirm_deletion"),% lang("Do_you_really_want_to_delete_the_flow_%1%?", _getFlowProperty(tempselectedID, "name"))
+			MsgBox, 4, % lang("Confirm_deletion"),% lang("Do you really want to delete the flow '%1%'?", _getFlowProperty(tempselectedID, "name"))
 			IfMsgBox,Yes
 			{
 				; Get the category in order to select it after treeview refill
@@ -912,7 +912,7 @@ Button_manager_Delete()
 			{
 				;ask user for confirmation
 				local tempCategoryName := _getCategoryProperty(tempselectedID, "name")
-				MsgBox, 4, % lang("Confirm_deletion"), % lang("Do_you_really_want_to_delete_the_category_%1%?", tempCategoryName) "`n" lang("All flows of that category will be moved into the category '%1%''",lang("Uncategorized"))
+				MsgBox, 4, % lang("Confirm_deletion"), % lang("Do you really want to delete the category '%1%'?", tempCategoryName) "`n" lang("All flows of that category will be moved into the category '%1%'", lang("Uncategorized"))
 				
 				IfMsgBox, Yes ; if user approved
 				{

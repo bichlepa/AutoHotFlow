@@ -10,13 +10,13 @@ Element_getElementType_Action_List_drives()
 ;Name of the element
 Element_getName_Action_List_drives()
 {
-	return lang("List_drives")
+	return x_lang("List_drives")
 }
 
 ;Category of the element
 Element_getCategory_Action_List_drives()
 {
-	return lang("Drive")
+	return x_lang("Drive")
 }
 
 ;This function returns the package of the element.
@@ -53,17 +53,17 @@ Element_getParametrizationDetails_Action_List_drives(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: lang("Output variable name")})
+	parametersToEdit.push({type: "Label", label: x_lang("Output variable name")})
 	parametersToEdit.push({type: "Edit", id: "Varname", default: "DriveList", content: "VariableName", WarnIfEmpty: true})
 	
-	parametersToEdit.push({type: "Radio", id: "OutputType", default: 1, choices: [lang("Output variable will contain a list"), lang("Output variable will contain a string")], result: "enum", enum: ["list", "string"]})
+	parametersToEdit.push({type: "Radio", id: "OutputType", default: 1, choices: [x_lang("Output variable will contain a list"), x_lang("Output variable will contain a string")], result: "enum", enum: ["list", "string"]})
 	
-	parametersToEdit.push({type: "Label", label: lang("Drive type")})
-	parametersToEdit.push({type: "Radio", id: "WhetherDriveTypeFilter", default: 1, choices: [lang("Find all drives"), lang("Get only a specific type of drive")], result: "enum", enum: ["all", "filter"]})
-	parametersToEdit.push({type: "DropDown", id: "DriveType", default: "CDROM", choices: [lang("Disk drives"), lang("Removable drives"), lang("Fixed drives"), lang("Network drives"), lang("RAM disk drives"), lang("Unknown drives")], result: "enum", enum: ["CDROM", "REMOVABLE", "FIXED", "NETWORK", "RAMDISK", "UNKNOWN"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Drive type")})
+	parametersToEdit.push({type: "Radio", id: "WhetherDriveTypeFilter", default: 1, choices: [x_lang("Find all drives"), x_lang("Get only a specific type of drive")], result: "enum", enum: ["all", "filter"]})
+	parametersToEdit.push({type: "DropDown", id: "DriveType", default: "CDROM", choices: [x_lang("Disk drives"), x_lang("Removable drives"), x_lang("Fixed drives"), x_lang("Network drives"), x_lang("RAM disk drives"), x_lang("Unknown drives")], result: "enum", enum: ["CDROM", "REMOVABLE", "FIXED", "NETWORK", "RAMDISK", "UNKNOWN"]})
 	
-	parametersToEdit.push({type: "Label", label: lang("If no drive can be found")})
-	parametersToEdit.push({type: "Radio", id: "IfNothingFound", default: 2, choices: [lang("Normal") " - " lang("Make output variable empty"),lang("Throw exception")], result: "enum", enum: ["Normal", "Exception"]})
+	parametersToEdit.push({type: "Label", label: x_lang("If no drive can be found")})
+	parametersToEdit.push({type: "Radio", id: "IfNothingFound", default: 2, choices: [x_lang("Normal") " - " x_lang("Make output variable empty"),x_lang("Throw exception")], result: "enum", enum: ["Normal", "Exception"]})
 	
 	return parametersToEdit
 }
@@ -71,7 +71,7 @@ Element_getParametrizationDetails_Action_List_drives(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_List_drives(Environment, ElementParameters)
 {
-	return lang("List_drives") 
+	return x_lang("List_drives") 
 }
 
 ;Called every time the user changes any parameter.
@@ -105,7 +105,7 @@ Element_run_Action_List_drives(Environment, ElementParameters)
 	{
 		if (EvaluatedParameters.IfNothingFound="exception")
 		{
-			x_finish(Environment,"exception", lang("No drives found"))
+			x_finish(Environment,"exception", x_lang("No drives found"))
 			return
 		}
 	}

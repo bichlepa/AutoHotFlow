@@ -10,13 +10,13 @@ Element_getElementType_Action_Set_Volume()
 ;Name of the element
 Element_getName_Action_Set_Volume()
 {
-	return lang("Set_Volume")
+	return x_lang("Set_Volume")
 }
 
 ;Category of the element
 Element_getCategory_Action_Set_Volume()
 {
-	return lang("Sound")
+	return x_lang("Sound")
 }
 
 ;This function returns the package of the element.
@@ -53,13 +53,13 @@ Element_getParametrizationDetails_Action_Set_Volume(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: lang("Action")})
-	parametersToEdit.push({type: "Radio", id: "Action", default: 1, choices: [lang("Set mute state"), lang("Set a specific volume"), lang("Increase or decrease volume")], result: "enum", enum: ["Mute", "Absolute", "Relative"]})
-	parametersToEdit.push({type: "Label", label: lang("Mute settings")})
-	parametersToEdit.push({type: "Radio", id: "Mute", default: 1, choices: [lang("Mute on"), lang("Mute off"), lang("Toggle")], retult: "enum", enum: ["On", "Off", "Toggle"]})
-	parametersToEdit.push({type: "Label", label: lang("Absolute volume")})
+	parametersToEdit.push({type: "Label", label: x_lang("Action")})
+	parametersToEdit.push({type: "Radio", id: "Action", default: 1, choices: [x_lang("Set mute state"), x_lang("Set a specific volume"), x_lang("Increase or decrease volume")], result: "enum", enum: ["Mute", "Absolute", "Relative"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Mute settings")})
+	parametersToEdit.push({type: "Radio", id: "Mute", default: 1, choices: [x_lang("Mute on"), x_lang("Mute off"), x_lang("Toggle")], retult: "enum", enum: ["On", "Off", "Toggle"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Absolute volume")})
 	parametersToEdit.push({type: "Slider", id: "volume", default: 80, options: "Range0-100 TickInterval10 tooltip"})
-	parametersToEdit.push({type: "Label", label: lang("Relative volume")})
+	parametersToEdit.push({type: "Label", label: x_lang("Relative volume")})
 	parametersToEdit.push({type: "Slider", id: "volumeRelative", default: 10, options: "Range-100-100 TickInterval10 tooltip"})
 	
 	return parametersToEdit
@@ -68,7 +68,7 @@ Element_getParametrizationDetails_Action_Set_Volume(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Set_Volume(Environment, ElementParameters)
 {
-	return lang("Set_Volume") 
+	return x_lang("Set_Volume") 
 }
 
 ;Called every time the user changes any parameter.

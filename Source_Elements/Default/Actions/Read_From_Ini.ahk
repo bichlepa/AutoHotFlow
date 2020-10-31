@@ -10,13 +10,13 @@ Element_getElementType_Action_Read_From_Ini()
 ;Name of the element
 Element_getName_Action_Read_From_Ini()
 {
-	return lang("Read_From_Ini")
+	return x_lang("Read_From_Ini")
 }
 
 ;Category of the element
 Element_getCategory_Action_Read_From_Ini()
 {
-	return lang("File")
+	return x_lang("File")
 }
 
 ;This function returns the package of the element.
@@ -53,19 +53,19 @@ Element_getParametrizationDetails_Action_Read_From_Ini(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: lang("Output Variable name")})
+	parametersToEdit.push({type: "Label", label: x_lang("Output Variable name")})
 	parametersToEdit.push({type: "Edit", id: "varname", default: "NewVariable", content: "VariableName", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("Path of .ini file")})
-	parametersToEdit.push({type: "File", id: "file", label: lang("Select an .ini file")})
-	parametersToEdit.push({type: "Label", label: lang("Action")})
-	parametersToEdit.push({type: "Radio", id: "Action", default: 1, choices: [lang("Read a key"), lang("Read the entire section"), lang("Read the section names")], result: "enum", enum: ["Key", "EntireSection", "SectionNames"]})
-	parametersToEdit.push({type: "Label", label: lang("Section")})
+	parametersToEdit.push({type: "Label", label: x_lang("Path of .ini file")})
+	parametersToEdit.push({type: "File", id: "file", label: x_lang("Select an .ini file")})
+	parametersToEdit.push({type: "Label", label: x_lang("Action")})
+	parametersToEdit.push({type: "Radio", id: "Action", default: 1, choices: [x_lang("Read a key"), x_lang("Read the entire section"), x_lang("Read the section names")], result: "enum", enum: ["Key", "EntireSection", "SectionNames"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Section")})
 	parametersToEdit.push({type: "Edit", id: "Section", default: "section", content: "String", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("Key")})
+	parametersToEdit.push({type: "Label", label: x_lang("Key")})
 	parametersToEdit.push({type: "Edit", id: "Key", default: "key", content: "String", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("Behavior on error")})
-	parametersToEdit.push({type: "Radio", id: "WhenError", default: 1, choices: [lang("Insert default value in the variable"), lang("Throw exception")], result: "enum", enum: ["Default", "Exception"]})
-	parametersToEdit.push({type: "Label", label: lang("Default value on failure")})
+	parametersToEdit.push({type: "Label", label: x_lang("Behavior on error")})
+	parametersToEdit.push({type: "Radio", id: "WhenError", default: 1, choices: [x_lang("Insert default value in the variable"), x_lang("Throw exception")], result: "enum", enum: ["Default", "Exception"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Default value on failure")})
 	parametersToEdit.push({type: "Edit", id: "Default", default: "ERROR", content: "String"})
 	
 	return parametersToEdit
@@ -74,7 +74,7 @@ Element_getParametrizationDetails_Action_Read_From_Ini(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Read_From_Ini(Environment, ElementParameters)
 {
-	return lang("Read_From_Ini") 
+	return x_lang("Read_From_Ini") 
 }
 
 ;Called every time the user changes any parameter.
@@ -122,7 +122,7 @@ Element_run_Action_Read_From_Ini(Environment, ElementParameters)
 	filepath := x_GetFullPath(Environment, EvaluatedParameters.file)
 	if not fileexist(filepath)
 	{
-		x_finish(Environment, "exception",  lang("File '%1%' does not exist",filepath))
+		x_finish(Environment, "exception",  x_lang("File '%1%' does not exist",filepath))
 		return
 	}
 	
@@ -134,12 +134,12 @@ Element_run_Action_Read_From_Ini(Environment, ElementParameters)
 		
 		if (EvaluatedParameters.section="")
 		{
-			x_finish(Environment, "exception",lang("%1% is not specified.",lang("Section name")))
+			x_finish(Environment, "exception",x_lang("%1% is not specified.",x_lang("Section name")))
 			return
 		}
 		if (EvaluatedParameters.key="")
 		{
-			x_finish(Environment, "exception",lang("%1% is not specified.",lang("Key name")))
+			x_finish(Environment, "exception",x_lang("%1% is not specified.",x_lang("Key name")))
 			return
 			
 		}
@@ -157,7 +157,7 @@ Element_run_Action_Read_From_Ini(Environment, ElementParameters)
 			IniRead,result,% filepath,% EvaluatedParameters.section,% EvaluatedParameters.key,E?R ROR
 			if result=E?R ROR
 			{
-				x_finish(Environment, "exception",lang("Section '%1%' and key '%2%' not found.",EvaluatedParameters.section,EvaluatedParameters.key))
+				x_finish(Environment, "exception",x_lang("Section '%1%' and key '%2%' not found.",EvaluatedParameters.section,EvaluatedParameters.key))
 				return
 			}
 		}
@@ -168,7 +168,7 @@ Element_run_Action_Read_From_Ini(Environment, ElementParameters)
 		x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["section"])
 		if (EvaluatedParameters.section="")
 		{
-			x_finish(Environment, "exception",lang("%1% is not specified.",lang("Section name")))
+			x_finish(Environment, "exception",x_lang("%1% is not specified.",x_lang("Section name")))
 			return
 		}
 		

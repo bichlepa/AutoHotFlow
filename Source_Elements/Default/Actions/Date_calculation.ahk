@@ -10,13 +10,13 @@ Element_getElementType_Action_Date_Calculation()
 ;Name of the element
 Element_getName_Action_Date_Calculation()
 {
-	return lang("Date_Calculation")
+	return x_lang("Date_Calculation")
 }
 
 ;Category of the element
 Element_getCategory_Action_Date_Calculation()
 {
-	return lang("Variable")
+	return x_lang("Variable")
 }
 
 ;This function returns the package of the element.
@@ -53,18 +53,18 @@ Element_getParametrizationDetails_Action_Date_Calculation(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: lang("Output variable name")})
+	parametersToEdit.push({type: "Label", label: x_lang("Output variable name")})
 	parametersToEdit.push({type: "Edit", id: "Varname", default: "CalculatedTime", content: "VariableName", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("Input variable name")})
+	parametersToEdit.push({type: "Label", label: x_lang("Input variable name")})
 	parametersToEdit.push({type: "Edit", id: "VarValue", default: "InputTime", content: "Expression", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("Operation")})
-	parametersToEdit.push({type: "Radio", id: "Operation", default: 1, result: "enum", choices: [lang("Add a period"), lang("Calculate time difference")], enum: ["AddPeriod", "TimeDifference"]})
-	parametersToEdit.push({type: "Label", label:  lang("How many units to add")})
+	parametersToEdit.push({type: "Label", label: x_lang("Operation")})
+	parametersToEdit.push({type: "Radio", id: "Operation", default: 1, result: "enum", choices: [x_lang("Add a period"), x_lang("Calculate time difference")], enum: ["AddPeriod", "TimeDifference"]})
+	parametersToEdit.push({type: "Label", label:  x_lang("How many units to add")})
 	parametersToEdit.push({type: "Edit", id: "Units", default: 10, content: "Expression", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label:  lang("Second input variable Name")})
+	parametersToEdit.push({type: "Label", label:  x_lang("Second input variable Name")})
 	parametersToEdit.push({type: "Edit", id: "VarValue2", default: "a_now", content: "Expression", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label:  lang("Which unit")})
-	parametersToEdit.push({type: "Radio", id: "Unit", default: 2, result: "enum", choices: [lang("Milliseconds"), lang("Seconds"), lang("Minutes"), lang("Hours"), lang("Days")], enum: ["Milliseconds", "Seconds", "Minutes", "Hours", "Days"]})
+	parametersToEdit.push({type: "Label", label:  x_lang("Which unit")})
+	parametersToEdit.push({type: "Radio", id: "Unit", default: 2, result: "enum", choices: [x_lang("Milliseconds"), x_lang("Seconds"), x_lang("Minutes"), x_lang("Hours"), x_lang("Days")], enum: ["Milliseconds", "Seconds", "Minutes", "Hours", "Days"]})
 	
 	return parametersToEdit
 }
@@ -72,7 +72,7 @@ Element_getParametrizationDetails_Action_Date_Calculation(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Date_Calculation(Environment, ElementParameters)
 {
-	return lang("Date_Calculation") 
+	return x_lang("Date_Calculation") 
 }
 
 ;Called every time the user changes any parameter.
@@ -93,7 +93,7 @@ Element_run_Action_Date_Calculation(Environment, ElementParameters)
 	if not x_CheckVariableName(Varname)
 	{
 		;On error, finish with exception and return
-		x_finish(Environment, "exception", lang("%1% is not valid", lang("Ouput variable name '%1%'", Varname)))
+		x_finish(Environment, "exception", x_lang("%1% is not valid", x_lang("Ouput variable name '%1%'", Varname)))
 		return
 	}
 	
@@ -101,13 +101,13 @@ Element_run_Action_Date_Calculation(Environment, ElementParameters)
 	if (evRes.error)
 	{
 		;On error, finish with exception and return
-		x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.VarValue) "`n`n" evRes.error) 
+		x_finish(Environment, "exception", x_lang("An error occured while parsing expression '%1%'", ElementParameters.VarValue) "`n`n" evRes.error) 
 		return
 	}
 	VarValue:=evRes.result
 	if VarValue is not time
 	{
-		x_finish(Environment, "exception", lang("Input time is not a time: '%1%'.",VarValue)) 
+		x_finish(Environment, "exception", x_lang("Input time is not a time: '%1%'.",VarValue)) 
 		return
 	}
 		
@@ -120,7 +120,7 @@ Element_run_Action_Date_Calculation(Environment, ElementParameters)
 		if (evRes.error)
 		{
 			;On error, finish with exception and return
-			x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.Units) "`n`n" evRes.error) 
+			x_finish(Environment, "exception", x_lang("An error occured while parsing expression '%1%'", ElementParameters.Units) "`n`n" evRes.error) 
 			return
 		}
 		Units:=evRes.result
@@ -140,14 +140,14 @@ Element_run_Action_Date_Calculation(Environment, ElementParameters)
 		if (evRes.error)
 		{
 			;On error, finish with exception and return
-			x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.VarValue2) "`n`n" evRes.error) 
+			x_finish(Environment, "exception", x_lang("An error occured while parsing expression '%1%'", ElementParameters.VarValue2) "`n`n" evRes.error) 
 			return
 		}
 		VarValue2:=evRes.result
 		
 		if VarValue2 is not time
 		{
-			x_finish(Environment, "exception", lang("Input time is not a time: '%1%'.",VarValue2)) 
+			x_finish(Environment, "exception", x_lang("Input time is not a time: '%1%'.",VarValue2)) 
 			return
 		}
 		
@@ -170,7 +170,7 @@ Element_run_Action_Date_Calculation(Environment, ElementParameters)
 	}
 	else
 	{
-		x_finish(Environment, "exception", lang("Operation not specified"))
+		x_finish(Environment, "exception", x_lang("Operation not specified"))
 		return
 	}
 	

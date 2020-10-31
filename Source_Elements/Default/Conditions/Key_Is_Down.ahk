@@ -10,13 +10,13 @@ Element_getElementType_Condition_Key_Is_Down()
 ;Name of the element
 Element_getName_Condition_Key_Is_Down()
 {
-	return lang("Key_Is_Down")
+	return x_lang("Key_Is_Down")
 }
 
 ;Category of the element
 Element_getCategory_Condition_Key_Is_Down()
 {
-	return lang("User_interaction")
+	return x_lang("User_interaction")
 }
 
 ;This function returns the package of the element.
@@ -53,7 +53,7 @@ Element_getParametrizationDetails_Condition_Key_Is_Down(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: lang("Key name")})
+	parametersToEdit.push({type: "Label", label: x_lang("Key name")})
 	parametersToEdit.push({type: "Edit", id: "key", content: "String", WarnIfEmpty: true})
 	
 	return parametersToEdit
@@ -62,7 +62,7 @@ Element_getParametrizationDetails_Condition_Key_Is_Down(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Condition_Key_Is_Down(Environment, ElementParameters)
 {
-	return lang("Key_Is_Down") 
+	return x_lang("Key_Is_Down") 
 }
 
 ;Called every time the user changes any parameter.
@@ -96,7 +96,7 @@ Element_run_Condition_Key_Is_Down(Environment, ElementParameters)
 		x_finish(Environment,"no")
 	else
 	{
-		x_finish(Environment, "exception", lang("Couldn't get state of key '%1%'", EvaluatedParameters.key)) 
+		x_finish(Environment, "exception", x_lang("Couldn't get state of key '%1%'", EvaluatedParameters.key)) 
 		return
 	}
 	return

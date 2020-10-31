@@ -10,13 +10,13 @@ Element_getElementType_Action_Select_file()
 ;Name of the element
 Element_getName_Action_Select_file()
 {
-	return lang("Select_file")
+	return x_lang("Select_file")
 }
 
 ;Category of the element
 Element_getCategory_Action_Select_file()
 {
-	return lang("User_interaction") "|" lang("Files")
+	return x_lang("User_interaction") "|" x_lang("Files")
 }
 
 ;This function returns the package of the element.
@@ -52,22 +52,22 @@ Element_getStabilityLevel_Action_Select_file()
 Element_getParametrizationDetails_Action_Select_file(Environment)
 {
 	parametersToEdit:=Object()
-	parametersToEdit.push({type: "Label", label: lang("Output variable_name")})
+	parametersToEdit.push({type: "Label", label: x_lang("Output variable_name")})
 	parametersToEdit.push({type: "Edit", id: "Varname", default: "selectedFiles", content: "VariableName", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("Prompt")})
-	parametersToEdit.push({type: "Edit", id: "title", default: lang("Select a file"), content: "String"})
-	parametersToEdit.push({type: "Label", label: lang("Root directory")})
+	parametersToEdit.push({type: "Label", label: x_lang("Prompt")})
+	parametersToEdit.push({type: "Edit", id: "title", default: x_lang("Select a file"), content: "String"})
+	parametersToEdit.push({type: "Label", label: x_lang("Root directory")})
 	parametersToEdit.push({type: "folder", id: "folder"})
-	parametersToEdit.push({type: "Label", label: lang("Filter")})
-	parametersToEdit.push({type: "Edit", id: "filter", default: lang("Any files") " (*.*)", content: "String"})
-	parametersToEdit.push({type: "Label", label: lang("Options")})
-	parametersToEdit.push({type: "checkbox", id: "MultiSelect", default: 0, label: lang("Allow to select multiple files")})
-	parametersToEdit.push({type: "checkbox", id: "SaveButton", default: 0, label: lang("'Save' button instead of an 'Open' button")})
-	parametersToEdit.push({type: "checkbox", id: "fileMustExist", default: 0, label: lang("File must exist")})
-	parametersToEdit.push({type: "checkbox", id: "PathMustExist", default: 0, label: lang("Path must exist")})
-	parametersToEdit.push({type: "checkbox", id: "PromptNewFile", default: 0, label: lang("Prompt to create new file")})
-	parametersToEdit.push({type: "checkbox", id: "PromptOverwriteFile", default: 0, label: lang("Prompt to overwrite file")})
-	parametersToEdit.push({type: "checkbox", id: "NoShortcutTarget", default: 0, label: lang("Don't resolve shortcuts to their targets")})
+	parametersToEdit.push({type: "Label", label: x_lang("Filter")})
+	parametersToEdit.push({type: "Edit", id: "filter", default: x_lang("Any files") " (*.*)", content: "String"})
+	parametersToEdit.push({type: "Label", label: x_lang("Options")})
+	parametersToEdit.push({type: "checkbox", id: "MultiSelect", default: 0, label: x_lang("Allow to select multiple files")})
+	parametersToEdit.push({type: "checkbox", id: "SaveButton", default: 0, label: x_lang("'Save' button instead of an 'Open' button")})
+	parametersToEdit.push({type: "checkbox", id: "fileMustExist", default: 0, label: x_lang("File must exist")})
+	parametersToEdit.push({type: "checkbox", id: "PathMustExist", default: 0, label: x_lang("Path must exist")})
+	parametersToEdit.push({type: "checkbox", id: "PromptNewFile", default: 0, label: x_lang("Prompt to create new file")})
+	parametersToEdit.push({type: "checkbox", id: "PromptOverwriteFile", default: 0, label: x_lang("Prompt to overwrite file")})
+	parametersToEdit.push({type: "checkbox", id: "NoShortcutTarget", default: 0, label: x_lang("Don't resolve shortcuts to their targets")})
 
 	return parametersToEdit
 }
@@ -76,7 +76,7 @@ Element_getParametrizationDetails_Action_Select_file(Environment)
 Element_GenerateName_Action_Select_file(Environment, ElementParameters)
 {
 	global
-	return % lang("Select_file") " - " ElementParameters.varname " - " ElementParameters.folder
+	return % x_lang("Select_file") " - " ElementParameters.varname " - " ElementParameters.folder
 	
 }
 
@@ -115,7 +115,7 @@ Element_run_Action_Select_file(Environment, ElementParameters)
 	if not x_CheckVariableName(varname)
 	{
 		;On error, finish with exception and return
-		x_finish(Environment, "exception", lang("%1% is not valid", lang("Ouput variable name '%1%'", varname)))
+		x_finish(Environment, "exception", x_lang("%1% is not valid", x_lang("Ouput variable name '%1%'", varname)))
 		return
 	}
 	
@@ -169,7 +169,7 @@ Element_run_Action_Select_file(Environment, ElementParameters)
 			result := "normal"
 		}
 	)
-	;Translations: lang("User dismissed the dialog without selecting a file or system refused to show the dialog.")
+	;Translations: x_lang("User dismissed the dialog without selecting a file or system refused to show the dialog.")
 	
 	functionObject := x_NewFunctionObject(Environment, "Action_Select_file_FinishExecution", ElementParameters)
 	x_SetExecutionValue(Environment, "functionObject", functionObject)

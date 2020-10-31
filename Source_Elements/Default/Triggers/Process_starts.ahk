@@ -10,13 +10,13 @@ Element_getElementType_Trigger_Process_starts()
 ;Name of the element
 Element_getName_Trigger_Process_starts()
 {
-	return lang("Process_starts")
+	return x_lang("Process_starts")
 }
 
 ;Category of the element
 Element_getCategory_Trigger_Process_starts()
 {
-	return lang("Process")
+	return x_lang("Process")
 }
 
 ;This function returns the package of the element.
@@ -53,12 +53,12 @@ Element_getParametrizationDetails_Trigger_Process_starts(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: lang("Process name")})
+	parametersToEdit.push({type: "Label", label: x_lang("Process name")})
 	parametersToEdit.push({type: "Edit", id: "ProcessName", content: "String"})
 	
-	parametersToEdit.push({type: "Label", label: lang("Options")})
-	parametersToEdit.push({type: "Checkbox", id: "NotTriggerOnEnable", default: 1, label: lang("Do not trigger if a matching window exists when enabling the trigger")})
-	parametersToEdit.push({type: "Label", label: lang("Check interval"), size: "small"})
+	parametersToEdit.push({type: "Label", label: x_lang("Options")})
+	parametersToEdit.push({type: "Checkbox", id: "NotTriggerOnEnable", default: 1, label: x_lang("Do not trigger if a matching window exists when enabling the trigger")})
+	parametersToEdit.push({type: "Label", label: x_lang("Check interval"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: "interval", content: "Number", default: 1000, WarnIfEmpty: true})
 	
 	return parametersToEdit
@@ -67,7 +67,7 @@ Element_getParametrizationDetails_Trigger_Process_starts(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Trigger_Process_starts(Environment, ElementParameters)
 {
-	return lang("Process_starts") 
+	return x_lang("Process_starts") 
 }
 
 ;Called every time the user changes any parameter.
@@ -95,7 +95,7 @@ Element_enable_Trigger_Process_starts(Environment, ElementParameters)
 	; check interval
 	if (not (EvaluatedParameters.interval > 0))
 	{
-		x_enabled(Environment, "exception", lang("Parameter '%1%' has invalid value: %2%", "interval", tempinterval)) 
+		x_enabled(Environment, "exception", x_lang("Parameter '%1%' has invalid value: %2%", "interval", tempinterval)) 
 		return
 	}
 

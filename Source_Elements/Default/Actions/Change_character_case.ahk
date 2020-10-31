@@ -10,13 +10,13 @@ Element_getElementType_Action_Change_character_case()
 ;Name of the element
 Element_getName_Action_Change_character_case()
 {
-	return lang("Change_character_case")
+	return x_lang("Change_character_case")
 }
 
 ;Category of the element
 Element_getCategory_Action_Change_character_case()
 {
-	return lang("Variable")
+	return x_lang("Variable")
 }
 
 ;This function returns the package of the element.
@@ -53,12 +53,12 @@ Element_getParametrizationDetails_Action_Change_character_case(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: lang("Output Variable_name")})
+	parametersToEdit.push({type: "Label", label: x_lang("Output Variable_name")})
 	parametersToEdit.push({type: "Edit", id: "Varname", default: "NewVariable", content: "VariableName", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label:  lang("Input string")})
+	parametersToEdit.push({type: "Label", label:  x_lang("Input string")})
 	parametersToEdit.push({type: "Edit", id: "VarValue", default: "Hello World", content: ["String", "Expression"], contentID: "expression", contentDefault: "string", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("Which case (character case)")})
-	parametersToEdit.push({type: "Radio", id: "CharCase", default: 1, choices: [lang("Uppercase"), lang("Lowercase"), lang("Firt character of a word is uppercase")], enum: ["upper", "lower", "firstUp"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Which case (character case)")})
+	parametersToEdit.push({type: "Radio", id: "CharCase", default: 1, choices: [x_lang("Uppercase"), x_lang("Lowercase"), x_lang("Firt character of a word is uppercase")], enum: ["upper", "lower", "firstUp"]})
 
 	return parametersToEdit
 }
@@ -66,7 +66,7 @@ Element_getParametrizationDetails_Action_Change_character_case(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Change_character_case(Environment, ElementParameters)
 {
-	return lang("Change_character_case") 
+	return x_lang("Change_character_case") 
 }
 
 ;Called every time the user changes any parameter.
@@ -90,7 +90,7 @@ Element_run_Action_Change_character_case(Environment, ElementParameters)
 	if not x_CheckVariableName(Varname)
 	{
 		;On error, finish with exception and return
-		x_finish(Environment, "exception", lang("%1% is not valid", lang("Ouput variable name '%1%'", par_editVariableName)))
+		x_finish(Environment, "exception", x_lang("%1% is not valid", x_lang("Ouput variable name '%1%'", par_editVariableName)))
 		return
 	}
 	
@@ -100,7 +100,7 @@ Element_run_Action_Change_character_case(Environment, ElementParameters)
 		if (evRes.error)
 		{
 			;On error, finish with exception and return
-			x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.VarValue) "`n`n" evRes.error) 
+			x_finish(Environment, "exception", x_lang("An error occured while parsing expression '%1%'", ElementParameters.VarValue) "`n`n" evRes.error) 
 			return
 		}
 		else

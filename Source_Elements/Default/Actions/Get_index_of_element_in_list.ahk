@@ -10,13 +10,13 @@ Element_getElementType_Action_Get_Index_Of_Element_In_List()
 ;Name of the element
 Element_getName_Action_Get_Index_Of_Element_In_List()
 {
-	return lang("Get_Index_Of_Element_In_List")
+	return x_lang("Get_Index_Of_Element_In_List")
 }
 
 ;Category of the element
 Element_getCategory_Action_Get_Index_Of_Element_In_List()
 {
-	return lang("Variable")
+	return x_lang("Variable")
 }
 
 ;This function returns the package of the element.
@@ -53,12 +53,12 @@ Element_getStabilityLevel_Action_Get_Index_Of_Element_In_List()
 Element_getParametrizationDetails_Action_Get_Index_Of_Element_In_List(Environment)
 {
 	parametersToEdit:=Object()
-	parametersToEdit.push({type: "Label", label: lang("Output variable name")})
+	parametersToEdit.push({type: "Label", label: x_lang("Output variable name")})
 	parametersToEdit.push({type: "Edit", id: "Varname", default: "NewVariable", content: "VariableName", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("Input list")})
+	parametersToEdit.push({type: "Label", label: x_lang("Input list")})
 	parametersToEdit.push({type: "Edit", id: "ListName", default: "MyList", content: "expression", WarnIfEmpty: true})
 	
-	parametersToEdit.push({type: "Label", label: lang("Seeked content")})
+	parametersToEdit.push({type: "Label", label: x_lang("Seeked content")})
 	parametersToEdit.push({type: "Edit", id: "SearchContent", default: "keyName", content: ["String", "Expression"], contentID: "expression", contentDefault: "string", WarnIfEmpty: true})
 	
 	return parametersToEdit
@@ -67,7 +67,7 @@ Element_getParametrizationDetails_Action_Get_Index_Of_Element_In_List(Environmen
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Get_Index_Of_Element_In_List(Environment, ElementParameters)
 {
-	return % lang("Get_Index_Of_Element_In_List")
+	return % x_lang("Get_Index_Of_Element_In_List")
 	
 }
 
@@ -91,7 +91,7 @@ Element_run_Action_Get_Index_Of_Element_In_List(Environment, ElementParameters)
 	if not x_CheckVariableName(varname)
 	{
 		;On error, finish with exception and return
-		x_finish(Environment, "exception", lang("%1% is not valid", lang("Ouput variable name '%1%'", varname)))
+		x_finish(Environment, "exception", x_lang("%1% is not valid", x_lang("Ouput variable name '%1%'", varname)))
 		return
 	}
 	
@@ -100,7 +100,7 @@ Element_run_Action_Get_Index_Of_Element_In_List(Environment, ElementParameters)
 	if (evRes.error)
 	{
 		;On error, finish with exception and return
-		x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.ListName) "`n`n" evRes.error) 
+		x_finish(Environment, "exception", x_lang("An error occured while parsing expression '%1%'", ElementParameters.ListName) "`n`n" evRes.error) 
 		return
 	}
 	ListName:=evRes.result
@@ -109,7 +109,7 @@ Element_run_Action_Get_Index_Of_Element_In_List(Environment, ElementParameters)
 	
 	if (!(IsObject(myList)))
 	{
-		x_finish(Environment, "exception", lang("Variable '%1%' does not contain a list.",myList))
+		x_finish(Environment, "exception", x_lang("Variable '%1%' does not contain a list.",myList))
 		return
 	}
 	
@@ -120,7 +120,7 @@ Element_run_Action_Get_Index_Of_Element_In_List(Environment, ElementParameters)
 		if (evRes.error)
 		{
 			;On error, finish with exception and return
-			x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.SearchContent) "`n`n" evRes.error) 
+			x_finish(Environment, "exception", x_lang("An error occured while parsing expression '%1%'", ElementParameters.SearchContent) "`n`n" evRes.error) 
 			return
 		}
 		else
@@ -144,7 +144,7 @@ Element_run_Action_Get_Index_Of_Element_In_List(Environment, ElementParameters)
 	
 	if (found!=true)
 	{
-		x_finish(Environment, "exception", lang("The list '%1%' does not contain the key '%2%'.",ListName,Position))
+		x_finish(Environment, "exception", x_lang("The list '%1%' does not contain the key '%2%'.",ListName,Position))
 		return
 	}	
 	

@@ -10,13 +10,13 @@ Element_getElementType_Action_Square_Root()
 ;Name of the element
 Element_getName_Action_Square_Root()
 {
-	return lang("Square_Root")
+	return x_lang("Square_Root")
 }
 
 ;Category of the element
 Element_getCategory_Action_Square_Root()
 {
-	return lang("Variable")
+	return x_lang("Variable")
 }
 
 ;This function returns the package of the element.
@@ -54,9 +54,9 @@ Element_getParametrizationDetails_Action_Square_Root(Environment)
 	parametersToEdit:=Object()
 	
 	
-	parametersToEdit.push({type: "Label", label: lang("Variable_name")})
+	parametersToEdit.push({type: "Label", label: x_lang("Variable_name")})
 	parametersToEdit.push({type: "Edit", id: "Varname", default: "NewVariable", content: "VariableName", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label:  lang("Variable containing a number")})
+	parametersToEdit.push({type: "Label", label:  x_lang("Variable containing a number")})
 	parametersToEdit.push({type: "Edit", id: "VarValue", default: 16, content: "Number", WarnIfEmpty: true})
 	
 	return parametersToEdit
@@ -65,7 +65,7 @@ Element_getParametrizationDetails_Action_Square_Root(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Square_Root(Environment, ElementParameters)
 {
-	return lang("Square_Root") 
+	return x_lang("Square_Root") 
 }
 
 ;Called every time the user changes any parameter.

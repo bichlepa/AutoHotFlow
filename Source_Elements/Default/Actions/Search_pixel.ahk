@@ -10,13 +10,13 @@ Element_getElementType_Action_Search_pixel()
 ;Name of the element
 Element_getName_Action_Search_pixel()
 {
-	return lang("Search_pixel")
+	return x_lang("Search_pixel")
 }
 
 ;Category of the element
 Element_getCategory_Action_Search_pixel()
 {
-	return lang("Image")
+	return x_lang("Image")
 }
 
 ;This function returns the package of the element.
@@ -53,25 +53,25 @@ Element_getParametrizationDetails_Action_Search_pixel(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: lang("Output variables") (x, y)})
+	parametersToEdit.push({type: "Label", label: x_lang("Output variables") (x, y)})
 	parametersToEdit.push({type: "Edit", id: ["varnameX", "varnameY"], default: ["PixelPosX", "PixelPosY"], content: "VariableName", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("Screen region")})
-	parametersToEdit.push({type: "Radio", id: "CoordMode", default: 1, result: "enum", choices: [lang("Relative to screen"), lang("Relative to active window position"), lang("Relative to active window client position")], enum: ["Screen", "Window", "Client"]})
-	parametersToEdit.push({type: "Checkbox", id: "WholeScreen", default: 0, label: lang("Whole screen")})
-	parametersToEdit.push({type: "Checkbox", id: "AllScreens", default: 0, label: lang("All screens")})
-	parametersToEdit.push({type: "Label", label: lang("Upper left corner") (x1, y1), size: "small"})
+	parametersToEdit.push({type: "Label", label: x_lang("Screen region")})
+	parametersToEdit.push({type: "Radio", id: "CoordMode", default: 1, result: "enum", choices: [x_lang("Relative to screen"), x_lang("Relative to active window position"), x_lang("Relative to active window client position")], enum: ["Screen", "Window", "Client"]})
+	parametersToEdit.push({type: "Checkbox", id: "WholeScreen", default: 0, label: x_lang("Whole screen")})
+	parametersToEdit.push({type: "Checkbox", id: "AllScreens", default: 0, label: x_lang("All screens")})
+	parametersToEdit.push({type: "Label", label: x_lang("Upper left corner") (x1, y1), size: "small"})
 	parametersToEdit.push({type: "Edit", id: ["x1", "y1"], default: [10, 20], content: "number", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("Lower right corner") (x2, y2), size: "small"})
+	parametersToEdit.push({type: "Label", label: x_lang("Lower right corner") (x2, y2), size: "small"})
 	parametersToEdit.push({type: "Edit", id: ["x2", "y2"], default: [600, 700], content: "number", WarnIfEmpty: true})
-	parametersToEdit.push({type: "button", id: "GetCoordinates", goto: "Action_Search_Pixel_Button_MouseTracker", label: lang("Get coordinates")})
-	parametersToEdit.push({type: "Label", label: lang("Pixel color") (RGB)})
+	parametersToEdit.push({type: "button", id: "GetCoordinates", goto: "Action_Search_Pixel_Button_MouseTracker", label: x_lang("Get coordinates")})
+	parametersToEdit.push({type: "Label", label: x_lang("Pixel color") (RGB)})
 	parametersToEdit.push({type: "Edit", id: "ColorID", default: "0xAA00FF", content: "String", WarnIfEmpty: true})
-	parametersToEdit.push({type: "button", id: "ChooseColor", goto: "Action_Search_Pixel_Button_ChooseColor", label: lang("Choose color")})
-	parametersToEdit.push({type: "button", id: "GetColor", goto: "Action_Search_Pixel_Button_GetColorFromScreen", label: lang("Get color from screen")})
-	parametersToEdit.push({type: "Label", label: lang("Variation")})
+	parametersToEdit.push({type: "button", id: "ChooseColor", goto: "Action_Search_Pixel_Button_ChooseColor", label: x_lang("Choose color")})
+	parametersToEdit.push({type: "button", id: "GetColor", goto: "Action_Search_Pixel_Button_GetColorFromScreen", label: x_lang("Get color from screen")})
+	parametersToEdit.push({type: "Label", label: x_lang("Variation")})
 	parametersToEdit.push({type: "Slider", id: "variation", default: 0, result: "number", options: "Range0-255 TickInterval10 tooltip"})
-	parametersToEdit.push({type: "Label", label: lang("Method")})
-	parametersToEdit.push({type: "Checkbox", id: "FastMode", default: 1, label: lang("Fast method")})
+	parametersToEdit.push({type: "Label", label: x_lang("Method")})
+	parametersToEdit.push({type: "Checkbox", id: "FastMode", default: 1, label: x_lang("Fast method")})
 	
 	return parametersToEdit
 }
@@ -91,7 +91,7 @@ Action_Search_Pixel_Button_GetColorFromScreen()
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Search_pixel(Environment, ElementParameters)
 {
-	return lang("Search_pixel") 
+	return x_lang("Search_pixel") 
 }
 
 ;Called every time the user changes any parameter.
@@ -102,17 +102,17 @@ Element_CheckSettings_Action_Search_pixel(Environment, ElementParameters)
 {	
 	if (ElementParameters.CoordMode = "Screen")
 	{
-		x_par_SetLabel("WholeScreen", lang("Whole screen"))
+		x_par_SetLabel("WholeScreen", x_lang("Whole screen"))
 		x_par_Enable("AllScreens", ElementParameters.WholeScreen)
 	}
 	else if (ElementParameters.CoordMode = "Window")
 	{
-		x_par_SetLabel("WholeScreen", lang("Whole window"))
+		x_par_SetLabel("WholeScreen", x_lang("Whole window"))
 		x_par_Disable("AllScreens")
 	}
 	else
 	{
-		x_par_SetLabel("WholeScreen", lang("Whole window client"))
+		x_par_SetLabel("WholeScreen", x_lang("Whole window client"))
 		x_par_Disable("AllScreens")
 	}
 	
@@ -239,13 +239,13 @@ Element_run_Action_Search_pixel(Environment, ElementParameters)
 	PixelSearch,foundx,foundy,%x1%,%y1%,%x2%,%y2%,% EvaluatedParameters.ColorID,% EvaluatedParameters.variation,RGB %WhetherFastMode%
 	if ErrorLevel=2
 	{
-		x_finish(Environment, "exception", lang("Something prevented the command from conducting the search")) 
+		x_finish(Environment, "exception", x_lang("Something prevented the command from conducting the search")) 
 		return
 	}
 	if ErrorLevel=1
 	{
 		
-		x_finish(Environment, "exception", lang("Pixel with color '%1%' not found",EvaluatedParameters.ColorID)) 
+		x_finish(Environment, "exception", x_lang("Pixel with color '%1%' not found",EvaluatedParameters.ColorID)) 
 		return
 	}
 	

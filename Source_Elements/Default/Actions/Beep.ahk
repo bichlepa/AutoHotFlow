@@ -10,13 +10,13 @@ Element_getElementType_Action_Beep()
 ;Name of the element
 Element_getName_Action_Beep()
 {
-	return lang("Beep")
+	return x_lang("Beep")
 }
 
 ;Category of the element
 Element_getCategory_Action_Beep()
 {
-	return lang("Sound")
+	return x_lang("Sound")
 }
 
 ;This function returns the package of the element.
@@ -54,9 +54,9 @@ Element_getParametrizationDetails_Action_Beep(Environment)
 {
 	;~ d( x_GetListOfAllVars(environment))
 	parametersToEdit:=Object()
-	parametersToEdit.push({type: "Label", label: lang("Frequency in Hz")})
+	parametersToEdit.push({type: "Label", label: x_lang("Frequency in Hz")})
 	parametersToEdit.push({type: "edit", id: "frequency", default: 523, content: "Expression", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("Duration in ms")})
+	parametersToEdit.push({type: "Label", label: x_lang("Duration in ms")})
 	parametersToEdit.push({type: "edit", id: "duration", default: 150, content: "Expression", WarnIfEmpty: true})
 	return parametersToEdit
 }
@@ -64,7 +64,7 @@ Element_getParametrizationDetails_Action_Beep(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Beep(Environment, ElementParameters)
 {
-	return % lang("Beep") " - " ElementParameters.frequency " " lang("Hz") " " ElementParameters.duration " " lang("ms")
+	return % x_lang("Beep") " - " ElementParameters.frequency " " x_lang("Hz") " " ElementParameters.duration " " x_lang("ms")
 }
 
 ;Called every time the user changes any parameter.
@@ -85,7 +85,7 @@ Element_run_Action_Beep(Environment, ElementParameters)
 	if (frequencyObj.error)
 	{
 		;On error, finish with exception and return
-		x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.frequency) "`n`n" frequencyObj.error) 
+		x_finish(Environment, "exception", x_lang("An error occured while parsing expression '%1%'", ElementParameters.frequency) "`n`n" frequencyObj.error) 
 		return
 	}
 	frequency:=frequencyObj.result
@@ -94,7 +94,7 @@ Element_run_Action_Beep(Environment, ElementParameters)
 	if (durationObj.error)
 	{
 		;On error, finish with exception and return
-		x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.duration)) "`n`n" durationObj.error
+		x_finish(Environment, "exception", x_lang("An error occured while parsing expression '%1%'", ElementParameters.duration)) "`n`n" durationObj.error
 		return
 	}
 	duration:=durationObj.result
@@ -102,13 +102,13 @@ Element_run_Action_Beep(Environment, ElementParameters)
 	if frequency is not number
 	{
 		;On error, finish with exception and return
-		x_finish(Environment, "exception",lang("Frequency is not a number: '%1%'", frequency))
+		x_finish(Environment, "exception",x_lang("Frequency is not a number: '%1%'", frequency))
 		return
 	}
 	if duration is not number
 	{
 		;On error, finish with exception and return
-		x_finish(Environment, "exception", lang("Frequency is not a number: '%1%'", duration))
+		x_finish(Environment, "exception", x_lang("Frequency is not a number: '%1%'", duration))
 		return
 	}
 	

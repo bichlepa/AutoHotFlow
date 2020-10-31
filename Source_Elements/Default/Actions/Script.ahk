@@ -10,13 +10,13 @@ Element_getElementType_Action_Script()
 ;Name of the element
 Element_getName_Action_Script()
 {
-	return lang("Script")
+	return x_lang("Script")
 }
 
 ;Category of the element
 Element_getCategory_Action_Script()
 {
-	return lang("Variable")
+	return x_lang("Variable")
 }
 
 ;This function returns the package of the element.
@@ -53,7 +53,7 @@ Element_getStabilityLevel_Action_Script()
 Element_getParametrizationDetails_Action_Script(Environment)
 {
 	parametersToEdit:=Object()
-	parametersToEdit.push({type: "label", label: lang("Script")})
+	parametersToEdit.push({type: "label", label: x_lang("Script")})
 	parametersToEdit.push({type: "multilineEdit", id: "Script", default: "", WarnIfEmpty: true})
 
 	return parametersToEdit
@@ -63,7 +63,7 @@ Element_getParametrizationDetails_Action_Script(Environment)
 Element_GenerateName_Action_Script(Environment, ElementParameters)
 {
 	global
-	return % lang("Script") " - " ElementParameters.Script 
+	return % x_lang("Script") " - " ElementParameters.Script 
 	
 }
 

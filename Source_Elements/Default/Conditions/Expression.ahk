@@ -10,13 +10,13 @@ Element_getElementType_Condition_Expression()
 ;Name of the element
 Element_getName_Condition_Expression()
 {
-	return lang("Expression")
+	return x_lang("Expression")
 }
 
 ;Category of the element
 Element_getCategory_Condition_Expression()
 {
-	return lang("Variable")
+	return x_lang("Variable")
 }
 
 ;This function returns the package of the element.
@@ -52,7 +52,7 @@ Element_getStabilityLevel_Condition_Expression()
 Element_getParametrizationDetails_Condition_Expression(Environment)
 {
 	parametersToEdit:=Object()
-	parametersToEdit.push({type: "Label", label: lang("Expression")})
+	parametersToEdit.push({type: "Label", label: x_lang("Expression")})
 	parametersToEdit.push({type: "Edit", id: "Expression", content: "Expression", WarnIfEmpty: true})
 
 	return parametersToEdit
@@ -62,7 +62,7 @@ Element_getParametrizationDetails_Condition_Expression(Environment)
 Element_GenerateName_Condition_Expression(Environment, ElementParameters)
 {
 	global
-	return % lang("Expression") " - " ElementParameters.expression
+	return % x_lang("Expression") " - " ElementParameters.expression
 	
 }
 
@@ -83,7 +83,7 @@ Element_run_Condition_Expression(Environment, ElementParameters)
 	if (evRes.error)
 	{
 		;On error, finish with exception and return
-		x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.Expression) "`n`n" evRes.error) 
+		x_finish(Environment, "exception", x_lang("An error occured while parsing expression '%1%'", ElementParameters.Expression) "`n`n" evRes.error) 
 		return
 	}
 	else

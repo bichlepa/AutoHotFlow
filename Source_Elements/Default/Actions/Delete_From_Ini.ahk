@@ -10,13 +10,13 @@ Element_getElementType_Action_Delete_From_Ini()
 ;Name of the element
 Element_getName_Action_Delete_From_Ini()
 {
-	return lang("Delete_From_Ini")
+	return x_lang("Delete_From_Ini")
 }
 
 ;Category of the element
 Element_getCategory_Action_Delete_From_Ini()
 {
-	return lang("File")
+	return x_lang("File")
 }
 
 ;This function returns the package of the element.
@@ -53,13 +53,13 @@ Element_getParametrizationDetails_Action_Delete_From_Ini(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: lang("Path of an .ini file")})
-	parametersToEdit.push({type: "File", id: "file", label: lang("Select an .ini file")})
-	parametersToEdit.push({type: "Label", label: lang("Action")})
-	parametersToEdit.push({type: "Radio", id: "Action", result: "enum", default: 1, choices: [lang("Delete a key"), lang("Delete a section")], enum: ["DeleteKey", "DeleteSection"]})
-	parametersToEdit.push({type: "Label", label: lang("Section")})
+	parametersToEdit.push({type: "Label", label: x_lang("Path of an .ini file")})
+	parametersToEdit.push({type: "File", id: "file", label: x_lang("Select an .ini file")})
+	parametersToEdit.push({type: "Label", label: x_lang("Action")})
+	parametersToEdit.push({type: "Radio", id: "Action", result: "enum", default: 1, choices: [x_lang("Delete a key"), x_lang("Delete a section")], enum: ["DeleteKey", "DeleteSection"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Section")})
 	parametersToEdit.push({type: "Edit", id: "Section", default: "section", content: "String", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("Key")})
+	parametersToEdit.push({type: "Label", label: x_lang("Key")})
 	parametersToEdit.push({type: "Edit", id: "Key", default: "key", content: "String", WarnIfEmpty: true})
 	
 	return parametersToEdit
@@ -68,7 +68,7 @@ Element_getParametrizationDetails_Action_Delete_From_Ini(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Delete_From_Ini(Environment, ElementParameters)
 {
-	return lang("Delete_From_Ini") 
+	return x_lang("Delete_From_Ini") 
 }
 
 ;Called every time the user changes any parameter.
@@ -94,7 +94,7 @@ Element_run_Action_Delete_From_Ini(Environment, ElementParameters)
 
 	if (not Section)
 	{
-		x_finish(Environment,"exception",lang("Section not specified") )
+		x_finish(Environment,"exception",x_lang("Section not specified") )
 		return
 	}
 	
@@ -103,14 +103,14 @@ Element_run_Action_Delete_From_Ini(Environment, ElementParameters)
 		Key := x_replaceVariables(Environment,ElementParameters.Key)
 		if (not Key)
 		{
-			x_finish(Environment,"exception",lang("Key not specified") )
+			x_finish(Environment,"exception",x_lang("Key not specified") )
 			return
 		}
 		
 		IniDelete,% file,% Section,% Key
 		if errorlevel
 		{
-			x_finish(Environment,"exception",lang("Error on delete from ini") )
+			x_finish(Environment,"exception",x_lang("Error on delete from ini") )
 			return
 		}
 	
@@ -120,7 +120,7 @@ Element_run_Action_Delete_From_Ini(Environment, ElementParameters)
 		IniDelete,% file,% Section
 		if errorlevel
 		{
-			x_finish(Environment,"exception",lang("Error on delete from ini") )
+			x_finish(Environment,"exception",x_lang("Error on delete from ini") )
 			return
 		}
 	}

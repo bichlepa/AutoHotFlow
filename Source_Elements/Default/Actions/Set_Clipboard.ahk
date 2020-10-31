@@ -10,13 +10,13 @@ Element_getElementType_Action_Set_Clipboard()
 ;Name of the element
 Element_getName_Action_Set_Clipboard()
 {
-	return lang("Set_Clipboard")
+	return x_lang("Set_Clipboard")
 }
 
 ;Category of the element
 Element_getCategory_Action_Set_Clipboard()
 {
-	return lang("Variable")
+	return x_lang("Variable")
 }
 
 ;This function returns the package of the element.
@@ -62,7 +62,7 @@ Element_getParametrizationDetails_Action_Set_Clipboard(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Set_Clipboard(Environment, ElementParameters)
 {
-	return lang("Set_Clipboard") 
+	return x_lang("Set_Clipboard") 
 }
 
 ;Called every time the user changes any parameter.

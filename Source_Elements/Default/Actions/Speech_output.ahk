@@ -10,13 +10,13 @@ Element_getElementType_Action_Speech_output()
 ;Name of the element
 Element_getName_Action_Speech_output()
 {
-	return lang("Speech_output")
+	return x_lang("Speech_output")
 }
 
 ;Category of the element
 Element_getCategory_Action_Speech_output()
 {
-	return lang("Sound") "|" lang("User_Interaction")
+	return x_lang("Sound") "|" x_lang("User_Interaction")
 }
 
 ;This function returns the package of the element.
@@ -54,18 +54,18 @@ Element_getParametrizationDetails_Action_Speech_output(Environment)
 	tts:=Action_Speech_output_GetSpeechEngines()
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: lang("Text_to_speak")})
-	parametersToEdit.push({type: "multiLineEdit", id: "text", default: lang("Message"), content: "String"})
-	parametersToEdit.push({type: "Label", label: lang("Wait options")})
-	;~ parametersToEdit.push({type: "Checkbox", id: "WaitUntilPreviousFinished", default: 0, label: lang("Wait until previous speech output has finished (if any)")})
-	parametersToEdit.push({type: "Checkbox", id: "WaitUntilCurrentFinishes", default: 1, label: lang("Wait until this speech output finishes")})
-	parametersToEdit.push({type: "Label", label: lang("Speech engine")})
+	parametersToEdit.push({type: "Label", label: x_lang("Text_to_speak")})
+	parametersToEdit.push({type: "multiLineEdit", id: "text", default: x_lang("Message"), content: "String"})
+	parametersToEdit.push({type: "Label", label: x_lang("Wait options")})
+	;~ parametersToEdit.push({type: "Checkbox", id: "WaitUntilPreviousFinished", default: 0, label: x_lang("Wait until previous speech output has finished (if any)")})
+	parametersToEdit.push({type: "Checkbox", id: "WaitUntilCurrentFinishes", default: 1, label: x_lang("Wait until this speech output finishes")})
+	parametersToEdit.push({type: "Label", label: x_lang("Speech engine")})
 	parametersToEdit.push({type: "DropDown", id: "TTSEngine", default: tts.default, choices: tts.list, result: "string"})
-	parametersToEdit.push({type: "Label", label: lang("Volume")})
+	parametersToEdit.push({type: "Label", label: x_lang("Volume")})
 	parametersToEdit.push({type: "Slider", id: "volume", default: 100, options: "Range0-100 TickInterval10 tooltip"})
-	parametersToEdit.push({type: "Label", label: lang("Speed")})
+	parametersToEdit.push({type: "Label", label: x_lang("Speed")})
 	parametersToEdit.push({type: "Slider", id: "speed", default: 0, options: "Range-10-10 TickInterval1 tooltip"})
-	parametersToEdit.push({type: "Label", label: lang("Pitch")})
+	parametersToEdit.push({type: "Label", label: x_lang("Pitch")})
 	parametersToEdit.push({type: "Slider", id: "pitch", default: 0, options: "Range-10-10 TickInterval1 tooltip"})
 
 	
@@ -76,7 +76,7 @@ Element_getParametrizationDetails_Action_Speech_output(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Speech_output(Environment, ElementParameters)
 {
-	return lang("Speech_output") 
+	return x_lang("Speech_output") 
 }
 
 ;Called every time the user changes any parameter.
@@ -111,7 +111,7 @@ Element_run_Action_Speech_output(Environment, ElementParameters)
 		ActionSpeech_Output_CreatedVoices[VoiceIdentification] := TTS_CreateVoice(EvaluatedParameters.TTSEngine, EvaluatedParameters.speed, EvaluatedParameters.volume, EvaluatedParameters.pitch)
 		if not (ActionSpeech_Output_CreatedVoices[VoiceIdentification])
 		{
-			x_finish(Environment, "exception", lang("Could not find TTS engine '%1%'", EvaluatedParameters.TTSEngine))
+			x_finish(Environment, "exception", x_lang("Could not find TTS engine '%1%'", EvaluatedParameters.TTSEngine))
 			return
 		}
 	}
@@ -131,7 +131,7 @@ Element_run_Action_Speech_output(Environment, ElementParameters)
 	}
 	catch
 	{
-		x_finish(Environment, "exception", lang("Error on speech output"))
+		x_finish(Environment, "exception", x_lang("Error on speech output"))
 		return
 	}
 	

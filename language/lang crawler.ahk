@@ -9,94 +9,136 @@ mainlanguagecode:="en"
 mainlanguagename:="English"
 
 
-#Include language.ahk
+#Include %A_ScriptDir%\..
+#Include lib\json\jxon.ahk
+#Include lib\ini\ini helper.ahk
 
-allStrings:=object()
-allLangs:=Object()
-stringalllangs=`n
+allStrings := object()
 
-_language:=Object()
-_language.lang:=mainlanguagecode
-_language.fallbacklang:=mainlanguagecode
-_language.dir:=A_ScriptDir
-_language.readAll:=True
-_language.MakeAdditionalCategoryOfTranslationObject:=true
+; at first we will search for lang() calls in source code of AHF. We will search in packages later
+folders := ["Source_Common", "Source_Main", "Source_Manager", "Source_Editor", "Source_Execution", "Source_Draw"]
 
+; the tranlations of source code are in the folder "basic"
+iniPath := "language\basic\en.ini"
 
-lang_Init()
+; read existing translations
+FileRead, iniFileContent, % iniPath
+iniContent := importIni(iniFileContent)
+iniContentLanguageInfo := iniContent.language_info
 
-;Search for all ahk files and search for lang() calls
-loop %A_WorkingDir%\*.ahk,1,1
+for oneFolderIndex, oneFolder in folders
 {
-	;MsgBox %A_LoopFileFullPath%
-	if A_LoopFileName=language.ahk
-		continue
-	
-	ToolTip, Scanning %A_LoopFileFullPath%
-	currentfile:=A_LoopFileFullPath
-	FileRead,ahkFileContent,%A_LoopFileFullPath%
-	tempFoundPos=1
-	Loop
-	{
-		;search for a lang() call and get the string out of it. (It was hard to implement maybe I will need to rewrite it)
-		tempFoundPos:=RegExMatch(ahkFileContent, "U)lang\(""(.+"")", tempVariablesToReplace,tempFoundPos +1)
-		if tempFoundPos=0
-			break
-		langvar:=tempVariablesToReplace1
-		;~ ToolTip, %A_LoopFileFullPath% %tempFoundPos%
-		StringGetPos,pos,langvar,"
-		if pos
-			StringLeft,langvar,langvar,%pos%
-		else
-		{
-			MsgBox, unexpected error!
-		}
-		
-		SetTimer,langremovetooltip,-5000
-		;~ StringReplace,langvar_no_spaces,langvar,%a_space%,_,all
-		if not allStrings.haskey(langvar)
-			allStrings[langvar]:=1
-		
-		lang(langvar)
-		if (_language.success != 1)
-		{
-			;~ StringReplace,langvar_spaces,langvar,_,%A_Space%,all
-			;~ MsgBox %currentfile%
-			InputBox,newtrans,How is this in %mainlanguagename%?,%currentfile%`n`n%langvar%,,,,,,,,%langvar%
-			
-			;try to correct common errors
-			loop,9
-			{
-				StringReplace,newtrans,newtrans,$%a_index%,`%1`%,all
-				StringReplace,newtrans,newtrans,$%a_index%,`%1`%,all
-				StringReplace,newtrans,newtrans,$%a_index%$,`%1`%,all
-				StringReplace,newtrans,newtrans,`%%a_index%$,`%1`%,all
-				StringReplace,newtrans,newtrans,$%a_index%`%,`%1`%,all
-			}
-			iniwrite,% newtrans,%A_ScriptDir%\%mainlanguagecode%.ini,translations,%langvar%
-		}
-		
-	}
+	allStringsValue := oneFolder
+	if (oneFolder = "Source_Common" or oneFolder = "Source_Main")
+		allStringsValue := "common"
+	searchLangCallsInCode(oneFolder, allStrings, allStringsValue, "common")
 }
 
-;Search for entries in ini which are not used
-for, tempString, tempTransl in _language.cache
+iniContent := mergeStringsInIniContent(iniContent, allStrings)
+
+iniFileContent := exportIni({language_info: iniContentLanguageInfo}) "`n`n" exportIni(iniContent)
+filedelete, % iniPath
+FileAppend, % iniFileContent, % iniPath
+
+
+; now we will search in packages
+loop, files, source_elements\*, D
 {
-	if not allStrings.HasKey(tempString)
-	{
-		tempCategory:=langCategoryOfTranslation[tempString]
-		MsgBox, 4,Unused translation,%tempString% `n`nin category '%tempCategory%' is not used. Delete?
-		IfMsgBox yes
-			IniDelete,%A_ScriptDir%\%mainlanguagecode%.ini,%tempCategory%,%tempString%
-	}
-	else
-		tooltip  %tempString%
+	iniPath := A_LoopFilePath "\language\en.ini"
 	
+	FileRead, iniFileContent, % iniPath
+	iniContent := importIni(iniFileContent)
+
+	allStringsValue := A_LoopFileName
+	allNewStrings := searchLangCallsInCode(A_LoopFilePath, allStrings, allStringsValue)
+	
+	iniContent := mergeStringsInIniContent(iniContent, allNewStrings)
+	iniFileContent := exportIni({language_info: iniContentLanguageInfo}) "`n`n" exportIni(iniContent)
+	filedelete, % iniPath
+	FileAppend, % iniFileContent, % iniPath
 }
 
-MsgBox Everything is translated! :-)
+
+
+MsgBox finished! :-)
 ExitApp
 
-langremovetooltip:
-ToolTip
-return
+searchLangCallsInCode(folder, allStrings, allStringsValue, allStringsValueIfOtherOccurences = "")
+{
+	allNewStrings := []
+
+	;Search for all ahk files and search for lang() calls
+	loop %folder%\*.ahk,1,1
+	{
+		currentfile := A_LoopFileFullPath
+		FileRead, ahkFileContent, %currentfile%
+		
+		tempFoundPos := 1
+		Loop
+		{
+			;search for a lang() call and get the string out of it. (It was hard to implement maybe I will need to rewrite it)
+			tempFoundPos := RegExMatch(ahkFileContent, "U)lang\(""(.+"")", tempVariablesToReplace, tempFoundPos + 1)
+			if (tempFoundPos = 0)
+				break
+			
+			langvar := tempVariablesToReplace1
+			stringreplace, langvar, langvar, _, %a_space%, all
+			
+			StringGetPos, pos, langvar, "
+			if pos
+				StringLeft, langvar, langvar, %pos%
+			else
+			{
+				MsgBox, unexpected error in file %currentfile%
+				exitapp
+			}
+			
+			if not allStrings.haskey(langvar)
+			{
+				allStrings[langvar] := allStringsValue
+				allNewStrings[langvar] := allStringsValue
+			}
+			Else if (allStrings[langvar] != allStringsValue and allStringsValueIfOtherOccurences)
+			{
+				allStrings[langvar] := allStringsValueIfOtherOccurences
+			}
+		}
+	}
+
+	return allNewStrings
+}
+
+
+; search for missing entries in ini file
+mergeStringsInIniContent(iniContent, allStrings)
+{
+	newIniContent := []
+
+	for oneString, oneCategory in allStrings
+	{
+		if not newIniContent[oneCategory]
+			newIniContent[oneCategory] := []
+		newIniContent[oneCategory][oneString] := getKeyFromIniContent(iniContent, oneString)
+	}
+
+	return newIniContent
+}
+
+getKeyFromIniContent(iniContent, string)
+{
+	for oneIndex, oneCategory in iniContent
+	{
+		if (oneCategory[string])
+		{
+			return oneCategory[string]
+		}
+	}
+
+	pos := instr(string, "#")
+	if pos
+		string := trim(substr(string, 1, pos-1))
+	return string
+}
+
+
+

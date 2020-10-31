@@ -10,13 +10,13 @@ Element_getElementType_Action_Change_Drive_Label()
 ;Name of the element
 Element_getName_Action_Change_Drive_Label()
 {
-	return lang("Change_Drive_Label")
+	return x_lang("Change_Drive_Label")
 }
 
 ;Category of the element
 Element_getCategory_Action_Change_Drive_Label()
 {
-	return lang("Drive")
+	return x_lang("Drive")
 }
 
 ;This function returns the package of the element.
@@ -64,9 +64,9 @@ Element_getParametrizationDetails_Action_Change_Drive_Label(Environment)
 		
 	}
 	
-	parametersToEdit.push({type: "Label", label: lang("Drive letter")})
+	parametersToEdit.push({type: "Label", label: x_lang("Drive letter")})
 	parametersToEdit.push({type: "ComboBox", id: "DriveLetter", content: "String", WarnIfEmpty: true, result: "string", default: defaultdrive, choices: listOfdrives})
-	parametersToEdit.push({type: "Label", label: lang("New label")})
+	parametersToEdit.push({type: "Label", label: x_lang("New label")})
 	parametersToEdit.push({type: "Edit", id: "NewLabel", content: "String"})
 	
 	
@@ -76,7 +76,7 @@ Element_getParametrizationDetails_Action_Change_Drive_Label(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Change_Drive_Label(Environment, ElementParameters)
 {
-	return lang("Change_Drive_Label") 
+	return x_lang("Change_Drive_Label") 
 }
 
 ;Called every time the user changes any parameter.
@@ -98,7 +98,7 @@ Element_run_Action_Change_Drive_Label(Environment, ElementParameters)
 
 	if not DriveLetter
 	{
-		x_finish(Environment,"exception", lang("Drive is not specified"))
+		x_finish(Environment,"exception", x_lang("Drive is not specified"))
 		return
 	}
 	
@@ -107,7 +107,7 @@ Element_run_Action_Change_Drive_Label(Environment, ElementParameters)
 	
 	if ErrorLevel
 	{
-		x_finish(Environment,"exception", lang("Label %1% could not be set to drive %2%",NewLabel,DriveLetter))
+		x_finish(Environment,"exception", x_lang("Label %1% could not be set to drive %2%",NewLabel,DriveLetter))
 		return
 	}
 	

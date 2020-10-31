@@ -10,13 +10,13 @@ Element_getElementType_Action_Compress_files()
 ;Name of the element
 Element_getName_Action_Compress_files()
 {
-	return lang("Compress_files")
+	return x_lang("Compress_files")
 }
 
 ;Category of the element
 Element_getCategory_Action_Compress_files()
 {
-	return lang("Files")
+	return x_lang("Files")
 }
 
 ;This function returns the package of the element.
@@ -52,12 +52,12 @@ Element_getStabilityLevel_Action_Compress_files()
 Element_getParametrizationDetails_Action_Compress_files(Environment)
 {
 	parametersToEdit:=Object()
-	parametersToEdit.push({type: "Label", label: lang("Source file")})
-	parametersToEdit.push({type: "File", id: "file", label: lang("Select a file")})
-	parametersToEdit.push({type: "Label", label: lang("Destination archive")})
-	parametersToEdit.push({type: "File", id: "zipfile", label: lang("Select a zip file"), filter: lang("Archive") " (.zip; .7z; .xz; .gz; .gzip; .tgz; .bz2; .bzip2; tbz2; tbz; tar)", options: "S"})
-	parametersToEdit.push({type: "Label", label: lang("Options")})
-	parametersToEdit.push({type: "Label", label: lang("Format"), size: "small"})
+	parametersToEdit.push({type: "Label", label: x_lang("Source file")})
+	parametersToEdit.push({type: "File", id: "file", label: x_lang("Select a file")})
+	parametersToEdit.push({type: "Label", label: x_lang("Destination archive")})
+	parametersToEdit.push({type: "File", id: "zipfile", label: x_lang("Select a zip file"), filter: x_lang("Archive") " (.zip; .7z; .xz; .gz; .gzip; .tgz; .bz2; .bzip2; tbz2; tbz; tar)", options: "S"})
+	parametersToEdit.push({type: "Label", label: x_lang("Options")})
+	parametersToEdit.push({type: "Label", label: x_lang("Format"), size: "small"})
 	parametersToEdit.push({type: "DropDown", id: "zipformat", default: "*", choices: ["*", "7z", "zip", "xz", "tar", "gzip", "BZIP2"], result: "string"})
 	
 	return parametersToEdit
@@ -67,7 +67,7 @@ Element_getParametrizationDetails_Action_Compress_files(Environment)
 Element_GenerateName_Action_Compress_files(Environment, ElementParameters)
 {
 	global
-	return % lang("Compress_files") " - " ElementParameters.file " - " ElementParameters.zipfile
+	return % x_lang("Compress_files") " - " ElementParameters.file " - " ElementParameters.zipfile
 	
 }
 

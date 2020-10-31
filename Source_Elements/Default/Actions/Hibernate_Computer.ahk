@@ -10,13 +10,13 @@ Element_getElementType_Action_Hibernate_Computer()
 ;Name of the element
 Element_getName_Action_Hibernate_Computer()
 {
-	return lang("Hibernate_Computer")
+	return x_lang("Hibernate_Computer")
 }
 
 ;Category of the element
 Element_getCategory_Action_Hibernate_Computer()
 {
-	return lang("Power")
+	return x_lang("Power")
 }
 
 ;This function returns the package of the element.
@@ -61,7 +61,7 @@ Element_getParametrizationDetails_Action_Hibernate_Computer(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Hibernate_Computer(Environment, ElementParameters)
 {
-	return lang("Hibernate_Computer") 
+	return x_lang("Hibernate_Computer") 
 }
 
 ;Called every time the user changes any parameter.

@@ -10,13 +10,13 @@ Element_getElementType_Action_Get_Screen_Settings()
 ;Name of the element
 Element_getName_Action_Get_Screen_Settings()
 {
-	return lang("Get_Screen_Settings")
+	return x_lang("Get_Screen_Settings")
 }
 
 ;Category of the element
 Element_getCategory_Action_Get_Screen_Settings()
 {
-	return lang("Image")
+	return x_lang("Image")
 }
 
 ;This function returns the package of the element.
@@ -56,32 +56,32 @@ Element_getParametrizationDetails_Action_Get_Screen_Settings(Environment)
 	
 	NumberOfMonitors := DllCall("user32.dll\GetSystemMetrics", "Int", 80)                  ; Get the number of display monitors on a desktop.
 
-	parametersToEdit.push({type: "Label", label: lang("Which monitor")})
+	parametersToEdit.push({type: "Label", label: x_lang("Which monitor")})
 	parametersToEdit.push({type: "edit", id: "MonitorNumber", default: 1, content: "Expression", WarnIfEmpty: true, UseUpDown: true, range: "1-" NumberOfMonitors})
 	
-	parametersToEdit.push({type: "Label", label:  lang("Output variables")})
+	parametersToEdit.push({type: "Label", label:  x_lang("Output variables")})
 	
-	parametersToEdit.push({type: "Label", label:  lang("Brightness") ": " lang("Current value") " - " lang("Minimum") " - " lang("Maximum") , size: "small"})
+	parametersToEdit.push({type: "Label", label:  x_lang("Brightness") ": " x_lang("Current value") " - " x_lang("Minimum") " - " x_lang("Maximum") , size: "small"})
 	parametersToEdit.push({type: "Edit", id: ["VarnameBrightness", "VarnameBrightnessMin", "VarnameBrightnessMax"], default: ["Brightness","" ,"" ], content: "VariableName"})
 	
-	parametersToEdit.push({type: "Label", label:  lang("Contrast") ": " lang("Current value") " - " lang("Minimum") " - " lang("Maximum") , size: "small"})
+	parametersToEdit.push({type: "Label", label:  x_lang("Contrast") ": " x_lang("Current value") " - " x_lang("Minimum") " - " x_lang("Maximum") , size: "small"})
 	parametersToEdit.push({type: "Edit", id: ["VarnameContrast", "VarnameContrastMin", "VarnameContrastMax"], default: ["Contrast","" ,"" ], content: "VariableName"})
 	
-	parametersToEdit.push({type: "Label", label:  lang("Red gain") ": " lang("Current value") " - " lang("Minimum") " - " lang("Maximum") , size: "small" })
+	parametersToEdit.push({type: "Label", label:  x_lang("Red gain") ": " x_lang("Current value") " - " x_lang("Minimum") " - " x_lang("Maximum") , size: "small" })
 	parametersToEdit.push({type: "Edit", id: ["VarnameRedGain", "VarnameRedGainMin", "VarnameRedGainMax"], default: ["RedGain", "","" ], content: "VariableName"})
-	parametersToEdit.push({type: "Label", label:  lang("Green gain") ": " lang("Current value") " - " lang("Minimum") " - " lang("Maximum") , size: "small" })
+	parametersToEdit.push({type: "Label", label:  x_lang("Green gain") ": " x_lang("Current value") " - " x_lang("Minimum") " - " x_lang("Maximum") , size: "small" })
 	parametersToEdit.push({type: "Edit", id: ["VarnameGreenGain", "VarnameGreenGainMin", "VarnameGreenGainMax"], default: ["GreenGain", "", ""], content: "VariableName"})
-	parametersToEdit.push({type: "Label", label:  lang("Blue gain") ": " lang("Current value") " - " lang("Minimum") " - " lang("Maximum") , size: "small" })
+	parametersToEdit.push({type: "Label", label:  x_lang("Blue gain") ": " x_lang("Current value") " - " x_lang("Minimum") " - " x_lang("Maximum") , size: "small" })
 	parametersToEdit.push({type: "Edit", id: ["VarnameBlueGain", "VarnameBlueGainMin", "VarnameBlueGainMax"], default: ["BlueGain","" , ""], content: "VariableName"})
 	
-	parametersToEdit.push({type: "Label", label:  lang("Red drive") ": " lang("Current value") " - " lang("Minimum") " - " lang("Maximum") , size: "small" })
+	parametersToEdit.push({type: "Label", label:  x_lang("Red drive") ": " x_lang("Current value") " - " x_lang("Minimum") " - " x_lang("Maximum") , size: "small" })
 	parametersToEdit.push({type: "Edit", id: ["VarnameReddrive", "VarnameReddriveMin", "VarnameReddriveMax"], default: ["RedDrive", "","" ], content: "VariableName"})
-	parametersToEdit.push({type: "Label", label:  lang("Green drive") ": " lang("Current value") " - " lang("Minimum") " - " lang("Maximum") , size: "small" })
+	parametersToEdit.push({type: "Label", label:  x_lang("Green drive") ": " x_lang("Current value") " - " x_lang("Minimum") " - " x_lang("Maximum") , size: "small" })
 	parametersToEdit.push({type: "Edit", id: ["VarnameGreendrive", "VarnameGreendriveMin", "VarnameGreendriveMax"], default: ["GreenDrive", "", ""], content: "VariableName"})
-	parametersToEdit.push({type: "Label", label:  lang("Blue drive") ": " lang("Current value") " - " lang("Minimum") " - " lang("Maximum") , size: "small" })
+	parametersToEdit.push({type: "Label", label:  x_lang("Blue drive") ": " x_lang("Current value") " - " x_lang("Minimum") " - " x_lang("Maximum") , size: "small" })
 	parametersToEdit.push({type: "Edit", id: ["VarnameBluedrive", "VarnameBluedriveMin", "VarnameBluedriveMax"], default: ["BlueDrive","" , ""], content: "VariableName"})
 	
-	parametersToEdit.push({type: "Label", label:  lang("Color temperature"), size: "small"})
+	parametersToEdit.push({type: "Label", label:  x_lang("Color temperature"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: "VarnameColorTemperature", default: "ColorTemperature", content: "VariableName"})
 
 	return parametersToEdit
@@ -90,7 +90,7 @@ Element_getParametrizationDetails_Action_Get_Screen_Settings(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Get_Screen_Settings(Environment, ElementParameters)
 {
-	return lang("Get_Screen_Settings") 
+	return x_lang("Get_Screen_Settings") 
 }
 
 ;Called every time the user changes any parameter.
@@ -113,17 +113,17 @@ Element_run_Action_Get_Screen_Settings(Environment, ElementParameters)
 	if (evRes.error)
 	{
 		;On error, finish with exception and return
-		x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.MonitorNumber) "`n`n" evRes.error) 
+		x_finish(Environment, "exception", x_lang("An error occured while parsing expression '%1%'", ElementParameters.MonitorNumber) "`n`n" evRes.error) 
 		return
 	}
 	MonitorNumber:=evRes.result
 	if MonitorNumber is not integer
 	{
-		x_finish(Environment, "exception", lang("Screen number is not specified") )
+		x_finish(Environment, "exception", x_lang("Screen number is not specified") )
 	}
 	if not (MonitorNumber >= 1 and MonitorNumber <= NumberOfMonitors)
 	{
-		x_finish(Environment, "exception", lang("Screen %1% does not exist", MonitorNumber) ) 
+		x_finish(Environment, "exception", x_lang("Screen %1% does not exist", MonitorNumber) ) 
 	}
 	
 	allVarNames:=["VarnameBrightness", "VarnameBrightnessMin", "VarnameBrightnessMax", "VarnameContrast", "VarnameContrastMin", "VarnameContrastMax", "VarnameRedGain", "VarnameRedGainMin", "VarnameRedGainMax", "VarnameGreenGain", "VarnameGreenGainMin", "VarnameGreenGainMax", "VarnameBlueGain", "VarnameBlueGainMin", "VarnameBlueGainMax", "VarnameReddrive", "VarnameReddriveMin", "VarnameReddriveMax", "VarnameGreendrive", "VarnameGreendriveMin", "VarnameGreendriveMax", "VarnameBluedrive", "VarnameBluedriveMin", "VarnameBluedriveMax", "VarnameColorTemperature"]
@@ -137,7 +137,7 @@ Element_run_Action_Get_Screen_Settings(Environment, ElementParameters)
 			if not x_CheckVariableName(%oneVarname%)
 			{
 				;On error, finish with exception and return
-				x_finish(Environment, "exception", lang("%1% is not valid", lang("Ouput variable name '%1%'", %oneVarname%)))
+				x_finish(Environment, "exception", x_lang("%1% is not valid", x_lang("Ouput variable name '%1%'", %oneVarname%)))
 				return
 			}
 			anyVarNameSpecified:=true
@@ -146,7 +146,7 @@ Element_run_Action_Get_Screen_Settings(Environment, ElementParameters)
 	
 	if not (anyVarNameSpecified)
 	{
-		x_finish(Environment, "exception", lang("No variable name specified"))
+		x_finish(Environment, "exception", x_lang("No variable name specified"))
 		return
 	}
 	
@@ -156,7 +156,7 @@ Element_run_Action_Get_Screen_Settings(Environment, ElementParameters)
 		result:=class_monitor.GetMonitorBrightness(MonitorNumber)
 		if (substr(result,1,1)="*")
 		{
-			x_finish(Environment, "exception", lang("Couldn't get screen setting: %1%",lang("Brightness")) ". " lang("Error code: %1%",result))
+			x_finish(Environment, "exception", x_lang("Couldn't get screen setting: %1%",x_lang("Brightness")) ". " x_lang("Error code: %1%",result))
 			return
 		}
 		if (VarnameBrightness!="")
@@ -172,7 +172,7 @@ Element_run_Action_Get_Screen_Settings(Environment, ElementParameters)
 		result:=class_monitor.GetMonitorContrast(MonitorNumber)
 		if (substr(result,1,1)="*")
 		{
-			x_finish(Environment, "exception", lang("Couldn't get screen setting: %1%",lang("Contrast")) ". " lang("Error code: %1%",result))
+			x_finish(Environment, "exception", x_lang("Couldn't get screen setting: %1%",x_lang("Contrast")) ". " x_lang("Error code: %1%",result))
 			
 			return
 		}
@@ -189,7 +189,7 @@ Element_run_Action_Get_Screen_Settings(Environment, ElementParameters)
 		result:=class_monitor.GetMonitorRedGreenOrBlueGain(MonitorNumber,0)
 		if (substr(result,1,1)="*")
 		{
-			x_finish(Environment, "exception", lang("Couldn't get screen setting: %1%",lang("Red gain")) ". " lang("Error code: %1%",result))
+			x_finish(Environment, "exception", x_lang("Couldn't get screen setting: %1%",x_lang("Red gain")) ". " x_lang("Error code: %1%",result))
 			return
 		}
 		if (VarnameRedGain!="")
@@ -204,7 +204,7 @@ Element_run_Action_Get_Screen_Settings(Environment, ElementParameters)
 		result:=class_monitor.GetMonitorRedGreenOrBlueGain(MonitorNumber,1)
 		if (substr(result,1,1)="*")
 		{
-			x_finish(Environment, "exception", lang("Couldn't get screen setting: %1%",lang("Green gain")) ". " lang("Error code: %1%",result))
+			x_finish(Environment, "exception", x_lang("Couldn't get screen setting: %1%",x_lang("Green gain")) ". " x_lang("Error code: %1%",result))
 			return
 		}
 		if (VarnameGreenGain!="")
@@ -219,7 +219,7 @@ Element_run_Action_Get_Screen_Settings(Environment, ElementParameters)
 		result:=class_monitor.GetMonitorRedGreenOrBlueGain(MonitorNumber,2)
 		if (substr(result,1,1)="*")
 		{
-			x_finish(Environment, "exception", lang("Couldn't get screen setting: %1%",lang("Blue gain")) ". " lang("Error code: %1%",result))
+			x_finish(Environment, "exception", x_lang("Couldn't get screen setting: %1%",x_lang("Blue gain")) ". " x_lang("Error code: %1%",result))
 			return
 		}
 		if (VarnameBlueGain!="")
@@ -235,7 +235,7 @@ Element_run_Action_Get_Screen_Settings(Environment, ElementParameters)
 		result:=class_monitor.GetMonitorRedGreenOrBlueDrive(MonitorNumber,0)
 		if (substr(result,1,1)="*")
 		{
-			x_finish(Environment, "exception", lang("Couldn't get screen setting: %1%",lang("Red drive")) ". " lang("Error code: %1%",result))
+			x_finish(Environment, "exception", x_lang("Couldn't get screen setting: %1%",x_lang("Red drive")) ". " x_lang("Error code: %1%",result))
 			return
 		}
 		if (VarnameRedDrive!="")
@@ -250,7 +250,7 @@ Element_run_Action_Get_Screen_Settings(Environment, ElementParameters)
 		result:=class_monitor.GetMonitorRedGreenOrBlueDrive(MonitorNumber,1)
 		if (substr(result,1,1)="*")
 		{
-			x_finish(Environment, "exception", lang("Couldn't get screen setting: %1%",lang("Green drive")) ". " lang("Error code: %1%",result))
+			x_finish(Environment, "exception", x_lang("Couldn't get screen setting: %1%",x_lang("Green drive")) ". " x_lang("Error code: %1%",result))
 			return
 		}
 		if (VarnameGreenDrive!="")
@@ -265,7 +265,7 @@ Element_run_Action_Get_Screen_Settings(Environment, ElementParameters)
 		result:=class_monitor.GetMonitorRedGreenOrBlueDrive(MonitorNumber,2)
 		if (substr(result,1,1)="*")
 		{
-			x_finish(Environment, "exception", lang("Couldn't get screen setting: %1%",lang("Blue drive")) ". " lang("Error code: %1%",result))
+			x_finish(Environment, "exception", x_lang("Couldn't get screen setting: %1%",x_lang("Blue drive")) ". " x_lang("Error code: %1%",result))
 			return
 		}
 		if (VarnameBlueDrive!="")
@@ -281,7 +281,7 @@ Element_run_Action_Get_Screen_Settings(Environment, ElementParameters)
 		result:=class_monitor.GetMonitorColorTemperature(MonitorNumber)
 		if (substr(result,1,1)="*")
 		{
-			x_finish(Environment, "exception", lang("Couldn't get screen setting: %1%",lang("Color temperature")) ". " lang("Error code: %1%",result))
+			x_finish(Environment, "exception", x_lang("Couldn't get screen setting: %1%",x_lang("Color temperature")) ". " x_lang("Error code: %1%",result))
 			return
 		}
 			x_SetVariable(Environment,VarnameColorTemperature,result)

@@ -150,7 +150,7 @@ lang_setLanguage(p_lang = "")
 }
 
 ;translate one string
-lang(langvar,$1="",$2="",$3="",$4="",$5="",$6="",$7="",$8="",$9="")
+lang(langvar, langReplacements*)
 {
 	global _language, developing
 	
@@ -237,16 +237,11 @@ lang(langvar,$1="",$2="",$3="",$4="",$5="",$6="",$7="",$8="",$9="")
 		_language.cache[langvar]:=initext
 	}
 	
-	;Replace 
-	StringReplace,initext,initext,`%1`%,%$1%,all
-	StringReplace,initext,initext,`%2`%,%$2%,all
-	StringReplace,initext,initext,`%3`%,%$3%,all
-	StringReplace,initext,initext,`%4`%,%$4%,all
-	StringReplace,initext,initext,`%5`%,%$4%,all
-	StringReplace,initext,initext,`%6`%,%$4%,all
-	StringReplace,initext,initext,`%7`%,%$4%,all
-	StringReplace,initext,initext,`%8`%,%$4%,all
-	StringReplace,initext,initext,`%9`%,%$4%,all
+	;Replace
+	loop langReplacements.Count()
+	{
+		StringReplace, initext, initext,% "%" a_index "%", % langReplacements[a_index], all
+	}
 	
 	
 	return initext
@@ -261,11 +256,11 @@ lang_ReadAllTranslations()
 	directory := _language.dir
 	filepath := _language.allLangs[lang].filepath
 	
-	_language.cache:=Object()
+	_language.cache := Object()
 	
 	;this is needed for the script "Search for new strings to translate"
 	if (_language.MakeAdditionalCategoryOfTranslationObject)
-		global langCategoryOfTranslation:=object()
+		global langCategoryOfTranslation := object()
 	
 	loop,read,%filepath%
 	{
@@ -433,3 +428,4 @@ initLanguageCodes()
 	_language.systemcodes["0843"] := "Uzbek_Cyrillic"
 	_language.systemcodes["042a"] := "Vietnamese"
 }
+

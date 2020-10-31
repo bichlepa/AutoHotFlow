@@ -7,15 +7,29 @@ SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 FileEncoding utf-8
 
 #include lib\Json\Jxon.ahk
+#Include lib\ini\ini helper.ahk
 
 if not (a_iscompiled)
 {
 	allElementTypes := ["actions", "conditions", "loops", "triggers"]
 	availableHelpFileLanguages := []
 
+	; find available help files
 	loop, files, Help\*, D
 	{
 		availableHelpFileLanguages.push(A_LoopFileName)
+	}
+
+	; prepare translations merge
+	; read and copy all existing basic translations
+	allTranslations := []
+	loop, files, language\basic\*.ini
+	{
+		oneLanguage := substr(a_loopfilename, 1, instr(a_loopfilename, ".") - 1)
+		
+		; read existing translations
+		FileRead, iniFileContent, % a_loopfilepath
+		allTranslations[oneLanguage] := importIni(iniFileContent)
 	}
 
 	;This is only executing while developing
@@ -82,6 +96,27 @@ if not (a_iscompiled)
 			FileAppend, % helpFileMenuTemplate, help\%oneLanguage%\Menu.html
 		}
 		
+
+		; merge translations files
+		loop, files, %A_LoopFileDir%\language\*.ini
+		{
+			oneLanguage := substr(a_loopfilename, 1, instr(a_loopfilename, ".") - 1)
+			
+			; read existing translations
+			FileRead, iniFileContent, % a_loopfilepath
+			newTranslations := importIni(iniFileContent)
+			mergeTranslations(allTranslations[oneLanguage], newTranslations)
+		}
+	}
+
+	; save merged translations
+	for oneLanguage, oneLanguageData in allTranslations
+	{
+		language_info := oneLanguageData.delete("language_info")
+		iniFileContent := exportIni({language_info: language_info}) "`n`n" exportIni(oneLanguageData)
+		iniPath := "language\" oneLanguage ".ini"
+		filedelete, % iniPath
+		FileAppend, % iniFileContent, % iniPath
 	}
 	
 	;Those includes are needed by the elements
@@ -106,7 +141,6 @@ if not (a_iscompiled)
 
 	FileDelete,source_main\main.ahk
 	FileAppend,%mainfilecontent%,source_main\main.ahk
-
 
 
 	;The element API functions are written three times for each of those threads: main, execution, editor
@@ -169,4 +203,34 @@ if not (a_iscompiled)
 	; FileAppend,%apifileEditor%, %A_WorkingDir%\source_Editor\api\API Caller Elements.ahk, utf-8
 	; FileAppend,%apifileMain%, %A_WorkingDir%\source_main\threads\API Caller Elements.ahk, utf-8
 	
+	MsgBox, finished
+}
+
+exitapp
+
+mergeTranslations(allTranslations, newTranslations)
+{
+	for oneNewCategory, oneNewCategoryContent in newTranslations
+	{
+		for oneNewTranslationKey, oneNewTranslationValue in oneNewCategoryContent
+		{
+			found := false
+			for oneCategory, oneCategoryContent in allTranslations
+			{
+				if (oneCategoryContent[oneNewTranslationKey])
+				{
+					found := true
+				}
+			}
+
+			if not found
+			{
+				if not allTranslations[oneNewCategory]
+					allTranslations[oneNewCategory] := []
+				allTranslations[oneNewCategory][oneNewTranslationKey] := oneNewTranslationValue
+			}
+		}
+	}
+
+	return
 }

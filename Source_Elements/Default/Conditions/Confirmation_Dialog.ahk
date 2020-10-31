@@ -10,13 +10,13 @@ Element_getElementType_Condition_Confirmation_Dialog()
 ;Name of the element
 Element_getName_Condition_Confirmation_Dialog()
 {
-	return lang("Confirmation_Dialog")
+	return x_lang("Confirmation_Dialog")
 }
 
 ;Category of the element
 Element_getCategory_Condition_Confirmation_Dialog()
 {
-	return lang("User_interaction")
+	return x_lang("User_interaction")
 }
 
 ;This function returns the package of the element.
@@ -53,37 +53,37 @@ Element_getParametrizationDetails_Condition_Confirmation_Dialog(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: lang("Title")})
-	parametersToEdit.push({type: "Edit", id: "title", default: lang("Title"), content: "String"})
-	parametersToEdit.push({type: "Label", label: lang("Message")})
-	parametersToEdit.push({type: "Edit", id: "message", default: lang("Message"), content: "String", multiline: true})
-	parametersToEdit.push({type: "Label", label: lang("Button Text")})
-	parametersToEdit.push({type: "Label", label: lang("Button '%1%'",lang("Yes")), size: "small"})
-	parametersToEdit.push({type: "Edit", id: "ButtonLabelYes", default: lang("Yes"), content: "String", WarnIfEmpty: true })
-	parametersToEdit.push({type: "Label", label: lang("Button '%1%'",lang("No")), size: "small"})
-	parametersToEdit.push({type: "Edit", id: "ButtonLabelNo", default: lang("No"), content: "String", WarnIfEmpty: true })
-	parametersToEdit.push({type: "Label", label: lang("Timeout")})
-	parametersToEdit.push({type: "Radio", id: "IsTimeout", default: 1, result: "enum", choices: [lang("No timeout"), lang("Define timeout")], enum: ["NoTimeout", "Timeout"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Title")})
+	parametersToEdit.push({type: "Edit", id: "title", default: x_lang("Title"), content: "String"})
+	parametersToEdit.push({type: "Label", label: x_lang("Message")})
+	parametersToEdit.push({type: "Edit", id: "message", default: x_lang("Message"), content: "String", multiline: true})
+	parametersToEdit.push({type: "Label", label: x_lang("Button Text")})
+	parametersToEdit.push({type: "Label", label: x_lang("Button '%1%'",x_lang("Yes")), size: "small"})
+	parametersToEdit.push({type: "Edit", id: "ButtonLabelYes", default: x_lang("Yes"), content: "String", WarnIfEmpty: true })
+	parametersToEdit.push({type: "Label", label: x_lang("Button '%1%'",x_lang("No")), size: "small"})
+	parametersToEdit.push({type: "Edit", id: "ButtonLabelNo", default: x_lang("No"), content: "String", WarnIfEmpty: true })
+	parametersToEdit.push({type: "Label", label: x_lang("Timeout")})
+	parametersToEdit.push({type: "Radio", id: "IsTimeout", default: 1, result: "enum", choices: [x_lang("No timeout"), x_lang("Define timeout")], enum: ["NoTimeout", "Timeout"]})
 	parametersToEdit.push({type: "Edit", id: "TimeoutUnits", default: 10, content: "Expression", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Radio", id: "Unit", default: "Seconds", result: "enum", choices: [lang("Seconds"), lang("Minutes"), lang("Hours")], enum: ["Seconds", "Minutes", "Hours"]})
-	parametersToEdit.push({type: "Label", label: lang("Result on timeout"), size: "small"})
-	parametersToEdit.push({type: "Radio", id: "OnTimeout", default: "Normal", result: "enum", choices: [lang("Normal") " - " lang("Make output variable empty"), lang("Throw exception")], enum: ["Normal", "Exception"]})
+	parametersToEdit.push({type: "Radio", id: "Unit", default: "Seconds", result: "enum", choices: [x_lang("Seconds"), x_lang("Minutes"), x_lang("Hours")], enum: ["Seconds", "Minutes", "Hours"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Result on timeout"), size: "small"})
+	parametersToEdit.push({type: "Radio", id: "OnTimeout", default: "Normal", result: "enum", choices: [x_lang("Normal") " - " x_lang("Make output variable empty"), x_lang("Throw exception")], enum: ["Normal", "Exception"]})
 	
-	;~ parametersToEdit.push({type: "Label", label: lang("Position")}) ;TODO
-	;~ parametersToEdit.push({type: "Radio", id: "Position", default: 1, choices: [lang("In the middle of screen"), lang("Beneath current mouse position"), lang("Define coordinates")]})
-	;~ parametersToEdit.push({type: "Label", label: lang("Coordinates") " (x,y)", size: "small"})
+	;~ parametersToEdit.push({type: "Label", label: x_lang("Position")}) ;TODO
+	;~ parametersToEdit.push({type: "Radio", id: "Position", default: 1, choices: [x_lang("In the middle of screen"), x_lang("Beneath current mouse position"), x_lang("Define coordinates")]})
+	;~ parametersToEdit.push({type: "Label", label: x_lang("Coordinates") " (x,y)", size: "small"})
 	;~ parametersToEdit.push({type: "Edit", id: ["Xpos", "Ypos"], default: ["A_ScreenWidth/2", "A_ScreenHeight/2"]})
-	;~ parametersToEdit.push({type: "button", id: "MouseTracker", goto: "ActionMove_WindowMouseTracker", label: lang("Get coordinates")})
-	parametersToEdit.push({type: "Label", label: lang("Width and height")})
-	;~ parametersToEdit.push({type: "Radio", id: "Size", default: 1, choices: [lang("Automatic"), lang("Define width and height"), result: "enum", enum: ["automatic", "predefined"]]})
-	;~ parametersToEdit.push({type: "Label", label: lang("Width, height"), size: "small"})
+	;~ parametersToEdit.push({type: "button", id: "MouseTracker", goto: "ActionMove_WindowMouseTracker", label: x_lang("Get coordinates")})
+	parametersToEdit.push({type: "Label", label: x_lang("Width and height")})
+	;~ parametersToEdit.push({type: "Radio", id: "Size", default: 1, choices: [x_lang("Automatic"), x_lang("Define width and height"), result: "enum", enum: ["automatic", "predefined"]]})
+	;~ parametersToEdit.push({type: "Label", label: x_lang("Width, height"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: ["Width", "Height"], default: [300, 200], content: "Expression", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("Cancelling")})
-	parametersToEdit.push({type: "Checkbox", id: "ShowCancelButton", default: 0, label: lang("Show cancel button")})
-	parametersToEdit.push({type: "Label", label: lang("Button text"), size: "small"})
-	parametersToEdit.push({type: "Edit", id: "ButtonLabelCancel", default: lang("Cancel"), content: "String", WarnIfEmpty: true })
-	parametersToEdit.push({type: "Label", label: lang("Result if cancelled"), size: "small"})
-	parametersToEdit.push({type: "Radio", id: "IfDismiss", choices: [lang("Normal"), lang("Throw exception")], default: 1})
+	parametersToEdit.push({type: "Label", label: x_lang("Cancelling")})
+	parametersToEdit.push({type: "Checkbox", id: "ShowCancelButton", default: 0, label: x_lang("Show cancel button")})
+	parametersToEdit.push({type: "Label", label: x_lang("Button text"), size: "small"})
+	parametersToEdit.push({type: "Edit", id: "ButtonLabelCancel", default: x_lang("Cancel"), content: "String", WarnIfEmpty: true })
+	parametersToEdit.push({type: "Label", label: x_lang("Result if cancelled"), size: "small"})
+	parametersToEdit.push({type: "Radio", id: "IfDismiss", choices: [x_lang("Normal"), x_lang("Throw exception")], default: 1})
 	
 	
 	return parametersToEdit
@@ -92,7 +92,7 @@ Element_getParametrizationDetails_Condition_Confirmation_Dialog(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Condition_Confirmation_Dialog(Environment, ElementParameters)
 {
-	return lang("Confirmation_Dialog") 
+	return x_lang("Confirmation_Dialog") 
 }
 
 ;Called every time the user changes any parameter.
@@ -143,12 +143,12 @@ Element_run_Condition_Confirmation_Dialog(Environment, ElementParameters)
 	
 	if width is not number
 	{
-		x_finish(Environment, "exception", lang("%1% is not a number.",lang("Width '%1%'",width))) 
+		x_finish(Environment, "exception", x_lang("%1% is not a number.",x_lang("Width '%1%'",width))) 
 		return
 	}
 	if height is not number
 	{
-		x_finish(Environment, "exception", lang("%1% is not a number.",lang("Height '%1%'",height))) 
+		x_finish(Environment, "exception", x_lang("%1% is not a number.",x_lang("Height '%1%'",height))) 
 		return
 	}
 
@@ -164,7 +164,7 @@ Element_run_Condition_Confirmation_Dialog(Environment, ElementParameters)
 		TimeoutUnits:=ElementParameters.TimeoutUnits
 		if TimeoutUnits is not number
 		{
-			x_finish(Environment, "exception", lang("%1% is not a number.",lang("Timeout '%1%'",TimeoutUnits))) 
+			x_finish(Environment, "exception", x_lang("%1% is not a number.",x_lang("Timeout '%1%'",TimeoutUnits))) 
 			return
 		}
 		
@@ -283,7 +283,7 @@ Condition_Confirmation_Dialog_OnClose()
 	
 	if (IfDismiss = "exception")
 	{
-		x_finish(Environment,"exception", lang("User closed the dialog"))
+		x_finish(Environment,"exception", x_lang("User closed the dialog"))
 	}
 	else
 	{
@@ -300,7 +300,7 @@ Condition_Confirmation_Dialog_ButtonCancel()
 	
 	if (IfDismiss = "exception")
 	{
-		x_finish(Environment,"exception", lang("User cancelled the dialog"))
+		x_finish(Environment,"exception", x_lang("User cancelled the dialog"))
 	}
 	else
 	{
@@ -331,7 +331,7 @@ Condition_Confirmation_Dialog_TimeoutTimer(Environment, uniqueID)
 		x_SetVariable(Environment,"A_UserAction", "Timeout", "thread")
 		if (OnTimeout = "Exception")
 		{
-			x_finish(Environment,"exception", lang("Timeout reached"))
+			x_finish(Environment,"exception", x_lang("Timeout reached"))
 		}
 		else
 		{
@@ -341,7 +341,7 @@ Condition_Confirmation_Dialog_TimeoutTimer(Environment, uniqueID)
 	else
 	{
 		;End of timeout not reached. Update the text in the GUI.
-		guicontrol,%guiID%:,% HWNDTimeoutText,% (remainingTime // 1000) " " lang("Seconds")
+		guicontrol,%guiID%:,% HWNDTimeoutText,% (remainingTime // 1000) " " x_lang("Seconds")
 		
 		;Calculate how many milliseconds we need to wait until the next full second is reached and update timer.
 		nextTimerTime:=mod(remainingTime,1000)

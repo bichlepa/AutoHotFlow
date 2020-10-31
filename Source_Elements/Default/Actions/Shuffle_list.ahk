@@ -10,13 +10,13 @@ Element_getElementType_Action_Shuffle_list()
 ;Name of the element
 Element_getName_Action_Shuffle_list()
 {
-	return lang("Shuffle_list")
+	return x_lang("Shuffle_list")
 }
 
 ;Category of the element
 Element_getCategory_Action_Shuffle_list()
 {
-	return lang("Variable")
+	return x_lang("Variable")
 }
 
 ;This function returns the package of the element.
@@ -53,9 +53,9 @@ Element_getParametrizationDetails_Action_Shuffle_list(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: lang("Output list name")})
+	parametersToEdit.push({type: "Label", label: x_lang("Output list name")})
 	parametersToEdit.push({type: "Edit", id: "Varname", default: "List", content: "VariableName", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: lang("Input list name")})
+	parametersToEdit.push({type: "Label", label: x_lang("Input list name")})
 	parametersToEdit.push({type: "Edit", id: "VarValue", default: "List", content: "Expression", WarnIfEmpty: true})
 	
 	
@@ -65,7 +65,7 @@ Element_getParametrizationDetails_Action_Shuffle_list(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Shuffle_list(Environment, ElementParameters)
 {
-	return lang("Shuffle_list") 
+	return x_lang("Shuffle_list") 
 }
 
 ;Called every time the user changes any parameter.
@@ -93,7 +93,7 @@ Element_run_Action_Shuffle_list(Environment, ElementParameters)
 	tempList:=EvaluatedParameters.VarValue
 	if not IsObject(tempList)
 	{
-		x_finish(Environment, "exception", lang("Variable '%1%' does not contain a list.",ElementParameters.VarValue)) 
+		x_finish(Environment, "exception", x_lang("Variable '%1%' does not contain a list.",ElementParameters.VarValue)) 
 		return
 	}
 	
