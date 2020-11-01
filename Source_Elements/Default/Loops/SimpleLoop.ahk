@@ -83,61 +83,66 @@ Element_CheckSettings_Loop_SimpleLoop(Environment, ElementParameters)
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Loop_SimpleLoop(Environment, ElementParameters)
 {
-	entryPoint := x_getEntryPoint(environment)
-	
-	if (not ElementParameters.Infinite)
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
+	if (EvaluatedParameters._error)
 	{
-		evRes := x_EvaluateExpression(Environment, ElementParameters.repeatCount)
-		if (evRes.error)
-		{
-			;On error, finish with exception and return
-			x_finish(Environment, "exception", x_lang("An error occured while parsing expression '%1%'", ElementParameters.repeatCount) "`n`n" evRes.error) 
-			return
-		}
-		else
-		{
-			repeatCount:=evRes.result
-		}
+		x_enabled(Environment, "exception", EvaluatedParameters._errorMessage) 
+		return
 	}
-	
+
+	; get entry point and decide what to do
+	entryPoint := x_getEntryPoint(environment)
 	if (entryPoint = "Head") ;Initialize loop
 	{
-		if (ElementParameters.Infinite or repeatCount >= 1)
+		; check condition
+		if (EvaluatedParameters.Infinite or EvaluatedParameters.repeatCount >= 1)
 		{
+			; loop is either infinite is repeat count greater than 0.
+			; start first iteration
+			; set a_index as loop variable
 			x_SetVariable(Environment, "A_Index", 1, "loop")
 			x_finish(Environment, "head")
 		}
 		else
 		{
+			; loop is neither infinite nor is repeat count greater than 0.
+			; end without a single iteration
 			x_finish(Environment, "tail")
 		}
 	}
 	else if (entryPoint = "Tail") ;Continue loop
 	{
+		; get current index and increase it
 		index := x_GetVariable(Environment, "A_Index")
 		index++
-		if (ElementParameters.Infinite or repeatCount >= index)
+
+		; check condition
+		if (EvaluatedParameters.Infinite or EvaluatedParameters.repeatCount >= index)
 		{
+			; loop is either infinite is repeat count greater than index.
+			; start next iteration
 			x_SetVariable(Environment, "A_Index", index, "loop")
 			x_finish(Environment, "head")
 		}
 		else
 		{
+			; last iteration reached.
 			x_finish(Environment, "tail")
 		}
 		
 	}
 	else if (entryPoint = "Break") ;Break loop
 	{
+		; break the loop
 		x_finish(Environment, "tail")
 		
 	}
 	else
 	{
+		;This should never happen, but I suggest to keep this code for catching bugs in AHF.
 		x_finish(Environment, "exception", x_lang("No information whether the connection lead into head or tail"))
 	}
-
-
 }
 
 ;Called when the execution of the element should be stopped.

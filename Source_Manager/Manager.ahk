@@ -47,8 +47,8 @@ init_logger()
 ; include language module
 #include language\language.ahk
 ;initialize languages
-_language:=Object()
-_language.dir:=_ScriptDir "\language" ;Directory where the translations are stored
+_language := Object()
+_language.dir := _ScriptDir "\language" ;Directory where the translations are stored
 lang_Init()
 lang_setLanguage(_getSettings("UILanguage"))
 

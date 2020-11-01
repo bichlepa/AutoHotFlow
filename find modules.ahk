@@ -116,7 +116,7 @@ if not (a_iscompiled)
 		iniFileContent := exportIni({language_info: language_info}) "`n`n" exportIni(oneLanguageData)
 		iniPath := "language\" oneLanguage ".ini"
 		filedelete, % iniPath
-		FileAppend, % iniFileContent, % iniPath
+		FileAppend, % iniFileContent, % iniPath, utf-16
 	}
 	
 	;Those includes are needed by the elements

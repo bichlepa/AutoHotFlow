@@ -54,7 +54,7 @@ Element_getParametrizationDetails_Trigger_Manual(Environment)
 {
 	parametersToEdit:=Object()
 	parametersToEdit.push({type: "Label", label: x_lang("ID")})
-	parametersToEdit.push({type: "Edit", id: "ID", content: "String",  default: "Trigger " x_randomPhrase()})
+	parametersToEdit.push({type: "Edit", id: "ID", content: "rawstring",  default: "Trigger " x_randomPhrase()})
 	parametersToEdit.updateOnEdit := true
 	return parametersToEdit
 }

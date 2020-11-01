@@ -170,7 +170,7 @@ lang(langvar, langReplacements*)
 	NoCache := _language.NoCache
 	directory := _language.dir
 	filepath := _language.allLangs[lang].filepath
-	fallbackfilepath := _language.allLangs[fallbackfilepath].filepath
+	fallbackfilepath := _language.allLangs[_language.fallbacklang].filepath
 	
 	if (langvar ="")
 		return ""
@@ -178,7 +178,7 @@ lang(langvar, langReplacements*)
 		_language.cache:=Object()
 	
 	langaborted:=false
-	;~ StringReplace,langvar,langvar,%a_space%,_,all
+	StringReplace,langvar,langvar,_,%a_space%,all
 	
 	langBeginAgain:
 	;look whether the string is in cache
@@ -238,9 +238,9 @@ lang(langvar, langReplacements*)
 	}
 	
 	;Replace
-	loop langReplacements.Count()
+	for oneIndex, oneReplacement in langReplacements
 	{
-		StringReplace, initext, initext,% "%" a_index "%", % langReplacements[a_index], all
+		StringReplace, initext, initext,% "%" a_index "%", % oneReplacement, all
 	}
 	
 	

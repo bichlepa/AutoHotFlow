@@ -82,64 +82,74 @@ Element_CheckSettings_Loop_Loop_Through_Files(Environment, ElementParameters)
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Loop_Loop_Through_Files(Environment, ElementParameters)
 {
+	; get entry point and decide what to do
 	entryPoint := x_getEntryPoint(environment)
-	
 	if (entryPoint = "Head") ;Initialize loop
 	{
-		EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters)
+		; evaluate parameters
+		EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
 		if (EvaluatedParameters._error)
 		{
 			x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 			return
 		}
 		
-		if (EvaluatedParameters.OperateOnWhat="Files")
-			operation:="F"
-		else if (EvaluatedParameters.OperateOnWhat="FilesAndFolders")
-			operation:="FD"
-		else if (EvaluatedParameters.OperateOnWhat="Folders")
-			operation:="D"
+		; prepare options for the loop files command
+		if (EvaluatedParameters.OperateOnWhat = "Files")
+			operation := "F"
+		else if (EvaluatedParameters.OperateOnWhat = "FilesAndFolders")
+			operation := "FD"
+		else if (EvaluatedParameters.OperateOnWhat = "Folders")
+			operation := "D"
 		
 		if (EvaluatedParameters.Recurse)
 			recurse:="R"
 		
-		tempPath:=x_GetFullPath(environment, EvaluatedParameters.file)
+		; the path may bo local. Convert it to full path
+		tempPath := x_GetFullPath(environment, EvaluatedParameters.file)
 		
-		tempError:=false
-		CurrentList:=Object()
-		tempFound:=false
-		
-		Loop,files,%tempPath%,% operation recurse
+		; loop through files and create a file list
+		CurrentList := Object()
+		Loop, files, %tempPath%, % operation recurse
 		{
-			tempFound:=true
-			tempOneFile:=Object()
+			; write information about the file to an object
+			tempOneFile := Object()
 			
-			tempOneFile.Insert("A_LoopFileName",A_LoopFileName)
-			tempOneFile.Insert("A_LoopFileExt",A_LoopFileExt)
-			tempOneFile.Insert("A_LoopFileFullPath",A_LoopFileFullPath)
-			tempOneFile.Insert("A_LoopFileLongPath",A_LoopFileLongPath)
-			tempOneFile.Insert("A_LoopFileShortPath",A_LoopFileShortPath)
-			tempOneFile.Insert("A_LoopFileShortName",A_LoopFileShortName)
-			tempOneFile.Insert("A_LoopFileDir",A_LoopFileDir)
-			tempOneFile.Insert("A_LoopFileTimeModified",A_LoopFileTimeModified)
-			tempOneFile.Insert("A_LoopFileTimeCreated",A_LoopFileTimeCreated)
-			tempOneFile.Insert("A_LoopFileTimeAccessed",A_LoopFileTimeAccessed)
-			tempOneFile.Insert("A_LoopFileAttrib",A_LoopFileAttrib)
-			tempOneFile.Insert("A_LoopFileSize",A_LoopFileSize)
-			tempOneFile.Insert("A_LoopFileSizeKB",A_LoopFileSizeKB)
-			tempOneFile.Insert("A_LoopFileSizeMB",A_LoopFileSizeMB)
+			tempOneFile.A_LoopFileName := A_LoopFileName
+			tempOneFile.A_LoopFileExt := A_LoopFileExt
+			tempOneFile.A_LoopFilePath := A_LoopFilePath
+			tempOneFile.A_LoopFileLongPath := A_LoopFileLongPath
+			tempOneFile.A_LoopFileShortPath := A_LoopFileShortPath
+			tempOneFile.A_LoopFileShortName := A_LoopFileShortName
+			tempOneFile.A_LoopFileDir := A_LoopFileDir
+			tempOneFile.A_LoopFileTimeModified := A_LoopFileTimeModified
+			tempOneFile.A_LoopFileTimeCreated := A_LoopFileTimeCreated
+			tempOneFile.A_LoopFileTimeAccessed := A_LoopFileTimeAccessed
+			tempOneFile.A_LoopFileAttrib := A_LoopFileAttrib
+			tempOneFile.A_LoopFileSize := A_LoopFileSize
+			tempOneFile.A_LoopFileSizeKB := A_LoopFileSizeKB
+			tempOneFile.A_LoopFileSizeMB := A_LoopFileSizeMB
+
+			; also create a variable with the file name without extension 
 			SplitPath, A_LoopFileLongPath , , , , OutNameNoExt
-			tempOneFile.Insert("A_LoopFileNameNoExt",OutNameNoExt)
+			tempOneFile.A_LoopFileNameNoExt := OutNameNoExt
 			
+			; save the informations about the file in the array
 			CurrentList.push(tempOneFile)
 		}
 		
+		; check whether CurrentList has values
 		if (CurrentList.HasKey(1))
 		{
-			x_SetVariable(Environment, "A_Index", 1, "loop")
+			; start first iteration
+			; write the array to a hidden variable. We will use it on next iteration to get the next value.
 			x_SetVariable(Environment, "A_LoopCurrentList", CurrentList, "loop", true)
 			
-			tempOneFile:=CurrentList[1]
+			; set a_index as loop variable
+			x_SetVariable(Environment, "A_Index", 1, "loop")
+
+			; set all informations about the file as loop variables
+			tempOneFile := CurrentList[1]
 			for onekey, oneValue in tempOneFile
 			{
 				x_SetVariable(Environment, onekey, oneValue, "loop")
@@ -149,19 +159,23 @@ Element_run_Loop_Loop_Through_Files(Environment, ElementParameters)
 		}
 		else
 		{
+			; the CurrentList array is empty. End without a single iteration
 			x_finish(Environment, "tail") ;Leave the loop
 		}
 	}
 	else if (entryPoint = "Tail") ;Continue loop
 	{
-		CurrentList := x_GetVariable(Environment, "A_LoopCurrentList", true)
+		; get current index and increase it
 		index := x_GetVariable(Environment, "A_Index")
 		index++
-		
+		; get array with the parsed elements
+		CurrentList := x_GetVariable(Environment, "A_LoopCurrentList", true)
+
 		if (CurrentList.haskey(index))
 		{
+			; there is another element in the array. Start next iteration
 			x_SetVariable(Environment, "A_Index", index, "loop")
-			tempOneFile:=CurrentList[index]
+			tempOneFile := CurrentList[index]
 			for onekey, oneValue in tempOneFile
 			{
 				x_SetVariable(Environment, onekey, oneValue, "loop")
@@ -171,6 +185,7 @@ Element_run_Loop_Loop_Through_Files(Environment, ElementParameters)
 		}
 		else
 		{
+			; we reached the end of the list.
 			x_finish(Environment, "tail") ;Leave the loop
 		}
 		

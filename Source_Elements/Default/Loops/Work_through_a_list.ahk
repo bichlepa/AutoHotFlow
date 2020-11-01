@@ -54,8 +54,6 @@ Element_getParametrizationDetails_Loop_Work_through_a_list(Environment)
 	parametersToEdit:=Object()
 	parametersToEdit.push({type: "Label", label: x_lang("Variable_name")})
 	parametersToEdit.push({type: "Edit", id: "Varname", default: "List", content: "VariableName", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: x_lang("Performance")})
-	parametersToEdit.push({type: "Checkbox", id: "CopyFirst", default: 1, label: x_lang("Copy list before first iteration")})
 
 	return parametersToEdit
 }
@@ -80,81 +78,77 @@ Element_CheckSettings_Loop_Work_through_a_list(Environment, ElementParameters)
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Loop_Work_through_a_list(Environment, ElementParameters)
 {
+	; get entry point and decide what to do
 	entryPoint := x_getEntryPoint(environment)
-	valueFound:=False
-	
-	
 	if (entryPoint = "Head") ;Initialize loop
 	{
-		varname := x_replaceVariables(Environment, ElementParameters.varname)
-		varContentList := x_GetVariable(Environment, Varname)
+		; evaluate parameters
+		EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
+		if (EvaluatedParameters._error)
+		{
+			x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
+			return
+		}
+
+		; get variable content
+		varContentList := x_GetVariable(Environment, EvaluatedParameters.Varname)
 		
+		; check whether variable content is an object
 		if not isobject(varContentList)
 		{
-			x_finish(Environment, "exception", x_lang("Variable '%1%' does not contain a list.",varname))
+			x_finish(Environment, "exception", x_lang("Variable '%1%' does not contain a list.", EvaluatedParameters.varname))
 			return
 		}
 		
-		index:=1
-		x_SetVariable(Environment, "A_Index", index, "loop")
-		
-		x_SetVariable(Environment, "A_LoopUseCopiedList", ElementParameters.CopyFirst, "loop", true)
-		if (ElementParameters.CopyFirst)
-		{
-			x_SetVariable(Environment, "A_LoopCurrentList", varContentList, "loop", true)
-		}
-		else
-		{
-			x_SetVariable(Environment, "A_LoopUseVarName", varname, "loop", true)
-		}
-		
-		;Set first element
+		; make a copy of the list
+		CurrentList := []
 		for tempkey, tempvalue in varContentList
 		{
-			valueFound := True
-			x_SetVariable(Environment, "a_LoopValue", tempvalue, "loop")
-			x_SetVariable(Environment, "a_LoopKey", tempkey, "loop")
-			break
+			CurrentList.push({key: tempkey, value: tempvalue})
 		}
-		
-		if (valueFound)
+
+		; check whether CurrentList has values
+		if (CurrentList.haskey(1))
+		{
+			; start first iteration
+			; write the array to a hidden variable. We will use it on next iteration to get the next value.
+			x_SetVariable(Environment, "A_LoopCurrentList", CurrentList, "loop", true)
+			
+			; set a_index as loop variable
+			x_SetVariable(Environment, "A_Index", 1, "loop")
+			
+			; set a_index as loop variable
+			x_SetVariable(Environment, "A_LoopField", CurrentList[1], "loop")
+			
 			x_finish(Environment, "head")
+		}
 		else
-			x_finish(Environment, "tail")
+		{
+			; the CurrentList array is empty. End without a single iteration
+			x_finish(Environment, "tail") ;Leave the loop
+		}
 	}
 	else if (entryPoint = "Tail") ;Continue loop
 	{
+		; get current index and increase it
 		index := x_GetVariable(Environment, "A_Index")
-		copiedFirst := x_GetVariable(Environment, "A_LoopUseCopiedList", true)
 		index++
-		if (copiedFirst)
+		; get array with the parsed elements
+		CurrentList := x_GetVariable(Environment, "A_LoopCurrentList", true)
+		
+		if (CurrentList.haskey(index))
 		{
-			varContentList := x_GetVariable(Environment, "A_LoopCurrentList", true)
+			; there is another element in the array
+			; Start next iteration
+			x_SetVariable(Environment, "A_Index", index, "loop")
+			x_SetVariable(Environment, "A_LoopField", CurrentList[index], "loop")
+			x_finish(Environment, "head") ;Continue with next iteration
 		}
 		else
 		{
-			varName := x_GetVariable(Environment, "A_LoopUseVarName", true)
-			varContentList := x_GetVariable(Environment, varName)
+			; we reached the end of the list.
+			x_finish(Environment, "tail") ;Leave the loop
 		}
-		
-		for tempkey, tempvalue in varContentList
-		{
-			if (a_index = index)
-			{
-				
-				valueFound := True
-				x_SetVariable(Environment, "a_LoopValue", tempvalue, "loop")
-				x_SetVariable(Environment, "a_LoopKey", tempkey, "loop")
-				x_SetVariable(Environment, "A_Index", index, "loop")
-				break
-			}
-		}
-		
-		
-		if (valueFound)
-			x_finish(Environment, "head")
-		else
-			x_finish(Environment, "tail")
 	}
 	else if (entryPoint = "Break") ;Break loop
 	{
@@ -165,8 +159,6 @@ Element_run_Loop_Work_through_a_list(Environment, ElementParameters)
 	{
 		x_finish(Environment, "exception", x_lang("No information whether the connection lead into head or tail"))
 	}
-
-
 }
 
 

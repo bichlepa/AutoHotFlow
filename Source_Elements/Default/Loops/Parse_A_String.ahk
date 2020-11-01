@@ -84,67 +84,77 @@ Element_CheckSettings_Loop_Parse_A_String(Environment, ElementParameters)
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Loop_Parse_A_String(Environment, ElementParameters)
 {
-	
+	; get entry point and decide what to do
 	entryPoint := x_getEntryPoint(environment)
-	
 	if (entryPoint = "Head") ;Initialize loop
 	{
-		EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters)
+		; evaluate parameters
+		EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
 		if (EvaluatedParameters._error)
 		{
 			x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 			return
 		}
 		
-		CurrentList:=Object()
-		loop,parse,% EvaluatedParameters.VarValue,% EvaluatedParameters.delimiters,% EvaluatedParameters.omitChars
+		; parse the string and write the loopfields in an array
+		CurrentList := Object()
+		loop, parse, % EvaluatedParameters.VarValue, % EvaluatedParameters.delimiters, % EvaluatedParameters.omitChars
 		{
-			Result.push(A_LoopField)
+			CurrentList.push(A_LoopField)
 		}
 		
-		if (Result.haskey(1))
+		; check whether CurrentList has values
+		if (CurrentList.haskey(1))
 		{
+			; start first iteration
+			; write the array to a hidden variable. We will use it on next iteration to get the next value.
 			x_SetVariable(Environment, "A_LoopCurrentList", CurrentList, "loop", true)
+			
+			; set a_index as loop variable
 			x_SetVariable(Environment, "A_Index", 1, "loop")
 			
+			; set a_index as loop variable
 			x_SetVariable(Environment, "A_LoopField", CurrentList[1], "loop")
 			
 			x_finish(Environment, "head")
 		}
 		else
 		{
+			; the CurrentList array is empty. End without a single iteration
 			x_finish(Environment, "tail") ;Leave the loop
 		}
 	}
 	else if (entryPoint = "Tail") ;Continue loop
 	{
-		CurrentList := x_GetVariable(Environment, "A_LoopCurrentList", true)
+		; get current index and increase it
 		index := x_GetVariable(Environment, "A_Index")
 		index++
+		; get array with the parsed elements
+		CurrentList := x_GetVariable(Environment, "A_LoopCurrentList", true)
 		
 		if (CurrentList.haskey(index))
 		{
+			; there is another element in the array
+			; Start next iteration
 			x_SetVariable(Environment, "A_Index", index, "loop")
 			x_SetVariable(Environment, "A_LoopField", CurrentList[index], "loop")
 			x_finish(Environment, "head") ;Continue with next iteration
 		}
 		else
 		{
+			; we reached the end of the list.
 			x_finish(Environment, "tail") ;Leave the loop
 		}
-		
 	}
 	else if (entryPoint = "Break") ;Break loop
 	{
 		x_finish(Environment, "tail") ;Leave the loop
-		
 	}
 	else
 	{
 		;This should never happen, but I suggest to keep this code for catching bugs in AHF.
 		x_finish(Environment, "exception", x_lang("No information whether the connection leads into head or tail"))
 	}
-	
 }
 
 

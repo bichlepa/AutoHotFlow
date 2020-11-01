@@ -80,41 +80,69 @@ Element_CheckSettings_Loop_Condition(Environment, ElementParameters)
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Loop_Condition(Environment, ElementParameters)
 {
+	; get entry point and decide what to do
 	entryPoint := x_getEntryPoint(environment)
-	
 	if (entryPoint = "Head") ;Initialize loop
 	{
-		EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters, "Expression")
-		if (EvaluatedParameters._error)
+		; check whether we need to evaluate the expression on first iteration 
+		if (ElementParameters.EvaluateOnFirstIteration)
 		{
-			x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
-			return
+			; we need to evaluate the expression on first iteration. Do it now.
+			evalutedExpression := x_EvaluateExpression(Environment,ElementParameters.Expression)
+			if (evalutedExpression.error)
+			{
+				x_finish(Environment, "exception", evalutedExpression.error) 
+				return
+			}
+		}
+		Else
+		{
+			; we don't need to evalute the expression on first iteration.
+			; Write true as expression result
+			evalutedExpression.result := true
 		}
 		
-		if (EvaluatedParameters.EvaluateOnFirstIteration = 0 || x_EvaluateExpression(Environment,ElementParameters.Expression))
+		; check expression result
+		if (evalutedExpression.result)
 		{
+			; we either don't need to evaluate the expression or the expression is not false 
+			; start first iteration
+			; set a_index as loop variable
 			x_SetVariable(Environment, "A_Index", 1, "loop")
 			x_finish(Environment, "head")
 		}
 		else
 		{
+			; the expression is false
+			; End without a single iteration
 			x_finish(Environment, "tail") ;Leave the loop
 		}
-		
-
 	}
 	else if (entryPoint = "Tail") ;Continue loop
 	{
+		; get current index and increase it
 		index := x_GetVariable(Environment, "A_Index")
 		index++
 		
-		if (x_EvaluateExpression(Environment,ElementParameters.Expression))
+		; evaluate expression parameter
+		evalutedExpression := x_EvaluateExpression(Environment,ElementParameters.Expression)
+		if (evalutedExpression.error)
 		{
+			x_finish(Environment, "exception", evalutedExpression.error) 
+			return
+		}
+		
+		; check expression result
+		if (evalutedExpression.result)
+		{
+			; the expression is not false
+			; Start next iteration
 			x_SetVariable(Environment, "A_Index", index, "loop")
 			x_finish(Environment, "head") ;Continue with next iteration
 		}
 		else
 		{
+			; the expression is false
 			x_finish(Environment, "tail") ;Leave the loop
 		}
 		

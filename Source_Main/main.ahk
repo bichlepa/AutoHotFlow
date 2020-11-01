@@ -53,8 +53,8 @@ _setShared("WindowsStartup", (firstCommandLineParameter = "WindowsStartup"))
 ; include language module
 #Include %A_ScriptDir%\..
 #include language\language.ahk
-_language:=Object()
-_language.dir:=_ScriptDir "\language" ;Directory where the translations are stored
+_language := Object()
+_language.dir := _ScriptDir "\language" ;Directory where the translations are stored
 lang_Init()
 lang_setLanguage(_settings.UILanguage)
 
@@ -98,7 +98,8 @@ FileDelete,%a_temp%\autoHotflowTryToStartAsAdmin.txt
 
 ;Include libraries which may be used by the elements. This code is generated.
 global global_libInclusionsForThreads, global_elementInclusionsForThreads
-;Lib_includes_Start#include source_Elements\Default\lib\TTS\TTS by Learning One.ahk
+;Lib_includes_Start
+#include source_Elements\Default\lib\TTS\TTS by Learning One.ahk
 #include source_Elements\Default\lib\7z wrapper\7z wrapper.ahk
 #include source_Elements\Default\lib\Eject by SKAN\Eject by SKAN.ahk
 #include source_Elements\Default\lib\Class_Monitor\Class_Monitor.ahk
@@ -156,7 +157,8 @@ global_libInclusionsForThreads =
 
 ;Include elements. This code is generated
 ;The elements must be included before the other treads are started
-;Element_Includes_Start#include source_Elements\Default\actions\New_Variable.ahk
+;Element_Includes_Start
+#include source_Elements\Default\actions\New_Variable.ahk
 #include source_Elements\Default\actions\Random_Number.ahk
 #include source_Elements\Default\actions\Absolute_Number.ahk
 #include source_Elements\Default\actions\Square_Root.ahk

@@ -3,7 +3,6 @@
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
 SetWorkingDir %A_ScriptDir%\..  ; Ensures a consistent starting directory.
 
-
 ;parameters
 mainlanguagecode:="en"
 mainlanguagename:="English"
@@ -55,7 +54,7 @@ loop, files, source_elements\*, D
 	iniContent := mergeStringsInIniContent(iniContent, allNewStrings)
 	iniFileContent := exportIni({language_info: iniContentLanguageInfo}) "`n`n" exportIni(iniContent)
 	filedelete, % iniPath
-	FileAppend, % iniFileContent, % iniPath
+	FileAppend, % iniFileContent, % iniPath, utf-16
 }
 
 
