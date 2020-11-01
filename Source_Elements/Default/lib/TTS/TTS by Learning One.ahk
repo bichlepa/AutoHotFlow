@@ -1,4 +1,16 @@
-﻿TTS(oVoice, command, param1="", param2="") {      ; by Learning one. For AHK_L. Thanks: jballi, Sean, Frankie.
+﻿/*
+license info:
+{
+	"name": "Easy Text to speech",
+	"author": "Learning one",
+	"source": "https://autohotkey.com/board/topic/53429-function-easy-text-to-speech/",
+	"license": "unknown (probably public domain)",
+	"licenselink": ""
+}
+*/
+
+
+TTS(oVoice, command, param1="", param2="") {      ; by Learning one. For AHK_L. Thanks: jballi, Sean, Frankie.
    ; AHK forum location:   www.autohotkey.com/forum/topic57773.html
    ; Read more:         msdn.microsoft.com/en-us/library/ms723602(v=VS.85).aspx, www.autohotkey.com/forum/topic45471.html, www.autohotkey.com/forum/topic83162.html
    static CommandList := "ToggleSpeak,Speak,SpeakWait,Pause,Stop,SetRate,SetVolume,SetPitch,SetVoice,GetVoices,GetStatus,GetCount,SpeakToFile"

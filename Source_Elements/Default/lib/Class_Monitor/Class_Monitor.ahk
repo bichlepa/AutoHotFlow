@@ -1,4 +1,15 @@
-﻿;By jNizM. License: unlicense.org
+﻿/*
+license info:
+{
+	"name": "Class_Monitor",
+	"author": "jNizM",
+	"source": "https://github.com/jNizM/Class_Monitor",
+	"license": "The Unlicense",
+	"licenselink": "https://unlicense.org/"
+}
+*/
+
+;By jNizM. License: unlicense.org
 ;https://github.com/jNizM/Class_Monitor
 
 ;Modified by Paul Bichler

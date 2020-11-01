@@ -36,13 +36,11 @@ init_logger()
 
 ; Include libraries
 #Include %A_ScriptDir%\..
-#include lib\Object to file\String-object-file.ahk
 #include lib\GDI+\GDIp.ahk
-#include lib\objhasvalue\objhasvalue.ahk
-#include lib\ObjFullyClone\ObjFullyClone.ahk
+#include lib\Objects\Objects.ahk
 #include lib\Random Word List\Random Word List.ahk
-#include lib\Robert - Ini library\Robert - Ini library.ahk
 #include lib\Json\Jxon.ahk
+#include lib\7z wrapper\7z wrapper.ahk
 
 ; include language module
 #include language\language.ahk ;Must be very first

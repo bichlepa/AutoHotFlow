@@ -1,4 +1,15 @@
-﻿uriencode( str ) { ; -------------------------------------------------------------------------------
+﻿/*
+license info:
+{
+	"name": "HTTPRequest v2.49",
+	"author": "VxE",
+	"source": "https://autohotkey.com/board/topic/69205-lib-oauth-10a-ahk-basic-ahk-l-unicode-v103/page-2",
+	"license": "BSD",
+	"licenselink": "https://opensource.org/licenses/BSD-3-Clause"
+}
+*/
+
+uriencode( str ) { ; -------------------------------------------------------------------------------
 ; Characters in str are converted to their %## encoding except unreserved ones ( a-z A-Z 0-9 _.~- ).
 ; If the string contains a character with an ascii code higher than 126, this function uses UTF-8
 ; encoding for those characters. E.g: '¢' will appear as %C2%A2 instead of %A2.

@@ -6,8 +6,7 @@
     "license": "GPL3.0",
     "libraries": [
         "lib\\TTS\\TTS by Learning One.ahk",
-        "lib\\7z wrapper\\7z wrapper.ahk",
-        "lib\\Eject by SKAN\\Eject by SKAN.ahk",
+        "lib\\Eject\\Eject.ahk",
         "lib\\Class_Monitor\\Class_Monitor.ahk",
         "lib\\HTTP Request\\HTTPRequest.ahk",
         "lib\\HTTP Request\\Uriencode.ahk",

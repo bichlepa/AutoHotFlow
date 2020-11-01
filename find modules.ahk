@@ -142,6 +142,43 @@ if not (a_iscompiled)
 	FileDelete,source_main\main.ahk
 	FileAppend,%mainfilecontent%,source_main\main.ahk
 
+	; find licenses in source code and create some readable text
+	licenseInfoText := ""
+	loop, files, *.ahk, FR
+	{
+		FileRead, fileContent, % a_loopfilePath
+		if instr(fileContent, "license info" ":")
+		{
+			pos1 := instr(fileContent, "license info" ":")
+			pos1 := instr(fileContent, "{", , pos1)
+			pos2 := instr(fileContent, "}", , pos1)
+			licenseInfo := substr(fileContent, pos1, pos2 - pos1 + 1)
+			licenseInfo := Jxon_Load(licenseInfo)
+			if (licenseInfo.name)
+			{
+				licenseInfoText .= licenseInfo.name "`n"
+				licenseInfoText .= "author: " licenseInfo.author "`n"
+				licenseInfoText .= "source: " licenseInfo.source "`n"
+				licenseInfoText .= "license: " licenseInfo.license "`n"
+				if (licenseInfo.licenselink)
+					licenseInfoText .= "link to license text: " licenseInfo.licenselink "`n"
+				licenseInfoText .= "`n"
+			}
+		}
+	}
+
+	; insert the text in the about.ahk file
+	aboutCodeFilePath := "Source_Manager\User interface\About.ahk"
+	FileRead, aboutCode, % aboutCodeFilePath
+	startpos := instr(aboutCode, "#aboutTextOtherCodeOverviewStart") + strlen("#aboutTextOtherCodeOverviewStart`n")
+	stopPos := instr(aboutCode, "#aboutTextOtherCodeOverviewStop")
+	codeBefore := substr(aboutCode, 1, startpos)
+	codeAfter := substr(aboutCode, stopPos)
+	aboutCode := codeBefore licenseInfoText codeAfter
+
+	filedelete, % aboutCodeFilePath
+	FileAppend, % aboutCode, % aboutCodeFilePath, utf-8
+
 
 	;The element API functions are written three times for each of those threads: main, execution, editor
 	;If a new API function is created for the thread execution,

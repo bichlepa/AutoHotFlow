@@ -85,7 +85,7 @@ LoadFlow(p_filepath)
 	for oneElementIndex, oneElementID in _getAllElementIds(FlowID)
 	{
 		oneElementClass := _getElementProperty(FlowID, oneElementID, "class")
-		oneElementPackage := RIni_GetKeyValue("IniFile", oneSection, "Package", "Unknown")
+		oneElementPackage := _getElementProperty(FlowID, oneElementID, "Package")
 		
 		;Check whether we have the implementation of the element class
 		if not (ObjHasValue(AllElementClasses, oneElementClass))

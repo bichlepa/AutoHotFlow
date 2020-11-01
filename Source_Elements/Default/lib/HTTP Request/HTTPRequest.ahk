@@ -1,4 +1,15 @@
 ﻿/*
+license info:
+{
+	"name": "HTTPRequest v2.49",
+	"author": "VxE",
+	"source": "https://github.com/camerb/AHKs/blob/master/thirdParty/HTTPRequest.ahk",
+	"license": "BSD",
+	"licenselink": "https://opensource.org/licenses/BSD-3-Clause"
+}
+*/
+
+/*
 ###############################################################################################################
 ###                                       HTTPRequest. Version: 2.49                                        ###
 ###############################################################################################################

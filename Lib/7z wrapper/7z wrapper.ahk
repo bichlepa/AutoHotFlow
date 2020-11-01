@@ -1,5 +1,5 @@
-﻿;7z warpper - joedf
-;modified by bichlepa
+﻿;written by bichlepa. License: WTFPL
+;thanks to joedf for the 7z_compress() function (https://www.autohotkey.com/boards/viewtopic.php?f=5&t=26832)
 
 7z_exe:=_WorkingDir "\bin\7za.exe"
 ;~ 7z_exe:="C:\Program Files\7-Zip\7z.exe"
@@ -9,8 +9,7 @@
 	flist:=""
 	for each, file in files
 		flist:= flist """" file """" " "
-	;~ if FileExist(dPack)
-		;~ FileDelete, %dPack%
+		
 	RunWait, %7z_exe% a %opts% "%dPack%" %flist%,,Hide UseErrorLevel
 	return 7z_error(ErrorLevel)
 }

@@ -36,13 +36,11 @@ init_logger()
 
 ; Include libraries
 #Include %A_ScriptDir%\..
-#include lib\Object to file\String-object-file.ahk
-#include lib\Robert - Ini library\Robert - Ini library.ahk
-#include lib\ObjFullyClone\ObjFullyClone.ahk
-#include lib\ObjHasValue\ObjHasValue.ahk
+#include lib\Objects\Objects.ahk
 #include lib\Random Word List\Random Word List.ahk
 #include lib\GDI+\GDIp.ahk
 #include lib\Json\Jxon.ahk
+#include lib\7z wrapper\7z wrapper.ahk
 
 ; include language module
 #include language\language.ahk
@@ -66,6 +64,7 @@ lang_setLanguage(_getSettings("UILanguage"))
 #include Source_Manager\User Interface\Change Category GUI.ahk
 #include Source_Manager\User Interface\Global_Settings.ahk
 #include Source_Manager\User Interface\import and export.ahk
+#include Source_Manager\User Interface\about.ahk
 #include Source_Manager\Api\API for Elements.ahk
 
 #include source_Common\variables\global variables.ahk

@@ -1,4 +1,15 @@
-﻿Eject( DRV  ) {                       ;  By SKAN,  http://goo.gl/pUUGRt,  CD:01/Sep/2014 | MD:13/Sep/2014
+﻿/*
+license info:
+{
+	"name": "Eject",
+	"author": "SKAN",
+	"source": "https://www.autohotkey.com/boards/viewtopic.php?f=6&t=4491",
+	"license": "public domain",
+	"licenselink": "https://creativecommons.org/publicdomain/zero/1.0/legalcode"
+}
+*/
+
+Eject( DRV  ) {                       ;  By SKAN,  http://goo.gl/pUUGRt,  CD:01/Sep/2014 | MD:13/Sep/2014
 Local hMod, hVol, queryEnum, VAR := "", sPHDRV := "", nDID := 0, nVT := 1, nTC := A_TickCount 
 Local IOCTL_STORAGE_GET_DEVICE_NUMBER := 0x2D1080, STORAGE_DEVICE_NUMBER,  FILE_DEVICE_DISK := 0x00000007 
  

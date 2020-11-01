@@ -963,7 +963,7 @@ Button_manager_Settings()
 Button_manager_About()
 {
 	; open about gui
-	;TODO
+	init_about_gui()
 }
 
 ; when user clicks on button "show log"

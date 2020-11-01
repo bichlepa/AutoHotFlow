@@ -1,3 +1,13 @@
+/*
+license info:
+{
+	"name": "Gdip standard library v1.45",
+	"author": "tic (Tariq Porter)",
+	"source": "https://github.com/tariqporter/Gdip",
+	"license": "unknown",
+	"licenselink": ""
+}
+*/
 ; Gdip standard library v1.45 by tic (Tariq Porter) 07/09/11
 ;
 ;#####################################################################################

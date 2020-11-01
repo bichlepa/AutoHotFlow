@@ -1,3 +1,5 @@
+; copied and modified from AHK Help. https://www.autohotkey.com/docs/commands/Process.htm
+
 DllCall("LoadLibrary", "Str", "Psapi.dll")  ; Increase performance by preloading the library.
 getProcessList(filter = "")
 {

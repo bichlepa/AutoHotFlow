@@ -1,6 +1,5 @@
 ﻿
 ;~ #Include %A_ScriptDir%\..\..
-;~ #include lib\Object to file\String-object-file.ahk
 
 
 ;~ string=

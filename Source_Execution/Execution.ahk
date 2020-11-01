@@ -36,13 +36,11 @@ FileEncoding utf-8
 
 ; Include libraries
 #Include %A_ScriptDir%\..
-#include Lib\Object to file\String-object-file.ahk
-#include Lib\ObjFullyClone\ObjFullyClone.ahk
+#include Lib\Objects\Objects.ahk
 #include lib\Random Word List\Random Word List.ahk
 #include Lib\gdi+\gdip.ahk
-#include lib\ObjHasValue\ObjHasValue.ahk
-#include lib\Robert - Ini library\Robert - Ini library.ahk
 #include lib\Json\Jxon.ahk
+#include lib\7z wrapper\7z wrapper.ahk
 
 ; include language module
 #include language\language.ahk ;Must be very first

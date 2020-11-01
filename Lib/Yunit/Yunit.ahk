@@ -1,4 +1,13 @@
-;#NoEnv
+/*
+license info:
+{
+	"name": "Yunit",
+	"author": "Uberi",
+	"source": "https://github.com/Uberi/Yunit",
+	"license": "GPL",
+	"licenselink": "http://www.gnu.org/licenses/"
+}
+*/
 
 class Yunit
 {

@@ -33,8 +33,7 @@ init_logger()
 ; Include libraries
 #Include %A_ScriptDir%\..
 #include Lib\gdi+\gdip.ahk
-#include Lib\Object to file\String-object-file.ahk
-#include Lib\ObjFullyClone\ObjFullyClone.ahk
+#include Lib\Objects\Objects.ahk
 
 ; include language module
 #include language\language.ahk ;Must be very first

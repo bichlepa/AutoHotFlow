@@ -1,3 +1,14 @@
+/*
+license info:
+{
+	"name": "AutoHotkey-JSON",
+	"author": "cocobelgica",
+	"source": "https://github.com/cocobelgica/AutoHotkey-JSON",
+	"license": "WTFPL",
+	"licenselink": "http://www.wtfpl.net/"
+}
+*/
+
 Jxon_Load(ByRef src, args*)
 {
 	static q := Chr(34)
