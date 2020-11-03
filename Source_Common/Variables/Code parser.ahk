@@ -183,8 +183,6 @@ class class_parser
 		; parse an expression in current code line
 		expr := this.parse_expression(this.parse_codeline(), 0)
 		
-			;~ MsgBox % A_ThisFunc " @ " A_LineNumber "`n" strobj(expr) "`n~`n" strobj(this)
-		
 		; todo: parse a call
 		;~ if (this.token.is_punc("("))
 			;~ return this.parse_call(expr)

@@ -1,0 +1,178 @@
+﻿{
+  "allConnections": {
+    "connection0000000008": {
+      "ConnectionType": "normal",
+      "from": "element0000000007",
+      "ID": "connection0000000008",
+      "to": "element0000000009",
+      "type": "Connection"
+    },
+    "connection0000000013": {
+      "ConnectionType": "normal",
+      "from": "element0000000012",
+      "ID": "connection0000000013",
+      "to": "element0000000009",
+      "type": "Connection"
+    },
+    "connection0000000015": {
+      "ConnectionType": "normal",
+      "from": "element0000000014",
+      "ID": "connection0000000015",
+      "to": "element0000000009",
+      "type": "Connection"
+    },
+    "connection0000000017": {
+      "ConnectionType": "normal",
+      "from": "element0000000016",
+      "ID": "connection0000000017",
+      "to": "element0000000009",
+      "type": "Connection"
+    }
+  },
+  "allElements": {
+    "element0000000007": {
+      "class": "Trigger_Window_Gets_Active",
+      "enabled": "0",
+      "ID": "element0000000007",
+      "name": "Fenster wird aktiviert:  - Title begins with: \u00B7AutoHotFlow\u00B7 Editor - Window Test - Fensterklasse: AutoHotkeyGUI - Prozess: autohotkey.exe",
+      "package": "default",
+      "pars": {
+        "ahk_class": "AutoHotkeyGUI",
+        "ahk_exe": "autohotkey.exe",
+        "ahk_id": "",
+        "ahk_pid": "",
+        "ExcludeText": "",
+        "excludeTitle": "",
+        "FindHiddenText": 0,
+        "FindHiddenWindow": 0,
+        "interval": "100",
+        "NotTriggerOnEnable": "1",
+        "TitleMatchMode": 1,
+        "winText": "",
+        "Wintitle": "\u00B7AutoHotFlow\u00B7 Editor - Window Test"
+      },
+      "StandardName": "1",
+      "type": "Trigger",
+      "x": "1295",
+      "y": "105"
+    },
+    "element0000000009": {
+      "class": "Action_Tooltip",
+      "ID": "element0000000009",
+      "name": "Tooltip: %a_windowID% - 2 s #Seconds - Der Maus folgen",
+      "package": "action",
+      "pars": {
+        "duration": 2,
+        "follow_mouse": 1,
+        "text": "%a_windowID%",
+        "Unit": "Seconds"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "1820",
+      "y": "665"
+    },
+    "element0000000012": {
+      "class": "Trigger_Window_Opens",
+      "enabled": "0",
+      "ID": "element0000000012",
+      "name": "Fenster \u00F6ffnet sich:  - Title begins with: Unbenannt - Paint - Fensterklasse: MSPaintApp - Prozess: mspaint.exe",
+      "package": "default",
+      "pars": {
+        "ahk_class": "MSPaintApp",
+        "ahk_exe": "mspaint.exe",
+        "ahk_id": "",
+        "ahk_pid": "",
+        "ExcludeText": "",
+        "excludeTitle": "",
+        "FindHiddenText": 0,
+        "FindHiddenWindow": 0,
+        "interval": 100,
+        "NotTriggerOnEnable": "0",
+        "TitleMatchMode": 1,
+        "winText": "",
+        "Wintitle": "Unbenannt - Paint"
+      },
+      "StandardName": "1",
+      "type": "Trigger",
+      "x": "2030",
+      "y": "105"
+    },
+    "element0000000014": {
+      "class": "Trigger_Window_Closes",
+      "enabled": "0",
+      "ID": "element0000000014",
+      "name": "Fenster schlie\u00DFt:  - Title begins with: Unbenannt - Paint - Fensterklasse: MSPaintApp - Prozess: mspaint.exe",
+      "package": "default",
+      "pars": {
+        "ahk_class": "MSPaintApp",
+        "ahk_exe": "mspaint.exe",
+        "ahk_id": "",
+        "ahk_pid": "",
+        "ExcludeText": "",
+        "excludeTitle": "",
+        "FindHiddenText": 0,
+        "FindHiddenWindow": 0,
+        "interval": 100,
+        "TitleMatchMode": 1,
+        "winText": "",
+        "Wintitle": "Unbenannt - Paint"
+      },
+      "StandardName": "1",
+      "type": "Trigger",
+      "x": "2205",
+      "y": "315"
+    },
+    "element0000000016": {
+      "class": "Trigger_Window_Gets_Inactive",
+      "enabled": "0",
+      "ID": "element0000000016",
+      "name": "Fenster wird deaktiviert:  - Title begins with: Unbenannt - Paint - Fensterklasse: MSPaintApp - Prozess: mspaint.exe",
+      "package": "default",
+      "pars": {
+        "ahk_class": "MSPaintApp",
+        "ahk_exe": "mspaint.exe",
+        "ahk_id": "",
+        "ahk_pid": "",
+        "ExcludeText": "",
+        "excludeTitle": "",
+        "FindHiddenText": 0,
+        "FindHiddenWindow": 0,
+        "interval": 100,
+        "TitleMatchMode": 1,
+        "winText": "",
+        "Wintitle": "Unbenannt - Paint"
+      },
+      "StandardName": "1",
+      "type": "Trigger",
+      "x": "2345",
+      "y": "455"
+    },
+    "element0000000018": {
+      "class": "Action_Eject_Drive",
+      "ID": "element0000000018",
+      "name": "Laufwerk auswerfen",
+      "package": "default",
+      "pars": {
+        "DriveLetter": "C:",
+        "Method": "LibraryEjectByScan",
+        "WhatDo": "ejectDrive"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "840",
+      "y": "315"
+    }
+  },
+  "category": "AHF Test",
+  "ElementIDCounter": "24",
+  "flowSettings": {
+    "DefaultWorkingDir": 1,
+    "ExecutionPolicy": "default",
+    "Offsetx": "-112.857144",
+    "Offsety": "-492.857143",
+    "WorkingDir": "",
+    "zoomFactor": "0.7"
+  },
+  "name": "Window Test"
+}

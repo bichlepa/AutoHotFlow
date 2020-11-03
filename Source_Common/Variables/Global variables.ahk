@@ -147,7 +147,7 @@ GlobalVariable_Get(Environment,p_Name, p_hidden = False)
 		FileRead,varcontent, % path "\" p_Name ".ahfvar"
 		if (vartype = "object")
 		{
-			retval:= strobj(varcontent)
+			retval:= Jxon_Dump(varcontent, 2)
 		}
 		else
 		{

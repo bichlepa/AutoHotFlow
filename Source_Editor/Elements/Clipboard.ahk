@@ -24,7 +24,12 @@ SaveToClipboard()
 		newClipboard.allElements[forElementID] := _getElement(FlowID, forElementID)
 
 		; clear info object
-		newClipboard.allElements[forElementID].info := object()
+		newClipboard.allElements[forElementID].info.enabled := false
+		newClipboard.allElements[forElementID].info.selected := false
+		newClipboard.allElements[forElementID].info.state := "idle"
+		newClipboard.allElements[forElementID].info.countRuns := 0
+		newClipboard.allElements[forElementID].info.lastRun := 0
+		newClipboard.allElements[forElementID].info.clickPriority := 0
 
 		tempsaveCounter++
 	}
@@ -48,7 +53,9 @@ SaveToClipboard()
 		newClipboard.allConnections[forConnectionID] := _getConnection(FlowID, forConnectionID)
 		
 		; clear info object
-		newClipboard.allConnections[forConnectionID].info := object()
+		newClipboard.allConnections[forConnectionID].info.selected := false
+		newClipboard.allConnections[forConnectionID].info.state := "idle"
+		newClipboard.allConnections[forConnectionID].info.clickPriority := 500
 		
 		tempsaveCounter++
 	}

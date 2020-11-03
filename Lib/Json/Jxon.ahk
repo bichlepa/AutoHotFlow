@@ -153,9 +153,9 @@ Jxon_Dump(obj, indent:="", lvl:=1)
 
 	if IsObject(obj)
 	{
-		static Type := Func("Type")
-		if Type ? (Type.Call(obj) != "Object") : (ObjGetCapacity(obj) == "")
-			throw Exception("Object type not supported.", -1, Format("<Object at 0x{:p}>", &obj))
+		; static Type := Func("Type")
+		; if Type ? (Type.Call(obj) != "Object") : (ObjGetCapacity(obj) == "")
+		; 	throw Exception("Object type not supported.", -1, Format("<Object at 0x{:p}>", &obj))
 
 		is_array := 0
 		for k in obj

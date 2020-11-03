@@ -187,7 +187,7 @@ Element_run_Condition_Debug_Dialog(Environment, ElementParameters)
 	tempVarType:=x_getVariableType(environment,tempvarname)
 	if tempVarType=object
 	{
-		tempVarContent:=strobj(tempVarContent)
+		tempVarContent:=Jxon_Dump(tempVarContent, 2)
 		guicontrol,%a_gui%:,Condition_Debug_DialogEditField%a_gui%,%tempVarContent%
 		x_SetExecutionValue(environment, "SelectedVarType","object")
 	}
@@ -217,7 +217,7 @@ Element_run_Condition_Debug_Dialog(Environment, ElementParameters)
 	;~ MsgBox %tempVarType%
 	if tempVarType=object
 	{
-		tempNewVarContent:=strobj(tempNewVarContent)
+		tempNewVarContent:=Jxon_load(tempNewVarContent)
 		x_SetVariable(Environment, tempvarname, tempNewVarContent, tempLocation)
 	}
 	else if tempVarType=normal

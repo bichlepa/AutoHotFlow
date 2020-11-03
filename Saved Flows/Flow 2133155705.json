@@ -1,0 +1,68 @@
+﻿{
+  "allConnections": {
+    "connection0000000004": {
+      "ConnectionType": "normal",
+      "from": "element0000000001",
+      "ID": "connection0000000004",
+      "to": "element0000000005",
+      "type": "Connection"
+    }
+  },
+  "allElements": {
+    "element0000000001": {
+      "class": "Trigger_Hotkey",
+      "enabled": "1",
+      "ID": "element0000000001",
+      "name": "Hotkey - f6",
+      "package": "default",
+      "pars": {
+        "ahk_class": "Notepad",
+        "ahk_exe": "notepad.exe",
+        "ahk_id": "",
+        "ahk_pid": "",
+        "BlockKey": "1",
+        "FindHiddenText": 0,
+        "FindHiddenWindow": 0,
+        "GetWindowInformation": "Parameter holen",
+        "hotkey": "f6",
+        "TitleMatchMode": 1,
+        "UseWindow": "Everywhere",
+        "WhenRelease": "0",
+        "Wildcard": "0",
+        "winText": "",
+        "Wintitle": "Unbenannt - Editor"
+      },
+      "StandardName": "1",
+      "type": "trigger",
+      "x": 0,
+      "y": 0
+    },
+    "element0000000005": {
+      "class": "Action_Tooltip",
+      "ID": "element0000000005",
+      "name": "Tooltip: hotkey pressed: %a_hotkey% - 2 s #Seconds - Der Maus folgen",
+      "package": "action",
+      "pars": {
+        "duration": 2,
+        "follow_mouse": 1,
+        "text": "hotkey pressed: %a_hotkey%",
+        "Unit": "Seconds"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "210",
+      "y": "315"
+    }
+  },
+  "category": "AHF Test",
+  "ElementIDCounter": "5",
+  "flowSettings": {
+    "DefaultWorkingDir": 1,
+    "ExecutionPolicy": "default",
+    "Offsetx": -200,
+    "Offsety": -200,
+    "WorkingDir": "",
+    "zoomFactor": "0.7"
+  },
+  "name": "Hotkey test"
+}

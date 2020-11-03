@@ -220,7 +220,7 @@ class class_evaluator
 			return object()
 		}
 		
-		this.croak("unknown function " funcname " called with pars: `n " strobj(args))
+		this.croak("unknown function " funcname " called with pars: `n " Jxon_Dump(args, 2))
 	}
 	
 	; apply a binary operator

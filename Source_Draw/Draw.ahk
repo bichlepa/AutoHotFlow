@@ -34,6 +34,7 @@ init_logger()
 #Include %A_ScriptDir%\..
 #include Lib\gdi+\gdip.ahk
 #include Lib\Objects\Objects.ahk
+#include lib\Json\Jxon.ahk
 
 ; include language module
 #include language\language.ahk ;Must be very first

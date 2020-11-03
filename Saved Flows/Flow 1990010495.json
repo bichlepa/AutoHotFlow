@@ -1,0 +1,98 @@
+﻿{
+  "allConnections": {
+    "connection0000000002": {
+      "ConnectionType": "normal",
+      "from": "element0000000001",
+      "ID": "connection0000000002",
+      "to": "element0000000006",
+      "type": "Connection"
+    },
+    "connection0000000004": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000004",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000005": {
+      "ConnectionType": "normal",
+      "from": "element0000000006",
+      "ID": "connection0000000005",
+      "to": "element0000000003",
+      "type": "Connection"
+    },
+    "connection0000000008": {
+      "ConnectionType": "normal",
+      "from": "element0000000007",
+      "ID": "connection0000000008",
+      "to": "element0000000006",
+      "type": "Connection"
+    }
+  },
+  "allElements": {
+    "element0000000001": {
+      "class": "Trigger_Clipboard_Changes",
+      "enabled": "0",
+      "ID": "element0000000001",
+      "name": "Zwischenablage \u00E4ndert sich",
+      "package": "default",
+      "pars": {},
+      "StandardName": "1",
+      "type": "trigger",
+      "x": 0,
+      "y": 0
+    },
+    "element0000000003": {
+      "class": "Action_Tooltip",
+      "ID": "element0000000003",
+      "name": "Tooltip: clipboard changed: %clipboard% - 2 s #Seconds - Der Maus folgen",
+      "package": "action",
+      "pars": {
+        "duration": 2,
+        "follow_mouse": 1,
+        "text": "clipboard changed: %clipboard%",
+        "Unit": "Seconds"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "210",
+      "y": "385"
+    },
+    "element0000000006": {
+      "class": "Action_Get_Clipboard",
+      "ID": "element0000000006",
+      "name": "Zwischenablage holen - clipboard = ^",
+      "package": "default",
+      "pars": {
+        "Varname": "clipboard"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "105",
+      "y": "210"
+    },
+    "element0000000007": {
+      "class": "Trigger_Clipboard_Changes",
+      "enabled": "0",
+      "ID": "element0000000007",
+      "name": "Zwischenablage \u00E4ndert sich",
+      "package": "default",
+      "pars": {},
+      "StandardName": "1",
+      "type": "trigger",
+      "x": "595",
+      "y": "35"
+    }
+  },
+  "category": "AHF Test",
+  "ElementIDCounter": "8",
+  "flowSettings": {
+    "DefaultWorkingDir": 1,
+    "ExecutionPolicy": "default",
+    "Offsetx": -200,
+    "Offsety": -200,
+    "WorkingDir": "",
+    "zoomFactor": "0.7"
+  },
+  "name": "clipboard test"
+}

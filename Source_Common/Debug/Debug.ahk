@@ -15,7 +15,7 @@ d(text,header="",wait=1)
 	dfinished:=false
 	
 	if (isobject(text))
-		text:=strobj(text)
+		text:=jxon_dump(text, 2)
 	
 	gui,d:destroy
 	gui,d:margin,5,5
@@ -86,13 +86,11 @@ d_showGlobals(wait=1)
 	; text.=CallStack(10)
 	text.="Flows:`n"
 	
-	text.=strobj(_flows) "`n`nSettings:`n"
-	text.=strobj(_settings) "`n`nExecution:`n"
-	text.=strobj(_execution) "`n`nShare:`n"
-	text.=strobj(_share) "`n`nAllFlows:`n"
-	;~ text.=strobj(allFlows)
+	text.=jxon_dump(_flows, 2) "`n`nSettings:`n"
+	text.=jxon_dump(_settings, 2) "`n`nExecution:`n"
+	text.=jxon_dump(_execution, 2) "`n`nShare:`n"
+	text.=jxon_dump(_share, 2) "`n`nAllFlows:`n"
 	
-	;~ MsgBox % strobj(_flows)
 	Clipboard := text
 	
 	gui,dGlobals:destroy

@@ -1,0 +1,212 @@
+﻿{
+  "allConnections": {
+    "connection0000000003": {
+      "ConnectionType": "normal",
+      "from": "element0000000002",
+      "ID": "connection0000000003",
+      "to": "element0000000010",
+      "type": "Connection"
+    },
+    "connection0000000006": {
+      "ConnectionType": "normal",
+      "from": "element0000000005",
+      "ID": "connection0000000006",
+      "to": "element0000000004",
+      "type": "Connection"
+    },
+    "connection0000000008": {
+      "ConnectionType": "normal",
+      "from": "element0000000007",
+      "ID": "connection0000000008",
+      "to": "element0000000009",
+      "type": "Connection"
+    },
+    "connection0000000011": {
+      "ConnectionType": "normal",
+      "from": "element0000000005",
+      "ID": "connection0000000011",
+      "to": "element0000000015",
+      "type": "Connection"
+    },
+    "connection0000000013": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000013",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000014": {
+      "ConnectionType": "normal",
+      "from": "element0000000015",
+      "ID": "connection0000000014",
+      "to": "element0000000012",
+      "type": "Connection"
+    }
+  },
+  "allElements": {
+    "element0000000001": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "1",
+      "enabled": "0",
+      "ID": "element0000000001",
+      "name": "Manual - \"\u1E73\u19B5\u1E69\u1E17\u2565\"",
+      "package": "default",
+      "pars": {
+        "ID": "\u1E73\u19B5\u1E69\u1E17\u2565"
+      },
+      "StandardName": 1,
+      "type": "trigger",
+      "x": 0,
+      "y": 0
+    },
+    "element0000000002": {
+      "class": "Trigger_Process_Closes",
+      "enabled": "0",
+      "ID": "element0000000002",
+      "name": "Prozess schlie\u00DFt",
+      "package": "default",
+      "pars": {
+        "interval": "10",
+        "ProcessName": "notepad.exe"
+      },
+      "StandardName": "1",
+      "type": "Trigger",
+      "x": "700",
+      "y": "210"
+    },
+    "element0000000004": {
+      "class": "Action_Message_Box",
+      "ID": "element0000000004",
+      "name": "Nachrichtenfenster",
+      "package": "default",
+      "pars": {
+        "ButtonLabel": "OK",
+        "ButtonLabelCancel": "Abbrechen",
+        "Height": 200,
+        "IfDismiss": 1,
+        "IsTimeout": "NoTimeout",
+        "message": "%a_processid% - %a_processName% started",
+        "OnTimeout": "Normal",
+        "ShowCancelButton": 0,
+        "TimeoutUnits": 10,
+        "title": "Titel",
+        "Unit": "Seconds",
+        "Width": 300
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "665",
+      "y": "595"
+    },
+    "element0000000005": {
+      "class": "Trigger_Process_starts",
+      "enabled": "0",
+      "ID": "element0000000005",
+      "name": "Prozess startet",
+      "package": "default",
+      "pars": {
+        "interval": "10",
+        "NotTriggerOnEnable": 1,
+        "ProcessName": "notepad.exe"
+      },
+      "StandardName": "1",
+      "type": "Trigger",
+      "x": "910",
+      "y": "245"
+    },
+    "element0000000007": {
+      "class": "Trigger_Process_starts",
+      "enabled": "0",
+      "ID": "element0000000007",
+      "name": "Prozess startet",
+      "package": "default",
+      "pars": {
+        "interval": 100,
+        "NotTriggerOnEnable": 1,
+        "ProcessName": ""
+      },
+      "StandardName": "1",
+      "type": "Trigger",
+      "x": "1155",
+      "y": "350"
+    },
+    "element0000000009": {
+      "class": "Action_Tooltip",
+      "ID": "element0000000009",
+      "name": "Tooltip: %a_processID% %a_processName% - 2 s #Seconds - Der Maus folgen",
+      "package": "action",
+      "pars": {
+        "duration": 2,
+        "follow_mouse": 1,
+        "text": "%a_processID% %a_processName%",
+        "Unit": "Seconds"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "1120",
+      "y": "525"
+    },
+    "element0000000010": {
+      "class": "Action_Message_Box",
+      "ID": "element0000000010",
+      "name": "Nachrichtenfenster",
+      "package": "default",
+      "pars": {
+        "ButtonLabel": "OK",
+        "ButtonLabelCancel": "Abbrechen",
+        "Height": 200,
+        "IfDismiss": 1,
+        "IsTimeout": "NoTimeout",
+        "message": "%a_processid% - %a_processName% stopped",
+        "OnTimeout": "Normal",
+        "ShowCancelButton": 0,
+        "TimeoutUnits": 10,
+        "title": "Titel",
+        "Unit": "Seconds",
+        "Width": 300
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "490",
+      "y": "525"
+    },
+    "element0000000012": {
+      "class": "Action_Kill_Process",
+      "ID": "element0000000012",
+      "name": "Prozess killen",
+      "package": "default",
+      "pars": {
+        "ProcessName": "%a_processID%"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "945",
+      "y": "595"
+    },
+    "element0000000015": {
+      "class": "Action_Sleep",
+      "ID": "element0000000015",
+      "name": "Pause: 2 s #Seconds",
+      "package": "action",
+      "pars": {
+        "Duration": 2,
+        "Unit": "Seconds"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "945",
+      "y": "455"
+    }
+  },
+  "category": "AHF Test",
+  "ElementIDCounter": "15",
+  "flowSettings": {
+    "DefaultWorkingDir": 1,
+    "ExecutionPolicy": "default",
+    "Offsetx": "-607.142857",
+    "Offsety": "-527.142858",
+    "WorkingDir": "",
+    "zoomFactor": "0.7"
+  },
+  "name": "Process Test"
+}

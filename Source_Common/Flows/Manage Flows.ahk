@@ -120,6 +120,8 @@ NewFlow(p_CategoryID = "", p_flowID = "")
 	newFlow.statesCounter := 0
 	newFlow.ElementIDCounter := 0
 	newFlow.CompabilityVersion := FlowCompabilityVersionOfApp
+	newFlow.allElements := Object()
+	newFlow.allConnections := Object()
 
 	; set default flow settings
 	newFlow.flowSettings := []
