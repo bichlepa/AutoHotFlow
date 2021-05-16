@@ -2,7 +2,11 @@
 global global_ThreadIdCounter := 0
 
 ; Starts a new execution instance
-newInstance(p_Environment, p_params = "", p_instanceProperties = "")
+; p_Environment: Environment data like Flow ID and element ID
+; p_instanceVars: list of instance variables which should be set at the beginning
+; p_instanceProperties: instance properties, which will be set
+; p_dataForPostTrigger: data which will be passed to the Element_postTrigger_...() function 
+newInstance(p_Environment, p_instanceVars = "", p_instanceProperties = "", p_dataForPostTrigger = "")
 {
 	_EnterCriticalSection()
 
@@ -99,7 +103,7 @@ newInstance(p_Environment, p_params = "", p_instanceProperties = "")
 			if (isfunc("Element_postTrigger_" ElementClass))
 			{
 				elementParams := _getElementProperty(p_Environment.FlowID, p_Environment.ElementID, "pars")
-				Element_postTrigger_%ElementClass%({instanceID: newInstanceId, threadID: newThreadID}, elementParams)
+				Element_postTrigger_%ElementClass%({instanceID: newInstanceId, threadID: newThreadID}, elementParams, p_dataForPostTrigger)
 			}
 			
 			; updates the "executing" property of the flow
@@ -123,7 +127,7 @@ newInstance(p_Environment, p_params = "", p_instanceProperties = "")
 
 ; Start execution of the flow
 ; todo: descriobe p_params
-ExecuteFlow(p_FlowID, p_TriggerID ="", p_params = "")
+ExecuteFlow(p_FlowID, p_TriggerID ="", p_instanceVars = "", p_instanceProperties = "")
 {
 	static
 
@@ -149,7 +153,7 @@ ExecuteFlow(p_FlowID, p_TriggerID ="", p_params = "")
 		environment := Object()
 		environment.flowID := p_FlowID
 		environment.elementID := p_TriggerID
-		newInstance(environment, p_params)
+		newInstance(environment, p_instanceVars, p_instanceProperties)
 	}
 	
 	_LeaveCriticalSection()
@@ -203,7 +207,7 @@ executeToggleFlow(p_FlowID)
 	}
 	else
 	{
-		; flow is not. start a new instance
+		; flow is not running. start a new instance
 		ExecuteFlow(p_FlowID)
 	}
 	

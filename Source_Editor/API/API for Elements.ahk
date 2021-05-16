@@ -141,9 +141,9 @@ x_ExecuteInNewAHKThread_stop(Environment)
 	return xx_ExecuteInNewAHKThread_stop(Environment)
 }
 
-x_trigger(Environment, params = "")
+x_trigger(Environment, data = "")
 {
-	return xx_trigger(Environment, params)
+	return xx_trigger(Environment, data)
 }
 x_enabled(Environment, Result, Message = "")
 {

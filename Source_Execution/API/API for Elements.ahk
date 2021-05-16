@@ -752,9 +752,9 @@ x_TriggerInNewAHKThread_GetExportedValues(Environment)
 
 ; only in nexecution
 ; trigger a trigger and create a new instance
-x_trigger(Environment, params = "")
+x_trigger(Environment, data = "")
 {
-	newInstance(Environment, params)
+	newInstance(Environment, , , data)
 }
 
 ; must be called when the trigger was enabled.

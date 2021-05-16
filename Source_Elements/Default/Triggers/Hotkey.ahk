@@ -236,7 +236,7 @@ Element_enable_Trigger_Hotkey(Environment, ElementParameters)
 }
 ;Called after the trigger has triggered.
 ;Here you can for example define the variables which are provided by the triggers.
-Element_postTrigger_Trigger_Hotkey(Environment, ElementParameters)
+Element_postTrigger_Trigger_Hotkey(Environment, ElementParameters, TriggerData)
 {
 	x_SetVariable(Environment, "A_Hotkey", ElementParameters.hotkey, "thread")
 }

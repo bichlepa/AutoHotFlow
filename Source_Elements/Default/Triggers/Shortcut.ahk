@@ -64,7 +64,7 @@ Element_getParametrizationDetails_Trigger_Shortcut(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Trigger_Shortcut(Environment, ElementParameters)
 {
-	return x_lang("Shortcut") 
+	return x_lang("Shortcut") "`n" ElementParameters.File
 }
 
 ;Called every time the user changes any parameter.
@@ -114,7 +114,7 @@ Trigger_Shortcut_Trigger(environment, EvaluatedParameters)
 
 ;Called after the trigger has triggered.
 ;Here you can for example define the variables which are provided by the triggers.
-Element_postTrigger_Trigger_Shortcut(Environment, ElementParameters)
+Element_postTrigger_Trigger_Shortcut(Environment, ElementParameters, TriggerData)
 {
 
 }

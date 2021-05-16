@@ -777,7 +777,7 @@ Element_enable_&ElementType&_&Name&(Environment, ElementParameters)
 
 ;Called after the trigger has triggered.
 ;Here you can for example define the variables which are provided by the triggers.
-Element_postTrigger_&ElementType&_&Name&(Environment, ElementParameters)
+Element_postTrigger_&ElementType&_&Name&(Environment, ElementParameters, TriggerData)
 {
 #if addSeparateAhkThread
 	exportedValues:=x_TriggerInNewAHKThread_GetExportedValues(Environment)

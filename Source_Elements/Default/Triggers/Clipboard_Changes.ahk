@@ -106,7 +106,7 @@ Trigger_Clipboard_Changes_Trigger(environment, EvaluatedParameters)
 
 ;Called after the trigger has triggered.
 ;Here you can for example define the variables which are provided by the triggers.
-Element_postTrigger_Trigger_Clipboard_Changes(Environment, ElementParameters)
+Element_postTrigger_Trigger_Clipboard_Changes(Environment, ElementParameters, TriggerData)
 {
 }
 

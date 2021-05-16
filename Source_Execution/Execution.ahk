@@ -109,7 +109,7 @@ queryTasks()
 			if (name = "ExecuteFlow")
 			{
 				; a flow should be started
-				ExecuteFlow(oneTask.FlowID, oneTask.TriggerID, oneTask.params)
+				ExecuteFlow(oneTask.FlowID, oneTask.TriggerID, oneTask.instanceVars, oneTask.instanceProperties)
 			}
 			else if (name = "enableTriggers")
 			{

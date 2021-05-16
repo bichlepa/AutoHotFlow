@@ -63,7 +63,7 @@ Element_getParametrizationDetails_Action_Kill_Process(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Kill_Process(Environment, ElementParameters)
 {
-	return x_lang("Kill_Process") 
+	return x_lang("Kill_Process") "`n" ElementParameters.ProcessName
 }
 
 ;Called every time the user changes any parameter.

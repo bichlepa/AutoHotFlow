@@ -66,7 +66,7 @@ Element_getParametrizationDetails_Trigger_Process_Closes(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Trigger_Process_Closes(Environment, ElementParameters)
 {
-	return x_lang("Process_Closes") 
+	return x_lang("Process_Closes") "`n" ElementParameters.ProcessName
 }
 
 ;Called every time the user changes any parameter.
@@ -117,10 +117,10 @@ Element_enable_Trigger_Process_Closes(Environment, ElementParameters)
 
 ;Called after the trigger has triggered.
 ;Here you can for example define the variables which are provided by the triggers.
-Element_postTrigger_Trigger_Process_Closes(Environment, parameters)
+Element_postTrigger_Trigger_Process_Closes(Environment, ElementParameters, TriggerData)
 {
-	x_SetVariable(Environment, "a_processID", parameters.processID, "Thread")
-	x_SetVariable(Environment, "a_processName", parameters.processName, "Thread")
+	x_SetVariable(Environment, "a_processID", TriggerData.processID, "Thread")
+	x_SetVariable(Environment, "a_processName", TriggerData.processName, "Thread")
 }
 
 ;Called when the trigger should be disabled.
@@ -140,23 +140,26 @@ Trigger_Process_Closes_TimerLabel(Environment, parameters, fistCall = false)
 {
 	if (fistCall)
 	{
+		x_log(Environment, "ProcessClosesTimerLabelFirstCall")
 		; on first call, we need to create an initial list of processes
 		parameters.currentProcesses := getProcessList(parameters.ProcessName)
 	}
 
 	; get a list of all matching processes
 	currentProcesses := getProcessList(parameters.ProcessName)
+	x_log(Environment, strobj(currentProcesses))
 
 	; check whether some elements are missing now
 	for oneProcessID, oneProcessName in parameters.currentProcesses
 	{
 		if (not currentProcesses.hasKey(oneProcessID))
 		{
+			x_log(Environment, "ProcessClosesTimerLabelTriggering. Process ID:" oneProcessID)
+			asdf:=true
 			; a process is missing now. Call the trigger
 			x_trigger(Environment, {processID: oneProcessID, processName: oneProcessName})
 		}
 	}
-	
 	; the result has changed. Save the changed value.
 	parameters.currentProcesses := currentProcesses
 }

@@ -117,7 +117,7 @@ Element_enable_Trigger_AutoHotkey_Script(Environment, ElementParameters)
 
 ;Called after the trigger has triggered.
 ;Here you can for example define the variables which are provided by the triggers.
-Element_postTrigger_Trigger_AutoHotkey_Script(Environment, ElementParameters)
+Element_postTrigger_Trigger_AutoHotkey_Script(Environment, ElementParameters, TriggerData)
 {
 	exportedValues := x_TriggerInNewAHKThread_GetExportedValues(Environment)
 	x_ImportInstanceVars(Environment, exportedValues)

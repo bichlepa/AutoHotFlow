@@ -139,7 +139,7 @@ xx_ExecuteInNewAHKThread(Environment, p_functionObject, p_Code, p_VarsToImport, 
 xx_ExecuteInNewAHKThread_Stop(Environment)
 {
 }
-xx_trigger(Environment, params = "")
+xx_trigger(Environment, data = "")
 {
 }
 xx_enabled(Environment, Result, Message = "")
@@ -464,11 +464,6 @@ xx_ManualTriggerDisable(p_FlowID, p_TriggerName="")
 ; if p_TriggerName is empty, it defaults to the default manual trigger of the flow
 xx_ManualTriggerExecute(p_FlowID, p_TriggerName = "", p_Variables ="", p_CallBackFunction ="")
 {
-	; when starting to execute the trigger, we will pass some variables in that object.
-	params := Object()
-	params.ahf_VarsToPass := p_Variables
-	params.ahf_CallBack := p_CallBackFunction
-	
 	; check first, whether flow exists
 	if (not _existsFlow(p_FlowID))
 	{
@@ -479,7 +474,7 @@ xx_ManualTriggerExecute(p_FlowID, p_TriggerName = "", p_Variables ="", p_CallBac
 	if (p_TriggerName = "")
 	{
 		; not trigger name specified. trigger the default trigger
-		executeFlow(p_FlowID, "", params)
+		executeFlow(p_FlowID, "", p_Variables, {CallBack: p_CallBackFunction})
 		return
 	}
 	else
@@ -501,7 +496,7 @@ xx_ManualTriggerExecute(p_FlowID, p_TriggerName = "", p_Variables ="", p_CallBac
 		if foundElementID
 		{
 			; we found the trigger. We can trigger it now.
-			executeFlow(p_FlowID, foundElementID, params)
+			executeFlow(p_FlowID, foundElementID, p_Variables, {CallBack: p_CallBackFunction})
 		}
 		else
 		{

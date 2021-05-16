@@ -191,6 +191,7 @@ Element_enable_Trigger_Window_Opens(Environment, ElementParameters)
 	x_SetTriggerValue(Environment, "functionObject", functionObject)
 	
 	; make the first call immediately
+	; the passed value is the last parameter of the function Trigger_Window_Opens_TimerLabel
 	%functionObject%(true)
 
 	; enable the timer
@@ -203,9 +204,9 @@ Element_enable_Trigger_Window_Opens(Environment, ElementParameters)
 
 ;Called after the trigger has triggered.
 ;Here you can for example define the variables which are provided by the triggers.
-Element_postTrigger_Trigger_Window_Opens(Environment, parameters)
+Element_postTrigger_Trigger_Window_Opens(Environment, ElementParameters, TriggerData)
 {
-	x_SetVariable(Environment, "a_WindowID", parameters.windowID, "Thread")
+	x_SetVariable(Environment, "a_WindowID", TriggerData.windowID, "Thread")
 }
 
 
@@ -236,6 +237,7 @@ Trigger_Window_Opens_TimerLabel(Environment, parameters, fistCall = false)
 	DetectHiddenText, % parameters.findhiddentext
 	DetectHiddenWindows, % parameters.findhiddenwindow
 
+	; firstCall is true if the function object was called with a parameter true
 	if (fistCall)
 	{
 		; check parameter NotTriggerOnEnable on first call

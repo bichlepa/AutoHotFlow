@@ -201,10 +201,10 @@ Element_enable_Trigger_Window_Gets_Inactive(Environment, ElementParameters)
 
 ;Called after the trigger has triggered.
 ;Here you can for example define the variables which are provided by the triggers.
-Element_postTrigger_Trigger_Window_Gets_Inactive(Environment, parameters)
+Element_postTrigger_Trigger_Window_Gets_Inactive(Environment, ElementParameters, TriggerData)
 {
 	; set the a_windowID variable
-	x_SetVariable(Environment, "a_WindowID", parameters.windowID, "Thread")
+	x_SetVariable(Environment, "a_WindowID", TriggerData.windowID, "Thread")
 }
 
 

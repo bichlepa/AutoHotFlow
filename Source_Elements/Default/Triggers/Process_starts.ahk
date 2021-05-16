@@ -67,7 +67,7 @@ Element_getParametrizationDetails_Trigger_Process_starts(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Trigger_Process_starts(Environment, ElementParameters)
 {
-	return x_lang("Process_starts") 
+	return x_lang("Process_starts") "`n" ElementParameters.ProcessName
 }
 
 ;Called every time the user changes any parameter.
@@ -118,10 +118,10 @@ Element_enable_Trigger_Process_starts(Environment, ElementParameters)
 
 ;Called after the trigger has triggered.
 ;Here you can for example define the variables which are provided by the triggers.
-Element_postTrigger_Trigger_Process_starts(Environment, parameters)
+Element_postTrigger_Trigger_Process_starts(Environment, ElementParameters, TriggerData)
 {
-	x_SetVariable(Environment, "a_processID", parameters.processID, "Thread")
-	x_SetVariable(Environment, "a_processName", parameters.processName, "Thread")
+	x_SetVariable(Environment, "a_processID", TriggerData.processID, "Thread")
+	x_SetVariable(Environment, "a_processName", TriggerData.processName, "Thread")
 }
 
 ;Called when the trigger should be disabled.

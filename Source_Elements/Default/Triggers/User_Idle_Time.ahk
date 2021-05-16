@@ -140,7 +140,7 @@ Element_enable_Trigger_User_Idle_Time(Environment, ElementParameters)
 
 ;Called after the trigger has triggered.
 ;Here you can for example define the variables which are provided by the triggers.
-Element_postTrigger_Trigger_User_Idle_Time(Environment, ElementParameters)
+Element_postTrigger_Trigger_User_Idle_Time(Environment, ElementParameters, TriggerData)
 {
 
 }

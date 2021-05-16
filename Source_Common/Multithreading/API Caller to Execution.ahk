@@ -1,11 +1,11 @@
 ﻿;This file is included by all threads which want to communicate to execution thread
 
 ; tells the execution thread that it should start a flow
-API_Execution_ExecuteFlow(p_FlowID, par_TriggerID ="", p_Params = "")
+API_Execution_ExecuteFlow(p_FlowID, par_TriggerID ="", p_instanceVars = "", p_instanceProperties = "")
 {
 	logger("t2", A_ThisFunc " called from thread", _ahkThreadID)
 	
-	_setTask("execution", {name: "ExecuteFlow", flowID: p_FlowID, TriggerID: par_TriggerID, Params: p_Params})
+	_setTask("execution", {name: "ExecuteFlow", flowID: p_FlowID, TriggerID: par_TriggerID, instanceVars: p_instanceVars, instanceProperties: p_instanceProperties})
 }
 
 ; tells the execution thread that it should enable all triggers of a flow

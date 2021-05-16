@@ -110,7 +110,7 @@ Element_enable_Trigger_Time_Of_Day(Environment, ElementParameters)
 
 ;Called after the trigger has triggered.
 ;Here you can for example define the variables which are provided by the triggers.
-Element_postTrigger_Trigger_Time_Of_Day(Environment, ElementParameters)
+Element_postTrigger_Trigger_Time_Of_Day(Environment, ElementParameters, TriggerData)
 {
 
 }

@@ -63,7 +63,7 @@ Element_getParametrizationDetails_Condition_Process_Is_Running(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Condition_Process_Is_Running(Environment, ElementParameters)
 {
-	return x_lang("Process_Is_Running") 
+	return x_lang("Process_Is_Running") "`n" ElementParameters.ProcessName
 }
 
 ;Called every time the user changes any parameter.
