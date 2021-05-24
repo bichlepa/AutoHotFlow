@@ -135,7 +135,7 @@ NewFlow(p_CategoryID = "", p_flowID = "")
 	;Set the file path of the new flow
 	newFlow.folder := _WorkingDir "\Saved Flows"
 	newFlow.filename := newFlowid
-	newFlow.file := _WorkingDir "\Saved Flows\" newFlowid ".ini"
+	newFlow.file := _WorkingDir "\Saved Flows\" newFlowid ".json"
 
 	; create empty objects for later use
 	newFlow.draw := Object()
@@ -164,6 +164,8 @@ createDefaultManualTrigger(p_flowID)
 ; delete a flow
 DeleteFlow(par_ID)
 {
+	logger("a2", "Goint to delete flow " par_ID)
+
 	; close editor
 	API_Editor_Exit(par_ID)
 
@@ -171,14 +173,40 @@ DeleteFlow(par_ID)
 	API_Execution_DisableTriggers(par_ID)
 	API_Execution_stopFlow(par_ID)
 	
-	; delete savefile
-	FileDelete,% _getFlowProperty(par_ID, "file")
-	
-	; wait a little bit. TODO: find better solution than waiting
-	sleep 300
+	; wait up to 10 seconds until the flow finishes
+	loop, 100
+	{
+		if (xx_isFlowEnabled(par_ID) or xx_isFlowExecuting(par_ID))
+		{
+			sleep 100
+		}
+		Else
+			break
+	}
+	if (xx_isFlowEnabled(par_ID) or xx_isFlowExecuting(par_ID))
+	{
+		logger("a0", "Flow " par_ID " could not be disabled and stopped!")
+		throw exception("Flow " par_ID " could not be disabled and stopped!")
+	}
 
+	logger("a2", "Flow " par_ID " is disabled and stopped. Deleting now.")
+
+	; delete savefile
+	loop 10
+	{
+		FileDelete, % _getFlowProperty(par_ID, "file")
+		myErrorLevel := errorlevel
+		if not myErrorLevel
+			break
+		sleep 100
+	}
+	if myErrorLevel
+		throw exception("File of flow " par_ID " could not be deleted! Windows error code: " A_LastError)
+	
 	; delete flow object
 	_deleteFlow(par_ID)
+
+	logger("a2", "Flow " par_ID " was deleted.")
 }
 
 ; duplicate an existing flow

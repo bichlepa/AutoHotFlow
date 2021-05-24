@@ -5,9 +5,6 @@ enableFlow(p_FlowID)
 {
 	; enable all triggers
 	enableTriggers(p_FlowID)
-
-	; save changed enabling state
-	SaveFlowMetaData(p_FlowID)
 }
 
 ; toggle the enable state of the flow
@@ -31,9 +28,6 @@ disableFlow(p_FlowID)
 {
 	; disable all triggers
 	disableTriggers(p_FlowID)
-	
-	; save changed enabling state
-	SaveFlowMetaData(p_FlowID)
 }
 
 ; enable all triggers of a flow
@@ -56,11 +50,11 @@ enableTriggers(p_FlowID)
 		}
 	}
 
-	; set the flow property "enabled" to "true"
-	_setFlowProperty(p_FlowID, "enabled", true)
-
 	; save changed enabling state
 	SaveFlowMetaData(p_FlowID)
+
+	; set the flow property "enabled" to "true"
+	_setFlowProperty(p_FlowID, "enabled", true)
 
 	logger("a1", "Flow " FlowName " enabled")
 }
@@ -137,11 +131,12 @@ disableTriggers(p_FlowID)
 		}
 	}
 
-	; set the flow property "enabled" to "false"
-	_setFlowProperty(p_FlowID, "enabled", false)
-
 	; save changed enabling state
 	SaveFlowMetaData(p_FlowID)
+
+	; set the flow property "enabled" to "false"
+	; we set it to false after we saved the flow. When a flow is deleted, it checks the "enabled" flag. If we set it to false and save afterwards, the flow file will be recreated.
+	_setFlowProperty(p_FlowID, "enabled", false)
 
 	logger("a1", "Flow " FlowName " disabled")
 }

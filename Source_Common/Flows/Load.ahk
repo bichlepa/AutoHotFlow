@@ -121,9 +121,6 @@ LoadFlow(p_filepath)
 		; move "enabled" property to info object
 		_setElementInfo(FlowID, oneElementID, "enabled", _getElementProperty(FlowID, oneElementID, "enabled"))
 		_deleteElementProperty(FlowID, oneElementID, "enabled")
-
-		; TODO: check whether we have one default manual trigger (if there are any manual trigger)
-
 		
 		; Ensure backward compatibility (for later use)
 		LoadFlowCheckCompabilityElement(flowID, oneElementID, _getFlowProperty(FlowID, "CompabilityVersion"))
@@ -185,9 +182,6 @@ LoadFlow(p_filepath)
 		logger("a0","Error in flow! Flow has manual triggers but none of them is set default trigger. Setting '" anyManualTriggerFound "' as default trigger.")
 		_setElementProperty(FlowID, anyManualTriggerFound, "DefaultTrigger", true)
 	}
-
-	
-	; TODO: check flow settings.
 
 	; check working directory
 	if not _getFlowProperty(FlowID, "flowSettings.DefaultWorkingDir")
