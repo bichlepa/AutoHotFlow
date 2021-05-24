@@ -146,12 +146,19 @@ NewFlow(p_CategoryID = "", p_flowID = "")
 	return newFlowid
 }
 
-; initialize a newly created flow with a manual trigger
+; initialize a newly created flow
 initNewFlow(p_flowID)
+{
+	createDefaultManualTrigger(p_flowID)
+}
+
+; create a default manual trigger
+createDefaultManualTrigger(p_flowID)
 {
 	newElementID := element_New(p_flowID, "trigger")
 	newElementClass := "Trigger_Manual"
 	Element_SetClass(p_flowID, newElementID, newElementClass)
+	Element_setDefaultTrigger(p_flowID, newElementID)
 }
 
 ; delete a flow

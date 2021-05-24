@@ -145,22 +145,93 @@ LoadFlow(p_filepath)
 	if not (_getFlowProperty(FlowID, "firstLoadedTime"))
 		_setFlowProperty(FlowID, "firstLoadedTime", a_now)
 	
-	; todo: ensure, we have a trigger
+	; ensure, we have a trigger. And if there are 1+ manual triggers, that one of them (and only one) is default trigger
+	triggerFound := False
+	anyManualTriggerFound := False
+	defaultManualTriggerFound := False
+	for oneElementIndex, oneElementID in _getAllElementIds(FlowID)
+	{
+		oneElementClass := _getElementProperty(FlowID, oneElementID, "class")
+
+		if (substr(oneElementClass, 1, 8) = "Trigger_")
+		{
+			triggerFound := oneElementID
+			if (oneElementClass = "Trigger_Manual")
+			{
+				anyManualTriggerFound := oneElementID
+				if (_getElementProperty(FlowID, oneElementID, "DefaultTrigger"))
+				{
+					if (defaultManualTriggerFound)
+					{
+						logger("a0","Error in flow! Trigger '" oneElementID "' is default but trigger '" defaultManualTriggerFound "' is also a deafault trigger. Keeping '" defaultManualTriggerFound "' as default trigger.")
+						_setElementProperty(FlowID, oneElementID, "DefaultTrigger", false)
+					}
+					Else
+					{
+						defaultManualTriggerFound := oneElementID
+					}
+				}
+			}
+		}
+	}
+	if not (triggerFound)
+	{
+		; create manual trigger
+		logger("a0","Error in flow! Flow has no trigger. Creating a new manual trigger.")
+		createDefaultManualTrigger(FlowID)
+	}
+	else if (anyManualTriggerFound and not defaultManualTriggerFound)
+	{
+		logger("a0","Error in flow! Flow has manual triggers but none of them is set default trigger. Setting '" anyManualTriggerFound "' as default trigger.")
+		_setElementProperty(FlowID, anyManualTriggerFound, "DefaultTrigger", true)
+	}
 
 	
 	; TODO: check flow settings.
 
 	; check working directory
-	if not fileexist(_getSettings("WorkingDir"))
+	if not _getFlowProperty(FlowID, "flowSettings.DefaultWorkingDir")
 	{
-		logger("a1","Working directory of the flow does not exist. Creating it now.")
-		FileCreateDir,% _getSettings("WorkingDir")
-		if errorlevel
+		flowWorkingDir := _getFlowProperty(FlowID, "flowSettings.WorkingDir")
+		if not fileexist(flowWorkingDir)
 		{
-			logger("a0","Error! Working directory couldn't be created.")
+			logger("a1","Working directory '" flowWorkingDir "' of the flow does not exist. Creating it now.")
+			FileCreateDir,% flowWorkingDir
+			if errorlevel
+			{
+				logger("a0","Error in flow! Working directory '" flowWorkingDir "' of the flow couldn't be created. Fall back to default working directory")
+				_setFlowProperty(FlowID, "flowSettings.DefaultWorkingDir", true)
+			}
 		}
 	}
 
+	; checking execution policy
+	flowExecutionPolicy := _getFlowProperty(FlowID, "flowSettings.ExecutionPolicy")
+	if (flowExecutionPolicy != "default" and flowExecutionPolicy != "parallel" and flowExecutionPolicy != "skip" and flowExecutionPolicy != "wait" and flowExecutionPolicy != "stop")
+	{
+		logger("a0","Error in flow! Execution policy has an invalid value. Fall back to default execution policy")
+		_setFlowProperty(FlowID, "flowSettings.ExecutionPolicy", "default")
+	}
+	
+	; checking zoom factor and offsets
+	flowZoomFactor := _getFlowProperty(FlowID, "flowSettings.zoomFactor")
+	flowOffsetx := _getFlowProperty(FlowID, "flowSettings.Offsetx")
+	flowOffsety := _getFlowProperty(FlowID, "flowSettings.Offsety")
+	if (flowZoomFactor < default_zoomFactorMin or flowZoomFactor > default_zoomFactorMax)
+	{
+		logger("a0","Error in flow! Zoom factor an invalid value. Fall back to default value")
+		_setFlowProperty(FlowID, "flowSettings.zoomFactor", default_ZoomFactor)
+	}
+	if flowOffsetx is not number
+	{
+		logger("a0","Error in flow! Offset X an invalid value. Fall back to default value")
+		_setFlowProperty(FlowID, "flowSettings.Offsetx", default_OffsetX)
+	}
+	if flowOffsety is not number
+	{
+		logger("a0","Error in flow! Offset Y an invalid value. Fall back to default value")
+		_setFlowProperty(FlowID, "flowSettings.Offsety", default_OffsetY)
+	}
 	
 	; did we find missing packages
 	if (missingpackages.length() > 0)

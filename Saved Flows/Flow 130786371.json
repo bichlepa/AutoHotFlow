@@ -56,7 +56,7 @@
         "ButtonLabelYes": "Jae",
         "DefaultButton": "No",
         "Height": 200,
-        "IfDismiss": "Yes",
+        "IfDismiss": "No",
         "IsTimeout": "1",
         "message": "Nachrichte",
         "OnTimeout": "Exception",
@@ -121,7 +121,7 @@
     },
     "element0000000015": {
       "class": "Trigger_Manual",
-      "DefaultTrigger": "1",
+      "DefaultTrigger": "0",
       "enabled": "",
       "ID": "element0000000015",
       "name": "Manual - \"Trigger bright bus\"",
@@ -136,7 +136,7 @@
     },
     "element0000000018": {
       "class": "Trigger_Manual",
-      "DefaultTrigger": "1",
+      "DefaultTrigger": "0",
       "enabled": "0",
       "ID": "element0000000018",
       "name": "Manual - \"Trigger bright bus\"",
@@ -153,10 +153,10 @@
   "category": "AHF Test",
   "ElementIDCounter": "20",
   "flowSettings": {
-    "DefaultWorkingDir": 1,
+    "DefaultWorkingDir": "1",
     "ExecutionPolicy": "default",
-    "Offsetx": "-315.714286",
-    "Offsety": "-677.142856",
+    "Offsetx": "-378.571429",
+    "Offsety": "-344.285714",
     "WorkingDir": "",
     "zoomFactor": "0.7"
   },
