@@ -204,7 +204,7 @@ Element_run_Condition_Confirmation_Dialog(Environment, ElementParameters)
 	
 	;Start building GUI
 	guiID := x_GetMyUniqueExecutionID(Environment)
-	gui, %guiID%: +labelCondition_Confirmation_Dialog_On
+	gui, %guiID%: +labelCondition_Confirmation_Dialog_On ;This label leads to a jump label beneath. It's needed if user closes the window
 	
 	;Calculate controls width
 	widthEdit := width - 10 * 2

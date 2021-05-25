@@ -272,7 +272,7 @@ Element_run_Action_Input_Box(Environment, ElementParameters)
 	;at first add the edit field and get the size of the edit field
 	gui,%guiID%:add,edit, w%widthEdit% %tempMaskInput% %tempRows% hwndHWNDText, % EvaluatedParameters.defaultText
 	controlgetpos,,,,heightEditText,,ahk_id %HWNDText%
-	x_SetExecutionValue(Environment, "HWNDText",HWNDText)
+	x_SetExecutionValue(Environment, "HWNDText", HWNDText)
 	
 	;Calculate the height of the message field
 	heightEditMessage:=height

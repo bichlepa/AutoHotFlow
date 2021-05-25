@@ -690,7 +690,7 @@ Button_manager_NewFlow()
 		if (global_allTreeViewItems[tempSelectedTV].type = "Category")
 		{
 			; a category is selected. Insert the new flow in this category
-			if (tempSelectedID = "uncategorized")
+			if (tempSelectedID = "uncategorized" or tempSelectedID = "demo")
 				NewFlowID := NewFlow() ; do not pass the "uncategorized" category. It means, that the flow does not have a category
 			else
 				NewFlowID := NewFlow(tempSelectedID)

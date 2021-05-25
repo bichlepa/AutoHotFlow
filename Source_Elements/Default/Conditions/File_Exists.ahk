@@ -51,8 +51,7 @@ Element_getStabilityLevel_Condition_File_Exists()
 ;Returns an array of objects which describe all controls which will be shown in the element settings GUI
 Element_getParametrizationDetails_Condition_File_Exists(Environment)
 {
-	parametersToEdit:=Object()
-	
+	parametersToEdit := Object()
 	
 	parametersToEdit.push({type: "Label", label: x_lang("File pattern")})
 	parametersToEdit.push({type: "File", id: "file", label: x_lang("Select a file")})
@@ -80,14 +79,15 @@ Element_CheckSettings_Condition_File_Exists(Environment, ElementParameters)
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Condition_File_Exists(Environment, ElementParameters)
 {
-	EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters)
+	;evalute the parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
 	if (EvaluatedParameters._error)
 	{
 		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
 	
-	file:=x_GetFullPath(Environment, EvaluatedParameters.file)
+	file := x_GetFullPath(Environment, EvaluatedParameters.file)
 
 	
 	IfExist, % file
@@ -96,10 +96,6 @@ Element_run_Condition_File_Exists(Environment, ElementParameters)
 		x_finish(Environment,"no")
 		
 	return
-	
-
-
-	
 }
 
 

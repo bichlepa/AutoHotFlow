@@ -145,9 +145,9 @@ GlobalVariable_Get(Environment,p_Name, p_hidden = False)
 	{
 		; read variable content from file
 		FileRead,varcontent, % path "\" p_Name ".ahfvar"
-		if (vartype = "object")
+		if (metaData.type = "object")
 		{
-			retval:= Jxon_Dump(varcontent, 2)
+			retval:= Jxon_Load(varcontent)
 		}
 		else
 		{

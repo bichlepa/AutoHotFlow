@@ -51,7 +51,7 @@ Element_getStabilityLevel_Condition_Expression()
 ;Returns an array of objects which describe all controls which will be shown in the element settings GUI
 Element_getParametrizationDetails_Condition_Expression(Environment)
 {
-	parametersToEdit:=Object()
+	parametersToEdit := Object()
 	parametersToEdit.push({type: "Label", label: x_lang("Expression")})
 	parametersToEdit.push({type: "Edit", id: "Expression", content: "Expression", WarnIfEmpty: true})
 
@@ -61,9 +61,7 @@ Element_getParametrizationDetails_Condition_Expression(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Condition_Expression(Environment, ElementParameters)
 {
-	global
 	return % x_lang("Expression") " - " ElementParameters.expression
-	
 }
 
 ;Called every time the user changes any parameter.
@@ -79,7 +77,8 @@ Element_CheckSettings_Condition_Expression(Environment, ElementParameters)
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Condition_Expression(Environment, ElementParameters)
 {
-	evRes:=x_EvaluateExpression(Environment,ElementParameters.Expression)
+	;Evaluate the expression
+	evRes := x_EvaluateExpression(Environment,ElementParameters.Expression)
 	if (evRes.error)
 	{
 		;On error, finish with exception and return
@@ -88,13 +87,12 @@ Element_run_Condition_Expression(Environment, ElementParameters)
 	}
 	else
 	{
+		; Expression was successfully evaluated. Check the result and convert it to a boolean result.
 		if (evRes.result)
-			return x_finish(Environment,"yes")
+			return x_finish(Environment, "yes")
 		else
-			return x_finish(Environment,"no")
+			return x_finish(Environment, "no")
 	}
-	
-
 }
 
 ;Called when the execution of the element should be stopped.
