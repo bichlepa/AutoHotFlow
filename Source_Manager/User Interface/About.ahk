@@ -48,6 +48,14 @@ AutoHotFlow - Written by bichlepa (Paul Bichler)
 Licensed under GNU General Public License 3
 Sourcecode: https://github.com/bichlepa/AutoHotFlow
 
+This application includes some external binaries. This is anoverview:
+
+7-Zip Command line version
+author: Igor Pavlov
+source: https://www.7-zip.org/
+license: GNU LGPL
+link to license text: https://www.7-zip.org/license.txt
+
 This application contains some code, which was written by other authors. This is an overview:
 #aboutTextOtherCodeOverviewStart
 Gdip standard library v1.45
