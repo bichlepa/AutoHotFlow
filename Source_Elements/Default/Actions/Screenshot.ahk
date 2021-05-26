@@ -72,42 +72,13 @@ Element_getParametrizationDetails_Action_Screenshot(Environment)
 	parametersToEdit.push({type: "Edit", id: ["x2", "y2"], default: [600, 700], content: "Number", WarnIfEmpty: true})
 	parametersToEdit.push({type: "button", id: "GetCoordinates", goto: "Action_Screenshot_ButtonMouseTracker", label: x_lang("Get coordinates")})
 	
-	parametersToEdit.push({type: "Label", label: x_lang("Window identification")})
-	parametersToEdit.push({type: "Checkbox", id: "UseActiveWindow", default: 1, label: x_lang("Use active window")})
-	parametersToEdit.push({type: "Label", label: x_lang("Title_of_Window"), size: "small"})
-	parametersToEdit.push({type: "Radio", id: "TitleMatchMode", default: 1, choices: [x_lang("Start_with"), x_lang("Contain_anywhere"), x_lang("Exactly")]})
-	parametersToEdit.push({type: "Edit", id: "Wintitle", content: "String"})
-	parametersToEdit.push({type: "Label", label: x_lang("Exclude_title"), size: "small"})
-	parametersToEdit.push({type: "Edit", id: "excludeTitle", content: "String"})
-	parametersToEdit.push({type: "Label", label: x_lang("Text_of_a_control_in_Window"), size: "small"})
-	parametersToEdit.push({type: "Edit", id: "winText", content: "String"})
-	parametersToEdit.push({type: "Checkbox", id: "FindHiddenText", default: 0, label: x_lang("Detect hidden text")})
-	parametersToEdit.push({type: "Label", label: x_lang("Exclude_text_of_a_control_in_window"), size: "small"})
-	parametersToEdit.push({type: "Edit", id: "ExcludeText", content: "String"})
-	parametersToEdit.push({type: "Label", label: x_lang("Window_Class"), size: "small"})
-	parametersToEdit.push({type: "Edit", id: "ahk_class", content: "String"})
-	parametersToEdit.push({type: "Label", label: x_lang("Process_Name"), size: "small"})
-	parametersToEdit.push({type: "Edit", id: "ahk_exe", content: "String"})
-	parametersToEdit.push({type: "Label", label: x_lang("Unique_window_ID"), size: "small"})
-	parametersToEdit.push({type: "Edit", id: "ahk_id", content: "String"})
-	parametersToEdit.push({type: "Label", label: x_lang("Unique_Process_ID"), size: "small"})
-	parametersToEdit.push({type: "Edit", id: "ahk_pid", content: "String"})
-	parametersToEdit.push({type: "Label", label: x_lang("Hidden window"), size: "small"})
-	parametersToEdit.push({type: "Checkbox", id: "FindHiddenWindow", default: 0, label: x_lang("Detect hidden window")})
-	parametersToEdit.push({type: "Label", label: x_lang("Import window identification"), size: "small"})
-	parametersToEdit.push({type: "button", id: "GetWindow", goto: "Action_Screenshot_ButtonWindowAssistant", label: x_lang("Import window identification")})
-	
+	; call function which adds all the required fields for window identification
+	windowFunctions_addWindowIdentificationParametrization(parametersToEdit)
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Method")})
 	parametersToEdit.push({type: "Radio", id: "Method", default: 1, choices: [x_lang("Method %1%",1), x_lang("Method %1%",2), x_lang("Method %1%",3) " - " x_lang("Works only if window visible")], result: "enum", enum: ["Gdip_FromScreen", "Gdip_FromHWND", "Gdip_FromScreenCoordinates"]})
 	
 	return parametersToEdit
-}
-
-; opens the assistant for getting window information
-Action_Screenshot_ButtonWindowAssistant()
-{
-	x_assistant_windowParameter({wintitle: "Wintitle", excludeTitle: "excludeTitle", winText: "winText", FindHiddenText: "FindHiddenText", ExcludeText: "ExcludeText", ahk_class: "ahk_class", ahk_exe: "ahk_exe", ahk_id: "ahk_id", ahk_pid: "ahk_pid", FindHiddenWindow: "FindHiddenWindow"})
 }
 
 ; opens the assistant for getting coordinates
@@ -299,46 +270,23 @@ Element_run_Action_Screenshot(Environment, ElementParameters)
 				return
 			}
 			
-			tempWinTitle:=EvaluatedParameters.Wintitle
-			tempWinText:=EvaluatedParameters.winText
-			tempTitleMatchMode :=EvaluatedParameters.TitleMatchMode
-			tempahk_class:=EvaluatedParameters.ahk_class
-			tempahk_exe:=EvaluatedParameters.ahk_exe
-			tempahk_id:= EvaluatedParameters.ahk_id
-			tempahk_pid:= EvaluatedParameters.ahk_pid
-			
-			tempwinstring:=EvaluatedParameters.Wintitle
-			if (EvaluatedParameters.ahk_class)
-				tempwinstring:=tempwinstring " ahk_class " EvaluatedParameters.ahk_class
-			if (EvaluatedParameters.ahk_id)
-				tempwinstring:=tempwinstring " ahk_id " EvaluatedParameters.ahk_id
-			if (EvaluatedParameters.ahk_pid)
-				tempwinstring:=tempwinstring " ahk_pid " EvaluatedParameters.ahk_pid
-			if (EvaluatedParameters.ahk_exe)
-				tempwinstring:=tempwinstring " ahk_exe " EvaluatedParameters.ahk_exe
-			
-			;If no window specified, error
-			if (tempwinstring="" and EvaluatedParameters.winText="")
+			; evaluate window parameters
+			EvaluatedWindowParameters := windowFunctions_evaluateWindowParameters(EvaluatedParameters)
+			if (EvaluatedWindowParameters.exception)
 			{
-				x_finish(Environment, "exception", x_lang("No window specified"))
+				x_finish(Environment, "exception", EvaluatedWindowParameters.exception)
 				return
 			}
-			
-			if (ElementParameters.findhiddenwindow=0)
-				tempFindHiddenWindows = off
-			else
-				tempFindHiddenWindows = on
-			if (ElementParameters.findhiddentext=0)
-				tempfindhiddentext = off
-			else
-				tempfindhiddentext = on
 
-			SetTitleMatchMode,% EvaluatedParameters.TitleMatchMode
-			DetectHiddenWindows,%tempFindHiddenWindows%
-			DetectHiddenText,%tempfindhiddentext%
-			
-			tempWinid:=winexist(tempwinstring,EvaluatedParameters.winText,EvaluatedParameters.ExcludeTitle,EvaluatedParameters.ExcludeText)
-			if not tempWinid
+			; get window ID
+			windowID := windowFunctions_getWindowID(EvaluatedWindowParameters)
+			if (windowID.exception)
+			{
+				x_finish(Environment, "exception", windowID.exception)
+				return
+			}
+
+			if not windowID
 			{
 				x_finish(Environment, "exception", x_lang("Error! Seeked window does not exist")) 
 				return
@@ -347,7 +295,7 @@ Element_run_Action_Screenshot(Environment, ElementParameters)
 		
 		if (EvaluatedParameters.Method="Gdip_FromScreen")
 		{
-			pBitmap:=Gdip_BitmapFromScreen("hwnd:" tempWinid)
+			pBitmap:=Gdip_BitmapFromScreen("hwnd:" windowID)
 			if pBitmap=-1
 			{
 				x_finish(Environment, "exception", x_lang("Can't make screenshot from window")) 
@@ -357,7 +305,7 @@ Element_run_Action_Screenshot(Environment, ElementParameters)
 		}
 		else if (EvaluatedParameters.Method="Gdip_FromHWND")
 		{
-			pBitmap:=Gdip_BitmapFromHWND(tempWinid)
+			pBitmap:=Gdip_BitmapFromHWND(windowID)
 			if pBitmap=-1
 			{
 				x_finish(Environment, "exception", x_lang("Can't make screenshot from window")) 
@@ -367,7 +315,7 @@ Element_run_Action_Screenshot(Environment, ElementParameters)
 		}
 		else if (EvaluatedParameters.Method="Gdip_FromScreenCoordinates")
 		{
-			wingetpos,x1,y1,x2,y2,ahk_id %tempWinid%
+			wingetpos,x1,y1,x2,y2,ahk_id %windowID%
 			pBitmap:=Gdip_BitmapFromScreen(x1 "|" y1 "|" x2 "|" y2 )
 			if pBitmap=-1
 			{
@@ -376,7 +324,7 @@ Element_run_Action_Screenshot(Environment, ElementParameters)
 				
 			}
 		}
-		x_SetVariable(Environment,"A_WindowID",tempWinid,"thread")
+		x_SetVariable(Environment,"A_WindowID",windowID,"thread")
 	}
 	
 	

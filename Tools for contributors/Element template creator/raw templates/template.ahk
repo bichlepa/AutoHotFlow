@@ -110,29 +110,8 @@ Element_getParametrizationDetails_&ElementType&_&Name&(Environment)
 	
 #if addWindowSelector
 	
-	parametersToEdit.push({type: "Label", label: lang("Window identification")})
-	parametersToEdit.push({type: "Label", label: lang("Title_of_Window"), size: "small"})
-	parametersToEdit.push({type: "Radio", id: "TitleMatchMode", default: 1, choices: [lang("Start_with"), lang("Contain_anywhere"), lang("Exactly")]})
-	parametersToEdit.push({type: "Edit", id: "Wintitle", content: "String"})
-	parametersToEdit.push({type: "Label", label: lang("Exclude_title"), size: "small"})
-	parametersToEdit.push({type: "Edit", id: "excludeTitle", content: "String"})
-	parametersToEdit.push({type: "Label", label: lang("Text_of_a_control_in_Window"), size: "small"})
-	parametersToEdit.push({type: "Edit", id: "winText", content: "String"})
-	parametersToEdit.push({type: "Checkbox", id: "FindHiddenText", default: 0, label: lang("Detect hidden text")})
-	parametersToEdit.push({type: "Label", label: lang("Exclude_text_of_a_control_in_window"), size: "small"})
-	parametersToEdit.push({type: "Edit", id: "ExcludeText", content: "String"})
-	parametersToEdit.push({type: "Label", label: lang("Window_Class"), size: "small"})
-	parametersToEdit.push({type: "Edit", id: "ahk_class", content: "String"})
-	parametersToEdit.push({type: "Label", label: lang("Process_Name"), size: "small"})
-	parametersToEdit.push({type: "Edit", id: "ahk_exe", content: "String"})
-	parametersToEdit.push({type: "Label", label: lang("Unique_window_ID"), size: "small"})
-	parametersToEdit.push({type: "Edit", id: "ahk_id", content: "String"})
-	parametersToEdit.push({type: "Label", label: lang("Unique_Process_ID"), size: "small"})
-	parametersToEdit.push({type: "Edit", id: "ahk_pid", content: "String"})
-	parametersToEdit.push({type: "Label", label: lang("Hidden window"), size: "small"})
-	parametersToEdit.push({type: "Checkbox", id: "FindHiddenWindow", default: 0, label: lang("Detect hidden window")})
-	parametersToEdit.push({type: "Label", label: lang("Import window identification"), size: "small"})
-	parametersToEdit.push({type: "button", goto: "&ElementType&_&Name&_ButtonWindowAssistant", label: lang("Import window identification")})
+	; call function which adds all the required fields for window identification
+	windowFunctions_addWindowIdentificationParametrization(parametersToEdit)
 #endif ;addWindowSelector
 	
 	return parametersToEdit
@@ -143,32 +122,10 @@ Element_GenerateName_&ElementType&_&Name&(Environment, ElementParameters)
 {
 #if addWindowSelector
 	
-	local tempNameString
-	if (ElementParameters.Wintitle)
-	{
-		if (ElementParameters.TitleMatchMode=1)
-			tempNameString:=tempNameString "`n" lang("Title begins with") ": " ElementParameters.Wintitle
-		else if (ElementParameters.TitleMatchMode=2)
-			tempNameString:=tempNameString "`n" lang("Title includes") ": " ElementParameters.Wintitle
-		else if (ElementParameters.TitleMatchMode=3)
-			tempNameString:=tempNameString "`n" lang("Title is exatly") ": " ElementParameters.Wintitle
-	}
-	if (ElementParameters.excludeTitle)
-		tempNameString:=tempNameString "`n" lang("Exclude_title") ": " ElementParameters.excludeTitle
-	if (ElementParameters.winText)
-		tempNameString:=tempNameString "`n" lang("Control_text") ": " ElementParameters.winText
-	if (ElementParameters.ExcludeText)
-		tempNameString:=tempNameString "`n" lang("Exclude_control_text") ": " ElementParameters.ExcludeText
-	if (ElementParameters.ahk_class)
-		tempNameString:=tempNameString "`n" lang("Window_Class") ": " ElementParameters.ahk_class
-	if (ElementParameters.ahk_exe)
-		tempNameString:=tempNameString "`n" lang("Process") ": " ElementParameters.ahk_exe
-	if (ElementParameters.ahk_id)
-		tempNameString:=tempNameString "`n" lang("Window_ID") ": " ElementParameters.ahk_id
-	if (ElementParameters.ahk_pid)
-		tempNameString:=tempNameString "`n" lang("Process_ID") ": " ElementParameters.ahk_pid
+	; generate window identification name
+	nameString := windowFunctions_generateWindowIdentificationName(ElementParameters)
 	
-	return lang("&Name&") ": " tempNameString
+	return lang("&Name&") ": " nameString
 #else ;addWindowSelector
 	return lang("&Name&") 
 #endif ;addWindowSelector
@@ -331,49 +288,24 @@ Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 
 #if addWindowSelector
 
-	tempWinTitle:=EvaluatedParameters.Wintitle
-	tempWinText:=EvaluatedParameters.winText
-	tempExcludeTitle:=EvaluatedParameters.ExcludeTitle
-	tempExcludeText:=EvaluatedParameters.ExcludeText
-	tempTitleMatchMode :=EvaluatedParameters.TitleMatchMode
-	tempahk_class:=EvaluatedParameters.ahk_class
-	tempahk_exe:=EvaluatedParameters.ahk_exe
-	tempahk_id:= EvaluatedParameters.ahk_id
-	tempahk_pid:= EvaluatedParameters.ahk_pid
-	
-	tempwinstring:=EvaluatedParameters.Wintitle
-	if (EvaluatedParameters.ahk_class)
-		tempwinstring:=tempwinstring " ahk_class " EvaluatedParameters.ahk_class
-	if (EvaluatedParameters.ahk_id)
-		tempwinstring:=tempwinstring " ahk_id " EvaluatedParameters.ahk_id
-	if (EvaluatedParameters.ahk_pid)
-		tempwinstring:=tempwinstring " ahk_pid " EvaluatedParameters.ahk_pid
-	if (EvaluatedParameters.ahk_exe)
-		tempwinstring:=tempwinstring " ahk_exe " EvaluatedParameters.ahk_exe
-	
-	;If no window specified, error
-	if (tempwinstring="" and EvaluatedParameters.winText="")
+	; evaluate window parameters
+	EvaluatedWindowParameters := windowFunctions_evaluateWindowParameters(EvaluatedParameters)
+	if (EvaluatedWindowParameters.exception)
 	{
-		x_finish(Environment, "exception", lang("No window specified"))
+		x_finish(Environment, "exception", EvaluatedWindowParameters.exception)
+		return
+	}
+
+	; get window ID
+	windowID := windowFunctions_getWindowID(EvaluatedWindowParameters)
+	if (windowID.exception)
+	{
+		x_finish(Environment, "exception", windowID.exception)
 		return
 	}
 	
-	if (ElementParameters.findhiddenwindow=0)
-		tempFindHiddenWindows = off
-	else
-		tempFindHiddenWindows = on
-	if (ElementParameters.findhiddentext=0)
-		tempfindhiddentext = off
-	else
-		tempfindhiddentext = on
-
-	SetTitleMatchMode,% EvaluatedParameters.TitleMatchMode
-	DetectHiddenWindows,%tempFindHiddenWindows%
-	DetectHiddenText,%tempfindhiddentext%
-	
 #if !ElementType = Loop
-	tempWinid:=winexist(tempwinstring,EvaluatedParameters.winText,EvaluatedParameters.ExcludeTitle,EvaluatedParameters.ExcludeText) ;Example code. Remove it
-	if not tempWinid
+	if not windowID
 	{
 #if ElementType = action
 		x_finish(Environment, "exception", lang("Error! Seeked window does not exist")) 
@@ -692,48 +624,22 @@ Element_enable_&ElementType&_&Name&(Environment, ElementParameters)
 
 #if addWindowSelector
 
-	tempWinTitle:=EvaluatedParameters.Wintitle
-	tempWinText:=EvaluatedParameters.winText
-	tempExcludeTitle:=EvaluatedParameters.ExcludeTitle
-	tempExcludeText:=EvaluatedParameters.ExcludeText
-	tempTitleMatchMode :=EvaluatedParameters.TitleMatchMode
-	tempahk_class:=EvaluatedParameters.ahk_class
-	tempahk_exe:=EvaluatedParameters.ahk_exe
-	tempahk_id:= EvaluatedParameters.ahk_id
-	tempahk_pid:= EvaluatedParameters.ahk_pid
-	
-	tempwinstring:=tempWinTitle
-	if tempahk_class
-		tempwinstring:=tempwinstring " ahk_class " tempahk_class
-	if tempahk_id
-		tempwinstring:=tempwinstring " ahk_id " tempahk_id
-	if tempahk_pid
-		tempwinstring:=tempwinstring " ahk_pid " tempahk_pid
-	if tempahk_exe
-		tempwinstring:=tempwinstring " ahk_exe " tempahk_exe
-	
-	;If no window specified, error
-	if (tempwinstring="" and tempWinText="")
+	; evaluate window parameters
+	EvaluatedWindowParameters := windowFunctions_evaluateWindowParameters(EvaluatedParameters)
+	if (EvaluatedWindowParameters.exception)
 	{
-		x_enabled(Environment, "exception", lang("No window specified"))
+		x_finish(Environment, "exception", EvaluatedWindowParameters.exception)
 		return
 	}
-	
-	if ElementParameters.findhiddenwindow=0
-		tempFindHiddenWindows = off
-	else
-		tempFindHiddenWindows = on
-	if ElementParameters.findhiddentext=0
-		tempfindhiddentext = off
-	else
-		tempfindhiddentext = on
 
-	SetTitleMatchMode,%tempTitleMatchMode%
-	DetectHiddenWindows,%tempFindHiddenWindows%
-	DetectHiddenText,%tempfindhiddentext%
-	
-	tempWinid:=winexist(tempwinstring,tempWinText,tempExcludeTitle,tempExcludeText)
-	if not tempWinid
+	; get window ID
+	windowID := windowFunctions_getWindowID(EvaluatedWindowParameters)
+	if (windowID.exception)
+	{
+		x_finish(Environment, "exception", windowID.exception)
+		return
+	}
+	if not windowID
 	{
 		x_enabled(Environment, "exception", lang("Error! Seeked window does not exist")) 
 		return
@@ -806,10 +712,3 @@ Element_disable_&ElementType&_&Name&(Environment, ElementParameters)
 	MsgBox user clicked me
 }
 #endif ;par_button
-
-#if addWindowSelector
-&ElementType&_&Name&_ButtonWindowAssistant()
-{
-	x_assistant_windowParameter({wintitle: "Wintitle", excludeTitle: "excludeTitle", winText: "winText", FindHiddenText: "FindHiddenText", ExcludeText: "ExcludeText", ahk_class: "ahk_class", ahk_exe: "ahk_exe", ahk_id: "ahk_id", ahk_pid: "ahk_pid", FindHiddenWindow: "FindHiddenWindow"})
-}
-#endif ;addWindowSelector

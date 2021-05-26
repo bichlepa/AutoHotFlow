@@ -187,7 +187,7 @@ Element_run_Action_Input_Box(Environment, ElementParameters)
 	}
 	if height is not number
 	{
-		x_finish(Environment, "exception", x_lang("%1% is not a number.",x_lang("Height '%1%'",height))) 
+		x_finish(Environment, "exception", x_lang("%1% is not a number.", x_lang("Height '%1%'", height))) 
 		return
 	}
 	

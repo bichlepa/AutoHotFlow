@@ -120,6 +120,9 @@ loadFromClipboard()
 	; we will write all pasted elements to this list which will help us to paste the connections later
 	tempClipboardElementList := Object()
 
+	; before pasting elements we need to know whether there is a default manual trigger
+	defaultManualTrigger := Element_findDefaultTrigger(_FlowID)
+
 	; paste all copied elements
 	for loadElementID, loadElement in clipboardContent.allElements
 	{
@@ -147,9 +150,42 @@ loadFromClipboard()
 		_setElementProperty(_FlowID, NewElementID, "x", ui_FitGridX(loadElement.X + tempOffsetX))
 		_setElementProperty(_FlowID, NewElementID, "y", ui_FitGridY(loadElement.Y + tempOffsetY))
 
+		; We have to make sure that if we have one or multiple manual triggers, there must always be one default manual trigger
+		ElementClass := _getElementProperty(_FlowID, NewElementID, "class")
+		if (ElementClass = "trigger_manual")
+		{
+			; we have pasted a manual trigger
+			if (defaultManualTrigger)
+			{
+				; the flow already has a default manual trigger. we will call Element_setDefaultTrigger() later, which will remove the "defaultTrigger" flag from all pasted triggers.
+				needSetDefaultTrigger := defaultManualTrigger
+			}
+			Else
+			{
+				; the flow has no manual trigger yet
+				if (_getElementProperty(_FlowID, NewElementID, "defaultTrigger"))
+				{
+					; the pasted element has the flag "defaultTrigger". We will set it as default trigger.
+					needSetDefaultTrigger := NewElementID
+				}
+				Else
+				{
+					; this may be the first manual trigger in the flow. Set it as default, if we do not paste any other manual trigger which has the "defaultTrigger" flag set
+					if not (needSetDefaultTrigger)
+						needSetDefaultTrigger := NewElementID
+				}
+			}
+		}
+
 		; select the pasted element
 		_setElementInfo(_FlowID, NewElementID, "selected", false)
 		SelectOneItem(NewElementID, true)
+	}
+
+	; set default manual trigger, if reuired
+	if (needSetDefaultTrigger)
+	{
+		Element_setDefaultTrigger(_FlowID, needSetDefaultTrigger)
 	}
 
 	; paste all copied connections

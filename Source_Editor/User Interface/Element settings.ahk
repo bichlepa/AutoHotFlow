@@ -298,7 +298,7 @@ class ElementSettings
 		{
 			; find out whether there were some changes
 			tempOldValue := _getElementProperty(_FlowID, ElementSettings.element, "pars." oneID)
-			if (tempOldValue != oneValue)
+			if (not (tempOldValue == oneValue))
 			{
 				; change detected
 				ElementSettings.changes++

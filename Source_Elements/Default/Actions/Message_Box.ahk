@@ -80,7 +80,9 @@ Element_getParametrizationDetails_Action_Message_Box(Environment)
 	parametersToEdit.push({type: "Label", label: x_lang("Button text"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: "ButtonLabelCancel", default: x_lang("Cancel"), content: "String", WarnIfEmpty: true })
 	parametersToEdit.push({type: "Label", label: x_lang("Result if cancelled"), size: "small"})
-	parametersToEdit.push({type: "Radio", id: "IfDismiss", choices: [x_lang("Normal"), x_lang("Throw exception")], default: 1})
+	parametersToEdit.push({type: "Radio", id: "IfDismiss", default: 1, result: "enum", choices: [x_lang("Normal"), x_lang("Throw exception")], enum: ["Normal", "Exception"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Result if closed"), size: "small"})
+	parametersToEdit.push({type: "Radio", id: "IfClose", default: 1, result: "enum", choices: [x_lang("Normal"), x_lang("Throw exception")], enum: ["Normal", "Exception"]})
 	
 	
 	return parametersToEdit
@@ -89,7 +91,7 @@ Element_getParametrizationDetails_Action_Message_Box(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Message_Box(Environment, ElementParameters)
 {
-	return x_lang("Message_Box") 
+	return x_lang("Message_Box") " - " ElementParameters.title " - " ElementParameters.message
 }
 
 ;Called every time the user changes any parameter.
@@ -134,7 +136,7 @@ Element_run_Action_Message_Box(Environment, ElementParameters)
 		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
-
+	
 	width:=EvaluatedParameters.width
 	height:=EvaluatedParameters.height
 	
@@ -177,7 +179,8 @@ Element_run_Action_Message_Box(Environment, ElementParameters)
 		x_SetExecutionValue(Environment, "EndTime",EndTime) ;We need this value later
 	}
 	;We need those parameters later
-	x_SetExecutionValue(Environment, "IfDismiss",EvaluatedParameters.IfDismiss)
+	x_SetExecutionValue(Environment, "IfDismiss", EvaluatedParameters.IfDismiss)
+	x_SetExecutionValue(Environment, "IfClose", EvaluatedParameters.IfClose)
 
 
 	if (EvaluatedParameters.ShowCancelButton)
@@ -266,10 +269,10 @@ Action_Message_Box_OnClose()
 {
 	Environment:=x_GetMyEnvironmentFromExecutionID(A_Gui)
 	gui,destroy
-	IfDismiss:=x_GetExecutionValue(Environment, "IfDismiss")
+	IfClose:=x_GetExecutionValue(Environment, "IfClose")
 	x_SetVariable(Environment,"A_UserAction", "Cancel", "thread")
 	
-	if (IfDismiss = "exception")
+	if (IfClose = "exception")
 	{
 		x_finish(Environment,"exception", x_lang("User closed the dialog"))
 	}

@@ -55,10 +55,13 @@ Element_getParametrizationDetails_Condition_String_Contains_Text(Environment)
 	
 	parametersToEdit.push({type: "Label", label:  x_lang("Input string")})
 	parametersToEdit.push({type: "Edit", id: "VarValue", default: "Hello World", content: ["String", "Expression"], contentID: "Expression", ContentDefault: "String", WarnIfEmpty: true})
+
 	parametersToEdit.push({type: "Label", label:  x_lang("Text to search")})
 	parametersToEdit.push({type: "Edit", id: "SearchText", default: "World", content: ["String", "Expression"], contentID: "IsExpressionSearchText", ContentDefault: "String", WarnIfEmpty: true})
+
 	parametersToEdit.push({type: "Label", label: x_lang("Search text position")})
 	parametersToEdit.push({type: "Radio", id: "WhereToBegin", default: 3, choices: [x_lang("Starts with"), x_lang("Ends with"), x_lang("Contains anywhere")], result: "enum", enum: ["Start", "End", "Anywhere"]})
+
 	parametersToEdit.push({type: "Label", label: x_lang("Case sensitivity")})
 	parametersToEdit.push({type: "Radio", id: "CaseSensitive", default: 1, choices: [x_lang("Case insensitive"), x_lang("Case sensitive")], result: "enum", enum: ["CaseInsensitive", "CaseSensitive"]})
 	
@@ -68,7 +71,19 @@ Element_getParametrizationDetails_Condition_String_Contains_Text(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Condition_String_Contains_Text(Environment, ElementParameters)
 {
-	return x_lang("String_Contains_Text") 
+	if (ElementParameters.WhereToBegin = "Start")
+		text := x_lang("'%1%' starts with '%2%'", ElementParameters.VarValue, ElementParameters.SearchText)
+	if (ElementParameters.WhereToBegin = "End")
+		text := x_lang("'%1%' starts with '%2%'", ElementParameters.VarValue, ElementParameters.SearchText)
+	if (ElementParameters.WhereToBegin = "Anywhere")
+		text := x_lang("'%1%' contains '%2%'", ElementParameters.VarValue, ElementParameters.SearchText)
+
+	if (ElementParameters.CaseSensitive = "CaseInsensitive")
+		caseText := x_lang("Case insensitive")
+	if (ElementParameters.CaseSensitive = "CaseSensitive")
+		caseText := x_lang("Case sensitive")
+
+	return x_lang("String_Contains_Text") " - "  text " - " caseText
 }
 
 ;Called every time the user changes any parameter.
@@ -85,6 +100,7 @@ Element_CheckSettings_Condition_String_Contains_Text(Environment, ElementParamet
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Condition_String_Contains_Text(Environment, ElementParameters)
 {
+	; evaluate some parameters
 	EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters)
 	if (EvaluatedParameters._error)
 	{
@@ -92,72 +108,71 @@ Element_run_Condition_String_Contains_Text(Environment, ElementParameters)
 		return
 	}
 
-	if (EvaluatedParameters.WhereToBegin="Anywhere") ;Search anywhere
+	; Look at parameter WhereToBegin
+	if (EvaluatedParameters.WhereToBegin = "Anywhere")
 	{
-		if (EvaluatedParameters.CaseSensitive="CaseSensitive")
+		; we will search anywhere for the string
+		CaseSensitive := (EvaluatedParameters.CaseSensitive = "CaseSensitive")
+		result := instr(EvaluatedParameters.VarValue, EvaluatedParameters.SearchText, CaseSensitive)
+
+		; set case sensitivity
+		if (result)
 		{
-			StringCaseSense,on
+			x_finish(Environment, "yes")
 		}
 		else
 		{
-			StringCaseSense,Off
-		}
-		varValue:=EvaluatedParameters.VarValue
-		IfInString,varValue,% EvaluatedParameters.SearchText
-		{
-			StringCaseSense,off
-			x_finish(Environment,"yes")
-		}
-		else
-		{
-			StringCaseSense,off
-			x_finish(Environment,"no")
+			x_finish(Environment, "no")
 		}
 	}
-	else if (EvaluatedParameters.WhereToBegin="Start") ;Starts with
+	else if (EvaluatedParameters.WhereToBegin = "Start")
 	{
-		StringLeft,temp,% EvaluatedParameters.VarValue,strlen(EvaluatedParameters.SearchText)
-		if (EvaluatedParameters.CaseSensitive="CaseInsensitive")
+		; we will check, whether the string starts with the search string
+
+		; extract as many characters as the search string long is (from start)
+		StringLeft, temp, % EvaluatedParameters.VarValue, strlen(EvaluatedParameters.SearchText)
+
+		if (EvaluatedParameters.CaseSensitive = "CaseInsensitive")
 		{
+			; compare cese insensitive
 			if (temp = EvaluatedParameters.SearchText)
-				x_finish(Environment,"yes")
+				x_finish(Environment, "yes")
 			else
-				x_finish(Environment,"no")
+				x_finish(Environment, "no")
 		}
 		else
 		{
+			; compare cese sensitive
 			if (temp == EvaluatedParameters.SearchText)
-				x_finish(Environment,"yes")
+				x_finish(Environment, "yes")
 			else
-				x_finish(Environment,"no")
+				x_finish(Environment, "no")
 		}
 	}
-	else if (EvaluatedParameters.WhereToBegin="End") ;Ends with
+	else if (EvaluatedParameters.WhereToBegin = "End") ;Ends with
 	{
-		StringRight,temp,% EvaluatedParameters.VarValue,strlen(EvaluatedParameters.SearchText)
+		; we will check, whether the string ends with the search string
 		
-		if (EvaluatedParameters.CaseSensitive="CaseInsensitive")
+		; extract as many characters as the search string long is (from the end)
+		StringRight, temp, % EvaluatedParameters.VarValue, strlen(EvaluatedParameters.SearchText)
+		
+		if (EvaluatedParameters.CaseSensitive = "CaseInsensitive")
 		{
+			; compare cese insensitive
 			if (temp = EvaluatedParameters.SearchText)
-				x_finish(Environment,"yes")
+				x_finish(Environment, "yes")
 			else
-				x_finish(Environment,"no")
+				x_finish(Environment, "no")
 		}
 		else
 		{
+			; compare cese sensitive
 			if (temp == EvaluatedParameters.SearchText)
-				x_finish(Environment,"yes")
+				x_finish(Environment, "yes")
 			else
-				x_finish(Environment,"no")
+				x_finish(Environment, "no")
 		}
 	}
-	
-	
-	return
-	
-
-
-	
 }
 
 

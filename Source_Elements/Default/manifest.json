@@ -10,7 +10,8 @@
         "lib\\Class_Monitor\\Class_Monitor.ahk",
         "lib\\HTTP Request\\HTTPRequest.ahk",
         "lib\\HTTP Request\\Uriencode.ahk",
-        "lib\\Process list\\getProcessList.ahk"
+        "lib\\Process list\\getProcessList.ahk",
+        "common\\window functions.ahk"
     ],
     "actions": [
         "New_Variable.ahk",

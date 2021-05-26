@@ -78,11 +78,12 @@ Element_CheckSettings_Action_Suspend_Computer(Environment, ElementParameters, st
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Suspend_Computer(Environment, ElementParameters)
 {
-	DllCall("PowrProf\SetSuspendState", "int", 0, "int", 0, "int", 0) ;Hibernate
+	; hibernate computer
+	DllCall("PowrProf\SetSuspendState", "int", 0, "int", 0, "int", 0)
+
+	; that's all
 	x_finish(Environment,"normal")
 	return
-	
-	
 }
 
 

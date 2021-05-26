@@ -330,6 +330,90 @@
       "ID": "connection0000000131",
       "to": "element0000000123",
       "type": "Connection"
+    },
+    "connection0000000134": {
+      "ConnectionType": "normal",
+      "from": "element0000000132",
+      "ID": "connection0000000134",
+      "to": "element0000000133",
+      "type": "Connection"
+    },
+    "connection0000000136": {
+      "ConnectionType": "normal",
+      "from": "element0000000133",
+      "ID": "connection0000000136",
+      "to": "element0000000135",
+      "type": "Connection"
+    },
+    "connection0000000138": {
+      "ConnectionType": "Yes",
+      "from": "element0000000135",
+      "ID": "connection0000000138",
+      "to": "element0000000137",
+      "type": "Connection"
+    },
+    "connection0000000140": {
+      "ConnectionType": "No",
+      "from": "element0000000137",
+      "ID": "connection0000000140",
+      "to": "element0000000139",
+      "type": "Connection"
+    },
+    "connection0000000142": {
+      "ConnectionType": "normal",
+      "from": "element0000000139",
+      "ID": "connection0000000142",
+      "to": "element0000000141",
+      "type": "Connection"
+    },
+    "connection0000000144": {
+      "ConnectionType": "Yes",
+      "from": "element0000000141",
+      "ID": "connection0000000144",
+      "to": "element0000000143",
+      "type": "Connection"
+    },
+    "connection0000000154": {
+      "ConnectionType": "Yes",
+      "from": "element0000000151",
+      "ID": "connection0000000154",
+      "to": "element0000000150",
+      "type": "Connection"
+    },
+    "connection0000000159": {
+      "ConnectionType": "No",
+      "from": "element0000000150",
+      "ID": "connection0000000159",
+      "to": "element0000000158",
+      "type": "Connection"
+    },
+    "connection0000000161": {
+      "ConnectionType": "Yes",
+      "from": "element0000000158",
+      "ID": "connection0000000161",
+      "to": "element0000000160",
+      "type": "Connection"
+    },
+    "connection0000000163": {
+      "ConnectionType": "No",
+      "from": "element0000000160",
+      "ID": "connection0000000163",
+      "to": "element0000000162",
+      "type": "Connection"
+    },
+    "connection0000000165": {
+      "ConnectionType": "normal",
+      "from": "element0000000088",
+      "ID": "connection0000000165",
+      "to": "element0000000164",
+      "type": "Connection"
+    },
+    "connection0000000166": {
+      "ConnectionType": "No",
+      "from": "element0000000143",
+      "ID": "connection0000000166",
+      "to": "element0000000151",
+      "type": "Connection"
     }
   },
   "allElements": {
@@ -844,12 +928,12 @@
     "element0000000101": {
       "class": "Action_New_variable",
       "ID": "element0000000101",
-      "name": "New variable - requiredSuccessfulRuns = 3",
+      "name": "New variable - requiredSuccessfulRuns = 4",
       "package": "default",
       "pars": {
         "expression": "Expression",
         "Varname": "requiredSuccessfulRuns",
-        "VarValue": "3"
+        "VarValue": "4"
       },
       "StandardName": "1",
       "type": "Action",
@@ -1007,15 +1091,239 @@
       "type": "Condition",
       "x": "630",
       "y": "840"
+    },
+    "element0000000132": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "0",
+      "enabled": "1",
+      "ID": "element0000000132",
+      "name": "Manual - \"string contains text test\"",
+      "package": "default",
+      "pars": {
+        "ID": "string contains text test"
+      },
+      "StandardName": "1",
+      "type": "trigger",
+      "x": "945",
+      "y": "140"
+    },
+    "element0000000133": {
+      "class": "Action_New_variable",
+      "ID": "element0000000133",
+      "name": "New variable - NewVariable = Hello World",
+      "package": "default",
+      "pars": {
+        "expression": "string",
+        "Varname": "NewVariable",
+        "VarValue": "Hello World"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "945",
+      "y": "280"
+    },
+    "element0000000135": {
+      "class": "Condition_String_Contains_Text",
+      "ID": "element0000000135",
+      "name": "String Contains Text - 'newVariable' contains 'World' - Case insensitive",
+      "package": "default",
+      "pars": {
+        "CaseSensitive": "CaseInsensitive",
+        "Expression": "Expression",
+        "IsExpressionSearchText": "String",
+        "SearchText": "World",
+        "VarValue": "newVariable",
+        "WhereToBegin": "Anywhere"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "945",
+      "y": "420"
+    },
+    "element0000000137": {
+      "class": "Condition_String_Contains_Text",
+      "ID": "element0000000137",
+      "name": "String Contains Text - 'newVariable' contains 'world' - Case sensitive",
+      "package": "default",
+      "pars": {
+        "CaseSensitive": "CaseSensitive",
+        "Expression": "Expression",
+        "IsExpressionSearchText": "String",
+        "SearchText": "world",
+        "VarValue": "newVariable",
+        "WhereToBegin": "Anywhere"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "945",
+      "y": "560"
+    },
+    "element0000000139": {
+      "class": "Action_New_variable",
+      "ID": "element0000000139",
+      "name": "New variable - searchText = hello",
+      "package": "default",
+      "pars": {
+        "expression": "String",
+        "Varname": "searchText",
+        "VarValue": "hello"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "945",
+      "y": "700"
+    },
+    "element0000000141": {
+      "class": "Condition_String_Contains_Text",
+      "ID": "element0000000141",
+      "name": "String Contains Text - 'Hello You' contains '%SearchText%' - Case insensitive",
+      "package": "default",
+      "pars": {
+        "CaseSensitive": "CaseInsensitive",
+        "Expression": "String",
+        "IsExpressionSearchText": "String",
+        "SearchText": "%SearchText%",
+        "VarValue": "Hello You",
+        "WhereToBegin": "Anywhere"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "945",
+      "y": "840"
+    },
+    "element0000000143": {
+      "class": "Condition_String_Contains_Text",
+      "ID": "element0000000143",
+      "name": "String Contains Text - 'Hello You' contains 'SearchText' - Case sensitive",
+      "package": "default",
+      "pars": {
+        "CaseSensitive": "CaseSensitive",
+        "Expression": "String",
+        "IsExpressionSearchText": "Expression",
+        "SearchText": "SearchText",
+        "VarValue": "Hello You",
+        "WhereToBegin": "Anywhere"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "945",
+      "y": "980"
+    },
+    "element0000000150": {
+      "class": "Condition_String_Contains_Text",
+      "ID": "element0000000150",
+      "name": "String Contains Text - 'Hello You' starts with 'hello' - Case sensitive",
+      "package": "default",
+      "pars": {
+        "CaseSensitive": "CaseSensitive",
+        "Expression": "String",
+        "IsExpressionSearchText": "String",
+        "SearchText": "hello",
+        "VarValue": "Hello You",
+        "WhereToBegin": "Start"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "945",
+      "y": "1400"
+    },
+    "element0000000151": {
+      "class": "Condition_String_Contains_Text",
+      "ID": "element0000000151",
+      "name": "String Contains Text - 'Hello You' starts with 'hello' - Case insensitive",
+      "package": "default",
+      "pars": {
+        "CaseSensitive": "CaseInsensitive",
+        "Expression": "String",
+        "IsExpressionSearchText": "String",
+        "SearchText": "hello",
+        "VarValue": "Hello You",
+        "WhereToBegin": "Start"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "945",
+      "y": "1260"
+    },
+    "element0000000158": {
+      "class": "Condition_String_Contains_Text",
+      "ID": "element0000000158",
+      "name": "String Contains Text - 'Hello You' starts with 'you' - Case insensitive",
+      "package": "default",
+      "pars": {
+        "CaseSensitive": "CaseInsensitive",
+        "Expression": "String",
+        "IsExpressionSearchText": "String",
+        "SearchText": "you",
+        "VarValue": "Hello You",
+        "WhereToBegin": "End"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "945",
+      "y": "1540"
+    },
+    "element0000000160": {
+      "class": "Condition_String_Contains_Text",
+      "ID": "element0000000160",
+      "name": "String Contains Text - 'Hello You' starts with 'you' - Case sensitive",
+      "package": "default",
+      "pars": {
+        "CaseSensitive": "CaseSensitive",
+        "Expression": "String",
+        "IsExpressionSearchText": "String",
+        "SearchText": "you",
+        "VarValue": "Hello You",
+        "WhereToBegin": "End"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "945",
+      "y": "1680"
+    },
+    "element0000000162": {
+      "class": "Action_New_variable",
+      "ID": "element0000000162",
+      "name": "New variable - static_successfulRuns = static_successfulRuns + 1",
+      "package": "default",
+      "pars": {
+        "expression": "Expression",
+        "Varname": "static_successfulRuns",
+        "VarValue": "static_successfulRuns + 1"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "945",
+      "y": "1820"
+    },
+    "element0000000164": {
+      "class": "Action_Execute_Flow",
+      "ID": "element0000000164",
+      "name": "Execute Flow: This flow - Manual - \"string contains text test\"",
+      "package": "default",
+      "pars": {
+        "flowID": "",
+        "ReturnVariables": 0,
+        "SendLocalVars": 1,
+        "SkipDisabled": 0,
+        "ThisFlow": 1,
+        "triggerID": "element0000000132",
+        "WaitToFinish": 0,
+        "WhichTrigger": "Specific"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-735",
+      "y": "595"
     }
   },
   "category": "AHF Test",
-  "ElementIDCounter": "131",
+  "ElementIDCounter": "166",
   "flowSettings": {
     "DefaultWorkingDir": 1,
     "ExecutionPolicy": "default",
-    "Offsetx": "-1311.428568",
-    "Offsety": "-44.285716",
+    "Offsetx": "-1517.142852",
+    "Offsety": "-122.857145",
     "WorkingDir": "",
     "zoomFactor": "0.7"
   },

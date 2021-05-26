@@ -268,6 +268,57 @@ Element_setDefaultTrigger(p_FlowID, p_elementID)
 	_LeaveCriticalSection()
 }
 
+; checks whether we have one or multiple manual triggers and a single manual trigger. If not, fix it.
+Element_checkAndFixDefaultTrigger(p_FlowID)
+{
+	_EnterCriticalSection() ; enter this critical section to ensure data integrity
+
+	defaultTrigger := ""
+	anyManualTrigger := ""
+	needToCallElement_setDefaultTrigger := ""
+
+	; loop through all elements
+	allElementsIDs := _getAllElementIds(p_FlowID)
+	for oneID, oneElementID in allElementsIDs
+	{
+		; we only need manual trigger
+		if (_getElementProperty(p_FlowID, oneElementID, "class") = "trigger_manual")
+		{
+			if (not anyManualTrigger)
+			{
+				; we found a manual trigger. Remember its ID
+				anyManualTrigger := oneElementID
+			}
+			
+			if (_getElementProperty(p_FlowID, oneElementID, "defaultTrigger"))
+			{
+				; we found a default trigger
+				if (defaultTrigger)
+				{
+					; we found a second default trigger. We will call Element_setDefaultTrigger() and set the first found trigger as default
+					needToCallElement_setDefaultTrigger := defaultTrigger
+				}
+				Else
+				{
+					; we faound a first default trigger. Remember its ID
+					defaultTrigger := oneElementID
+				}
+			}
+		}
+	}
+	if (anyManualTrigger and not defaultTrigger)
+	{
+		; there are manual triggers but none of them is default. We will set one of them as default.
+		needToCallElement_setDefaultTrigger := anyManualTrigger
+	}
+	if (needToCallElement_setDefaultTrigger)
+	{
+		; we need to call Element_setDefaultTrigger() and set a trigger as default
+		Element_setDefaultTrigger(p_FlowID, needToCallElement_setDefaultTrigger)
+	}
+
+	_LeaveCriticalSection()
+}
 
 ;Removes the element or connection. It will be deleted from list of all elements and all connections which start or end there will be deleted, too
 Element_Remove(p_FlowID, p_elementID)
@@ -301,6 +352,9 @@ Element_Remove(p_FlowID, p_elementID)
 			}
 		}
 	}
+
+	; if we have deleted a default manual trigger, it needs to be fixed
+	Element_checkAndFixDefaultTrigger(p_FlowID)
 	
 	_LeaveCriticalSection()
 }
