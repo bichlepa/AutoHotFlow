@@ -51,27 +51,15 @@ Element_getStabilityLevel_Action_Execute_Flow()
 ;Returns an array of objects which describe all controls which will be shown in the element settings GUI
 Element_getParametrizationDetails_Action_Execute_Flow(Environment)
 {
-	choicesFlows := x_GetListOfFlowNames()
-	
-	FlowID := x_GetMyFlowID(Environment)
-	myFlowName := x_GetMyFlowName(Environment)
-	
-	allTriggerIDs := x_getAllElementIDsOfClass(FlowID, "manual_trigger")
-	
-	choicesTriggers:=Object()
-	for oneIDIndex, oneTriggerID in allTriggerIDs
-	{
-		elementPars:=x_getElementPars(FlowID, oneTriggerID)
-		choicesTriggers.push(elementPars.id)
-	}
-	
-	parametersToEdit:=Object()
-	parametersToEdit.push({type: "Label", label: x_lang("Flow_name")})
-	parametersToEdit.push({type: "Checkbox", id: "ThisFlow", default: 1, label: x_lang("This flow (%1%)",myFlowName ) })
-	parametersToEdit.push({type: "ComboBox", id: "flowName", content: "String", WarnIfEmpty: true, result: "string", choices: choicesFlows})
-	parametersToEdit.push({type: "Label", label: x_lang("Trigger")})
-	parametersToEdit.push({type: "Checkbox", id: "DefaultTrigger", default: 1, label: x_lang("Default trigger") })
-	parametersToEdit.push({type: "ComboBox", id: "triggerName", content: "String", WarnIfEmpty: true, result: "string", choices: choicesTriggers})
+	parametersToEdit := Object()
+	parametersToEdit.push({type: "Label", label: x_lang("Which flow")})
+	parametersToEdit.push({type: "Checkbox", id: "ThisFlow", default: 1, label: x_lang("This flow (%1%)", x_GetMyFlowID(Environment))})
+	parametersToEdit.push({type: "DropDown", id: "flowID", WarnIfEmpty: true, result: "enum", choices: [], enum: []})
+
+	parametersToEdit.push({type: "Label", label: x_lang("Which trigger")})
+	parametersToEdit.push({type: "Radio", id: "WhichTrigger", default: 1, result: "enum", choices: [x_lang("Default trigger"), x_lang("Specific trigger")], enum: ["Default", "Specific"]})
+	parametersToEdit.push({type: "DropDown", id: "triggerID", WarnIfEmpty: true, result: "enum", choices: [], enum: []})
+
 	parametersToEdit.push({type: "Label", label:  x_lang("Options")})
 	parametersToEdit.push({type: "Checkbox", id: "SendLocalVars", default: 1, label: x_lang("Send local variables")})
 	parametersToEdit.push({type: "Checkbox", id: "SkipDisabled", default: 0, label: x_lang("Skip disabled flows without error")})
@@ -85,25 +73,125 @@ Element_getParametrizationDetails_Action_Execute_Flow(Environment)
 Element_GenerateName_Action_Execute_Flow(Environment, ElementParameters)
 {
 	if (ElementParameters.ThisFlow = True)
-		FlowName:=x_lang("This flow")
+	{
+		FlowName := x_lang("This flow")
+		FlowID := x_GetMyFlowID(Environment)
+	}
 	else
-		FlowName:=ElementParameters.flowName
-	if (ElementParameters.defaultTrigger = True)
-		TriggerName:=x_lang("Default trigger")
-	else
-		TriggerName:=ElementParameters.TriggerName
-	return % x_lang("Execute_Flow") ": " FlowName " - " TriggerName
+	{
+		FlowName := x_getFlowName(ElementParameters.flowID)
+		FlowID := ElementParameters.flowID
+	}
 	
+	if (ElementParameters.WhichTrigger = "Default")
+		TriggerName := x_lang("Default trigger")
+	else
+		TriggerName := x_getElementName(FlowID, ElementParameters.TriggerID) 
+
+	return % x_lang("Execute_Flow") ": " FlowName " - " TriggerName
 }
 
 ;Called every time the user changes any parameter.
 ;This function allows to check the integrity of the parameters. For example you can:
 ;- Disable options which are not available because of other options
 ;- Correct misconfiguration
-Element_CheckSettings_Action_Execute_Flow(Environment, ElementParameters)
+Element_CheckSettings_Action_Execute_Flow(Environment, ElementParameters, staticValues)
 {
-	static oldParFlowName
-	static oldParThisFlow
+	thisFlow := ElementParameters.ThisFlow
+	flowID := ElementParameters.flowID
+	WhichTrigger := ElementParameters.WhichTrigger
+
+	if (ThisFlow != staticValues.oldParThisFlow)
+	{
+		if (ThisFlow)
+		{
+			x_Par_Disable("flowID")
+			x_Par_SetValue("flowID", "")
+		}
+		else
+		{
+			x_Par_Enable("flowID")
+
+			; get list of flows
+			choicesFlowIDs := x_GetListOfFlowIDs()
+			choicesFlowNames := []
+			for oneFlowIndex, oneFlowID in choicesFlowIDs
+			{
+				choicesFlowNames.push(oneFlowID ": " x_getFlowName(oneFlowID))
+			}
+			
+			; set choices
+			x_Par_SetChoices("flowID", choicesFlowNames, choicesFlowIDs)
+
+			; select flow
+			if (not flowID or not x_FirstCallOfCheckSettings(Environment))
+			{
+				; there is no flow ID specified or user swichted option "ThisFlow" off.
+				; Set current flow ID
+				flowID := x_GetMyFlowID(Environment)
+			}
+			x_Par_SetValue("flowID", flowID)
+		}
+	}
+
+	if (WhichTrigger != staticValues.oldParWhichTrigger)
+	{
+		if (WhichTrigger != "Specific")
+		{
+			x_Par_Disable("triggerID")
+			x_Par_SetValue("triggerID", "")
+		}
+		Else
+		{
+			x_Par_Enable("triggerID")
+		}
+	}
+
+	if (WhichTrigger = "Specific")
+	{
+		if (staticValues.oldParFlowID != flowID or staticValues.oldParThisFlow != ThisFlow or WhichTrigger != staticValues.oldParWhichTrigger)
+		{
+			; user changed flow name or checkbox "thisFlow" and "Specific" trigger is chosen. We need to update the trigger list.
+			if (x_Par_GetValue("ThisFlow"))
+			{
+				; ThisFlow is checked. get own flow ID
+				FlowID := x_getMyFlowID(Environment)
+			}
+			else
+			{
+				; ThisFlow is not checked. flowID does not need to be changed
+			}
+
+			; get all triggers
+			choicesTriggerIDs := x_getAllElementIDsOfClass(FlowID, "trigger_manual")
+			
+			; generate a list with all triggers
+			choicesTriggerNames := []
+			for oneIDIndex, oneTriggerID in choicesTriggerIDs
+			{
+				elementName := x_getElementName(FlowID, oneTriggerID)
+				choicesTriggerNames.push(oneTriggerID ": " elementName)
+
+				; we chosse either the first trigger or if the list contains the parametrized trigger ID, we will select it.
+				; this is also importand on first call of this function
+				if (ElementParameters.triggerID = oneTriggerID or not toChooseTriggerID)
+				{
+					toChooseTriggerID := oneTriggerID
+				}
+			}
+
+			; show the trigger list
+			x_Par_SetChoices("triggerID", choicesTriggerNames, choicesTriggerIDs)
+
+			; check the trigger
+			x_Par_SetValue("triggerID", toChooseTriggerID)
+		}
+	}
+
+	staticValues.oldParThisFlow := ThisFlow
+	staticValues.oldParFlowID := flowID
+	staticValues.oldParWhichTrigger := WhichTrigger
+	
 	if (ElementParameters.WaitToFinish = False)
 	{
 		x_Par_Disable("ReturnVariables")
@@ -123,137 +211,132 @@ Element_CheckSettings_Action_Execute_Flow(Environment, ElementParameters)
 	{
 		x_Par_Enable("triggerName")
 	}	
-	
-	x_Par_Disable("flowName",ElementParameters.ThisFlow)
-	
-	if (oldParFlowName!=ElementParameters.flowName or oldParThisFlow!=ElementParameters.ThisFlow or x_FirstCallOfCheckSettings(Environment))
-	{
-		oldParThisFlow:=ElementParameters.ThisFlow
-		oldParFlowName:=ElementParameters.flowName
-		
-		if (ElementParameters.ThisFlow)
-		{
-			FlowID := x_getMyFlowID(Environment)
-		}
-		else
-		{
-			FlowID := x_getFlowIDByName(ElementParameters.flowName)
-		}
-		allTriggerIDs := x_getAllElementIDsOfClass(FlowID, "Trigger_manual")
-		;~ d(allTriggerIDs, FlowID)
-		
-		choicesTriggers:=Object()
-		for oneIndex, oneTriggerID in allTriggerIDs
-		{
-			elementPars:=x_getElementPars(FlowID, oneTriggerID)
-			choicesTriggers.push(elementPars.id)
-		}
-		x_Par_SetChoices("triggerName", choicesTriggers)
-		
-		toChoose:=choicesTriggers[1]
-		for oneIndex, oneChoice in choicesTriggers
-		{
-			if (oneChoice = ElementParameters.triggerName)
-			{
-				toChoose:=oneChoice
-			}
-		}
-		;~ d(choicesTriggers, tochoose)
-		x_Par_SetValue("triggerName", toChoose)
-		
-	}
-	
 }
 
 ;Called when the element should execute.
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Execute_Flow(Environment, ElementParameters)
 {
+	; get flow ID
 	if (ElementParameters.ThisFlow)
 	{
-		FlowName:=x_GetMyFlowName(Environment)
-		FlowNameText:=x_lang("This flow")
+		; we take the ID of the current flow
+		FlowID := x_GetMyFlowID(Environment)
 	}
 	else
 	{
-		FlowName := x_replaceVariables(Environment, ElementParameters.flowName)
-		FlowNameText:=FlowName
+		; we take the specified flow ID and check whether it exists
+		FlowID := ElementParameters.flowID
 		
-		if not x_FlowExistsByName(FlowName)
+		if not x_FlowExists(FlowID)
 		{
-			return x_finish(Environment,"exception",x_lang("Flow '%1%' does not exist",FlowName))
-		}
-	}
-	FlowID:=x_getFlowIDByName(FlowName)
-	
-	Variables:=Object()
-	
-	if (ElementParameters.DefaultTrigger)
-	{
-		TriggerName := ""
-		TriggerNameText:=x_lang("Default trigger")
-	}
-	else
-	{
-		TriggerName := x_replaceVariables(Environment, ElementParameters.triggerName)
-		TriggerNameText:=TriggerName
-		if (TriggerName ="")
-		{
-			return x_finish(Environment,"exception",x_lang("Trigger name is empty",FlowName))
+			return x_finish(Environment, "exception", x_lang("Flow '%1%' does not exist", FlowID))
 		}
 	}
 	
-	if not x_ManualTriggerExist(FlowID, TriggerName)
+	if (ElementParameters.WhichTrigger = "Default")
 	{
-		return x_finish(Environment,"exception",x_lang("Trigger '%1%' in flow '%2%' does not exist",TriggerNameText, FlowName))
-	}
-	
-	if not x_isManualTriggerEnabled(FlowID, TriggerName)
-	{
-		if (ElementParameters.SkipDisabled)
+		; default trigger is selected. We have to find the ID of the default trigger
+		
+		; we can call this function. If we keep the name empty, it will seek for the default trigger
+		TriggerID := x_getDefaultManualTriggerID(FlowID)
+		if (TriggerID)
 		{
-			return x_finish(Environment,"normal",x_lang("Trigger '%1%' in '%2%' is disabled",TriggerNameText, FlowNameText))
+			; there is a manual trigger. We can continue
+		}
+		Else
+		{
+			; there is no manual trigger. finish with error.
+			return x_finish(Environment, "exception", x_lang("Flow '%1%' does not have any manual trigger.", FlowID))
+		}
+	}
+	else if (ElementParameters.WhichTrigger = "Specific")
+	{
+		; a specific trigger is selected
+		TriggerID := ElementParameters.TriggerID
+
+		; check whether trigger ID is set
+		if (TriggerID = "")
+		{
+			return x_finish(Environment, "exception", x_lang("Trigger ID is empty"))
+		}
+		
+		; check whether specified trigger exists
+		if (x_elementExists(FlowID, TriggerID))
+		{
+			; specified trigger exists. We cann continue
 		}
 		else
 		{
-			return x_finish(Environment,"exception",x_lang("Trigger '%1%' in '%2%' is disabled",TriggerNameText, FlowNameText))
+			; specified trigger does not exist. finish with error.
+			return x_finish(Environment, "exception", x_lang("Flow '%1%' does not have the trigger with ID '%2%'.", FlowID, TriggerID))
+		}
+	}
+	Else
+	{
+		return x_finish(Environment, "exception", x_lang("Unexpected Error!") " " x_lang("Parameter '%1%' is invalid.", "WhichTrigger"))
+	}
+	
+	; check whether trigger is enabled
+	if not x_isTriggerEnabled(FlowID, TriggerID)
+	{
+		; trigger is disabled. Finish.
+		if (ElementParameters.SkipDisabled)
+		{
+			; do not raise exception since the configuration sais so.
+			return x_finish(Environment, "normal", x_lang("Trigger '%1%' in '%2%' is disabled", TriggerNameText, FlowNameText))
+		}
+		else
+		{
+			return x_finish(Environment, "exception", x_lang("Trigger '%1%' in '%2%' is disabled", TriggerNameText, FlowNameText))
 		}
 	}
 	
-	
 	if (ElementParameters.SendLocalVars = True)
 	{
+		; local variables schould be sent to the other flow. Get all local variables.
 		Variables := x_ExportAllInstanceVars(Environment)
 	}
 	if (ElementParameters.WaitToFinish)
 	{
-		
-		functionObject:= x_NewFunctionObject(environment, "Action_Execute_Flow_FunctionExecutionFinished", ElementParameters)
-		x_SetExecutionValue(Environment, "hotkey", temphotkey)
-		x_ManualTriggerExecute(FlowID, TriggerName, Variables, functionObject)
-		
+		; we want to wait until the execution finishes.
+
+		; prepare a funciton object. It will be the called as soon as the other flow finishes
+		functionObject := x_NewFunctionObject(environment, "Action_Execute_Flow_FunctionExecutionFinished", ElementParameters)
+
+		; trigger the other flow and pass the function object as callback
+		x_ManualTriggerExecute(FlowID, TriggerID, Variables, functionObject)
+
+		; do not call x_finish(). It will be called when the functionObject is called.
 		return
 	}
 	else
 	{
-		x_ManualTriggerExecute(FlowID, TriggerName, Variables)
-		return x_finish(Environment,"normal")
+		; we don't want to wait until the execution finishes
+
+		; trigger the other flow and finish
+		x_ManualTriggerExecute(FlowID, TriggerID, Variables)
+		return x_finish(Environment, "normal")
 	}
-	
-	return
 }
 
 ;Called when the execution of the element should be stopped.
 ;If the task in Element_run_...() takes more than several seconds, then it is up to you to make it stoppable.
 Element_stop_Action_Execute_Flow(Environment, ElementParameters)
 {
-	
+	; nothing to do.
+	; if WaitToFinish is set, the funciton Action_Execute_Flow_FunctionExecutionFinished() will be called when the remot flow finishes.
+	; it's not a problem, if x_finish() will be called.
 }
 
 ; if parameter WaitToFinish is set, this funciton will be called when the remote flow finishes
 Action_Execute_Flow_FunctionExecutionFinished(Environment, ElementParameters, p_result, p_variables)
 {
 	if (ElementParameters.ReturnVariables)
+	{
+		; we want to import the instance variables from the other flow.
 		x_ImportInstanceVars(Environment, p_variables)
-	return x_finish(Environment,"normal")
+	}
+	; call x_finish()
+	return x_finish(Environment, "normal")
 }

@@ -68,7 +68,7 @@ Element_GenerateName_Action_Log_Off(Environment, ElementParameters)
 ;This function allows to check the integrity of the parameters. For example you can:
 ;- Disable options which are not available because of other options
 ;- Correct misconfiguration
-Element_CheckSettings_Action_Log_Off(Environment, ElementParameters)
+Element_CheckSettings_Action_Log_Off(Environment, ElementParameters, staticValues)
 {	
 	
 }

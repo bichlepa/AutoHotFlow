@@ -98,7 +98,7 @@ Element_GenerateName_Trigger_Hotkey(Environment, ElementParameters)
 ;This function allows to check the integrity of the parameters. For example you can:
 ;- Disable options which are not available because of other options
 ;- Correct misconfiguration
-Element_CheckSettings_Trigger_Hotkey(Environment, ElementParameters)
+Element_CheckSettings_Trigger_Hotkey(Environment, ElementParameters, staticValues)
 {
 	x_Par_Disable("WhenRelease", ElementParameters.BlockKey)
 	x_Par_Disable("BlockKey", ElementParameters.WhenRelease)

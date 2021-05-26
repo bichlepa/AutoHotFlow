@@ -16,11 +16,11 @@ SelectOneItem(p_ID, additional := false)
 		; Select one element
 		if p_ID contains connection
 		{
-			_setConnectionInfo(FlowID, p_ID, "selected", true)
+			_setConnectionInfo(_FlowID, p_ID, "selected", true)
 		}
 		else
 		{
-			_setElementInfo(FlowID, p_ID, "selected", true)
+			_setElementInfo(_FlowID, p_ID, "selected", true)
 		}
 	}
 	else ;if (additional=true)
@@ -28,11 +28,11 @@ SelectOneItem(p_ID, additional := false)
 		; Select one element (additionally, unselect if selected)
 		if p_ID contains connection
 		{
-			_setConnectionInfo(FlowID, p_ID, "selected", !_getConnectionInfo(FlowID, p_ID, "selected"))
+			_setConnectionInfo(_FlowID, p_ID, "selected", !_getConnectionInfo(_FlowID, p_ID, "selected"))
 		}
 		else
 		{
-			_setElementInfo(FlowID, p_ID, "selected", !_getElementInfo(FlowID, p_ID, "selected"))
+			_setElementInfo(_FlowID, p_ID, "selected", !_getElementInfo(_FlowID, p_ID, "selected"))
 		}
 	}
 	
@@ -46,13 +46,13 @@ UnSelectEverything(CreateList = true)
 {
 	_EnterCriticalSection()
 	
-	for forIndex, forElementID in _getAllElementIds(FlowID) 
+	for forIndex, forElementID in _getAllElementIds(_FlowID) 
 	{
-		_setElementInfo(FlowID, forElementID, "selected", false)
+		_setElementInfo(_FlowID, forElementID, "selected", false)
 	}
-	for forIndex, forConnectionID in _getAllConnectionIds(FlowID) ;Add all selected elements into array
+	for forIndex, forConnectionID in _getAllConnectionIds(_FlowID) ;Add all selected elements into array
 	{
-		_setConnectionInfo(FlowID, forConnectionID, "selected", false)
+		_setConnectionInfo(_FlowID, forConnectionID, "selected", false)
 	}
 	
 	if (CreateList)
@@ -67,14 +67,14 @@ SelectEverything()
 	_EnterCriticalSection()
 	
 	;Select all elements
-	for forIndex, forElementID in _getAllElementIds(FlowID)
+	for forIndex, forElementID in _getAllElementIds(_FlowID)
 	{
-		_setElementInfo(FlowID, forElementID, "selected", true)
+		_setElementInfo(_FlowID, forElementID, "selected", true)
 	}
 	;Select all connections
-	for forIndex, forConnectionID in _getAllConnectionIds(FlowID)
+	for forIndex, forConnectionID in _getAllConnectionIds(_FlowID)
 	{
-		_setConnectionInfo(FlowID, forConnectionID, "selected", false)
+		_setConnectionInfo(_FlowID, forConnectionID, "selected", false)
 	}
 	
 	UpdateSelectedItemsList()
@@ -90,15 +90,15 @@ UpdateSelectedItemsList()
 	selectedElements := []
 
 	;Add all selected elements into array
-	for forIndex, forElementID in _getAllElementIds(FlowID) 
+	for forIndex, forElementID in _getAllElementIds(_FlowID) 
 	{
-		if (_getElementInfo(FlowID, forElementID, "selected"))
+		if (_getElementInfo(_FlowID, forElementID, "selected"))
 			selectedElements[forElementID] := forElementID
 	}
 	;Add all selected connections into array
-	for forIndex, forConnectionID in _getAllConnectionIds(FlowID)
+	for forIndex, forConnectionID in _getAllConnectionIds(_FlowID)
 	{
-		if (_getConnectionInfo(FlowID, forConnectionID, "selected"))
+		if (_getConnectionInfo(_FlowID, forConnectionID, "selected"))
 			selectedElements[forConnectionID] := forConnectionID
 	}
 	
@@ -107,16 +107,16 @@ UpdateSelectedItemsList()
 	{
 		; we have a single selected element. Write it into flow variable selectedElement
 		for oneSelectedElement in selectedElements
-			_setFlowProperty(FlowID, "selectedElement", oneSelectedElement)
+			_setFlowProperty(_FlowID, "selectedElement", oneSelectedElement)
 	}
 	else
 	{
 		; we have either none or multiple selected elements. Make variable selectedElement empty
-		_setFlowProperty(FlowID, "selectedElement", "")
+		_setFlowProperty(_FlowID, "selectedElement", "")
 	}
 	
 	; set flow variable selectedElements
-	_setFlowProperty(FlowID, "selectedElements", selectedElements)
+	_setFlowProperty(_FlowID, "selectedElements", selectedElements)
 
 	_LeaveCriticalSection()
 }

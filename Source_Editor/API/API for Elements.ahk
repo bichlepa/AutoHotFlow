@@ -168,6 +168,11 @@ x_GetMyElementID(Environment)
 	return xx_GetMyElementID(Environment)
 }
 
+x_getFlowName(p_FlowID)
+{
+	return xx_getFlowName(p_FlowID)
+}
+
 x_getFlowIDByName(p_FlowName)
 {
 	return xx_getFlowIDByName(p_FlowName)
@@ -258,29 +263,34 @@ x_getMyElementPars(Environment)
 }
 
 
-x_ManualTriggerExist(p_FlowID, p_TriggerName = "")
+x_elementExists(p_FlowID, p_ElementID)
 {
-	return xx_ManualTriggerExist(p_FlowID, p_TriggerName)
+	return xx_elementExists(p_FlowID, p_ElementID)
 }
 
-x_isManualTriggerEnabled(p_FlowID, p_TriggerName="")
+x_isTriggerEnabled(p_FlowID, p_TriggerID)
 {
-	return xx_isManualTriggerEnabled(p_FlowID, p_TriggerName)
+	return xx_isTriggerEnabled(p_FlowID, p_TriggerID)
 }
 
-x_ManualTriggerEnable(p_FlowID, p_TriggerName="")
+x_triggerEnable(p_FlowID, p_TriggerID)
 {
-	return xx_ManualTriggerEnable(p_FlowID, p_TriggerName)
+	return xx_triggerEnable(p_FlowID, p_TriggerID)
 }
 
-x_ManualTriggerDisable(p_FlowID, p_TriggerName="")
+x_triggerDisable(p_FlowID, p_TriggerID)
 {
-	return xx_ManualTriggerDisable(p_FlowID, p_TriggerName)
+	return xx_triggerDisable(p_FlowID, p_TriggerID)
 }
 
-x_ManualTriggerExecute(p_FlowID, p_TriggerName = "", p_Variables ="", p_CallBackFunction ="")
+x_getDefaultManualTriggerID(p_FlowID)
 {
-	return xx_ManualTriggerExecute(p_FlowID, p_TriggerName, p_Variables, p_CallBackFunction)
+	return xx_getDefaultManualTriggerID(p_FlowID)
+}
+
+x_ManualTriggerExecute(p_FlowID, p_TriggerID = "", p_Variables ="", p_CallBackFunction ="")
+{
+	return xx_ManualTriggerExecute(p_FlowID, p_TriggerID, p_Variables, p_CallBackFunction)
 }
 
 ; only in editor
@@ -305,14 +315,14 @@ x_Par_GetValue(p_ParameterID)
 	return ElementSettings.field.getvalue(p_ParameterID)
 }
 ; set choices of a dropdown for a parameter in the gui
-x_Par_SetChoices(p_ParameterID, p_Choices)
+x_Par_SetChoices(p_ParameterID, p_Choices, p_Enums = "")
 {
-	return ElementSettings.field.setChoices(p_Choices,p_ParameterID)
+	return ElementSettings.field.setChoices(p_Choices, p_Enums, p_ParameterID)
 }
 ; set a label value in the gui
 x_Par_SetLabel(p_ParameterID, p_Label)
 {
-	return ElementSettings.field.setLabel(p_Label,p_ParameterID)
+	return ElementSettings.field.setLabel(p_Label, p_ParameterID)
 }
 ; returns whether the call of the element function "Element_CheckSettings_...()" is performed the first time after opening the element parametration gui
 x_FirstCallOfCheckSettings(Environment)

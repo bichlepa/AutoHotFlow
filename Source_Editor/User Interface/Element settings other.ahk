@@ -33,10 +33,10 @@ class ElementSettingsElementClassSelector
 		
 		; save some information about the element which we will need repeadetely
 		this.elementID := p_ElementID
-		this.elementType := _getElementProperty(FlowID, this.elementID, "type")
-		this.elementClass := _getElementProperty(FlowID, this.elementID, "Class")
-		this.elementName := _getElementProperty(FlowID, this.elementID, "Name")
-		this.elementPars := _getElementProperty(FlowID, this.elementID, "pars")
+		this.elementType := _getElementProperty(_FlowID, this.elementID, "type")
+		this.elementClass := _getElementProperty(_FlowID, this.elementID, "Class")
+		this.elementName := _getElementProperty(_FlowID, this.elementID, "Name")
+		this.elementPars := _getElementProperty(_FlowID, this.elementID, "pars")
 
 		; disable editor gui
 		EditGUIDisable()
@@ -221,7 +221,7 @@ class ElementSettingsElementClassSelector
 		EditGUIEnable()
 
 		; set element class
-		Element_SetClass(FlowID, this.elementID, GuiElementChoosedClass)
+		Element_SetClass(_FlowID, this.elementID, GuiElementChoosedClass)
 
 		; set result to selected element class
 		this.result := GuiElementChoosedClass
@@ -258,9 +258,9 @@ class ElementSettingsConnectionTypeSelector
 		this.connectionID := p_connectionID
 
 		; get some further information about the connection
-		local setConnectionType := _getConnectionProperty(FlowID, this.connectionID, "connectionType")
-		local setConnectionFrom := _getConnectionProperty(FlowID, this.connectionID, "from")
-		local setConnectionFromType := _getElementProperty(FlowID, setconnectionFrom, "type")
+		local setConnectionType := _getConnectionProperty(_FlowID, this.connectionID, "connectionType")
+		local setConnectionFrom := _getConnectionProperty(_FlowID, this.connectionID, "from")
+		local setConnectionFromType := _getElementProperty(_FlowID, setconnectionFrom, "type")
 		
 		; disable editor gui
 		EditGUIDisable()
@@ -340,7 +340,7 @@ class ElementSettingsConnectionTypeSelector
 		StringReplace, result, A_GuiControl, ConnectionTypeSelectorButton
 
 		; set connection type
-		_setConnectionProperty(FlowID, this.connectionID, "ConnectionType", result)
+		_setConnectionProperty(_FlowID, this.connectionID, "ConnectionType", result)
 
 		; destroy gui and enable editor gui
 		gui,destroy
@@ -388,7 +388,7 @@ class ElementSettingsContainerTypeSelector
 		this.elementID := p_ElementID
 
 		; get some further information about the element
-		setElementType := _getElementProperty(FlowID, this.elementID, "type")
+		setElementType := _getElementProperty(_FlowID, this.elementID, "type")
 
 		; disable editor gui
 		EditGUIDisable()
@@ -450,7 +450,7 @@ class ElementSettingsContainerTypeSelector
 		StringReplace, result, A_GuiControl, ContainerTypeSelectorButton
 
 		; set connection type
-		Element_SetType(FlowID, this.elementID, result)
+		Element_SetType(_FlowID, this.elementID, result)
 
 		; destroy gui and enable editor gui
 		gui,destroy

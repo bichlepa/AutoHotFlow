@@ -75,7 +75,7 @@ Element_GenerateName_Action_Get_Index_Of_Element_In_List(Environment, ElementPar
 ;This function allows to check the integrity of the parameters. For example you can:
 ;- Disable options which are not available because of other options
 ;- Correct misconfiguration
-Element_CheckSettings_Action_Get_Index_Of_Element_In_List(Environment, ElementParameters)
+Element_CheckSettings_Action_Get_Index_Of_Element_In_List(Environment, ElementParameters, staticValues)
 {
 	
 }

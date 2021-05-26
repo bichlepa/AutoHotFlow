@@ -33,7 +33,7 @@ ui_Menu_save()
 		ui_ActionWhenMainGUIDisabled()
 		return
 	}
-	saveFlow(FlowID)
+	saveFlow(_FlowID)
 }
 
 ; user wants to start flow
@@ -44,7 +44,7 @@ ui_Menu_MenuStart()
 		ui_ActionWhenMainGUIDisabled()
 		return
 	}
-	executeFlow(FlowID)
+	executeFlow(_FlowID)
 }
 
 ; user wants to stop flow
@@ -55,7 +55,7 @@ ui_Menu_MenuStop()
 		ui_ActionWhenMainGUIDisabled()
 		return
 	}
-	StopFlow(FlowID)
+	StopFlow(_FlowID)
 }
 
 ; user wants to enable or disable flow
@@ -66,7 +66,7 @@ ui_Menu_Enable()
 		ui_ActionWhenMainGUIDisabled()
 		return
 	}
-	enableToggleFlow(FlowID)
+	enableToggleFlow(_FlowID)
 }
 
 ; user wants to undo a change
@@ -111,7 +111,7 @@ ui_Menu_CheckLoop()
 	static menu_bar_IsEnabled
 
 	; get information whether flow is enabled
-	tempEnabled := _getFlowProperty(FlowID, "enabled")
+	tempEnabled := _getFlowProperty(_FlowID, "enabled")
 
 	; check whether something changed
 	if (menu_bar_IsEnabled != tempEnabled)

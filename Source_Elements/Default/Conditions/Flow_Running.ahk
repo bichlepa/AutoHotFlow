@@ -51,11 +51,9 @@ Element_getStabilityLevel_Condition_Flow_Running()
 ;Returns an array of objects which describe all controls which will be shown in the element settings GUI
 Element_getParametrizationDetails_Condition_Flow_Running(Environment)
 {
-	choices := x_GetListOfFlowNames()
-	
 	parametersToEdit:=Object()
-	parametersToEdit.push({type: "Label", label: x_lang("Flow_name")})
-	parametersToEdit.push({type: "ComboBox", id: "flowName", content: "String", WarnIfEmpty: true, result: "string", choices: choices})
+	parametersToEdit.push({type: "Label", label: x_lang("Which flow")})
+	parametersToEdit.push({type: "DropDown", id: "flowID", WarnIfEmpty: true, result: "enum", choices: [], enum: []})
 
 	return parametersToEdit
 }
@@ -64,7 +62,7 @@ Element_getParametrizationDetails_Condition_Flow_Running(Environment)
 Element_GenerateName_Condition_Flow_Running(Environment, ElementParameters)
 {
 	global
-	return % x_lang("Flow_Executing") " - " ElementParameters.flowName
+	return % x_lang("Flow_Executing") " - " x_getFlowName(ElementParameters.flowID)
 	
 }
 
@@ -72,33 +70,52 @@ Element_GenerateName_Condition_Flow_Running(Environment, ElementParameters)
 ;This function allows to check the integrity of the parameters. For example you can:
 ;- Disable options which are not available because of other options
 ;- Correct misconfiguration
-Element_CheckSettings_Condition_Flow_Running(Environment, ElementParameters)
+Element_CheckSettings_Condition_Flow_Running(Environment, ElementParameters, staticValues)
 {	
-	
+	; we need to fill the flow list on first call
+	if (x_FirstCallOfCheckSettings(Environment))
+	{
+		; get list of flows
+		choicesFlowIDs := x_GetListOfFlowIDs()
+		choicesFlowNames := []
+		for oneFlowIndex, oneFlowID in choicesFlowIDs
+		{
+			choicesFlowNames.push(oneFlowID ": " x_getFlowName(oneFlowID))
+		}
+		
+		; set choices
+		x_Par_SetChoices("flowID", choicesFlowNames, choicesFlowIDs)
+
+		; select flow
+		flowID := ElementParameters.flowID
+		if (not flowID)
+		{
+			; there is no flow ID specified. Set current flow ID
+			flowID := x_GetMyFlowID(Environment)
+		}
+		x_Par_SetValue("flowID", flowID)
+	}
 }
 
 ;Called when the element should execute.
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Condition_Flow_Running(Environment, ElementParameters)
 {
-	result:=false
-	FlowName := x_replaceVariables(Environment, ElementParameters.flowName)
+	result := false
+	FlowID := ElementParameters.FlowID
 	
-	if x_FlowExistsByName(FlowName)
+	if x_FlowExists(FlowID)
 	{
-		FlowID:=x_getFlowIDByName(FlowName)
-		
-		result:=x_isFlowExecuting(FlowID)
+		result := x_isFlowExecuting(FlowID)
 		if (result)
-			return x_finish(Environment,"yes")
+			return x_finish(Environment, "yes")
 		else
-			return x_finish(Environment,"no")
+			return x_finish(Environment, "no")
 	}
 	else
 	{
-		return x_finish(Environment,"exception",x_lang("Flow '%1%' does not exist",FlowName))
+		return x_finish(Environment,"exception", x_lang("Flow '%1%' does not exist", FlowID))
 	}
-	
 }
 
 ;Called when the execution of the element should be stopped.

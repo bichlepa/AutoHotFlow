@@ -26,7 +26,7 @@ initializeTrayBar()
 
 	menu, tray, icon, %_ScriptDir%\Icons\disabled.ico
 	
-	menu, tray, tip, % lang("Flow") ": " _getFlowProperty(FlowID, "name")
+	menu, tray, tip, % lang("Flow") ": " _getFlowProperty(_FlowID, "name")
 }
 
 ; react if user clicks on "show" entry
@@ -38,11 +38,11 @@ tray_show()
 ; react if user clicks on "start" entry
 tray_start()
 {
-	executeFlow(FlowID)
+	executeFlow(_FlowID)
 }
 
 ; react if user clicks on "enable" entry
 tray_enable()
 {
-	enableToggleFlow(FlowID)
+	enableToggleFlow(_FlowID)
 }

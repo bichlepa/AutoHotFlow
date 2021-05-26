@@ -11,9 +11,9 @@ SaveToClipboard()
 	newClipboard.allConnections := Object()
 	
 	; loop through all elements
-	for forIndex, forElementID in _getAllElementIds(FlowID)
+	for forIndex, forElementID in _getAllElementIds(_FlowID)
 	{
-		selected := _getElementInfo(FlowID, forElementID, "selected")
+		selected := _getElementInfo(_FlowID, forElementID, "selected")
 		if (not selected) 
 		{
 			; Skip elements which are not selected
@@ -21,7 +21,7 @@ SaveToClipboard()
 		}
 		
 		; copy the selected element to clipboard
-		newClipboard.allElements[forElementID] := _getElement(FlowID, forElementID)
+		newClipboard.allElements[forElementID] := _getElement(_FlowID, forElementID)
 
 		; clear info object
 		newClipboard.allElements[forElementID].info.enabled := false
@@ -35,13 +35,13 @@ SaveToClipboard()
 	}
 	
 	; loop through all connections
-	for forIndex, forConnectionID in _getAllConnectionIds(FlowID) 
+	for forIndex, forConnectionID in _getAllConnectionIds(_FlowID) 
 	{
 		; get some connection information
-		from := _getConnectionProperty(FlowID, forConnectionID, "from")
-		to := _getConnectionProperty(FlowID, forConnectionID, "to")
-		fromselected := _getElementInfo(FlowID, from, "selected")
-		toselected := _getElementInfo(FlowID, to, "selected")
+		from := _getConnectionProperty(_FlowID, forConnectionID, "from")
+		to := _getConnectionProperty(_FlowID, forConnectionID, "to")
+		fromselected := _getElementInfo(_FlowID, from, "selected")
+		toselected := _getElementInfo(_FlowID, to, "selected")
 
 		; A connection will be saved to clipboard if its connected elements are both selected
 		if (not (fromselected and toselected))
@@ -50,7 +50,7 @@ SaveToClipboard()
 		}
 
 		; both elements are selected. We will copy the connection to clipboard
-		newClipboard.allConnections[forConnectionID] := _getConnection(FlowID, forConnectionID)
+		newClipboard.allConnections[forConnectionID] := _getConnection(_FlowID, forConnectionID)
 		
 		; clear info object
 		newClipboard.allConnections[forConnectionID].info.selected := false
@@ -93,21 +93,21 @@ loadFromClipboard()
 	UnSelectEverything()
 	
 	;Find mouse position and find out whether the mouse is hovering the editor
-	winHWND := _getSharedProperty("hwnds.editGUI" FlowID)
+	winHWND := _getSharedProperty("hwnds.editGUI" _FlowID)
 	MouseGetPos, TempMouseX, TempMouseY, tempWin, TempControl, 2
 	If (tempWin = winHWND)
 	{
 		; mouse is hovering the editor. We will paste the elements under the mouse
-		zoomFactor := _getFlowProperty(FlowID, "flowSettings.zoomFactor") 
-		offsetx := _getFlowProperty(FlowID, "flowSettings.offsetx") 
-		offsety := _getFlowProperty(FlowID, "flowSettings.offsety") 
+		zoomFactor := _getFlowProperty(_FlowID, "flowSettings.zoomFactor") 
+		offsetx := _getFlowProperty(_FlowID, "flowSettings.offsetx") 
+		offsety := _getFlowProperty(_FlowID, "flowSettings.offsety") 
 		tempPosUnderMouseX := (TempMouseX / zoomFactor) + offsetx
 		tempPosUnderMouseY := (TempMouseY / zoomFactor) + offsety
 	}
 	else
 	{
 		; mouse is not hovering the editor. We will paste the elements in the middle of the editor
-		visibleArea := _getFlowProperty(FlowID, "DrawResult.visiblearea") 
+		visibleArea := _getFlowProperty(_FlowID, "DrawResult.visiblearea") 
 		tempPosUnderMouseX := (visibleArea.x1 + visiblearea.w / 2)
 		tempPosUnderMouseY := (visibleArea.y1 + visiblearea.h / 2)
 	}
@@ -126,13 +126,13 @@ loadFromClipboard()
 		tempCountLoadedElements++
 		
 		; Create new element. Do not pass Element ID, we want to get a new one
-		NewElementID := element_New(FlowID)
+		NewElementID := element_New(_FlowID)
 
 		; write all element properties to the new element
-		_setElement(FlowID, NewElementID, loadElement)
+		_setElement(_FlowID, NewElementID, loadElement)
 
 		; Restore the element ID, since we just overwrote it
-		_setElementProperty(FlowID, NewElementID, "id", NewElementID)
+		_setElementProperty(_FlowID, NewElementID, "id", NewElementID)
 		
 		;Save new element IDs in order to be able to assign the correct elements to the connections
 		tempClipboardElementList[loadElementID] := NewElementID
@@ -144,11 +144,11 @@ loadFromClipboard()
 			tempOffsetY := ui_FitGridY(tempPosUnderMouseY - loadElement.Y - 0.5 * default_ElementHeight)
 		}
 		;Correct the position. Each element should have the same relative position to each other as in the flow where they were copied from
-		_setElementProperty(FlowID, NewElementID, "x", ui_FitGridX(loadElement.X + tempOffsetX))
-		_setElementProperty(FlowID, NewElementID, "y", ui_FitGridY(loadElement.Y + tempOffsetY))
+		_setElementProperty(_FlowID, NewElementID, "x", ui_FitGridX(loadElement.X + tempOffsetX))
+		_setElementProperty(_FlowID, NewElementID, "y", ui_FitGridY(loadElement.Y + tempOffsetY))
 
 		; select the pasted element
-		_setElementInfo(FlowID, NewElementID, "selected", false)
+		_setElementInfo(_FlowID, NewElementID, "selected", false)
 		SelectOneItem(NewElementID, true)
 	}
 
@@ -158,20 +158,20 @@ loadFromClipboard()
 		tempCountLoadedElements++
 		
 		; Create new element. Do not pass Element ID, we want to get a new one
-		NewElementID := connection_new(FlowID)
+		NewElementID := connection_new(_FlowID)
 
 		; write all element properties to the new element
-		_setConnection(FlowID, NewElementID, loadElement)
+		_setConnection(_FlowID, NewElementID, loadElement)
 		
 		; Restore the element ID, since we just overwrote it
-		_setConnectionProperty(FlowID, NewElementID, "id", NewElementID)
+		_setConnectionProperty(_FlowID, NewElementID, "id", NewElementID)
 
 		; Correct the element IDs in parameters "to" and "from"
-		_setConnectionProperty(FlowID, NewElementID, "to", tempClipboardElementList[loadElement.to])
-		_setConnectionProperty(FlowID, NewElementID, "from", tempClipboardElementList[loadElement.from])
+		_setConnectionProperty(_FlowID, NewElementID, "to", tempClipboardElementList[loadElement.to])
+		_setConnectionProperty(_FlowID, NewElementID, "from", tempClipboardElementList[loadElement.from])
 
 		; select the pasted element
-		_setConnectionInfo(FlowID, NewElementID, "selected", false)
+		_setConnectionInfo(_FlowID, NewElementID, "selected", false)
 		SelectOneItem(NewElementID, true)
 	}
 
@@ -179,13 +179,13 @@ loadFromClipboard()
 	{
 		; we pasted some elements.
 		; Create a new state
-		State_New(FlowID)
+		State_New(_FlowID)
 
 		ToolTip(lang("Loaded %1% elements from clipboard", tempCountLoadedElements), 1000)
 		logger("a2","Loaded " tempCountLoadedElements " elements from clipboard")
 		
 		; redraw
-		API_Draw_Draw(FlowID)
+		API_Draw_Draw(_FlowID)
 	}
 	else
 	{

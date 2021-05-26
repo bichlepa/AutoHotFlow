@@ -213,11 +213,11 @@ executionTask()
 					_setThreadProperty(OneInstanceID, OneThreadID, "ElementExecutionValues", "")
 					global_AllExecutionIDs.delete(OneThread.uniqueID)
 				}
-				
-				if (instance.callback)
+
+				tempCallBackfunc := _getInstanceProperty(OneInstanceID, callback, false)
+				if (tempCallBackfunc)
 				{
 					; if there is a callback, call it and tell the waiting function that this instance has been stopped
-					tempCallBackfunc := instance.callback
 					%tempCallBackfunc%("stopped", instance.InstanceVars)
 				}
 

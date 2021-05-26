@@ -55,6 +55,7 @@ Element_getParametrizationDetails_Condition_File_Has_Attribute(Environment)
 	
 	parametersToEdit.push({type: "Label", label: x_lang("File path")})
 	parametersToEdit.push({type: "File", id: "file", label: x_lang("Select a file")})
+
 	parametersToEdit.push({type: "Label", label: x_lang("Which attribute")})
 	parametersToEdit.push({type: "Radio", id: "Attribute", default: 1, choices: [x_lang("Normal"), x_lang("Read only"), x_lang("Archive"), x_lang("System"), x_lang("Hidden"), x_lang("Directory"), x_lang("Offline"), x_lang("Compressed"), x_lang("Temporary")], result: "enum", enum: ["N", "R", "A", "S", "H", "D", "O", "C", "T"]})
 	
@@ -71,7 +72,7 @@ Element_GenerateName_Condition_File_Has_Attribute(Environment, ElementParameters
 ;This function allows to check the integrity of the parameters. For example you can:
 ;- Disable options which are not available because of other options
 ;- Correct misconfiguration
-Element_CheckSettings_Condition_File_Has_Attribute(Environment, ElementParameters)
+Element_CheckSettings_Condition_File_Has_Attribute(Environment, ElementParameters, staticValues)
 {	
 	
 }
@@ -81,40 +82,41 @@ Element_CheckSettings_Condition_File_Has_Attribute(Environment, ElementParameter
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Condition_File_Has_Attribute(Environment, ElementParameters)
 {
-	EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters)
+	;evalute the parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
 	if (EvaluatedParameters._error)
 	{
 		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
 
-	file:=x_GetFullPath(Environment, EvaluatedParameters.file)
+	; if file path is relative, convert it to full path
+	file := x_GetFullPath(Environment, EvaluatedParameters.file)
 
-
-	
-	FileGetAttrib,result,% file
+	; get file attribute
+	FileGetAttrib, result, % file
 	if ErrorLevel
 	{
+		; an error occured. Check whether file exists
 		if not fileexist(tempPath)
 		{
-			x_finish(Environment, "exception", x_lang("File '%1%' does not exist",file)) 
+			; file does not exist. finish with exception
+			x_finish(Environment, "exception", x_lang("File '%1%' does not exist", file)) 
 			return
 		}
 		else
 		{
+			; file exists. Reason is unknown. Finish with exception
 			x_finish(Environment, "exception", x_lang("Attributes of file '%1%' could not be read",file)) 
 			return
 		}
 	}
 	
-	IfInString,result,% EvaluatedParameters.Attribute
-		x_finish(Environment,"yes")
+	; check whether the attribute exists
+	IfInString, result, % EvaluatedParameters.Attribute
+		x_finish(Environment, "yes")
 	else
-		x_finish(Environment,"no")
-	
-	return
-	
-	
+		x_finish(Environment, "no")
 }
 
 

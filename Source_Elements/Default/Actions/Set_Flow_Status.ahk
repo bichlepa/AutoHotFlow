@@ -51,28 +51,17 @@ Element_getStabilityLevel_Action_Set_Flow_Status()
 ;Returns an array of objects which describe all controls which will be shown in the element settings GUI
 Element_getParametrizationDetails_Action_Set_Flow_Status(Environment)
 {
-	choicesFlows := x_GetListOfFlowNames()
-	FlowID := x_GetMyFlowID(Environment)
-	myFlowName := x_GetMyFlowName(Environment)
-	
-	allTriggerIDs := x_getAllElementIDsOfClass(FlowID, "manual_trigger")
-	
-	choicesTriggers:=Object()
-	for oneIDIndex, oneTriggerID in allTriggerIDs
-	{
-		elementPars:=x_getElementPars(FlowID, oneTriggerID)
-		choicesTriggers.push(elementPars.id)
-	}
-	
-	parametersToEdit:=Object()
+	parametersToEdit := Object()
 	parametersToEdit.push({type: "Label", label: x_lang("New state")})
 	parametersToEdit.push({type: "Radio", id: "Enable", default: 1, result: "enum", choices: [x_lang("Enable"), x_lang("Disable")], enum: ["Enable", "Disable"]})
-	parametersToEdit.push({type: "Label", label: x_lang("Flow_name")})
-	parametersToEdit.push({type: "Checkbox", id: "ThisFlow", default: 1, label: x_lang("This flow (%1%)",myFlowName ) })
-	parametersToEdit.push({type: "ComboBox", id: "flowName", content: "String", WarnIfEmpty: true, result: "string", choices: choicesFlows})
+
+	parametersToEdit.push({type: "Label", label: x_lang("Which flow")})
+	parametersToEdit.push({type: "Checkbox", id: "ThisFlow", default: 1, label: x_lang("This flow (%1%)", x_GetMyFlowID(Environment))})
+	parametersToEdit.push({type: "DropDown", id: "flowID", WarnIfEmpty: true, result: "enum", choices: [], enum: []})
+
 	parametersToEdit.push({type: "Label", label: x_lang("Which trigger")})
 	parametersToEdit.push({type: "Radio", id: "WhichTrigger", default: 1, result: "enum", choices: [x_lang("Any trigger"), x_lang("Default trigger"), x_lang("Specific trigger")], enum: ["Any", "Default", "Specific"]})
-	parametersToEdit.push({type: "ComboBox", id: "triggerName", content: "String", WarnIfEmpty: true, result: "string", choices: choicesTriggers})
+	parametersToEdit.push({type: "DropDown", id: "triggerID", WarnIfEmpty: true, result: "enum", choices: [], enum: []})
 
 	return parametersToEdit
 }
@@ -81,20 +70,29 @@ Element_getParametrizationDetails_Action_Set_Flow_Status(Environment)
 Element_GenerateName_Action_Set_Flow_Status(Environment, ElementParameters)
 {
 	if (ElementParameters.Enable = "Enable")
-		enableString:=x_lang("Enable")
+		enableString := x_lang("Enable")
 	else
-		enableString:=x_lang("Disable")
-	
+		enableString := x_lang("Disable")
+
 	if (ElementParameters.ThisFlow = True)
-		FlowName:=x_lang("This flow")
+	{
+		FlowName := x_lang("This flow")
+		FlowID := x_GetMyFlowID(Environment)
+	}
 	else
-		FlowName:=ElementParameters.flowName
+	{
+		FlowName := x_getFlowName(ElementParameters.flowID)
+		FlowID := ElementParameters.flowID
+	}
+	
 	if (ElementParameters.WhichTrigger = "Any")
-		TriggerName:=x_lang("Any trigger")
+		TriggerName := x_lang("Any trigger")
 	else if (ElementParameters.WhichTrigger = "Default")
-		TriggerName:=x_lang("Default trigger")
+		TriggerName := x_lang("Default trigger")
 	else
-		TriggerName:=ElementParameters.TriggerName
+		TriggerName := x_getElementName(FlowID, ElementParameters.TriggerID) 
+
+	
 	return % x_lang("Set_Flow_Status") " - " enableString ": " FlowName " - " TriggerName
 	
 	
@@ -105,119 +103,189 @@ Element_GenerateName_Action_Set_Flow_Status(Environment, ElementParameters)
 ;This function allows to check the integrity of the parameters. For example you can:
 ;- Disable options which are not available because of other options
 ;- Correct misconfiguration
-Element_CheckSettings_Action_Set_Flow_Status(Environment, ElementParameters)
+Element_CheckSettings_Action_Set_Flow_Status(Environment, ElementParameters, staticValues)
 {
-	static oldParFlowName
-	static oldParThisFlow
-	
-	if (ElementParameters.WhichTrigger != "Specific")
+	thisFlow := ElementParameters.ThisFlow
+	flowID := ElementParameters.flowID
+	WhichTrigger := ElementParameters.WhichTrigger
+
+	if (ThisFlow != staticValues.oldParThisFlow)
 	{
-		x_Par_Disable("triggerName")
-		x_Par_SetValue("triggerName", "")
-	}
-	else
-	{
-		x_Par_Enable("triggerName")
-	}	
-	
-	x_Par_Disable("flowName",ElementParameters.ThisFlow)
-	
-	if (oldParFlowName!=ElementParameters.flowName or oldParThisFlow!=ElementParameters.ThisFlow)
-	{
-		oldParThisFlow:=ElementParameters.ThisFlow
-		oldParFlowName:=ElementParameters.flowName
-		
-		if (ElementParameters.ThisFlow)
+		if (ThisFlow)
 		{
-			FlowID := x_getMyFlowID(Environment)
+			x_Par_Disable("flowID")
+			x_Par_SetValue("flowID", "")
 		}
 		else
 		{
-			FlowID := x_getFlowIDByName(ElementParameters.flowName)
-		}
-		allTriggerIDs := x_getAllElementIDsOfClass(FlowID, "manual_trigger")
-		
-		choicesTriggers:=Object()
-		for oneIndex, oneTriggerID in allTriggerIDs
-		{
-			elementPars:=x_getElementPars(FlowID, oneTriggerID)
-			choicesTriggers.push(elementPars.id)
-		}
-		x_Par_SetChoices("triggerName", choicesTriggers)
-		
-		toChoose:=choicesTriggers[1]
-		for oneIndex, oneChoice in choicesTriggers
-		{
-			if (oneChoice = ElementParameters.triggerName)
+			x_Par_Enable("flowID")
+
+			; get list of flows
+			choicesFlowIDs := x_GetListOfFlowIDs()
+			choicesFlowNames := []
+			for oneFlowIndex, oneFlowID in choicesFlowIDs
 			{
-				toChoose:=oneChoice
+				choicesFlowNames.push(oneFlowID ": " x_getFlowName(oneFlowID))
 			}
+			
+			; set choices
+			x_Par_SetChoices("flowID", choicesFlowNames, choicesFlowIDs)
+
+			; select flow
+			if (not flowID or not x_FirstCallOfCheckSettings(Environment))
+			{
+				; there is no flow ID specified or user swichted option "ThisFlow" off.
+				; Set current flow ID
+				flowID := x_GetMyFlowID(Environment)
+			}
+			x_Par_SetValue("flowID", flowID)
 		}
-		;~ d(choicesTriggers, tochoose)
-		x_Par_SetValue("triggerName", toChoose)
-		
 	}
-	
+
+	if (WhichTrigger != staticValues.oldParWhichTrigger)
+	{
+		if (WhichTrigger != "Specific")
+		{
+			x_Par_Disable("triggerID")
+			x_Par_SetValue("triggerID", "")
+		}
+		Else
+		{
+			x_Par_Enable("triggerID")
+		}
+	}
+
+	if (WhichTrigger = "Specific")
+	{
+		if (staticValues.oldParFlowID != flowID or staticValues.oldParThisFlow != ThisFlow or WhichTrigger != staticValues.oldParWhichTrigger)
+		{
+			; user changed flow name or checkbox "thisFlow" and "Specific" trigger is chosen. We need to update the trigger list.
+			if (x_Par_GetValue("ThisFlow"))
+			{
+				; ThisFlow is checked. get own flow ID
+				FlowID := x_getMyFlowID(Environment)
+			}
+			else
+			{
+				; ThisFlow is not checked. flowID does not need to be changed
+			}
+
+			; get all triggers
+			choicesTriggerIDs := x_getAllElementIDsOfType(FlowID, "trigger")
+			
+			; generate a list with all triggers
+			choicesTriggerNames := []
+			for oneIDIndex, oneTriggerID in choicesTriggerIDs
+			{
+				elementName := x_getElementName(FlowID, oneTriggerID)
+				choicesTriggerNames.push(oneTriggerID ": " elementName)
+
+				; we chosse either the first trigger or if the list contains the parametrized trigger ID, we will select it.
+				; this is also importand on first call of this function
+				if (ElementParameters.triggerID = oneTriggerID or not toChooseTriggerID)
+				{
+					toChooseTriggerID := oneTriggerID
+				}
+			}
+
+			; show the trigger list
+			x_Par_SetChoices("triggerID", choicesTriggerNames, choicesTriggerIDs)
+
+			; check the trigger
+			x_Par_SetValue("triggerID", toChooseTriggerID)
+		}
+	}
+
+	staticValues.oldParThisFlow := ThisFlow
+	staticValues.oldParFlowID := flowID
+	staticValues.oldParWhichTrigger := WhichTrigger
 }
 
 ;Called when the element should execute.
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Set_Flow_Status(Environment, ElementParameters)
 {
+	; get flow ID
 	if (ElementParameters.ThisFlow)
-		FlowName:=x_GetMyFlowName(Environment)
+	{
+		; we take the ID of the current flow
+		FlowID := x_GetMyFlowID(Environment)
+	}
 	else
 	{
-		FlowName := x_replaceVariables(Environment, ElementParameters.flowName)
+		; we take the specified flow ID and check whether it exists
+		FlowID := ElementParameters.flowID
 		
-		if not x_FlowExistsByName(FlowName)
+		if not x_FlowExists(FlowID)
 		{
-			return x_finish(Environment,"exception",x_lang("Flow '%1%' does not exist",FlowName))
+			return x_finish(Environment, "exception", x_lang("Flow '%1%' does not exist", FlowID))
 		}
 	}
-	FlowID:=x_getFlowIDByName(FlowName)
-	
 	
 	if (ElementParameters.WhichTrigger = "Any")
 	{
-		
+		; any trigger is selected. We can enable the flow
 		if (ElementParameters.Enable = "Enable")
-			x_FlowEnable(FlowID)
-		else if (ElementParameters.Enable = "Disable")
-			x_FlowDisable(FlowID)
-		return x_finish(Environment,"normal")
-	
+			x_flowEnable(FlowID)
+		Else
+			x_flowDisable(FlowID)
+		
+		return x_finish(Environment, "normal")
 	}
-	else 
+	else if (ElementParameters.WhichTrigger = "Default")
 	{
-		if (ElementParameters.WhichTrigger = "Default")
+		; default trigger is selected. We have to find the ID of the default trigger
+		
+		; we can call this function. If we keep the name empty, it will seek for the default trigger
+		TriggerID := x_getDefaultManualTriggerID(FlowID)
+		if (TriggerID)
 		{
-			TriggerName := ""
+			; there is a manual trigger. We can enable it
+			if (ElementParameters.Enable = "Enable")
+				x_triggerEnable(FlowID, TriggerID)
+			Else
+				x_triggerDisable(FlowID, TriggerID)
+
+			return x_finish(Environment, "normal")
+		}
+		Else
+		{
+			; there is no manual trigger. finish with error.
+			return x_finish(Environment, "exception", x_lang("Flow '%1%' does not have any manual trigger.", FlowID))
+		}
+	}
+	else if (ElementParameters.WhichTrigger = "Specific")
+	{
+		; a specific trigger is selected
+		TriggerID := ElementParameters.TriggerID
+
+		; check whether trigger ID is set
+		if (TriggerID = "")
+		{
+			return x_finish(Environment, "exception", x_lang("Trigger ID is empty"))
+		}
+		
+		; check whether specified trigger exists
+		if (x_elementExists(FlowID, TriggerID))
+		{
+			; specified trigger exists. Enable it
+			if (ElementParameters.Enable = "Enable")
+				x_triggerEnable(FlowID, TriggerID)
+			Else
+				x_triggerDisable(FlowID, TriggerID)
+			
+			return x_finish(Environment, "normal")
 		}
 		else
 		{
-			TriggerName := x_replaceVariables(Environment, ElementParameters.triggerName)
-			if (TriggerName ="")
-			{
-				return x_finish(Environment,"exception",x_lang("Trigger name is empty",FlowName))
-			}
+			; specified trigger does not exist. finish with error.
+			return x_finish(Environment, "exception", x_lang("Flow '%1%' does not have the trigger with ID '%2%'.", FlowID, TriggerID))
 		}
-		
-		if not x_ManualTriggerExist(FlowID, TriggerName)
-		{
-			return x_finish(Environment,"exception",x_lang("Trigger '%1%' in flow '%2%' does not exist",TriggerNameText, FlowName))
-		}
-		
-		if (ElementParameters.Enable = 1)
-			x_ManualTriggerEnable(FlowID,TriggerName)
-		else if (ElementParameters.Enable = 2)
-			x_ManualTriggerDisable(FlowID,TriggerName)
-		return x_finish(Environment,"normal")
-		
 	}
-	
-	
-	return
+	Else
+	{
+		return x_finish(Environment, "exception", x_lang("Unexpected Error!") " " x_lang("Parameter '%1%' is invalid.", "WhichTrigger"))
+	}
 }
 
 

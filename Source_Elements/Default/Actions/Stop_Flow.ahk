@@ -52,8 +52,8 @@ Element_getStabilityLevel_Action_Stop_Flow()
 Element_getParametrizationDetails_Action_Stop_Flow(Environment)
 {
 	parametersToEdit:=Object()
-	parametersToEdit.push({type: "Label", label: x_lang("Flow_name")})
-	parametersToEdit.push({type: "Edit", id: "flowName", content: "String", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: x_lang("Which flow")})
+	parametersToEdit.push({type: "DropDown", id: "flowID", WarnIfEmpty: true, result: "enum", choices: [], enum: []})
 
 	return parametersToEdit
 }
@@ -61,7 +61,7 @@ Element_getParametrizationDetails_Action_Stop_Flow(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Stop_Flow(Environment, ElementParameters)
 {
-	return % x_lang("Stop_Flow") ": " ElementParameters.flowName
+	return % x_lang("Stop_Flow") " - " x_getFlowName(ElementParameters.flowID)
 	
 }
 
@@ -69,29 +69,48 @@ Element_GenerateName_Action_Stop_Flow(Environment, ElementParameters)
 ;This function allows to check the integrity of the parameters. For example you can:
 ;- Disable options which are not available because of other options
 ;- Correct misconfiguration
-Element_CheckSettings_Action_Stop_Flow(Environment, ElementParameters)
+Element_CheckSettings_Action_Stop_Flow(Environment, ElementParameters, staticValues)
 {	
-	
+	; we need to fill the flow list on first call
+	if (x_FirstCallOfCheckSettings(Environment))
+	{
+		; get list of flows
+		choicesFlowIDs := x_GetListOfFlowIDs()
+		choicesFlowNames := []
+		for oneFlowIndex, oneFlowID in choicesFlowIDs
+		{
+			choicesFlowNames.push(oneFlowID ": " x_getFlowName(oneFlowID))
+		}
+		
+		; set choices
+		x_Par_SetChoices("flowID", choicesFlowNames, choicesFlowIDs)
+
+		; select flow
+		flowID := ElementParameters.flowID
+		if (not flowID)
+		{
+			; there is no flow ID specified. Set current flow ID
+			flowID := x_GetMyFlowID(Environment)
+		}
+		x_Par_SetValue("flowID", flowID)
+	}
 }
 
 ;Called when the element should execute.
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Stop_Flow(Environment, ElementParameters)
 {
-	FlowName := x_replaceVariables(Environment, ElementParameters.flowName)
+	FlowID := ElementParameters.FlowID
 	
-	if x_FlowExistsByName(FlowName)
+	if x_FlowExists(FlowID)
 	{
-		FlowID:=x_getFlowIDByName(FlowName)
 		x_FlowStop(FlowID)
 		return x_finish(Environment,"normal")
-		
 	}
 	else
 	{
-		return x_finish(Environment,"exception",x_lang("Flow '%1%' does not exist",FlowName))
+		return x_finish(Environment,"exception", x_lang("Flow '%1%' does not exist", FlowID))
 	}
-	return
 }
 
 ;Called when the execution of the element should be stopped.

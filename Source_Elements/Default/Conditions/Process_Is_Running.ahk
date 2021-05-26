@@ -70,7 +70,7 @@ Element_GenerateName_Condition_Process_Is_Running(Environment, ElementParameters
 ;This function allows to check the integrity of the parameters. For example you can:
 ;- Disable options which are not available because of other options
 ;- Correct misconfiguration
-Element_CheckSettings_Condition_Process_Is_Running(Environment, ElementParameters)
+Element_CheckSettings_Condition_Process_Is_Running(Environment, ElementParameters, staticValues)
 {	
 	
 }

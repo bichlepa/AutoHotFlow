@@ -64,7 +64,7 @@
     },
     "element0000000010": {
       "class": "Trigger_User_Idle_Time",
-      "enabled": "1",
+      "enabled": "0",
       "ID": "element0000000010",
       "name": "User Idle Time",
       "package": "default",
@@ -112,7 +112,7 @@
     },
     "element0000000017": {
       "class": "Trigger_Time_Of_Day",
-      "enabled": "1",
+      "enabled": "0",
       "ID": "element0000000017",
       "name": "Time Of Day",
       "package": "default",

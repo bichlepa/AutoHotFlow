@@ -83,7 +83,7 @@ Element_GenerateName_Action_Move_Mouse(Environment, ElementParameters)
 ;This function allows to check the integrity of the parameters. For example you can:
 ;- Disable options which are not available because of other options
 ;- Correct misconfiguration
-Element_CheckSettings_Action_Move_Mouse(Environment, ElementParameters)
+Element_CheckSettings_Action_Move_Mouse(Environment, ElementParameters, staticValues)
 {	
 	
 	if (ElementParameters.SendMode = "input")

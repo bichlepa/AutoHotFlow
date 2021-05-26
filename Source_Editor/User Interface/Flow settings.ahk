@@ -18,7 +18,7 @@ ui_SettingsOfFlow()
 	gui, font, s8 cDefault wnorm
 	
 	; get current setting
-	local executionPolicy := _getFlowProperty(FlowID, "flowSettings.ExecutionPolicy")
+	local executionPolicy := _getFlowProperty(_FlowID, "flowSettings.ExecutionPolicy")
 	; add the radio buttons and check the selected option
 	if (executionPolicy = "default")
 		tempchecked := 1
@@ -51,12 +51,12 @@ ui_SettingsOfFlow()
 	gui, add, text, x10 w300 Y+15, % lang("Working directory")
 	gui, font, s8 cDefault wnorm
 	
-	if (_getFlowProperty(FlowID, "flowSettings.DefaultWorkingDir"))
+	if (_getFlowProperty(_FlowID, "flowSettings.DefaultWorkingDir"))
 		tempchecked := 1
 	else
 		tempchecked := 0
 	gui, add, Checkbox, w300 x10 Y+10 vGuiFlowSettingsDefaultWorkingDir checked%tempchecked% gGuiFlowSettingsDefaultWorkingDir, % lang("Use global working dir")
-	gui, add, Edit, w300 x10 Y+10 r3 vGuiFlowSettingsWorkingDir disabled%tempchecked%, % _getFlowProperty(FlowID, "flowSettings.WorkingDir")
+	gui, add, Edit, w300 x10 Y+10 r3 vGuiFlowSettingsWorkingDir disabled%tempchecked%, % _getFlowProperty(_FlowID, "flowSettings.WorkingDir")
 	
 	; show debug options
 	gui, font, s10 cnavy wbold
@@ -87,7 +87,7 @@ ui_SettingsOfFlow()
 	
 	; react if user wants to show the log
 	GuiFlowSettingsButtonShowLog:
-	showlog(_getFlowProperty(FlowID, "Name"))
+	showlog(_getFlowProperty(_FlowID, "Name"))
 	return
 	
 	; react if user changes the working directory
@@ -126,20 +126,20 @@ ui_SettingsOfFlow()
 		}
 
 		; check whether parameter WorkingDir changed
-		if (GuiFlowSettingsWorkingDir != _getFlowProperty(FlowID, "flowSettings.WorkingDir"))
+		if (GuiFlowSettingsWorkingDir != _getFlowProperty(_FlowID, "flowSettings.WorkingDir"))
 		{
 			; write the changed value
 			someSettingChanged := true
-			_setFlowProperty(FlowID, "flowSettings.WorkingDir", GuiFlowSettingsWorkingDir)
+			_setFlowProperty(_FlowID, "flowSettings.WorkingDir", GuiFlowSettingsWorkingDir)
 		}
 	}
 
 	; check whether parameter DefaultWorkingDir changed
-	if (_getFlowProperty(FlowID, "flowSettings.DefaultWorkingDir") != GuiFlowSettingsDefaultWorkingDir)
+	if (_getFlowProperty(_FlowID, "flowSettings.DefaultWorkingDir") != GuiFlowSettingsDefaultWorkingDir)
 	{
 		; write the changed value
 		someSettingChanged := true
-		_setFlowProperty(FlowID, "flowSettings.DefaultWorkingDir", GuiFlowSettingsDefaultWorkingDir)
+		_setFlowProperty(_FlowID, "flowSettings.DefaultWorkingDir", GuiFlowSettingsDefaultWorkingDir)
 	}
 	
 	; find the selected execution policy
@@ -155,17 +155,17 @@ ui_SettingsOfFlow()
 		tempExecutionPolicy := "stop"
 	
 	; check whether parameter ExecutionPolicy changed
-	if (_getFlowProperty(FlowID, "flowSettings.ExecutionPolicy") != tempExecutionPolicy)
+	if (_getFlowProperty(_FlowID, "flowSettings.ExecutionPolicy") != tempExecutionPolicy)
 	{
 		; write the changed value
-		_setFlowProperty(FlowID, "flowSettings.ExecutionPolicy", tempExecutionPolicy)
+		_setFlowProperty(_FlowID, "flowSettings.ExecutionPolicy", tempExecutionPolicy)
 		someSettingChanged := true
 	}
 	
 	if someSettingChanged := true
 	{
 		; a parameter has changed. Create a new state.
-		State_New(FlowID)
+		State_New(_FlowID)
 	}
 
 	; destroy gui and enable editor gui

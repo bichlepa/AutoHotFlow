@@ -14,20 +14,20 @@ EditorGUIInit()
 	gui,-dpiscale ; DPI Scaling would cause diffilcuties when calculating mouse coordinates
 	; Add a statsu bar
 	gui,add,StatusBar,hwnd_StatusbarHWND
-	_setSharedProperty("hwnds.editGUIStatusbar" FlowID, _StatusbarHWND)
+	_setSharedProperty("hwnds.editGUIStatusbar" _FlowID, _StatusbarHWND)
 	_setSharedProperty("hwnds.editGUIStatusbar" Global_ThisThreadID, _StatusbarHWND)
 
 	; Add an hidden control, to avoid error sound when user presses keys while this window is open
 	gui,add,hotkey,hidden hwnd_EditControlHWND
-	_setSharedProperty("hwnds.editGUIEditControl" FlowID, _EditControlHWND)
+	_setSharedProperty("hwnds.editGUIEditControl" _FlowID, _EditControlHWND)
 	_setSharedProperty("hwnds.editGUIEditControl" Global_ThisThreadID, _EditControlHWND)
 	gui +resize
 
 	;Store information which is needed by the draw thread
 	gui,+Hwnd_EditorGuiHwnd
-	_setSharedProperty("hwnds.editGUI" FlowID, _EditorGuiHwnd)
+	_setSharedProperty("hwnds.editGUI" _FlowID, _EditorGuiHwnd)
 	_setSharedProperty("hwnds.editGUI" Global_ThisThreadID, _EditorGuiHwnd)
-	_setSharedProperty("hwnds.editGUIDC" FlowID, GetDC(_EditorGuiHwnd))
+	_setSharedProperty("hwnds.editGUIDC" _FlowID, GetDC(_EditorGuiHwnd))
 	_setSharedProperty("hwnds.editGUIDC" Global_ThisThreadID, GetDC(_EditorGuiHwnd))
 	
 	; find out the height of the status bar, so we can calculate the available space for the rendered picture
@@ -61,7 +61,7 @@ EditGUIshow()
 
 
 	; show window
-	flowName := _getFlowProperty(FlowID, "Name")
+	flowName := _getFlowProperty(_FlowID, "Name")
 	if (Editor_guiAlreadyShown=true)
 	{
 		 ;Added  w%widthofguipic% to trigger the guisize label
@@ -110,7 +110,7 @@ EditGUIEnable()
 	global_CurrentlyMainGuiIsDisabled:=false
 	
 	; redraw picture
-	API_Draw_Draw(FlowID)
+	API_Draw_Draw(_FlowID)
 }
 
 
@@ -127,14 +127,14 @@ EditGUIGetPos()
 WindowGetsActive()
 {
 	; redraw the picture
-	API_Draw_Draw(FlowID)
+	API_Draw_Draw(_FlowID)
 }
 
 ; react if window gets moved
 WindowGetsMoved()
 {
 	; redraw the picture
-	API_Draw_Draw(FlowID)
+	API_Draw_Draw(_FlowID)
 }
 
 ; user clicked with left mouse button
@@ -276,14 +276,14 @@ ui_UpdateStatusbartext(which="")
 	if (which != "pos")
 	{
 		; update element text if not only the position needs to be updated
-		selectedElements := _getFlowProperty(FlowID, "selectedElements")
+		selectedElements := _getFlowProperty(_FlowID, "selectedElements")
 		if (selectedElements.count()=0)
 		{
-			elementtext:=lang("%1% elements", _getAllElementIds(FlowID).count())
+			elementtext:=lang("%1% elements", _getAllElementIds(_FlowID).count())
 		}
 		else if (selectedElements.count()=1)
 		{
-			elementtext:=lang("1 selected element: %1%",_getFlowProperty(FlowID, "selectedElement"))
+			elementtext:=lang("1 selected element: %1%",_getFlowProperty(_FlowID, "selectedElement"))
 		}
 		else
 		{
@@ -291,9 +291,9 @@ ui_UpdateStatusbartext(which="")
 		}
 	}
 	; get position informations
-	offsetx := _getFlowProperty(FlowID, "flowSettings.offsetx")
-	offsety := _getFlowProperty(FlowID, "flowSettings.offsety")
-	zoomFactor := _getFlowProperty(FlowID, "flowSettings.zoomFactor")
+	offsetx := _getFlowProperty(_FlowID, "flowSettings.offsetx")
+	offsety := _getFlowProperty(_FlowID, "flowSettings.offsety")
+	zoomFactor := _getFlowProperty(_FlowID, "flowSettings.zoomFactor")
 
 	; update status bar text
 	gui,maingui:default
@@ -307,12 +307,12 @@ ui_OnLanguageChange()
 	local temp
 
 	; Redraw the flow
-	API_Draw_Draw(FlowID)
+	API_Draw_Draw(_FlowID)
 
 	DetectHiddenWindows off
 	WinGetTitle, temp, % "ahk_id " _EditorGuiHwnd
 	
-	flowName := _getFlowProperty(FlowID, "Name")
+	flowName := _getFlowProperty(_FlowID, "Name")
 	IfWinExist,% temp
 		gui,MainGUI:show,,% "·AutoHotFlow· " lang("Editor") " - " flowName 
 	else
@@ -336,11 +336,11 @@ MainGUIguisize()
 	; calculate and share the available space for the picture 
 	heightofguipic:=a_guiheight - EditGUI_StatusBarHeight
 	widthofguipic:=a_guiwidth
-	_setFlowProperty(FlowID, "draw.heightofguipic", heightofguipic)
-	_setFlowProperty(FlowID, "draw.widthofguipic", widthofguipic)
+	_setFlowProperty(_FlowID, "draw.heightofguipic", heightofguipic)
+	_setFlowProperty(_FlowID, "draw.widthofguipic", widthofguipic)
 
 	; Redraw the picture
-	API_Draw_Draw(FlowID)
+	API_Draw_Draw(_FlowID)
 }
 
 ; returns the gui client size

@@ -27,10 +27,10 @@ class ElementSettings
 
 		; save some information about the element which we will need repeadetely
 		this.element := setElementID
-		this.elementType := _getElementProperty(FlowID, this.element, "type")
-		this.elementClass := _getElementProperty(FlowID, this.element, "Class")
-		this.elementName := _getElementProperty(FlowID, this.element, "Name")
-		this.elementPars := _getElementProperty(FlowID, this.element, "pars")
+		this.elementType := _getElementProperty(_FlowID, this.element, "type")
+		this.elementClass := _getElementProperty(_FlowID, this.element, "Class")
+		this.elementName := _getElementProperty(_FlowID, this.element, "Name")
+		this.elementPars := _getElementProperty(_FlowID, this.element, "pars")
 
 		if (not this.elementType)
 		{
@@ -55,6 +55,10 @@ class ElementSettings
 		this.initializing := true
 		this.generalUpdateRunning := true
 
+		; object which will be passed to the Element_CheckSettings_...() function.
+		; The element function can store some static values there which will be kept while the element settings window is open.
+		this.staticValuesForCheckSettingsFunction := []
+
 		; this variable will help us not to miss any user input
 		this.tasks := []
 
@@ -65,7 +69,7 @@ class ElementSettings
 		gui, -DPIScale
 		
 		;Get the parameter list
-		this.parametersToEdit := Element_getParametrizationDetails(this.elementClass, {flowID: FlowID, elementID: this.elementID}, true)
+		this.parametersToEdit := Element_getParametrizationDetails(this.elementClass, {flowID: _FlowID, elementID: this.elementID}, true)
 
 		; add first gui elements
 		; All elements have the parameter "name" and "StandardName"
@@ -274,17 +278,17 @@ class ElementSettings
 		ElementSettings.generalUpdate()
 		
 		;If editing a trigger, disable it (and enable it afterwards)
-		if (ElementSettings.elementType = "trigger" and _getElementInfo(FlowID, ElementSettings.element, "enabled") = true)
+		if (ElementSettings.elementType = "trigger" and _getElementInfo(_FlowID, ElementSettings.element, "enabled") = true)
 		{
 			tempReenablethen := true
-			disableOneTrigger(FlowID, ElementSettings.element, false)
+			disableOneTrigger(_FlowID, ElementSettings.element, false)
 		}
 		else
 			tempReenablethen := false
 		
 		;Save the parameters
-		_setElementProperty(FlowID, ElementSettings.element, "Name", ElementSettings.NameField.getValue("Name"))
-		_setElementProperty(FlowID, ElementSettings.element, "StandardName", ElementSettings.NameField.getValue("StandardName"))
+		_setElementProperty(_FlowID, ElementSettings.element, "Name", ElementSettings.NameField.getValue("Name"))
+		_setElementProperty(_FlowID, ElementSettings.element, "StandardName", ElementSettings.NameField.getValue("StandardName"))
 		
 		; get all parameter values
 		allParamValues := ElementSettings.getAllValues()
@@ -293,20 +297,20 @@ class ElementSettings
 		for oneID, oneValue in allParamValues
 		{
 			; find out whether there were some changes
-			tempOldValue := _getElementProperty(FlowID, ElementSettings.element, "pars." oneID)
+			tempOldValue := _getElementProperty(_FlowID, ElementSettings.element, "pars." oneID)
 			if (tempOldValue != oneValue)
 			{
 				; change detected
 				ElementSettings.changes++
 				; write changed value
-				_setElementProperty(FlowID, ElementSettings.element, "pars." oneID, oneValue)
+				_setElementProperty(_FlowID, ElementSettings.element, "pars." oneID, oneValue)
 			}
 		}
 		
 		;If editing a trigger which we have disabled previously, reenable it
 		if (tempReenablethen)
 		{
-			enableOneTrigger(FlowID, ElementSettings.element, false)
+			enableOneTrigger(_FlowID, ElementSettings.element, false)
 		}
 		
 		; close the element settings gui
@@ -394,7 +398,7 @@ class ElementSettings
 				}
 				Else
 				{
-					logger("a0", "cannot get value of field which has no parameter ID. (field class: " this.__Class ")", flowID)
+					logger("a0", "cannot get value of field which has no parameter ID. (field class: " this.__Class ")", _FlowID)
 				}
 				return temp
 			}
@@ -422,7 +426,7 @@ class ElementSettings
 				}
 
 				; if we are here, we did not find a field for this parameter ID
-				logger("a0", "cannot get value of field, since parameter ID ''" parameterID "'' was not found. (field class: " this.__Class ")", flowID)
+				logger("a0", "cannot get value of field, since parameter ID ''" parameterID "'' was not found. (field class: " this.__Class ")", _FlowID)
 			}
 			return 
 		}
@@ -447,7 +451,7 @@ class ElementSettings
 				}
 				Else
 				{
-					logger("a0", "cannot set value of field which has no parameter ID. (field class: " this.__Class ")", flowID)
+					logger("a0", "cannot set value of field which has no parameter ID. (field class: " this.__Class ")", _FlowID)
 				}
 			}
 			else
@@ -476,7 +480,7 @@ class ElementSettings
 				}
 
 				; if we are here, we did not find a field for this parameter ID
-				logger("a0", "cannot set value of field, since parameter ID ''" parameterID "'' was not found. (field class: " this.__Class ")", flowID)
+				logger("a0", "cannot set value of field, since parameter ID ''" parameterID "'' was not found. (field class: " this.__Class ")", _FlowID)
 			}
 
 			; update some general values (e.g. element name)
@@ -488,13 +492,13 @@ class ElementSettings
 		; If parameterID is empty, the choices for the first (or the only) parameter of the field will be set
 		; If parameterID is set, this function will check whether the curernt class instance has the parameterID and then set it,
 		;     otherwise it will find the object which contains the parameterID and call its setChoices() function.
-		setChoices(value, parameterID = "")
+		setChoices(p_Choices, p_Enums = "", parameterID = "")
 		{
 			global
 			local foundField
 			if (not parameterID)
 			{
-				logger("a0", "cannot set choices of current field. It is not implemented for this field type. (field class: " this.__Class ")", flowID)
+				logger("a0", "cannot set choices of current field. It is not implemented for this field type. (field class: " this.__Class ")", _FlowID)
 			}
 			else
 			{
@@ -503,25 +507,25 @@ class ElementSettings
 				foundField := ElementSettings.fieldParIDs[parameterID]
 				if (foundField)
 				{
-					foundField.setChoices(value, parameterID)
+					foundField.setChoices(p_Choices, p_Enums, parameterID)
 				}
 
 				; if we are here, we did not find a field for this parameter ID
-				logger("a0", "cannot set choices of field, since parameter ID ''" parameterID "'' was not found. (field class: " this.__Class ")", flowID)
+				logger("a0", "cannot set choices of field, since parameter ID ''" parameterID "'' was not found. (field class: " this.__Class ")", _FlowID)
 			}
 		}
 		
 		; Set label of a field
 		; If parameterID is empty, the choices for the first (or the only) parameter of the field will be set
 		; If parameterID is set, this function will check whether the curernt class instance has the parameterID and then set it,
-		;     otherwise it will find the object which contains the parameterID and call its setChoices() function.
+		;     otherwise it will find the object which contains the parameterID and call its setLabel() function.
 		setLabel(value, parameterID = "")
 		{
 			global
 			local foundField
 			if (not parameterID)
 			{
-				logger("a0", "cannot set label of current field. It is not implemented for this field type. (field class: " this.__Class ")", flowID)
+				logger("a0", "cannot set label of current field. It is not implemented for this field type. (field class: " this.__Class ")", _FlowID)
 			}
 			else
 			{
@@ -535,7 +539,7 @@ class ElementSettings
 				}
 
 				; if we are here, we did not find a field for this parameter ID
-				logger("a0", "cannot set label of field, since parameter ID ''" parameterID "'' was not found. (field class: " this.__Class ")", flowID)
+				logger("a0", "cannot set label of field, since parameter ID ''" parameterID "'' was not found. (field class: " this.__Class ")", _FlowID)
 			}
 		}
 		
@@ -600,7 +604,7 @@ class ElementSettings
 
 				; if we are here, we did not find a field for this parameter ID
 				tempString := enOrDis ? "enable" : "disable"
-				logger("a0", "cannot " tempString " a field, since parameter ID ''" parameterID "'' was not found. (field class: " this.__Class ")", flowID)
+				logger("a0", "cannot " tempString " a field, since parameter ID ''" parameterID "'' was not found. (field class: " this.__Class ")", _FlowID)
 			}
 		}
 
@@ -1014,7 +1018,7 @@ class ElementSettings
 			gui, font, s8 cDefault wnorm
 			
 			; add the checkbox for the parameter "StandardName"
-			tempchecked := _getElementProperty(FlowID, ElementSettings.element, "StandardName")
+			tempchecked := _getElementProperty(_FlowID, ElementSettings.element, "StandardName")
 			gui,add,checkbox, x10 hwndtempHWND checked%tempchecked% vGUISettingsOfElementStandardName gGUISettingsOfElementCheckStandardName, % lang("Default name")
 			this.components.push("GUISettingsOfElementStandardName")
 			ElementSettings.fieldHWNDs[tempHWND] := this
@@ -1042,7 +1046,7 @@ class ElementSettings
 				; the default name is enabled. We will disable the name field and generate the name
 				this.disable("Name")
 				setElementClass := ElementSettings.elementClass
-				Newname := Element_GenerateName_%setElementClass%({flowID: FlowID, ElementID: ElementSettings.element}, p_CurrentPars) 
+				Newname := Element_GenerateName_%setElementClass%({flowID: _FlowID, ElementID: ElementSettings.element}, p_CurrentPars) 
 				; the element function may return some linefeeds. We will replace them.
 				StringReplace, Newname, Newname, `n, %a_space%-%a_space%, all
 				this.setvalue(Newname, "Name")
@@ -1573,7 +1577,7 @@ class ElementSettings
 			
 			if (parameter.result != "number" and parameter.result != "string" and parameter.result != "enum")
 			{
-				logger("a0", "Parameter 'result' ''" parameter.result "'' is unset or has unsupported value. (field class: " this.__Class ")", flowID)
+				logger("a0", "Parameter 'result' ''" parameter.result "'' is unset or has unsupported value. (field class: " this.__Class ")", _FlowID)
 				return
 			}
 
@@ -1585,9 +1589,11 @@ class ElementSettings
 			; copy some paramters in local variables
 			local tempParameterID := parameter.id[1]
 			local tempValue := ElementSettings.elementPars[tempParameterID] 
-			local tempChoises := parameter.choices
-			local tempEnums := parameter.enum
 			
+			; the choices can be set after the control was created. We will save the initial value
+			this.par_choices := parameter.choices
+			this.par_enum := parameter.enum
+
 			; decide, whether we will need altSubmit
 			if (parameter.result = "number" or parameter.result = "enum")
 			{
@@ -1603,7 +1609,7 @@ class ElementSettings
 			
 			;loop through all choices. Find which one to select. Make a selection list which is suitable for the gui,add command
 			local tempAllChoices := ""
-			for tempIndex, TempOneChoice in tempChoises
+			for tempIndex, TempOneChoice in this.par_choices
 			{
 				; find out whether the current value should be selected
 				if (parameter.result = "string")
@@ -1613,7 +1619,7 @@ class ElementSettings
 				}
 				else
 				{
-					if (tempValue = A_Index or tempValue = tempEnums[A_Index])
+					if (tempValue = A_Index or tempValue = this.par_enum[A_Index])
 						temptoChoose := A_Index
 				}
 
@@ -1626,7 +1632,8 @@ class ElementSettings
 			gui, font, s8 cDefault wnorm
 
 			; add the dropdown control
-			gui, add, DropDownList, w400 x10 %tempAltSumbit% choose%temptoChoose% hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID%, % tempAllChoices
+			gui, add, DropDownList, w400 x10 %tempAltSumbit% hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID%, % tempAllChoices
+			GUIControl, GUISettingsOfElement:choose, GUISettingsOfElement%tempParameterID%, % temptoChoose
 			this.components.push("GUISettingsOfElement" tempParameterID)
 			ElementSettings.fieldHWNDs[tempHWND] := this
 		}
@@ -1636,13 +1643,16 @@ class ElementSettings
 		{
 			global
 			local temp
+
+			; copy some paramters in local variables
+			local tempParameterID := this.parameter.id[1]
 			
 			; reuse the base function
-			temp := base.getvalue(parameterID)
+			temp := base.getvalue(tempParameterID)
 
 			; if we should return the enum value as result, convert the index to enum string 
 			if (this.parameter.result = "enum")
-				temp := this.parameter.Enum[temp]
+				temp := this.par_enum[temp]
 			
 			return temp
 		}
@@ -1651,35 +1661,60 @@ class ElementSettings
 		setvalue(value, parameterID = "") ; override
 		{
 			global
-
 			; copy some paramters in local variables
 			local tempParameterID := this.parameter.id[1]
 
 			; decide how to set the value depending on the result type
-			if (parameter.result = "number")
+			if (this.parameter.result = "number")
 			{
 				; select the value with given index
-				GUIControl, GUISettingsOfElement:choose, GUISettingsOfElement%tempParameterID%, value
+				GUIControl, GUISettingsOfElement:choose, GUISettingsOfElement%tempParameterID%, % value
 			}
-			else if (parameter.result = "enum")
+			else if (this.parameter.result = "enum")
 			{
+				valueIndex := 0
+
 				; find the enum value index
-				loop % this.parameter.choices.MaxIndex()
+				loop % this.par_choices.MaxIndex()
 				{
-					if (this.parameter.Enum[a_index] = value)
+					if (this.par_enum[a_index] = value)
 					{
-						value := a_index
+						valueIndex := a_index
 						break
 					}
 				}
 				; select the value with found index
-				GUIControl, GUISettingsOfElement:choose, GUISettingsOfElement%tempParameterID%, value
+				GUIControl, GUISettingsOfElement:choose, GUISettingsOfElement%tempParameterID%, % valueIndex
 			}
-			else if (parameter.result = "string")
+			else if (this.parameter.result = "string")
 			{
 				; select the value with given string
-				GUIControl, GUISettingsOfElement:chooseString, GUISettingsOfElement%tempParameterID%, value
+				GUIControl, GUISettingsOfElement:chooseString, GUISettingsOfElement%tempParameterID%, % value
 			}
+		}
+
+		; change the available choices of the listview
+		setChoices(p_Choices, p_Enums = "", parameterID = "")
+		{
+			global
+			
+			; copy some paramters in local variables
+			local tempParameterID := this.parameter.id[1]
+			
+			; the value contains an array of choices. We need to convert it to delimited string
+			local tempAllChoices := ""
+			for tempIndex, TempOneChoice in p_Choices
+			{
+				tempAllChoices .= "|" TempOneChoice
+			}
+
+			; keep the choices in variable
+			this.par_choices := p_Choices
+			this.par_enum := p_Enums
+			
+			; set the choices in control
+			GUIControl, GUISettingsOfElement:, GUISettingsOfElement%tempParameterID%, % tempAllChoices
+			return
 		}
 	}
 	
@@ -1791,8 +1826,9 @@ class ElementSettings
 			}
 		}
 		
+
 		; change the available choices of the combobox
-		setChoices(value)
+		setChoices(p_Choices, p_Enums)
 		{
 			global
 
@@ -1801,13 +1837,13 @@ class ElementSettings
 			
 			; the value contains an array of choices. We need to convert it to delimited string
 			tempAllChoices := ""
-			for tempIndex, TempOneChoice in value
+			for tempIndex, TempOneChoice in p_Choices
 			{
 				tempAllChoices .= "|" TempOneChoice
 			}
 
 			; keep the choices in variable
-			this.par_choices := value
+			this.par_choices := p_Choices
 			
 			; set the choices in control
 			GUIControl, GUISettingsOfElement:, GUISettingsOfElement%tempParameterID%, % tempAllChoices
@@ -1946,16 +1982,16 @@ class ElementSettings
 					else if (countpars = 2) ;One mandantory parameter
 					{
 						; the function has one mandantory parameter. Pass the environment variable
-						%templabel%({flowID: FlowID, elementID: ElementSettings.element})
+						%templabel%({flowID: _FlowID, elementID: ElementSettings.element})
 					}
 					else
 					{
-						logger("a0", "Parameter 'goto' ''" this.parameter.goto "'' points to a function which has too many parameters. (field class: " this.__Class ")", flowID)
+						logger("a0", "Parameter 'goto' ''" this.parameter.goto "'' points to a function which has too many parameters. (field class: " this.__Class ")", _FlowID)
 					}
 				}
 				else
 				{
-					logger("a0", "Parameter 'goto' ''" this.parameter.goto "'' does not point to any valid label or function. (field class: " this.__Class ")", flowID)
+					logger("a0", "Parameter 'goto' ''" this.parameter.goto "'' does not point to any valid label or function. (field class: " this.__Class ")", _FlowID)
 				}
 			}
 		}
@@ -2220,6 +2256,7 @@ class ElementSettings
 
 			; the choices can be set after the control was created. We will save the initial value
 			this.par_choices := tempChoices
+			this.par_enum := parameter.enum
 			this.par_result := parameter.result
 
 			;loop through all choices. Make a selection list which is suitable for the gui,add command
@@ -2381,14 +2418,24 @@ class ElementSettings
 		GUISettingsOfElementRemoveInfoTooltip()
 		
 		; save the firstCall property. x_FirstCallOfCheckSettings() will return true
-		_setElementProperty(FlowID, ElementSettings.element, "FirstCallOfCheckSettings", firstCall)
+		_setElementProperty(_FlowID, ElementSettings.element, "FirstCallOfCheckSettings", firstCall)
 
 		; get all parameter values
-		allParamValues := ElementSettings.getAllValues()
+		if (firstCall)
+		{
+			; There are flows where some parametration options are generated on first call of "Element_CheckSettings_...()"
+			; So there may be values which cannot be set in the gui before the parametration options are generated.
+			; Therefore we need to pass the original actual settings and not get them from the gui.
+			allParamValues := ObjFullyClone(this.elementPars)
+		}
+		Else
+		{
+			allParamValues := ElementSettings.getAllValues()
+		}
 
 		; let the element function Element_CheckSettings_xxx check the settings
 		setElementClass := ElementSettings.elementClass
-		Element_CheckSettings_%setElementClass%({FlowID: FlowID, ElementID: ElementSettings.element}, allParamValues)
+		Element_CheckSettings_%setElementClass%({FlowID: _FlowID, ElementID: ElementSettings.element}, allParamValues, this.staticValuesForCheckSettingsFunction)
 		
 		; update the element name
 		ElementSettings.NameField.updatename(allParamValues)

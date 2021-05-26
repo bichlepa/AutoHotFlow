@@ -21,8 +21,8 @@ ui_showHelp(elementID)
 	gui, Help: -dpiscale
 
 	; copy some information to local variables
-	local elementType := _getElementProperty(FlowID, elementID, "type")
-	local elementClass := _getElementProperty(FlowID, elementID, "Class")
+	local elementType := _getElementProperty(_FlowID, elementID, "type")
+	local elementClass := _getElementProperty(_FlowID, elementID, "Class")
 	local elementHelpFilepath := elementType "s\" StrReplace(elementClass, elementType "_")
 	local uiLang := _getSettings("UILanguage")
 

@@ -69,7 +69,7 @@ Element_GenerateName_Condition_File_Exists(Environment, ElementParameters)
 ;This function allows to check the integrity of the parameters. For example you can:
 ;- Disable options which are not available because of other options
 ;- Correct misconfiguration
-Element_CheckSettings_Condition_File_Exists(Environment, ElementParameters)
+Element_CheckSettings_Condition_File_Exists(Environment, ElementParameters, staticValues)
 {	
 	
 }
@@ -87,13 +87,14 @@ Element_run_Condition_File_Exists(Environment, ElementParameters)
 		return
 	}
 	
+	; if file path is relative, convert it to full path
 	file := x_GetFullPath(Environment, EvaluatedParameters.file)
 
-	
+	; check whether file exists and finish
 	IfExist, % file
-		x_finish(Environment,"yes")
+		x_finish(Environment, "yes")
 	else
-		x_finish(Environment,"no")
+		x_finish(Environment, "no")
 		
 	return
 }

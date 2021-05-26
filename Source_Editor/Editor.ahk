@@ -112,7 +112,7 @@ queryTasks()
 	global
 	Loop
 	{
-		oneTask:=_getTask("editor" FlowID)
+		oneTask:=_getTask("editor" _FlowID)
 		if (oneTask)
 		{
 			name:=oneTask.name
@@ -123,7 +123,7 @@ queryTasks()
 			}
 			if (name="exit")
 			{
-				ToolTip, % "exit " flowID
+				ToolTip, % "exit " _FlowID
 				; the editor gui should be closed. We close the thread
 				ExitApp
 			}
@@ -137,11 +137,11 @@ queryTasks()
 }
 
 ; Functions which are defined in api Caller to Editor.
-API_Editor_EditGUIshow(FlowID) ;Api function which is used in common code
+API_Editor_EditGUIshow(p_FlowID) ;Api function which is used in common code
 {
 	EditGUIshow()
 }
-API_Editor_Exit(par_flowID)
+API_Editor_Exit(p_FlowID)
 {
 	ExitApp
 }
@@ -149,7 +149,7 @@ API_Editor_Exit(par_flowID)
 
 ; Start the exit routine
 exit:
-logger("t1", "editor thread for " flowID " is going to exit")
+logger("t1", "editor thread for " _flowID " is going to exit")
 global _exiting := true
 return
 

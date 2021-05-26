@@ -34,7 +34,7 @@
       "class": "Trigger_Clipboard_Changes",
       "enabled": "0",
       "ID": "element0000000001",
-      "name": "Zwischenablage \u00E4ndert sich",
+      "name": "Clipboard Changes",
       "package": "default",
       "pars": {},
       "StandardName": "1",
@@ -45,7 +45,7 @@
     "element0000000003": {
       "class": "Action_Tooltip",
       "ID": "element0000000003",
-      "name": "Tooltip: clipboard changed: %clipboard% - 2 s #Seconds - Der Maus folgen",
+      "name": "Tooltip: clipboard changed: %clipboard% - 2 s - Follow Mouse",
       "package": "action",
       "pars": {
         "duration": 2,
@@ -61,7 +61,7 @@
     "element0000000006": {
       "class": "Action_Get_Clipboard",
       "ID": "element0000000006",
-      "name": "Zwischenablage holen - clipboard = ^",
+      "name": "Get Clipboard - clipboard = ^",
       "package": "default",
       "pars": {
         "Varname": "clipboard"
@@ -75,7 +75,7 @@
       "class": "Trigger_Clipboard_Changes",
       "enabled": "0",
       "ID": "element0000000007",
-      "name": "Zwischenablage \u00E4ndert sich",
+      "name": "Clipboard Changes",
       "package": "default",
       "pars": {},
       "StandardName": "1",
@@ -89,8 +89,8 @@
   "flowSettings": {
     "DefaultWorkingDir": 1,
     "ExecutionPolicy": "default",
-    "Offsetx": -200,
-    "Offsety": -200,
+    "Offsetx": "-131.428572",
+    "Offsety": "-367.142857",
     "WorkingDir": "",
     "zoomFactor": "0.7"
   },

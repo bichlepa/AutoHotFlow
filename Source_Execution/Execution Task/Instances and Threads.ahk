@@ -61,21 +61,15 @@ newInstance(p_Environment, p_instanceVars = "", p_instanceProperties = "", p_dat
 			newInstance.InstanceVars := Object()
 			newInstance.InstanceVarsHidden := Object()
 			_setInstance(newInstanceId, newInstance)
-
-			if (p_params.ahf_CallBack)
-			{
-				; it is possible that a funtion will be called a soon as the instance stops. If so, we will save the callback function.
-				_setInstanceProperty(newInstanceId, "CallBack", p_params.ahf_CallBack, false)
-			}
 			
 			; create a first thread
 			newThreadID := newThread(newInstanceId)
 			_setThreadProperty(newInstanceId, newThreadID, "ElementID", oneElementID)
 			
 			; We may need to import some instance variables
-			if (p_params.ahf_varstoPass)
+			if (p_instanceVars)
 			{
-				for onevarName, oneValue in p_params.ahf_varstoPass
+				for onevarName, oneValue in p_instanceVars
 				{
 					InstanceVariable_Set({instanceID: newInstanceId, threadID: newThreadID}, onevarName, oneValue)
 				}
@@ -86,7 +80,7 @@ newInstance(p_Environment, p_instanceVars = "", p_instanceProperties = "", p_dat
 			{
 				for onevarName, oneValue in p_instanceProperties
 				{
-					_setInstanceProperty(newInstanceId, onevarName, oneValue)
+					_setInstanceProperty(newInstanceId, onevarName, oneValue, false)
 				}
 			}
 			
@@ -112,10 +106,10 @@ newInstance(p_Environment, p_instanceVars = "", p_instanceProperties = "", p_dat
 	}
 	Else
 	{
-		if (p_params.ahf_CallBack)
+		; it is possible that a funtion will be called a soon as the instance stops. If so, we will call the callback to in form the waiting function that the instance won't be executed.
+		tempCallBackfunc := _getInstanceProperty(p_InstanceID, "callback", false)
+		if (tempCallBackfunc)
 		{
-			; it is possible that a funtion will be called a soon as the instance stops. If so, we will call the callback to in form the waiting function that the instance won't be executed.
-			tempCallBackfunc := p_params.ahf_CallBack
 			%tempCallBackfunc%("skipped", [])
 		}
 	}

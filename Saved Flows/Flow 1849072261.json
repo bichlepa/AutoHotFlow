@@ -139,7 +139,7 @@
     "element0000000002": {
       "class": "Action_AutoHotKey_script",
       "ID": "element0000000002",
-      "name": "AutoHotKey Skript - counter += 1",
+      "name": "AutoHotKey script - counter += 1",
       "package": "default",
       "pars": {
         "ExportVariables": "counter",
@@ -154,7 +154,7 @@
     "element0000000008": {
       "class": "Action_New_variable",
       "ID": "element0000000008",
-      "name": "Neue Variable - counter = 1",
+      "name": "New variable - counter = 1",
       "package": "default",
       "pars": {
         "expression": "string",
@@ -169,7 +169,7 @@
     "element0000000010": {
       "class": "Action_Trace_Point",
       "ID": "element0000000010",
-      "name": "Trace_Point - tall stairs",
+      "name": "Trace Point - tall stairs",
       "package": "default",
       "pars": {
         "ID": "tall stairs",
@@ -184,7 +184,7 @@
     "element0000000014": {
       "class": "Action_Stop_Flow",
       "ID": "element0000000014",
-      "name": "Flow stoppen: external script test",
+      "name": "Stop Flow: external script test",
       "package": "default",
       "pars": {
         "flowName": "external script test"
@@ -197,7 +197,7 @@
     "element0000000015": {
       "class": "Action_AutoHotKey_script",
       "ID": "element0000000015",
-      "name": "AutoHotKey Skript - sleep, 5000 - msgbox, skript wurde nicht gestoppt",
+      "name": "AutoHotKey script - sleep, 5000 - msgbox, skript wurde nicht gestoppt",
       "package": "default",
       "pars": {
         "ExportVariables": "counter",
@@ -212,7 +212,7 @@
     "element0000000017": {
       "class": "Action_AutoHotKey_script",
       "ID": "element0000000017",
-      "name": "AutoHotKey Skript - sleep, 5000 - msgbox, skript wurde nicht gestoppt",
+      "name": "AutoHotKey script - sleep, 5000 - msgbox, skript wurde nicht gestoppt",
       "package": "default",
       "pars": {
         "ExportVariables": "counter",
@@ -228,7 +228,7 @@
       "class": "Trigger_Window_Gets_Active",
       "enabled": "0",
       "ID": "element0000000020",
-      "name": "Fenster wird aktiviert:  - Title begins with: AutoHotkey Help - Fensterklasse: HH Parent - Prozess: hh.exe",
+      "name": "Window Gets Active:  - Title begins with: AutoHotkey Help - Window Class: HH Parent - Prozess: hh.exe",
       "package": "default",
       "pars": {
         "ahk_class": "HH Parent",
@@ -239,6 +239,7 @@
         "excludeTitle": "",
         "FindHiddenText": 0,
         "FindHiddenWindow": 0,
+        "interval": "",
         "NotTriggerOnEnable": "1",
         "TitleMatchMode": 1,
         "winText": "",
@@ -252,7 +253,7 @@
     "element0000000022": {
       "class": "Action_Tooltip",
       "ID": "element0000000022",
-      "name": "Tooltip: Nachricht - 2 s #Seconds - Der Maus folgen",
+      "name": "Tooltip: Nachricht - 2 s - Follow Mouse",
       "package": "action",
       "pars": {
         "duration": 2,
@@ -268,7 +269,7 @@
     "element0000000023": {
       "class": "Action_AutoHotKey_script",
       "ID": "element0000000023",
-      "name": "AutoHotKey Skript - counter += 1",
+      "name": "AutoHotKey script - counter += 1",
       "package": "default",
       "pars": {
         "ExportVariables": "counter",
@@ -283,7 +284,7 @@
     "element0000000024": {
       "class": "Action_AutoHotKey_script",
       "ID": "element0000000024",
-      "name": "AutoHotKey Skript - counter += 1",
+      "name": "AutoHotKey script - counter += 1",
       "package": "default",
       "pars": {
         "ExportVariables": "counter",
@@ -298,7 +299,7 @@
     "element0000000025": {
       "class": "Action_AutoHotKey_script",
       "ID": "element0000000025",
-      "name": "AutoHotKey Skript - counter += 1",
+      "name": "AutoHotKey script - counter += 1",
       "package": "default",
       "pars": {
         "ExportVariables": "counter",
@@ -313,7 +314,7 @@
     "element0000000026": {
       "class": "Action_AutoHotKey_script",
       "ID": "element0000000026",
-      "name": "AutoHotKey Skript - counter += 1",
+      "name": "AutoHotKey script - counter += 1",
       "package": "default",
       "pars": {
         "ExportVariables": "counter",
@@ -328,7 +329,7 @@
     "element0000000027": {
       "class": "Action_AutoHotKey_script",
       "ID": "element0000000027",
-      "name": "AutoHotKey Skript - counter += 1",
+      "name": "AutoHotKey script - counter += 1",
       "package": "default",
       "pars": {
         "ExportVariables": "counter",
@@ -343,7 +344,7 @@
     "element0000000032": {
       "class": "Action_AutoHotKey_script",
       "ID": "element0000000032",
-      "name": "AutoHotKey Skript - counter += 1 - counterPlus10 := counter + 10",
+      "name": "AutoHotKey script - counter += 1 - counterPlus10 := counter + 10",
       "package": "default",
       "pars": {
         "ExportVariables": "counter, counterPlus10 ",
@@ -371,7 +372,7 @@
     "element0000000043": {
       "class": "Action_Tooltip",
       "ID": "element0000000043",
-      "name": "Tooltip: %counter% - %counterplus10% - 2 s #Seconds - Der Maus folgen",
+      "name": "Tooltip: %counter% - %counterplus10% - 2 s - Follow Mouse",
       "package": "action",
       "pars": {
         "duration": 2,
@@ -388,7 +389,7 @@
       "class": "Trigger_Window_Gets_Active",
       "enabled": "0",
       "ID": "element0000000049",
-      "name": "Fenster wird aktiviert:  - Title begins with: AutoHotkey Help - Fensterklasse: HH Parent - Prozess: hh.exe",
+      "name": "Window Gets Active:  - Title begins with: AutoHotkey Help - Window Class: HH Parent - Prozess: hh.exe",
       "package": "default",
       "pars": {
         "ahk_class": "HH Parent",
@@ -399,6 +400,7 @@
         "excludeTitle": "",
         "FindHiddenText": 0,
         "FindHiddenWindow": 0,
+        "interval": "",
         "NotTriggerOnEnable": 1,
         "TitleMatchMode": 1,
         "winText": "",
@@ -413,7 +415,7 @@
       "class": "Trigger_Window_Gets_Active",
       "enabled": "0",
       "ID": "element0000000050",
-      "name": "Fenster wird aktiviert:  - Title begins with: AutoHotkey Help - Fensterklasse: HH Parent - Prozess: hh.exe",
+      "name": "Window Gets Active:  - Title begins with: AutoHotkey Help - Window Class: HH Parent - Prozess: hh.exe",
       "package": "default",
       "pars": {
         "ahk_class": "HH Parent",
@@ -424,6 +426,7 @@
         "excludeTitle": "",
         "FindHiddenText": 0,
         "FindHiddenWindow": 0,
+        "interval": "",
         "NotTriggerOnEnable": 1,
         "TitleMatchMode": 1,
         "winText": "",
@@ -438,7 +441,7 @@
       "class": "Trigger_Window_Gets_Active",
       "enabled": "0",
       "ID": "element0000000051",
-      "name": "Fenster wird aktiviert:  - Title begins with: AutoHotkey Help - Fensterklasse: HH Parent - Prozess: hh.exe",
+      "name": "Window Gets Active:  - Title begins with: AutoHotkey Help - Window Class: HH Parent - Prozess: hh.exe",
       "package": "default",
       "pars": {
         "ahk_class": "HH Parent",
@@ -449,6 +452,7 @@
         "excludeTitle": "",
         "FindHiddenText": 0,
         "FindHiddenWindow": 0,
+        "interval": "",
         "NotTriggerOnEnable": 1,
         "TitleMatchMode": 1,
         "winText": "",
@@ -463,7 +467,7 @@
       "class": "Trigger_Window_Gets_Active",
       "enabled": "0",
       "ID": "element0000000052",
-      "name": "Fenster wird aktiviert:  - Title begins with: AutoHotkey Help - Fensterklasse: HH Parent - Prozess: hh.exe",
+      "name": "Window Gets Active:  - Title begins with: AutoHotkey Help - Window Class: HH Parent - Prozess: hh.exe",
       "package": "default",
       "pars": {
         "ahk_class": "HH Parent",
@@ -474,6 +478,7 @@
         "excludeTitle": "",
         "FindHiddenText": 0,
         "FindHiddenWindow": 0,
+        "interval": "",
         "NotTriggerOnEnable": 1,
         "TitleMatchMode": 1,
         "winText": "",
@@ -488,7 +493,7 @@
       "class": "Trigger_Window_Gets_Active",
       "enabled": "0",
       "ID": "element0000000053",
-      "name": "Fenster wird aktiviert:  - Title begins with: AutoHotkey Help - Fensterklasse: HH Parent - Prozess: hh.exe",
+      "name": "Window Gets Active:  - Title begins with: AutoHotkey Help - Window Class: HH Parent - Prozess: hh.exe",
       "package": "default",
       "pars": {
         "ahk_class": "HH Parent",
@@ -499,6 +504,7 @@
         "excludeTitle": "",
         "FindHiddenText": 0,
         "FindHiddenWindow": 0,
+        "interval": "",
         "NotTriggerOnEnable": 1,
         "TitleMatchMode": 1,
         "winText": "",
@@ -513,7 +519,7 @@
       "class": "Trigger_Window_Gets_Active",
       "enabled": "0",
       "ID": "element0000000054",
-      "name": "Fenster wird aktiviert:  - Title begins with: AutoHotkey Help - Fensterklasse: HH Parent - Prozess: hh.exe",
+      "name": "Window Gets Active:  - Title begins with: AutoHotkey Help - Window Class: HH Parent - Prozess: hh.exe",
       "package": "default",
       "pars": {
         "ahk_class": "HH Parent",
@@ -524,6 +530,7 @@
         "excludeTitle": "",
         "FindHiddenText": 0,
         "FindHiddenWindow": 0,
+        "interval": "",
         "NotTriggerOnEnable": 1,
         "TitleMatchMode": 1,
         "winText": "",
@@ -538,7 +545,7 @@
       "class": "Trigger_AutoHotkey_Script",
       "enabled": "0",
       "ID": "element0000000055",
-      "name": "AutoHotKey Skript - iteration:= 0 - loop - { - iteration++ - x_trigger() - sleep",
+      "name": "AutoHotKey script - iteration:= 0 - loop - { - iteration++ - x_trigger() - sleep",
       "package": "default",
       "pars": {
         "ExportVariables": "iteration",
@@ -553,7 +560,7 @@
     "element0000000057": {
       "class": "Action_Tooltip",
       "ID": "element0000000057",
-      "name": "Tooltip: ahk script iteration: %iteration% - 2 s #Seconds - Der Maus folgen",
+      "name": "Tooltip: ahk script iteration: %iteration% - 2 s - Follow Mouse",
       "package": "action",
       "pars": {
         "duration": 2,
@@ -572,8 +579,8 @@
   "flowSettings": {
     "DefaultWorkingDir": 1,
     "ExecutionPolicy": "default",
-    "Offsetx": "-470.000000",
-    "Offsety": "-592.857144",
+    "Offsetx": "-622.857144",
+    "Offsety": "-1267.142859",
     "WorkingDir": "",
     "zoomFactor": "0.7"
   },

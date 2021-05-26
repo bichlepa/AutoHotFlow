@@ -94,7 +94,7 @@ Element_GenerateName_Condition_Confirmation_Dialog(Environment, ElementParameter
 ;This function allows to check the integrity of the parameters. For example you can:
 ;- Disable options which are not available because of other options
 ;- Correct misconfiguration
-Element_CheckSettings_Condition_Confirmation_Dialog(Environment, ElementParameters)
+Element_CheckSettings_Condition_Confirmation_Dialog(Environment, ElementParameters, staticValues)
 {	
 	; check parameter IsTimeout
 	if (not ElementParameters.IsTimeout)

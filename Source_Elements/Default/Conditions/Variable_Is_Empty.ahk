@@ -68,7 +68,7 @@ Element_GenerateName_Condition_Variable_Is_Empty(Environment, ElementParameters)
 ;This function allows to check the integrity of the parameters. For example you can:
 ;- Disable options which are not available because of other options
 ;- Correct misconfiguration
-Element_CheckSettings_Condition_Variable_Is_Empty(Environment, ElementParameters)
+Element_CheckSettings_Condition_Variable_Is_Empty(Environment, ElementParameters, staticValues)
 {	
 	
 	parametersToEdit.push({type: "Label", label:  x_lang("Variable name")})

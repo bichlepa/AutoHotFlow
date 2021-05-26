@@ -57,7 +57,7 @@ Thread_StartEditor(p_FlowID)
 	StringReplace,ExecutionThreadCode,ExecutionThreadCode, % ";PlaceholderIncludesOfElements",% global_libInclusionsForThreads global_elementInclusionsForThreads
 
 	; start the new thread
-	newThread := AhkThread(global_CommonAhkCodeForAllThreads "`n global _ahkThreadID := """ threadID """`n global FlowID := """ p_FlowID """`n"  ExecutionThreadCode)
+	newThread := AhkThread(global_CommonAhkCodeForAllThreads "`n global _ahkThreadID := """ threadID """`n global _FlowID := """ p_FlowID """`n"  ExecutionThreadCode)
 	
 	; write thread ID to the list of all threads
 	global_AllThreads[threadID] := {permanent: false, type: "Editor", flowID: p_FlowID, thread: newThread}
