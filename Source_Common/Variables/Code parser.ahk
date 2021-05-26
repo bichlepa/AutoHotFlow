@@ -84,8 +84,16 @@ class class_parser
 		; will be set to true, if we reach end of code
 		this.eof := false
 
-		; set the first token as current token
+		; set the first token as current token and skip first whitespaces
 		this.next()
+		this.skip_whitespace()
+
+		; check whether expression or code is empty
+		if (this.eof)
+		{
+			; there is nothing here, return nothing
+			return
+		}
 		
 		if (whatToParse = "code")
 		{
@@ -116,6 +124,9 @@ class class_parser
 		else
 		{
 			; we reached the end of the code
+			this.nextToken := ""
+			this.Token := ""
+			this.prevToken := ""
 			this.eof := true
 		}
 	}
@@ -419,7 +430,7 @@ class class_parser
 			{
 				;If not, there is something what is not expected. Tell error
 				expr := ""
-				this.croak("Unexpected token in expression")
+				this.croak("Unexpected token in expression" " - '" value "'")
 			}
 		}
 		

@@ -35,13 +35,6 @@
       "to": "element0000000017",
       "type": "Connection"
     },
-    "connection0000000021": {
-      "ConnectionType": "normal",
-      "from": "element0000000020",
-      "ID": "connection0000000021",
-      "to": "element0000000022",
-      "type": "Connection"
-    },
     "connection0000000028": {
       "ConnectionType": "normal",
       "from": "element0000000008",
@@ -111,13 +104,6 @@
       "ID": "connection0000000042",
       "to": "element0000000036",
       "type": "Connection"
-    },
-    "connection0000000056": {
-      "ConnectionType": "normal",
-      "from": "element0000000055",
-      "ID": "connection0000000056",
-      "to": "element0000000057",
-      "type": "Connection"
     }
   },
   "allElements": {
@@ -166,28 +152,13 @@
       "x": "420",
       "y": "210"
     },
-    "element0000000010": {
-      "class": "Action_Trace_Point",
-      "ID": "element0000000010",
-      "name": "Trace Point - tall stairs",
-      "package": "default",
-      "pars": {
-        "ID": "tall stairs",
-        "LogMessage": "",
-        "StopCondition": "counter != 7"
-      },
-      "StandardName": "1",
-      "type": "Action",
-      "x": "490",
-      "y": "665"
-    },
     "element0000000014": {
       "class": "Action_Stop_Flow",
       "ID": "element0000000014",
-      "name": "Stop Flow: external script test",
+      "name": "Stop Flow - external script test",
       "package": "default",
       "pars": {
-        "flowName": "external script test"
+        "flowID": "Flow 1849072261"
       },
       "StandardName": "1",
       "type": "Action",
@@ -223,48 +194,6 @@
       "type": "Action",
       "x": "140",
       "y": "280"
-    },
-    "element0000000020": {
-      "class": "Trigger_Window_Gets_Active",
-      "enabled": "0",
-      "ID": "element0000000020",
-      "name": "Window Gets Active:  - Title begins with: AutoHotkey Help - Window Class: HH Parent - Prozess: hh.exe",
-      "package": "default",
-      "pars": {
-        "ahk_class": "HH Parent",
-        "ahk_exe": "hh.exe",
-        "ahk_id": "",
-        "ahk_pid": "",
-        "ExcludeText": "",
-        "excludeTitle": "",
-        "FindHiddenText": 0,
-        "FindHiddenWindow": 0,
-        "interval": "",
-        "NotTriggerOnEnable": "1",
-        "TitleMatchMode": 1,
-        "winText": "",
-        "Wintitle": "AutoHotkey Help"
-      },
-      "StandardName": "1",
-      "type": "Trigger",
-      "x": "1155",
-      "y": "0"
-    },
-    "element0000000022": {
-      "class": "Action_Tooltip",
-      "ID": "element0000000022",
-      "name": "Tooltip: Nachricht - 2 s - Follow Mouse",
-      "package": "action",
-      "pars": {
-        "duration": 2,
-        "follow_mouse": 1,
-        "text": "Nachricht",
-        "Unit": "Seconds"
-      },
-      "StandardName": "1",
-      "type": "Action",
-      "x": "1155",
-      "y": "245"
     },
     "element0000000023": {
       "class": "Action_AutoHotKey_script",
@@ -384,194 +313,6 @@
       "type": "Action",
       "x": "910",
       "y": "735"
-    },
-    "element0000000049": {
-      "class": "Trigger_Window_Gets_Active",
-      "enabled": "0",
-      "ID": "element0000000049",
-      "name": "Window Gets Active:  - Title begins with: AutoHotkey Help - Window Class: HH Parent - Prozess: hh.exe",
-      "package": "default",
-      "pars": {
-        "ahk_class": "HH Parent",
-        "ahk_exe": "hh.exe",
-        "ahk_id": "",
-        "ahk_pid": "",
-        "ExcludeText": "",
-        "excludeTitle": "",
-        "FindHiddenText": 0,
-        "FindHiddenWindow": 0,
-        "interval": "",
-        "NotTriggerOnEnable": 1,
-        "TitleMatchMode": 1,
-        "winText": "",
-        "Wintitle": "AutoHotkey Help"
-      },
-      "StandardName": "1",
-      "type": "Trigger",
-      "x": "1365",
-      "y": "-140"
-    },
-    "element0000000050": {
-      "class": "Trigger_Window_Gets_Active",
-      "enabled": "0",
-      "ID": "element0000000050",
-      "name": "Window Gets Active:  - Title begins with: AutoHotkey Help - Window Class: HH Parent - Prozess: hh.exe",
-      "package": "default",
-      "pars": {
-        "ahk_class": "HH Parent",
-        "ahk_exe": "hh.exe",
-        "ahk_id": "",
-        "ahk_pid": "",
-        "ExcludeText": "",
-        "excludeTitle": "",
-        "FindHiddenText": 0,
-        "FindHiddenWindow": 0,
-        "interval": "",
-        "NotTriggerOnEnable": 1,
-        "TitleMatchMode": 1,
-        "winText": "",
-        "Wintitle": "AutoHotkey Help"
-      },
-      "StandardName": "1",
-      "type": "Trigger",
-      "x": "1400",
-      "y": "-105"
-    },
-    "element0000000051": {
-      "class": "Trigger_Window_Gets_Active",
-      "enabled": "0",
-      "ID": "element0000000051",
-      "name": "Window Gets Active:  - Title begins with: AutoHotkey Help - Window Class: HH Parent - Prozess: hh.exe",
-      "package": "default",
-      "pars": {
-        "ahk_class": "HH Parent",
-        "ahk_exe": "hh.exe",
-        "ahk_id": "",
-        "ahk_pid": "",
-        "ExcludeText": "",
-        "excludeTitle": "",
-        "FindHiddenText": 0,
-        "FindHiddenWindow": 0,
-        "interval": "",
-        "NotTriggerOnEnable": 1,
-        "TitleMatchMode": 1,
-        "winText": "",
-        "Wintitle": "AutoHotkey Help"
-      },
-      "StandardName": "1",
-      "type": "Trigger",
-      "x": "1435",
-      "y": "-70"
-    },
-    "element0000000052": {
-      "class": "Trigger_Window_Gets_Active",
-      "enabled": "0",
-      "ID": "element0000000052",
-      "name": "Window Gets Active:  - Title begins with: AutoHotkey Help - Window Class: HH Parent - Prozess: hh.exe",
-      "package": "default",
-      "pars": {
-        "ahk_class": "HH Parent",
-        "ahk_exe": "hh.exe",
-        "ahk_id": "",
-        "ahk_pid": "",
-        "ExcludeText": "",
-        "excludeTitle": "",
-        "FindHiddenText": 0,
-        "FindHiddenWindow": 0,
-        "interval": "",
-        "NotTriggerOnEnable": 1,
-        "TitleMatchMode": 1,
-        "winText": "",
-        "Wintitle": "AutoHotkey Help"
-      },
-      "StandardName": "1",
-      "type": "Trigger",
-      "x": "1470",
-      "y": "-35"
-    },
-    "element0000000053": {
-      "class": "Trigger_Window_Gets_Active",
-      "enabled": "0",
-      "ID": "element0000000053",
-      "name": "Window Gets Active:  - Title begins with: AutoHotkey Help - Window Class: HH Parent - Prozess: hh.exe",
-      "package": "default",
-      "pars": {
-        "ahk_class": "HH Parent",
-        "ahk_exe": "hh.exe",
-        "ahk_id": "",
-        "ahk_pid": "",
-        "ExcludeText": "",
-        "excludeTitle": "",
-        "FindHiddenText": 0,
-        "FindHiddenWindow": 0,
-        "interval": "",
-        "NotTriggerOnEnable": 1,
-        "TitleMatchMode": 1,
-        "winText": "",
-        "Wintitle": "AutoHotkey Help"
-      },
-      "StandardName": "1",
-      "type": "Trigger",
-      "x": "1505",
-      "y": "0"
-    },
-    "element0000000054": {
-      "class": "Trigger_Window_Gets_Active",
-      "enabled": "0",
-      "ID": "element0000000054",
-      "name": "Window Gets Active:  - Title begins with: AutoHotkey Help - Window Class: HH Parent - Prozess: hh.exe",
-      "package": "default",
-      "pars": {
-        "ahk_class": "HH Parent",
-        "ahk_exe": "hh.exe",
-        "ahk_id": "",
-        "ahk_pid": "",
-        "ExcludeText": "",
-        "excludeTitle": "",
-        "FindHiddenText": 0,
-        "FindHiddenWindow": 0,
-        "interval": "",
-        "NotTriggerOnEnable": 1,
-        "TitleMatchMode": 1,
-        "winText": "",
-        "Wintitle": "AutoHotkey Help"
-      },
-      "StandardName": "1",
-      "type": "Trigger",
-      "x": "1330",
-      "y": "-175"
-    },
-    "element0000000055": {
-      "class": "Trigger_AutoHotkey_Script",
-      "enabled": "0",
-      "ID": "element0000000055",
-      "name": "AutoHotKey script - iteration:= 0 - loop - { - iteration++ - x_trigger() - sleep",
-      "package": "default",
-      "pars": {
-        "ExportVariables": "iteration",
-        "ImportVariables": "",
-        "Script": "iteration:= 0\nloop\n{\niteration++\nx_trigger()\nsleep 10000\n}"
-      },
-      "StandardName": "1",
-      "type": "Trigger",
-      "x": "770",
-      "y": "-245"
-    },
-    "element0000000057": {
-      "class": "Action_Tooltip",
-      "ID": "element0000000057",
-      "name": "Tooltip: ahk script iteration: %iteration% - 2 s - Follow Mouse",
-      "package": "action",
-      "pars": {
-        "duration": 2,
-        "follow_mouse": 1,
-        "text": "ahk script iteration: %iteration%",
-        "Unit": "Seconds"
-      },
-      "StandardName": "1",
-      "type": "Action",
-      "x": "735",
-      "y": "-70"
     }
   },
   "category": "AHF Test",
@@ -579,8 +320,8 @@
   "flowSettings": {
     "DefaultWorkingDir": 1,
     "ExecutionPolicy": "default",
-    "Offsetx": "-622.857144",
-    "Offsety": "-1267.142859",
+    "Offsetx": "-434.285715",
+    "Offsety": "-672.857145",
     "WorkingDir": "",
     "zoomFactor": "0.7"
   },

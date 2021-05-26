@@ -542,6 +542,12 @@ xx_GetAhfPath()
 }
 
 ; only in execution
+xx_isAHFStartup()
+{
+	return false
+}
+
+; only in execution
 xx_isWindowsStartup()
 {
 	return false

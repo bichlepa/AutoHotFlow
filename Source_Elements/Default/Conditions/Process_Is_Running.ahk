@@ -80,6 +80,7 @@ Element_CheckSettings_Condition_Process_Is_Running(Environment, ElementParameter
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Condition_Process_Is_Running(Environment, ElementParameters)
 {
+	; evaluate some parameters
 	EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters)
 	if (EvaluatedParameters._error)
 	{
@@ -87,20 +88,19 @@ Element_run_Condition_Process_Is_Running(Environment, ElementParameters)
 		return
 	}
 	
-	Process,exist,% EvaluatedParameters.ProcessName
+	; check whether the process exists
+	Process, exist, % EvaluatedParameters.ProcessName
 	if errorlevel
 	{
-		x_SetVariable(Environment,"a_pid",errorlevel, "thread")
+		; process exists. Save PID in a thread variable
+		x_SetVariable(Environment, "a_pid", errorlevel, "thread")
 		x_finish(Environment,"yes")
 	}
 	else
+	{
+		; process does not exist
 		x_finish(Environment,"no")
-	
-	return
-	
-
-
-	
+	}
 }
 
 

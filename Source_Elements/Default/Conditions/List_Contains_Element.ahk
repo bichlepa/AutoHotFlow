@@ -16,7 +16,7 @@ Element_getName_Condition_List_Contains_Element()
 ;Category of the element
 Element_getCategory_Condition_List_Contains_Element()
 {
-	return x_lang("User_interaction")
+	return x_lang("Variable")
 }
 
 ;This function returns the package of the element.
@@ -52,10 +52,10 @@ Element_getStabilityLevel_Condition_List_Contains_Element()
 Element_getParametrizationDetails_Condition_List_Contains_Element(Environment)
 {
 	parametersToEdit:=Object()
-	
 	parametersToEdit.push({type: "Label", label: x_lang("List name")})
 	parametersToEdit.push({type: "Edit", id: "InputList", default: "List", content: "Expression", WarnIfEmpty: true})
 	parametersToEdit.push({type: "Label", label: x_lang("Search for what")})
+
 	parametersToEdit.push({type: "Radio", id: "SearchWhat", default: 2, choices: [x_lang("Search for an index or key"), x_lang("Search for an element with a specific content")], result: "enum", enum: ["Key", "Content"]})
 	parametersToEdit.push({type: "Label", label: x_lang("Key or index")})
 	parametersToEdit.push({type: "Edit", id: "Position", default: 1, content: ["String", "Expression"], contentID: "isExpressionPosition", contentDefault: "String", WarnIfEmpty: true})
@@ -68,7 +68,14 @@ Element_getParametrizationDetails_Condition_List_Contains_Element(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Condition_List_Contains_Element(Environment, ElementParameters)
 {
-	return x_lang("List_Contains_Element") 
+	if (ElementParameters.SearchWhat = "Content")
+		string := lang("Value '%1%' in list '%2%'", ElementParameters.Position, ElementParameters.InputList)
+	else if (ElementParameters.SearchWhat = "Key")
+	{
+		string := lang("Key '%1%' in list '%2%'", ElementParameters.SearchContent, ElementParameters.InputList)
+	}
+
+	return x_lang("List_Contains_Element") " - " string
 }
 
 ;Called every time the user changes any parameter.
@@ -76,20 +83,17 @@ Element_GenerateName_Condition_List_Contains_Element(Environment, ElementParamet
 ;- Disable options which are not available because of other options
 ;- Correct misconfiguration
 Element_CheckSettings_Condition_List_Contains_Element(Environment, ElementParameters, staticValues)
-{	
+{
 	if (ElementParameters.SearchWhat = "Key") ;Search for an index or key
 	{
 		x_Par_Enable("Position")
-		x_Par_Disable("isExpressionSearchContent")
 		x_Par_Disable("SearchContent")
 	}
 	else
 	{
 		x_Par_Disable("Position")
-		x_Par_Enable("isExpressionSearchContent")
 		x_Par_Enable("SearchContent")
 	}
-	
 }
 
 
@@ -97,85 +101,81 @@ Element_CheckSettings_Condition_List_Contains_Element(Environment, ElementParame
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Condition_List_Contains_Element(Environment, ElementParameters)
 {
-	EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters, ["Position", "SearchContent"])
+	; evaluate some parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters, ["Position", "SearchContent"])
 	if (EvaluatedParameters._error)
 	{
 		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
 
-	
-	found:=false
-	InputList:=EvaluatedParameters.InputList
-	SearchPosition:=EvaluatedParameters.Position
-	if not IsObject(InputList)
+	; check input object
+	if not IsObject(EvaluatedParameters.InputList)
 	{
-		x_finish(Environment, "exception", x_lang("Variable '%1%' does not contain a list.",ElementParameters.InputList)) 
+		x_finish(Environment, "exception", x_lang("Variable '%1%' does not contain a list.", ElementParameters.InputList)) 
 		return
 	}
 	
-	if (EvaluatedParameters.SearchWhat="Key") ;search for an index or key
+	if (EvaluatedParameters.SearchWhat = "Key") ;search for an index or key
 	{
+		; evaluate more parameters which we will need
 		x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["Position"])
 		if (ElementParameters._error)
 		{
-			x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
-			return
+			return x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		}
-		for tempkey, tempvalue in InputList
+
+		; check whether the object has the key and return result
+		SearchPosition := EvaluatedParameters.Position
+		for tempkey, tempvalue in EvaluatedParameters.InputList
 		{
-			if (tempkey=SearchPosition)
+			if (tempkey = SearchPosition)
 			{
-				found:=true
+				found := true
 				break
 			}
 		}
 		if (found=true)
 		{
-			x_finish(Environment,"yes")
+			return x_finish(Environment, "yes")
 		}
 		else
 		{
-			x_finish(Environment,"no")
+			return x_finish(Environment, "no")
 		}
-		
 	}
-	else  ;search for a value
+	else (EvaluatedParameters.SearchWhat = "Content") ;search for a value
 	{
+		; evaluate more parameters which we will need
 		x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["SearchContent"])
 		if (ElementParameters._error)
 		{
-			x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
-			return
+			return x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		}
-		for tempkey, tempvalue in tempObject
+		
+		; check whether the object has the valuet
+		found := false
+		for tempkey, tempvalue in EvaluatedParameters.InputList
 		{
-			
-			if (tempvalue=SearchContent)
+			if (tempvalue = EvaluatedParameters.SearchContent)
 			{
-				found:=true
-				foundkey:=tempkey
+				found := true
+				foundkey := tempkey
 				break
 			}
 		}
-		if (found=true)
+		; return result
+		if (found)
 		{
-			x_setVariable(Environment,"A_FoundKey",foundkey, "thread")
-			x_finish(Environment,"yes")
+			; set the key name as Thread variable
+			x_setVariable(Environment, "A_FoundKey", foundkey, "thread")
+			return x_finish(Environment,"yes")
 		}
 		else
 		{
-			x_finish(Environment,"no")
+			return x_finish(Environment,"no")
 		}
-		
 	}
-	
-	
-	return
-	
-
-
-	
 }
 
 

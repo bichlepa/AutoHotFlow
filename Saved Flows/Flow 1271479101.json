@@ -1,0 +1,74 @@
+﻿{
+  "allConnections": {
+    "connection0000000003": {
+      "ConnectionType": "normal",
+      "from": "element0000000001",
+      "ID": "connection0000000003",
+      "to": "element0000000002",
+      "type": "Connection"
+    },
+    "connection0000000005": {
+      "ConnectionType": "normal",
+      "from": "element0000000002",
+      "ID": "connection0000000005",
+      "to": "element0000000004",
+      "type": "Connection"
+    }
+  },
+  "allElements": {
+    "element0000000001": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "1",
+      "enabled": "0",
+      "ID": "element0000000001",
+      "name": "Manual - \"Trigger safe salad\"",
+      "package": "default",
+      "pars": {
+        "ID": "Trigger safe salad"
+      },
+      "StandardName": 1,
+      "type": "trigger",
+      "x": 0,
+      "y": 0
+    },
+    "element0000000002": {
+      "class": "Action_Beep",
+      "ID": "element0000000002",
+      "name": "Piepsen - 523 Hz 150 ms",
+      "package": "default",
+      "pars": {
+        "duration": 150,
+        "frequency": 523
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "0",
+      "y": "210"
+    },
+    "element0000000004": {
+      "class": "Action_Beep",
+      "ID": "element0000000004",
+      "name": "Piepsen - 600 Hz 500 ms",
+      "package": "default",
+      "pars": {
+        "duration": "500",
+        "frequency": "600"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "0",
+      "y": "420"
+    }
+  },
+  "category": "AHF Test",
+  "ElementIDCounter": "7",
+  "flowSettings": {
+    "DefaultWorkingDir": 1,
+    "ExecutionPolicy": "default",
+    "Offsetx": "-397.142857",
+    "Offsety": "-332.857143",
+    "WorkingDir": "",
+    "zoomFactor": "0.7"
+  },
+  "name": "sound test"
+}

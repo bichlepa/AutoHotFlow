@@ -118,7 +118,8 @@ Element_run_Loop_Work_through_a_list(Environment, ElementParameters)
 			x_SetVariable(Environment, "A_Index", 1, "loop")
 			
 			; set a_index as loop variable
-			x_SetVariable(Environment, "A_LoopField", CurrentList[1], "loop")
+			x_SetVariable(Environment, "A_LoopKey", CurrentList[1].key, "loop")
+			x_SetVariable(Environment, "A_LoopField", CurrentList[1].value, "loop")
 			
 			x_finish(Environment, "head")
 		}
@@ -141,7 +142,8 @@ Element_run_Loop_Work_through_a_list(Environment, ElementParameters)
 			; there is another element in the array
 			; Start next iteration
 			x_SetVariable(Environment, "A_Index", index, "loop")
-			x_SetVariable(Environment, "A_LoopField", CurrentList[index], "loop")
+			x_SetVariable(Environment, "A_LoopKey", CurrentList[index].key, "loop")
+			x_SetVariable(Environment, "A_LoopField", CurrentList[index].value, "loop")
 			x_finish(Environment, "head") ;Continue with next iteration
 		}
 		else

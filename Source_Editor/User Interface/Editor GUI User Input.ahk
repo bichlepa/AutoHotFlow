@@ -1124,7 +1124,7 @@ ui_MoveConnection(connection1 = "", element1 = "", connection2 = "", element2 = 
 	if (connection1 and connection2)
 	{
 		; since connection1 is the old connection, connection2 has now to end, where connection1 has ended before.
-		connection1toPart := _getElementProperty(_FlowID, connection1, "toPart")
+		connection1toPart := _getConnectionProperty(_FlowID, connection1, "toPart")
 		_setConnectionProperty(_FlowID, connection2, "toPart", connection1toPart)
 		; delete the part information from connection 1
 		_deleteConnectionProperty(_FlowID, connection1, "toPart")

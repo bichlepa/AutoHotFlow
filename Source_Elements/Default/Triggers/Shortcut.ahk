@@ -64,7 +64,7 @@ Element_getParametrizationDetails_Trigger_Shortcut(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Trigger_Shortcut(Environment, ElementParameters)
 {
-	return x_lang("Shortcut") "`n" ElementParameters.File
+	return x_lang("Shortcut") "`n" ElementParameters.ShortCutPath
 }
 
 ;Called every time the user changes any parameter.
@@ -79,22 +79,27 @@ Element_CheckSettings_Trigger_Shortcut(Environment, ElementParameters, staticVal
 ;Called when the trigger is activated
 Element_enable_Trigger_Shortcut(Environment, ElementParameters)
 {
-	
-	EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters)
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
 	if (EvaluatedParameters._error)
 	{
 		x_enabled(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
 	
-	ahfPath:=x_GetAhfPath()
+	; get path of AHF exe. We will need to to set up the shortcut.
+	ahfPath := x_GetAhfPath()
 	if (ahfPath = "")
 	{
 		x_enabled(Environment, "exception", "AutoHotFlow.exe not found") 
 		return
 	}
 	
-	FileCreateShortcut,% ahfPath,% EvaluatedParameters.ShortCutPath,,% "AHFCommand ""Trigger|" x_GetMyFlowID(Environment) "|" x_GetMyElementID(Environment) """"
+	; if shortcut path is relative, convert it to full path
+	ShortCutPath := x_GetFullPath(Environment, EvaluatedParameters.ShortCutPath)
+
+	; create shortcut. It will call AHF with a command which will trigger this flow
+	FileCreateShortcut, % ahfPath,% ShortCutPath,, % "AHFCommand ""Trigger|" x_GetMyFlowID(Environment) "|" x_GetMyElementID(Environment) """"
 	if errorlevel
 	{
 		x_enabled(Environment, "exception", x_lang("Can't create shortcut in path '%1%'", ShortCutPath))
@@ -122,17 +127,22 @@ Element_postTrigger_Trigger_Shortcut(Environment, ElementParameters, TriggerData
 ;Called when the trigger should be disabled.
 Element_disable_Trigger_Shortcut(Environment, ElementParameters)
 {
+	; check settings
 	if (ElementParameters.RemoveShortcutOnDisabling)
 	{
-		EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters)
+		; it is configured that the shortcut should be removed if it is disabled.
+		EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
 		if (EvaluatedParameters._error)
 		{
 			x_disabled(Environment, "exception", EvaluatedParameters._errorMessage) 
 			return
 		}
 		
-		shortcutPath:=x_GetFullPath(Environment, EvaluatedParameters.ShortCutPath)
-		FileDelete,%shortcutPath%
+		; if shortcut path is relative, convert it to full path
+		shortcutPath := x_GetFullPath(Environment, EvaluatedParameters.ShortCutPath)
+
+		; delete the shortcut
+		FileDelete, %shortcutPath%
 	}
 	
 	x_disabled(Environment, "normal")

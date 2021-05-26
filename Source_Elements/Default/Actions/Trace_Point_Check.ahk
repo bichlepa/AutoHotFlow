@@ -41,7 +41,6 @@ Element_getElementLevel_Action_Trace_Point_Check()
 ;This will help them to get started with AHF
 Element_getIconPath_Action_Trace_Point_Check()
 {
-	return "Source_elements\default\icons\New variable.png"
 }
 
 ;How stable is this element? Experimental elements will be marked and can be hidden by user.

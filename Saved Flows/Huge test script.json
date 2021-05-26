@@ -140,34 +140,6 @@
       "to": "element0000000489",
       "type": "Connection"
     },
-    "Connection0000000491": {
-      "ConnectionType": "normal",
-      "from": "element0000000490",
-      "ID": "Connection0000000491",
-      "to": "element0000000492",
-      "type": "Connection"
-    },
-    "Connection0000000493": {
-      "ConnectionType": "normal",
-      "from": "element0000000492",
-      "ID": "Connection0000000493",
-      "to": "element0000000494",
-      "type": "Connection"
-    },
-    "Connection0000000495": {
-      "ConnectionType": "normal",
-      "from": "element0000000494",
-      "ID": "Connection0000000495",
-      "to": "element0000000496",
-      "type": "Connection"
-    },
-    "Connection0000000497": {
-      "ConnectionType": "normal",
-      "from": "element0000000498",
-      "ID": "Connection0000000497",
-      "to": "element0000000352",
-      "type": "Connection"
-    },
     "connection0000000514": {
       "ConnectionType": "normal",
       "from": "element0000000350",
@@ -228,7 +200,7 @@
       "ConnectionType": "normal",
       "from": "element0000000528",
       "ID": "connection0000000530",
-      "to": "element0000000498",
+      "to": "element0000000352",
       "type": "Connection"
     },
     "connection0000000531": {
@@ -396,8 +368,8 @@
       },
       "StandardName": 1,
       "type": "loop",
-      "x": "1610",
-      "y": "665"
+      "x": "1050",
+      "y": "525"
     },
     "element0000000409": {
       "class": "Action_Tooltip",
@@ -412,8 +384,8 @@
       },
       "StandardName": 1,
       "type": "action",
-      "x": "1645",
-      "y": "945"
+      "x": "1085",
+      "y": "840"
     },
     "element0000000414": {
       "class": "Action_Tooltip",
@@ -428,8 +400,8 @@
       },
       "StandardName": 1,
       "type": "action",
-      "x": "1400",
-      "y": "1155"
+      "x": "1050",
+      "y": "1190"
     },
     "element0000000428": {
       "class": "Action_New_variable",
@@ -477,7 +449,7 @@
     "element0000000433": {
       "class": "Action_Trace_Point",
       "ID": "element0000000433",
-      "name": "Trace Point - Tracepoint friendly bus",
+      "name": "Trace Point - Tracepoint friendly bus - With stop condition",
       "package": "default",
       "pars": {
         "ID": "Tracepoint friendly bus",
@@ -492,7 +464,7 @@
     "element0000000439": {
       "class": "Action_Trace_Point",
       "ID": "element0000000439",
-      "name": "Trace Point - Tracepoint friendly bus2",
+      "name": "Trace Point - Tracepoint friendly bus2 - With stop condition",
       "package": "default",
       "pars": {
         "ID": "Tracepoint friendly bus2",
@@ -522,7 +494,7 @@
     "element0000000444": {
       "class": "Action_Trace_Point",
       "ID": "element0000000444",
-      "name": "Trace Point - Tracepoint friendly bus3",
+      "name": "Trace Point - Tracepoint friendly bus3 - With stop condition",
       "package": "default",
       "pars": {
         "ID": "Tracepoint friendly bus3",
@@ -537,7 +509,7 @@
     "element0000000451": {
       "class": "Action_Trace_Point",
       "ID": "element0000000451",
-      "name": "Trace Point - bright leg",
+      "name": "Trace Point - bright leg - With stop condition",
       "package": "default",
       "pars": {
         "ID": "bright leg",
@@ -546,7 +518,7 @@
       },
       "StandardName": 1,
       "type": "action",
-      "x": "1400",
+      "x": "1015",
       "y": "385"
     },
     "element0000000455": {
@@ -562,13 +534,13 @@
       },
       "StandardName": 1,
       "type": "action",
-      "x": "1190",
-      "y": "350"
+      "x": "1015",
+      "y": "245"
     },
     "element0000000465": {
       "class": "Action_Trace_Point",
       "ID": "element0000000465",
-      "name": "Trace Point - bright leg2",
+      "name": "Trace Point - bright leg2 - With stop condition",
       "package": "default",
       "pars": {
         "ID": "bright leg2",
@@ -577,8 +549,8 @@
       },
       "StandardName": 1,
       "type": "action",
-      "x": "1855",
-      "y": "875"
+      "x": "1085",
+      "y": "665"
     },
     "element0000000480": {
       "class": "Trigger_Manual",
@@ -598,17 +570,17 @@
     "element0000000485": {
       "class": "Action_Execute_Flow",
       "ID": "element0000000485",
-      "name": "Execute Flow: This flow - calculate",
+      "name": "Execute Flow: This flow - Manual - \"calculate\"",
       "package": "default",
       "pars": {
-        "DefaultTrigger": 0,
-        "flowName": "",
+        "flowID": "",
         "ReturnVariables": "1",
         "SendLocalVars": 1,
         "SkipDisabled": 0,
         "ThisFlow": 1,
-        "triggerName": "calculate",
-        "WaitToFinish": 1
+        "triggerID": "element0000000480",
+        "WaitToFinish": 1,
+        "WhichTrigger": "Specific"
       },
       "StandardName": "1",
       "type": "action",
@@ -629,83 +601,6 @@
       "type": "action",
       "x": "-455",
       "y": "-105"
-    },
-    "element0000000490": {
-      "class": "Trigger_Manual",
-      "DefaultTrigger": "",
-      "enabled": "1",
-      "ID": "element0000000490",
-      "name": "Manual - \"Soundbeep test\"",
-      "package": "default",
-      "pars": {
-        "ID": "Soundbeep test"
-      },
-      "StandardName": 1,
-      "type": "Trigger",
-      "x": "-1085",
-      "y": "-560"
-    },
-    "element0000000492": {
-      "class": "Action_Beep",
-      "ID": "element0000000492",
-      "name": "Piepsen - 523 Hz 150 ms",
-      "package": "default",
-      "pars": {
-        "duration": 150,
-        "frequency": 523
-      },
-      "StandardName": 1,
-      "type": "action",
-      "x": "-1085",
-      "y": "-385"
-    },
-    "element0000000494": {
-      "class": "Action_Beep",
-      "ID": "element0000000494",
-      "name": "Piepsen - 700 Hz 300 ms",
-      "package": "default",
-      "pars": {
-        "duration": 300,
-        "frequency": 700
-      },
-      "StandardName": 1,
-      "type": "action",
-      "x": "-1225",
-      "y": "-245"
-    },
-    "element0000000496": {
-      "class": "Action_Beep",
-      "ID": "element0000000496",
-      "name": "Piepsen - 1000 Hz 400 ms",
-      "package": "default",
-      "pars": {
-        "duration": 400,
-        "frequency": 1000
-      },
-      "StandardName": 1,
-      "type": "action",
-      "x": "-1365",
-      "y": "-140"
-    },
-    "element0000000498": {
-      "class": "Action_Execute_Flow",
-      "ID": "element0000000498",
-      "name": "Execute Flow: This flow - Soundbeep test",
-      "package": "default",
-      "pars": {
-        "DefaultTrigger": 0,
-        "flowName": "",
-        "ReturnVariables": 0,
-        "SendLocalVars": 0,
-        "SkipDisabled": 0,
-        "ThisFlow": 1,
-        "triggerName": "Soundbeep test",
-        "WaitToFinish": 1
-      },
-      "StandardName": 1,
-      "type": "action",
-      "x": "350",
-      "y": "1645"
     },
     "element0000000507": {
       "class": "Action_AutoHotKey_script",
@@ -770,7 +665,7 @@
     "element0000000528": {
       "class": "Action_Trace_Point",
       "ID": "element0000000528",
-      "name": "Trace Point - Tracepoint calculate",
+      "name": "Trace Point - Tracepoint calculate - With stop condition",
       "package": "default",
       "pars": {
         "ID": "Tracepoint calculate",
@@ -813,21 +708,6 @@
       "type": "action",
       "x": "-210",
       "y": "1785"
-    },
-    "element0000000551": {
-      "class": "Action_Trace_Point",
-      "ID": "element0000000551",
-      "name": "Trace Point - Tracepoint red box",
-      "package": "default",
-      "pars": {
-        "ID": "Tracepoint red box",
-        "LogMessage": "",
-        "StopCondition": ""
-      },
-      "StandardName": "1",
-      "type": "action",
-      "x": "-385",
-      "y": "1610"
     }
   },
   "category": "AHF Test",
@@ -837,10 +717,10 @@
     "ExecutionPolicy": "parallel",
     "FolderOfStaticVariables": "C:\\Users\\bichl\\Documents\\git\\AutoHotFlow\\Saved Flows\\Static variables\\Huge test script",
     "Name": "Huge test script",
-    "Offsetx": "-750.880281",
-    "Offsety": "-673.567179",
+    "Offsetx": "-709.590385",
+    "Offsety": "-729.721439",
     "WorkingDir": "C:\\Users\\Paul\\Documents\\AutoHotFlow default working direction",
     "zoomFactor": "0.605475"
   },
-  "name": "Huge test script"
+  "name": "old Huge test script"
 }

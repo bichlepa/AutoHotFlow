@@ -404,6 +404,11 @@ x_GetAhfPath()
 	return xx_GetAhfPath()
 }
 
+x_isAHFStartup()
+{
+	return xx_isAHFStartup()
+}
+
 x_isWindowsStartup()
 {
 	return xx_isWindowsStartup()

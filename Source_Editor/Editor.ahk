@@ -2,6 +2,9 @@
 ;~ #Warn  ; Recommended for catching common errors.
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
 
+; do not warn if a continuable exception occurs (it happens often when AHF is closing)
+#WarnContinuableException off
+
 ; faster execution
 SetBatchLines -1
 

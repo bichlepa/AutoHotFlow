@@ -62,7 +62,7 @@ Element_getParametrizationDetails_Condition_Key_Is_Down(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Condition_Key_Is_Down(Environment, ElementParameters)
 {
-	return x_lang("Key_Is_Down") 
+	return x_lang("Key_Is_Down") " - " ElementParameters.key
 }
 
 ;Called every time the user changes any parameter.
@@ -79,31 +79,24 @@ Element_CheckSettings_Condition_Key_Is_Down(Environment, ElementParameters, stat
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Condition_Key_Is_Down(Environment, ElementParameters)
 {
-	EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters)
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
 	if (EvaluatedParameters._error)
 	{
-		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
-		return
+		return x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 	}
 
-	
-	GetKeyState,tempKeyState,% EvaluatedParameters.key
-	
-	
-	if (tempKeyState="d")
-		x_finish(Environment,"yes")
-	else if (tempKeyState="u")
-		x_finish(Environment,"no")
+	; get the key state
+	if (GetKeyState(EvaluatedParameters.key))
+	{
+		; key is down
+		return x_finish(Environment, "yes")
+	}
 	else
 	{
-		x_finish(Environment, "exception", x_lang("Couldn't get state of key '%1%'", EvaluatedParameters.key)) 
-		return
+		; key is up
+		return x_finish(Environment, "no")
 	}
-	return
-	
-
-
-	
 }
 
 

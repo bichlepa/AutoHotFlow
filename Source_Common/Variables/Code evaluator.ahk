@@ -23,10 +23,20 @@ class class_evaluator
 		this.parsedCode := parsedCode
 		this.environment := environment
 		this.useCommonFunctions := useCommonFunctions
-
-		; start evaluation
-		res := this.evalnext(parsedCode)
-		return res
+		this.errors := []
+		
+		if (parsedCode)
+		{
+			; start evaluation
+			res := this.evalnext(parsedCode)
+		}
+		Else
+		{
+			;nothing was pared. return empty string
+			res := ""
+		}
+		
+		return {res: res, errors: this.errors}
 	}
 	
 	; evaluate the current part of the pared expression
@@ -189,7 +199,6 @@ class class_evaluator
 			; call the function
 			return this.callfunc(path,args*)
 		}
-		
 		; if we get here, the parsed code contains something that we don't know yet. This is then an implementation error.
 		this.croak("Unexpected error during evaluation", exp)
 	}
@@ -242,7 +251,7 @@ class class_evaluator
 		if (op = "&&")
 			return a && b
 		if (op = "||")
-			return a && b
+			return a || b
 		if (op = "!")
 			return !b
 		if (op = "<")
@@ -292,7 +301,6 @@ class class_evaluator
 	{
 		wholelinehighlighted := substr(token.wholeline,1,this.token.col-1) " -> " token.value " <- " substr(token.wholeline, token.col + strlen(token.value))
 		error := {description: description, line: token.line, col: token.col, pos: token.pos, wholeline: token.wholeline, value: token.value, wholelinehighlighted: wholelinehighlighted}
-		token.errors.push(error)
-		errors.push(error)
+		this.errors.push(error)
 	}
 }

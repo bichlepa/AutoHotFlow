@@ -192,7 +192,7 @@ justDisableOneTrigger(p_FlowID, p_ElementID, p_EnabledTriggerID)
 
 	; get some informations
 	tempElementClass := _getElementProperty(p_FlowID, p_ElementID, "class")
-	triggerPars := _getTriggerProperty(TriggerID, "pars")
+	triggerPars := _getTriggerProperty(p_EnabledTriggerID, "pars")
 
 	; call the element function to disable the trigger
 	environment := {flowID: p_FlowID, elementID: p_ElementID, triggerID: p_EnabledTriggerID}

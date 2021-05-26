@@ -179,7 +179,7 @@
       "ConnectionType": "Yes",
       "from": "element0000000083",
       "ID": "connection0000000088",
-      "to": "element0000000087",
+      "to": "element0000000158",
       "type": "Connection"
     },
     "connection0000000091": {
@@ -287,11 +287,88 @@
       "to": "element0000000127",
       "type": "Connection"
     },
-    "connection0000000129": {
+    "connection0000000135": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000135",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000155": {
+      "ConnectionType": "normal",
+      "from": "element0000000131",
+      "ID": "connection0000000155",
+      "to": "element0000000164",
+      "type": "Connection"
+    },
+    "connection0000000157": {
+      "ConnectionType": "normal",
+      "from": "element0000000001",
+      "ID": "connection0000000157",
+      "to": "element0000000156",
+      "type": "Connection"
+    },
+    "connection0000000159": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000159",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000160": {
+      "ConnectionType": "Yes",
+      "from": "element0000000158",
+      "ID": "connection0000000160",
+      "to": "element0000000087",
+      "type": "Connection"
+    },
+    "connection0000000162": {
+      "ConnectionType": "normal",
+      "from": "element0000000046",
+      "ID": "connection0000000162",
+      "to": "element0000000161",
+      "type": "Connection"
+    },
+    "connection0000000163": {
       "ConnectionType": "normal",
       "from": "element0000000089",
-      "ID": "connection0000000129",
+      "ID": "connection0000000163",
       "to": "element0000000130",
+      "type": "Connection"
+    },
+    "connection0000000166": {
+      "ConnectionType": "normal",
+      "from": "element0000000164",
+      "ID": "connection0000000166",
+      "to": "element0000000167",
+      "type": "Connection"
+    },
+    "connection0000000169": {
+      "ConnectionType": "No",
+      "from": "element0000000167",
+      "ID": "connection0000000169",
+      "to": "element0000000154",
+      "type": "Connection"
+    },
+    "connection0000000170": {
+      "ConnectionType": "No",
+      "from": "element0000000158",
+      "ID": "connection0000000170",
+      "to": "element0000000085",
+      "type": "Connection"
+    },
+    "connection0000000171": {
+      "ConnectionType": "Yes",
+      "from": "element0000000167",
+      "ID": "connection0000000171",
+      "to": "element0000000085",
+      "type": "Connection"
+    },
+    "connection0000000173": {
+      "ConnectionType": "normal",
+      "from": "element0000000172",
+      "ID": "connection0000000173",
+      "to": "element0000000174",
       "type": "Connection"
     }
   },
@@ -659,7 +736,7 @@
       "StandardName": "1",
       "type": "Action",
       "x": "945",
-      "y": "210"
+      "y": "350"
     },
     "element0000000089": {
       "class": "Action_New_variable",
@@ -852,16 +929,150 @@
       "StandardName": "1",
       "type": "Action",
       "x": "105",
-      "y": "1575"
+      "y": "1610"
+    },
+    "element0000000131": {
+      "class": "Trigger_Shortcut",
+      "enabled": "0",
+      "ID": "element0000000131",
+      "name": "Verkn\u00FCpfung - %A_Desktop%\\Flow Trigger test.lnk",
+      "package": "default",
+      "pars": {
+        "RemoveShortcutOnDisabling": "1",
+        "ShortCutPath": "%A_Desktop%\\Flow Trigger test.lnk"
+      },
+      "StandardName": "1",
+      "type": "Trigger",
+      "x": "1400",
+      "y": "-210"
+    },
+    "element0000000154": {
+      "class": "Action_New_variable",
+      "ID": "element0000000154",
+      "name": "New variable - static_shortcutSuccess = 1",
+      "package": "default",
+      "pars": {
+        "expression": "Expression",
+        "Varname": "static_shortcutSuccess",
+        "VarValue": "1"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "1715",
+      "y": "350"
+    },
+    "element0000000156": {
+      "class": "Action_New_variable",
+      "ID": "element0000000156",
+      "name": "New variable - static_shortcutSuccess = 0",
+      "package": "default",
+      "pars": {
+        "expression": "Expression",
+        "Varname": "static_shortcutSuccess",
+        "VarValue": "0"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "175",
+      "y": "-350"
+    },
+    "element0000000158": {
+      "class": "Condition_Expression",
+      "ID": "element0000000158",
+      "name": "Ausdruck - static_shortcutSuccess",
+      "package": "default",
+      "pars": {
+        "Expression": "static_shortcutSuccess"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "945",
+      "y": "175"
+    },
+    "element0000000161": {
+      "class": "Action_Run",
+      "ID": "element0000000161",
+      "name": "Starten",
+      "package": "default",
+      "pars": {
+        "ToRun": "%A_Desktop%\\Flow Trigger test.lnk",
+        "ToRunContent": "String"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "280",
+      "y": "910"
+    },
+    "element0000000164": {
+      "class": "Action_Set_Flow_Status",
+      "ID": "element0000000164",
+      "name": "Set Flow Status - Deaktivieren: This flow - Verkn\u00FCpfung - %A_Desktop%\\Flow Trigger test.lnk",
+      "package": "default",
+      "pars": {
+        "Enable": "Disable",
+        "flowID": "",
+        "ThisFlow": 1,
+        "triggerID": "element0000000131",
+        "WhichTrigger": "Specific"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "1400",
+      "y": "-35"
+    },
+    "element0000000167": {
+      "class": "Condition_File_Exists",
+      "ID": "element0000000167",
+      "name": "File Exists",
+      "package": "default",
+      "pars": {
+        "file": "%A_Desktop%\\Flow Trigger test.lnk"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "1400",
+      "y": "105"
+    },
+    "element0000000172": {
+      "class": "Trigger_Start_up",
+      "enabled": "0",
+      "ID": "element0000000172",
+      "name": "Start up - When AHF starts",
+      "package": "default",
+      "pars": {
+        "startupType": "AutoHotFlow"
+      },
+      "StandardName": "1",
+      "type": "Trigger",
+      "x": "2065",
+      "y": "-175"
+    },
+    "element0000000174": {
+      "class": "Action_Speech_output",
+      "ID": "element0000000174",
+      "name": "Speech output",
+      "package": "default",
+      "pars": {
+        "pitch": 0,
+        "speed": 0,
+        "text": "Hello",
+        "TTSEngine": "Microsoft Hedda Desktop",
+        "volume": 100,
+        "WaitUntilCurrentFinishes": 1
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "2100",
+      "y": "140"
     }
   },
   "category": "AHF Test",
-  "ElementIDCounter": "130",
+  "ElementIDCounter": "174",
   "flowSettings": {
     "DefaultWorkingDir": 1,
     "ExecutionPolicy": "default",
-    "Offsetx": "-642.857136",
-    "Offsety": "-8.571432",
+    "Offsetx": "40.000007",
+    "Offsety": "-515.714290",
     "WorkingDir": "",
     "zoomFactor": "0.7"
   },

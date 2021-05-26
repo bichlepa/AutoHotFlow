@@ -6,8 +6,8 @@
 CreateHiddenCommandWindow()
 {
 	global
-	gui,HiddenCommandWindow:add, edit, gHiddenCommandWindowOnNewMessage vHiddenCommandWindowEditMessage
-	gui,HiddenCommandWindow:show,hide,%_ScriptDir% AHF_HIDDEN_COMMAND_WINDOW
+	gui, HiddenCommandWindow:add, edit, gHiddenCommandWindowOnNewMessage vHiddenCommandWindowEditMessage
+	gui, HiddenCommandWindow:show, hide, %_ScriptDir% AHF_HIDDEN_COMMAND_WINDOW
 }
 
 ; a new command was pasted in the hidden window.
@@ -16,7 +16,7 @@ HiddenCommandWindowOnNewMessage()
 	global HiddenCommandWindowEditMessage
 
 	; get the command
-	guicontrolget,newMessage,,HiddenCommandWindowEditMessage
+	guicontrolget, newMessage,, HiddenCommandWindowEditMessage
 
 	; process the command
 	HiddenCommandWindowProcessMessage(newMessage)
@@ -27,7 +27,7 @@ HiddenCommandWindowProcessMessage(message)
 {
 	; split the parts of the message, which are delimited by pipes
 	messageParsed := Object()
-	loop,parse,newMessage,|
+	loop, parse, message, |
 	{
 		messageParsed.push(A_LoopField)
 	}

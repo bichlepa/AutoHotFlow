@@ -16,7 +16,7 @@ Element_getName_Trigger_Start_up()
 ;Category of the element
 Element_getCategory_Trigger_Start_up()
 {
-	return x_lang("Power")
+	return x_lang("Time")
 }
 
 ;This function returns the package of the element.
@@ -52,13 +52,21 @@ Element_getStabilityLevel_Trigger_Start_up()
 Element_getParametrizationDetails_Trigger_Start_up(Environment)
 {
 	parametersToEdit := Object()
+
+	parametersToEdit.push({type: "Label", label: x_lang("Trigger event")})
+	parametersToEdit.push({type: "Radio", id: "startupType", default: 1, result: "enum", choices: [x_lang("AutoHotFlow startup"), x_lang("Windows startup")], enum: ["AutoHotFlow", "Windows"]})
+
 	return parametersToEdit
 }
 
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Trigger_Start_up(Environment, ElementParameters)
 {
-	return x_lang("Start_up") 
+	if (ElementParameters.startupType = "AutoHotFlow")
+		startupType := lang("When AHF starts")
+	Else if (ElementParameters.startupType = "Windows")
+		startupType := lang("When Windows starts")
+	return x_lang("Start_up") " - " startupType
 }
 
 ;Called every time the user changes any parameter.
@@ -70,8 +78,6 @@ Element_CheckSettings_Trigger_Start_up(Environment, ElementParameters, staticVal
 	
 }
 
-
-
 ;Called when the trigger is activated
 Element_enable_Trigger_Start_up(Environment, ElementParameters)
 {
@@ -79,8 +85,24 @@ Element_enable_Trigger_Start_up(Environment, ElementParameters)
 	x_enabled(Environment, "normal")
 
 	; if we have windows startup, trigger right now
-	if (x_isWindowsStartup())
-		x_trigger(Environment)
+	if (ElementParameters.startupType = "AutoHotFlow")
+	{
+		; should always trigger when AHF starts.
+		if (x_isAHFStartup())
+		{
+			;Trigger rightaway
+			x_trigger(Environment)
+		}
+	}
+	else if (ElementParameters.startupType = "Windows")
+	{
+		; should only trigger if windows starts
+		if (x_isWindowsStartup())
+		{
+			; windows startup detected. Trigger rightaway
+			x_trigger(Environment)
+		}
+	}
 		
 	; return true, if trigger was enabled
 	return true

@@ -39,7 +39,6 @@ Element_getElementLevel_Action_Trace_Point()
 ;Icon path which will be shown in the background of the element
 Element_getIconPath_Action_Trace_Point()
 {
-	return "Source_elements\default\icons\New variable.png"
 }
 
 ;How stable is this element? Experimental elements will be marked and can be hidden by user.
@@ -71,7 +70,9 @@ Element_getParametrizationDetails_Action_Trace_Point(Environment)
 Element_GenerateName_Action_Trace_Point(Environment, ElementParameters)
 {
 	global
-	return % x_lang("Trace_Point") " - " ElementParameters.ID 
+	if (ElementParameters.StopCondition)
+		textStopCondition := " - " lang("With stop condition")
+	return % x_lang("Trace_Point") " - " ElementParameters.ID textStopCondition
 	
 }
 
@@ -117,7 +118,7 @@ Element_run_Action_Trace_Point(Environment, ElementParameters)
 	passed_Tracepoints.push(EvaluatedParameters.ID " (" elementID ")")
 	x_SetVariable(Environment, "passed_Tracepoints", passed_Tracepoints,, true)
 	
-	; Check the stop condition
+	; Check the evaluated stop condition
 	if (EvaluatedParameters.stopcondition)
 	{
 		; stop condition is true. Finish element and stop the execution

@@ -1,0 +1,1023 @@
+﻿{
+  "allConnections": {
+    "connection0000000011": {
+      "ConnectionType": "normal",
+      "from": "element0000000004",
+      "ID": "connection0000000011",
+      "to": "element0000000002",
+      "type": "Connection"
+    },
+    "connection0000000013": {
+      "ConnectionType": "normal",
+      "from": "element0000000005",
+      "fromPart": "TAIL",
+      "ID": "connection0000000013",
+      "to": "element0000000007",
+      "type": "Connection"
+    },
+    "connection0000000015": {
+      "ConnectionType": "normal",
+      "from": "element0000000008",
+      "ID": "connection0000000015",
+      "to": "element0000000005",
+      "toPart": "HEAD",
+      "type": "Connection"
+    },
+    "connection0000000019": {
+      "ConnectionType": "normal",
+      "from": "element0000000009",
+      "ID": "connection0000000019",
+      "to": "element0000000008",
+      "type": "Connection"
+    },
+    "connection0000000022": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000022",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000028": {
+      "ConnectionType": "normal",
+      "from": "element0000000006",
+      "ID": "connection0000000028",
+      "to": "element0000000010",
+      "type": "Connection"
+    },
+    "connection0000000032": {
+      "ConnectionType": "normal",
+      "from": "element0000000003",
+      "fromPart": "TAIL",
+      "ID": "connection0000000032",
+      "to": "element0000000029",
+      "type": "Connection"
+    },
+    "connection0000000036": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000036",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000037": {
+      "ConnectionType": "Yes",
+      "from": "element0000000038",
+      "ID": "connection0000000037",
+      "to": "element0000000006",
+      "type": "Connection"
+    },
+    "connection0000000040": {
+      "ConnectionType": "normal",
+      "from": "element0000000003",
+      "fromPart": "HEAD",
+      "ID": "connection0000000040",
+      "to": "element0000000009",
+      "type": "Connection"
+    },
+    "connection0000000041": {
+      "ConnectionType": "No",
+      "from": "element0000000038",
+      "ID": "connection0000000041",
+      "to": "element0000000005",
+      "toPart": "BREAK",
+      "type": "Connection"
+    },
+    "connection0000000042": {
+      "ConnectionType": "normal",
+      "from": "element0000000005",
+      "fromPart": "HEAD",
+      "ID": "connection0000000042",
+      "to": "element0000000038",
+      "type": "Connection"
+    },
+    "connection0000000043": {
+      "ConnectionType": "normal",
+      "from": "element0000000010",
+      "ID": "connection0000000043",
+      "to": "element0000000005",
+      "toPart": "TAIL",
+      "type": "Connection"
+    },
+    "connection0000000049": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000049",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000052": {
+      "ConnectionType": "normal",
+      "from": "element0000000007",
+      "ID": "connection0000000052",
+      "to": "element0000000003",
+      "toPart": "TAIL",
+      "type": "Connection"
+    },
+    "connection0000000054": {
+      "ConnectionType": "normal",
+      "from": "element0000000077",
+      "ID": "connection0000000054",
+      "to": "element0000000053",
+      "type": "Connection"
+    },
+    "connection0000000058": {
+      "ConnectionType": "Yes",
+      "from": "element0000000053",
+      "ID": "connection0000000058",
+      "to": "element0000000057",
+      "type": "Connection"
+    },
+    "connection0000000060": {
+      "ConnectionType": "No",
+      "from": "element0000000057",
+      "ID": "connection0000000060",
+      "to": "element0000000061",
+      "type": "Connection"
+    },
+    "connection0000000063": {
+      "ConnectionType": "Yes",
+      "from": "element0000000061",
+      "ID": "connection0000000063",
+      "to": "element0000000062",
+      "type": "Connection"
+    },
+    "connection0000000066": {
+      "ConnectionType": "No",
+      "from": "element0000000062",
+      "ID": "connection0000000066",
+      "to": "element0000000065",
+      "type": "Connection"
+    },
+    "connection0000000068": {
+      "ConnectionType": "No",
+      "from": "element0000000067",
+      "ID": "connection0000000068",
+      "to": "element0000000094",
+      "type": "Connection"
+    },
+    "connection0000000069": {
+      "ConnectionType": "No",
+      "from": "element0000000065",
+      "ID": "connection0000000069",
+      "to": "element0000000067",
+      "type": "Connection"
+    },
+    "connection0000000071": {
+      "ConnectionType": "normal",
+      "from": "element0000000002",
+      "ID": "connection0000000071",
+      "to": "element0000000003",
+      "toPart": "HEAD",
+      "type": "Connection"
+    },
+    "connection0000000072": {
+      "ConnectionType": "normal",
+      "from": "element0000000001",
+      "ID": "connection0000000072",
+      "to": "element0000000004",
+      "type": "Connection"
+    },
+    "connection0000000079": {
+      "ConnectionType": "normal",
+      "from": "element0000000078",
+      "ID": "connection0000000079",
+      "to": "element0000000077",
+      "type": "Connection"
+    },
+    "connection0000000080": {
+      "ConnectionType": "normal",
+      "from": "element0000000076",
+      "ID": "connection0000000080",
+      "to": "element0000000078",
+      "type": "Connection"
+    },
+    "connection0000000082": {
+      "ConnectionType": "normal",
+      "from": "element0000000075",
+      "ID": "connection0000000082",
+      "to": "element0000000108",
+      "type": "Connection"
+    },
+    "connection0000000085": {
+      "ConnectionType": "normal",
+      "from": "element0000000088",
+      "ID": "connection0000000085",
+      "to": "element0000000084",
+      "type": "Connection"
+    },
+    "connection0000000086": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000086",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000087": {
+      "ConnectionType": "normal",
+      "from": "element0000000088",
+      "ID": "connection0000000087",
+      "to": "element0000000083",
+      "type": "Connection"
+    },
+    "connection0000000093": {
+      "ConnectionType": "normal",
+      "from": "element0000000029",
+      "ID": "connection0000000093",
+      "to": "element0000000092",
+      "type": "Connection"
+    },
+    "connection0000000097": {
+      "ConnectionType": "normal",
+      "from": "element0000000084",
+      "ID": "connection0000000097",
+      "to": "element0000000098",
+      "type": "Connection"
+    },
+    "connection0000000099": {
+      "ConnectionType": "No",
+      "from": "element0000000098",
+      "ID": "connection0000000099",
+      "to": "element0000000100",
+      "type": "Connection"
+    },
+    "connection0000000102": {
+      "ConnectionType": "Yes",
+      "from": "element0000000098",
+      "ID": "connection0000000102",
+      "to": "element0000000103",
+      "type": "Connection"
+    },
+    "connection0000000105": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000105",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000106": {
+      "ConnectionType": "normal",
+      "from": "element0000000101",
+      "ID": "connection0000000106",
+      "to": "element0000000088",
+      "type": "Connection"
+    },
+    "connection0000000111": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000111",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000112": {
+      "ConnectionType": "normal",
+      "from": "element0000000108",
+      "ID": "connection0000000112",
+      "to": "element0000000101",
+      "type": "Connection"
+    },
+    "connection0000000114": {
+      "ConnectionType": "normal",
+      "from": "element0000000113",
+      "ID": "connection0000000114",
+      "to": "element0000000120",
+      "type": "Connection"
+    },
+    "connection0000000116": {
+      "ConnectionType": "normal",
+      "from": "element0000000115",
+      "ID": "connection0000000116",
+      "to": "element0000000117",
+      "type": "Connection"
+    },
+    "connection0000000121": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000121",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000122": {
+      "ConnectionType": "Yes",
+      "from": "element0000000120",
+      "ID": "connection0000000122",
+      "to": "element0000000115",
+      "type": "Connection"
+    },
+    "connection0000000124": {
+      "ConnectionType": "No",
+      "from": "element0000000117",
+      "ID": "connection0000000124",
+      "to": "element0000000128",
+      "type": "Connection"
+    },
+    "connection0000000127": {
+      "ConnectionType": "normal",
+      "from": "element0000000088",
+      "ID": "connection0000000127",
+      "to": "element0000000125",
+      "type": "Connection"
+    },
+    "connection0000000130": {
+      "ConnectionType": "normal",
+      "from": "element0000000128",
+      "ID": "connection0000000130",
+      "to": "element0000000129",
+      "type": "Connection"
+    },
+    "connection0000000131": {
+      "ConnectionType": "Yes",
+      "from": "element0000000129",
+      "ID": "connection0000000131",
+      "to": "element0000000123",
+      "type": "Connection"
+    }
+  },
+  "allElements": {
+    "element0000000001": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "0",
+      "enabled": "1",
+      "ID": "element0000000001",
+      "name": "Manual - \"loop test\"",
+      "package": "default",
+      "pars": {
+        "ID": "loop test"
+      },
+      "StandardName": "1",
+      "type": "trigger",
+      "x": "210",
+      "y": "105"
+    },
+    "element0000000002": {
+      "class": "Action_New_List",
+      "ID": "element0000000002",
+      "name": "New list TestList2 with initial content: Eins,Zwei,Drei",
+      "package": "default",
+      "pars": {
+        "DelimiterComma": 1,
+        "DelimiterLinefeed": 0,
+        "DelimiterSemicolon": 0,
+        "DelimiterSpace": 0,
+        "expression": "string",
+        "expressionPos": "string",
+        "InitialContent": "Multiple",
+        "Position": 1,
+        "Varname": "TestList2",
+        "VarValue": "New element",
+        "VarValues": "Eins,Zwei,Drei",
+        "WhichPosition": "Specified"
+      },
+      "StandardName": 1,
+      "type": "action",
+      "x": "210",
+      "y": "385"
+    },
+    "element0000000003": {
+      "class": "Loop_Work_through_a_list",
+      "HeightOfVerticalBar": 1365,
+      "ID": "element0000000003",
+      "name": "Work through a list: testListFirst",
+      "package": "default",
+      "pars": {
+        "Varname": "testListFirst"
+      },
+      "StandardName": 1,
+      "type": "Loop",
+      "x": "210",
+      "y": "525"
+    },
+    "element0000000004": {
+      "class": "Action_New_List",
+      "ID": "element0000000004",
+      "name": "New list testListFirst with initial content: One - Two - Three",
+      "package": "default",
+      "pars": {
+        "DelimiterComma": "0",
+        "DelimiterLinefeed": "1",
+        "DelimiterSemicolon": "0",
+        "DelimiterSpace": "0",
+        "expression": "String",
+        "expressionPos": "String",
+        "InitialContent": "Multiple",
+        "Position": "1",
+        "Varname": "testListFirst",
+        "VarValue": "New element",
+        "VarValues": "One\nTwo\nThree",
+        "WhichPosition": "Specified"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "210",
+      "y": "245"
+    },
+    "element0000000005": {
+      "class": "Loop_Work_through_a_list",
+      "HeightOfVerticalBar": "525",
+      "ID": "element0000000005",
+      "name": "Work through a list: testlist2",
+      "package": "default",
+      "pars": {
+        "Varname": "testlist2"
+      },
+      "StandardName": 1,
+      "type": "loop",
+      "x": "280",
+      "y": "980"
+    },
+    "element0000000006": {
+      "class": "Action_Tooltip",
+      "ID": "element0000000006",
+      "name": "Tooltip: inner loop %a_index% - 2 s - Follow Mouse",
+      "package": "action",
+      "pars": {
+        "duration": 2,
+        "follow_mouse": 1,
+        "text": "inner loop %a_index%",
+        "Unit": "Seconds"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "420",
+      "y": "1295"
+    },
+    "element0000000007": {
+      "class": "Action_Tooltip",
+      "ID": "element0000000007",
+      "name": "Tooltip: outer loop %a_index% end - 2 s - Follow Mouse",
+      "package": "action",
+      "pars": {
+        "duration": 2,
+        "follow_mouse": 1,
+        "text": "outer loop %a_index% end",
+        "Unit": "Seconds"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "280",
+      "y": "1715"
+    },
+    "element0000000008": {
+      "class": "Action_Trace_Point",
+      "ID": "element0000000008",
+      "name": "Trace Point - bright leg - With stop condition",
+      "package": "default",
+      "pars": {
+        "ID": "bright leg",
+        "LogMessage": "",
+        "StopCondition": "(a_index = 1) && (a_loopfield != \"one\") || (a_index = 2) && (a_loopfield !=\"two\")  || (a_index = 3) && (a_loopfield !=\"three\")"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "245",
+      "y": "840"
+    },
+    "element0000000009": {
+      "class": "Action_Tooltip",
+      "ID": "element0000000009",
+      "name": "Tooltip: outer loop %a_index% - 2 s - Follow Mouse",
+      "package": "action",
+      "pars": {
+        "duration": 2,
+        "follow_mouse": 1,
+        "text": "outer loop %a_index%",
+        "Unit": "Seconds"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "280",
+      "y": "700"
+    },
+    "element0000000010": {
+      "class": "Action_Trace_Point",
+      "ID": "element0000000010",
+      "name": "Trace Point - bright leg2 - With stop condition",
+      "package": "default",
+      "pars": {
+        "ID": "bright leg2",
+        "LogMessage": "",
+        "StopCondition": "(a_index = 1) && (a_loopfield != \"eins\") || (a_index = 2) && (a_loopfield != \"zwei\") || (a_index = 3)"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "420",
+      "y": "1470"
+    },
+    "element0000000029": {
+      "class": "Action_Trace_Point_Check",
+      "ID": "element0000000029",
+      "name": "Trace Point Check",
+      "package": "default",
+      "pars": {
+        "MustNotPassTracepoints": [
+          "Tracepoint red box (element0000000551)"
+        ],
+        "MustNotPassTracepointsAll": 0,
+        "MustPassTracepoints": {},
+        "MustPassTracepointsAll": 1
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "210",
+      "y": "2135"
+    },
+    "element0000000038": {
+      "class": "Condition_Expression",
+      "ID": "element0000000038",
+      "name": "Ausdruck - a_index <= 2",
+      "package": "default",
+      "pars": {
+        "Expression": "a_index <= 2"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "315",
+      "y": "1120"
+    },
+    "element0000000053": {
+      "class": "Condition_List_Contains_Element",
+      "ID": "element0000000053",
+      "name": "List Contains Element - Value '1' in list 'TestList2'",
+      "package": "default",
+      "pars": {
+        "InputList": "TestList2",
+        "isExpressionPosition": "String",
+        "isExpressionSearchContent": "String",
+        "Position": 1,
+        "SearchContent": "Zwei",
+        "SearchWhat": "Content"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-280",
+      "y": "455"
+    },
+    "element0000000057": {
+      "class": "Condition_List_Contains_Element",
+      "ID": "element0000000057",
+      "name": "List Contains Element - Value '1' in list 'TestList2'",
+      "package": "default",
+      "pars": {
+        "InputList": "TestList2",
+        "isExpressionPosition": "String",
+        "isExpressionSearchContent": "String",
+        "Position": 1,
+        "SearchContent": "gagaga",
+        "SearchWhat": "Content"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-280",
+      "y": "595"
+    },
+    "element0000000061": {
+      "class": "Condition_List_Contains_Element",
+      "ID": "element0000000061",
+      "name": "List Contains Element - Key 'Zwei' in list 'TestList2'",
+      "package": "default",
+      "pars": {
+        "InputList": "TestList2",
+        "isExpressionPosition": "String",
+        "isExpressionSearchContent": "String",
+        "Position": 1,
+        "SearchContent": "Zwei",
+        "SearchWhat": "Key"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-315",
+      "y": "770"
+    },
+    "element0000000062": {
+      "class": "Condition_List_Contains_Element",
+      "ID": "element0000000062",
+      "name": "List Contains Element - Key 'gagaga' in list 'TestList2'",
+      "package": "default",
+      "pars": {
+        "InputList": "TestList2",
+        "isExpressionPosition": "String",
+        "isExpressionSearchContent": "String",
+        "Position": "5",
+        "SearchContent": "gagaga",
+        "SearchWhat": "Key"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-315",
+      "y": "910"
+    },
+    "element0000000065": {
+      "class": "Condition_List_Contains_Element",
+      "ID": "element0000000065",
+      "name": "List Contains Element - Key 'gagaga' in list 'TestList2'",
+      "package": "default",
+      "pars": {
+        "InputList": "TestList2",
+        "isExpressionPosition": "String",
+        "isExpressionSearchContent": "String",
+        "Position": "0",
+        "SearchContent": "gagaga",
+        "SearchWhat": "Key"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-315",
+      "y": "1050"
+    },
+    "element0000000067": {
+      "class": "Condition_List_Contains_Element",
+      "ID": "element0000000067",
+      "name": "List Contains Element - Key 'gagaga' in list 'TestList2'",
+      "package": "default",
+      "pars": {
+        "InputList": "TestList2",
+        "isExpressionPosition": "String",
+        "isExpressionSearchContent": "String",
+        "Position": "gaga",
+        "SearchContent": "gagaga",
+        "SearchWhat": "Key"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-315",
+      "y": "1190"
+    },
+    "element0000000075": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "1",
+      "enabled": "1",
+      "ID": "element0000000075",
+      "name": "Manual - \"Main trigger\"",
+      "package": "default",
+      "pars": {
+        "ID": "Main trigger"
+      },
+      "StandardName": "1",
+      "type": "trigger",
+      "x": "-1050",
+      "y": "35"
+    },
+    "element0000000076": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "0",
+      "enabled": "1",
+      "ID": "element0000000076",
+      "name": "Manual - \"list test\"",
+      "package": "default",
+      "pars": {
+        "ID": "list test"
+      },
+      "StandardName": "1",
+      "type": "trigger",
+      "x": "-280",
+      "y": "35"
+    },
+    "element0000000077": {
+      "class": "Action_New_List",
+      "ID": "element0000000077",
+      "name": "New list TestList2 with initial content: Eins,Zwei,Drei",
+      "package": "default",
+      "pars": {
+        "DelimiterComma": 1,
+        "DelimiterLinefeed": 0,
+        "DelimiterSemicolon": 0,
+        "DelimiterSpace": 0,
+        "expression": "string",
+        "expressionPos": "string",
+        "InitialContent": "Multiple",
+        "Position": 1,
+        "Varname": "TestList2",
+        "VarValue": "New element",
+        "VarValues": "Eins,Zwei,Drei",
+        "WhichPosition": "Specified"
+      },
+      "StandardName": 1,
+      "type": "action",
+      "x": "-280",
+      "y": "315"
+    },
+    "element0000000078": {
+      "class": "Action_New_List",
+      "ID": "element0000000078",
+      "name": "New list testListFirst with initial content: One - Two - Three",
+      "package": "default",
+      "pars": {
+        "DelimiterComma": "0",
+        "DelimiterLinefeed": "1",
+        "DelimiterSemicolon": "0",
+        "DelimiterSpace": "0",
+        "expression": "String",
+        "expressionPos": "String",
+        "InitialContent": "Multiple",
+        "Position": "1",
+        "Varname": "testListFirst",
+        "VarValue": "New element",
+        "VarValues": "One\nTwo\nThree",
+        "WhichPosition": "Specified"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "-280",
+      "y": "175"
+    },
+    "element0000000083": {
+      "class": "Action_Execute_Flow",
+      "ID": "element0000000083",
+      "name": "Execute Flow: This flow - Manual - \"list test\"",
+      "package": "default",
+      "pars": {
+        "flowID": "",
+        "ReturnVariables": 0,
+        "SendLocalVars": 1,
+        "SkipDisabled": 0,
+        "ThisFlow": 1,
+        "triggerID": "element0000000076",
+        "WaitToFinish": 0,
+        "WhichTrigger": "Specific"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-1050",
+      "y": "595"
+    },
+    "element0000000084": {
+      "class": "Action_Execute_Flow",
+      "ID": "element0000000084",
+      "name": "Execute Flow: This flow - Manual - \"loop test\"",
+      "package": "default",
+      "pars": {
+        "flowID": "",
+        "ReturnVariables": 0,
+        "SendLocalVars": 1,
+        "SkipDisabled": 0,
+        "ThisFlow": 1,
+        "triggerID": "element0000000001",
+        "WaitToFinish": "1",
+        "WhichTrigger": "Specific"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-1260",
+      "y": "595"
+    },
+    "element0000000088": {
+      "class": "Action_New_variable",
+      "ID": "element0000000088",
+      "name": "New variable - static_successfulRuns = 0",
+      "package": "default",
+      "pars": {
+        "expression": "String",
+        "Varname": "static_successfulRuns",
+        "VarValue": "0"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-1050",
+      "y": "455"
+    },
+    "element0000000092": {
+      "class": "Action_New_variable",
+      "ID": "element0000000092",
+      "name": "New variable - static_successfulRuns = static_successfulRuns + 1",
+      "package": "default",
+      "pars": {
+        "expression": "Expression",
+        "Varname": "static_successfulRuns",
+        "VarValue": "static_successfulRuns + 1"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "245",
+      "y": "2275"
+    },
+    "element0000000094": {
+      "class": "Action_New_variable",
+      "ID": "element0000000094",
+      "name": "New variable - static_successfulRuns = static_successfulRuns + 1",
+      "package": "default",
+      "pars": {
+        "expression": "Expression",
+        "Varname": "static_successfulRuns",
+        "VarValue": "static_successfulRuns + 1"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-315",
+      "y": "1365"
+    },
+    "element0000000098": {
+      "class": "Condition_Expression",
+      "ID": "element0000000098",
+      "name": "Ausdruck - static_successfulRuns = requiredSuccessfulRuns",
+      "package": "default",
+      "pars": {
+        "Expression": "static_successfulRuns = requiredSuccessfulRuns"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-1050",
+      "y": "945"
+    },
+    "element0000000100": {
+      "class": "Action_Message_Box",
+      "ID": "element0000000100",
+      "name": "Message Box",
+      "package": "default",
+      "pars": {
+        "ButtonLabel": "OK",
+        "ButtonLabelCancel": "Abbrechen",
+        "Height": 200,
+        "IfDismiss": 1,
+        "IsTimeout": "NoTimeout",
+        "message": "Only %static_successfulRuns% successful runs instead of %requiredSuccessfulRuns%",
+        "OnTimeout": "Normal",
+        "ShowCancelButton": 0,
+        "TimeoutUnits": 10,
+        "title": "Fehler",
+        "Unit": "Seconds",
+        "Width": 300
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-1190",
+      "y": "1120"
+    },
+    "element0000000101": {
+      "class": "Action_New_variable",
+      "ID": "element0000000101",
+      "name": "New variable - requiredSuccessfulRuns = 3",
+      "package": "default",
+      "pars": {
+        "expression": "Expression",
+        "Varname": "requiredSuccessfulRuns",
+        "VarValue": "3"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-1050",
+      "y": "315"
+    },
+    "element0000000103": {
+      "class": "Action_Tooltip",
+      "ID": "element0000000103",
+      "name": "Tooltip: %static_SuccessfulRuns% of %requiredSuccessfulRuns% successful runs! - 2 s - Follow Mouse",
+      "package": "action",
+      "pars": {
+        "duration": 2,
+        "follow_mouse": 1,
+        "text": "%static_SuccessfulRuns% of %requiredSuccessfulRuns% successful runs!",
+        "Unit": "Seconds"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-910",
+      "y": "1085"
+    },
+    "element0000000108": {
+      "class": "Action_Set_Flow_Status",
+      "ID": "element0000000108",
+      "name": "Set Flow Status - Aktivieren: This flow - Any trigger",
+      "package": "default",
+      "pars": {
+        "Enable": "Enable",
+        "flowID": "",
+        "ThisFlow": 1,
+        "triggerID": "",
+        "WhichTrigger": "Any"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-1050",
+      "y": "175"
+    },
+    "element0000000113": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "0",
+      "enabled": "1",
+      "ID": "element0000000113",
+      "name": "Manual - \"basic variables test\"",
+      "package": "default",
+      "pars": {
+        "ID": "basic variables test"
+      },
+      "StandardName": "1",
+      "type": "trigger",
+      "x": "630",
+      "y": "140"
+    },
+    "element0000000115": {
+      "class": "Action_New_variable",
+      "ID": "element0000000115",
+      "name": "New variable - NewVariable = New element",
+      "package": "default",
+      "pars": {
+        "expression": "string",
+        "Varname": "NewVariable",
+        "VarValue": "New element"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "630",
+      "y": "420"
+    },
+    "element0000000117": {
+      "class": "Condition_Variable_Is_Empty",
+      "ID": "element0000000117",
+      "name": "Variable Is Empty - NewVariable",
+      "package": "default",
+      "pars": {
+        "VarName": "NewVariable"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "630",
+      "y": "560"
+    },
+    "element0000000120": {
+      "class": "Condition_Variable_Is_Empty",
+      "ID": "element0000000120",
+      "name": "Variable Is Empty - NewVariable",
+      "package": "default",
+      "pars": {
+        "VarName": "NewVariable"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "630",
+      "y": "280"
+    },
+    "element0000000123": {
+      "class": "Action_New_variable",
+      "ID": "element0000000123",
+      "name": "New variable - static_successfulRuns = static_successfulRuns + 1",
+      "package": "default",
+      "pars": {
+        "expression": "Expression",
+        "Varname": "static_successfulRuns",
+        "VarValue": "static_successfulRuns + 1"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "630",
+      "y": "1015"
+    },
+    "element0000000125": {
+      "class": "Action_Execute_Flow",
+      "ID": "element0000000125",
+      "name": "Execute Flow: This flow - Manual - \"basic variables test\"",
+      "package": "default",
+      "pars": {
+        "flowID": "",
+        "ReturnVariables": 0,
+        "SendLocalVars": 1,
+        "SkipDisabled": 0,
+        "ThisFlow": 1,
+        "triggerID": "element0000000113",
+        "WaitToFinish": 0,
+        "WhichTrigger": "Specific"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-875",
+      "y": "595"
+    },
+    "element0000000128": {
+      "class": "Action_New_variable",
+      "ID": "element0000000128",
+      "name": "New variable - NewVariable = ",
+      "package": "default",
+      "pars": {
+        "expression": "Expression",
+        "Varname": "NewVariable",
+        "VarValue": ""
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "630",
+      "y": "700"
+    },
+    "element0000000129": {
+      "class": "Condition_Variable_Is_Empty",
+      "ID": "element0000000129",
+      "name": "Variable Is Empty - NewVariable",
+      "package": "default",
+      "pars": {
+        "VarName": "NewVariable"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "630",
+      "y": "840"
+    }
+  },
+  "category": "AHF Test",
+  "ElementIDCounter": "131",
+  "flowSettings": {
+    "DefaultWorkingDir": 1,
+    "ExecutionPolicy": "default",
+    "Offsetx": "-1311.428568",
+    "Offsety": "-44.285716",
+    "WorkingDir": "",
+    "zoomFactor": "0.7"
+  },
+  "name": "Huge test script"
+}

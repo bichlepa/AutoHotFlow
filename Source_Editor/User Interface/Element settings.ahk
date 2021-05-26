@@ -572,6 +572,7 @@ class ElementSettings
 			{
 				;make list of all available parameter ID of this object
 				tempParameterID := this.parameter.id
+				tempParameterID.push(this.parameter.contentID)
 				
 				;Check whether current object has the requested parameter ID
 				for oneindex, oneid in tempParameterID
