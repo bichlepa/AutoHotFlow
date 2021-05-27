@@ -47,6 +47,7 @@ windowFunctions_addWindowIdentificationParametrization(parametersToEdit, options
 	    parametersToEdit.push({type: "button", goto: "windowFunctions_openAssistantNoExcludes", label: x_lang("Import window identification")})
 }
 
+; generates a string based on the configuration for the element name
 windowFunctions_generateWindowIdentificationName(ElementParameters, options = "")
 {
     nameString := ""
@@ -157,11 +158,13 @@ windowFunctions_getWindowID(EvaluatedParameters)
     return windowID
 }
 
+; opens window parameter assistant
 windowFunctions_openAssistant()
 {
     x_assistant_windowParameter({wintitle: "Wintitle", excludeTitle: "excludeTitle", winText: "winText", FindHiddenText: "FindHiddenText", ExcludeText: "ExcludeText", ahk_class: "ahk_class", ahk_exe: "ahk_exe", ahk_id: "ahk_id", ahk_pid: "ahk_pid", FindHiddenWindow: "FindHiddenWindow"})
 }
 
+; opens window parameter assistant bug excludes the parameters excludeTitle and ExcludeText
 windowFunctions_openAssistantNoExcludes()
 {
     x_assistant_windowParameter({wintitle: "Wintitle", winText: "winText", FindHiddenText: "FindHiddenText", ahk_class: "ahk_class", ahk_exe: "ahk_exe", ahk_id: "ahk_id", ahk_pid: "ahk_pid", FindHiddenWindow: "FindHiddenWindow"})
