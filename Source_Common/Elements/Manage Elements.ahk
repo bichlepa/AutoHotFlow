@@ -35,13 +35,7 @@ Element_New(p_FlowID, p_type="", p_elementID="")
 	newElement.StandardName := True
 
 	; set som initial info (which are not changed on undo/redo actions)
-	newElement.info := object()
-	newElement.info.enabled := False
-	newElement.info.selected := false
-	newElement.info.state := "idle"
-	newElement.info.countRuns := 0
-	newElement.info.lastrun := 0
-	newElement.info.ClickPriority := 500
+	newElement.info := Element_generateDefaultInfoObject()
 	
 	;Assign default position
 	newElement.x := 0
@@ -359,6 +353,19 @@ Element_Remove(p_FlowID, p_elementID)
 	_LeaveCriticalSection()
 }
 
+; returns a default info property of a new element
+Element_generateDefaultInfoObject()
+{
+	info := object()
+	info.enabled := False
+	info.selected := false
+	info.state := "idle"
+	info.countRuns := 0
+	info.lastrun := 0
+	info.ClickPriority := 500
+	return info
+}
+
 ; create a new connection
 Connection_New(p_FlowID, p_connectionID="")
 {
@@ -395,10 +402,7 @@ Connection_New(p_FlowID, p_connectionID="")
 	newConnection.topart := ""
 	
 	; set som initial info (which are not changed on undo/redo actions)
-	newConnection.info := object()
-	newConnection.info.selected := false
-	newConnection.info.state := "idle"
-	newConnection.info.ClickPriority := 500
+	newConnection.info := Connection_generateDefaultInfoObject()
 
 	; write connection object
 	_setConnection(p_FlowID, newConnection.ID, newConnection)
@@ -467,4 +471,14 @@ UpdateConnectionLists(p_FlowID)
 	}
 
 	_LeaveCriticalSection()
+}
+
+; returns a default info property of a new connection
+Connection_generateDefaultInfoObject()
+{
+	info := object()
+	info.selected := false
+	info.state := "idle"
+	info.ClickPriority := 500
+	return info
 }

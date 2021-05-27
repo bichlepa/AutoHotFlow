@@ -54,7 +54,8 @@ Element_getParametrizationDetails_Action_Get_String_Length(Environment)
 	parametersToEdit:=Object()
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Output variable name")})
-	parametersToEdit.push({type: "Edit", id: "Varname", default: "NewLength", content: "VariableName", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Edit", id: "Varname", default: "StringLength", content: "VariableName", WarnIfEmpty: true})
+
 	parametersToEdit.push({type: "Label", label:  x_lang("Input string")})
 	parametersToEdit.push({type: "Edit", id: "VarValue", default: "Hello World", content: ["String", "Expression"], contentID: "expression", contentDefault: "string", WarnIfEmpty: true})
 	
@@ -64,7 +65,7 @@ Element_getParametrizationDetails_Action_Get_String_Length(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Get_String_Length(Environment, ElementParameters)
 {
-	return x_lang("Get_String_Length") "`n" ElementParameters.Varname " = |" ElementParameters.VarValue "|"
+	return x_lang("Get_String_Length") "`n" ElementParameters.Varname " = " x_lang("Length of %1%", ElementParameters.VarValue)
 }
 
 ;Called every time the user changes any parameter.
@@ -81,36 +82,21 @@ Element_CheckSettings_Action_Get_String_Length(Environment, ElementParameters, s
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Get_String_Length(Environment, ElementParameters)
 {
-	Varname := x_replaceVariables(Environment, ElementParameters.Varname)
-	
-	if not x_CheckVariableName(Varname)
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
+	if (EvaluatedParameters._error)
 	{
-		;On error, finish with exception and return
-		x_finish(Environment, "exception", x_lang("%1% is not valid", x_lang("Ouput variable name '%1%'", varname)))
+		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
 
-	if (ElementParameters.Expression = 2)
-	{
-		evRes := x_EvaluateExpression(Environment, ElementParameters.VarValue)
-		if (evRes.error)
-		{
-			;On error, finish with exception and return
-			x_finish(Environment, "exception", x_lang("An error occured while parsing expression '%1%'", ElementParameters.VarValue) "`n`n" evRes.error) 
-			return
-		}
-		else
-		{
-			VarValue:=evRes.result
-		}
-	}
-	else
-		VarValue := x_replaceVariables(Environment, ElementParameters.VarValue)
+	; calculate string length
+	strlen := StrLen(EvaluatedParameters.VarValue)
 
-
-	StringLen,Result,VarValue
-	x_SetVariable(Environment,Varname,Result)
+	; set output variable
+	x_SetVariable(Environment, EvaluatedParameters.Varname, strlen)
 	
+	; finish
 	x_finish(Environment,"normal")
 	return
 }

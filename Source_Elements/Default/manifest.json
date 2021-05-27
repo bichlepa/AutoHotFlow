@@ -29,6 +29,7 @@
         "Search_in_a_string.ahk",
         "Add_to_list.ahk",
         "Get_from_list.ahk",
+        "Get_list_info.ahk",
         "Get_index_of_element_in_list.ahk",
         "Delete_from_list.ahk",
         "New_List.ahk",

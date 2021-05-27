@@ -112,7 +112,7 @@ x_AutoEvaluateParameters(Environment, ElementParameters, p_skipList = "")
 ; additionally evaluate some parameters of an element
 ; EvaluatedParameters: already evaluated parameters (can be empty)
 ; p_ParametersToEvaluate: Array of parameter names which need to be evaluated
-x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, p_ParametersToEvaluate)
+x_AutoEvaluateAdditionalParameters(byref EvaluatedParameters, Environment, ElementParameters, p_ParametersToEvaluate)
 {
 	_EnterCriticalSection()
 

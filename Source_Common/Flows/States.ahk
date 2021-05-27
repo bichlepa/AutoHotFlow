@@ -170,7 +170,13 @@ states_Restore(p_FlowID, p_StateID)
 	allElements := _getFlowProperty(p_FlowID, "states." p_StateID ".allElements")
 	for oneElementID, oneElement in allElements
 	{
+		; copy info property from current element 
 		oneElement.info := _getElementProperty(p_FlowID, oneElementID, "info")
+		if not (oneElement.info)
+		{
+			; if we restore a deleted element, we need to initialize a new info object
+			oneElement.info := Element_generateDefaultInfoObject()
+		}
 	}
 	_setFlowProperty(p_FlowID, "allElements", allElements, false)
 	allConnections := _getFlowProperty(p_FlowID, "states." p_StateID ".allConnections")

@@ -53,10 +53,13 @@ Element_getStabilityLevel_Action_New_List()
 Element_getParametrizationDetails_Action_New_List(Environment)
 {
 	parametersToEdit:=Object()
+
 	parametersToEdit.push({type: "Label", label: x_lang("Variable_name")})
 	parametersToEdit.push({type: "Edit", id: "Varname", default: "NewList", content: "VariableName", WarnIfEmpty: true})
+
 	parametersToEdit.push({type: "Label", label: x_lang("Number of elements")})
-	parametersToEdit.push({type: "Radio", id: "InitialContent", default: 1, result: "enum", choices: [x_lang("Empty list"), x_lang("Initialize with one element"), x_lang("Initialize with multiple elements")], enum: ["Empty", "One", "Multiple"]})
+	parametersToEdit.push({type: "Radio", id: "NumberOfElements", default: 1, result: "enum", choices: [x_lang("Empty list"), x_lang("Initialize with one element"), x_lang("Initialize with multiple elements")], enum: ["None", "One", "Multiple"]})
+
 	parametersToEdit.push({type: "Label", label:  x_lang("Initial content")})
 	parametersToEdit.push({type: "Edit", id: "VarValue", default: "New element", content: ["String", "Expression"], contentID: "expression", contentDefault: "string", WarnIfEmpty: true})
 	parametersToEdit.push({type: "multilineEdit", id: "VarValues", default: "Element one`nElement two", WarnIfEmpty: true})
@@ -64,35 +67,44 @@ Element_getParametrizationDetails_Action_New_List(Environment)
 	parametersToEdit.push({type: "Checkbox", id: "DelimiterComma", default: 0, label: x_lang("Use comma as delimiter")})
 	parametersToEdit.push({type: "Checkbox", id: "DelimiterSemicolon", default: 0, label: x_lang("Use semicolon as delimiter")})
 	parametersToEdit.push({type: "Checkbox", id: "DelimiterSpace", default: 0, label: x_lang("Use space as delimiter")})
+
 	parametersToEdit.push({type: "Label", label: x_lang("Key")})
 	parametersToEdit.push({type: "Radio", id: "WhichPosition", default: 1, result: "enum", choices: [x_lang("Numerically as first element"), x_lang("Following key")], enum: ["First", "Specified"]})
 	parametersToEdit.push({type: "Edit", id: "Position", default: "keyName", content: ["String", "Expression"], contentID: "expressionPos", contentDefault: "string", WarnIfEmpty: true})
 	
-
 	return parametersToEdit
 }
 
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_New_List(Environment, ElementParameters)
 {
-	if (ElementParameters.InitialContent="empty")
+	if (ElementParameters.NumberOfElements != "None")
 	{
-		Text.= x_lang("New empty list") " " ElementParameters.Varname
+		PositionText := " - "
+		if (ElementParameters.WhichPosition = "First")
+		{
+			PositionText .= x_lang("As first value")
+		}
+		else if (ElementParameters.WhichPosition = "Specified")
+		{
+			PositionText .= x_lang("At position '%1%'", ElementParameters.Position)
+		}
 	}
-	else if (ElementParameters.InitialContent="one")
+
+	if (ElementParameters.NumberOfElements = "None")
 	{
-		Text.= x_lang("New list %1% with initial content",ElementParameters.Varname) ": "
-		Text.=  ElementParameters.VarValue
-		
+		ValueText := x_lang("Empty")
+	}
+	else if (ElementParameters.NumberOfElements = "one")
+	{
+		ValueText := x_lang("Value '%1%'", ElementParameters.VarValue)
 	}
 	else
 	{
-		Text.= x_lang("New list %1% with initial content",ElementParameters.Varname) ": "
-		Text.=  ElementParameters.VarValues
-		
+		ValueText := x_lang("Multiple values '%1%'", ElementParameters.VarValues)
 	}
 	
-	return % Text
+	return % lang("New list %1%", ElementParameters.Varname) PositionText " - " ValueText
 	
 }
 
@@ -102,12 +114,11 @@ Element_GenerateName_Action_New_List(Environment, ElementParameters)
 ;- Correct misconfiguration
 Element_CheckSettings_Action_New_List(Environment, ElementParameters, staticValues)
 {
-	
-	if (ElementParameters.InitialContent = "one") ;one element
+	if (ElementParameters.NumberOfElements = "one") ;one element
 	{
 		x_Par_Enable("VarValue")
 		x_Par_Enable("WhichPosition")
-		x_Par_Enable("Position", (ElementParameters.WhichPosition = 2))
+		x_Par_Enable("Position", (ElementParameters.WhichPosition = "Specified"))
 	}
 	else
 	{
@@ -116,7 +127,7 @@ Element_CheckSettings_Action_New_List(Environment, ElementParameters, staticValu
 		x_Par_Disable("Position")
 	}
 	
-	if (ElementParameters.InitialContent = "multiple") ;Multiple elements
+	if (ElementParameters.NumberOfElements = "multiple") ;Multiple elements
 	{
 		x_Par_Enable("VarValues")
 		x_Par_Enable("DelimiterLinefeed")
@@ -132,110 +143,92 @@ Element_CheckSettings_Action_New_List(Environment, ElementParameters, staticValu
 		x_Par_Disable("DelimiterSemicolon")
 		x_Par_Disable("DelimiterSpace")
 	}
-	
-	
 }
 
 ;Called when the element should execute.
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_New_List(Environment, ElementParameters)
 {
-	;~ d(ElementParameters, "element parameters")
-	Varname := x_replaceVariables(Environment, ElementParameters.Varname)
-	Value := ""
-	
-	if not x_CheckVariableName(varname)
+	; evaluate parameters
+	x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["Varname", "NumberOfElements"])
+	if (ElementParameters._error)
 	{
-		;On error, finish with exception and return
-		x_finish(Environment, "exception", x_lang("%1% is not valid", x_lang("Ouput variable name '%1%'", varname)))
-		return
+		return x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 	}
 	
+	; create a new object which will be the output variable
+	newList := Object()
 	
-	newList:=Object()
-	
-	if (ElementParameters.InitialContent = "empty")
+	; check option NumberOfElements
+	if (ElementParameters.NumberOfElements = "None")
 	{
-		x_SetVariable(Environment,Varname,newList)
+		; list should be empty
 	}
-	else if (ElementParameters.InitialContent = "one") ;one element
+	else if (ElementParameters.NumberOfElements = "one")
 	{
-		if (ElementParameters.Expression = "expression")
+		; list should contain one element
+
+		; evaluate more parameters
+		x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["VarValue", "WhichPosition"])
+		if (ElementParameters._error)
 		{
-			evRes := x_EvaluateExpression(Environment, ElementParameters.VarValue)
-			if (evRes.error)
-			{
-				;On error, finish with exception and return
-				x_finish(Environment, "exception", x_lang("An error occured while parsing expression '%1%'", ElementParameters.VarValue) "`n`n" evRes.error) 
-				return
-			}
-			else
-			{
-				Value:=evRes.result
-			}
-		}
-		else
-			Value := x_replaceVariables(Environment, ElementParameters.VarValue)
-		
-		
-		
-		if (ElementParameters.WhichPosition="First")
-		{
-			newList.push(Value)
-		}
-		else
-		{
-			
-			if (ElementParameters.ExpressionPos = "expression")
-			{
-				evRes := x_EvaluateExpression(Environment, ElementParameters.Position)
-				if (evRes.error)
-				{
-					;On error, finish with exception and return
-					x_finish(Environment, "exception", x_lang("An error occured while parsing expression '%1%'", ElementParameters.Position) "`n`n" evRes.error) 
-					return
-				}
-				else
-				{
-					Position:=evRes.result
-				}
-			}
-			else
-				Position := x_replaceVariables(Environment, ElementParameters.Position)
-			
-			if (position = "")
-			{
-				;On error, finish with exception and return
-				x_finish(Environment, "exception", x_lang("Position is not specified")) 
-				return
-			}
-			
-			newList[Position] :=Value
+			return x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		}
 		
-		x_SetVariable(Environment,Varname,newList)
+		if (ElementParameters.WhichPosition = "First")
+		{
+			newList.push(EvaluatedParameters.VarValue)
+		}
+		else if (ElementParameters.WhichPosition = "Specified")
+		{
+			; evaluate more parameters
+			x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["Position"])
+			if (ElementParameters._error)
+			{
+				return x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
+			}
+
+			if (EvaluatedParameters.Position = "")
+			{
+				;position is not set. finish with exception
+				return x_finish(Environment, "exception", x_lang("Position is not specified")) 
+			}
+			
+			; write the value at the position
+			newList[EvaluatedParameters.Position] := EvaluatedParameters.VarValue
+		}
 	}
-	else if (ElementParameters.InitialContent = "multiple") 
+	else if (ElementParameters.NumberOfElements = "multiple") 
 	{
-		Value := x_replaceVariables(Environment, ElementParameters.varvalues)
+		; list should contain multiple elements
+
+		; evaluate more parameters
+		x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["VarValues", "DelimiterLinefeed", "DelimiterComma", "DelimiterSemicolon", "DelimiterSpace"])
+		if (ElementParameters._error)
+		{
+			return x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
+		}
 		
-		if ElementParameters.DelimiterLinefeed
-			StringReplace,Value,Value,`n,▬,all
-		if ElementParameters.DelimiterComma
-			StringReplace,Value,Value,`,,▬,all
-		if ElementParameters.DelimiterSemicolon
-			StringReplace,Value,Value,;,▬,all
-		if ElementParameters.DelimiterSpace
-			StringReplace,Value,Value,%A_Space%,▬,all
+		; prepare delimiter list
+		delimiters := ""
+		if (ElementParameters.DelimiterLinefeed)
+			delimiters .= "`n"
+		if (ElementParameters.DelimiterComma)
+			delimiters .= ","
+		if (ElementParameters.DelimiterSemicolon)
+			delimiters .= ";"
+		if (ElementParameters.DelimiterSpace)
+			delimiters .= " "
 		
-		loop,parse,Value,▬
+		; parse string and add all elements to list
+		loop, parse, % EvaluatedParameters.varvalues, % delimiters
 		{
 			newList.push(A_LoopField)
 		}
-		x_SetVariable(Environment,Varname,newList)
 	}
 	
-		;~ d(newlist)
+	; write object to variable
+	x_SetVariable(Environment, EvaluatedParameters.Varname, newList)
 	
 	;Always call v_finish() before return
 	x_finish(Environment, "normal")

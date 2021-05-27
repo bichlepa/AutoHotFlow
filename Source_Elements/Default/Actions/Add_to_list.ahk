@@ -53,10 +53,13 @@ Element_getStabilityLevel_Action_Add_To_List()
 Element_getParametrizationDetails_Action_Add_To_List(Environment)
 {
 	parametersToEdit:=Object()
+
 	parametersToEdit.push({type: "Label", label: x_lang("Variable_name")})
 	parametersToEdit.push({type: "Edit", id: "Varname", default: "MyList", content: "VariableName", WarnIfEmpty: true})
+
 	parametersToEdit.push({type: "Label", label: x_lang("Number of elements")})
-	parametersToEdit.push({type: "Radio", id: "NumberOfElements", default: 1, result: "enum", choices: [x_lang("Initialize with one element"), x_lang("Initialize with multiple elements")], enum: ["One", "Multiple"]})
+	parametersToEdit.push({type: "Radio", id: "NumberOfElements", default: 1, result: "enum", choices: [x_lang("Add one element"), x_lang("Add multiple elements")], enum: ["One", "Multiple"]})
+
 	parametersToEdit.push({type: "Label", label:  x_lang("Content to add")})
 	parametersToEdit.push({type: "Edit", id: "VarValue", default: "New element", content: ["String", "Expression"], contentID: "Expression", contentDefault: "string", WarnIfEmpty: true})
 	parametersToEdit.push({type: "multilineEdit", id: "VarValues", default: "Element one`nElement two", WarnIfEmpty: true})
@@ -64,36 +67,42 @@ Element_getParametrizationDetails_Action_Add_To_List(Environment)
 	parametersToEdit.push({type: "Checkbox", id: "DelimiterComma", default: 0, label: x_lang("Use comma as delimiter")})
 	parametersToEdit.push({type: "Checkbox", id: "DelimiterSemicolon", default: 0, label: x_lang("Use semicolon as delimiter")})
 	parametersToEdit.push({type: "Checkbox", id: "DelimiterSpace", default: 0, label: x_lang("Use space as delimiter")})
-	parametersToEdit.push({type: "Label", label: x_lang("Key")})
-	parametersToEdit.push({type: "Radio", id: "WhichPosition", default: 1, result: "enum", choices: [x_lang("First position"), x_lang("Last position"), x_lang("Following position or key")], enum: ["First", "Last", "Specified"]})
-	parametersToEdit.push({type: "Edit", id: "Position", default: "keyName", content: ["String", "Expression"], contentID: "expressionPos", contentDefault: "string", WarnIfEmpty: true})
-	
 
+	parametersToEdit.push({type: "Label", label: x_lang("Key")})
+	parametersToEdit.push({type: "Radio", id: "WhichPosition", default: "Last", result: "enum", choices: [x_lang("First position"), x_lang("Last position"), x_lang("Following position or key")], enum: ["First", "Last", "Specified"]})
+	parametersToEdit.push({type: "Edit", id: "Position", default: "keyName", content: ["String", "Expression"], contentID: "expressionPos", contentDefault: "string", WarnIfEmpty: true})
+
+	parametersToEdit.push({type: "Label", id: "InsertMethodLabel", size: "small", label: x_lang("Insertion method if position is an integer and list contains values at this or higher positions")})
+	parametersToEdit.push({type: "Radio", id: "InsertMethod", default: "Insert", result: "enum", choices: [x_lang("Insert and increment all other positions"), x_lang("Overwrite value")], enum: ["Insert", "Overwrite"]})	
 	return parametersToEdit
 }
 
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Add_To_List(Environment, ElementParameters)
 {
-	if ElementParameters.InitialContent=empty
+	if (ElementParameters.WhichPosition = "First")
 	{
-		Text.= x_lang("New empty list") " " ElementParameters.Varname
+		PositionText := x_lang("As first value")
 	}
-	else if ElementParameters.InitialContent=one
+	else if (ElementParameters.WhichPosition = "Last")
 	{
-		Text.= x_lang("New list %1% with initial content",ElementParameters.Varname) ": "
-		Text.=  ElementParameters.VarValue
-		
+		PositionText := x_lang("As last value")
+	}
+	else if (ElementParameters.WhichPosition = "Specified")
+	{
+		PositionText := x_lang("At position '%1%'", ElementParameters.Position)
+	}
+
+	if (ElementParameters.NumberOfElements = "one")
+	{
+		ValueText := x_lang("Value '%1%'", ElementParameters.VarValue)
 	}
 	else
 	{
-		Text.= x_lang("New list %1% with initial content",ElementParameters.Varname) ": "
-		Text.=  ElementParameters.VarValues
-		
+		ValueText := x_lang("Multiple values '%1%'", ElementParameters.VarValues)
 	}
 	
-	return % Text
-	
+	return % lang("Add to list %1%", ElementParameters.Varname) " - " PositionText " - " ValueText
 }
 
 ;Called every time the user changes any parameter.
@@ -102,21 +111,16 @@ Element_GenerateName_Action_Add_To_List(Environment, ElementParameters)
 ;- Correct misconfiguration
 Element_CheckSettings_Action_Add_To_List(Environment, ElementParameters, staticValues)
 {
-	
-	if (ElementParameters.InitialContent = "one") ;one element
+	if (ElementParameters.NumberOfElements = "one") ;one element
 	{
 		x_Par_Enable("VarValue")
-		x_Par_Enable("WhichPosition")
-		x_Par_Enable("Position", (ElementParameters.WhichPosition = 2))
 	}
 	else
 	{
 		x_Par_Disable("VarValue")
-		x_Par_Disable("WhichPosition")
-		x_Par_Disable("Position")
 	}
 	
-	if (ElementParameters.InitialContent = "multiple") ;Multiple elements
+	if (ElementParameters.NumberOfElements = "multiple") ;Multiple elements
 	{
 		x_Par_Enable("VarValues")
 		x_Par_Enable("DelimiterLinefeed")
@@ -133,167 +137,171 @@ Element_CheckSettings_Action_Add_To_List(Environment, ElementParameters, staticV
 		x_Par_Disable("DelimiterSpace")
 	}
 	
-	
+	x_Par_Enable("Position", (ElementParameters.WhichPosition = "Specified"))
+	x_Par_Enable("InsertMethod", (ElementParameters.WhichPosition = "Specified"))
+	x_Par_Enable("InsertMethodLabel", (ElementParameters.WhichPosition = "Specified")) ; this will gray out the label (in future versions of AHF)
 }
 
 ;Called when the element should execute.
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Add_To_List(Environment, ElementParameters)
 {
-	;~ d(ElementParameters, "element parameters")
-	Varname := x_replaceVariables(Environment, ElementParameters.Varname)
-	Value := ""
-	
-	if not x_CheckVariableName(varname)
+	; evaluate parameters
+	x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["Varname", "NumberOfElements"])
+	if (ElementParameters._error)
 	{
-		;On error, finish with exception and return
-		x_finish(Environment, "exception", x_lang("%1% is not valid", x_lang("Ouput variable name '%1%'", varname)))
-		return
+		return x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 	}
 	
-	myList:=x_getVariable(Environment,Varname)
+	; get list from variable
+	newList := x_getVariable(Environment, EvaluatedParameters.Varname)
 	
-	if (!(IsObject(myList)))
+	; check whether we got a list
+	if (!(IsObject(newList)))
 	{
-		if myList=
+		if (newList = "")
 		{
-			x_log(Environment, x_lang("Waring!") " " x_lang("Variable '%1%' is empty. A new list will be created.",Varname) ,1)
-			myList:=Object()
+			; we got an empty value. Log a warning and create a new list
+			x_log(Environment, x_lang("Waring!") " " x_lang("Variable '%1%' is empty. A new list will be created.", Varname) ,1)
+			newList := Object()
 		}
 		else
 		{
-			x_finish(Environment, "exception", x_lang("Variable '%1%' is not empty and does not contain a list.",Varname))
+			; we got a value wich is not empty and contains something. Finish with exception.
+			x_finish(Environment, "exception", x_lang("Variable '%1%' is not empty and does not contain a list.", Varname))
 			return
 		}
 	}
 	
-	if (ElementParameters.InitialContent = "one") ;one element
+	if (ElementParameters.NumberOfElements = "one")
 	{
-		if (ElementParameters.Expression = "expression")
+		; one element should be added
+
+		; evaluate more parameters
+		x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["VarValue", "WhichPosition"])
+		if (ElementParameters._error)
 		{
-			evRes := x_EvaluateExpression(Environment, ElementParameters.VarValue)
-			if (evRes.error)
-			{
-				;On error, finish with exception and return
-				x_finish(Environment, "exception", x_lang("An error occured while parsing expression '%1%'", ElementParameters.VarValue) "`n`n" evRes.error) 
-				return
-			}
-			else
-			{
-				Value:=evRes.result
-			}
+			return x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		}
-		else
-			Value := x_replaceVariables(Environment, ElementParameters.VarValue)
 		
-		
-		
-		if (ElementParameters.WhichPosition="First")
+		if (ElementParameters.WhichPosition = "First")
 		{
-			myList.insertat(1, Value)
+			newList.insertat(1, EvaluatedParameters.VarValue)
 		}
-		else if (ElementParameters.WhichPosition="Last")
+		else if (ElementParameters.WhichPosition = "Last")
 		{
-			myList.push(Value)
+			newList.push(EvaluatedParameters.VarValue)
 		}
-		else if (ElementParameters.WhichPosition="Specified")
+		else if (ElementParameters.WhichPosition = "Specified")
 		{
-			
-			if (ElementParameters.ExpressionPos = "expression")
+			; evaluate more parameters
+			x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["Position", "InsertMethod"])
+			if (ElementParameters._error)
 			{
-				evRes := x_EvaluateExpression(Environment, ElementParameters.Position)
-				if (evRes.error)
-				{
-					;On error, finish with exception and return
-					x_finish(Environment, "exception", x_lang("An error occured while parsing expression '%1%'", ElementParameters.Position) "`n`n" evRes.error) 
-					return
-				}
-				else
-				{
-					Position:=evRes.result
-				}
+				return x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 			}
-			else
-				Position := x_replaceVariables(Environment, ElementParameters.Position)
-			
-			if (position = "")
+
+			if (EvaluatedParameters.Position = "")
 			{
-				;On error, finish with exception and return
-				x_finish(Environment, "exception", x_lang("Position is not specified")) 
-				return
+				;position is not set. finish with exception
+				return x_finish(Environment, "exception", x_lang("Position is not specified")) 
 			}
 			
-			myList[Position] :=Value
+			if (EvaluatedParameters.insertMethod = "Insert")
+			{
+				; use the insertat function. It will not overwrite if the integer key has a value. If key is not integer, it will work like a direct assignment
+				newList.insertat(EvaluatedParameters.Position, EvaluatedParameters.VarValue)
+			}
+			Else if (EvaluatedParameters.InsertMethod = "Overwrite")
+			{
+				; assign directly. If the key is an integer, it will overwrite its value. 
+				newList[EvaluatedParameters.Position] := EvaluatedParameters.VarValue
+			}
 		}
-		
-		x_SetVariable(Environment,Varname,myList)
 	}
 	else if (ElementParameters.InitialContent = "multiple") 
 	{
-		Value := x_replaceVariables(Environment, ElementParameters.varvalues)
+		; evaluate more parameters
+		x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["VarValues", "DelimiterLinefeed", "DelimiterComma", "DelimiterSemicolon", "DelimiterSpace", "WhichPosition"])
+		if (ElementParameters._error)
+		{
+			return x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
+		}
 		
-		if ElementParameters.DelimiterLinefeed
-			StringReplace,Value,Value,`n,▬,all
-		if ElementParameters.DelimiterComma
-			StringReplace,Value,Value,`,,▬,all
-		if ElementParameters.DelimiterSemicolon
-			StringReplace,Value,Value,;,▬,all
-		if ElementParameters.DelimiterSpace
-			StringReplace,Value,Value,%A_Space%,▬,all
-		if (ElementParameters.WhichPosition="First")
+		; prepare delimiter list
+		delimiters := ""
+		if (ElementParameters.DelimiterLinefeed)
+			delimiters .= "`n"
+		if (ElementParameters.DelimiterComma)
+			delimiters .= ","
+		if (ElementParameters.DelimiterSemicolon)
+			delimiters .= ";"
+		if (ElementParameters.DelimiterSpace)
+			delimiters .= " "
+		
+		; parse string and add all elements to list
+		parsedList := object()
+		loop, parse, % EvaluatedParameters.varvalues, % delimiters
 		{
-			loop,parse,Value,▬
+			parsedList.push(A_LoopField)
+		}
+
+		if (ElementParameters.WhichPosition = "First")
+		{
+			; add all elements at first position
+			for oneIndex, oneValue in parsedList
 			{
-				myList.insertat(a_index, Value)
+				newList.insertat(1, oneValue)
 			}
 		}
-		else if (ElementParameters.WhichPosition="Last")
+		else if (ElementParameters.WhichPosition = "Last")
 		{
-			loop,parse,Value,▬
+			; push all elements to last position
+			for oneIndex, oneValue in parsedList
 			{
-				myList.push(Value)
+				newList.push(oneValue)
 			}
 		}
-		else if (ElementParameters.WhichPosition="Specified")
+		else if (ElementParameters.WhichPosition = "Specified")
 		{
-			if (ElementParameters.ExpressionPos = "expression")
+			; evaluate more parameters
+			x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["Position", "InsertMethod"])
+			if (ElementParameters._error)
 			{
-				evRes := x_EvaluateExpression(Environment, ElementParameters.Position)
-				if (evRes.error)
+				return x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
+			}
+
+			; copy position value
+			position := EvaluatedParameters.Position
+
+			; check whether position is an integer
+			if position is not integer
+			{
+				; it is not possible to insert multiple values to a single key. Raise exception.
+				return x_finish(Environment, "exception", x_lang("Position '%1%'is not an integer value", position))
+			}
+
+			if (EvaluatedParameters.InsertMethod = "Insert")
+			{
+				; use the insertat function. It will not overwrite the values.
+				for oneIndex, oneValue in parsedList
 				{
-					;On error, finish with exception and return
-					x_finish(Environment, "exception", x_lang("An error occured while parsing expression '%1%'", ElementParameters.Position) "`n`n" evRes.error) 
-					return
+					newList.insertat(position + a_index - 1, oneValue)
 				}
-				else
+			}
+			else if (EvaluatedParameters.InsertMethod = "Overwrite")
+			{
+				; assign directly. It will overwrite existing values. 
+				for oneIndex, oneValue in parsedList
 				{
-					Position:=evRes.result
+					newList[position + a_index - 1] := oneValue
 				}
-			}
-			else
-				Position := x_replaceVariables(Environment, ElementParameters.Position)
-			
-			if (position = "")
-			{
-				;On error, finish with exception and return
-				x_finish(Environment, "exception", x_lang("Position is not specified")) 
-				return
-			}
-			
-			if position is not Integer
-			{
-				x_finish(Environment, "exception", x_lang("Position is not a number: %1%", position)) 
-			}
-			
-			loop,parse,Value,▬
-			{
-				myList.Insert(Position+A_Index-1, A_LoopField)
 			}
 		}
-		x_SetVariable(Environment,Varname,myList)
 	}
-	
-		;~ d(myList)
+
+	; write object to variable
+	x_SetVariable(Environment, EvaluatedParameters.Varname, newList)
 	
 	;Always call v_finish() before return
 	x_finish(Environment, "normal")

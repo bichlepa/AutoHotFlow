@@ -81,16 +81,18 @@ Element_run_Condition_Debug_Dialog(Environment, ElementParameters)
 	gui, %guiID%: +LabelCondition_Debug_Dialog_On ;This label leads to a jump label beneath. It's needed if user closes the window
 
 	; add variable list header with update button
-	gui, %guiID%:add, text, xm w90, % x_lang("Variable list")
-	gui, %guiID%:add, button, X+10 w80 h20 gCondition_Debug_DialogButtonUpdateVariableList, % x_lang("Update")
+	gui, %guiID%:add, text, xm ym w90, % x_lang("Variable list")
+	gui, %guiID%:add, button, xm Y+10 w80 h20 gCondition_Debug_DialogButtonUpdateVariableList, % x_lang("Update")
 
-	; add variable value header with type selector
-	gui, %guiID%:add, text, X+30 w90, % x_lang("Type and value")
+	; add variable value header with type selector and unicode checkbox
+	gui, %guiID%:add, text, xm+210 ym w90, % x_lang("Type and value")
 	gui, %guiID%:add, DropDownList, X+10 w130 gCondition_Debug_DialogValueEditField hwndHWNDVarTypeDropDown disabled, % x_lang("Normal") "|" x_lang("Object")
 	x_SetExecutionValue(Environment, "HWNDVarTypeDropDown", HWNDVarTypeDropDown)
+	gui, %guiID%:add, checkbox, xp-100 Y+10 w200 gCondition_Debug_DialogVarList hwndHWNDUnicodeCheckbox, % x_lang("Convert special characters")
+	x_SetExecutionValue(Environment, "HWNDUnicodeCheckbox", HWNDUnicodeCheckbox)
 
 	; add list box with variable names
-	gui, %guiID%:add, listbox, xm w200 h200 hwndHWNDVarList gCondition_Debug_DialogVarList
+	gui, %guiID%:add, listbox, xm Y+10 w200 h200 hwndHWNDVarList gCondition_Debug_DialogVarList
 	x_SetExecutionValue(Environment, "HWNDVarList", HWNDVarList)
 	
 	; add edit field where user can see and change the variable value
@@ -181,7 +183,7 @@ Condition_Debug_Dialog_UpdateVariableList(guiID)
 	GuiControl, %guiID%:Disable, % HWNDDeleteVariableButton
 	GuiControl, %guiID%:Disable, % HWNDChangeValueButton
 
-	; disable variable type dropdown and hide value
+	; disable variable type dropdown and checkbox and hide dropdown value
 	GuiControl, %guiID%:Disable, % HWNDVarTypeDropDown
 	GuiControl, %guiID%:choose, % HWNDVarTypeDropDown, 0
 }
@@ -217,6 +219,7 @@ Condition_Debug_DialogVarList()
 	HWNDVarList := x_GetExecutionValue(Environment, "HWNDVarList")
 	HWNDValueEditField := x_GetExecutionValue(Environment, "HWNDValueEditField")
 	HWNDVarTypeDropDown := x_GetExecutionValue(Environment, "HWNDVarTypeDropDown")
+	HWNDUnicodeCheckbox := x_GetExecutionValue(Environment, "HWNDUnicodeCheckbox")
 
 	; get the selected variable name
 	guicontrolget, selectedVarName,, % HWNDVarList
@@ -248,7 +251,8 @@ Condition_Debug_DialogVarList()
 		if (variableType = "object")
 		{
 			; the variable contains an object. We habe to convert it to readable format
-			variableContent := Jxon_Dump(variableContent, 2)
+			guicontrolget, convertUnicode,, % HWNDUnicodeCheckbox
+			variableContent := Jxon_Dump(variableContent, 2, , not convertUnicode)
 		}
 
 		; show the variable content in the edit field

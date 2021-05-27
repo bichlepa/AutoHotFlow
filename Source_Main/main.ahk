@@ -174,6 +174,7 @@ global_libInclusionsForThreads =
 #include source_Elements\Default\actions\Search_in_a_string.ahk
 #include source_Elements\Default\actions\Add_to_list.ahk
 #include source_Elements\Default\actions\Get_from_list.ahk
+#include source_Elements\Default\actions\Get_list_info.ahk
 #include source_Elements\Default\actions\Get_index_of_element_in_list.ahk
 #include source_Elements\Default\actions\Delete_from_list.ahk
 #include source_Elements\Default\actions\New_List.ahk
@@ -312,6 +313,7 @@ global_elementInclusionsForThreads =
 #include source_Elements\Default\actions\Search_in_a_string.ahk
 #include source_Elements\Default\actions\Add_to_list.ahk
 #include source_Elements\Default\actions\Get_from_list.ahk
+#include source_Elements\Default\actions\Get_list_info.ahk
 #include source_Elements\Default\actions\Get_index_of_element_in_list.ahk
 #include source_Elements\Default\actions\Delete_from_list.ahk
 #include source_Elements\Default\actions\New_List.ahk

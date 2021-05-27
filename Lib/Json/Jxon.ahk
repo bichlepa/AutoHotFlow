@@ -147,7 +147,7 @@ Jxon_Load(ByRef src, args*)
 	return tree[1]
 }
 
-Jxon_Dump(obj, indent:="", lvl:=1)
+Jxon_Dump(obj, indent:="", lvl:=1, showUnicode := 0)
 {
 	static q := Chr(34)
 
@@ -184,7 +184,7 @@ Jxon_Dump(obj, indent:="", lvl:=1)
 			if !is_array
 				out .= ( ObjGetCapacity([k], 1) ? Jxon_Dump(k) : q . k . q ) ;// key
 				    .  ( indent ? ": " : ":" ) ; token + padding
-			out .= Jxon_Dump(v, indent, lvl) ; value
+			out .= Jxon_Dump(v, indent, lvl, showUnicode) ; value
 			    .  ( indent ? ",`n" . indt : "," ) ; token + indent
 		}
 
@@ -214,7 +214,11 @@ Jxon_Dump(obj, indent:="", lvl:=1)
 		, obj := StrReplace(obj, "`r",    "\r")
 		, obj := StrReplace(obj, "`t",    "\t")
 
-		static needle := (A_AhkVersion<"2" ? "O)" : "") . "[^\x20-\x7e]"
+		; modified by bichlepa to disable conversion of unicode characters
+		if (showUnicode)
+			needle := (A_AhkVersion<"2" ? "O)" : "") . "[\x0-\x1f]"
+		Else
+			needle := (A_AhkVersion<"2" ? "O)" : "") . "[^\x20-\x7e]"
 		while RegExMatch(obj, needle, m)
 			obj := StrReplace(obj, m[0], Format("\u{:04X}", Ord(m[0])))
 	}

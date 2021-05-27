@@ -650,6 +650,8 @@ ui_findElementUnderMouse(mx, my, par_filter="", par_priority = "highest")
 			drawResultElement := drawResultFlow.elements[forElementID]
 			; get additional data
 			clickPriority := _getElementInfo(_FlowID, forElementID, "ClickPriority")
+			if not clickPriority
+				clickPriority := 500
 			selected := _getElementInfo(_FlowID, forElementID, "selected")
 
 			;Some elements consist of multiple parts, so we need to loop through all of them
@@ -704,6 +706,8 @@ ui_findElementUnderMouse(mx, my, par_filter="", par_priority = "highest")
 
 			; get additional data
 			clickPriority := _getConnectionInfo(_FlowID, forElementID, "ClickPriority")
+			if not clickPriority
+				clickPriority := 500
 
 			;Connections consist of multiple parts, so we need to loop through all of them
 			found := false

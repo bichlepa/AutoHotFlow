@@ -152,7 +152,7 @@
       "ConnectionType": "No",
       "from": "element0000000067",
       "ID": "connection0000000068",
-      "to": "element0000000094",
+      "to": "element0000000203",
       "type": "Connection"
     },
     "connection0000000069": {
@@ -414,6 +414,132 @@
       "ID": "connection0000000166",
       "to": "element0000000151",
       "type": "Connection"
+    },
+    "connection0000000169": {
+      "ConnectionType": "normal",
+      "from": "element0000000167",
+      "ID": "connection0000000169",
+      "to": "element0000000168",
+      "type": "Connection"
+    },
+    "connection0000000170": {
+      "ConnectionType": "normal",
+      "from": "element0000000168",
+      "ID": "connection0000000170",
+      "to": "element0000000171",
+      "type": "Connection"
+    },
+    "connection0000000172": {
+      "ConnectionType": "normal",
+      "from": "element0000000171",
+      "ID": "connection0000000172",
+      "to": "element0000000173",
+      "type": "Connection"
+    },
+    "connection0000000179": {
+      "ConnectionType": "Yes",
+      "from": "element0000000173",
+      "ID": "connection0000000179",
+      "to": "element0000000177",
+      "type": "Connection"
+    },
+    "connection0000000180": {
+      "ConnectionType": "normal",
+      "from": "element0000000177",
+      "ID": "connection0000000180",
+      "to": "element0000000178",
+      "type": "Connection"
+    },
+    "connection0000000184": {
+      "ConnectionType": "normal",
+      "from": "element0000000088",
+      "ID": "connection0000000184",
+      "to": "element0000000183",
+      "type": "Connection"
+    },
+    "connection0000000195": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000195",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000198": {
+      "ConnectionType": "Yes",
+      "from": "element0000000178",
+      "ID": "connection0000000198",
+      "to": "element0000000197",
+      "type": "Connection"
+    },
+    "connection0000000199": {
+      "ConnectionType": "normal",
+      "from": "element0000000197",
+      "ID": "connection0000000199",
+      "to": "element0000000190",
+      "type": "Connection"
+    },
+    "connection0000000200": {
+      "ConnectionType": "Exception",
+      "from": "element0000000190",
+      "ID": "connection0000000200",
+      "to": "element0000000181",
+      "type": "Connection"
+    },
+    "connection0000000205": {
+      "ConnectionType": "normal",
+      "from": "element0000000203",
+      "ID": "connection0000000205",
+      "to": "element0000000204",
+      "type": "Connection"
+    },
+    "connection0000000209": {
+      "ConnectionType": "normal",
+      "from": "element0000000204",
+      "ID": "connection0000000209",
+      "to": "element0000000208",
+      "type": "Connection"
+    },
+    "connection0000000217": {
+      "ConnectionType": "normal",
+      "from": "element0000000208",
+      "ID": "connection0000000217",
+      "to": "element0000000215",
+      "type": "Connection"
+    },
+    "connection0000000218": {
+      "ConnectionType": "normal",
+      "from": "element0000000215",
+      "ID": "connection0000000218",
+      "to": "element0000000216",
+      "type": "Connection"
+    },
+    "connection0000000220": {
+      "ConnectionType": "normal",
+      "from": "element0000000216",
+      "ID": "connection0000000220",
+      "to": "element0000000219",
+      "type": "Connection"
+    },
+    "connection0000000221": {
+      "ConnectionType": "Yes",
+      "from": "element0000000211",
+      "ID": "connection0000000221",
+      "to": "element0000000094",
+      "type": "Connection"
+    },
+    "connection0000000222": {
+      "ConnectionType": "normal",
+      "from": "element0000000219",
+      "ID": "connection0000000222",
+      "to": "element0000000211",
+      "type": "Connection"
+    },
+    "connection0000000228": {
+      "ConnectionType": "normal",
+      "from": "element0000000204",
+      "ID": "connection0000000228",
+      "to": "element0000000227",
+      "type": "Connection"
     }
   },
   "allElements": {
@@ -435,23 +561,23 @@
     "element0000000002": {
       "class": "Action_New_List",
       "ID": "element0000000002",
-      "name": "New list TestList2 with initial content: Eins,Zwei,Drei",
+      "name": "New list TestList2 - At position '1' - Multiple values 'Eins,Zwei,Drei'",
       "package": "default",
       "pars": {
         "DelimiterComma": 1,
         "DelimiterLinefeed": 0,
         "DelimiterSemicolon": 0,
         "DelimiterSpace": 0,
-        "expression": "string",
-        "expressionPos": "string",
-        "InitialContent": "Multiple",
+        "expression": "String",
+        "expressionPos": "String",
+        "NumberOfElements": "Multiple",
         "Position": 1,
         "Varname": "TestList2",
         "VarValue": "New element",
         "VarValues": "Eins,Zwei,Drei",
         "WhichPosition": "Specified"
       },
-      "StandardName": 1,
+      "StandardName": "1",
       "type": "action",
       "x": "210",
       "y": "385"
@@ -473,7 +599,7 @@
     "element0000000004": {
       "class": "Action_New_List",
       "ID": "element0000000004",
-      "name": "New list testListFirst with initial content: One - Two - Three",
+      "name": "New list testListFirst - At position '1' - Multiple values 'One - Two - Three'",
       "package": "default",
       "pars": {
         "DelimiterComma": "0",
@@ -482,7 +608,7 @@
         "DelimiterSpace": "0",
         "expression": "String",
         "expressionPos": "String",
-        "InitialContent": "Multiple",
+        "NumberOfElements": "Multiple",
         "Position": "1",
         "Varname": "testListFirst",
         "VarValue": "New element",
@@ -758,23 +884,23 @@
     "element0000000077": {
       "class": "Action_New_List",
       "ID": "element0000000077",
-      "name": "New list TestList2 with initial content: Eins,Zwei,Drei",
+      "name": "New list TestList2 - At position '1' - Multiple values 'Eins,Zwei,Drei'",
       "package": "default",
       "pars": {
         "DelimiterComma": 1,
         "DelimiterLinefeed": 0,
         "DelimiterSemicolon": 0,
         "DelimiterSpace": 0,
-        "expression": "string",
-        "expressionPos": "string",
-        "InitialContent": "Multiple",
+        "expression": "String",
+        "expressionPos": "String",
+        "NumberOfElements": "Multiple",
         "Position": 1,
         "Varname": "TestList2",
         "VarValue": "New element",
         "VarValues": "Eins,Zwei,Drei",
         "WhichPosition": "Specified"
       },
-      "StandardName": 1,
+      "StandardName": "1",
       "type": "action",
       "x": "-280",
       "y": "315"
@@ -782,7 +908,7 @@
     "element0000000078": {
       "class": "Action_New_List",
       "ID": "element0000000078",
-      "name": "New list testListFirst with initial content: One - Two - Three",
+      "name": "New list testListFirst - At position '1' - Multiple values 'One - Two - Three'",
       "package": "default",
       "pars": {
         "DelimiterComma": "0",
@@ -791,7 +917,7 @@
         "DelimiterSpace": "0",
         "expression": "String",
         "expressionPos": "String",
-        "InitialContent": "Multiple",
+        "NumberOfElements": "Multiple",
         "Position": "1",
         "Varname": "testListFirst",
         "VarValue": "New element",
@@ -886,7 +1012,7 @@
       "StandardName": "1",
       "type": "Action",
       "x": "-315",
-      "y": "1365"
+      "y": "2380"
     },
     "element0000000098": {
       "class": "Condition_Expression",
@@ -904,12 +1030,13 @@
     "element0000000100": {
       "class": "Action_Message_Box",
       "ID": "element0000000100",
-      "name": "Message Box",
+      "name": "Message Box - Fehler - Only %static_successfulRuns% successful runs instead of %requiredSuccessfulRuns%",
       "package": "default",
       "pars": {
         "ButtonLabel": "OK",
         "ButtonLabelCancel": "Abbrechen",
         "Height": 200,
+        "IfClose": "",
         "IfDismiss": 1,
         "IsTimeout": "NoTimeout",
         "message": "Only %static_successfulRuns% successful runs instead of %requiredSuccessfulRuns%",
@@ -928,12 +1055,12 @@
     "element0000000101": {
       "class": "Action_New_variable",
       "ID": "element0000000101",
-      "name": "New variable - requiredSuccessfulRuns = 4",
+      "name": "New variable - requiredSuccessfulRuns = 5",
       "package": "default",
       "pars": {
         "expression": "Expression",
         "Varname": "requiredSuccessfulRuns",
-        "VarValue": "4"
+        "VarValue": "5"
       },
       "StandardName": "1",
       "type": "Action",
@@ -1315,17 +1442,299 @@
       "type": "Action",
       "x": "-735",
       "y": "595"
+    },
+    "element0000000167": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "0",
+      "enabled": "1",
+      "ID": "element0000000167",
+      "name": "Manual - \"calculations test\"",
+      "package": "default",
+      "pars": {
+        "ID": "calculations test"
+      },
+      "StandardName": "1",
+      "type": "trigger",
+      "x": "1190",
+      "y": "140"
+    },
+    "element0000000168": {
+      "class": "Action_New_variable",
+      "ID": "element0000000168",
+      "name": "New variable - NewVariable = -5",
+      "package": "default",
+      "pars": {
+        "expression": "String",
+        "Varname": "NewVariable",
+        "VarValue": "-5"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "1190",
+      "y": "280"
+    },
+    "element0000000171": {
+      "class": "Action_Absolute_number",
+      "ID": "element0000000171",
+      "name": "Absolute number - NewVariable = |newVariable|",
+      "package": "default",
+      "pars": {
+        "Varname": "NewVariable",
+        "VarValue": "newVariable"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "1190",
+      "y": "420"
+    },
+    "element0000000173": {
+      "class": "Condition_Expression",
+      "ID": "element0000000173",
+      "name": "Ausdruck - newVariable = 5",
+      "package": "default",
+      "pars": {
+        "Expression": "newVariable = 5"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "1190",
+      "y": "560"
+    },
+    "element0000000177": {
+      "class": "Action_Absolute_number",
+      "ID": "element0000000177",
+      "name": "Absolute number - NewVariable = |newVariable|",
+      "package": "default",
+      "pars": {
+        "Varname": "NewVariable",
+        "VarValue": "newVariable"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "1190",
+      "y": "700"
+    },
+    "element0000000178": {
+      "class": "Condition_Expression",
+      "ID": "element0000000178",
+      "name": "Ausdruck - newVariable = 5",
+      "package": "default",
+      "pars": {
+        "Expression": "newVariable = 5"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "1190",
+      "y": "840"
+    },
+    "element0000000181": {
+      "class": "Action_New_variable",
+      "ID": "element0000000181",
+      "name": "New variable - static_successfulRuns = static_successfulRuns + 1",
+      "package": "default",
+      "pars": {
+        "expression": "Expression",
+        "Varname": "static_successfulRuns",
+        "VarValue": "static_successfulRuns + 1"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "1190",
+      "y": "1260"
+    },
+    "element0000000183": {
+      "class": "Action_Execute_Flow",
+      "ID": "element0000000183",
+      "name": "Execute Flow: This flow - Manual - \"calculations test\"",
+      "package": "default",
+      "pars": {
+        "flowID": "",
+        "ReturnVariables": 0,
+        "SendLocalVars": 1,
+        "SkipDisabled": 0,
+        "ThisFlow": 1,
+        "triggerID": "element0000000167",
+        "WaitToFinish": 0,
+        "WhichTrigger": "Specific"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-1400",
+      "y": "595"
+    },
+    "element0000000190": {
+      "class": "Action_Absolute_number",
+      "ID": "element0000000190",
+      "name": "Absolute number - NewVariable = |newVariable|",
+      "package": "default",
+      "pars": {
+        "Varname": "NewVariable",
+        "VarValue": "newVariable"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "1190",
+      "y": "1120"
+    },
+    "element0000000197": {
+      "class": "Action_New_variable",
+      "ID": "element0000000197",
+      "name": "New variable - NewVariable = aegasdf",
+      "package": "default",
+      "pars": {
+        "expression": "String",
+        "Varname": "NewVariable",
+        "VarValue": "aegasdf"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "1190",
+      "y": "980"
+    },
+    "element0000000203": {
+      "class": "Action_New_List",
+      "ID": "element0000000203",
+      "name": "New list russianList - At position '3' - Value '\"\u0442\u0440\u0438\"'",
+      "package": "default",
+      "pars": {
+        "DelimiterComma": "0",
+        "DelimiterLinefeed": "1",
+        "DelimiterSemicolon": "0",
+        "DelimiterSpace": "0",
+        "expression": "Expression",
+        "expressionPos": "String",
+        "NumberOfElements": "One",
+        "Position": "3",
+        "Varname": "russianList",
+        "VarValue": "\"\u0442\u0440\u0438\"",
+        "VarValues": "One\nTwo\nThree",
+        "WhichPosition": "Specified"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "-315",
+      "y": "1400"
+    },
+    "element0000000204": {
+      "class": "Action_Add_To_List",
+      "ID": "element0000000204",
+      "name": "Add to list russianList - As last value - Value '\"\u0447\u0435\u0442\u044B\u0440\u0435\"'",
+      "package": "default",
+      "pars": {
+        "DelimiterComma": "0",
+        "DelimiterLinefeed": "1",
+        "DelimiterSemicolon": "0",
+        "DelimiterSpace": "0",
+        "Expression": "Expression",
+        "expressionPos": "String",
+        "InsertMethod": "Insert",
+        "InsertMethodLabel": "",
+        "NumberOfElements": "One",
+        "Position": "2",
+        "Varname": "russianList",
+        "VarValue": "\"\u0447\u0435\u0442\u044B\u0440\u0435\"",
+        "VarValues": "One\nTwo\nThree",
+        "WhichPosition": "Last"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "-315",
+      "y": "1540"
+    },
+    "element0000000208": {
+      "class": "Action_Get_List_Info",
+      "ID": "element0000000208",
+      "name": "Get list info - ListMax = Maximum index of russianList",
+      "package": "default",
+      "pars": {
+        "List": "russianList",
+        "Varname": "ListMax",
+        "WhichInfo": "maxIndex"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "-315",
+      "y": "1680"
+    },
+    "element0000000211": {
+      "class": "Condition_Expression",
+      "ID": "element0000000211",
+      "name": "Ausdruck - listLength = 4 and listMax = 4 and listMin = 3 and listCount = 2",
+      "package": "default",
+      "pars": {
+        "Expression": "listLength = 4 and listMax = 4 and listMin = 3 and listCount = 2"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-315",
+      "y": "2240"
+    },
+    "element0000000215": {
+      "class": "Action_Get_List_Info",
+      "ID": "element0000000215",
+      "name": "Get list info - ListMin = Minimum index of russianList",
+      "package": "default",
+      "pars": {
+        "List": "russianList",
+        "Varname": "ListMin",
+        "WhichInfo": "minIndex"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "-315",
+      "y": "1820"
+    },
+    "element0000000216": {
+      "class": "Action_Get_List_Info",
+      "ID": "element0000000216",
+      "name": "Get list info - ListLength = Array length of russianList",
+      "package": "default",
+      "pars": {
+        "List": "russianList",
+        "Varname": "ListLength",
+        "WhichInfo": "length"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "-315",
+      "y": "1960"
+    },
+    "element0000000219": {
+      "class": "Action_Get_List_Info",
+      "ID": "element0000000219",
+      "name": "Get list info - ListCount = Element count of russianList",
+      "package": "default",
+      "pars": {
+        "List": "russianList",
+        "Varname": "ListCount",
+        "WhichInfo": "count"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "-315",
+      "y": "2100"
+    },
+    "element0000000227": {
+      "class": "Condition_Debug_Dialog",
+      "ID": "element0000000227",
+      "name": "Debug Dialog",
+      "package": "default",
+      "pars": {},
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-70",
+      "y": "2205"
     }
   },
   "category": "AHF Test",
-  "ElementIDCounter": "166",
+  "ElementIDCounter": "228",
   "flowSettings": {
     "DefaultWorkingDir": 1,
     "ExecutionPolicy": "default",
-    "Offsetx": "-1517.142852",
-    "Offsety": "-122.857145",
+    "Offsetx": "-1135.555313",
+    "Offsety": "1283.189522",
     "WorkingDir": "",
-    "zoomFactor": "0.7"
+    "zoomFactor": "0.931698"
   },
   "name": "Huge test script"
 }
