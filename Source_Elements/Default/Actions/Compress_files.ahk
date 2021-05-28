@@ -94,20 +94,16 @@ Element_run_Action_Compress_files(Environment, ElementParameters)
 		return
 	}
 
-	; get absolute paths
-	File := x_GetFullPath(Environment, EvaluatedParameters.File)
-	zipfile := x_GetFullPath(Environment, EvaluatedParameters.zipfile)
-
 	; check whether zip file path is a folder
-	fileAttr := FileExist(zipfile)
+	fileAttr := FileExist(EvaluatedParameters.zipfile)
 	if (instr(fileAttr, "D"))
 	{
-		x_finish(Environment, "exception", x_lang("%1% '%2%' is a folder.", x_lang("Destination file"), zipfile)) 
+		x_finish(Environment, "exception", x_lang("%1% '%2%' is a folder.", x_lang("Destination file"), EvaluatedParameters.zipfile)) 
 		return
 	}
 	
 	; call 7zip
-	result := 7z_compress(zipfile, "-t" EvaluatedParameters.zipformat, file)
+	result := 7z_compress(EvaluatedParameters.zipfile, "-t" EvaluatedParameters.zipformat, EvaluatedParameters.File)
 
 	; check result and finish
 	if (result = "Success")

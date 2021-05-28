@@ -88,44 +88,41 @@ Element_run_Action_Delete_File(Environment, ElementParameters)
 		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
-
-	; get absolute path
-	file := x_GetFullPath(Environment, EvaluatedParameters.file)
-
+	
 	; check whether file exist
-	fileAttr := FileExist(file)
+	fileAttr := FileExist(EvaluatedParameters.file)
 	if (not fileAttr)
 	{
-		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("Source file"), file)) 
+		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("Source file"), EvaluatedParameters.file)) 
 		return
 	}
 	if (instr(fileAttr, "D"))
 	{
-		x_finish(Environment, "exception", x_lang("%1% '%2%' is a folder.", x_lang("Source file"), file)) 
+		x_finish(Environment, "exception", x_lang("%1% '%2%' is a folder.", x_lang("Source file"), EvaluatedParameters.file)) 
 		return
 	}
 
 	if (EvaluatedParameters.deleteFileMethod = "Delete")
 	{
 		; delete file
-		FileDelete, % file
+		FileDelete, % EvaluatedParameters.file
 		
 		; check for errors
 		if errorlevel
 		{
-			x_finish(Environment, "exception", x_lang("%1% files could not be deleted (Filepattern: '%2%')", errorlevel, file)) 
+			x_finish(Environment, "exception", x_lang("%1% files could not be deleted (Filepattern: '%2%')", errorlevel, EvaluatedParameters.file)) 
 			return
 		}
 	}
 	else if (EvaluatedParameters.deleteFileMethod = "Recycle") 
 	{
 		; recycle file
-		FileRecycle, % file
+		FileRecycle, % EvaluatedParameters.file
 
 		; check for errors
 		if errorlevel
 		{
-			x_finish(Environment, "exception", x_lang("Some files could not be recycled (Filepattern: '%1%')",file)) 
+			x_finish(Environment, "exception", x_lang("Some files could not be recycled (Filepattern: '%1%')", EvaluatedParameters.file)) 
 			return
 		}
 	}

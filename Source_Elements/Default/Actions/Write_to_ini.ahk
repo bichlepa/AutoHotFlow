@@ -68,7 +68,7 @@ Element_getParametrizationDetails_Action_Write_to_ini(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Write_to_ini(Environment, ElementParameters)
 {
-	return x_lang("Write_to_ini") 
+	return x_lang("Write_to_ini") " - " ElementParameters.section " - " ElementParameters.key " - " ElementParameters.value " - " ElementParameters.file
 }
 
 ;Called every time the user changes any parameter.
@@ -85,27 +85,48 @@ Element_CheckSettings_Action_Write_to_ini(Environment, ElementParameters, static
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Write_to_ini(Environment, ElementParameters)
 {
-	EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters)
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
 	if (EvaluatedParameters._error)
 	{
-		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
+		x_enabled(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
 	
-	file:=x_GetFullPath(Environment,EvaluatedParameters.file)
+	; check whether files is not a folder
+	fileAttr := FileExist(EvaluatedParameters.file)
+	if (instr(fileAttr, "D"))
+	{
+		x_finish(Environment, "exception", x_lang("%1% '%2%' is a folder.", x_lang("File"), EvaluatedParameters.file)) 
+		return
+	}
+
+	; check whether section is empty
+	if (EvaluatedParameters.section = "")
+	{
+		x_finish(Environment, "exception", x_lang("%1% is not specified.", x_lang("Section name")))
+		return
+	}
+	; check whether key is empty
+	if (EvaluatedParameters.key = "")
+	{
+		x_finish(Environment, "exception", x_lang("%1% is not specified.", x_lang("Key name")))
+		return
+	}
+
+	; write to ini
+	IniWrite, % EvaluatedParameters.Value, % EvaluatedParameters.file, % EvaluatedParameters.section, % EvaluatedParameters.key
 	
-	IniWrite,% EvaluatedParameters.Value,% file,% EvaluatedParameters.section,% EvaluatedParameters.key
-	
+	; check for errors
 	if ErrorLevel
 	{
-		x_finish(Environment, "exception", x_lang("Could not write value '%1%' to ini file '%2%', section '%3%', key '%4%'",EvaluatedParameters.Value,file,EvaluatedParameters.section,EvaluatedParameters.key)) 
+		x_finish(Environment, "exception", x_lang("Could not write value '%1%' to ini file '%2%', section '%3%', key '%4%'", EvaluatedParameters.Value, EvaluatedParameters.file, EvaluatedParameters.section, EvaluatedParameters.key)) 
 		return
 		
 	}
 
 	x_finish(Environment,"normal")
 	return
-	
 }
 
 

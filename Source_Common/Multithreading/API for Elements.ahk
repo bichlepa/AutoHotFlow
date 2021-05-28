@@ -482,7 +482,7 @@ xx_GetFullPath(Environment, p_Path)
 	path:=p_Path
 	if  DllCall("Shlwapi.dll\PathIsRelative","Str",path)
 	{
-		path := xx_GetWorkingDir(Environment)
+		path := xx_GetWorkingDir(Environment) "\" path
 	}
 	return path
 }

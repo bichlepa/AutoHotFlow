@@ -55,16 +55,22 @@ Element_getParametrizationDetails_Action_Read_From_Ini(Environment)
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Output Variable name")})
 	parametersToEdit.push({type: "Edit", id: "varname", default: "NewVariable", content: "VariableName", WarnIfEmpty: true})
+
 	parametersToEdit.push({type: "Label", label: x_lang("Path of .ini file")})
 	parametersToEdit.push({type: "File", id: "file", label: x_lang("Select an .ini file")})
+
 	parametersToEdit.push({type: "Label", label: x_lang("Action")})
 	parametersToEdit.push({type: "Radio", id: "Action", default: 1, choices: [x_lang("Read a key"), x_lang("Read the entire section"), x_lang("Read the section names")], result: "enum", enum: ["Key", "EntireSection", "SectionNames"]})
+
 	parametersToEdit.push({type: "Label", label: x_lang("Section")})
 	parametersToEdit.push({type: "Edit", id: "Section", default: "section", content: "String", WarnIfEmpty: true})
+
 	parametersToEdit.push({type: "Label", label: x_lang("Key")})
 	parametersToEdit.push({type: "Edit", id: "Key", default: "key", content: "String", WarnIfEmpty: true})
+
 	parametersToEdit.push({type: "Label", label: x_lang("Behavior on error")})
 	parametersToEdit.push({type: "Radio", id: "WhenError", default: 1, choices: [x_lang("Insert default value in the variable"), x_lang("Throw exception")], result: "enum", enum: ["Default", "Exception"]})
+
 	parametersToEdit.push({type: "Label", label: x_lang("Default value on failure")})
 	parametersToEdit.push({type: "Edit", id: "Default", default: "ERROR", content: "String"})
 	
@@ -74,7 +80,15 @@ Element_getParametrizationDetails_Action_Read_From_Ini(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Read_From_Ini(Environment, ElementParameters)
 {
-	return x_lang("Read_From_Ini") 
+	switch (ElementParameters.Action)
+	{
+		case "Key":
+			return x_lang("Read_From_Ini")  " - " x_lang("Read a key") - ElementParameters.varname " - " ElementParameters.section " - " ElementParameters.key " - " ElementParameters.file
+		case "EntireSection":
+			return x_lang("Read_From_Ini")  " - " x_lang("Read the entire section") - ElementParameters.varname " - " ElementParameters.section " - " ElementParameters.file
+		case "SectionNames":
+			return x_lang("Read_From_Ini")  " - " x_lang("Read the section names") - ElementParameters.varname " - " ElementParameters.file
+	}
 }
 
 ;Called every time the user changes any parameter.
@@ -111,83 +125,136 @@ Element_CheckSettings_Action_Read_From_Ini(Environment, ElementParameters, stati
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Read_From_Ini(Environment, ElementParameters)
 {
-	EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters, ["section", "key", "Default"])
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters, ["section", "key", "Default", "WhenError"])
 	if (EvaluatedParameters._error)
 	{
-		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
-		return
-	}
-
-
-	filepath := x_GetFullPath(Environment, EvaluatedParameters.file)
-	if not fileexist(filepath)
-	{
-		x_finish(Environment, "exception",  x_lang("File '%1%' does not exist",filepath))
+		x_enabled(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
 	
-	
-	
-	if (EvaluatedParameters.Action="key") ;Read a key
+	; check whether files exist
+	fileAttr := FileExist(EvaluatedParameters.file)
+	if (not fileAttr)
 	{
-		x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["section", "key"])
-		
-		if (EvaluatedParameters.section="")
+		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("File"), EvaluatedParameters.file)) 
+		return
+	}
+	if (instr(fileAttr, "D"))
+	{
+		x_finish(Environment, "exception", x_lang("%1% '%2%' is a folder.", x_lang("File"), EvaluatedParameters.file)) 
+		return
+	}
+	
+	; decide what to do according to parameter Action
+	if (EvaluatedParameters.Action = "key")
+	{
+		; We will read a key
+
+		; evaluate additional parameters
+		x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["section", "Key", "WhenError"])
+		if (EvaluatedParameters._error)
 		{
-			x_finish(Environment, "exception",x_lang("%1% is not specified.",x_lang("Section name")))
+			x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 			return
 		}
-		if (EvaluatedParameters.key="")
+		
+		; check whether section is empty
+		if (EvaluatedParameters.section = "")
 		{
-			x_finish(Environment, "exception",x_lang("%1% is not specified.",x_lang("Key name")))
+			x_finish(Environment, "exception", x_lang("%1% is not specified.", x_lang("Section name")))
 			return
+		}
+		; check whether key is empty
+		if (EvaluatedParameters.key = "")
+		{
+			x_finish(Environment, "exception", x_lang("%1% is not specified.", x_lang("Key name")))
+			return
+		}
+		
+		if (EvaluatedParameters.WhenError = "Default")
+		{
+			; if file does not have the entry, return default value
 			
-		}
-		
-		if (EvaluatedParameters.WhenError="Default")
-		{
+			; evaluate additional parameters
 			x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["default"])
+			if (EvaluatedParameters._error)
+			{
+				x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
+				return
+			}
 			
 			if (EvaluatedParameters.Default = "")
+			{
+				; default value is not set. We have to pass a space, otherwise, default will be "ERROR"
 				EvaluatedParameters.Default := " "
-			IniRead,result,% filepath,% EvaluatedParameters.section,% EvaluatedParameters.key,% EvaluatedParameters.Default
+			}
+
+			; read entry
+			IniRead, result, % EvaluatedParameters.file, % EvaluatedParameters.section, % EvaluatedParameters.key, % EvaluatedParameters.Default
 		}
 		else
 		{
-			IniRead,result,% filepath,% EvaluatedParameters.section,% EvaluatedParameters.key,E?R ROR
-			if result=E?R ROR
+			; if file does not have the entry, throw error
+			IniRead, result, % EvaluatedParameters.file, % EvaluatedParameters.section, % EvaluatedParameters.key, % "E?R ROR"
+			if (result = "E?R ROR")
 			{
+				; entry not found. Raise error
 				x_finish(Environment, "exception",x_lang("Section '%1%' and key '%2%' not found.",EvaluatedParameters.section,EvaluatedParameters.key))
 				return
 			}
 		}
-		
 	}
-	else if (EvaluatedParameters.Action="entireSection") ;Read entire section
+	else if (EvaluatedParameters.Action = "entireSection")
 	{
+		; We will read an entire section
+
+		; evaluate additional parameters
 		x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["section"])
-		if (EvaluatedParameters.section="")
+		if (EvaluatedParameters._error)
 		{
-			x_finish(Environment, "exception",x_lang("%1% is not specified.",x_lang("Section name")))
+			x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
+			return
+		}
+
+		; check whether section is empty
+		if (EvaluatedParameters.section = "")
+		{
+			x_finish(Environment, "exception", x_lang("%1% is not specified.", x_lang("Section name")))
 			return
 		}
 		
-		IniRead,result,% filepath,% EvaluatedParameters.section
-		
+		; read entire section
+		IniRead, resultstr, % EvaluatedParameters.file, % EvaluatedParameters.section
+
+		; convert result value to an object
+		result := object()
+		loop, parse, resultstr, `n
+		{
+			operatorPos := instr(a_loopfield, "=")
+			key := substr(A_LoopField, 1, operatorPos - 1)
+			value := substr(A_LoopField, operatorPos + 1)
+			result[key] := value
+		}
 	}
-	else ;Get section list
+	else if (EvaluatedParameters.Action = "SectionNames")
 	{
-		IniRead,resultstr,% filepath
-		x_SetVariable(Environment,EvaluatedParameters.varname,result)
+		; We will read an entire section
+
+		; read section list
+		IniRead, resultstr, % EvaluatedParameters.file
 		
-		result:=Object()
+		; convert linefeed delimited list to an array
+		result := Object()
 		loop, parse, resultstr, `n
 		{
 			result.push(A_LoopField)
 		}
 	}
 	
-	x_SetVariable(Environment,EvaluatedParameters.varname,result)
+	; write result variable
+	x_SetVariable(Environment, EvaluatedParameters.varname, result)
+
 	x_finish(Environment,"normal")
 	return
 }

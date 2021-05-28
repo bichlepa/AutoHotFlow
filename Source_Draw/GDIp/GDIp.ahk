@@ -871,12 +871,17 @@ gdip_DrawEverything(FlowObj)
 			
 			if not (abs(middlePointOfMoveButton2Y-middlePointOfMoveButton1Y)<(gridy*2) and abs(middlePointOfMoveButton2X-middlePointOfMoveButton1X) <(gridx*5)) ;Don't show if they overlap other buttons
 			{
-				Gdip_DrawImage(G, pBitmapMove, (middlePointOfMoveButton1X - (SizeOfButtons*0.5) )*zoomFactor, ( middlePointOfMoveButton1Y - (SizeOfButtons*0.5)) *zoomFactor, SizeOfButtons*zoomFactor, SizeOfButtons*zoomFactor , 0, 0, 48, 48)
+				if (middlePointOfMoveButton1X and middlePointOfMoveButton1Y)
+				{
+					Gdip_DrawImage(G, pBitmapMove, (middlePointOfMoveButton1X - (SizeOfButtons*0.5) )*zoomFactor, ( middlePointOfMoveButton1Y - (SizeOfButtons*0.5)) *zoomFactor, SizeOfButtons*zoomFactor, SizeOfButtons*zoomFactor , 0, 0, 48, 48)
+					MoveButton1Exist:=true
+				}
 				
-				Gdip_DrawImage(G, pBitmapMove, (middlePointOfMoveButton2X - (SizeOfButtons*0.5) )*zoomFactor, ( middlePointOfMoveButton2Y - (SizeOfButtons*0.5)) *zoomFactor, SizeOfButtons*zoomFactor, SizeOfButtons*zoomFactor , 0, 0, 48, 48)
-				
-				MoveButton1Exist:=true
-				MoveButton2Exist:=True
+				if (middlePointOfMoveButton2X and middlePointOfMoveButton2Y)
+				{
+					Gdip_DrawImage(G, pBitmapMove, (middlePointOfMoveButton2X - (SizeOfButtons*0.5) )*zoomFactor, ( middlePointOfMoveButton2Y - (SizeOfButtons*0.5)) *zoomFactor, SizeOfButtons*zoomFactor, SizeOfButtons*zoomFactor , 0, 0, 48, 48)
+					MoveButton2Exist:=True
+				}
 			}
 		}
 		
@@ -894,8 +899,11 @@ gdip_DrawEverything(FlowObj)
 			middlePointOfEditButtonX:=((DrawResult.elements[selectedElement].part3x1 +  DrawResult.elements[selectedElement].part3x2)/2  ) / zoomFactor - SizeOfButtons*1.3
 			middlePointOfEditButtonY:=((DrawResult.elements[selectedElement].part3y1 + DrawResult.elements[selectedElement].part3y2) /2   ) / zoomFactor 
 		}
-		Gdip_DrawImage(G, pBitmapEdit, (middlePointOfEditButtonX - (SizeOfButtons*0.5) )*zoomFactor, ( middlePointOfEditButtonY - (SizeOfButtons*0.5)) *zoomFactor, SizeOfButtons*zoomFactor, SizeOfButtons*zoomFactor , 0, 0, 48, 48)
-		EditButtonExist:=true
+		if (middlePointOfEditButtonX and middlePointOfEditButtonY)
+		{
+			Gdip_DrawImage(G, pBitmapEdit, (middlePointOfEditButtonX - (SizeOfButtons*0.5) )*zoomFactor, ( middlePointOfEditButtonY - (SizeOfButtons*0.5)) *zoomFactor, SizeOfButtons*zoomFactor, SizeOfButtons*zoomFactor , 0, 0, 48, 48)
+			EditButtonExist:=true
+		}
 		
 		
 		;Trash Button
@@ -911,31 +919,43 @@ gdip_DrawEverything(FlowObj)
 				middlePointOfTrashButtonX:=tempElList[selectedElement].x + ElementWidth *9/8 + SizeOfButtons*0.2 - Offsetx
 				middlePointOfTrashButtonY:=tempElList[selectedElement].y +ElementWidth *0.375 - Offsety
 			}
-			Gdip_DrawImage(G, pBitmapTrash, (middlePointOfTrashButtonX - (SizeOfButtons*0.5) )*zoomFactor, ( middlePointOfTrashButtonY - (SizeOfButtons*0.5)) *zoomFactor, SizeOfButtons*zoomFactor, SizeOfButtons*zoomFactor , 0, 0, 48, 48)
-			TrashButtonExist:=true
+			if (middlePointOfTrashButtonX and middlePointOfTrashButtonY)
+			{
+				Gdip_DrawImage(G, pBitmapTrash, (middlePointOfTrashButtonX - (SizeOfButtons*0.5) )*zoomFactor, ( middlePointOfTrashButtonY - (SizeOfButtons*0.5)) *zoomFactor, SizeOfButtons*zoomFactor, SizeOfButtons*zoomFactor , 0, 0, 48, 48)
+				TrashButtonExist:=true
+			}
 		}
 		
 		;Plus Button
 		if (tempElList[selectedElement].type = "connection")
 		{
 			middlePointOfPlusButtonX:=((DrawResult.elements[selectedElement].part3x1 +  DrawResult.elements[selectedElement].part3x2)/2  ) / zoomFactor 
-			middlePointOfPlusButtonY:=((DrawResult.elements[selectedElement].part3y1 + DrawResult.elements[selectedElement].part3y2 )/2  ) / zoomFactor 
-			Gdip_DrawImage(G, pBitmapPlus, (middlePointOfPlusButtonX - (SizeOfButtons*0.5) )*zoomFactor, ( middlePointOfPlusButtonY - (SizeOfButtons*0.5)) *zoomFactor, SizeOfButtons*zoomFactor, SizeOfButtons*zoomFactor , 0, 0, 48, 48)
-			PlusButtonExist:=true
+			middlePointOfPlusButtonY:=((DrawResult.elements[selectedElement].part3y1 + DrawResult.elements[selectedElement].part3y2 )/2  ) / zoomFactor
+			if (middlePointOfPlusButtonX and middlePointOfPlusButtonY)
+			{
+				Gdip_DrawImage(G, pBitmapPlus, (middlePointOfPlusButtonX - (SizeOfButtons*0.5) )*zoomFactor, ( middlePointOfPlusButtonY - (SizeOfButtons*0.5)) *zoomFactor, SizeOfButtons*zoomFactor, SizeOfButtons*zoomFactor , 0, 0, 48, 48)
+				PlusButtonExist:=true
+			}
 		}
 		else if ((tempElList[selectedElement].type = "action" or  tempElList[selectedElement].type = "condition" or tempElList[selectedElement].type = "trigger" or tempElList[selectedElement].type = "loop"))
 		{
 			middlePointOfPlusButtonX:=tempElList[selectedElement].x + ElementWidth *0.5 - Offsetx
 			middlePointOfPlusButtonY:=tempElList[selectedElement].y +ElementWidth *7/8 + SizeOfButtons*0.2 - Offsety
-			Gdip_DrawImage(G, pBitmapPlus, (middlePointOfPlusButtonX - (SizeOfButtons*0.5) )*zoomFactor, ( middlePointOfPlusButtonY - (SizeOfButtons*0.5)) *zoomFactor, SizeOfButtons*zoomFactor, SizeOfButtons*zoomFactor , 0, 0, 48, 48)
-			PlusButtonExist:=true
+			if (middlePointOfPlusButtonX and middlePointOfPlusButtonY)
+			{
+				Gdip_DrawImage(G, pBitmapPlus, (middlePointOfPlusButtonX - (SizeOfButtons*0.5) )*zoomFactor, ( middlePointOfPlusButtonY - (SizeOfButtons*0.5)) *zoomFactor, SizeOfButtons*zoomFactor, SizeOfButtons*zoomFactor , 0, 0, 48, 48)
+				PlusButtonExist:=true
+			}
 		}
 		if (tempElList[selectedElement].type = "loop") ;Additional plus button for loop
 		{
 			middlePointOfPlusButton2X:=tempElList[selectedElement].x + ElementWidth *0.5 - Offsetx
 			middlePointOfPlusButton2Y:=tempElList[selectedElement].y +ElementWidth /8 + ElementHeight*4/3+tempElList[selectedElement].HeightOfVerticalBar + SizeOfButtons*0.2 - Offsety
-			Gdip_DrawImage(G, pBitmapPlus, (middlePointOfPlusButton2X - (SizeOfButtons*0.5) )*zoomFactor, ( middlePointOfPlusButton2Y - (SizeOfButtons*0.5)) *zoomFactor, SizeOfButtons*zoomFactor, SizeOfButtons*zoomFactor , 0, 0, 48, 48)
-			PlusButton2Exist:=true
+			if (middlePointOfPlusButton2X and middlePointOfPlusButton2Y)
+			{
+				Gdip_DrawImage(G, pBitmapPlus, (middlePointOfPlusButton2X - (SizeOfButtons*0.5) )*zoomFactor, ( middlePointOfPlusButton2Y - (SizeOfButtons*0.5)) *zoomFactor, SizeOfButtons*zoomFactor, SizeOfButtons*zoomFactor , 0, 0, 48, 48)
+				PlusButton2Exist:=true
+			}
 			
 		}
 		
@@ -949,8 +969,12 @@ gdip_DrawEverything(FlowObj)
 				PosOfSwitchOnButtonX2:=PosOfSwitchOnButtonX1 + (SizeOfButtons * pBitmapSwitchOn_W / pBitmapSwitchOn_size)
 				PosOfSwitchOnButtonY1:=tempElList[selectedElement].y + ElementHeight *0.25 - SizeOfButtons*0.5 - Offsety			
 				PosOfSwitchOnButtonY2:=PosOfSwitchOnButtonY1 + (SizeOfButtons * pBitmapSwitchOn_H / pBitmapSwitchOn_size)
-				Gdip_DrawImage(G, pBitmapSwitchOn, (PosOfSwitchOnButtonX1 )*zoomFactor, (PosOfSwitchOnButtonY1) *zoomFactor, (PosOfSwitchOnButtonX2 - PosOfSwitchOnButtonX1) *zoomFactor, (PosOfSwitchOnButtonY2 - PosOfSwitchOnButtonY1) *zoomFactor , 0, 0, pBitmapSwitchOn_w,pBitmapSwitchOn_H)
-				SwitchOnButtonExist:=true
+				
+				if (PosOfSwitchOnButtonX1 and PosOfSwitchOnButtonX2 and PosOfSwitchOnButtonY1 and PosOfSwitchOnButtonY2)
+				{
+					Gdip_DrawImage(G, pBitmapSwitchOn, (PosOfSwitchOnButtonX1 )*zoomFactor, (PosOfSwitchOnButtonY1) *zoomFactor, (PosOfSwitchOnButtonX2 - PosOfSwitchOnButtonX1) *zoomFactor, (PosOfSwitchOnButtonY2 - PosOfSwitchOnButtonY1) *zoomFactor , 0, 0, pBitmapSwitchOn_w,pBitmapSwitchOn_H)
+					SwitchOnButtonExist:=true
+				}
 				
 			}
 			else
@@ -959,8 +983,11 @@ gdip_DrawEverything(FlowObj)
 				PosOfSwitchOffButtonX2:=PosOfSwitchOffButtonX1 + (SizeOfButtons * pBitmapSwitchOff_W / pBitmapSwitchOff_size)
 				PosOfSwitchOffButtonY1:=tempElList[selectedElement].y + ElementHeight *0.25 - SizeOfButtons*0.5 - Offsety			
 				PosOfSwitchOffButtonY2:=PosOfSwitchOffButtonY1 + (SizeOfButtons * pBitmapSwitchOff_H / pBitmapSwitchOff_size)
-				Gdip_DrawImage(G, pBitmapSwitchOff, (PosOfSwitchOffButtonX1 )*zoomFactor, (PosOfSwitchOffButtonY1) *zoomFactor, (PosOfSwitchOffButtonX2 - PosOfSwitchOffButtonX1) *zoomFactor, (PosOfSwitchOffButtonY2 - PosOfSwitchOffButtonY1) *zoomFactor , 0, 0, pBitmapSwitchOff_w, pBitmapSwitchOff_H)
-				SwitchOffButtonExist:=true
+				if (PosOfSwitchOffButtonX1 and PosOfSwitchOffButtonX2 and PosOfSwitchOffButtonY1 and PosOfSwitchOffButtonY2)
+				{
+					Gdip_DrawImage(G, pBitmapSwitchOff, (PosOfSwitchOffButtonX1 )*zoomFactor, (PosOfSwitchOffButtonY1) *zoomFactor, (PosOfSwitchOffButtonX2 - PosOfSwitchOffButtonX1) *zoomFactor, (PosOfSwitchOffButtonY2 - PosOfSwitchOffButtonY1) *zoomFactor , 0, 0, pBitmapSwitchOff_w, pBitmapSwitchOff_H)
+					SwitchOffButtonExist:=true
+				}
 			}
 		}
 		
@@ -974,8 +1001,11 @@ gdip_DrawEverything(FlowObj)
 				PosOfStarFilledButtonX2:=PosOfStarFilledButtonX1 + (SizeOfButtons * pBitmapStarFilled_W / pBitmapStarFilled_size)
 				PosOfStarFilledButtonY1:=tempElList[selectedElement].y + ElementHeight *0.20 - SizeOfButtons*0.5 - Offsety			
 				PosOfStarFilledButtonY2:=PosOfStarFilledButtonY1 + (SizeOfButtons * pBitmapStarFilled_H / pBitmapStarFilled_size)
-				Gdip_DrawImage(G, pBitmapStarFilled, (PosOfStarFilledButtonX1 )*zoomFactor, (PosOfStarFilledButtonY1) *zoomFactor, (PosOfStarFilledButtonX2 - PosOfStarFilledButtonX1) *zoomFactor, (PosOfStarFilledButtonY2 - PosOfStarFilledButtonY1) *zoomFactor , 0, 0, pBitmapStarFilled_w,pBitmapStarFilled_H)
-				StarFilledButtonExist:=true
+				if (PosOfStarFilledButtonX1 and PosOfStarFilledButtonX2 and PosOfStarFilledButtonY1 and PosOfStarFilledButtonY2)
+				{
+					Gdip_DrawImage(G, pBitmapStarFilled, (PosOfStarFilledButtonX1 )*zoomFactor, (PosOfStarFilledButtonY1) *zoomFactor, (PosOfStarFilledButtonX2 - PosOfStarFilledButtonX1) *zoomFactor, (PosOfStarFilledButtonY2 - PosOfStarFilledButtonY1) *zoomFactor , 0, 0, pBitmapStarFilled_w,pBitmapStarFilled_H)
+					StarFilledButtonExist:=true
+				}
 				
 			}
 			else
@@ -984,8 +1014,11 @@ gdip_DrawEverything(FlowObj)
 				PosOfStarEmptyButtonX2:=PosOfStarEmptyButtonX1 + (SizeOfButtons * pBitmapStarEmpty_W / pBitmapStarEmpty_size)
 				PosOfStarEmptyButtonY1:=tempElList[selectedElement].y + ElementHeight *0.20 - SizeOfButtons*0.5 - Offsety			
 				PosOfStarEmptyButtonY2:=PosOfStarEmptyButtonY1 + (SizeOfButtons * pBitmapStarEmpty_H / pBitmapStarEmpty_size)
-				Gdip_DrawImage(G, pBitmapStarEmpty, (PosOfStarEmptyButtonX1 )*zoomFactor, (PosOfStarEmptyButtonY1) *zoomFactor, (PosOfStarEmptyButtonX2 - PosOfStarEmptyButtonX1) *zoomFactor, (PosOfStarEmptyButtonY2 - PosOfStarEmptyButtonY1) *zoomFactor , 0, 0, pBitmapStarEmpty_w, pBitmapStarEmpty_H)
-				StarEmptyButtonExist:=true
+				if (PosOfStarEmptyButtonX1 and PosOfStarEmptyButtonX2 and PosOfStarEmptyButtonY1 and PosOfStarEmptyButtonY2)
+				{
+					Gdip_DrawImage(G, pBitmapStarEmpty, (PosOfStarEmptyButtonX1 )*zoomFactor, (PosOfStarEmptyButtonY1) *zoomFactor, (PosOfStarEmptyButtonX2 - PosOfStarEmptyButtonX1) *zoomFactor, (PosOfStarEmptyButtonY2 - PosOfStarEmptyButtonY1) *zoomFactor , 0, 0, pBitmapStarEmpty_w, pBitmapStarEmpty_H)
+					StarEmptyButtonExist:=true
+				}
 			}
 		}
 		

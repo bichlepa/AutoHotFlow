@@ -105,12 +105,9 @@ Element_run_Loop_Loop_Through_Files(Environment, ElementParameters)
 		if (EvaluatedParameters.Recurse)
 			recurse:="R"
 		
-		; the path may bo local. Convert it to full path
-		tempPath := x_GetFullPath(environment, EvaluatedParameters.file)
-		
 		; loop through files and create a file list
 		CurrentList := Object()
-		Loop, files, %tempPath%, % operation recurse
+		Loop, files, % EvaluatedParameters.file, % operation recurse
 		{
 			; write information about the file to an object
 			tempOneFile := Object()

@@ -113,7 +113,7 @@ Element_run_Action_Select_Folder(Environment, ElementParameters)
 	}
 	
 	; get absolute path
-	folder := x_GetFullPath(Environment, EvaluatedParameters.folder)
+	folder := EvaluatedParameters.folder
 
 	; prepare options for FileSelectFile
 	options := 0

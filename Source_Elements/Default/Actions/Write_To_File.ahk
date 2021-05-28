@@ -115,10 +115,6 @@ Element_run_Action_Write_To_File(Environment, ElementParameters)
 		return
 	}
 	
-	; get absolute path
-	file := x_GetFullPath(Environment, EvaluatedParameters.file)
-	
-	
 	; prepare parameter for FileRead and set FileAppend
 	pars:= ""
 	if (EvaluatedParameters.encoding = "UTF-8" or EvaluatedParameters.encoding = "UTF-16")
@@ -149,26 +145,26 @@ Element_run_Action_Write_To_File(Environment, ElementParameters)
 	if (EvaluatedParameters.Overwrite = "Overwrite")
 	{
 		; delete file if we have to overwrite it
-		if (fileexist(file))
+		if (fileexist(EvaluatedParameters.file))
 		{
-			FileDelete,% file
+			FileDelete, % EvaluatedParameters.file
 
 			; check for errors
 			if errorlevel
 			{
-				x_finish(Environment, "exception",  x_lang("File '%1%' could not be deleted", file))
+				x_finish(Environment, "exception",  x_lang("File '%1%' could not be deleted", EvaluatedParameters.file))
 				return
 			}
 		}
 	}
 	
 	; write to file
-	FileAppend, % EvaluatedParameters.text, % pars file
+	FileAppend, % EvaluatedParameters.text, % pars EvaluatedParameters.file
 	
 	; check for errors
 	if ErrorLevel
 	{
-		x_finish(Environment,"exception", x_lang("File '%1%' could not be written",file))
+		x_finish(Environment,"exception", x_lang("File '%1%' could not be written", EvaluatedParameters.file))
 		return
 	}
 	

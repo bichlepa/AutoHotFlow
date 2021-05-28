@@ -91,36 +91,32 @@ Element_run_Action_Move_File(Environment, ElementParameters)
 		return
 	}
 
-	; get absolute paths
-	fileFrom := x_GetFullPath(Environment, EvaluatedParameters.file)
-	destFileOrFolder := x_GetFullPath(Environment, EvaluatedParameters.destFile)
-
 	; check whether files exist
-	fileAttr := FileExist(fileFrom)
+	fileAttr := FileExist(EvaluatedParameters.file)
 	if (not fileAttr)
 	{
-		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("Source file"), fileFrom)) 
+		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("Source file"), EvaluatedParameters.file)) 
 		return
 	}
 	if (instr(fileAttr, "D"))
 	{
-		x_finish(Environment, "exception", x_lang("%1% '%2%' is a folder.", x_lang("Source file"), fileFrom)) 
+		x_finish(Environment, "exception", x_lang("%1% '%2%' is a folder.", x_lang("Source file"), EvaluatedParameters.file)) 
 		return
 	}
 
-	if not FileExist(destFileOrFolder)
+	if not FileExist(EvaluatedParameters.destFile)
 	{
-		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("Destination file or folder"), destFileOrFolder)) 
+		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("Destination file or folder"), EvaluatedParameters.destFile)) 
 		return
 	}
 
 	; move files
-	FileMove, % fileFrom, % destFileOrFolder, % EvaluatedParameters.Overwrite
+	FileMove, % EvaluatedParameters.file, % EvaluatedParameters.destFile, % EvaluatedParameters.Overwrite
 	
 	; check for errors
 	if errorlevel
 	{
-		x_finish(Environment, "exception", x_lang("%1% files could not be moved from '%2%' to '%3%'", errorlevel, fileFrom, destFileOrFolder)) 
+		x_finish(Environment, "exception", x_lang("%1% files could not be moved from '%2%' to '%3%'", errorlevel, EvaluatedParameters.file, EvaluatedParameters.destFile)) 
 		return
 	}
 	

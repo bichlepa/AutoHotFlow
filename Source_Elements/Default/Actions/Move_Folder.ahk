@@ -101,42 +101,38 @@ Element_run_Action_Move_Folder(Environment, ElementParameters)
 		OverwriteOption = 0
 	}
 
-	; get absolute paths
-	folderFrom := x_GetFullPath(Environment, x_replaceVariables(Environment, ElementParameters.folder))
-	destFolder := x_GetFullPath(Environment, x_replaceVariables(Environment, ElementParameters.destFolder))
-
 	; check whether files exist
-	fileAttr := FileExist(folderFrom)
+	fileAttr := FileExist(ElementParameters.folder)
 	if (not fileAttr)
 	{
-		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("Source folder"), folderFrom)) 
+		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("Source folder"), ElementParameters.folder)) 
 		return
 	}
 	if (not instr(fileAttr, "D"))
 	{
-		x_finish(Environment, "exception", x_lang("%1% '%2%' is not a folder.", x_lang("Source folder"), folderFrom)) 
+		x_finish(Environment, "exception", x_lang("%1% '%2%' is not a folder.", x_lang("Source folder"), ElementParameters.folder)) 
 		return
 	}
 
-	fileAttr := FileExist(destFolder)
+	fileAttr := FileExist(ElementParameters.destFolder)
 	if (not fileAttr)
 	{
-		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("Destination folder"), destFolder)) 
+		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("Destination folder"), ElementParameters.destFolder)) 
 		return
 	}
 	if (not instr(fileAttr, "D"))
 	{
-		x_finish(Environment, "exception", x_lang("%1% '%2%' is not a folder.", x_lang("Destination folder"), destFolder)) 
+		x_finish(Environment, "exception", x_lang("%1% '%2%' is not a folder.", x_lang("Destination folder"), ElementParameters.destFolder)) 
 		return
 	}
 
 	; move folder
-	FileMoveDir, % folderFrom ,% destFolder, % OverwriteOption
+	FileMoveDir, % ElementParameters.folder ,% ElementParameters.destFolder, % OverwriteOption
 	
 	; check for errors
 	if errorlevel
 	{
-		x_finish(Environment, "exception", x_lang("Folder '%1%' could not be copied to '%2%'", folderFrom, destFolder)) 
+		x_finish(Environment, "exception", x_lang("Folder '%1%' could not be copied to '%2%'", ElementParameters.folder, ElementParameters.destFolder)) 
 		return
 	}
 	

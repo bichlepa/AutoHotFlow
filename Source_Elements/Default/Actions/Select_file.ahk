@@ -122,9 +122,6 @@ Element_run_Action_Select_file(Environment, ElementParameters)
 		return
 	}
 
-	; get absolute path
-	folder := x_GetFullPath(Environment, EvaluatedParameters.folder)
-	
 	; prepare options for FileSelectFile
 	options := 0
 	if (ElementParameters.fileMustExist)
@@ -144,7 +141,7 @@ Element_run_Action_Select_file(Environment, ElementParameters)
 	
 	; we will call FileSelectFile in an other AHK thread, because the dialog is blocking.
 	; set input and output variables
-	inputVars := {options: options, folder: folder, title: title, filter: filter}
+	inputVars := {options: options, folder: EvaluatedParameters.folder, title: title, filter: filter}
 	outputVars := ["selectedFile", "result", "message"]
 
 	; define code of the AHK thread

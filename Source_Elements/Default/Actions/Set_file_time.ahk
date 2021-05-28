@@ -122,28 +122,25 @@ Element_run_Action_Set_file_time(Environment, ElementParameters)
 	else if (EvaluatedParameters.OperateOnWhat = "Folders")
 		operation := 2
 	
-	; get absolute path
-	file := x_GetFullPath(Environment,EvaluatedParameters.file)
-	
 	; set file time
-	FileSetTime, % timeValue, % file, % TimeTypePar, % operation, % EvaluatedParameters.Recurse
+	FileSetTime, % timeValue, % EvaluatedParameters.file, % TimeTypePar, % operation, % EvaluatedParameters.Recurse
 	
 	; check for errors
 	if ErrorLevel
 	{
 		; we check here whether file exists, because the file path may contain a wildcard pattern
-		if not fileexist(file)
+		if not fileexist(EvaluatedParameters.file)
 		{
-			x_finish(Environment, "exception", x_lang("File '%1%' does not exist", file))
+			x_finish(Environment, "exception", x_lang("File '%1%' does not exist", EvaluatedParameters.file))
 			return
 		}
 		else
 		{
-			x_finish(Environment, "exception", x_lang("Attributes of file '%1%' could not be changed", file)) 
+			x_finish(Environment, "exception", x_lang("Attributes of file '%1%' could not be changed", EvaluatedParameters.file)) 
 			return
 		}
 	}
-	
+
 	x_finish(Environment,"normal")
 	return
 }

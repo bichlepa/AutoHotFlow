@@ -86,12 +86,9 @@ Element_run_Condition_File_Exists(Environment, ElementParameters)
 		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
-	
-	; if file path is relative, convert it to full path
-	file := x_GetFullPath(Environment, EvaluatedParameters.file)
 
 	; check whether file exists and finish
-	IfExist, % file
+	IfExist, % EvaluatedParameters.file
 		x_finish(Environment, "yes")
 	else
 		x_finish(Environment, "no")

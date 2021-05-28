@@ -93,19 +93,16 @@ Element_run_Action_Get_File_Size(Environment, ElementParameters)
 		return
 	}
 	
-	; get absolute path
-	file := x_GetFullPath(Environment, EvaluatedParameters.file)
-
 	; check whether files exist
-	fileAttr := FileExist(file)
+	fileAttr := FileExist(EvaluatedParameters.file)
 	if (not fileAttr)
 	{
-		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("Source file"), file)) 
+		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("Source file"), EvaluatedParameters.file)) 
 		return
 	}
 	if (instr(fileAttr, "D"))
 	{
-		x_finish(Environment, "exception", x_lang("%1% '%2%' is a folder.", x_lang("Source file"), file)) 
+		x_finish(Environment, "exception", x_lang("%1% '%2%' is a folder.", x_lang("Source file"), EvaluatedParameters.file)) 
 		return
 	}
 	
@@ -121,12 +118,12 @@ Element_run_Action_Get_File_Size(Environment, ElementParameters)
 	}
 
 	; get file size
-	FileGetSize, result, % file, % UnitPar
+	FileGetSize, result, % EvaluatedParameters.file, % UnitPar
 
 	; check for errors
 	if ErrorLevel
 	{
-		x_finish(Environment, "exception", x_lang("Couldn't get file size of file '%1%'",file)) 
+		x_finish(Environment, "exception", x_lang("Couldn't get file size of file '%1%'", EvaluatedParameters.file)) 
 		return
 	}
 	

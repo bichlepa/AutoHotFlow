@@ -88,19 +88,16 @@ Element_run_Action_Rename_File(Environment, ElementParameters)
 		return
 	}
 
-	; get absolute path
-	fileFrom := x_GetFullPath(Environment, EvaluatedParameters.file)
-
 	; check whether file exist and is not a folder
 	fileAttr := FileExist(fileFrom)
 	if (not fileAttr)
 	{
-		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.",x_lang("Source file"), fileFrom)) 
+		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.",x_lang("Source file"), EvaluatedParameters.file)) 
 		return
 	}
 	if (instr(fileAttr, "D"))
 	{
-		x_finish(Environment, "exception", x_lang("%1% '%2%' is a folder.", x_lang("Source file"), fileFrom)) 
+		x_finish(Environment, "exception", x_lang("%1% '%2%' is a folder.", x_lang("Source file"), EvaluatedParameters.file)) 
 		return
 	}
 
@@ -112,16 +109,16 @@ Element_run_Action_Rename_File(Environment, ElementParameters)
 	}
 
 	; calculate new file path
-	SplitPath, fileFrom, OldFileName, folderFrom
+	SplitPath, EvaluatedParameters.file, OldFileName, folderFrom
 	newFilePath := folderFrom "\" EvaluatedParameters.newName
 	
 	; rename file. Do not overwrite, if a file exists.
-	FileMove, % fileFrom, % newFilePath
+	FileMove, % EvaluatedParameters.file, % newFilePath
 	
 	; check for errors
 	if errorlevel
 	{
-		x_finish(Environment, "exception", x_lang("%1% files could not be renamed from '%2%' to '%3%'", errorlevel, fileFrom, newFilePath)) 
+		x_finish(Environment, "exception", x_lang("%1% files could not be renamed from '%2%' to '%3%'", errorlevel, EvaluatedParameters.file, newFilePath)) 
 		return
 	}
 

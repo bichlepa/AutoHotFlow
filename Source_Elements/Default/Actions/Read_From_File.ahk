@@ -120,19 +120,16 @@ Element_run_Action_Read_From_File(Environment, ElementParameters)
 		return
 	}
 	
-	; get absolute path
-	file := x_GetFullPath(Environment, EvaluatedParameters.file)
-	
 	; check whether files exist
-	fileAttr := FileExist(file)
+	fileAttr := FileExist(EvaluatedParameters.file)
 	if (not fileAttr)
 	{
-		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("Source file"), file)) 
+		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("Source file"), EvaluatedParameters.file)) 
 		return
 	}
 	if (instr(fileAttr, "D"))
 	{
-		x_finish(Environment, "exception", x_lang("%1% '%2%' is a folder.", x_lang("Source file"), file)) 
+		x_finish(Environment, "exception", x_lang("%1% '%2%' is a folder.", x_lang("Source file"), EvaluatedParameters.file)) 
 		return
 	}
 
@@ -188,12 +185,12 @@ Element_run_Action_Read_From_File(Environment, ElementParameters)
 	}
 	
 	; read from file
-	FileRead, fileContent, % pars file
+	FileRead, fileContent, % pars EvaluatedParameters.file
 	
 	; check for errors
 	if ErrorLevel
 	{
-		x_finish(Environment, "exception", x_lang("File '%1%' could not be read", file))
+		x_finish(Environment, "exception", x_lang("File '%1%' could not be read", EvaluatedParameters.file))
 		return
 	}
 	

@@ -94,15 +94,12 @@ Element_enable_Trigger_Shortcut(Environment, ElementParameters)
 		x_enabled(Environment, "exception", "AutoHotFlow.exe not found") 
 		return
 	}
-	
-	; if shortcut path is relative, convert it to full path
-	ShortCutPath := x_GetFullPath(Environment, EvaluatedParameters.ShortCutPath)
 
 	; create shortcut. It will call AHF with a command which will trigger this flow
-	FileCreateShortcut, % ahfPath,% ShortCutPath,, % "AHFCommand ""Trigger|" x_GetMyFlowID(Environment) "|" x_GetMyElementID(Environment) """"
+	FileCreateShortcut, % ahfPath, % EvaluatedParameters.ShortCutPath,, % "AHFCommand ""Trigger|" x_GetMyFlowID(Environment) "|" x_GetMyElementID(Environment) """"
 	if errorlevel
 	{
-		x_enabled(Environment, "exception", x_lang("Can't create shortcut in path '%1%'", ShortCutPath))
+		x_enabled(Environment, "exception", x_lang("Can't create shortcut in path '%1%'", EvaluatedParameters.ShortCutPath))
 		return
 	}
 	
@@ -138,11 +135,8 @@ Element_disable_Trigger_Shortcut(Environment, ElementParameters)
 			return
 		}
 		
-		; if shortcut path is relative, convert it to full path
-		shortcutPath := x_GetFullPath(Environment, EvaluatedParameters.ShortCutPath)
-
 		; delete the shortcut
-		FileDelete, %shortcutPath%
+		FileDelete, % EvaluatedParameters.shortcutPath
 	}
 	
 	x_disabled(Environment, "normal")

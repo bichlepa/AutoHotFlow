@@ -91,29 +91,25 @@ Element_run_Action_Copy_Folder(Environment, ElementParameters)
 		return
 	}
 
-	; get absolute paths
-	folderFrom := x_GetFullPath(Environment, EvaluatedParameters.folde)
-	destFolder := x_GetFullPath(Environment, EvaluatedParameters.destFolder)
-
 	; check whether files exist
-	if not FileExist(folderFrom)
+	if not FileExist(EvaluatedParameters.folder)
 	{
-		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("Source folder"), folderFrom)) 
+		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("Source folder"), EvaluatedParameters.folder)) 
 		return
 	}
-	if not FileExist(destFolder)
+	if not FileExist(EvaluatedParameters.destFolder)
 	{
-		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("Destination folder"), destFolder)) 
+		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("Destination folder"), EvaluatedParameters.destFolder)) 
 		return
 	}
 
 	; copy folder
-	FileCopyDir, % folderFrom, % destFolder, % EvaluatedParameters.Overwrite
+	FileCopyDir, % EvaluatedParameters.folder, % EvaluatedParameters.destFolder, % EvaluatedParameters.Overwrite
 
 	; check for errors
 	if errorlevel ;Indecates that files could not be copied
 	{
-		x_finish(Environment, "exception", x_lang("Folder '%1%' could not be copied to '%2%'", folderFrom, destFolder)) 
+		x_finish(Environment, "exception", x_lang("Folder '%1%' could not be copied to '%2%'", EvaluatedParameters.folder, EvaluatedParameters.destFolder)) 
 		return
 	}
 	

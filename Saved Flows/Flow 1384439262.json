@@ -534,11 +534,74 @@
       "to": "element0000000211",
       "type": "Connection"
     },
-    "connection0000000228": {
+    "connection0000000230": {
       "ConnectionType": "normal",
-      "from": "element0000000204",
-      "ID": "connection0000000228",
-      "to": "element0000000227",
+      "from": "element0000000229",
+      "ID": "connection0000000230",
+      "to": "element0000000231",
+      "type": "Connection"
+    },
+    "connection0000000233": {
+      "ConnectionType": "normal",
+      "from": "element0000000088",
+      "ID": "connection0000000233",
+      "to": "element0000000232",
+      "type": "Connection"
+    },
+    "connection0000000237": {
+      "ConnectionType": "normal",
+      "from": "element0000000231",
+      "ID": "connection0000000237",
+      "to": "element0000000236",
+      "type": "Connection"
+    },
+    "connection0000000238": {
+      "ConnectionType": "normal",
+      "from": "element0000000236",
+      "ID": "connection0000000238",
+      "to": "element0000000239",
+      "type": "Connection"
+    },
+    "connection0000000243": {
+      "ConnectionType": "normal",
+      "from": "element0000000239",
+      "ID": "connection0000000243",
+      "to": "element0000000240",
+      "type": "Connection"
+    },
+    "connection0000000244": {
+      "ConnectionType": "Exception",
+      "from": "element0000000240",
+      "ID": "connection0000000244",
+      "to": "element0000000241",
+      "type": "Connection"
+    },
+    "connection0000000245": {
+      "ConnectionType": "normal",
+      "from": "element0000000241",
+      "ID": "connection0000000245",
+      "to": "element0000000242",
+      "type": "Connection"
+    },
+    "connection0000000247": {
+      "ConnectionType": "Yes",
+      "from": "element0000000242",
+      "ID": "connection0000000247",
+      "to": "element0000000246",
+      "type": "Connection"
+    },
+    "connection0000000270": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000270",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000273": {
+      "ConnectionType": "normal",
+      "from": "element0000000231",
+      "ID": "connection0000000273",
+      "to": "element0000000272",
       "type": "Connection"
     }
   },
@@ -1055,12 +1118,12 @@
     "element0000000101": {
       "class": "Action_New_variable",
       "ID": "element0000000101",
-      "name": "New variable - requiredSuccessfulRuns = 5",
+      "name": "New variable - requiredSuccessfulRuns = 6",
       "package": "default",
       "pars": {
         "expression": "Expression",
         "Varname": "requiredSuccessfulRuns",
-        "VarValue": "5"
+        "VarValue": "6"
       },
       "StandardName": "1",
       "type": "Action",
@@ -1724,15 +1787,183 @@
       "type": "Condition",
       "x": "-70",
       "y": "2205"
+    },
+    "element0000000229": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "",
+      "enabled": "1",
+      "ID": "element0000000229",
+      "name": "Manual - \"Ini test\"",
+      "package": "default",
+      "pars": {
+        "ID": "Ini test"
+      },
+      "StandardName": "1",
+      "type": "Trigger",
+      "x": "1470",
+      "y": "140"
+    },
+    "element0000000231": {
+      "class": "Action_Write_to_ini",
+      "ID": "element0000000231",
+      "name": "Write to ini - mySection - myKey - test value - testIni.ini",
+      "package": "default",
+      "pars": {
+        "file": "testIni.ini",
+        "Key": "myKey",
+        "Section": "mySection",
+        "Value": "test value"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "1470",
+      "y": "280"
+    },
+    "element0000000232": {
+      "class": "Action_Execute_Flow",
+      "ID": "element0000000232",
+      "name": "Execute Flow: This flow - Manual - \"Ini test\"",
+      "package": "default",
+      "pars": {
+        "flowID": "",
+        "ReturnVariables": 0,
+        "SendLocalVars": 1,
+        "SkipDisabled": 0,
+        "ThisFlow": 1,
+        "triggerID": "element0000000229",
+        "WaitToFinish": 0,
+        "WhichTrigger": "Specific"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-1540",
+      "y": "595"
+    },
+    "element0000000236": {
+      "class": "Action_Write_to_ini",
+      "ID": "element0000000236",
+      "name": "Write to ini - yourSection - yourKey - little value - testIni.ini",
+      "package": "default",
+      "pars": {
+        "file": "testIni.ini",
+        "Key": "yourKey",
+        "Section": "yourSection",
+        "Value": "little value"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "1470",
+      "y": "420"
+    },
+    "element0000000239": {
+      "class": "Action_Read_From_Ini",
+      "ID": "element0000000239",
+      "name": "Read From Ini -  - mySection - myKey - testIni.ini",
+      "package": "default",
+      "pars": {
+        "Action": "Key",
+        "Default": "ERROR",
+        "file": "testIni.ini",
+        "Key": "myKey",
+        "Section": "mySection",
+        "varname": "value",
+        "WhenError": "Exception"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "1470",
+      "y": "560"
+    },
+    "element0000000240": {
+      "class": "Action_Read_From_Ini",
+      "ID": "element0000000240",
+      "name": "Read From Ini -  - mySection - wrongKey - testIni.ini",
+      "package": "default",
+      "pars": {
+        "Action": "Key",
+        "Default": "ERROR",
+        "file": "testIni.ini",
+        "Key": "wrongKey",
+        "Section": "mySection",
+        "varname": "value",
+        "WhenError": "Exception"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "1470",
+      "y": "700"
+    },
+    "element0000000241": {
+      "class": "Action_Read_From_Ini",
+      "ID": "element0000000241",
+      "name": "Read From Ini -  - mySection - wrongKey - testIni.ini",
+      "package": "default",
+      "pars": {
+        "Action": "Key",
+        "Default": "Big error!",
+        "file": "testIni.ini",
+        "Key": "wrongKey",
+        "Section": "mySection",
+        "varname": "value",
+        "WhenError": "Default"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "1470",
+      "y": "840"
+    },
+    "element0000000242": {
+      "class": "Condition_Expression",
+      "ID": "element0000000242",
+      "name": "Ausdruck - value = \"Big error!\"",
+      "package": "default",
+      "pars": {
+        "Expression": "value = \"Big error!\""
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "1470",
+      "y": "980"
+    },
+    "element0000000246": {
+      "class": "Action_New_variable",
+      "ID": "element0000000246",
+      "name": "New variable - static_successfulRuns = static_successfulRuns + 1",
+      "package": "default",
+      "pars": {
+        "expression": "Expression",
+        "Varname": "static_successfulRuns",
+        "VarValue": "static_successfulRuns + 1"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "1470",
+      "y": "1155"
+    },
+    "element0000000272": {
+      "class": "Action_Write_to_ini",
+      "ID": "element0000000272",
+      "name": "Write to ini - yourSection - yourKey2 - little value - testIni.ini",
+      "package": "default",
+      "pars": {
+        "file": "testIni.ini",
+        "Key": "yourKey2",
+        "Section": "yourSection",
+        "Value": "little value"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "1645",
+      "y": "420"
     }
   },
   "category": "AHF Test",
-  "ElementIDCounter": "228",
+  "ElementIDCounter": "273",
   "flowSettings": {
     "DefaultWorkingDir": 1,
     "ExecutionPolicy": "default",
-    "Offsetx": "-1135.555313",
-    "Offsety": "1283.189522",
+    "Offsetx": "491.556432",
+    "Offsety": "244.481281",
     "WorkingDir": "",
     "zoomFactor": "0.931698"
   },

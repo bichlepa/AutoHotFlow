@@ -90,16 +90,14 @@ Element_run_Action_Create_Folder(Environment, ElementParameters)
 		return
 	}
 
-	; get absolute path
-	folder := x_GetFullPath(Environment, EvaluatedParameters.file)
-
-	fileAttr := FileExist(Folder)
+	; check whether path exists
+	fileAttr := FileExist(EvaluatedParameters.folder)
 	if (fileAttr)
 	{
 		if (not instr(fileAttr, "D"))
 		{
 			; there is a file in that path
-			x_finish(Environment, "exception", x_lang("%1% '%2%' exists and it is a file.", x_lang("Destination folder"), Folder)) 
+			x_finish(Environment, "exception", x_lang("%1% '%2%' exists and it is a file.", x_lang("Destination folder"), EvaluatedParameters.folder)) 
 			return
 		}
 		Else
@@ -108,7 +106,7 @@ Element_run_Action_Create_Folder(Environment, ElementParameters)
 			if (EvaluatedParameters.ErrorIfExists)
 			{
 				; ErrorIfExists is set. Throw exception
-				x_finish(Environment, "exception", x_lang("%1% '%2%' already exists.", x_lang("Destination folder"), Folder))
+				x_finish(Environment, "exception", x_lang("%1% '%2%' already exists.", x_lang("Destination folder"), EvaluatedParameters.folder))
 			}
 			; folder already exists and ErrorIfExists is not set . Nothing to do.
 			return
@@ -116,12 +114,12 @@ Element_run_Action_Create_Folder(Environment, ElementParameters)
 	}
 
 	; create directory
-	FileCreateDir,% folder
+	FileCreateDir, % EvaluatedParameters.folder
 
 	; check for errors
 	if errorlevel 
 	{
-		x_finish(Environment, "exception", x_lang("Folder '%1%' could not be created", folder)) 
+		x_finish(Environment, "exception", x_lang("Folder '%1%' could not be created", EvaluatedParameters.folder)) 
 		return
 	}
 	

@@ -90,10 +90,10 @@ Element_run_Action_Rename_Folder(Environment, ElementParameters)
 	}
 
 	; get absolute path
-	folderFrom := x_GetFullPath(Environment, EvaluatedParameters.folder)
+	folderFrom := EvaluatedParameters.folder
 
 	; check whether folder exist and is not a file
-	fileAttr := FileExist(folderFrom)
+	fileAttr := FileExist(EvaluatedParameters.folder)
 	if (not fileAttr)
 	{
 		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("Source folder"), folderFrom)) 

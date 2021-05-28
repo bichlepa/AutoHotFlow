@@ -94,39 +94,34 @@ Element_run_Action_Extract_files(Environment, ElementParameters)
 		return
 	}
 	
-	; get absolute paths
-	Folder := x_GetFullPath(Environment, EvaluatedParameters.Folder)
-	zipfile := x_GetFullPath(Environment, EvaluatedParameters.zipfile)
-	
-	
 	; check whether folder exist
-	fileAttr := FileExist(Folder)
+	fileAttr := FileExist(EvaluatedParameters.Folder)
 	if (not fileAttr)
 	{
-		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("Destination folder"), Folder)) 
+		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("Destination folder"), EvaluatedParameters.Folder)) 
 		return
 	}
 	if (not instr(fileAttr, "D"))
 	{
-		x_finish(Environment, "exception", x_lang("%1% '%2%' is not a folder.", x_lang("Destination folder"), Folder)) 
+		x_finish(Environment, "exception", x_lang("%1% '%2%' is not a folder.", x_lang("Destination folder"), EvaluatedParameters.Folder)) 
 		return
 	}
 
 	; check whether file exist
-	fileAttr := FileExist(zipfile)
+	fileAttr := FileExist(EvaluatedParameters.zipfile)
 	if (not fileAttr)
 	{
-		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("Source file"), zipfile)) 
+		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("Source file"), EvaluatedParameters.zipfile)) 
 		return
 	}
 	if (instr(fileAttr, "D"))
 	{
-		x_finish(Environment, "exception", x_lang("%1% '%2%' is a folder.", x_lang("Source file"), zipfile)) 
+		x_finish(Environment, "exception", x_lang("%1% '%2%' is a folder.", x_lang("Source file"), EvaluatedParameters.zipfile)) 
 		return
 	}
 
 	; call 7zip
-	result:=7z_extract(zipfile, "-t" EvaluatedParameters.zipformat, Folder)
+	result:=7z_extract(EvaluatedParameters.zipfile, "-t" EvaluatedParameters.zipformat, EvaluatedParameters.Folder)
 	
 	; check result and finish
 	if (result = "Success")

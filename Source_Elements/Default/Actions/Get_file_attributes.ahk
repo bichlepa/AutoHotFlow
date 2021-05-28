@@ -90,14 +90,11 @@ Element_run_Action_Get_File_Attributes(Environment, ElementParameters)
 		return
 	}
 
-	; get absolute path
-	file := x_GetFullPath(Environment, EvaluatedParameters.file)
-
 	; check whether file exists
-	attributes := FileExist(file)
+	attributes := FileExist(EvaluatedParameters.file)
 	if attributes
 	{
-		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("File"), file)) 
+		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("File"), EvaluatedParameters.file)) 
 		return
 	}
 

@@ -90,24 +90,21 @@ Element_run_Condition_File_Has_Attribute(Environment, ElementParameters)
 		return
 	}
 
-	; if file path is relative, convert it to full path
-	file := x_GetFullPath(Environment, EvaluatedParameters.file)
-
 	; get file attribute
-	FileGetAttrib, result, % file
+	FileGetAttrib, result, % EvaluatedParameters.file
 	if ErrorLevel
 	{
 		; an error occured. Check whether file exists
 		if not fileexist(tempPath)
 		{
 			; file does not exist. finish with exception
-			x_finish(Environment, "exception", x_lang("File '%1%' does not exist", file)) 
+			x_finish(Environment, "exception", x_lang("File '%1%' does not exist", EvaluatedParameters.file)) 
 			return
 		}
 		else
 		{
 			; file exists. Reason is unknown. Finish with exception
-			x_finish(Environment, "exception", x_lang("Attributes of file '%1%' could not be read",file)) 
+			x_finish(Environment, "exception", x_lang("Attributes of file '%1%' could not be read", EvaluatedParameters.file)) 
 			return
 		}
 	}

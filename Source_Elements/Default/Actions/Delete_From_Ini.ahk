@@ -55,10 +55,13 @@ Element_getParametrizationDetails_Action_Delete_From_Ini(Environment)
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Path of an .ini file")})
 	parametersToEdit.push({type: "File", id: "file", label: x_lang("Select an .ini file")})
+
 	parametersToEdit.push({type: "Label", label: x_lang("Action")})
 	parametersToEdit.push({type: "Radio", id: "Action", result: "enum", default: 1, choices: [x_lang("Delete a key"), x_lang("Delete a section")], enum: ["DeleteKey", "DeleteSection"]})
+
 	parametersToEdit.push({type: "Label", label: x_lang("Section")})
 	parametersToEdit.push({type: "Edit", id: "Section", default: "section", content: "String", WarnIfEmpty: true})
+
 	parametersToEdit.push({type: "Label", label: x_lang("Key")})
 	parametersToEdit.push({type: "Edit", id: "Key", default: "key", content: "String", WarnIfEmpty: true})
 	
@@ -80,56 +83,81 @@ Element_CheckSettings_Action_Delete_From_Ini(Environment, ElementParameters, sta
 	
 }
 
-
 ;Called when the element should execute.
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Delete_From_Ini(Environment, ElementParameters)
 {
-
-	Action := ElementParameters.Action
-
-	Section := x_replaceVariables(Environment,ElementParameters.Section)
-
-	file := x_GetFullPath(Environment, x_replaceVariables(Environment, ElementParameters.file))
-
-	if (not Section)
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters, "Key")
+	if (EvaluatedParameters._error)
 	{
-		x_finish(Environment,"exception",x_lang("Section not specified") )
+		x_enabled(Environment, "exception", EvaluatedParameters._errorMessage) 
+		return
+	}
+
+	; check whether files exist
+	fileAttr := FileExist(EvaluatedParameters.file)
+	if (not fileAttr)
+	{
+		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("File"), EvaluatedParameters.file)) 
+		return
+	}
+	if (instr(fileAttr, "D"))
+	{
+		x_finish(Environment, "exception", x_lang("%1% '%2%' is a folder.", x_lang("File"), EvaluatedParameters.file)) 
+		return
+	}
+
+	; check whether section is empty
+	if (EvaluatedParameters.Section = "")
+	{
+		x_finish(Environment, "exception", x_lang("Section not specified"))
 		return
 	}
 	
-	if (Action = "DeleteKey")
+	if (EvaluatedParameters.Action = "DeleteKey")
 	{
-		Key := x_replaceVariables(Environment,ElementParameters.Key)
-		if (not Key)
+		; evaluate additional parameters
+		x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["Key"])
+		if (EvaluatedParameters._error)
 		{
-			x_finish(Environment,"exception",x_lang("Key not specified") )
+			x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
+			return
+		}
+
+		; check whether key is empty
+		if (EvaluatedParameters.Key)
+		{
+			x_finish(Environment, "exception", x_lang("Key not specified"))
 			return
 		}
 		
-		IniDelete,% file,% Section,% Key
-		if errorlevel
-		{
-			x_finish(Environment,"exception",x_lang("Error on delete from ini") )
-			return
-		}
-	
-	}
-	else if (Action = "DeleteSection")
-	{
-		IniDelete,% file,% Section
-		if errorlevel
-		{
-			x_finish(Environment,"exception",x_lang("Error on delete from ini") )
-			return
-		}
-	}
-	
-	x_finish(Environment,"normal")
-	return
-	
+		; delete key
+		IniDelete, % EvaluatedParameters.file, % EvaluatedParameters.Section, % EvaluatedParameters.Key
 
+		; check for errors
+		if errorlevel
+		{
+			x_finish(Environment, "exception", x_lang("Error on delete from ini"))
+			return
+		}
 	
+	}
+	else if (EvaluatedParameters.Action = "DeleteSection")
+	{
+		; delete section
+		IniDelete, % EvaluatedParameters.file, % EvaluatedParameters.Section
+
+		; check for errors
+		if errorlevel
+		{
+			x_finish(Environment,"exception",x_lang("Error on delete from ini") )
+			return
+		}
+	}
+	
+	x_finish(Environment, "normal")
+	return
 }
 
 ;Called when the execution of the element should be stopped.

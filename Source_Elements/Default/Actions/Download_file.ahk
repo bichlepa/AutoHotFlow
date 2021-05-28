@@ -89,24 +89,21 @@ Element_run_Action_Download_File(Environment, ElementParameters)
 		return
 	}
 
-	; get full path
-	file := x_GetFullPath(Environment, EvaluatedParameters.file)
-	
 	; check whether destination file path is a folder
-	fileAttr := FileExist(file)
+	fileAttr := FileExist(EvaluatedParameters.file)
 	if (instr(fileAttr, "D"))
 	{
-		x_finish(Environment, "exception", x_lang("%1% '%2%' is a folder.", x_lang("Destination file"), file)) 
+		x_finish(Environment, "exception", x_lang("%1% '%2%' is a folder.", x_lang("Destination file"), EvaluatedParameters.file)) 
 		return
 	}
 
 	; download file
-	URLDownloadToFile, % EvaluatedParameters.URL, % file
+	URLDownloadToFile, % EvaluatedParameters.URL, % EvaluatedParameters.file
 
 	; check for errors
 	if ErrorLevel
 	{
-		x_finish(Environment, "exception", x_lang("Couldn't download URL '%1%' to file '%2%", EvaluatedParameters.URL, file))
+		x_finish(Environment, "exception", x_lang("Couldn't download URL '%1%' to file '%2%", EvaluatedParameters.URL, EvaluatedParameters.file))
 		return
 	}
 

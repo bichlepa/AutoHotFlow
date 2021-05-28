@@ -88,38 +88,35 @@ Element_run_Action_Delete_Folder(Environment, ElementParameters)
 		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
-	
-	; get absolute path
-	Folder := x_GetFullPath(Environment, EvaluatedParameters.Folder)
 
 	; check whether file exist
-	fileAttr := FileExist(Folder)
+	fileAttr := FileExist(EvaluatedParameters.Folder)
 	if (not fileAttr)
 	{
-		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("Destination folder"), Folder)) 
+		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("Destination folder"), EvaluatedParameters.Folder)) 
 		return
 	}
 	if (not instr(fileAttr, "D"))
 	{
-		x_finish(Environment, "exception", x_lang("%1% '%2%' is not a folder.", x_lang("Destination folder"), Folder)) 
+		x_finish(Environment, "exception", x_lang("%1% '%2%' is not a folder.", x_lang("Destination folder"), EvaluatedParameters.Folder)) 
 		return
 	}
 
 	if (EvaluatedParameters.OnlyIfEmpty)
 	{
 		; remove folder. It won't delete if folder contains any file
-		FileRemoveDir, % Folder
+		FileRemoveDir, % EvaluatedParameters.Folder
 	}
 	else
 	{
 		; remove folder. It deletes even if folder contains files
-		FileRemoveDir, % Folder, 1
+		FileRemoveDir, % EvaluatedParameters.Folder, 1
 	}
 	
 	; check for errors
 	if errorlevel ;Indecates that files could not be copied
 	{
-		x_finish(Environment, "exception", x_lang("Folder could not be deleted (Filepattern: '%1%')", Folder)) 
+		x_finish(Environment, "exception", x_lang("Folder could not be deleted (Filepattern: '%1%')", EvaluatedParameters.Folder)) 
 		return
 	}
 	
