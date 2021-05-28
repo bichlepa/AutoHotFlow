@@ -176,6 +176,8 @@ if not (a_iscompiled)
 	codeAfter := substr(aboutCode, stopPos)
 	aboutCode := codeBefore licenseInfoText codeAfter
 
+	StringReplace, aboutCode, aboutCode, `n, `r`n, all
+	StringReplace, aboutCode, aboutCode, `r`r`n, `r`n, all
 	filedelete, % aboutCodeFilePath
 	FileAppend, % aboutCode, % aboutCodeFilePath, utf-8
 

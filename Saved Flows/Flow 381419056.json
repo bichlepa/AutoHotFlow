@@ -1,12 +1,5 @@
 ﻿{
   "allConnections": {
-    "connection0000000012": {
-      "ConnectionType": "normal",
-      "from": "element0000000001",
-      "ID": "connection0000000012",
-      "to": "element0000000013",
-      "type": "Connection"
-    },
     "connection0000000016": {
       "ConnectionType": "normal",
       "from": "element0000000010",
@@ -20,6 +13,97 @@
       "ID": "connection0000000021",
       "to": "element0000000020",
       "type": "Connection"
+    },
+    "connection0000000026": {
+      "ConnectionType": "normal",
+      "from": "element0000000048",
+      "ID": "connection0000000026",
+      "to": "element0000000027",
+      "type": "Connection"
+    },
+    "connection0000000028": {
+      "ConnectionType": "normal",
+      "from": "element0000000027",
+      "ID": "connection0000000028",
+      "to": "element0000000029",
+      "type": "Connection"
+    },
+    "connection0000000036": {
+      "ConnectionType": "normal",
+      "from": "element0000000001",
+      "ID": "connection0000000036",
+      "to": "element0000000034",
+      "type": "Connection"
+    },
+    "connection0000000037": {
+      "ConnectionType": "normal",
+      "from": "element0000000034",
+      "ID": "connection0000000037",
+      "to": "element0000000038",
+      "type": "Connection"
+    },
+    "connection0000000043": {
+      "ConnectionType": "normal",
+      "from": "element0000000029",
+      "ID": "connection0000000043",
+      "to": "element0000000044",
+      "type": "Connection"
+    },
+    "connection0000000047": {
+      "ConnectionType": "normal",
+      "from": "element0000000025",
+      "ID": "connection0000000047",
+      "to": "element0000000048",
+      "type": "Connection"
+    },
+    "connection0000000051": {
+      "ConnectionType": "normal",
+      "from": "element0000000044",
+      "ID": "connection0000000051",
+      "to": "element0000000052",
+      "type": "Connection"
+    },
+    "connection0000000056": {
+      "ConnectionType": "Yes",
+      "from": "element0000000052",
+      "ID": "connection0000000056",
+      "to": "element0000000059",
+      "type": "Connection"
+    },
+    "connection0000000060": {
+      "ConnectionType": "normal",
+      "from": "element0000000059",
+      "ID": "connection0000000060",
+      "to": "element0000000061",
+      "type": "Connection"
+    },
+    "connection0000000062": {
+      "ConnectionType": "Yes",
+      "from": "element0000000067",
+      "ID": "connection0000000062",
+      "to": "element0000000055",
+      "type": "Connection"
+    },
+    "connection0000000063": {
+      "ConnectionType": "Yes",
+      "from": "element0000000061",
+      "ID": "connection0000000063",
+      "to": "element0000000064",
+      "type": "Connection"
+    },
+    "connection0000000066": {
+      "ConnectionType": "normal",
+      "from": "element0000000064",
+      "ID": "connection0000000066",
+      "to": "element0000000065",
+      "type": "Connection"
+    },
+    "connection0000000068": {
+      "ConnectionType": "normal",
+      "from": "element0000000065",
+      "ID": "connection0000000068",
+      "to": "element0000000067",
+      "type": "Connection"
     }
   },
   "allElements": {
@@ -27,26 +111,27 @@
       "class": "Trigger_Periodic_Timer",
       "enabled": "0",
       "ID": "element0000000001",
-      "name": "Periodic Timer",
+      "name": "Periodic Timer - 5 Sekunden",
       "package": "default",
       "pars": {
-        "Interval": "1",
+        "Interval": "5",
         "Unit": "Seconds"
       },
       "StandardName": "1",
       "type": "trigger",
-      "x": 0,
-      "y": 0
+      "x": "350",
+      "y": "140"
     },
     "element0000000005": {
       "class": "Action_Message_Box",
       "ID": "element0000000005",
-      "name": "Message Box",
+      "name": "Message Box - Titel - Nachricht",
       "package": "default",
       "pars": {
         "ButtonLabel": "OK",
         "ButtonLabelCancel": "Abbrechen",
         "Height": 200,
+        "IfClose": "",
         "IfDismiss": 1,
         "IsTimeout": "NoTimeout",
         "message": "Nachricht",
@@ -77,22 +162,6 @@
       "type": "Trigger",
       "x": "665",
       "y": "35"
-    },
-    "element0000000013": {
-      "class": "Action_Tooltip",
-      "ID": "element0000000013",
-      "name": "Tooltip: %A_TimeIdle% - 2 s - Follow Mouse",
-      "package": "action",
-      "pars": {
-        "duration": 2,
-        "follow_mouse": 1,
-        "text": "%A_TimeIdle%",
-        "Unit": "Seconds"
-      },
-      "StandardName": "1",
-      "type": "Action",
-      "x": "0",
-      "y": "245"
     },
     "element0000000015": {
       "class": "Action_Tooltip",
@@ -155,15 +224,227 @@
       "type": "Trigger",
       "x": "1610",
       "y": "245"
+    },
+    "element0000000025": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "1",
+      "enabled": "0",
+      "ID": "element0000000025",
+      "name": "Manual - \"Trigger bright branch\"",
+      "package": "default",
+      "pars": {
+        "ID": "Trigger bright branch"
+      },
+      "StandardName": "1",
+      "type": "Trigger",
+      "x": "0",
+      "y": "-140"
+    },
+    "element0000000027": {
+      "class": "Action_Set_Flow_Status",
+      "ID": "element0000000027",
+      "name": "Set Flow Status - Aktivieren: This flow - Periodic Timer - 5 Sekunden",
+      "package": "default",
+      "pars": {
+        "Enable": "Enable",
+        "flowID": "",
+        "ThisFlow": 1,
+        "triggerID": "element0000000001",
+        "WhichTrigger": "Specific"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "0",
+      "y": "140"
+    },
+    "element0000000029": {
+      "class": "Action_New_Time",
+      "ID": "element0000000029",
+      "name": "New time - static_startTime - Current time",
+      "package": "default",
+      "pars": {
+        "Time": "20210528165541",
+        "Varname": "static_startTime",
+        "WhichTime": "Current"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "0",
+      "y": "280"
+    },
+    "element0000000034": {
+      "class": "Action_Set_Flow_Status",
+      "ID": "element0000000034",
+      "name": "Set Flow Status - Deaktivieren: This flow - Periodic Timer - 5 Sekunden",
+      "package": "default",
+      "pars": {
+        "Enable": "Disable",
+        "flowID": "",
+        "ThisFlow": 1,
+        "triggerID": "element0000000001",
+        "WhichTrigger": "Specific"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "350",
+      "y": "280"
+    },
+    "element0000000038": {
+      "class": "Action_Time_Difference",
+      "ID": "element0000000038",
+      "name": "Time Difference - static_TimeDiff = a_now - static_startTime - Seconds",
+      "package": "default",
+      "pars": {
+        "InputTime": "a_now",
+        "InputTime2": "static_startTime",
+        "Unit": "Seconds",
+        "Varname": "static_TimeDiff"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "350",
+      "y": "420"
+    },
+    "element0000000044": {
+      "class": "Action_Sleep",
+      "ID": "element0000000044",
+      "name": "Pause: 7 s",
+      "package": "action",
+      "pars": {
+        "Duration": "7",
+        "Unit": "Seconds"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "0",
+      "y": "420"
+    },
+    "element0000000048": {
+      "class": "Action_New_variable",
+      "ID": "element0000000048",
+      "name": "New variable - static_TimeDiff = 0",
+      "package": "default",
+      "pars": {
+        "expression": "String",
+        "Varname": "static_TimeDiff",
+        "VarValue": "0"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "0",
+      "y": "0"
+    },
+    "element0000000052": {
+      "class": "Condition_Expression",
+      "ID": "element0000000052",
+      "name": "Ausdruck - static_TimeDiff >=4 and static_TimeDiff <= 6",
+      "package": "default",
+      "pars": {
+        "Expression": "static_TimeDiff >=4 and static_TimeDiff <= 6"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "0",
+      "y": "595"
+    },
+    "element0000000055": {
+      "class": "Action_Tooltip",
+      "ID": "element0000000055",
+      "name": "Tooltip: test successful - 2 s - Follow Mouse",
+      "package": "action",
+      "pars": {
+        "duration": 2,
+        "follow_mouse": 1,
+        "text": "test successful",
+        "Unit": "Seconds"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "0",
+      "y": "1470"
+    },
+    "element0000000059": {
+      "class": "Action_Time_Difference",
+      "ID": "element0000000059",
+      "name": "Time Difference - TimeDiff = 2015 - 2010 - Days",
+      "package": "default",
+      "pars": {
+        "InputTime": "2015",
+        "InputTime2": "2010",
+        "Unit": "Days",
+        "Varname": "TimeDiff"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "0",
+      "y": "735"
+    },
+    "element0000000061": {
+      "class": "Condition_Expression",
+      "ID": "element0000000061",
+      "name": "Ausdruck - TimeDiff = 1826",
+      "package": "default",
+      "pars": {
+        "Expression": "TimeDiff = 1826"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "0",
+      "y": "875"
+    },
+    "element0000000064": {
+      "class": "Action_Time_Calculation",
+      "ID": "element0000000064",
+      "name": "Time Calculation - CalculatedTime = 2010 + 1826 ",
+      "package": "default",
+      "pars": {
+        "InputTime": "2010",
+        "Unit": "Days",
+        "Units": "1826",
+        "Varname": "CalculatedTime"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "0",
+      "y": "1015"
+    },
+    "element0000000065": {
+      "class": "Action_Time_Difference",
+      "ID": "element0000000065",
+      "name": "Time Difference - TimeDiff = 2015 - calculatedtime - Seconds",
+      "package": "default",
+      "pars": {
+        "InputTime": "2015",
+        "InputTime2": "calculatedtime",
+        "Unit": "Seconds",
+        "Varname": "TimeDiff"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "0",
+      "y": "1155"
+    },
+    "element0000000067": {
+      "class": "Condition_Expression",
+      "ID": "element0000000067",
+      "name": "Ausdruck - TimeDiff = 0",
+      "package": "default",
+      "pars": {
+        "Expression": "TimeDiff = 0"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "0",
+      "y": "1295"
     }
   },
   "category": "AHF Test",
-  "ElementIDCounter": "22",
+  "ElementIDCounter": "69",
   "flowSettings": {
     "DefaultWorkingDir": 1,
     "ExecutionPolicy": "default",
-    "Offsetx": "-228.571429",
-    "Offsety": "-290.000000",
+    "Offsetx": "-387.142858",
+    "Offsety": "-210.000000",
     "WorkingDir": "",
     "zoomFactor": "0.7"
   },

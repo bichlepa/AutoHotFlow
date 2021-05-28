@@ -55,7 +55,7 @@ Element_getParametrizationDetails_Trigger_Periodic_Timer(Environment)
 	
 	parametersToEdit.push({type: "label", label:  x_lang("Time interval")})
 	parametersToEdit.push({type: "edit", id: "Interval", default: 10, content: "Number", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Radio", id: "Unit", choices: [x_lang("Milliseconds"), x_lang("Seconds"), x_lang("Minutes")], default: 2, result: "enum", enum: ["MilliSeconds", "Seconds", "Minutes"]})
+	parametersToEdit.push({type: "Radio", id: "Unit", choices: [x_lang("Milliseconds"), x_lang("Seconds"), x_lang("Minutes")], default: "Seconds", result: "enum", enum: ["MilliSeconds", "Seconds", "Minutes"]})
 	
 	return parametersToEdit
 }
@@ -63,7 +63,16 @@ Element_getParametrizationDetails_Trigger_Periodic_Timer(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Trigger_Periodic_Timer(Environment, ElementParameters)
 {
-	return x_lang("Periodic_Timer") 
+	switch (ElementParameters.Unit)
+	{
+		case "MilliSeconds":
+		unitText := x_lang("Milliseconds")
+		case "Seconds":
+		unitText := x_lang("Seconds")
+		case "Minutes":
+		unitText := x_lang("Minutes")
+	}
+	return x_lang("Periodic_Timer") " - " ElementParameters.Interval " " unitText
 }
 
 ;Called every time the user changes any parameter.

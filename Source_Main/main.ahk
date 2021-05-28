@@ -179,8 +179,9 @@ global_libInclusionsForThreads =
 #include source_Elements\Default\actions\Delete_from_list.ahk
 #include source_Elements\Default\actions\New_List.ahk
 #include source_Elements\Default\actions\Shuffle_list.ahk
-#include source_Elements\Default\actions\Date_calculation.ahk
-#include source_Elements\Default\actions\New_Date.ahk
+#include source_Elements\Default\actions\Time_calculation.ahk
+#include source_Elements\Default\actions\Time_difference.ahk
+#include source_Elements\Default\actions\New_Time.ahk
 #include source_Elements\Default\actions\Script.ahk
 #include source_Elements\Default\actions\Get_Clipboard.ahk
 #include source_Elements\Default\actions\Set_Clipboard.ahk
@@ -318,8 +319,9 @@ global_elementInclusionsForThreads =
 #include source_Elements\Default\actions\Delete_from_list.ahk
 #include source_Elements\Default\actions\New_List.ahk
 #include source_Elements\Default\actions\Shuffle_list.ahk
-#include source_Elements\Default\actions\Date_calculation.ahk
-#include source_Elements\Default\actions\New_Date.ahk
+#include source_Elements\Default\actions\Time_calculation.ahk
+#include source_Elements\Default\actions\Time_difference.ahk
+#include source_Elements\Default\actions\New_Time.ahk
 #include source_Elements\Default\actions\Script.ahk
 #include source_Elements\Default\actions\Get_Clipboard.ahk
 #include source_Elements\Default\actions\Set_Clipboard.ahk
