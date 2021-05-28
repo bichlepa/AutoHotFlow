@@ -83,9 +83,16 @@ Element_CheckSettings_Action_Move_Folder(Environment, ElementParameters, staticV
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Move_Folder(Environment, ElementParameters)
 {
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
+	if (EvaluatedParameters._error)
+	{
+		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
+		return
+	}
 
-	Overwrite := ElementParameters.Overwrite
-	if (Overwrite = 1)
+	; get right option for fileMoveDir command
+	if (ElementParameters.Overwrite)
 	{
 		OverwriteOption := 2
 	}
@@ -94,28 +101,44 @@ Element_run_Action_Move_Folder(Environment, ElementParameters)
 		OverwriteOption = 0
 	}
 
+	; get absolute paths
 	folderFrom := x_GetFullPath(Environment, x_replaceVariables(Environment, ElementParameters.folder))
-
 	destFolder := x_GetFullPath(Environment, x_replaceVariables(Environment, ElementParameters.destFolder))
 
-	if not FileExist(folderFrom)
+	; check whether files exist
+	fileAttr := FileExist(folderFrom)
+	if (not fileAttr)
 	{
-		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.",x_lang("Source folder"), folderFrom)) 
+		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("Source folder"), folderFrom)) 
 		return
 	}
-	if not FileExist(destFolder)
+	if (not instr(fileAttr, "D"))
 	{
-		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.",x_lang("Destination folder"), destFolder)) 
+		x_finish(Environment, "exception", x_lang("%1% '%2%' is not a folder.", x_lang("Source folder"), folderFrom)) 
 		return
 	}
 
-	FileMoveDir,% folderFrom,% destFolder,% OverwriteOption
-	if errorlevel ;Indecates that files could not be copied
+	fileAttr := FileExist(destFolder)
+	if (not fileAttr)
 	{
-		x_finish(Environment, "exception", x_lang("Folder '%1%' could not be copied to '%2%'",folderFrom, destFolder)) 
+		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("Destination folder"), destFolder)) 
 		return
 	}
+	if (not instr(fileAttr, "D"))
+	{
+		x_finish(Environment, "exception", x_lang("%1% '%2%' is not a folder.", x_lang("Destination folder"), destFolder)) 
+		return
+	}
+
+	; move folder
+	FileMoveDir, % folderFrom ,% destFolder, % OverwriteOption
 	
+	; check for errors
+	if errorlevel
+	{
+		x_finish(Environment, "exception", x_lang("Folder '%1%' could not be copied to '%2%'", folderFrom, destFolder)) 
+		return
+	}
 	
 	x_finish(Environment,"normal")
 	return

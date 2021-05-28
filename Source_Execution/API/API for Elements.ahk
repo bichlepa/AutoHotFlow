@@ -484,7 +484,7 @@ class Class_FunctionObject
 		; Add parameters which were passed to as "params*" when the function object was created (if any)
 		for oneparindex, onepar in this.params
 		{
-			args.insertat(1, onepar)
+			args.insertat(a_index, onepar)
 		}
 
 		; get the function name

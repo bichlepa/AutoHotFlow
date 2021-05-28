@@ -57,8 +57,6 @@ Element_getParametrizationDetails_Action_Rename_File(Environment)
 	parametersToEdit.push({type: "File", id: "file", label: x_lang("Select a file")})
 	parametersToEdit.push({type: "Label", label: x_lang("New file name")})
 	parametersToEdit.push({type: "Edit", id: "newName", default: x_lang("Renamed") ".txt", content: "String", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: x_lang("Overwrite")})
-	parametersToEdit.push({type: "Checkbox", id: "Overwrite", default: 0, label: x_lang("Overwrite existing files")})
 	
 	return parametersToEdit
 }
@@ -82,58 +80,52 @@ Element_CheckSettings_Action_Rename_File(Environment, ElementParameters, staticV
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Rename_File(Environment, ElementParameters)
 {
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
+	if (EvaluatedParameters._error)
+	{
+		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
+		return
+	}
 
-	Overwrite := ElementParameters.Overwrite
+	; get absolute path
+	fileFrom := x_GetFullPath(Environment, EvaluatedParameters.file)
 
-	fileFrom := x_GetFullPath(Environment, x_replaceVariables(Environment, ElementParameters.file))
-
-	newName := x_replaceVariables(Environment, ElementParameters.newName)
-
-	if not FileExist(fileFrom)
+	; check whether file exist and is not a folder
+	fileAttr := FileExist(fileFrom)
+	if (not fileAttr)
 	{
 		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.",x_lang("Source file"), fileFrom)) 
 		return
 	}
-	if not newName
+	if (instr(fileAttr, "D"))
 	{
-		x_finish(Environment, "exception", x_lang("%1% is not specified.",x_lang("New file name"))) 
-		return
-	}
-	if (instr(FileExist(fileFrom),"D"))
-	{
-		x_finish(Environment, "exception", x_lang("%1% '%2%' is a folder.",x_lang("Source file"), fileFrom)) 
+		x_finish(Environment, "exception", x_lang("%1% '%2%' is a folder.", x_lang("Source file"), fileFrom)) 
 		return
 	}
 
-	SplitPath,fileFrom,OldFileName,folderFrom
-	newFilePath:=folderFrom "\" newName
-	
-	FileMove,% fileFrom,% newFilePath,% Overwrite
-	
-	;Todo: check whether error handling is correct
-	if a_lasterror ;Indicates that no files were found
+	; check whether new name is not empty
+	if (not EvaluatedParameters.newName)
 	{
-		if errorlevel ;Indecates that files could not be copied
-		{
-			x_finish(Environment, "exception", x_lang("%1% files could not be renamed from '%2%' to '%3%'",temperror, fileFrom, newFilePath)) 
-			return
-		}
-		else
-		{
-			x_finish(Environment, "exception", x_lang("No files found (%1%)", fileFrom)) 
-			return
-		}
+		x_finish(Environment, "exception", x_lang("%1% is not specified.", x_lang("New file name"))) 
+		return
 	}
-	else
-	{
-		if errorlevel ;Indecates that files could not be copied
-		{
-			x_finish(Environment, "exception", x_lang("%1% files could not be renamed from '%2%' to '%3%'",temperror, fileFrom, newFilePath)) 
-			return
-		}
-	}
+
+	; calculate new file path
+	SplitPath, fileFrom, OldFileName, folderFrom
+	newFilePath := folderFrom "\" EvaluatedParameters.newName
 	
-	x_finish(Environment,"normal")
+	; rename file. Do not overwrite, if a file exists.
+	FileMove, % fileFrom, % newFilePath
+	
+	; check for errors
+	if errorlevel
+	{
+		x_finish(Environment, "exception", x_lang("%1% files could not be renamed from '%2%' to '%3%'", errorlevel, fileFrom, newFilePath)) 
+		return
+	}
+
+	x_finish(Environment, "normal")
 	return
 }
 

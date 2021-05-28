@@ -66,7 +66,16 @@ Element_getParametrizationDetails_Action_Get_File_Time(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Get_File_Time(Environment, ElementParameters)
 {
-	return x_lang("Get_File_Time") 
+	switch (ElementParameters.TimeType)
+	{
+		case "Modification":
+		timeTypeText := " - " x_lang("Modification time")
+		case "Creation":
+		timeTypeText := " - " x_lang("Creation time")
+		case "Access":
+		timeTypeText := " - " x_lang("Last access time")
+	}
+	return x_lang("Get_File_Time") timeTypeText " - " ElementParameters.varname " - " ElementParameters.file 
 }
 
 ;Called every time the user changes any parameter.
@@ -83,37 +92,53 @@ Element_CheckSettings_Action_Get_File_Time(Environment, ElementParameters, stati
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Get_File_Time(Environment, ElementParameters)
 {
-	varname := x_replaceVariables(Environment, ElementParameters.varname)
-	if not x_CheckVariableName(varname)
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
+	if (EvaluatedParameters._error)
 	{
-		;On error, finish with exception and return
-		x_finish(Environment, "exception", x_lang("%1% is not valid", x_lang("Ouput variable name '%1%'", varname)))
-		return
-	}
-
-	file := x_GetFullPath(Environment, x_replaceVariables(Environment, ElementParameters.file))
-	if not FileExist(file)
-	{
-		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.",x_lang("File"), file)) 
+		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
 	
-	TimeType:=ElementParameters.Unit
-	if (TimeType = "Modification")
-		TimeTypePar:="M"
-	else if (TimeType = "Creation")
-		TimeTypePar :="C"
-	else if (TimeType = "Access")
-		TimeTypePar :="A"
+	; get absolute path
+	file := x_GetFullPath(Environment, EvaluatedParameters.file)
 
-	FileGetTime,result,% file,% TimeTypePar
+	; check whether files exist
+	fileAttr := FileExist(file)
+	if (not fileAttr)
+	{
+		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("Source file"), file)) 
+		return
+	}
+	if (instr(fileAttr, "D"))
+	{
+		x_finish(Environment, "exception", x_lang("%1% '%2%' is a folder.", x_lang("Source file"), file)) 
+		return
+	}
+	
+	; prepare timeType parameter for FileGetSize
+	switch (EvaluatedParameters.TimeType)
+	{
+		case "Modification":
+		TimeTypePar := "M"
+		case "Creation":
+		TimeTypePar := "C"
+		case "Access":
+		TimeTypePar := "A"
+	}
+
+	; get file time
+	FileGetTime, result, % file, % TimeTypePar
+	
+	; check for errors
 	if ErrorLevel
 	{
-		x_finish(Environment, "exception", x_lang("Couldn't get file time of file '%1%'",file)) 
+		x_finish(Environment, "exception", x_lang("Couldn't get file time of file '%1%'", file)) 
 		return
 	}
 	
-	x_SetVariable(Environment,Varname,result)
+	; set output variable
+	x_SetVariable(Environment, Varname, result)
 	
 	x_finish(Environment,"normal")
 	return

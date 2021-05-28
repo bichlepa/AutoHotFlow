@@ -54,12 +54,16 @@ Element_getParametrizationDetails_Action_Select_file(Environment)
 	parametersToEdit:=Object()
 	parametersToEdit.push({type: "Label", label: x_lang("Output variable_name")})
 	parametersToEdit.push({type: "Edit", id: "Varname", default: "selectedFiles", content: "VariableName", WarnIfEmpty: true})
+
 	parametersToEdit.push({type: "Label", label: x_lang("Prompt")})
 	parametersToEdit.push({type: "Edit", id: "title", default: x_lang("Select a file"), content: "String"})
+
 	parametersToEdit.push({type: "Label", label: x_lang("Root directory")})
 	parametersToEdit.push({type: "folder", id: "folder"})
+
 	parametersToEdit.push({type: "Label", label: x_lang("Filter")})
 	parametersToEdit.push({type: "Edit", id: "filter", default: x_lang("Any files") " (*.*)", content: "String"})
+
 	parametersToEdit.push({type: "Label", label: x_lang("Options")})
 	parametersToEdit.push({type: "checkbox", id: "MultiSelect", default: 0, label: x_lang("Allow to select multiple files")})
 	parametersToEdit.push({type: "checkbox", id: "SaveButton", default: 0, label: x_lang("'Save' button instead of an 'Open' button")})
@@ -110,41 +114,44 @@ Element_CheckSettings_Action_Select_file(Environment, ElementParameters, staticV
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Select_file(Environment, ElementParameters)
 {
-	;~ d(ElementParameters, "element parameters")
-	Varname := x_replaceVariables(Environment, ElementParameters.Varname)
-	if not x_CheckVariableName(varname)
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
+	if (EvaluatedParameters._error)
 	{
-		;On error, finish with exception and return
-		x_finish(Environment, "exception", x_lang("%1% is not valid", x_lang("Ouput variable name '%1%'", varname)))
+		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
+
+	; get absolute path
+	folder := x_GetFullPath(Environment, EvaluatedParameters.folder)
 	
-	title := x_replaceVariables(Environment, ElementParameters.title)
-	folder := x_GetFullPath(Environment, x_replaceVariables(Environment, ElementParameters.folder))
-	filter := x_replaceVariables(Environment, ElementParameters.filter)
-	
-	options:=0
+	; prepare options for FileSelectFile
+	options := 0
 	if (ElementParameters.fileMustExist)
-		options+=1
+		options += 1
 	if (ElementParameters.PathMustExist)
-		options+=2
+		options += 2
 	if (ElementParameters.PromptNewFile)
-		options+=8
+		options += 8
 	if (ElementParameters.PromptOverwriteFile)
-		options+=16
+		options += 16
 	if (ElementParameters.NoShortcutTarget)
-		options+=32
+		options += 32
 	if (ElementParameters.SaveButton)
-		options:="S" options
+		options := "S" options
 	if (ElementParameters.MultiSelect)
-		options:="M" options
+		options := "M" options
 	
-	inputVars:={options: options, folder: folder, title: title, filter: filter}
-	outputVars:=["selectedFile", "result", "message"]
+	; we will call FileSelectFile in an other AHK thread, because the dialog is blocking.
+	; set input and output variables
+	inputVars := {options: options, folder: folder, title: title, filter: filter}
+	outputVars := ["selectedFile", "result", "message"]
+
+	; define code of the AHK thread
 	code =
 	( ` , LTrim %
 	
-		FileSelectFile,selectedFile,%options%,%folder%,%title%,%filter%
+		FileSelectFile, selectedFile, %options%, %folder%, %title%, %filter%
 		if errorlevel
 		{
 			result := "exception"
@@ -154,12 +161,12 @@ Element_run_Action_Select_file(Environment, ElementParameters)
 		{
 			IfInString, options, m ;If multiselect, make a list
 			{
-				selectedFileCopy:=selectedFile
-				selectedFile:=Object()
-				Loop,parse,selectedFileCopy,`n
+				selectedFileCopy := selectedFile
+				selectedFile := Object()
+				Loop, parse, selectedFileCopy, `n
 				{
-					if a_index=1
-						tempActionSelectFiledir:=A_LoopField
+					if (a_index = 1)
+						tempActionSelectFiledir := A_LoopField
 					else
 						selectedFile.push(tempActionSelectFiledir "\" A_LoopField )
 					
@@ -169,11 +176,11 @@ Element_run_Action_Select_file(Environment, ElementParameters)
 			result := "normal"
 		}
 	)
-	;Translations: x_lang("User dismissed the dialog without selecting a file or system refused to show the dialog.")
+	; make sure, lang crawler finds the translation for the error message
+	; x_lang("User dismissed the dialog without selecting a file or system refused to show the dialog.")
 	
-	functionObject := x_NewFunctionObject(Environment, "Action_Select_file_FinishExecution", ElementParameters)
-	x_SetExecutionValue(Environment, "functionObject", functionObject)
-	x_SetExecutionValue(Environment, "Varname", Varname)
+	; start new AHK thread
+	functionObject := x_NewFunctionObject(Environment, "Action_Select_file_FinishExecution", ElementParameters, EvaluatedParameters.Varname)
 	x_ExecuteInNewAHKThread(Environment, functionObject, code, inputVars, outputVars)
 }
 
@@ -181,25 +188,26 @@ Element_run_Action_Select_file(Environment, ElementParameters)
 ;If the task in Element_run_...() takes more than several seconds, then it is up to you to make it stoppable.
 Element_stop_Action_Select_file(Environment, ElementParameters)
 {
-	; TODO stop ahk thread
+	; stop the other AHK thread
+	x_ExecuteInNewAHKThread_Stop(Environment)
 }
 
 
-
-Action_Select_file_FinishExecution(Environment, ElementParameters, values)
+; callback function of the external thread
+Action_Select_file_FinishExecution(Environment, ElementParameters, Varname, outputVars)
 {
-	;~ d(values,"asdf")
-	;~ d(ElementParameters,"asdf")
-	
-	if (values.result="normal")
+	; check result
+	if (outputVars.result = "normal")
 	{
-		varname := x_GetExecutionValue(Environment, "Varname")
-		x_SetVariable(Environment, Varname, values.selectedFile)
-		x_finish(Environment,values.result, values.message)
+		; user selected a file
+		; set output variable
+		x_SetVariable(Environment, Varname, outputVars.selectedFile)
+		; finish
+		x_finish(Environment, outputVars.result)
 	}
 	else
 	{
-		x_finish(Environment,"exception", values.message)
+		; user did not select a file
+		x_finish(Environment, "exception", outputVars.message)
 	}
-	
 }

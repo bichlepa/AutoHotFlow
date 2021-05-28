@@ -55,8 +55,10 @@ Element_getParametrizationDetails_Action_Change_character_case(Environment)
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Output Variable_name")})
 	parametersToEdit.push({type: "Edit", id: "Varname", default: "NewVariable", content: "VariableName", WarnIfEmpty: true})
+
 	parametersToEdit.push({type: "Label", label:  x_lang("Input string")})
 	parametersToEdit.push({type: "Edit", id: "VarValue", default: "Hello World", content: ["String", "Expression"], contentID: "expression", contentDefault: "string", WarnIfEmpty: true})
+
 	parametersToEdit.push({type: "Label", label: x_lang("Which case (character case)")})
 	parametersToEdit.push({type: "Radio", id: "CharCase", default: 1, choices: [x_lang("Uppercase"), x_lang("Lowercase"), x_lang("Firt character of a word is uppercase")], enum: ["upper", "lower", "firstUp"]})
 
@@ -83,49 +85,28 @@ Element_CheckSettings_Action_Change_character_case(Environment, ElementParameter
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Change_character_case(Environment, ElementParameters)
 {
-	radioValue := ElementParameters.radio
-	
-	Varname := x_replaceVariables(Environment, ElementParameters.Varname)
-	
-	if not x_CheckVariableName(Varname)
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
+	if (EvaluatedParameters._error)
 	{
-		;On error, finish with exception and return
-		x_finish(Environment, "exception", x_lang("%1% is not valid", x_lang("Ouput variable name '%1%'", par_editVariableName)))
+		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
 	
-	if (ElementParameters.Expression = "expression")
-	{
-		evRes := x_EvaluateExpression(Environment, ElementParameters.VarValue)
-		if (evRes.error)
-		{
-			;On error, finish with exception and return
-			x_finish(Environment, "exception", x_lang("An error occured while parsing expression '%1%'", ElementParameters.VarValue) "`n`n" evRes.error) 
-			return
-		}
-		else
-		{
-			VarValue:=evRes.result
-		}
-	}
-	else
-		VarValue := x_replaceVariables(Environment, ElementParameters.VarValue)
+	; change character case as desired
+	if (EvaluatedParameters.CharCase = "upper") ;Uppercase
+		StringUpper, VarValue, VarValue
+	else if (EvaluatedParameters.CharCase = "lower") ;Lowercase
+		StringLower, VarValue, VarValue
+	else if (EvaluatedParameters.CharCase = "firstUp")
+		StringUpper, VarValue, VarValue, T ;First character of a word is uppercase
 	
-	CharCase := ElementParameters.CharCase
+	; write variable
+	x_SetVariable(Environment, Varname, VarValue)
 	
-	if CharCase=upper ;Uppercase
-		StringUpper,VarValue,VarValue
-	else if CharCase=lower ;Lowercase
-		StringLower,VarValue,VarValue
-	else if CharCase=firstUp
-		StringUpper,VarValue,VarValue,T ;First character of a word is uppercase
-	x_SetVariable(Environment,Varname,VarValue)
-	
+	;Always call v_finish() before return
 	x_finish(Environment,"normal")
 	return
-	
-
-	
 }
 
 ;Called when the execution of the element should be stopped.

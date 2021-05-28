@@ -107,60 +107,73 @@ Element_CheckSettings_Action_Write_To_File(Environment, ElementParameters, stati
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Write_To_File(Environment, ElementParameters)
 {
-	EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters)
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
 	if (EvaluatedParameters._error)
 	{
 		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
 	
-	filepath := x_GetFullPath(Environment, EvaluatedParameters.file)
+	; get absolute path
+	file := x_GetFullPath(Environment, EvaluatedParameters.file)
 	
 	
+	; prepare parameter for FileRead and set FileAppend
+	pars:= ""
 	if (EvaluatedParameters.encoding = "UTF-8" or EvaluatedParameters.encoding = "UTF-16")
 	{
+		; set unicode file encoding. Also consider BOM option
 		if (EvaluatedParameters.WithBOM)
-			FileEncoding,% EvaluatedParameters.encoding
+			FileEncoding, % EvaluatedParameters.encoding
 		else
-			FileEncoding,% EvaluatedParameters.encoding "-RAW"
+			FileEncoding, % EvaluatedParameters.encoding "-RAW"
 	}
 	else if (EvaluatedParameters.encoding = "ANSI")
 	{
-		FileEncoding ;Set system default ANSI codepage
+		;Set system default ANSI codepage
+		FileEncoding
 	}
 	else if (EvaluatedParameters.encoding = "other")
 	{
-		FileEncoding,% "CP" EvaluatedParameters.CodePageIdentifier
+		; set defined encoding
+		FileEncoding, % "CP" EvaluatedParameters.CodePageIdentifier
 	}
 	if (EvaluatedParameters.Linefeed)
 	{
+		; this will replace all "`n" with "`r`n"
 		pars.="*"
 	}
 
+	; check option Overwrite
 	if (EvaluatedParameters.Overwrite = "Overwrite")
 	{
-		if (fileexist(filepath))
+		; delete file if we have to overwrite it
+		if (fileexist(file))
 		{
-			FileDelete,% filepath
+			FileDelete,% file
+
+			; check for errors
 			if errorlevel
 			{
-				x_finish(Environment, "exception",  x_lang("File '%1%' could not be deleted",filepath) )
+				x_finish(Environment, "exception",  x_lang("File '%1%' could not be deleted", file))
 				return
 			}
 		}
 	}
 	
-	FileAppend,% EvaluatedParameters.text,% pars filepath
+	; write to file
+	FileAppend, % EvaluatedParameters.text, % pars file
 	
+	; check for errors
 	if ErrorLevel
 	{
-		x_finish(Environment,"exception", x_lang("File '%1%' could not be written",filepath))
+		x_finish(Environment,"exception", x_lang("File '%1%' could not be written",file))
 		return
 	}
 	
 	x_finish(Environment,"normal")
 	return
-	
 }
 
 

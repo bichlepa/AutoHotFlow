@@ -81,40 +81,52 @@ Element_CheckSettings_Action_Rename_Folder(Environment, ElementParameters, stati
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Rename_Folder(Environment, ElementParameters)
 {
-
-	folderFrom := x_GetFullPath(Environment, x_replaceVariables(Environment, ElementParameters.folder))
-
-	newName := x_replaceVariables(Environment, ElementParameters.newName)
-
-	if not FileExist(folderFrom)
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
+	if (EvaluatedParameters._error)
 	{
-		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.",x_lang("Source folder"), folderFrom)) 
-		return
-	}
-	if not newName
-	{
-		x_finish(Environment, "exception", x_lang("%1% is not specified.",x_lang("New folder name"))) 
-		return
-	}
-	if (not instr(FileExist(fileFrom),"D"))
-	{
-		x_finish(Environment, "exception", x_lang("%1% '%2%' is not a folder.",x_lang("Source folder"), fileFrom)) 
+		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
 
-	SplitPath,folderFrom,OldFolderName,folderOfFolderFrom
-	newFolderPath:=folderOfFolderFrom "\" newName
-	
-	FileMoveDir,% fileFrom,% newFilePath,R
-	
-	if errorlevel ;Indecates that files could not be copied
+	; get absolute path
+	folderFrom := x_GetFullPath(Environment, EvaluatedParameters.folder)
+
+	; check whether folder exist and is not a file
+	fileAttr := FileExist(folderFrom)
+	if (not fileAttr)
 	{
-		x_finish(Environment, "exception", x_lang("Folder '%1%' could not be renamed to '%2%'",folderFrom, newFolderPath)) 
+		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("Source folder"), folderFrom)) 
+		return
+	}
+	if (not instr(fileAttr, "D"))
+	{
+		x_finish(Environment, "exception", x_lang("%1% '%2%' is not a folder.", x_lang("Source folder"), folderFrom)) 
 		return
 	}
 	
+	; check whether new name is not empty
+	if (not EvaluatedParameters.newName)
+	{
+		x_finish(Environment, "exception", x_lang("%1% is not specified.", x_lang("New folder name"))) 
+		return
+	}
+
+	; calculate new folder path
+	SplitPath, folderFrom, OldFolderName, folderOfFolderFrom
+	newFolderPath := folderOfFolderFrom "\" EvaluatedParameters.newName
 	
-	x_finish(Environment,"normal")
+	; rename folder
+	FileMoveDir, % fileFrom, % newFilePath, R
+	
+	; check for errors
+	if errorlevel
+	{
+		x_finish(Environment, "exception", x_lang("Folder '%1%' could not be renamed to '%2%'", folderFrom, newFolderPath)) 
+		return
+	}
+	
+	x_finish(Environment, "normal")
 	return
 }
 

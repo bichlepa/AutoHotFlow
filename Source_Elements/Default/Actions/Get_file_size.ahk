@@ -55,8 +55,10 @@ Element_getParametrizationDetails_Action_Get_File_Size(Environment)
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Output variable name")})
 	parametersToEdit.push({type: "Edit", id: "varname", default: "FileSize", content: "VariableName", WarnIfEmpty: true})
+
 	parametersToEdit.push({type: "Label", label: x_lang("File path")})
 	parametersToEdit.push({type: "File", id: "file", label: x_lang("Select a file")})
+
 	parametersToEdit.push({type: "Label", label: x_lang("Unit")})
 	parametersToEdit.push({type: "Radio", id: "Unit", result: "enum", default: 1, choices: [x_lang("Bytes"), x_lang("Kilobytes"), x_lang("Megabytes")], enum: ["Bytes", "Kilobytes", "Megabytes"]})
 	
@@ -66,7 +68,7 @@ Element_getParametrizationDetails_Action_Get_File_Size(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Get_File_Size(Environment, ElementParameters)
 {
-	return x_lang("Get_File_Size") 
+	return x_lang("Get_File_Size") " - " ElementParameters.varname " - " ElementParameters.file
 }
 
 ;Called every time the user changes any parameter.
@@ -83,35 +85,53 @@ Element_CheckSettings_Action_Get_File_Size(Environment, ElementParameters, stati
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Get_File_Size(Environment, ElementParameters)
 {
-	varname := x_replaceVariables(Environment, ElementParameters.varname)
-	if not x_CheckVariableName(varname)
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
+	if (EvaluatedParameters._error)
 	{
-		;On error, finish with exception and return
-		x_finish(Environment, "exception", x_lang("%1% is not valid", x_lang("Ouput variable name '%1%'", varname)))
-		return
-	}
-
-	file := x_GetFullPath(Environment, x_replaceVariables(Environment, ElementParameters.file))
-	if not FileExist(file)
-	{
-		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.",x_lang("File"), file)) 
+		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
 	
-	Unit:=ElementParameters.Unit
-	if (Unit = "Kilobytes")
-		UnitPar:="K"
-	else if (Unit = "Megabytes")
-		UnitPar :="M"
+	; get absolute path
+	file := x_GetFullPath(Environment, EvaluatedParameters.file)
 
-	FileGetSize,result,% file,% UnitPar
+	; check whether files exist
+	fileAttr := FileExist(file)
+	if (not fileAttr)
+	{
+		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("Source file"), file)) 
+		return
+	}
+	if (instr(fileAttr, "D"))
+	{
+		x_finish(Environment, "exception", x_lang("%1% '%2%' is a folder.", x_lang("Source file"), file)) 
+		return
+	}
+	
+	; prepare unit parameter for FileGetSize
+	switch (EvaluatedParameters.Unit)
+	{
+		case "Bytes":
+		UnitPar := ""
+		case "Kilobytes":
+		UnitPar := "K"
+		case "Megabytes":
+		UnitPar := "M"
+	}
+
+	; get file size
+	FileGetSize, result, % file, % UnitPar
+
+	; check for errors
 	if ErrorLevel
 	{
 		x_finish(Environment, "exception", x_lang("Couldn't get file size of file '%1%'",file)) 
 		return
 	}
 	
-	x_SetVariable(Environment,Varname,result)
+	; set output variable
+	x_SetVariable(Environment, Varname, result)
 	
 	x_finish(Environment,"normal")
 	return

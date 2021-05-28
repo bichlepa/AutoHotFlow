@@ -55,6 +55,9 @@ Element_getParametrizationDetails_Action_Create_Folder(Environment)
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Source folder")})
 	parametersToEdit.push({type: "File", id: "folder", label: x_lang("Select a folder")})
+
+	parametersToEdit.push({type: "Label", label: x_lang("Options")})
+	parametersToEdit.push({type: "Checkbox", id: "ErrorIfExists", default: 0, label: x_lang("Throw exception if folder already exists")})
 	
 	return parametersToEdit
 }
@@ -62,7 +65,7 @@ Element_getParametrizationDetails_Action_Create_Folder(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Create_Folder(Environment, ElementParameters)
 {
-	return x_lang("Create_Folder") 
+	return x_lang("Create_Folder") " - " ElementParameters.folder
 }
 
 ;Called every time the user changes any parameter.
@@ -79,21 +82,52 @@ Element_CheckSettings_Action_Create_Folder(Environment, ElementParameters, stati
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Create_Folder(Environment, ElementParameters)
 {
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
+	if (EvaluatedParameters._error)
+	{
+		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
+		return
+	}
 
-	Overwrite := ElementParameters.Overwrite
+	; get absolute path
+	folder := x_GetFullPath(Environment, EvaluatedParameters.file)
 
-	folder := x_GetFullPath(Environment, x_replaceVariables(Environment, ElementParameters.file))
+	fileAttr := FileExist(Folder)
+	if (fileAttr)
+	{
+		if (not instr(fileAttr, "D"))
+		{
+			; there is a file in that path
+			x_finish(Environment, "exception", x_lang("%1% '%2%' exists and it is a file.", x_lang("Destination folder"), Folder)) 
+			return
+		}
+		Else
+		{
+			; folder already exists
+			if (EvaluatedParameters.ErrorIfExists)
+			{
+				; ErrorIfExists is set. Throw exception
+				x_finish(Environment, "exception", x_lang("%1% '%2%' already exists.", x_lang("Destination folder"), Folder))
+			}
+			; folder already exists and ErrorIfExists is not set . Nothing to do.
+			return
+		}
+	}
 
+	; create directory
 	FileCreateDir,% folder
+
+	; check for errors
 	if errorlevel 
 	{
-		x_finish(Environment, "exception", x_lang("Folder '%1%' could not be created",folder)) 
+		x_finish(Environment, "exception", x_lang("Folder '%1%' could not be created", folder)) 
 		return
 	}
 	
+	; no errors occured. finish normally
 	x_finish(Environment,"normal")
 	return
-	
 }
 
 ;Called when the execution of the element should be stopped.

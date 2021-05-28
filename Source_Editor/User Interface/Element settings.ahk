@@ -2068,7 +2068,7 @@ class ElementSettings
 			gui, font, s8 cDefault wnorm
 			
 			; create an edit control
-			gui, add, edit, w370 x10 hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID%, %temp%
+			gui, add, edit, w370 x10 hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID%, %tempValue%
 			this.components.push("GUISettingsOfElement" tempParameterID)
 			ElementSettings.fieldHWNDs[tempHWND] := this
 

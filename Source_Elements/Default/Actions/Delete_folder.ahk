@@ -81,35 +81,50 @@ Element_CheckSettings_Action_Delete_Folder(Environment, ElementParameters, stati
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Delete_Folder(Environment, ElementParameters)
 {
-	OnlyIfEmpty := ElementParameters.ifEmpty
-
-	Folder := x_GetFullPath(Environment, x_replaceVariables(Environment, ElementParameters.Folder))
-
-	if not FileExist(Folder)
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
+	if (EvaluatedParameters._error)
 	{
-		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.",x_lang("Folder"), Folder)) 
+		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
+		return
+	}
+	
+	; get absolute path
+	Folder := x_GetFullPath(Environment, EvaluatedParameters.Folder)
+
+	; check whether file exist
+	fileAttr := FileExist(Folder)
+	if (not fileAttr)
+	{
+		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("Destination folder"), Folder)) 
+		return
+	}
+	if (not instr(fileAttr, "D"))
+	{
+		x_finish(Environment, "exception", x_lang("%1% '%2%' is not a folder.", x_lang("Destination folder"), Folder)) 
 		return
 	}
 
-	if (OnlyIfEmpty)
+	if (EvaluatedParameters.OnlyIfEmpty)
 	{
-		FileRemoveDir,% Folder
+		; remove folder. It won't delete if folder contains any file
+		FileRemoveDir, % Folder
 	}
 	else
 	{
-		FileRemoveDir,% Folder, 1
+		; remove folder. It deletes even if folder contains files
+		FileRemoveDir, % Folder, 1
 	}
 	
+	; check for errors
 	if errorlevel ;Indecates that files could not be copied
 	{
-		x_finish(Environment, "exception", x_lang("%1% folders could not be deleted (Filepattern: '%2%')",temperror, Folder)) 
+		x_finish(Environment, "exception", x_lang("Folder could not be deleted (Filepattern: '%1%')", Folder)) 
 		return
 	}
 	
-	
 	x_finish(Environment,"normal")
 	return
-	
 }
 
 ;Called when the execution of the element should be stopped.

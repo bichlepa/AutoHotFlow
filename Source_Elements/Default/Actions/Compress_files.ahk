@@ -51,14 +51,16 @@ Element_getStabilityLevel_Action_Compress_files()
 ;Returns an array of objects which describe all controls which will be shown in the element settings GUI
 Element_getParametrizationDetails_Action_Compress_files(Environment)
 {
-	parametersToEdit:=Object()
+	parametersToEdit := Object()
 	parametersToEdit.push({type: "Label", label: x_lang("Source file")})
 	parametersToEdit.push({type: "File", id: "file", label: x_lang("Select a file")})
+
 	parametersToEdit.push({type: "Label", label: x_lang("Destination archive")})
-	parametersToEdit.push({type: "File", id: "zipfile", label: x_lang("Select a zip file"), filter: x_lang("Archive") " (.zip; .7z; .xz; .gz; .gzip; .tgz; .bz2; .bzip2; tbz2; tbz; tar)", options: "S"})
+	parametersToEdit.push({type: "File", id: "zipfile", label: x_lang("Select a file path for the compressed file"), filter: x_lang("Archive") " (.zip; .7z; .xz; .gz; .gzip; .tgz; .bz2; .bzip2; .tbz2; .tbz; .tar)", options: "S"})
+
 	parametersToEdit.push({type: "Label", label: x_lang("Options")})
 	parametersToEdit.push({type: "Label", label: x_lang("Format"), size: "small"})
-	parametersToEdit.push({type: "DropDown", id: "zipformat", default: "*", choices: ["*", "7z", "zip", "xz", "tar", "gzip", "BZIP2"], result: "string"})
+	parametersToEdit.push({type: "DropDown", id: "zipformat", default: "zip", choices: ["zip", "7z", "xz", "tar", "gzip", "BZIP2"], result: "string"})
 	
 	return parametersToEdit
 }
@@ -67,8 +69,7 @@ Element_getParametrizationDetails_Action_Compress_files(Environment)
 Element_GenerateName_Action_Compress_files(Environment, ElementParameters)
 {
 	global
-	return % x_lang("Compress_files") " - " ElementParameters.file " - " ElementParameters.zipfile
-	
+	return % x_lang("Compress_files") " - " ElementParameters.zipformat " - " ElementParameters.file " - " ElementParameters.zipfile
 }
 
 ;Called every time the user changes any parameter.
@@ -85,13 +86,31 @@ Element_CheckSettings_Action_Compress_files(Environment, ElementParameters, stat
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Compress_files(Environment, ElementParameters)
 {
-	;~ d(ElementParameters, "element parameters")
-	File := x_GetFullPath(Environment, x_replaceVariables(Environment, ElementParameters.File))
-	zipfile := x_GetFullPath(Environment, x_replaceVariables(Environment, ElementParameters.zipfile))
-	zipformat := ElementParameters.zipformat
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
+	if (EvaluatedParameters._error)
+	{
+		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
+		return
+	}
+
+	; get absolute paths
+	File := x_GetFullPath(Environment, EvaluatedParameters.File)
+	zipfile := x_GetFullPath(Environment, EvaluatedParameters.zipfile)
+
+	; check whether zip file path is a folder
+	fileAttr := FileExist(zipfile)
+	if (instr(fileAttr, "D"))
+	{
+		x_finish(Environment, "exception", x_lang("%1% '%2%' is a folder.", x_lang("Destination file"), zipfile)) 
+		return
+	}
 	
-	result:=7z_compress(zipfile, "-t" zipformat, file)
-	if result = Success
+	; call 7zip
+	result := 7z_compress(zipfile, "-t" EvaluatedParameters.zipformat, file)
+
+	; check result and finish
+	if (result = "Success")
 		x_finish(Environment, "normal")
 	else
 		x_finish(Environment, "exception", result)

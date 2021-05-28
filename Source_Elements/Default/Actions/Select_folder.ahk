@@ -104,32 +104,36 @@ Element_CheckSettings_Action_Select_Folder(Environment, ElementParameters, stati
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Select_Folder(Environment, ElementParameters)
 {
-	;~ d(ElementParameters, "element parameters")
-	Varname := x_replaceVariables(Environment, ElementParameters.Varname)
-	if not x_CheckVariableName(varname)
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
+	if (EvaluatedParameters._error)
 	{
-		;On error, finish with exception and return
-		x_finish(Environment, "exception", x_lang("%1% is not valid", x_lang("Ouput variable name '%1%'", varname)))
+		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
 	
-	title := x_replaceVariables(Environment, ElementParameters.title)
-	folder := x_GetFullPath(Environment, x_replaceVariables(Environment, ElementParameters.folder))
-	
-	options:=0
+	; get absolute path
+	folder := x_GetFullPath(Environment, EvaluatedParameters.folder)
+
+	; prepare options for FileSelectFile
+	options := 0
 	if (ElementParameters.ButtonNewFolder)
-		options+=1
+		options += 1
 	if (ElementParameters.EditField)
-		options+=2
+		options += 2
 	if (ElementParameters.AllowUpward)
-		folder:="*" folder
+		folder := "*" folder
 	
-	inputVars:={options: options, folder: folder, title: title}
-	outputVars:=["selectedFolder", "result", "message"]
+	; we will call FileSelectFile in an other AHK thread, because the dialog is blocking.
+	; set input and output variables
+	inputVars := {options: options, folder: folder, title: title}
+	outputVars := ["selectedFolder", "result", "message"]
+	
+	; define code of the AHK thread
 	code =
 	( ` , LTrim %
 	
-		FileSelectFolder,selectedFolder,%folder%,%options%,%title%
+		FileSelectFolder, selectedFolder, %folder%, %options%, %title%
 		if errorlevel
 		{
 			result := "exception"
@@ -140,11 +144,11 @@ Element_run_Action_Select_Folder(Environment, ElementParameters)
 			result := "normal"
 		}
 	)
-	;Translations: x_lang("User dismissed the dialog without selecting a file or system refused to show the dialog.")
+	; make sure, lang crawler finds the translation for the error message
+	; x_lang("User dismissed the dialog without selecting a file or system refused to show the dialog.")
 	
-	functionObject := x_NewFunctionObject(Environment, "Action_Select_Folder_FinishExecution", ElementParameters)
-	x_SetExecutionValue(Environment, "functionObject", functionObject)
-	x_SetExecutionValue(Environment, "Varname", Varname)
+	; start new AHK thread
+	functionObject := x_NewFunctionObject(Environment, "Action_Select_Folder_FinishExecution", ElementParameters, EvaluatedParameters.Varname)
 	x_ExecuteInNewAHKThread(Environment, functionObject, code, inputVars, outputVars)
 }
 
@@ -152,24 +156,26 @@ Element_run_Action_Select_Folder(Environment, ElementParameters)
 ;If the task in Element_run_...() takes more than several seconds, then it is up to you to make it stoppable.
 Element_stop_Action_Select_Folder(Environment, ElementParameters)
 {
-	; todo
+	; stop the other AHK thread
+	x_ExecuteInNewAHKThread_Stop(Environment)
 }
 
 
-Action_Select_Folder_FinishExecution(Environment, ElementParameters, values)
+; callback function of the external thread
+Action_Select_Folder_FinishExecution(Environment, ElementParameters, Varname, outputVars)
 {
-	;~ d(values,"asdf")
-	;~ d(ElementParameters,"asdf")
-	
-	if (values.result="normal")
+	; check result
+	if (outputVars.result = "normal")
 	{
-		varname := x_GetExecutionValue(Environment, "Varname")
-		x_SetVariable(Environment, Varname, values.selectedFolder)
-		x_finish(Environment,values.result, values.message)
+		; user selected a folder
+		; set output variable
+		x_SetVariable(Environment, Varname, outputVars.selectedFolder)
+		; finish
+		x_finish(Environment, outputVars.result)
 	}
 	else
 	{
-		x_finish(Environment,"exception", values.message)
+		; user did not select a file
+		x_finish(Environment, "exception", outputVars.message)
 	}
-	
 }

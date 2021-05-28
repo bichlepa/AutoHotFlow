@@ -83,35 +83,43 @@ Element_CheckSettings_Action_Copy_Folder(Environment, ElementParameters, staticV
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Copy_Folder(Environment, ElementParameters)
 {
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
+	if (EvaluatedParameters._error)
+	{
+		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
+		return
+	}
 
-	Overwrite := ElementParameters.Overwrite
+	; get absolute paths
+	folderFrom := x_GetFullPath(Environment, EvaluatedParameters.folde)
+	destFolder := x_GetFullPath(Environment, EvaluatedParameters.destFolder)
 
-	folderFrom := x_GetFullPath(Environment, x_replaceVariables(Environment, ElementParameters.folder))
-
-	destFolder := x_GetFullPath(Environment, x_replaceVariables(Environment, ElementParameters.destFolder))
-
+	; check whether files exist
 	if not FileExist(folderFrom)
 	{
-		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.",x_lang("Source folder"), folderFrom)) 
+		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("Source folder"), folderFrom)) 
 		return
 	}
 	if not FileExist(destFolder)
 	{
-		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.",x_lang("Destination folder"), destFolder)) 
+		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("Destination folder"), destFolder)) 
 		return
 	}
 
-	FileCopyDir,% folderFrom,% destFolder,% Overwrite
+	; copy folder
+	FileCopyDir, % folderFrom, % destFolder, % EvaluatedParameters.Overwrite
+
+	; check for errors
 	if errorlevel ;Indecates that files could not be copied
 	{
-		x_finish(Environment, "exception", x_lang("Folder '%1%' could not be copied to '%2%'",folderFrom, destFolder)) 
+		x_finish(Environment, "exception", x_lang("Folder '%1%' could not be copied to '%2%'", folderFrom, destFolder)) 
 		return
 	}
 	
-	
-	x_finish(Environment,"normal")
+	; no errors occured. finish normally
+	x_finish(Environment, "normal")
 	return
-	
 }
 
 ;Called when the execution of the element should be stopped.

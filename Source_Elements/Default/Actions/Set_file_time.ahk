@@ -87,53 +87,65 @@ Element_CheckSettings_Action_Set_file_time(Environment, ElementParameters, stati
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Set_file_time(Environment, ElementParameters)
 {
-	EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters)
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
 	if (EvaluatedParameters._error)
 	{
 		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
 	
-	temptime:=ElementParameters.time
-	
-	if temptime is not time
+	; check time
+	timeValue := EvaluatedParameters.time
+	if timeValue is not time
 	{
-		x_finish(Environment, "exception", x_lang("Timestamp '%1%' is not valid", temptime)) 
+		x_finish(Environment, "exception", x_lang("Timestamp '%1%' is not valid", timeValue)) 
 		return
 	}
 	
-	TimeType:=ElementParameters.Unit
-	if (TimeType = "Modification")
-		TimeTypePar:="M"
-	else if (TimeType = "Creation")
-		TimeTypePar :="C"
-	else if (TimeType = "Access")
-		TimeTypePar :="A"
+	; prepare TimeType string for FileSetTime
+	switch (EvaluatedParameters.TimeType)
+	{
+		case "Modification":
+		TimeTypePar := "M"
+		case "Creation":
+		TimeTypePar := "C"
+		case "Access":
+		TimeTypePar := "A"
+	}
 
+	; prepare operation string for FileSetAttrib
+	if (EvaluatedParameters.OperateOnWhat = "Files")
+		operation := 0
+	else if (EvaluatedParameters.OperateOnWhat = "FilesAndFolders")
+		operation := 1
+	else if (EvaluatedParameters.OperateOnWhat = "Folders")
+		operation := 2
 	
-	tempPath:= x_GetFullPath(Environment,EvaluatedParameters.file)
+	; get absolute path
+	file := x_GetFullPath(Environment,EvaluatedParameters.file)
 	
+	; set file time
+	FileSetTime, % timeValue, % file, % TimeTypePar, % operation, % EvaluatedParameters.Recurse
 	
-	FileSetTime,%temptime%,% tempPath,%TimeTypePar%
+	; check for errors
 	if ErrorLevel
 	{
-		if not fileexist(tempPath)
+		; we check here whether file exists, because the file path may contain a wildcard pattern
+		if not fileexist(file)
 		{
-			x_finish(Environment, "exception", x_lang("File '%1%' does not exist",tempPath))
+			x_finish(Environment, "exception", x_lang("File '%1%' does not exist", file))
 			return
 		}
 		else
 		{
-			x_finish(Environment, "exception", x_lang("Attributes of file '%1%' could not be changed",tempPath)) 
+			x_finish(Environment, "exception", x_lang("Attributes of file '%1%' could not be changed", file)) 
 			return
 		}
 	}
+	
 	x_finish(Environment,"normal")
 	return
-	
-
-
-	
 }
 
 

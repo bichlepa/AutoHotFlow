@@ -55,6 +55,7 @@ Element_getParametrizationDetails_Action_Set_file_attributes(Environment)
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Select file")})
 	parametersToEdit.push({type: "File", id: "file", label: x_lang("Select a file")})
+
 	parametersToEdit.push({type: "Label", label: x_lang("Attributes")})
 	parametersToEdit.push({type: "CheckBox", id: "ReadOnly", default: -1, label: x_lang("Read only"), gray: true})
 	parametersToEdit.push({type: "CheckBox", id: "Archive", default: -1, label: x_lang("Archive"), gray: true})
@@ -62,10 +63,10 @@ Element_getParametrizationDetails_Action_Set_file_attributes(Environment)
 	parametersToEdit.push({type: "CheckBox", id: "Hidden", default: -1, label: x_lang("Hidden"), gray: true})
 	parametersToEdit.push({type: "CheckBox", id: "Offline", default: -1, label: x_lang("Offline"), gray: true})
 	parametersToEdit.push({type: "CheckBox", id: "Temporary", default: -1, label: x_lang("Temporary"), gray: true})
+
 	parametersToEdit.push({type: "Label", label: x_lang("Options")})
 	parametersToEdit.push({type: "Radio", id: "OperateOnWhat", default: 1, choices: [x_lang("Operate on files"), x_lang("Operate on files and folders"), x_lang("Operate on folders")], result: "enum", enum: ["Files", "FilesAndFolders", "Folders"]})
 	parametersToEdit.push({type: "Checkbox", id: "Recurse", default: 0, label: x_lang("Recurse subfolders into")})
-	
 	
 	return parametersToEdit
 }
@@ -90,71 +91,73 @@ Element_CheckSettings_Action_Set_file_attributes(Environment, ElementParameters,
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Set_file_attributes(Environment, ElementParameters)
 {
-	EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters)
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
 	if (EvaluatedParameters._error)
 	{
 		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
 
-	tempattr:=""
-	if (EvaluatedParameters.ReadOnly=1)
-		tempattr.="+R"
-	else if (EvaluatedParameters.ReadOnly=0)
-		tempattr.="-R"
-	if (EvaluatedParameters.Archive=1)
-		tempattr.="+A"
-	else if (EvaluatedParameters.Archive=0)
-		tempattr.="-A"
-	if (EvaluatedParameters.System=1)
-		tempattr.="+S"
-	else if (EvaluatedParameters.System=0)
-		tempattr.="-S"
-	if (EvaluatedParameters.Hidden=1)
-		tempattr.="+H"
-	else if (EvaluatedParameters.Hidden=0)
-		tempattr.="-H"
-	if (EvaluatedParameters.Offline=1)
-		tempattr.="+O"
-	else if (EvaluatedParameters.Offline=0)
-		tempattr.="-O"
-	if (EvaluatedParameters.Temporary=1)
-		tempattr.="+T"
-	else if (EvaluatedParameters.Temporary=0)
-		tempattr.="-T"
+	; prepare attributes string for FileSetAttrib
+	newAttributes := ""
+	if (EvaluatedParameters.ReadOnly = 1)
+		newAttributes .= "+R"
+	else if (EvaluatedParameters.ReadOnly = 0)
+		newAttributes .= "-R"
+	if (EvaluatedParameters.Archive = 1)
+		newAttributes .= "+A"
+	else if (EvaluatedParameters.Archive = 0)
+		newAttributes .= "-A"
+	if (EvaluatedParameters.System = 1)
+		newAttributes .= "+S"
+	else if (EvaluatedParameters.System = 0)
+		newAttributes .= "-S"
+	if (EvaluatedParameters.Hidden = 1)
+		newAttributes .= "+H"
+	else if (EvaluatedParameters.Hidden = 0)
+		newAttributes .= "-H"
+	if (EvaluatedParameters.Offline = 1)
+		newAttributes .= "+O"
+	else if (EvaluatedParameters.Offline = 0)
+		newAttributes .= "-O"
+	if (EvaluatedParameters.Temporary = 1)
+		newAttributes .= "+T"
+	else if (EvaluatedParameters.Temporary = 0)
+		newAttributes .= "-T"
 	
-	if (EvaluatedParameters.OperateOnWhat="Files")
-		operation=0
-	else if (EvaluatedParameters.OperateOnWhat="FilesAndFolders")
-		operation=1
-	else if (EvaluatedParameters.OperateOnWhat="Folders")
-		operation=2
-	
-	recurse:=EvaluatedParameters.Recurse
-	
-	tempPath:= x_GetFullPath(Environment,EvaluatedParameters.file)
-	
-	FileSetAttrib,%tempattr%,% tempPath,%operation%,%recurse%
+	; prepare operation string for FileSetAttrib
+	if (EvaluatedParameters.OperateOnWhat = "Files")
+		operation := 0
+	else if (EvaluatedParameters.OperateOnWhat = "FilesAndFolders")
+		operation := 1
+	else if (EvaluatedParameters.OperateOnWhat = "Folders")
+		operation := 2
+
+	; get absolute path
+	file := x_GetFullPath(Environment, EvaluatedParameters.file)
+
+	; set new file attributes
+	FileSetAttrib, % newAttributes, % file, % operation, % EvaluatedParameters.Recurse
+
+	; check for errors
 	if ErrorLevel
 	{
-		if not fileexist(tempPath)
+		; we check here whether file exists, because the file path may contain a wildcard pattern
+		if not fileexist(file)
 		{
-			x_finish(Environment, "exception", x_lang("File '%1%' does not exist",tempPath))
+			x_finish(Environment, "exception", x_lang("File '%1%' does not exist", file))
 			return
 		}
 		else
 		{
-			x_finish(Environment, "exception", x_lang("Attributes of file '%1%' could not be changed",tempPath)) 
+			x_finish(Environment, "exception", x_lang("Attributes of file '%1%' could not be changed", file)) 
 			return
 		}
 	}
 	
-
-
 	x_finish(Environment,"normal")
 	return
-	
-
 }
 
 

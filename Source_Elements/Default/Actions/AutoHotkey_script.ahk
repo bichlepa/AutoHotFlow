@@ -54,11 +54,12 @@ Element_getParametrizationDetails_Action_AutoHotKey_script(Environment)
 	parametersToEdit:=Object()
 	parametersToEdit.push({type: "Label", label: x_lang("AutoHotKey_script"), WarnIfEmpty: true})
 	parametersToEdit.push({type: "multilineEdit", id: "Script", default: "", WarnIfEmpty: false})
+
 	parametersToEdit.push({type: "Label", label: x_lang("Variables_that_should_be_imported_to_script_prior_to_execution")})
-	parametersToEdit.push({type: "edit", id: "ImportVariables", multiline: true})
+	parametersToEdit.push({type: "edit", id: "ImportVariables", content: "String", multiline: true})
+
 	parametersToEdit.push({type: "Label", label: x_lang("Variables_that_should_be_exported_from_script_after_execution")})
-	parametersToEdit.push({type: "edit", id: "ExportVariables", multiline: true})
-	
+	parametersToEdit.push({type: "edit", id: "ExportVariables", content: "String", multiline: true})
 	
 	return parametersToEdit
 }
@@ -83,68 +84,78 @@ Element_CheckSettings_Action_AutoHotKey_script(Environment, ElementParameters, s
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_AutoHotKey_script(Environment, ElementParameters)
 {
-	ImportVariables := x_replaceVariables(Environment,ElementParameters.ImportVariables)
-	ExportVariables := x_replaceVariables(Environment, ElementParameters.ExportVariables)
+	; evaluate parameters
+	x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["ImportVariables", "ExportVariables"])
+	if (ElementParameters._error)
+	{
+		return x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
+	}
+
+	; script does not need to be evaluated
 	script := ElementParameters.script
 
-	;Write all local variables in the script
-	inputVars:=Object()
-	loop,parse,ImportVariables,|`,`n%a_space%
+	; Make list of all input variables
+	inputVars := Object()
+	loop, parse, % EvaluatedParameters.ImportVariables, |`,`n%a_space%
 	{
 		if not A_LoopField
 			continue
-		
 		inputVars[A_LoopField] := x_GetVariable(Environment, A_LoopField)
 	}
 	
-	;Get all local variables from the script
-	outputVars:=Object()
-	loop,parse,ExportVariables,|`,`n%a_space%
+	; Make list of all output variables
+	outputVars := Object()
+	loop, parse, % EvaluatedParameters.ExportVariables, |`,`n%a_space%
 	{
 		if not A_LoopField
 			continue
 		outputVars.push(A_LoopField)
 	}
+	; also add variables result and resultmessage as output variables
 	outputVars.push("result", "resultmessage")
-	
-	
+
+	; create function object and start AHK script in new thread
 	functionObject := x_NewFunctionObject(Environment, "Action_AutoHotKey_script_FinishExecution", ElementParameters)
-	x_SetExecutionValue(Environment, "functionObject", functionObject)
-	x_SetExecutionValue(Environment, "Varname", Varname)
 	x_ExecuteInNewAHKThread(Environment, functionObject, script, inputVars, outputVars)
-	
 }
 
 ;Called when the execution of the element should be stopped.
 ;If the task in Element_run_...() takes more than several seconds, then it is up to you to make it stoppable.
 Element_stop_Action_AutoHotKey_script(Environment, ElementParameters)
 {
+	; stop the other AHK thread
 	x_ExecuteInNewAHKThread_Stop(Environment)
 }
 
-
+; function will be called when the external AHK thread finishes
 Action_AutoHotKey_script_FinishExecution(Environment, ElementParameters, values)
 {
+	; values contains the output values from the script. Set them as instance variables
 	for onevaluekey, onevalue in values
 	{
 		x_SetVariable(Environment, onevaluekey, onevalue)
 	}
-	if (values.result != "exception") ;we ignore any values other than "exception"
+
+	; check value "exception"
+	if (values.result != "exception")
 	{
+		; external script did not report any exception. Finisch normally
 		x_finish(Environment, "normal", values.message)
 	}
 	else
 	{
+		; There was an exception
 		if (values.message)
 		{
+			; script returned an exception message. Finish with exception and add the exception
 			x_finish(Environment, "exception", values.message)
 		}
 		else
 		{
+			; script did not return an exception message. Finish with a static message.
 			x_finish(Environment, "exception", "Unknown error")
 		}
 	}
-	
 }
 
 

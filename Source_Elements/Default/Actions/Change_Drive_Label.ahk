@@ -51,24 +51,23 @@ Element_getStabilityLevel_Action_Change_Drive_Label()
 ;Returns an array of objects which describe all controls which will be shown in the element settings GUI
 Element_getParametrizationDetails_Action_Change_Drive_Label(Environment)
 {
-	parametersToEdit:=Object()
+	parametersToEdit := Object()
 	
-	listOfdrives:=Object()
+	; get list of drive letters
+	listOfdrives := Object()
 	driveget, tempdrives,list
 	
-	loop,parse,tempdrives
+	loop, parse, tempdrives
 	{
-		if a_index=1
-			defaultdrive:=A_LoopField ":"
+		if (a_index = 1)
+			defaultdrive := A_LoopField ":"
 		listOfdrives.push(A_LoopField ":")
-		
 	}
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Drive letter")})
 	parametersToEdit.push({type: "ComboBox", id: "DriveLetter", content: "String", WarnIfEmpty: true, result: "string", default: defaultdrive, choices: listOfdrives})
 	parametersToEdit.push({type: "Label", label: x_lang("New label")})
 	parametersToEdit.push({type: "Edit", id: "NewLabel", content: "String"})
-	
 	
 	return parametersToEdit
 }
@@ -93,25 +92,31 @@ Element_CheckSettings_Action_Change_Drive_Label(Environment, ElementParameters, 
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Change_Drive_Label(Environment, ElementParameters)
 {
-	NewLabel := x_replaceVariables(Environment,ElementParameters.NewLabel)
-	DriveLetter := x_replaceVariables(Environment, ElementParameters.DriveLetter) 
-
-	if not DriveLetter
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
+	if (EvaluatedParameters._error)
 	{
-		x_finish(Environment,"exception", x_lang("Drive is not specified"))
+		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
 	
-	;Admin rights are needed
-	drive,label,%DriveLetter%,%NewLabel%
+	if (not EvaluatedParameters.DriveLetter)
+	{
+		x_finish(Environment, "exception", x_lang("Drive is not specified"))
+		return
+	}
 	
+	; change drive label
+	;Admin rights are needed
+	drive, label, % EvaluatedParameters.DriveLetter, % EvaluatedParameters.NewLabel
 	if ErrorLevel
 	{
-		x_finish(Environment,"exception", x_lang("Label %1% could not be set to drive %2%",NewLabel,DriveLetter))
+		; an error occured. Finish with exception.
+		x_finish(Environment, "exception", x_lang("Label '%1%'' could not be set to drive '%2%'", NewLabel,DriveLetter))
 		return
 	}
 	
-	x_finish(Environment,"normal")
+	x_finish(Environment, "normal")
 	return
 }
 

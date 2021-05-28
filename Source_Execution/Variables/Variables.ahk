@@ -493,7 +493,7 @@ Var_replaceVariables(environment, p_String, pars = "")
 		{
 			; if requested, convert the value to string
 			IfInString, pars, ConvertObjectToString
-				tempVarValue := Jxon_Dump(tempVarValue, 2)
+				tempVarValue := Jxon_Dump(tempVarValue, 2,, true) ; do not convert unicode chars
 		}
 		
 		; replace the found variable in string

@@ -83,48 +83,46 @@ Element_CheckSettings_Action_Move_File(Environment, ElementParameters, staticVal
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Move_File(Environment, ElementParameters)
 {
-
-	Overwrite := ElementParameters.Overwrite
-
-	fileFrom := x_GetFullPath(Environment, x_replaceVariables(Environment, ElementParameters.file))
-
-	destFileOrFolder := x_GetFullPath(Environment, x_replaceVariables(Environment, ElementParameters.destFile))
-
-	if not FileExist(fileFrom)
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
+	if (EvaluatedParameters._error)
 	{
-		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.",x_lang("Source file"), fileFrom)) 
+		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
+
+	; get absolute paths
+	fileFrom := x_GetFullPath(Environment, EvaluatedParameters.file)
+	destFileOrFolder := x_GetFullPath(Environment, EvaluatedParameters.destFile)
+
+	; check whether files exist
+	fileAttr := FileExist(fileFrom)
+	if (not fileAttr)
+	{
+		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("Source file"), fileFrom)) 
+		return
+	}
+	if (instr(fileAttr, "D"))
+	{
+		x_finish(Environment, "exception", x_lang("%1% '%2%' is a folder.", x_lang("Source file"), fileFrom)) 
+		return
+	}
+
 	if not FileExist(destFileOrFolder)
 	{
-		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.",x_lang("Destination file or folder"), destFileOrFolder)) 
+		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("Destination file or folder"), destFileOrFolder)) 
 		return
 	}
 
-	FileMove,% fileFrom,% destFileOrFolder,% Overwrite
-	;Todo: check whether error handling is correct
-	if a_lasterror ;Indicates that no files were found
-	{
-		if errorlevel ;Indecates that files could not be copied
-		{
-			x_finish(Environment, "exception", x_lang("%1% files could not be moved from '%2%' to '%3%'",temperror, fileFrom, destFileOrFolder)) 
-			return
-		}
-		else
-		{
-			x_finish(Environment, "exception", x_lang("No files found (%1%)", fileFrom)) 
-			return
-		}
-	}
-	else
-	{
-		if errorlevel ;Indecates that files could not be copied
-		{
-			x_finish(Environment, "exception", x_lang("%1% files could not be moved from '%2%' to '%3%'",temperror, fileFrom, destFileOrFolder)) 
-			return
-		}
-	}
+	; move files
+	FileMove, % fileFrom, % destFileOrFolder, % EvaluatedParameters.Overwrite
 	
+	; check for errors
+	if errorlevel
+	{
+		x_finish(Environment, "exception", x_lang("%1% files could not be moved from '%2%' to '%3%'", errorlevel, fileFrom, destFileOrFolder)) 
+		return
+	}
 	
 	x_finish(Environment,"normal")
 	return

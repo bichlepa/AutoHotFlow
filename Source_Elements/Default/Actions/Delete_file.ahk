@@ -81,36 +81,54 @@ Element_CheckSettings_Action_Delete_File(Environment, ElementParameters, staticV
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Delete_File(Environment, ElementParameters)
 {
-	deleteFileMethod := ElementParameters.deleteFileMethod
-
-	file := x_GetFullPath(Environment, x_replaceVariables(Environment, ElementParameters.file))
-
-	if not FileExist(file)
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
+	if (EvaluatedParameters._error)
 	{
-		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.",x_lang("File"), file)) 
+		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
 
-	if (deleteFileMethod = "Delete")
+	; get absolute path
+	file := x_GetFullPath(Environment, EvaluatedParameters.file)
+
+	; check whether file exist
+	fileAttr := FileExist(file)
+	if (not fileAttr)
 	{
-		FileDelete,% file
+		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("Source file"), file)) 
+		return
+	}
+	if (instr(fileAttr, "D"))
+	{
+		x_finish(Environment, "exception", x_lang("%1% '%2%' is a folder.", x_lang("Source file"), file)) 
+		return
+	}
+
+	if (EvaluatedParameters.deleteFileMethod = "Delete")
+	{
+		; delete file
+		FileDelete, % file
 		
-		if errorlevel ;Indecates that files could not be copied
+		; check for errors
+		if errorlevel
 		{
-			x_finish(Environment, "exception", x_lang("%1% files could not be deleted (Filepattern: '%2%')",temperror, file)) 
+			x_finish(Environment, "exception", x_lang("%1% files could not be deleted (Filepattern: '%2%')", errorlevel, file)) 
 			return
 		}
 	}
-	else if (deleteFileMethod = "Recycle") 
+	else if (EvaluatedParameters.deleteFileMethod = "Recycle") 
 	{
+		; recycle file
 		FileRecycle, % file
-		if errorlevel ;Indecates that files could not be copied
+
+		; check for errors
+		if errorlevel
 		{
-			x_finish(Environment, "exception", x_lang("Some files could not be recycled (Filepattern: '%2%')",temperror, file)) 
+			x_finish(Environment, "exception", x_lang("Some files could not be recycled (Filepattern: '%1%')",file)) 
 			return
 		}
 	}
-	
 	
 	x_finish(Environment,"normal")
 	return

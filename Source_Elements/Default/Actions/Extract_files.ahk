@@ -53,12 +53,14 @@ Element_getParametrizationDetails_Action_Extract_files(Environment)
 {
 	parametersToEdit:=Object()
 	parametersToEdit.push({type: "Label", label: x_lang("Source archive")})
-	parametersToEdit.push({type: "File", id: "zipfile", label: x_lang("Select a zip file"), filter: x_lang("Archive") " (.zip; .7z; .xz; .gz; .gzip; .tgz; .bz2; .bzip2; tbz2; tbz; tar; .z; .taz; .lzma)"})
+	parametersToEdit.push({type: "File", id: "zipfile", label: x_lang("Select a zip file"), filter: x_lang("Archive") " (.zip; .7z; .xz; .gz; .gzip; .tgz; .bz2; .bzip2; .tbz2; .tbz; .tar; .z; .taz; .lzma)"})
+
 	parametersToEdit.push({type: "Label", label: x_lang("Destination folder")})
 	parametersToEdit.push({type: "Folder", id: "folder", label: x_lang("Select a folder")})
+
 	parametersToEdit.push({type: "Label", label: x_lang("Options")})
 	parametersToEdit.push({type: "Label", label: x_lang("Format"), size: "small"})
-	parametersToEdit.push({type: "DropDown", id: "zipformat", default: "*", choices: ["*", "7z", "zip", "xz", "tar", "gzip", "BZIP2", "Z", "lzma"], result: "string"})
+	parametersToEdit.push({type: "DropDown", id: "zipformat", default: "*", choices: ["*", "zip", "7z", "xz", "tar", "gzip", "BZIP2", "Z", "lzma"], result: "string"})
 	
 	return parametersToEdit
 }
@@ -84,13 +86,50 @@ Element_CheckSettings_Action_Extract_files(Environment, ElementParameters, stati
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Extract_files(Environment, ElementParameters)
 {
-	;~ d(ElementParameters, "element parameters")
-	Folder := x_GetFullPath(Environment, x_replaceVariables(Environment, ElementParameters.Folder))
-	zipfile := x_GetFullPath(Environment, x_replaceVariables(Environment, ElementParameters.zipfile))
-	zipformat := ElementParameters.zipformat
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
+	if (EvaluatedParameters._error)
+	{
+		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
+		return
+	}
 	
-	result:=7z_extract(zipfile, "-t" zipformat, Folder)
-	if result = Success
+	; get absolute paths
+	Folder := x_GetFullPath(Environment, EvaluatedParameters.Folder)
+	zipfile := x_GetFullPath(Environment, EvaluatedParameters.zipfile)
+	
+	
+	; check whether folder exist
+	fileAttr := FileExist(Folder)
+	if (not fileAttr)
+	{
+		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("Destination folder"), Folder)) 
+		return
+	}
+	if (not instr(fileAttr, "D"))
+	{
+		x_finish(Environment, "exception", x_lang("%1% '%2%' is not a folder.", x_lang("Destination folder"), Folder)) 
+		return
+	}
+
+	; check whether file exist
+	fileAttr := FileExist(zipfile)
+	if (not fileAttr)
+	{
+		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("Source file"), zipfile)) 
+		return
+	}
+	if (instr(fileAttr, "D"))
+	{
+		x_finish(Environment, "exception", x_lang("%1% '%2%' is a folder.", x_lang("Source file"), zipfile)) 
+		return
+	}
+
+	; call 7zip
+	result:=7z_extract(zipfile, "-t" EvaluatedParameters.zipformat, Folder)
+	
+	; check result and finish
+	if (result = "Success")
 		x_finish(Environment, "normal")
 	else
 		x_finish(Environment, "exception", result)

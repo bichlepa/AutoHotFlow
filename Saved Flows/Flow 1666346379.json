@@ -35,13 +35,6 @@
       "to": "element0000000005",
       "type": "Connection"
     },
-    "connection0000000012": {
-      "ConnectionType": "No",
-      "from": "element0000000005",
-      "ID": "connection0000000012",
-      "to": "element0000000013",
-      "type": "Connection"
-    },
     "connection0000000019": {
       "ConnectionType": "normal",
       "from": "element0000000017",
@@ -63,25 +56,32 @@
       "to": "element0000000017",
       "type": "Connection"
     },
-    "connection0000000023": {
-      "ConnectionType": "Yes",
-      "from": "element0000000016",
-      "ID": "connection0000000023",
-      "to": "element0000000022",
-      "type": "Connection"
-    },
     "connection0000000024": {
       "ConnectionType": "No",
       "from": "element0000000016",
       "ID": "connection0000000024",
       "to": "element0000000025",
       "type": "Connection"
+    },
+    "connection0000000032": {
+      "ConnectionType": "normal",
+      "from": "element0000000028",
+      "ID": "connection0000000032",
+      "to": "element0000000031",
+      "type": "Connection"
+    },
+    "connection0000000033": {
+      "ConnectionType": "normal",
+      "from": "element0000000031",
+      "ID": "connection0000000033",
+      "to": "element0000000034",
+      "type": "Connection"
     }
   },
   "allElements": {
     "element0000000001": {
       "class": "Trigger_Manual",
-      "DefaultTrigger": "1",
+      "DefaultTrigger": "0",
       "enabled": "0",
       "ID": "element0000000001",
       "name": "Manual - \"Key Down test\"",
@@ -137,17 +137,6 @@
       "x": "0",
       "y": "315"
     },
-    "element0000000013": {
-      "class": "Condition_Debug_Dialog",
-      "ID": "element0000000013",
-      "name": "Debug Dialog",
-      "package": "default",
-      "pars": {},
-      "StandardName": "1",
-      "type": "Condition",
-      "x": "245",
-      "y": "595"
-    },
     "element0000000016": {
       "class": "Condition_Key_Is_Down",
       "ID": "element0000000016",
@@ -191,17 +180,6 @@
       "x": "0",
       "y": "770"
     },
-    "element0000000022": {
-      "class": "Condition_Debug_Dialog",
-      "ID": "element0000000022",
-      "name": "Debug Dialog",
-      "package": "default",
-      "pars": {},
-      "StandardName": "1",
-      "type": "Condition",
-      "x": "245",
-      "y": "1015"
-    },
     "element0000000025": {
       "class": "Action_Tooltip",
       "ID": "element0000000025",
@@ -217,10 +195,59 @@
       "type": "Action",
       "x": "0",
       "y": "1120"
+    },
+    "element0000000028": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "1",
+      "enabled": "0",
+      "ID": "element0000000028",
+      "name": "Manual - \"File select test\"",
+      "package": "default",
+      "pars": {
+        "ID": "File select test"
+      },
+      "StandardName": "1",
+      "type": "Trigger",
+      "x": "350",
+      "y": "0"
+    },
+    "element0000000031": {
+      "class": "Action_Select_file",
+      "ID": "element0000000031",
+      "name": "Select file - selectedFiles - ",
+      "package": "default",
+      "pars": {
+        "fileMustExist": 0,
+        "filter": "Any files (*.*)",
+        "folder": "",
+        "MultiSelect": 0,
+        "NoShortcutTarget": 0,
+        "PathMustExist": 0,
+        "PromptNewFile": 0,
+        "PromptOverwriteFile": 0,
+        "SaveButton": 0,
+        "title": "Select a file",
+        "Varname": "selectedFiles"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "350",
+      "y": "175"
+    },
+    "element0000000034": {
+      "class": "Condition_Debug_Dialog",
+      "ID": "element0000000034",
+      "name": "Debug Dialog",
+      "package": "default",
+      "pars": {},
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "315",
+      "y": "420"
     }
   },
   "category": "AHF Test",
-  "ElementIDCounter": "25",
+  "ElementIDCounter": "38",
   "flowSettings": {
     "DefaultWorkingDir": 1,
     "ExecutionPolicy": "default",

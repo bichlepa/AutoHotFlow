@@ -80,25 +80,17 @@ Element_CheckSettings_Action_Beep(Environment, ElementParameters, staticValues)
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Beep(Environment, ElementParameters)
 {
-	frequencyObj:=x_evaluateExpression(Environment,ElementParameters.frequency)
-	
-	if (frequencyObj.error)
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
+	if (EvaluatedParameters._error)
 	{
-		;On error, finish with exception and return
-		x_finish(Environment, "exception", x_lang("An error occured while parsing expression '%1%'", ElementParameters.frequency) "`n`n" frequencyObj.error) 
+		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
-	frequency:=frequencyObj.result
 	
-	durationObj:=x_evaluateExpression(Environment,ElementParameters.duration)
-	if (durationObj.error)
-	{
-		;On error, finish with exception and return
-		x_finish(Environment, "exception", x_lang("An error occured while parsing expression '%1%'", ElementParameters.duration)) "`n`n" durationObj.error
-		return
-	}
-	duration:=durationObj.result
-	
+	; make sure, that the values are numbers
+	frequency := EvaluatedParameters.frequency
+	duration := EvaluatedParameters.duration
 	if frequency is not number
 	{
 		;On error, finish with exception and return
@@ -112,8 +104,8 @@ Element_run_Action_Beep(Environment, ElementParameters)
 		return
 	}
 	
-	;Do the action
-	SoundBeep,% frequency,% duration
+	; Beep
+	SoundBeep, % frequency, % duration
 	
 	;Always call v_finish() before return
 	x_finish(Environment, "normal")

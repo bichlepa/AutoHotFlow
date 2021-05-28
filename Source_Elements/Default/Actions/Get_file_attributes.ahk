@@ -55,6 +55,7 @@ Element_getParametrizationDetails_Action_Get_File_Attributes(Environment)
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Output variable name")})
 	parametersToEdit.push({type: "Edit", id: "varname", default: "FileAttributes", content: "VariableName", WarnIfEmpty: true})
+
 	parametersToEdit.push({type: "Label", label: x_lang("File path")})
 	parametersToEdit.push({type: "File", id: "file", label: x_lang("Select a file")})
 	
@@ -64,7 +65,7 @@ Element_getParametrizationDetails_Action_Get_File_Attributes(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Get_File_Attributes(Environment, ElementParameters)
 {
-	return x_lang("Get_File_Attributes") 
+	return x_lang("Get_File_Attributes") " - " ElementParameters.varname " - " ElementParameters.file
 }
 
 ;Called every time the user changes any parameter.
@@ -81,30 +82,29 @@ Element_CheckSettings_Action_Get_File_Attributes(Environment, ElementParameters,
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Get_File_Attributes(Environment, ElementParameters)
 {
-	varname := x_replaceVariables(Environment, ElementParameters.varname)
-	if not x_CheckVariableName(varname)
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
+	if (EvaluatedParameters._error)
 	{
-		;On error, finish with exception and return
-		x_finish(Environment, "exception", x_lang("%1% is not valid", x_lang("Ouput variable name '%1%'", varname)))
+		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
 
-	file := x_GetFullPath(Environment, x_replaceVariables(Environment, ElementParameters.file))
-	if not FileExist(file)
+	; get absolute path
+	file := x_GetFullPath(Environment, EvaluatedParameters.file)
+
+	; check whether file exists
+	attributes := FileExist(file)
+	if attributes
 	{
-		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.",x_lang("File"), file)) 
+		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("File"), file)) 
 		return
 	}
 
-	FileGetAttrib,result,% file
-	if ErrorLevel
-	{
-		x_finish(Environment, "exception", x_lang("Couldn't get file attributes of file '%1%'",file)) 
-		return
-	}
+	; set output variable
+	x_SetVariable(Environment, Varname, attributes)
 	
-	x_SetVariable(Environment,Varname,result)
-	
+	; finish
 	x_finish(Environment,"normal")
 	return
 }

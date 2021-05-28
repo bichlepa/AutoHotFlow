@@ -54,9 +54,9 @@ Element_getParametrizationDetails_Action_Download_File(Environment)
 	parametersToEdit:=Object()
 	parametersToEdit.push({type: "Label", label: x_lang("URL")})
 	parametersToEdit.push({type: "Edit", id: "URL", default: "http://www.example.com", content: ["RawString", "String", "Expression"], contentID: "IsExpression", contentDefault: "string", WarnIfEmpty: true})
+	
 	parametersToEdit.push({type: "Label", label: x_lang("File path")})
 	parametersToEdit.push({type: "File", id: "file", label: x_lang("Select file"), default: "%A_Desktop%\Downloaded example.html"})
-	
 	
 	return parametersToEdit
 }
@@ -81,40 +81,37 @@ Element_CheckSettings_Action_Download_File(Environment, ElementParameters, stati
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Download_File(Environment, ElementParameters)
 {
-
-	if (ElementParameters.IsExpression = "Expression")
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
+	if (EvaluatedParameters._error)
 	{
-		evRes := x_EvaluateExpression(Environment, ElementParameters.URL)
-		if (evRes.error)
-		{
-			;On error, finish with exception and return
-			x_finish(Environment, "exception", x_lang("An error occured while parsing expression '%1%'", ElementParameters.URL) "`n`n" evRes.error) 
-			return
-		}
-		else
-		{
-			URL:=evRes.result
-		}
+		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
+		return
 	}
-	else if (ElementParameters.IsExpression = "String")
-		URL := x_replaceVariables(Environment, ElementParameters.URL)
-	else
-		URL:=ElementParameters.URL
 
-	file := x_GetFullPath(Environment, x_replaceVariables(Environment, ElementParameters.file))
+	; get full path
+	file := x_GetFullPath(Environment, EvaluatedParameters.file)
 	
-	URLDownloadToFile,%URL%,%file%
+	; check whether destination file path is a folder
+	fileAttr := FileExist(file)
+	if (instr(fileAttr, "D"))
+	{
+		x_finish(Environment, "exception", x_lang("%1% '%2%' is a folder.", x_lang("Destination file"), file)) 
+		return
+	}
+
+	; download file
+	URLDownloadToFile, % EvaluatedParameters.URL, % file
+
+	; check for errors
 	if ErrorLevel
 	{
-		x_finish(Environment, "exception", x_lang("Couldn't download file") )
+		x_finish(Environment, "exception", x_lang("Couldn't download URL '%1%' to file '%2%", EvaluatedParameters.URL, file))
 		return
 	}
 
 	x_finish(Environment,"normal")
 	return
-	
-
-	
 }
 
 ;Called when the execution of the element should be stopped.
