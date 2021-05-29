@@ -56,7 +56,7 @@ Element_getParametrizationDetails_Condition_List_Contains_Element(Environment)
 	parametersToEdit.push({type: "Edit", id: "InputList", default: "List", content: "Expression", WarnIfEmpty: true})
 	parametersToEdit.push({type: "Label", label: x_lang("Search for what")})
 
-	parametersToEdit.push({type: "Radio", id: "SearchWhat", default: 2, choices: [x_lang("Search for an index or key"), x_lang("Search for an element with a specific content")], result: "enum", enum: ["Key", "Content"]})
+	parametersToEdit.push({type: "Radio", id: "SearchWhat", default: 2, choices: [x_lang("Search for an index or key"), x_lang("Search for an element with a Specified content")], result: "enum", enum: ["Key", "Content"]})
 	parametersToEdit.push({type: "Label", label: x_lang("Key or index")})
 	parametersToEdit.push({type: "Edit", id: "Position", default: 1, content: ["String", "Expression"], contentID: "isExpressionPosition", contentDefault: "String", WarnIfEmpty: true})
 	parametersToEdit.push({type: "Label", label: x_lang("Seeked content")})

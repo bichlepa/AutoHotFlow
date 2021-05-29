@@ -58,7 +58,7 @@ Element_getParametrizationDetails_Action_Trim_a_string(Environment)
 	parametersToEdit.push({type: "Label", label:  x_lang("Input string")})
 	parametersToEdit.push({type: "Edit", id: "VarValue", default: "Hello World", content: ["String", "Expression"], contentID: "expression", contentDefault: "String", WarnIfEmpty: true})
 	parametersToEdit.push({type: "Label", label: x_lang("Operation")})
-	parametersToEdit.push({type: "Radio", id: "TrimWhat", default: 1, choices: [x_lang("Remove a number of characters"), x_lang("Remove specific caracters")], result: "enum", enum: ["Number", "Specified"]})
+	parametersToEdit.push({type: "Radio", id: "TrimWhat", default: 1, choices: [x_lang("Remove a number of characters"), x_lang("Remove Specified caracters")], result: "enum", enum: ["Number", "Specified"]})
 	parametersToEdit.push({type: "Label", label: x_lang("Remove from which side")})
 	parametersToEdit.push({type: "CheckBox", id: "LeftSide", default: 1, label: x_lang("Left-hand side")})
 	parametersToEdit.push({type: "CheckBox", id: "RightSide", default: 0, label: x_lang("Right-hand side")})
@@ -92,7 +92,7 @@ Element_CheckSettings_Action_Trim_a_string(Environment, ElementParameters, stati
 		x_Par_Disable("SpacesAndTabs")
 		x_Par_Disable("OmitChars")
 	}
-	else ;Trim specific characters
+	else ;Trim Specified characters
 	{
 		x_Par_Disable("Length")
 		x_Par_Enable("SpacesAndTabs")
@@ -151,7 +151,7 @@ Element_run_Action_Trim_a_string(Environment, ElementParameters)
 		if (EvaluatedParameters.RightSide)
 			StringTrimRight,result,result,% EvaluatedParameters,Length
 	}
-	else  ;Trim specific characters
+	else  ;Trim Specified characters
 	{
 		if (EvaluatedParameters.SpacesAndTabs = "SpacesAndTabs")
 			OptionOmitChars:=" `t"

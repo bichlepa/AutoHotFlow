@@ -2204,7 +2204,7 @@ class ElementSettings
 			local tempParameterID := parameter.id[1]
 			local tempFormat := parameter.format
 
-			; convert the tempFormat if it has a specific value
+			; convert the tempFormat if it has a specified value
 			if (tempFormat = "Time")
 			{
 				tempFormat := "Time"

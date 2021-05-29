@@ -55,6 +55,7 @@ Element_getParametrizationDetails_Action_Get_Index_Of_Element_In_List(Environmen
 	parametersToEdit:=Object()
 	parametersToEdit.push({type: "Label", label: x_lang("Output variable name")})
 	parametersToEdit.push({type: "Edit", id: "Varname", default: "NewVariable", content: "VariableName", WarnIfEmpty: true})
+
 	parametersToEdit.push({type: "Label", label: x_lang("Input list")})
 	parametersToEdit.push({type: "Edit", id: "ListName", default: "MyList", content: "expression", WarnIfEmpty: true})
 	
@@ -67,7 +68,7 @@ Element_getParametrizationDetails_Action_Get_Index_Of_Element_In_List(Environmen
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Get_Index_Of_Element_In_List(Environment, ElementParameters)
 {
-	return % x_lang("Get_Index_Of_Element_In_List")
+	return % x_lang("Get position of element in list") " - " ElementParameters.Varname " - " ElementParameters.ListName " - " ElementParameters.SearchContent
 	
 }
 
@@ -84,71 +85,45 @@ Element_CheckSettings_Action_Get_Index_Of_Element_In_List(Environment, ElementPa
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Get_Index_Of_Element_In_List(Environment, ElementParameters)
 {
-	;~ d(ElementParameters, "element parameters")
-	Varname := x_replaceVariables(Environment, ElementParameters.Varname)
-	Value := ""
-	
-	if not x_CheckVariableName(varname)
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
+	if (EvaluatedParameters._error)
 	{
-		;On error, finish with exception and return
-		x_finish(Environment, "exception", x_lang("%1% is not valid", x_lang("Ouput variable name '%1%'", varname)))
+		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
+
+	; get list from variable
+	myList := EvaluatedParameters.ListName
 	
-	
-	evRes := x_evaluateExpression(Environment,ElementParameters.ListName)
-	if (evRes.error)
-	{
-		;On error, finish with exception and return
-		x_finish(Environment, "exception", x_lang("An error occured while parsing expression '%1%'", ElementParameters.ListName) "`n`n" evRes.error) 
-		return
-	}
-	ListName:=evRes.result
-	
-	myList:=x_getVariable(Environment,ListName)
-	
+	; check whether we got a list
 	if (!(IsObject(myList)))
 	{
-		x_finish(Environment, "exception", x_lang("Variable '%1%' does not contain a list.",myList))
+		x_finish(Environment, "exception", x_lang("Variable '%1%' does not contain a list.", ElementParameters.ListName)) 
 		return
 	}
 	
-	
-	if (ElementParameters.Expression = 2)
+	;Search for the value in list
+	found := false
+	for oneKey, oneValue in myList
 	{
-		evRes := x_EvaluateExpression(Environment, ElementParameters.SearchContent)
-		if (evRes.error)
+		if (oneValue = EvaluatedParameters.SearchContent)
 		{
-			;On error, finish with exception and return
-			x_finish(Environment, "exception", x_lang("An error occured while parsing expression '%1%'", ElementParameters.SearchContent) "`n`n" evRes.error) 
-			return
-		}
-		else
-		{
-			SearchContent:=evRes.result
-		}
-	}
-	else
-		SearchContent := x_replaceVariables(Environment, ElementParameters.SearchContent)
-
-	;Search for the object
-	for tempkey, tempvalue in myList
-	{
-		if (tempvalue=SearchContent)
-		{
-			found:=true
-			result:=tempkey
+			found := true
+			result := oneKey
 			break
 		}
 	}
 	
-	if (found!=true)
+	; check whether we found value
+	if (found != true)
 	{
-		x_finish(Environment, "exception", x_lang("The list '%1%' does not contain the key '%2%'.",ListName,Position))
+		x_finish(Environment, "exception", x_lang("The list '%1%' does not contain the value '%2%'.", ElementParameters.ListName, Position))
 		return
-	}	
+	}
 	
-	x_SetVariable(Environment,Varname,Result)
+	; set key name to variable
+	x_SetVariable(Environment, EvaluatedParameters.Varname, Result)
 	
 	;Always call v_finish() before return
 	x_finish(Environment, "normal")

@@ -58,7 +58,7 @@ Element_getParametrizationDetails_Action_Add_To_List(Environment)
 	parametersToEdit.push({type: "Edit", id: "Varname", default: "MyList", content: "VariableName", WarnIfEmpty: true})
 
 	parametersToEdit.push({type: "Label", label: x_lang("Number of elements")})
-	parametersToEdit.push({type: "Radio", id: "NumberOfElements", default: 1, result: "enum", choices: [x_lang("Add one element"), x_lang("Add multiple elements")], enum: ["One", "Multiple"]})
+	parametersToEdit.push({type: "Radio", id: "NumberOfElements", default: "One", result: "enum", choices: [x_lang("Add one element"), x_lang("Add multiple elements")], enum: ["One", "Multiple"]})
 
 	parametersToEdit.push({type: "Label", label:  x_lang("Content to add")})
 	parametersToEdit.push({type: "Edit", id: "VarValue", default: "New element", content: ["String", "Expression"], contentID: "Expression", contentDefault: "string", WarnIfEmpty: true})
@@ -69,7 +69,7 @@ Element_getParametrizationDetails_Action_Add_To_List(Environment)
 	parametersToEdit.push({type: "Checkbox", id: "DelimiterSpace", default: 0, label: x_lang("Use space as delimiter")})
 
 	parametersToEdit.push({type: "Label", label: x_lang("Key")})
-	parametersToEdit.push({type: "Radio", id: "WhichPosition", default: "Last", result: "enum", choices: [x_lang("First position"), x_lang("Last position"), x_lang("Following position or key")], enum: ["First", "Last", "Specified"]})
+	parametersToEdit.push({type: "Radio", id: "WhichPosition", default: "Last", result: "enum", choices: [x_lang("First integer position"), x_lang("Last integer position"), x_lang("Following position or key")], enum: ["First", "Last", "Specified"]})
 	parametersToEdit.push({type: "Edit", id: "Position", default: "keyName", content: ["String", "Expression"], contentID: "expressionPos", contentDefault: "string", WarnIfEmpty: true})
 
 	parametersToEdit.push({type: "Label", id: "InsertMethodLabel", size: "small", label: x_lang("Insertion method if position is an integer and list contains values at this or higher positions")})
@@ -154,16 +154,16 @@ Element_run_Action_Add_To_List(Environment, ElementParameters)
 	}
 	
 	; get list from variable
-	newList := x_getVariable(Environment, EvaluatedParameters.Varname)
+	myList := x_getVariable(Environment, EvaluatedParameters.Varname)
 	
 	; check whether we got a list
-	if (!(IsObject(newList)))
+	if (!(IsObject(myList)))
 	{
-		if (newList = "")
+		if (myList = "")
 		{
 			; we got an empty value. Log a warning and create a new list
 			x_log(Environment, x_lang("Waring!") " " x_lang("Variable '%1%' is empty. A new list will be created.", Varname) ,1)
-			newList := Object()
+			myList := Object()
 		}
 		else
 		{
@@ -186,11 +186,11 @@ Element_run_Action_Add_To_List(Environment, ElementParameters)
 		
 		if (ElementParameters.WhichPosition = "First")
 		{
-			newList.insertat(1, EvaluatedParameters.VarValue)
+			myList.insertat(1, EvaluatedParameters.VarValue)
 		}
 		else if (ElementParameters.WhichPosition = "Last")
 		{
-			newList.push(EvaluatedParameters.VarValue)
+			myList.push(EvaluatedParameters.VarValue)
 		}
 		else if (ElementParameters.WhichPosition = "Specified")
 		{
@@ -210,12 +210,12 @@ Element_run_Action_Add_To_List(Environment, ElementParameters)
 			if (EvaluatedParameters.insertMethod = "Insert")
 			{
 				; use the insertat function. It will not overwrite if the integer key has a value. If key is not integer, it will work like a direct assignment
-				newList.insertat(EvaluatedParameters.Position, EvaluatedParameters.VarValue)
+				myList.insertat(EvaluatedParameters.Position, EvaluatedParameters.VarValue)
 			}
 			Else if (EvaluatedParameters.InsertMethod = "Overwrite")
 			{
 				; assign directly. If the key is an integer, it will overwrite its value. 
-				newList[EvaluatedParameters.Position] := EvaluatedParameters.VarValue
+				myList[EvaluatedParameters.Position] := EvaluatedParameters.VarValue
 			}
 		}
 	}
@@ -251,7 +251,7 @@ Element_run_Action_Add_To_List(Environment, ElementParameters)
 			; add all elements at first position
 			for oneIndex, oneValue in parsedList
 			{
-				newList.insertat(1, oneValue)
+				myList.insertat(1, oneValue)
 			}
 		}
 		else if (ElementParameters.WhichPosition = "Last")
@@ -259,7 +259,7 @@ Element_run_Action_Add_To_List(Environment, ElementParameters)
 			; push all elements to last position
 			for oneIndex, oneValue in parsedList
 			{
-				newList.push(oneValue)
+				myList.push(oneValue)
 			}
 		}
 		else if (ElementParameters.WhichPosition = "Specified")
@@ -286,7 +286,7 @@ Element_run_Action_Add_To_List(Environment, ElementParameters)
 				; use the insertat function. It will not overwrite the values.
 				for oneIndex, oneValue in parsedList
 				{
-					newList.insertat(position + a_index - 1, oneValue)
+					myList.insertat(position + a_index - 1, oneValue)
 				}
 			}
 			else if (EvaluatedParameters.InsertMethod = "Overwrite")
@@ -294,14 +294,14 @@ Element_run_Action_Add_To_List(Environment, ElementParameters)
 				; assign directly. It will overwrite existing values. 
 				for oneIndex, oneValue in parsedList
 				{
-					newList[position + a_index - 1] := oneValue
+					myList[position + a_index - 1] := oneValue
 				}
 			}
 		}
 	}
 
 	; write object to variable
-	x_SetVariable(Environment, EvaluatedParameters.Varname, newList)
+	x_SetVariable(Environment, EvaluatedParameters.Varname, myList)
 	
 	;Always call v_finish() before return
 	x_finish(Environment, "normal")

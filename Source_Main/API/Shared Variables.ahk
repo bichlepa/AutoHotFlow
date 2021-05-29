@@ -48,7 +48,7 @@ _flows is an associative array of objects. Each object contains some information
 	
 	.selectedElements	Contains an array of all element and connection IDs which are selected
 	
-	.FlowSettings		Contains all flow specific settings
+	.FlowSettings		Contains all flow Specified settings
 		.ExecutionPolicy	Defines what happens if a flow is triggered but already executing. Contains "default", "wait", "skip", "stop" or "parallel"
 		.FolderOfStaticVariables	;TODO
 		.LogToFile		Defines whether the logging of this flow should be written to file

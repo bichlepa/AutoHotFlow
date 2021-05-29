@@ -54,10 +54,10 @@ Element_getParametrizationDetails_Action_Shuffle_list(Environment)
 	parametersToEdit:=Object()
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Output list name")})
-	parametersToEdit.push({type: "Edit", id: "Varname", default: "List", content: "VariableName", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: x_lang("Input list name")})
-	parametersToEdit.push({type: "Edit", id: "VarValue", default: "List", content: "Expression", WarnIfEmpty: true})
-	
+	parametersToEdit.push({type: "Edit", id: "Varname", default: "shuffledList", content: "VariableName", WarnIfEmpty: true})
+
+	parametersToEdit.push({type: "Label", label: x_lang("Input list")})
+	parametersToEdit.push({type: "Edit", id: "VarValue", default: "myList", content: "Expression", WarnIfEmpty: true})
 	
 	return parametersToEdit
 }
@@ -65,7 +65,7 @@ Element_getParametrizationDetails_Action_Shuffle_list(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Shuffle_list(Environment, ElementParameters)
 {
-	return x_lang("Shuffle_list") 
+	return x_lang("Shuffle_list") " - " ElementParameters.Varname " - " ElementParameters.VarValue
 }
 
 ;Called every time the user changes any parameter.
@@ -82,63 +82,63 @@ Element_CheckSettings_Action_Shuffle_list(Environment, ElementParameters, static
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Shuffle_list(Environment, ElementParameters)
 {
-	EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters)
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
 	if (EvaluatedParameters._error)
 	{
 		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
 
-
-	tempList:=EvaluatedParameters.VarValue
-	if not IsObject(tempList)
+	; get list from variable
+	myList := EvaluatedParameters.VarValue
+	
+	; check whether we got a list
+	if (!(IsObject(myList)))
 	{
-		x_finish(Environment, "exception", x_lang("Variable '%1%' does not contain a list.",ElementParameters.VarValue)) 
+		x_finish(Environment, "exception", x_lang("Variable '%1%' does not contain a list.", ElementParameters.VarValue)) 
 		return
 	}
 	
-	
-	maxindex:=tempList.MaxIndex()
-	
-	tempObject:=Object()
-	countOfElements:=0
-	;Copy all numeric elements to a separate list
-	for tempkey, tempvalue in tempList
-	{
-		if tempkey is number
-		{
-			tempObject.insert(tempvalue)
-			countOfElements++
-		}
-	}
-	;Delete all numeric elements
-	Loop
-	{
-		tempkey:=tempList.MaxIndex()
-		if tempkey!=
-		{
-			tempList.remove(tempkey)
-		}
-		else
-			break
-	}
-	;Add all previous copied list to the list in random order
-	loop %countOfElements%
-	{
-		random,randomnumber,1,% countOfElements + 1 - A_Index
-		tempvalue:=tempObject.Remove(randomnumber)
-		tempList.Insert(tempvalue)
-		
-	}
-	x_SetVariable(Environment,Varname,tempList)
-	
+	; The input list may contain some non-numerical entries.
+	; So we will remove and copy the numerial values to temporary objects and then re-insert them into the original list in random order.
 
+	; prepare temporary lists
+	valueList := Object()
+	keyList := Object()
+
+	;Copy all numeric elements to a separate list
+	for oneKey, oneValue in myList
+	{
+		if oneKey is number
+		{
+			valueList.insert(oneValue)
+			keyList.insert(oneKey)
+		}
+	}
+	;Delete all numeric elements from original list
+	for oneIndex, oneKey in keyList
+	{
+		myList.delete(oneKey)
+	}
+
+	;Add all previous copied values to the list in random order
+	countOfElements := valueList.maxIndex()
+	loop % countOfElements
+	{
+		; generate random index
+		random, randomnumber, 1, % countOfElements + 1 - A_Index
+		; get and remove value from temporary list
+		oneValue := valueList.RemoveAt(randomnumber)
+		; push value to original list
+		myList.push(oneValue)
+	}
+
+	; write list to variable
+	x_SetVariable(Environment, EvaluatedParameters.Varname, myList)
+	
 	x_finish(Environment,"normal")
 	return
-	
-
-
-	
 }
 
 

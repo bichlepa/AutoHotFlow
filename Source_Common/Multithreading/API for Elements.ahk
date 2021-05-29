@@ -178,7 +178,7 @@ xx_getFlowIDByName(p_FlowName)
 	return _getFlowIdByName(p_FlowName)
 }
 
-; checks whether flow with a specific name exists
+; checks whether flow with the specified name exists
 xx_FlowExistsByName(p_FlowName)
 {
 	_EnterCriticalSection()
@@ -200,7 +200,7 @@ xx_FlowExistsByName(p_FlowName)
 	return retval
 }
 
-; checks whether flow with a specific ID exists
+; checks whether flow with the specified ID exists
 xx_FlowExists(p_FlowID)
 {
 	return _existsFlow(p_FlowID)
@@ -271,7 +271,7 @@ xx_GetListOfFlowIDs()
 	return _getAllFlowIds()
 }
 
-; get all Element IDs in a flow of a specific type
+; get all Element IDs in a flow of the specified type
 xx_getAllElementIDsOfType(p_FlowID, p_Type)
 {
 	_EnterCriticalSection()
@@ -288,7 +288,7 @@ xx_getAllElementIDsOfType(p_FlowID, p_Type)
 	return elements
 }
 
-; get all element IDs in a flow of a specific class
+; get all element IDs in a flow of the specified class
 xx_getAllElementIDsOfClass(p_FlowID, p_Class)
 {
 	_EnterCriticalSection()
@@ -398,7 +398,7 @@ xx_getDefaultManualTriggerID(p_FlowID)
 	return
 }
 
-; execute a specific manual trigger
+; execute the specified manual trigger
 ; if p_TriggerName is empty, it defaults to the default manual trigger of the flow
 xx_ManualTriggerExecute(p_FlowID, p_TriggerID = "", p_Variables ="", p_CallBackFunction ="")
 {

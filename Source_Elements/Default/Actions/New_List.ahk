@@ -55,10 +55,10 @@ Element_getParametrizationDetails_Action_New_List(Environment)
 	parametersToEdit:=Object()
 
 	parametersToEdit.push({type: "Label", label: x_lang("Variable_name")})
-	parametersToEdit.push({type: "Edit", id: "Varname", default: "NewList", content: "VariableName", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Edit", id: "Varname", default: "myList", content: "VariableName", WarnIfEmpty: true})
 
 	parametersToEdit.push({type: "Label", label: x_lang("Number of elements")})
-	parametersToEdit.push({type: "Radio", id: "NumberOfElements", default: 1, result: "enum", choices: [x_lang("Empty list"), x_lang("Initialize with one element"), x_lang("Initialize with multiple elements")], enum: ["None", "One", "Multiple"]})
+	parametersToEdit.push({type: "Radio", id: "NumberOfElements", default: "None", result: "enum", choices: [x_lang("Empty list"), x_lang("Initialize with one element"), x_lang("Initialize with multiple elements")], enum: ["None", "One", "Multiple"]})
 
 	parametersToEdit.push({type: "Label", label:  x_lang("Initial content")})
 	parametersToEdit.push({type: "Edit", id: "VarValue", default: "New element", content: ["String", "Expression"], contentID: "expression", contentDefault: "string", WarnIfEmpty: true})
@@ -69,7 +69,7 @@ Element_getParametrizationDetails_Action_New_List(Environment)
 	parametersToEdit.push({type: "Checkbox", id: "DelimiterSpace", default: 0, label: x_lang("Use space as delimiter")})
 
 	parametersToEdit.push({type: "Label", label: x_lang("Key")})
-	parametersToEdit.push({type: "Radio", id: "WhichPosition", default: 1, result: "enum", choices: [x_lang("Numerically as first element"), x_lang("Following key")], enum: ["First", "Specified"]})
+	parametersToEdit.push({type: "Radio", id: "WhichPosition", default: "First", result: "enum", choices: [x_lang("Numerically as first element"), x_lang("Following key")], enum: ["First", "Specified"]})
 	parametersToEdit.push({type: "Edit", id: "Position", default: "keyName", content: ["String", "Expression"], contentID: "expressionPos", contentDefault: "string", WarnIfEmpty: true})
 	
 	return parametersToEdit
@@ -157,7 +157,7 @@ Element_run_Action_New_List(Environment, ElementParameters)
 	}
 	
 	; create a new object which will be the output variable
-	newList := Object()
+	myList := Object()
 	
 	; check option NumberOfElements
 	if (ElementParameters.NumberOfElements = "None")
@@ -177,7 +177,7 @@ Element_run_Action_New_List(Environment, ElementParameters)
 		
 		if (ElementParameters.WhichPosition = "First")
 		{
-			newList.push(EvaluatedParameters.VarValue)
+			myList.push(EvaluatedParameters.VarValue)
 		}
 		else if (ElementParameters.WhichPosition = "Specified")
 		{
@@ -195,7 +195,7 @@ Element_run_Action_New_List(Environment, ElementParameters)
 			}
 			
 			; write the value at the position
-			newList[EvaluatedParameters.Position] := EvaluatedParameters.VarValue
+			myList[EvaluatedParameters.Position] := EvaluatedParameters.VarValue
 		}
 	}
 	else if (ElementParameters.NumberOfElements = "multiple") 
@@ -223,12 +223,12 @@ Element_run_Action_New_List(Environment, ElementParameters)
 		; parse string and add all elements to list
 		loop, parse, % EvaluatedParameters.varvalues, % delimiters
 		{
-			newList.push(A_LoopField)
+			myList.push(A_LoopField)
 		}
 	}
 	
 	; write object to variable
-	x_SetVariable(Environment, EvaluatedParameters.Varname, newList)
+	x_SetVariable(Environment, EvaluatedParameters.Varname, myList)
 	
 	;Always call v_finish() before return
 	x_finish(Environment, "normal")

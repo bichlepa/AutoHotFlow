@@ -54,7 +54,7 @@ Element_getParametrizationDetails_Action_Set_Volume(Environment)
 	parametersToEdit:=Object()
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Action")})
-	parametersToEdit.push({type: "Radio", id: "Action", default: 1, choices: [x_lang("Set mute state"), x_lang("Set a specific volume"), x_lang("Increase or decrease volume")], result: "enum", enum: ["Mute", "Absolute", "Relative"]})
+	parametersToEdit.push({type: "Radio", id: "Action", default: 1, choices: [x_lang("Set mute state"), x_lang("Set a Specified volume"), x_lang("Increase or decrease volume")], result: "enum", enum: ["Mute", "Absolute", "Relative"]})
 	parametersToEdit.push({type: "Label", label: x_lang("Mute settings")})
 	parametersToEdit.push({type: "Radio", id: "Mute", default: 1, choices: [x_lang("Mute on"), x_lang("Mute off"), x_lang("Toggle")], retult: "enum", enum: ["On", "Off", "Toggle"]})
 	parametersToEdit.push({type: "Label", label: x_lang("Absolute volume")})

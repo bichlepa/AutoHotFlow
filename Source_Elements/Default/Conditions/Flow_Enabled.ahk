@@ -59,7 +59,7 @@ Element_getParametrizationDetails_Condition_Flow_Enabled(Environment)
 	parametersToEdit.push({type: "DropDown", id: "flowID", WarnIfEmpty: true, result: "enum", choices: [], enum: []})
 
 	parametersToEdit.push({type: "Label", label: x_lang("Which trigger")})
-	parametersToEdit.push({type: "Radio", id: "WhichTrigger", default: 1, result: "enum", choices: [x_lang("Any trigger"), x_lang("Default trigger"), x_lang("Specific trigger")], enum: ["Any", "Default", "Specific"]})
+	parametersToEdit.push({type: "Radio", id: "WhichTrigger", default: 1, result: "enum", choices: [x_lang("Any trigger"), x_lang("Default trigger"), x_lang("Specified trigger")], enum: ["Any", "Default", "Specified"]})
 	parametersToEdit.push({type: "DropDown", id: "triggerID", WarnIfEmpty: true, result: "enum", choices: [], enum: []})
 
 	return parametersToEdit
@@ -135,7 +135,7 @@ Element_CheckSettings_Condition_Flow_Enabled(Environment, ElementParameters, sta
 
 	if (WhichTrigger != staticValues.oldParWhichTrigger)
 	{
-		if (WhichTrigger != "Specific")
+		if (WhichTrigger != "Specified")
 		{
 			x_Par_Disable("triggerID")
 			x_Par_SetValue("triggerID", "")
@@ -146,11 +146,11 @@ Element_CheckSettings_Condition_Flow_Enabled(Environment, ElementParameters, sta
 		}
 	}
 
-	if (WhichTrigger = "Specific")
+	if (WhichTrigger = "Specified")
 	{
 		if (staticValues.oldParFlowID != flowID or staticValues.oldParThisFlow != ThisFlow or WhichTrigger != staticValues.oldParWhichTrigger)
 		{
-			; user changed flow name or checkbox "thisFlow" and "Specific" trigger is chosen. We need to update the trigger list.
+			; user changed flow name or checkbox "thisFlow" and "Specified" trigger is chosen. We need to update the trigger list.
 			if (x_Par_GetValue("ThisFlow"))
 			{
 				; ThisFlow is checked. get own flow ID
@@ -249,9 +249,9 @@ Element_run_Condition_Flow_Enabled(Environment, ElementParameters)
 			return x_finish(Environment, "exception", x_lang("Flow '%1%' does not have any manual trigger.", FlowID))
 		}
 	}
-	else if (ElementParameters.WhichTrigger = "Specific")
+	else if (ElementParameters.WhichTrigger = "Specified")
 	{
-		; a specific trigger is selected
+		; a Specified trigger is selected
 		TriggerID := ElementParameters.TriggerID
 
 		; check whether trigger ID is set

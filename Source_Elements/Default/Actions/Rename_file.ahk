@@ -89,7 +89,7 @@ Element_run_Action_Rename_File(Environment, ElementParameters)
 	}
 
 	; check whether file exist and is not a folder
-	fileAttr := FileExist(fileFrom)
+	fileAttr := FileExist(EvaluatedParameters.file)
 	if (not fileAttr)
 	{
 		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.",x_lang("Source file"), EvaluatedParameters.file)) 
@@ -109,7 +109,7 @@ Element_run_Action_Rename_File(Environment, ElementParameters)
 	}
 
 	; calculate new file path
-	SplitPath, EvaluatedParameters.file, OldFileName, folderFrom
+	SplitPath, % EvaluatedParameters.file, OldFileName, folderFrom
 	newFilePath := folderFrom "\" EvaluatedParameters.newName
 	
 	; rename file. Do not overwrite, if a file exists.
