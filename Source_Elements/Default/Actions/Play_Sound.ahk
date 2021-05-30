@@ -66,6 +66,7 @@ Element_getParametrizationDetails_Action_Play_Sound(Environment)
 	parametersToEdit.push({type: "Label", label: x_lang("Preview")})
 	parametersToEdit.push({type: "button", id: "stopSoundNow",  goto: "Action_Play_Sound_StopSoundNow", label: x_lang("Stop playback now")})
 	
+	; request that the result of this function is never cached (because of the system sound list)
 	parametersToEdit.updateOnEdit:=True
 	return parametersToEdit
 }

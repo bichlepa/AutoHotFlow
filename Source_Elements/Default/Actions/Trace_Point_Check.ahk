@@ -71,7 +71,7 @@ Element_getParametrizationDetails_Action_Trace_Point_Check(Environment)
 	parametersToEdit.push({type: "Checkbox", id: "MustNotPassTracepointsAll", default: 0, label: x_lang("All tracepoints")})
 	parametersToEdit.push({type: "ListBox", id: "MustNotPassTracepoints", result: "String", choices: allTracePointIDs, multi: True})
 	
-	; we want that this function is called every time when the element editor is opened
+	; request that the result of this function is never cached (because of the trace point list)
 	parametersToEdit.updateOnEdit := true
 
 	return parametersToEdit

@@ -59,10 +59,9 @@ Element_getParametrizationDetails_Action_Trace_Point(Environment)
 	parametersToEdit.push({type: "Label", label: x_lang("Stop condition")})
 	parametersToEdit.push({type: "Edit", id: "StopCondition", default: "", content: "Expression", WarnIfEmpty: false})
 
-	; we want a unique random phrase for each element. Therefore it will alwa
+	; request that the result of this function is never cached (because we want a unique random phrase for each element)
 	parametersToEdit.updateOnEdit := true
 	
-
 	return parametersToEdit
 }
 

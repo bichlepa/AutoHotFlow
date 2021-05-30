@@ -66,16 +66,19 @@ Element_getParametrizationDetails_Action_Change_Drive_Label(Environment)
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Drive letter")})
 	parametersToEdit.push({type: "ComboBox", id: "DriveLetter", content: "String", WarnIfEmpty: true, result: "string", default: defaultdrive, choices: listOfdrives})
+
 	parametersToEdit.push({type: "Label", label: x_lang("New label")})
 	parametersToEdit.push({type: "Edit", id: "NewLabel", content: "String"})
 	
+	; request that the result of this function is never cached (because of the drive letter list)
+	parametersToEdit.updateOnEdit := true
 	return parametersToEdit
 }
 
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Change_Drive_Label(Environment, ElementParameters)
 {
-	return x_lang("Change_Drive_Label") 
+	return x_lang("Change_Drive_Label") " - " ElementParameters.DriveLetter " - " ElementParameters.NewLabel
 }
 
 ;Called every time the user changes any parameter.
@@ -100,6 +103,7 @@ Element_run_Action_Change_Drive_Label(Environment, ElementParameters)
 		return
 	}
 	
+	; check whether parameter is specified
 	if (not EvaluatedParameters.DriveLetter)
 	{
 		x_finish(Environment, "exception", x_lang("Drive is not specified"))
@@ -112,7 +116,7 @@ Element_run_Action_Change_Drive_Label(Environment, ElementParameters)
 	if ErrorLevel
 	{
 		; an error occured. Finish with exception.
-		x_finish(Environment, "exception", x_lang("Label '%1%'' could not be set to drive '%2%'", NewLabel,DriveLetter))
+		x_finish(Environment, "exception", x_lang("Label '%1%'' could not be set to drive '%2%'", EvaluatedParameters.NewLabel, EvaluatedParameters.DriveLetter))
 		return
 	}
 	

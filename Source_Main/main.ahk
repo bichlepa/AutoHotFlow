@@ -70,7 +70,7 @@ check_settings()
 if (_getSettings("runAsAdmin") and not A_IsAdmin)
 {
 	;Use a file to catch if gaining administrator rights fails multiple times
-	FileRead,triedtostart,%a_temp%\autoHotflowTryToStartAsAdmin.txt
+	FileRead, triedtostart, %a_temp%\autoHotflowTryToStartAsAdmin.txt
 	IfInString, triedtostart, 111
 	{
 		MsgBox, 52, , % lang("Several tries to start as administrator failed. Do you want to disable it?")
@@ -78,19 +78,19 @@ if (_getSettings("runAsAdmin") and not A_IsAdmin)
 		{
 			_setSettings("runAsAdmin", false)
 			write_settings()
-			skipstartAsAdmin :=true
+			skipstartAsAdmin := true
 		}
 	}
 	if not skipstartAsAdmin
 	{
 		; Restart with administrator rights
-		FileAppend,1,%a_temp%\autoHotflowTryToStartAsAdmin.txt
-		try Run *RunAs "%A_ScriptFullPath%" ;Run as admin. See https://autohotkey.com/docs/commands/Run.htm#RunAs
+		FileAppend, 1, %a_temp%\autoHotflowTryToStartAsAdmin.txt
+		try Run *RunAs "%a_ahkPath%" "%A_ScriptFullPath%" ;Run as admin. See https://autohotkey.com/docs/commands/Run.htm#RunAs
 		ExitApp
 	}
 }
 ;If we reach that line, either no administartor rights are needed, or administrator rights are granted. Therefore remove that file.
-FileDelete,%a_temp%\autoHotflowTryToStartAsAdmin.txt
+FileDelete, %a_temp%\autoHotflowTryToStartAsAdmin.txt
 
 ;Some library function includes
 #include lib\Objects\Objects.ahk
@@ -101,7 +101,8 @@ FileDelete,%a_temp%\autoHotflowTryToStartAsAdmin.txt
 
 ;Include libraries which may be used by the elements. This code is generated.
 global global_libInclusionsForThreads, global_elementInclusionsForThreads
-;Lib_includes_Start#include source_Elements\Default\lib\TTS\TTS by Learning One.ahk
+;Lib_includes_Start
+#include source_Elements\Default\lib\TTS\TTS by Learning One.ahk
 #include source_Elements\Default\lib\Eject\Eject.ahk
 #include source_Elements\Default\lib\Class_Monitor\Class_Monitor.ahk
 #include source_Elements\Default\lib\HTTP Request\HTTPRequest.ahk
@@ -159,7 +160,8 @@ global_libInclusionsForThreads =
 
 ;Include elements. This code is generated
 ;The elements must be included before the other treads are started
-;Element_Includes_Start#include source_Elements\Default\actions\New_Variable.ahk
+;Element_Includes_Start
+#include source_Elements\Default\actions\New_Variable.ahk
 #include source_Elements\Default\actions\Random_Number.ahk
 #include source_Elements\Default\actions\Absolute_Number.ahk
 #include source_Elements\Default\actions\Square_Root.ahk

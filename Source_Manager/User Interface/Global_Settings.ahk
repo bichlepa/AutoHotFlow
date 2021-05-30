@@ -243,7 +243,7 @@ globalSettings_GUI()
 		MsgBox, 36, , % lang("You have selected '%1%' do you want to restart in order to enable this setting?", lang("Run as admin") )
 		IfMsgBox yes
 		{
-			try Run *RunAs "%A_ScriptFullPath%" ;Run as admin. See https://autohotkey.com/docs/commands/Run.htm#RunAs
+			try Run *RunAs "%a_ahkPath%" "%A_ScriptFullPath%" ;Run as admin. See https://autohotkey.com/docs/commands/Run.htm#RunAs
 			ExitApp
 		}
 	}

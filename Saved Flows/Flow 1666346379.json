@@ -81,7 +81,42 @@
       "ConnectionType": "normal",
       "from": "element0000000040",
       "ID": "connection0000000041",
+      "to": "element0000000047",
+      "type": "Connection"
+    },
+    "connection0000000048": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000048",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000049": {
+      "ConnectionType": "normal",
+      "from": "element0000000047",
+      "ID": "connection0000000049",
       "to": "element0000000039",
+      "type": "Connection"
+    },
+    "connection0000000051": {
+      "ConnectionType": "normal",
+      "from": "element0000000050",
+      "ID": "connection0000000051",
+      "to": "element0000000055",
+      "type": "Connection"
+    },
+    "connection0000000056": {
+      "ConnectionType": "normal",
+      "from": "element0000000053",
+      "ID": "connection0000000056",
+      "to": "element0000000055",
+      "type": "Connection"
+    },
+    "connection0000000060": {
+      "ConnectionType": "normal",
+      "from": "element0000000055",
+      "ID": "connection0000000060",
+      "to": "element0000000059",
       "type": "Connection"
     }
   },
@@ -238,7 +273,7 @@
       },
       "StandardName": "1",
       "type": "action",
-      "x": "350",
+      "x": "385",
       "y": "175"
     },
     "element0000000034": {
@@ -253,27 +288,31 @@
       "y": "420"
     },
     "element0000000039": {
-      "class": "Action_Move_Mouse",
+      "class": "Action_Drag_With_Mouse",
       "ID": "element0000000039",
-      "name": "Move Mouse",
+      "name": "Drag With Mouse - Right button - From '961\/745' to '821\/745'",
       "package": "default",
       "pars": {
+        "Button": "Right",
         "CoordMode": "Screen",
-        "delay": 10,
-        "MouseTracker": "Get coordinates",
-        "SendMode": "Input",
-        "speed": "9",
-        "Xpos": 100,
-        "Ypos": 200
+        "delay": "10",
+        "MouseTrackerFrom": "Get coordinates",
+        "MouseTrackerTo": "Get coordinates",
+        "SendMode": "Event",
+        "speed": "22",
+        "Xpos": "821",
+        "XposFrom": "961",
+        "Ypos": "735",
+        "YposFrom": "745"
       },
       "StandardName": "1",
       "type": "action",
       "x": "770",
-      "y": "35"
+      "y": "280"
     },
     "element0000000040": {
       "class": "Trigger_Manual",
-      "DefaultTrigger": "1",
+      "DefaultTrigger": "0",
       "enabled": "0",
       "ID": "element0000000040",
       "name": "Manual - \"Move mouse\"",
@@ -283,17 +322,92 @@
       },
       "StandardName": "1",
       "type": "Trigger",
-      "x": "805",
-      "y": "-105"
+      "x": "770",
+      "y": "0"
+    },
+    "element0000000047": {
+      "class": "Action_Sleep",
+      "ID": "element0000000047",
+      "name": "Pause: 2 s",
+      "package": "action",
+      "pars": {
+        "Duration": 2,
+        "Unit": "Seconds"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "1015",
+      "y": "175"
+    },
+    "element0000000050": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "1",
+      "enabled": "0",
+      "ID": "element0000000050",
+      "name": "Manual - \"drive lock eject label\"",
+      "package": "default",
+      "pars": {
+        "ID": "drive lock eject label"
+      },
+      "StandardName": "1",
+      "type": "Trigger",
+      "x": "1365",
+      "y": "35"
+    },
+    "element0000000053": {
+      "class": "Action_Change_Drive_Label",
+      "ID": "element0000000053",
+      "name": "Change Drive Label",
+      "package": "default",
+      "pars": {
+        "DriveLetter": "I:",
+        "NewLabel": "Sonstiges"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "1540",
+      "y": "175"
+    },
+    "element0000000055": {
+      "class": "Action_Get_Drive_Information",
+      "ID": "element0000000055",
+      "name": "Get Drive Information",
+      "package": "default",
+      "pars": {
+        "DriveLetter": "J:",
+        "folder": "C:",
+        "Varname": "DriveInfo",
+        "WhichInformation": "StatusCD"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "1400",
+      "y": "315"
+    },
+    "element0000000059": {
+      "class": "Action_Tooltip",
+      "ID": "element0000000059",
+      "name": "Tooltip: %DriveInfo% - 2 s - Follow Mouse",
+      "package": "action",
+      "pars": {
+        "duration": 2,
+        "follow_mouse": 1,
+        "text": "%DriveInfo%",
+        "Unit": "Seconds"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "1435",
+      "y": "490"
     }
   },
   "category": "AHF Test",
-  "ElementIDCounter": "42",
+  "ElementIDCounter": "60",
   "flowSettings": {
     "DefaultWorkingDir": 1,
     "ExecutionPolicy": "default",
-    "Offsetx": "-390.000000",
-    "Offsety": "-225.714285",
+    "Offsetx": "-435.714286",
+    "Offsety": "-495.714285",
     "WorkingDir": "",
     "zoomFactor": "0.7"
   },

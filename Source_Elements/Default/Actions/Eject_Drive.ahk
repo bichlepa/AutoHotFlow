@@ -53,35 +53,43 @@ Element_getParametrizationDetails_Action_Eject_Drive(Environment)
 {
 	parametersToEdit:=Object()
 	
-	listOfdrives:=Object()
+	; get list of drive letters
+	listOfdrives := Object()
 	driveget, tempdrives,list
 	
-	loop,parse,tempdrives
+	loop, parse, tempdrives
 	{
-		if a_index=1
-			defaultdrive:=A_LoopField ":"
+		if (a_index = 1)
+			defaultdrive := A_LoopField ":"
 		listOfdrives.push(A_LoopField ":")
-		
 	}
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Drive letter")})
 	parametersToEdit.push({type: "ComboBox", id: "DriveLetter", content: "String", WarnIfEmpty: true, result: "string", default: defaultdrive, choices: listOfdrives})
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Action")})
-	parametersToEdit.push({type: "Radio", id: "WhatDo", default: "ejectDrive", result: "enum", choices: [x_lang("Eject drive"), x_lang("Retract the tray of a optical disc drive") ], enum: ["ejectDrive", "RetractTray"] })
+	parametersToEdit.push({type: "Radio", id: "WhatDo", default: "ejectDrive", result: "enum", choices: [x_lang("Eject drive"), x_lang("Retract the tray of a optical disc drive") ], enum: ["ejectDrive", "RetractTray"]})
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Method")})
-	parametersToEdit.push({type: "Radio", id: "Method", default: "LibraryEjectByScan", result: "enum", choices: [x_lang("Method %1%",1), x_lang("Method %1%",2) " ("  x_lang("Force")  ")" , x_lang("Method %1%",3) " ("  x_lang("Only optical disc drive")  ")" ], enum: ["LibraryEjectByScan", "DeviceIoControl", "builtIn"]})
+	parametersToEdit.push({type: "Radio", id: "Method", default: "LibraryEjectByScan", result: "enum", choices: [x_lang("Method %1%", 1), x_lang("Method %1%", 2) " ("  x_lang("Force")  ")", x_lang("Method %1%", 3) " ("  x_lang("Only optical disc drive")  ")" ], enum: ["LibraryEjectByScan", "DeviceIoControl", "builtIn"]})
 	
-	
-	parametersToEdit.updateOnEdit:=true
+	; request that the result of this function is never cached (because of the drive letter list)
+	parametersToEdit.updateOnEdit := true
 	return parametersToEdit
 }
 
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Eject_Drive(Environment, ElementParameters)
 {
-	return x_lang("Eject_Drive") 
+	switch (ElementParameters.WhatDo)
+	{
+		case "ejectDrive":
+		WhatDoString := x_lang("Eject drive")
+		case "RetractTray":
+		WhatDoString := x_lang("Retract the tray of a optical disc drive")
+	}
+
+	return x_lang("Eject_Drive") " - " WhatDoString " - " ElementParameters.DriveLetter
 }
 
 ;Called every time the user changes any parameter.
@@ -90,7 +98,6 @@ Element_GenerateName_Action_Eject_Drive(Environment, ElementParameters)
 ;- Correct misconfiguration
 Element_CheckSettings_Action_Eject_Drive(Environment, ElementParameters, staticValues)
 {	
-	
 	if (ElementParameters.WhatDo = "ejectDrive")
 	{
 		x_Par_Enable("Method")
@@ -106,72 +113,83 @@ Element_CheckSettings_Action_Eject_Drive(Environment, ElementParameters, staticV
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Eject_Drive(Environment, ElementParameters)
 {
-	NewLabel := x_replaceVariables(Environment,ElementParameters.NewLabel)
-	DriveLetter := x_replaceVariables(Environment, ElementParameters.DriveLetter) 
-	
-	WhatDo := ElementParameters.WhatDo
-	Method := ElementParameters.Method
-	
-	if not DriveLetter
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
+	if (EvaluatedParameters._error)
 	{
-		x_finish(Environment,"exception", x_lang("Drive is not specified"))
+		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
+		return
+	}
+
+	if (not EvaluatedParameters.DriveLetter)
+	{
+		x_finish(Environment, "exception", x_lang("Drive is not specified"))
 		return
 	}
 	
-	if (WhatDo="ejectDrive") 
+	if (EvaluatedParameters.WhatDo = "ejectDrive") 
 	{
-		if (Method="LibraryEjectByScan") 
+		; user wants to eject a drive
+
+		if (EvaluatedParameters.Method = "LibraryEjectByScan") 
 		{
-			Result:=Eject( DriveLetter  )
-			;~ ToolTip %ErrorLevel% %a_lasterror%
-			if (ErrorLevel<0)
+			; we will try the Eject library of Scan
+
+			; eject now
+			Result := Eject(EvaluatedParameters.DriveLetter)
+			
+			; check for errors
+			if (ErrorLevel < 0)
 			{
-				if (ErrorLevel=-1)
-					String:="Invalid drive letter"
-				else if (ErrorLevel=-2)
+				; an error occured. Return error description
+				if (ErrorLevel = -1)
 				{
-					String:="Neither a CD/DVD drive, nor a USB Mass Storage device."
+					String := "Invalid drive letter"
 				}
-				else if (ErrorLevel=-3)
+				else if (ErrorLevel = -2)
 				{
-					if (a_lasterror=1)
-						String:="The specified operation was rejected for an unknown reason."
-					if (a_lasterror=2)
-						String:="The device does not support the specified PnP operation."
-					if (a_lasterror=3)
-						String:="The specified operation cannot be completed because of a pending close operation."
-					if (a_lasterror=4)
-						String:="A Microsoft Win32 application vetoed the specified operation."
-					if (a_lasterror=5)
-						String:="A Win32 service vetoed the specified operation."
-					if (a_lasterror=6)
-						String:="The requested operation was rejected because of outstanding open handles."
-					if (a_lasterror=7)
-						String:="The device supports the specified operation, but the device rejected the operation."
-					if (a_lasterror=8)
-						String:="The driver supports the specified operation, but the driver rejected the operation."
-					if (a_lasterror=9)
-						String:="The device does not support the specified operation."
-					if (a_lasterror=10)
-						String:="There is insufficient power to perform the requested operation."
-					if (a_lasterror=11)
-						String:="The device cannot be disabled."
-					if (a_lasterror=12)
-						String:="The driver does not support the specified PnP operation."
-					if (a_lasterror=13)
-						String:="The caller has insufficient privileges to complete the operation."
+					String := "Neither a CD/DVD drive, nor a USB Mass Storage device."
+				}
+				else if (ErrorLevel = -3)
+				{
+					if (a_lasterror = 1)
+						String := "The specified operation was rejected for an unknown reason."
+					if (a_lasterror = 2)
+						String := "The device does not support the specified PnP operation."
+					if (a_lasterror = 3)
+						String := "The specified operation cannot be completed because of a pending close operation."
+					if (a_lasterror = 4)
+						String := "A Microsoft Win32 application vetoed the specified operation."
+					if (a_lasterror = 5)
+						String := "A Win32 service vetoed the specified operation."
+					if (a_lasterror = 6)
+						String := "The requested operation was rejected because of outstanding open handles."
+					if (a_lasterror = 7)
+						String := "The device supports the specified operation, but the device rejected the operation."
+					if (a_lasterror = 8)
+						String := "The driver supports the specified operation, but the driver rejected the operation."
+					if (a_lasterror = 9)
+						String := "The device does not support the specified operation."
+					if (a_lasterror = 10)
+						String := "There is insufficient power to perform the requested operation."
+					if (a_lasterror = 11)
+						String := "The device cannot be disabled."
+					if (a_lasterror = 12)
+						String := "The driver does not support the specified PnP operation."
+					if (a_lasterror = 13)
+						String := "The caller has insufficient privileges to complete the operation."
 				}
 				
-				x_finish(Environment,"exception", x_lang("Drive %1% could not be ejected",DriveLetter) " - " x_lang("Error description") ": " String)
+				x_finish(Environment, "exception", x_lang("Drive %1% could not be ejected", EvaluatedParameters.DriveLetter) " - " x_lang("Error description") ": " String)
 				return
-				
-				
 			}
 		}
-		else if (Method="DeviceIoControl")
+		else if (EvaluatedParameters.Method = "DeviceIoControl")
 		{
+			; we will try the alternate ejection method from the AHK help
+
 			hVolume := DllCall("CreateFile"
-			, Str, "\\.\" . Driveletter
+			, Str, "\\.\" . EvaluatedParameters.DriveLetter
 			, UInt, 0x80000000 | 0x40000000  ; GENERIC_READ | GENERIC_WRITE
 			, UInt, 0x1 | 0x2  ; FILE_SHARE_READ | FILE_SHARE_WRITE
 			, UInt, 0
@@ -188,47 +206,45 @@ Element_run_Action_Eject_Drive(Environment, ElementParameters)
 				DllCall("CloseHandle", UInt, hVolume)
 			}
 			
+			; check for errors
 			if ErrorLevel
 			{
-				x_finish(Environment,"exception", x_lang("Drive %1% could not be ejected",DriveLetter))
-				
+				x_finish(Environment, "exception", x_lang("Drive %1% could not be ejected", EvaluatedParameters.DriveLetter))
 				return
-				
-				
 			}
 		}
-		else if (Method="builtIn")
+		else if (EvaluatedParameters.Method = "builtIn")
 		{
-			drive,eject,% DriveLetter
+			; we will try the built in AHK function. It works only on optical disk drives
+
+			; eject
+			drive, eject, % EvaluatedParameters.DriveLetter
+
+			; check for errors
 			if ErrorLevel
 			{
-				x_finish(Environment,"exception", x_lang("Drive %1% could not be ejected",DriveLetter))
+				x_finish(Environment, "exception", x_lang("Drive %1% could not be ejected", EvaluatedParameters.DriveLetter))
 				return
-				
-				
 			}
 		}
-		
 	}
-	else if (WhatDo="RetractTray") 
+	else if (EvaluatedParameters.WhatDo = "RetractTray") 
 	{
-		drive,eject,% DriveLetter,1
+		; user wants to retract an optical disk drive
+
+		; retract drive
+		drive, eject, % EvaluatedParameters.DriveLetter, 1
+		
+		; check for errors
 		if ErrorLevel
 		{
-			x_finish(Environment,"exception", x_lang("Drive %1% could not be retracted",DriveLetter))
+			x_finish(Environment, "exception", x_lang("Drive %1% could not be retracted", EvaluatedParameters.DriveLetter))
 			return
-			
-			
 		}
 	}
 	
-	if ErrorLevel
-	{
-		x_finish(Environment,"exception", x_lang("Label %1% could not be set to drive %2%",NewLabel,DriveLetter))
-		return
-	}
-	
-	x_finish(Environment,"normal")
+	; if we are here, everything worked.
+	x_finish(Environment, "normal")
 	return
 }
 

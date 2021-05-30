@@ -55,6 +55,8 @@ Element_getParametrizationDetails_Trigger_Manual(Environment)
 	parametersToEdit:=Object()
 	parametersToEdit.push({type: "Label", label: x_lang("ID")})
 	parametersToEdit.push({type: "Edit", id: "ID", content: "rawstring",  default: "Trigger " x_randomPhrase()})
+	
+	; request that the result of this function is never cached (because we want a unique random phrase for each element)
 	parametersToEdit.updateOnEdit := true
 	return parametersToEdit
 }

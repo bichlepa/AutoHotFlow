@@ -53,28 +53,31 @@ Element_getParametrizationDetails_Action_Get_Drive_Information(Environment)
 {
 	parametersToEdit:=Object()
 	
-	listOfdrives:=Object()
+	; get list of drive letters
+	listOfdrives := Object()
 	driveget, tempdrives,list
 	
-	loop,parse,tempdrives
+	loop, parse, tempdrives
 	{
-		if a_index=1
-			defaultdrive:=A_LoopField ":"
+		if (a_index = 1)
+			defaultdrive := A_LoopField ":"
 		listOfdrives.push(A_LoopField ":")
-		
 	}
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Output variable name")})
 	parametersToEdit.push({type: "Edit", id: "Varname", default: "DriveInfo", content: "VariableName", WarnIfEmpty: true})
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Which information")})
-	parametersToEdit.push({type: "dropdown", id: "WhichInformation", default: 1, result: "enum", choices: [x_lang("Label"), x_lang("Type"), x_lang("Status"), x_lang("Status of optical disc drive"), x_lang("Capacity"), x_lang("Free disk space"), x_lang("File system"), x_lang("Serial number")], enum: ["Label", "Type", "Status", "StatusCD", "Capacity", "FreeSpace", "FileSystem", "Serial"] })
+	parametersToEdit.push({type: "dropdown", id: "WhichInformation", default: "Label", result: "enum", choices: [x_lang("Label"), x_lang("Type"), x_lang("Status"), x_lang("Status of optical disc drive"), x_lang("Capacity"), x_lang("Free disk space"), x_lang("File system"), x_lang("Serial number")], enum: ["Label", "Type", "Status", "StatusCD", "Capacity", "FreeSpace", "FileSystem", "Serial"] })
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Drive letter")})
 	parametersToEdit.push({type: "ComboBox", id: "DriveLetter", content: "String", WarnIfEmpty: true, result: "string", default: defaultdrive, choices: listOfdrives})
+	
 	parametersToEdit.push({type: "Label", label: x_lang("Path")})
 	parametersToEdit.push({type: "Folder", id: "folder", label: x_lang("Select a folder")})
 	
+	; request that the result of this function is never cached (because of the drive letter list)
+	parametersToEdit.updateOnEdit := true
 	
 	return parametersToEdit
 }
@@ -82,7 +85,38 @@ Element_getParametrizationDetails_Action_Get_Drive_Information(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Get_Drive_Information(Environment, ElementParameters)
 {
-	return x_lang("Get_Drive_Information") 
+	
+	WhichInformation := ElementParameters.WhichInformation
+	if  (WhichInformation = "Label" or WhichInformation = "StatusCD" or WhichInformation = "FileSystem" or WhichInformation = "Serial")
+	{
+		pathString := ElementParameters.DriveLetter
+	}
+	else if (WhichInformation = "Type" or WhichInformation = "Capacity" or WhichInformation = "FreeSpace")
+	{
+		pathString := ElementParameters.folder
+	}
+
+	switch (ElementParameters.WhichInformation)
+	{
+		case "Label":
+		WhichInformationString := x_lang("Label")
+		case "Type":
+		WhichInformationString := x_lang("Type")
+		case "Status":
+		WhichInformationString := x_lang("Status")
+		case "StatusCD":
+		WhichInformationString := x_lang("Status of optical disc drive")
+		case "Capacity":
+		WhichInformationString := x_lang("Capacity")
+		case "FreeSpace":
+		WhichInformationString := x_lang("Free disk space")
+		case "FileSystem":
+		WhichInformationString := x_lang("File system")
+		case "Serial":
+		WhichInformationString := x_lang("Serial number")
+	}
+
+	return x_lang("Get_Drive_Information") " - " ElementParameters.DriveInfo " - " WhichInformationString " - " pathString
 }
 
 ;Called every time the user changes any parameter.
@@ -91,13 +125,13 @@ Element_GenerateName_Action_Get_Drive_Information(Environment, ElementParameters
 ;- Correct misconfiguration
 Element_CheckSettings_Action_Get_Drive_Information(Environment, ElementParameters, staticValues)
 {	
-	WhichInformation:=ElementParameters.WhichInformation
-	if (WhichInformation="Label" or WhichInformation="StatusCD" or WhichInformation="FileSystem" or WhichInformation="Serial")
+	WhichInformation := ElementParameters.WhichInformation
+	if  (WhichInformation = "Label" or WhichInformation = "StatusCD" or WhichInformation = "FileSystem" or WhichInformation = "Serial")
 	{
 		x_par_enable("DriveLetter")
 		x_par_disable("folder")
 	}
-	else
+	else if (WhichInformation = "Type" or WhichInformation = "Capacity" or WhichInformation = "FreeSpace")
 	{
 		x_par_disable("DriveLetter")
 		x_par_enable("folder")
@@ -109,51 +143,79 @@ Element_CheckSettings_Action_Get_Drive_Information(Environment, ElementParameter
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Get_Drive_Information(Environment, ElementParameters)
 {
-	Varname := x_replaceVariables(Environment, ElementParameters.Varname)
-	if not x_CheckVariableName(Varname)
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters, ["DriveLetter", "folder"])
+	if (EvaluatedParameters._error)
 	{
-		;On error, finish with exception and return
-		x_finish(Environment, "exception", x_lang("%1% is not valid", x_lang("Ouput variable name '%1%'", varname)))
+		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
 	
-	WhichInformation:=ElementParameters.WhichInformation
-	if (WhichInformation="Label" or WhichInformation="StatusCD" or WhichInformation="FileSystem" or WhichInformation="Serial")
+	WhichInformation := ElementParameters.WhichInformation
+	if (WhichInformation = "Label" or WhichInformation = "StatusCD" or WhichInformation = "FileSystem" or WhichInformation = "Serial")
 	{
-		Path := x_replaceVariables(Environment, ElementParameters.DriveLetter) 
+		; those informations require a drive letter
 
-		if not Path
+		; evaluate additional parameters
+		x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["DriveLetter"])
+		if (EvaluatedParameters._error)
 		{
-			x_finish(Environment,"exception", x_lang("Drive is not specified"))
+			x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 			return
 		}
+
+		if (not EvaluatedParameters.DriveLetter)
+		{
+			x_finish(Environment, "exception", x_lang("Drive is not specified"))
+			return
+		}
+
+		; copy value to a variable for later use
+		path := EvaluatedParameters.DriveLetter
 	}
-	else
+	else if (WhichInformation = "Type" or WhichInformation = "Capacity" or WhichInformation = "FreeSpace")
 	{
-		Path := x_GetFullPath(Environment, x_replaceVariables(Environment, ElementParameters.folder))
-		
-		if not FileExist(Path)
+		; those informations require a folder path
+
+		; evaluate additional parameters
+		x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["folder"])
+		if (EvaluatedParameters._error)
 		{
-			x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.",x_lang("Folder"), Path)) 
+			x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 			return
 		}
+		
+		if not FileExist(EvaluatedParameters.folder)
+		{
+			x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("Folder"), EvaluatedParameters.folder)) 
+			return
+		}
+
+		; copy value to a variable for later use
+		path := EvaluatedParameters.folder
 	}
 	
-	if (WhichInformation="FreeSpace")
+	if (WhichInformation = "FreeSpace")
 	{
-		DriveSpaceFree, ResultValue,%Path%
+		; get free space
+		DriveSpaceFree, ResultValue, %Path%
 	}
 	else
 	{
-		driveget, ResultValue,%WhichInformation%,%Path%
+		; get specified drive information
+		driveget, ResultValue, %WhichInformation%, %Path%
 	}
+
+	; check for errors
 	if ErrorLevel
 	{
-		x_finish(Environment,"exception", x_lang("Could not be get drive information from '%1%'",Path))
+		x_finish(Environment, "exception", x_lang("Could not get drive information from '%1%'", Path))
 		return
 	}
 	
-	x_SetVariable(Environment,Varname,ResultValue)
+	; set output variable
+	x_SetVariable(Environment, EvaluatedParameters.Varname, ResultValue)
+
 	x_finish(Environment,"normal")
 	return
 }
