@@ -55,16 +55,19 @@ Element_getParametrizationDetails_Action_Move_Mouse(Environment)
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Mouse position")})
 	parametersToEdit.push({type: "Radio", id: "CoordMode", default: 1, result: "enum", choices: [x_lang("Relative to screen"), x_lang("Relative to active window position"), x_lang("Relative to active window client position"), x_lang("Relative to current mouse position")], enum: ["Screen", "Window", "Client", "Relative"]})
+	
 	parametersToEdit.push({type: "Label", label: x_lang("Coordinates") x_lang("(x,y)"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: ["Xpos", "Ypos"], default: [10, 20], content: "Expression", WarnIfEmpty: true})
 	parametersToEdit.push({type: "button", id: "MouseTracker", goto: "ActionMove_MouseMouseTracker", label: x_lang("Get coordinates")})
+	
 	parametersToEdit.push({type: "Label", label: x_lang("Method")})
 	parametersToEdit.push({type: "Radio", id: "SendMode", default: 1, result: "enum", choices: [x_lang("Input mode"), x_lang("Event mode"), x_lang("Play mode")], enum: ["Input", "Event", "Play"]})
+	
 	parametersToEdit.push({type: "Label", label: x_lang("Speed")})
 	parametersToEdit.push({type: "Slider", id: "speed", default: 2, options: "Range0-100 tooltip"})
+	
 	parametersToEdit.push({type: "Label", label: x_lang("Delay in ms")})
 	parametersToEdit.push({type: "Edit", id: "delay", default: 10, content: "Expression", WarnIfEmpty: true})
-	
 	
 	return parametersToEdit
 }
@@ -85,16 +88,6 @@ Element_GenerateName_Action_Move_Mouse(Environment, ElementParameters)
 ;- Correct misconfiguration
 Element_CheckSettings_Action_Move_Mouse(Environment, ElementParameters, staticValues)
 {	
-	
-	if (ElementParameters.SendMode = "input")
-	{
-		x_Par_Disable("speed")
-	}
-	else
-	{
-		x_Par_Enable("speed")
-	}
-
 }
 
 
@@ -102,52 +95,67 @@ Element_CheckSettings_Action_Move_Mouse(Environment, ElementParameters, staticVa
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Move_Mouse(Environment, ElementParameters)
 {
-	EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters)
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters, [])
 	if (EvaluatedParameters._error)
 	{
 		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
 	
-	;Parameter evaluation and check
-
-	CoordModeValue := EvaluatedParameters.CoordMode
-	SendModeValue := EvaluatedParameters.SendMode
-
-	delay:=EvaluatedParameters.delay
-
-	speed:=EvaluatedParameters.speed
-	CoordModeValue := EvaluatedParameters.CoordMode
-	Xpos:=EvaluatedParameters.Xpos
-	Ypos:=EvaluatedParameters.Ypos
-	
+	; check whether we got numbers
+	Xpos := EvaluatedParameters.Xpos
+	Ypos := EvaluatedParameters.Ypos
+	Speed := EvaluatedParameters.Speed
+	delay := EvaluatedParameters.delay
 	if Xpos is not number
 	{
-		x_finish(Environment, "exception", x_lang("%1% is not a number.",x_lang("X position"))) 
+		x_finish(Environment, "exception", x_lang("%1% is not a number.", x_lang("X position"))) 
 		return
 	}
 	if Ypos is not number
 	{
-		x_finish(Environment, "exception", x_lang("%1% is not a number.",x_lang("Y position"))) 
+		x_finish(Environment, "exception", x_lang("%1% is not a number.", x_lang("Y position"))) 
 		return
 	}
+	if Speed is not number
+	{
+		x_finish(Environment, "exception", x_lang("%1% is not a number.", x_lang("Speed"))) 
+		return
 	
-	if (CoordModeValue = "relative")
+	}
+	if delay is not number
+	{
+		x_finish(Environment, "exception", x_lang("%1% is not a number.", x_lang("Delay"))) 
+		return
+	}
+
+	; set values for mouse click call depending on selected coordMode
+	if (EvaluatedParameters.CoordMode = "relative")
 	{
 		CoordModeValue := ""
-		relativeValue:="R"
+		relativeValue := "R"
+	}
+	Else
+	{
+		CoordModeValue := EvaluatedParameters.CoordMode
+		relativeValue := ""
 	}
 		
-	;Action
-	SendMode, %SendModeValue%
-	if (SendModeValue = "play")
-		SetMouseDelay,%delay%, play
-	else
-		SetMouseDelay,%delay%
+	; set send mode
+	SendMode, % EvaluatedParameters.SendMode
 	
+	; set mouse delay
+	if (EvaluatedParameters.SendMode = "play")
+		SetMouseDelay, % delay, play
+	else if (EvaluatedParameters.SendMode = "Event")
+		SetMouseDelay, % delay
 	
+	; set coord mode
 	CoordMode, Mouse, %CoordModeValue%
-	MouseMove,% Xpos,% Ypos,% speed,%relativeValue%
+
+	; move mouse now
+	MouseMove, % Xpos, % Ypos, % speed, %relativeValue%
 	
 	x_finish(Environment,"normal")
 	return

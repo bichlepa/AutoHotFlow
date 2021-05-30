@@ -76,6 +76,13 @@
       "ID": "connection0000000033",
       "to": "element0000000034",
       "type": "Connection"
+    },
+    "connection0000000041": {
+      "ConnectionType": "normal",
+      "from": "element0000000040",
+      "ID": "connection0000000041",
+      "to": "element0000000039",
+      "type": "Connection"
     }
   },
   "allElements": {
@@ -198,7 +205,7 @@
     },
     "element0000000028": {
       "class": "Trigger_Manual",
-      "DefaultTrigger": "1",
+      "DefaultTrigger": "0",
       "enabled": "0",
       "ID": "element0000000028",
       "name": "Manual - \"File select test\"",
@@ -244,10 +251,44 @@
       "type": "Condition",
       "x": "315",
       "y": "420"
+    },
+    "element0000000039": {
+      "class": "Action_Move_Mouse",
+      "ID": "element0000000039",
+      "name": "Move Mouse",
+      "package": "default",
+      "pars": {
+        "CoordMode": "Screen",
+        "delay": 10,
+        "MouseTracker": "Get coordinates",
+        "SendMode": "Input",
+        "speed": "9",
+        "Xpos": 100,
+        "Ypos": 200
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "770",
+      "y": "35"
+    },
+    "element0000000040": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "1",
+      "enabled": "0",
+      "ID": "element0000000040",
+      "name": "Manual - \"Move mouse\"",
+      "package": "default",
+      "pars": {
+        "ID": "Move mouse"
+      },
+      "StandardName": "1",
+      "type": "Trigger",
+      "x": "805",
+      "y": "-105"
     }
   },
   "category": "AHF Test",
-  "ElementIDCounter": "38",
+  "ElementIDCounter": "42",
   "flowSettings": {
     "DefaultWorkingDir": 1,
     "ExecutionPolicy": "default",

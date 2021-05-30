@@ -56,12 +56,12 @@ Element_getParametrizationDetails_Action_Get_Mouse_Position(Environment)
 	parametersToEdit.push({type: "Label", label: x_lang("Output variables") (x_lang("Position: x,y"))})
 	parametersToEdit.push({type: "Edit", id: ["varnameX", "varnameY"], default: ["posX", "posY"], content: "VariableName", WarnIfEmpty: true})
 	parametersToEdit.push({type: "Label", label: x_lang("Mouse position"), size: "small"})
-	parametersToEdit.push({type: "Radio", id: "CoordMode", default: 1, result: "enum", choices: [x_lang("Relative to screen"), x_lang("Relative to active window position"), x_lang("Relative to active window client position"), x_lang("Relative to current mouse position")], enum: ["Screen", "Window", "Client"]})
+	parametersToEdit.push({type: "Radio", id: "CoordMode", default: "Screen", result: "enum", choices: [x_lang("Relative to screen"), x_lang("Relative to active window position"), x_lang("Relative to active window client position")], enum: ["Screen", "Window", "Client"]})
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Additional information")})
-	parametersToEdit.push({type: "Checkbox", id: "WhetherGetWindowID", default: 0, label: x_lang("Get window ID of the mouse")})
+	parametersToEdit.push({type: "Checkbox", id: "WhetherGetWindowID", default: 0, label: x_lang("Get window ID beneath the mouse")})
 	parametersToEdit.push({type: "Edit", id: "varnameWindowID", default: "windowID", content: "VariableName", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Checkbox", id: "WhetherGetControlID", default: 0, label: x_lang("Get control ID of the mouse")})
+	parametersToEdit.push({type: "Checkbox", id: "WhetherGetControlID", default: 0, label: x_lang("Get control ID beneath the mouse")})
 	parametersToEdit.push({type: "Edit", id: "varnameControlID", default: "controlID", content: "VariableName", WarnIfEmpty: true})
 	
 	return parametersToEdit
@@ -87,70 +87,61 @@ Element_CheckSettings_Action_Get_Mouse_Position(Environment, ElementParameters, 
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Get_Mouse_Position(Environment, ElementParameters)
 {
-	varnameX := x_replaceVariables(Environment, ElementParameters.varnameX)
-	if not x_CheckVariableName(varnameX)
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters, ["varnameWindowID", "varnameControlID"])
+	if (EvaluatedParameters._error)
 	{
-		;On error, finish with exception and return
-		x_finish(Environment, "exception", x_lang("%1% is not valid", x_lang("Ouput variable name '%1%'", varnameX)))
+		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
 	
-	varnameY := x_replaceVariables(Environment, ElementParameters.varnameY)
-	if not x_CheckVariableName(varnameY)
+	if (EvaluatedParameters.WhetherGetWindowID)
 	{
-		;On error, finish with exception and return
-		x_finish(Environment, "exception", x_lang("%1% is not valid", x_lang("Ouput variable name '%1%'", varnameY)))
-		return
-	}
-	
-	WhetherGetWindowID:=ElementParameters.WhetherGetWindowID
-	if (WhetherGetWindowID)
-	{
-		varnameWindowID := x_replaceVariables(Environment, ElementParameters.varnameWindowID)
-		if not x_CheckVariableName(varnameWindowID)
+		; evaluate additional parameters
+		x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["varnameWindowID"])
+		if (EvaluatedParameters._error)
 		{
-			;On error, finish with exception and return
-			x_finish(Environment, "exception", x_lang("%1% is not valid", x_lang("Ouput variable name '%1%'", varnameWindowID)))
+			x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 			return
 		}
 	}
-	WhetherGetControlID:=ElementParameters.WhetherGetControlID
-	if (WhetherGetWindowID)
+	if (EvaluatedParameters.WhetherGetControlID)
 	{
-		varnameControlID := x_replaceVariables(Environment, ElementParameters.varnameControlID)
-		if not x_CheckVariableName(varnameControlID)
+		; evaluate additional parameters
+		x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["varnameControlID"])
+		if (EvaluatedParameters._error)
 		{
-			;On error, finish with exception and return
-			x_finish(Environment, "exception", x_lang("%1% is not valid", x_lang("Ouput variable name '%1%'", varnameControlID)))
+			x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 			return
 		}
 	}
 	
-	CoordModeValue := ElementParameters.CoordMode
+	; set coord mode
+	CoordMode, Mouse, % ElementParameters.CoordMode
 	
-	CoordMode, Mouse, %CoordModeValue%
-	
-	if (WhetherGetWindowID)
+	; get mouse coordinates and, if required, also window ID and control ID
+	if (EvaluatedParameters.WhetherGetWindowID)
 	{
-		if (WhetherGetControlID)
-			MouseGetPos,tempx,tempy,tempwin,tempcontrol,2 ;Get control hwnd
+		if (EvaluatedParameters.WhetherGetControlID)
+			MouseGetPos, tempx, tempy, tempwin, tempcontrol, 2 ;Get mouse pos with window ID and control ID
 		else 
-			MouseGetPos,tempx,tempy,tempwin
+			MouseGetPos, tempx, tempy, tempwin ;Get mouse pos with window ID
 	}
 	else
 	{
-		if (WhetherGetControlID)
-			MouseGetPos,tempx,tempy,,tempcontrol,2 ;Get control hwnd
+		if (EvaluatedParameters.WhetherGetControlID)
+			MouseGetPos, tempx, tempy,, tempcontrol, 2 ;Get mouse pos with control ID
 		else 
-			MouseGetPos,tempx,tempy
+			MouseGetPos, tempx, tempy ;Get mouse pos
 	}
-		
-	x_SetVariable(Environment,varnameX,tempx)
-	x_SetVariable(Environment,varnameY,tempy)
-	if (WhetherGetControlID)
-		x_SetVariable(Environment,varnameControlID,tempcontrol)
-	if (WhetherGetWindowID)
-		x_SetVariable(Environment,varnameWindowID,tempwin)
+	
+	; set output variables
+	x_SetVariable(Environment, EvaluatedParameters.varnameX, tempx)
+	x_SetVariable(Environment, EvaluatedParameters.varnameY, tempy)
+	if (EvaluatedParameters.WhetherGetControlID)
+		x_SetVariable(Environment, EvaluatedParameters.varnameControlID, tempcontrol)
+	if (EvaluatedParameters.WhetherGetWindowID)
+		x_SetVariable(Environment, EvaluatedParameters.varnameWindowID, tempwin)
 	
 	x_finish(Environment,"normal")
 	return

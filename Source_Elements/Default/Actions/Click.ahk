@@ -73,7 +73,7 @@ Element_getParametrizationDetails_Action_Click(Environment)
 	parametersToEdit.push({type: "Label", label: x_lang("Method")})
 	parametersToEdit.push({type: "Radio", id: "SendMode", default: "Input", result: "enum", choices: [x_lang("Input mode"), x_lang("Event mode"), x_lang("Play mode")], enum: ["Input", "Event", "Play"]})
 
-	parametersToEdit.push({type: "Label", label: x_lang("Speed")})
+	parametersToEdit.push({type: "Label", label: x_lang("Mouse movement speed")})
 	parametersToEdit.push({type: "Slider", id: "speed", default: 2, options: "Range0-100 tooltip"})
 
 	parametersToEdit.push({type: "Label", label: x_lang("Delay in ms")})
@@ -82,9 +82,10 @@ Element_getParametrizationDetails_Action_Click(Environment)
 	return parametersToEdit
 }
 
+; button "Get coordinates" callback. Opens the mouse tracker assistant
 ActionClickMouseTracker()
 {
-	x_assistant_MouseTracker({ImportMousePos:"Yes", CoordMode:"CoordMode", xpos:"xpos", ypos:"ypos"})
+	x_assistant_MouseTracker({ImportMousePos: "Yes", CoordMode: "CoordMode", xpos: "xpos", ypos: "ypos"})
 }
 
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
@@ -145,15 +146,7 @@ Element_CheckSettings_Action_Click(Environment, ElementParameters, staticValues)
 		x_Par_Enable("Xpos")
 		x_Par_Enable("Ypos")
 		x_Par_Enable("CoordMode")
-		
-		if (ElementParameters.SendMode = "input")
-		{
-			x_Par_Disable("speed")
-		}
-		else
-		{
-			x_Par_Enable("speed")
-		}
+		x_Par_Enable("speed")
 	}
 	else
 	{
@@ -170,7 +163,7 @@ Element_CheckSettings_Action_Click(Environment, ElementParameters, staticValues)
 Element_run_Action_Click(Environment, ElementParameters)
 {
 	; evaluate parameters
-	EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters, ["Xpos", "Ypos", "speed", "CoordMode"])
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters, ["Xpos", "Ypos", "speed", "CoordMode"])
 	if (EvaluatedParameters._error)
 	{
 		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
@@ -188,28 +181,39 @@ Element_run_Action_Click(Environment, ElementParameters)
 		updownValue := "U"
 	}
 	
-	; set send mode and mouse delay
+	; set send mode
 	SendMode, % EvaluatedParameters.SendMode
+
+	; check whether we got a number for delay
+	delay := EvaluatedParameters.delay
+	if delay is not number
+	{
+		x_finish(Environment, "exception", x_lang("%1% is not a number.", x_lang("Delay"))) 
+		return
+	}
+
+	; set mouse delay
 	if (EvaluatedParameters.SendMode = "play")
-		SetMouseDelay,% EvaluatedParameters.delay, play
-	else
-		SetMouseDelay,% EvaluatedParameters.delay
+		SetMouseDelay, % delay, play
+	else if (EvaluatedParameters.SendMode = "Event")
+		SetMouseDelay, % delay
 	
 	if (EvaluatedParameters.changePosition)
 	{
 		; we need to change the position.
 
 		; evaluate additional parameters
-		x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["Xpos", "Ypos", "speed", "CoordMode"])
+		x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["Xpos", "Ypos", "CoordMode", "speed", "Delay"])
 		if (EvaluatedParameters._error)
 		{
 			x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 			return
 		}
-		
+
 		; check xpos and ypos values
 		Xpos := EvaluatedParameters.Xpos
 		Ypos := EvaluatedParameters.Ypos
+		Speed := EvaluatedParameters.Speed
 		if Xpos is not number
 		{
 			x_finish(Environment, "exception", x_lang("%1% is not a number.",x_lang("X position"))) 
@@ -218,6 +222,11 @@ Element_run_Action_Click(Environment, ElementParameters)
 		if Ypos is not number
 		{
 			x_finish(Environment, "exception", x_lang("%1% is not a number.",x_lang("Y position"))) 
+			return
+		}
+		if Speed is not number
+		{
+			x_finish(Environment, "exception", x_lang("%1% is not a number.", x_lang("Speed"))) 
 			return
 		}
 		
@@ -237,7 +246,7 @@ Element_run_Action_Click(Environment, ElementParameters)
 		CoordMode, Mouse, %CoordModeValue%
 
 		; click with mouse movement
-		MouseClick, % EvaluatedParameters.Button, % Xpos, % Ypos, % EvaluatedParameters.ClickCount, % EvaluatedParameters.speed, % updownValue, %relativeValue%
+		MouseClick, % EvaluatedParameters.Button, % Xpos, % Ypos, % EvaluatedParameters.ClickCount, % speed, % updownValue, %relativeValue%
 	}
 	else
 	{
