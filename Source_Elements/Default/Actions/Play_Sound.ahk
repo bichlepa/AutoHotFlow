@@ -53,16 +53,18 @@ Element_getParametrizationDetails_Action_Play_Sound(Environment)
 {
 	parametersToEdit:=Object()
 	
-	listOfSysSounds:=Object()
+	; get a list of all system sound
+	listOfSysSounds := Object()
 	loop, %a_windir%\media\*
 	{
 		listOfSysSounds.push(a_loopfilename)
 	}
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Select sound")})
-	parametersToEdit.push({type: "Radio", id: "WhichSound", default: 1, choices: [x_lang("System sound"), x_lang("Sound file")], result: "enum", enum: ["SystemSound", "SoundFile"]})
+	parametersToEdit.push({type: "Radio", id: "WhichSound", default: "SystemSound", choices: [x_lang("System sound"), x_lang("Sound file")], result: "enum", enum: ["SystemSound", "SoundFile"]})
 	parametersToEdit.push({type: "dropdown", id: "systemSound", default: "tada.wav", choices: listOfSysSounds, result: "string"})
 	parametersToEdit.push({type: "File", id: "soundfile", label: x_lang("Select a sound file"), options: 1})
+
 	parametersToEdit.push({type: "Label", label: x_lang("Preview")})
 	parametersToEdit.push({type: "button", id: "stopSoundNow",  goto: "Action_Play_Sound_StopSoundNow", label: x_lang("Stop playback now")})
 	
@@ -73,13 +75,21 @@ Element_getParametrizationDetails_Action_Play_Sound(Environment)
 
 Action_Play_Sound_StopSoundNow()
 {
-	SoundPlay,stoooooooop
+	; stop soundplay
+	SoundPlay, stoooooooop
 }
 
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Play_Sound(Environment, ElementParameters)
 {
-	return x_lang("Play_Sound") 
+	switch (ElementParameters.WhichSound)
+	{
+		case "SystemSound":
+		soundString := ElementParameters.systemSound
+		case "SoundFile":
+		soundString := ElementParameters.soundfile
+	}
+	return x_lang("Play_Sound") " - " soundString
 }
 
 ;Called every time the user changes any parameter.
@@ -100,14 +110,15 @@ Element_CheckSettings_Action_Play_Sound(Environment, ElementParameters, staticVa
 		x_Par_Enable("systemSound")
 		x_Par_Disable("soundfile")
 		
-		if (playedSound!=ElementParameters.systemSound)
+		; play sound as preview
+		if (playedSound != ElementParameters.systemSound)
 		{
-			playedSound:=ElementParameters.systemSound
+			playedSound := ElementParameters.systemSound
 			if (not x_FirstCallOfCheckSettings(Environment))
 			{
 				if playedSound
 				{
-					SoundPlay,%a_windir%\media\%playedSound%
+					SoundPlay, %a_windir%\media\%playedSound%
 				}
 			}
 		}
@@ -119,33 +130,43 @@ Element_CheckSettings_Action_Play_Sound(Environment, ElementParameters, staticVa
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Play_Sound(Environment, ElementParameters)
 {
-	EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters)
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters, ["soundfile"])
 	if (EvaluatedParameters._error)
 	{
 		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
 
-	if (ElementParameters.WhichSound = "SystemSound")
+	if (EvaluatedParameters.WhichSound = "SystemSound")
 	{
-		if (EvaluatedParameters.systemSound) ;Maybe unnecessary
-		{
-			SoundPlay,% a_windir "\media\" EvaluatedParameters.systemSound
-		}
+		; play a system sound
+		SoundPlay, % a_windir "\media\" EvaluatedParameters.systemSound
 	}
 	else
 	{
-		SoundPlay,% EvaluatedParameters.soundfile
+		; a sound file should be played
+
+		; evaluate more parameters
+		x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["soundfile"])
+		if (EvaluatedParameters._error)
+		{
+			return x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
+		}
+
+		; play sound file
+		SoundPlay, % EvaluatedParameters.soundfile
 	}
+
+	; check for errors
 	if errorlevel
 	{
-		x_finish(Environment,"exception", x_lang("Sound could not be played"))
+		x_finish(Environment, "exception", x_lang("Sound could not be played"))
 		return
 	}
 	
 	x_finish(Environment,"normal")
 	return
-	
 }
 
 

@@ -56,7 +56,6 @@ Element_getParametrizationDetails_Action_Minimize_all_windows(Environment)
 	parametersToEdit.push({type: "Label", label: x_lang("Event")})
 	parametersToEdit.push({type: "Radio", id: "WinMinimizeAllEvent", default: "Minimize", choices: [x_lang("Minimize all windows"), x_lang("Undo")], result: "enum", enum: ["Minimize", "Undo"]})
 	
-	
 	return parametersToEdit
 }
 
@@ -80,24 +79,28 @@ Element_CheckSettings_Action_Minimize_all_windows(Environment, ElementParameters
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Minimize_all_windows(Environment, ElementParameters)
 {
-	EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters)
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
 	if (EvaluatedParameters._error)
 	{
 		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
 
-	if (EvaluatedParameters.WinMinimizeAllEvent="Minimize")
+	if (EvaluatedParameters.WinMinimizeAllEvent = "Minimize")
+	{
+		; minimize all windows
 		WinMinimizeAll
+	}
 	else
+	{
+		; undo minimizing
 		WinMinimizeAllUndo
+	}
 
+	; finish
 	x_finish(Environment,"normal")
 	return
-	
-
-
-	
 }
 
 

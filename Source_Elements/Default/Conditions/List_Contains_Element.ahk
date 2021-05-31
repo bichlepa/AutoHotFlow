@@ -120,7 +120,7 @@ Element_run_Condition_List_Contains_Element(Environment, ElementParameters)
 	{
 		; evaluate more parameters which we will need
 		x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["Position"])
-		if (ElementParameters._error)
+		if (EvaluatedParameters._error)
 		{
 			return x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		}
@@ -148,7 +148,7 @@ Element_run_Condition_List_Contains_Element(Environment, ElementParameters)
 	{
 		; evaluate more parameters which we will need
 		x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["SearchContent"])
-		if (ElementParameters._error)
+		if (EvaluatedParameters._error)
 		{
 			return x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		}

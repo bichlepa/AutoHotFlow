@@ -103,7 +103,7 @@ Element_run_Action_Tooltip(Environment, ElementParameters)
 	
 	;Evaluate Parameters
 	EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters, ["text"])
-	if (ElementParameters._error)
+	if (EvaluatedParameters._error)
 	{
 		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return

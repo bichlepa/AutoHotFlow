@@ -53,21 +53,20 @@ Element_getParametrizationDetails_Action_Empty_Recycle_Bin(Environment)
 {
 	parametersToEdit:=Object()
 	
-	listOfdrives:=Object()
+	; get list of drive letters
+	listOfdrives := Object()
 	driveget, tempdrives,list
 	
-	loop,parse,tempdrives
+	loop, parse, tempdrives
 	{
-		if a_index=1
-			defaultdrive:=A_LoopField ":"
+		if (a_index = 1)
+			defaultdrive := A_LoopField ":"
 		listOfdrives.push(A_LoopField ":")
-		
 	}
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Which drive")})
-	parametersToEdit.push({type: "Radio", id: "AllDrives", default: 1, result: "enum", choices: [x_lang("All drives"), x_lang("Specified drive")], enum: ["All", "Specified"]})
+	parametersToEdit.push({type: "Radio", id: "AllDrives", default: "All", result: "enum", choices: [x_lang("All drives"), x_lang("Specified drive")], enum: ["All", "Specified"]})
 	parametersToEdit.push({type: "ComboBox", id: "DriveLetter", content: "String", WarnIfEmpty: true, result: "string", default: defaultdrive, choices: listOfdrives})
-	
 	
 	return parametersToEdit
 }
@@ -75,7 +74,14 @@ Element_getParametrizationDetails_Action_Empty_Recycle_Bin(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Empty_Recycle_Bin(Environment, ElementParameters)
 {
-	return x_lang("Empty_Recycle_Bin") 
+	switch (ElementParameters.AllDrives)
+	{
+		case "All":
+		driveText := x_lang("All drives")
+		case "Specified":
+		driveText := ElementParameters.DriveLetter
+	}
+	return x_lang("Empty_Recycle_Bin") " - " driveText
 }
 
 ;Called every time the user changes any parameter.
@@ -99,20 +105,40 @@ Element_CheckSettings_Action_Empty_Recycle_Bin(Environment, ElementParameters, s
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Empty_Recycle_Bin(Environment, ElementParameters)
 {
-	AllDrives := ElementParameters.AllDrives
-	DriveLetter := x_replaceVariables(Environment, ElementParameters.DriveLetter) 
-
-	if not DriveLetter
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters, "DriveLetter")
+	if (EvaluatedParameters._error)
 	{
-		x_finish(Environment,"exception", x_lang("Drive is not specified"))
+		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
 	
-	if (AllDrives="All")
+	if (EvaluatedParameters.AllDrives = "All")
+	{
+		; recycle all drives
 		FileRecycleEmpty
+	}
 	else
-		FileRecycleEmpty, % DriveLetter
+	{
+		; evaluate more parameters
+		x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["DriveLetter"])
+		if (EvaluatedParameters._error)
+		{
+			return x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
+		}
+		
+		; check whether drive is set
+		if not DriveLetter
+		{
+			x_finish(Environment, "exception", x_lang("Drive is not specified"))
+			return
+		}
+
+		; recycle the specified drive
+		FileRecycleEmpty, % EvaluatedParameters.DriveLetter
+	}
 	
+	; check for errors
 	if ErrorLevel
 	{
 		x_finish(Environment,"exception", x_lang("Recycle bin could not be emptied."))

@@ -186,7 +186,7 @@ Element_run_Action_Message_Box(Environment, ElementParameters)
 	if (EvaluatedParameters.ShowCancelButton)
 	{
 		x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["ButtonLabelCancel"])
-		if (ElementParameters._error)
+		if (EvaluatedParameters._error)
 		{
 			x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 			return

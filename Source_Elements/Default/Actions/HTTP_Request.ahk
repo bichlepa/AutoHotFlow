@@ -57,11 +57,11 @@ Element_getParametrizationDetails_Action_HTTP_Request(Environment)
 	parametersToEdit.push({type: "Edit", id: "URL", default: "http://www.example.com", content: ["RawString", "String", "Expression"], contentID: "IsExpression", contentDefault: "string", WarnIfEmpty: true})
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Post data")})
-	parametersToEdit.push({type: "Radio", id: "WhereToGetPostData", default: 1, result: "Enum", choices: [x_lang("Do not upload any data"), x_lang("Use follwing post data"), x_lang("Use file as source (upload)")], enum: ["NoUpload", "Specified", "File"]})
+	parametersToEdit.push({type: "Radio", id: "WhereToGetPostData", default: "NoUpload", result: "Enum", choices: [x_lang("Do not upload any data"), x_lang("Use follwing post data"), x_lang("Use file as source (upload)")], enum: ["NoUpload", "Specified", "File"]})
 	parametersToEdit.push({type: "Edit", id: "PostData", default: "", multiline: true, content: "String"})
 	parametersToEdit.push({type: "Checkbox", id: "URIEncodePostData", default: 0, label: x_lang("URI encode post data")})
 	parametersToEdit.push({type: "Label", label: x_lang("Charset"), size: "small"})
-	parametersToEdit.push({type: "Radio", id: "WhichCodepage", default: 1, result: "Enum", choices: [x_lang("Use UTF-8 charset"), x_lang("Define charset"), x_lang("Define codepage")], enum: ["utf-8", "definedCharset", "definedCodepage"]})
+	parametersToEdit.push({type: "Radio", id: "WhichCodepage", default: "utf-8", result: "Enum", choices: [x_lang("Use UTF-8 charset"), x_lang("Define charset"), x_lang("Define codepage")], enum: ["utf-8", "definedCharset", "definedCodepage"]})
 	parametersToEdit.push({type: "Edit", id: "Codepage", default: "", content: "String", WarnIfEmpty: true})
 	parametersToEdit.push({type: "Label", label: x_lang("File path"), size: "small"})
 	parametersToEdit.push({type: "File", id: "InputFile", label: x_lang("Select file")})
@@ -71,7 +71,7 @@ Element_getParametrizationDetails_Action_HTTP_Request(Environment)
 	parametersToEdit.push({type: "Checkbox", id: "URIEncodeRequestHeaders", default: 0, label: x_lang("URI encode request headers")})
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Response data")})
-	parametersToEdit.push({type: "Radio", id: "WhereToPutResponseData", default: 1, result: "Enum", choices: [x_lang("Write response data to a variable"), x_lang("Write response data to file (download)")], enum: ["Variable", "File"]})
+	parametersToEdit.push({type: "Radio", id: "WhereToPutResponseData", default: "Variable", result: "Enum", choices: [x_lang("Write response data to a variable"), x_lang("Write response data to file (download)")], enum: ["Variable", "File"]})
 	parametersToEdit.push({type: "Label", label: x_lang("Output variable"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: "ResponseDataVar", default: "HTTPResponseData", content: "VariableName"})
 	;~ parametersToEdit.push({type: "Checkbox", id: "KeepBinary", default: 0, label: langeeee("Don't convert to codepage of AHF. Keep binary instead.")}) ;TODO Binary data
@@ -82,35 +82,34 @@ Element_getParametrizationDetails_Action_HTTP_Request(Environment)
 	parametersToEdit.push({type: "Edit", id: "ResponseHeadersVar", default: "HTTPResponseHeaders", content: "VariableName"})
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Content type")})
-	parametersToEdit.push({type: "Radio", id: "WhichContentType", default: 1, result: "Enum", choices: [x_lang("Automatic"), x_lang("Custom")], enum: ["automatic", "custom"]})
+	parametersToEdit.push({type: "Radio", id: "WhichContentType", default: "automatic", result: "Enum", choices: [x_lang("Automatic"), x_lang("Custom")], enum: ["automatic", "custom"]})
 	parametersToEdit.push({type: "Edit", id: "Contenttype", default: "", content: "String", WarnIfEmpty: true})
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Content length")})
-	parametersToEdit.push({type: "Radio", id: "WhichContentLength", default: 1, result: "Enum", choices: [x_lang("Automatic"), x_lang("Custom")], enum: ["automatic", "custom"]})
+	parametersToEdit.push({type: "Radio", id: "WhichContentLength", default: "automatic", result: "Enum", choices: [x_lang("Automatic"), x_lang("Custom")], enum: ["automatic", "custom"]})
 	parametersToEdit.push({type: "Edit", id: "ContentLength", default: "", content: "expression", WarnIfEmpty: true})
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Content MD5")})
-	parametersToEdit.push({type: "Radio", id: "WhichContentMD5", default: 1, result: "Enum", choices: [x_lang("Do not use"), x_lang("Automatic"), x_lang("Custom")], enum: ["none", "automatic", "custom"]})
+	parametersToEdit.push({type: "Radio", id: "WhichContentMD5", default: "automatic", result: "Enum", choices: [x_lang("Do not use"), x_lang("Automatic"), x_lang("Custom")], enum: ["none", "automatic", "custom"]})
 	parametersToEdit.push({type: "Edit", id: "ContentMD5", default: "", content: "String", WarnIfEmpty: true})
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Method")})
-	parametersToEdit.push({type: "Radio", id: "WhichMethod", default: 1, result: "Enum", choices: [x_lang("Automatic"), x_lang("Custom")], enum: ["automatic", "custom"]})
+	parametersToEdit.push({type: "Radio", id: "WhichMethod", default: "automatic", result: "Enum", choices: [x_lang("Automatic"), x_lang("Custom")], enum: ["automatic", "custom"]})
 	parametersToEdit.push({type: "DropDown", id: "Method", default: "GET", result: "enum", choices: ["GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS", "TRACE"], enum: ["GET", "HEAD", "POST", "PUT", "DELETE", "OPTIONS", "TRACE"]})
 	
 	parametersToEdit.push({type: "Label", label: x_lang("User agent")})
-	parametersToEdit.push({type: "Radio", id: "WhichUserAgent", default: 1, result: "Enum", choices: [x_lang("Automatic"), x_lang("Custom")], enum: ["automatic", "custom"]})
+	parametersToEdit.push({type: "Radio", id: "WhichUserAgent", default: "automatic", result: "Enum", choices: [x_lang("Automatic"), x_lang("Custom")], enum: ["automatic", "custom"]})
 	parametersToEdit.push({type: "Edit", id: "UserAgent", default: "", content: "String", WarnIfEmpty: true})
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Flags")})
 	parametersToEdit.push({type: "Edit", id: "Flags", default: "", multiline: true, content: "String"})
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Proxy")})
-	parametersToEdit.push({type: "Radio", id: "WhichProxy", default: 1, result: "Enum", choices: [x_lang("No proxy"), x_lang("Automatic"), x_lang("Custom")], enum: ["none", "automatic", "custom"]})
+	parametersToEdit.push({type: "Radio", id: "WhichProxy", default: "none", result: "Enum", choices: [x_lang("No proxy"), x_lang("Automatic"), x_lang("Custom")], enum: ["none", "automatic", "custom"]})
 	parametersToEdit.push({type: "Edit", id: "Proxy", default: "", content: "String", WarnIfEmpty: true})
 	parametersToEdit.push({type: "Label", label: x_lang("Bypass proxy"), size: "small"})
 	parametersToEdit.push({type: "Checkbox", id: "WhetherBypassProxy", default: 0, label: x_lang("Don't use proxy to access following website")})
 	parametersToEdit.push({type: "Edit", id: "BypassProxy", default: "", content: "String", WarnIfEmpty: true})
-	
 	
 	return parametersToEdit
 }
@@ -235,174 +234,220 @@ Element_CheckSettings_Action_HTTP_Request(Environment, ElementParameters, static
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_HTTP_Request(Environment, ElementParameters)
 {
-	Headers := x_replaceVariables(Environment,ElementParameters.RequestHeaders)
-	
-	if Headers
-		Headers := uriencode(Headers)
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters, ["PostData", "Codepage", "InputFile", "Contenttype", "Contentlength", "ContentMD5", "OutputFile", "UserAgent", "Proxy", "BypassProxy"])
+	if (EvaluatedParameters._error)
+	{
+		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
+		return
+	}
 
-	Flags:=x_replaceVariables(Environment,ElementParameters.Flags)
-	
-	BytesDownloaded:=0
+	; prepare variable where we will write options for HTTPRequest function
 	Options:=""
 	
-	if (ElementParameters.IsExpression = "expression")
+	; find out whether we have POST data 
+	postDataAvailable := false
+	if (EvaluatedParameters.WhereToGetPostData = "Specified") ;If data should be sent
 	{
-		evRes := x_EvaluateExpression(Environment, ElementParameters.URL)
-		if (evRes.error)
-		{
-			;On error, finish with exception and return
-			x_finish(Environment, "exception", x_lang("An error occured while parsing expression '%1%'", ElementParameters.URL) "`n`n" evRes.error) 
-			return
-		}
-		else
-		{
-			URL:=evRes.result
-		}
-	}
-	else if (ElementParameters.IsExpression = "string")
-	{
-		URL := x_replaceVariables(Environment, ElementParameters.URL)
-	}
-	else
-		URL := ElementParameters.URL
+		; POST data from variable should be sent
 
-
-	ResponseDataVar := x_replaceVariables(Environment, ElementParameters.ResponseDataVar)
-	if not x_CheckVariableName(ResponseDataVar)
-	{
-		;On error, finish with exception and return
-		x_finish(Environment, "exception", x_lang("%1% is not valid", x_lang("Ouput variable name '%1%'", ResponseDataVar)))
-		return
-	}
-	ResponseHeadersVar := x_replaceVariables(Environment, ElementParameters.ResponseHeadersVar)
-	if not x_CheckVariableName(ResponseHeadersVar)
-	{
-		;On error, finish with exception and return
-		x_finish(Environment, "exception", x_lang("%1% is not valid", x_lang("Ouput variable name '%1%'", ResponseHeadersVar)))
-		return
-	}
-	
-	postDataAvailable:=false
-	if (ElementParameters.WhereToGetPostData="Specified") ;If data should be sent
-	{
-		PostData:=x_replaceVariables(Environment,ElementParameters.PostData)
-		if (PostData)
-			PostData:=uriencode(PostData)
-		
-		if (ElementParameters.WhichCodepage="definedCharset")
+		; evaluate more parameters
+		x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["PostData", "Codepage"])
+		if (EvaluatedParameters._error)
 		{
-			Codepage:=x_replaceVariables(Environment,ElementParameters.Codepage)
-			Options.="Charset: " Codepage "`n"
-		}
-		else if (ElementParameters.WhichCodepage="definedCodepage")
-		{
-			Codepage:=x_replaceVariables(Environment,ElementParameters.Codepage)
-			Options.="Codepage: " Codepage "`n"
-		}
-		postDataAvailable:=true
-	}
-	else if (ElementParameters.WhereToGetPostData="File") ;If file should be used
-	{
-		InputFile := x_GetFullPath(Environment, x_replaceVariables(Environment, ElementParameters.InputFile))
-		if not FileExist(InputFile)
-		{
-			x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.",x_lang("Source file"), InputFile)) 
-			return
+			return x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		}
 		
-		Options.="Upload: " InputFile "`n"
-		postDataAvailable:=true
+		; check whether charset or codepage is defined
+		if (ElementParameters.WhichCodepage = "definedCharset")
+		{
+			; charset is defined. Add it to options.
+			Codepage := x_replaceVariables(Environment, EvaluatedParameters.Codepage)
+			Options .= "Charset: " Codepage "`n"
+		}
+		else if (ElementParameters.WhichCodepage = "definedCodepage")
+		{
+			; codepage is defined. Add it to options.
+			Codepage := x_replaceVariables(Environment, EvaluatedParameters.Codepage)
+			Options .= "Codepage: " Codepage "`n"
+		}
+
+		postDataAvailable := true
 	}
+	else if (EvaluatedParameters.WhereToGetPostData = "File") ;If file should be used
+	{
+		; POST data from file should be sent
+
+		; evaluate more parameters
+		x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["InputFile"])
+		if (EvaluatedParameters._error)
+		{
+			return x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
+		}
+		
+		; add the file to options
+		Options .= "Upload: " InputFile "`n"
+		postDataAvailable := true
+	}
+
 	if (postDataAvailable) ;If data or file should be sent
 	{
-		if (ElementParameters.WhichContentType="custom")
+		; we got some post data. Evaluate more related options.
+
+		if (EvaluatedParameters.WhichContentType = "custom")
 		{
-			Contenttype:=x_replaceVariables(Environment,ElementParameters.Contenttype)
-			Options.="Content-Type: " Contenttype "`n"
+			; custom content type is set
+
+			; evaluate more parameters
+			x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["Contenttype"])
+			if (EvaluatedParameters._error)
+			{
+				return x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
+			}
+
+			; add content type to options
+			Options .= "Content-Type: " EvaluatedParameters.Contenttype "`n"
 		}
-		if (ElementParameters.WhichContentLength="custom")
+		if (EvaluatedParameters.WhichContentLength = "custom")
 		{
-			evRes := x_EvaluateExpression(Environment, ElementParameters.Contentlength)
-			if (evRes.error)
+			; custom content length is set
+
+			; evaluate more parameters
+			x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["Contentlength"])
+			if (EvaluatedParameters._error)
 			{
-				;On error, finish with exception and return
-				x_finish(Environment, "exception", x_lang("An error occured while parsing expression '%1%'", ElementParameters.Contentlength) "`n`n" evRes.error) 
-				return
+				return x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 			}
-			else
-			{
-				Contentlength:=evRes.result
-			}
-			
+
+			; add content length to options
 			Options.="Content-Length: " ContentLength "`n"
 		}
-		if (ElementParameters.WhichContentMD5="automatic")
+
+		if (EvaluatedParameters.WhichContentMD5 = "automatic")
 		{
-			Options.="Content-MD5:"  "`n"
+			; MD5 should be calculated
+
+			; this will calculate the MD5 automatically
+			Options .= "Content-MD5:"  "`n"
 		}
-		if (ElementParameters.WhichContentMD5="custom")
+		if (EvaluatedParameters.WhichContentMD5 = "custom")
 		{
-			ContentMD5:=x_replaceVariables(Environment,ElementParameters.ContentMD5)
-			Options.="Content-MD5: " ContentMD5 "`n"
+			; Custom MD5 checksum should be added
+
+			; evaluate more parameters
+			x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["ContentMD5"])
+			if (EvaluatedParameters._error)
+			{
+				return x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
+			}
+
+			; add MD5 to options
+			Options .= "Content-MD5: " ContentMD5 "`n"
 		}
 	}
 	
-	
-	if (ElementParameters.WhereToPutResponseData="File") ;If file should be used
+	if (EvaluatedParameters.WhereToPutResponseData = "File") ;If file should be used
 	{
-		OutputFile := x_GetFullPath(Environment, x_replaceVariables(Environment, ElementParameters.OutputFile))
-		SplitPath,OutputFile,,OutputFileDir
-		if not InStr(FileExist(OutputFileDir), "D") ;Check whether directory exists
+		; output should be saved to file. Add option
+		
+		; evaluate more parameters
+		x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["OutputFile"])
+		if (EvaluatedParameters._error)
 		{
-			x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.",x_lang("Destination folder"), OutputFileDir)) 
+			return x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
+		}
+		
+		;Check whether directory exists
+		SplitPath, OutputFile,, OutputFileDir
+		if not InStr(FileExist(OutputFileDir), "D")
+		{
+			x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("Destination folder"), OutputFileDir)) 
 			return
 		}
+
+		; add output file path to options
 		Options.="SaveAs: " OutputFile "`n"
 	}
 	
+	if (EvaluatedParameters.WhichMethod = "Custom")
+	{
+		; A specific method should be used. Add it to the options
+		Options .= "Method: " ElementParameters.Method "`n"
+	}
+	if (EvaluatedParameters.WhichUserAgent = "custom")
+	{
+		; A specific user agent should be used. Add it to the options
+		
+		; evaluate more parameters
+		x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["UserAgent"])
+		if (EvaluatedParameters._error)
+		{
+			return x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
+		}
+		
+		; Add custom user agent to options.
+		Options .= "User-Agent: " EvaluatedParameters.UserAgent "`n"
+	}
+	if (EvaluatedParameters.WhichProxy = "automatic")
+	{
+		; automatic proxy should be used. Add it to options.
+		Options .= "AutoProxy" "`n"
+	}
+	else if (EvaluatedParameters.WhichProxy = "custom")
+	{
+		; custom proxy should be used.
+
+		; evaluate more parameters
+		x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["Proxy"])
+		if (EvaluatedParameters._error)
+		{
+			return x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
+		}
+
+		; Add custom proxy to options.
+		Options .= "Proxy: " Proxy "`n"
+	}
+	if (EvaluatedParameters.WhetherBypassProxy = true)
+	{
+		; proxy should be bypassed
+
+		; evaluate more parameters
+		x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["BypassProxy"])
+		if (EvaluatedParameters._error)
+		{
+			return x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
+		}
+
+		; Add bypass proxy to options.
+		Options .= "ProxyBypass: " BypassProxy "`n"
+	}
 	
 	
-	
-	if (ElementParameters.WhichMethod="Custom")
-	{
-		Options.="Method: " ElementParameters.Method "`n"
-	}
-	if (ElementParameters.WhichUserAgent="custom")
-	{
-		UserAgent:=x_replaceVariables(Environment,ElementParameters.UserAgent)
-		Options.="User-Agent: " UserAgent "`n"
-	}
-	if (ElementParameters.WhichProxy="automatic")
-	{
-		Options.="AutoProxy" "`n"
-	}
-	else if (ElementParameters.WhichProxy="custom")
-	{
-		Proxy:=x_replaceVariables(Environment,ElementParameters.Proxy)
-		Options.="Proxy: " Proxy "`n"
-	}
-	if (ElementParameters.WhetherBypassProxy=true)
-	{
-		BypassProxy:=x_replaceVariables(Environment,ElementParameters.BypassProxy)
-		Options.="ProxyBypass: " BypassProxy "`n"
-	}
-	
-	
+	; URI encode headers and post data (if any)
+	if (EvaluatedParameters.Headers)
+		Headers := x_UriEncode(EvaluatedParameters.Headers)
+	if (EvaluatedParameters.PostData)
+		PostData := x_UriEncode(EvaluatedParameters.PostData)
 	
 	;All informations gathered: Perform HTTP Request
-	BytesDownloaded := HTTPRequest( URL, PostData, Headers, Options )
+	BytesDownloaded := HTTPRequest(EvaluatedParameters.URL, PostData, Headers, Options)
 	
-	if (ElementParameters.WhereToPutResponseData="Variable")
+	if (EvaluatedParameters.WhereToPutResponseData = "Variable")
 	{
-		x_SetVariable(Environment,ResponseDataVar,PostData)
+		; response data should be written to a variable
+
+		; write response to output variable
+		x_SetVariable(Environment, EvaluatedParameters.ResponseDataVar, PostData)
 	}
-	x_SetVariable(Environment,ResponseHeadersVar,Headers)
-	x_SetVariable(Environment,"A_BytesDownloaded",BytesDownloaded, "thread")
+	; write response headers to output variable
+	x_SetVariable(Environment, EvaluatedParameters.ResponseHeadersVar, Headers)
+
+	; write downloaded byte count to a thread variable
+	x_SetVariable(Environment, "A_BytesDownloaded", BytesDownloaded, "thread")
 	
-	
-	x_finish(Environment,"normal")
+	; finish
+	x_finish(Environment, "normal")
 	return
-	
 }
 
 ;Called when the execution of the element should be stopped.

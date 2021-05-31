@@ -53,8 +53,6 @@ Element_getParametrizationDetails_Action_Reboot_Computer(Environment)
 {
 	parametersToEdit:=Object()
 	
-	
-	
 	return parametersToEdit
 }
 
@@ -78,7 +76,10 @@ Element_CheckSettings_Action_Reboot_Computer(Environment, ElementParameters, sta
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Reboot_Computer(Environment, ElementParameters)
 {
-	shutdown,2
+	; reboot computer
+	shutdown, 2
+
+	; finish
 	x_finish(Environment,"normal")
 	return
 }

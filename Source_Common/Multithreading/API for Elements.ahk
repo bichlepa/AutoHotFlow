@@ -458,16 +458,21 @@ xx_randomPhrase()
 	return randomPhrase()
 }
 ; converts an object to a json string
-xx_ConvertObjToString(p_Value)
+xx_ConvertObjToString(p_Value, convertUnicodeChars = false)
 {
 	if IsObject(p_Value)
-		return Jxon_Dump(p_Value, 2)
+		return Jxon_Dump(p_Value, 2,, not convertUnicodeChars)
 }
 ; convert an json string to an object
 xx_ConvertStringToObj(p_Value)
 {
 	if not IsObject(p_Value)
 		return Jxon_Load(p_Value)
+}
+; URI encode a string
+xx_UriEncode(p_Value)
+{
+	return uriencode(p_Value)
 }
 
 ; write a log message

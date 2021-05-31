@@ -54,7 +54,7 @@ Element_getParametrizationDetails_Action_Script(Environment)
 {
 	parametersToEdit:=Object()
 	parametersToEdit.push({type: "label", label: x_lang("Script")})
-	parametersToEdit.push({type: "multilineEdit", id: "Script", default: "", WarnIfEmpty: true})
+	parametersToEdit.push({type: "multilineEdit", id: "Script", content: "RawString", default: "", WarnIfEmpty: true})
 
 	return parametersToEdit
 }
@@ -64,7 +64,6 @@ Element_GenerateName_Action_Script(Environment, ElementParameters)
 {
 	global
 	return % x_lang("Script") " - " ElementParameters.Script 
-	
 }
 
 ;Called every time the user changes any parameter.
@@ -80,10 +79,21 @@ Element_CheckSettings_Action_Script(Environment, ElementParameters, staticValues
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Script(Environment, ElementParameters)
 {
-	;~ d(ElementParameters, "element parameters")
-	Script := ElementParameters.Script
-	
-	x_EvaluateScript(Environment, Script)
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters, "WorkingDir")
+	if (EvaluatedParameters._error)
+	{
+		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
+		return
+	}
+
+	; run script
+	result := x_EvaluateScript(Environment, EvaluatedParameters.Script)
+	if (result.errors)
+	{
+		x_finish(Environment, "exception", result.errors) 
+		return
+	}
 	
 	;Always call v_finish() before return
 	x_finish(Environment, "normal")

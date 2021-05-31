@@ -46,7 +46,7 @@ x_EvaluateExpression(Environment, p_String)
 ; execute an AHF scriopt
 x_EvaluateScript(Environment, p_script)
 {
-	var_evaluateScript(Environment, p_script, false)
+	return var_evaluateScript(Environment, p_script, false)
 }
 
 ; checks a variable name, whether it is valid
@@ -952,13 +952,17 @@ x_randomPhrase()
 {
 	return xx_randomPhrase()
 }
-x_ConvertObjToString(p_Value)
+x_ConvertObjToString(p_Value, convertUnicodeChars = false)
 {
-	return xx_ConvertObjToString(p_Value)
+	return xx_ConvertObjToString(p_Value, convertUnicodeChars)
 }
 x_ConvertStringToObj(p_Value)
 {
 	return xx_ConvertStringToObj(p_Value)
+}
+x_UriEncode(p_Value)
+{
+	return xx_UriEncode(p_Value)
 }
 
 

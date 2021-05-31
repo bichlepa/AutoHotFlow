@@ -118,6 +118,20 @@
       "ID": "connection0000000060",
       "to": "element0000000059",
       "type": "Connection"
+    },
+    "connection0000000063": {
+      "ConnectionType": "normal",
+      "from": "element0000000062",
+      "ID": "connection0000000063",
+      "to": "element0000000061",
+      "type": "Connection"
+    },
+    "connection0000000065": {
+      "ConnectionType": "normal",
+      "from": "element0000000061",
+      "ID": "connection0000000065",
+      "to": "element0000000064",
+      "type": "Connection"
     }
   },
   "allElements": {
@@ -341,7 +355,7 @@
     },
     "element0000000050": {
       "class": "Trigger_Manual",
-      "DefaultTrigger": "1",
+      "DefaultTrigger": "0",
       "enabled": "0",
       "ID": "element0000000050",
       "name": "Manual - \"drive lock eject label\"",
@@ -357,7 +371,7 @@
     "element0000000053": {
       "class": "Action_Change_Drive_Label",
       "ID": "element0000000053",
-      "name": "Change Drive Label",
+      "name": "Change Drive Label - I: - Sonstiges",
       "package": "default",
       "pars": {
         "DriveLetter": "I:",
@@ -371,7 +385,7 @@
     "element0000000055": {
       "class": "Action_Get_Drive_Information",
       "ID": "element0000000055",
-      "name": "Get Drive Information",
+      "name": "Get Drive Information -  - Status of optical disc drive - J:",
       "package": "default",
       "pars": {
         "DriveLetter": "J:",
@@ -399,15 +413,54 @@
       "type": "Action",
       "x": "1435",
       "y": "490"
+    },
+    "element0000000061": {
+      "class": "Action_Script",
+      "ID": "element0000000061",
+      "name": "Script - a:=34 - B:=a \"asdf\"",
+      "package": "default",
+      "pars": {
+        "Script": "a:=34\nB:=a \"asdf\""
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "2100",
+      "y": "455"
+    },
+    "element0000000062": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "1",
+      "enabled": "0",
+      "ID": "element0000000062",
+      "name": "Manual - \"drive lock eject label\"",
+      "package": "default",
+      "pars": {
+        "ID": "drive lock eject label"
+      },
+      "StandardName": "1",
+      "type": "Trigger",
+      "x": "2205",
+      "y": "105"
+    },
+    "element0000000064": {
+      "class": "Condition_Debug_Dialog",
+      "ID": "element0000000064",
+      "name": "Debug Dialog",
+      "package": "default",
+      "pars": {},
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "2205",
+      "y": "700"
     }
   },
   "category": "AHF Test",
-  "ElementIDCounter": "60",
+  "ElementIDCounter": "65",
   "flowSettings": {
     "DefaultWorkingDir": 1,
     "ExecutionPolicy": "default",
-    "Offsetx": "-435.714286",
-    "Offsety": "-495.714285",
+    "Offsetx": "-314.285715",
+    "Offsety": "-557.142856",
     "WorkingDir": "",
     "zoomFactor": "0.7"
   },

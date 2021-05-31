@@ -53,8 +53,6 @@ Element_getParametrizationDetails_Action_Stop_Sound(Environment)
 {
 	parametersToEdit:=Object()
 	
-	
-	
 	return parametersToEdit
 }
 
@@ -78,10 +76,12 @@ Element_CheckSettings_Action_Stop_Sound(Environment, ElementParameters, staticVa
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Stop_Sound(Environment, ElementParameters)
 {
-	SoundPlay,-
+	; stop sound
+	SoundPlay, -
+
+	; finish
 	x_finish(Environment,"normal")
 	return
-	
 }
 
 

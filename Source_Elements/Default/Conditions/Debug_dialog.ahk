@@ -252,7 +252,7 @@ Condition_Debug_DialogVarList()
 		{
 			; the variable contains an object. We habe to convert it to readable format
 			guicontrolget, convertUnicode,, % HWNDUnicodeCheckbox
-			variableContent := Jxon_Dump(variableContent, 2, , not convertUnicode)
+			variableContent := x_ConvertObjToString(variableContent, convertUnicode)
 		}
 
 		; show the variable content in the edit field
@@ -312,7 +312,7 @@ Condition_Debug_DialogButtonChangeValue()
 		try 
 		{
 			; convert
-			newVariableContent := Jxon_load(newVariableContent)
+			newVariableContent := x_ConvertStringToObj(newVariableContent)
 		}
 		Catch
 		{

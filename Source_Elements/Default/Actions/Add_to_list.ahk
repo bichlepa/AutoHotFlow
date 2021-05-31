@@ -62,7 +62,7 @@ Element_getParametrizationDetails_Action_Add_To_List(Environment)
 
 	parametersToEdit.push({type: "Label", label:  x_lang("Content to add")})
 	parametersToEdit.push({type: "Edit", id: "VarValue", default: "New element", content: ["String", "Expression"], contentID: "Expression", contentDefault: "string", WarnIfEmpty: true})
-	parametersToEdit.push({type: "multilineEdit", id: "VarValues", default: "Element one`nElement two", WarnIfEmpty: true})
+	parametersToEdit.push({type: "multilineEdit", id: "VarValues", content: "String", default: "Element one`nElement two", WarnIfEmpty: true})
 	parametersToEdit.push({type: "Checkbox", id: "DelimiterLinefeed", default: 1, label: x_lang("Use linefeed as delimiter")})
 	parametersToEdit.push({type: "Checkbox", id: "DelimiterComma", default: 0, label: x_lang("Use comma as delimiter")})
 	parametersToEdit.push({type: "Checkbox", id: "DelimiterSemicolon", default: 0, label: x_lang("Use semicolon as delimiter")})
@@ -148,7 +148,7 @@ Element_run_Action_Add_To_List(Environment, ElementParameters)
 {
 	; evaluate parameters
 	x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["Varname", "NumberOfElements"])
-	if (ElementParameters._error)
+	if (EvaluatedParameters._error)
 	{
 		return x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 	}
@@ -179,7 +179,7 @@ Element_run_Action_Add_To_List(Environment, ElementParameters)
 
 		; evaluate more parameters
 		x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["VarValue", "WhichPosition"])
-		if (ElementParameters._error)
+		if (EvaluatedParameters._error)
 		{
 			return x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		}
@@ -196,7 +196,7 @@ Element_run_Action_Add_To_List(Environment, ElementParameters)
 		{
 			; evaluate more parameters
 			x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["Position", "InsertMethod"])
-			if (ElementParameters._error)
+			if (EvaluatedParameters._error)
 			{
 				return x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 			}
@@ -223,7 +223,7 @@ Element_run_Action_Add_To_List(Environment, ElementParameters)
 	{
 		; evaluate more parameters
 		x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["VarValues", "DelimiterLinefeed", "DelimiterComma", "DelimiterSemicolon", "DelimiterSpace", "WhichPosition"])
-		if (ElementParameters._error)
+		if (EvaluatedParameters._error)
 		{
 			return x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		}
@@ -266,7 +266,7 @@ Element_run_Action_Add_To_List(Environment, ElementParameters)
 		{
 			; evaluate more parameters
 			x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["Position", "InsertMethod"])
-			if (ElementParameters._error)
+			if (EvaluatedParameters._error)
 			{
 				return x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 			}

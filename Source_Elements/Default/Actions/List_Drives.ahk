@@ -56,14 +56,12 @@ Element_getParametrizationDetails_Action_List_drives(Environment)
 	parametersToEdit.push({type: "Label", label: x_lang("Output variable name")})
 	parametersToEdit.push({type: "Edit", id: "Varname", default: "DriveList", content: "VariableName", WarnIfEmpty: true})
 	
-	parametersToEdit.push({type: "Radio", id: "OutputType", default: 1, choices: [x_lang("Output variable will contain a list"), x_lang("Output variable will contain a string")], result: "enum", enum: ["list", "string"]})
-	
 	parametersToEdit.push({type: "Label", label: x_lang("Drive type")})
-	parametersToEdit.push({type: "Radio", id: "WhetherDriveTypeFilter", default: 1, choices: [x_lang("Find all drives"), x_lang("Get only a Specified type of drive")], result: "enum", enum: ["all", "filter"]})
+	parametersToEdit.push({type: "Radio", id: "WhetherDriveTypeFilter", default: "all", choices: [x_lang("Find all drives"), x_lang("Get only a Specified type of drive")], result: "enum", enum: ["all", "filter"]})
 	parametersToEdit.push({type: "DropDown", id: "DriveType", default: "CDROM", choices: [x_lang("Disk drives"), x_lang("Removable drives"), x_lang("Fixed drives"), x_lang("Network drives"), x_lang("RAM disk drives"), x_lang("Unknown drives")], result: "enum", enum: ["CDROM", "REMOVABLE", "FIXED", "NETWORK", "RAMDISK", "UNKNOWN"]})
 	
 	parametersToEdit.push({type: "Label", label: x_lang("If no drive can be found")})
-	parametersToEdit.push({type: "Radio", id: "IfNothingFound", default: 2, choices: [x_lang("Normal") " - " x_lang("Make output variable empty"),x_lang("Throw exception")], result: "enum", enum: ["Normal", "Exception"]})
+	parametersToEdit.push({type: "Radio", id: "IfNothingFound", default: "Exception", choices: [x_lang("Normal") " - " x_lang("Make output variable empty"),x_lang("Throw exception")], result: "enum", enum: ["Normal", "Exception"]})
 	
 	return parametersToEdit
 }
@@ -88,44 +86,51 @@ Element_CheckSettings_Action_List_drives(Environment, ElementParameters, staticV
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_List_drives(Environment, ElementParameters)
 {
-	EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters)
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
 	if (EvaluatedParameters._error)
 	{
 		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
 	
-	if (EvaluatedParameters.WhetherDriveTypeFilter="filter")
+	; check whether a filter should be used
+	if (EvaluatedParameters.WhetherDriveTypeFilter = "filter")
 	{
-		tempType:=EvaluatedParameters.DriveType
+		DriveType := EvaluatedParameters.DriveType
 	}
 	
-	driveget, tempDrives,list,% tempType
+	; list drives
+	driveget, foundDrives, list, % DriveType
+
+	; check for error
 	if ErrorLevel
 	{
-		if (EvaluatedParameters.IfNothingFound="exception")
+		; there was an error. Return according to settings
+		if (EvaluatedParameters.IfNothingFound = "exception")
 		{
-			x_finish(Environment,"exception", x_lang("No drives found"))
+			x_finish(Environment, "exception", x_lang("No drives found"))
+			return
+		}
+		Else
+		{
+			x_finish(Environment, "normal", x_lang("No drives found"))
 			return
 		}
 	}
 	
-	if (EvaluatedParameters.OutputType="list")
+	; convert result to a list
+	foundDrivesObject := Object()
+	loop, parse, foundDrives
 	{
-		tempobject:=Object()
-		loop,parse,tempDrives
-		{
-			tempobject.push(A_LoopField)
-			
-		}
-		x_SetVariable(Environment,EvaluatedParameters.Varname,tempObject)
+		foundDrivesObject.push(A_LoopField)
+		
 	}
-	else
-	{
-		x_SetVariable(Environment,EvaluatedParameters.Varname,tempDrives)
-	}
+
+	; set output variable
+	x_SetVariable(Environment, EvaluatedParameters.Varname, foundDrivesObject)
 	
-	x_finish(Environment,"normal")
+	x_finish(Environment, "normal")
 	return
 }
 

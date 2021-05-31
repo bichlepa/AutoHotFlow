@@ -121,6 +121,7 @@ Element_run_Action_Eject_Drive(Environment, ElementParameters)
 		return
 	}
 
+	; check whether drive is set
 	if (not EvaluatedParameters.DriveLetter)
 	{
 		x_finish(Environment, "exception", x_lang("Drive is not specified"))

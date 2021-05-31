@@ -176,7 +176,7 @@ Element_run_Action_Delete_From_List(Environment, ElementParameters)
 	{
 		; evaluate more parameters
 		x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["Position"])
-		if (ElementParameters._error)
+		if (EvaluatedParameters._error)
 		{
 			return x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		}
@@ -214,7 +214,7 @@ Element_run_Action_Delete_From_List(Environment, ElementParameters)
 		
 		; evaluate more parameters
 		x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["Varname"])
-		if (ElementParameters._error)
+		if (EvaluatedParameters._error)
 		{
 			return x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		}

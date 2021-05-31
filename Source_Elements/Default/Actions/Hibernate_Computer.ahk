@@ -53,8 +53,6 @@ Element_getParametrizationDetails_Action_Hibernate_Computer(Environment)
 {
 	parametersToEdit:=Object()
 	
-	
-	
 	return parametersToEdit
 }
 
@@ -78,14 +76,12 @@ Element_CheckSettings_Action_Hibernate_Computer(Environment, ElementParameters, 
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Hibernate_Computer(Environment, ElementParameters)
 {
+	; Hibernate computer
+	DllCall("PowrProf\SetSuspendState", "int", 1, "int", 0, "int", 0)
 
-
-	DllCall("PowrProf\SetSuspendState", "int", 1, "int", 0, "int", 0) ;Hibernate
+	; finish
 	x_finish(Environment,"normal")
 	return
-	
-
-	
 }
 
 ;Called when the execution of the element should be stopped.

@@ -53,9 +53,12 @@ Element_getParametrizationDetails_Action_Run(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: x_lang("Target")})
+	parametersToEdit.push({type: "Label", label: x_lang("Command")})
 	parametersToEdit.push({type: "Edit", id: "ToRun", content: ["String", "RawString"], contentID: "ToRunContent", WarnIfEmpty: true})
-	
+
+	parametersToEdit.push({type: "Label", label: x_lang("Working directory")})
+	parametersToEdit.push({type: "Radio", id: "WhichWorkingDir", default: "Default", result: "enum", choices: [x_lang("Working directory of the flow"), x_lang("Following working directory")], enum: ["Default", "Specified"]})
+	parametersToEdit.push({type: "Edit", id: "WorkingDir", content: ["String", "RawString"], contentID: "WorkingDirContent", WarnIfEmpty: true})
 	
 	return parametersToEdit
 }
@@ -63,7 +66,7 @@ Element_getParametrizationDetails_Action_Run(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Run(Environment, ElementParameters)
 {
-	return x_lang("Run") 
+	return x_lang("Run") ElementParameters.ToRun
 }
 
 ;Called every time the user changes any parameter.
@@ -79,33 +82,53 @@ Element_CheckSettings_Action_Run(Environment, ElementParameters, staticValues)
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Run(Environment, ElementParameters)
 {
-	EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters)
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters, "WorkingDir")
 	if (EvaluatedParameters._error)
 	{
 		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
 	
-	toRun:=x_GetFullPath(Environment, EvaluatedParameters.ToRun)
-	
-	workingDir:=x_GetWorkingDir(Environment)
-	
-	run, % toRun,% workingDir, UseErrorLevel,ActionRuntempPid ;Try to run it in the working direction
-	if (ErrorLevel)
+	switch (EvaluatedParameters.WhichWorkingDir)
 	{
-		
-		run, % EvaluatedParameters.ToRun,% workingDir, UseErrorLevel,ActionRuntempPid ;Try tu run it without the working direction (relative path)
-		if (ErrorLevel)
+		case "Default":
+		WorkingDir := x_GetWorkingDir(Environment)
+
+		case "Specified":
+		; evaluate more parameters
+		x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["WorkingDir"])
+		if (EvaluatedParameters._error)
 		{
-			x_finish(Environment,"exception", x_lang("Can't run '%1%'",EvaluatedParameters.ToRun))
+			return x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
+		}
+
+		WorkingDir := EvaluatedParameters.WorkingDir
+		
+		; check whether working dir exists
+		if not InStr(FileExist(WorkingDir), "D")
+		{
+			x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("Folder"), WorkingDir)) 
 			return
 		}
 	}
+
+	; run command
+	run, % EvaluatedParameters.toRun, % WorkingDir, UseErrorLevel, StartedProcessID
 	
-	x_setVariable(Environment,"a_pid",ActionRuntempPid,"thread")
+	; check for errors
+	if (ErrorLevel)
+	{
+		x_finish(Environment, "exception", x_lang("Can't run '%1%'", EvaluatedParameters.ToRun))
+		return
+	}
+	
+	; set PID as thread variable
+	x_setVariable(Environment, "a_pid", StartedProcessID, "thread")
+
+	; finish
 	x_finish(Environment,"normal")
 	return
-	
 }
 
 

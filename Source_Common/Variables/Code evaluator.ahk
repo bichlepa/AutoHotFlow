@@ -8,7 +8,7 @@ var_evaluateScript(environment, p_script, useCommonFunctions)
 	parsedCode := class_parser.parse(tokens)
 
 	; step 3: evaluate the pared code
-	class_evaluator.evaluate(parsedCode, environment, useCommonFunctions)
+	return class_evaluator.evaluate(parsedCode, environment, useCommonFunctions)
 }
 
 
@@ -36,7 +36,11 @@ class class_evaluator
 			res := ""
 		}
 		
-		return {res: res, errors: this.errors}
+
+		if (this.errors.Length() != 0)
+			return {res: res, errors: this.errors}
+		Else
+			return {res: res}
 	}
 	
 	; evaluate the current part of the pared expression

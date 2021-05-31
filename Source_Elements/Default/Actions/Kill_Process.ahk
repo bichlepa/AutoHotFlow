@@ -80,40 +80,39 @@ Element_CheckSettings_Action_Kill_Process(Environment, ElementParameters, static
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Kill_Process(Environment, ElementParameters)
 {
-	EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters)
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
 	if (EvaluatedParameters._error)
 	{
 		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
 
-	Process,close, % EvaluatedParameters.ProcessName
+	; close process
+	Process, close, % EvaluatedParameters.ProcessName
 	
-	if (ErrorLevel=0)
+	; check for errors
+	if (ErrorLevel = 0)
 	{
-		Process,exist,% EvaluatedParameters.ProcessName
-		if (ErrorLevel=0)
+		; check whether process exists
+		Process, exist, % EvaluatedParameters.ProcessName
+		if (ErrorLevel = 0)
 		{
 			x_finish(Environment,"exception", x_lang("Process '%1%' does not exist", EvaluatedParameters.ProcessName))
-			
 		}
 		else
 		{
 			x_finish(Environment,"exception", x_lang("Process '%1%' could not be closed", EvaluatedParameters.ProcessName))
-			
 		}
-
 		return
 	}
-	else
-	{
-		x_SetVariable(Environment,"A_Pid",errorlevel,"thread")
-		x_finish(Environment,"normal")
-	}
+	
+	; set PID of killed process to a thread variable
+	x_SetVariable(Environment, "A_Pid", errorlevel, "thread")
+	
+	x_finish(Environment, "normal")
 	
 	return
-	
-
 }
 
 

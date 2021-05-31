@@ -53,8 +53,6 @@ Element_getParametrizationDetails_Action_Log_Off(Environment)
 {
 	parametersToEdit:=Object()
 	
-	
-	
 	return parametersToEdit
 }
 
@@ -78,10 +76,12 @@ Element_CheckSettings_Action_Log_Off(Environment, ElementParameters, staticValue
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Log_Off(Environment, ElementParameters)
 {
-	shutdown,0
+	; log off
+	shutdown, 0
+
+	; finish
 	x_finish(Environment,"normal")
 	return
-	
 }
 
 

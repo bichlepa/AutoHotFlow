@@ -56,14 +56,13 @@ Element_getParametrizationDetails_Action_Get_Volume(Environment)
 	parametersToEdit.push({type: "Label", label: x_lang("Output_Variable_name")})
 	parametersToEdit.push({type: "edit", id: "Varname", default: "Volume", content: "VariableName", WarnIfEmpty: true})
 	
-	
 	return parametersToEdit
 }
 
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Get_Volume(Environment, ElementParameters)
 {
-	return x_lang("Get_Volume") "`n" ElementParameters.Varname " = |" ElementParameters.VarValue "|"
+	return x_lang("Get_Volume") "`n" ElementParameters.Varname
 }
 
 ;Called every time the user changes any parameter.
@@ -80,23 +79,22 @@ Element_CheckSettings_Action_Get_Volume(Environment, ElementParameters, staticVa
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Get_Volume(Environment, ElementParameters)
 {
-	Varname := x_replaceVariables(Environment, ElementParameters.Varname)
-	
-	if not x_CheckVariableName(Varname)
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
+	if (EvaluatedParameters._error)
 	{
-		;On error, finish with exception and return
-		x_finish(Environment, "exception", x_lang("%1% is not valid", x_lang("Ouput variable name '%1%'", varname)))
+		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
 
-	SoundGet,Result
+	; Get volume
+	SoundGet, Result
 
-	x_SetVariable(Environment,Varname,Result)
+	; set output variable
+	x_SetVariable(Environment, EvaluatedParameters.Varname, Result)
 	
 	x_finish(Environment,"normal")
-	
 	return
-	
 }
 
 ;Called when the execution of the element should be stopped.

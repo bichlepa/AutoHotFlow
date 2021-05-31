@@ -330,13 +330,17 @@ x_randomPhrase()
 {
 	return xx_randomPhrase()
 }
-x_ConvertObjToString(p_Value)
+x_ConvertObjToString(p_Value, convertUnicodeChars = false)
 {
-	return xx_ConvertObjToString(p_Value)
+	return xx_ConvertObjToString(p_Value, convertUnicodeChars)
 }
 x_ConvertStringToObj(p_Value)
 {
 	return xx_ConvertStringToObj(p_Value)
+}
+x_UriEncode(p_Value)
+{
+	return xx_UriEncode(p_Value)
 }
 
 

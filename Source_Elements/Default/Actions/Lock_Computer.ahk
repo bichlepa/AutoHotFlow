@@ -53,8 +53,6 @@ Element_getParametrizationDetails_Action_Lock_Computer(Environment)
 {
 	parametersToEdit:=Object()
 	
-	
-	
 	return parametersToEdit
 }
 
@@ -78,10 +76,12 @@ Element_CheckSettings_Action_Lock_Computer(Environment, ElementParameters, stati
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Lock_Computer(Environment, ElementParameters)
 {
+	; lock computer
 	DllCall("LockWorkStation")
+
+	; finish
 	x_finish(Environment,"normal")
 	return
-	
 }
 
 

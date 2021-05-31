@@ -55,6 +55,7 @@ Element_getParametrizationDetails_Action_New_variable(Environment)
 	parametersToEdit:=Object()
 	parametersToEdit.push({type: "Label", label: x_lang("Variable_name")})
 	parametersToEdit.push({type: "Edit", id: "Varname", default: "NewVariable", content: "VariableName", WarnIfEmpty: true})
+
 	parametersToEdit.push({type: "Label", label:  x_lang("Value")})
 	parametersToEdit.push({type: "Edit", id: "VarValue", default: "New element", content: ["String", "Expression"], contentID: "expression", contentDefault: "string"})
 
@@ -82,35 +83,16 @@ Element_CheckSettings_Action_New_variable(Environment, ElementParameters, static
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_New_variable(Environment, ElementParameters)
 {
-	;~ d(ElementParameters, "element parameters")
-	Varname := x_replaceVariables(Environment, ElementParameters.Varname)
-	Value := ""
-	
-	if not x_CheckVariableName(varname)
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
+	if (EvaluatedParameters._error)
 	{
-		;On error, finish with exception and return
-		x_finish(Environment, "exception", x_lang("%1% is not valid", x_lang("Ouput variable name '%1%'", varname)))
+		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
 	
-	if (ElementParameters.Expression = "expression")
-	{
-		evRes := x_EvaluateExpression(Environment, ElementParameters.VarValue)
-		if (evRes.error)
-		{
-			;On error, finish with exception and return
-			x_finish(Environment, "exception", x_lang("An error occured while parsing expression '%1%'", ElementParameters.VarValue) "`n`n" evRes.error) 
-			return
-		}
-		else
-		{
-			Value:=evRes.result
-		}
-	}
-	else
-		Value := x_replaceVariables(Environment, ElementParameters.VarValue)
-	
-	x_SetVariable(Environment, Varname, Value)
+	; set output variable
+	x_SetVariable(Environment, EvaluatedParameters.Varname, EvaluatedParameters.VarValue)
 	
 	;Always call v_finish() before return
 	x_finish(Environment, "normal")

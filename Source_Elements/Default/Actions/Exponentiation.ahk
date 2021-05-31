@@ -55,11 +55,12 @@ Element_getParametrizationDetails_Action_Exponentiation(Environment)
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Output_Variable_name")})
 	parametersToEdit.push({type: "edit", id: "Varname", default: "NewVariable", content: "VariableName", WarnIfEmpty: true})
+
 	parametersToEdit.push({type: "Label", label:  x_lang("Input number")})
 	parametersToEdit.push({type: "edit", id: "VarValue", default: 3, content: "Expression", WarnIfEmpty: true})
+
 	parametersToEdit.push({type: "Label", label:  x_lang("Exponent")})
 	parametersToEdit.push({type: "Edit", id: "Exponent", default: 2, content: "Expression", WarnIfEmpty: true})
-	
 	
 	return parametersToEdit
 }
@@ -84,42 +85,22 @@ Element_CheckSettings_Action_Exponentiation(Environment, ElementParameters, stat
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Exponentiation(Environment, ElementParameters)
 {
-	Varname := x_replaceVariables(Environment, ElementParameters.Varname)
-	
-	if not x_CheckVariableName(Varname)
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
+	if (EvaluatedParameters._error)
 	{
-		;On error, finish with exception and return
-		x_finish(Environment, "exception", x_lang("%1% is not valid", x_lang("Ouput variable name '%1%'", varname)))
+		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
 
-	evRes := x_evaluateExpression(Environment,ElementParameters.VarValue)
-	if (evRes.error)
-	{
-		;On error, finish with exception and return
-		x_finish(Environment, "exception", x_lang("An error occured while parsing expression '%1%'", ElementParameters.VarValue) "`n`n" evRes.error) 
-		return
-	}
-	VarValue:=evRes.result
-	
-	evRes := x_evaluateExpression(Environment,ElementParameters.Exponent)
-	if (evRes.error)
-	{
-		;On error, finish with exception and return
-		x_finish(Environment, "exception", x_lang("An error occured while parsing expression '%1%'", ElementParameters.Exponent) "`n`n" evRes.error) 
-		return
-	}
-	Exponent:=evRes.result
-	
-	
-	VarValue:=VarValue**Exponent
-	x_SetVariable(Environment,Varname,VarValue)
+	; calculate result
+	result := EvaluatedParameters.VarValue ** EvaluatedParameters.Exponent
+
+	; write output variable
+	x_SetVariable(Environment, EvaluatedParameters.Varname, result)
 	
 	x_finish(Environment,"normal")
 	return
-	
-	
-	
 }
 
 ;Called when the execution of the element should be stopped.
