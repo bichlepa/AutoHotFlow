@@ -54,10 +54,11 @@ Element_getParametrizationDetails_Action_Get_Screen_Settings(Environment)
 {
 	parametersToEdit:=Object()
 	
-	NumberOfMonitors := DllCall("user32.dll\GetSystemMetrics", "Int", 80)                  ; Get the number of display monitors on a desktop.
+	; get count of screens
+	NumberOfMonitors := DllCall("user32.dll\GetSystemMetrics", "Int", 80)
 
 	parametersToEdit.push({type: "Label", label: x_lang("Which monitor")})
-	parametersToEdit.push({type: "edit", id: "MonitorNumber", default: 1, content: "Expression", WarnIfEmpty: true, UseUpDown: true, range: "1-" NumberOfMonitors})
+	parametersToEdit.push({type: "edit", id: "MonitorNumber", default: 1, content: "positiveInteger", WarnIfEmpty: true, UseUpDown: true, range: "1-" NumberOfMonitors})
 	
 	parametersToEdit.push({type: "Label", label:  x_lang("Output variables")})
 	
@@ -84,6 +85,9 @@ Element_getParametrizationDetails_Action_Get_Screen_Settings(Environment)
 	parametersToEdit.push({type: "Label", label:  x_lang("Color temperature"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: "VarnameColorTemperature", default: "ColorTemperature", content: "VariableName"})
 
+	; request that the result of this function is never cached (because of the screen number value)
+	parametersToEdit.updateOnEdit := true
+
 	return parametersToEdit
 }
 
@@ -107,184 +111,209 @@ Element_CheckSettings_Action_Get_Screen_Settings(Environment, ElementParameters,
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Get_Screen_Settings(Environment, ElementParameters)
 {
-	NumberOfMonitors := DllCall("user32.dll\GetSystemMetrics", "Int", 80)  ; Get the number of displays on a desktop.
-	
-	evRes := x_evaluateExpression(Environment,ElementParameters.MonitorNumber)
-	if (evRes.error)
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters, ["varnameRGB", "varnameR", "varnameG", "varnameB"])
+	if (EvaluatedParameters._error)
 	{
-		;On error, finish with exception and return
-		x_finish(Environment, "exception", x_lang("An error occured while parsing expression '%1%'", ElementParameters.MonitorNumber) "`n`n" evRes.error) 
+		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
-	MonitorNumber:=evRes.result
-	if MonitorNumber is not integer
+
+	; Get the count of screens
+	NumberOfMonitors := DllCall("user32.dll\GetSystemMetrics", "Int", 80)
+	; check whether the screen exists
+	if not (EvaluatedParameters.MonitorNumber >= 1 and EvaluatedParameters.MonitorNumber <= NumberOfMonitors)
 	{
-		x_finish(Environment, "exception", x_lang("Screen number is not specified") )
-	}
-	if not (MonitorNumber >= 1 and MonitorNumber <= NumberOfMonitors)
-	{
-		x_finish(Environment, "exception", x_lang("Screen %1% does not exist", MonitorNumber) ) 
-	}
-	
-	allVarNames:=["VarnameBrightness", "VarnameBrightnessMin", "VarnameBrightnessMax", "VarnameContrast", "VarnameContrastMin", "VarnameContrastMax", "VarnameRedGain", "VarnameRedGainMin", "VarnameRedGainMax", "VarnameGreenGain", "VarnameGreenGainMin", "VarnameGreenGainMax", "VarnameBlueGain", "VarnameBlueGainMin", "VarnameBlueGainMax", "VarnameReddrive", "VarnameReddriveMin", "VarnameReddriveMax", "VarnameGreendrive", "VarnameGreendriveMin", "VarnameGreendriveMax", "VarnameBluedrive", "VarnameBluedriveMin", "VarnameBluedriveMax", "VarnameColorTemperature"]
-	
-	anyVarNameSpecified:=False
-	for oneindex, oneVarname in allVarNames
-	{
-		%oneVarname% := x_replaceVariables(Environment, ElementParameters[oneVarname])
-		if (%oneVarname% != "")
-		{
-			if not x_CheckVariableName(%oneVarname%)
-			{
-				;On error, finish with exception and return
-				x_finish(Environment, "exception", x_lang("%1% is not valid", x_lang("Ouput variable name '%1%'", %oneVarname%)))
-				return
-			}
-			anyVarNameSpecified:=true
-		}
+		x_finish(Environment, "exception", x_lang("Screen %1% does not exist", EvaluatedParameters.MonitorNumber)) 
 	}
 	
-	if not (anyVarNameSpecified)
+	if (EvaluatedParameters.VarnameBrightness != "" or EvaluatedParameters.VarnameBrightnessMin != "" or EvaluatedParameters.VarnameBrightnessMax != "")
 	{
-		x_finish(Environment, "exception", x_lang("No variable name specified"))
-		return
+		; we need to get the screen brightness
+		result := class_monitor.GetMonitorBrightness(EvaluatedParameters.MonitorNumber)
+
+		; check for errors
+		if (substr(result, 1, 1) = "*")
+		{
+			result := substr(result, 2)
+			x_finish(Environment, "exception", x_lang("Couldn't get screen setting: %1%", x_lang("Brightness")) ". " x_lang("Error code: %1% (%2%)", result, Format("0x{:X}", result)))
+			return
+		}
+
+		; set output variables
+		if (EvaluatedParameters.VarnameBrightness != "")
+			x_SetVariable(Environment, EvaluatedParameters.VarnameBrightness, result.Current)
+		if (EvaluatedParameters.VarnameBrightnessmin != "")
+			x_SetVariable(Environment, EvaluatedParameters.VarnameBrightnessMin, result.Minimum)
+		if (EvaluatedParameters.VarnameBrightnessmax != "")
+			x_SetVariable(Environment, EvaluatedParameters.VarnameBrightnessMax, result.Maximum)
 	}
 	
-	
-	if (VarnameBrightness!="" or VarnameBrightnessMin!="" or VarnameBrightnessMax!="")
+	if (EvaluatedParameters.VarnameContrast != "" or EvaluatedParameters.VarnameContrastMin != "" or EvaluatedParameters.VarnameContrastMax != "")
 	{
-		result:=class_monitor.GetMonitorBrightness(MonitorNumber)
-		if (substr(result,1,1)="*")
+		; we need to get the screen contrast
+		result := class_monitor.GetMonitorContrast(EvaluatedParameters.MonitorNumber)
+		
+		; check for errors
+		if (substr(result, 1, 1) = "*")
 		{
-			x_finish(Environment, "exception", x_lang("Couldn't get screen setting: %1%",x_lang("Brightness")) ". " x_lang("Error code: %1%",result))
+			result := substr(result, 2)
+			x_finish(Environment, "exception", x_lang("Couldn't get screen setting: %1%", x_lang("Contrast")) ". " x_lang("Error code: %1% (%2%)", result, Format("0x{:X}", result)))
 			return
 		}
-		if (VarnameBrightness!="")
-			x_SetVariable(Environment,VarnameBrightness,result.Current)
-		if (VarnameBrightnessmin!="")
-			x_SetVariable(Environment,VarnameBrightnessMin,result.Minimum)
-		if (VarnameBrightnessmax!="")
-			x_SetVariable(Environment,VarnameBrightnessMax,result.Maximum)
+
+		; set output variables
+		if (EvaluatedParameters.VarnameContrast != "")
+			x_SetVariable(Environment, EvaluatedParameters.VarnameContrast, result.Current)
+		if (EvaluatedParameters.VarnameContrastmin != "")
+			x_SetVariable(Environment, EvaluatedParameters.VarnameContrastmin, result.Minimum)
+		if (EvaluatedParameters.VarnameContrastmax != "")
+			x_SetVariable(Environment, EvaluatedParameters.VarnameContrastmax, result.Maximum)
 	}
 	
-	if (VarnameContrast!="" or VarnameContrastMin!="" or VarnameContrastMax!="")
+	if (EvaluatedParameters.VarnameRedGain != "" or EvaluatedParameters.VarnameRedGainMin != "" or EvaluatedParameters.VarnameRedGainMax != "")
 	{
-		result:=class_monitor.GetMonitorContrast(MonitorNumber)
-		if (substr(result,1,1)="*")
+		; we need to get the red gain
+		result := class_monitor.GetMonitorRedGreenOrBlueGain(EvaluatedParameters.MonitorNumber, 0)
+
+		; check for errors
+		if (substr(result, 1, 1) = "*")
 		{
-			x_finish(Environment, "exception", x_lang("Couldn't get screen setting: %1%",x_lang("Contrast")) ". " x_lang("Error code: %1%",result))
-			
+			result := substr(result, 2)
+			x_finish(Environment, "exception", x_lang("Couldn't get screen setting: %1%", x_lang("Red gain")) ". " x_lang("Error code: %1% (%2%)", result, Format("0x{:X}", result)))
 			return
 		}
-		if (VarnameContrast!="")
-			x_SetVariable(Environment,VarnameContrast,result.Current)
-		if (VarnameContrastmin!="")
-			x_SetVariable(Environment,VarnameContrastmin,result.Minimum)
-		if (VarnameContrastmax!="")
-			x_SetVariable(Environment,VarnameContrastmax,result.Maximum)
+
+		; set output variables
+		if (EvaluatedParameters.VarnameRedGain != "")
+			x_SetVariable(Environment, EvaluatedParameters.VarnameRedGain, result.Current)
+		if (EvaluatedParameters.VarnameRedGainmin != "")
+			x_SetVariable(Environment, EvaluatedParameters.VarnameRedGainmin, result.Minimum)
+		if (EvaluatedParameters.VarnameRedGainmax != "")
+			x_SetVariable(Environment, EvaluatedParameters.VarnameRedGainmax, result.Maximum)
+	}
+	if (EvaluatedParameters.VarnameGreenGain != "" or EvaluatedParameters.VarnameGreenGainMin != "" or EvaluatedParameters.VarnameGreenGainMax != "")
+	{
+		; we need to get the green gain
+		result := class_monitor.GetMonitorRedGreenOrBlueGain(EvaluatedParameters.MonitorNumber, 1)
+
+		; check for errors
+		if (substr(result, 1, 1) = "*")
+		{
+			result := substr(result, 2)
+			x_finish(Environment, "exception", x_lang("Couldn't get screen setting: %1%", x_lang("Green gain")) ". " x_lang("Error code: %1% (%2%)", result, Format("0x{:X}", result)))
+			return
+		}
+
+		; set output variables
+		if (EvaluatedParameters.VarnameGreenGain != "")
+			x_SetVariable(Environment, EvaluatedParameters.VarnameGreenGain, result.Current)
+		if (EvaluatedParameters.VarnameGreenGainmin != "")
+			x_SetVariable(Environment, EvaluatedParameters.VarnameGreenGainmin, result.Minimum)
+		if (EvaluatedParameters.VarnameGreenGainmax != "")
+			x_SetVariable(Environment, EvaluatedParameters.VarnameGreenGainmax, result.Maximum)
+	}
+	if (VarnameBlueGain != "" or VarnameBlueGainMin != "" or VarnameBlueGainMax!="")
+	{
+		; we need to get the blue gain
+		result := class_monitor.GetMonitorRedGreenOrBlueGain(EvaluatedParameters.MonitorNumber, 2)
+
+		; check for errors
+		if (substr(result, 1, 1) = "*")
+		{
+			result := substr(result, 2)
+			x_finish(Environment, "exception", x_lang("Couldn't get screen setting: %1%", x_lang("Blue gain")) ". " x_lang("Error code: %1% (%2%)", result, Format("0x{:X}", result)))
+			return
+		}
+
+		; set output variables
+		if (EvaluatedParameters.VarnameBlueGain != "")
+			x_SetVariable(Environment, EvaluatedParameters.VarnameBlueGain, result.Current)
+		if (EvaluatedParameters.VarnameBlueGainmin != "")
+			x_SetVariable(Environment, EvaluatedParameters.VarnameBlueGainmin, result.Minimum)
+		if (EvaluatedParameters.VarnameBlueGainmax!="")
+			x_SetVariable(Environment, EvaluatedParameters.VarnameBlueGainmax, result.Maximum)
 	}
 	
-	if (VarnameRedGain!="" or VarnameRedGainMin!="" or VarnameRedGainMax!="")
+	if (EvaluatedParameters.VarnameRedDrive != "" or EvaluatedParameters.VarnameRedDriveMin != "" or EvaluatedParameters.VarnameRedDriveMax != "")
 	{
-		result:=class_monitor.GetMonitorRedGreenOrBlueGain(MonitorNumber,0)
-		if (substr(result,1,1)="*")
+		; we need to get the red drive
+		result := class_monitor.GetMonitorRedGreenOrBlueDrive(EvaluatedParameters.MonitorNumber, 0)
+
+		; check for errors
+		if (substr(result, 1, 1) = "*")
 		{
-			x_finish(Environment, "exception", x_lang("Couldn't get screen setting: %1%",x_lang("Red gain")) ". " x_lang("Error code: %1%",result))
+			result := substr(result, 2)
+			x_finish(Environment, "exception", x_lang("Couldn't get screen setting: %1%", x_lang("Red drive")) ". " x_lang("Error code: %1% (%2%)", result, Format("0x{:X}", result)))
 			return
 		}
-		if (VarnameRedGain!="")
-			x_SetVariable(Environment,VarnameRedGain,result.Current)
-		if (VarnameRedGainmin!="")
-			x_SetVariable(Environment,VarnameRedGainmin,result.Minimum)
-		if (VarnameRedGainmax!="")
-			x_SetVariable(Environment,VarnameRedGainmax,result.Maximum)
+
+		; set output variables
+		if (EvaluatedParameters.VarnameRedDrive != "")
+			x_SetVariable(Environment, EvaluatedParameters.VarnameRedDrive, result.Current)
+		if (EvaluatedParameters.VarnameRedDrivemin != "")
+			x_SetVariable(Environment, EvaluatedParameters.VarnameRedDrivemin, result.Minimum)
+		if (EvaluatedParameters.VarnameRedDrivemax != "")
+			x_SetVariable(Environment, EvaluatedParameters.VarnameRedDrivemax, result.Maximum)
 	}
-	if (VarnameGreenGain!="" or VarnameGreenGainMin!="" or VarnameGreenGainMax!="")
+	if (EvaluatedParameters.VarnameGreenDrive != "" or EvaluatedParameters.VarnameGreenDriveMin != "" or EvaluatedParameters.VarnameGreenDriveMax != "")
 	{
-		result:=class_monitor.GetMonitorRedGreenOrBlueGain(MonitorNumber,1)
-		if (substr(result,1,1)="*")
+		; we need to get the green drive
+		result := class_monitor.GetMonitorRedGreenOrBlueDrive(EvaluatedParameters.MonitorNumber, 1)
+
+		; check for errors
+		if (substr(result, 1, 1) = "*")
 		{
-			x_finish(Environment, "exception", x_lang("Couldn't get screen setting: %1%",x_lang("Green gain")) ". " x_lang("Error code: %1%",result))
+			result := substr(result, 2)
+			x_finish(Environment, "exception", x_lang("Couldn't get screen setting: %1%", x_lang("Green drive")) ". " x_lang("Error code: %1% (%2%)", result, Format("0x{:X}", result)))
 			return
 		}
-		if (VarnameGreenGain!="")
-			x_SetVariable(Environment,VarnameGreenGain,result.Current)
-		if (VarnameGreenGainmin!="")
-			x_SetVariable(Environment,VarnameGreenGainmin,result.Minimum)
-		if (VarnameGreenGainmax!="")
-			x_SetVariable(Environment,VarnameGreenGainmax,result.Maximum)
+
+		; set output variables
+		if (EvaluatedParameters.VarnameGreenDrive != "")
+			x_SetVariable(Environment, EvaluatedParameters.VarnameGreenDrive, result.Current)
+		if (EvaluatedParameters.VarnameGreenDrivemin != "")
+			x_SetVariable(Environment, EvaluatedParameters.VarnameGreenDrivemin, result.Minimum)
+		if (EvaluatedParameters.VarnameGreenDrivemax != "")
+			x_SetVariable(Environment, EvaluatedParameters.VarnameGreenDrivemax, result.Maximum)
 	}
-	if (VarnameBlueGain!="" or VarnameBlueGainMin!="" or VarnameBlueGainMax!="")
+	if (EvaluatedParameters.VarnameBlueDrive != "" or EvaluatedParameters.VarnameBlueDriveMin != "" or EvaluatedParameters.VarnameBlueDriveMax != "")
 	{
-		result:=class_monitor.GetMonitorRedGreenOrBlueGain(MonitorNumber,2)
-		if (substr(result,1,1)="*")
+		; we need to get the blue drive
+		result := class_monitor.GetMonitorRedGreenOrBlueDrive(EvaluatedParameters.MonitorNumber, 2)
+
+		; check for errors
+		if (substr(result, 1, 1) = "*")
 		{
-			x_finish(Environment, "exception", x_lang("Couldn't get screen setting: %1%",x_lang("Blue gain")) ". " x_lang("Error code: %1%",result))
+			result := substr(result, 2)
+			x_finish(Environment, "exception", x_lang("Couldn't get screen setting: %1%", x_lang("Blue drive")) ". " x_lang("Error code: %1% (%2%)", result, Format("0x{:X}", result)))
 			return
 		}
-		if (VarnameBlueGain!="")
-			x_SetVariable(Environment,VarnameBlueGain,result.Current)
-		if (VarnameBlueGainmin!="")
-			x_SetVariable(Environment,VarnameBlueGainmin,result.Minimum)
-		if (VarnameBlueGainmax!="")
-			x_SetVariable(Environment,VarnameBlueGainmax,result.Maximum)
-	}
-	
-	if (VarnameRedDrive!="" or VarnameRedDriveMin!="" or VarnameRedDriveMax!="")
-	{
-		result:=class_monitor.GetMonitorRedGreenOrBlueDrive(MonitorNumber,0)
-		if (substr(result,1,1)="*")
-		{
-			x_finish(Environment, "exception", x_lang("Couldn't get screen setting: %1%",x_lang("Red drive")) ". " x_lang("Error code: %1%",result))
-			return
-		}
-		if (VarnameRedDrive!="")
-			x_SetVariable(Environment,VarnameRedDrive,result.Current)
-		if (VarnameRedDrivemin!="")
-			x_SetVariable(Environment,VarnameRedDrivemin,result.Minimum)
-		if (VarnameRedDrivemax!="")
-			x_SetVariable(Environment,VarnameRedDrivemax,result.Maximum)
-	}
-	if (VarnameGreenDrive!="" or VarnameGreenDriveMin!="" or VarnameGreenDriveMax!="")
-	{
-		result:=class_monitor.GetMonitorRedGreenOrBlueDrive(MonitorNumber,1)
-		if (substr(result,1,1)="*")
-		{
-			x_finish(Environment, "exception", x_lang("Couldn't get screen setting: %1%",x_lang("Green drive")) ". " x_lang("Error code: %1%",result))
-			return
-		}
-		if (VarnameGreenDrive!="")
-			x_SetVariable(Environment,VarnameGreenDrive,result.Current)
-		if (VarnameGreenDrivemin!="")
-			x_SetVariable(Environment,VarnameGreenDrivemin,result.Minimum)
-		if (VarnameGreenDrivemax!="")
-			x_SetVariable(Environment,VarnameGreenDrivemax,result.Maximum)
-	}
-	if (VarnameBlueDrive!="" or VarnameBlueDriveMin!="" or VarnameBlueDriveMax!="")
-	{
-		result:=class_monitor.GetMonitorRedGreenOrBlueDrive(MonitorNumber,2)
-		if (substr(result,1,1)="*")
-		{
-			x_finish(Environment, "exception", x_lang("Couldn't get screen setting: %1%",x_lang("Blue drive")) ". " x_lang("Error code: %1%",result))
-			return
-		}
-		if (VarnameBlueDrive!="")
-			x_SetVariable(Environment,VarnameBlueDrive,result.Current)
-		if (VarnameBlueDrivemin!="")
-			x_SetVariable(Environment,VarnameBlueDrivemin,result.Minimum)
-		if (VarnameBlueDrivemax!="")
-			x_SetVariable(Environment,VarnameBlueDrivemax,result.Maximum)
+
+		; set output variables
+		if (EvaluatedParameters.VarnameBlueDrive != "")
+			x_SetVariable(Environment, EvaluatedParameters.VarnameBlueDrive, result.Current)
+		if (EvaluatedParameters.VarnameBlueDrivemin != "")
+			x_SetVariable(Environment, EvaluatedParameters.VarnameBlueDrivemin, result.Minimum)
+		if (EvaluatedParameters.VarnameBlueDrivemax != "")
+			x_SetVariable(Environment, EvaluatedParameters.VarnameBlueDrivemax, result.Maximum)
 	}
 	
-	if (VarnameColorTemperature!="")
+	if (EvaluatedParameters.VarnameColorTemperature != "")
 	{
-		result:=class_monitor.GetMonitorColorTemperature(MonitorNumber)
-		if (substr(result,1,1)="*")
+		; we need to get the color temperature
+		result := class_monitor.GetMonitorColorTemperature(EvaluatedParameters.MonitorNumber)
+
+		; check for errors
+		if (substr(result, 1, 1) = "*")
 		{
-			x_finish(Environment, "exception", x_lang("Couldn't get screen setting: %1%",x_lang("Color temperature")) ". " x_lang("Error code: %1%",result))
+			result := substr(result, 2)
+			x_finish(Environment, "exception", x_lang("Couldn't get screen setting: %1%",x_lang("Color temperature")) ". " x_lang("Error code: %1% (%2%)", result, Format("0x{:X}", result)))
 			return
 		}
-			x_SetVariable(Environment,VarnameColorTemperature,result)
+
+		; set output variable
+		x_SetVariable(Environment, EvaluatedParameters.VarnameColorTemperature, result)
 	}
 	
 	x_finish(Environment,"normal")

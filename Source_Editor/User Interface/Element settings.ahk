@@ -840,7 +840,7 @@ class ElementSettings
 			This.warningText := ""
 			if (this.enabled)
 			{
-				if (tempRadioVal = "expression" or tempRadioVal = "number")
+				if (tempRadioVal = "expression" or tempRadioVal = "number" or tempRadioVal = "positiveNumber" or tempRadioVal = "integer" or tempRadioVal = "positiveInteger" or tempRadioVal = "positiveIntegerOrZero")
 				{
 					;The content is an expression.
 					for oneindex, oneparamID in this.parameter.id
@@ -944,7 +944,23 @@ class ElementSettings
 			}
 			if (tempRadioVal = "Number")
 			{
-				ToolTip, % lang("This field contains an expression which must result to a number") "`n" lang("Examples") ":`n5`n5+3*6`nA_ScreenWidth" ,,, 11
+				ToolTip, % lang("This field contains an expression which must result to a number") "`n" lang("Examples") ":`n1.2345`n-5.6`n5+3*6`nA_ScreenWidth" ,,, 11
+			}
+			if (tempRadioVal = "PositiveNumber")
+			{
+				ToolTip, % lang("This field contains an expression which must result to a positive number (at least 0.0)") "`n" lang("Examples") ":`n1.2345`n5.6`n5+3*6`nA_ScreenWidth" ,,, 11
+			}
+			if (tempRadioVal = "Integer")
+			{
+				ToolTip, % lang("This field contains an expression which must result to an integer") "`n" lang("Examples") ":`n5`n-5`n5+3*6`nA_ScreenWidth" ,,, 11
+			}
+			if (tempRadioVal = "PositiveInteger")
+			{
+				ToolTip, % lang("This field contains an expression which must result to an positive integer (at least 1)") "`n" lang("Examples") ":`n5`n5+3*6`nA_ScreenWidth" ,,, 11
+			}
+			if (tempRadioVal = "positiveIntegerOrZero")
+			{
+				ToolTip, % lang("This field contains an expression which must result to an positive integer or Zero") "`n" lang("Examples") ":`n5`n0`n5+3*6`nA_ScreenWidth" ,,, 11
 			}
 			if (tempRadioVal = "String")
 			{
@@ -986,7 +1002,7 @@ class ElementSettings
 			{
 				guicontrol, GUISettingsOfElement:,GUISettingsOfElementInfoIconOf%tempFirstParamID%, %_ScriptDir%\Icons\String.ico
 			}
-			else if (tempRadioVal = "expression" or tempRadioVal = "number") 
+			else if (tempRadioVal = "expression" or tempRadioVal = "number" or tempRadioVal = "positiveNumber" or tempRadioVal = "integer" or tempRadioVal = "positiveInteger" or tempRadioVal = "positiveIntegerOrZero") 
 			{
 				guicontrol, GUISettingsOfElement:, GUISettingsOfElementInfoIconOf%tempFirstParamID%, %_ScriptDir%\Icons\Expression.ico
 			}
@@ -1423,7 +1439,7 @@ class ElementSettings
 				this.components.push("GUISettingsOfElement" tempOneParameterID)
 				ElementSettings.fieldHWNDs[tempHWND] := this
 				
-				if (parameter.id.MaxIndex() = 1 and not parameter.contentID and parameter.content[1] = "expression")
+				if (parameter.id.MaxIndex() = 1 and not parameter.contentID and (parameter.content[1] = "expression" or parameter.content[1] = "number" or parameter.content[1] = "positiveNumber" or parameter.content[1] = "integer" or parameter.content[1] = "positiveInteger" or parameter.content[1] = "positiveIntegerOrZero"))
 				{
 					;If we have a single expression, it may have some arrow keys
 					if (parameter.useupdown)

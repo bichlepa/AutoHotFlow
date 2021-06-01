@@ -56,15 +56,20 @@ Element_getParametrizationDetails_Action_Get_Pixel_Color(Environment)
 	parametersToEdit.push({type: "Label", label: x_lang("Output variables")})
 	parametersToEdit.push({type: "Checkbox", id: "OutputRGB", default: 1, label: x_lang("Write RGB value in output variable")})
 	parametersToEdit.push({type: "Checkbox", id: "OutputSeparate", default: 0, label: x_lang("Write each color in separate variable")})
+	
 	parametersToEdit.push({type: "Label", label: x_lang("RGB value"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: "varnameRGB", default: "ColorRBG", content: "VariableName", WarnIfEmpty: true})
+	
 	parametersToEdit.push({type: "Label", label: x_lang("Red, green, blue"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: ["varnameR", "varnameG", "varnameB"], default: ["ColorRed", "ColorBlue", "ColorGreen"], content: "VariableName", WarnIfEmpty: true})
+	
 	parametersToEdit.push({type: "Label", label: x_lang("Position")})
 	parametersToEdit.push({type: "Radio", id: "CoordMode", default: 1, result: "enum", choices: [x_lang("Relative to screen"), x_lang("Relative to active window position"), x_lang("Relative to active window client position")], enum: ["Screen", "Window", "Client"]})
+	
 	parametersToEdit.push({type: "Label", label: "x, y", size: "small"})
 	parametersToEdit.push({type: "Edit", id: ["Xpos", "Ypos"], default: [10, 20], content: "Expression", WarnIfEmpty: true})
 	parametersToEdit.push({type: "button", id: "MouseTracker", goto: "Action_Get_Pixel_Color_MouseTracker", label: x_lang("Get coordinates")})
+	
 	parametersToEdit.push({type: "Label", label: x_lang("Method")})
 	parametersToEdit.push({type: "Radio", id: "Method", default: 1, choices: [x_lang("Default method"), x_lang("Alternative method"), x_lang("Slow method")], enum: ["Default", "Alt", "Slow"]})
 	
@@ -96,64 +101,39 @@ Element_CheckSettings_Action_Get_Pixel_Color(Environment, ElementParameters, sta
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Get_Pixel_Color(Environment, ElementParameters)
 {
-	
-	OutputRGB:=ElementParameters.OutputRGB
-	if (OutputRGB)
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters, ["varnameRGB", "varnameR", "varnameG", "varnameB"])
+	if (EvaluatedParameters._error)
 	{
-		varnameRGB := x_replaceVariables(Environment, ElementParameters.varnameRGB)
-		if not x_CheckVariableName(varnameRGB)
-		{
-			;On error, finish with exception and return
-			x_finish(Environment, "exception", x_lang("%1% is not valid", x_lang("Ouput variable name '%1%'", varnameRGB)))
-			return
-		}
-	}
-	OutputSeparate:=ElementParameters.OutputSeparate
-	if (OutputSeparate)
-	{
-		varnameR := x_replaceVariables(Environment, ElementParameters.varnameR)
-		if not x_CheckVariableName(varnameR)
-		{
-			;On error, finish with exception and return
-			x_finish(Environment, "exception", x_lang("%1% is not valid", x_lang("Ouput variable name '%1%'", varnameR)))
-			return
-		}
-		varnameG := x_replaceVariables(Environment, ElementParameters.varnameG)
-		if not x_CheckVariableName(varnameG)
-		{
-			;On error, finish with exception and return
-			x_finish(Environment, "exception", x_lang("%1% is not valid", x_lang("Ouput variable name '%1%'", varnameG)))
-			return
-		}
-		varnameB := x_replaceVariables(Environment, ElementParameters.varnameB)
-		if not x_CheckVariableName(varnameB)
-		{
-			;On error, finish with exception and return
-			x_finish(Environment, "exception", x_lang("%1% is not valid", x_lang("Ouput variable name '%1%'", varnameB)))
-			return
-		}
-	}
-	
-	CoordModeValue := ElementParameters.CoordMode
-	Method := ElementParameters.Method
-	
-	evRes := x_evaluateExpression(Environment,ElementParameters.Xpos)
-	if (evRes.error)
-	{
-		;On error, finish with exception and return
-		x_finish(Environment, "exception", x_lang("An error occured while parsing expression '%1%'", ElementParameters.Xpos) "`n`n" evRes.error) 
+		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
-	Xpos:=evRes.result
-	evRes := x_evaluateExpression(Environment,ElementParameters.Ypos)
-	if (evRes.error)
+
+	if (EvaluatedParameters.OutputRGB)
 	{
-		;On error, finish with exception and return
-		x_finish(Environment, "exception", x_lang("An error occured while parsing expression '%1%'", ElementParameters.Ypos) "`n`n" evRes.error) 
-		return
+		; evaluate additional parameters
+		x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["varnameRGB"])
+		if (EvaluatedParameters._error)
+		{
+			x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
+			return
+		}
 	}
-	Ypos:=evRes.result
+
+	if (EvaluatedParameters.OutputSeparate)
+	{
+		; evaluate additional parameters
+		x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["varnameR", "varnameG", "varnameB"])
+		if (EvaluatedParameters._error)
+		{
+			x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
+			return
+		}
+	}
 	
+	; check whether we got numbers
+	Xpos := EvaluatedParameters.Xpos
+	Ypos := EvaluatedParameters.Ypos
 	if Xpos is not number
 	{
 		x_finish(Environment, "exception", x_lang("%1% is not a number.",x_lang("X position"))) 
@@ -165,34 +145,53 @@ Element_run_Action_Get_Pixel_Color(Environment, ElementParameters)
 		return
 	}
 	
-	CoordMode, Pixel, %CoordModeValue%
-	if (method = "default")
-		method:=""
+	; set coord mode
+	CoordMode, Pixel, % EvaluatedParameters.CoordMode
+
+	; prepare method parameter for PixelGetColor call
+	if (EvaluatedParameters.method = "default")
+	{
+		method := ""
+	}
+	Else
+	{
+		method := EvaluatedParameters.method
+	}
 	
-	PixelGetColor,tempcolor,%Xpos%,%Ypos%,RGB %Method%
+	; get pixel color
+	PixelGetColor, pixelColor, %Xpos%, %Ypos%, RGB %method%
 	
+	; check for errors
 	if ErrorLevel
 	{
-		;On error, finish with exception and return
 		x_finish(Environment, "exception", x_lang("Could not get pixel color from coordinates x%1% y%2%.", Xpos, Ypos)) 
 		return
 	}
 	
-	if OutputRGB
+	if (EvaluatedParameters.OutputRGB)
 	{
-		x_SetVariable(Environment,varnameRGB,tempcolor)
+		; set output variable which contains all colors
+		x_SetVariable(Environment, EvaluatedParameters.varnameRGB, pixelColor)
 	}
-	if OutputSeparate
+	if (EvaluatedParameters.OutputSeparate)
 	{
-		temp:=SubStr(tempcolor,1,4)
-		temp+=0
-		x_SetVariable(Environment,varnameR,temp)
-		temp:=("0x" SubStr(tempcolor,5,2))
-		temp+=0
-		x_SetVariable(Environment,varnameG,temp)
-		temp:=("0x" SubStr(tempcolor,7,2))
-		temp+=0
-		x_SetVariable(Environment,varnameB,temp)
+		; set output variable which contains each color
+		
+		; get first color (wich starts with "0x")
+		temp := SubStr(pixelColor, 1, 4)
+		; convert hexadecimal value to decimal value
+		temp += 0
+		; set output variable
+		x_SetVariable(Environment, EvaluatedParameters.varnameR, temp)
+		
+		; repeat with the remaining colors. This time we will need to add the "0x" to make sure that AHK interprets it as Hexadecimal number.
+		temp := ("0x" SubStr(pixelColor, 5, 2))
+		temp += 0
+		x_SetVariable(Environment, EvaluatedParameters.varnameG, temp)
+
+		temp := ("0x" SubStr(pixelColor, 7, 2))
+		temp += 0
+		x_SetVariable(Environment, EvaluatedParameters.varnameB, temp)
 	}
 	
 	x_finish(Environment,"normal")

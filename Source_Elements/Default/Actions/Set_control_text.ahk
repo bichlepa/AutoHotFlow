@@ -57,8 +57,10 @@ Element_getParametrizationDetails_Action_Set_control_text(Environment)
 	parametersToEdit.push({type: "Edit", id: "Text", content: "String"})
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Control_Identification")})
+	
 	parametersToEdit.push({type: "Label", label: x_lang("Method_for_control_Identification"), size: "small"})
 	parametersToEdit.push({type: "Radio", id: "IdentifyControlBy", result: "enum", default: 2, choices: [x_lang("Text_in_control"), x_lang("Classname and instance number of the control"), x_lang("Unique control ID")], enum: ["Text", "Class", "ID"]})
+	
 	parametersToEdit.push({type: "Label", label: x_lang("Control_Identification"), size: "small"})
 	parametersToEdit.push({type: "Radio", id: "ControlTextMatchMode", default: 2, choices: [x_lang("Start_with"), x_lang("Contain_anywhere"), x_lang("Exactly")]})
 	parametersToEdit.push({type: "Edit", id: "Control_identifier", content: "String", WarnIfEmpty: true})
@@ -75,7 +77,7 @@ Element_GenerateName_Action_Set_control_text(Environment, ElementParameters)
 	; generate window identification name
 	nameString := windowFunctions_generateWindowIdentificationName(ElementParameters)
 	
-	return x_lang("Set_control_text") ": " nameString
+	return x_lang("Set_control_text") ": " ElementParameters.Control_identifier " - " ElementParameters.Text " - " nameString
 }
 
 ;Called every time the user changes any parameter.
@@ -116,30 +118,26 @@ Element_run_Action_Set_control_text(Environment, ElementParameters)
 		return
 	}
 	
-	if not windowID
-	{
-		x_finish(Environment, "exception", x_lang("Error! Seeked window does not exist")) 
-		return
-	}
+	; get control HWND
+	SetTitleMatchMode, % EvaluatedParameters.ControlTextMatchMode
+	controlget, controlID, hwnd,, % EvaluatedParameters.Control_identifier, ahk_id %windowID%
 	
-	SetTitleMatchMode,% EvaluatedParameters.ControlTextMatchMode
-	controlget,tempControlID,hwnd,,% Control_identifier,ahk_id %windowID%
-	if not tempControlID
+	; check whether we found the control
+	if not controlID
 	{
 		x_finish(Environment, "exception", x_lang("Error! Seeked control does not exist in the specified windows")) 
 		return
 	}
 	
-	ControlSetText,,% EvaluatedParameters.text,ahk_id %tempControlID%
+	; set control text
+	ControlSetText,,%  EvaluatedParameters.text, ahk_id %controlID%
 	
-	x_SetVariable(Environment,"A_WindowID",windowID,"Thread")
-	x_SetVariable(Environment,"A_ControlID",tempControlID,"Thread")
-	
-	
+	; set window ID and control ID as thread variables
+	x_SetVariable(Environment, "A_WindowID", windowID, "Thread")
+	x_SetVariable(Environment, "A_ControlID", controlID, "Thread")
 	
 	x_finish(Environment, "normal")
-	
-	
+	return
 }
 
 

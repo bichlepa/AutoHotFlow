@@ -57,8 +57,10 @@ Element_getParametrizationDetails_Action_Get_Control_Text(Environment)
 	parametersToEdit.push({type: "Edit", id: "Varname", default: "ControlText", content: "VariableName"})
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Control_Identification")})
+
 	parametersToEdit.push({type: "Label", label: x_lang("Method_for_control_Identification"), size: "small"})
-	parametersToEdit.push({type: "Radio", id: "IdentifyControlBy", result: "enum", default: 2, choices: [x_lang("Text_in_control"), x_lang("Classname and instance number of the control"), x_lang("Unique control ID")], enum: ["Text", "Class", "ID"]})
+	parametersToEdit.push({type: "Radio", id: "IdentifyControlBy", result: "enum", default: "Class", choices: [x_lang("Text_in_control"), x_lang("Classname and instance number of the control"), x_lang("Unique control ID")], enum: ["Text", "Class", "ID"]})
+	
 	parametersToEdit.push({type: "Label", label: x_lang("Control_Identification"), size: "small"})
 	parametersToEdit.push({type: "Radio", id: "ControlTextMatchMode", default: 2, choices: [x_lang("Start_with"), x_lang("Contain_anywhere"), x_lang("Exactly")]})
 	parametersToEdit.push({type: "Edit", id: "Control_identifier", content: "String", WarnIfEmpty: true})
@@ -75,7 +77,7 @@ Element_GenerateName_Action_Get_Control_Text(Environment, ElementParameters)
 	; generate window identification name
 	nameString := windowFunctions_generateWindowIdentificationName(ElementParameters)
 	
-	return x_lang("Get_Control_Text") ": " nameString
+	return x_lang("Get_Control_Text") ": " ElementParameters.Control_identifier " - " nameString
 }
 
 ;Called every time the user changes any parameter.
@@ -92,82 +94,53 @@ Element_CheckSettings_Action_Get_Control_Text(Environment, ElementParameters, st
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Get_Control_Text(Environment, ElementParameters)
 {
-	Varname := x_replaceVariables(Environment, ElementParameters.Varname)
-	if not x_CheckVariableName(Varname)
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
+	if (EvaluatedParameters._error)
 	{
-		;On error, finish with exception and return
-		x_finish(Environment, "exception", x_lang("%1% is not valid", x_lang("Ouput variable name '%1%'", Varname)))
+		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
 
-	IdentifyControlBy := ElementParameters.IdentifyControlBy
-	ControlTextMatchMode := ElementParameters.ControlTextMatchMode
-
-	Control_identifier := x_replaceVariables(Environment,ElementParameters.Control_identifier)
-
-	tempWinTitle:=x_replaceVariables(Environment, ElementParameters.Wintitle) 
-	tempWinText:=x_replaceVariables(Environment, ElementParameters.winText)
-	tempExcludeTitle:=EvaluatedParameters.ExcludeTitle
-	tempExcludeText:=EvaluatedParameters.ExcludeText
-	tempTitleMatchMode :=ElementParameters.TitleMatchMode
-	tempahk_class:=x_replaceVariables(Environment, ElementParameters.ahk_class)
-	tempahk_exe:=x_replaceVariables(Environment, ElementParameters.ahk_exe)
-	tempahk_id:=x_replaceVariables(Environment, ElementParameters.ahk_id)
-	tempahk_pid:=x_replaceVariables(Environment, ElementParameters.ahk_pid)
-	
-	tempwinstring:=tempWinTitle
-	if tempahk_class
-		tempwinstring:=tempwinstring " ahk_class " tempahk_class
-	if tempahk_id
-		tempwinstring:=tempwinstring " ahk_id " tempahk_id
-	if tempahk_pid
-		tempwinstring:=tempwinstring " ahk_pid " tempahk_pid
-	if tempahk_exe
-		tempwinstring:=tempwinstring " ahk_exe " tempahk_exe
-	
-	;If no window specified, error
-	if (tempwinstring="" and tempWinText="")
+	; evaluate window parameters
+	EvaluatedWindowParameters := windowFunctions_evaluateWindowParameters(EvaluatedParameters)
+	if (EvaluatedWindowParameters.exception)
 	{
-		x_enabled(Environment, "exception", x_lang("No window specified"))
+		x_finish(Environment, "exception", EvaluatedWindowParameters.exception)
+		return
+	}
+
+	; get window ID
+	windowID := windowFunctions_getWindowID(EvaluatedWindowParameters)
+	if (windowID.exception)
+	{
+		x_finish(Environment, "exception", windowID.exception)
 		return
 	}
 	
-	if ElementParameters.findhiddenwindow=0
-		tempFindHiddenWindows = off
-	else
-		tempFindHiddenWindows = on
-	if ElementParameters.findhiddentext=0
-		tempfindhiddentext = off
-	else
-		tempfindhiddentext = on
-	
-	SetTitleMatchMode,%tempTitleMatchMode%
-	DetectHiddenWindows,%tempFindHiddenWindows%
-	DetectHiddenText,%tempfindhiddentext%
-	
-	tempWinid:=winexist(tempwinstring,tempWinText,tempExcludeTitle,tempExcludeText) ;Example code. Remove it
-	if not tempWinid
-	{
-		x_finish(Environment, "exception", x_lang("Error! Seeked window does not exist")) 
-		return
-	}
-	
-	SetTitleMatchMode,%ControlTextMatchMode%
-	controlget,tempControlID,hwnd,,% Control_identifier,ahk_id %tempWinid%
-	if not tempControlID
+	; get control HWND
+	SetTitleMatchMode, % EvaluatedParameters.ControlTextMatchMode
+	controlget, controlID, hwnd,, % EvaluatedParameters.Control_identifier, ahk_id %windowID%
+
+	; check whether we found the control
+	if not controlID
 	{
 		x_finish(Environment, "exception", x_lang("Error! Seeked control does not exist in the specified windows")) 
 		return
 	}
-	ControlGetText,tempText,,ahk_id %tempControlID%
+
+	; get control text
+	ControlGetText, controlText,, ahk_id %controlID%
 	
-	x_SetVariable(Environment,Varname,tempText)
-	x_SetVariable(Environment,"A_WindowID",tempWinid,"Thread")
-	x_SetVariable(Environment,"A_ControlID",tempControlID,"Thread")
+	; set output variable
+	x_SetVariable(Environment, EvaluatedWindowParameters.Varname, controlText)
+
+	; set window ID and control ID as thread variables
+	x_SetVariable(Environment, "A_WindowID", windowID, "Thread")
+	x_SetVariable(Environment, "A_ControlID", controlID, "Thread")
 	
 	x_finish(Environment, "normal")
 	return
-	
 }
 
 ;Called when the execution of the element should be stopped.

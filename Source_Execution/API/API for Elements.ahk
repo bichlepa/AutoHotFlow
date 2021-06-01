@@ -251,7 +251,7 @@ x_AutoEvaluateOneParameter(EvaluatedParameters, Environment, ElementParameters, 
 			}
 			EvaluatedParameters[oneParID] := result
 		}
-		else if (oneParContent = "expression" or oneParContent = "number")
+		else if (oneParContent = "expression" or oneParContent = "number" or oneParContent = "positiveNumber" or oneParContent = "integer" or oneParContent = "positiveInteger" or oneParContent = "positiveIntegerOrZero")
 		{
 			; content type is "expression" or "number". We will evaluate the expression
 			evRes := x_evaluateExpression(Environment,ElementParameters[oneParID])
@@ -270,7 +270,7 @@ x_AutoEvaluateOneParameter(EvaluatedParameters, Environment, ElementParameters, 
 					EvaluatedParameters._errorMessage := lang("Result of expression '%1%' is empty", ElementParameters[oneParID])
 				}
 			}
-			if (oneParContent = "number")
+			if (oneParContent = "number" or oneParContent = "positiveNumber")
 			{
 				; if parameter type is "number", check whether the value is a number
 				temp := evRes.result
@@ -281,18 +281,59 @@ x_AutoEvaluateOneParameter(EvaluatedParameters, Environment, ElementParameters, 
 					EvaluatedParameters._errorMessage := lang("Result of expression '%1%' is not a number", ElementParameters[oneParID])
 				}
 			}
+			if (oneParContent = "integer" or oneParContent = "positiveInteger" or oneParContent = "positiveIntegerOrZero")
+			{
+				; if parameter type is "number", check whether the value is a number
+				temp := evRes.result
+				if temp is not integer
+				{
+					; the value is not a number, add a warning
+					EvaluatedParameters._error := true
+					EvaluatedParameters._errorMessage := lang("Result of expression '%1%' is not an integer", ElementParameters[oneParID])
+				}
+			}
+			if (oneParContent = "positiveInteger")
+			{
+				; if parameter type is "number", check whether the value is a number
+				temp := evRes.result
+				if (not temp >= 1)
+				{
+					; the value is not a number, add a warning
+					EvaluatedParameters._error := true
+					EvaluatedParameters._errorMessage := lang("Result of expression '%1%' is not a positive number", ElementParameters[oneParID])
+				}
+			}
+			if (oneParContent = "positiveIntegerOrZero" or oneParContent = "positiveNumber")
+			{
+				; if parameter type is "number", check whether the value is a number
+				temp := evRes.result
+				if (not temp >= 0)
+				{
+					; the value is not a number, add a warning
+					EvaluatedParameters._error := true
+					EvaluatedParameters._errorMessage := lang("Result of expression '%1%' is not a positive number or zero", ElementParameters[oneParID])
+				}
+			}
 			EvaluatedParameters[oneParID] := evRes.result
 		}
 		else if (oneParContent = "VariableName")
 		{
 			; content type is "VariableName". Replace variables encased by percent signs in string (if any) to allow 
 			result := x_replaceVariables(Environment, ElementParameters[oneParID])
-			; check the variable name, whether it is a valid name and is not empty
-			if not x_CheckVariableName(result)
+
+			if (not onePar.WarnIfEmpty and result = "")
 			{
-				; variable is invalid. add a warning
-				EvaluatedParameters._error := true
-				EvaluatedParameters._errorMessage := lang("%1% is not valid", lang("Variable name '%1%'", result))
+				; do not check if it is allowed that the variable name is empty
+			}
+			else
+			{
+				; check the variable name, whether it is a valid name and is not empty
+				if not x_CheckVariableName(result)
+				{
+					; variable is invalid. add a warning
+					EvaluatedParameters._error := true
+					EvaluatedParameters._errorMessage := lang("%1% is not valid", lang("Variable name '%1%'", result))
+				}
 			}
 			EvaluatedParameters[oneParID] := result
 		}
