@@ -55,34 +55,35 @@ Element_getParametrizationDetails_Action_Message_Box(Environment)
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Title")})
 	parametersToEdit.push({type: "Edit", id: "title", default: x_lang("Title"), content: "String"})
+	
 	parametersToEdit.push({type: "Label", label: x_lang("Message")})
 	parametersToEdit.push({type: "Edit", id: "message", default: x_lang("Message"), content: "String", multiline: true})
+	
 	parametersToEdit.push({type: "Label", label: x_lang("Button Text")})
 	parametersToEdit.push({type: "Edit", id: "ButtonLabel", default: x_lang("OK"), content: "String", WarnIfEmpty: true })
+	
 	parametersToEdit.push({type: "Label", label: x_lang("Timeout")})
-	parametersToEdit.push({type: "Radio", id: "IsTimeout", default: 1, result: "enum", choices: [x_lang("No timeout"), x_lang("Define timeout")], enum: ["NoTimeout", "Timeout"]})
-	parametersToEdit.push({type: "Edit", id: "TimeoutUnits", default: 10, content: "Expression", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Radio", id: "IsTimeout", default: "NoTimeout", result: "enum", choices: [x_lang("No timeout"), x_lang("Define timeout")], enum: ["NoTimeout", "Timeout"]})
+	parametersToEdit.push({type: "Edit", id: "TimeoutUnits", default: 10, content: "PositiveNumber", WarnIfEmpty: true})
 	parametersToEdit.push({type: "Radio", id: "Unit", default: "Seconds", result: "enum", choices: [x_lang("Seconds"), x_lang("Minutes"), x_lang("Hours")], enum: ["Seconds", "Minutes", "Hours"]})
+	
 	parametersToEdit.push({type: "Label", label: x_lang("Result on timeout"), size: "small"})
 	parametersToEdit.push({type: "Radio", id: "OnTimeout", default: "Normal", result: "enum", choices: [x_lang("Normal") " - " x_lang("Make output variable empty"), x_lang("Throw exception")], enum: ["Normal", "Exception"]})
 	
-	;~ parametersToEdit.push({type: "Label", label: x_lang("Position")}) ;TODO
-	;~ parametersToEdit.push({type: "Radio", id: "Position", default: 1, choices: [x_lang("In the middle of screen"), x_lang("Beneath current mouse position"), x_lang("Define coordinates")]})
-	;~ parametersToEdit.push({type: "Label", label: x_lang("Coordinates") " (x,y)", size: "small"})
-	;~ parametersToEdit.push({type: "Edit", id: ["Xpos", "Ypos"], default: ["A_ScreenWidth/2", "A_ScreenHeight/2"]})
-	;~ parametersToEdit.push({type: "button", id: "MouseTracker", goto: "ActionMove_WindowMouseTracker", label: x_lang("Get coordinates")})
 	parametersToEdit.push({type: "Label", label: x_lang("Width and height")})
-	;~ parametersToEdit.push({type: "Radio", id: "Size", default: 1, choices: [x_lang("Automatic"), x_lang("Define width and height"), result: "enum", enum: ["automatic", "predefined"]]})
-	;~ parametersToEdit.push({type: "Label", label: x_lang("Width, height"), size: "small"})
-	parametersToEdit.push({type: "Edit", id: ["Width", "Height"], default: [300, 200], content: "Expression", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Edit", id: ["Width", "Height"], default: [300, 200], content: "PositiveNumber", WarnIfEmpty: true})
+	
 	parametersToEdit.push({type: "Label", label: x_lang("Cancelling")})
 	parametersToEdit.push({type: "Checkbox", id: "ShowCancelButton", default: 0, label: x_lang("Show cancel button")})
+	
 	parametersToEdit.push({type: "Label", label: x_lang("Button text"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: "ButtonLabelCancel", default: x_lang("Cancel"), content: "String", WarnIfEmpty: true })
+	
 	parametersToEdit.push({type: "Label", label: x_lang("Result if cancelled"), size: "small"})
-	parametersToEdit.push({type: "Radio", id: "IfDismiss", default: 1, result: "enum", choices: [x_lang("Normal"), x_lang("Throw exception")], enum: ["Normal", "Exception"]})
+	parametersToEdit.push({type: "Radio", id: "IfDismiss", default: "Exception", result: "enum", choices: [x_lang("Normal"), x_lang("Throw exception")], enum: ["Normal", "Exception"]})
+	
 	parametersToEdit.push({type: "Label", label: x_lang("Result if closed"), size: "small"})
-	parametersToEdit.push({type: "Radio", id: "IfClose", default: 1, result: "enum", choices: [x_lang("Normal"), x_lang("Throw exception")], enum: ["Normal", "Exception"]})
+	parametersToEdit.push({type: "Radio", id: "IfClose", default: "Exception", result: "enum", choices: [x_lang("Normal"), x_lang("Throw exception")], enum: ["Normal", "Exception"]})
 	
 	
 	return parametersToEdit
@@ -130,29 +131,19 @@ Element_CheckSettings_Action_Message_Box(Environment, ElementParameters, staticV
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Message_Box(Environment, ElementParameters)
 {
-	EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters)
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
 	if (EvaluatedParameters._error)
 	{
 		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
 	
-	width:=EvaluatedParameters.width
-	height:=EvaluatedParameters.height
-	
-	if width is not number
-	{
-		x_finish(Environment, "exception", x_lang("%1% is not a number.",x_lang("Width '%1%'",width))) 
-		return
-	}
-	if height is not number
-	{
-		x_finish(Environment, "exception", x_lang("%1% is not a number.",x_lang("Height '%1%'",height))) 
-		return
-	}
-
 	if (EvaluatedParameters.isTimeout = "Timeout")
 	{
+		; timeout is enabled.
+		
+		; Evaluate additional parameters
 		x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["TimeoutUnits", "Unit", "OnTimeout"])
 		if (EvaluatedParameters._error)
 		{
@@ -160,31 +151,30 @@ Element_run_Action_Message_Box(Environment, ElementParameters)
 			return
 		}
 		
-		TimeoutUnits:=ElementParameters.TimeoutUnits
-		if TimeoutUnits is not number
-		{
-			x_finish(Environment, "exception", x_lang("%1% is not a number.",x_lang("Timeout '%1%'",TimeoutUnits))) 
-			return
-		}
-		
+		; calculate end time
 		EndTime := A_TickCount
 		
-		if (ElementParameters.Unit="Seconds") ;Seconds
-			EndTime+=TimeoutUnits * 1000
-		else if (ElementParameters.Unit="Minutes") ;minutes
-			EndTime+=TimeoutUnits * 60000
-		else if (ElementParameters.Unit="Hours") ;minutes
-			EndTime+=TimeoutUnits * 60000 * 60
+		if (EvaluatedParameters.Unit = "Seconds") ;Seconds
+			EndTime += TimeoutUnits * 1000
+		else if (EvaluatedParameters.Unit = "Minutes") ;minutes
+			EndTime += TimeoutUnits * 60000
+		else if (EvaluatedParameters.Unit = "Hours") ;minutes
+			EndTime += TimeoutUnits * 60000 * 60
 		
-		x_SetExecutionValue(Environment, "EndTime",EndTime) ;We need this value later
+		; save end time to a execution variable, so we can use it later.
+		x_SetExecutionValue(Environment, "EndTime", EndTime)
 	}
+
 	;We need those parameters later
 	x_SetExecutionValue(Environment, "IfDismiss", EvaluatedParameters.IfDismiss)
 	x_SetExecutionValue(Environment, "IfClose", EvaluatedParameters.IfClose)
-
+	x_SetExecutionValue(Environment, "Varname", EvaluatedParameters.Varname)
 
 	if (EvaluatedParameters.ShowCancelButton)
 	{
+		; cancel button should be shown
+		
+		; Evaluate additional parameters
 		x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["ButtonLabelCancel"])
 		if (EvaluatedParameters._error)
 		{
@@ -195,107 +185,139 @@ Element_run_Action_Message_Box(Environment, ElementParameters)
 
 	
 	;Start building GUI
-	guiID:=x_GetMyUniqueExecutionID(Environment)
+	guiID := x_GetMyUniqueExecutionID(Environment)
+	
+	; set gui label, so the function Action_Message_Box_OnClose is called if window gets closed
 	gui,%guiID%:+labelAction_Message_Box_On
 	
 	;Calculate controls width
-	widthEdit:=width-10*2
-	heightEditMessage:=height
+	widthEdit := EvaluatedParameters.width - 10 * 2
+	
+	;Calculate the height of the message field
+	heightEditMessage := EvaluatedParameters.height
 	heightEditMessage -= 30 ;Button height
-	heightEditMessage -= 10*3 ;Spaces
+	heightEditMessage -= 10 * 3 ;Spaces
 	if (EvaluatedParameters.isTimeout = "Timeout")
 		heightEditMessage -= 10 + 15 ;Timeout text
 	
 	;Add message field
-	gui,%guiID%:add,edit, ReadOnly x10 y10 w%widthEdit% h%heightEditMessage% +hwndHWNDMessage , % EvaluatedParameters.Message
-	
-	;move the Text field beneath the message field
-	yPos:=10+10+heightEditMessage
-	guicontrol,%guiID%:move,% HWNDText,x10 y%yPos%
+	gui, %guiID%:add, edit, ReadOnly x10 y10 w%widthEdit% h%heightEditMessage% +hwndHWNDMessage , % EvaluatedParameters.Message
 	
 	;Calculate position of the next control
-	yPos+=10+heightEditText
+	yPos += 10
 	
 	;Add timeout text if a timeout is specified
 	if (EvaluatedParameters.isTimeout = "Timeout")
 	{
-		gui,%guiID%:add,text, y%yPos% w%widthEdit% h15 x10 +hwndHWNDTimeoutText
-		yPos+=10+15 ;Calculate position of the next control
+		; add timeout text field
+		gui, %guiID%: add, text, y%yPos% w%widthEdit% h15 x10 +hwndHWNDTimeoutText
+		
+		;Calculate position of the next control
+		yPos += 10 + 15
 	}
 	
 	
 	if (EvaluatedParameters.ShowCancelButton)
 	{
-		;Show two buttons
-		widthOneButton:=round((widthEdit-10)/2)
-		gui,%guiID%:add,button,x10 y%yPos% w%widthOneButton% h30  gAction_Message_Box_ButtonOK Default +hwndHWNDButtonOK,% EvaluatedParameters.ButtonLabel
-		gui,%guiID%:add,button,X+10 y%yPos% w%widthOneButton% h30  gAction_Message_Box_ButtonCancel +hwndHWNDButtonCancel,% EvaluatedParameters.ButtonLabelCancel
+		; Show ok button and cancel button
+		widthOneButton := round((widthEdit - 10) / 2)
+		gui, %guiID%: add, button, x10 y%yPos% w%widthOneButton% h30 gAction_Message_Box_ButtonOK Default +hwndHWNDButtonOK, % EvaluatedParameters.ButtonLabel
+		gui, %guiID%: add, button, X+10 y%yPos% w%widthOneButton% h30 gAction_Message_Box_ButtonCancel +hwndHWNDButtonCancel, % EvaluatedParameters.ButtonLabelCancel
 	}
 	else
 	{
-		gui,%guiID%:add,button,x10 y%yPos% w%widthEdit% h30  gAction_Message_Box_ButtonOK +hwndHWNDButtonOK Default ,% EvaluatedParameters.ButtonLabel
+		; show only ok button
+		gui, %guiID%: add, button, x10 y%yPos% w%widthEdit% h30 gAction_Message_Box_ButtonOK +hwndHWNDButtonOK Default, % EvaluatedParameters.ButtonLabel
 	}
 	
+	; focus OK button
+	guicontrol, %guiID%: focus, % HWNDButtonOK
+
 	;Show GUI
-	guicontrol,%guiID%:focus,% HWNDButtonOK
-	gui,%guiID%:show,w%Width% h%height% ,% EvaluatedParameters.title
+	gui, %guiID%: show, w%Width% h%height%, % EvaluatedParameters.title
 
 	;Set timer if a timeout is set
 	if (EvaluatedParameters.isTimeout = "Timeout")
 	{
-		functionObject:= x_NewFunctionObject(environment, "Action_Message_Box_TimeoutTimer",x_GetMyUniqueExecutionID(Environment)) ;Pass the current unique ID
-		x_SetExecutionValue(Environment, "HWNDTimeoutText",HWNDTimeoutText)
-		x_SetExecutionValue(Environment, "OnTimeout",EvaluatedParameters.OnTimeout)
-		x_SetExecutionValue(Environment, "functionObjectTimer",functionObjectTimer)
-		settimer,% functionObject,-1
+		; create function object for timeout function. Pass the GUI ID to that function, so it can operate on the GUI.
+		functionObject:= x_NewFunctionObject(environment, "Action_Message_Box_TimeoutTimer", guiID)
+		
+		; write some more values as execution varialbes
+		x_SetExecutionValue(Environment, "HWNDTimeoutText", HWNDTimeoutText)
+		x_SetExecutionValue(Environment, "OnTimeout", EvaluatedParameters.OnTimeout)
+		
+		; execute the timeout function rightaway
+		settimer, % functionObject, -1
 	}
-
-	return
-	
-	
 }
 
-;Handle user input
+; React if user clicks on the OK button
 Action_Message_Box_ButtonOK()
 {
-	Environment:=x_GetMyEnvironmentFromExecutionID(A_Gui)
+	; get environment variable
+	Environment := x_GetMyEnvironmentFromExecutionID(A_Gui)
+
+	; destroy gui
+	gui,destroy
+
+	; set user action as output variable
 	x_SetVariable(Environment,"A_UserAction", "OK", "thread")
 	
-	gui,destroy
+	; finish
 	x_finish(Environment,"normal")
 }
 
 Action_Message_Box_OnClose()
 {
-	Environment:=x_GetMyEnvironmentFromExecutionID(A_Gui)
+	; get environment variable
+	Environment := x_GetMyEnvironmentFromExecutionID(A_Gui)
+
+	; destroy gui
 	gui,destroy
-	IfClose:=x_GetExecutionValue(Environment, "IfClose")
-	x_SetVariable(Environment,"A_UserAction", "Cancel", "thread")
+
+	; get a value from execution variables
+	IfClose := x_GetExecutionValue(Environment, "IfClose")
+
+	; set user action as output variable
+	x_SetVariable(Environment,"A_UserAction", "Close", "thread")
 	
+	; check what to do
 	if (IfClose = "exception")
 	{
-		x_finish(Environment,"exception", x_lang("User closed the dialog"))
+		; finish with exception
+		x_finish(Environment, "exception", x_lang("User closed the dialog"))
 	}
 	else
 	{
-		x_finish(Environment,"normal")
+		; finish without exception
+		x_finish(Environment, "normal", x_lang("User closed the dialog"))
 	}
 }
 
 Action_Message_Box_ButtonCancel()
 {
-	Environment:=x_GetMyEnvironmentFromExecutionID(A_Gui)
+	; get environment variable
+	Environment := x_GetMyEnvironmentFromExecutionID(A_Gui)
+
+	; destroy gui
 	gui,destroy
-	IfDismiss:=x_GetExecutionValue(Environment, "IfDismiss")
-	x_SetVariable(Environment,"A_UserAction", "Cancel", "thread")
 	
+	; get a value from execution variables
+	IfDismiss := x_GetExecutionValue(Environment, "IfDismiss")
+	
+	; set user action as output variable
+	x_SetVariable(Environment, "A_UserAction", "Cancel", "thread")
+	
+	; check what to do
 	if (IfDismiss = "exception")
 	{
-		x_finish(Environment,"exception", x_lang("User cancelled the dialog"))
+		; finish with exception
+		x_finish(Environment, "exception", x_lang("User cancelled the dialog"))
 	}
 	else
 	{
-		x_finish(Environment,"normal")
+		; finish without exception
+		x_finish(Environment, "normal", x_lang("User cancelled the dialog"))
 	}
 }
 
@@ -306,37 +328,49 @@ Action_Message_Box_TimeoutTimer(Environment, uniqueID)
 	;It may happen that currently an other element is executed.
 	;We compare the unique ID which was passed when creating the timer and the current unique ID.
 	;If they are not equal, already an other element is being executed.
-	guiID:=x_GetMyUniqueExecutionID(Environment)
+	guiID := x_GetMyUniqueExecutionID(Environment)
 	if (uniqueID != guiID)
 		return
 	
-	EndTime:=x_GetExecutionValue(Environment, "EndTime")
-	HWNDTimeoutText:=x_GetExecutionValue(Environment, "HWNDTimeoutText")
-	OnTimeout:=x_GetExecutionValue(Environment, "OnTimeout")
+	; get some values from execution variables
+	EndTime := x_GetExecutionValue(Environment, "EndTime")
+	HWNDTimeoutText := x_GetExecutionValue(Environment, "HWNDTimeoutText")
 	
-	remainingTime:=EndTime - a_tickCount
+	; calculate remaining time
+	remainingTime := EndTime - a_tickCount
 	if (remainingTime <= 0)
 	{
 		;End of timeout reached
-		gui,%guiID%:destroy
-		x_SetVariable(Environment,"A_UserAction", "Timeout", "thread")
+		
+		; get a value from execution variables
+		OnTimeout := x_GetExecutionValue(Environment, "OnTimeout")
+
+		; destroy gui
+		gui, %guiID%: destroy
+		
+		; set user action as output variable
+		x_SetVariable(Environment, "A_UserAction", "Timeout", "thread")
+		
+		; check what to do
 		if (OnTimeout = "Exception")
 		{
-			x_finish(Environment,"exception", x_lang("Timeout reached"))
+			; finish with exception
+			x_finish(Environment, "exception", x_lang("Timeout reached"))
 		}
 		else
 		{
-			x_finish(Environment,"normal")
+			; finish without exception
+			x_finish(Environment, "normal", x_lang("Timeout reached"))
 		}
 	}
 	else
 	{
 		;End of timeout not reached. Update the text in the GUI.
-		guicontrol,%guiID%:,% HWNDTimeoutText,% (remainingTime // 1000) " " x_lang("Seconds")
+		guicontrol, %guiID%:, % HWNDTimeoutText, % (remainingTime // 1000) " " x_lang("Seconds")
 		
 		;Calculate how many milliseconds we need to wait until the next full second is reached and update timer.
-		nextTimerTime:=mod(remainingTime,1000)
-		settimer,,% - nextTimerTime
+		nextTimerTime := mod(remainingTime, 1000)
+		settimer,, % - nextTimerTime
 	}
 }
 
@@ -346,8 +380,13 @@ Action_Message_Box_TimeoutTimer(Environment, uniqueID)
 ;If the task in Element_run_...() takes more than several seconds, then it is up to you to make it stoppable.
 Element_stop_Action_Message_Box(Environment, ElementParameters)
 {
-	guiID:=x_GetMyUniqueExecutionID(Environment)
-	gui,%guiID%:destroy
+	;Close window if currently opened
+	
+	; get GUI ID from execution variable
+	guiID := x_GetMyUniqueExecutionID(Environment)
+
+	; destroy GUI
+	gui, %guiID%: destroy
 }
 
 

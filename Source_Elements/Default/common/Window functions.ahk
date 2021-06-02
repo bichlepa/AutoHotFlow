@@ -1,6 +1,18 @@
 ﻿; this file contains some functions which are used for elements which interact with a window
 ; warning! Those functions are not ment to be used by elements from other packages. Incompatible changes are likely in future. If you want to use them, then make a copy of this file and add it to your package.
 
+; returns a list of all window parameters
+windowFunctions_getWindowParametersList(options = "")
+{
+	result := ["TitleMatchMode", "Wintitle", "winText", "FindHiddenText", "ahk_class", "ahk_exe", "ahk_id", "ahk_pid", "FindHiddenWindow"]
+
+	if (not options.noExcludes)
+	{
+		result.push("excludeTitle", "ExcludeText")
+	}
+	return result
+}
+
 ; adds all required fields for a window identification
 windowFunctions_addWindowIdentificationParametrization(parametersToEdit, options = "")
 {

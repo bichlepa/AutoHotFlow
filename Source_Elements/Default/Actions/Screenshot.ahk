@@ -53,21 +53,21 @@ Element_getParametrizationDetails_Action_Screenshot(Environment)
 {
 	parametersToEdit:=Object()
 	
-	
 	parametersToEdit.push({type: "Label", label: x_lang("Output")})
-	;~ parametersToEdit.push({type: "Radio", id: "WhichOutput", default: 1, choices: [x_lang("Write image into a variable"), x_lang("Write image to file")]}) ;TODO later
-	;~ parametersToEdit.push({type: "Edit", id: "varname", default: "Screenshot", content: "VariableName", WarnIfEmpty: true})
 	parametersToEdit.push({type: "File", id: "file", label: x_lang("Select a file"), options: 8, filter: x_lang("Image") " (*.bmp; *.dib; *.rle; *.jpg; *.jpeg; *.jpe; *.jfif; *.gif; *.tif; *.tiff; *.png)"})
 	
-	
 	parametersToEdit.push({type: "Label", label: x_lang("Screen region")})
-	parametersToEdit.push({type: "Radio", id: "WhichRegion", default: 1, choices: [x_lang("Whole screen"), x_lang("Defined region"), x_lang("Specified window")], result: "enum", enum: ["Screen", "Region", "Window"]})
+	parametersToEdit.push({type: "Radio", id: "WhichRegion", default: "Screen", choices: [x_lang("Whole screen"), x_lang("Defined region"), x_lang("Specified window")], result: "enum", enum: ["Screen", "Region", "Window"]})
+	
 	parametersToEdit.push({type: "Label", label: x_lang("Which screen")})
 	parametersToEdit.push({type: "Checkbox", id: "AllScreens", default: 1, label: x_lang("All screens")})
-	parametersToEdit.push({type: "Edit", id: "ScreenNumber", default: 1, content: "Number", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Edit", id: "ScreenNumber", default: 1, content: "PositiveInteger", WarnIfEmpty: true})
+
 	parametersToEdit.push({type: "Label", label: x_lang("Coordinates") (x1, y1)})
+
 	parametersToEdit.push({type: "Label", label: x_lang("Upper left corner") (x1, y1), size: "small"})
 	parametersToEdit.push({type: "Edit", id: ["x1", "y1"], default: [10, 20], content: "Number", WarnIfEmpty: true})
+
 	parametersToEdit.push({type: "Label", label: x_lang("Lower right corner") (x2, y2), size: "small"})
 	parametersToEdit.push({type: "Edit", id: ["x2", "y2"], default: [600, 700], content: "Number", WarnIfEmpty: true})
 	parametersToEdit.push({type: "button", id: "GetCoordinates", goto: "Action_Screenshot_ButtonMouseTracker", label: x_lang("Get coordinates")})
@@ -84,7 +84,7 @@ Element_getParametrizationDetails_Action_Screenshot(Environment)
 ; opens the assistant for getting coordinates
 Action_Screenshot_ButtonMouseTracker()
 {
-	x_assistant_MouseTracker({ImportMousePos:"Yes",CoordMode:"CoordMode",xpos:"xpos",ypos:"ypos"})
+	x_assistant_MouseTracker({ImportMousePos: "Yes", CoordMode: "CoordMode", xpos: "xpos", ypos: "ypos"})
 }
 
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
@@ -99,7 +99,6 @@ Element_GenerateName_Action_Screenshot(Environment, ElementParameters)
 ;- Correct misconfiguration
 Element_CheckSettings_Action_Screenshot(Environment, ElementParameters, staticValues)
 {	
-	
 	if (ElementParameters.WhichRegion = "Screen")
 	{
 		x_Par_Enable("AllScreens")
@@ -201,7 +200,7 @@ Element_CheckSettings_Action_Screenshot(Environment, ElementParameters, staticVa
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Screenshot(Environment, ElementParameters)
 {
-	EvaluatedParameters:=Object()
+	; evaluate some parameters
 	x_AutoEvaluateAdditionalParameters(EvaluatedParameters,Environment, ElementParameters, ["file", "WhichRegion", "UseActiveWindow", "AllScreens"])
 	if (EvaluatedParameters._error)
 	{
@@ -209,31 +208,47 @@ Element_run_Action_Screenshot(Environment, ElementParameters)
 		return
 	}
 	
+	; decide what to do
 	if (EvaluatedParameters.WhichRegion = "Screen")
 	{
+		; from a screen or all screens
+
 		if (ElementParameters.AllScreens)
 		{
-			parameterRegion:=0
+			; make screenshot from all screens
+			pBitmap := Gdip_BitmapFromScreen(0)
+			if (not isobject(pBitmap))
+			{
+				x_finish(Environment, "exception", x_lang("Can't make screenshot from all screens")) 
+				return
+			}
 		}
 		else
 		{
+			; one Screen
+
+			; evaluate additional parameters
 			x_AutoEvaluateAdditionalParameters(EvaluatedParameters,Environment, ElementParameters, ["ScreenNumber"])
 			if (EvaluatedParameters._error)
 			{
 				x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 				return
 			}
-			parameterRegion:=EvaluatedParameters.ScreenNumber
-		}
-		pBitmap:=Gdip_BitmapFromScreen(parameterRegion)
-		if pBitmap=-1
-		{
-			x_finish(Environment, "exception", x_lang("Can't make screenshot from screen %1%", ScreenNumber)) 
-			return
+
+			; make screenshot from one screen
+			pBitmap := Gdip_BitmapFromScreen(EvaluatedParameters.ScreenNumber)
+			if (not isobject(pBitmap))
+			{
+				x_finish(Environment, "exception", x_lang("Can't make screenshot from screen %1%", EvaluatedParameters.ScreenNumber)) 
+				return
+			}
 		}
 	}
 	else if (EvaluatedParameters.WhichRegion = "Region")
 	{
+		; make screenshot from a region
+
+		; evaluate additional parameters
 		x_AutoEvaluateAdditionalParameters(EvaluatedParameters,Environment, ElementParameters, ["y1", "y2", "x1", "x2"])
 		if (EvaluatedParameters._error)
 		{
@@ -241,21 +256,28 @@ Element_run_Action_Screenshot(Environment, ElementParameters)
 			return
 		}
 		
-		parameterRegion:= EvaluatedParameters.x1 "|" EvaluatedParameters.y1 "|" EvaluatedParameters.x2-EvaluatedParameters.x1 "|" EvaluatedParameters.y2-EvaluatedParameters.y1 
+		; prepare parameters for function call
+		parameterRegion := EvaluatedParameters.x1 "|" EvaluatedParameters.y1 "|" (EvaluatedParameters.x2 - EvaluatedParameters.x1) "|" (EvaluatedParameters.y2 - EvaluatedParameters.y1)
 		
-		pBitmap:=Gdip_BitmapFromScreen(parameterRegion)
-		if pBitmap=-1
+		; make screenshot from defined region
+		pBitmap := Gdip_BitmapFromScreen(parameterRegion)
+		if (not isobject(pBitmap))
 		{
-			x_finish(Environment, "exception", x_lang("Coordinates are invalid") ": x" EvaluatedParameters.x1 "-" EvaluatedParameters.y1 " y" EvaluatedParameters.x2 "-" EvaluatedParameters.y2 ) 
+			x_finish(Environment, "exception", x_lang("Coordinates are invalid") ": x" EvaluatedParameters.x1 "-" EvaluatedParameters.y1 " y" EvaluatedParameters.x2 "-" EvaluatedParameters.y2) 
 			return
 		}
 	}
 	else if (EvaluatedParameters.WhichRegion = "Window")
 	{
+		; make screenshot from a window
+
 		if (EvaluatedParameters.UseActiveWindow)
 		{
-			tempWinid:=winexist("A")
-			if not tempWinid
+			; make screenshot from active window
+
+			; get window ID of active window
+			windowID := winexist("A")
+			if not windowID
 			{
 				x_finish(Environment, "exception", x_lang("Error! No active window found!")) 
 				return
@@ -263,7 +285,10 @@ Element_run_Action_Screenshot(Environment, ElementParameters)
 		}
 		else
 		{
-			x_AutoEvaluateAdditionalParameters(EvaluatedParameters,Environment, ElementParameters, ["Wintitle", "winText", "TitleMatchMode", "Wintitle", "excludeTitle", "winText", "FindHiddenText", "ExcludeText", "ahk_class", "ahk_exe", "ahk_id", "ahk_pid", "FindHiddenWindow"])
+			; make screenshot from a specified window
+			
+			; evaluate additional parameters
+			x_AutoEvaluateAdditionalParameters(EvaluatedParameters,Environment, ElementParameters, windowFunctions_getWindowParametersList())
 			if (EvaluatedParameters._error)
 			{
 				x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
@@ -285,84 +310,68 @@ Element_run_Action_Screenshot(Environment, ElementParameters)
 				x_finish(Environment, "exception", windowID.exception)
 				return
 			}
-
-			if not windowID
-			{
-				x_finish(Environment, "exception", x_lang("Error! Seeked window does not exist")) 
-				return
-			}
 		}
 		
-		if (EvaluatedParameters.Method="Gdip_FromScreen")
+		; decide which method to use
+		if (EvaluatedParameters.Method = "Gdip_FromScreen")
 		{
-			pBitmap:=Gdip_BitmapFromScreen("hwnd:" windowID)
-			if pBitmap=-1
+			; make screenshot
+			pBitmap := Gdip_BitmapFromScreen("hwnd:" windowID)
+			if (not isobject(pBitmap))
 			{
 				x_finish(Environment, "exception", x_lang("Can't make screenshot from window")) 
 				return
-				
 			}
 		}
-		else if (EvaluatedParameters.Method="Gdip_FromHWND")
+		else if (EvaluatedParameters.Method = "Gdip_FromHWND")
 		{
-			pBitmap:=Gdip_BitmapFromHWND(windowID)
-			if pBitmap=-1
+			; make screenshot
+			pBitmap := Gdip_BitmapFromHWND(windowID)
+			if (not isobject(pBitmap))
 			{
 				x_finish(Environment, "exception", x_lang("Can't make screenshot from window")) 
 				return
-				
 			}
 		}
-		else if (EvaluatedParameters.Method="Gdip_FromScreenCoordinates")
+		else if (EvaluatedParameters.Method = "Gdip_FromScreenCoordinates")
 		{
-			wingetpos,x1,y1,x2,y2,ahk_id %windowID%
-			pBitmap:=Gdip_BitmapFromScreen(x1 "|" y1 "|" x2 "|" y2 )
-			if pBitmap=-1
+			; get coordinates of window
+			wingetpos, x1, y1, x2, y2, ahk_id %windowID%
+
+			; make screenshot
+			pBitmap := Gdip_BitmapFromScreen(x1 "|" y1 "|" x2 "|" y2 )
+
+			if (not isobject(pBitmap))
 			{
 				x_finish(Environment, "exception", x_lang("Can't make screenshot from window")) 
 				return
-				
 			}
 		}
-		x_SetVariable(Environment,"A_WindowID",windowID,"thread")
+
+		; set window ID as thread variable
+		x_SetVariable(Environment, "A_WindowID", windowID, "thread")
 	}
 	
+	; save image to file
+	result := Gdip_SaveBitmapToFile(pBitmap, EvaluatedParameters.file)
 	
-	filepath:=x_GetFullPath(Environment, EvaluatedParameters.file)
-	result:=Gdip_SaveBitmapToFile(pBitmap,filepath)
-	;~ MsgBox %result%
-	if result=-1
+	; check for errrors.
+	switch (result)
 	{
+		case -1:
 		x_finish(Environment, "exception", x_lang("Can't save screenshot to file '%1%'", EvaluatedParameters.file) ": " x_lang("Wrong extension")) 
-		return
-	}
-	else if result=-2
-	{
+		case -2:
 		x_finish(Environment, "exception", x_lang("Can't save screenshot to file '%1%'", EvaluatedParameters.file) ": " x_lang("Could not get a list of encoders on system.")) 
-		return
-	}
-	else if result=-3
-	{
+		case -3:
 		x_finish(Environment, "exception", x_lang("Can't save screenshot to file '%1%'", EvaluatedParameters.file) ": " x_lang("Could not find matching encoder for specified file format.")) 
-		return
-	}
-	else if result=-4
-	{
+		case -4:
 		x_finish(Environment, "exception", x_lang("Can't save screenshot to file '%1%'", EvaluatedParameters.file) ": " x_lang("Could not get WideChar name of output file.")) 
-		return
+		case -5:
+		x_finish(Environment, "exception", x_lang("Can't save screenshot to file '%1%'", EvaluatedParameters.file) ": " x_lang("Could not save file to disk."))
+		default:
+		; no error occured. finish normally
+		x_finish(Environment,"normal")
 	}
-	else if result=-5
-	{
-		x_finish(Environment, "exception", x_lang("Can't save screenshot to file '%1%'", EvaluatedParameters.file) ": " x_lang("Could not save file to disk.")) 
-		return
-	}
-
-	x_finish(Environment,"normal")
-	return
-	
-
-
-	
 }
 
 
