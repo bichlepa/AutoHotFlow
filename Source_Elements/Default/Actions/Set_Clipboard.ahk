@@ -62,7 +62,7 @@ Element_getParametrizationDetails_Action_Set_Clipboard(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Set_Clipboard(Environment, ElementParameters)
 {
-	return x_lang("Set_Clipboard") 
+	return x_lang("Set_Clipboard") " - " ElementParameters.text
 }
 
 ;Called every time the user changes any parameter.
@@ -79,18 +79,19 @@ Element_CheckSettings_Action_Set_Clipboard(Environment, ElementParameters, stati
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Set_Clipboard(Environment, ElementParameters)
 {
-	EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters)
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
 	if (EvaluatedParameters._error)
 	{
 		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
 
-	Clipboard:=ElementParameters.text
+	; set clipboard content
+	Clipboard := ElementParameters.text
 	
-	x_finish(Environment,"normal")
+	x_finish(Environment, "normal")
 	return
-	
 }
 
 

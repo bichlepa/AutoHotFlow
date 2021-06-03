@@ -55,34 +55,44 @@ Element_getParametrizationDetails_Action_Search_pixel(Environment)
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Output variables") (x, y)})
 	parametersToEdit.push({type: "Edit", id: ["varnameX", "varnameY"], default: ["PixelPosX", "PixelPosY"], content: "VariableName", WarnIfEmpty: true})
+	
 	parametersToEdit.push({type: "Label", label: x_lang("Screen region")})
-	parametersToEdit.push({type: "Radio", id: "CoordMode", default: 1, result: "enum", choices: [x_lang("Relative to screen"), x_lang("Relative to active window position"), x_lang("Relative to active window client position")], enum: ["Screen", "Window", "Client"]})
+	parametersToEdit.push({type: "Radio", id: "CoordMode", default: "Screen", result: "enum", choices: [x_lang("Relative to screen"), x_lang("Relative to active window position"), x_lang("Relative to active window client position")], enum: ["Screen", "Window", "Client"]})
 	parametersToEdit.push({type: "Checkbox", id: "WholeScreen", default: 0, label: x_lang("Whole screen")})
 	parametersToEdit.push({type: "Checkbox", id: "AllScreens", default: 0, label: x_lang("All screens")})
+	
 	parametersToEdit.push({type: "Label", label: x_lang("Upper left corner") (x1, y1), size: "small"})
 	parametersToEdit.push({type: "Edit", id: ["x1", "y1"], default: [10, 20], content: "number", WarnIfEmpty: true})
+	
 	parametersToEdit.push({type: "Label", label: x_lang("Lower right corner") (x2, y2), size: "small"})
 	parametersToEdit.push({type: "Edit", id: ["x2", "y2"], default: [600, 700], content: "number", WarnIfEmpty: true})
 	parametersToEdit.push({type: "button", id: "GetCoordinates", goto: "Action_Search_Pixel_Button_MouseTracker", label: x_lang("Get coordinates")})
+	
 	parametersToEdit.push({type: "Label", label: x_lang("Pixel color") (RGB)})
 	parametersToEdit.push({type: "Edit", id: "ColorID", default: "0xAA00FF", content: "String", WarnIfEmpty: true})
 	parametersToEdit.push({type: "button", id: "ChooseColor", goto: "Action_Search_Pixel_Button_ChooseColor", label: x_lang("Choose color")})
 	parametersToEdit.push({type: "button", id: "GetColor", goto: "Action_Search_Pixel_Button_GetColorFromScreen", label: x_lang("Get color from screen")})
+	
 	parametersToEdit.push({type: "Label", label: x_lang("Variation")})
 	parametersToEdit.push({type: "Slider", id: "variation", default: 0, result: "number", options: "Range0-255 TickInterval10 tooltip"})
+	
 	parametersToEdit.push({type: "Label", label: x_lang("Method")})
 	parametersToEdit.push({type: "Checkbox", id: "FastMode", default: 1, label: x_lang("Fast method")})
 	
 	return parametersToEdit
 }
+
+; opens assistant for coordinates
 Action_Search_Pixel_Button_MouseTracker()
 {
-	x_assistant_MouseTracker({ImportMousePos:"Yes",CoordMode:"CoordMode",xpos:"x1",ypos:"y1",xpos2:"x2",ypos2:"y2"})
+	x_assistant_MouseTracker({ImportMousePos: "Yes", CoordMode: "CoordMode", xpos: "x1", ypos: "y1", xpos2: "x2", ypos2: "y2"})
 }
+; opens assistant for a color selector
 Action_Search_Pixel_Button_ChooseColor()
 {
 	x_assistant_ChooseColor({color: "ColorID"})
 }
+; opens assistant for a color picker
 Action_Search_Pixel_Button_GetColorFromScreen()
 {
 	x_assistant_MouseTracker({color: "ColorID"})
@@ -91,7 +101,45 @@ Action_Search_Pixel_Button_GetColorFromScreen()
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Search_pixel(Environment, ElementParameters)
 {
-	return x_lang("Search_pixel") 
+	switch (ElementParameters.CoordMode)
+	{
+		case "Screen":
+		if (ElementParameters.WholeScreen)
+		{
+			if (ElementParameters.AllScreens)
+			{
+				areaString := x_lang("All screens")
+			}
+			Else
+			{
+				areaString := x_lang("Whole screen")
+			}
+		}
+		Else
+		{
+			areaString := x_lang("Screen region '%1%','%2%'-'%3%','%4%'", ElementParameters.x1, ElementParameters.y1, ElementParameters.x2, ElementParameters.y2)
+		}
+		case "Window":
+		if (ElementParameters.WholeScreen)
+		{
+			areaString := x_lang("Whole window")
+		}
+		Else
+		{
+			areaString := x_lang("Window region '%1%','%2%'-'%3%','%4%'", ElementParameters.x1, ElementParameters.y1, ElementParameters.x2, ElementParameters.y2)
+		}
+		case "Client":
+		if (ElementParameters.WholeScreen)
+		{
+			areaString := x_lang("Whole window client")
+		}
+		Else
+		{
+			areaString := x_lang("Window client region '%1%','%2%'-'%3%','%4%'", ElementParameters.x1, ElementParameters.y1, ElementParameters.x2, ElementParameters.y2)
+		}
+	}
+
+	return x_lang("Search_pixel") " - " areaString " - " ElementParameters.ColorID
 }
 
 ;Called every time the user changes any parameter.
@@ -138,7 +186,8 @@ Element_CheckSettings_Action_Search_pixel(Environment, ElementParameters, static
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Search_pixel(Environment, ElementParameters)
 {
-	EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters, ["x1", "x2", "y1", "y2"])
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters, ["x1", "x2", "y1", "y2"])
 	if (EvaluatedParameters._error)
 	{
 		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
@@ -147,116 +196,140 @@ Element_run_Action_Search_pixel(Environment, ElementParameters)
 	
 	;Set coord mode and region
 	
-	if (EvaluatedParameters.CoordMode="Screen")
+	if (EvaluatedParameters.CoordMode = "Screen")
 	{
+		; We will search in screen.
 		CoordMode, Pixel, Screen
+
 		if (EvaluatedParameters.WholeScreen)
 		{
-			
+			; we will search in whole screen
+
 			if (EvaluatedParameters.AllScreens)
 			{
+				; we will search in all screens
+				
+				; get coordinates which enclose all screens
 				SysGet, VirtualWidth, 78
 				SysGet, VirtualHeight, 79
 				SysGet, Virtualx1, 76
 				SysGet, Virtualy1, 77
-				x1:=Virtualx1
-				y1:=Virtualy1
-				x2:=VirtualWidth
-				y2:=VirtualHeight
+				x1 := Virtualx1
+				y1 := Virtualy1
+				x2 := VirtualWidth
+				y2 := VirtualHeight
 			}
 			else ;Only main screen
 			{
-				x1:=0
-				y1:=0
-				x2:=A_ScreenWidth
-				y2:=A_ScreenHeight
+				; we will search only in main screen
+
+				; Get coordinates of the main screen
+				x1 := 0
+				y1 := 0
+				x2 := A_ScreenWidth
+				y2 := A_ScreenHeight
 			}
 		}
-		else ;Specified region
+		else
 		{
-			WhetherSpecifiedRegion:=true
+			;Specified region. We will evaluate the coordinates later
+			WhetherSpecifiedRegion := true
 		}
 	}
 	else if (EvaluatedParameters.CoordMode="Window")
 	{
+		; we will search in a window
 		CoordMode, Pixel, Window
 		
 		if (EvaluatedParameters.WholeScreen)
 		{
-			x1:=0
-			y1:=0
-			wingetpos,,,x2,y2,A
+			; we will search in whole window
+
+			x1 := 0
+			y1 := 0
+
+			; get size of the active window
+			wingetpos,,, x2, y2, A
 		}
 		else ;Specified region
 		{
-			WhetherSpecifiedRegion:=true
+			;Specified region. We will evaluate the coordinates later
+			WhetherSpecifiedRegion := true
 		}
 	}
 	else if (EvaluatedParameters.CoordMode="Client")
 	{
+		; we will search in a window client
 		CoordMode, Pixel, Client
 		
 		if (EvaluatedParameters.WholeScreen)
 		{
-			x1:=0
-			y1:=0
+			; we will search in whole window client
+
+			x1 := 0
+			y1 := 0
 			
-			;Get window client size
-			winget,wineid,id,a
+			;Get client size of the active window
+			winget, wineid, id, a
 			VarSetCapacity(temp, 16)
 			DllCall("GetClientRect", "uint", wineid, "uint", &temp)
 			x2 := NumGet(temp, 8, "int")
 			y2 := NumGet(temp, 12, "int")
-			
-			;~ MsgBox % wineid " -- " tempWinPos " - " x2 " . " y2 " - " format("{1:X}",tempWinPos)
 		}
 		else ;Specified region
 		{
-			WhetherSpecifiedRegion:=true
+			;Specified region. We will evaluate the coordinates later
+			WhetherSpecifiedRegion := true
 		}
 	}
 	
-	if (WhetherSpecifiedRegion=true)
+	if (WhetherSpecifiedRegion = true)
 	{
+		; we need the coordinate parameters
+
+		; evaluate additional parameters
 		x_AutoEvaluateAdditionalParameters(EvaluatedParameters,Environment, ElementParameters, ["x1", "x2", "y1", "y2"])
 		if (EvaluatedParameters._error)
 		{
 			x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 			return
 		}
-		x1:=EvaluatedParameters.x1
-		x2:=EvaluatedParameters.x2
-		y1:=EvaluatedParameters.y1
-		y2:=EvaluatedParameters.y2
+
+		; those will be our coordinates
+		x1 := EvaluatedParameters.x1
+		x2 := EvaluatedParameters.x2
+		y1 := EvaluatedParameters.y1
+		y2 := EvaluatedParameters.y2
 	}
 	
 	if (EvaluatedParameters.FastMode)
 	{
-		WhetherFastMode=Fast
+		; fast mode is selected. Use it
+		FastModeOptions := "Fast"
 	}
 	
-	;~ MsgBox %x1%,%y1%,%x2%,%y2%,%ColorID%,%variation%,RGB %WhetherFastMode%
-	PixelSearch,foundx,foundy,%x1%,%y1%,%x2%,%y2%,% EvaluatedParameters.ColorID,% EvaluatedParameters.variation,RGB %WhetherFastMode%
-	if ErrorLevel=2
+	; search the pixel
+	PixelSearch, foundx, foundy, %x1%, %y1%, %x2%, %y2%, % EvaluatedParameters.ColorID, % EvaluatedParameters.variation, RGB %FastModeOptions%
+
+	; check for errors
+	if (ErrorLevel = 2)
 	{
 		x_finish(Environment, "exception", x_lang("Something prevented the command from conducting the search")) 
 		return
 	}
-	if ErrorLevel=1
+	if (ErrorLevel = 1)
 	{
 		
-		x_finish(Environment, "exception", x_lang("Pixel with color '%1%' not found",EvaluatedParameters.ColorID)) 
+		x_finish(Environment, "exception", x_lang("Pixel with color '%1%' not found", EvaluatedParameters.ColorID)) 
 		return
 	}
 	
-	
-	x_SetVariable(Environment,EvaluatedParameters.varnameX,foundx)
-	x_SetVariable(Environment,EvaluatedParameters.varnameY,foundy)
-	
+	; set output variables
+	x_SetVariable(Environment, EvaluatedParameters.varnameX, foundx)
+	x_SetVariable(Environment, EvaluatedParameters.varnameY, foundy)
 	
 	x_finish(Environment,"normal")
 	return
-	
 }
 
 

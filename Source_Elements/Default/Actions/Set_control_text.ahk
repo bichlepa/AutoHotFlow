@@ -77,7 +77,7 @@ Element_GenerateName_Action_Set_control_text(Environment, ElementParameters)
 	; generate window identification name
 	nameString := windowFunctions_generateWindowIdentificationName(ElementParameters)
 	
-	return x_lang("Set_control_text") ": " ElementParameters.Control_identifier " - " ElementParameters.Text " - " nameString
+	return x_lang("Set_control_text") ": " ElementParameters.Text " - " ElementParameters.Control_identifier " - " nameString
 }
 
 ;Called every time the user changes any parameter.

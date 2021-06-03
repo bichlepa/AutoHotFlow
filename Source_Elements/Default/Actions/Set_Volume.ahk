@@ -55,12 +55,15 @@ Element_getParametrizationDetails_Action_Set_Volume(Environment)
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Action")})
 	parametersToEdit.push({type: "Radio", id: "Action", default: 1, choices: [x_lang("Set mute state"), x_lang("Set a Specified volume"), x_lang("Increase or decrease volume")], result: "enum", enum: ["Mute", "Absolute", "Relative"]})
+	
 	parametersToEdit.push({type: "Label", label: x_lang("Mute settings")})
-	parametersToEdit.push({type: "Radio", id: "Mute", default: 1, choices: [x_lang("Mute on"), x_lang("Mute off"), x_lang("Toggle")], retult: "enum", enum: ["On", "Off", "Toggle"]})
+	parametersToEdit.push({type: "Radio", id: "Mute", default: "On", choices: [x_lang("Mute on"), x_lang("Mute off"), x_lang("Toggle")], retult: "enum", enum: ["On", "Off", "Toggle"]})
+	
 	parametersToEdit.push({type: "Label", label: x_lang("Absolute volume")})
-	parametersToEdit.push({type: "Slider", id: "volume", default: 80, options: "Range0-100 TickInterval10 tooltip"})
+	parametersToEdit.push({type: "Slider", id: "volume", default: 80, content: "positiveNumber", options: "Range0-100 TickInterval10 tooltip", AllowExpression: true})
+	
 	parametersToEdit.push({type: "Label", label: x_lang("Relative volume")})
-	parametersToEdit.push({type: "Slider", id: "volumeRelative", default: 10, options: "Range-100-100 TickInterval10 tooltip"})
+	parametersToEdit.push({type: "Slider", id: "volumeRelative", default: 10, content: "Number", options: "Range-100-100 TickInterval10 tooltip", AllowExpression: true})
 	
 	return parametersToEdit
 }
@@ -68,7 +71,28 @@ Element_getParametrizationDetails_Action_Set_Volume(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Set_Volume(Environment, ElementParameters)
 {
-	return x_lang("Set_Volume") 
+	switch (ElementParameters.Action)
+	{
+		case "Mute":
+		actionText := x_lang("Set mute state")
+		switch (ElementParameters.Mute)
+		{
+			case "On":
+			valueText := x_lang("Mute on")
+			case "Off":
+			valueText := x_lang("Mute off")
+			case "Toggle":
+			valueText := x_lang("Toggle")
+		}
+		case "Absolute":
+		actionText := x_lang("Set a Specified volume")
+		valueText := ElementParameters.volume
+		case "Relative":
+		actionText := x_lang("Increase or decrease volume")
+		valueText := ElementParameters.volumeRelative
+	}
+
+	return x_lang("Set_Volume") " - " actionText " - " valueText
 }
 
 ;Called every time the user changes any parameter.
@@ -77,7 +101,6 @@ Element_GenerateName_Action_Set_Volume(Environment, ElementParameters)
 ;- Correct misconfiguration
 Element_CheckSettings_Action_Set_Volume(Environment, ElementParameters, staticValues)
 {	
-	
 	if (ElementParameters.Action = "Absolute")
 	{
 		x_Par_Disable("Mute")
@@ -92,7 +115,6 @@ Element_CheckSettings_Action_Set_Volume(Environment, ElementParameters, staticVa
 	}
 	else if (ElementParameters.Action = "Mute")
 	{
-		
 		x_Par_Enable("Mute")
 		x_Par_Disable("volume")
 		x_Par_Disable("volumeRelative")
@@ -105,39 +127,67 @@ Element_CheckSettings_Action_Set_Volume(Environment, ElementParameters, staticVa
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Set_Volume(Environment, ElementParameters)
 {
-	EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters)
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters, ["volumeRelative", "Volume", "Mute"])
 	if (EvaluatedParameters._error)
 	{
 		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
 	
-	if (EvaluatedParameters.Action="Relative")
+	switch (EvaluatedParameters.Action)
 	{
-		if (ElementParameters.volumeRelative<0)
-			SoundSet,% ElementParameters.volumeRelative
+		case "Mute":
+		
+		; evaluate additional parameters
+		x_AutoEvaluateAdditionalParameters(EvaluatedParameters,Environment, ElementParameters, ["Mute"])
+		if (EvaluatedParameters._error)
+		{
+			x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
+			return
+		}
+
+		; set mute option
+		switch (EvaluatedParameters.Mute)
+		{
+			case "On":
+			SoundSet, 1,, mute
+			case "Off":
+			SoundSet, 0,, mute
+			case "Toggle":
+			SoundSet, +1,, mute
+		}
+
+		case "Absolute":
+		; evaluate additional parameters
+		x_AutoEvaluateAdditionalParameters(EvaluatedParameters,Environment, ElementParameters, ["Volume"])
+		if (EvaluatedParameters._error)
+		{
+			x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
+			return
+		}
+
+		; set volume to absolute value
+		SoundSet, % EvaluatedParameters.Volume
+
+		case "Relative":
+		; evaluate additional parameters
+		x_AutoEvaluateAdditionalParameters(EvaluatedParameters,Environment, ElementParameters, ["volumeRelative"])
+		if (EvaluatedParameters._error)
+		{
+			x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
+			return
+		}
+
+		; change volume by relative value
+		if (EvaluatedParameters.volumeRelative < 0)
+			SoundSet, % EvaluatedParameters.volumeRelative
 		else
-			SoundSet,% "+" ElementParameters.volumeRelative
+			SoundSet, % "+" EvaluatedParameters.volumeRelative
 	}
-	else if (EvaluatedParameters.Action="Absolute")
-	{
-		SoundSet,% ElementParameters.Volume
-	}
-	else if (EvaluatedParameters.Action="Mute")
-	{
-		if (EvaluatedParameters.Mute="On")
-			SoundSet,1,,mute
-		else if (EvaluatedParameters.Mute="Off")
-			SoundSet,0,,mute
-		else if (EvaluatedParameters.Mute="Toggle")
-			SoundSet,+1,,mute
-	}
-	
-	
-	x_finish(Environment,"normal")
+
+	x_finish(Environment, "normal")
 	return
-	
-	
 }
 
 

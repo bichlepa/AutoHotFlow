@@ -66,7 +66,7 @@ Element_getParametrizationDetails_Action_Send_keystrokes(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Send_keystrokes(Environment, ElementParameters)
 {
-	return x_lang("Send_keystrokes") 
+	return x_lang("Send_keystrokes") " - " ElementParameters.KeysToSend
 }
 
 ;Called every time the user changes any parameter.
@@ -83,27 +83,28 @@ Element_CheckSettings_Action_Send_keystrokes(Environment, ElementParameters, sta
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Send_keystrokes(Environment, ElementParameters)
 {
-	EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters)
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
 	if (EvaluatedParameters._error)
 	{
 		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
 
-
-	if (ElementParameters.RawMode)
-		tempRawText={raw}
+	; decide whether we will send in raw mode or not
+	if (EvaluatedParameters.RawMode)
+		rawTextOption := "{raw}"
 	else
-		tempRawText=
-	SendMode,% ElementParameters.sendmode
-	
-	Send,% tempRawText ElementParameters.KeysToSend
-	
+		rawTextOption :=
 
-	x_finish(Environment,"normal")
+	; set send mode
+	SendMode, % EvaluatedParameters.sendmode
+	
+	; send keystrokes
+	Send, % rawTextOption EvaluatedParameters.KeysToSend
+	
+	x_finish(Environment, "normal")
 	return
-	
-	
 }
 
 

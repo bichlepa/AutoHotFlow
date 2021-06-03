@@ -55,47 +55,59 @@ Element_getParametrizationDetails_Action_Search_Image(Environment)
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Output variables") (x, y)})
 	parametersToEdit.push({type: "Edit", id: ["varnameX", "varnameY"], default: ["ImagePosX", "ImagePosY"], content: "VariableName", WarnIfEmpty: true})
+	
 	parametersToEdit.push({type: "Label", label: x_lang("Screen region")})
-	parametersToEdit.push({type: "Radio", id: "CoordMode", default: 1, result: "enum", choices: [x_lang("Relative to screen"), x_lang("Relative to active window position"), x_lang("Relative to active window client position")], enum: ["Screen", "Window", "Client"]})
+	parametersToEdit.push({type: "Radio", id: "CoordMode", default: "Screen", result: "enum", choices: [x_lang("Relative to screen"), x_lang("Relative to active window position"), x_lang("Relative to active window client position")], enum: ["Screen", "Window", "Client"]})
 	parametersToEdit.push({type: "Checkbox", id: "WholeScreen", default: 0, label: x_lang("Whole screen")})
 	parametersToEdit.push({type: "Checkbox", id: "AllScreens", default: 0, label: x_lang("All screens")})
+	
 	parametersToEdit.push({type: "Label", label: x_lang("Upper left corner") (x1, y1), size: "small"})
 	parametersToEdit.push({type: "Edit", id: ["x1", "y1"], default: [10, 20], content: "Number", WarnIfEmpty: true})
+	
 	parametersToEdit.push({type: "Label", label: x_lang("Lower right corner") (x2, y2), size: "small"})
 	parametersToEdit.push({type: "Edit", id: ["x2", "y2"], default: [600, 700], content: "Number", WarnIfEmpty: true})
 	parametersToEdit.push({type: "button", id: "GetCoordinates", goto: "Action_Search_Image_Button_MouseTracker", label: x_lang("Get coordinates")})
+	
 	parametersToEdit.push({type: "Label", label: x_lang("Image file path")})
 	parametersToEdit.push({type: "File", id: "file", label: x_lang("Select a file"), options: 8, filter: x_lang("Images and icons") " (*.gif; *.jpg; *.bmp; *.ico; *.cur; *.ani; *.png; *.tif; *.exif; *.wmf; *.emf; *.exe; *.dll; *.cpl; *.scr)"})
+	
 	parametersToEdit.push({type: "Label", label: x_lang("File with multiple icons")})
 	parametersToEdit.push({type: "Checkbox", id: "SetIconNumber", default: 0, label: x_lang("Set icon number")})
-	parametersToEdit.push({type: "Edit", id: "IconNumber", default: 1, content: "Number", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Edit", id: "IconNumber", default: 1, content: "PositiveInteger", WarnIfEmpty: true})
+	
 	parametersToEdit.push({type: "Label", label: x_lang("Variation")})
-	parametersToEdit.push({type: "Slider", id: "variation", content: "Number", default: 0, options: "Range0-255 TickInterval10 tooltip"})
+	parametersToEdit.push({type: "Slider", id: "variation", content: "PositiveNumber", default: 0, options: "Range0-255 TickInterval10 tooltip"})
+	
 	parametersToEdit.push({type: "Label", label: x_lang("Transparent color")})
 	parametersToEdit.push({type: "Checkbox", id: "makeTransparent", default: 0, label: x_lang("Make a color of image transparent")})
+	
 	parametersToEdit.push({type: "Label", label: x_lang("Color name or RGB value"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: "transparent", content: "String", WarnIfEmpty: true})
 	parametersToEdit.push({type: "button", id: "ChooseColor", goto: "Action_Search_Image_Button_ChooseColor", label: x_lang("Choose color")})
 	parametersToEdit.push({type: "button", id: "GetColor", goto: "Action_Search_Image_Button_GetColorFromScreen", label: x_lang("Get color from screen")})
+	
 	parametersToEdit.push({type: "Label", label: x_lang("Scale image")})
 	parametersToEdit.push({type: "Checkbox", id: "ScaleImage", default: 0, label: x_lang("Scale image")})
 	parametersToEdit.push({type: "Checkbox", id: "PreserveAspectRatio", default: 0, label: x_lang("Preserve aspect ratio")})
-	parametersToEdit.push({type: "Radio", id: "WhichSizeSet", default: 1, choices: [x_lang("Set width manually and set height automatically"), x_lang("Set height manually and set width automatically")], result: "enum", enum: ["widthManually", "heightManually"]})
+	parametersToEdit.push({type: "Radio", id: "WhichSizeSet", default: "widthManually", choices: [x_lang("Set width manually and set height automatically"), x_lang("Set height manually and set width automatically")], result: "enum", enum: ["widthManually", "heightManually"]})
+	
 	parametersToEdit.push({type: "Label", label: x_lang("width, height"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: ["ImageWidth", "ImageHeight"], content: "Number", WarnIfEmpty: true})
 
-	
 	return parametersToEdit
 }
 
+; opens assistant for coordinates
 Action_Search_Image_Button_MouseTracker()
 {
-	x_assistant_MouseTracker({ImportMousePos:"Yes",CoordMode:"CoordMode",xpos:"x1",ypos:"y1",xpos2:"x2",ypos2:"y2"})
+	x_assistant_MouseTracker({ImportMousePos: "Yes", CoordMode: "CoordMode", xpos: "x1", ypos: "y1", xpos2: "x2", ypos2: "y2"})
 }
+; opens assistant for a color selector
 Action_Search_Image_Button_ChooseColor()
 {
 	x_assistant_ChooseColor({color: "transparent"})
 }
+; opens assistant for a color picker
 Action_Search_Image_Button_GetColorFromScreen()
 {
 	x_assistant_MouseTracker({color: "transparent"})
@@ -104,7 +116,45 @@ Action_Search_Image_Button_GetColorFromScreen()
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Search_Image(Environment, ElementParameters)
 {
-	return x_lang("Search_Image") 
+	switch (ElementParameters.CoordMode)
+	{
+		case "Screen":
+		if (ElementParameters.WholeScreen)
+		{
+			if (ElementParameters.AllScreens)
+			{
+				areaString := x_lang("All screens")
+			}
+			Else
+			{
+				areaString := x_lang("Whole screen")
+			}
+		}
+		Else
+		{
+			areaString := x_lang("Screen region '%1%','%2%'-'%3%','%4%'", ElementParameters.x1, ElementParameters.y1, ElementParameters.x2, ElementParameters.y2)
+		}
+		case "Window":
+		if (ElementParameters.WholeScreen)
+		{
+			areaString := x_lang("Whole window")
+		}
+		Else
+		{
+			areaString := x_lang("Window region '%1%','%2%'-'%3%','%4%'", ElementParameters.x1, ElementParameters.y1, ElementParameters.x2, ElementParameters.y2)
+		}
+		case "Client":
+		if (ElementParameters.WholeScreen)
+		{
+			areaString := x_lang("Whole window client")
+		}
+		Else
+		{
+			areaString := x_lang("Window client region '%1%','%2%'-'%3%','%4%'", ElementParameters.x1, ElementParameters.y1, ElementParameters.x2, ElementParameters.y2)
+		}
+	}
+
+	return x_lang("Search_Image") " - " areaString " - " ElementParameters.file
 }
 
 ;Called every time the user changes any parameter.
@@ -185,122 +235,147 @@ Element_CheckSettings_Action_Search_Image(Environment, ElementParameters, static
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Search_Image(Environment, ElementParameters)
 {
-	EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters, ["x1", "x2", "y1", "y2", "IconNumber", "transparent", "ImageHeight", "ImageWidth"])
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters, ["x1", "x2", "y1", "y2", "IconNumber", "transparent", "ImageHeight", "ImageWidth"])
 	if (EvaluatedParameters._error)
 	{
 		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
 	
-	
-	
-	tempPath:=x_GetFullPath(Environment, EvaluatedParameters.file)
-
-	
 	;Set coord mode and region
 	
-	if (EvaluatedParameters.CoordMode="Screen")
+	if (EvaluatedParameters.CoordMode = "Screen")
 	{
+		; We will search in screen.
 		CoordMode, Pixel, Screen
+
 		if (EvaluatedParameters.WholeScreen)
 		{
-			
+			; we will search in whole screen
+
 			if (EvaluatedParameters.AllScreens)
 			{
+				; we will search in all screens
+				
+				; get coordinates which enclose all screens
 				SysGet, VirtualWidth, 78
 				SysGet, VirtualHeight, 79
 				SysGet, Virtualx1, 76
 				SysGet, Virtualy1, 77
-				x1:=Virtualx1
-				y1:=Virtualy1
-				x2:=VirtualWidth
-				y2:=VirtualHeight
+				x1 := Virtualx1
+				y1 := Virtualy1
+				x2 := VirtualWidth
+				y2 := VirtualHeight
 			}
 			else ;Only main screen
 			{
-				x1:=0
-				y1:=0
-				x2:=A_ScreenWidth
-				y2:=A_ScreenHeight
+				; we will search only in main screen
+
+				; Get coordinates of the main screen
+				x1 := 0
+				y1 := 0
+				x2 := A_ScreenWidth
+				y2 := A_ScreenHeight
 			}
 		}
-		else ;Specified region
+		else
 		{
-			WhetherSpecifiedRegion:=true
+			;Specified region. We will evaluate the coordinates later
+			WhetherSpecifiedRegion := true
 		}
 	}
 	else if (EvaluatedParameters.CoordMode="Window")
 	{
+		; we will search in a window
 		CoordMode, Pixel, Window
 		
 		if (EvaluatedParameters.WholeScreen)
 		{
-			x1:=0
-			y1:=0
-			wingetpos,,,x2,y2,A
+			; we will search in whole window
+
+			x1 := 0
+			y1 := 0
+
+			; get size of the active window
+			wingetpos,,, x2, y2, A
 		}
 		else ;Specified region
 		{
-			WhetherSpecifiedRegion:=true
+			;Specified region. We will evaluate the coordinates later
+			WhetherSpecifiedRegion := true
 		}
 	}
 	else if (EvaluatedParameters.CoordMode="Client")
 	{
+		; we will search in a window client
 		CoordMode, Pixel, Client
 		
 		if (EvaluatedParameters.WholeScreen)
 		{
-			x1:=0
-			y1:=0
+			; we will search in whole window client
+
+			x1 := 0
+			y1 := 0
 			
-			;Get window client size
-			winget,wineid,id,a
+			;Get client size of the active window
+			winget, wineid, id, a
 			VarSetCapacity(temp, 16)
 			DllCall("GetClientRect", "uint", wineid, "uint", &temp)
 			x2 := NumGet(temp, 8, "int")
 			y2 := NumGet(temp, 12, "int")
-			
-			;~ MsgBox % wineid " -- " tempWinPos " - " x2 " . " y2 " - " format("{1:X}",tempWinPos)
 		}
 		else ;Specified region
 		{
-			WhetherSpecifiedRegion:=true
+			;Specified region. We will evaluate the coordinates later
+			WhetherSpecifiedRegion := true
 		}
 	}
 	
-	if (WhetherSpecifiedRegion=true)
+	if (WhetherSpecifiedRegion = true)
 	{
+		; we need the coordinate parameters
+
+		; evaluate additional parameters
 		x_AutoEvaluateAdditionalParameters(EvaluatedParameters,Environment, ElementParameters, ["x1", "x2", "y1", "y2"])
 		if (EvaluatedParameters._error)
 		{
 			x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 			return
 		}
-		x1:=EvaluatedParameters.x1
-		x2:=EvaluatedParameters.x2
-		y1:=EvaluatedParameters.y1
-		y2:=EvaluatedParameters.y2
+
+		; those will be our coordinates
+		x1 := EvaluatedParameters.x1
+		x2 := EvaluatedParameters.x2
+		y1 := EvaluatedParameters.y1
+		y2 := EvaluatedParameters.y2
 	}
 	
-	tempOptions:=""
+	; prepare options for the ImageSearch call
+	ImageSearchOptions := ""
 	if (EvaluatedParameters.SetIconNumber)
 	{
+		; we need the icon number parameter
 		x_AutoEvaluateAdditionalParameters(EvaluatedParameters,Environment, ElementParameters, "IconNumber")
 		if (EvaluatedParameters._error)
 		{
 			x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 			return
 		}
-		tempOptions.="*Icon" EvaluatedParameters.IconNumber " "
+
+		; add the icon number parameter to the options string
+		ImageSearchOptions .= "*Icon" EvaluatedParameters.IconNumber " "
 	}
 	
 	if (EvaluatedParameters.Variation > 0)
 	{
-		tempOptions.="*" EvaluatedParameters.Variation " "
+		; variation is not zero. We will add it to the options string
+		ImageSearchOptions .= "*" EvaluatedParameters.Variation " "
 	}
 	
 	if (EvaluatedParameters.makeTransparent)
 	{
+		; we need the transparent color parameter
 		x_AutoEvaluateAdditionalParameters(EvaluatedParameters,Environment, ElementParameters, "transparent")
 		if (EvaluatedParameters._error)
 		{
@@ -309,88 +384,101 @@ Element_run_Action_Search_Image(Environment, ElementParameters)
 		}
 		
 		;TODO: check whether the string contains spaces
-		tempOptions.="*Trans" EvaluatedParameters.transparent " "
+
+		; add the icon number parameter to the options string
+		ImageSearchOptions.="*Trans" EvaluatedParameters.transparent " "
 	}
 	
 	if (EvaluatedParameters.ScaleImage)
 	{
+		; scale image is selected
 		if (EvaluatedParameters.PreserveAspectRatio)
 		{
+			; we preserve aspect ratio. Therefore we only need one size parameter
 			if (EvaluatedParameters.WhichSizeSet = "widthManually") ;Set width manually
 			{
-				setHeight:=false
-				setWidth:=true
-				Height:=-1
+				; We will need the width parameter
+				setHeight := false
+				setWidth := true
+				Height := -1
 			}
 			else if (EvaluatedParameters.WhichSizeSet="heightManually") ;Set height manually
 			{
-				setHeight:=true
-				setWidth:=false
-				width:=-1
+				; We will need the height parameter
+				setHeight := true
+				setWidth := false
+				width := -1
 			}
 		}
 		else
 		{
-			setHeight:=true
-			setWidth:=true
+			; we don't preserve aspect ratio. Therefore we need both size parameters
+			setHeight := true
+			setWidth := true
 		}
 		
 		if setHeight
 		{
+			; evaluate additional parameters
 			x_AutoEvaluateAdditionalParameters(EvaluatedParameters,Environment, ElementParameters, "ImageHeight")
 			if (EvaluatedParameters._error)
 			{
 				x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 				return
 			}
-			height:=EvaluatedParameters.ImageHeight
+
+			; set height
+			height := EvaluatedParameters.ImageHeight
 		}
 		if setWidth
 		{
+			; evaluate additional parameters
 			x_AutoEvaluateAdditionalParameters(EvaluatedParameters,Environment, ElementParameters, "ImageWidth")
 			if (EvaluatedParameters._error)
 			{
 				x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 				return
 			}
-			width:=EvaluatedParameters.ImageWidth
+			
+			; set width
+			width := EvaluatedParameters.ImageWidth
 		}
 		
-		
-		tempOptions.="*w" width " *h" height " "
+		; add the size parameters to the options string
+		ImageSearchOptions .= "*w" width " *h" height " "
 	}
 	
-	ImageSearch,foundx,foundy,%x1%,%y1%,%x2%,%y2%,% tempOptions tempPath
+	; search for the image
+	ImageSearch, foundx, foundy, %x1%, %y1%, %x2%, %y2%, % ImageSearchOptions EvaluatedParameters.file
 	
-	if ErrorLevel=2
+	; check for errors
+	if (ErrorLevel = 2)
 	{
-		if not fileexist(tempPath)
+		; there was a problem reading the file. Check whether file exists and report error.
+		if not fileexist(EvaluatedParameters.file)
 		{
-			x_finish(Environment, "exception", x_lang("File '%1%' does not exist",tempPath)) 
+			x_finish(Environment, "exception", x_lang("File '%1%' does not exist", EvaluatedParameters.file)) 
 			return
 		}
 		else
 		{
-			x_finish(Environment, "exception", x_lang("File '%1%' could not be read",tempPath)) 
+			x_finish(Environment, "exception", x_lang("File '%1%' could not be read", EvaluatedParameters.file)) 
 			return
 		}
 	}
-	if ErrorLevel=1
+	if (ErrorLevel = 1)
 	{
-		x_finish(Environment, "exception", x_lang("Image was not found on screen",tempPath)) 
+		; the image was not found.
+		x_finish(Environment, "exception", x_lang("Image was not found on screen", EvaluatedParameters.file)) 
 		return
-		
 	}
 	
-	x_SetVariable(Environment,EvaluatedParameters.varnameX,foundx)
-	x_SetVariable(Environment,EvaluatedParameters.varnameY,foundy)
+	; set output variables
+	x_SetVariable(Environment, EvaluatedParameters.varnameX, foundx)
+	x_SetVariable(Environment, EvaluatedParameters.varnameY, foundy)
 	
-	
-
 	x_finish(Environment,"normal")
 	return
-	
-
 }
 
 

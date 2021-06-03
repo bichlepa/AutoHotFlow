@@ -59,8 +59,10 @@ Element_getParametrizationDetails_Action_Send_Keystrokes_To_Control(Environment)
 	parametersToEdit.push({type: "Edit", id: "KeysToSend", content: ["RawString", "String"], contentID: "KeysToSendContentType", ContentDefault: "String", WarnIfEmpty: true})
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Control_Identification")})
+	
 	parametersToEdit.push({type: "Label", label: x_lang("Method_for_control_Identification"), size: "small"})
 	parametersToEdit.push({type: "Radio", id: "IdentifyControlBy", result: "enum", default: 2, choices: [x_lang("Text_in_control"), x_lang("Classname and instance number of the control"), x_lang("Unique control ID")], enum: ["Text", "Class", "ID"]})
+	
 	parametersToEdit.push({type: "Label", label: x_lang("Control_Identification"), size: "small"})
 	parametersToEdit.push({type: "Radio", id: "ControlTextMatchMode", default: 2, choices: [x_lang("Start_with"), x_lang("Contain_anywhere"), x_lang("Exactly")]})
 	parametersToEdit.push({type: "Edit", id: "Control_identifier", content: "String", WarnIfEmpty: true})
@@ -77,7 +79,7 @@ Element_GenerateName_Action_Send_Keystrokes_To_Control(Environment, ElementParam
 	; generate window identification name
 	nameString := windowFunctions_generateWindowIdentificationName(ElementParameters)
 	
-	return x_lang("Send_Keystrokes_To_Control") ": " nameString
+	return x_lang("Send_Keystrokes_To_Control") ": " ElementParameters.KeysToSend " - " ElementParameters.Control_identifier " - " nameString
 }
 
 ;Called every time the user changes any parameter.
@@ -117,33 +119,35 @@ Element_run_Action_Send_Keystrokes_To_Control(Environment, ElementParameters)
 		x_finish(Environment, "exception", windowID.exception)
 		return
 	}
-	if not windowID
-	{
-		x_finish(Environment, "exception", x_lang("Error! Seeked window does not exist")) 
-		return
-	}
 	
-	SetTitleMatchMode,% EvaluatedParameters.ControlTextMatchMode
-	controlget,tempControlID,hwnd,,% Control_identifier,ahk_id %windowID%
-	if not tempControlID
+	; get control HWND
+	SetTitleMatchMode, % EvaluatedParameters.ControlTextMatchMode
+	controlget, controlID, hwnd,, % EvaluatedParameters.Control_identifier, ahk_id %windowID%
+	
+	; check whether we found the control
+	if not controlID
 	{
 		x_finish(Environment, "exception", x_lang("Error! Seeked control does not exist in the specified windows")) 
 		return
 	}
 	
+	; decide whether we will send in raw mode or not
 	if (ElementParameters.RawMode)
-		ControlSendraw,,% EvaluatedParameters.KeysToSend,ahk_id %tempControlID%
-	else
-		ControlSend,,% EvaluatedParameters.KeysToSend,ahk_id %tempControlID%
+	{
+		; send in raw mode
+		ControlSendraw,, % EvaluatedParameters.KeysToSend, ahk_id %controlID%
+	}
+	else	
+	{
+		; send in normal mode
+		ControlSend,, % EvaluatedParameters.KeysToSend, ahk_id %controlID%
+	}
 	
-	x_SetVariable(Environment,"A_WindowID",windowID,"Thread")
-	x_SetVariable(Environment,"A_ControlID",tempControlID,"Thread")
-	
-	
+	; set window ID and control ID as thread variables
+	x_SetVariable(Environment, "A_WindowID", windowID, "Thread")
+	x_SetVariable(Environment, "A_ControlID", controlID, "Thread")
 	
 	x_finish(Environment, "normal")
-	
-	
 }
 
 

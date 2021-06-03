@@ -63,18 +63,17 @@ Element_getParametrizationDetails_Action_Sleep(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Sleep(Environment, ElementParameters)
 {
-	global
-	;~ d(ElementParameters)
-	if (ElementParameters.Unit = "Milliseconds")
-		duration:=ElementParameters.duration " " x_lang("ms #Milliseconds")
-	if (ElementParameters.Unit = "Seconds")
-		duration:=ElementParameters.duration " " x_lang("s #Seconds")
-	if (ElementParameters.Unit = "Minutes")
-		duration:=ElementParameters.duration " " x_lang("m #Minutes")
-	
+	switch (ElementParameters.Unit)
+	{
+	case "Milliseconds":
+		duration := ElementParameters.duration " " x_lang("ms #Milliseconds")
+	case "Seconds":
+		duration := ElementParameters.duration " " x_lang("s #Seconds")
+	case "Minutes":
+		duration := ElementParameters.duration " " x_lang("m #Minutes")
+	}
+
 	return x_lang("Sleep") ": " duration
-	
-	
 }
 
 ;Called every time the user changes any parameter.
@@ -90,43 +89,48 @@ Element_CheckSettings_Action_Sleep(Environment, ElementParameters, staticValues)
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Sleep(Environment, ElementParameters)
 {
-	ElementParameters:=x_AutoEvaluateParameters(Environment, ElementParameters)
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
 	if (EvaluatedParameters._error)
 	{
 		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
 	
-	if (ElementParameters.Unit="Milliseconds") ;Milliseconds
-		tempDuration:=ElementParameters.duration
-	else if (ElementParameters.Unit="Seconds") ;Seconds
-		tempDuration:=ElementParameters.duration * 1000
-	else if (ElementParameters.Unit="Minutes") ;minutes
-		tempDuration:=ElementParameters.duration * 60000
-	
-	functionObject:= x_NewFunctionObject(environment, "Action_Sleep_EndSleep", ElementParameters)
+	switch (EvaluatedParameters.Unit)
+	{
+	case "Milliseconds":
+		duration := EvaluatedParameters.duration
+	case "Seconds":
+		duration := EvaluatedParameters.duration * 1000
+	case "Minutes":
+		duration := EvaluatedParameters.duration * 60000
+	}
+
+	; create a function object which will be called when the timeout is reached
+	functionObject := x_NewFunctionObject(environment, "Action_Sleep_EndSleep", ElementParameters)
+
+	; set functionObject as execution value
 	x_SetExecutionValue(Environment, "functionObject", functionObject)
 	
-	SetTimer,% functionObject,-%tempDuration%
-	;~ d(functionObject)
+	; set the timer for the function object
+	SetTimer, % functionObject, -%duration%
 	return
-	
-	
 }
 
 ;Called when the execution of the element should be stopped.
 ;If the task in Element_run_...() takes more than several seconds, then it is up to you to make it stoppable.
 Element_stop_Action_Sleep(Environment, ElementParameters)
 {
-	;~ d(Environment)
-	functionObject:=x_getExecutionValue(Environment, "functionObject")
-	;~ d(functionObject)
+	; get function object
+	functionObject := x_getExecutionValue(Environment, "functionObject")
+	
+	; stop timer for the function object
 	SetTimer, % functionObject, off
 }
 
 ;callback function when the sleep timeout ends
-Action_Sleep_EndSleep(Environment, ElementParameters="")
+Action_Sleep_EndSleep(Environment, ElementParameters)
 {
-	;~ d(ElementParameters)
-	x_finish(Environment,"normal")
+	; just finish
+	x_finish(Environment, "normal")
 }

@@ -55,8 +55,9 @@ Element_getParametrizationDetails_Action_Set_Process_Priority(Environment)
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Process name or ID")})
 	parametersToEdit.push({type: "Edit", id: "ProcessName", content: "String", WarnIfEmpty: true})
+	
 	parametersToEdit.push({type: "Label", label:  x_lang("Priority")})
-	parametersToEdit.push({type: "Radio", id: "Priority", default: 3, choices: [x_lang("Low"), x_lang("Below normal"), x_lang("Normal"), x_lang("Above normal"), x_lang("High"), x_lang("Realtime")], result: "enum", enum: ["Low", "BelowNormal", "Normal", "AboveNormal", "High", "Realtime"]})
+	parametersToEdit.push({type: "Radio", id: "Priority", default: "Normal", choices: [x_lang("Low"), x_lang("Below normal"), x_lang("Normal"), x_lang("Above normal"), x_lang("High"), x_lang("Realtime")], result: "enum", enum: ["Low", "BelowNormal", "Normal", "AboveNormal", "High", "Realtime"]})
 	
 	return parametersToEdit
 }
@@ -64,7 +65,23 @@ Element_getParametrizationDetails_Action_Set_Process_Priority(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Set_Process_Priority(Environment, ElementParameters)
 {
-	return x_lang("Set_Process_Priority") 
+	switch (ElementParameters.Priority)
+	{
+		case "Low":
+		PriorityString := x_lang("Low")
+		case "BelowNormal":
+		PriorityString := x_lang("Below normal")
+		case "Normal":
+		PriorityString := x_lang("Normal")
+		case "AboveNormal":
+		PriorityString := x_lang("Above normal")
+		case "High":
+		PriorityString := x_lang("High")
+		case "Realtime":
+		PriorityString := x_lang("Realtime")
+	}
+
+	return x_lang("Set_Process_Priority") " - " ElementParameters.ProcessName " - " PriorityString
 }
 
 ;Called every time the user changes any parameter.
@@ -81,35 +98,35 @@ Element_CheckSettings_Action_Set_Process_Priority(Environment, ElementParameters
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Set_Process_Priority(Environment, ElementParameters)
 {
-	EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters)
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
 	if (EvaluatedParameters._error)
 	{
 		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
 	
-	Process,Priority, % ElementParameters.ProcessName,% substr(ElementParameters.Priority,1,1)
-	if (ErrorLevel=0)
+	; set process priority
+	Process, Priority, % ElementParameters.ProcessName, % ElementParameters.Priority
+
+	; check for errors
+	if (ErrorLevel = 0)
 	{
-		Process,exist,% EvaluatedParameters.ProcessName
-		if (ErrorLevel=0)
+		; an error occured. check whether process exists
+		Process, exist, % EvaluatedParameters.ProcessName
+		if (ErrorLevel = 0)
 		{
-			x_finish(Environment,"exception", x_lang("Process '%1%' does not exist", EvaluatedParameters.ProcessName))
-			
+			x_finish(Environment, "exception", x_lang("Process '%1%' does not exist", EvaluatedParameters.ProcessName))
 		}
 		else
 		{
-			x_finish(Environment,"exception", x_lang("Priority of process '%1%' could not be changed", EvaluatedParameters.ProcessName))
-			
+			x_finish(Environment, "exception", x_lang("Priority of process '%1%' could not be changed", EvaluatedParameters.ProcessName))
 		}
+		return
 	}
 
 	x_finish(Environment,"normal")
 	return
-	
-
-
-	
 }
 
 

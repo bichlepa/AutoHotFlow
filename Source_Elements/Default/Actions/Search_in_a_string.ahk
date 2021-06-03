@@ -55,17 +55,21 @@ Element_getParametrizationDetails_Action_Search_in_a_string(Environment)
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Output variable")})
 	parametersToEdit.push({type: "Edit", id: "Varname", default: "NewPosition", content: "VariableName", WarnIfEmpty: true})
+	
 	parametersToEdit.push({type: "Label", label:  x_lang("Input string")})
 	parametersToEdit.push({type: "Edit", id: "VarValue", default: "Hello World", content: ["String", "Expression"], contentID: "Expression", ContentDefault: "String", WarnIfEmpty: true})
+	
 	parametersToEdit.push({type: "Label", label:  x_lang("Text to search")})
 	parametersToEdit.push({type: "Edit", id: "SearchText", default: "World", content: ["String", "Expression"], contentID: "IsExpressionSearchText", ContentDefault: "String", WarnIfEmpty: true})
+	
 	parametersToEdit.push({type: "Label", label: x_lang("Which occurence")})
-	parametersToEdit.push({type: "Edit", id: "OccurenceNumber", default: 1, content: "Number", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Radio", id: "LeftOrRight", default: 1, choices: [x_lang("From left"), x_lang("From right")], result: "enum", enum: ["FromLeft", "FromRight"]})
+	parametersToEdit.push({type: "Edit", id: "OccurenceNumber", default: 1, content: "PositiveInteger", WarnIfEmpty: true})
+	
 	parametersToEdit.push({type: "Label", label: x_lang("Start position")})
-	parametersToEdit.push({type: "Edit", id: "Offset", default: 1, content: "Number", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Edit", id: "Offset", default: 1, content: "Integer", WarnIfEmpty: true})
+	
 	parametersToEdit.push({type: "Label", label: x_lang("Case sensitivity")})
-	parametersToEdit.push({type: "Radio", id: "CaseSensitive", default: 1, choices: [x_lang("Case insensitive"), x_lang("Case sensitive")], result: "enum", enum: ["CaseInsensitive", "CaseSensitive"]})
+	parametersToEdit.push({type: "Radio", id: "CaseSensitive", default: "CaseInsensitive", choices: [x_lang("Case insensitive"), x_lang("Case sensitive")], result: "enum", enum: ["CaseInsensitive", "CaseSensitive"]})
 	
 	return parametersToEdit
 }
@@ -73,7 +77,7 @@ Element_getParametrizationDetails_Action_Search_in_a_string(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Search_in_a_string(Environment, ElementParameters)
 {
-	return x_lang("Search_in_a_string") 
+	return x_lang("Search_in_a_string") " - " ElementParameters.Varname " - " ElementParameters.VarValue " - " ElementParameters.SearchText
 }
 
 ;Called every time the user changes any parameter.
@@ -90,51 +94,31 @@ Element_CheckSettings_Action_Search_in_a_string(Environment, ElementParameters, 
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Search_in_a_string(Environment, ElementParameters)
 {
-	EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters)
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
 	if (EvaluatedParameters._error)
 	{
 		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
 
-	
-	if (EvaluatedParameters.CaseSensitive="CaseSensitive")
+	; search for the string
+	Result := instr(EvaluatedParameters.VarValue, EvaluatedParameters.SearchText, (EvaluatedParameters.CaseSensitive = "CaseSensitive"), EvaluatedParameters.Offset, EvaluatedParameters.OccurenceNumber)
+
+	; check for errors
+	if (Result = 0)
 	{
-		StringCaseSense,on
-	}
-	else
-	{
-		StringCaseSense,off
-	}
-	
-	if (EvaluatedParameters.LeftOrRight="FromLeft")
-	{
-		Options:="L" EvaluatedParameters.OccurenceNumber
-	}
-	else ;Right
-	{
-		Options:="R" EvaluatedParameters.OccurenceNumber
-	}
-		
-	StringGetPos,Result,% EvaluatedParameters.VarValue,% EvaluatedParameters.SearchText,%Options%,% EvaluatedParameters.Offset
-	StringCaseSense,off
-	
-	if errorlevel ;If no string was found
-	{
-		x_SetVariable(Environment,EvaluatedParameters.Varname,"") 
-		x_finish(Environment, "exception",x_lang("Searched text not found")) 
+		; nothing found
+		x_SetVariable(Environment, EvaluatedParameters.Varname, "") 
+		x_finish(Environment, "exception", x_lang("Searched text not found")) 
 		return
 	}
-	else
-	{
-		Result+= 1 ;because the first character index is 0 in the command StringGetPos
-		x_SetVariable(Environment,EvaluatedParameters.Varname,Result) 
-	}
+
+	; set output variable
+	x_SetVariable(Environment, EvaluatedParameters.Varname, Result) 
 	
-	
-	x_finish(Environment,"normal")
+	x_finish(Environment, "normal")
 	return
-	
 }
 
 
