@@ -69,19 +69,18 @@ Element_GenerateName_Action_Tooltip(Environment, ElementParameters)
 {
 	global
 	if (ElementParameters.Unit = "Milliseconds")
-		duration:=ElementParameters.duration " " x_lang("ms #Milliseconds")
+		duration := ElementParameters.duration " " x_lang("ms #Milliseconds")
 	if (ElementParameters.Unit = "Seconds")
-		duration:=ElementParameters.duration " " x_lang("s #Seconds")
+		duration := ElementParameters.duration " " x_lang("s #Seconds")
 	if (ElementParameters.Unit = "Minutes")
-		duration:=ElementParameters.duration " " x_lang("m #Minutes")
+		duration := ElementParameters.duration " " x_lang("m #Minutes")
 	
 	if (ElementParameters.follow_mouse=1)
-		temptext:=x_lang("Follow_Mouse")
+		temptext := x_lang("Follow_Mouse")
 	else
-		temptext=
+		temptext := ""
+	
 	return x_lang("Tooltip") ": " ElementParameters.text " - " duration " - " temptext
-	
-	
 }
 
 ;Called every time the user changes any parameter.
@@ -102,30 +101,36 @@ Element_run_Action_Tooltip(Environment, ElementParameters)
 	global runActionTooltip_Oldy=
 	
 	;Evaluate Parameters
-	EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters, ["text"])
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters, ["text"])
 	if (EvaluatedParameters._error)
 	{
 		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
-	runActionTooltip_Text:=x_replaceVariables(Environment,ElementParameters.text, "ConvertObjectToString")
+	runActionTooltip_Text := x_replaceVariables(Environment,ElementParameters.text, "ConvertObjectToString")
 	
-	;Perform task
-	ToolTip,% runActionTooltip_Text,,,13
-	if (EvaluatedParameters.follow_mouse =1)
-		SetTimer,runActionTooltip_follow_mouse,10,,,13
+	; Show tooltip
+	ToolTip, % runActionTooltip_Text,,, 13
+
+	if (EvaluatedParameters.follow_mouse)
+	{
+		; we need to follow the mouse. Set task timer for that
+		SetTimer, runActionTooltip_follow_mouse, 10,,, 13
+	}
 	
-	if (EvaluatedParameters.Unit="Milliseconds") ;Milliseconds
-		tempDuration:=EvaluatedParameters.duration
-	else if (EvaluatedParameters.Unit="Seconds") ;Seconds
-		tempDuration:=EvaluatedParameters.duration * 1000
-	else if (EvaluatedParameters.Unit="Minutes") ;minutes
-		tempDuration:=EvaluatedParameters.duration * 60000
+	; calculate duration in ms
+	if (EvaluatedParameters.Unit = "Milliseconds") ;Milliseconds
+		tempDuration := EvaluatedParameters.duration
+	else if (EvaluatedParameters.Unit = "Seconds") ;Seconds
+		tempDuration := EvaluatedParameters.duration * 1000
+	else if (EvaluatedParameters.Unit = "Minutes") ;minutes
+		tempDuration := EvaluatedParameters.duration * 60000
 	
-	SetTimer,runActionTooltip_RemoveTooltip,-%tempDuration%
-	x_finish(Environment,"normal")
+	; set timer which will remove the tooltip
+	SetTimer, runActionTooltip_RemoveTooltip, -%tempDuration%
+	
+	x_finish(Environment, "normal")
 	return
-	
 }
 
 ;Called when the execution of the element should be stopped.
@@ -140,18 +145,28 @@ runActionTooltip_follow_mouse()
 {
 	global runActionTooltip_Text
 	static runActionTooltip_Oldy, runActionTooltip_Oldx
-	MouseGetPos,runActionTooltip_MouseX,runActionTooltip_MouseY
-	if !(runActionTooltip_Oldy=runActionTooltip_Mousey and runActionTooltip_Oldx=runActionTooltip_MouseX)
+
+	; get mouse position
+	MouseGetPos, runActionTooltip_MouseX, runActionTooltip_MouseY
+
+	; check whether mouse position has changed
+	if !(runActionTooltip_Oldy = runActionTooltip_Mousey and runActionTooltip_Oldx = runActionTooltip_MouseX)
 	{
-		runActionTooltip_Oldy:=runActionTooltip_Mousey 
-		runActionTooltip_Oldx:=runActionTooltip_MouseX
-		ToolTip,%runActionTooltip_Text%,,,13
+		; mouse position has changed. Remember current position
+		runActionTooltip_Oldy := runActionTooltip_Mousey 
+		runActionTooltip_Oldx := runActionTooltip_MouseX
+
+		; move tooltip
+		ToolTip, %runActionTooltip_Text%,,, 13
 	}
 }
 
 ; removes the tooltip
 runActionTooltip_RemoveTooltip()
 {
-	SetTimer,runActionTooltip_follow_mouse,off
-	ToolTip,,,,13
+	; stop the timer which makes the tooltip follow the mouse
+	SetTimer, runActionTooltip_follow_mouse, off
+
+	; disable tooltip
+	ToolTip,,,, 13
 }

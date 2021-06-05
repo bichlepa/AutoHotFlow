@@ -1,7 +1,7 @@
 ﻿; list of all built in variables which also exist in AHK
-global global_AllBuiltInVars:=" A_Space A_Tab A_YYYY A_Year A_MM A_Mon A_DD A_MDay A_MMMM A_MMM A_DDDD A_DDD A_WDay A_YDay A_Hour A_Min A_Sec A_MSec A_TickCount A_TimeIdle A_TimeIdlePhysical A_Temp A_OSVersion A_Is64bitOS A_PtrSize A_Language A_ComputerName A_UserName A_ScriptDir A_WinDir A_ProgramFiles A_AppData A_AppDataCommon A_Desktop A_DesktopCommon A_StartMenu A_StartMenuCommon A_Programs A_ProgramsCommon A_Startup A_StartupCommon A_MyDocuments A_IsAdmin A_ScreenWidth A_ScreenHeight A_ScreenDPI A_IPAddress1 A_IPAddress2 A_IPAddress3 A_IPAddress4 A_Cursor A_CaretX A_CaretY a_now A_NowUTC a_linefeed "
+global global_AllBuiltInVars:=" A_Space A_Tab A_YYYY A_Year A_MM A_Mon A_DD A_MDay A_MMMM A_MMM A_DDDD A_DDD A_WDay A_YDay A_Hour A_Min A_Sec A_MSec A_TickCount A_TimeIdle A_TimeIdlePhysical A_Temp A_OSVersion A_Is64bitOS A_PtrSize A_Language A_ComputerName A_UserName A_ScriptDir A_WinDir A_ProgramFiles A_AppData A_AppDataCommon A_Desktop A_DesktopCommon A_StartMenu A_StartMenuCommon A_Programs A_ProgramsCommon A_Startup A_StartupCommon A_MyDocuments A_IsAdmin A_ScreenWidth A_ScreenHeight A_ScreenDPI A_IPAddress1 A_IPAddress2 A_IPAddress3 A_IPAddress4 A_Cursor A_CaretX A_CaretY a_now A_NowUTC "
 ; list of all custom built in variables which do not exist in AHK or have different value
-global global_AllCustomBuiltInVars:=" A_YWeek a_lf a_workingdir A_LanguageName a_NowString "
+global global_AllCustomBuiltInVars:=" A_YWeek a_linefeed a_lf a_cr a_carriageReturn a_workingdir A_LanguageName a_NowString "
 
 ; create variable folder, if it does not exist
 if not fileexist(_WorkingDir "\Variables")
@@ -189,7 +189,11 @@ BuiltInVariable_Get(Environment, p_Name, p_hidden = False)
 		FormatTime, tempvalue, %a_Now%
 		return tempvalue
 	}
-	else if (p_Name = "a_lf")
+	else if (p_Name = "a_lf" or p_Name = "a_linefeed")
+	{
+		return "`n"
+	}
+	else if (p_Name = "a_cr" or p_Name = "a_carriageReturn")
 	{
 		return "`n"
 	}

@@ -68,7 +68,7 @@ Element_getParametrizationDetails_Action_Split_a_string(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Split_a_string(Environment, ElementParameters)
 {
-	return x_lang("Split_a_string") 
+	return x_lang("Split_a_string") " - " ElementParameters.Varname " - " ElementParameters.VarValue " - " ElementParameters.Delimiters " - " ElementParameters.OmitChars
 }
 
 ;Called every time the user changes any parameter.
@@ -85,28 +85,26 @@ Element_CheckSettings_Action_Split_a_string(Environment, ElementParameters, stat
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Split_a_string(Environment, ElementParameters)
 {
-	EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters)
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
 	if (EvaluatedParameters._error)
 	{
 		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
 
-	Result:=Object()
-	loop,parse,% EvaluatedParameters.VarValue,% EvaluatedParameters.delimiters,% EvaluatedParameters.omitChars
+	; split the string
+	Result := Object()
+	loop, parse, % EvaluatedParameters.VarValue, % EvaluatedParameters.delimiters, % EvaluatedParameters.omitChars
 	{
 		Result.push(A_LoopField)
 	}
 	
-	
+	; set output variable
 	x_SetVariable(Environment,EvaluatedParameters.varname,Result)
 	
-	x_finish(Environment,"normal")
+	x_finish(Environment, "normal")
 	return
-	
-
-
-	
 }
 
 

@@ -58,13 +58,12 @@ Element_getParametrizationDetails_Action_Substring(Environment)
 	parametersToEdit.push({type: "Label", label:  x_lang("Input string")})
 	parametersToEdit.push({type: "Edit", id: "VarValue", default: "Hello World", content: ["String", "Expression"], contentID: "expression", contentDefault: "string", WarnIfEmpty: true})
 	parametersToEdit.push({type: "Label", label: x_lang("Start position")})
-	parametersToEdit.push({type: "Radio", id: "WhereToBegin", default: 1, choices: [x_lang("Begin from left"), x_lang("Begin from right"), x_lang("Start from following position")], result: "enum", enum: ["FromLeft", "FromRight", "Position"]})
+	parametersToEdit.push({type: "Radio", id: "WhereToBegin", default: "FromLeft", choices: [x_lang("Begin from left"), x_lang("Begin from right"), x_lang("Start from following position")], result: "enum", enum: ["FromLeft", "FromRight", "Position"]})
 	parametersToEdit.push({type: "Edit", id: "StartPos", default: 1, content: "Number", WarnIfEmpty: true})
 	parametersToEdit.push({type: "Label", label: x_lang("Count of characters")})
 	parametersToEdit.push({type: "CheckBox", id: "UntilTheEnd", default: 0, label: x_lang("Until the end")})
 	parametersToEdit.push({type: "Edit", id: "Length", default: 5, content: "Number", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Radio", id: "LeftOrRight", default: 1, choices: [x_lang("Go left"), x_lang("Go right")], result: "enum", enum: ["GoLeft", "GoRight"]})
-	
+	parametersToEdit.push({type: "Radio", id: "LeftOrRight", default: "GoLeft", choices: [x_lang("Go left"), x_lang("Go right")], result: "enum", enum: ["GoLeft", "GoRight"]})
 	
 	return parametersToEdit
 }
@@ -72,7 +71,7 @@ Element_getParametrizationDetails_Action_Substring(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Substring(Environment, ElementParameters)
 {
-	return x_lang("Substring") 
+	return x_lang("Substring") " - " ElementParameters.Varname " - " ElementParameters.VarValue 
 }
 
 ;Called every time the user changes any parameter.
@@ -81,7 +80,7 @@ Element_GenerateName_Action_Substring(Environment, ElementParameters)
 ;- Correct misconfiguration
 Element_CheckSettings_Action_Substring(Environment, ElementParameters, staticValues)
 {	
-	if (ElementParameters.WhereToBegin="Position")
+	if (ElementParameters.WhereToBegin = "Position")
 	{
 		x_Par_Enable("StartPos")
 		x_Par_Enable("LeftOrRight")
@@ -96,7 +95,7 @@ Element_CheckSettings_Action_Substring(Environment, ElementParameters, staticVal
 		x_Par_Disable("UntilTheEnd")
 		x_Par_SetValue("UntilTheEnd", 0)
 	}
-	if (ElementParameters.WhereToBegin ="FromRight")
+	if (ElementParameters.WhereToBegin = "FromRight")
 	{
 		x_Par_SetValue("LeftOrRight", "GoLeft")
 	}
@@ -111,37 +110,50 @@ Element_CheckSettings_Action_Substring(Environment, ElementParameters, staticVal
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Substring(Environment, ElementParameters)
 {
-	EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters, ["StartPos", "Length"])
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters, ["StartPos", "Length"])
 	if (EvaluatedParameters._error)
 	{
 		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
 	
-	
-	
-	if (EvaluatedParameters.WhereToBegin = "FromLeft") ;Begin from left
+	; Decide what to do
+	if (EvaluatedParameters.WhereToBegin = "FromLeft")
 	{
+		; Begin from left
+
+		; evaluate additional parameters
 		x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["Length"])
 		if (EvaluatedParameters._error)
 		{
 			x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 			return
 		}
-		StringLeft,Result,% EvaluatedParameters.VarValue,% EvaluatedParameters.Length
+
+		; get substring
+		StringLeft, Result, % EvaluatedParameters.VarValue, % EvaluatedParameters.Length
 	}
-	else if (EvaluatedParameters.WhereToBegin = "FromRight")  ;Begin from right
+	else if (EvaluatedParameters.WhereToBegin = "FromRight")
 	{
+		; Begin from right
+
+		; evaluate additional parameters
 		x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["Length"])
 		if (EvaluatedParameters._error)
 		{
 			x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 			return
 		}
-		StringRight,Result,% EvaluatedParameters.VarValue,% EvaluatedParameters.Length
+		
+		; get substring
+		StringRight, Result, % EvaluatedParameters.VarValue, % EvaluatedParameters.Length
 	}
-	else if (EvaluatedParameters.WhereToBegin = "Position")  ;Begin from specified position
+	else if (EvaluatedParameters.WhereToBegin = "Position")
 	{
+		; Begin from specified position
+		
+		; evaluate additional parameters
 		x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["StartPos"])
 		if (EvaluatedParameters._error)
 		{
@@ -150,34 +162,41 @@ Element_run_Action_Substring(Environment, ElementParameters)
 		}
 		
 		
-		if (EvaluatedParameters.LeftOrRight="GoLeft") ;Go left
+		if (EvaluatedParameters.LeftOrRight = "GoLeft")
 		{
-			OptionToLeft=L
+			; we need to go left. Set this option
+			OptionToLeft := "L"
 		}
-		if  (EvaluatedParameters.UntilTheEnd=0)
+		
+		if (not EvaluatedParameters.UntilTheEnd)
 		{
+			; we don't go until the end
+			
+			; evaluate additional parameters
 			x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["Length"])
 			if (EvaluatedParameters._error)
 			{
 				x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 				return
 			}
-			Stringmid,Result,% EvaluatedParameters.VarValue,% EvaluatedParameters.StartPos,% EvaluatedParameters.Length,%OptionToLeft%
+			
+			; get substring
+			Stringmid, Result, % EvaluatedParameters.VarValue, % EvaluatedParameters.StartPos, % EvaluatedParameters.Length, %OptionToLeft%
 		}
 		else
 		{
-			Stringmid,Result,% EvaluatedParameters.VarValue,% EvaluatedParameters.StartPos,,%OptionToLeft%
+			; we go until the end
+
+			; get substring
+			Stringmid, Result, % EvaluatedParameters.VarValue, % EvaluatedParameters.StartPos,, %OptionToLeft%
 		}
 	}
 	
+	; set output variable
+	x_SetVariable(Environment, EvaluatedParameters.Varname, result) 
 
-	x_SetVariable(Environment,EvaluatedParameters.Varname,result) 
-	x_finish(Environment,"normal")
+	x_finish(Environment, "normal")
 	return
-	
-
-
-	
 }
 
 

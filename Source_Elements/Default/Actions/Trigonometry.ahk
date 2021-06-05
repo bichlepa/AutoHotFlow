@@ -58,9 +58,9 @@ Element_getParametrizationDetails_Action_Trigonometry(Environment)
 	parametersToEdit.push({type: "Label", label:  x_lang("Input number")})
 	parametersToEdit.push({type: "Edit", id: "VarValue", default: 0.5, content: "Number", WarnIfEmpty: true})
 	parametersToEdit.push({type: "Label", label:  x_lang("Operation")})
-	parametersToEdit.push({type: "Radio", id: "Operation", default: 2, choices: [x_lang("Sine"), x_lang("Cosine"), x_lang("Tangent"), x_lang("Arcsine"), x_lang("Arccosine"), x_lang("Arctangent")], result: "enum", enum: ["Sine", "Cosine", "Tangent", "Arcsine", "Arccosine", "Arctangent"]})
+	parametersToEdit.push({type: "Radio", id: "Operation", default: "Sine", choices: [x_lang("Sine"), x_lang("Cosine"), x_lang("Tangent"), x_lang("Arcsine"), x_lang("Arccosine"), x_lang("Arctangent")], result: "enum", enum: ["Sine", "Cosine", "Tangent", "Arcsine", "Arccosine", "Arctangent"]})
 	parametersToEdit.push({type: "Label", label:  x_lang("Unit")})
-	parametersToEdit.push({type: "Radio", id: "Unit", default: 1, choices: [x_lang("Radian"), x_lang("Degree")], result: "enum", enum: ["Radian", "Degree"]})
+	parametersToEdit.push({type: "Radio", id: "Unit", default: "Radian", choices: [x_lang("Radian"), x_lang("Degree")], result: "enum", enum: ["Radian", "Degree"]})
 	
 	return parametersToEdit
 }
@@ -68,7 +68,23 @@ Element_getParametrizationDetails_Action_Trigonometry(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Trigonometry(Environment, ElementParameters)
 {
-	return x_lang("Trigonometry") 
+	; calculate result based on operation
+	switch (Operation)
+	{
+		case "Sine":
+		operationText := x_lang("Sine")
+		case "Cosine":
+		operationText := x_lang("Cosine")
+		case "Tangent":
+		operationText := x_lang("Tangent")
+		case "Arcsine":
+		operationText := x_lang("Arcsine")
+		case "Arccosine":
+		operationText := x_lang("Arccosine")
+		case "Arctangent":
+		operationText := x_lang("Arctangent")
+	}
+	return x_lang("Trigonometry") " - " operationText " - " ElementParameters.Varname " - " ElementParameters.VarValue
 }
 
 ;Called every time the user changes any parameter.
@@ -85,48 +101,59 @@ Element_CheckSettings_Action_Trigonometry(Environment, ElementParameters, static
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Trigonometry(Environment, ElementParameters)
 {
-	EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters)
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
 	if (EvaluatedParameters._error)
 	{
 		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
 
-	Operation:=EvaluatedParameters.Operation
-	Unit:=EvaluatedParameters.Unit
-	VarValue:=EvaluatedParameters.VarValue
+	; copy value to shorter variable
+	Operation := EvaluatedParameters.Operation
 	
-	if (Operation="Sine" or Operation="Cosine" or Operation="Tangent") ;If input is radian or degree
+	; If input is an angle
+	if (Operation = "Sine" or Operation = "Cosine" or Operation = "Tangent")
 	{
-		if (Unit="Degree") ;If degree, convert to radian
+		if (EvaluatedParameters.Unit = "Degree") 
 		{
-			VarValue/=180/3.141592653589793
+			; convert degree to radian
+			VarValue /= 180 / 3.141592653589793
 		}
 	}
-	if (Operation="Sine") ;Sine
-		Result:=Sin(VarValue)
-	else if (Operation="Cosine") ;Cosine
-		Result:=Cos(VarValue)
-	else if (Operation="Tangent") ;Tangent
-		Result:=Tan(VarValue)
-	else if (Operation="Arcsine") ;ASine
-		Result:=ASin(VarValue)
-	else if (Operation="Arccosine") ;ACosine
-		Result:=ACos(VarValue)
-	else if (Operation="Arctangent") ;ATangent
-		Result:=ATan(VarValue)
-	if (Operation="Arcsine" or Operation="Arccosine" or Operation="Arctangent") ;If output is radian or degree
+
+	; calculate result based on operation
+	switch (Operation)
 	{
-		if (Unit="Degree") ;If degree, convert from radian
+		case "Sine":
+		Result := Sin(EvaluatedParameters.VarValue)
+		case "Cosine":
+		Result := Cos(EvaluatedParameters.VarValue)
+		case "Tangent":
+		Result := Tan(EvaluatedParameters.VarValue)
+		case "Arcsine":
+		Result := ASin(EvaluatedParameters.VarValue)
+		case "Arccosine":
+		Result := ACos(EvaluatedParameters.VarValue)
+		case "Arctangent":
+		Result := ATan(EvaluatedParameters.VarValue)
+	}
+
+	; If output is an angle
+	if (Operation = "Arcsine" or Operation = "Arccosine" or Operation = "Arctangent")
+	{
+		if (EvaluatedParameters.Unit = "Degree")
 		{
-			Result*=180/3.141592653589793
+			; convert radian to degree
+			Result *= 180 / 3.141592653589793
 		}
 	}
 	
-	x_SetVariable(Environment,EvaluatedParameters.Varname,Result)
-	x_finish(Environment,"normal")
+	; set output variable
+	x_SetVariable(Environment, EvaluatedParameters.Varname, Result)
+
+	x_finish(Environment, "normal")
 	return
-	
 }
 
 

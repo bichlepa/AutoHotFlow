@@ -2453,6 +2453,7 @@ class ElementSettings
 		; let the element function Element_CheckSettings_xxx check the settings
 		setElementClass := ElementSettings.elementClass
 		Element_CheckSettings_%setElementClass%({FlowID: _FlowID, ElementID: ElementSettings.element}, allParamValues, this.staticValuesForCheckSettingsFunction)
+		allParamValues := ElementSettings.getAllValues()
 		
 		; update the element name
 		ElementSettings.NameField.updatename(allParamValues)

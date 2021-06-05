@@ -53,7 +53,6 @@ Element_getParametrizationDetails_Action_Square_Root(Environment)
 {
 	parametersToEdit:=Object()
 	
-	
 	parametersToEdit.push({type: "Label", label: x_lang("Variable_name")})
 	parametersToEdit.push({type: "Edit", id: "Varname", default: "NewVariable", content: "VariableName", WarnIfEmpty: true})
 	parametersToEdit.push({type: "Label", label:  x_lang("Variable containing a number")})
@@ -65,7 +64,7 @@ Element_getParametrizationDetails_Action_Square_Root(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Square_Root(Environment, ElementParameters)
 {
-	return x_lang("Square_Root") 
+	return x_lang("Square_Root") " - " ElementParameters.Varname " - " ElementParameters.VarValue
 }
 
 ;Called every time the user changes any parameter.
@@ -82,21 +81,22 @@ Element_CheckSettings_Action_Square_Root(Environment, ElementParameters, staticV
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Square_Root(Environment, ElementParameters)
 {
-	EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters)
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
 	if (EvaluatedParameters._error)
 	{
 		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
 
+	; calculate square root
+	result := sqrt(EvaluatedParameters.VarValue)
 
-	x_SetVariable(Environment,EvaluatedParameters.Varname,sqrt(EvaluatedParameters.VarValue))
-	x_finish(Environment,"normal")
+	; set output variable
+	x_SetVariable(Environment, EvaluatedParameters.Varname, result)
+
+	x_finish(Environment, "normal")
 	return
-	
-
-
-	
 }
 
 

@@ -2837,10 +2837,30 @@
       "type": "Action",
       "x": "-735",
       "y": "3885"
+    },
+    "element0000000485": {
+      "class": "Action_Trim_a_string",
+      "ID": "element0000000485",
+      "name": "Trim a string - NewVariable - Hello World - Remove '6' characters from 'right side'",
+      "package": "default",
+      "pars": {
+        "expression": "String",
+        "LeftSide": "0",
+        "Length": 6,
+        "OmitChars": "%a_space%%a_tab%%a_lf%%a_cr%",
+        "RightSide": "1",
+        "TrimWhat": "Number",
+        "Varname": "NewVariable",
+        "VarValue": "Hello World"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "-770",
+      "y": "-175"
     }
   },
   "category": "AHF Test",
-  "ElementIDCounter": "484",
+  "ElementIDCounter": "485",
   "flowSettings": {
     "DefaultWorkingDir": 1,
     "ExecutionPolicy": "default",

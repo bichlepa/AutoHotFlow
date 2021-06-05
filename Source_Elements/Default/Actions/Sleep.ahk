@@ -89,6 +89,7 @@ Element_CheckSettings_Action_Sleep(Environment, ElementParameters, staticValues)
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Sleep(Environment, ElementParameters)
 {
+	; evaluate parameters
 	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
 	if (EvaluatedParameters._error)
 	{
@@ -96,6 +97,7 @@ Element_run_Action_Sleep(Environment, ElementParameters)
 		return
 	}
 	
+	; calculate duration in ms
 	switch (EvaluatedParameters.Unit)
 	{
 	case "Milliseconds":
