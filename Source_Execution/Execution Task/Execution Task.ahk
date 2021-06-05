@@ -191,6 +191,9 @@ executionTask()
 					if (OneThread.state = "running" )
 					{
 						; there was a running element.
+
+						_setThreadProperty(OneInstanceID, OneThreadID, "state", "stopping")
+
 						; get some information about the current element
 						oneElementClass := _getElementProperty(OneThread.FlowID, OneThread.ElementID, "class")
 						
@@ -260,8 +263,8 @@ finishExecutionOfElement(p_InstanceID, p_ThreadID, p_Result, p_Message = "")
 	_EnterCriticalSection()
 
 	; check whether the current thread exists
-	threadID := _getThreadProperty(p_InstanceID, p_ThreadID, "threadID")
-	if not threadID
+	threadState := _getThreadProperty(p_InstanceID, p_ThreadID, "state")
+	if (not threadState or threadState = "stopping")
 	{
 		; the current thread does not exist (it was stopped). Ignore the call from a finished element of a stopped thread
 	}
