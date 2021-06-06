@@ -1,0 +1,357 @@
+﻿{
+  "allConnections": {
+    "connection0000000015": {
+      "ConnectionType": "normal",
+      "from": "element0000000005",
+      "ID": "connection0000000015",
+      "to": "element0000000003",
+      "type": "Connection"
+    },
+    "connection0000000016": {
+      "ConnectionType": "normal",
+      "from": "element0000000006",
+      "fromPart": "TAIL",
+      "ID": "connection0000000016",
+      "to": "element0000000008",
+      "type": "Connection"
+    },
+    "connection0000000017": {
+      "ConnectionType": "normal",
+      "from": "element0000000009",
+      "ID": "connection0000000017",
+      "to": "element0000000006",
+      "toPart": "HEAD",
+      "type": "Connection"
+    },
+    "connection0000000018": {
+      "ConnectionType": "normal",
+      "from": "element0000000010",
+      "ID": "connection0000000018",
+      "to": "element0000000009",
+      "type": "Connection"
+    },
+    "connection0000000019": {
+      "ConnectionType": "normal",
+      "from": "element0000000007",
+      "ID": "connection0000000019",
+      "to": "element0000000011",
+      "type": "Connection"
+    },
+    "connection0000000020": {
+      "ConnectionType": "normal",
+      "from": "element0000000004",
+      "fromPart": "TAIL",
+      "ID": "connection0000000020",
+      "to": "element0000000012",
+      "type": "Connection"
+    },
+    "connection0000000021": {
+      "ConnectionType": "Yes",
+      "from": "element0000000013",
+      "ID": "connection0000000021",
+      "to": "element0000000007",
+      "type": "Connection"
+    },
+    "connection0000000022": {
+      "ConnectionType": "normal",
+      "from": "element0000000004",
+      "fromPart": "HEAD",
+      "ID": "connection0000000022",
+      "to": "element0000000010",
+      "type": "Connection"
+    },
+    "connection0000000023": {
+      "ConnectionType": "No",
+      "from": "element0000000013",
+      "ID": "connection0000000023",
+      "to": "element0000000006",
+      "toPart": "BREAK",
+      "type": "Connection"
+    },
+    "connection0000000024": {
+      "ConnectionType": "normal",
+      "from": "element0000000006",
+      "fromPart": "HEAD",
+      "ID": "connection0000000024",
+      "to": "element0000000013",
+      "type": "Connection"
+    },
+    "connection0000000025": {
+      "ConnectionType": "normal",
+      "from": "element0000000011",
+      "ID": "connection0000000025",
+      "to": "element0000000006",
+      "toPart": "TAIL",
+      "type": "Connection"
+    },
+    "connection0000000026": {
+      "ConnectionType": "normal",
+      "from": "element0000000008",
+      "ID": "connection0000000026",
+      "to": "element0000000004",
+      "toPart": "TAIL",
+      "type": "Connection"
+    },
+    "connection0000000027": {
+      "ConnectionType": "normal",
+      "from": "element0000000003",
+      "ID": "connection0000000027",
+      "to": "element0000000004",
+      "toPart": "HEAD",
+      "type": "Connection"
+    },
+    "connection0000000028": {
+      "ConnectionType": "normal",
+      "from": "element0000000002",
+      "ID": "connection0000000028",
+      "to": "element0000000005",
+      "type": "Connection"
+    },
+    "connection0000000029": {
+      "ConnectionType": "normal",
+      "from": "element0000000012",
+      "ID": "connection0000000029",
+      "to": "element0000000030",
+      "type": "Connection"
+    }
+  },
+  "allElements": {
+    "element0000000002": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "1",
+      "enabled": "1",
+      "ID": "element0000000002",
+      "name": "Manual - \"loop test\"",
+      "package": "default",
+      "pars": {
+        "ID": "loop test"
+      },
+      "StandardName": "1",
+      "type": "trigger",
+      "x": "245",
+      "y": "70"
+    },
+    "element0000000003": {
+      "class": "Action_New_List",
+      "ID": "element0000000003",
+      "name": "New list TestList2 - At position '1' - Multiple values 'Eins,Zwei,Drei'",
+      "package": "default",
+      "pars": {
+        "DelimiterComma": 1,
+        "DelimiterLinefeed": 0,
+        "DelimiterSemicolon": 0,
+        "DelimiterSpace": 0,
+        "expression": "String",
+        "expressionPos": "String",
+        "NumberOfElements": "Multiple",
+        "Position": 1,
+        "Varname": "TestList2",
+        "VarValue": "New element",
+        "VarValues": "Eins,Zwei,Drei",
+        "WhichPosition": "Specified"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "245",
+      "y": "350"
+    },
+    "element0000000004": {
+      "class": "Loop_Work_through_a_list",
+      "HeightOfVerticalBar": 1365,
+      "ID": "element0000000004",
+      "name": "Work through a list: testListFirst",
+      "package": "default",
+      "pars": {
+        "Varname": "testListFirst"
+      },
+      "StandardName": 1,
+      "type": "Loop",
+      "x": "245",
+      "y": "490"
+    },
+    "element0000000005": {
+      "class": "Action_New_List",
+      "ID": "element0000000005",
+      "name": "New list testListFirst - At position '1' - Multiple values 'One - Two - Three'",
+      "package": "default",
+      "pars": {
+        "DelimiterComma": "0",
+        "DelimiterLinefeed": "1",
+        "DelimiterSemicolon": "0",
+        "DelimiterSpace": "0",
+        "expression": "String",
+        "expressionPos": "String",
+        "NumberOfElements": "Multiple",
+        "Position": "1",
+        "Varname": "testListFirst",
+        "VarValue": "New element",
+        "VarValues": "One\nTwo\nThree",
+        "WhichPosition": "Specified"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "245",
+      "y": "210"
+    },
+    "element0000000006": {
+      "class": "Loop_Work_through_a_list",
+      "HeightOfVerticalBar": "525",
+      "ID": "element0000000006",
+      "name": "Work through a list: testlist2",
+      "package": "default",
+      "pars": {
+        "Varname": "testlist2"
+      },
+      "StandardName": 1,
+      "type": "loop",
+      "x": "315",
+      "y": "945"
+    },
+    "element0000000007": {
+      "class": "Action_Tooltip",
+      "ID": "element0000000007",
+      "name": "Tooltip: inner loop %a_index% - 2 s - Follow Mouse",
+      "package": "action",
+      "pars": {
+        "duration": 2,
+        "follow_mouse": 1,
+        "text": "inner loop %a_index%",
+        "Unit": "Seconds"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "455",
+      "y": "1260"
+    },
+    "element0000000008": {
+      "class": "Action_Tooltip",
+      "ID": "element0000000008",
+      "name": "Tooltip: outer loop %a_index% end - 2 s - Follow Mouse",
+      "package": "action",
+      "pars": {
+        "duration": 2,
+        "follow_mouse": 1,
+        "text": "outer loop %a_index% end",
+        "Unit": "Seconds"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "315",
+      "y": "1680"
+    },
+    "element0000000009": {
+      "class": "Action_Trace_Point",
+      "ID": "element0000000009",
+      "name": "Trace Point - bright leg - With stop condition",
+      "package": "default",
+      "pars": {
+        "ID": "bright leg",
+        "LogMessage": "",
+        "StopCondition": "(a_index = 1) && (a_loopfield != \"one\") || (a_index = 2) && (a_loopfield !=\"two\")  || (a_index = 3) && (a_loopfield !=\"three\")"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "280",
+      "y": "805"
+    },
+    "element0000000010": {
+      "class": "Action_Tooltip",
+      "ID": "element0000000010",
+      "name": "Tooltip: outer loop %a_index% - 2 s - Follow Mouse",
+      "package": "action",
+      "pars": {
+        "duration": 2,
+        "follow_mouse": 1,
+        "text": "outer loop %a_index%",
+        "Unit": "Seconds"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "315",
+      "y": "665"
+    },
+    "element0000000011": {
+      "class": "Action_Trace_Point",
+      "ID": "element0000000011",
+      "name": "Trace Point - bright leg2 - With stop condition",
+      "package": "default",
+      "pars": {
+        "ID": "bright leg2",
+        "LogMessage": "",
+        "StopCondition": "(a_index = 1) && (a_loopfield != \"eins\") || (a_index = 2) && (a_loopfield != \"zwei\") || (a_index = 3)"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "455",
+      "y": "1435"
+    },
+    "element0000000012": {
+      "class": "Action_Trace_Point_Check",
+      "ID": "element0000000012",
+      "name": "Trace Point Check",
+      "package": "default",
+      "pars": {
+        "MustNotPassTracepoints": [
+          "Tracepoint red box (element0000000551)"
+        ],
+        "MustNotPassTracepointsAll": 0,
+        "MustPassTracepoints": {},
+        "MustPassTracepointsAll": 1
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "245",
+      "y": "2100"
+    },
+    "element0000000013": {
+      "class": "Condition_Expression",
+      "ID": "element0000000013",
+      "name": "Ausdruck - a_index <= 2",
+      "package": "default",
+      "pars": {
+        "Expression": "a_index <= 2"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "350",
+      "y": "1085"
+    },
+    "element0000000030": {
+      "class": "Action_Add_To_List",
+      "ID": "element0000000030",
+      "name": "Add to list global_testResults - As last value - Value 'a_flowName'",
+      "package": "default",
+      "pars": {
+        "DelimiterComma": 0,
+        "DelimiterLinefeed": 1,
+        "DelimiterSemicolon": 0,
+        "DelimiterSpace": 0,
+        "Expression": "Expression",
+        "expressionPos": "String",
+        "InsertMethod": "Insert",
+        "InsertMethodLabel": "",
+        "NumberOfElements": "One",
+        "Position": "keyName",
+        "Varname": "global_testResults",
+        "VarValue": "a_flowName",
+        "VarValues": "Element one\nElement two",
+        "WhichPosition": "Last"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "280",
+      "y": "2380"
+    }
+  },
+  "category": "Automatic tests",
+  "ElementIDCounter": "30",
+  "flowSettings": {
+    "DefaultWorkingDir": 1,
+    "ExecutionPolicy": "default",
+    "Offsetx": "-347.142858",
+    "Offsety": "952.857143",
+    "WorkingDir": "",
+    "zoomFactor": "0.7"
+  },
+  "name": "Loop test"
+}

@@ -61,7 +61,7 @@
     "element0000000006": {
       "class": "Action_Get_Clipboard",
       "ID": "element0000000006",
-      "name": "Get Clipboard - clipboard = ^",
+      "name": "Get Clipboard - clipboard",
       "package": "default",
       "pars": {
         "Varname": "clipboard"
@@ -84,7 +84,7 @@
       "y": "35"
     }
   },
-  "category": "AHF Test",
+  "category": "Manual tests",
   "ElementIDCounter": "8",
   "flowSettings": {
     "DefaultWorkingDir": 1,

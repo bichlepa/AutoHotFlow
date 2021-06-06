@@ -76,6 +76,7 @@ ActionMove_MouseMouseTracker()
 {
 	x_assistant_MouseTracker({ImportMousePos:"Yes",CoordMode:"CoordMode",xpos:"xpos",ypos:"ypos"})
 }
+
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Move_Mouse(Environment, ElementParameters)
 {

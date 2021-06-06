@@ -16,7 +16,7 @@ Element_getName_Action_Trigonometry()
 ;Category of the element
 Element_getCategory_Action_Trigonometry()
 {
-	return x_lang("Variable")
+	return x_lang("Maths")
 }
 
 ;This function returns the package of the element.

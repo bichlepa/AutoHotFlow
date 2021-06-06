@@ -83,7 +83,7 @@ Element_CheckSettings_Action_Run(Environment, ElementParameters, staticValues)
 Element_run_Action_Run(Environment, ElementParameters)
 {
 	; evaluate parameters
-	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters, "WorkingDir")
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters, ["WorkingDir"])
 	if (EvaluatedParameters._error)
 	{
 		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 

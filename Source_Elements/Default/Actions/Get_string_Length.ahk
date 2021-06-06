@@ -16,7 +16,7 @@ Element_getName_Action_Get_String_Length()
 ;Category of the element
 Element_getCategory_Action_Get_String_Length()
 {
-	return x_lang("Variable")
+	return x_lang("Text")
 }
 
 ;This function returns the package of the element.

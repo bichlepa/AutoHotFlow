@@ -16,7 +16,7 @@ Element_getName_Action_Extract_files()
 ;Category of the element
 Element_getCategory_Action_Extract_files()
 {
-	return x_lang("Files")
+	return x_lang("File")
 }
 
 ;This function returns the package of the element.

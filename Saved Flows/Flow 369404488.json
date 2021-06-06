@@ -1,0 +1,500 @@
+﻿{
+  "allConnections": {
+    "connection0000000014": {
+      "ConnectionType": "normal",
+      "from": "element0000000002",
+      "ID": "connection0000000014",
+      "to": "element0000000003",
+      "type": "Connection"
+    },
+    "connection0000000015": {
+      "ConnectionType": "normal",
+      "from": "element0000000003",
+      "ID": "connection0000000015",
+      "to": "element0000000004",
+      "type": "Connection"
+    },
+    "connection0000000016": {
+      "ConnectionType": "Yes",
+      "from": "element0000000004",
+      "ID": "connection0000000016",
+      "to": "element0000000005",
+      "type": "Connection"
+    },
+    "connection0000000017": {
+      "ConnectionType": "No",
+      "from": "element0000000005",
+      "ID": "connection0000000017",
+      "to": "element0000000006",
+      "type": "Connection"
+    },
+    "connection0000000018": {
+      "ConnectionType": "normal",
+      "from": "element0000000006",
+      "ID": "connection0000000018",
+      "to": "element0000000007",
+      "type": "Connection"
+    },
+    "connection0000000019": {
+      "ConnectionType": "Yes",
+      "from": "element0000000007",
+      "ID": "connection0000000019",
+      "to": "element0000000008",
+      "type": "Connection"
+    },
+    "connection0000000020": {
+      "ConnectionType": "Yes",
+      "from": "element0000000010",
+      "ID": "connection0000000020",
+      "to": "element0000000009",
+      "type": "Connection"
+    },
+    "connection0000000021": {
+      "ConnectionType": "No",
+      "from": "element0000000009",
+      "ID": "connection0000000021",
+      "to": "element0000000011",
+      "type": "Connection"
+    },
+    "connection0000000022": {
+      "ConnectionType": "Yes",
+      "from": "element0000000011",
+      "ID": "connection0000000022",
+      "to": "element0000000012",
+      "type": "Connection"
+    },
+    "connection0000000023": {
+      "ConnectionType": "No",
+      "from": "element0000000012",
+      "ID": "connection0000000023",
+      "to": "element0000000013",
+      "type": "Connection"
+    },
+    "connection0000000024": {
+      "ConnectionType": "No",
+      "from": "element0000000008",
+      "ID": "connection0000000024",
+      "to": "element0000000010",
+      "type": "Connection"
+    },
+    "connection0000000028": {
+      "ConnectionType": "normal",
+      "from": "element0000000025",
+      "ID": "connection0000000028",
+      "to": "element0000000029",
+      "type": "Connection"
+    },
+    "connection0000000031": {
+      "ConnectionType": "normal",
+      "from": "element0000000029",
+      "ID": "connection0000000031",
+      "to": "element0000000036",
+      "type": "Connection"
+    },
+    "connection0000000038": {
+      "ConnectionType": "Yes",
+      "from": "element0000000035",
+      "ID": "connection0000000038",
+      "to": "element0000000045",
+      "type": "Connection"
+    },
+    "connection0000000039": {
+      "ConnectionType": "normal",
+      "from": "element0000000036",
+      "ID": "connection0000000039",
+      "to": "element0000000034",
+      "type": "Connection"
+    },
+    "connection0000000041": {
+      "ConnectionType": "normal",
+      "from": "element0000000034",
+      "ID": "connection0000000041",
+      "to": "element0000000030",
+      "type": "Connection"
+    },
+    "connection0000000043": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000043",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000044": {
+      "ConnectionType": "normal",
+      "from": "element0000000030",
+      "ID": "connection0000000044",
+      "to": "element0000000035",
+      "type": "Connection"
+    },
+    "connection0000000047": {
+      "ConnectionType": "No",
+      "from": "element0000000035",
+      "ID": "connection0000000047",
+      "to": "element0000000046",
+      "type": "Connection"
+    }
+  },
+  "allElements": {
+    "element0000000002": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "0",
+      "enabled": "1",
+      "ID": "element0000000002",
+      "name": "Manual - \"string contains text test\"",
+      "package": "default",
+      "pars": {
+        "ID": "string contains text test"
+      },
+      "StandardName": "1",
+      "type": "trigger",
+      "x": "350",
+      "y": "0"
+    },
+    "element0000000003": {
+      "class": "Action_New_variable",
+      "ID": "element0000000003",
+      "name": "New variable - NewVariable = Hello World",
+      "package": "default",
+      "pars": {
+        "expression": "string",
+        "Varname": "NewVariable",
+        "VarValue": "Hello World"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "350",
+      "y": "140"
+    },
+    "element0000000004": {
+      "class": "Condition_String_Contains_Text",
+      "ID": "element0000000004",
+      "name": "String Contains Text - 'newVariable' contains 'World' - Case insensitive",
+      "package": "default",
+      "pars": {
+        "CaseSensitive": "CaseInsensitive",
+        "Expression": "Expression",
+        "IsExpressionSearchText": "String",
+        "SearchText": "World",
+        "VarValue": "newVariable",
+        "WhereToBegin": "Anywhere"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "350",
+      "y": "280"
+    },
+    "element0000000005": {
+      "class": "Condition_String_Contains_Text",
+      "ID": "element0000000005",
+      "name": "String Contains Text - 'newVariable' contains 'world' - Case sensitive",
+      "package": "default",
+      "pars": {
+        "CaseSensitive": "CaseSensitive",
+        "Expression": "Expression",
+        "IsExpressionSearchText": "String",
+        "SearchText": "world",
+        "VarValue": "newVariable",
+        "WhereToBegin": "Anywhere"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "350",
+      "y": "420"
+    },
+    "element0000000006": {
+      "class": "Action_New_variable",
+      "ID": "element0000000006",
+      "name": "New variable - searchText = hello",
+      "package": "default",
+      "pars": {
+        "expression": "String",
+        "Varname": "searchText",
+        "VarValue": "hello"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "350",
+      "y": "560"
+    },
+    "element0000000007": {
+      "class": "Condition_String_Contains_Text",
+      "ID": "element0000000007",
+      "name": "String Contains Text - 'Hello You' contains '%SearchText%' - Case insensitive",
+      "package": "default",
+      "pars": {
+        "CaseSensitive": "CaseInsensitive",
+        "Expression": "String",
+        "IsExpressionSearchText": "String",
+        "SearchText": "%SearchText%",
+        "VarValue": "Hello You",
+        "WhereToBegin": "Anywhere"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "350",
+      "y": "700"
+    },
+    "element0000000008": {
+      "class": "Condition_String_Contains_Text",
+      "ID": "element0000000008",
+      "name": "String Contains Text - 'Hello You' contains 'SearchText' - Case sensitive",
+      "package": "default",
+      "pars": {
+        "CaseSensitive": "CaseSensitive",
+        "Expression": "String",
+        "IsExpressionSearchText": "Expression",
+        "SearchText": "SearchText",
+        "VarValue": "Hello You",
+        "WhereToBegin": "Anywhere"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "350",
+      "y": "840"
+    },
+    "element0000000009": {
+      "class": "Condition_String_Contains_Text",
+      "ID": "element0000000009",
+      "name": "String Contains Text - 'Hello You' starts with 'hello' - Case sensitive",
+      "package": "default",
+      "pars": {
+        "CaseSensitive": "CaseSensitive",
+        "Expression": "String",
+        "IsExpressionSearchText": "String",
+        "SearchText": "hello",
+        "VarValue": "Hello You",
+        "WhereToBegin": "Start"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "350",
+      "y": "1260"
+    },
+    "element0000000010": {
+      "class": "Condition_String_Contains_Text",
+      "ID": "element0000000010",
+      "name": "String Contains Text - 'Hello You' starts with 'hello' - Case insensitive",
+      "package": "default",
+      "pars": {
+        "CaseSensitive": "CaseInsensitive",
+        "Expression": "String",
+        "IsExpressionSearchText": "String",
+        "SearchText": "hello",
+        "VarValue": "Hello You",
+        "WhereToBegin": "Start"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "350",
+      "y": "1120"
+    },
+    "element0000000011": {
+      "class": "Condition_String_Contains_Text",
+      "ID": "element0000000011",
+      "name": "String Contains Text - 'Hello You' starts with 'you' - Case insensitive",
+      "package": "default",
+      "pars": {
+        "CaseSensitive": "CaseInsensitive",
+        "Expression": "String",
+        "IsExpressionSearchText": "String",
+        "SearchText": "you",
+        "VarValue": "Hello You",
+        "WhereToBegin": "End"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "350",
+      "y": "1400"
+    },
+    "element0000000012": {
+      "class": "Condition_String_Contains_Text",
+      "ID": "element0000000012",
+      "name": "String Contains Text - 'Hello You' starts with 'you' - Case sensitive",
+      "package": "default",
+      "pars": {
+        "CaseSensitive": "CaseSensitive",
+        "Expression": "String",
+        "IsExpressionSearchText": "String",
+        "SearchText": "you",
+        "VarValue": "Hello You",
+        "WhereToBegin": "End"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "350",
+      "y": "1540"
+    },
+    "element0000000013": {
+      "class": "Action_New_variable",
+      "ID": "element0000000013",
+      "name": "New variable - static_successfulRuns = static_successfulRuns + 1",
+      "package": "default",
+      "pars": {
+        "expression": "Expression",
+        "Varname": "static_successfulRuns",
+        "VarValue": "static_successfulRuns + 1"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "350",
+      "y": "1680"
+    },
+    "element0000000025": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "1",
+      "enabled": "1",
+      "ID": "element0000000025",
+      "name": "Manual - \"start\"",
+      "package": "default",
+      "pars": {
+        "ID": "start"
+      },
+      "StandardName": "1",
+      "type": "trigger",
+      "x": "-175",
+      "y": "70"
+    },
+    "element0000000029": {
+      "class": "Action_Set_Flow_Status",
+      "ID": "element0000000029",
+      "name": "Set Flow Status - Aktivieren: This flow - Any trigger",
+      "package": "default",
+      "pars": {
+        "Enable": "Enable",
+        "flowID": "",
+        "ThisFlow": 1,
+        "triggerID": "",
+        "WhichTrigger": "Any"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-175",
+      "y": "245"
+    },
+    "element0000000030": {
+      "class": "Action_Execute_Flow",
+      "ID": "element0000000030",
+      "name": "Execute Flow: This flow - Manual - \"string contains text test\"",
+      "package": "default",
+      "pars": {
+        "flowID": "",
+        "ReturnVariables": 0,
+        "SendLocalVars": 1,
+        "SkipDisabled": 0,
+        "ThisFlow": 1,
+        "triggerID": "element0000000002",
+        "WaitToFinish": "1",
+        "WhichTrigger": "specified"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-140",
+      "y": "840"
+    },
+    "element0000000034": {
+      "class": "Action_New_variable",
+      "ID": "element0000000034",
+      "name": "New variable - static_successfulRuns = 0",
+      "package": "default",
+      "pars": {
+        "expression": "String",
+        "Varname": "static_successfulRuns",
+        "VarValue": "0"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-175",
+      "y": "630"
+    },
+    "element0000000035": {
+      "class": "Condition_Expression",
+      "ID": "element0000000035",
+      "name": "Ausdruck - static_successfulRuns = requiredSuccessfulRuns",
+      "package": "default",
+      "pars": {
+        "Expression": "static_successfulRuns = requiredSuccessfulRuns"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-140",
+      "y": "1050"
+    },
+    "element0000000036": {
+      "class": "Action_New_variable",
+      "ID": "element0000000036",
+      "name": "New variable - requiredSuccessfulRuns = 1",
+      "package": "default",
+      "pars": {
+        "expression": "Expression",
+        "Varname": "requiredSuccessfulRuns",
+        "VarValue": "1"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-175",
+      "y": "490"
+    },
+    "element0000000045": {
+      "class": "Action_Add_To_List",
+      "ID": "element0000000045",
+      "name": "Add to list global_testResults - As last value - Value 'a_flowName'",
+      "package": "default",
+      "pars": {
+        "DelimiterComma": 0,
+        "DelimiterLinefeed": 1,
+        "DelimiterSemicolon": 0,
+        "DelimiterSpace": 0,
+        "Expression": "Expression",
+        "expressionPos": "String",
+        "InsertMethod": "Insert",
+        "InsertMethodLabel": "",
+        "NumberOfElements": "One",
+        "Position": "keyName",
+        "Varname": "global_testResults",
+        "VarValue": "a_flowName",
+        "VarValues": "Element one\nElement two",
+        "WhichPosition": "Last"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-140",
+      "y": "1260"
+    },
+    "element0000000046": {
+      "class": "Action_Message_Box",
+      "ID": "element0000000046",
+      "name": "Message Box - Fehler - Only %static_successfulRuns% successful runs instead of %requiredSuccessfulRuns%",
+      "package": "default",
+      "pars": {
+        "ButtonLabel": "OK",
+        "ButtonLabelCancel": "Abbrechen",
+        "Height": 200,
+        "IfClose": "",
+        "IfDismiss": 1,
+        "IsTimeout": "NoTimeout",
+        "message": "Only %static_successfulRuns% successful runs instead of %requiredSuccessfulRuns%",
+        "OnTimeout": "Normal",
+        "ShowCancelButton": 0,
+        "TimeoutUnits": 10,
+        "title": "Fehler",
+        "Unit": "Seconds",
+        "Width": 300
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-455",
+      "y": "1295"
+    }
+  },
+  "category": "Automatic tests",
+  "ElementIDCounter": "47",
+  "flowSettings": {
+    "DefaultWorkingDir": 1,
+    "ExecutionPolicy": "default",
+    "Offsetx": "-1184.285716",
+    "Offsety": "-341.428572",
+    "WorkingDir": "",
+    "zoomFactor": "0.7"
+  },
+  "name": "string test"
+}

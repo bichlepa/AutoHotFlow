@@ -16,7 +16,7 @@ Element_getName_Action_Select_file()
 ;Category of the element
 Element_getCategory_Action_Select_file()
 {
-	return x_lang("User_interaction") "|" x_lang("Files")
+	return x_lang("User_interaction") "|" x_lang("File")
 }
 
 ;This function returns the package of the element.

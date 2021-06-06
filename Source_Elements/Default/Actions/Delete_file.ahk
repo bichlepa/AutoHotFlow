@@ -64,7 +64,7 @@ Element_getParametrizationDetails_Action_Delete_File(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Delete_File(Environment, ElementParameters)
 {
-	return x_lang("Delete_File") 
+	return x_lang("Delete_File") " - " ElementParameters.file
 }
 
 ;Called every time the user changes any parameter.

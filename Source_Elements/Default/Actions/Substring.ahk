@@ -16,7 +16,7 @@ Element_getName_Action_Substring()
 ;Category of the element
 Element_getCategory_Action_Substring()
 {
-	return x_lang("Variable")
+	return x_lang("Text")
 }
 
 ;This function returns the package of the element.

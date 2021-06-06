@@ -16,7 +16,7 @@ Element_getName_Action_Add_To_List()
 ;Category of the element
 Element_getCategory_Action_Add_To_List()
 {
-	return x_lang("Variable")
+	return x_lang("List")
 }
 
 ;This function returns the package of the element.

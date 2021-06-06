@@ -16,7 +16,7 @@ Element_getName_Action_Rounding_A_Number()
 ;Category of the element
 Element_getCategory_Action_Rounding_A_Number()
 {
-	return x_lang("Variable")
+	return x_lang("Maths")
 }
 
 ;This function returns the package of the element.

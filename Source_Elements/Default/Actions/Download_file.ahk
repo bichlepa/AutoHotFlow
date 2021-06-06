@@ -16,7 +16,7 @@ Element_getName_Action_Download_File()
 ;Category of the element
 Element_getCategory_Action_Download_File()
 {
-	return x_lang("File")
+	return x_lang("File") "|" x_lang("Internet")
 }
 
 ;This function returns the package of the element.
@@ -64,7 +64,7 @@ Element_getParametrizationDetails_Action_Download_File(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Download_File(Environment, ElementParameters)
 {
-	return x_lang("Download_File") 
+	return x_lang("Download_File") " - " ElementParameters.URL " - " ElementParameters.file
 }
 
 ;Called every time the user changes any parameter.

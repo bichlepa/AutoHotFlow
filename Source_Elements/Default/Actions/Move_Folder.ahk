@@ -66,7 +66,7 @@ Element_getParametrizationDetails_Action_Move_Folder(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Move_Folder(Environment, ElementParameters)
 {
-	return x_lang("Move_Folder") 
+	return x_lang("Move_Folder") " - " ElementParameters.folder " - " ElementParameters.destFolder
 }
 
 ;Called every time the user changes any parameter.

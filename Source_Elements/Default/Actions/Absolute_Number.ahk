@@ -16,7 +16,7 @@ Element_getName_Action_Absolute_number()
 ;Category of the element
 Element_getCategory_Action_Absolute_number()
 {
-	return x_lang("Variable")
+	return x_lang("Maths")
 }
 
 ;This function returns the package of the element.

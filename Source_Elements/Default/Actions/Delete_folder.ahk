@@ -57,6 +57,8 @@ Element_getParametrizationDetails_Action_Delete_Folder(Environment)
 	parametersToEdit.push({type: "File", id: "Folder", label: x_lang("Select a folder")})
 	parametersToEdit.push({type: "Label", label: x_lang("Delete method")})
 	parametersToEdit.push({type: "Checkbox", id: "ifEmpty", default: 0, label: x_lang("Remove only if the folder is empty")})
+	parametersToEdit.push({type: "Label", label: x_lang("Error handling")})
+	parametersToEdit.push({type: "Checkbox", id: "ExceptionIfNotExist", default: 1, label: x_lang("Throw exception if folder does not exist")})
 	
 	return parametersToEdit
 }
@@ -64,7 +66,7 @@ Element_getParametrizationDetails_Action_Delete_Folder(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Delete_Folder(Environment, ElementParameters)
 {
-	return x_lang("Delete_Folder") 
+	return x_lang("Delete_Folder") " - " ElementParameters.Folder
 }
 
 ;Called every time the user changes any parameter.
@@ -93,7 +95,14 @@ Element_run_Action_Delete_Folder(Environment, ElementParameters)
 	fileAttr := FileExist(EvaluatedParameters.Folder)
 	if (not fileAttr)
 	{
-		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("Destination folder"), EvaluatedParameters.Folder)) 
+		if (EvaluatedParameters.ExceptionIfNotExist)
+		{
+			x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("Destination folder"), EvaluatedParameters.Folder))
+		}
+		Else
+		{
+			x_finish(Environment, "normal", x_lang("%1% '%2%' does not exist.", x_lang("Destination folder"), EvaluatedParameters.Folder))
+		} 
 		return
 	}
 	if (not instr(fileAttr, "D"))

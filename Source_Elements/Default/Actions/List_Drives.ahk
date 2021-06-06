@@ -69,7 +69,7 @@ Element_getParametrizationDetails_Action_List_drives(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_List_drives(Environment, ElementParameters)
 {
-	return x_lang("List_drives") 
+	return x_lang("List_drives") " - " ElementParameters.Varname
 }
 
 ;Called every time the user changes any parameter.

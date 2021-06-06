@@ -16,7 +16,7 @@ Element_getName_Action_Shuffle_list()
 ;Category of the element
 Element_getCategory_Action_Shuffle_list()
 {
-	return x_lang("Variable")
+	return x_lang("List")
 }
 
 ;This function returns the package of the element.

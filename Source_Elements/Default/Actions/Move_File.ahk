@@ -66,7 +66,7 @@ Element_getParametrizationDetails_Action_Move_File(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Move_File(Environment, ElementParameters)
 {
-	return x_lang("Move_File") 
+	return x_lang("Move_File") " - " ElementParameters.File " - " ElementParameters.destFile
 }
 
 ;Called every time the user changes any parameter.

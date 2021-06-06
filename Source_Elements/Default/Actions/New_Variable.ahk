@@ -16,7 +16,7 @@ Element_getName_Action_New_variable()
 ;Category of the element
 Element_getCategory_Action_New_variable()
 {
-	return x_lang("Variable")
+	return x_lang("Variable") "|" x_lang("Text") "|" x_lang("Maths")
 }
 
 ;This function returns the package of the element.

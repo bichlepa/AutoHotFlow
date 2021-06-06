@@ -23,7 +23,6 @@
         "BlockKey": "1",
         "FindHiddenText": 0,
         "FindHiddenWindow": 0,
-        "GetWindowInformation": "Parameter holen",
         "hotkey": "f6",
         "TitleMatchMode": 1,
         "UseWindow": "Everywhere",
@@ -54,7 +53,7 @@
       "y": "315"
     }
   },
-  "category": "AHF Test",
+  "category": "Manual tests",
   "ElementIDCounter": "6",
   "flowSettings": {
     "DefaultWorkingDir": 1,

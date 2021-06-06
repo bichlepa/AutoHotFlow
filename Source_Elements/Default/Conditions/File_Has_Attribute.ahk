@@ -65,7 +65,28 @@ Element_getParametrizationDetails_Condition_File_Has_Attribute(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Condition_File_Has_Attribute(Environment, ElementParameters)
 {
-	return x_lang("File_Has_Attribute") 
+	switch (ElementParameters.Attribute)
+	{
+		case "N":
+		attributeText := x_lang("Normal")
+		case "R":
+		attributeText := x_lang("Read only")
+		case "A":
+		attributeText := x_lang("Archive")
+		case "S":
+		attributeText := x_lang("System")
+		case "H":
+		attributeText := x_lang("Hidden")
+		case "D":
+		attributeText := x_lang("Directory")
+		case "O":
+		attributeText := x_lang("Offline")
+		case "C":
+		attributeText := x_lang("Compressed")
+		case "T":
+		attributeText := x_lang("Temporary")
+	}
+	return x_lang("File_Has_Attribute") " - " attributeText " - " ElementParameters.file
 }
 
 ;Called every time the user changes any parameter.

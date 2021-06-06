@@ -240,7 +240,7 @@
       "y": "1015"
     }
   },
-  "category": "AHF Test",
+  "category": "Manual tests",
   "ElementIDCounter": "28",
   "flowSettings": {
     "DefaultWorkingDir": 1,

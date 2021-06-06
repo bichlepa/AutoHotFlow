@@ -370,6 +370,13 @@
       "ID": "connection0000000173",
       "to": "element0000000174",
       "type": "Connection"
+    },
+    "connection0000000176": {
+      "ConnectionType": "normal",
+      "from": "element0000000087",
+      "ID": "connection0000000176",
+      "to": "element0000000175",
+      "type": "Connection"
     }
   },
   "allElements": {
@@ -397,7 +404,7 @@
         "flowID": "Flow 884290977",
         "ThisFlow": "0",
         "triggerID": "element0000000013",
-        "WhichTrigger": "Specific"
+        "WhichTrigger": "Specified"
       },
       "StandardName": "1",
       "type": "Condition",
@@ -408,7 +415,7 @@
       "class": "Trigger_Periodic_Timer",
       "enabled": "0",
       "ID": "element0000000005",
-      "name": "Periodic Timer",
+      "name": "Periodic Timer - 1 Sekunden",
       "package": "default",
       "pars": {
         "Interval": "1",
@@ -437,14 +444,14 @@
     "element0000000024": {
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000024",
-      "name": "Set Flow Status - Deaktivieren: This flow - Periodic Timer",
+      "name": "Set Flow Status - Deaktivieren: This flow - Periodic Timer - 1 Sekunden",
       "package": "default",
       "pars": {
         "Enable": "Disable",
         "flowID": "",
         "ThisFlow": 1,
         "triggerID": "element0000000005",
-        "WhichTrigger": "Specific"
+        "WhichTrigger": "Specified"
       },
       "StandardName": "1",
       "type": "Action",
@@ -461,7 +468,7 @@
         "flowID": "",
         "ThisFlow": 1,
         "triggerID": "element0000000013",
-        "WhichTrigger": "Specific"
+        "WhichTrigger": "Specified"
       },
       "StandardName": "1",
       "type": "Action",
@@ -505,7 +512,7 @@
         "flowID": "Flow 884290977",
         "ThisFlow": "0",
         "triggerID": "element0000000013",
-        "WhichTrigger": "Specific"
+        "WhichTrigger": "Specified"
       },
       "StandardName": "1",
       "type": "Condition",
@@ -611,13 +618,13 @@
     "element0000000063": {
       "class": "Condition_Flow_Enabled",
       "ID": "element0000000063",
-      "name": "Flow Enabled: This flow - Periodic Timer",
+      "name": "Flow Enabled: This flow - Periodic Timer - 1 Sekunden",
       "package": "default",
       "pars": {
         "flowID": "",
         "ThisFlow": "1",
         "triggerID": "element0000000005",
-        "WhichTrigger": "Specific"
+        "WhichTrigger": "Specified"
       },
       "StandardName": "1",
       "type": "Condition",
@@ -672,7 +679,7 @@
       "class": "Trigger_Periodic_Timer",
       "enabled": "0",
       "ID": "element0000000076",
-      "name": "Periodic Timer",
+      "name": "Periodic Timer - 10 Sekunden",
       "package": "default",
       "pars": {
         "Interval": "10",
@@ -783,7 +790,7 @@
         "ThisFlow": "0",
         "triggerID": "element0000000013",
         "WaitToFinish": "0",
-        "WhichTrigger": "Specific"
+        "WhichTrigger": "specified"
       },
       "StandardName": "1",
       "type": "Action",
@@ -815,7 +822,7 @@
         "flowID": "",
         "ThisFlow": 1,
         "triggerID": "element0000000013",
-        "WhichTrigger": "Specific"
+        "WhichTrigger": "Specified"
       },
       "StandardName": "1",
       "type": "Action",
@@ -835,7 +842,7 @@
         "ThisFlow": "1",
         "triggerID": "element0000000013",
         "WaitToFinish": "1",
-        "WhichTrigger": "Specific"
+        "WhichTrigger": "specified"
       },
       "StandardName": "1",
       "type": "Action",
@@ -852,7 +859,7 @@
         "flowID": "",
         "ThisFlow": 1,
         "triggerID": "element0000000013",
-        "WhichTrigger": "Specific"
+        "WhichTrigger": "Specified"
       },
       "StandardName": "1",
       "type": "Action",
@@ -992,11 +999,14 @@
     "element0000000161": {
       "class": "Action_Run",
       "ID": "element0000000161",
-      "name": "Starten",
+      "name": "Starten%A_Desktop%\\Flow Trigger test.lnk",
       "package": "default",
       "pars": {
         "ToRun": "%A_Desktop%\\Flow Trigger test.lnk",
-        "ToRunContent": "String"
+        "ToRunContent": "String",
+        "WhichWorkingDir": "Default",
+        "WorkingDir": "",
+        "WorkingDirContent": "String"
       },
       "StandardName": "1",
       "type": "Action",
@@ -1013,7 +1023,7 @@
         "flowID": "",
         "ThisFlow": 1,
         "triggerID": "element0000000131",
-        "WhichTrigger": "Specific"
+        "WhichTrigger": "Specified"
       },
       "StandardName": "1",
       "type": "Action",
@@ -1050,7 +1060,7 @@
     "element0000000174": {
       "class": "Action_Speech_output",
       "ID": "element0000000174",
-      "name": "Speech output",
+      "name": "Speech output -  - Microsoft Hedda Desktop",
       "package": "default",
       "pars": {
         "pitch": 0,
@@ -1058,21 +1068,48 @@
         "text": "Hello",
         "TTSEngine": "Microsoft Hedda Desktop",
         "volume": 100,
-        "WaitUntilCurrentFinishes": 1
+        "WaitUntilCurrentFinishes": 1,
+        "WaitUntilPreviousFinished": ""
       },
       "StandardName": "1",
       "type": "Action",
       "x": "2100",
       "y": "140"
+    },
+    "element0000000175": {
+      "class": "Action_Add_To_List",
+      "ID": "element0000000175",
+      "name": "Add to list global_testResults - As last value - Value 'a_flowName'",
+      "package": "default",
+      "pars": {
+        "DelimiterComma": 0,
+        "DelimiterLinefeed": 1,
+        "DelimiterSemicolon": 0,
+        "DelimiterSpace": 0,
+        "Expression": "Expression",
+        "expressionPos": "String",
+        "InsertMethod": "Insert",
+        "InsertMethodLabel": "",
+        "NumberOfElements": "One",
+        "Position": "keyName",
+        "Varname": "global_testResults",
+        "VarValue": "a_flowName",
+        "VarValues": "Element one\nElement two",
+        "WhichPosition": "Last"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "980",
+      "y": "490"
     }
   },
-  "category": "AHF Test",
-  "ElementIDCounter": "174",
+  "category": "Automatic tests",
+  "ElementIDCounter": "176",
   "flowSettings": {
     "DefaultWorkingDir": 1,
     "ExecutionPolicy": "default",
-    "Offsetx": "40.000007",
-    "Offsety": "-515.714290",
+    "Offsetx": "-338.571422",
+    "Offsety": "-308.571431",
     "WorkingDir": "",
     "zoomFactor": "0.7"
   },

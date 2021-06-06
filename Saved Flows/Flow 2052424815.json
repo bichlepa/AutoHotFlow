@@ -79,7 +79,7 @@
     "element0000000003": {
       "class": "Action_New_List",
       "ID": "element0000000003",
-      "name": "New list global_TestList with initial content: Element one - Element two",
+      "name": "New list global_TestList - As first value - Multiple values 'Element one - Element two'",
       "package": "default",
       "pars": {
         "DelimiterComma": 0,
@@ -88,7 +88,7 @@
         "DelimiterSpace": 0,
         "expression": "string",
         "expressionPos": "string",
-        "InitialContent": "Multiple",
+        "NumberOfElements": "",
         "Position": "keyName",
         "Varname": "global_TestList",
         "VarValue": "New element",
@@ -141,9 +141,11 @@
       "class": "Trigger_Start_up",
       "enabled": "0",
       "ID": "element0000000017",
-      "name": "Start up",
+      "name": "Start up - ",
       "package": "default",
-      "pars": {},
+      "pars": {
+        "startupType": ""
+      },
       "StandardName": "1",
       "type": "Trigger",
       "x": "525",
@@ -165,7 +167,7 @@
       "y": "210"
     }
   },
-  "category": "AHF Test",
+  "category": "Manual tests",
   "ElementIDCounter": "21",
   "flowSettings": {
     "DefaultWorkingDir": 1,

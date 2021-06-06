@@ -62,7 +62,7 @@ Element_getParametrizationDetails_Condition_File_Exists(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Condition_File_Exists(Environment, ElementParameters)
 {
-	return x_lang("File_Exists") 
+	return x_lang("File_Exists") " - " ElementParameters.file
 }
 
 ;Called every time the user changes any parameter.

@@ -16,7 +16,7 @@ Element_getName_Action_Get_Index_Of_Element_In_List()
 ;Category of the element
 Element_getCategory_Action_Get_Index_Of_Element_In_List()
 {
-	return x_lang("Variable")
+	return x_lang("List")
 }
 
 ;This function returns the package of the element.

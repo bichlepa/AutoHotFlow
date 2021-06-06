@@ -81,14 +81,14 @@
       "ConnectionType": "normal",
       "from": "element0000000032",
       "ID": "connection0000000035",
-      "to": "element0000000043",
+      "to": "element0000000036",
       "type": "Connection"
     },
     "connection0000000038": {
       "ConnectionType": "Yes",
       "from": "element0000000036",
       "ID": "connection0000000038",
-      "to": "element0000000014",
+      "to": "element0000000089",
       "type": "Connection"
     },
     "connection0000000041": {
@@ -104,20 +104,34 @@
       "ID": "connection0000000042",
       "to": "element0000000036",
       "type": "Connection"
+    },
+    "connection0000000087": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000087",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000088": {
+      "ConnectionType": "normal",
+      "from": "element0000000089",
+      "ID": "connection0000000088",
+      "to": "element0000000014",
+      "type": "Connection"
     }
   },
   "allElements": {
     "element0000000001": {
       "class": "Trigger_Manual",
       "DefaultTrigger": "1",
-      "enabled": "0",
+      "enabled": "1",
       "ID": "element0000000001",
-      "name": "Manual - \"Trigger boring eye\"",
+      "name": "Manual - \"start\"",
       "package": "default",
       "pars": {
-        "ID": "Trigger boring eye"
+        "ID": "start"
       },
-      "StandardName": 1,
+      "StandardName": "1",
       "type": "trigger",
       "x": "-70",
       "y": "-105"
@@ -162,8 +176,8 @@
       },
       "StandardName": "1",
       "type": "Action",
-      "x": "560",
-      "y": "910"
+      "x": "840",
+      "y": "1260"
     },
     "element0000000015": {
       "class": "Action_AutoHotKey_script",
@@ -313,15 +327,41 @@
       "type": "Action",
       "x": "910",
       "y": "735"
+    },
+    "element0000000089": {
+      "class": "Action_Add_To_List",
+      "ID": "element0000000089",
+      "name": "Add to list global_testResults - As last value - Value 'a_flowName'",
+      "package": "default",
+      "pars": {
+        "DelimiterComma": 0,
+        "DelimiterLinefeed": 1,
+        "DelimiterSemicolon": 0,
+        "DelimiterSpace": 0,
+        "Expression": "Expression",
+        "expressionPos": "String",
+        "InsertMethod": "Insert",
+        "InsertMethodLabel": "",
+        "NumberOfElements": "One",
+        "Position": "keyName",
+        "Varname": "global_testResults",
+        "VarValue": "a_flowName",
+        "VarValues": "Element one\nElement two",
+        "WhichPosition": "Last"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "840",
+      "y": "1085"
     }
   },
-  "category": "AHF Test",
-  "ElementIDCounter": "86",
+  "category": "Automatic tests",
+  "ElementIDCounter": "89",
   "flowSettings": {
     "DefaultWorkingDir": 1,
     "ExecutionPolicy": "default",
-    "Offsetx": "-434.285715",
-    "Offsety": "-672.857145",
+    "Offsetx": "-514.285715",
+    "Offsety": "-312.857145",
     "WorkingDir": "",
     "zoomFactor": "0.7"
   },

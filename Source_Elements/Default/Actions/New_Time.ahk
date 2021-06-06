@@ -16,7 +16,7 @@ Element_getName_Action_New_Time()
 ;Category of the element
 Element_getCategory_Action_New_Time()
 {
-	return x_lang("Variable")
+	return x_lang("Time")
 }
 
 ;This function returns the package of the element.

@@ -77,12 +77,13 @@
     "element0000000004": {
       "class": "Action_Message_Box",
       "ID": "element0000000004",
-      "name": "Message Box",
+      "name": "Message Box - Titel - %a_processid% - %a_processName% started",
       "package": "default",
       "pars": {
         "ButtonLabel": "OK",
         "ButtonLabelCancel": "Abbrechen",
         "Height": 200,
+        "IfClose": "",
         "IfDismiss": 1,
         "IsTimeout": "NoTimeout",
         "message": "%a_processid% - %a_processName% started",
@@ -149,12 +150,13 @@
     "element0000000010": {
       "class": "Action_Message_Box",
       "ID": "element0000000010",
-      "name": "Message Box",
+      "name": "Message Box - Titel - %a_processid% - %a_processName% stopped",
       "package": "default",
       "pars": {
         "ButtonLabel": "OK",
         "ButtonLabelCancel": "Abbrechen",
         "Height": 200,
+        "IfClose": "",
         "IfDismiss": 1,
         "IsTimeout": "NoTimeout",
         "message": "%a_processid% - %a_processName% stopped",
@@ -209,7 +211,7 @@
       "y": "735"
     }
   },
-  "category": "AHF Test",
+  "category": "Manual tests",
   "ElementIDCounter": "17",
   "flowSettings": {
     "DefaultWorkingDir": 1,

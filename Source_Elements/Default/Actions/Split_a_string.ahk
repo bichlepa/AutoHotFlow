@@ -16,7 +16,7 @@ Element_getName_Action_Split_a_string()
 ;Category of the element
 Element_getCategory_Action_Split_a_string()
 {
-	return x_lang("Variable")
+	return x_lang("Text")
 }
 
 ;This function returns the package of the element.
