@@ -36,7 +36,7 @@
       "type": "Connection"
     },
     "connection0000000073": {
-      "ConnectionType": "Exception",
+      "ConnectionType": "No",
       "from": "element0000000070",
       "ID": "connection0000000073",
       "to": "element0000000067",
@@ -447,10 +447,35 @@
       "type": "Condition",
       "x": "1540",
       "y": "455"
+    },
+    "element0000000097": {
+      "class": "Action_Message_Box",
+      "ID": "element0000000097",
+      "name": "Message Box - TestWindowTitle - This should disapper soon",
+      "package": "default",
+      "pars": {
+        "ButtonLabel": "OK",
+        "ButtonLabelCancel": "Abbrechen",
+        "Height": 200,
+        "IfClose": "Exception",
+        "IfDismiss": "Exception",
+        "IsTimeout": "NoTimeout",
+        "message": "This should disapper soon",
+        "OnTimeout": "Normal",
+        "ShowCancelButton": "0",
+        "TimeoutUnits": 10,
+        "title": "TestWindowTitle",
+        "Unit": "Seconds",
+        "Width": 300
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "840",
+      "y": "210"
     }
   },
   "category": "Manual tests",
-  "ElementIDCounter": "96",
+  "ElementIDCounter": "97",
   "flowSettings": {
     "DefaultWorkingDir": 1,
     "ExecutionPolicy": "default",

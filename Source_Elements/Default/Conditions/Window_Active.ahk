@@ -108,23 +108,16 @@ Element_run_Condition_Window_Active(Environment, ElementParameters)
 
 	if not windowID
 	{
-		; window does not exist. exception
-		x_finish(Environment, "exception", x_lang("Seeked window does not exist") )
+		; window does not exist. Finish
+		x_finish(Environment, "no")
 		return
 	}
 	
 	; save the window ID as thread variable
 	x_SetVariable(Environment, "A_WindowID", windowID, "Thread")
-	
-	; check whether window is active
-	if winactive("ahk_id " windowID)
-	{
-		x_finish(Environment, "yes")
-	}
-	else
-	{
-		x_finish(Environment, "no")
-	}
+
+	; finish
+	x_finish(Environment, "yes")
 }
 
 

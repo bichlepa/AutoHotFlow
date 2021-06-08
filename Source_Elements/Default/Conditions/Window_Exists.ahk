@@ -112,7 +112,7 @@ Element_run_Condition_Window_Exists(Environment, ElementParameters)
 	}
 	
 	; save the window ID as thread variable
-	x_SetVariable(Environment,"A_WindowID", windowID, "Thread")
+	x_SetVariable(Environment, "A_WindowID", windowID, "Thread")
 
 	; finish
 	x_finish(Environment, "yes")
