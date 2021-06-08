@@ -148,6 +148,10 @@ windowFunctions_evaluateWindowParameters(EvaluatedParameters)
     returnValue.winText := EvaluatedParameters.winText
     returnValue.ExcludeTitle := EvaluatedParameters.ExcludeTitle
     returnValue.ExcludeText := EvaluatedParameters.ExcludeText
+    returnValue.ahk_id := EvaluatedParameters.ahk_id
+    returnValue.ahk_pid := EvaluatedParameters.ahk_pid
+    returnValue.ahk_exe := EvaluatedParameters.ahk_exe
+    returnValue.ahk_class := EvaluatedParameters.ahk_class
     return returnValue
 }
 

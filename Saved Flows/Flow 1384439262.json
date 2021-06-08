@@ -1184,21 +1184,6 @@
       "x": "-105",
       "y": "70"
     },
-    "element0000000625": {
-      "class": "Action_Get_File_Time",
-      "ID": "element0000000625",
-      "name": "Get File Time - Modification time - FileSize - ",
-      "package": "default",
-      "pars": {
-        "file": "",
-        "TimeType": "Modification",
-        "varname": "FileSize"
-      },
-      "StandardName": "1",
-      "type": "action",
-      "x": "-1645",
-      "y": "700"
-    },
     "element0000000639": {
       "class": "Action_Get_File_Time",
       "ID": "element0000000639",
@@ -1366,8 +1351,8 @@
   "flowSettings": {
     "DefaultWorkingDir": 1,
     "ExecutionPolicy": "stop",
-    "Offsetx": "-1371.669070",
-    "Offsety": "6485.173623",
+    "Offsetx": "-927.425142",
+    "Offsety": "5648.543032",
     "WorkingDir": "",
     "zoomFactor": "0.578511"
   },

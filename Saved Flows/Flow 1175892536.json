@@ -404,12 +404,12 @@
     "element0000000087": {
       "class": "Action_Close_Window",
       "ID": "element0000000087",
-      "name": "Close Window:  - Title begins with: TestWindowTitle",
+      "name": "Close Window:  - Window ID: %a_windowID%",
       "package": "default",
       "pars": {
         "ahk_class": "",
         "ahk_exe": "",
-        "ahk_id": "",
+        "ahk_id": "%a_windowID%",
         "ahk_pid": "",
         "ExcludeText": "",
         "excludeTitle": "",
@@ -418,7 +418,7 @@
         "TitleMatchMode": 1,
         "WinCloseMethod": "close",
         "winText": "",
-        "Wintitle": "TestWindowTitle"
+        "Wintitle": ""
       },
       "StandardName": "1",
       "type": "Action",
@@ -475,7 +475,7 @@
     }
   },
   "category": "Manual tests",
-  "ElementIDCounter": "97",
+  "ElementIDCounter": "99",
   "flowSettings": {
     "DefaultWorkingDir": 1,
     "ExecutionPolicy": "default",
