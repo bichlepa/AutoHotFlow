@@ -68,7 +68,7 @@ Element_getParametrizationDetails_Action_Copy_File(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Copy_File(Environment, ElementParameters)
 {
-	return x_lang("Copy_File") 
+	return x_lang("Copy_File") " - " ElementParameters.file " - " ElementParameters.destFile
 }
 
 ;Called every time the user changes any parameter.
@@ -93,7 +93,7 @@ Element_run_Action_Copy_File(Environment, ElementParameters)
 		return
 	}
 	
-	; check whether files exist
+	; check whether source file exist
 	fileAttr := FileExist(EvaluatedParameters.file)
 	if (not fileAttr)
 	{
@@ -105,18 +105,22 @@ Element_run_Action_Copy_File(Environment, ElementParameters)
 		x_finish(Environment, "exception", x_lang("%1% '%2%' is a folder.", x_lang("Source file"), EvaluatedParameters.file)) 
 		return
 	}
-	if not FileExist(EvaluatedParameters.destFile)
-	{
-		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("Destination file or folder"), EvaluatedParameters.destFile)) 
-		return
-	}
-
+	
 	; copy file
 	FileCopy, % EvaluatedParameters.file, % EvaluatedParameters.destFile, % EvaluatedParameters.Overwrite
 	
 	; check for errors
 	if errorlevel ;Indecates that files could not be copied
 	{
+		; check whether destination file exists
+		fileAttr := FileExist(EvaluatedParameters.destFile)
+		if (not instr(fileAttr, "D") and not EvaluatedParameters.Overwrite)
+		{
+			x_finish(Environment, "exception", x_lang("%1% '%2%' already exists.", x_lang("Destination file"), EvaluatedParameters.destFile)) 
+			return
+		}
+
+		; there was an other error
 		x_finish(Environment, "exception", x_lang("%1% files could not be copied from '%2%' to '%3%'", errorlevel, EvaluatedParameters.file, EvaluatedParameters.destFile)) 
 		return
 	}

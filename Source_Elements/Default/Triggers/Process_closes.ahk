@@ -147,7 +147,6 @@ Trigger_Process_Closes_TimerLabel(Environment, parameters, fistCall = false)
 
 	; get a list of all matching processes
 	currentProcesses := getProcessList(parameters.ProcessName)
-	x_log(Environment, x_ConvertObjToString(currentProcesses))
 
 	; check whether some elements are missing now
 	for oneProcessID, oneProcessName in parameters.currentProcesses
@@ -155,7 +154,7 @@ Trigger_Process_Closes_TimerLabel(Environment, parameters, fistCall = false)
 		if (not currentProcesses.hasKey(oneProcessID))
 		{
 			x_log(Environment, "ProcessClosesTimerLabelTriggering. Process ID:" oneProcessID)
-			asdf:=true
+			
 			; a process is missing now. Call the trigger
 			x_trigger(Environment, {processID: oneProcessID, processName: oneProcessName})
 		}

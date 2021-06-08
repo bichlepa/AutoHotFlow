@@ -104,18 +104,21 @@ Element_run_Action_Move_File(Environment, ElementParameters)
 		return
 	}
 
-	if not FileExist(EvaluatedParameters.destFile)
-	{
-		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("Destination file or folder"), EvaluatedParameters.destFile)) 
-		return
-	}
-
 	; move files
 	FileMove, % EvaluatedParameters.file, % EvaluatedParameters.destFile, % EvaluatedParameters.Overwrite
 	
 	; check for errors
 	if errorlevel
 	{
+		; check whether destination file exists
+		fileAttr := FileExist(EvaluatedParameters.destFile)
+		if (not instr(fileAttr, "D") and not EvaluatedParameters.Overwrite)
+		{
+			x_finish(Environment, "exception", x_lang("%1% '%2%' already exists.", x_lang("Destination file"), EvaluatedParameters.destFile)) 
+			return
+		}
+
+		; there was an other error
 		x_finish(Environment, "exception", x_lang("%1% files could not be moved from '%2%' to '%3%'", errorlevel, EvaluatedParameters.file, EvaluatedParameters.destFile)) 
 		return
 	}

@@ -54,7 +54,7 @@ Element_getParametrizationDetails_Action_Time_Difference(Environment)
 	parametersToEdit:=Object()
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Output variable name")})
-	parametersToEdit.push({type: "Edit", id: "Varname", default: "CalculatedTime", content: "VariableName", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Edit", id: "Varname", default: "TimeDifference", content: "VariableName", WarnIfEmpty: true})
 
 	parametersToEdit.push({type: "Label", label: x_lang("First input time")})
 	parametersToEdit.push({type: "Edit", id: "InputTime", default: "a_now", content: "Expression", WarnIfEmpty: true})

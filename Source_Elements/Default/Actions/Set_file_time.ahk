@@ -70,7 +70,16 @@ Element_getParametrizationDetails_Action_Set_file_time(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Set_file_time(Environment, ElementParameters)
 {
-	return x_lang("Set_file_time") 
+	switch (ElementParameters.TimeType)
+	{
+		case "Modification":
+		timeTypeText := " - " x_lang("Modification time")
+		case "Creation":
+		timeTypeText := " - " x_lang("Creation time")
+		case "Access":
+		timeTypeText := " - " x_lang("Last access time")
+	}
+	return x_lang("Set_file_time") timeTypeText " - " ElementParameters.time " - " ElementParameters.file 
 }
 
 ;Called every time the user changes any parameter.

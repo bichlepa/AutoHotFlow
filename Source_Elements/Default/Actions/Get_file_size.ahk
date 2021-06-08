@@ -128,7 +128,7 @@ Element_run_Action_Get_File_Size(Environment, ElementParameters)
 	}
 	
 	; set output variable
-	x_SetVariable(Environment, Varname, result)
+	x_SetVariable(Environment, EvaluatedParameters.Varname, result)
 	
 	x_finish(Environment,"normal")
 	return

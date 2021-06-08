@@ -66,7 +66,7 @@ Element_getParametrizationDetails_Action_Copy_Folder(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Copy_Folder(Environment, ElementParameters)
 {
-	return x_lang("Copy_Folder") 
+	return x_lang("Copy_Folder") " - " ElementParameters.folder " - " ElementParameters.destFolder
 }
 
 ;Called every time the user changes any parameter.
@@ -91,16 +91,33 @@ Element_run_Action_Copy_Folder(Environment, ElementParameters)
 		return
 	}
 
-	; check whether files exist
-	if not FileExist(EvaluatedParameters.folder)
+	; check whether source folder exists
+	fileAttr := FileExist(EvaluatedParameters.folder)
+	if (not fileAttr)
 	{
-		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("Source folder"), EvaluatedParameters.folder)) 
+		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("Source folder"), ElementParameters.folder)) 
 		return
 	}
-	if not FileExist(EvaluatedParameters.destFolder)
+	if (not instr(fileAttr, "D"))
 	{
-		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("Destination folder"), EvaluatedParameters.destFolder)) 
+		x_finish(Environment, "exception", x_lang("%1% '%2%' is not a folder.", x_lang("Source folder"), ElementParameters.folder)) 
 		return
+	}
+	
+	; check whether desination folder exists
+	fileAttr := FileExist(EvaluatedParameters.destFolder)
+	if (fileAttr)
+	{
+		if (not EvaluatedParameters.Overwrite)
+		{
+			x_finish(Environment, "exception", x_lang("%1% '%2%' already exists.", x_lang("Destination folder"), ElementParameters.destFolder)) 
+			return
+		}
+		else if (not instr(fileAttr, "D"))
+		{
+			x_finish(Environment, "exception", x_lang("%1% '%2%' exists and is not a folder.", x_lang("Destination folder"), ElementParameters.destFolder)) 
+			return
+		}
 	}
 
 	; copy folder

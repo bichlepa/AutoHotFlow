@@ -225,7 +225,7 @@ x_AutoEvaluateOneParameter(EvaluatedParameters, Environment, ElementParameters, 
 			if (result = "")
 			{
 				EvaluatedParameters._error := true
-				EvaluatedParameters._errorMessage := lang("String '%1%' is empty", ElementParameters[oneParID])
+				EvaluatedParameters._errorMessage := lang("String '%1%' is empty", oneParID)
 			}
 		}
 
@@ -246,7 +246,7 @@ x_AutoEvaluateOneParameter(EvaluatedParameters, Environment, ElementParameters, 
 				if (result = "")
 				{
 					EvaluatedParameters._error := true
-					EvaluatedParameters._errorMessage := lang("String '%1%' is empty", ElementParameters[oneParID])
+					EvaluatedParameters._errorMessage := lang("String '%1%' is empty", oneParID)
 				}
 			}
 			EvaluatedParameters[oneParID] := result

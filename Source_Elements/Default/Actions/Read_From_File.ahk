@@ -113,7 +113,7 @@ Element_CheckSettings_Action_Read_From_File(Environment, ElementParameters, stat
 Element_run_Action_Read_From_File(Environment, ElementParameters)
 {
 	; evaluate parameters
-	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters, ["CodePageIdentifier"])
 	if (EvaluatedParameters._error)
 	{
 		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
@@ -155,6 +155,13 @@ Element_run_Action_Read_From_File(Environment, ElementParameters)
 		}
 		else if (EvaluatedParameters.encoding = "other")
 		{
+			; evaluate more parameters
+			x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["CodePageIdentifier"])
+			if (EvaluatedParameters._error)
+			{
+				return x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
+			}
+			
 			; set defined encoding
 			FileEncoding, % "CP" EvaluatedParameters.CodePageIdentifier
 		}

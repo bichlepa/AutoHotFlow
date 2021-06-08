@@ -92,7 +92,7 @@ Element_run_Action_Move_Folder(Environment, ElementParameters)
 	}
 
 	; get right option for fileMoveDir command
-	if (ElementParameters.Overwrite)
+	if (EvaluatedParameters.Overwrite)
 	{
 		OverwriteOption := 2
 	}
@@ -101,38 +101,41 @@ Element_run_Action_Move_Folder(Environment, ElementParameters)
 		OverwriteOption = 0
 	}
 
-	; check whether files exist
-	fileAttr := FileExist(ElementParameters.folder)
+	; check whether source folder exists
+	fileAttr := FileExist(EvaluatedParameters.folder)
 	if (not fileAttr)
 	{
-		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("Source folder"), ElementParameters.folder)) 
+		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("Source folder"), EvaluatedParameters.folder)) 
 		return
 	}
 	if (not instr(fileAttr, "D"))
 	{
-		x_finish(Environment, "exception", x_lang("%1% '%2%' is not a folder.", x_lang("Source folder"), ElementParameters.folder)) 
+		x_finish(Environment, "exception", x_lang("%1% '%2%' is not a folder.", x_lang("Source folder"), EvaluatedParameters.folder)) 
 		return
 	}
 
-	fileAttr := FileExist(ElementParameters.destFolder)
-	if (not fileAttr)
+	; check whether desination folder exists
+	fileAttr := FileExist(EvaluatedParameters.destFolder)
+	if (fileAttr)
 	{
-		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("Destination folder"), ElementParameters.destFolder)) 
-		return
+		if (not EvaluatedParameters.Overwrite)
+		{
+			x_finish(Environment, "exception", x_lang("%1% '%2%' already exists.", x_lang("Destination folder"), EvaluatedParameters.destFolder)) 
+			return
+		}
+		else if (not instr(fileAttr, "D"))
+		{
+			x_finish(Environment, "exception", x_lang("%1% '%2%' exists and is not a folder.", x_lang("Destination folder"), EvaluatedParameters.destFolder)) 
+			return
+		}
 	}
-	if (not instr(fileAttr, "D"))
-	{
-		x_finish(Environment, "exception", x_lang("%1% '%2%' is not a folder.", x_lang("Destination folder"), ElementParameters.destFolder)) 
-		return
-	}
-
 	; move folder
-	FileMoveDir, % ElementParameters.folder ,% ElementParameters.destFolder, % OverwriteOption
+	FileMoveDir, % EvaluatedParameters.folder ,% EvaluatedParameters.destFolder, % OverwriteOption
 	
 	; check for errors
 	if errorlevel
 	{
-		x_finish(Environment, "exception", x_lang("Folder '%1%' could not be copied to '%2%'", ElementParameters.folder, ElementParameters.destFolder)) 
+		x_finish(Environment, "exception", x_lang("Folder '%1%' could not be copied to '%2%'", EvaluatedParameters.folder, EvaluatedParameters.destFolder)) 
 		return
 	}
 	

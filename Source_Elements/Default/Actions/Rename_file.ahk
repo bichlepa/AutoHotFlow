@@ -64,7 +64,7 @@ Element_getParametrizationDetails_Action_Rename_File(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Rename_File(Environment, ElementParameters)
 {
-	return x_lang("Rename_File") 
+	return x_lang("Rename_File") " - " ElementParameters.file " - " ElementParameters.newName
 }
 
 ;Called every time the user changes any parameter.

@@ -1,38 +1,23 @@
 ﻿
-;~ #Include %A_ScriptDir%\..\..
+;  #Include Code evaluator.ahk
+;  #Include Code tokenizer.ahk
+;  #Include ../../lib/json/jxon.ahk
 
 
-;~ string=
-;~ (
-;~ aasdf:=round(2)
-;~ bage:="hello" 4
-;~ if (bage = "hel" "o" . round(10/2-1))
-	
-	;~ cee:=1
-
-;~ else if bage = "hell" "o" . round(10/2-1)
-	
-;~ {
-	
-	;~ cee:="richtig"
-	
-	;~ d:=2
-	
-;~ }
-;~ else
-	;~ cee:=3
-
-
-;~ )
+;  string=
+;  (
+; a:=4
+; b := -5
+;  )
 
 ;Thanks to Mihai Bazon for the tutorial: http://lisperator.net/pltut/parser/
 
-;~ tokens:=tokenizer(string)
-;~ MsgBox % strobj(tokens)
-;~ parsedCode:=parser.parse(tokens)
-;~ MsgBox % strobj(parsedCode)
-;~ FileDelete, result.txt
-;~ FileAppend,% strobj(parsedCode), result.txt
+; tokens:=tokenizer(string)
+; MsgBox % strobj(tokens)
+; parsedCode:=class_parser.parse(tokens)
+; MsgBox % strobj(parsedCode)
+; FileDelete, result.txt
+; FileAppend,% strobj(parsedCode), result.txt
 
 ; code parser. Needs a tokenized code.
 class class_parser
@@ -416,7 +401,7 @@ class class_parser
 				; we have a string. start parsing the string
 				expr := this.parse_String()
 			}
-			else if (this.token.type = "number")
+			else if (this.token.type = "number" or this.token.is("-"))
 			{
 				; we have a number. start parsing the number
 				expr := this.parse_Number()
@@ -649,6 +634,12 @@ class class_parser
 	{
 		; prepare return value
 		num := ""
+		isNegative := false
+		if (this.token.is("-"))
+		{
+			isNegative := true
+			this.next()
+		}
 		if (this.token.type = "number")
 		{
 			line := this.token.line
@@ -684,6 +675,9 @@ class class_parser
 					}
 				}
 			}
+
+			if (isNegative)
+				num := -num
 			return {type: "num", value: num, line: line, col: col, pos: pos, wholeline: wholeline}
 		}
 		else

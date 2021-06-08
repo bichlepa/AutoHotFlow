@@ -64,7 +64,7 @@ Element_getParametrizationDetails_Action_Rename_Folder(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Rename_Folder(Environment, ElementParameters)
 {
-	return x_lang("Rename_Folder") 
+	return x_lang("Rename_Folder")  " - " ElementParameters.folder " - " ElementParameters.newName
 }
 
 ;Called every time the user changes any parameter.
@@ -117,7 +117,7 @@ Element_run_Action_Rename_Folder(Environment, ElementParameters)
 	newFolderPath := folderOfFolderFrom "\" EvaluatedParameters.newName
 	
 	; rename folder
-	FileMoveDir, % fileFrom, % newFilePath, R
+	FileMoveDir, % folderFrom, % newFolderPath, R
 	
 	; check for errors
 	if errorlevel

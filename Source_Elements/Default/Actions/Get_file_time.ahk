@@ -54,7 +54,7 @@ Element_getParametrizationDetails_Action_Get_File_Time(Environment)
 	parametersToEdit:=Object()
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Output variable name")})
-	parametersToEdit.push({type: "Edit", id: "varname", default: "FileSize", content: "VariableName", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Edit", id: "varname", default: "FileTime", content: "VariableName", WarnIfEmpty: true})
 	parametersToEdit.push({type: "Label", label: x_lang("File path")})
 	parametersToEdit.push({type: "File", id: "file", label: x_lang("Select a file")})
 	parametersToEdit.push({type: "Label", label: x_lang("Unit")})
@@ -101,15 +101,10 @@ Element_run_Action_Get_File_Time(Environment, ElementParameters)
 	}
 
 	; check whether files exist
-	fileAttr := FileExist(file)
+	fileAttr := FileExist(EvaluatedParameters.file)
 	if (not fileAttr)
 	{
 		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("Source file"), EvaluatedParameters.file)) 
-		return
-	}
-	if (instr(fileAttr, "D"))
-	{
-		x_finish(Environment, "exception", x_lang("%1% '%2%' is a folder.", x_lang("Source file"), EvaluatedParameters.file)) 
 		return
 	}
 	
@@ -135,9 +130,9 @@ Element_run_Action_Get_File_Time(Environment, ElementParameters)
 	}
 	
 	; set output variable
-	x_SetVariable(Environment, Varname, result)
+	x_SetVariable(Environment, EvaluatedParameters.Varname, result)
 	
-	x_finish(Environment,"normal")
+	x_finish(Environment, "normal")
 	return
 }
 

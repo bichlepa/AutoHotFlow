@@ -60,7 +60,7 @@ Element_getParametrizationDetails_Action_Time_Calculation(Environment)
 	parametersToEdit.push({type: "Edit", id: "InputTime", default: "InputTime", content: "Expression", WarnIfEmpty: true})
 	
 	parametersToEdit.push({type: "Label", label:  x_lang("Time to add")})
-	parametersToEdit.push({type: "Edit", id: "Units", default: 10, content: "Expression", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Edit", id: "Units", default: 10, content: "Number", WarnIfEmpty: true})
 	parametersToEdit.push({type: "Label", label:  x_lang("Which unit"), size: "small"})
 	parametersToEdit.push({type: "Radio", id: "Unit", default: 2, result: "enum", choices: [x_lang("Seconds"), x_lang("Minutes"), x_lang("Hours"), x_lang("Days")], enum: ["Seconds", "Minutes", "Hours", "Days"]})
 	
@@ -112,16 +112,8 @@ Element_run_Action_Time_Calculation(Environment, ElementParameters)
 		return
 	}
 	
-	; check units value
-	Units := EvaluatedParameters.Units
-	if Units is not number
-	{
-		x_finish(Environment, "exception", x_lang("Value is not a number: %1%", Units))
-		return 
-	}
-	
 	; add time
-	envadd, InputTime, % Units, % EvaluatedParameters.Unit
+	envadd, InputTime, % EvaluatedParameters.Units, % EvaluatedParameters.Unit
 
 	; set output variable
 	x_SetVariable(Environment, EvaluatedParameters.Varname, InputTime)
