@@ -165,7 +165,7 @@
     "element0000000008": {
       "class": "Condition_Expression",
       "ID": "element0000000008",
-      "name": "Ausdruck - value = \"Big error!\"",
+      "name": "Expression - value = \"Big error!\"",
       "package": "default",
       "pars": {
         "Expression": "value = \"Big error!\""

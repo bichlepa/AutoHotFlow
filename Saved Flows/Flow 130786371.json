@@ -48,21 +48,21 @@
     "element0000000008": {
       "class": "Condition_Confirmation_Dialog",
       "ID": "element0000000008",
-      "name": "Confirmation Dialog - Titele, Nachrichte",
+      "name": "Confirmation Dialog - Das ist ein sch\u00F6ner Titel, Das ist eine sch\u00F6ne Nachricht",
       "package": "default",
       "pars": {
-        "ButtonLabelCancel": "Abbrechene",
-        "ButtonLabelNo": "Neine",
-        "ButtonLabelYes": "Jae",
+        "ButtonLabelCancel": "Abbrechen!",
+        "ButtonLabelNo": "Nein!",
+        "ButtonLabelYes": "Ja!",
         "DefaultButton": "No",
         "Height": 200,
-        "IfDismiss": "No",
+        "IfDismiss": "Exception",
         "IsTimeout": "1",
-        "message": "Nachrichte",
+        "message": "Das ist eine sch\u00F6ne Nachricht",
         "OnTimeout": "Exception",
         "ShowCancelButton": "1",
         "TimeoutUnits": 10,
-        "title": "Titele",
+        "title": "Das ist ein sch\u00F6ner Titel",
         "Unit": "Seconds",
         "Width": 300
       },
@@ -118,36 +118,6 @@
       "type": "Action",
       "x": "560",
       "y": "595"
-    },
-    "element0000000015": {
-      "class": "Trigger_Manual",
-      "DefaultTrigger": "0",
-      "enabled": "",
-      "ID": "element0000000015",
-      "name": "Manual - \"Trigger bright bus\"",
-      "package": "default",
-      "pars": {
-        "ID": "Trigger bright bus"
-      },
-      "StandardName": 1,
-      "type": "trigger",
-      "x": "630",
-      "y": "-105"
-    },
-    "element0000000018": {
-      "class": "Trigger_Manual",
-      "DefaultTrigger": "0",
-      "enabled": "0",
-      "ID": "element0000000018",
-      "name": "Manual - \"Trigger bright bus\"",
-      "package": "default",
-      "pars": {
-        "ID": "Trigger bright bus"
-      },
-      "StandardName": 1,
-      "type": "trigger",
-      "x": "1015",
-      "y": "-140"
     }
   },
   "category": "Manual tests",

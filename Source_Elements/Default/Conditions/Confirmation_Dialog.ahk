@@ -236,7 +236,7 @@ Element_run_Condition_Confirmation_Dialog(Environment, ElementParameters)
 	{
 		;Show three buttons
 		widthOneButton := round((widthEdit - 20) / 3)
-		gui, %guiID%: add, button, x10  y%yPos% w%widthOneButton% h30 gCondition_Confirmation_Dialog_ButtonYes +hwndHWNDButtonOYes, % EvaluatedParameters.ButtonLabelYes
+		gui, %guiID%: add, button, x10  y%yPos% w%widthOneButton% h30 gCondition_Confirmation_Dialog_ButtonYes +hwndHWNDButtonYes, % EvaluatedParameters.ButtonLabelYes
 		gui, %guiID%: add, button, X+10 y%yPos% w%widthOneButton% h30 gCondition_Confirmation_Dialog_ButtonNo +hwndHWNDButtonNo, % EvaluatedParameters.ButtonLabelNo
 		gui, %guiID%: add, button, X+10 y%yPos% w%widthOneButton% h30 gCondition_Confirmation_Dialog_ButtonCancel +hwndHWNDButtonCancel, % EvaluatedParameters.ButtonLabelCancel
 	}

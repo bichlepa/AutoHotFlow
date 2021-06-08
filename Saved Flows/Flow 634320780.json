@@ -306,7 +306,7 @@
     "element0000000013": {
       "class": "Condition_Expression",
       "ID": "element0000000013",
-      "name": "Ausdruck - a_index <= 2",
+      "name": "Expression - a_index <= 2",
       "package": "default",
       "pars": {
         "Expression": "a_index <= 2"

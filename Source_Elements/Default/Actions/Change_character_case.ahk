@@ -60,7 +60,7 @@ Element_getParametrizationDetails_Action_Change_character_case(Environment)
 	parametersToEdit.push({type: "Edit", id: "VarValue", default: "Hello World", content: ["String", "Expression"], contentID: "expression", contentDefault: "string", WarnIfEmpty: true})
 
 	parametersToEdit.push({type: "Label", label: x_lang("Which case (character case)")})
-	parametersToEdit.push({type: "Radio", id: "CharCase", default: 1, choices: [x_lang("Uppercase"), x_lang("Lowercase"), x_lang("Firt character of a word is uppercase")], enum: ["upper", "lower", "firstUp"]})
+	parametersToEdit.push({type: "Radio", id: "CharCase", default: "upper", result: "enum", choices: [x_lang("Uppercase"), x_lang("Lowercase"), x_lang("Firt character of a word is uppercase")], enum: ["upper", "lower", "firstUp"]})
 
 	return parametersToEdit
 }
@@ -68,7 +68,17 @@ Element_getParametrizationDetails_Action_Change_character_case(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Change_character_case(Environment, ElementParameters)
 {
-	return x_lang("Change_character_case") 
+	switch (ElementParameters.CharCase)
+	{
+		case "upper":
+		charCaseText := x_lang("Uppercase")
+		case "lower":
+		charCaseText := x_lang("Lowercase")
+		case "firstUp":
+		charCaseText := x_lang("Firt character uppercase")
+	}
+
+	return x_lang("Change_character_case") " - " charCaseText " - " ElementParameters.Varname " - " ElementParameters.VarValue
 }
 
 ;Called every time the user changes any parameter.
@@ -94,15 +104,19 @@ Element_run_Action_Change_character_case(Environment, ElementParameters)
 	}
 	
 	; change character case as desired
-	if (EvaluatedParameters.CharCase = "upper") ;Uppercase
-		StringUpper, VarValue, VarValue
-	else if (EvaluatedParameters.CharCase = "lower") ;Lowercase
-		StringLower, VarValue, VarValue
-	else if (EvaluatedParameters.CharCase = "firstUp")
-		StringUpper, VarValue, VarValue, T ;First character of a word is uppercase
-	
+	VarValue := EvaluatedParameters.VarValue
+	switch (EvaluatedParameters.CharCase)
+	{
+		case "upper":
+		StringUpper, result, VarValue
+		case "lower":
+		StringLower, result, VarValue
+		case "firstUp":
+		StringUpper, result, VarValue, T ;First character of a word is uppercase
+	}
+
 	; write variable
-	x_SetVariable(Environment, Varname, VarValue)
+	x_SetVariable(Environment, EvaluatedParameters.Varname, result)
 	
 	;Always call v_finish() before return
 	x_finish(Environment,"normal")

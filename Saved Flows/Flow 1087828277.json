@@ -105,7 +105,7 @@
     "element0000000005": {
       "class": "Condition_Expression",
       "ID": "element0000000005",
-      "name": "Ausdruck - newVariable = 5",
+      "name": "Expression - newVariable = 5",
       "package": "default",
       "pars": {
         "Expression": "newVariable = 5"
@@ -132,7 +132,7 @@
     "element0000000007": {
       "class": "Condition_Expression",
       "ID": "element0000000007",
-      "name": "Ausdruck - newVariable = 5",
+      "name": "Expression - newVariable = 5",
       "package": "default",
       "pars": {
         "Expression": "newVariable = 5"

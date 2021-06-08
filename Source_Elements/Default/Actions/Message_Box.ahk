@@ -188,7 +188,7 @@ Element_run_Action_Message_Box(Environment, ElementParameters)
 	guiID := x_GetMyUniqueExecutionID(Environment)
 	
 	; set gui label, so the function Action_Message_Box_OnClose is called if window gets closed
-	gui,%guiID%:+labelAction_Message_Box_On
+	gui, %guiID%: +labelAction_Message_Box_On
 	
 	;Calculate controls width
 	widthEdit := EvaluatedParameters.width - 10 * 2
@@ -200,11 +200,14 @@ Element_run_Action_Message_Box(Environment, ElementParameters)
 	if (EvaluatedParameters.isTimeout = "Timeout")
 		heightEditMessage -= 10 + 15 ;Timeout text
 	
+	;Calculate position of first
+	yPos := 10
+
 	;Add message field
-	gui, %guiID%:add, edit, ReadOnly x10 y10 w%widthEdit% h%heightEditMessage% +hwndHWNDMessage , % EvaluatedParameters.Message
+	gui, %guiID%:add, edit, ReadOnly x10 y%yPos% w%widthEdit% h%heightEditMessage% +hwndHWNDMessage , % EvaluatedParameters.Message
 	
 	;Calculate position of the next control
-	yPos += 10
+	yPos += heightEditMessage + 10
 	
 	;Add timeout text if a timeout is specified
 	if (EvaluatedParameters.isTimeout = "Timeout")
@@ -234,6 +237,8 @@ Element_run_Action_Message_Box(Environment, ElementParameters)
 	guicontrol, %guiID%: focus, % HWNDButtonOK
 
 	;Show GUI
+	width := EvaluatedParameters.width
+	height := EvaluatedParameters.height
 	gui, %guiID%: show, w%Width% h%height%, % EvaluatedParameters.title
 
 	;Set timer if a timeout is set

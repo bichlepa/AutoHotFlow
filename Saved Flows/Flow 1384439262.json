@@ -502,7 +502,7 @@
     "element0000000487": {
       "class": "Trigger_Manual",
       "DefaultTrigger": "1",
-      "enabled": "0",
+      "enabled": "1",
       "ID": "element0000000487",
       "name": "Manual - \"start\"",
       "package": "default",

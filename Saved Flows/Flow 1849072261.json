@@ -302,7 +302,7 @@
     "element0000000036": {
       "class": "Condition_Expression",
       "ID": "element0000000036",
-      "name": "Ausdruck - counter = 3",
+      "name": "Expression - counter = 3",
       "package": "default",
       "pars": {
         "Expression": "counter = 3"

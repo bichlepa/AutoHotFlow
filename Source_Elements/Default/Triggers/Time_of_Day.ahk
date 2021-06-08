@@ -64,7 +64,8 @@ Element_getParametrizationDetails_Trigger_Time_Of_Day(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Trigger_Time_Of_Day(Environment, ElementParameters)
 {
-	return x_lang("Time_Of_Day") 
+	timeString := substr(ElementParameters.Time, -5, 2) ":" substr(ElementParameters.Time, -3, 2) ":" substr(ElementParameters.Time, -1)
+	return x_lang("Time_Of_Day") " - " timeString " - " x_lang("Weekdays: '%1%'", ElementParameters.Weekdays)
 }
 
 ;Called every time the user changes any parameter.

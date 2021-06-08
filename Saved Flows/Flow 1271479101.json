@@ -74,7 +74,7 @@
   "allElements": {
     "element0000000001": {
       "class": "Trigger_Manual",
-      "DefaultTrigger": "0",
+      "DefaultTrigger": "1",
       "enabled": "0",
       "ID": "element0000000001",
       "name": "Manual - \"Trigger safe salad\"",
@@ -90,7 +90,7 @@
     "element0000000002": {
       "class": "Action_Beep",
       "ID": "element0000000002",
-      "name": "Piepsen - 523 Hz 150 ms",
+      "name": "Beep - 523 Hz 150 ms",
       "package": "default",
       "pars": {
         "duration": 150,
@@ -104,7 +104,7 @@
     "element0000000004": {
       "class": "Action_Beep",
       "ID": "element0000000004",
-      "name": "Piepsen - 600 Hz 500 ms",
+      "name": "Beep - 600 Hz 500 ms",
       "package": "default",
       "pars": {
         "duration": "500",
@@ -117,7 +117,7 @@
     },
     "element0000000008": {
       "class": "Trigger_Manual",
-      "DefaultTrigger": "1",
+      "DefaultTrigger": "0",
       "enabled": "0",
       "ID": "element0000000008",
       "name": "Manual - \"Trigger serious clock\"",
@@ -190,7 +190,7 @@
     "element0000000018": {
       "class": "Action_Sleep",
       "ID": "element0000000018",
-      "name": "Pause: 2 s",
+      "name": "Sleep: 2 s",
       "package": "action",
       "pars": {
         "Duration": 2,

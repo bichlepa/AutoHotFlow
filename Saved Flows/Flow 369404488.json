@@ -357,7 +357,7 @@
     "element0000000029": {
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000029",
-      "name": "Set Flow Status - Aktivieren: This flow - Any trigger",
+      "name": "Set Flow Status - Enable: This flow - Any trigger",
       "package": "default",
       "pars": {
         "Enable": "Enable",
@@ -409,7 +409,7 @@
     "element0000000035": {
       "class": "Condition_Expression",
       "ID": "element0000000035",
-      "name": "Ausdruck - static_successfulRuns = requiredSuccessfulRuns",
+      "name": "Expression - static_successfulRuns = requiredSuccessfulRuns",
       "package": "default",
       "pars": {
         "Expression": "static_successfulRuns = requiredSuccessfulRuns"

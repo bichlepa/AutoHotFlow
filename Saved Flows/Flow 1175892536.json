@@ -1,12 +1,5 @@
 ﻿{
   "allConnections": {
-    "connection0000000056": {
-      "ConnectionType": "normal",
-      "from": "element0000000053",
-      "ID": "connection0000000056",
-      "to": "element0000000063",
-      "type": "Connection"
-    },
     "connection0000000061": {
       "ConnectionType": "normal",
       "from": "",
@@ -104,6 +97,13 @@
       "ID": "connection0000000091",
       "to": "element0000000086",
       "type": "Connection"
+    },
+    "connection0000000096": {
+      "ConnectionType": "normal",
+      "from": "element0000000053",
+      "ID": "connection0000000096",
+      "to": "element0000000063",
+      "type": "Connection"
     }
   },
   "allElements": {
@@ -136,7 +136,7 @@
     "element0000000053": {
       "class": "Trigger_Manual",
       "DefaultTrigger": "1",
-      "enabled": "0",
+      "enabled": "1",
       "ID": "element0000000053",
       "name": "Manual - \"Trigger happy message\"",
       "package": "default",
@@ -145,8 +145,8 @@
       },
       "StandardName": "1",
       "type": "Trigger",
-      "x": "735",
-      "y": "175"
+      "x": "700",
+      "y": "35"
     },
     "element0000000057": {
       "class": "Action_Message_Box",
@@ -176,14 +176,14 @@
     "element0000000063": {
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000063",
-      "name": "Set Flow Status - Aktivieren: This flow - Window Gets Active:  - Title begins with: TestWindowTitle",
+      "name": "Set Flow Status - Enable: This flow - Window Gets Active:  - Title begins with: TestWindowTitle",
       "package": "default",
       "pars": {
         "Enable": "Enable",
         "flowID": "",
         "ThisFlow": 1,
         "triggerID": "element0000000007",
-        "WhichTrigger": "Specific"
+        "WhichTrigger": "Specified"
       },
       "StandardName": "1",
       "type": "Action",
@@ -279,14 +279,14 @@
     "element0000000074": {
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000074",
-      "name": "Set Flow Status - Deaktivieren: This flow - Window Gets Active:  - Title begins with: TestWindowTitle",
+      "name": "Set Flow Status - Disable: This flow - Window Gets Active:  - Title begins with: TestWindowTitle",
       "package": "default",
       "pars": {
         "Enable": "Disable",
         "flowID": "",
         "ThisFlow": 1,
         "triggerID": "element0000000007",
-        "WhichTrigger": "Specific"
+        "WhichTrigger": "Specified"
       },
       "StandardName": "1",
       "type": "Action",
@@ -321,14 +321,14 @@
     "element0000000080": {
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000080",
-      "name": "Set Flow Status - Aktivieren: This flow - Window Opens:  - Title begins with: TestWindowTitle",
+      "name": "Set Flow Status - Enable: This flow - Window Opens:  - Title begins with: TestWindowTitle",
       "package": "default",
       "pars": {
         "Enable": "Enable",
         "flowID": "",
         "ThisFlow": 1,
         "triggerID": "element0000000083",
-        "WhichTrigger": "Specific"
+        "WhichTrigger": "Specified"
       },
       "StandardName": "1",
       "type": "Action",
@@ -364,14 +364,14 @@
     "element0000000084": {
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000084",
-      "name": "Set Flow Status - Deaktivieren: This flow - Window Opens:  - Title begins with: TestWindowTitle",
+      "name": "Set Flow Status - Disable: This flow - Window Opens:  - Title begins with: TestWindowTitle",
       "package": "default",
       "pars": {
         "Enable": "Disable",
         "flowID": "",
         "ThisFlow": 1,
         "triggerID": "element0000000083",
-        "WhichTrigger": "Specific"
+        "WhichTrigger": "Specified"
       },
       "StandardName": "1",
       "type": "Action",
@@ -450,7 +450,7 @@
     }
   },
   "category": "Manual tests",
-  "ElementIDCounter": "91",
+  "ElementIDCounter": "96",
   "flowSettings": {
     "DefaultWorkingDir": 1,
     "ExecutionPolicy": "default",

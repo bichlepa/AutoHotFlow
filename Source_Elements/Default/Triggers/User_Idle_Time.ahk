@@ -65,7 +65,16 @@ Element_getParametrizationDetails_Trigger_User_Idle_Time(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Trigger_User_Idle_Time(Environment, ElementParameters)
 {
-	return x_lang("User_Idle_Time") 
+	switch (ElementParameters.Unit)
+	{
+	case "Milliseconds":
+		duration := ElementParameters.duration " " x_lang("ms #Milliseconds")
+	case "Seconds":
+		duration := ElementParameters.duration " " x_lang("s #Seconds")
+	case "Minutes":
+		duration := ElementParameters.duration " " x_lang("m #Minutes")
+	}
+	return x_lang("User_Idle_Time") " - " duration
 }
 
 ;Called every time the user changes any parameter.

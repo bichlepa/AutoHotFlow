@@ -137,7 +137,7 @@
   "allElements": {
     "element0000000001": {
       "class": "Trigger_Manual",
-      "DefaultTrigger": "0",
+      "DefaultTrigger": "1",
       "enabled": "0",
       "ID": "element0000000001",
       "name": "Manual - \"Key Down test\"",
@@ -182,7 +182,7 @@
     "element0000000011": {
       "class": "Action_Sleep",
       "ID": "element0000000011",
-      "name": "Pause: 2 s",
+      "name": "Sleep: 2 s",
       "package": "action",
       "pars": {
         "Duration": 2,
@@ -225,7 +225,7 @@
     "element0000000018": {
       "class": "Action_Sleep",
       "ID": "element0000000018",
-      "name": "Pause: 2 s",
+      "name": "Sleep: 2 s",
       "package": "action",
       "pars": {
         "Duration": 2,
@@ -313,7 +313,7 @@
         "MouseTrackerFrom": "Get coordinates",
         "MouseTrackerTo": "Get coordinates",
         "SendMode": "Event",
-        "speed": "22",
+        "speed": "6",
         "Xpos": "821",
         "XposFrom": "961",
         "Ypos": "735",
@@ -342,7 +342,7 @@
     "element0000000047": {
       "class": "Action_Sleep",
       "ID": "element0000000047",
-      "name": "Pause: 2 s",
+      "name": "Sleep: 2 s",
       "package": "action",
       "pars": {
         "Duration": 2,
@@ -454,7 +454,7 @@
     },
     "element0000000062": {
       "class": "Trigger_Manual",
-      "DefaultTrigger": "1",
+      "DefaultTrigger": "0",
       "enabled": "0",
       "ID": "element0000000062",
       "name": "Manual - \"drive lock eject label\"",
@@ -516,8 +516,8 @@
   "flowSettings": {
     "DefaultWorkingDir": 1,
     "ExecutionPolicy": "default",
-    "Offsetx": "704.285714",
-    "Offsety": "-538.571427",
+    "Offsetx": "-827.142858",
+    "Offsety": "-355.714286",
     "WorkingDir": "",
     "zoomFactor": "0.7"
   },

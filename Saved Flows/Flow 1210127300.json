@@ -498,7 +498,7 @@
     "element0000000008": {
       "class": "Trigger_Manual",
       "DefaultTrigger": "1",
-      "enabled": "0",
+      "enabled": "1",
       "ID": "element0000000008",
       "name": "Manual - \"list test\"",
       "package": "default",
@@ -626,7 +626,7 @@
     "element0000000014": {
       "class": "Condition_Expression",
       "ID": "element0000000014",
-      "name": "Ausdruck - listLength = 4 and listMax = 4 and listMin = 3 and listCount = 2",
+      "name": "Expression - listLength = 4 and listMax = 4 and listMin = 3 and listCount = 2",
       "package": "default",
       "pars": {
         "Expression": "listLength = 4 and listMax = 4 and listMin = 3 and listCount = 2"
@@ -700,7 +700,7 @@
     "element0000000019": {
       "class": "Condition_Expression",
       "ID": "element0000000019",
-      "name": "Ausdruck - index = 4",
+      "name": "Expression - index = 4",
       "package": "default",
       "pars": {
         "Expression": "index = 4"
@@ -770,7 +770,7 @@
     "element0000000023": {
       "class": "Condition_Expression",
       "ID": "element0000000023",
-      "name": "Ausdruck - listLength = 4 and listMax = 4 and listMin = 1 and listCount = 3",
+      "name": "Expression - listLength = 4 and listMax = 4 and listMin = 1 and listCount = 3",
       "package": "default",
       "pars": {
         "Expression": "listLength = 4 and listMax = 4 and listMin = 1 and listCount = 3"
@@ -869,7 +869,7 @@
     "element0000000029": {
       "class": "Condition_Expression",
       "ID": "element0000000029",
-      "name": "Ausdruck - listLength = 5 and listMax = 5 and listMin = 1 and listCount = 4",
+      "name": "Expression - listLength = 5 and listMax = 5 and listMin = 1 and listCount = 4",
       "package": "default",
       "pars": {
         "Expression": "listLength = 5 and listMax = 5 and listMin = 1 and listCount = 4"
@@ -1033,7 +1033,7 @@
     "element0000000039": {
       "class": "Condition_Expression",
       "ID": "element0000000039",
-      "name": "Ausdruck - listLength = 4 and listMax = 4 and listMin = 1 and listCount = 4",
+      "name": "Expression - listLength = 4 and listMax = 4 and listMin = 1 and listCount = 4",
       "package": "default",
       "pars": {
         "Expression": "listLength = 4 and listMax = 4 and listMin = 1 and listCount = 4"
@@ -1046,7 +1046,7 @@
     "element0000000040": {
       "class": "Condition_Expression",
       "ID": "element0000000040",
-      "name": "Ausdruck - deletedVariable = \"\u043D\u043E\u043B\u044C\"",
+      "name": "Expression - deletedVariable = \"\u043D\u043E\u043B\u044C\"",
       "package": "default",
       "pars": {
         "Expression": "deletedVariable = \"\u043D\u043E\u043B\u044C\""
@@ -1133,7 +1133,7 @@
     "element0000000046": {
       "class": "Condition_Expression",
       "ID": "element0000000046",
-      "name": "Ausdruck - listLength = 4 and listMax = 4 and listMin = 1 and listCount = 4",
+      "name": "Expression - listLength = 4 and listMax = 4 and listMin = 1 and listCount = 4",
       "package": "default",
       "pars": {
         "Expression": "listLength = 4 and listMax = 4 and listMin = 1 and listCount = 4"
@@ -1210,7 +1210,7 @@
     "element0000000051": {
       "class": "Condition_Expression",
       "ID": "element0000000051",
-      "name": "Ausdruck - index1 and index2 and index3 and index4",
+      "name": "Expression - index1 and index2 and index3 and index4",
       "package": "default",
       "pars": {
         "Expression": "index1 and index2 and index3 and index4"
@@ -1223,7 +1223,7 @@
     "element0000000052": {
       "class": "Condition_Expression",
       "ID": "element0000000052",
-      "name": "Ausdruck - index1 != 1 or index2 != 2 or index3 != 3 or index4 != 4",
+      "name": "Expression - index1 != 1 or index2 != 2 or index3 != 3 or index4 != 4",
       "package": "default",
       "pars": {
         "Expression": "index1 != 1 or index2 != 2 or index3 != 3 or index4 != 4"
@@ -1236,7 +1236,7 @@
     "element0000000054": {
       "class": "Condition_Expression",
       "ID": "element0000000054",
-      "name": "Ausdruck - countShuffleTries < 3",
+      "name": "Expression - countShuffleTries < 3",
       "package": "default",
       "pars": {
         "Expression": "countShuffleTries < 3"

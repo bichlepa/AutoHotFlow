@@ -111,7 +111,7 @@
       "class": "Trigger_Periodic_Timer",
       "enabled": "0",
       "ID": "element0000000001",
-      "name": "Periodic Timer - 5 Sekunden",
+      "name": "Periodic Timer - 5 Seconds",
       "package": "default",
       "pars": {
         "Interval": "5",
@@ -243,14 +243,14 @@
     "element0000000027": {
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000027",
-      "name": "Set Flow Status - Aktivieren: This flow - Periodic Timer - 5 Sekunden",
+      "name": "Set Flow Status - Enable: This flow - Periodic Timer - 5 Seconds",
       "package": "default",
       "pars": {
         "Enable": "Enable",
         "flowID": "",
         "ThisFlow": 1,
         "triggerID": "element0000000001",
-        "WhichTrigger": "Specific"
+        "WhichTrigger": "Specified"
       },
       "StandardName": "1",
       "type": "Action",
@@ -275,14 +275,14 @@
     "element0000000034": {
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000034",
-      "name": "Set Flow Status - Deaktivieren: This flow - Periodic Timer - 5 Sekunden",
+      "name": "Set Flow Status - Disable: This flow - Periodic Timer - 5 Seconds",
       "package": "default",
       "pars": {
         "Enable": "Disable",
         "flowID": "",
         "ThisFlow": 1,
         "triggerID": "element0000000001",
-        "WhichTrigger": "Specific"
+        "WhichTrigger": "Specified"
       },
       "StandardName": "1",
       "type": "Action",
@@ -308,7 +308,7 @@
     "element0000000044": {
       "class": "Action_Sleep",
       "ID": "element0000000044",
-      "name": "Pause: 7 s",
+      "name": "Sleep: 7 s",
       "package": "action",
       "pars": {
         "Duration": "7",
@@ -337,7 +337,7 @@
     "element0000000052": {
       "class": "Condition_Expression",
       "ID": "element0000000052",
-      "name": "Ausdruck - static_TimeDiff >=4 and static_TimeDiff <= 6",
+      "name": "Expression - static_TimeDiff >=4 and static_TimeDiff <= 6",
       "package": "default",
       "pars": {
         "Expression": "static_TimeDiff >=4 and static_TimeDiff <= 6"
@@ -382,7 +382,7 @@
     "element0000000061": {
       "class": "Condition_Expression",
       "ID": "element0000000061",
-      "name": "Ausdruck - TimeDiff = 1826",
+      "name": "Expression - TimeDiff = 1826",
       "package": "default",
       "pars": {
         "Expression": "TimeDiff = 1826"
@@ -427,7 +427,7 @@
     "element0000000067": {
       "class": "Condition_Expression",
       "ID": "element0000000067",
-      "name": "Ausdruck - TimeDiff = 0",
+      "name": "Expression - TimeDiff = 0",
       "package": "default",
       "pars": {
         "Expression": "TimeDiff = 0"
@@ -443,8 +443,8 @@
   "flowSettings": {
     "DefaultWorkingDir": 1,
     "ExecutionPolicy": "default",
-    "Offsetx": "-387.142858",
-    "Offsety": "-210.000000",
+    "Offsetx": "-390.000001",
+    "Offsety": "-432.857143",
     "WorkingDir": "",
     "zoomFactor": "0.7"
   },

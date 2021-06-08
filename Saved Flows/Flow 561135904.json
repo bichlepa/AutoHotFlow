@@ -11,7 +11,7 @@
       "ConnectionType": "normal",
       "from": "element0000000005",
       "ID": "connection0000000006",
-      "to": "element0000000004",
+      "to": "element0000000018",
       "type": "Connection"
     },
     "connection0000000008": {
@@ -41,24 +41,16 @@
       "ID": "connection0000000016",
       "to": "element0000000012",
       "type": "Connection"
+    },
+    "connection0000000020": {
+      "ConnectionType": "Yes",
+      "from": "element0000000018",
+      "ID": "connection0000000020",
+      "to": "element0000000012",
+      "type": "Connection"
     }
   },
   "allElements": {
-    "element0000000001": {
-      "class": "Trigger_Manual",
-      "DefaultTrigger": "1",
-      "enabled": "1",
-      "ID": "element0000000001",
-      "name": "Manual - \"\u1E73\u19B5\u1E69\u1E17\u2565\"",
-      "package": "default",
-      "pars": {
-        "ID": "\u1E73\u19B5\u1E69\u1E17\u2565"
-      },
-      "StandardName": 1,
-      "type": "trigger",
-      "x": 0,
-      "y": 0
-    },
     "element0000000002": {
       "class": "Trigger_Process_Closes",
       "enabled": "0",
@@ -71,33 +63,8 @@
       },
       "StandardName": "1",
       "type": "Trigger",
-      "x": "700",
-      "y": "210"
-    },
-    "element0000000004": {
-      "class": "Action_Message_Box",
-      "ID": "element0000000004",
-      "name": "Message Box - Titel - %a_processid% - %a_processName% started",
-      "package": "default",
-      "pars": {
-        "ButtonLabel": "OK",
-        "ButtonLabelCancel": "Abbrechen",
-        "Height": 200,
-        "IfClose": "",
-        "IfDismiss": 1,
-        "IsTimeout": "NoTimeout",
-        "message": "%a_processid% - %a_processName% started",
-        "OnTimeout": "Normal",
-        "ShowCancelButton": 0,
-        "TimeoutUnits": 10,
-        "title": "Titel",
-        "Unit": "Seconds",
-        "Width": 300
-      },
-      "StandardName": "1",
-      "type": "Action",
-      "x": "665",
-      "y": "595"
+      "x": "210",
+      "y": "175"
     },
     "element0000000005": {
       "class": "Trigger_Process_starts",
@@ -112,8 +79,8 @@
       },
       "StandardName": "1",
       "type": "Trigger",
-      "x": "910",
-      "y": "245"
+      "x": "700",
+      "y": "210"
     },
     "element0000000007": {
       "class": "Trigger_Process_starts",
@@ -169,8 +136,8 @@
       },
       "StandardName": "1",
       "type": "Action",
-      "x": "490",
-      "y": "525"
+      "x": "210",
+      "y": "385"
     },
     "element0000000012": {
       "class": "Action_Kill_Process",
@@ -182,13 +149,13 @@
       },
       "StandardName": "1",
       "type": "Action",
-      "x": "700",
-      "y": "840"
+      "x": "735",
+      "y": "945"
     },
     "element0000000015": {
       "class": "Action_Sleep",
       "ID": "element0000000015",
-      "name": "Pause: 2 s",
+      "name": "Sleep: 2 s",
       "package": "action",
       "pars": {
         "Duration": 2,
@@ -209,15 +176,41 @@
       "type": "Condition",
       "x": "1155",
       "y": "735"
+    },
+    "element0000000018": {
+      "class": "Condition_Confirmation_Dialog",
+      "ID": "element0000000018",
+      "name": "Confirmation Dialog - Process test, %a_processid% - %a_processName% started%a_lf%Kill it?",
+      "package": "default",
+      "pars": {
+        "ButtonLabelCancel": "Cancel",
+        "ButtonLabelNo": "No",
+        "ButtonLabelYes": "Yes",
+        "DefaultButton": "No",
+        "Height": 200,
+        "IfDismiss": "Exception",
+        "IsTimeout": 0,
+        "message": "%a_processid% - %a_processName% started%a_lf%Kill it?",
+        "OnTimeout": "Exception",
+        "ShowCancelButton": 0,
+        "TimeoutUnits": 10,
+        "title": "Process test",
+        "Unit": "Seconds",
+        "Width": 300
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "525",
+      "y": "595"
     }
   },
   "category": "Manual tests",
-  "ElementIDCounter": "17",
+  "ElementIDCounter": "20",
   "flowSettings": {
     "DefaultWorkingDir": 1,
     "ExecutionPolicy": "default",
-    "Offsetx": "-607.142857",
-    "Offsety": "-527.142858",
+    "Offsetx": "-451.428571",
+    "Offsety": "-340.000001",
     "WorkingDir": "",
     "zoomFactor": "0.7"
   },

@@ -88,7 +88,7 @@ Element_run_Action_Set_Clipboard(Environment, ElementParameters)
 	}
 
 	; set clipboard content
-	Clipboard := ElementParameters.text
+	Clipboard := EvaluatedParameters.text
 	
 	x_finish(Environment, "normal")
 	return
