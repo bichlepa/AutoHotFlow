@@ -147,7 +147,7 @@ Trigger_Process_Closes_TimerLabel(Environment, parameters, fistCall = false)
 
 	; get a list of all matching processes
 	currentProcesses := getProcessList(parameters.ProcessName)
-	x_log(Environment, strobj(currentProcesses))
+	x_log(Environment, x_ConvertObjToString(currentProcesses))
 
 	; check whether some elements are missing now
 	for oneProcessID, oneProcessName in parameters.currentProcesses
