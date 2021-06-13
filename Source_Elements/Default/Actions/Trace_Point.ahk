@@ -68,7 +68,6 @@ Element_getParametrizationDetails_Action_Trace_Point(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Trace_Point(Environment, ElementParameters)
 {
-	global
 	if (ElementParameters.StopCondition)
 		textStopCondition := " - " lang("With stop condition")
 	return % x_lang("Trace_Point") " - " ElementParameters.ID textStopCondition

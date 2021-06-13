@@ -109,11 +109,11 @@
     "element0000000014": {
       "class": "Action_Set_Clipboard",
       "ID": "element0000000014",
-      "name": "Set Clipboard - CLIPBOARDCHANGED",
+      "name": "Set Clipboard - clipboardChanged",
       "package": "default",
       "pars": {
         "expression": "expression",
-        "text": "CLIPBOARDCHANGED"
+        "text": "clipboardChanged"
       },
       "StandardName": "1",
       "type": "Action",
@@ -157,12 +157,12 @@
     "element0000000023": {
       "class": "Action_Tooltip",
       "ID": "element0000000023",
-      "name": "Tooltip: clipboard: %clipboard% - changed to: %CLIPBOARDCHANGED% - 2 s - Follow Mouse",
+      "name": "Tooltip: clipboard: %clipboard% - changed to: %clipboardChanged% - 2 s - Follow Mouse",
       "package": "action",
       "pars": {
         "duration": 2,
         "follow_mouse": 1,
-        "text": "clipboard: %clipboard%\nchanged to: %CLIPBOARDCHANGED%",
+        "text": "clipboard: %clipboard%\nchanged to: %clipboardChanged%",
         "Unit": "Seconds"
       },
       "StandardName": "1",

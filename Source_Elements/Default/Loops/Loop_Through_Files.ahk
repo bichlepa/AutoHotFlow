@@ -56,7 +56,7 @@ Element_getParametrizationDetails_Loop_Loop_Through_Files(Environment)
 	parametersToEdit.push({type: "Label", label: x_lang("File pattern")})
 	parametersToEdit.push({type: "File", id: "file", label: x_lang("Select a file")})
 	parametersToEdit.push({type: "Label", label: x_lang("Options")})
-	parametersToEdit.push({type: "Radio", id: "OperateOnWhat", default: 1, choices: [x_lang("Operate on files"), x_lang("Operate on files and folders"), x_lang("Operate on folders")], result: "enum", enum: ["Files", "FilesAndFolders", "Folders"]})
+	parametersToEdit.push({type: "Radio", id: "OperateOnWhat", default: "Files", choices: [x_lang("Operate on files"), x_lang("Operate on files and folders"), x_lang("Operate on folders")], result: "enum", enum: ["Files", "FilesAndFolders", "Folders"]})
 	parametersToEdit.push({type: "Checkbox", id: "Recurse", default: 0, label: x_lang("Recurse subfolders into")})
 	
 	return parametersToEdit
@@ -65,7 +65,22 @@ Element_getParametrizationDetails_Loop_Loop_Through_Files(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Loop_Loop_Through_Files(Environment, ElementParameters)
 {
-	return x_lang("Loop_Through_Files") 
+	switch (ElementParameters.OperateOnWhat)
+	{
+		case "Files":
+		textFileType := x_lang("Operate on files")
+		case "FilesAndFolders":
+		textFileType := x_lang("Operate on files and folders")
+		case "Folders":
+		textFileType := x_lang("Operate on folders")
+	}
+
+	if (ElementParameters.Recurse)
+		textRecursive := x_lang("Recursive")
+	else
+		textRecursive := x_lang("Not recursive")
+
+	return x_lang("Loop_Through_Files") " - " ElementParameters.File " - " textFileType " - " textRecursive
 }
 
 ;Called every time the user changes any parameter.

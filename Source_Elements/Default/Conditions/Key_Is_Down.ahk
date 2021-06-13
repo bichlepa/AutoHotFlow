@@ -56,6 +56,9 @@ Element_getParametrizationDetails_Condition_Key_Is_Down(Environment)
 	parametersToEdit.push({type: "Label", label: x_lang("Key name")})
 	parametersToEdit.push({type: "Edit", id: "key", content: "String", WarnIfEmpty: true})
 	
+	parametersToEdit.push({type: "Label", label: x_lang("Which key state")})
+	parametersToEdit.push({type: "Radio", id: "WhichKeyState", default: "logical", result: "enum", choices: [x_lang("Logical"), x_lang("Physical")], enum: ["logical", "physical"]})
+	
 	return parametersToEdit
 }
 
@@ -87,7 +90,17 @@ Element_run_Condition_Key_Is_Down(Environment, ElementParameters)
 	}
 
 	; get the key state
-	if (GetKeyState(EvaluatedParameters.key))
+
+	if (EvaluatedParameters.WhichKeyState = "logical")
+	{
+		keyState := GetKeyState(EvaluatedParameters.key)
+	}
+	else if (EvaluatedParameters.WhichKeyState = "physical")
+	{
+		keyState := GetKeyState(EvaluatedParameters.key, "P")
+	}
+
+	if (keyState)
 	{
 		; key is down
 		return x_finish(Environment, "yes")

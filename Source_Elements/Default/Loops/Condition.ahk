@@ -63,7 +63,7 @@ Element_getParametrizationDetails_Loop_Condition(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Loop_Condition(Environment, ElementParameters)
 {
-	return x_lang("Condition") 
+	return x_lang("Condition") " - " ElementParameters.Expression
 }
 
 ;Called every time the user changes any parameter.
@@ -123,6 +123,7 @@ Element_run_Loop_Condition(Environment, ElementParameters)
 		; get current index and increase it
 		index := x_GetVariable(Environment, "A_Index")
 		index++
+		x_SetVariable(Environment, "A_Index", index, "loop")
 		
 		; evaluate expression parameter
 		evalutedExpression := x_EvaluateExpression(Environment,ElementParameters.Expression)
@@ -137,7 +138,6 @@ Element_run_Loop_Condition(Environment, ElementParameters)
 		{
 			; the expression is not false
 			; Start next iteration
-			x_SetVariable(Environment, "A_Index", index, "loop")
 			x_finish(Environment, "head") ;Continue with next iteration
 		}
 		else

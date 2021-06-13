@@ -80,9 +80,51 @@ Element_getParametrizationDetails_Action_Trace_Point_Check(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Trace_Point_Check(Environment, ElementParameters)
 {
-	global
-	return % x_lang("Trace_Point_Check")
-	
+	mustPassSelected := lementParameters.MustPassTracepoints.length()
+	mustNotPassSelected := lementParameters.MustPassTracepoints.length()
+
+	if (ElementParameters.MustPassTracepointsAll)
+	{
+		if (not mustNotPassSelected)
+		{
+			tracePointText := x_lang("Must pass all tracepoints")
+		}
+		Else
+		{
+			tracePointText := x_lang("Must pass all tracepoints with exceptions")
+		}
+	}
+	else if (ElementParameters.MustNotPassTracepointsAll)
+	{
+		if (not mustPassSelected)
+		{
+			tracePointText := x_lang("Must not pass any tracepoint")
+		}
+		Else
+		{
+			tracePointText := x_lang("Must not pass any tracepoint with exceptions")
+		}
+	}
+	Else
+	{
+		if (mustPassSelected and mustNotPassSelected)
+		{
+			tracePointText := x_lang("Must pass some selected tracepoints and must not pass some selected tracepoints")
+		}
+		else if (mustPassSelected)
+		{
+			tracePointText := x_lang("Must pass selected tracepoints")
+		}
+		else if (mustNotPassSelected)
+		{
+			tracePointText := x_lang("Must not pass selected tracepoints")
+		}
+		else
+		{
+			tracePointText := x_lang("No checks")
+		}
+	}
+	return % x_lang("Trace_Point_Check") " - " tracePointText
 }
 
 ;Called every time the user changes any parameter.

@@ -42,7 +42,7 @@
       "from": "element0000000004",
       "fromPart": "TAIL",
       "ID": "connection0000000020",
-      "to": "element0000000012",
+      "to": "element0000000040",
       "type": "Connection"
     },
     "connection0000000021": {
@@ -112,6 +112,248 @@
       "from": "element0000000012",
       "ID": "connection0000000029",
       "to": "element0000000030",
+      "type": "Connection"
+    },
+    "connection0000000038": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000038",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000039": {
+      "ConnectionType": "normal",
+      "from": "element0000000040",
+      "ID": "connection0000000039",
+      "to": "element0000000031",
+      "toPart": "HEAD",
+      "type": "Connection"
+    },
+    "connection0000000042": {
+      "ConnectionType": "normal",
+      "from": "element0000000031",
+      "fromPart": "HEAD",
+      "ID": "connection0000000042",
+      "to": "element0000000041",
+      "type": "Connection"
+    },
+    "connection0000000045": {
+      "ConnectionType": "normal",
+      "from": "element0000000041",
+      "ID": "connection0000000045",
+      "to": "element0000000046",
+      "type": "Connection"
+    },
+    "connection0000000050": {
+      "ConnectionType": "Yes",
+      "from": "element0000000046",
+      "ID": "connection0000000050",
+      "to": "element0000000051",
+      "type": "Connection"
+    },
+    "connection0000000052": {
+      "ConnectionType": "Yes",
+      "from": "element0000000051",
+      "ID": "connection0000000052",
+      "to": "element0000000049",
+      "type": "Connection"
+    },
+    "connection0000000053": {
+      "ConnectionType": "No",
+      "from": "element0000000049",
+      "ID": "connection0000000053",
+      "to": "element0000000031",
+      "toPart": "TAIL",
+      "type": "Connection"
+    },
+    "connection0000000057": {
+      "ConnectionType": "Yes",
+      "from": "element0000000049",
+      "ID": "connection0000000057",
+      "to": "element0000000056",
+      "type": "Connection"
+    },
+    "connection0000000058": {
+      "ConnectionType": "normal",
+      "from": "element0000000056",
+      "ID": "connection0000000058",
+      "to": "element0000000031",
+      "toPart": "TAIL",
+      "type": "Connection"
+    },
+    "connection0000000060": {
+      "ConnectionType": "normal",
+      "from": "element0000000031",
+      "fromPart": "TAIL",
+      "ID": "connection0000000060",
+      "to": "element0000000059",
+      "toPart": "HEAD",
+      "type": "Connection"
+    },
+    "connection0000000063": {
+      "ConnectionType": "Yes",
+      "from": "element0000000061",
+      "ID": "connection0000000063",
+      "to": "element0000000062",
+      "type": "Connection"
+    },
+    "connection0000000064": {
+      "ConnectionType": "normal",
+      "from": "element0000000059",
+      "fromPart": "HEAD",
+      "ID": "connection0000000064",
+      "to": "element0000000061",
+      "type": "Connection"
+    },
+    "connection0000000065": {
+      "ConnectionType": "normal",
+      "from": "element0000000062",
+      "ID": "connection0000000065",
+      "to": "element0000000059",
+      "toPart": "BREAK",
+      "type": "Connection"
+    },
+    "connection0000000068": {
+      "ConnectionType": "No",
+      "from": "element0000000061",
+      "ID": "connection0000000068",
+      "to": "element0000000059",
+      "toPart": "TAIL",
+      "type": "Connection"
+    },
+    "connection0000000072": {
+      "ConnectionType": "normal",
+      "from": "element0000000059",
+      "fromPart": "TAIL",
+      "ID": "connection0000000072",
+      "to": "element0000000070",
+      "toPart": "HEAD",
+      "type": "Connection"
+    },
+    "connection0000000076": {
+      "ConnectionType": "Yes",
+      "from": "element0000000074",
+      "ID": "connection0000000076",
+      "to": "element0000000073",
+      "type": "Connection"
+    },
+    "connection0000000077": {
+      "ConnectionType": "Yes",
+      "from": "element0000000073",
+      "ID": "connection0000000077",
+      "to": "element0000000075",
+      "type": "Connection"
+    },
+    "connection0000000078": {
+      "ConnectionType": "normal",
+      "from": "element0000000070",
+      "fromPart": "HEAD",
+      "ID": "connection0000000078",
+      "to": "element0000000074",
+      "type": "Connection"
+    },
+    "connection0000000079": {
+      "ConnectionType": "normal",
+      "from": "element0000000075",
+      "ID": "connection0000000079",
+      "to": "element0000000070",
+      "toPart": "TAIL",
+      "type": "Connection"
+    },
+    "connection0000000080": {
+      "ConnectionType": "No",
+      "from": "element0000000073",
+      "ID": "connection0000000080",
+      "to": "element0000000070",
+      "toPart": "TAIL",
+      "type": "Connection"
+    },
+    "connection0000000082": {
+      "ConnectionType": "normal",
+      "from": "element0000000070",
+      "fromPart": "TAIL",
+      "ID": "connection0000000082",
+      "to": "element0000000081",
+      "toPart": "HEAD",
+      "type": "Connection"
+    },
+    "connection0000000084": {
+      "ConnectionType": "normal",
+      "from": "element0000000081",
+      "fromPart": "HEAD",
+      "ID": "connection0000000084",
+      "to": "element0000000083",
+      "type": "Connection"
+    },
+    "connection0000000085": {
+      "ConnectionType": "Yes",
+      "from": "element0000000086",
+      "ID": "connection0000000085",
+      "to": "element0000000081",
+      "toPart": "TAIL",
+      "type": "Connection"
+    },
+    "connection0000000087": {
+      "ConnectionType": "normal",
+      "from": "element0000000081",
+      "fromPart": "HEAD",
+      "ID": "connection0000000087",
+      "to": "element0000000086",
+      "type": "Connection"
+    },
+    "connection0000000088": {
+      "ConnectionType": "Yes",
+      "from": "element0000000083",
+      "ID": "connection0000000088",
+      "to": "element0000000081",
+      "toPart": "TAIL",
+      "type": "Connection"
+    },
+    "connection0000000092": {
+      "ConnectionType": "normal",
+      "from": "element0000000081",
+      "fromPart": "TAIL",
+      "ID": "connection0000000092",
+      "to": "element0000000096",
+      "type": "Connection"
+    },
+    "connection0000000094": {
+      "ConnectionType": "normal",
+      "from": "element0000000093",
+      "fromPart": "HEAD",
+      "ID": "connection0000000094",
+      "to": "element0000000095",
+      "type": "Connection"
+    },
+    "connection0000000098": {
+      "ConnectionType": "normal",
+      "from": "element0000000095",
+      "ID": "connection0000000098",
+      "to": "element0000000093",
+      "toPart": "TAIL",
+      "type": "Connection"
+    },
+    "connection0000000099": {
+      "ConnectionType": "normal",
+      "from": "element0000000093",
+      "fromPart": "TAIL",
+      "ID": "connection0000000099",
+      "to": "element0000000097",
+      "type": "Connection"
+    },
+    "connection0000000100": {
+      "ConnectionType": "normal",
+      "from": "element0000000096",
+      "ID": "connection0000000100",
+      "to": "element0000000093",
+      "toPart": "HEAD",
+      "type": "Connection"
+    },
+    "connection0000000104": {
+      "ConnectionType": "No",
+      "from": "element0000000097",
+      "ID": "connection0000000104",
+      "to": "element0000000012",
       "type": "Connection"
     }
   },
@@ -288,7 +530,7 @@
     "element0000000012": {
       "class": "Action_Trace_Point_Check",
       "ID": "element0000000012",
-      "name": "Trace Point Check",
+      "name": "Trace Point Check - Must pass all tracepoints",
       "package": "default",
       "pars": {
         "MustNotPassTracepoints": [
@@ -300,8 +542,8 @@
       },
       "StandardName": "1",
       "type": "action",
-      "x": "245",
-      "y": "2100"
+      "x": "595",
+      "y": "5915"
     },
     "element0000000013": {
       "class": "Condition_Expression",
@@ -339,19 +581,318 @@
       },
       "StandardName": "1",
       "type": "Action",
-      "x": "280",
+      "x": "595",
+      "y": "6125"
+    },
+    "element0000000031": {
+      "class": "Loop_SimpleLoop",
+      "HeightOfVerticalBar": "700",
+      "ID": "element0000000031",
+      "name": "Simple loop: 5 Repeats",
+      "package": "default",
+      "pars": {
+        "Infinite": 0,
+        "repeatCount": 5
+      },
+      "StandardName": "1",
+      "type": "Loop",
+      "x": "245",
+      "y": "2240"
+    },
+    "element0000000040": {
+      "class": "Action_New_variable",
+      "ID": "element0000000040",
+      "name": "New variable - myIndex = 0",
+      "package": "default",
+      "pars": {
+        "expression": "Expression",
+        "Varname": "myIndex",
+        "VarValue": "0"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "245",
+      "y": "2100"
+    },
+    "element0000000041": {
+      "class": "Action_New_variable",
+      "ID": "element0000000041",
+      "name": "New variable - myIndex = myIndex + 1",
+      "package": "default",
+      "pars": {
+        "expression": "Expression",
+        "Varname": "myIndex",
+        "VarValue": "myIndex + 1"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "315",
       "y": "2380"
+    },
+    "element0000000046": {
+      "class": "Condition_Expression",
+      "ID": "element0000000046",
+      "name": "Expression - myIndex = a_index",
+      "package": "default",
+      "pars": {
+        "Expression": "myIndex = a_index"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "350",
+      "y": "2520"
+    },
+    "element0000000049": {
+      "class": "Condition_Expression",
+      "ID": "element0000000049",
+      "name": "Expression - myIndex = 5",
+      "package": "default",
+      "pars": {
+        "Expression": "myIndex = 5"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "455",
+      "y": "2800"
+    },
+    "element0000000051": {
+      "class": "Condition_Expression",
+      "ID": "element0000000051",
+      "name": "Expression - myIndex <= 5",
+      "package": "default",
+      "pars": {
+        "Expression": "myIndex <= 5"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "385",
+      "y": "2660"
+    },
+    "element0000000056": {
+      "class": "Action_Trace_Point",
+      "ID": "element0000000056",
+      "name": "Trace Point - index5",
+      "package": "default",
+      "pars": {
+        "ID": "index5",
+        "LogMessage": "",
+        "StopCondition": ""
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "560",
+      "y": "2940"
+    },
+    "element0000000059": {
+      "class": "Loop_SimpleLoop",
+      "HeightOfVerticalBar": "350",
+      "ID": "element0000000059",
+      "name": "Simple loop: Infinite loop",
+      "package": "default",
+      "pars": {
+        "Infinite": "1",
+        "repeatCount": 5
+      },
+      "StandardName": "1",
+      "type": "Loop",
+      "x": "280",
+      "y": "3185"
+    },
+    "element0000000061": {
+      "class": "Condition_Expression",
+      "ID": "element0000000061",
+      "name": "Expression - a_index = 6",
+      "package": "default",
+      "pars": {
+        "Expression": "a_index = 6"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "385",
+      "y": "3325"
+    },
+    "element0000000062": {
+      "class": "Action_Trace_Point",
+      "ID": "element0000000062",
+      "name": "Trace Point - index6",
+      "package": "default",
+      "pars": {
+        "ID": "index6",
+        "LogMessage": "",
+        "StopCondition": ""
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "490",
+      "y": "3465"
+    },
+    "element0000000070": {
+      "class": "Loop_Condition",
+      "HeightOfVerticalBar": "560",
+      "ID": "element0000000070",
+      "name": "Condition - a_index <= 3",
+      "package": "default",
+      "pars": {
+        "EvaluateOnFirstIteration": 1,
+        "Expression": "a_index <= 3"
+      },
+      "StandardName": "1",
+      "type": "Loop",
+      "x": "560",
+      "y": "3815"
+    },
+    "element0000000073": {
+      "class": "Condition_Expression",
+      "ID": "element0000000073",
+      "name": "Expression - a_Index = 3",
+      "package": "default",
+      "pars": {
+        "Expression": "a_Index = 3"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "700",
+      "y": "4095"
+    },
+    "element0000000074": {
+      "class": "Condition_Expression",
+      "ID": "element0000000074",
+      "name": "Expression - a_Index <= 3",
+      "package": "default",
+      "pars": {
+        "Expression": "a_Index <= 3"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "630",
+      "y": "3955"
+    },
+    "element0000000075": {
+      "class": "Action_Trace_Point",
+      "ID": "element0000000075",
+      "name": "Trace Point - index3",
+      "package": "default",
+      "pars": {
+        "ID": "index3",
+        "LogMessage": "",
+        "StopCondition": ""
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "805",
+      "y": "4235"
+    },
+    "element0000000081": {
+      "class": "Loop_Parse_A_String",
+      "HeightOfVerticalBar": "350",
+      "ID": "element0000000081",
+      "name": "Parse A String - Hello real world, Hello virtual world - , - %a_space%%a_tab%",
+      "package": "default",
+      "pars": {
+        "Delimiters": ",",
+        "Expression": "String",
+        "OmitChars": "%a_space%%a_tab%",
+        "VarValue": "Hello real world, Hello virtual world"
+      },
+      "StandardName": "1",
+      "type": "Loop",
+      "x": "560",
+      "y": "4550"
+    },
+    "element0000000083": {
+      "class": "Condition_Expression",
+      "ID": "element0000000083",
+      "name": "Expression - a_Index = 1 and a_loopfield = \"Hello real world\"",
+      "package": "default",
+      "pars": {
+        "Expression": "a_Index = 1 and a_loopfield = \"Hello real world\""
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "630",
+      "y": "4725"
+    },
+    "element0000000086": {
+      "class": "Condition_Expression",
+      "ID": "element0000000086",
+      "name": "Expression - a_Index = 2 and a_loopfield = \"Hello virtual world\"",
+      "package": "default",
+      "pars": {
+        "Expression": "a_Index = 2 and a_loopfield = \"Hello virtual world\""
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "910",
+      "y": "4725"
+    },
+    "element0000000093": {
+      "class": "Loop_Condition",
+      "HeightOfVerticalBar": "210",
+      "ID": "element0000000093",
+      "name": "Condition - 4 = 5",
+      "package": "default",
+      "pars": {
+        "EvaluateOnFirstIteration": 1,
+        "Expression": "4 = 5"
+      },
+      "StandardName": "1",
+      "type": "Loop",
+      "x": "560",
+      "y": "5320"
+    },
+    "element0000000095": {
+      "class": "Action_New_variable",
+      "ID": "element0000000095",
+      "name": "New variable - failed = 1",
+      "package": "default",
+      "pars": {
+        "expression": "Expression",
+        "Varname": "failed",
+        "VarValue": "1"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "595",
+      "y": "5460"
+    },
+    "element0000000096": {
+      "class": "Action_New_variable",
+      "ID": "element0000000096",
+      "name": "New variable - failed = 0",
+      "package": "default",
+      "pars": {
+        "expression": "Expression",
+        "Varname": "failed",
+        "VarValue": "0"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "560",
+      "y": "5180"
+    },
+    "element0000000097": {
+      "class": "Condition_Expression",
+      "ID": "element0000000097",
+      "name": "Expression - failed",
+      "package": "default",
+      "pars": {
+        "Expression": "failed"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "630",
+      "y": "5740"
     }
   },
   "category": "Automatic tests",
-  "ElementIDCounter": "30",
+  "ElementIDCounter": "104",
   "flowSettings": {
     "DefaultWorkingDir": 1,
     "ExecutionPolicy": "default",
-    "Offsetx": "-347.142858",
-    "Offsety": "952.857143",
+    "Offsetx": "-315.820889",
+    "Offsety": "4074.964721",
     "WorkingDir": "",
-    "zoomFactor": "0.7"
+    "zoomFactor": "0.578513"
   },
   "name": "Loop test"
 }

@@ -67,7 +67,7 @@ Element_getParametrizationDetails_Loop_Parse_A_String(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Loop_Parse_A_String(Environment, ElementParameters)
 {
-	return x_lang("Parse_A_String") 
+	return x_lang("Parse_A_String") " - " ElementParameters.VarValue " - " ElementParameters.Delimiters " - " ElementParameters.OmitChars
 }
 
 ;Called every time the user changes any parameter.

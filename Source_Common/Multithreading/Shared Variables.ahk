@@ -170,6 +170,13 @@ _getFlow(FlowID)
 	_LeaveCriticalSection()
     return flow
 }
+_getFlowWithoutStates(FlowID)
+{
+	_EnterCriticalSection()
+    flow:=ObjFullyClone(_flows[FlowID], ["states"])
+	_LeaveCriticalSection()
+    return flow
+}
 _setFlow(FlowID, flow)
 {
 	_EnterCriticalSection()

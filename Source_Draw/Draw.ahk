@@ -84,7 +84,7 @@ drawTask()
 				_setFlowProperty(FlowID, "draw.mustDraw", false)
 				
 				; get all flow properties
-				flow:=_getFlow(flowID)
+				flow:=_getFlowWithoutStates(flowID)
 				break
 			}
 		}

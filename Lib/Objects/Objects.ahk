@@ -2,14 +2,30 @@
 
 
 ;Thanks to fincs
-ObjFullyClone(obj)
+ObjFullyClone(obj, keysToSkip = "")
 {
 	if IsObject(obj)
 	{
 		nobj := obj.Clone()
 		for k,v in nobj
+		{
+			if (keysToSkip)
+			{
+				found := false
+				for oneIndex, oneKey in keysToSkip
+				{
+					if (oneKey = k)
+						found := true
+				}
+				if (found)
+				{
+					nobj.delete(k)
+					Continue
+				}
+			}
 			if IsObject(v)
 				nobj[k] := A_ThisFunc.(v)
+		}
 	}
 	else
 		nobj := obj
