@@ -66,7 +66,8 @@ Element_getParametrizationDetails_Action_Search_in_a_string(Environment)
 	parametersToEdit.push({type: "Edit", id: "OccurenceNumber", default: 1, content: "PositiveInteger", WarnIfEmpty: true})
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Start position")})
-	parametersToEdit.push({type: "Edit", id: "Offset", default: 1, content: "Integer", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Radio", id: "LeftOrRight", default: "GoRight", choices: [x_lang("Search from left to right"), x_lang("Search from right to left")], result: "enum", enum: ["GoRight", "GoLeft"]})
+	parametersToEdit.push({type: "Edit", id: "Offset", default: 1, content: "PositiveInteger", WarnIfEmpty: true})
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Case sensitivity")})
 	parametersToEdit.push({type: "Radio", id: "CaseSensitive", default: "CaseInsensitive", choices: [x_lang("Case insensitive"), x_lang("Case sensitive")], result: "enum", enum: ["CaseInsensitive", "CaseSensitive"]})
@@ -100,6 +101,13 @@ Element_run_Action_Search_in_a_string(Environment, ElementParameters)
 	{
 		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
+	}
+
+	; do we serach from right to left?
+	if (EvaluatedParameters.LeftOrRight = "GoLeft")
+	{
+		; calculate index, so we can search from right to left
+		EvaluatedParameters.Offset := 1 - EvaluatedParameters.Offset
 	}
 
 	; search for the string

@@ -70,7 +70,7 @@ Element_getParametrizationDetails_Action_Trim_a_string(Environment)
 	parametersToEdit.push({type: "Edit", id: "Length", default: 6, content: "Number", WarnIfEmpty: true})
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Which characters")})
-	parametersToEdit.push({type: "Edit", id: "OmitChars", default: "%a_space%%a_tab%%a_lf%%a_cr%", content: "String"})
+	parametersToEdit.push({type: "Edit", id: "OmitChars", default: "%a_space%%a_tab%%a_lf%%a_cr%", content: "String", WarnIfEmpty: true})
 	
 	return parametersToEdit
 }
@@ -120,8 +120,7 @@ Element_CheckSettings_Action_Trim_a_string(Environment, ElementParameters, stati
 	{
 		x_Par_Disable("Length")
 		x_Par_Enable("WhiteSpaces")
-		
-		x_Par_Enable("OmitChars", ElementParameters.WhiteSpaces = "Specified")
+		x_Par_Enable("OmitChars")
 	}
 	
 	if (ElementParameters.LeftSide = 0 and ElementParameters.RightSide = 0)
@@ -177,7 +176,7 @@ Element_run_Action_Trim_a_string(Environment, ElementParameters)
 		if (EvaluatedParameters.LeftSide)
 			StringTrimLeft, result, result, % EvaluatedParameters.Length
 		if (EvaluatedParameters.RightSide)
-			StringTrimRight, result, result, % EvaluatedParameters,Length
+			StringTrimRight, result, result, % EvaluatedParameters.Length
 	}
 	else if (EvaluatedParameters.TrimWhat = "Specified")
 	{

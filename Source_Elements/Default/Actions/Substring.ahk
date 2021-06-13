@@ -63,7 +63,7 @@ Element_getParametrizationDetails_Action_Substring(Environment)
 	parametersToEdit.push({type: "Label", label: x_lang("Count of characters")})
 	parametersToEdit.push({type: "CheckBox", id: "UntilTheEnd", default: 0, label: x_lang("Until the end")})
 	parametersToEdit.push({type: "Edit", id: "Length", default: 5, content: "Number", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Radio", id: "LeftOrRight", default: "GoLeft", choices: [x_lang("Go left"), x_lang("Go right")], result: "enum", enum: ["GoLeft", "GoRight"]})
+	parametersToEdit.push({type: "Radio", id: "LeftOrRight", default: "GoRight", choices: [x_lang("Go left"), x_lang("Go right")], result: "enum", enum: ["GoLeft", "GoRight"]})
 	
 	return parametersToEdit
 }

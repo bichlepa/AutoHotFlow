@@ -59,7 +59,7 @@ Element_getParametrizationDetails_Loop_Parse_A_String(Environment)
 	parametersToEdit.push({type: "Label", label: x_lang("Delimiter characters")})
 	parametersToEdit.push({type: "Edit", id: "Delimiters", default: ",", content: "String", WarnIfEmpty: true})
 	parametersToEdit.push({type: "Label", label: x_lang("Omit characters")})
-	parametersToEdit.push({type: "Edit", id: "OmitChars", default: "%a_space%%a_tab%", content: "String"})
+	parametersToEdit.push({type: "Edit", id: "OmitChars", default: "%a_space%%a_tab%%a_lf%%a_cr%", content: "String"})
 	
 	return parametersToEdit
 }
