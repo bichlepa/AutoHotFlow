@@ -77,22 +77,18 @@ Element_CheckSettings_Condition_Expression(Environment, ElementParameters, stati
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Condition_Expression(Environment, ElementParameters)
 {
-	;Evaluate the expression
-	evRes := x_EvaluateExpression(Environment,ElementParameters.Expression)
-	if (evRes.error)
+	; evaluate parameters
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
+	if (EvaluatedParameters._error)
 	{
-		;On error, finish with exception and return
-		x_finish(Environment, "exception", x_lang("An error occured while parsing expression '%1%'", ElementParameters.Expression) "`n`n" evRes.error) 
-		return
+		return x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 	}
+
+	; Expression was successfully evaluated. Check the result and convert it to a boolean result.
+	if (EvaluatedParameters.expression)
+		return x_finish(Environment, "yes")
 	else
-	{
-		; Expression was successfully evaluated. Check the result and convert it to a boolean result.
-		if (evRes.result)
-			return x_finish(Environment, "yes")
-		else
-			return x_finish(Environment, "no")
-	}
+		return x_finish(Environment, "no")
 }
 
 ;Called when the execution of the element should be stopped.

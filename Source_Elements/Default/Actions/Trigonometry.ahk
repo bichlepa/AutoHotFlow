@@ -69,7 +69,7 @@ Element_getParametrizationDetails_Action_Trigonometry(Environment)
 Element_GenerateName_Action_Trigonometry(Environment, ElementParameters)
 {
 	; calculate result based on operation
-	switch (Operation)
+	switch (ElementParameters.Operation)
 	{
 		case "Sine":
 		operationText := x_lang("Sine")
@@ -118,7 +118,7 @@ Element_run_Action_Trigonometry(Environment, ElementParameters)
 		if (EvaluatedParameters.Unit = "Degree") 
 		{
 			; convert degree to radian
-			VarValue /= 180 / 3.141592653589793
+			EvaluatedParameters.VarValue /= 180 / 3.141592653589793
 		}
 	}
 

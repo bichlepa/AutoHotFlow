@@ -261,57 +261,59 @@ x_AutoEvaluateOneParameter(EvaluatedParameters, Environment, ElementParameters, 
 				EvaluatedParameters._error := true
 				EvaluatedParameters._errorMessage := lang("An error occured while parsing expression '%1%'", ElementParameters[oneParID]) "`n`n" evRes.error
 			}
-			if (onePar.WarnIfEmpty)
+			if (onePar.WarnIfEmpty and evRes.result = "")
 			{
-				; if parameter must be set and is empty, add a warning
-				if (evRes.result = "")
-				{
-					EvaluatedParameters._error := true
-					EvaluatedParameters._errorMessage := lang("Result of expression '%1%' is empty", ElementParameters[oneParID])
-				}
+				; if parameter must be set but is empty, add a warning
+				EvaluatedParameters._error := true
+				EvaluatedParameters._errorMessage := lang("Result of expression '%1%' is empty", ElementParameters[oneParID])
 			}
-			if (oneParContent = "number" or oneParContent = "positiveNumber")
+			Else if (evRes.result != "")
 			{
-				; if parameter type is "number", check whether the value is a number
-				temp := evRes.result
-				if temp is not number
+				; parameter value is not empty
+
+				if (oneParContent = "number" or oneParContent = "positiveNumber")
 				{
-					; the value is not a number, add a warning
-					EvaluatedParameters._error := true
-					EvaluatedParameters._errorMessage := lang("Result of expression '%1%' is not a number", ElementParameters[oneParID])
+					; if parameter type is "number", check whether the value is a number
+					temp := evRes.result
+					if temp is not number
+					{
+						; the value is not a number, add a warning
+						EvaluatedParameters._error := true
+						EvaluatedParameters._errorMessage := lang("Result of expression '%1%' is not a number", ElementParameters[oneParID])
+					}
 				}
-			}
-			if (oneParContent = "integer" or oneParContent = "positiveInteger" or oneParContent = "positiveIntegerOrZero")
-			{
-				; if parameter type is "number", check whether the value is a number
-				temp := evRes.result
-				if temp is not integer
+				if (oneParContent = "integer" or oneParContent = "positiveInteger" or oneParContent = "positiveIntegerOrZero")
 				{
-					; the value is not a number, add a warning
-					EvaluatedParameters._error := true
-					EvaluatedParameters._errorMessage := lang("Result of expression '%1%' is not an integer", ElementParameters[oneParID])
+					; if parameter type is "number", check whether the value is a number
+					temp := evRes.result
+					if temp is not integer
+					{
+						; the value is not a number, add a warning
+						EvaluatedParameters._error := true
+						EvaluatedParameters._errorMessage := lang("Result of expression '%1%' is not an integer", ElementParameters[oneParID])
+					}
 				}
-			}
-			if (oneParContent = "positiveInteger")
-			{
-				; if parameter type is "number", check whether the value is a number
-				temp := evRes.result
-				if (not temp >= 1)
+				if (oneParContent = "positiveInteger")
 				{
-					; the value is not a number, add a warning
-					EvaluatedParameters._error := true
-					EvaluatedParameters._errorMessage := lang("Result of expression '%1%' is not a positive number", ElementParameters[oneParID])
+					; if parameter type is "number", check whether the value is a number
+					temp := evRes.result
+					if (not temp >= 1)
+					{
+						; the value is not a number, add a warning
+						EvaluatedParameters._error := true
+						EvaluatedParameters._errorMessage := lang("Result of expression '%1%' is not a positive number", ElementParameters[oneParID])
+					}
 				}
-			}
-			if (oneParContent = "positiveIntegerOrZero" or oneParContent = "positiveNumber")
-			{
-				; if parameter type is "number", check whether the value is a number
-				temp := evRes.result
-				if (not temp >= 0)
+				if (oneParContent = "positiveIntegerOrZero" or oneParContent = "positiveNumber")
 				{
-					; the value is not a number, add a warning
-					EvaluatedParameters._error := true
-					EvaluatedParameters._errorMessage := lang("Result of expression '%1%' is not a positive number or zero", ElementParameters[oneParID])
+					; if parameter type is "number", check whether the value is a number
+					temp := evRes.result
+					if (not temp >= 0)
+					{
+						; the value is not a number, add a warning
+						EvaluatedParameters._error := true
+						EvaluatedParameters._errorMessage := lang("Result of expression '%1%' is not a positive number or zero", ElementParameters[oneParID])
+					}
 				}
 			}
 			EvaluatedParameters[oneParID] := evRes.result

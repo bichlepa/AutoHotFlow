@@ -56,10 +56,10 @@ Element_getParametrizationDetails_Action_Random_number(Environment)
 	parametersToEdit.push({type: "Edit", id: "Varname", default: "NewVariable", content: "VariableName", WarnIfEmpty: true})
 
 	parametersToEdit.push({type: "Label", label:  x_lang("Minimum value")})
-	parametersToEdit.push({type: "Edit", id: "MinValue", default: 0, content: "Expression", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Edit", id: "MinValue", default: 0, content: "Number", WarnIfEmpty: true})
 
 	parametersToEdit.push({type: "Label", label:  x_lang("Maximum value")})
-	parametersToEdit.push({type: "Edit", id: "MaxValue", default: 100, content: "Expression", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Edit", id: "MaxValue", default: 100, content: "Number", WarnIfEmpty: true})
 	
 	return parametersToEdit
 }

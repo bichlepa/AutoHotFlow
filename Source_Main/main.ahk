@@ -122,6 +122,7 @@ global_libInclusionsForThreads =
 
 )
 
+
 ;Lib_Includes_End
 
 ; include all the other source code
@@ -268,6 +269,7 @@ global_libInclusionsForThreads =
 #include source_Elements\Default\conditions\Variable_Is_Empty.ahk
 #include source_Elements\Default\conditions\List_Contains_Element.ahk
 #include source_Elements\Default\conditions\String_Contains_Text.ahk
+#include source_Elements\Default\conditions\Number_is.ahk
 #include source_Elements\Default\conditions\File_Exists.ahk
 #include source_Elements\Default\conditions\File_Has_Attribute.ahk
 #include source_Elements\Default\conditions\Confirmation_Dialog.ahk
@@ -408,6 +410,7 @@ global_elementInclusionsForThreads =
 #include source_Elements\Default\conditions\Variable_Is_Empty.ahk
 #include source_Elements\Default\conditions\List_Contains_Element.ahk
 #include source_Elements\Default\conditions\String_Contains_Text.ahk
+#include source_Elements\Default\conditions\Number_is.ahk
 #include source_Elements\Default\conditions\File_Exists.ahk
 #include source_Elements\Default\conditions\File_Has_Attribute.ahk
 #include source_Elements\Default\conditions\Confirmation_Dialog.ahk
@@ -440,6 +443,7 @@ global_elementInclusionsForThreads =
 #include source_Elements\Default\triggers\AutoHotkey_Script.ahk
 
 )
+
 
 ;Element_Includes_End
 

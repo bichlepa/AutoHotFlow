@@ -227,6 +227,14 @@
       "ID": "connection0000000070",
       "to": "element0000000067",
       "type": "Connection"
+    },
+    "connection0000000071": {
+      "ConnectionType": "normal",
+      "from": "element0000000011",
+      "fromPart": "TAIL",
+      "ID": "connection0000000071",
+      "to": "element0000000072",
+      "type": "Connection"
     }
   },
   "allElements": {
@@ -248,7 +256,7 @@
     "element0000000002": {
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000002",
-      "name": "Set Flow Status - Aktivieren: external script test - Default trigger",
+      "name": "Set Flow Status - Enable: external script test - Default trigger",
       "package": "default",
       "pars": {
         "Enable": "Enable",
@@ -320,7 +328,7 @@
     "element0000000019": {
       "class": "Action_Sleep",
       "ID": "element0000000019",
-      "name": "Pause: 2 s",
+      "name": "Sleep: 2 s",
       "package": "action",
       "pars": {
         "Duration": 2,
@@ -354,7 +362,7 @@
     "element0000000027": {
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000027",
-      "name": "Set Flow Status - Aktivieren:  - Default trigger",
+      "name": "Set Flow Status - Enable:  - Default trigger",
       "package": "default",
       "pars": {
         "Enable": "Enable",
@@ -401,7 +409,7 @@
     "element0000000038": {
       "class": "Condition_Expression",
       "ID": "element0000000038",
-      "name": "Ausdruck - ListLength = CountOfTests",
+      "name": "Expression - ListLength = CountOfTests",
       "package": "default",
       "pars": {
         "Expression": "ListLength = CountOfTests"
@@ -434,7 +442,7 @@
     "element0000000043": {
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000043",
-      "name": "Set Flow Status - Aktivieren: string test - Default trigger",
+      "name": "Set Flow Status - Enable: string test - Default trigger",
       "package": "default",
       "pars": {
         "Enable": "Enable",
@@ -471,7 +479,7 @@
     "element0000000047": {
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000047",
-      "name": "Set Flow Status - Aktivieren: Loop test - Default trigger",
+      "name": "Set Flow Status - Enable: Loop test - Default trigger",
       "package": "default",
       "pars": {
         "Enable": "Enable",
@@ -508,7 +516,7 @@
     "element0000000051": {
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000051",
-      "name": "Set Flow Status - Aktivieren: ini file test - Default trigger",
+      "name": "Set Flow Status - Enable: ini file test - Default trigger",
       "package": "default",
       "pars": {
         "Enable": "Enable",
@@ -545,7 +553,7 @@
     "element0000000055": {
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000055",
-      "name": "Set Flow Status - Aktivieren: maths test - Default trigger",
+      "name": "Set Flow Status - Enable: maths test - Default trigger",
       "package": "default",
       "pars": {
         "Enable": "Enable",
@@ -582,7 +590,7 @@
     "element0000000059": {
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000059",
-      "name": "Set Flow Status - Aktivieren: variable test - Default trigger",
+      "name": "Set Flow Status - Enable: variable test - Default trigger",
       "package": "default",
       "pars": {
         "Enable": "Enable",
@@ -619,7 +627,7 @@
     "element0000000063": {
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000063",
-      "name": "Set Flow Status - Aktivieren: List test - Default trigger",
+      "name": "Set Flow Status - Enable: List test - Default trigger",
       "package": "default",
       "pars": {
         "Enable": "Enable",
@@ -656,7 +664,7 @@
     "element0000000067": {
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000067",
-      "name": "Set Flow Status - Aktivieren: file test - Default trigger",
+      "name": "Set Flow Status - Enable: file test - Default trigger",
       "package": "default",
       "pars": {
         "Enable": "Enable",
@@ -689,15 +697,31 @@
       "type": "action",
       "x": "1295",
       "y": "560"
+    },
+    "element0000000072": {
+      "class": "Action_Tooltip",
+      "ID": "element0000000072",
+      "name": "Tooltip: All tests succeeded: - %global_testresults% - 2 s - Follow Mouse",
+      "package": "action",
+      "pars": {
+        "duration": 2,
+        "follow_mouse": 1,
+        "text": "All tests succeeded:\n%global_testresults%",
+        "Unit": "Seconds"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "0",
+      "y": "1540"
     }
   },
   "category": "Automatic tests",
-  "ElementIDCounter": "70",
+  "ElementIDCounter": "72",
   "flowSettings": {
     "DefaultWorkingDir": 1,
     "ExecutionPolicy": "default",
-    "Offsetx": "-672.082283",
-    "Offsety": "-179.019566",
+    "Offsetx": "-645.368138",
+    "Offsety": "422.834396",
     "WorkingDir": "",
     "zoomFactor": "0.636367"
   },

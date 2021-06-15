@@ -49,24 +49,786 @@
       "to": "element0000000009",
       "type": "Connection"
     },
-    "connection0000000020": {
+    "connection0000000029": {
+      "ConnectionType": "normal",
+      "from": "element0000000021",
+      "ID": "connection0000000029",
+      "to": "element0000000022",
+      "type": "Connection"
+    },
+    "connection0000000030": {
+      "ConnectionType": "normal",
+      "from": "element0000000022",
+      "ID": "connection0000000030",
+      "to": "element0000000025",
+      "type": "Connection"
+    },
+    "connection0000000031": {
+      "ConnectionType": "Yes",
+      "from": "element0000000024",
+      "ID": "connection0000000031",
+      "to": "element0000000026",
+      "type": "Connection"
+    },
+    "connection0000000032": {
+      "ConnectionType": "normal",
+      "from": "element0000000025",
+      "ID": "connection0000000032",
+      "to": "element0000000023",
+      "type": "Connection"
+    },
+    "connection0000000033": {
+      "ConnectionType": "No",
+      "from": "element0000000024",
+      "ID": "connection0000000033",
+      "to": "element0000000027",
+      "type": "Connection"
+    },
+    "connection0000000034": {
+      "ConnectionType": "normal",
+      "from": "element0000000023",
+      "ID": "connection0000000034",
+      "to": "element0000000028",
+      "type": "Connection"
+    },
+    "connection0000000036": {
       "ConnectionType": "Exception",
       "from": "element0000000009",
-      "ID": "connection0000000020",
-      "to": "element0000000019",
+      "ID": "connection0000000036",
+      "to": "element0000000035",
+      "type": "Connection"
+    },
+    "connection0000000037": {
+      "ConnectionType": "normal",
+      "from": "element0000000028",
+      "ID": "connection0000000037",
+      "to": "element0000000040",
+      "type": "Connection"
+    },
+    "connection0000000041": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000041",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000042": {
+      "ConnectionType": "normal",
+      "from": "element0000000040",
+      "ID": "connection0000000042",
+      "to": "element0000000057",
+      "type": "Connection"
+    },
+    "connection0000000043": {
+      "ConnectionType": "normal",
+      "from": "element0000000038",
+      "ID": "connection0000000043",
+      "to": "element0000000073",
+      "toPart": "HEAD",
+      "type": "Connection"
+    },
+    "connection0000000047": {
+      "ConnectionType": "normal",
+      "from": "element0000000046",
+      "ID": "connection0000000047",
+      "to": "element0000000045",
+      "type": "Connection"
+    },
+    "connection0000000055": {
+      "ConnectionType": "normal",
+      "from": "element0000000054",
+      "ID": "connection0000000055",
+      "to": "element0000000053",
+      "type": "Connection"
+    },
+    "connection0000000056": {
+      "ConnectionType": "normal",
+      "from": "element0000000052",
+      "ID": "connection0000000056",
+      "to": "element0000000051",
+      "type": "Connection"
+    },
+    "connection0000000061": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000061",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000062": {
+      "ConnectionType": "normal",
+      "from": "element0000000057",
+      "ID": "connection0000000062",
+      "to": "element0000000058",
+      "type": "Connection"
+    },
+    "connection0000000063": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000063",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000064": {
+      "ConnectionType": "normal",
+      "from": "element0000000058",
+      "ID": "connection0000000064",
+      "to": "element0000000059",
+      "type": "Connection"
+    },
+    "connection0000000065": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000065",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000067": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000067",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000068": {
+      "ConnectionType": "normal",
+      "from": "element0000000271",
+      "ID": "connection0000000068",
+      "to": "element0000000024",
+      "type": "Connection"
+    },
+    "connection0000000069": {
+      "ConnectionType": "normal",
+      "from": "element0000000039",
+      "ID": "connection0000000069",
+      "to": "element0000000070",
+      "type": "Connection"
+    },
+    "connection0000000071": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000071",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000072": {
+      "ConnectionType": "normal",
+      "from": "element0000000073",
+      "fromPart": "HEAD",
+      "ID": "connection0000000072",
+      "to": "element0000000039",
+      "type": "Connection"
+    },
+    "connection0000000075": {
+      "ConnectionType": "Yes",
+      "from": "element0000000070",
+      "ID": "connection0000000075",
+      "to": "element0000000074",
+      "type": "Connection"
+    },
+    "connection0000000079": {
+      "ConnectionType": "Yes",
+      "from": "element0000000074",
+      "ID": "connection0000000079",
+      "to": "element0000000078",
+      "type": "Connection"
+    },
+    "connection0000000080": {
+      "ConnectionType": "Yes",
+      "from": "element0000000078",
+      "ID": "connection0000000080",
+      "to": "element0000000081",
+      "type": "Connection"
+    },
+    "connection0000000084": {
+      "ConnectionType": "No",
+      "from": "element0000000078",
+      "ID": "connection0000000084",
+      "to": "element0000000083",
+      "type": "Connection"
+    },
+    "connection0000000085": {
+      "ConnectionType": "Yes",
+      "from": "element0000000083",
+      "ID": "connection0000000085",
+      "to": "element0000000082",
+      "type": "Connection"
+    },
+    "connection0000000087": {
+      "ConnectionType": "normal",
+      "from": "element0000000082",
+      "ID": "connection0000000087",
+      "to": "element0000000086",
+      "type": "Connection"
+    },
+    "connection0000000091": {
+      "ConnectionType": "normal",
+      "from": "element0000000081",
+      "ID": "connection0000000091",
+      "to": "element0000000086",
+      "type": "Connection"
+    },
+    "connection0000000092": {
+      "ConnectionType": "No",
+      "from": "element0000000083",
+      "ID": "connection0000000092",
+      "to": "element0000000086",
+      "type": "Connection"
+    },
+    "connection0000000093": {
+      "ConnectionType": "Yes",
+      "from": "element0000000086",
+      "ID": "connection0000000093",
+      "to": "element0000000073",
+      "toPart": "BREAK",
+      "type": "Connection"
+    },
+    "connection0000000094": {
+      "ConnectionType": "No",
+      "from": "element0000000086",
+      "ID": "connection0000000094",
+      "to": "element0000000073",
+      "toPart": "TAIL",
+      "type": "Connection"
+    },
+    "connection0000000096": {
+      "ConnectionType": "normal",
+      "from": "element0000000073",
+      "fromPart": "TAIL",
+      "ID": "connection0000000096",
+      "to": "element0000000098",
+      "type": "Connection"
+    },
+    "connection0000000097": {
+      "ConnectionType": "No",
+      "from": "element0000000074",
+      "ID": "connection0000000097",
+      "to": "element0000000073",
+      "toPart": "TAIL",
+      "type": "Connection"
+    },
+    "connection0000000100": {
+      "ConnectionType": "normal",
+      "from": "element0000000098",
+      "ID": "connection0000000100",
+      "to": "element0000000099",
+      "type": "Connection"
+    },
+    "connection0000000101": {
+      "ConnectionType": "Yes",
+      "from": "element0000000099",
+      "ID": "connection0000000101",
+      "to": "element0000000102",
+      "type": "Connection"
+    },
+    "connection0000000103": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000103",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000104": {
+      "ConnectionType": "normal",
+      "from": "element0000000102",
+      "ID": "connection0000000104",
+      "to": "element0000000105",
+      "type": "Connection"
+    },
+    "connection0000000106": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000106",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000107": {
+      "ConnectionType": "Yes",
+      "from": "element0000000105",
+      "ID": "connection0000000107",
+      "to": "element0000000095",
+      "type": "Connection"
+    },
+    "connection0000000109": {
+      "ConnectionType": "normal",
+      "from": "element0000000045",
+      "ID": "connection0000000109",
+      "to": "element0000000108",
+      "type": "Connection"
+    },
+    "connection0000000112": {
+      "ConnectionType": "normal",
+      "from": "element0000000110",
+      "ID": "connection0000000112",
+      "to": "element0000000111",
+      "type": "Connection"
+    },
+    "connection0000000113": {
+      "ConnectionType": "Yes",
+      "from": "element0000000108",
+      "ID": "connection0000000113",
+      "to": "element0000000110",
+      "type": "Connection"
+    },
+    "connection0000000116": {
+      "ConnectionType": "Yes",
+      "from": "element0000000111",
+      "ID": "connection0000000116",
+      "to": "element0000000115",
+      "type": "Connection"
+    },
+    "connection0000000118": {
+      "ConnectionType": "normal",
+      "from": "element0000000048",
+      "ID": "connection0000000118",
+      "to": "element0000000117",
+      "type": "Connection"
+    },
+    "connection0000000121": {
+      "ConnectionType": "normal",
+      "from": "element0000000119",
+      "ID": "connection0000000121",
+      "to": "element0000000120",
+      "type": "Connection"
+    },
+    "connection0000000122": {
+      "ConnectionType": "Yes",
+      "from": "element0000000117",
+      "ID": "connection0000000122",
+      "to": "element0000000119",
+      "type": "Connection"
+    },
+    "connection0000000124": {
+      "ConnectionType": "Yes",
+      "from": "element0000000139",
+      "ID": "connection0000000124",
+      "to": "element0000000148",
+      "type": "Connection"
+    },
+    "connection0000000130": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000130",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000137": {
+      "ConnectionType": "Yes",
+      "from": "element0000000120",
+      "ID": "connection0000000137",
+      "to": "element0000000127",
+      "type": "Connection"
+    },
+    "connection0000000141": {
+      "ConnectionType": "Yes",
+      "from": "element0000000128",
+      "ID": "connection0000000141",
+      "to": "element0000000138",
+      "type": "Connection"
+    },
+    "connection0000000144": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000144",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000154": {
+      "ConnectionType": "Yes",
+      "from": "element0000000149",
+      "ID": "connection0000000154",
+      "to": "element0000000158",
+      "type": "Connection"
+    },
+    "connection0000000156": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000156",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000160": {
+      "ConnectionType": "normal",
+      "from": "element0000000158",
+      "ID": "connection0000000160",
+      "to": "element0000000159",
+      "type": "Connection"
+    },
+    "connection0000000163": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000163",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000165": {
+      "ConnectionType": "normal",
+      "from": "element0000000138",
+      "ID": "connection0000000165",
+      "to": "element0000000139",
+      "type": "Connection"
+    },
+    "connection0000000166": {
+      "ConnectionType": "normal",
+      "from": "element0000000148",
+      "ID": "connection0000000166",
+      "to": "element0000000149",
+      "type": "Connection"
+    },
+    "connection0000000167": {
+      "ConnectionType": "Yes",
+      "from": "element0000000159",
+      "ID": "connection0000000167",
+      "to": "element0000000178",
+      "type": "Connection"
+    },
+    "connection0000000170": {
+      "ConnectionType": "normal",
+      "from": "element0000000049",
+      "ID": "connection0000000170",
+      "to": "element0000000169",
+      "type": "Connection"
+    },
+    "connection0000000172": {
+      "ConnectionType": "normal",
+      "from": "element0000000169",
+      "ID": "connection0000000172",
+      "to": "element0000000171",
+      "type": "Connection"
+    },
+    "connection0000000173": {
+      "ConnectionType": "normal",
+      "from": "element0000000171",
+      "ID": "connection0000000173",
+      "to": "element0000000048",
+      "type": "Connection"
+    },
+    "connection0000000177": {
+      "ConnectionType": "normal",
+      "from": "element0000000127",
+      "ID": "connection0000000177",
+      "to": "element0000000128",
+      "type": "Connection"
+    },
+    "connection0000000180": {
+      "ConnectionType": "normal",
+      "from": "element0000000178",
+      "ID": "connection0000000180",
+      "to": "element0000000179",
+      "type": "Connection"
+    },
+    "connection0000000181": {
+      "ConnectionType": "Yes",
+      "from": "element0000000179",
+      "ID": "connection0000000181",
+      "to": "element0000000186",
+      "type": "Connection"
+    },
+    "connection0000000188": {
+      "ConnectionType": "normal",
+      "from": "element0000000186",
+      "ID": "connection0000000188",
+      "to": "element0000000187",
+      "type": "Connection"
+    },
+    "connection0000000189": {
+      "ConnectionType": "Yes",
+      "from": "element0000000187",
+      "ID": "connection0000000189",
+      "to": "element0000000123",
+      "type": "Connection"
+    },
+    "connection0000000192": {
+      "ConnectionType": "normal",
+      "from": "element0000000051",
+      "ID": "connection0000000192",
+      "to": "element0000000191",
+      "type": "Connection"
+    },
+    "connection0000000195": {
+      "ConnectionType": "normal",
+      "from": "element0000000193",
+      "ID": "connection0000000195",
+      "to": "element0000000194",
+      "type": "Connection"
+    },
+    "connection0000000196": {
+      "ConnectionType": "Yes",
+      "from": "element0000000191",
+      "ID": "connection0000000196",
+      "to": "element0000000193",
+      "type": "Connection"
+    },
+    "connection0000000199": {
+      "ConnectionType": "normal",
+      "from": "element0000000197",
+      "ID": "connection0000000199",
+      "to": "element0000000198",
+      "type": "Connection"
+    },
+    "connection0000000202": {
+      "ConnectionType": "normal",
+      "from": "element0000000200",
+      "ID": "connection0000000202",
+      "to": "element0000000201",
+      "type": "Connection"
+    },
+    "connection0000000203": {
+      "ConnectionType": "Yes",
+      "from": "element0000000198",
+      "ID": "connection0000000203",
+      "to": "element0000000200",
+      "type": "Connection"
+    },
+    "connection0000000204": {
+      "ConnectionType": "Yes",
+      "from": "element0000000194",
+      "ID": "connection0000000204",
+      "to": "element0000000197",
+      "type": "Connection"
+    },
+    "connection0000000205": {
+      "ConnectionType": "Yes",
+      "from": "element0000000201",
+      "ID": "connection0000000205",
+      "to": "element0000000206",
+      "type": "Connection"
+    },
+    "connection0000000208": {
+      "ConnectionType": "normal",
+      "from": "element0000000206",
+      "ID": "connection0000000208",
+      "to": "element0000000207",
+      "type": "Connection"
+    },
+    "connection0000000210": {
+      "ConnectionType": "Yes",
+      "from": "element0000000207",
+      "ID": "connection0000000210",
+      "to": "element0000000190",
+      "type": "Connection"
+    },
+    "connection0000000213": {
+      "ConnectionType": "normal",
+      "from": "element0000000053",
+      "ID": "connection0000000213",
+      "to": "element0000000212",
+      "type": "Connection"
+    },
+    "connection0000000215": {
+      "ConnectionType": "Yes",
+      "from": "element0000000212",
+      "ID": "connection0000000215",
+      "to": "element0000000219",
+      "type": "Connection"
+    },
+    "connection0000000218": {
+      "ConnectionType": "normal",
+      "from": "element0000000216",
+      "ID": "connection0000000218",
+      "to": "element0000000217",
+      "type": "Connection"
+    },
+    "connection0000000220": {
+      "ConnectionType": "normal",
+      "from": "element0000000219",
+      "ID": "connection0000000220",
+      "to": "element0000000216",
+      "type": "Connection"
+    },
+    "connection0000000221": {
+      "ConnectionType": "Yes",
+      "from": "element0000000217",
+      "ID": "connection0000000221",
+      "to": "element0000000222",
+      "type": "Connection"
+    },
+    "connection0000000224": {
+      "ConnectionType": "normal",
+      "from": "element0000000222",
+      "ID": "connection0000000224",
+      "to": "element0000000223",
+      "type": "Connection"
+    },
+    "connection0000000227": {
+      "ConnectionType": "normal",
+      "from": "element0000000225",
+      "ID": "connection0000000227",
+      "to": "element0000000226",
+      "type": "Connection"
+    },
+    "connection0000000230": {
+      "ConnectionType": "normal",
+      "from": "element0000000228",
+      "ID": "connection0000000230",
+      "to": "element0000000229",
+      "type": "Connection"
+    },
+    "connection0000000231": {
+      "ConnectionType": "Yes",
+      "from": "element0000000226",
+      "ID": "connection0000000231",
+      "to": "element0000000228",
+      "type": "Connection"
+    },
+    "connection0000000232": {
+      "ConnectionType": "Yes",
+      "from": "element0000000229",
+      "ID": "connection0000000232",
+      "to": "element0000000214",
+      "type": "Connection"
+    },
+    "connection0000000233": {
+      "ConnectionType": "Yes",
+      "from": "element0000000223",
+      "ID": "connection0000000233",
+      "to": "element0000000225",
+      "type": "Connection"
+    },
+    "connection0000000236": {
+      "ConnectionType": "normal",
+      "from": "element0000000234",
+      "ID": "connection0000000236",
+      "to": "element0000000235",
+      "type": "Connection"
+    },
+    "connection0000000238": {
+      "ConnectionType": "Yes",
+      "from": "element0000000235",
+      "ID": "connection0000000238",
+      "to": "element0000000237",
+      "type": "Connection"
+    },
+    "connection0000000240": {
+      "ConnectionType": "No",
+      "from": "element0000000237",
+      "ID": "connection0000000240",
+      "to": "element0000000239",
+      "type": "Connection"
+    },
+    "connection0000000245": {
+      "ConnectionType": "Yes",
+      "from": "element0000000239",
+      "ID": "connection0000000245",
+      "to": "element0000000244",
+      "type": "Connection"
+    },
+    "connection0000000247": {
+      "ConnectionType": "No",
+      "from": "element0000000244",
+      "ID": "connection0000000247",
+      "to": "element0000000246",
+      "type": "Connection"
+    },
+    "connection0000000250": {
+      "ConnectionType": "Yes",
+      "from": "element0000000246",
+      "ID": "connection0000000250",
+      "to": "element0000000249",
+      "type": "Connection"
+    },
+    "connection0000000252": {
+      "ConnectionType": "No",
+      "from": "element0000000249",
+      "ID": "connection0000000252",
+      "to": "element0000000251",
+      "type": "Connection"
+    },
+    "connection0000000254": {
+      "ConnectionType": "Yes",
+      "from": "element0000000251",
+      "ID": "connection0000000254",
+      "to": "element0000000253",
+      "type": "Connection"
+    },
+    "connection0000000256": {
+      "ConnectionType": "No",
+      "from": "element0000000253",
+      "ID": "connection0000000256",
+      "to": "element0000000255",
+      "type": "Connection"
+    },
+    "connection0000000258": {
+      "ConnectionType": "Yes",
+      "from": "element0000000255",
+      "ID": "connection0000000258",
+      "to": "element0000000257",
+      "type": "Connection"
+    },
+    "connection0000000260": {
+      "ConnectionType": "Yes",
+      "from": "element0000000257",
+      "ID": "connection0000000260",
+      "to": "element0000000259",
+      "type": "Connection"
+    },
+    "connection0000000262": {
+      "ConnectionType": "No",
+      "from": "element0000000259",
+      "ID": "connection0000000262",
+      "to": "element0000000263",
+      "type": "Connection"
+    },
+    "connection0000000265": {
+      "ConnectionType": "Yes",
+      "from": "element0000000263",
+      "ID": "connection0000000265",
+      "to": "element0000000264",
+      "type": "Connection"
+    },
+    "connection0000000266": {
+      "ConnectionType": "No",
+      "from": "element0000000264",
+      "ID": "connection0000000266",
+      "to": "element0000000268",
+      "type": "Connection"
+    },
+    "connection0000000269": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000269",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000270": {
+      "ConnectionType": "Yes",
+      "from": "element0000000268",
+      "ID": "connection0000000270",
+      "to": "element0000000261",
+      "type": "Connection"
+    },
+    "connection0000000272": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000272",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000274": {
+      "ConnectionType": "normal",
+      "from": "element0000000059",
+      "ID": "connection0000000274",
+      "to": "element0000000060",
+      "type": "Connection"
+    },
+    "connection0000000275": {
+      "ConnectionType": "normal",
+      "from": "element0000000060",
+      "ID": "connection0000000275",
+      "to": "element0000000271",
       "type": "Connection"
     }
   },
   "allElements": {
     "element0000000002": {
       "class": "Trigger_Manual",
-      "DefaultTrigger": "1",
+      "DefaultTrigger": "0",
       "enabled": "1",
       "ID": "element0000000002",
-      "name": "Manual - \"start\"",
+      "name": "Manual - \"absolute number\"",
       "package": "default",
       "pars": {
-        "ID": "start"
+        "ID": "absolute number"
       },
       "StandardName": "1",
       "type": "trigger",
@@ -171,9 +933,84 @@
       "x": "350",
       "y": "1190"
     },
-    "element0000000019": {
+    "element0000000021": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "1",
+      "enabled": "1",
+      "ID": "element0000000021",
+      "name": "Manual - \"start\"",
+      "package": "default",
+      "pars": {
+        "ID": "start"
+      },
+      "StandardName": "1",
+      "type": "trigger",
+      "x": "-140",
+      "y": "350"
+    },
+    "element0000000022": {
+      "class": "Action_Set_Flow_Status",
+      "ID": "element0000000022",
+      "name": "Set Flow Status - Enable: This flow - Any trigger",
+      "package": "default",
+      "pars": {
+        "Enable": "Enable",
+        "flowID": "",
+        "ThisFlow": 1,
+        "triggerID": "",
+        "WhichTrigger": "Any"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-140",
+      "y": "525"
+    },
+    "element0000000023": {
+      "class": "Action_New_variable",
+      "ID": "element0000000023",
+      "name": "New variable - static_successfulRuns = 0",
+      "package": "default",
+      "pars": {
+        "expression": "String",
+        "Varname": "static_successfulRuns",
+        "VarValue": "0"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-140",
+      "y": "910"
+    },
+    "element0000000024": {
+      "class": "Condition_Expression",
+      "ID": "element0000000024",
+      "name": "Expression - static_successfulRuns = requiredSuccessfulRuns",
+      "package": "default",
+      "pars": {
+        "Expression": "static_successfulRuns = requiredSuccessfulRuns"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-105",
+      "y": "1330"
+    },
+    "element0000000025": {
+      "class": "Action_New_variable",
+      "ID": "element0000000025",
+      "name": "New variable - requiredSuccessfulRuns = 7",
+      "package": "default",
+      "pars": {
+        "expression": "Expression",
+        "Varname": "requiredSuccessfulRuns",
+        "VarValue": "7"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-140",
+      "y": "770"
+    },
+    "element0000000026": {
       "class": "Action_Add_To_List",
-      "ID": "element0000000019",
+      "ID": "element0000000026",
       "name": "Add to list global_testResults - As last value - Value 'a_flowName'",
       "package": "default",
       "pars": {
@@ -194,17 +1031,1450 @@
       },
       "StandardName": "1",
       "type": "Action",
-      "x": "525",
+      "x": "-105",
+      "y": "1540"
+    },
+    "element0000000027": {
+      "class": "Action_Message_Box",
+      "ID": "element0000000027",
+      "name": "Message Box - Fehler - Only %static_successfulRuns% successful runs instead of %requiredSuccessfulRuns%",
+      "package": "default",
+      "pars": {
+        "ButtonLabel": "OK",
+        "ButtonLabelCancel": "Abbrechen",
+        "Height": 200,
+        "IfClose": "",
+        "IfDismiss": 1,
+        "IsTimeout": "NoTimeout",
+        "message": "Only %static_successfulRuns% successful runs instead of %requiredSuccessfulRuns%",
+        "OnTimeout": "Normal",
+        "ShowCancelButton": 0,
+        "TimeoutUnits": 10,
+        "title": "Fehler",
+        "Unit": "Seconds",
+        "Width": 300
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-420",
+      "y": "1575"
+    },
+    "element0000000028": {
+      "class": "Action_Execute_Flow",
+      "ID": "element0000000028",
+      "name": "Execute Flow: This flow - Manual - \"absolute number\"",
+      "package": "default",
+      "pars": {
+        "flowID": "",
+        "ReturnVariables": 0,
+        "SendLocalVars": 1,
+        "SkipDisabled": 0,
+        "ThisFlow": 1,
+        "triggerID": "element0000000002",
+        "WaitToFinish": "1",
+        "WhichTrigger": "specified"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-665",
+      "y": "1155"
+    },
+    "element0000000035": {
+      "class": "Action_New_variable",
+      "ID": "element0000000035",
+      "name": "New variable - static_successfulRuns = static_successfulRuns + 1",
+      "package": "default",
+      "pars": {
+        "expression": "Expression",
+        "Varname": "static_successfulRuns",
+        "VarValue": "static_successfulRuns + 1"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "350",
+      "y": "1540"
+    },
+    "element0000000038": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "0",
+      "enabled": "1",
+      "ID": "element0000000038",
+      "name": "Manual - \"random number\"",
+      "package": "default",
+      "pars": {
+        "ID": "random number"
+      },
+      "StandardName": "1",
+      "type": "trigger",
+      "x": "805",
+      "y": "385"
+    },
+    "element0000000039": {
+      "class": "Action_Random_number",
+      "ID": "element0000000039",
+      "name": "Random number - NewVariable - 0-10",
+      "package": "default",
+      "pars": {
+        "MaxValue": "10",
+        "MinValue": 0,
+        "Varname": "NewVariable"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "840",
+      "y": "840"
+    },
+    "element0000000040": {
+      "class": "Action_Execute_Flow",
+      "ID": "element0000000040",
+      "name": "Execute Flow: This flow - Manual - \"random number\"",
+      "package": "default",
+      "pars": {
+        "flowID": "",
+        "ReturnVariables": 0,
+        "SendLocalVars": 1,
+        "SkipDisabled": 0,
+        "ThisFlow": 1,
+        "triggerID": "element0000000038",
+        "WaitToFinish": "1",
+        "WhichTrigger": "specified"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-490",
+      "y": "1155"
+    },
+    "element0000000045": {
+      "class": "Action_Square_Root",
+      "ID": "element0000000045",
+      "name": "Square Root - NewVariable - 16",
+      "package": "default",
+      "pars": {
+        "Varname": "NewVariable",
+        "VarValue": 16
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "1190",
+      "y": "595"
+    },
+    "element0000000046": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "0",
+      "enabled": "1",
+      "ID": "element0000000046",
+      "name": "Manual - \"square root\"",
+      "package": "default",
+      "pars": {
+        "ID": "square root"
+      },
+      "StandardName": "1",
+      "type": "trigger",
+      "x": "1190",
+      "y": "385"
+    },
+    "element0000000048": {
+      "class": "Action_Trigonometry",
+      "ID": "element0000000048",
+      "name": "Trigonometry - Sine - NewVariable - 90",
+      "package": "default",
+      "pars": {
+        "Operation": "Sine",
+        "Unit": "Degree",
+        "Varname": "NewVariable",
+        "VarValue": "90"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "1610",
+      "y": "595"
+    },
+    "element0000000049": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "0",
+      "enabled": "1",
+      "ID": "element0000000049",
+      "name": "Manual - \"trigonometry\"",
+      "package": "default",
+      "pars": {
+        "ID": "trigonometry"
+      },
+      "StandardName": "1",
+      "type": "trigger",
+      "x": "1645",
+      "y": "245"
+    },
+    "element0000000051": {
+      "class": "Action_Rounding_A_Number",
+      "ID": "element0000000051",
+      "name": "Rounding A Number - NewVariable - 1.2345 - 0",
+      "package": "default",
+      "pars": {
+        "Places": 0,
+        "Roundingtype": "round",
+        "Varname": "NewVariable",
+        "VarValue": "1.2345"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "2205",
+      "y": "595"
+    },
+    "element0000000052": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "0",
+      "enabled": "1",
+      "ID": "element0000000052",
+      "name": "Manual - \"rounding\"",
+      "package": "default",
+      "pars": {
+        "ID": "rounding"
+      },
+      "StandardName": "1",
+      "type": "trigger",
+      "x": "2205",
+      "y": "385"
+    },
+    "element0000000053": {
+      "class": "Action_Exponentiation",
+      "ID": "element0000000053",
+      "name": "Exponentiation - NewVariable = 3^2",
+      "package": "default",
+      "pars": {
+        "Exponent": 2,
+        "Varname": "NewVariable",
+        "VarValue": 3
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "2625",
+      "y": "595"
+    },
+    "element0000000054": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "0",
+      "enabled": "1",
+      "ID": "element0000000054",
+      "name": "Manual - \"exponentiation\"",
+      "package": "default",
+      "pars": {
+        "ID": "exponentiation"
+      },
+      "StandardName": "1",
+      "type": "trigger",
+      "x": "2625",
+      "y": "385"
+    },
+    "element0000000057": {
+      "class": "Action_Execute_Flow",
+      "ID": "element0000000057",
+      "name": "Execute Flow: This flow - Manual - \"square root\"",
+      "package": "default",
+      "pars": {
+        "flowID": "",
+        "ReturnVariables": 0,
+        "SendLocalVars": 1,
+        "SkipDisabled": 0,
+        "ThisFlow": 1,
+        "triggerID": "element0000000046",
+        "WaitToFinish": "1",
+        "WhichTrigger": "specified"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-350",
+      "y": "1155"
+    },
+    "element0000000058": {
+      "class": "Action_Execute_Flow",
+      "ID": "element0000000058",
+      "name": "Execute Flow: This flow - Manual - \"trigonometry\"",
+      "package": "default",
+      "pars": {
+        "flowID": "",
+        "ReturnVariables": 0,
+        "SendLocalVars": 1,
+        "SkipDisabled": 0,
+        "ThisFlow": 1,
+        "triggerID": "element0000000049",
+        "WaitToFinish": "1",
+        "WhichTrigger": "specified"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-210",
+      "y": "1155"
+    },
+    "element0000000059": {
+      "class": "Action_Execute_Flow",
+      "ID": "element0000000059",
+      "name": "Execute Flow: This flow - Manual - \"rounding\"",
+      "package": "default",
+      "pars": {
+        "flowID": "",
+        "ReturnVariables": 0,
+        "SendLocalVars": 1,
+        "SkipDisabled": 0,
+        "ThisFlow": 1,
+        "triggerID": "element0000000052",
+        "WaitToFinish": "1",
+        "WhichTrigger": "specified"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-70",
+      "y": "1155"
+    },
+    "element0000000060": {
+      "class": "Action_Execute_Flow",
+      "ID": "element0000000060",
+      "name": "Execute Flow: This flow - Manual - \"exponentiation\"",
+      "package": "default",
+      "pars": {
+        "flowID": "",
+        "ReturnVariables": 0,
+        "SendLocalVars": 1,
+        "SkipDisabled": 0,
+        "ThisFlow": 1,
+        "triggerID": "element0000000054",
+        "WaitToFinish": "1",
+        "WhichTrigger": "specified"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "70",
+      "y": "1155"
+    },
+    "element0000000070": {
+      "class": "Condition_Expression",
+      "ID": "element0000000070",
+      "name": "Expression - newVariable >= 0 and newVariable <= 10",
+      "package": "default",
+      "pars": {
+        "Expression": "newVariable >= 0 and newVariable <= 10"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "840",
+      "y": "1015"
+    },
+    "element0000000073": {
+      "class": "Loop_SimpleLoop",
+      "HeightOfVerticalBar": "945",
+      "ID": "element0000000073",
+      "name": "Simple loop: Infinite loop",
+      "package": "default",
+      "pars": {
+        "Infinite": "1",
+        "repeatCount": 5
+      },
+      "StandardName": "1",
+      "type": "Loop",
+      "x": "665",
+      "y": "735"
+    },
+    "element0000000074": {
+      "class": "Condition_Expression",
+      "ID": "element0000000074",
+      "name": "Expression - a_index > 10",
+      "package": "default",
+      "pars": {
+        "Expression": "a_index > 10"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "875",
+      "y": "1155"
+    },
+    "element0000000078": {
+      "class": "Condition_Expression",
+      "ID": "element0000000078",
+      "name": "Expression - newVariable = 10",
+      "package": "default",
+      "pars": {
+        "Expression": "newVariable = 10"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "840",
+      "y": "1295"
+    },
+    "element0000000081": {
+      "class": "Action_New_variable",
+      "ID": "element0000000081",
+      "name": "New variable - maxValueFound = 1",
+      "package": "default",
+      "pars": {
+        "expression": "Expression",
+        "Varname": "maxValueFound",
+        "VarValue": "1"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "805",
       "y": "1470"
+    },
+    "element0000000082": {
+      "class": "Action_New_variable",
+      "ID": "element0000000082",
+      "name": "New variable - minValueFound = 1",
+      "package": "default",
+      "pars": {
+        "expression": "Expression",
+        "Varname": "minValueFound",
+        "VarValue": "1"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "1050",
+      "y": "1470"
+    },
+    "element0000000083": {
+      "class": "Condition_Expression",
+      "ID": "element0000000083",
+      "name": "Expression - newVariable = 0",
+      "package": "default",
+      "pars": {
+        "Expression": "newVariable = 0"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "1050",
+      "y": "1330"
+    },
+    "element0000000086": {
+      "class": "Condition_Expression",
+      "ID": "element0000000086",
+      "name": "Expression - maxValueFound and minValueFound",
+      "package": "default",
+      "pars": {
+        "Expression": "maxValueFound and minValueFound"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "840",
+      "y": "1645"
+    },
+    "element0000000095": {
+      "class": "Action_New_variable",
+      "ID": "element0000000095",
+      "name": "New variable - static_successfulRuns = static_successfulRuns + 1",
+      "package": "default",
+      "pars": {
+        "expression": "Expression",
+        "Varname": "static_successfulRuns",
+        "VarValue": "static_successfulRuns + 1"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "455",
+      "y": "2380"
+    },
+    "element0000000098": {
+      "class": "Action_Random_number",
+      "ID": "element0000000098",
+      "name": "Random number - NewVariable - 0-1.0",
+      "package": "default",
+      "pars": {
+        "MaxValue": "1.0",
+        "MinValue": 0,
+        "Varname": "NewVariable"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "665",
+      "y": "1960"
+    },
+    "element0000000099": {
+      "class": "Condition_Expression",
+      "ID": "element0000000099",
+      "name": "Expression - newVariable > 0 and newVariable < 1",
+      "package": "default",
+      "pars": {
+        "Expression": "newVariable > 0 and newVariable < 1"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "665",
+      "y": "2100"
+    },
+    "element0000000102": {
+      "class": "Action_Random_number",
+      "ID": "element0000000102",
+      "name": "Random number - NewVariable - -100--99",
+      "package": "default",
+      "pars": {
+        "MaxValue": "-99",
+        "MinValue": "-100",
+        "Varname": "NewVariable"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "770",
+      "y": "2275"
+    },
+    "element0000000105": {
+      "class": "Condition_Expression",
+      "ID": "element0000000105",
+      "name": "Expression - newVariable = -99 or newVariable = -100",
+      "package": "default",
+      "pars": {
+        "Expression": "newVariable = -99 or newVariable = -100"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "735",
+      "y": "2450"
+    },
+    "element0000000108": {
+      "class": "Condition_Expression",
+      "ID": "element0000000108",
+      "name": "Expression - newVariable = 4",
+      "package": "default",
+      "pars": {
+        "Expression": "newVariable = 4"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "1225",
+      "y": "770"
+    },
+    "element0000000110": {
+      "class": "Action_Square_Root",
+      "ID": "element0000000110",
+      "name": "Square Root - NewVariable - -16",
+      "package": "default",
+      "pars": {
+        "Varname": "NewVariable",
+        "VarValue": "-16"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "1260",
+      "y": "980"
+    },
+    "element0000000111": {
+      "class": "Condition_Expression",
+      "ID": "element0000000111",
+      "name": "Expression - newVariable = \"\"",
+      "package": "default",
+      "pars": {
+        "Expression": "newVariable = \"\""
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "1295",
+      "y": "1155"
+    },
+    "element0000000115": {
+      "class": "Action_New_variable",
+      "ID": "element0000000115",
+      "name": "New variable - static_successfulRuns = static_successfulRuns + 1",
+      "package": "default",
+      "pars": {
+        "expression": "Expression",
+        "Varname": "static_successfulRuns",
+        "VarValue": "static_successfulRuns + 1"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "1330",
+      "y": "1365"
+    },
+    "element0000000117": {
+      "class": "Condition_NumberIs",
+      "ID": "element0000000117",
+      "name": "Number is - newVariable - 1",
+      "package": "default",
+      "pars": {
+        "absoluteDeviation": "0",
+        "expectedNumber": "1",
+        "expression": "newVariable",
+        "relativeDeviation": "0.01"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "1610",
+      "y": "735"
+    },
+    "element0000000119": {
+      "class": "Action_Trigonometry",
+      "ID": "element0000000119",
+      "name": "Trigonometry - Cosine - NewVariable - 180",
+      "package": "default",
+      "pars": {
+        "Operation": "Cosine",
+        "Unit": "Degree",
+        "Varname": "NewVariable",
+        "VarValue": "180"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "1645",
+      "y": "875"
+    },
+    "element0000000120": {
+      "class": "Condition_NumberIs",
+      "ID": "element0000000120",
+      "name": "Number is - newVariable - -1",
+      "package": "default",
+      "pars": {
+        "absoluteDeviation": "0",
+        "expectedNumber": "-1",
+        "expression": "newVariable",
+        "relativeDeviation": "0.01"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "1645",
+      "y": "1015"
+    },
+    "element0000000123": {
+      "class": "Action_New_variable",
+      "ID": "element0000000123",
+      "name": "New variable - static_successfulRuns = static_successfulRuns + 1",
+      "package": "default",
+      "pars": {
+        "expression": "Expression",
+        "Varname": "static_successfulRuns",
+        "VarValue": "static_successfulRuns + 1"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "1575",
+      "y": "2940"
+    },
+    "element0000000127": {
+      "class": "Action_Trigonometry",
+      "ID": "element0000000127",
+      "name": "Trigonometry - Tangent - NewVariable - 60",
+      "package": "default",
+      "pars": {
+        "Operation": "Tangent",
+        "Unit": "Degree",
+        "Varname": "NewVariable",
+        "VarValue": "60"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "1610",
+      "y": "1155"
+    },
+    "element0000000128": {
+      "class": "Condition_NumberIs",
+      "ID": "element0000000128",
+      "name": "Number is - newVariable - rootOf3",
+      "package": "default",
+      "pars": {
+        "absoluteDeviation": "0",
+        "expectedNumber": "rootOf3",
+        "expression": "newVariable",
+        "relativeDeviation": "0.01"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "1610",
+      "y": "1295"
+    },
+    "element0000000138": {
+      "class": "Action_Trigonometry",
+      "ID": "element0000000138",
+      "name": "Trigonometry - Arcsine - NewVariable - rootOf3 \/ 2",
+      "package": "default",
+      "pars": {
+        "Operation": "Arcsine",
+        "Unit": "Degree",
+        "Varname": "NewVariable",
+        "VarValue": "rootOf3 \/ 2"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "1645",
+      "y": "1435"
+    },
+    "element0000000139": {
+      "class": "Condition_NumberIs",
+      "ID": "element0000000139",
+      "name": "Number is - newVariable - 60",
+      "package": "default",
+      "pars": {
+        "absoluteDeviation": "0",
+        "expectedNumber": "60",
+        "expression": "newVariable",
+        "relativeDeviation": "0.01"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "1645",
+      "y": "1575"
+    },
+    "element0000000148": {
+      "class": "Action_Trigonometry",
+      "ID": "element0000000148",
+      "name": "Trigonometry - Arccosine - NewVariable - rootOf3 \/ 2",
+      "package": "default",
+      "pars": {
+        "Operation": "Arccosine",
+        "Unit": "Degree",
+        "Varname": "NewVariable",
+        "VarValue": "rootOf3 \/ 2"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "1610",
+      "y": "1715"
+    },
+    "element0000000149": {
+      "class": "Condition_NumberIs",
+      "ID": "element0000000149",
+      "name": "Number is - newVariable - 30",
+      "package": "default",
+      "pars": {
+        "absoluteDeviation": "0",
+        "expectedNumber": "30",
+        "expression": "newVariable",
+        "relativeDeviation": "0.01"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "1610",
+      "y": "1855"
+    },
+    "element0000000158": {
+      "class": "Action_Trigonometry",
+      "ID": "element0000000158",
+      "name": "Trigonometry - Arctangent - NewVariable - 1",
+      "package": "default",
+      "pars": {
+        "Operation": "Arctangent",
+        "Unit": "Degree",
+        "Varname": "NewVariable",
+        "VarValue": "1"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "1645",
+      "y": "1995"
+    },
+    "element0000000159": {
+      "class": "Condition_NumberIs",
+      "ID": "element0000000159",
+      "name": "Number is - newVariable - 45",
+      "package": "default",
+      "pars": {
+        "absoluteDeviation": "0",
+        "expectedNumber": "45",
+        "expression": "newVariable",
+        "relativeDeviation": "0.01"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "1645",
+      "y": "2135"
+    },
+    "element0000000169": {
+      "class": "Action_Square_Root",
+      "ID": "element0000000169",
+      "name": "Square Root - rootOf3 - 3",
+      "package": "default",
+      "pars": {
+        "Varname": "rootOf3",
+        "VarValue": "3"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "1575",
+      "y": "420"
+    },
+    "element0000000171": {
+      "class": "Action_New_variable",
+      "ID": "element0000000171",
+      "name": "New variable - pi = 3.141592653589793",
+      "package": "default",
+      "pars": {
+        "expression": "Expression",
+        "Varname": "pi",
+        "VarValue": "3.141592653589793"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "1750",
+      "y": "420"
+    },
+    "element0000000178": {
+      "class": "Action_Trigonometry",
+      "ID": "element0000000178",
+      "name": "Trigonometry - Sine - NewVariable - pi \/ 6",
+      "package": "default",
+      "pars": {
+        "Operation": "Sine",
+        "Unit": "Radian",
+        "Varname": "NewVariable",
+        "VarValue": "pi \/ 6"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "1575",
+      "y": "2310"
+    },
+    "element0000000179": {
+      "class": "Condition_NumberIs",
+      "ID": "element0000000179",
+      "name": "Number is - newVariable - 1\/2",
+      "package": "default",
+      "pars": {
+        "absoluteDeviation": "0",
+        "expectedNumber": "1\/2",
+        "expression": "newVariable",
+        "relativeDeviation": "0.01"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "1575",
+      "y": "2450"
+    },
+    "element0000000186": {
+      "class": "Action_Trigonometry",
+      "ID": "element0000000186",
+      "name": "Trigonometry - Arctangent - NewVariable - rootOf3",
+      "package": "default",
+      "pars": {
+        "Operation": "Arctangent",
+        "Unit": "Radian",
+        "Varname": "NewVariable",
+        "VarValue": "rootOf3"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "1645",
+      "y": "2590"
+    },
+    "element0000000187": {
+      "class": "Condition_NumberIs",
+      "ID": "element0000000187",
+      "name": "Number is - newVariable - pi\/3",
+      "package": "default",
+      "pars": {
+        "absoluteDeviation": "0",
+        "expectedNumber": "pi\/3",
+        "expression": "newVariable",
+        "relativeDeviation": "0.01"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "1645",
+      "y": "2730"
+    },
+    "element0000000190": {
+      "class": "Action_New_variable",
+      "ID": "element0000000190",
+      "name": "New variable - static_successfulRuns = static_successfulRuns + 1",
+      "package": "default",
+      "pars": {
+        "expression": "Expression",
+        "Varname": "static_successfulRuns",
+        "VarValue": "static_successfulRuns + 1"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "2240",
+      "y": "2170"
+    },
+    "element0000000191": {
+      "class": "Condition_NumberIs",
+      "ID": "element0000000191",
+      "name": "Number is - newVariable - 1",
+      "package": "default",
+      "pars": {
+        "absoluteDeviation": "0",
+        "expectedNumber": "1",
+        "expression": "newVariable",
+        "relativeDeviation": "0"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "2205",
+      "y": "735"
+    },
+    "element0000000193": {
+      "class": "Action_Rounding_A_Number",
+      "ID": "element0000000193",
+      "name": "Rounding A Number - NewVariable - 1.2345 - 3",
+      "package": "default",
+      "pars": {
+        "Places": "3",
+        "Roundingtype": "round",
+        "Varname": "NewVariable",
+        "VarValue": "1.2345"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "2205",
+      "y": "875"
+    },
+    "element0000000194": {
+      "class": "Condition_NumberIs",
+      "ID": "element0000000194",
+      "name": "Number is - newVariable - 1.235",
+      "package": "default",
+      "pars": {
+        "absoluteDeviation": "0",
+        "expectedNumber": "1.235",
+        "expression": "newVariable",
+        "relativeDeviation": "0"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "2205",
+      "y": "1015"
+    },
+    "element0000000197": {
+      "class": "Action_Rounding_A_Number",
+      "ID": "element0000000197",
+      "name": "Rounding A Number - NewVariable - 1.2345 - 3",
+      "package": "default",
+      "pars": {
+        "Places": "3",
+        "Roundingtype": "roundDown",
+        "Varname": "NewVariable",
+        "VarValue": "1.2345"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "2275",
+      "y": "1190"
+    },
+    "element0000000198": {
+      "class": "Condition_NumberIs",
+      "ID": "element0000000198",
+      "name": "Number is - newVariable - 1.234",
+      "package": "default",
+      "pars": {
+        "absoluteDeviation": "0",
+        "expectedNumber": "1.234",
+        "expression": "newVariable",
+        "relativeDeviation": "0"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "2275",
+      "y": "1330"
+    },
+    "element0000000200": {
+      "class": "Action_Rounding_A_Number",
+      "ID": "element0000000200",
+      "name": "Rounding A Number - NewVariable - 1.2345 - 2",
+      "package": "default",
+      "pars": {
+        "Places": "2",
+        "Roundingtype": "roundUp",
+        "Varname": "NewVariable",
+        "VarValue": "1.2345"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "2275",
+      "y": "1505"
+    },
+    "element0000000201": {
+      "class": "Condition_NumberIs",
+      "ID": "element0000000201",
+      "name": "Number is - newVariable - 1.24",
+      "package": "default",
+      "pars": {
+        "absoluteDeviation": "0",
+        "expectedNumber": "1.24",
+        "expression": "newVariable",
+        "relativeDeviation": "0"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "2275",
+      "y": "1645"
+    },
+    "element0000000206": {
+      "class": "Action_Rounding_A_Number",
+      "ID": "element0000000206",
+      "name": "Rounding A Number - NewVariable - 12345 - -3",
+      "package": "default",
+      "pars": {
+        "Places": "-3",
+        "Roundingtype": "round",
+        "Varname": "NewVariable",
+        "VarValue": "12345"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "2240",
+      "y": "1820"
+    },
+    "element0000000207": {
+      "class": "Condition_NumberIs",
+      "ID": "element0000000207",
+      "name": "Number is - newVariable - 12000",
+      "package": "default",
+      "pars": {
+        "absoluteDeviation": "0",
+        "expectedNumber": "12000",
+        "expression": "newVariable",
+        "relativeDeviation": "0"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "2240",
+      "y": "1960"
+    },
+    "element0000000212": {
+      "class": "Condition_NumberIs",
+      "ID": "element0000000212",
+      "name": "Number is - newVariable - 9",
+      "package": "default",
+      "pars": {
+        "absoluteDeviation": "0",
+        "expectedNumber": "9",
+        "expression": "newVariable",
+        "relativeDeviation": "0"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "2625",
+      "y": "735"
+    },
+    "element0000000214": {
+      "class": "Action_New_variable",
+      "ID": "element0000000214",
+      "name": "New variable - static_successfulRuns = static_successfulRuns + 1",
+      "package": "default",
+      "pars": {
+        "expression": "Expression",
+        "Varname": "static_successfulRuns",
+        "VarValue": "static_successfulRuns + 1"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "2730",
+      "y": "2310"
+    },
+    "element0000000216": {
+      "class": "Action_Exponentiation",
+      "ID": "element0000000216",
+      "name": "Exponentiation - NewVariable = rootOf3^2",
+      "package": "default",
+      "pars": {
+        "Exponent": 2,
+        "Varname": "NewVariable",
+        "VarValue": "rootOf3"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "2695",
+      "y": "1015"
+    },
+    "element0000000217": {
+      "class": "Condition_NumberIs",
+      "ID": "element0000000217",
+      "name": "Number is - newVariable - 3",
+      "package": "default",
+      "pars": {
+        "absoluteDeviation": "0",
+        "expectedNumber": "3",
+        "expression": "newVariable",
+        "relativeDeviation": "0.001"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "2695",
+      "y": "1155"
+    },
+    "element0000000219": {
+      "class": "Action_Square_Root",
+      "ID": "element0000000219",
+      "name": "Square Root - rootOf3 - 3",
+      "package": "default",
+      "pars": {
+        "Varname": "rootOf3",
+        "VarValue": "3"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "2695",
+      "y": "875"
+    },
+    "element0000000222": {
+      "class": "Action_Exponentiation",
+      "ID": "element0000000222",
+      "name": "Exponentiation - NewVariable = 4^1",
+      "package": "default",
+      "pars": {
+        "Exponent": "1",
+        "Varname": "NewVariable",
+        "VarValue": "4"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "2660",
+      "y": "1330"
+    },
+    "element0000000223": {
+      "class": "Condition_NumberIs",
+      "ID": "element0000000223",
+      "name": "Number is - newVariable - 4",
+      "package": "default",
+      "pars": {
+        "absoluteDeviation": "0",
+        "expectedNumber": "4",
+        "expression": "newVariable",
+        "relativeDeviation": "0"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "2660",
+      "y": "1470"
+    },
+    "element0000000225": {
+      "class": "Action_Exponentiation",
+      "ID": "element0000000225",
+      "name": "Exponentiation - NewVariable = 4^0",
+      "package": "default",
+      "pars": {
+        "Exponent": "0",
+        "Varname": "NewVariable",
+        "VarValue": "4"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "2730",
+      "y": "1645"
+    },
+    "element0000000226": {
+      "class": "Condition_NumberIs",
+      "ID": "element0000000226",
+      "name": "Number is - newVariable - 1",
+      "package": "default",
+      "pars": {
+        "absoluteDeviation": "0",
+        "expectedNumber": "1",
+        "expression": "newVariable",
+        "relativeDeviation": "0"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "2730",
+      "y": "1785"
+    },
+    "element0000000228": {
+      "class": "Action_Exponentiation",
+      "ID": "element0000000228",
+      "name": "Exponentiation - NewVariable = 4^3",
+      "package": "default",
+      "pars": {
+        "Exponent": "3",
+        "Varname": "NewVariable",
+        "VarValue": "4"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "2695",
+      "y": "1960"
+    },
+    "element0000000229": {
+      "class": "Condition_NumberIs",
+      "ID": "element0000000229",
+      "name": "Number is - newVariable - 64",
+      "package": "default",
+      "pars": {
+        "absoluteDeviation": "0",
+        "expectedNumber": "64",
+        "expression": "newVariable",
+        "relativeDeviation": "0"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "2695",
+      "y": "2100"
+    },
+    "element0000000234": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "0",
+      "enabled": "1",
+      "ID": "element0000000234",
+      "name": "Manual - \"Number is\"",
+      "package": "default",
+      "pars": {
+        "ID": "Number is"
+      },
+      "StandardName": "1",
+      "type": "trigger",
+      "x": "3045",
+      "y": "420"
+    },
+    "element0000000235": {
+      "class": "Condition_NumberIs",
+      "ID": "element0000000235",
+      "name": "Number is - 5 - 5",
+      "package": "default",
+      "pars": {
+        "absoluteDeviation": "0",
+        "expectedNumber": "5",
+        "expression": "5",
+        "relativeDeviation": "0"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "3080",
+      "y": "630"
+    },
+    "element0000000237": {
+      "class": "Condition_NumberIs",
+      "ID": "element0000000237",
+      "name": "Number is - 5.000000001 - 5",
+      "package": "default",
+      "pars": {
+        "absoluteDeviation": "0",
+        "expectedNumber": "5",
+        "expression": "5.000000001",
+        "relativeDeviation": "0"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "3080",
+      "y": "770"
+    },
+    "element0000000239": {
+      "class": "Condition_NumberIs",
+      "ID": "element0000000239",
+      "name": "Number is - 5.000000001 - 5",
+      "package": "default",
+      "pars": {
+        "absoluteDeviation": "0",
+        "expectedNumber": "5",
+        "expression": "5.000000001",
+        "relativeDeviation": "0.0001"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "3080",
+      "y": "945"
+    },
+    "element0000000244": {
+      "class": "Condition_NumberIs",
+      "ID": "element0000000244",
+      "name": "Number is - 5.000500001 - 5",
+      "package": "default",
+      "pars": {
+        "absoluteDeviation": "0",
+        "expectedNumber": "5",
+        "expression": "5.000500001",
+        "relativeDeviation": "0.0001"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "3080",
+      "y": "1120"
+    },
+    "element0000000246": {
+      "class": "Condition_NumberIs",
+      "ID": "element0000000246",
+      "name": "Number is - 4.9995 - 5",
+      "package": "default",
+      "pars": {
+        "absoluteDeviation": "0",
+        "expectedNumber": "5",
+        "expression": "4.9995",
+        "relativeDeviation": "0.0001"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "3080",
+      "y": "1295"
+    },
+    "element0000000249": {
+      "class": "Condition_NumberIs",
+      "ID": "element0000000249",
+      "name": "Number is - 4.99949999 - 5",
+      "package": "default",
+      "pars": {
+        "absoluteDeviation": "0",
+        "expectedNumber": "5",
+        "expression": "4.99949999",
+        "relativeDeviation": "0.0001"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "3080",
+      "y": "1470"
+    },
+    "element0000000251": {
+      "class": "Condition_NumberIs",
+      "ID": "element0000000251",
+      "name": "Number is - 4.9995 - 5",
+      "package": "default",
+      "pars": {
+        "absoluteDeviation": "0.0005",
+        "expectedNumber": "5",
+        "expression": "4.9995",
+        "relativeDeviation": "0"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "3080",
+      "y": "1610"
+    },
+    "element0000000253": {
+      "class": "Condition_NumberIs",
+      "ID": "element0000000253",
+      "name": "Number is - 4.9994999 - 5",
+      "package": "default",
+      "pars": {
+        "absoluteDeviation": "0.0005",
+        "expectedNumber": "5",
+        "expression": "4.9994999",
+        "relativeDeviation": "0"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "3080",
+      "y": "1750"
+    },
+    "element0000000255": {
+      "class": "Condition_NumberIs",
+      "ID": "element0000000255",
+      "name": "Number is - 4.9990 - 5",
+      "package": "default",
+      "pars": {
+        "absoluteDeviation": "0.0005",
+        "expectedNumber": "5",
+        "expression": "4.9990",
+        "relativeDeviation": "0.0001"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "3080",
+      "y": "1890"
+    },
+    "element0000000257": {
+      "class": "Condition_NumberIs",
+      "ID": "element0000000257",
+      "name": "Number is - 5.001 - 5",
+      "package": "default",
+      "pars": {
+        "absoluteDeviation": "0.0005",
+        "expectedNumber": "5",
+        "expression": "5.001",
+        "relativeDeviation": "0.0001"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "3080",
+      "y": "2065"
+    },
+    "element0000000259": {
+      "class": "Condition_NumberIs",
+      "ID": "element0000000259",
+      "name": "Number is - 5.0010001 - 5",
+      "package": "default",
+      "pars": {
+        "absoluteDeviation": "0.0005",
+        "expectedNumber": "5",
+        "expression": "5.0010001",
+        "relativeDeviation": "0.0001"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "3080",
+      "y": "2240"
+    },
+    "element0000000261": {
+      "class": "Action_New_variable",
+      "ID": "element0000000261",
+      "name": "New variable - static_successfulRuns = static_successfulRuns + 1",
+      "package": "default",
+      "pars": {
+        "expression": "Expression",
+        "Varname": "static_successfulRuns",
+        "VarValue": "static_successfulRuns + 1"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "3045",
+      "y": "2835"
+    },
+    "element0000000263": {
+      "class": "Condition_NumberIs",
+      "ID": "element0000000263",
+      "name": "Number is - -5.001 - -5",
+      "package": "default",
+      "pars": {
+        "absoluteDeviation": "0.0005",
+        "expectedNumber": "-5",
+        "expression": "-5.001",
+        "relativeDeviation": "0.0001"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "3115",
+      "y": "2415"
+    },
+    "element0000000264": {
+      "class": "Condition_NumberIs",
+      "ID": "element0000000264",
+      "name": "Number is - -5.0010001 - -5",
+      "package": "default",
+      "pars": {
+        "absoluteDeviation": "0.0005",
+        "expectedNumber": "-5",
+        "expression": "-5.0010001",
+        "relativeDeviation": "0.0001"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "3115",
+      "y": "2555"
+    },
+    "element0000000268": {
+      "class": "Condition_NumberIs",
+      "ID": "element0000000268",
+      "name": "Number is - 5 - 5",
+      "package": "default",
+      "pars": {
+        "absoluteDeviation": "",
+        "expectedNumber": "5",
+        "expression": "5",
+        "relativeDeviation": ""
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "3080",
+      "y": "2695"
+    },
+    "element0000000271": {
+      "class": "Action_Execute_Flow",
+      "ID": "element0000000271",
+      "name": "Execute Flow: This flow - Manual - \"Number is\"",
+      "package": "default",
+      "pars": {
+        "flowID": "",
+        "ReturnVariables": 0,
+        "SendLocalVars": 1,
+        "SkipDisabled": 0,
+        "ThisFlow": 1,
+        "triggerID": "element0000000234",
+        "WaitToFinish": "1",
+        "WhichTrigger": "specified"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "210",
+      "y": "1155"
     }
   },
   "category": "Automatic tests",
-  "ElementIDCounter": "20",
+  "ElementIDCounter": "275",
   "flowSettings": {
     "DefaultWorkingDir": 1,
     "ExecutionPolicy": "default",
-    "Offsetx": "-55.714285",
-    "Offsety": "108.571428",
+    "Offsetx": "-948.571425",
+    "Offsety": "69.999997",
     "WorkingDir": "",
     "zoomFactor": "0.7"
   },
