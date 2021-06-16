@@ -1546,18 +1546,18 @@ key_del()
 
 
 ;Zoom out
-ctrl_wheeldown()
+mouse_wheeldown()
 {
-	ctrl_wheel("down")
+	mouse_wheel("down")
 }
 ;Zoom in
-ctrl_wheelup()
+mouse_wheelup()
 {
-	ctrl_wheel("up")
+	mouse_wheel("up")
 }
 
 ; zoom in or out
-ctrl_wheel(direction)
+mouse_wheel(direction)
 {
 	global default_zoomFactorMin, default_zoomFactorMax
 

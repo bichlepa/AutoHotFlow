@@ -54,11 +54,14 @@ Element_getParametrizationDetails_Action_Run(Environment)
 	parametersToEdit:=Object()
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Command")})
-	parametersToEdit.push({type: "Edit", id: "ToRun", content: ["String", "RawString"], contentID: "ToRunContent", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Edit", id: "ToRun", content: ["String", "RawString"], contentID: "ToRunContent", contentDefault: "string", WarnIfEmpty: true})
 
 	parametersToEdit.push({type: "Label", label: x_lang("Working directory")})
 	parametersToEdit.push({type: "Radio", id: "WhichWorkingDir", default: "Default", result: "enum", choices: [x_lang("Working directory of the flow"), x_lang("Following working directory")], enum: ["Default", "Specified"]})
-	parametersToEdit.push({type: "Edit", id: "WorkingDir", content: ["String", "RawString"], contentID: "WorkingDirContent", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Edit", id: "WorkingDir", content: ["String", "RawString"], contentID: "WorkingDirContent", contentDefault: "string", WarnIfEmpty: true})
+
+	parametersToEdit.push({type: "Label", label: x_lang("Run mode")})
+	parametersToEdit.push({type: "Radio", id: "RunMode", default: "Normal", result: "enum", choices: [x_lang("Run normally"), x_lang("Run maximized"), x_lang("Run minimized"), x_lang("Run hidden")], enum: ["Normal", "Max", "Min", "Hide"]})
 	
 	return parametersToEdit
 }
@@ -66,7 +69,7 @@ Element_getParametrizationDetails_Action_Run(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Run(Environment, ElementParameters)
 {
-	return x_lang("Run") ElementParameters.ToRun
+	return x_lang("Run") " - " ElementParameters.ToRun
 }
 
 ;Called every time the user changes any parameter.
@@ -113,8 +116,13 @@ Element_run_Action_Run(Environment, ElementParameters)
 		}
 	}
 
+	if (EvaluatedParameters.RunMode = "normal")
+	{
+		EvaluatedParameters.RunMode := ""
+	}
+
 	; run command
-	run, % EvaluatedParameters.toRun, % WorkingDir, UseErrorLevel, StartedProcessID
+	run, % EvaluatedParameters.toRun, % WorkingDir, % "UseErrorLevel " EvaluatedParameters.RunMode, StartedProcessID
 	
 	; check for errors
 	if (ErrorLevel)

@@ -128,7 +128,7 @@ Element_SetClass(p_FlowID, p_ElementID, p_elementClass)
 }
 
 ; Is called when the element class is set. All parameters that are not yet set will be set to the default values.
-; We only overwrite the unset parameters. 
+; We only write the unset parameters.
 ; After a change of element class, the unused parameters of the class will stay in the object, but they won't appear in the savefile and will get lost after a restart of AHF.
 ; This is a feature for following usecases:
 ; - User changes element class and both elements have similar parameters. Then the element parameters will be transferred to the new class.
@@ -155,7 +155,7 @@ Element_setParameterDefaults(p_FlowID, p_elementID)
 	ElementParsObject := _getElementProperty(p_FlowID, p_elementID, "pars")
 
 	; loop through all parametration details and create a list of all parameters and their defauls
-	parametersAndTheirDefaults := []
+	parameters := []
 	for index, oneParameter in ParametrizationDetails
 	{
 		; the value in key "ID" can either contain a single ID or an array of IDs. Convert single ID into an array for easy user later
@@ -163,13 +163,13 @@ Element_setParameterDefaults(p_FlowID, p_elementID)
 		{
 			if (not IsObject(oneParameter.id))
 			{
-				parametersAndTheirDefaults.push({ID: oneParameter.id, Default: oneParameter.default})
+				parameters.push({ID: oneParameter.id, Default: oneParameter.default, result: oneParameter.result, enum: oneParameter.enum, WarnIfEmpty: oneParameter.WarnIfEmpty})
 			}
 			else
 			{
 				for index, oneID in oneParameter.id
 				{
-					parametersAndTheirDefaults.push({ID: oneID, Default: oneParameter.default[index]})
+					parameters.push({ID: oneID, Default: oneParameter.default[index], result: oneParameter.result, enum: oneParameter.enum, WarnIfEmpty: oneParameter.WarnIfEmpty})
 				}
 			}
 		}
@@ -179,17 +179,27 @@ Element_setParameterDefaults(p_FlowID, p_elementID)
 		{
 			if (not IsObject(oneParameter.id))
 			{
-				parametersAndTheirDefaults.push({ID: oneParameter.ContentID, Default: oneParameter.ContentDefault})
+				parameters.push({ID: oneParameter.ContentID, Default: oneParameter.ContentDefault, result: "enum", enum: oneParameter.content, WarnIfEmpty: true})
 			}
 		}
 	}
 	
-	;Apply all found default parameters if they are unset.
-	for index, oneParameter in parametersAndTheirDefaults
+	; loop through all parameters
+	for index, oneParameter in parameters
 	{
-		if (ElementParsObject[oneParameter.ID] = "")
+		; write default parameter if it either doen't exist yet or if it is empty but must have a value.
+		if ((not ElementParsObject.hasKey(oneParameter.ID)) or (oneParameter.WarnIfEmpty and ElementParsObject[oneParameter.ID] = ""))
 		{
 			ElementParsObject[oneParameter.ID] := oneParameter.Default
+		}
+
+		; check value of parameter which have an enum
+		if (oneParameter.result = "enum")
+		{
+			if (not ObjHasValue(oneParameter.enum, ElementParsObject[oneParameter.ID]))
+			{
+				ElementParsObject[oneParameter.ID] := oneParameter.Default
+			}
 		}
 	}
 

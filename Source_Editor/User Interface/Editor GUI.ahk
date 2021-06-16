@@ -254,10 +254,10 @@ mousewheelmove(wpar, lpar, msg, hwn)
 		; react only if user interacted with the main gui
 		return
 	}
-	if (wpar = 7864328)
-		SetTimer, ctrl_wheelup, -1 
-	else if (wpar = 4287102984)
-		SetTimer, ctrl_wheeldown, -1 
+	if (wpar = 7864320 or wpar = 7864328)
+		SetTimer, mouse_wheelup, -1 
+	else if (wpar = 4287102976 or wpar = 4287102984)
+		SetTimer, mouse_wheeldown, -1 
 }
 
 ; When user tries to interact with disabled gui, enable the child gui
