@@ -1,6 +1,6 @@
 ﻿
 ;load all flow information from file (additionally to meta data)
-LoadFlow(p_filepath)
+LoadFlow(p_filepath, p_demo = false)
 {
 	global currentlyLoadingFlow
 	
@@ -46,17 +46,24 @@ LoadFlow(p_filepath)
 
 	_EnterCriticalSection()  ; We get, change and store an element in this function. keep this critical section to ensure data integrity
 	
-	; We the category is saved as as name. After loading, we need the category ID here.
-	categoryname := fileContent.category
-	if (categoryname)
+	if (not p_demo)
 	{
-		; category is set. Create category if it does not exist
-		categoryID := _getCategoryIdByName(categoryname)
-		if (not categoryID)
-			categoryID := NewCategory(categoryname)
+		; We the category is saved as as name. After loading, we need the category ID here.
+		categoryname := fileContent.category
+		if (categoryname)
+		{
+			; category is set. Create category if it does not exist
+			categoryID := _getCategoryIdByName(categoryname)
+			if (not categoryID)
+				categoryID := NewCategory(categoryname)
 
-		; set the category ID
-		fileContent.category := categoryID
+			; set the category ID
+			fileContent.category := categoryID
+		}
+	}
+	Else
+	{
+		; demo flows do not need a dedicated cetegory
 	}
 
 	; create a new flow
@@ -72,6 +79,13 @@ LoadFlow(p_filepath)
 	flow.file := ThisFlowFilepath
 	flow.Folder := ThisFlowFolder
 	flow.FileName := ThisFlowFilename
+
+	if (p_demo)
+	{
+		; this is a demo flow. Set the flow property
+		flow.demo := true
+		flow.category := ""
+	}
 
 	; write the flow object
 	flow.loaded := true

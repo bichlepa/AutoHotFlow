@@ -151,7 +151,7 @@
       "class": "Trigger_User_Idle_Time",
       "enabled": "0",
       "ID": "element0000000010",
-      "name": "User Idle Time",
+      "name": "User Idle Time - 3 s",
       "package": "default",
       "pars": {
         "Interval": "3",
@@ -183,7 +183,7 @@
       "class": "Trigger_Time_Of_Day",
       "enabled": "0",
       "ID": "element0000000017",
-      "name": "Time Of Day",
+      "name": "Time Of Day - 12:11:20 - Weekdays: '3'",
       "package": "default",
       "pars": {
         "Time": "20201030121120",
@@ -214,7 +214,7 @@
       "class": "Trigger_Time_Of_Day",
       "enabled": "0",
       "ID": "element0000000022",
-      "name": "Time Of Day",
+      "name": "Time Of Day - 11:52:26 - Weekdays: ''",
       "package": "default",
       "pars": {
         "Time": "20201030115226",
@@ -443,8 +443,8 @@
   "flowSettings": {
     "DefaultWorkingDir": 1,
     "ExecutionPolicy": "default",
-    "Offsetx": "-390.000001",
-    "Offsety": "-432.857143",
+    "Offsetx": "-252.857144",
+    "Offsety": "-404.285714",
     "WorkingDir": "",
     "zoomFactor": "0.7"
   },

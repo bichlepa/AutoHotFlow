@@ -999,9 +999,10 @@
     "element0000000161": {
       "class": "Action_Run",
       "ID": "element0000000161",
-      "name": "Run%A_Desktop%\\Flow Trigger test.lnk",
+      "name": "Run - %A_Desktop%\\Flow Trigger test.lnk",
       "package": "default",
       "pars": {
+        "RunMode": "",
         "ToRun": "%A_Desktop%\\Flow Trigger test.lnk",
         "ToRunContent": "String",
         "WhichWorkingDir": "Default",

@@ -6,6 +6,34 @@
       "ID": "connection0000000004",
       "to": "element0000000005",
       "type": "Connection"
+    },
+    "connection0000000011": {
+      "ConnectionType": "normal",
+      "from": "element0000000007",
+      "ID": "connection0000000011",
+      "to": "element0000000008",
+      "type": "Connection"
+    },
+    "connection0000000012": {
+      "ConnectionType": "Yes",
+      "from": "element0000000008",
+      "ID": "connection0000000012",
+      "to": "element0000000009",
+      "type": "Connection"
+    },
+    "connection0000000013": {
+      "ConnectionType": "normal",
+      "from": "element0000000009",
+      "ID": "connection0000000013",
+      "to": "element0000000008",
+      "type": "Connection"
+    },
+    "connection0000000014": {
+      "ConnectionType": "No",
+      "from": "element0000000008",
+      "ID": "connection0000000014",
+      "to": "element0000000010",
+      "type": "Connection"
     }
   },
   "allElements": {
@@ -49,12 +77,90 @@
       },
       "StandardName": "1",
       "type": "Action",
-      "x": "210",
-      "y": "315"
+      "x": "105",
+      "y": "420"
+    },
+    "element0000000007": {
+      "class": "Trigger_Hotkey",
+      "enabled": "1",
+      "ID": "element0000000007",
+      "name": "Hotkey - xbutton1",
+      "package": "default",
+      "pars": {
+        "ahk_class": "",
+        "ahk_exe": "",
+        "ahk_id": "",
+        "ahk_pid": "",
+        "BlockKey": 1,
+        "FindHiddenText": 0,
+        "FindHiddenWindow": 0,
+        "hotkey": "xbutton1",
+        "TitleMatchMode": 1,
+        "UseWindow": "Everywhere",
+        "WhenRelease": 0,
+        "Wildcard": "1",
+        "winText": "",
+        "Wintitle": ""
+      },
+      "StandardName": "1",
+      "type": "Trigger",
+      "x": "840",
+      "y": "105"
+    },
+    "element0000000008": {
+      "class": "Condition_Key_Is_Down",
+      "ID": "element0000000008",
+      "name": "Key Is Down - xbutton1",
+      "package": "default",
+      "pars": {
+        "key": "xbutton1",
+        "WhichKeyState": "physical"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "875",
+      "y": "420"
+    },
+    "element0000000009": {
+      "class": "Action_Click",
+      "ID": "element0000000009",
+      "name": "Click - Left button - Click",
+      "package": "default",
+      "pars": {
+        "Button": "Left",
+        "changePosition": 0,
+        "ClickCount": 1,
+        "CoordMode": "Screen",
+        "delay": 10,
+        "DownUp": "Click",
+        "MouseTracker": "Get coordinates",
+        "SendMode": "Input",
+        "speed": 2,
+        "Xpos": 10,
+        "Ypos": 20
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "875",
+      "y": "665"
+    },
+    "element0000000010": {
+      "class": "Action_Sleep",
+      "ID": "element0000000010",
+      "name": "Sleep: 200 ms",
+      "package": "action",
+      "pars": {
+        "Duration": "200",
+        "Unit": "Milliseconds"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "1085",
+      "y": "630"
     }
   },
   "category": "Manual tests",
-  "ElementIDCounter": "6",
+  "ElementIDCounter": "14",
   "flowSettings": {
     "DefaultWorkingDir": 1,
     "ExecutionPolicy": "default",

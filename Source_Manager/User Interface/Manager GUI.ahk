@@ -838,7 +838,7 @@ Button_manager_Delete()
 		; disable the gui in ordner to prevent errors if user interacts with the gui
 		Disable_Manager_GUI()
 		
-		if (_getFlowProperty(tempselectedID, "demo")) ;Check whether this is a demo flow
+		if (_getFlowProperty(tempselectedID, "category") = "demo") ;Check whether this is a demo flow
 		{
 			; The demo flows are shipped with AutoHotkey and they cannot be deleted. But user may want to hide them
 			MsgBox, 52, AutoHotFlow, % lang("You cannot delete the demonstration flows, but you can hide all of them.") "`n" lang("Do you want to do that now?")

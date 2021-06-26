@@ -55,9 +55,9 @@ Element_getParametrizationDetails_Trigger_User_Idle_Time(Environment)
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Period of time")})
 	parametersToEdit.push({type: "edit", id: "Interval", default: 10, content: "Expression", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Radio", id: "Unit", default: 2, result: "enum", choices: [x_lang("MilliSeconds"), x_lang("Seconds"), x_lang("Minutes"), x_lang("Hours")], enum: ["MilliSeconds", "Seconds", "Minutes", "Hours"]})
+	parametersToEdit.push({type: "Radio", id: "Unit", default: "Seconds", result: "enum", choices: [x_lang("MilliSeconds"), x_lang("Seconds"), x_lang("Minutes"), x_lang("Hours")], enum: ["MilliSeconds", "Seconds", "Minutes", "Hours"]})
 	parametersToEdit.push({type: "Label", label: x_lang("Method")})
-	parametersToEdit.push({type: "Radio", id: "Method", default: 1, result: "enum", choices: [x_lang("Method: %1%", x_lang("Default")), x_lang("Method: %1%", x_lang("Physical"))], enum: ["TimeIdle", "TimeIdlePhysical"]})
+	parametersToEdit.push({type: "Radio", id: "Method", default: "TimeIdle", result: "enum", choices: [x_lang("Method: %1%", x_lang("Default")), x_lang("Method: %1%", x_lang("Physical"))], enum: ["TimeIdle", "TimeIdlePhysical"]})
 
 	return parametersToEdit
 }
@@ -68,11 +68,11 @@ Element_GenerateName_Trigger_User_Idle_Time(Environment, ElementParameters)
 	switch (ElementParameters.Unit)
 	{
 	case "Milliseconds":
-		duration := ElementParameters.duration " " x_lang("ms #Milliseconds")
+		duration := ElementParameters.Interval " " x_lang("ms #Milliseconds")
 	case "Seconds":
-		duration := ElementParameters.duration " " x_lang("s #Seconds")
+		duration := ElementParameters.Interval " " x_lang("s #Seconds")
 	case "Minutes":
-		duration := ElementParameters.duration " " x_lang("m #Minutes")
+		duration := ElementParameters.Interval " " x_lang("m #Minutes")
 	}
 	return x_lang("User_Idle_Time") " - " duration
 }

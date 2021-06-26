@@ -2,7 +2,7 @@
   "developing": 1,
   "FlowExecutionPolicy": "Wait",
   "FlowWorkingDir": "C:\\Users\\bichl\\Documents\\AutoHotFlow",
-  "HideDemoFlows": 0,
+  "HideDemoFlows": "0",
   "LogLevelApp": "3",
   "LogLevelFlow": "3",
   "LogLevelThread": "2",

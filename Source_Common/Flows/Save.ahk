@@ -14,7 +14,7 @@ SaveFlow(FlowID)
 
 	logger("a1", "Saving flow " FlowName)	
 	
-	if (flow.demo and _getSettings("developing") != True)
+	if (_getFlowProperty(FlowID, "demo") and _getSettings("developing") != True)
 	{
 		;A demo flow cannot be saved
 		logger("a0","Cannot save flow " FlowName ". It is a demonstation flow.")

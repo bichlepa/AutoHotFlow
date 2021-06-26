@@ -19,11 +19,27 @@ FindFlows()
 		}
 	}
 	
-	;Load metadata of existing Flows
+	; get list of all flow savefiles
+	flowList := []
 	loop %_WorkingDir%\Saved Flows\*.json
 	{
+		flowList.push({path: A_LoopFileFullPath, demo: false})
+	}
+
+	; get list of all demo flows if it is not disabled
+	if (not _getSettings("HideDemoFlows"))
+	{
+		loop %_WorkingDir%\Saved Flows\demo flows\*.json
+		{
+			flowList.push({path: A_LoopFileFullPath, demo: true})
+		}
+	}
+
+	;Load all Flows
+	for oneIndex, oneFlowItem in flowList
+	{
 		; load the flow from file
-		newFlowid := LoadFlow(A_LoopFileFullPath)
+		newFlowid := LoadFlow(oneFlowItem.path, oneFlowItem.demo)
 
 		if not newFlowid
 		{

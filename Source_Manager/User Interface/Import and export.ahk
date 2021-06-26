@@ -163,11 +163,12 @@ importExportGui_import(filepathZip)
 		Loop
 		{
 			newFlowFullPath := _WorkingDir "\saved flows\" ThisFlowFilename
-			if fileexist(newFlowFullPath)
+			newFlowFullPathDemo := _WorkingDir "\saved flows\demo flows\" ThisFlowFilename
+			if (fileexist(newFlowFullPath) or fileexist(newFlowFullPathDemo))
 			{
 				random, randomnumber, 0, 1000
 				
-				ThisFlowFilename := substr(ThisFlowFilename,1,strlen(ThisFlowFilename)-4) "_" randomnumber ".json"
+				ThisFlowFilename := substr(ThisFlowFilename,1,strlen(ThisFlowFilename)-5) "_" randomnumber ".json"
 			}
 			else
 				break

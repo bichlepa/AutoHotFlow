@@ -358,7 +358,7 @@ Element_run_Action_HTTP_Request(Environment, ElementParameters)
 		}
 		
 		;Check whether directory exists
-		SplitPath, OutputFile,, OutputFileDir
+		SplitPath, % EvaluatedParameters.OutputFile,, OutputFileDir
 		if not InStr(FileExist(OutputFileDir), "D")
 		{
 			x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.", x_lang("Destination folder"), OutputFileDir)) 
@@ -366,7 +366,7 @@ Element_run_Action_HTTP_Request(Environment, ElementParameters)
 		}
 
 		; add output file path to options
-		Options.="SaveAs: " OutputFile "`n"
+		Options.="SaveAs: " EvaluatedParameters.OutputFile "`n"
 	}
 	
 	if (EvaluatedParameters.WhichMethod = "Custom")

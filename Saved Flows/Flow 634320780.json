@@ -12,7 +12,8 @@
       "from": "element0000000006",
       "fromPart": "TAIL",
       "ID": "connection0000000016",
-      "to": "element0000000008",
+      "to": "element0000000004",
+      "toPart": "TAIL",
       "type": "Connection"
     },
     "connection0000000017": {
@@ -21,20 +22,6 @@
       "ID": "connection0000000017",
       "to": "element0000000006",
       "toPart": "HEAD",
-      "type": "Connection"
-    },
-    "connection0000000018": {
-      "ConnectionType": "normal",
-      "from": "element0000000010",
-      "ID": "connection0000000018",
-      "to": "element0000000009",
-      "type": "Connection"
-    },
-    "connection0000000019": {
-      "ConnectionType": "normal",
-      "from": "element0000000007",
-      "ID": "connection0000000019",
-      "to": "element0000000011",
       "type": "Connection"
     },
     "connection0000000020": {
@@ -49,7 +36,7 @@
       "ConnectionType": "Yes",
       "from": "element0000000013",
       "ID": "connection0000000021",
-      "to": "element0000000007",
+      "to": "element0000000011",
       "type": "Connection"
     },
     "connection0000000022": {
@@ -57,7 +44,7 @@
       "from": "element0000000004",
       "fromPart": "HEAD",
       "ID": "connection0000000022",
-      "to": "element0000000010",
+      "to": "element0000000009",
       "type": "Connection"
     },
     "connection0000000023": {
@@ -81,14 +68,6 @@
       "from": "element0000000011",
       "ID": "connection0000000025",
       "to": "element0000000006",
-      "toPart": "TAIL",
-      "type": "Connection"
-    },
-    "connection0000000026": {
-      "ConnectionType": "normal",
-      "from": "element0000000008",
-      "ID": "connection0000000026",
-      "to": "element0000000004",
       "toPart": "TAIL",
       "type": "Connection"
     },
@@ -449,38 +428,6 @@
       "x": "315",
       "y": "945"
     },
-    "element0000000007": {
-      "class": "Action_Tooltip",
-      "ID": "element0000000007",
-      "name": "Tooltip: inner loop %a_index% - 2 s - Follow Mouse",
-      "package": "action",
-      "pars": {
-        "duration": 2,
-        "follow_mouse": 1,
-        "text": "inner loop %a_index%",
-        "Unit": "Seconds"
-      },
-      "StandardName": "1",
-      "type": "action",
-      "x": "455",
-      "y": "1260"
-    },
-    "element0000000008": {
-      "class": "Action_Tooltip",
-      "ID": "element0000000008",
-      "name": "Tooltip: outer loop %a_index% end - 2 s - Follow Mouse",
-      "package": "action",
-      "pars": {
-        "duration": 2,
-        "follow_mouse": 1,
-        "text": "outer loop %a_index% end",
-        "Unit": "Seconds"
-      },
-      "StandardName": "1",
-      "type": "action",
-      "x": "315",
-      "y": "1680"
-    },
     "element0000000009": {
       "class": "Action_Trace_Point",
       "ID": "element0000000009",
@@ -495,22 +442,6 @@
       "type": "action",
       "x": "280",
       "y": "805"
-    },
-    "element0000000010": {
-      "class": "Action_Tooltip",
-      "ID": "element0000000010",
-      "name": "Tooltip: outer loop %a_index% - 2 s - Follow Mouse",
-      "package": "action",
-      "pars": {
-        "duration": 2,
-        "follow_mouse": 1,
-        "text": "outer loop %a_index%",
-        "Unit": "Seconds"
-      },
-      "StandardName": "1",
-      "type": "action",
-      "x": "315",
-      "y": "665"
     },
     "element0000000011": {
       "class": "Action_Trace_Point",
@@ -889,10 +820,10 @@
   "flowSettings": {
     "DefaultWorkingDir": 1,
     "ExecutionPolicy": "default",
-    "Offsetx": "-315.820889",
-    "Offsety": "4074.964721",
+    "Offsetx": "-309.140414",
+    "Offsety": "227.292649",
     "WorkingDir": "",
-    "zoomFactor": "0.578513"
+    "zoomFactor": "0.931700"
   },
   "name": "Loop test"
 }

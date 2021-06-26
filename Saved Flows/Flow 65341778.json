@@ -235,6 +235,20 @@
       "ID": "connection0000000071",
       "to": "element0000000072",
       "type": "Connection"
+    },
+    "connection0000000075": {
+      "ConnectionType": "normal",
+      "from": "element0000000073",
+      "ID": "connection0000000075",
+      "to": "element0000000074",
+      "type": "Connection"
+    },
+    "connection0000000076": {
+      "ConnectionType": "normal",
+      "from": "element0000000032",
+      "ID": "connection0000000076",
+      "to": "element0000000073",
+      "type": "Connection"
     }
   },
   "allElements": {
@@ -312,10 +326,10 @@
     "element0000000015": {
       "class": "Action_Tooltip",
       "ID": "element0000000015",
-      "name": "Tooltip: %global_testResults% - 2 s - Follow Mouse",
+      "name": "Tooltip: %global_testResults% - 5 s - Follow Mouse",
       "package": "action",
       "pars": {
-        "duration": 2,
+        "duration": "5",
         "follow_mouse": "1",
         "text": "%global_testResults%",
         "Unit": "Seconds"
@@ -379,12 +393,12 @@
     "element0000000032": {
       "class": "Action_New_variable",
       "ID": "element0000000032",
-      "name": "New variable - CountOfTests = 9",
+      "name": "New variable - CountOfTests = 10",
       "package": "default",
       "pars": {
         "expression": "String",
         "Varname": "CountOfTests",
-        "VarValue": "9"
+        "VarValue": "10"
       },
       "StandardName": "1",
       "type": "Action",
@@ -701,10 +715,10 @@
     "element0000000072": {
       "class": "Action_Tooltip",
       "ID": "element0000000072",
-      "name": "Tooltip: All tests succeeded: - %global_testresults% - 2 s - Follow Mouse",
+      "name": "Tooltip: All tests succeeded: - %global_testresults% - 10 s - Follow Mouse",
       "package": "action",
       "pars": {
-        "duration": 2,
+        "duration": "10",
         "follow_mouse": 1,
         "text": "All tests succeeded:\n%global_testresults%",
         "Unit": "Seconds"
@@ -713,15 +727,52 @@
       "type": "Action",
       "x": "0",
       "y": "1540"
+    },
+    "element0000000073": {
+      "class": "Action_Set_Flow_Status",
+      "ID": "element0000000073",
+      "name": "Set Flow Status - Enable: Process Test - Default trigger",
+      "package": "default",
+      "pars": {
+        "Enable": "Enable",
+        "flowID": "Flow 561135904",
+        "ThisFlow": "0",
+        "triggerID": "",
+        "WhichTrigger": "Default"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "1435",
+      "y": "420"
+    },
+    "element0000000074": {
+      "class": "Action_Execute_Flow",
+      "ID": "element0000000074",
+      "name": "Execute Flow: Process Test - Default trigger",
+      "package": "default",
+      "pars": {
+        "flowID": "Flow 561135904",
+        "ReturnVariables": 0,
+        "SendLocalVars": 1,
+        "SkipDisabled": 0,
+        "ThisFlow": "0",
+        "triggerID": "",
+        "WaitToFinish": 0,
+        "WhichTrigger": "Default"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "1435",
+      "y": "560"
     }
   },
   "category": "Automatic tests",
-  "ElementIDCounter": "72",
+  "ElementIDCounter": "76",
   "flowSettings": {
     "DefaultWorkingDir": 1,
     "ExecutionPolicy": "default",
-    "Offsetx": "-645.368138",
-    "Offsety": "422.834396",
+    "Offsetx": "-654.796660",
+    "Offsety": "-240.304956",
     "WorkingDir": "",
     "zoomFactor": "0.636367"
   },
