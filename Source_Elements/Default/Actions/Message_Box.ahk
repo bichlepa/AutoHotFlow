@@ -57,7 +57,7 @@ Element_getParametrizationDetails_Action_Message_Box(Environment)
 	parametersToEdit.push({type: "Edit", id: "title", default: x_lang("Title"), content: "String"})
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Message")})
-	parametersToEdit.push({type: "Edit", id: "message", default: x_lang("Message"), content: "String", multiline: true})
+	parametersToEdit.push({type: "multiLineEdit", id: "message", default: x_lang("Message"), content: "String", contentConvertObjects: true})
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Button Text")})
 	parametersToEdit.push({type: "Edit", id: "ButtonLabel", default: x_lang("OK"), content: "String", WarnIfEmpty: true })

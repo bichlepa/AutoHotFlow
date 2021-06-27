@@ -54,7 +54,7 @@ Element_getParametrizationDetails_Action_Tooltip(Environment)
 {
 	parametersToEdit:=Object()
 	parametersToEdit.push({type: "Label", label: x_lang("Text_to_show")})
-	parametersToEdit.push({type: "multilineEdit", id: "text", default:  x_lang("Message"), content: "string",  WarnIfEmpty: true})
+	parametersToEdit.push({type: "multilineEdit", id: "text", default:  x_lang("Message"), content: "string", contentConvertObjects: true, WarnIfEmpty: true})
 	parametersToEdit.push({type: "Label", label: x_lang("Duration")})
 	parametersToEdit.push({type: "Edit", id: "duration", default: 2, content: "Expression", WarnIfEmpty: true})
 	parametersToEdit.push({type: "Radio", id: "Unit", default: 2, result: "enum", choices: [x_lang("Milliseconds"), x_lang("Seconds"), x_lang("Minutes")], enum: ["Milliseconds", "Seconds", "Minutes"]})
@@ -101,13 +101,13 @@ Element_run_Action_Tooltip(Environment, ElementParameters)
 	global runActionTooltip_Oldy=
 	
 	;Evaluate Parameters
-	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters, ["text"])
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
 	if (EvaluatedParameters._error)
 	{
 		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
 		return
 	}
-	runActionTooltip_Text := x_replaceVariables(Environment,ElementParameters.text, "ConvertObjectToString")
+	runActionTooltip_Text := EvaluatedParameters.text
 	
 	; Show tooltip
 	ToolTip, % runActionTooltip_Text,,, 13

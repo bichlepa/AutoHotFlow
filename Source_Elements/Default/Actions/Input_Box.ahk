@@ -59,7 +59,7 @@ Element_getParametrizationDetails_Action_Input_Box(Environment)
 	parametersToEdit.push({type: "Edit", id: "title", default: x_lang("Title"), content: "String", WarnIfEmpty: true})
 
 	parametersToEdit.push({type: "Label", label: x_lang("Message")})
-	parametersToEdit.push({type: "Edit", id: "message", default: x_lang("Please, write something"), multiline: true, content: "String"})
+	parametersToEdit.push({type: "multiLineEdit", id: "message", default: x_lang("Please, write something"), content: "String", contentConvertObjects: true})
 
 	parametersToEdit.push({type: "Label", label: x_lang("Edit field")})
 	parametersToEdit.push({type: "Checkbox", id: "OnlyNumbers", default: 0, label: x_lang("Only allow numbers")})
@@ -70,7 +70,7 @@ Element_getParametrizationDetails_Action_Input_Box(Environment)
 	parametersToEdit.push({type: "Edit", id: "MultilineEditRows", default: 4, content: "PositiveInteger", WarnIfEmpty: true})
 
 	parametersToEdit.push({type: "Label", label: x_lang("Default value"), size: "small"})
-	parametersToEdit.push({type: "Edit", id: "defaultText", default: "", multiline: true, content: "String"})
+	parametersToEdit.push({type: "multiLineEdit", id: "defaultText", default: "", content: "String"})
 
 	parametersToEdit.push({type: "Label", label: x_lang("Button Text")})
 	parametersToEdit.push({type: "Edit", id: "ButtonLabel", default: x_lang("OK"), content: "String", WarnIfEmpty: true })

@@ -182,12 +182,12 @@
     "element0000000015": {
       "class": "Action_AutoHotKey_script",
       "ID": "element0000000015",
-      "name": "AutoHotKey script - sleep, 5000 - msgbox, skript wurde nicht gestoppt",
+      "name": "AutoHotKey script - sleep, 10000 - msgbox, skript wurde nicht gestoppt",
       "package": "default",
       "pars": {
         "ExportVariables": "counter",
         "ImportVariables": "counter",
-        "Script": "sleep, 5000\nmsgbox, skript wurde nicht gestoppt"
+        "Script": "sleep, 10000\nmsgbox, skript wurde nicht gestoppt"
       },
       "StandardName": "1",
       "type": "Action",
@@ -197,12 +197,12 @@
     "element0000000017": {
       "class": "Action_AutoHotKey_script",
       "ID": "element0000000017",
-      "name": "AutoHotKey script - sleep, 5000 - msgbox, skript wurde nicht gestoppt",
+      "name": "AutoHotKey script - sleep, 10000 - msgbox, skript wurde nicht gestoppt",
       "package": "default",
       "pars": {
         "ExportVariables": "counter",
         "ImportVariables": "counter",
-        "Script": "sleep, 5000\nmsgbox, skript wurde nicht gestoppt"
+        "Script": "sleep, 10000\nmsgbox, skript wurde nicht gestoppt"
       },
       "StandardName": "1",
       "type": "Action",

@@ -238,8 +238,11 @@ x_AutoEvaluateOneParameter(EvaluatedParameters, Environment, ElementParameters, 
 		; the content type may be set
 		if (oneParContent = "string")
 		{
+			if (onePar.contentConvertObjects)
+				replacePars := "ConvertObjectToString"
+
 			; content type is "string". Replace variables encased by percent signs in string (if any)
-			result := x_replaceVariables(Environment,ElementParameters[oneParID])
+			result := x_replaceVariables(Environment, ElementParameters[oneParID], replacePars)
 			if (onePar.WarnIfEmpty)
 			{
 				; if parameter must be set and is empty, add a warning

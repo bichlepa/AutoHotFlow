@@ -56,9 +56,9 @@ Element_getParametrizationDetails_Trigger_AutoHotkey_Script(Environment)
 	parametersToEdit.push({type: "Label", label: x_lang("AutoHotKey_script"), WarnIfEmpty: true})
 	parametersToEdit.push({type: "multilineEdit", id: "Script", default: "loop`n{`n  sleep 10000`n  x_trigger()`n}", WarnIfEmpty: false})
 	parametersToEdit.push({type: "Label", label: x_lang("Variables that should be imported to script before enabling")})
-	parametersToEdit.push({type: "edit", id: "ImportVariables", multiline: true})
+	parametersToEdit.push({type: "multiLineEdit", id: "ImportVariables"})
 	parametersToEdit.push({type: "Label", label: x_lang("Variables that should be exported from script on trigger")})
-	parametersToEdit.push({type: "edit", id: "ExportVariables", multiline: true})
+	parametersToEdit.push({type: "multiLineEdit", id: "ExportVariables"})
 	
 	
 	return parametersToEdit

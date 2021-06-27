@@ -54,7 +54,7 @@ Element_getParametrizationDetails_Action_Write_To_File(Environment)
 	parametersToEdit:=Object()
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Text_to_write")})
-	parametersToEdit.push({type: "Edit", id: "text", multiline: true, content: ["String", "Expression"], contentID: "Expression", contentDefault: "string", WarnIfEmpty: true})
+	parametersToEdit.push({type: "multiLineEdit", id: "text", content: ["String", "Expression"], contentID: "Expression", contentDefault: "string", WarnIfEmpty: true})
 	parametersToEdit.push({type: "Label", label: x_lang("File path")})
 	parametersToEdit.push({type: "File", id: "file", label: x_lang("Select a file"), options: 8})
 	parametersToEdit.push({type: "Label", label: x_lang("Append or overwrite")})

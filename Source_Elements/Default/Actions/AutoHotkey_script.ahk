@@ -56,10 +56,10 @@ Element_getParametrizationDetails_Action_AutoHotKey_script(Environment)
 	parametersToEdit.push({type: "multilineEdit", id: "Script", content: "RawString", default: "", WarnIfEmpty: false})
 
 	parametersToEdit.push({type: "Label", label: x_lang("Variables_that_should_be_imported_to_script_prior_to_execution")})
-	parametersToEdit.push({type: "edit", id: "ImportVariables", content: "String", multiline: true})
+	parametersToEdit.push({type: "multiLineEdit", id: "ImportVariables", content: "String"})
 
 	parametersToEdit.push({type: "Label", label: x_lang("Variables_that_should_be_exported_from_script_after_execution")})
-	parametersToEdit.push({type: "edit", id: "ExportVariables", content: "String", multiline: true})
+	parametersToEdit.push({type: "multiLineEdit", id: "ExportVariables", content: "String"})
 	
 	return parametersToEdit
 }

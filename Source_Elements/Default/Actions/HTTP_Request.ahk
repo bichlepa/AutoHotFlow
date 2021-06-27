@@ -58,7 +58,7 @@ Element_getParametrizationDetails_Action_HTTP_Request(Environment)
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Post data")})
 	parametersToEdit.push({type: "Radio", id: "WhereToGetPostData", default: "NoUpload", result: "Enum", choices: [x_lang("Do not upload any data"), x_lang("Use follwing post data"), x_lang("Use file as source (upload)")], enum: ["NoUpload", "Specified", "File"]})
-	parametersToEdit.push({type: "Edit", id: "PostData", default: "", multiline: true, content: "String"})
+	parametersToEdit.push({type: "multiLineEdit", id: "PostData", default: "", content: "String"})
 	parametersToEdit.push({type: "Checkbox", id: "URIEncodePostData", default: 0, label: x_lang("URI encode post data")})
 	parametersToEdit.push({type: "Label", label: x_lang("Charset"), size: "small"})
 	parametersToEdit.push({type: "Radio", id: "WhichCodepage", default: "utf-8", result: "Enum", choices: [x_lang("Use UTF-8 charset"), x_lang("Define charset"), x_lang("Define codepage")], enum: ["utf-8", "definedCharset", "definedCodepage"]})
@@ -67,7 +67,7 @@ Element_getParametrizationDetails_Action_HTTP_Request(Environment)
 	parametersToEdit.push({type: "File", id: "InputFile", label: x_lang("Select file")})
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Request headers")})
-	parametersToEdit.push({type: "Edit", id: "RequestHeaders", default: "", multiline: true, content: "String"})
+	parametersToEdit.push({type: "multiLineEdit", id: "RequestHeaders", default: "", content: "String"})
 	parametersToEdit.push({type: "Checkbox", id: "URIEncodeRequestHeaders", default: 0, label: x_lang("URI encode request headers")})
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Response data")})
@@ -102,7 +102,7 @@ Element_getParametrizationDetails_Action_HTTP_Request(Environment)
 	parametersToEdit.push({type: "Edit", id: "UserAgent", default: "", content: "String", WarnIfEmpty: true})
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Flags")})
-	parametersToEdit.push({type: "Edit", id: "Flags", default: "", multiline: true, content: "String"})
+	parametersToEdit.push({type: "multiLineEdit", id: "Flags", default: "", content: "String"})
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Proxy")})
 	parametersToEdit.push({type: "Radio", id: "WhichProxy", default: "none", result: "Enum", choices: [x_lang("No proxy"), x_lang("Automatic"), x_lang("Custom")], enum: ["none", "automatic", "custom"]})

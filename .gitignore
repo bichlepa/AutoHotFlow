@@ -6,13 +6,12 @@ AutoHotFlow Installation.exe
 Editor.exe
 
 # exclude flows except of demonstration flows
-Saved Flows/*
-!Saved Flows/D_*
+Saved Flows/backup
+Saved Flows/demo flows/backup
 
 #other files that are generated when AutoHotFlow is running
 Log
-Global variables
-!Source_Common/Global variables
+variables
 Clipboard.ini
 Generated Scripts/*.ahk
 
@@ -25,47 +24,3 @@ ehthumbs.db
 
 # Folder config file
 Desktop.ini
-
-# Recycle Bin used on file shares
-$RECYCLE.BIN/
-
-# Windows Installer files
-*.cab
-*.msi
-*.msm
-*.msp
-
-# Windows shortcuts
-*.lnk
-
-# =========================
-# Operating System Files
-# =========================
-
-# OSX
-# =========================
-
-.DS_Store
-.AppleDouble
-.LSOverride
-
-# Thumbnails
-._*
-
-# Files that might appear on external disk
-.Spotlight-V100
-.Trashes
-
-# Directories potentially created on remote AFP share
-.AppleDB
-.AppleDesktop
-Network Trash Folder
-Temporary Items
-.apdisk
-
-/AutoHotFlow Setup.exe
-/Source_Main/-lib
-/Source_Main/*AutoHotkey.dll
-/Variables
-/StartupScriptLog.txt
-/test.ahk

@@ -194,7 +194,7 @@ executeToggleFlow(p_FlowID)
 {
 	_EnterCriticalSection()
 
-	if (_getFlowProperty(FlowID, "executing"))
+	if (_getFlowProperty(p_FlowID, "executing"))
 	{
 		; flow is running. Stop it
 		stopFlow(p_FlowID)

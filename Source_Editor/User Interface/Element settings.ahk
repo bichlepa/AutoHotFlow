@@ -1496,6 +1496,9 @@ class ElementSettings
 			
 			; Add picture, which will warn user if the content is invalid
 			this.addErrorWarnIconControl()
+			
+			; update the content type icon
+			this.updateContentTypePicture()
 		}
 	}
 	
