@@ -18,8 +18,12 @@ global _ScriptDir := StrReplace(A_ScriptDir, "\Source_Main") ;The directory of A
 ; Set the variable _WorkingDir which we will always use instead of a_workingDir
 ;if portable installation, the script dir is the working dir. 
 ;If installed in programs folder, it is a dir which is writable without admin rights
-global _WorkingDir := _ScriptDir
-IfInString, _WorkingDir, %A_ProgramFiles%
+global _WorkingDir
+if FileExist(_ScriptDir "\AppData")
+{
+	_WorkingDir = %_ScriptDir%\AppData
+}
+Else
 {
 	_WorkingDir = %A_AppData%\AutoHotFlow
 	if not fileexist(_WorkingDir)
@@ -101,8 +105,7 @@ FileDelete, %a_temp%\autoHotflowTryToStartAsAdmin.txt
 
 ;Include libraries which may be used by the elements. This code is generated.
 global global_libInclusionsForThreads, global_elementInclusionsForThreads
-;Lib_includes_Start
-#include source_Elements\Default\lib\TTS\TTS by Learning One.ahk
+;Lib_includes_Start#include source_Elements\Default\lib\TTS\TTS by Learning One.ahk
 #include source_Elements\Default\lib\Eject\Eject.ahk
 #include source_Elements\Default\lib\Class_Monitor\Class_Monitor.ahk
 #include source_Elements\Default\lib\HTTP Request\HTTPRequest.ahk
@@ -121,7 +124,6 @@ global_libInclusionsForThreads =
 #include source_Elements\Default\common\window functions.ahk
 
 )
-
 
 ;Lib_Includes_End
 
@@ -161,8 +163,7 @@ global_libInclusionsForThreads =
 
 ;Include elements. This code is generated
 ;The elements must be included before the other treads are started
-;Element_Includes_Start
-#include source_Elements\Default\actions\New_Variable.ahk
+;Element_Includes_Start#include source_Elements\Default\actions\New_Variable.ahk
 #include source_Elements\Default\actions\Random_Number.ahk
 #include source_Elements\Default\actions\Absolute_Number.ahk
 #include source_Elements\Default\actions\Square_Root.ahk
@@ -443,7 +444,6 @@ global_elementInclusionsForThreads =
 #include source_Elements\Default\triggers\AutoHotkey_Script.ahk
 
 )
-
 
 ;Element_Includes_End
 

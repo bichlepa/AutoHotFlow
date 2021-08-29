@@ -1,0 +1,73 @@
+html{
+    font-family: Arial, Helvetica, sans-serif;
+}
+h1 {
+	color: black;
+	margin-top: 0.3cm;
+	margin-bottom: 0.4cm;
+	page-break-before: "always";
+}
+h2 {
+	color: black;
+	margin-top: 0.3cm;
+	margin-bottom: 0.4cm;
+	page-break-before: "always";
+}
+p.warning {
+	border-left: 6px solid #ccc!important;
+	border-color: crimson!important;
+	background-color: rgb(255, 204, 204);
+	padding: 0.1em 16px;
+	
+}
+table {
+	border-color: #000000;
+    border-width: 2px;
+	border-style: solid;
+	border-collapse: collapse;
+}
+
+td {
+	border-color: #000000;
+    border-width: 2px;
+	border-style: solid;
+    padding: 5px;
+}
+td.example-parameter {
+	width: 30%;
+    padding-right: 10px;
+    border-width: 1px;
+}
+td.example-value {
+    font-family: "Lucida Console", "Courier New", monospace;
+	width: 100%;
+    border-width: 1px;
+}
+table.settings {
+	width: 100%;
+    background-color: #ccffff;
+}
+table.examples {
+	width: 100%;
+    background-color: #ccffcc;
+}
+table.example {
+	width: 100%;
+    background-color: #ccffcc;
+    border-width: 1px;
+}
+
+
+ul.examples {
+    background-color: #ccffcc;
+	border-color: #000000;
+    border-width: 1px;
+	border-style: solid;
+	line-height: 50%;
+    font-family: "Lucida Console", "Courier New", monospace;
+}
+
+i {
+    font-family: Arial, Helvetica, sans-serif;
+	color:grey;
+}

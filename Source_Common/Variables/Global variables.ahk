@@ -195,7 +195,7 @@ BuiltInVariable_Get(Environment, p_Name, p_hidden = False)
 	}
 	else if (p_Name = "a_cr" or p_Name = "a_carriageReturn")
 	{
-		return "`n"
+		return "`r"
 	}
 	;~ else if (p_Name="a_CPULoad")
 	;~ {

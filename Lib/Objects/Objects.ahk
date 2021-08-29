@@ -82,3 +82,16 @@ ObjHasValue(aObj, aValue) {
             return, true, ErrorLevel := 0
     return, false, errorlevel := 1
 }
+
+
+ArrayToDelimitedString(obj, delimiter)
+{
+	result := ""
+	for oneKey, oneValue in obj
+	{
+		if a_index != 1
+			result .= delimiter
+		result .= oneValue
+	}
+	return result
+}

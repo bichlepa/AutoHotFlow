@@ -29,7 +29,7 @@ FindFlows()
 	; get list of all demo flows if it is not disabled
 	if (not _getSettings("HideDemoFlows"))
 	{
-		loop %_WorkingDir%\Saved Flows\demo flows\*.json
+		loop %_ScriptDir%\Saved Flows\demo flows\*.json
 		{
 			flowList.push({path: A_LoopFileFullPath, demo: true})
 		}
