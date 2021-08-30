@@ -78,7 +78,7 @@ Element_GenerateName_Action_List_drives(Environment, ElementParameters)
 ;- Correct misconfiguration
 Element_CheckSettings_Action_List_drives(Environment, ElementParameters, staticValues)
 {	
-	
+	x_Par_Enable("DriveType", ElementParameters.WhetherDriveTypeFilter = "filter")
 }
 
 

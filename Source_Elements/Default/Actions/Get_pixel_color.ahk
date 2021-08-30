@@ -93,7 +93,10 @@ Element_GenerateName_Action_Get_Pixel_Color(Environment, ElementParameters)
 ;- Correct misconfiguration
 Element_CheckSettings_Action_Get_Pixel_Color(Environment, ElementParameters, staticValues)
 {	
-	
+	x_Par_Enable("varnameRGB", ElementParameters.OutputRGB)
+	x_Par_Enable("varnameR", ElementParameters.OutputSeparate)
+	x_Par_Enable("varnameG", ElementParameters.OutputSeparate)
+	x_Par_Enable("varnameB", ElementParameters.OutputSeparate)
 }
 
 

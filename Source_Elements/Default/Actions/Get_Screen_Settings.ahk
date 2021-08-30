@@ -57,7 +57,7 @@ Element_getParametrizationDetails_Action_Get_Screen_Settings(Environment)
 	; get count of screens
 	NumberOfMonitors := DllCall("user32.dll\GetSystemMetrics", "Int", 80)
 
-	parametersToEdit.push({type: "Label", label: x_lang("Which monitor")})
+	parametersToEdit.push({type: "Label", label: x_lang("Which screen")})
 	parametersToEdit.push({type: "edit", id: "MonitorNumber", default: 1, content: "positiveInteger", WarnIfEmpty: true, UseUpDown: true, range: "1-" NumberOfMonitors})
 	
 	parametersToEdit.push({type: "Label", label:  x_lang("Output variables")})

@@ -56,9 +56,9 @@ Element_getParametrizationDetails_Action_Move_Window(Environment)
 	parametersToEdit.push({type: "Label", label: x_lang("Event")})
 	parametersToEdit.push({type: "Radio", id: "WinMoveEvent", default: 1, result: "enum", choices: [x_lang("Maximize"), x_lang("Minimize"), x_lang("Restore"), x_lang("Move")], enum: ["Maximize", "Minimize", "Restore", "Move"]})
 	parametersToEdit.push({type: "Label", label: x_lang("Coordinates") " (x,y)", size: "small"})
-	parametersToEdit.push({type: "Edit", id: ["Xpos", "Ypos"], content: "Expression", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Edit", id: ["Xpos", "Ypos"], content: "Number"})
 	parametersToEdit.push({type: "Label", label: x_lang("Width and height"), size: "small"})
-	parametersToEdit.push({type: "Edit", id: ["Width", "Height"], content: "Expression", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Edit", id: ["Width", "Height"], content: "Number"})
 	parametersToEdit.push({type: "button", id: "MouseTracker", goto: "Action_Move_Window_ButtonGetWinPosAssistant", label: x_lang("Grab coordinates from existing window")})
 	
 	; call function which adds all the required fields for window identification
@@ -82,7 +82,11 @@ Element_GenerateName_Action_Move_Window(Environment, ElementParameters)
 ;- Correct misconfiguration
 Element_CheckSettings_Action_Move_Window(Environment, ElementParameters, staticValues)
 {	
-	
+	x_Par_Enable("Xpos", ElementParameters.WinMoveEvent = "Move")
+	x_Par_Enable("Ypos", ElementParameters.WinMoveEvent = "Move")
+	x_Par_Enable("Width", ElementParameters.WinMoveEvent = "Move")
+	x_Par_Enable("Height", ElementParameters.WinMoveEvent = "Move")
+	x_Par_Enable("MouseTracker", ElementParameters.WinMoveEvent = "Move")
 }
 
 

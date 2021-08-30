@@ -1,101 +1,58 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<html>
-<head>
-	<meta http-equiv="content-type" content="text/html; charset=windows-1252"/>
-	<title>Bedienung</title>
-	<meta name="generator" content="LibreOffice 4.4.3.2 (Windows)"/>
-	<meta name="created" content="00:00:00"/>
-	<meta name="changedby" content="Paul Bichler"/>
-	<meta name="changed" content="2015-08-15T09:15:34.538000000"/>
-	<meta name="CHANGEDBY" content="Paul Bichler">
-	<meta name="CHANGEDBY" content="Paul Bichler">
-	<meta name="CHANGEDBY" content="Paul Bichler">
-	<meta name="CHANGEDBY" content="Paul Bichler">
-	<meta name="CHANGEDBY" content="Paul Bichler">
-	<style type="text/css">
-		td p { color: #000000 }
-		h1 { color: #000000 }
-		p { color: #000000 }
-		dt { color: #000000 }
-		h2 { color: #000000 }
-		h2.western { font-family: "Albany", sans-serif; font-size: 14pt; font-style: italic }
-		h2.cjk { font-family: "HG Mincho Light J"; font-size: 14pt; font-style: italic }
-		h2.ctl { font-family: "Arial Unicode MS"; font-size: 14pt; font-style: italic }
-	</style>
-</head>
-<body lang="en-US" text="#000000" dir="ltr">
-<h1 style="margin-top: 0.3cm; margin-bottom: 0.4cm; page-break-before: always">
-AutoHotKey script</h1>
-<dl>
-	<dt style="margin-bottom: 0.1cm">The action <b>AutoHotKey script</b>
-	<span style="font-weight: normal">creates a new AutoHotKey scripts
-	and executes it. Don't use that action if you don't master the
-	AutoHotKey scripting language.</span></dt><dt style="margin-bottom: 0.1cm; font-weight: normal">
-	<font color="#990000"><font size="3" style="font-size: 12pt">Note!</font></font></dt></dl>
-<table width="100%" cellpadding="4" cellspacing="0" bgcolor="#ffcccc">
-	<col width="256*">
-	<tr>
-		<td width="100%" valign="top" style="border: 1px solid #000000; padding: 0.11cm">
-			<p>This action is experimental.</p>
-			<p>This action has low performance, since a new instance of
-			AutoHotKey must be loaded.</p>
-		</td>
-	</tr>
-</table>
-<h2 class="western" style="margin-top: 0.3cm; margin-bottom: 0.1cm; font-weight: normal">
-Settings</h2>
-<table width="100%" cellpadding="4" cellspacing="0" bgcolor="#ccffff">
-	<col width="256*">
-	<tr>
-		<td width="100%" valign="top" style="border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding: 0.11cm">
-			<p style="margin-bottom: 0.1cm"><b>AutoHotKey script</b></p>
-			<p style="font-weight: normal">Script that will be executed.</p>
-		</td>
-	</tr>
-	<tr>
-		<td width="100%" valign="top" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
-			<p style="margin-bottom: 0.1cm"><b>Variables that should be
-			exported prior to execution</b></p>
-			<p>Specify a list of variables that should be exported to the
-			AutoHotKey script prior to execution. Those variables will be
-			accessible in the script.<br/>
-The list can be separated either by
-			a space, linefeed, comma or tab.</p>
-		</td>
-	</tr>
-	<tr>
-		<td width="100%" valign="top" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
-			<p style="margin-bottom: 0.1cm"><b>Variables that should be
-			imported after execution</b></p>
-			<p style="margin-bottom: 0.1cm">Specify a list of variables that
-			should be imported from the AutoHotKey script after execution.
-			Those variables will be accessible in the flow.</p>
-			<p>The list can be separated either by a space, linefeed, comma or
-			tab.</p>
-		</td>
-	</tr>
-</table>
-<h2 class="western" style="margin-top: 0.3cm; margin-bottom: 0.1cm; font-weight: normal">
-Remarks</h2>
-<p style="margin-top: 0.3cm; margin-bottom: 0.1cm; font-weight: normal">
-If the script should end with the result <b>exception</b> then the
-variable <b>result</b> must have the value <b>exception</b>.
-<font face="Consolas, monospace">(result=exception)</font></p>
-<p style="margin-top: 0.3cm; margin-bottom: 0.1cm; font-weight: normal">
-If the script reaches the bottom, it will end. If the script is
-persistent (e.g. it uses timers, GUIs, hotkeys &hellip;) then the
-script should be exited by jumping to the label <b>endExecution</b>.
-<font face="Consolas, monospace">(goto endExecution)</font><font face="Liberation Serif, serif">.
-Otherwise, the flow will not notice that the script has finished.</font></p>
-<p style="margin-top: 0.3cm; margin-bottom: 0.1cm; font-weight: normal">
-<br/>
-<br/>
-
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<link rel="stylesheet" href="../../stylesheet.css">
+	<link rel="stylesheet" href="stylesheet.css">
+	<link rel="stylesheet" href="../../../../../Help/stylesheet.css">
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<H1>AutoHotKey script</H1>
+<p>
+	The action <B>AutoHotKey script</B> executes an AutoHotkey script in a new AutoHotkey thread. 
 </p>
-<p style="margin-top: 0.3cm; margin-bottom: 0.1cm; font-weight: normal">
-<br/>
-<br/>
 
+<p class="warning">Don't use that action if you don't master the AutoHotKey scripting language.</p>
+<p class="warning">If the AutoHotkey script crashes, AHF may crash too.</p>
+<p class="info">This action has low performance, since a new AutoHotkey thread must be started.</p>
+
+<H2>Settings</H2>
+<table class="settings">
+	<TR>
+		<TD>
+			<h4>AutoHotKey script</h4>
+			<p>Script that will be executed.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Variables that should be exported prior to execution</h4>
+			<p>Specify a list of variables that should be exported to the AutoHotKey script prior to execution.
+				<br/>The list can be separated either by a space, linefeed, comma or tab.
+				<br/>The variables will be available in global scope.
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Variables that should be imported after execution</h4>
+			<p>Specify a list of variables that should be imported from the AutoHotKey script after execution.
+			<br/>The list can be separated either by a space, linefeed, comma or tab.
+			<br/>The variables must be available in global scope and will be accessible in the flow with same.
+		</p>
+		</TD>
+	</TR>
+</table>
+
+<H2>Remarks</H2>
+<p>
+	<br/>If the script reaches the bottom, it will end, even if it is persistent.
+	<br/>The script may be stopped with <code>exitapp</code>.
+	<br/>Do not use command <code>onexit</code>.
+	<br/>Do not use functions <code>EnterCriticalSection()</code> and <code>LeaveCriticalSection()</code> as well as other AHK-H specific functions.
+	<br/>Do not use variables which start with <code>ahf_</code>.
 </p>
-</body>
-</html>
+
+
+</BODY>
+</HTML>

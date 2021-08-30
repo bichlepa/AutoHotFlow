@@ -1,0 +1,60 @@
+﻿{
+  "allConnections": {},
+  "allElements": {
+    "element0000000001": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "1",
+      "enabled": "0",
+      "ID": "element0000000001",
+      "name": "Manual - \"Trigger great dog\"",
+      "package": "default",
+      "pars": {
+        "ID": "Trigger great dog"
+      },
+      "StandardName": 1,
+      "type": "trigger",
+      "x": 0,
+      "y": 0
+    },
+    "element0000000007": {
+      "class": "Action_Move_Window",
+      "ID": "element0000000007",
+      "name": "Move Window: ",
+      "package": "default",
+      "pars": {
+        "ahk_class": "",
+        "ahk_exe": "",
+        "ahk_id": "",
+        "ahk_pid": "",
+        "ExcludeText": "",
+        "excludeTitle": "",
+        "FindHiddenText": 0,
+        "FindHiddenWindow": 0,
+        "Height": 200,
+        "MouseTracker": "Grab coordinates from existing window",
+        "TitleMatchMode": 1,
+        "Width": 300,
+        "WinMoveEvent": "Maximize",
+        "winText": "",
+        "Wintitle": "",
+        "Xpos": 10,
+        "Ypos": 20
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "350",
+      "y": "385"
+    }
+  },
+  "category": "",
+  "ElementIDCounter": "7",
+  "flowSettings": {
+    "DefaultWorkingDir": 1,
+    "ExecutionPolicy": "default",
+    "Offsetx": -200,
+    "Offsety": -200,
+    "WorkingDir": "",
+    "zoomFactor": "0.7"
+  },
+  "name": "New flow 1"
+}

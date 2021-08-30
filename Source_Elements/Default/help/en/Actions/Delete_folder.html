@@ -1,83 +1,62 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <HTML>
 <HEAD>
-	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=windows-1252">
-	<TITLE>Bedienung</TITLE>
-	<META NAME="GENERATOR" CONTENT="OpenOffice 4.1.0  (Win32)">
-	<META NAME="CREATED" CONTENT="0;0">
-	<META NAME="CHANGEDBY" CONTENT="Paul Bichler">
-	<META NAME="CHANGED" CONTENT="20150615;15010014">
-	<META NAME="CHANGEDBY" CONTENT="Paul Bichler">
-	<META NAME="CHANGEDBY" CONTENT="Paul Bichler">
-	<META NAME="CHANGEDBY" CONTENT="Paul Bichler">
-	<STYLE TYPE="text/css">
-	<!--
-		P { color: #000000 }
-		TD P { color: #000000 }
-		H1 { color: #000000 }
-		DT { color: #000000 }
-		DD { color: #000000 }
-		H2 { color: #000000 }
-		H2.western { font-family: "Albany", sans-serif; font-size: 14pt; font-style: italic }
-		H2.cjk { font-family: "HG Mincho Light J"; font-size: 14pt; font-style: italic }
-		H2.ctl { font-family: "Arial Unicode MS"; font-size: 14pt; font-style: italic }
-	-->
-	</STYLE>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<link rel="stylesheet" href="../../stylesheet.css">
+	<link rel="stylesheet" href="stylesheet.css">
+	<link rel="stylesheet" href="../../../../../Help/stylesheet.css">
 </HEAD>
-<BODY LANG="en-US" TEXT="#000000" DIR="LTR">
-<H1 STYLE="margin-top: 0.3cm; margin-bottom: 0.4cm; page-break-before: always">
-Delete folder</H1>
-<DL>
-	<DT STYLE="margin-bottom: 0.1cm">The action <B>Delete folder</B>
-	deletes a folder<SPAN STYLE="font-weight: normal">.</SPAN></DT></DL>
-<P STYLE="margin-bottom: 0.1cm; font-weight: normal">
-<FONT COLOR="#990000"><FONT SIZE=3>Note!</FONT></FONT></P>
-<TABLE WIDTH=100% BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0 BGCOLOR="#ffcccc">
-	<COL WIDTH=256*>
+<BODY LANG="en-US" DIR="LTR">
+<H1>Delete folder</H1>
+<p>
+	The action <B>Delete folder</B> deletes a folder.
+</p>
+
+<p class="warning">Be careful using that action. It may cause loss of data.</p>
+
+<H2>Settings</H2>
+<table class="settings">
 	<TR>
-		<TD WIDTH=100% VALIGN=TOP>
-			<P>Be careful using that action. It may cause loss of data.</P>
-		</TD>
-	</TR>
-</TABLE>
-<H2 CLASS="western" STYLE="margin-top: 0cm; margin-bottom: 0cm"><BR>
-</H2>
-<H2 CLASS="western" STYLE="margin-top: 0.3cm; margin-bottom: 0.1cm; font-weight: normal">
-Settings</H2>
-<TABLE WIDTH=100% BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0 BGCOLOR="#ccffff">
-	<COL WIDTH=256*>
-	<TR>
-		<TD WIDTH=100% VALIGN=TOP>
-			<P STYLE="margin-bottom: 0.1cm"><B>Folder path</B></P>
-			<DL>
-				<DD STYLE="margin-left: 0cm; font-weight: normal">Name of the
-				directory to delete.<BR>The folder path is assumed to be in the
-				working directory if an absolute path isn't specified.</DD></DL>
+		<TD>
+			<h4>Folder path</h4>
+			<p>Path of the directory to delete.
+				<BR>The folder path is assumed to be in the working directory if an absolute path isn't specified.
+			</p>
 		</TD>
 	</TR>
 	<TR>
-		<TD WIDTH=100% VALIGN=TOP>
-			<P STYLE="margin-bottom: 0.1cm"><B>Options</B></P>
-			<DL>
-				<DD STYLE="margin-left: 0cm; font-weight: normal">If <B>Remove
-				only if the folder is empty</B> is selected, the folder will not
-				be deleted, if it contains any file or folder.</DD></DL>
+		<TD>
+			<h4>Options</h4>
+			<p>If <b>Remove only if the folder is empty</b> is selected, the folder will not be deleted, if it contains any file or folder.</p>
 		</TD>
 	</TR>
-</TABLE>
-<P STYLE="margin-bottom: 0.1cm"><I><U><B>Examples:</B></U></I></P>
-<TABLE WIDTH=100% BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0 BGCOLOR="#ccffcc">
-	<COL WIDTH=256*>
 	<TR>
-		<TD WIDTH=100% VALIGN=TOP>
-			<P STYLE="margin-bottom: 0.1cm"><FONT FACE="Times New Roman, serif">Delete
-			one folder from MyDocuments folder.</FONT></P>
-			<P><FONT FACE="Times New Roman, serif">File pattern:
-			<FONT FACE="Consolas, monospace">%</FONT><FONT FACE="Consolas, monospace"><SPAN STYLE="font-weight: normal">A_MyDocuments%\ExampleFolder</SPAN></FONT></FONT></P>
+		<TD>
+			<h4>Error handling</h4>
+			<p>If <b>Throw exception if folder does not exist</b> is not selected, nothing will happen, if the folder doesn't exists.</p>
 		</TD>
 	</TR>
-</TABLE>
-<P STYLE="margin-bottom: 0.1cm"><BR><BR>
-</P>
+</table>
+
+<H2>Examples</H2>
+<table class="examples">
+	<TR>
+		<TD>
+			<p>Delete one folder from MyDocuments folder.</p>
+			<table class="example">
+				<TR>
+					<TD class="example-parameter">
+						<p>Folder path</p>
+					</TD>
+					<TD class="example-value">
+						<p>%A_MyDocuments%\ExampleFolder</p>
+					</TD>
+				</TR>
+			</table>
+		</TD>
+	</TR>
+</table>
+
+
 </BODY>
 </HTML>

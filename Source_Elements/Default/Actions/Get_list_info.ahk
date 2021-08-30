@@ -10,7 +10,7 @@ Element_getElementType_Action_Get_List_Info()
 ;Name of the element
 Element_getName_Action_Get_List_Info()
 {
-	return x_lang("Get_List_Info")
+	return x_lang("Get_list_Info")
 }
 
 ;Category of the element
@@ -59,7 +59,7 @@ Element_getParametrizationDetails_Action_Get_List_Info(Environment)
 	parametersToEdit.push({type: "Label", label:  x_lang("Input list")})
 	parametersToEdit.push({type: "Edit", id: "List", default: "myList", content: "Expression", WarnIfEmpty: true})
 
-	parametersToEdit.push({type: "Label", label:  x_lang("WhichInfo")})
+	parametersToEdit.push({type: "Label", label:  x_lang("Which info")})
 	parametersToEdit.push({type: "Radio", id: "WhichInfo", default: "maxIndex", result: "enum", choices: [x_lang("Minimum index"), x_lang("Maximum index"), x_lang("Array length"), x_lang("Element count")], enum: ["minIndex", "maxIndex", "length", "count"]})
 	
 	return parametersToEdit

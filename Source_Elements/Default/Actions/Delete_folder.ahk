@@ -53,7 +53,7 @@ Element_getParametrizationDetails_Action_Delete_Folder(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: x_lang("Source file")})
+	parametersToEdit.push({type: "Label", label: x_lang("Folder path")})
 	parametersToEdit.push({type: "File", id: "Folder", label: x_lang("Select a folder")})
 	parametersToEdit.push({type: "Label", label: x_lang("Delete method")})
 	parametersToEdit.push({type: "Checkbox", id: "ifEmpty", default: 0, label: x_lang("Remove only if the folder is empty")})

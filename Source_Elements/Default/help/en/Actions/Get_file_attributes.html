@@ -1,60 +1,57 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <HTML>
 <HEAD>
-	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=windows-1252">
-	<TITLE>Bedienung</TITLE>
-	<META NAME="GENERATOR" CONTENT="OpenOffice 4.1.0  (Win32)">
-	<META NAME="CREATED" CONTENT="0;0">
-	<META NAME="CHANGEDBY" CONTENT="Paul Bichler">
-	<META NAME="CHANGED" CONTENT="20150615;16172425">
-	<META NAME="CHANGEDBY" CONTENT="Paul Bichler">
-	<STYLE TYPE="text/css">
-	<!--
-		P { color: #000000 }
-		TD P { color: #000000 }
-		H1 { color: #000000 }
-		DT { color: #000000 }
-		DD { color: #000000 }
-		H2 { color: #000000 }
-		H2.western { font-family: "Albany", sans-serif; font-size: 14pt; font-style: italic }
-		H2.cjk { font-family: "HG Mincho Light J"; font-size: 14pt; font-style: italic }
-		H2.ctl { font-family: "Arial Unicode MS"; font-size: 14pt; font-style: italic }
-	-->
-	</STYLE>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<link rel="stylesheet" href="../../stylesheet.css">
+	<link rel="stylesheet" href="stylesheet.css">
+	<link rel="stylesheet" href="../../../../../Help/stylesheet.css">
 </HEAD>
-<BODY LANG="en-US" TEXT="#000000" DIR="LTR">
-<H1 STYLE="margin-top: 0.3cm; margin-bottom: 0.4cm; page-break-before: always">
-Get file attributes</H1>
-<DL>
-	<DT STYLE="margin-bottom: 0.1cm">The action <B>Get file attributes</B>
-	retrieves the attributes (read-only, hidden, etc) of a file<SPAN STYLE="font-weight: normal">.</SPAN></DT></DL>
-<H2 CLASS="western" STYLE="margin-top: 0.3cm; margin-bottom: 0.1cm; font-weight: normal">
-Settings</H2>
-<TABLE WIDTH=100% BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0 BGCOLOR="#ccffff">
-	<COL WIDTH=256*>
+<BODY LANG="en-US" DIR="LTR">
+<H1>Get file attributes</H1>
+<p>
+	The action <B>Get file attributes</B> retrieves the attributes (read-only, hidden, etc) of a file.
+</p>
+
+<H2>Settings</H2>
+<table class="settings">
 	<TR>
-		<TD WIDTH=100% VALIGN=TOP>
-			<P STYLE="margin-bottom: 0.1cm"><B>Output variable name</B></P>
-			<P STYLE="font-weight: normal">Name of the variable which will
-			contain the result.</P>
+		<TD>
+			<h4>Output variable name</h4>
+			<p>Name of the variable which will contain the result.</p>
 		</TD>
 	</TR>
 	<TR>
-		<TD WIDTH=100% VALIGN=TOP>
-			<P STYLE="margin-bottom: 0.1cm"><B>File path</B></P>
-			<DL>
-				<DD STYLE="margin-left: 0cm; font-weight: normal">Name and path
-				of the file. The file path is assumed to be in the working
-				directory if an absolute path isn't specified.</DD></DL>
+		<TD>
+			<h4>File path</h4>
+			<p>Name and path of the file. The file path is assumed to be in the working directory if an absolute path isn't specified.</p>
 		</TD>
 	</TR>
-</TABLE>
-<H2 CLASS="western" STYLE="margin-top: 0.3cm; margin-bottom: 0.1cm; font-weight: normal">
-Remarks</H2>
-<P STYLE="margin-bottom: 0cm">The result string will contain a subset
-of the letters in the string &quot;<FONT FACE="Consolas, monospace">RASHNDOCT</FONT>&quot;:</P>
-<P STYLE="margin-bottom: 0.1cm"><FONT FACE="Consolas, monospace">R =
-READONLY<BR>A = ARCHIVE<BR>S = SYSTEM<BR>H = HIDDEN<BR>N = NORMAL<BR>D
-= DIRECTORY<BR>O = OFFLINE<BR>C = COMPRESSED<BR>T = TEMPORARY</FONT></P>
+</table>
+
+<H2>Remarks</H2>
+<p>
+	The result string will contain a subset of the letters in the string <code>RASHNDOCT</code>:
+	<ul>
+		<li/>
+			<p><code>R</code> = READONLY</p>
+		<li/>
+			<p><code>A</code> = ARCHIVE</p>
+		<li/>
+			<p><code>S</code> = SYSTEM</p>
+		<li/>
+			<p><code>H</code> = HIDDEN</p>
+		<li/>
+			<p><code>N</code> = NORMAL</p>
+		<li/>
+			<p><code>D</code> = DIRECTORY</p>
+		<li/>
+			<p><code>O</code> = OFFLINE</p>
+		<li/>
+			<p><code>C</code> = COMPRESSED</p>
+		<li/>
+			<p><code>T</code> = TEMPORARY</p>
+	</ul>
+</p>
+
 </BODY>
 </HTML>

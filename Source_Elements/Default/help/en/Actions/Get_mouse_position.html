@@ -1,75 +1,35 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <HTML>
 <HEAD>
-	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=windows-1252">
-	<TITLE>Bedienung</TITLE>
-	<META NAME="GENERATOR" CONTENT="OpenOffice 4.1.0  (Win32)">
-	<META NAME="CREATED" CONTENT="0;0">
-	<META NAME="CHANGEDBY" CONTENT="Paul Bichler">
-	<META NAME="CHANGED" CONTENT="20150615;16424719">
-	<STYLE TYPE="text/css">
-	<!--
-		P { color: #000000 }
-		TD P { color: #000000 }
-		H1 { color: #000000 }
-		DT { color: #000000 }
-		H2 { color: #000000 }
-		H2.western { font-family: "Albany", sans-serif; font-size: 14pt; font-style: italic }
-		H2.cjk { font-family: "HG Mincho Light J"; font-size: 14pt; font-style: italic }
-		H2.ctl { font-family: "Arial Unicode MS"; font-size: 14pt; font-style: italic }
-	-->
-	</STYLE>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<link rel="stylesheet" href="../../stylesheet.css">
+	<link rel="stylesheet" href="stylesheet.css">
+	<link rel="stylesheet" href="../../../../../Help/stylesheet.css">
 </HEAD>
-<BODY LANG="en-US" TEXT="#000000" DIR="LTR">
-<H1 STYLE="margin-top: 0.3cm; margin-bottom: 0.4cm; page-break-before: always">
-Get mouse position</H1>
-<DL>
-	<DT STYLE="margin-bottom: 0.1cm">The action <B>Get mouse position</B>
-	simulates a click with any mouse button. The coordinates can be
-	specified<SPAN STYLE="font-weight: normal">.<BR></SPAN><BR><BR>
-	</DT></DL>
-<H2 CLASS="western" STYLE="margin-top: 0.3cm; margin-bottom: 0.1cm; font-weight: normal">
-Settings</H2>
-<TABLE WIDTH=100% BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0 BGCOLOR="#ccffff">
-	<COL WIDTH=256*>
+<BODY LANG="en-US" DIR="LTR">
+<H1>Get mouse position</H1>
+<p>
+	The action <B>Get mouse position</B> retrieves the mouse position.
+	<br/>It can also retrieve information about the window ID and control ID beneath the mouse.
+</p>
+
+<H2>Settings</H2>
+<table class="settings">
 	<TR>
-		<TD WIDTH=100% VALIGN=TOP>
-			<P STYLE="margin-bottom: 0.1cm; font-weight: normal"><B>Output
-			variable X position</B> and <B>Output variable Y position</B></P>
-			<P STYLE="font-weight: normal">Name of the variables which will
-			contain the result.</P>
+		<TD>
+			<h4>Output variables</h4>
+			<p>Names of the variables which will contain the result.
+				<br/>You can choose the reference point of the coordinates.
+			</p>
 		</TD>
 	</TR>
 	<TR>
-		<TD WIDTH=100% VALIGN=TOP>
-			<P STYLE="margin-bottom: 0.1cm"><B>Mouse position</B></P>
-			<P STYLE="font-weight: normal">Specify whether the retrieved mouse
-			position should be relative to the position of the screen, active
-			window or the window client.</P>
+		<TD>
+			<h4>Additional information</h4>
+			<p>Choose whether the window ID and control ID beneath the mouse should be retrieved as well.</p>
 		</TD>
 	</TR>
-</TABLE>
-<H2 CLASS="western" STYLE="margin-top: 0.3cm; margin-bottom: 0.1cm; font-weight: normal">
-Supplied variables</H2>
-<TABLE WIDTH=100% BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0 BGCOLOR="#ccffff">
-	<COL WIDTH=256*>
-	<TR>
-		<TD WIDTH=100% VALIGN=TOP BGCOLOR="#ffffcc">
-			<P STYLE="margin-bottom: 0.1cm"><FONT FACE="Consolas, monospace"><B>A_WindowID</B></FONT></P>
-			<P STYLE="font-weight: normal">contains the unique ID of the
-			window that is currently covered by the mouse.</P>
-		</TD>
-	</TR>
-	<TR>
-		<TD WIDTH=100% VALIGN=TOP BGCOLOR="#ffffcc">
-			<P STYLE="margin-bottom: 0.1cm"><FONT FACE="Consolas, monospace"><B>A_ControlID</B></FONT></P>
-			<P STYLE="font-weight: normal">contains the unique ID of the
-			control that is currently covered by the mouse.</P>
-		</TD>
-	</TR>
-</TABLE>
-<H2 CLASS="western" STYLE="margin-top: 0.3cm; margin-bottom: 0.1cm; font-weight: normal">
-<BR><BR>
-</H2>
+</table>
+
 </BODY>
 </HTML>

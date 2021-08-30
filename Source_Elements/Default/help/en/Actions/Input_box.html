@@ -1,105 +1,70 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<html>
-<head>
-	<meta http-equiv="content-type" content="text/html; charset=windows-1252"/>
-	<title>Bedienung</title>
-	<meta name="generator" content="LibreOffice 4.4.3.2 (Windows)"/>
-	<meta name="created" content="00:00:00"/>
-	<meta name="changedby" content="Paul Bichler"/>
-	<meta name="changed" content="2015-09-01T15:44:47.717000000"/>
-	<meta name="CHANGEDBY" content="Paul Bichler">
-	<style type="text/css">
-		td p { color: #000000 }
-		h1 { color: #000000 }
-		p { color: #000000 }
-		dt { color: #000000 }
-		h2 { color: #000000 }
-		h2.western { font-family: "Albany", sans-serif; font-size: 14pt; font-style: italic }
-		h2.cjk { font-family: "HG Mincho Light J"; font-size: 14pt; font-style: italic }
-		h2.ctl { font-family: "Arial Unicode MS"; font-size: 14pt; font-style: italic }
-	</style>
-</head>
-<body lang="en-US" text="#000000" dir="ltr">
-<h1 style="margin-top: 0.3cm; margin-bottom: 0.4cm; page-break-before: always">
-Input box</h1>
-<dl>
-	<dt style="margin-bottom: 0.1cm">The action <b>Input box</b>
-	d<span style="font-weight: normal">isplays an input box to ask the
-	user to enter a string.</span></dt></dl>
-<h2 class="western" style="margin-top: 0.3cm; margin-bottom: 0.1cm; font-weight: normal">
-Settings</h2>
-<table width="100%" cellpadding="4" cellspacing="0" bgcolor="#ccffff">
-	<col width="256*">
-	<tr>
-		<td width="100%" valign="top" style="border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding: 0.11cm">
-			<p style="margin-bottom: 0.1cm"><b>Output variable name</b></p>
-			<p style="font-weight: normal">Name of the variable which will
-			contain the user input.</p>
-		</td>
-	</tr>
-	<tr>
-		<td width="100%" valign="top" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
-			<p style="margin-bottom: 0.1cm"><b>Title </b><span style="font-weight: normal">and</span>
-			<b>Message</b></p>
-			<p style="font-weight: normal">Message shown to the user.</p>
-		</td>
-	</tr>
-	<tr>
-		<td width="100%" valign="top" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
-			<p style="margin-bottom: 0.1cm"><b>E</b><b>dit field</b></p>
-			<p><span style="font-weight: normal">If </span><b>Only allow
-			numbers</b><span style="font-weight: normal"> is selected, it will
-			prevent</span> the user from typing anything other than digits
-			into the field (however, it is still possible to paste non-digits
-			into it).<br/>
-If <b>Mask user's input</b> is selected, it will
-			hide the user's input (such as for password entry) by substituting
-			masking characters for what the user types<br/>
-If <b>Use a
-			multiline edit field</b> is selected, the edit field will have
-			multiple lines. The count of lines may be specified.</p>
-			<p>If <b>Default value</b> contains some text, the edit field will
-			contain that text when the dialog first appears.</p>
-		</td>
-	</tr>
-	<tr>
-		<td width="100%" valign="top" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
-			<p style="margin-bottom: 0.1cm"><b>Button Text</b></p>
-			<p>Enter the text which will be shown as the <b>OK</b> button.</p>
-		</td>
-	</tr>
-	<tr>
-		<td width="100%" valign="top" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
-			<p style="margin-bottom: 0.1cm"><b>Timeout</b></p>
-			<p style="font-weight: normal">If <b>Define timeout</b> is
-			selected, the dialog will automatically close after the specified
-			amount of time.<br/>
-<b>Result on timeout</b>: If timeout reaches
-			zero, the action will end with the specified result.</p>
-		</td>
-	</tr>
-	<tr>
-		<td width="100%" valign="top" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
-			<p style="margin-bottom: 0.1cm"><b>Width and height</b></p>
-			<p style="font-weight: normal">Specify the size of the window that
-			will be shown. Make sure, that the window is not too small.</p>
-		</td>
-	</tr>
-	<tr>
-		<td width="100%" valign="top" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
-			<p style="margin-bottom: 0.1cm"><b>Cancelling</b></p>
-			<p style="margin-bottom: 0.1cm; font-weight: normal">If <b>Show
-			cancel button</b> is selected, a second button near to the OK
-			button will be shown. The text can be specified.</p>
-			<p style="font-weight: normal"><b>Result if cancelled</b>: If uses
-			either closes the window or clicks on the cancel button, the
-			action will end with the specified result.</p>
-		</td>
-	</tr>
-</table>
-<p style="margin-bottom: 0.1cm"><br/>
-<br/>
-
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<link rel="stylesheet" href="../../stylesheet.css">
+	<link rel="stylesheet" href="stylesheet.css">
+	<link rel="stylesheet" href="../../../../../Help/stylesheet.css">
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<H1>Input box</H1>
+<p>
+	The action <B>Input box</B> displays an input box to ask the user to enter a string or number.
 </p>
-</body>
-</html>
+
+<H2>Settings</H2>
+<table class="settings">
+	<TR>
+		<TD>
+			<h4>Output variable name</h4>
+			<p>Name of the variable which will contain the user input.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Title <i>and</i> Message</h4>
+			<p>Message shown to the user.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Edit field</h4>
+			<p>If <b>Only allow numbers</b> is selected, it will prevent the user from typing anything other than digits into the field (however, it is still possible to paste non-digits into it).
+				<br/>If <b>Mask user's input</b> is selected, it will hide the user's input (such as for password entry) by substituting masking characters for what the user types
+				<br/>If <b>Use a multiline edit field</b> is selected, the edit field will have multiple lines. The count of lines may be specified.
+				<br/>If <b>Default value</b> contains some text, the edit field will contain that text when the dialog first appears.
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Button Text</h4>
+			<p>Enter the text which will be shown as the <b>OK</b> button.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Timeout</h4>
+			<p>If <b>Define timeout</b> is selected, the dialog will automatically close after the specified amount of time.
+				<br/><b>Result on timeout</b>: If timeout reaches zero, the action will end with the specified result.
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Width and height</h4>
+			<p>Specify the size of the window that will be shown. Make sure, that the window is not too small.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Cancelling</h4>
+			<p>If <b>Show cancel button</b> is selected, a second button near to the OK button will be shown. The text can be specified.
+				<br/><b>Result if cancelled</b>: If uses either closes the window or clicks on the cancel button, the action will end with the specified result.
+			</p>
+		</TD>
+	</TR>
+</table>
+
+</BODY>
+</HTML>

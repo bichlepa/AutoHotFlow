@@ -57,7 +57,7 @@ Element_getParametrizationDetails_Action_Get_File_Time(Environment)
 	parametersToEdit.push({type: "Edit", id: "varname", default: "FileTime", content: "VariableName", WarnIfEmpty: true})
 	parametersToEdit.push({type: "Label", label: x_lang("File path")})
 	parametersToEdit.push({type: "File", id: "file", label: x_lang("Select a file")})
-	parametersToEdit.push({type: "Label", label: x_lang("Unit")})
+	parametersToEdit.push({type: "Label", label: x_lang("Which time")})
 	parametersToEdit.push({type: "Radio", id: "TimeType", result: "enum", default: 1, choices: [x_lang("Modification time"), x_lang("Creation time"), x_lang("Last access time")], enum: ["Modification", "Creation", "Access"]})
 	
 	return parametersToEdit

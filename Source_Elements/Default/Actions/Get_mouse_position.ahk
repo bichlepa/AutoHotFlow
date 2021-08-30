@@ -53,7 +53,8 @@ Element_getParametrizationDetails_Action_Get_Mouse_Position(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: x_lang("Output variables") (x_lang("Position: x,y"))})
+	parametersToEdit.push({type: "Label", label: x_lang("Output variables")})
+	parametersToEdit.push({type: "Label", label: x_lang("Coordinates"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: ["varnameX", "varnameY"], default: ["posX", "posY"], content: "VariableName", WarnIfEmpty: true})
 	parametersToEdit.push({type: "Label", label: x_lang("Mouse position"), size: "small"})
 	parametersToEdit.push({type: "Radio", id: "CoordMode", default: "Screen", result: "enum", choices: [x_lang("Relative to screen"), x_lang("Relative to active window position"), x_lang("Relative to active window client position")], enum: ["Screen", "Window", "Client"]})
@@ -79,6 +80,8 @@ Element_GenerateName_Action_Get_Mouse_Position(Environment, ElementParameters)
 ;- Correct misconfiguration
 Element_CheckSettings_Action_Get_Mouse_Position(Environment, ElementParameters, staticValues)
 {	
+	x_Par_Enable("varnameWindowID", ElementParameters.WhetherGetWindowID)
+	x_Par_Enable("varnameControlID", ElementParameters.WhetherGetControlID)
 	
 }
 

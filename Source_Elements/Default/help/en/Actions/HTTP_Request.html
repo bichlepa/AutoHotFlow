@@ -1,220 +1,136 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<html>
-<head>
-	<meta http-equiv="content-type" content="text/html; charset=windows-1252"/>
-	<title>Bedienung</title>
-	<meta name="generator" content="LibreOffice 4.4.3.2 (Windows)"/>
-	<meta name="created" content="00:00:00"/>
-	<meta name="changedby" content="Paul Bichler"/>
-	<meta name="changed" content="2015-09-02T20:22:22.699000000"/>
-	<meta name="CHANGEDBY" content="Paul Bichler">
-	<meta name="CHANGEDBY" content="Paul Bichler">
-	<meta name="CHANGEDBY" content="Paul Bichler">
-	<meta name="CHANGEDBY" content="Paul Bichler">
-	<style type="text/css">
-		td p { color: #000000 }
-		h1 { color: #000000 }
-		p { color: #000000 }
-		dt { color: #000000 }
-		dd { color: #000000 }
-		h2 { color: #000000 }
-		h2.western { font-family: "Albany", sans-serif; font-size: 14pt; font-style: italic }
-		h2.cjk { font-family: "HG Mincho Light J"; font-size: 14pt; font-style: italic }
-		h2.ctl { font-family: "Arial Unicode MS"; font-size: 14pt; font-style: italic }
-	</style>
-</head>
-<body lang="en-US" text="#000000" dir="ltr">
-<h1 style="margin-top: 0.3cm; margin-bottom: 0.4cm; page-break-before: always">
-HTTP Request</h1>
-<dl>
-	<dt style="margin-bottom: 0.1cm">The action <b>HTTP Request</b> is
-	capable of making HTTP Request to an internet resource in the
-	internet or in local network<span style="font-weight: normal">.</span></dt></dl>
-<h2 class="western" style="margin-top: 0.3cm; margin-bottom: 0.1cm; font-weight: normal">
-Settings</h2>
-<table width="100%" cellpadding="4" cellspacing="0" bgcolor="#ccffff">
-	<col width="256*">
-	<tr>
-		<td width="100%" valign="top" style="border-top: 1px solid #000000; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding: 0.11cm">
-			<p style="margin-bottom: 0.1cm"><b>URL</b></p>
-			<dl>
-				<dd style="margin-left: 0cm; font-weight: normal">The URL of the
-				internet resource you wish to access.</dd></dl>
-		</td>
-	</tr>
-	<tr>
-		<td width="100%" valign="top" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
-			<p style="margin-bottom: 0.1cm"><b>Post data</b></p>
-			<p style="margin-bottom: 0.1cm; font-weight: normal">Data that
-			will be uploaded.<br/>
-Either a specified text or a file may be
-			uploaded.</p>
-			<p style="margin-bottom: 0.1cm; font-weight: normal">Check <b>URI
-			encode post data</b> if the text should be URI encoded. Commonly,
-			POST data from a web form must be URI encoded.</p>
-			<p style="font-weight: normal"><b>Charset</b>: Specify the charset
-			or the codepage if the server does not accept UTF-8 charset.</p>
-		</td>
-	</tr>
-	<tr>
-		<td width="100%" valign="top" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
-			<p style="margin-bottom: 0.1cm"><b>Request headers</b></p>
-			<dl>
-				<dd style="margin-left: 0cm; margin-bottom: 0.1cm">AHF
-				automatically sets up some request headers. If additional headers
-				are wished, they can be specified here.</dd><dd style="margin-left: 0cm">
-				Check URI encode header data if the text should be URI encoded.</dd></dl>
-		</td>
-	</tr>
-	<tr>
-		<td width="100%" valign="top" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
-			<p style="margin-bottom: 0.1cm"><b>Response data</b></p>
-			<p style="font-weight: normal">The response data may be written to
-			a variable or to a text file.<br/>
-If the download will contain
-			binary data, please, use a file.<br/>
-If the response data are not
-			needed, it can be left blank.</p>
-		</td>
-	</tr>
-	<tr>
-		<td width="100%" valign="top" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
-			<p style="margin-bottom: 0.1cm"><b>Response headers</b></p>
-			<p style="font-weight: normal">Specify a variable which will
-			contain the response headers.<br/>
-If the response headers are not
-			needed, it can be left blank.</p>
-		</td>
-	</tr>
-	<tr>
-		<td width="100%" valign="top" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
-			<p style="margin-bottom: 0.1cm"><b>Content type</b></p>
-			<p style="margin-bottom: 0.1cm; font-weight: normal">If some data
-			is uploaded, AHF will automatically add the Content-Type header.
-			It can be overridden by specifying an other content type.</p>
-			<p style="font-weight: normal">Default values for this header are
-			&quot;application/octet-stream&quot; when uploading from a file
-			and the file's extension is neither &quot;txt&quot; nor &quot;xml&quot;;
-			&quot;text/xml&quot; when the string &quot;&lt;?xml&quot; appears
-			near the beginning of the data; or
-			&quot;application/x-www-form-urlencoded&quot; in all other cases.</p>
-		</td>
-	</tr>
-	<tr>
-		<td width="100%" valign="top" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
-			<p style="margin-bottom: 0.1cm"><b>Content length</b></p>
-			<p style="margin-bottom: 0.1cm; font-weight: normal">If some data
-			is uploaded, AHF will automatically add the Content-Length header.
-			It can be overridden by specifying an other content length.</p>
-			<p style="font-weight: normal">If AHF can't determine the content
-			length automatically (e.g: you are uploading non-text data), you
-			must provide the &quot;Content-Length&quot; header with the total
-			number of bytes you wish to upload. Note for UTF-8 charset: if you
-			are uploading text, the number of bytes in text is twice the
-			length of the text.</p>
-		</td>
-	</tr>
-	<tr>
-		<td width="100%" valign="top" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
-			<p style="margin-bottom: 0.1cm"><b>Content MD5</b></p>
-			<p><span style="font-weight: normal">If some data is uploaded, AHF
-			will automatically add the Content-MD5 header. It can be
-			overridden by specifying an other content MD5.</span></p>
-		</td>
-	</tr>
-	<tr>
-		<td width="100%" valign="top" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
-			<p style="margin-bottom: 0.1cm"><b>Method</b></p>
-			<p><span style="font-weight: normal">If some data is uploaded, AHF
-			will use POST method, otherwise GET method will be used. It can be
-			overridden by specifying an other method.</span></p>
-		</td>
-	</tr>
-	<tr>
-		<td width="100%" valign="top" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
-			<p style="margin-bottom: 0.1cm"><b>User agent</b></p>
-			<p><span style="font-weight: normal">AHF will add the &quot;User-Agent&quot;
-			header to every request. By default, your script name, AHK
-			version, and OS are used. If this is unacceptable to you, provide
-			your own &quot;User-Agent&quot; header.</span></p>
-		</td>
-	</tr>
-	<tr>
-		<td width="100%" valign="top" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
-			<p style="margin-bottom: 0.1cm"><b>Flags</b></p>
-			<p style="margin-bottom: 0.1cm; font-weight: normal">Some flags
-			can be added using a <b>+</b> sign or removed using a <b>-</b>
-			sign. Internet flags can be found <a href="http://msdn.microsoft.com/en-us/library/aa383661(v=vs.85).aspx">here</a>.
-			Security flags can be found <a href="https://msdn.microsoft.com/en-us/library/aa385328(v=VS.85).aspx">here</a>.</p>
-			<p style="margin-bottom: 0.1cm; font-weight: normal"><i><u><b>Examples:</b></u></i></p>
-			<table width="100%" cellpadding="4" cellspacing="0" bgcolor="#ccffcc">
-				<col width="256*">
-				<tr>
-					<td width="100%" valign="top" style="border: 1px solid #000000; padding: 0.11cm">
-						<p><font face="Consolas, monospace">+INTERNET_FLAG_NO_COOKIES</font></p>
-						<p><font face="Consolas, monospace"><font face="Liberation Serif, serif">Tells
-						WinINet to NOT automatically handle cookies (by default,
-						WinINet uses Internet Explorer's cookie pool). This is required
-						if you want your flow to manage cookies with this action. If
-						your request headers contain any &quot;Cookie&quot; headers,
-						this option is applied automatically.</font></font></p>
-					</td>
-				</tr>
-				<tr>
-					<td width="100%" valign="top" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
-						<p><font face="Consolas, monospace">+INTERNET_FLAG_NO_AUTO_REDIRECT</font></p>
-						<p><font face="Consolas, monospace"><font face="Liberation Serif, serif">Does
-						not automatically handle redirection in HttpSendRequest. </font></font>
-						</p>
-					</td>
-				</tr>
-				<tr>
-					<td width="100%" valign="top" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
-						<p><font face="Consolas, monospace">+SECURITY_FLAG_IGNORE_UNKNOWN_CA</font></p>
-						<p><font face="Consolas, monospace"><font face="Liberation Serif, serif">Ignores
-						unknown certificate authority problems.</font></font></p>
-					</td>
-				</tr>
-			</table>
-			<p style="margin-bottom: 0.1cm; font-weight: normal"><br/>
-<br/>
-
-			</p>
-		</td>
-	</tr>
-	<tr>
-		<td width="100%" valign="top" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
-			<p style="margin-bottom: 0.1cm"><b>Proxy</b></p>
-			<p style="margin-bottom: 0.1cm; font-weight: normal">AutoHotFlow
-			may use a proxy to access an internet resource.<br/>
-If <b>Automatic</b>
-			is selected, Internet Exlporer's proxy configuration will be used.
-			If your Internet Explorer is not configured to use a proxy, this
-			option has no effect.<br/>
-If <b>Custom</b> is selected, AHF will
-			use the specified proxy.</p>
-			<p style="margin-bottom: 0.1cm; font-weight: normal"><i><u><b>Example:</b></u></i></p>
-			<table width="100%" cellpadding="4" cellspacing="0" bgcolor="#ccffcc">
-				<col width="256*">
-				<tr>
-					<td width="100%" valign="top" style="border: 1px solid #000000; padding: 0.11cm">
-						<p><font face="Consolas, monospace">http://www.exampleproxy.com:1234</font></p>
-					</td>
-				</tr>
-			</table>
-			<p style="margin-bottom: 0.1cm; font-weight: normal"><b>Bypass
-			proxy</b>: 
-			</p>
-			<p style="margin-bottom: 0.1cm; font-weight: normal">Tells AHF NOT
-			to use a proxy to access a specified website. This has no effect
-			unless AHF has been told to use a proxy via the <b>Custom</b>
-			option.</p>
-		</td>
-	</tr>
-</table>
-<p style="margin-bottom: 0.1cm"><br/>
-Many thanks to VxE for
-providing the outstanding HTTPRequest library. 
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<link rel="stylesheet" href="../../stylesheet.css">
+	<link rel="stylesheet" href="stylesheet.css">
+	<link rel="stylesheet" href="../../../../../Help/stylesheet.css">
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<H1>HTTP Request</H1>
+<p>
+	The action <B>HTTP Request</B> is capable of making HTTP Request to an internet resource in the internet or in local network.
 </p>
-</body>
-</html>
+
+<H2>Settings</H2>
+<table class="settings">
+	<TR>
+		<TD>
+			<h4>URL</h4>
+			<p>The URL of the internet resource you wish to access.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Post data</h4>
+			<p>Data that will be uploaded. Either a specified text or a file may be uploaded.
+				<br/>Check <b>URI encode post data</b> if the text should be URI encoded. Commonly, POST data from a web form must be URI encoded.
+				<br/><b>Charset</b>: Change the charset or the codepage if the server does not accept UTF-8 charset.
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Request headers</h4>
+			<p>AHF automatically sets up some request headers. If additional headers are wished, they can be specified here.
+				<br/>Check <b>URI encode request headers</b> if the text should be URI encoded.
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Response data</h4>
+			<p>The response data may be written to a variable or to a text file.
+				<br/>If the download will contain binary data, please, use a file.
+				<br/>If the response data are not needed, it can be left blank.
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Response headers</h4>
+			<p>Specify a variable which will contain the response headers.
+				<br/>If the response headers are not needed, it can be left blank.
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Content type</h4>
+			<p>If some data is uploaded, AHF will automatically add the Content-Type header. It can be overridden by specifying an other content type.
+				<br/>Default values for this header are:
+				
+				<ul>
+					<li/>
+						<p><code>application/octet-stream</code> when uploading from a file and the file's extension is neither "txt" nor "xml"</p>
+					<li/>
+						<p"><code>text/xml</code> when the string "&lt;?xml" appears near the beginning of the data</p>
+					<li/>
+						<p"><code>application/x-www-form-urlencoded</code> in all other casesa</p>
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Content length</h4>
+			<p>If some data is uploaded, AHF will automatically add the Content-Length header. It can be overridden by specifying an other content length.
+				<br/>If AHF can't determine the content length automatically (e.g: you are uploading non-text data), you must provide the "Content-Length" header with the total number of bytes you wish to upload. Note for UTF-8 charset: if you are uploading text, the number of bytes in text is twice the length of the text.
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Content MD5</h4>
+			<p>If some data is uploaded, AHF will automatically add the Content-MD5 header. It can be overridden by specifying an other content MD5.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Method</h4>
+			<p>If some data is uploaded, AHF will use POST method, otherwise GET method will be used. It can be overridden by specifying an other method.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>User agent</h4>
+			<p>AHF will add the "User-Agent" header to every request. By default, your script name, AHK version, and OS are used. If this is unacceptable to you, provide your own "User-Agent" header.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Flags</h4>
+			<p>Some flags can be added using a + sign or removed using a - sign. Internet flags can be found <a href="https://docs.microsoft.com/en-us/windows/win32/wininet/api-flags">here</a>. Security flags can be found <a href="https://docs.microsoft.com/en-us/windows/win32/wininet/option-flags">here</a>.
+				<ul class="examples">
+					<li/>
+						<p>+INTERNET_FLAG_NO_COOKIES <i>Tells WinINet to NOT automatically handle cookies (by default, WinINet uses Internet Explorer's cookie pool). This is required if you want your flow to manage cookies with this action. If your request headers contain any "Cookie" headers, this option is applied automatically.</i></p>
+					<li/>
+						<p">+INTERNET_FLAG_NO_AUTO_REDIRECT <i>Does not automatically handle redirection in HttpSendRequest.</i></p>
+					<li/>
+						<p">+SECURITY_FLAG_IGNORE_UNKNOWN_CA <i>Ignores unknown certificate authority problems.</i></p>
+				</ul>
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Proxy</h4>
+			<p>AutoHotFlow may use a proxy to access an internet resource.
+				<br/>If <b>Automatic</b> is selected, Internet Exlporer's proxy configuration will be used. If your Internet Explorer is not configured to use a proxy, this option has no effect.
+				<br/>If <b>Custom</b> is selected, AHF will use the specified proxy.
+				<br/><ul class="examples">
+						<li/>
+							<p>http://www.exampleproxy.com:1234</p>
+					</ul>
+				<br/><b>Bypass proxy</b>: Tells AHF NOT to use a proxy to access a specified website. This has no effect unless AHF has been told to use a proxy via the <b>Custom</b> option.
+			</p>
+		</TD>
+	</TR>
+</table>
+
+<H2>Remarks</H2>
+<p>
+	Many thanks to VxE for providing the outstanding HTTPRequest library.
+</p>
+
+</BODY>
+</HTML>

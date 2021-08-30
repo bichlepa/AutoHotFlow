@@ -2,21 +2,13 @@
 *.bak
 
 # compiled files
-AutoHotFlow Installation.exe
-Editor.exe
+/AutoHotFlow Installation.exe
+/AutoHotFlow Setup.exe
+/AutoHotFlow.exe
 
 # exclude flows except of demonstration flows
 Saved Flows/backup
 Saved Flows/demo flows/backup
-
-#other files that are generated when AutoHotFlow is running
-Log
-variables
-Clipboard.ini
-Generated Scripts/*.ahk
-
-# user paul
-compress install.bat
 
 # Windows image file caches
 Thumbs.db
@@ -24,5 +16,3 @@ ehthumbs.db
 
 # Folder config file
 Desktop.ini
-/AutoHotFlow Setup.exe
-/AutoHotFlow.exe

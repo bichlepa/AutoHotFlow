@@ -1,115 +1,117 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <HTML>
 <HEAD>
-	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=windows-1252">
-	<TITLE>Bedienung</TITLE>
-	<META NAME="GENERATOR" CONTENT="OpenOffice 4.1.0  (Win32)">
-	<META NAME="CREATED" CONTENT="0;0">
-	<META NAME="CHANGEDBY" CONTENT="Paul Bichler">
-	<META NAME="CHANGED" CONTENT="20150613;21570232">
-	<STYLE TYPE="text/css">
-	<!--
-		P { color: #000000 }
-		TD P { color: #000000 }
-		H1 { color: #000000 }
-		DT { color: #000000 }
-		H2 { color: #000000 }
-		H2.western { font-family: "Albany", sans-serif; font-size: 14pt; font-style: italic }
-		H2.cjk { font-family: "HG Mincho Light J"; font-size: 14pt; font-style: italic }
-		H2.ctl { font-family: "Arial Unicode MS"; font-size: 14pt; font-style: italic }
-	-->
-	</STYLE>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<link rel="stylesheet" href="../../stylesheet.css">
+	<link rel="stylesheet" href="stylesheet.css">
+	<link rel="stylesheet" href="../../../../../Help/stylesheet.css">
 </HEAD>
-<BODY LANG="en-US" TEXT="#000000" DIR="LTR">
-<H1 STYLE="margin-top: 0.3cm; margin-bottom: 0.4cm; page-break-before: always">
-Copy file</H1>
-<DL>
-	<DT STYLE="margin-bottom: 0.1cm">The action <B>Copy file</B> copies
-	one or more files<SPAN STYLE="font-weight: normal">.</SPAN></DT></DL>
-<H2 CLASS="western" STYLE="margin-top: 0.3cm; margin-bottom: 0.1cm; font-weight: normal">
-Settings</H2>
-<TABLE WIDTH=100% BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0 BGCOLOR="#ccffff">
-	<COL WIDTH=256*>
+<BODY LANG="en-US" DIR="LTR">
+<H1>Copy file</H1>
+<p>
+	The action <B>Copy file</B> copies one or more files.
+</p>
+
+<H2>Settings</H2>
+<table class="settings">
 	<TR>
-		<TD WIDTH=100% VALIGN=TOP>
-			<P STYLE="margin-bottom: 0.1cm"><B>Source file</B></P>
-			<P STYLE="font-weight: normal">The name of a single file or
-			folder, or a wildcard pattern.</P>
-			<P STYLE="font-weight: normal">Both asterisks and question marks
-			are supported as wildcards. A match occurs when the pattern
-			appears in either the file's long/normal name or its 8.3 short
-			name.<BR>The file pattern is assumed to be in the working
-			directory if an absolute path isn't specified.</P>
+		<TD>
+			<h4>Source file</h4>
+			<p>The name of a single file or folder, or a wildcard pattern.</p>
+			<p>Both asterisks and question marks are supported as wildcards. A match occurs when the pattern appears in either the file's long/normal name or its 8.3 short name.
+				<br/>The file path is assumed to be in the working directory if an absolute path isn't specified.
+			</p>
 		</TD>
 	</TR>
 	<TR>
-		<TD WIDTH=100% VALIGN=TOP>
-			<P STYLE="margin-bottom: 0.1cm"><B>Destination file or folder</B></P>
-			<P STYLE="font-weight: normal">The name or pattern of the
-			destination, which is assumed to be in the working directory if an
-			absolute path isn't specified. To perform a simple copy --
-			retaining the existing file name(s) -- specify only the folder
-			name.</P>
+		<TD>
+			<h4>Destination file or folder</h4>
+			<p>The path of the destination. To perform a simple copy -- retaining the existing file name(s) -- specify only the folder path.
+				<br/>The file path is assumed to be in the working directory if an absolute path isn't specified.
+			</p>
 		</TD>
 	</TR>
 	<TR>
-		<TD WIDTH=100% VALIGN=TOP>
-			<P STYLE="margin-bottom: 0.1cm"><B>Overwrite</B></P>
-			<P STYLE="font-weight: normal">If <B>Overwrite</B> is checked,
-			existing files will be overwritten.</P>
-			<P STYLE="margin-bottom: 0.1cm; font-weight: normal"><FONT COLOR="#990000"><FONT SIZE=3>Note!</FONT></FONT></P>
-			<TABLE WIDTH=100% BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0 BGCOLOR="#ffcccc">
-				<COL WIDTH=256*>
+		<TD>
+			<h4>Overwrite</h4>
+			<p>If Overwrite is checked, existing files will be overwritten.</p>
+			<p class="warning">Be careful using that option. It may cause loss of data.</p>
+		</TD>
+	</TR>
+</table>
+
+<H2>Examples</H2>
+<table class="examples">
+	<TR>
+		<TD>
+			<p>Copy one file from one drive to MyDocuments folder.</p>
+			<table class="example">
 				<TR>
-					<TD WIDTH=100% VALIGN=TOP>
-						<P>Be carefully using that option. It may cause loss of data.</P>
+					<TD class="example-parameter">
+						<p>Source</p>
+					</TD>
+					<TD class="example-value">
+						<p>G:\example.txt</p>
 					</TD>
 				</TR>
-			</TABLE>
-			<H2 CLASS="western" STYLE="margin-top: 0cm; margin-bottom: 0cm; font-weight: normal">
-			<BR>
-			</H2>
-		</TD>
-	</TR>
-</TABLE>
-<P STYLE="margin-bottom: 0.1cm"><I><U><B>Examples:</B></U></I></P>
-<TABLE WIDTH=100% BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0 BGCOLOR="#ccffcc">
-	<COL WIDTH=256*>
-	<TR>
-		<TD WIDTH=100% VALIGN=TOP>
-			<P STYLE="margin-bottom: 0.1cm"><FONT FACE="Times New Roman, serif">Copy
-			one file from one drive to MyDocuments folder.</FONT></P>
-			<P STYLE="margin-bottom: 0.1cm"><FONT FACE="Times New Roman, serif">Source:
-				<FONT FACE="Consolas, monospace">G:\example.txt </FONT></FONT>
-			</P>
-			<P><FONT FACE="Times New Roman, serif">Destination:
-				<FONT FACE="Consolas, monospace">%</FONT><FONT FACE="Consolas, monospace"><SPAN STYLE="font-weight: normal">A_MyDocuments%</SPAN></FONT></FONT></P>
+				<TR>
+					<TD class="example-parameter">
+						<p>Destination</p>
+					</TD>
+					<TD class="example-value">
+						<p>%A_MyDocuments%</p>
+					</TD>
+				</TR>
+			</table>
 		</TD>
 	</TR>
 	<TR>
-		<TD WIDTH=100% VALIGN=TOP>
-			<P STYLE="margin-bottom: 0.1cm"><FONT FACE="Times New Roman, serif">Copy
-			all files from one drive to other drive.</FONT></P>
-			<P STYLE="margin-bottom: 0.1cm"><FONT FACE="Times New Roman, serif">Source:
-				<FONT FACE="Consolas, monospace">G:\* </FONT></FONT>
-			</P>
-			<P><FONT FACE="Times New Roman, serif">Destination: <FONT FACE="Consolas, monospace">	H:\*
-			</FONT></FONT>
-			</P>
+		<TD>
+			<p>Copy all files from one drive to other drive.</p>
+			<table class="example">
+				<TR>
+					<TD class="example-parameter">
+						<p>Source</p>
+					</TD>
+					<TD class="example-value">
+						<p>G:\*</p>
+					</TD>
+				</TR>
+				<TR>
+					<TD class="example-parameter">
+						<p>Destination</p>
+					</TD>
+					<TD class="example-value">
+						<p>H:\*</p>
+					</TD>
+				</TR>
+			</table>
 		</TD>
 	</TR>
 	<TR>
-		<TD WIDTH=100% VALIGN=TOP>
-			<P STYLE="margin-bottom: 0.1cm"><FONT FACE="Times New Roman, serif">Copy
-			one file from desktop to the working directory and rename it.</FONT></P>
-			<P STYLE="margin-bottom: 0.1cm"><FONT FACE="Times New Roman, serif">Source:
-				<FONT FACE="Consolas, monospace">%A_Desktop%\example.txt</FONT></FONT></P>
-			<P><FONT FACE="Times New Roman, serif">Destination:
-			<FONT FACE="Consolas, monospace">	RenamedExample.txt</FONT></FONT></P>
+		<TD>
+			<p>Copy one file from desktop to the working directory and rename it.</p>
+			<table class="example">
+				<TR>
+					<TD class="example-parameter">
+						<p>Source</p>
+					</TD>
+					<TD class="example-value">
+						<p>%A_Desktop%\example.txt</p>
+					</TD>
+				</TR>
+				<TR>
+					<TD class="example-parameter">
+						<p>Destination</p>
+					</TD>
+					<TD class="example-value">
+						<p>RenamedExample.txt</p>
+					</TD>
+				</TR>
+			</table>
 		</TD>
 	</TR>
-</TABLE>
-<P STYLE="margin-bottom: 0.1cm"><BR><BR>
-</P>
+</table>
+
 </BODY>
 </HTML>

@@ -1,5 +1,6 @@
-html{
-    font-family: Arial, Helvetica, sans-serif;
+html, table{
+    font-family: sans-serif;
+	font-size: 14px;
 }
 h1 {
 	color: black;
@@ -15,10 +16,15 @@ h2 {
 }
 p.warning {
 	border-left: 6px solid #ccc!important;
-	border-color: crimson!important;
-	background-color: rgb(255, 204, 204);
+	border-color: rgb(255, 0, 0)!important;
+	background-color: rgb(255, 196, 196);
 	padding: 0.1em 16px;
-	
+}
+p.info {
+	border-left: 6px solid #ccc!important;
+	border-color: rgb(206, 203, 0)!important;
+	background-color: rgb(255, 254, 185);
+	padding: 0.1em 16px;
 }
 table {
 	border-color: #000000;
@@ -39,7 +45,7 @@ td.example-parameter {
     border-width: 1px;
 }
 td.example-value {
-    font-family: "Lucida Console", "Courier New", monospace;
+    font-family: monospace;
 	width: 100%;
     border-width: 1px;
 }
@@ -56,18 +62,37 @@ table.example {
     background-color: #ccffcc;
     border-width: 1px;
 }
+table.variables {
+	width: 100%;
+    background-color: #ccffcc;
+}
 
-
+table.codeblock {
+	width: 100%;
+    background-color: #d3d3d3;
+    font-family: monospace;
+}
 ul.examples {
     background-color: #ccffcc;
 	border-color: #000000;
     border-width: 1px;
 	border-style: solid;
-	line-height: 50%;
-    font-family: "Lucida Console", "Courier New", monospace;
+	line-height: 100%;
+    font-family: monospace;
 }
 
 i {
-    font-family: Arial, Helvetica, sans-serif;
-	color:grey;
+    font-family: sans-serif;
+	color:rgb(59, 59, 59);
 }
+
+h4 {
+    font-size: 16px;
+}
+h4.VariableName {
+    font-family: monospace;
+}
+code {
+	background-color: rgb(228, 228, 228);
+}
+

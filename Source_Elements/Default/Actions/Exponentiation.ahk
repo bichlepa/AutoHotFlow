@@ -56,11 +56,11 @@ Element_getParametrizationDetails_Action_Exponentiation(Environment)
 	parametersToEdit.push({type: "Label", label: x_lang("Output_Variable_name")})
 	parametersToEdit.push({type: "edit", id: "Varname", default: "NewVariable", content: "VariableName", WarnIfEmpty: true})
 
-	parametersToEdit.push({type: "Label", label:  x_lang("Input number")})
-	parametersToEdit.push({type: "edit", id: "VarValue", default: 3, content: "Expression", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label:  x_lang("Base")})
+	parametersToEdit.push({type: "edit", id: "VarValue", default: 3, content: "Number", WarnIfEmpty: true})
 
 	parametersToEdit.push({type: "Label", label:  x_lang("Exponent")})
-	parametersToEdit.push({type: "Edit", id: "Exponent", default: 2, content: "Expression", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Edit", id: "Exponent", default: 2, content: "Number", WarnIfEmpty: true})
 	
 	return parametersToEdit
 }

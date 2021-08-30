@@ -106,7 +106,7 @@ Element_run_Condition_Window_Active(Environment, ElementParameters)
 		return
 	}
 
-	if not windowID
+	if (not windowID or not WinActive("ahk_id " windowID))
 	{
 		; window does not exist. Finish
 		x_finish(Environment, "no")
