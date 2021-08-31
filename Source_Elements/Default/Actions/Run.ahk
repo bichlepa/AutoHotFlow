@@ -58,7 +58,7 @@ Element_getParametrizationDetails_Action_Run(Environment)
 
 	parametersToEdit.push({type: "Label", label: x_lang("Working directory")})
 	parametersToEdit.push({type: "Radio", id: "WhichWorkingDir", default: "Default", result: "enum", choices: [x_lang("Working directory of the flow"), x_lang("Following working directory")], enum: ["Default", "Specified"]})
-	parametersToEdit.push({type: "Edit", id: "WorkingDir", content: ["String", "RawString"], contentID: "WorkingDirContent", contentDefault: "string", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Folder", id: "WorkingDir", label: x_lang("Select a folder")})
 
 	parametersToEdit.push({type: "Label", label: x_lang("Run mode")})
 	parametersToEdit.push({type: "Radio", id: "RunMode", default: "Normal", result: "enum", choices: [x_lang("Run normally"), x_lang("Run maximized"), x_lang("Run minimized"), x_lang("Run hidden")], enum: ["Normal", "Max", "Min", "Hide"]})
@@ -78,6 +78,7 @@ Element_GenerateName_Action_Run(Environment, ElementParameters)
 ;- Correct misconfiguration
 Element_CheckSettings_Action_Run(Environment, ElementParameters, staticValues)
 {	
+	x_Par_Enable("WorkingDir", ElementParameters.WhichWorkingDir = "Specified")
 }
 
 

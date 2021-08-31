@@ -1,5 +1,13 @@
 ﻿{
-  "allConnections": {},
+  "allConnections": {
+    "connection0000000008": {
+      "ConnectionType": "normal",
+      "from": "element0000000001",
+      "ID": "connection0000000008",
+      "to": "element0000000007",
+      "type": "Connection"
+    }
+  },
   "allElements": {
     "element0000000001": {
       "class": "Trigger_Manual",
@@ -17,37 +25,68 @@
       "y": 0
     },
     "element0000000007": {
-      "class": "Action_Move_Window",
+      "class": "Action_Screenshot",
       "ID": "element0000000007",
-      "name": "Move Window: ",
+      "name": "Screenshot",
       "package": "default",
       "pars": {
         "ahk_class": "",
         "ahk_exe": "",
         "ahk_id": "",
         "ahk_pid": "",
+        "AllScreens": 1,
         "ExcludeText": "",
         "excludeTitle": "",
+        "file": "",
         "FindHiddenText": 0,
         "FindHiddenWindow": 0,
-        "Height": 200,
-        "MouseTracker": "Grab coordinates from existing window",
+        "GetCoordinates": "Get coordinates",
+        "Method": "Gdip_FromScreen",
+        "ScreenNumber": 1,
         "TitleMatchMode": 1,
-        "Width": 300,
-        "WinMoveEvent": "Maximize",
+        "WhichRegion": "Screen",
         "winText": "",
         "Wintitle": "",
-        "Xpos": 10,
-        "Ypos": 20
+        "x1": 10,
+        "x2": 600,
+        "y1": 20,
+        "y2": 700
       },
       "StandardName": "1",
       "type": "action",
       "x": "350",
       "y": "385"
+    },
+    "element0000000009": {
+      "class": "Action_Tooltip",
+      "ID": "element0000000009",
+      "name": "Tooltip: %FileText% - 2 s - Follow Mouse",
+      "package": "action",
+      "pars": {
+        "duration": 2,
+        "follow_mouse": 1,
+        "text": "%FileText%",
+        "Unit": "Seconds"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "245",
+      "y": "665"
+    },
+    "element0000000012": {
+      "class": "Condition_Debug_Dialog",
+      "ID": "element0000000012",
+      "name": "Debug Dialog",
+      "package": "default",
+      "pars": {},
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "525",
+      "y": "595"
     }
   },
   "category": "",
-  "ElementIDCounter": "7",
+  "ElementIDCounter": "12",
   "flowSettings": {
     "DefaultWorkingDir": 1,
     "ExecutionPolicy": "default",

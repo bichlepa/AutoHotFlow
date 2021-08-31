@@ -56,7 +56,7 @@ Element_getParametrizationDetails_Action_New_Time(Environment)
 	parametersToEdit.push({type: "Label", label: x_lang("Variable_name")})
 	parametersToEdit.push({type: "Edit", id: "Varname", default: "NewTime", content: "VariableName", WarnIfEmpty: true})
 
-	parametersToEdit.push({type: "Label", label:  x_lang("Date")})
+	parametersToEdit.push({type: "Label", label:  x_lang("Time")})
 	parametersToEdit.push({type: "Radio", id: "WhichTime", default: "Specified", choices: [x_lang("Current time"), x_lang("Specified time")], result: "enum", enum: ["Current", "Specified"]})
 	parametersToEdit.push({type: "Dateandtime", id: "Time"})
 	

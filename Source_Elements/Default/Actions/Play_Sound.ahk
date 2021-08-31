@@ -66,6 +66,7 @@ Element_getParametrizationDetails_Action_Play_Sound(Environment)
 	parametersToEdit.push({type: "File", id: "soundfile", label: x_lang("Select a sound file"), options: 1})
 
 	parametersToEdit.push({type: "Label", label: x_lang("Preview")})
+	parametersToEdit.push({type: "button", id: "startSoundNow",  goto: "Action_Play_Sound_StartSoundNow", label: x_lang("Start playback")})
 	parametersToEdit.push({type: "button", id: "stopSoundNow",  goto: "Action_Play_Sound_StopSoundNow", label: x_lang("Stop playback now")})
 	
 	; request that the result of this function is never cached (because of the system sound list)
@@ -73,6 +74,20 @@ Element_getParametrizationDetails_Action_Play_Sound(Environment)
 	return parametersToEdit
 }
 
+Action_Play_Sound_StartSoundNow()
+{
+	whichSound := x_Par_GetValue("WhichSound")
+	if (whichSound = "SystemSound")
+	{
+		systemSound := x_Par_GetValue("systemSound")
+		SoundPlay, %a_windir%\media\%systemSound%
+	}
+	Else
+	{
+		soundfile := x_Par_GetValue("soundfile")
+		SoundPlay, %soundfile%
+	}
+}
 Action_Play_Sound_StopSoundNow()
 {
 	; stop soundplay
@@ -109,19 +124,6 @@ Element_CheckSettings_Action_Play_Sound(Environment, ElementParameters, staticVa
 	{
 		x_Par_Enable("systemSound")
 		x_Par_Disable("soundfile")
-		
-		; play sound as preview
-		if (playedSound != ElementParameters.systemSound)
-		{
-			playedSound := ElementParameters.systemSound
-			if (not x_FirstCallOfCheckSettings(Environment))
-			{
-				if playedSound
-				{
-					SoundPlay, %a_windir%\media\%playedSound%
-				}
-			}
-		}
 	}
 }
 

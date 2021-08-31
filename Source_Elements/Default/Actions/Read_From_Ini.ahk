@@ -70,8 +70,7 @@ Element_getParametrizationDetails_Action_Read_From_Ini(Environment)
 
 	parametersToEdit.push({type: "Label", label: x_lang("Behavior on error")})
 	parametersToEdit.push({type: "Radio", id: "WhenError", default: 1, choices: [x_lang("Insert default value in the variable"), x_lang("Throw exception")], result: "enum", enum: ["Default", "Exception"]})
-
-	parametersToEdit.push({type: "Label", label: x_lang("Default value on failure")})
+	parametersToEdit.push({type: "Label", label: x_lang("Default value on failure"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: "Default", default: "ERROR", content: "String"})
 	
 	return parametersToEdit

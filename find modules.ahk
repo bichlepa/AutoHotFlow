@@ -241,7 +241,6 @@ FileAppend, % aboutCode, % aboutCodeFilePath, utf-8
 ; FileAppend,%apifileEditor%, %A_WorkingDir%\source_Editor\api\API Caller Elements.ahk, utf-8
 ; FileAppend,%apifileMain%, %A_WorkingDir%\source_main\threads\API Caller Elements.ahk, utf-8
 
-MsgBox, finished
 
 
 exitapp

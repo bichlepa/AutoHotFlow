@@ -8,5 +8,6 @@
   "LogToFile": "0",
   "runAsAdmin": "0",
   "ShowElementsLevel": "Programmer",
-  "UILanguage": "en"
+  "UILanguage": "en",
+  "developing": 1
 }

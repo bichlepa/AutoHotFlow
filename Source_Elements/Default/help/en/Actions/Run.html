@@ -1,107 +1,118 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<html>
-<head>
-	<meta http-equiv="content-type" content="text/html; charset=windows-1252"/>
-	<title>Bedienung</title>
-	<meta name="generator" content="LibreOffice 4.4.3.2 (Windows)"/>
-	<meta name="created" content="00:00:00"/>
-	<meta name="changedby" content="Paul Bichler"/>
-	<meta name="changed" content="2015-06-20T13:14:49.002000000"/>
-	<meta name="created" content="00:00:00">
-	<meta name="changed" content="2015-06-16T20:03:01.316000000">
-	<meta name="CHANGEDBY" content="Paul Bichler">
-	<style type="text/css">
-		td p { color: #000000 }
-		h1 { color: #000000 }
-		p { color: #000000 }
-		dt { color: #000000 }
-		h2 { color: #000000 }
-		h2.western { font-family: "Albany", sans-serif; font-size: 14pt; font-style: italic }
-		h2.cjk { font-family: "HG Mincho Light J"; font-size: 14pt; font-style: italic }
-		h2.ctl { font-family: "Arial Unicode MS"; font-size: 14pt; font-style: italic }
-	</style>
-</head>
-<body lang="en-US" text="#000000" dir="ltr">
-<h1 style="margin-top: 0.3cm; margin-bottom: 0.4cm; page-break-before: always">
-Run</h1>
-<dl>
-	<dt style="margin-bottom: 0.1cm">The action <b>Run</b> executes <span style="font-weight: normal">an
-	external program.</span></dt></dl>
-<h2 class="western" style="margin-top: 0.3cm; margin-bottom: 0.1cm; font-weight: normal">
-Settings</h2>
-<table width="100%" cellpadding="4" cellspacing="0" bgcolor="#ccffff">
-	<col width="256*">
-	<tr>
-		<td width="100%" valign="top" style="border: 1px solid #000000; padding: 0.11cm">
-			<p style="margin-bottom: 0.1cm"><b>Target</b></p>
-			<p style="font-weight: normal">The name of a single file,
-			document, URL that will be opened.<br/>
-If this field is a file
-			and an absolute path isn't specified, the file pattern is assumed
-			to be in the working directory.</p>
-		</td>
-	</tr>
-	<tr>
-		<td width="100%" valign="top" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
-			<p style="margin-bottom: 0.1cm"><b>Value</b></p>
-			<p style="font-weight: normal">If <b>Replace variables</b> is
-			checked, the variable names which are enclosed in percent signs
-			are replaced by their value.</p>
-		</td>
-	</tr>
-</table>
-<p style="margin-bottom: 0.1cm"><i><u><b>Examples:</b></u></i></p>
-<table width="100%" cellpadding="4" cellspacing="0" bgcolor="#ccffcc">
-	<col width="256*">
-	<tr>
-		<td width="100%" valign="top" style="border: 1px solid #000000; padding: 0.11cm">
-			<p style="margin-bottom: 0.1cm"><font face="Times New Roman, serif">Run
-			Notepad.</font></p>
-			<p><font face="Times New Roman, serif">Target: <font face="Consolas, monospace"><span style="font-weight: normal">notepad</span></font></font></p>
-		</td>
-	</tr>
-	<tr>
-		<td width="100%" valign="top" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
-			<p style="margin-bottom: 0.1cm"><font face="Times New Roman, serif">Run
-			VLC media player.</font></p>
-			<p><font face="Times New Roman, serif">Target: <font face="Consolas, monospace">C:\Program
-			Files\VideoLAN\VLC\vlc.exe</font></font></p>
-		</td>
-	</tr>
-	<tr>
-		<td width="100%" valign="top" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
-			<p style="margin-bottom: 0.1cm"><font face="Times New Roman, serif">Open
-			a document.</font></p>
-			<p><font face="Times New Roman, serif">Target:
-			</font><font face="Consolas, monospace">%A_MyDocuments%\<br/>
-</font><font face="Times New Roman, serif">Check:
-			</font><font face="Times New Roman, serif"><b>Replace variables</b></font></p>
-		</td>
-	</tr>
-	<tr>
-		<td width="100%" valign="top" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
-			<p style="margin-bottom: 0.1cm"><font face="Times New Roman, serif">Open
-			a website.</font></p>
-			<p><font face="Times New Roman, serif">Target:
-			<font face="Consolas, monospace">http://www.autohotkey.com</font></font></p>
-		</td>
-	</tr>
-</table>
-<h2 class="western" style="margin-top: 0.3cm; margin-bottom: 0.1cm; font-weight: normal">
-Supplied variables</h2>
-<table width="100%" cellpadding="4" cellspacing="0" bgcolor="#ccffff">
-	<col width="256*">
-	<tr>
-		<td width="100%" valign="top" bgcolor="#ffffcc" style="border: 1px solid #000000; padding: 0.11cm">
-			<p style="margin-bottom: 0.1cm"><font face="Consolas, monospace"><b>A_PID</b></font></p>
-			<p style="font-weight: normal">contains the Process ID of the
-			launched process.</p>
-		</td>
-	</tr>
-</table>
-<h2 class="western" style="margin-top: 0.3cm; margin-bottom: 0.1cm"><br/>
-<br/>
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<link rel="stylesheet" href="../../stylesheet.css">
+	<link rel="stylesheet" href="stylesheet.css">
+	<link rel="stylesheet" href="../../../../../Help/stylesheet.css">
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<H1>Run</H1>
+<p>
+	The action <B>Run</B> runs an external program.
+</p>
 
-</h2>
-</body>
-</html>
+<H2>Settings</H2>
+<table class="settings">
+	<TR>
+		<TD>
+			<h4>Command</h4>
+			<p>The name of a single file, document, URL that will be opened.
+				<br/>If an absolute path isn't specified, the file pattern is assumed to be in the working directory.
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Working directory</h4>
+			<p>The working directory of the executed application. 
+				<br/>If an absolute path isn't specified, the file pattern is assumed to be in the working directory.
+				<br/>In many cases this parameter does not make a difference.
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Run mode</h4>
+			<p>Some applications can be started in a specific mode. This can be selected here.</p>
+		</TD>
+	</TR>
+</table>
+
+<H2>Supplied Variables</H2>
+<table class="variables">
+	<TR>
+		<TD>
+			<h4 class="VariableName">A_PID</h4>
+			<p>Process ID of the launched process.</p>
+		</TD>
+	</TR>
+</table>
+
+<H2>Examples</H2>
+<table class="examples">
+	<TR>
+		<TD>
+			<p>Run Notepad.</p>
+			<table class="example">
+				<TR>
+					<TD class="example-parameter">
+						<p>Command</p>
+					</TD>
+					<TD class="example-value">
+						<p>notepad</p>
+					</TD>
+				</TR>
+			</table>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<p>Run VLC media player.</p>
+			<table class="example">
+				<TR>
+					<TD class="example-parameter">
+						<p>Command</p>
+					</TD>
+					<TD class="example-value">
+						<p>C:\Program Files\VideoLAN\VLC\vlc.exe <i>(The VLC Media player may be installed in an other location)</i></p>
+					</TD>
+				</TR>
+			</table>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<p>Open a document.</p>
+			<table class="example">
+				<TR>
+					<TD class="example-parameter">
+						<p>Command</p>
+					</TD>
+					<TD class="example-value">
+						<p>%A_MyDocuments%\exampleDocument.odt</p>
+					</TD>
+				</TR>
+			</table>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<p>Open a website.</p>
+			<table class="example">
+				<TR>
+					<TD class="example-parameter">
+						<p>Command</p>
+					</TD>
+					<TD class="example-value">
+						<p>http://www.autohotkey.com</p>
+					</TD>
+				</TR>
+			</table>
+		</TD>
+	</TR>
+</table>
+
+
+</BODY>
+</HTML>

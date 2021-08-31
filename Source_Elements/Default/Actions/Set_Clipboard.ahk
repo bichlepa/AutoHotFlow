@@ -53,7 +53,7 @@ Element_getParametrizationDetails_Action_Set_Clipboard(Environment)
 {
 	parametersToEdit:=Object()
 	
-	
+	parametersToEdit.push({type: "Label", label: x_lang("New clipboard content")})
 	parametersToEdit.push({type: "Edit", id: "text", default: "New element", content: ["string", "expression"], contentID: "expression", contentDefault: "string"})
 	
 	return parametersToEdit

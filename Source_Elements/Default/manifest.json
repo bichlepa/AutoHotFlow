@@ -23,6 +23,7 @@
         "Exponentiation.ahk",
         "Change_character_case.ahk",
         "Get_string_Length.ahk",
+        "Replace_in_a_string.ahk",
         "Trim_a_string.ahk",
         "Split_a_string.ahk",
         "Substring.ahk",

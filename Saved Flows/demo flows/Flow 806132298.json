@@ -74,7 +74,7 @@
       "ConnectionType": "normal",
       "from": "element0000000018",
       "ID": "connection0000000022",
-      "to": "element0000000006",
+      "to": "element0000000030",
       "type": "Connection"
     },
     "connection0000000023": {
@@ -82,6 +82,20 @@
       "from": "element0000000006",
       "ID": "connection0000000023",
       "to": "element0000000024",
+      "type": "Connection"
+    },
+    "connection0000000028": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000028",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000029": {
+      "ConnectionType": "normal",
+      "from": "element0000000030",
+      "ID": "connection0000000029",
+      "to": "element0000000006",
       "type": "Connection"
     }
   },
@@ -156,7 +170,7 @@
       "StandardName": "1",
       "type": "Action",
       "x": "315",
-      "y": "875"
+      "y": "980"
     },
     "element0000000010": {
       "class": "Action_Search_in_a_string",
@@ -282,11 +296,30 @@
       "StandardName": "1",
       "type": "Action",
       "x": "315",
-      "y": "1015"
+      "y": "1120"
+    },
+    "element0000000030": {
+      "class": "Action_replace_in_a_string",
+      "ID": "element0000000030",
+      "name": "Replace in a string - joke - joke - <\/br> -  ",
+      "package": "default",
+      "pars": {
+        "CaseSensitive": "CaseInsensitive",
+        "expression": "Expression",
+        "ReplaceAll": "all",
+        "ReplaceText": " ",
+        "SearchText": "<\/br>",
+        "Varname": "joke",
+        "VarValue": "joke"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "315",
+      "y": "840"
     }
   },
-  "category": "demo",
-  "ElementIDCounter": "27",
+  "category": "",
+  "ElementIDCounter": "30",
   "flowSettings": {
     "DefaultWorkingDir": 1,
     "ExecutionPolicy": "default",

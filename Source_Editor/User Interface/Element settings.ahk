@@ -73,7 +73,7 @@ class ElementSettings
 
 		; add first gui elements
 		; All elements have the parameter "name" and "StandardName"
-		this.fields.push(new this.label({label: lang("name (name)")}))
+		this.fields.push(new this.label({label: lang("name (noun)")}))
 		this.fields.push(new this.name({id: ["name", "StandardName"]}))
 		
 		;Loop through all parameters
