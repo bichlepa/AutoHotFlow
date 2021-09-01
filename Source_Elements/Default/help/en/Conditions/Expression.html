@@ -1,83 +1,41 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<html>
-<head>
-	<meta http-equiv="content-type" content="text/html; charset=windows-1252"/>
-	<title>Bedienung</title>
-	<meta name="generator" content="LibreOffice 4.4.3.2 (Windows)"/>
-	<meta name="created" content="00:00:00"/>
-	<meta name="changedby" content="Paul Bichler"/>
-	<meta name="changed" content="2015-06-19T19:32:01.599000000"/>
-	<meta name="created" content="00:00:00">
-	<meta name="changedby" content="Paul Bichler">
-	<meta name="changed" content="2015-06-19T19:26:20.981000000">
-	<style type="text/css">
-		td p { color: #000000 }
-		h1 { color: #000000 }
-		p { color: #000000 }
-		dt { color: #000000 }
-		h2 { color: #000000 }
-		h2.western { font-family: "Albany", sans-serif; font-size: 14pt; font-style: italic }
-		h2.cjk { font-family: "HG Mincho Light J"; font-size: 14pt; font-style: italic }
-		h2.ctl { font-family: "Arial Unicode MS"; font-size: 14pt; font-style: italic }
-	</style>
-</head>
-<body lang="en-US" text="#000000" dir="ltr">
-<h1 style="margin-top: 0.3cm; margin-bottom: 0.4cm; page-break-before: always">
-Expressions</h1>
-<dl>
-	<dt style="margin-bottom: 0.1cm">The condition <b>Expression</b>
-	<span style="font-weight: normal">evaluates an expression and
-	decides whether the result is true or false. This is similar to an
-	if-statement.</span></dt></dl>
-<h2 class="western" style="margin-top: 0.3cm; margin-bottom: 0.1cm; font-weight: normal">
-Settings</h2>
-<table width="100%" cellpadding="4" cellspacing="0" bgcolor="#ccffff">
-	<col width="256*">
-	<tr>
-		<td width="100%" valign="top" style="border: 1px solid #000000; padding: 0.11cm">
-			<p style="margin-bottom: 0.1cm"><b>Expression</b></p>
-			<p style="font-weight: normal">Expression to evaluate.<br/>
-The
-			condition exits with &ldquo;yes&rdquo; if the result of the
-			expression is 1 or an other value without 0.<br/>
-The condition
-			exits with &ldquo;no&rdquo; if the result is 0 or empty.</p>
-			<p style="font-weight: normal"><i><u><b>Examples:</b></u></i></p>
-			<table width="100%" cellpadding="4" cellspacing="0" bgcolor="#ccffcc">
-				<col width="256*">
-				<tr>
-					<td width="100%" valign="top" style="border-top: 1px solid #000000; border-bottom: none; border-left: 1px solid #000000; border-right: 1px solid #000000; padding: 0cm 0.11cm">
-						<p style="font-variant: normal; font-style: normal; font-weight: normal">
-						<font face="Consolas, monospace">(1 or 0) and 1 <font color="#0000ff"><i>(results
-						to 1)</i></font></font></p>
-					</td>
-				</tr>
-				<tr>
-					<td width="100%" valign="top" style="border-top: none; border-bottom: none; border-left: 1px solid #000000; border-right: 1px solid #000000; padding: 0cm 0.11cm">
-						<p style="font-variant: normal; font-style: normal; font-weight: normal">
-						<font face="Consolas, monospace">number &gt; 5 &amp;&amp;
-						number &lt;= 7 <font color="#0000ff"><i>(results to 1 if number
-						is between 6 or 7)</i></font></font></p>
-					</td>
-				</tr>
-				<tr>
-					<td width="100%" valign="top" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
-						<p style="font-variant: normal; font-style: normal; font-weight: normal">
-						<font face="Consolas, monospace">Var%VarContainingTwo%
-						<font color="#0000ff"><i>(Accessing variable Var2)</i></font></font></p>
-					</td>
-				</tr>
-			</table>
-			<p style="font-weight: normal"><br/>
-<br/>
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<link rel="stylesheet" href="../../stylesheet.css">
+	<link rel="stylesheet" href="stylesheet.css">
+	<link rel="stylesheet" href="../../../../../Help/stylesheet.css">
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<H1>Expressions</H1>
+<p>
+	The condition <B>Expressions</B> evaluates an expression and decides whether the result is true or false. This is similar to an if-statement in most programming languages.
+</p>
 
+<H2>Settings</H2>
+<table class="settings">
+	<TR>
+		<TD>
+			<h4>Expression</h4>
+			<p>Expression to evaluate.
+				<br/>The condition exits with <b>yes</b> if the result of the expression is not 0 or empty.
+				<br/>The condition exits with <b>no</b> if the result is 0 or empty.
 			</p>
-		</td>
-	</tr>
+			<ul class="examples"><p"><i>Examples:</i></p>
+				<li/>
+					<p"><code>(1 or 0) and 1</code> <i>(results to 1)</i></p>
+				<li/>
+					<p"><code>number > 5 && number <= 7</code> <i>(results to 1 if number is between 6 or 7)</i></p>
+				<li/>
+					<p"><code>Var%VarContainingTwo%</code> <i>(Accessing variable Var2)</i></p>
+		</TD>
+	</TR>
 </table>
-<h2 class="western" style="margin-top: 0.3cm; margin-bottom: 0.1cm; font-weight: normal">
-Remarks</h2>
-<p style="margin-bottom: 0.1cm">Read more about expressions in the
-chapter <a href="../Variables.html">Variables</a>.</p>
-</body>
-</html>
+
+<H2>Remarks</H2>
+<p>
+	Read more about expressions in the chapter <a href="../Variables.html">Variables</a>.
+</p>
+
+</BODY>
+</HTML>

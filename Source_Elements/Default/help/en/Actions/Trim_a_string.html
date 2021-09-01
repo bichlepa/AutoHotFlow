@@ -1,130 +1,138 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<html>
-<head>
-	<meta http-equiv="content-type" content="text/html; charset=windows-1252"/>
-	<title>Bedienung</title>
-	<meta name="generator" content="LibreOffice 4.4.3.2 (Windows)"/>
-	<meta name="created" content="00:00:00"/>
-	<meta name="changedby" content="Paul Bichler"/>
-	<meta name="changed" content="2015-06-19T17:19:12.604000000"/>
-	<style type="text/css">
-		td p { color: #000000 }
-		h1 { color: #000000 }
-		p { color: #000000 }
-		dt { color: #000000 }
-		dd { color: #000000 }
-		h2 { color: #000000 }
-		h2.western { font-family: "Albany", sans-serif; font-size: 14pt; font-style: italic }
-		h2.cjk { font-family: "HG Mincho Light J"; font-size: 14pt; font-style: italic }
-		h2.ctl { font-family: "Arial Unicode MS"; font-size: 14pt; font-style: italic }
-	</style>
-</head>
-<body lang="en-US" text="#000000" dir="ltr">
-<h1 style="margin-top: 0.3cm; margin-bottom: 0.4cm; page-break-before: always">
-Trim a string</h1>
-<dl>
-	<dt style="margin-bottom: 0.1cm">The action <b>Trim a string</b>
-	removes one or more characters from the beginning and/or end of a
-	string<span style="font-weight: normal">.</span></dt></dl>
-<h2 class="western" style="margin-top: 0.3cm; margin-bottom: 0.1cm; font-weight: normal">
-Settings</h2>
-<table width="100%" cellpadding="4" cellspacing="0" bgcolor="#ccffff">
-	<col width="256*">
-	<tr>
-		<td width="100%" valign="top" style="border: 1px solid #000000; padding: 0.11cm">
-			<p style="margin-bottom: 0.1cm"><b>Output variable name</b></p>
-			<p style="font-weight: normal">Name of the variable which will
-			contain the trimmed string. It can be the same variable as the
-			input string.</p>
-		</td>
-	</tr>
-	<tr>
-		<td width="100%" valign="top" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
-			<p style="margin-bottom: 0.1cm"><b>Input string</b></p>
-			<p><span style="font-weight: normal">A</span><span style="font-weight: normal">n
-			input</span><span style="font-weight: normal"> string which</span>
-			will be trimmed.</p>
-		</td>
-	</tr>
-	<tr>
-		<td width="100%" valign="top" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
-			<p style="margin-bottom: 0.1cm"><b>Operation</b></p>
-			<p style="font-weight: normal">If <b>Remove a number of characters</b>
-			is selected, a specified count of characters from left and/or
-			right side of the string will be removed.<br/>
-If <b>Remove
-			specific characters</b> is selected, some specific characters from
-			left and/or right side of the string will be removed.</p>
-		</td>
-	</tr>
-	<tr>
-		<td width="100%" valign="top" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
-			<dl>
-				<dd style="margin-left: 0cm; margin-bottom: 0.1cm"><b>Remove from
-				which side</b></dd><dd style="margin-left: 0cm; font-weight: normal">
-				Select whether the characters should be removed from left-hand
-				and/or right-hand side of the string.</dd></dl>
-		</td>
-	</tr>
-	<tr>
-		<td width="100%" valign="top" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
-			<dl>
-				<dd style="margin-left: 0cm; margin-bottom: 0.1cm"><b>Count of
-				characters</b></dd><dd style="margin-left: 0cm; font-weight: normal">
-				Only accessible if <b>Remove a number of characters</b> is
-				selected.<br/>
-Specify how many characters will be removed.</dd></dl>
-		</td>
-	</tr>
-	<tr>
-		<td width="100%" valign="top" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
-			<dl>
-				<dd style="margin-left: 0cm; margin-bottom: 0.1cm"><b>Which
-				characters</b></dd></dl>
-			<p style="margin-bottom: 0.1cm; font-weight: normal">
-			Only accessible if <b>Remove specific characters</b> is selected.</p>
-			<p style="margin-bottom: 0cm"><span style="font-weight: normal">This
-			field contains the characters (case sensitive) </span>to exclude
-			from the beginning and end of the input string.</p>
-			<p style="margin-bottom: 0cm; font-weight: normal">You can use a
-			space, tabulator and linefeed by using following variables:</p>
-			<p><font face="Consolas, monospace"><b>a_space, a_tab, a_lf</b></font></p>
-		</td>
-	</tr>
-</table>
-<p style="margin-bottom: 0.1cm"><i><u><b>Examples:</b></u></i></p>
-<table width="100%" cellpadding="4" cellspacing="0" bgcolor="#ccffcc">
-	<col width="256*">
-	<tr>
-		<td width="100%" valign="top" style="border: 1px solid #000000; padding: 0.11cm">
-			<p><font face="Liberation Serif, serif">Trim the word &ldquo;Hello&rdquo;
-			and the space from the string &ldquo;Hello world!&rdquo;.<br/>
-Operation:
-			<b>Remove a number of characters<br/>
-</b><span style="font-weight: normal">Remove
-			from which side:</span><b> Left-hand side</b><br/>
-Count of
-			characters: <b>6</b></font></p>
-		</td>
-	</tr>
-	<tr>
-		<td width="100%" valign="top" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
-			<p><font face="Liberation Serif, serif">Remove the spaces and
-			characters from both sides of the string &ldquo;  Hello world!  
-			&ldquo;.<br/>
-<span style="font-weight: normal">Operation:</span><b>
-			</b><b>Remove specific characters<br/>
-</b><span style="font-weight: normal">Remove
-			from which side:</span><b> Left-hand side </b><span style="font-weight: normal">and</span><b>
-			Right-hand side</b><b><br/>
-</b><span style="font-weight: normal">Which
-			characters: </span><b>%a_space%%a_tab%</b></font></p>
-		</td>
-	</tr>
-</table>
-<p style="margin-bottom: 0.1cm"><br/>
-<br/>
-
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<link rel="stylesheet" href="../../stylesheet.css">
+	<link rel="stylesheet" href="stylesheet.css">
+	<link rel="stylesheet" href="../../../../../Help/stylesheet.css">
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<H1>Trim a string</H1>
+<p>
+	The action <B>Trim a string</B> removes one or more characters from the beginning and/or end of a string.
 </p>
-</body>
-</html>
+
+<H2>Settings</H2>
+<table class="settings">
+	<TR>
+		<TD>
+			<h4>Output variable name</h4>
+			<p>Name of the variable which will contain the trimmed string. It can be the same variable as the input string.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Input string</h4>
+			<p>An input string which will be trimmed.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Operation</h4>
+			<p>If <b>Remove a number of characters</b> is selected, a specified count of characters from left and/or right side of the string will be removed.
+				<br/>If <b>Remove specific characters</b> is selected, some specific characters from left and/or right side of the string will be removed.
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Remove from which side</h4>
+			<p>Select whether the characters should be removed from left-hand and/or right-hand side of the string.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Count of characters</h4>
+			<p>Only accessible if <b>Remove a number of characters</b> is selected.
+				<br/>Specify how many characters will be removed.
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Which characters</h4>
+			<p>Only accessible if <b>Remove specific characters</b> is selected.
+				<br/>This field contains the characters (case sensitive) to exclude from the beginning and/or end of the input string.
+			</p>
+			<ul class="examples"><i>Examples:</i>
+				<li/>
+					<p><code>,.:;-!?</code> <i>(Omit punctuation characters)</i></p>
+				<li/>
+					<p"><code>%a_space%%a_tab%%a_lf%%a_cr%</code> <i>(omit whitespaces)</i></p>
+			</ul>
+		</TD>
+	</TR>
+</table>
+
+
+<H2>Examples</H2>
+<table class="examples">
+	<TR>
+		<TD>
+			<p>Extract the word "Hello" and the space from the string "Hello world!".</p>
+			<table class="example">
+				<TR>
+					<TD class="example-parameter">
+						<p>Operation</p>
+					</TD>
+					<TD class="example-value">
+						<p>◉ Remove a number of characters</p>
+					</TD>
+				</TR>
+				<TR>
+					<TD class="example-parameter">
+						<p>Remove from which side</p>
+					</TD>
+					<TD class="example-value">
+						<p>☑ Left-hand side
+							<br/>☐ Right-hand side</p>
+					</TD>
+				</TR>
+				<TR>
+					<TD class="example-parameter">
+						<p>Count of characters</p>
+					</TD>
+					<TD class="example-value">
+						<p>6</p>
+					</TD>
+				</TR>
+			</table>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<p>Remove the spaces from both sides of the string " Hello world! ".</p>
+			<table class="example">
+				<TR>
+					<TD class="example-parameter">
+						<p>Operation</p>
+					</TD>
+					<TD class="example-value">
+						<p>◉ Remove specific characters</p>
+					</TD>
+				</TR>
+				<TR>
+					<TD class="example-parameter">
+						<p>Remove from which side</p>
+					</TD>
+					<TD class="example-value">
+						<p>☑ Left-hand side
+							<br/>☑ Right-hand side</p>
+					</TD>
+				</TR>
+				<TR>
+					<TD class="example-parameter">
+						<p>Which characters</p>
+					</TD>
+					<TD class="example-value">
+						<p>%a_space%</p>
+					</TD>
+				</TR>
+			</table>
+		</TD>
+	</TR>
+</table>
+
+
+</BODY>
+</HTML>

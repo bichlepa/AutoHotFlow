@@ -1,0 +1,40 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<link rel="stylesheet" href="../../stylesheet.css">
+	<link rel="stylesheet" href="stylesheet.css">
+	<link rel="stylesheet" href="../../../../../Help/stylesheet.css">
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<H1>Trace point check</H1>
+<p>
+	The action <B>Trace point check</B> is used to debug the flow.
+	<br/>Trace points can be added anywhere in the flow with the action <b>Trace point</b>. With this action it is possible to check which trace points have passed.
+	<br/>You can define freely which trace points must have beed passed and which mustn't have been passed. You can also ignore any trace point.
+</p>
+
+<H2>Settings</H2>
+<table class="settings">
+	<TR>
+		<TD>
+			<h4>Trace points which must have been passed</h4>
+			<p>If <b>All trace points</b> is checked, all trace points will be checked.
+			<br/>You may exclude some trace points under <b>Trace points which must not have been passed</b>.</p>
+			<p>If <b>All trace points</b> is not checked, you can select which trace point will be checked. It is allowed not to select any trace point.</p>
+			<p>The action will throw an exception if any of the selected tracepoints have not passed until the moment when this action is executed.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Trace points which must not have been passed</h4>
+			<p>If <b>All trace points</b> is checked, all trace points will be checked.
+			<br/>You may exclude some trace points under <b>Trace points which must have been passed</b>.</p>
+			<p>If <b>All trace points</b> is not checked, you can select which trace point will be checked. It is allowed not to select any trace point.</p>
+			<p>The action will throw an exception if any of the selected tracepoints have passed until the moment when this action is executed.</p>
+		</TD>
+	</TR>
+</table>
+
+</BODY>
+</HTML>

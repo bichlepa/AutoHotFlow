@@ -53,7 +53,7 @@ Element_getParametrizationDetails_Action_Set_file_attributes(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: x_lang("Select file")})
+	parametersToEdit.push({type: "Label", label: x_lang("File path")})
 	parametersToEdit.push({type: "File", id: "file", label: x_lang("Select a file")})
 
 	parametersToEdit.push({type: "Label", label: x_lang("Attributes")})

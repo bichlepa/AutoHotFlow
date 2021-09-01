@@ -75,10 +75,10 @@ Element_getParametrizationDetails_Condition_Confirmation_Dialog(Environment)
 	parametersToEdit.push({type: "Checkbox", id: "ShowCancelButton", default: 0, label: x_lang("Show cancel button")})
 	parametersToEdit.push({type: "Label", label: x_lang("Button text"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: "ButtonLabelCancel", default: x_lang("Cancel"), content: "String", WarnIfEmpty: true })
-	parametersToEdit.push({type: "Label", label: x_lang("Default Button"), size: "small"})
-	parametersToEdit.push({type: "Radio", id: "DefaultButton", default: "No", result: "enum", choices: [x_lang("Yes"), x_lang("No"), x_lang("Cancel")], enum: ["Yes", "No", "Cancel"]})
 	parametersToEdit.push({type: "Label", label: x_lang("Result if cancelled"), size: "small"})
 	parametersToEdit.push({type: "Radio", id: "IfDismiss", default: "Exception", result: "enum", choices: [x_lang("Yes"), x_lang("No"), x_lang("Throw exception")], enum: ["Yes", "No", "Exception"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Default Button")})
+	parametersToEdit.push({type: "Radio", id: "DefaultButton", default: "No", result: "enum", choices: [x_lang("Yes"), x_lang("No"), x_lang("Cancel")], enum: ["Yes", "No", "Cancel"]})
 	
 	
 	return parametersToEdit

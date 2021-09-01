@@ -64,11 +64,11 @@ Element_getParametrizationDetails_Action_Trace_Point_Check(Environment)
 	}
 	
 	parametersToEdit := Object()
-	parametersToEdit.push({type: "Label", label: x_lang("Tracepoints which must be passed")})
-	parametersToEdit.push({type: "Checkbox", id: "MustPassTracepointsAll", default: 0, label: x_lang("All tracepoints")})
+	parametersToEdit.push({type: "Label", label: x_lang("Trace points which must have been passed")})
+	parametersToEdit.push({type: "Checkbox", id: "MustPassTracepointsAll", default: 0, label: x_lang("All trace points")})
 	parametersToEdit.push({type: "ListBox", id: "MustPassTracepoints", result: "String", choices: allTracePointIDs, multi: True})
-	parametersToEdit.push({type: "Label", label: x_lang("Tracepoints which must not be passed")})
-	parametersToEdit.push({type: "Checkbox", id: "MustNotPassTracepointsAll", default: 0, label: x_lang("All tracepoints")})
+	parametersToEdit.push({type: "Label", label: x_lang("Trace points which must not have been passed")})
+	parametersToEdit.push({type: "Checkbox", id: "MustNotPassTracepointsAll", default: 0, label: x_lang("All trace points")})
 	parametersToEdit.push({type: "ListBox", id: "MustNotPassTracepoints", result: "String", choices: allTracePointIDs, multi: True})
 	
 	; request that the result of this function is never cached (because of the trace point list)
@@ -87,37 +87,37 @@ Element_GenerateName_Action_Trace_Point_Check(Environment, ElementParameters)
 	{
 		if (not mustNotPassSelected)
 		{
-			tracePointText := x_lang("Must pass all tracepoints")
+			tracePointText := x_lang("Must pass all trace points")
 		}
 		Else
 		{
-			tracePointText := x_lang("Must pass all tracepoints with exceptions")
+			tracePointText := x_lang("Must pass all trace points with exceptions")
 		}
 	}
 	else if (ElementParameters.MustNotPassTracepointsAll)
 	{
 		if (not mustPassSelected)
 		{
-			tracePointText := x_lang("Must not pass any tracepoint")
+			tracePointText := x_lang("Must not pass any trace point")
 		}
 		Else
 		{
-			tracePointText := x_lang("Must not pass any tracepoint with exceptions")
+			tracePointText := x_lang("Must not pass any trace point with exceptions")
 		}
 	}
 	Else
 	{
 		if (mustPassSelected and mustNotPassSelected)
 		{
-			tracePointText := x_lang("Must pass some selected tracepoints and must not pass some selected tracepoints")
+			tracePointText := x_lang("Must pass some selected trace points and must not pass some selected trace points")
 		}
 		else if (mustPassSelected)
 		{
-			tracePointText := x_lang("Must pass selected tracepoints")
+			tracePointText := x_lang("Must pass selected trace points")
 		}
 		else if (mustNotPassSelected)
 		{
-			tracePointText := x_lang("Must not pass selected tracepoints")
+			tracePointText := x_lang("Must not pass selected trace points")
 		}
 		else
 		{

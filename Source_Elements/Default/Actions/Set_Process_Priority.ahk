@@ -120,10 +120,16 @@ Element_run_Action_Set_Process_Priority(Environment, ElementParameters)
 		}
 		else
 		{
+			; set PID of process to a thread variable
+			x_SetVariable(Environment, "A_Pid", errorlevel, "thread")
+
 			x_finish(Environment, "exception", x_lang("Priority of process '%1%' could not be changed", EvaluatedParameters.ProcessName))
 		}
 		return
 	}
+
+	; set PID of process to a thread variable
+	x_SetVariable(Environment, "A_Pid", errorlevel, "thread")
 
 	x_finish(Environment,"normal")
 	return

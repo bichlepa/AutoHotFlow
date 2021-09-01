@@ -55,7 +55,7 @@ Element_getParametrizationDetails_Action_Write_to_ini(Environment)
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Value")})
 	parametersToEdit.push({type: "Edit", id: "Value", default: "value", content: "String"})
-	parametersToEdit.push({type: "Label", label: x_lang("Select an .ini file")})
+	parametersToEdit.push({type: "Label", label: x_lang("Path of .ini file")})
 	parametersToEdit.push({type: "File", id: "file", label: x_lang("Select an .ini file")})
 	parametersToEdit.push({type: "Label", label: x_lang("Section")})
 	parametersToEdit.push({type: "Edit", id: "Section", default: "section", content: "String", WarnIfEmpty: true})

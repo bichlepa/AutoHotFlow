@@ -58,7 +58,7 @@ Element_getParametrizationDetails_Action_Split_a_string(Environment)
 	parametersToEdit.push({type: "Label", label:  x_lang("Input string")})
 	parametersToEdit.push({type: "Edit", id: "VarValue", default: "Hello real world, Hello virtual world", content: ["String", "Expression"], contentID: "expression", contentDefault: "String", WarnIfEmpty: true})
 	parametersToEdit.push({type: "Label", label: x_lang("Delimiter characters")})
-	parametersToEdit.push({type: "Edit", id: "Delimiters", default: ",", content: "String", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Edit", id: "Delimiters", default: ",", content: "String"})
 	parametersToEdit.push({type: "Label", label: x_lang("Omit characters")})
 	parametersToEdit.push({type: "Edit", id: "OmitChars", default: "%a_space%%a_tab%%a_lf%%a_cr%", content: "String"})
 	

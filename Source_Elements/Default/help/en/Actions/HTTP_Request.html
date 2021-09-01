@@ -100,13 +100,13 @@
 		<TD>
 			<h4>Flags</h4>
 			<p>Some flags can be added using a + sign or removed using a - sign. Internet flags can be found <a href="https://docs.microsoft.com/en-us/windows/win32/wininet/api-flags">here</a>. Security flags can be found <a href="https://docs.microsoft.com/en-us/windows/win32/wininet/option-flags">here</a>.
-				<ul class="examples">
+				<ul class="examples"><i>Examples:</i>
 					<li/>
-						<p>+INTERNET_FLAG_NO_COOKIES <i>Tells WinINet to NOT automatically handle cookies (by default, WinINet uses Internet Explorer's cookie pool). This is required if you want your flow to manage cookies with this action. If your request headers contain any "Cookie" headers, this option is applied automatically.</i></p>
+						<p><code>+INTERNET_FLAG_NO_COOKIES</code> <i>Tells WinINet to NOT automatically handle cookies (by default, WinINet uses Internet Explorer's cookie pool). This is required if you want your flow to manage cookies with this action. If your request headers contain any "Cookie" headers, this option is applied automatically.</i></p>
 					<li/>
-						<p">+INTERNET_FLAG_NO_AUTO_REDIRECT <i>Does not automatically handle redirection in HttpSendRequest.</i></p>
+						<p"><code>+INTERNET_FLAG_NO_AUTO_REDIRECT</code> <i>Does not automatically handle redirection in HttpSendRequest.</i></p>
 					<li/>
-						<p">+SECURITY_FLAG_IGNORE_UNKNOWN_CA <i>Ignores unknown certificate authority problems.</i></p>
+						<p"><code>+SECURITY_FLAG_IGNORE_UNKNOWN_CA</code> <i>Ignores unknown certificate authority problems.</i></p>
 				</ul>
 			</p>
 		</TD>
@@ -117,9 +117,9 @@
 			<p>AutoHotFlow may use a proxy to access an internet resource.
 				<br/>If <b>Automatic</b> is selected, Internet Exlporer's proxy configuration will be used. If your Internet Explorer is not configured to use a proxy, this option has no effect.
 				<br/>If <b>Custom</b> is selected, AHF will use the specified proxy.
-				<br/><ul class="examples">
+				<br/><ul class="examples"><i>Examples:</i>
 						<li/>
-							<p>http://www.exampleproxy.com:1234</p>
+							<p><code>http://www.exampleproxy.com:1234</code></p>
 					</ul>
 				<br/><b>Bypass proxy</b>: Tells AHF NOT to use a proxy to access a specified website. This has no effect unless AHF has been told to use a proxy via the <b>Custom</b> option.
 			</p>

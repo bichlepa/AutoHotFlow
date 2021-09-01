@@ -53,9 +53,9 @@ Element_getParametrizationDetails_Action_Square_Root(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: x_lang("Variable_name")})
+	parametersToEdit.push({type: "Label", label: x_lang("Output variable_name")})
 	parametersToEdit.push({type: "Edit", id: "Varname", default: "NewVariable", content: "VariableName", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label:  x_lang("Variable containing a number")})
+	parametersToEdit.push({type: "Label", label:  x_lang("Input number")})
 	parametersToEdit.push({type: "Edit", id: "VarValue", default: 16, content: "Number", WarnIfEmpty: true})
 	
 	return parametersToEdit

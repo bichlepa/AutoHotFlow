@@ -58,12 +58,12 @@ Element_getParametrizationDetails_Condition_NumberIs(Environment)
 	parametersToEdit.push({type: "Label", label: x_lang("Expected number")})
 	parametersToEdit.push({type: "Edit", id: "expectedNumber", default: "5", content: "Number", WarnIfEmpty: true})
 
-	parametersToEdit.push({type: "Label", label: x_lang("Maximum deviation")})
+	parametersToEdit.push({type: "Label", label: x_lang("Maximum difference")})
 
-	parametersToEdit.push({type: "Label", label: x_lang("Absolute deviation"), size: "small"})
+	parametersToEdit.push({type: "Label", label: x_lang("Absolute difference"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: "absoluteDeviation", default: "0", content: "PositiveNumber"})
 
-	parametersToEdit.push({type: "Label", label: x_lang("Relative deviation"), size: "small"})
+	parametersToEdit.push({type: "Label", label: x_lang("Relative difference"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: "relativeDeviation", default: "0.01", content: "PositiveNumber"})
 
 	return parametersToEdit

@@ -53,10 +53,10 @@ Element_getParametrizationDetails_Action_Set_file_time(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: x_lang("New time") " (" x_lang("Date format") ")"})
-	parametersToEdit.push({type: "Edit", id: "time", content: "String", WarnIfEmpty: true})
-	parametersToEdit.push({type: "Label", label: x_lang("Select file")})
+	parametersToEdit.push({type: "Label", label: x_lang("File path")})
 	parametersToEdit.push({type: "File", id: "file", label: x_lang("Select a file"), options: 8})
+	parametersToEdit.push({type: "Label", label: x_lang("New time")})
+	parametersToEdit.push({type: "Edit", id: "time", content: "String", WarnIfEmpty: true})
 	parametersToEdit.push({type: "Label", label: x_lang("Which time")})
 	parametersToEdit.push({type: "Radio", id: "TimeType", result: "enum", default: 1, choices: [x_lang("Modification time"), x_lang("Creation time"), x_lang("Last access time")], enum: ["Modification", "Creation", "Access"]})
 	parametersToEdit.push({type: "Label", label: x_lang("Options")})

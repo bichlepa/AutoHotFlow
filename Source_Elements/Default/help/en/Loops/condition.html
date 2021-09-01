@@ -1,88 +1,49 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <HTML>
 <HEAD>
-	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=windows-1252">
-	<TITLE>Bedienung</TITLE>
-	<META NAME="GENERATOR" CONTENT="OpenOffice 4.1.0  (Win32)">
-	<META NAME="CREATED" CONTENT="0;0">
-	<META NAME="CHANGEDBY" CONTENT="Paul Bichler">
-	<META NAME="CHANGED" CONTENT="20150611;16404070">
-	<META NAME="CHANGEDBY" CONTENT="Paul Bichler">
-	<META NAME="CHANGEDBY" CONTENT="Paul Bichler">
-	<META NAME="CHANGEDBY" CONTENT="Paul Bichler">
-	<META NAME="CHANGEDBY" CONTENT="Paul Bichler">
-	<STYLE TYPE="text/css">
-	<!--
-		P { color: #000000 }
-		TD P { color: #000000 }
-		H1 { color: #000000 }
-		DT { color: #000000 }
-		H2 { color: #000000 }
-		H2.western { font-family: "Albany", sans-serif; font-size: 14pt; font-style: italic }
-		H2.cjk { font-family: "HG Mincho Light J"; font-size: 14pt; font-style: italic }
-		H2.ctl { font-family: "Arial Unicode MS"; font-size: 14pt; font-style: italic }
-	-->
-	</STYLE>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<link rel="stylesheet" href="../../stylesheet.css">
+	<link rel="stylesheet" href="stylesheet.css">
+	<link rel="stylesheet" href="../../../../../Help/stylesheet.css">
 </HEAD>
-<BODY LANG="en-US" TEXT="#000000" DIR="LTR">
-<H1 STYLE="margin-top: 0.3cm; margin-bottom: 0.4cm; page-break-before: always">
-Conditional loop</H1>
-<DL>
-	<DT STYLE="margin-bottom: 0.1cm">The loop <B>Conditional loop</B>
-	<SPAN STYLE="font-weight: normal">allows to repeat some actions
-	several times. It will continue iteration until the condition is
-	true.</SPAN></DT></DL>
-<H2 CLASS="western" STYLE="margin-top: 0.3cm; margin-bottom: 0.1cm; font-weight: normal">
-Settings</H2>
-<TABLE WIDTH=100% BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0 BGCOLOR="#ccffff">
-	<COL WIDTH=256*>
+<BODY LANG="en-US" DIR="LTR">
+<H1>Condition</H1>
+<p>
+	The loop <B>Condition</B> evaluates an expression on each iteraction and continues only if the condition result is true.
+</p>
+
+<H2>Settings</H2>
+<table class="settings">
 	<TR>
-		<TD WIDTH=100% VALIGN=TOP>
-			<P STYLE="margin-bottom: 0.1cm"><B>Condition</B></P>
-			<P STYLE="margin-bottom: 0.1cm; font-weight: normal">An expression
-			which will be checked on each iteration.</P>
-			<P STYLE="margin-bottom: 0.1cm; font-weight: normal">If <B>Evaluate
-			on first iteration</B> is checked, the condition will be checked
-			before first iteration. If it is not checked, the first iteration
-			will be always performed, with no regard whether the condition is
-			true or not.</P>
-			<P STYLE="margin-bottom: 0.1cm"><I><U><B>Examples:</B></U></I></P>
-			<TABLE WIDTH=100% BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0 BGCOLOR="#ccffcc">
-				<COL WIDTH=256*>
-				<TR>
-					<TD WIDTH=100% VALIGN=TOP>
-						<UL>
-							<LI><P STYLE="margin-bottom: 0.1cm"><FONT FACE="Consolas, monospace">(1
-							or 0) and 1 <FONT COLOR="#0000ff"><I>(results to 1)</I></FONT></FONT></P>
-							<LI><P STYLE="margin-bottom: 0.1cm"><FONT FACE="Consolas, monospace">!(5
-							&lt; 3) <FONT COLOR="#0000ff"><I>(results to 1)</I></FONT></FONT></P>
-							<LI><P STYLE="margin-bottom: 0.1cm"><FONT FACE="Consolas, monospace">num
-							&gt; 5 &amp;&amp; num &lt;= 7 <FONT COLOR="#0000ff"><I>(true
-							if num contains a number between 6 or 7)</I></FONT></FONT></P>
-							<LI><P><FONT FACE="Consolas, monospace">a_index &lt;= 5
-							<FONT COLOR="#0000ff"><I>(performs 5 iterations)</I></FONT></FONT></P>
-						</UL>
-					</TD>
-				</TR>
-			</TABLE>
-			<P STYLE="margin-bottom: 0.1cm"><BR><BR>
-			</P>
+		<TD>
+			<h4>Condition</h4>
+			<p>Expression to evaluate on each iteration.</p>
+			<p>If <b>Evaluate on first iteration</b> is checked, the condition will be checked before first iteration. If it is not checked, the first iteration will be always performed, with no regard whether the condition is true or not.</p>
+			<ul class="examples"><p"><i>Examples:</i></p>
+				<li/>
+					<p"><code>a_index <= 10</code> <i>(performs 10 iterations)</i></p>
+				<li/>
+					<p"><code>VariableContainingBreakCondition</code> <i>(continues as long as the variable is not false)</i></p>
 		</TD>
 	</TR>
-</TABLE>
-<H2 CLASS="western" STYLE="margin-top: 0.3cm; margin-bottom: 0.1cm; font-weight: normal">
-Supplied variables</H2>
-<TABLE WIDTH=100% BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0 BGCOLOR="#ccffff">
-	<COL WIDTH=256*>
+</table>
+
+<H2>Supplied Variables</H2>
+<table class="variables">
 	<TR>
-		<TD WIDTH=100% VALIGN=TOP BGCOLOR="#ffffcc">
-			<P STYLE="margin-bottom: 0.1cm"><FONT FACE="Consolas, monospace"><B>A_Index</B></FONT></P>
-			<P STYLE="font-weight: normal">contains the number of the current
-			iteration. It starts with the value 1 and increases on every loop.</P>
+		<TD>
+			<h4 class="VariableName">a_index</h4>
+			<p>Index of the current iteration. It starts with the value 1 and increases on every loop.
+				<br/>This variable will be removed after last iteration.
+			</p>
 		</TD>
 	</TR>
-</TABLE>
-<P STYLE="margin-bottom: 0cm"><BR>
-</P>
+</table>
+
+<H2>Remarks</H2>
+<p>
+	Read more about expressions in the chapter <a href="../Variables.html">Variables</a>.
+</p>
+
 </BODY>
 </HTML>

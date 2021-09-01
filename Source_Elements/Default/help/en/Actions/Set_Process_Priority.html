@@ -1,86 +1,42 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<html>
-<head>
-	<meta http-equiv="content-type" content="text/html; charset=windows-1252"/>
-	<title>Bedienung</title>
-	<meta name="generator" content="LibreOffice 4.4.3.2 (Windows)"/>
-	<meta name="created" content="00:00:00"/>
-	<meta name="changedby" content="Paul Bichler"/>
-	<meta name="changed" content="2015-09-13T20:16:53.364000000"/>
-	<meta name="created" content="00:00:00">
-	<meta name="changedby" content="Paul Bichler">
-	<meta name="changed" content="2015-06-20T12:59:51.269000000">
-	<meta name="created" content="00:00:00">
-	<meta name="changedby" content="Paul Bichler">
-	<meta name="changed" content="2015-06-17T19:30:25.645000000">
-	<style type="text/css">
-		td p { color: #000000 }
-		h1 { color: #000000 }
-		p { color: #000000 }
-		dt { color: #000000 }
-		dd { color: #000000 }
-		h2 { color: #000000 }
-		h2.western { font-family: "Albany", sans-serif; font-size: 14pt; font-style: italic }
-		h2.cjk { font-family: "HG Mincho Light J"; font-size: 14pt; font-style: italic }
-		h2.ctl { font-family: "Arial Unicode MS"; font-size: 14pt; font-style: italic }
-	</style>
-</head>
-<body lang="en-US" text="#000000" dir="ltr">
-<h1 style="margin-top: 0.3cm; margin-bottom: 0.4cm; page-break-before: always">
-Set process priority</h1>
-<dl>
-	<dt style="margin-bottom: 0.1cm">The action <b>Set process priority</b>
-	terminates a process<span style="font-weight: normal">.</span></dt></dl>
-<h2 class="western" style="margin-top: 0.3cm; margin-bottom: 0.1cm; font-weight: normal">
-Settings</h2>
-<table width="100%" cellpadding="4" cellspacing="0" bgcolor="#ccffff">
-	<col width="256*">
-	<tr>
-		<td width="100%" valign="top" style="border-top: 1px solid #000000; border-bottom: none; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0.11cm; padding-bottom: 0cm; padding-left: 0.11cm; padding-right: 0.11cm">
-			<p style="margin-bottom: 0.1cm"><b>Process name or ID</b></p>
-			<p style="font-weight: normal">Name or ID of the process.</p>
-		</td>
-	</tr>
-	<tr>
-		<td width="100%" valign="top" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
-			<p style="margin-bottom: 0.1cm"><b>Priority</b></p>
-			<p style="margin-bottom: 0.1cm; font-weight: normal">Specify the
-			priority to set. 
-			</p>
-			<p style="margin-bottom: 0.1cm; font-weight: normal"><font color="#990000"><font size="3" style="font-size: 12pt">Note!</font></font></p>
-			<table width="100%" cellpadding="4" cellspacing="0" bgcolor="#ffcccc">
-				<col width="256*">
-				<tr>
-					<td width="100%" valign="top" style="border: 1px solid #000000; padding: 0.11cm">
-						<dl>
-							<dd style="margin-left: 0cm">Any process not designed to run
-							at Realtime priority might reduce system stability if set to
-							that level.</dd></dl>
-					</td>
-				</tr>
-			</table>
-			<p style="margin-bottom: 0.1cm"><br/>
-<br/>
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<link rel="stylesheet" href="../../stylesheet.css">
+	<link rel="stylesheet" href="stylesheet.css">
+	<link rel="stylesheet" href="../../../../../Help/stylesheet.css">
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<H1>Set process priority</H1>
+<p>
+	The action <B>Set process priority</B> sets the priority level of a process.
+</p>
 
-			</p>
-		</td>
-	</tr>
+<H2>Settings</H2>
+<table class="settings">
+	<TR>
+		<TD>
+			<h4>Process name <i>or</i> ID</h4>
+			<p>Name or ID of the process.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Priority</h4>
+			<p>Specify the priority to set.</p>
+			<p class="warning">Any process not designed to run at Realtime priority might reduce system stability if set to that level.</p>
+		</TD>
+	</TR>
 </table>
-<h2 class="western" style="margin-top: 0.3cm; margin-bottom: 0.1cm; font-weight: normal">
-Supplied variables</h2>
-<table width="100%" cellpadding="4" cellspacing="0" bgcolor="#ccffff">
-	<col width="256*">
-	<tr>
-		<td width="100%" valign="top" bgcolor="#ffffcc" style="border: 1px solid #000000; padding: 0.11cm">
-			<p style="margin-bottom: 0.1cm"><font face="Consolas, monospace"><b>A_PID</b></font></p>
-			<p style="font-weight: normal">contains the Process ID of the
-			found process.</p>
-		</td>
-	</tr>
-</table>
-<h2 class="western" style="margin-top: 0.3cm; margin-bottom: 0.1cm"><br/>
-<br/>
 
-</h2>
-</body>
-</html>
+<H2>Supplied Variables</H2>
+<table class="variables">
+	<TR>
+		<TD>
+			<h4 class="VariableName">A_PID</h4>
+			<p>Process ID of the found process</p>
+		</TD>
+	</TR>
+</table>
+</BODY>
+</HTML>

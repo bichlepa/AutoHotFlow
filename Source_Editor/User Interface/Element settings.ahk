@@ -1479,6 +1479,10 @@ class ElementSettings
 			if not tempParameterRows
 				tempParameterRows := 5
 
+			; prepare some strings for the content type radio
+			this.contentTypeLangs := {string: lang("This is a string"), rawString: lang("This is a raw string"), expression: lang("This is an expression"), VarName: lang("This is a variable name")}
+			this.currentContentType := ""
+			
 			; create the gui elements
 			gui,font,s8 cDefault wnorm
 

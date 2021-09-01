@@ -7,29 +7,31 @@
 	<link rel="stylesheet" href="../../../../../Help/stylesheet.css">
 </HEAD>
 <BODY LANG="en-US" DIR="LTR">
-<H1>Set flow status</H1>
+<H1>Number is</H1>
 <p>
-	The action <B>Set flow status</B> enables or disables one or all triggers of a flow.
+	The condition <B>Number is</B> checks whether a number has a specified value. It can compare float values and allow a certain deviation.
 </p>
 
 <H2>Settings</H2>
 <table class="settings">
 	<TR>
 		<TD>
-			<h4>New state</h4>
-			<p>Choose whether the trigger(s) will be enabled or disabled.</p>
+			<h4>Input number</h4>
+			<p>The first number to compare.</p>
 		</TD>
 	</TR>
 	<TR>
 		<TD>
-			<h4>Which flow</h4>
-			<p>Choose which flow state should be changed.</p>
+			<h4>Expected number</h4>
+			<p>The second number to compare.</p>
 		</TD>
 	</TR>
 	<TR>
 		<TD>
-			<h4>Which trigger</h4>
-			<p>Choose which trigger(s) should be enabled or disabled. Either all, or the default trigger, or any other trigger can be selected.</p>
+			<h4>Maximum difference.</h4>
+			<p>Maximum absolute and realtive difference of the number.
+				<br/>The relative difference is calculated with the (first) <b>Input number</b>.
+			</p>
 		</TD>
 	</TR>
 </table>
