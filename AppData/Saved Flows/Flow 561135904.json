@@ -352,7 +352,7 @@
     "element0000000023": {
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000023",
-      "name": "Set Flow Status - Disable: This flow - Any trigger",
+      "name": "Set Flow Status - Disable: This flow - All triggers",
       "package": "default",
       "pars": {
         "Enable": "Disable",
@@ -393,8 +393,7 @@
         "ToRun": "notepad.exe",
         "ToRunContent": "String",
         "WhichWorkingDir": "Default",
-        "WorkingDir": "",
-        "WorkingDirContent": "String"
+        "WorkingDir": ""
       },
       "StandardName": "1",
       "type": "action",
@@ -614,8 +613,7 @@
         "ToRun": "notepad.exe",
         "ToRunContent": "String",
         "WhichWorkingDir": "Default",
-        "WorkingDir": "",
-        "WorkingDirContent": "String"
+        "WorkingDir": ""
       },
       "StandardName": "1",
       "type": "action",
@@ -804,7 +802,7 @@
     "element0000000095": {
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000095",
-      "name": "Set Flow Status - Disable: This flow - Any trigger",
+      "name": "Set Flow Status - Disable: This flow - All triggers",
       "package": "default",
       "pars": {
         "Enable": "Disable",

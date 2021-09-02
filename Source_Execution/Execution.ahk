@@ -8,7 +8,7 @@ SendMode Input  ; Recommended for new scripts due to its superior speed and reli
 ; faster execution
 SetBatchLines -1
 
-; The manager should not have an own tray icon
+; The execution thread should not have an own tray icon
 #NoTrayIcon
 
 ; Make the variable _ahkThreadID super global. This variable will be set by the main thread after this thread is created.

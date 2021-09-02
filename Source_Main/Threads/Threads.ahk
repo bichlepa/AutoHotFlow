@@ -105,12 +105,6 @@ Thread_StartExecution()
 	; replace placeholders
 	StringReplace, ExecutionThreadCode, ExecutionThreadCode, % ";PlaceholderIncludesOfElements", % global_libInclusionsForThreads global_elementInclusionsForThreads
 
-	; if developing, show tray icon
-	if (_getSettings("developing"))
-	{
-		StringReplace, ExecutionThreadCode, ExecutionThreadCode, % "#NoTrayIcon", % "menu, tray, tip, execution"
-	}
-
 	; start the new thread
 	newThread := AhkThread(global_CommonAhkCodeForAllThreads "`n global _ahkThreadID := """ threadID """`n" ExecutionThreadCode)
 	

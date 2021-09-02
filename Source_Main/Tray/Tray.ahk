@@ -19,7 +19,13 @@ Menu, tray, add, % lang("Show Manager"), onTrayMenuShowManagerGUI
 Menu, tray, default, % lang("Show Manager")
 
 ; add entry to exit AHF
-Menu, tray, add, % lang("Close"), exit
+Menu, tray, add, % lang("Exit"), exit
+
+
+; disable default tray menu entries
+if (not _settings.developing)
+	Menu, tray, NoStandard
+
 
 ; Set tooltip of tray icon
 Menu, tray, tip, % "AutoHotFlow"

@@ -12,7 +12,7 @@ EditorGUIInit()
 	; Create the gui. It is empty, since the draw thread will paint the picture inside the gui
 	gui,MainGUI:default
 	gui,-dpiscale ; DPI Scaling would cause diffilcuties when calculating mouse coordinates
-	; Add a statsu bar
+	; Add a status bar
 	gui,add,StatusBar,hwnd_StatusbarHWND
 	_setSharedProperty("hwnds.editGUIStatusbar" _FlowID, _StatusbarHWND)
 	_setSharedProperty("hwnds.editGUIStatusbar" Global_ThisThreadID, _StatusbarHWND)
@@ -34,7 +34,7 @@ EditorGUIInit()
 	gui +lastfound
 	ControlGetPos,,,,StatusBarHeight,,ahk_id %_StatusbarHWND%
 	EditGUI_StatusBarHeight:=StatusBarHeight
-	
+
 	; Initialize the menu bar
 	initializeMenuBar()
 	ui_UpdateStatusbartext()
@@ -84,6 +84,23 @@ EditGUIshow()
 		gui, MainGUI:show,  w%tempwidth% h%tempheight%,% "·AutoHotFlow· " lang("Editor") " - " flowName
 	}
 	Editor_guiAlreadyShown:=true
+}
+
+EditGuiSetIcon(flowState)
+{
+	global
+
+	; check whether icon has to be changed
+	static oldFlowState
+	if (oldFlowState != flowState)
+	{
+		oldFlowState := flowState
+		
+		; set the gui icon
+		gui, MainGUI:+LastFound
+		setGuiIcon(_ScriptDir "\icons\" flowState ".ico")
+	}
+
 }
 
 ; disable editor

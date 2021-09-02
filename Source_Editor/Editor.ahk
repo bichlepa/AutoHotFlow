@@ -115,6 +115,28 @@ queryTasks()
 	global
 	Loop
 	{
+		; check whether flow is active or running
+		if xx_isFlowExecuting(_FlowID)
+		{
+			; change icon to "running"
+			EditGuiSetIcon("running")
+			tray_setIcon("running")
+		}
+		Else
+		{
+			if xx_isFlowEnabled(_FlowID)
+			{
+				EditGuiSetIcon("enabled")
+				tray_setIcon("enabled")
+			}
+			Else
+			{
+				EditGuiSetIcon("disabled")
+				tray_setIcon("disabled")
+			}
+		}
+		
+		; check whether there is a new task from another ahk thread
 		oneTask:=_getTask("editor" _FlowID)
 		if (oneTask)
 		{

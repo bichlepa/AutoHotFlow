@@ -24,8 +24,6 @@ initializeTrayBar()
 	menu, tray, add, Exit
 	menu, tray, rename, Exit, % lang("Exit #verb")
 
-	menu, tray, icon, %_ScriptDir%\Icons\disabled.ico
-	
 	menu, tray, tip, % lang("Flow") ": " _getFlowProperty(_FlowID, "name")
 }
 
@@ -45,4 +43,17 @@ tray_start()
 tray_enable()
 {
 	enableToggleFlow(_FlowID)
+}
+
+tray_setIcon(flowState)
+{
+	; check whether icon has to be changed
+	static oldFlowState
+	if (oldFlowState != flowState)
+	{
+		oldFlowState := flowState
+		
+		menu, tray, icon, %_ScriptDir%\Icons\%flowState%.ico
+	}
+
 }

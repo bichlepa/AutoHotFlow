@@ -4,7 +4,7 @@
       "ConnectionType": "normal",
       "from": "element0000000001",
       "ID": "connection0000000008",
-      "to": "element0000000007",
+      "to": "element0000000012",
       "type": "Connection"
     }
   },
@@ -25,19 +25,24 @@
       "y": 0
     },
     "element0000000007": {
-      "class": "Action_Write_To_File",
+      "class": "Action_Message_Box",
       "ID": "element0000000007",
-      "name": "Write To File -  - ",
+      "name": "Message Box - Title - Message",
       "package": "default",
       "pars": {
-        "CodePageIdentifier": "",
-        "Encoding": "UTF-8",
-        "Expression": "String",
-        "file": "",
-        "Linefeed": 1,
-        "Overwrite": "Append",
-        "text": "",
-        "WithBOM": 0
+        "ButtonLabel": "OK",
+        "ButtonLabelCancel": "Cancel",
+        "Height": 200,
+        "IfClose": "Exception",
+        "IfDismiss": "Exception",
+        "IsTimeout": "NoTimeout",
+        "message": "Message",
+        "OnTimeout": "Normal",
+        "ShowCancelButton": 0,
+        "TimeoutUnits": 10,
+        "title": "Title",
+        "Unit": "Seconds",
+        "Width": 300
       },
       "StandardName": "1",
       "type": "action",
@@ -99,7 +104,7 @@
     }
   },
   "category": "",
-  "ElementIDCounter": "13",
+  "ElementIDCounter": "16",
   "flowSettings": {
     "DefaultWorkingDir": 1,
     "ExecutionPolicy": "default",

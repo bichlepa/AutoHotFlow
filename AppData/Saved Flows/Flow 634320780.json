@@ -461,7 +461,7 @@
     "element0000000012": {
       "class": "Action_Trace_Point_Check",
       "ID": "element0000000012",
-      "name": "Trace Point Check - Must pass all tracepoints",
+      "name": "Trace Point Check - Must pass all trace points",
       "package": "default",
       "pars": {
         "MustNotPassTracepoints": [

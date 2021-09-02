@@ -489,7 +489,7 @@
     "element0000000034": {
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000034",
-      "name": "Set Flow Status - Disable: Trigger test - Any trigger",
+      "name": "Set Flow Status - Disable: Trigger test - All triggers",
       "package": "default",
       "pars": {
         "Enable": "Disable",
@@ -533,7 +533,7 @@
     "element0000000043": {
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000043",
-      "name": "Set Flow Status - Enable: Trigger test - Any trigger",
+      "name": "Set Flow Status - Enable: Trigger test - All triggers",
       "package": "default",
       "pars": {
         "Enable": "Enable",
@@ -634,7 +634,7 @@
     "element0000000070": {
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000070",
-      "name": "Set Flow Status - Disable: This flow - Any trigger",
+      "name": "Set Flow Status - Disable: This flow - All triggers",
       "package": "default",
       "pars": {
         "Enable": "Disable",
@@ -763,7 +763,7 @@
     "element0000000090": {
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000090",
-      "name": "Set Flow Status - Disable: This flow - Any trigger",
+      "name": "Set Flow Status - Disable: This flow - All triggers",
       "package": "default",
       "pars": {
         "Enable": "Disable",
@@ -1006,8 +1006,7 @@
         "ToRun": "%A_Desktop%\\Flow Trigger test.lnk",
         "ToRunContent": "String",
         "WhichWorkingDir": "Default",
-        "WorkingDir": "",
-        "WorkingDirContent": "String"
+        "WorkingDir": ""
       },
       "StandardName": "1",
       "type": "Action",

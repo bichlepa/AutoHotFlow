@@ -50,6 +50,10 @@ init_Manager_GUI()
 	gui,+hwndManagerGUIHWND
 	_setSharedProperty("hwnds.Manager", ManagerGUIHWND)
 	
+	; set the gui icon
+	gui, +LastFound
+	setGuiIcon(_ScriptDir "\icons\MainIcon.ico")
+
 	;Set title. Do not show yet
 	Gui, Show, hide, % "AutoHotFlow " lang("Manager") 
 	

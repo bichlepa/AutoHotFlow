@@ -951,7 +951,7 @@
     "element0000000022": {
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000022",
-      "name": "Set Flow Status - Enable: This flow - Any trigger",
+      "name": "Set Flow Status - Enable: This flow - All triggers",
       "package": "default",
       "pars": {
         "Enable": "Enable",
