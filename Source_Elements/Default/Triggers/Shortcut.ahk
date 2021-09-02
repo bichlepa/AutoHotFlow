@@ -53,8 +53,8 @@ Element_getParametrizationDetails_Trigger_Shortcut(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: x_lang("Path of the Shortcut")})
-	parametersToEdit.push({type: "File", id: "ShortCutPath", default: "%A_Desktop%\" x_lang("Flow") " " x_GetMyFlowName(Environment) ".lnk" , label: x_lang("Set_the_Shortcut_path"), options: 8, filter: x_lang("Shortcut") " (*.lnk)"})
+	parametersToEdit.push({type: "Label", label: x_lang("Path of the shortcut")})
+	parametersToEdit.push({type: "File", id: "ShortCutPath", default: "%A_Desktop%\" x_lang("Flow") " " x_GetMyFlowName(Environment) ".lnk" , label: x_lang("Set_the_shortcut_path"), options: 8, filter: x_lang("Shortcut") " (*.lnk)"})
 	parametersToEdit.push({type: "Label", label: x_lang("Options")})
 	parametersToEdit.push({type: "CheckBox", id: "RemoveShortcutOnDisabling", default: 1, label: x_lang("Remove_shortcut_when_disabling")})
 	

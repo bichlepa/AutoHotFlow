@@ -52,8 +52,8 @@ Element_getStabilityLevel_Loop_Work_through_a_list()
 Element_getParametrizationDetails_Loop_Work_through_a_list(Environment)
 {
 	parametersToEdit:=Object()
-	parametersToEdit.push({type: "Label", label: x_lang("Variable_name")})
-	parametersToEdit.push({type: "Edit", id: "Varname", default: "List", content: "VariableName", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: x_lang("Input list")})
+	parametersToEdit.push({type: "Edit", id: "VarValue", default: "List", content: "VariableName", WarnIfEmpty: true})
 
 	return parametersToEdit
 }
@@ -91,12 +91,12 @@ Element_run_Loop_Work_through_a_list(Environment, ElementParameters)
 		}
 
 		; get variable content
-		varContentList := x_GetVariable(Environment, EvaluatedParameters.Varname)
+		varContentList := x_GetVariable(Environment, EvaluatedParameters.VarValue)
 		
 		; check whether variable content is an object
 		if not isobject(varContentList)
 		{
-			x_finish(Environment, "exception", x_lang("Variable '%1%' does not contain a list.", EvaluatedParameters.varname))
+			x_finish(Environment, "exception", x_lang("Variable '%1%' does not contain a list.", EvaluatedParameters.VarValue))
 			return
 		}
 		

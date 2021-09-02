@@ -1,60 +1,42 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <HTML>
 <HEAD>
-	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=windows-1252">
-	<TITLE>Bedienung</TITLE>
-	<META NAME="GENERATOR" CONTENT="OpenOffice 4.1.0  (Win32)">
-	<META NAME="CREATED" CONTENT="0;0">
-	<META NAME="CHANGEDBY" CONTENT="Paul Bichler">
-	<META NAME="CHANGED" CONTENT="20150611;16403771">
-	<META NAME="CHANGEDBY" CONTENT="Paul Bichler">
-	<META NAME="CHANGEDBY" CONTENT="Paul Bichler">
-	<STYLE TYPE="text/css">
-	<!--
-		P { color: #000000 }
-		TD P { color: #000000 }
-		H1 { color: #000000 }
-		DT { color: #000000 }
-		H2 { color: #000000 }
-		H2.western { font-family: "Albany", sans-serif; font-size: 14pt; font-style: italic }
-		H2.cjk { font-family: "HG Mincho Light J"; font-size: 14pt; font-style: italic }
-		H2.ctl { font-family: "Arial Unicode MS"; font-size: 14pt; font-style: italic }
-	-->
-	</STYLE>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<link rel="stylesheet" href="../../stylesheet.css">
+	<link rel="stylesheet" href="stylesheet.css">
+	<link rel="stylesheet" href="../../../../../Help/stylesheet.css">
 </HEAD>
-<BODY LANG="en-US" TEXT="#000000" DIR="LTR">
-<H1 STYLE="margin-top: 0.3cm; margin-bottom: 0.4cm; page-break-before: always">
-Simple loop</H1>
-<DL>
-	<DT STYLE="margin-bottom: 0.1cm">The loop <B>Simple loop</B> <SPAN STYLE="font-weight: normal">allows
-	to repeat some actions several times.</SPAN></DT></DL>
-<H2 CLASS="western" STYLE="margin-top: 0.3cm; margin-bottom: 0.1cm; font-weight: normal">
-Settings</H2>
-<TABLE WIDTH=100% BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0 BGCOLOR="#ccffff">
-	<COL WIDTH=256*>
+<BODY LANG="en-US" DIR="LTR">
+<H1>Loop through files</H1>
+<p>
+	The loop <B>Loop through files</B> allows to repeat some actions several times.
+</p>
+
+<H2>Settings</H2>
+<table class="settings">
 	<TR>
-		<TD WIDTH=100% VALIGN=TOP>
-			<P STYLE="margin-bottom: 0.1cm"><B>Repeats</B></P>
-			<P STYLE="margin-bottom: 0.1cm; font-weight: normal">A number,
-			variable or expression which defines the count of iterations.</P>
-			<P STYLE="font-weight: normal">If <B>Endless loop</B> is checked,
-			the loop will never end.</P>
+		<TD>
+			<h4>Repeats</h4>
+			<p>If <b>Endless loop</b> is checked, the loop will never end. The loop can still be left if a connection leads to "break" part.
+				<br/>If <b>Endless loop</b> is not checked, the loop will end after the specified repeats.</p>
 		</TD>
 	</TR>
-</TABLE>
-<H2 CLASS="western" STYLE="margin-top: 0.3cm; margin-bottom: 0.1cm; font-weight: normal">
-Supplied variables</H2>
-<TABLE WIDTH=100% BORDER=1 BORDERCOLOR="#000000" CELLPADDING=4 CELLSPACING=0 BGCOLOR="#ccffff">
-	<COL WIDTH=256*>
+</table>
+
+<H2>Supplied Variables</H2>
+<table class="variables">
 	<TR>
-		<TD WIDTH=100% VALIGN=TOP BGCOLOR="#ffffcc">
-			<P STYLE="margin-bottom: 0.1cm"><B>A_Index</B></P>
-			<P STYLE="font-weight: normal">contains the number of the current
-			iteration. It starts with the value 1 and increases on every loop.</P>
+		<TD>
+			<h4 class="VariableName">A_Index</h4>
+			<p>Index of the current iteration. It starts with the value 1 and increases on every loop.</p>
 		</TD>
 	</TR>
-</TABLE>
-<P STYLE="margin-bottom: 0cm"><BR>
-</P>
+</table>
+
+<H2>Remarks</H2>
+<p>
+	The supplied variable will be removed after last iteration.
+</p>
+
 </BODY>
 </HTML>

@@ -3,7 +3,13 @@
 ;Check an element after it was loaded
 LoadFlowCheckCompabilityElement(p_FlowID, p_ElementID, FlowCompabilityVersion)
 {
-	
+    ; example:
+    ; elementClass := x_getElementClass(p_FlowID, p_ElementID)
+    ; if (elementClass = "Loop_Work_through_a_list")
+    ; {
+    ;     value := _getElementProperty(p_FlowID, p_ElementID, "pars.VarName")
+    ;     _setElementProperty(p_FlowID, p_ElementID, "pars.VarValue", value)
+    ; }
 }
 
 ;Check a connection after it was loaded

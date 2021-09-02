@@ -52,7 +52,7 @@ Element_getStabilityLevel_Action_AutoHotKey_script()
 Element_getParametrizationDetails_Action_AutoHotKey_script(Environment)
 {
 	parametersToEdit:=Object()
-	parametersToEdit.push({type: "Label", label: x_lang("AutoHotKey_script"), WarnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: x_lang("AutoHotkey_script"), WarnIfEmpty: true})
 	parametersToEdit.push({type: "multilineEdit", id: "Script", content: "RawString", default: "", WarnIfEmpty: false})
 
 	parametersToEdit.push({type: "Label", label: x_lang("Variables_that_should_be_imported_to_script_prior_to_execution")})

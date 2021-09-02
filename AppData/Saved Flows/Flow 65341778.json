@@ -233,7 +233,7 @@
       "from": "element0000000011",
       "fromPart": "TAIL",
       "ID": "connection0000000071",
-      "to": "element0000000072",
+      "to": "element0000000079",
       "type": "Connection"
     },
     "connection0000000075": {
@@ -248,6 +248,20 @@
       "from": "element0000000032",
       "ID": "connection0000000076",
       "to": "element0000000073",
+      "type": "Connection"
+    },
+    "connection0000000077": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000077",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000078": {
+      "ConnectionType": "normal",
+      "from": "element0000000079",
+      "ID": "connection0000000078",
+      "to": "element0000000072",
       "type": "Connection"
     }
   },
@@ -726,7 +740,7 @@
       "StandardName": "1",
       "type": "Action",
       "x": "0",
-      "y": "1540"
+      "y": "1715"
     },
     "element0000000073": {
       "class": "Action_Set_Flow_Status",
@@ -764,17 +778,34 @@
       "type": "action",
       "x": "1435",
       "y": "560"
+    },
+    "element0000000079": {
+      "class": "Action_Play_Sound",
+      "ID": "element0000000079",
+      "name": "Play Sound - tada.wav",
+      "package": "default",
+      "pars": {
+        "soundfile": "",
+        "startSoundNow": "Start playback",
+        "stopSoundNow": "Stop playback now",
+        "systemSound": "tada.wav",
+        "WhichSound": "SystemSound"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "0",
+      "y": "1540"
     }
   },
   "category": "Automatic tests",
-  "ElementIDCounter": "76",
+  "ElementIDCounter": "79",
   "flowSettings": {
     "DefaultWorkingDir": 1,
     "ExecutionPolicy": "default",
-    "Offsetx": "-654.796660",
-    "Offsety": "-240.304956",
+    "Offsetx": "-552.297508",
+    "Offsety": "602.154719",
     "WorkingDir": "",
-    "zoomFactor": "0.636367"
+    "zoomFactor": "0.700004"
   },
   "name": "_AutomaticTest starter"
 }

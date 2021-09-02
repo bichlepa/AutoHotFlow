@@ -90,7 +90,8 @@ Element_enable_Trigger_Manual(Environment, ElementParameters)
 ;Here you can for example define the variables which are provided by the triggers.
 Element_postTrigger_Trigger_Manual(Environment, ElementParameters, TriggerData)
 {
-
+	; Write the manual trigger ID into the variable.
+	x_SetVariable(Environment, "A_ManualTriggerID", ElementParameters.id, "thread")
 }
 
 ;Called when the trigger should be disabled.

@@ -6,6 +6,13 @@
       "ID": "connection0000000008",
       "to": "element0000000012",
       "type": "Connection"
+    },
+    "connection0000000019": {
+      "ConnectionType": "normal",
+      "from": "element0000000017",
+      "ID": "connection0000000019",
+      "to": "element0000000009",
+      "type": "Connection"
     }
   },
   "allElements": {
@@ -52,18 +59,18 @@
     "element0000000009": {
       "class": "Action_Tooltip",
       "ID": "element0000000009",
-      "name": "Tooltip: %FileText% - 2 s - Follow Mouse",
+      "name": "Tooltip: hi - 2 s - ",
       "package": "action",
       "pars": {
         "duration": 2,
-        "follow_mouse": 1,
-        "text": "%FileText%",
+        "follow_mouse": "0",
+        "text": "hi",
         "Unit": "Seconds"
       },
       "StandardName": "1",
       "type": "action",
-      "x": "245",
-      "y": "665"
+      "x": "420",
+      "y": "140"
     },
     "element0000000012": {
       "class": "Condition_Debug_Dialog",
@@ -101,15 +108,45 @@
       "type": "Condition",
       "x": "875",
       "y": "350"
+    },
+    "element0000000017": {
+      "class": "Trigger_Shortcut",
+      "enabled": "1",
+      "ID": "element0000000017",
+      "name": "Shortcut - %A_Desktop%\\Flow New flow 1.lnk",
+      "package": "default",
+      "pars": {
+        "RemoveShortcutOnDisabling": "1",
+        "ShortCutPath": "%A_Desktop%\\Flow New flow 1.lnk"
+      },
+      "StandardName": "1",
+      "type": "Trigger",
+      "x": "525",
+      "y": "-35"
+    },
+    "element0000000018": {
+      "class": "Action_AutoHotKey_script",
+      "ID": "element0000000018",
+      "name": "AutoHotKey script - ",
+      "package": "default",
+      "pars": {
+        "ExportVariables": "",
+        "ImportVariables": "",
+        "Script": ""
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "630",
+      "y": "70"
     }
   },
   "category": "",
-  "ElementIDCounter": "16",
+  "ElementIDCounter": "19",
   "flowSettings": {
     "DefaultWorkingDir": 1,
     "ExecutionPolicy": "default",
-    "Offsetx": -200,
-    "Offsety": -200,
+    "Offsetx": "-200.000000",
+    "Offsety": "-200.000000",
     "WorkingDir": "",
     "zoomFactor": "0.7"
   },

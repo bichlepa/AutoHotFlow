@@ -126,6 +126,7 @@ global_libInclusionsForThreads =
 
 )
 
+
 ;Lib_Includes_End
 
 ; include all the other source code
@@ -448,6 +449,7 @@ global_elementInclusionsForThreads =
 #include source_Elements\Default\triggers\AutoHotkey_Script.ahk
 
 )
+
 
 ;Element_Includes_End
 

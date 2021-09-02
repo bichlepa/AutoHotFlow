@@ -35,7 +35,13 @@ HiddenCommandWindowProcessMessage(message)
 	; process known commands
 	if (messageParsed[1] = "trigger")
 	{
-		API_Execution_ExecuteFlow(messageParsed[2], messageParsed[3])
+		flowID := messageParsed[2]
+		triggerID := messageParsed[3]
+		
+		if (_getElementInfo(flowID, triggerID, "enabled"))
+		{
+			API_Execution_ExecuteFlow(flowID, triggerID)
+		}
 	}
 	Else
 	{

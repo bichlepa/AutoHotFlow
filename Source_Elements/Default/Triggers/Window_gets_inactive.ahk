@@ -57,7 +57,7 @@ Element_getParametrizationDetails_Trigger_Window_Gets_Inactive(Environment)
 	windowFunctions_addWindowIdentificationParametrization(parametersToEdit)
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Options")})
-	parametersToEdit.push({type: "Label", label: x_lang("Check interval"), size: "small"})
+	parametersToEdit.push({type: "Label", label: x_lang("Check interval (ms)"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: "interval", content: "Number", default: 500, WarnIfEmpty: true})
 	
 	return parametersToEdit

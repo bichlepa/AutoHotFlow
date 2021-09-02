@@ -1,85 +1,32 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<html>
-<head>
-	<meta http-equiv="content-type" content="text/html; charset=windows-1252"/>
-	<title>Bedienung</title>
-	<meta name="generator" content="LibreOffice 4.4.3.2 (Windows)"/>
-	<meta name="created" content="00:00:00"/>
-	<meta name="changedby" content="Paul Bichler"/>
-	<meta name="changed" content="2015-08-14T21:41:40.217000000"/>
-	<meta name="created" content="00:00:00">
-	<meta name="changedby" content="Paul Bichler">
-	<meta name="changed" content="2015-08-12T20:17:29.077000000">
-	<meta name="created" content="00:00:00">
-	<meta name="changedby" content="Paul Bichler">
-	<meta name="changed" content="2015-06-20T14:30:15.315000000">
-	<style type="text/css">
-		td p { color: #000000 }
-		h1 { color: #000000 }
-		p { color: #000000 }
-		dt { color: #000000 }
-		h2 { color: #000000 }
-		h2.western { font-family: "Albany", sans-serif; font-size: 14pt; font-style: italic }
-		h2.cjk { font-family: "HG Mincho Light J"; font-size: 14pt; font-style: italic }
-		h2.ctl { font-family: "Arial Unicode MS"; font-size: 14pt; font-style: italic }
-	</style>
-</head>
-<body lang="en-US" text="#000000" dir="ltr">
-<h1 style="margin-top: 0.3cm; margin-bottom: 0.4cm; page-break-before: always">
-Periodic timer</h1>
-<dl>
-	<dt style="margin-bottom: 0.1cm">The trigger <b>Periodic time</b>
-	launches the flow periodically.</dt></dl>
-<h2 class="western" style="margin-top: 0.3cm; margin-bottom: 0.1cm; font-weight: normal">
-Settings</h2>
-<table width="100%" cellpadding="4" cellspacing="0" bgcolor="#ccffff">
-	<col width="256*">
-	<tr>
-		<td width="100%" valign="top" style="border: 1px solid #000000; padding: 0.11cm">
-			<p style="margin-bottom: 0.1cm"><b>Time interval</b></p>
-			<p style="font-weight: normal">Specify the time interval. Don't
-			for get to specify the unit!</p>
-		</td>
-	</tr>
-</table>
-<h2 class="western" style="margin-top: 0.3cm; margin-bottom: 0.1cm; font-weight: normal">
-Supplied variables</h2>
-<table width="100%" cellpadding="4" cellspacing="0" bgcolor="#ccffff">
-	<col width="256*">
-	<tr>
-		<td width="100%" valign="top" bgcolor="#ffffcc" style="border: 1px solid #000000; padding: 0.11cm">
-			<p style="margin-bottom: 0.1cm"><font face="Consolas, monospace"><b>A_ThisHokey</b></font></p>
-			<p>contains the text (if any) which were found in the clipboard.</p>
-		</td>
-	</tr>
-	<tr>
-		<td width="100%" valign="top" bgcolor="#ffffcc" style="border-top: none; border-bottom: 1px solid #000000; border-left: 1px solid #000000; border-right: 1px solid #000000; padding-top: 0cm; padding-bottom: 0.11cm; padding-left: 0.11cm; padding-right: 0.11cm">
-			<p style="margin-bottom: 0.1cm"><font face="Consolas, monospace"><b>A_ContentType</b></font></p>
-			<p><span style="font-weight: normal">contains one of following
-			values:<br/>
-- </span><strong>0</strong> if the clipboard is now
-			empty<br/>
-- <strong>1</strong> if it contains something that can
-			be expressed as text (this includes files copied from an Explorer
-			window)<br/>
-- <strong>2</strong> if it contains something
-			entirely non-text such as a picture</p>
-		</td>
-	</tr>
-</table>
-<h2 class="western" style="margin-top: 0.3cm; margin-bottom: 0.1cm; font-weight: normal">
-Remarks</h2>
-<p style="margin-top: 0.3cm; margin-bottom: 0.1cm"><span style="font-weight: normal">It
-will not trigger on activation, instead </span>the entirety of its
-period must elapse before it triggers the flow.</p>
-<p style="margin-top: 0.3cm; margin-bottom: 0.1cm">The maximum amount
-of periodic timers in one flow is 10.</p>
-<p style="margin-top: 0.3cm; margin-bottom: 0.1cm; font-weight: normal">
-Do not specify a period smaller than 100 ms. AutoHotFlow can't work
-that fast.</p>
-<h2 class="western" style="margin-top: 0.3cm; margin-bottom: 0.1cm"><br/>
-<br/>
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<link rel="stylesheet" href="../../stylesheet.css">
+	<link rel="stylesheet" href="stylesheet.css">
+	<link rel="stylesheet" href="../../../../../Help/stylesheet.css">
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<H1>Periodic timer</H1>
+<p>
+	The trigger <B>Periodic timer</B> triggers periodically.
+</p>
 
-</h2>
-</body>
-</html>
+<H2>Settings</H2>
+<table class="settings">
+	<TR>
+		<TD>
+			<h4>Time interval</h4>
+			<p>Specify the time interval.</p>
+			<p class="info">Be careful if you specify a period smaller than 100 ms. AutoHotFlow might not be able to work that fast!</p>
+		</TD>
+	</TR>
+</table>
+
+<H2>Remarks</H2>
+<p>
+	It will not trigger on activation, instead the entirety of its period must elapse before it triggers the flow.
+</p>
+
+</BODY>
+</HTML>

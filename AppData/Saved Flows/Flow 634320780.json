@@ -380,10 +380,10 @@
       "class": "Loop_Work_through_a_list",
       "HeightOfVerticalBar": 1365,
       "ID": "element0000000004",
-      "name": "Work through a list: testListFirst",
+      "name": "Work through a list: ",
       "package": "default",
       "pars": {
-        "Varname": "testListFirst"
+        "VarValue": "testListFirst"
       },
       "StandardName": 1,
       "type": "Loop",
@@ -418,10 +418,10 @@
       "class": "Loop_Work_through_a_list",
       "HeightOfVerticalBar": "525",
       "ID": "element0000000006",
-      "name": "Work through a list: testlist2",
+      "name": "Work through a list: ",
       "package": "default",
       "pars": {
-        "Varname": "testlist2"
+        "VarValue": "testlist2"
       },
       "StandardName": 1,
       "type": "loop",
@@ -820,10 +820,10 @@
   "flowSettings": {
     "DefaultWorkingDir": 1,
     "ExecutionPolicy": "default",
-    "Offsetx": "-309.140414",
-    "Offsety": "227.292649",
+    "Offsetx": "-1852.797203",
+    "Offsety": "1236.483530",
     "WorkingDir": "",
-    "zoomFactor": "0.931700"
+    "zoomFactor": "0.184333"
   },
   "name": "Loop test"
 }

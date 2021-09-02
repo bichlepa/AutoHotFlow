@@ -1084,10 +1084,10 @@
       "class": "Loop_Work_through_a_list",
       "HeightOfVerticalBar": "385",
       "ID": "element0000000060",
-      "name": "Work through a list: NewList",
+      "name": "Work through a list: ",
       "package": "default",
       "pars": {
-        "Varname": "NewList"
+        "VarValue": "NewList"
       },
       "StandardName": "1",
       "type": "Loop",
@@ -1171,10 +1171,10 @@
       "class": "Loop_Work_through_a_list",
       "HeightOfVerticalBar": "595",
       "ID": "element0000000073",
-      "name": "Work through a list: NewList",
+      "name": "Work through a list: ",
       "package": "default",
       "pars": {
-        "Varname": "NewList"
+        "VarValue": "NewList"
       },
       "StandardName": "1",
       "type": "Loop",

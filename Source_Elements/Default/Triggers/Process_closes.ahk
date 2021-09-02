@@ -57,7 +57,7 @@ Element_getParametrizationDetails_Trigger_Process_Closes(Environment)
 	parametersToEdit.push({type: "Edit", id: "ProcessName", content: "String"})
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Options")})
-	parametersToEdit.push({type: "Label", label: x_lang("Check interval"), size: "small"})
+	parametersToEdit.push({type: "Label", label: x_lang("Check interval (ms)"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: "interval", content: "Number", default: 1000, WarnIfEmpty: true})
 	
 	return parametersToEdit
@@ -119,8 +119,8 @@ Element_enable_Trigger_Process_Closes(Environment, ElementParameters)
 ;Here you can for example define the variables which are provided by the triggers.
 Element_postTrigger_Trigger_Process_Closes(Environment, ElementParameters, TriggerData)
 {
-	x_SetVariable(Environment, "a_processID", TriggerData.processID, "Thread")
-	x_SetVariable(Environment, "a_processName", TriggerData.processName, "Thread")
+	x_SetVariable(Environment, "A_ProcessID", TriggerData.processID, "Thread")
+	x_SetVariable(Environment, "A_ProcessName", TriggerData.processName, "Thread")
 }
 
 ;Called when the trigger should be disabled.
