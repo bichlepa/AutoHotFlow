@@ -1,17 +1,24 @@
 ﻿{
   "allConnections": {
-    "connection0000000008": {
-      "ConnectionType": "normal",
-      "from": "element0000000001",
-      "ID": "connection0000000008",
-      "to": "element0000000012",
-      "type": "Connection"
-    },
     "connection0000000019": {
       "ConnectionType": "normal",
-      "from": "element0000000017",
+      "from": "element0000000001",
       "ID": "connection0000000019",
       "to": "element0000000009",
+      "type": "Connection"
+    },
+    "connection0000000021": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000021",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000022": {
+      "ConnectionType": "normal",
+      "from": "element0000000020",
+      "ID": "connection0000000022",
+      "to": "element0000000012",
       "type": "Connection"
     }
   },
@@ -34,7 +41,7 @@
     "element0000000007": {
       "class": "Action_Message_Box",
       "ID": "element0000000007",
-      "name": "Message Box - Title - Message",
+      "name": "Message box - Title - Message",
       "package": "default",
       "pars": {
         "ButtonLabel": "OK",
@@ -59,12 +66,12 @@
     "element0000000009": {
       "class": "Action_Tooltip",
       "ID": "element0000000009",
-      "name": "Tooltip: hi - 2 s - ",
+      "name": "Tooltip: %a_ahfversion% - 2 s - ",
       "package": "action",
       "pars": {
         "duration": 2,
         "follow_mouse": "0",
-        "text": "hi",
+        "text": "%a_ahfversion%",
         "Unit": "Seconds"
       },
       "StandardName": "1",
@@ -75,7 +82,7 @@
     "element0000000012": {
       "class": "Condition_Debug_Dialog",
       "ID": "element0000000012",
-      "name": "Debug Dialog",
+      "name": "Debug dialog",
       "package": "default",
       "pars": {},
       "StandardName": "1",
@@ -86,7 +93,7 @@
     "element0000000013": {
       "class": "Condition_Confirmation_Dialog",
       "ID": "element0000000013",
-      "name": "Confirmation Dialog - Title, Message",
+      "name": "Confirmation dialog - Title, Message",
       "package": "default",
       "pars": {
         "ButtonLabelCancel": "Cancel",
@@ -138,10 +145,23 @@
       "type": "action",
       "x": "630",
       "y": "70"
+    },
+    "element0000000020": {
+      "class": "Action_Script",
+      "ID": "element0000000020",
+      "name": "Script - a := 4",
+      "package": "default",
+      "pars": {
+        "Script": "a := 4"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "1400",
+      "y": "630"
     }
   },
   "category": "",
-  "ElementIDCounter": "19",
+  "ElementIDCounter": "22",
   "flowSettings": {
     "DefaultWorkingDir": 1,
     "ExecutionPolicy": "default",

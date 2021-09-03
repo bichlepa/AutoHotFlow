@@ -41,10 +41,11 @@ aboutGuiClose()
 
 ; define the text which will be shown in the gui.
 ; the content will be modified by the "find modles.ahk" script.
+_AhfVersion := _getShared("AhfVersion")
 global global_aboutText
 global_aboutText =
 (
-AutoHotFlow - Written by bichlepa (Paul Bichler)
+AutoHotFlow %_AhfVersion% - Written by bichlepa (Paul Bichler)
 Licensed under GNU General Public License 3
 Sourcecode: https://github.com/bichlepa/AutoHotFlow
 

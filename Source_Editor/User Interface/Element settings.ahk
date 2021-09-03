@@ -31,6 +31,7 @@ class ElementSettings
 		this.elementClass := _getElementProperty(_FlowID, this.element, "Class")
 		this.elementName := _getElementProperty(_FlowID, this.element, "Name")
 		this.elementPars := _getElementProperty(_FlowID, this.element, "pars")
+		setElementClass := this.elementClass
 
 		if (not this.elementType)
 		{
@@ -67,6 +68,14 @@ class ElementSettings
 		gui, +hwndglobal_SettingWindowHWND
 		gui, +vscroll
 		gui, -DPIScale
+
+		; get the stability level. Show warning if the element is experimental.
+		this.stability := Element_getStabilityLevel_%setElementClass%()
+		
+		if (this.stability = "experimental")
+		{
+			this.fields.push(new this.label({label: lang("This element is experimental!"), color: "red"}))
+		}
 		
 		;Get the parameter list
 		this.parametersToEdit := Element_getParametrizationDetails(this.elementClass, {flowID: _FlowID, elementID: this.elementID}, true)
@@ -170,7 +179,6 @@ class ElementSettings
 		gui, GUISettingsOfElementParent: +maxsize%WSettingsParent%x%HSettingsParent%
 		
 		;add the always visible buttons
-		setElementClass := this.elementClass
 		gui, GUISettingsOfElementParent: font, s8 cDefault wnorm
 		; button for changing element type
 		gui, GUISettingsOfElementParent: add, button, w370 x10 y10 gGUISettingsOfElementSelectType h20, % lang("%1% type: %2% #e.g. Trigger type: Manual", lang(this.elementType), Element_getName_%setElementClass%())
@@ -1128,6 +1136,12 @@ class ElementSettings
 			{
 				gui, font, s10 cnavy wbold
 				tempYPos := "Y+15"
+			}
+
+			if (parameter.color)
+			{
+				color := parameter.color
+				gui, font, c%color%
 			}
 
 			; do we have a label ID?

@@ -2,6 +2,8 @@
 ;#Warn  ; Recommended for catching common errors.
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
 
+global _AHF_VERSION := "1.0.0"
+
 ; do not warn if a continuable exception occurs (it happens often when AHF is closing)
 #WarnContinuableException off
 
@@ -105,8 +107,7 @@ FileDelete, %a_temp%\autoHotflowTryToStartAsAdmin.txt
 
 ;Include libraries which may be used by the elements. This code is generated.
 global global_libInclusionsForThreads, global_elementInclusionsForThreads
-;Lib_includes_Start
-#include source_Elements\Default\lib\TTS\TTS by Learning One.ahk
+;Lib_includes_Start#include source_Elements\Default\lib\TTS\TTS by Learning One.ahk
 #include source_Elements\Default\lib\Eject\Eject.ahk
 #include source_Elements\Default\lib\Class_Monitor\Class_Monitor.ahk
 #include source_Elements\Default\lib\HTTP Request\HTTPRequest.ahk
@@ -125,7 +126,6 @@ global_libInclusionsForThreads =
 #include source_Elements\Default\common\window functions.ahk
 
 )
-
 
 ;Lib_Includes_End
 
@@ -165,8 +165,7 @@ global_libInclusionsForThreads =
 
 ;Include elements. This code is generated
 ;The elements must be included before the other treads are started
-;Element_Includes_Start
-#include source_Elements\Default\actions\New_Variable.ahk
+;Element_Includes_Start#include source_Elements\Default\actions\New_Variable.ahk
 #include source_Elements\Default\actions\Random_Number.ahk
 #include source_Elements\Default\actions\Absolute_Number.ahk
 #include source_Elements\Default\actions\Square_Root.ahk
@@ -449,7 +448,6 @@ global_elementInclusionsForThreads =
 #include source_Elements\Default\triggers\AutoHotkey_Script.ahk
 
 )
-
 
 ;Element_Includes_End
 

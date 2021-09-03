@@ -65,7 +65,7 @@ EditGUIshow()
 	if (Editor_guiAlreadyShown=true)
 	{
 		 ;Added  w%widthofguipic% to trigger the guisize label
-		gui, MainGUI:show, w%widthofguipic%,% "·AutoHotFlow· " lang("Editor") " - " flowName
+		gui, MainGUI:show, w%widthofguipic%,% "AutoHotFlow " lang("Editor") " - " flowName
 	}
 	else
 	{
@@ -81,7 +81,7 @@ EditGUIshow()
 		local tempheight:=round((MonitorWorkAreabottom -MonitorWorkAreatop)*0.9)
 
 		; show window
-		gui, MainGUI:show,  w%tempwidth% h%tempheight%,% "·AutoHotFlow· " lang("Editor") " - " flowName
+		gui, MainGUI:show,  w%tempwidth% h%tempheight%,% "AutoHotFlow " lang("Editor") " - " flowName
 	}
 	Editor_guiAlreadyShown:=true
 }
@@ -331,9 +331,9 @@ ui_OnLanguageChange()
 	
 	flowName := _getFlowProperty(_FlowID, "Name")
 	IfWinExist,% temp
-		gui,MainGUI:show,,% "·AutoHotFlow· " lang("Editor") " - " flowName 
+		gui,MainGUI:show,,% "AutoHotFlow " lang("Editor") " - " flowName 
 	else
-		gui,MainGUI:show,hide,% "·AutoHotFlow· " lang("Editor") " - " flowName 
+		gui,MainGUI:show,hide,% "AutoHotFlow " lang("Editor") " - " flowName 
 	
 	;TODO Renamed the menus when the language changes.
 	;~ initializeTrayBar()

@@ -226,6 +226,7 @@ Source: "Source_Elements\Default\Actions\Read_From_Ini.ahk"; DestDir: "{app}\Sou
 Source: "Source_Elements\Default\Actions\Reboot_Computer.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Actions\Rename_file.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Actions\Rename_Folder.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
+Source: "Source_Elements\Default\Actions\Replace_in_a_string.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Actions\Rounding_a_number.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Actions\Run.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Actions\Screenshot.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
@@ -319,9 +320,7 @@ Source: "Source_Elements\Default\help\en\Actions\Click.html"; DestDir: "{app}\So
 Source: "Source_Elements\Default\help\en\Actions\close_Window.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Copy_file.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Copy_folder.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
-Source: "Source_Elements\Default\help\en\Actions\Copy_variable.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Create_folder.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
-Source: "Source_Elements\Default\help\en\Actions\Date_calculation.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Delete_file.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Delete_folder.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Delete_from_ini.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
@@ -332,6 +331,7 @@ Source: "Source_Elements\Default\help\en\Actions\Eject_Drive.html"; DestDir: "{a
 Source: "Source_Elements\Default\help\en\Actions\Empty_recycle_bin.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Execute_Flow.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Exponentiation.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
+Source: "Source_Elements\Default\help\en\Actions\Extract_files.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Get_Clipboard.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Get_control_text.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Get_Drive_Information.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
@@ -340,9 +340,10 @@ Source: "Source_Elements\Default\help\en\Actions\Get_file_size.html"; DestDir: "
 Source: "Source_Elements\Default\help\en\Actions\Get_file_time.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Get_from_list.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Get_index_of_element_in_list.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
-Source: "Source_Elements\Default\help\en\Actions\Get_Monitor_Settings.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
+Source: "Source_Elements\Default\help\en\Actions\Get_list_info.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Get_mouse_position.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Get_pixel_color.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
+Source: "Source_Elements\Default\help\en\Actions\Get_Screen_Settings.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Get_string_length.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Get_Volume.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Hibernate_Computer.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
@@ -350,7 +351,6 @@ Source: "Source_Elements\Default\help\en\Actions\Hide_window.html"; DestDir: "{a
 Source: "Source_Elements\Default\help\en\Actions\HTTP_Request.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Input_box.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Kill_Process.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
-Source: "Source_Elements\Default\help\en\Actions\Kill_Window.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\List_Drives.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Lock_Computer.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Log_off.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
@@ -360,21 +360,21 @@ Source: "Source_Elements\Default\help\en\Actions\Move_file.html"; DestDir: "{app
 Source: "Source_Elements\Default\help\en\Actions\Move_folder.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Move_mouse.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Move_window.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
-Source: "Source_Elements\Default\help\en\Actions\New_Date.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\New_List.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
+Source: "Source_Elements\Default\help\en\Actions\New_Time.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\New_Variable.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Play_Sound.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Random_number.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Read_from_file.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Read_from_ini.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\reboot_Computer.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
-Source: "Source_Elements\Default\help\en\Actions\Recycle_file.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Rename_file.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Rename_folder.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
-Source: "Source_Elements\Default\help\en\Actions\Replace_a_string.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
+Source: "Source_Elements\Default\help\en\Actions\Replace_in_a_string.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Rounding_a_number.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Run.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Screenshot.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
+Source: "Source_Elements\Default\help\en\Actions\Script.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Search_image.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Search_in_a_string.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Search_pixel.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
@@ -388,8 +388,8 @@ Source: "Source_Elements\Default\help\en\Actions\Set_file_attributes.html"; Dest
 Source: "Source_Elements\Default\help\en\Actions\Set_file_time.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Set_Flow_Status.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Set_lock_key.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
-Source: "Source_Elements\Default\help\en\Actions\Set_Monitor_Settings.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Set_Process_Priority.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
+Source: "Source_Elements\Default\help\en\Actions\Set_Screen_Settings.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Set_Volume.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Show_window.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Shuffle_list.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
@@ -402,8 +402,11 @@ Source: "Source_Elements\Default\help\en\Actions\Stop_Flow.html"; DestDir: "{app
 Source: "Source_Elements\Default\help\en\Actions\Stop_Sound.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Substring.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Suspend_Computer.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
+Source: "Source_Elements\Default\help\en\Actions\Time_calculation.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
+Source: "Source_Elements\Default\help\en\Actions\Time_difference.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\tooltip.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
-Source: "Source_Elements\Default\help\en\Actions\Traytip.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
+Source: "Source_Elements\Default\help\en\Actions\Trace_Point.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
+Source: "Source_Elements\Default\help\en\Actions\Trace_Point_Check.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Trigonometry.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Trim_a_string.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Write_to_file.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
@@ -417,6 +420,7 @@ Source: "Source_Elements\Default\help\en\Conditions\Flow_Enabled.html"; DestDir:
 Source: "Source_Elements\Default\help\en\Conditions\Flow_Running.html"; DestDir: "{app}\Source_Elements\Default\help\en\Conditions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Conditions\key_is_down.html"; DestDir: "{app}\Source_Elements\Default\help\en\Conditions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Conditions\List_contains_element.html"; DestDir: "{app}\Source_Elements\Default\help\en\Conditions"; Flags: ignoreversion
+Source: "Source_Elements\Default\help\en\Conditions\Number is.html"; DestDir: "{app}\Source_Elements\Default\help\en\Conditions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Conditions\Process_is_running.html"; DestDir: "{app}\Source_Elements\Default\help\en\Conditions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Conditions\String_contains_text.html"; DestDir: "{app}\Source_Elements\Default\help\en\Conditions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Conditions\Variable_is_empty.html"; DestDir: "{app}\Source_Elements\Default\help\en\Conditions"; Flags: ignoreversion
@@ -427,9 +431,10 @@ Source: "Source_Elements\Default\help\en\Loops\Loop_through_files.html"; DestDir
 Source: "Source_Elements\Default\help\en\Loops\Parse_a_string.html"; DestDir: "{app}\Source_Elements\Default\help\en\Loops"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Loops\simpleloop.html"; DestDir: "{app}\Source_Elements\Default\help\en\Loops"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Loops\Work_through_a_list.html"; DestDir: "{app}\Source_Elements\Default\help\en\Loops"; Flags: ignoreversion
+Source: "Source_Elements\Default\help\en\Triggers\AutoHotkey_Script.html"; DestDir: "{app}\Source_Elements\Default\help\en\Triggers"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Triggers\Clipboard_Changes.html"; DestDir: "{app}\Source_Elements\Default\help\en\Triggers"; Flags: ignoreversion
-Source: "Source_Elements\Default\help\en\Triggers\File_Observer.html"; DestDir: "{app}\Source_Elements\Default\help\en\Triggers"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Triggers\Hotkey.html"; DestDir: "{app}\Source_Elements\Default\help\en\Triggers"; Flags: ignoreversion
+Source: "Source_Elements\Default\help\en\Triggers\Manual.html"; DestDir: "{app}\Source_Elements\Default\help\en\Triggers"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Triggers\Periodic_Timer.html"; DestDir: "{app}\Source_Elements\Default\help\en\Triggers"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Triggers\Process_closes.html"; DestDir: "{app}\Source_Elements\Default\help\en\Triggers"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Triggers\Process_starts.html"; DestDir: "{app}\Source_Elements\Default\help\en\Triggers"; Flags: ignoreversion

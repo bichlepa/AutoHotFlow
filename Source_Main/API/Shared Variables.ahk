@@ -163,6 +163,8 @@ _share._WorkingDir := _WorkingDir
 _share.CategoryIDCounter := 1	
 _share.Exiting := false
 
+_share.AhfVersion := _AHF_VERSION
+
 _share.tasks := Object()
 _share.Tasks.main := Object()
 

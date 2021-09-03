@@ -55,7 +55,7 @@ init_Manager_GUI()
 	setGuiIcon(_ScriptDir "\icons\MainIcon.ico")
 
 	;Set title. Do not show yet
-	Gui, Show, hide, % "AutoHotFlow " lang("Manager") 
+	Gui, Show, hide, % "AutoHotFlow " lang("Manager") " " _getShared("AhfVersion")
 	
 	; enable hotkeys
 	hotkey, ifwinactive, ahk_id %ManagerGUIHWND%
