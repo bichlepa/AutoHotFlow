@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<link rel="stylesheet" href="../../stylesheet.css">
+	<link rel="stylesheet" href="stylesheet.css">
+	<link rel="stylesheet" href="../../../../../Help/stylesheet.css">
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<H1>Execute flow</H1>
+<p>
+	The action <B>Execute flow</B> executes a flow. The target trigger must be enabled.
+</p>
+
+<H2>Settings</H2>
+<table class="settings">
+	<TR>
+		<TD>
+			<h4>Which flow</h4>
+			<p>Choose which flow should be executed.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Which trigger</h4>
+			<p>Choose which trigger should be executed. You can choose any of the manual triggers.
+				<br/>The trigger must be enabled, otherwise the action will throw an exception by default.
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Options</h4>
+			<p>If <b>Send local variables</b> is checked, all local variables from the current instance will be sent to the executed flow.
+				<br/>If <b>Skip disabled flow</b> is checked, the action will not throw an error if the target flow is not enabled.
+				<br/>If <b>Wait for called flow to finish</b> is checked, the action will wait until the target flow has finished.
+				<br/>If <b>Return variables to the calling flow</b> is checked, all generated variables in the target flow will be sent back after it finishes.
+			</p>
+		</TD>
+	</TR>
+</table>
+
+</BODY>
+</HTML>

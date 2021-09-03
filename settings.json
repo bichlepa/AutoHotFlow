@@ -1,0 +1,13 @@
+﻿{
+  "developing": 1,
+  "FlowExecutionPolicy": "Wait",
+  "FlowWorkingDir": "C:\\Users\\bichl\\Documents\\AutoHotFlow",
+  "HideDemoFlows": "0",
+  "LogLevelApp": "3",
+  "LogLevelFlow": "3",
+  "LogLevelThread": "2",
+  "LogToFile": "1",
+  "runAsAdmin": "0",
+  "ShowElementsLevel": "Programmer",
+  "UILanguage": "en"
+}

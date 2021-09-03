@@ -1,0 +1,1317 @@
+﻿{
+  "allConnections": {
+    "connection0000000057": {
+      "ConnectionType": "normal",
+      "from": "element0000000009",
+      "ID": "connection0000000057",
+      "to": "element0000000002",
+      "type": "Connection"
+    },
+    "connection0000000058": {
+      "ConnectionType": "Yes",
+      "from": "element0000000002",
+      "ID": "connection0000000058",
+      "to": "element0000000003",
+      "type": "Connection"
+    },
+    "connection0000000059": {
+      "ConnectionType": "No",
+      "from": "element0000000003",
+      "ID": "connection0000000059",
+      "to": "element0000000004",
+      "type": "Connection"
+    },
+    "connection0000000060": {
+      "ConnectionType": "Yes",
+      "from": "element0000000004",
+      "ID": "connection0000000060",
+      "to": "element0000000005",
+      "type": "Connection"
+    },
+    "connection0000000061": {
+      "ConnectionType": "No",
+      "from": "element0000000005",
+      "ID": "connection0000000061",
+      "to": "element0000000006",
+      "type": "Connection"
+    },
+    "connection0000000062": {
+      "ConnectionType": "No",
+      "from": "element0000000007",
+      "ID": "connection0000000062",
+      "to": "element0000000011",
+      "type": "Connection"
+    },
+    "connection0000000063": {
+      "ConnectionType": "No",
+      "from": "element0000000006",
+      "ID": "connection0000000063",
+      "to": "element0000000007",
+      "type": "Connection"
+    },
+    "connection0000000064": {
+      "ConnectionType": "normal",
+      "from": "element0000000010",
+      "ID": "connection0000000064",
+      "to": "element0000000009",
+      "type": "Connection"
+    },
+    "connection0000000065": {
+      "ConnectionType": "normal",
+      "from": "element0000000008",
+      "ID": "connection0000000065",
+      "to": "element0000000010",
+      "type": "Connection"
+    },
+    "connection0000000066": {
+      "ConnectionType": "normal",
+      "from": "element0000000011",
+      "ID": "connection0000000066",
+      "to": "element0000000012",
+      "type": "Connection"
+    },
+    "connection0000000067": {
+      "ConnectionType": "normal",
+      "from": "element0000000012",
+      "ID": "connection0000000067",
+      "to": "element0000000013",
+      "type": "Connection"
+    },
+    "connection0000000068": {
+      "ConnectionType": "normal",
+      "from": "element0000000013",
+      "ID": "connection0000000068",
+      "to": "element0000000015",
+      "type": "Connection"
+    },
+    "connection0000000069": {
+      "ConnectionType": "normal",
+      "from": "element0000000015",
+      "ID": "connection0000000069",
+      "to": "element0000000016",
+      "type": "Connection"
+    },
+    "connection0000000070": {
+      "ConnectionType": "normal",
+      "from": "element0000000016",
+      "ID": "connection0000000070",
+      "to": "element0000000017",
+      "type": "Connection"
+    },
+    "connection0000000071": {
+      "ConnectionType": "Yes",
+      "from": "element0000000014",
+      "ID": "connection0000000071",
+      "to": "element0000000018",
+      "type": "Connection"
+    },
+    "connection0000000072": {
+      "ConnectionType": "normal",
+      "from": "element0000000017",
+      "ID": "connection0000000072",
+      "to": "element0000000014",
+      "type": "Connection"
+    },
+    "connection0000000073": {
+      "ConnectionType": "normal",
+      "from": "element0000000018",
+      "ID": "connection0000000073",
+      "to": "element0000000019",
+      "type": "Connection"
+    },
+    "connection0000000074": {
+      "ConnectionType": "Yes",
+      "from": "element0000000019",
+      "ID": "connection0000000074",
+      "to": "element0000000020",
+      "type": "Connection"
+    },
+    "connection0000000075": {
+      "ConnectionType": "Exception",
+      "from": "element0000000020",
+      "ID": "connection0000000075",
+      "to": "element0000000021",
+      "type": "Connection"
+    },
+    "connection0000000076": {
+      "ConnectionType": "normal",
+      "from": "element0000000022",
+      "ID": "connection0000000076",
+      "to": "element0000000024",
+      "type": "Connection"
+    },
+    "connection0000000077": {
+      "ConnectionType": "normal",
+      "from": "element0000000024",
+      "ID": "connection0000000077",
+      "to": "element0000000025",
+      "type": "Connection"
+    },
+    "connection0000000078": {
+      "ConnectionType": "normal",
+      "from": "element0000000025",
+      "ID": "connection0000000078",
+      "to": "element0000000026",
+      "type": "Connection"
+    },
+    "connection0000000079": {
+      "ConnectionType": "normal",
+      "from": "element0000000026",
+      "ID": "connection0000000079",
+      "to": "element0000000023",
+      "type": "Connection"
+    },
+    "connection0000000080": {
+      "ConnectionType": "normal",
+      "from": "element0000000021",
+      "ID": "connection0000000080",
+      "to": "element0000000022",
+      "type": "Connection"
+    },
+    "connection0000000081": {
+      "ConnectionType": "Yes",
+      "from": "element0000000023",
+      "ID": "connection0000000081",
+      "to": "element0000000027",
+      "type": "Connection"
+    },
+    "connection0000000082": {
+      "ConnectionType": "normal",
+      "from": "element0000000028",
+      "ID": "connection0000000082",
+      "to": "element0000000030",
+      "type": "Connection"
+    },
+    "connection0000000083": {
+      "ConnectionType": "normal",
+      "from": "element0000000030",
+      "ID": "connection0000000083",
+      "to": "element0000000031",
+      "type": "Connection"
+    },
+    "connection0000000084": {
+      "ConnectionType": "normal",
+      "from": "element0000000031",
+      "ID": "connection0000000084",
+      "to": "element0000000032",
+      "type": "Connection"
+    },
+    "connection0000000085": {
+      "ConnectionType": "normal",
+      "from": "element0000000032",
+      "ID": "connection0000000085",
+      "to": "element0000000029",
+      "type": "Connection"
+    },
+    "connection0000000086": {
+      "ConnectionType": "normal",
+      "from": "element0000000027",
+      "ID": "connection0000000086",
+      "to": "element0000000028",
+      "type": "Connection"
+    },
+    "connection0000000087": {
+      "ConnectionType": "Yes",
+      "from": "element0000000029",
+      "ID": "connection0000000087",
+      "to": "element0000000033",
+      "type": "Connection"
+    },
+    "connection0000000088": {
+      "ConnectionType": "normal",
+      "from": "element0000000035",
+      "ID": "connection0000000088",
+      "to": "element0000000036",
+      "type": "Connection"
+    },
+    "connection0000000089": {
+      "ConnectionType": "normal",
+      "from": "element0000000036",
+      "ID": "connection0000000089",
+      "to": "element0000000037",
+      "type": "Connection"
+    },
+    "connection0000000090": {
+      "ConnectionType": "normal",
+      "from": "element0000000037",
+      "ID": "connection0000000090",
+      "to": "element0000000038",
+      "type": "Connection"
+    },
+    "connection0000000091": {
+      "ConnectionType": "normal",
+      "from": "element0000000034",
+      "ID": "connection0000000091",
+      "to": "element0000000035",
+      "type": "Connection"
+    },
+    "connection0000000092": {
+      "ConnectionType": "normal",
+      "from": "element0000000033",
+      "ID": "connection0000000092",
+      "to": "element0000000040",
+      "type": "Connection"
+    },
+    "connection0000000093": {
+      "ConnectionType": "Yes",
+      "from": "element0000000040",
+      "ID": "connection0000000093",
+      "to": "element0000000034",
+      "type": "Connection"
+    },
+    "connection0000000094": {
+      "ConnectionType": "normal",
+      "from": "element0000000038",
+      "ID": "connection0000000094",
+      "to": "element0000000039",
+      "type": "Connection"
+    },
+    "connection0000000095": {
+      "ConnectionType": "Yes",
+      "from": "element0000000046",
+      "ID": "connection0000000095",
+      "to": "element0000000047",
+      "type": "Connection"
+    },
+    "connection0000000096": {
+      "ConnectionType": "Yes",
+      "from": "element0000000039",
+      "ID": "connection0000000096",
+      "to": "element0000000041",
+      "type": "Connection"
+    },
+    "connection0000000097": {
+      "ConnectionType": "normal",
+      "from": "element0000000042",
+      "ID": "connection0000000097",
+      "to": "element0000000043",
+      "type": "Connection"
+    },
+    "connection0000000098": {
+      "ConnectionType": "normal",
+      "from": "element0000000043",
+      "ID": "connection0000000098",
+      "to": "element0000000044",
+      "type": "Connection"
+    },
+    "connection0000000099": {
+      "ConnectionType": "normal",
+      "from": "element0000000044",
+      "ID": "connection0000000099",
+      "to": "element0000000045",
+      "type": "Connection"
+    },
+    "connection0000000100": {
+      "ConnectionType": "normal",
+      "from": "element0000000045",
+      "ID": "connection0000000100",
+      "to": "element0000000046",
+      "type": "Connection"
+    },
+    "connection0000000101": {
+      "ConnectionType": "normal",
+      "from": "element0000000041",
+      "ID": "connection0000000101",
+      "to": "element0000000042",
+      "type": "Connection"
+    },
+    "connection0000000102": {
+      "ConnectionType": "normal",
+      "from": "element0000000047",
+      "ID": "connection0000000102",
+      "to": "element0000000048",
+      "type": "Connection"
+    },
+    "connection0000000103": {
+      "ConnectionType": "normal",
+      "from": "element0000000048",
+      "ID": "connection0000000103",
+      "to": "element0000000049",
+      "type": "Connection"
+    },
+    "connection0000000104": {
+      "ConnectionType": "normal",
+      "from": "element0000000049",
+      "ID": "connection0000000104",
+      "to": "element0000000050",
+      "type": "Connection"
+    },
+    "connection0000000105": {
+      "ConnectionType": "normal",
+      "from": "element0000000050",
+      "ID": "connection0000000105",
+      "to": "element0000000051",
+      "type": "Connection"
+    },
+    "connection0000000106": {
+      "ConnectionType": "Yes",
+      "from": "element0000000051",
+      "ID": "connection0000000106",
+      "to": "element0000000052",
+      "type": "Connection"
+    },
+    "connection0000000107": {
+      "ConnectionType": "Yes",
+      "from": "element0000000052",
+      "ID": "connection0000000107",
+      "to": "element0000000112",
+      "type": "Connection"
+    },
+    "connection0000000108": {
+      "ConnectionType": "No",
+      "from": "element0000000052",
+      "ID": "connection0000000108",
+      "to": "element0000000054",
+      "type": "Connection"
+    },
+    "connection0000000109": {
+      "ConnectionType": "Yes",
+      "from": "element0000000054",
+      "ID": "connection0000000109",
+      "to": "element0000000055",
+      "type": "Connection"
+    },
+    "connection0000000110": {
+      "ConnectionType": "Yes",
+      "from": "element0000000039",
+      "ID": "connection0000000110",
+      "to": "element0000000056",
+      "type": "Connection"
+    },
+    "connection0000000111": {
+      "ConnectionType": "normal",
+      "from": "element0000000055",
+      "ID": "connection0000000111",
+      "to": "element0000000041",
+      "type": "Connection"
+    }
+  },
+  "allElements": {
+    "element0000000002": {
+      "class": "Condition_List_Contains_Element",
+      "ID": "element0000000002",
+      "name": "List Contains Element - Value '1' in list 'TestList2'",
+      "package": "default",
+      "pars": {
+        "InputList": "TestList2",
+        "isExpressionPosition": "String",
+        "isExpressionSearchContent": "String",
+        "Position": 1,
+        "SearchContent": "Zwei",
+        "SearchWhat": "Content"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "350",
+      "y": "350"
+    },
+    "element0000000003": {
+      "class": "Condition_List_Contains_Element",
+      "ID": "element0000000003",
+      "name": "List Contains Element - Value '1' in list 'TestList2'",
+      "package": "default",
+      "pars": {
+        "InputList": "TestList2",
+        "isExpressionPosition": "String",
+        "isExpressionSearchContent": "String",
+        "Position": 1,
+        "SearchContent": "gagaga",
+        "SearchWhat": "Content"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "350",
+      "y": "490"
+    },
+    "element0000000004": {
+      "class": "Condition_List_Contains_Element",
+      "ID": "element0000000004",
+      "name": "List Contains Element - Key 'Zwei' in list 'TestList2'",
+      "package": "default",
+      "pars": {
+        "InputList": "TestList2",
+        "isExpressionPosition": "String",
+        "isExpressionSearchContent": "String",
+        "Position": 1,
+        "SearchContent": "Zwei",
+        "SearchWhat": "Key"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "315",
+      "y": "665"
+    },
+    "element0000000005": {
+      "class": "Condition_List_Contains_Element",
+      "ID": "element0000000005",
+      "name": "List Contains Element - Key 'gagaga' in list 'TestList2'",
+      "package": "default",
+      "pars": {
+        "InputList": "TestList2",
+        "isExpressionPosition": "String",
+        "isExpressionSearchContent": "String",
+        "Position": "5",
+        "SearchContent": "gagaga",
+        "SearchWhat": "Key"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "315",
+      "y": "805"
+    },
+    "element0000000006": {
+      "class": "Condition_List_Contains_Element",
+      "ID": "element0000000006",
+      "name": "List Contains Element - Key 'gagaga' in list 'TestList2'",
+      "package": "default",
+      "pars": {
+        "InputList": "TestList2",
+        "isExpressionPosition": "String",
+        "isExpressionSearchContent": "String",
+        "Position": "0",
+        "SearchContent": "gagaga",
+        "SearchWhat": "Key"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "315",
+      "y": "945"
+    },
+    "element0000000007": {
+      "class": "Condition_List_Contains_Element",
+      "ID": "element0000000007",
+      "name": "List Contains Element - Key 'gagaga' in list 'TestList2'",
+      "package": "default",
+      "pars": {
+        "InputList": "TestList2",
+        "isExpressionPosition": "String",
+        "isExpressionSearchContent": "String",
+        "Position": "gaga",
+        "SearchContent": "gagaga",
+        "SearchWhat": "Key"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "315",
+      "y": "1085"
+    },
+    "element0000000008": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "1",
+      "enabled": "1",
+      "ID": "element0000000008",
+      "name": "Manual - \"list test\"",
+      "package": "default",
+      "pars": {
+        "ID": "list test"
+      },
+      "StandardName": "1",
+      "type": "trigger",
+      "x": "350",
+      "y": "-70"
+    },
+    "element0000000009": {
+      "class": "Action_New_List",
+      "ID": "element0000000009",
+      "name": "New list TestList2 - At position '1' - Multiple values 'Eins,Zwei,Drei'",
+      "package": "default",
+      "pars": {
+        "DelimiterComma": 1,
+        "DelimiterLinefeed": 0,
+        "DelimiterSemicolon": 0,
+        "DelimiterSpace": 0,
+        "expression": "String",
+        "expressionPos": "String",
+        "NumberOfElements": "Multiple",
+        "Position": 1,
+        "Varname": "TestList2",
+        "VarValue": "New element",
+        "VarValues": "Eins,Zwei,Drei",
+        "WhichPosition": "Specified"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "350",
+      "y": "210"
+    },
+    "element0000000010": {
+      "class": "Action_New_List",
+      "ID": "element0000000010",
+      "name": "New list testListFirst - At position '1' - Multiple values 'One - Two - Three'",
+      "package": "default",
+      "pars": {
+        "DelimiterComma": "0",
+        "DelimiterLinefeed": "1",
+        "DelimiterSemicolon": "0",
+        "DelimiterSpace": "0",
+        "expression": "String",
+        "expressionPos": "String",
+        "NumberOfElements": "Multiple",
+        "Position": "1",
+        "Varname": "testListFirst",
+        "VarValue": "New element",
+        "VarValues": "One\nTwo\nThree",
+        "WhichPosition": "Specified"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "350",
+      "y": "70"
+    },
+    "element0000000011": {
+      "class": "Action_New_List",
+      "ID": "element0000000011",
+      "name": "New list russianList - At position '3' - Value '\"\u0442\u0440\u0438\"'",
+      "package": "default",
+      "pars": {
+        "DelimiterComma": "0",
+        "DelimiterLinefeed": "1",
+        "DelimiterSemicolon": "0",
+        "DelimiterSpace": "0",
+        "expression": "Expression",
+        "expressionPos": "String",
+        "NumberOfElements": "One",
+        "Position": "3",
+        "Varname": "russianList",
+        "VarValue": "\"\u0442\u0440\u0438\"",
+        "VarValues": "One\nTwo\nThree",
+        "WhichPosition": "Specified"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "315",
+      "y": "1295"
+    },
+    "element0000000012": {
+      "class": "Action_Add_To_List",
+      "ID": "element0000000012",
+      "name": "Add to list russianList - As last value - Value '\"\u0447\u0435\u0442\u044B\u0440\u0435\"'",
+      "package": "default",
+      "pars": {
+        "DelimiterComma": "0",
+        "DelimiterLinefeed": "1",
+        "DelimiterSemicolon": "0",
+        "DelimiterSpace": "0",
+        "Expression": "Expression",
+        "expressionPos": "String",
+        "InsertMethod": "Insert",
+        "InsertMethodLabel": "",
+        "NumberOfElements": "One",
+        "Position": "2",
+        "Varname": "russianList",
+        "VarValue": "\"\u0447\u0435\u0442\u044B\u0440\u0435\"",
+        "VarValues": "One\nTwo\nThree",
+        "WhichPosition": "Last"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "315",
+      "y": "1435"
+    },
+    "element0000000013": {
+      "class": "Action_Get_List_Info",
+      "ID": "element0000000013",
+      "name": "Get list info - ListMax = Maximum index of russianList",
+      "package": "default",
+      "pars": {
+        "List": "russianList",
+        "Varname": "ListMax",
+        "WhichInfo": "maxIndex"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "140",
+      "y": "1575"
+    },
+    "element0000000014": {
+      "class": "Condition_Expression",
+      "ID": "element0000000014",
+      "name": "Expression - listLength = 4 and listMax = 4 and listMin = 3 and listCount = 2",
+      "package": "default",
+      "pars": {
+        "Expression": "listLength = 4 and listMax = 4 and listMin = 3 and listCount = 2"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "315",
+      "y": "1715"
+    },
+    "element0000000015": {
+      "class": "Action_Get_List_Info",
+      "ID": "element0000000015",
+      "name": "Get list info - ListMin = Minimum index of russianList",
+      "package": "default",
+      "pars": {
+        "List": "russianList",
+        "Varname": "ListMin",
+        "WhichInfo": "minIndex"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "245",
+      "y": "1575"
+    },
+    "element0000000016": {
+      "class": "Action_Get_List_Info",
+      "ID": "element0000000016",
+      "name": "Get list info - ListLength = Array length of russianList",
+      "package": "default",
+      "pars": {
+        "List": "russianList",
+        "Varname": "ListLength",
+        "WhichInfo": "length"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "350",
+      "y": "1575"
+    },
+    "element0000000017": {
+      "class": "Action_Get_List_Info",
+      "ID": "element0000000017",
+      "name": "Get list info - ListCount = Element count of russianList",
+      "package": "default",
+      "pars": {
+        "List": "russianList",
+        "Varname": "ListCount",
+        "WhichInfo": "count"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "455",
+      "y": "1575"
+    },
+    "element0000000018": {
+      "class": "Action_Get_Index_Of_Element_In_List",
+      "ID": "element0000000018",
+      "name": "Get position of element in list - index - russianList - \u0447\u0435\u0442\u044B\u0440\u0435",
+      "package": "default",
+      "pars": {
+        "expression": "String",
+        "ListName": "russianList",
+        "SearchContent": "\u0447\u0435\u0442\u044B\u0440\u0435",
+        "Varname": "index"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "315",
+      "y": "1855"
+    },
+    "element0000000019": {
+      "class": "Condition_Expression",
+      "ID": "element0000000019",
+      "name": "Expression - index = 4",
+      "package": "default",
+      "pars": {
+        "Expression": "index = 4"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "315",
+      "y": "1995"
+    },
+    "element0000000020": {
+      "class": "Action_Get_Index_Of_Element_In_List",
+      "ID": "element0000000020",
+      "name": "Get position of element in list - index - russianList - asdf",
+      "package": "default",
+      "pars": {
+        "expression": "String",
+        "ListName": "russianList",
+        "SearchContent": "asdf",
+        "Varname": "index"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "315",
+      "y": "2135"
+    },
+    "element0000000021": {
+      "class": "Action_Add_To_List",
+      "ID": "element0000000021",
+      "name": "Add to list russianList - At position '1' - Value '\u0440\u0430\u0437'",
+      "package": "default",
+      "pars": {
+        "DelimiterComma": 0,
+        "DelimiterLinefeed": 1,
+        "DelimiterSemicolon": 0,
+        "DelimiterSpace": 0,
+        "Expression": "String",
+        "expressionPos": "String",
+        "InsertMethod": "Overwrite",
+        "InsertMethodLabel": "",
+        "NumberOfElements": "One",
+        "Position": "1",
+        "Varname": "russianList",
+        "VarValue": "\u0440\u0430\u0437",
+        "VarValues": "Element one\nElement two",
+        "WhichPosition": "Specified"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "315",
+      "y": "2275"
+    },
+    "element0000000022": {
+      "class": "Action_Get_List_Info",
+      "ID": "element0000000022",
+      "name": "Get list info - ListMax = Maximum index of russianList",
+      "package": "default",
+      "pars": {
+        "List": "russianList",
+        "Varname": "ListMax",
+        "WhichInfo": "maxIndex"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "175",
+      "y": "2415"
+    },
+    "element0000000023": {
+      "class": "Condition_Expression",
+      "ID": "element0000000023",
+      "name": "Expression - listLength = 4 and listMax = 4 and listMin = 1 and listCount = 3",
+      "package": "default",
+      "pars": {
+        "Expression": "listLength = 4 and listMax = 4 and listMin = 1 and listCount = 3"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "315",
+      "y": "2555"
+    },
+    "element0000000024": {
+      "class": "Action_Get_List_Info",
+      "ID": "element0000000024",
+      "name": "Get list info - ListMin = Minimum index of russianList",
+      "package": "default",
+      "pars": {
+        "List": "russianList",
+        "Varname": "ListMin",
+        "WhichInfo": "minIndex"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "280",
+      "y": "2415"
+    },
+    "element0000000025": {
+      "class": "Action_Get_List_Info",
+      "ID": "element0000000025",
+      "name": "Get list info - ListLength = Array length of russianList",
+      "package": "default",
+      "pars": {
+        "List": "russianList",
+        "Varname": "ListLength",
+        "WhichInfo": "length"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "385",
+      "y": "2415"
+    },
+    "element0000000026": {
+      "class": "Action_Get_List_Info",
+      "ID": "element0000000026",
+      "name": "Get list info - ListCount = Element count of russianList",
+      "package": "default",
+      "pars": {
+        "List": "russianList",
+        "Varname": "ListCount",
+        "WhichInfo": "count"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "490",
+      "y": "2415"
+    },
+    "element0000000027": {
+      "class": "Action_Add_To_List",
+      "ID": "element0000000027",
+      "name": "Add to list russianList - As first value - Value '\u043D\u043E\u043B\u044C'",
+      "package": "default",
+      "pars": {
+        "DelimiterComma": 0,
+        "DelimiterLinefeed": 1,
+        "DelimiterSemicolon": 0,
+        "DelimiterSpace": 0,
+        "Expression": "String",
+        "expressionPos": "String",
+        "InsertMethod": "Overwrite",
+        "InsertMethodLabel": "",
+        "NumberOfElements": "One",
+        "Position": "1",
+        "Varname": "russianList",
+        "VarValue": "\u043D\u043E\u043B\u044C",
+        "VarValues": "Element one\nElement two",
+        "WhichPosition": "First"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "315",
+      "y": "2695"
+    },
+    "element0000000028": {
+      "class": "Action_Get_List_Info",
+      "ID": "element0000000028",
+      "name": "Get list info - ListMax = Maximum index of russianList",
+      "package": "default",
+      "pars": {
+        "List": "russianList",
+        "Varname": "ListMax",
+        "WhichInfo": "maxIndex"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "175",
+      "y": "2835"
+    },
+    "element0000000029": {
+      "class": "Condition_Expression",
+      "ID": "element0000000029",
+      "name": "Expression - listLength = 5 and listMax = 5 and listMin = 1 and listCount = 4",
+      "package": "default",
+      "pars": {
+        "Expression": "listLength = 5 and listMax = 5 and listMin = 1 and listCount = 4"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "315",
+      "y": "2975"
+    },
+    "element0000000030": {
+      "class": "Action_Get_List_Info",
+      "ID": "element0000000030",
+      "name": "Get list info - ListMin = Minimum index of russianList",
+      "package": "default",
+      "pars": {
+        "List": "russianList",
+        "Varname": "ListMin",
+        "WhichInfo": "minIndex"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "280",
+      "y": "2835"
+    },
+    "element0000000031": {
+      "class": "Action_Get_List_Info",
+      "ID": "element0000000031",
+      "name": "Get list info - ListLength = Array length of russianList",
+      "package": "default",
+      "pars": {
+        "List": "russianList",
+        "Varname": "ListLength",
+        "WhichInfo": "length"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "385",
+      "y": "2835"
+    },
+    "element0000000032": {
+      "class": "Action_Get_List_Info",
+      "ID": "element0000000032",
+      "name": "Get list info - ListCount = Element count of russianList",
+      "package": "default",
+      "pars": {
+        "List": "russianList",
+        "Varname": "ListCount",
+        "WhichInfo": "count"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "490",
+      "y": "2835"
+    },
+    "element0000000033": {
+      "class": "Action_Delete_From_List",
+      "ID": "element0000000033",
+      "name": "Delete from list russianList - First value - deletedVariable - Write deleted value to 'deletedVariable'",
+      "package": "default",
+      "pars": {
+        "DeleteMethod": "Decrement",
+        "DeleteMethodLabel": "",
+        "expressionPos": "String",
+        "ListName": "russianList",
+        "Position": "keyName",
+        "Varname": "deletedVariable",
+        "WhichPosition": "First",
+        "WriteToVariable": "1"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "315",
+      "y": "3115"
+    },
+    "element0000000034": {
+      "class": "Action_Add_To_List",
+      "ID": "element0000000034",
+      "name": "Add to list russianList - At position '2' - Value '\u0434\u0432\u0430'",
+      "package": "default",
+      "pars": {
+        "DelimiterComma": 0,
+        "DelimiterLinefeed": 1,
+        "DelimiterSemicolon": 0,
+        "DelimiterSpace": 0,
+        "Expression": "String",
+        "expressionPos": "String",
+        "InsertMethod": "Overwrite",
+        "InsertMethodLabel": "",
+        "NumberOfElements": "One",
+        "Position": "2",
+        "Varname": "russianList",
+        "VarValue": "\u0434\u0432\u0430",
+        "VarValues": "Element one\nElement two",
+        "WhichPosition": "Specified"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "315",
+      "y": "3430"
+    },
+    "element0000000035": {
+      "class": "Action_Get_List_Info",
+      "ID": "element0000000035",
+      "name": "Get list info - ListMax = Maximum index of russianList",
+      "package": "default",
+      "pars": {
+        "List": "russianList",
+        "Varname": "ListMax",
+        "WhichInfo": "maxIndex"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "175",
+      "y": "3570"
+    },
+    "element0000000036": {
+      "class": "Action_Get_List_Info",
+      "ID": "element0000000036",
+      "name": "Get list info - ListMin = Minimum index of russianList",
+      "package": "default",
+      "pars": {
+        "List": "russianList",
+        "Varname": "ListMin",
+        "WhichInfo": "minIndex"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "280",
+      "y": "3570"
+    },
+    "element0000000037": {
+      "class": "Action_Get_List_Info",
+      "ID": "element0000000037",
+      "name": "Get list info - ListLength = Array length of russianList",
+      "package": "default",
+      "pars": {
+        "List": "russianList",
+        "Varname": "ListLength",
+        "WhichInfo": "length"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "385",
+      "y": "3570"
+    },
+    "element0000000038": {
+      "class": "Action_Get_List_Info",
+      "ID": "element0000000038",
+      "name": "Get list info - ListCount = Element count of russianList",
+      "package": "default",
+      "pars": {
+        "List": "russianList",
+        "Varname": "ListCount",
+        "WhichInfo": "count"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "490",
+      "y": "3570"
+    },
+    "element0000000039": {
+      "class": "Condition_Expression",
+      "ID": "element0000000039",
+      "name": "Expression - listLength = 4 and listMax = 4 and listMin = 1 and listCount = 4",
+      "package": "default",
+      "pars": {
+        "Expression": "listLength = 4 and listMax = 4 and listMin = 1 and listCount = 4"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "315",
+      "y": "3710"
+    },
+    "element0000000040": {
+      "class": "Condition_Expression",
+      "ID": "element0000000040",
+      "name": "Expression - deletedVariable = \"\u043D\u043E\u043B\u044C\"",
+      "package": "default",
+      "pars": {
+        "Expression": "deletedVariable = \"\u043D\u043E\u043B\u044C\""
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "315",
+      "y": "3255"
+    },
+    "element0000000041": {
+      "class": "Action_Shuffle_list",
+      "ID": "element0000000041",
+      "name": "Shuffle list - shuffledList - russianList",
+      "package": "default",
+      "pars": {
+        "Varname": "shuffledList",
+        "VarValue": "russianList"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "315",
+      "y": "3885"
+    },
+    "element0000000042": {
+      "class": "Action_Get_List_Info",
+      "ID": "element0000000042",
+      "name": "Get list info - ListMax = Maximum index of russianList",
+      "package": "default",
+      "pars": {
+        "List": "russianList",
+        "Varname": "ListMax",
+        "WhichInfo": "maxIndex"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "140",
+      "y": "4025"
+    },
+    "element0000000043": {
+      "class": "Action_Get_List_Info",
+      "ID": "element0000000043",
+      "name": "Get list info - ListMin = Minimum index of russianList",
+      "package": "default",
+      "pars": {
+        "List": "russianList",
+        "Varname": "ListMin",
+        "WhichInfo": "minIndex"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "245",
+      "y": "4025"
+    },
+    "element0000000044": {
+      "class": "Action_Get_List_Info",
+      "ID": "element0000000044",
+      "name": "Get list info - ListLength = Array length of russianList",
+      "package": "default",
+      "pars": {
+        "List": "russianList",
+        "Varname": "ListLength",
+        "WhichInfo": "length"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "350",
+      "y": "4025"
+    },
+    "element0000000045": {
+      "class": "Action_Get_List_Info",
+      "ID": "element0000000045",
+      "name": "Get list info - ListCount = Element count of russianList",
+      "package": "default",
+      "pars": {
+        "List": "russianList",
+        "Varname": "ListCount",
+        "WhichInfo": "count"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "455",
+      "y": "4025"
+    },
+    "element0000000046": {
+      "class": "Condition_Expression",
+      "ID": "element0000000046",
+      "name": "Expression - listLength = 4 and listMax = 4 and listMin = 1 and listCount = 4",
+      "package": "default",
+      "pars": {
+        "Expression": "listLength = 4 and listMax = 4 and listMin = 1 and listCount = 4"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "280",
+      "y": "4165"
+    },
+    "element0000000047": {
+      "class": "Action_Get_Index_Of_Element_In_List",
+      "ID": "element0000000047",
+      "name": "Get position of element in list - index1 - shuffledList - \u0440\u0430\u0437",
+      "package": "default",
+      "pars": {
+        "expression": "String",
+        "ListName": "shuffledList",
+        "SearchContent": "\u0440\u0430\u0437",
+        "Varname": "index1"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "105",
+      "y": "4340"
+    },
+    "element0000000048": {
+      "class": "Action_Get_Index_Of_Element_In_List",
+      "ID": "element0000000048",
+      "name": "Get position of element in list - index2 - shuffledList - \u0434\u0432\u0430",
+      "package": "default",
+      "pars": {
+        "expression": "String",
+        "ListName": "shuffledList",
+        "SearchContent": "\u0434\u0432\u0430",
+        "Varname": "index2"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "245",
+      "y": "4340"
+    },
+    "element0000000049": {
+      "class": "Action_Get_Index_Of_Element_In_List",
+      "ID": "element0000000049",
+      "name": "Get position of element in list - index3 - shuffledList - \u0442\u0440\u0438",
+      "package": "default",
+      "pars": {
+        "expression": "String",
+        "ListName": "shuffledList",
+        "SearchContent": "\u0442\u0440\u0438",
+        "Varname": "index3"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "385",
+      "y": "4340"
+    },
+    "element0000000050": {
+      "class": "Action_Get_Index_Of_Element_In_List",
+      "ID": "element0000000050",
+      "name": "Get position of element in list - index4 - shuffledList - \u0447\u0435\u0442\u044B\u0440\u0435",
+      "package": "default",
+      "pars": {
+        "expression": "String",
+        "ListName": "shuffledList",
+        "SearchContent": "\u0447\u0435\u0442\u044B\u0440\u0435",
+        "Varname": "index4"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "525",
+      "y": "4340"
+    },
+    "element0000000051": {
+      "class": "Condition_Expression",
+      "ID": "element0000000051",
+      "name": "Expression - index1 and index2 and index3 and index4",
+      "package": "default",
+      "pars": {
+        "Expression": "index1 and index2 and index3 and index4"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "280",
+      "y": "4480"
+    },
+    "element0000000052": {
+      "class": "Condition_Expression",
+      "ID": "element0000000052",
+      "name": "Expression - index1 != 1 or index2 != 2 or index3 != 3 or index4 != 4",
+      "package": "default",
+      "pars": {
+        "Expression": "index1 != 1 or index2 != 2 or index3 != 3 or index4 != 4"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "280",
+      "y": "4620"
+    },
+    "element0000000054": {
+      "class": "Condition_Expression",
+      "ID": "element0000000054",
+      "name": "Expression - countShuffleTries < 3",
+      "package": "default",
+      "pars": {
+        "Expression": "countShuffleTries < 3"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-70",
+      "y": "4620"
+    },
+    "element0000000055": {
+      "class": "Action_New_variable",
+      "ID": "element0000000055",
+      "name": "New variable - countShuffleTries = countShuffleTries + 1",
+      "package": "default",
+      "pars": {
+        "expression": "Expression",
+        "Varname": "countShuffleTries",
+        "VarValue": "countShuffleTries + 1"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-105",
+      "y": "3920"
+    },
+    "element0000000056": {
+      "class": "Action_New_variable",
+      "ID": "element0000000056",
+      "name": "New variable - countShuffleTries = 0",
+      "package": "default",
+      "pars": {
+        "expression": "Expression",
+        "Varname": "countShuffleTries",
+        "VarValue": "0"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-105",
+      "y": "3780"
+    },
+    "element0000000112": {
+      "class": "Action_Add_To_List",
+      "ID": "element0000000112",
+      "name": "Add to list global_testResults - As last value - Value 'a_flowName'",
+      "package": "default",
+      "pars": {
+        "DelimiterComma": 0,
+        "DelimiterLinefeed": 1,
+        "DelimiterSemicolon": 0,
+        "DelimiterSpace": 0,
+        "Expression": "Expression",
+        "expressionPos": "String",
+        "InsertMethod": "Insert",
+        "InsertMethodLabel": "",
+        "NumberOfElements": "One",
+        "Position": "keyName",
+        "Varname": "global_testResults",
+        "VarValue": "a_flowName",
+        "VarValues": "Element one\nElement two",
+        "WhichPosition": "Last"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "315",
+      "y": "4900"
+    }
+  },
+  "category": "Automatic tests",
+  "ElementIDCounter": "112",
+  "flowSettings": {
+    "DefaultWorkingDir": 1,
+    "ExecutionPolicy": "default",
+    "Offsetx": "-345.714285",
+    "Offsety": "3492.857143",
+    "WorkingDir": "",
+    "zoomFactor": "0.7"
+  },
+  "name": "List test"
+}

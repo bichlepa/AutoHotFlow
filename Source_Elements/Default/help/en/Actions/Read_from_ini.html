@@ -1,0 +1,72 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<link rel="stylesheet" href="../../stylesheet.css">
+	<link rel="stylesheet" href="stylesheet.css">
+	<link rel="stylesheet" href="../../../../../Help/stylesheet.css">
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<H1>Read from ini</H1>
+<p>
+	The action <B>Read from ini</B> reads a value from a standard format .ini file.
+</p>
+
+<H2>Settings</H2>
+<table class="settings">
+	<TR>
+		<TD>
+			<h4>Output variable name</h4>
+			<p>Name of the variable which will contain the result.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Path of .ini file</h4>
+			<p>Path of the file.
+				<br/>The file path is assumed to be in the working directory if an absolute path isn't specified.
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Action</h4>
+			<p>If <b>Read a key</b> is checked, only one key will be read and its value will be stored to the output variable.
+				<br/>If <b>Read the entire section</b> is checked, the entire section will be stored to the output variable. Comments and empty lines are omitted. Only the first 65,533 characters of the section are retrieved.
+				<br/>If <b>Read the section names</b> is checked, a list of all section names will be stored to the output variable.
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Section <i>and</i> Key</h4>
+			<p>The section and the key that contain the value.
+				<br/>One or both of the options may be disabled, depending on the choice in Action.
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Behavior on error</h4>
+			<p>This option is only available if <b>Read a key</b> is checked.
+				If the file, section or key won't be found, the action could throw an exception or write a default value in the variable.
+			</p>
+		</TD>
+	</TR>
+</table>
+
+<H2>Remarks</H2>
+<p>
+	A standard ini file looks like this:
+	<table class="codeblock">
+		<TR>
+			<TD>
+				[SectionName]
+				<br/>Key=Value
+			</TD>
+		</TR>
+	</table>
+</p>
+
+</BODY>
+</HTML>

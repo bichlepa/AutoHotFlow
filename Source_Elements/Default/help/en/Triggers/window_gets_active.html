@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<link rel="stylesheet" href="../../stylesheet.css">
+	<link rel="stylesheet" href="stylesheet.css">
+	<link rel="stylesheet" href="../../../../../Help/stylesheet.css">
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<H1>Window gets active</H1>
+<p>
+	The trigger <B>Window gets active</B> triggers whenever the specified window gets active.
+</p>
+
+<H2>Settings</H2>
+<table class="settings">
+	<TR>
+		<TD>
+			<h4>Window identification</h4>
+			<p><b>Title of window</b>: Name of the window title. It can be chosen whether the title starts, contains or ends with the specified string.
+				<br/><b>Exclude title</b>: Windows whose titles include this value will not be considered.
+				<br/><b>Text of a control in window</b>: If present, this parameter must be a substring from a single text element of the target window. It can be specified whether hidden text will be found
+				<br/><b>Exclude text of a control in window</b>: Windows whose text include this value will not be considered
+				<br/><b>Window class</b>: A window class is a set of attributes that the system uses as a template to create a window. In other words, the class name of the window identifies what type of window it is.
+				<br/><b>Process name</b>: The name or path of the executable that created that window.
+				<br/><b>Unique window ID</b>: Each window or control has a unique ID, also known as a HWND (short for handle to window). This ID can be used to identify the window or control even if its title changes.
+				<br/><b>Unique process ID</b>: Use the unique process id to identify a window belonging to a specific process. Each process has its unique ID, even if it has the same executable.
+				<br/><b>Hidden window</b>: If detect hidden window is selected, a window that exists but is not visible will be found.
+				<br/><b>Import window identification</b>: Use a wizard to get parameters of a window.
+			</p>
+			<p>At least <b>Title of window</b>, <b>Window class</b>, <b>Process name</b>, <b>Unique window ID</b> or <b>Unique process ID</b> must be set.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Options</h4>
+			<p>Decide whether the trigger should trigger when it is enabled if a matching window is active.</p>
+			<p>Define the <b>Check interval</b> in ms.</p>
+		</TD>
+	</TR>
+</table>
+
+<H2>Supplied Variables</H2>
+<table class="variables">
+	<TR>
+		<TD>
+			<h4 class="VariableName">A_WindowID</h4>
+			<p>The unique ID of the found window.</p>
+		</TD>
+	</TR>
+</table>
+
+</BODY>
+</HTML>

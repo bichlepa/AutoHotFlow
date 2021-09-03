@@ -1,0 +1,136 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<link rel="stylesheet" href="../../stylesheet.css">
+	<link rel="stylesheet" href="stylesheet.css">
+	<link rel="stylesheet" href="../../../../../Help/stylesheet.css">
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<H1>HTTP Request</H1>
+<p>
+	The action <B>HTTP Request</B> is capable of making HTTP Request to an internet resource in the internet or in local network.
+</p>
+
+<H2>Settings</H2>
+<table class="settings">
+	<TR>
+		<TD>
+			<h4>URL</h4>
+			<p>The URL of the internet resource you wish to access.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Post data</h4>
+			<p>Data that will be uploaded. Either a specified text or a file may be uploaded.
+				<br/>Check <b>URI encode post data</b> if the text should be URI encoded. Commonly, POST data from a web form must be URI encoded.
+				<br/><b>Charset</b>: Change the charset or the codepage if the server does not accept UTF-8 charset.
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Request headers</h4>
+			<p>AHF automatically sets up some request headers. If additional headers are wished, they can be specified here.
+				<br/>Check <b>URI encode request headers</b> if the text should be URI encoded.
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Response data</h4>
+			<p>The response data may be written to a variable or to a text file.
+				<br/>If the download will contain binary data, please, use a file.
+				<br/>If the response data are not needed, it can be left blank.
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Response headers</h4>
+			<p>Specify a variable which will contain the response headers.
+				<br/>If the response headers are not needed, it can be left blank.
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Content type</h4>
+			<p>If some data is uploaded, AHF will automatically add the Content-Type header. It can be overridden by specifying an other content type.
+				<br/>Default values for this header are:
+				
+				<ul>
+					<li/>
+						<p><code>application/octet-stream</code> when uploading from a file and the file's extension is neither "txt" nor "xml"</p>
+					<li/>
+						<p"><code>text/xml</code> when the string "&lt;?xml" appears near the beginning of the data</p>
+					<li/>
+						<p"><code>application/x-www-form-urlencoded</code> in all other casesa</p>
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Content length</h4>
+			<p>If some data is uploaded, AHF will automatically add the Content-Length header. It can be overridden by specifying an other content length.
+				<br/>If AHF can't determine the content length automatically (e.g: you are uploading non-text data), you must provide the "Content-Length" header with the total number of bytes you wish to upload. Note for UTF-8 charset: if you are uploading text, the number of bytes in text is twice the length of the text.
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Content MD5</h4>
+			<p>If some data is uploaded, AHF will automatically add the Content-MD5 header. It can be overridden by specifying an other content MD5.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Method</h4>
+			<p>If some data is uploaded, AHF will use POST method, otherwise GET method will be used. It can be overridden by specifying an other method.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>User agent</h4>
+			<p>AHF will add the "User-Agent" header to every request. By default, your script name, AHK version, and OS are used. If this is unacceptable to you, provide your own "User-Agent" header.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Flags</h4>
+			<p>Some flags can be added using a + sign or removed using a - sign. Internet flags can be found <a href="https://docs.microsoft.com/en-us/windows/win32/wininet/api-flags">here</a>. Security flags can be found <a href="https://docs.microsoft.com/en-us/windows/win32/wininet/option-flags">here</a>.
+				<ul class="examples"><i>Examples:</i>
+					<li/>
+						<p><code>+INTERNET_FLAG_NO_COOKIES</code> <i>Tells WinINet to NOT automatically handle cookies (by default, WinINet uses Internet Explorer's cookie pool). This is required if you want your flow to manage cookies with this action. If your request headers contain any "Cookie" headers, this option is applied automatically.</i></p>
+					<li/>
+						<p"><code>+INTERNET_FLAG_NO_AUTO_REDIRECT</code> <i>Does not automatically handle redirection in HttpSendRequest.</i></p>
+					<li/>
+						<p"><code>+SECURITY_FLAG_IGNORE_UNKNOWN_CA</code> <i>Ignores unknown certificate authority problems.</i></p>
+				</ul>
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Proxy</h4>
+			<p>AutoHotFlow may use a proxy to access an internet resource.
+				<br/>If <b>Automatic</b> is selected, Internet Exlporer's proxy configuration will be used. If your Internet Explorer is not configured to use a proxy, this option has no effect.
+				<br/>If <b>Custom</b> is selected, AHF will use the specified proxy.
+				<br/><ul class="examples"><i>Examples:</i>
+						<li/>
+							<p><code>http://www.exampleproxy.com:1234</code></p>
+					</ul>
+				<br/><b>Bypass proxy</b>: Tells AHF NOT to use a proxy to access a specified website. This has no effect unless AHF has been told to use a proxy via the <b>Custom</b> option.
+			</p>
+		</TD>
+	</TR>
+</table>
+
+<H2>Remarks</H2>
+<p>
+	Many thanks to VxE for providing the outstanding HTTPRequest library.
+</p>
+
+</BODY>
+</HTML>

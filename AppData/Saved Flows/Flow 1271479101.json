@@ -1,0 +1,254 @@
+﻿{
+  "allConnections": {
+    "connection0000000003": {
+      "ConnectionType": "normal",
+      "from": "element0000000001",
+      "ID": "connection0000000003",
+      "to": "element0000000002",
+      "type": "Connection"
+    },
+    "connection0000000005": {
+      "ConnectionType": "normal",
+      "from": "element0000000002",
+      "ID": "connection0000000005",
+      "to": "element0000000004",
+      "type": "Connection"
+    },
+    "connection0000000009": {
+      "ConnectionType": "normal",
+      "from": "element0000000008",
+      "ID": "connection0000000009",
+      "to": "element0000000010",
+      "type": "Connection"
+    },
+    "connection0000000012": {
+      "ConnectionType": "normal",
+      "from": "element0000000010",
+      "ID": "connection0000000012",
+      "to": "element0000000011",
+      "type": "Connection"
+    },
+    "connection0000000014": {
+      "ConnectionType": "normal",
+      "from": "element0000000011",
+      "ID": "connection0000000014",
+      "to": "element0000000013",
+      "type": "Connection"
+    },
+    "connection0000000015": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000015",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000019": {
+      "ConnectionType": "normal",
+      "from": "element0000000013",
+      "ID": "connection0000000019",
+      "to": "element0000000022",
+      "type": "Connection"
+    },
+    "connection0000000021": {
+      "ConnectionType": "normal",
+      "from": "element0000000018",
+      "ID": "connection0000000021",
+      "to": "element0000000020",
+      "type": "Connection"
+    },
+    "connection0000000023": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000023",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000024": {
+      "ConnectionType": "normal",
+      "from": "element0000000022",
+      "ID": "connection0000000024",
+      "to": "element0000000018",
+      "type": "Connection"
+    }
+  },
+  "allElements": {
+    "element0000000001": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "1",
+      "enabled": "0",
+      "ID": "element0000000001",
+      "name": "Manual - \"Trigger safe salad\"",
+      "package": "default",
+      "pars": {
+        "ID": "Trigger safe salad"
+      },
+      "StandardName": 1,
+      "type": "trigger",
+      "x": 0,
+      "y": 0
+    },
+    "element0000000002": {
+      "class": "Action_Beep",
+      "ID": "element0000000002",
+      "name": "Beep - 523 Hz 150 ms",
+      "package": "default",
+      "pars": {
+        "duration": 150,
+        "frequency": 523
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "0",
+      "y": "210"
+    },
+    "element0000000004": {
+      "class": "Action_Beep",
+      "ID": "element0000000004",
+      "name": "Beep - 600 Hz 500 ms",
+      "package": "default",
+      "pars": {
+        "duration": "500",
+        "frequency": "600"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "0",
+      "y": "420"
+    },
+    "element0000000008": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "0",
+      "enabled": "0",
+      "ID": "element0000000008",
+      "name": "Manual - \"Trigger serious clock\"",
+      "package": "default",
+      "pars": {
+        "ID": "Trigger serious clock"
+      },
+      "StandardName": "1",
+      "type": "Trigger",
+      "x": "630",
+      "y": "0"
+    },
+    "element0000000010": {
+      "class": "Action_Speech_output",
+      "ID": "element0000000010",
+      "name": "Speech output -  - Microsoft Hedda Desktop",
+      "package": "default",
+      "pars": {
+        "pitch": 0,
+        "speed": "4",
+        "text": "Es war einmal ein Mann, er hatte sieben S\u00F6hne. Die sieben S\u00F6hne sagten: Vater, erz\u00E4hle uns eine Geschichte! Da fing der Vater an:",
+        "TTSEngine": "Microsoft Hedda Desktop",
+        "volume": 100,
+        "WaitUntilCurrentFinishes": "1",
+        "WaitUntilPreviousFinished": "1"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "665",
+      "y": "350"
+    },
+    "element0000000011": {
+      "class": "Action_Speech_output",
+      "ID": "element0000000011",
+      "name": "Speech output -  - Microsoft Hedda Desktop",
+      "package": "default",
+      "pars": {
+        "pitch": "-8",
+        "speed": "5",
+        "text": "Es war einmal ein Mann, er hatte sieben S\u00F6hne. Die sieben S\u00F6hne sagten: Vater, erz\u00E4hle uns eine Geschichte! Da fing der Vater an:",
+        "TTSEngine": "Microsoft Hedda Desktop",
+        "volume": "52",
+        "WaitUntilCurrentFinishes": "0",
+        "WaitUntilPreviousFinished": "1"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "665",
+      "y": "560"
+    },
+    "element0000000013": {
+      "class": "Action_Speech_output",
+      "ID": "element0000000013",
+      "name": "Speech output -  - Microsoft Hedda Desktop",
+      "package": "default",
+      "pars": {
+        "pitch": "3",
+        "speed": "7",
+        "text": "Es war einmal ein Mann, er hatte sieben S\u00F6hne. Die sieben S\u00F6hne sagten: Vater, erz\u00E4hle uns eine Geschichte! Da fing der Vater an:",
+        "TTSEngine": "Microsoft Hedda Desktop",
+        "volume": "100",
+        "WaitUntilCurrentFinishes": "1",
+        "WaitUntilPreviousFinished": "1"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "490",
+      "y": "875"
+    },
+    "element0000000018": {
+      "class": "Action_Sleep",
+      "ID": "element0000000018",
+      "name": "Sleep: 2 s",
+      "package": "action",
+      "pars": {
+        "Duration": 2,
+        "Unit": "Seconds"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "490",
+      "y": "1155"
+    },
+    "element0000000020": {
+      "class": "Action_Speech_output",
+      "ID": "element0000000020",
+      "name": "Speech output -  - Microsoft Hedda Desktop",
+      "package": "default",
+      "pars": {
+        "pitch": "3",
+        "speed": "7",
+        "text": "Es war einmal ein Mann, er hatte sieben S\u00F6hne. Die sieben S\u00F6hne sagten: Vater, erz\u00E4hle uns eine Geschichte! Da fing der Vater an:",
+        "TTSEngine": "Microsoft Hedda Desktop",
+        "volume": "100",
+        "WaitUntilCurrentFinishes": "1",
+        "WaitUntilPreviousFinished": "0"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "525",
+      "y": "1295"
+    },
+    "element0000000022": {
+      "class": "Action_Speech_output",
+      "ID": "element0000000022",
+      "name": "Speech output -  - Microsoft Hedda Desktop",
+      "package": "default",
+      "pars": {
+        "pitch": "3",
+        "speed": "7",
+        "text": "Es war einmal ein Mann, er hatte sieben S\u00F6hne. Die sieben S\u00F6hne sagten: Vater, erz\u00E4hle uns eine Geschichte! Da fing der Vater an:",
+        "TTSEngine": "Microsoft Hedda Desktop",
+        "volume": "100",
+        "WaitUntilCurrentFinishes": "0",
+        "WaitUntilPreviousFinished": "0"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "490",
+      "y": "1015"
+    }
+  },
+  "category": "Manual tests",
+  "ElementIDCounter": "28",
+  "flowSettings": {
+    "DefaultWorkingDir": 1,
+    "ExecutionPolicy": "default",
+    "Offsetx": "-527.142857",
+    "Offsety": "-195.714286",
+    "WorkingDir": "",
+    "zoomFactor": "0.7"
+  },
+  "name": "sound test"
+}

@@ -1,0 +1,141 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<link rel="stylesheet" href="../../stylesheet.css">
+	<link rel="stylesheet" href="stylesheet.css">
+	<link rel="stylesheet" href="../../../../../Help/stylesheet.css">
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<H1>Loop through files</H1>
+<p>
+	The loop <B>Loop through files</B> retrieves the specified files or folders, one at a time.
+</p>
+
+<H2>Settings</H2>
+<table class="settings">
+	<TR>
+		<TD>
+			<h4>File pattern</h4>
+			<p>The path of a single file or folder, or a wildcard pattern.
+				<br/>Both asterisks and question marks are supported as wildcards. A match occurs when the pattern appears in either the file's long/normal name or its 8.3 short name.
+				<br/>The file pattern is assumed to be in the working directory if an absolute path isn't specified.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Options</h4>
+			<p>This action can perform on files, forlder or both. It can also iterate in the subfolders.</p>
+		</TD>
+	</TR>
+</table>
+
+<H2>Supplied Variables</H2>
+<table class="variables">
+	<TR>
+		<TD>
+			<h4 class="VariableName">A_Index</h4>
+			<p>Index of the current iteration. It starts with the value 1 and increases on every loop.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">A_LoopFileName</h4>
+			<p>The name of the file or folder currently retrieved (without the path).</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">A_LoopFileNameNoExt</h4>
+			<p>>The name of the file or folder without extension.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">A_LoopFileExt</h4>
+			<p>The file's extension (e.g. TXT, DOC, or EXE). The period (.) is not included.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">A_LoopFilePath</h4>
+			<p>The path and name of the file/folder currently retrieved. If <b>File pattern</b> contains a relative path rather than an absolute path, the path here will also be relative. In addition, any short (8.3) folder names in <b>File pattern</b> will still be short (see next item to get the long version).</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">A_LoopFileLongPath</h4>
+			<p>This is different than A_LoopFileFullPath in the following ways: 1) It always contains the absolute/complete path of the file even if <b>File pattern</b> contains a relative path; 2) Any short (8.3) folder names in <b>File pattern</b> itself are converted to their long names; 3) Characters in <b>File pattern</b> are converted to uppercase or lowercase to match the case stored in the file system. This is useful for converting file names -- such as those passed into a script as command line parameters -- to their exact path names as shown by Explorer.
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">A_LoopFileShortPath</h4>
+			<p>The 8.3 short path and name of the file/folder currently retrieved. For example: C:\MYDOCU~1\ADDRES~1.txt. If FilePattern contains a relative path rather than an absolute path, the path here will also be relative.</p>
+			<p class="info">This variable will be blank if the file does not have a short name, which can happen on systems where NtfsDisable8dot3NameCreation has been set in the registry. It will also be blank if FilePattern contains a relative path and the body of the loop uses SetWorkingDir to switch away from the working directory in effect for the loop itself.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">A_LoopFileShortName</h4>
+			<p>The 8.3 short name, or alternate name of the file. If the file doesn't have one (due to the long name being shorter than 8.3 or perhaps because short-name generation is disabled on an NTFS file system), A_LoopFileName will be retrieved instead.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">A_LoopFileDir</h4>
+			<p>The path of the directory in which A_LoopFileName resides. If FilePattern contains a relative path rather than an absolute path, the path here will also be relative. A root directory will not contain a trailing backslash. For example: C:</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">A_LoopFileTimeModified</h4>
+			<p>The time the file was last modified. Format YYYYMMDDHH24MISS.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">A_LoopFileTimeCreated</h4>
+			<p>The time the file was created. Format YYYYMMDDHH24MISS.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">A_LoopFileTimeAccessed</h4>
+			<p>The time the file was last accessed. Format YYYYMMDDHH24MISS.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">A_LoopFileAttrib</h4>
+			<p>The attributes of the file currently retrieved.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">A_LoopFileSize</h4>
+			<p>The size in bytes of the file currently retrieved. Files larger than 4 gigabytes are also supported.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">A_LoopFileSizeKB</h4>
+			<p>The size in Kbytes of the file currently retrieved, rounded down to the nearest integer.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">A_LoopFileSizeMB</h4>
+			<p>The size in Mbytes of the file currently retrieved, rounded down to the nearest integer.</p>
+		</TD>
+	</TR>
+</table>
+
+<H2>Remarks</H2>
+<p>
+	All supplied variables will be removed after last iteration.
+</p>
+
+</BODY>
+</HTML>

@@ -1,0 +1,187 @@
+{
+    "name": "Default",
+    "description": "Default AutoHotFlow elements",
+    "author": "Paul Bichler (bichlepa)",
+    "website": "https://github.com/bichlepa/AutoHotFlow",
+    "license": "GPL3.0",
+    "libraries": [
+        "lib\\TTS\\TTS by Learning One.ahk",
+        "lib\\Eject\\Eject.ahk",
+        "lib\\Class_Monitor\\Class_Monitor.ahk",
+        "lib\\HTTP Request\\HTTPRequest.ahk",
+        "lib\\HTTP Request\\Uriencode.ahk",
+        "lib\\Process list\\getProcessList.ahk",
+        "common\\window functions.ahk"
+    ],
+    "actions": [
+        "New_Variable.ahk",
+        "Random_Number.ahk",
+        "Absolute_Number.ahk",
+        "Square_Root.ahk",
+        "Trigonometry.ahk",
+        "Rounding_a_number.ahk",
+        "Exponentiation.ahk",
+        "Change_character_case.ahk",
+        "Get_string_Length.ahk",
+        "Replace_in_a_string.ahk",
+        "Trim_a_string.ahk",
+        "Split_a_string.ahk",
+        "Substring.ahk",
+        "Search_in_a_string.ahk",
+        "Add_to_list.ahk",
+        "Get_from_list.ahk",
+        "Get_list_info.ahk",
+        "Get_index_of_element_in_list.ahk",
+        "Delete_from_list.ahk",
+        "New_List.ahk",
+        "Shuffle_list.ahk",
+        "Time_calculation.ahk",
+        "Time_difference.ahk",
+        "New_Time.ahk",
+        "Script.ahk",
+        "Get_Clipboard.ahk",
+        "Set_Clipboard.ahk",
+
+        "Input_Box.ahk",
+        "Message_Box.ahk",
+        "Tooltip.ahk",
+
+        "Eject_Drive.ahk",
+        "Change_Drive_Label.ahk",
+        "Get_Drive_Information.ahk",
+        "Lock_Or_Unlcock_Drive.ahk",
+        "List_Drives.ahk",
+        "Compress_files.ahk",
+        "Extract_files.ahk",
+        "Copy_file.ahk",
+        "Copy_folder.ahk",
+        "Create_folder.ahk",
+        "Delete_file.ahk",
+        "Delete_folder.ahk",
+        "Empty_Recycle_bin.ahk",
+        "Get_file_attributes.ahk",
+        "Get_file_size.ahk",
+        "Get_file_time.ahk",
+        "Move_File.ahk",
+        "Move_Folder.ahk",
+        "Rename_file.ahk",
+        "Rename_Folder.ahk",
+        "Select_file.ahk",
+        "Select_folder.ahk",
+        "Set_file_attributes.ahk",
+        "Set_file_time.ahk",
+        "Write_To_File.ahk",
+
+        "Read_From_File.ahk",
+        "Read_From_Ini.ahk",
+        "Delete_From_Ini.ahk",
+        "Write_to_ini.ahk",
+
+        "Download_file.ahk",
+        "HTTP_Request.ahk",
+
+        "Get_Screen_Settings.ahk",
+        "Set_Screen_Settings.ahk",
+        "Get_pixel_color.ahk",
+        "Search_pixel.ahk",
+        "Screenshot.ahk",
+        "Search_Image.ahk",
+
+        "activate_Window.ahk",
+        "Close_Window.ahk",
+        "Hide_window.ahk",
+        "Minimize_All_Windows.ahk",
+        "Move_window.ahk",
+        "Get_control_text.ahk",
+        "Set_control_text.ahk",
+        "Show_window.ahk",
+
+        "Click.ahk",
+        "Drag_with_mouse.ahk",
+        "Get_mouse_position.ahk",
+        "Move_Mouse.ahk",
+        "Send_Keystrokes.ahk",
+        "Send_Keystrokes_To_Control.ahk",
+        "Set_Lock_Key.ahk",
+
+        "Play_Sound.ahk",
+        "Beep.ahk",
+        "Get_Volume.ahk",
+        "Set_Volume.ahk",
+        "Speech_output.ahk",
+        "Stop_Sound.ahk",
+
+        "Run.ahk",
+        "Kill_Process.ahk",
+        "Set_Process_Priority.ahk",
+
+        "Hibernate_Computer.ahk",
+        "Lock_Computer.ahk",
+        "Log_Off.ahk",
+        "Reboot_Computer.ahk",
+        "Shutdown.ahk",
+        "Suspend_Computer.ahk",
+
+        "Sleep.ahk",
+        "Trace_Point.ahk",
+        "Trace_Point_Check.ahk",
+        "Execute_Flow.ahk",
+        "Set_Flow_Status.ahk",
+        "Stop_Flow.ahk",
+        "AutoHotkey_script.ahk"
+    ],
+    "conditions": [
+        "Expression.ahk",
+        "Variable_Is_Empty.ahk",
+        "List_Contains_Element.ahk",
+        "String_Contains_Text.ahk",
+        "Number_is.ahk",
+
+        "File_Exists.ahk",
+        "File_Has_Attribute.ahk",
+
+        "Confirmation_Dialog.ahk",
+        "Debug_dialog.ahk",
+
+        "Key_Is_Down.ahk",
+
+        "Window_Active.ahk",
+        "Window_Exists.ahk",
+
+        "Process_Is_Running.ahk",
+        
+        "Flow_Enabled.ahk",
+        "Flow_Running.ahk"
+
+    ],
+    "loops": [
+        "SimpleLoop.ahk",
+        "Condition.ahk",
+        "Parse_A_String.ahk",
+        "Work_through_a_list.ahk",
+
+        "Loop_Through_Files.ahk"
+    ],
+    "triggers": [
+        "Manual.ahk",
+        "Periodic_Timer.ahk",
+        "Time_of_Day.ahk",
+
+        "User_Idle_Time.ahk",
+        "Clipboard_Changes.ahk",
+
+        "Hotkey.ahk",
+        "Shortcut.ahk",
+
+        "Window_closes.ahk",
+        "Window_gets_active.ahk",
+        "Window_gets_inactive.ahk",
+        "Window_opens.ahk",
+
+        "Process_closes.ahk",
+        "Process_starts.ahk",
+
+        "Start_up.ahk",
+        "AutoHotkey_Script.ahk"
+    ]
+}

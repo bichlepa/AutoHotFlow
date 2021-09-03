@@ -1,0 +1,146 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<link rel="stylesheet" href="../../stylesheet.css">
+	<link rel="stylesheet" href="stylesheet.css">
+	<link rel="stylesheet" href="../../../../../Help/stylesheet.css">
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<H1>Get drive information</H1>
+<p>
+	The action <B>Get drive information</B> retrieves some information about the connected drives.
+</p>
+
+<H2>Settings</H2>
+<table class="settings">
+	<TR>
+		<TD>
+			<h4>Output variable name</h4>
+			<p>Name of the variable which will contain the value.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Which information</h4>
+			<p>Select an information type which you want to retrieve. There are following options:</p>
+			<table class="settings">
+				<TR>
+					<TD>
+						<h4>Label</h4>
+						<p>Retrieves a drive's volume label</p>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4>Type</h4>
+						<p>Retrieves the drive type, which is one of the following words:</p>
+						<ul>
+							<li/>
+								<p><code>Unknown</code></p>
+							<li/>
+								<p><code>Removable</code></p>
+							<li/>
+								<p><code>Fixed</code></p>
+							<li/>
+								<p><code>Network</code></p>
+							<li/>
+								<p><code>CDROM</code></p>
+							<li/>
+								<p><code>RAMDisk</code></p>
+						</ul>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4>Status</h4>
+						<p>Retrieves the drive status, which is one of the following words:</p>
+						<ul>
+							<li/>
+								<p><code>Unknown</code> (might indicate unformatted/RAW)</p>
+							<li/>
+								<p><code>Ready</code></p>
+							<li/>
+								<p><code>NotReady</code> (typical for removable drives that don't contain media)</p>
+							<li/>
+								<p><code>Invalid</code> (Path does not exist or is a network drive that is presently inaccessible, etc.)</p>
+						</ul>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4>Status of optical disc drive</h4>
+						<p>Retrieves the media status of an optical drive. Output variable is made blank if the status cannot be determined. Otherwise, it will contain one of the following words:</p>
+						<ul>
+							<li/>
+								<p><code>not ready</code> - The drive is not ready to be accessed, perhaps due to being engaged in a write operation. Known limitation: "not ready" also occurs when the drive contains a DVD rather than a CD.</p>
+							<li/>
+								<p><code>open</code> - The drive contains no disc, or the tray is ejected.</p>
+							<li/>
+								<p><code>playing</code> - The drive is playing a disc.</p>
+							<li/>
+								<p><code>paused</code> - The previously playing audio or video is now paused.</p>
+							<li/>
+								<p><code>seeking</code> - The drive is seeking.</p>
+							<li/>
+								<p><code>stopped</code> - The drive contains a CD but is not currently accessing it.</p>
+						</ul>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4>Capacity</h4>
+						<p>Retrieves the total capacity of a path or drive, in Megabytes.</p>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4>Free disk space</h4>
+						<p>Retrieves the free disk space of a path or drive, in Megabytes.</p>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4>File system</h4>
+						<p>Retrieves the type of drive's file system, which is one of the following words:</p>
+						<ul>
+							<li/>
+								<p><code>FAT</code></p>
+							<li/>
+								<p><code>FAT32</code></p>
+							<li/>
+								<p><code>NTFS</code></p>
+							<li/>
+								<p><code>CDFS</code> (typically indicates a CD)</p>
+							<li/>
+								<p><code>UDF</code> (typically indicates a DVD)</p>
+						</ul>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4>Serial number</h4>
+						<p>Retrieves drive's volume serial number expressed as decimal integer.</p>
+					</TD>
+				</TR>
+			</table>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Drive letter or UNC name</h4>
+			<p>Specify a drive letter, followed by a colon and an optional backslash. In some cases a UNC name (such as <code>\\server1\share1</code>) might work.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Path</h4>
+			<p>Name of the directory or a drive letter, followed by a colon and an optional backslash.
+				<br/>Since NTFS supports mounted volumes and directory junctions, different values might result in different folders of the same "drive" in some cases.
+			</p>
+		</TD>
+	</TR>
+</table>
+
+</BODY>
+</HTML>

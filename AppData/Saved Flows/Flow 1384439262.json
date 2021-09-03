@@ -1,0 +1,1360 @@
+﻿{
+  "allConnections": {
+    "connection0000000022": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000022",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000036": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000036",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000049": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000049",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000086": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000086",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000105": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000105",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000111": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000111",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000121": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000121",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000195": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000195",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000270": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000270",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000277": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000277",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000281": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000281",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000491": {
+      "ConnectionType": "normal",
+      "from": "element0000000487",
+      "ID": "connection0000000491",
+      "to": "element0000000492",
+      "type": "Connection"
+    },
+    "connection0000000495": {
+      "ConnectionType": "normal",
+      "from": "element0000000492",
+      "ID": "connection0000000495",
+      "to": "element0000000496",
+      "type": "Connection"
+    },
+    "connection0000000502": {
+      "ConnectionType": "Yes",
+      "from": "element0000000499",
+      "ID": "connection0000000502",
+      "to": "element0000000514",
+      "type": "Connection"
+    },
+    "connection0000000505": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000505",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000506": {
+      "ConnectionType": "normal",
+      "from": "element0000000507",
+      "ID": "connection0000000506",
+      "to": "element0000000508",
+      "type": "Connection"
+    },
+    "connection0000000509": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000509",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000510": {
+      "ConnectionType": "Yes",
+      "from": "element0000000508",
+      "ID": "connection0000000510",
+      "to": "element0000000499",
+      "type": "Connection"
+    },
+    "connection0000000511": {
+      "ConnectionType": "No",
+      "from": "element0000000496",
+      "ID": "connection0000000511",
+      "to": "element0000000507",
+      "type": "Connection"
+    },
+    "connection0000000512": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000512",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000518": {
+      "ConnectionType": "normal",
+      "from": "element0000000514",
+      "ID": "connection0000000518",
+      "to": "element0000000517",
+      "type": "Connection"
+    },
+    "connection0000000519": {
+      "ConnectionType": "Yes",
+      "from": "element0000000517",
+      "ID": "connection0000000519",
+      "to": "element0000000520",
+      "type": "Connection"
+    },
+    "connection0000000521": {
+      "ConnectionType": "normal",
+      "from": "element0000000520",
+      "ID": "connection0000000521",
+      "to": "element0000000522",
+      "type": "Connection"
+    },
+    "connection0000000523": {
+      "ConnectionType": "Yes",
+      "from": "element0000000522",
+      "ID": "connection0000000523",
+      "to": "element0000000524",
+      "type": "Connection"
+    },
+    "connection0000000527": {
+      "ConnectionType": "normal",
+      "from": "element0000000524",
+      "ID": "connection0000000527",
+      "to": "element0000000526",
+      "type": "Connection"
+    },
+    "connection0000000528": {
+      "ConnectionType": "Yes",
+      "from": "element0000000533",
+      "ID": "connection0000000528",
+      "to": "element0000000539",
+      "type": "Connection"
+    },
+    "connection0000000529": {
+      "ConnectionType": "No",
+      "from": "element0000000526",
+      "ID": "connection0000000529",
+      "to": "element0000000531",
+      "type": "Connection"
+    },
+    "connection0000000532": {
+      "ConnectionType": "normal",
+      "from": "element0000000531",
+      "ID": "connection0000000532",
+      "to": "element0000000530",
+      "type": "Connection"
+    },
+    "connection0000000534": {
+      "ConnectionType": "normal",
+      "from": "element0000000530",
+      "ID": "connection0000000534",
+      "to": "element0000000533",
+      "type": "Connection"
+    },
+    "connection0000000542": {
+      "ConnectionType": "normal",
+      "from": "element0000000540",
+      "ID": "connection0000000542",
+      "to": "element0000000541",
+      "type": "Connection"
+    },
+    "connection0000000543": {
+      "ConnectionType": "normal",
+      "from": "element0000000539",
+      "ID": "connection0000000543",
+      "to": "element0000000540",
+      "type": "Connection"
+    },
+    "connection0000000547": {
+      "ConnectionType": "normal",
+      "from": "element0000000545",
+      "ID": "connection0000000547",
+      "to": "element0000000546",
+      "type": "Connection"
+    },
+    "connection0000000548": {
+      "ConnectionType": "normal",
+      "from": "element0000000544",
+      "ID": "connection0000000548",
+      "to": "element0000000545",
+      "type": "Connection"
+    },
+    "connection0000000549": {
+      "ConnectionType": "Yes",
+      "from": "element0000000541",
+      "ID": "connection0000000549",
+      "to": "element0000000544",
+      "type": "Connection"
+    },
+    "connection0000000552": {
+      "ConnectionType": "normal",
+      "from": "element0000000550",
+      "ID": "connection0000000552",
+      "to": "element0000000551",
+      "type": "Connection"
+    },
+    "connection0000000557": {
+      "ConnectionType": "Yes",
+      "from": "element0000000546",
+      "ID": "connection0000000557",
+      "to": "element0000000554",
+      "type": "Connection"
+    },
+    "connection0000000559": {
+      "ConnectionType": "normal",
+      "from": "element0000000554",
+      "ID": "connection0000000559",
+      "to": "element0000000550",
+      "type": "Connection"
+    },
+    "connection0000000560": {
+      "ConnectionType": "Yes",
+      "from": "element0000000551",
+      "ID": "connection0000000560",
+      "to": "element0000000561",
+      "type": "Connection"
+    },
+    "connection0000000566": {
+      "ConnectionType": "normal",
+      "from": "element0000000561",
+      "ID": "connection0000000566",
+      "to": "element0000000567",
+      "type": "Connection"
+    },
+    "connection0000000568": {
+      "ConnectionType": "Yes",
+      "from": "element0000000567",
+      "ID": "connection0000000568",
+      "to": "element0000000570",
+      "type": "Connection"
+    },
+    "connection0000000571": {
+      "ConnectionType": "No",
+      "from": "element0000000577",
+      "ID": "connection0000000571",
+      "to": "element0000000538",
+      "type": "Connection"
+    },
+    "connection0000000575": {
+      "ConnectionType": "Exception",
+      "from": "element0000000570",
+      "ID": "connection0000000575",
+      "to": "element0000000574",
+      "type": "Connection"
+    },
+    "connection0000000578": {
+      "ConnectionType": "normal",
+      "from": "element0000000574",
+      "ID": "connection0000000578",
+      "to": "element0000000576",
+      "type": "Connection"
+    },
+    "connection0000000579": {
+      "ConnectionType": "No",
+      "from": "element0000000576",
+      "ID": "connection0000000579",
+      "to": "element0000000577",
+      "type": "Connection"
+    },
+    "connection0000000583": {
+      "ConnectionType": "Yes",
+      "from": "element0000000577",
+      "ID": "connection0000000583",
+      "to": "element0000000584",
+      "type": "Connection"
+    },
+    "connection0000000587": {
+      "ConnectionType": "No",
+      "from": "element0000000585",
+      "ID": "connection0000000587",
+      "to": "element0000000586",
+      "type": "Connection"
+    },
+    "connection0000000588": {
+      "ConnectionType": "normal",
+      "from": "element0000000584",
+      "ID": "connection0000000588",
+      "to": "element0000000585",
+      "type": "Connection"
+    },
+    "connection0000000589": {
+      "ConnectionType": "Yes",
+      "from": "element0000000609",
+      "ID": "connection0000000589",
+      "to": "element0000000640",
+      "type": "Connection"
+    },
+    "connection0000000590": {
+      "ConnectionType": "Yes",
+      "from": "element0000000586",
+      "ID": "connection0000000590",
+      "to": "element0000000591",
+      "type": "Connection"
+    },
+    "connection0000000593": {
+      "ConnectionType": "normal",
+      "from": "element0000000591",
+      "ID": "connection0000000593",
+      "to": "element0000000592",
+      "type": "Connection"
+    },
+    "connection0000000597": {
+      "ConnectionType": "Yes",
+      "from": "element0000000592",
+      "ID": "connection0000000597",
+      "to": "element0000000596",
+      "type": "Connection"
+    },
+    "connection0000000599": {
+      "ConnectionType": "Yes",
+      "from": "element0000000596",
+      "ID": "connection0000000599",
+      "to": "element0000000598",
+      "type": "Connection"
+    },
+    "connection0000000603": {
+      "ConnectionType": "normal",
+      "from": "element0000000598",
+      "ID": "connection0000000603",
+      "to": "element0000000601",
+      "type": "Connection"
+    },
+    "connection0000000605": {
+      "ConnectionType": "No",
+      "from": "element0000000601",
+      "ID": "connection0000000605",
+      "to": "element0000000606",
+      "type": "Connection"
+    },
+    "connection0000000608": {
+      "ConnectionType": "normal",
+      "from": "element0000000606",
+      "ID": "connection0000000608",
+      "to": "element0000000607",
+      "type": "Connection"
+    },
+    "connection0000000610": {
+      "ConnectionType": "normal",
+      "from": "element0000000607",
+      "ID": "connection0000000610",
+      "to": "element0000000609",
+      "type": "Connection"
+    },
+    "connection0000000613": {
+      "ConnectionType": "normal",
+      "from": "element0000000487",
+      "ID": "connection0000000613",
+      "to": "element0000000611",
+      "type": "Connection"
+    },
+    "connection0000000614": {
+      "ConnectionType": "normal",
+      "from": "element0000000487",
+      "ID": "connection0000000614",
+      "to": "element0000000612",
+      "type": "Connection"
+    },
+    "connection0000000616": {
+      "ConnectionType": "normal",
+      "from": "element0000000487",
+      "ID": "connection0000000616",
+      "to": "element0000000615",
+      "type": "Connection"
+    },
+    "connection0000000643": {
+      "ConnectionType": "normal",
+      "from": "element0000000640",
+      "ID": "connection0000000643",
+      "to": "element0000000647",
+      "type": "Connection"
+    },
+    "connection0000000644": {
+      "ConnectionType": "normal",
+      "from": "element0000000639",
+      "ID": "connection0000000644",
+      "to": "element0000000641",
+      "type": "Connection"
+    },
+    "connection0000000645": {
+      "ConnectionType": "normal",
+      "from": "element0000000641",
+      "ID": "connection0000000645",
+      "to": "element0000000642",
+      "type": "Connection"
+    },
+    "connection0000000646": {
+      "ConnectionType": "Yes",
+      "from": "element0000000642",
+      "ID": "connection0000000646",
+      "to": "element0000000651",
+      "type": "Connection"
+    },
+    "connection0000000648": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000648",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000649": {
+      "ConnectionType": "normal",
+      "from": "element0000000647",
+      "ID": "connection0000000649",
+      "to": "element0000000639",
+      "type": "Connection"
+    },
+    "connection0000000652": {
+      "ConnectionType": "normal",
+      "from": "element0000000651",
+      "ID": "connection0000000652",
+      "to": "element0000000653",
+      "type": "Connection"
+    },
+    "connection0000000677": {
+      "ConnectionType": "normal",
+      "from": "element0000000674",
+      "ID": "connection0000000677",
+      "to": "element0000000675",
+      "type": "Connection"
+    },
+    "connection0000000678": {
+      "ConnectionType": "normal",
+      "from": "element0000000675",
+      "ID": "connection0000000678",
+      "to": "element0000000676",
+      "type": "Connection"
+    },
+    "connection0000000679": {
+      "ConnectionType": "normal",
+      "from": "element0000000653",
+      "ID": "connection0000000679",
+      "to": "element0000000674",
+      "type": "Connection"
+    },
+    "connection0000000680": {
+      "ConnectionType": "Yes",
+      "from": "element0000000676",
+      "ID": "connection0000000680",
+      "to": "element0000000501",
+      "type": "Connection"
+    },
+    "connection0000000682": {
+      "ConnectionType": "No",
+      "from": "element0000000676",
+      "ID": "connection0000000682",
+      "to": "element0000000681",
+      "type": "Connection"
+    }
+  },
+  "allElements": {
+    "element0000000487": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "1",
+      "enabled": "1",
+      "ID": "element0000000487",
+      "name": "Manual - \"start\"",
+      "package": "default",
+      "pars": {
+        "ID": "start"
+      },
+      "StandardName": "1",
+      "type": "Trigger",
+      "x": "-665",
+      "y": "-70"
+    },
+    "element0000000492": {
+      "class": "Action_Delete_Folder",
+      "ID": "element0000000492",
+      "name": "Delete Folder - fileTestFiles",
+      "package": "default",
+      "pars": {
+        "ExceptionIfNotExist": "0",
+        "Folder": "fileTestFiles",
+        "ifEmpty": 0
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-665",
+      "y": "70"
+    },
+    "element0000000496": {
+      "class": "Condition_File_Exists",
+      "ID": "element0000000496",
+      "name": "File Exists - fileTestFiles",
+      "package": "default",
+      "pars": {
+        "file": "fileTestFiles"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-665",
+      "y": "210"
+    },
+    "element0000000499": {
+      "class": "Condition_File_Has_Attribute",
+      "ID": "element0000000499",
+      "name": "File Has Attribute - Directory - fileTestFiles",
+      "package": "default",
+      "pars": {
+        "Attribute": "D",
+        "file": "fileTestFiles"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-665",
+      "y": "630"
+    },
+    "element0000000501": {
+      "class": "Action_Add_To_List",
+      "ID": "element0000000501",
+      "name": "Add to list global_testResults - As last value - Value 'a_flowName'",
+      "package": "default",
+      "pars": {
+        "DelimiterComma": 0,
+        "DelimiterLinefeed": 1,
+        "DelimiterSemicolon": 0,
+        "DelimiterSpace": 0,
+        "Expression": "Expression",
+        "expressionPos": "String",
+        "InsertMethod": "Insert",
+        "InsertMethodLabel": "",
+        "NumberOfElements": "One",
+        "Position": "keyName",
+        "Varname": "global_testResults",
+        "VarValue": "a_flowName",
+        "VarValues": "Element one\nElement two",
+        "WhichPosition": "Last"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-140",
+      "y": "7455"
+    },
+    "element0000000507": {
+      "class": "Action_Create_Folder",
+      "ID": "element0000000507",
+      "name": "Create Folder - fileTestFiles",
+      "package": "default",
+      "pars": {
+        "ErrorIfExists": 0,
+        "folder": "fileTestFiles"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-665",
+      "y": "350"
+    },
+    "element0000000508": {
+      "class": "Condition_File_Exists",
+      "ID": "element0000000508",
+      "name": "File Exists - fileTestFiles",
+      "package": "default",
+      "pars": {
+        "file": "fileTestFiles"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-665",
+      "y": "490"
+    },
+    "element0000000514": {
+      "class": "Action_Write_To_File",
+      "ID": "element0000000514",
+      "name": "Write To File - fileTestFiles\\test.txt - hello",
+      "package": "default",
+      "pars": {
+        "CodePageIdentifier": "",
+        "Encoding": "UTF-8",
+        "Expression": "String",
+        "file": "fileTestFiles\\test.txt",
+        "Linefeed": 1,
+        "Overwrite": "Append",
+        "text": "hello",
+        "WithBOM": 0
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-665",
+      "y": "770"
+    },
+    "element0000000517": {
+      "class": "Condition_File_Exists",
+      "ID": "element0000000517",
+      "name": "File Exists - fileTestFiles\\test.txt",
+      "package": "default",
+      "pars": {
+        "file": "fileTestFiles\\test.txt"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-420",
+      "y": "840"
+    },
+    "element0000000520": {
+      "class": "Action_Read_From_File",
+      "ID": "element0000000520",
+      "name": "Read From File - FileText - fileTestFiles\\test.txt",
+      "package": "default",
+      "pars": {
+        "CodePageIdentifier": "",
+        "EnableSizeLimit": 0,
+        "Encoding": "UTF-8",
+        "file": "fileTestFiles\\test.txt",
+        "Linefeed": 1,
+        "SizeLimit": "1024",
+        "varname": "FileText"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-420",
+      "y": "980"
+    },
+    "element0000000522": {
+      "class": "Condition_Expression",
+      "ID": "element0000000522",
+      "name": "Expression - FileText = \"hello\"",
+      "package": "default",
+      "pars": {
+        "Expression": "FileText = \"hello\""
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-420",
+      "y": "1120"
+    },
+    "element0000000524": {
+      "class": "Action_Delete_File",
+      "ID": "element0000000524",
+      "name": "Delete File - fileTestFiles\\test.txt",
+      "package": "default",
+      "pars": {
+        "deleteFileMethod": "Recycle",
+        "file": "fileTestFiles\\test.txt"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-420",
+      "y": "1260"
+    },
+    "element0000000526": {
+      "class": "Condition_File_Exists",
+      "ID": "element0000000526",
+      "name": "File Exists - fileTestFiles\\test.txt",
+      "package": "default",
+      "pars": {
+        "file": "fileTestFiles\\test.txt"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-420",
+      "y": "1400"
+    },
+    "element0000000530": {
+      "class": "Action_Get_File_Size",
+      "ID": "element0000000530",
+      "name": "Get File Size - FileSize - fileTestFiles\\test.txt",
+      "package": "default",
+      "pars": {
+        "file": "fileTestFiles\\test.txt",
+        "Unit": "Bytes",
+        "varname": "FileSize"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "70",
+      "y": "1540"
+    },
+    "element0000000531": {
+      "class": "Action_Write_To_File",
+      "ID": "element0000000531",
+      "name": "Write To File - fileTestFiles\\test.txt - hello",
+      "package": "default",
+      "pars": {
+        "CodePageIdentifier": "",
+        "Encoding": "UTF-8",
+        "Expression": "String",
+        "file": "fileTestFiles\\test.txt",
+        "Linefeed": 1,
+        "Overwrite": "Append",
+        "text": "hello",
+        "WithBOM": 0
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "35",
+      "y": "1400"
+    },
+    "element0000000533": {
+      "class": "Condition_Expression",
+      "ID": "element0000000533",
+      "name": "Expression - FileSize = 5",
+      "package": "default",
+      "pars": {
+        "Expression": "FileSize = 5"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "35",
+      "y": "1680"
+    },
+    "element0000000538": {
+      "class": "Condition_Debug_Dialog",
+      "ID": "element0000000538",
+      "name": "Debug Dialog",
+      "package": "default",
+      "pars": {},
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "280",
+      "y": "2765"
+    },
+    "element0000000539": {
+      "class": "Action_Write_To_File",
+      "ID": "element0000000539",
+      "name": "Write To File - fileTestFiles\\test.txt - hello",
+      "package": "default",
+      "pars": {
+        "CodePageIdentifier": "",
+        "Encoding": "UTF-8",
+        "Expression": "String",
+        "file": "fileTestFiles\\test.txt",
+        "Linefeed": 1,
+        "Overwrite": "Append",
+        "text": "hello",
+        "WithBOM": 0
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-35",
+      "y": "1855"
+    },
+    "element0000000540": {
+      "class": "Action_Get_File_Size",
+      "ID": "element0000000540",
+      "name": "Get File Size - FileSize - fileTestFiles\\test.txt",
+      "package": "default",
+      "pars": {
+        "file": "fileTestFiles\\test.txt",
+        "Unit": "Bytes",
+        "varname": "FileSize"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-70",
+      "y": "2030"
+    },
+    "element0000000541": {
+      "class": "Condition_Expression",
+      "ID": "element0000000541",
+      "name": "Expression - FileSize = 10",
+      "package": "default",
+      "pars": {
+        "Expression": "FileSize = 10"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-105",
+      "y": "2170"
+    },
+    "element0000000544": {
+      "class": "Action_Write_To_File",
+      "ID": "element0000000544",
+      "name": "Write To File - fileTestFiles\\test.txt - hello",
+      "package": "default",
+      "pars": {
+        "CodePageIdentifier": "",
+        "Encoding": "UTF-8",
+        "Expression": "String",
+        "file": "fileTestFiles\\test.txt",
+        "Linefeed": 1,
+        "Overwrite": "Overwrite",
+        "text": "hello",
+        "WithBOM": "1"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-70",
+      "y": "2380"
+    },
+    "element0000000545": {
+      "class": "Action_Get_File_Size",
+      "ID": "element0000000545",
+      "name": "Get File Size - FileSize - fileTestFiles\\test.txt",
+      "package": "default",
+      "pars": {
+        "file": "fileTestFiles\\test.txt",
+        "Unit": "Bytes",
+        "varname": "FileSize"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-105",
+      "y": "2555"
+    },
+    "element0000000546": {
+      "class": "Condition_Expression",
+      "ID": "element0000000546",
+      "name": "Ausdruck - FileSize = 5 + 3\n\nSize of BOM is 3",
+      "package": "default",
+      "pars": {
+        "Expression": "FileSize = 5 + 3"
+      },
+      "StandardName": "0",
+      "type": "Condition",
+      "x": "-140",
+      "y": "2695"
+    },
+    "element0000000550": {
+      "class": "Action_Get_File_Size",
+      "ID": "element0000000550",
+      "name": "Get File Size - FileSize - fileTestFiles\\test.txt",
+      "package": "default",
+      "pars": {
+        "file": "fileTestFiles\\test.txt",
+        "Unit": "Kilobytes",
+        "varname": "FileSize"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-280",
+      "y": "3045"
+    },
+    "element0000000551": {
+      "class": "Condition_Expression",
+      "ID": "element0000000551",
+      "name": "Expression - FileSize = 1",
+      "package": "default",
+      "pars": {
+        "Expression": "FileSize = 1"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-245",
+      "y": "3220"
+    },
+    "element0000000554": {
+      "class": "Action_Write_To_File",
+      "ID": "element0000000554",
+      "name": "Write To File - fileTestFiles\\test.txt - Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et",
+      "package": "default",
+      "pars": {
+        "CodePageIdentifier": "",
+        "Encoding": "UTF-8",
+        "Expression": "String",
+        "file": "fileTestFiles\\test.txt",
+        "Linefeed": 1,
+        "Overwrite": "Overwrite",
+        "text": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et",
+        "WithBOM": "1"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-280",
+      "y": "2905"
+    },
+    "element0000000561": {
+      "class": "Action_Copy_File",
+      "ID": "element0000000561",
+      "name": "Copy File - fileTestFiles\\test.txt - fileTestFiles\\test copy.txt",
+      "package": "default",
+      "pars": {
+        "destFile": "fileTestFiles\\test copy.txt",
+        "file": "fileTestFiles\\test.txt",
+        "Overwrite": 0
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-210",
+      "y": "3430"
+    },
+    "element0000000567": {
+      "class": "Condition_File_Exists",
+      "ID": "element0000000567",
+      "name": "File Exists - fileTestFiles\\test copy.txt",
+      "package": "default",
+      "pars": {
+        "file": "fileTestFiles\\test copy.txt"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-210",
+      "y": "3570"
+    },
+    "element0000000570": {
+      "class": "Action_Copy_File",
+      "ID": "element0000000570",
+      "name": "Copy File - fileTestFiles\\test.txt - fileTestFiles\\test copy.txt",
+      "package": "default",
+      "pars": {
+        "destFile": "fileTestFiles\\test copy.txt",
+        "file": "fileTestFiles\\test.txt",
+        "Overwrite": 0
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-210",
+      "y": "3710"
+    },
+    "element0000000574": {
+      "class": "Action_Move_File",
+      "ID": "element0000000574",
+      "name": "Move File - fileTestFiles\\test.txt - fileTestFiles\\test moved.txt",
+      "package": "default",
+      "pars": {
+        "destFile": "fileTestFiles\\test moved.txt",
+        "file": "fileTestFiles\\test.txt",
+        "Overwrite": 0
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-245",
+      "y": "3885"
+    },
+    "element0000000576": {
+      "class": "Condition_File_Exists",
+      "ID": "element0000000576",
+      "name": "File Exists - fileTestFiles\\test.txt",
+      "package": "default",
+      "pars": {
+        "file": "fileTestFiles\\test.txt"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-245",
+      "y": "4060"
+    },
+    "element0000000577": {
+      "class": "Condition_File_Exists",
+      "ID": "element0000000577",
+      "name": "File Exists - fileTestFiles\\test moved.txt",
+      "package": "default",
+      "pars": {
+        "file": "fileTestFiles\\test moved.txt"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-245",
+      "y": "4235"
+    },
+    "element0000000584": {
+      "class": "Action_Rename_File",
+      "ID": "element0000000584",
+      "name": "Rename File - fileTestFiles\\test moved.txt - test renamed.txt",
+      "package": "default",
+      "pars": {
+        "file": "fileTestFiles\\test moved.txt",
+        "newName": "test renamed.txt"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-105",
+      "y": "4445"
+    },
+    "element0000000585": {
+      "class": "Condition_File_Exists",
+      "ID": "element0000000585",
+      "name": "File Exists - fileTestFiles\\test moved.txt",
+      "package": "default",
+      "pars": {
+        "file": "fileTestFiles\\test moved.txt"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "0",
+      "y": "4655"
+    },
+    "element0000000586": {
+      "class": "Condition_File_Exists",
+      "ID": "element0000000586",
+      "name": "File Exists - fileTestFiles\\test renamed.txt",
+      "package": "default",
+      "pars": {
+        "file": "fileTestFiles\\test renamed.txt"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "0",
+      "y": "4830"
+    },
+    "element0000000591": {
+      "class": "Action_Copy_Folder",
+      "ID": "element0000000591",
+      "name": "Copy Folder - fileTestFiles - fileTestFiles copied",
+      "package": "default",
+      "pars": {
+        "destFolder": "fileTestFiles copied",
+        "folder": "fileTestFiles",
+        "Overwrite": 0
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "420",
+      "y": "4935"
+    },
+    "element0000000592": {
+      "class": "Condition_File_Exists",
+      "ID": "element0000000592",
+      "name": "File Exists - fileTestFiles",
+      "package": "default",
+      "pars": {
+        "file": "fileTestFiles"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "420",
+      "y": "5110"
+    },
+    "element0000000596": {
+      "class": "Condition_File_Exists",
+      "ID": "element0000000596",
+      "name": "File Exists - fileTestFiles copied\\test renamed.txt",
+      "package": "default",
+      "pars": {
+        "file": "fileTestFiles copied\\test renamed.txt"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "420",
+      "y": "5250"
+    },
+    "element0000000598": {
+      "class": "Action_Delete_Folder",
+      "ID": "element0000000598",
+      "name": "Delete Folder - fileTestFiles copied",
+      "package": "default",
+      "pars": {
+        "ExceptionIfNotExist": 1,
+        "Folder": "fileTestFiles copied",
+        "ifEmpty": 0
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "420",
+      "y": "5425"
+    },
+    "element0000000601": {
+      "class": "Condition_File_Exists",
+      "ID": "element0000000601",
+      "name": "File Exists - fileTestFiles copied\\test renamed.txt",
+      "package": "default",
+      "pars": {
+        "file": "fileTestFiles copied\\test renamed.txt"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "420",
+      "y": "5565"
+    },
+    "element0000000606": {
+      "class": "Action_Move_Folder",
+      "ID": "element0000000606",
+      "name": "Move Folder - fileTestFiles - fileTestFiles moved",
+      "package": "default",
+      "pars": {
+        "destFolder": "fileTestFiles moved",
+        "folder": "fileTestFiles",
+        "Overwrite": 0
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "560",
+      "y": "5740"
+    },
+    "element0000000607": {
+      "class": "Action_Rename_Folder",
+      "ID": "element0000000607",
+      "name": "Rename Folder - fileTestFiles moved - fileTestFiles renamed",
+      "package": "default",
+      "pars": {
+        "folder": "fileTestFiles moved",
+        "newName": "fileTestFiles renamed"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "385",
+      "y": "5845"
+    },
+    "element0000000609": {
+      "class": "Condition_File_Exists",
+      "ID": "element0000000609",
+      "name": "File Exists - fileTestFiles renamed\\test renamed.txt",
+      "package": "default",
+      "pars": {
+        "file": "fileTestFiles renamed\\test renamed.txt"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "385",
+      "y": "6020"
+    },
+    "element0000000611": {
+      "class": "Action_Delete_Folder",
+      "ID": "element0000000611",
+      "name": "Delete Folder - fileTestFiles moved",
+      "package": "default",
+      "pars": {
+        "ExceptionIfNotExist": "0",
+        "Folder": "fileTestFiles moved",
+        "ifEmpty": 0
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-490",
+      "y": "70"
+    },
+    "element0000000612": {
+      "class": "Action_Delete_Folder",
+      "ID": "element0000000612",
+      "name": "Delete Folder - fileTestFiles copied",
+      "package": "default",
+      "pars": {
+        "ExceptionIfNotExist": "0",
+        "Folder": "fileTestFiles copied",
+        "ifEmpty": 0
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-280",
+      "y": "70"
+    },
+    "element0000000615": {
+      "class": "Action_Delete_Folder",
+      "ID": "element0000000615",
+      "name": "Delete Folder - fileTestFiles renamed",
+      "package": "default",
+      "pars": {
+        "ExceptionIfNotExist": "0",
+        "Folder": "fileTestFiles renamed",
+        "ifEmpty": 0
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-105",
+      "y": "70"
+    },
+    "element0000000639": {
+      "class": "Action_Get_File_Time",
+      "ID": "element0000000639",
+      "name": "Get File Time - Modification time - FileTime - fileTest",
+      "package": "default",
+      "pars": {
+        "file": "fileTest",
+        "TimeType": "Modification",
+        "varname": "FileTime"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "140",
+      "y": "6720"
+    },
+    "element0000000640": {
+      "class": "Action_Delete_Folder",
+      "ID": "element0000000640",
+      "name": "Delete Folder - fileTest",
+      "package": "default",
+      "pars": {
+        "ExceptionIfNotExist": "0",
+        "Folder": "fileTest",
+        "ifEmpty": 0
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "140",
+      "y": "6440"
+    },
+    "element0000000641": {
+      "class": "Action_Time_Difference",
+      "ID": "element0000000641",
+      "name": "Time Difference - TimeDifference = a_now - FileTime - Seconds",
+      "package": "default",
+      "pars": {
+        "InputTime": "a_now",
+        "InputTime2": "FileTime",
+        "Unit": "Seconds",
+        "Varname": "TimeDifference"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "140",
+      "y": "6860"
+    },
+    "element0000000642": {
+      "class": "Condition_Expression",
+      "ID": "element0000000642",
+      "name": "Expression - TimeDifference <= 1 and TimeDifference >= 0",
+      "package": "default",
+      "pars": {
+        "Expression": "TimeDifference <= 1 and TimeDifference >= 0"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "140",
+      "y": "7035"
+    },
+    "element0000000647": {
+      "class": "Action_Create_Folder",
+      "ID": "element0000000647",
+      "name": "Create Folder - fileTest",
+      "package": "default",
+      "pars": {
+        "ErrorIfExists": 0,
+        "folder": "fileTest"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "140",
+      "y": "6580"
+    },
+    "element0000000651": {
+      "class": "Action_Time_Calculation",
+      "ID": "element0000000651",
+      "name": "Time Calculation - CalculatedTime = a_now + 0-10 Minutes",
+      "package": "default",
+      "pars": {
+        "InputTime": "a_now",
+        "Unit": "Minutes",
+        "Units": "0-10",
+        "Varname": "CalculatedTime"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "140",
+      "y": "7175"
+    },
+    "element0000000653": {
+      "class": "Action_Set_file_time",
+      "ID": "element0000000653",
+      "name": "Set file time - Modification time - %calculatedTime% - fileTest",
+      "package": "default",
+      "pars": {
+        "file": "fileTest",
+        "OperateOnWhat": "Files",
+        "Recurse": 0,
+        "time": "%calculatedTime%",
+        "TimeType": "Modification"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "140",
+      "y": "7315"
+    },
+    "element0000000674": {
+      "class": "Action_Get_File_Time",
+      "ID": "element0000000674",
+      "name": "Get File Time - Modification time - FileTime - fileTest",
+      "package": "default",
+      "pars": {
+        "file": "fileTest",
+        "TimeType": "Modification",
+        "varname": "FileTime"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "175",
+      "y": "7560"
+    },
+    "element0000000675": {
+      "class": "Action_Time_Difference",
+      "ID": "element0000000675",
+      "name": "Time Difference - TimeDifference = FileTime - a_now - Minutes",
+      "package": "default",
+      "pars": {
+        "InputTime": "FileTime",
+        "InputTime2": "a_now",
+        "Unit": "Minutes",
+        "Varname": "TimeDifference"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "175",
+      "y": "7700"
+    },
+    "element0000000676": {
+      "class": "Condition_Expression",
+      "ID": "element0000000676",
+      "name": "Expression - TimeDifference = -10",
+      "package": "default",
+      "pars": {
+        "Expression": "TimeDifference = -10"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "175",
+      "y": "7875"
+    },
+    "element0000000681": {
+      "class": "Condition_Debug_Dialog",
+      "ID": "element0000000681",
+      "name": "Debug Dialog",
+      "package": "default",
+      "pars": {},
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "350",
+      "y": "8155"
+    }
+  },
+  "category": "Automatic tests",
+  "ElementIDCounter": "684",
+  "flowSettings": {
+    "DefaultWorkingDir": 1,
+    "ExecutionPolicy": "stop",
+    "Offsetx": "-1665.526924",
+    "Offsety": "-7.356338",
+    "WorkingDir": "",
+    "zoomFactor": "0.578511"
+  },
+  "name": "file test"
+}

@@ -1,0 +1,983 @@
+﻿{
+  "allConnections": {
+    "connection0000000013": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000013",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000026": {
+      "ConnectionType": "normal",
+      "from": "element0000000023",
+      "ID": "connection0000000026",
+      "to": "element0000000025",
+      "type": "Connection"
+    },
+    "connection0000000032": {
+      "ConnectionType": "normal",
+      "from": "element0000000025",
+      "ID": "connection0000000032",
+      "to": "element0000000031",
+      "type": "Connection"
+    },
+    "connection0000000034": {
+      "ConnectionType": "normal",
+      "from": "element0000000031",
+      "ID": "connection0000000034",
+      "to": "element0000000035",
+      "type": "Connection"
+    },
+    "connection0000000037": {
+      "ConnectionType": "normal",
+      "from": "element0000000035",
+      "ID": "connection0000000037",
+      "to": "element0000000036",
+      "type": "Connection"
+    },
+    "connection0000000040": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000040",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000041": {
+      "ConnectionType": "normal",
+      "from": "element0000000038",
+      "ID": "connection0000000041",
+      "to": "element0000000023",
+      "type": "Connection"
+    },
+    "connection0000000045": {
+      "ConnectionType": "normal",
+      "from": "element0000000036",
+      "ID": "connection0000000045",
+      "to": "element0000000044",
+      "type": "Connection"
+    },
+    "connection0000000046": {
+      "ConnectionType": "normal",
+      "from": "element0000000033",
+      "ID": "connection0000000046",
+      "to": "element0000000039",
+      "type": "Connection"
+    },
+    "connection0000000048": {
+      "ConnectionType": "normal",
+      "from": "element0000000005",
+      "ID": "connection0000000048",
+      "to": "element0000000047",
+      "type": "Connection"
+    },
+    "connection0000000058": {
+      "ConnectionType": "normal",
+      "from": "element0000000044",
+      "ID": "connection0000000058",
+      "to": "element0000000057",
+      "type": "Connection"
+    },
+    "connection0000000059": {
+      "ConnectionType": "normal",
+      "from": "element0000000057",
+      "ID": "connection0000000059",
+      "to": "element0000000060",
+      "type": "Connection"
+    },
+    "connection0000000062": {
+      "ConnectionType": "Yes",
+      "from": "element0000000060",
+      "ID": "connection0000000062",
+      "to": "element0000000061",
+      "type": "Connection"
+    },
+    "connection0000000069": {
+      "ConnectionType": "normal",
+      "from": "element0000000067",
+      "ID": "connection0000000069",
+      "to": "element0000000068",
+      "type": "Connection"
+    },
+    "connection0000000070": {
+      "ConnectionType": "normal",
+      "from": "element0000000066",
+      "ID": "connection0000000070",
+      "to": "element0000000127",
+      "type": "Connection"
+    },
+    "connection0000000073": {
+      "ConnectionType": "Yes",
+      "from": "element0000000071",
+      "ID": "connection0000000073",
+      "to": "element0000000072",
+      "type": "Connection"
+    },
+    "connection0000000074": {
+      "ConnectionType": "normal",
+      "from": "element0000000068",
+      "ID": "connection0000000074",
+      "to": "element0000000071",
+      "type": "Connection"
+    },
+    "connection0000000077": {
+      "ConnectionType": "normal",
+      "from": "element0000000002",
+      "ID": "connection0000000077",
+      "to": "element0000000076",
+      "type": "Connection"
+    },
+    "connection0000000079": {
+      "ConnectionType": "Yes",
+      "from": "element0000000072",
+      "ID": "connection0000000079",
+      "to": "element0000000078",
+      "type": "Connection"
+    },
+    "connection0000000081": {
+      "ConnectionType": "normal",
+      "from": "element0000000078",
+      "ID": "connection0000000081",
+      "to": "element0000000080",
+      "type": "Connection"
+    },
+    "connection0000000083": {
+      "ConnectionType": "normal",
+      "from": "element0000000080",
+      "ID": "connection0000000083",
+      "to": "element0000000091",
+      "type": "Connection"
+    },
+    "connection0000000090": {
+      "ConnectionType": "Yes",
+      "from": "element0000000082",
+      "ID": "connection0000000090",
+      "to": "element0000000084",
+      "type": "Connection"
+    },
+    "connection0000000092": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000092",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000093": {
+      "ConnectionType": "normal",
+      "from": "element0000000091",
+      "ID": "connection0000000093",
+      "to": "element0000000082",
+      "type": "Connection"
+    },
+    "connection0000000097": {
+      "ConnectionType": "normal",
+      "from": "element0000000095",
+      "ID": "connection0000000097",
+      "to": "element0000000096",
+      "type": "Connection"
+    },
+    "connection0000000098": {
+      "ConnectionType": "normal",
+      "from": "element0000000094",
+      "ID": "connection0000000098",
+      "to": "element0000000095",
+      "type": "Connection"
+    },
+    "connection0000000100": {
+      "ConnectionType": "normal",
+      "from": "element0000000023",
+      "ID": "connection0000000100",
+      "to": "element0000000099",
+      "type": "Connection"
+    },
+    "connection0000000101": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000101",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000104": {
+      "ConnectionType": "normal",
+      "from": "element0000000022",
+      "ID": "connection0000000104",
+      "to": "element0000000110",
+      "type": "Connection"
+    },
+    "connection0000000108": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000108",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000109": {
+      "ConnectionType": "No",
+      "from": "element0000000110",
+      "ID": "connection0000000109",
+      "to": "element0000000038",
+      "type": "Connection"
+    },
+    "connection0000000113": {
+      "ConnectionType": "Yes",
+      "from": "element0000000110",
+      "ID": "connection0000000113",
+      "to": "element0000000130",
+      "type": "Connection"
+    },
+    "connection0000000115": {
+      "ConnectionType": "No",
+      "from": "element0000000061",
+      "ID": "connection0000000115",
+      "to": "element0000000116",
+      "type": "Connection"
+    },
+    "connection0000000117": {
+      "ConnectionType": "Yes",
+      "from": "element0000000116",
+      "ID": "connection0000000117",
+      "to": "element0000000118",
+      "type": "Connection"
+    },
+    "connection0000000119": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000119",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000120": {
+      "ConnectionType": "Yes",
+      "from": "element0000000118",
+      "ID": "connection0000000120",
+      "to": "element0000000066",
+      "type": "Connection"
+    },
+    "connection0000000123": {
+      "ConnectionType": "No",
+      "from": "element0000000121",
+      "ID": "connection0000000123",
+      "to": "element0000000122",
+      "type": "Connection"
+    },
+    "connection0000000124": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000124",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000125": {
+      "ConnectionType": "No",
+      "from": "element0000000122",
+      "ID": "connection0000000125",
+      "to": "element0000000067",
+      "type": "Connection"
+    },
+    "connection0000000128": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000128",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000129": {
+      "ConnectionType": "normal",
+      "from": "element0000000127",
+      "ID": "connection0000000129",
+      "to": "element0000000121",
+      "type": "Connection"
+    },
+    "connection0000000132": {
+      "ConnectionType": "Yes",
+      "from": "element0000000130",
+      "ID": "connection0000000132",
+      "to": "element0000000131",
+      "type": "Connection"
+    },
+    "connection0000000133": {
+      "ConnectionType": "normal",
+      "from": "element0000000131",
+      "ID": "connection0000000133",
+      "to": "element0000000110",
+      "type": "Connection"
+    }
+  },
+  "allElements": {
+    "element0000000002": {
+      "class": "Trigger_Process_Closes",
+      "enabled": "0",
+      "ID": "element0000000002",
+      "name": "Process Closes - notepad.exe",
+      "package": "default",
+      "pars": {
+        "interval": "1000",
+        "ProcessName": "notepad.exe"
+      },
+      "StandardName": "1",
+      "type": "Trigger",
+      "x": "665",
+      "y": "210"
+    },
+    "element0000000005": {
+      "class": "Trigger_Process_starts",
+      "enabled": "0",
+      "ID": "element0000000005",
+      "name": "Process starts - notepad.exe",
+      "package": "default",
+      "pars": {
+        "interval": "1000",
+        "NotTriggerOnEnable": 1,
+        "ProcessName": "notepad.exe"
+      },
+      "StandardName": "1",
+      "type": "Trigger",
+      "x": "420",
+      "y": "210"
+    },
+    "element0000000022": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "1",
+      "enabled": "1",
+      "ID": "element0000000022",
+      "name": "Manual - \"start\"",
+      "package": "default",
+      "pars": {
+        "ID": "start"
+      },
+      "StandardName": "1",
+      "type": "trigger",
+      "x": "-140",
+      "y": "-350"
+    },
+    "element0000000023": {
+      "class": "Action_Set_Flow_Status",
+      "ID": "element0000000023",
+      "name": "Set Flow Status - Disable: This flow - All triggers",
+      "package": "default",
+      "pars": {
+        "Enable": "Disable",
+        "flowID": "",
+        "ThisFlow": 1,
+        "triggerID": "",
+        "WhichTrigger": "Any"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-140",
+      "y": "315"
+    },
+    "element0000000025": {
+      "class": "Action_Set_Flow_Status",
+      "ID": "element0000000025",
+      "name": "Set Flow Status - Enable: This flow - Default trigger",
+      "package": "default",
+      "pars": {
+        "Enable": "Enable",
+        "flowID": "",
+        "ThisFlow": 1,
+        "triggerID": "",
+        "WhichTrigger": "Default"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-140",
+      "y": "455"
+    },
+    "element0000000031": {
+      "class": "Action_Run",
+      "ID": "element0000000031",
+      "name": "Run - notepad.exe",
+      "package": "default",
+      "pars": {
+        "RunMode": "Hide",
+        "ToRun": "notepad.exe",
+        "ToRunContent": "String",
+        "WhichWorkingDir": "Default",
+        "WorkingDir": ""
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "-140",
+      "y": "665"
+    },
+    "element0000000033": {
+      "class": "Trigger_Process_starts",
+      "enabled": "0",
+      "ID": "element0000000033",
+      "name": "Process starts - notepad.exe",
+      "package": "default",
+      "pars": {
+        "interval": "1000",
+        "NotTriggerOnEnable": "0",
+        "ProcessName": "notepad.exe"
+      },
+      "StandardName": "1",
+      "type": "Trigger",
+      "x": "245",
+      "y": "210"
+    },
+    "element0000000035": {
+      "class": "Action_Sleep",
+      "ID": "element0000000035",
+      "name": "Sleep: 2 s",
+      "package": "action",
+      "pars": {
+        "Duration": 2,
+        "Unit": "Seconds"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-140",
+      "y": "805"
+    },
+    "element0000000036": {
+      "class": "Action_Set_Flow_Status",
+      "ID": "element0000000036",
+      "name": "Set Flow Status - Enable: This flow - Process starts - notepad.exe",
+      "package": "default",
+      "pars": {
+        "Enable": "Enable",
+        "flowID": "",
+        "ThisFlow": 1,
+        "triggerID": "element0000000033",
+        "WhichTrigger": "Specified"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-140",
+      "y": "980"
+    },
+    "element0000000038": {
+      "class": "Action_New_List",
+      "ID": "element0000000038",
+      "name": "New list static_successfulRuns - Empty",
+      "package": "default",
+      "pars": {
+        "DelimiterComma": 0,
+        "DelimiterLinefeed": 1,
+        "DelimiterSemicolon": 0,
+        "DelimiterSpace": 0,
+        "expression": "String",
+        "expressionPos": "String",
+        "NumberOfElements": "None",
+        "Position": "keyName",
+        "Varname": "static_successfulRuns",
+        "VarValue": "New element",
+        "VarValues": "Element one\nElement two",
+        "WhichPosition": "First"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-140",
+      "y": "140"
+    },
+    "element0000000039": {
+      "class": "Action_Add_To_List",
+      "ID": "element0000000039",
+      "name": "Add to list static_successfulRuns - As last value - Value 'processStartsTriggerOnEnable'",
+      "package": "default",
+      "pars": {
+        "DelimiterComma": 0,
+        "DelimiterLinefeed": 1,
+        "DelimiterSemicolon": 0,
+        "DelimiterSpace": 0,
+        "Expression": "String",
+        "expressionPos": "String",
+        "InsertMethod": "Insert",
+        "InsertMethodLabel": "",
+        "NumberOfElements": "One",
+        "Position": "keyName",
+        "Varname": "static_successfulRuns",
+        "VarValue": "processStartsTriggerOnEnable",
+        "VarValues": "Element one\nElement two",
+        "WhichPosition": "Last"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "245",
+      "y": "350"
+    },
+    "element0000000044": {
+      "class": "Action_Set_Flow_Status",
+      "ID": "element0000000044",
+      "name": "Set Flow Status - Enable: This flow - Process starts - notepad.exe",
+      "package": "default",
+      "pars": {
+        "Enable": "Enable",
+        "flowID": "",
+        "ThisFlow": 1,
+        "triggerID": "element0000000005",
+        "WhichTrigger": "Specified"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-140",
+      "y": "1155"
+    },
+    "element0000000047": {
+      "class": "Action_Add_To_List",
+      "ID": "element0000000047",
+      "name": "Add to list static_successfulRuns - As last value - Value 'processStartsNotTriggerOnEnable'",
+      "package": "default",
+      "pars": {
+        "DelimiterComma": 0,
+        "DelimiterLinefeed": 1,
+        "DelimiterSemicolon": 0,
+        "DelimiterSpace": 0,
+        "Expression": "String",
+        "expressionPos": "String",
+        "InsertMethod": "Insert",
+        "InsertMethodLabel": "",
+        "NumberOfElements": "One",
+        "Position": "keyName",
+        "Varname": "static_successfulRuns",
+        "VarValue": "processStartsNotTriggerOnEnable",
+        "VarValues": "Element one\nElement two",
+        "WhichPosition": "Last"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "420",
+      "y": "350"
+    },
+    "element0000000057": {
+      "class": "Action_Sleep",
+      "ID": "element0000000057",
+      "name": "Sleep: 2 s",
+      "package": "action",
+      "pars": {
+        "Duration": 2,
+        "Unit": "Seconds"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-140",
+      "y": "1330"
+    },
+    "element0000000060": {
+      "class": "Condition_List_Contains_Element",
+      "ID": "element0000000060",
+      "name": "List Contains Element - Value '1' in list 'static_successfulRuns'",
+      "package": "default",
+      "pars": {
+        "InputList": "static_successfulRuns",
+        "isExpressionPosition": "String",
+        "isExpressionSearchContent": "String",
+        "Position": 1,
+        "SearchContent": "processStartsTriggerOnEnable",
+        "SearchWhat": "Content"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-140",
+      "y": "1470"
+    },
+    "element0000000061": {
+      "class": "Condition_List_Contains_Element",
+      "ID": "element0000000061",
+      "name": "List Contains Element - Value '1' in list 'static_successfulRuns'",
+      "package": "default",
+      "pars": {
+        "InputList": "static_successfulRuns",
+        "isExpressionPosition": "String",
+        "isExpressionSearchContent": "String",
+        "Position": 1,
+        "SearchContent": "processStartsNotTriggerOnEnable",
+        "SearchWhat": "Content"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-140",
+      "y": "1610"
+    },
+    "element0000000066": {
+      "class": "Action_Kill_Process",
+      "ID": "element0000000066",
+      "name": "Kill Process - notepad.exe",
+      "package": "default",
+      "pars": {
+        "ProcessName": "notepad.exe"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-140",
+      "y": "1785"
+    },
+    "element0000000067": {
+      "class": "Action_Run",
+      "ID": "element0000000067",
+      "name": "Run - notepad.exe",
+      "package": "default",
+      "pars": {
+        "RunMode": "Hide",
+        "ToRun": "notepad.exe",
+        "ToRunContent": "String",
+        "WhichWorkingDir": "Default",
+        "WorkingDir": ""
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "-140",
+      "y": "1960"
+    },
+    "element0000000068": {
+      "class": "Action_Sleep",
+      "ID": "element0000000068",
+      "name": "Sleep: 2 s",
+      "package": "action",
+      "pars": {
+        "Duration": 2,
+        "Unit": "Seconds"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-140",
+      "y": "2100"
+    },
+    "element0000000071": {
+      "class": "Condition_List_Contains_Element",
+      "ID": "element0000000071",
+      "name": "List Contains Element - Value '1' in list 'static_successfulRuns'",
+      "package": "default",
+      "pars": {
+        "InputList": "static_successfulRuns",
+        "isExpressionPosition": "String",
+        "isExpressionSearchContent": "String",
+        "Position": 1,
+        "SearchContent": "processStartsTriggerOnEnable",
+        "SearchWhat": "Content"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-140",
+      "y": "2275"
+    },
+    "element0000000072": {
+      "class": "Condition_List_Contains_Element",
+      "ID": "element0000000072",
+      "name": "List Contains Element - Value '1' in list 'static_successfulRuns'",
+      "package": "default",
+      "pars": {
+        "InputList": "static_successfulRuns",
+        "isExpressionPosition": "String",
+        "isExpressionSearchContent": "String",
+        "Position": 1,
+        "SearchContent": "processStartsNotTriggerOnEnable",
+        "SearchWhat": "Content"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-140",
+      "y": "2450"
+    },
+    "element0000000076": {
+      "class": "Action_Add_To_List",
+      "ID": "element0000000076",
+      "name": "Add to list static_successfulRuns - As last value - Value 'processCloses'",
+      "package": "default",
+      "pars": {
+        "DelimiterComma": 0,
+        "DelimiterLinefeed": 1,
+        "DelimiterSemicolon": 0,
+        "DelimiterSpace": 0,
+        "Expression": "String",
+        "expressionPos": "String",
+        "InsertMethod": "Insert",
+        "InsertMethodLabel": "",
+        "NumberOfElements": "One",
+        "Position": "keyName",
+        "Varname": "static_successfulRuns",
+        "VarValue": "processCloses",
+        "VarValues": "Element one\nElement two",
+        "WhichPosition": "Last"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "665",
+      "y": "350"
+    },
+    "element0000000078": {
+      "class": "Action_Set_Flow_Status",
+      "ID": "element0000000078",
+      "name": "Set Flow Status - Enable: This flow - Process Closes - notepad.exe",
+      "package": "default",
+      "pars": {
+        "Enable": "Enable",
+        "flowID": "",
+        "ThisFlow": 1,
+        "triggerID": "element0000000002",
+        "WhichTrigger": "Specified"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-140",
+      "y": "2625"
+    },
+    "element0000000080": {
+      "class": "Action_Kill_Process",
+      "ID": "element0000000080",
+      "name": "Kill Process - notepad.exe",
+      "package": "default",
+      "pars": {
+        "ProcessName": "notepad.exe"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-140",
+      "y": "2800"
+    },
+    "element0000000082": {
+      "class": "Condition_List_Contains_Element",
+      "ID": "element0000000082",
+      "name": "List Contains Element - Value '1' in list 'static_successfulRuns'",
+      "package": "default",
+      "pars": {
+        "InputList": "static_successfulRuns",
+        "isExpressionPosition": "String",
+        "isExpressionSearchContent": "String",
+        "Position": 1,
+        "SearchContent": "processCloses",
+        "SearchWhat": "Content"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-140",
+      "y": "3115"
+    },
+    "element0000000084": {
+      "class": "Action_Add_To_List",
+      "ID": "element0000000084",
+      "name": "Add to list global_testResults - As last value - Value 'a_flowName'",
+      "package": "default",
+      "pars": {
+        "DelimiterComma": 0,
+        "DelimiterLinefeed": 1,
+        "DelimiterSemicolon": 0,
+        "DelimiterSpace": 0,
+        "Expression": "Expression",
+        "expressionPos": "String",
+        "InsertMethod": "Insert",
+        "InsertMethodLabel": "",
+        "NumberOfElements": "One",
+        "Position": "keyName",
+        "Varname": "global_testResults",
+        "VarValue": "a_flowName",
+        "VarValues": "Element one\nElement two",
+        "WhichPosition": "Last"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-140",
+      "y": "3360"
+    },
+    "element0000000091": {
+      "class": "Action_Sleep",
+      "ID": "element0000000091",
+      "name": "Sleep: 2 s",
+      "package": "action",
+      "pars": {
+        "Duration": 2,
+        "Unit": "Seconds"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-140",
+      "y": "2940"
+    },
+    "element0000000094": {
+      "class": "Trigger_Periodic_Timer",
+      "enabled": "0",
+      "ID": "element0000000094",
+      "name": "Periodic Timer - 15 Seconds",
+      "package": "default",
+      "pars": {
+        "Interval": "15",
+        "Unit": "Seconds"
+      },
+      "StandardName": "1",
+      "type": "Trigger",
+      "x": "-665",
+      "y": "140"
+    },
+    "element0000000095": {
+      "class": "Action_Set_Flow_Status",
+      "ID": "element0000000095",
+      "name": "Set Flow Status - Disable: This flow - All triggers",
+      "package": "default",
+      "pars": {
+        "Enable": "Disable",
+        "flowID": "",
+        "ThisFlow": 1,
+        "triggerID": "",
+        "WhichTrigger": "Any"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-665",
+      "y": "315"
+    },
+    "element0000000096": {
+      "class": "Action_Set_Flow_Status",
+      "ID": "element0000000096",
+      "name": "Set Flow Status - Enable: This flow - Default trigger",
+      "package": "default",
+      "pars": {
+        "Enable": "Enable",
+        "flowID": "",
+        "ThisFlow": 1,
+        "triggerID": "",
+        "WhichTrigger": "Default"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-665",
+      "y": "455"
+    },
+    "element0000000099": {
+      "class": "Action_Set_Flow_Status",
+      "ID": "element0000000099",
+      "name": "Set Flow Status - Enable: This flow - Periodic Timer - 15 Seconds",
+      "package": "default",
+      "pars": {
+        "Enable": "Enable",
+        "flowID": "",
+        "ThisFlow": 1,
+        "triggerID": "element0000000094",
+        "WhichTrigger": "Specified"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-385",
+      "y": "455"
+    },
+    "element0000000110": {
+      "class": "Condition_Process_Is_Running",
+      "ID": "element0000000110",
+      "name": "Process Is Running - notepad.exe",
+      "package": "default",
+      "pars": {
+        "ProcessName": "notepad.exe"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-140",
+      "y": "-140"
+    },
+    "element0000000116": {
+      "class": "Condition_Process_Is_Running",
+      "ID": "element0000000116",
+      "name": "Process Is Running - notepad.exe",
+      "package": "default",
+      "pars": {
+        "ProcessName": "notepad.exe"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "140",
+      "y": "1575"
+    },
+    "element0000000118": {
+      "class": "Condition_Process_Is_Running",
+      "ID": "element0000000118",
+      "name": "Process Is Running - %a_pID%",
+      "package": "default",
+      "pars": {
+        "ProcessName": "%a_pID%"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "175",
+      "y": "1715"
+    },
+    "element0000000121": {
+      "class": "Condition_Process_Is_Running",
+      "ID": "element0000000121",
+      "name": "Process Is Running - notepad.exe",
+      "package": "default",
+      "pars": {
+        "ProcessName": "notepad.exe"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "105",
+      "y": "1995"
+    },
+    "element0000000122": {
+      "class": "Condition_Process_Is_Running",
+      "ID": "element0000000122",
+      "name": "Process Is Running - %a_pID%",
+      "package": "default",
+      "pars": {
+        "ProcessName": "%a_pID%"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "105",
+      "y": "2135"
+    },
+    "element0000000127": {
+      "class": "Action_Sleep",
+      "ID": "element0000000127",
+      "name": "Sleep: 2 s",
+      "package": "action",
+      "pars": {
+        "Duration": 2,
+        "Unit": "Seconds"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "105",
+      "y": "1855"
+    },
+    "element0000000130": {
+      "class": "Condition_Confirmation_Dialog",
+      "ID": "element0000000130",
+      "name": "Confirmation Dialog - Process Test, Notepad.exe must be closed to start the test. Close it now?",
+      "package": "default",
+      "pars": {
+        "ButtonLabelCancel": "Cancel",
+        "ButtonLabelNo": "No",
+        "ButtonLabelYes": "Yes",
+        "DefaultButton": "No",
+        "Height": 200,
+        "IfDismiss": "Exception",
+        "IsTimeout": 0,
+        "message": "Notepad.exe must be closed to start the test. Close it now?",
+        "OnTimeout": "Exception",
+        "ShowCancelButton": 0,
+        "TimeoutUnits": 10,
+        "title": "Process Test",
+        "Unit": "Seconds",
+        "Width": 300
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "105",
+      "y": "-210"
+    },
+    "element0000000131": {
+      "class": "Action_Kill_Process",
+      "ID": "element0000000131",
+      "name": "Kill Process - notepad.exe",
+      "package": "default",
+      "pars": {
+        "ProcessName": "notepad.exe"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "140",
+      "y": "-70"
+    }
+  },
+  "category": "Automatic tests",
+  "ElementIDCounter": "133",
+  "flowSettings": {
+    "DefaultWorkingDir": 1,
+    "ExecutionPolicy": "default",
+    "Offsetx": "-1119.485740",
+    "Offsety": "-538.013906",
+    "WorkingDir": "",
+    "zoomFactor": "0.700002"
+  },
+  "name": "Process Test"
+}

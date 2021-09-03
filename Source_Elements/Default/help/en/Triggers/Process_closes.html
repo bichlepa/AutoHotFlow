@@ -1,0 +1,50 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<link rel="stylesheet" href="../../stylesheet.css">
+	<link rel="stylesheet" href="stylesheet.css">
+	<link rel="stylesheet" href="../../../../../Help/stylesheet.css">
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<H1>Process closes</H1>
+<p>
+	The trigger <B>Process closes</B> triggers whenever a process closes.
+</p>
+
+<H2>Settings</H2>
+<table class="settings">
+	<TR>
+		<TD>
+			<h4>Process name or ID</h4>
+			<p>Name or ID of the process.
+				<br/>This field can be left empty, it will trigger whenever any process closes.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Options</h4>
+			<p>Specify the check interval in ms.</p>
+			<p class="info">Be careful if you specify a period smaller than 1000 ms. It might sometimes trigger multiple times when a process closes.</p>
+		</TD>
+	</TR>
+</table>
+
+<H2>Supplied Variables</H2>
+<table class="variables">
+	<TR>
+		<TD>
+			<h4 class="VariableName">A_ProcessID</h4>
+			<p>ID of the closed process.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">A_ProcessName</h4>
+			<p>Name of the closed process.</p>
+		</TD>
+	</TR>
+</table>
+
+</BODY>
+</HTML>

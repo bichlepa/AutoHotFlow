@@ -1,0 +1,332 @@
+﻿{
+  "allConnections": {
+    "connection0000000005": {
+      "ConnectionType": "normal",
+      "from": "element0000000002",
+      "ID": "connection0000000005",
+      "to": "element0000000013",
+      "type": "Connection"
+    },
+    "connection0000000007": {
+      "ConnectionType": "normal",
+      "from": "element0000000001",
+      "ID": "connection0000000007",
+      "to": "element0000000002",
+      "type": "Connection"
+    },
+    "connection0000000008": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000008",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000009": {
+      "ConnectionType": "normal",
+      "from": "element0000000010",
+      "ID": "connection0000000009",
+      "to": "element0000000015",
+      "type": "Connection"
+    },
+    "connection0000000011": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000011",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000012": {
+      "ConnectionType": "normal",
+      "from": "element0000000013",
+      "ID": "connection0000000012",
+      "to": "element0000000021",
+      "type": "Connection"
+    },
+    "connection0000000016": {
+      "ConnectionType": "normal",
+      "from": "element0000000015",
+      "ID": "connection0000000016",
+      "to": "element0000000014",
+      "type": "Connection"
+    },
+    "connection0000000017": {
+      "ConnectionType": "normal",
+      "from": "element0000000014",
+      "ID": "connection0000000017",
+      "to": "element0000000018",
+      "type": "Connection"
+    },
+    "connection0000000019": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000019",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000020": {
+      "ConnectionType": "normal",
+      "from": "element0000000021",
+      "ID": "connection0000000020",
+      "to": "element0000000010",
+      "type": "Connection"
+    },
+    "connection0000000022": {
+      "ConnectionType": "normal",
+      "from": "element0000000018",
+      "ID": "connection0000000022",
+      "to": "element0000000030",
+      "type": "Connection"
+    },
+    "connection0000000023": {
+      "ConnectionType": "normal",
+      "from": "element0000000006",
+      "ID": "connection0000000023",
+      "to": "element0000000024",
+      "type": "Connection"
+    },
+    "connection0000000028": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000028",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000029": {
+      "ConnectionType": "normal",
+      "from": "element0000000030",
+      "ID": "connection0000000029",
+      "to": "element0000000006",
+      "type": "Connection"
+    }
+  },
+  "allElements": {
+    "element0000000001": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "1",
+      "enabled": "0",
+      "ID": "element0000000001",
+      "name": "Manual - \"Trigger joke teller\"",
+      "package": "default",
+      "pars": {
+        "ID": "Trigger joke teller"
+      },
+      "StandardName": "1",
+      "type": "trigger",
+      "x": "280",
+      "y": "35"
+    },
+    "element0000000002": {
+      "class": "Action_HTTP_Request",
+      "ID": "element0000000002",
+      "name": "HTTP Request",
+      "package": "default",
+      "pars": {
+        "BypassProxy": "",
+        "Codepage": "",
+        "ContentLength": "",
+        "ContentMD5": "",
+        "Contenttype": "",
+        "Flags": "",
+        "InputFile": "",
+        "IsExpression": "String",
+        "Method": "GET",
+        "OutputFile": "HTTPResponseData.html",
+        "PostData": "",
+        "Proxy": "",
+        "RequestHeaders": "",
+        "ResponseDataVar": "HTTPResponseData",
+        "ResponseHeadersVar": "HTTPResponseHeaders",
+        "URIEncodePostData": 0,
+        "URIEncodeRequestHeaders": 0,
+        "URL": "https:\/\/icanhazdadjoke.com\/",
+        "UserAgent": "",
+        "WhereToGetPostData": "NoUpload",
+        "WhereToPutResponseData": "Variable",
+        "WhetherBypassProxy": 0,
+        "WhichCodepage": "utf-8",
+        "WhichContentLength": "automatic",
+        "WhichContentMD5": "automatic",
+        "WhichContentType": "automatic",
+        "WhichMethod": "automatic",
+        "WhichProxy": "none",
+        "WhichUserAgent": "automatic"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "280",
+      "y": "210"
+    },
+    "element0000000006": {
+      "class": "Action_Tooltip",
+      "ID": "element0000000006",
+      "name": "Tooltip: %joke% - 10 s - Follow Mouse",
+      "package": "action",
+      "pars": {
+        "duration": "10",
+        "follow_mouse": 1,
+        "text": "%joke%",
+        "Unit": "Seconds"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "315",
+      "y": "980"
+    },
+    "element0000000010": {
+      "class": "Action_Search_in_a_string",
+      "ID": "element0000000010",
+      "name": "Search in a string - posLeft - HTTPResponseData - leftString",
+      "package": "default",
+      "pars": {
+        "CaseSensitive": "CaseInsensitive",
+        "Expression": "Expression",
+        "IsExpressionSearchText": "Expression",
+        "LeftOrRight": "GoRight",
+        "OccurenceNumber": 1,
+        "Offset": 1,
+        "SearchText": "leftString",
+        "Varname": "posLeft",
+        "VarValue": "HTTPResponseData"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "140",
+      "y": "665"
+    },
+    "element0000000013": {
+      "class": "Action_New_variable",
+      "ID": "element0000000013",
+      "name": "New variable - leftString = <p class=\"subtitle\">",
+      "package": "default",
+      "pars": {
+        "expression": "String",
+        "Varname": "leftString",
+        "VarValue": "<p class=\"subtitle\">"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "140",
+      "y": "385"
+    },
+    "element0000000014": {
+      "class": "Action_Search_in_a_string",
+      "ID": "element0000000014",
+      "name": "Search in a string - posRight - HTTPResponseData - <\/p>",
+      "package": "default",
+      "pars": {
+        "CaseSensitive": "CaseInsensitive",
+        "Expression": "Expression",
+        "IsExpressionSearchText": "String",
+        "LeftOrRight": "GoRight",
+        "OccurenceNumber": 1,
+        "Offset": "posLeft",
+        "SearchText": "<\/p>",
+        "Varname": "posRight",
+        "VarValue": "HTTPResponseData"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "455",
+      "y": "525"
+    },
+    "element0000000015": {
+      "class": "Action_New_variable",
+      "ID": "element0000000015",
+      "name": "New variable - rightString = <\/p>",
+      "package": "default",
+      "pars": {
+        "expression": "String",
+        "Varname": "rightString",
+        "VarValue": "<\/p>"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "455",
+      "y": "385"
+    },
+    "element0000000018": {
+      "class": "Action_Substring",
+      "ID": "element0000000018",
+      "name": "Substring - joke - HTTPResponseData",
+      "package": "default",
+      "pars": {
+        "expression": "Expression",
+        "LeftOrRight": "GoRight",
+        "Length": "posRight - (posLeft + leftLength)",
+        "StartPos": "posLeft + leftLength",
+        "UntilTheEnd": 0,
+        "Varname": "joke",
+        "VarValue": "HTTPResponseData",
+        "WhereToBegin": "Position"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "455",
+      "y": "665"
+    },
+    "element0000000021": {
+      "class": "Action_Get_String_Length",
+      "ID": "element0000000021",
+      "name": "Get String Length - leftLength = Length of leftString",
+      "package": "default",
+      "pars": {
+        "expression": "Expression",
+        "Varname": "leftLength",
+        "VarValue": "leftString"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "140",
+      "y": "525"
+    },
+    "element0000000024": {
+      "class": "Action_Speech_output",
+      "ID": "element0000000024",
+      "name": "Speech output -  - Microsoft Zira Desktop",
+      "package": "default",
+      "pars": {
+        "pitch": 0,
+        "speed": 0,
+        "text": "%joke%",
+        "TTSEngine": "Microsoft Zira Desktop",
+        "volume": 100,
+        "WaitUntilCurrentFinishes": 1,
+        "WaitUntilPreviousFinished": 0
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "315",
+      "y": "1120"
+    },
+    "element0000000030": {
+      "class": "Action_replace_in_a_string",
+      "ID": "element0000000030",
+      "name": "Replace in a string - joke - joke - <\/br> -  ",
+      "package": "default",
+      "pars": {
+        "CaseSensitive": "CaseInsensitive",
+        "expression": "Expression",
+        "ReplaceAll": "all",
+        "ReplaceText": " ",
+        "SearchText": "<\/br>",
+        "Varname": "joke",
+        "VarValue": "joke"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "315",
+      "y": "840"
+    }
+  },
+  "category": "",
+  "ElementIDCounter": "30",
+  "flowSettings": {
+    "DefaultWorkingDir": 1,
+    "ExecutionPolicy": "default",
+    "Offsetx": -200,
+    "Offsety": -200,
+    "WorkingDir": "",
+    "zoomFactor": "0.7"
+  },
+  "name": "Joke teller"
+}

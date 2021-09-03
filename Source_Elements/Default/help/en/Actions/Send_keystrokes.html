@@ -1,0 +1,47 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<link rel="stylesheet" href="../../stylesheet.css">
+	<link rel="stylesheet" href="stylesheet.css">
+	<link rel="stylesheet" href="../../../../../Help/stylesheet.css">
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<H1>Send keystrokes</H1>
+<p>
+	The action <B>Send keystrokes</B> sends simulated keystrokes and mouse clicks to the active window.
+</p>
+
+<H2>Settings</H2>
+<table class="settings">
+	<TR>
+		<TD>
+			<h4>Keys or text to send</h4>
+			<p>Specify the keys that will be sent.
+				<br/>If <b>Raw mode</b> is selected, the entered string will be sent as is.
+				<br/>If <b>Raw mode</b> is not selected, some keys can be declared as described in the section Remarks.
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Method</h4>
+			<p>There are different methods to simulate keyboard events. If the sent keys are not recognized by the application using the default method, you may try to change it.
+				<br/><b>Input mode</b> has best performance and is the recommended one in most cases.
+				<br/><b>Event mode</b> has lower performance.
+				<br/><b>Play mode</b> may require to disable the UAC to work. It may work better in games.
+			</p>
+			<p>
+				<b>Input mode</b> can only be used in one AutoHotFlow instance. If you run multiple AutoHotFlow instances simultanously, the second instance will not be able to use it. Also other applications and AutoHotkey scripts may block the input mode. If <b>Input mode</b> is blocked, it will automatically fall back to <b>Event mode</b>.
+			</p>
+		</TD>
+	</TR>
+</table>
+
+<H2>Remarks</H2>
+<p>
+	<iframe src="../Key list.html"></iframe></p>
+</p>
+
+</BODY>
+</HTML>

@@ -1,0 +1,80 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<link rel="stylesheet" href="../../stylesheet.css">
+	<link rel="stylesheet" href="stylesheet.css">
+	<link rel="stylesheet" href="../../../../../Help/stylesheet.css">
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<H1>Parse a string</H1>
+<p>
+	The loop <B>Parse a string</B> retrieves substrings (fields) from a string, one at a time.
+</p>
+
+<H2>Settings</H2>
+<table class="settings">
+	<TR>
+		<TD>
+			<h4>Input string</h4>
+			<p>A string whose contents will be read from.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Delimiter characters</h4>
+			<p>This field contains the separator characters (case sensitive). On every appearance of one of those characters the input text will be split into substrings.
+				<br/>If this field is blank, each character of the input string will be treated as a separate substring.
+				<br/>Each letter is a delimiter. Don't separate the delimiters by a comma or space, unless you want the comma or space to be a delimiter.
+			</p>
+			<ul class="examples"><i>Examples:</i>
+				<li/>
+					<p><code>,</code> <i>(Use comma as delimiter)</i></p>
+				<li/>
+					<p"><code>%a_space%%a_tab%%a_lf%%a_cr%</code> <i>(separate by whitespaces)</i></p>
+				<li/>
+					<p"><code>%delimiters%</code> <i>(variable that contains the delimiters)</i></p>
+				<li/>
+					<p"><code>ab c</code> <i>(use the letters <b>a</b>, <b>b</b>, <b>c</b> and a <b>space</b> as delimiter)</i></p>
+			</ul>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Omit characters</h4>
+			<p>This field contains the characters (case sensitive) to exclude from the beginning and end of each substring.
+				<br/>This field can be blank.
+			</p>
+			<ul class="examples"><i>Examples:</i>
+				<li/>
+					<p><code>,.:;-!?</code> <i>(Omit punctuation characters)</i></p>
+				<li/>
+					<p"><code>%a_space%%a_tab%%a_lf%%a_cr%</code> <i>(omit whitespaces)</i></p>
+			</ul>
+		</TD>
+	</TR>
+</table>
+
+<H2>Supplied Variables</H2>
+<table class="variables">
+	<TR>
+		<TD>
+			<h4 class="VariableName">A_Index</h4>
+			<p>Index of the current iteration. It starts with the value 1 and increases on every loop.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">A_LoopField</h4>
+			<p>Current substring.</p>
+		</TD>
+	</TR>
+</table>
+
+<H2>Remarks</H2>
+<p>
+	All supplied variables will be removed after last iteration.
+</p>
+
+</BODY>
+</HTML>

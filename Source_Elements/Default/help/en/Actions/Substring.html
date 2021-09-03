@@ -1,0 +1,98 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<link rel="stylesheet" href="../../stylesheet.css">
+	<link rel="stylesheet" href="stylesheet.css">
+	<link rel="stylesheet" href="../../../../../Help/stylesheet.css">
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<H1>Substring</H1>
+<p>
+	The action <B>Substring</B> retrieves one or more characters from the specified position in a string.
+</p>
+
+<H2>Settings</H2>
+<table class="settings">
+	<TR>
+		<TD>
+			<h4>Output variable name</h4>
+			<p>Name of the variable which will contain the substring.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Input string</h4>
+			<p>A string from which the substring will be extracted.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Start position</h4>
+			<p>If <b>Begin from left</b> or <b>Begin from right</b> is selected, the leftmost or rightmost characters of the input string will be written to the substring.
+				<br/>If <b>Start in following position</b> is selected, specify the start position.
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Count of characters</h4>
+			<p>Specify how many characters will be retrieved.
+				<br/>If <b>Start in following position</b> is selected, it is possible to choose whether the characters that will be extracted lie left or right from the start position. It is also possible to extract all remaining characters from the specified position until the end.
+			</p>
+		</TD>
+	</TR>
+</table>
+
+<H2>Examples</H2>
+<table class="examples">
+	<TR>
+		<TD>
+			<p>Extract the word "Hello" from the string "Hello world!".</p>
+			<table class="example">
+				<TR>
+					<TD class="example-parameter">
+						<p>Start position</p>
+					</TD>
+					<TD class="example-value">
+						<p>◉ Begin from left</p>
+					</TD>
+				</TR>
+				<TR>
+					<TD class="example-parameter">
+						<p>Count of characters</p>
+					</TD>
+					<TD class="example-value">
+						<p>5</p>
+					</TD>
+				</TR>
+			</table>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<p>Extract the name from the string "Hello Paul".</p>
+			<table class="example">
+				<TR>
+					<TD class="example-parameter">
+						<p>Start position</p>
+					</TD>
+					<TD class="example-value">
+						<p>◉ Start in following position <br/>7</p>
+					</TD>
+				</TR>
+				<TR>
+					<TD class="example-parameter">
+						<p>Count of characters</p>
+					</TD>
+					<TD class="example-value">
+						<p>☑ Until the end<br/>◉ Go right</p>
+					</TD>
+				</TR>
+			</table>
+		</TD>
+	</TR>
+</table>
+
+</BODY>
+</HTML>

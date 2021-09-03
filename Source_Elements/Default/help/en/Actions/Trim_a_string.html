@@ -1,0 +1,138 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<link rel="stylesheet" href="../../stylesheet.css">
+	<link rel="stylesheet" href="stylesheet.css">
+	<link rel="stylesheet" href="../../../../../Help/stylesheet.css">
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<H1>Trim a string</H1>
+<p>
+	The action <B>Trim a string</B> removes one or more characters from the beginning and/or end of a string.
+</p>
+
+<H2>Settings</H2>
+<table class="settings">
+	<TR>
+		<TD>
+			<h4>Output variable name</h4>
+			<p>Name of the variable which will contain the trimmed string. It can be the same variable as the input string.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Input string</h4>
+			<p>An input string which will be trimmed.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Operation</h4>
+			<p>If <b>Remove a number of characters</b> is selected, a specified count of characters from left and/or right side of the string will be removed.
+				<br/>If <b>Remove specific characters</b> is selected, some specific characters from left and/or right side of the string will be removed.
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Remove from which side</h4>
+			<p>Select whether the characters should be removed from left-hand and/or right-hand side of the string.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Count of characters</h4>
+			<p>Only accessible if <b>Remove a number of characters</b> is selected.
+				<br/>Specify how many characters will be removed.
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Which characters</h4>
+			<p>Only accessible if <b>Remove specific characters</b> is selected.
+				<br/>This field contains the characters (case sensitive) to exclude from the beginning and/or end of the input string.
+			</p>
+			<ul class="examples"><i>Examples:</i>
+				<li/>
+					<p><code>,.:;-!?</code> <i>(Omit punctuation characters)</i></p>
+				<li/>
+					<p"><code>%a_space%%a_tab%%a_lf%%a_cr%</code> <i>(omit whitespaces)</i></p>
+			</ul>
+		</TD>
+	</TR>
+</table>
+
+
+<H2>Examples</H2>
+<table class="examples">
+	<TR>
+		<TD>
+			<p>Extract the word "Hello" and the space from the string "Hello world!".</p>
+			<table class="example">
+				<TR>
+					<TD class="example-parameter">
+						<p>Operation</p>
+					</TD>
+					<TD class="example-value">
+						<p>◉ Remove a number of characters</p>
+					</TD>
+				</TR>
+				<TR>
+					<TD class="example-parameter">
+						<p>Remove from which side</p>
+					</TD>
+					<TD class="example-value">
+						<p>☑ Left-hand side
+							<br/>☐ Right-hand side</p>
+					</TD>
+				</TR>
+				<TR>
+					<TD class="example-parameter">
+						<p>Count of characters</p>
+					</TD>
+					<TD class="example-value">
+						<p>6</p>
+					</TD>
+				</TR>
+			</table>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<p>Remove the spaces from both sides of the string " Hello world! ".</p>
+			<table class="example">
+				<TR>
+					<TD class="example-parameter">
+						<p>Operation</p>
+					</TD>
+					<TD class="example-value">
+						<p>◉ Remove specific characters</p>
+					</TD>
+				</TR>
+				<TR>
+					<TD class="example-parameter">
+						<p>Remove from which side</p>
+					</TD>
+					<TD class="example-value">
+						<p>☑ Left-hand side
+							<br/>☑ Right-hand side</p>
+					</TD>
+				</TR>
+				<TR>
+					<TD class="example-parameter">
+						<p>Which characters</p>
+					</TD>
+					<TD class="example-value">
+						<p>%a_space%</p>
+					</TD>
+				</TR>
+			</table>
+		</TD>
+	</TR>
+</table>
+
+
+</BODY>
+</HTML>

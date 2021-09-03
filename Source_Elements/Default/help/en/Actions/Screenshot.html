@@ -1,0 +1,87 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<link rel="stylesheet" href="../../stylesheet.css">
+	<link rel="stylesheet" href="stylesheet.css">
+	<link rel="stylesheet" href="../../../../../Help/stylesheet.css">
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<H1>Screenshot</H1>
+<p>
+	The action <B>Screenshot</B> makes a screenshot of the screen, a screen region or a window.
+</p>
+
+<H2>Settings</H2>
+<table class="settings">
+	<TR>
+		<TD>
+			<h4>Output</h4>
+			<p>Name and path of the file which will contain the screenshot image. The file path is assumed to be in the working directory if an absolute path isn't specified.
+				<br/>Supported file formats are BMP, DIB, RLE, JPG, JPEG, JPE, JFIF, GIF, TIF, TIFF and PNG. The extension must be set.
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Screen region</h4>
+			<p>The screenshot can contain either the whole screen, a defined region or a specified window.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Which screen</h4>
+			<p>If screen region <b>Whole screen</b> is selected, this will be the screen.
+				Specify, whether the screenshot should contain all screens or only one.
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Coordinates</h4>
+			<p>If screen region <b>Whole screen</b> is selected, this will be the screen.
+				Specify the rectangle region which the screenshot should contain.
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Window identification</h4>
+			<p><b>Title of window</b>: Name of the window title. It can be chosen whether the title starts, contains or ends with the specified string.
+				<br/><b>Exclude title</b>: Windows whose titles include this value will not be considered.
+				<br/><b>Text of a control in window</b>: If present, this parameter must be a substring from a single text element of the target window. It can be specified whether hidden text will be found
+				<br/><b>Exclude text of a control in window</b>: Windows whose text include this value will not be considered
+				<br/><b>Window class</b>: A window class is a set of attributes that the system uses as a template to create a window. In other words, the class name of the window identifies what type of window it is.
+				<br/><b>Process name</b>: The name or path of the executable that created that window.
+				<br/><b>Unique window ID</b>: Each window or control has a unique ID, also known as a HWND (short for handle to window). This ID can be used to identify the window or control even if its title changes.
+				<br/><b>Unique process ID</b>: Use the unique process id to identify a window belonging to a specific process. Each process has its unique ID, even if it has the same executable.
+				<br/><b>Hidden window</b>: If detect hidden window is selected, a window that exists but is not visible will be found.
+				<br/><b>Import window identification</b>: Use a wizard to get parameters of a window.
+			</p>
+			<p>At least <b>Title of window</b>, <b>Window class</b>, <b>Process name</b>, <b>Unique window ID</b> or <b>Unique process ID</b> must be set.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Method</h4>
+			<p>When making a screenshot of a window, there are three different methods. If a method does not work, try an other one.
+				<br/><b>Method 1</b> and <b>Method 2</b> can make a screenshot of them even if they are behind an other window.
+				<br/><b>Method 3</b> captures the screen region where the window currently is. Windows which are in front of the specified one will be visible in the screenshot.
+			</p>
+		</TD>
+	</TR>
+</table>
+
+<H2>Supplied Variables</H2>
+<table class="variables">
+	<TR>
+		<TD>
+			<h4 class="VariableName">A_WindowID</h4>
+			<p>Only if <b>Screen region → Specified window</b> is selected. It contains the unique ID of the found window.</p>
+		</TD>
+	</TR>
+</table>
+
+
+</BODY>
+</HTML>

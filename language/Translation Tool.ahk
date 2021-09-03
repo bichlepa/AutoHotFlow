@@ -1,10 +1,41 @@
 ﻿#NoEnv  ; Recommended for performance and compatibility with future AutoHotkey releases.
 ; #Warn  ; Enable warnings to assist with detecting common errors.
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
-SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
-#Include language.ahk
-#include strobj.ahk
+SetWorkingDir %A_ScriptDir%\basic  ; Ensures a consistent starting directory.
+;#Include language.ahk
 
+;parameters
+mainlanguagecode:="en"
+
+SplitPath, A_ScriptDir, , OutDir
+
+paths := "language\basic"
+
+loop, files, % OutDir "\source_elements\*", D
+{
+	if fileexist(a_loopfilepath "\language")
+	{
+		paths .= "|" StrReplace(a_loopfilepath, OutDir "\") "\language"
+	}
+}
+
+gui, selectPath: default
+gui, add, text, w400, Please choose your working directory`nYou can either edit the translations of the base application or of an element package
+gui, add, ListBox, w400 vguipathListbox choose1, % paths
+gui, add, button, w400 h30 gguiPathButtonOK, OK
+
+gui,show
+return
+
+guiPathButtonOK:
+gui, submit
+SetWorkingDir, % OutDir "\" guipathListbox
+gui, destroy
+
+
+
+
+gui,main:default
 gui, add, dropdownlist,vDropDownLanguage  x10 y10 w70
 
 gui, add, button, gButtonFindUntranslated y10 X+10, Find untranslated entries
@@ -14,7 +45,7 @@ gui, add, button, gButtonSearch vButtonSearch y10 X+10, Search
 
 gui, add, button, gButtonAddNewLanguage y10 X+30, Add new language
 
-;Translators will not need that
+;Only for developers. Translators will not need that
 if not a_iscompiled
 	gui, add, button, gButtonChangeCategory y10 X+10, Change category
 
@@ -27,12 +58,11 @@ gui,font,s12
 gui, add, edit,gEditField vEditField xp Y+10 h290 w450 disabled
 gui,font,s8
 gui,+hwndMainGuiHWND
-;~ gui,add,button,gNewEntry x10 Y+10,New Entry
-;~ gui,add,button,gEintragLöschen yp X+10,Delete Entry
-;~ gui,add,button,gNeueKategorie yp X+10,New Category
-;~ gui,add,button,gKategorieLöschen yp X+10,Delete Category
 
 LV_Modify(2, "Select") ;Zweite Sprache auswählen
+
+
+
 loadLanguageList()
 updateTreeView()
 ;~ gui,+resize ;TODO
@@ -47,6 +77,7 @@ return
 loadLanguageList()
 {
 	global
+	gui,main:default
 	allLangs:=Object()
 	local langname
 	local enlangname
@@ -57,8 +88,8 @@ loadLanguageList()
 	{
 		StringReplace,filenameNoExt,A_LoopFileName,.%A_LoopFileExt%
 		
-		IniRead,enlangname,%filenameNoExt%.ini,general,enname
-		IniRead,langname,%filenameNoExt%.ini,general,name
+		IniRead,enlangname,%filenameNoExt%.ini,language_info,enname
+		IniRead,langname,%filenameNoExt%.ini,language_info,name
 		if enlangname!=Error
 		{
 			LanguageListString.=filenameNoExt "|"
@@ -69,6 +100,7 @@ loadLanguageList()
 	}
 	
 	stringreplace,LanguageListString,LanguageListString,|en|,|en||
+	;~ MsgBox %LanguageListString%
 	guicontrol, ,DropDownLanguage,%LanguageListString%
 }
 
@@ -76,6 +108,7 @@ loadLanguageList()
 updateTreeView()
 {
 	global
+	gui,main:default
 	local temp
 	local tempCategory
 	local tempItemName
@@ -83,37 +116,34 @@ updateTreeView()
 	
 	AllCategories:=object()
 	AllItems:=object()
-	
-	loop,read,en.ini
+	loop,read,%mainlanguagecode%.ini
 	{
 		
 		ifinstring,a_loopreadline,[
 			ifinstring,a_loopreadline,]
 			{
+				tempCategory:=trim(a_loopreadline)
 				tempCategory:=trim(a_loopreadline,"[]")
-				AllCategories[tempCategory]:={ID: TV_Add(tempCategory)} ;insert the id of the category
+				if tempCategory!=language_info
+					AllCategories[tempCategory]:={ID: TV_Add(tempCategory)} ;insert the id of the category
 			}
+			
+		if tempCategory=language_info
+			continue
 		
 		ifinstring,a_loopreadline,=
 		{
-			
 			stringgetpos,pos,a_loopreadline,=
 			stringleft,tempItemName,a_loopreadline,%pos%
 			
 			AllItems[tempItemName]:={ID: TV_Add(tempItemName,AllCategories[tempCategory]["id"]),Category: tempCategory}
-			
-			
-				
-			
-			
 		}
 		
 	}
-	;~ MsgBox % strobj(AllCategories)
-	;~ MsgBox % strobj(AllItems)
 }
 
 Action:
+gui,main:default
 if (A_GuiEvent = "i" or A_GuiEvent = "c")
 	return
 
@@ -129,7 +159,6 @@ TV_GetText(SelectedCategoryText, SelectedCategoryID)
 
 if SelectedCategoryID ;If an item is selected
 {
-	;~ MsgBox % strobj(allLangs)
 	for templang, langobject in allLangs
 	{
 		
@@ -194,6 +223,7 @@ else ;If a category is selected
 return
 
 EditField:
+gui,main:default
 ;~ MsgBox % SelectedLanguageID " - " SelectedItemText "-" SelectedCategoryText
 if not SelectedLanguageID
 	return
@@ -212,6 +242,7 @@ LV_Modify(SelectedLanguageNr,"",allLangs[SelectedLanguageID].langname,EditFieldC
 return
 
 ButtonChangeCategory:
+gui,main:default
 if not SelectedItemText
 	return
 if not SelectedCategoryText
@@ -220,8 +251,6 @@ if not SelectedCategoryText
 try menu,MenuCategory,DeleteAll
 for tempCategoryName, tempCategoryObject in AllCategories
 {
-	if tempCategoryName=general
-		continue
 	menu,MenuCategory,add,%tempCategoryName%,MenuChangeCategory
 	if (tempCategoryName=SelectedCategoryText)
 		menu,MenuCategory,check,%tempCategoryName%
@@ -230,6 +259,7 @@ menu,MenuCategory,add,--- New category ---,MenuChangeCategory
 menu,menucategory,show
 return
 MenuChangeCategory:
+gui,main:default
 Critical
 ;~ MsgBox %A_ThisMenuItem% %SelectedLanguageID%
 if (a_thismenuitem=SelectedCategoryText)
@@ -241,6 +271,11 @@ if (a_thismenuitem="--- New category ---")
 	InputBox,ToChangeCategory,New category,Enter new category name for item '%SelectedItemText%'
 	if not ToChangeCategory
 		return
+	if ToChangeCategory = language_info
+	{
+		MsgBox category name "language_info" is forbidden
+		return
+	}
 	if not AllCategories.haskey(ToChangeCategory)
 		AllCategories[ToChangeCategory]:={ID: TV_Add(ToChangeCategory)} ;insert the id of the category
 }
@@ -297,13 +332,17 @@ if NewLangEnName=
 	MsgBox,0,Error,Please enter language Name
 	return
 }
-IniWrite,% NewLangEnName,%NewLangId%.ini,general,enname
-iniWrite,% NewLangName,%NewLangId%.ini,general,name
+IniWrite,% NewLangEnName,%NewLangId%.ini,language_info,enname
+iniWrite,% NewLangName,%NewLangId%.ini,language_info,name
 loadLanguageList()
+updateTreeView()
+gui,2:destroy
+return
 
-;Mark all elements which are complete
+;Select all elements which are complete
 
 ButtonFindUntranslated:
+gui,main:default
 gui,submit,nohide
 ;~ MsgBox %DropDownLanguage%
 for tempCategoryName, tempCategoryObject in AllCategories
@@ -343,6 +382,7 @@ for tempCategoryName, tempCategoryObject in AllCategories
 return
 
 ButtonSearch:
+gui,main:default
 gui,submit,nohide
 for tempCategoryName, tempCategoryObject in AllCategories
 {
@@ -381,10 +421,12 @@ for tempCategoryName, tempCategoryObject in AllCategories
 return
 
 EditSearch:
+gui,main:default
 guicontrol,+default,buttonsearch
 return
 
 HotkeyNextEntry:
+gui,main:default
 if a_thishotkey=pgup
 	controlsend,,{up},ahk_id %treeViewHWND%
 else
@@ -394,3 +436,6 @@ return
 NewLangCancel:
 gui,2:destroy
 return
+
+mainguiclose:
+exitapp

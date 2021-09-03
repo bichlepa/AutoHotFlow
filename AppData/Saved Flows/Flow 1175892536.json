@@ -1,0 +1,488 @@
+﻿{
+  "allConnections": {
+    "connection0000000061": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000061",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000062": {
+      "ConnectionType": "normal",
+      "from": "element0000000063",
+      "ID": "connection0000000062",
+      "to": "element0000000057",
+      "type": "Connection"
+    },
+    "connection0000000066": {
+      "ConnectionType": "Yes",
+      "from": "element0000000065",
+      "ID": "connection0000000066",
+      "to": "element0000000070",
+      "type": "Connection"
+    },
+    "connection0000000068": {
+      "ConnectionType": "Exception",
+      "from": "element0000000057",
+      "ID": "connection0000000068",
+      "to": "element0000000080",
+      "type": "Connection"
+    },
+    "connection0000000071": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000071",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000073": {
+      "ConnectionType": "No",
+      "from": "element0000000070",
+      "ID": "connection0000000073",
+      "to": "element0000000067",
+      "type": "Connection"
+    },
+    "connection0000000076": {
+      "ConnectionType": "normal",
+      "from": "element0000000074",
+      "ID": "connection0000000076",
+      "to": "element0000000065",
+      "type": "Connection"
+    },
+    "connection0000000078": {
+      "ConnectionType": "normal",
+      "from": "element0000000007",
+      "ID": "connection0000000078",
+      "to": "element0000000074",
+      "type": "Connection"
+    },
+    "connection0000000081": {
+      "ConnectionType": "normal",
+      "from": "element0000000080",
+      "ID": "connection0000000081",
+      "to": "element0000000079",
+      "type": "Connection"
+    },
+    "connection0000000082": {
+      "ConnectionType": "Exception",
+      "from": "element0000000079",
+      "ID": "connection0000000082",
+      "to": "element0000000069",
+      "type": "Connection"
+    },
+    "connection0000000085": {
+      "ConnectionType": "normal",
+      "from": "element0000000083",
+      "ID": "connection0000000085",
+      "to": "element0000000084",
+      "type": "Connection"
+    },
+    "connection0000000089": {
+      "ConnectionType": "Yes",
+      "from": "element0000000086",
+      "ID": "connection0000000089",
+      "to": "element0000000088",
+      "type": "Connection"
+    },
+    "connection0000000090": {
+      "ConnectionType": "No",
+      "from": "element0000000088",
+      "ID": "connection0000000090",
+      "to": "element0000000087",
+      "type": "Connection"
+    },
+    "connection0000000091": {
+      "ConnectionType": "normal",
+      "from": "element0000000084",
+      "ID": "connection0000000091",
+      "to": "element0000000086",
+      "type": "Connection"
+    },
+    "connection0000000096": {
+      "ConnectionType": "normal",
+      "from": "element0000000053",
+      "ID": "connection0000000096",
+      "to": "element0000000063",
+      "type": "Connection"
+    }
+  },
+  "allElements": {
+    "element0000000007": {
+      "class": "Trigger_Window_Gets_Active",
+      "enabled": "0",
+      "ID": "element0000000007",
+      "name": "Window Gets Active:  - Title begins with: TestWindowTitle",
+      "package": "default",
+      "pars": {
+        "ahk_class": "",
+        "ahk_exe": "",
+        "ahk_id": "",
+        "ahk_pid": "",
+        "ExcludeText": "",
+        "excludeTitle": "",
+        "FindHiddenText": 0,
+        "FindHiddenWindow": 0,
+        "interval": "1000",
+        "NotTriggerOnEnable": "1",
+        "TitleMatchMode": 1,
+        "winText": "",
+        "Wintitle": "TestWindowTitle"
+      },
+      "StandardName": "1",
+      "type": "Trigger",
+      "x": "1295",
+      "y": "-35"
+    },
+    "element0000000053": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "1",
+      "enabled": "1",
+      "ID": "element0000000053",
+      "name": "Manual - \"Trigger happy message\"",
+      "package": "default",
+      "pars": {
+        "ID": "Trigger happy message"
+      },
+      "StandardName": "1",
+      "type": "Trigger",
+      "x": "700",
+      "y": "35"
+    },
+    "element0000000057": {
+      "class": "Action_Message_Box",
+      "ID": "element0000000057",
+      "name": "Message Box - TestWindowTitle - This should disapper soon",
+      "package": "default",
+      "pars": {
+        "ButtonLabel": "OK",
+        "ButtonLabelCancel": "Abbrechen",
+        "Height": 200,
+        "IfClose": "Exception",
+        "IfDismiss": "Exception",
+        "IsTimeout": "NoTimeout",
+        "message": "This should disapper soon",
+        "OnTimeout": "Normal",
+        "ShowCancelButton": "0",
+        "TimeoutUnits": 10,
+        "title": "TestWindowTitle",
+        "Unit": "Seconds",
+        "Width": 300
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "595",
+      "y": "560"
+    },
+    "element0000000063": {
+      "class": "Action_Set_Flow_Status",
+      "ID": "element0000000063",
+      "name": "Set Flow Status - Enable: This flow - Window Gets Active:  - Title begins with: TestWindowTitle",
+      "package": "default",
+      "pars": {
+        "Enable": "Enable",
+        "flowID": "",
+        "ThisFlow": 1,
+        "triggerID": "element0000000007",
+        "WhichTrigger": "Specified"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "595",
+      "y": "385"
+    },
+    "element0000000065": {
+      "class": "Condition_Window_Active",
+      "ID": "element0000000065",
+      "name": "Window Active:  - Title begins with: TestWindowTitle",
+      "package": "default",
+      "pars": {
+        "ahk_class": "",
+        "ahk_exe": "",
+        "ahk_id": "",
+        "ahk_pid": "",
+        "ExcludeText": "",
+        "excludeTitle": "",
+        "FindHiddenText": 0,
+        "FindHiddenWindow": 0,
+        "TitleMatchMode": 1,
+        "winText": "",
+        "Wintitle": "TestWindowTitle"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "1295",
+      "y": "280"
+    },
+    "element0000000067": {
+      "class": "Action_Close_Window",
+      "ID": "element0000000067",
+      "name": "Close Window:  - Title begins with: TestWindowTitle",
+      "package": "default",
+      "pars": {
+        "ahk_class": "",
+        "ahk_exe": "",
+        "ahk_id": "",
+        "ahk_pid": "",
+        "ExcludeText": "",
+        "excludeTitle": "",
+        "FindHiddenText": 0,
+        "FindHiddenWindow": 0,
+        "TitleMatchMode": 1,
+        "WinCloseMethod": "close",
+        "winText": "",
+        "Wintitle": "TestWindowTitle"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "1295",
+      "y": "595"
+    },
+    "element0000000069": {
+      "class": "Action_Tooltip",
+      "ID": "element0000000069",
+      "name": "Tooltip: success - 2 s - Follow Mouse",
+      "package": "action",
+      "pars": {
+        "duration": 2,
+        "follow_mouse": 1,
+        "text": "success",
+        "Unit": "Seconds"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "595",
+      "y": "770"
+    },
+    "element0000000070": {
+      "class": "Condition_Window_Active",
+      "ID": "element0000000070",
+      "name": "Window Active:  - Title begins with: wrongTitle",
+      "package": "default",
+      "pars": {
+        "ahk_class": "",
+        "ahk_exe": "",
+        "ahk_id": "",
+        "ahk_pid": "",
+        "ExcludeText": "",
+        "excludeTitle": "",
+        "FindHiddenText": 0,
+        "FindHiddenWindow": 0,
+        "TitleMatchMode": 1,
+        "winText": "",
+        "Wintitle": "wrongTitle"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "1295",
+      "y": "420"
+    },
+    "element0000000074": {
+      "class": "Action_Set_Flow_Status",
+      "ID": "element0000000074",
+      "name": "Set Flow Status - Disable: This flow - Window Gets Active:  - Title begins with: TestWindowTitle",
+      "package": "default",
+      "pars": {
+        "Enable": "Disable",
+        "flowID": "",
+        "ThisFlow": 1,
+        "triggerID": "element0000000007",
+        "WhichTrigger": "Specified"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "1295",
+      "y": "140"
+    },
+    "element0000000079": {
+      "class": "Action_Message_Box",
+      "ID": "element0000000079",
+      "name": "Message Box - TestWindowTitle - This should disapper soon",
+      "package": "default",
+      "pars": {
+        "ButtonLabel": "OK",
+        "ButtonLabelCancel": "Abbrechen",
+        "Height": 200,
+        "IfClose": "Exception",
+        "IfDismiss": "Exception",
+        "IsTimeout": "NoTimeout",
+        "message": "This should disapper soon",
+        "OnTimeout": "Normal",
+        "ShowCancelButton": "0",
+        "TimeoutUnits": 10,
+        "title": "TestWindowTitle",
+        "Unit": "Seconds",
+        "Width": 300
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "840",
+      "y": "630"
+    },
+    "element0000000080": {
+      "class": "Action_Set_Flow_Status",
+      "ID": "element0000000080",
+      "name": "Set Flow Status - Enable: This flow - Window Opens:  - Title begins with: TestWindowTitle",
+      "package": "default",
+      "pars": {
+        "Enable": "Enable",
+        "flowID": "",
+        "ThisFlow": 1,
+        "triggerID": "element0000000083",
+        "WhichTrigger": "Specified"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "840",
+      "y": "455"
+    },
+    "element0000000083": {
+      "class": "Trigger_Window_Opens",
+      "enabled": "0",
+      "ID": "element0000000083",
+      "name": "Window Opens:  - Title begins with: TestWindowTitle",
+      "package": "default",
+      "pars": {
+        "ahk_class": "",
+        "ahk_exe": "",
+        "ahk_id": "",
+        "ahk_pid": "",
+        "ExcludeText": "",
+        "excludeTitle": "",
+        "FindHiddenText": 0,
+        "FindHiddenWindow": 0,
+        "interval": "1000",
+        "NotTriggerOnEnable": "1",
+        "TitleMatchMode": 1,
+        "winText": "",
+        "Wintitle": "TestWindowTitle"
+      },
+      "StandardName": "1",
+      "type": "Trigger",
+      "x": "1505",
+      "y": "-35"
+    },
+    "element0000000084": {
+      "class": "Action_Set_Flow_Status",
+      "ID": "element0000000084",
+      "name": "Set Flow Status - Disable: This flow - Window Opens:  - Title begins with: TestWindowTitle",
+      "package": "default",
+      "pars": {
+        "Enable": "Disable",
+        "flowID": "",
+        "ThisFlow": 1,
+        "triggerID": "element0000000083",
+        "WhichTrigger": "Specified"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "1540",
+      "y": "140"
+    },
+    "element0000000086": {
+      "class": "Condition_Window_Exists",
+      "ID": "element0000000086",
+      "name": "Window Exists:  - Title begins with: TestWindowTitle",
+      "package": "default",
+      "pars": {
+        "ahk_class": "",
+        "ahk_exe": "",
+        "ahk_id": "",
+        "ahk_pid": "",
+        "ExcludeText": "",
+        "excludeTitle": "",
+        "FindHiddenText": 0,
+        "FindHiddenWindow": 0,
+        "TitleMatchMode": 1,
+        "winText": "",
+        "Wintitle": "TestWindowTitle"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "1540",
+      "y": "315"
+    },
+    "element0000000087": {
+      "class": "Action_Close_Window",
+      "ID": "element0000000087",
+      "name": "Close Window:  - Window ID: %a_windowID%",
+      "package": "default",
+      "pars": {
+        "ahk_class": "",
+        "ahk_exe": "",
+        "ahk_id": "%a_windowID%",
+        "ahk_pid": "",
+        "ExcludeText": "",
+        "excludeTitle": "",
+        "FindHiddenText": 0,
+        "FindHiddenWindow": 0,
+        "TitleMatchMode": 1,
+        "WinCloseMethod": "close",
+        "winText": "",
+        "Wintitle": ""
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "1540",
+      "y": "630"
+    },
+    "element0000000088": {
+      "class": "Condition_Window_Exists",
+      "ID": "element0000000088",
+      "name": "Window Exists:  - Title begins with: wrongTitle",
+      "package": "default",
+      "pars": {
+        "ahk_class": "",
+        "ahk_exe": "",
+        "ahk_id": "",
+        "ahk_pid": "",
+        "ExcludeText": "",
+        "excludeTitle": "",
+        "FindHiddenText": 0,
+        "FindHiddenWindow": 0,
+        "TitleMatchMode": 1,
+        "winText": "",
+        "Wintitle": "wrongTitle"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "1540",
+      "y": "455"
+    },
+    "element0000000097": {
+      "class": "Action_Message_Box",
+      "ID": "element0000000097",
+      "name": "Message Box - TestWindowTitle - This should disapper soon",
+      "package": "default",
+      "pars": {
+        "ButtonLabel": "OK",
+        "ButtonLabelCancel": "Abbrechen",
+        "Height": 200,
+        "IfClose": "Exception",
+        "IfDismiss": "Exception",
+        "IsTimeout": "NoTimeout",
+        "message": "This should disapper soon",
+        "OnTimeout": "Normal",
+        "ShowCancelButton": "0",
+        "TimeoutUnits": 10,
+        "title": "TestWindowTitle",
+        "Unit": "Seconds",
+        "Width": 300
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "840",
+      "y": "210"
+    }
+  },
+  "category": "Manual tests",
+  "ElementIDCounter": "99",
+  "flowSettings": {
+    "DefaultWorkingDir": 1,
+    "ExecutionPolicy": "default",
+    "Offsetx": "409.999999",
+    "Offsety": "-392.857143",
+    "WorkingDir": "",
+    "zoomFactor": "0.7"
+  },
+  "name": "Window Test"
+}

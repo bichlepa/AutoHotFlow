@@ -1,0 +1,59 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<link rel="stylesheet" href="../../stylesheet.css">
+	<link rel="stylesheet" href="stylesheet.css">
+	<link rel="stylesheet" href="../../../../../Help/stylesheet.css">
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<H1>AutoHotKey script</H1>
+<p>
+	The action <B>AutoHotKey script</B> executes an AutoHotkey script in a new AutoHotkey thread. 
+</p>
+
+<p class="warning">Don't use that action if you don't master the AutoHotkey scripting language.</p>
+<p class="warning">If the AutoHotkey script crashes, AHF may crash too.</p>
+<p class="info">This action has low performance, since a new AutoHotkey thread must be started.</p>
+
+<H2>Settings</H2>
+<table class="settings">
+	<TR>
+		<TD>
+			<h4>AutoHotkey script</h4>
+			<p>Script that will be executed. Use the function x_trigger() to trigger the trigger.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Variables that should be imported to script before enabling</h4>
+			<p>Specify a list of variables that should be imported to the AutoHotkey script before it gets enabled.
+				<br/>The list can be separated either by a space, linefeed, comma or tab.
+				<br/>The variables will be available in global scope.
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Variables that should be exported from script on trigger</h4>
+			<p>Specify a list of variables that should be exported from the AutoHotkey when it calls x_trigger().
+			<br/>The list can be separated either by a space, linefeed, comma or tab.
+			<br/>The variables must be available in global scope and will be accessible in the flow with same..
+		</p>
+		<p class="info"> The variables must not start with <code>A_</code>.</p>
+		</TD>
+	</TR>
+</table>
+
+<H2>Remarks</H2>
+<p>
+	<br/>The script may reach the bottom, there will be a <code>return</code> statement. It already contains the command <code>#persistent</code>.
+	<br/>The script may be stopped with <code>exitapp</code>. If it stops, nothing will happen and the trigger will still appear as active.
+	<br/>Do not use command <code>onexit</code>.
+	<br/>Do not use functions <code>EnterCriticalSection()</code> and <code>LeaveCriticalSection()</code> as well as other AHK_H specific functions.
+	<br/>Do not use variable, function and label names which start with <code>ahf_</code>.
+</p>
+
+
+</BODY>
+</HTML>

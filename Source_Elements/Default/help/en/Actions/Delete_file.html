@@ -1,0 +1,78 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<link rel="stylesheet" href="../../stylesheet.css">
+	<link rel="stylesheet" href="stylesheet.css">
+	<link rel="stylesheet" href="../../../../../Help/stylesheet.css">
+	<TITLE>Delete file</TITLE>
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<H1>Delete file</H1>
+<p>The action <B>Delete file</B> deletes one or more files.</p>
+<p class="warning">Be careful using that action. It may cause loss of data.</p>
+
+<H2>Settings</H2>
+<table class="settings">
+	<TR>
+		<TD>
+			<h4>File pattern</h4>
+			<p>The name of a single file or folder, or a wildcard pattern.
+				<BR>Both asterisks and question marks are supported as wildcards.
+				<BR>The file path is assumed to be in the working directory if an absolute path isn't specified.
+			</p>
+		</TD>
+	</TR>
+</table>
+
+<H2>Examples</H2>
+<table class="examples">
+	<TR>
+		<TD>
+			<p>Delete one file from MyDocuments folder..</p>
+			<table class="example">
+				<TR>
+					<TD class="example-parameter">
+						<p>File pattern</p>
+					</TD>
+					<TD class="example-value">
+						<p class="example-value">A_MyDocuments%\Example.txt</p>
+					</TD>
+				</TR>
+			</table>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<p>Delete all files from a drive.</p>
+			<table class="example">
+				<TR>
+					<TD class="example-parameter">
+						<p>File pattern</p>
+					</TD>
+					<TD class="example-value">
+						<p>G:\*</p>
+					</TD>
+				</TR>
+			</table>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<p>Delete all text files from the working directory.</p>
+			<table class="example">
+				<TR>
+					<TD class="example-parameter">
+						<p>File pattern</p>
+					</TD>
+					<TD class="example-value">
+						<p>*.txt</p>
+					</TD>
+				</TR>
+			</table>
+		</TD>
+	</TR>
+</table>
+
+</BODY>
+</HTML>

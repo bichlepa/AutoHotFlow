@@ -1,0 +1,438 @@
+﻿{
+  "allConnections": {
+    "connection0000000003": {
+      "ConnectionType": "normal",
+      "from": "element0000000001",
+      "ID": "connection0000000003",
+      "to": "element0000000002",
+      "toPart": "HEAD",
+      "type": "Connection"
+    },
+    "connection0000000006": {
+      "ConnectionType": "normal",
+      "from": "element0000000002",
+      "fromPart": "HEAD",
+      "ID": "connection0000000006",
+      "to": "element0000000007",
+      "type": "Connection"
+    },
+    "connection0000000010": {
+      "ConnectionType": "Yes",
+      "from": "element0000000007",
+      "ID": "connection0000000010",
+      "to": "element0000000002",
+      "toPart": "TAIL",
+      "type": "Connection"
+    },
+    "connection0000000011": {
+      "ConnectionType": "No",
+      "from": "element0000000007",
+      "ID": "connection0000000011",
+      "to": "element0000000013",
+      "type": "Connection"
+    },
+    "connection0000000014": {
+      "ConnectionType": "normal",
+      "from": "element0000000013",
+      "ID": "connection0000000014",
+      "to": "element0000000002",
+      "toPart": "BREAK",
+      "type": "Connection"
+    },
+    "connection0000000016": {
+      "ConnectionType": "normal",
+      "from": "element0000000002",
+      "fromPart": "TAIL",
+      "ID": "connection0000000016",
+      "to": "element0000000015",
+      "type": "Connection"
+    },
+    "connection0000000019": {
+      "ConnectionType": "normal",
+      "from": "element0000000015",
+      "ID": "connection0000000019",
+      "to": "element0000000020",
+      "type": "Connection"
+    },
+    "connection0000000023": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000023",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000024": {
+      "ConnectionType": "normal",
+      "from": "element0000000020",
+      "ID": "connection0000000024",
+      "to": "element0000000018",
+      "toPart": "HEAD",
+      "type": "Connection"
+    },
+    "connection0000000029": {
+      "ConnectionType": "normal",
+      "from": "element0000000018",
+      "fromPart": "HEAD",
+      "ID": "connection0000000029",
+      "to": "element0000000028",
+      "type": "Connection"
+    },
+    "connection0000000031": {
+      "ConnectionType": "normal",
+      "from": "element0000000028",
+      "ID": "connection0000000031",
+      "to": "element0000000030",
+      "toPart": "HEAD",
+      "type": "Connection"
+    },
+    "connection0000000033": {
+      "ConnectionType": "normal",
+      "from": "element0000000030",
+      "fromPart": "HEAD",
+      "ID": "connection0000000033",
+      "to": "element0000000042",
+      "type": "Connection"
+    },
+    "connection0000000040": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000040",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000041": {
+      "ConnectionType": "Yes",
+      "from": "element0000000042",
+      "ID": "connection0000000041",
+      "to": "element0000000032",
+      "type": "Connection"
+    },
+    "connection0000000044": {
+      "ConnectionType": "No",
+      "from": "element0000000042",
+      "ID": "connection0000000044",
+      "to": "element0000000043",
+      "type": "Connection"
+    },
+    "connection0000000045": {
+      "ConnectionType": "normal",
+      "from": "element0000000043",
+      "ID": "connection0000000045",
+      "to": "element0000000030",
+      "toPart": "TAIL",
+      "type": "Connection"
+    },
+    "connection0000000046": {
+      "ConnectionType": "normal",
+      "from": "element0000000032",
+      "ID": "connection0000000046",
+      "to": "element0000000030",
+      "toPart": "TAIL",
+      "type": "Connection"
+    },
+    "connection0000000047": {
+      "ConnectionType": "normal",
+      "from": "element0000000030",
+      "fromPart": "TAIL",
+      "ID": "connection0000000047",
+      "to": "element0000000018",
+      "toPart": "TAIL",
+      "type": "Connection"
+    },
+    "connection0000000049": {
+      "ConnectionType": "normal",
+      "from": "element0000000018",
+      "fromPart": "TAIL",
+      "ID": "connection0000000049",
+      "to": "element0000000048",
+      "type": "Connection"
+    }
+  },
+  "allElements": {
+    "element0000000001": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "1",
+      "enabled": "0",
+      "ID": "element0000000001",
+      "name": "Manual - \"Demonstration\"",
+      "package": "default",
+      "pars": {
+        "ID": "Demonstration"
+      },
+      "StandardName": "1",
+      "type": "trigger",
+      "x": "35",
+      "y": "140"
+    },
+    "element0000000002": {
+      "class": "Loop_SimpleLoop",
+      "HeightOfVerticalBar": "560",
+      "ID": "element0000000002",
+      "name": "Simple loop: Infinite loop",
+      "package": "default",
+      "pars": {
+        "Infinite": "1",
+        "repeatCount": 5
+      },
+      "StandardName": "1",
+      "type": "Loop",
+      "x": "35",
+      "y": "350"
+    },
+    "element0000000007": {
+      "class": "Condition_Confirmation_Dialog",
+      "ID": "element0000000007",
+      "name": "Confirmation Dialog - Endless loop, You are in an endless loop at iteration %a_index%. Do you want to continue?",
+      "package": "default",
+      "pars": {
+        "ButtonLabelCancel": "Cancel",
+        "ButtonLabelNo": "No",
+        "ButtonLabelYes": "Yes",
+        "DefaultButton": "No",
+        "Height": 200,
+        "IfDismiss": "Exception",
+        "IsTimeout": 0,
+        "message": "You are in an endless loop at iteration %a_index%. Do you want to continue?",
+        "OnTimeout": "Exception",
+        "ShowCancelButton": 0,
+        "TimeoutUnits": 10,
+        "title": "Endless loop",
+        "Unit": "Seconds",
+        "Width": 300
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "105",
+      "y": "560"
+    },
+    "element0000000013": {
+      "class": "Action_Message_Box",
+      "ID": "element0000000013",
+      "name": "Message Box - Endlees loop - In order to quit the endlees loop properly, we need to use the \"break\" part of the loop.",
+      "package": "default",
+      "pars": {
+        "ButtonLabel": "OK",
+        "ButtonLabelCancel": "Cancel",
+        "Height": 200,
+        "IfClose": "Exception",
+        "IfDismiss": "Exception",
+        "IsTimeout": "NoTimeout",
+        "message": "In order to quit the endlees loop properly, we need to use the \"break\" part of the loop.",
+        "OnTimeout": "Normal",
+        "ShowCancelButton": 0,
+        "TimeoutUnits": 10,
+        "title": "Endlees loop",
+        "Unit": "Seconds",
+        "Width": 300
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "210",
+      "y": "770"
+    },
+    "element0000000015": {
+      "class": "Action_New_List",
+      "ID": "element0000000015",
+      "name": "New list famousPeople - As first value - Multiple values 'Bill Gates - Tim Cook - Elon Musk'",
+      "package": "default",
+      "pars": {
+        "DelimiterComma": 0,
+        "DelimiterLinefeed": 1,
+        "DelimiterSemicolon": 0,
+        "DelimiterSpace": 0,
+        "expression": "String",
+        "expressionPos": "String",
+        "NumberOfElements": "Multiple",
+        "Position": "keyName",
+        "Varname": "famousPeople",
+        "VarValue": "New element",
+        "VarValues": "Bill Gates\nTim Cook\nElon Musk",
+        "WhichPosition": "First"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "35",
+      "y": "1155"
+    },
+    "element0000000018": {
+      "class": "Loop_Work_through_a_list",
+      "HeightOfVerticalBar": "1050",
+      "ID": "element0000000018",
+      "name": "Work through a list: famousPeople",
+      "package": "default",
+      "pars": {
+        "Varname": "famousPeople"
+      },
+      "StandardName": "1",
+      "type": "Loop",
+      "x": "35",
+      "y": "1470"
+    },
+    "element0000000020": {
+      "class": "Action_Message_Box",
+      "ID": "element0000000020",
+      "name": "Message Box - Work through list loop - We will now work through a list which contains following famous people: - %famousPeople%",
+      "package": "default",
+      "pars": {
+        "ButtonLabel": "OK",
+        "ButtonLabelCancel": "Cancel",
+        "Height": 200,
+        "IfClose": "Exception",
+        "IfDismiss": "Exception",
+        "IsTimeout": "NoTimeout",
+        "message": "We will now work through a list which contains following famous people:\n%famousPeople%",
+        "OnTimeout": "Normal",
+        "ShowCancelButton": 0,
+        "TimeoutUnits": 10,
+        "title": "Work through list loop",
+        "Unit": "Seconds",
+        "Width": 300
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "35",
+      "y": "1330"
+    },
+    "element0000000028": {
+      "class": "Action_Message_Box",
+      "ID": "element0000000028",
+      "name": "Message Box - Work through list loop - Current person at position %a_index%: %a_loopfield%",
+      "package": "default",
+      "pars": {
+        "ButtonLabel": "OK",
+        "ButtonLabelCancel": "Cancel",
+        "Height": 200,
+        "IfClose": "Exception",
+        "IfDismiss": "Exception",
+        "IsTimeout": "NoTimeout",
+        "message": "Current person at position %a_index%: %a_loopfield%",
+        "OnTimeout": "Normal",
+        "ShowCancelButton": 0,
+        "TimeoutUnits": 10,
+        "title": "Work through list loop",
+        "Unit": "Seconds",
+        "Width": 300
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "105",
+      "y": "1645"
+    },
+    "element0000000030": {
+      "class": "Loop_Parse_A_String",
+      "HeightOfVerticalBar": "525",
+      "ID": "element0000000030",
+      "name": "Parse A String - %a_loopfield% -   - ",
+      "package": "default",
+      "pars": {
+        "Delimiters": " ",
+        "Expression": "String",
+        "OmitChars": "",
+        "VarValue": "%a_loopfield%"
+      },
+      "StandardName": "1",
+      "type": "Loop",
+      "x": "175",
+      "y": "1785"
+    },
+    "element0000000032": {
+      "class": "Action_Message_Box",
+      "ID": "element0000000032",
+      "name": "Message Box - Work through list loop - First name is: %a_loopfield%",
+      "package": "default",
+      "pars": {
+        "ButtonLabel": "OK",
+        "ButtonLabelCancel": "Cancel",
+        "Height": 200,
+        "IfClose": "Exception",
+        "IfDismiss": "Exception",
+        "IsTimeout": "NoTimeout",
+        "message": "First name is: %a_loopfield%",
+        "OnTimeout": "Normal",
+        "ShowCancelButton": 0,
+        "TimeoutUnits": 10,
+        "title": "Work through list loop",
+        "Unit": "Seconds",
+        "Width": 300
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "210",
+      "y": "2170"
+    },
+    "element0000000042": {
+      "class": "Condition_Expression",
+      "ID": "element0000000042",
+      "name": "Expression - a_index = 1",
+      "package": "default",
+      "pars": {
+        "Expression": "a_index = 1"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "210",
+      "y": "1960"
+    },
+    "element0000000043": {
+      "class": "Action_Message_Box",
+      "ID": "element0000000043",
+      "name": "Message Box - Work through list loop - Last name is: %a_loopfield%",
+      "package": "default",
+      "pars": {
+        "ButtonLabel": "OK",
+        "ButtonLabelCancel": "Cancel",
+        "Height": 200,
+        "IfClose": "Exception",
+        "IfDismiss": "Exception",
+        "IsTimeout": "NoTimeout",
+        "message": "Last name is: %a_loopfield%",
+        "OnTimeout": "Normal",
+        "ShowCancelButton": 0,
+        "TimeoutUnits": 10,
+        "title": "Work through list loop",
+        "Unit": "Seconds",
+        "Width": 300
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "385",
+      "y": "2170"
+    },
+    "element0000000048": {
+      "class": "Action_Message_Box",
+      "ID": "element0000000048",
+      "name": "Message Box - Finish - End of the loop demonstration and tutorial",
+      "package": "default",
+      "pars": {
+        "ButtonLabel": "OK",
+        "ButtonLabelCancel": "Cancel",
+        "Height": 200,
+        "IfClose": "Exception",
+        "IfDismiss": "Exception",
+        "IsTimeout": "NoTimeout",
+        "message": "End of the loop demonstration and tutorial",
+        "OnTimeout": "Normal",
+        "ShowCancelButton": 0,
+        "TimeoutUnits": 10,
+        "title": "Finish",
+        "Unit": "Seconds",
+        "Width": 300
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "35",
+      "y": "2730"
+    }
+  },
+  "category": "",
+  "ElementIDCounter": "49",
+  "flowSettings": {
+    "DefaultWorkingDir": 1,
+    "ExecutionPolicy": "default",
+    "Offsetx": "-952.503498",
+    "Offsety": "601.834116",
+    "WorkingDir": "",
+    "zoomFactor": "0.525919"
+  },
+  "name": "Loop tutorial"
+}

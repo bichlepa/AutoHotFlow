@@ -1,0 +1,134 @@
+﻿{
+  "allConnections": {
+    "connection0000000007": {
+      "ConnectionType": "normal",
+      "from": "element0000000001",
+      "ID": "connection0000000007",
+      "to": "element0000000008",
+      "type": "Connection"
+    },
+    "connection0000000009": {
+      "ConnectionType": "Yes",
+      "from": "element0000000008",
+      "ID": "connection0000000009",
+      "to": "element0000000010",
+      "type": "Connection"
+    },
+    "connection0000000012": {
+      "ConnectionType": "No",
+      "from": "element0000000008",
+      "ID": "connection0000000012",
+      "to": "element0000000011",
+      "type": "Connection"
+    },
+    "connection0000000014": {
+      "ConnectionType": "Exception",
+      "from": "element0000000008",
+      "ID": "connection0000000014",
+      "to": "element0000000013",
+      "type": "Connection"
+    }
+  },
+  "allElements": {
+    "element0000000001": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "1",
+      "enabled": "0",
+      "ID": "element0000000001",
+      "name": "Manual - \"Trigger bright bus\"",
+      "package": "default",
+      "pars": {
+        "ID": "Trigger bright bus"
+      },
+      "StandardName": 1,
+      "type": "trigger",
+      "x": 0,
+      "y": 0
+    },
+    "element0000000008": {
+      "class": "Condition_Confirmation_Dialog",
+      "ID": "element0000000008",
+      "name": "Confirmation Dialog - Das ist ein sch\u00F6ner Titel, Das ist eine sch\u00F6ne Nachricht",
+      "package": "default",
+      "pars": {
+        "ButtonLabelCancel": "Abbrechen!",
+        "ButtonLabelNo": "Nein!",
+        "ButtonLabelYes": "Ja!",
+        "DefaultButton": "No",
+        "Height": 200,
+        "IfDismiss": "Exception",
+        "IsTimeout": "1",
+        "message": "Das ist eine sch\u00F6ne Nachricht",
+        "OnTimeout": "Exception",
+        "ShowCancelButton": "1",
+        "TimeoutUnits": 10,
+        "title": "Das ist ein sch\u00F6ner Titel",
+        "Unit": "Seconds",
+        "Width": 300
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "105",
+      "y": "315"
+    },
+    "element0000000010": {
+      "class": "Action_Tooltip",
+      "ID": "element0000000010",
+      "name": "Tooltip: ja - 2 s - Follow Mouse",
+      "package": "action",
+      "pars": {
+        "duration": 2,
+        "follow_mouse": 1,
+        "text": "ja",
+        "Unit": "Seconds"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "70",
+      "y": "630"
+    },
+    "element0000000011": {
+      "class": "Action_Tooltip",
+      "ID": "element0000000011",
+      "name": "Tooltip: nein - 2 s - Follow Mouse",
+      "package": "action",
+      "pars": {
+        "duration": 2,
+        "follow_mouse": 1,
+        "text": "nein",
+        "Unit": "Seconds"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "315",
+      "y": "595"
+    },
+    "element0000000013": {
+      "class": "Action_Tooltip",
+      "ID": "element0000000013",
+      "name": "Tooltip: abbr - 2 s - Follow Mouse",
+      "package": "action",
+      "pars": {
+        "duration": 2,
+        "follow_mouse": 1,
+        "text": "abbr",
+        "Unit": "Seconds"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "560",
+      "y": "595"
+    }
+  },
+  "category": "Manual tests",
+  "ElementIDCounter": "20",
+  "flowSettings": {
+    "DefaultWorkingDir": "1",
+    "ExecutionPolicy": "default",
+    "Offsetx": "-378.571429",
+    "Offsety": "-344.285714",
+    "WorkingDir": "",
+    "zoomFactor": "0.7"
+  },
+  "name": "Dialog test"
+}

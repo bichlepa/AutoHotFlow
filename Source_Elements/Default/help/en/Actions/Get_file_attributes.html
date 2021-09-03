@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<link rel="stylesheet" href="../../stylesheet.css">
+	<link rel="stylesheet" href="stylesheet.css">
+	<link rel="stylesheet" href="../../../../../Help/stylesheet.css">
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<H1>Get file attributes</H1>
+<p>
+	The action <B>Get file attributes</B> retrieves the attributes (read-only, hidden, etc) of a file.
+</p>
+
+<H2>Settings</H2>
+<table class="settings">
+	<TR>
+		<TD>
+			<h4>Output variable name</h4>
+			<p>Name of the variable which will contain the result.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>File path</h4>
+			<p>Name and path of the file. The file path is assumed to be in the working directory if an absolute path isn't specified.</p>
+		</TD>
+	</TR>
+</table>
+
+<H2>Remarks</H2>
+<p>
+	The result string will contain a subset of the letters in the string <code>RASHNDOCT</code>:
+	<ul>
+		<li/>
+			<p><code>R</code> = READONLY</p>
+		<li/>
+			<p><code>A</code> = ARCHIVE</p>
+		<li/>
+			<p><code>S</code> = SYSTEM</p>
+		<li/>
+			<p><code>H</code> = HIDDEN</p>
+		<li/>
+			<p><code>N</code> = NORMAL</p>
+		<li/>
+			<p><code>D</code> = DIRECTORY</p>
+		<li/>
+			<p><code>O</code> = OFFLINE</p>
+		<li/>
+			<p><code>C</code> = COMPRESSED</p>
+		<li/>
+			<p><code>T</code> = TEMPORARY</p>
+	</ul>
+</p>
+
+</BODY>
+</HTML>

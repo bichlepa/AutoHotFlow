@@ -1,0 +1,185 @@
+﻿{
+  "allConnections": {
+    "connection0000000002": {
+      "ConnectionType": "normal",
+      "from": "element0000000001",
+      "ID": "connection0000000002",
+      "to": "element0000000006",
+      "type": "Connection"
+    },
+    "connection0000000004": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000004",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000009": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000009",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000010": {
+      "ConnectionType": "normal",
+      "from": "element0000000006",
+      "ID": "connection0000000010",
+      "to": "element0000000011",
+      "type": "Connection"
+    },
+    "connection0000000015": {
+      "ConnectionType": "normal",
+      "from": "element0000000011",
+      "ID": "connection0000000015",
+      "to": "element0000000018",
+      "type": "Connection"
+    },
+    "connection0000000016": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000016",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000017": {
+      "ConnectionType": "normal",
+      "from": "element0000000018",
+      "ID": "connection0000000017",
+      "to": "element0000000014",
+      "type": "Connection"
+    },
+    "connection0000000020": {
+      "ConnectionType": "normal",
+      "from": "element0000000014",
+      "ID": "connection0000000020",
+      "to": "element0000000019",
+      "type": "Connection"
+    },
+    "connection0000000024": {
+      "ConnectionType": "normal",
+      "from": "element0000000019",
+      "ID": "connection0000000024",
+      "to": "element0000000023",
+      "type": "Connection"
+    }
+  },
+  "allElements": {
+    "element0000000001": {
+      "class": "Trigger_Clipboard_Changes",
+      "enabled": "0",
+      "ID": "element0000000001",
+      "name": "Clipboard Changes",
+      "package": "default",
+      "pars": {},
+      "StandardName": "1",
+      "type": "trigger",
+      "x": 0,
+      "y": 0
+    },
+    "element0000000006": {
+      "class": "Action_Get_Clipboard",
+      "ID": "element0000000006",
+      "name": "Get Clipboard - clipboard",
+      "package": "default",
+      "pars": {
+        "Varname": "clipboard"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "105",
+      "y": "210"
+    },
+    "element0000000011": {
+      "class": "Action_Change_character_case",
+      "ID": "element0000000011",
+      "name": "Change character case - Uppercase - clipboardChanged - clipboard",
+      "package": "default",
+      "pars": {
+        "CharCase": "upper",
+        "expression": "Expression",
+        "Varname": "clipboardChanged",
+        "VarValue": "clipboard"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "280",
+      "y": "840"
+    },
+    "element0000000014": {
+      "class": "Action_Set_Clipboard",
+      "ID": "element0000000014",
+      "name": "Set Clipboard - clipboardChanged",
+      "package": "default",
+      "pars": {
+        "expression": "expression",
+        "text": "clipboardChanged"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "735",
+      "y": "1050"
+    },
+    "element0000000018": {
+      "class": "Action_Set_Flow_Status",
+      "ID": "element0000000018",
+      "name": "Set Flow Status - Disable: This flow - Any trigger",
+      "package": "default",
+      "pars": {
+        "Enable": "Disable",
+        "flowID": "",
+        "ThisFlow": 1,
+        "triggerID": "",
+        "WhichTrigger": "Any"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "455",
+      "y": "945"
+    },
+    "element0000000019": {
+      "class": "Action_Set_Flow_Status",
+      "ID": "element0000000019",
+      "name": "Set Flow Status - Enable: This flow - Any trigger",
+      "package": "default",
+      "pars": {
+        "Enable": "Enable",
+        "flowID": "",
+        "ThisFlow": 1,
+        "triggerID": "",
+        "WhichTrigger": "Any"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "735",
+      "y": "1190"
+    },
+    "element0000000023": {
+      "class": "Action_Tooltip",
+      "ID": "element0000000023",
+      "name": "Tooltip: clipboard: %clipboard% - changed to: %clipboardChanged% - 2 s - Follow Mouse",
+      "package": "action",
+      "pars": {
+        "duration": 2,
+        "follow_mouse": 1,
+        "text": "clipboard: %clipboard%\nchanged to: %clipboardChanged%",
+        "Unit": "Seconds"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "735",
+      "y": "1330"
+    }
+  },
+  "category": "Manual tests",
+  "ElementIDCounter": "24",
+  "flowSettings": {
+    "DefaultWorkingDir": 1,
+    "ExecutionPolicy": "default",
+    "Offsetx": "-297.142858",
+    "Offsety": "-192.857143",
+    "WorkingDir": "",
+    "zoomFactor": "0.7"
+  },
+  "name": "clipboard test"
+}

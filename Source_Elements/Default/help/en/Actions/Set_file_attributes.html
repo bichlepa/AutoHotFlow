@@ -1,0 +1,74 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<link rel="stylesheet" href="../../stylesheet.css">
+	<link rel="stylesheet" href="stylesheet.css">
+	<link rel="stylesheet" href="../../../../../Help/stylesheet.css">
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<H1>Set file attributes</H1>
+<p>
+	The action <B>Set file attributes</B> sets a timestamp of a file or folder.
+</p>
+
+<H2>Settings</H2>
+<table class="settings">
+	<TR>
+		<TD>
+			<h4>File path</h4>
+			<p>Name and path of the file. The file path is assumed to be in the working directory if an absolute path isn't specified.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Attributes</h4>
+			<p>The attributes to change.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Options</h4>
+			<p>This action can perform on files, forlder or both. It can also iterate in the subfolders.</p>
+		</TD>
+	</TR>
+</table>
+
+<H2>Examples</H2>
+<table class="examples">
+	<TR>
+		<TD>
+			<p>Hide all files in a folder.</p>
+			<table class="example">
+				<TR>
+					<TD class="example-parameter">
+						<p>File path</p>
+					</TD>
+					<TD class="example-value">
+						<p>%A_MyDocuments%\exampleFolder\*</p>
+					</TD>
+				</TR>
+				<TR>
+					<TD class="example-parameter">
+						<p>Attributes</p>
+					</TD>
+					<TD class="example-value">
+						<p>☑ Hidden<br/>▣ <i>all others</i></p>
+					</TD>
+				</TR>
+				<TR>
+					<TD class="example-parameter">
+						<p>Options</p>
+					</TD>
+					<TD class="example-value">
+						<p>◉ Operate on files<br/>☐ Recurse subfolders into</p>
+					</TD>
+				</TR>
+			</table>
+		</TD>
+	</TR>
+</table>
+
+
+</BODY>
+</HTML>

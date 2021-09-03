@@ -1,0 +1,169 @@
+﻿{
+  "allConnections": {
+    "connection0000000009": {
+      "ConnectionType": "normal",
+      "from": "element0000000002",
+      "ID": "connection0000000009",
+      "to": "element0000000005",
+      "type": "Connection"
+    },
+    "connection0000000010": {
+      "ConnectionType": "normal",
+      "from": "element0000000003",
+      "ID": "connection0000000010",
+      "to": "element0000000004",
+      "type": "Connection"
+    },
+    "connection0000000011": {
+      "ConnectionType": "Yes",
+      "from": "element0000000005",
+      "ID": "connection0000000011",
+      "to": "element0000000003",
+      "type": "Connection"
+    },
+    "connection0000000012": {
+      "ConnectionType": "No",
+      "from": "element0000000004",
+      "ID": "connection0000000012",
+      "to": "element0000000007",
+      "type": "Connection"
+    },
+    "connection0000000013": {
+      "ConnectionType": "normal",
+      "from": "element0000000007",
+      "ID": "connection0000000013",
+      "to": "element0000000008",
+      "type": "Connection"
+    },
+    "connection0000000014": {
+      "ConnectionType": "Yes",
+      "from": "element0000000008",
+      "ID": "connection0000000014",
+      "to": "element0000000015",
+      "type": "Connection"
+    }
+  },
+  "allElements": {
+    "element0000000002": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "1",
+      "enabled": "1",
+      "ID": "element0000000002",
+      "name": "Manual - \"basic variables test\"",
+      "package": "default",
+      "pars": {
+        "ID": "basic variables test"
+      },
+      "StandardName": "1",
+      "type": "trigger",
+      "x": "105",
+      "y": "385"
+    },
+    "element0000000003": {
+      "class": "Action_New_variable",
+      "ID": "element0000000003",
+      "name": "New variable - NewVariable = New element",
+      "package": "default",
+      "pars": {
+        "expression": "string",
+        "Varname": "NewVariable",
+        "VarValue": "New element"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "105",
+      "y": "665"
+    },
+    "element0000000004": {
+      "class": "Condition_Variable_Is_Empty",
+      "ID": "element0000000004",
+      "name": "Variable Is Empty - NewVariable",
+      "package": "default",
+      "pars": {
+        "VarName": "NewVariable"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "105",
+      "y": "805"
+    },
+    "element0000000005": {
+      "class": "Condition_Variable_Is_Empty",
+      "ID": "element0000000005",
+      "name": "Variable Is Empty - NewVariable",
+      "package": "default",
+      "pars": {
+        "VarName": "NewVariable"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "105",
+      "y": "525"
+    },
+    "element0000000007": {
+      "class": "Action_New_variable",
+      "ID": "element0000000007",
+      "name": "New variable - NewVariable = ",
+      "package": "default",
+      "pars": {
+        "expression": "Expression",
+        "Varname": "NewVariable",
+        "VarValue": ""
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "105",
+      "y": "945"
+    },
+    "element0000000008": {
+      "class": "Condition_Variable_Is_Empty",
+      "ID": "element0000000008",
+      "name": "Variable Is Empty - NewVariable",
+      "package": "default",
+      "pars": {
+        "VarName": "NewVariable"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "105",
+      "y": "1085"
+    },
+    "element0000000015": {
+      "class": "Action_Add_To_List",
+      "ID": "element0000000015",
+      "name": "Add to list global_testResults - As last value - Value 'a_flowName'",
+      "package": "default",
+      "pars": {
+        "DelimiterComma": 0,
+        "DelimiterLinefeed": 1,
+        "DelimiterSemicolon": 0,
+        "DelimiterSpace": 0,
+        "Expression": "Expression",
+        "expressionPos": "String",
+        "InsertMethod": "Insert",
+        "InsertMethodLabel": "",
+        "NumberOfElements": "One",
+        "Position": "keyName",
+        "Varname": "global_testResults",
+        "VarValue": "a_flowName",
+        "VarValues": "Element one\nElement two",
+        "WhichPosition": "Last"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "175",
+      "y": "1330"
+    }
+  },
+  "category": "Automatic tests",
+  "ElementIDCounter": "15",
+  "flowSettings": {
+    "DefaultWorkingDir": 1,
+    "ExecutionPolicy": "default",
+    "Offsetx": -200,
+    "Offsety": -200,
+    "WorkingDir": "",
+    "zoomFactor": "0.7"
+  },
+  "name": "variable test"
+}
