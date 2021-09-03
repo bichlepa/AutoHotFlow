@@ -169,10 +169,12 @@ Element_CheckSettings_Action_Input_Box(Environment, ElementParameters, staticVal
 	if (ElementParameters.ShowCancelButton = 1) 
 	{
 		x_Par_Enable("ButtonLabelCancel")
+		x_Par_Enable("IfDismiss")
 	}
 	else
 	{
 		x_Par_Disable("ButtonLabelCancel")
+		x_Par_Disable("IfDismiss")
 	}
 	
 }
@@ -313,13 +315,15 @@ Element_run_Action_Input_Box(Environment, ElementParameters)
 	else
 	{
 		; show only ok button
-		gui, %guiID%: add, button, x10 y%yPos% w%widthEdit% h30 gActionInput_BoxButtonOK +hwndHWNDButtonOK Default, % tEvaluatedParameters.ButtonLabel
+		gui, %guiID%: add, button, x10 y%yPos% w%widthEdit% h30 gActionInput_BoxButtonOK +hwndHWNDButtonOK Default, % EvaluatedParameters.ButtonLabel
 	}
 	
 	; focus OK button
 	guicontrol, %guiID%: focus, % HWNDButtonOK
 
 	;Show GUI
+	width := EvaluatedParameters.width
+	height := EvaluatedParameters.height
 	gui, %guiID%: show, w%Width% h%height%, % EvaluatedParameters.title
 
 	;Set timer if a timeout is set

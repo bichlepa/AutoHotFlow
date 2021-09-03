@@ -94,7 +94,8 @@ lang_setLanguage(_getSettings("UILanguage"))
 
 ; Create and show manager gui
 init_Manager_GUI()
-Show_Manager_GUI()
+if (not _getShared("WindowsStartup"))
+	Show_Manager_GUI()
 
 ; check regularly for new tasks which we get through shared variable
 SetTimer,queryTasks,100
