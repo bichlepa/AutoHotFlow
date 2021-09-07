@@ -39,7 +39,7 @@ Element_getElementLevel_Action_Sleep()
 ;Icon path which will be shown in the background of the element
 Element_getIconPath_Action_Sleep()
 {
-	return "Source_elements\default\icons\sleep.ico"
+	return "sleep.ico"
 }
 
 ;How stable is this element? Experimental elements will be marked and can be hidden by user.

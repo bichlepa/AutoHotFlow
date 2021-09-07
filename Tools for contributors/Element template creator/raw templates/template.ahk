@@ -686,8 +686,7 @@ Element_enable_&ElementType&_&Name&(Environment, ElementParameters)
 Element_postTrigger_&ElementType&_&Name&(Environment, ElementParameters, TriggerData)
 {
 #if addSeparateAhkThread
-	exportedValues:=x_TriggerInNewAHKThread_GetExportedValues(Environment)
-	x_SetVariable(Environment,"A_ReturnValue",exportedValues.returnValue,"Thread") ;Example
+	x_ImportInstanceVars(Environment, TriggerData)
 #endif ;addSeparateAhkThread
 
 #if addWindowSelector

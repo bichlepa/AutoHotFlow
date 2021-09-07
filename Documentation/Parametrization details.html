@@ -1,0 +1,684 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<link rel="stylesheet" href="stylesheet.css">
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<H1>Parametrization details</H1>
+<p>Definition of parametrization details and defining the content of element settings window.
+</p>
+
+<p>The function <code>Element_getParametrizationDetails_...(Environment)</code> returns all informations about the parameters and how they can be changed by the user in the element settings window.
+	<br/>It must return an array where each array entry defines a line in the element settings window.
+	<br/>It's recommended to use the <code>x_lang()</code> function for all labels to allow the text to be translated in other languages.
+</p>
+<table class="settings">
+	<TR>
+		<TD>
+			<h4>Type: <code>Label</code></h4>
+			<p>This entry shows a label in the element settings window.</p>
+			<table class="variables">
+				<TR>
+					<TD>
+						<h4 class="VariableName">label</h4>
+						<p>Text of the label.</p>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4 class="VariableName">size <i>optional</i></h4>
+						<p>Defines the size of the label.</p>
+						<ul class="examples"><p"><i>Possible values:</i></p>
+							<li/>
+								<p><code><i>empty</i></code> <i>(default size)</i></p>
+							<li/>
+								<p"><code>small</code></p>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4 class="VariableName">id <i>optional</i></h4>
+						<p>Defines the ID of the label. This ID allows to change the label text in function <code>Element_CheckSettings_...</code></p>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4 class="VariableName">color <i>optional</i></h4>
+						<p>Defines the color of the label.</p>
+					</TD>
+				</TR>
+			</table>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Type: <code>checkbox</code></h4>
+			<p>This entry shows a checkbox in the element settings window.</p>
+			<p>The parameter value can be <code>0</code> <i>(checked)</i>, <code>1</code> <i>(unchecked)</i> or <code>-1</code> <i>(gray state, neither checked nor unchecked))</i>.</p>
+			<table class="variables">
+				<TR>
+					<TD>
+						<h4 class="VariableName">id</h4>
+						<p>The ID of the parameter. This ID allows to perform actions via API calls in <code>Element_CheckSettings_...</code></p>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4 class="VariableName">default</h4>
+						<p>Default value of the parameter.</p>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4 class="VariableName">label</h4>
+						<p>Text of the label.</p>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4 class="VariableName">gray <i>optional</i></h4>
+						<p>If <code>true</code> the checkbox can be set to gray state (neither selected nor unselected, returns value <code>-1</code>).</p>
+					</TD>
+				</TR>
+			</table>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Type: <code>radio</code></h4>
+			<p>This entry shows a radio group in the element settings window.</p>
+			<p>The parameter value can be either the index or the enum value of the selected entry.</p>
+			<table class="variables">
+				<TR>
+					<TD>
+						<h4 class="VariableName">id</h4>
+						<p>The ID of the parameter. This ID allows to perform actions via API calls in <code>Element_CheckSettings_...</code></p>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4 class="VariableName">default</h4>
+						<p>Default value of the parameter. It is affected by the option <code>result</code>.</p>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4 class="VariableName">choices</h4>
+						<p>Array with label text of all choices.</p>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4 class="VariableName">result <i>optional</i></h4>
+						<p>Defines what kind of value the parameter gets.</p>
+						<ul class="examples"><p"><i>Possible values:</i></p>
+							<li/>
+								<p><code><i>empty</i></code> <i>(The parameter value is the index of the selected item)</i></p>
+							<li/>
+								<p"><code>enum</code> <i>(The parameter value is the enumeration ID of the selected item)</i></p>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4 class="VariableName">enum <i>required if <code>result = enum</code></i></h4>
+						<p>Array with the enumeration IDs of all choices. The order must be same as in <code>choices</code>.</p>
+					</TD>
+				</TR>
+			</table>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Type: <code>edit</code></h4>
+			<p>This entry shows edit control in the element settings window.</p>
+			<table class="variables">
+				<TR>
+					<TD>
+						<h4 class="VariableName">id</h4>
+						<p>The ID of the parameter. This ID allows to perform actions via API calls in <code>Element_CheckSettings_...</code>
+							<br/>It can be an array with multiple IDs. This will show multiple edit fields side by side.
+						</p>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4 class="VariableName">default</h4>
+						<p>Default value of the parameter.</p>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4 class="VariableName">content <i>optional</i></h4>
+						<p>Content type of the parameter.
+							<br/>A correspoding icon and help text will be shown near the edit field.
+							<br/>The API functions which automatically evaluate parameters use this option to find out how to evaluate it.
+							<br/>This option can contain an array of those values. If so, it will show a radio group where the user can select the desired content type.
+						</p>
+						<ul class="examples"><p"><i>Possible values:</i></p>
+							<li/>
+								<p><code>String</code> <i>(Normal string. Content of parameters can be inserted using the percent signs)</i></p>
+							<li/>
+								<p"><code>RawString</code> <i>(Raw string. Content of parameters can't be passed here)</i></p>
+							<li/>
+								<p"><code>VariableName</code> <i>(Name of a variable)</i></p>
+							<li/>
+								<p"><code>Expression</code> <i>(Normal expression with any result value type)</i></p>
+							<li/>
+								<p"><code>Number</code> <i>(Expression which must result to a number)</i></p>
+							<li/>
+								<p"><code>Integer</code> <i>(Expression which must result to an integer)</i></p>
+							<li/>
+								<p"><code>PositiveInteger</code> <i>(Expression which must result to an integer. 1 or greater)</i></p>
+							<li/>
+								<p"><code>positiveIntegerOrZero</code> <i>(Expression which must result to an integer. 0 or greater)</i></p>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4 class="VariableName">ContentID <i>required if <code>content</code> is an array</i></h4>
+						<p>ID of the parameter which stores the selected content ID.</p>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4 class="VariableName">ContentDefault <i>required if <code>content</code> is an array</i></h4>
+						<p>Default content type.</p>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4 class="VariableName">WarnIfEmpty <i>optional</i></h4>
+						<p>Whether value must not be empty.
+							<br/>A correspoding icon and help text will be shown near the edit field if it is empty.
+							<br/>The API functions which automatically evaluate parameters uses this option.
+						</p>
+						<ul class="examples"><p"><i>Possible values:</i></p>
+							<li/>
+								<p><code>false <i>or empty</i></code> <i>(Value can be empty)</i></p>
+							<li/>
+								<p"><code>true</code> <i>(Value must not be empty)</i></p>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4 class="VariableName">useupdown <i>optional</i></h4>
+						<p>If <code>true</code> it shows up and down buttons near the edit field where user can change the value by 1.</p>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4 class="VariableName">range <i>optional or <code>useupdown = true</code></i></h4>
+						<p>Allowed range of values which can be set via the up and down buttons.</p>
+					</TD>
+				</TR>
+			</table>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Type: <code>multilineEdit</code></h4>
+			<p>This entry shows a multiline edit control in the element settings window.</p>
+			<table class="variables">
+				<TR>
+					<TD>
+						<h4 class="VariableName">id</h4>
+						<p>The ID of the parameter. This ID allows to perform actions via API calls in <code>Element_CheckSettings_...</code></p>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4 class="VariableName">default</h4>
+						<p>Default value of the parameter.</p>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4 class="VariableName">content <i>optional</i></h4>
+						<p>Content type of the parameter.
+							<br/>A correspoding icon and help text will be shown near the edit field.
+							<br/>The API functions which automatically evaluate parameters use this option to find out how to evaluate it.
+							<br/>This option can contain an array of those values. If so, it will show a radio group where the user can select the desired content type.
+						</p>
+						<ul class="examples"><p"><i>Possible values:</i></p>
+							<li/>
+								<p><code>String</code> <i>(Normal string. Content of parameters can be inserted using the percent signs)</i></p>
+							<li/>
+								<p"><code>RawString</code> <i>(Raw string. Content of parameters can't be passed here)</i></p>
+							<li/>
+								<p"><code>VariableName</code> <i>(Name of a variable)</i></p>
+							<li/>
+								<p"><code>Expression</code> <i>(Normal expression with any result value type)</i></p>
+							<li/>
+								<p"><code>Number</code> <i>(Expression which must result to a number)</i></p>
+							<li/>
+								<p"><code>Integer</code> <i>(Expression which must result to an integer)</i></p>
+							<li/>
+								<p"><code>PositiveInteger</code> <i>(Expression which must result to an integer. 1 or greater)</i></p>
+							<li/>
+								<p"><code>positiveIntegerOrZero</code> <i>(Expression which must result to an integer. 0 or greater)</i></p>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4 class="VariableName">ContentID <i>required if <code>content</code> is an array</i></h4>
+						<p>ID of the parameter which stores the selected content ID.</p>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4 class="VariableName">ContentDefault <i>required if <code>content</code> is an array</i></h4>
+						<p>Default content type.</p>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4 class="VariableName">WarnIfEmpty <i>optional</i></h4>
+						<p>Whether value must not be empty.
+							<br/>A correspoding icon and help text will be shown near the edit field if it is empty.
+							<br/>The API functions which automatically evaluate parameters uses this option.
+						</p>
+						<ul class="examples"><p"><i>Possible values:</i></p>
+							<li/>
+								<p><code>false <i>or empty</i></code> <i>(Value can be empty)</i></p>
+							<li/>
+								<p"><code>true</code> <i>(Value must not be empty)</i></p>
+					</TD>
+				</TR>
+			</table>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Type: <code>slider</code></h4>
+			<p>This entry shows a slider where user can set a number. It can optionally show an edit field nearby.</p>
+			<table class="variables">
+				<TR>
+					<TD>
+						<h4 class="VariableName">id</h4>
+						<p>The ID of the parameter. This ID allows to perform actions via API calls in <code>Element_CheckSettings_...</code></p>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4 class="VariableName">default</h4>
+						<p>Default value of the parameter.</p>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4 class="VariableName">allowExpression</h4>
+						<p>If <code>true</code> an edit control will be shown near the slider to allow the user to enter an expression.</p>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4 class="VariableName">content <i>optional if <code>allowExpression = true</code></i></h4>
+						<p>Content type of the parameter.
+							<br/>A correspoding icon and help text will be shown near the edit field.
+							<br/>The API functions which automatically evaluate parameters use this option to find out how to evaluate it.
+							<br/>This option can contain an array of those values. If so, it will show a radio group where the user can select the desired content type.
+						</p>
+						<ul class="examples"><p"><i>Possible values (only reasonable):</i></p>
+							<li/>
+								<p"><code>Expression</code> <i>(Normal expression with any result value type)</i></p>
+							<li/>
+								<p"><code>Number</code> <i>(Expression which must result to a number)</i></p>
+							<li/>
+								<p"><code>Integer</code> <i>(Expression which must result to an integer)</i></p>
+							<li/>
+								<p"><code>PositiveInteger</code> <i>(Expression which must result to an integer. 1 or greater)</i></p>
+							<li/>
+								<p"><code>positiveIntegerOrZero</code> <i>(Expression which must result to an integer. 0 or greater)</i></p>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4 class="VariableName">options</h4>
+						<p>Additional slider options as defined in AutoHotkey language.</p>
+						<ul class="examples"><p"><i>example:</i></p>
+							<li/>
+								<p"><code>Range0-255 tooltip tickinterval10</code></p>
+					</TD>
+				</TR>
+			</table>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Type: <code>dropDown</code></h4>
+			<p>This entry shows a drop down in the element settings window.</p>
+			<p>The parameter value can be either the index, the enum value or the string of the selected entry.</p>
+			<table class="variables">
+				<TR>
+					<TD>
+						<h4 class="VariableName">id</h4>
+						<p>The ID of the parameter. This ID allows to perform actions via API calls in <code>Element_CheckSettings_...</code></p>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4 class="VariableName">default</h4>
+						<p>Default value of the parameter. It is affected by the option <code>result</code>.</p>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4 class="VariableName">choices</h4>
+						<p>Array with text of all choices.</p>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4 class="VariableName">result <i>optional</i></h4>
+						<p>Defines what kind of value the parameter gets.</p>
+						<ul class="examples"><p"><i>Possible values:</i></p>
+							<li/>
+								<p><code>number <i>or empty</i></code> <i>(The parameter value is the index of the selected item)</i></p>
+							<li/>
+								<p"><code>enum</code> <i>(The parameter value is the enumeration ID of the selected item)</i></p>
+							<li/>
+								<p"><code>string</code> <i>(The parameter value is the text of the selected item)</i></p>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4 class="VariableName">enum <i>required if <code>result = enum</code></i></h4>
+						<p>Array with the enumeration IDs of all choices. The order must be same as in <code>choices</code>.</p>
+					</TD>
+				</TR>
+			</table>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Type: <code>listbox</code></h4>
+			<p>This entry shows a listbox control in the element settings window.</p>
+			<p>The parameter value is an array with all selected entries. The entries can be identified either by the index or the string.</p>
+			<table class="variables">
+				<TR>
+					<TD>
+						<h4 class="VariableName">id</h4>
+						<p>The ID of the parameter. This ID allows to perform actions via API calls in <code>Element_CheckSettings_...</code></p>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4 class="VariableName">default</h4>
+						<p>Default value of the parameter. It is affected by the option <code>result</code>.</p>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4 class="VariableName">choices</h4>
+						<p>Array with text of all choices.</p>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4 class="VariableName">result <i>optional</i></h4>
+						<p>Defines what kind of value the parameter gets.</p>
+						<ul class="examples"><p"><i>Possible values:</i></p>
+							<li/>
+								<p><code>number <i>or empty</i></code> <i>(The parameter value is the index of the selected item)</i></p>
+							<li/>
+								<p"><code>string</code> <i>(The parameter value is the text of the selected item)</i></p>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4 class="VariableName">multi <i>optional</i></h4>
+						<p>If <code>true</code> user can select multiple elements.</p>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4 class="VariableName">sort <i>optional</i></h4>
+						<p>If <code>true</code> the entries will be alphabetically sorted.</p>
+					</TD>
+				</TR>
+			</table>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Type: <code>comboBox</code></h4>
+			<p>This entry shows a combo box in the element settings window.</p>
+			<p>The parameter value can be either the index or the string of the selected entry.</p>
+			<table class="variables">
+				<TR>
+					<TD>
+						<h4 class="VariableName">id</h4>
+						<p>The ID of the parameter. This ID allows to perform actions via API calls in <code>Element_CheckSettings_...</code></p>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4 class="VariableName">default</h4>
+						<p>Default value of the parameter. It is affected by the option <code>result</code>.</p>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4 class="VariableName">choices</h4>
+						<p>Array with text of all choices.</p>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4 class="VariableName">result <i>optional</i></h4>
+						<p>Defines what kind of value the parameter gets.</p>
+						<ul class="examples"><p"><i>Possible values:</i></p>
+							<li/>
+								<p><code>string <i>or empty</i></code> <i>(The parameter value is the text of the selected item)</i></p>
+							<li/>
+								<p"><code>number</code> <i>(The parameter value is the index of the selected item)</i></p>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4 class="VariableName">enum <i>required if <code>result = enum</code></i></h4>
+						<p>Array with the enumeration IDs of all choices. The order must be same as in <code>choices</code>.</p>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4 class="VariableName">WarnIfEmpty <i>optional</i></h4>
+						<p>Whether value must not be empty.
+							<br/>A correspoding icon and help text will be shown near the edit field if it is empty.
+							<br/>The API functions which automatically evaluate parameters uses this option.
+						</p>
+						<ul class="examples"><p"><i>Possible values:</i></p>
+							<li/>
+								<p><code>false <i>or empty</i></code> <i>(Value can be empty)</i></p>
+							<li/>
+								<p"><code>true</code> <i>(Value must not be empty)</i></p>
+					</TD>
+				</TR>
+			</table>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Type: <code>hotkey</code></h4>
+			<p>This entry shows a edit field a hotkey field in the element settings window where the user can define hotkeys.</p>
+			<table class="variables">
+				<TR>
+					<TD>
+						<h4 class="VariableName">id</h4>
+						<p>The ID of the parameter. This ID allows to perform actions via API calls in <code>Element_CheckSettings_...</code></p>
+					</TD>
+				</TR>
+			</table>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Type: <code>button</code></h4>
+			<p>This entry shows a button in the element settings window.</p>
+			<table class="variables">
+				<TR>
+					<TD>
+						<h4 class="VariableName">label</h4>
+						<p>Text of the button.</p>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4 class="VariableName">id <i>optional</i></h4>
+						<p>Defines the ID of the button. This ID allows to change the label text in function <code>Element_CheckSettings_...</code></p>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4 class="VariableName">goto</h4>
+						<p>Defines the function name or goto-label that will be called if user clicks on the button.
+							<br/>It's recommended to use a function. If the function may have one parameter, the parameter will contain the "Environment" value that may be used in some API functions.
+						</p>
+					</TD>
+				</TR>
+			</table>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Type: <code>file</code></h4>
+			<p>This entry shows an edit field, where user can enter a file path, and a button, which opens the file select dialog, in the element settings window.</p>
+			<table class="variables">
+				<TR>
+					<TD>
+						<h4 class="VariableName">id</h4>
+						<p>The ID of the parameter. This ID allows to perform actions via API calls in <code>Element_CheckSettings_...</code></p>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4 class="VariableName">label</h4>
+						<p>Prompt that will be shown in the file select dialog.</p>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4 class="VariableName">filter</h4>
+						<p>Filter of the file select dialog.</p>
+						<ul class="examples"><p"><i>example:</i></p>
+							<li/>
+								<p"><code>x_lang("Images and icons") " (*.gif; *.jpg; *.bmp; *.ico; *.cur; *.ani; *.png; *.tif; *.exif; *.wmf; *.emf; *.exe; *.dll; *.cpl; *.scr)"</code></p>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4 class="VariableName">options</h4>
+						<p>Additional options for the AutoHotkey command <code>FileSelectFile</code> as defined in AutoHotkey language.</p>
+						<ul class="examples"><p"><i>example:</i></p>
+							<li/>
+								<p"><code>8</code></p>
+					</TD>
+				</TR>
+			</table>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Type: <code>folder</code></h4>
+			<p>This entry shows an edit field, where user can enter a folder path, and a button, which opens the folder select dialog, in the element settings window.</p>
+			<table class="variables">
+				<TR>
+					<TD>
+						<h4 class="VariableName">id</h4>
+						<p>The ID of the parameter. This ID allows to perform actions via API calls in <code>Element_CheckSettings_...</code></p>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4 class="VariableName">label</h4>
+						<p>Prompt that will be shown in the folder select dialog.</p>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4 class="VariableName">options</h4>
+						<p>Additional options for the AutoHotkey command <code>FileSelectFolder</code> as defined in AutoHotkey language.</p>
+						<ul class="examples"><p"><i>example:</i></p>
+							<li/>
+								<p"><code>2</code></p>
+					</TD>
+				</TR>
+			</table>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Type: <code>weekdays</code></h4>
+			<p>This entry shows some checkboxes, where user can select weekdays, in the element settings window.
+				<br/>The parameter value is a string with all selected weekdays where each weekday is represented by a number. For example: <code>147</code> means monday, thursday and sunday are selected.
+			</p>
+			<table class="variables">
+				<TR>
+					<TD>
+						<h4 class="VariableName">id</h4>
+						<p>The ID of the parameter. This ID allows to perform actions via API calls in <code>Element_CheckSettings_...</code></p>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4 class="VariableName">default</h4>
+						<p>Default value of the parameter.</p>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4 class="VariableName">WarnIfEmpty <i>optional</i></h4>
+						<p>Whether value must not be empty.
+							<br/>A correspoding icon and help text will be shown near the edit field if it is empty. (not yet implemented)
+							<br/>The API functions which automatically evaluate parameters uses this option.
+						</p>
+						<ul class="examples"><p"><i>Possible values:</i></p>
+							<li/>
+								<p><code>false <i>or empty</i></code> <i>(Value can be empty)</i></p>
+							<li/>
+								<p"><code>true</code> <i>(Value must not be empty)</i></p>
+					</TD>
+				</TR>
+			</table>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Type: <code>dateAndTime</code></h4>
+			<p>This entry shows a DateTime control, where user can select a time.
+				<br/>The parameter value is a timestamp in the YYYYMMDDHH24MISS format.
+			</p>
+			<table class="variables">
+				<TR>
+					<TD>
+						<h4 class="VariableName">id</h4>
+						<p>The ID of the parameter. This ID allows to perform actions via API calls in <code>Element_CheckSettings_...</code></p>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4 class="VariableName">default</h4>
+						<p>Default value of the parameter.</p>
+					</TD>
+				</TR>
+				<TR>
+					<TD>
+						<h4 class="VariableName">format <i>optional</i></h4>
+						<p>Format of the control.</p>
+						<ul class="examples"><p"><i>Possible values:</i></p>
+							<li/>
+								<p><code>Time</code> <i>(Control shows only the time without the date)</i></p>
+							<li/>
+								<p"><code>Date</code> <i>(Control shows only the date)</i></p>
+							<li/>
+								<p"><code>DateTime</code> <i>(Control shows the time and the date)</i></p>
+					</TD>
+				</TR>
+			</table>
+		</TD>
+	</TR>
+</table>
+
+</BODY>
+</HTML>

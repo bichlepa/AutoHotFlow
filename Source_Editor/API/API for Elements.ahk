@@ -384,12 +384,6 @@ x_TriggerInNewAHKThread(Environment, p_Code, p_VarsToImport, p_VarsToExport)
 }
 
 
-x_TriggerInNewAHKThread_GetExportedValues(Environment)
-{
-	return xx_TriggerInNewAHKThread_GetExportedValues(Environment)
-}
-
-
 x_TriggerInNewAHKThread_Stop(Environment)
 {
 	return xx_TriggerInNewAHKThread_Stop(Environment)

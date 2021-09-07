@@ -74,7 +74,7 @@ Element_getParametrizationDetails_Action_Search_pixel(Environment)
 	parametersToEdit.push({type: "button", id: "GetColor", goto: "Action_Search_Pixel_Button_GetColorFromScreen", label: x_lang("Get color from screen")})
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Variation")})
-	parametersToEdit.push({type: "Slider", id: "variation", default: 0, result: "number", options: "Range0-255 TickInterval10 tooltip"})
+	parametersToEdit.push({type: "Slider", id: "variation", default: 0, content: "number", options: "Range0-255 TickInterval10 tooltip"})
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Method")})
 	parametersToEdit.push({type: "Checkbox", id: "FastMode", default: 1, label: x_lang("Fast method")})

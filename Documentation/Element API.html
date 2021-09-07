@@ -1,0 +1,992 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<link rel="stylesheet" href="stylesheet.css">
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<H1>Element API</H1>
+
+<p>Inside some element functions some API functions can be used which provide all functionality you need. The API functions were designed to keep it simple.
+	<br/>Not all API functions can be used in every element function. There are three types of element functions:
+	<ul>
+		<li/><b>Execution functions</b>: They can be used when the element is executed
+		<ul>
+			<li/>Element_run_...(Environment, ElementParameters)
+			<li/>Element_stop_...(Environment, ElementParameters)
+			<li/>Element_postTrigger_...(Environment, ElementParameters, TriggerData)
+		</ul>
+		<li/><b>Trigger functions</b>: They can be used when a trigger is enabled or disabled
+		<ul>
+			<li/>Element_enable_...(Environment, ElementParameters)
+			<li/>Element_disable_...(Environment, ElementParameters)
+		</ul>
+		<li/><b>Editor functions</b>: They can be used when an element is edited.
+		<ul>
+			<li/>Element_CheckSettings_...(Environment, ElementParameters, staticValues)
+		</ul>
+		<li/><b>Common functions</b>: They can be used everywhere.
+	</ul>
+	<br/>As you see, each function has the parameter <b>Environment</b>. Most API functions need this parameter.
+	<br/>Important: Do not change anything inside the <b>Environment</b> object!
+	<br/>The parameter <b>ElementParameters</b> is an object which keys contain the current parameters of the element.
+</p>
+
+<H2>API functions for variables</H2>
+Those functions are used to perform operations on variables.
+<br/>They can be used anywhere but if they are not used in <b>execution functions</b> they will only be able to handle static, global and some built-in variables.
+
+<p><b>Remarks: Hidden variables</b>
+<br/>Hidden variables are not explicit accessible by the user. They can only be used by elements. Hidden variable use an own variable space, therefore they can't collide with regular variables.
+<br/>Example usecases:
+<ul>
+	<li/>The action <b>Tracepoint</b> appends its ID in a hidden variable. The action <b>Tracepoint check</b> reads the hidden variable and then can check which tracepoints were passed. 
+	<li/>Some loops generate a list with all values they want to iterate on, before they start the first iteration. The list is stored in a hidden loop-variable.
+</ul>
+</p>
+<table class="variables">
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_getVariable(Environment, p_Varname, p_hidden = False)</h4>
+			<p>Returns the value of a variable. Returns an empty value if variable does not exist.</p>
+			<ul class="examples"><p"><i>Function parameters:</i></p>
+				<li/>
+					<p><code>p_Varname</code> <i>variable name</i></p>
+				<li/>
+					<p"><code>p_hidden</code> <i>(optional) if <code>true</code>, it will read the hidden variable</i></p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_getVariableType(Environment, p_Varname, p_hidden = False)</h4>
+			<p>Returns the type of a variable. It can be <code>normal</code> or <code>object</code>. Returns an empty value if variable does not exist.</p>
+			<ul class="examples"><p"><i>Function parameters:</i></p>
+				<li/>
+					<p><code>p_Varname</code> <i>variable name</i></p>
+				<li/>
+					<p"><code>p_hidden</code> <i>(optional) if <code>true</code>, it will find the hidden variable</i></p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_setVariable(Environment, p_Varname, p_Value, p_destination="", p_hidden = False)</h4>
+			<p>Sets the value of a variable. Creates a new variable if it does not exists.</p>
+			<ul class="examples"><p"><i>Function parameters:</i></p>
+				<li/>
+					<p><code>p_Varname</code> <i>variable name</i></p>
+				<li/>
+					<p><code>p_Value</code> <i>value to set</i></p>
+				<li/>
+					<p><code>p_destination</code> <i>(optional) You may assign a specific destination (<code>Loop</code>, <code>Thread</code>, <code>Instance</code>, <code>Static</code> or <code>Global</code>). If you set a loop or thread variable, the destination is required and the variable name must begin with <code>a_</code>. If omitted, the destination will be retrieved automatically and will be either <code>Instance</code>, <code>Static</code> or <code>Global</code>. It should be omitted if a user defined variable should be set.</i></p>
+				<li/>
+					<p"><code>p_hidden</code> <i>(optional) if <code>true</code>, it will find the hidden variable</i></p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_deleteVariable(Environment, p_Varname, p_hidden = False)</h4>
+			<p>Deletes a variable. Does nothing if variable does not exist.</p>
+			<ul class="examples"><p"><i>Function parameters:</i></p>
+				<li/>
+					<p><code>p_Varname</code> <i>variable name</i></p>
+				<li/>
+					<p"><code>p_hidden</code> <i>(optional) if <code>true</code>, it will find the hidden variable</i></p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_getVariableLocation(Environment, p_Varname, p_hidden = False)</h4>
+			<p>Returns the location of a variable. Returns an empty value if variable does not exist.
+				<br/>It can return the values: <code>BuiltIn</code>, <code>Loop</code>, <code>Thread</code>, <code>Instance</code>, <code>Static</code> or <code>Global</code>
+			</p>
+			<ul class="examples"><p"><i>Function parameters:</i></p>
+				<li/>
+					<p><code>p_Varname</code> <i>variable name</i></p>
+				<li/>
+					<p"><code>p_hidden</code> <i>(optional) if <code>true</code>, it will find the hidden variable</i></p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_GetListOfAllVars(Environment)</h4>
+			<p>Returns an array with all existing variables of any type except built-in variables.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_GetListOfLoopVars(Environment)</h4>
+			<p>Returns an array with all existing loop variables.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_GetListOfThreadVars(Environment)</h4>
+			<p>Returns an array with all existing thread variables.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_GetListOfInstanceVars(Environment)</h4>
+			<p>Returns an array with all existing instance variables.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_GetListOfStaticVars(Environment)</h4>
+			<p>Returns an array with all existing static variables.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_GetListOfGlobalVars(Environment)</h4>
+			<p>Returns an array with all existing global variables.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_ExportAllInstanceVars(Environment)</h4>
+			<p>Returns an associative array with all existing instance variables and their content.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_ImportAllInstanceVars(Environment, p_VarsToImport)</h4>
+			<p>Imports all variables from an associative array as instance variables.</p>
+			<ul class="examples"><p"><i>Function parameters:</i></p>
+				<li/>
+					<p><code>p_VarsToImport</code> <i>associative array with instance variables to import</i></p>
+		</TD>
+	</TR>
+</table>
+
+
+
+<H2>API functions for parameter evaluation</H2>
+Those functions are used to evaluate parameters. They are used in <b>execution functions</b> and in <b>trigger functions</b>.
+<table class="variables">
+	<TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_AutoEvaluateParameters(Environment, ElementParameters, p_skipList = "")</h4>
+			<p>Evaluates all parameters automatically. It includes following steps:
+				<ul>
+					<li/>Find out which content type the variable has. If it can be set by the user, find out what he selected.
+					<li/>If variable type is a string, call the <code>x_replaceVariables()</code> function
+					<li/>If variable type is a variable name, call the <code>x_replaceVariables()</code> function and check variable name with <code>x_CheckVariableName()</code> function
+					<li/>If variable type is an expression or any of the number types, call the <code>x_EvaluateExpression()</code> function and check the value range for number types
+					<li/>If variable type is a path, call the <code>x_replaceVariables()</code> function and the <code>x_GetFullPath()</code> function
+					<li/>If value must not be empty (option <code>WarnIfEmpty</code> is set), check whether value is empty
+					<li/>If nothing has to be changed, copy value
+				</ul>
+				It returns an object that contains all parameters.
+				<br/>If an error occures, it stops evaluating and adds following values to the return objects:
+				<ul>
+					<li/><code>_error</code>: Contains <code>true</code>.
+					<li/><code>_errorMessage</code>: Error message in user language.
+				</ul>
+			</p>
+			<ul class="examples"><p"><i>Function parameters:</i></p>
+				<li/>
+					<p><code>ElementParameters</code> <i>variable name</i></p>
+				<li/>
+					<p"><code>p_skipList</code> <i>(optional) array with parameters IDs which should not be evaluated. This is used, if some parameters only need to be evaluated under certain conditions.</i></p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, p_ParametersToEvaluate)</h4>
+			<p>Evaluates some parameters automatically. It uses same steps as <code>x_AutoEvaluateParameters()</code> and has same error handling.
+			</p>
+			<ul class="examples"><p"><i>Function parameters:</i></p>
+				<li/>
+					<p><code>EvaluatedParameters</code> <i>object with already evaluated parameters. The newly evaluated parameters will be added to it. If there are no evaluated parameters yet, pass an empty object.</i></p>
+				<li/>
+					<p><code>ElementParameters</code> <i>variable name</i></p>
+				<li/>
+					<p"><code>p_ParametersToEvaluate</code> <i>array with parameters IDs which should be evaluated.</i></p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_AutoEvaluateOneParameter(EvaluatedParameters, Environment, ElementParameters, oneParID, onePar = "")</h4>
+			<p>Evaluates one parameter automatically. It uses same steps as <code>x_AutoEvaluateParameters()</code> and has same error handling.
+			</p>
+			<ul class="examples"><p"><i>Function parameters:</i></p>
+				<li/>
+					<p><code>EvaluatedParameters</code> <i>object with already evaluated parameters. The newly evaluated parameter will be added to it. If there are no evaluated parameters yet, pass an empty object.</i></p>
+				<li/>
+					<p><code>ElementParameters</code> <i>variable name</i></p>
+				<li/>
+					<p"><code>oneParID</code> <i>ID of parameter which should be evaluated.</i></p>
+				<li/>
+					<p"><code>onePar</code> <i>(optional) value of parameter which should be evaluated. It can be used for faster execution if parameter value is already known.</i></p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_replaceVariables(Environment, p_String, p_pars = "")</h4>
+			<p>Parses a string and inserts variables which are enclosed in percent signs.</p>
+			<ul class="examples"><p"><i>Function parameters:</i></p>
+				<li/>
+					<p><code>p_String</code> <i>input string</i></p>
+				<li/>
+					<p"><code>p_pars</code> <i>(optional) if it contains the string <code>ConvertObjectToString</code>, the function will convert objects that may be inside a variable to string.</i></p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_EvaluateExpression(Environment, p_String)</h4>
+			<p>Parses and executes an expression.</p>
+			<ul class="examples"><p"><i>Function parameters:</i></p>
+				<li/>
+					<p><code>p_String</code> <i>input string</i></p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_EvaluateScript(Environment, p_script)</h4>
+			<p>Parses and executes an AHF script.
+				<br/><b>It is not completely implemented yet. It's not recommended to use it!</b>
+			</p>
+			<ul class="examples"><p"><i>Function parameters:</i></p>
+				<li/>
+					<p><code>p_script</code> <i>input script</i></p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_CheckVariableName(p_VarName)</h4>
+			<p>Checks whether a variable name is valid.</p>
+			<ul class="examples"><p"><i>Function parameters:</i></p>
+				<li/>
+					<p><code>p_VarName</code> <i>variable name</i></p>
+		</TD>
+	</TR>
+</table>
+
+
+<H2>API functions for execution functions</H2>
+Those functions can only be used in <b>execution functions</b>.
+<table class="variables">
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_finish(Environment, p_Result, p_Message = "") </h4>
+			<p>Sets the result of the execution. <b>It must always be called when the execution of an element finishes.</b>
+			</p>
+			<ul class="examples"><p"><i>Function parameters:</i></p>
+				<li/>
+					<p><code>p_Result</code> <i>Result of the execution. It can have following values:</i>
+						<ul>	
+							<li/><code>normal</code> <i>(only actions) execution finished without errors</i>
+							<li/><code>yes</code> or <code>no</code> <i>(only conditions) execution finished with result "yes" or "no"</i>
+							<li/><code>head</code> <i>(only loops) the loop should will continue with a new iteration</i>
+							<li/><code>tail</code> <i>(only loops) the loop should will not start a new iteration</i>
+							<li/><code>exception</code> <i>(all element types) there was an error, an exception will be raised</i>
+						</ul></p>
+				<li/>
+					<p><code>p_Message</code> <i>If result is <code>exception</code>, this message will be shown in a message box. It will always be logged.</i></p>
+			<ul/>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_getEntryPoint(Environment) <i>only loops</i></h4>
+			<p>Returns the entry point of a loop. It returns <code>head</code>, <code>tail</code> or <code>break</code>.
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_GetMyUniqueExecutionID(Environment)</h4>
+			<p>Returns a string which is unique during the execution of the current element.
+				<br/>You can use <code>x_GetMyEnvironmentFromExecutionID()</code> to get the environment variable, then you can use it then to call other API functions.
+				<br/>Usage example: You can use it as GUI ID. When a GUI event occurs, pass <code>A_Gui</code> to <code>x_GetMyEnvironmentFromExecutionID()</code>.
+			</p>
+				
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_GetMyEnvironmentFromExecutionID(p_ExecutionID)</h4>
+			<p>Returns the environment variable from the execution ID.
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_SetExecutionValue(Environment, p_name, p_Value)</h4>
+			<p>Set a variable that will only be available while this element is executing. They will be deleted after the element finishes the execution.
+			</p><ul class="examples"><p"><i>Function parameters:</i></p>
+				<li/>
+					<p><code>p_name</code> <i>variable name</i></p>
+				<li/>
+					<p"><code>p_Value</code> <i>value to set</i></p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_GetExecutionValue(Environment, p_name)</h4>
+			<p>Set a variable that will only be available while this element is executing.
+			</p><ul class="examples"><p"><i>Function parameters:</i></p>
+				<li/>
+					<p><code>p_name</code> <i>variable name</i></p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_NewFunctionObject(Environment, p_ToCallFunction, params*)</h4>
+			<p>Returns a function object which can be called later.
+				<br/>You can use this function object for example as a timer or hotkey callback.
+			</p>
+			<p>The function prototype must be as follows: <code>functionName(environment, param1, param2, <i>and so on...</i>)</code>
+				<br/>The first parameter will always be the environment variable.
+				<br/>Then it will get all the parameters that were passed as <code>params*</code> when the function object was created
+				<br/>Then it will get all the parameters that were passed to the function object when it was called
+				<br/>The count of function parameters must match the count of all the input parameters, otherwise the callback will silently fail.
+				<br/>Example code:
+				<table class="codeblock">
+					<TR><TD><p>functionObject := x_NewFunctionObject(Environment, "myFunction", "Hello", "World")
+						<br/>...
+						<br/>functionObject("Goodbye", "World")
+						<br/>...
+						<br/>myFunction(environment, param1, param2, param3, param4)
+						<br/>{
+							<br/>&nbsp;&nbsp;msgbox % param1 " " param2 " " param3 " " param4 <i>;shows "Hello World Goodbye World"</i>
+						<br/>}
+					</p></TD>
+				</TR></table>
+			</p><ul class="examples"><p"><i>Function parameters:</i></p>
+				<li/>
+					<p><code>p_ToCallFunction</code> <i>name of the function that will be called</i></p>
+				<li/>
+					<p><code>params*</code> <i>(opitonal) one or more parameters which will be passed to the called function</i></p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_InstanceStop(Environment)</h4>
+			<p>Stops the current execution instance.
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_GetThreadCountInCurrentInstance(Environment)</h4>
+			<p>Returns the thread count in the current instance.
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_ExecuteInNewAHKThread(Environment, p_functionObject, p_Code, p_VarsToImport, p_VarsToExport)</h4>
+			<p>Executes AHK code in a new AHK thread. This function must not be called more than one time during the execution of an element.
+				<br/>See also help for action <b>AutoHotkey script</b> for more details.
+			</p><ul class="examples"><p"><i>Function parameters:</i></p>
+				<li/>
+					<p><code>p_functionObject</code> <i>function object which will be called when the AHK thread finishes.</i></p>
+				<li/>
+					<p><code>p_Code</code> <i>code that will be executed</i></p>
+				<li/>
+					<p><code>p_VarsToImport</code> <i>associative array of variables that will be imported to the AHK thread</i></p>
+				<li/>
+					<p><code>p_VarsToExport</code> <i>array of variable names that will be exported from the AHK thread</i></p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_ExecuteInNewAHKThread_Stop(Environment)</h4>
+			<p>Stops the execution of AHK code that was started using <code>x_ExecuteInNewAHKThread()</code>.
+				<br/>It is usually used in the function <code>Element_stop_...(Environment, ElementParameters)</code>.
+		</TD>
+	</TR>
+</table>
+
+<H2>API functions for trigger functions</H2>
+Those functions can only be used in <b>trigger functions</b>.
+<table class="variables">
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_trigger(Environment, p_TriggerData = "") </h4>
+			<p>Starts a new instance of the flow starting from this trigger.
+			</p>
+			<ul class="examples"><p"><i>Function parameters:</i></p>
+				<li/>
+					<p><code>p_TriggerData</code> <i>(optional) some data that will be passed to the function <code>Element_postTrigger_...()</code></i></p>
+			<ul/>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_enabled(Environment, p_Result, p_Message = "") <i>Only in function <code>Element_enable_...()</code></i></h4>
+			<p>Notifies AHF that the trigger was enabled. <b>It must always be called in the function <code>Element_enable_...()</code>.</b>
+			</p>
+			<ul class="examples"><p"><i>Function parameters:</i></p>
+				<li/>
+					<p><code>p_Result</code> <i>Result of the trigger enabling. It can have following values:</i>
+						<ul>	
+							<li/><code>normal</code> <i>trigger was successfully enabled</i>
+							<li/><code>exception</code> <i>there was an error, an exception will be raised</i>
+						</ul></p>
+				<li/>
+					<p><code>p_Message</code> <i>If result is <code>exception</code>, this message will be shown in a message box. It will always be logged.</i></p>
+			<ul/>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_disabled(Environment, p_Result, p_Message = "") <i>Only in function <code>Element_disable_...()</code></i></h4>
+			<p>Notifies AHF that the trigger was disabled. <b>It must always be called in the function <code>Element_disable_...()</b>
+			</p>
+			<ul class="examples"><p"><i>Function parameters:</i></p>
+				<li/>
+					<p><code>p_Result</code> <i>Result of the trigger disabling. It can have following values:</i>
+						<ul>	
+							<li/><code>normal</code> <i>trigger was successfully disabled</i>
+							<li/><code>exception</code> <i>there was an error, an exception will be raised</i>
+						</ul></p>
+				<li/>
+					<p><code>p_Message</code> <i>If result is <code>exception</code>, this message will be shown in a message box. It will always be logged.</i></p>
+			<ul/>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_TriggerInNewAHKThread(Environment, p_Code, p_VarsToImport, p_VarsToExport)</h4>
+			<p>Executes AHK code in a new AHK thread. This function must not be called more than one time when a trigger is enabled.
+				<br/>See also help for trigger <b>AutoHotkey script</b> for more details.
+			</p><ul class="examples"><p"><i>Function parameters:</i></p>
+				<li/>
+					<p><code>p_Code</code> <i>code that will be executed</i></p>
+				<li/>
+					<p><code>p_VarsToImport</code> <i>associative array of variables that will be imported to the AHK thread</i></p>
+				<li/>
+					<p><code>p_VarsToExport</code> <i>array of variable names that will be exported from the AHK thread. The variables will be passed as the parameter <code>TriggerData</code> to function <code>Element_postTrigger_...()</code></i></p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_TriggerInNewAHKThread_Stop(Environment)</h4>
+			<p>Stops the execution of AHK code that was started using <code>x_TriggerInNewAHKThread()</code>.
+				<br/>It is usually used in the function <code>Element_disable_...(Environment, ElementParameters)</code>.
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_isAHFStartup() <i>Only in function <code>Element_enable_...()</code></i></h4>
+			<p>Returns <code>true</code>, if AutoHotFlow was just started.</b>
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_isWindowsStartup() <i>Only in function <code>Element_enable_...()</code></i></h4>
+			<p>Returns <code>true</code>, if AutoHotFlow was just started automatically with Windows.</b>
+			</p>
+		</TD>
+	</TR>
+</table>
+
+
+<H2>API functions for editor functions</H2>
+Those functions can only be used in <b>editor functions</b>.
+<table class="variables">
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_Par_Enable(p_ParameterID, p_TrueOrFalse = True)
+			<br/>x_Par_Disable(p_ParameterID, p_TrueOrFalse = True)</h4>
+			<p>Enables or disables all contols which can change the specified parameter.</p>
+			<ul class="examples"><p"><i>Function parameters:</i></p>
+				<li/>
+					<p><code>p_ParameterID</code> <i>ID of the parameter</i></p>
+				<li/>
+					<p><code>p_TrueOrFalse</code> <i>(optional) if <code>false</code>, it inverts the action</i></p>
+			</ul>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_Par_GetValue(p_ParameterID)</h4>
+			<p>Returns the value of a parameter.</p>
+			<ul class="examples"><p"><i>Function parameters:</i></p>
+				<li/>
+					<p><code>p_ParameterID</code> <i>ID of the parameter</i></p>
+			</ul>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_Par_SetValue(p_ParameterID, p_Value)</h4>
+			<p>Sets a value of a parameter and updates the controls.</p>
+			<ul class="examples"><p"><i>Function parameters:</i></p>
+				<li/>
+					<p><code>p_ParameterID</code> <i>ID of the parameter</i></p>
+				<li/>
+					<p><code>p_Value</code> <i>new value of the parameter</i></p>
+			</ul>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_Par_SetChoices(p_ParameterID, p_Choices, p_Enums = "")</h4>
+			<p>Sets the choices of a parameter. It works with follwing parameter types: <code>radio</code>, <code>dropDown</code>, <code>listbox</code> and <code>comboBox</code></p>
+			<ul class="examples"><p"><i>Function parameters:</i></p>
+				<li/>
+					<p><code>p_ParameterID</code> <i>ID of the parameter</i></p>
+				<li/>
+					<p><code>p_Choices</code> <i>choices that will be set</i></p>
+				<li/>
+					<p><code>p_ParameterID</code> <i>(required if parameter option <code>result = enum</code>) enum values of the choices</i></p>
+			</ul>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_Par_SetLabel(p_ParameterID, p_Label)</h4>
+			<p>Sets the label of a parameter. It works with all parameter that have the <code>label</code> option.</p>
+			<ul class="examples"><p"><i>Function parameters:</i></p>
+				<li/>
+					<p><code>p_Label</code> <i>new label that will be set</i></p>
+			</ul>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_FirstCallOfCheckSettings(Environment)</h4>
+			<p>Returns <code>true</code> if user just opened the settings window and it is the first time, the function <code>Element_CheckSettings_...()</code> is called.
+			</p>
+		</TD>
+	</TR>
+</table>
+
+<H2>API functions for assistants</H2>
+Those functions are designed to be used in callbacks of the button controls in the element settings window.
+<table class="variables">
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_assistant_windowParameter(neededInfo)</h4>
+			<p>Opens the assistant <b>window parameters</b>.</p>
+			<ul class="examples"><p"><i>Function parameters:</i></p>
+				<li/>
+					<p><code>neededInfo</code> <i>associative array of parameter IDs which the assistant should retrieve. It can have following values:</i></p>
+					<ul>
+						<li/>
+							<p><code>wintitle</code> <i>window title</i></p>
+						<li/>
+							<p><code>excludeTitle</code> <i>exclude window title</i></p>
+						<li/>
+							<p><code>winText</code> <i>window text</i></p>
+						<li/>
+							<p><code>FindHiddenText</code> <i>find hidden text (boolean)</i></p>
+						<li/>
+							<p><code>ExcludeText</code> <i>exclude window text</i></p>
+						<li/>
+							<p><code>ahk_class</code> <i>ahk_class property</i></p>
+						<li/>
+							<p><code>ahk_exe</code> <i>ahk_exe property</i></p>
+						<li/>
+							<p><code>ahk_id</code> <i>ahk_id property</i></p>
+						<li/>
+							<p><code>ahk_pid</code> <i>ahk_pid property</i></p>
+						<li/>
+							<p><code>FindHiddenWindow</code> <i>FindHiddenWindow property (boolean)</i></p>
+						<li/>
+							<p><code>Xpos</code> <i>x coordinate of the window</i></p>
+						<li/>
+							<p><code>Ypos</code> <i>y coordinate of the window</i></p>
+						<li/>
+							<p><code>Width</code> <i>width of the window</i></p>
+						<li/>
+							<p><code>Height</code> <i>height of the window</i></p>
+						<li/>
+							<p><code>Control_identifier</code> <i>control identifier</i></p>
+						<li/>
+							<p><code>IdentifyControlBy</code> <i>how to identify control</i></p>
+					</ul>
+			</ul>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_assistant_MouseTracker(neededInfo)</h4>
+			<p>Opens the assistant <b>mouse tracker</b>.</p>
+			<ul class="examples"><p"><i>Function parameters:</i></p>
+				<li/>
+					<p><code>neededInfo</code> <i>associative array of parameter IDs which the assistant should retrieve. It can have following values:</i></p>
+					<ul>
+						<li/>
+							<p><code>xpos</code> <i>x coordinate</i></p>
+						<li/>
+							<p><code>ypos</code> <i>y coordinate</i></p>
+						<li/>
+							<p><code>xpos2</code> <i>second x coordinate</i></p>
+						<li/>
+							<p><code>ypos2</code> <i>second y coordinate</i></p>
+						<li/>
+							<p><code>color</code> <i>color of a pixel</i></p>
+						<li/>
+							<p><code>CoordMode</code> <i>coordinate mode</i></p>
+						<li/>
+							<p><code>colorGetMethod</code> <i>method how to geht the color (<code>default</code>, <code>alt</code> or <code>slow</code></i></p>
+						
+					</ul>
+			</ul>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_assistant_ChooseColor(neededInfo)</h4>
+			<p>Opens the assistant <b>choose color</b>.</p>
+			<ul class="examples"><p"><i>Function parameters:</i></p>
+				<li/>
+					<p><code>neededInfo</code> <i>associative array of parameter IDs which the assistant should retrieve. It can have following values:</i></p>
+					<ul>
+						<li/>
+							<p><code>Color</code> <i>color value</i></p>
+					</ul>
+			</ul>
+		</TD>
+	</TR>
+</table>
+
+
+<H2>API functions for flow information and manipulation</H2>
+Those functions can be used everywhere.
+<table class="variables">
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_GetMyFlowID(Environment)</h4>
+			<p>Returns the ID of the current flow.
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_GetMyFlowName(Environment)</h4>
+			<p>Returns the name of the current flow.
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_GetMyElementID(Environment)</h4>
+			<p>Returns the ID of the current element.
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_getMyElementPars(Environment)</h4>
+			<p>Returns an associative array with the parameters of the current element.
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_getFlowName(p_FlowID)</h4>
+			<p>Returns the name of a flow.</p>
+			<ul class="examples"><p"><i>Function parameters:</i></p>
+				<li/>
+					<p><code>p_FlowID</code> <i>the flow ID</i></p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_getFlowIDByName(p_FlowName)</h4>
+			<p>Returns the flow ID of a flow with a specified name.</p>
+			<ul class="examples"><p"><i>Function parameters:</i></p>
+				<li/>
+					<p><code>p_FlowName</code> <i>the flow name</i></p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_FlowExists(p_FlowID)</h4>
+			<p>Returns <code>true</code> if a flow with the specified ID exists.</p>
+			<ul class="examples"><p"><i>Function parameters:</i></p>
+				<li/>
+					<p><code>p_FlowID</code> <i>the flow ID</i></p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_FlowExistsByName(p_FlowName)</h4>
+			<p>Returns <code>true</code> if a flow with the specified name exists.</p>
+			<ul class="examples"><p"><i>Function parameters:</i></p>
+				<li/>
+					<p><code>p_FlowName</code> <i>the flow name</i></p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_elementExists(p_FlowID, p_ElementID)</h4>
+			<p>Returns <code>true</code> if a element with the specified ID in a specified flow exists.</p>
+			<ul class="examples"><p"><i>Function parameters:</i></p>
+				<li/>
+					<p><code>p_FlowID</code> <i>the flow ID</i></p>
+				<li/>
+					<p><code>p_ElementID</code> <i>the element ID</i></p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_isFlowEnabled(p_FlowID)</h4>
+			<p>Returns <code>true</code> if a flow with the specified ID is enabled.</p>
+			<ul class="examples"><p"><i>Function parameters:</i></p>
+				<li/>
+					<p><code>p_FlowID</code> <i>the flow ID</i></p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_isFlowExecuting(p_FlowID)</h4>
+			<p>Returns <code>true</code> if a flow with the specified ID is executing.</p>
+			<ul class="examples"><p"><i>Function parameters:</i></p>
+				<li/>
+					<p><code>p_FlowID</code> <i>the flow ID</i></p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_FlowEnable(p_FlowID)</h4>
+			<p>Enables a flow with the specified ID.</p>
+			<ul class="examples"><p"><i>Function parameters:</i></p>
+				<li/>
+					<p><code>p_FlowID</code> <i>the flow ID</i></p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_FlowDisable(p_FlowID)</h4>
+			<p>Disables a flow with the specified ID.</p>
+			<ul class="examples"><p"><i>Function parameters:</i></p>
+				<li/>
+					<p><code>p_FlowID</code> <i>the flow ID</i></p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_FlowStop(p_FlowID)</h4>
+			<p>Stops all instances of a flow with the specified ID.</p>
+			<ul class="examples"><p"><i>Function parameters:</i></p>
+				<li/>
+					<p><code>p_FlowID</code> <i>the flow ID</i></p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_isTriggerEnabled(p_FlowID, p_TriggerID)</h4>
+			<p>Returns <code>true</code> if a trigger with the specified ID in a specified flow is executing.</p>
+			<ul class="examples"><p"><i>Function parameters:</i></p>
+				<li/>
+					<p><code>p_FlowID</code> <i>the flow ID</i></p>
+				<li/>
+					<p><code>p_TriggerID</code> <i>the trigger element ID</i></p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_triggerEnable(p_FlowID, p_TriggerID)</h4>
+			<p>Enables a trigger with the specified ID in a specified flow.</p>
+			<ul class="examples"><p"><i>Function parameters:</i></p>
+				<li/>
+					<p><code>p_FlowID</code> <i>the flow ID</i></p>
+				<li/>
+					<p><code>p_TriggerID</code> <i>the trigger element ID</i></p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_triggerDisable(p_FlowID, p_TriggerID)</h4>
+			<p>Disables a trigger with the specified ID in a specified flow.</p>
+			<ul class="examples"><p"><i>Function parameters:</i></p>
+				<li/>
+					<p><code>p_FlowID</code> <i>the flow ID</i></p>
+				<li/>
+					<p><code>p_TriggerID</code> <i>the trigger element ID</i></p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_getDefaultManualTriggerID(p_FlowID)</h4>
+			<p>Returns the ID of the default manual trigger in a specified flow.</p>
+			<ul class="examples"><p"><i>Function parameters:</i></p>
+				<li/>
+					<p><code>p_FlowID</code> <i>the flow ID</i></p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_ManualTriggerExecute(p_FlowID, p_TriggerID = "", p_Variables ="", p_CallBackFunction ="")</h4>
+			<p>Triggers a specified manual trigger.</p>
+			<ul class="examples"><p"><i>Function parameters:</i></p>
+				<li/>
+					<p><code>p_FlowID</code> <i>the flow ID</i></p>
+				<li/>
+					<p><code>p_TriggerID</code> <i>the trigger element ID</i></p>
+				<li/>
+					<p><code>p_Variables</code> <i>associative array of variables that will be available in the new instance</i></p>
+				<li/>
+					<p><code>p_CallBackFunction</code> <i>function (usually function object) that will be called when the instance finishes</i></p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_GetListOfFlowIDs()</h4>
+			<p>Returns an array that contains the IDs of all existing flows.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_GetListOfFlowNames()</h4>
+			<p>Returns an array that contains the names of all existing flows.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_getAllElementIDsOfType(p_FlowID, p_Type)</h4>
+			<p>Returns an array that contains the IDs of all existing elements of a specified type in a specified flow.</p>
+			<ul class="examples"><p"><i>Function parameters:</i></p>
+				<li/>
+					<p><code>p_FlowID</code> <i>the flow ID</i></p>
+				<li/>
+					<p><code>p_Type</code> <i>element type. It can be <code>action</code>, <code>condition</code>, <code>loop</code> or <code>trigger</code></i></p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_getAllElementIDsOfClass(p_FlowID, p_Class)</h4>
+			<p>Returns an array that contains the IDs of all existing elements of a specified class in a specified flow.</p>
+			<ul class="examples"><p"><i>Function parameters:</i></p>
+				<li/>
+					<p><code>p_FlowID</code> <i>the flow ID</i></p>
+				<li/>
+					<p><code>p_Class</code> <i>element class. The element class can be retrieved with the function <code>x_getElementClass()</code>. It is also in the name of all element functions and is represented with <code>...</code> in this documentation.</i></p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_getElementPars(p_FlowID, p_ElementID)</h4>
+			<p>Returns an associative array that contains the parameters of a specified element in a specified flow.</p>
+			<ul class="examples"><p"><i>Function parameters:</i></p>
+				<li/>
+					<p><code>p_FlowID</code> <i>the flow ID</i></p>
+				<li/>
+					<p><code>p_ElementID</code> <i>the element ID</i></p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_getElementClass(p_FlowID, p_ElementID)</h4>
+			<p>Returns the class name of a specified element in a specified flow.</p>
+			<ul class="examples"><p"><i>Function parameters:</i></p>
+				<li/>
+					<p><code>p_FlowID</code> <i>the flow ID</i></p>
+				<li/>
+					<p><code>p_ElementID</code> <i>the element ID</i></p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_getElementName(p_FlowID, p_ElementID)</h4>
+			<p>Returns the name of a specified element in a specified flow.</p>
+			<ul class="examples"><p"><i>Function parameters:</i></p>
+				<li/>
+					<p><code>p_FlowID</code> <i>the flow ID</i></p>
+				<li/>
+					<p><code>p_ElementID</code> <i>the element ID</i></p>
+		</TD>
+	</TR>
+</table>
+
+
+<H2>Other API functions</H2>
+Those functions can be used everywhere.
+<table class="variables">
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_lang(key, params*)</h4>
+			<p>Translates a text into the language that was set by the user.
+				<br/>If the translation does not exist, it returns the untranslated string.
+			</p>
+			<ul class="examples"><p"><i>Function parameters:</i></p>
+				<li/>
+					<p><code>key</code> <i>text which will be translated. It may contain placeholders like <code>%1%</code></i></p>
+				<li/>
+					<p><code>params*</code> <i>zero or more values that will be inserted into the placeholders</i></p>
+			<ul/>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_log(Environment, Text, loglevel)</h4>
+			<p>Writes a log message.</p>
+			<ul class="examples"><p"><i>Function parameters:</i></p>
+				<li/>
+					<p><code>Text</code> <i>text which will be logged</i></p>
+				<li/>
+					<p><code>loglevel</code> <i>importance of the log message. It can be <code>0</code> (errors), <code>1</code> (major), <code>2</code> (minor) or <code>3</code> (debug)</i></p>
+			<ul/>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_GetWorkingDir(Environment)</h4>
+			<p>Returns the path of the working directory of the flow.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_GetFullPath(Environment, p_Path)</h4>
+			<p>If the specified path is not absolute, it will convert it to an absolute path.
+				<br/>This must always be done because the scripts's working directory is not the same as the flow's working directory, which also can be set by user for each flow individually.
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_GetAhfPath(Environment, p_Path)</h4>
+			<p>Returns the path where AHF is installed.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_ConvertObjToString(p_Value, convertUnicodeChars = false)</h4>
+			<p>Converts an object to a json string.</p>
+			<ul class="examples"><p"><i>Function parameters:</i></p>
+				<li/>
+					<p><code>p_Value</code> <i>input object</i></p>
+				<li/>
+					<p><code>convertUnicodeChars</code> <i>If <code>true</code>, the unicode characters will be encoded, too. Otherwise they will be left as is.</i></p>
+			<ul/>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_ConvertStringToObj(p_Value)</h4>
+			<p>Converts a json string to an object.</p>
+			<ul class="examples"><p"><i>Function parameters:</i></p>
+				<li/>
+					<p><code>p_Value</code> <i>input json string</i></p>
+			<ul/>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_UriEncode(p_Value)</h4>
+			<p>URI encodes a string. This may be used for HTTP requests.</p>
+			<ul class="examples"><p"><i>Function parameters:</i></p>
+				<li/>
+					<p><code>p_Value</code> <i>input string</i></p>
+			<ul/>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_randomPhrase()</h4>
+			<p>Returns a random phrase of two words (an adjective and a noun). This can be used to generate a memorizable ID or name.</p>
+		</TD>
+	</TR>
+</table>
+
+</BODY>
+</HTML>

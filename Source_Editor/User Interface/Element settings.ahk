@@ -670,7 +670,20 @@ class ElementSettings
 					logger("a0", "cannot create edit field. Multiple contents should be possible but the content ID is not specified (field class: " this.__Class ", first paramter ID: " this.parameterIds[1] ")")
 					return
 				}
-				
+
+				; prepare some strings for the content type radio
+				this.contentTypeLangs := []
+				this.contentTypeLangs.string := lang("This is a string")
+				this.contentTypeLangs.rawString := lang("This is a raw string")
+				this.contentTypeLangs.expression := lang("This is an expression")
+				this.contentTypeLangs.VarName := lang("This is a variable name")
+				this.contentTypeLangs.number := lang("This is a number")
+				this.contentTypeLangs.positiveNumber := lang("This is a positive number")
+				this.contentTypeLangs.integer := lang("This is an integer")
+				this.contentTypeLangs.positiveInteger := lang("This is an positive integer (0 is not allowed)")
+				this.contentTypeLangs.positiveIntegerOrZero := lang("This is an positive integer (0 is allowed)")
+				this.currentContentType := ""
+
 				; get the value of the content type parameter
 				tempContentTypeNum := ElementSettings.elementPars[tempParameterContentTypeID]
 
@@ -1425,10 +1438,6 @@ class ElementSettings
 			local tempFirstParameterID := parameter.id[1]
 			local tempParameterdefault := parameter.default
 			
-			; prepare some strings for the content type radio
-			this.contentTypeLangs := {string: lang("This is a string"), rawString: lang("This is a raw string"), expression: lang("This is an expression"), VarName: lang("This is a variable name")}
-			this.currentContentType := ""
-			
 			; create the gui elements
 			gui, font, s8 cDefault wnorm
 			
@@ -1492,10 +1501,6 @@ class ElementSettings
 			; set default value if not set in parameters
 			if not tempParameterRows
 				tempParameterRows := 5
-
-			; prepare some strings for the content type radio
-			this.contentTypeLangs := {string: lang("This is a string"), rawString: lang("This is a raw string"), expression: lang("This is an expression"), VarName: lang("This is a variable name")}
-			this.currentContentType := ""
 			
 			; create the gui elements
 			gui,font,s8 cDefault wnorm
@@ -2252,7 +2257,7 @@ class ElementSettings
 			}
 			else if (tempFormat = "DateTime")
 			{
-				tempFormat := % "'" lang("Date") ":' " lang("MM/dd/yy") "   '" lang("Time") ":' " lang("HH:mm:ss")
+				tempFormat := % "'" lang("Date") ":' " lang("MM/dd/yyyy") "   '" lang("Time") ":' " lang("HH:mm:ss")
 			}
 			
 			; get the current value
@@ -2294,7 +2299,6 @@ class ElementSettings
 
 			; the choices can be set after the control was created. We will save the initial value
 			this.par_choices := tempChoices
-			this.par_enum := parameter.enum
 			this.par_result := parameter.result
 
 			;loop through all choices. Make a selection list which is suitable for the gui,add command
@@ -2317,7 +2321,7 @@ class ElementSettings
 
 			; decide whether we need the altSubmit keyword
 			tempAltSubmit := ""
-			if (parameter.result != "number")
+			if (parameter.result = "string")
 			{
 				tempAltSubmit := "altSubmit"
 			}

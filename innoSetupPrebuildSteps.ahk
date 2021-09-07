@@ -127,7 +127,7 @@ for oneIndex, oneFile in AppFileList
     SplitPath, oneFile, oneFileName, dirPath
     if dirPath
         dirPath := "\" dirPath
-    scriptContent .= "Source: """ oneFile """; DestDir: ""{app}" dirPath """; Flags: ignoreversion`n"
+    scriptContent .= "Source: """ oneFile """; DestDir: ""{app}" dirPath """; Flags: ignoreversion`r`n"
 }
 
 ; write new version number to inno setup file

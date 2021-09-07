@@ -20,6 +20,13 @@
       "ID": "connection0000000022",
       "to": "element0000000012",
       "type": "Connection"
+    },
+    "connection0000000029": {
+      "ConnectionType": "normal",
+      "from": "element0000000027",
+      "ID": "connection0000000029",
+      "to": "element0000000028",
+      "type": "Connection"
     }
   },
   "allElements": {
@@ -158,15 +165,98 @@
       "type": "action",
       "x": "1400",
       "y": "630"
+    },
+    "element0000000023": {
+      "class": "Action_Add_To_List",
+      "ID": "element0000000023",
+      "name": "Add to list myList - As first value - Value 'New element'",
+      "package": "default",
+      "pars": {
+        "DelimiterComma": 0,
+        "DelimiterLinefeed": 1,
+        "DelimiterSemicolon": 0,
+        "DelimiterSpace": 0,
+        "Expression": "String",
+        "expressionPos": "String",
+        "InsertMethod": "Insert",
+        "InsertMethodLabel": "",
+        "NumberOfElements": "One",
+        "Position": "keyName",
+        "Varname": "myList",
+        "VarValue": "New element",
+        "VarValues": "Element one\nElement two",
+        "WhichPosition": "First"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "455",
+      "y": "-210"
+    },
+    "element0000000024": {
+      "class": "Trigger_Time_Of_Day",
+      "enabled": "0",
+      "ID": "element0000000024",
+      "name": "Time of day - 16:01:56 - Weekdays: '1234567'",
+      "package": "default",
+      "pars": {
+        "Time": "20210905160156",
+        "WeekDays": "1234567"
+      },
+      "StandardName": "1",
+      "type": "Trigger",
+      "x": "1435",
+      "y": "-35"
+    },
+    "element0000000026": {
+      "class": "Action_New_Time",
+      "ID": "element0000000026",
+      "name": "New time - NewTime - 17700905170205",
+      "package": "default",
+      "pars": {
+        "Time": "17700905170205",
+        "Varname": "NewTime",
+        "WhichTime": "Specified"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "980",
+      "y": "-175"
+    },
+    "element0000000027": {
+      "class": "Trigger_AutoHotkey_Script",
+      "enabled": "0",
+      "ID": "element0000000027",
+      "name": "AutoHotKey script - loop - { -   sleep 10000 - time := [a_now] -   x_trigger()",
+      "package": "default",
+      "pars": {
+        "ExportVariables": "time",
+        "ImportVariables": "",
+        "Script": "loop\n{\n  sleep 10000\ntime := [a_now]\n  x_trigger()\n}"
+      },
+      "StandardName": "1",
+      "type": "Trigger",
+      "x": "1120",
+      "y": "0"
+    },
+    "element0000000028": {
+      "class": "Condition_Debug_Dialog",
+      "ID": "element0000000028",
+      "name": "Debug dialog",
+      "package": "default",
+      "pars": {},
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "1085",
+      "y": "245"
     }
   },
   "category": "",
-  "ElementIDCounter": "22",
+  "ElementIDCounter": "29",
   "flowSettings": {
     "DefaultWorkingDir": 1,
     "ExecutionPolicy": "default",
-    "Offsetx": "-200.000000",
-    "Offsety": "-200.000000",
+    "Offsetx": "-357.142857",
+    "Offsety": "-460.000000",
     "WorkingDir": "",
     "zoomFactor": "0.7"
   },

@@ -54,11 +54,11 @@ Element_getParametrizationDetails_Action_Execute_Flow(Environment)
 	parametersToEdit := Object()
 	parametersToEdit.push({type: "Label", label: x_lang("Which flow")})
 	parametersToEdit.push({type: "Checkbox", id: "ThisFlow", default: 1, label: x_lang("This flow (%1%)", x_GetMyFlowID(Environment))})
-	parametersToEdit.push({type: "DropDown", id: "flowID", WarnIfEmpty: true, result: "enum", choices: [], enum: []})
+	parametersToEdit.push({type: "DropDown", id: "flowID", result: "enum", choices: [], enum: []})
 
 	parametersToEdit.push({type: "Label", label: x_lang("Which trigger")})
 	parametersToEdit.push({type: "Radio", id: "WhichTrigger", default: 1, result: "enum", choices: [x_lang("Default trigger"), x_lang("Specified trigger")], enum: ["Default", "specified"]})
-	parametersToEdit.push({type: "DropDown", id: "triggerID", WarnIfEmpty: true, result: "enum", choices: [], enum: []})
+	parametersToEdit.push({type: "DropDown", id: "triggerID", result: "enum", choices: [], enum: []})
 
 	parametersToEdit.push({type: "Label", label:  x_lang("Options")})
 	parametersToEdit.push({type: "Checkbox", id: "SendLocalVars", default: 1, label: x_lang("Send local variables")})

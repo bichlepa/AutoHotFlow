@@ -53,7 +53,7 @@ Element_getParametrizationDetails_Action_Stop_Flow(Environment)
 {
 	parametersToEdit:=Object()
 	parametersToEdit.push({type: "Label", label: x_lang("Which flow")})
-	parametersToEdit.push({type: "DropDown", id: "flowID", WarnIfEmpty: true, result: "enum", choices: [], enum: []})
+	parametersToEdit.push({type: "DropDown", id: "flowID", result: "enum", choices: [], enum: []})
 
 	return parametersToEdit
 }

@@ -119,8 +119,7 @@ Element_enable_Trigger_AutoHotkey_Script(Environment, ElementParameters)
 ;Here you can for example define the variables which are provided by the triggers.
 Element_postTrigger_Trigger_AutoHotkey_Script(Environment, ElementParameters, TriggerData)
 {
-	exportedValues := x_TriggerInNewAHKThread_GetExportedValues(Environment)
-	x_ImportInstanceVars(Environment, exportedValues)
+	x_ImportInstanceVars(Environment, TriggerData)
 }
 
 ;Called when the trigger should be disabled.

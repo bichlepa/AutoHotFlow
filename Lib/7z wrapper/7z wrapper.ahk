@@ -1,7 +1,7 @@
 ﻿;written by bichlepa. License: WTFPL
 ;thanks to joedf for the 7z_compress() function (https://www.autohotkey.com/boards/viewtopic.php?f=5&t=26832)
 
-7z_exe:=_WorkingDir "\bin\7za.exe"
+7z_exe:=_ScriptDir "\bin\7za.exe"
 ;~ 7z_exe:="C:\Program Files\7-Zip\7z.exe"
 
 7z_compress(dPack, opts, files*) {

@@ -50,7 +50,7 @@ exportFlowsExportNow()
 	}
 	
 	; Let user select the destination
-	FileSelectFile,filepathexport,S18,,% lang("Export AutoHotFlow flows"), % lang("AutoHotFlow file") " (*.ahf)"
+	FileSelectFile,filepathexport,S18,exported flow.ahf,% lang("Export AutoHotFlow flows"), % lang("AutoHotFlow file") " (*.ahf)"
 
 	; Append .ahf to the file name if it is omitted
 	if (substr(filepathexport, -3) != ".ahf")
@@ -103,8 +103,15 @@ importExportGui_import(filepathZip)
 	; extract the files
 	filepathextractfolder:=_WorkingDir "\tempimportflows"
 	FileRemoveDir, % filepathextractfolder, 1 ; first delete the directory, if any
-	7z_extract(filepathZip, "-tzip", filepathextractfolder)
-	
+
+	result := 7z_extract(filepathZip, "-tzip", filepathextractfolder)
+	; check result and finish
+	if (result != "Success")
+	{
+		MsgBox, % lang("Error. AutoHotFlow file could not be extracted.") "`n" result
+		return
+	}
+
 	; check all extracted files
 	loop, %filepathextractfolder%\*.json
 	{

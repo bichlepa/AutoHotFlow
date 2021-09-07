@@ -39,7 +39,7 @@ Element_getElementLevel_Condition_Debug_Dialog()
 ;Icon path which will be shown in the background of the element
 Element_getIconPath_Condition_Debug_Dialog()
 {
-	return "Source_elements\default\icons\bug.png"
+	return "bug.png"
 }
 
 ;How stable is this element? Experimental elements will be marked and can be hidden by user.

@@ -776,22 +776,14 @@ ExecuteInNewAHKThread_trigger(p_uniqueID, p_iteration)
 	Environment := global_AllActiveTriggerIDs[p_uniqueID].environment
 	; get the variables which the trigger has passed.
 	varsExportedFromExternalThread := _getSharedProperty("temp." p_uniqueID ".sharedObject.varsExported." p_iteration)
-	
+	; delete the object in shared object
+	_setSharedProperty("temp." p_uniqueID ".sharedObject.varsExported." p_iteration, "")
+
 	_LeaveCriticalSection()
 
 	; trigger the trigger
-	instanceID := newInstance(Environment, , {varsExportedFromExternalThread: varsExportedFromExternalThread})
+	instanceID := newInstance(Environment, , , varsExportedFromExternalThread)
 }
-
-; Does it work, if trigger tirggers multiple times at once?
-x_TriggerInNewAHKThread_GetExportedValues(Environment)
-{
-	_EnterCriticalSection()
-	retval := _getInstanceProperty(Environment.InstanceID, "varsExportedFromExternalThread")
-	_LeaveCriticalSection()
-	return retval
-}
-
 
 
 

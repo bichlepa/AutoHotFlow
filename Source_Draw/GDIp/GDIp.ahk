@@ -600,7 +600,7 @@ gdip_DrawEverything(FlowObj)
 			
 			if (drawElement.icon)
 			{
-				drawElementIcon(G,((drawElement.x-Offsetx)*zoomFactor),((drawElement.y-Offsety)*zoomFactor), (ElementWidth*zoomFactor), (ElementHeight*zoomFactor), drawElement.icon) 
+				drawElementIcon(G,((drawElement.x-Offsetx)*zoomFactor),((drawElement.y-Offsety)*zoomFactor), (ElementWidth*zoomFactor), (ElementHeight*zoomFactor), drawElement.package, drawElement.icon) 
 			}
 			
 			
@@ -684,7 +684,7 @@ gdip_DrawEverything(FlowObj)
 			
 			if (drawElement.icon)
 			{
-				drawElementIcon(G,((drawElement.x-Offsetx)*zoomFactor),((drawElement.y-Offsety)*zoomFactor), (ElementWidth*zoomFactor), (ElementHeight*zoomFactor), drawElement.icon) 
+				drawElementIcon(G,((drawElement.x-Offsetx)*zoomFactor),((drawElement.y-Offsety)*zoomFactor), (ElementWidth*zoomFactor), (ElementHeight*zoomFactor), drawElement.package, drawElement.icon) 
 			}
 			
 			;Gdip_TextToGraphics(G, drawElement.name, "x" ((drawElement.x-Offsetx)*zoomFactor +4) "y" ((drawElement.y-Offsety)*zoomFactor+4) TextOptions , Font, ((ElementWidth)*zoomFactor-8), ((ElementHeight)*zoomFactor-8))
@@ -727,7 +727,7 @@ gdip_DrawEverything(FlowObj)
 			
 			if (drawElement.icon)
 			{
-				drawElementIcon(G,((drawElement.x-Offsetx)*zoomFactor),((drawElement.y-Offsety)*zoomFactor), (ElementWidth*zoomFactor), (ElementHeight*zoomFactor), drawElement.icon) 
+				drawElementIcon(G,((drawElement.x-Offsetx)*zoomFactor),((drawElement.y-Offsety)*zoomFactor), (ElementWidth*zoomFactor), (ElementHeight*zoomFactor), drawElement.package, drawElement.icon) 
 			}
 			
 			Gdip_TextToGraphics(G, drawElement.name, "x" ((drawElement.x-Offsetx)*zoomFactor +4) " y" ((drawElement.y-Offsety)*zoomFactor+4) " vCenter " TextOptions , Font, (ElementWidth*zoomFactor-8), (ElementHeight*zoomFactor-8))
@@ -769,7 +769,7 @@ gdip_DrawEverything(FlowObj)
 			
 			if (drawElement.icon)
 			{
-				drawElementIcon(G,((drawElement.x-Offsetx)*zoomFactor),((drawElement.y-Offsety)*zoomFactor), (ElementWidth*zoomFactor), (ElementHeight*zoomFactor), drawElement.icon) 
+				drawElementIcon(G,((drawElement.x-Offsetx)*zoomFactor),((drawElement.y-Offsety)*zoomFactor), (ElementWidth*zoomFactor), (ElementHeight*zoomFactor), drawElement.package, drawElement.icon) 
 			}
 			
 			Gdip_TextToGraphics(G, drawElement.name, "x" ((drawElement.x-Offsetx)*zoomFactor +4) " y" ((drawElement.y-Offsety)*zoomFactor+4) " vCenter " TextOptions , Font, (ElementWidth*zoomFactor-8), (ElementHeight*zoomFactor-8))
@@ -1128,7 +1128,7 @@ gdip_DrawEverything(FlowObj)
 
 }
 
-drawElementIcon(G, p_x, p_y, p_w, p_h ,path)
+drawElementIcon(G, p_x, p_y, p_w, p_h, package, path)
 {
 	static allElementIconBitmaps:=Object()
 	
@@ -1138,7 +1138,7 @@ drawElementIcon(G, p_x, p_y, p_w, p_h ,path)
 	}
 	else
 	{
-		BitmapIcon := Gdip_CreateBitmapFromFile(_ScriptDir "\" path)
+		BitmapIcon := Gdip_CreateBitmapFromFile(_ScriptDir "\source_elements\" package "\icons\" path)
 		allElementIconBitmaps[path]:=BitmapIcon
 	}
 	

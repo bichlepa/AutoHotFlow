@@ -69,7 +69,7 @@ Element_getParametrizationDetails_Action_Lock_Or_Unlock_Drive(Environment)
 	parametersToEdit.push({type: "Radio", id: "WhatDo", default: 1, choices: [x_lang("Lock drive"), x_lang("Unlock drive")], result: "enum", enum: ["Lock", "Unlock"]})
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Drive letter")})
-	parametersToEdit.push({type: "ComboBox", id: "DriveLetter", content: "string", default: defaultdrive, choices: listOfdrives, result: "name"})
+	parametersToEdit.push({type: "ComboBox", id: "DriveLetter", content: "string", default: defaultdrive, choices: listOfdrives, result: "string"})
 	
 	; request that the result of this function is never cached (because of the drive letter list)
 	parametersToEdit.updateOnEdit := true

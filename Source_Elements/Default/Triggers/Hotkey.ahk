@@ -39,7 +39,7 @@ Element_getElementLevel_Trigger_Hotkey()
 ;Icon path which will be shown in the background of the element
 Element_getIconPath_Trigger_Hotkey()
 {
-	return "Source_elements\default\icons\keyboard.png"
+	return "keyboard.png"
 }
 
 ;How stable is this element? Experimental elements will be marked and can be hidden by user.

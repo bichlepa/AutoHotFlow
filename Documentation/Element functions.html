@@ -1,0 +1,156 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<link rel="stylesheet" href="stylesheet.css">
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<H1>Element functions</H1>
+<p>The template has some functions which must be present in every element implementation.
+	<br/>The three dots <code>...</code> are placehoders for the unique element class which usually consists of element type and sub type. If you build a package, it is recommended to add a prefix to them. TODO Correct???
+	<br/>Some function have the parameter <code>Environment</code>. This variable must never be changed and is not meant to be read. It must be passed to some API functions.
+</p>
+
+<table class="variables">
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_RegisterElementClass("<code>...</code>")</h4>
+			<p>First of all this function must be called from global scope in order to register the element. Only then it will be available when AHF runs.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">Element_getElementType_<code>...</code>()</h4>
+			<p>This function returns the element type. It can be one of following values: <code>action</code>, <code>condition</code>, <code>loop</code> or <code>trigger</code></p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">Element_getName_<code>...</code>()</h4>
+			<p>This function returns the name of the element which is shown to the user in the element subtype selection menu.
+				<br/>It's recommended to use the <code>x_lang()</code> function to allow the text to be translated in other languages.
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">Element_getCategory_<code>...</code>()</h4>
+			<p>This function returns the categories of the element. The categories define the folder where the element will be put in in the subtype selection menu.
+				<br/>Usually each element has a single category. They can also have multiple categories, it will then show up in multiple folders. Use a pipe <code>|</code> to separate the categories.
+				<br/>It's recommended to use the <code>x_lang()</code> function to allow the text to be translated in other languages.
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">Element_getPackage_<code>...</code>()</h4>
+			<p>This function returns the package ID of the element. It must be same as the folder name of the package.
+				<br/>If you create a new package, the function should return the name of your package.
+				<br/>The package ID will be saved into the savefile of the flow. If the flow is imported into an AHF installation where the package is missing, it will show the warning, that the package is not installed.
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">Element_getElementLevel_<code>...</code>()</h4>
+			<p>This function returns required experience level of the user. It can be one of following values: <code>Beginner</code>, <code>Advanced</code> or <code>Programmer</code></p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">Element_getIconPath_<code>...</code>()</h4>
+			<p>This function returns the path of the icon. The origin path is the "icons" folder inside the package folder.
+				<br/>If you want to reuse an icon from the default package, you have to copy the icon file into your package.
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">Element_getStabilityLevel_<code>...</code>()</h4>
+			<p>This function returns the stability level of the element. It can be one of following values: <code>Stable</code> or <code>Experimental</code>
+				<br/><code>Stable</code> means that the element doesn't have known bugs and is fully implemented. It's also granted that there won't be any compatibility breaking changes in the future.
+				<br/><code>Experimental</code> means that the element has either known bugs or is not fully implemented. Future updates may also break the compatibility.
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">Element_getParametrizationDetails_<code>...</code>(Environment)</h4>
+			<p>This function returns the parameters of the element with details how to show them in the element settings window.
+				<br/>They are explained below.
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">Element_GenerateName_<code>...</code>(Environment, ElementParameters)</h4>
+			<p>This function returns the individual element name which can vary depending on the parameter values the user has set.
+				<br/>It can use some element API functions. They are described below.
+				<br/>It's recommended to use the <code>x_lang()</code> function to allow the text to be translated in other languages.
+			</p>
+			<p><code>ElementParameters</code> contains the element parameter values.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">Element_CheckSettings_<code>...</code>(Environment, ElementParameters, staticValues)</h4>
+			<p>This function can check the parameters while user edits them in the element settings window.
+				<br/>It can use some element API functions. They are described below.
+			</p>
+			<p><code>ElementParameters</code> contains the element parameter values.
+				<br/><code>staticValues</code> is an object which will keep data that is stored inside it while the element settings window is open.
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">Element_run_<code>...</code>(Environment, ElementParameters) <i>only actions, conditions and loops</i></h4>
+			<p>This function executes the element.
+				<br/>It can use some element API functions. They are described below.
+			</p>
+			<p><code>ElementParameters</code> contains the element parameter values.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">Element_stop_<code>...</code>(Environment, ElementParameters) <i>only actions, conditions and loops</i></h4>
+			<p>This function stops the execution of the element.
+				<br/>If a function can take a long time, it it good practice, if it is possible to stop the execution via this function.
+				<br/>It can use some element API functions. They are described below.
+			</p>
+			<p><code>ElementParameters</code> contains the element parameter values.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">Element_enable_<code>...</code>(Environment, ElementParameters) <i>only triggers</i></h4>
+			<p>This function enables a trigger.
+				<br/>It can use some element API functions. They are described below.
+			</p>
+			<p><code>ElementParameters</code> contains the element parameter values.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">Element_postTrigger_<code>...</code>(Environment, ElementParameters, TriggerData) <i>only triggers</i></h4>
+			<p>This function is called after a trigger event occured and a new execution instance has been created.
+				<br/>It can use some element API functions. They are described below.
+			</p>
+			<p><code>ElementParameters</code> contains the element parameter values.</p>
+			<p><code>TriggerData</code> may contain data which were passed with the trigger event.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">Element_disable_<code>...</code>(Environment, ElementParameters) <i>only triggers</i></h4>
+			<p>This function disables a trigger.
+				<br/>It can use some element API functions. They are described below.
+			</p>
+			<p><code>ElementParameters</code> contains the element parameter values.</p>
+		</TD>
+	</TR>
+</table>
+
+
+</BODY>
+</HTML>

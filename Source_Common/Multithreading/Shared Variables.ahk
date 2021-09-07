@@ -47,6 +47,11 @@ _LeaveCriticalSection()
 	global criticalSectionCounter
 	criticalSectionCounter--
 	
+	/*
+ 	suppress warning of "checkCriticalSection.ahk" with this comment:
+	EnterCriticalSection(_cs_shared)
+	*/
+
 	LeaveCriticalSection(_cs_shared)
 	if (criticalSectionCounter = 0)
 		Critical off

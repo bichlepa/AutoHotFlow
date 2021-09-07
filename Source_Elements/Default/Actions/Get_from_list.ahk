@@ -39,7 +39,7 @@ Element_getElementLevel_Action_Get_From_List()
 ;Icon path which will be shown in the background of the element
 Element_getIconPath_Action_Get_From_List()
 {
-	return "Source_elements\default\icons\New variable.png"
+	return "New variable.png"
 }
 
 ;How stable is this element? Experimental elements will be marked and can be hidden by user.
