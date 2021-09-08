@@ -18,7 +18,10 @@ SaveFlow(FlowID)
 	{
 		;A demo flow cannot be saved
 		logger("a0","Cannot save flow " FlowName ". It is a demonstation flow.")
-		MsgBox, 48, % lang("Save flow"), % lang("This flow cannot be saved because it is a demonstration flow.") " " lang("You may duplicate this flow first and then you can edit it.")
+		if not (_exiting)
+		{
+			MsgBox, 48, % lang("Save flow"), % lang("This flow cannot be saved because it is a demonstration flow.") " " lang("You may duplicate this flow first and then you can edit it.")
+		}
 		return
 	}
 	

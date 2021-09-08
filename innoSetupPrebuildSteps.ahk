@@ -105,12 +105,12 @@ addFilesInFolderWithExtension(AppDirList, AppFileList, "Source_Execution", "ahk"
 addFilesInFolderWithExtension(AppDirList, AppFileList, "Source_Main", "ahk", true)
 addFilesInFolderWithExtension(AppDirList, AppFileList, "Source_Manager", "ahk", true)
 
-addFilesInFolderWithExtension(AppDirList, AppFileList, "Source_Elements", "ahk", true)
-addFilesInFolderWithExtension(AppDirList, AppFileList, "Source_Elements", "html", true)
-addFilesInFolderWithExtension(AppDirList, AppFileList, "Source_Elements", "png", true)
-addFilesInFolderWithExtension(AppDirList, AppFileList, "Source_Elements", "ico", true)
-addFilesInFolderWithExtension(AppDirList, AppFileList, "Source_Elements", "ini", true)
-addFilesInFolderWithExtension(AppDirList, AppFileList, "Source_Elements", "json", true)
+addFilesInFolderWithExtension(AppDirList, AppFileList, "Source_Elements\Default", "ahk", true)
+addFilesInFolderWithExtension(AppDirList, AppFileList, "Source_Elements\Default", "html", true)
+addFilesInFolderWithExtension(AppDirList, AppFileList, "Source_Elements\Default", "png", true)
+addFilesInFolderWithExtension(AppDirList, AppFileList, "Source_Elements\Default", "ico", true)
+addFilesInFolderWithExtension(AppDirList, AppFileList, "Source_Elements\Default", "ini", true)
+addFilesInFolderWithExtension(AppDirList, AppFileList, "Source_Elements\Default", "json", true)
 
 addFile(AppDirList, AppFileList, "find modules.exe")
 addFile(AppDirList, AppFileList, "AutoHotFlow.exe")

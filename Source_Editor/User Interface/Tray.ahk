@@ -13,13 +13,14 @@ initializeTrayBar()
 	try menu, tray, deleteall
 	
 	menu, tray, add,  tray_show
+	Menu, tray, default, tray_show
 	menu, tray, rename, tray_show, % lang("Show #verb")
 
 	menu, tray, add, tray_start
 	menu, tray, rename, tray_start, % lang("Run #verb")
 
 	menu, tray, add, tray_enable
-	menu, tray, rename, tray_enable, % lang("Enable")
+	menu, tray, rename, tray_enable, % lang("Enable or disable")
 
 	menu, tray, add, Exit
 	menu, tray, rename, Exit, % lang("Exit #verb")
