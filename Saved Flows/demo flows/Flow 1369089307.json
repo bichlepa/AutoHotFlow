@@ -182,7 +182,7 @@
     "element0000000007": {
       "class": "Condition_Confirmation_Dialog",
       "ID": "element0000000007",
-      "name": "Confirmation Dialog - Endless loop, You are in an endless loop at iteration %a_index%. Do you want to continue?",
+      "name": "Confirmation dialog - Endless loop, You are in an endless loop at iteration %a_index%. Do you want to continue?",
       "package": "default",
       "pars": {
         "ButtonLabelCancel": "Cancel",
@@ -208,7 +208,7 @@
     "element0000000013": {
       "class": "Action_Message_Box",
       "ID": "element0000000013",
-      "name": "Message Box - Endlees loop - In order to quit the endlees loop properly, we need to use the \"break\" part of the loop.",
+      "name": "Message box - Endlees loop - In order to quit the endlees loop properly, we need to use the \"break\" part of the loop.",
       "package": "default",
       "pars": {
         "ButtonLabel": "OK",
@@ -261,7 +261,7 @@
       "name": "Work through a list: famousPeople",
       "package": "default",
       "pars": {
-        "Varname": "famousPeople"
+        "VarValue": "famousPeople"
       },
       "StandardName": "1",
       "type": "Loop",
@@ -271,7 +271,7 @@
     "element0000000020": {
       "class": "Action_Message_Box",
       "ID": "element0000000020",
-      "name": "Message Box - Work through list loop - We will now work through a list which contains following famous people: - %famousPeople%",
+      "name": "Message box - Work through list loop - We will now work through a list which contains following famous people: - %famousPeople%",
       "package": "default",
       "pars": {
         "ButtonLabel": "OK",
@@ -296,7 +296,7 @@
     "element0000000028": {
       "class": "Action_Message_Box",
       "ID": "element0000000028",
-      "name": "Message Box - Work through list loop - Current person at position %a_index%: %a_loopfield%",
+      "name": "Message box - Work through list loop - Current person at position %a_index%: %a_loopfield%",
       "package": "default",
       "pars": {
         "ButtonLabel": "OK",
@@ -322,7 +322,7 @@
       "class": "Loop_Parse_A_String",
       "HeightOfVerticalBar": "525",
       "ID": "element0000000030",
-      "name": "Parse A String - %a_loopfield% -   - ",
+      "name": "Parse a string - %a_loopfield% -   - ",
       "package": "default",
       "pars": {
         "Delimiters": " ",
@@ -338,7 +338,7 @@
     "element0000000032": {
       "class": "Action_Message_Box",
       "ID": "element0000000032",
-      "name": "Message Box - Work through list loop - First name is: %a_loopfield%",
+      "name": "Message box - Work through list loop - First name is: %a_loopfield%",
       "package": "default",
       "pars": {
         "ButtonLabel": "OK",
@@ -376,7 +376,7 @@
     "element0000000043": {
       "class": "Action_Message_Box",
       "ID": "element0000000043",
-      "name": "Message Box - Work through list loop - Last name is: %a_loopfield%",
+      "name": "Message box - Work through list loop - Last name is: %a_loopfield%",
       "package": "default",
       "pars": {
         "ButtonLabel": "OK",
@@ -401,7 +401,7 @@
     "element0000000048": {
       "class": "Action_Message_Box",
       "ID": "element0000000048",
-      "name": "Message Box - Finish - End of the loop demonstration and tutorial",
+      "name": "Message box - Finish - End of the loop demonstration and tutorial",
       "package": "default",
       "pars": {
         "ButtonLabel": "OK",
@@ -429,8 +429,8 @@
   "flowSettings": {
     "DefaultWorkingDir": 1,
     "ExecutionPolicy": "default",
-    "Offsetx": "-952.503498",
-    "Offsety": "601.834116",
+    "Offsetx": "-1135.041113",
+    "Offsety": "1653.326836",
     "WorkingDir": "",
     "zoomFactor": "0.525919"
   },

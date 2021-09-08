@@ -62,7 +62,7 @@ Element_getParametrizationDetails_Loop_Work_through_a_list(Environment)
 Element_GenerateName_Loop_Work_through_a_list(Environment, ElementParameters)
 {
 	global
-	return x_lang("Work_through_a_list") ": " ElementParameters.Varname 
+	return x_lang("Work_through_a_list") ": " ElementParameters.VarValue 
 }
 
 ;Called every time the user changes any parameter.
