@@ -111,7 +111,7 @@
       "class": "Trigger_Window_Gets_Active",
       "enabled": "0",
       "ID": "element0000000007",
-      "name": "Window Gets Active:  - Title begins with: TestWindowTitle",
+      "name": "Window gets active:  - Title begins with: TestWindowTitle",
       "package": "default",
       "pars": {
         "ahk_class": "",
@@ -136,7 +136,7 @@
     "element0000000053": {
       "class": "Trigger_Manual",
       "DefaultTrigger": "1",
-      "enabled": "1",
+      "enabled": "0",
       "ID": "element0000000053",
       "name": "Manual - \"Trigger happy message\"",
       "package": "default",
@@ -151,7 +151,7 @@
     "element0000000057": {
       "class": "Action_Message_Box",
       "ID": "element0000000057",
-      "name": "Message Box - TestWindowTitle - This should disapper soon",
+      "name": "Message box - TestWindowTitle - This should disapper soon",
       "package": "default",
       "pars": {
         "ButtonLabel": "OK",
@@ -176,7 +176,7 @@
     "element0000000063": {
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000063",
-      "name": "Set Flow Status - Enable: This flow - Window Gets Active:  - Title begins with: TestWindowTitle",
+      "name": "Set flow status - Enable: This flow - Window gets active:  - Title begins with: TestWindowTitle",
       "package": "default",
       "pars": {
         "Enable": "Enable",
@@ -193,7 +193,7 @@
     "element0000000065": {
       "class": "Condition_Window_Active",
       "ID": "element0000000065",
-      "name": "Window Active:  - Title begins with: TestWindowTitle",
+      "name": "Window active:  - Title begins with: TestWindowTitle",
       "package": "default",
       "pars": {
         "ahk_class": "",
@@ -216,7 +216,7 @@
     "element0000000067": {
       "class": "Action_Close_Window",
       "ID": "element0000000067",
-      "name": "Close Window:  - Title begins with: TestWindowTitle",
+      "name": "Close window:  - Title begins with: TestWindowTitle",
       "package": "default",
       "pars": {
         "ahk_class": "",
@@ -240,7 +240,7 @@
     "element0000000069": {
       "class": "Action_Tooltip",
       "ID": "element0000000069",
-      "name": "Tooltip: success - 2 s - Follow Mouse",
+      "name": "Tooltip: success - 2 s - Follow mouse",
       "package": "action",
       "pars": {
         "duration": 2,
@@ -256,7 +256,7 @@
     "element0000000070": {
       "class": "Condition_Window_Active",
       "ID": "element0000000070",
-      "name": "Window Active:  - Title begins with: wrongTitle",
+      "name": "Window active:  - Title begins with: wrongTitle",
       "package": "default",
       "pars": {
         "ahk_class": "",
@@ -279,7 +279,7 @@
     "element0000000074": {
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000074",
-      "name": "Set Flow Status - Disable: This flow - Window Gets Active:  - Title begins with: TestWindowTitle",
+      "name": "Set flow status - Disable: This flow - Window gets active:  - Title begins with: TestWindowTitle",
       "package": "default",
       "pars": {
         "Enable": "Disable",
@@ -296,7 +296,7 @@
     "element0000000079": {
       "class": "Action_Message_Box",
       "ID": "element0000000079",
-      "name": "Message Box - TestWindowTitle - This should disapper soon",
+      "name": "Message box - TestWindowTitle - This should disapper soon",
       "package": "default",
       "pars": {
         "ButtonLabel": "OK",
@@ -321,7 +321,7 @@
     "element0000000080": {
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000080",
-      "name": "Set Flow Status - Enable: This flow - Window Opens:  - Title begins with: TestWindowTitle",
+      "name": "Set flow status - Enable: This flow - Window Opens:  - Title begins with: TestWindowTitle",
       "package": "default",
       "pars": {
         "Enable": "Enable",
@@ -339,7 +339,7 @@
       "class": "Trigger_Window_Opens",
       "enabled": "0",
       "ID": "element0000000083",
-      "name": "Window Opens:  - Title begins with: TestWindowTitle",
+      "name": "Window opens:  - Title begins with: TestWindowTitle",
       "package": "default",
       "pars": {
         "ahk_class": "",
@@ -364,7 +364,7 @@
     "element0000000084": {
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000084",
-      "name": "Set Flow Status - Disable: This flow - Window Opens:  - Title begins with: TestWindowTitle",
+      "name": "Set flow status - Disable: This flow - Window opens:  - Title begins with: TestWindowTitle",
       "package": "default",
       "pars": {
         "Enable": "Disable",
@@ -381,7 +381,7 @@
     "element0000000086": {
       "class": "Condition_Window_Exists",
       "ID": "element0000000086",
-      "name": "Window Exists:  - Title begins with: TestWindowTitle",
+      "name": "Window exists:  - Title begins with: TestWindowTitle",
       "package": "default",
       "pars": {
         "ahk_class": "",
@@ -404,7 +404,7 @@
     "element0000000087": {
       "class": "Action_Close_Window",
       "ID": "element0000000087",
-      "name": "Close Window:  - Window ID: %a_windowID%",
+      "name": "Close window:  - Window ID: %a_windowID%",
       "package": "default",
       "pars": {
         "ahk_class": "",
@@ -428,7 +428,7 @@
     "element0000000088": {
       "class": "Condition_Window_Exists",
       "ID": "element0000000088",
-      "name": "Window Exists:  - Title begins with: wrongTitle",
+      "name": "Window exists:  - Title begins with: wrongTitle",
       "package": "default",
       "pars": {
         "ahk_class": "",
@@ -451,7 +451,7 @@
     "element0000000097": {
       "class": "Action_Message_Box",
       "ID": "element0000000097",
-      "name": "Message Box - TestWindowTitle - This should disapper soon",
+      "name": "Message box - TestWindowTitle - This should disapper soon",
       "package": "default",
       "pars": {
         "ButtonLabel": "OK",

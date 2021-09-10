@@ -2321,16 +2321,12 @@ class ElementSettings
 
 			; decide whether we need the altSubmit keyword
 			tempAltSubmit := ""
-			if (parameter.result = "string")
-			{
-				tempAltSubmit := "altSubmit"
-			}
 			
 			; create the gui elements
 			gui, font, s8 cDefault wnorm
 
 			; add the listbox control
-			gui, add, listbox, w400 x10 %tempMulti% %tempSort% %tempAltSubmit% hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID%, %tempAllChoices%
+			gui, add, listbox, w400 x10 %tempMulti% %tempSort% altSubmit hwndtempHWND gGUISettingsOfElementGeneralUpdate vGUISettingsOfElement%tempParameterID%, %tempAllChoices%
 			this.components.push("GUISettingsOfElement" tempParameterID)
 			ElementSettings.fieldHWNDs[tempHWND] := this
 			
@@ -2387,7 +2383,7 @@ class ElementSettings
 				local found := false
 				for tempindexChosen, tempLabelChosen in value
 				{
-					for tempindexChoice, tempLabelChoice in this.choices
+					for tempindexChoice, tempLabelChoice in this.par_choices
 					{
 						if (tempLabelChoice = tempLabelChosen)
 						{

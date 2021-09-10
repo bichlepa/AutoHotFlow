@@ -1,0 +1,1 @@
+There is a documentation how to use the element template creator and much more in the folder "Documentation".

@@ -108,9 +108,17 @@ x_GetMyUniqueExecutionID(Environment)
 {
 	return xx_GetMyUniqueExecutionID(Environment)
 }
+x_GetMyUniqueTriggerID(Environment)
+{
+	return xx_GetMyUniqueTriggerID(Environment)
+}
 x_GetMyEnvironmentFromExecutionID(p_ExecutionID)
 {
 	return xx_GetMyEnvironmentFromExecutionID(p_ExecutionID)
+}
+x_GetMyEnvironmentFromTriggerID(p_TriggerID)
+{
+	return xx_GetMyEnvironmentFromTriggerID(p_TriggerID)
 }
 x_SetExecutionValue(Environment, p_name, p_Value)
 {

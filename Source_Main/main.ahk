@@ -2,7 +2,7 @@
 ;#Warn  ; Recommended for catching common errors.
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
 
-global _AHF_VERSION := "1.0.3"
+global _AHF_VERSION := "1.0.4"
 
 ; do not warn if a continuable exception occurs (it happens often when AHF is closing)
 #WarnContinuableException off
@@ -304,6 +304,23 @@ global_libInclusionsForThreads =
 #include source_Elements\Default\triggers\Process_starts.ahk
 #include source_Elements\Default\triggers\Start_up.ahk
 #include source_Elements\Default\triggers\AutoHotkey_Script.ahk
+#include source_Elements\Pauls Spielwiese\actions\none.ahk
+#include source_Elements\Pauls Spielwiese\actions\custom_gui.ahk
+#include source_Elements\Pauls Spielwiese\actions\separate_thread.ahk
+#include source_Elements\Pauls Spielwiese\actions\window_selector.ahk
+#include source_Elements\Pauls Spielwiese\conditions\none.ahk
+#include source_Elements\Pauls Spielwiese\conditions\custom_gui.ahk
+#include source_Elements\Pauls Spielwiese\conditions\separate_thread.ahk
+#include source_Elements\Pauls Spielwiese\conditions\window_selector.ahk
+#include source_Elements\Pauls Spielwiese\loops\none.ahk
+#include source_Elements\Pauls Spielwiese\loops\custom_gui.ahk
+#include source_Elements\Pauls Spielwiese\loops\separate_thread.ahk
+#include source_Elements\Pauls Spielwiese\loops\window_selector.ahk
+#include source_Elements\Pauls Spielwiese\triggers\none.ahk
+#include source_Elements\Pauls Spielwiese\triggers\custom_gui.ahk
+#include source_Elements\Pauls Spielwiese\triggers\separate_thread.ahk
+#include source_Elements\Pauls Spielwiese\triggers\window_selector.ahk
+#include source_Elements\Pauls Spielwiese\triggers\custom.ahk
 
 global_elementInclusionsForThreads = 
 (
@@ -446,6 +463,23 @@ global_elementInclusionsForThreads =
 #include source_Elements\Default\triggers\Process_starts.ahk
 #include source_Elements\Default\triggers\Start_up.ahk
 #include source_Elements\Default\triggers\AutoHotkey_Script.ahk
+#include source_Elements\Pauls Spielwiese\actions\none.ahk
+#include source_Elements\Pauls Spielwiese\actions\custom_gui.ahk
+#include source_Elements\Pauls Spielwiese\actions\separate_thread.ahk
+#include source_Elements\Pauls Spielwiese\actions\window_selector.ahk
+#include source_Elements\Pauls Spielwiese\conditions\none.ahk
+#include source_Elements\Pauls Spielwiese\conditions\custom_gui.ahk
+#include source_Elements\Pauls Spielwiese\conditions\separate_thread.ahk
+#include source_Elements\Pauls Spielwiese\conditions\window_selector.ahk
+#include source_Elements\Pauls Spielwiese\loops\none.ahk
+#include source_Elements\Pauls Spielwiese\loops\custom_gui.ahk
+#include source_Elements\Pauls Spielwiese\loops\separate_thread.ahk
+#include source_Elements\Pauls Spielwiese\loops\window_selector.ahk
+#include source_Elements\Pauls Spielwiese\triggers\none.ahk
+#include source_Elements\Pauls Spielwiese\triggers\custom_gui.ahk
+#include source_Elements\Pauls Spielwiese\triggers\separate_thread.ahk
+#include source_Elements\Pauls Spielwiese\triggers\window_selector.ahk
+#include source_Elements\Pauls Spielwiese\triggers\custom.ahk
 
 )
 

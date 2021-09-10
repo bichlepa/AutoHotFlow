@@ -340,7 +340,7 @@
     "element0000000002": {
       "class": "Trigger_Manual",
       "DefaultTrigger": "1",
-      "enabled": "1",
+      "enabled": "0",
       "ID": "element0000000002",
       "name": "Manual - \"loop test\"",
       "package": "default",
@@ -380,12 +380,12 @@
       "class": "Loop_Work_through_a_list",
       "HeightOfVerticalBar": 1365,
       "ID": "element0000000004",
-      "name": "Work through a list: ",
+      "name": "Work through a list: testListFirst",
       "package": "default",
       "pars": {
         "VarValue": "testListFirst"
       },
-      "StandardName": 1,
+      "StandardName": "1",
       "type": "Loop",
       "x": "245",
       "y": "490"
@@ -418,7 +418,7 @@
       "class": "Loop_Work_through_a_list",
       "HeightOfVerticalBar": "525",
       "ID": "element0000000006",
-      "name": "Work through a list: ",
+      "name": "Work through a list: testlist2",
       "package": "default",
       "pars": {
         "VarValue": "testlist2"
@@ -431,7 +431,7 @@
     "element0000000009": {
       "class": "Action_Trace_Point",
       "ID": "element0000000009",
-      "name": "Trace Point - bright leg - With stop condition",
+      "name": "Trace point - bright leg - With stop condition",
       "package": "default",
       "pars": {
         "ID": "bright leg",
@@ -446,7 +446,7 @@
     "element0000000011": {
       "class": "Action_Trace_Point",
       "ID": "element0000000011",
-      "name": "Trace Point - bright leg2 - With stop condition",
+      "name": "Trace point - bright leg2 - With stop condition",
       "package": "default",
       "pars": {
         "ID": "bright leg2",
@@ -461,7 +461,7 @@
     "element0000000012": {
       "class": "Action_Trace_Point_Check",
       "ID": "element0000000012",
-      "name": "Trace Point Check - Must pass all trace points",
+      "name": "Trace point check - Must pass all trace points",
       "package": "default",
       "pars": {
         "MustNotPassTracepoints": [
@@ -602,7 +602,7 @@
     "element0000000056": {
       "class": "Action_Trace_Point",
       "ID": "element0000000056",
-      "name": "Trace Point - index5",
+      "name": "Trace point - index5",
       "package": "default",
       "pars": {
         "ID": "index5",
@@ -645,7 +645,7 @@
     "element0000000062": {
       "class": "Action_Trace_Point",
       "ID": "element0000000062",
-      "name": "Trace Point - index6",
+      "name": "Trace point - index6",
       "package": "default",
       "pars": {
         "ID": "index6",
@@ -701,7 +701,7 @@
     "element0000000075": {
       "class": "Action_Trace_Point",
       "ID": "element0000000075",
-      "name": "Trace Point - index3",
+      "name": "Trace point - index3",
       "package": "default",
       "pars": {
         "ID": "index3",
@@ -717,7 +717,7 @@
       "class": "Loop_Parse_A_String",
       "HeightOfVerticalBar": "350",
       "ID": "element0000000081",
-      "name": "Parse A String - Hello real world, Hello virtual world - , - %a_space%%a_tab%",
+      "name": "Parse a string - Hello real world, Hello virtual world - , - %a_space%%a_tab%",
       "package": "default",
       "pars": {
         "Delimiters": ",",
@@ -820,10 +820,10 @@
   "flowSettings": {
     "DefaultWorkingDir": 1,
     "ExecutionPolicy": "default",
-    "Offsetx": "-1852.797203",
-    "Offsety": "1236.483530",
+    "Offsetx": "-805.621357",
+    "Offsety": "-35.150183",
     "WorkingDir": "",
-    "zoomFactor": "0.184333"
+    "zoomFactor": "0.700004"
   },
   "name": "Loop test"
 }

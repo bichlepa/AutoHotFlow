@@ -36,7 +36,7 @@ Element_getElementLevel_Action_HTTP_Request()
 	return "Advanced"
 }
 
-;Icon path which will be shown in the background of the element
+;Icon file name which will be shown in the background of the element
 Element_getIconPath_Action_HTTP_Request()
 {
 }

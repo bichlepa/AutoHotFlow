@@ -24,7 +24,7 @@ Element_getCategory_&ElementType&_&Name&()
 ;where it will be possible to install additional add-ons which provide more elements.
 Element_getPackage_&ElementType&_&Name&()
 {
-	return "default"
+	return "&package&"
 }
 
 ;Minimum user experience to use this element.
@@ -33,14 +33,14 @@ Element_getPackage_&ElementType&_&Name&()
 Element_getElementLevel_&ElementType&_&Name&()
 {
 	;"Beginner" or "Advanced" or "Programmer"
-	return "Beginner"
+	return "&Level&"
 }
 
-;Icon path which will be shown in the background of the element
+;Icon file name which will be shown in the background of the element
 Element_getIconPath_&ElementType&_&Name&()
 {
 #if icon
-	return "Source_elements\default\icons\&icon&"
+	return "&icon&"
 #endif ;icon
 }
 
@@ -105,7 +105,7 @@ Element_getParametrizationDetails_&ElementType&_&Name&(Environment)
 	parametersToEdit.push({type: "Folder", id: "folder", label: lang("Select a folder")})
 #endif ;par_folder
 #if par_button
-	parametersToEdit.push({type: "button", id: "button", goto: "&ElementType&_&Name&_ButtonClick", label: lang("Get coordinates")})
+	parametersToEdit.push({type: "button", id: "button", goto: "&ElementType&_&Name&_ButtonClick", label: lang("Click me")})
 #endif ;par_button
 	
 #if addWindowSelector
@@ -141,18 +141,11 @@ Element_CheckSettings_&ElementType&_&Name&(Environment, ElementParameters, stati
 }
 
 
-#if ElementType = action | condition | loop
 ;Called when the element should execute.
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 {
-#if ElementType = Loop
-	entryPoint := x_getEntryPoint(environment)
-	
-	if (entryPoint = "Head") ;Initialize loop
-	{
-#endif ;ElementType = Loop
-	EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters)
+	EvaluatedParameters := x_AutoEvaluateParameters(Environment, ElementParameters)
 	if (EvaluatedParameters._error)
 	{
 		x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
@@ -173,18 +166,18 @@ Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 #endif ;par_radioEnum
 #if par_editstring 
 
-	editstringValue := x_replaceVariables(Environment,ElementParameters.editstring)
+	editstringValue := x_replaceVariables(Environment, ElementParameters.editstring)
 #endif ;par_editstring
 #if par_editExpression 
 
-	evRes := x_evaluateExpression(Environment,ElementParameters.editExpression)
+	evRes := x_evaluateExpression(Environment, ElementParameters.editExpression)
 	if (evRes.error)
 	{
 		;On error, finish with exception and return
 		x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.editExpression) "`n`n" evRes.error) 
 		return
 	}
-	editExpressionValue:=evRes.result
+	editExpressionValue := evRes.result
 	if editExpressionValue is not number
 	{
 		x_finish(Environment, "exception", lang("%1% is not a number: %2%",lang("Expression value"), editExpressionValue))
@@ -193,7 +186,7 @@ Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 #endif ;par_editExpression
 #if par_editStringOrExpression 
 
-	if (ElementParameters.Expression = 2)
+	if (ElementParameters.Expression = "expression")
 	{
 		evRes := x_EvaluateExpression(Environment, ElementParameters.editStringOrExpression)
 		if (evRes.error)
@@ -204,7 +197,7 @@ Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 		}
 		else
 		{
-			editStringOrExpressionValue:=evRes.result
+			editStringOrExpressionValue := evRes.result
 		}
 	}
 	else
@@ -233,7 +226,7 @@ Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 		x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.editTwoExpressions1) "`n`n" evRes.error) 
 		return
 	}
-	editTwoExpressions1Value:=evRes.result
+	editTwoExpressions1Value := evRes.result
 	evRes := x_evaluateExpression(Environment,ElementParameters.editTwoExpressions2)
 	if (evRes.error)
 	{
@@ -241,7 +234,7 @@ Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 		x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.editTwoExpressions2) "`n`n" evRes.error) 
 		return
 	}
-	editTwoExpressions2Value:=evRes.result
+	editTwoExpressions2Value := evRes.result
 #endif ;par_editTwoExpressions
 #if par_DropDownString 
 
@@ -253,7 +246,7 @@ Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 #endif ;par_ComboBoxString
 #if par_ListBoxString 
 
-	ListBoxStringValue:=ElementParameters.ListBoxString
+	ListBoxStringValue := ElementParameters.ListBoxString
 	for oneListBoxStringIndex, oneListBoxString in ListBoxStringValue
 	{
 		;Do anything with oneListBoxString
@@ -261,7 +254,7 @@ Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 #endif ;par_ListBoxString
 #if par_Slider
 
-	evRes := x_evaluateExpression(Environment,ElementParameters.Slider)
+	evRes := x_evaluateExpression(Environment, ElementParameters.Slider)
 	if (evRes.error)
 	{
 		;On error, finish with exception and return
@@ -277,342 +270,6 @@ Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 	if not FileExist(fileValue)
 	{
 		x_finish(Environment, "exception", lang("%1% '%2%' does not exist.",lang("File"), fileValue)) 
-		return
-	}
-#endif ;par_file
-#if par_folder
-
-	folderValue := x_GetFullPath(Environment, x_replaceVariables(Environment, ElementParameters.folder))
-#endif ;par_folder
-#endif ;ElementType = action | condition | loop
-
-#if addWindowSelector
-
-	; evaluate window parameters
-	EvaluatedWindowParameters := windowFunctions_evaluateWindowParameters(EvaluatedParameters)
-	if (EvaluatedWindowParameters.exception)
-	{
-		x_finish(Environment, "exception", EvaluatedWindowParameters.exception)
-		return
-	}
-
-	; get window ID
-	windowID := windowFunctions_getWindowID(EvaluatedWindowParameters)
-	if (windowID.exception)
-	{
-		x_finish(Environment, "exception", windowID.exception)
-		return
-	}
-	
-#if !ElementType = Loop
-	if not windowID
-	{
-#if ElementType = action
-		x_finish(Environment, "exception", lang("Error! Seeked window does not exist")) 
-#endif ;ElementType = action
-#if ElementType = condition
-		x_finish(Environment, "no")
-#endif ;ElementType = condition
-		return
-	}
-	
-	x_SetVariable(Environment,"A_WindowID",tempWinid,"Thread") ;Example code. Remove it
-	;Do some actions here
-#if ElementType = action
-	x_finish(Environment, "normal")
-#endif ;ElementType = action
-#if ElementType = condition
-	x_finish(Environment, "yes")
-#endif ;ElementType = condition
-	
-#endif ;addWindowSelector
-#endif ;!ElementType = Loop
-
-	x_SetVariable(Environment,Varname,VarValue) ;Example
-#if ElementType = action
-#if !addWindowSelector
-#if !addSeparateAhkThread
-#if !addCustomGUI
-	MsgBox Hello World
-	x_finish(Environment,"normal")
-	return
-#endif ;!addCustomGUI
-#endif ;!addSeparateAhkThread
-#endif ;!addWindowSelector
-#endif ;ElementType = action
-	
-#if ElementType = condition
-#if !addWindowSelector
-#if !addSeparateAhkThread
-#if !addCustomGUI
-	MsgBox, 4, Choose, Yes or no
-	IfMsgBox yes
-		x_finish(Environment,"yes")
-	else
-		x_finish(Environment,"no")
-		
-	return
-	
-#endif ;!addCustomGUI
-#endif ;!addSeparateAhkThread
-#endif ;!addWindowSelector
-#endif ;ElementType = condition
-
-#if addCustomGUI
-	guiID:=x_GetMyUniqueExecutionID(Environment)
-	gui,%guiID%:+label&ElementType&_&Name&_On
-	
-	gui,%guiID%:add,button,g&ElementType&_&Name&_ChangeButtonText, Change button text
-	gui,%guiID%:add,button,g&ElementType&_&Name&_OnClose, Close this window
-	
-	gui,%guiID%:show
-#endif ;addCustomGUI
-
-#if addSeparateAhkThread
-	;Unfortunately we can't use the function lang() inside the exported code. But we can export them inside variables befor use.
-	inputVars:={header: lang("Hello"), message: lang("Input some text")}
-	outputVars:=["enteredText"]
-	outputVars.push("resultmessage","result") ;We use those variables to find out whether an error was found during execution 
-	code =
-	( ` , LTrim %
-		InputBox,enteredText, %header%, %message%
-		if errorlevel
-		{
-			result := "exception"
-			resultmessage := "User dismissed the dialog."
-		}
-		else
-		{
-			result := "normal"
-		}
-	)
-	;We want later to translate the text inside message. Add the text here inside comments, so the translation tool can find it.
-	;Translations: lang("User dismissed the dialog.")
-	 
-	functionObject := x_NewFunctionObject(Environment, "&ElementType&_&Name&_FinishExecution", ElementParameters)
-	x_SetExecutionValue(Environment, "functionObject", functionObject)
-	x_SetExecutionValue(Environment, "Varname", Varname)
-	x_ExecuteInNewAHKThread(Environment, functionObject, code, inputVars, outputVars)
-#endif ;addSeparateAhkThread
-	
-#if ElementType = Loop
-		x_SetVariable(Environment, "A_Index", 1, "loop")
-		x_finish(Environment, "head")
-	}
-	else if (entryPoint = "Tail") ;Continue loop
-	{
-		index := x_GetVariable(Environment, "A_Index")
-		index++
-		
-		if (true) ;add here a decision
-		{
-			x_SetVariable(Environment, "A_Index", index, "loop")
-			x_finish(Environment, "head") ;Continue with next iteration
-		}
-		else
-		{
-			x_finish(Environment, "tail") ;Leave the loop
-		}
-		
-	}
-	else if (entryPoint = "Break") ;Break loop
-	{
-		x_finish(Environment, "tail") ;Leave the loop
-		
-	}
-	else
-	{
-		;This should never happen, but I suggest to keep this code for catching bugs in AHF.
-		x_finish(Environment, "exception", lang("No information whether the connection leads into head or tail"))
-	}
-#endif ;ElementType = Loop
-}
-
-#if addCustomGUI
-;Handle user input
-&ElementType&_&Name&_OnClose()
-{
-	Environment:=x_GetMyEnvironmentFromExecutionID(A_Gui)
-	gui,destroy
-	x_finish(Environment,"normal")
-}
-&ElementType&_&Name&_ChangeButtonText()
-{
-	guicontrol,,%A_GuiControl% ,Button text changed
-}
-
-#endif ;addCustomGUI
-
-;Called when the execution of the element should be stopped.
-;If the task in Element_run_...() takes more than several seconds, then it is up to you to make it stoppable.
-Element_stop_&ElementType&_&Name&(Environment, ElementParameters)
-{
-#if addCustomGUI
-	;Close window if currently opened
-	guiID:=x_GetMyUniqueExecutionID(Environment)
-	gui,%guiID%:destroy
-#endif ;addCustomGUI
-#if addSeparateAhkThread
-	x_ExecuteInNewAHKThread_Stop(Environment)
-#endif ;addSeparateAhkThread
-}
-
-
-#if addSeparateAhkThread
-&ElementType&_&Name&_FinishExecution(Environment, values, ElementParameters)
-{
-	if (values.result="normal")
-	{
-		varname := x_GetExecutionValue(Environment, "Varname")
-		selectedFile:=values.selectedFile ;Do something with the result
-		x_finish(Environment,values.result, values.message)
-	}
-	else
-	{
-		if (values.resultmessage)
-		{
-			x_finish(Environment,"exception", lang(values.resultmessage))
-		}
-		else
-		{
-			x_finish(Environment,"exception", lang("Unknown error"))
-		}
-	}
-	
-}
-#endif ;addSeparateAhkThread
-#endif ;ElementType = action | condition | loop
-
-#if ElementType = trigger
-;Called when the trigger is activated
-Element_enable_&ElementType&_&Name&(Environment, ElementParameters)
-{
-	
-	EvaluatedParameters:=x_AutoEvaluateParameters(Environment, ElementParameters)
-	if (EvaluatedParameters._error)
-	{
-		x_enabled(Environment, "exception", EvaluatedParameters._errorMessage) 
-		return
-	}
-#if customParameterEvaluation
-#if par_checkbox 
-
-	checkboxValue := ElementParameters.checkbox
-#endif ;par_checkbox
-#if par_radio 
-
-	radioValue := ElementParameters.radio
-#endif ;par_radio
-#if par_radioEnum
-
-	radioEnumValue := ElementParameters.radioEnum
-#endif ;par_radioEnum
-#if par_editstring 
-
-	editstringValue := x_replaceVariables(Environment,ElementParameters.editstring)
-#endif ;par_editstring
-#if par_editExpression 
-
-	evRes := x_evaluateExpression(Environment,ElementParameters.editExpression)
-	if (evRes.error)
-	{
-		;On error, finish with exception and return
-		x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.editExpression) "`n`n" evRes.error) 
-		return
-	}
-	editExpressionValue:=evRes.result
-	if editExpressionValue is not number
-	{
-		x_finish(Environment, "exception", lang("%1% is not a number: %2%",lang("Expression value"), editExpressionValue))
-		return
-	}
-#endif ;par_editExpression
-#if par_editStringOrExpression 
-
-	if (ElementParameters.Expression = 2)
-	{
-		evRes := x_EvaluateExpression(Environment, ElementParameters.editStringOrExpression)
-		if (evRes.error)
-		{
-			;On error, finish with exception and return
-			x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.editStringOrExpression) "`n`n" evRes.error) 
-			return
-		}
-		else
-		{
-			editStringOrExpressionValue:=evRes.result
-		}
-	}
-	else
-		editStringOrExpressionValue := x_replaceVariables(Environment, ElementParameters.editStringOrExpression)
-#endif ;par_editStringOrExpression
-#if par_editVariableName
-
-	editVariableNameValue := x_replaceVariables(Environment, ElementParameters.editVariableName)
-	if not x_CheckVariableName(editVariableNameValue)
-	{
-		;On error, finish with exception and return
-		x_finish(Environment, "exception", lang("%1% is not valid", lang("Ouput variable name '%1%'", editVariableName)))
-		return
-	}
-#endif ;par_editVariableName
-#if par_editMultiLine
-
-	editMultiLineValue := x_replaceVariables(Environment, ElementParameters.editMultiLine)
-#endif ;par_editMultiLine
-#if par_editTwoExpressions
-
-	evRes := x_evaluateExpression(Environment,ElementParameters.editTwoExpressions1)
-	if (evRes.error)
-	{
-		;On error, finish with exception and return
-		x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.editTwoExpressions1) "`n`n" evRes.error) 
-		return
-	}
-	editTwoExpressions1Value:=evRes.result
-	evRes := x_evaluateExpression(Environment,ElementParameters.editTwoExpressions2)
-	if (evRes.error)
-	{
-		;On error, finish with exception and return
-		x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.editTwoExpressions2) "`n`n" evRes.error) 
-		return
-	}
-	editTwoExpressions2Value:=evRes.result
-#endif ;par_editTwoExpressions
-#if par_DropDownString 
-
-	DropDownStringValue := ElementParameters.DropDownString
-#endif ;par_DropDownString
-#if par_ComboBoxString
-
-	ComboBoxStringValue := x_replaceVariables(Environment, ElementParameters.ComboBoxString) 
-#endif ;par_ComboBoxString
-#if par_ListBoxString 
-
-	ListBoxStringValue:=ElementParameters.ListBoxString
-	for oneListBoxStringIndex, oneListBoxString in ListBoxStringValue
-	{
-		;Do anything with oneListBoxString
-	}
-#endif ;par_ListBoxString
-#if par_Slider
-
-	evRes := x_evaluateExpression(Environment,ElementParameters.Slider)
-	if (evRes.error)
-	{
-		;On error, finish with exception and return
-		x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.Slider) "`n`n" evRes.error) 
-		return
-	}
-	SliderValue:=evRes.result
-
-#endif ;par_Slider
-#if par_file 
-
-	fileValue := x_GetFullPath(Environment, x_replaceVariables(Environment, ElementParameters.file))
-	if not FileExist(fileValue)
-	{
-		x_enabled(Environment, "exception", lang("%1% '%2%' does not exist.",lang("File"), fileValue)) 
 		return
 	}
 #endif ;par_file
@@ -639,71 +296,125 @@ Element_enable_&ElementType&_&Name&(Environment, ElementParameters)
 		x_finish(Environment, "exception", windowID.exception)
 		return
 	}
+	
 	if not windowID
 	{
-		x_enabled(Environment, "exception", lang("Error! Seeked window does not exist")) 
+		x_finish(Environment, "no")
 		return
 	}
-
-	x_SetTriggerValue(Environment, "windowID", tempWinid)
-#endif ;addWindowSelector
 	
+	; write found window ID as thread variable
+	x_SetVariable(Environment, "A_WindowID", windowID, "Thread") ;Example code. Remove it
+	;Do some actions here
+	x_finish(Environment, "yes")
+	
+#endif ;addWindowSelector
+
+	x_SetVariable(Environment, Varname, VarValue) ;Example
+	
+#if addNothing
+	MsgBox, 4, Choose, Yes or no
+	IfMsgBox yes
+		x_finish(Environment, "yes")
+	else
+		x_finish(Environment, "no")
+		
+	return
+	
+#endif ;addNothing
+
+#if addCustomGUI
+	guiID := x_GetMyUniqueExecutionID(Environment)
+	gui, %guiID%: +label&ElementType&_&Name&_On
+	
+	gui, %guiID%: add, button, g&ElementType&_&Name&_ChangeButtonText, Change button text
+
+	gui, %guiID%: add, button, g&ElementType&_&Name&_OnCloseYes, Yes
+	gui, %guiID%: add, button, g&ElementType&_&Name&_OnCloseNo, No
+	
+	gui, %guiID%: show
+#endif ;addCustomGUI
+
 #if addSeparateAhkThread
-	inputVars:={key: "F12"} ;Variables which will be available in the external scriptExample
-	outputVars:=["returnValue"]
+	;Unfortunately we can't use the function lang() inside the exported code. But we can export them inside variables befor use.
+	inputVars := {header: lang("Hello"), message: lang("Input some text")}
+	outputVars := ["enteredText"]
+	outputVars.push("resultmessage", "result") ;We use those variables to find out whether an error was found during execution 
 	code =
 	( ` , LTrim %
-		loop
+		InputBox, enteredText, %header%, %message%
+		if errorlevel
 		{
-			KeyWait,%key%,D ;Example
-			returnValue:="Hello " a_now ;Example
-			x_trigger()
-			KeyWait,%key% ;Example
-			
+			result := "no"
+			resultmessage := "User dismissed the dialog."
+		}
+		else
+		{
+			result := "yes"
 		}
 	)
-	
-	x_TriggerInNewAHKThread(Environment, code, inputVars, outputVars)
-#else ;addWindowSelector
-	functionObject:= x_NewFunctionObject(environment, "&ElementType&_&Name&_Trigger", EvaluatedParameters)
-	x_SetTriggerValue(environment, "functionObject", functionObject)
-	SetTimer, % functionObject, -1000 ;Example
-	
-#endif ;else addSeparateAhkThread
-	x_enabled(Environment, "normal")
-}
+	;We want later to translate the text inside message. Add the text here inside comments, so the translation tool can find it.
+	;Translations: lang("User dismissed the dialog.")
 
-#if !addSeparateAhkThread
-;Function which triggers the flow
-&ElementType&_&Name&_Trigger(environment, EvaluatedParameters)
-{
-	x_trigger(Environment)
-}
-#endif ;!addSeparateAhkThread
-
-;Called after the trigger has triggered.
-;Here you can for example define the variables which are provided by the triggers.
-Element_postTrigger_&ElementType&_&Name&(Environment, ElementParameters, TriggerData)
-{
-#if addSeparateAhkThread
-	x_ImportInstanceVars(Environment, TriggerData)
+	;create a function object as callback for the other AHK thread
+	functionObject := x_NewFunctionObject(Environment, "&ElementType&_&Name&_FinishExecution", ElementParameters)
+	x_SetExecutionValue(Environment, "functionObject", functionObject)
+	x_SetExecutionValue(Environment, "Varname", Varname)
+	;Start new AHK thread
+	x_ExecuteInNewAHKThread(Environment, functionObject, code, inputVars, outputVars)
 #endif ;addSeparateAhkThread
 
-#if addWindowSelector
-	tempWinid:=x_getExecutionValue(Environment, "windowID")
-	x_SetVariable(Environment,"A_WindowID",tempWinid,"Thread")
-#endif ;addWindowSelector
 }
 
-;Called when the trigger should be disabled.
-Element_disable_&ElementType&_&Name&(Environment, ElementParameters)
+#if addCustomGUI
+;Handle user input
+
+&ElementType&_&Name&_OnCloseYes()
 {
-	functionObject := x_GetTriggerValue(environment, "functionObject")
-	SetTimer, % functionObject, delete
-	x_disabled(Environment, "normal")
+	Environment := x_GetMyEnvironmentFromExecutionID(A_Gui)
+	gui, destroy
+	x_finish(Environment, "yes")
+}
+&ElementType&_&Name&_OnCloseNo()
+{
+	Environment := x_GetMyEnvironmentFromExecutionID(A_Gui)
+	gui, destroy
+	x_finish(Environment, "no")
 }
 
-#endif ;ElementType = trigger
+&ElementType&_&Name&_ChangeButtonText()
+{
+	guicontrol,, %A_GuiControl%, Button text changed
+}
+
+#endif ;addCustomGUI
+
+;Called when the execution of the element should be stopped.
+;If the task in Element_run_...() takes more than several seconds, then it is up to you to make it stoppable.
+Element_stop_&ElementType&_&Name&(Environment, ElementParameters)
+{
+#if addCustomGUI
+	;Close window if currently opened
+	guiID := x_GetMyUniqueExecutionID(Environment)
+	gui, %guiID%: destroy
+#endif ;addCustomGUI
+#if addSeparateAhkThread
+	;Stop AHK thread
+	x_ExecuteInNewAHKThread_Stop(Environment)
+#endif ;addSeparateAhkThread
+}
+
+
+#if addSeparateAhkThread
+&ElementType&_&Name&_FinishExecution(Environment, ElementParameters, values)
+{
+	if (values.result = "yes")
+	{
+		x_SetVariable(Environment, "A_text", values.enteredText, "thread")
+	}
+	x_finish(Environment, values.result, values.message)
+}
+#endif ;addSeparateAhkThread
 
 #if par_button
 &ElementType&_&Name&_ButtonClick()

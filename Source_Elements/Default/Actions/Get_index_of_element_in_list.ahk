@@ -36,7 +36,7 @@ Element_getElementLevel_Action_Get_Index_Of_Element_In_List()
 	return "Beginner"
 }
 
-;Icon path which will be shown in the background of the element
+;Icon file name which will be shown in the background of the element
 Element_getIconPath_Action_Get_Index_Of_Element_In_List()
 {
 	return "New variable.png"

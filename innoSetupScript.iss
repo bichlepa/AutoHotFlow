@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "AutoHotFlow"
-#define MyAppVersion "1.0.3"
+#define MyAppVersion "1.0.4"
 #define MyAppPublisher "Paul Bichler"
 #define MyAppURL "https://bichlepa.jimdofree.com/autohotflow/"
 #define MyAppExeName "AutoHotFlow.exe" 

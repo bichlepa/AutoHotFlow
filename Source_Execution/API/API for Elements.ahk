@@ -447,6 +447,22 @@ x_GetMyEnvironmentFromExecutionID(p_ExecutionID)
 	return global_AllExecutionIDs[p_ExecutionID].environment
 }
 
+; Returns a string which is unique fot the trigger ID. Usercases:
+; - Use as GUI name.
+; - get the environment variable if only this unique execution ID is known with x_GetMyEnvironmentFromExecutionID()
+x_GetMyUniqueTriggerID(Environment)
+{
+	return Environment.triggerID
+}
+
+; returns the environment variable using the unique execution ID, which can be retrieved with x_GetMyUniqueExecutionID()
+x_GetMyEnvironmentFromTriggerID(p_TriggerID)
+{
+	flowID := _getTriggerProperty(p_TriggerID, "flowID")
+	elementID := _getTriggerProperty(p_TriggerID, "elementID")
+	return {flowID: flowID, elementID: elementID, triggerID: p_TriggerID}
+}
+
 ; set a variable which will be available during the execution of the element
 x_SetExecutionValue(Environment, p_name, p_Value)
 {

@@ -1,0 +1,162 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<link rel="stylesheet" href="stylesheet.css">
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<H1>Elements API</H1>
+<p>
+	This documentation is designed for those who want to add new elements.
+</p>
+<p>
+	You need some tools in some steps. You'll find them here:
+	<ul>
+		<li/><b>Create new package</b>: Tools for contributors\Element creation\Create new package.ahk
+		<li/><b>Element template creator</b>: Tools for contributors\Element creation\Element template creator.ahk
+		<li/><b>Lang crawler</b>: language\lang crawler.ahk
+		<li/><b>Translation tool</b>: language\Translation Tool.ahk
+		<li/><b>Find modules</b>: find modules.ahk
+		<li/><b>InnoSetup package creator pre build steps</b>: innoSetupPackageCreatorPreBuildSteps.ahk
+	</ul>
+</p>
+
+<H2>How to start</H2>
+<p>AHF is designed to make it as easy as possible to create new elements or even extension packages.</p>
+<p>You'll find here multiple instructions depending on what you want to do.</p>
+<p>
+	<ul>
+		<li/>If you want to create an element just for you, read <b>Create new elements with low effort</b>.
+		<li/>If you want to add elements that are not very special and don't require external applications, consider to submit them to the default package. Read <b>Create new elements for the default package</b>.
+		<li/>If you want to add elements for an external application or with some very special stuff, consider to create a new package with an installer. Read <b>Create a new package with installer</b>.
+	</ul>
+</p>
+
+<H3>Create new elements with low effort</H3>
+<p>This section describes how you can create new elements with minimum effort.</p>
+<p><ul>
+	<li/>Create a new package using the tool <b>Create new package</b>
+	<ul>
+		<li/>Enter a package name of your choice
+	</ul>
+	<li/>Create a new element using the tool <b>Element template creator</b>
+	<ul>
+		<li/>Choose the package
+		<li/>Choose the element type
+		<li/>Enter a name
+		<li/>Choose or enter a category name
+		<li/>Choose which kind of parameters you want to have
+		<li/>Choose which kind of pre coded features you want to have
+		<li/>Click on <b>Generate file</b>
+	</ul>
+	<li/>If your element requires a new library</b>
+	<ul>
+		<li/>Add the lib file to <b>source_elements\Default\lib\%anyNewSubFolder%</b>
+	</ul>
+	<li/>Open the file <b>manifest.json</b> in the folder <b>source_elements\%yourPackageName%</b>
+	<ul>
+		<li/>Add the name of the new element in the list of the matching element type
+		<li/>Add the file path of the new library (if any) in section <code>libraries</code>
+	</ul>
+	<li/>Run the tool <b>Find modules</b>. This will make the source code files available to AHF</b>
+	<li/>Open the source file of the newly created element. You'll find it in the folder <b>source_elements\%yourPackageName%\%ElementType%s</b></b>
+	<ul>
+		<li/>Edit the code and implement everything. See other help pages for help
+	</ul>
+	<li/>Restart AHF. The new element will be available now</b>
+</ul></p>
+
+<H3>Create new elements for the default package</H3>
+<p>This section describes how you can create new elements that may be submitted to the default package of AHF</p>
+<p><ul>
+	<li/>Create a new element using the tool <b>Element template creator</b>
+	<ul>
+		<li/>Choose the element type
+		<li/>Enter a name
+		<li/>Choose or enter a category name
+		<li/>Choose an icon. You may also create a new icon in <b>Source_Elements\Default\Icons</b>. It will be then selectable here.
+		<li/>Choose the stability level.
+		<li/>Choose which kind of parameters you want to have
+		<li/>Choose which kind of pre coded features you want to have
+		<li/>Click on <b>Generate file</b>
+	</ul>
+	<li/>If your element requires a new library</b>
+	<ul>
+		<li/>Add the lib file to <b>source_elements\Default\lib\%anyNewSubFolder%</b>
+	</ul>
+	<li/>Open the file <b>manifest.json</b> in the folder <b>source_elements\Default</b>
+	<ul>
+		<li/>Add the name of the new element in the list of the matching element type
+		<li/>Add the file path of the new library (if any) in section <code>libraries</code>
+	</ul>
+	<li/>Run the tool <b>Find modules</b>. This will make the source code files available to AHF</b>
+	<li/>Open the source file of the newly created element. You'll find it in the folder <b>source_elements\Default\%ElementType%s</b></b>
+	<ul>
+		<li/>Edit the code and implement everything. See other help pages for help
+	</ul>
+	<li/>Restart AHF. The new element will be available now
+	<li/>Test your element. It's best if you create a flow that tests it with different configurations
+	<li/>Write a help file for your element. 
+	<ul>
+		<li/>Go to the folder <b>Help</b> and copy the file <b>template.html</b>
+		<li/>Paste it to <b>source_elements\Default\help\en\%ElementType%s</b> and paste it there.
+		<li/>Rename it to the element name.
+		<li/>Open and edit it. Describe it alike other elements in the default package.
+	</ul>
+	<li/>Run the tool <b>Find modules</b>. This will update make the help file available to AHF</b>
+	<li/>Restart AHF. Test whether the help file works from the element editor window</b>
+	<li/>Submit the element via forum, via email to <a href= "mailto:autohotflow@arcor.de">autohotflow@arcor.de</a> or via merge request on git. It should include</b>
+	<ul>
+		<li/>The source file of the element
+		<li/>The help file
+		<li/>The test flow
+		<li/>Library file, (if any)
+	</ul>
+</ul></p>
+
+<H3>Create a new package with installer</H3>
+<p>This section describes how you can create a new package with an installer.</p>
+<p class="info">The installer generator is not finished yet. It will follow soon.</p>
+<p>You need to install the InnoSetup application. It can be downloaded here: <a href="https://jrsoftware.org/isdl.php">https://jrsoftware.org/isdl.php</a></p>
+<p><ul>
+	<li/>Create a new element using the tool <b>Element template creator</b>
+	<ul>
+		<li/>Choose the element type
+		<li/>Enter a name
+		<li/>Choose or enter a category name
+		<li/>Choose an icon. You may also create a new icon in <b>Source_Elements\%yourPackageName%\Icons</b>. It will be then selectable here.
+		<li/>Choose the stability level.
+		<li/>Choose which kind of parameters you want to have
+		<li/>Choose which kind of pre coded features you want to have
+		<li/>Click on <b>Generate file</b>
+	</ul>
+	<li/>If your element requires a new library</b>
+	<ul>
+		<li/>Add the lib file to <b>source_elements\Default\lib\%anyNewSubFolder%</b>
+	</ul>
+	<li/>Open the file <b>manifest.json</b> in the folder <b>source_elements\%yourPackageName%</b>
+	<ul>
+		<li/>Add the name of the new element in the list of the matching element type
+		<li/>Add the file path of the new library (if any) in section <code>libraries</code>
+	</ul>
+	<li/>Run the tool <b>Find modules</b>. This will update the source code files of AHF</b>
+	<li/>Open the source file of the newly created element. You'll find it in the folder <b>source_elements\%yourPackageName%\%ElementType%s</b></b>
+	<ul>
+		<li/>Edit the code and implement everything. See other help pages for help
+	</ul>
+	<li/>Restart AHF. The new element will be available now</b>
+	<li/>Test your element. It's best if you create a flow that tests it with different configurations
+	<li/>Run <b>Lang crawler</b>. This will find all translatable strings in your package and write them in <b>source_elements\%yourPackageName%\language\en.ini</b>
+	<li/>You may use <b>Translation tool</b> and translate everything to an other language</b>
+	<li/>Build the setup file
+	<ul>
+		<li/>Use tool <b>InnoSetup package creator pre build steps</b> to update the InnoSetup file <b>innoSetupPackageInstallerScript.iss</b>. You'll have to select your package name.
+		<li/>Open <b>innoSetupPackageInstallerScript.iss</b> and compile the installer
+	</ul>
+	<li/>Publish the package installer on your own via forum and notify bichlepa via email to <a href= "mailto:autohotflow@arcor.de">autohotflow@arcor.de</a></b>
+</ul></p>
+
+
+
+</BODY>
+</HTML>

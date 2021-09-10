@@ -36,7 +36,7 @@ Element_getElementLevel_Loop_Loop_Through_Files()
 	return "Beginner"
 }
 
-;Icon path which will be shown in the background of the element
+;Icon file name which will be shown in the background of the element
 Element_getIconPath_Loop_Loop_Through_Files()
 {
 }

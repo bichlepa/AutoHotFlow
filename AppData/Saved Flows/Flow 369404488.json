@@ -668,7 +668,7 @@
     "element0000000002": {
       "class": "Trigger_Manual",
       "DefaultTrigger": "0",
-      "enabled": "1",
+      "enabled": "0",
       "ID": "element0000000002",
       "name": "Manual - \"string contains text test\"",
       "package": "default",
@@ -698,7 +698,7 @@
     "element0000000004": {
       "class": "Condition_String_Contains_Text",
       "ID": "element0000000004",
-      "name": "String Contains Text - 'newVariable' contains 'World' - Case insensitive",
+      "name": "String contains text - newVariable' contains 'World - Case insensitive",
       "package": "default",
       "pars": {
         "CaseSensitive": "CaseInsensitive",
@@ -716,7 +716,7 @@
     "element0000000005": {
       "class": "Condition_String_Contains_Text",
       "ID": "element0000000005",
-      "name": "String Contains Text - 'newVariable' contains 'world' - Case sensitive",
+      "name": "String contains text - newVariable' contains 'world - Case sensitive",
       "package": "default",
       "pars": {
         "CaseSensitive": "CaseSensitive",
@@ -749,7 +749,7 @@
     "element0000000007": {
       "class": "Condition_String_Contains_Text",
       "ID": "element0000000007",
-      "name": "String Contains Text - 'Hello You' contains '%SearchText%' - Case insensitive",
+      "name": "String contains text - Hello You' contains '%SearchText% - Case insensitive",
       "package": "default",
       "pars": {
         "CaseSensitive": "CaseInsensitive",
@@ -767,7 +767,7 @@
     "element0000000008": {
       "class": "Condition_String_Contains_Text",
       "ID": "element0000000008",
-      "name": "String Contains Text - 'Hello You' contains 'SearchText' - Case sensitive",
+      "name": "String contains text - Hello You' contains 'SearchText - Case sensitive",
       "package": "default",
       "pars": {
         "CaseSensitive": "CaseSensitive",
@@ -785,7 +785,7 @@
     "element0000000009": {
       "class": "Condition_String_Contains_Text",
       "ID": "element0000000009",
-      "name": "String Contains Text - 'Hello You' starts with 'hello' - Case sensitive",
+      "name": "String contains text - Hello You' starts with 'hello - Case sensitive",
       "package": "default",
       "pars": {
         "CaseSensitive": "CaseSensitive",
@@ -803,7 +803,7 @@
     "element0000000010": {
       "class": "Condition_String_Contains_Text",
       "ID": "element0000000010",
-      "name": "String Contains Text - 'Hello You' starts with 'hello' - Case insensitive",
+      "name": "String contains text - Hello You' starts with 'hello - Case insensitive",
       "package": "default",
       "pars": {
         "CaseSensitive": "CaseInsensitive",
@@ -821,7 +821,7 @@
     "element0000000011": {
       "class": "Condition_String_Contains_Text",
       "ID": "element0000000011",
-      "name": "String Contains Text - 'Hello You' starts with 'you' - Case insensitive",
+      "name": "String contains text - Hello You' starts with 'you - Case insensitive",
       "package": "default",
       "pars": {
         "CaseSensitive": "CaseInsensitive",
@@ -839,7 +839,7 @@
     "element0000000012": {
       "class": "Condition_String_Contains_Text",
       "ID": "element0000000012",
-      "name": "String Contains Text - 'Hello You' starts with 'you' - Case sensitive",
+      "name": "String contains text - Hello You' starts with 'you - Case sensitive",
       "package": "default",
       "pars": {
         "CaseSensitive": "CaseSensitive",
@@ -872,7 +872,7 @@
     "element0000000025": {
       "class": "Trigger_Manual",
       "DefaultTrigger": "1",
-      "enabled": "1",
+      "enabled": "0",
       "ID": "element0000000025",
       "name": "Manual - \"start\"",
       "package": "default",
@@ -887,7 +887,7 @@
     "element0000000029": {
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000029",
-      "name": "Set Flow Status - Enable: This flow - All triggers",
+      "name": "Set flow status - Enable: This flow - All triggers",
       "package": "default",
       "pars": {
         "Enable": "Enable",
@@ -904,7 +904,7 @@
     "element0000000030": {
       "class": "Action_Execute_Flow",
       "ID": "element0000000030",
-      "name": "Execute Flow: This flow - Manual - \"string contains text test\"",
+      "name": "Execute flow: This flow - Manual - \"string contains text test\"",
       "package": "default",
       "pars": {
         "flowID": "",
@@ -993,7 +993,7 @@
     "element0000000046": {
       "class": "Action_Message_Box",
       "ID": "element0000000046",
-      "name": "Message Box - Fehler - Only %static_successfulRuns% successful runs instead of %requiredSuccessfulRuns%",
+      "name": "Message box - Fehler - Only %static_successfulRuns% successful runs instead of %requiredSuccessfulRuns%",
       "package": "default",
       "pars": {
         "ButtonLabel": "OK",
@@ -1035,7 +1035,7 @@
     "element0000000050": {
       "class": "Trigger_Manual",
       "DefaultTrigger": "0",
-      "enabled": "1",
+      "enabled": "0",
       "ID": "element0000000050",
       "name": "Manual - \"string split and trim test\"",
       "package": "default",
@@ -1050,7 +1050,7 @@
     "element0000000052": {
       "class": "Action_Execute_Flow",
       "ID": "element0000000052",
-      "name": "Execute Flow: This flow - Manual - \"string split and trim test\"",
+      "name": "Execute flow: This flow - Manual - \"string split and trim test\"",
       "package": "default",
       "pars": {
         "flowID": "",
@@ -1084,7 +1084,7 @@
       "class": "Loop_Work_through_a_list",
       "HeightOfVerticalBar": "385",
       "ID": "element0000000060",
-      "name": "Work through a list: ",
+      "name": "Work through a list: NewList",
       "package": "default",
       "pars": {
         "VarValue": "NewList"
@@ -1125,7 +1125,7 @@
     "element0000000069": {
       "class": "Trigger_Manual",
       "DefaultTrigger": "0",
-      "enabled": "1",
+      "enabled": "0",
       "ID": "element0000000069",
       "name": "Manual - \"substring test\"",
       "package": "default",
@@ -1171,7 +1171,7 @@
       "class": "Loop_Work_through_a_list",
       "HeightOfVerticalBar": "595",
       "ID": "element0000000073",
-      "name": "Work through a list: ",
+      "name": "Work through a list: NewList",
       "package": "default",
       "pars": {
         "VarValue": "NewList"
@@ -1592,7 +1592,7 @@
     "element0000000154": {
       "class": "Trigger_Manual",
       "DefaultTrigger": "0",
-      "enabled": "1",
+      "enabled": "0",
       "ID": "element0000000154",
       "name": "Manual - \"search in string test\"",
       "package": "default",
@@ -1844,7 +1844,7 @@
     "element0000000195": {
       "class": "Action_Execute_Flow",
       "ID": "element0000000195",
-      "name": "Execute Flow: This flow - Manual - \"substring test\"",
+      "name": "Execute flow: This flow - Manual - \"substring test\"",
       "package": "default",
       "pars": {
         "flowID": "",
@@ -1864,7 +1864,7 @@
     "element0000000198": {
       "class": "Action_Execute_Flow",
       "ID": "element0000000198",
-      "name": "Execute Flow: This flow - Manual - \"search in string test\"",
+      "name": "Execute flow: This flow - Manual - \"search in string test\"",
       "package": "default",
       "pars": {
         "flowID": "",

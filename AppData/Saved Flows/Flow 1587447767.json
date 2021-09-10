@@ -61,7 +61,7 @@
     "element0000000002": {
       "class": "Trigger_Manual",
       "DefaultTrigger": "1",
-      "enabled": "1",
+      "enabled": "0",
       "ID": "element0000000002",
       "name": "Manual - \"Ini test\"",
       "package": "default",
@@ -108,7 +108,7 @@
     "element0000000005": {
       "class": "Action_Read_From_Ini",
       "ID": "element0000000005",
-      "name": "Read From Ini -  - mySection - myKey - testIni.ini",
+      "name": "Read from ini -  - mySection - myKey - testIni.ini",
       "package": "default",
       "pars": {
         "Action": "Key",
@@ -127,7 +127,7 @@
     "element0000000006": {
       "class": "Action_Read_From_Ini",
       "ID": "element0000000006",
-      "name": "Read From Ini -  - mySection - wrongKey - testIni.ini",
+      "name": "Read from ini -  - mySection - wrongKey - testIni.ini",
       "package": "default",
       "pars": {
         "Action": "Key",
@@ -146,7 +146,7 @@
     "element0000000007": {
       "class": "Action_Read_From_Ini",
       "ID": "element0000000007",
-      "name": "Read From Ini -  - mySection - wrongKey - testIni.ini",
+      "name": "Read from ini -  - mySection - wrongKey - testIni.ini",
       "package": "default",
       "pars": {
         "Action": "Key",

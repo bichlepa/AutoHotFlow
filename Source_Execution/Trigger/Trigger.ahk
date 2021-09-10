@@ -146,7 +146,6 @@ disableOneTrigger(p_FlowID, p_ElementID, p_save = true)
 {
 	FlowName := _getFlowProperty(p_FlowID, "name")
 	logger("a2", "Going to disable trigger " p_ElementID " in Flow " FlowName)
-	
 	otherTriggersInThisFlowEnabled := False
 
 	; loop through all active triggers

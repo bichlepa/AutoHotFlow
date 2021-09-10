@@ -36,7 +36,7 @@ Element_getElementLevel_Condition_NumberIs()
 	return "Beginner"
 }
 
-;Icon path which will be shown in the background of the element
+;Icon file name which will be shown in the background of the element
 Element_getIconPath_Condition_NumberIs()
 {
 }

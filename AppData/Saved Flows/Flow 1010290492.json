@@ -47,7 +47,7 @@
     "element0000000002": {
       "class": "Trigger_Manual",
       "DefaultTrigger": "1",
-      "enabled": "1",
+      "enabled": "0",
       "ID": "element0000000002",
       "name": "Manual - \"basic variables test\"",
       "package": "default",
@@ -77,7 +77,7 @@
     "element0000000004": {
       "class": "Condition_Variable_Is_Empty",
       "ID": "element0000000004",
-      "name": "Variable Is Empty - NewVariable",
+      "name": "Variable is empty - NewVariable",
       "package": "default",
       "pars": {
         "VarName": "NewVariable"
@@ -90,7 +90,7 @@
     "element0000000005": {
       "class": "Condition_Variable_Is_Empty",
       "ID": "element0000000005",
-      "name": "Variable Is Empty - NewVariable",
+      "name": "Variable is empty - NewVariable",
       "package": "default",
       "pars": {
         "VarName": "NewVariable"
@@ -118,7 +118,7 @@
     "element0000000008": {
       "class": "Condition_Variable_Is_Empty",
       "ID": "element0000000008",
-      "name": "Variable Is Empty - NewVariable",
+      "name": "Variable is empty - NewVariable",
       "package": "default",
       "pars": {
         "VarName": "NewVariable"

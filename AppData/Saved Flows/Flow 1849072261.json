@@ -124,7 +124,7 @@
     "element0000000001": {
       "class": "Trigger_Manual",
       "DefaultTrigger": "1",
-      "enabled": "1",
+      "enabled": "0",
       "ID": "element0000000001",
       "name": "Manual - \"start\"",
       "package": "default",
@@ -169,7 +169,7 @@
     "element0000000014": {
       "class": "Action_Stop_Flow",
       "ID": "element0000000014",
-      "name": "Stop Flow - external script test",
+      "name": "Stop flow - external script test",
       "package": "default",
       "pars": {
         "flowID": "Flow 1849072261"
@@ -315,7 +315,7 @@
     "element0000000043": {
       "class": "Action_Tooltip",
       "ID": "element0000000043",
-      "name": "Tooltip: %counter% - %counterplus10% - 2 s - Follow Mouse",
+      "name": "Tooltip: %counter% - %counterplus10% - 2 s - Follow mouse",
       "package": "action",
       "pars": {
         "duration": 2,

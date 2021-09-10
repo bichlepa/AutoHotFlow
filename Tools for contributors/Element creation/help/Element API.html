@@ -451,6 +451,23 @@ Those functions can only be used in <b>trigger functions</b>.
 	</TR>
 	<TR>
 		<TD>
+			<h4 class="VariableName">x_GetMyUniqueTriggerID(Environment)</h4>
+			<p>Returns a string which is unique during while the trigger is enabled.
+				<br/>You can use <code>x_GetMyEnvironmentFromTriggerID()</code> to get the environment variable, then you can use it then to call other API functions.
+				<br/>Usage example: You can use it as GUI ID. When a GUI event occurs, pass <code>A_Gui</code> to <code>x_GetMyEnvironmentFromTriggerID()</code>.
+			</p>
+				
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">x_GetMyEnvironmentFromTriggerID(p_TriggerID)</h4>
+			<p>Returns the environment variable from the unique trigger ID.
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
 			<h4 class="VariableName">x_TriggerInNewAHKThread(Environment, p_Code, p_VarsToImport, p_VarsToExport)</h4>
 			<p>Executes AHK code in a new AHK thread. This function must not be called more than one time when a trigger is enabled.
 				<br/>See also help for trigger <b>AutoHotkey script</b> for more details.

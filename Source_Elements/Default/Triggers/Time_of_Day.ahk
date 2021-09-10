@@ -36,7 +36,7 @@ Element_getElementLevel_Trigger_Time_Of_Day()
 	return "Beginner"
 }
 
-;Icon path which will be shown in the background of the element
+;Icon file name which will be shown in the background of the element
 Element_getIconPath_Trigger_Time_Of_Day()
 {
 }

@@ -307,7 +307,7 @@
       "class": "Trigger_Process_Closes",
       "enabled": "0",
       "ID": "element0000000002",
-      "name": "Process Closes - notepad.exe",
+      "name": "Process closes - notepad.exe",
       "package": "default",
       "pars": {
         "interval": "1000",
@@ -337,7 +337,7 @@
     "element0000000022": {
       "class": "Trigger_Manual",
       "DefaultTrigger": "1",
-      "enabled": "1",
+      "enabled": "0",
       "ID": "element0000000022",
       "name": "Manual - \"start\"",
       "package": "default",
@@ -352,7 +352,7 @@
     "element0000000023": {
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000023",
-      "name": "Set Flow Status - Disable: This flow - All triggers",
+      "name": "Set flow status - Disable: This flow - All triggers",
       "package": "default",
       "pars": {
         "Enable": "Disable",
@@ -369,7 +369,7 @@
     "element0000000025": {
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000025",
-      "name": "Set Flow Status - Enable: This flow - Default trigger",
+      "name": "Set flow status - Enable: This flow - Default trigger",
       "package": "default",
       "pars": {
         "Enable": "Enable",
@@ -433,7 +433,7 @@
     "element0000000036": {
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000036",
-      "name": "Set Flow Status - Enable: This flow - Process starts - notepad.exe",
+      "name": "Set flow status - Enable: This flow - Process starts - notepad.exe",
       "package": "default",
       "pars": {
         "Enable": "Enable",
@@ -500,7 +500,7 @@
     "element0000000044": {
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000044",
-      "name": "Set Flow Status - Enable: This flow - Process starts - notepad.exe",
+      "name": "Set flow status - Enable: This flow - Process starts - notepad.exe",
       "package": "default",
       "pars": {
         "Enable": "Enable",
@@ -557,7 +557,7 @@
     "element0000000060": {
       "class": "Condition_List_Contains_Element",
       "ID": "element0000000060",
-      "name": "List Contains Element - Value '1' in list 'static_successfulRuns'",
+      "name": "List contains element - Value '1' in list 'static_successfulRuns'",
       "package": "default",
       "pars": {
         "InputList": "static_successfulRuns",
@@ -575,7 +575,7 @@
     "element0000000061": {
       "class": "Condition_List_Contains_Element",
       "ID": "element0000000061",
-      "name": "List Contains Element - Value '1' in list 'static_successfulRuns'",
+      "name": "List contains element - Value '1' in list 'static_successfulRuns'",
       "package": "default",
       "pars": {
         "InputList": "static_successfulRuns",
@@ -593,7 +593,7 @@
     "element0000000066": {
       "class": "Action_Kill_Process",
       "ID": "element0000000066",
-      "name": "Kill Process - notepad.exe",
+      "name": "Kill process - notepad.exe",
       "package": "default",
       "pars": {
         "ProcessName": "notepad.exe"
@@ -637,7 +637,7 @@
     "element0000000071": {
       "class": "Condition_List_Contains_Element",
       "ID": "element0000000071",
-      "name": "List Contains Element - Value '1' in list 'static_successfulRuns'",
+      "name": "List contains element - Value '1' in list 'static_successfulRuns'",
       "package": "default",
       "pars": {
         "InputList": "static_successfulRuns",
@@ -655,7 +655,7 @@
     "element0000000072": {
       "class": "Condition_List_Contains_Element",
       "ID": "element0000000072",
-      "name": "List Contains Element - Value '1' in list 'static_successfulRuns'",
+      "name": "List contains element - Value '1' in list 'static_successfulRuns'",
       "package": "default",
       "pars": {
         "InputList": "static_successfulRuns",
@@ -699,7 +699,7 @@
     "element0000000078": {
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000078",
-      "name": "Set Flow Status - Enable: This flow - Process Closes - notepad.exe",
+      "name": "Set flow status - Enable: This flow - Process closes - notepad.exe",
       "package": "default",
       "pars": {
         "Enable": "Enable",
@@ -716,7 +716,7 @@
     "element0000000080": {
       "class": "Action_Kill_Process",
       "ID": "element0000000080",
-      "name": "Kill Process - notepad.exe",
+      "name": "Kill process - notepad.exe",
       "package": "default",
       "pars": {
         "ProcessName": "notepad.exe"
@@ -729,7 +729,7 @@
     "element0000000082": {
       "class": "Condition_List_Contains_Element",
       "ID": "element0000000082",
-      "name": "List Contains Element - Value '1' in list 'static_successfulRuns'",
+      "name": "List contains element - Value '1' in list 'static_successfulRuns'",
       "package": "default",
       "pars": {
         "InputList": "static_successfulRuns",
@@ -788,7 +788,7 @@
       "class": "Trigger_Periodic_Timer",
       "enabled": "0",
       "ID": "element0000000094",
-      "name": "Periodic Timer - 15 Seconds",
+      "name": "Periodic timer - 15 Seconds",
       "package": "default",
       "pars": {
         "Interval": "15",
@@ -802,7 +802,7 @@
     "element0000000095": {
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000095",
-      "name": "Set Flow Status - Disable: This flow - All triggers",
+      "name": "Set flow status - Disable: This flow - All triggers",
       "package": "default",
       "pars": {
         "Enable": "Disable",
@@ -819,7 +819,7 @@
     "element0000000096": {
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000096",
-      "name": "Set Flow Status - Enable: This flow - Default trigger",
+      "name": "Set flow status - Enable: This flow - Default trigger",
       "package": "default",
       "pars": {
         "Enable": "Enable",
@@ -836,7 +836,7 @@
     "element0000000099": {
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000099",
-      "name": "Set Flow Status - Enable: This flow - Periodic Timer - 15 Seconds",
+      "name": "Set flow status - Enable: This flow - Periodic timer - 15 Seconds",
       "package": "default",
       "pars": {
         "Enable": "Enable",
@@ -853,7 +853,7 @@
     "element0000000110": {
       "class": "Condition_Process_Is_Running",
       "ID": "element0000000110",
-      "name": "Process Is Running - notepad.exe",
+      "name": "Process is running - notepad.exe",
       "package": "default",
       "pars": {
         "ProcessName": "notepad.exe"
@@ -866,7 +866,7 @@
     "element0000000116": {
       "class": "Condition_Process_Is_Running",
       "ID": "element0000000116",
-      "name": "Process Is Running - notepad.exe",
+      "name": "Process is running - notepad.exe",
       "package": "default",
       "pars": {
         "ProcessName": "notepad.exe"
@@ -879,7 +879,7 @@
     "element0000000118": {
       "class": "Condition_Process_Is_Running",
       "ID": "element0000000118",
-      "name": "Process Is Running - %a_pID%",
+      "name": "Process is running - %a_pID%",
       "package": "default",
       "pars": {
         "ProcessName": "%a_pID%"
@@ -892,7 +892,7 @@
     "element0000000121": {
       "class": "Condition_Process_Is_Running",
       "ID": "element0000000121",
-      "name": "Process Is Running - notepad.exe",
+      "name": "Process is running - notepad.exe",
       "package": "default",
       "pars": {
         "ProcessName": "notepad.exe"
@@ -905,7 +905,7 @@
     "element0000000122": {
       "class": "Condition_Process_Is_Running",
       "ID": "element0000000122",
-      "name": "Process Is Running - %a_pID%",
+      "name": "Process is running - %a_pID%",
       "package": "default",
       "pars": {
         "ProcessName": "%a_pID%"
@@ -932,7 +932,7 @@
     "element0000000130": {
       "class": "Condition_Confirmation_Dialog",
       "ID": "element0000000130",
-      "name": "Confirmation Dialog - Process Test, Notepad.exe must be closed to start the test. Close it now?",
+      "name": "Confirmation dialog - Process Test, Notepad.exe must be closed to start the test. Close it now?",
       "package": "default",
       "pars": {
         "ButtonLabelCancel": "Cancel",
@@ -958,7 +958,7 @@
     "element0000000131": {
       "class": "Action_Kill_Process",
       "ID": "element0000000131",
-      "name": "Kill Process - notepad.exe",
+      "name": "Kill process - notepad.exe",
       "package": "default",
       "pars": {
         "ProcessName": "notepad.exe"

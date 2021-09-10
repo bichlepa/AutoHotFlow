@@ -36,7 +36,7 @@ Element_getElementLevel_Action_Send_Keystrokes_To_Control()
 	return "Beginner"
 }
 
-;Icon path which will be shown in the background of the element
+;Icon file name which will be shown in the background of the element
 Element_getIconPath_Action_Send_Keystrokes_To_Control()
 {
 }

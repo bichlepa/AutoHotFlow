@@ -823,7 +823,7 @@
     "element0000000002": {
       "class": "Trigger_Manual",
       "DefaultTrigger": "0",
-      "enabled": "1",
+      "enabled": "0",
       "ID": "element0000000002",
       "name": "Manual - \"absolute number\"",
       "package": "default",
@@ -936,7 +936,7 @@
     "element0000000021": {
       "class": "Trigger_Manual",
       "DefaultTrigger": "1",
-      "enabled": "1",
+      "enabled": "0",
       "ID": "element0000000021",
       "name": "Manual - \"start\"",
       "package": "default",
@@ -951,7 +951,7 @@
     "element0000000022": {
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000022",
-      "name": "Set Flow Status - Enable: This flow - All triggers",
+      "name": "Set flow status - Enable: This flow - All triggers",
       "package": "default",
       "pars": {
         "Enable": "Enable",
@@ -1037,7 +1037,7 @@
     "element0000000027": {
       "class": "Action_Message_Box",
       "ID": "element0000000027",
-      "name": "Message Box - Fehler - Only %static_successfulRuns% successful runs instead of %requiredSuccessfulRuns%",
+      "name": "Message box - Fehler - Only %static_successfulRuns% successful runs instead of %requiredSuccessfulRuns%",
       "package": "default",
       "pars": {
         "ButtonLabel": "OK",
@@ -1062,7 +1062,7 @@
     "element0000000028": {
       "class": "Action_Execute_Flow",
       "ID": "element0000000028",
-      "name": "Execute Flow: This flow - Manual - \"absolute number\"",
+      "name": "Execute flow: This flow - Manual - \"absolute number\"",
       "package": "default",
       "pars": {
         "flowID": "",
@@ -1097,7 +1097,7 @@
     "element0000000038": {
       "class": "Trigger_Manual",
       "DefaultTrigger": "0",
-      "enabled": "1",
+      "enabled": "0",
       "ID": "element0000000038",
       "name": "Manual - \"random number\"",
       "package": "default",
@@ -1127,7 +1127,7 @@
     "element0000000040": {
       "class": "Action_Execute_Flow",
       "ID": "element0000000040",
-      "name": "Execute Flow: This flow - Manual - \"random number\"",
+      "name": "Execute flow: This flow - Manual - \"random number\"",
       "package": "default",
       "pars": {
         "flowID": "",
@@ -1147,7 +1147,7 @@
     "element0000000045": {
       "class": "Action_Square_Root",
       "ID": "element0000000045",
-      "name": "Square Root - NewVariable - 16",
+      "name": "Square root - NewVariable - 16",
       "package": "default",
       "pars": {
         "Varname": "NewVariable",
@@ -1161,7 +1161,7 @@
     "element0000000046": {
       "class": "Trigger_Manual",
       "DefaultTrigger": "0",
-      "enabled": "1",
+      "enabled": "0",
       "ID": "element0000000046",
       "name": "Manual - \"square root\"",
       "package": "default",
@@ -1192,7 +1192,7 @@
     "element0000000049": {
       "class": "Trigger_Manual",
       "DefaultTrigger": "0",
-      "enabled": "1",
+      "enabled": "0",
       "ID": "element0000000049",
       "name": "Manual - \"trigonometry\"",
       "package": "default",
@@ -1207,7 +1207,7 @@
     "element0000000051": {
       "class": "Action_Rounding_A_Number",
       "ID": "element0000000051",
-      "name": "Rounding A Number - NewVariable - 1.2345 - 0",
+      "name": "Rounding a number - NewVariable - 1.2345 - 0",
       "package": "default",
       "pars": {
         "Places": 0,
@@ -1223,7 +1223,7 @@
     "element0000000052": {
       "class": "Trigger_Manual",
       "DefaultTrigger": "0",
-      "enabled": "1",
+      "enabled": "0",
       "ID": "element0000000052",
       "name": "Manual - \"rounding\"",
       "package": "default",
@@ -1253,7 +1253,7 @@
     "element0000000054": {
       "class": "Trigger_Manual",
       "DefaultTrigger": "0",
-      "enabled": "1",
+      "enabled": "0",
       "ID": "element0000000054",
       "name": "Manual - \"exponentiation\"",
       "package": "default",
@@ -1268,7 +1268,7 @@
     "element0000000057": {
       "class": "Action_Execute_Flow",
       "ID": "element0000000057",
-      "name": "Execute Flow: This flow - Manual - \"square root\"",
+      "name": "Execute flow: This flow - Manual - \"square root\"",
       "package": "default",
       "pars": {
         "flowID": "",
@@ -1288,7 +1288,7 @@
     "element0000000058": {
       "class": "Action_Execute_Flow",
       "ID": "element0000000058",
-      "name": "Execute Flow: This flow - Manual - \"trigonometry\"",
+      "name": "Execute flow: This flow - Manual - \"trigonometry\"",
       "package": "default",
       "pars": {
         "flowID": "",
@@ -1308,7 +1308,7 @@
     "element0000000059": {
       "class": "Action_Execute_Flow",
       "ID": "element0000000059",
-      "name": "Execute Flow: This flow - Manual - \"rounding\"",
+      "name": "Execute flow: This flow - Manual - \"rounding\"",
       "package": "default",
       "pars": {
         "flowID": "",
@@ -1328,7 +1328,7 @@
     "element0000000060": {
       "class": "Action_Execute_Flow",
       "ID": "element0000000060",
-      "name": "Execute Flow: This flow - Manual - \"exponentiation\"",
+      "name": "Execute flow: This flow - Manual - \"exponentiation\"",
       "package": "default",
       "pars": {
         "flowID": "",
@@ -1542,7 +1542,7 @@
     "element0000000110": {
       "class": "Action_Square_Root",
       "ID": "element0000000110",
-      "name": "Square Root - NewVariable - -16",
+      "name": "Square root - NewVariable - -16",
       "package": "default",
       "pars": {
         "Varname": "NewVariable",
@@ -1775,7 +1775,7 @@
     "element0000000169": {
       "class": "Action_Square_Root",
       "ID": "element0000000169",
-      "name": "Square Root - rootOf3 - 3",
+      "name": "Square root - rootOf3 - 3",
       "package": "default",
       "pars": {
         "Varname": "rootOf3",
@@ -1899,7 +1899,7 @@
     "element0000000193": {
       "class": "Action_Rounding_A_Number",
       "ID": "element0000000193",
-      "name": "Rounding A Number - NewVariable - 1.2345 - 3",
+      "name": "Rounding a number - NewVariable - 1.2345 - 3",
       "package": "default",
       "pars": {
         "Places": "3",
@@ -1931,7 +1931,7 @@
     "element0000000197": {
       "class": "Action_Rounding_A_Number",
       "ID": "element0000000197",
-      "name": "Rounding A Number - NewVariable - 1.2345 - 3",
+      "name": "Rounding a number - NewVariable - 1.2345 - 3",
       "package": "default",
       "pars": {
         "Places": "3",
@@ -1963,7 +1963,7 @@
     "element0000000200": {
       "class": "Action_Rounding_A_Number",
       "ID": "element0000000200",
-      "name": "Rounding A Number - NewVariable - 1.2345 - 2",
+      "name": "Rounding a number - NewVariable - 1.2345 - 2",
       "package": "default",
       "pars": {
         "Places": "2",
@@ -1995,7 +1995,7 @@
     "element0000000206": {
       "class": "Action_Rounding_A_Number",
       "ID": "element0000000206",
-      "name": "Rounding A Number - NewVariable - 12345 - -3",
+      "name": "Rounding a number - NewVariable - 12345 - -3",
       "package": "default",
       "pars": {
         "Places": "-3",
@@ -2089,7 +2089,7 @@
     "element0000000219": {
       "class": "Action_Square_Root",
       "ID": "element0000000219",
-      "name": "Square Root - rootOf3 - 3",
+      "name": "Square root - rootOf3 - 3",
       "package": "default",
       "pars": {
         "Varname": "rootOf3",
@@ -2196,7 +2196,7 @@
     "element0000000234": {
       "class": "Trigger_Manual",
       "DefaultTrigger": "0",
-      "enabled": "1",
+      "enabled": "0",
       "ID": "element0000000234",
       "name": "Manual - \"Number is\"",
       "package": "default",
@@ -2450,7 +2450,7 @@
     "element0000000271": {
       "class": "Action_Execute_Flow",
       "ID": "element0000000271",
-      "name": "Execute Flow: This flow - Manual - \"Number is\"",
+      "name": "Execute flow: This flow - Manual - \"Number is\"",
       "package": "default",
       "pars": {
         "flowID": "",

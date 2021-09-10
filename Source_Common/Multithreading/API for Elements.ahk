@@ -112,7 +112,13 @@ xx_InstanceStop(Environment)
 xx_GetMyUniqueExecutionID(Environment)
 {
 }
+xx_GetMyUniqueTriggerID(Environment)
+{
+}
 xx_GetMyEnvironmentFromExecutionID(p_ExecutionID)
+{
+}
+xx_GetMyEnvironmentFromTriggerID(p_TriggerID)
 {
 }
 xx_SetExecutionValue(Environment, p_name, p_Value)
