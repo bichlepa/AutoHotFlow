@@ -44,6 +44,17 @@ loop, files, language\basic\*.ini
 	allTranslations[oneLanguage] := importIni(iniFileContent)
 }
 
+; prepare help menu index
+for oneLanguageIndex, oneLanguage in availableHelpFileLanguages
+{
+	fileRead, helpFileMenuTemplate_%oneLanguage%, help\%oneLanguage%\Menu - template.html
+	fileRead, helpFileMenuTemplateOneEntry_%oneLanguage%, help\%oneLanguage%\Menu - template of one entry.html
+	for oneElementTypeIndex, oneElementType in allElementTypes
+	{
+		helpFileMenuEntries_%oneElementType%_%oneLanguage% := ""
+	}
+}
+
 ;This is only executing while developing
 ;Here, some source files are automatically modified
 Libincludes := ""
@@ -81,14 +92,11 @@ loop, files, source_Elements\*manifest.json, FR
 
 	for oneLanguageIndex, oneLanguage in availableHelpFileLanguages
 	{
-		fileRead, helpFileMenuTemplate, help\%oneLanguage%\Menu - template.html
-		fileRead, helpFileMenuTemplateOneEntry, help\%oneLanguage%\Menu - template of one entry.html
 
 		for oneElementTypeIndex, oneElementType in allElementTypes
 		{
 			FileCreateDir, help\%oneLanguage%\%oneElementType%
 
-			helpFileMenuEntries := ""
 			for oneElementIndex, oneElement in fileContent[oneElementType]
 			{
 				oneElementWithoutExtension := substr(oneElement, 1, -4)
@@ -104,18 +112,15 @@ loop, files, source_Elements\*manifest.json, FR
 					startPos := instr(helpFile, ">", ,startPos) + strlen(">")
 					stopPos := instr(helpFile, "</h1>", ,startPos)
 					oneElementName := trim(substr(helpFile, startPos, stopPos - startPos), "`r`n`t ")
-					helpFileMenuOneEntry := helpFileMenuTemplateOneEntry
+					helpFileMenuOneEntry := helpFileMenuTemplateOneEntry_%oneLanguage%
 					helpFileMenuOneEntry := StrReplace(helpFileMenuOneEntry, "%path%", oneElementType "\" helpFileName)
 					helpFileMenuOneEntry := StrReplace(helpFileMenuOneEntry, "%name%", oneElementName)
-					helpFileMenuEntries .= helpFileMenuOneEntry
+					helpFileMenuEntries_%oneElementType%_%oneLanguage% .= helpFileMenuOneEntry
 				}
 			}
 
-			helpFileMenuTemplate := StrReplace(helpFileMenuTemplate, "%" oneElementType "%", helpFileMenuEntries)
 		}
 
-		Filedelete, help\%oneLanguage%\Menu.html
-		FileAppend, % helpFileMenuTemplate, help\%oneLanguage%\Menu.html
 	}
 	
 
@@ -129,6 +134,17 @@ loop, files, source_Elements\*manifest.json, FR
 		newTranslations := importIni(iniFileContent)
 		mergeTranslations(allTranslations[oneLanguage], newTranslations)
 	}
+}
+
+; write help menu index; prepare help menu index
+for oneLanguageIndex, oneLanguage in availableHelpFileLanguages
+{
+	for oneElementTypeIndex, oneElementType in allElementTypes
+	{
+		helpFileMenuTemplate_%oneLanguage% := StrReplace(helpFileMenuTemplate_%oneLanguage%, "%" oneElementType "%", helpFileMenuEntries_%oneElementType%_%oneLanguage%)
+	}
+	Filedelete, help\%oneLanguage%\Menu.html
+	FileAppend, % helpFileMenuTemplate_%oneLanguage%, help\%oneLanguage%\Menu.html
 }
 
 ; save merged translations
