@@ -4,6 +4,12 @@ SendMode Input  ; Recommended for new scripts due to its superior speed and reli
 SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 ;~ MsgBox '%1%' - %2% - %3% - %4% - %5%
 
+if not fileexist("language\en.ini")
+{
+	runwait, "find modules.ahk"
+}
+
+
 FileEncoding utf-8
 
 ;Handle a command line parameter if any
