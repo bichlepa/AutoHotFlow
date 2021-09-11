@@ -1,0 +1,1117 @@
+﻿{
+  "allConnections": {
+    "connection0000000002": {
+      "ConnectionType": "normal",
+      "from": "element0000000001",
+      "ID": "connection0000000002",
+      "to": "element0000000080",
+      "type": "Connection"
+    },
+    "connection0000000008": {
+      "ConnectionType": "Yes",
+      "from": "element0000000004",
+      "ID": "connection0000000008",
+      "to": "element0000000034",
+      "type": "Connection"
+    },
+    "connection0000000023": {
+      "ConnectionType": "normal",
+      "from": "element0000000005",
+      "ID": "connection0000000023",
+      "to": "element0000000024",
+      "type": "Connection"
+    },
+    "connection0000000025": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000025",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000026": {
+      "ConnectionType": "normal",
+      "from": "element0000000027",
+      "ID": "connection0000000026",
+      "to": "element0000000004",
+      "type": "Connection"
+    },
+    "connection0000000030": {
+      "ConnectionType": "No",
+      "from": "element0000000004",
+      "ID": "connection0000000030",
+      "to": "element0000000031",
+      "type": "Connection"
+    },
+    "connection0000000036": {
+      "ConnectionType": "normal",
+      "from": "element0000000034",
+      "ID": "connection0000000036",
+      "to": "element0000000035",
+      "type": "Connection"
+    },
+    "connection0000000039": {
+      "ConnectionType": "Yes",
+      "from": "element0000000035",
+      "ID": "connection0000000039",
+      "to": "element0000000040",
+      "type": "Connection"
+    },
+    "connection0000000044": {
+      "ConnectionType": "No",
+      "from": "element0000000035",
+      "ID": "connection0000000044",
+      "to": "element0000000043",
+      "type": "Connection"
+    },
+    "connection0000000045": {
+      "ConnectionType": "normal",
+      "from": "element0000000043",
+      "ID": "connection0000000045",
+      "to": "element0000000046",
+      "type": "Connection"
+    },
+    "connection0000000051": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000051",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000053": {
+      "ConnectionType": "normal",
+      "from": "element0000000046",
+      "ID": "connection0000000053",
+      "to": "element0000000054",
+      "type": "Connection"
+    },
+    "connection0000000055": {
+      "ConnectionType": "normal",
+      "from": "element0000000054",
+      "ID": "connection0000000055",
+      "to": "element0000000056",
+      "type": "Connection"
+    },
+    "connection0000000062": {
+      "ConnectionType": "No",
+      "from": "element0000000056",
+      "ID": "connection0000000062",
+      "to": "element0000000061",
+      "type": "Connection"
+    },
+    "connection0000000064": {
+      "ConnectionType": "Yes",
+      "from": "element0000000063",
+      "ID": "connection0000000064",
+      "to": "element0000000061",
+      "type": "Connection"
+    },
+    "connection0000000065": {
+      "ConnectionType": "Yes",
+      "from": "element0000000056",
+      "ID": "connection0000000065",
+      "to": "element0000000063",
+      "type": "Connection"
+    },
+    "connection0000000066": {
+      "ConnectionType": "No",
+      "from": "element0000000063",
+      "ID": "connection0000000066",
+      "to": "element0000000089",
+      "type": "Connection"
+    },
+    "connection0000000068": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000068",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000069": {
+      "ConnectionType": "normal",
+      "from": "element0000000070",
+      "ID": "connection0000000069",
+      "to": "element0000000073",
+      "type": "Connection"
+    },
+    "connection0000000071": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000071",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000072": {
+      "ConnectionType": "No",
+      "from": "element0000000073",
+      "ID": "connection0000000072",
+      "to": "element0000000027",
+      "type": "Connection"
+    },
+    "connection0000000075": {
+      "ConnectionType": "Yes",
+      "from": "element0000000073",
+      "ID": "connection0000000075",
+      "to": "element0000000074",
+      "type": "Connection"
+    },
+    "connection0000000081": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000081",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000082": {
+      "ConnectionType": "normal",
+      "from": "element0000000080",
+      "ID": "connection0000000082",
+      "to": "element0000000070",
+      "type": "Connection"
+    },
+    "connection0000000086": {
+      "ConnectionType": "No",
+      "from": "element0000000083",
+      "ID": "connection0000000086",
+      "to": "element0000000085",
+      "type": "Connection"
+    },
+    "connection0000000088": {
+      "ConnectionType": "Yes",
+      "from": "element0000000083",
+      "ID": "connection0000000088",
+      "to": "element0000000158",
+      "type": "Connection"
+    },
+    "connection0000000091": {
+      "ConnectionType": "normal",
+      "from": "element0000000076",
+      "ID": "connection0000000091",
+      "to": "element0000000090",
+      "type": "Connection"
+    },
+    "connection0000000095": {
+      "ConnectionType": "normal",
+      "from": "element0000000013",
+      "ID": "connection0000000095",
+      "to": "element0000000118",
+      "type": "Connection"
+    },
+    "connection0000000098": {
+      "ConnectionType": "Normal",
+      "from": "element0000000024",
+      "ID": "connection0000000098",
+      "to": "element0000000105",
+      "type": "Connection"
+    },
+    "connection0000000103": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000103",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000104": {
+      "ConnectionType": "normal",
+      "from": "element0000000105",
+      "ID": "connection0000000104",
+      "to": "element0000000107",
+      "type": "Connection"
+    },
+    "connection0000000106": {
+      "ConnectionType": "normal",
+      "from": "element0000000090",
+      "ID": "connection0000000106",
+      "to": "element0000000083",
+      "type": "Connection"
+    },
+    "connection0000000108": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000108",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000109": {
+      "ConnectionType": "normal",
+      "from": "element0000000107",
+      "ID": "connection0000000109",
+      "to": "element0000000099",
+      "type": "Connection"
+    },
+    "connection0000000112": {
+      "ConnectionType": "normal",
+      "from": "element0000000111",
+      "ID": "connection0000000112",
+      "to": "element0000000110",
+      "type": "Connection"
+    },
+    "connection0000000113": {
+      "ConnectionType": "Exception",
+      "from": "element0000000099",
+      "ID": "connection0000000113",
+      "to": "element0000000111",
+      "type": "Connection"
+    },
+    "connection0000000119": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000119",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000120": {
+      "ConnectionType": "normal",
+      "from": "element0000000118",
+      "ID": "connection0000000120",
+      "to": "element0000000050",
+      "type": "Connection"
+    },
+    "connection0000000122": {
+      "ConnectionType": "normal",
+      "from": "element0000000110",
+      "ID": "connection0000000122",
+      "to": "element0000000121",
+      "type": "Connection"
+    },
+    "connection0000000126": {
+      "ConnectionType": "normal",
+      "from": "element0000000121",
+      "ID": "connection0000000126",
+      "to": "element0000000125",
+      "type": "Connection"
+    },
+    "connection0000000128": {
+      "ConnectionType": "normal",
+      "from": "element0000000125",
+      "ID": "connection0000000128",
+      "to": "element0000000127",
+      "type": "Connection"
+    },
+    "connection0000000135": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000135",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000155": {
+      "ConnectionType": "normal",
+      "from": "element0000000131",
+      "ID": "connection0000000155",
+      "to": "element0000000164",
+      "type": "Connection"
+    },
+    "connection0000000157": {
+      "ConnectionType": "normal",
+      "from": "element0000000001",
+      "ID": "connection0000000157",
+      "to": "element0000000156",
+      "type": "Connection"
+    },
+    "connection0000000159": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000159",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000160": {
+      "ConnectionType": "Yes",
+      "from": "element0000000158",
+      "ID": "connection0000000160",
+      "to": "element0000000087",
+      "type": "Connection"
+    },
+    "connection0000000162": {
+      "ConnectionType": "normal",
+      "from": "element0000000046",
+      "ID": "connection0000000162",
+      "to": "element0000000161",
+      "type": "Connection"
+    },
+    "connection0000000163": {
+      "ConnectionType": "normal",
+      "from": "element0000000089",
+      "ID": "connection0000000163",
+      "to": "element0000000130",
+      "type": "Connection"
+    },
+    "connection0000000166": {
+      "ConnectionType": "normal",
+      "from": "element0000000164",
+      "ID": "connection0000000166",
+      "to": "element0000000167",
+      "type": "Connection"
+    },
+    "connection0000000169": {
+      "ConnectionType": "No",
+      "from": "element0000000167",
+      "ID": "connection0000000169",
+      "to": "element0000000154",
+      "type": "Connection"
+    },
+    "connection0000000170": {
+      "ConnectionType": "No",
+      "from": "element0000000158",
+      "ID": "connection0000000170",
+      "to": "element0000000085",
+      "type": "Connection"
+    },
+    "connection0000000171": {
+      "ConnectionType": "Yes",
+      "from": "element0000000167",
+      "ID": "connection0000000171",
+      "to": "element0000000085",
+      "type": "Connection"
+    },
+    "connection0000000173": {
+      "ConnectionType": "normal",
+      "from": "element0000000172",
+      "ID": "connection0000000173",
+      "to": "element0000000174",
+      "type": "Connection"
+    },
+    "connection0000000176": {
+      "ConnectionType": "normal",
+      "from": "element0000000087",
+      "ID": "connection0000000176",
+      "to": "element0000000175",
+      "type": "Connection"
+    }
+  },
+  "allElements": {
+    "element0000000001": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "1",
+      "enabled": "0",
+      "ID": "element0000000001",
+      "name": "Manual - \"Trigger black branch\"",
+      "package": "default",
+      "pars": {
+        "ID": "Trigger black branch"
+      },
+      "StandardName": 1,
+      "type": "trigger",
+      "x": "0",
+      "y": "-490"
+    },
+    "element0000000004": {
+      "class": "Condition_Flow_Enabled",
+      "ID": "element0000000004",
+      "name": "Flow enabled: Trigger test - Manual - \"Trigger attractive air\"",
+      "package": "default",
+      "pars": {
+        "flowID": "Flow 884290977",
+        "ThisFlow": "0",
+        "triggerID": "element0000000013",
+        "WhichTrigger": "Specified"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-35",
+      "y": "210"
+    },
+    "element0000000005": {
+      "class": "Trigger_Periodic_Timer",
+      "enabled": "0",
+      "ID": "element0000000005",
+      "name": "Periodic timer - 1 Seconds",
+      "package": "default",
+      "pars": {
+        "Interval": "1",
+        "Unit": "Seconds"
+      },
+      "StandardName": "1",
+      "type": "Trigger",
+      "x": "630",
+      "y": "-175"
+    },
+    "element0000000013": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "0",
+      "enabled": "0",
+      "ID": "element0000000013",
+      "name": "Manual - \"Trigger attractive air\"",
+      "package": "default",
+      "pars": {
+        "ID": "Trigger attractive air"
+      },
+      "StandardName": "1",
+      "type": "Trigger",
+      "x": "315",
+      "y": "-175"
+    },
+    "element0000000024": {
+      "class": "Action_Set_Flow_Status",
+      "ID": "element0000000024",
+      "name": "Set flow status - Disable: This flow - Periodic timer - 1 Seconds",
+      "package": "default",
+      "pars": {
+        "Enable": "Disable",
+        "flowID": "",
+        "ThisFlow": 1,
+        "triggerID": "element0000000005",
+        "WhichTrigger": "Specified"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "630",
+      "y": "-35"
+    },
+    "element0000000027": {
+      "class": "Action_Set_Flow_Status",
+      "ID": "element0000000027",
+      "name": "Set flow status - Enable: This flow - Manual - \"Trigger attractive air\"",
+      "package": "default",
+      "pars": {
+        "Enable": "Enable",
+        "flowID": "",
+        "ThisFlow": 1,
+        "triggerID": "element0000000013",
+        "WhichTrigger": "Specified"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-35",
+      "y": "105"
+    },
+    "element0000000031": {
+      "class": "Condition_Debug_Dialog",
+      "ID": "element0000000031",
+      "name": "Debug dialog",
+      "package": "default",
+      "pars": {},
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-210",
+      "y": "350"
+    },
+    "element0000000034": {
+      "class": "Action_Set_Flow_Status",
+      "ID": "element0000000034",
+      "name": "Set flow status - Disable: Trigger test - All triggers",
+      "package": "default",
+      "pars": {
+        "Enable": "Disable",
+        "flowID": "Flow 884290977",
+        "ThisFlow": "0",
+        "triggerID": "",
+        "WhichTrigger": "Any"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-35",
+      "y": "385"
+    },
+    "element0000000035": {
+      "class": "Condition_Flow_Enabled",
+      "ID": "element0000000035",
+      "name": "Flow enabled: Trigger test - Manual - \"Trigger attractive air\"",
+      "package": "default",
+      "pars": {
+        "flowID": "Flow 884290977",
+        "ThisFlow": "0",
+        "triggerID": "element0000000013",
+        "WhichTrigger": "Specified"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-35",
+      "y": "525"
+    },
+    "element0000000040": {
+      "class": "Condition_Debug_Dialog",
+      "ID": "element0000000040",
+      "name": "Debug dialog",
+      "package": "default",
+      "pars": {},
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-210",
+      "y": "665"
+    },
+    "element0000000043": {
+      "class": "Action_Set_Flow_Status",
+      "ID": "element0000000043",
+      "name": "Set flow status - Enable: Trigger test - All triggers",
+      "package": "default",
+      "pars": {
+        "Enable": "Enable",
+        "flowID": "Flow 884290977",
+        "ThisFlow": "0",
+        "triggerID": "",
+        "WhichTrigger": "Any"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "105",
+      "y": "665"
+    },
+    "element0000000046": {
+      "class": "Action_New_variable",
+      "ID": "element0000000046",
+      "name": "New variable - static_periodicTimerPassed = 0",
+      "package": "default",
+      "pars": {
+        "expression": "string",
+        "Varname": "static_periodicTimerPassed",
+        "VarValue": "0"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "105",
+      "y": "805"
+    },
+    "element0000000050": {
+      "class": "Action_New_variable",
+      "ID": "element0000000050",
+      "name": "New variable - static_periodicTimerPassed = static_periodicTimerPassed+increment",
+      "package": "default",
+      "pars": {
+        "expression": "Expression",
+        "Varname": "static_periodicTimerPassed",
+        "VarValue": "static_periodicTimerPassed+increment"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "350",
+      "y": "175"
+    },
+    "element0000000054": {
+      "class": "Action_Sleep",
+      "ID": "element0000000054",
+      "name": "Sleep: 3 s",
+      "package": "action",
+      "pars": {
+        "Duration": "3",
+        "Unit": "Seconds"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "105",
+      "y": "945"
+    },
+    "element0000000056": {
+      "class": "Condition_Expression",
+      "ID": "element0000000056",
+      "name": "Expression - static_periodicTimerPassed == 2",
+      "package": "default",
+      "pars": {
+        "Expression": "static_periodicTimerPassed == 2"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "105",
+      "y": "1085"
+    },
+    "element0000000061": {
+      "class": "Condition_Debug_Dialog",
+      "ID": "element0000000061",
+      "name": "Debug dialog",
+      "package": "default",
+      "pars": {},
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-140",
+      "y": "1225"
+    },
+    "element0000000063": {
+      "class": "Condition_Flow_Enabled",
+      "ID": "element0000000063",
+      "name": "Flow enabled: This flow - Periodic timer - 1 Seconds",
+      "package": "default",
+      "pars": {
+        "flowID": "",
+        "ThisFlow": "1",
+        "triggerID": "element0000000005",
+        "WhichTrigger": "Specified"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "105",
+      "y": "1225"
+    },
+    "element0000000070": {
+      "class": "Action_Set_Flow_Status",
+      "ID": "element0000000070",
+      "name": "Set flow status - Disable: This flow - All triggers",
+      "package": "default",
+      "pars": {
+        "Enable": "Disable",
+        "flowID": "",
+        "ThisFlow": 1,
+        "triggerID": "",
+        "WhichTrigger": "Any"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "0",
+      "y": "-210"
+    },
+    "element0000000073": {
+      "class": "Condition_Flow_Enabled",
+      "ID": "element0000000073",
+      "name": "Flow enabled: This flow - Any trigger",
+      "package": "default",
+      "pars": {
+        "flowID": "",
+        "ThisFlow": 1,
+        "triggerID": "",
+        "WhichTrigger": "Any"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-35",
+      "y": "-35"
+    },
+    "element0000000074": {
+      "class": "Condition_Debug_Dialog",
+      "ID": "element0000000074",
+      "name": "Debug dialog",
+      "package": "default",
+      "pars": {},
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-245",
+      "y": "35"
+    },
+    "element0000000076": {
+      "class": "Trigger_Periodic_Timer",
+      "enabled": "0",
+      "ID": "element0000000076",
+      "name": "Periodic timer - 10 Seconds",
+      "package": "default",
+      "pars": {
+        "Interval": "10",
+        "Unit": "Seconds"
+      },
+      "StandardName": "1",
+      "type": "Trigger",
+      "x": "980",
+      "y": "-245"
+    },
+    "element0000000080": {
+      "class": "Action_New_variable",
+      "ID": "element0000000080",
+      "name": "New variable - static_testSuccess = 0",
+      "package": "default",
+      "pars": {
+        "expression": "string",
+        "Varname": "static_testSuccess",
+        "VarValue": "0"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "0",
+      "y": "-350"
+    },
+    "element0000000083": {
+      "class": "Condition_Expression",
+      "ID": "element0000000083",
+      "name": "Expression - static_testSuccess",
+      "package": "default",
+      "pars": {
+        "Expression": "static_testSuccess"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "980",
+      "y": "35"
+    },
+    "element0000000085": {
+      "class": "Condition_Debug_Dialog",
+      "ID": "element0000000085",
+      "name": "Debug dialog",
+      "package": "default",
+      "pars": {},
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "1155",
+      "y": "175"
+    },
+    "element0000000087": {
+      "class": "Action_Tooltip",
+      "ID": "element0000000087",
+      "name": "Tooltip: Trigger State Test success - 2 s - Follow mouse",
+      "package": "action",
+      "pars": {
+        "duration": 2,
+        "follow_mouse": 1,
+        "text": "Trigger State Test success",
+        "Unit": "Seconds"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "945",
+      "y": "350"
+    },
+    "element0000000089": {
+      "class": "Action_New_variable",
+      "ID": "element0000000089",
+      "name": "New variable - static_testSuccess = 1",
+      "package": "default",
+      "pars": {
+        "expression": "string",
+        "Varname": "static_testSuccess",
+        "VarValue": "1"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "105",
+      "y": "1400"
+    },
+    "element0000000090": {
+      "class": "Action_Set_Flow_Status",
+      "ID": "element0000000090",
+      "name": "Set flow status - Disable: This flow - All triggers",
+      "package": "default",
+      "pars": {
+        "Enable": "Disable",
+        "flowID": "",
+        "ThisFlow": 1,
+        "triggerID": "",
+        "WhichTrigger": "Any"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "980",
+      "y": "-105"
+    },
+    "element0000000099": {
+      "class": "Action_Execute_Flow",
+      "ID": "element0000000099",
+      "name": "Execute flow: Trigger test - Manual - \"Trigger attractive air\"",
+      "package": "default",
+      "pars": {
+        "flowID": "Flow 884290977",
+        "ReturnVariables": "0",
+        "SendLocalVars": "1",
+        "SkipDisabled": "0",
+        "ThisFlow": "0",
+        "triggerID": "element0000000013",
+        "WaitToFinish": "0",
+        "WhichTrigger": "specified"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "665",
+      "y": "420"
+    },
+    "element0000000105": {
+      "class": "Action_New_variable",
+      "ID": "element0000000105",
+      "name": "New variable - increment = 1",
+      "package": "default",
+      "pars": {
+        "expression": "string",
+        "Varname": "increment",
+        "VarValue": "1"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "665",
+      "y": "140"
+    },
+    "element0000000107": {
+      "class": "Action_Set_Flow_Status",
+      "ID": "element0000000107",
+      "name": "Set flow status - Disable: This flow - Manual - \"Trigger attractive air\"",
+      "package": "default",
+      "pars": {
+        "Enable": "Disable",
+        "flowID": "",
+        "ThisFlow": 1,
+        "triggerID": "element0000000013",
+        "WhichTrigger": "Specified"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "665",
+      "y": "280"
+    },
+    "element0000000110": {
+      "class": "Action_Execute_Flow",
+      "ID": "element0000000110",
+      "name": "Execute flow: This flow - Manual - \"Trigger attractive air\"",
+      "package": "default",
+      "pars": {
+        "flowID": "",
+        "ReturnVariables": "1",
+        "SendLocalVars": "1",
+        "SkipDisabled": "1",
+        "ThisFlow": "1",
+        "triggerID": "element0000000013",
+        "WaitToFinish": "1",
+        "WhichTrigger": "specified"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "665",
+      "y": "700"
+    },
+    "element0000000111": {
+      "class": "Action_Set_Flow_Status",
+      "ID": "element0000000111",
+      "name": "Set flow status - Enable: This flow - Manual - \"Trigger attractive air\"",
+      "package": "default",
+      "pars": {
+        "Enable": "Enable",
+        "flowID": "",
+        "ThisFlow": 1,
+        "triggerID": "element0000000013",
+        "WhichTrigger": "Specified"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "665",
+      "y": "560"
+    },
+    "element0000000118": {
+      "class": "Action_New_variable",
+      "ID": "element0000000118",
+      "name": "New variable - otherincrement = 1",
+      "package": "default",
+      "pars": {
+        "expression": "string",
+        "Varname": "otherincrement",
+        "VarValue": "1"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "350",
+      "y": "35"
+    },
+    "element0000000121": {
+      "class": "Action_New_variable",
+      "ID": "element0000000121",
+      "name": "New variable - static_periodicTimerPassed = static_periodicTimerPassed + otherincrement",
+      "package": "default",
+      "pars": {
+        "expression": "Expression",
+        "Varname": "static_periodicTimerPassed",
+        "VarValue": "static_periodicTimerPassed + otherincrement"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "665",
+      "y": "910"
+    },
+    "element0000000125": {
+      "class": "Action_Sleep",
+      "ID": "element0000000125",
+      "name": "Sleep: 5 s",
+      "package": "action",
+      "pars": {
+        "Duration": "5",
+        "Unit": "Seconds"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "665",
+      "y": "1085"
+    },
+    "element0000000127": {
+      "class": "Action_New_variable",
+      "ID": "element0000000127",
+      "name": "New variable - static_testSuccess = 0",
+      "package": "default",
+      "pars": {
+        "expression": "string",
+        "Varname": "static_testSuccess",
+        "VarValue": "0"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "665",
+      "y": "1225"
+    },
+    "element0000000130": {
+      "class": "Action_Stop_Flow",
+      "ID": "element0000000130",
+      "name": "Stop flow - Trigger test",
+      "package": "default",
+      "pars": {
+        "flowID": "Flow 884290977"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "105",
+      "y": "1610"
+    },
+    "element0000000131": {
+      "class": "Trigger_Shortcut",
+      "enabled": "0",
+      "ID": "element0000000131",
+      "name": "Shortcut - %A_Desktop%\\Flow Trigger test.lnk",
+      "package": "default",
+      "pars": {
+        "RemoveShortcutOnDisabling": "1",
+        "ShortCutPath": "%A_Desktop%\\Flow Trigger test.lnk"
+      },
+      "StandardName": "1",
+      "type": "Trigger",
+      "x": "1400",
+      "y": "-210"
+    },
+    "element0000000154": {
+      "class": "Action_New_variable",
+      "ID": "element0000000154",
+      "name": "New variable - static_shortcutSuccess = 1",
+      "package": "default",
+      "pars": {
+        "expression": "Expression",
+        "Varname": "static_shortcutSuccess",
+        "VarValue": "1"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "1715",
+      "y": "350"
+    },
+    "element0000000156": {
+      "class": "Action_New_variable",
+      "ID": "element0000000156",
+      "name": "New variable - static_shortcutSuccess = 0",
+      "package": "default",
+      "pars": {
+        "expression": "Expression",
+        "Varname": "static_shortcutSuccess",
+        "VarValue": "0"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "175",
+      "y": "-350"
+    },
+    "element0000000158": {
+      "class": "Condition_Expression",
+      "ID": "element0000000158",
+      "name": "Expression - static_shortcutSuccess",
+      "package": "default",
+      "pars": {
+        "Expression": "static_shortcutSuccess"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "945",
+      "y": "175"
+    },
+    "element0000000161": {
+      "class": "Action_Run",
+      "ID": "element0000000161",
+      "name": "Run - %A_Desktop%\\Flow Trigger test.lnk",
+      "package": "default",
+      "pars": {
+        "RunMode": "",
+        "ToRun": "%A_Desktop%\\Flow Trigger test.lnk",
+        "ToRunContent": "String",
+        "WhichWorkingDir": "Default",
+        "WorkingDir": ""
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "280",
+      "y": "910"
+    },
+    "element0000000164": {
+      "class": "Action_Set_Flow_Status",
+      "ID": "element0000000164",
+      "name": "Set flow status - Disable: This flow - Shortcut - %A_Desktop%\\Flow Trigger test.lnk",
+      "package": "default",
+      "pars": {
+        "Enable": "Disable",
+        "flowID": "",
+        "ThisFlow": 1,
+        "triggerID": "element0000000131",
+        "WhichTrigger": "Specified"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "1400",
+      "y": "-35"
+    },
+    "element0000000167": {
+      "class": "Condition_File_Exists",
+      "ID": "element0000000167",
+      "name": "File exists - %A_Desktop%\\Flow Trigger test.lnk",
+      "package": "default",
+      "pars": {
+        "file": "%A_Desktop%\\Flow Trigger test.lnk"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "1400",
+      "y": "105"
+    },
+    "element0000000172": {
+      "class": "Trigger_Start_up",
+      "enabled": "0",
+      "ID": "element0000000172",
+      "name": "Start up - When AHF starts",
+      "package": "default",
+      "pars": {
+        "startupType": "AutoHotFlow"
+      },
+      "StandardName": "1",
+      "type": "Trigger",
+      "x": "2065",
+      "y": "-175"
+    },
+    "element0000000174": {
+      "class": "Action_Speech_output",
+      "ID": "element0000000174",
+      "name": "Speech output -  - Microsoft Hedda Desktop",
+      "package": "default",
+      "pars": {
+        "pitch": 0,
+        "speed": 0,
+        "text": "Hello",
+        "TTSEngine": "Microsoft Hedda Desktop",
+        "volume": 100,
+        "WaitUntilCurrentFinishes": 1,
+        "WaitUntilPreviousFinished": ""
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "2100",
+      "y": "140"
+    },
+    "element0000000175": {
+      "class": "Action_Add_To_List",
+      "ID": "element0000000175",
+      "name": "Add to list global_testResults - As last value - Value 'a_flowName'",
+      "package": "default",
+      "pars": {
+        "DelimiterComma": 0,
+        "DelimiterLinefeed": 1,
+        "DelimiterSemicolon": 0,
+        "DelimiterSpace": 0,
+        "Expression": "Expression",
+        "expressionPos": "String",
+        "InsertMethod": "Insert",
+        "InsertMethodLabel": "",
+        "NumberOfElements": "One",
+        "Position": "keyName",
+        "Varname": "global_testResults",
+        "VarValue": "a_flowName",
+        "VarValues": "Element one\nElement two",
+        "WhichPosition": "Last"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "980",
+      "y": "490"
+    }
+  },
+  "category": "Automatic tests",
+  "ElementIDCounter": "176",
+  "flowSettings": {
+    "DefaultWorkingDir": 1,
+    "ExecutionPolicy": "default",
+    "Offsetx": "-338.571422",
+    "Offsety": "-308.571431",
+    "WorkingDir": "",
+    "zoomFactor": "0.7"
+  },
+  "name": "Trigger test"
+}

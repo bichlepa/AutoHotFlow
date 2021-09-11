@@ -9,6 +9,19 @@ FileEncoding utf-8
 #include lib\Json\Jxon.ahk
 #Include lib\ini\ini helper.ahk
 
+; parse arguments
+for n, param in A_Args
+{
+    if (param = "onlyDefaultPackage")
+	{
+		; if this parameter is present, we will only include the default package
+		onlyDefaultPackage := true
+	}
+	Else
+	{
+		MsgBox, unknown parameter: %param%
+	}
+}
 
 allElementTypes := ["actions", "conditions", "loops", "triggers"]
 availableHelpFileLanguages := []
@@ -38,6 +51,16 @@ elementInclusions := ""
 helpFiles := ""
 loop, files, source_Elements\*manifest.json, FR
 {
+	if (onlyDefaultPackage)
+	{
+		; we want only default package.
+		searchString := "\Default\manifest.json"
+		if (not substr(A_LoopFileFullPath, - (strlen(searchString) - 1)) = searchString)
+		{
+			; skip this package
+			continue
+		}
+	}
 	fileread,fileContent,% A_LoopFileFullPath
 	fileContent := Jxon_Load(fileContent)
 
