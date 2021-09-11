@@ -27,7 +27,7 @@ You can track the progress on trello: https://trello.com/b/Ca91IaeG/autohotflow
 Go the the Relases section and download the installer of the current version. If you only want to use AutoHotFlow, it's not recommended to clone this repository.
 # How to develop
 Here you'll find instructions for those who want to work on AHF.
-After checkout, run the script "find modules.ahk" first. Otherwise you'll get some error messages on start of AHF.
+After first checkout, `find modules.ahk` will be automatically started by AHF. Please run `find modules.ahk` every time after you pulled some changes. Otherwise errors may sometimes occur.
 ## Add new elements
 If you want to add some new elements, you'll find everything you need in the folder `Tools for contributors\Element creation`.
 ## Improve AHF and create an installer
