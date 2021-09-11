@@ -1,7 +1,7 @@
 ﻿/*
 license info:
 {
-	"name": "HTTPRequest v2.49",
+	"name": "uriencode",
 	"author": "VxE",
 	"source": "https://autohotkey.com/board/topic/69205-lib-oauth-10a-ahk-basic-ahk-l-unicode-v103/page-2",
 	"license": "BSD",

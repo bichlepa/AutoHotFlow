@@ -60,31 +60,33 @@ for oneLanguageIndex, oneLanguage in availableHelpFileLanguages
 Libincludes := ""
 elementInclusions := ""
 helpFiles := ""
-loop, files, source_Elements\*manifest.json, FR
+licenseInfo := []
+loop, files, source_Elements\*, D
 {
+	packageName := A_LoopFileName
+	packagePath := A_LoopFilePath
 	if (onlyDefaultPackage)
 	{
 		; we want only default package.
-		searchString := "\Default\manifest.json"
-		if (not substr(A_LoopFileFullPath, - (strlen(searchString) - 1)) = searchString)
+		if (packageName != "Default")
 		{
 			; skip this package
 			continue
 		}
 	}
-	fileread,fileContent,% A_LoopFileFullPath
+	fileread,fileContent,% packagePath "\manifest.json"
 	fileContent := Jxon_Load(fileContent)
 
 	for oneLibraryIndex, oneLibrary in fileContent.libraries
 	{
-		Libincludes .= "#include " A_LoopFileDir "\" oneLibrary "`n"
+		Libincludes .= "#include " packagePath "\" oneLibrary "`n"
 	}
 
 	for oneElementTypeIndex, oneElementType in allElementTypes
 	{
 		for oneElementIndex, oneElement in fileContent[oneElementType]
 		{
-			elementInclusions .= "#include " A_LoopFileDir "\" oneElementType "\" oneElement "`n"
+			elementInclusions .= "#include " packagePath "\" oneElementType "\" oneElement "`n"
 		}
 	}
 	
@@ -102,7 +104,7 @@ loop, files, source_Elements\*manifest.json, FR
 				oneElementWithoutExtension := substr(oneElement, 1, -4)
 				helpFileName:= oneElementWithoutExtension ".html"
 				helpFilePathDestination := "help\" oneLanguage "\" oneElementType "\" helpFileName
-				helpFilePathSource := A_LoopFileDir "\" helpFilePathDestination
+				helpFilePathSource := packagePath "\" helpFilePathDestination
 				if (FileExist(helpFilePathSource))
 				{
 					FileCopy, % helpFilePathSource, % helpFilePathDestination , 1
@@ -125,7 +127,7 @@ loop, files, source_Elements\*manifest.json, FR
 	
 
 	; merge translations files
-	loop, files, %A_LoopFileDir%\language\*.ini
+	loop, files, %packagePath%\language\*.ini
 	{
 		oneLanguage := substr(a_loopfilename, 1, instr(a_loopfilename, ".") - 1)
 		
@@ -134,6 +136,16 @@ loop, files, source_Elements\*manifest.json, FR
 		newTranslations := importIni(iniFileContent)
 		mergeTranslations(allTranslations[oneLanguage], newTranslations)
 	}
+
+
+	; read license informations
+	licenseInfoEntry := []
+	licenseInfoEntry.author := fileContent.author
+	licenseInfoEntry.website := fileContent.website
+	licenseInfoEntry.license := fileContent.license
+	licenseInfoEntry.description := fileContent.description
+	licenseInfoEntry.version := fileContent.version
+	licenseInfo[packageName] := licenseInfoEntry
 }
 
 ; write help menu index; prepare help menu index
@@ -180,10 +192,37 @@ mainfilecontent:=substr(mainfilecontent,1,posstart) Libincludes SubStr(mainfilec
 FileDelete,source_main\main.ahk
 FileAppend,%mainfilecontent%,source_main\main.ahk
 
+; license text
+; add license informations from modules
+licenseInfoPackageText := ""
+for onePackageName, onePackage in licenseInfo
+{
+	licenseInfoPackageText .= onePackageName "`n"
+	licenseInfoPackageText .= "description: " onePackage.description "`n"
+	licenseInfoPackageText .= "author: " onePackage.author "`n"
+	licenseInfoPackageText .= "source: " onePackage.website "`n"
+	licenseInfoPackageText .= "license: " onePackage.license "`n"
+	licenseInfoPackageText .= "`n"
+}
+
+
 ; find licenses in source code and create some readable text
 licenseInfoText := ""
 loop, files, *.ahk, FR
 {
+	if (onlyDefaultPackage)
+	{
+		; we want only default package.
+		if (instr(a_loopfilePath,"\Source_Elements\"))
+		{
+			if (not instr(a_loopfilePath,"\Source_Elements\Default\"))
+			{
+				; skip this package
+				continue
+			}
+		}
+	}
+
 	FileRead, fileContent, % a_loopfilePath
 	if instr(fileContent, "license info" ":")
 	{
@@ -205,9 +244,11 @@ loop, files, *.ahk, FR
 	}
 }
 
+
 ; insert the text in the about.ahk file
 aboutCodeFilePath := "Source_Manager\User interface\About.ahk"
 FileRead, aboutCode, % aboutCodeFilePath
+
 startpos := instr(aboutCode, "#aboutTextOtherCodeOverviewStart") + strlen("#aboutTextOtherCodeOverviewStart`n")
 stopPos := instr(aboutCode, "#aboutTextOtherCodeOverviewStop")
 codeBefore := substr(aboutCode, 1, startpos)
@@ -216,6 +257,16 @@ aboutCode := codeBefore licenseInfoText codeAfter
 
 StringReplace, aboutCode, aboutCode, `n, `r`n, all
 StringReplace, aboutCode, aboutCode, `r`r`n, `r`n, all
+
+startpos := instr(aboutCode, "#aboutTextPackagesStart") + strlen("#aboutTextPackagesStart`n")
+stopPos := instr(aboutCode, "#aboutTextPackagesStop")
+codeBefore := substr(aboutCode, 1, startpos)
+codeAfter := substr(aboutCode, stopPos)
+aboutCode := codeBefore licenseInfoPackageText codeAfter
+
+StringReplace, aboutCode, aboutCode, `n, `r`n, all
+StringReplace, aboutCode, aboutCode, `r`r`n, `r`n, all
+
 filedelete, % aboutCodeFilePath
 FileAppend, % aboutCode, % aboutCodeFilePath, utf-8
 

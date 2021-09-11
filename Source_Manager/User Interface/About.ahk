@@ -8,10 +8,8 @@ init_about_gui()
     licenseText := global_aboutText
     licenseText := StrReplace(licenseText, "#aboutTextOtherCodeOverview" "Start")
     licenseText := StrReplace(licenseText, "#aboutTextOtherCodeOverview" "Stop")
-
-    local gplLicenseText
-    fileread, gplLicenseText, %a_scriptDir%\..\License.txt
-    licenseText .= gplLicenseText
+    licenseText := StrReplace(licenseText, "#aboutTextPackages" "Start")
+    licenseText := StrReplace(licenseText, "#aboutTextPackages" "Stop")
 
     ; create the gui
     gui, about:default
@@ -49,6 +47,7 @@ AutoHotFlow %_AhfVersion% - Written by bichlepa (Paul Bichler)
 Licensed under GNU General Public License 3
 Sourcecode: https://github.com/bichlepa/AutoHotFlow
 
+
 This application includes some external binaries. This is anoverview:
 
 7-Zip Command line version
@@ -56,6 +55,16 @@ author: Igor Pavlov
 source: https://www.7-zip.org/
 license: GNU LGPL
 link to license text: https://www.7-zip.org/license.txt
+
+This application contains following packages:
+#aboutTextPackagesStart
+Default
+description: Default AutoHotFlow elements
+author: Paul Bichler (bichlepa)
+source: https://github.com/bichlepa/AutoHotFlow
+license: Unlicense
+
+#aboutTextPackagesStop
 
 This application contains some code, which was written by other authors. This is an overview:
 #aboutTextOtherCodeOverviewStart
@@ -94,7 +103,7 @@ source: https://github.com/camerb/AHKs/blob/master/thirdParty/HTTPRequest.ahk
 license: BSD
 link to license text: https://opensource.org/licenses/BSD-3-Clause
 
-HTTPRequest v2.49
+uriencode
 author: VxE
 source: https://autohotkey.com/board/topic/69205-lib-oauth-10a-ahk-basic-ahk-l-unicode-v103/page-2
 license: BSD
@@ -106,7 +115,6 @@ source: https://autohotkey.com/board/topic/53429-function-easy-text-to-speech/
 license: unknown (probably public domain)
 
 #aboutTextOtherCodeOverviewStop
-Full text of the GNU General Public License 3:
 
 
 )

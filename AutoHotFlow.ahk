@@ -29,4 +29,4 @@ if (command = "AHFCommand")
 
 
 ;At last run main.ahk passing all command line parameters which were passed to this script
-run,autohotkey\autohotkey.exe "%A_ScriptDir%\source_main\main.ahk" "%1%" "%2%" "%3%" "%4%" "%5%" "%6%" "%7%" "%8%" "%9%" "%10%"
+run,autohotkey\AutoHotFlow.exe "%A_ScriptDir%\source_main\main.ahk" "%1%" "%2%" "%3%" "%4%" "%5%" "%6%" "%7%" "%8%" "%9%" "%10%"

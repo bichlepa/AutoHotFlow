@@ -64,6 +64,7 @@ FileAppend, % mainFile, % mainFilePath
 ; build some executables
 buildFile("AutoHotFlow", "Icons/MainIcon.ico")
 buildFile("find modules")
+buildFile("Package uninstaller", "Icons/Trash.ico")
 
 buildFile(path, icon = "")
 {
@@ -75,8 +76,24 @@ buildFile(path, icon = "")
 }
 
 
+; write new version number in default package manifest
+manifestPath := "Source_Elements\Default\manifest.json"
+FileRead, manifestContent, % manifestPath
+; write new version number to inno setup file
+StringReplace, manifestContent, manifestContent, % """version"": """ oldVersionNumber """", % """version"": """ versionNumber """"
+if (errorlevel)
+{
+    MsgBox, could not write new version number to default manifest file
+    ExitApp
+}
+
+
+FileDelete, % manifestPath
+FileAppend, % manifestContent, % manifestPath
+
+
 ; run find Modules
-run, "find modules.exe"
+run, "find modules - only default package.ahk"
 
 ; create file list
 AppDirList := []
@@ -114,6 +131,8 @@ addFilesInFolderWithExtension(AppDirList, AppFileList, "Source_Elements\Default"
 
 addFile(AppDirList, AppFileList, "find modules.exe")
 addFile(AppDirList, AppFileList, "AutoHotFlow.exe")
+addFile(AppDirList, AppFileList, "Package uninstaller.exe")
+addFile(AppDirList, AppFileList, "License.txt")
 
 
 

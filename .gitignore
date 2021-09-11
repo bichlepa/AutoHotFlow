@@ -2,9 +2,7 @@
 *.bak
 
 # compiled files
-/AutoHotFlow Installation.exe
-/AutoHotFlow Setup.exe
-/AutoHotFlow.exe
+/*.exe
 
 # exclude flows except of demonstration flows
 Saved Flows/backup
@@ -16,3 +14,6 @@ ehthumbs.db
 
 # Folder config file
 Desktop.ini
+
+#other
+/innoSetupScript - Extension Package.iss

@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "AutoHotFlow"
-#define MyAppVersion "1.0.4"
+#define MyAppVersion "1.0.5"
 #define MyAppPublisher "Paul Bichler"
 #define MyAppURL "https://bichlepa.jimdofree.com/autohotflow/"
 #define MyAppExeName "AutoHotFlow.exe" 
@@ -32,6 +32,7 @@ SolidCompression=yes
 WizardStyle=modern
 OutputDir=.
 SetupIconFile=icons\MainIcon.ico
+UninstallDisplayIcon={app}\{#MyAppExeName}
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -47,12 +48,21 @@ Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: de
 Filename: "{app}\find modules.exe"
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent runasoriginaluser
 
+[UninstallRun]
+Filename: "{cmd}"; Parameters: "/C ""taskkill /im {#MyAppExeName} /f /t"; RunOnceId: "StopAHF"
+
+[UninstallDelete]
+Type: filesandordirs; Name: "{app}\Help"
+Type: filesandordirs; Name: "{app}\Source_Elements"
+Type: filesandordirs; Name: "{app}\language"
+Type: dirifempty; Name: "{app}"
+
 [InstallDelete]
 ;Type: files; Name: "{app}\language\*.ini"
 
 ; this section must be at the bottom, Because the script innoSetupPrebuildSteps will overwrite everything that is beneath Files section
 [Files]
-Source: "AutoHotKey\AutoHotkey.exe"; DestDir: "{app}\AutoHotKey"; Flags: ignoreversion
+Source: "AutoHotKey\AutoHotFlow.exe"; DestDir: "{app}\AutoHotKey"; Flags: ignoreversion
 Source: "bin\7-zip.chm"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "bin\7za.exe"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "bin\license.txt"; DestDir: "{app}\bin"; Flags: ignoreversion
@@ -456,3 +466,5 @@ Source: "Source_Elements\Default\language\en.ini"; DestDir: "{app}\Source_Elemen
 Source: "Source_Elements\Default\manifest.json"; DestDir: "{app}\Source_Elements\Default"; Flags: ignoreversion
 Source: "find modules.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "AutoHotFlow.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "Package uninstaller.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "License.txt"; DestDir: "{app}"; Flags: ignoreversion

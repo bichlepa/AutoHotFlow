@@ -47,6 +47,7 @@ FileCreateDir, % packagePath "\language"
 FileCreateDir, % packagePath "\lib"
 FileCreateDir, % packagePath "\Loops"
 FileCreateDir, % packagePath "\Triggers"
+FileCreateDir, % packagePath "\bin"
 
 ; create initial language file
 IniWrite, % "English", % packagePath "\language\en.ini", language_info, enname
@@ -57,9 +58,10 @@ jsonfile =
 {
     "name": "&packageName&",
     "description": "&packageName& extension",
-    "author": "",
+    "author": "%a_username%",
     "website": "",
-    "license": "",
+    "license": "Unlicense",
+    "version": "1.0.0",
     "libraries": [
     ],
     "actions": [
@@ -76,6 +78,8 @@ jsonfile =
     ]
 }
 )
+
+filecopy, % ahf_path "\source_elements\default\license.txt", % packagePath "\license.txt"
 
 StringReplace, jsonfile, jsonfile, &packageName& , %packageName%, All
 

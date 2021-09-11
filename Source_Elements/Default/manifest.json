@@ -3,7 +3,8 @@
     "description": "Default AutoHotFlow elements",
     "author": "Paul Bichler (bichlepa)",
     "website": "https://github.com/bichlepa/AutoHotFlow",
-    "license": "GPL3.0",
+    "license": "Unlicense",
+    "version": "1.0.5",
     "libraries": [
         "lib\\TTS\\TTS by Learning One.ahk",
         "lib\\Eject\\Eject.ahk",

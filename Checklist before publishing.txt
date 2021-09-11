@@ -1,3 +1,5 @@
-- Write down new version number and the changes into Base Frame 
-- Run the translation tool
-- Run the huge test flow
+- run "innoSetupPrebuildSteps.ahk"
+- run all test flows
+- make installer via innoSetupScript.iss
+- test the installer
+- open installed AHF
