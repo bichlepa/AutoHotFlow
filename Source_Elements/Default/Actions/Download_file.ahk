@@ -103,7 +103,7 @@ Element_run_Action_Download_File(Environment, ElementParameters)
 	; check for errors
 	if ErrorLevel
 	{
-		x_finish(Environment, "exception", x_lang("Couldn't download URL '%1%' to file '%2%", EvaluatedParameters.URL, EvaluatedParameters.file))
+		x_finish(Environment, "exception", x_lang("Couldn't download URL '%1%' to file '%2%'", EvaluatedParameters.URL, EvaluatedParameters.file))
 		return
 	}
 

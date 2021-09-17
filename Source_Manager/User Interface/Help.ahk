@@ -40,7 +40,7 @@ ui_showHelp()
 	local helpw := MonitorWorkArearight - MonitorWorkArealeft - 100
 	
 	; Show the help gui
-	Gui, Help:Show, x%helpx% y%helpy% w%helpw% h%helph%,% lang("Help")
+	Gui, Help:Show, x%helpx% y%helpy% w%helpw% h%helph%,% lang("Help #noun")
 	Return
 	
 	; user closes help gui

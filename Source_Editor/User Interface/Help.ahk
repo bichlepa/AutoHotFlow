@@ -72,12 +72,12 @@ ui_showHelp(elementID)
 		}
 		
 		;show gui
-		Gui, Help: Show, x%helpx% y%helpy% w%helpw% h%helph%, % lang("Help")
+		Gui, Help: Show, x%helpx% y%helpy% w%helpw% h%helph%, % lang("Help #noun")
 	}
 	else
 	{
 		; Settings window does not exist. Show it in the middle of the screen
-		Gui, Help: Show, w720, % lang("Help")
+		Gui, Help: Show, w720, % lang("Help #noun")
 	}
 	
 	Gui, Help: +Hwndglobal_GUIHelpHWND

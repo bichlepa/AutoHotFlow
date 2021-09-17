@@ -58,7 +58,7 @@ Element_getParametrizationDetails_Action_List_drives(Environment)
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Drive type")})
 	parametersToEdit.push({type: "Radio", id: "WhetherDriveTypeFilter", default: "all", choices: [x_lang("Find all drives"), x_lang("Get only a Specified type of drive")], result: "enum", enum: ["all", "filter"]})
-	parametersToEdit.push({type: "DropDown", id: "DriveType", default: "CDROM", choices: [x_lang("Disk drives"), x_lang("Removable drives"), x_lang("Fixed drives"), x_lang("Network drives"), x_lang("RAM disk drives"), x_lang("Unknown drives")], result: "enum", enum: ["CDROM", "REMOVABLE", "FIXED", "NETWORK", "RAMDISK", "UNKNOWN"]})
+	parametersToEdit.push({type: "DropDown", id: "DriveType", default: "CDROM", choices: [x_lang("Optical disk drives"), x_lang("Removable drives"), x_lang("Fixed drives"), x_lang("Network drives"), x_lang("RAM disk drives"), x_lang("Unknown drives")], result: "enum", enum: ["CDROM", "REMOVABLE", "FIXED", "NETWORK", "RAMDISK", "UNKNOWN"]})
 	
 	parametersToEdit.push({type: "Label", label: x_lang("If no drive can be found")})
 	parametersToEdit.push({type: "Radio", id: "IfNothingFound", default: "Exception", choices: [x_lang("Normal") " - " x_lang("Make output variable empty"),x_lang("Throw exception")], result: "enum", enum: ["Normal", "Exception"]})

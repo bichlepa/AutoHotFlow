@@ -66,13 +66,13 @@ Element_getParametrizationDetails_Action_Speech_output(Environment)
 	parametersToEdit.push({type: "Label", label: x_lang("Speech engine")})
 	parametersToEdit.push({type: "DropDown", id: "TTSEngine", default: tts.default, choices: tts.list, result: "string"})
 	
-	parametersToEdit.push({type: "Label", label: x_lang("Volume")})
+	parametersToEdit.push({type: "Label", label: x_lang("Volume #sound volume")})
 	parametersToEdit.push({type: "Slider", id: "volume", default: 100, options: "Range0-100 TickInterval10 tooltip"})
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Speed")})
 	parametersToEdit.push({type: "Slider", id: "speed", default: 0, options: "Range-10-10 TickInterval1 tooltip"})
 	
-	parametersToEdit.push({type: "Label", label: x_lang("Pitch")})
+	parametersToEdit.push({type: "Label", label: x_lang("Pitch #tone pitch")})
 	parametersToEdit.push({type: "Slider", id: "pitch", default: 0, options: "Range-10-10 TickInterval1 tooltip"})
 
 	return parametersToEdit

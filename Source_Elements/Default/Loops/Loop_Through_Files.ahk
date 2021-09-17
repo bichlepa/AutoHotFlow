@@ -53,11 +53,11 @@ Element_getParametrizationDetails_Loop_Loop_Through_Files(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: x_lang("File pattern")})
+	parametersToEdit.push({type: "Label", label: x_lang("File path")})
 	parametersToEdit.push({type: "File", id: "file", label: x_lang("Select a file")})
 	parametersToEdit.push({type: "Label", label: x_lang("Options")})
 	parametersToEdit.push({type: "Radio", id: "OperateOnWhat", default: "Files", choices: [x_lang("Operate on files"), x_lang("Operate on files and folders"), x_lang("Operate on folders")], result: "enum", enum: ["Files", "FilesAndFolders", "Folders"]})
-	parametersToEdit.push({type: "Checkbox", id: "Recurse", default: 0, label: x_lang("Recurse subfolders into")})
+	parametersToEdit.push({type: "Checkbox", id: "Recurse", default: 0, label: x_lang("Recurse into subfolders")})
 	
 	return parametersToEdit
 }
@@ -210,7 +210,7 @@ Element_run_Loop_Loop_Through_Files(Environment, ElementParameters)
 	else
 	{
 		;This should never happen, but I suggest to keep this code for catching bugs in AHF.
-		x_finish(Environment, "exception", x_lang("No information whether the connection leads into head or tail"))
+		x_finish(Environment, "exception", x_lang("No information whether the connection leads to head or tail"))
 	}
 	
 }

@@ -12,7 +12,7 @@ assistant_GetWindowInformation(neededInfo)
 	gui,add,text,xm ym w400 ,% lang("Select_a_window_which_you_want_to_import")
 	if (assistant_GetWindowInformation_NeededInfo.winText)
 	{
-		gui,add,text,X+10 yp w400,% lang("Optinally select some text of a control in window")
+		gui,add,text,X+10 yp w400,% lang("Optionally select some text of a control in window")
 	}
 	if (assistant_GetWindowInformation_NeededInfo.Control_identifier)
 	{

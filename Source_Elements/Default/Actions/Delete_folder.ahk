@@ -125,7 +125,7 @@ Element_run_Action_Delete_Folder(Environment, ElementParameters)
 	; check for errors
 	if errorlevel ;Indecates that files could not be copied
 	{
-		x_finish(Environment, "exception", x_lang("Folder could not be deleted (Filepattern: '%1%')", EvaluatedParameters.Folder)) 
+		x_finish(Environment, "exception", x_lang("Folder could not be deleted (File path: '%1%')", EvaluatedParameters.Folder)) 
 		return
 	}
 	

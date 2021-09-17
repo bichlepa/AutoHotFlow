@@ -65,7 +65,7 @@ Element_getParametrizationDetails_Action_Play_Sound(Environment)
 	parametersToEdit.push({type: "dropdown", id: "systemSound", default: "tada.wav", choices: listOfSysSounds, result: "string"})
 	parametersToEdit.push({type: "File", id: "soundfile", label: x_lang("Select a sound file"), options: 1})
 
-	parametersToEdit.push({type: "Label", label: x_lang("Preview")})
+	parametersToEdit.push({type: "Label", label: x_lang("Preview #noun")})
 	parametersToEdit.push({type: "button", id: "startSoundNow",  goto: "Action_Play_Sound_StartSoundNow", label: x_lang("Start playback")})
 	parametersToEdit.push({type: "button", id: "stopSoundNow",  goto: "Action_Play_Sound_StopSoundNow", label: x_lang("Stop playback now")})
 	

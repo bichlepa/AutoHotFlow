@@ -53,7 +53,7 @@ Element_getParametrizationDetails_Condition_File_Exists(Environment)
 {
 	parametersToEdit := Object()
 	
-	parametersToEdit.push({type: "Label", label: x_lang("File pattern")})
+	parametersToEdit.push({type: "Label", label: x_lang("File path")})
 	parametersToEdit.push({type: "File", id: "file", label: x_lang("Select a file")})
 	
 	return parametersToEdit

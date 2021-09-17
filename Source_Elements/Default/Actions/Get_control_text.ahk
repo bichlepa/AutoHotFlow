@@ -125,7 +125,7 @@ Element_run_Action_Get_Control_Text(Environment, ElementParameters)
 	; check whether we found the control
 	if not controlID
 	{
-		x_finish(Environment, "exception", x_lang("Error! Seeked control does not exist in the specified windows")) 
+		x_finish(Environment, "exception", x_lang("Error! Seeked control does not exist in the specified window")) 
 		return
 	}
 

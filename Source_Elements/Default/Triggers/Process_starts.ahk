@@ -58,7 +58,7 @@ Element_getParametrizationDetails_Trigger_Process_starts(Environment)
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Options")})
 	parametersToEdit.push({type: "Checkbox", id: "NotTriggerOnEnable", default: 1, label: x_lang("Do not trigger if a matching window exists when enabling the trigger")})
-	parametersToEdit.push({type: "Label", label: x_lang("Check interval"), size: "small"})
+	parametersToEdit.push({type: "Label", label: x_lang("Check interval (ms)"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: "interval", content: "Number", default: 1000, WarnIfEmpty: true})
 	
 	return parametersToEdit

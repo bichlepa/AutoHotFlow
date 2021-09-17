@@ -203,8 +203,17 @@ generate()
 		
 	}
 
-	StringReplace, generatedCode,generatedCode,&elementtype&,%elementtype%,a
+	; Generate a readable name without "_"
+	Name_Readable := name
+	StringReplace, Name_Readable, Name_Readable, % "_", % " ", all
+	stringlower, Name_Readable, Name_Readable
+	firstChar := substr(Name_Readable, 1, 1)
+	stringupper, firstChar, firstChar
+	Name_Readable := firstChar substr(Name_Readable, 2)
+
+	StringReplace, generatedCode,generatedCode,&Name_Readable&,%Name_Readable%,a
 	StringReplace, generatedCode,generatedCode,&Name&,%Name%,a
+	StringReplace, generatedCode,generatedCode,&elementtype&,%elementtype%,a
 	StringReplace, generatedCode,generatedCode,&Category&,%Category%,a
 	StringReplace, generatedCode,generatedCode,&package&,%ElementPackage%,a
 	StringReplace, generatedCode,generatedCode,&stability&,%stability%,a

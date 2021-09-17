@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<link rel="stylesheet" href="stylesheet.css">
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<H1>Translation tool help</H1>
+<p>
+	This documentation is designed for those who want to add translations of AHF.
+</p>
+<p>
+	You need some tools in some steps. You'll find them here:
+	<ul>
+		<li/><b>Translation tool</b>: language\Translation Tool.ahk
+		<li/><b>Find modules</b>: find modules.ahk
+	</ul>
+</p>
+
+<H2>How to start</H2>
+<p>This section describes how you can create new elements with minimum effort.</p>
+<p><ul>
+	<li/>Open the <b>Translation tool</b>
+	<li/>Select the workspace. There are translation files for AHF itself and for each package. AHF comes with the "Default" package.
+	<li/>If you want to add a new language
+	<ul>
+		<li/>Click on "Add new language"
+		<li/>Fill out the form and click on OK
+	</ul>
+	<li/>Select an entry in the tree view (on left side) and the language in the list view (on right side)
+	<li/>Enter the translated string. The tool saves the changes instantly. You don't need to think about saving at all.
+	<li/>Proceed with all other entries.
+	<li/>Each element has a help files. You'll find them in <b>Source_Elements\Default\help</b>.
+	<li/>Copy the help files to a folder that matches the ID of your language, open the html files and translate them.
+	<li/>Run the tool <b>Find modules</b>. This will make your changes visible to AHF.
+	<li/>Reload AHF and check the result.
+	<li/>Send the all translated files via email to <a href= "mailto:autohotflow@arcor.de">autohotflow@arcor.de</a></b>. I'll include it in the next update of AHF.
+	<li/>Please update your translations regularely. If AHF gets some updates and the translations won't get any update, I'll remove it if the amount of untranslated strings gets too big.
+</ul></p>
+
+<H2>Remarks</H2>
+<p>You can highlight untranslated entries: Select the language in the dropdown and click on "Find untranslated entries". Now all untranslated entries will be highlighted.</p>
+<p>You can highlight entries with specified string: Select the language in the dropdown, write search text in the edit field and click on "Search". Now all entries with that string will be highlighted.</p>
+
+<p>If you encounter any problem, please contact via <a href= "https://github.com/bichlepa/AutoHotFlow/issues" target="_parent">GitHub Issues</a> (preferable), via <a href= "https://www.autohotkey.com/boards/viewtopic.php?f=6&t=6399">forum</a> or via <a href= "mailto:autohotflow@arcor.de">autohotflow@arcor.de</a>.</p>
+
+</BODY>
+</HTML>

@@ -337,7 +337,7 @@ x_AutoEvaluateOneParameter(EvaluatedParameters, Environment, ElementParameters, 
 				{
 					; variable is invalid. add a warning
 					EvaluatedParameters._error := true
-					EvaluatedParameters._errorMessage := lang("%1% is not valid", lang("Variable name '%1%'", result))
+					EvaluatedParameters._errorMessage := lang("%1% is not valid.", lang("Variable name '%1%'", result))
 				}
 			}
 			EvaluatedParameters[oneParID] := result

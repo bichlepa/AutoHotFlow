@@ -71,7 +71,7 @@ Element_getParametrizationDetails_Action_Eject_Drive(Environment)
 	parametersToEdit.push({type: "Radio", id: "WhatDo", default: "ejectDrive", result: "enum", choices: [x_lang("Eject drive"), x_lang("Retract the tray of a optical disc drive") ], enum: ["ejectDrive", "RetractTray"]})
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Method")})
-	parametersToEdit.push({type: "Radio", id: "Method", default: "LibraryEjectByScan", result: "enum", choices: [x_lang("Method %1%", 1), x_lang("Method %1%", 2) " ("  x_lang("Force")  ")", x_lang("Method %1%", 3) " ("  x_lang("Only optical disc drive")  ")" ], enum: ["LibraryEjectByScan", "DeviceIoControl", "builtIn"]})
+	parametersToEdit.push({type: "Radio", id: "Method", default: "LibraryEjectByScan", result: "enum", choices: [x_lang("Method %1%", 1), x_lang("Method %1%", 2) " ("  x_lang("Force #verb")  ")", x_lang("Method %1%", 3) " ("  x_lang("Only optical disc drive")  ")" ], enum: ["LibraryEjectByScan", "DeviceIoControl", "builtIn"]})
 	
 	; request that the result of this function is never cached (because of the drive letter list)
 	parametersToEdit.updateOnEdit := true

@@ -385,7 +385,7 @@
       "DefaultTrigger": "1",
       "enabled": "0",
       "ID": "element0000000001",
-      "name": "Manual - \"Trigger black branch\"",
+      "name": "Manuell - \"Trigger black branch\"",
       "package": "default",
       "pars": {
         "ID": "Trigger black branch"
@@ -398,7 +398,7 @@
     "element0000000004": {
       "class": "Condition_Flow_Enabled",
       "ID": "element0000000004",
-      "name": "Flow enabled: Trigger test - Manual - \"Trigger attractive air\"",
+      "name": "Flow ist aktiviert: Trigger test - Manual - \"Trigger attractive air\"",
       "package": "default",
       "pars": {
         "flowID": "Flow 884290977",
@@ -415,7 +415,7 @@
       "class": "Trigger_Periodic_Timer",
       "enabled": "0",
       "ID": "element0000000005",
-      "name": "Periodic timer - 1 Seconds",
+      "name": "Periodischer Timer - 1 Sekunden",
       "package": "default",
       "pars": {
         "Interval": "1",
@@ -431,7 +431,7 @@
       "DefaultTrigger": "0",
       "enabled": "0",
       "ID": "element0000000013",
-      "name": "Manual - \"Trigger attractive air\"",
+      "name": "Manuell - \"Trigger attractive air\"",
       "package": "default",
       "pars": {
         "ID": "Trigger attractive air"
@@ -444,7 +444,7 @@
     "element0000000024": {
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000024",
-      "name": "Set flow status - Disable: This flow - Periodic timer - 1 Seconds",
+      "name": "Flow-Status einstellen - Deaktivieren: Dieser Flow - Periodischer Timer - 1 Sekunden",
       "package": "default",
       "pars": {
         "Enable": "Disable",
@@ -461,7 +461,7 @@
     "element0000000027": {
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000027",
-      "name": "Set flow status - Enable: This flow - Manual - \"Trigger attractive air\"",
+      "name": "Flow-Status einstellen - Aktivieren: Dieser Flow - Manuell - \"Trigger attractive air\"",
       "package": "default",
       "pars": {
         "Enable": "Enable",
@@ -478,7 +478,7 @@
     "element0000000031": {
       "class": "Condition_Debug_Dialog",
       "ID": "element0000000031",
-      "name": "Debug dialog",
+      "name": "Debug-Dialog",
       "package": "default",
       "pars": {},
       "StandardName": "1",
@@ -489,7 +489,7 @@
     "element0000000034": {
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000034",
-      "name": "Set flow status - Disable: Trigger test - All triggers",
+      "name": "Flow-Status einstellen - Deaktivieren: Trigger test - Alle Trigger",
       "package": "default",
       "pars": {
         "Enable": "Disable",
@@ -506,7 +506,7 @@
     "element0000000035": {
       "class": "Condition_Flow_Enabled",
       "ID": "element0000000035",
-      "name": "Flow enabled: Trigger test - Manual - \"Trigger attractive air\"",
+      "name": "Flow ist aktiviert: Trigger test - Manuell - \"Trigger attractive air\"",
       "package": "default",
       "pars": {
         "flowID": "Flow 884290977",
@@ -522,7 +522,7 @@
     "element0000000040": {
       "class": "Condition_Debug_Dialog",
       "ID": "element0000000040",
-      "name": "Debug dialog",
+      "name": "Debug-Dialog",
       "package": "default",
       "pars": {},
       "StandardName": "1",
@@ -533,7 +533,7 @@
     "element0000000043": {
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000043",
-      "name": "Set flow status - Enable: Trigger test - All triggers",
+      "name": "Flow-Status einstellen - Aktivieren: Trigger test - Alle Trigger",
       "package": "default",
       "pars": {
         "Enable": "Enable",
@@ -550,7 +550,7 @@
     "element0000000046": {
       "class": "Action_New_variable",
       "ID": "element0000000046",
-      "name": "New variable - static_periodicTimerPassed = 0",
+      "name": "Neue Variable - static_periodicTimerPassed = 0",
       "package": "default",
       "pars": {
         "expression": "string",
@@ -565,7 +565,7 @@
     "element0000000050": {
       "class": "Action_New_variable",
       "ID": "element0000000050",
-      "name": "New variable - static_periodicTimerPassed = static_periodicTimerPassed+increment",
+      "name": "Neue Variable - static_periodicTimerPassed = static_periodicTimerPassed+increment",
       "package": "default",
       "pars": {
         "expression": "Expression",
@@ -580,7 +580,7 @@
     "element0000000054": {
       "class": "Action_Sleep",
       "ID": "element0000000054",
-      "name": "Sleep: 3 s",
+      "name": "Schlafen: 3 Sek",
       "package": "action",
       "pars": {
         "Duration": "3",
@@ -594,7 +594,7 @@
     "element0000000056": {
       "class": "Condition_Expression",
       "ID": "element0000000056",
-      "name": "Expression - static_periodicTimerPassed == 2",
+      "name": "Ausdruck - static_periodicTimerPassed == 2",
       "package": "default",
       "pars": {
         "Expression": "static_periodicTimerPassed == 2"
@@ -607,7 +607,7 @@
     "element0000000061": {
       "class": "Condition_Debug_Dialog",
       "ID": "element0000000061",
-      "name": "Debug dialog",
+      "name": "Debug-Dialog",
       "package": "default",
       "pars": {},
       "StandardName": "1",
@@ -618,7 +618,7 @@
     "element0000000063": {
       "class": "Condition_Flow_Enabled",
       "ID": "element0000000063",
-      "name": "Flow enabled: This flow - Periodic timer - 1 Seconds",
+      "name": "Flow ist aktiviert: Dieser Flow - Periodischer Timer - 1 Sekunden",
       "package": "default",
       "pars": {
         "flowID": "",
@@ -634,7 +634,7 @@
     "element0000000070": {
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000070",
-      "name": "Set flow status - Disable: This flow - All triggers",
+      "name": "Flow-Status einstellen - Deaktivieren: Dieser Flow - Alle Trigger",
       "package": "default",
       "pars": {
         "Enable": "Disable",
@@ -651,7 +651,7 @@
     "element0000000073": {
       "class": "Condition_Flow_Enabled",
       "ID": "element0000000073",
-      "name": "Flow enabled: This flow - Any trigger",
+      "name": "Flow ist aktiviert: Dieser Flow - Beliebiger Trigger",
       "package": "default",
       "pars": {
         "flowID": "",
@@ -667,7 +667,7 @@
     "element0000000074": {
       "class": "Condition_Debug_Dialog",
       "ID": "element0000000074",
-      "name": "Debug dialog",
+      "name": "Debug-Dialog",
       "package": "default",
       "pars": {},
       "StandardName": "1",
@@ -679,7 +679,7 @@
       "class": "Trigger_Periodic_Timer",
       "enabled": "0",
       "ID": "element0000000076",
-      "name": "Periodic timer - 10 Seconds",
+      "name": "Periodischer Timer - 10 Sekunden",
       "package": "default",
       "pars": {
         "Interval": "10",
@@ -693,7 +693,7 @@
     "element0000000080": {
       "class": "Action_New_variable",
       "ID": "element0000000080",
-      "name": "New variable - static_testSuccess = 0",
+      "name": "Neue Variable - static_testSuccess = 0",
       "package": "default",
       "pars": {
         "expression": "string",
@@ -708,7 +708,7 @@
     "element0000000083": {
       "class": "Condition_Expression",
       "ID": "element0000000083",
-      "name": "Expression - static_testSuccess",
+      "name": "Ausdruck - static_testSuccess",
       "package": "default",
       "pars": {
         "Expression": "static_testSuccess"
@@ -721,7 +721,7 @@
     "element0000000085": {
       "class": "Condition_Debug_Dialog",
       "ID": "element0000000085",
-      "name": "Debug dialog",
+      "name": "Debug-Dialog",
       "package": "default",
       "pars": {},
       "StandardName": "1",
@@ -732,7 +732,7 @@
     "element0000000087": {
       "class": "Action_Tooltip",
       "ID": "element0000000087",
-      "name": "Tooltip: Trigger State Test success - 2 s - Follow mouse",
+      "name": "Tooltip: Trigger State Test success - 2 Sek - Maus folgen",
       "package": "action",
       "pars": {
         "duration": 2,
@@ -748,7 +748,7 @@
     "element0000000089": {
       "class": "Action_New_variable",
       "ID": "element0000000089",
-      "name": "New variable - static_testSuccess = 1",
+      "name": "Neue Variable - static_testSuccess = 1",
       "package": "default",
       "pars": {
         "expression": "string",
@@ -763,7 +763,7 @@
     "element0000000090": {
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000090",
-      "name": "Set flow status - Disable: This flow - All triggers",
+      "name": "Flow-Status einstellen - Deaktivieren: Dieser Flow - Alle Trigger",
       "package": "default",
       "pars": {
         "Enable": "Disable",
@@ -780,7 +780,7 @@
     "element0000000099": {
       "class": "Action_Execute_Flow",
       "ID": "element0000000099",
-      "name": "Execute flow: Trigger test - Manual - \"Trigger attractive air\"",
+      "name": "Flow ausf\u00FChren: Trigger test - Manuell - \"Trigger attractive air\"",
       "package": "default",
       "pars": {
         "flowID": "Flow 884290977",
@@ -800,7 +800,7 @@
     "element0000000105": {
       "class": "Action_New_variable",
       "ID": "element0000000105",
-      "name": "New variable - increment = 1",
+      "name": "Neue Variable - increment = 1",
       "package": "default",
       "pars": {
         "expression": "string",
@@ -815,7 +815,7 @@
     "element0000000107": {
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000107",
-      "name": "Set flow status - Disable: This flow - Manual - \"Trigger attractive air\"",
+      "name": "Flow-Status einstellen - Deaktivieren: Dieser Flow - Manuell - \"Trigger attractive air\"",
       "package": "default",
       "pars": {
         "Enable": "Disable",
@@ -832,7 +832,7 @@
     "element0000000110": {
       "class": "Action_Execute_Flow",
       "ID": "element0000000110",
-      "name": "Execute flow: This flow - Manual - \"Trigger attractive air\"",
+      "name": "Flow ausf\u00FChren: Dieser Flow - Manuell - \"Trigger attractive air\"",
       "package": "default",
       "pars": {
         "flowID": "",
@@ -852,7 +852,7 @@
     "element0000000111": {
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000111",
-      "name": "Set flow status - Enable: This flow - Manual - \"Trigger attractive air\"",
+      "name": "Flow-Status einstellen - Aktivieren: Dieser Flow - Manuell - \"Trigger attractive air\"",
       "package": "default",
       "pars": {
         "Enable": "Enable",
@@ -869,7 +869,7 @@
     "element0000000118": {
       "class": "Action_New_variable",
       "ID": "element0000000118",
-      "name": "New variable - otherincrement = 1",
+      "name": "Neue Variable - otherincrement = 1",
       "package": "default",
       "pars": {
         "expression": "string",
@@ -884,7 +884,7 @@
     "element0000000121": {
       "class": "Action_New_variable",
       "ID": "element0000000121",
-      "name": "New variable - static_periodicTimerPassed = static_periodicTimerPassed + otherincrement",
+      "name": "Neue Variable - static_periodicTimerPassed = static_periodicTimerPassed + otherincrement",
       "package": "default",
       "pars": {
         "expression": "Expression",
@@ -899,7 +899,7 @@
     "element0000000125": {
       "class": "Action_Sleep",
       "ID": "element0000000125",
-      "name": "Sleep: 5 s",
+      "name": "Schlafen: 5 Sek",
       "package": "action",
       "pars": {
         "Duration": "5",
@@ -913,7 +913,7 @@
     "element0000000127": {
       "class": "Action_New_variable",
       "ID": "element0000000127",
-      "name": "New variable - static_testSuccess = 0",
+      "name": "Neue Variable - static_testSuccess = 0",
       "package": "default",
       "pars": {
         "expression": "string",
@@ -928,7 +928,7 @@
     "element0000000130": {
       "class": "Action_Stop_Flow",
       "ID": "element0000000130",
-      "name": "Stop flow - Trigger test",
+      "name": "Flow stoppen - Trigger test",
       "package": "default",
       "pars": {
         "flowID": "Flow 884290977"
@@ -942,7 +942,7 @@
       "class": "Trigger_Shortcut",
       "enabled": "0",
       "ID": "element0000000131",
-      "name": "Shortcut - %A_Desktop%\\Flow Trigger test.lnk",
+      "name": "Verkn\u00FCpfung - %A_Desktop%\\Flow Trigger test.lnk",
       "package": "default",
       "pars": {
         "RemoveShortcutOnDisabling": "1",
@@ -956,7 +956,7 @@
     "element0000000154": {
       "class": "Action_New_variable",
       "ID": "element0000000154",
-      "name": "New variable - static_shortcutSuccess = 1",
+      "name": "Neue Variable - static_shortcutSuccess = 1",
       "package": "default",
       "pars": {
         "expression": "Expression",
@@ -971,7 +971,7 @@
     "element0000000156": {
       "class": "Action_New_variable",
       "ID": "element0000000156",
-      "name": "New variable - static_shortcutSuccess = 0",
+      "name": "Neue Variable - static_shortcutSuccess = 0",
       "package": "default",
       "pars": {
         "expression": "Expression",
@@ -986,7 +986,7 @@
     "element0000000158": {
       "class": "Condition_Expression",
       "ID": "element0000000158",
-      "name": "Expression - static_shortcutSuccess",
+      "name": "Ausdruck - static_shortcutSuccess",
       "package": "default",
       "pars": {
         "Expression": "static_shortcutSuccess"
@@ -999,7 +999,7 @@
     "element0000000161": {
       "class": "Action_Run",
       "ID": "element0000000161",
-      "name": "Run - %A_Desktop%\\Flow Trigger test.lnk",
+      "name": "Starten - %A_Desktop%\\Flow Trigger test.lnk",
       "package": "default",
       "pars": {
         "RunMode": "",
@@ -1016,7 +1016,7 @@
     "element0000000164": {
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000164",
-      "name": "Set flow status - Disable: This flow - Shortcut - %A_Desktop%\\Flow Trigger test.lnk",
+      "name": "Flow-Status einstellen - Deaktivieren: Dieser Flow - Verkn\u00FCpfung - %A_Desktop%\\Flow Trigger test.lnk",
       "package": "default",
       "pars": {
         "Enable": "Disable",
@@ -1033,7 +1033,7 @@
     "element0000000167": {
       "class": "Condition_File_Exists",
       "ID": "element0000000167",
-      "name": "File exists - %A_Desktop%\\Flow Trigger test.lnk",
+      "name": "Datei existiert - %A_Desktop%\\Flow Trigger test.lnk",
       "package": "default",
       "pars": {
         "file": "%A_Desktop%\\Flow Trigger test.lnk"
@@ -1047,7 +1047,7 @@
       "class": "Trigger_Start_up",
       "enabled": "0",
       "ID": "element0000000172",
-      "name": "Start up - When AHF starts",
+      "name": "Start - Wenn AHF startet",
       "package": "default",
       "pars": {
         "startupType": "AutoHotFlow"
@@ -1060,7 +1060,7 @@
     "element0000000174": {
       "class": "Action_Speech_output",
       "ID": "element0000000174",
-      "name": "Speech output -  - Microsoft Hedda Desktop",
+      "name": "Sprachausgabe -  - Microsoft Hedda Desktop",
       "package": "default",
       "pars": {
         "pitch": 0,
@@ -1079,7 +1079,7 @@
     "element0000000175": {
       "class": "Action_Add_To_List",
       "ID": "element0000000175",
-      "name": "Add to list global_testResults - As last value - Value 'a_flowName'",
+      "name": "Zur Liste hinzuf\u00FCgen - global_testResults - Als letzten Wert - Wert 'a_flowName'",
       "package": "default",
       "pars": {
         "DelimiterComma": 0,

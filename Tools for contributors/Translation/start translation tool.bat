@@ -1,0 +1,1 @@
+start "" ../../AutoHotkey/AutoHotFlow.exe "Translation Tool.ahk"

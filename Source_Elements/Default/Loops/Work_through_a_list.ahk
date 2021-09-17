@@ -159,7 +159,7 @@ Element_run_Loop_Work_through_a_list(Environment, ElementParameters)
 	}
 	else
 	{
-		x_finish(Environment, "exception", x_lang("No information whether the connection lead into head or tail"))
+		x_finish(Environment, "exception", x_lang("No information whether the connection leads to head or tail"))
 	}
 }
 

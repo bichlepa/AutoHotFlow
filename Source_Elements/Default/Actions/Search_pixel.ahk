@@ -117,7 +117,7 @@ Element_GenerateName_Action_Search_pixel(Environment, ElementParameters)
 		}
 		Else
 		{
-			areaString := x_lang("Screen region '%1%','%2%'-'%3%','%4%'", ElementParameters.x1, ElementParameters.y1, ElementParameters.x2, ElementParameters.y2)
+			areaString := x_lang("Screen region") " '" ElementParameters.x1 "', '" ElementParameters.y1 "' - '" ElementParameters.x2 "', '" ElementParameters.y2 "'"
 		}
 		case "Window":
 		if (ElementParameters.WholeScreen)
@@ -126,7 +126,7 @@ Element_GenerateName_Action_Search_pixel(Environment, ElementParameters)
 		}
 		Else
 		{
-			areaString := x_lang("Window region '%1%','%2%'-'%3%','%4%'", ElementParameters.x1, ElementParameters.y1, ElementParameters.x2, ElementParameters.y2)
+			areaString := x_lang("Window region") " '" ElementParameters.x1 "', '" ElementParameters.y1 "' - '" ElementParameters.x2 "', '" ElementParameters.y2 "'"
 		}
 		case "Client":
 		if (ElementParameters.WholeScreen)
@@ -135,7 +135,7 @@ Element_GenerateName_Action_Search_pixel(Environment, ElementParameters)
 		}
 		Else
 		{
-			areaString := x_lang("Window client region '%1%','%2%'-'%3%','%4%'", ElementParameters.x1, ElementParameters.y1, ElementParameters.x2, ElementParameters.y2)
+			areaString := x_lang("Window client region") " '" ElementParameters.x1 "', '" ElementParameters.y1 "' - '" ElementParameters.x2 "', '" ElementParameters.y2 "'"
 		}
 	}
 

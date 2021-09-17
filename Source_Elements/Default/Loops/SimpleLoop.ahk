@@ -65,7 +65,7 @@ Element_GenerateName_Loop_SimpleLoop(Environment, ElementParameters)
 	global
 	
 	if (ElementParameters.Infinite)
-		return x_lang("Simple loop") ": " x_lang("Infinite loop") 
+		return x_lang("Simple loop") ": " x_lang("Endless loop") 
 	else
 		return x_lang("Simple loop") ": " ElementParameters.repeatCount " " x_lang("Repeats") 
 }
@@ -141,7 +141,7 @@ Element_run_Loop_SimpleLoop(Environment, ElementParameters)
 	else
 	{
 		;This should never happen, but I suggest to keep this code for catching bugs in AHF.
-		x_finish(Environment, "exception", x_lang("No information whether the connection lead into head or tail"))
+		x_finish(Environment, "exception", x_lang("No information whether the connection leads to head or tail"))
 	}
 }
 

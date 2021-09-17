@@ -502,9 +502,9 @@
     "element0000000487": {
       "class": "Trigger_Manual",
       "DefaultTrigger": "1",
-      "enabled": "0",
+      "enabled": "1",
       "ID": "element0000000487",
-      "name": "Manual - \"start\"",
+      "name": "Manuell - \"start\"",
       "package": "default",
       "pars": {
         "ID": "start"
@@ -517,7 +517,7 @@
     "element0000000492": {
       "class": "Action_Delete_Folder",
       "ID": "element0000000492",
-      "name": "Delete folder - fileTestFiles",
+      "name": "Ordner l\u00F6schen - fileTestFiles",
       "package": "default",
       "pars": {
         "ExceptionIfNotExist": "0",
@@ -532,7 +532,7 @@
     "element0000000496": {
       "class": "Condition_File_Exists",
       "ID": "element0000000496",
-      "name": "File exists - fileTestFiles",
+      "name": "Datei existiert - fileTestFiles",
       "package": "default",
       "pars": {
         "file": "fileTestFiles"
@@ -545,7 +545,7 @@
     "element0000000499": {
       "class": "Condition_File_Has_Attribute",
       "ID": "element0000000499",
-      "name": "File has attribute - Directory - fileTestFiles",
+      "name": "Datei hat Attribute - Ordner - fileTestFiles",
       "package": "default",
       "pars": {
         "Attribute": "D",
@@ -559,7 +559,7 @@
     "element0000000501": {
       "class": "Action_Add_To_List",
       "ID": "element0000000501",
-      "name": "Add to list global_testResults - As last value - Value 'a_flowName'",
+      "name": "Zur Liste hinzuf\u00FCgen - global_testResults - Als letzten Wert - Wert 'a_flowName'",
       "package": "default",
       "pars": {
         "DelimiterComma": 0,
@@ -585,7 +585,7 @@
     "element0000000507": {
       "class": "Action_Create_Folder",
       "ID": "element0000000507",
-      "name": "Create Folder - fileTestFiles",
+      "name": "Ordner erstellen - fileTestFiles",
       "package": "default",
       "pars": {
         "ErrorIfExists": 0,
@@ -599,7 +599,7 @@
     "element0000000508": {
       "class": "Condition_File_Exists",
       "ID": "element0000000508",
-      "name": "File exists - fileTestFiles",
+      "name": "Datei existiert - fileTestFiles",
       "package": "default",
       "pars": {
         "file": "fileTestFiles"
@@ -612,7 +612,7 @@
     "element0000000514": {
       "class": "Action_Write_To_File",
       "ID": "element0000000514",
-      "name": "Write to file - fileTestFiles\\test.txt - hello",
+      "name": "In Datei schreiben - fileTestFiles\\test.txt - hello",
       "package": "default",
       "pars": {
         "CodePageIdentifier": "",
@@ -632,7 +632,7 @@
     "element0000000517": {
       "class": "Condition_File_Exists",
       "ID": "element0000000517",
-      "name": "File exists - fileTestFiles\\test.txt",
+      "name": "Datei existiert - fileTestFiles\\test.txt",
       "package": "default",
       "pars": {
         "file": "fileTestFiles\\test.txt"
@@ -645,7 +645,7 @@
     "element0000000520": {
       "class": "Action_Read_From_File",
       "ID": "element0000000520",
-      "name": "Read from file - FileText - fileTestFiles\\test.txt",
+      "name": "Aus Datei lesen - FileText - fileTestFiles\\test.txt",
       "package": "default",
       "pars": {
         "CodePageIdentifier": "",
@@ -664,7 +664,7 @@
     "element0000000522": {
       "class": "Condition_Expression",
       "ID": "element0000000522",
-      "name": "Expression - FileText = \"hello\"",
+      "name": "Ausdruck - FileText = \"hello\"",
       "package": "default",
       "pars": {
         "Expression": "FileText = \"hello\""
@@ -677,7 +677,7 @@
     "element0000000524": {
       "class": "Action_Delete_File",
       "ID": "element0000000524",
-      "name": "Delete file - fileTestFiles\\test.txt",
+      "name": "Datei l\u00F6schen - fileTestFiles\\test.txt",
       "package": "default",
       "pars": {
         "deleteFileMethod": "Recycle",
@@ -691,7 +691,7 @@
     "element0000000526": {
       "class": "Condition_File_Exists",
       "ID": "element0000000526",
-      "name": "File exists - fileTestFiles\\test.txt",
+      "name": "Datei existiert - fileTestFiles\\test.txt",
       "package": "default",
       "pars": {
         "file": "fileTestFiles\\test.txt"
@@ -704,7 +704,7 @@
     "element0000000530": {
       "class": "Action_Get_File_Size",
       "ID": "element0000000530",
-      "name": "Get file size - FileSize - fileTestFiles\\test.txt",
+      "name": "Dateigr\u00F6\u00DFe ermitteln - FileSize - fileTestFiles\\test.txt",
       "package": "default",
       "pars": {
         "file": "fileTestFiles\\test.txt",
@@ -719,7 +719,7 @@
     "element0000000531": {
       "class": "Action_Write_To_File",
       "ID": "element0000000531",
-      "name": "Write to file - fileTestFiles\\test.txt - hello",
+      "name": "In Datei schreiben - fileTestFiles\\test.txt - hello",
       "package": "default",
       "pars": {
         "CodePageIdentifier": "",
@@ -739,7 +739,7 @@
     "element0000000533": {
       "class": "Condition_Expression",
       "ID": "element0000000533",
-      "name": "Expression - FileSize = 5",
+      "name": "Ausdruck - FileSize = 5",
       "package": "default",
       "pars": {
         "Expression": "FileSize = 5"
@@ -752,7 +752,7 @@
     "element0000000538": {
       "class": "Condition_Debug_Dialog",
       "ID": "element0000000538",
-      "name": "Debug dialog",
+      "name": "Debug-Dialog",
       "package": "default",
       "pars": {},
       "StandardName": "1",
@@ -763,7 +763,7 @@
     "element0000000539": {
       "class": "Action_Write_To_File",
       "ID": "element0000000539",
-      "name": "Write to file - fileTestFiles\\test.txt - hello",
+      "name": "In Datei schreiben - fileTestFiles\\test.txt - hello",
       "package": "default",
       "pars": {
         "CodePageIdentifier": "",
@@ -783,7 +783,7 @@
     "element0000000540": {
       "class": "Action_Get_File_Size",
       "ID": "element0000000540",
-      "name": "Get file size - FileSize - fileTestFiles\\test.txt",
+      "name": "Dateigr\u00F6\u00DFe ermitteln - FileSize - fileTestFiles\\test.txt",
       "package": "default",
       "pars": {
         "file": "fileTestFiles\\test.txt",
@@ -798,7 +798,7 @@
     "element0000000541": {
       "class": "Condition_Expression",
       "ID": "element0000000541",
-      "name": "Expression - FileSize = 10",
+      "name": "Ausdruck - FileSize = 10",
       "package": "default",
       "pars": {
         "Expression": "FileSize = 10"
@@ -811,7 +811,7 @@
     "element0000000544": {
       "class": "Action_Write_To_File",
       "ID": "element0000000544",
-      "name": "Write to file - fileTestFiles\\test.txt - hello",
+      "name": "In Datei schreiben - fileTestFiles\\test.txt - hello",
       "package": "default",
       "pars": {
         "CodePageIdentifier": "",
@@ -831,7 +831,7 @@
     "element0000000545": {
       "class": "Action_Get_File_Size",
       "ID": "element0000000545",
-      "name": "Get file size - FileSize - fileTestFiles\\test.txt",
+      "name": "Dateigr\u00F6\u00DFe ermitteln - FileSize - fileTestFiles\\test.txt",
       "package": "default",
       "pars": {
         "file": "fileTestFiles\\test.txt",
@@ -859,7 +859,7 @@
     "element0000000550": {
       "class": "Action_Get_File_Size",
       "ID": "element0000000550",
-      "name": "Get file size - FileSize - fileTestFiles\\test.txt",
+      "name": "Dateigr\u00F6\u00DFe ermitteln - FileSize - fileTestFiles\\test.txt",
       "package": "default",
       "pars": {
         "file": "fileTestFiles\\test.txt",
@@ -874,7 +874,7 @@
     "element0000000551": {
       "class": "Condition_Expression",
       "ID": "element0000000551",
-      "name": "Expression - FileSize = 1",
+      "name": "Ausdruck - FileSize = 1",
       "package": "default",
       "pars": {
         "Expression": "FileSize = 1"
@@ -887,7 +887,7 @@
     "element0000000554": {
       "class": "Action_Write_To_File",
       "ID": "element0000000554",
-      "name": "Write to file - fileTestFiles\\test.txt - Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et",
+      "name": "In Datei schreiben - fileTestFiles\\test.txt - Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et",
       "package": "default",
       "pars": {
         "CodePageIdentifier": "",
@@ -907,7 +907,7 @@
     "element0000000561": {
       "class": "Action_Copy_File",
       "ID": "element0000000561",
-      "name": "Copy file - fileTestFiles\\test.txt - fileTestFiles\\test copy.txt",
+      "name": "Datei kopieren - fileTestFiles\\test.txt - fileTestFiles\\test copy.txt",
       "package": "default",
       "pars": {
         "destFile": "fileTestFiles\\test copy.txt",
@@ -922,7 +922,7 @@
     "element0000000567": {
       "class": "Condition_File_Exists",
       "ID": "element0000000567",
-      "name": "File exists - fileTestFiles\\test copy.txt",
+      "name": "Datei existiert - fileTestFiles\\test copy.txt",
       "package": "default",
       "pars": {
         "file": "fileTestFiles\\test copy.txt"
@@ -935,7 +935,7 @@
     "element0000000570": {
       "class": "Action_Copy_File",
       "ID": "element0000000570",
-      "name": "Copy file - fileTestFiles\\test.txt - fileTestFiles\\test copy.txt",
+      "name": "Datei kopieren - fileTestFiles\\test.txt - fileTestFiles\\test copy.txt",
       "package": "default",
       "pars": {
         "destFile": "fileTestFiles\\test copy.txt",
@@ -950,7 +950,7 @@
     "element0000000574": {
       "class": "Action_Move_File",
       "ID": "element0000000574",
-      "name": "Move file - fileTestFiles\\test.txt - fileTestFiles\\test moved.txt",
+      "name": "Datei verschieben - fileTestFiles\\test.txt - fileTestFiles\\test moved.txt",
       "package": "default",
       "pars": {
         "destFile": "fileTestFiles\\test moved.txt",
@@ -965,7 +965,7 @@
     "element0000000576": {
       "class": "Condition_File_Exists",
       "ID": "element0000000576",
-      "name": "File exists - fileTestFiles\\test.txt",
+      "name": "Datei existiert - fileTestFiles\\test.txt",
       "package": "default",
       "pars": {
         "file": "fileTestFiles\\test.txt"
@@ -978,7 +978,7 @@
     "element0000000577": {
       "class": "Condition_File_Exists",
       "ID": "element0000000577",
-      "name": "File exists - fileTestFiles\\test moved.txt",
+      "name": "Datei existiert - fileTestFiles\\test moved.txt",
       "package": "default",
       "pars": {
         "file": "fileTestFiles\\test moved.txt"
@@ -991,7 +991,7 @@
     "element0000000584": {
       "class": "Action_Rename_File",
       "ID": "element0000000584",
-      "name": "Rename file - fileTestFiles\\test moved.txt - test renamed.txt",
+      "name": "Datei umbenennen - fileTestFiles\\test moved.txt - test renamed.txt",
       "package": "default",
       "pars": {
         "file": "fileTestFiles\\test moved.txt",
@@ -1005,7 +1005,7 @@
     "element0000000585": {
       "class": "Condition_File_Exists",
       "ID": "element0000000585",
-      "name": "File exists - fileTestFiles\\test moved.txt",
+      "name": "Datei existiert - fileTestFiles\\test moved.txt",
       "package": "default",
       "pars": {
         "file": "fileTestFiles\\test moved.txt"
@@ -1018,7 +1018,7 @@
     "element0000000586": {
       "class": "Condition_File_Exists",
       "ID": "element0000000586",
-      "name": "File exists - fileTestFiles\\test renamed.txt",
+      "name": "Datei existiert - fileTestFiles\\test renamed.txt",
       "package": "default",
       "pars": {
         "file": "fileTestFiles\\test renamed.txt"
@@ -1031,7 +1031,7 @@
     "element0000000591": {
       "class": "Action_Copy_Folder",
       "ID": "element0000000591",
-      "name": "Copy folder - fileTestFiles - fileTestFiles copied",
+      "name": "Ordner kopieren - fileTestFiles - fileTestFiles copied",
       "package": "default",
       "pars": {
         "destFolder": "fileTestFiles copied",
@@ -1046,7 +1046,7 @@
     "element0000000592": {
       "class": "Condition_File_Exists",
       "ID": "element0000000592",
-      "name": "File exists - fileTestFiles",
+      "name": "Datei existiert - fileTestFiles",
       "package": "default",
       "pars": {
         "file": "fileTestFiles"
@@ -1059,7 +1059,7 @@
     "element0000000596": {
       "class": "Condition_File_Exists",
       "ID": "element0000000596",
-      "name": "File exists - fileTestFiles copied\\test renamed.txt",
+      "name": "Datei existiert - fileTestFiles copied\\test renamed.txt",
       "package": "default",
       "pars": {
         "file": "fileTestFiles copied\\test renamed.txt"
@@ -1072,7 +1072,7 @@
     "element0000000598": {
       "class": "Action_Delete_Folder",
       "ID": "element0000000598",
-      "name": "Delete folder - fileTestFiles copied",
+      "name": "Ordner l\u00F6schen - fileTestFiles copied",
       "package": "default",
       "pars": {
         "ExceptionIfNotExist": 1,
@@ -1087,7 +1087,7 @@
     "element0000000601": {
       "class": "Condition_File_Exists",
       "ID": "element0000000601",
-      "name": "File exists - fileTestFiles copied\\test renamed.txt",
+      "name": "Datei existiert - fileTestFiles copied\\test renamed.txt",
       "package": "default",
       "pars": {
         "file": "fileTestFiles copied\\test renamed.txt"
@@ -1100,7 +1100,7 @@
     "element0000000606": {
       "class": "Action_Move_Folder",
       "ID": "element0000000606",
-      "name": "Move folder - fileTestFiles - fileTestFiles moved",
+      "name": "Ordner verschieben - fileTestFiles - fileTestFiles moved",
       "package": "default",
       "pars": {
         "destFolder": "fileTestFiles moved",
@@ -1115,7 +1115,7 @@
     "element0000000607": {
       "class": "Action_Rename_Folder",
       "ID": "element0000000607",
-      "name": "Rename folder - fileTestFiles moved - fileTestFiles renamed",
+      "name": "Ordner umbenennen - fileTestFiles moved - fileTestFiles renamed",
       "package": "default",
       "pars": {
         "folder": "fileTestFiles moved",
@@ -1129,7 +1129,7 @@
     "element0000000609": {
       "class": "Condition_File_Exists",
       "ID": "element0000000609",
-      "name": "File exists - fileTestFiles renamed\\test renamed.txt",
+      "name": "Datei existiert - fileTestFiles renamed\\test renamed.txt",
       "package": "default",
       "pars": {
         "file": "fileTestFiles renamed\\test renamed.txt"
@@ -1142,7 +1142,7 @@
     "element0000000611": {
       "class": "Action_Delete_Folder",
       "ID": "element0000000611",
-      "name": "Delete folder - fileTestFiles moved",
+      "name": "Ordner l\u00F6schen - fileTestFiles moved",
       "package": "default",
       "pars": {
         "ExceptionIfNotExist": "0",
@@ -1157,7 +1157,7 @@
     "element0000000612": {
       "class": "Action_Delete_Folder",
       "ID": "element0000000612",
-      "name": "Delete folder - fileTestFiles copied",
+      "name": "Ordner l\u00F6schen - fileTestFiles copied",
       "package": "default",
       "pars": {
         "ExceptionIfNotExist": "0",
@@ -1172,7 +1172,7 @@
     "element0000000615": {
       "class": "Action_Delete_Folder",
       "ID": "element0000000615",
-      "name": "Delete folder - fileTestFiles renamed",
+      "name": "Ordner l\u00F6schen - fileTestFiles renamed",
       "package": "default",
       "pars": {
         "ExceptionIfNotExist": "0",
@@ -1187,7 +1187,7 @@
     "element0000000639": {
       "class": "Action_Get_File_Time",
       "ID": "element0000000639",
-      "name": "Get file time - Modification time - FileTime - fileTest",
+      "name": "Datei-Zeit abrufen - \u00C4nderungszeit - FileTime - fileTest",
       "package": "default",
       "pars": {
         "file": "fileTest",
@@ -1202,7 +1202,7 @@
     "element0000000640": {
       "class": "Action_Delete_Folder",
       "ID": "element0000000640",
-      "name": "Delete folder - fileTest",
+      "name": "Ordner l\u00F6schen - fileTest",
       "package": "default",
       "pars": {
         "ExceptionIfNotExist": "0",
@@ -1217,7 +1217,7 @@
     "element0000000641": {
       "class": "Action_Time_Difference",
       "ID": "element0000000641",
-      "name": "Time difference - TimeDifference = a_now - FileTime - Seconds",
+      "name": "Zeitunterschied - TimeDifference = a_now - FileTime - Seconds",
       "package": "default",
       "pars": {
         "InputTime": "a_now",
@@ -1233,7 +1233,7 @@
     "element0000000642": {
       "class": "Condition_Expression",
       "ID": "element0000000642",
-      "name": "Expression - TimeDifference <= 1 and TimeDifference >= 0",
+      "name": "Ausdruck - TimeDifference <= 1 and TimeDifference >= 0",
       "package": "default",
       "pars": {
         "Expression": "TimeDifference <= 1 and TimeDifference >= 0"
@@ -1246,7 +1246,7 @@
     "element0000000647": {
       "class": "Action_Create_Folder",
       "ID": "element0000000647",
-      "name": "Create Folder - fileTest",
+      "name": "Ordner erstellen - fileTest",
       "package": "default",
       "pars": {
         "ErrorIfExists": 0,
@@ -1260,7 +1260,7 @@
     "element0000000651": {
       "class": "Action_Time_Calculation",
       "ID": "element0000000651",
-      "name": "Time calculation - CalculatedTime = a_now + 0-10 Minutes",
+      "name": "Zeitberechnung - CalculatedTime = a_now + 0-10 Minuten",
       "package": "default",
       "pars": {
         "InputTime": "a_now",
@@ -1276,7 +1276,7 @@
     "element0000000653": {
       "class": "Action_Set_file_time",
       "ID": "element0000000653",
-      "name": "Set file time - Modification time - %calculatedTime% - fileTest",
+      "name": "Dateizeit setzen - \u00C4nderungszeit - %calculatedTime% - fileTest",
       "package": "default",
       "pars": {
         "file": "fileTest",
@@ -1293,7 +1293,7 @@
     "element0000000674": {
       "class": "Action_Get_File_Time",
       "ID": "element0000000674",
-      "name": "Get file time - Modification time - FileTime - fileTest",
+      "name": "Datei-Zeit abrufen - \u00C4nderungszeit - FileTime - fileTest",
       "package": "default",
       "pars": {
         "file": "fileTest",
@@ -1308,7 +1308,7 @@
     "element0000000675": {
       "class": "Action_Time_Difference",
       "ID": "element0000000675",
-      "name": "Time difference - TimeDifference = FileTime - a_now - Minutes",
+      "name": "Zeitunterschied - TimeDifference = FileTime - a_now - Minutes",
       "package": "default",
       "pars": {
         "InputTime": "FileTime",
@@ -1324,7 +1324,7 @@
     "element0000000676": {
       "class": "Condition_Expression",
       "ID": "element0000000676",
-      "name": "Expression - TimeDifference = -10",
+      "name": "Ausdruck - TimeDifference = -10",
       "package": "default",
       "pars": {
         "Expression": "TimeDifference = -10"
@@ -1337,7 +1337,7 @@
     "element0000000681": {
       "class": "Condition_Debug_Dialog",
       "ID": "element0000000681",
-      "name": "Debug dialog",
+      "name": "Debug-Dialog",
       "package": "default",
       "pars": {},
       "StandardName": "1",

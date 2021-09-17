@@ -10,7 +10,7 @@ Element_getElementType_Action_Get_Volume()
 ;Name of the element
 Element_getName_Action_Get_Volume()
 {
-	return x_lang("Get_Volume")
+	return x_lang("Get_Volume #sound volume")
 }
 
 ;Category of the element
@@ -62,7 +62,7 @@ Element_getParametrizationDetails_Action_Get_Volume(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Get_Volume(Environment, ElementParameters)
 {
-	return x_lang("Get_Volume") "`n" ElementParameters.Varname
+	return x_lang("Get_Volume #sound volume") "`n" ElementParameters.Varname
 }
 
 ;Called every time the user changes any parameter.

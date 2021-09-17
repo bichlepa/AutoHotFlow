@@ -98,14 +98,17 @@ run, "find modules - only default package.ahk"
 ; create file list
 AppDirList := []
 AppFileList := []
-
+languages := ["en", "de"]
 
 addFilesInFolderWithExtension(AppDirList, AppFileList, "AutoHotKey", "*", true)
 addFilesInFolderWithExtension(AppDirList, AppFileList, "bin", "*", true)
 addFilesInFolderWithExtension(AppDirList, AppFileList, "Icons", "ico", true)
 
 addFile(AppDirList, AppFileList, "language\language.ahk")
-addFile(AppDirList, AppFileList, "language\en.ini")
+for oneIndex, oneLanguage in languages
+{
+    addFile(AppDirList, AppFileList, "language\" oneLanguage ".ini")
+}
 
 addFilesInFolderWithExtension(AppDirList, AppFileList, "Saved Flows\demo flows", "json", false)
 
@@ -123,11 +126,18 @@ addFilesInFolderWithExtension(AppDirList, AppFileList, "Source_Main", "ahk", tru
 addFilesInFolderWithExtension(AppDirList, AppFileList, "Source_Manager", "ahk", true)
 
 addFilesInFolderWithExtension(AppDirList, AppFileList, "Source_Elements\Default", "ahk", true)
-addFilesInFolderWithExtension(AppDirList, AppFileList, "Source_Elements\Default", "html", true)
 addFilesInFolderWithExtension(AppDirList, AppFileList, "Source_Elements\Default", "png", true)
 addFilesInFolderWithExtension(AppDirList, AppFileList, "Source_Elements\Default", "ico", true)
-addFilesInFolderWithExtension(AppDirList, AppFileList, "Source_Elements\Default", "ini", true)
 addFilesInFolderWithExtension(AppDirList, AppFileList, "Source_Elements\Default", "json", true)
+
+for oneIndex, oneLanguage in languages
+{
+    addFile(AppDirList, AppFileList, "Source_Elements\Default\language\" oneLanguage ".ini")
+}
+for oneIndex, oneLanguage in languages
+{
+    addFilesInFolderWithExtension(AppDirList, AppFileList, "Source_Elements\Default\help\" oneLanguage, "html", true)
+}
 
 addFile(AppDirList, AppFileList, "find modules.exe")
 addFile(AppDirList, AppFileList, "AutoHotFlow.exe")

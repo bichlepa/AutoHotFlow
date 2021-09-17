@@ -109,6 +109,7 @@ Element_run_Action_Create_Folder(Environment, ElementParameters)
 				x_finish(Environment, "exception", x_lang("%1% '%2%' already exists.", x_lang("Destination folder"), EvaluatedParameters.folder))
 			}
 			; folder already exists and ErrorIfExists is not set . Nothing to do.
+			x_finish(Environment,"normal")
 			return
 		}
 	}

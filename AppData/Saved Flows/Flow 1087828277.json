@@ -823,9 +823,9 @@
     "element0000000002": {
       "class": "Trigger_Manual",
       "DefaultTrigger": "0",
-      "enabled": "0",
+      "enabled": "1",
       "ID": "element0000000002",
-      "name": "Manual - \"absolute number\"",
+      "name": "Manuell - \"absolute number\"",
       "package": "default",
       "pars": {
         "ID": "absolute number"
@@ -838,7 +838,7 @@
     "element0000000003": {
       "class": "Action_New_variable",
       "ID": "element0000000003",
-      "name": "New variable - NewVariable = -5",
+      "name": "Neue Variable - NewVariable = -5",
       "package": "default",
       "pars": {
         "expression": "String",
@@ -853,7 +853,7 @@
     "element0000000004": {
       "class": "Action_Absolute_number",
       "ID": "element0000000004",
-      "name": "Absolute number - NewVariable = |newVariable|",
+      "name": "Betrag einer Zahl - NewVariable = |newVariable|",
       "package": "default",
       "pars": {
         "Varname": "NewVariable",
@@ -867,7 +867,7 @@
     "element0000000005": {
       "class": "Condition_Expression",
       "ID": "element0000000005",
-      "name": "Expression - newVariable = 5",
+      "name": "Ausdruck - newVariable = 5",
       "package": "default",
       "pars": {
         "Expression": "newVariable = 5"
@@ -880,7 +880,7 @@
     "element0000000006": {
       "class": "Action_Absolute_number",
       "ID": "element0000000006",
-      "name": "Absolute number - NewVariable = |newVariable|",
+      "name": "Betrag einer Zahl - NewVariable = |newVariable|",
       "package": "default",
       "pars": {
         "Varname": "NewVariable",
@@ -894,7 +894,7 @@
     "element0000000007": {
       "class": "Condition_Expression",
       "ID": "element0000000007",
-      "name": "Expression - newVariable = 5",
+      "name": "Ausdruck - newVariable = 5",
       "package": "default",
       "pars": {
         "Expression": "newVariable = 5"
@@ -907,7 +907,7 @@
     "element0000000009": {
       "class": "Action_Absolute_number",
       "ID": "element0000000009",
-      "name": "Absolute number - NewVariable = |newVariable|",
+      "name": "Betrag einer Zahl - NewVariable = |newVariable|",
       "package": "default",
       "pars": {
         "Varname": "NewVariable",
@@ -921,7 +921,7 @@
     "element0000000010": {
       "class": "Action_New_variable",
       "ID": "element0000000010",
-      "name": "New variable - NewVariable = aegasdf",
+      "name": "Neue Variable - NewVariable = aegasdf",
       "package": "default",
       "pars": {
         "expression": "String",
@@ -936,9 +936,9 @@
     "element0000000021": {
       "class": "Trigger_Manual",
       "DefaultTrigger": "1",
-      "enabled": "0",
+      "enabled": "1",
       "ID": "element0000000021",
-      "name": "Manual - \"start\"",
+      "name": "Manuell - \"start\"",
       "package": "default",
       "pars": {
         "ID": "start"
@@ -951,7 +951,7 @@
     "element0000000022": {
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000022",
-      "name": "Set flow status - Enable: This flow - All triggers",
+      "name": "Flow-Status einstellen - Aktivieren: Dieser Flow - Alle Trigger",
       "package": "default",
       "pars": {
         "Enable": "Enable",
@@ -968,7 +968,7 @@
     "element0000000023": {
       "class": "Action_New_variable",
       "ID": "element0000000023",
-      "name": "New variable - static_successfulRuns = 0",
+      "name": "Neue Variable - static_successfulRuns = 0",
       "package": "default",
       "pars": {
         "expression": "String",
@@ -983,7 +983,7 @@
     "element0000000024": {
       "class": "Condition_Expression",
       "ID": "element0000000024",
-      "name": "Expression - static_successfulRuns = requiredSuccessfulRuns",
+      "name": "Ausdruck - static_successfulRuns = requiredSuccessfulRuns",
       "package": "default",
       "pars": {
         "Expression": "static_successfulRuns = requiredSuccessfulRuns"
@@ -996,7 +996,7 @@
     "element0000000025": {
       "class": "Action_New_variable",
       "ID": "element0000000025",
-      "name": "New variable - requiredSuccessfulRuns = 7",
+      "name": "Neue Variable - requiredSuccessfulRuns = 7",
       "package": "default",
       "pars": {
         "expression": "Expression",
@@ -1011,7 +1011,7 @@
     "element0000000026": {
       "class": "Action_Add_To_List",
       "ID": "element0000000026",
-      "name": "Add to list global_testResults - As last value - Value 'a_flowName'",
+      "name": "Zur Liste hinzuf\u00FCgen - global_testResults - Als letzten Wert - Wert 'a_flowName'",
       "package": "default",
       "pars": {
         "DelimiterComma": 0,
@@ -1037,7 +1037,7 @@
     "element0000000027": {
       "class": "Action_Message_Box",
       "ID": "element0000000027",
-      "name": "Message box - Fehler - Only %static_successfulRuns% successful runs instead of %requiredSuccessfulRuns%",
+      "name": "Meldungsdialog - Fehler - Only %static_successfulRuns% successful runs instead of %requiredSuccessfulRuns%",
       "package": "default",
       "pars": {
         "ButtonLabel": "OK",
@@ -1062,7 +1062,7 @@
     "element0000000028": {
       "class": "Action_Execute_Flow",
       "ID": "element0000000028",
-      "name": "Execute flow: This flow - Manual - \"absolute number\"",
+      "name": "Flow ausf\u00FChren: Dieser Flow - Manuell - \"absolute number\"",
       "package": "default",
       "pars": {
         "flowID": "",
@@ -1082,7 +1082,7 @@
     "element0000000035": {
       "class": "Action_New_variable",
       "ID": "element0000000035",
-      "name": "New variable - static_successfulRuns = static_successfulRuns + 1",
+      "name": "Neue Variable - static_successfulRuns = static_successfulRuns + 1",
       "package": "default",
       "pars": {
         "expression": "Expression",
@@ -1097,9 +1097,9 @@
     "element0000000038": {
       "class": "Trigger_Manual",
       "DefaultTrigger": "0",
-      "enabled": "0",
+      "enabled": "1",
       "ID": "element0000000038",
-      "name": "Manual - \"random number\"",
+      "name": "Manuell - \"random number\"",
       "package": "default",
       "pars": {
         "ID": "random number"
@@ -1112,7 +1112,7 @@
     "element0000000039": {
       "class": "Action_Random_number",
       "ID": "element0000000039",
-      "name": "Random number - NewVariable - 0-10",
+      "name": "Zufallszahl - NewVariable - 0-10",
       "package": "default",
       "pars": {
         "MaxValue": "10",
@@ -1127,7 +1127,7 @@
     "element0000000040": {
       "class": "Action_Execute_Flow",
       "ID": "element0000000040",
-      "name": "Execute flow: This flow - Manual - \"random number\"",
+      "name": "Flow ausf\u00FChren: Dieser Flow - Manuell - \"random number\"",
       "package": "default",
       "pars": {
         "flowID": "",
@@ -1147,7 +1147,7 @@
     "element0000000045": {
       "class": "Action_Square_Root",
       "ID": "element0000000045",
-      "name": "Square root - NewVariable - 16",
+      "name": "Quadratwurzel - NewVariable - 16",
       "package": "default",
       "pars": {
         "Varname": "NewVariable",
@@ -1161,9 +1161,9 @@
     "element0000000046": {
       "class": "Trigger_Manual",
       "DefaultTrigger": "0",
-      "enabled": "0",
+      "enabled": "1",
       "ID": "element0000000046",
-      "name": "Manual - \"square root\"",
+      "name": "Manuell - \"square root\"",
       "package": "default",
       "pars": {
         "ID": "square root"
@@ -1176,7 +1176,7 @@
     "element0000000048": {
       "class": "Action_Trigonometry",
       "ID": "element0000000048",
-      "name": "Trigonometry - Sine - NewVariable - 90",
+      "name": "Trigonometrie - Sinus - NewVariable - 90",
       "package": "default",
       "pars": {
         "Operation": "Sine",
@@ -1192,9 +1192,9 @@
     "element0000000049": {
       "class": "Trigger_Manual",
       "DefaultTrigger": "0",
-      "enabled": "0",
+      "enabled": "1",
       "ID": "element0000000049",
-      "name": "Manual - \"trigonometry\"",
+      "name": "Manuell - \"trigonometry\"",
       "package": "default",
       "pars": {
         "ID": "trigonometry"
@@ -1207,7 +1207,7 @@
     "element0000000051": {
       "class": "Action_Rounding_A_Number",
       "ID": "element0000000051",
-      "name": "Rounding a number - NewVariable - 1.2345 - 0",
+      "name": "Zahl runden - NewVariable - 1.2345 - 0",
       "package": "default",
       "pars": {
         "Places": 0,
@@ -1223,9 +1223,9 @@
     "element0000000052": {
       "class": "Trigger_Manual",
       "DefaultTrigger": "0",
-      "enabled": "0",
+      "enabled": "1",
       "ID": "element0000000052",
-      "name": "Manual - \"rounding\"",
+      "name": "Manuell - \"rounding\"",
       "package": "default",
       "pars": {
         "ID": "rounding"
@@ -1238,7 +1238,7 @@
     "element0000000053": {
       "class": "Action_Exponentiation",
       "ID": "element0000000053",
-      "name": "Exponentiation - NewVariable = 3^2",
+      "name": "Potenzierung - NewVariable = 3^2",
       "package": "default",
       "pars": {
         "Exponent": 2,
@@ -1253,9 +1253,9 @@
     "element0000000054": {
       "class": "Trigger_Manual",
       "DefaultTrigger": "0",
-      "enabled": "0",
+      "enabled": "1",
       "ID": "element0000000054",
-      "name": "Manual - \"exponentiation\"",
+      "name": "Manuell - \"exponentiation\"",
       "package": "default",
       "pars": {
         "ID": "exponentiation"
@@ -1268,7 +1268,7 @@
     "element0000000057": {
       "class": "Action_Execute_Flow",
       "ID": "element0000000057",
-      "name": "Execute flow: This flow - Manual - \"square root\"",
+      "name": "Flow ausf\u00FChren: Dieser Flow - Manuell - \"square root\"",
       "package": "default",
       "pars": {
         "flowID": "",
@@ -1288,7 +1288,7 @@
     "element0000000058": {
       "class": "Action_Execute_Flow",
       "ID": "element0000000058",
-      "name": "Execute flow: This flow - Manual - \"trigonometry\"",
+      "name": "Flow ausf\u00FChren: Dieser Flow - Manuell - \"trigonometry\"",
       "package": "default",
       "pars": {
         "flowID": "",
@@ -1308,7 +1308,7 @@
     "element0000000059": {
       "class": "Action_Execute_Flow",
       "ID": "element0000000059",
-      "name": "Execute flow: This flow - Manual - \"rounding\"",
+      "name": "Flow ausf\u00FChren: Dieser Flow - Manuell - \"rounding\"",
       "package": "default",
       "pars": {
         "flowID": "",
@@ -1328,7 +1328,7 @@
     "element0000000060": {
       "class": "Action_Execute_Flow",
       "ID": "element0000000060",
-      "name": "Execute flow: This flow - Manual - \"exponentiation\"",
+      "name": "Flow ausf\u00FChren: Dieser Flow - Manuell - \"exponentiation\"",
       "package": "default",
       "pars": {
         "flowID": "",
@@ -1348,7 +1348,7 @@
     "element0000000070": {
       "class": "Condition_Expression",
       "ID": "element0000000070",
-      "name": "Expression - newVariable >= 0 and newVariable <= 10",
+      "name": "Ausdruck - newVariable >= 0 and newVariable <= 10",
       "package": "default",
       "pars": {
         "Expression": "newVariable >= 0 and newVariable <= 10"
@@ -1362,7 +1362,7 @@
       "class": "Loop_SimpleLoop",
       "HeightOfVerticalBar": "945",
       "ID": "element0000000073",
-      "name": "Simple loop: Infinite loop",
+      "name": "Einfache Schleife: Endlose Schleife",
       "package": "default",
       "pars": {
         "Infinite": "1",
@@ -1376,7 +1376,7 @@
     "element0000000074": {
       "class": "Condition_Expression",
       "ID": "element0000000074",
-      "name": "Expression - a_index > 10",
+      "name": "Ausdruck - a_index > 10",
       "package": "default",
       "pars": {
         "Expression": "a_index > 10"
@@ -1389,7 +1389,7 @@
     "element0000000078": {
       "class": "Condition_Expression",
       "ID": "element0000000078",
-      "name": "Expression - newVariable = 10",
+      "name": "Ausdruck - newVariable = 10",
       "package": "default",
       "pars": {
         "Expression": "newVariable = 10"
@@ -1402,7 +1402,7 @@
     "element0000000081": {
       "class": "Action_New_variable",
       "ID": "element0000000081",
-      "name": "New variable - maxValueFound = 1",
+      "name": "Neue Variable - maxValueFound = 1",
       "package": "default",
       "pars": {
         "expression": "Expression",
@@ -1417,7 +1417,7 @@
     "element0000000082": {
       "class": "Action_New_variable",
       "ID": "element0000000082",
-      "name": "New variable - minValueFound = 1",
+      "name": "Neue Variable - minValueFound = 1",
       "package": "default",
       "pars": {
         "expression": "Expression",
@@ -1432,7 +1432,7 @@
     "element0000000083": {
       "class": "Condition_Expression",
       "ID": "element0000000083",
-      "name": "Expression - newVariable = 0",
+      "name": "Ausdruck - newVariable = 0",
       "package": "default",
       "pars": {
         "Expression": "newVariable = 0"
@@ -1445,7 +1445,7 @@
     "element0000000086": {
       "class": "Condition_Expression",
       "ID": "element0000000086",
-      "name": "Expression - maxValueFound and minValueFound",
+      "name": "Ausdruck - maxValueFound and minValueFound",
       "package": "default",
       "pars": {
         "Expression": "maxValueFound and minValueFound"
@@ -1458,7 +1458,7 @@
     "element0000000095": {
       "class": "Action_New_variable",
       "ID": "element0000000095",
-      "name": "New variable - static_successfulRuns = static_successfulRuns + 1",
+      "name": "Neue Variable - static_successfulRuns = static_successfulRuns + 1",
       "package": "default",
       "pars": {
         "expression": "Expression",
@@ -1473,7 +1473,7 @@
     "element0000000098": {
       "class": "Action_Random_number",
       "ID": "element0000000098",
-      "name": "Random number - NewVariable - 0-1.0",
+      "name": "Zufallszahl - NewVariable - 0-1.0",
       "package": "default",
       "pars": {
         "MaxValue": "1.0",
@@ -1488,7 +1488,7 @@
     "element0000000099": {
       "class": "Condition_Expression",
       "ID": "element0000000099",
-      "name": "Expression - newVariable > 0 and newVariable < 1",
+      "name": "Ausdruck - newVariable > 0 and newVariable < 1",
       "package": "default",
       "pars": {
         "Expression": "newVariable > 0 and newVariable < 1"
@@ -1501,7 +1501,7 @@
     "element0000000102": {
       "class": "Action_Random_number",
       "ID": "element0000000102",
-      "name": "Random number - NewVariable - -100--99",
+      "name": "Zufallszahl - NewVariable - -100--99",
       "package": "default",
       "pars": {
         "MaxValue": "-99",
@@ -1516,7 +1516,7 @@
     "element0000000105": {
       "class": "Condition_Expression",
       "ID": "element0000000105",
-      "name": "Expression - newVariable = -99 or newVariable = -100",
+      "name": "Ausdruck - newVariable = -99 or newVariable = -100",
       "package": "default",
       "pars": {
         "Expression": "newVariable = -99 or newVariable = -100"
@@ -1529,7 +1529,7 @@
     "element0000000108": {
       "class": "Condition_Expression",
       "ID": "element0000000108",
-      "name": "Expression - newVariable = 4",
+      "name": "Ausdruck - newVariable = 4",
       "package": "default",
       "pars": {
         "Expression": "newVariable = 4"
@@ -1542,7 +1542,7 @@
     "element0000000110": {
       "class": "Action_Square_Root",
       "ID": "element0000000110",
-      "name": "Square root - NewVariable - -16",
+      "name": "Quadratwurzel - NewVariable - -16",
       "package": "default",
       "pars": {
         "Varname": "NewVariable",
@@ -1556,7 +1556,7 @@
     "element0000000111": {
       "class": "Condition_Expression",
       "ID": "element0000000111",
-      "name": "Expression - newVariable = \"\"",
+      "name": "Ausdruck - newVariable = \"\"",
       "package": "default",
       "pars": {
         "Expression": "newVariable = \"\""
@@ -1569,7 +1569,7 @@
     "element0000000115": {
       "class": "Action_New_variable",
       "ID": "element0000000115",
-      "name": "New variable - static_successfulRuns = static_successfulRuns + 1",
+      "name": "Neue Variable - static_successfulRuns = static_successfulRuns + 1",
       "package": "default",
       "pars": {
         "expression": "Expression",
@@ -1584,7 +1584,7 @@
     "element0000000117": {
       "class": "Condition_NumberIs",
       "ID": "element0000000117",
-      "name": "Number is - newVariable - 1",
+      "name": "Zahl ist - newVariable - 1",
       "package": "default",
       "pars": {
         "absoluteDeviation": "0",
@@ -1600,7 +1600,7 @@
     "element0000000119": {
       "class": "Action_Trigonometry",
       "ID": "element0000000119",
-      "name": "Trigonometry - Cosine - NewVariable - 180",
+      "name": "Trigonometrie - Kosinus - NewVariable - 180",
       "package": "default",
       "pars": {
         "Operation": "Cosine",
@@ -1616,7 +1616,7 @@
     "element0000000120": {
       "class": "Condition_NumberIs",
       "ID": "element0000000120",
-      "name": "Number is - newVariable - -1",
+      "name": "Zahl ist - newVariable - -1",
       "package": "default",
       "pars": {
         "absoluteDeviation": "0",
@@ -1632,7 +1632,7 @@
     "element0000000123": {
       "class": "Action_New_variable",
       "ID": "element0000000123",
-      "name": "New variable - static_successfulRuns = static_successfulRuns + 1",
+      "name": "Neue Variable - static_successfulRuns = static_successfulRuns + 1",
       "package": "default",
       "pars": {
         "expression": "Expression",
@@ -1647,7 +1647,7 @@
     "element0000000127": {
       "class": "Action_Trigonometry",
       "ID": "element0000000127",
-      "name": "Trigonometry - Tangent - NewVariable - 60",
+      "name": "Trigonometrie - Tangent - NewVariable - 60",
       "package": "default",
       "pars": {
         "Operation": "Tangent",
@@ -1663,7 +1663,7 @@
     "element0000000128": {
       "class": "Condition_NumberIs",
       "ID": "element0000000128",
-      "name": "Number is - newVariable - rootOf3",
+      "name": "Zahl ist - newVariable - rootOf3",
       "package": "default",
       "pars": {
         "absoluteDeviation": "0",
@@ -1679,7 +1679,7 @@
     "element0000000138": {
       "class": "Action_Trigonometry",
       "ID": "element0000000138",
-      "name": "Trigonometry - Arcsine - NewVariable - rootOf3 \/ 2",
+      "name": "Trigonometrie - Arkussinus - NewVariable - rootOf3 \/ 2",
       "package": "default",
       "pars": {
         "Operation": "Arcsine",
@@ -1695,7 +1695,7 @@
     "element0000000139": {
       "class": "Condition_NumberIs",
       "ID": "element0000000139",
-      "name": "Number is - newVariable - 60",
+      "name": "Zahl ist - newVariable - 60",
       "package": "default",
       "pars": {
         "absoluteDeviation": "0",
@@ -1711,7 +1711,7 @@
     "element0000000148": {
       "class": "Action_Trigonometry",
       "ID": "element0000000148",
-      "name": "Trigonometry - Arccosine - NewVariable - rootOf3 \/ 2",
+      "name": "Trigonometrie - Arkuskosinus - NewVariable - rootOf3 \/ 2",
       "package": "default",
       "pars": {
         "Operation": "Arccosine",
@@ -1727,7 +1727,7 @@
     "element0000000149": {
       "class": "Condition_NumberIs",
       "ID": "element0000000149",
-      "name": "Number is - newVariable - 30",
+      "name": "Zahl ist - newVariable - 30",
       "package": "default",
       "pars": {
         "absoluteDeviation": "0",
@@ -1743,7 +1743,7 @@
     "element0000000158": {
       "class": "Action_Trigonometry",
       "ID": "element0000000158",
-      "name": "Trigonometry - Arctangent - NewVariable - 1",
+      "name": "Trigonometrie - Arkustangent - NewVariable - 1",
       "package": "default",
       "pars": {
         "Operation": "Arctangent",
@@ -1759,7 +1759,7 @@
     "element0000000159": {
       "class": "Condition_NumberIs",
       "ID": "element0000000159",
-      "name": "Number is - newVariable - 45",
+      "name": "Zahl ist - newVariable - 45",
       "package": "default",
       "pars": {
         "absoluteDeviation": "0",
@@ -1775,7 +1775,7 @@
     "element0000000169": {
       "class": "Action_Square_Root",
       "ID": "element0000000169",
-      "name": "Square root - rootOf3 - 3",
+      "name": "Quadratwurzel - rootOf3 - 3",
       "package": "default",
       "pars": {
         "Varname": "rootOf3",
@@ -1789,7 +1789,7 @@
     "element0000000171": {
       "class": "Action_New_variable",
       "ID": "element0000000171",
-      "name": "New variable - pi = 3.141592653589793",
+      "name": "Neue Variable - pi = 3.141592653589793",
       "package": "default",
       "pars": {
         "expression": "Expression",
@@ -1804,7 +1804,7 @@
     "element0000000178": {
       "class": "Action_Trigonometry",
       "ID": "element0000000178",
-      "name": "Trigonometry - Sine - NewVariable - pi \/ 6",
+      "name": "Trigonometrie - Sinus - NewVariable - pi \/ 6",
       "package": "default",
       "pars": {
         "Operation": "Sine",
@@ -1820,7 +1820,7 @@
     "element0000000179": {
       "class": "Condition_NumberIs",
       "ID": "element0000000179",
-      "name": "Number is - newVariable - 1\/2",
+      "name": "Zahl ist - newVariable - 1\/2",
       "package": "default",
       "pars": {
         "absoluteDeviation": "0",
@@ -1836,7 +1836,7 @@
     "element0000000186": {
       "class": "Action_Trigonometry",
       "ID": "element0000000186",
-      "name": "Trigonometry - Arctangent - NewVariable - rootOf3",
+      "name": "Trigonometrie - Arkustangent - NewVariable - rootOf3",
       "package": "default",
       "pars": {
         "Operation": "Arctangent",
@@ -1852,7 +1852,7 @@
     "element0000000187": {
       "class": "Condition_NumberIs",
       "ID": "element0000000187",
-      "name": "Number is - newVariable - pi\/3",
+      "name": "Zahl ist - newVariable - pi\/3",
       "package": "default",
       "pars": {
         "absoluteDeviation": "0",
@@ -1868,7 +1868,7 @@
     "element0000000190": {
       "class": "Action_New_variable",
       "ID": "element0000000190",
-      "name": "New variable - static_successfulRuns = static_successfulRuns + 1",
+      "name": "Neue Variable - static_successfulRuns = static_successfulRuns + 1",
       "package": "default",
       "pars": {
         "expression": "Expression",
@@ -1883,7 +1883,7 @@
     "element0000000191": {
       "class": "Condition_NumberIs",
       "ID": "element0000000191",
-      "name": "Number is - newVariable - 1",
+      "name": "Zahl ist - newVariable - 1",
       "package": "default",
       "pars": {
         "absoluteDeviation": "0",
@@ -1899,7 +1899,7 @@
     "element0000000193": {
       "class": "Action_Rounding_A_Number",
       "ID": "element0000000193",
-      "name": "Rounding a number - NewVariable - 1.2345 - 3",
+      "name": "Zahl runden - NewVariable - 1.2345 - 3",
       "package": "default",
       "pars": {
         "Places": "3",
@@ -1915,7 +1915,7 @@
     "element0000000194": {
       "class": "Condition_NumberIs",
       "ID": "element0000000194",
-      "name": "Number is - newVariable - 1.235",
+      "name": "Zahl ist - newVariable - 1.235",
       "package": "default",
       "pars": {
         "absoluteDeviation": "0",
@@ -1931,7 +1931,7 @@
     "element0000000197": {
       "class": "Action_Rounding_A_Number",
       "ID": "element0000000197",
-      "name": "Rounding a number - NewVariable - 1.2345 - 3",
+      "name": "Zahl runden - NewVariable - 1.2345 - 3",
       "package": "default",
       "pars": {
         "Places": "3",
@@ -1947,7 +1947,7 @@
     "element0000000198": {
       "class": "Condition_NumberIs",
       "ID": "element0000000198",
-      "name": "Number is - newVariable - 1.234",
+      "name": "Zahl ist - newVariable - 1.234",
       "package": "default",
       "pars": {
         "absoluteDeviation": "0",
@@ -1963,7 +1963,7 @@
     "element0000000200": {
       "class": "Action_Rounding_A_Number",
       "ID": "element0000000200",
-      "name": "Rounding a number - NewVariable - 1.2345 - 2",
+      "name": "Zahl runden - NewVariable - 1.2345 - 2",
       "package": "default",
       "pars": {
         "Places": "2",
@@ -1979,7 +1979,7 @@
     "element0000000201": {
       "class": "Condition_NumberIs",
       "ID": "element0000000201",
-      "name": "Number is - newVariable - 1.24",
+      "name": "Zahl ist - newVariable - 1.24",
       "package": "default",
       "pars": {
         "absoluteDeviation": "0",
@@ -1995,7 +1995,7 @@
     "element0000000206": {
       "class": "Action_Rounding_A_Number",
       "ID": "element0000000206",
-      "name": "Rounding a number - NewVariable - 12345 - -3",
+      "name": "Zahl runden - NewVariable - 12345 - -3",
       "package": "default",
       "pars": {
         "Places": "-3",
@@ -2011,7 +2011,7 @@
     "element0000000207": {
       "class": "Condition_NumberIs",
       "ID": "element0000000207",
-      "name": "Number is - newVariable - 12000",
+      "name": "Zahl ist - newVariable - 12000",
       "package": "default",
       "pars": {
         "absoluteDeviation": "0",
@@ -2027,7 +2027,7 @@
     "element0000000212": {
       "class": "Condition_NumberIs",
       "ID": "element0000000212",
-      "name": "Number is - newVariable - 9",
+      "name": "Zahl ist - newVariable - 9",
       "package": "default",
       "pars": {
         "absoluteDeviation": "0",
@@ -2043,7 +2043,7 @@
     "element0000000214": {
       "class": "Action_New_variable",
       "ID": "element0000000214",
-      "name": "New variable - static_successfulRuns = static_successfulRuns + 1",
+      "name": "Neue Variable - static_successfulRuns = static_successfulRuns + 1",
       "package": "default",
       "pars": {
         "expression": "Expression",
@@ -2058,7 +2058,7 @@
     "element0000000216": {
       "class": "Action_Exponentiation",
       "ID": "element0000000216",
-      "name": "Exponentiation - NewVariable = rootOf3^2",
+      "name": "Potenzierung - NewVariable = rootOf3^2",
       "package": "default",
       "pars": {
         "Exponent": 2,
@@ -2073,7 +2073,7 @@
     "element0000000217": {
       "class": "Condition_NumberIs",
       "ID": "element0000000217",
-      "name": "Number is - newVariable - 3",
+      "name": "Zahl ist - newVariable - 3",
       "package": "default",
       "pars": {
         "absoluteDeviation": "0",
@@ -2089,7 +2089,7 @@
     "element0000000219": {
       "class": "Action_Square_Root",
       "ID": "element0000000219",
-      "name": "Square root - rootOf3 - 3",
+      "name": "Quadratwurzel - rootOf3 - 3",
       "package": "default",
       "pars": {
         "Varname": "rootOf3",
@@ -2103,7 +2103,7 @@
     "element0000000222": {
       "class": "Action_Exponentiation",
       "ID": "element0000000222",
-      "name": "Exponentiation - NewVariable = 4^1",
+      "name": "Potenzierung - NewVariable = 4^1",
       "package": "default",
       "pars": {
         "Exponent": "1",
@@ -2118,7 +2118,7 @@
     "element0000000223": {
       "class": "Condition_NumberIs",
       "ID": "element0000000223",
-      "name": "Number is - newVariable - 4",
+      "name": "Zahl ist - newVariable - 4",
       "package": "default",
       "pars": {
         "absoluteDeviation": "0",
@@ -2134,7 +2134,7 @@
     "element0000000225": {
       "class": "Action_Exponentiation",
       "ID": "element0000000225",
-      "name": "Exponentiation - NewVariable = 4^0",
+      "name": "Potenzierung - NewVariable = 4^0",
       "package": "default",
       "pars": {
         "Exponent": "0",
@@ -2149,7 +2149,7 @@
     "element0000000226": {
       "class": "Condition_NumberIs",
       "ID": "element0000000226",
-      "name": "Number is - newVariable - 1",
+      "name": "Zahl ist - newVariable - 1",
       "package": "default",
       "pars": {
         "absoluteDeviation": "0",
@@ -2165,7 +2165,7 @@
     "element0000000228": {
       "class": "Action_Exponentiation",
       "ID": "element0000000228",
-      "name": "Exponentiation - NewVariable = 4^3",
+      "name": "Potenzierung - NewVariable = 4^3",
       "package": "default",
       "pars": {
         "Exponent": "3",
@@ -2180,7 +2180,7 @@
     "element0000000229": {
       "class": "Condition_NumberIs",
       "ID": "element0000000229",
-      "name": "Number is - newVariable - 64",
+      "name": "Zahl ist - newVariable - 64",
       "package": "default",
       "pars": {
         "absoluteDeviation": "0",
@@ -2196,9 +2196,9 @@
     "element0000000234": {
       "class": "Trigger_Manual",
       "DefaultTrigger": "0",
-      "enabled": "0",
+      "enabled": "1",
       "ID": "element0000000234",
-      "name": "Manual - \"Number is\"",
+      "name": "Manuell - \"Number is\"",
       "package": "default",
       "pars": {
         "ID": "Number is"
@@ -2211,7 +2211,7 @@
     "element0000000235": {
       "class": "Condition_NumberIs",
       "ID": "element0000000235",
-      "name": "Number is - 5 - 5",
+      "name": "Zahl ist - 5 - 5",
       "package": "default",
       "pars": {
         "absoluteDeviation": "0",
@@ -2227,7 +2227,7 @@
     "element0000000237": {
       "class": "Condition_NumberIs",
       "ID": "element0000000237",
-      "name": "Number is - 5.000000001 - 5",
+      "name": "Zahl ist - 5.000000001 - 5",
       "package": "default",
       "pars": {
         "absoluteDeviation": "0",
@@ -2243,7 +2243,7 @@
     "element0000000239": {
       "class": "Condition_NumberIs",
       "ID": "element0000000239",
-      "name": "Number is - 5.000000001 - 5",
+      "name": "Zahl ist - 5.000000001 - 5",
       "package": "default",
       "pars": {
         "absoluteDeviation": "0",
@@ -2259,7 +2259,7 @@
     "element0000000244": {
       "class": "Condition_NumberIs",
       "ID": "element0000000244",
-      "name": "Number is - 5.000500001 - 5",
+      "name": "Zahl ist - 5.000500001 - 5",
       "package": "default",
       "pars": {
         "absoluteDeviation": "0",
@@ -2275,7 +2275,7 @@
     "element0000000246": {
       "class": "Condition_NumberIs",
       "ID": "element0000000246",
-      "name": "Number is - 4.9995 - 5",
+      "name": "Zahl ist - 4.9995 - 5",
       "package": "default",
       "pars": {
         "absoluteDeviation": "0",
@@ -2291,7 +2291,7 @@
     "element0000000249": {
       "class": "Condition_NumberIs",
       "ID": "element0000000249",
-      "name": "Number is - 4.99949999 - 5",
+      "name": "Zahl ist - 4.99949999 - 5",
       "package": "default",
       "pars": {
         "absoluteDeviation": "0",
@@ -2307,7 +2307,7 @@
     "element0000000251": {
       "class": "Condition_NumberIs",
       "ID": "element0000000251",
-      "name": "Number is - 4.9995 - 5",
+      "name": "Zahl ist - 4.9995 - 5",
       "package": "default",
       "pars": {
         "absoluteDeviation": "0.0005",
@@ -2323,7 +2323,7 @@
     "element0000000253": {
       "class": "Condition_NumberIs",
       "ID": "element0000000253",
-      "name": "Number is - 4.9994999 - 5",
+      "name": "Zahl ist - 4.9994999 - 5",
       "package": "default",
       "pars": {
         "absoluteDeviation": "0.0005",
@@ -2339,7 +2339,7 @@
     "element0000000255": {
       "class": "Condition_NumberIs",
       "ID": "element0000000255",
-      "name": "Number is - 4.9990 - 5",
+      "name": "Zahl ist - 4.9990 - 5",
       "package": "default",
       "pars": {
         "absoluteDeviation": "0.0005",
@@ -2355,7 +2355,7 @@
     "element0000000257": {
       "class": "Condition_NumberIs",
       "ID": "element0000000257",
-      "name": "Number is - 5.001 - 5",
+      "name": "Zahl ist - 5.001 - 5",
       "package": "default",
       "pars": {
         "absoluteDeviation": "0.0005",
@@ -2371,7 +2371,7 @@
     "element0000000259": {
       "class": "Condition_NumberIs",
       "ID": "element0000000259",
-      "name": "Number is - 5.0010001 - 5",
+      "name": "Zahl ist - 5.0010001 - 5",
       "package": "default",
       "pars": {
         "absoluteDeviation": "0.0005",
@@ -2387,7 +2387,7 @@
     "element0000000261": {
       "class": "Action_New_variable",
       "ID": "element0000000261",
-      "name": "New variable - static_successfulRuns = static_successfulRuns + 1",
+      "name": "Neue Variable - static_successfulRuns = static_successfulRuns + 1",
       "package": "default",
       "pars": {
         "expression": "Expression",
@@ -2402,7 +2402,7 @@
     "element0000000263": {
       "class": "Condition_NumberIs",
       "ID": "element0000000263",
-      "name": "Number is - -5.001 - -5",
+      "name": "Zahl ist - -5.001 - -5",
       "package": "default",
       "pars": {
         "absoluteDeviation": "0.0005",
@@ -2418,7 +2418,7 @@
     "element0000000264": {
       "class": "Condition_NumberIs",
       "ID": "element0000000264",
-      "name": "Number is - -5.0010001 - -5",
+      "name": "Zahl ist - -5.0010001 - -5",
       "package": "default",
       "pars": {
         "absoluteDeviation": "0.0005",
@@ -2434,7 +2434,7 @@
     "element0000000268": {
       "class": "Condition_NumberIs",
       "ID": "element0000000268",
-      "name": "Number is - 5 - 5",
+      "name": "Zahl ist - 5 - 5",
       "package": "default",
       "pars": {
         "absoluteDeviation": "",
@@ -2450,7 +2450,7 @@
     "element0000000271": {
       "class": "Action_Execute_Flow",
       "ID": "element0000000271",
-      "name": "Execute flow: This flow - Manual - \"Number is\"",
+      "name": "Flow ausf\u00FChren: Dieser Flow - Manuell - \"Number is\"",
       "package": "default",
       "pars": {
         "flowID": "",

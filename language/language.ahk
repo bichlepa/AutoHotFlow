@@ -32,6 +32,7 @@ contents of _language:
 lang_init()
 {
 	global _language
+
 	if not isobject(_language)
 		_language:=Object()
 	directory := _language.dir
@@ -180,7 +181,7 @@ lang(langvar, langReplacements*)
 	langaborted:=false
 	StringReplace,langvar,langvar,_,%a_space%,all
 	
-	langBeginAgain:
+	_language.success := false
 	;look whether the string is in cache
 	if ((!(NoCache)) and (_language.cache.haskey(langvar)))
 	{
@@ -192,7 +193,7 @@ lang(langvar, langReplacements*)
 		}
 	}
 	;if the translation was not in cache or empty or the cache should not be used
-	if (initext="")
+	if (not _language.success)
 	{
 		;read from ini file
 		IniRead,iniAllSections,%filepath%
@@ -210,7 +211,7 @@ lang(langvar, langReplacements*)
 	}
 	
 	;if the translation was not found in the ini file of desired language, use fallback language
-	if (initext="")
+	if (not _language.success)
 	{
 		IniRead,iniAllSections,%fallbackfilepath%
 		Loop,parse,iniAllSections,`n
@@ -218,7 +219,7 @@ lang(langvar, langReplacements*)
 			IniRead,initext,%fallbackfilepath%,%a_loopfield%,%langvar%,%A_Space%
 			if initext
 			{
-				_language.success:=0
+				_language.success:=1
 				break
 			}
 		}
@@ -283,6 +284,7 @@ lang_ReadAllTranslations()
 			
 			StringTrimLeft,tempItemContent,a_loopreadline,% (pos +1)
 			
+			StringReplace,tempItemName,tempItemName,_,%a_space%,all
 			_language.cache[tempItemName]:=tempItemContent
 			
 			;this is needed for the script "Search for new strings to translate"

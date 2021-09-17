@@ -10,7 +10,7 @@ Element_getElementType_Action_Set_Volume()
 ;Name of the element
 Element_getName_Action_Set_Volume()
 {
-	return x_lang("Set_Volume")
+	return x_lang("Set_Volume #sound volume")
 }
 
 ;Category of the element
@@ -92,7 +92,7 @@ Element_GenerateName_Action_Set_Volume(Environment, ElementParameters)
 		valueText := ElementParameters.volumeRelative
 	}
 
-	return x_lang("Set_Volume") " - " actionText " - " valueText
+	return x_lang("Set_Volume #sound volume") " - " actionText " - " valueText
 }
 
 ;Called every time the user changes any parameter.

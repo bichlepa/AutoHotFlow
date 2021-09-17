@@ -102,7 +102,7 @@ Element_GenerateName_Action_Add_To_List(Environment, ElementParameters)
 		ValueText := x_lang("Multiple values '%1%'", ElementParameters.VarValues)
 	}
 	
-	return % lang("Add to list %1%", ElementParameters.Varname) " - " PositionText " - " ValueText
+	return % lang("Add to list") " - " ElementParameters.Varname " - " PositionText " - " ValueText
 }
 
 ;Called every time the user changes any parameter.
@@ -162,7 +162,7 @@ Element_run_Action_Add_To_List(Environment, ElementParameters)
 		if (myList = "")
 		{
 			; we got an empty value. Log a warning and create a new list
-			x_log(Environment, x_lang("Waring!") " " x_lang("Variable '%1%' is empty. A new list will be created.", Varname) ,1)
+			x_log(Environment, x_lang("Warning!") " " x_lang("Variable '%1%' is empty. A new list will be created.", Varname) ,1)
 			myList := Object()
 		}
 		else
@@ -278,7 +278,7 @@ Element_run_Action_Add_To_List(Environment, ElementParameters)
 			if position is not integer
 			{
 				; it is not possible to insert multiple values to a single key. Raise exception.
-				return x_finish(Environment, "exception", x_lang("Position '%1%'is not an integer value", position))
+				return x_finish(Environment, "exception", x_lang("Position '%1%' is not an integer value", position))
 			}
 
 			if (EvaluatedParameters.InsertMethod = "Insert")

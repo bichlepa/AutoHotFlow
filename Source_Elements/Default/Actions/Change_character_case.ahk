@@ -59,8 +59,8 @@ Element_getParametrizationDetails_Action_Change_character_case(Environment)
 	parametersToEdit.push({type: "Label", label:  x_lang("Input string")})
 	parametersToEdit.push({type: "Edit", id: "VarValue", default: "Hello World", content: ["String", "Expression"], contentID: "expression", contentDefault: "string", WarnIfEmpty: true})
 
-	parametersToEdit.push({type: "Label", label: x_lang("Which case (character case)")})
-	parametersToEdit.push({type: "Radio", id: "CharCase", default: "upper", result: "enum", choices: [x_lang("Uppercase"), x_lang("Lowercase"), x_lang("Firt character of a word is uppercase")], enum: ["upper", "lower", "firstUp"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Which case #character case")})
+	parametersToEdit.push({type: "Radio", id: "CharCase", default: "upper", result: "enum", choices: [x_lang("Uppercase"), x_lang("Lowercase"), x_lang("First character of a word is uppercase")], enum: ["upper", "lower", "firstUp"]})
 
 	return parametersToEdit
 }
@@ -75,7 +75,7 @@ Element_GenerateName_Action_Change_character_case(Environment, ElementParameters
 		case "lower":
 		charCaseText := x_lang("Lowercase")
 		case "firstUp":
-		charCaseText := x_lang("Firt character uppercase")
+		charCaseText := x_lang("First character uppercase")
 	}
 
 	return x_lang("Change_character_case") " - " charCaseText " - " ElementParameters.Varname " - " ElementParameters.VarValue

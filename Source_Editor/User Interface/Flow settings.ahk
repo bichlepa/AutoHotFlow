@@ -64,7 +64,7 @@ ui_SettingsOfFlow()
 	gui, add, button, w300 x10 h30 Y+10 gGuiFlowSettingsButtonShowLog, % lang("Show log")
 	
 	; add save and cancel buttons
-	gui, add, button, w145 x10 h30 Y+20 gGuiFlowSettingsOK default, % lang("Save")
+	gui, add, button, w145 x10 h30 Y+20 gGuiFlowSettingsOK default, % lang("Save #verb")
 	gui, add, button, w145 h30 yp X+10 gGuiFlowSettingsCancel, % lang("Cancel")
 	
 

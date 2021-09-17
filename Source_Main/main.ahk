@@ -2,7 +2,7 @@
 ;#Warn  ; Recommended for catching common errors.
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
 
-global _AHF_VERSION := "1.0.5"
+global _AHF_VERSION := "1.0.6"
 
 ; do not warn if a continuable exception occurs (it happens often when AHF is closing)
 #WarnContinuableException off
@@ -66,6 +66,7 @@ _setShared("AHFStartup", true)
 #include language\language.ahk
 _language := Object()
 _language.dir := _ScriptDir "\language" ;Directory where the translations are stored
+_language.readAll := true
 lang_Init()
 lang_setLanguage(_settings.UILanguage)
 

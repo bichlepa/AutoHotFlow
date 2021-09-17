@@ -35,13 +35,20 @@ loop, files, Help\*, D
 ; prepare translations merge
 ; read and copy all existing basic translations
 allTranslations := []
+allTranslationsMeta := []
 loop, files, language\basic\*.ini
 {
+	if instr(a_loopfilename, "removed")
+		continue
+
 	oneLanguage := substr(a_loopfilename, 1, instr(a_loopfilename, ".") - 1)
-	
+
 	; read existing translations
 	FileRead, iniFileContent, % a_loopfilepath
-	allTranslations[oneLanguage] := importIni(iniFileContent)
+	newTranslations := importIni(iniFileContent)
+	allTranslationsMeta[oneLanguage] := newTranslations.delete("language_info")
+	allTranslations[oneLanguage] := []
+	mergeTranslations(allTranslations[oneLanguage], newTranslations)
 }
 
 ; prepare help menu index
@@ -129,11 +136,15 @@ loop, files, source_Elements\*, D
 	; merge translations files
 	loop, files, %packagePath%\language\*.ini
 	{
+		if instr(a_loopfilename, "removed")
+			continue
+
 		oneLanguage := substr(a_loopfilename, 1, instr(a_loopfilename, ".") - 1)
 		
 		; read existing translations
 		FileRead, iniFileContent, % a_loopfilepath
 		newTranslations := importIni(iniFileContent)
+		newTranslations.delete("language_info")
 		mergeTranslations(allTranslations[oneLanguage], newTranslations)
 	}
 
@@ -159,11 +170,12 @@ for oneLanguageIndex, oneLanguage in availableHelpFileLanguages
 	FileAppend, % helpFileMenuTemplate_%oneLanguage%, help\%oneLanguage%\Menu.html
 }
 
+
 ; save merged translations
 for oneLanguage, oneLanguageData in allTranslations
 {
 	language_info := oneLanguageData.delete("language_info")
-	iniFileContent := exportIni({language_info: language_info}) "`n`n" exportIni(oneLanguageData)
+	iniFileContent := exportIni({language_info: allTranslationsMeta[oneLanguage]}) "`n`n" exportIni({translations: oneLanguageData})
 	iniPath := "language\" oneLanguage ".ini"
 	filedelete, % iniPath
 	FileAppend, % iniFileContent, % iniPath, utf-16
@@ -331,7 +343,8 @@ FileAppend, % aboutCode, % aboutCodeFilePath, utf-8
 ; FileAppend,%apifileEditor%, %A_WorkingDir%\source_Editor\api\API Caller Elements.ahk, utf-8
 ; FileAppend,%apifileMain%, %A_WorkingDir%\source_main\threads\API Caller Elements.ahk, utf-8
 
-
+if not a_iscompiled
+	SoundBeep, 300, 100
 
 exitapp
 
@@ -341,20 +354,9 @@ mergeTranslations(allTranslations, newTranslations)
 	{
 		for oneNewTranslationKey, oneNewTranslationValue in oneNewCategoryContent
 		{
-			found := false
-			for oneCategory, oneCategoryContent in allTranslations
+			if (not allTranslations.hasKey(oneNewTranslationKey))
 			{
-				if (oneCategoryContent[oneNewTranslationKey])
-				{
-					found := true
-				}
-			}
-
-			if not found
-			{
-				if not allTranslations[oneNewCategory]
-					allTranslations[oneNewCategory] := []
-				allTranslations[oneNewCategory][oneNewTranslationKey] := oneNewTranslationValue
+				allTranslations[oneNewTranslationKey] := oneNewTranslationValue
 			}
 		}
 	}

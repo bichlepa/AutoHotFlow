@@ -19,7 +19,7 @@ Menu, tray, add, % lang("Show Manager"), onTrayMenuShowManagerGUI
 Menu, tray, default, % lang("Show Manager")
 
 ; add entry to exit AHF
-Menu, tray, add, % lang("Exit"), exit
+Menu, tray, add, % lang("Exit #verb"), exit
 
 
 ; disable default tray menu entries

@@ -110,7 +110,7 @@ Element_run_Action_New_Time(Environment, ElementParameters)
 		NewTime := EvaluatedParameters.Time
 		if NewTime is not time
 		{
-			x_finish(Environment, "exception", x_lang("%1% is not valid", x_lang("Value '%1%'", NewTime)) )
+			x_finish(Environment, "exception", x_lang("%1% is not valid.", x_lang("Value '%1%'", NewTime)) )
 			return
 		}
 		; set output variable

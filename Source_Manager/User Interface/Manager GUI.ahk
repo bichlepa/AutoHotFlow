@@ -82,7 +82,7 @@ Refresh_Manager_GUI()
 
 	guicontrol,,Button_manager_Import_Export ,% lang("Import and export")
 	guicontrol,,Button_manager_Settings ,% lang("Settings")
-	guicontrol,,Button_manager_Help ,% lang("Help")
+	guicontrol,,Button_manager_Help ,% lang("Help #noun")
 	guicontrol,,Button_manager_ShowLog ,% lang("Show log")
 	guicontrol,,Button_manager_About ,% lang("About AutoHotFlow")
 	guicontrol,,Button_manager_Exit ,% lang("Exit #verb")
@@ -435,7 +435,7 @@ TreeView_manager()
 				if (tempselectedID = "demo" and tempNewName != lang("Demonstration"))
 				{
 					soundplay,*16
-					MsgBox, 16, % lang("Rename category"), % lang("The demonstration category cannot be renamed")
+					MsgBox, 16, % lang("Rename category"), % lang("The demonstration category cannot be renamed.")
 					TV_Modify(tempselectedTV, "", lang("Demonstration"))
 					return
 				}
@@ -450,7 +450,7 @@ TreeView_manager()
 				if (_getCategoryIdByName(tempNewName) != "")
 				{
 					soundplay,*16
-					MsgBox, 16, % lang("Rename category"), % lang("A_category_with_name_%1%_already_exists", tempNewName)
+					MsgBox, 16, % lang("Rename category"), % lang("A category with name '%1%' already exists.", tempNewName)
 					TV_Modify(tempselectedTV, "", tempOldName)
 					return
 				}
@@ -916,7 +916,7 @@ Button_manager_Delete()
 			{
 				;ask user for confirmation
 				local tempCategoryName := _getCategoryProperty(tempselectedID, "name")
-				MsgBox, 4, % lang("Confirm_deletion"), % lang("Do you really want to delete the category '%1%'?", tempCategoryName) "`n" lang("All flows of that category will be moved into the category '%1%'", lang("Uncategorized"))
+				MsgBox, 4, % lang("Confirm_deletion"), % lang("Do you really want to delete the category '%1%'?", tempCategoryName) "`n" lang("All flows of that category will be moved into the category '%1%'.", lang("Uncategorized"))
 				
 				IfMsgBox, Yes ; if user approved
 				{

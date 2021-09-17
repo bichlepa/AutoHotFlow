@@ -390,7 +390,7 @@
     "element0000000002": {
       "class": "Condition_List_Contains_Element",
       "ID": "element0000000002",
-      "name": "List contains element - Value '1' in list 'TestList2'",
+      "name": "Liste enth\u00E4lt Element - Wert '1' in Liste 'TestList2'",
       "package": "default",
       "pars": {
         "InputList": "TestList2",
@@ -408,7 +408,7 @@
     "element0000000003": {
       "class": "Condition_List_Contains_Element",
       "ID": "element0000000003",
-      "name": "List contains element - Value '1' in list 'TestList2'",
+      "name": "Liste enth\u00E4lt Element - Wert '1' in Liste 'TestList2'",
       "package": "default",
       "pars": {
         "InputList": "TestList2",
@@ -426,7 +426,7 @@
     "element0000000004": {
       "class": "Condition_List_Contains_Element",
       "ID": "element0000000004",
-      "name": "List contains element - Key 'Zwei' in list 'TestList2'",
+      "name": "Liste enth\u00E4lt Element - Schl\u00FCssel 'Zwei' in Liste 'TestList2'",
       "package": "default",
       "pars": {
         "InputList": "TestList2",
@@ -444,7 +444,7 @@
     "element0000000005": {
       "class": "Condition_List_Contains_Element",
       "ID": "element0000000005",
-      "name": "List contains element - Key 'gagaga' in list 'TestList2'",
+      "name": "Liste enth\u00E4lt Element - Schl\u00FCssel 'gagaga' in Liste 'TestList2'",
       "package": "default",
       "pars": {
         "InputList": "TestList2",
@@ -462,7 +462,7 @@
     "element0000000006": {
       "class": "Condition_List_Contains_Element",
       "ID": "element0000000006",
-      "name": "List contains element - Key 'gagaga' in list 'TestList2'",
+      "name": "Liste enth\u00E4lt Element - Schl\u00FCssel 'gagaga' in Liste 'TestList2'",
       "package": "default",
       "pars": {
         "InputList": "TestList2",
@@ -480,7 +480,7 @@
     "element0000000007": {
       "class": "Condition_List_Contains_Element",
       "ID": "element0000000007",
-      "name": "List contains element - Key 'gagaga' in list 'TestList2'",
+      "name": "Liste enth\u00E4lt Element - Schl\u00FCssel 'gagaga' in Liste 'TestList2'",
       "package": "default",
       "pars": {
         "InputList": "TestList2",
@@ -498,9 +498,9 @@
     "element0000000008": {
       "class": "Trigger_Manual",
       "DefaultTrigger": "1",
-      "enabled": "0",
+      "enabled": "1",
       "ID": "element0000000008",
-      "name": "Manual - \"list test\"",
+      "name": "Manuell - \"list test\"",
       "package": "default",
       "pars": {
         "ID": "list test"
@@ -513,7 +513,7 @@
     "element0000000009": {
       "class": "Action_New_List",
       "ID": "element0000000009",
-      "name": "New list TestList2 - At position '1' - Multiple values 'Eins,Zwei,Drei'",
+      "name": "Neue Liste TestList2 - Auf Position '1' - Mehrere Werte 'Eins,Zwei,Drei'",
       "package": "default",
       "pars": {
         "DelimiterComma": 1,
@@ -537,7 +537,7 @@
     "element0000000010": {
       "class": "Action_New_List",
       "ID": "element0000000010",
-      "name": "New list testListFirst - At position '1' - Multiple values 'One - Two - Three'",
+      "name": "Neue Liste testListFirst - Auf Position '1' - Mehrere Werte 'One - Two - Three'",
       "package": "default",
       "pars": {
         "DelimiterComma": "0",
@@ -561,7 +561,7 @@
     "element0000000011": {
       "class": "Action_New_List",
       "ID": "element0000000011",
-      "name": "New list russianList - At position '3' - Value '\"\u0442\u0440\u0438\"'",
+      "name": "Neue Liste russianList - Auf Position '3' - Wert '\"\u0442\u0440\u0438\"'",
       "package": "default",
       "pars": {
         "DelimiterComma": "0",
@@ -585,7 +585,7 @@
     "element0000000012": {
       "class": "Action_Add_To_List",
       "ID": "element0000000012",
-      "name": "Add to list russianList - As last value - Value '\"\u0447\u0435\u0442\u044B\u0440\u0435\"'",
+      "name": "Zur Liste hinzuf\u00FCgen - russianList - Als letzten Wert - Wert '\"\u0447\u0435\u0442\u044B\u0440\u0435\"'",
       "package": "default",
       "pars": {
         "DelimiterComma": "0",
@@ -611,7 +611,7 @@
     "element0000000013": {
       "class": "Action_Get_List_Info",
       "ID": "element0000000013",
-      "name": "Get list Info - ListMax = Maximum index of russianList",
+      "name": "Informationen zur Liste erhalten - ListMax = Maximaler Index von russianList",
       "package": "default",
       "pars": {
         "List": "russianList",
@@ -626,7 +626,7 @@
     "element0000000014": {
       "class": "Condition_Expression",
       "ID": "element0000000014",
-      "name": "Expression - listLength = 4 and listMax = 4 and listMin = 3 and listCount = 2",
+      "name": "Ausdruck - listLength = 4 and listMax = 4 and listMin = 3 and listCount = 2",
       "package": "default",
       "pars": {
         "Expression": "listLength = 4 and listMax = 4 and listMin = 3 and listCount = 2"
@@ -639,7 +639,7 @@
     "element0000000015": {
       "class": "Action_Get_List_Info",
       "ID": "element0000000015",
-      "name": "Get list Info - ListMin = Minimum index of russianList",
+      "name": "Informationen zur Liste erhalten - ListMin = Minimaler Index von russianList",
       "package": "default",
       "pars": {
         "List": "russianList",
@@ -654,7 +654,7 @@
     "element0000000016": {
       "class": "Action_Get_List_Info",
       "ID": "element0000000016",
-      "name": "Get list Info - ListLength = Array length of russianList",
+      "name": "Informationen zur Liste erhalten - ListLength = Array-L\u00E4nge von russianList",
       "package": "default",
       "pars": {
         "List": "russianList",
@@ -669,7 +669,7 @@
     "element0000000017": {
       "class": "Action_Get_List_Info",
       "ID": "element0000000017",
-      "name": "Get list Info - ListCount = Element count of russianList",
+      "name": "Informationen zur Liste erhalten - ListCount = Anzahl der Elemente von russianList",
       "package": "default",
       "pars": {
         "List": "russianList",
@@ -684,7 +684,7 @@
     "element0000000018": {
       "class": "Action_Get_Index_Of_Element_In_List",
       "ID": "element0000000018",
-      "name": "Get position of element in list - index - russianList - \u0447\u0435\u0442\u044B\u0440\u0435",
+      "name": "Position des Elements in der Liste ermitteln - index - russianList - \u0447\u0435\u0442\u044B\u0440\u0435",
       "package": "default",
       "pars": {
         "expression": "String",
@@ -700,7 +700,7 @@
     "element0000000019": {
       "class": "Condition_Expression",
       "ID": "element0000000019",
-      "name": "Expression - index = 4",
+      "name": "Ausdruck - index = 4",
       "package": "default",
       "pars": {
         "Expression": "index = 4"
@@ -713,7 +713,7 @@
     "element0000000020": {
       "class": "Action_Get_Index_Of_Element_In_List",
       "ID": "element0000000020",
-      "name": "Get position of element in list - index - russianList - asdf",
+      "name": "Position des Elements in der Liste ermitteln - index - russianList - asdf",
       "package": "default",
       "pars": {
         "expression": "String",
@@ -729,7 +729,7 @@
     "element0000000021": {
       "class": "Action_Add_To_List",
       "ID": "element0000000021",
-      "name": "Add to list russianList - At position '1' - Value '\u0440\u0430\u0437'",
+      "name": "Zur Liste hinzuf\u00FCgen - russianList - Auf Position '1' - Wert '\u0440\u0430\u0437'",
       "package": "default",
       "pars": {
         "DelimiterComma": 0,
@@ -755,7 +755,7 @@
     "element0000000022": {
       "class": "Action_Get_List_Info",
       "ID": "element0000000022",
-      "name": "Get list Info - ListMax = Maximum index of russianList",
+      "name": "Informationen zur Liste erhalten - ListMax = Maximaler Index von russianList",
       "package": "default",
       "pars": {
         "List": "russianList",
@@ -770,7 +770,7 @@
     "element0000000023": {
       "class": "Condition_Expression",
       "ID": "element0000000023",
-      "name": "Expression - listLength = 4 and listMax = 4 and listMin = 1 and listCount = 3",
+      "name": "Ausdruck - listLength = 4 and listMax = 4 and listMin = 1 and listCount = 3",
       "package": "default",
       "pars": {
         "Expression": "listLength = 4 and listMax = 4 and listMin = 1 and listCount = 3"
@@ -783,7 +783,7 @@
     "element0000000024": {
       "class": "Action_Get_List_Info",
       "ID": "element0000000024",
-      "name": "Get list Info - ListMin = Minimum index of russianList",
+      "name": "Informationen zur Liste erhalten - ListMin = Minimaler Index von russianList",
       "package": "default",
       "pars": {
         "List": "russianList",
@@ -798,7 +798,7 @@
     "element0000000025": {
       "class": "Action_Get_List_Info",
       "ID": "element0000000025",
-      "name": "Get list Info - ListLength = Array length of russianList",
+      "name": "Informationen zur Liste erhalten - ListLength = Array-L\u00E4nge von russianList",
       "package": "default",
       "pars": {
         "List": "russianList",
@@ -813,7 +813,7 @@
     "element0000000026": {
       "class": "Action_Get_List_Info",
       "ID": "element0000000026",
-      "name": "Get list Info - ListCount = Element count of russianList",
+      "name": "Informationen zur Liste erhalten - ListCount = Anzahl der Elemente von russianList",
       "package": "default",
       "pars": {
         "List": "russianList",
@@ -828,7 +828,7 @@
     "element0000000027": {
       "class": "Action_Add_To_List",
       "ID": "element0000000027",
-      "name": "Add to list russianList - As first value - Value '\u043D\u043E\u043B\u044C'",
+      "name": "Zur Liste hinzuf\u00FCgen - russianList - Als ersten Wert - Wert '\u043D\u043E\u043B\u044C'",
       "package": "default",
       "pars": {
         "DelimiterComma": 0,
@@ -854,7 +854,7 @@
     "element0000000028": {
       "class": "Action_Get_List_Info",
       "ID": "element0000000028",
-      "name": "Get list Info - ListMax = Maximum index of russianList",
+      "name": "Informationen zur Liste erhalten - ListMax = Maximaler Index von russianList",
       "package": "default",
       "pars": {
         "List": "russianList",
@@ -869,7 +869,7 @@
     "element0000000029": {
       "class": "Condition_Expression",
       "ID": "element0000000029",
-      "name": "Expression - listLength = 5 and listMax = 5 and listMin = 1 and listCount = 4",
+      "name": "Ausdruck - listLength = 5 and listMax = 5 and listMin = 1 and listCount = 4",
       "package": "default",
       "pars": {
         "Expression": "listLength = 5 and listMax = 5 and listMin = 1 and listCount = 4"
@@ -882,7 +882,7 @@
     "element0000000030": {
       "class": "Action_Get_List_Info",
       "ID": "element0000000030",
-      "name": "Get list Info - ListMin = Minimum index of russianList",
+      "name": "Informationen zur Liste erhalten - ListMin = Minimaler Index von russianList",
       "package": "default",
       "pars": {
         "List": "russianList",
@@ -897,7 +897,7 @@
     "element0000000031": {
       "class": "Action_Get_List_Info",
       "ID": "element0000000031",
-      "name": "Get list Info - ListLength = Array length of russianList",
+      "name": "Informationen zur Liste erhalten - ListLength = Array-L\u00E4nge von russianList",
       "package": "default",
       "pars": {
         "List": "russianList",
@@ -912,7 +912,7 @@
     "element0000000032": {
       "class": "Action_Get_List_Info",
       "ID": "element0000000032",
-      "name": "Get list Info - ListCount = Element count of russianList",
+      "name": "Informationen zur Liste erhalten - ListCount = Anzahl der Elemente von russianList",
       "package": "default",
       "pars": {
         "List": "russianList",
@@ -927,7 +927,7 @@
     "element0000000033": {
       "class": "Action_Delete_From_List",
       "ID": "element0000000033",
-      "name": "Delete from list russianList - First value - deletedVariable - Write deleted value to 'deletedVariable'",
+      "name": "Aus der Liste russianList l\u00F6schen - Erster Wert - deletedVariable - Gel\u00F6schten Wert in 'deletedVariable' schreiben",
       "package": "default",
       "pars": {
         "DeleteMethod": "Decrement",
@@ -947,7 +947,7 @@
     "element0000000034": {
       "class": "Action_Add_To_List",
       "ID": "element0000000034",
-      "name": "Add to list russianList - At position '2' - Value '\u0434\u0432\u0430'",
+      "name": "Zur Liste hinzuf\u00FCgen - russianList - Auf Position '2' - Wert '\u0434\u0432\u0430'",
       "package": "default",
       "pars": {
         "DelimiterComma": 0,
@@ -973,7 +973,7 @@
     "element0000000035": {
       "class": "Action_Get_List_Info",
       "ID": "element0000000035",
-      "name": "Get list Info - ListMax = Maximum index of russianList",
+      "name": "Informationen zur Liste erhalten - ListMax = Maximaler Index von russianList",
       "package": "default",
       "pars": {
         "List": "russianList",
@@ -988,7 +988,7 @@
     "element0000000036": {
       "class": "Action_Get_List_Info",
       "ID": "element0000000036",
-      "name": "Get list Info - ListMin = Minimum index of russianList",
+      "name": "Informationen zur Liste erhalten - ListMin = Minimaler Index von russianList",
       "package": "default",
       "pars": {
         "List": "russianList",
@@ -1003,7 +1003,7 @@
     "element0000000037": {
       "class": "Action_Get_List_Info",
       "ID": "element0000000037",
-      "name": "Get list Info - ListLength = Array length of russianList",
+      "name": "Informationen zur Liste erhalten - ListLength = Array-L\u00E4nge von russianList",
       "package": "default",
       "pars": {
         "List": "russianList",
@@ -1018,7 +1018,7 @@
     "element0000000038": {
       "class": "Action_Get_List_Info",
       "ID": "element0000000038",
-      "name": "Get list Info - ListCount = Element count of russianList",
+      "name": "Informationen zur Liste erhalten - ListCount = Anzahl der Elemente von russianList",
       "package": "default",
       "pars": {
         "List": "russianList",
@@ -1033,7 +1033,7 @@
     "element0000000039": {
       "class": "Condition_Expression",
       "ID": "element0000000039",
-      "name": "Expression - listLength = 4 and listMax = 4 and listMin = 1 and listCount = 4",
+      "name": "Ausdruck - listLength = 4 and listMax = 4 and listMin = 1 and listCount = 4",
       "package": "default",
       "pars": {
         "Expression": "listLength = 4 and listMax = 4 and listMin = 1 and listCount = 4"
@@ -1046,7 +1046,7 @@
     "element0000000040": {
       "class": "Condition_Expression",
       "ID": "element0000000040",
-      "name": "Expression - deletedVariable = \"\u043D\u043E\u043B\u044C\"",
+      "name": "Ausdruck - deletedVariable = \"\u043D\u043E\u043B\u044C\"",
       "package": "default",
       "pars": {
         "Expression": "deletedVariable = \"\u043D\u043E\u043B\u044C\""
@@ -1059,7 +1059,7 @@
     "element0000000041": {
       "class": "Action_Shuffle_list",
       "ID": "element0000000041",
-      "name": "Shuffle list - shuffledList - russianList",
+      "name": "Liste durchmischen - shuffledList - russianList",
       "package": "default",
       "pars": {
         "Varname": "shuffledList",
@@ -1073,7 +1073,7 @@
     "element0000000042": {
       "class": "Action_Get_List_Info",
       "ID": "element0000000042",
-      "name": "Get list Info - ListMax = Maximum index of russianList",
+      "name": "Informationen zur Liste erhalten - ListMax = Maximaler Index von russianList",
       "package": "default",
       "pars": {
         "List": "russianList",
@@ -1088,7 +1088,7 @@
     "element0000000043": {
       "class": "Action_Get_List_Info",
       "ID": "element0000000043",
-      "name": "Get list Info - ListMin = Minimum index of russianList",
+      "name": "Informationen zur Liste erhalten - ListMin = Minimaler Index von russianList",
       "package": "default",
       "pars": {
         "List": "russianList",
@@ -1103,7 +1103,7 @@
     "element0000000044": {
       "class": "Action_Get_List_Info",
       "ID": "element0000000044",
-      "name": "Get list Info - ListLength = Array length of russianList",
+      "name": "Informationen zur Liste erhalten - ListLength = Array-L\u00E4nge von russianList",
       "package": "default",
       "pars": {
         "List": "russianList",
@@ -1118,7 +1118,7 @@
     "element0000000045": {
       "class": "Action_Get_List_Info",
       "ID": "element0000000045",
-      "name": "Get list Info - ListCount = Element count of russianList",
+      "name": "Informationen zur Liste erhalten - ListCount = Anzahl der Elemente von russianList",
       "package": "default",
       "pars": {
         "List": "russianList",
@@ -1133,7 +1133,7 @@
     "element0000000046": {
       "class": "Condition_Expression",
       "ID": "element0000000046",
-      "name": "Expression - listLength = 4 and listMax = 4 and listMin = 1 and listCount = 4",
+      "name": "Ausdruck - listLength = 4 and listMax = 4 and listMin = 1 and listCount = 4",
       "package": "default",
       "pars": {
         "Expression": "listLength = 4 and listMax = 4 and listMin = 1 and listCount = 4"
@@ -1146,7 +1146,7 @@
     "element0000000047": {
       "class": "Action_Get_Index_Of_Element_In_List",
       "ID": "element0000000047",
-      "name": "Get position of element in list - index1 - shuffledList - \u0440\u0430\u0437",
+      "name": "Position des Elements in der Liste ermitteln - index1 - shuffledList - \u0440\u0430\u0437",
       "package": "default",
       "pars": {
         "expression": "String",
@@ -1162,7 +1162,7 @@
     "element0000000048": {
       "class": "Action_Get_Index_Of_Element_In_List",
       "ID": "element0000000048",
-      "name": "Get position of element in list - index2 - shuffledList - \u0434\u0432\u0430",
+      "name": "Position des Elements in der Liste ermitteln - index2 - shuffledList - \u0434\u0432\u0430",
       "package": "default",
       "pars": {
         "expression": "String",
@@ -1178,7 +1178,7 @@
     "element0000000049": {
       "class": "Action_Get_Index_Of_Element_In_List",
       "ID": "element0000000049",
-      "name": "Get position of element in list - index3 - shuffledList - \u0442\u0440\u0438",
+      "name": "Position des Elements in der Liste ermitteln - index3 - shuffledList - \u0442\u0440\u0438",
       "package": "default",
       "pars": {
         "expression": "String",
@@ -1194,7 +1194,7 @@
     "element0000000050": {
       "class": "Action_Get_Index_Of_Element_In_List",
       "ID": "element0000000050",
-      "name": "Get position of element in list - index4 - shuffledList - \u0447\u0435\u0442\u044B\u0440\u0435",
+      "name": "Position des Elements in der Liste ermitteln - index4 - shuffledList - \u0447\u0435\u0442\u044B\u0440\u0435",
       "package": "default",
       "pars": {
         "expression": "String",
@@ -1210,7 +1210,7 @@
     "element0000000051": {
       "class": "Condition_Expression",
       "ID": "element0000000051",
-      "name": "Expression - index1 and index2 and index3 and index4",
+      "name": "Ausdruck - index1 and index2 and index3 and index4",
       "package": "default",
       "pars": {
         "Expression": "index1 and index2 and index3 and index4"
@@ -1223,7 +1223,7 @@
     "element0000000052": {
       "class": "Condition_Expression",
       "ID": "element0000000052",
-      "name": "Expression - index1 != 1 or index2 != 2 or index3 != 3 or index4 != 4",
+      "name": "Ausdruck - index1 != 1 or index2 != 2 or index3 != 3 or index4 != 4",
       "package": "default",
       "pars": {
         "Expression": "index1 != 1 or index2 != 2 or index3 != 3 or index4 != 4"
@@ -1236,7 +1236,7 @@
     "element0000000054": {
       "class": "Condition_Expression",
       "ID": "element0000000054",
-      "name": "Expression - countShuffleTries < 3",
+      "name": "Ausdruck - countShuffleTries < 3",
       "package": "default",
       "pars": {
         "Expression": "countShuffleTries < 3"
@@ -1249,7 +1249,7 @@
     "element0000000055": {
       "class": "Action_New_variable",
       "ID": "element0000000055",
-      "name": "New variable - countShuffleTries = countShuffleTries + 1",
+      "name": "Neue Variable - countShuffleTries = countShuffleTries + 1",
       "package": "default",
       "pars": {
         "expression": "Expression",
@@ -1264,7 +1264,7 @@
     "element0000000056": {
       "class": "Action_New_variable",
       "ID": "element0000000056",
-      "name": "New variable - countShuffleTries = 0",
+      "name": "Neue Variable - countShuffleTries = 0",
       "package": "default",
       "pars": {
         "expression": "Expression",
@@ -1279,7 +1279,7 @@
     "element0000000112": {
       "class": "Action_Add_To_List",
       "ID": "element0000000112",
-      "name": "Add to list global_testResults - As last value - Value 'a_flowName'",
+      "name": "Zur Liste hinzuf\u00FCgen - global_testResults - Als letzten Wert - Wert 'a_flowName'",
       "package": "default",
       "pars": {
         "DelimiterComma": 0,

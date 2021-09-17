@@ -155,7 +155,7 @@ Element_run_Loop_Condition(Environment, ElementParameters)
 	else
 	{
 		;This should never happen, but I suggest to keep this code for catching bugs in AHF.
-		x_finish(Environment, "exception", x_lang("No information whether the connection leads into head or tail"))
+		x_finish(Environment, "exception", x_lang("No information whether the connection leads to head or tail"))
 	}
 	
 }

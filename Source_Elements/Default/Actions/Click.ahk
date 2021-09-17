@@ -60,7 +60,7 @@ Element_getParametrizationDetails_Action_Click(Environment)
 	parametersToEdit.push({type: "Edit", id: "ClickCount", default: 1, content: "Expression", WarnIfEmpty: true})
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Event")})
-	parametersToEdit.push({type: "Radio", id: "DownUp", default: "Click", result: "enum", choices: [x_lang("Click (Down and up)"), x_lang("Keep down"), x_lang("Release only")], enum: ["Click", "D", "U"]})
+	parametersToEdit.push({type: "Radio", id: "DownUp", default: "Click", result: "enum", choices: [x_lang("Click (Down and up)"), x_lang("Hold down"), x_lang("Release only")], enum: ["Click", "D", "U"]})
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Mouse position")})
 	parametersToEdit.push({type: "Checkbox", id: "changePosition", default: 0, label: x_lang("Move mouse before clicking")})

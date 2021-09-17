@@ -102,7 +102,7 @@ Element_run_Action_Kill_Process(Environment, ElementParameters)
 		}
 		else
 		{
-			x_finish(Environment,"exception", x_lang("Process '%1%' could not be closed", EvaluatedParameters.ProcessName))
+			x_finish(Environment,"exception", x_lang("Process '%1%' could not be terminated", EvaluatedParameters.ProcessName))
 		}
 		return
 	}

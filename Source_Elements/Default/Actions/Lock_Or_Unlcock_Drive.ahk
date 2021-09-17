@@ -82,7 +82,7 @@ Element_GenerateName_Action_Lock_Or_Unlock_Drive(Environment, ElementParameters)
 	switch (ElementParameters.WhatDo)
 	{
 		case "Lock":
-		WhatDoString := x_lang("Lock")
+		WhatDoString := x_lang("Lock #verb")
 		case "Unlock":
 		WhatDoString := x_lang("Unlock")
 	}

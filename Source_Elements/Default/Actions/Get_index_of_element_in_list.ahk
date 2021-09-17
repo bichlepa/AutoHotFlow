@@ -10,7 +10,7 @@ Element_getElementType_Action_Get_Index_Of_Element_In_List()
 ;Name of the element
 Element_getName_Action_Get_Index_Of_Element_In_List()
 {
-	return x_lang("Get_Index_Of_Element_In_List")
+	return x_lang("Get position of element in list")
 }
 
 ;Category of the element

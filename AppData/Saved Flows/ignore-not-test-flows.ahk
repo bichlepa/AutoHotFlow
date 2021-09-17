@@ -13,6 +13,9 @@ testCategories := []
 testCategories.push("Automatic tests")
 testCategories.push("Manual tests")
 
+filedelete, .gitignore
+fileappend, % "/*.json`n", .gitignore
+
 loop, files, *.json
 {
     FileRead, fileContent, % a_loopfilepath
@@ -26,14 +29,7 @@ loop, files, *.json
     
     if (isTestFlow)
     {
-        prefix := "Test "
-        if (substr(a_loopfilename, 1, strlen(prefix)) = prefix)
-        {
-            continue
-        }
-        Else
-        {
-            FileMove, % a_loopfilename, % prefix a_loopfilename
-        }
+        fileappend, % "!/" a_loopfilename "`n", .gitignore
     }
 }
+

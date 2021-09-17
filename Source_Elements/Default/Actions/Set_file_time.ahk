@@ -61,7 +61,7 @@ Element_getParametrizationDetails_Action_Set_file_time(Environment)
 	parametersToEdit.push({type: "Radio", id: "TimeType", result: "enum", default: 1, choices: [x_lang("Modification time"), x_lang("Creation time"), x_lang("Last access time")], enum: ["Modification", "Creation", "Access"]})
 	parametersToEdit.push({type: "Label", label: x_lang("Options")})
 	parametersToEdit.push({type: "Radio", id: "OperateOnWhat", default: 1, choices: [x_lang("Operate on files"), x_lang("Operate on files and folders"), x_lang("Operate on folders")], result: "enum", enum: ["Files", "FilesAndFolders", "Folders"]})
-	parametersToEdit.push({type: "Checkbox", id: "Recurse", default: 0, label: x_lang("Recurse subfolders into")})
+	parametersToEdit.push({type: "Checkbox", id: "Recurse", default: 0, label: x_lang("Recurse into subfolders")})
 	
 	
 	return parametersToEdit
@@ -108,7 +108,7 @@ Element_run_Action_Set_file_time(Environment, ElementParameters)
 	timeValue := EvaluatedParameters.time
 	if timeValue is not time
 	{
-		x_finish(Environment, "exception", x_lang("Timestamp '%1%' is not valid", timeValue)) 
+		x_finish(Environment, "exception", x_lang("Timestamp '%1%' is not valid.", timeValue)) 
 		return
 	}
 	

@@ -185,7 +185,7 @@ class ElementSettings
 		; button for getting help
 		gui, GUISettingsOfElementParent: add, button, w20 X+10 yp h20 gGUISettingsOfElementHelp vGUISettingsOfElementHelp, ?
 		; save button
-		Gui, GUISettingsOfElementParent: Add, Button, gGUISettingsOfElementSave vButtonSave w145 x10 h30 y%YsettingsButtoPos%, % lang("Save")
+		Gui, GUISettingsOfElementParent: Add, Button, gGUISettingsOfElementSave vButtonSave w145 x10 h30 y%YsettingsButtoPos%, % lang("Save #verb")
 		; cancel button
 		Gui, GUISettingsOfElementParent: Add, Button, gGUISettingsOfElementCancel vButtonCancel default w145 h30 yp X+10, % lang("Cancel")
 
@@ -873,7 +873,7 @@ class ElementSettings
 						{
 							guicontrol, GUISettingsOfElement:show, GUISettingsOfElementWarningIconOf%tempFirstParamID%
 							guicontrol, GUISettingsOfElement:, GUISettingsOfElementWarningIconOf%tempFirstParamID%, %_ScriptDir%\Icons\Question mark.ico
-							This.warningText := lang("Note!") " " lang("This is an expression.") " " lang("You must not use percent signs to add a variable's content.") "`n" lang("But you can still use percent signs if the variable name or a part of it is stored in a variable.")
+							This.warningText := lang("Note!") " " lang("This is an expression") " - " lang("You must not use percent signs to add a variable's content.") "`n" lang("But you can still use percent signs if the variable name or a part of it is stored in a variable.")
 						}
 					}
 				}
@@ -2257,7 +2257,7 @@ class ElementSettings
 			}
 			else if (tempFormat = "DateTime")
 			{
-				tempFormat := % "'" lang("Date") ":' " lang("MM/dd/yyyy") "   '" lang("Time") ":' " lang("HH:mm:ss")
+				tempFormat := % "'" lang("Date") ":' " lang("MM/dd/yyyy #common date format") "   '" lang("Time") ":' " lang("HH:mm:ss #common time format")
 			}
 			
 			; get the current value

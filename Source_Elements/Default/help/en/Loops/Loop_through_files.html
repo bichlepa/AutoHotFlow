@@ -16,10 +16,10 @@
 <table class="settings">
 	<TR>
 		<TD>
-			<h4>File pattern</h4>
+			<h4>File path</h4>
 			<p>The path of a single file or folder, or a wildcard pattern.
 				<br/>Both asterisks and question marks are supported as wildcards. A match occurs when the pattern appears in either the file's long/normal name or its 8.3 short name.
-				<br/>The file pattern is assumed to be in the working directory if an absolute path isn't specified.</p>
+				<br/>The file path is assumed to be in the working directory if an absolute path isn't specified.</p>
 		</TD>
 	</TR>
 	<TR>
@@ -59,21 +59,21 @@
 	<TR>
 		<TD>
 			<h4 class="VariableName">A_LoopFilePath</h4>
-			<p>The path and name of the file/folder currently retrieved. If <b>File pattern</b> contains a relative path rather than an absolute path, the path here will also be relative. In addition, any short (8.3) folder names in <b>File pattern</b> will still be short (see next item to get the long version).</p>
+			<p>The path and name of the file/folder currently retrieved. If <b>File path</b> contains a relative path rather than an absolute path, the path here will also be relative. In addition, any short (8.3) folder names in <b>File path</b> will still be short (see next item to get the long version).</p>
 		</TD>
 	</TR>
 	<TR>
 		<TD>
 			<h4 class="VariableName">A_LoopFileLongPath</h4>
-			<p>This is different than A_LoopFileFullPath in the following ways: 1) It always contains the absolute/complete path of the file even if <b>File pattern</b> contains a relative path; 2) Any short (8.3) folder names in <b>File pattern</b> itself are converted to their long names; 3) Characters in <b>File pattern</b> are converted to uppercase or lowercase to match the case stored in the file system. This is useful for converting file names -- such as those passed into a script as command line parameters -- to their exact path names as shown by Explorer.
+			<p>This is different than A_LoopFileFullPath in the following ways: 1) It always contains the absolute/complete path of the file even if <b>File path</b> contains a relative path; 2) Any short (8.3) folder names in <b>File path</b> itself are converted to their long names; 3) Characters in <b>File path</b> are converted to uppercase or lowercase to match the case stored in the file system. This is useful for converting file names -- such as those passed into a script as command line parameters -- to their exact path names as shown by Explorer.
 			</p>
 		</TD>
 	</TR>
 	<TR>
 		<TD>
 			<h4 class="VariableName">A_LoopFileShortPath</h4>
-			<p>The 8.3 short path and name of the file/folder currently retrieved. For example: C:\MYDOCU~1\ADDRES~1.txt. If FilePattern contains a relative path rather than an absolute path, the path here will also be relative.</p>
-			<p class="info">This variable will be blank if the file does not have a short name, which can happen on systems where NtfsDisable8dot3NameCreation has been set in the registry. It will also be blank if FilePattern contains a relative path and the body of the loop uses SetWorkingDir to switch away from the working directory in effect for the loop itself.</p>
+			<p>The 8.3 short path and name of the file/folder currently retrieved. For example: C:\MYDOCU~1\ADDRES~1.txt. If File path contains a relative path rather than an absolute path, the path here will also be relative.</p>
+			<p class="info">This variable will be blank if the file does not have a short name, which can happen on systems where NtfsDisable8dot3NameCreation has been set in the registry. It will also be blank if File path contains a relative path and the body of the loop uses SetWorkingDir to switch away from the working directory in effect for the loop itself.</p>
 		</TD>
 	</TR>
 	<TR>
@@ -85,7 +85,7 @@
 	<TR>
 		<TD>
 			<h4 class="VariableName">A_LoopFileDir</h4>
-			<p>The path of the directory in which A_LoopFileName resides. If FilePattern contains a relative path rather than an absolute path, the path here will also be relative. A root directory will not contain a trailing backslash. For example: C:</p>
+			<p>The path of the directory in which A_LoopFileName resides. If File path contains a relative path rather than an absolute path, the path here will also be relative. A root directory will not contain a trailing backslash. For example: C:</p>
 		</TD>
 	</TR>
 	<TR>

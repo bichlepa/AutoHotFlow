@@ -66,7 +66,7 @@ Element_getParametrizationDetails_Action_Set_file_attributes(Environment)
 
 	parametersToEdit.push({type: "Label", label: x_lang("Options")})
 	parametersToEdit.push({type: "Radio", id: "OperateOnWhat", default: 1, choices: [x_lang("Operate on files"), x_lang("Operate on files and folders"), x_lang("Operate on folders")], result: "enum", enum: ["Files", "FilesAndFolders", "Folders"]})
-	parametersToEdit.push({type: "Checkbox", id: "Recurse", default: 0, label: x_lang("Recurse subfolders into")})
+	parametersToEdit.push({type: "Checkbox", id: "Recurse", default: 0, label: x_lang("Recurse into subfolders")})
 	
 	return parametersToEdit
 }

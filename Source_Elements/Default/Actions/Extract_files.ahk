@@ -53,7 +53,7 @@ Element_getParametrizationDetails_Action_Extract_files(Environment)
 {
 	parametersToEdit:=Object()
 	parametersToEdit.push({type: "Label", label: x_lang("Source archive")})
-	parametersToEdit.push({type: "File", id: "zipfile", label: x_lang("Select a zip file"), filter: x_lang("Archive") " (.zip; .7z; .xz; .gz; .gzip; .tgz; .bz2; .bzip2; .tbz2; .tbz; .tar; .z; .taz; .lzma)"})
+	parametersToEdit.push({type: "File", id: "zipfile", label: x_lang("Select an archive"), filter: x_lang("Archive") " (.zip; .7z; .xz; .gz; .gzip; .tgz; .bz2; .bzip2; .tbz2; .tbz; .tar; .z; .taz; .lzma)"})
 
 	parametersToEdit.push({type: "Label", label: x_lang("Destination folder")})
 	parametersToEdit.push({type: "Folder", id: "folder", label: x_lang("Select a folder")})

@@ -138,7 +138,7 @@ Element_run_Action_Delete_From_Ini(Environment, ElementParameters)
 		; check for errors
 		if errorlevel
 		{
-			x_finish(Environment, "exception", x_lang("Error on delete from ini"))
+			x_finish(Environment, "exception", x_lang("Error while deleting from ini"))
 			return
 		}
 	
@@ -151,7 +151,7 @@ Element_run_Action_Delete_From_Ini(Environment, ElementParameters)
 		; check for errors
 		if errorlevel
 		{
-			x_finish(Environment,"exception",x_lang("Error on delete from ini") )
+			x_finish(Environment,"exception",x_lang("Error while deleting from ini") )
 			return
 		}
 	}

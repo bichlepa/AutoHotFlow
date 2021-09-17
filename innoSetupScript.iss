@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "AutoHotFlow"
-#define MyAppVersion "1.0.5"
+#define MyAppVersion "1.0.6"
 #define MyAppPublisher "Paul Bichler"
 #define MyAppURL "https://bichlepa.jimdofree.com/autohotflow/"
 #define MyAppExeName "AutoHotFlow.exe" 
@@ -91,6 +91,7 @@ Source: "Icons\Update Checker.ico"; DestDir: "{app}\Icons"; Flags: ignoreversion
 Source: "Icons\VariableName.ico"; DestDir: "{app}\Icons"; Flags: ignoreversion
 Source: "language\language.ahk"; DestDir: "{app}\language"; Flags: ignoreversion
 Source: "language\en.ini"; DestDir: "{app}\language"; Flags: ignoreversion
+Source: "language\de.ini"; DestDir: "{app}\language"; Flags: ignoreversion
 Source: "Saved Flows\demo flows\Flow 1369089307.json"; DestDir: "{app}\Saved Flows\demo flows"; Flags: ignoreversion
 Source: "Saved Flows\demo flows\Flow 1428714744.json"; DestDir: "{app}\Saved Flows\demo flows"; Flags: ignoreversion
 Source: "Saved Flows\demo flows\Flow 806132298.json"; DestDir: "{app}\Saved Flows\demo flows"; Flags: ignoreversion
@@ -319,6 +320,15 @@ Source: "Source_Elements\Default\Triggers\Window_closes.ahk"; DestDir: "{app}\So
 Source: "Source_Elements\Default\Triggers\Window_gets_active.ahk"; DestDir: "{app}\Source_Elements\Default\Triggers"; Flags: ignoreversion
 Source: "Source_Elements\Default\Triggers\Window_gets_inactive.ahk"; DestDir: "{app}\Source_Elements\Default\Triggers"; Flags: ignoreversion
 Source: "Source_Elements\Default\Triggers\Window_opens.ahk"; DestDir: "{app}\Source_Elements\Default\Triggers"; Flags: ignoreversion
+Source: "Source_Elements\Default\Icons\Bug.png"; DestDir: "{app}\Source_Elements\Default\Icons"; Flags: ignoreversion
+Source: "Source_Elements\Default\Icons\Bullhorn.png"; DestDir: "{app}\Source_Elements\Default\Icons"; Flags: ignoreversion
+Source: "Source_Elements\Default\Icons\Keyboard.png"; DestDir: "{app}\Source_Elements\Default\Icons"; Flags: ignoreversion
+Source: "Source_Elements\Default\Icons\new Variable.png"; DestDir: "{app}\Source_Elements\Default\Icons"; Flags: ignoreversion
+Source: "Source_Elements\Default\Icons\Tooltip.png"; DestDir: "{app}\Source_Elements\Default\Icons"; Flags: ignoreversion
+Source: "Source_Elements\Default\Icons\Sleep.ico"; DestDir: "{app}\Source_Elements\Default\Icons"; Flags: ignoreversion
+Source: "Source_Elements\Default\manifest.json"; DestDir: "{app}\Source_Elements\Default"; Flags: ignoreversion
+Source: "Source_Elements\Default\language\en.ini"; DestDir: "{app}\Source_Elements\Default\language"; Flags: ignoreversion
+Source: "Source_Elements\Default\language\de.ini"; DestDir: "{app}\Source_Elements\Default\language"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Absolute_number.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\activate_Window.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Add_to_list.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
@@ -456,14 +466,6 @@ Source: "Source_Elements\Default\help\en\Triggers\window_closes.html"; DestDir: 
 Source: "Source_Elements\Default\help\en\Triggers\window_gets_active.html"; DestDir: "{app}\Source_Elements\Default\help\en\Triggers"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Triggers\window_gets_inactive.html"; DestDir: "{app}\Source_Elements\Default\help\en\Triggers"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Triggers\window_opens.html"; DestDir: "{app}\Source_Elements\Default\help\en\Triggers"; Flags: ignoreversion
-Source: "Source_Elements\Default\Icons\Bug.png"; DestDir: "{app}\Source_Elements\Default\Icons"; Flags: ignoreversion
-Source: "Source_Elements\Default\Icons\Bullhorn.png"; DestDir: "{app}\Source_Elements\Default\Icons"; Flags: ignoreversion
-Source: "Source_Elements\Default\Icons\Keyboard.png"; DestDir: "{app}\Source_Elements\Default\Icons"; Flags: ignoreversion
-Source: "Source_Elements\Default\Icons\new Variable.png"; DestDir: "{app}\Source_Elements\Default\Icons"; Flags: ignoreversion
-Source: "Source_Elements\Default\Icons\Tooltip.png"; DestDir: "{app}\Source_Elements\Default\Icons"; Flags: ignoreversion
-Source: "Source_Elements\Default\Icons\Sleep.ico"; DestDir: "{app}\Source_Elements\Default\Icons"; Flags: ignoreversion
-Source: "Source_Elements\Default\language\en.ini"; DestDir: "{app}\Source_Elements\Default\language"; Flags: ignoreversion
-Source: "Source_Elements\Default\manifest.json"; DestDir: "{app}\Source_Elements\Default"; Flags: ignoreversion
 Source: "find modules.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "AutoHotFlow.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "Package uninstaller.exe"; DestDir: "{app}"; Flags: ignoreversion

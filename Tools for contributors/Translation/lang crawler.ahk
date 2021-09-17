@@ -1,14 +1,18 @@
 ﻿#NoEnv  ; Recommended for performance and compatibility with future AutoHotkey releases.
 ;~ #Warn  ; Recommended for catching common errors.
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
-SetWorkingDir %A_ScriptDir%\..  ; Ensures a consistent starting directory.
+SetWorkingDir %A_ScriptDir%\..\..  ; Ensures a consistent starting directory.
+
+
+; this script parses the source code and writes all text that is passed to lang() to the translation files
+
 
 ;parameters
 mainlanguagecode:="en"
 mainlanguagename:="English"
 
 
-#Include %A_ScriptDir%\..
+#Include %A_ScriptDir%\..\..
 #Include lib\json\jxon.ahk
 #Include lib\ini\ini helper.ahk
 
@@ -49,7 +53,7 @@ loop, files, source_elements\*, D
 	iniContent := importIni(iniFileContent)
 
 	allStringsValue := A_LoopFileName
-	allNewStrings := searchLangCallsInCode(A_LoopFilePath, allStrings, allStringsValue)
+	allNewStrings := searchLangCallsInCode(A_LoopFilePath, allStrings, "fileName", "_common")
 	
 	iniContent := mergeStringsInIniContent(iniContent, allNewStrings)
 	iniFileContent := exportIni({language_info: iniContentLanguageInfo}) "`n`n" exportIni(iniContent)
@@ -59,16 +63,22 @@ loop, files, source_elements\*, D
 
 
 
-MsgBox finished! :-)
+SoundBeep, 200, 100
 ExitApp
 
 searchLangCallsInCode(folder, allStrings, allStringsValue, allStringsValueIfOtherOccurences = "")
 {
 	allNewStrings := []
 
+	if (allStringsValue = "filename")
+		useFileNameAsStringsValue := true
+
 	;Search for all ahk files and search for lang() calls
 	loop %folder%\*.ahk,1,1
 	{
+		if (useFileNameAsStringsValue)
+			allStringsValue := A_LoopFileName
+	
 		currentfile := A_LoopFileFullPath
 		FileRead, ahkFileContent, %currentfile%
 		
@@ -81,7 +91,6 @@ searchLangCallsInCode(folder, allStrings, allStringsValue, allStringsValueIfOthe
 				break
 			
 			langvar := tempVariablesToReplace1
-			stringreplace, langvar, langvar, _, %a_space%, all
 			
 			StringGetPos, pos, langvar, "
 			if pos
@@ -92,6 +101,7 @@ searchLangCallsInCode(folder, allStrings, allStringsValue, allStringsValueIfOthe
 				exitapp
 			}
 			
+			stringreplace, langvar, langvar, _, %a_space%, all
 			if not allStrings.haskey(langvar)
 			{
 				allStrings[langvar] := allStringsValue
@@ -100,6 +110,7 @@ searchLangCallsInCode(folder, allStrings, allStringsValue, allStringsValueIfOthe
 			Else if (allStrings[langvar] != allStringsValue and allStringsValueIfOtherOccurences)
 			{
 				allStrings[langvar] := allStringsValueIfOtherOccurences
+				allNewStrings[langvar] := allStringsValueIfOtherOccurences
 			}
 		}
 	}

@@ -19,7 +19,7 @@ Var_EvaluateExpression(environment, ExpressionString, useCommonFunctions)
 		{
 			if (a_index != 1)
 				string .= "`n`n"
-			string .= lang("line %1%, col %2%`n", oneerror.line, oneerror.col) 
+			string .= lang("line %1%, col %2%", oneerror.line, oneerror.col) "`n"
 			string .= oneerror.wholeline "`n"
 			string .= oneerror.description
 		}
@@ -38,7 +38,7 @@ Var_EvaluateExpression(environment, ExpressionString, useCommonFunctions)
 		{
 			if (a_index != 1)
 				string .= "`n`n"
-			string .= lang("line %1%, col %2%`n", oneerror.line, oneerror.col) 
+			string .= lang("line %1%, col %2%", oneerror.line, oneerror.col) "`n"
 			string .= oneerror.wholeline "`n"
 			string .= oneerror.description
 		}

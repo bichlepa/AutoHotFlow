@@ -47,9 +47,9 @@
     "element0000000002": {
       "class": "Trigger_Manual",
       "DefaultTrigger": "1",
-      "enabled": "0",
+      "enabled": "1",
       "ID": "element0000000002",
-      "name": "Manual - \"basic variables test\"",
+      "name": "Manuell - \"basic variables test\"",
       "package": "default",
       "pars": {
         "ID": "basic variables test"
@@ -62,7 +62,7 @@
     "element0000000003": {
       "class": "Action_New_variable",
       "ID": "element0000000003",
-      "name": "New variable - NewVariable = New element",
+      "name": "Neue Variable - NewVariable = New element",
       "package": "default",
       "pars": {
         "expression": "string",
@@ -77,7 +77,7 @@
     "element0000000004": {
       "class": "Condition_Variable_Is_Empty",
       "ID": "element0000000004",
-      "name": "Variable is empty - NewVariable",
+      "name": "Variable ist leer - NewVariable",
       "package": "default",
       "pars": {
         "VarName": "NewVariable"
@@ -90,7 +90,7 @@
     "element0000000005": {
       "class": "Condition_Variable_Is_Empty",
       "ID": "element0000000005",
-      "name": "Variable is empty - NewVariable",
+      "name": "Variable ist leer - NewVariable",
       "package": "default",
       "pars": {
         "VarName": "NewVariable"
@@ -103,7 +103,7 @@
     "element0000000007": {
       "class": "Action_New_variable",
       "ID": "element0000000007",
-      "name": "New variable - NewVariable = ",
+      "name": "Neue Variable - NewVariable = ",
       "package": "default",
       "pars": {
         "expression": "Expression",
@@ -118,7 +118,7 @@
     "element0000000008": {
       "class": "Condition_Variable_Is_Empty",
       "ID": "element0000000008",
-      "name": "Variable is empty - NewVariable",
+      "name": "Variable ist leer - NewVariable",
       "package": "default",
       "pars": {
         "VarName": "NewVariable"
@@ -131,7 +131,7 @@
     "element0000000015": {
       "class": "Action_Add_To_List",
       "ID": "element0000000015",
-      "name": "Add to list global_testResults - As last value - Value 'a_flowName'",
+      "name": "Zur Liste hinzuf\u00FCgen - global_testResults - Als letzten Wert - Wert 'a_flowName'",
       "package": "default",
       "pars": {
         "DelimiterComma": 0,

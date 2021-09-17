@@ -51,7 +51,7 @@
 	</ul>
 	<li/>If your element requires a new library</b>
 	<ul>
-		<li/>Add the lib file to <b>source_elements\Default\lib\%anyNewSubFolder%</b>
+		<li/>Add the lib file to <b>source_elements\%yourPackageName%\lib\%anyNewSubFolder%</b>
 	</ul>
 	<li/>Open the file <b>manifest.json</b> in the folder <b>source_elements\%yourPackageName%</b>
 	<ul>
@@ -59,7 +59,7 @@
 		<li/>Add the file path of the new library (if any) in section <code>libraries</code>
 	</ul>
 	<li/>Run the tool <b>Find modules</b>. This will make the source code files available to AHF</b>
-	<li/>Open the source file of the newly created element. You'll find it in the folder <b>source_elements\%yourPackageName%\%ElementType%s</b></b>
+	<li/>Open the source file of the newly created element. You'll find it in the folder <b>source_elements\%yourPackageName%\%ElementType%s</b>
 	<ul>
 		<li/>Edit the code and implement everything. See other help pages for help
 	</ul>
@@ -90,7 +90,7 @@
 		<li/>Add the file path of the new library (if any) in section <code>libraries</code>
 	</ul>
 	<li/>Run the tool <b>Find modules</b>. This will make the source code files available to AHF</b>
-	<li/>Open the source file of the newly created element. You'll find it in the folder <b>source_elements\Default\%ElementType%s</b></b>
+	<li/>Open the source file of the newly created element. You'll find it in the folder <b>source_elements\Default\%ElementType%s</b>
 	<ul>
 		<li/>Edit the code and implement everything. See other help pages for help
 	</ul>
@@ -118,6 +118,10 @@
 <p>This section describes how you can create a new package with an installer.</p>
 <p>You need to install the InnoSetup application. It can be downloaded here: <a href="https://jrsoftware.org/isdl.php" target="_parent">https://jrsoftware.org/isdl.php</a></p>
 <p><ul>
+	<li/>Create a new package using the tool <b>Create new package</b>
+	<ul>
+		<li/>Enter a package name of your choice
+	</ul>
 	<li/>Create a new element using the tool <b>Element template creator</b>
 	<ul>
 		<li/>Choose the element type
@@ -131,7 +135,7 @@
 	</ul>
 	<li/>If your element requires a new library</b>
 	<ul>
-		<li/>Add the lib file to <b>source_elements\Default\lib\%anyNewSubFolder%</b>
+		<li/>Add the lib file to <b>source_elements\%yourPackageName%\lib\%anyNewSubFolder%</b>
 	</ul>
 	<li/>Open the file <b>manifest.json</b> in the folder <b>source_elements\%yourPackageName%</b>
 	<ul>
@@ -139,7 +143,7 @@
 		<li/>Add the file path of the new library (if any) in section <code>libraries</code>
 	</ul>
 	<li/>Run the tool <b>Find modules</b>. This will update the source code files of AHF</b>
-	<li/>Open the source file of the newly created element. You'll find it in the folder <b>source_elements\%yourPackageName%\%ElementType%s</b></b>
+	<li/>Open the source file of the newly created element. You'll find it in the folder <b>source_elements\%yourPackageName%\%ElementType%s</b>
 	<ul>
 		<li/>Edit the code and implement everything. See other help pages for help
 	</ul>
@@ -155,8 +159,20 @@
 	<li/>Publish the package installer on your own via <a href= "https://www.autohotkey.com/boards/viewtopic.php?f=6&t=6399" target="_parent">forum</a> and notify bichlepa via email to <a href= "mailto:autohotflow@arcor.de">autohotflow@arcor.de</a></b>
 </ul></p>
 
+<p>Please make sure that all function and label names, global variable names and class names that you have in the package are unique. I suggest that you add the package name as prefix for all names in global scopes.
+	<br/>We have to make sure that there won't ba any collisions if user installs multiple packages.
+	<br/>For example if you use a library and an other package uses the same library, too, then, if both packages are installed, the same function will be defined twice and AHF won't start. Therefore it's also important to rename all library functions.</p>
+
 
 <H2>Remarks</H2>
+<p>The package name appears in multiple places and must be exactly the same everywhere:
+<ul>
+	<li/>Name of the folder in <b>source_elements\%yourPackageName%\</b>
+	<li/>Value <code>"name": "%yourPackageName%"</code> in <b>source_elements\%yourPackageName%\manifest.json</b>
+	<li/>Return value of function <code>Element_getPackage_...()</code> in each element implementation file
+</ul>
+</p>
+
 <p>If you encounter any problem, please contact via <a href= "https://github.com/bichlepa/AutoHotFlow/issues" target="_parent">GitHub Issues</a> (preferable), via <a href= "https://www.autohotkey.com/boards/viewtopic.php?f=6&t=6399">forum</a> or via <a href= "mailto:autohotflow@arcor.de">autohotflow@arcor.de</a>.</p>
 <p>If you with some new features, you can post them in the <a href= "https://www.autohotkey.com/boards/viewtopic.php?f=6&t=6399" target="_parent">forum</a> or via <a href= "mailto:autohotflow@arcor.de">autohotflow@arcor.de</a>.</p>
 

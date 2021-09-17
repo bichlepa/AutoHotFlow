@@ -10,7 +10,7 @@ Element_getElementType_&ElementType&_&Name&()
 ;Name of the element
 Element_getName_&ElementType&_&Name&()
 {
-	return lang("&Name&")
+	return lang("&Name_Readable&")
 }
 
 ;Category of the element
@@ -125,9 +125,9 @@ Element_GenerateName_&ElementType&_&Name&(Environment, ElementParameters)
 	; generate window identification name
 	nameString := windowFunctions_generateWindowIdentificationName(ElementParameters)
 	
-	return lang("&Name&") ": " nameString
+	return lang("&Name_Readable&") ": " nameString
 #else ;addWindowSelector
-	return lang("&Name&") 
+	return lang("&Name_Readable&") 
 #endif ;addWindowSelector
 }
 
@@ -214,7 +214,7 @@ Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 		if not x_CheckVariableName(editVariableNameValue)
 		{
 			;On error, finish with exception and return
-			x_finish(Environment, "exception", lang("%1% is not valid", lang("Ouput variable name '%1%'", editVariableName)))
+			x_finish(Environment, "exception", lang("%1% is not valid.", lang("Ouput variable name '%1%'", editVariableName)))
 			return
 		}
 #endif ;par_editVariableName
@@ -459,7 +459,7 @@ Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 	else
 	{
 		;This should never happen, but I suggest to keep this code for catching bugs in AHF.
-		x_finish(Environment, "exception", lang("No information whether the connection leads into head or tail"))
+		x_finish(Environment, "exception", lang("No information whether the connection leads to head or tail"))
 	}
 }
 

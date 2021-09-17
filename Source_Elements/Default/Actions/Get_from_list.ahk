@@ -177,7 +177,7 @@ Element_run_Action_Get_From_List(Environment, ElementParameters)
 		; check whether positoin is specified
 		if (Position = "")
 		{
-			x_finish(Environment, "exception", x_lang("%1% is not secified.", x_lang("Position")))
+			x_finish(Environment, "exception", x_lang("%1% is not specified.", x_lang("Position")))
 			return
 		}
 		; check whether list contains the key

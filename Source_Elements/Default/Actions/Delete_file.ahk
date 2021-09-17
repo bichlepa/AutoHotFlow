@@ -110,7 +110,7 @@ Element_run_Action_Delete_File(Environment, ElementParameters)
 		; check for errors
 		if errorlevel
 		{
-			x_finish(Environment, "exception", x_lang("%1% files could not be deleted (Filepattern: '%2%')", errorlevel, EvaluatedParameters.file)) 
+			x_finish(Environment, "exception", x_lang("%1% files could not be deleted (File path: '%2%')", errorlevel, EvaluatedParameters.file)) 
 			return
 		}
 	}
@@ -122,7 +122,7 @@ Element_run_Action_Delete_File(Environment, ElementParameters)
 		; check for errors
 		if errorlevel
 		{
-			x_finish(Environment, "exception", x_lang("Some files could not be recycled (Filepattern: '%1%')", EvaluatedParameters.file)) 
+			x_finish(Environment, "exception", x_lang("Some files could not be recycled (File path: '%1%')", EvaluatedParameters.file)) 
 			return
 		}
 	}

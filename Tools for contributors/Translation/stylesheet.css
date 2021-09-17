@@ -1,0 +1,104 @@
+html, table{
+    font-family: sans-serif;
+	font-size: 14px;
+}
+h1 {
+	color: black;
+	margin-top: 0.3cm;
+	margin-bottom: 0.4cm;
+	page-break-before: "always";
+}
+h2 {
+	color: black;
+	margin-top: 0.3cm;
+	margin-bottom: 0.4cm;
+	page-break-before: "always";
+}
+p.warning {
+	border-left: 6px solid #ccc!important;
+	border-color: rgb(255, 0, 0)!important;
+	background-color: rgb(255, 196, 196);
+	padding: 0.1em 16px;
+}
+p.info {
+	border-left: 6px solid #ccc!important;
+	border-color: rgb(206, 203, 0)!important;
+	background-color: rgb(255, 254, 185);
+	padding: 0.1em 16px;
+}
+table {
+	border-color: #000000;
+    border-width: 2px;
+	border-style: solid;
+	border-collapse: collapse;
+}
+
+td {
+	border-color: #000000;
+    border-width: 2px;
+	border-style: solid;
+    padding: 5px;
+}
+td.example-parameter {
+	width: 30%;
+    padding-right: 10px;
+    border-width: 1px;
+}
+td.example-value {
+    font-family: monospace;
+	width: 100%;
+    border-width: 1px;
+}
+table.settings {
+	width: 100%;
+    background-color: #ccffff;
+}
+table.examples {
+	width: 100%;
+    background-color: #ccffcc;
+}
+table.example {
+	width: 100%;
+    background-color: #ccffcc;
+    border-width: 1px;
+}
+table.variables {
+	width: 100%;
+    background-color: #feffcc;
+}
+
+table.codeblock {
+	width: 100%;
+    background-color: #d3d3d3;
+    font-family: monospace;
+}
+ul.examples {
+    background-color: #ccffcc;
+	border-color: #000000;
+    border-width: 1px;
+	border-style: solid;
+	line-height: 100%;
+    font-family: monospace;
+}
+
+i {
+    font-family: sans-serif;
+	font-weight: normal;
+	color:rgb(59, 59, 59);
+}
+
+h4 {
+    font-size: 16px;
+}
+h4.VariableName {
+    font-family: monospace;
+}
+code {
+	background-color: rgb(228, 228, 228);
+}
+
+iframe {
+	width: 100%;
+	height: 80%;
+}
+

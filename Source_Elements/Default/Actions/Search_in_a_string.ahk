@@ -118,7 +118,7 @@ Element_run_Action_Search_in_a_string(Environment, ElementParameters)
 	{
 		; nothing found
 		x_SetVariable(Environment, EvaluatedParameters.Varname, "") 
-		x_finish(Environment, "exception", x_lang("Searched text not found")) 
+		x_finish(Environment, "exception", x_lang("Searched text was not found")) 
 		return
 	}
 
