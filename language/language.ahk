@@ -154,6 +154,11 @@ lang_setLanguage(p_lang = "")
 lang(langvar, langReplacements*)
 {
 	global _language, developing
+
+	if (langvar ="")
+	{
+		return ""
+	}
 	
 	if (not _language.lang_init_called)
 	{
@@ -161,6 +166,7 @@ lang(langvar, langReplacements*)
 		return
 	}
 	
+	_EnterCriticalSection()
 	;if set language was not called yet, call it now
 	if (not _language.lang_setLanguage_called)
 	{
@@ -173,8 +179,6 @@ lang(langvar, langReplacements*)
 	filepath := _language.allLangs[lang].filepath
 	fallbackfilepath := _language.allLangs[_language.fallbacklang].filepath
 	
-	if (langvar ="")
-		return ""
 	if not isobject(_language.cache)
 		_language.cache:=Object()
 	
@@ -245,6 +249,7 @@ lang(langvar, langReplacements*)
 	}
 	
 	
+	_LeaveCriticalSection()
 	return initext
 	
 }
