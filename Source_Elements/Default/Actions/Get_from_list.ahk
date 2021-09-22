@@ -189,7 +189,7 @@ Element_run_Action_Get_From_List(Environment, ElementParameters)
 	}
 	
 	; write value from list to variable
-	x_SetVariable(Environment, Varname, myList[Position])
+	x_SetVariable(Environment, EvaluatedParameters.Varname, myList[Position])
 	
 	;Always call v_finish() before return
 	x_finish(Environment, "normal")
