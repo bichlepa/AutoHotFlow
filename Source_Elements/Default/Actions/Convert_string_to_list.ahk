@@ -69,7 +69,7 @@ Element_getParametrizationDetails_Action_Convert_string_to_list(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Convert_string_to_list(Environment, ElementParameters)
 {
-	return lang("Convert string '%1%' to '%2%' list", ElementParameters.VarValue, ElementParameters.listToStringOutputFormat) " - " ElementParameters.Varname
+	return lang("Convert %1%-string to list '%2%'", ElementParameters.listToStringOutputFormat, ElementParameters.VarValue) " - " ElementParameters.Varname
 }
 
 ;Called every time the user changes any parameter.

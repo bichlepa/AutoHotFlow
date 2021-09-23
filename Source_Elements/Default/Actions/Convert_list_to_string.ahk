@@ -72,7 +72,7 @@ Element_getParametrizationDetails_Action_Convert_list_to_string(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Convert_list_to_string(Environment, ElementParameters)
 {
-	return lang("Convert list '%1%' to '%2%' string", ElementParameters.ListName, ElementParameters.listToStringOutputFormat) " - " ElementParameters.Varname
+	return lang("Convert list '%1%' to %2%-string", ElementParameters.ListName, ElementParameters.listToStringOutputFormat) " - " ElementParameters.Varname
 }
 
 ;Called every time the user changes any parameter.
@@ -132,7 +132,7 @@ Element_run_Action_Convert_list_to_string(Environment, ElementParameters)
 		}
 		catch e
 		{
-			x_finish(Environment, "exception", x_lang("Error converting string to list") " - " e.Message)
+			x_finish(Environment, "exception", x_lang("Error converting list to string") " - " e.Message)
 			return
 		}
 		case "YAML":

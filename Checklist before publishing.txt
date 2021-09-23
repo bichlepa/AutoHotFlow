@@ -1,5 +1,6 @@
 - run "innoSetupPrebuildSteps.ahk"
 - run all test flows
+- run "lang crawler" and use "Translation tool" to add German translation
 - make installer via innoSetupScript.iss
 - test the installer
 - open installed AHF
