@@ -281,14 +281,14 @@ Action_Speech_Output_Task()
 		ActionSpeech_Output_Stop := false
 		if (CurrentVoice)
 		{
-			TTS(AllVoices[CurrentVoice], "Stop")
+			Default_Lib_TTS(AllVoices[CurrentVoice], "Stop")
 		}
 	}
 	; is a speech output running?
 	if (CurrentVoice)
 	{
 		; check state of the speech output
-		status := TTS(AllVoices[CurrentVoice], "GetStatus")
+		status := Default_Lib_TTS(AllVoices[CurrentVoice], "GetStatus")
 		
 		if (status = "reading" or status = "paused")
 		{
@@ -320,7 +320,7 @@ Action_Speech_Output_Task()
 			if (not AllVoices[VoiceIdentification])
 			{
 				; voice with those parameters was not created yet. Create a new one.
-				createdVoice := TTS_CreateVoice(QueueItem.TTSEngine, QueueItem.speed, QueueItem.volume, QueueItem.pitch)
+				createdVoice := Default_Lib_TTS_CreateVoice(QueueItem.TTSEngine, QueueItem.speed, QueueItem.volume, QueueItem.pitch)
 
 				; check for errors
 				if not (createdVoice)
@@ -338,7 +338,7 @@ Action_Speech_Output_Task()
 			try
 			{
 				; start speech output
-				TTS(AllVoices[VoiceIdentification], "Speak", QueueItem.TextToSpeak)
+				Default_Lib_TTS(AllVoices[VoiceIdentification], "Speak", QueueItem.TextToSpeak)
 				ActionSpeech_Output_CurrentExecution := QueueItem.uniqueID
 				CurrentVoice := VoiceIdentification
 				if not (QueueItem.wait)

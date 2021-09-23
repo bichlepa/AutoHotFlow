@@ -9,7 +9,7 @@ license info:
 }
 */
 
-Jxon_Load(ByRef src, args*)
+Default_Lib_Jxon_Load(ByRef src, args*)
 {
 	static q := Chr(34)
 
@@ -147,7 +147,7 @@ Jxon_Load(ByRef src, args*)
 	return tree[1]
 }
 
-Jxon_Dump(obj, indent:="", lvl:=1, showUnicode := 0)
+Default_Lib_Jxon_Dump(obj, indent:="", lvl:=1, showUnicode := 0)
 {
 	static q := Chr(34)
 
@@ -182,9 +182,9 @@ Jxon_Dump(obj, indent:="", lvl:=1, showUnicode := 0)
 				throw Exception("Invalid object key.", -1, k ? Format("<Object at 0x{:p}>", &obj) : "<blank>")
 			
 			if !is_array
-				out .= ( ObjGetCapacity([k], 1) ? Jxon_Dump(k) : q . k . q ) ;// key
+				out .= ( ObjGetCapacity([k], 1) ? Default_Lib_Jxon_Dump(k) : q . k . q ) ;// key
 				    .  ( indent ? ": " : ":" ) ; token + padding
-			out .= Jxon_Dump(v, indent, lvl, showUnicode) ; value
+			out .= Default_Lib_Jxon_Dump(v, indent, lvl, showUnicode) ; value
 			    .  ( indent ? ",`n" . indt : "," ) ; token + indent
 		}
 

@@ -430,7 +430,7 @@ Element_run_Action_HTTP_Request(Environment, ElementParameters)
 		PostData := x_UriEncode(EvaluatedParameters.PostData)
 	
 	;All informations gathered: Perform HTTP Request
-	BytesDownloaded := HTTPRequest(EvaluatedParameters.URL, PostData, Headers, Options)
+	BytesDownloaded := Default_Lib_HTTPRequest(EvaluatedParameters.URL, PostData, Headers, Options)
 	
 	if (EvaluatedParameters.WhereToPutResponseData = "Variable")
 	{

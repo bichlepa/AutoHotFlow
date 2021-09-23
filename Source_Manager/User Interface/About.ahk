@@ -109,10 +109,21 @@ source: https://autohotkey.com/board/topic/69205-lib-oauth-10a-ahk-basic-ahk-l-u
 license: BSD
 link to license text: https://opensource.org/licenses/BSD-3-Clause
 
+AutoHotkey-JSON
+author: cocobelgica
+source: https://github.com/cocobelgica/AutoHotkey-JSON
+license: WTFPL
+link to license text: http://www.wtfpl.net/
+
 Easy Text to speech
 author: Learning one
 source: https://autohotkey.com/board/topic/53429-function-easy-text-to-speech/
 license: unknown (probably public domain)
+
+Yaml Parser for AutoHotkey
+author: HotKeyIt
+source: https://github.com/HotKeyIt/Yaml
+license: public domain
 
 #aboutTextOtherCodeOverviewStop
 

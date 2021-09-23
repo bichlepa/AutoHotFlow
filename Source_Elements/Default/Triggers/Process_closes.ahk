@@ -142,11 +142,11 @@ Trigger_Process_Closes_TimerLabel(Environment, parameters, fistCall = false)
 	{
 		x_log(Environment, "ProcessClosesTimerLabelFirstCall")
 		; on first call, we need to create an initial list of processes
-		parameters.currentProcesses := getProcessList(parameters.ProcessName)
+		parameters.currentProcesses := Default_Lib_getProcessList(parameters.ProcessName)
 	}
 
 	; get a list of all matching processes
-	currentProcesses := getProcessList(parameters.ProcessName)
+	currentProcesses := Default_Lib_getProcessList(parameters.ProcessName)
 
 	; check whether some elements are missing now
 	for oneProcessID, oneProcessName in parameters.currentProcesses

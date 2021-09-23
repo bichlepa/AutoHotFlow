@@ -165,7 +165,7 @@ Element_run_Action_Set_Screen_Settings(Environment, ElementParameters)
 			if (ElementParameters.WhetherChangeBrightness)
 			{
 				; change brightness
-				result := class_monitor.SetMonitorBrightness(A_Index, ElementParameters.brightness)
+				result := Default_Lib_class_monitor.SetMonitorBrightness(A_Index, ElementParameters.brightness)
 
 				; check for errors
 				if (substr(result, 1, 1) = "*")
@@ -178,7 +178,7 @@ Element_run_Action_Set_Screen_Settings(Environment, ElementParameters)
 			if (ElementParameters.WhetherChangecontrast)
 			{
 				; change contrast
-				result := class_monitor.SetMonitorContrast(A_Index, ElementParameters.contrast)
+				result := Default_Lib_class_monitor.SetMonitorContrast(A_Index, ElementParameters.contrast)
 				
 				; check for errors
 				if (substr(result, 1, 1) = "*")
@@ -192,7 +192,7 @@ Element_run_Action_Set_Screen_Settings(Environment, ElementParameters)
 			if (ElementParameters.WhetherSetRedGain)
 			{
 				; change red gain
-				result := class_monitor.SetMonitorRedGreenOrBlueGain(A_Index, 0, ElementParameters.RedGain)
+				result := Default_Lib_class_monitor.SetMonitorRedGreenOrBlueGain(A_Index, 0, ElementParameters.RedGain)
 				
 				; check for errors
 				if (substr(result, 1, 1) = "*")
@@ -205,7 +205,7 @@ Element_run_Action_Set_Screen_Settings(Environment, ElementParameters)
 			if (ElementParameters.WhetherSetGreenGain)
 			{
 				; set green gain
-				result := class_monitor.SetMonitorRedGreenOrBlueGain(A_Index, 1, ElementParameters.GreenGain)
+				result := Default_Lib_class_monitor.SetMonitorRedGreenOrBlueGain(A_Index, 1, ElementParameters.GreenGain)
 				
 				; check for errors
 				if (substr(result, 1, 1) = "*")
@@ -218,7 +218,7 @@ Element_run_Action_Set_Screen_Settings(Environment, ElementParameters)
 			if (ElementParameters.WhetherSetBlueGain)
 			{
 				; set blue gain
-				result := class_monitor.SetMonitorRedGreenOrBlueGain(A_Index, 2, ElementParameters.BlueGain)
+				result := Default_Lib_class_monitor.SetMonitorRedGreenOrBlueGain(A_Index, 2, ElementParameters.BlueGain)
 				
 				; check for errors
 				if (substr(result, 1, 1) = "*")
@@ -231,7 +231,7 @@ Element_run_Action_Set_Screen_Settings(Environment, ElementParameters)
 			if (ElementParameters.WhetherSetRedDrive)
 			{
 				; set red drive
-				result := class_monitor.SetMonitorRedGreenOrBlueDrive(A_Index, 0, ElementParameters.RedDrive)
+				result := Default_Lib_class_monitor.SetMonitorRedGreenOrBlueDrive(A_Index, 0, ElementParameters.RedDrive)
 				
 				; check for errors
 				if (substr(result, 1, 1) = "*")
@@ -244,7 +244,7 @@ Element_run_Action_Set_Screen_Settings(Environment, ElementParameters)
 			if (ElementParameters.WhetherSetGreenDrive)
 			{
 				; set green drive
-				result := class_monitor.SetMonitorRedGreenOrBlueDrive(A_Index, 1, ElementParameters.GreenDrive)
+				result := Default_Lib_class_monitor.SetMonitorRedGreenOrBlueDrive(A_Index, 1, ElementParameters.GreenDrive)
 				
 				; check for errors
 				if (substr(result, 1, 1) = "*")
@@ -257,7 +257,7 @@ Element_run_Action_Set_Screen_Settings(Environment, ElementParameters)
 			if (ElementParameters.WhetherSetBlueDrive)
 			{
 				; set blue drive
-				result := class_monitor.SetMonitorRedGreenOrBlueDrive(A_Index, 2, ElementParameters.BlueDrive)
+				result := Default_Lib_class_monitor.SetMonitorRedGreenOrBlueDrive(A_Index, 2, ElementParameters.BlueDrive)
 				
 				; check for errors
 				if (substr(result, 1, 1) = "*")
@@ -270,7 +270,7 @@ Element_run_Action_Set_Screen_Settings(Environment, ElementParameters)
 			if (ElementParameters.WhetherChangeColorTemperature)
 			{
 				; set color temperature
-				result := class_monitor.SetMonitorColorTemperature(A_Index, ElementParameters.ColorTemperature)
+				result := Default_Lib_class_monitor.SetMonitorColorTemperature(A_Index, ElementParameters.ColorTemperature)
 				
 				; check for errors
 				if (substr(result, 1, 1) = "*")

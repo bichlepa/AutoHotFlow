@@ -37,7 +37,7 @@ TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF TH
 THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-HTTPRequest( URL, byref In_POST__Out_Data="", byref In_Out_HEADERS="", Options="" ) { ; -----------------------
+Default_Lib_HTTPRequest( URL, byref In_POST__Out_Data="", byref In_Out_HEADERS="", Options="" ) { ; -----------------------
 ; Function by [VxE], compatible with AHK v1.0.48.05 (basic), v1.1.00.00 (AHK-L ANSI, Unicode, x64) and later.
 ; Special thanks to derRaphael and everyone who reported bugs and/or suggested improvements.
 ; Source is freely available at: http://www.autohotkey.com/forum/viewtopic.php?t=73040

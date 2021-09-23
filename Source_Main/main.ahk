@@ -2,7 +2,7 @@
 ;#Warn  ; Recommended for catching common errors.
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
 
-global _AHF_VERSION := "1.0.6"
+global _AHF_VERSION := "1.0.7"
 
 ; do not warn if a continuable exception occurs (it happens often when AHF is closing)
 #WarnContinuableException off
@@ -114,6 +114,8 @@ global global_libInclusionsForThreads, global_elementInclusionsForThreads
 #include source_Elements\Default\lib\HTTP Request\HTTPRequest.ahk
 #include source_Elements\Default\lib\HTTP Request\Uriencode.ahk
 #include source_Elements\Default\lib\Process list\getProcessList.ahk
+#include source_Elements\Default\lib\Json\Jxon.ahk
+#include source_Elements\Default\lib\Yaml\Yaml.ahk
 #include source_Elements\Default\common\window functions.ahk
 
 global_libInclusionsForThreads = 
@@ -124,6 +126,8 @@ global_libInclusionsForThreads =
 #include source_Elements\Default\lib\HTTP Request\HTTPRequest.ahk
 #include source_Elements\Default\lib\HTTP Request\Uriencode.ahk
 #include source_Elements\Default\lib\Process list\getProcessList.ahk
+#include source_Elements\Default\lib\Json\Jxon.ahk
+#include source_Elements\Default\lib\Yaml\Yaml.ahk
 #include source_Elements\Default\common\window functions.ahk
 
 )
@@ -173,23 +177,25 @@ global_libInclusionsForThreads =
 #include source_Elements\Default\actions\Trigonometry.ahk
 #include source_Elements\Default\actions\Rounding_a_number.ahk
 #include source_Elements\Default\actions\Exponentiation.ahk
-#include source_Elements\Default\actions\Change_character_case.ahk
+#include source_Elements\Default\actions\Search_in_a_string.ahk
+#include source_Elements\Default\actions\Substring.ahk
 #include source_Elements\Default\actions\Get_string_Length.ahk
 #include source_Elements\Default\actions\Replace_in_a_string.ahk
 #include source_Elements\Default\actions\Trim_a_string.ahk
 #include source_Elements\Default\actions\Split_a_string.ahk
-#include source_Elements\Default\actions\Substring.ahk
-#include source_Elements\Default\actions\Search_in_a_string.ahk
+#include source_Elements\Default\actions\Change_character_case.ahk
+#include source_Elements\Default\actions\New_List.ahk
 #include source_Elements\Default\actions\Add_to_list.ahk
 #include source_Elements\Default\actions\Get_from_list.ahk
-#include source_Elements\Default\actions\Get_list_info.ahk
 #include source_Elements\Default\actions\Get_index_of_element_in_list.ahk
+#include source_Elements\Default\actions\Get_list_info.ahk
 #include source_Elements\Default\actions\Delete_from_list.ahk
-#include source_Elements\Default\actions\New_List.ahk
+#include source_Elements\Default\actions\Convert_list_to_string.ahk
+#include source_Elements\Default\actions\Convert_string_to_list.ahk
 #include source_Elements\Default\actions\Shuffle_list.ahk
+#include source_Elements\Default\actions\New_Time.ahk
 #include source_Elements\Default\actions\Time_calculation.ahk
 #include source_Elements\Default\actions\Time_difference.ahk
-#include source_Elements\Default\actions\New_Time.ahk
 #include source_Elements\Default\actions\Script.ahk
 #include source_Elements\Default\actions\Get_Clipboard.ahk
 #include source_Elements\Default\actions\Set_Clipboard.ahk
@@ -227,49 +233,49 @@ global_libInclusionsForThreads =
 #include source_Elements\Default\actions\Write_to_ini.ahk
 #include source_Elements\Default\actions\Download_file.ahk
 #include source_Elements\Default\actions\HTTP_Request.ahk
-#include source_Elements\Default\actions\Get_Screen_Settings.ahk
-#include source_Elements\Default\actions\Set_Screen_Settings.ahk
+#include source_Elements\Default\actions\Screenshot.ahk
 #include source_Elements\Default\actions\Get_pixel_color.ahk
 #include source_Elements\Default\actions\Search_pixel.ahk
-#include source_Elements\Default\actions\Screenshot.ahk
 #include source_Elements\Default\actions\Search_Image.ahk
+#include source_Elements\Default\actions\Get_Screen_Settings.ahk
+#include source_Elements\Default\actions\Set_Screen_Settings.ahk
 #include source_Elements\Default\actions\activate_Window.ahk
+#include source_Elements\Default\actions\Show_window.ahk
 #include source_Elements\Default\actions\Close_Window.ahk
 #include source_Elements\Default\actions\Hide_window.ahk
-#include source_Elements\Default\actions\Minimize_All_Windows.ahk
 #include source_Elements\Default\actions\Move_window.ahk
+#include source_Elements\Default\actions\Minimize_All_Windows.ahk
 #include source_Elements\Default\actions\Get_control_text.ahk
 #include source_Elements\Default\actions\Set_control_text.ahk
-#include source_Elements\Default\actions\Show_window.ahk
 #include source_Elements\Default\actions\Click.ahk
+#include source_Elements\Default\actions\Move_Mouse.ahk
 #include source_Elements\Default\actions\Drag_with_mouse.ahk
 #include source_Elements\Default\actions\Get_mouse_position.ahk
-#include source_Elements\Default\actions\Move_Mouse.ahk
 #include source_Elements\Default\actions\Send_Keystrokes.ahk
 #include source_Elements\Default\actions\Send_Keystrokes_To_Control.ahk
 #include source_Elements\Default\actions\Set_Lock_Key.ahk
 #include source_Elements\Default\actions\Play_Sound.ahk
+#include source_Elements\Default\actions\Stop_Sound.ahk
 #include source_Elements\Default\actions\Beep.ahk
 #include source_Elements\Default\actions\Get_Volume.ahk
 #include source_Elements\Default\actions\Set_Volume.ahk
 #include source_Elements\Default\actions\Speech_output.ahk
-#include source_Elements\Default\actions\Stop_Sound.ahk
 #include source_Elements\Default\actions\Run.ahk
 #include source_Elements\Default\actions\Kill_Process.ahk
 #include source_Elements\Default\actions\Set_Process_Priority.ahk
-#include source_Elements\Default\actions\Hibernate_Computer.ahk
 #include source_Elements\Default\actions\Lock_Computer.ahk
 #include source_Elements\Default\actions\Log_Off.ahk
-#include source_Elements\Default\actions\Reboot_Computer.ahk
 #include source_Elements\Default\actions\Shutdown.ahk
+#include source_Elements\Default\actions\Reboot_Computer.ahk
+#include source_Elements\Default\actions\Hibernate_Computer.ahk
 #include source_Elements\Default\actions\Suspend_Computer.ahk
 #include source_Elements\Default\actions\Sleep.ahk
-#include source_Elements\Default\actions\Trace_Point.ahk
-#include source_Elements\Default\actions\Trace_Point_Check.ahk
-#include source_Elements\Default\actions\Execute_Flow.ahk
 #include source_Elements\Default\actions\Set_Flow_Status.ahk
+#include source_Elements\Default\actions\Execute_Flow.ahk
 #include source_Elements\Default\actions\Stop_Flow.ahk
 #include source_Elements\Default\actions\AutoHotkey_script.ahk
+#include source_Elements\Default\actions\Trace_Point.ahk
+#include source_Elements\Default\actions\Trace_Point_Check.ahk
 #include source_Elements\Default\conditions\Expression.ahk
 #include source_Elements\Default\conditions\Variable_Is_Empty.ahk
 #include source_Elements\Default\conditions\List_Contains_Element.ahk
@@ -297,12 +303,12 @@ global_libInclusionsForThreads =
 #include source_Elements\Default\triggers\Clipboard_Changes.ahk
 #include source_Elements\Default\triggers\Hotkey.ahk
 #include source_Elements\Default\triggers\Shortcut.ahk
+#include source_Elements\Default\triggers\Window_opens.ahk
 #include source_Elements\Default\triggers\Window_closes.ahk
 #include source_Elements\Default\triggers\Window_gets_active.ahk
 #include source_Elements\Default\triggers\Window_gets_inactive.ahk
-#include source_Elements\Default\triggers\Window_opens.ahk
-#include source_Elements\Default\triggers\Process_closes.ahk
 #include source_Elements\Default\triggers\Process_starts.ahk
+#include source_Elements\Default\triggers\Process_closes.ahk
 #include source_Elements\Default\triggers\Start_up.ahk
 #include source_Elements\Default\triggers\AutoHotkey_Script.ahk
 
@@ -315,23 +321,25 @@ global_elementInclusionsForThreads =
 #include source_Elements\Default\actions\Trigonometry.ahk
 #include source_Elements\Default\actions\Rounding_a_number.ahk
 #include source_Elements\Default\actions\Exponentiation.ahk
-#include source_Elements\Default\actions\Change_character_case.ahk
+#include source_Elements\Default\actions\Search_in_a_string.ahk
+#include source_Elements\Default\actions\Substring.ahk
 #include source_Elements\Default\actions\Get_string_Length.ahk
 #include source_Elements\Default\actions\Replace_in_a_string.ahk
 #include source_Elements\Default\actions\Trim_a_string.ahk
 #include source_Elements\Default\actions\Split_a_string.ahk
-#include source_Elements\Default\actions\Substring.ahk
-#include source_Elements\Default\actions\Search_in_a_string.ahk
+#include source_Elements\Default\actions\Change_character_case.ahk
+#include source_Elements\Default\actions\New_List.ahk
 #include source_Elements\Default\actions\Add_to_list.ahk
 #include source_Elements\Default\actions\Get_from_list.ahk
-#include source_Elements\Default\actions\Get_list_info.ahk
 #include source_Elements\Default\actions\Get_index_of_element_in_list.ahk
+#include source_Elements\Default\actions\Get_list_info.ahk
 #include source_Elements\Default\actions\Delete_from_list.ahk
-#include source_Elements\Default\actions\New_List.ahk
+#include source_Elements\Default\actions\Convert_list_to_string.ahk
+#include source_Elements\Default\actions\Convert_string_to_list.ahk
 #include source_Elements\Default\actions\Shuffle_list.ahk
+#include source_Elements\Default\actions\New_Time.ahk
 #include source_Elements\Default\actions\Time_calculation.ahk
 #include source_Elements\Default\actions\Time_difference.ahk
-#include source_Elements\Default\actions\New_Time.ahk
 #include source_Elements\Default\actions\Script.ahk
 #include source_Elements\Default\actions\Get_Clipboard.ahk
 #include source_Elements\Default\actions\Set_Clipboard.ahk
@@ -369,49 +377,49 @@ global_elementInclusionsForThreads =
 #include source_Elements\Default\actions\Write_to_ini.ahk
 #include source_Elements\Default\actions\Download_file.ahk
 #include source_Elements\Default\actions\HTTP_Request.ahk
-#include source_Elements\Default\actions\Get_Screen_Settings.ahk
-#include source_Elements\Default\actions\Set_Screen_Settings.ahk
+#include source_Elements\Default\actions\Screenshot.ahk
 #include source_Elements\Default\actions\Get_pixel_color.ahk
 #include source_Elements\Default\actions\Search_pixel.ahk
-#include source_Elements\Default\actions\Screenshot.ahk
 #include source_Elements\Default\actions\Search_Image.ahk
+#include source_Elements\Default\actions\Get_Screen_Settings.ahk
+#include source_Elements\Default\actions\Set_Screen_Settings.ahk
 #include source_Elements\Default\actions\activate_Window.ahk
+#include source_Elements\Default\actions\Show_window.ahk
 #include source_Elements\Default\actions\Close_Window.ahk
 #include source_Elements\Default\actions\Hide_window.ahk
-#include source_Elements\Default\actions\Minimize_All_Windows.ahk
 #include source_Elements\Default\actions\Move_window.ahk
+#include source_Elements\Default\actions\Minimize_All_Windows.ahk
 #include source_Elements\Default\actions\Get_control_text.ahk
 #include source_Elements\Default\actions\Set_control_text.ahk
-#include source_Elements\Default\actions\Show_window.ahk
 #include source_Elements\Default\actions\Click.ahk
+#include source_Elements\Default\actions\Move_Mouse.ahk
 #include source_Elements\Default\actions\Drag_with_mouse.ahk
 #include source_Elements\Default\actions\Get_mouse_position.ahk
-#include source_Elements\Default\actions\Move_Mouse.ahk
 #include source_Elements\Default\actions\Send_Keystrokes.ahk
 #include source_Elements\Default\actions\Send_Keystrokes_To_Control.ahk
 #include source_Elements\Default\actions\Set_Lock_Key.ahk
 #include source_Elements\Default\actions\Play_Sound.ahk
+#include source_Elements\Default\actions\Stop_Sound.ahk
 #include source_Elements\Default\actions\Beep.ahk
 #include source_Elements\Default\actions\Get_Volume.ahk
 #include source_Elements\Default\actions\Set_Volume.ahk
 #include source_Elements\Default\actions\Speech_output.ahk
-#include source_Elements\Default\actions\Stop_Sound.ahk
 #include source_Elements\Default\actions\Run.ahk
 #include source_Elements\Default\actions\Kill_Process.ahk
 #include source_Elements\Default\actions\Set_Process_Priority.ahk
-#include source_Elements\Default\actions\Hibernate_Computer.ahk
 #include source_Elements\Default\actions\Lock_Computer.ahk
 #include source_Elements\Default\actions\Log_Off.ahk
-#include source_Elements\Default\actions\Reboot_Computer.ahk
 #include source_Elements\Default\actions\Shutdown.ahk
+#include source_Elements\Default\actions\Reboot_Computer.ahk
+#include source_Elements\Default\actions\Hibernate_Computer.ahk
 #include source_Elements\Default\actions\Suspend_Computer.ahk
 #include source_Elements\Default\actions\Sleep.ahk
-#include source_Elements\Default\actions\Trace_Point.ahk
-#include source_Elements\Default\actions\Trace_Point_Check.ahk
-#include source_Elements\Default\actions\Execute_Flow.ahk
 #include source_Elements\Default\actions\Set_Flow_Status.ahk
+#include source_Elements\Default\actions\Execute_Flow.ahk
 #include source_Elements\Default\actions\Stop_Flow.ahk
 #include source_Elements\Default\actions\AutoHotkey_script.ahk
+#include source_Elements\Default\actions\Trace_Point.ahk
+#include source_Elements\Default\actions\Trace_Point_Check.ahk
 #include source_Elements\Default\conditions\Expression.ahk
 #include source_Elements\Default\conditions\Variable_Is_Empty.ahk
 #include source_Elements\Default\conditions\List_Contains_Element.ahk
@@ -439,12 +447,12 @@ global_elementInclusionsForThreads =
 #include source_Elements\Default\triggers\Clipboard_Changes.ahk
 #include source_Elements\Default\triggers\Hotkey.ahk
 #include source_Elements\Default\triggers\Shortcut.ahk
+#include source_Elements\Default\triggers\Window_opens.ahk
 #include source_Elements\Default\triggers\Window_closes.ahk
 #include source_Elements\Default\triggers\Window_gets_active.ahk
 #include source_Elements\Default\triggers\Window_gets_inactive.ahk
-#include source_Elements\Default\triggers\Window_opens.ahk
-#include source_Elements\Default\triggers\Process_closes.ahk
 #include source_Elements\Default\triggers\Process_starts.ahk
+#include source_Elements\Default\triggers\Process_closes.ahk
 #include source_Elements\Default\triggers\Start_up.ahk
 #include source_Elements\Default\triggers\AutoHotkey_Script.ahk
 

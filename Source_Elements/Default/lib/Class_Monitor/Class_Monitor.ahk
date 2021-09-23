@@ -15,8 +15,8 @@ license info:
 ;Modified by Paul Bichler
 
 
-global class_monitor:=new Class_Monitor_Class()
-Class Class_Monitor_Class                                                                        ; http://msdn.com/library/dd692964(vs.85,en-us)
+global Default_Lib_class_monitor:=new Default_Lib_Class_Monitor_Class()
+Class Default_Lib_Class_Monitor_Class                                                                        ; http://msdn.com/library/dd692964(vs.85,en-us)
 {
     static FreeSize, FreeArray
     static hDXVA2 := DllCall("LoadLibrary", "Str", "dxva2.dll", "Ptr")
@@ -49,9 +49,9 @@ Class Class_Monitor_Class                                                       
 
     EnumDisplayMonitors(MonitorNumber)                                            ; http://msdn.com/library/dd162610(vs.85,en-us)
     {
-        static MonitorEnumProc := RegisterCallback("Class_Monitor_Class.MonitorEnumProc")
+        static MonitorEnumProc := RegisterCallback("Default_Lib_Class_Monitor_Class.MonitorEnumProc")
         static Monitors
-        static Init := Class_Monitor_Class.EnumDisplayMonitors("")
+        static Init := Default_Lib_Class_Monitor_Class.EnumDisplayMonitors("")
         if (MonitorNumber = "")
         {
             Monitors := {}

@@ -1,7 +1,7 @@
 ; copied and modified from AHK Help. https://www.autohotkey.com/docs/commands/Process.htm
 
 DllCall("LoadLibrary", "Str", "Psapi.dll")  ; Increase performance by preloading the library.
-getProcessList(filter = "")
+Default_Lib_getProcessList(filter = "")
 {
     d := "  |  "  ; string separator
     s := 4096  ; size of buffers and arrays (4 KB)

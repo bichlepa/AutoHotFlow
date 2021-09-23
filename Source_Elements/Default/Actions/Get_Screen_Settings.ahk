@@ -130,7 +130,7 @@ Element_run_Action_Get_Screen_Settings(Environment, ElementParameters)
 	if (EvaluatedParameters.VarnameBrightness != "" or EvaluatedParameters.VarnameBrightnessMin != "" or EvaluatedParameters.VarnameBrightnessMax != "")
 	{
 		; we need to get the screen brightness
-		result := class_monitor.GetMonitorBrightness(EvaluatedParameters.MonitorNumber)
+		result := Default_Lib_class_monitor.GetMonitorBrightness(EvaluatedParameters.MonitorNumber)
 
 		; check for errors
 		if (substr(result, 1, 1) = "*")
@@ -152,7 +152,7 @@ Element_run_Action_Get_Screen_Settings(Environment, ElementParameters)
 	if (EvaluatedParameters.VarnameContrast != "" or EvaluatedParameters.VarnameContrastMin != "" or EvaluatedParameters.VarnameContrastMax != "")
 	{
 		; we need to get the screen contrast
-		result := class_monitor.GetMonitorContrast(EvaluatedParameters.MonitorNumber)
+		result := Default_Lib_class_monitor.GetMonitorContrast(EvaluatedParameters.MonitorNumber)
 		
 		; check for errors
 		if (substr(result, 1, 1) = "*")
@@ -174,7 +174,7 @@ Element_run_Action_Get_Screen_Settings(Environment, ElementParameters)
 	if (EvaluatedParameters.VarnameRedGain != "" or EvaluatedParameters.VarnameRedGainMin != "" or EvaluatedParameters.VarnameRedGainMax != "")
 	{
 		; we need to get the red gain
-		result := class_monitor.GetMonitorRedGreenOrBlueGain(EvaluatedParameters.MonitorNumber, 0)
+		result := Default_Lib_class_monitor.GetMonitorRedGreenOrBlueGain(EvaluatedParameters.MonitorNumber, 0)
 
 		; check for errors
 		if (substr(result, 1, 1) = "*")
@@ -195,7 +195,7 @@ Element_run_Action_Get_Screen_Settings(Environment, ElementParameters)
 	if (EvaluatedParameters.VarnameGreenGain != "" or EvaluatedParameters.VarnameGreenGainMin != "" or EvaluatedParameters.VarnameGreenGainMax != "")
 	{
 		; we need to get the green gain
-		result := class_monitor.GetMonitorRedGreenOrBlueGain(EvaluatedParameters.MonitorNumber, 1)
+		result := Default_Lib_class_monitor.GetMonitorRedGreenOrBlueGain(EvaluatedParameters.MonitorNumber, 1)
 
 		; check for errors
 		if (substr(result, 1, 1) = "*")
@@ -216,7 +216,7 @@ Element_run_Action_Get_Screen_Settings(Environment, ElementParameters)
 	if (VarnameBlueGain != "" or VarnameBlueGainMin != "" or VarnameBlueGainMax!="")
 	{
 		; we need to get the blue gain
-		result := class_monitor.GetMonitorRedGreenOrBlueGain(EvaluatedParameters.MonitorNumber, 2)
+		result := Default_Lib_class_monitor.GetMonitorRedGreenOrBlueGain(EvaluatedParameters.MonitorNumber, 2)
 
 		; check for errors
 		if (substr(result, 1, 1) = "*")
@@ -238,7 +238,7 @@ Element_run_Action_Get_Screen_Settings(Environment, ElementParameters)
 	if (EvaluatedParameters.VarnameRedDrive != "" or EvaluatedParameters.VarnameRedDriveMin != "" or EvaluatedParameters.VarnameRedDriveMax != "")
 	{
 		; we need to get the red drive
-		result := class_monitor.GetMonitorRedGreenOrBlueDrive(EvaluatedParameters.MonitorNumber, 0)
+		result := Default_Lib_class_monitor.GetMonitorRedGreenOrBlueDrive(EvaluatedParameters.MonitorNumber, 0)
 
 		; check for errors
 		if (substr(result, 1, 1) = "*")
@@ -259,7 +259,7 @@ Element_run_Action_Get_Screen_Settings(Environment, ElementParameters)
 	if (EvaluatedParameters.VarnameGreenDrive != "" or EvaluatedParameters.VarnameGreenDriveMin != "" or EvaluatedParameters.VarnameGreenDriveMax != "")
 	{
 		; we need to get the green drive
-		result := class_monitor.GetMonitorRedGreenOrBlueDrive(EvaluatedParameters.MonitorNumber, 1)
+		result := Default_Lib_class_monitor.GetMonitorRedGreenOrBlueDrive(EvaluatedParameters.MonitorNumber, 1)
 
 		; check for errors
 		if (substr(result, 1, 1) = "*")
@@ -280,7 +280,7 @@ Element_run_Action_Get_Screen_Settings(Environment, ElementParameters)
 	if (EvaluatedParameters.VarnameBlueDrive != "" or EvaluatedParameters.VarnameBlueDriveMin != "" or EvaluatedParameters.VarnameBlueDriveMax != "")
 	{
 		; we need to get the blue drive
-		result := class_monitor.GetMonitorRedGreenOrBlueDrive(EvaluatedParameters.MonitorNumber, 2)
+		result := Default_Lib_class_monitor.GetMonitorRedGreenOrBlueDrive(EvaluatedParameters.MonitorNumber, 2)
 
 		; check for errors
 		if (substr(result, 1, 1) = "*")
@@ -302,7 +302,7 @@ Element_run_Action_Get_Screen_Settings(Environment, ElementParameters)
 	if (EvaluatedParameters.VarnameColorTemperature != "")
 	{
 		; we need to get the color temperature
-		result := class_monitor.GetMonitorColorTemperature(EvaluatedParameters.MonitorNumber)
+		result := Default_Lib_class_monitor.GetMonitorColorTemperature(EvaluatedParameters.MonitorNumber)
 
 		; check for errors
 		if (substr(result, 1, 1) = "*")

@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "AutoHotFlow"
-#define MyAppVersion "1.0.6"
+#define MyAppVersion "1.0.7"
 #define MyAppPublisher "Paul Bichler"
 #define MyAppURL "https://bichlepa.jimdofree.com/autohotflow/"
 #define MyAppExeName "AutoHotFlow.exe" 
@@ -184,6 +184,8 @@ Source: "Source_Elements\Default\Actions\Change_Drive_Label.ahk"; DestDir: "{app
 Source: "Source_Elements\Default\Actions\Click.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Actions\Close_Window.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Actions\Compress_files.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
+Source: "Source_Elements\Default\Actions\Convert_list_to_string.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
+Source: "Source_Elements\Default\Actions\Convert_string_to_list.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Actions\Copy_file.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Actions\Copy_folder.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Actions\Create_folder.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
@@ -298,8 +300,10 @@ Source: "Source_Elements\Default\lib\Class_Monitor\Class_Monitor.ahk"; DestDir: 
 Source: "Source_Elements\Default\lib\Eject\Eject.ahk"; DestDir: "{app}\Source_Elements\Default\lib\Eject"; Flags: ignoreversion
 Source: "Source_Elements\Default\lib\HTTP Request\HTTPRequest.ahk"; DestDir: "{app}\Source_Elements\Default\lib\HTTP Request"; Flags: ignoreversion
 Source: "Source_Elements\Default\lib\HTTP Request\Uriencode.ahk"; DestDir: "{app}\Source_Elements\Default\lib\HTTP Request"; Flags: ignoreversion
+Source: "Source_Elements\Default\lib\Json\Jxon.ahk"; DestDir: "{app}\Source_Elements\Default\lib\Json"; Flags: ignoreversion
 Source: "Source_Elements\Default\lib\Process list\getProcessList.ahk"; DestDir: "{app}\Source_Elements\Default\lib\Process list"; Flags: ignoreversion
 Source: "Source_Elements\Default\lib\TTS\TTS by Learning One.ahk"; DestDir: "{app}\Source_Elements\Default\lib\TTS"; Flags: ignoreversion
+Source: "Source_Elements\Default\lib\Yaml\Yaml.ahk"; DestDir: "{app}\Source_Elements\Default\lib\Yaml"; Flags: ignoreversion
 Source: "Source_Elements\Default\Loops\Condition.ahk"; DestDir: "{app}\Source_Elements\Default\Loops"; Flags: ignoreversion
 Source: "Source_Elements\Default\Loops\Loop_Through_Files.ahk"; DestDir: "{app}\Source_Elements\Default\Loops"; Flags: ignoreversion
 Source: "Source_Elements\Default\Loops\Parse_A_String.ahk"; DestDir: "{app}\Source_Elements\Default\Loops"; Flags: ignoreversion
@@ -338,6 +342,8 @@ Source: "Source_Elements\Default\help\en\Actions\Change_character_case.html"; De
 Source: "Source_Elements\Default\help\en\Actions\Change_Drive_Label.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Click.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\close_Window.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
+Source: "Source_Elements\Default\help\en\Actions\Convert_list_to_string.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
+Source: "Source_Elements\Default\help\en\Actions\Convert_string_to_list.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Copy_file.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Copy_folder.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Create_folder.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion

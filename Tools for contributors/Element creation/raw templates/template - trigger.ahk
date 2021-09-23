@@ -63,7 +63,7 @@ Element_getParametrizationDetails_&ElementType&_&Name&(Environment)
 	parametersToEdit.push({type: "Radio", id: "radio", result: "number", default: 1, choices: [lang("Choice %1%", 1), lang("Choice %1%", 2), lang("Choice %1%", 3)]})
 #endif ;par_radio
 #if par_radioEnum
-	parametersToEdit.push({type: "Radio", id: "radioEnum", result: "enum", default: 1, choices: [lang("Cat"), lang("Dog"), lang("Bird")], enum: ["Cat", "Dog", "Bird"]})
+	parametersToEdit.push({type: "Radio", id: "radioEnum", result: "enum", default: "cat", choices: [lang("Cat"), lang("Dog"), lang("Bird")], enum: ["Cat", "Dog", "Bird"]})
 #endif ;par_radioEnum
 #if par_checkbox 
 	parametersToEdit.push({type: "Checkbox", id: "checkbox", default: 0, label: lang("Label")})

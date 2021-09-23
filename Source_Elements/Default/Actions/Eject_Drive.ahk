@@ -137,7 +137,7 @@ Element_run_Action_Eject_Drive(Environment, ElementParameters)
 			; we will try the Eject library of Scan
 
 			; eject now
-			Result := Eject(EvaluatedParameters.DriveLetter)
+			Result := Default_Lib_Eject(EvaluatedParameters.DriveLetter)
 			
 			; check for errors
 			if (ErrorLevel < 0)

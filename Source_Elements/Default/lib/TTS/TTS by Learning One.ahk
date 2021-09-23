@@ -10,7 +10,7 @@ license info:
 */
 
 
-TTS(oVoice, command, param1="", param2="") {      ; by Learning one. For AHK_L. Thanks: jballi, Sean, Frankie.
+Default_Lib_TTS(oVoice, command, param1="", param2="") {      ; by Learning one. For AHK_L. Thanks: jballi, Sean, Frankie.
    ; AHK forum location:   www.autohotkey.com/forum/topic57773.html
    ; Read more:         msdn.microsoft.com/en-us/library/ms723602(v=VS.85).aspx, www.autohotkey.com/forum/topic45471.html, www.autohotkey.com/forum/topic83162.html
    static CommandList := "ToggleSpeak,Speak,SpeakWait,Pause,Stop,SetRate,SetVolume,SetPitch,SetVoice,GetVoices,GetStatus,GetCount,SpeakToFile"
@@ -123,21 +123,21 @@ TTS(oVoice, command, param1="", param2="") {      ; by Learning one. For AHK_L. 
       FileDelete, % param2   ; OutputFilePath
       SpStream.Open(param2, 3)
       oVoice.AudioOutputStream := SpStream
-      TTS(oVoice, "SpeakWait", param1)
+      Default_Lib_TTS(oVoice, "SpeakWait", param1)
       SpStream.Close()
       oVoice.AudioOutputStream := oldAOS
       oVoice.AllowAudioOutputFormatChangesOnNextSet := oldAAOFCONS
    }
 }   
- TTS_CreateVoice(VoiceName="", VoiceRate="", VoiceVolume="", VoicePitch="") {      ; by Learning one. For AHK_L.
+ Default_Lib_TTS_CreateVoice(VoiceName="", VoiceRate="", VoiceVolume="", VoicePitch="") {      ; by Learning one. For AHK_L.
    oVoice := ComObjCreate("SAPI.SpVoice")
    if !(VoiceName = "")
-      TTS(oVoice, "SetVoice", VoiceName)
+      Default_Lib_TTS(oVoice, "SetVoice", VoiceName)
    if VoiceRate between -10 and 10
       oVoice.Rate := VoiceRate      ; rate (reading speed): from -10 to 10. 0 is default.
    if VoiceVolume between 0 and 100
       oVoice.Volume := VoiceVolume   ; volume (reading loudness): from 0 to 100. 100 is default
    if VoicePitch between -10 and 10
-      TTS(oVoice, "SetPitch", VoicePitch)   ; pitch: from -10 to 10. 0 is default.
+      Default_Lib_TTS(oVoice, "SetPitch", VoicePitch)   ; pitch: from -10 to 10. 0 is default.
    return oVoice
 }

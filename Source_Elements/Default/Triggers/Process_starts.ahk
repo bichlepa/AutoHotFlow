@@ -145,12 +145,12 @@ Trigger_Process_Opens_TimerLabel(Environment, parameters, fistCall = false)
 		if (parameters.NotTriggerOnEnable)
 		{
 			; we must not trigger on enable. So create an initial list of processes
-			parameters.currentProcesses := getProcessList(parameters.ProcessName)
+			parameters.currentProcesses := Default_Lib_getProcessList(parameters.ProcessName)
 		}
 	}
 
 	; get a list of all matching processes
-	currentProcesses := getProcessList(parameters.ProcessName)
+	currentProcesses := Default_Lib_getProcessList(parameters.ProcessName)
 
 	; check whether some elements appeared
 	for oneProcessID, oneProcessName in currentProcesses
