@@ -29,7 +29,7 @@ assistant_GetWindowInformation(neededInfo)
 	}
 	if (assistant_GetWindowInformation_NeededInfo.Control_identifier and assistant_GetWindowInformation_NeededInfo.IdentifyControlBy)
 	{
-		gui,add,radio,ys X+30 w400 vassistant_GetWindowInformation_RadioIdentifyControlByText,% lang("Text in conrol")
+		gui,add,radio,ys X+30 w400 vassistant_GetWindowInformation_RadioIdentifyControlByText,% lang("Text in control")
 		gui,add,radio,Y+5 xp w400 vassistant_GetWindowInformation_RadioIdentifyControlByClass,% lang("Classname and instance number of the control")
 		gui,add,radio,Y+5 xp w400 vassistant_GetWindowInformation_RadioIdentifyControlByID,% lang("Unique control ID")
 	}

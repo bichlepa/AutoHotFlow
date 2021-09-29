@@ -16,7 +16,7 @@ Element_getName_Trigger_User_Idle_Time()
 ;Category of the element
 Element_getCategory_Trigger_User_Idle_Time()
 {
-	return x_lang("User_interaction")
+	return x_lang("User_interaction") "|" x_lang("Time")
 }
 
 ;This function returns the package of the element.
@@ -54,7 +54,7 @@ Element_getParametrizationDetails_Trigger_User_Idle_Time(Environment)
 	parametersToEdit:=Object()
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Period of time")})
-	parametersToEdit.push({type: "edit", id: "Interval", default: 10, content: "Expression", WarnIfEmpty: true})
+	parametersToEdit.push({type: "edit", id: "Interval", default: 10, content: "PositiveNumber", WarnIfEmpty: true})
 	parametersToEdit.push({type: "Radio", id: "Unit", default: "Seconds", result: "enum", choices: [x_lang("MilliSeconds"), x_lang("Seconds"), x_lang("Minutes"), x_lang("Hours")], enum: ["MilliSeconds", "Seconds", "Minutes", "Hours"]})
 	parametersToEdit.push({type: "Label", label: x_lang("Method")})
 	parametersToEdit.push({type: "Radio", id: "Method", default: "TimeIdle", result: "enum", choices: [x_lang("Method: %1%", x_lang("Default")), x_lang("Method: %1%", x_lang("Physical"))], enum: ["TimeIdle", "TimeIdlePhysical"]})
@@ -73,6 +73,8 @@ Element_GenerateName_Trigger_User_Idle_Time(Environment, ElementParameters)
 		duration := ElementParameters.Interval " " x_lang("s #Seconds")
 	case "Minutes":
 		duration := ElementParameters.Interval " " x_lang("m #Minutes")
+	case "Hours":
+		duration := ElementParameters.Interval " " x_lang("h #Hours")
 	}
 	return x_lang("User_Idle_Time") " - " duration
 }

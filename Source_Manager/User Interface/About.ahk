@@ -85,6 +85,11 @@ source: https://github.com/Uberi/Yunit
 license: GPL
 link to license text: http://www.gnu.org/licenses/
 
+Windows Color Picker Plus
+author: rbrtryn
+source: https://autohotkey.com/board/topic/91229-windows-color-picker-plus/
+license: unknown, probably public domain
+
 Class_Monitor
 author: jNizM
 source: https://github.com/jNizM/Class_Monitor

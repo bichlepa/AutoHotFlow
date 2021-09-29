@@ -1,0 +1,426 @@
+﻿{
+  "allConnections": {
+    "connection0000000006": {
+      "ConnectionType": "normal",
+      "from": "element0000000002",
+      "ID": "connection0000000006",
+      "to": "element0000000004",
+      "type": "Connection"
+    },
+    "connection0000000007": {
+      "ConnectionType": "normal",
+      "from": "element0000000004",
+      "ID": "connection0000000007",
+      "to": "element0000000005",
+      "type": "Connection"
+    },
+    "connection0000000012": {
+      "ConnectionType": "normal",
+      "from": "element0000000001",
+      "ID": "connection0000000012",
+      "to": "element0000000010",
+      "type": "Connection"
+    },
+    "connection0000000015": {
+      "ConnectionType": "normal",
+      "from": "element0000000013",
+      "ID": "connection0000000015",
+      "to": "element0000000014",
+      "type": "Connection"
+    },
+    "connection0000000017": {
+      "ConnectionType": "normal",
+      "from": "element0000000014",
+      "ID": "connection0000000017",
+      "to": "element0000000016",
+      "type": "Connection"
+    },
+    "connection0000000018": {
+      "ConnectionType": "Yes",
+      "from": "element0000000016",
+      "ID": "connection0000000018",
+      "to": "element0000000019",
+      "type": "Connection"
+    },
+    "connection0000000022": {
+      "ConnectionType": "normal",
+      "from": "element0000000001",
+      "ID": "connection0000000022",
+      "to": "element0000000021",
+      "type": "Connection"
+    },
+    "connection0000000029": {
+      "ConnectionType": "normal",
+      "from": "element0000000010",
+      "ID": "connection0000000029",
+      "to": "element0000000034",
+      "type": "Connection"
+    },
+    "connection0000000031": {
+      "ConnectionType": "normal",
+      "from": "element0000000030",
+      "ID": "connection0000000031",
+      "to": "element0000000032",
+      "type": "Connection"
+    },
+    "connection0000000033": {
+      "ConnectionType": "Yes",
+      "from": "element0000000032",
+      "ID": "connection0000000033",
+      "to": "element0000000024",
+      "type": "Connection"
+    },
+    "connection0000000035": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000035",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000036": {
+      "ConnectionType": "normal",
+      "from": "element0000000034",
+      "ID": "connection0000000036",
+      "to": "element0000000039",
+      "type": "Connection"
+    },
+    "connection0000000037": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000037",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000038": {
+      "ConnectionType": "normal",
+      "from": "element0000000039",
+      "ID": "connection0000000038",
+      "to": "element0000000040",
+      "type": "Connection"
+    },
+    "connection0000000041": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000041",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000042": {
+      "ConnectionType": "normal",
+      "from": "element0000000040",
+      "ID": "connection0000000042",
+      "to": "element0000000030",
+      "type": "Connection"
+    },
+    "connection0000000043": {
+      "ConnectionType": "normal",
+      "from": "element0000000019",
+      "ID": "connection0000000043",
+      "to": "element0000000020",
+      "type": "Connection"
+    },
+    "connection0000000044": {
+      "ConnectionType": "No",
+      "from": "element0000000005",
+      "ID": "connection0000000044",
+      "to": "element0000000003",
+      "type": "Connection"
+    }
+  },
+  "allElements": {
+    "element0000000001": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "1",
+      "enabled": "1",
+      "ID": "element0000000001",
+      "name": "Manual\n\"Trigger happy leg\"",
+      "package": "default",
+      "pars": {
+        "ID": "Trigger happy leg"
+      },
+      "StandardName": 1,
+      "type": "trigger",
+      "x": 0,
+      "y": 0
+    },
+    "element0000000002": {
+      "class": "Trigger_Shortcut",
+      "enabled": "0",
+      "ID": "element0000000002",
+      "name": "Shortcut - %A_Desktop%\\Flow Trigger test remove.lnk",
+      "package": "default",
+      "pars": {
+        "RemoveShortcutOnDisabling": "1",
+        "ShortCutPath": "%A_Desktop%\\Flow Trigger test remove.lnk"
+      },
+      "StandardName": "1",
+      "type": "Trigger",
+      "x": "665",
+      "y": "140"
+    },
+    "element0000000003": {
+      "class": "Action_New_variable",
+      "ID": "element0000000003",
+      "name": "New variable - static_shortcutSuccess_remove = 1",
+      "package": "default",
+      "pars": {
+        "expression": "Expression",
+        "Varname": "static_shortcutSuccess_remove",
+        "VarValue": "1"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "665",
+      "y": "630"
+    },
+    "element0000000004": {
+      "class": "Action_Set_Flow_Status",
+      "ID": "element0000000004",
+      "name": "Set flow status - Disable: This flow - Shortcut - %A_Desktop%\\Flow Trigger test.lnk",
+      "package": "default",
+      "pars": {
+        "Enable": "Disable",
+        "flowID": "",
+        "ThisFlow": 1,
+        "triggerID": "element0000000002",
+        "WhichTrigger": "Specified"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "665",
+      "y": "315"
+    },
+    "element0000000005": {
+      "class": "Condition_File_Exists",
+      "ID": "element0000000005",
+      "name": "File exists - %A_Desktop%\\Flow Trigger test remove.lnk",
+      "package": "default",
+      "pars": {
+        "file": "%A_Desktop%\\Flow Trigger test remove.lnk"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "665",
+      "y": "455"
+    },
+    "element0000000010": {
+      "class": "Action_New_variable",
+      "ID": "element0000000010",
+      "name": "New variable - static_shortcutSuccess_keep = 0",
+      "package": "default",
+      "pars": {
+        "expression": "String",
+        "Varname": "static_shortcutSuccess_keep",
+        "VarValue": "0"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "0",
+      "y": "175"
+    },
+    "element0000000013": {
+      "class": "Trigger_Shortcut",
+      "enabled": "0",
+      "ID": "element0000000013",
+      "name": "Shortcut - %A_Desktop%\\Flow Trigger test keep.lnk",
+      "package": "default",
+      "pars": {
+        "RemoveShortcutOnDisabling": "0",
+        "ShortCutPath": "%A_Desktop%\\Flow Trigger test keep.lnk"
+      },
+      "StandardName": "1",
+      "type": "Trigger",
+      "x": "1225",
+      "y": "175"
+    },
+    "element0000000014": {
+      "class": "Action_Set_Flow_Status",
+      "ID": "element0000000014",
+      "name": "Set flow status - Disable: This flow - Shortcut - %A_Desktop%\\Flow Trigger test 2.lnk",
+      "package": "default",
+      "pars": {
+        "Enable": "Disable",
+        "flowID": "",
+        "ThisFlow": 1,
+        "triggerID": "element0000000013",
+        "WhichTrigger": "Specified"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "1225",
+      "y": "350"
+    },
+    "element0000000016": {
+      "class": "Condition_File_Exists",
+      "ID": "element0000000016",
+      "name": "File exists - %A_Desktop%\\Flow Trigger test keep.lnk",
+      "package": "default",
+      "pars": {
+        "file": "%A_Desktop%\\Flow Trigger test keep.lnk"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "1225",
+      "y": "490"
+    },
+    "element0000000019": {
+      "class": "Action_Delete_File",
+      "ID": "element0000000019",
+      "name": "Delete file - %A_Desktop%\\Flow Trigger test keep.lnk",
+      "package": "default",
+      "pars": {
+        "deleteFileMethod": "Delete",
+        "file": "%A_Desktop%\\Flow Trigger test keep.lnk"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "1225",
+      "y": "700"
+    },
+    "element0000000020": {
+      "class": "Action_New_variable",
+      "ID": "element0000000020",
+      "name": "New variable - static_shortcutSuccess_keep = 1",
+      "package": "default",
+      "pars": {
+        "expression": "Expression",
+        "Varname": "static_shortcutSuccess_keep",
+        "VarValue": "1"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "1260",
+      "y": "840"
+    },
+    "element0000000021": {
+      "class": "Action_New_variable",
+      "ID": "element0000000021",
+      "name": "New variable - static_shortcutSuccess_remove = 0",
+      "package": "default",
+      "pars": {
+        "expression": "String",
+        "Varname": "static_shortcutSuccess_remove",
+        "VarValue": "0"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "175",
+      "y": "175"
+    },
+    "element0000000024": {
+      "class": "Action_Add_To_List",
+      "ID": "element0000000024",
+      "name": "Add To List - global_testResults - As last value - Value 'a_flowName'",
+      "package": "default",
+      "pars": {
+        "DelimiterComma": 0,
+        "DelimiterLinefeed": 1,
+        "DelimiterSemicolon": 0,
+        "DelimiterSpace": 0,
+        "Expression": "Expression",
+        "expressionPos": "String",
+        "InsertMethod": "Insert",
+        "InsertMethodLabel": "",
+        "NumberOfElements": "One",
+        "Position": "keyName",
+        "Varname": "global_testResults",
+        "VarValue": "a_flowName",
+        "VarValues": "Element one\nElement two",
+        "WhichPosition": "Last"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "0",
+      "y": "1015"
+    },
+    "element0000000030": {
+      "class": "Action_Sleep",
+      "ID": "element0000000030",
+      "name": "Sleep: 2 s",
+      "package": "action",
+      "pars": {
+        "Duration": 2,
+        "Unit": "Seconds"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "0",
+      "y": "700"
+    },
+    "element0000000032": {
+      "class": "Condition_Expression",
+      "ID": "element0000000032",
+      "name": "Expression - static_shortcutSuccess_keep and static_shortcutSuccess_remove",
+      "package": "default",
+      "pars": {
+        "Expression": "static_shortcutSuccess_keep and static_shortcutSuccess_remove"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "0",
+      "y": "840"
+    },
+    "element0000000034": {
+      "class": "Action_Set_Flow_Status",
+      "ID": "element0000000034",
+      "name": "Set flow status - Enable: This flow - All triggers",
+      "package": "default",
+      "pars": {
+        "Enable": "Enable",
+        "flowID": "",
+        "ThisFlow": 1,
+        "triggerID": "",
+        "WhichTrigger": "Any"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "0",
+      "y": "315"
+    },
+    "element0000000039": {
+      "class": "Action_Run",
+      "ID": "element0000000039",
+      "name": "Run - %A_Desktop%\\Flow Trigger test remove.lnk",
+      "package": "default",
+      "pars": {
+        "RunMode": "Normal",
+        "ToRun": "%A_Desktop%\\Flow Trigger test remove.lnk",
+        "ToRunContent": "String",
+        "WhichWorkingDir": "Default",
+        "WorkingDir": ""
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "70",
+      "y": "455"
+    },
+    "element0000000040": {
+      "class": "Action_Run",
+      "ID": "element0000000040",
+      "name": "Run - %A_Desktop%\\Flow Trigger test keep.lnk",
+      "package": "default",
+      "pars": {
+        "RunMode": "Normal",
+        "ToRun": "%A_Desktop%\\Flow Trigger test keep.lnk",
+        "ToRunContent": "String",
+        "WhichWorkingDir": "Default",
+        "WorkingDir": ""
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "280",
+      "y": "560"
+    }
+  },
+  "category": "Automatic tests",
+  "ElementIDCounter": "44",
+  "flowSettings": {
+    "DefaultWorkingDir": 1,
+    "ExecutionPolicy": "default",
+    "Offsetx": "-497.142857",
+    "Offsety": "-297.142857",
+    "WorkingDir": "",
+    "zoomFactor": "0.7"
+  },
+  "name": "File link test"
+}

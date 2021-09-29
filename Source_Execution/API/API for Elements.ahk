@@ -622,6 +622,8 @@ x_ExecuteInNewAHKThread(Environment, p_functionObject, p_Code, p_VarsToImport, p
 	preCode .= "#NoTrayIcon`n"
 	; on exit, go to the exit routine
 	preCode .= "onexit, ahf_onexit`n"
+	; add variable A_FlowWorkingDir
+	preCode .= "A_FlowWorkingDir := """ x_GetWorkingDir(Environment) """`n"
 	; we will need the unique ID for the callback function
 	preCode .= "ahf_uniqueID :=""" uniqueID """`n"
 	; get the critical section
@@ -719,6 +721,8 @@ x_TriggerInNewAHKThread(Environment, p_Code, p_VarsToImport, p_VarsToExport)
 	preCode .= "#NoTrayIcon`n"
 	; on exit, go to the exit routine
 	preCode .= "onexit, ahf_onexit`n"
+	; add variable A_FlowWorkingDir
+	preCode .= "A_FlowWorkingDir := """ x_GetWorkingDir(Environment) """`n"
 	; we will need the unique ID for the callback function
 	preCode .= "ahf_uniqueID :=""" uniqueID """`n"
 	; get the critical section

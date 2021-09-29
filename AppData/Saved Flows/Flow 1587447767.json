@@ -63,7 +63,7 @@
       "DefaultTrigger": "1",
       "enabled": "1",
       "ID": "element0000000002",
-      "name": "Manuell - \"Ini test\"",
+      "name": "Manual - \"Ini test\"",
       "package": "default",
       "pars": {
         "ID": "Ini test"
@@ -76,7 +76,7 @@
     "element0000000003": {
       "class": "Action_Write_to_ini",
       "ID": "element0000000003",
-      "name": "In ini schreiben - mySection - myKey - test value - testIni.ini",
+      "name": "Write to ini - mySection - myKey - test value - testIni.ini",
       "package": "default",
       "pars": {
         "file": "testIni.ini",
@@ -92,7 +92,7 @@
     "element0000000004": {
       "class": "Action_Write_to_ini",
       "ID": "element0000000004",
-      "name": "In ini schreiben - yourSection - yourKey - little value - testIni.ini",
+      "name": "Write to ini - yourSection - yourKey - little value - testIni.ini",
       "package": "default",
       "pars": {
         "file": "testIni.ini",
@@ -108,7 +108,7 @@
     "element0000000005": {
       "class": "Action_Read_From_Ini",
       "ID": "element0000000005",
-      "name": "Aus ini lesen -  - mySection - myKey - testIni.ini",
+      "name": "Read from ini -  - mySection - myKey - testIni.ini",
       "package": "default",
       "pars": {
         "Action": "Key",
@@ -127,7 +127,7 @@
     "element0000000006": {
       "class": "Action_Read_From_Ini",
       "ID": "element0000000006",
-      "name": "Aus ini lesen -  - mySection - wrongKey - testIni.ini",
+      "name": "Read from ini -  - mySection - wrongKey - testIni.ini",
       "package": "default",
       "pars": {
         "Action": "Key",
@@ -146,7 +146,7 @@
     "element0000000007": {
       "class": "Action_Read_From_Ini",
       "ID": "element0000000007",
-      "name": "Aus ini lesen -  - mySection - wrongKey - testIni.ini",
+      "name": "Read from ini -  - mySection - wrongKey - testIni.ini",
       "package": "default",
       "pars": {
         "Action": "Key",
@@ -165,7 +165,7 @@
     "element0000000008": {
       "class": "Condition_Expression",
       "ID": "element0000000008",
-      "name": "Ausdruck - value = \"Big error!\"",
+      "name": "Expression - value = \"Big error!\"",
       "package": "default",
       "pars": {
         "Expression": "value = \"Big error!\""
@@ -178,7 +178,7 @@
     "element0000000010": {
       "class": "Action_Write_to_ini",
       "ID": "element0000000010",
-      "name": "In ini schreiben - yourSection - yourKey2 - little value - testIni.ini",
+      "name": "Write to ini - yourSection - yourKey2 - little value - testIni.ini",
       "package": "default",
       "pars": {
         "file": "testIni.ini",
@@ -194,7 +194,7 @@
     "element0000000019": {
       "class": "Action_Add_To_List",
       "ID": "element0000000019",
-      "name": "Zur Liste hinzuf\u00FCgen - global_testResults - Als letzten Wert - Wert 'a_flowName'",
+      "name": "Add To List - global_testResults - As last value - Value 'a_flowName'",
       "package": "default",
       "pars": {
         "DelimiterComma": 0,

@@ -4,7 +4,7 @@
       "ConnectionType": "normal",
       "from": "element0000000001",
       "ID": "connection0000000004",
-      "to": "element0000000005",
+      "to": "element0000000030",
       "type": "Connection"
     },
     "connection0000000011": {
@@ -18,21 +18,154 @@
       "ConnectionType": "Yes",
       "from": "element0000000008",
       "ID": "connection0000000012",
-      "to": "element0000000009",
+      "to": "element0000000058",
       "type": "Connection"
     },
-    "connection0000000013": {
+    "connection0000000021": {
       "ConnectionType": "normal",
-      "from": "element0000000009",
-      "ID": "connection0000000013",
-      "to": "element0000000008",
+      "from": "element0000000015",
+      "ID": "connection0000000021",
+      "to": "element0000000016",
       "type": "Connection"
     },
-    "connection0000000014": {
+    "connection0000000022": {
+      "ConnectionType": "normal",
+      "from": "element0000000016",
+      "ID": "connection0000000022",
+      "to": "element0000000017",
+      "type": "Connection"
+    },
+    "connection0000000023": {
+      "ConnectionType": "normal",
+      "from": "element0000000015",
+      "ID": "connection0000000023",
+      "to": "element0000000018",
+      "type": "Connection"
+    },
+    "connection0000000024": {
+      "ConnectionType": "normal",
+      "from": "element0000000015",
+      "ID": "connection0000000024",
+      "to": "element0000000019",
+      "type": "Connection"
+    },
+    "connection0000000025": {
+      "ConnectionType": "normal",
+      "from": "element0000000015",
+      "ID": "connection0000000025",
+      "to": "element0000000020",
+      "type": "Connection"
+    },
+    "connection0000000032": {
+      "ConnectionType": "normal",
+      "from": "element0000000017",
+      "ID": "connection0000000032",
+      "to": "element0000000033",
+      "type": "Connection"
+    },
+    "connection0000000034": {
+      "ConnectionType": "normal",
+      "from": "element0000000033",
+      "ID": "connection0000000034",
+      "to": "element0000000036",
+      "type": "Connection"
+    },
+    "connection0000000037": {
       "ConnectionType": "No",
-      "from": "element0000000008",
-      "ID": "connection0000000014",
-      "to": "element0000000010",
+      "from": "element0000000036",
+      "ID": "connection0000000037",
+      "to": "element0000000029",
+      "type": "Connection"
+    },
+    "connection0000000040": {
+      "ConnectionType": "normal",
+      "from": "element0000000029",
+      "ID": "connection0000000040",
+      "to": "element0000000038",
+      "type": "Connection"
+    },
+    "connection0000000041": {
+      "ConnectionType": "normal",
+      "from": "element0000000038",
+      "ID": "connection0000000041",
+      "to": "element0000000039",
+      "type": "Connection"
+    },
+    "connection0000000042": {
+      "ConnectionType": "Yes",
+      "from": "element0000000054",
+      "ID": "connection0000000042",
+      "to": "element0000000063",
+      "type": "Connection"
+    },
+    "connection0000000044": {
+      "ConnectionType": "normal",
+      "from": "element0000000030",
+      "ID": "connection0000000044",
+      "to": "element0000000043",
+      "type": "Connection"
+    },
+    "connection0000000048": {
+      "ConnectionType": "normal",
+      "from": "element0000000046",
+      "ID": "connection0000000048",
+      "to": "element0000000047",
+      "type": "Connection"
+    },
+    "connection0000000051": {
+      "ConnectionType": "normal",
+      "from": "element0000000050",
+      "ID": "connection0000000051",
+      "to": "element0000000046",
+      "type": "Connection"
+    },
+    "connection0000000053": {
+      "ConnectionType": "normal",
+      "from": "element0000000029",
+      "ID": "connection0000000053",
+      "to": "element0000000052",
+      "type": "Connection"
+    },
+    "connection0000000055": {
+      "ConnectionType": "Yes",
+      "from": "element0000000039",
+      "ID": "connection0000000055",
+      "to": "element0000000054",
+      "type": "Connection"
+    },
+    "connection0000000057": {
+      "ConnectionType": "normal",
+      "from": "element0000000052",
+      "ID": "connection0000000057",
+      "to": "element0000000056",
+      "type": "Connection"
+    },
+    "connection0000000061": {
+      "ConnectionType": "No",
+      "from": "element0000000059",
+      "ID": "connection0000000061",
+      "to": "element0000000060",
+      "type": "Connection"
+    },
+    "connection0000000062": {
+      "ConnectionType": "normal",
+      "from": "element0000000058",
+      "ID": "connection0000000062",
+      "to": "element0000000059",
+      "type": "Connection"
+    },
+    "connection0000000064": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000064",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000065": {
+      "ConnectionType": "Yes",
+      "from": "element0000000063",
+      "ID": "connection0000000065",
+      "to": "element0000000026",
       "type": "Connection"
     }
   },
@@ -44,8 +177,8 @@
       "name": "Hotkey - f6",
       "package": "default",
       "pars": {
-        "ahk_class": "Notepad",
-        "ahk_exe": "notepad.exe",
+        "ahk_class": "SALFRAME",
+        "ahk_exe": "soffice.bin",
         "ahk_id": "",
         "ahk_pid": "",
         "BlockKey": "1",
@@ -57,34 +190,18 @@
         "WhenRelease": "0",
         "Wildcard": "0",
         "winText": "",
-        "Wintitle": "Unbenannt - Editor"
+        "Wintitle": "Test status.ods - LibreOffice Calc"
       },
       "StandardName": "1",
       "type": "trigger",
-      "x": 0,
-      "y": 0
-    },
-    "element0000000005": {
-      "class": "Action_Tooltip",
-      "ID": "element0000000005",
-      "name": "Tooltip: hotkey pressed: %a_hotkey% - 2 Sek - Maus folgen",
-      "package": "action",
-      "pars": {
-        "duration": 2,
-        "follow_mouse": 1,
-        "text": "hotkey pressed: %a_hotkey%",
-        "Unit": "Seconds"
-      },
-      "StandardName": "1",
-      "type": "Action",
-      "x": "105",
-      "y": "420"
+      "x": "385",
+      "y": "0"
     },
     "element0000000007": {
       "class": "Trigger_Hotkey",
-      "enabled": "0",
+      "enabled": "1",
       "ID": "element0000000007",
-      "name": "Hotkey - xbutton1",
+      "name": "Hotkey - F8",
       "package": "default",
       "pars": {
         "ahk_class": "",
@@ -94,80 +211,425 @@
         "BlockKey": 1,
         "FindHiddenText": 0,
         "FindHiddenWindow": 0,
-        "hotkey": "xbutton1",
+        "hotkey": "F8",
         "TitleMatchMode": 1,
         "UseWindow": "Everywhere",
         "WhenRelease": 0,
-        "Wildcard": "1",
+        "Wildcard": "0",
         "winText": "",
         "Wintitle": ""
       },
       "StandardName": "1",
       "type": "Trigger",
-      "x": "840",
-      "y": "105"
+      "x": "980",
+      "y": "0"
     },
     "element0000000008": {
       "class": "Condition_Key_Is_Down",
       "ID": "element0000000008",
-      "name": "Taste ist gedr\u00FCckt - xbutton1",
+      "name": "Key is down - f8",
       "package": "default",
       "pars": {
-        "key": "xbutton1",
+        "key": "f8",
+        "WhichKeyState": "logical"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "980",
+      "y": "140"
+    },
+    "element0000000015": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "1",
+      "enabled": "1",
+      "ID": "element0000000015",
+      "name": "Manual - \"Trigger left bicycle\"",
+      "package": "default",
+      "pars": {
+        "ID": "Trigger left bicycle"
+      },
+      "StandardName": 1,
+      "type": "trigger",
+      "x": "-525",
+      "y": "-70"
+    },
+    "element0000000016": {
+      "class": "Action_New_variable",
+      "ID": "element0000000016",
+      "name": "New variable - static_trigger1 = 0",
+      "package": "default",
+      "pars": {
+        "expression": "String",
+        "Varname": "static_trigger1",
+        "VarValue": "0"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-700",
+      "y": "140"
+    },
+    "element0000000017": {
+      "class": "Action_Set_Flow_Status",
+      "ID": "element0000000017",
+      "name": "Set flow status - Enable: This flow - All triggers",
+      "package": "default",
+      "pars": {
+        "Enable": "Enable",
+        "flowID": "",
+        "ThisFlow": 1,
+        "triggerID": "",
+        "WhichTrigger": "Any"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-560",
+      "y": "385"
+    },
+    "element0000000018": {
+      "class": "Action_New_variable",
+      "ID": "element0000000018",
+      "name": "New variable - static_trigger2 = 0",
+      "package": "default",
+      "pars": {
+        "expression": "String",
+        "Varname": "static_trigger2",
+        "VarValue": "0"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-525",
+      "y": "140"
+    },
+    "element0000000019": {
+      "class": "Action_New_variable",
+      "ID": "element0000000019",
+      "name": "New variable - static_trigger3 = 0",
+      "package": "default",
+      "pars": {
+        "expression": "String",
+        "Varname": "static_trigger3",
+        "VarValue": "0"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-350",
+      "y": "140"
+    },
+    "element0000000020": {
+      "class": "Action_New_variable",
+      "ID": "element0000000020",
+      "name": "New variable - static_trigger4 = 0",
+      "package": "default",
+      "pars": {
+        "expression": "String",
+        "Varname": "static_trigger4",
+        "VarValue": "0"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-175",
+      "y": "140"
+    },
+    "element0000000026": {
+      "class": "Action_Add_To_List",
+      "ID": "element0000000026",
+      "name": "Add To List - global_testResults - As last value - Value 'a_flowName'",
+      "package": "default",
+      "pars": {
+        "DelimiterComma": 0,
+        "DelimiterLinefeed": 1,
+        "DelimiterSemicolon": 0,
+        "DelimiterSpace": 0,
+        "Expression": "Expression",
+        "expressionPos": "String",
+        "InsertMethod": "Insert",
+        "InsertMethodLabel": "",
+        "NumberOfElements": "One",
+        "Position": "keyName",
+        "Varname": "global_testResults",
+        "VarValue": "a_flowName",
+        "VarValues": "Element one\nElement two",
+        "WhichPosition": "Last"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-665",
+      "y": "1365"
+    },
+    "element0000000029": {
+      "class": "Action_Send_keystrokes",
+      "ID": "element0000000029",
+      "name": "Send keystrokes - {f6}",
+      "package": "default",
+      "pars": {
+        "KeysToSend": "{f6}",
+        "KeysToSendContentType": "String",
+        "RawMode": 0,
+        "SendMode": "Event"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-560",
+      "y": "910"
+    },
+    "element0000000030": {
+      "class": "Action_New_variable",
+      "ID": "element0000000030",
+      "name": "New variable - static_trigger1 = 1",
+      "package": "default",
+      "pars": {
+        "expression": "String",
+        "Varname": "static_trigger1",
+        "VarValue": "1"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "385",
+      "y": "140"
+    },
+    "element0000000033": {
+      "class": "Action_Sleep",
+      "ID": "element0000000033",
+      "name": "Sleep: 1 s",
+      "package": "action",
+      "pars": {
+        "Duration": "1",
+        "Unit": "Seconds"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-560",
+      "y": "560"
+    },
+    "element0000000036": {
+      "class": "Condition_Expression",
+      "ID": "element0000000036",
+      "name": "Expression - static_trigger1",
+      "package": "default",
+      "pars": {
+        "Expression": "static_trigger1"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-560",
+      "y": "700"
+    },
+    "element0000000038": {
+      "class": "Action_Sleep",
+      "ID": "element0000000038",
+      "name": "Sleep: 1 s",
+      "package": "action",
+      "pars": {
+        "Duration": "1",
+        "Unit": "Seconds"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-560",
+      "y": "1050"
+    },
+    "element0000000039": {
+      "class": "Condition_Expression",
+      "ID": "element0000000039",
+      "name": "Expression - static_trigger1",
+      "package": "default",
+      "pars": {
+        "Expression": "static_trigger1"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-385",
+      "y": "1190"
+    },
+    "element0000000043": {
+      "class": "Action_Set_Flow_Status",
+      "ID": "element0000000043",
+      "name": "Set flow status - Disable: This flow - Hotkey - f6",
+      "package": "default",
+      "pars": {
+        "Enable": "Disable",
+        "flowID": "",
+        "ThisFlow": 1,
+        "triggerID": "element0000000001",
+        "WhichTrigger": "Specified"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "385",
+      "y": "280"
+    },
+    "element0000000046": {
+      "class": "Action_New_variable",
+      "ID": "element0000000046",
+      "name": "New variable - static_trigger2 = 1",
+      "package": "default",
+      "pars": {
+        "expression": "String",
+        "Varname": "static_trigger2",
+        "VarValue": "1"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "630",
+      "y": "140"
+    },
+    "element0000000047": {
+      "class": "Action_Set_Flow_Status",
+      "ID": "element0000000047",
+      "name": "Set flow status - Disable: This flow - Hotkey - ^f7",
+      "package": "default",
+      "pars": {
+        "Enable": "Disable",
+        "flowID": "",
+        "ThisFlow": 1,
+        "triggerID": "element0000000050",
+        "WhichTrigger": "Specified"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "630",
+      "y": "280"
+    },
+    "element0000000050": {
+      "class": "Trigger_Hotkey",
+      "enabled": "0",
+      "ID": "element0000000050",
+      "name": "Hotkey - ^f7",
+      "package": "default",
+      "pars": {
+        "ahk_class": "Notepad",
+        "ahk_exe": "notepad.exe",
+        "ahk_id": "",
+        "ahk_pid": "",
+        "BlockKey": "1",
+        "FindHiddenText": 0,
+        "FindHiddenWindow": 0,
+        "hotkey": "^f7",
+        "TitleMatchMode": 1,
+        "UseWindow": "Everywhere",
+        "WhenRelease": "0",
+        "Wildcard": "0",
+        "winText": "",
+        "Wintitle": "Unbenannt - Editor"
+      },
+      "StandardName": "1",
+      "type": "trigger",
+      "x": "630",
+      "y": "0"
+    },
+    "element0000000052": {
+      "class": "Action_Send_keystrokes",
+      "ID": "element0000000052",
+      "name": "Send keystrokes - ^{f7}",
+      "package": "default",
+      "pars": {
+        "KeysToSend": "^{f7}",
+        "KeysToSendContentType": "String",
+        "RawMode": 0,
+        "SendMode": "Event"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-350",
+      "y": "910"
+    },
+    "element0000000054": {
+      "class": "Condition_Expression",
+      "ID": "element0000000054",
+      "name": "Expression - static_trigger2",
+      "package": "default",
+      "pars": {
+        "Expression": "static_trigger2"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-210",
+      "y": "1190"
+    },
+    "element0000000056": {
+      "class": "Action_Send_keystrokes",
+      "ID": "element0000000056",
+      "name": "Send keystrokes - {f8 down}",
+      "package": "default",
+      "pars": {
+        "KeysToSend": "{f8 down}",
+        "KeysToSendContentType": "String",
+        "RawMode": 0,
+        "SendMode": "Event"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-140",
+      "y": "910"
+    },
+    "element0000000058": {
+      "class": "Action_Send_keystrokes",
+      "ID": "element0000000058",
+      "name": "Send keystrokes - {f8 up}",
+      "package": "default",
+      "pars": {
+        "KeysToSend": "{f8 up}",
+        "KeysToSendContentType": "String",
+        "RawMode": 0,
+        "SendMode": "Event"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "980",
+      "y": "280"
+    },
+    "element0000000059": {
+      "class": "Condition_Key_Is_Down",
+      "ID": "element0000000059",
+      "name": "Key is down - f8",
+      "package": "default",
+      "pars": {
+        "key": "f8",
         "WhichKeyState": "physical"
       },
       "StandardName": "1",
       "type": "Condition",
-      "x": "875",
+      "x": "980",
       "y": "420"
     },
-    "element0000000009": {
-      "class": "Action_Click",
-      "ID": "element0000000009",
-      "name": "Klicken - Linker Knopf - Klicken",
+    "element0000000060": {
+      "class": "Action_New_variable",
+      "ID": "element0000000060",
+      "name": "New variable - static_trigger3 = 1",
       "package": "default",
       "pars": {
-        "Button": "Left",
-        "changePosition": 0,
-        "ClickCount": 1,
-        "CoordMode": "Screen",
-        "delay": 10,
-        "DownUp": "Click",
-        "MouseTracker": "Get coordinates",
-        "SendMode": "Input",
-        "speed": 2,
-        "Xpos": 10,
-        "Ypos": 20
+        "expression": "String",
+        "Varname": "static_trigger3",
+        "VarValue": "1"
       },
       "StandardName": "1",
       "type": "Action",
-      "x": "875",
-      "y": "665"
+      "x": "980",
+      "y": "560"
     },
-    "element0000000010": {
-      "class": "Action_Sleep",
-      "ID": "element0000000010",
-      "name": "Schlafen: 200 Ms",
-      "package": "action",
+    "element0000000063": {
+      "class": "Condition_Expression",
+      "ID": "element0000000063",
+      "name": "Expression - static_trigger3",
+      "package": "default",
       "pars": {
-        "Duration": "200",
-        "Unit": "Milliseconds"
+        "Expression": "static_trigger3"
       },
       "StandardName": "1",
-      "type": "Action",
-      "x": "1085",
-      "y": "630"
+      "type": "Condition",
+      "x": "0",
+      "y": "1190"
     }
   },
-  "category": "Manual tests",
-  "ElementIDCounter": "14",
+  "category": "Automatic tests",
+  "ElementIDCounter": "65",
   "flowSettings": {
     "DefaultWorkingDir": 1,
     "ExecutionPolicy": "default",
-    "Offsetx": -200,
-    "Offsety": -200,
+    "Offsetx": "-1039.970755",
+    "Offsety": "-570.085510",
     "WorkingDir": "",
-    "zoomFactor": "0.7"
+    "zoomFactor": "0.578513"
   },
   "name": "Hotkey test"
 }

@@ -251,12 +251,21 @@ LoadFlow(p_filepath, p_demo = false)
 			tempmissingpackageslist .= forvalue ", "
 		}
 		StringTrimRight, tempmissingpackageslist, tempmissingpackageslist, 2
-		MsgBox % lang("Attention!") " " lang("The flow '%1%' could not be loaded properly!" _getFlowProperty(FlowID, "name")) "`n" lang("Following packages are missing:") "`n`n" tempmissingpackageslist "`n`n" lang("Debug Info") ":`n" lang("Filename") ": " ThisFlowFilepath
+		
+		; delete flow
+		_deleteflow(FlowID)
+
+		MsgBox, 4,, % lang("Attention!") " " lang("The flow '%1%' could not be loaded!", _getFlowProperty(FlowID, "name")) "`n" lang("Following packages are missing:") "`n`n" tempmissingpackageslist "`n`n" lang("Debug Info") ":`n" lang("Filename") ": " ThisFlowFilepath "`n`n" lang("Do you want to delete this flow?")
+		IfMsgBox, yes
+			FileDelete, % ThisFlowFilepath
 	}
-	
-	; create a new state
-	state_New(FlowID)
-	_setFlowProperty(FlowID, "savedState", _getFlowProperty(FlowID, "currentState"))
+	Else
+	{
+		
+		; create a new state
+		state_New(FlowID)
+		_setFlowProperty(FlowID, "savedState", _getFlowProperty(FlowID, "currentState"))
+	}
 	
 	_LeaveCriticalSection()
 	currentlyLoadingFlow:=false

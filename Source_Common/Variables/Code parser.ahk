@@ -667,6 +667,7 @@ class class_parser
 					; add the number after the dot
 					this.token.type := "num"
 					num .= this.token.value
+					this.next()
 
 					; check whether we have an other decimal number
 					if (this.token.value = ".")

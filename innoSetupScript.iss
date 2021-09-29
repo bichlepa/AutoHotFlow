@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "AutoHotFlow"
-#define MyAppVersion "1.0.7"
+#define MyAppVersion "1.1.0"
 #define MyAppPublisher "Paul Bichler"
 #define MyAppURL "https://bichlepa.jimdofree.com/autohotflow/"
 #define MyAppExeName "AutoHotFlow.exe" 
@@ -62,7 +62,7 @@ Type: dirifempty; Name: "{app}"
 
 ; this section must be at the bottom, Because the script innoSetupPrebuildSteps will overwrite everything that is beneath Files section
 [Files]
-Source: "AutoHotKey\AutoHotFlow.exe"; DestDir: "{app}\AutoHotKey"; Flags: ignoreversion
+Source: "AutoHotkey\AutoHotFlow.exe"; DestDir: "{app}\AutoHotkey"; Flags: ignoreversion
 Source: "bin\7-zip.chm"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "bin\7za.exe"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: "bin\license.txt"; DestDir: "{app}\bin"; Flags: ignoreversion

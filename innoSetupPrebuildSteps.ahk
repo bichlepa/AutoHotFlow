@@ -95,12 +95,15 @@ FileAppend, % manifestContent, % manifestPath
 ; run find Modules
 run, "find modules - only default package.ahk"
 
+; run ignore-not-test-flows.ahk
+run, "AppData\Saved Flows\ignore-not-test-flows.ahk"
+
 ; create file list
 AppDirList := []
 AppFileList := []
 languages := ["en", "de"]
 
-addFilesInFolderWithExtension(AppDirList, AppFileList, "AutoHotKey", "*", true)
+addFilesInFolderWithExtension(AppDirList, AppFileList, "AutoHotkey", "*", true)
 addFilesInFolderWithExtension(AppDirList, AppFileList, "bin", "*", true)
 addFilesInFolderWithExtension(AppDirList, AppFileList, "Icons", "ico", true)
 

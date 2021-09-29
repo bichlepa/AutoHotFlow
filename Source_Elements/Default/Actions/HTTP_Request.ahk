@@ -252,7 +252,7 @@ Element_run_Action_HTTP_Request(Environment, ElementParameters)
 		; POST data from variable should be sent
 
 		; evaluate more parameters
-		x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["PostData", "Codepage"])
+		x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["PostData"])
 		if (EvaluatedParameters._error)
 		{
 			return x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
@@ -262,14 +262,24 @@ Element_run_Action_HTTP_Request(Environment, ElementParameters)
 		if (ElementParameters.WhichCodepage = "definedCharset")
 		{
 			; charset is defined. Add it to options.
-			Codepage := x_replaceVariables(Environment, EvaluatedParameters.Codepage)
-			Options .= "Charset: " Codepage "`n"
+			x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["Codepage"])
+			if (EvaluatedParameters._error)
+			{
+				return x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
+			}
+
+			Options .= "Charset: " EvaluatedParameters.Codepage "`n"
 		}
 		else if (ElementParameters.WhichCodepage = "definedCodepage")
 		{
 			; codepage is defined. Add it to options.
-			Codepage := x_replaceVariables(Environment, EvaluatedParameters.Codepage)
-			Options .= "Codepage: " Codepage "`n"
+			x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["Codepage"])
+			if (EvaluatedParameters._error)
+			{
+				return x_finish(Environment, "exception", EvaluatedParameters._errorMessage) 
+			}
+			
+			Options .= "Codepage: " EvaluatedParameters.Codepage "`n"
 		}
 
 		postDataAvailable := true

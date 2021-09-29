@@ -56,17 +56,8 @@ Element_getParametrizationDetails_Action_Set_control_text(Environment)
 	parametersToEdit.push({type: "Label", label: x_lang("Text to set")})
 	parametersToEdit.push({type: "Edit", id: "Text", content: "String"})
 	
-	parametersToEdit.push({type: "Label", label: x_lang("Control_Identification")})
-	
-	parametersToEdit.push({type: "Label", label: x_lang("Method_for_control_Identification"), size: "small"})
-	parametersToEdit.push({type: "Radio", id: "IdentifyControlBy", result: "enum", default: 2, choices: [x_lang("Text_in_control"), x_lang("Classname and instance number of the control"), x_lang("Unique control ID")], enum: ["Text", "Class", "ID"]})
-	
-	parametersToEdit.push({type: "Label", label: x_lang("Control_Identification"), size: "small"})
-	parametersToEdit.push({type: "Radio", id: "ControlTextMatchMode", default: 2, choices: [x_lang("Start_with"), x_lang("Contain_anywhere"), x_lang("Exactly")]})
-	parametersToEdit.push({type: "Edit", id: "Control_identifier", content: "String", WarnIfEmpty: true})
-	
 	; call function which adds all the required fields for window identification
-	windowFunctions_addWindowIdentificationParametrization(parametersToEdit)
+	windowFunctions_addWindowIdentificationParametrization(parametersToEdit, {withControl: true})
 	
 	return parametersToEdit
 }
@@ -77,7 +68,7 @@ Element_GenerateName_Action_Set_control_text(Environment, ElementParameters)
 	; generate window identification name
 	nameString := windowFunctions_generateWindowIdentificationName(ElementParameters)
 	
-	return x_lang("Set_control_text") ": " ElementParameters.Text " - " ElementParameters.Control_identifier " - " nameString
+	return x_lang("Set_control_text") ": " ElementParameters.Text " - " nameString
 }
 
 ;Called every time the user changes any parameter.
@@ -86,7 +77,7 @@ Element_GenerateName_Action_Set_control_text(Environment, ElementParameters)
 ;- Correct misconfiguration
 Element_CheckSettings_Action_Set_control_text(Environment, ElementParameters, staticValues)
 {	
-	
+	windowFunctions_CheckSettings(ElementParameters)
 }
 
 
@@ -110,31 +101,41 @@ Element_run_Action_Set_control_text(Environment, ElementParameters)
 		return
 	}
 
-	; get window ID
-	windowID := windowFunctions_getWindowID(EvaluatedWindowParameters)
-	if (windowID.exception)
+	; get window and control ID
+	result := windowFunctions_getWindowAndControlID(EvaluatedWindowParameters)
+	if (result.exception)
 	{
-		x_finish(Environment, "exception", windowID.exception)
+		x_finish(Environment, "exception", result.exception)
 		return
 	}
 	
-	; get control HWND
-	SetTitleMatchMode, % EvaluatedParameters.ControlTextMatchMode
-	controlget, controlID, hwnd,, % EvaluatedParameters.Control_identifier, ahk_id %windowID%
-	
 	; check whether we found the control
-	if not controlID
+	if (not result.controlID)
 	{
-		x_finish(Environment, "exception", x_lang("Error! Seeked control does not exist in the specified window")) 
-		return
+		if (EvaluatedParameters.IdentifyControlBy = "ID")
+		{
+			x_finish(Environment, "exception", x_lang("Error! Seeked control does not exist")) 
+			return
+		}
+		else if (not result.windowID)
+		{
+			x_finish(Environment, "exception", x_lang("Error! Seeked window does not exist")) 
+			return
+		}
+		Else
+		{
+			x_finish(Environment, "exception", x_lang("Error! Seeked control does not exist in the specified window")) 
+			return
+		}
 	}
 	
 	; set control text
-	ControlSetText,,%  EvaluatedParameters.text, ahk_id %controlID%
+	ControlSetText,,%  EvaluatedParameters.text, % "ahk_id " result.controlID
 	
 	; set window ID and control ID as thread variables
-	x_SetVariable(Environment, "A_WindowID", windowID, "Thread")
-	x_SetVariable(Environment, "A_ControlID", controlID, "Thread")
+	if (result.windowID) ; only if available
+		x_SetVariable(Environment, "A_WindowID", result.windowID, "Thread")
+	x_SetVariable(Environment, "A_ControlID", result.controlID, "Thread")
 	
 	x_finish(Environment, "normal")
 	return

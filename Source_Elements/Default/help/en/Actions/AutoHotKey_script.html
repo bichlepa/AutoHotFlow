@@ -7,9 +7,9 @@
 	<link rel="stylesheet" href="../../../../../Help/stylesheet.css">
 </HEAD>
 <BODY LANG="en-US" DIR="LTR">
-<H1>AutoHotKey script</H1>
+<H1>AutoHotkey script</H1>
 <p>
-	The action <B>AutoHotKey script</B> executes an AutoHotkey script in a new AutoHotkey thread. 
+	The action <B>AutoHotkey script</B> executes an AutoHotkey script in a new AutoHotkey thread. 
 </p>
 
 <p class="warning">Don't use that action if you don't master the AutoHotkey scripting language.</p>
@@ -52,6 +52,8 @@
 	<br/>Do not use command <code>onexit</code>.
 	<br/>Do not use functions <code>EnterCriticalSection()</code> and <code>LeaveCriticalSection()</code> as well as other AHK_H specific functions.
 	<br/>Do not use variable, function and label names which start with <code>ahf_</code>.
+	<br/>Do not use the working directory (variable <code>a_workingDir</code> or relative paths). The working directory cannot be set per AHK thread and if AHF or an other AHK script changes it, it will be changed for this script, too. However (even if not userful), since AHF does not use the working directory, it is safe to change the working directory using command <code>SetWorkingDir</code>.
+	<br/>The variable <code>A_FlowWorkingDir</code> will contain the working directory of the flow.
 </p>
 
 

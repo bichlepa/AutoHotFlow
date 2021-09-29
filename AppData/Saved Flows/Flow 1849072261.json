@@ -126,7 +126,7 @@
       "DefaultTrigger": "1",
       "enabled": "1",
       "ID": "element0000000001",
-      "name": "Manuell - \"start\"",
+      "name": "Manual - \"start\"",
       "package": "default",
       "pars": {
         "ID": "start"
@@ -139,7 +139,7 @@
     "element0000000002": {
       "class": "Action_AutoHotKey_script",
       "ID": "element0000000002",
-      "name": "AutoHotKey Skript - counter += 1",
+      "name": "AutoHotkey script - counter += 1",
       "package": "default",
       "pars": {
         "ExportVariables": "counter",
@@ -154,7 +154,7 @@
     "element0000000008": {
       "class": "Action_New_variable",
       "ID": "element0000000008",
-      "name": "Neue Variable - counter = 1",
+      "name": "New variable - counter = 1",
       "package": "default",
       "pars": {
         "expression": "string",
@@ -169,7 +169,7 @@
     "element0000000014": {
       "class": "Action_Stop_Flow",
       "ID": "element0000000014",
-      "name": "Flow stoppen - external script test",
+      "name": "Stop flow - external script test",
       "package": "default",
       "pars": {
         "flowID": "Flow 1849072261"
@@ -182,7 +182,7 @@
     "element0000000015": {
       "class": "Action_AutoHotKey_script",
       "ID": "element0000000015",
-      "name": "AutoHotKey Skript - sleep, 10000 - msgbox, skript wurde nicht gestoppt",
+      "name": "AutoHotkey script - sleep, 10000 - msgbox, skript wurde nicht gestoppt",
       "package": "default",
       "pars": {
         "ExportVariables": "counter",
@@ -197,7 +197,7 @@
     "element0000000017": {
       "class": "Action_AutoHotKey_script",
       "ID": "element0000000017",
-      "name": "AutoHotKey Skript - sleep, 10000 - msgbox, skript wurde nicht gestoppt",
+      "name": "AutoHotkey script - sleep, 10000 - msgbox, skript wurde nicht gestoppt",
       "package": "default",
       "pars": {
         "ExportVariables": "counter",
@@ -212,7 +212,7 @@
     "element0000000023": {
       "class": "Action_AutoHotKey_script",
       "ID": "element0000000023",
-      "name": "AutoHotKey Skript - counter += 1",
+      "name": "AutoHotkey script - counter += 1",
       "package": "default",
       "pars": {
         "ExportVariables": "counter",
@@ -227,7 +227,7 @@
     "element0000000024": {
       "class": "Action_AutoHotKey_script",
       "ID": "element0000000024",
-      "name": "AutoHotKey Skript - counter += 1",
+      "name": "AutoHotkey script - counter += 1",
       "package": "default",
       "pars": {
         "ExportVariables": "counter",
@@ -242,7 +242,7 @@
     "element0000000025": {
       "class": "Action_AutoHotKey_script",
       "ID": "element0000000025",
-      "name": "AutoHotKey Skript - counter += 1",
+      "name": "AutoHotkey script - counter += 1",
       "package": "default",
       "pars": {
         "ExportVariables": "counter",
@@ -257,7 +257,7 @@
     "element0000000026": {
       "class": "Action_AutoHotKey_script",
       "ID": "element0000000026",
-      "name": "AutoHotKey Skript - counter += 1",
+      "name": "AutoHotkey script - counter += 1",
       "package": "default",
       "pars": {
         "ExportVariables": "counter",
@@ -272,7 +272,7 @@
     "element0000000027": {
       "class": "Action_AutoHotKey_script",
       "ID": "element0000000027",
-      "name": "AutoHotKey Skript - counter += 1",
+      "name": "AutoHotkey script - counter += 1",
       "package": "default",
       "pars": {
         "ExportVariables": "counter",
@@ -287,7 +287,7 @@
     "element0000000032": {
       "class": "Action_AutoHotKey_script",
       "ID": "element0000000032",
-      "name": "AutoHotKey Skript - counter += 1 - counterPlus10 := counter + 10",
+      "name": "AutoHotkey script - counter += 1 - counterPlus10 := counter + 10",
       "package": "default",
       "pars": {
         "ExportVariables": "counter, counterPlus10 ",
@@ -302,7 +302,7 @@
     "element0000000036": {
       "class": "Condition_Expression",
       "ID": "element0000000036",
-      "name": "Ausdruck - counter = 3",
+      "name": "Expression - counter = 3",
       "package": "default",
       "pars": {
         "Expression": "counter = 3"
@@ -315,7 +315,7 @@
     "element0000000043": {
       "class": "Action_Tooltip",
       "ID": "element0000000043",
-      "name": "Tooltip: %counter% - %counterplus10% - 2 Sek - Maus folgen",
+      "name": "Tooltip: %counter% - %counterplus10% - 2 s - Follow mouse",
       "package": "action",
       "pars": {
         "duration": 2,
@@ -331,7 +331,7 @@
     "element0000000089": {
       "class": "Action_Add_To_List",
       "ID": "element0000000089",
-      "name": "Zur Liste hinzuf\u00FCgen - global_testResults - Als letzten Wert - Wert 'a_flowName'",
+      "name": "Add To List - global_testResults - As last value - Value 'a_flowName'",
       "package": "default",
       "pars": {
         "DelimiterComma": 0,

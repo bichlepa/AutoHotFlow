@@ -1,0 +1,765 @@
+﻿{
+  "allConnections": {
+    "connection0000000005": {
+      "ConnectionType": "normal",
+      "from": "element0000000001",
+      "ID": "connection0000000005",
+      "to": "element0000000007",
+      "type": "Connection"
+    },
+    "connection0000000008": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000008",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000009": {
+      "ConnectionType": "normal",
+      "from": "element0000000007",
+      "ID": "connection0000000009",
+      "to": "element0000000010",
+      "type": "Connection"
+    },
+    "connection0000000011": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000011",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000018": {
+      "ConnectionType": "normal",
+      "from": "element0000000004",
+      "ID": "connection0000000018",
+      "to": "element0000000017",
+      "type": "Connection"
+    },
+    "connection0000000025": {
+      "ConnectionType": "normal",
+      "from": "element0000000020",
+      "ID": "connection0000000025",
+      "to": "element0000000024",
+      "type": "Connection"
+    },
+    "connection0000000026": {
+      "ConnectionType": "normal",
+      "from": "element0000000019",
+      "ID": "connection0000000026",
+      "to": "element0000000023",
+      "type": "Connection"
+    },
+    "connection0000000031": {
+      "ConnectionType": "normal",
+      "from": "element0000000029",
+      "ID": "connection0000000031",
+      "to": "element0000000030",
+      "type": "Connection"
+    },
+    "connection0000000042": {
+      "ConnectionType": "normal",
+      "from": "element0000000001",
+      "ID": "connection0000000042",
+      "to": "element0000000039",
+      "type": "Connection"
+    },
+    "connection0000000043": {
+      "ConnectionType": "normal",
+      "from": "element0000000001",
+      "ID": "connection0000000043",
+      "to": "element0000000040",
+      "type": "Connection"
+    },
+    "connection0000000044": {
+      "ConnectionType": "normal",
+      "from": "element0000000001",
+      "ID": "connection0000000044",
+      "to": "element0000000041",
+      "type": "Connection"
+    },
+    "connection0000000049": {
+      "ConnectionType": "normal",
+      "from": "element0000000024",
+      "ID": "connection0000000049",
+      "to": "element0000000047",
+      "type": "Connection"
+    },
+    "connection0000000050": {
+      "ConnectionType": "normal",
+      "from": "element0000000030",
+      "ID": "connection0000000050",
+      "to": "element0000000048",
+      "type": "Connection"
+    },
+    "connection0000000051": {
+      "ConnectionType": "normal",
+      "from": "element0000000023",
+      "ID": "connection0000000051",
+      "to": "element0000000046",
+      "type": "Connection"
+    },
+    "connection0000000052": {
+      "ConnectionType": "normal",
+      "from": "element0000000017",
+      "ID": "connection0000000052",
+      "to": "element0000000045",
+      "type": "Connection"
+    },
+    "connection0000000053": {
+      "ConnectionType": "normal",
+      "from": "element0000000035",
+      "fromPart": "HEAD",
+      "ID": "connection0000000053",
+      "to": "element0000000063",
+      "type": "Connection"
+    },
+    "connection0000000057": {
+      "ConnectionType": "No",
+      "from": "element0000000054",
+      "ID": "connection0000000057",
+      "to": "element0000000056",
+      "type": "Connection"
+    },
+    "connection0000000058": {
+      "ConnectionType": "No",
+      "from": "element0000000056",
+      "ID": "connection0000000058",
+      "to": "element0000000035",
+      "toPart": "TAIL",
+      "type": "Connection"
+    },
+    "connection0000000059": {
+      "ConnectionType": "Yes",
+      "from": "element0000000056",
+      "ID": "connection0000000059",
+      "to": "element0000000035",
+      "toPart": "BREAK",
+      "type": "Connection"
+    },
+    "connection0000000061": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000061",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000062": {
+      "ConnectionType": "normal",
+      "from": "element0000000063",
+      "ID": "connection0000000062",
+      "to": "element0000000054",
+      "type": "Connection"
+    },
+    "connection0000000064": {
+      "ConnectionType": "normal",
+      "from": "element0000000035",
+      "fromPart": "TAIL",
+      "ID": "connection0000000064",
+      "to": "element0000000072",
+      "type": "Connection"
+    },
+    "connection0000000069": {
+      "ConnectionType": "normal",
+      "from": "element0000000067",
+      "ID": "connection0000000069",
+      "to": "element0000000066",
+      "type": "Connection"
+    },
+    "connection0000000070": {
+      "ConnectionType": "normal",
+      "from": "element0000000060",
+      "fromPart": "HEAD",
+      "ID": "connection0000000070",
+      "to": "element0000000067",
+      "type": "Connection"
+    },
+    "connection0000000071": {
+      "ConnectionType": "No",
+      "from": "element0000000066",
+      "ID": "connection0000000071",
+      "to": "element0000000065",
+      "type": "Connection"
+    },
+    "connection0000000073": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000073",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000074": {
+      "ConnectionType": "normal",
+      "from": "element0000000072",
+      "ID": "connection0000000074",
+      "to": "element0000000060",
+      "toPart": "HEAD",
+      "type": "Connection"
+    },
+    "connection0000000075": {
+      "ConnectionType": "No",
+      "from": "element0000000065",
+      "ID": "connection0000000075",
+      "to": "element0000000060",
+      "toPart": "TAIL",
+      "type": "Connection"
+    },
+    "connection0000000076": {
+      "ConnectionType": "Yes",
+      "from": "element0000000065",
+      "ID": "connection0000000076",
+      "to": "element0000000060",
+      "toPart": "BREAK",
+      "type": "Connection"
+    },
+    "connection0000000078": {
+      "ConnectionType": "normal",
+      "from": "element0000000060",
+      "fromPart": "TAIL",
+      "ID": "connection0000000078",
+      "to": "element0000000077",
+      "type": "Connection"
+    },
+    "connection0000000080": {
+      "ConnectionType": "normal",
+      "from": "element0000000010",
+      "ID": "connection0000000080",
+      "to": "element0000000035",
+      "toPart": "HEAD",
+      "type": "Connection"
+    },
+    "connection0000000082": {
+      "ConnectionType": "No",
+      "from": "element0000000056",
+      "ID": "connection0000000082",
+      "to": "element0000000081",
+      "type": "Connection"
+    },
+    "connection0000000083": {
+      "ConnectionType": "Yes",
+      "from": "element0000000081",
+      "ID": "connection0000000083",
+      "to": "element0000000084",
+      "type": "Connection"
+    },
+    "connection0000000087": {
+      "ConnectionType": "Yes",
+      "from": "element0000000085",
+      "ID": "connection0000000087",
+      "to": "element0000000086",
+      "type": "Connection"
+    },
+    "connection0000000088": {
+      "ConnectionType": "No",
+      "from": "element0000000065",
+      "ID": "connection0000000088",
+      "to": "element0000000085",
+      "type": "Connection"
+    }
+  },
+  "allElements": {
+    "element0000000001": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "1",
+      "enabled": "1",
+      "ID": "element0000000001",
+      "name": "Manual - \"Trigger left bicycle\"",
+      "package": "default",
+      "pars": {
+        "ID": "Trigger left bicycle"
+      },
+      "StandardName": 1,
+      "type": "trigger",
+      "x": "140",
+      "y": "-35"
+    },
+    "element0000000004": {
+      "class": "Trigger_User_Idle_Time",
+      "enabled": "0",
+      "ID": "element0000000004",
+      "name": "User idle time - 10 s",
+      "package": "default",
+      "pars": {
+        "Interval": 10,
+        "Method": "TimeIdlePhysical",
+        "Unit": "Seconds"
+      },
+      "StandardName": "1",
+      "type": "Trigger",
+      "x": "1225",
+      "y": "245"
+    },
+    "element0000000007": {
+      "class": "Action_New_variable",
+      "ID": "element0000000007",
+      "name": "New variable - static_trigger1 = 0",
+      "package": "default",
+      "pars": {
+        "expression": "String",
+        "Varname": "static_trigger1",
+        "VarValue": "0"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-35",
+      "y": "175"
+    },
+    "element0000000010": {
+      "class": "Action_Set_Flow_Status",
+      "ID": "element0000000010",
+      "name": "Set flow status - Enable: This flow - All triggers",
+      "package": "default",
+      "pars": {
+        "Enable": "Enable",
+        "flowID": "",
+        "ThisFlow": 1,
+        "triggerID": "",
+        "WhichTrigger": "Any"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "0",
+      "y": "420"
+    },
+    "element0000000017": {
+      "class": "Action_Set_Flow_Status",
+      "ID": "element0000000017",
+      "name": "Set flow status - Disable: This flow - User idle time - 10 s",
+      "package": "default",
+      "pars": {
+        "Enable": "Disable",
+        "flowID": "",
+        "ThisFlow": 1,
+        "triggerID": "element0000000004",
+        "WhichTrigger": "Specified"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "1225",
+      "y": "385"
+    },
+    "element0000000019": {
+      "class": "Trigger_User_Idle_Time",
+      "enabled": "0",
+      "ID": "element0000000019",
+      "name": "User idle time - 5000 ms",
+      "package": "default",
+      "pars": {
+        "Interval": "5000",
+        "Method": "TimeIdlePhysical",
+        "Unit": "MilliSeconds"
+      },
+      "StandardName": "1",
+      "type": "Trigger",
+      "x": "1435",
+      "y": "245"
+    },
+    "element0000000020": {
+      "class": "Trigger_User_Idle_Time",
+      "enabled": "0",
+      "ID": "element0000000020",
+      "name": "User idle time - 1.0\/60*10 m",
+      "package": "default",
+      "pars": {
+        "Interval": "1.0\/60*10",
+        "Method": "TimeIdlePhysical",
+        "Unit": "Minutes"
+      },
+      "StandardName": "1",
+      "type": "Trigger",
+      "x": "1645",
+      "y": "245"
+    },
+    "element0000000023": {
+      "class": "Action_Set_Flow_Status",
+      "ID": "element0000000023",
+      "name": "Set flow status - Disable: This flow - User idle time - 5000 ms",
+      "package": "default",
+      "pars": {
+        "Enable": "Disable",
+        "flowID": "",
+        "ThisFlow": 1,
+        "triggerID": "element0000000019",
+        "WhichTrigger": "Specified"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "1435",
+      "y": "385"
+    },
+    "element0000000024": {
+      "class": "Action_Set_Flow_Status",
+      "ID": "element0000000024",
+      "name": "Set flow status - Disable: This flow - User idle time - 1.0\/60*10 m",
+      "package": "default",
+      "pars": {
+        "Enable": "Disable",
+        "flowID": "",
+        "ThisFlow": 1,
+        "triggerID": "element0000000020",
+        "WhichTrigger": "Specified"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "1645",
+      "y": "385"
+    },
+    "element0000000029": {
+      "class": "Trigger_User_Idle_Time",
+      "enabled": "0",
+      "ID": "element0000000029",
+      "name": "User idle time - 1.0\/60\/60*10 h #Hours",
+      "package": "default",
+      "pars": {
+        "Interval": "1.0\/60\/60*10",
+        "Method": "TimeIdlePhysical",
+        "Unit": "Hours"
+      },
+      "StandardName": "1",
+      "type": "Trigger",
+      "x": "1855",
+      "y": "245"
+    },
+    "element0000000030": {
+      "class": "Action_Set_Flow_Status",
+      "ID": "element0000000030",
+      "name": "Set flow status - Disable: This flow - User idle time - 1.0\/60\/60*10 h #Hours",
+      "package": "default",
+      "pars": {
+        "Enable": "Disable",
+        "flowID": "",
+        "ThisFlow": 1,
+        "triggerID": "element0000000029",
+        "WhichTrigger": "Specified"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "1855",
+      "y": "385"
+    },
+    "element0000000035": {
+      "class": "Loop_SimpleLoop",
+      "HeightOfVerticalBar": "735",
+      "ID": "element0000000035",
+      "name": "Simple loop: 30 Repeats",
+      "package": "default",
+      "pars": {
+        "Infinite": 0,
+        "repeatCount": "30"
+      },
+      "StandardName": "1",
+      "type": "Loop",
+      "x": "210",
+      "y": "735"
+    },
+    "element0000000039": {
+      "class": "Action_New_variable",
+      "ID": "element0000000039",
+      "name": "New variable - static_trigger2 = 0",
+      "package": "default",
+      "pars": {
+        "expression": "String",
+        "Varname": "static_trigger2",
+        "VarValue": "0"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "140",
+      "y": "175"
+    },
+    "element0000000040": {
+      "class": "Action_New_variable",
+      "ID": "element0000000040",
+      "name": "New variable - static_trigger3 = 0",
+      "package": "default",
+      "pars": {
+        "expression": "String",
+        "Varname": "static_trigger3",
+        "VarValue": "0"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "315",
+      "y": "175"
+    },
+    "element0000000041": {
+      "class": "Action_New_variable",
+      "ID": "element0000000041",
+      "name": "New variable - static_trigger4 = 0",
+      "package": "default",
+      "pars": {
+        "expression": "String",
+        "Varname": "static_trigger4",
+        "VarValue": "0"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "490",
+      "y": "175"
+    },
+    "element0000000045": {
+      "class": "Action_New_variable",
+      "ID": "element0000000045",
+      "name": "New variable - static_trigger1 = 1",
+      "package": "default",
+      "pars": {
+        "expression": "String",
+        "Varname": "static_trigger1",
+        "VarValue": "1"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "1225",
+      "y": "560"
+    },
+    "element0000000046": {
+      "class": "Action_New_variable",
+      "ID": "element0000000046",
+      "name": "New variable - static_trigger2 = 1",
+      "package": "default",
+      "pars": {
+        "expression": "String",
+        "Varname": "static_trigger2",
+        "VarValue": "1"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "1435",
+      "y": "560"
+    },
+    "element0000000047": {
+      "class": "Action_New_variable",
+      "ID": "element0000000047",
+      "name": "New variable - static_trigger3 = 1",
+      "package": "default",
+      "pars": {
+        "expression": "String",
+        "Varname": "static_trigger3",
+        "VarValue": "1"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "1645",
+      "y": "560"
+    },
+    "element0000000048": {
+      "class": "Action_New_variable",
+      "ID": "element0000000048",
+      "name": "New variable - static_trigger4 = 1",
+      "package": "default",
+      "pars": {
+        "expression": "String",
+        "Varname": "static_trigger4",
+        "VarValue": "1"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "1855",
+      "y": "560"
+    },
+    "element0000000054": {
+      "class": "Condition_Expression",
+      "ID": "element0000000054",
+      "name": "Expression - static_trigger1 or static_trigger3 or static_trigger4",
+      "package": "default",
+      "pars": {
+        "Expression": "static_trigger1 or static_trigger3 or static_trigger4"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "280",
+      "y": "1050"
+    },
+    "element0000000056": {
+      "class": "Condition_Expression",
+      "ID": "element0000000056",
+      "name": "Expression - static_trigger2",
+      "package": "default",
+      "pars": {
+        "Expression": "static_trigger2"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "280",
+      "y": "1225"
+    },
+    "element0000000060": {
+      "class": "Loop_SimpleLoop",
+      "HeightOfVerticalBar": "630",
+      "ID": "element0000000060",
+      "name": "Simple loop: 30 Repeats",
+      "package": "default",
+      "pars": {
+        "Infinite": 0,
+        "repeatCount": "30"
+      },
+      "StandardName": "1",
+      "type": "Loop",
+      "x": "210",
+      "y": "1855"
+    },
+    "element0000000063": {
+      "class": "Action_Sleep",
+      "ID": "element0000000063",
+      "name": "Sleep: 1 s",
+      "package": "action",
+      "pars": {
+        "Duration": "1",
+        "Unit": "Seconds"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "280",
+      "y": "875"
+    },
+    "element0000000065": {
+      "class": "Condition_Expression",
+      "ID": "element0000000065",
+      "name": "Expression - static_trigger1 and static_trigger3 and static_trigger4",
+      "package": "default",
+      "pars": {
+        "Expression": "static_trigger1 and static_trigger3 and static_trigger4"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "315",
+      "y": "2380"
+    },
+    "element0000000066": {
+      "class": "Condition_Expression",
+      "ID": "element0000000066",
+      "name": "Expression - static_trigger2",
+      "package": "default",
+      "pars": {
+        "Expression": "static_trigger2"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "280",
+      "y": "2170"
+    },
+    "element0000000067": {
+      "class": "Action_Sleep",
+      "ID": "element0000000067",
+      "name": "Sleep: 1 s",
+      "package": "action",
+      "pars": {
+        "Duration": "1",
+        "Unit": "Seconds"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "245",
+      "y": "2030"
+    },
+    "element0000000072": {
+      "class": "Action_New_variable",
+      "ID": "element0000000072",
+      "name": "New variable - static_trigger2 = 0",
+      "package": "default",
+      "pars": {
+        "expression": "String",
+        "Varname": "static_trigger2",
+        "VarValue": "0"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "245",
+      "y": "1645"
+    },
+    "element0000000077": {
+      "class": "Action_Add_To_List",
+      "ID": "element0000000077",
+      "name": "Add To List - global_testResults - As last value - Value 'a_flowName'",
+      "package": "default",
+      "pars": {
+        "DelimiterComma": 0,
+        "DelimiterLinefeed": 1,
+        "DelimiterSemicolon": 0,
+        "DelimiterSpace": 0,
+        "Expression": "Expression",
+        "expressionPos": "String",
+        "InsertMethod": "Insert",
+        "InsertMethodLabel": "",
+        "NumberOfElements": "One",
+        "Position": "keyName",
+        "Varname": "global_testResults",
+        "VarValue": "a_flowName",
+        "VarValues": "Element one\nElement two",
+        "WhichPosition": "Last"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "210",
+      "y": "2695"
+    },
+    "element0000000081": {
+      "class": "Condition_Expression",
+      "ID": "element0000000081",
+      "name": "Expression - a_index > 6",
+      "package": "default",
+      "pars": {
+        "Expression": "a_index > 6"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "525",
+      "y": "1295"
+    },
+    "element0000000084": {
+      "class": "Action_Tooltip",
+      "ID": "element0000000084",
+      "name": "Tooltip: don't move the mouse and don't press anything - 2 s - Follow mouse",
+      "package": "action",
+      "pars": {
+        "duration": 2,
+        "follow_mouse": 1,
+        "text": "don't move the mouse and don't press anything",
+        "Unit": "Seconds"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "560",
+      "y": "1435"
+    },
+    "element0000000085": {
+      "class": "Condition_Expression",
+      "ID": "element0000000085",
+      "name": "Expression - a_index > 6",
+      "package": "default",
+      "pars": {
+        "Expression": "a_index > 6"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "525",
+      "y": "2345"
+    },
+    "element0000000086": {
+      "class": "Action_Tooltip",
+      "ID": "element0000000086",
+      "name": "Tooltip: don't move the mouse and don't press anything - 2 s - Follow mouse",
+      "package": "action",
+      "pars": {
+        "duration": 2,
+        "follow_mouse": 1,
+        "text": "don't move the mouse and don't press anything",
+        "Unit": "Seconds"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "595",
+      "y": "2520"
+    }
+  },
+  "category": "Automatic tests",
+  "ElementIDCounter": "89",
+  "flowSettings": {
+    "DefaultWorkingDir": 1,
+    "ExecutionPolicy": "default",
+    "Offsetx": "-1304.122569",
+    "Offsety": "-307.801127",
+    "WorkingDir": "",
+    "zoomFactor": "0.578513"
+  },
+  "name": "User idle test"
+}
