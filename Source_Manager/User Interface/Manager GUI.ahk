@@ -1,5 +1,7 @@
 ﻿global global_allTreeViewItems := Object()
 global global_Treeview_currentIcons := Object()
+global global_ManagerGUIHWND := ""
+global global_ManagerGUIControlHWNDs := ""
 
 ; Initialize the manager gui. Does not show it.
 init_Manager_GUI()
@@ -47,8 +49,8 @@ init_Manager_GUI()
 	Refresh_Manager_GUI()
 
 	; Save manager hwnd
-	gui,+hwndManagerGUIHWND
-	_setSharedProperty("hwnds.Manager", ManagerGUIHWND)
+	gui,+hwndglobal_ManagerGUIHWND
+	_setSharedProperty("hwnds.Manager", global_ManagerGUIHWND)
 	
 	; set the gui icon
 	gui, +LastFound
@@ -58,9 +60,7 @@ init_Manager_GUI()
 	Gui, Show, hide, % "AutoHotFlow " lang("Manager") " " _getShared("AhfVersion")
 	
 	; enable hotkeys
-	hotkey, ifwinactive, ahk_id %ManagerGUIHWND%
-	hotkey, f5, KeyReload
-	hotkey, del, Button_manager_Delete
+	OnMessage(0x100, "keyPressed", 1)
 
 	; the icons of the flows are going to be updated repeatedly.
 	settimer, updateFlowIcons_Manager_GUI, 100
@@ -211,7 +211,7 @@ TreeView_manager_Refill()
 {
 	global
 
-	if not (ManagerGUIHWND)
+	if not (global_ManagerGUIHWND)
 		return
 
 	Gui, manager:default
@@ -283,7 +283,7 @@ TreeView_manager_AddEntry(par_Type, par_ID)
 {
 	global
 
-	if not (ManagerGUIHWND)
+	if not (global_ManagerGUIHWND)
 		return
 
 	Gui, manager:default
@@ -349,7 +349,7 @@ TreeView_manager_Select(par_Type, par_ID, options = "")
 {
 	global
 
-	if not (ManagerGUIHWND)
+	if not (global_ManagerGUIHWND)
 		return
 	if not par_Type
 		return
@@ -394,7 +394,7 @@ TreeView_manager_Rename(par_Type, par_ID)
 {
 	global
 
-	if not (ManagerGUIHWND)
+	if not (global_ManagerGUIHWND)
 		return
 	
 	Gui, manager:default
@@ -640,6 +640,28 @@ manager_menu_changeCategory()
 {
 	;Same as if user has pressed the button
 	Button_manager_ChangeCategory()
+}
+
+
+; react on key input
+keyPressed(wpar, lpar, msg, hwn)
+{
+	global
+	if (hwn != TreeView_manager_HWND)
+	{
+		; react only if user interacted with the tree view
+		return
+	}
+
+	; wpar defines the hotkey
+	if (wpar = GetKeyVK("F5")) ; F5
+	{
+		SetTimer, KeyReload, -1
+	}
+	if (wpar = GetKeyVK("DEL")) ; DEL
+	{
+		SetTimer, Button_manager_Delete, -1
+	}
 }
 
 ; When user presses F5 to reload the treeview

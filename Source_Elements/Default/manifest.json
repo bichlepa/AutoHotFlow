@@ -113,6 +113,7 @@
         "Send_Keystrokes.ahk",
         "Send_Keystrokes_To_Control.ahk",
         "Set_Lock_Key.ahk",
+        "Block_user_input.ahk",
 
         "Play_Sound.ahk",
         "Stop_Sound.ahk",
@@ -182,6 +183,7 @@
         "Clipboard_Changes.ahk",
 
         "Hotkey.ahk",
+        "Hotstring.ahk",
         "Shortcut.ahk",
 
         "Window_opens.ahk",

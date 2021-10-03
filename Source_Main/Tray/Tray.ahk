@@ -11,7 +11,7 @@ if a_iscompiled
 else
 {
 	; if not compiled, add a delimiter
-	Menu, tray, add	
+	;Menu, tray, add	
 }
 
 ; add entry to show manager gui and set it to default (action on double click)

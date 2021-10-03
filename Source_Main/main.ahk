@@ -254,6 +254,7 @@ global_libInclusionsForThreads =
 #include source_Elements\Default\actions\Send_Keystrokes.ahk
 #include source_Elements\Default\actions\Send_Keystrokes_To_Control.ahk
 #include source_Elements\Default\actions\Set_Lock_Key.ahk
+#include source_Elements\Default\actions\Block_user_input.ahk
 #include source_Elements\Default\actions\Play_Sound.ahk
 #include source_Elements\Default\actions\Stop_Sound.ahk
 #include source_Elements\Default\actions\Beep.ahk
@@ -302,6 +303,7 @@ global_libInclusionsForThreads =
 #include source_Elements\Default\triggers\User_Idle_Time.ahk
 #include source_Elements\Default\triggers\Clipboard_Changes.ahk
 #include source_Elements\Default\triggers\Hotkey.ahk
+#include source_Elements\Default\triggers\Hotstring.ahk
 #include source_Elements\Default\triggers\Shortcut.ahk
 #include source_Elements\Default\triggers\Window_opens.ahk
 #include source_Elements\Default\triggers\Window_closes.ahk
@@ -398,6 +400,7 @@ global_elementInclusionsForThreads =
 #include source_Elements\Default\actions\Send_Keystrokes.ahk
 #include source_Elements\Default\actions\Send_Keystrokes_To_Control.ahk
 #include source_Elements\Default\actions\Set_Lock_Key.ahk
+#include source_Elements\Default\actions\Block_user_input.ahk
 #include source_Elements\Default\actions\Play_Sound.ahk
 #include source_Elements\Default\actions\Stop_Sound.ahk
 #include source_Elements\Default\actions\Beep.ahk
@@ -446,6 +449,7 @@ global_elementInclusionsForThreads =
 #include source_Elements\Default\triggers\User_Idle_Time.ahk
 #include source_Elements\Default\triggers\Clipboard_Changes.ahk
 #include source_Elements\Default\triggers\Hotkey.ahk
+#include source_Elements\Default\triggers\Hotstring.ahk
 #include source_Elements\Default\triggers\Shortcut.ahk
 #include source_Elements\Default\triggers\Window_opens.ahk
 #include source_Elements\Default\triggers\Window_closes.ahk

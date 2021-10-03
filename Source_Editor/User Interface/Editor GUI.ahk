@@ -208,42 +208,42 @@ keyPressed(wpar, lpar, msg, hwn)
 	}
 	
 	; wpar defines the hotkey
-	if (wpar=0x41)
+	if (wpar = GetKeyVK("a"))
 	{
 		if getkeystate("ctrl")
 			SetTimer, key_ctrl_a,-1
 	}
-	if (wpar=0x43)
+	if (wpar = GetKeyVK("c"))
 	{
 		if getkeystate("ctrl")
 			SetTimer, key_ctrl_c,-1
 	}
-	if (wpar=0x53)
+	if (wpar = GetKeyVK("s"))
 	{
 		if getkeystate("ctrl")
 			SetTimer, key_ctrl_s,-1
 	}
-	if (wpar=0x56)
+	if (wpar = GetKeyVK("v"))
 	{
 		if getkeystate("ctrl")
 			SetTimer, key_ctrl_v,-1
 	}
-	if (wpar=0x58)
+	if (wpar = GetKeyVK("x"))
 	{
 		if getkeystate("ctrl")
 			SetTimer, key_ctrl_x,-1
 	}
-	if (wpar=0x59)
+	if (wpar = GetKeyVK("y"))
 	{
 		if getkeystate("ctrl")
 			SetTimer, key_ctrl_y,-1
 	}
-	if (wpar=0x5A)
+	if (wpar = GetKeyVK("z"))
 	{
 		if getkeystate("ctrl")
 			SetTimer, key_ctrl_z,-1
 	}
-	if (wpar=0x2e)
+	if (wpar = GetKeyVK("DEL"))
 	{
 		SetTimer, key_del,-1
 	}
