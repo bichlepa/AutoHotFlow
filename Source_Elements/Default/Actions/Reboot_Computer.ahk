@@ -53,13 +53,19 @@ Element_getParametrizationDetails_Action_Reboot_Computer(Environment)
 {
 	parametersToEdit:=Object()
 	
+	parametersToEdit.push({type: "Label", label: x_lang("Force #verb")})
+	parametersToEdit.push({type: "Checkbox", id: "Force", default: 0, label: x_lang("Force (this can cause loss of data!)")})
+	
 	return parametersToEdit
 }
 
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Reboot_Computer(Environment, ElementParameters)
 {
-	return x_lang("Reboot_Computer") 
+	if (ElementParameters.Force)
+		return x_lang("Reboot computer")
+	Else
+		return x_lang("Reboot computer (force)")
 }
 
 ;Called every time the user changes any parameter.
@@ -76,8 +82,14 @@ Element_CheckSettings_Action_Reboot_Computer(Environment, ElementParameters, sta
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Reboot_Computer(Environment, ElementParameters)
 {
+	; initialize option (2 is reboot)
+	shutDownOption := 2
+
+	if (ElementParameters.Force)
+		shutDownOption += 4 ; add force option
+
 	; reboot computer
-	shutdown, 2
+	shutdown, % shutDownOption
 
 	; finish
 	x_finish(Environment,"normal")

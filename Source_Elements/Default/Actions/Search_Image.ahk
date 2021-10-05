@@ -70,8 +70,7 @@ Element_getParametrizationDetails_Action_Search_Image(Environment)
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Image file path")})
 	parametersToEdit.push({type: "File", id: "file", label: x_lang("Select a file"), options: 8, filter: x_lang("Images and icons") " (*.gif; *.jpg; *.bmp; *.ico; *.cur; *.ani; *.png; *.tif; *.exif; *.wmf; *.emf; *.exe; *.dll; *.cpl; *.scr)"})
-	
-	parametersToEdit.push({type: "Label", label: x_lang("File with multiple icons")})
+	parametersToEdit.push({type: "Label", label: x_lang("File with multiple icons"), size: "small"})
 	parametersToEdit.push({type: "Checkbox", id: "SetIconNumber", default: 0, label: x_lang("Set icon number")})
 	parametersToEdit.push({type: "Edit", id: "IconNumber", default: 1, content: "PositiveInteger", WarnIfEmpty: true})
 	
