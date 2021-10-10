@@ -149,6 +149,7 @@
     "conditions": [
         "Expression.ahk",
         "Variable_Is_Empty.ahk",
+        "Variable_content_is.ahk",
         "List_Contains_Element.ahk",
         "String_Contains_Text.ahk",
         "Number_is.ahk",

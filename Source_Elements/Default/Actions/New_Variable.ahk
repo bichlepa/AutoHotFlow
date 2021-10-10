@@ -59,6 +59,9 @@ Element_getParametrizationDetails_Action_New_variable(Environment)
 	parametersToEdit.push({type: "Label", label:  x_lang("Value")})
 	parametersToEdit.push({type: "Edit", id: "VarValue", default: "New element", content: ["String", "Expression"], contentID: "expression", contentDefault: "string"})
 
+	parametersToEdit.push({type: "Label", label:  x_lang("Options")})
+	parametersToEdit.push({type: "Checkbox", id: "onlyIfNotExist", default: 0, label: x_lang("Write only if variable does not exist")})
+
 	return parametersToEdit
 }
 
@@ -92,6 +95,15 @@ Element_run_Action_New_variable(Environment, ElementParameters)
 	}
 	
 	; set output variable
+	if (EvaluatedParameters.onlyIfNotExist)
+	{
+		varLoc := x_GetVariableLocation(Environment, EvaluatedParameters.Varname)
+		if varLoc
+		{
+			x_finish(Environment, "normal", "Variable was not written, because it already exists.")
+			return
+		}
+	}
 	x_SetVariable(Environment, EvaluatedParameters.Varname, EvaluatedParameters.VarValue)
 	
 	;Always call v_finish() before return

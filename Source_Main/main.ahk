@@ -282,6 +282,7 @@ global_libInclusionsForThreads =
 #include source_Elements\Default\actions\Trace_Point_Check.ahk
 #include source_Elements\Default\conditions\Expression.ahk
 #include source_Elements\Default\conditions\Variable_Is_Empty.ahk
+#include source_Elements\Default\conditions\Variable_content_is.ahk
 #include source_Elements\Default\conditions\List_Contains_Element.ahk
 #include source_Elements\Default\conditions\String_Contains_Text.ahk
 #include source_Elements\Default\conditions\Number_is.ahk
@@ -431,6 +432,7 @@ global_elementInclusionsForThreads =
 #include source_Elements\Default\actions\Trace_Point_Check.ahk
 #include source_Elements\Default\conditions\Expression.ahk
 #include source_Elements\Default\conditions\Variable_Is_Empty.ahk
+#include source_Elements\Default\conditions\Variable_content_is.ahk
 #include source_Elements\Default\conditions\List_Contains_Element.ahk
 #include source_Elements\Default\conditions\String_Contains_Text.ahk
 #include source_Elements\Default\conditions\Number_is.ahk
