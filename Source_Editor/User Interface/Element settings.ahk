@@ -1750,6 +1750,11 @@ class ElementSettings
 			{
 				tempAllChoices .= "|" TempOneChoice
 			}
+			if (tempAllChoices = "")
+			{
+				; list should be empty
+				tempAllChoices := "|"
+			}
 
 			; keep the choices in variable
 			this.par_choices := p_Choices
@@ -1884,6 +1889,12 @@ class ElementSettings
 			{
 				tempAllChoices .= "|" TempOneChoice
 			}
+			if (tempAllChoices = "")
+			{
+				; list should be empty
+				tempAllChoices := "|"
+			}
+
 
 			; keep the choices in variable
 			this.par_choices := p_Choices

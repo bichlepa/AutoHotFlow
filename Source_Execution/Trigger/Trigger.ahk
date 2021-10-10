@@ -82,6 +82,8 @@ enableOneTrigger(p_FlowID, p_ElementID, p_save = true)
 justEnableOneTrigger(p_FlowID, p_ElementID)
 {
 	_EnterCriticalSection()
+
+	triggerProperties := _getElementFromState(p_FlowID, p_ElementID)
 	
 	; add the current trigger to the list of all enabled triggers
 
@@ -90,14 +92,14 @@ justEnableOneTrigger(p_FlowID, p_ElementID)
 	newEnabledTrigger.id := "enabledTrigger" ++EnabledTriggerIDCounter
 	newEnabledTrigger.flowID := p_FlowID
 	newEnabledTrigger.ElementID := p_ElementID
-	newEnabledTrigger.Pars := _getElementProperty(p_FlowID, p_ElementID, "Pars")
+	newEnabledTrigger.Pars := triggerProperties.Pars
 	newEnabledTrigger.variables := []
 	newEnabledTrigger.triggerValues := []
 	
 	_setTrigger(newEnabledTrigger.id, newEnabledTrigger)
 	
 	; call the element function to enable the trigger
-	tempElementClass := _getElementProperty(p_FlowID, p_ElementID, "class")
+	tempElementClass := triggerProperties.class
 	environment := {flowID: newEnabledTrigger.FlowID, elementID: newEnabledTrigger.elementID, triggerID: newEnabledTrigger.id}
 	
 	_LeaveCriticalSection()

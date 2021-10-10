@@ -141,6 +141,7 @@
         "Set_Flow_Status.ahk",
         "Execute_Flow.ahk",
         "Stop_Flow.ahk",
+        "Set_element_parameter.ahk",
 
         "AutoHotkey_script.ahk",
         "Trace_Point.ahk",

@@ -242,6 +242,11 @@ x_GetListOfFlowIDs()
 }
 
 
+x_getAllElementIDs(p_FlowID)
+{
+	return xx_getAllElementIDs(p_FlowID)
+}
+
 x_getAllElementIDsOfType(p_FlowID, p_Type)
 {
 	return xx_getAllElementIDsOfType(p_FlowID, p_Type)
@@ -255,6 +260,14 @@ x_getAllElementIDsOfClass(p_FlowID, p_Class)
 x_getElementPars(p_FlowID, p_ElementID)
 {
 	return xx_getElementPars(p_FlowID, p_ElementID)
+}
+x_getElementParsDetails(p_FlowID, p_ElementID)
+{
+	return xx_getElementParsDetails(p_FlowID, p_ElementID)
+}
+x_setElementPar(p_FlowID, p_ElementID, p_ParameterID, p_newValue)
+{
+	return xx_setElementPar(p_FlowID, p_ElementID, p_ParameterID, p_newValue)
 }
 x_getElementName(p_FlowID, p_ElementID)
 {

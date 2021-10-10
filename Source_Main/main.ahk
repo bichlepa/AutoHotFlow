@@ -277,6 +277,7 @@ global_libInclusionsForThreads =
 #include source_Elements\Default\actions\Set_Flow_Status.ahk
 #include source_Elements\Default\actions\Execute_Flow.ahk
 #include source_Elements\Default\actions\Stop_Flow.ahk
+#include source_Elements\Default\actions\Set_element_parameter.ahk
 #include source_Elements\Default\actions\AutoHotkey_script.ahk
 #include source_Elements\Default\actions\Trace_Point.ahk
 #include source_Elements\Default\actions\Trace_Point_Check.ahk
@@ -427,6 +428,7 @@ global_elementInclusionsForThreads =
 #include source_Elements\Default\actions\Set_Flow_Status.ahk
 #include source_Elements\Default\actions\Execute_Flow.ahk
 #include source_Elements\Default\actions\Stop_Flow.ahk
+#include source_Elements\Default\actions\Set_element_parameter.ahk
 #include source_Elements\Default\actions\AutoHotkey_script.ahk
 #include source_Elements\Default\actions\Trace_Point.ahk
 #include source_Elements\Default\actions\Trace_Point_Check.ahk

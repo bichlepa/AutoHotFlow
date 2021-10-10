@@ -111,12 +111,8 @@ Element_SetClass(p_FlowID, p_ElementID, p_elementClass)
 	;Set new parameter Defaults
 	Element_setParameterDefaults(p_FlowID, p_elementID)
 	
-	; Set the default element name (if default name is enabled)
-	if (_getElementProperty(p_FlowID, p_elementID, "StandardName"))
-	{
-		newName := Element_GenerateName_%p_elementClass%({flowID: p_FlowID, elementID: p_ElementID}, _getElementProperty(p_FlowID, p_ElementID, "pars"))
-		_setElementProperty(p_FlowID, p_elementID, "name", newName)
-	}
+	; update the name
+	Element_updateName(p_FlowID, p_ElementID)
 	
 	;If element is of class trigger_manual: Set the trigger as default if no other is already default
 	if (p_elementClass = "trigger_manual" and Element_findDefaultTrigger(p_FlowID) = "")
@@ -124,6 +120,21 @@ Element_SetClass(p_FlowID, p_ElementID, p_elementClass)
 		Element_setDefaultTrigger(p_FlowID, p_elementID)
 	}
 
+	_LeaveCriticalSection()
+}
+
+; update the name of an element
+Element_updateName(p_FlowID, p_ElementID)
+{
+	_EnterCriticalSection() ; enter this critical section to ensure data integrity
+	elementClass := _getElementProperty(p_FlowID, p_elementID, "class")
+
+	; Set the default element name (if default name is enabled)
+	if (_getElementProperty(p_FlowID, p_elementID, "StandardName"))
+	{
+		newName := Element_GenerateName_%elementClass%({flowID: p_FlowID, elementID: p_ElementID}, _getElementProperty(p_FlowID, p_ElementID, "pars"))
+		_setElementProperty(p_FlowID, p_elementID, "name", newName)
+	}
 	_LeaveCriticalSection()
 }
 
