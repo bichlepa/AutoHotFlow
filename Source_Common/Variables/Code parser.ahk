@@ -534,8 +534,8 @@ class class_parser
 					{
 						; the token type is name or number. We can add it as a path part
 						this.token.type := "var"
-						this.next()
 						path.push({type: "str", value: this.token.value})
+						this.next()
 					}
 					else if (!percentIsEnd and this.token.value="%")
 					{
