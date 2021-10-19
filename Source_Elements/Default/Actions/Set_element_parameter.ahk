@@ -69,13 +69,12 @@ Element_getParametrizationDetails_Action_Set_element_parameter(Environment)
 	parametersToEdit.push({type: "Checkbox", id: "newParameterValueCheckboxGray", default: 0, gray: true, label: lang("Label")})
 	parametersToEdit.push({type: "DropDown", id: "newParameterValueDropDown", default: "", choices: [""], result: "enum", enum: [""]})
 	parametersToEdit.push({type: "DropDown", id: "newParameterValueComboBox", default: "", choices: [""], result: "enum", enum: [""]})
-	parametersToEdit.push({type: "multilineEdit", id: "newParameterValueMultilineEdit", default: "", type: "string"})
+	parametersToEdit.push({type: "multilineEdit", id: "newParameterValueMultilineEdit", default: "",  content: ["rawString", "string"], contentID: "newParameterValueMultilineEditContent", contentDefault: "rawString"})
 	parametersToEdit.push({type: "DropDown", id: "newParameterValueListBox", default: "", choices: [""], result: "enum", enum: [""]})
 	parametersToEdit.push({type: "File", id: "newParameterValueFile", label: lang("Select a file")})
 	parametersToEdit.push({type: "Folder", id: "newParameterValueFolder", label: lang("Select a folder")})
 	parametersToEdit.push({type: "Weekdays", id: "newParameterValueWeekdays"})
-	parametersToEdit.push({type: "dateAndTime", id: "newParameterValueDateAndTime"})
-	
+	parametersToEdit.push({type: "dateAndTime", id: "newParameterValueDateAndTime", format: "datetime"})
 	
 	return parametersToEdit
 }
@@ -83,7 +82,23 @@ Element_getParametrizationDetails_Action_Set_element_parameter(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Set_element_parameter(Environment, ElementParameters)
 {
-	return lang("Set element parameter") 
+	if (ElementParameters.ThisFlow)
+	{
+		flowText := x_lang("This flow")
+	}
+	Else
+	{
+		flowText :=  x_lang("Flow '%1%'", ElementParameters.flowID)
+	}
+	elementText := x_lang("Element '%1%'", ElementParameters.elementID)
+	
+	parameterIDSplit := StrSplit(ElementParameters.ParameterID, "/", , 2)
+	controlID := parameterIDSplit[1]
+	parameterIDonly := parameterIDSplit[2]
+	parameterText := x_lang("'%1%'", parameterIDonly)
+	valueText := x_lang("'%1%'", ElementParameters[controlID])
+
+	return lang("Set element parameter") " - " parameterText " = " valueText " - " elementText " - " flowText
 }
 
 ;Called every time the user changes any parameter.
@@ -103,6 +118,7 @@ Element_CheckSettings_Action_Set_element_parameter(Environment, ElementParameter
 		flowID :=  x_GetMyFlowID(Environment)
 	}
 
+	; if flow is changed, we need to update the list of available elements
 	if (ThisFlow != staticValues.oldParThisFlow)
 	{
 		if (ThisFlow)
@@ -136,6 +152,7 @@ Element_CheckSettings_Action_Set_element_parameter(Environment, ElementParameter
 		}
 	}
 
+	; if flow or element was changed, we need to update the available parameters
 	if (staticValues.oldParFlowID != flowID or staticValues.oldParThisFlow != ThisFlow or elementID != staticValues.oldParelementID)
 	{
 		; get all Elements
@@ -334,6 +351,7 @@ Element_CheckSettings_Action_Set_element_parameter(Environment, ElementParameter
 		ParameterID := toChooseParameterID
 	}
 
+	; if flow or element or parameter was changed, we need to find out which control has tu be activated and (if applicable) update the choices
 	if (staticValues.oldParFlowID != flowID or staticValues.oldParThisFlow != ThisFlow or elementID != staticValues.oldParelementID or ParameterID != staticValues.oldParParameterID)
 	{
 		; enable the required control
@@ -341,7 +359,7 @@ Element_CheckSettings_Action_Set_element_parameter(Environment, ElementParameter
 			; the value EvaluatedParameters.parameterID contains the control which contains the new value and the ID of the parameter in the target element
 			parameterIDSplit := StrSplit(ParameterID, "/", , 2)
 			controlID := parameterIDSplit[1]
-			parameterID := parameterIDSplit[2]
+			parameterIDonly := parameterIDSplit[2]
 
 			allControls := []
 			allControls.push("newParameterValueEdit")
@@ -364,7 +382,7 @@ Element_CheckSettings_Action_Set_element_parameter(Environment, ElementParameter
 			; find the entry in allPars
 			for oneIndex, onePars in allPars
 			{
-				if (onePars.id = parameterID)
+				if (onePars.id = parameterIDonly)
 				{
 					if (onePars.choices)
 					{
@@ -372,6 +390,7 @@ Element_CheckSettings_Action_Set_element_parameter(Environment, ElementParameter
 					}
 				}
 			}
+			x_Par_SetValue(controlID, ElementParameters[controlID])
 		}
 	}
 	staticValues.oldParThisFlow := ThisFlow
