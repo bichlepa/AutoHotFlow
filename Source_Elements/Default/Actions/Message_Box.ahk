@@ -155,11 +155,11 @@ Element_run_Action_Message_Box(Environment, ElementParameters)
 		EndTime := A_TickCount
 		
 		if (EvaluatedParameters.Unit = "Seconds") ;Seconds
-			EndTime += TimeoutUnits * 1000
+			EndTime += EvaluatedParameters.TimeoutUnits * 1000
 		else if (EvaluatedParameters.Unit = "Minutes") ;minutes
-			EndTime += TimeoutUnits * 60000
+			EndTime += EvaluatedParameters.TimeoutUnits * 60000
 		else if (EvaluatedParameters.Unit = "Hours") ;minutes
-			EndTime += TimeoutUnits * 60000 * 60
+			EndTime += EvaluatedParameters.TimeoutUnits * 60000 * 60
 		
 		; save end time to a execution variable, so we can use it later.
 		x_SetExecutionValue(Environment, "EndTime", EndTime)
