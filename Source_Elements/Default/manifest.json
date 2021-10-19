@@ -138,6 +138,7 @@
         "Suspend_Computer.ahk",
 
         "Sleep.ahk",
+        "Do_nothing.ahk",
         "Set_Flow_Status.ahk",
         "Execute_Flow.ahk",
         "Stop_Flow.ahk",
@@ -168,6 +169,7 @@
 
         "Process_Is_Running.ahk",
         
+        "Do_nothing.ahk",
         "Flow_Enabled.ahk",
         "Flow_Running.ahk"
 

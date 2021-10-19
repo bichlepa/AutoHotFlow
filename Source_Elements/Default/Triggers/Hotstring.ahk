@@ -218,7 +218,8 @@ Element_enable_Trigger_Hotstring(Environment, ElementParameters)
 ;Here you can for example define the variables which are provided by the triggers.
 Element_postTrigger_Trigger_Hotstring(Environment, ElementParameters, TriggerData)
 {
-	x_SetVariable(Environment, "A_Hotkey", ElementParameters.hotkey, "thread")
+	x_SetVariable(Environment, "A_EndChar", TriggerData.endChar, "thread")
+	x_SetVariable(Environment, "A_Hotstring", ElementParameters.hotstring, "thread")
 }
 
 
@@ -255,5 +256,5 @@ Trigger_Hotstring_Trigger(Environment, ElementParameters)
 	}
 
 	; trigger the trigger
-	x_trigger(Environment)
+	x_trigger(Environment, {endChar: A_EndChar})
 }

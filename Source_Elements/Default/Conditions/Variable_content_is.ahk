@@ -76,19 +76,19 @@ Element_GenerateName_Condition_Variable_content_is(Environment, ElementParameter
 		case "integer":
 		typeText := lang("Integer")
 		case "float":
-		typeText := lang("Float")
+		typeText := lang("Floating point number")
 		case "digit":
 		typeText := lang("Decimal digits")
 		case "xdigit":
 		typeText := lang("Hexadecimal digits")
 		case "alnum":
-		typeText := lang("Alphanumeric")
+		typeText := lang("Alphanumeric string")
 		case "alpha":
-		typeText := lang("Aplphabetic")
+		typeText := lang("Alphabetic string")
 		case "upper":
-		typeText := lang("Upper")
+		typeText := lang("String with only uppercase characters")
 		case "lower":
-		typeText := lang("Lower")
+		typeText := lang("String with only lowercase characters")
 		case "space":
 		typeText := lang("Whitespaces")
 	}

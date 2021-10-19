@@ -189,13 +189,21 @@ BuiltInVariable_Get(Environment, p_Name, p_hidden = False)
 		FormatTime, tempvalue, %a_Now%
 		return tempvalue
 	}
-	else if (p_Name = "a_lf" or p_Name = "a_linefeed")
+	else if (p_Name = "a_lf" or p_Name = "A_Linefeed")
 	{
 		return "`n"
 	}
-	else if (p_Name = "a_cr" or p_Name = "a_carriageReturn")
+	else if (p_Name = "a_cr" or p_Name = "A_CarriageReturn")
 	{
 		return "`r"
+	}
+	else if (p_Name = "a_vt" or p_Name = "A_VerticalTab")
+	{
+		return "`v"
+	}
+	else if (p_Name = "a_ff" or p_Name = "A_Formfeed")
+	{
+		return "`f"
 	}
 	;~ else if (p_Name="a_CPULoad")
 	;~ {

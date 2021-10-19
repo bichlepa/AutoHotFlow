@@ -274,6 +274,7 @@ global_libInclusionsForThreads =
 #include source_Elements\Default\actions\Hibernate_Computer.ahk
 #include source_Elements\Default\actions\Suspend_Computer.ahk
 #include source_Elements\Default\actions\Sleep.ahk
+#include source_Elements\Default\actions\Do_nothing.ahk
 #include source_Elements\Default\actions\Set_Flow_Status.ahk
 #include source_Elements\Default\actions\Execute_Flow.ahk
 #include source_Elements\Default\actions\Stop_Flow.ahk
@@ -295,6 +296,7 @@ global_libInclusionsForThreads =
 #include source_Elements\Default\conditions\Window_Active.ahk
 #include source_Elements\Default\conditions\Window_Exists.ahk
 #include source_Elements\Default\conditions\Process_Is_Running.ahk
+#include source_Elements\Default\conditions\Do_nothing.ahk
 #include source_Elements\Default\conditions\Flow_Enabled.ahk
 #include source_Elements\Default\conditions\Flow_Running.ahk
 #include source_Elements\Default\loops\SimpleLoop.ahk
@@ -425,6 +427,7 @@ global_elementInclusionsForThreads =
 #include source_Elements\Default\actions\Hibernate_Computer.ahk
 #include source_Elements\Default\actions\Suspend_Computer.ahk
 #include source_Elements\Default\actions\Sleep.ahk
+#include source_Elements\Default\actions\Do_nothing.ahk
 #include source_Elements\Default\actions\Set_Flow_Status.ahk
 #include source_Elements\Default\actions\Execute_Flow.ahk
 #include source_Elements\Default\actions\Stop_Flow.ahk
@@ -446,6 +449,7 @@ global_elementInclusionsForThreads =
 #include source_Elements\Default\conditions\Window_Active.ahk
 #include source_Elements\Default\conditions\Window_Exists.ahk
 #include source_Elements\Default\conditions\Process_Is_Running.ahk
+#include source_Elements\Default\conditions\Do_nothing.ahk
 #include source_Elements\Default\conditions\Flow_Enabled.ahk
 #include source_Elements\Default\conditions\Flow_Running.ahk
 #include source_Elements\Default\loops\SimpleLoop.ahk
