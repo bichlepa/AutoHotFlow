@@ -260,6 +260,7 @@
       "package": "default",
       "pars": {
         "expression": "String",
+        "onlyIfNotExist": "",
         "Varname": "static_trigger1",
         "VarValue": "0"
       },
@@ -292,6 +293,7 @@
       "package": "default",
       "pars": {
         "expression": "String",
+        "onlyIfNotExist": "",
         "Varname": "static_trigger2",
         "VarValue": "0"
       },
@@ -307,6 +309,7 @@
       "package": "default",
       "pars": {
         "expression": "String",
+        "onlyIfNotExist": "",
         "Varname": "static_trigger3",
         "VarValue": "0"
       },
@@ -322,6 +325,7 @@
       "package": "default",
       "pars": {
         "expression": "String",
+        "onlyIfNotExist": "",
         "Varname": "static_trigger4",
         "VarValue": "0"
       },
@@ -379,6 +383,7 @@
       "package": "default",
       "pars": {
         "expression": "String",
+        "onlyIfNotExist": "",
         "Varname": "static_trigger1",
         "VarValue": "1"
       },
@@ -465,6 +470,7 @@
       "package": "default",
       "pars": {
         "expression": "String",
+        "onlyIfNotExist": "",
         "Varname": "static_trigger2",
         "VarValue": "1"
       },
@@ -599,6 +605,7 @@
       "package": "default",
       "pars": {
         "expression": "String",
+        "onlyIfNotExist": "",
         "Varname": "static_trigger3",
         "VarValue": "1"
       },

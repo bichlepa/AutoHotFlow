@@ -1,4 +1,4 @@
-﻿{
+{
   "allConnections": {
     "connection0000000006": {
       "ConnectionType": "normal",
@@ -133,7 +133,7 @@
       "DefaultTrigger": "1",
       "enabled": "1",
       "ID": "element0000000001",
-      "name": "Manual\n\"Trigger happy leg\"",
+      "name": "Manual - \"Trigger happy leg\"",
       "package": "default",
       "pars": {
         "ID": "Trigger happy leg"
@@ -165,6 +165,7 @@
       "package": "default",
       "pars": {
         "expression": "Expression",
+        "onlyIfNotExist": "",
         "Varname": "static_shortcutSuccess_remove",
         "VarValue": "1"
       },
@@ -176,7 +177,7 @@
     "element0000000004": {
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000004",
-      "name": "Set flow status - Disable: This flow - Shortcut - %A_Desktop%\\Flow Trigger test.lnk",
+      "name": "Set flow status - Disable: This flow - Shortcut - %A_Desktop%\\Flow Trigger test remove.lnk",
       "package": "default",
       "pars": {
         "Enable": "Disable",
@@ -210,6 +211,7 @@
       "package": "default",
       "pars": {
         "expression": "String",
+        "onlyIfNotExist": "",
         "Varname": "static_shortcutSuccess_keep",
         "VarValue": "0"
       },
@@ -236,7 +238,7 @@
     "element0000000014": {
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000014",
-      "name": "Set flow status - Disable: This flow - Shortcut - %A_Desktop%\\Flow Trigger test 2.lnk",
+      "name": "Set flow status - Disable: This flow - Shortcut - %A_Desktop%\\Flow Trigger test keep.lnk",
       "package": "default",
       "pars": {
         "Enable": "Disable",
@@ -284,6 +286,7 @@
       "package": "default",
       "pars": {
         "expression": "Expression",
+        "onlyIfNotExist": "",
         "Varname": "static_shortcutSuccess_keep",
         "VarValue": "1"
       },
@@ -299,6 +302,7 @@
       "package": "default",
       "pars": {
         "expression": "String",
+        "onlyIfNotExist": "",
         "Varname": "static_shortcutSuccess_remove",
         "VarValue": "0"
       },

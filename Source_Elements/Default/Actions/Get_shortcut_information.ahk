@@ -103,7 +103,7 @@ Element_run_Action_Get_shortcut_information(Environment, ElementParameters)
 	}
 
 	; read shortcut informations
-	FileGetShortcut, % EvaluatedParameters.shortcutFile, OutTarget, OutDir, OutArgs, OutDesc, OutIcon, OutIconNum, OutRunState
+	FileGetShortcut, % EvaluatedParameters.shortcutFile, OutTarget, OutDir, OutArgs, OutDescription, OutIcon, OutIconNum, OutRunState
 
 	; check for errors
 	if (ErrorLevel)
@@ -116,7 +116,7 @@ Element_run_Action_Get_shortcut_information(Environment, ElementParameters)
 	x_SetVariable(Environment, EvaluatedParameters.OutTarget, OutTarget)
 	x_SetVariable(Environment, EvaluatedParameters.OutDir, OutDir)
 	x_SetVariable(Environment, EvaluatedParameters.OutArgs, OutArgs)
-	x_SetVariable(Environment, EvaluatedParameters.OutDesc, OutDesc)
+	x_SetVariable(Environment, EvaluatedParameters.OutDescription, OutDescription)
 	x_SetVariable(Environment, EvaluatedParameters.OutIcon, OutIcon)
 	x_SetVariable(Environment, EvaluatedParameters.OutIconNum, OutIconNum)
 

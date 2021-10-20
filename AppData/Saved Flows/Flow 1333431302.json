@@ -295,6 +295,7 @@
       "package": "default",
       "pars": {
         "expression": "String",
+        "onlyIfNotExist": "",
         "Varname": "static_trigger1",
         "VarValue": "0"
       },
@@ -407,7 +408,7 @@
       "class": "Trigger_User_Idle_Time",
       "enabled": "0",
       "ID": "element0000000029",
-      "name": "User idle time - 1.0\/60\/60*10 h #Hours",
+      "name": "User idle time - 1.0\/60\/60*10 h",
       "package": "default",
       "pars": {
         "Interval": "1.0\/60\/60*10",
@@ -422,7 +423,7 @@
     "element0000000030": {
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000030",
-      "name": "Set flow status - Disable: This flow - User idle time - 1.0\/60\/60*10 h #Hours",
+      "name": "Set flow status - Disable: This flow - User idle time - 1.0\/60\/60*10 h",
       "package": "default",
       "pars": {
         "Enable": "Disable",
@@ -458,6 +459,7 @@
       "package": "default",
       "pars": {
         "expression": "String",
+        "onlyIfNotExist": "",
         "Varname": "static_trigger2",
         "VarValue": "0"
       },
@@ -473,6 +475,7 @@
       "package": "default",
       "pars": {
         "expression": "String",
+        "onlyIfNotExist": "",
         "Varname": "static_trigger3",
         "VarValue": "0"
       },
@@ -488,6 +491,7 @@
       "package": "default",
       "pars": {
         "expression": "String",
+        "onlyIfNotExist": "",
         "Varname": "static_trigger4",
         "VarValue": "0"
       },
@@ -503,6 +507,7 @@
       "package": "default",
       "pars": {
         "expression": "String",
+        "onlyIfNotExist": "",
         "Varname": "static_trigger1",
         "VarValue": "1"
       },
@@ -518,6 +523,7 @@
       "package": "default",
       "pars": {
         "expression": "String",
+        "onlyIfNotExist": "",
         "Varname": "static_trigger2",
         "VarValue": "1"
       },
@@ -533,6 +539,7 @@
       "package": "default",
       "pars": {
         "expression": "String",
+        "onlyIfNotExist": "",
         "Varname": "static_trigger3",
         "VarValue": "1"
       },
@@ -548,6 +555,7 @@
       "package": "default",
       "pars": {
         "expression": "String",
+        "onlyIfNotExist": "",
         "Varname": "static_trigger4",
         "VarValue": "1"
       },
@@ -658,6 +666,7 @@
       "package": "default",
       "pars": {
         "expression": "String",
+        "onlyIfNotExist": "",
         "Varname": "static_trigger2",
         "VarValue": "0"
       },

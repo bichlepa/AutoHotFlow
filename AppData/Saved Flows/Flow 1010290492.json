@@ -66,6 +66,7 @@
       "package": "default",
       "pars": {
         "expression": "string",
+        "onlyIfNotExist": "",
         "Varname": "NewVariable",
         "VarValue": "New element"
       },
@@ -107,6 +108,7 @@
       "package": "default",
       "pars": {
         "expression": "Expression",
+        "onlyIfNotExist": "",
         "Varname": "NewVariable",
         "VarValue": ""
       },
@@ -151,17 +153,30 @@
       },
       "StandardName": "1",
       "type": "Action",
-      "x": "175",
-      "y": "1330"
+      "x": "105",
+      "y": "1365"
+    },
+    "element0000000016": {
+      "class": "Action_Do_nothing",
+      "ID": "element0000000016",
+      "name": "Test condition \"Variable is empty\"",
+      "package": "Default",
+      "pars": {
+        "executionResult": "Normal"
+      },
+      "StandardName": "0",
+      "type": "action",
+      "x": "-140",
+      "y": "525"
     }
   },
   "category": "Automatic tests",
-  "ElementIDCounter": "15",
+  "ElementIDCounter": "18",
   "flowSettings": {
     "DefaultWorkingDir": 1,
     "ExecutionPolicy": "default",
-    "Offsetx": -200,
-    "Offsety": -200,
+    "Offsetx": "-1235.714286",
+    "Offsety": "178.571429",
     "WorkingDir": "",
     "zoomFactor": "0.7"
   },

@@ -1,4 +1,4 @@
-﻿{
+{
   "allConnections": {
     "connection0000000015": {
       "ConnectionType": "normal",
@@ -537,6 +537,7 @@
       "package": "default",
       "pars": {
         "expression": "Expression",
+        "onlyIfNotExist": "",
         "Varname": "myIndex",
         "VarValue": "0"
       },
@@ -552,6 +553,7 @@
       "package": "default",
       "pars": {
         "expression": "Expression",
+        "onlyIfNotExist": "",
         "Varname": "myIndex",
         "VarValue": "myIndex + 1"
       },
@@ -778,6 +780,7 @@
       "package": "default",
       "pars": {
         "expression": "Expression",
+        "onlyIfNotExist": "",
         "Varname": "failed",
         "VarValue": "1"
       },
@@ -793,6 +796,7 @@
       "package": "default",
       "pars": {
         "expression": "Expression",
+        "onlyIfNotExist": "",
         "Varname": "failed",
         "VarValue": "0"
       },

@@ -103,7 +103,7 @@ Element_run_Condition_Window_Exists(Environment, ElementParameters)
 		x_finish(Environment, "exception", windowID.exception)
 		return
 	}
-
+	
 	if not windowID
 	{
 		; window does not exist. Finish

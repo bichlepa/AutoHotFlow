@@ -1,4 +1,4 @@
-﻿{
+{
   "allConnections": {
     "connection0000000003": {
       "ConnectionType": "normal",
@@ -158,6 +158,7 @@
       "package": "default",
       "pars": {
         "expression": "string",
+        "onlyIfNotExist": "",
         "Varname": "counter",
         "VarValue": "1"
       },

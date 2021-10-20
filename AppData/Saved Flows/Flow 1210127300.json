@@ -1,4 +1,4 @@
-﻿{
+{
   "allConnections": {
     "connection0000000057": {
       "ConnectionType": "normal",
@@ -1253,6 +1253,7 @@
       "package": "default",
       "pars": {
         "expression": "Expression",
+        "onlyIfNotExist": "",
         "Varname": "countShuffleTries",
         "VarValue": "countShuffleTries + 1"
       },
@@ -1268,6 +1269,7 @@
       "package": "default",
       "pars": {
         "expression": "Expression",
+        "onlyIfNotExist": "",
         "Varname": "countShuffleTries",
         "VarValue": "0"
       },

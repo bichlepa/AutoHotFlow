@@ -181,7 +181,7 @@ BuiltInVariable_Get(Environment, p_Name, p_hidden = False)
 	}
 	else if (p_Name = "a_workingdir")
 	{
-		tempvalue := _getSettings("WorkingDir")
+		tempvalue := x_GetWorkingDir(Environment)
 		return tempvalue
 	}
 	else if (p_Name = "a_NowString")

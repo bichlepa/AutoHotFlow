@@ -1,4 +1,4 @@
-﻿{
+{
   "allConnections": {
     "connection0000000011": {
       "ConnectionType": "normal",
@@ -842,6 +842,7 @@
       "package": "default",
       "pars": {
         "expression": "String",
+        "onlyIfNotExist": "",
         "Varname": "NewVariable",
         "VarValue": "-5"
       },
@@ -925,6 +926,7 @@
       "package": "default",
       "pars": {
         "expression": "String",
+        "onlyIfNotExist": "",
         "Varname": "NewVariable",
         "VarValue": "aegasdf"
       },
@@ -972,6 +974,7 @@
       "package": "default",
       "pars": {
         "expression": "String",
+        "onlyIfNotExist": "",
         "Varname": "static_successfulRuns",
         "VarValue": "0"
       },
@@ -1000,6 +1003,7 @@
       "package": "default",
       "pars": {
         "expression": "Expression",
+        "onlyIfNotExist": "",
         "Varname": "requiredSuccessfulRuns",
         "VarValue": "7"
       },
@@ -1086,6 +1090,7 @@
       "package": "default",
       "pars": {
         "expression": "Expression",
+        "onlyIfNotExist": "",
         "Varname": "static_successfulRuns",
         "VarValue": "static_successfulRuns + 1"
       },
@@ -1406,6 +1411,7 @@
       "package": "default",
       "pars": {
         "expression": "Expression",
+        "onlyIfNotExist": "",
         "Varname": "maxValueFound",
         "VarValue": "1"
       },
@@ -1421,6 +1427,7 @@
       "package": "default",
       "pars": {
         "expression": "Expression",
+        "onlyIfNotExist": "",
         "Varname": "minValueFound",
         "VarValue": "1"
       },
@@ -1462,6 +1469,7 @@
       "package": "default",
       "pars": {
         "expression": "Expression",
+        "onlyIfNotExist": "",
         "Varname": "static_successfulRuns",
         "VarValue": "static_successfulRuns + 1"
       },
@@ -1573,6 +1581,7 @@
       "package": "default",
       "pars": {
         "expression": "Expression",
+        "onlyIfNotExist": "",
         "Varname": "static_successfulRuns",
         "VarValue": "static_successfulRuns + 1"
       },
@@ -1636,6 +1645,7 @@
       "package": "default",
       "pars": {
         "expression": "Expression",
+        "onlyIfNotExist": "",
         "Varname": "static_successfulRuns",
         "VarValue": "static_successfulRuns + 1"
       },
@@ -1793,6 +1803,7 @@
       "package": "default",
       "pars": {
         "expression": "Expression",
+        "onlyIfNotExist": "",
         "Varname": "pi",
         "VarValue": "3.141592653589793"
       },
@@ -1872,6 +1883,7 @@
       "package": "default",
       "pars": {
         "expression": "Expression",
+        "onlyIfNotExist": "",
         "Varname": "static_successfulRuns",
         "VarValue": "static_successfulRuns + 1"
       },
@@ -2047,6 +2059,7 @@
       "package": "default",
       "pars": {
         "expression": "Expression",
+        "onlyIfNotExist": "",
         "Varname": "static_successfulRuns",
         "VarValue": "static_successfulRuns + 1"
       },
@@ -2391,6 +2404,7 @@
       "package": "default",
       "pars": {
         "expression": "Expression",
+        "onlyIfNotExist": "",
         "Varname": "static_successfulRuns",
         "VarValue": "static_successfulRuns + 1"
       },

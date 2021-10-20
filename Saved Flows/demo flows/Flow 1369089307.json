@@ -146,6 +146,75 @@
       "ID": "connection0000000049",
       "to": "element0000000048",
       "type": "Connection"
+    },
+    "connection0000000065": {
+      "ConnectionType": "normal",
+      "from": "element0000000064",
+      "ID": "connection0000000065",
+      "to": "element0000000058",
+      "toPart": "HEAD",
+      "type": "Connection"
+    },
+    "connection0000000068": {
+      "ConnectionType": "normal",
+      "from": "element0000000058",
+      "fromPart": "TAIL",
+      "ID": "connection0000000068",
+      "to": "element0000000067",
+      "type": "Connection"
+    },
+    "connection0000000079": {
+      "ConnectionType": "normal",
+      "from": "element0000000076",
+      "fromPart": "HEAD",
+      "ID": "connection0000000079",
+      "to": "element0000000077",
+      "type": "Connection"
+    },
+    "connection0000000080": {
+      "ConnectionType": "Yes",
+      "from": "element0000000077",
+      "ID": "connection0000000080",
+      "to": "element0000000076",
+      "toPart": "TAIL",
+      "type": "Connection"
+    },
+    "connection0000000081": {
+      "ConnectionType": "No",
+      "from": "element0000000077",
+      "ID": "connection0000000081",
+      "to": "element0000000078",
+      "type": "Connection"
+    },
+    "connection0000000082": {
+      "ConnectionType": "normal",
+      "from": "element0000000078",
+      "ID": "connection0000000082",
+      "to": "element0000000087",
+      "type": "Connection"
+    },
+    "connection0000000083": {
+      "ConnectionType": "normal",
+      "from": "element0000000071",
+      "ID": "connection0000000083",
+      "to": "element0000000076",
+      "toPart": "HEAD",
+      "type": "Connection"
+    },
+    "connection0000000089": {
+      "ConnectionType": "normal",
+      "from": "element0000000087",
+      "ID": "connection0000000089",
+      "to": "element0000000088",
+      "type": "Connection"
+    },
+    "connection0000000090": {
+      "ConnectionType": "Yes",
+      "from": "element0000000088",
+      "ID": "connection0000000090",
+      "to": "element0000000076",
+      "toPart": "HEAD",
+      "type": "Connection"
     }
   },
   "allElements": {
@@ -168,7 +237,7 @@
       "class": "Loop_SimpleLoop",
       "HeightOfVerticalBar": "560",
       "ID": "element0000000002",
-      "name": "Simple loop: Infinite loop",
+      "name": "Simple loop: Endless loop",
       "package": "default",
       "pars": {
         "Infinite": "1",
@@ -203,7 +272,7 @@
       "StandardName": "1",
       "type": "Condition",
       "x": "105",
-      "y": "560"
+      "y": "490"
     },
     "element0000000013": {
       "class": "Action_Message_Box",
@@ -228,12 +297,12 @@
       "StandardName": "1",
       "type": "Action",
       "x": "210",
-      "y": "770"
+      "y": "630"
     },
     "element0000000015": {
       "class": "Action_New_List",
       "ID": "element0000000015",
-      "name": "New list famousPeople - As first value - Multiple values 'Bill Gates - Tim Cook - Elon Musk'",
+      "name": "New list famousPeople - As first value - Multiple values 'Bill Gates - Steve Jobs - Elon Musk'",
       "package": "default",
       "pars": {
         "DelimiterComma": 0,
@@ -246,7 +315,7 @@
         "Position": "keyName",
         "Varname": "famousPeople",
         "VarValue": "New element",
-        "VarValues": "Bill Gates\nTim Cook\nElon Musk",
+        "VarValues": "Bill Gates\nSteve Jobs\nElon Musk",
         "WhichPosition": "First"
       },
       "StandardName": "1",
@@ -422,17 +491,309 @@
       "type": "Action",
       "x": "35",
       "y": "2730"
+    },
+    "element0000000050": {
+      "class": "Action_Do_nothing",
+      "ID": "element0000000050",
+      "name": "This is an endless loop.",
+      "package": "Default",
+      "pars": {
+        "executionResult": "Normal"
+      },
+      "StandardName": "0",
+      "type": "action",
+      "x": "-210",
+      "y": "350"
+    },
+    "element0000000051": {
+      "class": "Action_Do_nothing",
+      "ID": "element0000000051",
+      "name": "If the loop should continue with a new iteration, create a connection to the lower bar.",
+      "package": "Default",
+      "pars": {
+        "executionResult": "Normal"
+      },
+      "StandardName": "0",
+      "type": "action",
+      "x": "210",
+      "y": "910"
+    },
+    "element0000000052": {
+      "class": "Action_Do_nothing",
+      "ID": "element0000000052",
+      "name": "If the loop should end, create a connection to the \"break\" part of the lower bar",
+      "package": "Default",
+      "pars": {
+        "executionResult": "Normal"
+      },
+      "StandardName": "0",
+      "type": "action",
+      "x": "385",
+      "y": "910"
+    },
+    "element0000000053": {
+      "class": "Action_Do_nothing",
+      "ID": "element0000000053",
+      "name": "This loop iterates through all entries in a list",
+      "package": "Default",
+      "pars": {
+        "executionResult": "Normal"
+      },
+      "StandardName": "0",
+      "type": "action",
+      "x": "-175",
+      "y": "1470"
+    },
+    "element0000000054": {
+      "class": "Action_Do_nothing",
+      "ID": "element0000000054",
+      "name": "Wen can have a loop inside another loop.",
+      "package": "Default",
+      "pars": {
+        "executionResult": "Normal"
+      },
+      "StandardName": "0",
+      "type": "action",
+      "x": "385",
+      "y": "1785"
+    },
+    "element0000000056": {
+      "class": "Action_Do_nothing",
+      "ID": "element0000000056",
+      "name": "This loop is broken",
+      "package": "Default",
+      "pars": {
+        "executionResult": "Normal"
+      },
+      "StandardName": "0",
+      "type": "action",
+      "x": "1190",
+      "y": "1610"
+    },
+    "element0000000058": {
+      "class": "Loop_SimpleLoop",
+      "HeightOfVerticalBar": "210",
+      "ID": "element0000000058",
+      "name": "Simple loop: Endless loop",
+      "package": "default",
+      "pars": {
+        "Infinite": "1",
+        "repeatCount": 5
+      },
+      "StandardName": "1",
+      "type": "Loop",
+      "x": "980",
+      "y": "1750"
+    },
+    "element0000000064": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "0",
+      "enabled": "0",
+      "ID": "element0000000064",
+      "name": "Manual - \"Test broken loop 1\"",
+      "package": "default",
+      "pars": {
+        "ID": "Test broken loop 1"
+      },
+      "StandardName": "1",
+      "type": "Trigger",
+      "x": "980",
+      "y": "1575"
+    },
+    "element0000000067": {
+      "class": "Action_Do_nothing",
+      "ID": "element0000000067",
+      "name": "This element will never be reached.",
+      "package": "Default",
+      "pars": {
+        "executionResult": "Normal"
+      },
+      "StandardName": "0",
+      "type": "action",
+      "x": "980",
+      "y": "2205"
+    },
+    "element0000000069": {
+      "class": "Action_Do_nothing",
+      "ID": "element0000000069",
+      "name": "The loop does not have inner elements. Therefore the execution will stop.",
+      "package": "Default",
+      "pars": {
+        "executionResult": "Normal"
+      },
+      "StandardName": "0",
+      "type": "action",
+      "x": "1190",
+      "y": "1890"
+    },
+    "element0000000071": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "0",
+      "enabled": "0",
+      "ID": "element0000000071",
+      "name": "Manual - \"Test broken loop 2\"",
+      "package": "default",
+      "pars": {
+        "ID": "Test broken loop 2"
+      },
+      "StandardName": "1",
+      "type": "Trigger",
+      "x": "1610",
+      "y": "1540"
+    },
+    "element0000000072": {
+      "class": "Action_Do_nothing",
+      "ID": "element0000000072",
+      "name": "Please never leave a loop like this. However this will work in many cases.",
+      "package": "Default",
+      "pars": {
+        "executionResult": "Normal"
+      },
+      "StandardName": "0",
+      "type": "action",
+      "x": "1820",
+      "y": "2450"
+    },
+    "element0000000076": {
+      "class": "Loop_SimpleLoop",
+      "HeightOfVerticalBar": "560",
+      "ID": "element0000000076",
+      "name": "Simple loop: Endless loop",
+      "package": "default",
+      "pars": {
+        "Infinite": "1",
+        "repeatCount": 5
+      },
+      "StandardName": "1",
+      "type": "Loop",
+      "x": "1610",
+      "y": "1680"
+    },
+    "element0000000077": {
+      "class": "Condition_Confirmation_Dialog",
+      "ID": "element0000000077",
+      "name": "Confirmation dialog - Endless loop, You are in an endless loop at iteration %a_index%. Do you want to continue?",
+      "package": "default",
+      "pars": {
+        "ButtonLabelCancel": "Cancel",
+        "ButtonLabelNo": "No",
+        "ButtonLabelYes": "Yes",
+        "DefaultButton": "No",
+        "Height": 200,
+        "IfDismiss": "Exception",
+        "IsTimeout": 0,
+        "message": "You are in an endless loop at iteration %a_index%. Do you want to continue?",
+        "OnTimeout": "Exception",
+        "ShowCancelButton": 0,
+        "TimeoutUnits": 10,
+        "title": "Endless loop",
+        "Unit": "Seconds",
+        "Width": 300
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "1715",
+      "y": "1855"
+    },
+    "element0000000078": {
+      "class": "Action_Message_Box",
+      "ID": "element0000000078",
+      "name": "Message box - Endlees loop - In order to quit the endlees loop properly, we need to use the \"break\" part of the loop. But in this test we won't use the \"break\" part.",
+      "package": "default",
+      "pars": {
+        "ButtonLabel": "OK",
+        "ButtonLabelCancel": "Cancel",
+        "Height": 200,
+        "IfClose": "Exception",
+        "IfDismiss": "Exception",
+        "IsTimeout": "NoTimeout",
+        "message": "In order to quit the endlees loop properly, we need to use the \"break\" part of the loop. But in this test we won't use the \"break\" part.",
+        "OnTimeout": "Normal",
+        "ShowCancelButton": 0,
+        "TimeoutUnits": 10,
+        "title": "Endlees loop",
+        "Unit": "Seconds",
+        "Width": 300
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "1820",
+      "y": "2205"
+    },
+    "element0000000085": {
+      "class": "Action_Do_nothing",
+      "ID": "element0000000085",
+      "name": "But AHF will still think that you are inside the loop and provide loop variables like A_Index",
+      "package": "Default",
+      "pars": {
+        "executionResult": "Normal"
+      },
+      "StandardName": "0",
+      "type": "action",
+      "x": "1820",
+      "y": "2555"
+    },
+    "element0000000087": {
+      "class": "Action_Message_Box",
+      "ID": "element0000000087",
+      "name": "Message box - Endlees loop - AHF will still thinks that you are inside the loop and provides loop variables like A_Index: It is currently %a_index%",
+      "package": "default",
+      "pars": {
+        "ButtonLabel": "OK",
+        "ButtonLabelCancel": "Cancel",
+        "Height": 200,
+        "IfClose": "Exception",
+        "IfDismiss": "Exception",
+        "IsTimeout": "NoTimeout",
+        "message": "AHF will still thinks that you are inside the loop and provides loop variables like A_Index: It is currently %a_index%",
+        "OnTimeout": "Normal",
+        "ShowCancelButton": 0,
+        "TimeoutUnits": 10,
+        "title": "Endlees loop",
+        "Unit": "Seconds",
+        "Width": 300
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "1610",
+      "y": "2555"
+    },
+    "element0000000088": {
+      "class": "Condition_Confirmation_Dialog",
+      "ID": "element0000000088",
+      "name": "Confirmation dialog - Endless loop, Now if you enter the loop again, this becomes cursed. AHF will think that you use a loop inside another loop. If you do that very often, it will cause AHF to consume more and more RAM. - Do you want to try? - (You won't barely see any memory consumption in this example. But if you create a flow that will execute this thousands times with high speed without any dialogs, you might see the raising memory consumption and AHF might eventually crash.)",
+      "package": "default",
+      "pars": {
+        "ButtonLabelCancel": "Cancel",
+        "ButtonLabelNo": "No",
+        "ButtonLabelYes": "Yes",
+        "DefaultButton": "No",
+        "Height": 200,
+        "IfDismiss": "Exception",
+        "IsTimeout": 0,
+        "message": "Now if you enter the loop again, this becomes cursed. AHF will think that you use a loop inside another loop. If you do that very often, it will cause AHF to consume more and more RAM.\nDo you want to try?\n(You won't barely see any memory consumption in this example. But if you create a flow that will execute this thousands times with high speed without any dialogs, you might see the raising memory consumption and AHF might eventually crash.)",
+        "OnTimeout": "Exception",
+        "ShowCancelButton": 0,
+        "TimeoutUnits": 10,
+        "title": "Endless loop",
+        "Unit": "Seconds",
+        "Width": 300
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "1610",
+      "y": "2660"
     }
   },
   "category": "",
-  "ElementIDCounter": "49",
+  "ElementIDCounter": "90",
   "flowSettings": {
     "DefaultWorkingDir": 1,
     "ExecutionPolicy": "default",
-    "Offsetx": "-1135.041113",
-    "Offsety": "1653.326836",
+    "Offsetx": "-1126.404270",
+    "Offsety": "945.819535",
     "WorkingDir": "",
-    "zoomFactor": "0.525919"
+    "zoomFactor": "0.578511"
   },
   "name": "Loop tutorial"
 }
