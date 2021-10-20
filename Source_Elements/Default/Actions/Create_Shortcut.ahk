@@ -10,13 +10,13 @@ Element_getElementType_Action_Create_Shortcut()
 ;Name of the element
 Element_getName_Action_Create_Shortcut()
 {
-	return lang("Create shortcut")
+	return x_lang("Create shortcut")
 }
 
 ;Category of the element
 Element_getCategory_Action_Create_Shortcut()
 {
-	return lang("File")
+	return x_lang("File")
 }
 
 ;This function returns the package of the element.
@@ -53,19 +53,19 @@ Element_getParametrizationDetails_Action_Create_Shortcut(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: lang("Shortcut path")})
-	parametersToEdit.push({type: "File", id: "shortcutFile", default: "shortcut.lnk", label: lang("Select a shortcut file"), filter: x_lang("Shortcut file") " (*.lnk)", options: 32, warnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: x_lang("Shortcut path")})
+	parametersToEdit.push({type: "File", id: "shortcutFile", default: "shortcut.lnk", label: x_lang("Select a shortcut file"), filter: x_lang("Shortcut file") " (*.lnk)", options: 32, warnIfEmpty: true})
 
-	parametersToEdit.push({type: "Label", label: lang("Target path")})
-	parametersToEdit.push({type: "File", id: "file", label: lang("Select a target file"), warnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: x_lang("Target path")})
+	parametersToEdit.push({type: "File", id: "file", label: x_lang("Select a target file"), warnIfEmpty: true})
 
-	parametersToEdit.push({type: "Label", label: lang("Target arguments")})
+	parametersToEdit.push({type: "Label", label: x_lang("Target arguments")})
 	parametersToEdit.push({type: "Edit", id: "runArguments", content: ["String", "RawString"], contentID: "ToRunContent", contentDefault: "string"})
 
 	parametersToEdit.push({type: "Label", label: x_lang("Working directory")})
 	parametersToEdit.push({type: "Folder", id: "WorkingDir", label: x_lang("Select a folder")})
 
-	parametersToEdit.push({type: "Label", label: lang("Description")})
+	parametersToEdit.push({type: "Label", label: x_lang("Description")})
 	parametersToEdit.push({type: "Edit", id: "description", content: "String"})
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Icon path")})
@@ -83,7 +83,7 @@ Element_getParametrizationDetails_Action_Create_Shortcut(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Create_Shortcut(Environment, ElementParameters)
 {
-	return lang("Create shortcut") " - " ElementParameters.shortcutFile " - " ElementParameters.file " " ElementParameters.runArguments
+	return x_lang("Create shortcut") " - " ElementParameters.shortcutFile " - " ElementParameters.file " " ElementParameters.runArguments
 }
 
 ;Called every time the user changes any parameter.

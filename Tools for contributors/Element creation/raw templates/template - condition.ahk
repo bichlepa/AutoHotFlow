@@ -10,13 +10,13 @@ Element_getElementType_&ElementType&_&Name&()
 ;Name of the element
 Element_getName_&ElementType&_&Name&()
 {
-	return lang("&Name_Readable&")
+	return x_lang("&Name_Readable&")
 }
 
 ;Category of the element
 Element_getCategory_&ElementType&_&Name&()
 {
-	return lang("&Category&")
+	return x_lang("&Category&")
 }
 
 ;This function returns the package of the element.
@@ -57,16 +57,16 @@ Element_getParametrizationDetails_&ElementType&_&Name&(Environment)
 	parametersToEdit:=Object()
 	
 #if par_label 
-	parametersToEdit.push({type: "Label", label: lang("My label")})
+	parametersToEdit.push({type: "Label", label: x_lang("My label")})
 #endif ;par_label
 #if par_radio 
-	parametersToEdit.push({type: "Radio", id: "radio", result: "number", default: 1, choices: [lang("Choice %1%", 1), lang("Choice %1%", 2), lang("Choice %1%", 3)]})
+	parametersToEdit.push({type: "Radio", id: "radio", result: "number", default: 1, choices: [x_lang("Choice %1%", 1), x_lang("Choice %1%", 2), x_lang("Choice %1%", 3)]})
 #endif ;par_radio
 #if par_radioEnum
-	parametersToEdit.push({type: "Radio", id: "radioEnum", result: "enum", default: "cat", choices: [lang("Cat"), lang("Dog"), lang("Bird")], enum: ["Cat", "Dog", "Bird"]})
+	parametersToEdit.push({type: "Radio", id: "radioEnum", result: "enum", default: "cat", choices: [x_lang("Cat"), x_lang("Dog"), x_lang("Bird")], enum: ["Cat", "Dog", "Bird"]})
 #endif ;par_radioEnum
 #if par_checkbox 
-	parametersToEdit.push({type: "Checkbox", id: "checkbox", default: 0, label: lang("Label")})
+	parametersToEdit.push({type: "Checkbox", id: "checkbox", default: 0, label: x_lang("Label")})
 #endif ;par_checkbox
 #if par_EditString 
 	parametersToEdit.push({type: "Edit", id: "editString", content: "String"})
@@ -99,13 +99,13 @@ Element_getParametrizationDetails_&ElementType&_&Name&(Environment)
 	parametersToEdit.push({type: "Slider", id: "Slider", default: 2, options: "Range0-100 tooltip"})
 #endif ;par_Slider
 #if par_file 
-	parametersToEdit.push({type: "File", id: "file", label: lang("Select a file")})
+	parametersToEdit.push({type: "File", id: "file", label: x_lang("Select a file")})
 #endif ;par_file
 #if par_folder
-	parametersToEdit.push({type: "Folder", id: "folder", label: lang("Select a folder")})
+	parametersToEdit.push({type: "Folder", id: "folder", label: x_lang("Select a folder")})
 #endif ;par_folder
 #if par_button
-	parametersToEdit.push({type: "button", id: "button", goto: "&ElementType&_&Name&_ButtonClick", label: lang("Click me")})
+	parametersToEdit.push({type: "button", id: "button", goto: "&ElementType&_&Name&_ButtonClick", label: x_lang("Click me")})
 #endif ;par_button
 	
 #if addWindowSelector
@@ -125,9 +125,9 @@ Element_GenerateName_&ElementType&_&Name&(Environment, ElementParameters)
 	; generate window identification name
 	nameString := windowFunctions_generateWindowIdentificationName(ElementParameters)
 	
-	return lang("&Name_Readable&") ": " nameString
+	return x_lang("&Name_Readable&") ": " nameString
 #else ;addWindowSelector
-	return lang("&Name_Readable&") 
+	return x_lang("&Name_Readable&") 
 #endif ;addWindowSelector
 }
 
@@ -174,13 +174,13 @@ Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 	if (evRes.error)
 	{
 		;On error, finish with exception and return
-		x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.editExpression) "`n`n" evRes.error) 
+		x_finish(Environment, "exception", x_lang("An error occured while parsing expression '%1%'", ElementParameters.editExpression) "`n`n" evRes.error) 
 		return
 	}
 	editExpressionValue := evRes.result
 	if editExpressionValue is not number
 	{
-		x_finish(Environment, "exception", lang("%1% is not a number: %2%",lang("Expression value"), editExpressionValue))
+		x_finish(Environment, "exception", x_lang("%1% is not a number: %2%",x_lang("Expression value"), editExpressionValue))
 		return
 	}
 #endif ;par_editExpression
@@ -192,7 +192,7 @@ Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 		if (evRes.error)
 		{
 			;On error, finish with exception and return
-			x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.editStringOrExpression) "`n`n" evRes.error) 
+			x_finish(Environment, "exception", x_lang("An error occured while parsing expression '%1%'", ElementParameters.editStringOrExpression) "`n`n" evRes.error) 
 			return
 		}
 		else
@@ -209,7 +209,7 @@ Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 	if not x_CheckVariableName(editVariableNameValue)
 	{
 		;On error, finish with exception and return
-		x_finish(Environment, "exception", lang("%1% is not valid.", lang("Ouput variable name '%1%'", editVariableName)))
+		x_finish(Environment, "exception", x_lang("%1% is not valid.", x_lang("Ouput variable name '%1%'", editVariableName)))
 		return
 	}
 #endif ;par_editVariableName
@@ -223,7 +223,7 @@ Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 	if (evRes.error)
 	{
 		;On error, finish with exception and return
-		x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.editTwoExpressions1) "`n`n" evRes.error) 
+		x_finish(Environment, "exception", x_lang("An error occured while parsing expression '%1%'", ElementParameters.editTwoExpressions1) "`n`n" evRes.error) 
 		return
 	}
 	editTwoExpressions1Value := evRes.result
@@ -231,7 +231,7 @@ Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 	if (evRes.error)
 	{
 		;On error, finish with exception and return
-		x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.editTwoExpressions2) "`n`n" evRes.error) 
+		x_finish(Environment, "exception", x_lang("An error occured while parsing expression '%1%'", ElementParameters.editTwoExpressions2) "`n`n" evRes.error) 
 		return
 	}
 	editTwoExpressions2Value := evRes.result
@@ -258,7 +258,7 @@ Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 	if (evRes.error)
 	{
 		;On error, finish with exception and return
-		x_finish(Environment, "exception", lang("An error occured while parsing expression '%1%'", ElementParameters.Slider) "`n`n" evRes.error) 
+		x_finish(Environment, "exception", x_lang("An error occured while parsing expression '%1%'", ElementParameters.Slider) "`n`n" evRes.error) 
 		return
 	}
 	SliderValue:=evRes.result
@@ -269,7 +269,7 @@ Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 	fileValue := x_GetFullPath(Environment, x_replaceVariables(Environment, ElementParameters.file))
 	if not FileExist(fileValue)
 	{
-		x_finish(Environment, "exception", lang("%1% '%2%' does not exist.",lang("File"), fileValue)) 
+		x_finish(Environment, "exception", x_lang("%1% '%2%' does not exist.",x_lang("File"), fileValue)) 
 		return
 	}
 #endif ;par_file
@@ -336,8 +336,8 @@ Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 #endif ;addCustomGUI
 
 #if addSeparateAhkThread
-	;Unfortunately we can't use the function lang() inside the exported code. But we can export them inside variables befor use.
-	inputVars := {header: lang("Hello"), message: lang("Input some text")}
+	;Unfortunately we can't use the function x_lang() inside the exported code. But we can export them inside variables befor use.
+	inputVars := {header: x_lang("Hello"), message: x_lang("Input some text")}
 	outputVars := ["enteredText"]
 	outputVars.push("resultmessage", "result") ;We use those variables to find out whether an error was found during execution 
 	code =
@@ -354,7 +354,7 @@ Element_run_&ElementType&_&Name&(Environment, ElementParameters)
 		}
 	)
 	;We want later to translate the text inside message. Add the text here inside comments, so the translation tool can find it.
-	;Translations: lang("User dismissed the dialog.")
+	;Translations: x_lang("User dismissed the dialog.")
 
 	;create a function object as callback for the other AHK thread
 	functionObject := x_NewFunctionObject(Environment, "&ElementType&_&Name&_FinishExecution", ElementParameters)

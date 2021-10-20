@@ -10,13 +10,13 @@ Element_getElementType_Condition_Variable_content_is()
 ;Name of the element
 Element_getName_Condition_Variable_content_is()
 {
-	return lang("Variable content is")
+	return x_lang("Variable content is")
 }
 
 ;Category of the element
 Element_getCategory_Condition_Variable_content_is()
 {
-	return lang("Variable")
+	return x_lang("Variable")
 }
 
 ;This function returns the package of the element.
@@ -53,11 +53,11 @@ Element_getParametrizationDetails_Condition_Variable_content_is(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: lang("Variable name or expression")})
+	parametersToEdit.push({type: "Label", label: x_lang("Variable name or expression")})
 	parametersToEdit.push({type: "Edit", id: "varname", default: "myVariable", content: ["VariableName", "Expression"], contentID: "varnameContent", contentDefault: "VariableName", WarnIfEmpty: true})
 
-	parametersToEdit.push({type: "Label", label: lang("Expected content type")})
-	parametersToEdit.push({type: "Radio", id: "variableContentType", result: "enum", default: "object", choices: [lang("List"), lang("Time"), lang("Number"), lang("Integer"), lang("Floating point number"), lang("Decimal digits"), lang("Hexadecimal digits"), lang("Alphanumeric string"), lang("Alphabetic string"), lang("String with only uppercase characters"), lang("String with only lowercase characters"), lang("Whitespaces")], enum: ["object", "time", "number", "integer", "float", "digit", "xdigit", "alnum", "alpha", "upper", "lower", "space"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Expected content type")})
+	parametersToEdit.push({type: "Radio", id: "variableContentType", result: "enum", default: "object", choices: [x_lang("List"), x_lang("Time"), x_lang("Number"), x_lang("Integer"), x_lang("Floating point number"), x_lang("Decimal digits"), x_lang("Hexadecimal digits"), x_lang("Alphanumeric string"), x_lang("Alphabetic string"), x_lang("String with only uppercase characters"), x_lang("String with only lowercase characters"), x_lang("Whitespaces")], enum: ["object", "time", "number", "integer", "float", "digit", "xdigit", "alnum", "alpha", "upper", "lower", "space"]})
 	
 	return parametersToEdit
 }
@@ -68,32 +68,32 @@ Element_GenerateName_Condition_Variable_content_is(Environment, ElementParameter
 	switch (ElementParameters.variableContentType)
 	{
 		case "object":
-		typeText := lang("List")
+		typeText := x_lang("List")
 		case "time":
-		typeText := lang("Time")
+		typeText := x_lang("Time")
 		case "number":
-		typeText := lang("Number")
+		typeText := x_lang("Number")
 		case "integer":
-		typeText := lang("Integer")
+		typeText := x_lang("Integer")
 		case "float":
-		typeText := lang("Floating point number")
+		typeText := x_lang("Floating point number")
 		case "digit":
-		typeText := lang("Decimal digits")
+		typeText := x_lang("Decimal digits")
 		case "xdigit":
-		typeText := lang("Hexadecimal digits")
+		typeText := x_lang("Hexadecimal digits")
 		case "alnum":
-		typeText := lang("Alphanumeric string")
+		typeText := x_lang("Alphanumeric string")
 		case "alpha":
-		typeText := lang("Alphabetic string")
+		typeText := x_lang("Alphabetic string")
 		case "upper":
-		typeText := lang("String with only uppercase characters")
+		typeText := x_lang("String with only uppercase characters")
 		case "lower":
-		typeText := lang("String with only lowercase characters")
+		typeText := x_lang("String with only lowercase characters")
 		case "space":
-		typeText := lang("Whitespaces")
+		typeText := x_lang("Whitespaces")
 	}
 
-	return lang("Variable content is %1%", typeText) " - " ElementParameters.varname
+	return x_lang("Variable content is %1%", typeText) " - " ElementParameters.varname
 }
 
 ;Called every time the user changes any parameter.

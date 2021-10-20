@@ -10,13 +10,13 @@ Element_getElementType_Action_Split_path()
 ;Name of the element
 Element_getName_Action_Split_path()
 {
-	return lang("Split path")
+	return x_lang("Split path")
 }
 
 ;Category of the element
 Element_getCategory_Action_Split_path()
 {
-	return lang("File")
+	return x_lang("File")
 }
 
 ;This function returns the package of the element.
@@ -53,19 +53,19 @@ Element_getParametrizationDetails_Action_Split_path(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: lang("File path")})
-	parametersToEdit.push({type: "File", id: "file", label: lang("Select a file"), warnIfEmpty: true})
+	parametersToEdit.push({type: "Label", label: x_lang("File path")})
+	parametersToEdit.push({type: "File", id: "file", label: x_lang("Select a file"), warnIfEmpty: true})
 	
-	parametersToEdit.push({type: "Label", label: lang("Output variables")})
-	parametersToEdit.push({type: "Label", label: lang("File name"), size: "small"})
+	parametersToEdit.push({type: "Label", label: x_lang("Output variables")})
+	parametersToEdit.push({type: "Label", label: x_lang("File name"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: "OutFileName", default: "fileName", content: "VariableName"})
-	parametersToEdit.push({type: "Label", label: lang("Directory"), size: "small"})
+	parametersToEdit.push({type: "Label", label: x_lang("Directory"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: "OutDir", default: "directory", content: "VariableName"})
-	parametersToEdit.push({type: "Label", label: lang("File extension"), size: "small"})
+	parametersToEdit.push({type: "Label", label: x_lang("File extension"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: "OutExtension", default: "fileExtension", content: "VariableName"})
-	parametersToEdit.push({type: "Label", label: lang("File name without extension"), size: "small"})
+	parametersToEdit.push({type: "Label", label: x_lang("File name without extension"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: "OutNameNoExt", default: "fileNameNoExtension", content: "VariableName"})
-	parametersToEdit.push({type: "Label", label: lang("Drive"), size: "small"})
+	parametersToEdit.push({type: "Label", label: x_lang("Drive"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: "OutDrive", default: "drive", content: "VariableName"})
 	
 	return parametersToEdit
@@ -74,7 +74,7 @@ Element_getParametrizationDetails_Action_Split_path(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Split_path(Environment, ElementParameters)
 {
-	return lang("Split path") " - " ElementParameters.file
+	return x_lang("Split path") " - " ElementParameters.file
 }
 
 ;Called every time the user changes any parameter.
