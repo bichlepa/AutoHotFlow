@@ -10,13 +10,13 @@ Element_getElementType_Action_Set_element_parameter()
 ;Name of the element
 Element_getName_Action_Set_element_parameter()
 {
-	return lang("Set element parameter")
+	return x_lang("Set element parameter")
 }
 
 ;Category of the element
 Element_getCategory_Action_Set_element_parameter()
 {
-	return lang("Flow_control")
+	return x_lang("Flow_control")
 }
 
 ;This function returns the package of the element.
@@ -63,16 +63,16 @@ Element_getParametrizationDetails_Action_Set_element_parameter(Environment)
 	parametersToEdit.push({type: "Label", label: x_lang("Which parameter")})
 	parametersToEdit.push({type: "DropDown", id: "parameterID", result: "enum", choices: [], enum: []})
 
-	parametersToEdit.push({type: "Label", label: lang("New value")})
+	parametersToEdit.push({type: "Label", label: x_lang("New value")})
 	parametersToEdit.push({type: "Edit", id: "newParameterValueEdit", default: "", content: ["rawString", "string"], contentID: "newParameterValueEditContent", contentDefault: "rawString"})
-	parametersToEdit.push({type: "Checkbox", id: "newParameterValueCheckbox", default: 0, label: lang("Label")})
-	parametersToEdit.push({type: "Checkbox", id: "newParameterValueCheckboxGray", default: 0, gray: true, label: lang("Label")})
+	parametersToEdit.push({type: "Checkbox", id: "newParameterValueCheckbox", default: 0, label: x_lang("Label")})
+	parametersToEdit.push({type: "Checkbox", id: "newParameterValueCheckboxGray", default: 0, gray: true, label: x_lang("Label")})
 	parametersToEdit.push({type: "DropDown", id: "newParameterValueDropDown", default: "", choices: [""], result: "enum", enum: [""]})
 	parametersToEdit.push({type: "DropDown", id: "newParameterValueComboBox", default: "", choices: [""], result: "enum", enum: [""]})
 	parametersToEdit.push({type: "multilineEdit", id: "newParameterValueMultilineEdit", default: "",  content: ["rawString", "string"], contentID: "newParameterValueMultilineEditContent", contentDefault: "rawString"})
 	parametersToEdit.push({type: "DropDown", id: "newParameterValueListBox", default: "", choices: [""], result: "enum", enum: [""]})
-	parametersToEdit.push({type: "File", id: "newParameterValueFile", label: lang("Select a file")})
-	parametersToEdit.push({type: "Folder", id: "newParameterValueFolder", label: lang("Select a folder")})
+	parametersToEdit.push({type: "File", id: "newParameterValueFile", label: x_lang("Select a file")})
+	parametersToEdit.push({type: "Folder", id: "newParameterValueFolder", label: x_lang("Select a folder")})
 	parametersToEdit.push({type: "Weekdays", id: "newParameterValueWeekdays"})
 	parametersToEdit.push({type: "dateAndTime", id: "newParameterValueDateAndTime", format: "datetime"})
 	
@@ -98,7 +98,7 @@ Element_GenerateName_Action_Set_element_parameter(Environment, ElementParameters
 	parameterText := x_lang("'%1%'", parameterIDonly)
 	valueText := x_lang("'%1%'", ElementParameters[controlID])
 
-	return lang("Set element parameter") " - " parameterText " = " valueText " - " elementText " - " flowText
+	return x_lang("Set element parameter") " - " parameterText " = " valueText " - " elementText " - " flowText
 }
 
 ;Called every time the user changes any parameter.
