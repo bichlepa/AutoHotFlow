@@ -108,7 +108,7 @@ Element_run_Action_Get_List_Info(Environment, ElementParameters)
 	; error if variable does not contain a list
 	if (not IsObject(EvaluatedParameters.List))
 	{
-		x_finish(Environment, "exception", lang("'%1%' does not contain a list", EvaluatedParameters.List))
+		x_finish(Environment, "exception", x_lang("'%1%' does not contain a list", EvaluatedParameters.List))
 		return
 	}
 	

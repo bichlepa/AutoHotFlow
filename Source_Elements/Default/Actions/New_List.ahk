@@ -104,7 +104,7 @@ Element_GenerateName_Action_New_List(Environment, ElementParameters)
 		ValueText := x_lang("Multiple values '%1%'", ElementParameters.VarValues)
 	}
 	
-	return % lang("New list %1%", ElementParameters.Varname) PositionText " - " ValueText
+	return % x_lang("New list %1%", ElementParameters.Varname) PositionText " - " ValueText
 	
 }
 

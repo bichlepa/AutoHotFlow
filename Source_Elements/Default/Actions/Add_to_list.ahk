@@ -102,7 +102,7 @@ Element_GenerateName_Action_Add_To_List(Environment, ElementParameters)
 		ValueText := x_lang("Multiple values '%1%'", ElementParameters.VarValues)
 	}
 	
-	return % lang("Add to list") " - " ElementParameters.Varname " - " PositionText " - " ValueText
+	return % x_lang("Add to list") " - " ElementParameters.Varname " - " PositionText " - " ValueText
 }
 
 ;Called every time the user changes any parameter.

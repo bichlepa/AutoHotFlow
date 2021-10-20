@@ -63,9 +63,9 @@ Element_getParametrizationDetails_Trigger_Start_up(Environment)
 Element_GenerateName_Trigger_Start_up(Environment, ElementParameters)
 {
 	if (ElementParameters.startupType = "AutoHotFlow")
-		startupType := lang("When AHF starts")
+		startupType := x_lang("When AHF starts")
 	Else if (ElementParameters.startupType = "Windows")
-		startupType := lang("When Windows starts")
+		startupType := x_lang("When Windows starts")
 	return x_lang("Start_up") " - " startupType
 }
 

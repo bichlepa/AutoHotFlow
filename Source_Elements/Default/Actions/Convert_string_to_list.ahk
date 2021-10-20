@@ -10,13 +10,13 @@ Element_getElementType_Action_Convert_string_to_list()
 ;Name of the element
 Element_getName_Action_Convert_string_to_list()
 {
-	return lang("Convert string to list")
+	return x_lang("Convert string to list")
 }
 
 ;Category of the element
 Element_getCategory_Action_Convert_string_to_list()
 {
-	return lang("List")
+	return x_lang("List")
 }
 
 ;This function returns the package of the element.
@@ -69,7 +69,7 @@ Element_getParametrizationDetails_Action_Convert_string_to_list(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Convert_string_to_list(Environment, ElementParameters)
 {
-	return lang("Convert %1%-string to list '%2%'", ElementParameters.listToStringOutputFormat, ElementParameters.VarValue) " - " ElementParameters.Varname
+	return x_lang("Convert %1%-string to list '%2%'", ElementParameters.listToStringOutputFormat, ElementParameters.VarValue) " - " ElementParameters.Varname
 }
 
 ;Called every time the user changes any parameter.

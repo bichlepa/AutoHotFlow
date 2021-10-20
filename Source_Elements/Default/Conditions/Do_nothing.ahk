@@ -10,13 +10,13 @@ Element_getElementType_Condition_Do_nothing()
 ;Name of the element
 Element_getName_Condition_Do_nothing()
 {
-	return lang("Do nothing")
+	return x_lang("Do nothing")
 }
 
 ;Category of the element
 Element_getCategory_Condition_Do_nothing()
 {
-	return lang("Flow_control")
+	return x_lang("Flow_control")
 }
 
 ;This function returns the package of the element.
@@ -53,8 +53,8 @@ Element_getParametrizationDetails_Condition_Do_nothing(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: lang("Result")})
-	parametersToEdit.push({type: "Radio", id: "executionResult", result: "enum", default: "Yes", choices: [lang("Yes"), lang("No"), lang("Exception")], enum: ["Yes", "No", "Exception"]})
+	parametersToEdit.push({type: "Label", label: x_lang("Result")})
+	parametersToEdit.push({type: "Radio", id: "executionResult", result: "enum", default: "Yes", choices: [x_lang("Yes"), x_lang("No"), x_lang("Exception")], enum: ["Yes", "No", "Exception"]})
 	
 	
 	return parametersToEdit
@@ -63,7 +63,7 @@ Element_getParametrizationDetails_Condition_Do_nothing(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Condition_Do_nothing(Environment, ElementParameters)
 {
-	return lang("Do nothing") 
+	return x_lang("Do nothing") 
 }
 
 ;Called every time the user changes any parameter.

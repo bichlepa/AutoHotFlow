@@ -10,13 +10,13 @@ Element_getElementType_Action_Get_shortcut_information()
 ;Name of the element
 Element_getName_Action_Get_shortcut_information()
 {
-	return lang("Get shortcut information")
+	return x_lang("Get shortcut information")
 }
 
 ;Category of the element
 Element_getCategory_Action_Get_shortcut_information()
 {
-	return lang("File")
+	return x_lang("File")
 }
 
 ;This function returns the package of the element.
@@ -53,23 +53,23 @@ Element_getParametrizationDetails_Action_Get_shortcut_information(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: lang("Shortcut path")})
-	parametersToEdit.push({type: "File", id: "shortcutFile", label: lang("Select a shortcut file"), filter: x_lang("Shortcut file") " (*.lnk)", options: 32})
+	parametersToEdit.push({type: "Label", label: x_lang("Shortcut path")})
+	parametersToEdit.push({type: "File", id: "shortcutFile", label: x_lang("Select a shortcut file"), filter: x_lang("Shortcut file") " (*.lnk)", options: 32})
 
-	parametersToEdit.push({type: "Label", label: lang("Output variables")})
-	parametersToEdit.push({type: "Label", label: lang("Target path"), size: "small"})
+	parametersToEdit.push({type: "Label", label: x_lang("Output variables")})
+	parametersToEdit.push({type: "Label", label: x_lang("Target path"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: "OutTarget", default: "shortcutTarget", content: "VariableName"})
-	parametersToEdit.push({type: "Label", label: lang("Target arguments"), size: "small"})
+	parametersToEdit.push({type: "Label", label: x_lang("Target arguments"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: "OutArgs", default: "shortcutArgs", content: "VariableName"})
-	parametersToEdit.push({type: "Label", label: lang("Working directory"), size: "small"})
+	parametersToEdit.push({type: "Label", label: x_lang("Working directory"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: "OutDir", default: "shortcutDir", content: "VariableName"})
-	parametersToEdit.push({type: "Label", label: lang("Description"), size: "small"})
+	parametersToEdit.push({type: "Label", label: x_lang("Description"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: "OutDescription", default: "shortcutDescription", content: "VariableName"})
-	parametersToEdit.push({type: "Label", label: lang("Icon path"), size: "small"})
+	parametersToEdit.push({type: "Label", label: x_lang("Icon path"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: "OutIcon", default: "shortcutIcon", content: "VariableName"})
-	parametersToEdit.push({type: "Label", label: lang("Icon number"), size: "small"})
+	parametersToEdit.push({type: "Label", label: x_lang("Icon number"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: "OutIconNum", default: "shortcutIconNumber", content: "VariableName"})
-	parametersToEdit.push({type: "Label", label: lang("Run mode"), size: "small"})
+	parametersToEdit.push({type: "Label", label: x_lang("Run mode"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: "OutRunState", default: "shortcutRunMode", content: "VariableName"})
 	
 	return parametersToEdit
@@ -78,7 +78,7 @@ Element_getParametrizationDetails_Action_Get_shortcut_information(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Get_shortcut_information(Environment, ElementParameters)
 {
-	return lang("Get shortcut information") " - " ElementParameters.shortcutFile
+	return x_lang("Get shortcut information") " - " ElementParameters.shortcutFile
 }
 
 ;Called every time the user changes any parameter.

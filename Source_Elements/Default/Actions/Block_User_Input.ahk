@@ -53,8 +53,8 @@ Element_getParametrizationDetails_Action_Block_User_Input(Environment)
 {
 	;~ d( x_GetListOfAllVars(environment))
 	parametersToEdit:=Object()
-	parametersToEdit.push({type: "Label", label: lang("New block state")})
-	parametersToEdit.push({type: "Radio", id: "blockState", result: "enum", default: "Block", choices: [lang("Block user input"), lang("Unblock user input")], enum: ["Block", "Unblock"]})
+	parametersToEdit.push({type: "Label", label: x_lang("New block state")})
+	parametersToEdit.push({type: "Radio", id: "blockState", result: "enum", default: "Block", choices: [x_lang("Block user input"), x_lang("Unblock user input")], enum: ["Block", "Unblock"]})
 
 	return parametersToEdit
 }

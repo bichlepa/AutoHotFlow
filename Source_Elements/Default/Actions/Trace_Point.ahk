@@ -69,7 +69,7 @@ Element_getParametrizationDetails_Action_Trace_Point(Environment)
 Element_GenerateName_Action_Trace_Point(Environment, ElementParameters)
 {
 	if (ElementParameters.StopCondition)
-		textStopCondition := " - " lang("With stop condition")
+		textStopCondition := " - " x_lang("With stop condition")
 	return % x_lang("Trace_Point") " - " ElementParameters.ID textStopCondition
 	
 }

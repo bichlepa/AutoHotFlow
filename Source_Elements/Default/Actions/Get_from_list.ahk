@@ -86,7 +86,7 @@ Element_GenerateName_Action_Get_From_List(Environment, ElementParameters)
 	{
 		PositionText .= x_lang("At position '%1%'", ElementParameters.Position)
 	}
-	return lang("Get from list %1%", ElementParameters.ListName) PositionText " - " ElementParameters.Varname
+	return x_lang("Get from list %1%", ElementParameters.ListName) PositionText " - " ElementParameters.Varname
 }
 
 ;Called every time the user changes any parameter.

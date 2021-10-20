@@ -69,10 +69,10 @@ Element_getParametrizationDetails_Condition_List_Contains_Element(Environment)
 Element_GenerateName_Condition_List_Contains_Element(Environment, ElementParameters)
 {
 	if (ElementParameters.SearchWhat = "Content")
-		string := lang("Value '%1%' in list '%2%'", ElementParameters.Position, ElementParameters.InputList)
+		string := x_lang("Value '%1%' in list '%2%'", ElementParameters.Position, ElementParameters.InputList)
 	else if (ElementParameters.SearchWhat = "Key")
 	{
-		string := lang("Key '%1%' in list '%2%'", ElementParameters.SearchContent, ElementParameters.InputList)
+		string := x_lang("Key '%1%' in list '%2%'", ElementParameters.SearchContent, ElementParameters.InputList)
 	}
 
 	return x_lang("List_Contains_Element") " - " string

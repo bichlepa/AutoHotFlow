@@ -92,7 +92,7 @@ Element_GenerateName_Action_Delete_From_List(Environment, ElementParameters)
 	{
 		WriteToVariableText .= " - " x_lang("Write deleted value to '%1%'", ElementParameters.Varname)
 	}
-	return lang("Delete from list %1%", ElementParameters.ListName) PositionText " - " ElementParameters.Varname WriteToVariableText
+	return x_lang("Delete from list %1%", ElementParameters.ListName) PositionText " - " ElementParameters.Varname WriteToVariableText
 }
 
 ;Called every time the user changes any parameter.
