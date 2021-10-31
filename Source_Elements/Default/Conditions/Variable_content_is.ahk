@@ -129,16 +129,15 @@ Element_run_Condition_Variable_content_is(Environment, ElementParameters)
 
 	; check the content type
 	result := false
-	switch (ElementParameters.variableContentType)
+	if (isobject(value))
 	{
-		case "object":
-		; check whether value is an object
-		if (isobject(value))
+		if (ElementParameters.variableContentType = "object")
 		{
 			result := true
 		}
-		default:
-		; all enum values are same as the AHK command "If var is [not] type"
+	}
+	Else
+	{
 		type := ElementParameters.variableContentType
 		if value is %type%
 		{
