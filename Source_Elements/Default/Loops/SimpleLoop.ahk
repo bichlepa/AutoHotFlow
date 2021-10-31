@@ -1,12 +1,4 @@
-﻿;Always add this element class name to the global list
-x_RegisterElementClass("Loop_SimpleLoop")
-
-;Element type of the element
-Element_getElementType_Loop_SimpleLoop()
-{
-	return "loop"
-}
-
+﻿
 ;Name of the element
 Element_getName_Loop_SimpleLoop()
 {
@@ -17,14 +9,6 @@ Element_getName_Loop_SimpleLoop()
 Element_getCategory_Loop_SimpleLoop()
 {
 	return x_lang("General")
-}
-
-;This function returns the package of the element.
-;This is a reserved function for future releases,
-;where it will be possible to install additional add-ons which provide more elements.
-Element_getPackage_Loop_SimpleLoop()
-{
-	return "default"
 }
 
 ;Minimum user experience to use this element.

@@ -1,12 +1,4 @@
-﻿;Always add this element class name to the global list
-x_RegisterElementClass("&ElementType&_&Name&")
-
-;Element type of the element
-Element_getElementType_&ElementType&_&Name&()
-{
-	return "&ElementType&"
-}
-
+﻿
 ;Name of the element
 Element_getName_&ElementType&_&Name&()
 {
@@ -17,14 +9,6 @@ Element_getName_&ElementType&_&Name&()
 Element_getCategory_&ElementType&_&Name&()
 {
 	return x_lang("&Category&")
-}
-
-;This function returns the package of the element.
-;This is a reserved function for future releases,
-;where it will be possible to install additional add-ons which provide more elements.
-Element_getPackage_&ElementType&_&Name&()
-{
-	return "&package&"
 }
 
 ;Minimum user experience to use this element.

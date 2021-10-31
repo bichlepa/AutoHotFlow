@@ -1,11 +1,3 @@
-;Always add this element class name to the global list
-x_RegisterElementClass("Action_Split_path")
-
-;Element type of the element
-Element_getElementType_Action_Split_path()
-{
-	return "Action"
-}
 
 ;Name of the element
 Element_getName_Action_Split_path()
@@ -17,14 +9,6 @@ Element_getName_Action_Split_path()
 Element_getCategory_Action_Split_path()
 {
 	return x_lang("File")
-}
-
-;This function returns the package of the element.
-;This is a reserved function for future releases,
-;where it will be possible to install additional add-ons which provide more elements.
-Element_getPackage_Action_Split_path()
-{
-	return "Default"
 }
 
 ;Minimum user experience to use this element.

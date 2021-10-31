@@ -1,12 +1,4 @@
-﻿;Always add this element class name to the global list
-x_RegisterElementClass("Action_Delete_From_List")
-
-;Element type of the element
-Element_getElementType_Action_Delete_From_List()
-{
-	return "Action"
-}
-
+﻿
 ;Name of the element
 Element_getName_Action_Delete_From_List()
 {
@@ -17,14 +9,6 @@ Element_getName_Action_Delete_From_List()
 Element_getCategory_Action_Delete_From_List()
 {
 	return x_lang("List")
-}
-
-;This function returns the package of the element.
-;This is a reserved function for future releases,
-;where it will be possible to install additional add-ons which provide more elements.
-Element_getPackage_Action_Delete_From_List()
-{
-	return "default"
 }
 
 ;Minimum user experience to use this element.

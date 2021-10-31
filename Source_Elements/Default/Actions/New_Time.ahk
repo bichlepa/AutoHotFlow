@@ -1,12 +1,4 @@
-﻿;Always add this element class name to the global list
-x_RegisterElementClass("Action_New_Time")
-
-;Element type of the element
-Element_getElementType_Action_New_Time()
-{
-	return "Action"
-}
-
+﻿
 ;Name of the element
 Element_getName_Action_New_Time()
 {
@@ -17,14 +9,6 @@ Element_getName_Action_New_Time()
 Element_getCategory_Action_New_Time()
 {
 	return x_lang("Time")
-}
-
-;This function returns the package of the element.
-;This is a reserved function for future releases,
-;where it will be possible to install additional add-ons which provide more elements.
-Element_getPackage_Action_New_Time()
-{
-	return "default"
 }
 
 ;Minimum user experience to use this element.

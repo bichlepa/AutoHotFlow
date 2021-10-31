@@ -1,12 +1,4 @@
-﻿;Always add this element class name to the global list
-x_RegisterElementClass("Trigger_Time_Of_Day")
-
-;Element type of the element
-Element_getElementType_Trigger_Time_Of_Day()
-{
-	return "Trigger"
-}
-
+﻿
 ;Name of the element
 Element_getName_Trigger_Time_Of_Day()
 {
@@ -17,14 +9,6 @@ Element_getName_Trigger_Time_Of_Day()
 Element_getCategory_Trigger_Time_Of_Day()
 {
 	return x_lang("Time")
-}
-
-;This function returns the package of the element.
-;This is a reserved function for future releases,
-;where it will be possible to install additional add-ons which provide more elements.
-Element_getPackage_Trigger_Time_Of_Day()
-{
-	return "default"
 }
 
 ;Minimum user experience to use this element.

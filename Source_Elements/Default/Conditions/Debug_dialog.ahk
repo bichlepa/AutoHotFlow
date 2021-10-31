@@ -1,12 +1,4 @@
-﻿;Always add this element class name to the global list
-x_RegisterElementClass("Condition_Debug_Dialog")
-
-;Element type of the element
-Element_getElementType_Condition_Debug_Dialog()
-{
-	return "condition"
-}
-
+﻿
 ;Name of the element
 Element_getName_Condition_Debug_Dialog()
 {
@@ -17,14 +9,6 @@ Element_getName_Condition_Debug_Dialog()
 Element_getCategory_Condition_Debug_Dialog()
 {
 	return x_lang("Debugging")
-}
-
-;This function returns the package of the element.
-;This is a reserved function for future releases,
-;where it will be possible to install additional add-ons which provide more elements.
-Element_getPackage_Condition_Debug_Dialog()
-{
-	return "default"
 }
 
 ;Minimum user experience to use this element.

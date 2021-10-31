@@ -1,12 +1,4 @@
-﻿;Always add this element class name to the global list
-x_RegisterElementClass("Trigger_Window_Gets_Active")
-
-;Element type of the element
-Element_getElementType_Trigger_Window_Gets_Active()
-{
-	return "trigger"
-}
-
+﻿
 ;Name of the element
 Element_getName_Trigger_Window_Gets_Active()
 {
@@ -17,14 +9,6 @@ Element_getName_Trigger_Window_Gets_Active()
 Element_getCategory_Trigger_Window_Gets_Active()
 {
 	return x_lang("Window")
-}
-
-;This function returns the package of the element.
-;This is a reserved function for future releases,
-;where it will be possible to install additional add-ons which provide more elements.
-Element_getPackage_Trigger_Window_Gets_Active()
-{
-	return "default"
 }
 
 ;Minimum user experience to use this element.

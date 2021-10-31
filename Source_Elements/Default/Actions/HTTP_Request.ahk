@@ -1,12 +1,4 @@
-﻿;Always add this element class name to the global list
-x_RegisterElementClass("Action_HTTP_Request")
-
-;Element type of the element
-Element_getElementType_Action_HTTP_Request()
-{
-	return "Action"
-}
-
+﻿
 ;Name of the element
 Element_getName_Action_HTTP_Request()
 {
@@ -17,14 +9,6 @@ Element_getName_Action_HTTP_Request()
 Element_getCategory_Action_HTTP_Request()
 {
 	return x_lang("Internet")
-}
-
-;This function returns the package of the element.
-;This is a reserved function for future releases,
-;where it will be possible to install additional add-ons which provide more elements.
-Element_getPackage_Action_HTTP_Request()
-{
-	return "default"
 }
 
 ;Minimum user experience to use this element.

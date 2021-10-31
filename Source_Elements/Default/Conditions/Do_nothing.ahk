@@ -1,11 +1,3 @@
-;Always add this element class name to the global list
-x_RegisterElementClass("Condition_Do_nothing")
-
-;Element type of the element
-Element_getElementType_Condition_Do_nothing()
-{
-	return "Condition"
-}
 
 ;Name of the element
 Element_getName_Condition_Do_nothing()
@@ -17,14 +9,6 @@ Element_getName_Condition_Do_nothing()
 Element_getCategory_Condition_Do_nothing()
 {
 	return x_lang("Flow_control")
-}
-
-;This function returns the package of the element.
-;This is a reserved function for future releases,
-;where it will be possible to install additional add-ons which provide more elements.
-Element_getPackage_Condition_Do_nothing()
-{
-	return "Default"
 }
 
 ;Minimum user experience to use this element.

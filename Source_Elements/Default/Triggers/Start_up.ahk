@@ -1,12 +1,4 @@
-﻿;Always add this element class name to the global list
-x_RegisterElementClass("Trigger_Start_up")
-
-;Element type of the element
-Element_getElementType_Trigger_Start_up()
-{
-	return "Trigger"
-}
-
+﻿
 ;Name of the element
 Element_getName_Trigger_Start_up()
 {
@@ -17,14 +9,6 @@ Element_getName_Trigger_Start_up()
 Element_getCategory_Trigger_Start_up()
 {
 	return x_lang("Time")
-}
-
-;This function returns the package of the element.
-;This is a reserved function for future releases,
-;where it will be possible to install additional add-ons which provide more elements.
-Element_getPackage_Trigger_Start_up()
-{
-	return "default"
 }
 
 ;Minimum user experience to use this element.

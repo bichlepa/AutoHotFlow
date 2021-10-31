@@ -1,12 +1,4 @@
-﻿;Always add this element class name to the global list
-x_RegisterElementClass("Condition_List_Contains_Element")
-
-;Element type of the element
-Element_getElementType_Condition_List_Contains_Element()
-{
-	return "Condition"
-}
-
+﻿
 ;Name of the element
 Element_getName_Condition_List_Contains_Element()
 {
@@ -17,14 +9,6 @@ Element_getName_Condition_List_Contains_Element()
 Element_getCategory_Condition_List_Contains_Element()
 {
 	return x_lang("Variable")
-}
-
-;This function returns the package of the element.
-;This is a reserved function for future releases,
-;where it will be possible to install additional add-ons which provide more elements.
-Element_getPackage_Condition_List_Contains_Element()
-{
-	return "default"
 }
 
 ;Minimum user experience to use this element.
