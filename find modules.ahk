@@ -66,6 +66,7 @@ for oneLanguageIndex, oneLanguage in availableHelpFileLanguages
 ;Here, some source files are automatically modified
 Libincludes := ""
 elementInclusions := ""
+packageInfoImports := ""
 helpFiles := ""
 licenseInfo := []
 loop, files, source_Elements\*, D
@@ -84,11 +85,16 @@ loop, files, source_Elements\*, D
 	fileread,fileContent,% packagePath "\manifest.json"
 	fileContent := Jxon_Load(fileContent)
 
+	; add package name to array
+	packageInfoImports .= "packageInfo[""" packageName """] := []`n"
+
+	; create includes for libraries
 	for oneLibraryIndex, oneLibrary in fileContent.libraries
 	{
 		Libincludes .= "#include " packagePath "\" oneLibrary "`n"
 	}
 
+	; create includes for elements
 	for oneElementTypeIndex, oneElementType in allElementTypes
 	{
 		for oneElementIndex, oneElement in fileContent[oneElementType]
@@ -200,6 +206,12 @@ posstart+= strlen(";Lib_Includes_Start") +1
 stringgetpos,posend,mainfilecontent,;Lib_Includes_End
 posend-=1
 mainfilecontent:=substr(mainfilecontent,1,posstart) Libincludes SubStr(mainfilecontent,posend)
+
+StringGetPos,posstart,mainfilecontent,;PackageInfos_Start
+posstart+= strlen(";PackageInfos_Start") +1
+stringgetpos,posend,mainfilecontent,;PackageInfos_End
+posend-=1
+mainfilecontent:=substr(mainfilecontent,1,posstart) packageInfoImports SubStr(mainfilecontent,posend)
 
 FileDelete,source_main\main.ahk
 FileAppend,%mainfilecontent%,source_main\main.ahk

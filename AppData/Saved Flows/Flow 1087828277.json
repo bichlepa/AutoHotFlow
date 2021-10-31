@@ -1,4 +1,4 @@
-{
+﻿{
   "allConnections": {
     "connection0000000011": {
       "ConnectionType": "normal",
@@ -826,7 +826,8 @@
       "enabled": "1",
       "ID": "element0000000002",
       "name": "Manual - \"absolute number\"",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "ID": "absolute number"
       },
@@ -839,10 +840,11 @@
       "class": "Action_New_variable",
       "ID": "element0000000003",
       "name": "New variable - NewVariable = -5",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "expression": "String",
-        "onlyIfNotExist": "",
+        "onlyIfNotExist": "0",
         "Varname": "NewVariable",
         "VarValue": "-5"
       },
@@ -855,7 +857,8 @@
       "class": "Action_Absolute_number",
       "ID": "element0000000004",
       "name": "Absolute number - NewVariable = |newVariable|",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Varname": "NewVariable",
         "VarValue": "newVariable"
@@ -869,7 +872,8 @@
       "class": "Condition_Expression",
       "ID": "element0000000005",
       "name": "Expression - newVariable = 5",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Expression": "newVariable = 5"
       },
@@ -882,7 +886,8 @@
       "class": "Action_Absolute_number",
       "ID": "element0000000006",
       "name": "Absolute number - NewVariable = |newVariable|",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Varname": "NewVariable",
         "VarValue": "newVariable"
@@ -896,7 +901,8 @@
       "class": "Condition_Expression",
       "ID": "element0000000007",
       "name": "Expression - newVariable = 5",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Expression": "newVariable = 5"
       },
@@ -909,7 +915,8 @@
       "class": "Action_Absolute_number",
       "ID": "element0000000009",
       "name": "Absolute number - NewVariable = |newVariable|",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Varname": "NewVariable",
         "VarValue": "newVariable"
@@ -923,10 +930,11 @@
       "class": "Action_New_variable",
       "ID": "element0000000010",
       "name": "New variable - NewVariable = aegasdf",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "expression": "String",
-        "onlyIfNotExist": "",
+        "onlyIfNotExist": "0",
         "Varname": "NewVariable",
         "VarValue": "aegasdf"
       },
@@ -941,7 +949,8 @@
       "enabled": "1",
       "ID": "element0000000021",
       "name": "Manual - \"start\"",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "ID": "start"
       },
@@ -954,7 +963,8 @@
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000022",
       "name": "Set flow status - Enable: This flow - All triggers",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Enable": "Enable",
         "flowID": "",
@@ -971,10 +981,11 @@
       "class": "Action_New_variable",
       "ID": "element0000000023",
       "name": "New variable - static_successfulRuns = 0",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "expression": "String",
-        "onlyIfNotExist": "",
+        "onlyIfNotExist": "0",
         "Varname": "static_successfulRuns",
         "VarValue": "0"
       },
@@ -987,7 +998,8 @@
       "class": "Condition_Expression",
       "ID": "element0000000024",
       "name": "Expression - static_successfulRuns = requiredSuccessfulRuns",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Expression": "static_successfulRuns = requiredSuccessfulRuns"
       },
@@ -1000,10 +1012,11 @@
       "class": "Action_New_variable",
       "ID": "element0000000025",
       "name": "New variable - requiredSuccessfulRuns = 7",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "expression": "Expression",
-        "onlyIfNotExist": "",
+        "onlyIfNotExist": "0",
         "Varname": "requiredSuccessfulRuns",
         "VarValue": "7"
       },
@@ -1016,7 +1029,8 @@
       "class": "Action_Add_To_List",
       "ID": "element0000000026",
       "name": "Add To List - global_testResults - As last value - Value 'a_flowName'",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "DelimiterComma": 0,
         "DelimiterLinefeed": 1,
@@ -1025,7 +1039,6 @@
         "Expression": "Expression",
         "expressionPos": "String",
         "InsertMethod": "Insert",
-        "InsertMethodLabel": "",
         "NumberOfElements": "One",
         "Position": "keyName",
         "Varname": "global_testResults",
@@ -1042,11 +1055,12 @@
       "class": "Action_Message_Box",
       "ID": "element0000000027",
       "name": "Message box - Fehler - Only %static_successfulRuns% successful runs instead of %requiredSuccessfulRuns%",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
+        "": "200",
         "ButtonLabel": "OK",
         "ButtonLabelCancel": "Abbrechen",
-        "Height": 200,
         "IfClose": "",
         "IfDismiss": 1,
         "IsTimeout": "NoTimeout",
@@ -1055,8 +1069,7 @@
         "ShowCancelButton": 0,
         "TimeoutUnits": 10,
         "title": "Fehler",
-        "Unit": "Seconds",
-        "Width": 300
+        "Unit": "Seconds"
       },
       "StandardName": "1",
       "type": "Action",
@@ -1067,7 +1080,8 @@
       "class": "Action_Execute_Flow",
       "ID": "element0000000028",
       "name": "Execute flow: This flow - Manual - \"absolute number\"",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "flowID": "",
         "ReturnVariables": 0,
@@ -1087,10 +1101,11 @@
       "class": "Action_New_variable",
       "ID": "element0000000035",
       "name": "New variable - static_successfulRuns = static_successfulRuns + 1",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "expression": "Expression",
-        "onlyIfNotExist": "",
+        "onlyIfNotExist": "0",
         "Varname": "static_successfulRuns",
         "VarValue": "static_successfulRuns + 1"
       },
@@ -1105,7 +1120,8 @@
       "enabled": "1",
       "ID": "element0000000038",
       "name": "Manual - \"random number\"",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "ID": "random number"
       },
@@ -1118,7 +1134,8 @@
       "class": "Action_Random_number",
       "ID": "element0000000039",
       "name": "Random number - NewVariable - 0-10",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "MaxValue": "10",
         "MinValue": 0,
@@ -1133,7 +1150,8 @@
       "class": "Action_Execute_Flow",
       "ID": "element0000000040",
       "name": "Execute flow: This flow - Manual - \"random number\"",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "flowID": "",
         "ReturnVariables": 0,
@@ -1153,7 +1171,8 @@
       "class": "Action_Square_Root",
       "ID": "element0000000045",
       "name": "Square root - NewVariable - 16",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Varname": "NewVariable",
         "VarValue": 16
@@ -1169,7 +1188,8 @@
       "enabled": "1",
       "ID": "element0000000046",
       "name": "Manual - \"square root\"",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "ID": "square root"
       },
@@ -1182,7 +1202,8 @@
       "class": "Action_Trigonometry",
       "ID": "element0000000048",
       "name": "Trigonometry - Sine - NewVariable - 90",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Operation": "Sine",
         "Unit": "Degree",
@@ -1200,7 +1221,8 @@
       "enabled": "1",
       "ID": "element0000000049",
       "name": "Manual - \"trigonometry\"",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "ID": "trigonometry"
       },
@@ -1213,7 +1235,8 @@
       "class": "Action_Rounding_A_Number",
       "ID": "element0000000051",
       "name": "Rounding a number - NewVariable - 1.2345 - 0",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Places": 0,
         "Roundingtype": "round",
@@ -1231,7 +1254,8 @@
       "enabled": "1",
       "ID": "element0000000052",
       "name": "Manual - \"rounding\"",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "ID": "rounding"
       },
@@ -1244,7 +1268,8 @@
       "class": "Action_Exponentiation",
       "ID": "element0000000053",
       "name": "Exponentiation - NewVariable = 3^2",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Exponent": 2,
         "Varname": "NewVariable",
@@ -1261,7 +1286,8 @@
       "enabled": "1",
       "ID": "element0000000054",
       "name": "Manual - \"exponentiation\"",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "ID": "exponentiation"
       },
@@ -1274,7 +1300,8 @@
       "class": "Action_Execute_Flow",
       "ID": "element0000000057",
       "name": "Execute flow: This flow - Manual - \"square root\"",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "flowID": "",
         "ReturnVariables": 0,
@@ -1294,7 +1321,8 @@
       "class": "Action_Execute_Flow",
       "ID": "element0000000058",
       "name": "Execute flow: This flow - Manual - \"trigonometry\"",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "flowID": "",
         "ReturnVariables": 0,
@@ -1314,7 +1342,8 @@
       "class": "Action_Execute_Flow",
       "ID": "element0000000059",
       "name": "Execute flow: This flow - Manual - \"rounding\"",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "flowID": "",
         "ReturnVariables": 0,
@@ -1334,7 +1363,8 @@
       "class": "Action_Execute_Flow",
       "ID": "element0000000060",
       "name": "Execute flow: This flow - Manual - \"exponentiation\"",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "flowID": "",
         "ReturnVariables": 0,
@@ -1354,7 +1384,8 @@
       "class": "Condition_Expression",
       "ID": "element0000000070",
       "name": "Expression - newVariable >= 0 and newVariable <= 10",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Expression": "newVariable >= 0 and newVariable <= 10"
       },
@@ -1368,7 +1399,8 @@
       "HeightOfVerticalBar": "945",
       "ID": "element0000000073",
       "name": "Simple loop: Endless loop",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Infinite": "1",
         "repeatCount": 5
@@ -1382,7 +1414,8 @@
       "class": "Condition_Expression",
       "ID": "element0000000074",
       "name": "Expression - a_index > 10",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Expression": "a_index > 10"
       },
@@ -1395,7 +1428,8 @@
       "class": "Condition_Expression",
       "ID": "element0000000078",
       "name": "Expression - newVariable = 10",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Expression": "newVariable = 10"
       },
@@ -1408,10 +1442,11 @@
       "class": "Action_New_variable",
       "ID": "element0000000081",
       "name": "New variable - maxValueFound = 1",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "expression": "Expression",
-        "onlyIfNotExist": "",
+        "onlyIfNotExist": "0",
         "Varname": "maxValueFound",
         "VarValue": "1"
       },
@@ -1424,10 +1459,11 @@
       "class": "Action_New_variable",
       "ID": "element0000000082",
       "name": "New variable - minValueFound = 1",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "expression": "Expression",
-        "onlyIfNotExist": "",
+        "onlyIfNotExist": "0",
         "Varname": "minValueFound",
         "VarValue": "1"
       },
@@ -1440,7 +1476,8 @@
       "class": "Condition_Expression",
       "ID": "element0000000083",
       "name": "Expression - newVariable = 0",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Expression": "newVariable = 0"
       },
@@ -1453,7 +1490,8 @@
       "class": "Condition_Expression",
       "ID": "element0000000086",
       "name": "Expression - maxValueFound and minValueFound",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Expression": "maxValueFound and minValueFound"
       },
@@ -1466,10 +1504,11 @@
       "class": "Action_New_variable",
       "ID": "element0000000095",
       "name": "New variable - static_successfulRuns = static_successfulRuns + 1",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "expression": "Expression",
-        "onlyIfNotExist": "",
+        "onlyIfNotExist": "0",
         "Varname": "static_successfulRuns",
         "VarValue": "static_successfulRuns + 1"
       },
@@ -1482,7 +1521,8 @@
       "class": "Action_Random_number",
       "ID": "element0000000098",
       "name": "Random number - NewVariable - 0-1.0",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "MaxValue": "1.0",
         "MinValue": 0,
@@ -1497,7 +1537,8 @@
       "class": "Condition_Expression",
       "ID": "element0000000099",
       "name": "Expression - newVariable > 0 and newVariable < 1",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Expression": "newVariable > 0 and newVariable < 1"
       },
@@ -1510,7 +1551,8 @@
       "class": "Action_Random_number",
       "ID": "element0000000102",
       "name": "Random number - NewVariable - -100--99",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "MaxValue": "-99",
         "MinValue": "-100",
@@ -1525,7 +1567,8 @@
       "class": "Condition_Expression",
       "ID": "element0000000105",
       "name": "Expression - newVariable = -99 or newVariable = -100",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Expression": "newVariable = -99 or newVariable = -100"
       },
@@ -1538,7 +1581,8 @@
       "class": "Condition_Expression",
       "ID": "element0000000108",
       "name": "Expression - newVariable = 4",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Expression": "newVariable = 4"
       },
@@ -1551,7 +1595,8 @@
       "class": "Action_Square_Root",
       "ID": "element0000000110",
       "name": "Square root - NewVariable - -16",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Varname": "NewVariable",
         "VarValue": "-16"
@@ -1565,7 +1610,8 @@
       "class": "Condition_Expression",
       "ID": "element0000000111",
       "name": "Expression - newVariable = \"\"",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Expression": "newVariable = \"\""
       },
@@ -1578,10 +1624,11 @@
       "class": "Action_New_variable",
       "ID": "element0000000115",
       "name": "New variable - static_successfulRuns = static_successfulRuns + 1",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "expression": "Expression",
-        "onlyIfNotExist": "",
+        "onlyIfNotExist": "0",
         "Varname": "static_successfulRuns",
         "VarValue": "static_successfulRuns + 1"
       },
@@ -1594,7 +1641,8 @@
       "class": "Condition_NumberIs",
       "ID": "element0000000117",
       "name": "Number is - newVariable - 1",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "absoluteDeviation": "0",
         "expectedNumber": "1",
@@ -1610,7 +1658,8 @@
       "class": "Action_Trigonometry",
       "ID": "element0000000119",
       "name": "Trigonometry - Cosine - NewVariable - 180",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Operation": "Cosine",
         "Unit": "Degree",
@@ -1626,7 +1675,8 @@
       "class": "Condition_NumberIs",
       "ID": "element0000000120",
       "name": "Number is - newVariable - -1",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "absoluteDeviation": "0",
         "expectedNumber": "-1",
@@ -1642,10 +1692,11 @@
       "class": "Action_New_variable",
       "ID": "element0000000123",
       "name": "New variable - static_successfulRuns = static_successfulRuns + 1",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "expression": "Expression",
-        "onlyIfNotExist": "",
+        "onlyIfNotExist": "0",
         "Varname": "static_successfulRuns",
         "VarValue": "static_successfulRuns + 1"
       },
@@ -1658,7 +1709,8 @@
       "class": "Action_Trigonometry",
       "ID": "element0000000127",
       "name": "Trigonometry - Tangent - NewVariable - 60",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Operation": "Tangent",
         "Unit": "Degree",
@@ -1674,7 +1726,8 @@
       "class": "Condition_NumberIs",
       "ID": "element0000000128",
       "name": "Number is - newVariable - rootOf3",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "absoluteDeviation": "0",
         "expectedNumber": "rootOf3",
@@ -1690,7 +1743,8 @@
       "class": "Action_Trigonometry",
       "ID": "element0000000138",
       "name": "Trigonometry - Arcsine - NewVariable - rootOf3 \/ 2",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Operation": "Arcsine",
         "Unit": "Degree",
@@ -1706,7 +1760,8 @@
       "class": "Condition_NumberIs",
       "ID": "element0000000139",
       "name": "Number is - newVariable - 60",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "absoluteDeviation": "0",
         "expectedNumber": "60",
@@ -1722,7 +1777,8 @@
       "class": "Action_Trigonometry",
       "ID": "element0000000148",
       "name": "Trigonometry - Arccosine - NewVariable - rootOf3 \/ 2",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Operation": "Arccosine",
         "Unit": "Degree",
@@ -1738,7 +1794,8 @@
       "class": "Condition_NumberIs",
       "ID": "element0000000149",
       "name": "Number is - newVariable - 30",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "absoluteDeviation": "0",
         "expectedNumber": "30",
@@ -1754,7 +1811,8 @@
       "class": "Action_Trigonometry",
       "ID": "element0000000158",
       "name": "Trigonometry - Arctangent - NewVariable - 1",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Operation": "Arctangent",
         "Unit": "Degree",
@@ -1770,7 +1828,8 @@
       "class": "Condition_NumberIs",
       "ID": "element0000000159",
       "name": "Number is - newVariable - 45",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "absoluteDeviation": "0",
         "expectedNumber": "45",
@@ -1786,7 +1845,8 @@
       "class": "Action_Square_Root",
       "ID": "element0000000169",
       "name": "Square root - rootOf3 - 3",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Varname": "rootOf3",
         "VarValue": "3"
@@ -1800,10 +1860,11 @@
       "class": "Action_New_variable",
       "ID": "element0000000171",
       "name": "New variable - pi = 3.141592653589793",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "expression": "Expression",
-        "onlyIfNotExist": "",
+        "onlyIfNotExist": "0",
         "Varname": "pi",
         "VarValue": "3.141592653589793"
       },
@@ -1816,7 +1877,8 @@
       "class": "Action_Trigonometry",
       "ID": "element0000000178",
       "name": "Trigonometry - Sine - NewVariable - pi \/ 6",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Operation": "Sine",
         "Unit": "Radian",
@@ -1832,7 +1894,8 @@
       "class": "Condition_NumberIs",
       "ID": "element0000000179",
       "name": "Number is - newVariable - 1\/2",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "absoluteDeviation": "0",
         "expectedNumber": "1\/2",
@@ -1848,7 +1911,8 @@
       "class": "Action_Trigonometry",
       "ID": "element0000000186",
       "name": "Trigonometry - Arctangent - NewVariable - rootOf3",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Operation": "Arctangent",
         "Unit": "Radian",
@@ -1864,7 +1928,8 @@
       "class": "Condition_NumberIs",
       "ID": "element0000000187",
       "name": "Number is - newVariable - pi\/3",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "absoluteDeviation": "0",
         "expectedNumber": "pi\/3",
@@ -1880,10 +1945,11 @@
       "class": "Action_New_variable",
       "ID": "element0000000190",
       "name": "New variable - static_successfulRuns = static_successfulRuns + 1",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "expression": "Expression",
-        "onlyIfNotExist": "",
+        "onlyIfNotExist": "0",
         "Varname": "static_successfulRuns",
         "VarValue": "static_successfulRuns + 1"
       },
@@ -1896,7 +1962,8 @@
       "class": "Condition_NumberIs",
       "ID": "element0000000191",
       "name": "Number is - newVariable - 1",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "absoluteDeviation": "0",
         "expectedNumber": "1",
@@ -1912,7 +1979,8 @@
       "class": "Action_Rounding_A_Number",
       "ID": "element0000000193",
       "name": "Rounding a number - NewVariable - 1.2345 - 3",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Places": "3",
         "Roundingtype": "round",
@@ -1928,7 +1996,8 @@
       "class": "Condition_NumberIs",
       "ID": "element0000000194",
       "name": "Number is - newVariable - 1.235",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "absoluteDeviation": "0",
         "expectedNumber": "1.235",
@@ -1944,7 +2013,8 @@
       "class": "Action_Rounding_A_Number",
       "ID": "element0000000197",
       "name": "Rounding a number - NewVariable - 1.2345 - 3",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Places": "3",
         "Roundingtype": "roundDown",
@@ -1960,7 +2030,8 @@
       "class": "Condition_NumberIs",
       "ID": "element0000000198",
       "name": "Number is - newVariable - 1.234",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "absoluteDeviation": "0",
         "expectedNumber": "1.234",
@@ -1976,7 +2047,8 @@
       "class": "Action_Rounding_A_Number",
       "ID": "element0000000200",
       "name": "Rounding a number - NewVariable - 1.2345 - 2",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Places": "2",
         "Roundingtype": "roundUp",
@@ -1992,7 +2064,8 @@
       "class": "Condition_NumberIs",
       "ID": "element0000000201",
       "name": "Number is - newVariable - 1.24",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "absoluteDeviation": "0",
         "expectedNumber": "1.24",
@@ -2008,7 +2081,8 @@
       "class": "Action_Rounding_A_Number",
       "ID": "element0000000206",
       "name": "Rounding a number - NewVariable - 12345 - -3",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Places": "-3",
         "Roundingtype": "round",
@@ -2024,7 +2098,8 @@
       "class": "Condition_NumberIs",
       "ID": "element0000000207",
       "name": "Number is - newVariable - 12000",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "absoluteDeviation": "0",
         "expectedNumber": "12000",
@@ -2040,7 +2115,8 @@
       "class": "Condition_NumberIs",
       "ID": "element0000000212",
       "name": "Number is - newVariable - 9",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "absoluteDeviation": "0",
         "expectedNumber": "9",
@@ -2056,10 +2132,11 @@
       "class": "Action_New_variable",
       "ID": "element0000000214",
       "name": "New variable - static_successfulRuns = static_successfulRuns + 1",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "expression": "Expression",
-        "onlyIfNotExist": "",
+        "onlyIfNotExist": "0",
         "Varname": "static_successfulRuns",
         "VarValue": "static_successfulRuns + 1"
       },
@@ -2072,7 +2149,8 @@
       "class": "Action_Exponentiation",
       "ID": "element0000000216",
       "name": "Exponentiation - NewVariable = rootOf3^2",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Exponent": 2,
         "Varname": "NewVariable",
@@ -2087,7 +2165,8 @@
       "class": "Condition_NumberIs",
       "ID": "element0000000217",
       "name": "Number is - newVariable - 3",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "absoluteDeviation": "0",
         "expectedNumber": "3",
@@ -2103,7 +2182,8 @@
       "class": "Action_Square_Root",
       "ID": "element0000000219",
       "name": "Square root - rootOf3 - 3",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Varname": "rootOf3",
         "VarValue": "3"
@@ -2117,7 +2197,8 @@
       "class": "Action_Exponentiation",
       "ID": "element0000000222",
       "name": "Exponentiation - NewVariable = 4^1",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Exponent": "1",
         "Varname": "NewVariable",
@@ -2132,7 +2213,8 @@
       "class": "Condition_NumberIs",
       "ID": "element0000000223",
       "name": "Number is - newVariable - 4",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "absoluteDeviation": "0",
         "expectedNumber": "4",
@@ -2148,7 +2230,8 @@
       "class": "Action_Exponentiation",
       "ID": "element0000000225",
       "name": "Exponentiation - NewVariable = 4^0",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Exponent": "0",
         "Varname": "NewVariable",
@@ -2163,7 +2246,8 @@
       "class": "Condition_NumberIs",
       "ID": "element0000000226",
       "name": "Number is - newVariable - 1",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "absoluteDeviation": "0",
         "expectedNumber": "1",
@@ -2179,7 +2263,8 @@
       "class": "Action_Exponentiation",
       "ID": "element0000000228",
       "name": "Exponentiation - NewVariable = 4^3",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Exponent": "3",
         "Varname": "NewVariable",
@@ -2194,7 +2279,8 @@
       "class": "Condition_NumberIs",
       "ID": "element0000000229",
       "name": "Number is - newVariable - 64",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "absoluteDeviation": "0",
         "expectedNumber": "64",
@@ -2212,7 +2298,8 @@
       "enabled": "1",
       "ID": "element0000000234",
       "name": "Manual - \"Number is\"",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "ID": "Number is"
       },
@@ -2225,7 +2312,8 @@
       "class": "Condition_NumberIs",
       "ID": "element0000000235",
       "name": "Number is - 5 - 5",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "absoluteDeviation": "0",
         "expectedNumber": "5",
@@ -2241,7 +2329,8 @@
       "class": "Condition_NumberIs",
       "ID": "element0000000237",
       "name": "Number is - 5.000000001 - 5",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "absoluteDeviation": "0",
         "expectedNumber": "5",
@@ -2257,7 +2346,8 @@
       "class": "Condition_NumberIs",
       "ID": "element0000000239",
       "name": "Number is - 5.000000001 - 5",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "absoluteDeviation": "0",
         "expectedNumber": "5",
@@ -2273,7 +2363,8 @@
       "class": "Condition_NumberIs",
       "ID": "element0000000244",
       "name": "Number is - 5.000500001 - 5",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "absoluteDeviation": "0",
         "expectedNumber": "5",
@@ -2289,7 +2380,8 @@
       "class": "Condition_NumberIs",
       "ID": "element0000000246",
       "name": "Number is - 4.9995 - 5",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "absoluteDeviation": "0",
         "expectedNumber": "5",
@@ -2305,7 +2397,8 @@
       "class": "Condition_NumberIs",
       "ID": "element0000000249",
       "name": "Number is - 4.99949999 - 5",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "absoluteDeviation": "0",
         "expectedNumber": "5",
@@ -2321,7 +2414,8 @@
       "class": "Condition_NumberIs",
       "ID": "element0000000251",
       "name": "Number is - 4.9995 - 5",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "absoluteDeviation": "0.0005",
         "expectedNumber": "5",
@@ -2337,7 +2431,8 @@
       "class": "Condition_NumberIs",
       "ID": "element0000000253",
       "name": "Number is - 4.9994999 - 5",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "absoluteDeviation": "0.0005",
         "expectedNumber": "5",
@@ -2353,7 +2448,8 @@
       "class": "Condition_NumberIs",
       "ID": "element0000000255",
       "name": "Number is - 4.9990 - 5",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "absoluteDeviation": "0.0005",
         "expectedNumber": "5",
@@ -2369,7 +2465,8 @@
       "class": "Condition_NumberIs",
       "ID": "element0000000257",
       "name": "Number is - 5.001 - 5",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "absoluteDeviation": "0.0005",
         "expectedNumber": "5",
@@ -2385,7 +2482,8 @@
       "class": "Condition_NumberIs",
       "ID": "element0000000259",
       "name": "Number is - 5.0010001 - 5",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "absoluteDeviation": "0.0005",
         "expectedNumber": "5",
@@ -2401,10 +2499,11 @@
       "class": "Action_New_variable",
       "ID": "element0000000261",
       "name": "New variable - static_successfulRuns = static_successfulRuns + 1",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "expression": "Expression",
-        "onlyIfNotExist": "",
+        "onlyIfNotExist": "0",
         "Varname": "static_successfulRuns",
         "VarValue": "static_successfulRuns + 1"
       },
@@ -2417,7 +2516,8 @@
       "class": "Condition_NumberIs",
       "ID": "element0000000263",
       "name": "Number is - -5.001 - -5",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "absoluteDeviation": "0.0005",
         "expectedNumber": "-5",
@@ -2433,7 +2533,8 @@
       "class": "Condition_NumberIs",
       "ID": "element0000000264",
       "name": "Number is - -5.0010001 - -5",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "absoluteDeviation": "0.0005",
         "expectedNumber": "-5",
@@ -2449,7 +2550,8 @@
       "class": "Condition_NumberIs",
       "ID": "element0000000268",
       "name": "Number is - 5 - 5",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "absoluteDeviation": "",
         "expectedNumber": "5",
@@ -2465,7 +2567,8 @@
       "class": "Action_Execute_Flow",
       "ID": "element0000000271",
       "name": "Execute flow: This flow - Manual - \"Number is\"",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "flowID": "",
         "ReturnVariables": 0,

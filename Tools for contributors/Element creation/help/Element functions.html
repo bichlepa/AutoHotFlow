@@ -7,23 +7,11 @@
 <BODY LANG="en-US" DIR="LTR">
 <H1>Element functions</H1>
 <p>The template has some functions which must be present in every element implementation.
-	<br/>The three dots <code>...</code> are placehoders for the unique element class which usually consists of element type and sub type. If you build a package, it is recommended to add a prefix to them. TODO Correct???
+	<br/>The three dots <code>...</code> are placehoders for the unique element class which usually consists of element type and sub type. If you build a package, it is recommended to add a prefix to the sub type.
 	<br/>Some function have the parameter <code>Environment</code>. This variable must never be changed and is not meant to be read. It must be passed to some API functions.
 </p>
 
 <table class="variables">
-	<TR>
-		<TD>
-			<h4 class="VariableName">x_RegisterElementClass("<code>...</code>")</h4>
-			<p>First of all this function must be called from global scope in order to register the element. Only then it will be available when AHF runs.</p>
-		</TD>
-	</TR>
-	<TR>
-		<TD>
-			<h4 class="VariableName">Element_getElementType_<code>...</code>()</h4>
-			<p>This function returns the element type. It can be one of following values: <code>action</code>, <code>condition</code>, <code>loop</code> or <code>trigger</code></p>
-		</TD>
-	</TR>
 	<TR>
 		<TD>
 			<h4 class="VariableName">Element_getName_<code>...</code>()</h4>
@@ -38,15 +26,6 @@
 			<p>This function returns the categories of the element. The categories define the folder where the element will be put in in the subtype selection menu.
 				<br/>Usually each element has a single category. They can also have multiple categories, it will then show up in multiple folders. Use a pipe <code>|</code> to separate the categories.
 				<br/>It's recommended to use the <code>x_lang()</code> function to allow the text to be translated in other languages.
-			</p>
-		</TD>
-	</TR>
-	<TR>
-		<TD>
-			<h4 class="VariableName">Element_getPackage_<code>...</code>()</h4>
-			<p>This function returns the package ID of the element. It must be same as the folder name of the package.
-				<br/>If you create a new package, the function should return the name of your package.
-				<br/>The package ID will be saved into the savefile of the flow. If the flow is imported into an AHF installation where the package is missing, it will show the warning, that the package is not installed.
 			</p>
 		</TD>
 	</TR>
@@ -151,6 +130,9 @@
 	</TR>
 </table>
 
+<H2>Remarks</H2>
+<p>From AHF Version 1.2, following functions became obsolete and can be removed: <b>x_RegisterElementClass("<code>...</code>")</b>, <b>Element_getElementType_<code>...</code>()</b>, <b>Element_getPackage_<code>...</code>()</b>
+</p>
 
 </BODY>
 </HTML>

@@ -1,4 +1,4 @@
-{
+﻿{
   "allConnections": {
     "connection0000000014": {
       "ConnectionType": "normal",
@@ -671,7 +671,8 @@
       "enabled": "1",
       "ID": "element0000000002",
       "name": "Manual - \"string contains text test\"",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "ID": "string contains text test"
       },
@@ -684,10 +685,11 @@
       "class": "Action_New_variable",
       "ID": "element0000000003",
       "name": "New variable - NewVariable = Hello World",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "expression": "string",
-        "onlyIfNotExist": "",
+        "onlyIfNotExist": "0",
         "Varname": "NewVariable",
         "VarValue": "Hello World"
       },
@@ -700,7 +702,8 @@
       "class": "Condition_String_Contains_Text",
       "ID": "element0000000004",
       "name": "String contains text - 'newVariable' contains 'World' - Case insensitive",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "CaseSensitive": "CaseInsensitive",
         "Expression": "Expression",
@@ -718,7 +721,8 @@
       "class": "Condition_String_Contains_Text",
       "ID": "element0000000005",
       "name": "String contains text - 'newVariable' contains 'world' - Case sensitive",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "CaseSensitive": "CaseSensitive",
         "Expression": "Expression",
@@ -736,10 +740,11 @@
       "class": "Action_New_variable",
       "ID": "element0000000006",
       "name": "New variable - searchText = hello",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "expression": "String",
-        "onlyIfNotExist": "",
+        "onlyIfNotExist": "0",
         "Varname": "searchText",
         "VarValue": "hello"
       },
@@ -752,7 +757,8 @@
       "class": "Condition_String_Contains_Text",
       "ID": "element0000000007",
       "name": "String contains text - 'Hello You' contains '%SearchText%' - Case insensitive",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "CaseSensitive": "CaseInsensitive",
         "Expression": "String",
@@ -770,7 +776,8 @@
       "class": "Condition_String_Contains_Text",
       "ID": "element0000000008",
       "name": "String contains text - 'Hello You' contains 'SearchText' - Case sensitive",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "CaseSensitive": "CaseSensitive",
         "Expression": "String",
@@ -788,7 +795,8 @@
       "class": "Condition_String_Contains_Text",
       "ID": "element0000000009",
       "name": "String contains text - 'Hello You' starts with 'hello' - Case sensitive",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "CaseSensitive": "CaseSensitive",
         "Expression": "String",
@@ -806,7 +814,8 @@
       "class": "Condition_String_Contains_Text",
       "ID": "element0000000010",
       "name": "String contains text - 'Hello You' starts with 'hello' - Case insensitive",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "CaseSensitive": "CaseInsensitive",
         "Expression": "String",
@@ -824,7 +833,8 @@
       "class": "Condition_String_Contains_Text",
       "ID": "element0000000011",
       "name": "String contains text - 'Hello You' starts with 'you' - Case insensitive",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "CaseSensitive": "CaseInsensitive",
         "Expression": "String",
@@ -842,7 +852,8 @@
       "class": "Condition_String_Contains_Text",
       "ID": "element0000000012",
       "name": "String contains text - 'Hello You' starts with 'you' - Case sensitive",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "CaseSensitive": "CaseSensitive",
         "Expression": "String",
@@ -860,10 +871,11 @@
       "class": "Action_New_variable",
       "ID": "element0000000013",
       "name": "New variable - static_successfulRuns = static_successfulRuns + 1",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "expression": "Expression",
-        "onlyIfNotExist": "",
+        "onlyIfNotExist": "0",
         "Varname": "static_successfulRuns",
         "VarValue": "static_successfulRuns + 1"
       },
@@ -878,7 +890,8 @@
       "enabled": "1",
       "ID": "element0000000025",
       "name": "Manual - \"start\"",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "ID": "start"
       },
@@ -891,7 +904,8 @@
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000029",
       "name": "Set flow status - Enable: This flow - All triggers",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Enable": "Enable",
         "flowID": "",
@@ -908,7 +922,8 @@
       "class": "Action_Execute_Flow",
       "ID": "element0000000030",
       "name": "Execute flow: This flow - Manual - \"string contains text test\"",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "flowID": "",
         "ReturnVariables": 0,
@@ -928,10 +943,11 @@
       "class": "Action_New_variable",
       "ID": "element0000000034",
       "name": "New variable - static_successfulRuns = 0",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "expression": "String",
-        "onlyIfNotExist": "",
+        "onlyIfNotExist": "0",
         "Varname": "static_successfulRuns",
         "VarValue": "0"
       },
@@ -944,7 +960,8 @@
       "class": "Condition_Expression",
       "ID": "element0000000035",
       "name": "Expression - static_successfulRuns = requiredSuccessfulRuns",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Expression": "static_successfulRuns = requiredSuccessfulRuns"
       },
@@ -957,10 +974,11 @@
       "class": "Action_New_variable",
       "ID": "element0000000036",
       "name": "New variable - requiredSuccessfulRuns = 4",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "expression": "Expression",
-        "onlyIfNotExist": "",
+        "onlyIfNotExist": "0",
         "Varname": "requiredSuccessfulRuns",
         "VarValue": "4"
       },
@@ -973,7 +991,8 @@
       "class": "Action_Add_To_List",
       "ID": "element0000000045",
       "name": "Add To List - global_testResults - As last value - Value 'a_flowName'",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "DelimiterComma": 0,
         "DelimiterLinefeed": 1,
@@ -982,7 +1001,6 @@
         "Expression": "Expression",
         "expressionPos": "String",
         "InsertMethod": "Insert",
-        "InsertMethodLabel": "",
         "NumberOfElements": "One",
         "Position": "keyName",
         "Varname": "global_testResults",
@@ -999,11 +1017,12 @@
       "class": "Action_Message_Box",
       "ID": "element0000000046",
       "name": "Message box - Fehler - Only %static_successfulRuns% successful runs instead of %requiredSuccessfulRuns%",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
+        "": "200",
         "ButtonLabel": "OK",
         "ButtonLabelCancel": "Abbrechen",
-        "Height": 200,
         "IfClose": "",
         "IfDismiss": 1,
         "IsTimeout": "NoTimeout",
@@ -1012,8 +1031,7 @@
         "ShowCancelButton": 0,
         "TimeoutUnits": 10,
         "title": "Fehler",
-        "Unit": "Seconds",
-        "Width": 300
+        "Unit": "Seconds"
       },
       "StandardName": "1",
       "type": "Action",
@@ -1024,7 +1042,8 @@
       "class": "Action_Split_a_string",
       "ID": "element0000000049",
       "name": "Split a string - NewList - Hello real world, Hello virtual world - , - %a_space%%a_tab%",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Delimiters": ",",
         "expression": "String",
@@ -1043,7 +1062,8 @@
       "enabled": "1",
       "ID": "element0000000050",
       "name": "Manual - \"string split and trim test\"",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "ID": "string split and trim test"
       },
@@ -1056,7 +1076,8 @@
       "class": "Action_Execute_Flow",
       "ID": "element0000000052",
       "name": "Execute flow: This flow - Manual - \"string split and trim test\"",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "flowID": "",
         "ReturnVariables": 0,
@@ -1076,7 +1097,8 @@
       "class": "Condition_Expression",
       "ID": "element0000000057",
       "name": "Expression - a_index = 1 and a_loopfield = \"Hello real world\"",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Expression": "a_index = 1 and a_loopfield = \"Hello real world\""
       },
@@ -1090,7 +1112,8 @@
       "HeightOfVerticalBar": "385",
       "ID": "element0000000060",
       "name": "Work through a list: NewList",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "VarValue": "NewList"
       },
@@ -1103,7 +1126,8 @@
       "class": "Condition_Expression",
       "ID": "element0000000061",
       "name": "Expression - a_index = 2 and a_loopfield = \"Hello virtual world\"",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Expression": "a_index = 2 and a_loopfield = \"Hello virtual world\""
       },
@@ -1116,10 +1140,11 @@
       "class": "Action_New_variable",
       "ID": "element0000000067",
       "name": "New variable - static_successfulRuns = static_successfulRuns + 1",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "expression": "Expression",
-        "onlyIfNotExist": "",
+        "onlyIfNotExist": "0",
         "Varname": "static_successfulRuns",
         "VarValue": "static_successfulRuns + 1"
       },
@@ -1134,7 +1159,8 @@
       "enabled": "1",
       "ID": "element0000000069",
       "name": "Manual - \"substring test\"",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "ID": "substring test"
       },
@@ -1147,7 +1173,8 @@
       "class": "Action_Split_a_string",
       "ID": "element0000000071",
       "name": "Split a string - NewList - Hello real world, Hello virtual world - , - ",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Delimiters": ",",
         "expression": "String",
@@ -1164,7 +1191,8 @@
       "class": "Condition_Expression",
       "ID": "element0000000072",
       "name": "Expression - a_index = 1 and a_loopfield = \"Hello real world\"",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Expression": "a_index = 1 and a_loopfield = \"Hello real world\""
       },
@@ -1178,7 +1206,8 @@
       "HeightOfVerticalBar": "595",
       "ID": "element0000000073",
       "name": "Work through a list: NewList",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "VarValue": "NewList"
       },
@@ -1191,7 +1220,8 @@
       "class": "Condition_Expression",
       "ID": "element0000000074",
       "name": "Expression - a_index = 2 and a_loopfield = \" Hello virtual world\"",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Expression": "a_index = 2 and a_loopfield = \" Hello virtual world\""
       },
@@ -1204,7 +1234,8 @@
       "class": "Condition_Expression",
       "ID": "element0000000083",
       "name": "Expression - trimmed = \"Hello virtual world\"",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Expression": "trimmed = \"Hello virtual world\""
       },
@@ -1217,7 +1248,8 @@
       "class": "Action_Trim_a_string",
       "ID": "element0000000084",
       "name": "Trim a string - trimmed - a_loopfield - Remove characters '%a_space%%a_tab%%a_lf%%a_cr%' from Both sides",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "expression": "Expression",
         "LeftSide": 1,
@@ -1237,7 +1269,8 @@
       "class": "Action_Trim_a_string",
       "ID": "element0000000091",
       "name": "Trim a string - trimmed - trimmed - Remove characters 'Hd' from Left side",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "expression": "Expression",
         "LeftSide": 1,
@@ -1257,7 +1290,8 @@
       "class": "Condition_Expression",
       "ID": "element0000000094",
       "name": "Expression - trimmed = \"ello virtual world\"",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Expression": "trimmed = \"ello virtual world\""
       },
@@ -1270,7 +1304,8 @@
       "class": "Action_Trim_a_string",
       "ID": "element0000000097",
       "name": "Trim a string - trimmed - trimmed - Remove characters 'ed' from Right side",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "expression": "Expression",
         "LeftSide": "0",
@@ -1290,7 +1325,8 @@
       "class": "Condition_Expression",
       "ID": "element0000000098",
       "name": "Expression - trimmed = \"ello virtual worl\"",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Expression": "trimmed = \"ello virtual worl\""
       },
@@ -1303,7 +1339,8 @@
       "class": "Action_Trim_a_string",
       "ID": "element0000000104",
       "name": "Trim a string - trimmed - trimmed - Remove '2' characters from Right side",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "expression": "Expression",
         "LeftSide": "0",
@@ -1323,7 +1360,8 @@
       "class": "Condition_Expression",
       "ID": "element0000000107",
       "name": "Expression - trimmed = \"o virtual wo\"",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Expression": "trimmed = \"o virtual wo\""
       },
@@ -1336,7 +1374,8 @@
       "class": "Action_Trim_a_string",
       "ID": "element0000000108",
       "name": "Trim a string - trimmed - trimmed - Remove '3' characters from Left side",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "expression": "Expression",
         "LeftSide": "1",
@@ -1356,7 +1395,8 @@
       "class": "Action_Trim_a_string",
       "ID": "element0000000115",
       "name": "Trim a string - trimmed - trimmed - Remove characters 'o' from Both sides",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "expression": "Expression",
         "LeftSide": "1",
@@ -1376,7 +1416,8 @@
       "class": "Condition_Expression",
       "ID": "element0000000118",
       "name": "Expression - trimmed = \" virtual w\"",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Expression": "trimmed = \" virtual w\""
       },
@@ -1389,7 +1430,8 @@
       "class": "Action_Trim_a_string",
       "ID": "element0000000121",
       "name": "Trim a string - trimmed - trimmed - Remove '1' characters from Both sides",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "expression": "Expression",
         "LeftSide": "1",
@@ -1409,7 +1451,8 @@
       "class": "Condition_Expression",
       "ID": "element0000000122",
       "name": "Expression - trimmed = \"virtual \"",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Expression": "trimmed = \"virtual \""
       },
@@ -1422,10 +1465,11 @@
       "class": "Action_New_variable",
       "ID": "element0000000130",
       "name": "New variable - string = Hello real world",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "expression": "String",
-        "onlyIfNotExist": "",
+        "onlyIfNotExist": "0",
         "Varname": "string",
         "VarValue": "Hello real world"
       },
@@ -1438,7 +1482,8 @@
       "class": "Action_Substring",
       "ID": "element0000000133",
       "name": "Substring - hello - string",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "expression": "Expression",
         "LeftOrRight": "GoRight",
@@ -1458,7 +1503,8 @@
       "class": "Action_Substring",
       "ID": "element0000000134",
       "name": "Substring - world - string",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "expression": "Expression",
         "LeftOrRight": "GoLeft",
@@ -1478,7 +1524,8 @@
       "class": "Action_Substring",
       "ID": "element0000000135",
       "name": "Substring - real - string",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "expression": "Expression",
         "LeftOrRight": "GoRight",
@@ -1498,7 +1545,8 @@
       "class": "Condition_Expression",
       "ID": "element0000000138",
       "name": "Expression - hello = \"hello\" and world = \"world\" and real = \"real\"",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Expression": "hello = \"hello\" and world = \"world\" and real = \"real\""
       },
@@ -1511,10 +1559,11 @@
       "class": "Action_New_variable",
       "ID": "element0000000140",
       "name": "New variable - static_successfulRuns = static_successfulRuns + 1",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "expression": "Expression",
-        "onlyIfNotExist": "",
+        "onlyIfNotExist": "0",
         "Varname": "static_successfulRuns",
         "VarValue": "static_successfulRuns + 1"
       },
@@ -1527,7 +1576,8 @@
       "class": "Action_Substring",
       "ID": "element0000000142",
       "name": "Substring - realWorld - string",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "expression": "Expression",
         "LeftOrRight": "GoRight",
@@ -1547,7 +1597,8 @@
       "class": "Action_Substring",
       "ID": "element0000000143",
       "name": "Substring - hello - string",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "expression": "Expression",
         "LeftOrRight": "GoLeft",
@@ -1567,7 +1618,8 @@
       "class": "Condition_Expression",
       "ID": "element0000000148",
       "name": "Expression - hello = \"hello\" and realWorld = \"real world\"",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Expression": "hello = \"hello\" and realWorld = \"real world\""
       },
@@ -1580,7 +1632,8 @@
       "class": "Action_Search_in_a_string",
       "ID": "element0000000153",
       "name": "Search in a string - posWorld1 - string - World",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "CaseSensitive": "CaseInsensitive",
         "Expression": "Expression",
@@ -1603,7 +1656,8 @@
       "enabled": "1",
       "ID": "element0000000154",
       "name": "Manual - \"search in string test\"",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "ID": "search in string test"
       },
@@ -1616,10 +1670,11 @@
       "class": "Action_New_variable",
       "ID": "element0000000156",
       "name": "New variable - string = Hello real world, Hello virtual world",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "expression": "String",
-        "onlyIfNotExist": "",
+        "onlyIfNotExist": "0",
         "Varname": "string",
         "VarValue": "Hello real world, Hello virtual world"
       },
@@ -1632,7 +1687,8 @@
       "class": "Action_Search_in_a_string",
       "ID": "element0000000159",
       "name": "Search in a string - posWorld2 - string - World",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "CaseSensitive": "CaseInsensitive",
         "Expression": "Expression",
@@ -1653,7 +1709,8 @@
       "class": "Action_Search_in_a_string",
       "ID": "element0000000161",
       "name": "Search in a string - posWorld2 - string - World",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "CaseSensitive": "CaseSensitive",
         "Expression": "Expression",
@@ -1674,7 +1731,8 @@
       "class": "Condition_Expression",
       "ID": "element0000000163",
       "name": "Expression - posWorld1 = 12 and posWorld2 = 33",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Expression": "posWorld1 = 12 and posWorld2 = 33"
       },
@@ -1687,10 +1745,11 @@
       "class": "Action_New_variable",
       "ID": "element0000000165",
       "name": "New variable - static_successfulRuns = static_successfulRuns + 1",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "expression": "Expression",
-        "onlyIfNotExist": "",
+        "onlyIfNotExist": "0",
         "Varname": "static_successfulRuns",
         "VarValue": "static_successfulRuns + 1"
       },
@@ -1703,7 +1762,8 @@
       "class": "Action_Search_in_a_string",
       "ID": "element0000000175",
       "name": "Search in a string - posWorld1 - string - World",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "CaseSensitive": "CaseInsensitive",
         "Expression": "Expression",
@@ -1724,7 +1784,8 @@
       "class": "Action_Search_in_a_string",
       "ID": "element0000000176",
       "name": "Search in a string - posWorld2 - string - World",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "CaseSensitive": "CaseInsensitive",
         "Expression": "Expression",
@@ -1745,7 +1806,8 @@
       "class": "Condition_Expression",
       "ID": "element0000000178",
       "name": "Expression - posWorld1 = 33 and posWorld2 = 12",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Expression": "posWorld1 = 33 and posWorld2 = 12"
       },
@@ -1758,7 +1820,8 @@
       "class": "Action_Search_in_a_string",
       "ID": "element0000000181",
       "name": "Search in a string - posWorld2 - string - World",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "CaseSensitive": "CaseInsensitive",
         "Expression": "Expression",
@@ -1779,7 +1842,8 @@
       "class": "Action_Search_in_a_string",
       "ID": "element0000000187",
       "name": "Search in a string - posWorld1 - string - World",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "CaseSensitive": "CaseInsensitive",
         "Expression": "Expression",
@@ -1800,7 +1864,8 @@
       "class": "Action_Search_in_a_string",
       "ID": "element0000000189",
       "name": "Search in a string - posWorld1 - string - World",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "CaseSensitive": "CaseInsensitive",
         "Expression": "Expression",
@@ -1821,7 +1886,8 @@
       "class": "Action_Search_in_a_string",
       "ID": "element0000000190",
       "name": "Search in a string - posWorld2 - string - World",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "CaseSensitive": "CaseInsensitive",
         "Expression": "Expression",
@@ -1842,7 +1908,8 @@
       "class": "Condition_Expression",
       "ID": "element0000000192",
       "name": "Expression - posWorld1 = 12 and posWorld2 = 33",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Expression": "posWorld1 = 12 and posWorld2 = 33"
       },
@@ -1855,7 +1922,8 @@
       "class": "Action_Execute_Flow",
       "ID": "element0000000195",
       "name": "Execute flow: This flow - Manual - \"substring test\"",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "flowID": "",
         "ReturnVariables": 0,
@@ -1875,7 +1943,8 @@
       "class": "Action_Execute_Flow",
       "ID": "element0000000198",
       "name": "Execute flow: This flow - Manual - \"search in string test\"",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "flowID": "",
         "ReturnVariables": 0,

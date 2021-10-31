@@ -62,9 +62,9 @@ Element_getParametrizationDetails_Action_Execute_Flow(Environment)
 
 	parametersToEdit.push({type: "Label", label:  x_lang("Options")})
 	parametersToEdit.push({type: "Checkbox", id: "SendLocalVars", default: 1, label: x_lang("Send local variables")})
-	parametersToEdit.push({type: "Checkbox", id: "SkipDisabled", default: 0, label: x_lang("Skip disabled flows without error")})
 	parametersToEdit.push({type: "Checkbox", id: "WaitToFinish", default: 0, label: x_lang("Wait for called flow to finish")})
 	parametersToEdit.push({type: "Checkbox", id: "ReturnVariables", default: 0, label: x_lang("Return local variables to the calling flow")})
+	parametersToEdit.push({type: "Checkbox", id: "SkipDisabled", default: 0, label: x_lang("Skip disabled flows without error")})
 
 	return parametersToEdit
 }

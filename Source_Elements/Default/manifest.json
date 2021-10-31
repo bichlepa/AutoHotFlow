@@ -14,7 +14,8 @@
         "lib\\Process list\\getProcessList.ahk",
         "lib\\Json\\Jxon.ahk",
         "lib\\Yaml\\Yaml.ahk",
-        "common\\window functions.ahk"
+        "common\\window functions.ahk",
+        "common\\compatibility.ahk"
     ],
     "actions": [
         "New_Variable.ahk",
@@ -59,7 +60,7 @@
         "Eject_Drive.ahk",
         "Change_Drive_Label.ahk",
         "Get_Drive_Information.ahk",
-        "Lock_Or_Unlcock_Drive.ahk",
+        "Lock_Or_Unlock_Drive.ahk",
         "List_Drives.ahk",
 
         "Read_From_File.ahk",
@@ -154,7 +155,7 @@
         "Variable_content_is.ahk",
         "List_Contains_Element.ahk",
         "String_Contains_Text.ahk",
-        "Number_is.ahk",
+        "NumberIs.ahk",
 
         "File_Exists.ahk",
         "File_Has_Attribute.ahk",

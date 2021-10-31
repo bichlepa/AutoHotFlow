@@ -1,4 +1,4 @@
-﻿{
+{
   "allConnections": {
     "connection0000000005": {
       "ConnectionType": "normal",
@@ -263,7 +263,8 @@
       "enabled": "1",
       "ID": "element0000000001",
       "name": "Manual - \"Trigger left bicycle\"",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "ID": "Trigger left bicycle"
       },
@@ -277,7 +278,8 @@
       "enabled": "0",
       "ID": "element0000000004",
       "name": "User idle time - 10 s",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Interval": 10,
         "Method": "TimeIdlePhysical",
@@ -292,10 +294,11 @@
       "class": "Action_New_variable",
       "ID": "element0000000007",
       "name": "New variable - static_trigger1 = 0",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "expression": "String",
-        "onlyIfNotExist": "",
+        "onlyIfNotExist": "0",
         "Varname": "static_trigger1",
         "VarValue": "0"
       },
@@ -308,7 +311,8 @@
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000010",
       "name": "Set flow status - Enable: This flow - All triggers",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Enable": "Enable",
         "flowID": "",
@@ -325,7 +329,8 @@
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000017",
       "name": "Set flow status - Disable: This flow - User idle time - 10 s",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Enable": "Disable",
         "flowID": "",
@@ -343,7 +348,8 @@
       "enabled": "0",
       "ID": "element0000000019",
       "name": "User idle time - 5000 ms",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Interval": "5000",
         "Method": "TimeIdlePhysical",
@@ -359,7 +365,8 @@
       "enabled": "0",
       "ID": "element0000000020",
       "name": "User idle time - 1.0\/60*10 m",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Interval": "1.0\/60*10",
         "Method": "TimeIdlePhysical",
@@ -374,7 +381,8 @@
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000023",
       "name": "Set flow status - Disable: This flow - User idle time - 5000 ms",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Enable": "Disable",
         "flowID": "",
@@ -391,7 +399,8 @@
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000024",
       "name": "Set flow status - Disable: This flow - User idle time - 1.0\/60*10 m",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Enable": "Disable",
         "flowID": "",
@@ -409,7 +418,8 @@
       "enabled": "0",
       "ID": "element0000000029",
       "name": "User idle time - 1.0\/60\/60*10 h",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Interval": "1.0\/60\/60*10",
         "Method": "TimeIdlePhysical",
@@ -424,7 +434,8 @@
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000030",
       "name": "Set flow status - Disable: This flow - User idle time - 1.0\/60\/60*10 h",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Enable": "Disable",
         "flowID": "",
@@ -442,7 +453,8 @@
       "HeightOfVerticalBar": "735",
       "ID": "element0000000035",
       "name": "Simple loop: 30 Repeats",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Infinite": 0,
         "repeatCount": "30"
@@ -456,10 +468,11 @@
       "class": "Action_New_variable",
       "ID": "element0000000039",
       "name": "New variable - static_trigger2 = 0",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "expression": "String",
-        "onlyIfNotExist": "",
+        "onlyIfNotExist": "0",
         "Varname": "static_trigger2",
         "VarValue": "0"
       },
@@ -472,10 +485,11 @@
       "class": "Action_New_variable",
       "ID": "element0000000040",
       "name": "New variable - static_trigger3 = 0",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "expression": "String",
-        "onlyIfNotExist": "",
+        "onlyIfNotExist": "0",
         "Varname": "static_trigger3",
         "VarValue": "0"
       },
@@ -488,10 +502,11 @@
       "class": "Action_New_variable",
       "ID": "element0000000041",
       "name": "New variable - static_trigger4 = 0",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "expression": "String",
-        "onlyIfNotExist": "",
+        "onlyIfNotExist": "0",
         "Varname": "static_trigger4",
         "VarValue": "0"
       },
@@ -504,10 +519,11 @@
       "class": "Action_New_variable",
       "ID": "element0000000045",
       "name": "New variable - static_trigger1 = 1",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "expression": "String",
-        "onlyIfNotExist": "",
+        "onlyIfNotExist": "0",
         "Varname": "static_trigger1",
         "VarValue": "1"
       },
@@ -520,10 +536,11 @@
       "class": "Action_New_variable",
       "ID": "element0000000046",
       "name": "New variable - static_trigger2 = 1",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "expression": "String",
-        "onlyIfNotExist": "",
+        "onlyIfNotExist": "0",
         "Varname": "static_trigger2",
         "VarValue": "1"
       },
@@ -536,10 +553,11 @@
       "class": "Action_New_variable",
       "ID": "element0000000047",
       "name": "New variable - static_trigger3 = 1",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "expression": "String",
-        "onlyIfNotExist": "",
+        "onlyIfNotExist": "0",
         "Varname": "static_trigger3",
         "VarValue": "1"
       },
@@ -552,10 +570,11 @@
       "class": "Action_New_variable",
       "ID": "element0000000048",
       "name": "New variable - static_trigger4 = 1",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "expression": "String",
-        "onlyIfNotExist": "",
+        "onlyIfNotExist": "0",
         "Varname": "static_trigger4",
         "VarValue": "1"
       },
@@ -568,7 +587,8 @@
       "class": "Condition_Expression",
       "ID": "element0000000054",
       "name": "Expression - static_trigger1 or static_trigger3 or static_trigger4",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Expression": "static_trigger1 or static_trigger3 or static_trigger4"
       },
@@ -581,7 +601,8 @@
       "class": "Condition_Expression",
       "ID": "element0000000056",
       "name": "Expression - static_trigger2",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Expression": "static_trigger2"
       },
@@ -595,7 +616,8 @@
       "HeightOfVerticalBar": "630",
       "ID": "element0000000060",
       "name": "Simple loop: 30 Repeats",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Infinite": 0,
         "repeatCount": "30"
@@ -609,7 +631,8 @@
       "class": "Action_Sleep",
       "ID": "element0000000063",
       "name": "Sleep: 1 s",
-      "package": "action",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Duration": "1",
         "Unit": "Seconds"
@@ -623,7 +646,8 @@
       "class": "Condition_Expression",
       "ID": "element0000000065",
       "name": "Expression - static_trigger1 and static_trigger3 and static_trigger4",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Expression": "static_trigger1 and static_trigger3 and static_trigger4"
       },
@@ -636,7 +660,8 @@
       "class": "Condition_Expression",
       "ID": "element0000000066",
       "name": "Expression - static_trigger2",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Expression": "static_trigger2"
       },
@@ -649,7 +674,8 @@
       "class": "Action_Sleep",
       "ID": "element0000000067",
       "name": "Sleep: 1 s",
-      "package": "action",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Duration": "1",
         "Unit": "Seconds"
@@ -663,10 +689,11 @@
       "class": "Action_New_variable",
       "ID": "element0000000072",
       "name": "New variable - static_trigger2 = 0",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "expression": "String",
-        "onlyIfNotExist": "",
+        "onlyIfNotExist": "0",
         "Varname": "static_trigger2",
         "VarValue": "0"
       },
@@ -679,7 +706,8 @@
       "class": "Action_Add_To_List",
       "ID": "element0000000077",
       "name": "Add To List - global_testResults - As last value - Value 'a_flowName'",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "DelimiterComma": 0,
         "DelimiterLinefeed": 1,
@@ -688,7 +716,6 @@
         "Expression": "Expression",
         "expressionPos": "String",
         "InsertMethod": "Insert",
-        "InsertMethodLabel": "",
         "NumberOfElements": "One",
         "Position": "keyName",
         "Varname": "global_testResults",
@@ -705,7 +732,8 @@
       "class": "Condition_Expression",
       "ID": "element0000000081",
       "name": "Expression - a_index > 6",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Expression": "a_index > 6"
       },
@@ -718,7 +746,8 @@
       "class": "Action_Tooltip",
       "ID": "element0000000084",
       "name": "Tooltip: don't move the mouse and don't press anything - 2 s - Follow mouse",
-      "package": "action",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "duration": 2,
         "follow_mouse": 1,
@@ -734,7 +763,8 @@
       "class": "Condition_Expression",
       "ID": "element0000000085",
       "name": "Expression - a_index > 6",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Expression": "a_index > 6"
       },
@@ -747,7 +777,8 @@
       "class": "Action_Tooltip",
       "ID": "element0000000086",
       "name": "Tooltip: don't move the mouse and don't press anything - 2 s - Follow mouse",
-      "package": "action",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "duration": 2,
         "follow_mouse": 1,

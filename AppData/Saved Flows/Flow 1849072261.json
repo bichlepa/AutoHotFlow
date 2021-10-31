@@ -1,4 +1,4 @@
-{
+﻿{
   "allConnections": {
     "connection0000000003": {
       "ConnectionType": "normal",
@@ -127,7 +127,8 @@
       "enabled": "1",
       "ID": "element0000000001",
       "name": "Manual - \"start\"",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "ID": "start"
       },
@@ -140,7 +141,8 @@
       "class": "Action_AutoHotKey_script",
       "ID": "element0000000002",
       "name": "AutoHotkey script - counter += 1",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "ExportVariables": "counter",
         "ImportVariables": "counter",
@@ -155,10 +157,11 @@
       "class": "Action_New_variable",
       "ID": "element0000000008",
       "name": "New variable - counter = 1",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "expression": "string",
-        "onlyIfNotExist": "",
+        "onlyIfNotExist": "0",
         "Varname": "counter",
         "VarValue": "1"
       },
@@ -171,7 +174,8 @@
       "class": "Action_Stop_Flow",
       "ID": "element0000000014",
       "name": "Stop flow - external script test",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "flowID": "Flow 1849072261"
       },
@@ -184,7 +188,8 @@
       "class": "Action_AutoHotKey_script",
       "ID": "element0000000015",
       "name": "AutoHotkey script - sleep, 10000 - msgbox, skript wurde nicht gestoppt",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "ExportVariables": "counter",
         "ImportVariables": "counter",
@@ -199,7 +204,8 @@
       "class": "Action_AutoHotKey_script",
       "ID": "element0000000017",
       "name": "AutoHotkey script - sleep, 10000 - msgbox, skript wurde nicht gestoppt",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "ExportVariables": "counter",
         "ImportVariables": "counter",
@@ -214,7 +220,8 @@
       "class": "Action_AutoHotKey_script",
       "ID": "element0000000023",
       "name": "AutoHotkey script - counter += 1",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "ExportVariables": "counter",
         "ImportVariables": "counter",
@@ -229,7 +236,8 @@
       "class": "Action_AutoHotKey_script",
       "ID": "element0000000024",
       "name": "AutoHotkey script - counter += 1",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "ExportVariables": "counter",
         "ImportVariables": "counter",
@@ -244,7 +252,8 @@
       "class": "Action_AutoHotKey_script",
       "ID": "element0000000025",
       "name": "AutoHotkey script - counter += 1",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "ExportVariables": "counter",
         "ImportVariables": "counter",
@@ -259,7 +268,8 @@
       "class": "Action_AutoHotKey_script",
       "ID": "element0000000026",
       "name": "AutoHotkey script - counter += 1",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "ExportVariables": "counter",
         "ImportVariables": "counter",
@@ -274,7 +284,8 @@
       "class": "Action_AutoHotKey_script",
       "ID": "element0000000027",
       "name": "AutoHotkey script - counter += 1",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "ExportVariables": "counter",
         "ImportVariables": "counter",
@@ -289,7 +300,8 @@
       "class": "Action_AutoHotKey_script",
       "ID": "element0000000032",
       "name": "AutoHotkey script - counter += 1 - counterPlus10 := counter + 10",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "ExportVariables": "counter, counterPlus10 ",
         "ImportVariables": "counter",
@@ -304,7 +316,8 @@
       "class": "Condition_Expression",
       "ID": "element0000000036",
       "name": "Expression - counter = 3",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Expression": "counter = 3"
       },
@@ -317,7 +330,8 @@
       "class": "Action_Tooltip",
       "ID": "element0000000043",
       "name": "Tooltip: %counter% - %counterplus10% - 2 s - Follow mouse",
-      "package": "action",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "duration": 2,
         "follow_mouse": 1,
@@ -333,7 +347,8 @@
       "class": "Action_Add_To_List",
       "ID": "element0000000089",
       "name": "Add To List - global_testResults - As last value - Value 'a_flowName'",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "DelimiterComma": 0,
         "DelimiterLinefeed": 1,
@@ -342,7 +357,6 @@
         "Expression": "Expression",
         "expressionPos": "String",
         "InsertMethod": "Insert",
-        "InsertMethodLabel": "",
         "NumberOfElements": "One",
         "Position": "keyName",
         "Varname": "global_testResults",

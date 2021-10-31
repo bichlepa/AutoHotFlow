@@ -58,6 +58,8 @@ class ElementSettingsElementClassSelector
 		this.TVelementID := Object()
 		this.TVelementClass := Object()
 		
+		AllElementClassInfos := _getShared("AllElementClassInfos")
+		
 		; Find all matching element classes and create a list of categories
 		local matchingElementClasses := Object()
 		local allCategories := Object()
@@ -65,7 +67,7 @@ class ElementSettingsElementClassSelector
 		for forelementIndex, forElementClass in _getShared("AllElementClasses")
 		{
 			; check element type
-			if (Element_getElementType_%forElementClass%() = this.elementType)
+			if (AllElementClassInfos[forElementClass].type = this.elementType)
 			{
 				; check required user experience level of this element. Always the selected element regardless of its required level
 				if (ShouldShowThatelementLevel(Element_getElementLevel_%forElementClass%())

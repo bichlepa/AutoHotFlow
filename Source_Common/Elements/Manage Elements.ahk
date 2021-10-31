@@ -89,19 +89,21 @@ Element_SetClass(p_FlowID, p_ElementID, p_elementClass)
 		MsgBox internal error! A new element class should be set but ElementID is empty!
 		return
 	}
+	
+	AllElementClassInfos := _getShared("AllElementClassInfos")
 
-	if not isfunc("Element_getElementType_" p_elementClass)
+	if (not AllElementClassInfos[p_elementClass].type)
 	{
-		MsgBox internal error! Function Element_getElementType_%p_elementClass% missing.
+		MsgBox internal error! Element type of class %p_elementClass% uknown.
 		return
 	}
 
 	_EnterCriticalSection() ; enter this critical section to ensure data integrity
 	
 	;Set element type if it has changed
-	if (_getElementProperty(p_FlowID, p_elementID, "type") != Element_getElementType_%p_elementClass%())
+	if (_getElementProperty(p_FlowID, p_elementID, "type") != AllElementClassInfos[p_elementClass].type)
 	{
-		Element_SetType(p_FlowID, p_elementID, Element_getElementType_%p_elementClass%())
+		Element_SetType(p_FlowID, p_elementID, AllElementClassInfos[p_elementClass].type)
 	}
 	
 	;Set element class

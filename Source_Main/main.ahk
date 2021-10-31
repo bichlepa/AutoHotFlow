@@ -117,6 +117,7 @@ global global_libInclusionsForThreads, global_elementInclusionsForThreads
 #include source_Elements\Default\lib\Json\Jxon.ahk
 #include source_Elements\Default\lib\Yaml\Yaml.ahk
 #include source_Elements\Default\common\window functions.ahk
+#include source_Elements\Default\common\compatibility.ahk
 
 global_libInclusionsForThreads = 
 (
@@ -129,6 +130,7 @@ global_libInclusionsForThreads =
 #include source_Elements\Default\lib\Json\Jxon.ahk
 #include source_Elements\Default\lib\Yaml\Yaml.ahk
 #include source_Elements\Default\common\window functions.ahk
+#include source_Elements\Default\common\compatibility.ahk
 
 )
 
@@ -140,6 +142,7 @@ global_libInclusionsForThreads =
 #include Source_Main\Threads\Threads.ahk
 #include Source_Main\Api\API for Elements.ahk
 #include Source_Main\hidden window\hidden window.ahk
+#include Source_Main\Elements\Elements.ahk
 
 #include Source_Common\Multithreading\API Caller to Main.ahk
 #include Source_Common\Multithreading\API Caller to Manager.ahk
@@ -205,7 +208,7 @@ global_libInclusionsForThreads =
 #include source_Elements\Default\actions\Eject_Drive.ahk
 #include source_Elements\Default\actions\Change_Drive_Label.ahk
 #include source_Elements\Default\actions\Get_Drive_Information.ahk
-#include source_Elements\Default\actions\Lock_Or_Unlcock_Drive.ahk
+#include source_Elements\Default\actions\Lock_Or_Unlock_Drive.ahk
 #include source_Elements\Default\actions\List_Drives.ahk
 #include source_Elements\Default\actions\Read_From_File.ahk
 #include source_Elements\Default\actions\Write_To_File.ahk
@@ -287,7 +290,7 @@ global_libInclusionsForThreads =
 #include source_Elements\Default\conditions\Variable_content_is.ahk
 #include source_Elements\Default\conditions\List_Contains_Element.ahk
 #include source_Elements\Default\conditions\String_Contains_Text.ahk
-#include source_Elements\Default\conditions\Number_is.ahk
+#include source_Elements\Default\conditions\NumberIs.ahk
 #include source_Elements\Default\conditions\File_Exists.ahk
 #include source_Elements\Default\conditions\File_Has_Attribute.ahk
 #include source_Elements\Default\conditions\Confirmation_Dialog.ahk
@@ -358,7 +361,7 @@ global_elementInclusionsForThreads =
 #include source_Elements\Default\actions\Eject_Drive.ahk
 #include source_Elements\Default\actions\Change_Drive_Label.ahk
 #include source_Elements\Default\actions\Get_Drive_Information.ahk
-#include source_Elements\Default\actions\Lock_Or_Unlcock_Drive.ahk
+#include source_Elements\Default\actions\Lock_Or_Unlock_Drive.ahk
 #include source_Elements\Default\actions\List_Drives.ahk
 #include source_Elements\Default\actions\Read_From_File.ahk
 #include source_Elements\Default\actions\Write_To_File.ahk
@@ -440,7 +443,7 @@ global_elementInclusionsForThreads =
 #include source_Elements\Default\conditions\Variable_content_is.ahk
 #include source_Elements\Default\conditions\List_Contains_Element.ahk
 #include source_Elements\Default\conditions\String_Contains_Text.ahk
-#include source_Elements\Default\conditions\Number_is.ahk
+#include source_Elements\Default\conditions\NumberIs.ahk
 #include source_Elements\Default\conditions\File_Exists.ahk
 #include source_Elements\Default\conditions\File_Has_Attribute.ahk
 #include source_Elements\Default\conditions\Confirmation_Dialog.ahk
@@ -477,6 +480,17 @@ global_elementInclusionsForThreads =
 )
 
 ;Element_Includes_End
+
+; read package Informations
+packageInfo := []
+
+;PackageInfos_StartpackageInfo["Default"] := []
+
+;PackageInfos_End
+_setShared("packageInfo", packageInfo)
+
+; check the implementation of elements
+Check_Packages()
 
 ;Start other threads. Multi-threading gain the performance heavily
 ;and execution of flows does not lower the GUI performance.
