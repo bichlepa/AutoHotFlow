@@ -796,10 +796,10 @@
   "flowSettings": {
     "DefaultWorkingDir": 1,
     "ExecutionPolicy": "default",
-    "Offsetx": "-1304.122569",
-    "Offsety": "-307.801127",
+    "Offsetx": "-1277.587011",
+    "Offsety": "1738.656529",
     "WorkingDir": "",
-    "zoomFactor": "0.578513"
+    "zoomFactor": "0.578511"
   },
   "name": "User idle test"
 }

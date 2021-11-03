@@ -37,7 +37,7 @@ Element_getParametrizationDetails_Condition_Expression(Environment)
 {
 	parametersToEdit := Object()
 	parametersToEdit.push({type: "Label", label: x_lang("Expression")})
-	parametersToEdit.push({type: "Edit", id: "Expression", content: "Expression", WarnIfEmpty: true})
+	parametersToEdit.push({type: "multilineEdit", id: "Expression", content: "Expression", WarnIfEmpty: true})
 
 	return parametersToEdit
 }

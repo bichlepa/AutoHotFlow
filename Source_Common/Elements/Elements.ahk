@@ -73,7 +73,7 @@ Element_getParameters(elementClass, Environment)
 					; The value contains a list of parameter IDs. Add them all.
 					for index3, OneID in oneParameterDetail.ID
 					{
-						tempObject.push({ID: oneParameterDetail.OneID, default: oneParameterDetail.default[index3]})
+						tempObject.push({ID: OneID, default: oneParameterDetail.default[index3]})
 					}
 				}
 			}
@@ -90,7 +90,7 @@ Element_getParameters(elementClass, Environment)
 					; The value contains a list of parameter IDs. Add them all.
 					for index3, OneID in oneParameterDetail.ContentID
 					{
-						tempObject.push({ID: oneParameterDetail.OneID, default: oneParameterDetail.ContentDefault[index3]})
+						tempObject.push({ID: OneID, default: oneParameterDetail.ContentDefault[index3]})
 					}
 				}
 			}

@@ -18,7 +18,7 @@
       "ConnectionType": "normal",
       "from": "element0000000009",
       "ID": "connection0000000008",
-      "to": "element0000000032",
+      "to": "element0000000109",
       "type": "Connection"
     },
     "connection0000000010": {
@@ -264,20 +264,6 @@
       "to": "element0000000085",
       "type": "Connection"
     },
-    "connection0000000089": {
-      "ConnectionType": "normal",
-      "from": "element0000000087",
-      "ID": "connection0000000089",
-      "to": "element0000000088",
-      "type": "Connection"
-    },
-    "connection0000000090": {
-      "ConnectionType": "normal",
-      "from": "element0000000032",
-      "ID": "connection0000000090",
-      "to": "element0000000087",
-      "type": "Connection"
-    },
     "connection0000000093": {
       "ConnectionType": "normal",
       "from": "element0000000091",
@@ -305,6 +291,102 @@
       "ID": "connection0000000098",
       "to": "element0000000095",
       "type": "Connection"
+    },
+    "connection0000000104": {
+      "ConnectionType": "normal",
+      "from": "element0000000032",
+      "ID": "connection0000000104",
+      "to": "element0000000102",
+      "type": "Connection"
+    },
+    "connection0000000105": {
+      "ConnectionType": "normal",
+      "from": "element0000000102",
+      "ID": "connection0000000105",
+      "to": "element0000000103",
+      "type": "Connection"
+    },
+    "connection0000000108": {
+      "ConnectionType": "normal",
+      "from": "element0000000106",
+      "ID": "connection0000000108",
+      "to": "element0000000107",
+      "type": "Connection"
+    },
+    "connection0000000110": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000110",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000112": {
+      "ConnectionType": "normal",
+      "from": "element0000000109",
+      "ID": "connection0000000112",
+      "to": "element0000000106",
+      "type": "Connection"
+    },
+    "connection0000000113": {
+      "ConnectionType": "normal",
+      "from": "element0000000107",
+      "ID": "connection0000000113",
+      "to": "element0000000114",
+      "toPart": "HEAD",
+      "type": "Connection"
+    },
+    "connection0000000116": {
+      "ConnectionType": "normal",
+      "from": "element0000000115",
+      "ID": "connection0000000116",
+      "to": "element0000000119",
+      "type": "Connection"
+    },
+    "connection0000000117": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000117",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000118": {
+      "ConnectionType": "normal",
+      "from": "element0000000119",
+      "ID": "connection0000000118",
+      "to": "element0000000114",
+      "toPart": "TAIL",
+      "type": "Connection"
+    },
+    "connection0000000123": {
+      "ConnectionType": "normal",
+      "from": "element0000000114",
+      "fromPart": "HEAD",
+      "ID": "connection0000000123",
+      "to": "element0000000124",
+      "type": "Connection"
+    },
+    "connection0000000125": {
+      "ConnectionType": "Yes",
+      "from": "element0000000124",
+      "ID": "connection0000000125",
+      "to": "element0000000114",
+      "toPart": "BREAK",
+      "type": "Connection"
+    },
+    "connection0000000126": {
+      "ConnectionType": "No",
+      "from": "element0000000124",
+      "ID": "connection0000000126",
+      "to": "element0000000115",
+      "type": "Connection"
+    },
+    "connection0000000127": {
+      "ConnectionType": "normal",
+      "from": "element0000000114",
+      "fromPart": "TAIL",
+      "ID": "connection0000000127",
+      "to": "element0000000032",
+      "type": "Connection"
     }
   },
   "allElements": {
@@ -314,20 +396,22 @@
       "enabled": "0",
       "ID": "element0000000001",
       "name": "Manual - \"Trigger silly eye\"",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "ID": "Trigger silly eye"
       },
       "StandardName": 1,
       "type": "trigger",
-      "x": 0,
-      "y": 0
+      "x": "-385",
+      "y": "-175"
     },
     "element0000000002": {
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000002",
       "name": "Set flow status - Enable: external script test - Default trigger",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Enable": "Enable",
         "flowID": "Flow 1849072261",
@@ -344,7 +428,8 @@
       "class": "Action_New_List",
       "ID": "element0000000009",
       "name": "New list global_testResults - Empty",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "DelimiterComma": 0,
         "DelimiterLinefeed": 1,
@@ -361,15 +446,16 @@
       },
       "StandardName": "1",
       "type": "Action",
-      "x": "0",
-      "y": "140"
+      "x": "-385",
+      "y": "-35"
     },
     "element0000000011": {
       "class": "Loop_SimpleLoop",
       "HeightOfVerticalBar": "595",
       "ID": "element0000000011",
       "name": "Simple loop: Endless loop",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Infinite": "1",
         "repeatCount": 5
@@ -383,7 +469,8 @@
       "class": "Action_Tooltip",
       "ID": "element0000000015",
       "name": "Tooltip: %global_testResults% - 5 s - Follow mouse",
-      "package": "action",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "duration": "5",
         "follow_mouse": "1",
@@ -399,7 +486,8 @@
       "class": "Action_Sleep",
       "ID": "element0000000019",
       "name": "Sleep: 2 s",
-      "package": "action",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Duration": 2,
         "Unit": "Seconds"
@@ -413,7 +501,8 @@
       "class": "Action_Execute_Flow",
       "ID": "element0000000024",
       "name": "Execute flow: external script test - Default trigger",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "flowID": "Flow 1849072261",
         "ReturnVariables": 0,
@@ -430,25 +519,25 @@
       "y": "560"
     },
     "element0000000032": {
-      "class": "Action_New_variable",
+      "class": "action_Do_nothing",
       "ID": "element0000000032",
-      "name": "New variable - CountOfTests = 13",
-      "package": "default",
+      "name": "Do nothing",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
-        "expression": "String",
-        "Varname": "CountOfTests",
-        "VarValue": "13"
+        "executionResult": "Normal"
       },
       "StandardName": "1",
       "type": "Action",
       "x": "0",
-      "y": "280"
+      "y": "245"
     },
     "element0000000035": {
       "class": "Action_Get_List_Info",
       "ID": "element0000000035",
       "name": "Get list info - ListLength = Maximum index of global_testResults",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "List": "global_testResults",
         "Varname": "ListLength",
@@ -463,7 +552,8 @@
       "class": "Condition_Expression",
       "ID": "element0000000038",
       "name": "Expression - ListLength = CountOfTests",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Expression": "ListLength = CountOfTests"
       },
@@ -476,7 +566,8 @@
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000043",
       "name": "Set flow status - Enable: string test - Default trigger",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Enable": "Enable",
         "flowID": "Flow 369404488",
@@ -493,7 +584,8 @@
       "class": "Action_Execute_Flow",
       "ID": "element0000000044",
       "name": "Execute flow: string test - Default trigger",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "flowID": "Flow 369404488",
         "ReturnVariables": 0,
@@ -513,7 +605,8 @@
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000047",
       "name": "Set flow status - Enable: Loop test - Default trigger",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Enable": "Enable",
         "flowID": "Flow 634320780",
@@ -530,7 +623,8 @@
       "class": "Action_Execute_Flow",
       "ID": "element0000000048",
       "name": "Execute flow: Loop test - Default trigger",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "flowID": "Flow 634320780",
         "ReturnVariables": 0,
@@ -550,7 +644,8 @@
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000051",
       "name": "Set flow status - Enable: ini file test - Default trigger",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Enable": "Enable",
         "flowID": "Flow 1587447767",
@@ -567,7 +662,8 @@
       "class": "Action_Execute_Flow",
       "ID": "element0000000052",
       "name": "Execute flow: ini file test - Default trigger",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "flowID": "Flow 1587447767",
         "ReturnVariables": 0,
@@ -587,7 +683,8 @@
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000055",
       "name": "Set flow status - Enable: maths test - Default trigger",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Enable": "Enable",
         "flowID": "Flow 1087828277",
@@ -604,7 +701,8 @@
       "class": "Action_Execute_Flow",
       "ID": "element0000000056",
       "name": "Execute flow: maths test - Default trigger",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "flowID": "Flow 1087828277",
         "ReturnVariables": 0,
@@ -624,7 +722,8 @@
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000059",
       "name": "Set flow status - Enable: variable test - Default trigger",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Enable": "Enable",
         "flowID": "Flow 1010290492",
@@ -641,7 +740,8 @@
       "class": "Action_Execute_Flow",
       "ID": "element0000000060",
       "name": "Execute flow: variable test - Default trigger",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "flowID": "Flow 1010290492",
         "ReturnVariables": 0,
@@ -661,7 +761,8 @@
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000063",
       "name": "Set flow status - Enable: List test - Default trigger",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Enable": "Enable",
         "flowID": "Flow 1210127300",
@@ -678,7 +779,8 @@
       "class": "Action_Execute_Flow",
       "ID": "element0000000064",
       "name": "Execute flow: List test - Default trigger",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "flowID": "Flow 1210127300",
         "ReturnVariables": 0,
@@ -698,7 +800,8 @@
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000067",
       "name": "Set flow status - Enable: file test - Default trigger",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Enable": "Enable",
         "flowID": "Flow 1384439262",
@@ -715,7 +818,8 @@
       "class": "Action_Execute_Flow",
       "ID": "element0000000068",
       "name": "Execute flow: file test - Default trigger",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "flowID": "Flow 1384439262",
         "ReturnVariables": 0,
@@ -735,7 +839,8 @@
       "class": "Action_Tooltip",
       "ID": "element0000000072",
       "name": "Tooltip: All tests succeeded: - %global_testresults% - 10 s - Follow mouse",
-      "package": "action",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "duration": "10",
         "follow_mouse": 1,
@@ -751,7 +856,8 @@
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000073",
       "name": "Set flow status - Enable: Process Test - Default trigger",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Enable": "Enable",
         "flowID": "Flow 561135904",
@@ -768,7 +874,8 @@
       "class": "Action_Execute_Flow",
       "ID": "element0000000074",
       "name": "Execute flow: Process Test - Default trigger",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "flowID": "Flow 561135904",
         "ReturnVariables": 0,
@@ -788,7 +895,8 @@
       "class": "Action_Play_Sound",
       "ID": "element0000000079",
       "name": "Play sound - tada.wav",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "soundfile": "",
         "startSoundNow": "Start playback",
@@ -805,7 +913,8 @@
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000084",
       "name": "Set flow status - Enable: User idle test - Default trigger",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Enable": "Enable",
         "flowID": "Flow 1333431302",
@@ -822,7 +931,8 @@
       "class": "Action_Execute_Flow",
       "ID": "element0000000085",
       "name": "Execute flow: User idle test - Default trigger",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "flowID": "Flow 1333431302",
         "ReturnVariables": 0,
@@ -838,48 +948,12 @@
       "x": "1575",
       "y": "560"
     },
-    "element0000000087": {
-      "class": "Action_Set_Flow_Status",
-      "ID": "element0000000087",
-      "name": "Set flow status - Enable: Trigger test - Default trigger",
-      "package": "default",
-      "pars": {
-        "Enable": "Enable",
-        "flowID": "Flow 884290977",
-        "ThisFlow": "0",
-        "triggerID": "",
-        "WhichTrigger": "Default"
-      },
-      "StandardName": "1",
-      "type": "action",
-      "x": "1715",
-      "y": "420"
-    },
-    "element0000000088": {
-      "class": "Action_Execute_Flow",
-      "ID": "element0000000088",
-      "name": "Execute flow: Trigger test - Default trigger",
-      "package": "default",
-      "pars": {
-        "flowID": "Flow 884290977",
-        "ReturnVariables": 0,
-        "SendLocalVars": 1,
-        "SkipDisabled": 0,
-        "ThisFlow": "0",
-        "triggerID": "",
-        "WaitToFinish": 0,
-        "WhichTrigger": "Default"
-      },
-      "StandardName": "1",
-      "type": "action",
-      "x": "1715",
-      "y": "560"
-    },
     "element0000000091": {
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000091",
       "name": "Set flow status - Enable: Hotkey test - Default trigger",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Enable": "Enable",
         "flowID": "Flow 2133155705",
@@ -896,7 +970,8 @@
       "class": "Action_Execute_Flow",
       "ID": "element0000000092",
       "name": "Execute flow: Hotkey test - Default trigger",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "flowID": "Flow 2133155705",
         "ReturnVariables": 0,
@@ -915,8 +990,9 @@
     "element0000000095": {
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000095",
-      "name": "Set flow status - Enable: File link test - Default trigger",
-      "package": "default",
+      "name": "Set flow status - Enable:  - Default trigger",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "Enable": "Enable",
         "flowID": "Flow 74366368",
@@ -932,8 +1008,9 @@
     "element0000000096": {
       "class": "Action_Execute_Flow",
       "ID": "element0000000096",
-      "name": "Execute flow: File link test - Default trigger",
-      "package": "default",
+      "name": "Execute flow:  - Default trigger",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "flowID": "Flow 74366368",
         "ReturnVariables": 0,
@@ -948,17 +1025,179 @@
       "type": "action",
       "x": "1995",
       "y": "560"
+    },
+    "element0000000102": {
+      "class": "Action_Set_Flow_Status",
+      "ID": "element0000000102",
+      "name": "Set flow status - Enable: Dialog test - Default trigger",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "Enable": "Enable",
+        "flowID": "Flow 130786371",
+        "ThisFlow": "0",
+        "triggerID": "",
+        "WhichTrigger": "Default"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "2135",
+      "y": "420"
+    },
+    "element0000000103": {
+      "class": "Action_Execute_Flow",
+      "ID": "element0000000103",
+      "name": "Execute flow: Dialog test - Default trigger",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "flowID": "Flow 130786371",
+        "ReturnVariables": 0,
+        "SendLocalVars": 1,
+        "SkipDisabled": 0,
+        "ThisFlow": "0",
+        "triggerID": "",
+        "WaitToFinish": 0,
+        "WhichTrigger": "Default"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "2135",
+      "y": "560"
+    },
+    "element0000000106": {
+      "class": "Action_Set_Flow_Status",
+      "ID": "element0000000106",
+      "name": "Set flow status - Enable:  - Default trigger",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "Enable": "Enable",
+        "flowID": "Flow 884290977",
+        "ThisFlow": "0",
+        "triggerID": "",
+        "WhichTrigger": "Default"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "-385",
+      "y": "455"
+    },
+    "element0000000107": {
+      "class": "Action_Execute_Flow",
+      "ID": "element0000000107",
+      "name": "Execute flow: Trigger test - Default trigger",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "flowID": "Flow 884290977",
+        "ReturnVariables": 0,
+        "SendLocalVars": "1",
+        "SkipDisabled": 0,
+        "ThisFlow": "0",
+        "triggerID": "",
+        "WaitToFinish": "0",
+        "WhichTrigger": "Default"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "-385",
+      "y": "595"
+    },
+    "element0000000109": {
+      "class": "Action_New_variable",
+      "ID": "element0000000109",
+      "name": "New variable - CountOfTests = 14",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "expression": "String",
+        "onlyIfNotExist": "0",
+        "Varname": "CountOfTests",
+        "VarValue": "14"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-385",
+      "y": "105"
+    },
+    "element0000000114": {
+      "class": "Loop_SimpleLoop",
+      "HeightOfVerticalBar": "665",
+      "ID": "element0000000114",
+      "name": "Simple loop: Endless loop",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "Infinite": "1",
+        "repeatCount": 5
+      },
+      "StandardName": "1",
+      "type": "Loop",
+      "x": "-560",
+      "y": "700"
+    },
+    "element0000000115": {
+      "class": "Action_Tooltip",
+      "ID": "element0000000115",
+      "name": "Tooltip: All tests succeeded: - %global_testresults% - 10 s - Follow mouse",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "duration": "10",
+        "follow_mouse": 1,
+        "text": "All tests succeeded:\n%global_testresults%",
+        "Unit": "Seconds"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-525",
+      "y": "1015"
+    },
+    "element0000000119": {
+      "class": "action_Sleep",
+      "ID": "element0000000119",
+      "name": "Sleep: 2 s",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "Duration": 2,
+        "Unit": "Seconds"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-525",
+      "y": "1190"
+    },
+    "element0000000124": {
+      "class": "condition_List_Contains_Element",
+      "ID": "element0000000124",
+      "name": "List contains element - Value '1' in list 'global_testResults'",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "InputList": "global_testResults",
+        "isExpressionPosition": "String",
+        "isExpressionSearchContent": "String",
+        "Position": 1,
+        "SearchContent": "Trigger test",
+        "SearchWhat": "Content"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-455",
+      "y": "875"
     }
   },
   "category": "Automatic tests",
-  "ElementIDCounter": "101",
+  "ElementIDCounter": "127",
   "flowSettings": {
     "DefaultWorkingDir": 1,
     "ExecutionPolicy": "default",
-    "Offsetx": "-633.725614",
-    "Offsety": "96.443324",
+    "Offsetx": "-1447.862884",
+    "Offsety": "-470.757419",
     "WorkingDir": "",
-    "zoomFactor": "0.700004"
+    "zoomFactor": "0.578515"
   },
   "name": "_AutomaticTest starter"
 }

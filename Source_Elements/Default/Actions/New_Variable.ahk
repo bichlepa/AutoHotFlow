@@ -41,7 +41,7 @@ Element_getParametrizationDetails_Action_New_variable(Environment)
 	parametersToEdit.push({type: "Edit", id: "Varname", default: "NewVariable", content: "VariableName", WarnIfEmpty: true})
 
 	parametersToEdit.push({type: "Label", label:  x_lang("Value")})
-	parametersToEdit.push({type: "Edit", id: "VarValue", default: "New element", content: ["String", "Expression"], contentID: "expression", contentDefault: "string"})
+	parametersToEdit.push({type: "multilineEdit", id: "VarValue", default: "New element", content: ["String", "Expression"], contentID: "expression", contentDefault: "string"})
 
 	parametersToEdit.push({type: "Label", label:  x_lang("Options")})
 	parametersToEdit.push({type: "Checkbox", id: "onlyIfNotExist", default: 0, label: x_lang("Write only if variable does not exist")})

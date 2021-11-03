@@ -312,7 +312,7 @@ Condition_Confirmation_Dialog_OnClose()
 	}
 
 	; set result variable
-	x_SetVariable(Environment, "A_UserAction", "Cancel", "thread")
+	x_SetVariable(Environment, "A_UserAction", "Close", "thread")
 	
 	; destroy gui
 	gui, destroy

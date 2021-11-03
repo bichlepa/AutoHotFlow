@@ -1,31 +1,668 @@
 ﻿{
   "allConnections": {
-    "connection0000000007": {
+    "connection0000000025": {
+      "ConnectionType": "normal",
+      "from": "element0000000023",
+      "ID": "connection0000000025",
+      "to": "element0000000024",
+      "type": "Connection"
+    },
+    "connection0000000026": {
+      "ConnectionType": "Yes",
+      "from": "element0000000024",
+      "ID": "connection0000000026",
+      "to": "element0000000027",
+      "type": "Connection"
+    },
+    "connection0000000033": {
+      "ConnectionType": "No",
+      "from": "element0000000024",
+      "ID": "connection0000000033",
+      "to": "element0000000032",
+      "type": "Connection"
+    },
+    "connection0000000035": {
+      "ConnectionType": "Exception",
+      "from": "element0000000024",
+      "ID": "connection0000000035",
+      "to": "element0000000034",
+      "type": "Connection"
+    },
+    "connection0000000038": {
       "ConnectionType": "normal",
       "from": "element0000000001",
-      "ID": "connection0000000007",
-      "to": "element0000000008",
+      "ID": "connection0000000038",
+      "to": "element0000000102",
       "type": "Connection"
     },
-    "connection0000000009": {
-      "ConnectionType": "Yes",
-      "from": "element0000000008",
-      "ID": "connection0000000009",
-      "to": "element0000000010",
+    "connection0000000049": {
+      "ConnectionType": "normal",
+      "from": "element0000000047",
+      "ID": "connection0000000049",
+      "to": "element0000000048",
       "type": "Connection"
     },
-    "connection0000000012": {
+    "connection0000000052": {
+      "ConnectionType": "normal",
+      "from": "element0000000048",
+      "ID": "connection0000000052",
+      "to": "element0000000050",
+      "type": "Connection"
+    },
+    "connection0000000053": {
       "ConnectionType": "No",
-      "from": "element0000000008",
-      "ID": "connection0000000012",
-      "to": "element0000000011",
+      "from": "element0000000243",
+      "ID": "connection0000000053",
+      "to": "element0000000182",
       "type": "Connection"
     },
-    "connection0000000014": {
+    "connection0000000054": {
+      "ConnectionType": "normal",
+      "from": "element0000000051",
+      "ID": "connection0000000054",
+      "to": "element0000000108",
+      "type": "Connection"
+    },
+    "connection0000000058": {
+      "ConnectionType": "Yes",
+      "from": "element0000000055",
+      "ID": "connection0000000058",
+      "to": "element0000000115",
+      "type": "Connection"
+    },
+    "connection0000000071": {
+      "ConnectionType": "normal",
+      "from": "element0000000039",
+      "ID": "connection0000000071",
+      "to": "element0000000072",
+      "type": "Connection"
+    },
+    "connection0000000073": {
+      "ConnectionType": "normal",
+      "from": "element0000000072",
+      "ID": "connection0000000073",
+      "to": "element0000000075",
+      "type": "Connection"
+    },
+    "connection0000000074": {
+      "ConnectionType": "Yes",
+      "from": "element0000000064",
+      "ID": "connection0000000074",
+      "to": "element0000000047",
+      "type": "Connection"
+    },
+    "connection0000000076": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000076",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000077": {
+      "ConnectionType": "normal",
+      "from": "element0000000075",
+      "ID": "connection0000000077",
+      "to": "element0000000064",
+      "type": "Connection"
+    },
+    "connection0000000080": {
+      "ConnectionType": "normal",
+      "from": "element0000000078",
+      "ID": "connection0000000080",
+      "to": "element0000000079",
+      "type": "Connection"
+    },
+    "connection0000000081": {
+      "ConnectionType": "normal",
+      "from": "element0000000059",
+      "ID": "connection0000000081",
+      "to": "element0000000078",
+      "type": "Connection"
+    },
+    "connection0000000084": {
+      "ConnectionType": "normal",
+      "from": "element0000000079",
+      "ID": "connection0000000084",
+      "to": "element0000000085",
+      "type": "Connection"
+    },
+    "connection0000000086": {
+      "ConnectionType": "Yes",
+      "from": "element0000000085",
+      "ID": "connection0000000086",
+      "to": "element0000000248",
+      "type": "Connection"
+    },
+    "connection0000000091": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000091",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000097": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000097",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000103": {
+      "ConnectionType": "normal",
+      "from": "element0000000102",
+      "ID": "connection0000000103",
+      "to": "element0000000121",
+      "type": "Connection"
+    },
+    "connection0000000105": {
+      "ConnectionType": "normal",
+      "from": "element0000000104",
+      "fromPart": "HEAD",
+      "ID": "connection0000000105",
+      "to": "element0000000126",
+      "type": "Connection"
+    },
+    "connection0000000107": {
+      "ConnectionType": "Yes",
+      "from": "element0000000106",
+      "ID": "connection0000000107",
+      "to": "element0000000039",
+      "type": "Connection"
+    },
+    "connection0000000109": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000109",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000110": {
+      "ConnectionType": "Yes",
+      "from": "element0000000108",
+      "ID": "connection0000000110",
+      "to": "element0000000055",
+      "type": "Connection"
+    },
+    "connection0000000116": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000116",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000117": {
+      "ConnectionType": "Yes",
+      "from": "element0000000115",
+      "ID": "connection0000000117",
+      "to": "element0000000059",
+      "type": "Connection"
+    },
+    "connection0000000118": {
+      "ConnectionType": "normal",
+      "from": "element0000000104",
+      "fromPart": "TAIL",
+      "ID": "connection0000000118",
+      "to": "element0000000167",
+      "type": "Connection"
+    },
+    "connection0000000119": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000119",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000120": {
+      "ConnectionType": "normal",
+      "from": "element0000000121",
+      "ID": "connection0000000120",
+      "to": "element0000000104",
+      "toPart": "HEAD",
+      "type": "Connection"
+    },
+    "connection0000000122": {
+      "ConnectionType": "No",
+      "from": "element0000000177",
+      "ID": "connection0000000122",
+      "to": "element0000000217",
+      "type": "Connection"
+    },
+    "connection0000000124": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000124",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000125": {
+      "ConnectionType": "normal",
+      "from": "element0000000126",
+      "ID": "connection0000000125",
+      "to": "element0000000106",
+      "type": "Connection"
+    },
+    "connection0000000128": {
+      "ConnectionType": "No",
+      "from": "element0000000115",
+      "ID": "connection0000000128",
+      "to": "element0000000127",
+      "type": "Connection"
+    },
+    "connection0000000130": {
+      "ConnectionType": "No",
+      "from": "element0000000127",
+      "ID": "connection0000000130",
+      "to": "element0000000148",
+      "type": "Connection"
+    },
+    "connection0000000132": {
+      "ConnectionType": "Yes",
+      "from": "element0000000127",
+      "ID": "connection0000000132",
+      "to": "element0000000131",
+      "type": "Connection"
+    },
+    "connection0000000139": {
+      "ConnectionType": "normal",
+      "from": "element0000000131",
+      "ID": "connection0000000139",
+      "to": "element0000000078",
+      "type": "Connection"
+    },
+    "connection0000000141": {
+      "ConnectionType": "No",
+      "from": "element0000000223",
+      "ID": "connection0000000141",
+      "to": "element0000000140",
+      "type": "Connection"
+    },
+    "connection0000000143": {
+      "ConnectionType": "No",
+      "from": "element0000000055",
+      "ID": "connection0000000143",
+      "to": "element0000000142",
+      "type": "Connection"
+    },
+    "connection0000000145": {
+      "ConnectionType": "No",
+      "from": "element0000000064",
+      "ID": "connection0000000145",
+      "to": "element0000000144",
+      "type": "Connection"
+    },
+    "connection0000000147": {
+      "ConnectionType": "No",
+      "from": "element0000000085",
+      "ID": "connection0000000147",
+      "to": "element0000000146",
+      "type": "Connection"
+    },
+    "connection0000000150": {
+      "ConnectionType": "Yes",
+      "from": "element0000000148",
+      "ID": "connection0000000150",
+      "to": "element0000000149",
+      "type": "Connection"
+    },
+    "connection0000000152": {
+      "ConnectionType": "Yes",
+      "from": "element0000000149",
+      "ID": "connection0000000152",
+      "to": "element0000000151",
+      "type": "Connection"
+    },
+    "connection0000000154": {
+      "ConnectionType": "No",
+      "from": "element0000000149",
+      "ID": "connection0000000154",
+      "to": "element0000000153",
+      "type": "Connection"
+    },
+    "connection0000000155": {
+      "ConnectionType": "normal",
+      "from": "element0000000151",
+      "ID": "connection0000000155",
+      "to": "element0000000078",
+      "type": "Connection"
+    },
+    "connection0000000156": {
+      "ConnectionType": "normal",
+      "from": "element0000000153",
+      "ID": "connection0000000156",
+      "to": "element0000000078",
+      "type": "Connection"
+    },
+    "connection0000000157": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000157",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000162": {
+      "ConnectionType": "Yes",
+      "from": "element0000000159",
+      "ID": "connection0000000162",
+      "to": "element0000000161",
+      "type": "Connection"
+    },
+    "connection0000000164": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000164",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000165": {
+      "ConnectionType": "No",
+      "from": "element0000000159",
+      "ID": "connection0000000165",
+      "to": "element0000000229",
+      "type": "Connection"
+    },
+    "connection0000000166": {
+      "ConnectionType": "normal",
+      "from": "element0000000161",
+      "ID": "connection0000000166",
+      "to": "element0000000078",
+      "type": "Connection"
+    },
+    "connection0000000175": {
+      "ConnectionType": "normal",
+      "from": "element0000000172",
+      "ID": "connection0000000175",
+      "to": "element0000000173",
+      "type": "Connection"
+    },
+    "connection0000000176": {
       "ConnectionType": "Exception",
-      "from": "element0000000008",
-      "ID": "connection0000000014",
-      "to": "element0000000013",
+      "from": "element0000000172",
+      "ID": "connection0000000176",
+      "to": "element0000000174",
+      "type": "Connection"
+    },
+    "connection0000000181": {
+      "ConnectionType": "normal",
+      "from": "element0000000178",
+      "ID": "connection0000000181",
+      "to": "element0000000072",
+      "type": "Connection"
+    },
+    "connection0000000183": {
+      "ConnectionType": "No",
+      "from": "element0000000182",
+      "ID": "connection0000000183",
+      "to": "element0000000108",
+      "type": "Connection"
+    },
+    "connection0000000184": {
+      "ConnectionType": "Yes",
+      "from": "element0000000182",
+      "ID": "connection0000000184",
+      "to": "element0000000051",
+      "type": "Connection"
+    },
+    "connection0000000187": {
+      "ConnectionType": "Yes",
+      "from": "element0000000186",
+      "ID": "connection0000000187",
+      "to": "element0000000185",
+      "type": "Connection"
+    },
+    "connection0000000188": {
+      "ConnectionType": "No",
+      "from": "element0000000108",
+      "ID": "connection0000000188",
+      "to": "element0000000186",
+      "type": "Connection"
+    },
+    "connection0000000189": {
+      "ConnectionType": "Yes",
+      "from": "element0000000185",
+      "ID": "connection0000000189",
+      "to": "element0000000115",
+      "type": "Connection"
+    },
+    "connection0000000190": {
+      "ConnectionType": "No",
+      "from": "element0000000185",
+      "ID": "connection0000000190",
+      "to": "element0000000142",
+      "type": "Connection"
+    },
+    "connection0000000196": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000196",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000199": {
+      "ConnectionType": "Yes",
+      "from": "element0000000177",
+      "ID": "connection0000000199",
+      "to": "element0000000178",
+      "type": "Connection"
+    },
+    "connection0000000200": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000200",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000203": {
+      "ConnectionType": "No",
+      "from": "element0000000106",
+      "ID": "connection0000000203",
+      "to": "element0000000177",
+      "type": "Connection"
+    },
+    "connection0000000204": {
+      "ConnectionType": "No",
+      "from": "element0000000148",
+      "ID": "connection0000000204",
+      "to": "element0000000159",
+      "type": "Connection"
+    },
+    "connection0000000213": {
+      "ConnectionType": "normal",
+      "from": "element0000000209",
+      "ID": "connection0000000213",
+      "to": "element0000000211",
+      "type": "Connection"
+    },
+    "connection0000000214": {
+      "ConnectionType": "Exception",
+      "from": "element0000000209",
+      "ID": "connection0000000214",
+      "to": "element0000000212",
+      "type": "Connection"
+    },
+    "connection0000000215": {
+      "ConnectionType": "normal",
+      "from": "element0000000169",
+      "ID": "connection0000000215",
+      "to": "element0000000172",
+      "type": "Connection"
+    },
+    "connection0000000216": {
+      "ConnectionType": "normal",
+      "from": "element0000000206",
+      "ID": "connection0000000216",
+      "to": "element0000000209",
+      "type": "Connection"
+    },
+    "connection0000000219": {
+      "ConnectionType": "Yes",
+      "from": "element0000000217",
+      "ID": "connection0000000219",
+      "to": "element0000000218",
+      "type": "Connection"
+    },
+    "connection0000000220": {
+      "ConnectionType": "No",
+      "from": "element0000000217",
+      "ID": "connection0000000220",
+      "to": "element0000000123",
+      "type": "Connection"
+    },
+    "connection0000000221": {
+      "ConnectionType": "normal",
+      "from": "element0000000218",
+      "ID": "connection0000000221",
+      "to": "element0000000072",
+      "type": "Connection"
+    },
+    "connection0000000224": {
+      "ConnectionType": "Yes",
+      "from": "element0000000223",
+      "ID": "connection0000000224",
+      "to": "element0000000222",
+      "type": "Connection"
+    },
+    "connection0000000225": {
+      "ConnectionType": "No",
+      "from": "element0000000186",
+      "ID": "connection0000000225",
+      "to": "element0000000223",
+      "type": "Connection"
+    },
+    "connection0000000226": {
+      "ConnectionType": "Yes",
+      "from": "element0000000222",
+      "ID": "connection0000000226",
+      "to": "element0000000115",
+      "type": "Connection"
+    },
+    "connection0000000227": {
+      "ConnectionType": "No",
+      "from": "element0000000222",
+      "ID": "connection0000000227",
+      "to": "element0000000142",
+      "type": "Connection"
+    },
+    "connection0000000230": {
+      "ConnectionType": "No",
+      "from": "element0000000229",
+      "ID": "connection0000000230",
+      "to": "element0000000129",
+      "type": "Connection"
+    },
+    "connection0000000234": {
+      "ConnectionType": "Yes",
+      "from": "element0000000229",
+      "ID": "connection0000000234",
+      "to": "element0000000233",
+      "type": "Connection"
+    },
+    "connection0000000235": {
+      "ConnectionType": "normal",
+      "from": "element0000000233",
+      "ID": "connection0000000235",
+      "to": "element0000000078",
+      "type": "Connection"
+    },
+    "connection0000000236": {
+      "ConnectionType": "normal",
+      "from": "element0000000104",
+      "fromPart": "TAIL",
+      "ID": "connection0000000236",
+      "to": "element0000000087",
+      "type": "Connection"
+    },
+    "connection0000000241": {
+      "ConnectionType": "normal",
+      "from": "element0000000211",
+      "ID": "connection0000000241",
+      "to": "element0000000240",
+      "type": "Connection"
+    },
+    "connection0000000242": {
+      "ConnectionType": "normal",
+      "from": "element0000000212",
+      "ID": "connection0000000242",
+      "to": "element0000000240",
+      "type": "Connection"
+    },
+    "connection0000000245": {
+      "ConnectionType": "normal",
+      "from": "element0000000050",
+      "ID": "connection0000000245",
+      "to": "element0000000243",
+      "type": "Connection"
+    },
+    "connection0000000246": {
+      "ConnectionType": "Yes",
+      "from": "element0000000243",
+      "ID": "connection0000000246",
+      "to": "element0000000244",
+      "type": "Connection"
+    },
+    "connection0000000247": {
+      "ConnectionType": "normal",
+      "from": "element0000000244",
+      "ID": "connection0000000247",
+      "to": "element0000000108",
+      "type": "Connection"
+    },
+    "connection0000000249": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000249",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000250": {
+      "ConnectionType": "No",
+      "from": "element0000000248",
+      "ID": "connection0000000250",
+      "to": "element0000000104",
+      "toPart": "TAIL",
+      "type": "Connection"
+    },
+    "connection0000000253": {
+      "ConnectionType": "Yes",
+      "from": "element0000000248",
+      "ID": "connection0000000253",
+      "to": "element0000000257",
+      "type": "Connection"
+    },
+    "connection0000000254": {
+      "ConnectionType": "Yes",
+      "from": "element0000000252",
+      "ID": "connection0000000254",
+      "to": "element0000000104",
+      "toPart": "TAIL",
+      "type": "Connection"
+    },
+    "connection0000000256": {
+      "ConnectionType": "No",
+      "from": "element0000000252",
+      "ID": "connection0000000256",
+      "to": "element0000000255",
+      "type": "Connection"
+    },
+    "connection0000000258": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000258",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000259": {
+      "ConnectionType": "Yes",
+      "from": "element0000000257",
+      "ID": "connection0000000259",
+      "to": "element0000000252",
+      "type": "Connection"
+    },
+    "connection0000000260": {
+      "ConnectionType": "No",
+      "from": "element0000000257",
+      "ID": "connection0000000260",
+      "to": "element0000000104",
+      "toPart": "TAIL",
       "type": "Connection"
     }
   },
@@ -33,102 +670,1247 @@
     "element0000000001": {
       "class": "Trigger_Manual",
       "DefaultTrigger": "1",
-      "enabled": "0",
+      "enabled": "1",
       "ID": "element0000000001",
       "name": "Manual - \"Trigger bright bus\"",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "ID": "Trigger bright bus"
       },
       "StandardName": 1,
       "type": "trigger",
-      "x": 0,
-      "y": 0
+      "x": "0",
+      "y": "-385"
     },
-    "element0000000008": {
-      "class": "Condition_Confirmation_Dialog",
-      "ID": "element0000000008",
-      "name": "Confirmation Dialog - Das ist ein sch\u00F6ner Titel, Das ist eine sch\u00F6ne Nachricht",
-      "package": "default",
+    "element0000000023": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "0",
+      "enabled": "1",
+      "ID": "element0000000023",
+      "name": "Manual - \"Confirmation Normal\"",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
-        "ButtonLabelCancel": "Abbrechen!",
-        "ButtonLabelNo": "Nein!",
-        "ButtonLabelYes": "Ja!",
+        "ID": "Confirmation Normal"
+      },
+      "StandardName": "1",
+      "type": "trigger",
+      "x": "1015",
+      "y": "-35"
+    },
+    "element0000000024": {
+      "class": "Condition_Confirmation_Dialog",
+      "ID": "element0000000024",
+      "name": "Confirmation dialog - Dialog Test Title, Dialog Test Text",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "ButtonLabelCancel": "Dialog test cancel",
+        "ButtonLabelNo": "Dialog test no",
+        "ButtonLabelYes": "Dialog test yes",
         "DefaultButton": "No",
-        "Height": 200,
+        "Height": "201",
         "IfDismiss": "Exception",
-        "IsTimeout": "1",
-        "message": "Das ist eine sch\u00F6ne Nachricht",
+        "IsTimeout": "0",
+        "message": "Dialog Test Text",
         "OnTimeout": "Exception",
         "ShowCancelButton": "1",
-        "TimeoutUnits": 10,
-        "title": "Das ist ein sch\u00F6ner Titel",
+        "TimeoutUnits": "10",
+        "title": "Dialog Test Title",
         "Unit": "Seconds",
-        "Width": 300
+        "Width": "301"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "1015",
+      "y": "140"
+    },
+    "element0000000027": {
+      "class": "action_New_Variable",
+      "ID": "element0000000027",
+      "name": "New variable - static_dialogResult = a_useraction",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "expression": "Expression",
+        "onlyIfNotExist": 0,
+        "Varname": "static_dialogResult",
+        "VarValue": "a_useraction"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "840",
+      "y": "315"
+    },
+    "element0000000032": {
+      "class": "action_New_Variable",
+      "ID": "element0000000032",
+      "name": "New variable - static_dialogResult = a_useraction",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "expression": "Expression",
+        "onlyIfNotExist": 0,
+        "Varname": "static_dialogResult",
+        "VarValue": "a_useraction"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "1015",
+      "y": "315"
+    },
+    "element0000000034": {
+      "class": "action_New_Variable",
+      "ID": "element0000000034",
+      "name": "New variable - static_dialogResult = a_useraction",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "expression": "Expression",
+        "onlyIfNotExist": 0,
+        "Varname": "static_dialogResult",
+        "VarValue": "a_useraction"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "1190",
+      "y": "315"
+    },
+    "element0000000039": {
+      "class": "action_Execute_Flow",
+      "ID": "element0000000039",
+      "name": "Execute flow: This flow - Manual - \"Confirmation Normal\"",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "flowID": "",
+        "ReturnVariables": 0,
+        "SendLocalVars": "0",
+        "SkipDisabled": 0,
+        "ThisFlow": 1,
+        "triggerID": "element0000000023",
+        "WaitToFinish": "0",
+        "WhichTrigger": "specified"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-630",
+      "y": "175"
+    },
+    "element0000000047": {
+      "class": "action_Get_control_text",
+      "ID": "element0000000047",
+      "name": "Get control text:  - Control text Dialog Test Text - Title begins with: Dialog Test Title - Window class: AutoHotkeyGUI - Process: AutoHotFlow.exe",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "ahk_class": "AutoHotkeyGUI",
+        "ahk_exe": "AutoHotFlow.exe",
+        "ahk_id": "",
+        "ahk_pid": "",
+        "Control_identifier": "Dialog Test Text",
+        "ControlTextMatchMode": "3",
+        "ExcludeText": "",
+        "excludeTitle": "",
+        "FindHiddenText": 0,
+        "FindHiddenWindow": 0,
+        "IdentifyControlBy": "Text",
+        "TitleMatchMode": 1,
+        "Varname": "EditText",
+        "winText": "",
+        "Wintitle": "Dialog Test Title"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-175",
+      "y": "805"
+    },
+    "element0000000048": {
+      "class": "action_Get_control_text",
+      "ID": "element0000000048",
+      "name": "Get control text:  - Control class Button1 - Title begins with: Dialog Test Title - Window class: AutoHotkeyGUI - Process: AutoHotFlow.exe",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "ahk_class": "AutoHotkeyGUI",
+        "ahk_exe": "AutoHotFlow.exe",
+        "ahk_id": "",
+        "ahk_pid": "",
+        "Control_identifier": "Button1",
+        "ControlTextMatchMode": 2,
+        "ExcludeText": "",
+        "excludeTitle": "",
+        "FindHiddenText": 0,
+        "FindHiddenWindow": 0,
+        "IdentifyControlBy": "Class",
+        "TitleMatchMode": 1,
+        "Varname": "button1",
+        "winText": "",
+        "Wintitle": "Dialog Test Title"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "0",
+      "y": "805"
+    },
+    "element0000000050": {
+      "class": "action_Get_control_text",
+      "ID": "element0000000050",
+      "name": "Get control text:  - Control class Button2 - Title begins with: Dialog Test Title - Window class: AutoHotkeyGUI - Process: AutoHotFlow.exe",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "ahk_class": "AutoHotkeyGUI",
+        "ahk_exe": "AutoHotFlow.exe",
+        "ahk_id": "",
+        "ahk_pid": "",
+        "Control_identifier": "Button2",
+        "ControlTextMatchMode": 2,
+        "ExcludeText": "",
+        "excludeTitle": "",
+        "FindHiddenText": 0,
+        "FindHiddenWindow": 0,
+        "IdentifyControlBy": "Class",
+        "TitleMatchMode": 1,
+        "Varname": "button2",
+        "winText": "",
+        "Wintitle": "Dialog Test Title"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "175",
+      "y": "805"
+    },
+    "element0000000051": {
+      "class": "action_Get_control_text",
+      "ID": "element0000000051",
+      "name": "Get control text:  - Control class Button3 - Title begins with: Dialog Test Title - Window class: AutoHotkeyGUI - Process: AutoHotFlow.exe",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "ahk_class": "AutoHotkeyGUI",
+        "ahk_exe": "AutoHotFlow.exe",
+        "ahk_id": "",
+        "ahk_pid": "",
+        "Control_identifier": "Button3",
+        "ControlTextMatchMode": 2,
+        "ExcludeText": "",
+        "excludeTitle": "",
+        "FindHiddenText": 0,
+        "FindHiddenWindow": 0,
+        "IdentifyControlBy": "Class",
+        "TitleMatchMode": 1,
+        "Varname": "button3",
+        "winText": "",
+        "Wintitle": "Dialog Test Title"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "910",
+      "y": "805"
+    },
+    "element0000000055": {
+      "class": "condition_Expression",
+      "ID": "element0000000055",
+      "name": "Expression - editText = \"Dialog Test Text\" and button1 = \"Dialog Test Yes\" and  button2 = \"Dialog Test No\" and  button3 = \"Dialog Test cancel\"",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "Expression": "editText = \"Dialog Test Text\" and button1 = \"Dialog Test Yes\" and  button2 = \"Dialog Test No\" and  button3 = \"Dialog Test cancel\""
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-175",
+      "y": "1190"
+    },
+    "element0000000059": {
+      "class": "action_Send_Keystrokes_To_Control",
+      "ID": "element0000000059",
+      "name": "Send keystrokes to control: {space} -  - Control class Button1 - Title begins with: Dialog Test Title - Window class: AutoHotkeyGUI - Process: AutoHotFlow.exe",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "ahk_class": "AutoHotkeyGUI",
+        "ahk_exe": "AutoHotFlow.exe",
+        "ahk_id": "",
+        "ahk_pid": "",
+        "Control_identifier": "Button1",
+        "ControlTextMatchMode": 2,
+        "ExcludeText": "",
+        "excludeTitle": "",
+        "FindHiddenText": 0,
+        "FindHiddenWindow": 0,
+        "IdentifyControlBy": "Class",
+        "KeysToSend": "{space}",
+        "KeysToSendContentType": "String",
+        "RawMode": 0,
+        "TitleMatchMode": 1,
+        "winText": "",
+        "Wintitle": "Dialog Test Title"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-105",
+      "y": "1715"
+    },
+    "element0000000064": {
+      "class": "condition_Window_Exists",
+      "ID": "element0000000064",
+      "name": "Window exists:  - Title is exatly: Dialog Test Title - Window class: AutoHotkeyGUI - Process: AutoHotFlow.exe",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "ahk_class": "AutoHotkeyGUI",
+        "ahk_exe": "AutoHotFlow.exe",
+        "ahk_id": "",
+        "ahk_pid": "",
+        "ExcludeText": "",
+        "excludeTitle": "",
+        "FindHiddenText": 0,
+        "FindHiddenWindow": 0,
+        "TitleMatchMode": "3",
+        "winText": "",
+        "Wintitle": "Dialog Test Title"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-175",
+      "y": "630"
+    },
+    "element0000000072": {
+      "class": "action_Sleep",
+      "ID": "element0000000072",
+      "name": "Sleep: 20 ms",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "Duration": "20",
+        "Unit": "Milliseconds"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-210",
+      "y": "315"
+    },
+    "element0000000075": {
+      "class": "action_Sleep",
+      "ID": "element0000000075",
+      "name": "Sleep: 20 ms",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "Duration": "20",
+        "Unit": "Milliseconds"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-210",
+      "y": "420"
+    },
+    "element0000000078": {
+      "class": "action_Sleep",
+      "ID": "element0000000078",
+      "name": "Sleep: 20 ms",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "Duration": "20",
+        "Unit": "Milliseconds"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-385",
+      "y": "1890"
+    },
+    "element0000000079": {
+      "class": "action_Sleep",
+      "ID": "element0000000079",
+      "name": "Sleep: 20 ms",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "Duration": "20",
+        "Unit": "Milliseconds"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-385",
+      "y": "1995"
+    },
+    "element0000000085": {
+      "class": "condition_Expression",
+      "ID": "element0000000085",
+      "name": "Expression - static_dialogResult = task.result",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "Expression": "static_dialogResult = task.result"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-350",
+      "y": "2135"
+    },
+    "element0000000087": {
+      "class": "action_Tooltip",
+      "ID": "element0000000087",
+      "name": "Tooltip: Message - 2 s - Follow mouse",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "duration": 2,
+        "follow_mouse": 1,
+        "text": "Message",
+        "Unit": "Seconds"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-805",
+      "y": "2625"
+    },
+    "element0000000102": {
+      "class": "action_New_Variable",
+      "ID": "element0000000102",
+      "name": "New variable - tasks = [ - { \"dialog\": \"confirmation\", \"result\": \"yes\"}, - { \"dialog\": \"confirmation\", \"result\": \"no\"}, - { \"dialog\": \"confirmation\", \"result\": \"cancel\"}, - { \"dialog\": \"confirmation\", \"result\": \"close\"}, - { \"dialog\": \"message\", \"result\": \"ok\"}, - { \"dialog\": \"message\", \"result\": \"cancel\"}, - { \"dialog\": \"message\", \"result\": \"close\"}, - { \"dialog\": \"input\", \"result\": \"ok\"}, - { \"dialog\": \"input\", \"result\": \"cancel\"}, - { \"dialog\": \"input\", \"result\": \"close\"} - ]",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "expression": "String",
+        "onlyIfNotExist": 0,
+        "Varname": "tasks",
+        "VarValue": "[\n{ \"dialog\": \"confirmation\", \"result\": \"yes\"},\n{ \"dialog\": \"confirmation\", \"result\": \"no\"},\n{ \"dialog\": \"confirmation\", \"result\": \"cancel\"},\n{ \"dialog\": \"confirmation\", \"result\": \"close\"},\n{ \"dialog\": \"message\", \"result\": \"ok\"},\n{ \"dialog\": \"message\", \"result\": \"cancel\"},\n{ \"dialog\": \"message\", \"result\": \"close\"},\n{ \"dialog\": \"input\", \"result\": \"ok\"},\n{ \"dialog\": \"input\", \"result\": \"cancel\"},\n{ \"dialog\": \"input\", \"result\": \"close\"}\n]"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-700",
+      "y": "-595"
+    },
+    "element0000000104": {
+      "class": "loop_Work_through_a_list",
+      "HeightOfVerticalBar": "2520",
+      "ID": "element0000000104",
+      "name": "Work through a list: tasks",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "VarValue": "tasks"
+      },
+      "StandardName": "1",
+      "type": "Loop",
+      "x": "-770",
+      "y": "-245"
+    },
+    "element0000000106": {
+      "class": "condition_Expression",
+      "ID": "element0000000106",
+      "name": "Expression - task.dialog = \"confirmation\"",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "Expression": "task.dialog = \"confirmation\""
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-630",
+      "y": "35"
+    },
+    "element0000000108": {
+      "class": "condition_Expression",
+      "ID": "element0000000108",
+      "name": "Expression - task.dialog = \"confirmation\"",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "Expression": "task.dialog = \"confirmation\""
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-210",
+      "y": "1015"
+    },
+    "element0000000115": {
+      "class": "condition_Expression",
+      "ID": "element0000000115",
+      "name": "Expression - task.result = \"yes\"",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "Expression": "task.result = \"yes\""
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-105",
+      "y": "1400"
+    },
+    "element0000000121": {
+      "class": "action_Convert_string_to_list",
+      "ID": "element0000000121",
+      "name": "Convert JSON-string to list 'tasks' - tasks",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "expression": "Expression",
+        "listToStringOutputFormat": "JSON",
+        "Varname": "tasks",
+        "VarValue": "tasks"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-735",
+      "y": "-455"
+    },
+    "element0000000123": {
+      "class": "condition_Debug_dialog",
+      "ID": "element0000000123",
+      "name": "Debug dialog",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {},
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-70",
+      "y": "0"
+    },
+    "element0000000126": {
+      "class": "action_New_Variable",
+      "ID": "element0000000126",
+      "name": "New variable - task = a_loopfield",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "expression": "Expression",
+        "onlyIfNotExist": 0,
+        "Varname": "task",
+        "VarValue": "a_loopfield"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-700",
+      "y": "-105"
+    },
+    "element0000000127": {
+      "class": "condition_Expression",
+      "ID": "element0000000127",
+      "name": "Expression - task.result = \"no\"",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "Expression": "task.result = \"no\""
       },
       "StandardName": "1",
       "type": "Condition",
       "x": "105",
+      "y": "1400"
+    },
+    "element0000000129": {
+      "class": "condition_Debug_dialog",
+      "ID": "element0000000129",
+      "name": "Debug dialog",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {},
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "1120",
+      "y": "1400"
+    },
+    "element0000000131": {
+      "class": "action_Send_Keystrokes_To_Control",
+      "ID": "element0000000131",
+      "name": "Send keystrokes to control: {space} -  - Control class Button2 - Title begins with: Dialog Test Title - Window class: AutoHotkeyGUI - Process: AutoHotFlow.exe",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "ahk_class": "AutoHotkeyGUI",
+        "ahk_exe": "AutoHotFlow.exe",
+        "ahk_id": "",
+        "ahk_pid": "",
+        "Control_identifier": "Button2",
+        "ControlTextMatchMode": 2,
+        "ExcludeText": "",
+        "excludeTitle": "",
+        "FindHiddenText": 0,
+        "FindHiddenWindow": 0,
+        "IdentifyControlBy": "Class",
+        "KeysToSend": "{space}",
+        "KeysToSendContentType": "String",
+        "RawMode": 0,
+        "TitleMatchMode": 1,
+        "winText": "",
+        "Wintitle": "Dialog Test Title"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "105",
+      "y": "1715"
+    },
+    "element0000000140": {
+      "class": "condition_Debug_dialog",
+      "ID": "element0000000140",
+      "name": "Debug dialog",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {},
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "385",
+      "y": "1050"
+    },
+    "element0000000142": {
+      "class": "condition_Debug_dialog",
+      "ID": "element0000000142",
+      "name": "Debug dialog",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {},
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-420",
+      "y": "1260"
+    },
+    "element0000000144": {
+      "class": "condition_Debug_dialog",
+      "ID": "element0000000144",
+      "name": "Debug dialog",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {},
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-385",
+      "y": "665"
+    },
+    "element0000000146": {
+      "class": "condition_Debug_dialog",
+      "ID": "element0000000146",
+      "name": "Debug dialog",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {},
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-140",
+      "y": "2135"
+    },
+    "element0000000148": {
+      "class": "condition_Expression",
+      "ID": "element0000000148",
+      "name": "Expression - task.result = \"cancel\"",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "Expression": "task.result = \"cancel\""
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "315",
+      "y": "1400"
+    },
+    "element0000000149": {
+      "class": "condition_Expression",
+      "ID": "element0000000149",
+      "name": "Expression - task.dialog = \"confirmation\"",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "Expression": "task.dialog = \"confirmation\""
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "385",
+      "y": "1575"
+    },
+    "element0000000151": {
+      "class": "action_Send_Keystrokes_To_Control",
+      "ID": "element0000000151",
+      "name": "Send keystrokes to control: {space} -  - Control class Button3 - Title begins with: Dialog Test Title - Window class: AutoHotkeyGUI - Process: AutoHotFlow.exe",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "ahk_class": "AutoHotkeyGUI",
+        "ahk_exe": "AutoHotFlow.exe",
+        "ahk_id": "",
+        "ahk_pid": "",
+        "Control_identifier": "Button3",
+        "ControlTextMatchMode": 2,
+        "ExcludeText": "",
+        "excludeTitle": "",
+        "FindHiddenText": 0,
+        "FindHiddenWindow": 0,
+        "IdentifyControlBy": "Class",
+        "KeysToSend": "{space}",
+        "KeysToSendContentType": "String",
+        "RawMode": 0,
+        "TitleMatchMode": 1,
+        "winText": "",
+        "Wintitle": "Dialog Test Title"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "280",
+      "y": "1715"
+    },
+    "element0000000153": {
+      "class": "action_Send_Keystrokes_To_Control",
+      "ID": "element0000000153",
+      "name": "Send keystrokes to control: {space} -  - Control class Button2 - Title begins with: Dialog Test Title - Window class: AutoHotkeyGUI - Process: AutoHotFlow.exe",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "ahk_class": "AutoHotkeyGUI",
+        "ahk_exe": "AutoHotFlow.exe",
+        "ahk_id": "",
+        "ahk_pid": "",
+        "Control_identifier": "Button2",
+        "ControlTextMatchMode": 2,
+        "ExcludeText": "",
+        "excludeTitle": "",
+        "FindHiddenText": 0,
+        "FindHiddenWindow": 0,
+        "IdentifyControlBy": "Class",
+        "KeysToSend": "{space}",
+        "KeysToSendContentType": "String",
+        "RawMode": 0,
+        "TitleMatchMode": 1,
+        "winText": "",
+        "Wintitle": "Dialog Test Title"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "490",
+      "y": "1715"
+    },
+    "element0000000159": {
+      "class": "condition_Expression",
+      "ID": "element0000000159",
+      "name": "Expression - task.result = \"ok\"",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "Expression": "task.result = \"ok\""
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "700",
+      "y": "1400"
+    },
+    "element0000000161": {
+      "class": "action_Send_Keystrokes_To_Control",
+      "ID": "element0000000161",
+      "name": "Send keystrokes to control: {space} -  - Control class Button1 - Title begins with: Dialog Test Title - Window class: AutoHotkeyGUI - Process: AutoHotFlow.exe",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "ahk_class": "AutoHotkeyGUI",
+        "ahk_exe": "AutoHotFlow.exe",
+        "ahk_id": "",
+        "ahk_pid": "",
+        "Control_identifier": "Button1",
+        "ControlTextMatchMode": 2,
+        "ExcludeText": "",
+        "excludeTitle": "",
+        "FindHiddenText": 0,
+        "FindHiddenWindow": 0,
+        "IdentifyControlBy": "Class",
+        "KeysToSend": "{space}",
+        "KeysToSendContentType": "String",
+        "RawMode": 0,
+        "TitleMatchMode": 1,
+        "winText": "",
+        "Wintitle": "Dialog Test Title"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "700",
+      "y": "1715"
+    },
+    "element0000000167": {
+      "class": "Action_Add_To_List",
+      "ID": "element0000000167",
+      "name": "Add To List - global_testResults - As last value - Value 'a_flowName'",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "DelimiterComma": 0,
+        "DelimiterLinefeed": 1,
+        "DelimiterSemicolon": 0,
+        "DelimiterSpace": 0,
+        "Expression": "Expression",
+        "expressionPos": "String",
+        "InsertMethod": "Insert",
+        "NumberOfElements": "One",
+        "Position": "keyName",
+        "Varname": "global_testResults",
+        "VarValue": "a_flowName",
+        "VarValues": "Element one\nElement two",
+        "WhichPosition": "Last"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-945",
+      "y": "2555"
+    },
+    "element0000000169": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "0",
+      "enabled": "1",
+      "ID": "element0000000169",
+      "name": "Manual - \"Message Normal\"",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "ID": "Message Normal"
+      },
+      "StandardName": "1",
+      "type": "trigger",
+      "x": "1575",
+      "y": "-35"
+    },
+    "element0000000172": {
+      "class": "action_Message_Box",
+      "ID": "element0000000172",
+      "name": "Message box - Dialog Test Title - Dialog Test Text",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "ButtonLabel": "Dialog Test OK",
+        "ButtonLabelCancel": "Dialog Test Cancel",
+        "Height": 200,
+        "IfClose": "Exception",
+        "IfDismiss": "Exception",
+        "IsTimeout": "NoTimeout",
+        "message": "Dialog Test Text",
+        "OnTimeout": "Normal",
+        "ShowCancelButton": "1",
+        "TimeoutUnits": 10,
+        "title": "Dialog Test Title",
+        "Unit": "Seconds",
+        "Width": "300"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "1575",
+      "y": "140"
+    },
+    "element0000000173": {
+      "class": "action_New_Variable",
+      "ID": "element0000000173",
+      "name": "New variable - static_dialogResult = a_useraction",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "expression": "Expression",
+        "onlyIfNotExist": 0,
+        "Varname": "static_dialogResult",
+        "VarValue": "a_useraction"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "1505",
       "y": "315"
     },
-    "element0000000010": {
-      "class": "Action_Tooltip",
-      "ID": "element0000000010",
-      "name": "Tooltip: ja - 2 s - Follow Mouse",
-      "package": "action",
+    "element0000000174": {
+      "class": "action_New_Variable",
+      "ID": "element0000000174",
+      "name": "New variable - static_dialogResult = a_useraction",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
-        "duration": 2,
-        "follow_mouse": 1,
-        "text": "ja",
-        "Unit": "Seconds"
+        "expression": "Expression",
+        "onlyIfNotExist": 0,
+        "Varname": "static_dialogResult",
+        "VarValue": "a_useraction"
       },
       "StandardName": "1",
       "type": "Action",
-      "x": "70",
-      "y": "630"
+      "x": "1680",
+      "y": "315"
     },
-    "element0000000011": {
-      "class": "Action_Tooltip",
-      "ID": "element0000000011",
-      "name": "Tooltip: nein - 2 s - Follow Mouse",
-      "package": "action",
+    "element0000000177": {
+      "class": "condition_Expression",
+      "ID": "element0000000177",
+      "name": "Expression - task.dialog = \"message\"",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
-        "duration": 2,
-        "follow_mouse": 1,
-        "text": "nein",
-        "Unit": "Seconds"
+        "Expression": "task.dialog = \"message\""
       },
       "StandardName": "1",
-      "type": "Action",
-      "x": "315",
-      "y": "595"
+      "type": "Condition",
+      "x": "-420",
+      "y": "35"
     },
-    "element0000000013": {
-      "class": "Action_Tooltip",
-      "ID": "element0000000013",
-      "name": "Tooltip: abbr - 2 s - Follow Mouse",
-      "package": "action",
+    "element0000000178": {
+      "class": "action_Execute_Flow",
+      "ID": "element0000000178",
+      "name": "Execute flow: This flow - Manual - \"Message Normal\"",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
-        "duration": 2,
-        "follow_mouse": 1,
-        "text": "abbr",
-        "Unit": "Seconds"
+        "flowID": "",
+        "ReturnVariables": 0,
+        "SendLocalVars": "1",
+        "SkipDisabled": 0,
+        "ThisFlow": 1,
+        "triggerID": "element0000000169",
+        "WaitToFinish": "0",
+        "WhichTrigger": "specified"
       },
       "StandardName": "1",
       "type": "Action",
-      "x": "560",
-      "y": "595"
+      "x": "-420",
+      "y": "175"
+    },
+    "element0000000182": {
+      "class": "condition_Expression",
+      "ID": "element0000000182",
+      "name": "Expression - task.dialog = \"confirmation\"",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "Expression": "task.dialog = \"confirmation\""
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "700",
+      "y": "805"
+    },
+    "element0000000185": {
+      "class": "condition_Expression",
+      "ID": "element0000000185",
+      "name": "Expression - editText = \"Dialog Test Text\" and button1 = \"Dialog Test OK\" and  button2 = \"Dialog Test cancel\"",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "Expression": "editText = \"Dialog Test Text\" and button1 = \"Dialog Test OK\" and  button2 = \"Dialog Test cancel\""
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "35",
+      "y": "1225"
+    },
+    "element0000000186": {
+      "class": "condition_Expression",
+      "ID": "element0000000186",
+      "name": "Expression - task.dialog = \"message\"",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "Expression": "task.dialog = \"message\""
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "0",
+      "y": "1015"
+    },
+    "element0000000206": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "0",
+      "enabled": "1",
+      "ID": "element0000000206",
+      "name": "Manual - \"Input Normal\"",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "ID": "Input Normal"
+      },
+      "StandardName": "1",
+      "type": "trigger",
+      "x": "1995",
+      "y": "-35"
+    },
+    "element0000000209": {
+      "class": "action_Input_Box",
+      "ID": "element0000000209",
+      "name": "Input box: UserInput - Dialog Test Title - Dialog Test Text",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "ButtonLabel": "Dialog Test OK",
+        "ButtonLabelCancel": "Dialog Test Cancel",
+        "defaultText": "Dialog Test Value",
+        "Height": 200,
+        "IfClose": "Exception",
+        "IfDismiss": "Exception",
+        "IsTimeout": "NoTimeout",
+        "MaskUserInput": 0,
+        "message": "Dialog Test Text",
+        "MultilineEdit": 0,
+        "MultilineEditRows": 4,
+        "OnlyNumbers": 0,
+        "OnTimeout": "Normal",
+        "ShowCancelButton": "1",
+        "TimeoutUnits": 10,
+        "title": "Dialog Test Title",
+        "Unit": "Seconds",
+        "Varname": "UserInput",
+        "Width": "300"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "1995",
+      "y": "140"
+    },
+    "element0000000211": {
+      "class": "action_New_Variable",
+      "ID": "element0000000211",
+      "name": "New variable - static_dialogResult = a_useraction",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "expression": "Expression",
+        "onlyIfNotExist": 0,
+        "Varname": "static_dialogResult",
+        "VarValue": "a_useraction"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "1995",
+      "y": "315"
+    },
+    "element0000000212": {
+      "class": "action_New_Variable",
+      "ID": "element0000000212",
+      "name": "New variable - static_dialogResult = a_useraction",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "expression": "Expression",
+        "onlyIfNotExist": 0,
+        "Varname": "static_dialogResult",
+        "VarValue": "a_useraction"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "2170",
+      "y": "315"
+    },
+    "element0000000217": {
+      "class": "condition_Expression",
+      "ID": "element0000000217",
+      "name": "Expression - task.dialog = \"input\"",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "Expression": "task.dialog = \"input\""
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-175",
+      "y": "35"
+    },
+    "element0000000218": {
+      "class": "action_Execute_Flow",
+      "ID": "element0000000218",
+      "name": "Execute flow: This flow - Manual - \"Input Normal\"",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "flowID": "",
+        "ReturnVariables": 0,
+        "SendLocalVars": "1",
+        "SkipDisabled": 0,
+        "ThisFlow": 1,
+        "triggerID": "element0000000206",
+        "WaitToFinish": "0",
+        "WhichTrigger": "specified"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-175",
+      "y": "175"
+    },
+    "element0000000222": {
+      "class": "condition_Expression",
+      "ID": "element0000000222",
+      "name": "Expression - editText = \"Dialog Test Text\" and button1 = \"Dialog Test OK\" and  button2 = \"Dialog Test cancel\" and inputText \"Dialog Test Value\"",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "Expression": "editText = \"Dialog Test Text\" and button1 = \"Dialog Test OK\" and  button2 = \"Dialog Test cancel\" and inputText \"Dialog Test Value\""
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "210",
+      "y": "1225"
+    },
+    "element0000000223": {
+      "class": "condition_Expression",
+      "ID": "element0000000223",
+      "name": "Expression - task.dialog = \"input\"",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "Expression": "task.dialog = \"input\""
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "175",
+      "y": "1015"
+    },
+    "element0000000229": {
+      "class": "condition_Expression",
+      "ID": "element0000000229",
+      "name": "Expression - task.result = \"close\"",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "Expression": "task.result = \"close\""
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "875",
+      "y": "1435"
+    },
+    "element0000000233": {
+      "class": "action_Close_Window",
+      "ID": "element0000000233",
+      "name": "Close window:  - Title begins with: Dialog Test Title - Window class: AutoHotkeyGUI - Process: AutoHotFlow.exe",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "ahk_class": "AutoHotkeyGUI",
+        "ahk_exe": "AutoHotFlow.exe",
+        "ahk_id": "",
+        "ahk_pid": "",
+        "ExcludeText": "",
+        "excludeTitle": "",
+        "FindHiddenText": 0,
+        "FindHiddenWindow": 0,
+        "TitleMatchMode": 1,
+        "WinCloseMethod": "close",
+        "winText": "",
+        "Wintitle": "Dialog Test Title"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "910",
+      "y": "1715"
+    },
+    "element0000000240": {
+      "class": "action_New_Variable",
+      "ID": "element0000000240",
+      "name": "New variable - static_dialogValue = UserInput",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "expression": "Expression",
+        "onlyIfNotExist": 0,
+        "Varname": "static_dialogValue",
+        "VarValue": "UserInput"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "2030",
+      "y": "490"
+    },
+    "element0000000243": {
+      "class": "condition_Expression",
+      "ID": "element0000000243",
+      "name": "Expression - task.dialog = \"input\"",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "Expression": "task.dialog = \"input\""
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "350",
+      "y": "805"
+    },
+    "element0000000244": {
+      "class": "action_Get_control_text",
+      "ID": "element0000000244",
+      "name": "Get control text:  - Control class Edit1 - Title begins with: Dialog Test Title - Window class: AutoHotkeyGUI - Process: AutoHotFlow.exe",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "ahk_class": "AutoHotkeyGUI",
+        "ahk_exe": "AutoHotFlow.exe",
+        "ahk_id": "",
+        "ahk_pid": "",
+        "Control_identifier": "Edit1",
+        "ControlTextMatchMode": 2,
+        "ExcludeText": "",
+        "excludeTitle": "",
+        "FindHiddenText": 0,
+        "FindHiddenWindow": 0,
+        "IdentifyControlBy": "Class",
+        "TitleMatchMode": 1,
+        "Varname": "inputText",
+        "winText": "",
+        "Wintitle": "Dialog Test Title"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "525",
+      "y": "805"
+    },
+    "element0000000248": {
+      "class": "condition_Expression",
+      "ID": "element0000000248",
+      "name": "Expression - task.dialog = \"input\"",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "Expression": "task.dialog = \"input\""
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-280",
+      "y": "2310"
+    },
+    "element0000000252": {
+      "class": "condition_Expression",
+      "ID": "element0000000252",
+      "name": "Expression - static_dialogValue = \"Dialog Test Value\"",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "Expression": "static_dialogValue = \"Dialog Test Value\""
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-280",
+      "y": "2660"
+    },
+    "element0000000255": {
+      "class": "condition_Debug_dialog",
+      "ID": "element0000000255",
+      "name": "Debug dialog",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {},
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-105",
+      "y": "2485"
+    },
+    "element0000000257": {
+      "class": "condition_Expression",
+      "ID": "element0000000257",
+      "name": "Expression - task.result = \"ok\"",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "Expression": "task.result = \"ok\""
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-280",
+      "y": "2485"
     }
   },
-  "category": "Manual tests",
-  "ElementIDCounter": "20",
+  "category": "Automatic tests",
+  "ElementIDCounter": "260",
   "flowSettings": {
     "DefaultWorkingDir": "1",
     "ExecutionPolicy": "default",
-    "Offsetx": "-378.571429",
-    "Offsety": "-344.285714",
+    "Offsetx": "1137.267074",
+    "Offsety": "-151.332405",
     "WorkingDir": "",
-    "zoomFactor": "0.7"
+    "zoomFactor": "1.364105"
   },
   "name": "Dialog test"
 }

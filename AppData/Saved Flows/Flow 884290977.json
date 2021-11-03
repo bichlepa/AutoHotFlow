@@ -88,7 +88,7 @@
       "ConnectionType": "normal",
       "from": "element0000000054",
       "ID": "connection0000000055",
-      "to": "element0000000056",
+      "to": "element0000000188",
       "type": "Connection"
     },
     "connection0000000062": {
@@ -314,6 +314,20 @@
       "ID": "connection0000000185",
       "to": "element0000000184",
       "type": "Connection"
+    },
+    "connection0000000186": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000186",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000187": {
+      "ConnectionType": "normal",
+      "from": "element0000000188",
+      "ID": "connection0000000187",
+      "to": "element0000000056",
+      "type": "Connection"
     }
   },
   "allElements": {
@@ -532,11 +546,11 @@
     "element0000000054": {
       "class": "Action_Sleep",
       "ID": "element0000000054",
-      "name": "Sleep: 3 s",
+      "name": "Sleep: 1 s",
       "package": "Default",
       "packageVersion": "1.1.0",
       "pars": {
-        "Duration": "3",
+        "Duration": "1",
         "Unit": "Seconds"
       },
       "StandardName": "1",
@@ -968,17 +982,32 @@
       "type": "Action",
       "x": "1050",
       "y": "245"
+    },
+    "element0000000188": {
+      "class": "action_Sleep",
+      "ID": "element0000000188",
+      "name": "Sleep: 2 s",
+      "package": "Default",
+      "packageVersion": "1.1.0",
+      "pars": {
+        "Duration": 2,
+        "Unit": "Seconds"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "245",
+      "y": "945"
     }
   },
   "category": "Automatic tests",
-  "ElementIDCounter": "185",
+  "ElementIDCounter": "188",
   "flowSettings": {
     "DefaultWorkingDir": 1,
     "ExecutionPolicy": "default",
-    "Offsetx": "-766.755263",
-    "Offsety": "-370.114801",
+    "Offsetx": "-1562.862490",
+    "Offsety": "-729.713557",
     "WorkingDir": "",
-    "zoomFactor": "0.578513"
+    "zoomFactor": "0.434645"
   },
   "name": "Trigger test"
 }
