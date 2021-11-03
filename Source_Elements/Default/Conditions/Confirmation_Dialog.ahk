@@ -1,12 +1,4 @@
-﻿;Always add this element class name to the global list
-x_RegisterElementClass("Condition_Confirmation_Dialog")
-
-;Element type of the element
-Element_getElementType_Condition_Confirmation_Dialog()
-{
-	return "Condition"
-}
-
+﻿
 ;Name of the element
 Element_getName_Condition_Confirmation_Dialog()
 {
@@ -17,14 +9,6 @@ Element_getName_Condition_Confirmation_Dialog()
 Element_getCategory_Condition_Confirmation_Dialog()
 {
 	return x_lang("User_interaction")
-}
-
-;This function returns the package of the element.
-;This is a reserved function for future releases,
-;where it will be possible to install additional add-ons which provide more elements.
-Element_getPackage_Condition_Confirmation_Dialog()
-{
-	return "default"
 }
 
 ;Minimum user experience to use this element.
@@ -328,7 +312,7 @@ Condition_Confirmation_Dialog_OnClose()
 	}
 
 	; set result variable
-	x_SetVariable(Environment, "A_UserAction", "Cancel", "thread")
+	x_SetVariable(Environment, "A_UserAction", "Close", "thread")
 	
 	; destroy gui
 	gui, destroy

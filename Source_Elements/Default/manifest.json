@@ -4,7 +4,7 @@
     "author": "Paul Bichler (bichlepa)",
     "website": "https://github.com/bichlepa/AutoHotFlow",
     "license": "Unlicense",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "libraries": [
         "lib\\TTS\\TTS by Learning One.ahk",
         "lib\\Eject\\Eject.ahk",
@@ -14,7 +14,8 @@
         "lib\\Process list\\getProcessList.ahk",
         "lib\\Json\\Jxon.ahk",
         "lib\\Yaml\\Yaml.ahk",
-        "common\\window functions.ahk"
+        "common\\window functions.ahk",
+        "common\\compatibility.ahk"
     ],
     "actions": [
         "New_Variable.ahk",
@@ -59,33 +60,37 @@
         "Eject_Drive.ahk",
         "Change_Drive_Label.ahk",
         "Get_Drive_Information.ahk",
-        "Lock_Or_Unlcock_Drive.ahk",
+        "Lock_Or_Unlock_Drive.ahk",
         "List_Drives.ahk",
-        "Compress_files.ahk",
-        "Extract_files.ahk",
+
+        "Read_From_File.ahk",
+        "Write_To_File.ahk",
         "Copy_file.ahk",
-        "Copy_folder.ahk",
-        "Create_folder.ahk",
+        "Move_File.ahk",
+        "Rename_file.ahk",
         "Delete_file.ahk",
+        "Create_folder.ahk",
+        "Copy_folder.ahk",
+        "Move_Folder.ahk",
+        "Rename_Folder.ahk",
         "Delete_folder.ahk",
         "Empty_Recycle_bin.ahk",
         "Get_file_attributes.ahk",
         "Get_file_size.ahk",
         "Get_file_time.ahk",
-        "Move_File.ahk",
-        "Move_Folder.ahk",
-        "Rename_file.ahk",
-        "Rename_Folder.ahk",
-        "Select_file.ahk",
-        "Select_folder.ahk",
         "Set_file_attributes.ahk",
         "Set_file_time.ahk",
-        "Write_To_File.ahk",
+        "Get_shortcut_information.ahk",
+        "Create_shortcut.ahk",
+        "Select_file.ahk",
+        "Select_folder.ahk",
+        "Split_path.ahk",
 
-        "Read_From_File.ahk",
         "Read_From_Ini.ahk",
         "Delete_From_Ini.ahk",
         "Write_to_ini.ahk",
+        "Compress_files.ahk",
+        "Extract_files.ahk",
 
         "Download_file.ahk",
         "HTTP_Request.ahk",
@@ -113,6 +118,7 @@
         "Send_Keystrokes.ahk",
         "Send_Keystrokes_To_Control.ahk",
         "Set_Lock_Key.ahk",
+        "Block_user_input.ahk",
 
         "Play_Sound.ahk",
         "Stop_Sound.ahk",
@@ -133,9 +139,11 @@
         "Suspend_Computer.ahk",
 
         "Sleep.ahk",
+        "Do_nothing.ahk",
         "Set_Flow_Status.ahk",
         "Execute_Flow.ahk",
         "Stop_Flow.ahk",
+        "Set_element_parameter.ahk",
 
         "AutoHotkey_script.ahk",
         "Trace_Point.ahk",
@@ -144,9 +152,10 @@
     "conditions": [
         "Expression.ahk",
         "Variable_Is_Empty.ahk",
+        "Variable_content_is.ahk",
         "List_Contains_Element.ahk",
         "String_Contains_Text.ahk",
-        "Number_is.ahk",
+        "NumberIs.ahk",
 
         "File_Exists.ahk",
         "File_Has_Attribute.ahk",
@@ -161,6 +170,7 @@
 
         "Process_Is_Running.ahk",
         
+        "Do_nothing.ahk",
         "Flow_Enabled.ahk",
         "Flow_Running.ahk"
 
@@ -182,6 +192,7 @@
         "Clipboard_Changes.ahk",
 
         "Hotkey.ahk",
+        "Hotstring.ahk",
         "Shortcut.ahk",
 
         "Window_opens.ahk",

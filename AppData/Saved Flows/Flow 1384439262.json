@@ -77,39 +77,11 @@
       "to": "",
       "type": "Connection"
     },
-    "connection0000000491": {
-      "ConnectionType": "normal",
-      "from": "element0000000487",
-      "ID": "connection0000000491",
-      "to": "element0000000492",
-      "type": "Connection"
-    },
-    "connection0000000495": {
-      "ConnectionType": "normal",
-      "from": "element0000000492",
-      "ID": "connection0000000495",
-      "to": "element0000000496",
-      "type": "Connection"
-    },
-    "connection0000000502": {
-      "ConnectionType": "Yes",
-      "from": "element0000000499",
-      "ID": "connection0000000502",
-      "to": "element0000000514",
-      "type": "Connection"
-    },
     "connection0000000505": {
       "ConnectionType": "normal",
       "from": "",
       "ID": "connection0000000505",
       "to": "",
-      "type": "Connection"
-    },
-    "connection0000000506": {
-      "ConnectionType": "normal",
-      "from": "element0000000507",
-      "ID": "connection0000000506",
-      "to": "element0000000508",
       "type": "Connection"
     },
     "connection0000000509": {
@@ -119,20 +91,6 @@
       "to": "",
       "type": "Connection"
     },
-    "connection0000000510": {
-      "ConnectionType": "Yes",
-      "from": "element0000000508",
-      "ID": "connection0000000510",
-      "to": "element0000000499",
-      "type": "Connection"
-    },
-    "connection0000000511": {
-      "ConnectionType": "No",
-      "from": "element0000000496",
-      "ID": "connection0000000511",
-      "to": "element0000000507",
-      "type": "Connection"
-    },
     "connection0000000512": {
       "ConnectionType": "normal",
       "from": "",
@@ -140,53 +98,11 @@
       "to": "",
       "type": "Connection"
     },
-    "connection0000000518": {
-      "ConnectionType": "normal",
-      "from": "element0000000514",
-      "ID": "connection0000000518",
-      "to": "element0000000517",
-      "type": "Connection"
-    },
-    "connection0000000519": {
-      "ConnectionType": "Yes",
-      "from": "element0000000517",
-      "ID": "connection0000000519",
-      "to": "element0000000520",
-      "type": "Connection"
-    },
-    "connection0000000521": {
-      "ConnectionType": "normal",
-      "from": "element0000000520",
-      "ID": "connection0000000521",
-      "to": "element0000000522",
-      "type": "Connection"
-    },
-    "connection0000000523": {
-      "ConnectionType": "Yes",
-      "from": "element0000000522",
-      "ID": "connection0000000523",
-      "to": "element0000000524",
-      "type": "Connection"
-    },
-    "connection0000000527": {
-      "ConnectionType": "normal",
-      "from": "element0000000524",
-      "ID": "connection0000000527",
-      "to": "element0000000526",
-      "type": "Connection"
-    },
     "connection0000000528": {
       "ConnectionType": "Yes",
       "from": "element0000000533",
       "ID": "connection0000000528",
       "to": "element0000000539",
-      "type": "Connection"
-    },
-    "connection0000000529": {
-      "ConnectionType": "No",
-      "from": "element0000000526",
-      "ID": "connection0000000529",
-      "to": "element0000000531",
       "type": "Connection"
     },
     "connection0000000532": {
@@ -259,13 +175,6 @@
       "to": "element0000000550",
       "type": "Connection"
     },
-    "connection0000000560": {
-      "ConnectionType": "Yes",
-      "from": "element0000000551",
-      "ID": "connection0000000560",
-      "to": "element0000000561",
-      "type": "Connection"
-    },
     "connection0000000566": {
       "ConnectionType": "normal",
       "from": "element0000000561",
@@ -278,13 +187,6 @@
       "from": "element0000000567",
       "ID": "connection0000000568",
       "to": "element0000000570",
-      "type": "Connection"
-    },
-    "connection0000000571": {
-      "ConnectionType": "No",
-      "from": "element0000000577",
-      "ID": "connection0000000571",
-      "to": "element0000000538",
       "type": "Connection"
     },
     "connection0000000575": {
@@ -329,88 +231,11 @@
       "to": "element0000000585",
       "type": "Connection"
     },
-    "connection0000000589": {
-      "ConnectionType": "Yes",
-      "from": "element0000000609",
-      "ID": "connection0000000589",
-      "to": "element0000000640",
-      "type": "Connection"
-    },
     "connection0000000590": {
       "ConnectionType": "Yes",
       "from": "element0000000586",
       "ID": "connection0000000590",
-      "to": "element0000000591",
-      "type": "Connection"
-    },
-    "connection0000000593": {
-      "ConnectionType": "normal",
-      "from": "element0000000591",
-      "ID": "connection0000000593",
-      "to": "element0000000592",
-      "type": "Connection"
-    },
-    "connection0000000597": {
-      "ConnectionType": "Yes",
-      "from": "element0000000592",
-      "ID": "connection0000000597",
-      "to": "element0000000596",
-      "type": "Connection"
-    },
-    "connection0000000599": {
-      "ConnectionType": "Yes",
-      "from": "element0000000596",
-      "ID": "connection0000000599",
-      "to": "element0000000598",
-      "type": "Connection"
-    },
-    "connection0000000603": {
-      "ConnectionType": "normal",
-      "from": "element0000000598",
-      "ID": "connection0000000603",
-      "to": "element0000000601",
-      "type": "Connection"
-    },
-    "connection0000000605": {
-      "ConnectionType": "No",
-      "from": "element0000000601",
-      "ID": "connection0000000605",
-      "to": "element0000000606",
-      "type": "Connection"
-    },
-    "connection0000000608": {
-      "ConnectionType": "normal",
-      "from": "element0000000606",
-      "ID": "connection0000000608",
-      "to": "element0000000607",
-      "type": "Connection"
-    },
-    "connection0000000610": {
-      "ConnectionType": "normal",
-      "from": "element0000000607",
-      "ID": "connection0000000610",
-      "to": "element0000000609",
-      "type": "Connection"
-    },
-    "connection0000000613": {
-      "ConnectionType": "normal",
-      "from": "element0000000487",
-      "ID": "connection0000000613",
-      "to": "element0000000611",
-      "type": "Connection"
-    },
-    "connection0000000614": {
-      "ConnectionType": "normal",
-      "from": "element0000000487",
-      "ID": "connection0000000614",
-      "to": "element0000000612",
-      "type": "Connection"
-    },
-    "connection0000000616": {
-      "ConnectionType": "normal",
-      "from": "element0000000487",
-      "ID": "connection0000000616",
-      "to": "element0000000615",
+      "to": "element0000000792",
       "type": "Connection"
     },
     "connection0000000643": {
@@ -487,14 +312,595 @@
       "ConnectionType": "Yes",
       "from": "element0000000676",
       "ID": "connection0000000680",
-      "to": "element0000000501",
+      "to": "element0000000823",
       "type": "Connection"
     },
-    "connection0000000682": {
+    "connection0000000701": {
+      "ConnectionType": "normal",
+      "from": "element0000000699",
+      "ID": "connection0000000701",
+      "to": "element0000000700",
+      "type": "Connection"
+    },
+    "connection0000000705": {
+      "ConnectionType": "normal",
+      "from": "element0000000703",
+      "ID": "connection0000000705",
+      "to": "element0000000704",
+      "type": "Connection"
+    },
+    "connection0000000706": {
+      "ConnectionType": "Yes",
+      "from": "element0000000704",
+      "ID": "connection0000000706",
+      "to": "element0000000702",
+      "type": "Connection"
+    },
+    "connection0000000707": {
       "ConnectionType": "No",
-      "from": "element0000000676",
-      "ID": "connection0000000682",
-      "to": "element0000000681",
+      "from": "element0000000700",
+      "ID": "connection0000000707",
+      "to": "element0000000703",
+      "type": "Connection"
+    },
+    "connection0000000709": {
+      "ConnectionType": "Yes",
+      "from": "element0000000702",
+      "ID": "connection0000000709",
+      "to": "element0000000708",
+      "type": "Connection"
+    },
+    "connection0000000716": {
+      "ConnectionType": "normal",
+      "from": "element0000000714",
+      "ID": "connection0000000716",
+      "to": "element0000000715",
+      "type": "Connection"
+    },
+    "connection0000000728": {
+      "ConnectionType": "normal",
+      "from": "element0000000725",
+      "ID": "connection0000000728",
+      "to": "element0000000751",
+      "type": "Connection"
+    },
+    "connection0000000730": {
+      "ConnectionType": "normal",
+      "from": "element0000000727",
+      "ID": "connection0000000730",
+      "to": "element0000000729",
+      "type": "Connection"
+    },
+    "connection0000000731": {
+      "ConnectionType": "normal",
+      "from": "element0000000715",
+      "ID": "connection0000000731",
+      "to": "element0000000717",
+      "type": "Connection"
+    },
+    "connection0000000734": {
+      "ConnectionType": "normal",
+      "from": "element0000000717",
+      "ID": "connection0000000734",
+      "to": "element0000000732",
+      "type": "Connection"
+    },
+    "connection0000000739": {
+      "ConnectionType": "normal",
+      "from": "element0000000735",
+      "ID": "connection0000000739",
+      "to": "element0000000736",
+      "type": "Connection"
+    },
+    "connection0000000740": {
+      "ConnectionType": "Yes",
+      "from": "element0000000736",
+      "ID": "connection0000000740",
+      "to": "element0000000737",
+      "type": "Connection"
+    },
+    "connection0000000741": {
+      "ConnectionType": "normal",
+      "from": "element0000000737",
+      "ID": "connection0000000741",
+      "to": "element0000000738",
+      "type": "Connection"
+    },
+    "connection0000000742": {
+      "ConnectionType": "Yes",
+      "from": "element0000000732",
+      "ID": "connection0000000742",
+      "to": "element0000000735",
+      "type": "Connection"
+    },
+    "connection0000000745": {
+      "ConnectionType": "No",
+      "from": "element0000000738",
+      "ID": "connection0000000745",
+      "to": "element0000000531",
+      "type": "Connection"
+    },
+    "connection0000000746": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000746",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000747": {
+      "ConnectionType": "normal",
+      "from": "element0000000748",
+      "ID": "connection0000000747",
+      "to": "element0000000724",
+      "type": "Connection"
+    },
+    "connection0000000749": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000749",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000750": {
+      "ConnectionType": "Yes",
+      "from": "element0000000751",
+      "ID": "connection0000000750",
+      "to": "element0000000727",
+      "type": "Connection"
+    },
+    "connection0000000756": {
+      "ConnectionType": "normal",
+      "from": "element0000000729",
+      "ID": "connection0000000756",
+      "to": "element0000000755",
+      "type": "Connection"
+    },
+    "connection0000000758": {
+      "ConnectionType": "Yes",
+      "from": "element0000000551",
+      "ID": "connection0000000758",
+      "to": "element0000000757",
+      "type": "Connection"
+    },
+    "connection0000000761": {
+      "ConnectionType": "Yes",
+      "from": "element0000000755",
+      "ID": "connection0000000761",
+      "to": "element0000000793",
+      "type": "Connection"
+    },
+    "connection0000000763": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000763",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000769": {
+      "ConnectionType": "normal",
+      "from": "element0000000718",
+      "ID": "connection0000000769",
+      "to": "element0000000765",
+      "type": "Connection"
+    },
+    "connection0000000770": {
+      "ConnectionType": "normal",
+      "from": "element0000000718",
+      "ID": "connection0000000770",
+      "to": "element0000000766",
+      "type": "Connection"
+    },
+    "connection0000000771": {
+      "ConnectionType": "normal",
+      "from": "element0000000718",
+      "ID": "connection0000000771",
+      "to": "element0000000767",
+      "type": "Connection"
+    },
+    "connection0000000772": {
+      "ConnectionType": "normal",
+      "from": "element0000000718",
+      "ID": "connection0000000772",
+      "to": "element0000000768",
+      "type": "Connection"
+    },
+    "connection0000000773": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000773",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000777": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000777",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000778": {
+      "ConnectionType": "normal",
+      "from": "element0000000724",
+      "ID": "connection0000000778",
+      "to": "element0000000725",
+      "type": "Connection"
+    },
+    "connection0000000779": {
+      "ConnectionType": "normal",
+      "from": "element0000000487",
+      "ID": "connection0000000779",
+      "to": "element0000000748",
+      "type": "Connection"
+    },
+    "connection0000000784": {
+      "ConnectionType": "normal",
+      "from": "element0000000780",
+      "ID": "connection0000000784",
+      "to": "element0000000785",
+      "type": "Connection"
+    },
+    "connection0000000786": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000786",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000787": {
+      "ConnectionType": "normal",
+      "from": "element0000000785",
+      "ID": "connection0000000787",
+      "to": "element0000000788",
+      "type": "Connection"
+    },
+    "connection0000000789": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000789",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000790": {
+      "ConnectionType": "normal",
+      "from": "element0000000788",
+      "ID": "connection0000000790",
+      "to": "element0000000561",
+      "type": "Connection"
+    },
+    "connection0000000796": {
+      "ConnectionType": "normal",
+      "from": "element0000000793",
+      "ID": "connection0000000796",
+      "to": "element0000000794",
+      "type": "Connection"
+    },
+    "connection0000000797": {
+      "ConnectionType": "normal",
+      "from": "element0000000794",
+      "ID": "connection0000000797",
+      "to": "element0000000795",
+      "type": "Connection"
+    },
+    "connection0000000798": {
+      "ConnectionType": "Yes",
+      "from": "element0000000836",
+      "ID": "connection0000000798",
+      "to": "element0000000759",
+      "type": "Connection"
+    },
+    "connection0000000810": {
+      "ConnectionType": "normal",
+      "from": "element0000000799",
+      "ID": "connection0000000810",
+      "to": "element0000000800",
+      "type": "Connection"
+    },
+    "connection0000000811": {
+      "ConnectionType": "Yes",
+      "from": "element0000000800",
+      "ID": "connection0000000811",
+      "to": "element0000000801",
+      "type": "Connection"
+    },
+    "connection0000000812": {
+      "ConnectionType": "Yes",
+      "from": "element0000000801",
+      "ID": "connection0000000812",
+      "to": "element0000000802",
+      "type": "Connection"
+    },
+    "connection0000000813": {
+      "ConnectionType": "normal",
+      "from": "element0000000802",
+      "ID": "connection0000000813",
+      "to": "element0000000803",
+      "type": "Connection"
+    },
+    "connection0000000814": {
+      "ConnectionType": "No",
+      "from": "element0000000803",
+      "ID": "connection0000000814",
+      "to": "element0000000804",
+      "type": "Connection"
+    },
+    "connection0000000815": {
+      "ConnectionType": "normal",
+      "from": "element0000000804",
+      "ID": "connection0000000815",
+      "to": "element0000000805",
+      "type": "Connection"
+    },
+    "connection0000000816": {
+      "ConnectionType": "normal",
+      "from": "element0000000805",
+      "ID": "connection0000000816",
+      "to": "element0000000806",
+      "type": "Connection"
+    },
+    "connection0000000821": {
+      "ConnectionType": "Yes",
+      "from": "element0000000806",
+      "ID": "connection0000000821",
+      "to": "element0000000819",
+      "type": "Connection"
+    },
+    "connection0000000822": {
+      "ConnectionType": "normal",
+      "from": "element0000000708",
+      "ID": "connection0000000822",
+      "to": "element0000000799",
+      "type": "Connection"
+    },
+    "connection0000000825": {
+      "ConnectionType": "normal",
+      "from": "element0000000824",
+      "ID": "connection0000000825",
+      "to": "element0000000640",
+      "type": "Connection"
+    },
+    "connection0000000829": {
+      "ConnectionType": "normal",
+      "from": "element0000000826",
+      "ID": "connection0000000829",
+      "to": "element0000000827",
+      "type": "Connection"
+    },
+    "connection0000000830": {
+      "ConnectionType": "normal",
+      "from": "element0000000827",
+      "ID": "connection0000000830",
+      "to": "element0000000828",
+      "type": "Connection"
+    },
+    "connection0000000831": {
+      "ConnectionType": "Yes",
+      "from": "element0000000795",
+      "ID": "connection0000000831",
+      "to": "element0000000826",
+      "type": "Connection"
+    },
+    "connection0000000837": {
+      "ConnectionType": "normal",
+      "from": "element0000000834",
+      "ID": "connection0000000837",
+      "to": "element0000000835",
+      "type": "Connection"
+    },
+    "connection0000000838": {
+      "ConnectionType": "normal",
+      "from": "element0000000835",
+      "ID": "connection0000000838",
+      "to": "element0000000836",
+      "type": "Connection"
+    },
+    "connection0000000839": {
+      "ConnectionType": "Yes",
+      "from": "element0000000828",
+      "ID": "connection0000000839",
+      "to": "element0000000834",
+      "type": "Connection"
+    },
+    "connection0000000844": {
+      "ConnectionType": "normal",
+      "from": "element0000000842",
+      "ID": "connection0000000844",
+      "to": "element0000000843",
+      "type": "Connection"
+    },
+    "connection0000000846": {
+      "ConnectionType": "normal",
+      "from": "element0000000843",
+      "ID": "connection0000000846",
+      "to": "element0000000856",
+      "type": "Connection"
+    },
+    "connection0000000848": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000848",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000849": {
+      "ConnectionType": "normal",
+      "from": "element0000000850",
+      "ID": "connection0000000849",
+      "to": "element0000000842",
+      "type": "Connection"
+    },
+    "connection0000000854": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000854",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000855": {
+      "ConnectionType": "Yes",
+      "from": "element0000000856",
+      "ID": "connection0000000855",
+      "to": "element0000000857",
+      "type": "Connection"
+    },
+    "connection0000000858": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000858",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000859": {
+      "ConnectionType": "Yes",
+      "from": "element0000000857",
+      "ID": "connection0000000859",
+      "to": "element0000000860",
+      "type": "Connection"
+    },
+    "connection0000000861": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000861",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000862": {
+      "ConnectionType": "Yes",
+      "from": "element0000000860",
+      "ID": "connection0000000862",
+      "to": "element0000000866",
+      "type": "Connection"
+    },
+    "connection0000000867": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000867",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000868": {
+      "ConnectionType": "Yes",
+      "from": "element0000000866",
+      "ID": "connection0000000868",
+      "to": "element0000000869",
+      "type": "Connection"
+    },
+    "connection0000000870": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000870",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000871": {
+      "ConnectionType": "Yes",
+      "from": "element0000000869",
+      "ID": "connection0000000871",
+      "to": "element0000000872",
+      "type": "Connection"
+    },
+    "connection0000000873": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000873",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000874": {
+      "ConnectionType": "Yes",
+      "from": "element0000000872",
+      "ID": "connection0000000874",
+      "to": "element0000000875",
+      "type": "Connection"
+    },
+    "connection0000000876": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000876",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000877": {
+      "ConnectionType": "Yes",
+      "from": "element0000000875",
+      "ID": "connection0000000877",
+      "to": "element0000000884",
+      "type": "Connection"
+    },
+    "connection0000000885": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000885",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000886": {
+      "ConnectionType": "normal",
+      "from": "element0000000887",
+      "ID": "connection0000000886",
+      "to": "element0000000850",
+      "type": "Connection"
+    },
+    "connection0000000888": {
+      "ConnectionType": "normal",
+      "from": "element0000000884",
+      "ID": "connection0000000888",
+      "to": "element0000000898",
+      "type": "Connection"
+    },
+    "connection0000000892": {
+      "ConnectionType": "normal",
+      "from": "element0000000890",
+      "ID": "connection0000000892",
+      "to": "element0000000833",
+      "type": "Connection"
+    },
+    "connection0000000896": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000896",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000897": {
+      "ConnectionType": "normal",
+      "from": "element0000000898",
+      "ID": "connection0000000897",
+      "to": "element0000000889",
+      "type": "Connection"
+    },
+    "connection0000000901": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000901",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000905": {
+      "ConnectionType": "normal",
+      "from": "element0000000832",
+      "ID": "connection0000000905",
+      "to": "element0000000908",
+      "type": "Connection"
+    },
+    "connection0000000906": {
+      "ConnectionType": "Yes",
+      "from": "element0000000908",
+      "ID": "connection0000000906",
+      "to": "element0000000887",
+      "type": "Connection"
+    },
+    "connection0000000907": {
+      "ConnectionType": "No",
+      "from": "element0000000908",
+      "ID": "connection0000000907",
+      "to": "element0000000850",
+      "type": "Connection"
+    },
+    "connection0000000909": {
+      "ConnectionType": "Yes",
+      "from": "element0000000889",
+      "ID": "connection0000000909",
+      "to": "element0000000890",
       "type": "Connection"
     }
   },
@@ -505,207 +911,22 @@
       "enabled": "1",
       "ID": "element0000000487",
       "name": "Manual - \"start\"",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "ID": "start"
       },
       "StandardName": "1",
       "type": "Trigger",
       "x": "-665",
-      "y": "-70"
-    },
-    "element0000000492": {
-      "class": "Action_Delete_Folder",
-      "ID": "element0000000492",
-      "name": "Delete folder - fileTestFiles",
-      "package": "default",
-      "pars": {
-        "ExceptionIfNotExist": "0",
-        "Folder": "fileTestFiles",
-        "ifEmpty": 0
-      },
-      "StandardName": "1",
-      "type": "Action",
-      "x": "-665",
-      "y": "70"
-    },
-    "element0000000496": {
-      "class": "Condition_File_Exists",
-      "ID": "element0000000496",
-      "name": "File exists - fileTestFiles",
-      "package": "default",
-      "pars": {
-        "file": "fileTestFiles"
-      },
-      "StandardName": "1",
-      "type": "Condition",
-      "x": "-665",
-      "y": "210"
-    },
-    "element0000000499": {
-      "class": "Condition_File_Has_Attribute",
-      "ID": "element0000000499",
-      "name": "File has attribute - Directory - fileTestFiles",
-      "package": "default",
-      "pars": {
-        "Attribute": "D",
-        "file": "fileTestFiles"
-      },
-      "StandardName": "1",
-      "type": "Condition",
-      "x": "-665",
-      "y": "630"
-    },
-    "element0000000501": {
-      "class": "Action_Add_To_List",
-      "ID": "element0000000501",
-      "name": "Add To List - global_testResults - As last value - Value 'a_flowName'",
-      "package": "default",
-      "pars": {
-        "DelimiterComma": 0,
-        "DelimiterLinefeed": 1,
-        "DelimiterSemicolon": 0,
-        "DelimiterSpace": 0,
-        "Expression": "Expression",
-        "expressionPos": "String",
-        "InsertMethod": "Insert",
-        "InsertMethodLabel": "",
-        "NumberOfElements": "One",
-        "Position": "keyName",
-        "Varname": "global_testResults",
-        "VarValue": "a_flowName",
-        "VarValues": "Element one\nElement two",
-        "WhichPosition": "Last"
-      },
-      "StandardName": "1",
-      "type": "Action",
-      "x": "-140",
-      "y": "7455"
-    },
-    "element0000000507": {
-      "class": "Action_Create_Folder",
-      "ID": "element0000000507",
-      "name": "Create Folder - fileTestFiles",
-      "package": "default",
-      "pars": {
-        "ErrorIfExists": 0,
-        "folder": "fileTestFiles"
-      },
-      "StandardName": "1",
-      "type": "Action",
-      "x": "-665",
-      "y": "350"
-    },
-    "element0000000508": {
-      "class": "Condition_File_Exists",
-      "ID": "element0000000508",
-      "name": "File exists - fileTestFiles",
-      "package": "default",
-      "pars": {
-        "file": "fileTestFiles"
-      },
-      "StandardName": "1",
-      "type": "Condition",
-      "x": "-665",
-      "y": "490"
-    },
-    "element0000000514": {
-      "class": "Action_Write_To_File",
-      "ID": "element0000000514",
-      "name": "Write to file - fileTestFiles\\test.txt - hello",
-      "package": "default",
-      "pars": {
-        "CodePageIdentifier": "",
-        "Encoding": "UTF-8",
-        "Expression": "String",
-        "file": "fileTestFiles\\test.txt",
-        "Linefeed": 1,
-        "Overwrite": "Append",
-        "text": "hello",
-        "WithBOM": 0
-      },
-      "StandardName": "1",
-      "type": "Action",
-      "x": "-665",
-      "y": "770"
-    },
-    "element0000000517": {
-      "class": "Condition_File_Exists",
-      "ID": "element0000000517",
-      "name": "File exists - fileTestFiles\\test.txt",
-      "package": "default",
-      "pars": {
-        "file": "fileTestFiles\\test.txt"
-      },
-      "StandardName": "1",
-      "type": "Condition",
-      "x": "-420",
-      "y": "840"
-    },
-    "element0000000520": {
-      "class": "Action_Read_From_File",
-      "ID": "element0000000520",
-      "name": "Read from file - FileText - fileTestFiles\\test.txt",
-      "package": "default",
-      "pars": {
-        "CodePageIdentifier": "",
-        "EnableSizeLimit": 0,
-        "Encoding": "UTF-8",
-        "file": "fileTestFiles\\test.txt",
-        "Linefeed": 1,
-        "SizeLimit": "1024",
-        "varname": "FileText"
-      },
-      "StandardName": "1",
-      "type": "Action",
-      "x": "-420",
-      "y": "980"
-    },
-    "element0000000522": {
-      "class": "Condition_Expression",
-      "ID": "element0000000522",
-      "name": "Expression - FileText = \"hello\"",
-      "package": "default",
-      "pars": {
-        "Expression": "FileText = \"hello\""
-      },
-      "StandardName": "1",
-      "type": "Condition",
-      "x": "-420",
-      "y": "1120"
-    },
-    "element0000000524": {
-      "class": "Action_Delete_File",
-      "ID": "element0000000524",
-      "name": "Delete file - fileTestFiles\\test.txt",
-      "package": "default",
-      "pars": {
-        "deleteFileMethod": "Recycle",
-        "file": "fileTestFiles\\test.txt"
-      },
-      "StandardName": "1",
-      "type": "Action",
-      "x": "-420",
-      "y": "1260"
-    },
-    "element0000000526": {
-      "class": "Condition_File_Exists",
-      "ID": "element0000000526",
-      "name": "File exists - fileTestFiles\\test.txt",
-      "package": "default",
-      "pars": {
-        "file": "fileTestFiles\\test.txt"
-      },
-      "StandardName": "1",
-      "type": "Condition",
-      "x": "-420",
-      "y": "1400"
+      "y": "-455"
     },
     "element0000000530": {
       "class": "Action_Get_File_Size",
       "ID": "element0000000530",
       "name": "Get file size - FileSize - fileTestFiles\\test.txt",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "file": "fileTestFiles\\test.txt",
         "Unit": "Bytes",
@@ -713,14 +934,15 @@
       },
       "StandardName": "1",
       "type": "Action",
-      "x": "70",
-      "y": "1540"
+      "x": "945",
+      "y": "1330"
     },
     "element0000000531": {
       "class": "Action_Write_To_File",
       "ID": "element0000000531",
       "name": "Write to file - fileTestFiles\\test.txt - hello",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "CodePageIdentifier": "",
         "Encoding": "UTF-8",
@@ -733,38 +955,29 @@
       },
       "StandardName": "1",
       "type": "Action",
-      "x": "35",
-      "y": "1400"
+      "x": "945",
+      "y": "1190"
     },
     "element0000000533": {
       "class": "Condition_Expression",
       "ID": "element0000000533",
       "name": "Expression - FileSize = 5",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "FileSize = 5"
       },
       "StandardName": "1",
       "type": "Condition",
-      "x": "35",
-      "y": "1680"
-    },
-    "element0000000538": {
-      "class": "Condition_Debug_Dialog",
-      "ID": "element0000000538",
-      "name": "Debug dialog",
-      "package": "default",
-      "pars": {},
-      "StandardName": "1",
-      "type": "Condition",
-      "x": "280",
-      "y": "2765"
+      "x": "945",
+      "y": "1470"
     },
     "element0000000539": {
       "class": "Action_Write_To_File",
       "ID": "element0000000539",
       "name": "Write to file - fileTestFiles\\test.txt - hello",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "CodePageIdentifier": "",
         "Encoding": "UTF-8",
@@ -777,14 +990,15 @@
       },
       "StandardName": "1",
       "type": "Action",
-      "x": "-35",
-      "y": "1855"
+      "x": "945",
+      "y": "1645"
     },
     "element0000000540": {
       "class": "Action_Get_File_Size",
       "ID": "element0000000540",
       "name": "Get file size - FileSize - fileTestFiles\\test.txt",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "file": "fileTestFiles\\test.txt",
         "Unit": "Bytes",
@@ -792,27 +1006,29 @@
       },
       "StandardName": "1",
       "type": "Action",
-      "x": "-70",
-      "y": "2030"
+      "x": "945",
+      "y": "1820"
     },
     "element0000000541": {
       "class": "Condition_Expression",
       "ID": "element0000000541",
       "name": "Expression - FileSize = 10",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "FileSize = 10"
       },
       "StandardName": "1",
       "type": "Condition",
-      "x": "-105",
-      "y": "2170"
+      "x": "945",
+      "y": "1960"
     },
     "element0000000544": {
       "class": "Action_Write_To_File",
       "ID": "element0000000544",
       "name": "Write to file - fileTestFiles\\test.txt - hello",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "CodePageIdentifier": "",
         "Encoding": "UTF-8",
@@ -825,14 +1041,15 @@
       },
       "StandardName": "1",
       "type": "Action",
-      "x": "-70",
-      "y": "2380"
+      "x": "945",
+      "y": "2170"
     },
     "element0000000545": {
       "class": "Action_Get_File_Size",
       "ID": "element0000000545",
       "name": "Get file size - FileSize - fileTestFiles\\test.txt",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "file": "fileTestFiles\\test.txt",
         "Unit": "Bytes",
@@ -840,27 +1057,29 @@
       },
       "StandardName": "1",
       "type": "Action",
-      "x": "-105",
-      "y": "2555"
+      "x": "945",
+      "y": "2345"
     },
     "element0000000546": {
       "class": "Condition_Expression",
       "ID": "element0000000546",
       "name": "Ausdruck - FileSize = 5 + 3\n\nSize of BOM is 3",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "FileSize = 5 + 3"
       },
       "StandardName": "0",
       "type": "Condition",
-      "x": "-140",
-      "y": "2695"
+      "x": "945",
+      "y": "2485"
     },
     "element0000000550": {
       "class": "Action_Get_File_Size",
       "ID": "element0000000550",
       "name": "Get file size - FileSize - fileTestFiles\\test.txt",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "file": "fileTestFiles\\test.txt",
         "Unit": "Kilobytes",
@@ -868,27 +1087,29 @@
       },
       "StandardName": "1",
       "type": "Action",
-      "x": "-280",
-      "y": "3045"
+      "x": "945",
+      "y": "2835"
     },
     "element0000000551": {
       "class": "Condition_Expression",
       "ID": "element0000000551",
       "name": "Expression - FileSize = 1",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "FileSize = 1"
       },
       "StandardName": "1",
       "type": "Condition",
-      "x": "-245",
-      "y": "3220"
+      "x": "945",
+      "y": "3010"
     },
     "element0000000554": {
       "class": "Action_Write_To_File",
       "ID": "element0000000554",
       "name": "Write to file - fileTestFiles\\test.txt - Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "CodePageIdentifier": "",
         "Encoding": "UTF-8",
@@ -901,14 +1122,15 @@
       },
       "StandardName": "1",
       "type": "Action",
-      "x": "-280",
-      "y": "2905"
+      "x": "945",
+      "y": "2695"
     },
     "element0000000561": {
       "class": "Action_Copy_File",
       "ID": "element0000000561",
       "name": "Copy file - fileTestFiles\\test.txt - fileTestFiles\\test copy.txt",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "destFile": "fileTestFiles\\test copy.txt",
         "file": "fileTestFiles\\test.txt",
@@ -916,27 +1138,29 @@
       },
       "StandardName": "1",
       "type": "Action",
-      "x": "-210",
-      "y": "3430"
+      "x": "1750",
+      "y": "245"
     },
     "element0000000567": {
       "class": "Condition_File_Exists",
       "ID": "element0000000567",
       "name": "File exists - fileTestFiles\\test copy.txt",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "file": "fileTestFiles\\test copy.txt"
       },
       "StandardName": "1",
       "type": "Condition",
-      "x": "-210",
-      "y": "3570"
+      "x": "1750",
+      "y": "385"
     },
     "element0000000570": {
       "class": "Action_Copy_File",
       "ID": "element0000000570",
       "name": "Copy file - fileTestFiles\\test.txt - fileTestFiles\\test copy.txt",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "destFile": "fileTestFiles\\test copy.txt",
         "file": "fileTestFiles\\test.txt",
@@ -944,14 +1168,15 @@
       },
       "StandardName": "1",
       "type": "Action",
-      "x": "-210",
-      "y": "3710"
+      "x": "1750",
+      "y": "525"
     },
     "element0000000574": {
       "class": "Action_Move_File",
       "ID": "element0000000574",
       "name": "Move file - fileTestFiles\\test.txt - fileTestFiles\\test moved.txt",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "destFile": "fileTestFiles\\test moved.txt",
         "file": "fileTestFiles\\test.txt",
@@ -959,236 +1184,86 @@
       },
       "StandardName": "1",
       "type": "Action",
-      "x": "-245",
-      "y": "3885"
+      "x": "1750",
+      "y": "700"
     },
     "element0000000576": {
       "class": "Condition_File_Exists",
       "ID": "element0000000576",
       "name": "File exists - fileTestFiles\\test.txt",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "file": "fileTestFiles\\test.txt"
       },
       "StandardName": "1",
       "type": "Condition",
-      "x": "-245",
-      "y": "4060"
+      "x": "1750",
+      "y": "875"
     },
     "element0000000577": {
       "class": "Condition_File_Exists",
       "ID": "element0000000577",
       "name": "File exists - fileTestFiles\\test moved.txt",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "file": "fileTestFiles\\test moved.txt"
       },
       "StandardName": "1",
       "type": "Condition",
-      "x": "-245",
-      "y": "4235"
+      "x": "1750",
+      "y": "1050"
     },
     "element0000000584": {
       "class": "Action_Rename_File",
       "ID": "element0000000584",
       "name": "Rename file - fileTestFiles\\test moved.txt - test renamed.txt",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "file": "fileTestFiles\\test moved.txt",
         "newName": "test renamed.txt"
       },
       "StandardName": "1",
       "type": "Action",
-      "x": "-105",
-      "y": "4445"
+      "x": "1750",
+      "y": "1260"
     },
     "element0000000585": {
       "class": "Condition_File_Exists",
       "ID": "element0000000585",
       "name": "File exists - fileTestFiles\\test moved.txt",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "file": "fileTestFiles\\test moved.txt"
       },
       "StandardName": "1",
       "type": "Condition",
-      "x": "0",
-      "y": "4655"
+      "x": "1750",
+      "y": "1435"
     },
     "element0000000586": {
       "class": "Condition_File_Exists",
       "ID": "element0000000586",
       "name": "File exists - fileTestFiles\\test renamed.txt",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "file": "fileTestFiles\\test renamed.txt"
       },
       "StandardName": "1",
       "type": "Condition",
-      "x": "0",
-      "y": "4830"
-    },
-    "element0000000591": {
-      "class": "Action_Copy_Folder",
-      "ID": "element0000000591",
-      "name": "Copy folder - fileTestFiles - fileTestFiles copied",
-      "package": "default",
-      "pars": {
-        "destFolder": "fileTestFiles copied",
-        "folder": "fileTestFiles",
-        "Overwrite": 0
-      },
-      "StandardName": "1",
-      "type": "Action",
-      "x": "420",
-      "y": "4935"
-    },
-    "element0000000592": {
-      "class": "Condition_File_Exists",
-      "ID": "element0000000592",
-      "name": "File exists - fileTestFiles",
-      "package": "default",
-      "pars": {
-        "file": "fileTestFiles"
-      },
-      "StandardName": "1",
-      "type": "Condition",
-      "x": "420",
-      "y": "5110"
-    },
-    "element0000000596": {
-      "class": "Condition_File_Exists",
-      "ID": "element0000000596",
-      "name": "File exists - fileTestFiles copied\\test renamed.txt",
-      "package": "default",
-      "pars": {
-        "file": "fileTestFiles copied\\test renamed.txt"
-      },
-      "StandardName": "1",
-      "type": "Condition",
-      "x": "420",
-      "y": "5250"
-    },
-    "element0000000598": {
-      "class": "Action_Delete_Folder",
-      "ID": "element0000000598",
-      "name": "Delete folder - fileTestFiles copied",
-      "package": "default",
-      "pars": {
-        "ExceptionIfNotExist": 1,
-        "Folder": "fileTestFiles copied",
-        "ifEmpty": 0
-      },
-      "StandardName": "1",
-      "type": "Action",
-      "x": "420",
-      "y": "5425"
-    },
-    "element0000000601": {
-      "class": "Condition_File_Exists",
-      "ID": "element0000000601",
-      "name": "File exists - fileTestFiles copied\\test renamed.txt",
-      "package": "default",
-      "pars": {
-        "file": "fileTestFiles copied\\test renamed.txt"
-      },
-      "StandardName": "1",
-      "type": "Condition",
-      "x": "420",
-      "y": "5565"
-    },
-    "element0000000606": {
-      "class": "Action_Move_Folder",
-      "ID": "element0000000606",
-      "name": "Move folder - fileTestFiles - fileTestFiles moved",
-      "package": "default",
-      "pars": {
-        "destFolder": "fileTestFiles moved",
-        "folder": "fileTestFiles",
-        "Overwrite": 0
-      },
-      "StandardName": "1",
-      "type": "Action",
-      "x": "560",
-      "y": "5740"
-    },
-    "element0000000607": {
-      "class": "Action_Rename_Folder",
-      "ID": "element0000000607",
-      "name": "Rename folder - fileTestFiles moved - fileTestFiles renamed",
-      "package": "default",
-      "pars": {
-        "folder": "fileTestFiles moved",
-        "newName": "fileTestFiles renamed"
-      },
-      "StandardName": "1",
-      "type": "Action",
-      "x": "385",
-      "y": "5845"
-    },
-    "element0000000609": {
-      "class": "Condition_File_Exists",
-      "ID": "element0000000609",
-      "name": "File exists - fileTestFiles renamed\\test renamed.txt",
-      "package": "default",
-      "pars": {
-        "file": "fileTestFiles renamed\\test renamed.txt"
-      },
-      "StandardName": "1",
-      "type": "Condition",
-      "x": "385",
-      "y": "6020"
-    },
-    "element0000000611": {
-      "class": "Action_Delete_Folder",
-      "ID": "element0000000611",
-      "name": "Delete folder - fileTestFiles moved",
-      "package": "default",
-      "pars": {
-        "ExceptionIfNotExist": "0",
-        "Folder": "fileTestFiles moved",
-        "ifEmpty": 0
-      },
-      "StandardName": "1",
-      "type": "Action",
-      "x": "-490",
-      "y": "70"
-    },
-    "element0000000612": {
-      "class": "Action_Delete_Folder",
-      "ID": "element0000000612",
-      "name": "Delete folder - fileTestFiles copied",
-      "package": "default",
-      "pars": {
-        "ExceptionIfNotExist": "0",
-        "Folder": "fileTestFiles copied",
-        "ifEmpty": 0
-      },
-      "StandardName": "1",
-      "type": "Action",
-      "x": "-280",
-      "y": "70"
-    },
-    "element0000000615": {
-      "class": "Action_Delete_Folder",
-      "ID": "element0000000615",
-      "name": "Delete folder - fileTestFiles renamed",
-      "package": "default",
-      "pars": {
-        "ExceptionIfNotExist": "0",
-        "Folder": "fileTestFiles renamed",
-        "ifEmpty": 0
-      },
-      "StandardName": "1",
-      "type": "Action",
-      "x": "-105",
-      "y": "70"
+      "x": "1750",
+      "y": "1610"
     },
     "element0000000639": {
       "class": "Action_Get_File_Time",
       "ID": "element0000000639",
       "name": "Get file time - Modification time - FileTime - fileTest",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "file": "fileTest",
         "TimeType": "Modification",
@@ -1196,14 +1271,15 @@
       },
       "StandardName": "1",
       "type": "action",
-      "x": "140",
-      "y": "6720"
+      "x": "2555",
+      "y": "245"
     },
     "element0000000640": {
       "class": "Action_Delete_Folder",
       "ID": "element0000000640",
       "name": "Delete folder - fileTest",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "ExceptionIfNotExist": "0",
         "Folder": "fileTest",
@@ -1211,14 +1287,15 @@
       },
       "StandardName": "1",
       "type": "Action",
-      "x": "140",
-      "y": "6440"
+      "x": "2555",
+      "y": "-35"
     },
     "element0000000641": {
       "class": "Action_Time_Difference",
       "ID": "element0000000641",
       "name": "Time difference - TimeDifference = a_now - FileTime - Seconds",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "InputTime": "a_now",
         "InputTime2": "FileTime",
@@ -1227,41 +1304,44 @@
       },
       "StandardName": "1",
       "type": "Action",
-      "x": "140",
-      "y": "6860"
+      "x": "2555",
+      "y": "385"
     },
     "element0000000642": {
       "class": "Condition_Expression",
       "ID": "element0000000642",
       "name": "Expression - TimeDifference <= 1 and TimeDifference >= 0",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "TimeDifference <= 1 and TimeDifference >= 0"
       },
       "StandardName": "1",
       "type": "Condition",
-      "x": "140",
-      "y": "7035"
+      "x": "2555",
+      "y": "560"
     },
     "element0000000647": {
       "class": "Action_Create_Folder",
       "ID": "element0000000647",
       "name": "Create Folder - fileTest",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "ErrorIfExists": 0,
         "folder": "fileTest"
       },
       "StandardName": "1",
       "type": "Action",
-      "x": "140",
-      "y": "6580"
+      "x": "2555",
+      "y": "105"
     },
     "element0000000651": {
       "class": "Action_Time_Calculation",
       "ID": "element0000000651",
       "name": "Time calculation - CalculatedTime = a_now + 0-10 Minutes",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "InputTime": "a_now",
         "Unit": "Minutes",
@@ -1270,14 +1350,15 @@
       },
       "StandardName": "1",
       "type": "Action",
-      "x": "140",
-      "y": "7175"
+      "x": "2555",
+      "y": "700"
     },
     "element0000000653": {
       "class": "Action_Set_file_time",
       "ID": "element0000000653",
       "name": "Set file time - Modification time - %calculatedTime% - fileTest",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "file": "fileTest",
         "OperateOnWhat": "Files",
@@ -1287,14 +1368,15 @@
       },
       "StandardName": "1",
       "type": "Action",
-      "x": "140",
-      "y": "7315"
+      "x": "2555",
+      "y": "840"
     },
     "element0000000674": {
       "class": "Action_Get_File_Time",
       "ID": "element0000000674",
       "name": "Get file time - Modification time - FileTime - fileTest",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "file": "fileTest",
         "TimeType": "Modification",
@@ -1302,14 +1384,15 @@
       },
       "StandardName": "1",
       "type": "action",
-      "x": "175",
-      "y": "7560"
+      "x": "2590",
+      "y": "1085"
     },
     "element0000000675": {
       "class": "Action_Time_Difference",
       "ID": "element0000000675",
       "name": "Time difference - TimeDifference = FileTime - a_now - Minutes",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "InputTime": "FileTime",
         "InputTime2": "a_now",
@@ -1318,43 +1401,1698 @@
       },
       "StandardName": "1",
       "type": "Action",
-      "x": "175",
-      "y": "7700"
+      "x": "2590",
+      "y": "1225"
     },
     "element0000000676": {
       "class": "Condition_Expression",
       "ID": "element0000000676",
       "name": "Expression - TimeDifference = -10",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "TimeDifference = -10"
       },
       "StandardName": "1",
       "type": "Condition",
-      "x": "175",
-      "y": "7875"
+      "x": "2590",
+      "y": "1400"
     },
-    "element0000000681": {
-      "class": "Condition_Debug_Dialog",
-      "ID": "element0000000681",
-      "name": "Debug dialog",
-      "package": "default",
-      "pars": {},
+    "element0000000685": {
+      "class": "Action_Do_nothing",
+      "ID": "element0000000685",
+      "name": "Delete all folders that we will create during the test",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "executionResult": "Normal"
+      },
+      "StandardName": "0",
+      "type": "action",
+      "x": "-1470",
+      "y": "105"
+    },
+    "element0000000687": {
+      "class": "Action_Do_nothing",
+      "ID": "element0000000687",
+      "name": "Write something to file",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "executionResult": "Normal"
+      },
+      "StandardName": "0",
+      "type": "action",
+      "x": "770",
+      "y": "315"
+    },
+    "element0000000689": {
+      "class": "Action_Do_nothing",
+      "ID": "element0000000689",
+      "name": "Write something to a file and check its size",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "executionResult": "Normal"
+      },
+      "StandardName": "0",
+      "type": "action",
+      "x": "770",
+      "y": "1190"
+    },
+    "element0000000690": {
+      "class": "Action_Do_nothing",
+      "ID": "element0000000690",
+      "name": "Write long text and read file size in KB",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "executionResult": "Normal"
+      },
+      "StandardName": "0",
+      "type": "action",
+      "x": "770",
+      "y": "2695"
+    },
+    "element0000000691": {
+      "class": "Action_Do_nothing",
+      "ID": "element0000000691",
+      "name": "Copy and move files",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "executionResult": "Normal"
+      },
+      "StandardName": "0",
+      "type": "action",
+      "x": "1540",
+      "y": "245"
+    },
+    "element0000000692": {
+      "class": "Action_Do_nothing",
+      "ID": "element0000000692",
+      "name": "Rename a file",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "executionResult": "Normal"
+      },
+      "StandardName": "0",
+      "type": "action",
+      "x": "1575",
+      "y": "1260"
+    },
+    "element0000000696": {
+      "class": "Action_Do_nothing",
+      "ID": "element0000000696",
+      "name": "Create a folder and read its modification time",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "executionResult": "Normal"
+      },
+      "StandardName": "0",
+      "type": "action",
+      "x": "2310",
+      "y": "-35"
+    },
+    "element0000000697": {
+      "class": "Action_Do_nothing",
+      "ID": "element0000000697",
+      "name": "Change modification time of a folder",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "executionResult": "Normal"
+      },
+      "StandardName": "0",
+      "type": "action",
+      "x": "2345",
+      "y": "840"
+    },
+    "element0000000698": {
+      "class": "Action_Do_nothing",
+      "ID": "element0000000698",
+      "name": "End the test",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "executionResult": "Normal"
+      },
+      "StandardName": "0",
+      "type": "action",
+      "x": "2380",
+      "y": "1575"
+    },
+    "element0000000699": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "0",
+      "enabled": "1",
+      "ID": "element0000000699",
+      "name": "Manual - \"folder create copy move rename delete\"",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "ID": "folder create copy move rename delete"
+      },
+      "StandardName": "1",
+      "type": "Trigger",
+      "x": "315",
+      "y": "0"
+    },
+    "element0000000700": {
+      "class": "Condition_File_Exists",
+      "ID": "element0000000700",
+      "name": "File exists - fileTestFiles",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "file": "fileTestFiles"
+      },
       "StandardName": "1",
       "type": "Condition",
-      "x": "350",
-      "y": "8155"
+      "x": "315",
+      "y": "175"
+    },
+    "element0000000702": {
+      "class": "Condition_File_Has_Attribute",
+      "ID": "element0000000702",
+      "name": "File has attribute - Directory - fileTestFiles",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "Attribute": "D",
+        "file": "fileTestFiles"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "315",
+      "y": "595"
+    },
+    "element0000000703": {
+      "class": "Action_Create_Folder",
+      "ID": "element0000000703",
+      "name": "Create Folder - fileTestFiles",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "ErrorIfExists": 0,
+        "folder": "fileTestFiles"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "315",
+      "y": "315"
+    },
+    "element0000000704": {
+      "class": "Condition_File_Exists",
+      "ID": "element0000000704",
+      "name": "File exists - fileTestFiles",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "file": "fileTestFiles"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "315",
+      "y": "455"
+    },
+    "element0000000708": {
+      "class": "Action_Write_To_File",
+      "ID": "element0000000708",
+      "name": "Write to file - fileTestFiles\\test.txt - hello",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "CodePageIdentifier": "",
+        "Encoding": "UTF-8",
+        "Expression": "String",
+        "file": "fileTestFiles\\test.txt",
+        "Linefeed": 1,
+        "Overwrite": "Append",
+        "text": "hello",
+        "WithBOM": 0
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "315",
+      "y": "735"
+    },
+    "element0000000710": {
+      "class": "Action_Do_nothing",
+      "ID": "element0000000710",
+      "name": "Create a folder",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "executionResult": "Normal"
+      },
+      "StandardName": "0",
+      "type": "action",
+      "x": "105",
+      "y": "315"
+    },
+    "element0000000711": {
+      "class": "Action_Do_nothing",
+      "ID": "element0000000711",
+      "name": "Check whether folder exists",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "executionResult": "Normal"
+      },
+      "StandardName": "0",
+      "type": "action",
+      "x": "105",
+      "y": "595"
+    },
+    "element0000000712": {
+      "class": "Action_Do_nothing",
+      "ID": "element0000000712",
+      "name": "Check whether folder not exists",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "executionResult": "Normal"
+      },
+      "StandardName": "0",
+      "type": "action",
+      "x": "105",
+      "y": "175"
+    },
+    "element0000000713": {
+      "class": "Action_Do_nothing",
+      "ID": "element0000000713",
+      "name": "Create a file in the folder",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "executionResult": "Normal"
+      },
+      "StandardName": "0",
+      "type": "action",
+      "x": "105",
+      "y": "735"
+    },
+    "element0000000714": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "0",
+      "enabled": "1",
+      "ID": "element0000000714",
+      "name": "Manual - \"File write and read\"",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "ID": "File write and read"
+      },
+      "StandardName": "1",
+      "type": "Trigger",
+      "x": "945",
+      "y": "0"
+    },
+    "element0000000715": {
+      "class": "Action_Create_Folder",
+      "ID": "element0000000715",
+      "name": "Create Folder - fileTestFiles",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "ErrorIfExists": 0,
+        "folder": "fileTestFiles"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "945",
+      "y": "175"
+    },
+    "element0000000717": {
+      "class": "Action_Write_To_File",
+      "ID": "element0000000717",
+      "name": "Write to file - fileTestFiles\\test.txt - hello",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "CodePageIdentifier": "",
+        "Encoding": "UTF-8",
+        "Expression": "String",
+        "file": "fileTestFiles\\test.txt",
+        "Linefeed": 1,
+        "Overwrite": "Append",
+        "text": "hello",
+        "WithBOM": 0
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "945",
+      "y": "315"
+    },
+    "element0000000718": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "0",
+      "enabled": "1",
+      "ID": "element0000000718",
+      "name": "Manual - \"clean\"",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "ID": "clean"
+      },
+      "StandardName": "1",
+      "type": "Trigger",
+      "x": "-1225",
+      "y": "-35"
+    },
+    "element0000000724": {
+      "class": "Action_Execute_Flow",
+      "ID": "element0000000724",
+      "name": "Execute flow: This flow - Manual - \"clean\"",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "flowID": "",
+        "ReturnVariables": 0,
+        "SendLocalVars": "0",
+        "SkipDisabled": 0,
+        "ThisFlow": 1,
+        "triggerID": "element0000000718",
+        "WaitToFinish": "1",
+        "WhichTrigger": "specified"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-665",
+      "y": "-35"
+    },
+    "element0000000725": {
+      "class": "Action_Execute_Flow",
+      "ID": "element0000000725",
+      "name": "Execute flow: This flow - Manual - \"folder create copy move rename delete\"",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "flowID": "",
+        "ReturnVariables": "0",
+        "SendLocalVars": "0",
+        "SkipDisabled": 0,
+        "ThisFlow": 1,
+        "triggerID": "element0000000699",
+        "WaitToFinish": "1",
+        "WhichTrigger": "specified"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-665",
+      "y": "105"
+    },
+    "element0000000727": {
+      "class": "Action_Execute_Flow",
+      "ID": "element0000000727",
+      "name": "Execute flow: This flow - Manual - \"clean\"",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "flowID": "",
+        "ReturnVariables": 0,
+        "SendLocalVars": "0",
+        "SkipDisabled": 0,
+        "ThisFlow": 1,
+        "triggerID": "element0000000718",
+        "WaitToFinish": "1",
+        "WhichTrigger": "specified"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-595",
+      "y": "385"
+    },
+    "element0000000729": {
+      "class": "Action_Execute_Flow",
+      "ID": "element0000000729",
+      "name": "Execute flow: This flow - Manual - \"File write and read\"",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "flowID": "",
+        "ReturnVariables": 0,
+        "SendLocalVars": "0",
+        "SkipDisabled": 0,
+        "ThisFlow": 1,
+        "triggerID": "element0000000714",
+        "WaitToFinish": "1",
+        "WhichTrigger": "specified"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-595",
+      "y": "525"
+    },
+    "element0000000732": {
+      "class": "Condition_File_Exists",
+      "ID": "element0000000732",
+      "name": "File exists - fileTestFiles\\test.txt",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "file": "fileTestFiles\\test.txt"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "945",
+      "y": "455"
+    },
+    "element0000000733": {
+      "class": "Action_Do_nothing",
+      "ID": "element0000000733",
+      "name": "Check whether file exists",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "executionResult": "Normal"
+      },
+      "StandardName": "0",
+      "type": "action",
+      "x": "770",
+      "y": "455"
+    },
+    "element0000000735": {
+      "class": "Action_Read_From_File",
+      "ID": "element0000000735",
+      "name": "Read from file - FileText - fileTestFiles\\test.txt",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "CodePageIdentifier": "",
+        "EnableSizeLimit": 0,
+        "Encoding": "UTF-8",
+        "file": "fileTestFiles\\test.txt",
+        "Linefeed": 1,
+        "SizeLimit": "1024",
+        "varname": "FileText"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "945",
+      "y": "595"
+    },
+    "element0000000736": {
+      "class": "Condition_Expression",
+      "ID": "element0000000736",
+      "name": "Expression - FileText = \"hello\"",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "Expression": "FileText = \"hello\""
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "945",
+      "y": "735"
+    },
+    "element0000000737": {
+      "class": "Action_Delete_File",
+      "ID": "element0000000737",
+      "name": "Delete file - fileTestFiles\\test.txt",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "deleteFileMethod": "Recycle",
+        "file": "fileTestFiles\\test.txt"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "945",
+      "y": "875"
+    },
+    "element0000000738": {
+      "class": "Condition_File_Exists",
+      "ID": "element0000000738",
+      "name": "File exists - fileTestFiles\\test.txt",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "file": "fileTestFiles\\test.txt"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "945",
+      "y": "1015"
+    },
+    "element0000000743": {
+      "class": "Action_Do_nothing",
+      "ID": "element0000000743",
+      "name": "Read from file and check content",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "executionResult": "Normal"
+      },
+      "StandardName": "0",
+      "type": "action",
+      "x": "770",
+      "y": "595"
+    },
+    "element0000000744": {
+      "class": "Action_Do_nothing",
+      "ID": "element0000000744",
+      "name": "Delete file",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "executionResult": "Normal"
+      },
+      "StandardName": "0",
+      "type": "action",
+      "x": "770",
+      "y": "875"
+    },
+    "element0000000748": {
+      "class": "Action_New_List",
+      "ID": "element0000000748",
+      "name": "New list static_results - Empty",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "DelimiterComma": 0,
+        "DelimiterLinefeed": 1,
+        "DelimiterSemicolon": 0,
+        "DelimiterSpace": 0,
+        "expression": "String",
+        "expressionPos": "String",
+        "NumberOfElements": "None",
+        "Position": "keyName",
+        "Varname": "static_results",
+        "VarValue": "New element",
+        "VarValues": "Element one\nElement two",
+        "WhichPosition": "First"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-665",
+      "y": "-175"
+    },
+    "element0000000751": {
+      "class": "Condition_List_Contains_Element",
+      "ID": "element0000000751",
+      "name": "List contains element - Value '1' in list 'static_results'",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "InputList": "static_results",
+        "isExpressionPosition": "String",
+        "isExpressionSearchContent": "String",
+        "Position": 1,
+        "SearchContent": "folder create",
+        "SearchWhat": "Content"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-665",
+      "y": "245"
+    },
+    "element0000000755": {
+      "class": "Condition_List_Contains_Element",
+      "ID": "element0000000755",
+      "name": "List contains element - Value '1' in list 'static_results'",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "InputList": "static_results",
+        "isExpressionPosition": "String",
+        "isExpressionSearchContent": "String",
+        "Position": 1,
+        "SearchContent": "file write",
+        "SearchWhat": "Content"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-595",
+      "y": "665"
+    },
+    "element0000000757": {
+      "class": "Action_Add_To_List",
+      "ID": "element0000000757",
+      "name": "Add To List - static_results - As last value - Value 'file write'",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "DelimiterComma": 0,
+        "DelimiterLinefeed": 1,
+        "DelimiterSemicolon": 0,
+        "DelimiterSpace": 0,
+        "Expression": "String",
+        "expressionPos": "String",
+        "InsertMethod": "Insert",
+        "NumberOfElements": "One",
+        "Position": "keyName",
+        "Varname": "static_results",
+        "VarValue": "file write",
+        "VarValues": "Element one\nElement two",
+        "WhichPosition": "Last"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "945",
+      "y": "3185"
+    },
+    "element0000000759": {
+      "class": "Action_Add_To_List",
+      "ID": "element0000000759",
+      "name": "Add To List - global_testResults - As last value - Value 'a_flowName'",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "DelimiterComma": 0,
+        "DelimiterLinefeed": 1,
+        "DelimiterSemicolon": 0,
+        "DelimiterSpace": 0,
+        "Expression": "Expression",
+        "expressionPos": "String",
+        "InsertMethod": "Insert",
+        "NumberOfElements": "One",
+        "Position": "keyName",
+        "Varname": "global_testResults",
+        "VarValue": "a_flowName",
+        "VarValues": "Element one\nElement two",
+        "WhichPosition": "Last"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-910",
+      "y": "2135"
+    },
+    "element0000000760": {
+      "class": "Action_Do_nothing",
+      "ID": "element0000000760",
+      "name": "End the test",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "executionResult": "Normal"
+      },
+      "StandardName": "0",
+      "type": "action",
+      "x": "-945",
+      "y": "1015"
+    },
+    "element0000000765": {
+      "class": "Action_Delete_Folder",
+      "ID": "element0000000765",
+      "name": "Delete folder - fileTestFiles",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "ExceptionIfNotExist": "0",
+        "Folder": "fileTestFiles",
+        "ifEmpty": 0
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-1435",
+      "y": "420"
+    },
+    "element0000000766": {
+      "class": "Action_Delete_Folder",
+      "ID": "element0000000766",
+      "name": "Delete folder - fileTestFiles moved",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "ExceptionIfNotExist": "0",
+        "Folder": "fileTestFiles moved",
+        "ifEmpty": 0
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-1260",
+      "y": "420"
+    },
+    "element0000000767": {
+      "class": "Action_Delete_Folder",
+      "ID": "element0000000767",
+      "name": "Delete folder - fileTestFiles copied",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "ExceptionIfNotExist": "0",
+        "Folder": "fileTestFiles copied",
+        "ifEmpty": 0
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-1050",
+      "y": "420"
+    },
+    "element0000000768": {
+      "class": "Action_Delete_Folder",
+      "ID": "element0000000768",
+      "name": "Delete folder - fileTestFiles renamed",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "ExceptionIfNotExist": "0",
+        "Folder": "fileTestFiles renamed",
+        "ifEmpty": 0
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-875",
+      "y": "420"
+    },
+    "element0000000780": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "0",
+      "enabled": "1",
+      "ID": "element0000000780",
+      "name": "Manual - \"File copy move rename\"",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "ID": "File copy move rename"
+      },
+      "StandardName": "1",
+      "type": "Trigger",
+      "x": "1750",
+      "y": "-210"
+    },
+    "element0000000785": {
+      "class": "Action_Create_Folder",
+      "ID": "element0000000785",
+      "name": "Create Folder - fileTestFiles",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "ErrorIfExists": 0,
+        "folder": "fileTestFiles"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "1750",
+      "y": "-35"
+    },
+    "element0000000788": {
+      "class": "Action_Write_To_File",
+      "ID": "element0000000788",
+      "name": "Write to file - fileTestFiles\\test.txt - hello",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "CodePageIdentifier": "",
+        "Encoding": "UTF-8",
+        "Expression": "String",
+        "file": "fileTestFiles\\test.txt",
+        "Linefeed": 1,
+        "Overwrite": "Append",
+        "text": "hello",
+        "WithBOM": 0
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "1750",
+      "y": "105"
+    },
+    "element0000000791": {
+      "class": "Action_Do_nothing",
+      "ID": "element0000000791",
+      "name": "Create a folder and a file",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "executionResult": "Normal"
+      },
+      "StandardName": "0",
+      "type": "action",
+      "x": "1540",
+      "y": "-35"
+    },
+    "element0000000792": {
+      "class": "Action_Add_To_List",
+      "ID": "element0000000792",
+      "name": "Add To List - static_results - As last value - Value 'file copy'",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "DelimiterComma": 0,
+        "DelimiterLinefeed": 1,
+        "DelimiterSemicolon": 0,
+        "DelimiterSpace": 0,
+        "Expression": "String",
+        "expressionPos": "String",
+        "InsertMethod": "Insert",
+        "NumberOfElements": "One",
+        "Position": "keyName",
+        "Varname": "static_results",
+        "VarValue": "file copy",
+        "VarValues": "Element one\nElement two",
+        "WhichPosition": "Last"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "1750",
+      "y": "1820"
+    },
+    "element0000000793": {
+      "class": "Action_Execute_Flow",
+      "ID": "element0000000793",
+      "name": "Execute flow: This flow - Manual - \"clean\"",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "flowID": "",
+        "ReturnVariables": 0,
+        "SendLocalVars": "0",
+        "SkipDisabled": 0,
+        "ThisFlow": 1,
+        "triggerID": "element0000000718",
+        "WaitToFinish": "1",
+        "WhichTrigger": "specified"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-490",
+      "y": "805"
+    },
+    "element0000000794": {
+      "class": "Action_Execute_Flow",
+      "ID": "element0000000794",
+      "name": "Execute flow: This flow - Manual - \"File copy move rename\"",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "flowID": "",
+        "ReturnVariables": 0,
+        "SendLocalVars": "0",
+        "SkipDisabled": 0,
+        "ThisFlow": 1,
+        "triggerID": "element0000000780",
+        "WaitToFinish": "1",
+        "WhichTrigger": "specified"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-490",
+      "y": "945"
+    },
+    "element0000000795": {
+      "class": "Condition_List_Contains_Element",
+      "ID": "element0000000795",
+      "name": "List contains element - Value '1' in list 'static_results'",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "InputList": "static_results",
+        "isExpressionPosition": "String",
+        "isExpressionSearchContent": "String",
+        "Position": 1,
+        "SearchContent": "file copy",
+        "SearchWhat": "Content"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-490",
+      "y": "1085"
+    },
+    "element0000000799": {
+      "class": "Action_Copy_Folder",
+      "ID": "element0000000799",
+      "name": "Copy folder - fileTestFiles - fileTestFiles copied",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "destFolder": "fileTestFiles copied",
+        "folder": "fileTestFiles",
+        "Overwrite": 0
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "315",
+      "y": "1155"
+    },
+    "element0000000800": {
+      "class": "Condition_File_Exists",
+      "ID": "element0000000800",
+      "name": "File exists - fileTestFiles",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "file": "fileTestFiles"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "315",
+      "y": "1330"
+    },
+    "element0000000801": {
+      "class": "Condition_File_Exists",
+      "ID": "element0000000801",
+      "name": "File exists - fileTestFiles copied\\test.txt",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "file": "fileTestFiles copied\\test.txt"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "315",
+      "y": "1470"
+    },
+    "element0000000802": {
+      "class": "Action_Delete_Folder",
+      "ID": "element0000000802",
+      "name": "Delete folder - fileTestFiles copied",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "ExceptionIfNotExist": 1,
+        "Folder": "fileTestFiles copied",
+        "ifEmpty": 0
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "315",
+      "y": "1645"
+    },
+    "element0000000803": {
+      "class": "Condition_File_Exists",
+      "ID": "element0000000803",
+      "name": "File exists - fileTestFiles copied\\test renamed.txt",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "file": "fileTestFiles copied\\test renamed.txt"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "315",
+      "y": "1785"
+    },
+    "element0000000804": {
+      "class": "Action_Move_Folder",
+      "ID": "element0000000804",
+      "name": "Move folder - fileTestFiles - fileTestFiles moved",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "destFolder": "fileTestFiles moved",
+        "folder": "fileTestFiles",
+        "Overwrite": 0
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "315",
+      "y": "1925"
+    },
+    "element0000000805": {
+      "class": "Action_Rename_Folder",
+      "ID": "element0000000805",
+      "name": "Rename folder - fileTestFiles moved - fileTestFiles renamed",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "folder": "fileTestFiles moved",
+        "newName": "fileTestFiles renamed"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "315",
+      "y": "2065"
+    },
+    "element0000000806": {
+      "class": "Condition_File_Exists",
+      "ID": "element0000000806",
+      "name": "File exists - fileTestFiles renamed\\test.txt",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "file": "fileTestFiles renamed\\test.txt"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "315",
+      "y": "2240"
+    },
+    "element0000000807": {
+      "class": "Action_Do_nothing",
+      "ID": "element0000000807",
+      "name": "Rename a folder",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "executionResult": "Normal"
+      },
+      "StandardName": "0",
+      "type": "action",
+      "x": "70",
+      "y": "1155"
+    },
+    "element0000000808": {
+      "class": "Action_Do_nothing",
+      "ID": "element0000000808",
+      "name": "Delete a folder",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "executionResult": "Normal"
+      },
+      "StandardName": "0",
+      "type": "action",
+      "x": "70",
+      "y": "1645"
+    },
+    "element0000000809": {
+      "class": "Action_Do_nothing",
+      "ID": "element0000000809",
+      "name": "Move and rename a folder",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "executionResult": "Normal"
+      },
+      "StandardName": "0",
+      "type": "action",
+      "x": "70",
+      "y": "1925"
+    },
+    "element0000000819": {
+      "class": "Action_Add_To_List",
+      "ID": "element0000000819",
+      "name": "Add To List - static_results - As last value - Value 'folder create'",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "DelimiterComma": 0,
+        "DelimiterLinefeed": 1,
+        "DelimiterSemicolon": 0,
+        "DelimiterSpace": 0,
+        "Expression": "String",
+        "expressionPos": "String",
+        "InsertMethod": "Insert",
+        "NumberOfElements": "One",
+        "Position": "keyName",
+        "Varname": "static_results",
+        "VarValue": "folder create",
+        "VarValues": "Element one\nElement two",
+        "WhichPosition": "Last"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "315",
+      "y": "2415"
+    },
+    "element0000000820": {
+      "class": "Action_Do_nothing",
+      "ID": "element0000000820",
+      "name": "Success",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "executionResult": "Normal"
+      },
+      "StandardName": "0",
+      "type": "action",
+      "x": "105",
+      "y": "2450"
+    },
+    "element0000000823": {
+      "class": "Action_Add_To_List",
+      "ID": "element0000000823",
+      "name": "Add To List - static_results - As last value - Value 'file time'",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "DelimiterComma": 0,
+        "DelimiterLinefeed": 1,
+        "DelimiterSemicolon": 0,
+        "DelimiterSpace": 0,
+        "Expression": "String",
+        "expressionPos": "String",
+        "InsertMethod": "Insert",
+        "NumberOfElements": "One",
+        "Position": "keyName",
+        "Varname": "static_results",
+        "VarValue": "file time",
+        "VarValues": "Element one\nElement two",
+        "WhichPosition": "Last"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "2590",
+      "y": "1575"
+    },
+    "element0000000824": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "0",
+      "enabled": "1",
+      "ID": "element0000000824",
+      "name": "Manual - \"File time\"",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "ID": "File time"
+      },
+      "StandardName": "1",
+      "type": "Trigger",
+      "x": "2590",
+      "y": "-210"
+    },
+    "element0000000826": {
+      "class": "Action_Execute_Flow",
+      "ID": "element0000000826",
+      "name": "Execute flow: This flow - Manual - \"clean\"",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "flowID": "",
+        "ReturnVariables": 0,
+        "SendLocalVars": "0",
+        "SkipDisabled": 0,
+        "ThisFlow": 1,
+        "triggerID": "element0000000718",
+        "WaitToFinish": "1",
+        "WhichTrigger": "specified"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-630",
+      "y": "1295"
+    },
+    "element0000000827": {
+      "class": "Action_Execute_Flow",
+      "ID": "element0000000827",
+      "name": "Execute flow: This flow - Manual - \"File time\"",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "flowID": "",
+        "ReturnVariables": 0,
+        "SendLocalVars": "0",
+        "SkipDisabled": 0,
+        "ThisFlow": 1,
+        "triggerID": "element0000000824",
+        "WaitToFinish": "1",
+        "WhichTrigger": "specified"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-630",
+      "y": "1435"
+    },
+    "element0000000828": {
+      "class": "Condition_List_Contains_Element",
+      "ID": "element0000000828",
+      "name": "List contains element - Value '1' in list 'static_results'",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "InputList": "static_results",
+        "isExpressionPosition": "String",
+        "isExpressionSearchContent": "String",
+        "Position": 1,
+        "SearchContent": "file time",
+        "SearchWhat": "Content"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-630",
+      "y": "1575"
+    },
+    "element0000000832": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "0",
+      "enabled": "1",
+      "ID": "element0000000832",
+      "name": "Manual - \"File shortcut\"",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "ID": "File shortcut"
+      },
+      "StandardName": "1",
+      "type": "Trigger",
+      "x": "3220",
+      "y": "-420"
+    },
+    "element0000000833": {
+      "class": "Action_Add_To_List",
+      "ID": "element0000000833",
+      "name": "Add To List - static_results - As last value - Value 'file shortcut'",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "DelimiterComma": 0,
+        "DelimiterLinefeed": 1,
+        "DelimiterSemicolon": 0,
+        "DelimiterSpace": 0,
+        "Expression": "String",
+        "expressionPos": "String",
+        "InsertMethod": "Insert",
+        "NumberOfElements": "One",
+        "Position": "keyName",
+        "Varname": "static_results",
+        "VarValue": "file shortcut",
+        "VarValues": "Element one\nElement two",
+        "WhichPosition": "Last"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "3220",
+      "y": "2205"
+    },
+    "element0000000834": {
+      "class": "Action_Execute_Flow",
+      "ID": "element0000000834",
+      "name": "Execute flow: This flow - Manual - \"File shortcut\"",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "flowID": "",
+        "ReturnVariables": 0,
+        "SendLocalVars": "0",
+        "SkipDisabled": 0,
+        "ThisFlow": 1,
+        "triggerID": "element0000000832",
+        "WaitToFinish": "1",
+        "WhichTrigger": "specified"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-455",
+      "y": "1820"
+    },
+    "element0000000835": {
+      "class": "Action_Execute_Flow",
+      "ID": "element0000000835",
+      "name": "Execute flow: This flow - Manual - \"File time\"",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "flowID": "",
+        "ReturnVariables": 0,
+        "SendLocalVars": "0",
+        "SkipDisabled": 0,
+        "ThisFlow": 1,
+        "triggerID": "element0000000824",
+        "WaitToFinish": "1",
+        "WhichTrigger": "specified"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-455",
+      "y": "1960"
+    },
+    "element0000000836": {
+      "class": "Condition_List_Contains_Element",
+      "ID": "element0000000836",
+      "name": "List contains element - Value '1' in list 'static_results'",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "InputList": "static_results",
+        "isExpressionPosition": "String",
+        "isExpressionSearchContent": "String",
+        "Position": 1,
+        "SearchContent": "file shortcut",
+        "SearchWhat": "Content"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-455",
+      "y": "2100"
+    },
+    "element0000000842": {
+      "class": "Action_Create_Shortcut",
+      "ID": "element0000000842",
+      "name": "Create shortcut - Notepad.exe.lnk - %a_windir%\\system32\\notepad.exe anyTestText.txt",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "description": "Notepad link created by AHF",
+        "file": "%a_windir%\\system32\\notepad.exe",
+        "iconFile": "%a_windir%\\system32\\ActionCenter.dll",
+        "IconNumber": "3",
+        "runArguments": "anyTestText.txt",
+        "RunMode": "Normal",
+        "SetIconNumber": "1",
+        "shortcutFile": "Notepad.exe.lnk",
+        "ToRunContent": "String",
+        "WorkingDir": "%a_workingdir%"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "3220",
+      "y": "210"
+    },
+    "element0000000843": {
+      "class": "Action_Get_shortcut_information",
+      "ID": "element0000000843",
+      "name": "Get shortcut information - Notepad.exe.lnk",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "OutArgs": "shortcutArgs",
+        "OutDescription": "shortcutDescription",
+        "OutDir": "shortcutDir",
+        "OutIcon": "shortcutIcon",
+        "OutIconNum": "shortcutIconNumber",
+        "OutRunState": "shortcutRunMode",
+        "OutTarget": "shortcutTarget",
+        "shortcutFile": "Notepad.exe.lnk"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "3220",
+      "y": "385"
+    },
+    "element0000000850": {
+      "class": "Action_Write_To_File",
+      "ID": "element0000000850",
+      "name": "Write to file - anyTestText.txt - This is a test file",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "CodePageIdentifier": "",
+        "Encoding": "UTF-8",
+        "Expression": "String",
+        "file": "anyTestText.txt",
+        "Linefeed": 1,
+        "Overwrite": "Overwrite",
+        "text": "This is a test file",
+        "WithBOM": 0
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "3220",
+      "y": "35"
+    },
+    "element0000000856": {
+      "class": "Condition_Expression",
+      "ID": "element0000000856",
+      "name": "Expression - shortcutTarget = a_windir \"\\system32\\notepad.exe\"",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "Expression": "shortcutTarget = a_windir \"\\system32\\notepad.exe\""
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "3220",
+      "y": "525"
+    },
+    "element0000000857": {
+      "class": "Condition_Expression",
+      "ID": "element0000000857",
+      "name": "Expression - shortcutArgs = \"anyTestText.txt\"",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "Expression": "shortcutArgs = \"anyTestText.txt\""
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "3220",
+      "y": "665"
+    },
+    "element0000000860": {
+      "class": "Condition_Expression",
+      "ID": "element0000000860",
+      "name": "Expression - shortcutDir = a_workingdir",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "Expression": "shortcutDir = a_workingdir"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "3220",
+      "y": "805"
+    },
+    "element0000000863": {
+      "class": "Action_Do_nothing",
+      "ID": "element0000000863",
+      "name": "Create a file which we will open later with notepad",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "executionResult": "Normal"
+      },
+      "StandardName": "0",
+      "type": "action",
+      "x": "3045",
+      "y": "35"
+    },
+    "element0000000864": {
+      "class": "Action_Do_nothing",
+      "ID": "element0000000864",
+      "name": "Create a shortcut to notepad which will open the created file",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "executionResult": "Normal"
+      },
+      "StandardName": "0",
+      "type": "action",
+      "x": "3045",
+      "y": "210"
+    },
+    "element0000000865": {
+      "class": "Action_Do_nothing",
+      "ID": "element0000000865",
+      "name": "Get shortcut information and compare it",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "executionResult": "Normal"
+      },
+      "StandardName": "0",
+      "type": "action",
+      "x": "3045",
+      "y": "385"
+    },
+    "element0000000866": {
+      "class": "Condition_Expression",
+      "ID": "element0000000866",
+      "name": "Expression - shortcutDescription = \"Notepad link created by AHF\"",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "Expression": "shortcutDescription = \"Notepad link created by AHF\""
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "3220",
+      "y": "980"
+    },
+    "element0000000869": {
+      "class": "Condition_Expression",
+      "ID": "element0000000869",
+      "name": "Expression - shortcutIcon = a_windir \"\\system32\\ActionCenter.dll\"",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "Expression": "shortcutIcon = a_windir \"\\system32\\ActionCenter.dll\""
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "3220",
+      "y": "1120"
+    },
+    "element0000000872": {
+      "class": "Condition_Expression",
+      "ID": "element0000000872",
+      "name": "Expression - shortcutIconNumber = 3",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "Expression": "shortcutIconNumber = 3"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "3220",
+      "y": "1260"
+    },
+    "element0000000875": {
+      "class": "Condition_Expression",
+      "ID": "element0000000875",
+      "name": "Expression - shortcutRunMode = \"normal\"",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "Expression": "shortcutRunMode = \"normal\""
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "3220",
+      "y": "1400"
+    },
+    "element0000000884": {
+      "class": "Action_Run",
+      "ID": "element0000000884",
+      "name": "Run - Notepad.exe.lnk",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "RunMode": "Hide",
+        "ToRun": "Notepad.exe.lnk",
+        "ToRunContent": "String",
+        "WhichWorkingDir": "Default",
+        "WorkingDir": ""
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "3220",
+      "y": "1540"
+    },
+    "element0000000887": {
+      "class": "Action_Close_Window",
+      "ID": "element0000000887",
+      "name": "Close window:  - Title begins with: anyTestText.txt - Window class: Notepad - Process: notepad.exe",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "ahk_class": "Notepad",
+        "ahk_exe": "notepad.exe",
+        "ahk_id": "",
+        "ahk_pid": "",
+        "ExcludeText": "",
+        "excludeTitle": "",
+        "FindHiddenText": 0,
+        "FindHiddenWindow": "1",
+        "TitleMatchMode": 1,
+        "WinCloseMethod": "close",
+        "winText": "",
+        "Wintitle": "anyTestText.txt"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "3325",
+      "y": "-105"
+    },
+    "element0000000889": {
+      "class": "Condition_Window_Exists",
+      "ID": "element0000000889",
+      "name": "Window exists:  - Title begins with: anyTestText.txt - Window class: Notepad - Process: notepad.exe",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "ahk_class": "Notepad",
+        "ahk_exe": "notepad.exe",
+        "ahk_id": "",
+        "ahk_pid": "",
+        "ExcludeText": "",
+        "excludeTitle": "",
+        "FindHiddenText": 0,
+        "FindHiddenWindow": "1",
+        "TitleMatchMode": 1,
+        "winText": "",
+        "Wintitle": "anyTestText.txt"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "3220",
+      "y": "1855"
+    },
+    "element0000000890": {
+      "class": "Action_Close_Window",
+      "ID": "element0000000890",
+      "name": "Close window:  - Title begins with: anyTestText.txt - Window class: Notepad - Process: notepad.exe",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "ahk_class": "Notepad",
+        "ahk_exe": "notepad.exe",
+        "ahk_id": "",
+        "ahk_pid": "",
+        "ExcludeText": "",
+        "excludeTitle": "",
+        "FindHiddenText": 0,
+        "FindHiddenWindow": "1",
+        "TitleMatchMode": 1,
+        "WinCloseMethod": "close",
+        "winText": "",
+        "Wintitle": "anyTestText.txt"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "3220",
+      "y": "1995"
+    },
+    "element0000000898": {
+      "class": "Action_Sleep",
+      "ID": "element0000000898",
+      "name": "Sleep: 2 s",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "Duration": 2,
+        "Unit": "Seconds"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "3220",
+      "y": "1680"
+    },
+    "element0000000899": {
+      "class": "Action_Do_nothing",
+      "ID": "element0000000899",
+      "name": "Open the link and wait for the notepad to open the file (notepad will be hidden)",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "executionResult": "Normal"
+      },
+      "StandardName": "0",
+      "type": "action",
+      "x": "3045",
+      "y": "1540"
+    },
+    "element0000000900": {
+      "class": "Action_Do_nothing",
+      "ID": "element0000000900",
+      "name": "Close notepad",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "executionResult": "Normal"
+      },
+      "StandardName": "0",
+      "type": "action",
+      "x": "3045",
+      "y": "1995"
+    },
+    "element0000000908": {
+      "class": "Condition_Window_Exists",
+      "ID": "element0000000908",
+      "name": "Window exists:  - Title begins with: anyTestText.txt - Window class: Notepad - Process: notepad.exe",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "ahk_class": "Notepad",
+        "ahk_exe": "notepad.exe",
+        "ahk_id": "",
+        "ahk_pid": "",
+        "ExcludeText": "",
+        "excludeTitle": "",
+        "FindHiddenText": 0,
+        "FindHiddenWindow": "1",
+        "TitleMatchMode": 1,
+        "winText": "",
+        "Wintitle": "anyTestText.txt"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "3185",
+      "y": "-245"
     }
   },
   "category": "Automatic tests",
-  "ElementIDCounter": "684",
+  "ElementIDCounter": "909",
   "flowSettings": {
     "DefaultWorkingDir": 1,
-    "ExecutionPolicy": "stop",
-    "Offsetx": "-1822.827304",
-    "Offsety": "172.415525",
+    "ExecutionPolicy": "parallel",
+    "Offsetx": "939.931248",
+    "Offsety": "659.129158",
     "WorkingDir": "",
-    "zoomFactor": "0.578511"
+    "zoomFactor": "0.700004"
   },
   "name": "file test"
 }

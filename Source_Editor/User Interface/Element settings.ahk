@@ -676,7 +676,7 @@ class ElementSettings
 				this.contentTypeLangs.string := lang("This is a string")
 				this.contentTypeLangs.rawString := lang("This is a raw string")
 				this.contentTypeLangs.expression := lang("This is an expression")
-				this.contentTypeLangs.VarName := lang("This is a variable name")
+				this.contentTypeLangs.VariableName := lang("This is a variable name")
 				this.contentTypeLangs.number := lang("This is a number")
 				this.contentTypeLangs.positiveNumber := lang("This is a positive number")
 				this.contentTypeLangs.integer := lang("This is an integer")
@@ -1750,6 +1750,11 @@ class ElementSettings
 			{
 				tempAllChoices .= "|" TempOneChoice
 			}
+			if (tempAllChoices = "")
+			{
+				; list should be empty
+				tempAllChoices := "|"
+			}
 
 			; keep the choices in variable
 			this.par_choices := p_Choices
@@ -1884,6 +1889,12 @@ class ElementSettings
 			{
 				tempAllChoices .= "|" TempOneChoice
 			}
+			if (tempAllChoices = "")
+			{
+				; list should be empty
+				tempAllChoices := "|"
+			}
+
 
 			; keep the choices in variable
 			this.par_choices := p_Choices

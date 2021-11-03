@@ -1,12 +1,4 @@
-﻿;Always add this element class name to the global list
-x_RegisterElementClass("Action_Add_To_List")
-
-;Element type of the element
-Element_getElementType_Action_Add_To_List()
-{
-	return "action"
-}
-
+﻿
 ;Name of the element
 Element_getName_Action_Add_To_List()
 {
@@ -17,14 +9,6 @@ Element_getName_Action_Add_To_List()
 Element_getCategory_Action_Add_To_List()
 {
 	return x_lang("List")
-}
-
-;This function returns the package of the element.
-;This is a reserved function for future releases,
-;where it will be possible to install additional add-ons which provide more elements.
-Element_getPackage_Action_Add_To_List()
-{
-	return "default"
 }
 
 ;Minimum user experience to use this element.
@@ -102,7 +86,7 @@ Element_GenerateName_Action_Add_To_List(Environment, ElementParameters)
 		ValueText := x_lang("Multiple values '%1%'", ElementParameters.VarValues)
 	}
 	
-	return % lang("Add to list") " - " ElementParameters.Varname " - " PositionText " - " ValueText
+	return % x_lang("Add to list") " - " ElementParameters.Varname " - " PositionText " - " ValueText
 }
 
 ;Called every time the user changes any parameter.

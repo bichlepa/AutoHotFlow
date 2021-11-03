@@ -1,12 +1,4 @@
-﻿;Always add this element class name to the global list
-x_RegisterElementClass("Action_Execute_Flow")
-
-;Element type of the element
-Element_getElementType_Action_Execute_Flow()
-{
-	return "action"
-}
-
+﻿
 ;Name of the element
 Element_getName_Action_Execute_Flow()
 {
@@ -17,14 +9,6 @@ Element_getName_Action_Execute_Flow()
 Element_getCategory_Action_Execute_Flow()
 {
 	return x_lang("Flow_control")
-}
-
-;This function returns the package of the element.
-;This is a reserved function for future releases,
-;where it will be possible to install additional add-ons which provide more elements.
-Element_getPackage_Action_Execute_Flow()
-{
-	return "default"
 }
 
 ;Minimum user experience to use this element.
@@ -62,9 +46,9 @@ Element_getParametrizationDetails_Action_Execute_Flow(Environment)
 
 	parametersToEdit.push({type: "Label", label:  x_lang("Options")})
 	parametersToEdit.push({type: "Checkbox", id: "SendLocalVars", default: 1, label: x_lang("Send local variables")})
-	parametersToEdit.push({type: "Checkbox", id: "SkipDisabled", default: 0, label: x_lang("Skip disabled flows without error")})
 	parametersToEdit.push({type: "Checkbox", id: "WaitToFinish", default: 0, label: x_lang("Wait for called flow to finish")})
 	parametersToEdit.push({type: "Checkbox", id: "ReturnVariables", default: 0, label: x_lang("Return local variables to the calling flow")})
+	parametersToEdit.push({type: "Checkbox", id: "SkipDisabled", default: 0, label: x_lang("Skip disabled flows without error")})
 
 	return parametersToEdit
 }

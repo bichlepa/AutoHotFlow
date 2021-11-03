@@ -1,12 +1,4 @@
-﻿;Always add this element class name to the global list
-x_RegisterElementClass("Action_New_List")
-
-;Element type of the element
-Element_getElementType_Action_New_List()
-{
-	return "action"
-}
-
+﻿
 ;Name of the element
 Element_getName_Action_New_List()
 {
@@ -17,14 +9,6 @@ Element_getName_Action_New_List()
 Element_getCategory_Action_New_List()
 {
 	return x_lang("Variable") "|" x_lang("List")
-}
-
-;This function returns the package of the element.
-;This is a reserved function for future releases,
-;where it will be possible to install additional add-ons which provide more elements.
-Element_getPackage_Action_New_List()
-{
-	return "default"
 }
 
 ;Minimum user experience to use this element.
@@ -104,7 +88,7 @@ Element_GenerateName_Action_New_List(Environment, ElementParameters)
 		ValueText := x_lang("Multiple values '%1%'", ElementParameters.VarValues)
 	}
 	
-	return % lang("New list %1%", ElementParameters.Varname) PositionText " - " ValueText
+	return % x_lang("New list %1%", ElementParameters.Varname) PositionText " - " ValueText
 	
 }
 

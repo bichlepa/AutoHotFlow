@@ -278,6 +278,13 @@ xx_GetListOfFlowIDs()
 }
 
 ; get all Element IDs in a flow of the specified type
+xx_getAllElementIDs(p_FlowID)
+{
+	allElementIDs := _getAllElementIds(p_FlowID)
+	return allElementIDs
+}
+
+; get all Element IDs in a flow of the specified type
 xx_getAllElementIDsOfType(p_FlowID, p_Type)
 {
 	_EnterCriticalSection()
@@ -318,6 +325,49 @@ xx_getElementPars(p_FlowID, p_ElementID)
 {
 	return _getElementProperty(p_FlowID, p_ElementID, "pars")
 }
+
+; get the parameter definitions of the element
+xx_getElementParsDetails(p_FlowID, p_ElementID)
+{
+	Environment := {flowID: p_FlowID, elementID: p_ElementID}
+	elementClass := _getElementProperty(p_FlowID, p_ElementID, "class")
+	return Element_getParametrizationDetails(elementClass, Environment)
+}
+; set the value of a element parameter
+xx_setElementPar(p_FlowID, p_ElementID, p_ParameterID, p_newValue, reenableActiveTrigger = true)
+{
+	if (reenableActiveTrigger)
+	{
+		; check whether the element is a trigger and is enabled. We will need to disable and reenable it.
+		elementType := _getElementProperty(p_FlowID, p_elementID, "type")
+		if (elementType = "trigger")
+		{
+			isEnabled := xx_isTriggerEnabled(p_FlowID, p_elementID)
+			if (isEnabled)
+			{
+				xx_triggerDisable(p_FlowID, p_elementID)
+			}
+		}
+	}
+
+	; set the new value in the current state
+	; this is a kind of a hack. Maybe I'll find a better solution later
+	currentState := _getFlowProperty(p_FlowID, "currentState")
+	_setFlowProperty(p_FlowID, "states." currentState ".allElements." p_ElementID ".pars." p_ParameterID, p_newValue)
+	
+	; set the new value in the working state
+	_setElementProperty(p_FlowID, p_ElementID, "pars." p_ParameterID, p_newValue)
+
+	; regenerate the name of the element
+	Element_updateName(p_FlowID, p_ElementID)
+
+	; reenable trigger if it was enabled
+	if (isEnabled)
+	{
+		xx_triggerEnable(p_FlowID, p_elementID)
+	}
+}
+
 ; get the name of an element
 xx_getElementName(p_FlowID, p_ElementID)
 {
@@ -482,6 +532,10 @@ xx_UriEncode(p_Value)
 }
 
 ; write a log message
+; loglevel 0: only errors
+; loglevel 1: major logs
+; loglevel 2: more logs
+; loglevel 3: all logs
 xx_log(Environment, LoggingText, loglevel = 2)
 {
 	logger("f" loglevel, "Element " _getElementProperty(Environment.FlowID, Environment.elementID, "name") " (" Environment.elementID "): " LoggingText, _getFlowProperty(Environment.FlowID, "name"))

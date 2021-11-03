@@ -1,30 +1,14 @@
-;Always add this element class name to the global list
-x_RegisterElementClass("Action_Convert_list_to_string")
-
-;Element type of the element
-Element_getElementType_Action_Convert_list_to_string()
-{
-	return "Action"
-}
 
 ;Name of the element
 Element_getName_Action_Convert_list_to_string()
 {
-	return lang("Convert list to string")
+	return x_lang("Convert list to string")
 }
 
 ;Category of the element
 Element_getCategory_Action_Convert_list_to_string()
 {
-	return lang("List")
-}
-
-;This function returns the package of the element.
-;This is a reserved function for future releases,
-;where it will be possible to install additional add-ons which provide more elements.
-Element_getPackage_Action_Convert_list_to_string()
-{
-	return "Default"
+	return x_lang("List")
 }
 
 ;Minimum user experience to use this element.
@@ -62,7 +46,7 @@ Element_getParametrizationDetails_Action_Convert_list_to_string(Environment)
 	parametersToEdit.push({type: "Radio", id: "listToStringOutputFormat", result: "enum", default: "JSON", choices: ["JSON", "YAML"], enum: ["JSON", "YAML"]})
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Options")})
-	parametersToEdit.push({type: "Checkbox", id: "compactMode", default: 0, label: lang("Compact mode")})
+	parametersToEdit.push({type: "Checkbox", id: "compactMode", default: 0, label: x_lang("Compact mode")})
 	parametersToEdit.push({type: "Label", label: x_lang("Indentation length"), size: "small"})
 	parametersToEdit.push({type: "Edit", id: "indentationLength", default: 2, content: "PositiveInteger", WarnIfEmpty: true})
 	
@@ -72,7 +56,7 @@ Element_getParametrizationDetails_Action_Convert_list_to_string(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Convert_list_to_string(Environment, ElementParameters)
 {
-	return lang("Convert list '%1%' to %2%-string", ElementParameters.ListName, ElementParameters.listToStringOutputFormat) " - " ElementParameters.Varname
+	return x_lang("Convert list '%1%' to %2%-string", ElementParameters.ListName, ElementParameters.listToStringOutputFormat) " - " ElementParameters.Varname
 }
 
 ;Called every time the user changes any parameter.

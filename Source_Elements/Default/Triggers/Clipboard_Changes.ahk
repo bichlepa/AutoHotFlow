@@ -1,12 +1,4 @@
-﻿;Always add this element class name to the global list
-x_RegisterElementClass("Trigger_Clipboard_Changes")
-
-;Element type of the element
-Element_getElementType_Trigger_Clipboard_Changes()
-{
-	return "Trigger"
-}
-
+﻿
 ;Name of the element
 Element_getName_Trigger_Clipboard_Changes()
 {
@@ -17,14 +9,6 @@ Element_getName_Trigger_Clipboard_Changes()
 Element_getCategory_Trigger_Clipboard_Changes()
 {
 	return x_lang("Variable")
-}
-
-;This function returns the package of the element.
-;This is a reserved function for future releases,
-;where it will be possible to install additional add-ons which provide more elements.
-Element_getPackage_Trigger_Clipboard_Changes()
-{
-	return "default"
 }
 
 ;Minimum user experience to use this element.

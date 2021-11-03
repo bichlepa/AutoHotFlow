@@ -1,12 +1,4 @@
-﻿;Always add this element class name to the global list
-x_RegisterElementClass("Action_Play_Sound")
-
-;Element type of the element
-Element_getElementType_Action_Play_Sound()
-{
-	return "Action"
-}
-
+﻿
 ;Name of the element
 Element_getName_Action_Play_Sound()
 {
@@ -17,14 +9,6 @@ Element_getName_Action_Play_Sound()
 Element_getCategory_Action_Play_Sound()
 {
 	return x_lang("Sound")
-}
-
-;This function returns the package of the element.
-;This is a reserved function for future releases,
-;where it will be possible to install additional add-ons which provide more elements.
-Element_getPackage_Action_Play_Sound()
-{
-	return "default"
 }
 
 ;Minimum user experience to use this element.

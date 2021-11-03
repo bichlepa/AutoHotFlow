@@ -1,12 +1,4 @@
-﻿;Always add this element class name to the global list
-x_RegisterElementClass("Action_Send_Keystrokes_To_Control")
-
-;Element type of the element
-Element_getElementType_Action_Send_Keystrokes_To_Control()
-{
-	return "Action"
-}
-
+﻿
 ;Name of the element
 Element_getName_Action_Send_Keystrokes_To_Control()
 {
@@ -17,14 +9,6 @@ Element_getName_Action_Send_Keystrokes_To_Control()
 Element_getCategory_Action_Send_Keystrokes_To_Control()
 {
 	return x_lang("User_simulation") "|" x_lang("Window")
-}
-
-;This function returns the package of the element.
-;This is a reserved function for future releases,
-;where it will be possible to install additional add-ons which provide more elements.
-Element_getPackage_Action_Send_Keystrokes_To_Control()
-{
-	return "default"
 }
 
 ;Minimum user experience to use this element.

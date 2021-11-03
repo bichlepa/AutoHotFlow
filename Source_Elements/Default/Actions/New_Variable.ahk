@@ -1,12 +1,4 @@
-﻿;Always add this element class name to the global list
-x_RegisterElementClass("Action_New_variable")
-
-;Element type of the element
-Element_getElementType_Action_New_variable()
-{
-	return "action"
-}
-
+﻿
 ;Name of the element
 Element_getName_Action_New_variable()
 {
@@ -17,14 +9,6 @@ Element_getName_Action_New_variable()
 Element_getCategory_Action_New_variable()
 {
 	return x_lang("Variable") "|" x_lang("Text") "|" x_lang("Maths")
-}
-
-;This function returns the package of the element.
-;This is a reserved function for future releases,
-;where it will be possible to install additional add-ons which provide more elements.
-Element_getPackage_Action_New_variable()
-{
-	return "default"
 }
 
 ;Minimum user experience to use this element.
@@ -57,7 +41,10 @@ Element_getParametrizationDetails_Action_New_variable(Environment)
 	parametersToEdit.push({type: "Edit", id: "Varname", default: "NewVariable", content: "VariableName", WarnIfEmpty: true})
 
 	parametersToEdit.push({type: "Label", label:  x_lang("Value")})
-	parametersToEdit.push({type: "Edit", id: "VarValue", default: "New element", content: ["String", "Expression"], contentID: "expression", contentDefault: "string"})
+	parametersToEdit.push({type: "multilineEdit", id: "VarValue", default: "New element", content: ["String", "Expression"], contentID: "expression", contentDefault: "string"})
+
+	parametersToEdit.push({type: "Label", label:  x_lang("Options")})
+	parametersToEdit.push({type: "Checkbox", id: "onlyIfNotExist", default: 0, label: x_lang("Write only if variable does not exist")})
 
 	return parametersToEdit
 }
@@ -92,6 +79,15 @@ Element_run_Action_New_variable(Environment, ElementParameters)
 	}
 	
 	; set output variable
+	if (EvaluatedParameters.onlyIfNotExist)
+	{
+		varLoc := x_GetVariableLocation(Environment, EvaluatedParameters.Varname)
+		if varLoc
+		{
+			x_finish(Environment, "normal", "Variable was not written, because it already exists.")
+			return
+		}
+	}
 	x_SetVariable(Environment, EvaluatedParameters.Varname, EvaluatedParameters.VarValue)
 	
 	;Always call v_finish() before return

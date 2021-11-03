@@ -48,6 +48,7 @@ FileCreateDir, % packagePath "\lib"
 FileCreateDir, % packagePath "\Loops"
 FileCreateDir, % packagePath "\Triggers"
 FileCreateDir, % packagePath "\bin"
+FileCreateDir, % packagePath "\common"
 
 ; create initial language file
 IniWrite, % "English", % packagePath "\language\en.ini", language_info, enname
@@ -63,6 +64,7 @@ jsonfile =
     "license": "Unlicense",
     "version": "1.0.0",
     "libraries": [
+        "common\\compatibility.ahk"
     ],
     "actions": [
 
@@ -84,6 +86,13 @@ filecopy, % ahf_path "\source_elements\default\license.txt", % packagePath "\lic
 StringReplace, jsonfile, jsonfile, &packageName& , %packageName%, All
 
 fileappend, % jsonfile, % packagePath "\manifest.json"
+
+fileread, compatibilityFile, raw templates\template - compatibility.ahk
+
+StringReplace, compatibilityFile, compatibilityFile, &packageName& , %packageName%, All
+
+fileappend, % compatibilityFile, % packagePath "\common\compatibility.ahk"
+
 
 MsgBox, Package %packageName% was created. Please open the manifest.json and fill out missing data.
 

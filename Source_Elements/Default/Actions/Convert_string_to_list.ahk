@@ -1,30 +1,14 @@
-;Always add this element class name to the global list
-x_RegisterElementClass("Action_Convert_string_to_list")
-
-;Element type of the element
-Element_getElementType_Action_Convert_string_to_list()
-{
-	return "Action"
-}
 
 ;Name of the element
 Element_getName_Action_Convert_string_to_list()
 {
-	return lang("Convert string to list")
+	return x_lang("Convert string to list")
 }
 
 ;Category of the element
 Element_getCategory_Action_Convert_string_to_list()
 {
-	return lang("List")
-}
-
-;This function returns the package of the element.
-;This is a reserved function for future releases,
-;where it will be possible to install additional add-ons which provide more elements.
-Element_getPackage_Action_Convert_string_to_list()
-{
-	return "Default"
+	return x_lang("List")
 }
 
 ;Minimum user experience to use this element.
@@ -69,7 +53,7 @@ Element_getParametrizationDetails_Action_Convert_string_to_list(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Convert_string_to_list(Environment, ElementParameters)
 {
-	return lang("Convert %1%-string to list '%2%'", ElementParameters.listToStringOutputFormat, ElementParameters.VarValue) " - " ElementParameters.Varname
+	return x_lang("Convert %1%-string to list '%2%'", ElementParameters.listToStringOutputFormat, ElementParameters.VarValue) " - " ElementParameters.Varname
 }
 
 ;Called every time the user changes any parameter.

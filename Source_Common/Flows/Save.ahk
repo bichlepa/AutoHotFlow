@@ -54,6 +54,7 @@ SaveFlow(FlowID)
 	flowSave.allElements :=  object()
 	for forElementID, forElement in flow.allElements
 	{
+		AllElementClassInfos := _getSharedProperty("AllElementClassInfos")
 		; create empty object where we will write all data needed
 		saveElement := Object()
 
@@ -78,15 +79,16 @@ SaveFlow(FlowID)
 		; usecase: if a flow will be exported and imported in an other installation of AHF
 		;   and this flow has elements which require additional packages, the user will get a message.
 		saveElementClass := saveElement.class
-		saveElement.package := Element_getPackage_%saveElementClass%()
+		saveElement.package := AllElementClassInfos[saveElementClass].package
+		saveElement.packageVersion := AllElementClassInfos[saveElementClass].packageVersion
 		
 		; write element parameters. We will write only the parameters which are needed by the element.
 		; because, if an element class was changed, the property "pars" may contain parameters which are not needed anymore.
 		parametersToSave := Element_getParameters(forElement.class, {flowID: FlowID, elementID: forElement.ID})
 		saveElement.pars := object()
-		for onParIndex, oneParID in parametersToSave
+		for onParIndex, oneParInfo in parametersToSave
 		{
-			saveElement.pars[oneParID] := forElement.pars[oneParID]
+			saveElement.pars[oneParInfo.id] := forElement.pars[oneParInfo.id]
 		}
 		
 		; write the new element in the flow object

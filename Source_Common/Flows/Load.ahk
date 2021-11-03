@@ -108,22 +108,33 @@ LoadFlow(p_filepath, p_demo = false)
 			if not (ObjHasValue(missingpackages, oneElementPackage))
 				missingpackages.push(oneElementPackage)
 		}
-	
-		;If property "default name" is enabled, regenerate the name of the element
-		if (_getElementProperty(FlowID, oneElementID, "StandardName"))
+		Else
 		{
-			if (IsFunc("Element_GenerateName_" oneElementClass))
+			;If property "default name" is enabled, regenerate the name of the element
+			if (_getElementProperty(FlowID, oneElementID, "StandardName"))
 			{
 				Newname := Element_GenerateName_%oneElementClass%({flowID: flowID, elementID: oneElementID},  _getElementProperty(FlowID, oneElementID, "pars"))
 				StringReplace, Newname, Newname, `n, %a_space%-%a_space%, all
 				_setElementProperty(FlowID, oneElementID, "Name", Newname)
 			}
+
+			; get element icon
+			icon := Element_getIconPath_%oneElementClass%()
+			_setElementProperty(FlowID, oneElementID, "icon", icon)
+		}
+
+		; check whether the element class was parameters that were not saved
+		; this may be required if the element implementation has been expanded and has new options
+		elementPars := _getElementProperty(FlowID, oneElementID, "pars")
+		parametersAndDefaultValues := Element_getParameters(oneElementClass, {flowID: FlowID, elementID: oneElementID})
+		for oneParameterIndex, oneParameterInfo in parametersAndDefaultValues
+		{
+			if (not elementPars.hasKey(oneParameterInfo.id))
+			{
+				_setElementProperty(FlowID, oneElementID, "pars." oneParameterInfo.id, oneParameterInfo.default)
+			}
 		}
 		
-		; get element icon
-		icon := Element_getIconPath_%oneElementClass%()
-		_setElementProperty(FlowID, oneElementID, "icon", icon)
-
 		; add some default element values
 		_setElementProperty(FlowID, oneElementID, "UniqueID", flowID "_" oneElementID)
 		_setElementProperty(FlowID, oneElementID, "info", object())
@@ -138,7 +149,6 @@ LoadFlow(p_filepath, p_demo = false)
 		
 		; Ensure backward compatibility (for later use)
 		LoadFlowCheckCompabilityElement(flowID, oneElementID, _getFlowProperty(FlowID, "CompabilityVersion"))
-		
 	}
 	
 	for oneConnectionIndex, oneConnectionID in _getAllConnectionIDs(FlowID)
@@ -152,6 +162,9 @@ LoadFlow(p_filepath, p_demo = false)
 		_setConnectionInfo(FlowID, oneConnectionID, "state", "idle")
 		_setConnectionInfo(FlowID, oneConnectionID, "ClickPriority", 200)
 	}
+
+	; Ensure backward compatibility (for later use)
+	LoadFlowCheckCompabilityFlow(flowID, _getFlowProperty(FlowID, "CompabilityVersion"))
 
 	if not (_getFlowProperty(FlowID, "firstLoadedTime"))
 		_setFlowProperty(FlowID, "firstLoadedTime", a_now)

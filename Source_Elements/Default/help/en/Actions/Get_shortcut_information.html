@@ -1,0 +1,40 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<link rel="stylesheet" href="../../stylesheet.css">
+	<link rel="stylesheet" href="stylesheet.css">
+	<link rel="stylesheet" href="../../../../../Help/stylesheet.css">
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<H1>Get shortcut information</H1>
+<p>
+	The action <B>Get shortcut information</B> retrieves information about a shortcut (.lnk) file, such as its target file.
+</p>
+
+<H2>Settings</H2>
+<table class="settings">
+	<TR>
+		<TD>
+			<h4>Shortcut path</h4>
+			<p>The path of the shortcut file to be analyzed. Be sure to include the <code>.lnk</code> extension.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Output variables</h4>
+			<p>Names of the variables that will contain the retrieved informations. The fields may be empty, if those informations are not required.</p>
+			<p><b>Target path</b>: The shortcut's target (not including any arguments it might have)
+			<p><b>Target arguments</b>: The shortcut's parameters (blank if none).
+			<p><b>Working directory</b>: The shortcut's working directory.
+			<p><b>Description</b>: The shortcut's comments (blank if none).
+			<p><b>Icon path</b>: The filename of the shortcut's icon (blank if none).
+			<p><b>Icon number</b>: The the shortcut's icon number within the icon file (blank if none). This value is most often 1, which means the first icon.
+			<p><b>Run mode</b>: The shortcut's  initial launch state, which is one of the following strings: <code>Normal</code>, <code>Maximized</code>, <code>Minimized</code>.
+			</p>
+		</TD>
+	</TR>
+</table>
+
+</BODY>
+</HTML>

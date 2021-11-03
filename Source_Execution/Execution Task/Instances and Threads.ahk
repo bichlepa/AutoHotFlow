@@ -88,8 +88,8 @@ newInstance(p_Environment, p_instanceVars = "", p_instanceProperties = "", p_dat
 			finishExecutionOfElement(newInstanceId, newThreadID, "Normal")
 
 			; set some thread variable with informations about the trigger event
-			ThreadVariable_Set(newThreadID, "A_TriggerTime", a_now)
-			ThreadVariable_Set(newThreadID, "A_TriggerID", p_Environment.ElementID)
+			ThreadVariable_Set({instanceID: newInstanceId, threadID: newThreadID}, "A_TriggerTime", a_now)
+			ThreadVariable_Set({instanceID: newInstanceId, threadID: newThreadID}, "A_TriggerID", p_Environment.ElementID)
 			
 			; some triggers have functions which must be called after a thread has started.
 			; it is usually used to set some thread variables which contain some additional informations of the trigger event

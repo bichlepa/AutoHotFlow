@@ -1,12 +1,4 @@
-﻿;Always add this element class name to the global list
-x_RegisterElementClass("Action_Trace_Point")
-
-;Element type of the element
-Element_getElementType_Action_Trace_Point()
-{
-	return "action"
-}
-
+﻿
 ;Name of the element
 Element_getName_Action_Trace_Point()
 {
@@ -17,14 +9,6 @@ Element_getName_Action_Trace_Point()
 Element_getCategory_Action_Trace_Point()
 {
 	return x_lang("Debugging")
-}
-
-;This function returns the package of the element.
-;This is a reserved function for future releases,
-;where it will be possible to install additional add-ons which provide more elements.
-Element_getPackage_Action_Trace_Point()
-{
-	return "default"
 }
 
 ;Minimum user experience to use this element.
@@ -69,7 +53,7 @@ Element_getParametrizationDetails_Action_Trace_Point(Environment)
 Element_GenerateName_Action_Trace_Point(Environment, ElementParameters)
 {
 	if (ElementParameters.StopCondition)
-		textStopCondition := " - " lang("With stop condition")
+		textStopCondition := " - " x_lang("With stop condition")
 	return % x_lang("Trace_Point") " - " ElementParameters.ID textStopCondition
 	
 }

@@ -343,7 +343,8 @@
       "enabled": "1",
       "ID": "element0000000002",
       "name": "Manual - \"loop test\"",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "ID": "loop test"
       },
@@ -356,7 +357,8 @@
       "class": "Action_New_List",
       "ID": "element0000000003",
       "name": "New list TestList2 - At position '1' - Multiple values 'Eins,Zwei,Drei'",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "DelimiterComma": 1,
         "DelimiterLinefeed": 0,
@@ -381,7 +383,8 @@
       "HeightOfVerticalBar": 1365,
       "ID": "element0000000004",
       "name": "Work through a list: testListFirst",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "VarValue": "testListFirst"
       },
@@ -394,7 +397,8 @@
       "class": "Action_New_List",
       "ID": "element0000000005",
       "name": "New list testListFirst - At position '1' - Multiple values 'One - Two - Three'",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "DelimiterComma": "0",
         "DelimiterLinefeed": "1",
@@ -419,7 +423,8 @@
       "HeightOfVerticalBar": "525",
       "ID": "element0000000006",
       "name": "Work through a list: testlist2",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "VarValue": "testlist2"
       },
@@ -432,7 +437,8 @@
       "class": "Action_Trace_Point",
       "ID": "element0000000009",
       "name": "Trace point - bright leg - With stop condition",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "ID": "bright leg",
         "LogMessage": "",
@@ -447,7 +453,8 @@
       "class": "Action_Trace_Point",
       "ID": "element0000000011",
       "name": "Trace point - bright leg2 - With stop condition",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "ID": "bright leg2",
         "LogMessage": "",
@@ -462,7 +469,8 @@
       "class": "Action_Trace_Point_Check",
       "ID": "element0000000012",
       "name": "Trace point check - Must pass all trace points",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "MustNotPassTracepoints": [
           "Tracepoint red box (element0000000551)"
@@ -480,7 +488,8 @@
       "class": "Condition_Expression",
       "ID": "element0000000013",
       "name": "Expression - a_index <= 2",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "a_index <= 2"
       },
@@ -493,7 +502,8 @@
       "class": "Action_Add_To_List",
       "ID": "element0000000030",
       "name": "Add To List - global_testResults - As last value - Value 'a_flowName'",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "DelimiterComma": 0,
         "DelimiterLinefeed": 1,
@@ -502,7 +512,6 @@
         "Expression": "Expression",
         "expressionPos": "String",
         "InsertMethod": "Insert",
-        "InsertMethodLabel": "",
         "NumberOfElements": "One",
         "Position": "keyName",
         "Varname": "global_testResults",
@@ -520,7 +529,8 @@
       "HeightOfVerticalBar": "700",
       "ID": "element0000000031",
       "name": "Simple loop: 5 Repeats",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "Infinite": 0,
         "repeatCount": 5
@@ -534,9 +544,11 @@
       "class": "Action_New_variable",
       "ID": "element0000000040",
       "name": "New variable - myIndex = 0",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "expression": "Expression",
+        "onlyIfNotExist": "0",
         "Varname": "myIndex",
         "VarValue": "0"
       },
@@ -549,9 +561,11 @@
       "class": "Action_New_variable",
       "ID": "element0000000041",
       "name": "New variable - myIndex = myIndex + 1",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "expression": "Expression",
+        "onlyIfNotExist": "0",
         "Varname": "myIndex",
         "VarValue": "myIndex + 1"
       },
@@ -564,7 +578,8 @@
       "class": "Condition_Expression",
       "ID": "element0000000046",
       "name": "Expression - myIndex = a_index",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "myIndex = a_index"
       },
@@ -577,7 +592,8 @@
       "class": "Condition_Expression",
       "ID": "element0000000049",
       "name": "Expression - myIndex = 5",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "myIndex = 5"
       },
@@ -590,7 +606,8 @@
       "class": "Condition_Expression",
       "ID": "element0000000051",
       "name": "Expression - myIndex <= 5",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "myIndex <= 5"
       },
@@ -603,7 +620,8 @@
       "class": "Action_Trace_Point",
       "ID": "element0000000056",
       "name": "Trace point - index5",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "ID": "index5",
         "LogMessage": "",
@@ -619,7 +637,8 @@
       "HeightOfVerticalBar": "350",
       "ID": "element0000000059",
       "name": "Simple loop: Endless loop",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "Infinite": "1",
         "repeatCount": 5
@@ -633,7 +652,8 @@
       "class": "Condition_Expression",
       "ID": "element0000000061",
       "name": "Expression - a_index = 6",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "a_index = 6"
       },
@@ -646,7 +666,8 @@
       "class": "Action_Trace_Point",
       "ID": "element0000000062",
       "name": "Trace point - index6",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "ID": "index6",
         "LogMessage": "",
@@ -662,7 +683,8 @@
       "HeightOfVerticalBar": "560",
       "ID": "element0000000070",
       "name": "Condition - a_index <= 3",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "EvaluateOnFirstIteration": 1,
         "Expression": "a_index <= 3"
@@ -676,7 +698,8 @@
       "class": "Condition_Expression",
       "ID": "element0000000073",
       "name": "Expression - a_Index = 3",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "a_Index = 3"
       },
@@ -689,7 +712,8 @@
       "class": "Condition_Expression",
       "ID": "element0000000074",
       "name": "Expression - a_Index <= 3",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "a_Index <= 3"
       },
@@ -702,7 +726,8 @@
       "class": "Action_Trace_Point",
       "ID": "element0000000075",
       "name": "Trace point - index3",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "ID": "index3",
         "LogMessage": "",
@@ -718,7 +743,8 @@
       "HeightOfVerticalBar": "350",
       "ID": "element0000000081",
       "name": "Parse a string - Hello real world, Hello virtual world - , - %a_space%%a_tab%",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "Delimiters": ",",
         "Expression": "String",
@@ -734,7 +760,8 @@
       "class": "Condition_Expression",
       "ID": "element0000000083",
       "name": "Expression - a_Index = 1 and a_loopfield = \"Hello real world\"",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "a_Index = 1 and a_loopfield = \"Hello real world\""
       },
@@ -747,7 +774,8 @@
       "class": "Condition_Expression",
       "ID": "element0000000086",
       "name": "Expression - a_Index = 2 and a_loopfield = \"Hello virtual world\"",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "a_Index = 2 and a_loopfield = \"Hello virtual world\""
       },
@@ -761,7 +789,8 @@
       "HeightOfVerticalBar": "210",
       "ID": "element0000000093",
       "name": "Condition - 4 = 5",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "EvaluateOnFirstIteration": 1,
         "Expression": "4 = 5"
@@ -775,9 +804,11 @@
       "class": "Action_New_variable",
       "ID": "element0000000095",
       "name": "New variable - failed = 1",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "expression": "Expression",
+        "onlyIfNotExist": "0",
         "Varname": "failed",
         "VarValue": "1"
       },
@@ -790,9 +821,11 @@
       "class": "Action_New_variable",
       "ID": "element0000000096",
       "name": "New variable - failed = 0",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "expression": "Expression",
+        "onlyIfNotExist": "0",
         "Varname": "failed",
         "VarValue": "0"
       },
@@ -805,7 +838,8 @@
       "class": "Condition_Expression",
       "ID": "element0000000097",
       "name": "Expression - failed",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "failed"
       },

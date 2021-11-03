@@ -1,12 +1,4 @@
-﻿;Always add this element class name to the global list
-x_RegisterElementClass("Action_Send_keystrokes")
-
-;Element type of the element
-Element_getElementType_Action_Send_keystrokes()
-{
-	return "Action"
-}
-
+﻿
 ;Name of the element
 Element_getName_Action_Send_keystrokes()
 {
@@ -17,14 +9,6 @@ Element_getName_Action_Send_keystrokes()
 Element_getCategory_Action_Send_keystrokes()
 {
 	return x_lang("User_simulation")
-}
-
-;This function returns the package of the element.
-;This is a reserved function for future releases,
-;where it will be possible to install additional add-ons which provide more elements.
-Element_getPackage_Action_Send_keystrokes()
-{
-	return "default"
 }
 
 ;Minimum user experience to use this element.
@@ -58,7 +42,7 @@ Element_getParametrizationDetails_Action_Send_keystrokes(Environment)
 	parametersToEdit.push({type: "Checkbox", id: "RawMode", default: 0, label: x_lang("Raw mode")})
 	parametersToEdit.push({type: "Edit", id: "KeysToSend", content: ["RawString", "String"], contentID: "KeysToSendContentType", ContentDefault: "String", WarnIfEmpty: true})
 	parametersToEdit.push({type: "Label", label: x_lang("Send mode")})
-	parametersToEdit.push({type: "Radio", id: "SendMode", default: 1, choices: [x_lang("Input mode"), x_lang("Event mode"), x_lang("Play mode")], result: "enum", enum: ["Input", "Event", "Play"]})
+	parametersToEdit.push({type: "Radio", id: "SendMode", default: "Input", choices: [x_lang("Input mode"), x_lang("Event mode"), x_lang("Play mode")], result: "enum", enum: ["Input", "Event", "Play"]})
 	
 	return parametersToEdit
 }
@@ -95,7 +79,7 @@ Element_run_Action_Send_keystrokes(Environment, ElementParameters)
 	if (EvaluatedParameters.RawMode)
 		rawTextOption := "{raw}"
 	else
-		rawTextOption :=
+		rawTextOption := ""
 
 	; set send mode
 	SendMode, % EvaluatedParameters.sendmode

@@ -1,7 +1,7 @@
 ﻿if (_settings.developing)
 {
-	hotkey, ^numpadenter, d_showGlobals
-	hotkey, ^numpadadd, d_showAnyVariable
+	;hotkey, ^numpadenter, d_showGlobals
+	;hotkey, ^numpadadd, d_showAnyVariable
 }
 
 ; shows the contents of a text or an object

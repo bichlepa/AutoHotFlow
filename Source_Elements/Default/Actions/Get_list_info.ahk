@@ -1,12 +1,4 @@
-﻿;Always add this element class name to the global list
-x_RegisterElementClass("Action_Get_List_Info")
-
-;Element type of the element
-Element_getElementType_Action_Get_List_Info()
-{
-	return "Action"
-}
-
+﻿
 ;Name of the element
 Element_getName_Action_Get_List_Info()
 {
@@ -17,14 +9,6 @@ Element_getName_Action_Get_List_Info()
 Element_getCategory_Action_Get_List_Info()
 {
 	return x_lang("List")
-}
-
-;This function returns the package of the element.
-;This is a reserved function for future releases,
-;where it will be possible to install additional add-ons which provide more elements.
-Element_getPackage_Action_Get_List_Info()
-{
-	return "default"
 }
 
 ;Minimum user experience to use this element.
@@ -108,7 +92,7 @@ Element_run_Action_Get_List_Info(Environment, ElementParameters)
 	; error if variable does not contain a list
 	if (not IsObject(EvaluatedParameters.List))
 	{
-		x_finish(Environment, "exception", lang("'%1%' does not contain a list", EvaluatedParameters.List))
+		x_finish(Environment, "exception", x_lang("'%1%' does not contain a list", EvaluatedParameters.List))
 		return
 	}
 	

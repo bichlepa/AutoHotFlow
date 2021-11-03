@@ -1,12 +1,4 @@
-﻿;Always add this element class name to the global list
-x_RegisterElementClass("Condition_List_Contains_Element")
-
-;Element type of the element
-Element_getElementType_Condition_List_Contains_Element()
-{
-	return "Condition"
-}
-
+﻿
 ;Name of the element
 Element_getName_Condition_List_Contains_Element()
 {
@@ -17,14 +9,6 @@ Element_getName_Condition_List_Contains_Element()
 Element_getCategory_Condition_List_Contains_Element()
 {
 	return x_lang("Variable")
-}
-
-;This function returns the package of the element.
-;This is a reserved function for future releases,
-;where it will be possible to install additional add-ons which provide more elements.
-Element_getPackage_Condition_List_Contains_Element()
-{
-	return "default"
 }
 
 ;Minimum user experience to use this element.
@@ -69,10 +53,10 @@ Element_getParametrizationDetails_Condition_List_Contains_Element(Environment)
 Element_GenerateName_Condition_List_Contains_Element(Environment, ElementParameters)
 {
 	if (ElementParameters.SearchWhat = "Content")
-		string := lang("Value '%1%' in list '%2%'", ElementParameters.Position, ElementParameters.InputList)
+		string := x_lang("Value '%1%' in list '%2%'", ElementParameters.Position, ElementParameters.InputList)
 	else if (ElementParameters.SearchWhat = "Key")
 	{
-		string := lang("Key '%1%' in list '%2%'", ElementParameters.SearchContent, ElementParameters.InputList)
+		string := x_lang("Key '%1%' in list '%2%'", ElementParameters.SearchContent, ElementParameters.InputList)
 	}
 
 	return x_lang("List_Contains_Element") " - " string

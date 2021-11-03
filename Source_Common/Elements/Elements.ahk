@@ -1,55 +1,7 @@
-﻿;Only called from main thread. Fills a list of all available element classes
+﻿;This function used to fill a list of all available element classes. It is not required anymore
 Element_Register_Element_Class(p_class)
 {
-	AllElementClasses := _getSharedProperty("AllElementClasses")
-
-	if (not isFunc("Element_getElementType_" p_class))
-	{
-		logger("A0", "Element class " p_class " is not fully implemented. Missing function: Element_getParametrizationDetails_" p_class "()", ,true)
-		return
-	}
-	elementType := Element_getElementType_%p_class%()
-	requiredFunctions := []
-	requiredFunctions.push("Element_getElementType_")
-	requiredFunctions.push("Element_getName_")
-	requiredFunctions.push("Element_getCategory_")
-	requiredFunctions.push("Element_getPackage_")
-	requiredFunctions.push("Element_getElementLevel_")
-	requiredFunctions.push("Element_getIconPath_")
-	requiredFunctions.push("Element_getStabilityLevel_")
-	requiredFunctions.push("Element_getParametrizationDetails_")
-	requiredFunctions.push("Element_GenerateName_")
-	requiredFunctions.push("Element_CheckSettings_")
-
-	if (elementType = "action" or elementType = "condition" or elementType = "loop")
-	{
-		requiredFunctions.push("Element_run_")
-		requiredFunctions.push("Element_stop_")
-	}
-	else if (elementType = "trigger")
-	{
-		requiredFunctions.push("Element_enable_")
-		requiredFunctions.push("Element_postTrigger_")
-		requiredFunctions.push("Element_disable_")
-	}
-	Else
-	{
-		logger("A0", "Element class " p_class " is of not supported type: " elementType, ,true)
-		return
-	}
-
-	for oneindex, oneRequiredFunction in requiredFunctions
-	{
-		if (not isFunc(oneRequiredFunction p_class))
-		{
-			logger("A0", "Element class " p_class " is not fully implemented. Missing function: " oneRequiredFunction p_class "()", ,true)
-			return
-		}
-	}
-
-
-	AllElementClasses.push(p_class)
-	_setSharedProperty("AllElementClasses", AllElementClasses)
+	; nothing to do
 }
 
 ; Returns parametration details of an element class.
@@ -81,7 +33,7 @@ Element_getParametrizationDetails(elementClass, Environment, updateIfRequired = 
 	return ObjFullyClone(Element_bufferedParametrationDetails[elementClass])
 }
 
-; Returns a list of all parameter IDs.
+; Returns a list of all parameter IDs and their default value.
 ; the result of the actual call of the element function is buffered to save execution time
 Element_getParameters(elementClass, Environment)
 {
@@ -102,20 +54,26 @@ Element_getParameters(elementClass, Environment)
 		; find all parameter IDs in the paraemetration details
 		for index, oneParameterDetail in ParametrizationDetails
 		{
+			if (oneParameterDetail.type = "label")
+			{
+				; a label may have an ID (if it needs to be changed while user edits the parameters), but it has not value
+				continue
+			}
+
 			; the value in key "ID" can contain parameter IDs
 			if (oneParameterDetail.ID)
 			{
 				if not isobject(oneParameterDetail.ID)
 				{
 					; the value contains a single parameter ID. Add it.
-					tempObject.push(oneParameterDetail.ID)
+					tempObject.push({ID: oneParameterDetail.ID, default: oneParameterDetail.default})
 				}
 				else
 				{
 					; The value contains a list of parameter IDs. Add them all.
 					for index3, OneID in oneParameterDetail.ID
 					{
-						tempObject.push(OneID)
+						tempObject.push({ID: OneID, default: oneParameterDetail.default[index3]})
 					}
 				}
 			}
@@ -125,14 +83,14 @@ Element_getParameters(elementClass, Environment)
 				if not isobject(oneParameterDetail.ContentID)
 				{
 					; the value contains a single parameter ID. Add it.
-					tempObject.push(oneParameterDetail.ContentID)
+					tempObject.push({ID: oneParameterDetail.ContentID, default: oneParameterDetail.ContentDefault})
 				}
 				else
 				{
 					; The value contains a list of parameter IDs. Add them all.
 					for index3, OneID in oneParameterDetail.ContentID
 					{
-						tempObject.push(OneID)
+						tempObject.push({ID: OneID, default: oneParameterDetail.ContentDefault[index3]})
 					}
 				}
 			}

@@ -1,12 +1,4 @@
-﻿;Always add this element class name to the global list
-x_RegisterElementClass("Condition_Expression")
-
-;Element type of the element
-Element_getElementType_Condition_Expression()
-{
-	return "condition"
-}
-
+﻿
 ;Name of the element
 Element_getName_Condition_Expression()
 {
@@ -17,14 +9,6 @@ Element_getName_Condition_Expression()
 Element_getCategory_Condition_Expression()
 {
 	return x_lang("Variable")
-}
-
-;This function returns the package of the element.
-;This is a reserved function for future releases,
-;where it will be possible to install additional add-ons which provide more elements.
-Element_getPackage_Condition_Expression()
-{
-	return "default"
 }
 
 ;Minimum user experience to use this element.
@@ -53,7 +37,7 @@ Element_getParametrizationDetails_Condition_Expression(Environment)
 {
 	parametersToEdit := Object()
 	parametersToEdit.push({type: "Label", label: x_lang("Expression")})
-	parametersToEdit.push({type: "Edit", id: "Expression", content: "Expression", WarnIfEmpty: true})
+	parametersToEdit.push({type: "multilineEdit", id: "Expression", content: "Expression", WarnIfEmpty: true})
 
 	return parametersToEdit
 }

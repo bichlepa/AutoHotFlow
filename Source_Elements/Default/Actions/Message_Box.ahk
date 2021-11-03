@@ -1,12 +1,4 @@
-﻿;Always add this element class name to the global list
-x_RegisterElementClass("Action_Message_Box")
-
-;Element type of the element
-Element_getElementType_Action_Message_Box()
-{
-	return "Action"
-}
-
+﻿
 ;Name of the element
 Element_getName_Action_Message_Box()
 {
@@ -17,14 +9,6 @@ Element_getName_Action_Message_Box()
 Element_getCategory_Action_Message_Box()
 {
 	return x_lang("User_interaction")
-}
-
-;This function returns the package of the element.
-;This is a reserved function for future releases,
-;where it will be possible to install additional add-ons which provide more elements.
-Element_getPackage_Action_Message_Box()
-{
-	return "default"
 }
 
 ;Minimum user experience to use this element.
@@ -155,11 +139,11 @@ Element_run_Action_Message_Box(Environment, ElementParameters)
 		EndTime := A_TickCount
 		
 		if (EvaluatedParameters.Unit = "Seconds") ;Seconds
-			EndTime += TimeoutUnits * 1000
+			EndTime += EvaluatedParameters.TimeoutUnits * 1000
 		else if (EvaluatedParameters.Unit = "Minutes") ;minutes
-			EndTime += TimeoutUnits * 60000
+			EndTime += EvaluatedParameters.TimeoutUnits * 60000
 		else if (EvaluatedParameters.Unit = "Hours") ;minutes
-			EndTime += TimeoutUnits * 60000 * 60
+			EndTime += EvaluatedParameters.TimeoutUnits * 60000 * 60
 		
 		; save end time to a execution variable, so we can use it later.
 		x_SetExecutionValue(Environment, "EndTime", EndTime)

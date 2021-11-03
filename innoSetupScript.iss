@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "AutoHotFlow"
-#define MyAppVersion "1.1.0"
+#define MyAppVersion "1.2.0"
 #define MyAppPublisher "Paul Bichler"
 #define MyAppURL "https://bichlepa.jimdofree.com/autohotflow/"
 #define MyAppExeName "AutoHotFlow.exe" 
@@ -163,6 +163,7 @@ Source: "Source_Execution\Variables\Variables.ahk"; DestDir: "{app}\Source_Execu
 Source: "Source_Main\main.ahk"; DestDir: "{app}\Source_Main"; Flags: ignoreversion
 Source: "Source_Main\API\API for Elements.ahk"; DestDir: "{app}\Source_Main\API"; Flags: ignoreversion
 Source: "Source_Main\API\Shared Variables.ahk"; DestDir: "{app}\Source_Main\API"; Flags: ignoreversion
+Source: "Source_Main\Elements\Elements.ahk"; DestDir: "{app}\Source_Main\Elements"; Flags: ignoreversion
 Source: "Source_Main\Hidden window\Hidden window.ahk"; DestDir: "{app}\Source_Main\Hidden window"; Flags: ignoreversion
 Source: "Source_Main\Threads\Threads.ahk"; DestDir: "{app}\Source_Main\Threads"; Flags: ignoreversion
 Source: "Source_Main\Tray\Tray.ahk"; DestDir: "{app}\Source_Main\Tray"; Flags: ignoreversion
@@ -179,6 +180,7 @@ Source: "Source_Elements\Default\Actions\activate_Window.ahk"; DestDir: "{app}\S
 Source: "Source_Elements\Default\Actions\Add_to_list.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Actions\AutoHotkey_script.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Actions\Beep.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
+Source: "Source_Elements\Default\Actions\Block_User_Input.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Actions\Change_character_case.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Actions\Change_Drive_Label.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Actions\Click.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
@@ -189,11 +191,13 @@ Source: "Source_Elements\Default\Actions\Convert_string_to_list.ahk"; DestDir: "
 Source: "Source_Elements\Default\Actions\Copy_file.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Actions\Copy_folder.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Actions\Create_folder.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
+Source: "Source_Elements\Default\Actions\Create_Shortcut.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Actions\Delete_file.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Actions\Delete_folder.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Actions\Delete_From_Ini.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Actions\Delete_from_list.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Actions\Download_file.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
+Source: "Source_Elements\Default\Actions\Do_nothing.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Actions\Drag_with_mouse.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Actions\Eject_Drive.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Actions\Empty_Recycle_bin.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
@@ -212,6 +216,7 @@ Source: "Source_Elements\Default\Actions\Get_list_info.ahk"; DestDir: "{app}\Sou
 Source: "Source_Elements\Default\Actions\Get_mouse_position.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Actions\Get_pixel_color.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Actions\Get_Screen_Settings.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
+Source: "Source_Elements\Default\Actions\Get_shortcut_information.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Actions\Get_string_Length.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Actions\Get_Volume.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Actions\Hibernate_Computer.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
@@ -221,7 +226,7 @@ Source: "Source_Elements\Default\Actions\Input_Box.ahk"; DestDir: "{app}\Source_
 Source: "Source_Elements\Default\Actions\Kill_Process.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Actions\List_Drives.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Actions\Lock_Computer.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
-Source: "Source_Elements\Default\Actions\Lock_Or_Unlcock_Drive.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
+Source: "Source_Elements\Default\Actions\Lock_Or_Unlock_Drive.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Actions\Log_Off.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Actions\Message_Box.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Actions\Minimize_All_Windows.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
@@ -253,6 +258,7 @@ Source: "Source_Elements\Default\Actions\Send_Keystrokes.ahk"; DestDir: "{app}\S
 Source: "Source_Elements\Default\Actions\Send_Keystrokes_To_Control.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Actions\Set_Clipboard.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Actions\Set_control_text.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
+Source: "Source_Elements\Default\Actions\Set_element_parameter.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Actions\Set_file_attributes.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Actions\Set_file_time.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Actions\Set_Flow_Status.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
@@ -266,6 +272,7 @@ Source: "Source_Elements\Default\Actions\Shutdown.ahk"; DestDir: "{app}\Source_E
 Source: "Source_Elements\Default\Actions\Sleep.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Actions\Speech_output.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Actions\Split_a_string.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
+Source: "Source_Elements\Default\Actions\Split_path.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Actions\Square_Root.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Actions\Stop_Flow.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Actions\Stop_Sound.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
@@ -280,9 +287,11 @@ Source: "Source_Elements\Default\Actions\Trigonometry.ahk"; DestDir: "{app}\Sour
 Source: "Source_Elements\Default\Actions\Trim_a_string.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Actions\Write_To_File.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Actions\Write_to_ini.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
+Source: "Source_Elements\Default\common\compatibility.ahk"; DestDir: "{app}\Source_Elements\Default\common"; Flags: ignoreversion
 Source: "Source_Elements\Default\common\Window functions.ahk"; DestDir: "{app}\Source_Elements\Default\common"; Flags: ignoreversion
 Source: "Source_Elements\Default\Conditions\Confirmation_Dialog.ahk"; DestDir: "{app}\Source_Elements\Default\Conditions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Conditions\Debug_dialog.ahk"; DestDir: "{app}\Source_Elements\Default\Conditions"; Flags: ignoreversion
+Source: "Source_Elements\Default\Conditions\Do_nothing.ahk"; DestDir: "{app}\Source_Elements\Default\Conditions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Conditions\Expression.ahk"; DestDir: "{app}\Source_Elements\Default\Conditions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Conditions\File_Exists.ahk"; DestDir: "{app}\Source_Elements\Default\Conditions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Conditions\File_Has_Attribute.ahk"; DestDir: "{app}\Source_Elements\Default\Conditions"; Flags: ignoreversion
@@ -290,9 +299,10 @@ Source: "Source_Elements\Default\Conditions\Flow_Enabled.ahk"; DestDir: "{app}\S
 Source: "Source_Elements\Default\Conditions\Flow_Running.ahk"; DestDir: "{app}\Source_Elements\Default\Conditions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Conditions\Key_Is_Down.ahk"; DestDir: "{app}\Source_Elements\Default\Conditions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Conditions\List_Contains_Element.ahk"; DestDir: "{app}\Source_Elements\Default\Conditions"; Flags: ignoreversion
-Source: "Source_Elements\Default\Conditions\Number_is.ahk"; DestDir: "{app}\Source_Elements\Default\Conditions"; Flags: ignoreversion
+Source: "Source_Elements\Default\Conditions\NumberIs.ahk"; DestDir: "{app}\Source_Elements\Default\Conditions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Conditions\Process_Is_Running.ahk"; DestDir: "{app}\Source_Elements\Default\Conditions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Conditions\String_Contains_Text.ahk"; DestDir: "{app}\Source_Elements\Default\Conditions"; Flags: ignoreversion
+Source: "Source_Elements\Default\Conditions\Variable_content_is.ahk"; DestDir: "{app}\Source_Elements\Default\Conditions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Conditions\Variable_Is_Empty.ahk"; DestDir: "{app}\Source_Elements\Default\Conditions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Conditions\Window_Active.ahk"; DestDir: "{app}\Source_Elements\Default\Conditions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Conditions\Window_Exists.ahk"; DestDir: "{app}\Source_Elements\Default\Conditions"; Flags: ignoreversion
@@ -312,6 +322,7 @@ Source: "Source_Elements\Default\Loops\Work_through_a_list.ahk"; DestDir: "{app}
 Source: "Source_Elements\Default\Triggers\AutoHotkey_Script.ahk"; DestDir: "{app}\Source_Elements\Default\Triggers"; Flags: ignoreversion
 Source: "Source_Elements\Default\Triggers\Clipboard_Changes.ahk"; DestDir: "{app}\Source_Elements\Default\Triggers"; Flags: ignoreversion
 Source: "Source_Elements\Default\Triggers\Hotkey.ahk"; DestDir: "{app}\Source_Elements\Default\Triggers"; Flags: ignoreversion
+Source: "Source_Elements\Default\Triggers\Hotstring.ahk"; DestDir: "{app}\Source_Elements\Default\Triggers"; Flags: ignoreversion
 Source: "Source_Elements\Default\Triggers\Manual.ahk"; DestDir: "{app}\Source_Elements\Default\Triggers"; Flags: ignoreversion
 Source: "Source_Elements\Default\Triggers\Periodic_Timer.ahk"; DestDir: "{app}\Source_Elements\Default\Triggers"; Flags: ignoreversion
 Source: "Source_Elements\Default\Triggers\Process_closes.ahk"; DestDir: "{app}\Source_Elements\Default\Triggers"; Flags: ignoreversion
@@ -329,6 +340,7 @@ Source: "Source_Elements\Default\Icons\Bullhorn.png"; DestDir: "{app}\Source_Ele
 Source: "Source_Elements\Default\Icons\Keyboard.png"; DestDir: "{app}\Source_Elements\Default\Icons"; Flags: ignoreversion
 Source: "Source_Elements\Default\Icons\new Variable.png"; DestDir: "{app}\Source_Elements\Default\Icons"; Flags: ignoreversion
 Source: "Source_Elements\Default\Icons\Tooltip.png"; DestDir: "{app}\Source_Elements\Default\Icons"; Flags: ignoreversion
+Source: "Source_Elements\Default\Icons\yellow.png"; DestDir: "{app}\Source_Elements\Default\Icons"; Flags: ignoreversion
 Source: "Source_Elements\Default\Icons\Sleep.ico"; DestDir: "{app}\Source_Elements\Default\Icons"; Flags: ignoreversion
 Source: "Source_Elements\Default\manifest.json"; DestDir: "{app}\Source_Elements\Default"; Flags: ignoreversion
 Source: "Source_Elements\Default\language\en.ini"; DestDir: "{app}\Source_Elements\Default\language"; Flags: ignoreversion
@@ -338,6 +350,7 @@ Source: "Source_Elements\Default\help\en\Actions\activate_Window.html"; DestDir:
 Source: "Source_Elements\Default\help\en\Actions\Add_to_list.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\AutoHotKey_script.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Beep.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
+Source: "Source_Elements\Default\help\en\Actions\Block_user_input.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Change_character_case.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Change_Drive_Label.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Click.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
@@ -347,11 +360,13 @@ Source: "Source_Elements\Default\help\en\Actions\Convert_string_to_list.html"; D
 Source: "Source_Elements\Default\help\en\Actions\Copy_file.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Copy_folder.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Create_folder.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
+Source: "Source_Elements\Default\help\en\Actions\Create_shortcut.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Delete_file.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Delete_folder.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Delete_from_ini.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Delete_from_list.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Download_file.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
+Source: "Source_Elements\Default\help\en\Actions\Do_nothing.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Drag_with_mouse.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Eject_Drive.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Empty_recycle_bin.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
@@ -370,6 +385,7 @@ Source: "Source_Elements\Default\help\en\Actions\Get_list_info.html"; DestDir: "
 Source: "Source_Elements\Default\help\en\Actions\Get_mouse_position.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Get_pixel_color.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Get_Screen_Settings.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
+Source: "Source_Elements\Default\help\en\Actions\Get_shortcut_information.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Get_string_length.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Get_Volume.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Hibernate_Computer.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
@@ -410,6 +426,7 @@ Source: "Source_Elements\Default\help\en\Actions\Send_keystrokes.html"; DestDir:
 Source: "Source_Elements\Default\help\en\Actions\Send_keystrokes_To_Control.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Set_Clipboard.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Set_control_text.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
+Source: "Source_Elements\Default\help\en\Actions\Set_element_parameter.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Set_file_attributes.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Set_file_time.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Set_Flow_Status.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
@@ -423,6 +440,7 @@ Source: "Source_Elements\Default\help\en\Actions\shutdown.html"; DestDir: "{app}
 Source: "Source_Elements\Default\help\en\Actions\sleep.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Speech_output.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Split_a_string.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
+Source: "Source_Elements\Default\help\en\Actions\Split_path.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Square_root.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Stop_Flow.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Stop_Sound.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
@@ -439,6 +457,7 @@ Source: "Source_Elements\Default\help\en\Actions\Write_to_file.html"; DestDir: "
 Source: "Source_Elements\Default\help\en\Actions\Write_to_ini.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Conditions\confirmation_dialog.html"; DestDir: "{app}\Source_Elements\Default\help\en\Conditions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Conditions\Debug_dialog.html"; DestDir: "{app}\Source_Elements\Default\help\en\Conditions"; Flags: ignoreversion
+Source: "Source_Elements\Default\help\en\Conditions\Do_nothing.html"; DestDir: "{app}\Source_Elements\Default\help\en\Conditions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Conditions\Expression.html"; DestDir: "{app}\Source_Elements\Default\help\en\Conditions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Conditions\File_exists.html"; DestDir: "{app}\Source_Elements\Default\help\en\Conditions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Conditions\File_has_attribute.html"; DestDir: "{app}\Source_Elements\Default\help\en\Conditions"; Flags: ignoreversion
@@ -449,6 +468,7 @@ Source: "Source_Elements\Default\help\en\Conditions\List_contains_element.html";
 Source: "Source_Elements\Default\help\en\Conditions\Number is.html"; DestDir: "{app}\Source_Elements\Default\help\en\Conditions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Conditions\Process_is_running.html"; DestDir: "{app}\Source_Elements\Default\help\en\Conditions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Conditions\String_contains_text.html"; DestDir: "{app}\Source_Elements\Default\help\en\Conditions"; Flags: ignoreversion
+Source: "Source_Elements\Default\help\en\Conditions\Variable_content_is.html"; DestDir: "{app}\Source_Elements\Default\help\en\Conditions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Conditions\Variable_is_empty.html"; DestDir: "{app}\Source_Elements\Default\help\en\Conditions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Conditions\Window_active.html"; DestDir: "{app}\Source_Elements\Default\help\en\Conditions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Conditions\Window_exists.html"; DestDir: "{app}\Source_Elements\Default\help\en\Conditions"; Flags: ignoreversion
@@ -460,6 +480,7 @@ Source: "Source_Elements\Default\help\en\Loops\Work_through_a_list.html"; DestDi
 Source: "Source_Elements\Default\help\en\Triggers\AutoHotkey_Script.html"; DestDir: "{app}\Source_Elements\Default\help\en\Triggers"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Triggers\Clipboard_Changes.html"; DestDir: "{app}\Source_Elements\Default\help\en\Triggers"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Triggers\Hotkey.html"; DestDir: "{app}\Source_Elements\Default\help\en\Triggers"; Flags: ignoreversion
+Source: "Source_Elements\Default\help\en\Triggers\Hotstring.html"; DestDir: "{app}\Source_Elements\Default\help\en\Triggers"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Triggers\Manual.html"; DestDir: "{app}\Source_Elements\Default\help\en\Triggers"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Triggers\Periodic_Timer.html"; DestDir: "{app}\Source_Elements\Default\help\en\Triggers"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Triggers\Process_closes.html"; DestDir: "{app}\Source_Elements\Default\help\en\Triggers"; Flags: ignoreversion

@@ -1,24 +1,10 @@
-﻿{
+{
   "allConnections": {
     "connection0000000004": {
       "ConnectionType": "normal",
       "from": "element0000000001",
       "ID": "connection0000000004",
       "to": "element0000000030",
-      "type": "Connection"
-    },
-    "connection0000000011": {
-      "ConnectionType": "normal",
-      "from": "element0000000007",
-      "ID": "connection0000000011",
-      "to": "element0000000008",
-      "type": "Connection"
-    },
-    "connection0000000012": {
-      "ConnectionType": "Yes",
-      "from": "element0000000008",
-      "ID": "connection0000000012",
-      "to": "element0000000058",
       "type": "Connection"
     },
     "connection0000000021": {
@@ -91,13 +77,6 @@
       "to": "element0000000039",
       "type": "Connection"
     },
-    "connection0000000042": {
-      "ConnectionType": "Yes",
-      "from": "element0000000054",
-      "ID": "connection0000000042",
-      "to": "element0000000063",
-      "type": "Connection"
-    },
     "connection0000000044": {
       "ConnectionType": "normal",
       "from": "element0000000030",
@@ -133,27 +112,6 @@
       "to": "element0000000054",
       "type": "Connection"
     },
-    "connection0000000057": {
-      "ConnectionType": "normal",
-      "from": "element0000000052",
-      "ID": "connection0000000057",
-      "to": "element0000000056",
-      "type": "Connection"
-    },
-    "connection0000000061": {
-      "ConnectionType": "No",
-      "from": "element0000000059",
-      "ID": "connection0000000061",
-      "to": "element0000000060",
-      "type": "Connection"
-    },
-    "connection0000000062": {
-      "ConnectionType": "normal",
-      "from": "element0000000058",
-      "ID": "connection0000000062",
-      "to": "element0000000059",
-      "type": "Connection"
-    },
     "connection0000000064": {
       "ConnectionType": "normal",
       "from": "",
@@ -161,10 +119,10 @@
       "to": "",
       "type": "Connection"
     },
-    "connection0000000065": {
+    "connection0000000068": {
       "ConnectionType": "Yes",
-      "from": "element0000000063",
-      "ID": "connection0000000065",
+      "from": "element0000000054",
+      "ID": "connection0000000068",
       "to": "element0000000026",
       "type": "Connection"
     }
@@ -175,7 +133,8 @@
       "enabled": "0",
       "ID": "element0000000001",
       "name": "Hotkey - f6",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "ahk_class": "SALFRAME",
         "ahk_exe": "soffice.bin",
@@ -197,54 +156,14 @@
       "x": "385",
       "y": "0"
     },
-    "element0000000007": {
-      "class": "Trigger_Hotkey",
-      "enabled": "1",
-      "ID": "element0000000007",
-      "name": "Hotkey - F8",
-      "package": "default",
-      "pars": {
-        "ahk_class": "",
-        "ahk_exe": "",
-        "ahk_id": "",
-        "ahk_pid": "",
-        "BlockKey": 1,
-        "FindHiddenText": 0,
-        "FindHiddenWindow": 0,
-        "hotkey": "F8",
-        "TitleMatchMode": 1,
-        "UseWindow": "Everywhere",
-        "WhenRelease": 0,
-        "Wildcard": "0",
-        "winText": "",
-        "Wintitle": ""
-      },
-      "StandardName": "1",
-      "type": "Trigger",
-      "x": "980",
-      "y": "0"
-    },
-    "element0000000008": {
-      "class": "Condition_Key_Is_Down",
-      "ID": "element0000000008",
-      "name": "Key is down - f8",
-      "package": "default",
-      "pars": {
-        "key": "f8",
-        "WhichKeyState": "logical"
-      },
-      "StandardName": "1",
-      "type": "Condition",
-      "x": "980",
-      "y": "140"
-    },
     "element0000000015": {
       "class": "Trigger_Manual",
       "DefaultTrigger": "1",
       "enabled": "1",
       "ID": "element0000000015",
       "name": "Manual - \"Trigger left bicycle\"",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "ID": "Trigger left bicycle"
       },
@@ -257,9 +176,11 @@
       "class": "Action_New_variable",
       "ID": "element0000000016",
       "name": "New variable - static_trigger1 = 0",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "expression": "String",
+        "onlyIfNotExist": "0",
         "Varname": "static_trigger1",
         "VarValue": "0"
       },
@@ -272,7 +193,8 @@
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000017",
       "name": "Set flow status - Enable: This flow - All triggers",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "Enable": "Enable",
         "flowID": "",
@@ -289,9 +211,11 @@
       "class": "Action_New_variable",
       "ID": "element0000000018",
       "name": "New variable - static_trigger2 = 0",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "expression": "String",
+        "onlyIfNotExist": "0",
         "Varname": "static_trigger2",
         "VarValue": "0"
       },
@@ -304,9 +228,11 @@
       "class": "Action_New_variable",
       "ID": "element0000000019",
       "name": "New variable - static_trigger3 = 0",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "expression": "String",
+        "onlyIfNotExist": "0",
         "Varname": "static_trigger3",
         "VarValue": "0"
       },
@@ -319,9 +245,11 @@
       "class": "Action_New_variable",
       "ID": "element0000000020",
       "name": "New variable - static_trigger4 = 0",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "expression": "String",
+        "onlyIfNotExist": "0",
         "Varname": "static_trigger4",
         "VarValue": "0"
       },
@@ -334,7 +262,8 @@
       "class": "Action_Add_To_List",
       "ID": "element0000000026",
       "name": "Add To List - global_testResults - As last value - Value 'a_flowName'",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "DelimiterComma": 0,
         "DelimiterLinefeed": 1,
@@ -343,7 +272,6 @@
         "Expression": "Expression",
         "expressionPos": "String",
         "InsertMethod": "Insert",
-        "InsertMethodLabel": "",
         "NumberOfElements": "One",
         "Position": "keyName",
         "Varname": "global_testResults",
@@ -360,7 +288,8 @@
       "class": "Action_Send_keystrokes",
       "ID": "element0000000029",
       "name": "Send keystrokes - {f6}",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "KeysToSend": "{f6}",
         "KeysToSendContentType": "String",
@@ -376,9 +305,11 @@
       "class": "Action_New_variable",
       "ID": "element0000000030",
       "name": "New variable - static_trigger1 = 1",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "expression": "String",
+        "onlyIfNotExist": "0",
         "Varname": "static_trigger1",
         "VarValue": "1"
       },
@@ -391,7 +322,8 @@
       "class": "Action_Sleep",
       "ID": "element0000000033",
       "name": "Sleep: 1 s",
-      "package": "action",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "Duration": "1",
         "Unit": "Seconds"
@@ -405,7 +337,8 @@
       "class": "Condition_Expression",
       "ID": "element0000000036",
       "name": "Expression - static_trigger1",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "static_trigger1"
       },
@@ -418,7 +351,8 @@
       "class": "Action_Sleep",
       "ID": "element0000000038",
       "name": "Sleep: 1 s",
-      "package": "action",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "Duration": "1",
         "Unit": "Seconds"
@@ -432,7 +366,8 @@
       "class": "Condition_Expression",
       "ID": "element0000000039",
       "name": "Expression - static_trigger1",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "static_trigger1"
       },
@@ -445,7 +380,8 @@
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000043",
       "name": "Set flow status - Disable: This flow - Hotkey - f6",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "Enable": "Disable",
         "flowID": "",
@@ -462,9 +398,11 @@
       "class": "Action_New_variable",
       "ID": "element0000000046",
       "name": "New variable - static_trigger2 = 1",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "expression": "String",
+        "onlyIfNotExist": "0",
         "Varname": "static_trigger2",
         "VarValue": "1"
       },
@@ -477,7 +415,8 @@
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000047",
       "name": "Set flow status - Disable: This flow - Hotkey - ^f7",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "Enable": "Disable",
         "flowID": "",
@@ -495,7 +434,8 @@
       "enabled": "0",
       "ID": "element0000000050",
       "name": "Hotkey - ^f7",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "ahk_class": "Notepad",
         "ahk_exe": "notepad.exe",
@@ -521,7 +461,8 @@
       "class": "Action_Send_keystrokes",
       "ID": "element0000000052",
       "name": "Send keystrokes - ^{f7}",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "KeysToSend": "^{f7}",
         "KeysToSendContentType": "String",
@@ -537,7 +478,8 @@
       "class": "Condition_Expression",
       "ID": "element0000000054",
       "name": "Expression - static_trigger2",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "static_trigger2"
       },
@@ -545,89 +487,15 @@
       "type": "Condition",
       "x": "-210",
       "y": "1190"
-    },
-    "element0000000056": {
-      "class": "Action_Send_keystrokes",
-      "ID": "element0000000056",
-      "name": "Send keystrokes - {f8 down}",
-      "package": "default",
-      "pars": {
-        "KeysToSend": "{f8 down}",
-        "KeysToSendContentType": "String",
-        "RawMode": 0,
-        "SendMode": "Event"
-      },
-      "StandardName": "1",
-      "type": "Action",
-      "x": "-140",
-      "y": "910"
-    },
-    "element0000000058": {
-      "class": "Action_Send_keystrokes",
-      "ID": "element0000000058",
-      "name": "Send keystrokes - {f8 up}",
-      "package": "default",
-      "pars": {
-        "KeysToSend": "{f8 up}",
-        "KeysToSendContentType": "String",
-        "RawMode": 0,
-        "SendMode": "Event"
-      },
-      "StandardName": "1",
-      "type": "Action",
-      "x": "980",
-      "y": "280"
-    },
-    "element0000000059": {
-      "class": "Condition_Key_Is_Down",
-      "ID": "element0000000059",
-      "name": "Key is down - f8",
-      "package": "default",
-      "pars": {
-        "key": "f8",
-        "WhichKeyState": "physical"
-      },
-      "StandardName": "1",
-      "type": "Condition",
-      "x": "980",
-      "y": "420"
-    },
-    "element0000000060": {
-      "class": "Action_New_variable",
-      "ID": "element0000000060",
-      "name": "New variable - static_trigger3 = 1",
-      "package": "default",
-      "pars": {
-        "expression": "String",
-        "Varname": "static_trigger3",
-        "VarValue": "1"
-      },
-      "StandardName": "1",
-      "type": "Action",
-      "x": "980",
-      "y": "560"
-    },
-    "element0000000063": {
-      "class": "Condition_Expression",
-      "ID": "element0000000063",
-      "name": "Expression - static_trigger3",
-      "package": "default",
-      "pars": {
-        "Expression": "static_trigger3"
-      },
-      "StandardName": "1",
-      "type": "Condition",
-      "x": "0",
-      "y": "1190"
     }
   },
   "category": "Automatic tests",
-  "ElementIDCounter": "65",
+  "ElementIDCounter": "68",
   "flowSettings": {
     "DefaultWorkingDir": 1,
     "ExecutionPolicy": "default",
-    "Offsetx": "-1039.970755",
-    "Offsety": "-570.085510",
+    "Offsetx": "-1052.070742",
+    "Offsety": "-241.657281",
     "WorkingDir": "",
     "zoomFactor": "0.578513"
   },

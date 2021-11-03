@@ -1,12 +1,4 @@
-﻿;Always add this element class name to the global list
-x_RegisterElementClass("Action_Speech_output")
-
-;Element type of the element
-Element_getElementType_Action_Speech_output()
-{
-	return "Action"
-}
-
+﻿
 ;Name of the element
 Element_getName_Action_Speech_output()
 {
@@ -17,14 +9,6 @@ Element_getName_Action_Speech_output()
 Element_getCategory_Action_Speech_output()
 {
 	return x_lang("Sound") "|" x_lang("User_Interaction")
-}
-
-;This function returns the package of the element.
-;This is a reserved function for future releases,
-;where it will be possible to install additional add-ons which provide more elements.
-Element_getPackage_Action_Speech_output()
-{
-	return "default"
 }
 
 ;Minimum user experience to use this element.

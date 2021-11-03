@@ -1,12 +1,4 @@
-﻿;Always add this element class name to the global list
-x_RegisterElementClass("Loop_Parse_A_String")
-
-;Element type of the element
-Element_getElementType_Loop_Parse_A_String()
-{
-	return "Loop"
-}
-
+﻿
 ;Name of the element
 Element_getName_Loop_Parse_A_String()
 {
@@ -17,14 +9,6 @@ Element_getName_Loop_Parse_A_String()
 Element_getCategory_Loop_Parse_A_String()
 {
 	return x_lang("Variable")
-}
-
-;This function returns the package of the element.
-;This is a reserved function for future releases,
-;where it will be possible to install additional add-ons which provide more elements.
-Element_getPackage_Loop_Parse_A_String()
-{
-	return "default"
 }
 
 ;Minimum user experience to use this element.

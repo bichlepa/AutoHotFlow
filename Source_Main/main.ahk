@@ -2,7 +2,7 @@
 ;#Warn  ; Recommended for catching common errors.
 SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
 
-global _AHF_VERSION := "1.1.0"
+global _AHF_VERSION := "1.2.0"
 
 ; do not warn if a continuable exception occurs (it happens often when AHF is closing)
 #WarnContinuableException off
@@ -117,6 +117,7 @@ global global_libInclusionsForThreads, global_elementInclusionsForThreads
 #include source_Elements\Default\lib\Json\Jxon.ahk
 #include source_Elements\Default\lib\Yaml\Yaml.ahk
 #include source_Elements\Default\common\window functions.ahk
+#include source_Elements\Default\common\compatibility.ahk
 
 global_libInclusionsForThreads = 
 (
@@ -129,6 +130,7 @@ global_libInclusionsForThreads =
 #include source_Elements\Default\lib\Json\Jxon.ahk
 #include source_Elements\Default\lib\Yaml\Yaml.ahk
 #include source_Elements\Default\common\window functions.ahk
+#include source_Elements\Default\common\compatibility.ahk
 
 )
 
@@ -140,6 +142,7 @@ global_libInclusionsForThreads =
 #include Source_Main\Threads\Threads.ahk
 #include Source_Main\Api\API for Elements.ahk
 #include Source_Main\hidden window\hidden window.ahk
+#include Source_Main\Elements\Elements.ahk
 
 #include Source_Common\Multithreading\API Caller to Main.ahk
 #include Source_Common\Multithreading\API Caller to Manager.ahk
@@ -205,32 +208,35 @@ global_libInclusionsForThreads =
 #include source_Elements\Default\actions\Eject_Drive.ahk
 #include source_Elements\Default\actions\Change_Drive_Label.ahk
 #include source_Elements\Default\actions\Get_Drive_Information.ahk
-#include source_Elements\Default\actions\Lock_Or_Unlcock_Drive.ahk
+#include source_Elements\Default\actions\Lock_Or_Unlock_Drive.ahk
 #include source_Elements\Default\actions\List_Drives.ahk
-#include source_Elements\Default\actions\Compress_files.ahk
-#include source_Elements\Default\actions\Extract_files.ahk
+#include source_Elements\Default\actions\Read_From_File.ahk
+#include source_Elements\Default\actions\Write_To_File.ahk
 #include source_Elements\Default\actions\Copy_file.ahk
-#include source_Elements\Default\actions\Copy_folder.ahk
-#include source_Elements\Default\actions\Create_folder.ahk
+#include source_Elements\Default\actions\Move_File.ahk
+#include source_Elements\Default\actions\Rename_file.ahk
 #include source_Elements\Default\actions\Delete_file.ahk
+#include source_Elements\Default\actions\Create_folder.ahk
+#include source_Elements\Default\actions\Copy_folder.ahk
+#include source_Elements\Default\actions\Move_Folder.ahk
+#include source_Elements\Default\actions\Rename_Folder.ahk
 #include source_Elements\Default\actions\Delete_folder.ahk
 #include source_Elements\Default\actions\Empty_Recycle_bin.ahk
 #include source_Elements\Default\actions\Get_file_attributes.ahk
 #include source_Elements\Default\actions\Get_file_size.ahk
 #include source_Elements\Default\actions\Get_file_time.ahk
-#include source_Elements\Default\actions\Move_File.ahk
-#include source_Elements\Default\actions\Move_Folder.ahk
-#include source_Elements\Default\actions\Rename_file.ahk
-#include source_Elements\Default\actions\Rename_Folder.ahk
-#include source_Elements\Default\actions\Select_file.ahk
-#include source_Elements\Default\actions\Select_folder.ahk
 #include source_Elements\Default\actions\Set_file_attributes.ahk
 #include source_Elements\Default\actions\Set_file_time.ahk
-#include source_Elements\Default\actions\Write_To_File.ahk
-#include source_Elements\Default\actions\Read_From_File.ahk
+#include source_Elements\Default\actions\Get_shortcut_information.ahk
+#include source_Elements\Default\actions\Create_shortcut.ahk
+#include source_Elements\Default\actions\Select_file.ahk
+#include source_Elements\Default\actions\Select_folder.ahk
+#include source_Elements\Default\actions\Split_path.ahk
 #include source_Elements\Default\actions\Read_From_Ini.ahk
 #include source_Elements\Default\actions\Delete_From_Ini.ahk
 #include source_Elements\Default\actions\Write_to_ini.ahk
+#include source_Elements\Default\actions\Compress_files.ahk
+#include source_Elements\Default\actions\Extract_files.ahk
 #include source_Elements\Default\actions\Download_file.ahk
 #include source_Elements\Default\actions\HTTP_Request.ahk
 #include source_Elements\Default\actions\Screenshot.ahk
@@ -254,6 +260,7 @@ global_libInclusionsForThreads =
 #include source_Elements\Default\actions\Send_Keystrokes.ahk
 #include source_Elements\Default\actions\Send_Keystrokes_To_Control.ahk
 #include source_Elements\Default\actions\Set_Lock_Key.ahk
+#include source_Elements\Default\actions\Block_user_input.ahk
 #include source_Elements\Default\actions\Play_Sound.ahk
 #include source_Elements\Default\actions\Stop_Sound.ahk
 #include source_Elements\Default\actions\Beep.ahk
@@ -270,17 +277,20 @@ global_libInclusionsForThreads =
 #include source_Elements\Default\actions\Hibernate_Computer.ahk
 #include source_Elements\Default\actions\Suspend_Computer.ahk
 #include source_Elements\Default\actions\Sleep.ahk
+#include source_Elements\Default\actions\Do_nothing.ahk
 #include source_Elements\Default\actions\Set_Flow_Status.ahk
 #include source_Elements\Default\actions\Execute_Flow.ahk
 #include source_Elements\Default\actions\Stop_Flow.ahk
+#include source_Elements\Default\actions\Set_element_parameter.ahk
 #include source_Elements\Default\actions\AutoHotkey_script.ahk
 #include source_Elements\Default\actions\Trace_Point.ahk
 #include source_Elements\Default\actions\Trace_Point_Check.ahk
 #include source_Elements\Default\conditions\Expression.ahk
 #include source_Elements\Default\conditions\Variable_Is_Empty.ahk
+#include source_Elements\Default\conditions\Variable_content_is.ahk
 #include source_Elements\Default\conditions\List_Contains_Element.ahk
 #include source_Elements\Default\conditions\String_Contains_Text.ahk
-#include source_Elements\Default\conditions\Number_is.ahk
+#include source_Elements\Default\conditions\NumberIs.ahk
 #include source_Elements\Default\conditions\File_Exists.ahk
 #include source_Elements\Default\conditions\File_Has_Attribute.ahk
 #include source_Elements\Default\conditions\Confirmation_Dialog.ahk
@@ -289,6 +299,7 @@ global_libInclusionsForThreads =
 #include source_Elements\Default\conditions\Window_Active.ahk
 #include source_Elements\Default\conditions\Window_Exists.ahk
 #include source_Elements\Default\conditions\Process_Is_Running.ahk
+#include source_Elements\Default\conditions\Do_nothing.ahk
 #include source_Elements\Default\conditions\Flow_Enabled.ahk
 #include source_Elements\Default\conditions\Flow_Running.ahk
 #include source_Elements\Default\loops\SimpleLoop.ahk
@@ -302,6 +313,7 @@ global_libInclusionsForThreads =
 #include source_Elements\Default\triggers\User_Idle_Time.ahk
 #include source_Elements\Default\triggers\Clipboard_Changes.ahk
 #include source_Elements\Default\triggers\Hotkey.ahk
+#include source_Elements\Default\triggers\Hotstring.ahk
 #include source_Elements\Default\triggers\Shortcut.ahk
 #include source_Elements\Default\triggers\Window_opens.ahk
 #include source_Elements\Default\triggers\Window_closes.ahk
@@ -349,32 +361,35 @@ global_elementInclusionsForThreads =
 #include source_Elements\Default\actions\Eject_Drive.ahk
 #include source_Elements\Default\actions\Change_Drive_Label.ahk
 #include source_Elements\Default\actions\Get_Drive_Information.ahk
-#include source_Elements\Default\actions\Lock_Or_Unlcock_Drive.ahk
+#include source_Elements\Default\actions\Lock_Or_Unlock_Drive.ahk
 #include source_Elements\Default\actions\List_Drives.ahk
-#include source_Elements\Default\actions\Compress_files.ahk
-#include source_Elements\Default\actions\Extract_files.ahk
+#include source_Elements\Default\actions\Read_From_File.ahk
+#include source_Elements\Default\actions\Write_To_File.ahk
 #include source_Elements\Default\actions\Copy_file.ahk
-#include source_Elements\Default\actions\Copy_folder.ahk
-#include source_Elements\Default\actions\Create_folder.ahk
+#include source_Elements\Default\actions\Move_File.ahk
+#include source_Elements\Default\actions\Rename_file.ahk
 #include source_Elements\Default\actions\Delete_file.ahk
+#include source_Elements\Default\actions\Create_folder.ahk
+#include source_Elements\Default\actions\Copy_folder.ahk
+#include source_Elements\Default\actions\Move_Folder.ahk
+#include source_Elements\Default\actions\Rename_Folder.ahk
 #include source_Elements\Default\actions\Delete_folder.ahk
 #include source_Elements\Default\actions\Empty_Recycle_bin.ahk
 #include source_Elements\Default\actions\Get_file_attributes.ahk
 #include source_Elements\Default\actions\Get_file_size.ahk
 #include source_Elements\Default\actions\Get_file_time.ahk
-#include source_Elements\Default\actions\Move_File.ahk
-#include source_Elements\Default\actions\Move_Folder.ahk
-#include source_Elements\Default\actions\Rename_file.ahk
-#include source_Elements\Default\actions\Rename_Folder.ahk
-#include source_Elements\Default\actions\Select_file.ahk
-#include source_Elements\Default\actions\Select_folder.ahk
 #include source_Elements\Default\actions\Set_file_attributes.ahk
 #include source_Elements\Default\actions\Set_file_time.ahk
-#include source_Elements\Default\actions\Write_To_File.ahk
-#include source_Elements\Default\actions\Read_From_File.ahk
+#include source_Elements\Default\actions\Get_shortcut_information.ahk
+#include source_Elements\Default\actions\Create_shortcut.ahk
+#include source_Elements\Default\actions\Select_file.ahk
+#include source_Elements\Default\actions\Select_folder.ahk
+#include source_Elements\Default\actions\Split_path.ahk
 #include source_Elements\Default\actions\Read_From_Ini.ahk
 #include source_Elements\Default\actions\Delete_From_Ini.ahk
 #include source_Elements\Default\actions\Write_to_ini.ahk
+#include source_Elements\Default\actions\Compress_files.ahk
+#include source_Elements\Default\actions\Extract_files.ahk
 #include source_Elements\Default\actions\Download_file.ahk
 #include source_Elements\Default\actions\HTTP_Request.ahk
 #include source_Elements\Default\actions\Screenshot.ahk
@@ -398,6 +413,7 @@ global_elementInclusionsForThreads =
 #include source_Elements\Default\actions\Send_Keystrokes.ahk
 #include source_Elements\Default\actions\Send_Keystrokes_To_Control.ahk
 #include source_Elements\Default\actions\Set_Lock_Key.ahk
+#include source_Elements\Default\actions\Block_user_input.ahk
 #include source_Elements\Default\actions\Play_Sound.ahk
 #include source_Elements\Default\actions\Stop_Sound.ahk
 #include source_Elements\Default\actions\Beep.ahk
@@ -414,17 +430,20 @@ global_elementInclusionsForThreads =
 #include source_Elements\Default\actions\Hibernate_Computer.ahk
 #include source_Elements\Default\actions\Suspend_Computer.ahk
 #include source_Elements\Default\actions\Sleep.ahk
+#include source_Elements\Default\actions\Do_nothing.ahk
 #include source_Elements\Default\actions\Set_Flow_Status.ahk
 #include source_Elements\Default\actions\Execute_Flow.ahk
 #include source_Elements\Default\actions\Stop_Flow.ahk
+#include source_Elements\Default\actions\Set_element_parameter.ahk
 #include source_Elements\Default\actions\AutoHotkey_script.ahk
 #include source_Elements\Default\actions\Trace_Point.ahk
 #include source_Elements\Default\actions\Trace_Point_Check.ahk
 #include source_Elements\Default\conditions\Expression.ahk
 #include source_Elements\Default\conditions\Variable_Is_Empty.ahk
+#include source_Elements\Default\conditions\Variable_content_is.ahk
 #include source_Elements\Default\conditions\List_Contains_Element.ahk
 #include source_Elements\Default\conditions\String_Contains_Text.ahk
-#include source_Elements\Default\conditions\Number_is.ahk
+#include source_Elements\Default\conditions\NumberIs.ahk
 #include source_Elements\Default\conditions\File_Exists.ahk
 #include source_Elements\Default\conditions\File_Has_Attribute.ahk
 #include source_Elements\Default\conditions\Confirmation_Dialog.ahk
@@ -433,6 +452,7 @@ global_elementInclusionsForThreads =
 #include source_Elements\Default\conditions\Window_Active.ahk
 #include source_Elements\Default\conditions\Window_Exists.ahk
 #include source_Elements\Default\conditions\Process_Is_Running.ahk
+#include source_Elements\Default\conditions\Do_nothing.ahk
 #include source_Elements\Default\conditions\Flow_Enabled.ahk
 #include source_Elements\Default\conditions\Flow_Running.ahk
 #include source_Elements\Default\loops\SimpleLoop.ahk
@@ -446,6 +466,7 @@ global_elementInclusionsForThreads =
 #include source_Elements\Default\triggers\User_Idle_Time.ahk
 #include source_Elements\Default\triggers\Clipboard_Changes.ahk
 #include source_Elements\Default\triggers\Hotkey.ahk
+#include source_Elements\Default\triggers\Hotstring.ahk
 #include source_Elements\Default\triggers\Shortcut.ahk
 #include source_Elements\Default\triggers\Window_opens.ahk
 #include source_Elements\Default\triggers\Window_closes.ahk
@@ -459,6 +480,17 @@ global_elementInclusionsForThreads =
 )
 
 ;Element_Includes_End
+
+; read package Informations
+packageInfo := []
+
+;PackageInfos_StartpackageInfo["Default"] := []
+
+;PackageInfos_End
+_setShared("packageInfo", packageInfo)
+
+; check the implementation of elements
+Check_Packages()
 
 ;Start other threads. Multi-threading gain the performance heavily
 ;and execution of flows does not lower the GUI performance.

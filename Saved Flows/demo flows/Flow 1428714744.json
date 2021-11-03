@@ -64,7 +64,8 @@
       "enabled": "0",
       "ID": "element0000000001",
       "name": "Manual - \"Trigger sad bird\"",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "ID": "Trigger sad bird"
       },
@@ -76,8 +77,9 @@
     "element0000000002": {
       "class": "Action_Message_Box",
       "ID": "element0000000002",
-      "name": "Message Box - Pet guesser - Think of one of those pets: - Cat - Dog - Horse - Rabbit",
-      "package": "default",
+      "name": "Message box - Pet guesser - Think of one of those pets: - Cat - Dog - Horse - Rabbit",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "ButtonLabel": "OK",
         "ButtonLabelCancel": "Cancel",
@@ -101,8 +103,9 @@
     "element0000000005": {
       "class": "Condition_Confirmation_Dialog",
       "ID": "element0000000005",
-      "name": "Confirmation Dialog - Question, Does your pet like meat?",
-      "package": "default",
+      "name": "Confirmation dialog - Question, Does your pet like meat?",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "ButtonLabelCancel": "Cancel",
         "ButtonLabelNo": "No",
@@ -127,8 +130,9 @@
     "element0000000009": {
       "class": "Condition_Confirmation_Dialog",
       "ID": "element0000000009",
-      "name": "Confirmation Dialog - Question, Can your pet bark?",
-      "package": "default",
+      "name": "Confirmation dialog - Question, Can your pet bark?",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "ButtonLabelCancel": "Cancel",
         "ButtonLabelNo": "No",
@@ -153,8 +157,9 @@
     "element0000000010": {
       "class": "Condition_Confirmation_Dialog",
       "ID": "element0000000010",
-      "name": "Confirmation Dialog - Question, Can you sit on your pet?",
-      "package": "default",
+      "name": "Confirmation dialog - Question, Can you sit on your pet?",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "ButtonLabelCancel": "Cancel",
         "ButtonLabelNo": "No",
@@ -179,8 +184,9 @@
     "element0000000013": {
       "class": "Action_Message_Box",
       "ID": "element0000000013",
-      "name": "Message Box - Yout pet - It's a dog!",
-      "package": "default",
+      "name": "Message box - Yout pet - It's a dog!",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "ButtonLabel": "OK",
         "ButtonLabelCancel": "Cancel",
@@ -204,8 +210,9 @@
     "element0000000015": {
       "class": "Action_Message_Box",
       "ID": "element0000000015",
-      "name": "Message Box - Yout pet - It's a cat!",
-      "package": "default",
+      "name": "Message box - Yout pet - It's a cat!",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "ButtonLabel": "OK",
         "ButtonLabelCancel": "Cancel",
@@ -229,8 +236,9 @@
     "element0000000016": {
       "class": "Action_Message_Box",
       "ID": "element0000000016",
-      "name": "Message Box - Yout pet - It's a horse!",
-      "package": "default",
+      "name": "Message box - Yout pet - It's a horse!",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "ButtonLabel": "OK",
         "ButtonLabelCancel": "Cancel",
@@ -254,8 +262,9 @@
     "element0000000017": {
       "class": "Action_Message_Box",
       "ID": "element0000000017",
-      "name": "Message Box - Yout pet - It's a rabbit!",
-      "package": "default",
+      "name": "Message box - Yout pet - It's a rabbit!",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "ButtonLabel": "OK",
         "ButtonLabelCancel": "Cancel",

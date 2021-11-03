@@ -1,12 +1,4 @@
-﻿;Always add this element class name to the global list
-x_RegisterElementClass("Action_Shutdown")
-
-;Element type of the element
-Element_getElementType_Action_Shutdown()
-{
-	return "Action"
-}
-
+﻿
 ;Name of the element
 Element_getName_Action_Shutdown()
 {
@@ -17,14 +9,6 @@ Element_getName_Action_Shutdown()
 Element_getCategory_Action_Shutdown()
 {
 	return x_lang("Power")
-}
-
-;This function returns the package of the element.
-;This is a reserved function for future releases,
-;where it will be possible to install additional add-ons which provide more elements.
-Element_getPackage_Action_Shutdown()
-{
-	return "default"
 }
 
 ;Minimum user experience to use this element.
@@ -53,7 +37,8 @@ Element_getParametrizationDetails_Action_Shutdown(Environment)
 {
 	parametersToEdit:=Object()
 	
-	
+	parametersToEdit.push({type: "Label", label: x_lang("Force #verb")})
+	parametersToEdit.push({type: "Checkbox", id: "Force", default: 0, label: x_lang("Force (this can cause loss of data!)")})
 	
 	return parametersToEdit
 }
@@ -61,7 +46,11 @@ Element_getParametrizationDetails_Action_Shutdown(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_Shutdown(Environment, ElementParameters)
 {
-	return x_lang("Shutdown") 
+	if (ElementParameters.Force)
+		return x_lang("Shutdown")
+	Else
+		return x_lang("Shutdown (force)")
+		
 }
 
 ;Called every time the user changes any parameter.
@@ -78,8 +67,15 @@ Element_CheckSettings_Action_Shutdown(Environment, ElementParameters, staticValu
 ;This is the most important function where you can code what the element acutally should do.
 Element_run_Action_Shutdown(Environment, ElementParameters)
 {
+	; initialize option (9 is Shutdown and power off)
+	shutDownOption := 9
 
-	shutdown,9 ;Shutdown and power off
+	if (ElementParameters.Force)
+		shutDownOption += 4 ; add force option
+
+	; reboot computer
+	shutdown, % shutDownOption
+
 	x_finish(Environment,"normal")
 	return
 	

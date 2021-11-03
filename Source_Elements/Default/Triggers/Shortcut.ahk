@@ -1,12 +1,4 @@
-﻿;Always add this element class name to the global list
-x_RegisterElementClass("Trigger_Shortcut")
-
-;Element type of the element
-Element_getElementType_Trigger_Shortcut()
-{
-	return "Trigger"
-}
-
+﻿
 ;Name of the element
 Element_getName_Trigger_Shortcut()
 {
@@ -17,14 +9,6 @@ Element_getName_Trigger_Shortcut()
 Element_getCategory_Trigger_Shortcut()
 {
 	return x_lang("User_interaction")
-}
-
-;This function returns the package of the element.
-;This is a reserved function for future releases,
-;where it will be possible to install additional add-ons which provide more elements.
-Element_getPackage_Trigger_Shortcut()
-{
-	return "default"
 }
 
 ;Minimum user experience to use this element.

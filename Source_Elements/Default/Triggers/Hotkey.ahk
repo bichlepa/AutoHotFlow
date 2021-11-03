@@ -1,12 +1,4 @@
-﻿;Always add this element class name to the global list
-x_RegisterElementClass("Trigger_Hotkey")
-
-;Element type of the element
-Element_getElementType_Trigger_Hotkey()
-{
-	return "trigger"
-}
-
+﻿
 ;Name of the element
 Element_getName_Trigger_Hotkey()
 {
@@ -17,14 +9,6 @@ Element_getName_Trigger_Hotkey()
 Element_getCategory_Trigger_Hotkey()
 {
 	return x_lang("User_interaction")
-}
-
-;This function returns the package of the element.
-;This is a reserved function for future releases,
-;where it will be possible to install additional add-ons which provide more elements.
-Element_getPackage_Trigger_Hotkey()
-{
-	return "default"
 }
 
 ;Minimum user experience to use this element.
@@ -172,18 +156,18 @@ Element_enable_Trigger_Hotkey(Environment, ElementParameters)
 	; create a function object
 	functionObject:= x_NewFunctionObject(environment, "Trigger_Hotkey_Trigger", EvaluatedParameters)
 	x_SetTriggerValue(Environment, "functionObject", functionObject)
-	x_SetTriggerValue(Environment, "fullHotkey", fullHotkey)
+	x_SetTriggerValue(Environment, "fullHotkey", EvaluatedParameters.fullHotkey)
 
 	; enable the hotkey
 	hotkey, % EvaluatedParameters.fullHotkey, % functionObject, UseErrorLevel on
 	if ErrorLevel
 	{
-		x_enabled(Environment, "exception", x_lang("The hotkey %1% cannot be set!", fullHotkey))
+		x_enabled(Environment, "exception", x_lang("The hotkey %1% cannot be set!", EvaluatedParameters.fullHotkey))
 		return
 	}
 
 	; finish and return true
-	x_enabled(Environment, "normal", x_lang("The hotkey %1% was set.", fullHotkey))
+	x_enabled(Environment, "normal", x_lang("The hotkey %1% was set.", EvaluatedParameters.fullHotkey))
 	return true
 }
 ;Called after the trigger has triggered.

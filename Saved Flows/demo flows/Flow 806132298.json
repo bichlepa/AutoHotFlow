@@ -106,7 +106,8 @@
       "enabled": "0",
       "ID": "element0000000001",
       "name": "Manual - \"Trigger joke teller\"",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "ID": "Trigger joke teller"
       },
@@ -118,8 +119,9 @@
     "element0000000002": {
       "class": "Action_HTTP_Request",
       "ID": "element0000000002",
-      "name": "HTTP Request",
-      "package": "default",
+      "name": "HTTP request",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "BypassProxy": "",
         "Codepage": "",
@@ -159,8 +161,9 @@
     "element0000000006": {
       "class": "Action_Tooltip",
       "ID": "element0000000006",
-      "name": "Tooltip: %joke% - 10 s - Follow Mouse",
-      "package": "action",
+      "name": "Tooltip: %joke% - 10 s - Follow mouse",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "duration": "10",
         "follow_mouse": 1,
@@ -176,7 +179,8 @@
       "class": "Action_Search_in_a_string",
       "ID": "element0000000010",
       "name": "Search in a string - posLeft - HTTPResponseData - leftString",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "CaseSensitive": "CaseInsensitive",
         "Expression": "Expression",
@@ -197,9 +201,11 @@
       "class": "Action_New_variable",
       "ID": "element0000000013",
       "name": "New variable - leftString = <p class=\"subtitle\">",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "expression": "String",
+        "onlyIfNotExist": "0",
         "Varname": "leftString",
         "VarValue": "<p class=\"subtitle\">"
       },
@@ -212,7 +218,8 @@
       "class": "Action_Search_in_a_string",
       "ID": "element0000000014",
       "name": "Search in a string - posRight - HTTPResponseData - <\/p>",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "CaseSensitive": "CaseInsensitive",
         "Expression": "Expression",
@@ -233,9 +240,11 @@
       "class": "Action_New_variable",
       "ID": "element0000000015",
       "name": "New variable - rightString = <\/p>",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "expression": "String",
+        "onlyIfNotExist": "0",
         "Varname": "rightString",
         "VarValue": "<\/p>"
       },
@@ -248,7 +257,8 @@
       "class": "Action_Substring",
       "ID": "element0000000018",
       "name": "Substring - joke - HTTPResponseData",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "expression": "Expression",
         "LeftOrRight": "GoRight",
@@ -267,8 +277,9 @@
     "element0000000021": {
       "class": "Action_Get_String_Length",
       "ID": "element0000000021",
-      "name": "Get String Length - leftLength = Length of leftString",
-      "package": "default",
+      "name": "Get string length - leftLength = Length of leftString",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "expression": "Expression",
         "Varname": "leftLength",
@@ -283,7 +294,8 @@
       "class": "Action_Speech_output",
       "ID": "element0000000024",
       "name": "Speech output -  - Microsoft Zira Desktop",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "pitch": 0,
         "speed": 0,
@@ -302,7 +314,8 @@
       "class": "Action_replace_in_a_string",
       "ID": "element0000000030",
       "name": "Replace in a string - joke - joke - <\/br> -  ",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.1.0",
       "pars": {
         "CaseSensitive": "CaseInsensitive",
         "expression": "Expression",

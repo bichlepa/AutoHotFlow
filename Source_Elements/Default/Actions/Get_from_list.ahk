@@ -1,12 +1,4 @@
-﻿;Always add this element class name to the global list
-x_RegisterElementClass("Action_Get_From_List")
-
-;Element type of the element
-Element_getElementType_Action_Get_From_List()
-{
-	return "action"
-}
-
+﻿
 ;Name of the element
 Element_getName_Action_Get_From_List()
 {
@@ -17,14 +9,6 @@ Element_getName_Action_Get_From_List()
 Element_getCategory_Action_Get_From_List()
 {
 	return x_lang("List")
-}
-
-;This function returns the package of the element.
-;This is a reserved function for future releases,
-;where it will be possible to install additional add-ons which provide more elements.
-Element_getPackage_Action_Get_From_List()
-{
-	return "default"
 }
 
 ;Minimum user experience to use this element.
@@ -86,7 +70,7 @@ Element_GenerateName_Action_Get_From_List(Environment, ElementParameters)
 	{
 		PositionText .= x_lang("At position '%1%'", ElementParameters.Position)
 	}
-	return lang("Get from list %1%", ElementParameters.ListName) PositionText " - " ElementParameters.Varname
+	return x_lang("Get from list %1%", ElementParameters.ListName) PositionText " - " ElementParameters.Varname
 }
 
 ;Called every time the user changes any parameter.

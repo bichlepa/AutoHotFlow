@@ -1,12 +1,4 @@
-﻿;Always add this element class name to the global list
-x_RegisterElementClass("Action_Search_Image")
-
-;Element type of the element
-Element_getElementType_Action_Search_Image()
-{
-	return "Action"
-}
-
+﻿
 ;Name of the element
 Element_getName_Action_Search_Image()
 {
@@ -17,14 +9,6 @@ Element_getName_Action_Search_Image()
 Element_getCategory_Action_Search_Image()
 {
 	return x_lang("Image")
-}
-
-;This function returns the package of the element.
-;This is a reserved function for future releases,
-;where it will be possible to install additional add-ons which provide more elements.
-Element_getPackage_Action_Search_Image()
-{
-	return "default"
 }
 
 ;Minimum user experience to use this element.
@@ -70,8 +54,7 @@ Element_getParametrizationDetails_Action_Search_Image(Environment)
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Image file path")})
 	parametersToEdit.push({type: "File", id: "file", label: x_lang("Select a file"), options: 8, filter: x_lang("Images and icons") " (*.gif; *.jpg; *.bmp; *.ico; *.cur; *.ani; *.png; *.tif; *.exif; *.wmf; *.emf; *.exe; *.dll; *.cpl; *.scr)"})
-	
-	parametersToEdit.push({type: "Label", label: x_lang("File with multiple icons")})
+	parametersToEdit.push({type: "Label", label: x_lang("File with multiple icons"), size: "small"})
 	parametersToEdit.push({type: "Checkbox", id: "SetIconNumber", default: 0, label: x_lang("Set icon number")})
 	parametersToEdit.push({type: "Edit", id: "IconNumber", default: 1, content: "PositiveInteger", WarnIfEmpty: true})
 	

@@ -1,12 +1,4 @@
-﻿;Always add this element class name to the global list
-x_RegisterElementClass("Action_Select_file")
-
-;Element type of the element
-Element_getElementType_Action_Select_file()
-{
-	return "action"
-}
-
+﻿
 ;Name of the element
 Element_getName_Action_Select_file()
 {
@@ -17,14 +9,6 @@ Element_getName_Action_Select_file()
 Element_getCategory_Action_Select_file()
 {
 	return x_lang("User_interaction") "|" x_lang("File")
-}
-
-;This function returns the package of the element.
-;This is a reserved function for future releases,
-;where it will be possible to install additional add-ons which provide more elements.
-Element_getPackage_Action_Select_file()
-{
-	return "default"
 }
 
 ;Minimum user experience to use this element.

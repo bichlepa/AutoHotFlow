@@ -1,12 +1,4 @@
-﻿;Always add this element class name to the global list
-x_RegisterElementClass("Action_replace_in_a_string")
-
-;Element type of the element
-Element_getElementType_Action_replace_in_a_string()
-{
-	return "Action"
-}
-
+﻿
 ;Name of the element
 Element_getName_Action_replace_in_a_string()
 {
@@ -17,14 +9,6 @@ Element_getName_Action_replace_in_a_string()
 Element_getCategory_Action_replace_in_a_string()
 {
 	return x_lang("Text")
-}
-
-;This function returns the package of the element.
-;This is a reserved function for future releases,
-;where it will be possible to install additional add-ons which provide more elements.
-Element_getPackage_Action_replace_in_a_string()
-{
-	return "default"
 }
 
 ;Minimum user experience to use this element.
@@ -66,7 +50,7 @@ Element_getParametrizationDetails_Action_replace_in_a_string(Environment)
 	parametersToEdit.push({type: "Edit", id: "ReplaceText", default: "%a_username%", content: "String", WarnIfEmpty: true})
 
 	parametersToEdit.push({type: "Label", label: x_lang("Number of replacements")})
-	parametersToEdit.push({type: "Radio", id: "ReplaceAll", default: "first", choices: [lang("Replace only the first occurence"), lang("Replace all occurences")], result: "enum", enum: ["first", "all"]})
+	parametersToEdit.push({type: "Radio", id: "ReplaceAll", default: "first", choices: [x_lang("Replace only the first occurence"), x_lang("Replace all occurences")], result: "enum", enum: ["first", "all"]})
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Case sensitivity")})
 	parametersToEdit.push({type: "Radio", id: "CaseSensitive", default: "CaseInsensitive", choices: [x_lang("Case insensitive"), x_lang("Case sensitive")], result: "enum", enum: ["CaseInsensitive", "CaseSensitive"]})
