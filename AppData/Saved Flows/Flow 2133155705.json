@@ -1,4 +1,4 @@
-﻿{
+{
   "allConnections": {
     "connection0000000004": {
       "ConnectionType": "normal",
@@ -134,7 +134,7 @@
       "ID": "element0000000001",
       "name": "Hotkey - f6",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "ahk_class": "SALFRAME",
         "ahk_exe": "soffice.bin",
@@ -163,7 +163,7 @@
       "ID": "element0000000015",
       "name": "Manual - \"Trigger left bicycle\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "ID": "Trigger left bicycle"
       },
@@ -177,7 +177,7 @@
       "ID": "element0000000016",
       "name": "New variable - static_trigger1 = 0",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "expression": "String",
         "onlyIfNotExist": "0",
@@ -194,7 +194,7 @@
       "ID": "element0000000017",
       "name": "Set flow status - Enable: This flow - All triggers",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Enable": "Enable",
         "flowID": "",
@@ -212,7 +212,7 @@
       "ID": "element0000000018",
       "name": "New variable - static_trigger2 = 0",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "expression": "String",
         "onlyIfNotExist": "0",
@@ -229,7 +229,7 @@
       "ID": "element0000000019",
       "name": "New variable - static_trigger3 = 0",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "expression": "String",
         "onlyIfNotExist": "0",
@@ -246,7 +246,7 @@
       "ID": "element0000000020",
       "name": "New variable - static_trigger4 = 0",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "expression": "String",
         "onlyIfNotExist": "0",
@@ -263,7 +263,7 @@
       "ID": "element0000000026",
       "name": "Add To List - global_testResults - As last value - Value 'a_flowName'",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "DelimiterComma": 0,
         "DelimiterLinefeed": 1,
@@ -289,7 +289,7 @@
       "ID": "element0000000029",
       "name": "Send keystrokes - {f6}",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "KeysToSend": "{f6}",
         "KeysToSendContentType": "String",
@@ -306,7 +306,7 @@
       "ID": "element0000000030",
       "name": "New variable - static_trigger1 = 1",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "expression": "String",
         "onlyIfNotExist": "0",
@@ -323,7 +323,7 @@
       "ID": "element0000000033",
       "name": "Sleep: 1 s",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Duration": "1",
         "Unit": "Seconds"
@@ -338,7 +338,7 @@
       "ID": "element0000000036",
       "name": "Expression - static_trigger1",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "static_trigger1"
       },
@@ -352,7 +352,7 @@
       "ID": "element0000000038",
       "name": "Sleep: 1 s",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Duration": "1",
         "Unit": "Seconds"
@@ -367,7 +367,7 @@
       "ID": "element0000000039",
       "name": "Expression - static_trigger1",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "static_trigger1"
       },
@@ -381,7 +381,7 @@
       "ID": "element0000000043",
       "name": "Set flow status - Disable: This flow - Hotkey - f6",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Enable": "Disable",
         "flowID": "",
@@ -399,7 +399,7 @@
       "ID": "element0000000046",
       "name": "New variable - static_trigger2 = 1",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "expression": "String",
         "onlyIfNotExist": "0",
@@ -416,7 +416,7 @@
       "ID": "element0000000047",
       "name": "Set flow status - Disable: This flow - Hotkey - ^f7",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Enable": "Disable",
         "flowID": "",
@@ -435,7 +435,7 @@
       "ID": "element0000000050",
       "name": "Hotkey - ^f7",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "ahk_class": "Notepad",
         "ahk_exe": "notepad.exe",
@@ -462,7 +462,7 @@
       "ID": "element0000000052",
       "name": "Send keystrokes - ^{f7}",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "KeysToSend": "^{f7}",
         "KeysToSendContentType": "String",
@@ -479,7 +479,7 @@
       "ID": "element0000000054",
       "name": "Expression - static_trigger2",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "static_trigger2"
       },

@@ -674,7 +674,7 @@
       "ID": "element0000000001",
       "name": "Manual - \"Trigger bright bus\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "ID": "Trigger bright bus"
       },
@@ -690,7 +690,7 @@
       "ID": "element0000000023",
       "name": "Manual - \"Confirmation Normal\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "ID": "Confirmation Normal"
       },
@@ -704,7 +704,7 @@
       "ID": "element0000000024",
       "name": "Confirmation dialog - Dialog Test Title, Dialog Test Text",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "ButtonLabelCancel": "Dialog test cancel",
         "ButtonLabelNo": "Dialog test no",
@@ -731,7 +731,7 @@
       "ID": "element0000000027",
       "name": "New variable - static_dialogResult = a_useraction",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "expression": "Expression",
         "onlyIfNotExist": 0,
@@ -748,7 +748,7 @@
       "ID": "element0000000032",
       "name": "New variable - static_dialogResult = a_useraction",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "expression": "Expression",
         "onlyIfNotExist": 0,
@@ -765,7 +765,7 @@
       "ID": "element0000000034",
       "name": "New variable - static_dialogResult = a_useraction",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "expression": "Expression",
         "onlyIfNotExist": 0,
@@ -782,7 +782,7 @@
       "ID": "element0000000039",
       "name": "Execute flow: This flow - Manual - \"Confirmation Normal\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "flowID": "",
         "ReturnVariables": 0,
@@ -803,7 +803,7 @@
       "ID": "element0000000047",
       "name": "Get control text:  - Control text Dialog Test Text - Title begins with: Dialog Test Title - Window class: AutoHotkeyGUI - Process: AutoHotFlow.exe",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "ahk_class": "AutoHotkeyGUI",
         "ahk_exe": "AutoHotFlow.exe",
@@ -831,7 +831,7 @@
       "ID": "element0000000048",
       "name": "Get control text:  - Control class Button1 - Title begins with: Dialog Test Title - Window class: AutoHotkeyGUI - Process: AutoHotFlow.exe",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "ahk_class": "AutoHotkeyGUI",
         "ahk_exe": "AutoHotFlow.exe",
@@ -859,7 +859,7 @@
       "ID": "element0000000050",
       "name": "Get control text:  - Control class Button2 - Title begins with: Dialog Test Title - Window class: AutoHotkeyGUI - Process: AutoHotFlow.exe",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "ahk_class": "AutoHotkeyGUI",
         "ahk_exe": "AutoHotFlow.exe",
@@ -887,7 +887,7 @@
       "ID": "element0000000051",
       "name": "Get control text:  - Control class Button3 - Title begins with: Dialog Test Title - Window class: AutoHotkeyGUI - Process: AutoHotFlow.exe",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "ahk_class": "AutoHotkeyGUI",
         "ahk_exe": "AutoHotFlow.exe",
@@ -915,7 +915,7 @@
       "ID": "element0000000055",
       "name": "Expression - editText = \"Dialog Test Text\" and button1 = \"Dialog Test Yes\" and  button2 = \"Dialog Test No\" and  button3 = \"Dialog Test cancel\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "editText = \"Dialog Test Text\" and button1 = \"Dialog Test Yes\" and  button2 = \"Dialog Test No\" and  button3 = \"Dialog Test cancel\""
       },
@@ -929,7 +929,7 @@
       "ID": "element0000000059",
       "name": "Send keystrokes to control: {space} -  - Control class Button1 - Title begins with: Dialog Test Title - Window class: AutoHotkeyGUI - Process: AutoHotFlow.exe",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "ahk_class": "AutoHotkeyGUI",
         "ahk_exe": "AutoHotFlow.exe",
@@ -959,7 +959,7 @@
       "ID": "element0000000064",
       "name": "Window exists:  - Title is exatly: Dialog Test Title - Window class: AutoHotkeyGUI - Process: AutoHotFlow.exe",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "ahk_class": "AutoHotkeyGUI",
         "ahk_exe": "AutoHotFlow.exe",
@@ -983,7 +983,7 @@
       "ID": "element0000000072",
       "name": "Sleep: 20 ms",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Duration": "20",
         "Unit": "Milliseconds"
@@ -998,7 +998,7 @@
       "ID": "element0000000075",
       "name": "Sleep: 20 ms",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Duration": "20",
         "Unit": "Milliseconds"
@@ -1013,7 +1013,7 @@
       "ID": "element0000000078",
       "name": "Sleep: 20 ms",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Duration": "20",
         "Unit": "Milliseconds"
@@ -1028,7 +1028,7 @@
       "ID": "element0000000079",
       "name": "Sleep: 20 ms",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Duration": "20",
         "Unit": "Milliseconds"
@@ -1043,7 +1043,7 @@
       "ID": "element0000000085",
       "name": "Expression - static_dialogResult = task.result",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "static_dialogResult = task.result"
       },
@@ -1057,7 +1057,7 @@
       "ID": "element0000000087",
       "name": "Tooltip: Message - 2 s - Follow mouse",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "duration": 2,
         "follow_mouse": 1,
@@ -1074,7 +1074,7 @@
       "ID": "element0000000102",
       "name": "New variable - tasks = [ - { \"dialog\": \"confirmation\", \"result\": \"yes\"}, - { \"dialog\": \"confirmation\", \"result\": \"no\"}, - { \"dialog\": \"confirmation\", \"result\": \"cancel\"}, - { \"dialog\": \"confirmation\", \"result\": \"close\"}, - { \"dialog\": \"message\", \"result\": \"ok\"}, - { \"dialog\": \"message\", \"result\": \"cancel\"}, - { \"dialog\": \"message\", \"result\": \"close\"}, - { \"dialog\": \"input\", \"result\": \"ok\"}, - { \"dialog\": \"input\", \"result\": \"cancel\"}, - { \"dialog\": \"input\", \"result\": \"close\"} - ]",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "expression": "String",
         "onlyIfNotExist": 0,
@@ -1092,7 +1092,7 @@
       "ID": "element0000000104",
       "name": "Work through a list: tasks",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "VarValue": "tasks"
       },
@@ -1106,7 +1106,7 @@
       "ID": "element0000000106",
       "name": "Expression - task.dialog = \"confirmation\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "task.dialog = \"confirmation\""
       },
@@ -1120,7 +1120,7 @@
       "ID": "element0000000108",
       "name": "Expression - task.dialog = \"confirmation\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "task.dialog = \"confirmation\""
       },
@@ -1134,7 +1134,7 @@
       "ID": "element0000000115",
       "name": "Expression - task.result = \"yes\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "task.result = \"yes\""
       },
@@ -1148,7 +1148,7 @@
       "ID": "element0000000121",
       "name": "Convert JSON-string to list 'tasks' - tasks",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "expression": "Expression",
         "listToStringOutputFormat": "JSON",
@@ -1165,19 +1165,19 @@
       "ID": "element0000000123",
       "name": "Debug dialog",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {},
       "StandardName": "1",
       "type": "Condition",
-      "x": "-70",
-      "y": "0"
+      "x": "0",
+      "y": "35"
     },
     "element0000000126": {
       "class": "action_New_Variable",
       "ID": "element0000000126",
       "name": "New variable - task = a_loopfield",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "expression": "Expression",
         "onlyIfNotExist": 0,
@@ -1194,7 +1194,7 @@
       "ID": "element0000000127",
       "name": "Expression - task.result = \"no\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "task.result = \"no\""
       },
@@ -1208,7 +1208,7 @@
       "ID": "element0000000129",
       "name": "Debug dialog",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {},
       "StandardName": "1",
       "type": "Condition",
@@ -1220,7 +1220,7 @@
       "ID": "element0000000131",
       "name": "Send keystrokes to control: {space} -  - Control class Button2 - Title begins with: Dialog Test Title - Window class: AutoHotkeyGUI - Process: AutoHotFlow.exe",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "ahk_class": "AutoHotkeyGUI",
         "ahk_exe": "AutoHotFlow.exe",
@@ -1250,7 +1250,7 @@
       "ID": "element0000000140",
       "name": "Debug dialog",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {},
       "StandardName": "1",
       "type": "Condition",
@@ -1262,7 +1262,7 @@
       "ID": "element0000000142",
       "name": "Debug dialog",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {},
       "StandardName": "1",
       "type": "Condition",
@@ -1274,7 +1274,7 @@
       "ID": "element0000000144",
       "name": "Debug dialog",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {},
       "StandardName": "1",
       "type": "Condition",
@@ -1286,7 +1286,7 @@
       "ID": "element0000000146",
       "name": "Debug dialog",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {},
       "StandardName": "1",
       "type": "Condition",
@@ -1298,7 +1298,7 @@
       "ID": "element0000000148",
       "name": "Expression - task.result = \"cancel\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "task.result = \"cancel\""
       },
@@ -1312,7 +1312,7 @@
       "ID": "element0000000149",
       "name": "Expression - task.dialog = \"confirmation\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "task.dialog = \"confirmation\""
       },
@@ -1326,7 +1326,7 @@
       "ID": "element0000000151",
       "name": "Send keystrokes to control: {space} -  - Control class Button3 - Title begins with: Dialog Test Title - Window class: AutoHotkeyGUI - Process: AutoHotFlow.exe",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "ahk_class": "AutoHotkeyGUI",
         "ahk_exe": "AutoHotFlow.exe",
@@ -1356,7 +1356,7 @@
       "ID": "element0000000153",
       "name": "Send keystrokes to control: {space} -  - Control class Button2 - Title begins with: Dialog Test Title - Window class: AutoHotkeyGUI - Process: AutoHotFlow.exe",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "ahk_class": "AutoHotkeyGUI",
         "ahk_exe": "AutoHotFlow.exe",
@@ -1386,7 +1386,7 @@
       "ID": "element0000000159",
       "name": "Expression - task.result = \"ok\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "task.result = \"ok\""
       },
@@ -1400,7 +1400,7 @@
       "ID": "element0000000161",
       "name": "Send keystrokes to control: {space} -  - Control class Button1 - Title begins with: Dialog Test Title - Window class: AutoHotkeyGUI - Process: AutoHotFlow.exe",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "ahk_class": "AutoHotkeyGUI",
         "ahk_exe": "AutoHotFlow.exe",
@@ -1430,7 +1430,7 @@
       "ID": "element0000000167",
       "name": "Add To List - global_testResults - As last value - Value 'a_flowName'",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "DelimiterComma": 0,
         "DelimiterLinefeed": 1,
@@ -1458,7 +1458,7 @@
       "ID": "element0000000169",
       "name": "Manual - \"Message Normal\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "ID": "Message Normal"
       },
@@ -1472,7 +1472,7 @@
       "ID": "element0000000172",
       "name": "Message box - Dialog Test Title - Dialog Test Text",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "ButtonLabel": "Dialog Test OK",
         "ButtonLabelCancel": "Dialog Test Cancel",
@@ -1498,7 +1498,7 @@
       "ID": "element0000000173",
       "name": "New variable - static_dialogResult = a_useraction",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "expression": "Expression",
         "onlyIfNotExist": 0,
@@ -1515,7 +1515,7 @@
       "ID": "element0000000174",
       "name": "New variable - static_dialogResult = a_useraction",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "expression": "Expression",
         "onlyIfNotExist": 0,
@@ -1532,7 +1532,7 @@
       "ID": "element0000000177",
       "name": "Expression - task.dialog = \"message\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "task.dialog = \"message\""
       },
@@ -1546,7 +1546,7 @@
       "ID": "element0000000178",
       "name": "Execute flow: This flow - Manual - \"Message Normal\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "flowID": "",
         "ReturnVariables": 0,
@@ -1567,7 +1567,7 @@
       "ID": "element0000000182",
       "name": "Expression - task.dialog = \"confirmation\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "task.dialog = \"confirmation\""
       },
@@ -1581,7 +1581,7 @@
       "ID": "element0000000185",
       "name": "Expression - editText = \"Dialog Test Text\" and button1 = \"Dialog Test OK\" and  button2 = \"Dialog Test cancel\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "editText = \"Dialog Test Text\" and button1 = \"Dialog Test OK\" and  button2 = \"Dialog Test cancel\""
       },
@@ -1595,7 +1595,7 @@
       "ID": "element0000000186",
       "name": "Expression - task.dialog = \"message\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "task.dialog = \"message\""
       },
@@ -1611,7 +1611,7 @@
       "ID": "element0000000206",
       "name": "Manual - \"Input Normal\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "ID": "Input Normal"
       },
@@ -1625,7 +1625,7 @@
       "ID": "element0000000209",
       "name": "Input box: UserInput - Dialog Test Title - Dialog Test Text",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "ButtonLabel": "Dialog Test OK",
         "ButtonLabelCancel": "Dialog Test Cancel",
@@ -1657,7 +1657,7 @@
       "ID": "element0000000211",
       "name": "New variable - static_dialogResult = a_useraction",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "expression": "Expression",
         "onlyIfNotExist": 0,
@@ -1674,7 +1674,7 @@
       "ID": "element0000000212",
       "name": "New variable - static_dialogResult = a_useraction",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "expression": "Expression",
         "onlyIfNotExist": 0,
@@ -1691,7 +1691,7 @@
       "ID": "element0000000217",
       "name": "Expression - task.dialog = \"input\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "task.dialog = \"input\""
       },
@@ -1705,7 +1705,7 @@
       "ID": "element0000000218",
       "name": "Execute flow: This flow - Manual - \"Input Normal\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "flowID": "",
         "ReturnVariables": 0,
@@ -1726,7 +1726,7 @@
       "ID": "element0000000222",
       "name": "Expression - editText = \"Dialog Test Text\" and button1 = \"Dialog Test OK\" and  button2 = \"Dialog Test cancel\" and inputText \"Dialog Test Value\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "editText = \"Dialog Test Text\" and button1 = \"Dialog Test OK\" and  button2 = \"Dialog Test cancel\" and inputText \"Dialog Test Value\""
       },
@@ -1740,7 +1740,7 @@
       "ID": "element0000000223",
       "name": "Expression - task.dialog = \"input\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "task.dialog = \"input\""
       },
@@ -1754,7 +1754,7 @@
       "ID": "element0000000229",
       "name": "Expression - task.result = \"close\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "task.result = \"close\""
       },
@@ -1768,7 +1768,7 @@
       "ID": "element0000000233",
       "name": "Close window:  - Title begins with: Dialog Test Title - Window class: AutoHotkeyGUI - Process: AutoHotFlow.exe",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "ahk_class": "AutoHotkeyGUI",
         "ahk_exe": "AutoHotFlow.exe",
@@ -1793,7 +1793,7 @@
       "ID": "element0000000240",
       "name": "New variable - static_dialogValue = UserInput",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "expression": "Expression",
         "onlyIfNotExist": 0,
@@ -1810,7 +1810,7 @@
       "ID": "element0000000243",
       "name": "Expression - task.dialog = \"input\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "task.dialog = \"input\""
       },
@@ -1824,7 +1824,7 @@
       "ID": "element0000000244",
       "name": "Get control text:  - Control class Edit1 - Title begins with: Dialog Test Title - Window class: AutoHotkeyGUI - Process: AutoHotFlow.exe",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "ahk_class": "AutoHotkeyGUI",
         "ahk_exe": "AutoHotFlow.exe",
@@ -1852,7 +1852,7 @@
       "ID": "element0000000248",
       "name": "Expression - task.dialog = \"input\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "task.dialog = \"input\""
       },
@@ -1866,7 +1866,7 @@
       "ID": "element0000000252",
       "name": "Expression - static_dialogValue = \"Dialog Test Value\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "static_dialogValue = \"Dialog Test Value\""
       },
@@ -1880,7 +1880,7 @@
       "ID": "element0000000255",
       "name": "Debug dialog",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {},
       "StandardName": "1",
       "type": "Condition",
@@ -1892,7 +1892,7 @@
       "ID": "element0000000257",
       "name": "Expression - task.result = \"ok\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "task.result = \"ok\""
       },
@@ -1907,10 +1907,10 @@
   "flowSettings": {
     "DefaultWorkingDir": "1",
     "ExecutionPolicy": "default",
-    "Offsetx": "1137.267074",
-    "Offsety": "-151.332405",
+    "Offsetx": "-1884.012461",
+    "Offsety": "-1925.921000",
     "WorkingDir": "",
-    "zoomFactor": "1.364105"
+    "zoomFactor": "0.245346"
   },
   "name": "Dialog test"
 }

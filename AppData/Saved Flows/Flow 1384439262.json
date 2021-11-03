@@ -912,7 +912,7 @@
       "ID": "element0000000487",
       "name": "Manual - \"start\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "ID": "start"
       },
@@ -926,7 +926,7 @@
       "ID": "element0000000530",
       "name": "Get file size - FileSize - fileTestFiles\\test.txt",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "file": "fileTestFiles\\test.txt",
         "Unit": "Bytes",
@@ -942,7 +942,7 @@
       "ID": "element0000000531",
       "name": "Write to file - fileTestFiles\\test.txt - hello",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "CodePageIdentifier": "",
         "Encoding": "UTF-8",
@@ -963,7 +963,7 @@
       "ID": "element0000000533",
       "name": "Expression - FileSize = 5",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "FileSize = 5"
       },
@@ -977,7 +977,7 @@
       "ID": "element0000000539",
       "name": "Write to file - fileTestFiles\\test.txt - hello",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "CodePageIdentifier": "",
         "Encoding": "UTF-8",
@@ -998,7 +998,7 @@
       "ID": "element0000000540",
       "name": "Get file size - FileSize - fileTestFiles\\test.txt",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "file": "fileTestFiles\\test.txt",
         "Unit": "Bytes",
@@ -1014,7 +1014,7 @@
       "ID": "element0000000541",
       "name": "Expression - FileSize = 10",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "FileSize = 10"
       },
@@ -1028,7 +1028,7 @@
       "ID": "element0000000544",
       "name": "Write to file - fileTestFiles\\test.txt - hello",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "CodePageIdentifier": "",
         "Encoding": "UTF-8",
@@ -1049,7 +1049,7 @@
       "ID": "element0000000545",
       "name": "Get file size - FileSize - fileTestFiles\\test.txt",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "file": "fileTestFiles\\test.txt",
         "Unit": "Bytes",
@@ -1065,7 +1065,7 @@
       "ID": "element0000000546",
       "name": "Ausdruck - FileSize = 5 + 3\n\nSize of BOM is 3",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "FileSize = 5 + 3"
       },
@@ -1079,7 +1079,7 @@
       "ID": "element0000000550",
       "name": "Get file size - FileSize - fileTestFiles\\test.txt",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "file": "fileTestFiles\\test.txt",
         "Unit": "Kilobytes",
@@ -1095,7 +1095,7 @@
       "ID": "element0000000551",
       "name": "Expression - FileSize = 1",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "FileSize = 1"
       },
@@ -1109,7 +1109,7 @@
       "ID": "element0000000554",
       "name": "Write to file - fileTestFiles\\test.txt - Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "CodePageIdentifier": "",
         "Encoding": "UTF-8",
@@ -1130,7 +1130,7 @@
       "ID": "element0000000561",
       "name": "Copy file - fileTestFiles\\test.txt - fileTestFiles\\test copy.txt",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "destFile": "fileTestFiles\\test copy.txt",
         "file": "fileTestFiles\\test.txt",
@@ -1146,7 +1146,7 @@
       "ID": "element0000000567",
       "name": "File exists - fileTestFiles\\test copy.txt",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "file": "fileTestFiles\\test copy.txt"
       },
@@ -1160,7 +1160,7 @@
       "ID": "element0000000570",
       "name": "Copy file - fileTestFiles\\test.txt - fileTestFiles\\test copy.txt",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "destFile": "fileTestFiles\\test copy.txt",
         "file": "fileTestFiles\\test.txt",
@@ -1176,7 +1176,7 @@
       "ID": "element0000000574",
       "name": "Move file - fileTestFiles\\test.txt - fileTestFiles\\test moved.txt",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "destFile": "fileTestFiles\\test moved.txt",
         "file": "fileTestFiles\\test.txt",
@@ -1192,7 +1192,7 @@
       "ID": "element0000000576",
       "name": "File exists - fileTestFiles\\test.txt",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "file": "fileTestFiles\\test.txt"
       },
@@ -1206,7 +1206,7 @@
       "ID": "element0000000577",
       "name": "File exists - fileTestFiles\\test moved.txt",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "file": "fileTestFiles\\test moved.txt"
       },
@@ -1220,7 +1220,7 @@
       "ID": "element0000000584",
       "name": "Rename file - fileTestFiles\\test moved.txt - test renamed.txt",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "file": "fileTestFiles\\test moved.txt",
         "newName": "test renamed.txt"
@@ -1235,7 +1235,7 @@
       "ID": "element0000000585",
       "name": "File exists - fileTestFiles\\test moved.txt",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "file": "fileTestFiles\\test moved.txt"
       },
@@ -1249,7 +1249,7 @@
       "ID": "element0000000586",
       "name": "File exists - fileTestFiles\\test renamed.txt",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "file": "fileTestFiles\\test renamed.txt"
       },
@@ -1263,7 +1263,7 @@
       "ID": "element0000000639",
       "name": "Get file time - Modification time - FileTime - fileTest",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "file": "fileTest",
         "TimeType": "Modification",
@@ -1279,7 +1279,7 @@
       "ID": "element0000000640",
       "name": "Delete folder - fileTest",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "ExceptionIfNotExist": "0",
         "Folder": "fileTest",
@@ -1295,7 +1295,7 @@
       "ID": "element0000000641",
       "name": "Time difference - TimeDifference = a_now - FileTime - Seconds",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "InputTime": "a_now",
         "InputTime2": "FileTime",
@@ -1312,7 +1312,7 @@
       "ID": "element0000000642",
       "name": "Expression - TimeDifference <= 1 and TimeDifference >= 0",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "TimeDifference <= 1 and TimeDifference >= 0"
       },
@@ -1326,7 +1326,7 @@
       "ID": "element0000000647",
       "name": "Create Folder - fileTest",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "ErrorIfExists": 0,
         "folder": "fileTest"
@@ -1341,7 +1341,7 @@
       "ID": "element0000000651",
       "name": "Time calculation - CalculatedTime = a_now + 0-10 Minutes",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "InputTime": "a_now",
         "Unit": "Minutes",
@@ -1358,7 +1358,7 @@
       "ID": "element0000000653",
       "name": "Set file time - Modification time - %calculatedTime% - fileTest",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "file": "fileTest",
         "OperateOnWhat": "Files",
@@ -1376,7 +1376,7 @@
       "ID": "element0000000674",
       "name": "Get file time - Modification time - FileTime - fileTest",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "file": "fileTest",
         "TimeType": "Modification",
@@ -1392,7 +1392,7 @@
       "ID": "element0000000675",
       "name": "Time difference - TimeDifference = FileTime - a_now - Minutes",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "InputTime": "FileTime",
         "InputTime2": "a_now",
@@ -1409,7 +1409,7 @@
       "ID": "element0000000676",
       "name": "Expression - TimeDifference = -10",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "TimeDifference = -10"
       },
@@ -1423,7 +1423,7 @@
       "ID": "element0000000685",
       "name": "Delete all folders that we will create during the test",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "executionResult": "Normal"
       },
@@ -1437,7 +1437,7 @@
       "ID": "element0000000687",
       "name": "Write something to file",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "executionResult": "Normal"
       },
@@ -1451,7 +1451,7 @@
       "ID": "element0000000689",
       "name": "Write something to a file and check its size",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "executionResult": "Normal"
       },
@@ -1465,7 +1465,7 @@
       "ID": "element0000000690",
       "name": "Write long text and read file size in KB",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "executionResult": "Normal"
       },
@@ -1479,7 +1479,7 @@
       "ID": "element0000000691",
       "name": "Copy and move files",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "executionResult": "Normal"
       },
@@ -1493,7 +1493,7 @@
       "ID": "element0000000692",
       "name": "Rename a file",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "executionResult": "Normal"
       },
@@ -1507,7 +1507,7 @@
       "ID": "element0000000696",
       "name": "Create a folder and read its modification time",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "executionResult": "Normal"
       },
@@ -1521,7 +1521,7 @@
       "ID": "element0000000697",
       "name": "Change modification time of a folder",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "executionResult": "Normal"
       },
@@ -1535,7 +1535,7 @@
       "ID": "element0000000698",
       "name": "End the test",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "executionResult": "Normal"
       },
@@ -1551,7 +1551,7 @@
       "ID": "element0000000699",
       "name": "Manual - \"folder create copy move rename delete\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "ID": "folder create copy move rename delete"
       },
@@ -1565,7 +1565,7 @@
       "ID": "element0000000700",
       "name": "File exists - fileTestFiles",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "file": "fileTestFiles"
       },
@@ -1579,7 +1579,7 @@
       "ID": "element0000000702",
       "name": "File has attribute - Directory - fileTestFiles",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Attribute": "D",
         "file": "fileTestFiles"
@@ -1594,7 +1594,7 @@
       "ID": "element0000000703",
       "name": "Create Folder - fileTestFiles",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "ErrorIfExists": 0,
         "folder": "fileTestFiles"
@@ -1609,7 +1609,7 @@
       "ID": "element0000000704",
       "name": "File exists - fileTestFiles",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "file": "fileTestFiles"
       },
@@ -1623,7 +1623,7 @@
       "ID": "element0000000708",
       "name": "Write to file - fileTestFiles\\test.txt - hello",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "CodePageIdentifier": "",
         "Encoding": "UTF-8",
@@ -1644,7 +1644,7 @@
       "ID": "element0000000710",
       "name": "Create a folder",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "executionResult": "Normal"
       },
@@ -1658,7 +1658,7 @@
       "ID": "element0000000711",
       "name": "Check whether folder exists",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "executionResult": "Normal"
       },
@@ -1672,7 +1672,7 @@
       "ID": "element0000000712",
       "name": "Check whether folder not exists",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "executionResult": "Normal"
       },
@@ -1686,7 +1686,7 @@
       "ID": "element0000000713",
       "name": "Create a file in the folder",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "executionResult": "Normal"
       },
@@ -1702,7 +1702,7 @@
       "ID": "element0000000714",
       "name": "Manual - \"File write and read\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "ID": "File write and read"
       },
@@ -1716,7 +1716,7 @@
       "ID": "element0000000715",
       "name": "Create Folder - fileTestFiles",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "ErrorIfExists": 0,
         "folder": "fileTestFiles"
@@ -1731,7 +1731,7 @@
       "ID": "element0000000717",
       "name": "Write to file - fileTestFiles\\test.txt - hello",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "CodePageIdentifier": "",
         "Encoding": "UTF-8",
@@ -1754,7 +1754,7 @@
       "ID": "element0000000718",
       "name": "Manual - \"clean\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "ID": "clean"
       },
@@ -1768,7 +1768,7 @@
       "ID": "element0000000724",
       "name": "Execute flow: This flow - Manual - \"clean\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "flowID": "",
         "ReturnVariables": 0,
@@ -1789,7 +1789,7 @@
       "ID": "element0000000725",
       "name": "Execute flow: This flow - Manual - \"folder create copy move rename delete\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "flowID": "",
         "ReturnVariables": "0",
@@ -1810,7 +1810,7 @@
       "ID": "element0000000727",
       "name": "Execute flow: This flow - Manual - \"clean\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "flowID": "",
         "ReturnVariables": 0,
@@ -1831,7 +1831,7 @@
       "ID": "element0000000729",
       "name": "Execute flow: This flow - Manual - \"File write and read\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "flowID": "",
         "ReturnVariables": 0,
@@ -1852,7 +1852,7 @@
       "ID": "element0000000732",
       "name": "File exists - fileTestFiles\\test.txt",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "file": "fileTestFiles\\test.txt"
       },
@@ -1866,7 +1866,7 @@
       "ID": "element0000000733",
       "name": "Check whether file exists",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "executionResult": "Normal"
       },
@@ -1880,7 +1880,7 @@
       "ID": "element0000000735",
       "name": "Read from file - FileText - fileTestFiles\\test.txt",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "CodePageIdentifier": "",
         "EnableSizeLimit": 0,
@@ -1900,7 +1900,7 @@
       "ID": "element0000000736",
       "name": "Expression - FileText = \"hello\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "FileText = \"hello\""
       },
@@ -1914,7 +1914,7 @@
       "ID": "element0000000737",
       "name": "Delete file - fileTestFiles\\test.txt",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "deleteFileMethod": "Recycle",
         "file": "fileTestFiles\\test.txt"
@@ -1929,7 +1929,7 @@
       "ID": "element0000000738",
       "name": "File exists - fileTestFiles\\test.txt",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "file": "fileTestFiles\\test.txt"
       },
@@ -1943,7 +1943,7 @@
       "ID": "element0000000743",
       "name": "Read from file and check content",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "executionResult": "Normal"
       },
@@ -1957,7 +1957,7 @@
       "ID": "element0000000744",
       "name": "Delete file",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "executionResult": "Normal"
       },
@@ -1971,7 +1971,7 @@
       "ID": "element0000000748",
       "name": "New list static_results - Empty",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "DelimiterComma": 0,
         "DelimiterLinefeed": 1,
@@ -1996,7 +1996,7 @@
       "ID": "element0000000751",
       "name": "List contains element - Value '1' in list 'static_results'",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "InputList": "static_results",
         "isExpressionPosition": "String",
@@ -2015,7 +2015,7 @@
       "ID": "element0000000755",
       "name": "List contains element - Value '1' in list 'static_results'",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "InputList": "static_results",
         "isExpressionPosition": "String",
@@ -2034,7 +2034,7 @@
       "ID": "element0000000757",
       "name": "Add To List - static_results - As last value - Value 'file write'",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "DelimiterComma": 0,
         "DelimiterLinefeed": 1,
@@ -2060,7 +2060,7 @@
       "ID": "element0000000759",
       "name": "Add To List - global_testResults - As last value - Value 'a_flowName'",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "DelimiterComma": 0,
         "DelimiterLinefeed": 1,
@@ -2086,7 +2086,7 @@
       "ID": "element0000000760",
       "name": "End the test",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "executionResult": "Normal"
       },
@@ -2100,7 +2100,7 @@
       "ID": "element0000000765",
       "name": "Delete folder - fileTestFiles",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "ExceptionIfNotExist": "0",
         "Folder": "fileTestFiles",
@@ -2116,7 +2116,7 @@
       "ID": "element0000000766",
       "name": "Delete folder - fileTestFiles moved",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "ExceptionIfNotExist": "0",
         "Folder": "fileTestFiles moved",
@@ -2132,7 +2132,7 @@
       "ID": "element0000000767",
       "name": "Delete folder - fileTestFiles copied",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "ExceptionIfNotExist": "0",
         "Folder": "fileTestFiles copied",
@@ -2148,7 +2148,7 @@
       "ID": "element0000000768",
       "name": "Delete folder - fileTestFiles renamed",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "ExceptionIfNotExist": "0",
         "Folder": "fileTestFiles renamed",
@@ -2166,7 +2166,7 @@
       "ID": "element0000000780",
       "name": "Manual - \"File copy move rename\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "ID": "File copy move rename"
       },
@@ -2180,7 +2180,7 @@
       "ID": "element0000000785",
       "name": "Create Folder - fileTestFiles",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "ErrorIfExists": 0,
         "folder": "fileTestFiles"
@@ -2195,7 +2195,7 @@
       "ID": "element0000000788",
       "name": "Write to file - fileTestFiles\\test.txt - hello",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "CodePageIdentifier": "",
         "Encoding": "UTF-8",
@@ -2216,7 +2216,7 @@
       "ID": "element0000000791",
       "name": "Create a folder and a file",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "executionResult": "Normal"
       },
@@ -2230,7 +2230,7 @@
       "ID": "element0000000792",
       "name": "Add To List - static_results - As last value - Value 'file copy'",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "DelimiterComma": 0,
         "DelimiterLinefeed": 1,
@@ -2256,7 +2256,7 @@
       "ID": "element0000000793",
       "name": "Execute flow: This flow - Manual - \"clean\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "flowID": "",
         "ReturnVariables": 0,
@@ -2277,7 +2277,7 @@
       "ID": "element0000000794",
       "name": "Execute flow: This flow - Manual - \"File copy move rename\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "flowID": "",
         "ReturnVariables": 0,
@@ -2298,7 +2298,7 @@
       "ID": "element0000000795",
       "name": "List contains element - Value '1' in list 'static_results'",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "InputList": "static_results",
         "isExpressionPosition": "String",
@@ -2317,7 +2317,7 @@
       "ID": "element0000000799",
       "name": "Copy folder - fileTestFiles - fileTestFiles copied",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "destFolder": "fileTestFiles copied",
         "folder": "fileTestFiles",
@@ -2333,7 +2333,7 @@
       "ID": "element0000000800",
       "name": "File exists - fileTestFiles",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "file": "fileTestFiles"
       },
@@ -2347,7 +2347,7 @@
       "ID": "element0000000801",
       "name": "File exists - fileTestFiles copied\\test.txt",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "file": "fileTestFiles copied\\test.txt"
       },
@@ -2361,7 +2361,7 @@
       "ID": "element0000000802",
       "name": "Delete folder - fileTestFiles copied",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "ExceptionIfNotExist": 1,
         "Folder": "fileTestFiles copied",
@@ -2377,7 +2377,7 @@
       "ID": "element0000000803",
       "name": "File exists - fileTestFiles copied\\test renamed.txt",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "file": "fileTestFiles copied\\test renamed.txt"
       },
@@ -2391,7 +2391,7 @@
       "ID": "element0000000804",
       "name": "Move folder - fileTestFiles - fileTestFiles moved",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "destFolder": "fileTestFiles moved",
         "folder": "fileTestFiles",
@@ -2407,7 +2407,7 @@
       "ID": "element0000000805",
       "name": "Rename folder - fileTestFiles moved - fileTestFiles renamed",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "folder": "fileTestFiles moved",
         "newName": "fileTestFiles renamed"
@@ -2422,7 +2422,7 @@
       "ID": "element0000000806",
       "name": "File exists - fileTestFiles renamed\\test.txt",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "file": "fileTestFiles renamed\\test.txt"
       },
@@ -2436,7 +2436,7 @@
       "ID": "element0000000807",
       "name": "Rename a folder",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "executionResult": "Normal"
       },
@@ -2450,7 +2450,7 @@
       "ID": "element0000000808",
       "name": "Delete a folder",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "executionResult": "Normal"
       },
@@ -2464,7 +2464,7 @@
       "ID": "element0000000809",
       "name": "Move and rename a folder",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "executionResult": "Normal"
       },
@@ -2478,7 +2478,7 @@
       "ID": "element0000000819",
       "name": "Add To List - static_results - As last value - Value 'folder create'",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "DelimiterComma": 0,
         "DelimiterLinefeed": 1,
@@ -2504,7 +2504,7 @@
       "ID": "element0000000820",
       "name": "Success",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "executionResult": "Normal"
       },
@@ -2518,7 +2518,7 @@
       "ID": "element0000000823",
       "name": "Add To List - static_results - As last value - Value 'file time'",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "DelimiterComma": 0,
         "DelimiterLinefeed": 1,
@@ -2546,7 +2546,7 @@
       "ID": "element0000000824",
       "name": "Manual - \"File time\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "ID": "File time"
       },
@@ -2560,7 +2560,7 @@
       "ID": "element0000000826",
       "name": "Execute flow: This flow - Manual - \"clean\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "flowID": "",
         "ReturnVariables": 0,
@@ -2581,7 +2581,7 @@
       "ID": "element0000000827",
       "name": "Execute flow: This flow - Manual - \"File time\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "flowID": "",
         "ReturnVariables": 0,
@@ -2602,7 +2602,7 @@
       "ID": "element0000000828",
       "name": "List contains element - Value '1' in list 'static_results'",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "InputList": "static_results",
         "isExpressionPosition": "String",
@@ -2623,7 +2623,7 @@
       "ID": "element0000000832",
       "name": "Manual - \"File shortcut\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "ID": "File shortcut"
       },
@@ -2637,7 +2637,7 @@
       "ID": "element0000000833",
       "name": "Add To List - static_results - As last value - Value 'file shortcut'",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "DelimiterComma": 0,
         "DelimiterLinefeed": 1,
@@ -2663,7 +2663,7 @@
       "ID": "element0000000834",
       "name": "Execute flow: This flow - Manual - \"File shortcut\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "flowID": "",
         "ReturnVariables": 0,
@@ -2684,7 +2684,7 @@
       "ID": "element0000000835",
       "name": "Execute flow: This flow - Manual - \"File time\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "flowID": "",
         "ReturnVariables": 0,
@@ -2705,7 +2705,7 @@
       "ID": "element0000000836",
       "name": "List contains element - Value '1' in list 'static_results'",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "InputList": "static_results",
         "isExpressionPosition": "String",
@@ -2724,7 +2724,7 @@
       "ID": "element0000000842",
       "name": "Create shortcut - Notepad.exe.lnk - %a_windir%\\system32\\notepad.exe anyTestText.txt",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "description": "Notepad link created by AHF",
         "file": "%a_windir%\\system32\\notepad.exe",
@@ -2747,7 +2747,7 @@
       "ID": "element0000000843",
       "name": "Get shortcut information - Notepad.exe.lnk",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "OutArgs": "shortcutArgs",
         "OutDescription": "shortcutDescription",
@@ -2768,7 +2768,7 @@
       "ID": "element0000000850",
       "name": "Write to file - anyTestText.txt - This is a test file",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "CodePageIdentifier": "",
         "Encoding": "UTF-8",
@@ -2789,7 +2789,7 @@
       "ID": "element0000000856",
       "name": "Expression - shortcutTarget = a_windir \"\\system32\\notepad.exe\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "shortcutTarget = a_windir \"\\system32\\notepad.exe\""
       },
@@ -2803,7 +2803,7 @@
       "ID": "element0000000857",
       "name": "Expression - shortcutArgs = \"anyTestText.txt\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "shortcutArgs = \"anyTestText.txt\""
       },
@@ -2817,7 +2817,7 @@
       "ID": "element0000000860",
       "name": "Expression - shortcutDir = a_workingdir",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "shortcutDir = a_workingdir"
       },
@@ -2831,7 +2831,7 @@
       "ID": "element0000000863",
       "name": "Create a file which we will open later with notepad",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "executionResult": "Normal"
       },
@@ -2845,7 +2845,7 @@
       "ID": "element0000000864",
       "name": "Create a shortcut to notepad which will open the created file",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "executionResult": "Normal"
       },
@@ -2859,7 +2859,7 @@
       "ID": "element0000000865",
       "name": "Get shortcut information and compare it",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "executionResult": "Normal"
       },
@@ -2873,7 +2873,7 @@
       "ID": "element0000000866",
       "name": "Expression - shortcutDescription = \"Notepad link created by AHF\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "shortcutDescription = \"Notepad link created by AHF\""
       },
@@ -2887,7 +2887,7 @@
       "ID": "element0000000869",
       "name": "Expression - shortcutIcon = a_windir \"\\system32\\ActionCenter.dll\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "shortcutIcon = a_windir \"\\system32\\ActionCenter.dll\""
       },
@@ -2901,7 +2901,7 @@
       "ID": "element0000000872",
       "name": "Expression - shortcutIconNumber = 3",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "shortcutIconNumber = 3"
       },
@@ -2915,7 +2915,7 @@
       "ID": "element0000000875",
       "name": "Expression - shortcutRunMode = \"normal\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "shortcutRunMode = \"normal\""
       },
@@ -2929,7 +2929,7 @@
       "ID": "element0000000884",
       "name": "Run - Notepad.exe.lnk",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "RunMode": "Hide",
         "ToRun": "Notepad.exe.lnk",
@@ -2947,7 +2947,7 @@
       "ID": "element0000000887",
       "name": "Close window:  - Title begins with: anyTestText.txt - Window class: Notepad - Process: notepad.exe",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "ahk_class": "Notepad",
         "ahk_exe": "notepad.exe",
@@ -2972,7 +2972,7 @@
       "ID": "element0000000889",
       "name": "Window exists:  - Title begins with: anyTestText.txt - Window class: Notepad - Process: notepad.exe",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "ahk_class": "Notepad",
         "ahk_exe": "notepad.exe",
@@ -2996,7 +2996,7 @@
       "ID": "element0000000890",
       "name": "Close window:  - Title begins with: anyTestText.txt - Window class: Notepad - Process: notepad.exe",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "ahk_class": "Notepad",
         "ahk_exe": "notepad.exe",
@@ -3021,7 +3021,7 @@
       "ID": "element0000000898",
       "name": "Sleep: 2 s",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Duration": 2,
         "Unit": "Seconds"
@@ -3036,7 +3036,7 @@
       "ID": "element0000000899",
       "name": "Open the link and wait for the notepad to open the file (notepad will be hidden)",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "executionResult": "Normal"
       },
@@ -3050,7 +3050,7 @@
       "ID": "element0000000900",
       "name": "Close notepad",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "executionResult": "Normal"
       },
@@ -3064,7 +3064,7 @@
       "ID": "element0000000908",
       "name": "Window exists:  - Title begins with: anyTestText.txt - Window class: Notepad - Process: notepad.exe",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "ahk_class": "Notepad",
         "ahk_exe": "notepad.exe",

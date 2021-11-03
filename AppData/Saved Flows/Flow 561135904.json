@@ -1,4 +1,4 @@
-﻿{
+{
   "allConnections": {
     "connection0000000013": {
       "ConnectionType": "normal",
@@ -323,7 +323,7 @@
       "ID": "element0000000002",
       "name": "Process closes - %static_ProcessName%",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "interval": "1000",
         "ProcessName": "%static_ProcessName%"
@@ -339,7 +339,7 @@
       "ID": "element0000000005",
       "name": "Process starts - %static_ProcessName%",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "interval": "1000",
         "NotTriggerOnEnable": 1,
@@ -357,7 +357,7 @@
       "ID": "element0000000022",
       "name": "Manual - \"start\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "ID": "start"
       },
@@ -371,7 +371,7 @@
       "ID": "element0000000023",
       "name": "Set flow status - Disable: This flow - All triggers",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Enable": "Disable",
         "flowID": "",
@@ -389,7 +389,7 @@
       "ID": "element0000000025",
       "name": "Set flow status - Enable: This flow - Default trigger",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Enable": "Enable",
         "flowID": "",
@@ -407,7 +407,7 @@
       "ID": "element0000000031",
       "name": "Run - %static_ProcessName%",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "RunMode": "Hide",
         "ToRun": "%static_ProcessName%",
@@ -426,7 +426,7 @@
       "ID": "element0000000033",
       "name": "Process starts - %static_ProcessName%",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "interval": "1000",
         "NotTriggerOnEnable": "0",
@@ -442,7 +442,7 @@
       "ID": "element0000000035",
       "name": "Sleep: 2 s",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Duration": 2,
         "Unit": "Seconds"
@@ -457,7 +457,7 @@
       "ID": "element0000000036",
       "name": "Set flow status - Enable: This flow - Process starts - %static_ProcessName%",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Enable": "Enable",
         "flowID": "",
@@ -475,7 +475,7 @@
       "ID": "element0000000038",
       "name": "New list static_successfulRuns - Empty",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "DelimiterComma": 0,
         "DelimiterLinefeed": 1,
@@ -500,7 +500,7 @@
       "ID": "element0000000039",
       "name": "Add To List - static_successfulRuns - As last value - Value 'processStartsTriggerOnEnable'",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "DelimiterComma": 0,
         "DelimiterLinefeed": 1,
@@ -526,7 +526,7 @@
       "ID": "element0000000044",
       "name": "Set flow status - Enable: This flow - Process starts - %static_ProcessName%",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Enable": "Enable",
         "flowID": "",
@@ -544,7 +544,7 @@
       "ID": "element0000000047",
       "name": "Add To List - static_successfulRuns - As last value - Value 'processStartsNotTriggerOnEnable'",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "DelimiterComma": 0,
         "DelimiterLinefeed": 1,
@@ -570,7 +570,7 @@
       "ID": "element0000000057",
       "name": "Sleep: 2 s",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Duration": 2,
         "Unit": "Seconds"
@@ -585,7 +585,7 @@
       "ID": "element0000000060",
       "name": "List contains element - Value '1' in list 'static_successfulRuns'",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "InputList": "static_successfulRuns",
         "isExpressionPosition": "String",
@@ -604,7 +604,7 @@
       "ID": "element0000000061",
       "name": "List contains element - Value '1' in list 'static_successfulRuns'",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "InputList": "static_successfulRuns",
         "isExpressionPosition": "String",
@@ -623,7 +623,7 @@
       "ID": "element0000000066",
       "name": "Kill process - %static_ProcessName%",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "ProcessName": "%static_ProcessName%"
       },
@@ -637,7 +637,7 @@
       "ID": "element0000000067",
       "name": "Run - %static_ProcessName%",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "RunMode": "Hide",
         "ToRun": "%static_ProcessName%",
@@ -655,7 +655,7 @@
       "ID": "element0000000068",
       "name": "Sleep: 2 s",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Duration": 2,
         "Unit": "Seconds"
@@ -670,7 +670,7 @@
       "ID": "element0000000071",
       "name": "List contains element - Value '1' in list 'static_successfulRuns'",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "InputList": "static_successfulRuns",
         "isExpressionPosition": "String",
@@ -689,7 +689,7 @@
       "ID": "element0000000072",
       "name": "List contains element - Value '1' in list 'static_successfulRuns'",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "InputList": "static_successfulRuns",
         "isExpressionPosition": "String",
@@ -708,7 +708,7 @@
       "ID": "element0000000076",
       "name": "Add To List - static_successfulRuns - As last value - Value 'processCloses'",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "DelimiterComma": 0,
         "DelimiterLinefeed": 1,
@@ -734,7 +734,7 @@
       "ID": "element0000000078",
       "name": "Set flow status - Enable: This flow - Process closes - %static_ProcessName%",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Enable": "Enable",
         "flowID": "",
@@ -752,7 +752,7 @@
       "ID": "element0000000080",
       "name": "Kill process - %static_ProcessName%",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "ProcessName": "%static_ProcessName%"
       },
@@ -766,7 +766,7 @@
       "ID": "element0000000082",
       "name": "List contains element - Value '1' in list 'static_successfulRuns'",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "InputList": "static_successfulRuns",
         "isExpressionPosition": "String",
@@ -785,7 +785,7 @@
       "ID": "element0000000084",
       "name": "Add To List - global_testResults - As last value - Value 'a_flowName'",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "DelimiterComma": 0,
         "DelimiterLinefeed": 1,
@@ -811,7 +811,7 @@
       "ID": "element0000000091",
       "name": "Sleep: 2 s",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Duration": 2,
         "Unit": "Seconds"
@@ -827,7 +827,7 @@
       "ID": "element0000000094",
       "name": "Periodic timer - 15 Seconds",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Interval": "15",
         "Unit": "Seconds"
@@ -842,7 +842,7 @@
       "ID": "element0000000095",
       "name": "Set flow status - Disable: This flow - All triggers",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Enable": "Disable",
         "flowID": "",
@@ -860,7 +860,7 @@
       "ID": "element0000000096",
       "name": "Set flow status - Enable: This flow - Default trigger",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Enable": "Enable",
         "flowID": "",
@@ -878,7 +878,7 @@
       "ID": "element0000000099",
       "name": "Set flow status - Enable: This flow - Periodic timer - 15 Seconds",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Enable": "Enable",
         "flowID": "",
@@ -896,7 +896,7 @@
       "ID": "element0000000110",
       "name": "Process is running - %static_ProcessName%",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "ProcessName": "%static_ProcessName%"
       },
@@ -910,7 +910,7 @@
       "ID": "element0000000116",
       "name": "Process is running - %static_ProcessName%",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "ProcessName": "%static_ProcessName%"
       },
@@ -924,7 +924,7 @@
       "ID": "element0000000118",
       "name": "Process is running - %a_pID%",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "ProcessName": "%a_pID%"
       },
@@ -938,7 +938,7 @@
       "ID": "element0000000121",
       "name": "Process is running - %static_ProcessName%",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "ProcessName": "%static_ProcessName%"
       },
@@ -952,7 +952,7 @@
       "ID": "element0000000122",
       "name": "Process is running - %a_pID%",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "ProcessName": "%a_pID%"
       },
@@ -966,7 +966,7 @@
       "ID": "element0000000127",
       "name": "Sleep: 2 s",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Duration": 2,
         "Unit": "Seconds"
@@ -981,13 +981,13 @@
       "ID": "element0000000130",
       "name": "Confirmation dialog - Process Test, %static_ProcessName% must be closed to start the test. Close it now?",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
-        "": "200",
         "ButtonLabelCancel": "Cancel",
         "ButtonLabelNo": "No",
         "ButtonLabelYes": "Yes",
         "DefaultButton": "No",
+        "Height": "200",
         "IfDismiss": "Exception",
         "IsTimeout": 0,
         "message": "%static_ProcessName% must be closed to start the test. Close it now?",
@@ -995,7 +995,8 @@
         "ShowCancelButton": 0,
         "TimeoutUnits": 10,
         "title": "Process Test",
-        "Unit": "Seconds"
+        "Unit": "Seconds",
+        "Width": "300"
       },
       "StandardName": "1",
       "type": "Condition",
@@ -1007,7 +1008,7 @@
       "ID": "element0000000131",
       "name": "Kill process - notepad.exe",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "ProcessName": "notepad.exe"
       },
@@ -1021,7 +1022,7 @@
       "ID": "element0000000139",
       "name": "New variable - static_ProcessName = cttune.exe",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "expression": "String",
         "onlyIfNotExist": 0,

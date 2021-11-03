@@ -919,7 +919,7 @@
       "ID": "element0000000002",
       "name": "Manual - \"basic variables test\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "ID": "basic variables test"
       },
@@ -933,7 +933,7 @@
       "ID": "element0000000003",
       "name": "New variable - NewVariable = myValue",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "expression": "String",
         "onlyIfNotExist": "0",
@@ -950,7 +950,7 @@
       "ID": "element0000000004",
       "name": "Variable is empty - NewVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "VarName": "NewVariable"
       },
@@ -964,7 +964,7 @@
       "ID": "element0000000005",
       "name": "Variable is empty - NewVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "VarName": "NewVariable"
       },
@@ -978,7 +978,7 @@
       "ID": "element0000000007",
       "name": "New variable - NewVariable = ",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "expression": "Expression",
         "onlyIfNotExist": "0",
@@ -995,7 +995,7 @@
       "ID": "element0000000008",
       "name": "Variable is empty - NewVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "VarName": "NewVariable"
       },
@@ -1009,7 +1009,7 @@
       "ID": "element0000000015",
       "name": "Add To List - global_testResults - As last value - Value 'a_flowName'",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "DelimiterComma": 0,
         "DelimiterLinefeed": 1,
@@ -1035,7 +1035,7 @@
       "ID": "element0000000016",
       "name": "Test condition \"Variable is empty\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "executionResult": "Normal"
       },
@@ -1051,7 +1051,7 @@
       "ID": "element0000000019",
       "name": "Manual - \"start\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "ID": "start"
       },
@@ -1065,7 +1065,7 @@
       "ID": "element0000000021",
       "name": "Execute flow: This flow - Manual - \"basic variables test\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "flowID": "",
         "ReturnVariables": 0,
@@ -1086,7 +1086,7 @@
       "ID": "element0000000026",
       "name": "New list static_results - Empty",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "DelimiterComma": 0,
         "DelimiterLinefeed": 1,
@@ -1111,7 +1111,7 @@
       "ID": "element0000000027",
       "name": "List contains element - Value '1' in list 'static_results'",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "InputList": "static_results",
         "isExpressionPosition": "String",
@@ -1130,7 +1130,7 @@
       "ID": "element0000000035",
       "name": "Add To List - static_results - As last value - Value '%a_manualTriggerID%'",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "DelimiterComma": 0,
         "DelimiterLinefeed": 1,
@@ -1158,7 +1158,7 @@
       "ID": "element0000000039",
       "name": "Manual - \"variable content test\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "ID": "variable content test"
       },
@@ -1172,7 +1172,7 @@
       "ID": "element0000000040",
       "name": "New variable - NewVariable = New element do not set",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "expression": "String",
         "onlyIfNotExist": "1",
@@ -1189,7 +1189,7 @@
       "ID": "element0000000043",
       "name": "Expression - NewVariable = \"myValue\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "Expression": "NewVariable = \"myValue\""
       },
@@ -1203,7 +1203,7 @@
       "ID": "element0000000046",
       "name": "New variable - NewVariable = myValue",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "expression": "String",
         "onlyIfNotExist": "0",
@@ -1220,7 +1220,7 @@
       "ID": "element0000000051",
       "name": "Tes option \"Write only if variable does not exist\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "executionResult": "Normal"
       },
@@ -1234,7 +1234,7 @@
       "ID": "element0000000053",
       "name": "Variable content is List - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "object",
         "varname": "myVariable",
@@ -1250,7 +1250,7 @@
       "ID": "element0000000054",
       "name": "Test condition \"Variable content is\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "executionResult": "Normal"
       },
@@ -1264,7 +1264,7 @@
       "ID": "element0000000055",
       "name": "New variable - myVariable = myValue",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "expression": "String",
         "onlyIfNotExist": "0",
@@ -1281,7 +1281,7 @@
       "ID": "element0000000058",
       "name": "Variable content is Time - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "time",
         "varname": "myVariable",
@@ -1297,7 +1297,7 @@
       "ID": "element0000000062",
       "name": "Variable content is Number - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "number",
         "varname": "myVariable",
@@ -1313,7 +1313,7 @@
       "ID": "element0000000066",
       "name": "Variable content is Alphanumeric string - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "alnum",
         "varname": "myVariable",
@@ -1329,7 +1329,7 @@
       "ID": "element0000000068",
       "name": "Variable content is Alphabetic string - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "alpha",
         "varname": "myVariable",
@@ -1345,7 +1345,7 @@
       "ID": "element0000000072",
       "name": "Variable content is String with only uppercase characters - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "upper",
         "varname": "myVariable",
@@ -1361,7 +1361,7 @@
       "ID": "element0000000074",
       "name": "Variable content is String with only lowercase characters - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "lower",
         "varname": "myVariable",
@@ -1377,7 +1377,7 @@
       "ID": "element0000000076",
       "name": "Variable content is Whitespaces - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "space",
         "varname": "myVariable",
@@ -1393,7 +1393,7 @@
       "ID": "element0000000078",
       "name": "New variable - myVariable = myvalue",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "expression": "String",
         "onlyIfNotExist": "0",
@@ -1410,7 +1410,7 @@
       "ID": "element0000000079",
       "name": "Variable content is Alphanumeric string - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "alnum",
         "varname": "myVariable",
@@ -1426,7 +1426,7 @@
       "ID": "element0000000080",
       "name": "Variable content is Alphabetic string - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "alpha",
         "varname": "myVariable",
@@ -1442,7 +1442,7 @@
       "ID": "element0000000084",
       "name": "Variable content is String with only lowercase characters - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "lower",
         "varname": "myVariable",
@@ -1458,7 +1458,7 @@
       "ID": "element0000000086",
       "name": "Variable content is List - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "object",
         "varname": "myVariable",
@@ -1474,7 +1474,7 @@
       "ID": "element0000000087",
       "name": "Variable content is Time - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "time",
         "varname": "myVariable",
@@ -1490,7 +1490,7 @@
       "ID": "element0000000088",
       "name": "Variable content is Number - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "number",
         "varname": "myVariable",
@@ -1506,7 +1506,7 @@
       "ID": "element0000000089",
       "name": "Variable content is String with only uppercase characters - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "upper",
         "varname": "myVariable",
@@ -1522,7 +1522,7 @@
       "ID": "element0000000090",
       "name": "Variable content is Whitespaces - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "space",
         "varname": "myVariable",
@@ -1538,7 +1538,7 @@
       "ID": "element0000000098",
       "name": "Add To List - static_results - As last value - Value '%a_manualTriggerID%'",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "DelimiterComma": 0,
         "DelimiterLinefeed": 1,
@@ -1564,7 +1564,7 @@
       "ID": "element0000000100",
       "name": "Execute flow: This flow - Manual - \"variable content test\"",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "flowID": "",
         "ReturnVariables": 0,
@@ -1585,7 +1585,7 @@
       "ID": "element0000000101",
       "name": "List contains element - Value '1' in list 'static_results'",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "InputList": "static_results",
         "isExpressionPosition": "String",
@@ -1604,7 +1604,7 @@
       "ID": "element0000000110",
       "name": "New variable - myVariable = MYVALUE",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "expression": "String",
         "onlyIfNotExist": "0",
@@ -1621,7 +1621,7 @@
       "ID": "element0000000111",
       "name": "Variable content is Alphanumeric string - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "alnum",
         "varname": "myVariable",
@@ -1637,7 +1637,7 @@
       "ID": "element0000000112",
       "name": "Variable content is Alphabetic string - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "alpha",
         "varname": "myVariable",
@@ -1653,7 +1653,7 @@
       "ID": "element0000000113",
       "name": "Variable content is String with only uppercase characters - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "upper",
         "varname": "myVariable",
@@ -1669,7 +1669,7 @@
       "ID": "element0000000114",
       "name": "Variable content is List - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "object",
         "varname": "myVariable",
@@ -1685,7 +1685,7 @@
       "ID": "element0000000115",
       "name": "Variable content is Time - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "time",
         "varname": "myVariable",
@@ -1701,7 +1701,7 @@
       "ID": "element0000000116",
       "name": "Variable content is Number - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "number",
         "varname": "myVariable",
@@ -1717,7 +1717,7 @@
       "ID": "element0000000117",
       "name": "Variable content is String with only lowercase characters - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "lower",
         "varname": "myVariable",
@@ -1733,7 +1733,7 @@
       "ID": "element0000000118",
       "name": "Variable content is Whitespaces - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "space",
         "varname": "myVariable",
@@ -1749,7 +1749,7 @@
       "ID": "element0000000130",
       "name": "New variable - myVariable = myValue123",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "expression": "String",
         "onlyIfNotExist": "0",
@@ -1766,7 +1766,7 @@
       "ID": "element0000000131",
       "name": "Variable content is Alphanumeric string - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "alnum",
         "varname": "myVariable",
@@ -1782,7 +1782,7 @@
       "ID": "element0000000134",
       "name": "Variable content is List - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "object",
         "varname": "myVariable",
@@ -1798,7 +1798,7 @@
       "ID": "element0000000135",
       "name": "Variable content is Time - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "time",
         "varname": "myVariable",
@@ -1814,7 +1814,7 @@
       "ID": "element0000000136",
       "name": "Variable content is Number - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "number",
         "varname": "myVariable",
@@ -1830,7 +1830,7 @@
       "ID": "element0000000137",
       "name": "Variable content is String with only lowercase characters - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "lower",
         "varname": "myVariable",
@@ -1846,7 +1846,7 @@
       "ID": "element0000000138",
       "name": "Variable content is Whitespaces - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "space",
         "varname": "myVariable",
@@ -1862,7 +1862,7 @@
       "ID": "element0000000148",
       "name": "Variable content is Alphabetic string - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "alpha",
         "varname": "myVariable",
@@ -1878,7 +1878,7 @@
       "ID": "element0000000152",
       "name": "Variable content is String with only uppercase characters - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "upper",
         "varname": "myVariable",
@@ -1894,7 +1894,7 @@
       "ID": "element0000000155",
       "name": "New variable - myVariable = 123",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "expression": "String",
         "onlyIfNotExist": "0",
@@ -1911,7 +1911,7 @@
       "ID": "element0000000156",
       "name": "Variable content is Alphanumeric string - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "alnum",
         "varname": "myVariable",
@@ -1927,7 +1927,7 @@
       "ID": "element0000000157",
       "name": "Variable content is List - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "object",
         "varname": "myVariable",
@@ -1943,7 +1943,7 @@
       "ID": "element0000000158",
       "name": "Variable content is Time - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "time",
         "varname": "myVariable",
@@ -1959,7 +1959,7 @@
       "ID": "element0000000161",
       "name": "Variable content is Whitespaces - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "space",
         "varname": "myVariable",
@@ -1975,7 +1975,7 @@
       "ID": "element0000000162",
       "name": "Variable content is Alphabetic string - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "alpha",
         "varname": "myVariable",
@@ -1991,7 +1991,7 @@
       "ID": "element0000000172",
       "name": "Variable content is Number - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "number",
         "varname": "myVariable",
@@ -2007,7 +2007,7 @@
       "ID": "element0000000173",
       "name": "Variable content is Integer - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "integer",
         "varname": "myVariable",
@@ -2023,7 +2023,7 @@
       "ID": "element0000000175",
       "name": "Variable content is Decimal digits - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "digit",
         "varname": "myVariable",
@@ -2039,7 +2039,7 @@
       "ID": "element0000000176",
       "name": "Variable content is Hexadecimal digits - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "xdigit",
         "varname": "myVariable",
@@ -2055,7 +2055,7 @@
       "ID": "element0000000182",
       "name": "New variable - myVariable = 123.45",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "expression": "String",
         "onlyIfNotExist": "0",
@@ -2072,7 +2072,7 @@
       "ID": "element0000000184",
       "name": "Variable content is List - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "object",
         "varname": "myVariable",
@@ -2088,7 +2088,7 @@
       "ID": "element0000000185",
       "name": "Variable content is Time - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "time",
         "varname": "myVariable",
@@ -2104,7 +2104,7 @@
       "ID": "element0000000186",
       "name": "Variable content is Whitespaces - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "space",
         "varname": "myVariable",
@@ -2120,7 +2120,7 @@
       "ID": "element0000000187",
       "name": "Variable content is Alphabetic string - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "alpha",
         "varname": "myVariable",
@@ -2136,7 +2136,7 @@
       "ID": "element0000000188",
       "name": "Variable content is Number - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "number",
         "varname": "myVariable",
@@ -2152,7 +2152,7 @@
       "ID": "element0000000189",
       "name": "Variable content is Floating point number - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "float",
         "varname": "myVariable",
@@ -2168,7 +2168,7 @@
       "ID": "element0000000202",
       "name": "Variable content is Alphanumeric string - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "alnum",
         "varname": "myVariable",
@@ -2184,7 +2184,7 @@
       "ID": "element0000000205",
       "name": "Variable content is Floating point number - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "float",
         "varname": "myVariable",
@@ -2200,7 +2200,7 @@
       "ID": "element0000000207",
       "name": "Variable content is Integer - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "integer",
         "varname": "myVariable",
@@ -2216,7 +2216,7 @@
       "ID": "element0000000209",
       "name": "Variable content is Decimal digits - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "digit",
         "varname": "myVariable",
@@ -2232,7 +2232,7 @@
       "ID": "element0000000210",
       "name": "Variable content is Hexadecimal digits - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "xdigit",
         "varname": "myVariable",
@@ -2248,7 +2248,7 @@
       "ID": "element0000000215",
       "name": "New variable - myVariable = 0x12abc",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "expression": "String",
         "onlyIfNotExist": "0",
@@ -2265,7 +2265,7 @@
       "ID": "element0000000216",
       "name": "Variable content is List - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "object",
         "varname": "myVariable",
@@ -2281,7 +2281,7 @@
       "ID": "element0000000217",
       "name": "Variable content is Time - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "time",
         "varname": "myVariable",
@@ -2297,7 +2297,7 @@
       "ID": "element0000000218",
       "name": "Variable content is Whitespaces - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "space",
         "varname": "myVariable",
@@ -2313,7 +2313,7 @@
       "ID": "element0000000219",
       "name": "Variable content is Alphabetic string - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "alpha",
         "varname": "myVariable",
@@ -2329,7 +2329,7 @@
       "ID": "element0000000220",
       "name": "Variable content is Number - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "number",
         "varname": "myVariable",
@@ -2345,7 +2345,7 @@
       "ID": "element0000000221",
       "name": "Variable content is Hexadecimal digits - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "xdigit",
         "varname": "myVariable",
@@ -2361,7 +2361,7 @@
       "ID": "element0000000224",
       "name": "Variable content is Decimal digits - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "digit",
         "varname": "myVariable",
@@ -2377,7 +2377,7 @@
       "ID": "element0000000225",
       "name": "Variable content is Floating point number - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "float",
         "varname": "myVariable",
@@ -2393,7 +2393,7 @@
       "ID": "element0000000236",
       "name": "Variable content is Alphanumeric string - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "alnum",
         "varname": "myVariable",
@@ -2409,7 +2409,7 @@
       "ID": "element0000000239",
       "name": "Variable content is Integer - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "integer",
         "varname": "myVariable",
@@ -2425,7 +2425,7 @@
       "ID": "element0000000263",
       "name": "New variable - myVariable = 2015",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "expression": "String",
         "onlyIfNotExist": "0",
@@ -2442,7 +2442,7 @@
       "ID": "element0000000264",
       "name": "Variable content is List - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "object",
         "varname": "myVariable",
@@ -2458,7 +2458,7 @@
       "ID": "element0000000266",
       "name": "Variable content is Whitespaces - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "space",
         "varname": "myVariable",
@@ -2474,7 +2474,7 @@
       "ID": "element0000000267",
       "name": "Variable content is Alphabetic string - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "alpha",
         "varname": "myVariable",
@@ -2490,7 +2490,7 @@
       "ID": "element0000000268",
       "name": "Variable content is Number - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "number",
         "varname": "myVariable",
@@ -2506,7 +2506,7 @@
       "ID": "element0000000269",
       "name": "Variable content is Hexadecimal digits - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "xdigit",
         "varname": "myVariable",
@@ -2522,7 +2522,7 @@
       "ID": "element0000000271",
       "name": "Variable content is Floating point number - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "float",
         "varname": "myVariable",
@@ -2538,7 +2538,7 @@
       "ID": "element0000000272",
       "name": "Variable content is Alphanumeric string - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "alnum",
         "varname": "myVariable",
@@ -2554,7 +2554,7 @@
       "ID": "element0000000273",
       "name": "Variable content is Integer - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "integer",
         "varname": "myVariable",
@@ -2570,7 +2570,7 @@
       "ID": "element0000000285",
       "name": "Variable content is Time - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "time",
         "varname": "myVariable",
@@ -2586,7 +2586,7 @@
       "ID": "element0000000288",
       "name": "Variable content is Decimal digits - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "digit",
         "varname": "myVariable",
@@ -2602,7 +2602,7 @@
       "ID": "element0000000291",
       "name": "New variable - myVariable = ",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "expression": "String",
         "onlyIfNotExist": "0",
@@ -2619,7 +2619,7 @@
       "ID": "element0000000311",
       "name": "Variable content is List - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "object",
         "varname": "myVariable",
@@ -2635,7 +2635,7 @@
       "ID": "element0000000315",
       "name": "Variable content is Hexadecimal digits - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "xdigit",
         "varname": "myVariable",
@@ -2651,7 +2651,7 @@
       "ID": "element0000000316",
       "name": "Variable content is Floating point number - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "float",
         "varname": "myVariable",
@@ -2667,7 +2667,7 @@
       "ID": "element0000000317",
       "name": "Variable content is Alphanumeric string - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "alnum",
         "varname": "myVariable",
@@ -2683,7 +2683,7 @@
       "ID": "element0000000320",
       "name": "Variable content is Decimal digits - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "digit",
         "varname": "myVariable",
@@ -2699,7 +2699,7 @@
       "ID": "element0000000332",
       "name": "Variable content is Number - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "number",
         "varname": "myVariable",
@@ -2715,7 +2715,7 @@
       "ID": "element0000000335",
       "name": "Variable content is Integer - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "integer",
         "varname": "myVariable",
@@ -2731,7 +2731,7 @@
       "ID": "element0000000336",
       "name": "Variable content is Time - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "time",
         "varname": "myVariable",
@@ -2747,7 +2747,7 @@
       "ID": "element0000000338",
       "name": "Variable content is Whitespaces - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "space",
         "varname": "myVariable",
@@ -2763,7 +2763,7 @@
       "ID": "element0000000340",
       "name": "Variable content is Alphabetic string - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "alpha",
         "varname": "myVariable",
@@ -2779,7 +2779,7 @@
       "ID": "element0000000345",
       "name": "New variable - myVariable = %a_space%%a_tab%",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "expression": "String",
         "onlyIfNotExist": "0",
@@ -2796,7 +2796,7 @@
       "ID": "element0000000404",
       "name": "Variable content is List - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "object",
         "varname": "myVariable",
@@ -2812,7 +2812,7 @@
       "ID": "element0000000406",
       "name": "Variable content is Floating point number - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "float",
         "varname": "myVariable",
@@ -2828,7 +2828,7 @@
       "ID": "element0000000409",
       "name": "Variable content is Number - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "number",
         "varname": "myVariable",
@@ -2844,7 +2844,7 @@
       "ID": "element0000000410",
       "name": "Variable content is Integer - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "integer",
         "varname": "myVariable",
@@ -2860,7 +2860,7 @@
       "ID": "element0000000411",
       "name": "Variable content is Time - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "time",
         "varname": "myVariable",
@@ -2876,7 +2876,7 @@
       "ID": "element0000000412",
       "name": "Variable content is Whitespaces - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "space",
         "varname": "myVariable",
@@ -2892,7 +2892,7 @@
       "ID": "element0000000424",
       "name": "Variable content is Hexadecimal digits - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "xdigit",
         "varname": "myVariable",
@@ -2908,7 +2908,7 @@
       "ID": "element0000000425",
       "name": "Variable content is Alphanumeric string - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "alnum",
         "varname": "myVariable",
@@ -2924,7 +2924,7 @@
       "ID": "element0000000426",
       "name": "Variable content is Decimal digits - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "digit",
         "varname": "myVariable",
@@ -2940,7 +2940,7 @@
       "ID": "element0000000427",
       "name": "Variable content is Alphabetic string - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "alpha",
         "varname": "myVariable",
@@ -2956,7 +2956,7 @@
       "ID": "element0000000434",
       "name": "New list myVariable - Empty",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "DelimiterComma": 0,
         "DelimiterLinefeed": 1,
@@ -2981,7 +2981,7 @@
       "ID": "element0000000435",
       "name": "Variable content is List - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "object",
         "varname": "myVariable",
@@ -2997,7 +2997,7 @@
       "ID": "element0000000439",
       "name": "Variable content is Number - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "number",
         "varname": "myVariable",
@@ -3013,7 +3013,7 @@
       "ID": "element0000000441",
       "name": "Variable content is Time - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "time",
         "varname": "myVariable",
@@ -3029,7 +3029,7 @@
       "ID": "element0000000442",
       "name": "Variable content is Whitespaces - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "space",
         "varname": "myVariable",
@@ -3045,7 +3045,7 @@
       "ID": "element0000000443",
       "name": "Variable content is Hexadecimal digits - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "xdigit",
         "varname": "myVariable",
@@ -3061,7 +3061,7 @@
       "ID": "element0000000444",
       "name": "Variable content is Alphanumeric string - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "alnum",
         "varname": "myVariable",
@@ -3077,7 +3077,7 @@
       "ID": "element0000000445",
       "name": "Variable content is Decimal digits - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "digit",
         "varname": "myVariable",
@@ -3093,7 +3093,7 @@
       "ID": "element0000000446",
       "name": "Variable content is Alphabetic string - myVariable",
       "package": "Default",
-      "packageVersion": "1.1.0",
+      "packageVersion": "1.2.0",
       "pars": {
         "variableContentType": "alpha",
         "varname": "myVariable",
