@@ -254,6 +254,20 @@
       "ID": "connection0000000088",
       "to": "element0000000085",
       "type": "Connection"
+    },
+    "connection0000000090": {
+      "ConnectionType": "Yes",
+      "from": "element0000000066",
+      "ID": "connection0000000090",
+      "to": "element0000000091",
+      "type": "Connection"
+    },
+    "connection0000000096": {
+      "ConnectionType": "Yes",
+      "from": "element0000000054",
+      "ID": "connection0000000096",
+      "to": "element0000000095",
+      "type": "Connection"
     }
   },
   "allElements": {
@@ -789,17 +803,41 @@
       "type": "Action",
       "x": "595",
       "y": "2520"
+    },
+    "element0000000091": {
+      "class": "condition_Debug_dialog",
+      "ID": "element0000000091",
+      "name": "Debug dialog",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {},
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "525",
+      "y": "2170"
+    },
+    "element0000000095": {
+      "class": "condition_Debug_dialog",
+      "ID": "element0000000095",
+      "name": "Debug dialog",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {},
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "490",
+      "y": "1050"
     }
   },
   "category": "Automatic tests",
-  "ElementIDCounter": "89",
+  "ElementIDCounter": "96",
   "flowSettings": {
     "DefaultWorkingDir": 1,
     "ExecutionPolicy": "default",
-    "Offsetx": "-1277.587011",
-    "Offsety": "1738.656529",
+    "Offsetx": "-1101.342523",
+    "Offsety": "396.544762",
     "WorkingDir": "",
-    "zoomFactor": "0.578511"
+    "zoomFactor": "0.636365"
   },
   "name": "User idle test"
 }

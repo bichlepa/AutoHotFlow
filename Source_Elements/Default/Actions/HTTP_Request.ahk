@@ -41,7 +41,7 @@ Element_getParametrizationDetails_Action_HTTP_Request(Environment)
 	parametersToEdit.push({type: "Edit", id: "URL", default: "http://www.example.com", content: ["RawString", "String", "Expression"], contentID: "IsExpression", contentDefault: "string", WarnIfEmpty: true})
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Post data")})
-	parametersToEdit.push({type: "Radio", id: "WhereToGetPostData", default: "NoUpload", result: "Enum", choices: [x_lang("Do not upload any data"), x_lang("Use follwing post data"), x_lang("Use file as source (upload)")], enum: ["NoUpload", "Specified", "File"]})
+	parametersToEdit.push({type: "Radio", id: "WhereToGetPostData", default: "NoUpload", result: "Enum", choices: [x_lang("Do not upload any data"), x_lang("Use following post data"), x_lang("Use file as source (upload)")], enum: ["NoUpload", "Specified", "File"]})
 	parametersToEdit.push({type: "multiLineEdit", id: "PostData", default: "", content: "String"})
 	parametersToEdit.push({type: "Checkbox", id: "URIEncodePostData", default: 0, label: x_lang("URI encode post data")})
 	parametersToEdit.push({type: "Label", label: x_lang("Charset"), size: "small"})
@@ -52,7 +52,6 @@ Element_getParametrizationDetails_Action_HTTP_Request(Environment)
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Request headers")})
 	parametersToEdit.push({type: "multiLineEdit", id: "RequestHeaders", default: "", content: "String"})
-	parametersToEdit.push({type: "Checkbox", id: "URIEncodeRequestHeaders", default: 0, label: x_lang("URI encode request headers")})
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Response data")})
 	parametersToEdit.push({type: "Radio", id: "WhereToPutResponseData", default: "Variable", result: "Enum", choices: [x_lang("Write response data to a variable"), x_lang("Write response data to file (download)")], enum: ["Variable", "File"]})
@@ -67,14 +66,15 @@ Element_getParametrizationDetails_Action_HTTP_Request(Environment)
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Content type")})
 	parametersToEdit.push({type: "Radio", id: "WhichContentType", default: "automatic", result: "Enum", choices: [x_lang("Automatic"), x_lang("Custom")], enum: ["automatic", "custom"]})
-	parametersToEdit.push({type: "Edit", id: "Contenttype", default: "", content: "String", WarnIfEmpty: true})
+	contentTyes := ["text/plain", "text/html", "text/json", "text/html", "application/x-www-form-urlencoded", "application/octet-stream", "application/json", "application/xml"]
+	parametersToEdit.push({type: "ComboBox", id: "Contenttype", default: "", content: "String", result: "string", choices: contentTyes, WarnIfEmpty: true})
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Content length")})
 	parametersToEdit.push({type: "Radio", id: "WhichContentLength", default: "automatic", result: "Enum", choices: [x_lang("Automatic"), x_lang("Custom")], enum: ["automatic", "custom"]})
 	parametersToEdit.push({type: "Edit", id: "ContentLength", default: "", content: "expression", WarnIfEmpty: true})
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Content MD5")})
-	parametersToEdit.push({type: "Radio", id: "WhichContentMD5", default: "automatic", result: "Enum", choices: [x_lang("Do not use"), x_lang("Automatic"), x_lang("Custom")], enum: ["none", "automatic", "custom"]})
+	parametersToEdit.push({type: "Radio", id: "WhichContentMD5", default: "none", result: "Enum", choices: [x_lang("Do not use"), x_lang("Automatic"), x_lang("Custom")], enum: ["none", "automatic", "custom"]})
 	parametersToEdit.push({type: "Edit", id: "ContentMD5", default: "", content: "String", WarnIfEmpty: true})
 	
 	parametersToEdit.push({type: "Label", label: x_lang("Method")})
@@ -101,7 +101,7 @@ Element_getParametrizationDetails_Action_HTTP_Request(Environment)
 ;Returns the detailed name of the element. The name can vary depending on the parameters.
 Element_GenerateName_Action_HTTP_Request(Environment, ElementParameters)
 {
-	return x_lang("HTTP_Request") 
+	return x_lang("HTTP_Request") " - " ElementParameters.URL 
 }
 
 ;Called every time the user changes any parameter.
@@ -128,22 +128,15 @@ Element_CheckSettings_Action_HTTP_Request(Environment, ElementParameters, static
 	{
 		x_Par_Enable("WhichContentType")
 		
-		if (ElementParameters.WhichContentType="automatic")
-			x_Par_Enable("Contenttype")
-		else
-			x_Par_Disable("Contenttype")
+		x_Par_Disable("Contenttype", ElementParameters.WhichContentType="automatic")
 		
 		x_Par_Enable("WhichContentLength")
-		if (ElementParameters.WhichContentLength="automatic")
-			x_Par_Enable("ContentLength")
-		else
-			x_Par_Disable("ContentLength")
+		
+		x_Par_Disable("ContentLength", ElementParameters.WhichContentLength="automatic")
 		
 		x_Par_Enable("WhichContentMD5")
-		if (ElementParameters.WhichContentLength="automatic")
-			x_Par_Enable("ContentMD5")
-		else
-			x_Par_Disable("ContentMD5")
+		
+		x_Par_Disable("ContentMD5", ElementParameters.WhichContentLength="automatic")
 		
 		
 		if (ElementParameters.WhereToGetPostData = "Specified")
@@ -226,7 +219,8 @@ Element_run_Action_HTTP_Request(Environment, ElementParameters)
 		return
 	}
 
-	; prepare variable where we will write options for HTTPRequest function
+	; prepare variable where we will write options and RequestHeaders for HTTPRequest function
+	RequestHeaders:=""
 	Options:=""
 	
 	; find out whether we have POST data 
@@ -243,7 +237,7 @@ Element_run_Action_HTTP_Request(Environment, ElementParameters)
 		}
 		
 		; check whether charset or codepage is defined
-		if (ElementParameters.WhichCodepage = "definedCharset")
+		if (EvaluatedParameters.WhichCodepage = "definedCharset")
 		{
 			; charset is defined. Add it to options.
 			x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["Codepage"])
@@ -254,7 +248,7 @@ Element_run_Action_HTTP_Request(Environment, ElementParameters)
 
 			Options .= "Charset: " EvaluatedParameters.Codepage "`n"
 		}
-		else if (ElementParameters.WhichCodepage = "definedCodepage")
+		else if (EvaluatedParameters.WhichCodepage = "definedCodepage")
 		{
 			; codepage is defined. Add it to options.
 			x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, ["Codepage"])
@@ -300,7 +294,7 @@ Element_run_Action_HTTP_Request(Environment, ElementParameters)
 			}
 
 			; add content type to options
-			Options .= "Content-Type: " EvaluatedParameters.Contenttype "`n"
+			RequestHeaders .= "Content-Type: " EvaluatedParameters.Contenttype "`n"
 		}
 		if (EvaluatedParameters.WhichContentLength = "custom")
 		{
@@ -314,7 +308,7 @@ Element_run_Action_HTTP_Request(Environment, ElementParameters)
 			}
 
 			; add content length to options
-			Options.="Content-Length: " ContentLength "`n"
+			RequestHeaders.="Content-Length: " ContentLength "`n"
 		}
 
 		if (EvaluatedParameters.WhichContentMD5 = "automatic")
@@ -322,7 +316,7 @@ Element_run_Action_HTTP_Request(Environment, ElementParameters)
 			; MD5 should be calculated
 
 			; this will calculate the MD5 automatically
-			Options .= "Content-MD5:"  "`n"
+			RequestHeaders .= "Content-MD5:"  "`n"
 		}
 		if (EvaluatedParameters.WhichContentMD5 = "custom")
 		{
@@ -336,7 +330,7 @@ Element_run_Action_HTTP_Request(Environment, ElementParameters)
 			}
 
 			; add MD5 to options
-			Options .= "Content-MD5: " ContentMD5 "`n"
+			RequestHeaders .= "Content-MD5: " ContentMD5 "`n"
 		}
 	}
 	
@@ -366,7 +360,7 @@ Element_run_Action_HTTP_Request(Environment, ElementParameters)
 	if (EvaluatedParameters.WhichMethod = "Custom")
 	{
 		; A specific method should be used. Add it to the options
-		Options .= "Method: " ElementParameters.Method "`n"
+		Options .= "Method: " EvaluatedParameters.Method "`n"
 	}
 	if (EvaluatedParameters.WhichUserAgent = "custom")
 	{
@@ -380,7 +374,7 @@ Element_run_Action_HTTP_Request(Environment, ElementParameters)
 		}
 		
 		; Add custom user agent to options.
-		Options .= "User-Agent: " EvaluatedParameters.UserAgent "`n"
+		RequestHeaders .= "User-Agent: " EvaluatedParameters.UserAgent "`n"
 	}
 	if (EvaluatedParameters.WhichProxy = "automatic")
 	{
@@ -418,13 +412,18 @@ Element_run_Action_HTTP_Request(Environment, ElementParameters)
 	
 	
 	; URI encode headers and post data (if any)
-	if (EvaluatedParameters.Headers)
-		Headers := x_UriEncode(EvaluatedParameters.Headers)
-	if (EvaluatedParameters.PostData)
-		PostData := x_UriEncode(EvaluatedParameters.PostData)
+	if (postDataAvailable)
+	{
+		if (EvaluatedParameters.URIEncodePostData)
+			PostData := x_UriEncode(EvaluatedParameters.PostData)
+		Else
+			PostData := EvaluatedParameters.PostData
+	}
+	RequestHeaders.= "`n" EvaluatedParameters.RequestHeaders
 	
+	;MsgBox, %  "PostData`n" PostData "`n`nHeaders`n" RequestHeaders "`n`nOptions`n" Options
 	;All informations gathered: Perform HTTP Request
-	BytesDownloaded := Default_Lib_HTTPRequest(EvaluatedParameters.URL, PostData, Headers, Options)
+	BytesDownloaded := Default_Lib_HTTPRequest(EvaluatedParameters.URL, PostData, RequestHeaders, Options)
 	
 	if (EvaluatedParameters.WhereToPutResponseData = "Variable")
 	{
