@@ -428,21 +428,31 @@ TreeView_manager()
 		if (tempselectedType = "category") ;If the item is a category
 		{
 			; Get the old name and compare it with the new name
-			tempOldName := _getCategoryProperty(tempselectedID, "name")
+			if (tempselectedID = "demo")
+			{
+				tempOldName := lang("Demonstration")
+			} else if (tempselectedID = "Uncategorized")
+			{
+				tempOldName := lang("Uncategorized")
+			}
+			Else
+			{
+				tempOldName := _getCategoryProperty(tempselectedID, "name")
+			}
 			if !(tempOldName == tempNewName) ;If the name has changed
 			{
-				;Do not rename demonstration category
-				if (tempselectedID = "demo" and tempNewName != lang("Demonstration"))
-				{
-					soundplay,*16
-					MsgBox, 16, % lang("Rename category"), % lang("The demonstration category cannot be renamed.")
-					TV_Modify(tempselectedTV, "", lang("Demonstration"))
-					return
-				}
 				;Do not rename if user has entered an empty name
 				if (tempNewName = "")
 				{
 					; Silently restore the old name
+					TV_Modify(tempselectedTV, "", tempOldName)
+					return
+				}
+				;Do not rename demonstration category
+				if (tempselectedID = "demo" and tempNewName != tempOldName)
+				{
+					soundplay,*16
+					MsgBox, 16, % lang("Rename category"), % lang("The demonstration category cannot be renamed.")
 					TV_Modify(tempselectedTV, "", tempOldName)
 					return
 				}
