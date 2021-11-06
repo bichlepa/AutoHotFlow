@@ -48,7 +48,7 @@ Licensed under GNU General Public License 3
 Sourcecode: https://github.com/bichlepa/AutoHotFlow
 
 
-This application includes some external binaries. This is anoverview:
+This application includes some external binaries. This is an overview:
 
 7-Zip Command line version
 author: Igor Pavlov
