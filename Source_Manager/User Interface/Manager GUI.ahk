@@ -573,6 +573,11 @@ TreeView_manager()
 		else
 			guicontrol,,Button_manager_RunFlow,% lang("Run #verb")
 	}
+
+	if (A_GuiEvent ="DoubleClick") ;If user has selected an item.
+	{
+		Button_manager_EditFlow()
+	}
 }
 
 ;Show context menu on right click of user in TreeView
@@ -837,8 +842,16 @@ Button_manager_Help()
 Button_manager_EditFlow()
 {
 	global
+	; get information about the selected item
+	local tempselectedTV := TV_GetSelection()
+	local tempselectedID := global_allTreeViewItems[tempselectedTV].id
+	local tempselectedType := global_allTreeViewItems[tempselectedTV].type
+
 	;open flow editor
-	editFlow(global_allTreeViewItems[TV_GetSelection()].id)
+	if (tempselectedType = "flow")
+	{
+		editFlow(global_allTreeViewItems[TV_GetSelection()].id)
+	}
 }
 
 ; when user clicks on button "run flow"
