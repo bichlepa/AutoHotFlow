@@ -41,11 +41,11 @@ API_Execution_DisableTriggers(p_FlowID)
 }
 
 ; tells the execution thread that it should enable a single trigger
-API_Execution_enableOneTrigger(par_FlowID, par_TriggerID, par_save = true)
+API_Execution_enableOneTrigger(par_FlowID, par_TriggerID, par_save = true, par_startup = false)
 {
 	logger("t2", A_ThisFunc " called from thread", _ahkThreadID)
 	
-	_setTask("execution", {name: "enableOneTrigger", flowID: par_FlowID, triggerID: par_TriggerID, save: par_save})
+	_setTask("execution", {name: "enableOneTrigger", flowID: par_FlowID, triggerID: par_TriggerID, save: par_save, startup: par_startup})
 }
 
 ; tells the execution thread that it should disable a single trigger

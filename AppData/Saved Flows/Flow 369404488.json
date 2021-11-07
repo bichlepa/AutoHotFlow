@@ -660,7 +660,284 @@
       "ConnectionType": "normal",
       "from": "element0000000198",
       "ID": "connection0000000200",
+      "to": "element0000000203",
+      "type": "Connection"
+    },
+    "connection0000000204": {
+      "ConnectionType": "normal",
+      "from": "element0000000203",
+      "ID": "connection0000000204",
       "to": "element0000000035",
+      "type": "Connection"
+    },
+    "connection0000000206": {
+      "ConnectionType": "normal",
+      "from": "element0000000202",
+      "ID": "connection0000000206",
+      "to": "element0000000207",
+      "type": "Connection"
+    },
+    "connection0000000208": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000208",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000209": {
+      "ConnectionType": "normal",
+      "from": "element0000000207",
+      "ID": "connection0000000209",
+      "to": "element0000000210",
+      "type": "Connection"
+    },
+    "connection0000000211": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000211",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000212": {
+      "ConnectionType": "normal",
+      "from": "element0000000210",
+      "ID": "connection0000000212",
+      "to": "element0000000216",
+      "type": "Connection"
+    },
+    "connection0000000214": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000214",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000215": {
+      "ConnectionType": "normal",
+      "from": "element0000000213",
+      "ID": "connection0000000215",
+      "to": "element0000000219",
+      "type": "Connection"
+    },
+    "connection0000000217": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000217",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000218": {
+      "ConnectionType": "normal",
+      "from": "element0000000216",
+      "ID": "connection0000000218",
+      "to": "element0000000227",
+      "type": "Connection"
+    },
+    "connection0000000220": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000220",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000221": {
+      "ConnectionType": "Yes",
+      "from": "element0000000219",
+      "ID": "connection0000000221",
+      "to": "element0000000239",
+      "type": "Connection"
+    },
+    "connection0000000224": {
+      "ConnectionType": "No",
+      "from": "element0000000233",
+      "ID": "connection0000000224",
+      "to": "element0000000225",
+      "type": "Connection"
+    },
+    "connection0000000228": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000228",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000229": {
+      "ConnectionType": "normal",
+      "from": "element0000000227",
+      "ID": "connection0000000229",
+      "to": "element0000000213",
+      "type": "Connection"
+    },
+    "connection0000000231": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000231",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000232": {
+      "ConnectionType": "normal",
+      "from": "element0000000230",
+      "ID": "connection0000000232",
+      "to": "element0000000236",
+      "type": "Connection"
+    },
+    "connection0000000234": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000234",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000235": {
+      "ConnectionType": "Yes",
+      "from": "element0000000233",
+      "ID": "connection0000000235",
+      "to": "element0000000251",
+      "type": "Connection"
+    },
+    "connection0000000237": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000237",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000238": {
+      "ConnectionType": "normal",
+      "from": "element0000000236",
+      "ID": "connection0000000238",
+      "to": "element0000000266",
+      "type": "Connection"
+    },
+    "connection0000000240": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000240",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000241": {
+      "ConnectionType": "normal",
+      "from": "element0000000239",
+      "ID": "connection0000000241",
+      "to": "element0000000230",
+      "type": "Connection"
+    },
+    "connection0000000246": {
+      "ConnectionType": "normal",
+      "from": "element0000000245",
+      "fromPart": "TAIL",
+      "ID": "connection0000000246",
+      "to": "element0000000263",
+      "type": "Connection"
+    },
+    "connection0000000247": {
+      "ConnectionType": "normal",
+      "from": "element0000000245",
+      "fromPart": "HEAD",
+      "ID": "connection0000000247",
+      "to": "element0000000248",
+      "type": "Connection"
+    },
+    "connection0000000249": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000249",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000250": {
+      "ConnectionType": "normal",
+      "from": "element0000000251",
+      "ID": "connection0000000250",
+      "to": "element0000000254",
+      "type": "Connection"
+    },
+    "connection0000000252": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000252",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000253": {
+      "ConnectionType": "normal",
+      "from": "element0000000254",
+      "ID": "connection0000000253",
+      "to": "element0000000245",
+      "toPart": "HEAD",
+      "type": "Connection"
+    },
+    "connection0000000256": {
+      "ConnectionType": "normal",
+      "from": "element0000000248",
+      "ID": "connection0000000256",
+      "to": "element0000000255",
+      "type": "Connection"
+    },
+    "connection0000000257": {
+      "ConnectionType": "Yes",
+      "from": "element0000000255",
+      "ID": "connection0000000257",
+      "to": "element0000000262",
+      "type": "Connection"
+    },
+    "connection0000000260": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000260",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000261": {
+      "ConnectionType": "normal",
+      "from": "element0000000262",
+      "ID": "connection0000000261",
+      "to": "element0000000245",
+      "toPart": "TAIL",
+      "type": "Connection"
+    },
+    "connection0000000264": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000264",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000265": {
+      "ConnectionType": "normal",
+      "from": "element0000000271",
+      "ID": "connection0000000265",
+      "to": "element0000000269",
+      "type": "Connection"
+    },
+    "connection0000000267": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000267",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000268": {
+      "ConnectionType": "normal",
+      "from": "element0000000266",
+      "ID": "connection0000000268",
+      "to": "element0000000233",
+      "type": "Connection"
+    },
+    "connection0000000270": {
+      "ConnectionType": "Yes",
+      "from": "element0000000269",
+      "ID": "connection0000000270",
+      "to": "element0000000205",
+      "type": "Connection"
+    },
+    "connection0000000272": {
+      "ConnectionType": "normal",
+      "from": "element0000000263",
+      "ID": "connection0000000272",
+      "to": "element0000000271",
       "type": "Connection"
     }
   },
@@ -886,7 +1163,7 @@
     },
     "element0000000025": {
       "class": "Trigger_Manual",
-      "DefaultTrigger": "1",
+      "DefaultTrigger": "0",
       "enabled": "1",
       "ID": "element0000000025",
       "name": "Manual - \"start\"",
@@ -936,7 +1213,7 @@
       },
       "StandardName": "1",
       "type": "Action",
-      "x": "-140",
+      "x": "-595",
       "y": "840"
     },
     "element0000000034": {
@@ -973,14 +1250,14 @@
     "element0000000036": {
       "class": "Action_New_variable",
       "ID": "element0000000036",
-      "name": "New variable - requiredSuccessfulRuns = 4",
+      "name": "New variable - requiredSuccessfulRuns = 5",
       "package": "Default",
       "packageVersion": "1.2.0",
       "pars": {
         "expression": "Expression",
         "onlyIfNotExist": "0",
         "Varname": "requiredSuccessfulRuns",
-        "VarValue": "4"
+        "VarValue": "5"
       },
       "StandardName": "1",
       "type": "Action",
@@ -1016,21 +1293,21 @@
     "element0000000046": {
       "class": "Action_Message_Box",
       "ID": "element0000000046",
-      "name": "Message box - Fehler - Only %static_successfulRuns% successful runs instead of %requiredSuccessfulRuns%",
+      "name": "Message box - Error - Only %static_successfulRuns% successful runs instead of %requiredSuccessfulRuns%",
       "package": "Default",
       "packageVersion": "1.2.0",
       "pars": {
         "ButtonLabel": "OK",
         "ButtonLabelCancel": "Abbrechen",
         "Height": "200",
-        "IfClose": "",
-        "IfDismiss": 1,
+        "IfClose": "0",
+        "IfDismiss": "Normal",
         "IsTimeout": "NoTimeout",
         "message": "Only %static_successfulRuns% successful runs instead of %requiredSuccessfulRuns%",
         "OnTimeout": "Normal",
         "ShowCancelButton": 0,
         "TimeoutUnits": 10,
-        "title": "Fehler",
+        "title": "Error",
         "Unit": "Seconds",
         "Width": "300"
       },
@@ -1091,7 +1368,7 @@
       },
       "StandardName": "1",
       "type": "Action",
-      "x": "-315",
+      "x": "-770",
       "y": "840"
     },
     "element0000000057": {
@@ -1937,7 +2214,7 @@
       },
       "StandardName": "1",
       "type": "Action",
-      "x": "35",
+      "x": "-420",
       "y": "840"
     },
     "element0000000198": {
@@ -1958,19 +2235,551 @@
       },
       "StandardName": "1",
       "type": "Action",
-      "x": "175",
+      "x": "-245",
       "y": "840"
+    },
+    "element0000000202": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "1",
+      "enabled": "1",
+      "ID": "element0000000202",
+      "name": "Manual - \"substring2 test\"",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "ID": "substring2 test"
+      },
+      "StandardName": "1",
+      "type": "trigger",
+      "x": "3080",
+      "y": "105"
+    },
+    "element0000000203": {
+      "class": "Action_Execute_Flow",
+      "ID": "element0000000203",
+      "name": "Execute flow: This flow - Manual - \"substring2 test\"",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "flowID": "",
+        "ReturnVariables": 0,
+        "SendLocalVars": 1,
+        "SkipDisabled": 0,
+        "ThisFlow": 1,
+        "triggerID": "element0000000202",
+        "WaitToFinish": "1",
+        "WhichTrigger": "specified"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-70",
+      "y": "840"
+    },
+    "element0000000205": {
+      "class": "Action_New_variable",
+      "ID": "element0000000205",
+      "name": "New variable - static_successfulRuns = static_successfulRuns + 1",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "expression": "Expression",
+        "onlyIfNotExist": "0",
+        "Varname": "static_successfulRuns",
+        "VarValue": "static_successfulRuns + 1"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "2765",
+      "y": "3360"
+    },
+    "element0000000207": {
+      "class": "Action_New_variable",
+      "ID": "element0000000207",
+      "name": "New variable - string = Hello real world",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "expression": "String",
+        "onlyIfNotExist": "0",
+        "Varname": "string",
+        "VarValue": "Hello real world"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "3080",
+      "y": "245"
+    },
+    "element0000000210": {
+      "class": "action_Substring2",
+      "ID": "element0000000210",
+      "name": "Substring2 - hello - string",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "EndPos": 5,
+        "EndTextCaseSensitive": "0",
+        "EndTextExcluding": "",
+        "EndTextIncluding": "",
+        "expression": "Expression",
+        "expressionEnd": "String",
+        "expressionStart": "String",
+        "Length": 5,
+        "StartPos": 1,
+        "StartTextCaseSensitive": "0",
+        "StartTextExcluding": "",
+        "StartTextIncluding": "",
+        "Varname": "hello",
+        "VarValue": "string",
+        "WhereToBegin": "FromLeft",
+        "WhereToEnd": "CountOfChars"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "3080",
+      "y": "420"
+    },
+    "element0000000213": {
+      "class": "action_Substring2",
+      "ID": "element0000000213",
+      "name": "Substring2 - world - string",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "EndPos": 5,
+        "EndTextCaseSensitive": "0",
+        "EndTextExcluding": "",
+        "EndTextIncluding": "",
+        "expression": "Expression",
+        "expressionEnd": "String",
+        "expressionStart": "String",
+        "Length": "1",
+        "StartPos": "12",
+        "StartTextCaseSensitive": "0",
+        "StartTextExcluding": "",
+        "StartTextIncluding": "",
+        "Varname": "world",
+        "VarValue": "string",
+        "WhereToBegin": "Position",
+        "WhereToEnd": "AtTheEnd"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "3010",
+      "y": "770"
+    },
+    "element0000000216": {
+      "class": "action_Substring2",
+      "ID": "element0000000216",
+      "name": "Substring2 - real - string",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "EndPos": 5,
+        "EndTextCaseSensitive": "0",
+        "EndTextExcluding": "",
+        "EndTextIncluding": "",
+        "expression": "Expression",
+        "expressionEnd": "String",
+        "expressionStart": "String",
+        "Length": "4",
+        "StartPos": "7",
+        "StartTextCaseSensitive": "0",
+        "StartTextExcluding": "",
+        "StartTextIncluding": "",
+        "Varname": "real",
+        "VarValue": "string",
+        "WhereToBegin": "Position",
+        "WhereToEnd": "CountOfChars"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "3080",
+      "y": "595"
+    },
+    "element0000000219": {
+      "class": "Condition_Expression",
+      "ID": "element0000000219",
+      "name": "Expression - hello = \"hello\" and world = \"world\" and real = \"real\" and real2 = \"real\"",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "Expression": "hello = \"hello\" and world = \"world\" and real = \"real\" and real2 = \"real\""
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "2975",
+      "y": "945"
+    },
+    "element0000000225": {
+      "class": "condition_Debug_dialog",
+      "ID": "element0000000225",
+      "name": "Debug dialog",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {},
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "3430",
+      "y": "1610"
+    },
+    "element0000000227": {
+      "class": "action_Substring2",
+      "ID": "element0000000227",
+      "name": "Substring2 - real2 - string",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "EndPos": "10",
+        "EndTextCaseSensitive": "0",
+        "EndTextExcluding": "",
+        "EndTextIncluding": "",
+        "expression": "Expression",
+        "expressionEnd": "String",
+        "expressionStart": "String",
+        "Length": "4",
+        "StartPos": "7",
+        "StartTextCaseSensitive": "0",
+        "StartTextExcluding": "",
+        "StartTextIncluding": "",
+        "Varname": "real2",
+        "VarValue": "string",
+        "WhereToBegin": "Position",
+        "WhereToEnd": "Position"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "3255",
+      "y": "595"
+    },
+    "element0000000230": {
+      "class": "action_Substring2",
+      "ID": "element0000000230",
+      "name": "Substring2 - allText - string",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "EndPos": 5,
+        "EndTextCaseSensitive": "0",
+        "EndTextExcluding": "",
+        "EndTextIncluding": "element",
+        "expression": "Expression",
+        "expressionEnd": "String",
+        "expressionStart": "String",
+        "Length": "1",
+        "StartPos": "1",
+        "StartTextCaseSensitive": "0",
+        "StartTextExcluding": "",
+        "StartTextIncluding": "I",
+        "Varname": "allText",
+        "VarValue": "string",
+        "WhereToBegin": "String",
+        "WhereToEnd": "String"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "3010",
+      "y": "1295"
+    },
+    "element0000000233": {
+      "class": "Condition_Expression",
+      "ID": "element0000000233",
+      "name": "Expression - allText = string and testwithspaces = \" test \" and testwithtothis = \"to test this\"",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "Expression": "allText = string and testwithspaces = \" test \" and testwithtothis = \"to test this\""
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "3080",
+      "y": "1610"
+    },
+    "element0000000236": {
+      "class": "action_Substring2",
+      "ID": "element0000000236",
+      "name": "Substring2 - testwithspaces - string",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "EndPos": 5,
+        "EndTextCaseSensitive": "0",
+        "EndTextExcluding": "this",
+        "EndTextIncluding": "",
+        "expression": "Expression",
+        "expressionEnd": "String",
+        "expressionStart": "String",
+        "Length": "1",
+        "StartPos": "1",
+        "StartTextCaseSensitive": "0",
+        "StartTextExcluding": "to",
+        "StartTextIncluding": "",
+        "Varname": "testwithspaces",
+        "VarValue": "string",
+        "WhereToBegin": "String",
+        "WhereToEnd": "String"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "3045",
+      "y": "1435"
+    },
+    "element0000000239": {
+      "class": "Action_New_variable",
+      "ID": "element0000000239",
+      "name": "New variable - string = I am going to test this very good, this absolutely good and this extraordinary good element",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "expression": "String",
+        "onlyIfNotExist": "0",
+        "Varname": "string",
+        "VarValue": "I am going to test this very good, this absolutely good and this extraordinary good element"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "3010",
+      "y": "1120"
+    },
+    "element0000000245": {
+      "class": "loop_Work_through_a_list",
+      "HeightOfVerticalBar": "560",
+      "ID": "element0000000245",
+      "name": "Work through a list: howGoodList",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "VarValue": "howGoodList"
+      },
+      "StandardName": "1",
+      "type": "Loop",
+      "x": "2905",
+      "y": "2135"
+    },
+    "element0000000248": {
+      "class": "action_Substring2",
+      "ID": "element0000000248",
+      "name": "Substring2 - howGood - string",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "EndPos": 5,
+        "EndTextCaseSensitive": 0,
+        "EndTextExcluding": " good",
+        "EndTextIncluding": "",
+        "expression": "Expression",
+        "expressionEnd": "String",
+        "expressionStart": "String",
+        "Length": 5,
+        "StartPos": "startpos",
+        "StartTextCaseSensitive": 0,
+        "StartTextExcluding": "this ",
+        "StartTextIncluding": "",
+        "Varname": "howGood",
+        "VarValue": "string",
+        "WhereToBegin": "String",
+        "WhereToEnd": "String"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "3045",
+      "y": "2345"
+    },
+    "element0000000251": {
+      "class": "action_New_List",
+      "ID": "element0000000251",
+      "name": "New list howGoodList - As first value - Multiple values 'very - absolutely - extraordinary'",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "DelimiterComma": 0,
+        "DelimiterLinefeed": 1,
+        "DelimiterSemicolon": 0,
+        "DelimiterSpace": 0,
+        "expression": "String",
+        "expressionPos": "String",
+        "NumberOfElements": "Multiple",
+        "Position": "keyName",
+        "Varname": "howGoodList",
+        "VarValue": "New element",
+        "VarValues": "very\nabsolutely\nextraordinary",
+        "WhichPosition": "First"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "2905",
+      "y": "1785"
+    },
+    "element0000000254": {
+      "class": "action_New_Variable",
+      "ID": "element0000000254",
+      "name": "New variable - startPos = 1",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "expression": "String",
+        "onlyIfNotExist": 0,
+        "Varname": "startPos",
+        "VarValue": "1"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "2905",
+      "y": "1960"
+    },
+    "element0000000255": {
+      "class": "Condition_Expression",
+      "ID": "element0000000255",
+      "name": "Expression - howGood = a_loopfield",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "Expression": "howGood = a_loopfield"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "3080",
+      "y": "2485"
+    },
+    "element0000000258": {
+      "class": "condition_Debug_dialog",
+      "ID": "element0000000258",
+      "name": "Debug dialog",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {},
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "3325",
+      "y": "2625"
+    },
+    "element0000000262": {
+      "class": "action_New_Variable",
+      "ID": "element0000000262",
+      "name": "New variable - startpos = a_startPos",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "expression": "Expression",
+        "onlyIfNotExist": 0,
+        "Varname": "startpos",
+        "VarValue": "a_startPos"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "2975",
+      "y": "2625"
+    },
+    "element0000000263": {
+      "class": "action_Substring2",
+      "ID": "element0000000263",
+      "name": "Substring2 - noText1 - string",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "EndPos": 5,
+        "EndTextCaseSensitive": "0",
+        "EndTextExcluding": "",
+        "EndTextIncluding": "aseg",
+        "expression": "Expression",
+        "expressionEnd": "String",
+        "expressionStart": "String",
+        "Length": "1",
+        "StartPos": "1",
+        "StartTextCaseSensitive": "0",
+        "StartTextExcluding": "",
+        "StartTextIncluding": "awdf",
+        "Varname": "noText1",
+        "VarValue": "string",
+        "WhereToBegin": "String",
+        "WhereToEnd": "AtTheEnd"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "2870",
+      "y": "2975"
+    },
+    "element0000000266": {
+      "class": "action_Substring2",
+      "ID": "element0000000266",
+      "name": "Substring2 - testwithtothis - string",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "EndPos": 5,
+        "EndTextCaseSensitive": "0",
+        "EndTextExcluding": " very",
+        "EndTextIncluding": "this",
+        "expression": "Expression",
+        "expressionEnd": "String",
+        "expressionStart": "String",
+        "Length": "1",
+        "StartPos": "1",
+        "StartTextCaseSensitive": "0",
+        "StartTextExcluding": "going ",
+        "StartTextIncluding": "to",
+        "Varname": "testwithtothis",
+        "VarValue": "string",
+        "WhereToBegin": "String",
+        "WhereToEnd": "String"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "3220",
+      "y": "1435"
+    },
+    "element0000000269": {
+      "class": "Condition_Expression",
+      "ID": "element0000000269",
+      "name": "Expression - notext1 = \"\" and notext2 = \"\"",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "Expression": "notext1 = \"\" and notext2 = \"\""
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "3010",
+      "y": "3255"
+    },
+    "element0000000271": {
+      "class": "action_Substring2",
+      "ID": "element0000000271",
+      "name": "Substring2 - noText2 - string",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "EndPos": 5,
+        "EndTextCaseSensitive": "0",
+        "EndTextExcluding": "",
+        "EndTextIncluding": "aseg",
+        "expression": "Expression",
+        "expressionEnd": "String",
+        "expressionStart": "String",
+        "Length": "1",
+        "StartPos": "1",
+        "StartTextCaseSensitive": "0",
+        "StartTextExcluding": "",
+        "StartTextIncluding": "awdf",
+        "Varname": "noText2",
+        "VarValue": "string",
+        "WhereToBegin": "FromLeft",
+        "WhereToEnd": "String"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "3115",
+      "y": "2975"
     }
   },
   "category": "Automatic tests",
-  "ElementIDCounter": "201",
+  "ElementIDCounter": "272",
   "flowSettings": {
     "DefaultWorkingDir": 1,
     "ExecutionPolicy": "default",
-    "Offsetx": "314.285712",
-    "Offsety": "498.571428",
+    "Offsetx": "1980.603918",
+    "Offsety": "676.826662",
     "WorkingDir": "",
-    "zoomFactor": "0.7"
+    "zoomFactor": "0.769998"
   },
   "name": "string test"
 }

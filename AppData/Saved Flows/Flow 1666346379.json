@@ -1,4 +1,4 @@
-﻿{
+{
   "allConnections": {
     "connection0000000004": {
       "ConnectionType": "normal",
@@ -141,7 +141,8 @@
       "enabled": "0",
       "ID": "element0000000001",
       "name": "Manual - \"Key Down test\"",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "ID": "Key Down test"
       },
@@ -153,10 +154,12 @@
     "element0000000005": {
       "class": "Condition_Key_Is_Down",
       "ID": "element0000000005",
-      "name": "Key Is Down - ctrl",
-      "package": "default",
+      "name": "Key is down - ctrl",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
-        "key": "ctrl"
+        "key": "ctrl",
+        "WhichKeyState": "logical"
       },
       "StandardName": "1",
       "type": "Condition",
@@ -166,8 +169,9 @@
     "element0000000008": {
       "class": "Action_Tooltip",
       "ID": "element0000000008",
-      "name": "Tooltip: press ctrl - 2 s - Follow Mouse",
-      "package": "action",
+      "name": "Tooltip: press ctrl - 2 s - Follow mouse",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "duration": 2,
         "follow_mouse": 1,
@@ -183,7 +187,8 @@
       "class": "Action_Sleep",
       "ID": "element0000000011",
       "name": "Sleep: 2 s",
-      "package": "action",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "Duration": 2,
         "Unit": "Seconds"
@@ -196,10 +201,12 @@
     "element0000000016": {
       "class": "Condition_Key_Is_Down",
       "ID": "element0000000016",
-      "name": "Key Is Down - ctrl",
-      "package": "default",
+      "name": "Key is down - ctrl",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
-        "key": "ctrl"
+        "key": "ctrl",
+        "WhichKeyState": "logical"
       },
       "StandardName": "1",
       "type": "Condition",
@@ -209,8 +216,9 @@
     "element0000000017": {
       "class": "Action_Tooltip",
       "ID": "element0000000017",
-      "name": "Tooltip: release ctrl - 2 s - Follow Mouse",
-      "package": "action",
+      "name": "Tooltip: release ctrl - 2 s - Follow mouse",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "duration": 2,
         "follow_mouse": 1,
@@ -226,7 +234,8 @@
       "class": "Action_Sleep",
       "ID": "element0000000018",
       "name": "Sleep: 2 s",
-      "package": "action",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "Duration": 2,
         "Unit": "Seconds"
@@ -239,8 +248,9 @@
     "element0000000025": {
       "class": "Action_Tooltip",
       "ID": "element0000000025",
-      "name": "Tooltip: Success - 2 s - Follow Mouse",
-      "package": "action",
+      "name": "Tooltip: Success - 2 s - Follow mouse",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "duration": 2,
         "follow_mouse": 1,
@@ -258,7 +268,8 @@
       "enabled": "0",
       "ID": "element0000000028",
       "name": "Manual - \"File select test\"",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "ID": "File select test"
       },
@@ -271,7 +282,8 @@
       "class": "Action_Select_file",
       "ID": "element0000000031",
       "name": "Select file - selectedFiles - ",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "fileMustExist": 0,
         "filter": "Any files (*.*)",
@@ -293,8 +305,9 @@
     "element0000000034": {
       "class": "Condition_Debug_Dialog",
       "ID": "element0000000034",
-      "name": "Debug Dialog",
-      "package": "default",
+      "name": "Debug dialog",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {},
       "StandardName": "1",
       "type": "Condition",
@@ -304,8 +317,9 @@
     "element0000000039": {
       "class": "Action_Drag_With_Mouse",
       "ID": "element0000000039",
-      "name": "Drag With Mouse - Right button - From '961\/745' to '821\/745'",
-      "package": "default",
+      "name": "Drag with mouse - Right button - From '961\/745' to '821\/745'",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "Button": "Right",
         "CoordMode": "Screen",
@@ -330,7 +344,8 @@
       "enabled": "0",
       "ID": "element0000000040",
       "name": "Manual - \"Move mouse\"",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "ID": "Move mouse"
       },
@@ -343,7 +358,8 @@
       "class": "Action_Sleep",
       "ID": "element0000000047",
       "name": "Sleep: 2 s",
-      "package": "action",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "Duration": 2,
         "Unit": "Seconds"
@@ -359,7 +375,8 @@
       "enabled": "0",
       "ID": "element0000000050",
       "name": "Manual - \"drive lock eject label\"",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "ID": "drive lock eject label"
       },
@@ -371,8 +388,9 @@
     "element0000000053": {
       "class": "Action_Change_Drive_Label",
       "ID": "element0000000053",
-      "name": "Change Drive Label - I: - Sonstiges",
-      "package": "default",
+      "name": "Change drive Label - I: - Sonstiges",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "DriveLetter": "I:",
         "NewLabel": "Sonstiges"
@@ -385,8 +403,9 @@
     "element0000000055": {
       "class": "Action_Get_Drive_Information",
       "ID": "element0000000055",
-      "name": "Get Drive Information -  - Status of optical disc drive - J:",
-      "package": "default",
+      "name": "Get drive information -  - Status of optical disc drive - J:",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "DriveLetter": "J:",
         "folder": "C:",
@@ -401,8 +420,9 @@
     "element0000000059": {
       "class": "Action_Tooltip",
       "ID": "element0000000059",
-      "name": "Tooltip: %DriveInfo% - 2 s - Follow Mouse",
-      "package": "action",
+      "name": "Tooltip: %DriveInfo% - 2 s - Follow mouse",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "duration": 2,
         "follow_mouse": 1,
@@ -417,8 +437,9 @@
     "element0000000061": {
       "class": "Action_Get_Screen_Settings",
       "ID": "element0000000061",
-      "name": "Get Screen Settings",
-      "package": "default",
+      "name": "Get screen settings",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "MonitorNumber": "2",
         "VarnameBluedrive": "",
@@ -458,7 +479,8 @@
       "enabled": "0",
       "ID": "element0000000062",
       "name": "Manual - \"drive lock eject label\"",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "ID": "drive lock eject label"
       },
@@ -470,8 +492,9 @@
     "element0000000064": {
       "class": "Condition_Debug_Dialog",
       "ID": "element0000000064",
-      "name": "Debug Dialog",
-      "package": "default",
+      "name": "Debug dialog",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {},
       "StandardName": "1",
       "type": "Condition",
@@ -481,8 +504,9 @@
     "element0000000068": {
       "class": "Action_Set_Screen_Settings",
       "ID": "element0000000068",
-      "name": "Set Screen Settings",
-      "package": "default",
+      "name": "Set screen settings",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "AllMonitors": "1",
         "BlueDrive": 128,

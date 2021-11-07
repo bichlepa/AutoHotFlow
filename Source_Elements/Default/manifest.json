@@ -29,6 +29,7 @@
         
         "Search_in_a_string.ahk",
         "Substring.ahk",
+        "Substring2.ahk",
         "Get_string_Length.ahk",
         "Replace_in_a_string.ahk",
         "Trim_a_string.ahk",

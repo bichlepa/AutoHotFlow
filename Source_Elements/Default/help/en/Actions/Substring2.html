@@ -1,0 +1,129 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<link rel="stylesheet" href="../../stylesheet.css">
+	<link rel="stylesheet" href="stylesheet.css">
+	<link rel="stylesheet" href="../../../../../Help/stylesheet.css">
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<H1>Substring2</H1>
+<p>
+	The action <B>Substring2</B> retrieves one or more characters from the specified position in a string.
+</p>
+
+<H2>Settings</H2>
+<table class="settings">
+	<TR>
+		<TD>
+			<h4>Output variable name</h4>
+			<p>Name of the variable which will contain the substring.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Input string</h4>
+			<p>A string from which the substring will be extracted.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Start position</h4>
+			<p>If <b>Start from left</b> is selected, the substring will contain characters from the start of the input string.</p>
+			<p>If <b>Start from following position</b> is selected, the substring will start at the specified position.</p>
+			<p>If <b>Search for a string and start there</b> is selected, the substring will start at the first occurence of the specified text. There are two text fields. The text in the first field won't be included in the substring, the text in the second field will be included. At least one field must contain any text. If the <b>Start position</b> is greater than 1, the occurences before this position will not be found.</p>
+			
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>End position</h4>
+			<p>If <b>End at the end of the string</b> is selected, the substring will contain all characters until the end of the input string.</p>
+			<p>If <b>End after a count of characters</b> is selected, the substring will contain the specified count of characters.</p>
+			<p>If <b>End at following position</b> is selected, the substring will contain all characters until the specified position.</p>
+			<p>If <b>Search for a string and end there</b> is selected, the substring will end at the specified text. There are two text fields. The text in the first field will be included in the substring, the text in the second field won't be included.</p>
+		</TD>
+	</TR>
+</table>
+
+<H2>Examples</H2>
+<table class="examples">
+	<TR>
+		<TD>
+			<p>Extract the word "Hello" from the string "Hello world!".</p>
+			<table class="example">
+				<TR>
+					<TD class="example-parameter">
+						<p>Start position</p>
+					</TD>
+					<TD class="example-value">
+						<p>◉ Start from left</p>
+					</TD>
+				</TR>
+				<TR>
+					<TD class="example-parameter">
+						<p>End position</p>
+					</TD>
+					<TD class="example-value">
+						<p>◉ End after a count of characters</p>
+					</TD>
+				</TR>
+				<TR>
+					<TD class="example-parameter">
+						<p>End position - Count of characters</p>
+					</TD>
+					<TD class="example-value">
+						<p>5</p>
+					</TD>
+				</TR>
+			</table>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<p>Extract the content of a the first header in a HTML page.</p>
+			<table class="example">
+				<TR>
+					<TD class="example-parameter">
+						<p>Start position</p>
+					</TD>
+					<TD class="example-value">
+						<p>◉ Search for a string and start there</p>
+					</TD>
+				</TR>
+				<TR>
+					<TD class="example-parameter">
+						<p>Start position - Text (excluding and including)</p>
+					</TD>
+					<TD class="example-value">
+						<p>&lth1&gt <i>and empty</i></p>
+					</TD>
+				</TR>
+				<TR>
+					<TD class="example-parameter">
+						<p>End position</p>
+					</TD>
+					<TD class="example-value">
+						<p>◉ Search for a string and end there</p>
+					</TD>
+				</TR>
+				<TR>
+					<TD class="example-parameter">
+						<p>End position - Text (including and excluding)</p>
+					</TD>
+					<TD class="example-value">
+						<p><i>empty and</i> &lt/h1&gt</p>
+					</TD>
+				</TR>
+			</table>
+		</TD>
+	</TR>
+</table>
+
+<H2>Remarks</H2>
+<p>
+	There action "Substring" is similar but has different parametrers. The combination of all parameters in one element was too complicated therefore I created two elements.
+</p>
+
+</BODY>
+</HTML>

@@ -1,4 +1,4 @@
-﻿{
+{
   "allConnections": {
     "connection0000000003": {
       "ConnectionType": "normal",
@@ -78,7 +78,8 @@
       "enabled": "0",
       "ID": "element0000000001",
       "name": "Manual - \"Trigger safe salad\"",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "ID": "Trigger safe salad"
       },
@@ -91,7 +92,8 @@
       "class": "Action_Beep",
       "ID": "element0000000002",
       "name": "Beep - 523 Hz 150 ms",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "duration": 150,
         "frequency": 523
@@ -105,7 +107,8 @@
       "class": "Action_Beep",
       "ID": "element0000000004",
       "name": "Beep - 600 Hz 500 ms",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "duration": "500",
         "frequency": "600"
@@ -121,7 +124,8 @@
       "enabled": "0",
       "ID": "element0000000008",
       "name": "Manual - \"Trigger serious clock\"",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "ID": "Trigger serious clock"
       },
@@ -134,7 +138,8 @@
       "class": "Action_Speech_output",
       "ID": "element0000000010",
       "name": "Speech output -  - Microsoft Hedda Desktop",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "pitch": 0,
         "speed": "4",
@@ -153,7 +158,8 @@
       "class": "Action_Speech_output",
       "ID": "element0000000011",
       "name": "Speech output -  - Microsoft Hedda Desktop",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "pitch": "-8",
         "speed": "5",
@@ -172,7 +178,8 @@
       "class": "Action_Speech_output",
       "ID": "element0000000013",
       "name": "Speech output -  - Microsoft Hedda Desktop",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "pitch": "3",
         "speed": "7",
@@ -191,7 +198,8 @@
       "class": "Action_Sleep",
       "ID": "element0000000018",
       "name": "Sleep: 2 s",
-      "package": "action",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "Duration": 2,
         "Unit": "Seconds"
@@ -205,7 +213,8 @@
       "class": "Action_Speech_output",
       "ID": "element0000000020",
       "name": "Speech output -  - Microsoft Hedda Desktop",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "pitch": "3",
         "speed": "7",
@@ -224,7 +233,8 @@
       "class": "Action_Speech_output",
       "ID": "element0000000022",
       "name": "Speech output -  - Microsoft Hedda Desktop",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "pitch": "3",
         "speed": "7",

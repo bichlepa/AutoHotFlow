@@ -1,4 +1,4 @@
-﻿{
+{
   "allConnections": {
     "connection0000000002": {
       "ConnectionType": "normal",
@@ -69,8 +69,9 @@
       "class": "Trigger_Clipboard_Changes",
       "enabled": "0",
       "ID": "element0000000001",
-      "name": "Zwischenablage \u00E4ndert sich",
-      "package": "default",
+      "name": "Clipboard changes",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {},
       "StandardName": "1",
       "type": "trigger",
@@ -80,8 +81,9 @@
     "element0000000006": {
       "class": "Action_Get_Clipboard",
       "ID": "element0000000006",
-      "name": "Zwischenablage lesen - clipboard",
-      "package": "default",
+      "name": "Get clipboard - clipboard",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "Varname": "clipboard"
       },
@@ -93,8 +95,9 @@
     "element0000000011": {
       "class": "Action_Change_character_case",
       "ID": "element0000000011",
-      "name": "Gro\u00DF- und Kleinschreibung \u00E4ndern - Gro\u00DFbuchstaben - clipboardChanged - clipboard",
-      "package": "default",
+      "name": "Change character case - Uppercase - clipboardChanged - clipboard",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "CharCase": "upper",
         "expression": "Expression",
@@ -109,8 +112,9 @@
     "element0000000014": {
       "class": "Action_Set_Clipboard",
       "ID": "element0000000014",
-      "name": "In Zwischenablage schreiben - clipboardChanged",
-      "package": "default",
+      "name": "Set clipboard - clipboardChanged",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "expression": "expression",
         "text": "clipboardChanged"
@@ -123,8 +127,9 @@
     "element0000000018": {
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000018",
-      "name": "Flow-Status einstellen - Deaktivieren: Dieser Flow - Alle Trigger",
-      "package": "default",
+      "name": "Set flow status - Disable: This flow - All triggers",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "Enable": "Disable",
         "flowID": "",
@@ -140,8 +145,9 @@
     "element0000000019": {
       "class": "Action_Set_Flow_Status",
       "ID": "element0000000019",
-      "name": "Flow-Status einstellen - Aktivieren: Dieser Flow - Alle Trigger",
-      "package": "default",
+      "name": "Set flow status - Enable: This flow - All triggers",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "Enable": "Enable",
         "flowID": "",
@@ -157,8 +163,9 @@
     "element0000000023": {
       "class": "Action_Tooltip",
       "ID": "element0000000023",
-      "name": "Tooltip: clipboard: %clipboard% - changed to: %clipboardChanged% - 2 Sek - Maus folgen",
-      "package": "action",
+      "name": "Tooltip: clipboard: %clipboard% - changed to: %clipboardChanged% - 2 s - Follow mouse",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "duration": 2,
         "follow_mouse": 1,

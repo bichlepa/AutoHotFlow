@@ -1079,7 +1079,7 @@ x_GetAhfPath()
 ; returns whether AHF was just started. Can only be used by triggers.
 x_isAHFStartup()
 {
-	return _getShared("AHFStartup")
+	return global_EnablingDuringStartup
 }
 
 ;Returns whether AHF was just started with Windows. Can only be used by triggers.

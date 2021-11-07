@@ -42,10 +42,10 @@ disableFlow(p_FlowID)
 }
 
 ; enable only one trigger
-enableOneTrigger(p_FlowID, p_TriggerID = "", p_save = True)
+enableOneTrigger(p_FlowID, p_TriggerID = "", p_save = True, p_startup = false)
 {
 	; enable the trigger
-	API_Execution_enableOneTrigger(p_FlowID, p_TriggerID, p_save)
+	API_Execution_enableOneTrigger(p_FlowID, p_TriggerID, p_save, p_startup)
 }
 
 ; disable only one trigger

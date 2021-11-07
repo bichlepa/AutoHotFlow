@@ -98,7 +98,7 @@ Element_run_Condition_Debug_Dialog(Environment, ElementParameters)
 	Condition_Debug_Dialog_UpdateVariableList(guiID)
 
 	; show gui
-	gui, %guiID%:show, , % tempTitle
+	gui, %guiID%:show, , % x_lang("Debug dialog")
 }
 
 ; update the variable list in gui

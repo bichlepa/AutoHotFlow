@@ -1,4 +1,4 @@
-﻿{
+{
   "allConnections": {
     "connection0000000002": {
       "ConnectionType": "normal",
@@ -60,7 +60,8 @@
       "enabled": "0",
       "ID": "element0000000001",
       "name": "Manual - \"Trigger clean joke\"",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "ID": "Trigger clean joke"
       },
@@ -73,7 +74,8 @@
       "class": "Action_New_List",
       "ID": "element0000000003",
       "name": "New list global_TestList - As first value - Multiple values 'Element one - Element two'",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "DelimiterComma": 0,
         "DelimiterLinefeed": 1,
@@ -96,8 +98,9 @@
     "element0000000009": {
       "class": "Condition_Debug_Dialog",
       "ID": "element0000000009",
-      "name": "Debug Dialog",
-      "package": "default",
+      "name": "Debug dialog",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {},
       "StandardName": "1",
       "type": "Condition",
@@ -108,9 +111,11 @@
       "class": "Action_New_variable",
       "ID": "element0000000012",
       "name": "New variable - NewVariable = New element",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "expression": "string",
+        "onlyIfNotExist": "0",
         "Varname": "NewVariable",
         "VarValue": "New element"
       },
@@ -122,8 +127,9 @@
     "element0000000015": {
       "class": "Condition_Debug_Dialog",
       "ID": "element0000000015",
-      "name": "Debug Dialog",
-      "package": "default",
+      "name": "Debug dialog",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {},
       "StandardName": "1",
       "type": "Condition",
@@ -135,7 +141,8 @@
       "HeightOfVerticalBar": "150",
       "ID": "element0000000019",
       "name": "Simple loop: 5 Repeats",
-      "package": "default",
+      "package": "Default",
+      "packageVersion": "1.2.0",
       "pars": {
         "Infinite": 0,
         "repeatCount": 5

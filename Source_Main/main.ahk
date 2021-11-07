@@ -182,6 +182,7 @@ global_libInclusionsForThreads =
 #include source_Elements\Default\actions\Exponentiation.ahk
 #include source_Elements\Default\actions\Search_in_a_string.ahk
 #include source_Elements\Default\actions\Substring.ahk
+#include source_Elements\Default\actions\Substring2.ahk
 #include source_Elements\Default\actions\Get_string_Length.ahk
 #include source_Elements\Default\actions\Replace_in_a_string.ahk
 #include source_Elements\Default\actions\Trim_a_string.ahk
@@ -335,6 +336,7 @@ global_elementInclusionsForThreads =
 #include source_Elements\Default\actions\Exponentiation.ahk
 #include source_Elements\Default\actions\Search_in_a_string.ahk
 #include source_Elements\Default\actions\Substring.ahk
+#include source_Elements\Default\actions\Substring2.ahk
 #include source_Elements\Default\actions\Get_string_Length.ahk
 #include source_Elements\Default\actions\Replace_in_a_string.ahk
 #include source_Elements\Default\actions\Trim_a_string.ahk

@@ -190,7 +190,7 @@ Element_setParameterDefaults(p_FlowID, p_elementID)
 		; the value in key "ContentID" can only contain a single ID
 		if (oneParameter.ContentID)
 		{
-			if (not IsObject(oneParameter.id))
+			if (not IsObject(oneParameter.oneParameter))
 			{
 				parameters.push({ID: oneParameter.ContentID, Default: oneParameter.ContentDefault, result: "enum", enum: oneParameter.content, WarnIfEmpty: true})
 			}

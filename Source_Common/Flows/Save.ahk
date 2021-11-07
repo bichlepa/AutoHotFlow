@@ -143,7 +143,7 @@ SaveFlow(FlowID)
 	
 	;Write new file. TODO: error check
 	FileDelete, % ThisFlowFolder "\" ThisFlowFilename ".json"
-	FileAppend, % Jxon_Dump(flowSave, 2), % ThisFlowFolder "\" ThisFlowFilename ".json"
+	FileAppend, % Jxon_Dump(flowSave, 2), % ThisFlowFolder "\" ThisFlowFilename ".json", UTF-8-RAW
 	
 	logger("a1","Flow " FlowName " was successfully saved.")
 	

@@ -1,4 +1,4 @@
-﻿{
+{
   "allConnections": {
     "connection0000000003": {
       "ConnectionType": "Normal",
@@ -393,6 +393,13 @@
       "from": "element0000000128",
       "ID": "connection0000000130",
       "to": "element0000000129",
+      "type": "Connection"
+    },
+    "connection0000000131": {
+      "ConnectionType": "normal",
+      "from": "element0000000032",
+      "ID": "connection0000000131",
+      "to": "element0000000128",
       "type": "Connection"
     }
   },
@@ -1236,14 +1243,14 @@
     }
   },
   "category": "Automatic tests",
-  "ElementIDCounter": "130",
+  "ElementIDCounter": "131",
   "flowSettings": {
     "DefaultWorkingDir": 1,
     "ExecutionPolicy": "default",
-    "Offsetx": "-762.115665",
-    "Offsety": "-183.313323",
+    "Offsetx": "-140.561827",
+    "Offsety": "-276.480341",
     "WorkingDir": "",
-    "zoomFactor": "0.931704"
+    "zoomFactor": "0.770004"
   },
   "name": "_AutomaticTest starter"
 }

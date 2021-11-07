@@ -1,0 +1,472 @@
+{
+  "allConnections": {
+    "connection0000000005": {
+      "ConnectionType": "normal",
+      "from": "element0000000001",
+      "ID": "connection0000000005",
+      "to": "element0000000010",
+      "type": "Connection"
+    },
+    "connection0000000008": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000008",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000009": {
+      "ConnectionType": "normal",
+      "from": "element0000000010",
+      "ID": "connection0000000009",
+      "to": "element0000000040",
+      "type": "Connection"
+    },
+    "connection0000000015": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000015",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000016": {
+      "ConnectionType": "Yes",
+      "from": "element0000000017",
+      "ID": "connection0000000016",
+      "to": "element0000000039",
+      "type": "Connection"
+    },
+    "connection0000000020": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000020",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000021": {
+      "ConnectionType": "normal",
+      "from": "element0000000022",
+      "ID": "connection0000000021",
+      "to": "element0000000032",
+      "type": "Connection"
+    },
+    "connection0000000024": {
+      "ConnectionType": "normal",
+      "from": "element0000000023",
+      "ID": "connection0000000024",
+      "to": "element0000000010",
+      "type": "Connection"
+    },
+    "connection0000000026": {
+      "ConnectionType": "normal",
+      "from": "element0000000025",
+      "ID": "connection0000000026",
+      "to": "element0000000010",
+      "type": "Connection"
+    },
+    "connection0000000029": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000029",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000031": {
+      "ConnectionType": "normal",
+      "from": "element0000000004",
+      "ID": "connection0000000031",
+      "to": "element0000000022",
+      "type": "Connection"
+    },
+    "connection0000000033": {
+      "ConnectionType": "Yes",
+      "from": "element0000000032",
+      "ID": "connection0000000033",
+      "to": "element0000000017",
+      "type": "Connection"
+    },
+    "connection0000000041": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000041",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000043": {
+      "ConnectionType": "Yes",
+      "from": "element0000000039",
+      "ID": "connection0000000043",
+      "to": "element0000000044",
+      "type": "Connection"
+    },
+    "connection0000000046": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000046",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000048": {
+      "ConnectionType": "normal",
+      "from": "element0000000040",
+      "ID": "connection0000000048",
+      "to": "element0000000049",
+      "type": "Connection"
+    },
+    "connection0000000050": {
+      "ConnectionType": "Yes",
+      "from": "element0000000049",
+      "ID": "connection0000000050",
+      "to": "element0000000004",
+      "type": "Connection"
+    }
+  },
+  "allElements": {
+    "element0000000001": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "1",
+      "enabled": "1",
+      "ID": "element0000000001",
+      "name": "Manual - \"update checker\"",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "ID": "update checker"
+      },
+      "StandardName": "1",
+      "type": "trigger",
+      "x": "-245",
+      "y": "-910"
+    },
+    "element0000000004": {
+      "class": "action_Substring2",
+      "ID": "element0000000004",
+      "name": "Substring2 - version - HTTPResponseData",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "EndPos": 5,
+        "EndTextCaseSensitive": "0",
+        "EndTextExcluding": "<\/a>",
+        "EndTextIncluding": "",
+        "expression": "Expression",
+        "expressionEnd": "String",
+        "expressionStart": "String",
+        "Length": 5,
+        "StartPos": 1,
+        "StartTextCaseSensitive": "0",
+        "StartTextExcluding": "class=\"Link--primary\">",
+        "StartTextIncluding": "",
+        "Varname": "version",
+        "VarValue": "HTTPResponseData",
+        "WhereToBegin": "String",
+        "WhereToEnd": "String"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "-455",
+      "y": "-105"
+    },
+    "element0000000010": {
+      "class": "action_New_Variable",
+      "ID": "element0000000010",
+      "name": "New variable - githubPage = https:\/\/github.com\/bichlepa\/AutoHotFlow\/releases",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "expression": "String",
+        "onlyIfNotExist": 0,
+        "Varname": "githubPage",
+        "VarValue": "https:\/\/github.com\/bichlepa\/AutoHotFlow\/releases"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-455",
+      "y": "-735"
+    },
+    "element0000000017": {
+      "class": "condition_Expression",
+      "ID": "element0000000017",
+      "name": "Expression - version > AHFversion",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "Expression": "version > AHFversion"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-455",
+      "y": "420"
+    },
+    "element0000000022": {
+      "class": "action_New_Variable",
+      "ID": "element0000000022",
+      "name": "New variable - ahfVersion = a_ahfversion",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "expression": "Expression",
+        "onlyIfNotExist": 0,
+        "Varname": "ahfVersion",
+        "VarValue": "a_ahfversion"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-455",
+      "y": "70"
+    },
+    "element0000000023": {
+      "class": "trigger_Start_up",
+      "enabled": "1",
+      "ID": "element0000000023",
+      "name": "Start up - When AHF starts",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "startupType": "AutoHotFlow"
+      },
+      "StandardName": "1",
+      "type": "Trigger",
+      "x": "-665",
+      "y": "-910"
+    },
+    "element0000000025": {
+      "class": "trigger_Periodic_Timer",
+      "enabled": "1",
+      "ID": "element0000000025",
+      "name": "Periodic timer - 60 Minutes",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "Interval": "60",
+        "Unit": "Minutes"
+      },
+      "StandardName": "1",
+      "type": "Trigger",
+      "x": "-455",
+      "y": "-910"
+    },
+    "element0000000032": {
+      "class": "condition_Expression",
+      "ID": "element0000000032",
+      "name": "Expression - version >= AHFversion and version <= \"100.0.0\"",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "Expression": "version >= AHFversion and version <= \"100.0.0\""
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-455",
+      "y": "245"
+    },
+    "element0000000034": {
+      "class": "action_Do_nothing",
+      "ID": "element0000000034",
+      "name": "Download releases page from github",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "executionResult": "Normal"
+      },
+      "StandardName": "0",
+      "type": "action",
+      "x": "-245",
+      "y": "-560"
+    },
+    "element0000000035": {
+      "class": "action_Do_nothing",
+      "ID": "element0000000035",
+      "name": "Extract the version number",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "executionResult": "Normal"
+      },
+      "StandardName": "0",
+      "type": "action",
+      "x": "-245",
+      "y": "-105"
+    },
+    "element0000000036": {
+      "class": "action_Do_nothing",
+      "ID": "element0000000036",
+      "name": "Check whether version number could be extracted and has a feasable value",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "executionResult": "Normal"
+      },
+      "StandardName": "0",
+      "type": "action",
+      "x": "-245",
+      "y": "70"
+    },
+    "element0000000037": {
+      "class": "action_Do_nothing",
+      "ID": "element0000000037",
+      "name": "Check whether version number could be extracted and has a feasable value",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "executionResult": "Normal"
+      },
+      "StandardName": "0",
+      "type": "action",
+      "x": "-245",
+      "y": "245"
+    },
+    "element0000000038": {
+      "class": "action_Do_nothing",
+      "ID": "element0000000038",
+      "name": "Compare version number with AHF version number",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "executionResult": "Normal"
+      },
+      "StandardName": "0",
+      "type": "action",
+      "x": "-245",
+      "y": "420"
+    },
+    "element0000000039": {
+      "class": "condition_Confirmation_Dialog",
+      "ID": "element0000000039",
+      "name": "Confirmation dialog - AutoHotFlow update available!, A new update for AHF is available. Do you want to open the download page?",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "ButtonLabelCancel": "Cancel",
+        "ButtonLabelNo": "No",
+        "ButtonLabelYes": "Yes",
+        "DefaultButton": "No",
+        "Height": 200,
+        "IfDismiss": "Exception",
+        "IsTimeout": "1",
+        "message": "A new update for AHF is available. Do you want to open the download page?",
+        "OnTimeout": "No",
+        "ShowCancelButton": 0,
+        "TimeoutUnits": "5",
+        "title": "AutoHotFlow update available!",
+        "Unit": "Seconds",
+        "Width": 300
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-455",
+      "y": "595"
+    },
+    "element0000000040": {
+      "class": "action_HTTP_Request",
+      "ID": "element0000000040",
+      "name": "HTTP request - %githubpage%",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "BypassProxy": "",
+        "Codepage": "",
+        "ContentLength": "",
+        "ContentMD5": "",
+        "Contenttype": "",
+        "Flags": "",
+        "InputFile": "",
+        "IsExpression": "String",
+        "Method": "GET",
+        "OutputFile": "HTTPResponseData.html",
+        "PostData": "",
+        "Proxy": "",
+        "RequestHeaders": "",
+        "ResponseDataVar": "HTTPResponseData",
+        "ResponseHeadersVar": "HTTPResponseHeaders",
+        "URIEncodePostData": 0,
+        "URL": "%githubpage%",
+        "UserAgent": "",
+        "WhereToGetPostData": "NoUpload",
+        "WhereToPutResponseData": "Variable",
+        "WhetherBypassProxy": 0,
+        "WhichCodepage": "utf-8",
+        "WhichContentLength": "automatic",
+        "WhichContentMD5": "none",
+        "WhichContentType": "automatic",
+        "WhichMethod": "automatic",
+        "WhichProxy": "none",
+        "WhichUserAgent": "automatic"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-455",
+      "y": "-560"
+    },
+    "element0000000044": {
+      "class": "action_Run",
+      "ID": "element0000000044",
+      "name": "Run - %githubpage%",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "RunMode": "Normal",
+        "ToRun": "%githubpage%",
+        "ToRunContent": "String",
+        "WhichWorkingDir": "Default",
+        "WorkingDir": ""
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "-455",
+      "y": "770"
+    },
+    "element0000000049": {
+      "class": "condition_Expression",
+      "ID": "element0000000049",
+      "name": "Expression - HTTPResponseData != \"\"",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "Expression": "HTTPResponseData != \"\""
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "-455",
+      "y": "-350"
+    },
+    "element0000000051": {
+      "class": "action_Do_nothing",
+      "ID": "element0000000051",
+      "name": "check whether anything was downloaded",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "executionResult": "Normal"
+      },
+      "StandardName": "0",
+      "type": "action",
+      "x": "-245",
+      "y": "-350"
+    },
+    "element0000000056": {
+      "class": "action_Do_nothing",
+      "ID": "element0000000056",
+      "name": "Ask whether the download page should be opened",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "executionResult": "Normal"
+      },
+      "StandardName": "0",
+      "type": "action",
+      "x": "-245",
+      "y": "595"
+    }
+  },
+  "category": "",
+  "ElementIDCounter": "57",
+  "flowSettings": {
+    "DefaultWorkingDir": 1,
+    "ExecutionPolicy": "default",
+    "Offsetx": "-1468.571430",
+    "Offsety": "-667.142857",
+    "WorkingDir": "",
+    "zoomFactor": "0.7"
+  },
+  "name": "Update checker"
+}

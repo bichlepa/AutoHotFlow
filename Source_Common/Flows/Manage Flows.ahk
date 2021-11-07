@@ -84,8 +84,8 @@ EnableLoadedFlows()
 			oneElementEnabled := _getElementInfo(oneFLowID, oneElementID, "enabled")
 			if (oneElementEnabled)
 			{
-				; enable the trigger without saving its state
-				enableOneTrigger(oneFlowID, oneElementID, false)
+				; enable the trigger without saving its state and notifying it that it is done during startup
+				enableOneTrigger(oneFlowID, oneElementID, false, true)
 			}
 		}
 	}

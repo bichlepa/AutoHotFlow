@@ -60,7 +60,7 @@ enableTriggers(p_FlowID)
 }
 
 ; enable a single trigger
-enableOneTrigger(p_FlowID, p_ElementID, p_save = true)
+enableOneTrigger(p_FlowID, p_ElementID, p_save = true, onStartup = false)
 {
 	FlowName := _getFlowProperty(p_FlowID, "name")
 	logger("a2", "Going to enable trigger " p_ElementID " in flow " FlowName)

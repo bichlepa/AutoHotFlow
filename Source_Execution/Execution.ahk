@@ -86,6 +86,8 @@ FileEncoding utf-8
 ; Include the source code of the elements. The includes will be pasted here by the main thread.
 ;PlaceholderIncludesOfElements
 
+; the api function x_isAHFStartup checks this variable to find out whether a trigger is triggered during startup
+global global_EnablingDuringStartup := false
 
 ; check regularly for new tasks which we get through shared variable
 SetTimer, queryTasks, 10
@@ -133,7 +135,9 @@ queryTasks()
 			if (name = "enableOneTrigger")
 			{
 				; a single trigger of a flow should be enabled
+				global_EnablingDuringStartup := oneTask.startup
 				enableOneTrigger(oneTask.FlowID, oneTask.TriggerID, oneTask.save)
+				global_EnablingDuringStartup := false
 			}
 			if (name = "disableOneTrigger")
 			{
