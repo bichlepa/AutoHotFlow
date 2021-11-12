@@ -24,7 +24,7 @@ It could also demontrate the broad possibilities of AutoHotkey.
 You can track the progress on [trello](https://trello.com/b/Ca91IaeG/autohotflow). 
 
 # How to install and use
-Go the the [Relases section](https://github.com/bichlepa/AutoHotFlow/releases) and download the installer of the current version.
+Go the the [Releases section](https://github.com/bichlepa/AutoHotFlow/releases) and download the installer of the current version.
 # How to develop
 Here you'll find instructions for those who want to work on AHF.
 After first checkout, `find modules.ahk` will be automatically started by AHF. Please run `find modules.ahk` every time after you pulled some changes. Otherwise errors may sometimes occur.
