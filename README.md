@@ -1,4 +1,4 @@
-# AutoHotFlow
+# AutoHotFlow [[Download here]](https://github.com/bichlepa/AutoHotFlow/releases)
 This script is designed to make programming and automation easy as never before! Just pull in some elements in the graphical interface and set up some triggers. Ready! :smile:
 This project ist made for people who never have programmed before and for those who want to make some automation, etc. without writing long codes.
 It's very easy to use. You need to pull an action or a condition, configurate them and connect them.
@@ -21,10 +21,10 @@ It has all basic functions. I'm working on it and its abilities are raising.
 My aim is to include many elements that would need many lines of ahk-code and thus to allow programming some complex things easier.
 
 It could also demontrate the broad possibilities of AutoHotkey.
-You can track the progress on trello: https://trello.com/b/Ca91IaeG/autohotflow
+You can track the progress on [trello](https://trello.com/b/Ca91IaeG/autohotflow). 
 
 # How to install and use
-Go the the Relases section and download the installer of the current version. If you only want to use AutoHotFlow, it's not recommended to clone this repository.
+Go the the [Releases section](https://github.com/bichlepa/AutoHotFlow/releases) and download the installer of the current version.
 # How to develop
 Here you'll find instructions for those who want to work on AHF.
 After first checkout, `find modules.ahk` will be automatically started by AHF. Please run `find modules.ahk` every time after you pulled some changes. Otherwise errors may sometimes occur.
