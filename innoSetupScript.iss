@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "AutoHotFlow"
-#define MyAppVersion "1.2.0"
+#define MyAppVersion "1.2.1"
 #define MyAppPublisher "Paul Bichler"
 #define MyAppURL "https://bichlepa.jimdofree.com/autohotflow/"
 #define MyAppExeName "AutoHotFlow.exe" 
@@ -94,6 +94,7 @@ Source: "language\en.ini"; DestDir: "{app}\language"; Flags: ignoreversion
 Source: "language\de.ini"; DestDir: "{app}\language"; Flags: ignoreversion
 Source: "Saved Flows\demo flows\Flow 1369089307.json"; DestDir: "{app}\Saved Flows\demo flows"; Flags: ignoreversion
 Source: "Saved Flows\demo flows\Flow 1428714744.json"; DestDir: "{app}\Saved Flows\demo flows"; Flags: ignoreversion
+Source: "Saved Flows\demo flows\Flow 1638325262.json"; DestDir: "{app}\Saved Flows\demo flows"; Flags: ignoreversion
 Source: "Saved Flows\demo flows\Flow 806132298.json"; DestDir: "{app}\Saved Flows\demo flows"; Flags: ignoreversion
 Source: "Help\stylesheet.css"; DestDir: "{app}\Help"; Flags: ignoreversion
 Source: "Help\en\Color chart.html"; DestDir: "{app}\Help\en"; Flags: ignoreversion
@@ -277,6 +278,7 @@ Source: "Source_Elements\Default\Actions\Square_Root.ahk"; DestDir: "{app}\Sourc
 Source: "Source_Elements\Default\Actions\Stop_Flow.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Actions\Stop_Sound.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Actions\Substring.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
+Source: "Source_Elements\Default\Actions\Substring2.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Actions\Suspend_Computer.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Actions\Time_calculation.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Actions\Time_difference.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
@@ -445,6 +447,7 @@ Source: "Source_Elements\Default\help\en\Actions\Square_root.html"; DestDir: "{a
 Source: "Source_Elements\Default\help\en\Actions\Stop_Flow.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Stop_Sound.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Substring.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
+Source: "Source_Elements\Default\help\en\Actions\Substring2.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Suspend_Computer.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Time_calculation.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\help\en\Actions\Time_difference.html"; DestDir: "{app}\Source_Elements\Default\help\en\Actions"; Flags: ignoreversion
