@@ -35,6 +35,7 @@
         "Trim_a_string.ahk",
         "Split_a_string.ahk",
         "Change_character_case.ahk",
+        "Encode_string.ahk",
 
         "New_List.ahk",
         "Add_to_list.ahk",
@@ -162,7 +163,6 @@
         "File_Has_Attribute.ahk",
 
         "Confirmation_Dialog.ahk",
-        "Debug_dialog.ahk",
 
         "Key_Is_Down.ahk",
 
@@ -173,8 +173,9 @@
         
         "Do_nothing.ahk",
         "Flow_Enabled.ahk",
-        "Flow_Running.ahk"
+        "Flow_Running.ahk",
 
+        "Debug_dialog.ahk"
     ],
     "loops": [
         "SimpleLoop.ahk",

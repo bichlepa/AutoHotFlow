@@ -202,6 +202,7 @@ Source: "Source_Elements\Default\Actions\Do_nothing.ahk"; DestDir: "{app}\Source
 Source: "Source_Elements\Default\Actions\Drag_with_mouse.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Actions\Eject_Drive.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Actions\Empty_Recycle_bin.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
+Source: "Source_Elements\Default\Actions\Encode_string.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Actions\Execute_Flow.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Actions\Exponentiation.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion
 Source: "Source_Elements\Default\Actions\Extract_files.ahk"; DestDir: "{app}\Source_Elements\Default\Actions"; Flags: ignoreversion

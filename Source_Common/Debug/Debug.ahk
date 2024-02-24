@@ -1,4 +1,4 @@
-﻿if (_settings.developing)
+if (_settings.developing)
 {
 	;hotkey, ^numpadenter, d_showGlobals
 	;hotkey, ^numpadadd, d_showAnyVariable

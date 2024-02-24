@@ -37,7 +37,7 @@ Element_getParametrizationDetails_Action_replace_in_a_string(Environment)
 {
 	parametersToEdit:=Object()
 	
-	parametersToEdit.push({type: "Label", label: x_lang("Output variable_name")})
+	parametersToEdit.push({type: "Label", label: x_lang("Output variable name")})
 	parametersToEdit.push({type: "Edit", id: "Varname", default: "NewVariable", content: "VariableName", WarnIfEmpty: true})
 	
 	parametersToEdit.push({type: "Label", label:  x_lang("Input string")})
@@ -47,7 +47,7 @@ Element_getParametrizationDetails_Action_replace_in_a_string(Environment)
 	parametersToEdit.push({type: "Edit", id: "SearchText", default: "World", content: "String", WarnIfEmpty: true})
 
 	parametersToEdit.push({type: "Label", label: x_lang("Replace by")})
-	parametersToEdit.push({type: "Edit", id: "ReplaceText", default: "%a_username%", content: "String", WarnIfEmpty: true})
+	parametersToEdit.push({type: "Edit", id: "ReplaceText", default: "%a_username%", content: "String"})
 
 	parametersToEdit.push({type: "Label", label: x_lang("Number of replacements")})
 	parametersToEdit.push({type: "Radio", id: "ReplaceAll", default: "first", choices: [x_lang("Replace only the first occurence"), x_lang("Replace all occurences")], result: "enum", enum: ["first", "all"]})

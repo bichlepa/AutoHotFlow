@@ -604,7 +604,7 @@ Var_replaceVariables_Common(environment, p_String, pars = "")
 	Loop
 	{
 		; find first variable name in the string which is encased in percent signs. Write found variable name
-		tempFoundPos := RegExMatch(tempstring, "SU).*%(.+)%.*", tempFoundVarName)
+		tempFoundPos := RegExMatch(p_String, "SU).*%(.+)%.*", tempFoundVarName)
 		
 		; break, if we didn't find a string
 		if (tempFoundPos = 0)
@@ -623,6 +623,7 @@ Var_replaceVariables_Common(environment, p_String, pars = "")
 		
 		; replace the found variable in string
 		StringReplace, tempstring, tempstring, `%%tempFoundVarName1%`%, % tempVarValue
+		StringReplace, p_String, p_String, `%%tempFoundVarName1%`%, _
 	}
 
 	return tempstring 

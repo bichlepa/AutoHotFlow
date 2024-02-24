@@ -188,6 +188,7 @@ global_libInclusionsForThreads =
 #include source_Elements\Default\actions\Trim_a_string.ahk
 #include source_Elements\Default\actions\Split_a_string.ahk
 #include source_Elements\Default\actions\Change_character_case.ahk
+#include source_Elements\Default\actions\Encode_string.ahk
 #include source_Elements\Default\actions\New_List.ahk
 #include source_Elements\Default\actions\Add_to_list.ahk
 #include source_Elements\Default\actions\Get_from_list.ahk
@@ -295,7 +296,6 @@ global_libInclusionsForThreads =
 #include source_Elements\Default\conditions\File_Exists.ahk
 #include source_Elements\Default\conditions\File_Has_Attribute.ahk
 #include source_Elements\Default\conditions\Confirmation_Dialog.ahk
-#include source_Elements\Default\conditions\Debug_dialog.ahk
 #include source_Elements\Default\conditions\Key_Is_Down.ahk
 #include source_Elements\Default\conditions\Window_Active.ahk
 #include source_Elements\Default\conditions\Window_Exists.ahk
@@ -303,6 +303,7 @@ global_libInclusionsForThreads =
 #include source_Elements\Default\conditions\Do_nothing.ahk
 #include source_Elements\Default\conditions\Flow_Enabled.ahk
 #include source_Elements\Default\conditions\Flow_Running.ahk
+#include source_Elements\Default\conditions\Debug_dialog.ahk
 #include source_Elements\Default\loops\SimpleLoop.ahk
 #include source_Elements\Default\loops\Condition.ahk
 #include source_Elements\Default\loops\Parse_A_String.ahk
@@ -342,6 +343,7 @@ global_elementInclusionsForThreads =
 #include source_Elements\Default\actions\Trim_a_string.ahk
 #include source_Elements\Default\actions\Split_a_string.ahk
 #include source_Elements\Default\actions\Change_character_case.ahk
+#include source_Elements\Default\actions\Encode_string.ahk
 #include source_Elements\Default\actions\New_List.ahk
 #include source_Elements\Default\actions\Add_to_list.ahk
 #include source_Elements\Default\actions\Get_from_list.ahk
@@ -449,7 +451,6 @@ global_elementInclusionsForThreads =
 #include source_Elements\Default\conditions\File_Exists.ahk
 #include source_Elements\Default\conditions\File_Has_Attribute.ahk
 #include source_Elements\Default\conditions\Confirmation_Dialog.ahk
-#include source_Elements\Default\conditions\Debug_dialog.ahk
 #include source_Elements\Default\conditions\Key_Is_Down.ahk
 #include source_Elements\Default\conditions\Window_Active.ahk
 #include source_Elements\Default\conditions\Window_Exists.ahk
@@ -457,6 +458,7 @@ global_elementInclusionsForThreads =
 #include source_Elements\Default\conditions\Do_nothing.ahk
 #include source_Elements\Default\conditions\Flow_Enabled.ahk
 #include source_Elements\Default\conditions\Flow_Running.ahk
+#include source_Elements\Default\conditions\Debug_dialog.ahk
 #include source_Elements\Default\loops\SimpleLoop.ahk
 #include source_Elements\Default\loops\Condition.ahk
 #include source_Elements\Default\loops\Parse_A_String.ahk
