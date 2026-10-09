@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<link rel="stylesheet" href="../../stylesheet.css">
+	<link rel="stylesheet" href="stylesheet.css">
+	<link rel="stylesheet" href="../../../../../Help/stylesheet.css">
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<H1>Condition</H1>
+<p>
+	The loop <B>Condition</B> evaluates an expression on each iteraction and continues only if the condition result is true.
+</p>
+
+<H2>Settings</H2>
+<table class="settings">
+	<TR>
+		<TD>
+			<h4>Condition</h4>
+			<p>Expression to evaluate on each iteration.</p>
+			<p>If <b>Evaluate on first iteration</b> is checked, the condition will be checked before first iteration. If it is not checked, the first iteration will be always performed, with no regard whether the condition is true or not.</p>
+			<ul class="examples"><p"><i>Examples:</i></p>
+				<li/>
+					<p"><code>a_index <= 10</code> <i>(performs 10 iterations)</i></p>
+				<li/>
+					<p"><code>VariableContainingBreakCondition</code> <i>(continues as long as the variable is not false)</i></p>
+		</TD>
+	</TR>
+</table>
+
+<H2>Supplied Variables</H2>
+<table class="variables">
+	<TR>
+		<TD>
+			<h4 class="VariableName">A_Index</h4>
+			<p>Index of the current iteration. It starts with the value 1 and increases on every loop.</p>
+		</TD>
+	</TR>
+</table>
+
+<H2>Remarks</H2>
+<p>
+	The supplied variable will be removed after last iteration.
+</p>
+<p>
+	Read more about expressions in the chapter <a href="../Variables.html">Variables</a>.
+</p>
+
+
+</BODY>
+</HTML>

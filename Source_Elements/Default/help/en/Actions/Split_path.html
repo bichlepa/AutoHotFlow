@@ -1,0 +1,47 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<link rel="stylesheet" href="../../stylesheet.css">
+	<link rel="stylesheet" href="stylesheet.css">
+	<link rel="stylesheet" href="../../../../../Help/stylesheet.css">
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<H1>Split path</H1>
+<p>
+	The action <B>Split path</B> separates a file name or URL into its name, directory, extension, and drive..
+</p>
+
+<H2>Settings</H2>
+<table class="settings">
+	<TR>
+		<TD>
+			<h4>File path</h4>
+			<p>The file path to be analyzed.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Output variables</h4>
+			<p>Names of the variables that will contain the retrieved path components. The fields may be empty, if those informations are not required.</p>
+			<p><b>File name</b>: The file name without its path. The file's extension is included.
+			<p><b>Directory</b>: The directory of the file, including drive letter or share name (if present). The final backslash is not included even if the file is located in a drive's root directory.
+			<p><b>File extension</b>: The file's extension (e.g. TXT, DOC, or EXE). The dot is not included.
+			<p><b>File name without extension</b>: The file name without its path, dot and extension.
+			<p><b>Drive</b>: The drive letter or server name of the file. If the file is on a local or mapped drive, the variable will be set to the drive letter followed by a colon (no backslash). If the file is on a network path (UNC), the variable will be set to the share name, e.g. <code>\\Workstation01</code>
+			</p>
+		</TD>
+	</TR>
+</table>
+
+<H2>Remarks</H2>
+<p>If <b>File path</b> contains a filename that lacks a drive letter (that is, it has no path or merely a relative path), <b>Drive</b> will be made blank but all the other output variables will be set correctly. Similarly, if there is no path present, <b>Directory</b> will be made blank; and if there is a path but no file name present, <b>File name</b> and <b>File extension</b> will be made blank.</p>
+
+<p>Actual files and directories in the file system are not checked by this command. It simply analyzes the string given in InputVar.</p>
+
+<p>Wildcards (* and ?) and other characters illegal in filenames are treated the same as legal characters, with the exception of colon, backslash, and period (dot), which are processed according to their nature in delimiting the drive letter, directory, and extension of the file.</p>
+
+<p>Support for URLs: If <b>File path</b> contains a colon-double-slash, such as <code>https://domain.com</code> or <code>ftp://domain.com</code>, <b>Directory</b> is set to the protocol prefix + domain name + directory (e.g. <code>https://domain.com/images</code>) and <b>Drive</b> is set to the protocol prefix + domain name (e.g. <code>https://domain.com</code>). All other variables are set according to their definitions above.</p>
+
+</BODY>
+</HTML>

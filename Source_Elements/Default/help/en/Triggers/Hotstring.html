@@ -1,0 +1,105 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<link rel="stylesheet" href="../../stylesheet.css">
+	<link rel="stylesheet" href="stylesheet.css">
+	<link rel="stylesheet" href="../../../../../Help/stylesheet.css">
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<H1>Hotstring</H1>
+<p>
+	The trigger <B>Hotstring</B> triggers whenever the user presses a specified text. It may also replace the entered text with another text.
+</p>
+
+<H2>Settings</H2>
+<table class="settings">
+	<TR>
+		<TD>
+			<h4>Hotstring</h4>
+			<p>Specify the text that should be entered in order to trigger the flow.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Options</h4>
+			<p>If <b>Require an ending character</b> is checked, the hotstring must be finished by an ending character. Ending characters are <code>-()[]{}':;"/\,.?!</code>, a linefeed, a space and a tabulator. If it is not checked, it will trigger immediately after the text was entered.
+				<br/>If <b>Omit the ending character after replacement</b> is checked, the ending character will be blocked. Otherwise it will be sent after the replacement.
+				<br/>If <b>Trigger inside another word</b> is checked, the hotstring will be detected even if it is inside another word. For example, the <b>Hotstring</b> <code>al</code> will be triggered if user enters <code>practical</code>.
+				<br/>If <b>Case sensitive</b> is not checked, the hotstring will be triggered even if the case of the entered text is different.
+				<br/>If <b>Backspace automatically the entered hotstring</b> is checked, the text will be backspaced before the <b>Replace text</b> is entered.
+				<br/>If <b>Reset hotstring recognizer after each triggering</b> is checked, the hotsring recognition will be reset after each trigger. For example, if the <b>Hotstring</b> is <code>aa</code>, typing <code>aaa</code> will trigger twice.
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Replace text</h4>
+			<p>Specify the text or keys that will be sent.
+				<br/>If <b>Raw mode</b> is selected, the entered string will be sent as is.
+				<br/>If <b>Raw mode</b> is not selected, some keys can be declared as described in the section Remarks.
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Method</h4>
+			<p>There are different methods to simulate keyboard events. If the sent keys are not recognized by the application using the default method, you may try to change it.
+				<br/><b>Input mode</b> has best performance and is the recommended one in most cases.
+				<br/><b>Event mode</b> has lower performance.
+				<br/><b>Play mode</b> may require to disable the UAC to work. It may work better in games.
+			</p>
+			<p>
+				<b>Input mode</b> can only be used in one AutoHotFlow instance. If you run multiple AutoHotFlow instances simultanously, the second instance will not be able to use it. Also other applications and AutoHotkey scripts may block the input mode. If <b>Input mode</b> is blocked, it will automatically fall back to <b>Event mode</b>.
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Scope</h4>
+			<p>If <b>Everywhere</b> is selected, the hotstring will always trigger, regardless on the currently active window.
+				<br/>If one of the other options is selected, the hotstring will only be active when a specific window is active or exists, or otherwise.
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Window identification</h4>
+			<p><b>Title of window</b>: Name of the window title. It can be chosen whether the title starts, contains or ends with the specified string.
+				<br/><b>Exclude title</b>: Windows whose titles include this value will not be considered.
+				<br/><b>Text of a control in window</b>: If present, this parameter must be a substring from a single text element of the target window. It can be specified whether hidden text will be found
+				<br/><b>Exclude text of a control in window</b>: Windows whose text include this value will not be considered
+				<br/><b>Window class</b>: A window class is a set of attributes that the system uses as a template to create a window. In other words, the class name of the window identifies what type of window it is.
+				<br/><b>Process name</b>: The name or path of the executable that created that window.
+				<br/><b>Unique window ID</b>: Each window or control has a unique ID, also known as a HWND (short for handle to window). This ID can be used to identify the window or control even if its title changes.
+				<br/><b>Unique process ID</b>: Use the unique process id to identify a window belonging to a specific process. Each process has its unique ID, even if it has the same executable.
+				<br/><b>Hidden window</b>: If detect hidden window is selected, a window that exists but is not visible will be found.
+				<br/><b>Import window identification</b>: Use a wizard to get parameters of a window.
+			</p>
+			<p>At least <b>Title of window</b>, <b>Window class</b>, <b>Process name</b>, <b>Unique window ID</b> or <b>Unique process ID</b> must be set.</p>
+		</TD>
+	</TR>
+</table>
+
+<H2>Supplied Variables</H2>
+<table class="variables">
+	<TR>
+		<TD>
+			<h4 class="VariableName">A_ThisHotstring</h4>
+			<p>The pressed hotstring as defined in <b>Hotstring</b>.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4 class="VariableName">A_EndChar</h4>
+			<p>The pressed end character.</p>
+		</TD>
+	</TR>
+</table>
+
+<H2>Remarks</H2>
+</p>
+<p><iframe src="../Key list.html"></iframe></p>
+
+</BODY>
+</HTML>

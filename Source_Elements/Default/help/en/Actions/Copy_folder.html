@@ -1,0 +1,93 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<link rel="stylesheet" href="../../stylesheet.css">
+	<link rel="stylesheet" href="stylesheet.css">
+	<link rel="stylesheet" href="../../../../../Help/stylesheet.css">
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<H1>Copy folder</H1>
+<p>
+	The action <B>Copy folder</B> copies a folder along with all its sub-folders and files.
+</p>
+
+<H2>Settings</H2>
+<table class="settings">
+	<TR>
+		<TD>
+			<h4>Source folder</h4>
+			<p>Path of the source directory (with no trailing backslash).
+				<br/>The folder path is assumed to be in the working directory if an absolute path isn't specified.
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Destination folder</h4>
+			<p>Name of the destination, which is assumed to be in the working directory if an absolute path isn't specified.
+				<br/>If the folder does not exist, it will be created.
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Overwrite</h4>
+			<p>If Overwrite is checked, existing files will be overwritten.</p>
+			<p class="warning">Be careful using that option. It may cause loss of data.</p>
+		</TD>
+	</TR>
+</table>
+
+<H2>Examples</H2>
+<table class="examples">
+	<TR>
+		<TD>
+			<p>Copy a folder from one drive to MyDocuments folder.</p>
+			<table class="example">
+				<TR>
+					<TD class="example-parameter">
+						<p>Source</p>
+					</TD>
+					<TD class="example-value">
+						<p>G:\exampleFolder</p>
+					</TD>
+				</TR>
+				<TR>
+					<TD class="example-parameter">
+						<p>Destination</p>
+					</TD>
+					<TD class="example-value">
+						<p>%A_MyDocuments%\exampleFolder</p>
+					</TD>
+				</TR>
+			</table>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<p>Copy one folder from desktop to the working directory and rename it.</p>
+			<table class="example">
+				<TR>
+					<TD class="example-parameter">
+						<p>Source</p>
+					</TD>
+					<TD class="example-value">
+						<p>%A_Desktop%\exampleFolder</p>
+					</TD>
+				</TR>
+				<TR>
+					<TD class="example-parameter">
+						<p>Destination</p>
+					</TD>
+					<TD class="example-value">
+						<p>RenamedExampleFolder</p>
+					</TD>
+				</TR>
+			</table>
+		</TD>
+	</TR>
+</table>
+
+</BODY>
+</HTML>

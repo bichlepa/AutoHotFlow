@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<link rel="stylesheet" href="../../stylesheet.css">
+	<link rel="stylesheet" href="stylesheet.css">
+	<link rel="stylesheet" href="../../../../../Help/stylesheet.css">
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<H1>Variable content is</H1>
+<p>
+	The condition <B>Variable content is</B> checks whether a variable contains a value of a certain type.
+</p>
+
+<H2>Settings</H2>
+<table class="settings">
+	<TR>
+		<TD>
+			<h4>Variable name or expression</h4>
+			<p>Enter either a variable name or an expression.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Expected content type</h4>
+			<p>The expected type.</p>
+			<p><b>List</b> (may also be called <b>Object</b>): True if value is a list, which may be empty. A list may contain an array or some key-value pairs.</p>
+			<p><b>Time</b>: True if value contains a valid date-time stamp, which can be all or just the leading part of the <code>YYYYMMDDHH24MISS</code> format. For example, a 4-digit string such as <code>2004</code> is considered valid. Years less than <code>1601</code> are not considered valid because the operating system generally does not support them. The maximum year considered valid is <code>9999</code>. Example: <code>20201231235959</code></p>
+			<p><b>Number</b>: True if value is either an <b>Integer</b> or a <b>Floating point number</b></p>
+			<p><b>Integer</b>: True if value is non-empty and contains a purely numeric string (decimal or hexadecimal) without a decimal point. Leading and trailing spaces and tabs are allowed. The string may start with a plus or minus sign.</p>
+			<p><b>Floating point number</b>: True if value is non-empty and contains a floating point number; that is, a purely numeric string containing a decimal point. Leading and trailing spaces and tabs are allowed. The string may start with a plus sign, minus sign, or decimal point.</p>
+			<p><b>Decimal digits</b>: True if value is empty or contains only digits, which consist of the characters 0 through 9. Other characters such as the following are not allowed: spaces, tabs, plus signs, minus signs, decimal points, hexadecimal digits, and the 0x prefix.</p>
+			<p><b>Hexadecimal digits</b>: Same as <b>Decimal digits</b> except the characters A through F (uppercase or lowercase) are also allowed. A prefix of 0x is tolerated if present.</p>
+			<p><b>Alphanumeric string</b>: Same as <b>Alphabetic string</b> except that characters 0 through 9 are also allowed.</p>
+			<p><b>Alphabetic string</b>: True if value is empty or contains only alphabetic characters. False if there are any digits, spaces, tabs, punctuation, or other non-alphabetic characters anywhere in the string. For example, if value contains a space followed by a letter, it is not considered to be an alphabetic string.</p>
+			<p><b>String with only uppercase characters</b>: True if value is empty or contains only uppercase characters. False if there are any digits, spaces, tabs, punctuation, or other non-uppercase characters anywhere in the string.</p>
+			<p><b>String with only lowercase characters</b>: True if value is empty or contains only lowercase characters. False if there are any digits, spaces, tabs, punctuation, or other non-lowercase characters anywhere in the string.</p>
+			<p><b>Whitespaces</b>: True if value is empty or contains only whitespace, which consists of the following characters: space (<code>%A_Space%</code>), tab (<code>%A_Tab%</code>), linefeed (<code>%A_Linefeed%</code>), return (<code>%A_CarriageReturn%</code>), vertical tab (<code>%A_VerticalTab%</code>), and formfeed (<code>%A_Formfeed%</code>).</p>
+		</TD>
+	</TR>
+</table>
+
+</BODY>
+</HTML>

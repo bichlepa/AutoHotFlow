@@ -1,0 +1,67 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<link rel="stylesheet" href="../../stylesheet.css">
+	<link rel="stylesheet" href="stylesheet.css">
+	<link rel="stylesheet" href="../../../../../Help/stylesheet.css">
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<H1>AutoHotkey script</H1>
+<p>
+	The trigger <B>AutoHotkey script</B> executes an AutoHotkey script in a new AutoHotkey thread. If the funciton x_trigger() will be called in the AutoHotkey script, it will trigger the trigger.
+</p>
+
+<p class="warning">Don't use that action if you don't master the AutoHotkey scripting language.</p>
+<p class="warning">If the AutoHotkey script crashes, AHF may crash too.</p>
+
+<H2>Settings</H2>
+<table class="settings">
+	<TR>
+		<TD>
+			<h4>AutoHotkey script</h4>
+			<p>Script that will be executed.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Variables that should be imported to script prior to execution</h4>
+			<p>Specify a list of variables that should be imported to the AutoHotkey script prior to execution.
+				<br/>The list can be separated either by a space, linefeed, comma or tab.
+				<br/>The variables will be available in global scope.
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Variables that should be exported from script after execution</h4>
+			<p>Specify a list of variables that should be exported from the AutoHotkey script after execution.
+				<br/>The list can be separated either by a space, linefeed, comma or tab.
+				<br/>The variables must be available in global scope and will be accessible in the flow with same.
+			</p>
+			<p class="info"> The variables must not start with <code>A_</code>.</p>
+		</TD>
+	</TR>
+</table>
+
+<H2>Supplied Variables</H2>
+<table class="variables">
+	<TR>
+		<TD>
+			<h4 class="VariableName">A_ManualTriggerID</h4>
+			<p>The <b>ID</b> of the manual trigger.</p>
+		</TD>
+	</TR>
+</table>
+
+<H2>Remarks</H2>
+<p>
+	<br/>If the script reaches the bottom, it will end and won't be able to trigger, even if it is persistent.
+	<br/>The script may be stopped with <code>exitapp</code>.
+	<br/>Do not use command <code>onexit</code>.
+	<br/>Do not use functions <code>EnterCriticalSection()</code> and <code>LeaveCriticalSection()</code> as well as other AHK_H specific functions.
+	<br/>Do not use variable, function and label names which start with <code>ahf_</code>.
+</p>
+
+</BODY>
+</HTML>

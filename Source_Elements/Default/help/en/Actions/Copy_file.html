@@ -1,0 +1,117 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<link rel="stylesheet" href="../../stylesheet.css">
+	<link rel="stylesheet" href="stylesheet.css">
+	<link rel="stylesheet" href="../../../../../Help/stylesheet.css">
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<H1>Copy file</H1>
+<p>
+	The action <B>Copy file</B> copies one or more files.
+</p>
+
+<H2>Settings</H2>
+<table class="settings">
+	<TR>
+		<TD>
+			<h4>Source file</h4>
+			<p>The name of a single file or folder, or a wildcard pattern.</p>
+			<p>Both asterisks and question marks are supported as wildcards. A match occurs when the pattern appears in either the file's long/normal name or its 8.3 short name.
+				<br/>The file path is assumed to be in the working directory if an absolute path isn't specified.
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Destination file or folder</h4>
+			<p>The path of the destination. To perform a simple copy -- retaining the existing file name(s) -- specify only the folder path.
+				<br/>The file path is assumed to be in the working directory if an absolute path isn't specified.
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Overwrite</h4>
+			<p>If Overwrite is checked, existing files will be overwritten.</p>
+			<p class="warning">Be careful using that option. It may cause loss of data.</p>
+		</TD>
+	</TR>
+</table>
+
+<H2>Examples</H2>
+<table class="examples">
+	<TR>
+		<TD>
+			<p>Copy one file from one drive to MyDocuments folder.</p>
+			<table class="example">
+				<TR>
+					<TD class="example-parameter">
+						<p>Source</p>
+					</TD>
+					<TD class="example-value">
+						<p>G:\example.txt</p>
+					</TD>
+				</TR>
+				<TR>
+					<TD class="example-parameter">
+						<p>Destination</p>
+					</TD>
+					<TD class="example-value">
+						<p>%A_MyDocuments%</p>
+					</TD>
+				</TR>
+			</table>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<p>Copy all files from one drive to other drive.</p>
+			<table class="example">
+				<TR>
+					<TD class="example-parameter">
+						<p>Source</p>
+					</TD>
+					<TD class="example-value">
+						<p>G:\*</p>
+					</TD>
+				</TR>
+				<TR>
+					<TD class="example-parameter">
+						<p>Destination</p>
+					</TD>
+					<TD class="example-value">
+						<p>H:\*</p>
+					</TD>
+				</TR>
+			</table>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<p>Copy one file from desktop to the working directory and rename it.</p>
+			<table class="example">
+				<TR>
+					<TD class="example-parameter">
+						<p>Source</p>
+					</TD>
+					<TD class="example-value">
+						<p>%A_Desktop%\example.txt</p>
+					</TD>
+				</TR>
+				<TR>
+					<TD class="example-parameter">
+						<p>Destination</p>
+					</TD>
+					<TD class="example-value">
+						<p>RenamedExample.txt</p>
+					</TD>
+				</TR>
+			</table>
+		</TD>
+	</TR>
+</table>
+
+</BODY>
+</HTML>

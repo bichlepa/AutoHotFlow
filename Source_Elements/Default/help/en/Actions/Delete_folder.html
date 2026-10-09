@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<link rel="stylesheet" href="../../stylesheet.css">
+	<link rel="stylesheet" href="stylesheet.css">
+	<link rel="stylesheet" href="../../../../../Help/stylesheet.css">
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<H1>Delete folder</H1>
+<p>
+	The action <B>Delete folder</B> deletes a folder.
+</p>
+
+<p class="warning">Be careful using that action. It may cause loss of data.</p>
+
+<H2>Settings</H2>
+<table class="settings">
+	<TR>
+		<TD>
+			<h4>Folder path</h4>
+			<p>Path of the directory to delete.
+				<BR>The folder path is assumed to be in the working directory if an absolute path isn't specified.
+			</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Options</h4>
+			<p>If <b>Remove only if the folder is empty</b> is selected, the folder will not be deleted, if it contains any file or folder.</p>
+		</TD>
+	</TR>
+	<TR>
+		<TD>
+			<h4>Error handling</h4>
+			<p>If <b>Throw exception if folder does not exist</b> is not selected, nothing will happen, if the folder doesn't exists.</p>
+		</TD>
+	</TR>
+</table>
+
+<H2>Examples</H2>
+<table class="examples">
+	<TR>
+		<TD>
+			<p>Delete one folder from MyDocuments folder.</p>
+			<table class="example">
+				<TR>
+					<TD class="example-parameter">
+						<p>Folder path</p>
+					</TD>
+					<TD class="example-value">
+						<p>%A_MyDocuments%\ExampleFolder</p>
+					</TD>
+				</TR>
+			</table>
+		</TD>
+	</TR>
+</table>
+
+
+</BODY>
+</HTML>
