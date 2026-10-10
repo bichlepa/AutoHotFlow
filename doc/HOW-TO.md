@@ -480,7 +480,63 @@ _Noch keine Einträge._
 
 ## GUI und Hotkeys
 
-_Noch keine Einträge._
+### Klasse aus einer Datei nicht eingebunden: Dialog "local variable ... never assigned"
+
+- **Problem:** `src/manager/StubManager.ahk` rief `StubGui(this)` auf, die Datei `StubGui.ahk` war aber nicht eingebunden. AHK meldet das beim Laden als Warnung, die einen Dialog öffnet: "Warning: This local variable appears to never be assigned a value. Specifically: StubGui". Ohne Wächter hängt der Prozess.
+- **Falsch:** Klasse in einer zweiten Datei verwenden, ohne `#Include` in der Datei, die sie nutzt.
+- **Richtig:** Jede Klasse, die eine Datei benutzt, mit `#Include` dieser Datei einbinden. Dialoge eines Rollenprozesses stehen unter `%TEMP%\ahf_dialogs\` (Text und PNG).
+- **Status:** verifiziert (Dialog erfasst beim Start der Rolle, nach dem Einfügen des `#Include` kein Dialog mehr, Probelauf und `tests/e2e/test_ui_stub.py` grün)
+- **Quelle:** `src/manager/StubManager.ahk`
+
+### Gui: Ereignisnamen und Zeilenreihenfolge der ListView
+
+- **Problem:** Die Hilfe zu ListView nennt nur die Ereignisnamen (`Click`, `ItemFocus`, `ItemSelect` u. a.). Die Parameter stehen dort nicht vollständig.
+- **Richtig:** Für Zeilenklicks `lv.OnEvent("Click", (lv, row) => ...)` verwenden. Das Muster `LV_DoubleClick(LV, RowNumber)` aus der Hilfe bestätigt die Reihenfolge (Steuerelement, Zeile). Zeilen nach jedem Neuaufbau über `Modify(row, "Select Focus")` wieder markieren, `Delete()` leert die Liste ohne Parameter.
+- **Status:** vermutet (Ereignisnamen und Parameter aus der Hilfe gelesen. Der Klick selbst ist nicht automatisiert geprüft, nur der Start des Fensters im Smoke-Lauf: Exit 0, kein Dialog).
+- **Quelle:** https://www.autohotkey.com/docs/v2/lib/ListView.htm
+
+### Gui-Fenster schließen beendet nicht den Prozess (Persistent)
+
+- **Problem:** Ein Fenster ohne eigenen Hauptschleifen-Grund endet mit dem letzten Fenster. Der Rollenprozess läuft aber über Timer und Peer weiter.
+- **Richtig:** `Role.Start` setzt `Persistent()`. Das Schließen des Fensters ist im Stub das gleiche wie "Beenden" (`cmd.app.exit`), damit kein Zustand verloren geht und die Anzeige nicht versehentlich verschwindet.
+- **Status:** verifiziert (Smoke-Lauf: Fenster offen, Supervisor antwortet, `cmd.app.exit` führt zu Exit 0)
+- **Quelle:** `src/manager/StubGui.ahk`
+
+## Prozesse, Pipes, Nachrichten (Stub)
+
+### Zeitmessung über Prozessgrenzen: `Time.NowMs` ist nicht vergleichbar
+
+- **Problem:** Der Stub soll Ankunftszeiten von Ereignissen messen. `Time.NowMs` ist ein Zähler der Leistungsmessung (QueryPerformanceCounter) und hat in jedem Prozess einen eigenen Nullpunkt.
+- **Falsch:** `recvMs := Time.NowMs()` im Stub und `time.perf_counter()` im Test vergleichen.
+- **Richtig:** Wandzeit über `GetSystemTimePreciseAsFileTime` (Puffer 8 Byte, `NumGet(buf, 0, "Int64") / 10000 - 11644473600000` ergibt ms seit 1970 UTC). Das entspricht `time.time() * 1000` in Python. Siehe `StubManager.WallMs`.
+- **Status:** verifiziert (Probe: Ankunftszeiten im Log, Latenzen 2 bis 4 ms zwischen Befehl und erstem Ereignis, `tests/e2e/test_ui_stub.py`)
+
+### Ereignisse, die der Stub selbst protokolliert, kommen über Topic `log` zurück
+
+- **Problem:** Der Stub schreibt jedes Ereignis über `storage` in das Logfile. `storage` leitet jeden Eintrag an Topic `log` weiter. Abonniert der Stub `log`, schreibt er jeden Eintrag erneut, und das Protokoll wächst endlos.
+- **Richtig:** Einträge vom Topic `evt.log.*` nur zählen, nie protokollieren (`StubManager._OnEvent`).
+- **Status:** verifiziert (`logEchoCount` im Probelauf gesetzt, Logdatei ohne Wiederholungen)
+
+### Engine-Neustart: `evt.engine.restarted` wird nicht gesendet
+
+- **Problem:** PROTOCOL 4.3 nennt `evt.engine.restarted`. Die Engine (WI-10) sendet es nicht. Ein neuer Engine-Prozess meldet nur `evt.engine.ready` mit neuer `epoch`.
+- **Richtig:** Clients erkennen den Neustart über `evt.process.restarted` (name `engine`, Supervisor), über eine neue `epoch` und über `evt.engine.ready`. Der Stub nutzt alle drei Signale (`_OnEvent`).
+- **Status:** verifiziert (Test `test_engine_restart_is_seen_and_resynced_without_restarting_the_stub` mit echtem Kill, Snapshot mit neuer `epoch`). Offen: die Engine sollte `evt.engine.restarted` senden, siehe `work_items/phase2/findings.md`.
+- **Quelle:** `doc/PROTOKOLL.md` 4.3
+
+### Log-Zeilen gehen verloren, wenn ein anderer Prozess die Datei offen hat (Storage)
+
+- **Problem:** Unter Last fehlten im Logfile des Stubs Zeilen (Ereignisse der letzten Sekunden). Die Storage-Ausgabe zeigt `storage unexpected OSError: (6) Das Handle ist ungültig`. Der Schreibvorgang der Zeile scheitert, die Zeile geht verloren. Auslöser war der Testleser, der die Datei während des Laufs las.
+- **Falsch:** Während eines Laufs eine Logdatei mit `read_bytes` lesen, um auf Einträge zu warten.
+- **Richtig:** Während des Laufs das Topic `log` beobachten (Storage leitet jeden Eintrag erst nach dem Schreiben weiter) und die Datei erst nach dem Ende lesen. Die Ursache im Storage (kein Wiederholversuch bei gesperrter Datei) ist offen, siehe `work_items/phase2/WI-13-ui-stub.md`, F-04.
+- **Status:** verifiziert (Fehler mit Reproduktion unter Parallellast: 2 bis 3 von 5 Läufen rot vorher; danach 6 von 6 Parallel-Läufe grün). Die Ursache im Storage-Code ist aus dem Fehlertext abgeleitet, nicht im Debugger gesehen: vermutet.
+- **Quelle:** `src/storage/LogSink.ahk` (`Append`, `_RotateIfBig`), `tests/e2e/test_ui_stub.py`
+
+### Boolesche Antworten als Zahl (Stub)
+
+- **Problem:** `cancel` soll laut Protokoll ein Bool sein. Der Json-Baustein schreibt `true` als `1`.
+- **Richtig:** Im Stub `cancel` als `1` oder `0` senden. Der Empfänger prüft als Wahrheitswert (siehe oben, Abschnitt "Wahrheitswerte gehen als Zahl auf die Leitung").
+- **Status:** verifiziert (Probe: `cancel: 0` im Log, Test `test_cancelled_exit_is_answered_and_nothing_stops`)
 
 ## Tests und Werkzeuge
 

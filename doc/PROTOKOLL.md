@@ -255,6 +255,18 @@ Die Engine zeigt nie Dialoge. Muss der Benutzer reagieren, nimmt die Engine eine
 | `evt.ui.notice` | engine/storage → `manager` | `{ level, text, flowId? }` | – (Tray-Hinweis statt MsgBox) |
 | `cmd.ui.confirmDeleteFlowFile` | engine → `manager` | `{ path, reason: "missing_packages", packages }` | `res: { ok, delete: bool }` (v1: MsgBox in `LoadFlow`) |
 
+### 4.8 Manager-Stub (WI-13, `src/manager/`, nur `--ui=stub`)
+
+Der Stub ist ein Minimal-Ersatz für `manager` (ARCHITEKTUR 3). Er zeigt, was die Engine meldet. Er hält nur UI-Zustand und keine Wahrheit über die Ausführung.
+
+- **Abonnements:** `engine`, `process`, `log`, nach dem Snapshot zusätzlich `flow:<flowId>` je Flow.
+- **Resync:** `cmd.engine.snapshot` nach `evt.engine.ready`, nach `evt.flow.list.changed`, nach `evt.process.restarted` (name `engine`), bei neuer `epoch`, bei einer Lücke in `seq` und bei einer veralteten Antwort (Antwort mit kleinerem `seq` als bereits gesehen wird wiederholt). Doppelte Ereignisse (`seq` bereits gesehen) werden verworfen.
+- **Antwort auf `cmd.app.prepareExit`:** `{ ok: true, cancel: 0 }`, mit Option `--stub-cancel-exit` `cancel: 1`. Zahlen statt Bool wie in 2 beschrieben.
+- **Ereignisse als Logzeilen:** jedes empfangene `evt.*` (außer Topic `log`) wird als `evt.log.append` an `storage` gesendet, Quelle `manager`, Text `ui-event {json}`. Storage schreibt `Log/Log_manager.txt`. Das Feld `recvMs` ist die Wandzeit (ms, UTC) beim Eingang. Die Zeilen `stub.*` sind eigene Einträge des Stubs (`stub.ready`, `stub.snapshot` mit `reason`, `stub.command`, `stub.commandAnswer`, `stub.prepareExit`, `stub.shutdown`).
+- **Testbefehl `cmd.test.command` (nur mit `--headless`):** Nutzlast `{ type, payload }`, `type` aus `cmd.flow.start`, `cmd.flow.stop`, `cmd.flow.toggle`, `cmd.engine.snapshot`. Der Stub leitet die Anfrage an `engine` weiter und antwortet mit `{ ok: true, answer: <Antwort der Engine> }`. Andere Typen: `bad_payload`. Die Antwort kommt verzögert (`Deferred`).
+- **Optionen, die der Supervisor an alle Rollen weitergibt:** `--ui=<wort>`, `--headless`, `--stub-cancel-exit`.
+- **Abweichung von 4.3:** Die Engine sendet kein `evt.engine.restarted` (Umsetzung WI-10 fehlt). Ein neu gestarteter Engine-Prozess meldet sich mit `evt.engine.ready` und neuer `epoch`. Der Stub löst den Resync über die Signale oben aus. Offen in `work_items/phase2/findings.md`.
+
 ## 5. Verbindungsaufbau, Wiederverbindung, Resync
 
 1. Rolle verbindet sich, sendet `sys.hello` mit `hwnd` ihres Fensters (Weckruf-Ziel, Abschnitt 1). Der Hub antwortet mit `sys.welcome`. Bis dahin sendet die Rolle nichts außer `sys.hello`. Der Peer (`src/core/ipc/Peer.ahk`) öffnet die Pipe ohne Warten (ein Versuch, dann Wiederholung per Timer), weckt bei bekannter Hub-HWND (Option `hubHwnd`) den Hub schon mit dem `sys.hello` und meldet `ready` erst nach `sys.welcome`.
