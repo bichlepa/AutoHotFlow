@@ -110,10 +110,21 @@ class PipeConnection {
             return false
         frame := FrameWriter.Encode(text)
         size := frame.Size
-        ; The limit is checked against the backlog that exists before this frame: a frame is
-        ; accepted while the backlog is below maxQueueBytes, so one large frame (up to the 16 MiB
-        ; frame limit) can always be sent, and the queue is bounded by maxQueueBytes + one frame.
-        if (this._queue.Length >= this.maxQueueFrames || this._queueBytes >= this.maxQueueBytes) {
+        ; Reap writes the kernel has already finished, so frames the peer has read do not count
+        ; as backlog just because nobody pumped yet.
+        if (this._queue.Length > 0) {
+            reason := this._DriveWriteGuarded()
+            if (reason != "") {
+                this._Fail(reason, true)
+                return false
+            }
+        }
+        ; The frame being written (queue[1]) is bounded by the frame limit and is the kernel's
+        ; business; the limit applies to what waits behind it. A frame is accepted while that
+        ; backlog is below maxQueueBytes, so one large frame can always be sent, and memory is
+        ; bounded by the head frame plus maxQueueBytes plus one frame.
+        backlog := (this._queue.Length > 0) ? this._queueBytes - this._queue[1].Size : 0
+        if (this._queue.Length >= this.maxQueueFrames || backlog >= this.maxQueueBytes) {
             this._Fail("queue_overflow", true)
             return false
         }

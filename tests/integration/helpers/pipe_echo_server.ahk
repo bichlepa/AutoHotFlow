@@ -42,10 +42,26 @@ class EchoServer {
         if (opts.Has("mt"))
             Wake.MaxThreads := Integer(opts["mt"])
         Wake.Install(EchoServer.Pump)
+        SetTimer(EchoServer.StatusFn, 1000)
         Kit.Record(EchoServer.resultPath, Map("type", "ready", "hwnd", Wake.Hwnd, "pid", ProcessExist()))
     }
 
     static Pump := (*) => EchoServer._Pump()
+    static StatusFn := (*) => EchoServer._Status()
+    static lastStatus := ""
+
+    ; Diagnostics for a stalled exchange: one record per change of the connection state.
+    static _Status() {
+        text := ""
+        for c in EchoServer.clients {
+            k := c.conn
+            text .= c.id ":" k.IsOpen ":rp=" k._readPending ":wp=" k._writePending ":q=" k.QueuedFrames
+                . ":buf=" k._reader.Buffered ":pumping=" k._pumping ";"
+        }
+        if (text != "" && text != EchoServer.lastStatus)
+            Kit.Record(EchoServer.resultPath, Map("type", "status", "text", text))
+        EchoServer.lastStatus := text
+    }
 
     static _Pump() {
         loop {
@@ -93,7 +109,9 @@ class EchoServer {
             return
         }
         if (SubStr(text, 1, 4) != "ctl:") {
-            c.conn.SendFrame(text)
+            ok := c.conn.SendFrame(text)
+            if (StrLen(text) > 1000000)
+                Kit.Record(EchoServer.resultPath, Map("type", "echo_big", "chars", StrLen(text), "sendOk", ok ? 1 : 0))
             return
         }
         parts := StrSplit(text, ":")

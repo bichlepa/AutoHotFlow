@@ -359,9 +359,9 @@ def test_configured_queue_byte_limit_is_applied(procs, ahk_exe, datadir, pipe_na
     end.send_text("hello:0")
     end.send_text("ctl:flood:102400:50")
     flood = server.wait_record("flood", timeout=15)
-    # the backlog is checked before a frame is added: 0, 102400 and 204800 bytes are below the
-    # limit of 300000, the backlog of 307200 bytes is not
-    assert flood["sent"] == 3 and flood["failedAt"] == 4
+    # the frame being written does not count, the backlog behind it is checked before a frame is
+    # added: 0, 102400 and 204800 bytes are below the limit of 300000, 307200 bytes are not
+    assert flood["sent"] == 4 and flood["failedAt"] == 5
     end.close()
 
 

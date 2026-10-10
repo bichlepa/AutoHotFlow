@@ -177,7 +177,11 @@ class OverlappedPipe:
                 raise OSError(err, "ReadFile failed")
             if _WaitForSingleObject(self._rev, int(timeout_s * 1000)) == WAIT_TIMEOUT:
                 _CancelIoEx(self._h, ctypes.byref(self._rov))
-                _GetOverlappedResult(self._h, ctypes.byref(self._rov), ctypes.byref(n), True)
+                # The read may have completed between the wait and the cancel (the thread can be
+                # descheduled there): then the cancel does nothing and the bytes are in `n`.
+                # Returning None would drop them silently.
+                if _GetOverlappedResult(self._h, ctypes.byref(self._rov), ctypes.byref(n), True) and n.value > 0:
+                    return bytes(self._rbuf[: n.value])
                 return None
             if not _GetOverlappedResult(self._h, ctypes.byref(self._rov), ctypes.byref(n), False):
                 err = _last_error()

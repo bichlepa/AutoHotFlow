@@ -247,12 +247,20 @@ _Noch keine Einträge._
 - **Richtig:** Pro Verbindung zwei Wächter-Flags (`_pumping`, `_writing`) mit "nochmal"-Flag. Prüfen und Setzen in `prev := Critical("On") ... Critical(prev)` kapseln, weil zwei getrennte Zeilen sonst unterbrochen werden könnten. `Critical("On")` liefert die vorherige Einstellung (`0` aus, `16` an), `Critical(prev)` stellt sie wieder her. Handlerfehler werden gefangen und geloggt, sonst bliebe der Zustandsautomat halb fertig. `OnClose` bei `queue_overflow` aus `SendFrame` heraus wird per `SetTimer(fn, -1)` verzögert, damit die Schleife des Aufrufers nicht durch den Handler verändert wird.
 - **Status:** verifiziert für die Funktion (Tests grün, 12000 Ping-Pong-Läufe ohne verlorenen Weckruf). Die Wächter selbst sind nicht gezielt gegen eine echte Unterbrechung getestet (nicht reproduzierbar erzwungen): vermutet.
 
-### Warteschlangengrenze: Rückstand vor dem Rahmen prüfen, nicht Summe nach dem Rahmen
+### Warteschlangengrenze: Rückstand hinter dem laufenden Rahmen, vorher abgeschlossene Schreibvorgänge einsammeln
 
-- **Problem:** Erste Fassung prüfte `Rückstand + neuer Rahmen > maxQueueBytes` und ließ nur bei leerer Warteschlange zu. Ein 16-MiB-Echo schlug sporadisch mit `queue_overflow` fehl, wenn noch ein kleiner Rahmen (`hello`) in der Warteschlange stand.
-- **Falsch:** `queueBytes + size > maxQueueBytes` (mit Ausnahme für leere Warteschlange).
-- **Richtig:** Überlauf, wenn der Rückstand **vor** dem Rahmen schon `maxQueueBytes` erreicht hat (oder `maxQueueFrames`). Die Warteschlange ist dann durch `maxQueueBytes` plus einen Rahmen begrenzt, und ein einzelner großer Rahmen ist immer sendbar.
-- **Status:** verifiziert (sporadisch in 1 von 25 Läufen vorher, danach 3 Gesamtläufe und 15 Einzelläufe grün)
+- **Problem:** Zwei Fehler in Folge. (1) Erste Fassung prüfte `Rückstand + neuer Rahmen > maxQueueBytes`: ein 16-MiB-Rahmen wurde mit `queue_overflow` abgelehnt, wenn noch ein kleiner stand. (2) Zweite Fassung prüfte den Rückstand vor dem Rahmen inklusive des laufenden: nach dem Echo eines 16-MiB-Rahmens hatte der Leser alles gelesen, aber niemand hatte den Abschluss eingesammelt (`Pump` lief noch nicht). Der nächste kleine Rahmen sah 16 MiB Rückstand und löste `queue_overflow` aus (ca. 1 von 5 Läufen von `test_frame_of_exactly_16_mib_is_echoed`).
+- **Falsch:** `queueBytes + size > maxQueueBytes`, und der Rückstand zählt den laufenden Rahmen und nicht eingesammelte, längst fertige Schreibvorgänge mit.
+- **Richtig:** In `SendFrame` zuerst `_DriveWriteGuarded()` (fertige Schreibvorgänge einsammeln), dann gilt Überlauf, wenn die Bytes **hinter** dem laufenden Rahmen (`queueBytes - queue[1].Size`) `maxQueueBytes` erreicht haben oder `maxQueueFrames` Rahmen anstehen. Der laufende Rahmen ist durch das Rahmenlimit begrenzt und Sache des Kernels. Ein einzelner großer Rahmen ist immer sendbar.
+- **Status:** verifiziert (40 aufeinanderfolgende Einzelläufe grün, 3 Gesamtläufe grün; vorher 3 von 20 rot, ein Teil davon dieser Fehler)
+
+### Python-Testleser verlor Bytes beim Abbruch eines Lesevorgangs (`winpipe.read_some`)
+
+- **Problem:** `test_frame_of_exactly_16_mib_is_echoed` wartete gelegentlich 60 s auf eine Antwort, obwohl der AHK-Server sie vollständig geschrieben hatte (Server: `wp=0 q=0`, `echo_big sendOk=1`). Ursache lag in der Python-Testunterstützung: `read_some` wartet 100 ms, bricht dann mit `CancelIoEx` ab und gab danach immer `None` zurück. Schließt der Lesevorgang zwischen Wartezeitende und Abbruch ab (Thread kurz verdrängt, GIL), tut der Abbruch nichts, die Bytes liegen in `n` und wurden verworfen. Ein Rahmen fehlte dann für immer.
+- **Falsch:** Nach `CancelIoEx` und `GetOverlappedResult(..., wait=True)` das Ergebnis ignorieren und `None` liefern.
+- **Richtig:** Ist `GetOverlappedResult` erfolgreich mit `n > 0`, die Bytes zurückgeben. Ein überlapptes Lesen kann beim Abbruch trotzdem abgeschlossen sein (dasselbe gilt für Schreiben). Gefunden mit Zustandsprotokoll des Servers (`status`-Datensätze in `pipe_echo_server.ahk`): Server fertig, Client ohne Daten.
+- **Status:** verifiziert (60 von 60 Läufen eines Schleifen-Skripts grün, vorher Ausfall nach 10 bis 40 Läufen; 40 Einzelläufe und 3 Gesamtläufe grün)
+- **Quelle:** `tests/support/winpipe.py` (WI-01), behoben im Zuge von WI-04
 
 ### `Round(x, 1)` liefert einen String
 
@@ -344,36 +352,6 @@ _Noch keine Einträge._
 
 ### Einmaliger Fehlschlag von `test_ahk_server_python_client_exchanges_10000_frames`
 
-- **Problem:** In einer Gesamtsuite schlug der Test einmal fehl (Meldung nicht gesichert), unmittelbar nachdem Helferskripte per Skript geändert wurden. In 15 anschließenden Einzelläufen, 8 Dateiläufen und 3 parallelen Dateiläufen trat es nicht mehr auf.
-- **Richtig:** Bei Wiederholung Meldung sichern (`-x`, `-s`). Ursache offen.
-- **Status:** vermutet (Wechselwirkung mit gleichzeitiger Änderung der Skriptdatei, nicht belegt)
-
-### Zustand für Tabellentests direkt setzen, Abläufe über echte Übergänge
-
-- **Problem:** Um jede Zelle der Übergangstabellen (ARCHITEKTUR 5.1/5.2) zu prüfen, muss der Zustand vorher gesetzt werden, `obj.State := "stopping"`. Für Abläufe fehlte der Schritt: Ein Trigger-Thread beginnt im Zustand `finished`, nicht `ready`. `Dispatch()` (ready → running) schlug deshalb fehl, und die Folgefehler sahen wie Engine-Fehler aus.
-- **Richtig:** In Tabellentests den Zustand direkt setzen, dann `TryTransition` aufrufen und Rückgabe und Zustand prüfen. In Ablauftests nur echte Übergänge verwenden: `finished` → `ready` (Scheduler), dann `ready` → `running` (`Dispatch`), dann `Finish`.
-- **Status:** verifiziert (`ToRunning` in `tests/ahk/engine_states.test.ahk`, `RunElement` in `tests/ahk/engine_scheduler.test.ahk`)
-- **Quelle:** `src/engine/core/Instance.ahk` (`Start`)
-
-### Timer einer Methode: `ObjBindMethod` statt Methodenname
-
-- **Problem:** Ein Element-Kontext plant Timer für seine eigene Methode `_RunTimer`. `SetTimer(this._RunTimer, ...)` ist keine Funktionsreferenz, und ein Timer braucht dieselbe Referenz zum Abschalten.
-- **Falsch:** `SetTimer(this._RunTimer, -100)` (Methode ohne Bindung), oder eine Lambda-Funktion, die später nicht mehr abschaltbar ist, weil man sie nicht aufbewahrt hat.
-- **Richtig:** `timer := ObjBindMethod(this, "_RunTimer", seq)`, die gebundene Funktion speichern und mit genau diesem Objekt `SetTimer(timer, 0)` abschalten (`ExecContext.After`, `CancelTimers`). Die Methode bekommt die Argumente nach `this`.
-- **Status:** verifiziert für die Richtig-Variante (`tests/ahk/element_runner.test.ahk`, Fälle "a timer is cancelled" und "Stop cancels pending timers"). Die Falsch-Variante wurde nicht gesondert ausprobiert. Lambdas mit Zuweisung wie `() => ctx.State.hits += 1` funktionieren (verifiziert).
-- **Quelle:** `src/elements/base/ExecContext.ahk`
-
-### Test-Sleep pumpt Nachrichten, Timer sind dadurch testbar
-
-- **Problem:** Ein Test startet einen Timer und prüft danach, ob er gefeuert hat. Ohne Nachrichtenschleife läuft der Timer nie.
-- **Richtig:** In Testfällen `Sleep(5)` in einer Warteschleife mit Frist verwenden (`WaitUntil` in `element_runner.test.ahk`). Ein Fall "Timer wurde nicht gefeuert" braucht ein festes `Sleep(150)` über die Dauer des Timers hinaus. `Sleep` läuft im Test, die Engine nie so.
-- **Status:** verifiziert (Testläufe der Element-Tests). Eine Verzögerung unter Last ist nicht gemessen; Toleranzen sind großzügig gewählt.
-- **Quelle:** `tests/ahk/element_sleep.test.ahk`, `tests/ahk/element_runner.test.ahk`
-
-### Zwei Schutzmechanismen verdecken einen Ausfall
-
-- **Problem:** Der Test "Timer nach Finish nicht gefeuert" blieb grün, als nur das Abschalten des Timers (`SetTimer(..., 0)`) entfernt war. Der Schutz `if (this.finished) return` in `_RunTimer` hat den Aufruf trotzdem verhindert.
-- **Richtig:** Erst prüfen, ob die Prüfung auf eine Ursache reagiert: Mutation im Scratchpad-Kopie (Repo unverändert). Entfernt man beide Schutzmechanismen, schlägt der Test fehl. Das ist gewollt: die Prüfung misst das sichtbare Verhalten, nicht den Weg dorthin.
-- **Status:** verifiziert (Mutationslauf in einer Kopie, Ergebnis: ein Fehlschlag mit beiden Schutzmechanismen aus)
-- **Quelle:** `src/elements/base/ExecContext.ahk`
-
+- **Problem:** In einer Gesamtsuite schlug der Test einmal fehl (Meldung nicht gesichert). In 15 Einzelläufen und 3 parallelen Dateiläufen danach nicht mehr.
+- **Richtig:** Sehr wahrscheinlich derselbe Fehler wie "Python-Testleser verlor Bytes" (oben): Rahmen für Rahmen durch den Python-Leser, ein verlorener Chunk lässt den Test hängen.
+- **Status:** vermutet (nicht reproduziert, daher nicht bewiesen)
