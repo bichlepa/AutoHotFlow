@@ -264,6 +264,7 @@ class Children {
             cmd .= ' --flow=' rec["flow"]
         if (cfg["testRoles"])
             cmd .= ' --test-roles'
+        cmd .= cfg["roleOpts"]   ; --ui, --headless, --stub-cancel-exit (WI-13), "" when not given
         pid := 0
         try {
             Run(cmd, , "Hide", &pid)

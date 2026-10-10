@@ -15,6 +15,7 @@
 #Include engine\Engine.ahk
 #Include worker\Worker.ahk
 #Include storage\Storage.ahk
+#Include manager\StubManager.ahk
 #Include elements\skeleton\Trigger_Manual.ahk
 #Include elements\skeleton\Action_Sleep.ahk
 #Include elements\skeleton\Action_Do_nothing.ahk
@@ -80,6 +81,7 @@ AhfRegisterRoles() {
     RoleRegistry.Register("engine", Engine)
     RoleRegistry.Register("worker", Worker)
     RoleRegistry.Register("storage", Storage)
+    RoleRegistry.Register("manager", StubManager)   ; WI-13: stub only, needs --ui=stub
 }
 
 ; Registers the test roles (tests/integration/helpers). Called only with --test-roles.

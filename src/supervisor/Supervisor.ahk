@@ -23,6 +23,7 @@
 ;   --deadline  total budget of the shutdown in ms (default 5000, sys.shutdown deadlineMs).
 ;   --test-roles  registers the test roles (tests/integration/helpers) and passes the option on.
 ;   --prepare-limit  (only with --test-roles) answer limit of cmd.app.prepareExit in ms, default 600000.
+;   --ui=<word>, --headless, --stub-cancel-exit  passed on to every role (WI-13: --ui=stub for the manager stub).
 ;
 ; Single instance: a named mutex per session. A second supervisor with the same session sends
 ; cmd.app.command {argv} to the running one and exits (exit 0 = delivered, 1 = no answer).
@@ -78,6 +79,7 @@ class Supervisor {
         }
         this.hasCommand := opts.Has("command")
         this.command := String(opts.Get("command", ""))
+        this.roleOpts := this._RoleOpts(opts)
         this.mutex := 0
         this.hub := ""
         this.children := ""
@@ -92,7 +94,8 @@ class Supervisor {
         if (this._ForwardIfRunning())
             return
         config := Map("session", this.session, "pipe", this.pipe, "data", this.data
-            , "hubHwnd", Wake.Hwnd, "testRoles", this.testRoles, "script", A_ScriptFullPath)
+            , "hubHwnd", Wake.Hwnd, "testRoles", this.testRoles, "script", A_ScriptFullPath
+            , "roleOpts", this.roleOpts)
         this.hub := Hub(this.pipe, this.session)
         this.children := Children(config, this.hub)
         this.heartbeat := Heartbeat(this.children, this.hub)
@@ -211,6 +214,23 @@ class Supervisor {
     static _OnError(e, mode) {
         Log.Write("a0", "supervisor", "unexpected " Type(e) ": " e.Message " (line " e.Line ", " mode ")")
         return 1
+    }
+
+    ; Options the supervisor passes on to every role process (WI-13): --ui=<word> selects the UI role
+    ; (manager: --ui=stub), --headless and --stub-cancel-exit are the stub's test options.
+    _RoleOpts(opts) {
+        text := ""
+        if (opts.Has("ui")) {
+            ui := String(opts["ui"])
+            if (!RegExMatch(ui, "^[a-z]+$"))
+                throw AhfError("supervisor: --ui must be a single word, e.g. --ui=stub", ErrCode.BAD_ARGS)
+            text .= " --ui=" ui
+        }
+        if (opts.Has("headless"))
+            text .= " --headless"
+        if (opts.Has("stub-cancel-exit"))
+            text .= " --stub-cancel-exit"
+        return text
     }
 
     _Integer(opts, key, fallback) {

@@ -45,6 +45,7 @@ class PlaceholderRole extends Role {
 ; "engine" is registered by the entry point (WI-10, src/engine/Engine.ahk): core/ must not include
 ; role folders, so the real class cannot be named here.
 RoleRegistry.Register("triggerhost", PlaceholderRole)  ; WI-14
-RoleRegistry.Register("manager", PlaceholderRole)      ; WI-13
 RoleRegistry.Register("editor", PlaceholderRole)       ; later phase
 ; "worker" is registered by the entry point (WI-11, src/worker/Worker.ahk), like "engine" (see above).
+; "manager" is registered by the entry point (WI-13, src/manager/StubManager.ahk), like "storage". Registering it
+; here as well would make the entry point's Register throw (duplicate role).
