@@ -3,6 +3,7 @@
 
 # compiled files
 /*.exe
+/v1/*.exe
 
 # exclude flows except of demonstration flows
 Saved Flows/backup
@@ -17,3 +18,10 @@ Desktop.ini
 
 #other
 /innoSetupScript - Extension Package.iss
+/v1/innoSetupScript - Extension Package.iss
+
+# Python / test artifacts
+__pycache__/
+*.pyc
+.pytest_cache/
+tests/.tmp/
