@@ -107,6 +107,32 @@ Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge kor
 - **Richtig:** Textläufe mit einem `RegExMatch`-Aufruf je Zeichenkette holen, Zeichencodes per `NumGet` aus einem UTF-16-Puffer lesen, `SkipWs` ohne Regex, wenn kein Leerzeichen folgt. Danach etwa 1,5 s Parsen und 0,6 s Schreiben (Messlauf, `tests/test_json_flows.py`). Die Restkosten sind die Methodenaufrufe pro Token. Das Ziel "unter 1 s" wurde damit nicht erreicht.
 - **Status:** verifiziert (gemessen, Werte schwanken je Lauf)
 
+### Reserviertes Wort `loop` nicht als Variablenname
+
+- **Problem:** In einem Test hieß eine Variable `loop`. Der Editor meldete "The following reserved word 'loop' must not be used as a variable name", dazu Folgefehler wie "Missing operand" an den Stellen, an denen die Variable benutzt wurde.
+- **Falsch:** `loop := inst.Threads["t1"]` und `RunElement(loop, "head")`.
+- **Richtig:** Anderen Namen wählen (`loopThread`). Das Wort in Zeichenketten (`"type":"loop"`) ist unproblematisch. Die Editor-Diagnose vor dem ersten Testlauf lesen, dann erspart man sich einen Ladefehler.
+- **Status:** verifiziert (Editor-Diagnose in `tests/ahk/engine_scheduler.test.ahk`, nach dem Umbenennen laufen die Tests grün)
+
+### Wahrheitswerte sind Integer 1 und 0
+
+- **Problem:** Eine Methode, die `true` oder `false` zurückgibt, liefert in AHK v2 einen Integer. `Assert.Equal(x, false)` prüft deshalb auf Integer, nicht auf einen Bool-Typ. Die Fehlermeldung zeigt "expected 0 (Integer)".
+- **Richtig:** Für Rückgabewerte wie `TryTransition` `Assert.Equal(ok, false)` oder `Assert.True(ok)` verwenden. Beide Seiten sind dann Integer.
+- **Status:** verifiziert (`tests/ahk/engine_states.test.ahk`, Vergleiche mit `false` und `true`)
+
+### Dieselbe Datei über verschiedene relative `#Include`-Wege
+
+- **Problem:** `src/core/Log.ahk` wird über `Instance.ahk` (und `ThreadState.ahk`) eingebunden und zusätzlich direkt vom Test. Es war unklar, ob AHK dabei eine doppelte Klassendefinition meldet.
+- **Richtig:** Kein Fehler. Die Pfade `..\..\core\Log.ahk` und `..\..\src\core\Log.ahk` zeigen auf dieselbe Datei, AHK lädt sie einmal. Mehrfach-Einbindung über Abhängigkeitsketten ist damit unkritisch.
+- **Status:** verifiziert (Testläufe `engine_states` und `engine_scheduler` ohne Ladefehler)
+- **Quelle:** `src/engine/core/Instance.ahk`, `tests/ahk/engine_states.test.ahk`
+
+### Zähler für Test-IDs im Closure statt global
+
+- **Problem:** Tests brauchen fortlaufende Thread-IDs. Globale Variablen verbietet `doc/KONVENTIONEN.md`, eine `static`-Variable in einer Funktion war schwer zu lesen.
+- **Richtig:** Ein Map-Objekt anlegen und die Funktion als Closure übergeben: `counter := Map("n", 1)` und `() => NextId(counter)`. Das Map-Objekt ist veränderlich und wird von allen Aufrufen gemeinsam benutzt.
+- **Status:** verifiziert (`MakeIds` in `tests/ahk/engine_scheduler.test.ahk`)
+
 ## Objekte, Maps, Arrays
 
 ### Map mit `CaseSense "Off"` behält die Schreibweise der ersten Einfügung
@@ -114,6 +140,13 @@ Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge kor
 - **Problem:** Offene Prüfung von WI-02: Bleibt die Schreibweise der Schlüssel bei der Aufzählung erhalten?
 - **Richtig:** Ja. Die erste Einfügung bestimmt die Schreibweise. Eine spätere Einfügung in anderer Schreibweise ersetzt nur den Wert. Die Aufzählung ist außerdem sortiert (`zebra`, `apple`, `mango` kommen als `apple`, `mango`, `zebra`). Ein eigener `AhfMap` ist deshalb nicht nötig. Zwei Schlüssel, die sich nur in der Schreibweise unterscheiden, werden zu einem: `Json.Parse` weist das ab.
 - **Status:** verifiziert (`tests/ahk/json.test.ahk`, "Map CaseSense Off keeps the first spelling of a key" und "... enumerates keys in sorted order"). Die Sortierung ist beobachtet, nicht dokumentiert.
+
+### Schlüssel vor dem Löschen aus einer Map in ein Array kopieren
+
+- **Problem:** Beim Stoppen einer Instanz werden Threads aus einer `Map` entfernt, während über die Map iteriert wird.
+- **Richtig:** Die Schlüssel zuerst in ein Array kopieren, dann in dieser Liste laufen (`Instance.Stop`). Ob das Löschen während der `for`-Schleife über eine Map funktioniert, wurde nicht geprüft; die Kopie vermeidet die Frage.
+- **Status:** nicht geprüft (nur das Muster mit Kopie ist im Einsatz)
+- **Quelle:** `src/engine/core/Instance.ahk`
 
 ## Fehlerbehandlung
 
@@ -135,6 +168,13 @@ Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge kor
 - **Problem:** Unterscheidung zwischen Assert-Fehlschlag und unerwartetem Fehler muss für den Bericht erhalten bleiben.
 - **Richtig:** `TestRun.Case` fängt `AssertFailed` als `fail` und jeden anderen Fehler als `error` mit Typ, Meldung und Zeile.
 - **Status:** verifiziert (Test `test_failing_and_erroring_cases_are_reported_red`)
+
+### Callback, der wirft, bricht den Zustandsautomaten nicht ab
+
+- **Problem:** Der Callback `onInvalid` eines Zustandsautomaten kann selbst einen Fehler werfen. Ungefangen würde das den Übergang mitten im Aufruf abbrechen.
+- **Richtig:** Den Callback in `try/catch` aufrufen, den Fehler als a0-Log schreiben und trotzdem `false` zurückgeben (`ThreadState.ReportInvalid`).
+- **Status:** verifiziert (Test "a throwing callback is logged, not raised" in `tests/ahk/engine_states.test.ahk`)
+- **Quelle:** `src/engine/core/ThreadState.ahk`
 
 ## Prozesse, Pipes, Nachrichten
 
@@ -292,4 +332,11 @@ _Noch keine Einträge._
 - **Problem:** In einer Gesamtsuite schlug der Test einmal fehl (Meldung nicht gesichert), unmittelbar nachdem Helferskripte per Skript geändert wurden. In 15 anschließenden Einzelläufen, 8 Dateiläufen und 3 parallelen Dateiläufen trat es nicht mehr auf.
 - **Richtig:** Bei Wiederholung Meldung sichern (`-x`, `-s`). Ursache offen.
 - **Status:** vermutet (Wechselwirkung mit gleichzeitiger Änderung der Skriptdatei, nicht belegt)
+
+### Zustand für Tabellentests direkt setzen, Abläufe über echte Übergänge
+
+- **Problem:** Um jede Zelle der Übergangstabellen (ARCHITEKTUR 5.1/5.2) zu prüfen, muss der Zustand vorher gesetzt werden, `obj.State := "stopping"`. Für Abläufe fehlte der Schritt: Ein Trigger-Thread beginnt im Zustand `finished`, nicht `ready`. `Dispatch()` (ready → running) schlug deshalb fehl, und die Folgefehler sahen wie Engine-Fehler aus.
+- **Richtig:** In Tabellentests den Zustand direkt setzen, dann `TryTransition` aufrufen und Rückgabe und Zustand prüfen. In Ablauftests nur echte Übergänge verwenden: `finished` → `ready` (Scheduler), dann `ready` → `running` (`Dispatch`), dann `Finish`.
+- **Status:** verifiziert (`ToRunning` in `tests/ahk/engine_states.test.ahk`, `RunElement` in `tests/ahk/engine_scheduler.test.ahk`)
+- **Quelle:** `src/engine/core/Instance.ahk` (`Start`)
 

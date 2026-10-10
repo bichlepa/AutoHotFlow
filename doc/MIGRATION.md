@@ -14,3 +14,7 @@ Wird laufend ergänzt. Stille Verhaltensänderungen sind nicht erlaubt: Alles, w
 | M-08 | Fehlende Pakete beim Laden | `MsgBox` mit Abfrage im Lock, Datei wird bei „Ja“ gelöscht | Engine meldet `cmd.ui.confirmDeleteFlowFile` an den Manager | Dialoge nur in UI | geplant |
 | M-09 | Chrome-Paket | vorhanden | entfällt | Entscheidung des Projektinhabers | beschlossen |
 | M-10 | Beenden | `criticalSectionCounter`, 4-s-Notbremse | zweiphasig mit Quittungen, Frist 5 s | Architektur | geplant |
+| M-11 | Ausführungsrichtlinie `wait` | wirkungslos: `executionTask` liest `ExecutionPolicy` an der Flow-Wurzel, der Wert steht unter `flowSettings` (`Execution Task.ahk:31` gegenüber `Instances and Threads.ahk:18`). `wait` verhält sich wie `parallel`. | `wait` wirkt wie im Editor beschrieben: nur die erste Instanz eines Flows läuft, weitere warten bis sie endet | offensichtlicher v1-Fehler, UI bietet die Option an | beschlossen |
+| M-12 | Richtlinie `stop` | Instanzen werden ohne Frist gestoppt | Frist 2 s, danach harter Abbruch des Workers | Architektur (Zustandsautomat) | geplant |
+| M-13 | Verbindungen ohne Ziel | 154 von 1039 Verbindungen in den Beispielflows haben leeres oder unbekanntes Ende, werden still ignoriert | werden ignoriert und beim Laden mit `f1`-Log gemeldet | Diagnose | geplant |
+| M-14 | `LoopStack.Pop` auf leerem Stack | setzt still `""` | wirft `AhfError` (code `internal`), geloggt, Thread endet mit `exception` | Fehler nicht verschlucken | geplant |
