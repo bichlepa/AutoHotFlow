@@ -6,7 +6,8 @@ Status: Entwurf, Protokollversion **1**. Begründung der Technik: [ARCHITEKTUR.m
 
 ## 1. Transport
 
-- **Hub:** Der Supervisor betreibt die Pipe `\\.\pipe\ahf.<session>.hub` (`<session>` = Supervisor-PID und Startzeit, hex). Alle anderen Rollen verbinden sich als Client. Es gibt keine direkten Verbindungen zwischen Nicht-Hub-Prozessen.
+- **Hub:** Der Supervisor betreibt die Pipe `\\.\pipe\ahf.<session>.hub`. Alle anderen Rollen verbinden sich als Client. Es gibt keine direkten Verbindungen zwischen Nicht-Hub-Prozessen.
+- **Sitzung (`<session>`):** Standard ist `main` (Option `--session=<id>`, Standard `main`). Abweichung von der ursprünglich geplanten Wahl (Supervisor-PID und Startzeit): Eine zweite Instanz muss den laufenden Hub finden, um ihren Befehl abzugeben (Abschnitt 4.1, `cmd.app.command`). Mit PID und Startzeit kennt sie den Namen nicht. Die Einzelinstanz-Sperre (benannter Mutex `AHF.supervisor.<session>`) und die Pipe nutzen denselben Schlüssel. Mehrere parallele Sitzungen (z. B. Tests) bekommen eigene `--session`-Werte.
 - **Pipe:** Byte-Modus, duplex, `FILE_FLAG_OVERLAPPED`, `PIPE_REJECT_REMOTE_CLIENTS`, eine Serverinstanz pro Client (der Hub legt nach jedem `Connect` eine neue Instanz an).
 - **Rahmen:** `uint32` Länge (little endian) + UTF-8-JSON. Maximale Größe 16 MiB. Größere Nutzdaten (z. B. große Flows) werden über `storage`-Dateien oder Chunking geteilt (`seq/total` in der Nutzlast), nicht über einen größeren Rahmen.
 - **Weckruf:** Nach jedem Schreiben sendet der Sender `PostMessage(peerHwnd, 0x8001, 0, 0)` (`WM_AHF_WAKE`). Der Empfänger liest bei Weckruf und zusätzlich per Fallback-Timer (250 ms). Ein Client, der die Hub-HWND kennt (Peer-Option `hubHwnd`), weckt den Hub schon mit dem `sys.hello` (Abschnitt 5); ohne Weckruf nimmt der Hub den neuen Client erst nach bis zu 250 ms an.
@@ -75,7 +76,7 @@ Jede Nachricht ist ein JSON-Objekt mit festem Schema. Der Serializer schreibt di
 | `engine` | `evt.engine.*`, `evt.flow.list.changed`, `evt.settings.changed` | alle UIs |
 | `flow:<flowId>` | `evt.flow.*`, `evt.element.state`, `evt.connection.state`, `evt.instance.*` für diesen Flow | `editor:<flowId>`, `manager` |
 | `log` | `evt.log.entry` | `manager` (Log-Fenster) |
-| `process` | `evt.process.*` | `manager`, Tests |
+| `process` | `evt.process.*` (Felder siehe 4.1a), `evt.app.exitCancelled` | `manager`, Tests |
 
 ## 4. Nachrichtenkatalog
 
@@ -92,9 +93,35 @@ Alle Nutzlasten sind Objekte. `flowId`, `elementId`, `connectionId` sind die Bez
 | `sys.shutdown` | supervisor → alle | `{ reason: "user"/"logoff"/"crash", deadlineMs }` | Rolle räumt auf, sendet `sys.bye`, beendet sich |
 | `sys.bye` | Rolle → supervisor | `{ clean: bool }` | – |
 | `cmd.app.prepareExit` | supervisor → editor/manager | `{}` | `res: { ok, cancel: bool }` (Benutzer kann abbrechen, Frist = unbegrenzt bis Antwort) |
-| `cmd.app.exit` | beliebige UI → supervisor | `{}` | startet Beenden (6.3) |
-| `cmd.app.command` | zweite Instanz → supervisor | `{ argv: [...] }` | v1-Kommandozeile (`AHFCommand`), `res: { ok }` |
+| `cmd.app.exit` | beliebige UI → supervisor | `{ deadlineMs? }` (optional, Integer 100 bis 60000, sonst Standard `--deadline`, 5000) | startet Beenden (6.3), `res: { ok, started: bool }`; `started` ist false, wenn schon ein Beenden läuft |
+| `cmd.app.command` | zweite Instanz → supervisor | `{ argv: [...] }` (Array von Strings, Kommandozeilen-Wörter; die Instanz übergibt `--command=<text>` als `argv` mit einem Eintrag) | `res: { ok }`. Phase 2 protokolliert den Text nur (`a1`), es gibt noch keine Befehle außer dem Test. Die zweite Instanz beendet sich mit Exit 0 (zugestellt) oder 1 (keine Antwort, Fehler) |
+| `cmd.process.list` | beliebige Rolle → supervisor | `{}` | `res: { ok, processes: [ {name, role, state, pid, restarts} ] }`. Momentaufnahme aller Kinder, Zustände nach ARCHITEKTUR 5.3. Dient als Resync für Späteinsteiger (Abschnitt 5a) |
 | `cmd.topic.subscribe` / `cmd.topic.unsubscribe` | Rolle → supervisor | `{ topic }` | `res: { ok }` |
+| `evt.app.exitCancelled` | supervisor → Topic `process` | `{ by }` (Rolle, die abgebrochen hat) | – (Beenden abgebrochen, nichts wurde gestoppt) |
+
+**Exit-Codes des Supervisors** (`AutoHotFlow.ahk --role=supervisor`, Standard ohne `--role`):
+0 sauber (jedes Kind hat sich selbst beendet), 1 Start fehlgeschlagen (z. B. Mutex, ungültige Optionen), 5 mindestens ein Kind wurde nach Frist oder Hang beendet (`TerminateProcess`). Dieselben Zahlen stehen im Einstieg (`src/AutoHotFlow.ahk`). Die zweite Instanz nutzt 0 und 1 (siehe `cmd.app.command`).
+
+### 4.1a Prozessereignisse (Topic `process`, supervisor → Abonnenten)
+
+Jeder Eintrag trägt `name` (der Name, unter dem das Kind gestartet wurde, z. B. `engine`, `echo:a`) und `pid`, wo der Prozess bekannt ist.
+
+| Typ | Nutzlast | Bedeutung |
+|---|---|---|
+| `evt.process.started` | `{ name, role, pid }` | Prozess gestartet, noch nicht bereit |
+| `evt.process.ready` | `{ name, pid }` | `sys.hello` angekommen, Rolle meldet sich bereit |
+| `evt.process.hung` | `{ name, reason }` | kein Pong (3 Pings × 2 s) oder kein `sys.hello` innerhalb 10 s. Der Supervisor sendet `sys.shutdown` mit `deadlineMs` 2000, nach 2 s `TerminateProcess` |
+| `evt.process.crashed` | `{ name, pid, reason: "exited"/"hung", exitCode, restart: bool }` | unerwartetes Ende (auch nach Hang). `restart` true, wenn neu gestartet wird |
+| `evt.process.exited` | `{ name, pid }` | Ende nach Aufforderung (Beenden) |
+| `evt.process.restarted` | `{ name, attempt }` | Neustart nach Richtlinie (automatisch nur für `storage` und `engine`; mit `--test-roles` zusätzlich `crasher`) |
+
+Neustart-Richtlinie: höchstens 3 Neustarts in 60 s, sonst bleibt der Prozess `crashed` (`restart: false`). `manager` und `editor` werden nie automatisch neu gestartet.
+
+### 4.1b Testrollen (nur mit `--test-roles`)
+
+Die Rollen `echo`, `crasher`, `hanger`, `slow_shutdown` (Quellen in `tests/integration/helpers/`) sind im Einstieg einkompiliert, aber nur mit `--test-roles` registriert. Ohne das Flag ist ihr Name unbekannt (Exit 2). Zusätzliche Nachrichten der Testrollen:
+- `cmd.test.arm` an `crasher` (`{}`, `res: { ok }`): startet einen Timer (300 ms), nach dem `crasher` sich mit `TerminateProcess` (Exit 7) selbst beendet, ohne `sys.bye`. Der Arm-Schritt erlaubt dem Test, den Prozess zu beobachten, bevor er stirbt (Testszenario für `evt.process.crashed`). Ohne Arm tut `crasher` nichts.
+- `cmd.test.echo`, `cmd.test.log`, `cmd.test.logstate`, `cmd.test.setlogtarget`, `cmd.test.throwlater` (`echo`): siehe `tests/integration/helpers/EchoRole.ahk`.
 
 ### 4.2 Engine-Befehle (Clients → `engine`)
 
@@ -185,6 +212,17 @@ Die Engine zeigt nie Dialoge. Muss der Benutzer reagieren, nimmt die Engine eine
 3. Bricht die Pipe, baut die Rolle neu auf (Backoff 100 ms, 200, 400, ..., max. 2 s, gesamt 10 s), wiederholt `hello` mit `epoch` des Besitzers, abonniert neu, macht Resync. Gelingt das nicht, beendet sich die Rolle (Orphan-Guard).
 4. Eine Lücke in `seq` oder ein neues `epoch` löst Resync aus.
 5. Der Hub hält pro Client eine Ausgabewarteschlange mit Obergrenze (Standard 1000 Nachrichten oder 8 MiB). Läuft sie über, gilt der Client als hängend (`peer_gone` für ausstehende Anfragen), der Supervisor wird informiert.
+
+### 5a Ereignisse vor dem Abonnement (Designfrage, WI-07)
+
+Ereignisse werden nur an Abonnenten verteilt, die zum Zeitpunkt des Sendens abonniert sind. Ein Ereignis, das vor dem `cmd.topic.subscribe` einer Rolle gesendet wurde, geht für diese Rolle verloren. Es gibt keine Persistenz und keine Wiederholung (Abschnitt 1, Lieferung).
+
+Daraus folgt die Regel für Späteinsteiger (z. B. ein Manager, der nach dem Start des Supervisors öffnet):
+1. Erst abonnieren (`cmd.topic.subscribe`), dann den Ist-Zustand holen (`cmd.process.list` beim Supervisor, `cmd.engine.snapshot` bei der Engine).
+2. Ereignisse, die zwischen beiden Schritten kommen, können doppelt vorkommen (Snapshot und Ereignis). Der Empfänger darf sie nicht als Zustandswechsel doppelt zählen; der Snapshot ist maßgeblich.
+3. Ein Ereignis, das nie eintraf, wird nicht nachgeholt. Der Snapshot korrigiert es.
+
+Der Supervisor hält für `process` keine Historie. `cmd.process.list` ist die einzige Quelle für den Zustand vor dem Abonnement. `tests/integration/test_supervisor.py` nutzt die Momentaufnahme (`process_list`) zum Warten auf Bereitschaft und für die Zustandsprüfung nach Absturz. Ein gezielter Test, bei dem ein Späteinsteiger Ereignisse verpasst, fehlt (nicht geprüft).
 
 ## 6. Versionierung und Erweiterung
 

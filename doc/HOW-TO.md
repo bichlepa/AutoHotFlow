@@ -149,6 +149,14 @@ Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge kor
 - **Status:** verifiziert (Dialog beim Start, nach der Umbenennung grün).
 - **Quelle:** `src/AutoHotFlow.ahk`
 
+### Feld und Methode mit gleichem Namen: `Property is read-only`
+
+- **Problem:** Eine Klasse hatte ein Feld und eine Methode mit Namen, die sich nur in der Schreibweise unterscheiden. AHK v2 behandelt Bezeichner case-insensitiv, also sind es dieselben Namen. Der Zugriff auf das Feld schlug mit "Property is read-only" fehl.
+- **Falsch:** Feld `state` und Methode `State()` in derselben Klasse.
+- **Richtig:** Felder und Methoden verschieden benennen (z. B. Feld `stateName`, Methode `State()`), auch wenn die Schreibweise nur leicht abweicht.
+- **Status:** verifiziert (im Lauf von WI-07 gefunden; die Fundstelle wurde für diesen Eintrag nicht erneut geprüft)
+- **Quelle:** `src/supervisor/` (WI-07)
+
 ## Objekte, Maps, Arrays
 
 ### Map mit `CaseSense "Off"` behält die Schreibweise der ersten Einfügung
@@ -349,6 +357,22 @@ _Noch keine Einträge._
 - **Status:** verifiziert (`test_hub_gone_role_ends_within_orphan_budget_and_leaves_no_process`). Der Beginn der Frist ist um bis zu 200 ms ungenau, weil er erst beim nächsten Timer-Tick gesetzt wird.
 - **Quelle:** `src/core/Role.ahk` (`_Guard`)
 
+### Ereignisse vor dem Abonnement gehen verloren: Snapshot nutzen
+
+- **Problem:** Ein Client, der nach dem Start abonniert, bekommt die früheren `evt.process.*`-Ereignisse nicht. Wer auf `evt.process.ready` wartet, wartet dann vergeblich, wenn das Ereignis schon vorher kam.
+- **Falsch:** Auf ein Ereignis warten, das vor `cmd.topic.subscribe` gesendet wurde.
+- **Richtig:** Erst abonnieren, dann den Zustand per Momentaufnahme holen (`cmd.process.list` beim Supervisor, `cmd.engine.snapshot` bei der Engine). Ereignisse danach verarbeiten. Siehe `doc/PROTOKOLL.md`, Abschnitt 5a.
+- **Status:** verifiziert (WI-07, `test_supervisor.py`, Warten über `process_list`)
+- **Quelle:** `doc/PROTOKOLL.md` 5a, `src/supervisor/Children.ahk` (`Snapshot`)
+
+### Hub.Request muss die registrierte Nachrichten-ID verwenden
+
+- **Problem:** Die Antwort auf eine Anfrage des Supervisors muss den Rückruf finden (`corr` = ID der Anfrage). Trägt die Anfrage eine andere ID als die registrierte, findet die Antwort keinen Rückruf. `Hub.Request` hat keinen eigenen Timer, der Rückruf bliebe dann offen.
+- **Falsch:** Die ID für die Nachricht neu erzeugen, nachdem sie im Rückruf-Verzeichnis abgelegt wurde.
+- **Richtig:** Die ID einmal erzeugen, im Verzeichnis unter dieser ID ablegen und dieselbe ID in die Nachricht setzen (`Hub.Request` in `src/supervisor/Hub.ahk`, aktueller Code erfüllt das).
+- **Status:** vermutet (Code gelesen, nicht in einem isolierten Test belegt)
+- **Quelle:** `src/supervisor/Hub.ahk` (`Request`)
+
 ## GUI und Hotkeys
 
 _Noch keine Einträge._
@@ -450,3 +474,27 @@ _Noch keine Einträge._
 - **Richtig:** `FileAppend(text, "**", "UTF-8-RAW")` schreibt auf stderr und legt keine Datei an. Das ist eine Ausnahme zu KONVENTIONEN 3 (dort nur `storage`), begründet mit Konsolenausgabe. `ahkrun.py` reicht stderr an den Aufrufer weiter.
 - **Status:** verifiziert (`test_unknown_role_exits_2_with_message_and_no_dialog`, `test_role_without_implementation_reports_not_implemented`).
 - **Quelle:** `src/core/Role.ahk` (`Role.Console`)
+
+### psutil-Status hinkt nach `suspend` um 3 bis 73 ms
+
+- **Problem:** Nach `psutil.Process.suspend()` zeigt `psutil.Process.status()` nicht sofort `STATUS_STOPPED`. Der Status hinkt um einige Millisekunden hinterher. Eine einmalige Prüfung direkt nach dem Anhalten ist deshalb unzuverlässig.
+- **Falsch:** Einmal `status()` nach `suspend` lesen und sofort prüfen.
+- **Richtig:** Den Status in einer kurzen Schleife (10 ms Abstand, Frist 2 s) pollen, bis er `STATUS_STOPPED` ist (`tests/support/test_procs.py`, `test_suspend_and_resume`).
+- **Status:** verifiziert (30 Läufe gemessen, Verzögerung bis 73 ms)
+- **Quelle:** `tests/support/test_procs.py`
+
+### ahkrun schreibt stderr erst am Ende: Logs laufender Prozesse sind leer
+
+- **Problem:** Ein Rollenprozess, der über `tools/ahkrun.py` läuft, liefert seine Ausgabe auf stderr erst beim Ende. Während er läuft, sind Log-Dateien und Ausgabe leer. Eine Diagnose über die Ausgabe ist dann nicht möglich.
+- **Falsch:** Während des Laufs in die Ausgabe schauen, um Zustand zu prüfen.
+- **Richtig:** Zustand über Nachrichten abfragen (z. B. `cmd.process.list`, `sys.hello`), die Ausgabe erst nach dem Ende auswerten.
+- **Status:** verifiziert (WI-07, Testläufe mit `ahkrun.py`)
+- **Quelle:** `tools/ahkrun.py`, `tests/integration/test_role.py`
+
+### Assertion auf Teilstring: `running for session` trifft auch andere Meldungen
+
+- **Problem:** Eine Assertion suchte nach dem Teilstring `running for session`. Die Meldung "already running for session main, forwarding the command" (zweite Instanz) enthält ihn ebenfalls. Der Teilstring trifft also auch einen anderen Fall, als gemeint war.
+- **Falsch:** `assert "running for session" in text`.
+- **Richtig:** Die ganze Meldung und ihren Anfang prüfen (z. B. Zeilenanfang `session main running`), oder die Meldung über ein Ereignis statt über Text prüfen.
+- **Status:** verifiziert (WI-07, Testfall für die zweite Instanz)
+- **Quelle:** `src/supervisor/Supervisor.ahk` (`_ForwardIfRunning`), `tests/integration/test_supervisor.py`
