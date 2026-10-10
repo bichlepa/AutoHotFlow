@@ -23,6 +23,10 @@ ReturnBadType(msg) {
     return "text"
 }
 
+ReturnDeferred(msg) {
+    return Deferred.Marker()
+}
+
 Incoming(msgType) {
     return Message("engine", "ui", "ui#1", msgType, Map("flowId", "F1"), "", 5000)
 }
@@ -140,8 +144,17 @@ CaseOnRejectsNonFunction() {
     Assert.Throws(() => d.On("cmd.", "notAFunction"), AhfError)
 }
 
+CaseDeferredMarkerIsPassedThrough() {
+    d := Dispatcher()
+    d.On("cmd.later.", ReturnDeferred)
+    res := d.Invoke(Incoming("cmd.later.run"))
+    Assert.True(res is Deferred)
+    Assert.Equal(Deferred.Marker() == res, true)
+}
+
 TestRun.Init()
 TestRun.Case("exact type is handled and gets ok", CaseExactTypeHandled)
+TestRun.Case("a Deferred marker is passed through, not answered as internal error", CaseDeferredMarkerIsPassedThrough)
 TestRun.Case("longest prefix wins", CaseLongestPrefixWins)
 TestRun.Case("registration order does not change the choice", CaseRegistrationOrderDoesNotMatter)
 TestRun.Case("a prefix must match the start of the type", CasePrefixMustMatchStart)

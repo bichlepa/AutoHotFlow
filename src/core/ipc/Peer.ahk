@@ -170,6 +170,17 @@ class Peer {
         return id
     }
 
+    ; Sends the answer to a cmd.* request whose handler returned Deferred.Marker() (WI-12). request is the
+    ; Message that the handler received. Returns false when the answer could not be sent (no connection).
+    ; The answer is sent as the handler's result would be: payload Map, ok added as true when missing.
+    Reply(request, payload) {
+        if (!IsObject(payload) || Type(payload) != "Map")
+            throw AhfError("Peer.Reply: payload must be a Map", ErrCode.BAD_ARGS)
+        if (!payload.Has("ok"))
+            payload["ok"] := true
+        return this._Transmit(request.from, Peer._ResType(request.type), payload, request.id)
+    }
+
     ; --- connection --------------------------------------------------------------------------
 
     ; One non-blocking attempt. Failure means "no hub yet": the retry policy decides what happens next.
@@ -351,7 +362,11 @@ class Peer {
             return
         }
         if (SubStr(t, 1, 4) = "cmd.") {
-            this._Transmit(msg.from, Peer._ResType(t), this._dispatcher.Invoke(msg), msg.id)
+            result := this._dispatcher.Invoke(msg)
+            ; A handler that returned Deferred answers later with Reply (WI-12). Nothing is sent now.
+            if (result is Deferred)
+                return
+            this._Transmit(msg.from, Peer._ResType(t), result, msg.id)
             return
         }
         if (!IsObject(this._dispatcher.Find(t))) {
@@ -359,6 +374,8 @@ class Peer {
             return
         }
         result := this._dispatcher.Invoke(msg)
+        if (result is Deferred)
+            return   ; an event has no answer, a deferred marker from it is ignored
         if (!result["ok"])
             Log.Write("a0", "ipc", "peer " this.name ": handler for " t " failed: " result["error"]["message"])
     }

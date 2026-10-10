@@ -1,6 +1,7 @@
 #Requires AutoHotkey v2.0
 #Include ..\Errors.ahk
 #Include Message.ahk
+#Include Deferred.ahk
 
 ; Routes messages to handlers by type prefix (doc/PROTOCOL.md, sections 2 and 6).
 ; The longest registered prefix wins: On("cmd.", f) takes all commands, On("cmd.flow.", g) the flow ones.
@@ -51,6 +52,9 @@ class Dispatcher {
             code := (e is AhfError) ? e.code : ErrCode.INTERNAL
             return Map("ok", false, "error", Map("code", code, "message", Type(e) ": " e.Message))
         }
+        ; The handler answers later with Peer.Reply (WI-12): pass the marker through unchanged.
+        if (result is Deferred)
+            return result
         ; A handler without a return statement gives "" (nothing); any other non-Map value is a bug.
         if (!IsObject(result) && result == "")
             return Map("ok", true)
