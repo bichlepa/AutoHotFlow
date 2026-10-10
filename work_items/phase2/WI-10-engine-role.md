@@ -60,10 +60,10 @@ Stand: WI-10 umgesetzt, alle Schritte committet (Commits mit Präfix `WI-10:`, `
 | `cmd.flow.start`: Reihenfolge `instance.started`, Trigger running/finished, Sleep running, nach 200 ms finished, Do_nothing running/finished, `instance.ended`; `seq` monoton | erfüllt | `test_start_emits_the_documented_event_order` (Sleep gemessen: 199,5 bis 208,3 ms) |
 | `cmd.flow.stop` während `Action_Sleep`: Ende innerhalb 500 ms, `countRuns` korrekt, Zustand `finished` | erfüllt | `test_stop_during_sleep_ends_the_instance_within_500_ms` (gemessen: 1,0 bis 1,2 ms bis `instance.ended`) |
 | `Action_TestThrow`: Ergebnis `exception`, Flow-Ereignis mit Meldung, Engine läuft weiter | erfüllt | `test_element_exception_is_reported_and_the_engine_keeps_running` (prüft auch die f0-Logzeile bei `storage`) |
-| `Action_TestBlockWorker`: Snapshot unter 50 ms während 800 ms Blockade | **nicht erfüllt** | Die Worker-Rolle fehlt (WI-11). Nur das Melden fehlt nicht: `test_worker_element_is_reported_as_exception_not_skipped` (Ergebnis `exception`, "worker not available") |
+| `Action_TestBlockWorker`: Snapshot unter 50 ms während 800 ms Blockade | **erfüllt (nachgetragen in WI-11)** | `test_snapshot_is_answered_within_50_ms_while_a_worker_element_blocks` (`tests/integration/test_worker.py`): vier Snapshots während des Blockierens, gemessen 0,7 bis 0,8 ms, Element endet nach über 600 ms. Ohne Worker-Pool (`--workers` nicht gesetzt) weiterhin `exception`: `test_worker_element_is_reported_as_exception_not_skipped` |
 | `sys.shutdown`: alle Instanzen gestoppt, `sys.bye` innerhalb der Frist | erfüllt | `test_shutdown_stops_running_instances_and_says_bye_within_the_deadline` (Exit 0 nach 125 ms gemessen, Frist 2 s) |
 
-Die Worker-Zeile bleibt offen. WI-10 ist deshalb **nicht** mit `[x]` in `work_items/phase2/README.md` markiert. Der Haken folgt, wenn WI-11 den Worker liefert und die Blockade-Messung nachgetragen ist.
+Nachtrag WI-11: Die Worker-Zeile ist erfüllt. Alle Akzeptanzkriterien dieses Pakets sind damit grün, der Haken in `work_items/phase2/README.md` ist gesetzt (Details und Messwerte in [WI-11-worker.md](WI-11-worker.md), Abschnitt Ergebnis).
 
 **Weitere Tests (`tests/integration/test_engine.py`, 19 Tests, Laufzeit etwa 14 s):** Snapshot und `cmd.flow.get` (inkl. `not_found`, `bad_payload`), kaputte Flow-Datei blockiert den Start nicht (`flow.parse`), Toggle, Enable/Disable, Richtlinien `parallel`, `default`, `skip` (busy), `wait` (busy), `stop` (`policy stop`), ungültige Richtlinie (`bad_payload`), `cmd.flow.patch` (Konflikt, leere `ops`, abgelehnte Operationen).
 
@@ -110,4 +110,4 @@ Die Worker-Zeile bleibt offen. WI-10 ist deshalb **nicht** mit `[x]` in `work_it
 - Späteres `OnReady` nach Wiederverbindung: lädt nicht neu, nicht getestet.
 - Trigger-Arming, `cmd.worker.*`, Anwendung von Patches: Phase 3 bzw. WI-11.
 - Stresstest (WI-16): nicht Teil dieses Pakets.
-- Snapshot-Latenz während einer Worker-Blockade (Akzeptanzkriterium 5): offen bis WI-11.
+- Snapshot-Latenz während einer Worker-Blockade (Akzeptanzkriterium 5): erfüllt in WI-11 (siehe oben).

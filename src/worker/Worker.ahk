@@ -11,11 +11,11 @@
 ; never waits for it: cmd.worker.run is answered at once with ok, the result comes later as
 ; evt.worker.done.
 ;
-; Blocking and pings: AHK v2 has one thread per process. While an element runs, the peer answers
-; sys.ping only if the element yields (Sleep, a timer, a message wait). An element that loops in
-; DllCall("Sleep") does not yield, so the supervisor sees it as hung after about 6 s and ends the
-; process. Decision for WI-11 (see work_items/phase2/WI-11-worker.md, open points): no heartbeat
-; tolerance. Blocking elements must yield in slices, or they are ended as hung.
+; Blocking and pings: AHK v2 has one thread per process. Between script lines AHK checks for
+; window messages, so an element that waits in short slices (Sleep, or a loop of DllCall("Sleep", 100))
+; still answers sys.ping and cancel. A single long blocking call does not (HOW-TO, worker section).
+; Decision for WI-11 (see work_items/phase2/WI-11-worker.md, open points): no heartbeat tolerance.
+; Elements that block for long must work in slices, or the supervisor sees them as hung.
 ;
 ; Cancel: cmd.worker.cancel stops the running element through ElementRunner.Stop and sends
 ; evt.worker.done with result "stopped". A later Finish of the element is ignored. An element that

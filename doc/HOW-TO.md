@@ -392,6 +392,54 @@ _Noch keine Einträge._
 - **Hinweis Log-Zeitpunkt:** Die stderr-Zeilen des Supervisors erscheinen gebündelt, nicht in Echtzeit. Zeitmessungen über das Erscheinen einer Log-Zeile sind unzuverlässig (im Test gemessen: ~2 s Verzug bei 500 ms Frist). Die Reihenfolge lässt sich über die Antwort prüfen, nicht über das Log (so ist der Timeout-Test gebaut). Status: verifiziert (Messung im Testlauf und Probe im Scratchpad)
 - **Quelle:** `src/supervisor/Hub.ahk` (`Request`)
 
+### Worker: Antwort vor dem Element, Element per Timer starten
+
+- **Problem:** `cmd.worker.run` soll sofort mit `ok` antworten, das Element läuft danach. Startet der Handler das Element direkt, wartet die Antwort so lange wie das Element.
+- **Falsch:** Element im Handler ausführen und dann `return Map()`.
+- **Richtig:** Auftrag speichern, `SetTimer(this._startFn, -1)` setzen, Handler antwortet. Dasselbe für das Ergebnis eines Abbruchs (`evt.worker.done` über Timer -1), damit die Antwort auf `cmd.worker.cancel` vor dem Ereignis ankommt (Reihenfolge im Hub-Protokoll geprüft).
+- **Status:** verifiziert (`tests/integration/test_worker.py`, Hub-Mitschnitt: `res.worker.cancel` vor `evt.worker.done`)
+- **Quelle:** `src/worker/Worker.ahk` (`_CmdRun`, `_StopCurrent`)
+
+### `DllCall("Sleep")` lässt Nachrichten zwischen den Zeilen zu
+
+- **Problem:** `Action_TestHangWorker` (Schleife mit `DllCall("Sleep", 1000)`) sollte laut Kommentar keine Nachrichten annehmen. Tatsächlich beantwortete der Worker `cmd.worker.cancel`, aber erst nach bis zu einer Scheibe: 812 ms bei 1000-ms-Scheiben, 29 ms bei 100-ms-Scheiben (Ziel WI-11: 500 ms).
+- **Falsch:** Annahme, ein Aufruf, der in `DllCall` wartet, sei für Nachrichten blind (gilt nur innerhalb eines Aufrufs).
+- **Richtig:** AHK prüft Fensternachrichten zwischen den Befehlszeilen. Die Latenz ist daher die Länge der längsten Wartescheibe. Lange Wartezeiten in kurze Schritte teilen (100 ms). Ein einzelner langer Aufruf wird nicht unterbrochen (nicht geprüft, welcher Wert kritisch ist).
+- **Status:** verifiziert (Messung: Abbruch 812 ms vs. 29 ms, Testläufe). Die Ursache im AHK-Code nicht nachgelesen: vermutet (Nachrichtenprüfung zwischen Zeilen, Peek-Intervall).
+- **Quelle:** `src/elements/skeleton/Action_TestHangWorker.ahk`
+
+### Dialoge (InputBox, MsgBox) sind Fenster der Klasse `#32770`
+
+- **Problem:** Ein Test-Element mit `InputBox(..., "T1")` gab im Worker `Cancel` nach 0,12 s zurück. Der Dialog-Wächter von `ahkrun.py` hatte das Fenster geschlossen und den Lauf mit Exit 97 beendet.
+- **Falsch:** Dialog-Elemente mit einem Test unter `ahkrun.py` ausführen und ein echtes Ergebnis erwarten.
+- **Richtig:** `InputBox` zeigt einen Standarddialog (Probe: Schaltflächen "OK" und "Abbrechen"). Solche Elemente lassen sich unter dem Wächter nicht testen. Eigener Lauf ohne Wächter oder eine Abstraktion des Dialogs nötig. WI-11 verlangt das nicht; das Element wurde wieder entfernt.
+- **Status:** verifiziert (Probe mit `ahkrun.py`, Exit 97; `src/elements/skeleton` ohne das Element)
+
+### Worker crasht: nur der Supervisor sieht den Prozesstod
+
+- **Problem:** Ein Python-Hub bemerkt den Tod eines Workers nicht. Die Engine erfährt davon nichts, der Job hängt.
+- **Richtig:** Die Engine abonniert das Topic `process` beim Supervisor (nur mit `--workers`). Der Crash-Test startet den echten Supervisor mit `--start=worker:1`. Der Supervisor nimmt das Stand-in-Storage am Hub an, ohne dass es ein Kind ist.
+- **Status:** verifiziert (`test_killed_worker_ends_its_element_with_worker_crashed`, Ende 395 ms nach dem Kill)
+
+### Python-Client: `sys.pong` ist eine Antwort, kein Ereignis
+
+- **Problem:** Der Test wartete mit `wait_event("sys.pong")` vergeblich, obwohl der Worker antwortete.
+- **Falsch:** `send` und danach `events()`.
+- **Richtig:** `client.request("worker:1", "sys.ping", {...})`. Antworten tragen `corr` und landen nicht im Ereignisstrom von `AhfClient.events()`.
+- **Status:** verifiziert (`test_pings_are_answered_while_a_blocking_element_runs`)
+
+### Warteschleife über `events()` verwirft fremde Nachrichten
+
+- **Problem:** Eine Hilfsfunktion las mit `events()` und suchte eine Nachricht. Ereignisse anderer Läufe, die sie nicht suchte, gingen verloren, der Test wartete dann vergeblich.
+- **Richtig:** Alle Ereignisse eines Zeitfensters sammeln (`late = [m for m in ... if type == ...]`) oder Ereignisse der Reihe nach mit einer Liste pro Typ bearbeiten.
+- **Status:** verifiziert (Testlauf `test_cancel_stops_the_running_element...`, zweites `done` fehlte zunächst)
+
+### Ein frozen Prozess zeigt Ack-Timeout und Orphan-Frist
+
+- **Problem:** Ob Engine und Pool bei einem nicht antwortenden Worker enden, war ungeprüft.
+- **Richtig:** `psutil.Process(pid).suspend()` friert den Worker ein. Dann kommt `cmd.worker.run` nicht an (Ack-Timeout 5 s, Element `exception`, "worker not available: worker:1 (timeout)"). Nach einem Abbruch bleibt der Slot 2 s `busy`, dann `down`.
+- **Status:** verifiziert (`test_frozen_worker_does_not_answer_the_run_and_the_element_fails_by_timeout`, `test_frozen_worker_does_not_confirm_the_cancel...`)
+
 ## GUI und Hotkeys
 
 _Noch keine Einträge._
@@ -525,3 +573,9 @@ _Noch keine Einträge._
 - **Richtig:** Wahrheit prüfen: `assert not msg["payload"]["enabled"]`, `assert msg["payload"]["executing"] == 1`. Für `ok` dasselbe. Die Regel steht in `doc/PROTOKOLL.md`, Abschnitt 2.
 - **Status:** verifiziert (Testlauf WI-10: zwei Tests rot mit `0 is False`, nach der Änderung grün).
 - **Quelle:** `tests/integration/test_engine.py`
+
+### Lange Dateitexte über Bash-Heredoc: "unexpected EOF"
+
+- **Problem:** Ein Heredoc mit Python-Code (Anführungszeichen, Backslashes, eingebettete Triple-Quotes) brach im Bash-Werkzeug mit `unexpected EOF while looking for matching` ab, die Datei entstand nicht.
+- **Richtig:** Text mit dem Schreib-Werkzeug in eine Datei im Scratchpad schreiben und dann mit einem kurzen Python-Skript an die Zieldatei anhängen oder einsetzen. Die Regel "Dateien mit Edit/Write" aus dem Auftrag gilt auch hier.
+- **Status:** verifiziert (Fehlermeldung im Bash-Lauf, WI-11)
