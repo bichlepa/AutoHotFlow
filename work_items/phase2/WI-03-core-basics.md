@@ -13,7 +13,7 @@ Kleine, abhängigkeitsfreie Bausteine in `src/core/`, die jede Rolle braucht.
 ## Zu erstellen
 
 - `src/core/Ids.ahk`: `Ids.Configure(processName)`, `Ids.Next(prefix := "")`. Zähler pro Prozess, beginnt bei 1, **nicht** `A_TickCount`. Rückgabe `"<processName>#<n>"` bzw. `"<prefix><n>"`, wenn `prefix` gesetzt ist.
-- `src/core/Errors.ahk`: `AhfError` (Basis, Felder `code`, `message`), `ProtocolError`, `TimeoutError`, `ElementError`, `JsonError` (von WI-02 genutzt, hier definieren). Fehlercodes als Konstanten (`ERR_TIMEOUT := "timeout"` usw., Liste aus PROTOKOLL 2).
+- `src/core/Errors.ahk`: `AhfError` (Basis, Felder `code`, `message`), `ProtocolError`, `AhfTimeoutError`, `ElementError`, `JsonError` (von WI-02 genutzt, hier definieren). Fehlercodes als Konstanten (`ERR_TIMEOUT := "timeout"` usw., Liste aus PROTOKOLL 2).
 - `src/core/Args.ahk`: `Args.Parse(argv)` → `Map`. Unterstützt `--key=value`, `--flag`, Rest als Positionsliste. Pflichtschlüssel für Rollen: `role`, `session`, `hub`, `data`. Fehlende Pflichtschlüssel melden `AhfError` mit lesbarer Meldung.
 - `src/core/Log.ahk`: `Log.Configure(sink)`, `Log.Write(level, source, text, flowId := "")`. Levels `a0..a3`, `f0..f3`, `t0..t3` wie v1. `sink` ist eine Funktion. Ohne Sink schreibt `Log` nichts (kein Datei-I/O in `core`). Eine einfache `Log.Memory`-Senke für Tests (Array).
 - `src/core/Time.ahk` (optional): `Time.NowMs()` über `QueryPerformanceCounter`, für Messungen und Timeouts, keine IDs.
@@ -31,4 +31,4 @@ Kleine, abhängigkeitsfreie Bausteine in `src/core/`, die jede Rolle braucht.
 
 ## Hinweise
 
-- Fehler-Klassen nutzen `extends Error`. Beim Werfen `throw TimeoutError("...")`, `code` ist in der Klasse vorbelegt.
+- Fehler-Klassen nutzen `extends Error`. Beim Werfen `throw AhfTimeoutError("...")`, `code` ist in der Klasse vorbelegt.

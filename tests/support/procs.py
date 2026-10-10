@@ -6,10 +6,15 @@ Ctrl+C or an interpreter exit either.
 """
 
 import atexit
+import os
+import sys
 import subprocess
 import threading
 
 import psutil
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "tools"))
+from ahf_dialogwatch import shared_watcher  # noqa: E402
 
 CREATE_NO_WINDOW = 0x08000000
 
@@ -55,6 +60,7 @@ class ProcessTracker:
             creationflags=CREATE_NO_WINDOW,
         )
         self._procs.append(proc)
+        shared_watcher().watch(proc.pid)  # blocking dialogs are saved, closed, and the process killed
         return proc
 
     def kill(self, proc, timeout=5.0):

@@ -50,6 +50,9 @@ Gesprochene Sprache mit dem Projektinhaber: Deutsch. Dokumentation: Deutsch. Cod
 - Python 3.13 mit `psutil`. `pytest` und `pytest-timeout` sind zu installieren: `pip install -r tests/requirements.txt` (entsteht in WI-01).
 - Messwerte AHK-v2-Prozess (Spike): Start ~30 ms, ~14 MB, 0 % CPU im Leerlauf. Named Pipe mit Weckruf: Round-Trip ~0,3 ms. Siehe `work_items/spikes/README.md`.
 - Stolperstein: Beim Schreiben von Dateien über Shell-Heredocs können `\\` zu `\` zusammenfallen (Pipe-Namen!). Quelltext mit dem Editor-Werkzeug schreiben und Pipe-Namen aus Konstanten bauen.
+- **AHK-Skripte nie direkt starten, sondern über `python tools/ahkrun.py [--timeout N] skript.ahk [args]`.** Ein unbehandelter AHK-Fehler oder eine `MsgBox` öffnet sonst einen Dialog, der den Aufruf für immer blockiert. `ahkrun.py` übergibt `/ErrorStdOut=UTF-8` (Ladefehler wie Syntaxfehler kommen auf stderr), fängt jeden trotzdem erscheinenden Dialog ab (Text und PNG-Screenshot in `%TEMP%\ahf_dialogs\`, den Pfad gibt das Tool aus), schließt ihn und beendet den Prozess. Exit-Codes: 97 Dialog abgefangen, 98 Timeout, 99 kein Interpreter. Die pytest-Läufe (`tests/`) nutzen denselben Wächter automatisch.
+- Unbekannte Kommandozeilenoptionen (z. B. `--version`) nie an den AHK-Interpreter geben: er hält sie für einen Skriptnamen und zeigt einen Dialog.
+- Eingebaute AHK-v2-Klassennamen nicht neu definieren (`TimeoutError`, `ValueError`, `OSError`, `TypeError`, `MemberError`, ...). Eigene Fehlerklassen tragen das Präfix `Ahf` (`AhfTimeoutError`).
 - `.claude/commands/*` (lokal, nicht versioniert) beziehen sich noch auf die v1-Struktur.
 
 ## AHK-Hilfe online nachschlagen

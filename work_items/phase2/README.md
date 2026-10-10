@@ -79,7 +79,7 @@ Ids.Next(prefix := "") -> String ; "<processName>#<n>", n zählt pro Prozess auf
 ; core/Errors.ahk
 class AhfError extends Error { code }                  ; Basis
 class ProtocolError extends AhfError
-class TimeoutError  extends AhfError
+class AhfTimeoutError  extends AhfError
 class ElementError  extends AhfError
 
 ; core/Log.ahk

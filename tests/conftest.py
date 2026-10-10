@@ -102,7 +102,7 @@ def run_ahk(ahk_exe, datadir, procs):
         stderr_path = datadir / ("run-%d.stderr" % n)
         script_path = Path(script).resolve()
         with open(stdout_path, "wb") as out, open(stderr_path, "wb") as err:
-            proc = procs.start([ahk_exe, str(script_path), str(out_path), *map(str, args)],
+            proc = procs.start([ahk_exe, "/ErrorStdOut=UTF-8", str(script_path), str(out_path), *map(str, args)],
                                stdout=out, stderr=err, cwd=str(script_path.parent))
             try:
                 returncode = proc.wait(timeout=timeout)
@@ -113,6 +113,10 @@ def run_ahk(ahk_exe, datadir, procs):
                 timed_out = True
         stdout = stdout_path.read_bytes().decode("utf-8", "replace")
         stderr = stderr_path.read_bytes().decode("utf-8", "replace")
+        # load-time errors arrive on stdout/stderr thanks to /ErrorStdOut; dialogs are caught by the watcher
+        from ahf_dialogwatch import shared_watcher
+        for ev in shared_watcher().events(proc.pid):
+            stderr += ev.summary() + "\n"
         return RunResult(returncode, timed_out, stdout, stderr, out_path, read_records(out_path))
 
     return run
