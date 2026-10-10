@@ -32,7 +32,7 @@ Gilt für alles unter `src/`, `tests/ahk/` und `tools/`. Sprache der Dokumentati
 ## 4. Fehler und Protokoll
 
 - Ausnahmen: Klassen `AhfError` (Basis), `ElementError`, `ProtocolError`, `AhfTimeoutError`. Jede trägt `code` (siehe Fehlercodes im Protokoll).
-- Jede Anfrage hat ein Timeout. Es gibt kein Warten ohne Frist.
+- Jede Anfrage hat ein Timeout. Es gibt kein Warten ohne Frist. Ausnahme mit Obergrenze: `cmd.app.prepareExit` (10 Minuten, PROTOKOLL 4.1), weil die Benutzerentscheidung keine feste Frist hat.
 - Eingehende Nachrichten werden validiert (Typ, Nutzlast-Pflichtfelder) und bei Fehlern beantwortet, nie ignoriert.
 - Zustandsautomaten sind Klassen mit Übergangstabelle (`static Transitions := Map(...)`). Ungültige Übergänge: `false` zurück plus `a0`-Log.
 

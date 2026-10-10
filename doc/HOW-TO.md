@@ -367,10 +367,12 @@ _Noch keine Einträge._
 
 ### Hub.Request muss die registrierte Nachrichten-ID verwenden
 
-- **Problem:** Die Antwort auf eine Anfrage des Supervisors muss den Rückruf finden (`corr` = ID der Anfrage). Trägt die Anfrage eine andere ID als die registrierte, findet die Antwort keinen Rückruf. `Hub.Request` hat keinen eigenen Timer, der Rückruf bliebe dann offen.
+- **Problem:** Die Antwort auf eine Anfrage des Supervisors muss den Rückruf finden (`corr` = ID der Anfrage). Trägt die Anfrage eine andere ID als die registrierte, findet die Antwort keinen Rückruf. Ohne Timer bliebe der Rückruf dann für immer offen (vor Commit `2bc8424` hatte `Hub.Request` keinen Timer).
 - **Falsch:** Die ID für die Nachricht neu erzeugen, nachdem sie im Rückruf-Verzeichnis abgelegt wurde.
-- **Richtig:** Die ID einmal erzeugen, im Verzeichnis unter dieser ID ablegen und dieselbe ID in die Nachricht setzen (`Hub.Request` in `src/supervisor/Hub.ahk`, aktueller Code erfüllt das).
-- **Status:** vermutet (Code gelesen, nicht in einem isolierten Test belegt)
+- **Richtig:** Die ID einmal erzeugen, im Verzeichnis unter dieser ID ablegen und dieselbe ID in die Nachricht setzen (`Hub.Request` in `src/supervisor/Hub.ahk`). Der Timer startet nach dem Senden und wird beim Abschluss gestoppt.
+- **Status:** verifiziert (Test `test_answer_to_a_hub_request_reaches_its_callback_once` in `tests/integration/test_supervisor.py`: die echte Antwort beendet den Exit vor der Frist, kein Timeout im Log). Ein Fehlschlag der Korrelation wurde nicht gezielt provoziert (kein Gegentest mit absichtlich falscher ID).
+- **Quelle:** `src/supervisor/Hub.ahk` (`Request`, `_Finish`)
+- **Hinweis Log-Zeitpunkt:** Die stderr-Zeilen des Supervisors erscheinen gebündelt, nicht in Echtzeit. Zeitmessungen über das Erscheinen einer Log-Zeile sind unzuverlässig (im Test gemessen: ~2 s Verzug bei 500 ms Frist). Die Reihenfolge lässt sich über die Antwort prüfen, nicht über das Log (so ist der Timeout-Test gebaut). Status: verifiziert (Messung im Testlauf und Probe im Scratchpad)
 - **Quelle:** `src/supervisor/Hub.ahk` (`Request`)
 
 ## GUI und Hotkeys
