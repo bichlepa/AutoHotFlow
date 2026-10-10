@@ -133,6 +133,22 @@ Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge kor
 - **Richtig:** Ein Map-Objekt anlegen und die Funktion als Closure übergeben: `counter := Map("n", 1)` und `() => NextId(counter)`. Das Map-Objekt ist veränderlich und wird von allen Aufrufen gemeinsam benutzt.
 - **Status:** verifiziert (`MakeIds` in `tests/ahk/engine_scheduler.test.ahk`)
 
+### Funktion in einer Eigenschaft: Aufruf mit Punkt übergibt die Klasse als erstes Argument
+
+- **Problem:** `Role.ConsoleFn("a0", "role", text)` (Funktionseigenschaft mit Lambda) öffnete den Dialog "Expected a String but got a Class". Der erste Parameter war die Klasse `Role`, nicht der Pegel.
+- **Falsch:** `static ConsoleFn := (level, source, text) => ...` und der Aufruf `Klasse.ConsoleFn(...)`.
+- **Richtig:** Die Funktion über eine statische Methode aufrufen (`Role.Console(...)`). Die Eigenschaft nur als Wert übergeben, z. B. `Log.Configure(Role.ConsoleFn)` oder als Callback. Gleiches Muster wie `Log.Write`, dort über die lokale Kopie `sink := this.sink`.
+- **Status:** verifiziert (Dialog beim Start mit unbekannter Rolle, danach grün). Warum AHK den Klassennamen durchreicht, wurde nicht in der Doku nachgelesen: vermutet.
+- **Quelle:** `src/core/Role.ahk`
+
+### Lokale Variable mit dem Namen einer Klasse
+
+- **Problem:** In `AhfMain` stand `role := ""`. Danach schlug `Role.ConsoleFn(...)` im selben Gültigkeitsbereich fehl: "This local variable has not been assigned a value. Specifically: role".
+- **Falsch:** Lokale Variable `role` neben der Klasse `Role`.
+- **Richtig:** AHK v2 behandelt Bezeichner ohne Unterschied der Schreibweise, `role` ist also `Role`. Lokale Namen nicht wie Klassen wählen (`roleObj`).
+- **Status:** verifiziert (Dialog beim Start, nach der Umbenennung grün).
+- **Quelle:** `src/AutoHotFlow.ahk`
+
 ## Objekte, Maps, Arrays
 
 ### Map mit `CaseSense "Off"` behält die Schreibweise der ersten Einfügung
@@ -190,6 +206,13 @@ Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge kor
 - **Richtig:** Den Callback in `try/catch` aufrufen, den Fehler als a0-Log schreiben und trotzdem `false` zurückgeben (`ThreadState.ReportInvalid`).
 - **Status:** verifiziert (Test "a throwing callback is logged, not raised" in `tests/ahk/engine_states.test.ahk`)
 - **Quelle:** `src/engine/core/ThreadState.ahk`
+
+### OnError: Rückgabe 1 hält den Prozess am Leben
+
+- **Problem:** Ein Fehler in einem Timer soll eine Rolle nicht beenden, und der Standarddialog darf nicht erscheinen.
+- **Richtig:** Die Funktion für `OnError` gibt `1` zurück. Der Fehler ist dann behandelt, es erscheint kein Dialog, und der Prozess läuft weiter. Getestet: Ein Timer wirft `ValueError`, danach beantwortet die Rolle weitere Befehle, und der Fehler steht im Log (`test_error_in_a_timer_is_logged_and_the_role_keeps_running`).
+- **Status:** verifiziert (Test grün). Nicht geprüft: andere Rückgabewerte (z. B. 0) und das Verhalten des Threads, der den Fehler warf, bei anderen Auslösern als Timer.
+- **Quelle:** `src/core/Role.ahk` (`Role._OnUnexpected`)
 
 ## Prozesse, Pipes, Nachrichten
 
@@ -312,6 +335,20 @@ _Noch keine Einträge._
 - **Status:** vermutet (aus dem Quelltext von `tests/support/pyhub.py` gelesen, nicht ausgeführt). Im Code des Pakets so umgesetzt.
 - **Quelle:** `tests/support/pyhub.py` (`__enter__`)
 
+### sys.shutdown: Verbindung nicht im Rahmen-Handler schließen
+
+- **Problem:** `sys.shutdown` muss `sys.bye` senden und danach den Prozess beenden. Ein `Peer.Close()` direkt im Handler schließt die Verbindung, während sie gerade den Rahmen abarbeitet. Das Ende des Handlers arbeitet dann mit einem geschlossenen Objekt.
+- **Richtig:** Im Handler nur die Arbeit erledigen und `SetTimer(Role.ByeFn, -1)` setzen. Der Timer sendet `sys.bye {clean:true}`, schließt den Peer und ruft `ExitApp(0)`. Gemessen: Exit 0 etwa 240 ms nach dem Befehl, `sys.bye` kommt beim Hub an (`test_shutdown_sends_bye_and_exits_0_within_one_second`).
+- **Status:** verifiziert (Test grün, gemessen). Ein direktes `Close` im Handler wurde nicht ausprobiert: nicht geprüft.
+- **Quelle:** `src/core/Role.ahk` (`_OnShutdown`, `_FinishShutdown`)
+
+### Hub-Verlust: die Frist des Orphan-Guards im eigenen Timer messen
+
+- **Problem:** Der Peer wiederholt den Verbindungsaufbau bis zu 10 s (Budget). Eine Rolle soll sich aber nach 3 s beenden, und dafür braucht sie eine eigene Uhr.
+- **Richtig:** Ein Timer (200 ms) liest `peer.status`. Steht dort `reconnecting`, merkt er sich den Zeitpunkt. Nach 3 s ohne `ready` ruft er `ExitApp(4)` auf. Gemessen: Ende 3,25 s nach dem Stopp des Hubs, kein Prozess übrig (psutil).
+- **Status:** verifiziert (`test_hub_gone_role_ends_within_orphan_budget_and_leaves_no_process`). Der Beginn der Frist ist um bis zu 200 ms ungenau, weil er erst beim nächsten Timer-Tick gesetzt wird.
+- **Quelle:** `src/core/Role.ahk` (`_Guard`)
+
 ## GUI und Hotkeys
 
 _Noch keine Einträge._
@@ -399,3 +436,17 @@ _Noch keine Einträge._
 - **Problem:** In einer Gesamtsuite schlug der Test einmal fehl (Meldung nicht gesichert). In 15 Einzelläufen und 3 parallelen Dateiläufen danach nicht mehr.
 - **Richtig:** Sehr wahrscheinlich derselbe Fehler wie "Python-Testleser verlor Bytes" (oben): Rahmen für Rahmen durch den Python-Leser, ein verlorener Chunk lässt den Test hängen.
 - **Status:** vermutet (nicht reproduziert, daher nicht bewiesen)
+
+### Rollenprozesse über ahkrun.py starten, Ausgabe in Dateien
+
+- **Problem:** Ein Rollentest braucht den Prozess neben einem laufenden Hub. `tools/ahkrun.py` wartet bis zum Ende, und ein Pipe-Puffer für die Ausgabe kann blockieren.
+- **Richtig:** `ahkrun.py` als Kindprozess über `procs.start` starten, Ausgabe in Dateien (`--timeout 60`). Die AutoHotkey-PID steht im `sys.hello` (`payload.pid`) und ist Kind von ahkrun (`psutil.Process(pid).ppid()`). Der Exit-Code von ahkrun ist der des Skripts. Den AHK-Prozess per psutil warten, um das Ende genau zu messen.
+- **Status:** verifiziert (`tests/integration/test_role.py`, 9 Tests).
+- **Quelle:** `tests/integration/test_role.py` (`RoleRun`)
+
+### Einstieg schreibt Meldungen auf stderr, ohne Datei
+
+- **Problem:** Der Einstieg hat noch keine Log-Senke (storage gibt es in dieser Phase noch nicht). "unknown role" und ähnliche Meldungen müssen trotzdem sichtbar sein, ohne Dialog.
+- **Richtig:** `FileAppend(text, "**", "UTF-8-RAW")` schreibt auf stderr und legt keine Datei an. Das ist eine Ausnahme zu KONVENTIONEN 3 (dort nur `storage`), begründet mit Konsolenausgabe. `ahkrun.py` reicht stderr an den Aufrufer weiter.
+- **Status:** verifiziert (`test_unknown_role_exits_2_with_message_and_no_dialog`, `test_role_without_implementation_reports_not_implemented`).
+- **Quelle:** `src/core/Role.ahk` (`Role.Console`)

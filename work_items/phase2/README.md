@@ -128,12 +128,22 @@ class Peer {
     OnReady := () => ...   OnClosed := () => ...
 }
 
-; core/Role.ahk  (WI-06)
+; core/Role.ahk, core/RoleRegistry.ahk  (WI-06, umgesetzt, Abweichungen siehe WI-06 "Ergebnis")
 class Role {
-    __New(args)                       ; args: Map aus Args.Parse
-    Start()                           ; Peer verbinden, hello, Registrierung der Standardhandler
+    __New(args)                       ; args: Map aus Args.Parse (role, flow, session, hub, data, hubHwnd)
+    Start()                           ; Peer anlegen, Log-Senke, OnError, RegisterHandlers, Connect
+    RegisterHandlers()                ; überschreiben: this.On(typePrefix, handler), vor Connect
+    On(typePrefix, handler)           ; Handler am Peer registrieren
     OnReady() / OnShutdown(deadlineMs) / OnPeerLost()    ; überschreiben
+    OnUnexpectedError(e, mode)        ; überschreiben, Standard: loggen, 1 (weiterlaufen)
+    SetLogTarget(address)             ; ab dann evt.log.append an address (sonst Warteschlange, max. 500)
+    LogStats() -> Map                 ; queued, dropped, last (Test und Diagnose)
+    static Current, Console(level, source, text), BaseName(name)
 }
+class RoleRegistry {                  ; Register(name, cls), Lookup(name) -> cls | ""
+}
+; Einstieg src/AutoHotFlow.ahk. Exit: 0 normal, 1 Start fehlgeschlagen, 2 Argumente/unbekannte Rolle,
+; 3 Rolle noch nicht implementiert, 4 Hub verloren (Orphan-Guard) oder Peer geschlossen.
 ```
 
 Rollenaufruf: `AutoHotkey64.exe src\AutoHotFlow.ahk --role=<name> --session=<id> --hub=<pipeName> --data=<dir> [--headless]`.
