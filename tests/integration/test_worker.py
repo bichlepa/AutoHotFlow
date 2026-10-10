@@ -277,9 +277,10 @@ def is_running(element_id=SLEEP):
 
 @pytest.fixture
 def worker1(procs, datadir, runs, session_id, pipe, hub, flowdir, storage):
-    """One worker process (worker:1). The engine is started by each test, after its observer subscribed."""
+    """One worker process (worker:1). The engine is started by each test, after its observer subscribed.
+    Yields the pid of the worker."""
     start_worker(procs, datadir, runs, pipe, session_id)
-    wait_hello(hub, "worker:1")
+    yield wait_hello(hub, "worker:1")
 
 
 def test_worker_element_runs_through_the_pool_and_the_flow_continues(worker1, procs, datadir, runs, session_id, pipe, hub, flowdir, storage):
@@ -360,7 +361,7 @@ def test_frozen_worker_does_not_confirm_the_cancel_and_its_slot_is_down_after_th
     # the instance at once; the slot stays busy for ORPHAN_MS (2 s), then it is down and jobs fail.
     make_flow(flowdir, "w6", element_class="Action_TestHangWorker")
     make_flow(flowdir, "w7", element_class="Action_TestEchoWorker")
-    worker_pid = worker1_pid(hub)
+    worker_pid = worker1
     with observer(pipe, "engine", "flow:w6", "flow:w7") as obs:
         start_engine_with_pool(procs, flowdir, runs, pipe, session_id, workers=1)
         wait_ready(obs, timeout=ENGINE_READY_S)
@@ -380,9 +381,21 @@ def test_frozen_worker_does_not_confirm_the_cancel_and_its_slot_is_down_after_th
     hub.send_to("engine", "sys.shutdown", {"reason": "user", "deadlineMs": 1000})
 
 
-def worker1_pid(hub):
-    """The pid of worker:1 from its sys.hello (wait_hello returns it)."""
-    return wait_hello(hub, "worker:1")
+def test_frozen_worker_does_not_answer_the_run_and_the_element_fails_by_timeout(
+        worker1, procs, datadir, runs, session_id, pipe, hub, flowdir, storage):
+    make_flow(flowdir, "w9", element_class="Action_TestEchoWorker")
+    psutil.Process(worker1).suspend()                 # no answer to cmd.worker.run (ack timeout 5 s)
+    with observer(pipe, "engine", "flow:w9") as obs:
+        start_engine_with_pool(procs, flowdir, runs, pipe, session_id, workers=1)
+        wait_ready(obs, timeout=ENGINE_READY_S)
+        t0 = time.perf_counter()
+        start_flow(obs, "w9")
+        got = collect_until(obs, is_type("evt.instance.ended"), timeout=10.0)
+        elapsed = time.perf_counter() - t0
+        last = element_states(got)[-1]
+        assert last[1] == "exception" and "worker not available: worker:1 (timeout)" in last[3], last
+        assert 4.5 < elapsed < 8.0, elapsed
+    hub.send_to("engine", "sys.shutdown", {"reason": "user", "deadlineMs": 1000})
 
 
 # --- crash of a worker (real supervisor) ---------------------------------------------------------
