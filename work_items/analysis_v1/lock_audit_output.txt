@@ -1,0 +1,70 @@
+Summary (heuristic):
+  blocking-while-locked:dynamic-call       3
+  blocking-while-locked:element-code       8
+  blocking-while-locked:file-io            37
+  blocking-while-locked:ui-blocking        2
+  critical-on                              4
+  exit-while-locked                        8
+
+Source_Common\Debug\Debug.ahk:48 [critical-on] in d: Critical, Off  -- AHK 'Critical' (not the Win32 section) used
+Source_Common\Debug\Logger.ahk:63 [blocking-while-locked:file-io] in logger: FileAppend,% LoggingText,%_WorkingDir%\Log\Log.txt,UTF-8  -- file I/O
+Source_Common\Debug\Logger.ahk:64 [blocking-while-locked:file-io] in logger: FileAppend,% LoggingText,%_WorkingDir%\Log\Log_%logSource%.txt,UTF-8  -- file I/O
+Source_Common\Debug\Logger.ahk:255 [blocking-while-locked:file-io] in log_cleanup: FileGetSize,temp,%A_LoopFileFullPath%,K  -- file I/O
+Source_Common\Debug\Logger.ahk:267 [blocking-while-locked:file-io] in log_cleanup: FileMove,%onebigfile%,%fullpath%_old.txt,1  -- file I/O
+Source_Common\Elements\Manage Elements.ahk:111 [blocking-while-locked:element-code] in Element_SetClass: _setElementProperty(p_FlowID, p_elementID, "icon", Element_getIconPath_%p_elementClass%())  -- calls element code (not owned by the engine)
+Source_Common\Elements\Manage Elements.ahk:137 [blocking-while-locked:element-code] in Element_updateName: newName := Element_GenerateName_%elementClass%({flowID: p_FlowID, elementID: p_ElementID}, _getElementProperty(p_FlowID, p_ElementID, "pars"))  -- calls element code (not owned by the engine)
+Source_Common\Flows\Load.ahk:116 [blocking-while-locked:element-code] in LoadFlow: Newname := Element_GenerateName_%oneElementClass%({flowID: flowID, elementID: oneElementID},  _getElementProperty(FlowID, oneElementID, "pars"))  -- calls element code (not owned by the engine)
+Source_Common\Flows\Load.ahk:122 [blocking-while-locked:element-code] in LoadFlow: icon := Element_getIconPath_%oneElementClass%()  -- calls element code (not owned by the engine)
+Source_Common\Flows\Load.ahk:129 [blocking-while-locked:element-code] in LoadFlow: parametersAndDefaultValues := Element_getParameters(oneElementClass, {flowID: FlowID, elementID: oneElementID})  -- calls element code (not owned by the engine)
+Source_Common\Flows\Load.ahk:217 [blocking-while-locked:file-io] in LoadFlow: if not fileexist(flowWorkingDir)  -- file system access
+Source_Common\Flows\Load.ahk:220 [blocking-while-locked:file-io] in LoadFlow: FileCreateDir,% flowWorkingDir  -- file I/O
+Source_Common\Flows\Load.ahk:271 [blocking-while-locked:ui-blocking] in LoadFlow: MsgBox, 4,, % lang("Attention!") " " lang("The flow '%1%' could not be loaded!", _getFlowProperty(FlowID, "name")) "`n" lang("Following packages are missing:") "`n`n" tempmissingpackageslist "`n`n" lang("Debug Info") ":`n" lang("Filename") ": " ThisFlowFilepath "`n`n" lang("Do you want to delete this flow?")  -- dialog blocks until user reacts
+Source_Common\Flows\Load.ahk:273 [blocking-while-locked:file-io] in LoadFlow: FileDelete, % ThisFlowFilepath  -- file I/O
+Source_Common\Flows\Save.ahk:41 [blocking-while-locked:file-io] in SaveFlow: FileCreateDir, %ThisFlowFolder%  -- file I/O
+Source_Common\Flows\Save.ahk:87 [blocking-while-locked:element-code] in SaveFlow: parametersToSave := Element_getParameters(forElement.class, {flowID: FlowID, elementID: forElement.ID})  -- calls element code (not owned by the engine)
+Source_Common\Flows\Save.ahk:125 [blocking-while-locked:file-io] in SaveFlow: FileCreateDir, %ThisFlowFolder%\backup  -- file I/O
+Source_Common\Flows\Save.ahk:126 [blocking-while-locked:file-io] in SaveFlow: Filemove, %ThisFlowFolder%\%ThisFlowFilename%.txt, %ThisFlowFolder%\backup\%ThisFlowFilename%_backup_%a_now%.json  -- file I/O
+Source_Common\Flows\Save.ahk:129 [blocking-while-locked:file-io] in SaveFlow: loop, files, %ThisFlowFolder%\backup\%ThisFlowFilename%_backup_*.json  -- file system access
+Source_Common\Flows\Save.ahk:139 [blocking-while-locked:file-io] in SaveFlow: FileDelete,% presentBackupFiles[1]  -- file I/O
+Source_Common\Flows\Save.ahk:145 [blocking-while-locked:file-io] in SaveFlow: FileDelete, % ThisFlowFolder "\" ThisFlowFilename ".json"  -- file I/O
+Source_Common\Flows\Save.ahk:146 [blocking-while-locked:file-io] in SaveFlow: FileAppend, % Jxon_Dump(flowSave, 2), % ThisFlowFolder "\" ThisFlowFilename ".json", UTF-8-RAW  -- file I/O
+Source_Common\Multithreading\Shared Variables.ahk:25 [critical-on] in _EnterCriticalSection: Critical on  -- AHK 'Critical' (not the Win32 section) used
+Source_Common\Multithreading\Shared Variables.ahk:57 [critical-on] in _LeaveCriticalSection: Critical off  -- AHK 'Critical' (not the Win32 section) used
+Source_Common\Variables\Global variables.ahk:17 [exit-while-locked] in StaticVariable_Set: throw exception("unexpected error! It is not possible to set a hidden static variable!")  -- lock taken at line 14 is not released on this path
+Source_Common\Variables\Global variables.ahk:23 [blocking-while-locked:file-io] in StaticVariable_Set: FileCreateDir, %path%  -- file I/O
+Source_Common\Variables\Global variables.ahk:26 [blocking-while-locked:file-io] in StaticVariable_Set: FileDelete, % path "\" p_Name ".ahfvd"  -- file I/O
+Source_Common\Variables\Global variables.ahk:27 [blocking-while-locked:file-io] in StaticVariable_Set: FileDelete, % path "\" p_Name ".ahfvar"  -- file I/O
+Source_Common\Variables\Global variables.ahk:35 [blocking-while-locked:file-io] in StaticVariable_Set: FileAppend, % Jxon_Dump(content, 2), % path "\" p_Name ".ahfvd"  -- file I/O
+Source_Common\Variables\Global variables.ahk:40 [blocking-while-locked:file-io] in StaticVariable_Set: FileAppend, % Jxon_Dump(p_Value), % path "\" p_Name ".ahfvar"  -- file I/O
+Source_Common\Variables\Global variables.ahk:44 [blocking-while-locked:file-io] in StaticVariable_Set: FileAppend, % p_Value, % path "\" p_Name ".ahfvar"  -- file I/O
+Source_Common\Variables\Global variables.ahk:57 [exit-while-locked] in GlobalVariable_Set: throw exception("unexpected error! It is not possible to set a hidden global variable!")  -- lock taken at line 54 is not released on this path
+Source_Common\Variables\Global variables.ahk:63 [blocking-while-locked:file-io] in GlobalVariable_Set: FileDelete,% path "\" p_Name ".ahfvd"  -- file I/O
+Source_Common\Variables\Global variables.ahk:64 [blocking-while-locked:file-io] in GlobalVariable_Set: FileDelete,% path "\" p_Name ".ahfvar"  -- file I/O
+Source_Common\Variables\Global variables.ahk:72 [blocking-while-locked:file-io] in GlobalVariable_Set: FileAppend, % Jxon_Dump(content, 2), % path "\" p_Name ".ahfvd"  -- file I/O
+Source_Common\Variables\Global variables.ahk:77 [blocking-while-locked:file-io] in GlobalVariable_Set: FileAppend, % Jxon_Dump(p_Value, 2), % path "\" p_Name ".ahfvar"  -- file I/O
+Source_Common\Variables\Global variables.ahk:81 [blocking-while-locked:file-io] in GlobalVariable_Set: FileAppend, % p_Value, % path "\" p_Name ".ahfvar"  -- file I/O
+Source_Common\Variables\Global variables.ahk:94 [exit-while-locked] in StaticVariable_Get: throw exception("unexpected error! There are no hidden static variables!")  -- lock taken at line 91 is not released on this path
+Source_Common\Variables\Global variables.ahk:100 [blocking-while-locked:file-io] in StaticVariable_Get: fileread, metaData, % path "\" p_Name ".ahfvd"  -- file I/O
+Source_Common\Variables\Global variables.ahk:109 [blocking-while-locked:file-io] in StaticVariable_Get: FileRead,varcontent, % path "\" p_Name ".ahfvar"  -- file I/O
+Source_Common\Variables\Global variables.ahk:131 [exit-while-locked] in GlobalVariable_Get: throw exception("unexpected error! There are no hidden global variables!")  -- lock taken at line 128 is not released on this path
+Source_Common\Variables\Global variables.ahk:137 [blocking-while-locked:file-io] in GlobalVariable_Get: fileread, metaData, % path "\" p_Name ".ahfvd"  -- file I/O
+Source_Common\Variables\Global variables.ahk:147 [blocking-while-locked:file-io] in GlobalVariable_Get: FileRead,varcontent, % path "\" p_Name ".ahfvar"  -- file I/O
+Source_Common\Variables\Global variables.ahk:262 [blocking-while-locked:file-io] in StaticVariable_Delete: FileDelete,% path "\" p_Name ".ahfvd"  -- file I/O
+Source_Common\Variables\Global variables.ahk:263 [blocking-while-locked:file-io] in StaticVariable_Delete: FileDelete,% path "\" p_Name ".ahfvar"  -- file I/O
+Source_Common\Variables\Global variables.ahk:277 [blocking-while-locked:file-io] in GlobalVariable_Delete: FileDelete,% path "\" p_Name ".ahfvd"  -- file I/O
+Source_Common\Variables\Global variables.ahk:278 [blocking-while-locked:file-io] in GlobalVariable_Delete: FileDelete,% path "\" p_Name ".ahfvar"  -- file I/O
+Source_Common\Variables\Global variables.ahk:295 [blocking-while-locked:file-io] in Var_GetListOfStaticVars: loop, files, %path%\*.ahfvd  -- file system access
+Source_Common\Variables\Global variables.ahk:318 [blocking-while-locked:file-io] in Var_GetListOfGlobalVars: loop, files, %path%\*.ahfvd  -- file system access
+Source_Draw\GDIp\GDIp.ahk:114 [critical-on] in gdip_DrawEverything: Critical,on  -- AHK 'Critical' (not the Win32 section) used
+Source_Editor\Elements\Select elements.ahk:8 [exit-while-locked] in SelectOneItem: throw exception("Cannot select one item. p_ID is empty")  -- lock taken at line 4 is not released on this path
+Source_Execution\Execution Task\Execution Task.ahk:94 [blocking-while-locked:ui-blocking] in executionTask: MsgBox Unexpected error! Function for running element does not exist: Element_run_%oneElementClass%  -- dialog blocks until user reacts
+Source_Execution\Execution Task\Execution Task.ahk:181 [exit-while-locked] in executionTask: throw exception("State of thread '" OneThreadID "' is unknown!")  -- lock taken at line 15 is not released on this path
+Source_Execution\Execution Task\Execution Task.ahk:211 [blocking-while-locked:element-code] in executionTask: Element_stop_%oneElementClass%({FlowID: OneThread.FlowID, ElementID: OneThread.ElementID, InstanceID: OneThread.InstanceID, ThreadID: OneThread.ID}, OneThread.elementpars)  -- calls element code (not owned by the engine)
+Source_Execution\Execution Task\Execution Task.ahk:224 [blocking-while-locked:dynamic-call] in executionTask: %tempCallBackfunc%("stopped", instance.InstanceVars)  -- dynamic function call (callback/element)
+Source_Execution\Execution Task\Instances and Threads.ahk:50 [exit-while-locked] in newInstance: throw exception("trigger element ID unknown: " oneElementID, -1)  -- lock taken at line 11 is not released on this path
+Source_Execution\Execution Task\Instances and Threads.ahk:100 [blocking-while-locked:element-code] in newInstance: Element_postTrigger_%ElementClass%({instanceID: newInstanceId, threadID: newThreadID}, elementParams, p_dataForPostTrigger)  -- calls element code (not owned by the engine)
+Source_Execution\Execution Task\Instances and Threads.ahk:113 [blocking-while-locked:dynamic-call] in newInstance: %tempCallBackfunc%("skipped", [])  -- dynamic function call (callback/element)
+Source_Execution\Execution Task\Instances and Threads.ahk:281 [blocking-while-locked:dynamic-call] in removeInstance: %tempCallBackfunc%("finished", _getInstanceProperty(p_InstanceID, "InstanceVars"))  -- dynamic function call (callback/element)
+Source_Execution\Variables\Variables.ahk:259 [exit-while-locked] in Var_GetLocation: throw exception("p_Name is an object")  -- lock taken at line 255 is not released on this path
+Source_Execution\Variables\Variables.ahk:292 [blocking-while-locked:file-io] in Var_GetLocation: if fileexist(_WorkingDir "\Variables\" p_Name ".ahfvd")  -- file system access
+Source_Execution\Variables\Variables.ahk:300 [blocking-while-locked:file-io] in Var_GetLocation: if fileexist(_WorkingDir "\Variables\"  Environment.flowID "\" p_Name ".ahfvd")  -- file system access
