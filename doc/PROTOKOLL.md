@@ -201,6 +201,13 @@ Jedes Ereignis trägt `seq` (steigend pro Engine-Epoche) und `epoch`.
 | `cmd.worker.cancel` | engine → worker | `{ execId }` | `res: { ok }`, danach `evt.worker.done` mit `result: "stopped"` |
 | `cmd.engine.var.get` | worker → engine | `{ execId, name, scope? }` | `res: { ok, exists, value }` (selten, mit Timeout) |
 
+**Umsetzung in WI-11 (`src/worker/`):**
+
+- `cmd.worker.run` `{execId, class, params, imports, env, timeoutMs?}`: `env` trägt `flowId`, `elementId`, `instanceId`, `threadId`. Antwort `{ok}` sofort, danach läuft das Element. Ein zweiter Lauf während der Ausführung: `busy`. Eine Klasse, die nicht `Mode := "worker"` hat, endet als `evt.worker.done` mit `exception` ("is not a worker element"). `timeoutMs` nutzt der Worker nicht: die Frist für die Annahme setzt der Absender, die Laufzeit des Elements ist nicht begrenzt.
+- `evt.worker.done` `{execId, result, message, exports}`: `result` ist `normal`, `yes`, `no`, `head`, `tail`, `exception` oder `stopped`. `exports` ist die Map aus `ctx.Export(name, value)` (nur Text und Zahlen). Der Worker sendet ihn genau einmal pro Lauf.
+- `cmd.worker.cancel` `{execId}`: Antwort `{ok}` (sonst `not_found`), danach `evt.worker.done` mit `stopped`. Ein späteres `Finish` des Elements wird verworfen. Ein Element, das nicht in Scheiben läuft (z. B. `DllCall("Sleep")`), kann den Abbruch nicht empfangen (AHK hat keine Vorkaufrechte, siehe `doc/HOW-TO.md`).
+- `sys.shutdown` während eines Laufs: `evt.worker.done` mit `stopped` vor `sys.bye`.
+
 ### 4.6 Engine ↔ Storage und Log
 
 | Typ | Nutzlast | Antwort |

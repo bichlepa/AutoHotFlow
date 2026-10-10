@@ -47,4 +47,4 @@ RoleRegistry.Register("storage", PlaceholderRole)      ; WI-12
 RoleRegistry.Register("triggerhost", PlaceholderRole)  ; WI-14
 RoleRegistry.Register("manager", PlaceholderRole)      ; WI-13
 RoleRegistry.Register("editor", PlaceholderRole)       ; later phase
-RoleRegistry.Register("worker", PlaceholderRole)       ; WI-11
+; "worker" is registered by the entry point (WI-11, src/worker/Worker.ahk), like "engine" (see above).

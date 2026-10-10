@@ -13,12 +13,15 @@
 #Include core\RoleRegistry.ahk
 #Include supervisor\Supervisor.ahk
 #Include engine\Engine.ahk
+#Include worker\Worker.ahk
 #Include elements\skeleton\Trigger_Manual.ahk
 #Include elements\skeleton\Action_Sleep.ahk
 #Include elements\skeleton\Action_Do_nothing.ahk
 #Include elements\skeleton\Action_TestThrow.ahk
 #Include elements\skeleton\Action_TestBlockWorker.ahk
 #Include elements\skeleton\Action_TestHangWorker.ahk
+#Include elements\skeleton\Action_TestThrowWorker.ahk
+#Include elements\skeleton\Action_TestEchoWorker.ahk
 #Include ..\tests\integration\helpers\EchoRole.ahk
 #Include ..\tests\integration\helpers\CrasherRole.ahk
 #Include ..\tests\integration\helpers\HangerRole.ahk
@@ -74,6 +77,7 @@ AhfMain() {
 ; Registers the roles that the entry point itself knows (the others sit in RoleRegistry.ahk).
 AhfRegisterRoles() {
     RoleRegistry.Register("engine", Engine)
+    RoleRegistry.Register("worker", Worker)
 }
 
 ; Registers the test roles (tests/integration/helpers). Called only with --test-roles.
