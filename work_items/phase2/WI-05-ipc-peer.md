@@ -44,3 +44,55 @@ Routing (Supervisor, WI-07), Rollenlebenszyklus (WI-06).
 
 - Ein `SetTimer` pro Anfrage ist einfach, aber teuer bei sehr vielen. Ein Timer mit sortierter Fälligkeitsliste ist erlaubt, solange die Genauigkeit ±50 ms bleibt.
 - Handler laufen im Nachrichtenpfad: **kein** Blockieren, Dateizugriff oder Warten.
+
+## Ergebnis
+
+Stand: WI-05 abgeschlossen, **nicht committet**. `python -m pytest tests -q`: `299 passed, 1 skipped in 62.21s`. Danach keine AutoHotkey-Prozesse übrig.
+
+Erstellt:
+
+- `src/core/ipc/Message.ahk`, `Dispatcher.ahk`, `Peer.ahk`
+- `tests/ahk/message.test.ahk` (19 Fälle), `tests/ahk/dispatcher.test.ahk` (15 Fälle)
+- `tests/integration/test_peer.py` (10 Tests), `tests/integration/helpers/peer_probe.ahk`
+- Geändert: `doc/PROTOKOLL.md` (Abschnitte 1, 2, 5), `doc/HOW-TO.md` (7 Einträge), `work_items/phase2/README.md` (Vertrag `Message`/`Dispatcher`/`Peer`, Fortschritt WI-05 abgehakt).
+
+Akzeptanzkriterien und Beleg:
+
+- Feste Kopf-Reihenfolge, `ReadTo` ohne vollständiges Parsen: `message.test.ahk` (Serialize-Fälle, ReadTo-Fälle).
+- Request mit Antwort, Callback einmal mit passender `corr`: `test_request_answers_and_event_between_two_ahk_peers` (`corr` == gesendete `id`).
+- Ohne Antwort: Callback einmal mit `timeout` nach 304,1 ms (Soll 300 ms, ±50): `test_timeout_calls_back_once_and_late_answer_is_dropped`.
+- Antwort nach Timeout: kein zweiter Callback, Zähler `lateReplies == 1`: selber Test.
+- Zwei Peers über den Python-Hub: Anfrage, Ereignis, `unknown_type`, Handler-Exception → `busy`, `bad_payload` für unlesbaren Payload: `test_request_answers...`, `test_python_gets_answers_for_...`.
+- Hub bricht ab: Wiederverbindung, Abos neu gesendet, `OnReady` wieder: `test_reconnect_after_hub_restart_resubscribes...`. `OnClosed` (`hub_unreachable`) nach 10,25 s: `test_hub_gone_for_longer_than_the_budget...`.
+- Offene Anfrage bei Verbindungsverlust: `peer_gone` sofort: `test_pending_request_fails_with_peer_gone...`.
+- 10.000 Anfragen ohne wachsende Handles: `test_10000_sequential_requests...`.
+
+Messwerte (10.000 sequentielle Anfragen, `-s`-Lauf):
+
+- 9,87 s gesamt, 0,99 ms je Anfrage, 0 Fehlantworten.
+- Handles 163 → 163 → 163.
+- `PendingCount` am Ende 0. Die Zahl aktiver Timer ist nicht direkt messbar, nur indirekt über Pending.
+
+Stabilität: `tests/integration/test_peer.py` fünfmal hintereinander grün, je `10 passed` (25 s je Lauf).
+
+Ready-Zeit mit `hubHwnd`-Weckruf: 1,1 bis 1,2 ms nach Start. Weckruf am Hub-Fenster nach `sys.hello`: 0,02 ms nach Abfrage (`test_hello_wakes_the_hub_window...`).
+
+Abweichungen vom Paket:
+
+- `Peer.__New(name, hubPipe, options := "")`, `Send(to, msgType, payload := "")`: Default statt `Map()`, da der Default ein Objekt ist. Parameter heißen `msgType` (Name `type` würde `Type()` verdecken). Im Vertrag nachgetragen.
+- `options` als Map oder Objekt akzeptiert.
+- Zusätzlich: `Peer.Close()`, `PendingCount`, Zähler `lateReplies`, `badFrames`, `droppedSends`, `closeReason`, `lastCloseReason`, `hubSession`.
+- `Wake.Install` wird vom Peer selbst aufgerufen. Pro Prozess nur ein Peer.
+- Schließen (`Close`) meldet `OnClosed` ebenfalls, nicht nur nach Ablauf der Frist.
+- Ein `sys.welcome` mit `error` oder `ok:false` gilt als `denied`. Der Peer beendet die Verbindung, `OnClosed` folgt.
+- Bei unlesbarem Frame mit lesbaren `from`/`id`/`type` und `cmd.` antwortet der Peer mit `bad_payload`. Das steht in PROTOKOLL Abschnitt 2.
+- Wahrheitswerte gehen als `1`/`0` auf die Leitung (Json-Vertrag WI-02). Empfänger prüfen truthy. Dokumentiert in PROTOKOLL Abschnitt 2 und HOW-TO.
+
+Nicht geprüft oder offen:
+
+- `tests/support/pyhub.py` postet selbst keinen Weckruf. Die Tests nutzen die Unterklasse `WakingHub` in `test_peer.py`. Eine Änderung an `pyhub.py` (außerhalb meiner Pfade) wäre sauberer. Vorschlag für Phase 2 / WI-07.
+- Der Wert 250 ms ohne Weckruf stammt aus der WI-04-Messung, für den Peer-Pfad nicht separat gemessen.
+- `with WakingHub(...).start()` ruft `start()` vermutlich doppelt (`PyHub.__enter__`). Aus dem Code gelesen, nicht ausgeführt (HOW-TO, Status vermutet).
+- Der Fall "alte Verbindung meldet nach dem Wechsel" ist nicht gezielt getestet.
+- Die Bytes einer Antwort mit `1` statt `true` wurden nicht ausgegeben. Das ist aus dem Code von `Json.Emit` gelesen.
+- Ein Bool-Typ im Json-Baustein wäre die saubere Lösung, ist aber ein Vertragswechsel für WI-02.

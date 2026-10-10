@@ -9,7 +9,7 @@ Status: Entwurf, Protokollversion **1**. Begründung der Technik: [ARCHITEKTUR.m
 - **Hub:** Der Supervisor betreibt die Pipe `\\.\pipe\ahf.<session>.hub` (`<session>` = Supervisor-PID und Startzeit, hex). Alle anderen Rollen verbinden sich als Client. Es gibt keine direkten Verbindungen zwischen Nicht-Hub-Prozessen.
 - **Pipe:** Byte-Modus, duplex, `FILE_FLAG_OVERLAPPED`, `PIPE_REJECT_REMOTE_CLIENTS`, eine Serverinstanz pro Client (der Hub legt nach jedem `Connect` eine neue Instanz an).
 - **Rahmen:** `uint32` Länge (little endian) + UTF-8-JSON. Maximale Größe 16 MiB. Größere Nutzdaten (z. B. große Flows) werden über `storage`-Dateien oder Chunking geteilt (`seq/total` in der Nutzlast), nicht über einen größeren Rahmen.
-- **Weckruf:** Nach jedem Schreiben sendet der Sender `PostMessage(peerHwnd, 0x8001, 0, 0)` (`WM_AHF_WAKE`). Der Empfänger liest bei Weckruf und zusätzlich per Fallback-Timer (250 ms).
+- **Weckruf:** Nach jedem Schreiben sendet der Sender `PostMessage(peerHwnd, 0x8001, 0, 0)` (`WM_AHF_WAKE`). Der Empfänger liest bei Weckruf und zusätzlich per Fallback-Timer (250 ms). Ein Client, der die Hub-HWND kennt (Peer-Option `hubHwnd`), weckt den Hub schon mit dem `sys.hello` (Abschnitt 5); ohne Weckruf nimmt der Hub den neuen Client erst nach bis zu 250 ms an.
 - **Lieferung:** Reihenfolge pro Verbindung erhalten, höchstens einmal, keine Persistenz. Verlorene Nachrichten werden über Timeouts und Resync (Abschnitt 5) behandelt, nicht über Wiederholung.
 - **Kodierung:** JSON-Zahlen sind Zahlen, Strings Strings. Flow-Daten behalten die Typen der Datei (z. B. `"zoomFactor": "0.700000"` bleibt ein String).
 
@@ -52,7 +52,9 @@ Jede Nachricht ist ein JSON-Objekt mit festem Schema. Der Serializer schreibt di
 
 **Fehlercodes:** `timeout`, `unknown_type`, `bad_payload`, `not_found`, `conflict` (Revision), `busy`, `denied`, `internal`, `peer_gone`, `shutting_down`.
 
-**Pflicht für jeden Empfänger:** jede `cmd.`-Anfrage wird beantwortet (auch mit Fehler). Der Absender erzeugt bei Fristablauf selbst ein lokales `res.` mit `timeout` und verwirft spätere Antworten mit unbekannter `corr`.
+**Pflicht für jeden Empfänger:** jede `cmd.`-Anfrage wird beantwortet (auch mit Fehler). Der Absender erzeugt bei Fristablauf selbst ein lokales `res.` mit `timeout` und verwirft spätere Antworten mit unbekannter `corr`. Ist der Umschlag ungültig, `from`/`id`/`type` aber lesbar, antwortet der Empfänger mit `bad_payload`. Ganz unlesbare Rahmen werden verworfen und gezählt.
+
+**Umsetzung in AHK (WI-05, `src/core/ipc/`):** Wahrheitswerte schreibt der JSON-Baustein als Zahl (`1`/`0`), weil er keinen Bool-Typ hat (Vertrag WI-02). Empfänger prüfen `ok` daher als Wahrheitswert (`1`, `true`), nicht als Text. Die Python-Gegenstellen senden `true`/`false`. Beide Schreibweisen sind gleichwertig.
 
 ## 3. Adressen und Topics
 
@@ -178,7 +180,7 @@ Die Engine zeigt nie Dialoge. Muss der Benutzer reagieren, nimmt die Engine eine
 
 ## 5. Verbindungsaufbau, Wiederverbindung, Resync
 
-1. Rolle verbindet sich, sendet `sys.hello`. Der Hub antwortet mit `sys.welcome`. Bis dahin sendet die Rolle nichts.
+1. Rolle verbindet sich, sendet `sys.hello` mit `hwnd` ihres Fensters (Weckruf-Ziel, Abschnitt 1). Der Hub antwortet mit `sys.welcome`. Bis dahin sendet die Rolle nichts außer `sys.hello`. Der Peer (`src/core/ipc/Peer.ahk`) öffnet die Pipe ohne Warten (ein Versuch, dann Wiederholung per Timer), weckt bei bekannter Hub-HWND (Option `hubHwnd`) den Hub schon mit dem `sys.hello` und meldet `ready` erst nach `sys.welcome`.
 2. Rolle abonniert Topics, ruft `cmd.engine.snapshot` auf (UIs) und beginnt, Ereignisse mit `seq` zu verarbeiten.
 3. Bricht die Pipe, baut die Rolle neu auf (Backoff 100 ms, 200, 400, ..., max. 2 s, gesamt 10 s), wiederholt `hello` mit `epoch` des Besitzers, abonniert neu, macht Resync. Gelingt das nicht, beendet sich die Rolle (Orphan-Guard).
 4. Eine Lücke in `seq` oder ein neues `epoch` löst Resync aus.

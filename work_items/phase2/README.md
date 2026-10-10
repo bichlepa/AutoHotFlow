@@ -103,15 +103,29 @@ class Wake { static Install(pumpFn, fallbackMs := 250), Uninstall(), Post(hwnd),
 class FrameWriter { static Encode(text) -> Buffer }   ; Frame.ahk bindet FrameWriter und FrameReader ein
 class FrameReader { Feed(bufOrPtr, n), Next() -> String | "" }
 
-; core/ipc/Peer.ahk  (WI-05)
+; core/ipc/Message.ahk, Dispatcher.ahk, Peer.ahk  (WI-05, umgesetzt, Abweichungen siehe WI-05 "Ergebnis")
+class Message {
+    __New(to, from, id, msgType, payload := "", corr := "", timeoutMs := 0)
+    Serialize() -> String                 ; Kopffelder in fester Reihenfolge
+    static Parse(text) -> Message         ; wirft ProtocolError (bad_payload)
+    static ReadTo(text) -> String         ; "to" ohne vollständiges Parsen
+}   ; Felder: to, from, id, type, corr ("" = null), timeoutMs (0 = fehlt), payload (Map)
+class Dispatcher {
+    On(typePrefix, handler)               ; längster Präfix gewinnt
+    Find(msgType) -> handler | ""
+    Invoke(msg) -> Map                    ; nie werfend: {ok, ...} | {ok:false, error:{code,message}}
+}
 class Peer {
-    __New(name, hubPipeName, options := {})
-    Connect() ; Close()
-    Send(to, type, payload := Map()) -> id                        ; Ereignis oder noReply
-    Request(to, type, payload, callback, timeoutMs := 5000) -> id ; callback(responseMessage)
-    On(typePrefix, handler)           ; handler(msg) -> Map (Antwort-Payload) | unset
-    Subscribe(topic)
-    OnClosed := () => ...
+    __New(name, hubPipeName, options := "")   ; options: Map oder Objekt, hubHwnd, reconnectTotalMs, helloTimeoutMs
+    Connect()                             ; kehrt sofort zurück, OnReady/OnClosed melden das Ergebnis
+    Close()                               ; OnClosed einmal
+    Send(to, msgType, payload := "") -> id | ""   ; Ereignis; "" wenn nicht bereit
+    Request(to, msgType, payload, callback, timeoutMs := 5000) -> id   ; callback(answer) genau einmal
+    On(typePrefix, handler)               ; handler(msg) -> Map | nichts
+    Subscribe(topic)                      ; wird bei jedem Verbindungsaufbau erneut gesendet
+    PendingCount -> Integer               ; nur lesen
+    status, closeReason, lateReplies, badFrames, droppedSends
+    OnReady := () => ...   OnClosed := () => ...
 }
 
 ; core/Role.ahk  (WI-06)
@@ -131,7 +145,7 @@ Der Supervisor startet sich ohne `--role` oder mit `--role=supervisor`.
 
 ## Fortschritt (Agenten haken ab, wenn ein Paket seine Akzeptanzkriterien erfüllt)
 
-- [ ] WI-01  - [ ] WI-02  - [ ] WI-03  - [x] WI-04  - [ ] WI-05  - [ ] WI-06
+- [ ] WI-01  - [ ] WI-02  - [ ] WI-03  - [x] WI-04  - [x] WI-05  - [ ] WI-06
 - [ ] WI-07  - [ ] WI-08  - [ ] WI-09  - [ ] WI-10  - [ ] WI-11  - [ ] WI-12
 - [ ] WI-13  - [ ] WI-14 (optional)  - [ ] WI-15  - [ ] WI-16  - [ ] WI-17
 

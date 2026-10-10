@@ -268,6 +268,50 @@ _Noch keine Einträge._
 - **Richtig:** `Round(x, n)` mit `n > 0` ist ein `String`, `Round(x)` ein `Integer`. Für eine Zahl `Round(x, 1) + 0` (Float) schreiben.
 - **Status:** verifiziert (`Type(Round(3.14159, 1))` gibt `String`)
 
+### Stand-in-Hub ohne Weckruf: jede Nachricht wartet 250 ms
+- **Problem:** `tests/support/pyhub.py` leitet Nachrichten weiter, ohne den Empfänger zu wecken. Der AHK-Peer verarbeitet sie dann erst beim Fallback-Timer. Eine Anfrage mit Antwort kostet dann etwa 250 ms je Richtung, 10.000 Anfragen also rund 40 Minuten.
+- **Falsch:** `PyHub` unverändert als Hub für Peer-Tests nutzen.
+- **Richtig:** `WakingHub(PyHub)` in `tests/integration/test_peer.py` weckt nach jeder Nachricht die Fenster aller Verbindungen mit bekanntem Fenster (`rawpipe.wake`). Das ist die Pflicht des Senders aus PROTOKOLL 1. `pyhub.py` selbst blieb unverändert (liegt außerhalb des Pakets).
+- **Status:** verifiziert (10.000 Anfragen mit `WakingHub` in 9,9 s). Den Wert ohne Weckruf (250 ms) übernehme ich aus der WI-04-Messung, für den Peer-Pfad nicht gesondert gemessen.
+- **Quelle:** `tests/integration/test_peer.py`, `work_items/phase2/WI-04-ipc-pipe.md`
+
+### Handler-Rückgabe: nur ein leerer Wert gilt als "nichts zurückgegeben"
+- **Problem:** `Dispatcher.Invoke` behandelte jede Nicht-Objekt-Rückgabe als "keine Rückgabe". Ein Handler, der `"text"` zurückgab, bekam `ok:true` statt eines Fehlers.
+- **Falsch:** `if (!IsObject(result)) return Map("ok", true)`.
+- **Richtig:** `if (!IsObject(result) && result == "")` ergibt `ok:true`. Jede andere Nicht-Map-Rückgabe wird `internal`.
+- **Status:** verifiziert (Test "a handler returning a non-Map is an internal error" war rot, nach der Änderung grün; `tests/ahk/dispatcher.test.ahk`).
+- **Quelle:** `src/core/ipc/Dispatcher.ahk`
+
+### Verbindungsaufbau ohne Blockade: ein Versuch, Wiederholung per Timer
+- **Problem:** `PipeConnection.Connect(name, 3000)` wartet bis zu 3 s mit `Sleep` im Aufrufer. Ein Peer, der beim Start auf den Hub wartet, würde seinen Nachrichtenpfad so lange anhalten.
+- **Richtig:** `PipeConnection.Connect(name, 0)` macht genau einen Versuch und wirft sofort. Der Peer wiederholt per `SetTimer` mit Backoff (100, 200, 400 ... höchstens 2 s) und meldet nach der Gesamtfrist (10 s) `hub_unreachable`.
+- **Status:** verifiziert (`test_hub_gone_for_longer_than_the_budget_calls_onclosed`: `OnClosed` nach 10,25 s; `test_reconnect_after_hub_restart_resubscribes_and_reports_ready_again`).
+- **Quelle:** `src/core/ipc/Peer.ahk` (`_Attempt`, `_ScheduleRetry`)
+
+### Ist der Verbindungsabbau noch der aktuelle? `ObjPtr` statt Vergleich
+- **Problem:** Ein `OnClose` einer alten Verbindung darf den Zustand des Peers nicht verändern. Der Vergleich der Objekte ist nicht eindeutig dokumentiert.
+- **Richtig:** `ObjPtr(c) != ObjPtr(this._conn)` vergleicht die Identität. Vor dem Zugriff `IsObject` prüfen, weil `this._conn` leer sein kann.
+- **Status:** verifiziert für den Abbau-Pfad (Reconnect-Test und Timeout-Test laufen über `_OnConnClose`). Der Fall "alte Verbindung meldet nach dem Wechsel" wurde nicht gezielt erzeugt: nicht geprüft.
+- **Quelle:** `src/core/ipc/Peer.ahk` (`_OnConnClose`)
+
+### Ein Timer pro Anfrage: 10.000 Anfragen ohne wachsende Handles
+- **Problem:** Jede Anfrage braucht einen Timeout. AHK bietet keine Zählung der aktiven Timer.
+- **Richtig:** Ein `SetTimer(fn, -timeoutMs)` pro Anfrage, bei der Antwort `SetTimer(fn, 0)`. Gezählt wird über `Peer.PendingCount` (muss am Ende 0 sein). Die Handle-Zahl des Prozesses bleibt konstant.
+- **Status:** verifiziert (10.000 sequentielle Anfragen: Handles 163 → 163 → 163, Pending 0, 0,99 ms je Anfrage). Die Zahl der aktiven Timer selbst ist nicht direkt messbar: nur indirekt über Pending.
+- **Quelle:** `tests/integration/test_peer.py::test_10000_sequential_requests_keep_pending_and_handles_flat`
+
+### Wahrheitswerte gehen als Zahl auf die Leitung
+- **Problem:** Das Protokoll zeigt `"ok": true`. `Json.Parse` liefert `true` als `1`, und `Json.Stringify` schreibt diesen Integer als Zahl. Beim Vergleich in Python ist `1 == True`, so dass der Test den Unterschied nicht bemerkt.
+- **Richtig:** Empfänger prüfen `ok` als Wahrheitswert, nicht als Text. Die Abweichung steht in `doc/PROTOKOLL.md`, Abschnitt 2. Ein eigener Bool-Typ im Json-Baustein wäre die saubere Lösung, ist aber ein Vertragswechsel (WI-02).
+- **Status:** verifiziert (gelesen: `Json.Emit` schreibt Integer als Zahl). Die Bytes einer Antwort wurden nicht ausgegeben.
+- **Quelle:** `src/core/Json.ahk`, `doc/PROTOKOLL.md`
+
+### Zweimal `start()` über `with`
+- **Problem:** `with WakingHub(name).start() as hub:` ruft `start()` zweimal auf, weil `PyHub.__enter__` selbst `start()` aufruft. Zwei Akzeptierschleifen auf demselben Namen wären die Folge.
+- **Richtig:** `with WakingHub(name) as hub:` (der `__enter__` startet). Ohne `with` `hub = WakingHub(name).start()` und `hub.stop()` im `finally`.
+- **Status:** vermutet (aus dem Quelltext von `tests/support/pyhub.py` gelesen, nicht ausgeführt). Im Code des Pakets so umgesetzt.
+- **Quelle:** `tests/support/pyhub.py` (`__enter__`)
+
 ## GUI und Hotkeys
 
 _Noch keine Einträge._
