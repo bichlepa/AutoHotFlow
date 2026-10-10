@@ -12,6 +12,7 @@
 ; registered only with --test-roles (WI-07), so a product start can never run them.
 #Include core\RoleRegistry.ahk
 #Include supervisor\Supervisor.ahk
+#Include engine\Engine.ahk
 #Include ..\tests\integration\helpers\EchoRole.ahk
 #Include ..\tests\integration\helpers\CrasherRole.ahk
 #Include ..\tests\integration\helpers\HangerRole.ahk
@@ -22,6 +23,7 @@ AhfMain()
 AhfMain() {
     Persistent()
     Log.Configure(Role.ConsoleFn)
+    AhfRegisterRoles()
     opts := ""
     try {
         opts := Args.Parse(A_Args)
@@ -61,6 +63,11 @@ AhfMain() {
     } catch as e {
         AhfExit(1, roleObj.name " failed to start: " Type(e) ": " e.Message)
     }
+}
+
+; Registers the roles that the entry point itself knows (the others sit in RoleRegistry.ahk).
+AhfRegisterRoles() {
+    RoleRegistry.Register("engine", Engine)
 }
 
 ; Registers the test roles (tests/integration/helpers). Called only with --test-roles.

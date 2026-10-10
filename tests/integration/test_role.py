@@ -136,10 +136,11 @@ def test_missing_connection_arguments_exit_2(procs, datadir, runs, session_id):
 
 
 def test_role_without_implementation_reports_not_implemented(procs, datadir, runs, session_id, pipe):
-    run = launch(procs, datadir, runs, pipe, session_id, "engine")
+    # "engine" is implemented since WI-10; "worker" is still a placeholder (WI-11).
+    run = launch(procs, datadir, runs, pipe, session_id, "worker")
     code = run.wait_exit(timeout=30)
     assert code == EXIT_NOT_IMPLEMENTED, "exit %s, stderr: %s" % (code, run.stderr_text())
-    assert "role 'engine' is not implemented yet" in run.stderr_text()
+    assert "role 'worker' is not implemented yet" in run.stderr_text()
 
 
 # --- echo role against the Python hub -------------------------------------------------------------

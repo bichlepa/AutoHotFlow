@@ -1,0 +1,74 @@
+{
+  "name": "Skeleton",
+  "category": "Skeleton",
+  "ElementIDCounter": "4",
+  "flowSettings": {
+    "DefaultWorkingDir": 1,
+    "ExecutionPolicy": "default",
+    "Offsetx": "0.000000",
+    "Offsety": "0.000000",
+    "WorkingDir": "",
+    "zoomFactor": "1.000000"
+  },
+  "allElements": {
+    "element0000000001": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "1",
+      "enabled": "0",
+      "ID": "element0000000001",
+      "name": "Manual - Skeleton",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "ID": "Skeleton"
+      },
+      "StandardName": "1",
+      "type": "trigger",
+      "x": "0",
+      "y": "0"
+    },
+    "element0000000002": {
+      "class": "Action_Sleep",
+      "ID": "element0000000002",
+      "name": "Sleep - 200 ms",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "Duration": "200",
+        "Unit": "Milliseconds"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "0",
+      "y": "210"
+    },
+    "element0000000003": {
+      "class": "Action_Do_nothing",
+      "ID": "element0000000003",
+      "name": "Do nothing",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {},
+      "StandardName": "1",
+      "type": "action",
+      "x": "0",
+      "y": "420"
+    }
+  },
+  "allConnections": {
+    "connection0000000004": {
+      "ConnectionType": "normal",
+      "from": "element0000000001",
+      "ID": "connection0000000004",
+      "to": "element0000000002",
+      "type": "Connection"
+    },
+    "connection0000000005": {
+      "ConnectionType": "normal",
+      "from": "element0000000002",
+      "ID": "connection0000000005",
+      "to": "element0000000003",
+      "type": "Connection"
+    }
+  }
+}
