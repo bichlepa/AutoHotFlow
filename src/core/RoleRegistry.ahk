@@ -41,7 +41,7 @@ class PlaceholderRole extends Role {
 }
 
 ; "supervisor" is not registered here: it is not a Role (WI-07) and the entry point starts it directly.
-RoleRegistry.Register("storage", PlaceholderRole)      ; WI-12
+; "storage" is registered by the entry point (WI-12, src/storage/Storage.ahk), like "engine" below.
 ; "engine" is registered by the entry point (WI-10, src/engine/Engine.ahk): core/ must not include
 ; role folders, so the real class cannot be named here.
 RoleRegistry.Register("triggerhost", PlaceholderRole)  ; WI-14

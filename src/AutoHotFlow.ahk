@@ -14,6 +14,7 @@
 #Include supervisor\Supervisor.ahk
 #Include engine\Engine.ahk
 #Include worker\Worker.ahk
+#Include storage\Storage.ahk
 #Include elements\skeleton\Trigger_Manual.ahk
 #Include elements\skeleton\Action_Sleep.ahk
 #Include elements\skeleton\Action_Do_nothing.ahk
@@ -78,6 +79,7 @@ AhfMain() {
 AhfRegisterRoles() {
     RoleRegistry.Register("engine", Engine)
     RoleRegistry.Register("worker", Worker)
+    RoleRegistry.Register("storage", Storage)
 }
 
 ; Registers the test roles (tests/integration/helpers). Called only with --test-roles.
