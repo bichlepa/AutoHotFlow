@@ -23,7 +23,7 @@ sys.path.insert(0, str(HELPERS))
 import rawpipe  # noqa: E402
 from rawpipe import Helper  # noqa: E402
 from support.ahfclient import AhfClient  # noqa: E402
-from support.pyhub import PyHub  # noqa: E402
+from support.pyhub import WakingHub  # noqa: E402  (moved to tests/support/pyhub.py in WI-07)
 
 PROBE = HELPERS / "peer_probe.ahk"
 WM_AHF_WAKE = 0x8001
@@ -40,17 +40,6 @@ _user32.PeekMessageW.argtypes = [ctypes.c_void_p, ctypes.c_void_p, wintypes.UINT
 _user32.PeekMessageW.restype = wintypes.BOOL
 PM_REMOVE = 1
 HWND_MESSAGE = ctypes.c_void_p(-3)
-
-
-class WakingHub(PyHub):
-    """PyHub that wakes every peer window that has announced one, after each routed message."""
-
-    def _handle(self, link, msg):
-        super()._handle(link, msg)
-        with self._lock:
-            hwnds = [l.hwnd for l in self._links if l.hwnd]
-        for hwnd in hwnds:
-            rawpipe.wake(hwnd)
 
 
 @pytest.fixture

@@ -42,5 +42,3 @@ class EchoRole extends Role {
         throw ValueError("echo role: deliberate error from a timer")
     }
 }
-
-RoleRegistry.Register("echo", EchoRole)

@@ -2,16 +2,20 @@
 #SingleInstance Off
 
 ; Single entry point of every role process (doc/ARCHITEKTUR.md D12, work_items/phase2/README.md):
-;   AutoHotkey64.exe src\AutoHotFlow.ahk --role=<name> --session=<id> --hub=<pipe> --data=<dir> [--flow=<id>] [--hubHwnd=<n>]
-; Without --role (or with --role=supervisor) the supervisor role starts (WI-07, placeholder for now).
-; Exit codes: 0 normal end, 1 role failed to start, 2 bad arguments or unknown role,
-; 3 role not implemented yet, 4 hub lost (orphan guard) or peer closed.
+;   AutoHotkey64.exe src\AutoHotFlow.ahk --role=<name> --session=<id> --hub=<pipe> --data=<dir> [--flow=<id>] [--hubHwnd=<n>] [--test-roles]
+; --role=supervisor (or no --role) starts the supervisor (WI-07, src/supervisor/), which is not a Role.
+; Exit codes: 0 normal end, 1 role or supervisor failed to start, 2 bad arguments or unknown role,
+; 3 role not implemented yet, 4 hub lost (orphan guard) or peer closed, 5 supervisor: a child was terminated.
 ; No dialog is ever shown: every message goes to the console sink (stderr).
 ;
-; Roles are included here, not loaded dynamically (WI-06). Test roles are included as well and
-; are registered only by name; no product code depends on them.
+; Roles are included here, not loaded dynamically (WI-06). The test roles are compiled in, but they are
+; registered only with --test-roles (WI-07), so a product start can never run them.
 #Include core\RoleRegistry.ahk
+#Include supervisor\Supervisor.ahk
 #Include ..\tests\integration\helpers\EchoRole.ahk
+#Include ..\tests\integration\helpers\CrasherRole.ahk
+#Include ..\tests\integration\helpers\HangerRole.ahk
+#Include ..\tests\integration\helpers\SlowShutdownRole.ahk
 
 AhfMain()
 
@@ -24,7 +28,17 @@ AhfMain() {
     } catch as e {
         AhfExit(2, "bad arguments: " e.Message)
     }
+    if (opts.Has("test-roles"))
+        AhfRegisterTestRoles()
     roleName := opts.Get("role", "supervisor")
+    if (roleName = "supervisor") {
+        try {
+            Supervisor.Run(opts)
+        } catch as e {
+            AhfExit(1, "supervisor failed to start: " Type(e) ": " e.Message)
+        }
+        return
+    }
     cls := RoleRegistry.Lookup(roleName)
     if (cls = "")
         AhfExit(2, "unknown role '" roleName "'")
@@ -47,6 +61,14 @@ AhfMain() {
     } catch as e {
         AhfExit(1, roleObj.name " failed to start: " Type(e) ": " e.Message)
     }
+}
+
+; Registers the test roles (tests/integration/helpers). Called only with --test-roles.
+AhfRegisterTestRoles() {
+    RoleRegistry.Register("echo", EchoRole)
+    RoleRegistry.Register("crasher", CrasherRole)
+    RoleRegistry.Register("hanger", HangerRole)
+    RoleRegistry.Register("slow_shutdown", SlowShutdownRole)
 }
 
 AhfExit(code, text) {

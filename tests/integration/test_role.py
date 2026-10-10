@@ -74,7 +74,8 @@ class RoleRun:
 
 
 def start_role(procs, datadir, pipe, session, role, *extra):
-    args = ["--role=" + role, "--session=" + session, "--hub=" + pipe, "--data=" + str(datadir), *extra]
+    # --test-roles: the echo role is a test role and is registered only with the flag (WI-07)
+    args = ["--role=" + role, "--session=" + session, "--hub=" + pipe, "--data=" + str(datadir), "--test-roles", *extra]
     return RoleRun(procs, datadir, role.replace(":", "_"), args)
 
 
@@ -127,7 +128,7 @@ def test_unknown_role_exits_2_with_message_and_no_dialog(procs, datadir, runs, s
 
 
 def test_missing_connection_arguments_exit_2(procs, datadir, runs, session_id):
-    run = RoleRun(procs, datadir, "noargs", ["--role=echo", "--session=" + session_id])
+    run = RoleRun(procs, datadir, "noargs", ["--role=echo", "--test-roles", "--session=" + session_id])
     runs.append(run)
     code = run.wait_exit(timeout=30)
     assert code == EXIT_BAD_ARGS, run.stderr_text()

@@ -10,7 +10,7 @@ production hub.
 import threading
 
 from support import winpipe
-from support.ahfclient import FrameDecoder, encode_frame, dumps, make_envelope
+from support.ahfclient import FrameDecoder, encode_frame, dumps, make_envelope, wake
 
 
 class _Link:
@@ -186,3 +186,18 @@ class PyHub:
     def _peer_table(self):
         with self._lock:
             return {l.name: {"hwnd": l.hwnd} for l in self._links if l.name}
+
+
+class WakingHub(PyHub):
+    """PyHub that wakes every peer window that has announced one, after each routed message.
+
+    PROTOCOL 1 asks the sender to post the wake-up. Without it each message waits for the 250 ms
+    fallback timer of the receiver. Moved here from test_peer.py in WI-07.
+    """
+
+    def _handle(self, link, msg):
+        super()._handle(link, msg)
+        with self._lock:
+            hwnds = [l.hwnd for l in self._links if l.hwnd]
+        for hwnd in hwnds:
+            wake(hwnd)

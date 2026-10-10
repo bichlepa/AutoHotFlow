@@ -40,7 +40,7 @@ class PlaceholderRole extends Role {
     }
 }
 
-RoleRegistry.Register("supervisor", PlaceholderRole)   ; WI-07
+; "supervisor" is not registered here: it is not a Role (WI-07) and the entry point starts it directly.
 RoleRegistry.Register("storage", PlaceholderRole)      ; WI-12
 RoleRegistry.Register("engine", PlaceholderRole)       ; WI-10
 RoleRegistry.Register("triggerhost", PlaceholderRole)  ; WI-14
