@@ -179,6 +179,7 @@ Jedes Ereignis trägt `seq` (steigend pro Engine-Epoche) und `epoch`.
 - `cmd.flow.toggle` `{flowId}`: `{action: "started"/"stopped", instanceId?}`.
 - `cmd.flow.enable` / `cmd.flow.disable` `{flowId}`: `{}`. Setzt nur das Flag und sendet `evt.flow.state`. Trigger werden in Phase 2 nicht scharf geschaltet.
 - `cmd.engine.snapshot`: `settings` ist `{}` (Einstellungen kommen in Phase 3).
+- `cmd.flow.patch` `{flowId, baseRev, ops}` (WI-10, nur Schema und Revision): `baseRev` muss eine Ganzzahl sein, `ops` ein Array (sonst `bad_payload`). Weicht `baseRev` von der aktuellen `rev` ab, antwortet die Engine mit `error.code = "conflict"` und auf Payload-Ebene `rev` und `definition` des aktuellen Stands. Alle `ops` werden vor jeder Anwendung geprüft: unbekannter `op` ist `bad_payload` ("unknown patch operation"), bekannte Operationen (`element.add`, `element.update`, `element.remove`, `connection.add`, `connection.remove`, `flow.settings`) sind `bad_payload` ("not applied before phase 3"). Ein leeres `ops` gibt `{rev}` ohne Änderung zurück.
 
 ### 4.4 Engine ↔ Triggerhost
 

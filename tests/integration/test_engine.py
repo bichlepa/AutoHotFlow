@@ -423,3 +423,41 @@ def test_shutdown_stops_running_instances_and_says_bye_within_the_deadline(procs
         assert run.wait_exit(timeout=5) == 0, run.stderr_text()
         elapsed = time.monotonic() - t0
         assert elapsed < 2.0, "shutdown took %.3f s" % elapsed
+
+
+# --- patch schema (PROTOCOL 4.2) -----------------------------------------------------------------
+
+def test_patch_with_a_stale_base_revision_is_a_conflict_with_the_current_state(pipe, flowdir, engine):
+    with subscribe_flow(pipe, "skeleton") as obs:
+        wait_ready(obs)
+        answer = obs.request("engine", "cmd.flow.patch", {"flowId": "skeleton", "baseRev": 0, "ops": []}, timeout=5)
+        payload = answer["payload"]
+        assert not payload["ok"] and payload["error"]["code"] == "conflict"
+        assert payload["rev"] == 1 and payload["definition"]["name"] == "Skeleton"
+
+
+def test_patch_with_the_current_revision_and_no_operations_changes_nothing(pipe, flowdir, engine):
+    with subscribe_flow(pipe, "skeleton") as obs:
+        wait_ready(obs)
+        answer = ask(obs, "cmd.flow.patch", {"flowId": "skeleton", "baseRev": 1, "ops": []})
+        assert answer["ok"] and answer["rev"] == 1
+        assert ask(obs, "cmd.engine.snapshot")["flows"][0]["rev"] == 1
+
+
+def test_patch_operations_are_validated_and_refused_until_phase_3(pipe, flowdir, engine):
+    cases = [
+        ({"flowId": "skeleton", "baseRev": 1, "ops": [{"op": "element.add"}]}, "not applied before phase 3"),
+        ({"flowId": "skeleton", "baseRev": 1, "ops": [{"op": "no.such.op"}]}, "unknown patch operation"),
+        ({"flowId": "skeleton", "baseRev": 1, "ops": [{"x": 1}]}, "needs an 'op' field"),
+        ({"flowId": "skeleton", "baseRev": 1, "ops": "nope"}, "must be an array"),
+        ({"flowId": "skeleton", "ops": []}, "baseRev"),
+        ({"flowId": "nope", "baseRev": 1, "ops": []}, None),
+    ]
+    with subscribe_flow(pipe, "skeleton") as obs:
+        wait_ready(obs)
+        for payload, text in cases:
+            error = obs.request("engine", "cmd.flow.patch", payload, timeout=5)["payload"]["error"]
+            assert error["code"] in ("bad_payload", "not_found"), error
+            if text is not None:
+                assert text in error["message"], error
+        assert ask(obs, "cmd.engine.snapshot")["flows"][0]["rev"] == 1

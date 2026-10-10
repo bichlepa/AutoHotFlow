@@ -22,6 +22,9 @@
 ; process, +1 per event). A client that sees a new epoch or a gap in seq asks for cmd.engine.snapshot.
 class Engine extends Role {
     static STORAGE := "storage"
+    ; Operation names of cmd.flow.patch (PROTOCOL 4.2). Known, but not applied in Phase 2.
+    static PATCH_OPS := Map("element.add", true, "element.update", true, "element.remove", true
+        , "connection.add", true, "connection.remove", true, "flow.settings", true)
     static READ_TIMEOUT_MS := 30000
     static LOAD_TRIES := 5
     static LOAD_RETRY_MS := 500
@@ -51,6 +54,7 @@ class Engine extends Role {
         this.On("cmd.flow.toggle", (msg) => this._CmdFlowToggle(msg))
         this.On("cmd.flow.enable", (msg) => this._CmdFlowEnable(msg, true))
         this.On("cmd.flow.disable", (msg) => this._CmdFlowEnable(msg, false))
+        this.On("cmd.flow.patch", (msg) => this._CmdFlowPatch(msg))
         SetTimer(this._safetyFn, Engine.SAFETY_MS)
     }
 
@@ -226,6 +230,33 @@ class Engine extends Role {
         rec.Enabled := enabled
         this.EmitFlowState(flowId)
         return Map()
+    }
+
+    ; Patch schema (PROTOCOL 4.2). Phase 2 checks the revision and the shape of the operations, then
+    ; refuses them: applying operations is Phase 3. A stale baseRev is a conflict with the current state.
+    ; Operations are checked all before any is applied (atomic), and an empty list changes nothing.
+    _CmdFlowPatch(msg) {
+        flowId := Engine.Text(msg, "flowId")
+        rec := this.flows.Require(flowId)
+        base := msg.payload.Get("baseRev", "")
+        if (!IsInteger(base))
+            throw AhfError("payload field 'baseRev' must be an integer", ErrCode.BAD_PAYLOAD)
+        ops := msg.payload.Get("ops", "")
+        if (!(ops is Array))
+            throw AhfError("payload field 'ops' must be an array", ErrCode.BAD_PAYLOAD)
+        if (Integer(base) != rec.Rev)
+            return Map("ok", false, "error", Map("code", ErrCode.CONFLICT
+                , "message", "flow '" flowId "' is at rev " rec.Rev ", baseRev was " base)
+                , "rev", rec.Rev, "definition", rec.Def.Raw)
+        for op in ops {
+            if (!(op is Map) || !op.Has("op") || IsObject(op["op"]))
+                throw AhfError("each operation needs an 'op' field", ErrCode.BAD_PAYLOAD)
+            name := String(op["op"])
+            if (!Engine.PATCH_OPS.Has(name))
+                throw AhfError("unknown patch operation '" name "'", ErrCode.BAD_PAYLOAD)
+            throw AhfError("patch operation '" name "' is not applied before phase 3", ErrCode.BAD_PAYLOAD)
+        }
+        return Map("rev", rec.Rev)
     }
 
     ; --- helpers -------------------------------------------------------------------------------
