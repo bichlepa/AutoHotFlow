@@ -136,11 +136,11 @@ def test_missing_connection_arguments_exit_2(procs, datadir, runs, session_id):
 
 
 def test_role_without_implementation_reports_not_implemented(procs, datadir, runs, session_id, pipe):
-    # "engine" (WI-10) and "worker" (WI-11) are implemented; "storage" is still a placeholder (WI-12).
-    run = launch(procs, datadir, runs, pipe, session_id, "storage")
+    # "engine" (WI-10), "worker" (WI-11) and "storage" (WI-12) are implemented; "triggerhost" is still a placeholder (WI-14).
+    run = launch(procs, datadir, runs, pipe, session_id, "triggerhost")
     code = run.wait_exit(timeout=30)
     assert code == EXIT_NOT_IMPLEMENTED, "exit %s, stderr: %s" % (code, run.stderr_text())
-    assert "role 'storage' is not implemented yet" in run.stderr_text()
+    assert "role 'triggerhost' is not implemented yet" in run.stderr_text()
 
 
 # --- echo role against the Python hub -------------------------------------------------------------
