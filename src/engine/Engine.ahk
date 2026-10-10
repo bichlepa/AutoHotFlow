@@ -6,6 +6,7 @@
 #Include ..\core\Role.ahk
 #Include FlowRecord.ahk
 #Include FlowTable.ahk
+#Include Executor.ahk
 
 ; Engine role (WI-10, ARCHITECTURE 3, 4, 6.1, PROTOCOL 4.2, 4.3, 4.6).
 ;
@@ -24,15 +25,20 @@ class Engine extends Role {
     static READ_TIMEOUT_MS := 30000
     static LOAD_TRIES := 5
     static LOAD_RETRY_MS := 500
+    ; Safety net for the dispatcher: a tick every 100 ms in case a kick was lost (ARCHITECTURE 2.3).
+    static SAFETY_MS := 100
 
     __New(args) {
         super.__New(args)
         this.epoch := Engine._NewEpoch()
         this.seq := 0
         this.flows := FlowTable()
+        this.executor := Executor(this)
         this._flowsLoaded := false     ; not _loaded: that name is the method _Loaded (case-insensitive)
         this._loadTries := 0
         this._loadRetryFn := () => this._LoadFlows()
+        this._tickFn := () => this._Tick()
+        this._safetyFn := () => this._Tick()
     }
 
     ; --- role hooks ----------------------------------------------------------------------------
@@ -40,12 +46,23 @@ class Engine extends Role {
     RegisterHandlers() {
         this.On("cmd.engine.snapshot", (msg) => this._CmdSnapshot(msg))
         this.On("cmd.flow.get", (msg) => this._CmdFlowGet(msg))
+        this.On("cmd.flow.start", (msg) => this._CmdFlowStart(msg))
+        this.On("cmd.flow.stop", (msg) => this._CmdFlowStop(msg))
+        this.On("cmd.flow.toggle", (msg) => this._CmdFlowToggle(msg))
+        this.On("cmd.flow.enable", (msg) => this._CmdFlowEnable(msg, true))
+        this.On("cmd.flow.disable", (msg) => this._CmdFlowEnable(msg, false))
+        SetTimer(this._safetyFn, Engine.SAFETY_MS)
     }
 
     OnReady() {
         this.SetLogTarget(Engine.STORAGE)
         if (!this._flowsLoaded)
             this._LoadFlows()
+    }
+
+    ; sys.shutdown: every instance is stopped before sys.bye (ARCHITECTURE 6.3, step 2).
+    OnShutdown(deadlineMs) {
+        this.executor.StopAll("shutdown")
     }
 
     ; --- events --------------------------------------------------------------------------------
@@ -57,6 +74,27 @@ class Engine extends Role {
         payload["epoch"] := this.epoch
         payload["seq"] := this.seq
         this.peer.Send(to, msgType, payload)
+    }
+
+    ; evt.flow.state for one flow: enabled flag and whether an instance runs.
+    EmitFlowState(flowId) {
+        rec := this.flows.Get(flowId)
+        enabled := IsObject(rec) ? rec.Enabled : false
+        this.Emit("topic:flow:" flowId, "evt.flow.state", Map("flowId", flowId, "enabled", enabled
+            , "executing", this.executor.IsExecuting(flowId)))
+    }
+
+    ; Asks for a dispatch tick soon (once, after the current message).
+    Kick() {
+        SetTimer(this._tickFn, -1)
+    }
+
+    _Tick() {
+        try {
+            this.executor.Tick()
+        } catch as e {
+            this._Log("a0", "engine", "dispatch failed: " Type(e) ": " e.Message)
+        }
     }
 
     ; --- loading (cmd.storage.*) ---------------------------------------------------------------
@@ -148,7 +186,7 @@ class Engine extends Role {
         list := []
         for rec in this.flows.All() {
             list.Push(Map("flowId", rec.FlowId, "name", rec.Def.Name, "category", rec.Def.Category
-                , "enabled", rec.Enabled, "executing", false, "rev", rec.Rev))
+                , "enabled", rec.Enabled, "executing", this.executor.IsExecuting(rec.FlowId), "rev", rec.Rev))
         }
         return Map("epoch", this.epoch, "seq", this.seq, "flows", list, "settings", Map())
     }
@@ -156,6 +194,38 @@ class Engine extends Role {
     _CmdFlowGet(msg) {
         rec := this.flows.Require(Engine.Text(msg, "flowId"))
         return Map("rev", rec.Rev, "definition", rec.Def.Raw)
+    }
+
+    _CmdFlowStart(msg) {
+        rec := this.flows.Require(Engine.Text(msg, "flowId"))
+        instId := this.executor.StartFlow(rec, Engine.Optional(msg, "triggerId"))
+        return Map("instanceId", instId)
+    }
+
+    _CmdFlowStop(msg) {
+        flowId := Engine.Text(msg, "flowId")
+        this.flows.Require(flowId)
+        return Map("stopped", this.executor.StopFlow(flowId, "flow.stop"))
+    }
+
+    _CmdFlowToggle(msg) {
+        flowId := Engine.Text(msg, "flowId")
+        rec := this.flows.Require(flowId)
+        if (this.executor.IsExecuting(flowId)) {
+            this.executor.StopFlow(flowId, "toggle")
+            return Map("action", "stopped")
+        }
+        instId := this.executor.StartFlow(rec)
+        return Map("action", "started", "instanceId", instId)
+    }
+
+    ; Phase 2: sets the flag and reports it. No trigger is armed (WI-14, Phase 3).
+    _CmdFlowEnable(msg, enabled) {
+        flowId := Engine.Text(msg, "flowId")
+        rec := this.flows.Require(flowId)
+        rec.Enabled := enabled
+        this.EmitFlowState(flowId)
+        return Map()
     }
 
     ; --- helpers -------------------------------------------------------------------------------
@@ -166,6 +236,14 @@ class Engine extends Role {
         if (IsObject(v) || v = "")
             throw AhfError("payload field '" key "' is missing", ErrCode.BAD_PAYLOAD)
         return String(v)
+    }
+
+    ; An optional text field: "" when missing, bad_payload when it is an object.
+    static Optional(msg, key) {
+        v := msg.payload.Get(key, "")
+        if (IsObject(v))
+            throw AhfError("payload field '" key "' must be a value", ErrCode.BAD_PAYLOAD)
+        return (v = "") ? "" : String(v)
     }
 
     static _ErrorText(res) {

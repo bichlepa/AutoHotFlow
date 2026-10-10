@@ -164,6 +164,22 @@ Jedes Ereignis trägt `seq` (steigend pro Engine-Epoche) und `epoch`.
 | `evt.log.entry` | `log` | `{ ts, level, source, flowId?, text }` (Engine/Storage senden Log über 4.5, nicht hier) |
 | `evt.storage.error` | `engine` | `{ op, path, message }` |
 
+**Umsetzung in WI-10 (`src/engine/`, Phase 2):**
+
+- Jedes `evt.*` der Engine trägt `epoch` (Startzeit des Engine-Prozesses, UTC mit Millisekunden, als Ganzzahl) und `seq` (ein Zähler pro Engine-Prozess, +1 pro Ereignis).
+- `evt.engine.ready` mit `{}` erst nach dem Laden der Flow-Liste. Beim Laden zusätzlich `evt.flow.list.changed` `{added, removed: [], changed: []}`.
+- `evt.storage.error` mit `op` = `flows.list` (Liste fehlgeschlagen, wird bis zu 5-mal wiederholt), `flow.read` (Datei nicht lesbar) oder `flow.parse` (Inhalt ungültig). Der Start wird dadurch nicht blockiert.
+- `evt.element.state` `{flowId, elementId, state, countRuns, lastRun}`. `lastRun` ist der Zeitstempel des letzten Starts (`yyyy-MM-dd HH:mm:ss`, UTC). `countRuns` ist +1 beim Start und -1 beim Ende (wie v1). `state` ist `running`, solange `countRuns > 0`, sonst `finished`, bei Ergebnis `exception` `exception`. Ein Stopp durch die Engine zählt als Ende (Ergebnis `stopped`, Zustand `finished`). Bei `exception` zusätzlich `message` (Meldung der Ausnahme).
+- `evt.instance.ended` `{flowId, instanceId, reason}` mit `reason`: `finished` (letzter Thread regulär beendet), `exception` (letzter Thread ohne passende Verbindung nach einer Ausnahme), `flow.stop`, `toggle`, `policy stop`, `shutdown`.
+- `evt.flow.state` `{flowId, enabled, executing}` nach `evt.instance.started` bzw. nach `evt.instance.ended`. Beim Ende kommt `evt.flow.state` also **nach** `evt.instance.ended`.
+- Wahrheitswerte (`enabled`, `executing`) gehen als 0 oder 1 auf die Leitung (Abschnitt 2).
+- `cmd.flow.start` `{flowId, triggerId?}`: `{instanceId}`. Ohne `triggerId` der erste Trigger des Flows. Ein Trigger wird vom Start simuliert (`running`, dann `finished`, wie v1 `newInstance`). Fehler: `not_found` (Flow nicht geladen), `bad_payload` (kein Trigger, kein Trigger unter dieser ID, ungültige Richtlinie), `busy` (Richtlinie `skip`, oder `wait`, das in WI-10 nicht umgesetzt ist).
+- Richtlinie: `flowSettings.ExecutionPolicy` des Flows, `default` wird zu `parallel` aufgelöst (globale Einstellung gibt es in Phase 2 noch nicht). Die Entscheidung trifft `ExecutionPolicy.Decide` (WI-08).
+- `cmd.flow.stop` `{flowId}`: `{stopped: n}`, Zahl der gestoppten Instanzen. Die Quittung (`evt.instance.ended`) folgt synchron.
+- `cmd.flow.toggle` `{flowId}`: `{action: "started"/"stopped", instanceId?}`.
+- `cmd.flow.enable` / `cmd.flow.disable` `{flowId}`: `{}`. Setzt nur das Flag und sendet `evt.flow.state`. Trigger werden in Phase 2 nicht scharf geschaltet.
+- `cmd.engine.snapshot`: `settings` ist `{}` (Einstellungen kommen in Phase 3).
+
 ### 4.4 Engine ↔ Triggerhost
 
 | Typ | Von → An | Nutzlast | Antwort |

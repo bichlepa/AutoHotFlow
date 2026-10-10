@@ -6,6 +6,7 @@ Python stand-in as well (StorageStub below, same protocol as WI-12 will implemen
 tested before the storage role exists. Observers are AhfClient instances that subscribe to topics.
 """
 
+import json
 import shutil
 import threading
 import time
@@ -188,3 +189,237 @@ def test_broken_flow_file_is_reported_and_does_not_block_the_start(procs, datadi
 
         hub.send_to("engine", "sys.shutdown", {"reason": "user", "deadlineMs": 1000})
         assert run.wait_exit(timeout=10) == 0, run.stderr_text()
+
+
+# --- running flows ----------------------------------------------------------------------------------
+
+TRIGGER, SLEEP, DONE = "element0000000001", "element0000000002", "element0000000003"
+
+
+def make_flow(flowdir, name, sleep_ms=200, policy="default", element_class=None):
+    """Writes Flows/<name>.json: the skeleton with a changed second element (see tests/data)."""
+    flow = json.loads(SKELETON_SRC.read_text(encoding="utf-8"))
+    flow["name"] = name
+    flow["flowSettings"]["ExecutionPolicy"] = policy
+    element = flow["allElements"][SLEEP]
+    if element_class is None:
+        element["pars"] = {"Duration": str(sleep_ms), "Unit": "Milliseconds"}
+    else:
+        element["class"] = element_class
+        element["name"] = element_class
+        element["pars"] = {}
+    (flowdir / "Flows" / (name + ".json")).write_text(json.dumps(flow, ensure_ascii=False, indent=2),
+                                                      encoding="utf-8")
+
+
+def subscribe_flow(pipe, flow_id):
+    return observer(pipe, "engine", "flow:" + flow_id)
+
+
+def collect_until(obs, predicate, timeout=10.0):
+    """Returns [(monotonic time, message)] up to and including the first message that satisfies predicate."""
+    got = []
+    for msg in obs.events(timeout=timeout):
+        got.append((time.monotonic(), msg))
+        if predicate(msg):
+            return got
+    raise AssertionError("expected message not received; got %s" % [m["type"] for _, m in got])
+
+
+def element_states(got):
+    """(elementId, state, countRuns, message) of the evt.element.state messages in got."""
+    return [(m["payload"]["elementId"], m["payload"]["state"], m["payload"]["countRuns"],
+             m["payload"].get("message")) for _, m in got if m["type"] == "evt.element.state"]
+
+
+def is_type(type_):
+    return lambda m: m.get("type") == type_
+
+
+def stop_flow(obs, flow_id):
+    return ask(obs, "cmd.flow.stop", {"flowId": flow_id})
+
+
+def check_seq(got):
+    seqs = [m["payload"]["seq"] for _, m in got if "seq" in m.get("payload", {})]
+    assert seqs == sorted(seqs) and len(set(seqs)) == len(seqs), seqs
+    epochs = {m["payload"]["epoch"] for _, m in got if "epoch" in m.get("payload", {})}
+    assert len(epochs) == 1, epochs
+
+
+@pytest.fixture
+def engine(procs, datadir, runs, session_id, pipe, hub, flowdir, storage):
+    """A running engine with the flows of flowdir (write them before using this fixture)."""
+    run = start_engine(procs, flowdir, runs, pipe, session_id)
+    yield run
+    if run.proc.poll() is None:
+        hub.send_to("engine", "sys.shutdown", {"reason": "user", "deadlineMs": 2000})
+        run.wait_exit(timeout=10)
+
+
+def test_start_emits_the_documented_event_order(pipe, flowdir, engine):
+    with subscribe_flow(pipe, "skeleton") as obs:
+        wait_ready(obs)
+        started = ask(obs, "cmd.flow.start", {"flowId": "skeleton"})
+        # The engine sends evt.instance.ended first, then evt.flow.state with executing 0 (PROTOCOL 4.3).
+        got = collect_until(obs, lambda m: m["type"] == "evt.flow.state" and m["payload"]["executing"] == 0)
+    types = [m["type"] for _, m in got if m["type"] != "evt.engine.ready"]
+    assert types[0] == "evt.instance.started" and got[0][1]["payload"]["instanceId"] == started["instanceId"]
+    assert types[-2:] == ["evt.instance.ended", "evt.flow.state"] and got[-2][1]["payload"]["reason"] == "finished"
+    assert element_states(got) == [
+        (TRIGGER, "running", 1, None), (TRIGGER, "finished", 0, None),
+        (SLEEP, "running", 1, None), (SLEEP, "finished", 0, None),
+        (DONE, "running", 1, None), (DONE, "finished", 0, None),
+    ]
+    flow_states = [m["payload"]["executing"] for _, m in got if m["type"] == "evt.flow.state"]
+    assert flow_states == [1, 0]
+    sleep_running = next(t for t, m in got if m["type"] == "evt.element.state" and m["payload"]["elementId"] == SLEEP
+                         and m["payload"]["state"] == "running")
+    sleep_done = next(t for t, m in got if m["type"] == "evt.element.state" and m["payload"]["elementId"] == SLEEP
+                      and m["payload"]["state"] == "finished")
+    assert sleep_done - sleep_running >= 0.18, "Action_Sleep 200 ms finished after %.3f s" % (sleep_done - sleep_running)
+    check_seq(got)
+
+
+def test_stop_during_sleep_ends_the_instance_within_500_ms(pipe, flowdir, engine):
+    make_flow(flowdir, "slow", sleep_ms=5000)
+    with subscribe_flow(pipe, "slow") as obs:
+        wait_ready(obs)
+        ask(obs, "cmd.flow.start", {"flowId": "slow"})
+        collect_until(obs, lambda m: m["type"] == "evt.element.state" and m["payload"]["elementId"] == SLEEP
+                      and m["payload"]["state"] == "running")
+        t0 = time.monotonic()
+        stopped = stop_flow(obs, "slow")
+        got = collect_until(obs, is_type("evt.instance.ended"), timeout=5)
+        elapsed = got[-1][0] - t0
+        assert stopped["stopped"] == 1
+        assert elapsed < 0.5, "instance ended %.3f s after the stop" % elapsed
+        assert got[-1][1]["payload"]["reason"] == "flow.stop"
+        assert element_states(got) == [(SLEEP, "finished", 0, None)]
+        quiet = list(obs.events(timeout=0.4))
+        assert not [m for m in quiet if m["type"] == "evt.element.state"], "no further element may run"
+        snap = ask(obs, "cmd.engine.snapshot")
+        assert not [f for f in snap["flows"] if f["flowId"] == "slow"][0]["executing"]
+
+
+def test_element_exception_is_reported_and_the_engine_keeps_running(pipe, flowdir, engine):
+    make_flow(flowdir, "throw", element_class="Action_TestThrow")
+    with subscribe_flow(pipe, "throw") as obs:
+        wait_ready(obs)
+        ask(obs, "cmd.flow.start", {"flowId": "throw"})
+        got = collect_until(obs, is_type("evt.instance.ended"), timeout=10)
+        assert element_states(got) == [(TRIGGER, "running", 1, None), (TRIGGER, "finished", 0, None),
+                                       (SLEEP, "running", 1, None), (SLEEP, "exception", 0, "test")]
+        assert got[-1][1]["payload"]["reason"] == "exception"
+        again = ask(obs, "cmd.flow.start", {"flowId": "throw"})     # the engine still runs flows
+        assert again["instanceId"]
+        collect_until(obs, is_type("evt.instance.ended"), timeout=10)
+
+
+def test_worker_element_is_reported_as_exception_not_skipped(pipe, flowdir, engine):
+    make_flow(flowdir, "worker", element_class="Action_TestBlockWorker")
+    with subscribe_flow(pipe, "worker") as obs:
+        wait_ready(obs)
+        ask(obs, "cmd.flow.start", {"flowId": "worker"})
+        got = collect_until(obs, is_type("evt.instance.ended"), timeout=10)
+        states = element_states(got)
+        assert states[-1][:2] == (SLEEP, "exception") and "worker not available" in states[-1][3]
+        assert got[-1][1]["payload"]["reason"] == "exception"
+
+
+def test_toggle_starts_and_stops_a_flow(pipe, flowdir, engine):
+    make_flow(flowdir, "slow", sleep_ms=5000)
+    with subscribe_flow(pipe, "slow") as obs:
+        wait_ready(obs)
+        def executing():
+            snap = ask(obs, "cmd.engine.snapshot")
+            return [f["executing"] for f in snap["flows"] if f["flowId"] == "slow"][0]
+
+        assert ask(obs, "cmd.flow.toggle", {"flowId": "slow"})["action"] == "started"
+        assert executing() == 1
+        assert ask(obs, "cmd.flow.toggle", {"flowId": "slow"})["action"] == "stopped"
+        assert executing() == 0
+
+
+def test_enable_and_disable_set_the_flag_and_report_it(pipe, flowdir, engine):
+    with subscribe_flow(pipe, "skeleton") as obs:
+        wait_ready(obs)
+        ask(obs, "cmd.flow.enable", {"flowId": "skeleton"})
+        state = obs.wait_event("evt.flow.state", timeout=5)["payload"]
+        assert state["enabled"] == 1 and state["executing"] == 0
+        assert ask(obs, "cmd.engine.snapshot")["flows"][0]["enabled"] == 1
+        ask(obs, "cmd.flow.disable", {"flowId": "skeleton"})
+        assert obs.wait_event("evt.flow.state", timeout=5)["payload"]["enabled"] == 0
+
+
+@pytest.mark.parametrize("policy", ["parallel", "default"])
+def test_parallel_and_default_policy_start_a_second_instance(pipe, flowdir, engine, policy):
+    make_flow(flowdir, "pol", sleep_ms=5000, policy=policy)
+    with subscribe_flow(pipe, "pol") as obs:
+        wait_ready(obs)
+        first = ask(obs, "cmd.flow.start", {"flowId": "pol"})["instanceId"]
+        second = ask(obs, "cmd.flow.start", {"flowId": "pol"})["instanceId"]
+        assert first != second
+        assert stop_flow(obs, "pol")["stopped"] == 2
+
+
+def test_skip_policy_refuses_a_second_start_with_busy(pipe, flowdir, engine):
+    make_flow(flowdir, "pol", sleep_ms=5000, policy="skip")
+    with subscribe_flow(pipe, "pol") as obs:
+        wait_ready(obs)
+        ask(obs, "cmd.flow.start", {"flowId": "pol"})
+        refused = obs.request("engine", "cmd.flow.start", {"flowId": "pol"}, timeout=5)
+        assert not refused["payload"]["ok"] and refused["payload"]["error"]["code"] == "busy"
+        stop_flow(obs, "pol")
+
+
+def test_wait_policy_is_refused_with_busy_until_it_is_implemented(pipe, flowdir, engine):
+    make_flow(flowdir, "pol", sleep_ms=5000, policy="wait")
+    with subscribe_flow(pipe, "pol") as obs:
+        wait_ready(obs)
+        ask(obs, "cmd.flow.start", {"flowId": "pol"})
+        refused = obs.request("engine", "cmd.flow.start", {"flowId": "pol"}, timeout=5)
+        assert refused["payload"]["error"]["code"] == "busy"
+        stop_flow(obs, "pol")
+
+
+def test_stop_policy_stops_the_running_instance_and_starts_a_new_one(pipe, flowdir, engine):
+    make_flow(flowdir, "pol", sleep_ms=5000, policy="stop")
+    with subscribe_flow(pipe, "pol") as obs:
+        wait_ready(obs)
+        first = ask(obs, "cmd.flow.start", {"flowId": "pol"})["instanceId"]
+        second = ask(obs, "cmd.flow.start", {"flowId": "pol"})["instanceId"]
+        assert first != second
+        ended = collect_until(obs, lambda m: m["type"] == "evt.instance.ended"
+                              and m["payload"]["instanceId"] == first, timeout=5)
+        assert ended[-1][1]["payload"]["reason"] == "policy stop"
+        assert ask(obs, "cmd.engine.snapshot")["flows"][0]["executing"] == 1
+        stop_flow(obs, "pol")
+
+
+def test_invalid_policy_value_is_bad_payload(pipe, flowdir, engine):
+    make_flow(flowdir, "pol", policy="bogus")
+    with subscribe_flow(pipe, "pol") as obs:
+        wait_ready(obs)
+        answer = obs.request("engine", "cmd.flow.start", {"flowId": "pol"}, timeout=5)
+        assert answer["payload"]["error"]["code"] == "bad_payload"
+
+
+def test_shutdown_stops_running_instances_and_says_bye_within_the_deadline(procs, datadir, runs, session_id, pipe,
+                                                                           hub, flowdir, storage):
+    make_flow(flowdir, "slow", sleep_ms=5000)
+    with subscribe_flow(pipe, "slow") as obs:
+        run = start_engine(procs, flowdir, runs, pipe, session_id)
+        wait_ready(obs)
+        ask(obs, "cmd.flow.start", {"flowId": "slow"})
+        collect_until(obs, lambda m: m["type"] == "evt.element.state" and m["payload"]["elementId"] == SLEEP
+                      and m["payload"]["state"] == "running")
+        t0 = time.monotonic()
+        hub.send_to("engine", "sys.shutdown", {"reason": "user", "deadlineMs": 2000})
+        got = collect_until(obs, is_type("evt.instance.ended"), timeout=5)
+        assert got[-1][1]["payload"]["reason"] == "shutdown"
+        bye = hub.wait_received(lambda m: m.get("type") == "sys.bye" and m.get("from") == "engine", timeout=3)
+        assert bye is not None and bye["payload"]["clean"] is not None
+        assert run.wait_exit(timeout=5) == 0, run.stderr_text()
+        elapsed = time.monotonic() - t0
+        assert elapsed < 2.0, "shutdown took %.3f s" % elapsed

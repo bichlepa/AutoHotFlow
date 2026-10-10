@@ -13,6 +13,12 @@
 #Include core\RoleRegistry.ahk
 #Include supervisor\Supervisor.ahk
 #Include engine\Engine.ahk
+#Include elements\skeleton\Trigger_Manual.ahk
+#Include elements\skeleton\Action_Sleep.ahk
+#Include elements\skeleton\Action_Do_nothing.ahk
+#Include elements\skeleton\Action_TestThrow.ahk
+#Include elements\skeleton\Action_TestBlockWorker.ahk
+#Include elements\skeleton\Action_TestHangWorker.ahk
 #Include ..\tests\integration\helpers\EchoRole.ahk
 #Include ..\tests\integration\helpers\CrasherRole.ahk
 #Include ..\tests\integration\helpers\HangerRole.ahk
