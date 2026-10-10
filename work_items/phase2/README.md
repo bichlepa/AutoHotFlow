@@ -86,17 +86,22 @@ class ElementError  extends AhfError
 Log.Configure(sink)              ; sink(level, source, text, flowId) wird aufgerufen
 Log.Write(level, source, text, flowId := "")
 
-; core/ipc/Pipe*.ahk  (WI-04)
-class PipeListener  { __New(pipeName) ; Accept() -> PipeConnection | "" ; Close() }
+; core/ipc/Pipe*.ahk, Frame*.ahk, Wake.ahk  (WI-04, umgesetzt, Abweichungen siehe WI-04 "Ergebnis")
+class PipeListener  { __New(pipeName) ; Accept() -> PipeConnection | "" ; Close() }   ; wirft AhfError, wenn der Name schon bedient wird
 class PipeConnection {
-    static Connect(pipeName, timeoutMs := 3000) -> PipeConnection
-    SendFrame(text) -> bool            ; nie blockierend. false = Warteschlange voll / Peer weg
+    static Connect(pipeName, timeoutMs := 3000) -> PipeConnection   ; wirft AhfTimeoutError; pipeName mit oder ohne \.\pipe\-Praefix
+    SendFrame(text) -> bool            ; nie blockierend. false = Warteschlange voll / Peer weg / geschlossen
     Pump() -> void                     ; liest vorhandene Rahmen, ruft OnFrame/OnClose
     OnFrame := (conn, text) => ...
-    OnClose := (conn, reason) => ...
+    OnClose := (conn, reason) => ...   ; genau einmal; reason: peer_closed | broken | queue_overflow | protocol_error | local
     PeerHwnd := 0                      ; für Wake
+    IsOpen, QueuedBytes, QueuedFrames, CloseReason ; nur lesen
+    maxQueueBytes := 8 MiB, maxQueueFrames := 1000
     Close()
 }
+class Wake { static Install(pumpFn, fallbackMs := 250), Uninstall(), Post(hwnd), Hwnd (= A_ScriptHwnd) }
+class FrameWriter { static Encode(text) -> Buffer }   ; Frame.ahk bindet FrameWriter und FrameReader ein
+class FrameReader { Feed(bufOrPtr, n), Next() -> String | "" }
 
 ; core/ipc/Peer.ahk  (WI-05)
 class Peer {
@@ -126,7 +131,7 @@ Der Supervisor startet sich ohne `--role` oder mit `--role=supervisor`.
 
 ## Fortschritt (Agenten haken ab, wenn ein Paket seine Akzeptanzkriterien erfüllt)
 
-- [ ] WI-01  - [ ] WI-02  - [ ] WI-03  - [ ] WI-04  - [ ] WI-05  - [ ] WI-06
+- [ ] WI-01  - [ ] WI-02  - [ ] WI-03  - [x] WI-04  - [ ] WI-05  - [ ] WI-06
 - [ ] WI-07  - [ ] WI-08  - [ ] WI-09  - [ ] WI-10  - [ ] WI-11  - [ ] WI-12
 - [ ] WI-13  - [ ] WI-14 (optional)  - [ ] WI-15  - [ ] WI-16  - [ ] WI-17
 

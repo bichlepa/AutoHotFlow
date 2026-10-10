@@ -1,0 +1,371 @@
+#Requires AutoHotkey v2.0
+#Include ..\Errors.ahk
+#Include ..\Log.ahk
+#Include ..\Time.ahk
+#Include Frame.ahk
+
+; One end of a named pipe connection (byte mode, overlapped I/O), used by clients and by the hub.
+; Never blocks: reads and writes are overlapped, completion is polled with bWait = false.
+;
+;   conn := PipeConnection.Connect(name, 3000)      ; client side
+;   conn := listener.Accept()                       ; server side (PipeListener)
+;   conn.OnFrame := (conn, text) => ...
+;   conn.OnClose := (conn, reason) => ...           ; once; reason see below
+;   conn.SendFrame(text)  -> true | false
+;   conn.Pump()           ; called on wake and by the fallback timer (see Wake.ahk)
+;
+; Close reasons: "peer_closed" (end of stream, the normal end), "broken" (I/O error),
+; "queue_overflow" (send queue limit hit), "protocol_error" (bad frame header), "local" (Close()).
+class PipeConnection {
+    static WAKE_MESSAGE := 0x8001
+    ; Reads handled in one Pump before it yields (64 KiB each). Bounds the time a busy peer can
+    ; keep the message loop away; the rest is picked up by a follow-up timer.
+    static MAX_READS_PER_PUMP := 64
+    ; Handles whose I/O could not be confirmed as cancelled stay referenced here, so the memory
+    ; the kernel may still write to is never freed.
+    static _graveyard := []
+
+    OnFrame := ""
+    OnClose := ""
+    PeerHwnd := 0
+    maxQueueBytes := 8 * 1024 * 1024
+    maxQueueFrames := 1000
+    handlerErrors := 0
+    ; Name the connection was created with (for log lines).
+    Name := ""
+
+    ; Use PipeConnection.Connect() or PipeListener.Accept(). `handle` is a pipe handle opened with
+    ; FILE_FLAG_OVERLAPPED; the connection owns it from here on.
+    __New(handle, name := "") {
+        this._h := handle
+        this.Name := name
+        this._open := true
+        this._closeReason := ""
+        this._closeNotified := false
+        this._reader := FrameReader()
+        this._readBuf := Buffer(65536)
+        this._readOv := Buffer(4 * 8, 0)
+        this._readEv := DllCall("CreateEventW", "ptr", 0, "int", 1, "int", 0, "ptr", 0, "ptr")
+        NumPut("ptr", this._readEv, this._readOv, 2 * A_PtrSize + 8)   ; OVERLAPPED.hEvent
+        this._readPending := false
+        this._writeOv := Buffer(4 * 8, 0)
+        this._writeEv := DllCall("CreateEventW", "ptr", 0, "int", 1, "int", 0, "ptr", 0, "ptr")
+        NumPut("ptr", this._writeEv, this._writeOv, 2 * A_PtrSize + 8)
+        this._writePending := false
+        this._writeOffset := 0         ; bytes of queue[1] already written
+        this._queue := []              ; frames (Buffer); queue[1] is the one being written
+        this._queueBytes := 0
+        this._pumping := false
+        this._pumpAgain := false
+        this._writing := false
+        this._writeAgain := false
+        this._pollFn := ObjBindMethod(this, "Pump")
+        this._notifyFn := ObjBindMethod(this, "_NotifyClose")
+    }
+
+    IsOpen => this._open
+    QueuedBytes => this._queueBytes
+    QueuedFrames => this._queue.Length
+    CloseReason => this._closeReason
+
+    ; "\\.\pipe\" + name. A name that already has the prefix is returned unchanged.
+    static FullName(name) {
+        bs := Chr(92)
+        prefix := bs bs "." bs "pipe" bs
+        return (SubStr(name, 1, StrLen(prefix)) = prefix) ? name : prefix name
+    }
+
+    ; Opens the client end. Retries while the server does not exist yet (ERROR_FILE_NOT_FOUND) or
+    ; has no free instance (ERROR_PIPE_BUSY), for at most timeoutMs. Does not pump messages: the
+    ; waits are kernel sleeps (DllCall Sleep), not AHK's Sleep. Throws AhfTimeoutError on timeout.
+    static Connect(pipeName, timeoutMs := 3000) {
+        full := PipeConnection.FullName(pipeName)
+        start := Time.NowMs()
+        loop {
+            ; GENERIC_READ|GENERIC_WRITE, no sharing, OPEN_EXISTING, FILE_FLAG_OVERLAPPED
+            h := DllCall("CreateFileW", "str", full, "uint", 0xC0000000, "uint", 0, "ptr", 0
+                , "uint", 3, "uint", 0x40000000, "ptr", 0, "ptr")
+            err := A_LastError
+            if (h != -1 && h != 0)
+                return PipeConnection(h, full)
+            if (err != 2 && err != 231)
+                throw AhfError("PipeConnection.Connect: CreateFileW failed for " full " (error " err ")", ErrCode.INTERNAL)
+            remaining := timeoutMs - (Time.NowMs() - start)
+            if (remaining <= 0)
+                throw AhfTimeoutError("PipeConnection.Connect: " full " not available after " timeoutMs " ms (error " err ")")
+            if (err = 231)
+                DllCall("WaitNamedPipeW", "str", full, "uint", Min(Ceil(remaining), 50))
+            else
+                DllCall("Sleep", "uint", Min(Ceil(remaining), 10))
+        }
+    }
+
+    ; Queues a frame and tries to write at once. Never blocks.
+    ; Returns false if the connection is closed or the queue limit was hit; in the latter case the
+    ; connection is closed with reason "queue_overflow" and OnClose is raised right after the
+    ; current call stack unwinds (not inside this call, so the caller's loop is not re-entered).
+    ; Throws ProtocolError if the text is empty or larger than the frame limit (programming error).
+    SendFrame(text) {
+        if (!this._open)
+            return false
+        frame := FrameWriter.Encode(text)
+        size := frame.Size
+        ; The limit is checked against the backlog that exists before this frame: a frame is
+        ; accepted while the backlog is below maxQueueBytes, so one large frame (up to the 16 MiB
+        ; frame limit) can always be sent, and the queue is bounded by maxQueueBytes + one frame.
+        if (this._queue.Length >= this.maxQueueFrames || this._queueBytes >= this.maxQueueBytes) {
+            this._Fail("queue_overflow", true)
+            return false
+        }
+        this._queue.Push(frame)
+        this._queueBytes += size
+        reason := this._DriveWriteGuarded()
+        if (reason != "") {
+            this._Fail(reason, true)
+            return false
+        }
+        if (this.PeerHwnd != 0)
+            DllCall("PostMessageW", "ptr", this.PeerHwnd, "uint", PipeConnection.WAKE_MESSAGE, "ptr", 0, "ptr", 0)
+        if (this._queue.Length > 0)
+            SetTimer(this._pollFn, -1)
+        return true
+    }
+
+    ; Completes finished reads and writes. Calls OnFrame per complete frame and OnClose once.
+    ; Re-entrant calls (from a handler, or an interrupting wake) only mark "pump again".
+    Pump() {
+        ; Critical only around the guard, so that checking and setting the flag cannot be
+        ; interrupted by another thread (wake message, timer). Restored right away.
+        prev := Critical("On")
+        if (!this._open || this._pumping) {
+            if (this._open)
+                this._pumpAgain := true
+            Critical(prev)
+            return
+        }
+        this._pumping := true
+        Critical(prev)
+        try {
+            loop {
+                this._pumpAgain := false
+                reason := this._PumpRead()
+                if (reason = "" && this._open) {
+                    reason := this._DriveWriteGuarded()
+                }
+                if (reason != "")
+                    this._Fail(reason, false)
+                if (!this._open)
+                    break
+                prev := Critical("On")
+                again := this._pumpAgain
+                if (!again)
+                    this._pumping := false
+                Critical(prev)
+                if (!again)
+                    break
+            }
+        } finally {
+            this._pumping := false
+        }
+        if (this._open && this._queue.Length > 0)
+            SetTimer(this._pollFn, -1)
+    }
+
+    ; Idempotent. Cancels pending I/O, closes the handles, drops queued frames (frames already
+    ; written to the pipe stay readable for the peer) and raises OnClose("local") once.
+    Close() {
+        if (!this._open)
+            return
+        this._Fail("local", false)
+    }
+
+    ; --- internals ---------------------------------------------------------------------------
+
+    ; Reads what has completed. Returns "" or a close reason (not yet applied).
+    _PumpRead() {
+        reads := 0
+        while (this._open) {
+            if (!this._readPending) {
+                reason := this._StartRead()
+                if (reason != "")
+                    return reason
+            }
+            got := 0
+            ok := DllCall("GetOverlappedResult", "ptr", this._h, "ptr", this._readOv, "uint*", &got, "int", 0)
+            err := A_LastError
+            if (!ok) {
+                if (err = 996)              ; ERROR_IO_INCOMPLETE: nothing there yet
+                    return ""
+                this._readPending := false
+                return PipeConnection._ReasonForError(err)
+            }
+            this._readPending := false
+            if (got = 0)                    ; end of stream in byte mode
+                return "peer_closed"
+            this._reader.Feed(this._readBuf, got)
+            try {
+                loop {
+                    text := this._reader.Next()
+                    if (text = "")
+                        break
+                    this._Deliver(text)
+                    if (!this._open)
+                        return ""
+                }
+            } catch ProtocolError as e {
+                Log.Write("a0", "ipc", "protocol error on " this.Name ": " e.Message)
+                return "protocol_error"
+            }
+            reads += 1
+            if (reads >= PipeConnection.MAX_READS_PER_PUMP) {
+                SetTimer(this._pollFn, -1)  ; yield to the message loop, continue right after
+                return ""
+            }
+        }
+        return ""
+    }
+
+    _StartRead() {
+        DllCall("ResetEvent", "ptr", this._readEv)
+        ok := DllCall("ReadFile", "ptr", this._h, "ptr", this._readBuf, "uint", this._readBuf.Size
+            , "ptr", 0, "ptr", this._readOv)
+        err := A_LastError
+        if (!ok && err != 997)              ; ERROR_IO_PENDING is the normal case
+            return PipeConnection._ReasonForError(err)
+        this._readPending := true
+        return ""
+    }
+
+    ; Serialises the write path (SendFrame can be interrupted by a Pump thread and vice versa).
+    _DriveWriteGuarded() {
+        prev := Critical("On")
+        if (this._writing) {
+            this._writeAgain := true
+            Critical(prev)
+            return ""
+        }
+        this._writing := true
+        Critical(prev)
+        reason := ""
+        try {
+            loop {
+                this._writeAgain := false
+                reason := this._DriveWrite()
+                if (reason != "" || !this._open)
+                    break
+                prev := Critical("On")
+                again := this._writeAgain
+                if (!again)
+                    this._writing := false
+                Critical(prev)
+                if (!again)
+                    break
+            }
+        } finally {
+            this._writing := false
+        }
+        return reason
+    }
+
+    ; Writes queued frames while the pipe accepts them. Returns "" or a close reason.
+    _DriveWrite() {
+        while (this._open && this._queue.Length > 0) {
+            buf := this._queue[1]
+            if (!this._writePending) {
+                DllCall("ResetEvent", "ptr", this._writeEv)
+                ok := DllCall("WriteFile", "ptr", this._h, "ptr", buf.Ptr + this._writeOffset
+                    , "uint", buf.Size - this._writeOffset, "ptr", 0, "ptr", this._writeOv)
+                err := A_LastError
+                if (!ok && err != 997)
+                    return PipeConnection._ReasonForError(err)
+                this._writePending := true
+            }
+            n := 0
+            ok := DllCall("GetOverlappedResult", "ptr", this._h, "ptr", this._writeOv, "uint*", &n, "int", 0)
+            err := A_LastError
+            if (!ok) {
+                if (err = 996)              ; still pending: the peer has not read enough yet
+                    return ""
+                this._writePending := false
+                return PipeConnection._ReasonForError(err)
+            }
+            this._writePending := false
+            this._writeOffset += n
+            if (this._writeOffset >= buf.Size) {
+                this._queue.RemoveAt(1)
+                this._queueBytes -= buf.Size
+                this._writeOffset := 0
+            }
+        }
+        return ""
+    }
+
+    ; 109 (broken pipe), 232 (pipe is being closed) and 233 (no process on the other end) mean the
+    ; peer is gone, which is a normal end. Everything else is an I/O error.
+    static _ReasonForError(err) {
+        return (err = 109 || err = 232 || err = 233) ? "peer_closed" : "broken"
+    }
+
+    ; Closes the connection and raises OnClose, immediately or after the current thread.
+    _Fail(reason, deferNotify) {
+        if (!this._open)
+            return
+        this._Teardown(reason)
+        if (deferNotify)
+            SetTimer(this._notifyFn, -1)
+        else
+            this._NotifyClose()
+    }
+
+    _Teardown(reason) {
+        this._open := false
+        this._closeReason := reason
+        SetTimer(this._pollFn, 0)
+        ; Cancel everything that is outstanding on this handle. Buffers must stay valid until the
+        ; kernel has finished with them, so wait (bounded) for the cancelled operations.
+        DllCall("CancelIoEx", "ptr", this._h, "ptr", 0)
+        stuck := false
+        if (this._readPending && DllCall("WaitForSingleObject", "ptr", this._readEv, "uint", 2000) != 0)
+            stuck := true
+        if (this._writePending && DllCall("WaitForSingleObject", "ptr", this._writeEv, "uint", 2000) != 0)
+            stuck := true
+        if (stuck)
+            PipeConnection._graveyard.Push([this._readBuf, this._readOv, this._writeOv, this._queue])
+        DllCall("CloseHandle", "ptr", this._h)
+        DllCall("CloseHandle", "ptr", this._readEv)
+        DllCall("CloseHandle", "ptr", this._writeEv)
+        this._readPending := false
+        this._writePending := false
+        this._queue := []
+        this._queueBytes := 0
+        this._reader.Reset()
+    }
+
+    _NotifyClose() {
+        if (this._closeNotified)
+            return
+        this._closeNotified := true
+        handler := this.OnClose
+        if (!IsObject(handler))
+            return
+        try {
+            handler(this, this._closeReason)
+        } catch as e {
+            this.handlerErrors += 1
+            Log.Write("a0", "ipc", "OnClose handler failed: " Type(e) ": " e.Message)
+        }
+    }
+
+    _Deliver(text) {
+        handler := this.OnFrame
+        if (!IsObject(handler))
+            return
+        try {
+            handler(this, text)
+        } catch as e {
+            ; A failing handler must not stop frame processing or leave the state machine half done.
+            this.handlerErrors += 1
+            Log.Write("a0", "ipc", "OnFrame handler failed: " Type(e) ": " e.Message)
+        }
+    }
+}
