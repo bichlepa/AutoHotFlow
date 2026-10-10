@@ -56,6 +56,8 @@ class Action_Example extends AhfElement {
 
 `TriggerVariables` ersetzt `Element_postTrigger_*`: Es liefert die Thread-Variablen (Name → Wert), die nach dem Ereignis gesetzt werden, und darf keine Seiteneffekte haben (läuft in der Engine, kein I/O).
 
+**Klassen-ID:** Nicht über `cls.Name` lesen. Eine Klasse mit `static Name()` verdeckt die eingebaute Eigenschaft, `cls.Name` ist dann eine Funktion. Die ID liefert `ElementRegistry.IdOf(cls)` (intern `Type(cls())`). Verifiziert in WI-09.
+
 **Registrierung:** Am Dateiende `ElementRegistry.Register(Action_Example)`. Die Registry ist ein `Map` mit `CaseSense := "Off"`. Ein generierter Include-Block pro Rolle (Engine, Editor, Worker, Triggerhost) bindet die Dateien ein, keine Textersetzung zur Laufzeit.
 
 **Parametercontainer:** `params` ist ein Objekt mit case-insensitivem Eigenschaftszugriff (`params.Duration` gleich `params.duration`), wie v1 es nutzt. Variablenablagen dagegen sind `Map` mit `CaseSense := "Off"`, damit Variablennamen wie in v1 groß-/kleinschreibungsunabhängig bleiben und v2-Objekte nicht verwechselt werden.
@@ -70,8 +72,8 @@ class Action_Example extends AhfElement {
 | `ctx.EvalParams(params)` | `x_AutoEvaluateParameters` | gibt ausgewertete Parameter zurück, wirft bei Fehler (kein `_error`) |
 | `ctx.EvalParams(params, skipList)` | mit `p_skipList` | – |
 | `ctx.Finish(result, msg := "")` | `x_finish` | `result`: `normal`, `yes`, `no`, `exception`, `head`, `tail` |
-| `ctx.SetVar(name, value, scope := "")` | `x_SetVariable` | `scope`: `thread`, `loop`, `instance`, `static`, `global`, wie v1 |
-| `ctx.GetVar(name)` | `x_GetVariable` | nur Inline und Trigger-Variablen der Engine. Im Worker nur über `imports` oder `ctx.Request`. |
+| `ctx.SetVar(name, value, scope := "")` | `x_SetVariable` | `scope`: `thread`, `loop`, `instance`, `static`, `global`, wie v1. Phase 2 (WI-09): nur `""`/`thread` und `instance`, andere Scopes werfen `ElementError`. |
+| `ctx.GetVar(name, default := "")` | `x_GetVariable` | Sucht erst im Thread-, dann im Instanz-Scope. Liefert `default`, wenn nicht gesetzt (Phase 2: Parameter `default` ergänzt, WI-09). Im Worker nur über `imports` oder `ctx.Request`. |
 | `ctx.After(ms, fn)` | `x_NewFunctionObject` + `SetTimer` | Timer gehört zur Ausführung, wird bei Stopp/Ende automatisch abgebrochen |
 | `ctx.State` | `x_SetExecutionValue`/`x_GetExecutionValue`, `x_SetTriggerValue`/`x_getTriggerValue` | Objekt pro Ausführung (Run) bzw. pro scharf geschaltetem Trigger |
 | `ctx.Fire(data := "")` | `x_trigger` | nur Trigger. Meldet `evt.trigger.fired` |

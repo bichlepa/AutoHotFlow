@@ -127,7 +127,7 @@ Der Supervisor startet sich ohne `--role` oder mit `--role=supervisor`.
 
 ## Testflow der Phase
 
-`tests/data/skeleton_flow.json` im v1-Format (`Trigger_Manual` → `Action_Sleep` (200 ms) → `Action_Do_nothing`). Wird in WI-10 angelegt. Variante mit Fehler (`Action_TestThrow`) und mit Worker-Blockade (`Action_TestWorkerBlock`) gehören zu WI-09 und WI-15.
+`tests/data/skeleton_flow.json` im v1-Format (`Trigger_Manual` → `Action_Sleep` (200 ms) → `Action_Do_nothing`). Wird in WI-10 angelegt. Variante mit Fehler (`Action_TestThrow`) und mit Worker-Blockade (`Action_TestBlockWorker`) gehören zu WI-09 und WI-15.
 
 ## Fortschritt (Agenten haken ab, wenn ein Paket seine Akzeptanzkriterien erfüllt)
 

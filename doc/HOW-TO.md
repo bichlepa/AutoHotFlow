@@ -148,6 +148,21 @@ Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge kor
 - **Status:** nicht geprüft (nur das Muster mit Kopie ist im Einsatz)
 - **Quelle:** `src/engine/core/Instance.ahk`
 
+### Statische Methode `Name()` verdeckt die `.Name`-Eigenschaft der Klasse
+
+- **Problem:** Die Registry wollte die Klassen-ID aus `cls.Name` lesen. Bei Element-Klassen liefert das eine Funktion (Typ `Func`), nicht den Klassennamen, weil `static Name()` die eingebaute Eigenschaft verdeckt.
+- **Falsch:** `id := cls.Name` für Klassen mit `static Name() => ...`.
+- **Richtig:** Die Klassen-ID als Typ einer Instanz lesen: `Type(cls())` liefert `Action_Sleep`. Elemente haben keinen Konstruktor, der Aufruf ist billig. Siehe `ElementRegistry.IdOf`.
+- **Status:** verifiziert (Probe im Scratchpad: `cls.Name` gibt `Func`, `Type(cls())` gibt den Klassennamen; `tests/ahk/element_registry.test.ahk`, Fall "IdOf gives the class name")
+- **Quelle:** `src/elements/base/ElementRegistry.ahk`
+
+### `static __New()` setzt die Schlüsselschreibweise einer statischen Map
+
+- **Problem:** Eine `static`-Map soll Schlüssel ohne Groß-/Kleinschreibung speichern. Die Einstellung `CaseSense` lässt sich in der Klassenzeile nicht als Anweisung ausführen.
+- **Richtig:** `static __New() { this.classes.CaseSense := "Off" }` läuft beim Laden der Klasse, vor der ersten Nutzung. Danach findet `Has("TRIGGER_MANUAL")` einen Eintrag `Trigger_Manual`.
+- **Status:** verifiziert (Probe im Scratchpad: `Has` case-insensitiv; `tests/ahk/element_registry.test.ahk`, Fall "lookup is case-insensitive")
+- **Quelle:** `src/elements/base/ElementRegistry.ahk`
+
 ## Fehlerbehandlung
 
 ### Statische Methode ist kein OnError-Callback
@@ -339,4 +354,26 @@ _Noch keine Einträge._
 - **Richtig:** In Tabellentests den Zustand direkt setzen, dann `TryTransition` aufrufen und Rückgabe und Zustand prüfen. In Ablauftests nur echte Übergänge verwenden: `finished` → `ready` (Scheduler), dann `ready` → `running` (`Dispatch`), dann `Finish`.
 - **Status:** verifiziert (`ToRunning` in `tests/ahk/engine_states.test.ahk`, `RunElement` in `tests/ahk/engine_scheduler.test.ahk`)
 - **Quelle:** `src/engine/core/Instance.ahk` (`Start`)
+
+### Timer einer Methode: `ObjBindMethod` statt Methodenname
+
+- **Problem:** Ein Element-Kontext plant Timer für seine eigene Methode `_RunTimer`. `SetTimer(this._RunTimer, ...)` ist keine Funktionsreferenz, und ein Timer braucht dieselbe Referenz zum Abschalten.
+- **Falsch:** `SetTimer(this._RunTimer, -100)` (Methode ohne Bindung), oder eine Lambda-Funktion, die später nicht mehr abschaltbar ist, weil man sie nicht aufbewahrt hat.
+- **Richtig:** `timer := ObjBindMethod(this, "_RunTimer", seq)`, die gebundene Funktion speichern und mit genau diesem Objekt `SetTimer(timer, 0)` abschalten (`ExecContext.After`, `CancelTimers`). Die Methode bekommt die Argumente nach `this`.
+- **Status:** verifiziert für die Richtig-Variante (`tests/ahk/element_runner.test.ahk`, Fälle "a timer is cancelled" und "Stop cancels pending timers"). Die Falsch-Variante wurde nicht gesondert ausprobiert. Lambdas mit Zuweisung wie `() => ctx.State.hits += 1` funktionieren (verifiziert).
+- **Quelle:** `src/elements/base/ExecContext.ahk`
+
+### Test-Sleep pumpt Nachrichten, Timer sind dadurch testbar
+
+- **Problem:** Ein Test startet einen Timer und prüft danach, ob er gefeuert hat. Ohne Nachrichtenschleife läuft der Timer nie.
+- **Richtig:** In Testfällen `Sleep(5)` in einer Warteschleife mit Frist verwenden (`WaitUntil` in `element_runner.test.ahk`). Ein Fall "Timer wurde nicht gefeuert" braucht ein festes `Sleep(150)` über die Dauer des Timers hinaus. `Sleep` läuft im Test, die Engine nie so.
+- **Status:** verifiziert (Testläufe der Element-Tests). Eine Verzögerung unter Last ist nicht gemessen; Toleranzen sind großzügig gewählt.
+- **Quelle:** `tests/ahk/element_sleep.test.ahk`, `tests/ahk/element_runner.test.ahk`
+
+### Zwei Schutzmechanismen verdecken einen Ausfall
+
+- **Problem:** Der Test "Timer nach Finish nicht gefeuert" blieb grün, als nur das Abschalten des Timers (`SetTimer(..., 0)`) entfernt war. Der Schutz `if (this.finished) return` in `_RunTimer` hat den Aufruf trotzdem verhindert.
+- **Richtig:** Erst prüfen, ob die Prüfung auf eine Ursache reagiert: Mutation im Scratchpad-Kopie (Repo unverändert). Entfernt man beide Schutzmechanismen, schlägt der Test fehl. Das ist gewollt: die Prüfung misst das sichtbare Verhalten, nicht den Weg dorthin.
+- **Status:** verifiziert (Mutationslauf in einer Kopie, Ergebnis: ein Fehlschlag mit beiden Schutzmechanismen aus)
+- **Quelle:** `src/elements/base/ExecContext.ahk`
 

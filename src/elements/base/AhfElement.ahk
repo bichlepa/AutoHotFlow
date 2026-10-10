@@ -1,0 +1,30 @@
+#Requires AutoHotkey v2.0
+#Include ..\..\core\Errors.ahk
+
+; Base class of every element (doc/ELEMENT-API-V2.md section 2). Elements are stateless: all
+; members are static, the state of one run lives in ctx.State. Subclasses override what they need.
+;
+; Name() and Category() are not defined here on purpose. A subclass defines Name() as a static
+; method, which hides the built-in .Name property of the class object. Use ElementRegistry.IdOf(cls)
+; for the class id.
+class AhfElement {
+    static Mode := "inline"          ; "inline" | "worker" | "trigger" (ARCHITEKTUR 2.3)
+    static Level := "Beginner"       ; "Beginner" | "Advanced" | "Programmer"
+    static Stability := "Stable"     ; "Stable" | "Experimental"
+    static Icon := ""                ; file name under assets/Icons, "" = none
+
+    ; Runtime entry point of inline and worker elements. The base class has no behavior: a class
+    ; that runs without its own Run is a bug and ends the execution with "exception".
+    static Run(ctx, params) {
+        throw ElementError("element does not implement Run")
+    }
+
+    ; Optional abort hook. Timers of ctx are cancelled by ElementRunner.Stop in any case.
+    static Stop(ctx, params) {
+    }
+
+    ; Editor side (not used in Phase 2): parameter schema and form rules.
+    static Parameters(ctx) => []
+    static CheckSettings(form, params, staticValues) {
+    }
+}
