@@ -32,6 +32,7 @@ class StorageStub:
         self._thread = threading.Thread(target=self._serve, name="storage-stub", daemon=True)
         self.list_calls = 0
         self.read_calls = []
+        self.logs = []          # payloads of evt.log.append (noReply), in arrival order
 
     def start(self):
         self._thread.start()
@@ -50,7 +51,9 @@ class StorageStub:
     def _handle(self, msg):
         type_ = msg.get("type")
         payload = msg.get("payload", {})
-        if type_ == "cmd.storage.flows.list":
+        if type_ == "evt.log.append":
+            self.logs.append(payload)
+        elif type_ == "cmd.storage.flows.list":
             self.list_calls += 1
             files = []
             for p in sorted((self.datadir / "Flows").glob("*.json")):
@@ -226,6 +229,16 @@ def collect_until(obs, predicate, timeout=10.0):
     raise AssertionError("expected message not received; got %s" % [m["type"] for _, m in got])
 
 
+def wait_for(predicate, timeout=3.0):
+    """Polls predicate until it returns a true value (log lines arrive on another connection)."""
+    deadline = time.monotonic() + timeout
+    while True:
+        value = predicate()
+        if value or time.monotonic() > deadline:
+            return value
+        time.sleep(0.02)
+
+
 def element_states(got):
     """(elementId, state, countRuns, message) of the evt.element.state messages in got."""
     return [(m["payload"]["elementId"], m["payload"]["state"], m["payload"]["countRuns"],
@@ -302,7 +315,7 @@ def test_stop_during_sleep_ends_the_instance_within_500_ms(pipe, flowdir, engine
         assert not [f for f in snap["flows"] if f["flowId"] == "slow"][0]["executing"]
 
 
-def test_element_exception_is_reported_and_the_engine_keeps_running(pipe, flowdir, engine):
+def test_element_exception_is_reported_and_the_engine_keeps_running(pipe, flowdir, engine, storage):
     make_flow(flowdir, "throw", element_class="Action_TestThrow")
     with subscribe_flow(pipe, "throw") as obs:
         wait_ready(obs)
@@ -311,6 +324,9 @@ def test_element_exception_is_reported_and_the_engine_keeps_running(pipe, flowdi
         assert element_states(got) == [(TRIGGER, "running", 1, None), (TRIGGER, "finished", 0, None),
                                        (SLEEP, "running", 1, None), (SLEEP, "exception", 0, "test")]
         assert got[-1][1]["payload"]["reason"] == "exception"
+        logged = wait_for(lambda: [e for e in storage.logs if e.get("level") == "f0"
+                                   and "unhandled exception in element" in e.get("text", "")])
+        assert logged, storage.logs
         again = ask(obs, "cmd.flow.start", {"flowId": "throw"})     # the engine still runs flows
         assert again["instanceId"]
         collect_until(obs, is_type("evt.instance.ended"), timeout=10)
