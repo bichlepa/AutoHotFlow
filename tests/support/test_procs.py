@@ -41,6 +41,11 @@ def test_suspend_and_resume():
         proc = _sleeper(tracker)
         assert tracker.alive(proc)
         tracker.suspend(proc)
+        # The status follows the thread states with a lag of a few ms (measured: up to ~70 ms in 30 runs
+        # through ProcessTracker), so poll for it instead of checking once.
+        deadline = time.monotonic() + 2.0
+        while psutil.Process(proc.pid).status() != psutil.STATUS_STOPPED and time.monotonic() < deadline:
+            time.sleep(0.01)
         assert psutil.Process(proc.pid).status() == psutil.STATUS_STOPPED
         tracker.resume(proc)
         time.sleep(0.2)
