@@ -32,3 +32,30 @@ Kleine, abhängigkeitsfreie Bausteine in `src/core/`, die jede Rolle braucht.
 ## Hinweise
 
 - Fehler-Klassen nutzen `extends Error`. Beim Werfen `throw AhfTimeoutError("...")`, `code` ist in der Klasse vorbelegt.
+
+## Ergebnis
+
+Stand: WI-03 abgeschlossen, nicht committet. `python -m pytest tests -q` grün (69 passed, 1 skipped), keine AutoHotkey-Prozesse übrig.
+
+Akzeptanzkriterien (verifiziert durch Tests):
+
+- `Ids.Next()`: 100.000 Aufrufe eindeutig und streng aufsteigend (`core_ids.test.ahk`, "100000 ids are unique").
+- `Args.Parse`: `--session=a=b`, `--flag`, `--data=` (leer), Positionsargumente, Großschreibung der Schlüssel, doppelter Schlüssel (letzter gewinnt, Log `a1`), leere Namen werfen `bad_args`. `Args.Require` nennt alle fehlenden Pflichtschlüssel.
+- Fehler: `catch AhfError as e` fängt alle Klassen, `e.code` ist gesetzt (`core_errors.test.ahk`, `core_log.test.ahk`).
+- Kein Datei-, GUI- oder Prozesszugriff in `src/core/` (gelesen; `Time.ahk` nutzt nur `QueryPerformanceCounter`).
+
+Behoben (Ursache):
+
+- `Log.Write` rief die Senke als `this.sink(...)` auf. Dabei wird das Objekt `Log` als zusätzliches erstes Argument übergeben. Freie Funktionen mit vier Parametern bekamen fünf Argumente ("Too many parameters passed to function"), und die Senke lief gar nicht. Fix: Senke in lokale Variable kopieren, dann `sink(...)` aufrufen.
+- `Log.Memory` war eine statische Methode. Als Senke verschob sie ebenfalls die Parameter. Fix: Funktionseigenschaft `static Memory := (...) => ...`. Der Name bleibt, der Vertrag (vier Argumente) bleibt.
+- Die Schreibweise der Fehlerklassen und des Vertrags (`Log.Configure(sink)`, `Log.Write(level, source, text, flowId)`) ist unverändert.
+
+Abweichungen:
+
+- `Log.Memory` ist keine Methode mehr, sondern eine Funktionseigenschaft (siehe oben, mit HOW-TO-Eintrag).
+
+Nicht geprüft / offen:
+
+- `test_msgbox_is_captured_and_closed` (`tests/support/test_dialogwatch.py`, nicht WI-03) war in einer Gesamtsuite einmal im Timeout. Bei Wiederholung grün. Ursache nicht untersucht, siehe HOW-TO (Status vermutet).
+- `doc/HOW-TO.md` hat die Überschrift "Prozesse, Pipes, Nachrichten" doppelt. Nicht angefasst, da außerhalb des Auftrags.
+- Die Checkbox für WI-03 in `work_items/phase2/README.md` ist nicht gesetzt (nicht Teil dieses Auftrags).
