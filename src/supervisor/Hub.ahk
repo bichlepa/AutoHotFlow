@@ -28,11 +28,14 @@
 ;   - Every cmd.* gets an answer (res.*), also when the target is unknown (not_found) or gone (peer_gone).
 ;   - A client whose send queue overflows is removed; the supervisor decides what that means.
 ;   - Nothing blocks: pipe I/O is overlapped and handled in Pump(), requests to clients carry no wait.
-; Requests the supervisor sends itself (Request) get exactly one callback: the answer, or "" when the
-; link is lost first. Request has no timer: a UI that never answers holds its request (see Shutdown).
+; Requests the supervisor sends itself (Request) get exactly one callback: the answer, a synthetic
+; answer {ok:false, error:{code:"timeout"}} when timeoutMs has passed, or "" when the link is lost first.
+; A real answer that comes after the timeout is dropped and counted in droppedAnswers (Peer does the same).
 class Hub {
     static PROTOCOL := 1
     static SUPERVISOR := "supervisor"
+    ; Default deadline of Request. Every request has one: nothing waits without a time limit.
+    static DEFAULT_REQUEST_TIMEOUT_MS := 5000
     ; A pipe connection has this long to say sys.hello, then it is closed.
     static HELLO_TIMEOUT_MS := 5000
     ; Accepts per Pump, so a flood of new clients cannot keep the message loop busy.
@@ -42,6 +45,8 @@ class Hub {
     onLinkLost := ""
     session := ""
     Listener := ""
+    ; Answers that arrived after their request had timed out or ended (or with an unknown corr).
+    droppedAnswers := 0
 
     __New(pipeName, session) {
         this.pipeName := pipeName
@@ -49,7 +54,7 @@ class Hub {
         this._anon := Map()       ; ObjPtr(conn) -> Map("conn", conn, "since", ms)
         this._links := Map()      ; name -> link Map (see _Link)
         this._byConn := Map()     ; ObjPtr(conn) -> name
-        this._pending := Map()    ; request id -> Map("to", name, "cb", fn)
+        this._pending := Map()    ; request id -> Map("to", name, "type", msgType, "cb", fn, "timerFn", fn)
         this._dispatcher := Dispatcher()
         this._dispatcher.On("cmd.topic.", (msg) => this._SetTopic(msg))
         this._pumpFn := () => this.Pump()
@@ -140,24 +145,32 @@ class Hub {
         return this._SendFrame(link, Message(name, Hub.SUPERVISOR, this._NextId(), msgType, payload, corr).Serialize())
     }
 
-    ; Asks a client a cmd.* question. cb(answer) is called exactly once: with the answer message, or with
-    ; "" when the client is gone before it answers. Returns the id.
-    Request(name, msgType, payload, cb) {
+    ; Asks a client a cmd.* question. cb(answer) is called exactly once: with the answer message, with the
+    ; synthetic timeout answer after timeoutMs, or with "" when the client is gone before it answers.
+    ; Returns the id. Throws AhfError (bad_args) for a non-cmd type or a timeoutMs that is not a positive integer.
+    Request(name, msgType, payload, cb, timeoutMs := 5000) {
         if (SubStr(msgType, 1, 4) != "cmd.")
             throw AhfError("Hub.Request: '" msgType "' is not a cmd.* message", ErrCode.BAD_ARGS)
+        if (!IsInteger(timeoutMs) || timeoutMs < 1)
+            throw AhfError("Hub.Request: timeoutMs must be a positive integer", ErrCode.BAD_ARGS)
         id := this._NextId()
         link := this._links.Get(name, "")
-        ; The id is registered before the frame leaves, so the answer (corr = id) always finds its callback.
         ; Not sent: the callback runs on the next message loop turn, never inside the caller.
         if (link = "") {
             SetTimer(() => this._CallBack(cb, ""), -1)
             return id
         }
-        this._pending[id] := Map("to", name, "cb", cb)
-        if (!this._SendFrame(link, Message(name, Hub.SUPERVISOR, id, msgType, payload).Serialize())) {
+        ; The id is registered before the frame leaves, so the answer (corr = id) always finds its callback.
+        ; The timer starts after the frame: a refused frame leaves no timer behind.
+        this._pending[id] := Map("to", name, "type", msgType, "cb", cb, "timerFn", "")
+        if (!this._SendFrame(link, Message(name, Hub.SUPERVISOR, id, msgType, payload, "", timeoutMs).Serialize())) {
             this._pending.Delete(id)
             SetTimer(() => this._CallBack(cb, ""), -1)
+            return id
         }
+        timerFn := () => this._OnTimeout(id)
+        this._pending[id]["timerFn"] := timerFn
+        SetTimer(timerFn, -timeoutMs)
         return id
     }
 
@@ -369,12 +382,34 @@ class Hub {
 
     _Answer(msg) {
         if (msg.corr = "" || !this._pending.Has(msg.corr)) {
-            Log.Write("a1", "hub", "late or unknown answer " msg.type " dropped")
+            this.droppedAnswers += 1
+            Log.Write("a1", "hub", "late or unknown answer " msg.type " dropped (" this.droppedAnswers " so far)")
             return
         }
-        rec := this._pending[msg.corr]
-        this._pending.Delete(msg.corr)
-        this._CallBack(rec["cb"], msg)
+        this._Finish(msg.corr, msg)
+    }
+
+    ; The deadline of a request passed: the callback gets the synthetic answer, a real one comes later and is dropped.
+    _OnTimeout(id) {
+        if (!this._pending.Has(id))
+            return
+        rec := this._pending[id]
+        Log.Write("a1", "hub", "request " rec["type"] " to '" rec["to"] "' timed out, no answer")
+        text := "no answer from '" rec["to"] "' within the request timeout"
+        this._Finish(id, Message(Hub.SUPERVISOR, rec["to"], id, "res." SubStr(rec["type"], 5)
+            , Map("ok", false, "error", Map("code", ErrCode.TIMEOUT, "message", text)), id))
+    }
+
+    ; Removes a request, stops its timer and calls its callback once. Returns false if it was not pending.
+    _Finish(id, answer) {
+        if (!this._pending.Has(id))
+            return false
+        rec := this._pending[id]
+        this._pending.Delete(id)
+        if (IsObject(rec["timerFn"]))
+            SetTimer(rec["timerFn"], 0)
+        this._CallBack(rec["cb"], answer)
+        return true
     }
 
     _CallBack(cb, answer) {
@@ -392,11 +427,8 @@ class Hub {
         for id, rec in this._pending
             if (rec["to"] = name)
                 pendingIds.Push(id)
-        for id in pendingIds {
-            rec := this._pending[id]
-            this._pending.Delete(id)
-            this._CallBack(rec["cb"], "")
-        }
+        for id in pendingIds
+            this._Finish(id, "")
     }
 
     ; Sends text to every client subscribed to topic except `except` (the sender of an event).

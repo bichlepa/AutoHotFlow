@@ -22,6 +22,7 @@
 ;   --start     roles started at once, each one is required (its evt.process.ready is awaited by tests).
 ;   --deadline  total budget of the shutdown in ms (default 5000, sys.shutdown deadlineMs).
 ;   --test-roles  registers the test roles (tests/integration/helpers) and passes the option on.
+;   --prepare-limit  (only with --test-roles) answer limit of cmd.app.prepareExit in ms, default 600000.
 ;
 ; Single instance: a named mutex per session. A second supervisor with the same session sends
 ; cmd.app.command {argv} to the running one and exits (exit 0 = delivered, 1 = no answer).
@@ -56,6 +57,15 @@ class Supervisor {
         this.mutexName := "AHF.supervisor." this.session
         this.data := opts.Get("data", A_AppData "\" Supervisor.DEFAULT_DATA_SUBDIR)
         this.testRoles := opts.Has("test-roles")
+        ; Only with --test-roles: the answer limit of cmd.app.prepareExit (Shutdown.PREPARE_LIMIT_MS) can be
+        ; lowered, so the tests see a timeout in seconds. A product start always uses the constant.
+        this.prepareLimitMs := Shutdown.PREPARE_LIMIT_MS
+        if (this.testRoles && opts.Has("prepare-limit")) {
+            this.prepareLimitMs := this._Integer(opts, "prepare-limit", Shutdown.PREPARE_LIMIT_MS)
+            if (this.prepareLimitMs < Supervisor.MIN_DEADLINE_MS || this.prepareLimitMs > Shutdown.PREPARE_LIMIT_MS)
+                throw AhfError("supervisor: --prepare-limit must be between " Supervisor.MIN_DEADLINE_MS " and "
+                    . Shutdown.PREPARE_LIMIT_MS " ms", ErrCode.BAD_ARGS)
+        }
         this.deadlineMs := this._Integer(opts, "deadline", Supervisor.DEFAULT_DEADLINE_MS)
         if (this.deadlineMs < Supervisor.MIN_DEADLINE_MS || this.deadlineMs > Supervisor.MAX_DEADLINE_MS)
             throw AhfError("supervisor: --deadline must be between " Supervisor.MIN_DEADLINE_MS " and "
@@ -87,6 +97,7 @@ class Supervisor {
         this.children := Children(config, this.hub)
         this.heartbeat := Heartbeat(this.children, this.hub)
         this.shutdown := Shutdown(this.children, this.hub)
+        this.shutdown.prepareLimitMs := this.prepareLimitMs
         this.shutdown.onDone := (code) => this._Finish(code)
         this._Wire()
         this.hub.Start()

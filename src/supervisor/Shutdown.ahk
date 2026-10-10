@@ -7,7 +7,8 @@
 ;
 ; Phase 1, prepare (cancellable, no deadline): cmd.app.prepareExit goes to every connected manager and
 ; editor. Any answer with cancel:true stops the exit (evt.app.exitCancelled, nothing is stopped). A
-; client that disconnects counts as "no cancel". Without an answer the phase waits: the user decides.
+; client that disconnects counts as "no cancel". The phase has no hard deadline, but each request ends:
+; without an answer after PREPARE_LIMIT_MS (10 minutes) the UI counts as "no cancel" (see Hub.Request).
 ;
 ; Phase 2, shutdown (hard deadline): sys.shutdown {reason, deadlineMs} to the children in rank order
 ; (UI first, storage last). A group is done when each child has sent sys.bye or has ended. At the
@@ -24,12 +25,17 @@ class Shutdown {
     static EXIT_CLEAN := 0
     static EXIT_FORCED := 5
     static KILL_WAIT_MS := 1500
+    ; Upper bound for the answers to cmd.app.prepareExit (10 minutes). It is not a hard deadline of the exit
+    ; (ARCHITEKTUR 6.3 has none for phase 1): a UI may take long to decide, but a request must still end.
+    ; When it passes, the UI counts as "no cancel" and the exit goes on. Not sent to the UIs, not a protocol value.
+    static PREPARE_LIMIT_MS := 600000
 
     onDone := ""
 
     __New(children, hub) {
         this.children := children
         this.hub := hub
+        this.prepareLimitMs := Shutdown.PREPARE_LIMIT_MS     ; the supervisor may lower it for tests (--prepare-limit)
         this.phase := "idle"          ; idle | prepare | shutdown | kill | done
         this.gen := 0                 ; identifies the answers of the current prepare round
         this.pending := 0
@@ -58,7 +64,7 @@ class Shutdown {
             return true
         }
         for name in targets
-            this.hub.Request(name, "cmd.app.prepareExit", Map(), this._PrepareCallback(this.gen))
+            this.hub.Request(name, "cmd.app.prepareExit", Map(), this._PrepareCallback(this.gen), this.prepareLimitMs)
         return true
     }
 
@@ -86,7 +92,8 @@ class Shutdown {
 
     _PrepareCallback(gen) => (res) => this._OnPrepare(gen, res)
 
-    ; res is the answer of a UI, or "" when the UI disconnected before it answered.
+    ; res is the answer of a UI, "" when the UI disconnected before it answered, or the synthetic timeout
+    ; answer (ok false): neither of those cancels the exit.
     _OnPrepare(gen, res) {
         if (gen != this.gen || this.phase != "prepare")
             return

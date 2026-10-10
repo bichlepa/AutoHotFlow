@@ -470,3 +470,62 @@ def test_a_manager_can_cancel_the_exit_in_the_prepare_phase(started, session_id)
         watch.stop()
         manager.close()
         py.close()
+
+
+# --- Hub.Request deadline (WI-07 open point) -----------------------------------------------------------
+
+def test_request_without_answer_times_out_and_late_answer_is_dropped(started, session_id):
+    """A UI that never answers cmd.app.prepareExit: the request ends at its limit with a timeout, the exit
+    goes on (a timeout is no cancel), and an answer that comes later is dropped, not counted as a cancel."""
+    limit_ms = 500
+    # the slow child keeps the exit running after the timeout, so a late answer still reaches a live hub
+    sup = started("--start=slow_shutdown:s", "--test-roles", "--prepare-limit=%d" % limit_ms)
+    py = connect(sup.pipe, "py")
+    watch = watch_for(py)
+    manager = connect(sup.pipe, "manager")
+    try:
+        ready = wait_ready(py, ("slow_shutdown:s",))
+        assert ready is not None, sup.text()
+        request_ok(py, "supervisor", "cmd.app.exit", {})
+        request = manager.wait_event("cmd.app.prepareExit", timeout=5)
+        # The timeout must have fired within limit + 0.5 s. The late answer is sent after that point, so it
+        # asks for a cancel while its request has ended. (The hub's stderr lines are not a clock: they
+        # appear in batches, so the test does not time the timeout from the log.) If the timeout had not
+        # fired by then, this answer would count as a real cancel and the assertions below would fail.
+        time.sleep(limit_ms / 1000 + 0.5)
+        manager.reply(request, {"cancel": True})
+        assert sup.wait_exit(timeout=30) == EXIT_OK, sup.text()
+        assert watch.find(event("evt.app.exitCancelled")) == [], sup.text()
+        text = sup.text()
+        assert text.count("timed out") == 1, text
+        assert "late or unknown answer" in text, text
+        exited = watch.find(event("evt.process.exited", name="slow_shutdown:s"))
+        assert exited and exited[0][1]["payload"]["clean"], exited
+    finally:
+        watch.stop()
+        manager.close()
+        py.close()
+
+
+def test_answer_to_a_hub_request_reaches_its_callback_once(started, session_id):
+    """The id of a Hub.Request is registered before the frame leaves, so the real answer finds its
+    callback: the exit goes on at once, long before the limit, and no timeout is logged."""
+    limit_ms = 3000
+    sup = started("--test-roles", "--prepare-limit=%d" % limit_ms)
+    py = connect(sup.pipe, "py")
+    manager = connect(sup.pipe, "manager")
+    try:
+        request_ok(py, "supervisor", "cmd.app.exit", {})
+        request = manager.wait_event("cmd.app.prepareExit", timeout=5)
+        started_at = time.perf_counter()
+        manager.reply(request, {"cancel": False})
+        assert sup.wait_exit(timeout=10) == EXIT_OK, sup.text()
+        elapsed = time.perf_counter() - started_at
+        print("\nprepareExit answered, exit after %.2f s" % elapsed)
+        assert elapsed < limit_ms / 1000, "exit waited for the timeout: %.2f s" % elapsed
+        text = sup.text()
+        assert "timed out" not in text, text
+        assert "late or unknown answer" not in text, text
+    finally:
+        manager.close()
+        py.close()
