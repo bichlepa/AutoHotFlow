@@ -54,12 +54,12 @@ ui_DrawShapeOnScreen(WindowPosx, WindowPosy, WindowWidth, WindowHeight, ControlP
 
 	;Red brush, very transparent
 	pBrushRed := Gdip_BrushCreateSolid("0x10ff0000")
-	
+
 	; Draw a rectangle onto the graphics of the bitmap using the pen just created
 	; Draws the rectangle from coordinates (250,80) a rectangle of 300x200 and outline width of 10 (specified when creating the pen)
 	Gdip_DrawRectangle(G, pPen, ControlPosx, ControlPosy,  ControlWidth,ControlHeight)
 	Gdip_FillRectangle(G, pBrushRed, ControlPosx, ControlPosy, ControlWidth,ControlHeight)
-	
+
 	; Delete the brush as it is no longer needed and wastes memory
 	Gdip_DeletePen(pPen)
 
@@ -78,7 +78,7 @@ ui_DrawShapeOnScreen(WindowPosx, WindowPosy, WindowWidth, WindowHeight, ControlP
 
 	; The graphics may now be deleted
 	Gdip_DeleteGraphics(G)
-	
+
 	;Make window click through
 	WinSet, ExStyle, +0x20, % "ahk_id " hwnd1
 }

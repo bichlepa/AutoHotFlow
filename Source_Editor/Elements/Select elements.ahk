@@ -2,7 +2,7 @@
 SelectOneItem(p_ID, additional := false)
 {
 	_EnterCriticalSection()
-	
+
 	if (not p_ID)
 	{
 		throw exception("Cannot select one item. p_ID is empty")
@@ -12,7 +12,7 @@ SelectOneItem(p_ID, additional := false)
 	{
 		; unselect all elements. Do not call UpdateSelectedItemsList()
 		UnSelectEverything(false)
-		
+
 		; Select one element
 		if p_ID contains connection
 		{
@@ -35,7 +35,7 @@ SelectOneItem(p_ID, additional := false)
 			_setElementInfo(_FlowID, p_ID, "selected", !_getElementInfo(_FlowID, p_ID, "selected"))
 		}
 	}
-	
+
 	UpdateSelectedItemsList()
 
 	_LeaveCriticalSection()
@@ -45,8 +45,8 @@ SelectOneItem(p_ID, additional := false)
 UnSelectEverything(CreateList = true)
 {
 	_EnterCriticalSection()
-	
-	for forIndex, forElementID in _getAllElementIds(_FlowID) 
+
+	for forIndex, forElementID in _getAllElementIds(_FlowID)
 	{
 		_setElementInfo(_FlowID, forElementID, "selected", false)
 	}
@@ -54,10 +54,10 @@ UnSelectEverything(CreateList = true)
 	{
 		_setConnectionInfo(_FlowID, forConnectionID, "selected", false)
 	}
-	
+
 	if (CreateList)
 		UpdateSelectedItemsList()
-	
+
 	_LeaveCriticalSection()
 }
 
@@ -65,7 +65,7 @@ UnSelectEverything(CreateList = true)
 SelectEverything()
 {
 	_EnterCriticalSection()
-	
+
 	;Select all elements
 	for forIndex, forElementID in _getAllElementIds(_FlowID)
 	{
@@ -76,7 +76,7 @@ SelectEverything()
 	{
 		_setConnectionInfo(_FlowID, forConnectionID, "selected", false)
 	}
-	
+
 	UpdateSelectedItemsList()
 
 	_LeaveCriticalSection()
@@ -86,11 +86,11 @@ SelectEverything()
 UpdateSelectedItemsList()
 {
 	_EnterCriticalSection()
-	
+
 	selectedElements := []
 
 	;Add all selected elements into array
-	for forIndex, forElementID in _getAllElementIds(_FlowID) 
+	for forIndex, forElementID in _getAllElementIds(_FlowID)
 	{
 		if (_getElementInfo(_FlowID, forElementID, "selected"))
 			selectedElements[forElementID] := forElementID
@@ -101,7 +101,7 @@ UpdateSelectedItemsList()
 		if (_getConnectionInfo(_FlowID, forConnectionID, "selected"))
 			selectedElements[forConnectionID] := forConnectionID
 	}
-	
+
 	; do we have a single selected element?
 	if (selectedElements.count() = 1)
 	{
@@ -114,7 +114,7 @@ UpdateSelectedItemsList()
 		; we have either none or multiple selected elements. Make variable selectedElement empty
 		_setFlowProperty(_FlowID, "selectedElement", "")
 	}
-	
+
 	; set flow variable selectedElements
 	_setFlowProperty(_FlowID, "selectedElements", selectedElements)
 

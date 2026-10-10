@@ -5,7 +5,7 @@
 ui_disableElementSettingsWindow()
 {
 	global
-	
+
 	gui, GUISettingsOfElement: +disabled
 }
 
@@ -19,7 +19,7 @@ ui_EnableElementSettingsWindow()
 ; get the position of the element settings GUI
 ui_GetElementSettingsGUIPos()
 {
-	global 
+	global
 	WinGetPos, ElementSettingsGUIX, ElementSettingsGUIY, ElementSettingsGUIWidth, ElementSettingsGUIHeight, % "ahk_id " global_SettingWindowParentHWND
 }
 
@@ -30,7 +30,7 @@ class ElementSettingsElementClassSelector
 	{
 		global
 		local forelementIndex, forElementClass, tempElementCategories, forindex, forcategory, tempOneCategory, tempcategoryTV, tempTV
-		
+
 		; save some information about the element which we will need repeadetely
 		this.elementID := p_ElementID
 		this.elementType := _getElementProperty(_FlowID, this.elementID, "type")
@@ -52,14 +52,14 @@ class ElementSettingsElementClassSelector
 		gui, add, Button, w140 X+10 yp gElementClassSelectorCancel,% lang("Cancel")
 		gui, +hwndglobal_SettingWindowHWND
 		global_CurrentlyActiveWindowHWND := global_SettingWindowHWND
-		
+
 		; prepare variables which will contain element data for each TV ID
 		this.TVelementIndex := Object()
 		this.TVelementID := Object()
 		this.TVelementClass := Object()
-		
+
 		AllElementClassInfos := _getShared("AllElementClassInfos")
-		
+
 		; Find all matching element classes and create a list of categories
 		local matchingElementClasses := Object()
 		local allCategories := Object()
@@ -94,7 +94,7 @@ class ElementSettingsElementClassSelector
 				}
 			}
 		}
-		
+
 		if (not matchingElementClasses.MaxIndex() > 0)
 		{
 			throw exception("Internal Error: No matching elements classes found of type: " this.elementType)
@@ -103,14 +103,14 @@ class ElementSettingsElementClassSelector
 		{
 			throw exception("Internal Error: No matching elements categories found of type: " this.elementType)
 		}
-		
+
 		; add all categories to the treeview
 		categoryTVs := object()
-		for forindex, forcategory in allCategories 
+		for forindex, forcategory in allCategories
 		{
 			categoryTVs.push(TV_Add(forcategory))
 		}
-		
+
 		; add all elements to the treeview
 		for forelementIndex, forElementClass in matchingElementClasses
 		{
@@ -136,11 +136,11 @@ class ElementSettingsElementClassSelector
 				this.TVelementClass[tempTV] := forElementClass
 
 				; If current element has already a class, select it
-				if (this.elementClass = forElementClass) 
+				if (this.elementClass = forElementClass)
 					TV_Modify(tempTV)
 			}
 		}
-		
+
 		; Calculate gui position. We want to show the settings window in the middle of the main window
 		gui, show, hide
 		local pos := EditGUIGetPos()
@@ -152,7 +152,7 @@ class ElementSettingsElementClassSelector
 
 		; move gui to the calculated position
 		gui, show, x%tempXpos% y%tempYpos%
-		
+
 		; We have to wait until user closes the window
 		; Wait until this.result is set
 		this.result := ""
@@ -160,7 +160,7 @@ class ElementSettingsElementClassSelector
 		{
 			if (this.result = "")
 				sleep 10
-			else 
+			else
 			{
 				return this.result
 			}
@@ -183,7 +183,7 @@ class ElementSettingsElementClassSelector
 		; get selected TV element
 		gui, ElementClassSelector: default
 		GuiElementChoosedTV := TV_GetSelection()
-		
+
 		; enable button "ok" if a class is selected
 		if (this.TVelementIndex[GuiElementChoosedTV] > 0)
 			GuiControl, enable, ElementClassSelectorOK
@@ -217,7 +217,7 @@ class ElementSettingsElementClassSelector
 		; return if nothing chose. This can happen if user makes a double click on a category
 		if not GuiElementChoosedClass
 			return
-		
+
 		; destroy gui and enable editor gui
 		gui,destroy
 		EditGUIEnable()
@@ -254,8 +254,8 @@ class ElementSettingsConnectionTypeSelector
 {
 	open(p_connectionID)
 	{
-		global 
-		
+		global
+
 		; save some information about the connection which we will need repeadetely
 		this.connectionID := p_connectionID
 
@@ -263,7 +263,7 @@ class ElementSettingsConnectionTypeSelector
 		local setConnectionType := _getConnectionProperty(_FlowID, this.connectionID, "connectionType")
 		local setConnectionFrom := _getConnectionProperty(_FlowID, this.connectionID, "from")
 		local setConnectionFromType := _getElementProperty(_FlowID, setconnectionFrom, "type")
-		
+
 		; disable editor gui
 		EditGUIDisable()
 
@@ -271,7 +271,7 @@ class ElementSettingsConnectionTypeSelector
 		gui, ConnectionTypeSelector: default
 		gui, font, s12
 		gui, add, text, , % lang("Select connection type")
-			
+
 		; depending on the element type from which the connection starts, we need different buttons
 		if (setconnectionFromType = "Condition")
 		{
@@ -279,7 +279,7 @@ class ElementSettingsConnectionTypeSelector
 			gui, add, Button, w100 h50 gConnectionTypeSelectorButton vConnectionTypeSelectorButtonYes default, % lang("Yes")
 			gui, add, Button, w100 h50 X+10 gConnectionTypeSelectorButton vConnectionTypeSelectorButtonNo, % lang("No")
 			gui, add, Button, w100 h50 X+10 gConnectionTypeSelectorButton vConnectionTypeSelectorButtonException, % lang("Exception")
-			
+
 			; if connection type is set, set the corresponding button as default. Otherwise keep "yes" as default
 			if (setConnectionType = "exception")
 			{
@@ -295,14 +295,14 @@ class ElementSettingsConnectionTypeSelector
 			; we have anything else. Add the buttons "exception", "normal"
 			gui, add, Button, w100 h50 gConnectionTypeSelectorButton vConnectionTypeSelectorButtonNormal default, % lang("Normal")
 			gui, add, Button, w100 h50 X+10 gConnectionTypeSelectorButton vConnectionTypeSelectorButtonException, % lang("Exception")
-			
+
 			; if connection type is set, set the corresponding button as default. Otherwise keep "normal" as default
 			if (setConnectionType = "exception")
 			{
 				guicontrol, +default, ConnectionTypeSelectorButtonException
 			}
 		}
-		
+
 		; add a cancel button
 		gui, add, Button, w90 Y+10 gConnectionTypeSelectorButtonCancel, % lang("Cancel")
 
@@ -317,10 +317,10 @@ class ElementSettingsConnectionTypeSelector
 		wingetpos, , , tempWidth, tempHeight, ahk_id %global_SettingWindowHWND%
 		local tempXpos := round(pos.x + pos.w / 2 - tempWidth / 2)
 		local tempYpos := round(pos.y + pos.h / 2 - tempHeight / 2)
-		
+
 		; move gui to the calculated position
 		gui, show, x%tempXpos% y%tempYpos%
-		
+
 		; We have to wait until user closes the window
 		; Wait until this.result is set
 		this.result := ""
@@ -328,13 +328,13 @@ class ElementSettingsConnectionTypeSelector
 		{
 			if (this.result = "")
 				sleep 10
-			else 
+			else
 			{
 				return this.result
 			}
 		}
 	}
-	
+
 	; react if user chooses a connection type
 	ConnectionTypeSelectorButton()
 	{
@@ -358,7 +358,7 @@ class ElementSettingsConnectionTypeSelector
 		; destroy gui and enable editor gui
 		gui,destroy
 		EditGUIEnable()
-		
+
 		; set result
 		this.result:="aborted"
 	}
@@ -394,12 +394,12 @@ class ElementSettingsContainerTypeSelector
 
 		; disable editor gui
 		EditGUIDisable()
-		
+
 		; create gui
 		gui, ContainerTypeSelector: default
 		gui, font ,s12
 		gui, add, text, , % lang("Select_element_type")
-			
+
 		; add the buttons
 		gui, add, Button, w100 h50 gContainerTypeSelectorButton vContainerTypeSelectorButtonAction default, % lang("Action")
 		gui, add, Button, w100 h50 X+10 gContainerTypeSelectorButton vContainerTypeSelectorButtonCondition, % lang("Condition")
@@ -414,7 +414,7 @@ class ElementSettingsContainerTypeSelector
 		{
 			guicontrol, +default, ContainerTypeSelectorButtonLoop
 		}
-		
+
 		; add a cancel button
 		gui,add,Button,w90  Y+10 gContainerTypeSelectorButtonCancel,% lang("Cancel")
 
@@ -429,22 +429,22 @@ class ElementSettingsContainerTypeSelector
 		wingetpos, , , tempWidth, tempHeight, ahk_id %global_SettingWindowHWND%
 		local tempXpos := round(pos.x + pos.w / 2 - tempWidth / 2)
 		local tempYpos := round(pos.y + pos.h / 2 - tempHeight / 2)
-		
+
 		; move gui to the calculated position
 		gui, show, x%tempXpos% y%tempYpos%
-		
+
 		this.result := ""
 		Loop
 		{
 			if (this.result = "")
 				sleep 10
-			else 
+			else
 			{
 				return this.result
 			}
 		}
 	}
-		
+
 	; react if user chooses a element container type
 	ContainerTypeSelectorButton()
 	{
@@ -468,7 +468,7 @@ class ElementSettingsContainerTypeSelector
 		; destroy gui and enable editor gui
 		gui,destroy
 		EditGUIEnable()
-		
+
 		; set result
 		this.result:="aborted"
 	}
@@ -506,7 +506,7 @@ ShouldShowThatElementLevel(elementlevel)
 	{
 		scoreFromSettings := 3
 	}
-	
+
 	; convert level from elementlevel to number
 	if (elementlevel = "Beginner")
 	{
@@ -527,4 +527,3 @@ ShouldShowThatElementLevel(elementlevel)
 	else
 		return False
 }
-

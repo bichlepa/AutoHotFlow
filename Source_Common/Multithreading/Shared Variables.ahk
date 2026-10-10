@@ -5,7 +5,7 @@
 
 criticalSectionCounter := 0
 
-	
+
 ; exit routine inside _EnterCriticalSection:
 ; when the application closes, the main thread informs all threads that they must stop
 ; We have to make sure, that the threads close, while not blocking the critical section (excluding main thread).
@@ -16,7 +16,7 @@ _EnterCriticalSection()
 {
 	global criticalSectionCounter
 	global API_Main_Thread_Stopped_sent
-	
+
 	; if below exit code already executed, do not enter critical section
 	if API_Main_Thread_Stopped_sent
 	{
@@ -33,7 +33,7 @@ _EnterCriticalSection()
 			API_Main_Thread_Stopped(_ahkThreadID)
 		}
 
-		; Leave critical section 
+		; Leave critical section
 		LeaveCriticalSection(_cs_shared)
 		onexit, FinallyExit
 		exitapp ; stop the ahk thread
@@ -46,9 +46,9 @@ _LeaveCriticalSection()
 {
 	global criticalSectionCounter
 	criticalSectionCounter--
-	
+
 	/*
- 	suppress warning of "checkCriticalSection.ahk" with this comment:
+	suppress warning of "checkCriticalSection.ahk" with this comment:
 	EnterCriticalSection(_cs_shared)
 	*/
 
@@ -92,11 +92,11 @@ _setSharedProperty(path, value, clone = true)
     objectPath:=parseObjectPath(_share, path)
 	if (clone)
 	{
-    	objectPath[1][objectPath[2]] := ObjFullyClone(value)
+	objectPath[1][objectPath[2]] := ObjFullyClone(value)
 	}
 	Else
 	{
-    	objectPath[1][objectPath[2]] := value
+	objectPath[1][objectPath[2]] := value
 	}
 	_LeaveCriticalSection()
 }
@@ -207,7 +207,7 @@ _setFlowProperty(FlowID, path, value, clone = true)
 	_EnterCriticalSection()
     objectPath:=parseObjectPath(_flows[FlowID], path)
 	if (clone)
-    	objectPath[1][objectPath[2]] := ObjFullyClone(value)
+	objectPath[1][objectPath[2]] := ObjFullyClone(value)
 	Else
 		objectPath[1][objectPath[2]] := value
 	_LeaveCriticalSection()
@@ -571,9 +571,9 @@ _getInstanceProperty(InstanceID, path, clone = true)
 	_EnterCriticalSection()
     objectPath:=parseObjectPath(_execution.instances[InstanceID], path)
 	if (clone)
-    	value:=ObjFullyClone(objectPath[1][objectPath[2]])
+	value:=ObjFullyClone(objectPath[1][objectPath[2]])
 	Else
-    	value:=objectPath[1][objectPath[2]]
+	value:=objectPath[1][objectPath[2]]
 	_LeaveCriticalSection()
     return value
 }
@@ -582,7 +582,7 @@ _setInstanceProperty(InstanceID, path, value, clone = true)
 	_EnterCriticalSection()
     objectPath:=parseObjectPath(_execution.instances[InstanceID], path)
 	if (clone)
-    	objectPath[1][objectPath[2]] := ObjFullyClone(value)
+	objectPath[1][objectPath[2]] := ObjFullyClone(value)
 	Else
 		objectPath[1][objectPath[2]] := value
 	_LeaveCriticalSection()
@@ -658,7 +658,7 @@ _getThreadProperty(InstanceID, ThreadID, path, clone = true)
 	_EnterCriticalSection()
     objectPath:=parseObjectPath(_execution.instances[InstanceID].threads[ThreadID], path)
 	if (clone)
-    	value:=ObjFullyClone(objectPath[1][objectPath[2]])
+	value:=ObjFullyClone(objectPath[1][objectPath[2]])
 	Else
 		value:=objectPath[1][objectPath[2]]
 	_LeaveCriticalSection()
@@ -669,9 +669,9 @@ _setThreadProperty(InstanceID, ThreadID, path, value, clone = true)
 	_EnterCriticalSection()
     objectPath:=parseObjectPath(_execution.instances[InstanceID].threads[ThreadID], path)
 	if (clone)
-    	objectPath[1][objectPath[2]] := ObjFullyClone(value)
+	objectPath[1][objectPath[2]] := ObjFullyClone(value)
 	Else
-    	objectPath[1][objectPath[2]] := value
+	objectPath[1][objectPath[2]] := value
 	_LeaveCriticalSection()
 }
 _deleteThreadProperty(InstanceID, ThreadID, path)
@@ -745,7 +745,7 @@ _getTriggerProperty(TriggerID, path, clone = true)
 	_EnterCriticalSection()
     objectPath:=parseObjectPath(_execution.Triggers[TriggerID], path)
 	if (clone)
-    	value:=ObjFullyClone(objectPath[1][objectPath[2]])
+	value:=ObjFullyClone(objectPath[1][objectPath[2]])
 	Else
 		value:=objectPath[1][objectPath[2]]
 	_LeaveCriticalSection()
@@ -756,9 +756,9 @@ _setTriggerProperty(TriggerID, path, value, clone = true)
 	_EnterCriticalSection()
     objectPath:=parseObjectPath(_execution.Triggers[TriggerID], path)
 	if (clone)
-    	objectPath[1][objectPath[2]] := ObjFullyClone(value)
+	objectPath[1][objectPath[2]] := ObjFullyClone(value)
 	Else
-    	objectPath[1][objectPath[2]] := value
+	objectPath[1][objectPath[2]] := value
 	_LeaveCriticalSection()
 }
 _existsTrigger(TriggerID)

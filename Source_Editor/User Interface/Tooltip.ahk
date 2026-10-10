@@ -3,7 +3,7 @@
 ToolTip(text = "", duration = 1000)
 {
 	global
-	
+
 	; save tooltip and duration parameters to global variables
 	ToolTip_text := text
 	ToolTip_duration := duration
@@ -15,10 +15,10 @@ ToolTip(text = "", duration = 1000)
 
 	; set up timer which will move the tooltip with mouse
 	SetTimer, Tooltip_follow_mouse, 10
-	
+
 	; set up timer which will disable the tooltip
 	SetTimer, Tooltip_RemoveTooltip, -%ToolTip_duration%
-	
+
 	return
 
 	; timer label which will move the tooltip with mouse
@@ -44,4 +44,3 @@ ToolTip(text = "", duration = 1000)
 	ToolTip
 	return
 }
-

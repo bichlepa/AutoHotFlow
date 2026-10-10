@@ -4,7 +4,7 @@
 API_Execution_ExecuteFlow(p_FlowID, par_TriggerID ="", p_instanceVars = "", p_instanceProperties = "")
 {
 	logger("t2", A_ThisFunc " called from thread", _ahkThreadID)
-	
+
 	_setTask("execution", {name: "ExecuteFlow", flowID: p_FlowID, TriggerID: par_TriggerID, instanceVars: p_instanceVars, instanceProperties: p_instanceProperties})
 }
 
@@ -12,7 +12,7 @@ API_Execution_ExecuteFlow(p_FlowID, par_TriggerID ="", p_instanceVars = "", p_in
 API_Execution_EnableTriggers(p_FlowID)
 {
 	logger("t2", A_ThisFunc " called from thread", _ahkThreadID)
-	
+
 	_setTask("execution", {name: "EnableTriggers", flowID: p_FlowID})
 }
 
@@ -20,7 +20,7 @@ API_Execution_EnableTriggers(p_FlowID)
 API_Execution_StopFlow(p_FlowID)
 {
 	logger("t2", A_ThisFunc " called from thread", _ahkThreadID)
-	
+
 	_setTask("execution", {name: "StopFlow", flowID: p_FlowID})
 }
 
@@ -28,7 +28,7 @@ API_Execution_StopFlow(p_FlowID)
 API_Execution_ExecuteToggleFlow(p_FlowID)
 {
 	logger("t2", A_ThisFunc " called from thread", _ahkThreadID)
-	
+
 	_setTask("execution", {name: "ExecuteToggleFlow", flowID: p_FlowID})
 }
 
@@ -36,7 +36,7 @@ API_Execution_ExecuteToggleFlow(p_FlowID)
 API_Execution_DisableTriggers(p_FlowID)
 {
 	logger("t2", A_ThisFunc " called from thread", _ahkThreadID)
-	
+
 	_setTask("execution", {name: "DisableTriggers", flowID: p_FlowID})
 }
 
@@ -44,7 +44,7 @@ API_Execution_DisableTriggers(p_FlowID)
 API_Execution_enableOneTrigger(par_FlowID, par_TriggerID, par_save = true, par_startup = false)
 {
 	logger("t2", A_ThisFunc " called from thread", _ahkThreadID)
-	
+
 	_setTask("execution", {name: "enableOneTrigger", flowID: par_FlowID, triggerID: par_TriggerID, save: par_save, startup: par_startup})
 }
 
@@ -52,7 +52,7 @@ API_Execution_enableOneTrigger(par_FlowID, par_TriggerID, par_save = true, par_s
 API_Execution_disableOneTrigger(par_FlowID, par_TriggerID, par_save = true)
 {
 	logger("t2", A_ThisFunc " called from thread", _ahkThreadID)
-	
+
 	_setTask("execution", {name: "disableOneTrigger", flowID: par_FlowID, triggerID: par_TriggerID, save: par_save})
 }
 
@@ -60,7 +60,7 @@ API_Execution_disableOneTrigger(par_FlowID, par_TriggerID, par_save = true)
 API_Execution_externaElementFinish(par_UniqueID)
 {
 	logger("t2", A_ThisFunc " called from thread", _ahkThreadID)
-	
+
 	_setTask("execution", {name: "externalElementFinish", uniqueID: par_UniqueID})
 }
 
@@ -68,7 +68,6 @@ API_Execution_externaElementFinish(par_UniqueID)
 API_Execution_externalTrigger(par_UniqueID, par_iteration)
 {
 	logger("t2", A_ThisFunc " called from thread", _ahkThreadID)
-	
+
 	_setTask("execution", {name: "externalTrigger", uniqueID: par_UniqueID, iteration: par_iteration})
 }
-

@@ -11,13 +11,13 @@ state_New(p_FlowID)
 {
 	_EnterCriticalSection()
 	logger("a2", "going to create a new state", p_FlowID)
-	
+
 	; if a new state was created, something was changed. Often the connection list has to be updated
 	UpdateConnectionLists(p_FlowID)
-	
-	; if user did undo some actions, we need to delete all states that would be restored if user wanted to redo 
+
+	; if user did undo some actions, we need to delete all states that would be restored if user wanted to redo
 	states_DeleteNewerThanCurrent(p_FlowID)
-	
+
 	; create a new state ID
 	newState := Object()
 	newState.ID := "state" . format("{1:010u}", _getAndIncrementFlowProperty(p_FlowID, "statesCounter"))
@@ -28,7 +28,7 @@ state_New(p_FlowID)
 
 	; keep only a limited count of states (limited count of possible undo actions)
 	states_DeleteTooOld(p_FlowID)
-	
+
 	_LeaveCriticalSection()
 }
 
@@ -39,7 +39,7 @@ state_Undo(p_FlowID)
 
 	found := false
 	restored := false
-	
+
 	_EnterCriticalSection()
 
 	;Try to find an older state than the current and set it.
@@ -61,7 +61,7 @@ state_Undo(p_FlowID)
 		; we found a state which is older than the current. remember it if next state is the current one
 		previousState := stateid
 	}
-	
+
 	_LeaveCriticalSection()
 }
 
@@ -71,9 +71,9 @@ state_Redo(p_FlowID)
 	logger("a2", "going to perform a redo", p_FlowID)
 
 	_EnterCriticalSection()
-	
+
 	currentState := _getFlowProperty(p_FlowID, "currentState")
-	
+
 	;Try to find a newer state than the current and set it. This is only possible after user has done a redo and did not changed anything yet.
 	assignnext := false
 	for stateIndex, stateID in _getAllFlowPropertyKeys(p_FlowID, "states")
@@ -91,19 +91,19 @@ state_Redo(p_FlowID)
 			; we found the current state in list. The next state (if any) will be restored
 			assignnext := true
 		}
-		
+
 	}
-	
+
 	_LeaveCriticalSection()
 }
 
-; update a state. 
+; update a state.
 ; It will make a full copy of the current flow settings and elements
 states_Update(p_FlowID, p_StateID, p_previousStateID = "")
 {
 	_EnterCriticalSection()
 	logger("a2", "Going to update state  " p_StateID, p_FlowID)
-	
+
 	; get current (resp. previous) state ID
 	currentState := _getFlowProperty(p_FlowID, "currentState")
 
@@ -131,7 +131,7 @@ states_Update(p_FlowID, p_StateID, p_previousStateID = "")
 
 	Settings := _getFlowProperty(p_FlowID, "Settings")
 	_setFlowProperty(p_FlowID, "states." p_StateID ".Settings", Settings, false)
-	
+
 	; save current state
 	_setFlowProperty(p_FlowID, "currentState", p_StateID)
 
@@ -141,7 +141,7 @@ states_Update(p_FlowID, p_StateID, p_previousStateID = "")
 		logger("a3", "updating state: Going to reenable changed trigger " oneelementID, p_FlowID)
 		enableOneTrigger(p_FlowID, oneelementID, false)
 	}
-	
+
 	_LeaveCriticalSection()
 }
 
@@ -151,7 +151,7 @@ states_Restore(p_FlowID, p_StateID)
 {
 	_EnterCriticalSection()
 	logger("a2", "Going to restore state  " p_StateID, p_FlowID)
-	
+
 	; get current (resp. previous) state ID
 	currentState := _getFlowProperty(p_FlowID, "currentState")
 
@@ -165,12 +165,12 @@ states_Restore(p_FlowID, p_StateID)
 		; disable one trigger. Do not save the disabled state
 		disableOneTrigger(p_FlowID, oneelementID, false)
 	}
-	
+
 	; copy all elements, connections and settings. Keep the info property in each element
 	allElements := _getFlowProperty(p_FlowID, "states." p_StateID ".allElements")
 	for oneElementID, oneElement in allElements
 	{
-		; copy info property from current element 
+		; copy info property from current element
 		oneElement.info := _getElementProperty(p_FlowID, oneElementID, "info")
 		if not (oneElement.info)
 		{
@@ -183,7 +183,7 @@ states_Restore(p_FlowID, p_StateID)
 	_setFlowProperty(p_FlowID, "allConnections", allConnections, false)
 	Settings := _getFlowProperty(p_FlowID, "states." p_StateID ".Settings")
 	_setFlowProperty(p_FlowID, "Settings", Settings, false)
-	
+
 	; save current state
 	_setFlowProperty(p_FlowID, "currentState", p_StateID)
 
@@ -193,7 +193,7 @@ states_Restore(p_FlowID, p_StateID)
 		logger("a3", "restoring state: Going to reenable changed trigger " oneelementID, p_FlowID)
 		enableOneTrigger(p_FlowID, oneelementID, false)
 	}
-	
+
 	; After an undo or redo, update information about selected elements and connections
 	selectedElements := _getFlowProperty(p_FlowID,  "selectedElements")
 	allElementIDs := _getAllElementIds(p_FlowID)
@@ -220,7 +220,7 @@ states_Restore(p_FlowID, p_StateID)
 			_setConnectionInfo(p_FlowID, forConnectionID, "selected", False)
 		}
 	}
-	
+
 	_LeaveCriticalSection()
 }
 
@@ -228,7 +228,7 @@ states_Restore(p_FlowID, p_StateID)
 state_RestoreCurrent(p_FlowID)
 {
 	_EnterCriticalSection()
-	
+
 	; get current state ID
 	currentState := _getFlowProperty(p_FlowID, "currentState")
 
@@ -236,7 +236,7 @@ state_RestoreCurrent(p_FlowID)
 
 	; restore current state
 	states_Restore(p_FlowID, currentState)
-	
+
 	_LeaveCriticalSection()
 }
 
@@ -245,7 +245,7 @@ state_RestoreCurrent(p_FlowID)
 states_DeleteNewerThanCurrent(p_FlowID)
 {
 	_EnterCriticalSection()
-	
+
 	; get current state ID
 	currentState := _getFlowProperty(p_FlowID, "currentState")
 
@@ -266,7 +266,7 @@ states_DeleteNewerThanCurrent(p_FlowID)
 			found := true
 		}
 	}
-	
+
 	_LeaveCriticalSection()
 }
 
@@ -288,15 +288,15 @@ states_DeleteTooOld(p_FlowID)
 			_deleteFlowProperty(p_FlowID, "states." allStateIds[a_index])
 		}
 	}
-	
+
 	_LeaveCriticalSection()
 }
 
-; find triggers which are enabled and which will have changes between the defined state and the working copy of the flow 
+; find triggers which are enabled and which will have changes between the defined state and the working copy of the flow
 findEnabledTriggersWhichHaveBeenChanged(p_FlowID, p_StateID)
 {
 	_EnterCriticalSection()
-	
+
 	; initialize return value
 	changedTriggers := Object()
 
@@ -320,7 +320,7 @@ findEnabledTriggersWhichHaveBeenChanged(p_FlowID, p_StateID)
 
 				; find differences in the element parameters
 				differenceFound := !ObjFullyCompare_oneDir(elementClass, elementInStatePars)
-				
+
 				; also check whether if element class was changed
 				if (elementClass != elementInStateClass)
 				{
@@ -336,8 +336,8 @@ findEnabledTriggersWhichHaveBeenChanged(p_FlowID, p_StateID)
 			}
 		}
 	}
-	
+
 	_LeaveCriticalSection()
-	
+
 	return changedTriggers
 }

@@ -106,7 +106,7 @@ queryTasks()
 		if (oneTask)
 		{
 			name:=oneTask.name
-			
+
 			if (name = "ExecuteFlow")
 			{
 				; a flow should be started

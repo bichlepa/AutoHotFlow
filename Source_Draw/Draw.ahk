@@ -65,7 +65,7 @@ drawTask()
 	Loop
 	{
 		_EnterCriticalSection()
-		
+
 		; Find a flow which editor gui must be redrawn
 		somethingdrawn:= false
 		flowParamsCloned:=""
@@ -78,22 +78,22 @@ drawTask()
 			{
 				; we found a flow
 				_setFlowProperty(FlowID, "draw.mustDraw", false)
-				
+
 				; get all flow properties
 				flow:=_getFlowWithoutStates(flowID)
 				break
 			}
 		}
-		
+
 		_LeaveCriticalSection()
-		
+
 		if flow
 		{
 			; redraw the editor gui
 			gdip_DrawEverything(flow)
 			somethingdrawn:=true
 		}
-		
+
 		if (somethingdrawn = false)
 		{
 			; nothing to do, we can let the cpu chill a while

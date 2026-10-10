@@ -4,6 +4,6 @@
 API_Draw_Draw(p_FlowID)
 {
 	logger("t3", A_ThisFunc " called from thread", _ahkThreadID)
-	
+
 	_setFlowProperty(p_FlowID, "draw.mustDraw", true)
 }

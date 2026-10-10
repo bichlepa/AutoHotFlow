@@ -11,7 +11,7 @@ if a_iscompiled
 else
 {
 	; if not compiled, add a delimiter
-	;Menu, tray, add	
+	;Menu, tray, add
 }
 
 ; add entry to show manager gui and set it to default (action on double click)
@@ -30,7 +30,7 @@ if (not _settings.developing)
 ; Set tooltip of tray icon
 Menu, tray, tip, % "AutoHotFlow"
 
-; user wants to open the manager gui 
+; user wants to open the manager gui
 onTrayMenuShowManagerGUI()
 {
 	API_Manager_ShowWindow()

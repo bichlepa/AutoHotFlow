@@ -5,7 +5,7 @@ global global_ThreadIdCounter := 0
 ; p_Environment: Environment data like Flow ID and element ID
 ; p_instanceVars: list of instance variables which should be set at the beginning
 ; p_instanceProperties: instance properties, which will be set
-; p_dataForPostTrigger: data which will be passed to the Element_postTrigger_...() function 
+; p_dataForPostTrigger: data which will be passed to the Element_postTrigger_...() function
 newInstance(p_Environment, p_instanceVars = "", p_instanceProperties = "", p_dataForPostTrigger = "")
 {
 	_EnterCriticalSection()
@@ -27,7 +27,7 @@ newInstance(p_Environment, p_instanceVars = "", p_instanceProperties = "", p_dat
 			; we will skip the current instance (effencively ignore this call)
 			logger("f1", "Execution of flow '" _getFlowProperty(p_Environment.FlowID, "name") "' skipped, due to flow execution policy")
 			skipped := true
-			
+
 		}
 		else if (ExecutionPolicy = "stop")
 		{
@@ -40,7 +40,7 @@ newInstance(p_Environment, p_instanceVars = "", p_instanceProperties = "", p_dat
 			; we will start a new one
 		}
 	}
-	
+
 	if (not skipped)
 	{
 		;Search for the matching trigger element
@@ -61,11 +61,11 @@ newInstance(p_Environment, p_instanceVars = "", p_instanceProperties = "", p_dat
 			newInstance.InstanceVars := Object()
 			newInstance.InstanceVarsHidden := Object()
 			_setInstance(newInstanceId, newInstance)
-			
+
 			; create a first thread
 			newThreadID := newThread(newInstanceId)
 			_setThreadProperty(newInstanceId, newThreadID, "ElementID", oneElementID)
-			
+
 			; We may need to import some instance variables
 			if (p_instanceVars)
 			{
@@ -74,7 +74,7 @@ newInstance(p_Environment, p_instanceVars = "", p_instanceProperties = "", p_dat
 					InstanceVariable_Set({instanceID: newInstanceId, threadID: newThreadID}, onevarName, oneValue)
 				}
 			}
-			
+
 			; We may need to import some variables
 			if (p_instanceProperties)
 			{
@@ -83,14 +83,14 @@ newInstance(p_Environment, p_instanceVars = "", p_instanceProperties = "", p_dat
 					_setInstanceProperty(newInstanceId, onevarName, oneValue, false)
 				}
 			}
-			
+
 			; to start the execution of elements which are connected to the trigger, we will reuse code which is executed when an element finishes it execution.
 			finishExecutionOfElement(newInstanceId, newThreadID, "Normal")
 
 			; set some thread variable with informations about the trigger event
 			ThreadVariable_Set({instanceID: newInstanceId, threadID: newThreadID}, "A_TriggerTime", a_now)
 			ThreadVariable_Set({instanceID: newInstanceId, threadID: newThreadID}, "A_TriggerID", p_Environment.ElementID)
-			
+
 			; some triggers have functions which must be called after a thread has started.
 			; it is usually used to set some thread variables which contain some additional informations of the trigger event
 			ElementClass := _getElementProperty(p_Environment.FlowID, p_Environment.ElementID, "class")
@@ -99,7 +99,7 @@ newInstance(p_Environment, p_instanceVars = "", p_instanceProperties = "", p_dat
 				elementParams := _getElementProperty(p_Environment.FlowID, p_Environment.ElementID, "pars")
 				Element_postTrigger_%ElementClass%({instanceID: newInstanceId, threadID: newThreadID}, elementParams, p_dataForPostTrigger)
 			}
-			
+
 			; updates the "executing" property of the flow
 			updateFlowExcutingStates()
 		}
@@ -149,14 +149,14 @@ ExecuteFlow(p_FlowID, p_TriggerID ="", p_instanceVars = "", p_instanceProperties
 		environment.elementID := p_TriggerID
 		newInstance(environment, p_instanceVars, p_instanceProperties)
 	}
-	
+
 	_LeaveCriticalSection()
-	
+
 	if not p_TriggerID
 	{
 		; we have no trigger ID. Probably because user tried manually to execute a trigger which has no manual trigger
 		logger("F0", lang("There is no default manual trigger available"), _getFlowProperty(oneThreadFlowID, "Name"), true)
-	}	
+	}
 	return
 }
 
@@ -165,7 +165,7 @@ ExecuteFlow(p_FlowID, p_TriggerID ="", p_instanceVars = "", p_instanceProperties
 stopFlow(p_FlowID)
 {
 	_EnterCriticalSection()
-	
+
 	; loop through all instances
 	InstanceIDs := _getAllInstanceIds()
 	for OneInstanceIndex, OneInstanceID in InstanceIDs
@@ -204,7 +204,7 @@ executeToggleFlow(p_FlowID)
 		; flow is not running. start a new instance
 		ExecuteFlow(p_FlowID)
 	}
-	
+
 	_LeaveCriticalSection()
 }
 
@@ -232,7 +232,7 @@ newThread(p_InstanceID, p_ToCloneFromThreadID ="")
 		newThread.InstanceID :=p_InstanceID
 		newThread.FlowID := _getInstanceProperty(p_InstanceID, "FlowID")
 		newThread.State := "finished" ;This means, the execution of the trigger has finished
-		
+
 		newThread.ElementPars := Object()
 		newThread.Result := "Normal"
 		newThread.threadVars := Object()
@@ -242,7 +242,7 @@ newThread(p_InstanceID, p_ToCloneFromThreadID ="")
 		newThread.loopVarsStack := Object()
 		newThread.loopVarsStackHidden := Object()
 	}
-	
+
 	; add the thread to the instance
 	_setThread(p_InstanceID, newThread.id, newThread)
 
@@ -280,7 +280,7 @@ removeInstance(p_instanceID)
 	{
 		%tempCallBackfunc%("finished", _getInstanceProperty(p_InstanceID, "InstanceVars"))
 	}
-	
+
 	; delete the instance
 	_deleteInstance(p_instanceID)
 	updateFlowExcutingStates()

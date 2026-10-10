@@ -12,10 +12,10 @@ if not fileexist(_WorkingDir "\Variables")
 StaticVariable_Set(Environment, p_Name, p_Value, p_hidden = False)
 {
 	_EnterCriticalSection()
-	
+
 	if (p_hidden)
 		throw exception("unexpected error! It is not possible to set a hidden static variable!")
-	
+
 	; calculate path of the variable
 	path := _WorkingDir "\Variables\" Environment.flowID
 
@@ -33,7 +33,7 @@ StaticVariable_Set(Environment, p_Name, p_Value, p_hidden = False)
 	else
 		content.type :="normal"
 	FileAppend, % Jxon_Dump(content, 2), % path "\" p_Name ".ahfvd"
-	
+
 	; write variable content in a file
 	if isobject(p_value)
 	{
@@ -43,7 +43,7 @@ StaticVariable_Set(Environment, p_Name, p_Value, p_hidden = False)
 	{
 		FileAppend, % p_Value, % path "\" p_Name ".ahfvar"
 	}
-	
+
 	_LeaveCriticalSection()
 }
 
@@ -52,17 +52,17 @@ StaticVariable_Set(Environment, p_Name, p_Value, p_hidden = False)
 GlobalVariable_Set(Environment, p_Name, p_Value, p_hidden = False)
 {
 	_EnterCriticalSection()
-	
+
 	if (p_hidden)
 		throw exception("unexpected error! It is not possible to set a hidden global variable!")
-	
+
 	; calculate path of the variable
 	path := _WorkingDir "\Variables"
-	
+
 	; delete old variable files, if exist
 	FileDelete,% path "\" p_Name ".ahfvd"
 	FileDelete,% path "\" p_Name ".ahfvar"
-	
+
 	; write metadata of variable in a file
 	content := {name: p_Name}
 	if isobject(p_value)
@@ -70,7 +70,7 @@ GlobalVariable_Set(Environment, p_Name, p_Value, p_hidden = False)
 	else
 		content.type :="normal"
 	FileAppend, % Jxon_Dump(content, 2), % path "\" p_Name ".ahfvd"
-	
+
 	; write variable content in a file
 	if isobject(p_value)
 	{
@@ -80,7 +80,7 @@ GlobalVariable_Set(Environment, p_Name, p_Value, p_hidden = False)
 	{
 		FileAppend, % p_Value, % path "\" p_Name ".ahfvar"
 	}
-	
+
 	_LeaveCriticalSection()
 }
 
@@ -89,10 +89,10 @@ GlobalVariable_Set(Environment, p_Name, p_Value, p_hidden = False)
 StaticVariable_Get(Environment, p_Name, p_hidden = False)
 {
 	_EnterCriticalSection()
-	
+
 	if (p_hidden)
 		throw exception("unexpected error! There are no hidden static variables!")
-	
+
 	; calculate path of the variable
 	path := _WorkingDir "\Variables\" Environment.flowID
 
@@ -103,7 +103,7 @@ StaticVariable_Get(Environment, p_Name, p_hidden = False)
 	{
 		logger("f0", "error getting static variable type of " p_Name)
 	}
-	else 
+	else
 	{
 		; read variable content from file
 		FileRead,varcontent, % path "\" p_Name ".ahfvar"
@@ -116,9 +116,9 @@ StaticVariable_Get(Environment, p_Name, p_hidden = False)
 			retval := varcontent
 		}
 	}
-	
+
 	_LeaveCriticalSection()
-	
+
 	return retval
 }
 
@@ -126,10 +126,10 @@ StaticVariable_Get(Environment, p_Name, p_hidden = False)
 GlobalVariable_Get(Environment,p_Name, p_hidden = False)
 {
 	_EnterCriticalSection()
-	
+
 	if (p_hidden)
 		throw exception("unexpected error! There are no hidden global variables!")
-	
+
 	; calculate path of the variable
 	path := _WorkingDir "\Variables"
 
@@ -141,7 +141,7 @@ GlobalVariable_Get(Environment,p_Name, p_hidden = False)
 	{
 		logger("f0", "error getting global variable type of " p_Name)
 	}
-	else 
+	else
 	{
 		; read variable content from file
 		FileRead,varcontent, % path "\" p_Name ".ahfvar"
@@ -154,9 +154,9 @@ GlobalVariable_Get(Environment,p_Name, p_hidden = False)
 			retval:= varcontent
 		}
 	}
-	
+
 	_LeaveCriticalSection()
-	
+
 	return retval
 }
 
@@ -167,16 +167,16 @@ BuiltInVariable_Get(Environment, p_Name, p_hidden = False)
 		throw exception("unexpected error! There are no hidden built-in variables!")
 
 	;If no thread and loop variable found, try to find a built in variable if (p_Name="A_YWeek") ;Separate the week.
-	if (p_Name = "A_YWeek") 
+	if (p_Name = "A_YWeek")
 	{
 		;Separate the week.
 		StringRight, tempvalue, A_YWeek, 2
 		return tempvalue
 	}
-	else if (p_Name = "A_LanguageName") 
+	else if (p_Name = "A_LanguageName")
 	{
 		tempvalue:= ;GetLanguageNameFromCode(A_Language) ;;TODO: Uncomment
-		
+
 		return tempvalue
 	}
 	else if (p_Name = "a_workingdir")
@@ -216,7 +216,7 @@ BuiltInVariable_Get(Environment, p_Name, p_hidden = False)
 	;~ else if (p_Name="a_OSInstallDate")
 	;~ {
 		;~ if p_Type=Normal
-			;~ return convertVariable(OSInstallDate(),"date","`n") 
+			;~ return convertVariable(OSInstallDate(),"date","`n")
 		;~ else
 		;~ {
 			;~ return OSInstallDate()
@@ -250,33 +250,33 @@ BuiltInVariable_Get(Environment, p_Name, p_hidden = False)
 	}
 }
 
-; delete static variable 
+; delete static variable
 StaticVariable_Delete(Environment, p_Name)
 {
 	_EnterCriticalSection()
-	
+
 	; calculate path of the variable
 	path := _WorkingDir "\Variables\" Environment.flowID
-	
+
 	; delete variable files, if exist
 	FileDelete,% path "\" p_Name ".ahfvd"
 	FileDelete,% path "\" p_Name ".ahfvar"
-	
+
 	_LeaveCriticalSection()
 }
 
-; delete global variable 
+; delete global variable
 GlobalVariable_Delete(Environment, p_Name)
 {
 	_EnterCriticalSection()
-	
+
 	; calculate path of the variable
 	path := _WorkingDir "\Variables"
-	
+
 	; delete variable files, if exist
 	FileDelete,% path "\" p_Name ".ahfvd"
 	FileDelete,% path "\" p_Name ".ahfvar"
-	
+
 	_LeaveCriticalSection()
 }
 
@@ -284,7 +284,7 @@ GlobalVariable_Delete(Environment, p_Name)
 Var_GetListOfStaticVars(environment)
 {
 	_EnterCriticalSection()
-	
+
 	; prepare list, which will contain the variable names
 	retobject := Object()
 
@@ -297,9 +297,9 @@ Var_GetListOfStaticVars(environment)
 		StringReplace, varname, a_loopfilename, .ahfvd
 		retobject.push(varname)
 	}
-	
+
 	_LeaveCriticalSection()
-	
+
 	return retobject
 }
 
@@ -307,10 +307,10 @@ Var_GetListOfStaticVars(environment)
 Var_GetListOfGlobalVars(environment)
 {
 	_EnterCriticalSection()
-	
+
 	; prepare list, which will contain the variable names
 	retobject := Object()
-	
+
 	; calculate path of the variables
 	path := _WorkingDir "\Variables"
 
@@ -320,9 +320,9 @@ Var_GetListOfGlobalVars(environment)
 		StringReplace, varname, a_loopfilename, .ahfvd
 		retobject.push(varname)
 	}
-	
+
 	_LeaveCriticalSection()
-	
+
 	return retobject
 }
 
@@ -331,7 +331,7 @@ Var_GetListOfGlobalVars(environment)
 Var_GetListOfAllVars_Common(environment)
 {
 	_EnterCriticalSection()
-	
+
 	; prepare list, which will contain the variable names
 	retobject := Object()
 
@@ -347,9 +347,9 @@ Var_GetListOfAllVars_Common(environment)
 	{
 		retobject.push(varname)
 	}
-	
+
 	_LeaveCriticalSection()
-	
+
 	return retobject
 }
 
@@ -408,7 +408,7 @@ Var_GetLocation_Common(Environment, p_Name, p_hidden=False)
 		{
 			; search for a static variable with that name
 			if fileexist(_WorkingDir "\Variables\"  Environment.flowID "\" p_Name ".ahfvd")
-			{		
+			{
 				return "static"
 			}
 		}
@@ -436,7 +436,7 @@ Var_Set_Common(Environment, p_Name, p_Value, p_Destination="", p_hidden=False)
 		return
 	}
 	; else variable name is valid
-	
+
 	; get the destination of the variable (and also check whether it is allowed to set it)
 	destination := Var_RetrieveDestination_Common(p_Name, p_Destination)
 
@@ -452,7 +452,7 @@ Var_Set_Common(Environment, p_Name, p_Value, p_Destination="", p_hidden=False)
 	}
 	else
 	{
-		; there was an error or destination is 
+		; there was an error or destination is
 		if (destination = "error_noPermission")
 		{
 			logger("f0","Setting variable '" p_Name "' failed. No permission.", Environment.flowID)
@@ -474,10 +474,10 @@ Var_Get_Common(environment, p_Name, p_hidden = False)
 	{
 		throw exception("p_Name is an object")
 	}
-	
+
 	; get the location of the variable and check whether it exists
 	varLocation := Var_GetLocation_Common(Environment, p_Name, p_hidden)
-	
+
 	if (varLocation)
 	{
 		; variable exists. Get the value
@@ -485,7 +485,7 @@ Var_Get_Common(environment, p_Name, p_hidden = False)
 		{
 			throw exception("function ''" varLocation "Variable_Get' does not exist")
 		}
-		
+
 		logger("f3","Retrieving " varLocation " variable '" p_Name "'", Environment.flowID)
 		tempVar := %varLocation%Variable_Get(environment, p_Name, p_hidden)
 		return tempVar
@@ -510,10 +510,10 @@ Var_GetType_Common(Environment, p_Name, p_hidden = False)
 		{
 			throw exception("function ''" varLocation "Variable_Get' does not exist")
 		}
-		
+
 		; get variable value
 		variable := %varLocation%Variable_Get(Environment, p_Name, p_hidden)
-		
+
 		; check the type of variable
 		if IsObject(variable)
 		{
@@ -605,7 +605,7 @@ Var_replaceVariables_Common(environment, p_String, pars = "")
 	{
 		; find first variable name in the string which is encased in percent signs. Write found variable name
 		tempFoundPos := RegExMatch(p_String, "SU).*%(.+)%.*", tempFoundVarName)
-		
+
 		; break, if we didn't find a string
 		if (tempFoundPos = 0)
 			break
@@ -620,11 +620,11 @@ Var_replaceVariables_Common(environment, p_String, pars = "")
 			IfInString, pars, ConvertObjectToString
 				tempVarValue := Jxon_Dump(tempVarValue)
 		}
-		
+
 		; replace the found variable in string
 		StringReplace, tempstring, tempstring, `%%tempFoundVarName1%`%, % tempVarValue
 		StringReplace, p_String, p_String, `%%tempFoundVarName1%`%, _
 	}
 
-	return tempstring 
+	return tempstring
 }

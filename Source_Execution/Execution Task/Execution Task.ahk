@@ -9,7 +9,7 @@ executionTask()
 
 	; this variable will contain the elements which are ready to be executed
 	ExecutionNextTasks := Object()
-	
+
 	Loop
 	{
 		_EnterCriticalSection()
@@ -22,18 +22,18 @@ executionTask()
 		for OneInstanceIndex, OneInstanceID in instances
 		{
 			OneInstance := _getInstance(OneInstanceID)
-			
+
 			;look in which state the instance is and perform an action
 			if (oneInstance.state = "running")
 			{
-				
+
 				; get the execution policy setting
 				ExecutionPolicy := _getFlowProperty(OneInstance.FlowID, "ExecutionPolicy")
 				if (ExecutionPolicy = "default")
 				{
 					ExecutionPolicy := _getSettings("FlowExecutionPolicy")
 				}
-			
+
 				;If only one instance is allowed in this flow, and other should wait
 				if (ExecutionPolicy = "wait")
 				{
@@ -46,27 +46,27 @@ executionTask()
 					}
 					executingFlows[OneInstance.flowID] := True
 				}
-				
+
 				; loop through all threads
 				threads := _getAllThreadIds(OneInstanceID)
 				for OneThreadIndex, OneThreadID in threads
 				{
 					;look in which state the thread is and perform an action
 					OneThreadState := _getThreadProperty(OneInstanceID, OneThreadID, "state")
-					
+
 					if (OneThreadState = "starting") ;The element execution is ready to be started
 					{
 						; The element is waiting to be executed. Create task in variable ExecutionNextTasks
-						
+
 						; get some information
 						oneThreadFlowID := _getThreadProperty(OneInstanceID, OneThreadID, "flowID")
 						oneThreadElementID := _getThreadProperty(OneInstanceID, OneThreadID, "ElementID")
 						oneThreadResult := _getThreadProperty(OneInstanceID, OneThreadID, "result")
-						
+
 						; We take the data from the dataset of the current state. Otherwise it can cause trouble if user is editing the flow while it is executing.
 						currentFinishedElement := _getElementFromState(OneThreadFlowID, OneThreadElementID)
 						oneElementClass := currentFinishedElement.class
-						
+
 						; change some thread properties
 						_setThreadProperty(OneInstanceID, OneThreadID, "state", "running")
 						_setThreadProperty(OneInstanceID, OneThreadID, "ElementPars", currentFinishedElement.pars)
@@ -75,7 +75,7 @@ executionTask()
 						_setElementInfo(OneThreadFlowID, OneThreadElementID, "state", "running")
 						_getAndIncrementElementInfo(OneThreadFlowID, OneThreadElementID, "countRuns")
 						_setFlowProperty(OneThreadFlowID, "draw.mustDraw", true)
-						
+
 						; generate a unique ID and prepare object for temporary values during execution
 						UniqueID := OneInstanceID "_" OneThreadID "_" OneThreadElementID "_" A_TickCount
 						_setThreadProperty(OneInstanceID, OneThreadID, "UniqueID", UniqueID)
@@ -84,7 +84,7 @@ executionTask()
 						; create a variable which contains all unique IDs and their environments and also some other temporary variables
 						global_AllExecutionIDs[UniqueID] := Object()
 						global_AllExecutionIDs[UniqueID].Environment := {instanceID: OneInstanceID, threadID: OneThreadID, flowID: OneThreadFlowID, elementID: OneThreadElementID}
-						
+
 						if Isfunc("Element_run_" oneElementClass)
 						{
 							;Add the element to the queue. It will be executed later
@@ -92,19 +92,19 @@ executionTask()
 						}
 						else
 							MsgBox Unexpected error! Function for running element does not exist: Element_run_%oneElementClass%
-						
+
 						somethingexecuted := true
 					}
 					else if (OneThreadState = "finished") ;The element execution has finished
 					{
 						;If the element execution has finished, check the result and find next elements to be executed and prepare the next execution
-						
+
 						; get some information
 						oneThreadFlowID := _getThreadProperty(OneInstanceID, OneThreadID, "flowID")
 						oneThreadElementID := _getThreadProperty(OneInstanceID, OneThreadID, "ElementID")
 						oneThreadResult := _getThreadProperty(OneInstanceID, OneThreadID, "result")
-						
-						; We will try to find connections which start from the current element and which have the same type as the current result 
+
+						; We will try to find connections which start from the current element and which have the same type as the current result
 						AnyConnectionFound := False
 						; We take the data from the dataset of the current state. Otherwise it can cause trouble if user is editing the flow while it is executing.
 						currentFinishedElement := _getElementFromState(oneThreadFlowID, oneThreadElementID)
@@ -124,7 +124,7 @@ executionTask()
 								{
 									LoopVariable_RestoreFromStack(OneInstanceID, OneThreadID)
 								}
-								
+
 								; We will need to clone the thread if we have more than one matching connections
 								NextThreadID := OneThreadID
 								if (AnyConnectionFound = True)
@@ -136,17 +136,17 @@ executionTask()
 								_setThreadProperty(OneInstanceID, NextThreadID, "ElementID", currentConnection.to)
 								_setThreadProperty(OneInstanceID, NextThreadID, "ElementEntryPoint", currentConnection.toPart)
 								currentStartingElement := _getElementFromState(oneThreadFlowID, currentConnection.to)
-								
+
 								; If entering a loop, we need to add current loop variables to stack
 								; that means, make current loop variables invisible, so that the loop variables of the next inner loop won't interfere
 								if (currentStartingElement.type = "loop" and _getThreadProperty(OneInstanceID, NextThreadID, "ElementEntryPoint") = "head")
 								{
 									LoopVariable_AddToStack(OneInstanceID, OneThreadID)
 								}
-								
+
 								; update the state of the thread
 								_setThreadProperty(OneInstanceID, NextThreadID, "state", "starting")
-								
+
 								AnyConnectionFound := True
 							}
 						}
@@ -196,7 +196,7 @@ executionTask()
 
 						; get some information about the current element
 						oneElementClass := _getElementProperty(OneThread.FlowID, OneThread.ElementID, "class")
-						
+
 						; make sure, the element is highlighted properly
 						oneElementCountRuns := _getAndIncrementElementInfo(OneThread.FlowID, OneThread.ElementID, "countRuns", -1)
 						if (oneElementCountRuns = 0)
@@ -205,12 +205,12 @@ executionTask()
 						}
 						_setElementInfo(OneThread.FlowID, OneThread.ElementID, "lastrun", a_tickcount)
 						_setFlowProperty(OneThread.flowID, "draw.mustDraw", true)
-						
+
 						; some elements have a function which can be called if the element is stopped. Call it
 						if Isfunc("Element_stop_" oneElementClass)
 							Element_stop_%oneElementClass%({FlowID: OneThread.FlowID, ElementID: OneThread.ElementID, InstanceID: OneThread.InstanceID, ThreadID: OneThread.ID}, OneThread.elementpars)
 					}
-					
+
 					; delete some temporary variables
 					_setThreadProperty(OneInstanceID, OneThreadID, "uniqueID", "")
 					_setThreadProperty(OneInstanceID, OneThreadID, "ElementExecutionValues", "")
@@ -231,7 +231,7 @@ executionTask()
 				somethingexecuted := true
 			}
 		}
-		
+
 		_LeaveCriticalSection()
 
 		; Actually execute the elements which are queued for execution
@@ -246,7 +246,7 @@ executionTask()
 				%func%(oneExecutionTask.Environment, _getThreadProperty(oneExecutionTask.environment.InstanceID, oneExecutionTask.environment.ThreadID, "elementpars"))
 				somethingexecuted := true
 			}
-		}		
+		}
 
 		if (not somethingexecuted)
 		{
@@ -254,7 +254,7 @@ executionTask()
 			sleep, 100
 		}
 	}
-	
+
 }
 
 ; called when the execution of an element finishes
@@ -280,26 +280,26 @@ finishExecutionOfElement(p_InstanceID, p_ThreadID, p_Result, p_Message = "")
 		ElementID := _getThreadProperty(p_InstanceID, p_ThreadID, "ElementID")
 		FlowID := _getThreadProperty(p_InstanceID, p_ThreadID, "FlowID")
 		FlowName := _getFlowProperty(FlowID, "Name")
-		
+
 		; log this event
 		if (p_Message)
 			logger("f1", "Execution of element " ElementID " finished with result " p_Result " and message: " p_Message, FlowName)
 		else
 			logger("f2", "Execution of element " ElementID " finished with result " p_Result, FlowName)
-		
+
 		; make sure, the element is highlighted properly
 		countRuns := _getAndIncrementElementInfo(FlowID, ElementID, "countRuns", -1)
 		if (countRuns = 0)
 			_setElementInfo(FlowID, ElementID, "state", "finished")
 		_setElementInfo(FlowID, ElementID, "lastrun", a_tickcount)
 		_setFlowProperty(FlowID, "draw.mustDraw", true)
-		
+
 		; delete some temporary variables
 		uniqueID := _getThreadProperty(p_InstanceID, p_ThreadID, "uniqueID")
 		global_AllExecutionIDs.delete(uniqueID)
 		_setThreadProperty(p_InstanceID, p_ThreadID, "uniqueID", "")
 		_setThreadProperty(p_InstanceID, p_ThreadID, "ElementExecutionValues", "")
-		
+
 		; set a thread variable if we have an exception
 		if (p_Result = "Exception")
 		{

@@ -9,4 +9,3 @@
 #include main\Globals\test globals.ahk
 
 Yunit.Use(YunitStdOut, YunitWindow).Test(main_Globals_TestSuite)
-

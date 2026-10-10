@@ -3,13 +3,13 @@
 LoadFlow(p_filepath, p_demo = false)
 {
 	global currentlyLoadingFlow
-	
+
 	; Split file path
 	ThisFlowFilepath := p_filepath
 	SplitPath, ThisFlowFilepath, , ThisFlowFolder, , ThisFlowFilename
 
 	logger("a1", "Loading flow from file: " ThisFlowFilePath)
-	
+
 	; check whether the file exists
 	IfnotExist,% ThisFlowFilepath
 	{
@@ -32,7 +32,7 @@ LoadFlow(p_filepath, p_demo = false)
 		MsgBox  % "ERROR! Flow savefile " ThisFlowFilepath " is empty"
 		return
 	}
-	
+
 	; ensure that only one flow is loading at time
 	if (currentlyLoadingFlow = true)
 	{
@@ -45,7 +45,7 @@ LoadFlow(p_filepath, p_demo = false)
 	fileContent := Jxon_Load(fileContent)
 
 	_EnterCriticalSection()  ; We get, change and store an element in this function. keep this critical section to ensure data integrity
-	
+
 	if (not p_demo)
 	{
 		; We the category is saved as as name. After loading, we need the category ID here.
@@ -71,7 +71,7 @@ LoadFlow(p_filepath, p_demo = false)
 
 	; get the flow object
 	flow := _getFlow(FlowID)
-	
+
 	; write all values from savefile into the flow object
 	flow := ObjFullyMerge(flow, fileContent)
 
@@ -90,7 +90,7 @@ LoadFlow(p_filepath, p_demo = false)
 	; write the flow object
 	flow.loaded := true
 	_setFlow(FlowID, flow)
-	
+
 	; if we load a flow and do not find some element impelementations, probably a package is missing. We will write missing packages here and warn user later
 	missingpackages := Object()
 	AllElementClasses := _getShared("AllElementClasses")
@@ -100,7 +100,7 @@ LoadFlow(p_filepath, p_demo = false)
 	{
 		oneElementClass := _getElementProperty(FlowID, oneElementID, "class")
 		oneElementPackage := _getElementProperty(FlowID, oneElementID, "Package")
-		
+
 		;Check whether we have the implementation of the element class
 		if not (ObjHasValue(AllElementClasses, oneElementClass))
 		{
@@ -134,7 +134,7 @@ LoadFlow(p_filepath, p_demo = false)
 				_setElementProperty(FlowID, oneElementID, "pars." oneParameterInfo.id, oneParameterInfo.default)
 			}
 		}
-		
+
 		; add some default element values
 		_setElementProperty(FlowID, oneElementID, "UniqueID", flowID "_" oneElementID)
 		_setElementProperty(FlowID, oneElementID, "info", object())
@@ -146,16 +146,16 @@ LoadFlow(p_filepath, p_demo = false)
 		; move "enabled" property to info object
 		_setElementInfo(FlowID, oneElementID, "enabled", _getElementProperty(FlowID, oneElementID, "enabled"))
 		_deleteElementProperty(FlowID, oneElementID, "enabled")
-		
+
 		; Ensure backward compatibility (for later use)
 		LoadFlowCheckCompabilityElement(flowID, oneElementID, _getFlowProperty(FlowID, "CompabilityVersion"))
 	}
-	
+
 	for oneConnectionIndex, oneConnectionID in _getAllConnectionIDs(FlowID)
 	{
 		; ensure backward compatibility (for later use)
 		LoadFlowCheckCompabilityConnection(FlowID, oneConnectionID, _getFlowProperty(FlowID, "CompabilityVersion"))
-	
+
 		; add some default element values
 		_setConnectionProperty(FlowID, oneConnectionID, "info", object())
 		_setConnectionInfo(FlowID, oneConnectionID, "selected", false)
@@ -168,7 +168,7 @@ LoadFlow(p_filepath, p_demo = false)
 
 	if not (_getFlowProperty(FlowID, "firstLoadedTime"))
 		_setFlowProperty(FlowID, "firstLoadedTime", a_now)
-	
+
 	; ensure, we have a trigger. And if there are 1+ manual triggers, that one of them (and only one) is default trigger
 	triggerFound := False
 	anyManualTriggerFound := False
@@ -233,7 +233,7 @@ LoadFlow(p_filepath, p_demo = false)
 		logger("a0","Error in flow! Execution policy has an invalid value. Fall back to default execution policy")
 		_setFlowProperty(FlowID, "flowSettings.ExecutionPolicy", "default")
 	}
-	
+
 	; checking zoom factor and offsets
 	flowZoomFactor := _getFlowProperty(FlowID, "flowSettings.zoomFactor")
 	flowOffsetx := _getFlowProperty(FlowID, "flowSettings.Offsetx")
@@ -253,7 +253,7 @@ LoadFlow(p_filepath, p_demo = false)
 		logger("a0","Error in flow! Offset Y an invalid value. Fall back to default value")
 		_setFlowProperty(FlowID, "flowSettings.Offsety", default_OffsetY)
 	}
-	
+
 	; did we find missing packages
 	if (missingpackages.length() > 0)
 	{
@@ -264,7 +264,7 @@ LoadFlow(p_filepath, p_demo = false)
 			tempmissingpackageslist .= forvalue ", "
 		}
 		StringTrimRight, tempmissingpackageslist, tempmissingpackageslist, 2
-		
+
 		; delete flow
 		_deleteflow(FlowID)
 
@@ -274,15 +274,14 @@ LoadFlow(p_filepath, p_demo = false)
 	}
 	Else
 	{
-		
+
 		; create a new state
 		state_New(FlowID)
 		_setFlowProperty(FlowID, "savedState", _getFlowProperty(FlowID, "currentState"))
 	}
-	
+
 	_LeaveCriticalSection()
 	currentlyLoadingFlow:=false
 
 	return FlowID
 }
-

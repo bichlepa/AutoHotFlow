@@ -5,10 +5,10 @@ Var_EvaluateExpression(environment, ExpressionString, useCommonFunctions)
 {
 	; step 1: tokenize the code
 	tokens := tokenizer(ExpressionString)
-	
+
 	; step 2: parse the tokenized code
 	parsedCode := class_parser.parse(tokens, "expression")
-	
+
 	; check for returned error
 	if (parsedCode.errors.MaxIndex())
 	{
@@ -23,7 +23,7 @@ Var_EvaluateExpression(environment, ExpressionString, useCommonFunctions)
 			string .= oneerror.wholeline "`n"
 			string .= oneerror.description
 		}
-		
+
 		return {error: string}
 	}
 	; there was no error
@@ -42,7 +42,7 @@ Var_EvaluateExpression(environment, ExpressionString, useCommonFunctions)
 			string .= oneerror.wholeline "`n"
 			string .= oneerror.description
 		}
-		
+
 		return {error: string}
 	}
 	; return the evaluated expression

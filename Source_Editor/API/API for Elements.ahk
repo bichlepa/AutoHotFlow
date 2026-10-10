@@ -30,7 +30,7 @@ x_GetVariableLocation(Environment, p_Varname, p_hidden = False)
 
 x_replaceVariables(Environment, p_String, p_pars ="")
 {
-	return xx_replaceVariables(Environment, p_String, p_pars) 
+	return xx_replaceVariables(Environment, p_String, p_pars)
 }
 x_EvaluateExpression(Environment, p_String)
 {
@@ -222,7 +222,7 @@ x_FlowEnable(p_FlowID)
 x_FlowDisable(p_FlowID)
 {
 	return xx_FlowDisable(p_FlowID)
-	
+
 }
 
 x_FlowStop(p_FlowID)

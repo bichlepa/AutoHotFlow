@@ -11,7 +11,7 @@ initializeTrayBar()
 {
 	global
 	try menu, tray, deleteall
-	
+
 	menu, tray, add,  tray_show
 	Menu, tray, default, tray_show
 	menu, tray, rename, tray_show, % lang("Show #verb")
@@ -53,7 +53,7 @@ tray_setIcon(flowState)
 	if (oldFlowState != flowState)
 	{
 		oldFlowState := flowState
-		
+
 		menu, tray, icon, %_ScriptDir%\Icons\%flowState%.ico
 	}
 

@@ -10,7 +10,7 @@ LoadFlowCheckCompabilityElement(p_FlowID, p_ElementID, p_AHFVersion)
     ;     value := _getElementProperty(p_FlowID, p_ElementID, "pars.VarName")
     ;     _setElementProperty(p_FlowID, p_ElementID, "pars.VarValue", value)
     ; }
-    
+
 	oneElementPackage := _getElementProperty(p_FlowID, p_ElementID, "Package")
 	oneElementPackageVersion := _getElementProperty(p_FlowID, p_ElementID, "PackageVersion")
     if (oneElementPackage and isFunc("LoadFlowCheckCompatibilityElement_Package_" oneElementPackage))
@@ -28,5 +28,5 @@ LoadFlowCheckCompabilityConnection(p_FlowID, p_ConnectionID, p_AHFVersion)
 ;Check the flow after it was loaded
 LoadFlowCheckCompabilityFlow(p_FlowID, p_AHFVersion)
 {
-	
+
 }

@@ -41,7 +41,7 @@ Element_getParameters(elementClass, Environment)
 	static Element_bufferedParameters
 	if (not isobject(Element_bufferedParameters))
 		Element_bufferedParameters := Object()
-	
+
 	; check whether the result of the call is already buffered
 	if (not isobject(Element_bufferedParameters[elementClass]))
 	{

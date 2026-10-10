@@ -22,7 +22,7 @@ windowFunctions_addWindowIdentificationParametrization(parametersToEdit, options
 
 		parametersToEdit.push({type: "Label", label: x_lang("Method_for_control_Identification"), size: "small"})
 		parametersToEdit.push({type: "Radio", id: "IdentifyControlBy", result: "enum", default: "Class", choices: [x_lang("Text_in_control"), x_lang("Classname and instance number of the control"), x_lang("Unique control ID")], enum: ["Text", "Class", "ID"]})
-		
+
 		parametersToEdit.push({type: "Label", label: x_lang("Control_Identification"), size: "small"})
 		parametersToEdit.push({type: "Radio", id: "ControlTextMatchMode", default: 2, choices: [x_lang("Start_with"), x_lang("Contain_anywhere"), x_lang("Exactly")]})
 		parametersToEdit.push({type: "Edit", id: "Control_identifier", content: "String", WarnIfEmpty: true})
@@ -89,7 +89,7 @@ windowFunctions_addWindowIdentificationParametrization(parametersToEdit, options
 windowFunctions_generateWindowIdentificationName(ElementParameters)
 {
     nameString := ""
-	
+
 	if (ElementParameters.IdentifyControlBy)
 	{
 		if (ElementParameters.IdentifyControlBy = "Text")
@@ -112,7 +112,7 @@ windowFunctions_generateWindowIdentificationName(ElementParameters)
 
 	if (ElementParameters.excludeTitle)
 		nameString := nameString "`n" x_lang("Exclude_title") ": " ElementParameters.excludeTitle
-    
+
 	if (ElementParameters.winText)
 		nameString := nameString "`n" x_lang("Control_text") ": " ElementParameters.winText
 
@@ -126,7 +126,7 @@ windowFunctions_generateWindowIdentificationName(ElementParameters)
 		nameString := nameString "`n" x_lang("Window_ID") ": " ElementParameters.ahk_id
 	if (ElementParameters.ahk_pid)
 		nameString := nameString "`n" x_lang("Process_ID") ": " ElementParameters.ahk_pid
-    
+
     return nameString
 }
 
@@ -165,13 +165,13 @@ windowFunctions_evaluateWindowParameters(EvaluatedParameters)
 		tempwinstring := tempwinstring " ahk_pid " EvaluatedParameters.ahk_pid
 	if (EvaluatedParameters.ahk_exe)
 		tempwinstring := tempwinstring " ahk_exe " EvaluatedParameters.ahk_exe
-	
+
 	;If no window specified, error
 	if (EvaluatedParameters.IdentifyControlBy != "ID" and tempwinstring = "" and EvaluatedParameters.winText = "")
 	{
 		return {exception: x_lang("No window specified")}
 	}
-	
+
 	; check findhiddentext and findhiddenwindow parameter. Convert them to string
 	switch (EvaluatedParameters.findhiddentext)
 	{
@@ -194,11 +194,11 @@ windowFunctions_evaluateWindowParameters(EvaluatedParameters)
 
     returnValue := {}
 	if (EvaluatedParameters.HasKey("IdentifyControlBy"))
-    	returnValue.IdentifyControlBy := EvaluatedParameters.IdentifyControlBy
+	returnValue.IdentifyControlBy := EvaluatedParameters.IdentifyControlBy
 	if (EvaluatedParameters.HasKey("ControlTextMatchMode"))
-    	returnValue.ControlTextMatchMode := EvaluatedParameters.ControlTextMatchMode
+	returnValue.ControlTextMatchMode := EvaluatedParameters.ControlTextMatchMode
 	if (EvaluatedParameters.HasKey("Control_identifier"))
-    	returnValue.Control_identifier := EvaluatedParameters.Control_identifier
+	returnValue.Control_identifier := EvaluatedParameters.Control_identifier
 
     returnValue.winString := tempwinstring
     returnValue.findhiddentext := findhiddentext
@@ -206,9 +206,9 @@ windowFunctions_evaluateWindowParameters(EvaluatedParameters)
     returnValue.TitleMatchMode := EvaluatedParameters.TitleMatchMode
     returnValue.winText := EvaluatedParameters.winText
 	if (EvaluatedParameters.HasKey("ExcludeTitle"))
-   	 returnValue.ExcludeTitle := EvaluatedParameters.ExcludeTitle
+	 returnValue.ExcludeTitle := EvaluatedParameters.ExcludeTitle
 	if (EvaluatedParameters.HasKey("ExcludeText"))
-    	returnValue.ExcludeText := EvaluatedParameters.ExcludeText
+	returnValue.ExcludeText := EvaluatedParameters.ExcludeText
     returnValue.ahk_id := EvaluatedParameters.ahk_id
     returnValue.ahk_pid := EvaluatedParameters.ahk_pid
     returnValue.ahk_exe := EvaluatedParameters.ahk_exe
@@ -216,8 +216,8 @@ windowFunctions_evaluateWindowParameters(EvaluatedParameters)
     return returnValue
 }
 
-; finds the window ID 
-; EvaluatedParameters must have the result of function windowFunctions_evaluateWindowParameters() 
+; finds the window ID
+; EvaluatedParameters must have the result of function windowFunctions_evaluateWindowParameters()
 ; returns window ID if window was found and 0 if window was not found
 ; on error, returns an object with key "exception" which contains the exception message. Use it to call x_finish() or x_enabled()
 windowFunctions_getWindowID(EvaluatedParameters)
@@ -230,17 +230,17 @@ windowFunctions_getWindowID(EvaluatedParameters)
 	SetTitleMatchMode, % EvaluatedParameters.TitleMatchMode
 	DetectHiddenWindows, % EvaluatedParameters.findhiddenwindow
 	DetectHiddenText, % EvaluatedParameters.findhiddentext
-	
+
 	; check whether window exists. If so get the window ID
 	windowID := winexist(EvaluatedParameters.winString, EvaluatedParameters.winText, EvaluatedParameters.ExcludeTitle, EvaluatedParameters.ExcludeText)
 	if not windowID
-    	return
+	return
     else
 		return windowID
 }
 
-; finds the window ID 
-; EvaluatedParameters must have the result of function windowFunctions_evaluateWindowParameters() 
+; finds the window ID
+; EvaluatedParameters must have the result of function windowFunctions_evaluateWindowParameters()
 ; returns window ID if window was found and 0 if window was not found
 ; on error, returns an object with key "exception" which contains the exception message. Use it to call x_finish() or x_enabled()
 windowFunctions_getWindowAndControlID(EvaluatedParameters)
@@ -270,7 +270,7 @@ windowFunctions_getWindowAndControlID(EvaluatedParameters)
 		SetTitleMatchMode, % EvaluatedParameters.TitleMatchMode
 		DetectHiddenWindows, % EvaluatedParameters.findhiddenwindow
 		DetectHiddenText, % EvaluatedParameters.findhiddentext
-		
+
 		; check whether window exists. If so get the window ID
 		windowID := winexist(EvaluatedParameters.winString, EvaluatedParameters.winText, EvaluatedParameters.ExcludeTitle, EvaluatedParameters.ExcludeText)
 

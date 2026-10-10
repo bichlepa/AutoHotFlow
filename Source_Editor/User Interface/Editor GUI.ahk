@@ -8,7 +8,7 @@ EditorGUIInit()
 
 	;We use this variable to indicate whether the main gui is disabled
 	global_CurrentlyMainGuiIsDisabled:=false
-	
+
 	; Create the gui. It is empty, since the draw thread will paint the picture inside the gui
 	gui,MainGUI:default
 	gui,-dpiscale ; DPI Scaling would cause diffilcuties when calculating mouse coordinates
@@ -29,7 +29,7 @@ EditorGUIInit()
 	_setSharedProperty("hwnds.editGUI" Global_ThisThreadID, _EditorGuiHwnd)
 	_setSharedProperty("hwnds.editGUIDC" _FlowID, GetDC(_EditorGuiHwnd))
 	_setSharedProperty("hwnds.editGUIDC" Global_ThisThreadID, GetDC(_EditorGuiHwnd))
-	
+
 	; find out the height of the status bar, so we can calculate the available space for the rendered picture
 	gui +lastfound
 	ControlGetPos,,,,StatusBarHeight,,ahk_id %_StatusbarHWND%
@@ -38,7 +38,7 @@ EditorGUIInit()
 	; Initialize the menu bar
 	initializeMenuBar()
 	ui_UpdateStatusbartext()
-	
+
 	;React on key
 	OnMessage(0x100,"keyPressed",1)
 
@@ -74,7 +74,7 @@ EditGUIshow()
 		; get the work area of the primary monitor
 		local MonitorPrimary
 		SysGet, MonitorPrimary, MonitorPrimary
-		SysGet, MonitorWorkArea, MonitorWorkArea,%MonitorPrimary% 
+		SysGet, MonitorWorkArea, MonitorWorkArea,%MonitorPrimary%
 
 		; Make window fill almost the whole screen
 		local tempwidth:=round((MonitorWorkArearight - MonitorWorkArealeft)*0.9)
@@ -95,7 +95,7 @@ EditGuiSetIcon(flowState)
 	if (oldFlowState != flowState)
 	{
 		oldFlowState := flowState
-		
+
 		; set the gui icon
 		gui, MainGUI:+LastFound
 		setGuiIcon(_ScriptDir "\icons\" flowState ".ico")
@@ -115,7 +115,7 @@ EditGUIDisable()
 EditGUIEnable()
 {
 	global
-	
+
 	;Activate window if it is not hidden
 	DetectHiddenWindows,off
 	IfWinExist,% "ahk_id " _EditorGuiHwnd
@@ -125,7 +125,7 @@ EditGUIEnable()
 	}
 	DetectHiddenWindows,on
 	global_CurrentlyMainGuiIsDisabled:=false
-	
+
 	; redraw picture
 	API_Draw_Draw(_FlowID)
 }
@@ -157,7 +157,7 @@ WindowGetsMoved()
 ; user clicked with left mouse button
 leftmousebuttonclick(wpar,lpar,msg,hwn)
 {
-	global 
+	global
 	if (hwn!=_EditorGuiHwnd and hwn!=_StatusbarHWND)
 	{
 		; react only if user interacted with the main gui
@@ -169,7 +169,7 @@ leftmousebuttonclick(wpar,lpar,msg,hwn)
 ; user clicked with right mouse button
 rightmousebuttonclick(wpar,lpar,msg,hwn)
 {
-	global 
+	global
 	if (hwn!=_EditorGuiHwnd and hwn!=_StatusbarHWND)
 	{
 		; react only if user interacted with the main gui
@@ -194,19 +194,19 @@ leftmousebuttondoubleclick(wpar,lpar,msg,hwn)
 keyPressed(wpar, lpar, msg, hwn)
 {
 	global
-	
+
 	if (hwn!=_EditControlHWND and hwn!=_StatusbarHWND and hwn!=_EditorGuiHwnd)
 	{
 		; react only if user interacted with the main gui
 		return
 	}
-	
+
 	if global_CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of the main gui are disabled
 	{
 		ui_ActionWhenMainGUIDisabled()
 		return
 	}
-	
+
 	; wpar defines the hotkey
 	if (wpar = GetKeyVK("a"))
 	{
@@ -253,13 +253,13 @@ keyPressed(wpar, lpar, msg, hwn)
 mousewheelmove(wpar, lpar, msg, hwn)
 {
 	global
-	
+
 	if (hwn!=_EditControlHWND and hwn!=_StatusbarHWND and hwn!=_EditorGuiHwnd)
 	{
 		; react only if user interacted with the main gui
 		return
 	}
-	
+
 	if global_CurrentlyMainGuiIsDisabled ;If an other GUI is opened and some functions of the main gui are disabled
 	{
 		ui_ActionWhenMainGUIDisabled()
@@ -272,9 +272,9 @@ mousewheelmove(wpar, lpar, msg, hwn)
 		return
 	}
 	if (wpar = 7864320 or wpar = 7864328)
-		SetTimer, mouse_wheelup, -1 
+		SetTimer, mouse_wheelup, -1
 	else if (wpar = 4287102976 or wpar = 4287102984)
-		SetTimer, mouse_wheeldown, -1 
+		SetTimer, mouse_wheeldown, -1
 }
 
 ; When user tries to interact with disabled gui, enable the child gui
@@ -320,7 +320,7 @@ ui_UpdateStatusbartext(which="")
 ; Updates the localized labels TODO: it is not finished and is never called
 ui_OnLanguageChange()
 {
-	global 
+	global
 	local temp
 
 	; Redraw the flow
@@ -328,13 +328,13 @@ ui_OnLanguageChange()
 
 	DetectHiddenWindows off
 	WinGetTitle, temp, % "ahk_id " _EditorGuiHwnd
-	
+
 	flowName := _getFlowProperty(_FlowID, "Name")
 	IfWinExist,% temp
-		gui,MainGUI:show,,% "AutoHotFlow " lang("Editor") " - " flowName 
+		gui,MainGUI:show,,% "AutoHotFlow " lang("Editor") " - " flowName
 	else
-		gui,MainGUI:show,hide,% "AutoHotFlow " lang("Editor") " - " flowName 
-	
+		gui,MainGUI:show,hide,% "AutoHotFlow " lang("Editor") " - " flowName
+
 	;TODO Renamed the menus when the language changes.
 	;~ initializeTrayBar()
 	;~ initializeMenuBar()
@@ -350,7 +350,7 @@ MainGUIguisize()
 	; adjust the status bar
 	SB_SetParts(a_guiwidth)
 
-	; calculate and share the available space for the picture 
+	; calculate and share the available space for the picture
 	heightofguipic:=a_guiheight - EditGUI_StatusBarHeight
 	widthofguipic:=a_guiwidth
 	_setFlowProperty(_FlowID, "draw.heightofguipic", heightofguipic)
@@ -368,5 +368,3 @@ GetClientSize(hwnd, ByRef w, ByRef h)
     w := NumGet(rc, 8, "int")
     h := NumGet(rc, 12, "int")
 }
-
-

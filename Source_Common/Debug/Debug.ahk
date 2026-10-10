@@ -11,12 +11,12 @@ d(text,header="",wait=1)
 	global dedit, dbutton, dbuttonShowGlobals, _settings
 	if not (_settings.developing)
 		return
-	
+
 	dfinished:=false
-	
+
 	if (isobject(text))
 		text:=jxon_dump(text, 2)
-	
+
 	gui,d:destroy
 	gui,d:margin,5,5
 	gui,d:add,edit,readonly vdedit,% text
@@ -26,23 +26,23 @@ d(text,header="",wait=1)
 	gui,d:show,hide
 	gui,d:+resize
 	gui,d:+hwnddHWND
-	
+
 	VarSetCapacity(rc, 16)
     DllCall("GetClientRect", "uint", dHWND, "uint", &rc)
     dw := NumGet(rc, 8, "int")
     dh := NumGet(rc, 12, "int")
-	
-	
+
+
 	if (dh>a_screenheight)
 		dh:= a_screenheight -50
 	if (dw>A_ScreenWidth)
 		dw:= A_ScreenWidth -50
 	if (dw<300)
 		dw:=300
-	
-	
+
+
 	gui,d:show,h%dh% w%dw%,%header%
-	
+
 	if (wait=1 or wait="wait")
 	{
 		Critical, Off
@@ -54,21 +54,21 @@ d(text,header="",wait=1)
 				sleep 100
 		}
 	}
-		
+
 	return
 	dClose:
 	dGUIClose:
 	gui,d:destroy
 	dfinished:=true
 	return
-	
+
 	dGuisize:
 	;~ MsgBox % A_GuiWidth " " A_GuiHeight
 	guicontrol,d:move,dedit,% "w" A_GuiWidth-10 " h" A_GuiHeight -45
 	guicontrol,d:move,dbutton,% "w" (A_GuiWidth / 2) - 10 " y" A_GuiHeight -35
 	guicontrol,d:move,dbuttonShowGlobals,% "w" (A_GuiWidth / 2) - 10 " y" A_GuiHeight -35 " x" (A_GuiWidth / 2) +5
 	return
-	
+
 	dShowGlobals:
 	gui,d:destroy
 	d_showGlobals()
@@ -85,14 +85,14 @@ d_showGlobals(wait=1)
 	; text.="Call stack:`n"
 	; text.=CallStack(10)
 	text.="Flows:`n"
-	
+
 	text.=jxon_dump(_flows, 2) "`n`nSettings:`n"
 	text.=jxon_dump(_settings, 2) "`n`nExecution:`n"
 	text.=jxon_dump(_execution, 2) "`n`nShare:`n"
 	text.=jxon_dump(_share, 2) "`n`nAllFlows:`n"
-	
+
 	Clipboard := text
-	
+
 	gui,dGlobals:destroy
 	gui,dGlobals:margin,5,5
 	gui,dGlobals:add,edit,readonly vdedit,% text
@@ -101,23 +101,23 @@ d_showGlobals(wait=1)
 	gui,dGlobals:show,hide
 	gui,dGlobals:+resize
 	gui,dGlobals:+hwndddGlobalsHWND
-	
+
 	VarSetCapacity(rc, 16)
     DllCall("GetClientRect", "uint", ddGlobalsHWND, "uint", &rc)
     dw := NumGet(rc, 8, "int")
     dh := NumGet(rc, 12, "int")
-	
-	
+
+
 	if (dh>a_screenheight)
 		dh:= a_screenheight -50
 	if (dw>A_ScreenWidth)
 		dw:= A_ScreenWidth -50
 	if (dw<300)
 		dw:=300
-	
-	
+
+
 	gui,dGlobals:show,h%dh% w%dw%,Global variables
-	
+
 	if (wait=1 or wait="wait")
 		Loop
 		{
@@ -126,15 +126,15 @@ d_showGlobals(wait=1)
 			else
 				sleep 100
 		}
-		
+
 	return
-	
+
 	dGlobalsClose:
 	dGlobalsGUIClose:
 	gui,dGlobals:destroy
 	dfinished:=true
 	return
-	
+
 	dGlobalsGuisize:
 	;~ MsgBox % A_GuiWidth " " A_GuiHeight
 	guicontrol,dGlobals:move,dedit,% "w" A_GuiWidth-10 " h" A_GuiHeight -45

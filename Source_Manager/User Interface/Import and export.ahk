@@ -10,7 +10,7 @@ import_and_export_gui()
 		gui,importexport:show
 		return
 	}
-	
+
 	; Create the gui
 	gui, importexport:default
 	gui,+hwndImportExportHWND
@@ -24,13 +24,13 @@ import_and_export_gui()
 	gui,font,s8 cDefault wnorm
 	gui, add, listbox,x10 Y+10 w400 h400 vexportFlowsListViewFlowsSelection multi sort
 	gui, add, button,x10 Y+10 w200 h30 gexportFlowsExportNow,% lang("Export now")
-	
+
 	;Search for all flowNames
 	for oneFlowIndex, oneFlowID in _getAllFlowIDs()
 	{
 		guicontrol,,exportFlowsListViewFlowsSelection,% _getFlowProperty(oneFlowID, "name")
 	}
-	
+
 	; show gui
 	gui,show,,% lang("Import and export flows")
 }
@@ -48,7 +48,7 @@ exportFlowsExportNow()
 		MsgBox % lang("Please select at least one flow at first")
 		return
 	}
-	
+
 	; Let user select the destination
 	FileSelectFile,filepathexport,S18,exported flow.ahf,% lang("Export AutoHotFlow flows"), % lang("AutoHotFlow file") " (*.ahf)"
 
@@ -64,7 +64,7 @@ exportFlowsExportNow()
 		filepathflow := _getFlowProperty(_getFlowIdByName(A_LoopField), "file")
 		7z_compress(filepathexport, "-tzip", filepathflow)
 	}
-	
+
 }
 
 ; user wants to select a file
@@ -89,7 +89,7 @@ importexportGuiDropFiles()
 	{
 		importExportGui_import(A_GuiEvent)
 		break
-	}	
+	}
 }
 
 importExportGui_import(filepathZip)
@@ -116,7 +116,7 @@ importExportGui_import(filepathZip)
 	loop, %filepathextractfolder%\*.json
 	{
 		;check whether there are flows with same name. Ask user if he wants to import them anyway
-		fileread, fileContent, %a_loopfilefullpath% 
+		fileread, fileContent, %a_loopfilefullpath%
 		fileContent := Jxon_Load(fileContent)
 		newflowname := fileContent.name
 		if not newflowname
@@ -156,7 +156,7 @@ importExportGui_import(filepathZip)
 				}
 				; rename the flow
 				fileContent.name := newflowname
-				FileDelete, %a_loopfilefullpath% 
+				FileDelete, %a_loopfilefullpath%
 				FileAppend, % Jxon_Dump(fileContent), %a_loopfilefullpath%
 			}
 			else IfMsgBox,cancel
@@ -164,7 +164,7 @@ importExportGui_import(filepathZip)
 				break
 			}
 		}
-		
+
 		;copy the flow to the flows folder. If a file with same name exists, rename first
 		ThisFlowFilename := A_LoopFileName
 		Loop
@@ -174,7 +174,7 @@ importExportGui_import(filepathZip)
 			if (fileexist(newFlowFullPath) or fileexist(newFlowFullPathDemo))
 			{
 				random, randomnumber, 0, 1000
-				
+
 				ThisFlowFilename := substr(ThisFlowFilename,1,strlen(ThisFlowFilename)-5) "_" randomnumber ".json"
 			}
 			else
@@ -187,13 +187,13 @@ importExportGui_import(filepathZip)
 			MsgBox, importing flow %newflowname% unexpectedly failed
 			continue
 		}
-		
+
 		;show flow in the manager
 		loadFlow(newFlowFullPath)
 		TreeView_manager_Refill()
 		TreeView_manager_Select("Flow", newFlowid)
 	}
-	
+
 	; remove the temporary folder
 	FileRemoveDir, % filepathextractfolder, 1
 }

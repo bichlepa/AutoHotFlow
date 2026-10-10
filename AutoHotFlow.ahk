@@ -18,7 +18,7 @@ commandMessage = %2%
 if (command = "AHFCommand")
 {
 	DetectHiddenWindows,on
-	
+
 	;If an instance of AutoHotFlow already exists, pass the command to the hidden window of AutoHotFlow
 	IfWinExist,%A_ScriptDir% AHF_HIDDEN_COMMAND_WINDOW
 	{

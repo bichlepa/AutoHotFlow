@@ -324,7 +324,7 @@ Default_Lib_HTTPRequest( URL, byref In_POST__Out_Data="", byref In_Out_HEADERS="
 					options := ( InStr( A_LoopField, "R" ) ? "RESUME`n" : "SAVEAS`n" )
 					;, Do_Legacy_Dual_Output := !!InStr( A_LoopField, "N" )
 				Else options .= A_LoopField
-		}	
+		}
 		Else
 		{
 			 If ( ( pos := InStr( A_LoopField, ":" ) ) && ( pos < InStr( A_LoopField ":\", ":\" ) ) )
@@ -609,7 +609,7 @@ Default_Lib_HTTPRequest( URL, byref In_POST__Out_Data="", byref In_Out_HEADERS="
 		NumPut( Content_Length, INTERNET_BUFFERS, pos - 12, DW )
 	}
 
-; If needed, clean up the resources for the upload hash. 
+; If needed, clean up the resources for the upload hash.
 	If ( Do_Up_MD5_Hash ) && !DllCall( "Advapi32\CryptDestroyHash", Ptr, hHash )
 		MyErrors .= swp "releasing the hash object. 'CryptDestroyHash' failed" sel ErrorLevel sle A_LastError "`n"
 	If ( Do_Up_MD5_Hash ) && !DllCall( "Advapi32\CryptReleaseContext", Ptr, hProv, DW, 0 )
@@ -685,7 +685,7 @@ Default_Lib_HTTPRequest( URL, byref In_POST__Out_Data="", byref In_Out_HEADERS="
 		StringTrimRight, In_Out_HEADERS, MyErrors, 1
 		Return 0, ErrorLevel := Response_Code
 	}
-	
+
 ; Step 7: Load WinINet.dll and initialize the internet connection and request.
 ; Kernel32.dll\LoadLibrary > http://msdn.microsoft.com/en-us/library/ms684175%28v=VS.85%29.aspx
 	If !( hWinINet := DllCall( "LoadLibrary" W_A, "Str", "WinINet.dll", Ptr ) )

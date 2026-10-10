@@ -12,13 +12,13 @@ global _AHF_VERSION := "1.2.1"
 
 ;Using working dir forbidden.
 ;The reason is that while any thread uses the command FileSelectFile, the working directory of the working directory of the whole process is changed to the path which is shown in the dialog.
-SetWorkingDir %a_temp%  
+SetWorkingDir %a_temp%
 
 ; Set the variable _ScriptDir which is acutally the root folder of AHF. If installed, it is the installation folder.
 global _ScriptDir := StrReplace(A_ScriptDir, "\Source_Main") ;The directory of AutoHotFlow.ahk/exe
 
 ; Set the variable _WorkingDir which we will always use instead of a_workingDir
-;if portable installation, the script dir is the working dir. 
+;if portable installation, the script dir is the working dir.
 ;If installed in programs folder, it is a dir which is writable without admin rights
 global _WorkingDir
 if FileExist(_ScriptDir "\AppData")
@@ -119,7 +119,7 @@ global global_libInclusionsForThreads, global_elementInclusionsForThreads
 #include source_Elements\Default\common\window functions.ahk
 #include source_Elements\Default\common\compatibility.ahk
 
-global_libInclusionsForThreads = 
+global_libInclusionsForThreads =
 (
 #include source_Elements\Default\lib\TTS\TTS by Learning One.ahk
 #include source_Elements\Default\lib\Eject\Eject.ahk
@@ -326,7 +326,7 @@ global_libInclusionsForThreads =
 #include source_Elements\Default\triggers\Start_up.ahk
 #include source_Elements\Default\triggers\AutoHotkey_Script.ahk
 
-global_elementInclusionsForThreads = 
+global_elementInclusionsForThreads =
 (
 #include source_Elements\Default\actions\New_Variable.ahk
 #include source_Elements\Default\actions\Random_Number.ahk

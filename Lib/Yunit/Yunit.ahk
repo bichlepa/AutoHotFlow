@@ -12,7 +12,7 @@ license info:
 class Yunit
 {
     static Modules := [Yunit.StdOut]
-    
+
     class Tester extends Yunit
     {
         __New(Modules)
@@ -20,12 +20,12 @@ class Yunit
             this.Modules := Modules
         }
     }
-    
+
     Use(Modules*)
     {
         return new this.Tester(Modules)
     }
-    
+
     Test(classes*) ; static method
     {
         instance := new this("")
@@ -42,13 +42,13 @@ class Yunit
             instance.TestClass(obj, cls)
         }
     }
-    
+
     Update(Category, Test, Result)
     {
         for k,module in this.Modules
             module.Update(Category, Test, Result)
     }
-    
+
     TestClass(results, cls)
     {
         environment := new cls() ; calls __New
@@ -58,7 +58,7 @@ class Yunit
             {
                 if (k = "Begin") or (k = "End")
                     continue
-                if ObjHasKey(cls,"Begin") 
+                if ObjHasKey(cls,"Begin")
                 && IsFunc(cls.Begin)
                     environment.Begin()
                 result := 0
@@ -91,14 +91,14 @@ class Yunit
             }
         }
     }
-    
+
     Assert(Value, params*)
     {
         Message := (params[1] = "") ? "FAIL" : params[1]
         if (!Value)
             throw Exception(Message, -1)
     }
-    
+
     CompareValues(v1, v2)
     {   ; Support for simple exceptions. May need to be extended in the future.
         if !IsObject(v1) || !IsObject(v2)

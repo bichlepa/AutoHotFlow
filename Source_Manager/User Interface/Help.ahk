@@ -3,10 +3,10 @@
 ui_showHelp()
 {
 	global
-	
+
 	; if a previous help gui is shown, destry it
 	Gui, Help:Destroy
-	
+
 	; disable DPI for this gui
 	gui,Help:-dpiscale
 
@@ -28,27 +28,27 @@ ui_showHelp()
 	HelpGuiBrowser.Navigate(helpfilepath)
 
 	; adjust gui appearance
-	Gui, Help: +ToolWindow 
+	Gui, Help: +ToolWindow
 	Gui, Help:Color, FFFFFF
 	Gui, Help: +resize
-	
+
 	; Find the perfect gui size
-	SysGet, MonitorWorkArea, MonitorWorkArea 
+	SysGet, MonitorWorkArea, MonitorWorkArea
 	local helpx := MonitorWorkArealeft + 50
 	local helpy := MonitorWorkAreatop + 50
 	local helph := MonitorWorkAreabottom - MonitorWorkAreatop - 100
 	local helpw := MonitorWorkArearight - MonitorWorkArealeft - 100
-	
+
 	; Show the help gui
 	Gui, Help:Show, x%helpx% y%helpy% w%helpw% h%helph%,% lang("Help #noun")
 	Return
-	
+
 	; user closes help gui
 	Helpguiclose:
 	; destroy the gui
 	Gui, Help:Destroy
 	return
-	
+
 	; user resizes the help gui
 	helpguisize:
 	; move the browser control

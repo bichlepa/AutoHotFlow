@@ -20,7 +20,7 @@ API_Main_Thread_Stopped(par_ThreadID)
 API_Main_StartEditor(par_FlowID)
 {
 	logger("t2", A_ThisFunc " called from thread", _ahkThreadID)
-	
+
 	_setTask("main", {name: "StartEditor", flowID: par_FlowID})
 }
 
@@ -29,7 +29,7 @@ API_Main_StartEditor(par_FlowID)
 API_Main_StartElementAhkThread(par_UniqueID, par_code, par_notifyWhenStopped)
 {
 	logger("t2", A_ThisFunc " called from thread", _ahkThreadID)
-	
+
 	_setTask("main", {name: "StartElementAhkThread", uniqueID: par_UniqueID, code: par_code, notifyWhenStopped: par_notifyWhenStopped})
 }
 
@@ -38,7 +38,7 @@ API_Main_StartElementAhkThread(par_UniqueID, par_code, par_notifyWhenStopped)
 API_Main_StopElementAhkThread(par_UniqueID)
 {
 	logger("t2", A_ThisFunc " called from thread", _ahkThreadID)
-	
+
 	_setTask("main", {name: "StopElementAhkThread", uniqueID: par_UniqueID})
 }
 

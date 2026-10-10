@@ -17,7 +17,7 @@ Element_New(p_FlowID, p_type="", p_elementID="")
 	if (not p_elementID)
 	{
 		; element ID is empty, so we generate a new unique one
-		newElement.ID := "element" . format("{1:010u}", _getAndIncrementFlowProperty(p_FlowID,"ElementIDCounter")) 
+		newElement.ID := "element" . format("{1:010u}", _getAndIncrementFlowProperty(p_FlowID,"ElementIDCounter"))
 	}
 	else
 	{
@@ -36,18 +36,18 @@ Element_New(p_FlowID, p_type="", p_elementID="")
 
 	; set som initial info (which are not changed on undo/redo actions)
 	newElement.info := Element_generateDefaultInfoObject()
-	
+
 	;Assign default position
 	newElement.x := 0
 	newElement.y := 0
-	
+
 	; write element object
 	_setElement(p_FlowID, newElement.ID, newElement)
 
 	; set element type, is parameter is passed
 	if (p_type)
 		Element_SetType(p_FlowID, newElement.ID, p_type)
-	
+
 	_LeaveCriticalSection()
 
 	return newElement.ID
@@ -67,17 +67,17 @@ Element_SetType(p_flowID, p_ElementID, p_elementType)
 
 	; set the element type
 	_setElementProperty(p_FlowID, p_elementID, "type", p_elementType)
-	;After changing the element type only, the class is unset 
+	;After changing the element type only, the class is unset
 	_setElementProperty(p_FlowID, p_elementID, "class", "")
 	; since the class is not set, the name is unset too
-	_setElementProperty(p_FlowID, p_elementID, "name", "") 
+	_setElementProperty(p_FlowID, p_elementID, "name", "")
 
 	; define default propoerties depending on the element type
 	if (p_elementType = "Loop")
 	{
-		_setElementProperty(p_FlowID, p_elementID, "heightOfVerticalBar", 150) 
+		_setElementProperty(p_FlowID, p_elementID, "heightOfVerticalBar", 150)
 	}
-	
+
 	_LeaveCriticalSection()
 }
 
@@ -89,7 +89,7 @@ Element_SetClass(p_FlowID, p_ElementID, p_elementClass)
 		MsgBox internal error! A new element class should be set but ElementID is empty!
 		return
 	}
-	
+
 	AllElementClassInfos := _getShared("AllElementClassInfos")
 
 	if (not AllElementClassInfos[p_elementClass].type)
@@ -99,23 +99,23 @@ Element_SetClass(p_FlowID, p_ElementID, p_elementClass)
 	}
 
 	_EnterCriticalSection() ; enter this critical section to ensure data integrity
-	
+
 	;Set element type if it has changed
 	if (_getElementProperty(p_FlowID, p_elementID, "type") != AllElementClassInfos[p_elementClass].type)
 	{
 		Element_SetType(p_FlowID, p_elementID, AllElementClassInfos[p_elementClass].type)
 	}
-	
+
 	;Set element class
 	_setElementProperty(p_FlowID, p_elementID, "class", p_elementClass)
 	_setElementProperty(p_FlowID, p_elementID, "icon", Element_getIconPath_%p_elementClass%())
-	
+
 	;Set new parameter Defaults
 	Element_setParameterDefaults(p_FlowID, p_elementID)
-	
+
 	; update the name
 	Element_updateName(p_FlowID, p_ElementID)
-	
+
 	;If element is of class trigger_manual: Set the trigger as default if no other is already default
 	if (p_elementClass = "trigger_manual" and Element_findDefaultTrigger(p_FlowID) = "")
 	{
@@ -163,7 +163,7 @@ Element_setParameterDefaults(p_FlowID, p_elementID)
 	; get parametration details
 	elementClass := _getElementProperty(p_FlowID, p_elementID, "class")
 	ParametrizationDetails := Element_getParametrizationDetails(elementClass, {flowID: p_FlowID, elementID: p_elementID}, true)
-	
+
 	; get alredy configured parameters (if available)
 	ElementParsObject := _getElementProperty(p_FlowID, p_elementID, "pars")
 
@@ -196,7 +196,7 @@ Element_setParameterDefaults(p_FlowID, p_elementID)
 			}
 		}
 	}
-	
+
 	; loop through all parameters
 	for index, oneParameter in parameters
 	{
@@ -218,7 +218,7 @@ Element_setParameterDefaults(p_FlowID, p_elementID)
 
 	; write parameter object
 	_setElementProperty(p_FlowID, p_elementID, "pars", ElementParsObject)
-	
+
 	_LeaveCriticalSection()
 }
 
@@ -230,7 +230,7 @@ Element_findDefaultTrigger(p_FlowID)
 		throw exception("internal error! Should find default trigger, but FlowID is empty", -1)
 		return
 	}
-	
+
 	; loop through all elements
 	allElementsIDs := _getAllElementIds(p_FlowID)
 	for oneID, oneElementID in allElementsIDs
@@ -246,9 +246,9 @@ Element_findDefaultTrigger(p_FlowID)
 			}
 		}
 	}
-	
+
 	; we did not find a default manual trigger
-	return 
+	return
 }
 
 ; set default trigger
@@ -306,7 +306,7 @@ Element_checkAndFixDefaultTrigger(p_FlowID)
 				; we found a manual trigger. Remember its ID
 				anyManualTrigger := oneElementID
 			}
-			
+
 			if (_getElementProperty(p_FlowID, oneElementID, "defaultTrigger"))
 			{
 				; we found a default trigger
@@ -357,12 +357,12 @@ Element_Remove(p_FlowID, p_elementID)
 	{
 		;remove the element from list of all elements
 		_deleteElement(p_FlowID, p_elementID)
-		
+
 		;remove the connections which end or start at the element
 		allConnectionIDs := _getAllConnectionIDs(p_FlowID)
 		for oneID, oneConnectionID in allConnectionIDs
 		{
-			if ((_getConnectionProperty(p_FlowID, oneConnectionID, "from") = p_elementID) 
+			if ((_getConnectionProperty(p_FlowID, oneConnectionID, "from") = p_elementID)
 				or (_getConnectionProperty(p_FlowID, oneConnectionID, "to") = p_elementID))
 			{
 				Connection_Remove(p_FlowID, oneConnectionID)
@@ -372,7 +372,7 @@ Element_Remove(p_FlowID, p_elementID)
 
 	; if we have deleted a default manual trigger, it needs to be fixed
 	Element_checkAndFixDefaultTrigger(p_FlowID)
-	
+
 	_LeaveCriticalSection()
 }
 
@@ -399,31 +399,31 @@ Connection_New(p_FlowID, p_connectionID="")
 	}
 
 	_EnterCriticalSection() ; enter this critical section to ensure data integrity
-	
+
 	; create an empty connection object
 	newConnection := Object()
-	
+
 	if (not p_connectionID)
 	{
 		; connection ID is empty, so we generate a new unique one
-		newConnection.ID := "connection" . format("{1:010u}", _getAndIncrementFlowProperty(p_FlowID,"ElementIDCounter")) 
+		newConnection.ID := "connection" . format("{1:010u}", _getAndIncrementFlowProperty(p_FlowID,"ElementIDCounter"))
 	}
 	else
 	{
 		; connection ID is set, we use it
 		newConnection.ID := p_connectionID
 	}
-	
+
 	; this ID is unique for all flows
 	newConnection.UniqueID := p_FlowID "_" newConnection.ID
-	
+
 	; set some default properties
 	newConnection.ConnectionType := "normal"
-	
+
 	newConnection.type := "Connection"
 	newConnection.frompart := ""
 	newConnection.topart := ""
-	
+
 	; set som initial info (which are not changed on undo/redo actions)
 	newConnection.info := Connection_generateDefaultInfoObject()
 
@@ -448,7 +448,7 @@ Connection_Remove(p_FlowID, p_connectionID)
 
 	;remove the connection from list of all connections
 	_deleteConnection(p_FlowID, p_connectionID)
-	
+
 	_LeaveCriticalSection()
 }
 
@@ -463,7 +463,7 @@ UpdateConnectionLists(p_FlowID)
 	}
 
 	_EnterCriticalSection() ; enter this critical section to ensure data integrity
-	
+
 	;Loop through all connections and create a list with all elements that have connections
 	allConnectionIDs := _getAllConnectionIDs(p_FlowID)
 	connectedElementsFrom := []

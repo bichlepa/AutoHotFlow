@@ -67,7 +67,7 @@ x_AutoEvaluateParameters(Environment, ElementParameters, p_skipList = "")
 
 	; prepare variable with the evaluated parameters which will be returned
 	EvaluatedParameters:=Object()
-	
+
 	; loop through all parameters
 	for oneParIndex, onePar in ParametrationDetails
 	{
@@ -81,7 +81,7 @@ x_AutoEvaluateParameters(Environment, ElementParameters, p_skipList = "")
 			parIDs:=[onePar.id]
 		else
 			parIDs:=onePar.id
-		
+
 		; loop through all paramter IDs
 		for oneIndex, oneParID in parIDs
 		{
@@ -90,11 +90,11 @@ x_AutoEvaluateParameters(Environment, ElementParameters, p_skipList = "")
 			{
 				continue
 			}
-			
+
 			;skip parameter if it is in the passed skip list
 			if (ObjHasValue(p_skipList, oneParID))
 				continue
-			
+
 			; evaluate the parameter
 			x_AutoEvaluateOneParameter(EvaluatedParameters, Environment, ElementParameters, oneParID, onePar)
 			if (EvaluatedParameters._error)
@@ -104,7 +104,7 @@ x_AutoEvaluateParameters(Environment, ElementParameters, p_skipList = "")
 			}
 		}
 	}
-	
+
 	_LeaveCriticalSection()
 	return EvaluatedParameters
 }
@@ -119,11 +119,11 @@ x_AutoEvaluateAdditionalParameters(byref EvaluatedParameters, Environment, Eleme
 	; create return object if it is not an object yet
 	if not isobject(EvaluatedParameters)
 		EvaluatedParameters:=Object()
-	
+
 	; get element parametration details
 	elementClass := _getElementProperty(Environment.FlowID, Environment.ElementID, "class")
 	ParametrationDetails := Element_getParametrizationDetails(elementClass, Environment)
-	
+
 	; loop through all parameters
 	for oneParIndex, onePar in ParametrationDetails
 	{
@@ -137,7 +137,7 @@ x_AutoEvaluateAdditionalParameters(byref EvaluatedParameters, Environment, Eleme
 			parIDs:=[onePar.id]
 		else
 			parIDs:=onePar.id
-		
+
 		for oneIndex, oneParID in parIDs
 		{
 			;Label and button cannot be evaluated
@@ -190,8 +190,8 @@ x_AutoEvaluateOneParameter(EvaluatedParameters, Environment, ElementParameters, 
 				parIDs:=[oneParDetails.id]
 			else
 				parIDs:=oneParDetails.id
-			
-			; if the parameter is in this list, take it 
+
+			; if the parameter is in this list, take it
 			if (ObjHasValue(parIDs, oneParID))
 			{
 				onePar := oneParDetails
@@ -199,7 +199,7 @@ x_AutoEvaluateOneParameter(EvaluatedParameters, Environment, ElementParameters, 
 			}
 		}
 	}
-	
+
 	; sometimes, the content type has one value (like "string", "expression", etc.)
 	; but it can also be changeable by the user. In this case, onePar.content contains an array
 	if (IsObject(onePar.content))
@@ -212,7 +212,7 @@ x_AutoEvaluateOneParameter(EvaluatedParameters, Environment, ElementParameters, 
 		; content type is not changeable by user.
 		oneParContent := onePar.content
 	}
-	
+
 	if (onePar.type = "file" or onepar.type = "folder")
 	{
 		; parameter type is a file or folder.
@@ -323,7 +323,7 @@ x_AutoEvaluateOneParameter(EvaluatedParameters, Environment, ElementParameters, 
 		}
 		else if (oneParContent = "VariableName")
 		{
-			; content type is "VariableName". Replace variables encased by percent signs in string (if any) to allow 
+			; content type is "VariableName". Replace variables encased by percent signs in string (if any) to allow
 			result := x_replaceVariables(Environment, ElementParameters[oneParID])
 
 			if (not onePar.WarnIfEmpty and result = "")
@@ -523,7 +523,7 @@ x_NewFunctionObject(Environment, p_ToCallFunction, params*)
 ; Function object for function x_NewFunctionObject
 class Class_FunctionObject
 {
-    __New(Environment, ToCallFunction, params*) 
+    __New(Environment, ToCallFunction, params*)
 	{
 		; save information which we will need if the function object will be called
         this.Environment := Environment
@@ -536,7 +536,7 @@ class Class_FunctionObject
     }
 
 	; function which will be called when the function object will be called
-    Call(args*) 
+    Call(args*)
 	{
 		; tha argument "args*" may contain parameters which were passed to the called funtion object
 		; if the function did not get any parameters, create a new object
@@ -551,11 +551,11 @@ class Class_FunctionObject
 
 		; get the function name
 		ToCallFunction := this.ToCallFunction
-		
+
 		; call the function with the environment as first argument and the additional arguments (if any)
 		%ToCallFunction%(this.Environment, args*)
     }
-	
+
 	; general pattern as documented in https://www.autohotkey.com/docs/objects/Functor.htm
 	__Call(method, args*) {
         if (method = "")  ; For %fn%() or fn.()
@@ -563,7 +563,7 @@ class Class_FunctionObject
         if (IsObject(method))  ; If this function object is being used as a method.
             return this.Call(method, args*)
     }
-	
+
 	; todo: delete functions object if execution of an element finished
 	__delete()
 	{
@@ -604,14 +604,14 @@ x_ExecuteInNewAHKThread(Environment, p_functionObject, p_Code, p_VarsToImport, p
 		global_AllExecutionIDs[uniqueID] := object()
 	global_AllExecutionIDs[uniqueID].ExeInNewThread := object()
 	global_AllExecutionIDs[uniqueID].ExeInNewThread.functionObject := p_functionObject
-	
+
 	; create a shared object which will be shared with the new ahk thread
 	sharedObject := CriticalObject()
 	sharedObject.varsToImport := p_VarsToImport
 	sharedObject.varsToExport := p_VarsToExport
 	sharedObject.varsExported := Object()
 	_setSharedProperty("temp." uniqueID, {sharedObject: sharedObject}, false)
-	
+
 	; define some code which will be appended before p_Code
 	; make code persistent
 	preCode := ""
@@ -657,7 +657,7 @@ x_ExecuteInNewAHKThread(Environment, p_functionObject, p_Code, p_VarsToImport, p
 	; finally exit the thread
 	postcode .= "exitapp"
 	_LeaveCriticalSection()
-	
+
 	; finally start the new ahk thread
 	API_Main_StartElementAhkThread(uniqueID, "`n" preCode "`n" p_Code "`n" postCode, true)
 }
@@ -703,14 +703,14 @@ x_TriggerInNewAHKThread(Environment, p_Code, p_VarsToImport, p_VarsToExport)
 	global_AllActiveTriggerIDs[uniqueID].ExeInNewThread := object()
 	global_AllActiveTriggerIDs[uniqueID].environment := Environment
 	global_AllActiveTriggerUniqueIDs[Environment.flowID "_" Environment.ElementID] := uniqueID
-	
+
 	; create a shared object which will be shared with the new ahk thread
 	sharedObject := CriticalObject()
 	sharedObject.varsToImport := p_VarsToImport
 	sharedObject.varsToExport := p_VarsToExport
 	sharedObject.varsExported := Object()
 	_setSharedProperty("temp." uniqueID, {sharedObject: sharedObject}, false)
-	
+
 	; define some code which will be appended before p_Code
 	preCode := ""
 	; make code persistent
@@ -738,7 +738,7 @@ x_TriggerInNewAHKThread(Environment, p_Code, p_VarsToImport, p_VarsToExport)
 	preCode .= "  %ahf_varname% := ahf_VarValue`n"
 	preCode .= "}`n"
 	preCode .= "LeaveCriticalSection(ahf_cs_shared)`n"
-	
+
 	; define some code which will be appended after p_Code
 	postcode := ""
 	; return if code reaches the end
@@ -770,7 +770,7 @@ x_TriggerInNewAHKThread(Environment, p_Code, p_VarsToImport, p_VarsToExport)
 	; finally exit the thread
 	postcode .= "ahf_exitapp_Label:`n"
 	postcode .= "exitapp`n"
-		
+
 	_LeaveCriticalSection()
 
 	; start the new ahk thread
@@ -817,7 +817,7 @@ x_trigger(Environment, data = "")
 
 ; must be called when the trigger was enabled.
 ; Result: must contain "normal" or "expection"
-; Message: if Result is "exception", Message must contain the error message which will be shown to the user 
+; Message: if Result is "exception", Message must contain the error message which will be shown to the user
 x_enabled(Environment, Result, Message = "")
 {
 	saveResultOfTriggerEnabling(Environment, Result, Message)
@@ -825,7 +825,7 @@ x_enabled(Environment, Result, Message = "")
 
 ; must be called when the trigger was disabled.
 ; Result: must contain "normal" or "expection"
-; Message: if Result is "exception", Message must contain the error message which will be shown to the user 
+; Message: if Result is "exception", Message must contain the error message which will be shown to the user
 x_disabled(Environment, Result, Message = "")
 {
 	saveResultOfTriggerDisabling(Environment, Result, Message)
@@ -893,7 +893,7 @@ x_FlowEnable(p_FlowID)
 x_FlowDisable(p_FlowID)
 {
 	return xx_FlowDisable(p_FlowID)
-	
+
 }
 
 x_FlowStop(p_FlowID)

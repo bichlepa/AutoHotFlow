@@ -9,9 +9,9 @@ init_Manager_GUI()
 	global
 
 	logger("a2", "initializing manager GUI")
-	
+
 	allItems:=object()
-	
+
 	;initialize image list
 	IconList:=IL_Create("","",1)
 	IL_Add(IconList, _ScriptDir "\Icons\disabled.ico")
@@ -33,7 +33,7 @@ init_Manager_GUI()
 	gui,add,Button,vButton_manager_ChangeCategory gButton_manager_ChangeCategory Disabled Y+20 x330 w130 h30
 	gui,add,Button,vButton_manager_DuplicateFlow gButton_manager_DuplicateFlow Disabled X+10 yp w130 h30
 	gui,add,Button,vButton_manager_Delete gButton_manager_Delete Disabled X+10 yp w130 h30
-	
+
 	gui,add,Button,vButton_manager_EditFlow gButton_manager_EditFlow Disabled Y+50 x330 w200 h30
 	gui,add,Button,vButton_manager_EnableFlow gButton_manager_EnableFlow Disabled Y+20 x330 w200 h30
 	gui,add,Button,vButton_manager_RunFlow gButton_manager_RunFlow Disabled X+10 yp w200 h30
@@ -51,14 +51,14 @@ init_Manager_GUI()
 	; Save manager hwnd
 	gui,+hwndglobal_ManagerGUIHWND
 	_setSharedProperty("hwnds.Manager", global_ManagerGUIHWND)
-	
+
 	; set the gui icon
 	gui, +LastFound
 	setGuiIcon(_ScriptDir "\icons\MainIcon.ico")
 
 	;Set title. Do not show yet
 	Gui, Show, hide, % "AutoHotFlow " lang("Manager") " " _getShared("AhfVersion")
-	
+
 	; enable hotkeys
 	OnMessage(0x100, "keyPressed", 1)
 
@@ -70,7 +70,7 @@ init_Manager_GUI()
 Refresh_Manager_GUI()
 {
 	gui,manager:default
-	
+
 	guicontrol,,Button_manager_NewCategory , % lang("New_Category")
 	guicontrol,,Button_manager_NewFlow , % lang("New_Flow")
 	guicontrol,,Button_manager_ChangeCategory , % lang("Change_category")
@@ -119,10 +119,10 @@ Enable_Manager_GUI()
 ; Updates the icons of the flows, which show the user whether the flow is disabled, enabled or executing
 updateFlowIcons_Manager_GUI()
 {
-	global 
+	global
 	static currentLabelButtonRun := ""
 	static currentLabelButtonEnable := ""
-	
+
 	;TODO: Skip if manger gui is hidden
 
 	; if the treeview needs a full refresh, do it
@@ -131,11 +131,11 @@ updateFlowIcons_Manager_GUI()
 		_setShared("FlowsTreeViewNeedFullRefresh", false)
 		TreeView_manager_Refill()
 	}
-	
+
 	Gui, manager:default
-	
+
 	_EnterCriticalSection()
-	
+
 	; loop throuth all flows and set the icons
 	local forFlowID, forFlowIndex
 	for forFlowIndex, forFlowID in _getAllFlowIds()
@@ -165,9 +165,9 @@ updateFlowIcons_Manager_GUI()
 				global_Treeview_currentIcons[forFlowID] := Icon_Disabled
 			}
 		}
-		
+
 	}
-	
+
 	; If a flow is selected, change tha labels of some buttons
 	local selectedFlowID := global_allTreeViewItems[TV_GetSelection()].id
 	if (_getFlowProperty(selectedFlowID, "executing") = True)
@@ -202,7 +202,7 @@ updateFlowIcons_Manager_GUI()
 			currentLabelButtonRun := "Enable"
 		}
 	}
-	
+
 	_LeaveCriticalSection()
 }
 
@@ -215,18 +215,18 @@ TreeView_manager_Refill()
 		return
 
 	Gui, manager:default
-	
+
 	; Before deleting the tree view, get the selected item, in order to reselect it later
 	local tempselectedTV := TV_GetSelection()
 	local tempselectedID := global_allTreeViewItems[tempselectedTV].id
 	local tempselectedType := global_allTreeViewItems[tempselectedTV].type
-	
+
 	; Disable gui to prevent errors if user interacts with the gui during the update
 	guicontrol, disable,TreeView_manager
 
 	;first delete everything
 	TV_Delete()
-	
+
 	;Add demo category if user wants to see it
 	local HideDemoFlows := _getSettings("HideDemoFlows")
 	if not (HideDemoFlows)
@@ -243,7 +243,7 @@ TreeView_manager_Refill()
 		local categoryTV := TreeView_manager_AddEntry("Category", onecategoryID)
 		_setCategoryProperty(onecategoryID, "tv", categoryTV)
 	}
-	
+
 	_EnterCriticalSection()
 	;go through all flows and add the tv elements
 	local uncategorizedCategoryTV
@@ -259,7 +259,7 @@ TreeView_manager_Refill()
 			uncategorizedCategoryTV:=TreeView_manager_AddEntry("Category", "uncategorized")
 			_setShared("uncategorizedCategoryTV", uncategorizedCategoryTV)
 		}
-			
+
 		;hide demo flows, if user wants
 		if not (HideDemoFlows && oneFlowDemo)
 		{
@@ -287,7 +287,7 @@ TreeView_manager_AddEntry(par_Type, par_ID)
 		return
 
 	Gui, manager:default
-	
+
 	local newTV
 	if (par_Type = "flow")
 	{
@@ -385,7 +385,7 @@ TreeView_manager_Select(par_Type, par_ID, options = "")
 		; If the category should be expanded, do it
 		IfInString,options, expand
 			TV_Modify(categoryTV, "expand") ;Expand the category
-			
+
 	}
 }
 
@@ -396,7 +396,7 @@ TreeView_manager_Rename(par_Type, par_ID)
 
 	if not (global_ManagerGUIHWND)
 		return
-	
+
 	Gui, manager:default
 
 	; Select the tree view item
@@ -418,13 +418,13 @@ TreeView_manager()
 	local tempselectedTV := TV_GetSelection()
 	local tempselectedID := global_allTreeViewItems[tempselectedTV].id
 	local tempselectedType := global_allTreeViewItems[tempselectedTV].type
-	
+
 	if (A_GuiEvent = "e") ;If user has renamed an entry
 	{
 		; get the new name of the renamed entry
 		local tempNewName
 		TV_GetText(tempNewName, tempselectedTV)
-		
+
 		if (tempselectedType = "category") ;If the item is a category
 		{
 			; Get the old name and compare it with the new name
@@ -482,7 +482,7 @@ TreeView_manager()
 					_setCategoryProperty(tempselectedID, "name", tempNewName)
 				}
 
-				
+
 				; move all flows inside the old category to the new category
 				local tempflowId, tempflowIndex
 				for tempflowIndex, tempflowId in _getAllFlowIds()
@@ -493,7 +493,7 @@ TreeView_manager()
 						SaveFlowMetaData(tempflowid)
 					}
 				}
-				
+
 				; We don't need to update the treeview, since the renamed flow is alredy shown
 			}
 		}
@@ -527,16 +527,16 @@ TreeView_manager()
 					TV_Modify(tempselectedTV, "", tempOldName)
 					return
 				}
-				
+
 				;rename
 				_setFlowProperty(tempselectedID, "name", tempNewName)
 				SaveFlowMetaData(tempSelectedID)
-				
+
 				;TODO notify editor that the name changed
-			
+
 			}
-			
-			
+
+
 		}
 	}
 
@@ -562,7 +562,7 @@ TreeView_manager()
 			guicontrol,Disable,Button_manager_DuplicateFlow
 			guicontrol,enable,Button_manager_Delete
 		}
-		
+
 		; Update some button labels
 		if (_getFlowProperty(tempselectedID, "enabled") = true)
 			guicontrol,,Button_manager_EnableFlow,% lang("Disable")
@@ -587,12 +587,12 @@ managerGuiContextMenu()
 	; Launched in response to a right-click or press of the Apps key.
 	if A_GuiControl <> TreeView_manager  ;It displays the menu only for clicks inside the TreeView.
 		return
-	
+
 	;Find out what is selected
 	tempselectedTV := TV_GetSelection()
 	tempselectedID := global_allTreeViewItems[tempselectedTV].id
 	tempselectedType := global_allTreeViewItems[tempselectedTV].type
-	
+
 	;Build the menu
 	if (tempselectedType = "flow")
 	{
@@ -618,7 +618,7 @@ managerGuiContextMenu()
 	}
 	else
 		return
-	
+
 	; Show the menu at the provided coordinates, A_GuiX and A_GuiY.  These should be used
 	; because they provide correct coordinates even if the user pressed the Apps key:
 	Menu, manager_menu, Show, %A_GuiX%, %A_GuiY%
@@ -682,7 +682,7 @@ keyPressed(wpar, lpar, msg, hwn)
 ; When user presses F5 to reload the treeview
 KeyReload()
 {
-	global 
+	global
 
 	gui,manager:default
 
@@ -690,7 +690,7 @@ KeyReload()
 	local tempselectedTV := TV_GetSelection()
 	local tempselectedID := global_allTreeViewItems[tempselectedTV].id
 	local tempselectedType := global_allTreeViewItems[tempselectedTV].type
-	
+
 	; refill the tree view
 	TreeView_manager_Refill()
 
@@ -704,7 +704,7 @@ Button_manager_NewCategory(par_Type, par_ID)
 	global
 
 	gui,manager:default
-	
+
 	;create new category
 	local newCategoryID := NewCategory()
 	; insert it in the treeview (todo: add without full refill)
@@ -718,7 +718,7 @@ Button_manager_NewFlow()
 {
 	global
 	gui,manager:default
-	
+
 	; get the selected element tv id.
 	local tempSelectedTV := TV_GetSelection()
 	local NewFlowID
@@ -727,7 +727,7 @@ Button_manager_NewFlow()
 	{
 		;Create new flow in the category of selected element
 		local tempSelectedID := global_allTreeViewItems[tempSelectedTV].id
-		
+
 		if (global_allTreeViewItems[tempSelectedTV].type = "Category")
 		{
 			; a category is selected. Insert the new flow in this category
@@ -750,7 +750,7 @@ Button_manager_NewFlow()
 			MsgBox,,Unexpected error, The type of selected element could not be resolved! (95698769890)
 			return
 		}
-		
+
 	}
 	else ;If nothing is selected
 	{
@@ -759,14 +759,14 @@ Button_manager_NewFlow()
 	}
 	; initialize the new flow
 	initNewFlow(NewFlowID)
-	
+
 	; create a new state
 	state_New(NewFlowID)
 	_setFlowProperty(NewFlowID, "savedState", _getFlowProperty(NewFlowID, "currentState"))
 
-	; save newly created flow 
+	; save newly created flow
 	SaveFlowMetaData(NewFlowID)
-	
+
 	; insert the flow in the tree view (todo: do it without a full refill)
 	TreeView_manager_Refill()
 
@@ -801,12 +801,12 @@ Button_manager_DuplicateFlow()
 	global
 
 	gui,manager:default
-	
+
 	; get information of the selected tv item
 	local tempselectedTV := TV_GetSelection()
 	local tempselectedID := global_allTreeViewItems[tempselectedTV].id
 	local tempselectedType := global_allTreeViewItems[tempselectedTV].type
-	
+
 	if (tempselectedType = "flow") ;this can only be performed on flows
 	{
 		; duplicate the flow
@@ -881,12 +881,12 @@ Button_manager_Delete()
 	local tempselectedTV := TV_GetSelection()
 	local tempselectedID := global_allTreeViewItems[tempselectedTV].id
 	local tempselectedType := global_allTreeViewItems[tempselectedTV].type
-	
+
 	if (tempselectedType = "flow") ;if a flow should be deleted
 	{
 		; disable the gui in ordner to prevent errors if user interacts with the gui
 		Disable_Manager_GUI()
-		
+
 		if (_getFlowProperty(tempselectedID, "category") = "demo") ;Check whether this is a demo flow
 		{
 			; The demo flows are shipped with AutoHotkey and they cannot be deleted. But user may want to hide them
@@ -916,10 +916,10 @@ Button_manager_Delete()
 				; Refill the tree view and select the parent category
 				TreeView_manager_Refill()
 				TreeView_manager_Select("Category", tempCategory, "expand")
-				
+
 			}
 		}
-		
+
 	}
 	else if (tempselectedType = "category") ;if a category should be deleted
 	{
@@ -956,13 +956,13 @@ Button_manager_Delete()
 					break
 				}
 			}
-			
+
 			if (temphasFlows = true) ;If there are flows inside the category
 			{
 				;ask user for confirmation
 				local tempCategoryName := _getCategoryProperty(tempselectedID, "name")
 				MsgBox, 4, % lang("Confirm_deletion"), % lang("Do you really want to delete the category '%1%'?", tempCategoryName) "`n" lang("All flows of that category will be moved into the category '%1%'.", lang("Uncategorized"))
-				
+
 				IfMsgBox, Yes ; if user approved
 				{
 					 ;Move all flows that were inside the category to uncategorized
@@ -975,7 +975,7 @@ Button_manager_Delete()
 							SaveFlowMetaData(tempflowid)
 						}
 					}
-					
+
 					; Delete the category
 					DeleteCategory(tempselectedID)
 
@@ -990,11 +990,11 @@ Button_manager_Delete()
 			{
 				; The category has no flows and can be removed without confirmation
 				DeleteCategory(tempselectedID)
-				
+
 				; rebuild the tree view
 				TreeView_manager_Refill()
 			}
-			
+
 		}
 	}
 
@@ -1028,5 +1028,3 @@ Button_manager_Exit()
 	; exit AHF
 	API_Main_Exit()
 }
-
-

@@ -20,18 +20,18 @@ _flows is an associative array of objects. Each object contains some information
 		.pars			Associative Array with the parameters of the element
 		.fromConnections	A list of connection IDs which start from the element
 		.toConnections	A list of connection IDs which end on the element
-		
+
 		.x	.y			Position
 		.heightOfVerticalBar	If element is a loop
 		.StandardName	Setting whether the name should be generated (True) or manually set by user (False)
 		.selected			True if element is selected
-		.ClickPriority	If multiple elements hover each other, this value makes it possible to click through the elements 
-		
+		.ClickPriority	If multiple elements hover each other, this value makes it possible to click through the elements
+
 		.state			Execution state of the element
 		.enabled		True if this is a trigger and is enabled
 		.countRuns		Count of Threads which are currently running this element
 		.lastrun		Timestamp of last execution (a_tickcount)
-		
+
 	.allConnections	Associative array of Objects. Each object contains following values:
 		.ID				ID of the connections. (Which is also the key)
 		.UniqueID		Unique ID of the connection. (Currently contains the flow ID and the element ID)
@@ -39,15 +39,15 @@ _flows is an associative array of objects. Each object contains some information
 		.ConnectionType	Connection type
 		.from			Element ID where the connection starts
 		.to				Element ID where the connection ends
-		
+
 		.selected			True if connection is selected
 		.ClickPriority	If multiple elements hover each other, this value makes it possible to click through the elements
-		
+
 		.state			Execution state of the element
 		.lastrun		Timestamp of last execution (a_tickcount)
-	
+
 	.selectedElements	Contains an array of all element and connection IDs which are selected
-	
+
 	.FlowSettings		Contains all flow Specified settings
 		.ExecutionPolicy	Defines what happens if a flow is triggered but already executing. Contains "default", "wait", "skip", "stop" or "parallel"
 		.FolderOfStaticVariables	;TODO
@@ -56,37 +56,37 @@ _flows is an associative array of objects. Each object contains some information
 		.OffsetY		Current offset
 		.zoomFactor		Current zoom factor
 		.WorkingDir		Working dir of the flow
-	
+
 	;Internal values
 	.category 		Flow category ID (Internal ID, which is not the name)
 	.tv 			Flow tree view ID
 	.ElementIDCounter	Counter which ensured that every new element ID is unique
 	.CompatibilityVersion	Version number of the save file format
-	
+
 	.loaded         True if flow is loaded
 	.enabled 		True if flow is enabled
 	.executing 		True if flow is running
 	.
-	.countOfExecutions	
+	.countOfExecutions
 	.countOfWaitingExecutions
-	
+
 	.file			File path of the flow
 	.Folder			Folder path of the flow
 	.FileName		File name of the flow
-	
+
 
 
 	.draw			Object containing some informations for the draw thread:
 		.mustDraw		True if something has changed and the flow must be redrawn
 	.Type			Flow type (currently containing "Flow")
-	
+
 	.states			Object containing up to 100 previous states of the flow (which allows undo and redo). Each object contains following values:
 		.id				ID of the state. (Which is also the key)
 		.allElements
 		.allConnections
 		.allTriggers
 	.currentState	ID of current state
-	
+
 	.demo			True if the flow is a demonstration flow
 */
 global _flows := CriticalObject()
@@ -119,7 +119,7 @@ _execution is an associative array of values:
 			.threadVars 	thread variables in current execution
 			.loopVars		thread loop variables in current execution
 		.InstanceVars	Local variables in current instance
-		
+
 	.triggers		Associative array of objects. Each object contains following values:
 		.ID				Enabled trigger ID (Which is also the key)
 		.FlowID			Flow ID
@@ -128,9 +128,9 @@ _execution is an associative array of values:
 		.enabled		Whether the element was successfully enabled
 		.result			Result of element enabling
 		.Message		Message of element enabling
-	
-	
-	
+
+
+
 */
 global _execution := CriticalObject()
 _execution.Instances := Object()
@@ -144,7 +144,7 @@ _share contains some values:
 		.id				Internal Category ID. (Which is also the key)
 		.Name			Category name.
 		.Type			Category Type. (Containing the string "Category")
-		.TV				Tree view ID. 
+		.TV				Tree view ID.
 	.log			All logs
 	.log_XXX		Logs from a certain source. (XXX is the name of the source)
 	.ScriptDir		Directory which contains ahk script files, icons, language files, help files and AHK_H.exe
@@ -159,8 +159,8 @@ _share.logcount := 0
 _share.logcountAfterTidy := 0
 _share.temp := Object() 	;For temporary content
 _share._ScriptDir := _ScriptDir
-_share._WorkingDir := _WorkingDir 
-_share.CategoryIDCounter := 1	
+_share._WorkingDir := _WorkingDir
+_share.CategoryIDCounter := 1
 _share.Exiting := false
 
 _share.AhfVersion := _AHF_VERSION

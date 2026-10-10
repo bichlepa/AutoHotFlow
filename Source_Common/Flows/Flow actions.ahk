@@ -7,7 +7,7 @@ editFlow(p_FlowID)
 	{
 		MsgBox, 48, % lang("Edit flow"), % lang("You are opening a demonstration flow for edit.") " " lang("Please be aware that a demonstration flow cannot be changed.") " " lang("You may duplicate this flow first and then you can edit it.")
 	}
-	
+
 	; open the editor
 	API_Main_StartEditor(p_FlowID)
 }

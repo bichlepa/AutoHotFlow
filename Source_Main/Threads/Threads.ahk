@@ -19,7 +19,7 @@ Thread_StartManager()
 {
 	; prepare variable which will be used to pass tasks or information to this thread
 	_setSharedProperty("tasks.manager", object())
-	
+
 	; define thread ID
 	threadID := "Manager"
 	logger("t1", "Starting manager thread. ID: " threadID)
@@ -32,7 +32,7 @@ Thread_StartManager()
 
 	; start the new thread
 	newThread := AhkThread(global_CommonAhkCodeForAllThreads "`n global _ahkThreadID := """ threadID """`n" ExecutionThreadCode)
-	
+
 	; write thread ID to the list of all threads
 	global_AllThreads[threadID] := {permanent: true, type: "Manager", thread: newThread}
 
@@ -45,7 +45,7 @@ Thread_StartEditor(p_FlowID)
 {
 	; prepare variable which will be used to pass tasks or information to this thread
 	_setSharedProperty("tasks." "editor" p_FlowID, object())
-	
+
 	; define thread ID
 	threadID := "Editor" global_EditorThreadIDCounter++
 	logger("t1", "Starting editor thread. ID: " threadID)
@@ -58,7 +58,7 @@ Thread_StartEditor(p_FlowID)
 
 	; start the new thread
 	newThread := AhkThread(global_CommonAhkCodeForAllThreads "`n global _ahkThreadID := """ threadID """`n global _FlowID := """ p_FlowID """`n"  ExecutionThreadCode)
-	
+
 	; write thread ID to the list of all threads
 	global_AllThreads[threadID] := {permanent: false, type: "Editor", flowID: p_FlowID, thread: newThread}
 
@@ -71,7 +71,7 @@ Thread_StartDraw()
 {
 	; prepare variable which will be used to pass tasks or information to this thread
 	_setSharedProperty("tasks.draw", object())
-	
+
 	; define thread ID
 	threadID := "Draw"
 	logger("t1", "Starting draw thread. ID: " threadID)
@@ -81,7 +81,7 @@ Thread_StartDraw()
 
 	; start the new thread
 	newThread := AhkThread(global_CommonAhkCodeForAllThreads "`n global _ahkThreadID := """ threadID """`n" ExecutionThreadCode)
-	
+
 	; write thread ID to the list of all threads
 	global_AllThreads[threadID] := {permanent: true, type: "Draw", thread: newThread}
 
@@ -94,20 +94,20 @@ Thread_StartExecution()
 {
 	; prepare variable which will be used to pass tasks or information to this thread
 	_setSharedProperty("tasks.execution", object())
-	
+
 	; define thread ID
 	threadID := "Execution"
 	logger("t1", "Starting execution thread. ID: " threadID)
 
 	; read source file
 	FileRead,ExecutionThreadCode,% _ScriptDir "\Source_Execution\execution.ahk"
-	
+
 	; replace placeholders
 	StringReplace, ExecutionThreadCode, ExecutionThreadCode, % ";PlaceholderIncludesOfElements", % global_libInclusionsForThreads global_elementInclusionsForThreads
 
 	; start the new thread
 	newThread := AhkThread(global_CommonAhkCodeForAllThreads "`n global _ahkThreadID := """ threadID """`n" ExecutionThreadCode)
-	
+
 	; write thread ID to the list of all threads
 	global_AllThreads[threadID] := {permanent: true, type: "Execution", thread: newThread}
 
@@ -132,7 +132,7 @@ Thread_StartElemenThread(uniqueID, code, notifyWhenStopped)
 Thread_StopElemenThread(uniqueID)
 {
 	threadID := "element_" uniqueID
-	
+
 	logger("t1", "Stopping element thread. ID: " threadID)
 
 	threadpars := global_AllThreads[threadID]
@@ -196,7 +196,7 @@ Thread_KillAll()
 {
 	logger("t1", "Killing all threads")
 	threadsCopy := global_Allthreads.clone()
-	
+
 	for threadID, threadpars in threadsCopy
 	{
 		if (threadpars.thread.ahkReady())
@@ -213,7 +213,7 @@ Thread_KillAll()
 
 ; called when a thread has terminated itself
 Thread_Stopped(par_ThreadID)
-{	
+{
 	logger("t1", "Thread  " par_ThreadID " stopped")
 
 	; if an external thread stopped, we have to inform the execution task about it

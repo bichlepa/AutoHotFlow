@@ -14,7 +14,7 @@ uriencode( str ) { ; -----------------------------------------------------------
 ; If the string contains a character with an ascii code higher than 126, this function uses UTF-8
 ; encoding for those characters. E.g: '¢' will appear as %C2%A2 instead of %A2.
 ; ! IMPORTANT ! For ANSI versions of AHK, this function assumes that the input string is ALREADY IN
-; UTF-8 FORMAT. 
+; UTF-8 FORMAT.
    If !RegexMatch( str, "[^\x01-\x7e]" ) ; This regex shouldn't be too slow in unicode AHK.
    {
       ; Use the simple character conversion method. For each ascii code that is not reserved,

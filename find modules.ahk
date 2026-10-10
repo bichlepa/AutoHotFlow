@@ -102,7 +102,7 @@ loop, files, source_Elements\*, D
 			elementInclusions .= "#include " packagePath "\" oneElementType "\" oneElement "`n"
 		}
 	}
-	
+
 	; Create the help file menu index and copy help files
 
 	for oneLanguageIndex, oneLanguage in availableHelpFileLanguages
@@ -137,7 +137,7 @@ loop, files, source_Elements\*, D
 		}
 
 	}
-	
+
 
 	; merge translations files
 	loop, files, %packagePath%\language\*.ini
@@ -146,7 +146,7 @@ loop, files, source_Elements\*, D
 			continue
 
 		oneLanguage := substr(a_loopfilename, 1, instr(a_loopfilename, ".") - 1)
-		
+
 		; read existing translations
 		FileRead, iniFileContent, % a_loopfilepath
 		newTranslations := importIni(iniFileContent)
@@ -325,7 +325,7 @@ FileAppend, % aboutCode, % aboutCodeFilePath, utf-8
 ; 			apiFile:=apifileEditor
 ; 		else if a_index=2
 ; 			apiFile:=apifileMain
-		
+
 ; 		StringGetPos, posfunc, apifile, % oneFuncion.name
 ; 		if (posfunc = -1)
 ; 		{
@@ -338,10 +338,10 @@ FileAppend, % aboutCode, % aboutCodeFilePath, utf-8
 ; 			stringgetpos, pospars, function, (
 ; 			stringleft,funcname, function, %pospars%
 ; 			StringTrimLeft,funcpars , function,%pospars%
-			
+
 ; 			StringReplace, apifile, apifile,% function,% oneFuncion.name oneFuncion.pars
 ; 		}
-		
+
 ; 		if a_index = 1
 ; 			apifileEditor:=apiFile
 ; 		else if a_index=2

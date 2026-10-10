@@ -37,7 +37,7 @@ HiddenCommandWindowProcessMessage(message)
 	{
 		flowID := messageParsed[2]
 		triggerID := messageParsed[3]
-		
+
 		if (_getElementInfo(flowID, triggerID, "enabled"))
 		{
 			API_Execution_ExecuteFlow(flowID, triggerID)

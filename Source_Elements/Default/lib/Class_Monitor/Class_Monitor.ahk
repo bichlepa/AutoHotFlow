@@ -268,5 +268,5 @@ Class Default_Lib_Class_Monitor_Class                                           
         this.DestroyPhysicalMonitors(this.FreeSize, this.FreeArray)
         DllCall("FreeLibrary", "Ptr", this.hDXVA2)
     }
-    
+
 }

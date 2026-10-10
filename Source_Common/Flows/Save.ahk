@@ -12,8 +12,8 @@ SaveFlow(FlowID)
 {
 	FlowName := _getFlowProperty(FlowID, "name")
 
-	logger("a1", "Saving flow " FlowName)	
-	
+	logger("a1", "Saving flow " FlowName)
+
 	if (_getFlowProperty(FlowID, "demo") and _getSettings("developing") != True)
 	{
 		;A demo flow cannot be saved
@@ -24,22 +24,22 @@ SaveFlow(FlowID)
 		}
 		return
 	}
-	
+
 	_EnterCriticalSection()
 
 	; get flow object from current state
 	; we save the current state because we don't want to save temporary changes while user edits the flow
 	currentState := _getFlowProperty(FlowID, "currentState")
 	flow := _getFlowProperty(FlowID, "states." currentState)
-	
+
 	; get flow savefile path
 	ThisFlowFilepath := _getFlowProperty(FlowID, "file")
 	ThisFlowFolder := _getFlowProperty(FlowID, "Folder")
 	ThisFlowFilename := _getFlowProperty(FlowID, "FileName")
-	
+
 	; create folder just in case
 	FileCreateDir, %ThisFlowFolder%
-	
+
 	; create a new flow object where we will copy all data that is worth for saving
 	flowSave := object()
 
@@ -49,7 +49,7 @@ SaveFlow(FlowID)
 	flowSave.flowSettings := _getFlowProperty(FlowID, "flowSettings")
 	; we will save the category name instead of the categry ID
 	flowSave.category := _getCategoryProperty(_getFlowProperty(FlowID, "category"), "Name")
-	
+
 	; Add elements
 	flowSave.allElements :=  object()
 	for forElementID, forElement in flow.allElements
@@ -66,7 +66,7 @@ SaveFlow(FlowID)
 		saveElement.y := forElement.y
 		saveElement.name := forElement.name
 		saveElement.StandardName := forElement.StandardName
-		
+
 		; write some data that is only needed for special element types
 		if (forElement.type = "loop")
 			saveElement.HeightOfVerticalBar := forElement.HeightOfVerticalBar
@@ -74,14 +74,14 @@ SaveFlow(FlowID)
 			saveElement.DefaultTrigger := forElement.DefaultTrigger
 		if (forElement.type = "trigger")
 			saveElement.enabled := _getElementInfo(FlowID, forElementID, "enabled")
-		
+
 		; write the package which is needed for this element.
 		; usecase: if a flow will be exported and imported in an other installation of AHF
 		;   and this flow has elements which require additional packages, the user will get a message.
 		saveElementClass := saveElement.class
 		saveElement.package := AllElementClassInfos[saveElementClass].package
 		saveElement.packageVersion := AllElementClassInfos[saveElementClass].packageVersion
-		
+
 		; write element parameters. We will write only the parameters which are needed by the element.
 		; because, if an element class was changed, the property "pars" may contain parameters which are not needed anymore.
 		parametersToSave := Element_getParameters(forElement.class, {flowID: FlowID, elementID: forElement.ID})
@@ -90,11 +90,11 @@ SaveFlow(FlowID)
 		{
 			saveElement.pars[oneParInfo.id] := forElement.pars[oneParInfo.id]
 		}
-		
+
 		; write the new element in the flow object
 		flowSave.allElements[forElementID] := saveElement
 	}
-	
+
 	; add connections
 	flowSave.allConnections :=  object()
 	for forConnectionID, forConnection in flow.allConnections
@@ -110,17 +110,17 @@ SaveFlow(FlowID)
 		; todo: remove type and rename connectionType to condition
 		saveConnection.type := forConnection.type
 		saveConnection.ConnectionType := forConnection.ConnectionType
-		
+
 		; some connectoins have information about the part of the element, where they are connected to. copy it if present.
 		if (forConnection.fromPart)
 			saveConnection.fromPart := forConnection.fromPart
 		if (forConnection.toPart)
 			saveConnection.toPart := forConnection.toPart
-			
+
 		; write the new connection in the flow object
 		flowSave.allConnections[forConnectionID] := saveConnection
 	}
-	
+
 	;Make a backup of the old flow. TODO: It will be possible to restore the old state later.
 	FileCreateDir, %ThisFlowFolder%\backup
 	Filemove, %ThisFlowFolder%\%ThisFlowFilename%.txt, %ThisFlowFolder%\backup\%ThisFlowFilename%_backup_%a_now%.json
@@ -140,16 +140,16 @@ SaveFlow(FlowID)
 			presentBackupFiles.removeat(1)
 		}
 	}
-	
+
 	;Write new file. TODO: error check
 	FileDelete, % ThisFlowFolder "\" ThisFlowFilename ".json"
 	FileAppend, % Jxon_Dump(flowSave, 2), % ThisFlowFolder "\" ThisFlowFilename ".json", UTF-8-RAW
-	
+
 	logger("a1","Flow " FlowName " was successfully saved.")
-	
+
 	; update the state of saved flow
 	_setFlowProperty(FlowID, "savedState", flow.currentState)
-	
+
 	_LeaveCriticalSection()
 }
 
@@ -165,6 +165,6 @@ i_SaveUnsavedFlows()
 			SaveFlow(oneFlowID)
 		}
 	}
-	
+
 	_LeaveCriticalSection()
 }

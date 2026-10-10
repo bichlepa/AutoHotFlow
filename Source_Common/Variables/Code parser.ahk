@@ -24,7 +24,7 @@ class class_parser
 {
 	; define available keywords
 	keywords:=" if else "
-	
+
 	; parse a code
 	parse(tokens, whatToParse ="code")
 	{
@@ -59,7 +59,7 @@ class class_parser
 
 		; prepare variable which will contain the errors
 		this.errors := Object()
-		
+
 		; prepare variable which will contain the parsed tokens
 		this.parsedTokens := Object()
 
@@ -79,7 +79,7 @@ class class_parser
 			; there is nothing here, return nothing
 			return
 		}
-		
+
 		if (whatToParse = "code")
 		{
 			return this.parseCode_toplevel()
@@ -91,7 +91,7 @@ class class_parser
 		else
 			throw exception("cannot parse code of type " whatToParse)
 	}
-	
+
 	; set the next token as the current one
 	next()
 	{
@@ -115,8 +115,8 @@ class class_parser
 			this.eof := true
 		}
 	}
-	
-	
+
+
 	;Entry point of the code parser
 	parseCode_toplevel()
 	{
@@ -127,7 +127,7 @@ class class_parser
 
 		return prog
 	}
-	
+
 	; Parse executable code
 	; if insideBrackets, we will only execute the code inside the brackets
 	; todo: implementation in progress
@@ -151,19 +151,19 @@ class class_parser
 			; break if we reach the closing bracket
 			if (this.token.is_punc("}"))
 				break
-			
+
 			; parse the code
 			prog.push(this.parse_code())
-			
+
 			this.skip_whitespace()
 		}
-		
+
 		if (insideBrackets)
 		{
 			; skip the closing bracket
 			this.expect_punc("}")
 		}
-		
+
 		; return the parsing result
 		retval := {type: "prog", prog: prog}
 		return retval
@@ -178,14 +178,14 @@ class class_parser
 
 		; parse an expression in current code line
 		expr := this.parse_expression(this.parse_codeline(), 0)
-		
+
 		; todo: parse a call
 		;~ if (this.token.is_punc("("))
 			;~ return this.parse_call(expr)
 		;~ else
 			return expr
 	}
-	
+
 	;parse a line of code
 	; todo: implementation in progress
 	parse_codeline()
@@ -223,7 +223,7 @@ class class_parser
 			; The token contains something that is not expected. Generate error
 			expr := ""
 			this.croak("Unexpected token in code")
-			
+
 		}
 		;If after a token there are brackets, parse a function call
 		if (this.token.is("("))
@@ -231,7 +231,7 @@ class class_parser
 		else
 			return expr
 	}
-	
+
 	;Parse an if expression
 	; todo: implementation in progress
 	parse_if()
@@ -240,15 +240,15 @@ class class_parser
 		this.expect_kw("if")
 
 		; parse the expression after the if keyword
-		cond := this.parse_expression(this.parse_expressionToken(), 0) 
-		
+		cond := this.parse_expression(this.parse_expressionToken(), 0)
+
 		; todo: remove?
-		;~ if (!this.token.is("{")) 
+		;~ if (!this.token.is("{"))
 			;~ this.skip_punc("{")
 
 		; skip whitespace
 		this.skip_whitespace()
-		
+
 		; parse the code after the if expression
 		then := this.parse_code()
 
@@ -257,7 +257,7 @@ class class_parser
 
 		; skip whitespace
 		this.skip_whitespace()
-		
+
 		; check whether we have now an else keyword
 		if (this.is_kw("else"))
 		{
@@ -270,7 +270,7 @@ class class_parser
 
 		return ret
 	}
-	
+
 	;Entry point of the expression parser
 	parse_expression_toplevel()
 	{
@@ -283,7 +283,7 @@ class class_parser
 
 		; write errors in return value, if any
 		prog.errors := this.errors
-		
+
 		return prog
 	}
 
@@ -295,7 +295,7 @@ class class_parser
 	{
 		;Skip whitespaces
 		this.skip_whitespace(false)
-		
+
 		;check whether the next token is an operation
 		if not(this.token.is_op())
 		{
@@ -340,7 +340,7 @@ class class_parser
 
 			; get the precedence of the current token
 			his_prec := this.precedence[tok.value]
-			
+
 			if (his_prec > my_prec)
 			{
 				; The precedence of the current token is higher than the precedence of the last parsed token. Parse the token
@@ -350,13 +350,13 @@ class class_parser
 					this.next()
 					this.skip_whitespace(false)
 				}
-				
+
 				;check wheter the next token is the assign token
 				if (tok.value = ":=" or tok.value = ".=" or tok.value = "+=" or tok.value = "-=" or tok.value = "*=" or tok.value = "/=")
 					type := "assign"
 				else
 					type := "binary"
-				
+
 				;parse the right part of the token
 				right := this.parse_expression(this.parse_expressionToken(percentIsEnd), his_prec, percentIsEnd)
 
@@ -364,7 +364,7 @@ class class_parser
 				newleft := {type: type, operator: tok.value, left: left, right: right}
 
 				;continue parsingthe next token
-				retval := this.parse_expression(newleft, my_prec, percentIsEnd)			
+				retval := this.parse_expression(newleft, my_prec, percentIsEnd)
 				return retval
 			}
 			else
@@ -373,17 +373,17 @@ class class_parser
 				return left
 			}
 		}
-		
+
 		; We have no operator token, return the already parsed expression
 		return left
 	}
-	
+
 	; parse a token in an expression.
 	parse_expressionToken(percentIsEnd = false)
 	{
 		;Skip whitespaces
 		this.skip_whitespace(false)
-		
+
 		;Do we have an openig bracket?
 		if (this.token.is("("))
 		{
@@ -418,33 +418,33 @@ class class_parser
 				this.croak("Unexpected token in expression" " - '" value "'")
 			}
 		}
-		
+
 		;If after a variable name token there are brackets
 		if (expr.type = "var" && this.token.is("("))
 		{
 			; we have a function call instead of a variable name. convert it and parse function parameters.
 			return this.parse_call(expr)
 		}
-		
+
 		return expr
 	}
-	
+
 	; Parse a variable name
-	; percentIsEnd: stops on percent sign. Used if we have an epxression inside percent signs 
+	; percentIsEnd: stops on percent sign. Used if we have an epxression inside percent signs
 	parse_varname(percentIsEnd = false)
 	{
 		line := this.token.line
 		col := this.token.col
 		pos := this.token.pos
 		wholeline := this.token.wholeline
-		
+
 		; catch error
 		if (this.token.type != "name" and this.token.value != "%")
 		{
 			this.croak("expected variable name")
 			return
 		}
-		
+
 		;Create path, which length can be more than one if accessing a element of object (e.g. obj.value or obj[valuename][1]
 		path := object()
 		Loop
@@ -506,7 +506,7 @@ class class_parser
 						reverseOrderIndices.push(oneindex)
 					}
 
-					; 
+					;
 					obj := object()
 					for oneindex, oneReverseIndex in reverseOrderIndices
 					{
@@ -518,7 +518,7 @@ class class_parser
 						{
 							obj := ({type: "binary", operator: ".", left: obj, right: concat[oneReverseIndex]})
 						}
-						
+
 					}
 					path.push(obj)
 				}
@@ -574,13 +574,13 @@ class class_parser
 				}
 			}
 		}
-		
+
 		; create return value
 		expr := {type: "var", path: path, line: line, col: col, pos: pos, wholeline: wholeline}
-		
+
 		return expr
 	}
-	
+
 	;Parse a function call
 	parse_call(func)
 	{
@@ -590,21 +590,21 @@ class class_parser
 		; skip the opening brackets and whitespaces
 		this.expect_punc("(")
 		this.skip_whitespace(false)
-		
+
 		if (this.token.is(")"))
 		{
 			while (not this.eof)
 			{
 				; parse the function parameter
 				pars.push(this.parse_expression(this.parse_expressionToken(),0))
-				
+
 				; skip whitespaces (if any)
 				this.skip_whitespace(false)
-				
+
 				; break on closing bracket (do not skip it yet)
 				if (this.token.is(")"))
 					break
-				
+
 				if this.token.is(",")
 				{
 					; we have a comma. Skip it and stay inside the loop to parse the next function parameter
@@ -620,7 +620,7 @@ class class_parser
 		; else we have no function parameter since we have a closing bracket right after the opening bracket
 		; there must be a closing bracket, if we finished the last loop
 		this.expect_punc(")")
-		
+
 		; change the type of the last token
 		func.type := "func"
 
@@ -628,7 +628,7 @@ class class_parser
 		call := {type: "call", path: func.path, args: pars, line: func.line, col: func.col, pos: func.pos, wholeline: func.wholeline}
 		return call
 	}
-	
+
 	;parse a number
 	parse_Number()
 	{
@@ -646,7 +646,7 @@ class class_parser
 			col := this.token.col
 			pos := this.token.pos
 			wholeline := this.token.wholeline
-			
+
 			; write the value of current numerical token and skip the token
 			num := this.token.value
 			this.token.type := "num"
@@ -687,16 +687,16 @@ class class_parser
 			return
 		}
 	}
-	
+
 	;parse a string
 	parse_string()
 	{
-		
+
 		line := this.token.line
 		col := this.token.col
 		pos := this.token.pos
 		wholeline := this.token.wholeline
-		
+
 		; skip the quotation marks
 		this.expect_punc("""")
 
@@ -790,12 +790,12 @@ class class_parser
 				this.token.type := "str"
 				this.next()
 				break
-				
+
 			}
 			else if (this.token.is_whitespace(true))
 			{
 				; we do not support linfeeds inside strings
-				this.croak("Linefeed inside a string") 
+				this.croak("Linefeed inside a string")
 				break
 			}
 			else
@@ -810,7 +810,7 @@ class class_parser
 		; return the parsed string
 		return {type: "str", value: string, line: line, col: col, pos: pos, wholeline: wholeline}
 	}
-	
+
 	;Skips the next punctuation. The parameter is the expected punctuation. If the punctuation is not found, it will report error.
 	expect_punc(ch)
 	{
@@ -828,7 +828,7 @@ class class_parser
 		else
 			this.croak("Expecting keyword: """  ch  """")
 	}
-	
+
 	;Skips whitespaces
 	skip_whitespace(AllowLF=true)
 	{
@@ -838,7 +838,7 @@ class class_parser
 				this.next()
 		}
 	}
-	
+
 	; checks whether the current token is a keyword
 	is_kw(kw)
 	{
@@ -856,7 +856,7 @@ class class_parser
 		}
 		return false
 	}
-	
+
 	; creates an error message on parsing error
 	croak(description)
 	{
@@ -865,7 +865,5 @@ class class_parser
 		this.token.errors.push(error)
 		this.errors.push(error)
 	}
-	
+
 }
-
-

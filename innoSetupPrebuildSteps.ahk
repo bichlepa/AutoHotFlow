@@ -71,7 +71,7 @@ buildFile(path, icon = "")
     SplitPath, A_AhkPath,, AhkRoot
     if (icon)
         RunWait, "%AhkRoot%\Compiler\Ahk2Exe.exe" /in "%A_WorkingDir%\%path%.ahk" /out "%A_WorkingDir%\%path%.exe" /icon "%A_WorkingDir%\%icon%"
-    else 
+    else
         RunWait, "%AhkRoot%\Compiler\Ahk2Exe.exe" /in "%A_WorkingDir%\%path%.ahk" /out "%A_WorkingDir%\%path%.exe"
 }
 
@@ -182,7 +182,7 @@ exitapp
 addFile(dirList, fileList, filepath)
 {
     SplitPath, filepath, oneFileName, dirPath
-    
+
     if (not ObjHasValue(fileList, filepath))
     {
         fileList.push(filepath)
@@ -248,7 +248,7 @@ removeUnusedDirs(dirList, fileList)
         for toCheckIndex, toCheckDir in dirList
         {
             found := false
-            
+
             for oneIndex, oneDir in dirList
             {
                 SplitPath, oneDir, oneFileName, dirPath
@@ -260,7 +260,7 @@ removeUnusedDirs(dirList, fileList)
                     }
                 }
             }
-            
+
             if found
                 continue
 
@@ -288,4 +288,3 @@ removeUnusedDirs(dirList, fileList)
             break
     }
 }
-

@@ -5,7 +5,7 @@ class main_Globals_TestSuite
 	{
 		init_GlobalVars()
 	}
-	
+
 	Test_Vars_exist()
 	{
 		global
@@ -13,5 +13,5 @@ class main_Globals_TestSuite
 		Yunit.assert(IsObject(_settings) == true)
 		Yunit.assert(IsObject(_execution) == true)
 	}
-	
+
 }

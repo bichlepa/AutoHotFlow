@@ -24,7 +24,7 @@ class class_evaluator
 		this.environment := environment
 		this.useCommonFunctions := useCommonFunctions
 		this.errors := []
-		
+
 		if (parsedCode)
 		{
 			; start evaluation
@@ -35,14 +35,14 @@ class class_evaluator
 			;nothing was pared. return empty string
 			res := ""
 		}
-		
+
 
 		if (this.errors.Length() != 0)
 			return {res: res, errors: this.errors}
 		Else
 			return {res: res}
 	}
-	
+
 	; evaluate the current part of the pared expression
 	evalnext(exp)
 	{
@@ -103,7 +103,7 @@ class class_evaluator
 			else
 			{
 				; we have a variable on left side
-				
+
 				; the path of the variable may consist of multiple parts
 				path := object()
 				for oneindex, onepath in exp.left.path
@@ -120,14 +120,14 @@ class class_evaluator
 						pathDotted .= "."
 					pathDotted .= onepath
 				}
-				
+
 				; get the variable value
 				; %empty% is here because the file may be included by threads which do not include the module with one of those functions
 				if (this.useCommonFunctions)
 					value:=var_get_common%empty%(this.environment, pathDotted)
 				Else
 					value:=var_get%empty%(this.environment ,pathDotted)
-				
+
 				; calculate the result of the assign operator
 				value := this.assign(exp.operator, value, this.evalnext(exp.right))
 
@@ -185,14 +185,14 @@ class class_evaluator
 		if (exp.type = "call")
 		{
 			; we have a function call
-			
+
 			; the path of the function name may consist of multiple parts
 			path:=object()
 			for oneindex, onepath in exp.path
 			{
 				path.push(this.evalnext(onepath))
 			}
-			
+
 			; evaluate the arguments
 			args := Object()
 			for oneIndex, oneArgsExp in exp.args
@@ -206,7 +206,7 @@ class class_evaluator
 		; if we get here, the parsed code contains something that we don't know yet. This is then an implementation error.
 		this.croak("Unexpected error during evaluation", exp)
 	}
-	
+
 	; call a function
 	callfunc(path, args*)
 	{
@@ -215,7 +215,7 @@ class class_evaluator
 			; we can't call functions which path has multiple parts
 			this.croak("cannot call functions inside an object", path)
 		}
-		
+
 		funcname := path[1]
 		if (funcname = "print")
 		{
@@ -232,10 +232,10 @@ class class_evaluator
 			; create an empty object
 			return object()
 		}
-		
+
 		this.croak("unknown function " funcname " called with pars: `n " Jxon_Dump(args, 2))
 	}
-	
+
 	; apply a binary operator
 	; op: opereator
 	; a: first operand (left side)
@@ -274,10 +274,10 @@ class class_evaluator
 			return a != b
 		if (op = ".")
 			return a . b
-		
+
 		this.croak("Error: Can't apply operator "  op)
 	}
-	
+
 	; apply an assign operator
 	; op: opereator
 	; a: first operand (left side)
@@ -296,10 +296,10 @@ class class_evaluator
 			return a * b
 		if (op = "/=")
 			return a / b
-		
+
 		this.croak("Error: Can't apply assign "  op)
 	}
-	
+
 	; creates an error message on evaluation error
 	croak(description, token = "")
 	{

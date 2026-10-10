@@ -26,7 +26,7 @@
         "Trigonometry.ahk",
         "Rounding_a_number.ahk",
         "Exponentiation.ahk",
-        
+
         "Search_in_a_string.ahk",
         "Substring.ahk",
         "Substring2.ahk",
@@ -170,7 +170,7 @@
         "Window_Exists.ahk",
 
         "Process_Is_Running.ahk",
-        
+
         "Do_nothing.ahk",
         "Flow_Enabled.ahk",
         "Flow_Running.ahk",

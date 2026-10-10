@@ -14,7 +14,7 @@ importIni(fileContent)
 		oneLine := A_LoopField
 		if not oneLine
 			continue
-		
+
 		if (substr(oneLine, 1, 1) = "[" and substr(oneLine, 0, 1) = "]")
 		{
 			currentSection := substr(oneLine, 2, -1)
@@ -32,7 +32,7 @@ importIni(fileContent)
 
 		if (currentSection = "" and not iniContent[currentSection])
 			iniContent[currentSection] := []
-		
+
 		iniContent[currentSection][oneKey] := oneValue
 	}
     return iniContent

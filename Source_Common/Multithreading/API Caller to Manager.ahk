@@ -4,7 +4,7 @@
 API_manager_TreeView_Refill()
 {
 	logger("t2", A_ThisFunc " called from thread", _ahkThreadID)
-	
+
 	_setTask("manager", {name: "TreeView_Refill"})
 }
 
@@ -12,7 +12,7 @@ API_manager_TreeView_Refill()
 API_Manager_ShowWindow()
 {
 	logger("t2", A_ThisFunc " called from thread", _ahkThreadID)
-	
+
 	_setTask("manager", {name: "ShowWindow"})
-	
+
 }

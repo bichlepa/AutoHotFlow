@@ -131,7 +131,7 @@ Var_GetListOfAllVars(environment)
 	_EnterCriticalSection()
 	; prepare list, which will contain the variable names
 	retobject := Object()
-	
+
 	; get all loop variables
 	tempVarsList := Var_GetListOfLoopVars(environment)
 	for index, varname in tempVarsList
@@ -186,7 +186,7 @@ LoopVariable_AddToStack(p_InstanceID, p_ThreadID)
 	loopvarsStack := _getThreadProperty(p_InstanceID, p_ThreadID, "loopvarsStackHidden")
 	loopvarsStack.push(loopvars)
 	_setThreadProperty(p_InstanceID, p_ThreadID, "loopvarsStackHidden", loopvarsStack)
-	
+
 	_LeaveCriticalSection()
 }
 
@@ -346,7 +346,7 @@ Var_Set(Environment, p_Name, p_Value, p_Destination="", p_hidden = False)
 	{
 		throw exception("p_Name is an object")
 	}
-	
+
 	; check variable name
 	res := Var_CheckName(p_Name, true)
 	if (res = "empty")
@@ -375,7 +375,7 @@ Var_Set(Environment, p_Name, p_Value, p_Destination="", p_hidden = False)
 	}
 	else
 	{
-		; there was an error or destination is 
+		; there was an error or destination is
 		if (destination = "error_noPermission")
 		{
 			logger("f0","Setting variable '" p_Name "' failed. No permission.", Environment.FlowID)
@@ -484,10 +484,10 @@ Var_replaceVariables(environment, p_String, pars = "")
 		; break, if we didn't find a string
 		if (tempFoundPos = 0)
 			break
-		
+
 		; get the value of the variable
 		tempVarValue := Var_Get(environment, tempFoundVarName1)
-		
+
 		; if value is an object
 		if isobject(tempVarValue)
 		{
@@ -495,11 +495,11 @@ Var_replaceVariables(environment, p_String, pars = "")
 			IfInString, pars, ConvertObjectToString
 				tempVarValue := Jxon_Dump(tempVarValue, 2,, true) ; do not convert unicode chars
 		}
-		
+
 		; replace the found variable in string
 		StringReplace, tempstring, tempstring, `%%tempFoundVarName1%`%, % tempVarValue
 		StringReplace, p_String, p_String, `%%tempFoundVarName1%`%, _
 	}
-	
+
 	return tempstring
 }

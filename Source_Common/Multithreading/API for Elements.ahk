@@ -188,7 +188,7 @@ xx_getFlowIDByName(p_FlowName)
 xx_FlowExistsByName(p_FlowName)
 {
 	_EnterCriticalSection()
-	
+
 	;Search for all flowNames
 	allFlowIDs := _getAllFlowIds()
 	allFlowNames := []
@@ -201,7 +201,7 @@ xx_FlowExistsByName(p_FlowName)
 			break
 		}
 	}
-	
+
 	_LeaveCriticalSection()
 	return retval
 }
@@ -243,7 +243,7 @@ xx_FlowDisable(p_FlowID)
 {
 	if xx_FlowExists(p_FlowID)
 		disableFlow(p_FlowID)
-	
+
 }
 
 ; stops a flow
@@ -257,7 +257,7 @@ xx_FlowStop(p_FlowID)
 xx_GetListOfFlowNames()
 {
 	_EnterCriticalSection()
-	
+
 	;Search for all flowNames
 	allFlowIDs := _getAllFlowIds()
 	allFlowNames := []
@@ -265,9 +265,9 @@ xx_GetListOfFlowNames()
 	{
 		allFlowNames.push(_getFlowProperty(oneFlowID, "name"))
 	}
-	
+
 	_LeaveCriticalSection()
-	
+
 	return allFlowNames
 }
 
@@ -296,7 +296,7 @@ xx_getAllElementIDsOfType(p_FlowID, p_Type)
 		if (_getElementProperty(p_FlowID, oneElementID, "type") = p_Type)
 			elements.push(oneElementID)
 	}
-	
+
 	_LeaveCriticalSection()
 	return elements
 }
@@ -305,7 +305,7 @@ xx_getAllElementIDsOfType(p_FlowID, p_Type)
 xx_getAllElementIDsOfClass(p_FlowID, p_Class)
 {
 	_EnterCriticalSection()
-	
+
 	allElementIDs := _getAllElementIds(p_FlowID)
 
 	elements:=Object()
@@ -314,9 +314,9 @@ xx_getAllElementIDsOfClass(p_FlowID, p_Class)
 		if (_getElementProperty(p_FlowID, oneElementID, "class") = p_Class)
 			elements.push(oneElementID)
 	}
-	
+
 	_LeaveCriticalSection()
-	
+
 	return elements
 }
 
@@ -354,7 +354,7 @@ xx_setElementPar(p_FlowID, p_ElementID, p_ParameterID, p_newValue, reenableActiv
 	; this is a kind of a hack. Maybe I'll find a better solution later
 	currentState := _getFlowProperty(p_FlowID, "currentState")
 	_setFlowProperty(p_FlowID, "states." currentState ".allElements." p_ElementID ".pars." p_ParameterID, p_newValue)
-	
+
 	; set the new value in the working state
 	_setElementProperty(p_FlowID, p_ElementID, "pars." p_ParameterID, p_newValue)
 
@@ -406,7 +406,7 @@ xx_elementExists(p_FlowID, p_ElementID)
 xx_isTriggerEnabled(p_FlowID, p_TriggerID)
 {
 	_EnterCriticalSection()
-	
+
 	; get all element IDs and loop through them
 	allElementIDs := _getAllElementIds(p_FlowID)
 	result := false
@@ -419,7 +419,7 @@ xx_isTriggerEnabled(p_FlowID, p_TriggerID)
 			break
 		}
 	}
-	
+
 	_LeaveCriticalSection()
 	return result
 }
@@ -464,7 +464,7 @@ xx_ManualTriggerExecute(p_FlowID, p_TriggerID = "", p_Variables ="", p_CallBackF
 		logger("f0", "cannot execute manual trigger. Flow with ID " p_FlowID " does not exists.")
 		return
 	}
-	
+
 	if (p_TriggerID = "")
 	{
 		; not trigger specified. trigger the default trigger

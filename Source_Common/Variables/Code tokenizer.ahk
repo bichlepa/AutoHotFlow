@@ -4,7 +4,7 @@ tokenizer(string)
 {
 	; initialize empty return value
 	tokens := Object()
-	
+
 	; define operator characters
 	opchars := "+-*/%=&|<>!:."
 	; define punctuation characters
@@ -13,8 +13,8 @@ tokenizer(string)
 	whitespacechars := " `t`r"
 	; define whitespace characters with linefeed
 	whitespaceandLfchars := " `t`r`n"
-	
-	
+
+
 	; first split the code into lines and remove comments
 	wholeLines := Object()
 	preparedString := ""
@@ -34,7 +34,7 @@ tokenizer(string)
 		wholeLines.push(oneWholeLine)
 		preparedString .= oneWholeLine "`n"
 	}
-	
+
 	; We will use a state machine. those are possible states
 	mode := 1 ;variable name or keyword
 	mode := 2 ;number
@@ -48,7 +48,7 @@ tokenizer(string)
 	; init line and column (character in line) counters
 	line := 1
 	col := 1
-	
+
 	; start tokenizing with the state machine
 	Loop, parse, preparedString
 	{
@@ -180,13 +180,13 @@ tokenizer(string)
 				currToken.value .= Char
 			}
 		}
-		
+
 		; we just entered the state machine or have now finished a token. Find the next token
 		if (mode = 0)
 		{
 			; create a new token
 			currToken := new class_token()
-			
+
 			;start parsing a new token
 			if ((CharNumber > 0x7f) or (charNumber >= 0x41 and  charNumber <= 0x5A or charNumber >= 0x61 and  charNumber <= 0x7A)) ;Unicode character or letter
 			{
@@ -246,7 +246,7 @@ tokenizer(string)
 				currToken.type := "punc"
 				tokens.push(currToken)
 			}
-			else 
+			else
 			{
 				; we have an uknown character
 				; this token will be unknown
@@ -254,7 +254,7 @@ tokenizer(string)
 				currToken.value := Char
 				currToken.type := "unknown"
 			}
-			
+
 			; save the position of the current token
 			currToken.line := line
 			currToken.col := col
@@ -263,7 +263,7 @@ tokenizer(string)
 			; save the whole line where the current token is, so we use it for warning messages
 			currToken.wholeline := wholeLines[line]
 		}
-		
+
 		; check whether the current character is a linefeed
 		if (char = "`n")
 		{
@@ -281,7 +281,7 @@ tokenizer(string)
 	; we finished parsing the code. We may have to save the last token
 	if (currToken.type)
 		tokens.push(currToken)
-	
+
 	return tokens
 }
 
@@ -329,4 +329,3 @@ class class_token
 			return false
 	}
 }
-	

@@ -220,7 +220,7 @@ Default_Lib_Yaml(YamlText,IsFile=1,YamlObj=0){ ; Version 1.0.0.17 http://www.aut
         If __CNT
           Default_Lib_Yaml_Continue(LVL%__LVL%[""],LVL%__LVL%[""].MaxIndex(),_LFL,__SCA,1)
         If (__CNT:=Default_Lib_Yaml_SeqMap(LVL%__LVL%[""],"",_LFL)?"":1)
-          LVL%__LVL%[""].Insert(_LFL) 
+          LVL%__LVL%[""].Insert(_LFL)
       } else {
         If !IsObject(LVL%_LVL%[""])
           LVL%_LVL%[""]:=Object("base",base)
@@ -412,7 +412,7 @@ Default_Lib_Yaml_CharUni( string ) {
     else if Asc(A_LoopField)<128
       var.=A_LoopField
     else {
-      str:=SubStr(Asc(A_LoopField),3)	
+      str:=SubStr(Asc(A_LoopField),3)
       var.="\u" (StrLen(str)<2?"000":StrLen(str)<3?"00":StrLen(str)<4?"0":"") str
     }
   }

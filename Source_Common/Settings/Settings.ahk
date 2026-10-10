@@ -35,7 +35,7 @@ load_settings()
 
 	; overwrite the default settings with the settings from file
 	settings := ObjFullyMerge(settings, settingsFromFile)
-	
+
 	; set settings object
 	_setAllSettings(settings)
 }
@@ -95,7 +95,7 @@ checkNewWorkingDir(NewWorkingDir, interactive = true)
 		{
 			MsgBox, 16, AutoHotFlow, % lang("The specified folder is not an absolute path!")
 		}
-		return false	
+		return false
 	}
 
 	; check whether the specified folder exists
@@ -138,7 +138,7 @@ checkNewWorkingDir(NewWorkingDir, interactive = true)
 		}
 		return false
 	}
-	
+
 	; todo: check write permissions
 
 	; working dir is ok

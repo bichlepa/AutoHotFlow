@@ -84,8 +84,8 @@ Default_Lib_TTS(oVoice, command, param1="", param2="") {      ; by Learning one.
       if !DoesVoiceExist
       {
         ;MsgBox,64,, Voice "%param1%" does not exist.
-        
-         return 
+
+         return
       }
       While !(oVoice.Status.RunningState = 1)
       Sleep, 20
@@ -117,8 +117,8 @@ Default_Lib_TTS(oVoice, command, param1="", param2="") {      ; by Learning one.
    {
       oldAOS := oVoice.AudioOutputStream
       oldAAOFCONS := oVoice.AllowAudioOutputFormatChangesOnNextSet
-      oVoice.AllowAudioOutputFormatChangesOnNextSet := 1   
-      
+      oVoice.AllowAudioOutputFormatChangesOnNextSet := 1
+
       SpStream := ComObjCreate("SAPI.SpFileStream")
       FileDelete, % param2   ; OutputFilePath
       SpStream.Open(param2, 3)
@@ -128,7 +128,7 @@ Default_Lib_TTS(oVoice, command, param1="", param2="") {      ; by Learning one.
       oVoice.AudioOutputStream := oldAOS
       oVoice.AllowAudioOutputFormatChangesOnNextSet := oldAAOFCONS
    }
-}   
+}
  Default_Lib_TTS_CreateVoice(VoiceName="", VoiceRate="", VoiceVolume="", VoicePitch="") {      ; by Learning one. For AHK_L.
    oVoice := ComObjCreate("SAPI.SpVoice")
    if !(VoiceName = "")

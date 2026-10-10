@@ -9,7 +9,7 @@
 	flist:=""
 	for each, file in files
 		flist:= flist """" file """" " "
-		
+
 	RunWait, %7z_exe% a %opts% "%dPack%" %flist%,,Hide UseErrorLevel
 	return 7z_error(ErrorLevel)
 }
@@ -42,14 +42,14 @@
 				RegExMatch(SubStr(A_LoopField,StrLen(p.1 p.2 p.3)+3),"\d+",S)
 				c:=InStr(A_LoopField,S)+StrLen(S)
 				StringTrimLeft,n,A_LoopField,%c%
-				
+
 				k:={}
 				k.Date := p.1
 				k.Time := p.2
 				k.Attr := p.3
 				k.Size := S
 				k.Name := RegExReplace(n,"\s+\d*\s+","","",1)
-				
+
 				r.Insert(k)
 			}
 		}

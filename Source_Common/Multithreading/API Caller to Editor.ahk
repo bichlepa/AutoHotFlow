@@ -4,7 +4,7 @@
 API_Editor_EditGUIshow(par_FlowID)
 {
 	logger("t2", A_ThisFunc " called from thread", _ahkThreadID)
-	
+
 	_setTask("editor" par_FlowID, {name: "EditGUIshow"})
 }
 
@@ -12,6 +12,6 @@ API_Editor_EditGUIshow(par_FlowID)
 API_Editor_Exit(par_flowID)
 {
 	logger("t2", A_ThisFunc " called from thread", _ahkThreadID)
-	
+
 	_setTask("editor" par_FlowID, {name: "exit"})
 }

@@ -4,7 +4,7 @@
 initializeMenuBar()
 {
 	global
-	
+
 	; create menu elements
 	Menu, MyMenu,add,% lang("Save #verb"),ui_Menu_save
 	Menu, MyMenu,add,% lang("Run #verb"),ui_Menu_MenuStart
@@ -18,9 +18,9 @@ initializeMenuBar()
 
 	; show them in the main gui
 	Gui, Maingui:menu, MyMenu
-	
+
 	; set timer which continuously updates the menu
-	SetTimer, ui_Menu_CheckLoop, 10	
+	SetTimer, ui_Menu_CheckLoop, 10
 }
 
 
@@ -127,7 +127,6 @@ ui_Menu_CheckLoop()
 			menu_bar_IsEnabled := False
 			try Menu, MyMenu,rename,% lang("Disable"),% lang("Enable")
 		}
-		
+
 	}
 }
-

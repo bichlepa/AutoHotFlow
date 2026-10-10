@@ -18,7 +18,7 @@ FindFlows()
 			throw exception("Folder for saved flows could not be created!")
 		}
 	}
-	
+
 	; get list of all flow savefiles
 	flowList := []
 	loop %_WorkingDir%\Saved Flows\*.json
@@ -188,7 +188,7 @@ DeleteFlow(par_ID)
 	; disable flow and stop execution
 	API_Execution_DisableTriggers(par_ID)
 	API_Execution_stopFlow(par_ID)
-	
+
 	; wait up to 10 seconds until the flow finishes
 	loop, 100
 	{
@@ -218,7 +218,7 @@ DeleteFlow(par_ID)
 	}
 	if myErrorLevel
 		throw exception("File of flow " par_ID " could not be deleted! Windows error code: " A_LastError)
-	
+
 	; delete flow object
 	_deleteFlow(par_ID)
 
@@ -239,7 +239,7 @@ DuplicateFlow(par_ID)
 		if (not  _existsFlow(newFlowid))
 			break
 	}
-	
+
 	;Generate a new unique flow name.
 	indexString:=""
 	Loop
@@ -260,7 +260,7 @@ DuplicateFlow(par_ID)
 	newFlow.name := newflowName
 	newFlow.enabled := "" ; make sure, the flow is disabled
 	newFlow.demo := false ;If user copies a demo flow, the copy is not a demo flow anymore and user can edit it
-	
+
 	;we will need old flow name for later
 	oldFile := newFlow.file
 
@@ -274,7 +274,7 @@ DuplicateFlow(par_ID)
 
 	; copy savefile
 	filecopy,% oldFile, % newFlow.file
-	
+
 	; save changed metadata
 	SaveFlowMetaData(newFlowid)
 
@@ -318,7 +318,7 @@ NewCategory(par_Newname = "")
 	newCategory.id := newCategoryid
 	newCategory.Name := Newname
 	newCategory.Type := "Category"
-	
+
 	; write the category object
 	_setCategory(newCategoryid, newCategory)
 
@@ -332,7 +332,7 @@ ChangeFlowCategory(par_FlowID, par_CategoryID)
 	{
 		MsgBox,,Unexpected error, 5616486132156
 	}
-	
+
 	; set category ID
 	_setFlowProperty(par_FlowID, "category", par_CategoryID)
 

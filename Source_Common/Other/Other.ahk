@@ -20,7 +20,7 @@ GetAhfPath()
 ; before call of this function, the command has to be called: gui, +LastFound
 setGuiIcon(iconPath)
 {
-	global 
+	global
 
 	local hIcon := DllCall("LoadImage", uint, 0, str, iconPath, uint, 1, int, 0, int, 0, uint, 0x10)
 

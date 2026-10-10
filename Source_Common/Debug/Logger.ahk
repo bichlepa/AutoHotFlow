@@ -65,7 +65,7 @@ logger(LogLevel, LoggingText, logSource = "common", showGui = false)
 			_LeaveCriticalSection()
 		}
 	}
-	
+
 }
 
 ; opens the gui with log entries
@@ -91,15 +91,15 @@ showlog(whichone="all")
 	gui,log:add,edit, xm Y+10 ReadOnly vGuiLogTextField Multi -wrap VScroll HScroll
 	gui,log:+resize
 	gui,log:+MinSize500x300
-	
+
 	; filter the logs if user wants to
 	GuiControl,log:ChooseString,GuiLogCategory, %whichone%
-	
+
 	; we will refresh the gui regularely
 	DebugLogOldCount := 0
 	SetTimer,GuiLogrefreshText,100
 	gosub GuiLogrefresh
-	
+
 	; find out the perfect size for the gui
 	GuiLogSizeH:=A_ScreenHeight*0.7
 	GuiLogSizeW:=A_ScreenWidth*0.8
@@ -110,7 +110,7 @@ showlog(whichone="all")
 	; correct the positions of the controls
 	gosub LogGuiSizeinitial
 	return
-	
+
 	; user resized the gui
 	LogGuiSize:
 	; get gui size
@@ -130,7 +130,7 @@ showlog(whichone="all")
 	DebugLogOldCount:=0
 	gosub GuiLogrefreshText
 	return
-	
+
 	; user closed the gui
 	logguiclose:
 	GuiLogClose:
@@ -141,7 +141,7 @@ showlog(whichone="all")
 	; destroy the gui
 	gui,log:destroy
 	return
-	
+
 	; user changed view mode
 	GuiLogViewMode:
 	gui,submit, nohide
@@ -161,7 +161,7 @@ showlog(whichone="all")
 	DebugLogOldCount:=0
 	gosub GuiLogrefreshText
 	return
-	
+
 	; user clicked on refresh button
 	GuiLogrefresh:
 	;find all log categories
@@ -183,7 +183,7 @@ showlog(whichone="all")
 	; refresh the log text
 	gosub GuiLogrefreshText
 	return
-	
+
 	; user changes the filter setting
 	GuiLogCategory:
 
@@ -191,7 +191,7 @@ showlog(whichone="all")
 	DebugLogOldCount:=0
 	gosub GuiLogrefreshText
 	return
-	
+
 	; refresh the log text
 	GuiLogrefreshText:
 	;Check whether the log text changed
@@ -201,7 +201,7 @@ showlog(whichone="all")
 
 		; get the log category
 		GuiControlGet,GuiLogCategory,log:,GuiLogCategory
-		
+
 		; get log, filtered or unfiltered
 		if (GuiLogCategory = "all")
 			DebugLogToShow:=_getShared("Log")
@@ -226,8 +226,8 @@ showlog(whichone="all")
 		; show the log text in gui
 		GuiControl,log:,GuiLogTextField,% DebugLogToShow
 	}
-	
-	return	
+
+	return
 }
 
 ; enables regular cleanup of the logger.
@@ -258,13 +258,13 @@ log_cleanup()
 				log_cleanup_toobigfiles.push(A_LoopFileFullPath)
 			}
 		}
-		
+
 		; clean up too big files
 		for onebigfileindex, onebigfile in log_cleanup_toobigfiles
 		{
 			;Rename current log file and add "_old" and overwrite the old "_old" file.
 			StringTrimRight, fullpath, onebigfile, 4 ;remove extension from filename
-			FileMove,%onebigfile%,%fullpath%_old.txt,1 
+			FileMove,%onebigfile%,%fullpath%_old.txt,1
 		}
 
 		; check the length of the logging variables
@@ -290,7 +290,7 @@ log_cleanup()
 	}
 }
 
-	
+
 ; logs and shows an error message to the user
 ; todo: show a list of messages. if window is opened, append it to list.
 showLogGui(message)
@@ -301,9 +301,9 @@ showLogGui(message)
 	gui, guiErrorMessage:add, button, default w100 x50 Y+10 h30 gguiErrorMessageGuiClose, % lang("OK")
 	gui, guiErrorMessage:show, , AutoHotFlow
 	return
-	
+
 	guiErrorMessageGuiClose:
-	
+
 	gui, guiErrorMessage:destroy
 	return
 }

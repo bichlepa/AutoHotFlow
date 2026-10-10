@@ -131,7 +131,7 @@ queryTasks()
 				tray_setIcon("disabled")
 			}
 		}
-		
+
 		; check whether there is a new task from another ahk thread
 		oneTask:=_getTask("editor" _FlowID)
 		if (oneTask)
