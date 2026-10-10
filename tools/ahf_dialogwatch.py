@@ -45,6 +45,16 @@ gdi32.SelectObject.argtypes = [wintypes.HDC, wintypes.HGDIOBJ]
 gdi32.SelectObject.restype = wintypes.HGDIOBJ
 gdi32.DeleteObject.argtypes = [wintypes.HGDIOBJ]
 gdi32.DeleteDC.argtypes = [wintypes.HDC]
+# Every call that takes a handle needs argtypes: without them ctypes passes a C int and a
+# 64-bit handle value above 2**31 raises OverflowError (the dialog then stays open).
+gdi32.GetDIBits.argtypes = [wintypes.HDC, wintypes.HBITMAP, wintypes.UINT, wintypes.UINT, ctypes.c_void_p,
+                            ctypes.c_void_p, wintypes.UINT]
+user32.GetWindowRect.argtypes = [wintypes.HWND, ctypes.POINTER(wintypes.RECT)]
+user32.PostMessageW.argtypes = [wintypes.HWND, wintypes.UINT, wintypes.WPARAM, wintypes.LPARAM]
+user32.IsWindowVisible.argtypes = [wintypes.HWND]
+user32.GetWindowThreadProcessId.argtypes = [wintypes.HWND, ctypes.POINTER(wintypes.DWORD)]
+user32.EnumWindows.argtypes = [WNDENUMPROC, wintypes.LPARAM]
+user32.EnumChildWindows.argtypes = [wintypes.HWND, WNDENUMPROC, wintypes.LPARAM]
 
 
 class _BITMAPINFOHEADER(ctypes.Structure):
@@ -230,27 +240,35 @@ class DialogWatcher:
             pname = psutil.Process(pid).name()
         except psutil.Error:
             pname = "?"
-        title, texts = _text(hwnd), _child_texts(hwnd)
-        png = base + ".png"
-        if not _screenshot_png(hwnd, png):
-            png = ""
-        txt = base + ".txt"
-        with open(txt, "w", encoding="utf-8") as f:
-            f.write("process: %s (pid %d)\ntitle: %s\n" % (pname, pid, title))
-            f.write("\n".join(texts) + "\n")
-            f.write("screenshot: %s\n" % (png or "(failed)"))
-        ev = DialogEvent(pid, pname, title, texts, txt, png)
-        with self._lock:
-            self._events.append(ev)
-        user32.PostMessageW(hwnd, WM_CLOSE, 0, 0)
-        if self._kill:
-            time.sleep(0.2)
+        title, texts, png = "", [], ""
+        try:
+            # collecting information is best effort: closing the dialog below must always happen
+            title, texts = _text(hwnd), _child_texts(hwnd)
+            png = base + ".png"
+            if not _screenshot_png(hwnd, png):
+                png = ""
+        except Exception as exc:
+            texts.append("(collecting dialog information failed: %r)" % (exc,))
+        finally:
+            txt = base + ".txt"
             try:
-                p = psutil.Process(pid)
-                if p.is_running():
-                    p.kill()
-            except psutil.Error:
+                with open(txt, "w", encoding="utf-8") as f:
+                    f.write("process: %s (pid %d)\ntitle: %s\n" % (pname, pid, title))
+                    f.write("\n".join(texts) + "\n")
+                    f.write("screenshot: %s\n" % (png or "(failed)"))
+            except OSError:
                 pass
+            with self._lock:
+                self._events.append(DialogEvent(pid, pname, title, texts, txt, png))
+            user32.PostMessageW(hwnd, WM_CLOSE, 0, 0)
+            if self._kill:
+                time.sleep(0.2)
+                try:
+                    p = psutil.Process(pid)
+                    if p.is_running():
+                        p.kill()
+                except psutil.Error:
+                    pass
 
 
 _shared = None
