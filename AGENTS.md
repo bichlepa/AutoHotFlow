@@ -27,14 +27,14 @@ Gesprochene Sprache mit dem Projektinhaber: Deutsch. Dokumentation: Deutsch. Cod
 
 | Pfad | Zweck |
 |---|---|
-| `doc/` | dauerhafte Dokumentation (Architektur, Protokoll, Element-API v2, Teststrategie, Konventionen, Migration) |
+| `doc/` | dauerhafte Dokumentation (Architektur, Protokoll, Element-API v2, Teststrategie, Konventionen, Migration, How-to AHK v2) |
 | `work_items/` | temporäre Arbeitsunterlagen: Analyse, Pläne, Spikes. Wird nach der Portierung gelöscht. |
 | `v1/` | temporärer v1-Stand als Referenz. Wird nach der Portierung gelöscht. |
 | `src/`, `tests/`, `tools/`, `assets/` | v2-Code, entstehen ab Phase 2 (Struktur siehe `doc/ARCHITEKTUR.md` Abschnitt 8) |
 
 ## Regeln für Änderungen
 
-1. Vor jeder Aufgabe lesen: dieses Dokument, `doc/ARCHITEKTUR.md` (Abschnitte 1 bis 6), `doc/KONVENTIONEN.md`, danach das Dokument der eigenen Aufgabe.
+1. Vor jeder Aufgabe lesen: dieses Dokument, `doc/ARCHITEKTUR.md` (Abschnitte 1 bis 6), `doc/KONVENTIONEN.md`, danach das Dokument der eigenen Aufgabe. Bei AHK-v2-Code zusätzlich `doc/HOW-TO.md`.
 2. Kein geteilter veränderlicher Zustand, nur Nachrichten. Jedes Datum hat genau einen Besitzer.
 3. Kein blockierender Aufruf im Nachrichtenpfad (`MsgBox`, Datei-I/O, `RunWait`, `WinWait` ohne Timeout). Jede Anfrage hat ein Timeout.
 4. Nichts in `v1/` ändern. Bewusste Abweichungen vom v1-Verhalten gehören in `doc/MIGRATION.md`.
@@ -42,6 +42,7 @@ Gesprochene Sprache mit dem Projektinhaber: Deutsch. Dokumentation: Deutsch. Cod
 6. Unterscheiden zwischen **verifiziert** (gelesen oder getestet), **vermutet** und **nicht geprüft**. Nichts über Code behaupten, den man nicht gelesen hat.
 7. Kleine Commits, eine Änderung pro Commit. Die Commit-Nachricht beschreibt das Warum.
 8. Elementcode darf die Engine nie zum Absturz bringen: jeder Aufruf unter `try/catch`, Fehler werden als Ergebnis `exception` gemeldet.
+9. Schwierigkeiten und eigene Fehler bei der AHK-v2-Umsetzung gehören in `doc/HOW-TO.md`: was schwer war, was falsch war, was richtig funktioniert (Format siehe Datei). Das dient als Wissensbasis für andere Agenten. Einträge mit Status (verifiziert / vermutet / nicht geprüft) versehen.
 
 ## Werkzeuge in dieser Umgebung
 
