@@ -156,6 +156,7 @@ Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge kor
 - **Richtig:** Felder und Methoden verschieden benennen (z. B. Feld `stateName`, Methode `State()`), auch wenn die Schreibweise nur leicht abweicht.
 - **Status:** verifiziert (im Lauf von WI-07 gefunden; die Fundstelle wurde für diesen Eintrag nicht erneut geprüft)
 - **Quelle:** `src/supervisor/` (WI-07)
+- **Wieder aufgetreten (WI-10):** `src/engine/Engine.ahk` hatte das Feld `_loaded` und die Methode `_Loaded()`. Der Start der Rolle schlug mit der gleichen Meldung fehl (Exit 2, "bad arguments: Property is read-only"). Behoben durch Umbenennen des Feldes in `_flowsLoaded`. Vor dem Benennen einer Methode `_X()` prüfen, ob es schon ein Feld `_x` gibt.
 
 ## Objekte, Maps, Arrays
 
@@ -186,6 +187,22 @@ Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge kor
 - **Richtig:** `static __New() { this.classes.CaseSense := "Off" }` läuft beim Laden der Klasse, vor der ersten Nutzung. Danach findet `Has("TRIGGER_MANUAL")` einen Eintrag `Trigger_Manual`.
 - **Status:** verifiziert (Probe im Scratchpad: `Has` case-insensitiv; `tests/ahk/element_registry.test.ahk`, Fall "lookup is case-insensitive")
 - **Quelle:** `src/elements/base/ElementRegistry.ahk`
+
+### Callback mit Zustand: `ObjBindMethod` statt Lambda in der Schleife
+
+- **Problem:** Die Engine liest je Flow-Datei eine Antwort von `storage`. Der Callback braucht den Namen und den Pfad der Datei, und ein Zähler der offenen Antworten muss von allen Callbacks gemeinsam geändert werden.
+- **Falsch:** `for f in files { peer.Request(..., (res) => this._OnRead(st, f["name"], res)) }`. Lambdas erfassen Variablen per Referenz, alle Callbacks sähen am Ende den letzten Eintrag.
+- **Richtig:** `peer.Request(..., ObjBindMethod(this, "_OnFlowRead", st, name, path), timeout)`. Die gebundenen Argumente kommen vor dem Argument des Aufrufers, der Callback ist `_OnFlowRead(st, name, path, res)`. Der Zähler ist eine `Map`, damit alle Callbacks dieselbe Änderung sehen.
+- **Status:** verifiziert (`tests/integration/test_engine.py`, Laden von zwei Flow-Dateien, Fehlerdatei mit `flow.parse`, Namen und Pfade stimmen).
+- **Quelle:** `src/engine/Engine.ahk` (`_OnFlowList`)
+
+### Parameter eines Elements als Objekt mit Eigenschaftszugriff
+
+- **Problem:** `Action_Sleep` liest `params.Duration` und `params.Unit` (Eigenschaftszugriff, wie v1). Die Flow-Datei hat die Parameter als `Map`.
+- **Falsch:** Die `Map` direkt als `params` übergeben.
+- **Richtig:** Ein Objekt bauen: `p := {}` und für jeden Schlüssel `p.%k% := v` (Objekte und `null` werden zu `""`). Eigenschaftsnamen sind case-insensitiv, wie v1 es braucht.
+- **Status:** verifiziert (Sleep mit Duration `200` und Unit `Milliseconds` in `tests/integration/test_engine.py`). Nicht geprüft: ob `Map` mit `HasProp` für Schlüssel genauso falsch antwortet.
+- **Quelle:** `src/engine/Executor.ahk` (`_Params`)
 
 ## Fehlerbehandlung
 
@@ -500,3 +517,11 @@ _Noch keine Einträge._
 - **Richtig:** Die ganze Meldung und ihren Anfang prüfen (z. B. Zeilenanfang `session main running`), oder die Meldung über ein Ereignis statt über Text prüfen.
 - **Status:** verifiziert (WI-07, Testfall für die zweite Instanz)
 - **Quelle:** `src/supervisor/Supervisor.ahk` (`_ForwardIfRunning`), `tests/integration/test_supervisor.py`
+
+### Wahrheitswerte aus AHK sind 0 und 1 auch in den Python-Tests
+
+- **Problem:** Ein Test prüfte `payload["ok"] is False`. AHK schreibt Wahrheitswerte als Zahl (`0`/`1`), der Vergleich mit `False` schlug fehl, obwohl die Antwort richtig war (`0 is False` ist falsch).
+- **Falsch:** `assert msg["payload"]["enabled"] is False`.
+- **Richtig:** Wahrheit prüfen: `assert not msg["payload"]["enabled"]`, `assert msg["payload"]["executing"] == 1`. Für `ok` dasselbe. Die Regel steht in `doc/PROTOKOLL.md`, Abschnitt 2.
+- **Status:** verifiziert (Testlauf WI-10: zwei Tests rot mit `0 is False`, nach der Änderung grün).
+- **Quelle:** `tests/integration/test_engine.py`
