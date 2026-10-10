@@ -440,6 +440,44 @@ _Noch keine Einträge._
 - **Richtig:** `psutil.Process(pid).suspend()` friert den Worker ein. Dann kommt `cmd.worker.run` nicht an (Ack-Timeout 5 s, Element `exception`, "worker not available: worker:1 (timeout)"). Nach einem Abbruch bleibt der Slot 2 s `busy`, dann `down`.
 - **Status:** verifiziert (`test_frozen_worker_does_not_answer_the_run_and_the_element_fails_by_timeout`, `test_frozen_worker_does_not_confirm_the_cancel...`)
 
+### cmd-Antwort später: der Peer antwortet sonst sofort
+
+- **Problem:** Storage soll Dateioperationen in einer Warteschlange ausführen (kein I/O im Nachrichtenpfad). `Peer` sendet die Antwort auf ein `cmd.*` aber beim Rücksprung des Handlers, mit dessen Rückgabewert. Eine spätere Antwort war nicht möglich.
+- **Falsch:** Die Datei im Handler synchron schreiben und dann antworten. Dann wartet jede andere Nachricht (auch `sys.ping`) die volle Dateizeit.
+- **Richtig:** Der Handler gibt `Deferred.Marker()` zurück und legt die Anfrage in die Warteschlange. Die Antwort kommt mit `peer.Reply(msg, payload)`. Jeder Fehlerpfad muss antworten, sonst endet der Absender mit seiner Frist. Die Änderung steht in Commit `419051a` (`src/core/ipc/Deferred.ahk`, `Dispatcher.ahk`, `Peer.ahk`). Sie berührt `core/` und braucht eine Absprache (offen, siehe WI-12 Ergebnis).
+- **Status:** verifiziert (`tests/ahk/dispatcher.test.ahk`, Fall "a Deferred marker is passed through"; `tests/integration/test_storage.py`, alle Anfragen über die Warteschlange; Peer- und Worker-Tests grün)
+
+### Atomar ersetzen: MoveFileExW mit Flags, Schreibschutz bleibt sichtbar
+
+- **Problem:** v1 löscht die Datei und schreibt sie neu (`FileDelete` + `FileAppend`). Ein Absturz dazwischen verliert die Datei.
+- **Richtig:** Temp-Datei im selben Ordner schreiben (`FileOpen(tmp, "w", "UTF-8-RAW")`), dann `DllCall("MoveFileExW", "Str", tmp, "Str", target, "UInt", 0x9, "Int")`. `0x9` = `MOVEFILE_REPLACE_EXISTING` (1) | `MOVEFILE_WRITE_THROUGH` (8). `A_LastError` direkt nach dem Aufruf lesen. Eine schreibgeschützte Zieldatei lässt das Ersetzen mit Zugriffsfehler scheitern, die alte Datei bleibt unverändert.
+- **Status:** verifiziert (`test_read_only_target_fails_with_error_event_and_keeps_the_old_file`, `test_hard_kill_during_a_big_write_...`)
+
+### Testhelfer: `wait_hello` findet das alte `sys.hello` im selben Hub
+
+- **Problem:** `wait_hello(hub, name)` liefert das erste `sys.hello` dieses Namens, das der Hub je gesehen hat. Startet man dieselbe Rolle zweimal im selben Hub, kommt die alte PID zurück. Der Test tötete dann einen schon beendeten Prozess (`psutil.NoSuchProcess`).
+- **Falsch:** Eine Rolle nacheinander im selben Hub starten und `wait_hello` jedes Mal aufrufen.
+- **Richtig:** Pro Start einen eigenen Hub mit eigenem Pipe-Namen: `with RoleHub(pipe_n) as hub:` (siehe `test_hard_kill_during_a_big_write_...`).
+- **Status:** verifiziert (Test war rot, nach der Änderung grün)
+
+### Negative Länge bei `SubStr`: Suffix zählen
+
+- **Problem:** Die Prüfung auf das Ende `_old.txt` nutzte `SubStr(path, -7)`. Das Suffix hat aber 8 Zeichen.
+- **Richtig:** `SubStr(path, -8) = "_old.txt"`. Allgemein: die Länge des Suffixes aus dem Literal zählen, nicht schätzen.
+- **Status:** vermutet (beim Lesen gefunden und vor dem ersten Lauf korrigiert). Der Zweig "schon `_old`" ist nicht gezielt getestet, die Rotation selbst ist getestet (`test_log_file_over_100_kb_...`).
+
+### `FileRead` mit "UTF-8" und BOM
+
+- **Problem:** v1-Variablendateien beginnen mit einem UTF-8-BOM. Ein BOM-Zeichen am Anfang bricht `Json.Parse` und den Vergleich mit Python.
+- **Richtig:** Das Zeichen `Chr(0xFEFF)` am Anfang nach dem Lesen entfernen (`AtomicFile.ReadText`).
+- **Status:** verifiziert (`test_v1_variables_are_read_as_stored`, `test_variable_round_trip_...`). Ob AHK das BOM bei `"UTF-8"` selbst entfernt, ist nicht geprüft; der eigene Schritt macht es unabhängig davon.
+
+### Storage-eigene Log-Senke nach `super.Start()`
+
+- **Problem:** `Role.Start` setzt die Log-Senke auf die Weiterleitung über den Peer. Storage hat aber keinen Log-Empfänger außer sich selbst.
+- **Richtig:** In `Storage.Start` nach `super.Start()` `Log.Configure(Storage.SelfLogFn)` setzen. Die Senke legt Einträge direkt in die Warteschlange.
+- **Status:** nicht geprüft (der Pfad ist nur bei Fehlern aktiv, ein gezielter Test fehlt)
+
 ## GUI und Hotkeys
 
 _Noch keine Einträge._

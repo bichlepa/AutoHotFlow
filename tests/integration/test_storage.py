@@ -1,0 +1,448 @@
+"""WI-12: storage role (src/storage/).
+
+The storage role runs as a real process (src/AutoHotFlow.ahk --role=storage, started through
+tools/ahkrun.py). Its hub is the Python stand-in RoleHub (WakingHub). The files are checked on disk
+from Python. v1 example data is copied to a temporary directory, never used in place.
+"""
+
+import json
+import os
+import shutil
+import stat
+import time
+import re
+from pathlib import Path
+
+import psutil
+import pytest
+
+from support.ahfclient import AhfClient
+from test_role import RoleHub, RoleRun, wait_hello, SHUTDOWN_LIMIT_S
+
+ROOT = Path(__file__).resolve().parents[2]
+V1_FLOWS = ROOT / "v1" / "AppData" / "Saved Flows"
+V1_VARS = ROOT / "v1" / "AppData" / "Variables"
+SKELETON_SRC = ROOT / "tests" / "data" / "skeleton_flow.json"
+BIG_BYTES = 5 * 1024 * 1024
+ASK_TIMEOUT_S = 15.0
+PING_LIMIT_S = 1.0          # acceptance: sys.ping is answered within 1 s during a 5 MB write
+V1_LOG_LINE = re.compile(r"^--- \d{4} \d{2} \d{2} \d{2}:\d{2}:\d{2} ~[^~]*~[^~]*~ ")
+
+
+# --- helpers ----------------------------------------------------------------------------------------
+
+def same(a, b):
+    """Structure and JSON types must match exactly (1 and 1.0 are different, "5" and 5 too)."""
+    if type(a) is not type(b):
+        return False
+    if isinstance(a, dict):
+        return a.keys() == b.keys() and all(same(a[k], b[k]) for k in a)
+    if isinstance(a, list):
+        return len(a) == len(b) and all(same(x, y) for x, y in zip(a, b))
+    return a == b
+
+
+def read_json(path):
+    return json.loads(Path(path).read_bytes().decode("utf-8-sig"))
+
+
+def ask(client, type_, payload=None, timeout=ASK_TIMEOUT_S):
+    """Request to the storage role. Returns the answer payload."""
+    answer = client.request("storage", type_, payload or {}, timeout=timeout)
+    assert answer["type"] == "res." + type_[4:], answer
+    return answer["payload"]
+
+
+def ask_ok(client, type_, payload=None, timeout=ASK_TIMEOUT_S):
+    answer = ask(client, type_, payload, timeout)
+    assert answer.get("ok"), answer
+    return answer
+
+
+def observer(pipe, name, *topics):
+    client = AhfClient(pipe, name)
+    for topic in topics:
+        answer = client.request("supervisor", "cmd.topic.subscribe", {"topic": topic}, timeout=5)
+        assert answer["payload"]["ok"], answer
+    return client
+
+
+def flow_text(label, pad=""):
+    """A small valid flow object (the root must be a JSON object)."""
+    obj = {"name": label, "category": "", "ElementIDCounter": "1", "flowSettings": {"zoomFactor": "0.700000"},
+           "allElements": {}, "allConnections": {}}
+    if pad:
+        obj["pad"] = pad
+    return json.dumps(obj, ensure_ascii=False, indent=2)
+
+
+@pytest.fixture
+def pipe(session_id):
+    return "ahf.storage.%s" % session_id
+
+
+@pytest.fixture
+def runs(procs):
+    started = []
+    yield started
+    for run in started:
+        run.close_files()
+
+
+@pytest.fixture
+def hub(pipe):
+    with RoleHub(pipe) as h:
+        yield h
+
+
+@pytest.fixture
+def flowdir(datadir):
+    """Data directory with one flow in Flows/ (the folder name of v2, see MIGRATION M-15)."""
+    (datadir / "Flows").mkdir()
+    shutil.copy(SKELETON_SRC, datadir / "Flows" / "skeleton.json")
+    return datadir
+
+
+def start_storage(procs, datadir, runs, pipe, session_id, label="storage"):
+    args = ["--role=storage", "--session=" + session_id, "--hub=" + pipe, "--data=" + str(datadir)]
+    run = RoleRun(procs, datadir, label, args)
+    runs.append(run)
+    return run
+
+
+@pytest.fixture
+def storage(procs, flowdir, runs, pipe, session_id, hub):
+    """A running storage role with the hub; yields (run, pid, client). The client is named 'tester'."""
+    run = start_storage(procs, flowdir, runs, pipe, session_id)
+    pid = wait_hello(hub, "storage")
+    client = AhfClient(pipe, "tester")
+    yield run, pid, client
+    client.close()
+
+
+# --- start, list, read ------------------------------------------------------------------------------
+
+def test_storage_lists_and_reads_flows_and_reports_missing_files(storage, flowdir, pipe):
+    run, pid, client = storage
+    listed = ask_ok(client, "cmd.storage.flows.list")
+    names = [f["name"] for f in listed["files"]]
+    assert names == ["skeleton"]
+    assert listed["files"][0]["path"] == "Flows/skeleton.json"
+    assert isinstance(listed["files"][0]["mtime"], int)
+
+    read = ask_ok(client, "cmd.storage.flow.read", {"path": "Flows/skeleton.json"})
+    assert json.loads(read["text"]) == json.loads((flowdir / "Flows" / "skeleton.json").read_text("utf-8"))
+
+    missing = ask(client, "cmd.storage.flow.read", {"path": "Flows/nothere.json"})
+    assert not missing["ok"]          # booleans come as 0/1 (PROTOCOL 2)
+    assert missing["error"]["code"] == "not_found"
+
+
+def test_names_with_spaces_and_umlauts_work(storage, flowdir):
+    _, _, client = storage
+    path = "Flows/Flow 1010290492 Übung.json"
+    ask_ok(client, "cmd.storage.flow.write", {"path": path, "text": flow_text("Übung"), "backup": False})
+    assert (flowdir / "Flows" / "Flow 1010290492 Übung.json").is_file()
+    listed = ask_ok(client, "cmd.storage.flows.list")
+    assert "Flow 1010290492 Übung" in [f["name"] for f in listed["files"]]
+    read = ask_ok(client, "cmd.storage.flow.read", {"path": path})
+    assert json.loads(read["text"])["name"] == "Übung"
+
+
+@pytest.mark.parametrize("bad", ["../escape.json", "Flows/../escape.json", "C:\\escape.json",
+                                 "Flows\\sub.json", "Flows/sub/x.json", "Flows/x.txt", "", "Flows/.json"])
+def test_bad_flow_paths_are_rejected_before_any_file_access(storage, flowdir, bad):
+    _, _, client = storage
+    answer = ask(client, "cmd.storage.flow.write", {"path": bad, "text": flow_text("x"), "backup": False})
+    assert not answer["ok"], answer
+    assert answer["error"]["code"] == "bad_payload"
+    assert not (flowdir.parent / "escape.json").exists()
+
+
+def test_flow_write_rejects_text_that_is_not_a_json_object(storage, flowdir):
+    _, _, client = storage
+    for text in ["{ not json", "[1, 2]", ""]:
+        answer = ask(client, "cmd.storage.flow.write", {"path": "Flows/bad.json", "text": text, "backup": False})
+        assert answer["error"]["code"] == "bad_payload", (text, answer)
+    assert not (flowdir / "Flows" / "bad.json").exists()
+
+
+# --- v1 round trip ----------------------------------------------------------------------------------
+
+def test_v1_flows_round_trip_through_storage_with_same_structure_and_types(procs, datadir, runs, pipe,
+                                                                           session_id, hub):
+    """Reads every v1 flow, writes it back through storage and compares structure and JSON types."""
+    flows = sorted(V1_FLOWS.glob("Flow *.json"))
+    assert len(flows) >= 20, "v1 example flows are missing"
+    (datadir / "Flows").mkdir()
+    for src in flows:
+        shutil.copy(src, datadir / "Flows" / src.name)
+    start_storage(procs, datadir, runs, pipe, session_id)
+    wait_hello(hub, "storage")
+    client = AhfClient(pipe, "tester")
+    try:
+        listed = ask_ok(client, "cmd.storage.flows.list")
+        assert sorted(f["name"] for f in listed["files"]) == sorted(p.stem for p in flows)
+        for src in flows:
+            path = "Flows/" + src.name
+            text = ask_ok(client, "cmd.storage.flow.read", {"path": path})["text"]
+            ask_ok(client, "cmd.storage.flow.write", {"path": path, "text": text, "backup": False})
+            written = datadir / "Flows" / src.name
+            raw = written.read_bytes()
+            assert raw[:3] != b"\xef\xbb\xbf", src.name + " must be written without BOM"
+            assert b"\r\n" in raw and raw.count(b"\n") == raw.count(b"\r\n"), src.name + " must be CRLF"
+            assert same(read_json(written), read_json(src)), src.name
+    finally:
+        client.close()
+
+
+# --- atomic write, backup, read-only target ---------------------------------------------------------
+
+def test_hard_kill_during_a_big_write_leaves_old_or_new_file_never_a_half_one(procs, datadir, runs,
+                                                                               session_id):
+    """Three rounds: a 5 MB write is sent, the role is killed at once. The file is old or new, never half.
+    Every round has its own hub and pipe name, so the hello of the new role is the one that is waited for."""
+    target = datadir / "Flows" / "atomic.json"
+    (datadir / "Flows").mkdir()
+    for round_no in range(3):
+        pipe_n = "ahf.storage.%s.%d" % (session_id, round_no)
+        old = flow_text("old %d" % round_no)
+        target.write_text(old, encoding="utf-8")
+        with RoleHub(pipe_n) as hub:
+            start_storage(procs, datadir, runs, pipe_n, session_id, label="storage%d" % round_no)
+            pid = wait_hello(hub, "storage")
+            client = AhfClient(pipe_n, "tester")
+            new = flow_text("new %d" % round_no, pad="y" * BIG_BYTES)
+            client.send("storage", "cmd.storage.flow.write",
+                        {"path": "Flows/atomic.json", "text": new, "backup": True}, timeout_ms=30000)
+            psutil.Process(pid).kill()
+            client.close()
+        time.sleep(0.2)
+        parsed = json.loads(target.read_bytes().decode("utf-8"))   # must be complete JSON
+        assert same(parsed, json.loads(old)) or same(parsed, json.loads(new)), \
+            "half-written file in round %d" % round_no
+
+
+def test_big_write_does_not_stop_the_ping(storage, flowdir):
+    """A 5 MB write is queued; sys.ping is answered within 1 s while the write runs or waits."""
+    _, _, client = storage
+    big = flow_text("big", pad="z" * BIG_BYTES)
+    started = time.perf_counter()
+    write_id = client.send("storage", "cmd.storage.flow.write",
+                           {"path": "Flows/big.json", "text": big, "backup": False}, timeout_ms=30000)
+    pings = []
+    for n in range(3):
+        t0 = time.perf_counter()
+        answer = client.request("storage", "sys.ping", {"n": n}, timeout=PING_LIMIT_S)
+        pings.append(time.perf_counter() - t0)
+        assert answer["type"] == "sys.pong"
+    listed = ask_ok(client, "cmd.storage.flows.list")
+    assert "big" in [f["name"] for f in listed["files"]]
+    print("\nping seconds during the 5 MB write: %s, write+list total %.3f s"
+          % (["%.4f" % p for p in pings], time.perf_counter() - started))
+    assert max(pings) < PING_LIMIT_S
+    assert write_id
+
+
+def test_backups_keep_exactly_ten_after_twelve_writes(storage, flowdir):
+    _, _, client = storage
+    versions = [flow_text("version %d" % i) for i in range(12)]
+    for text in versions:
+        ask_ok(client, "cmd.storage.flow.write", {"path": "Flows/skeleton.json", "text": text, "backup": True})
+    backups = sorted((flowdir / "Flows" / "backup").glob("skeleton_backup_*.json"))
+    assert len(backups) == 10, [b.name for b in backups]
+    # The newest backup is the version before the last write, the oldest kept one is version 2.
+    assert same(read_json(backups[-1]), json.loads(versions[10]))
+    assert same(read_json(backups[0]), json.loads(versions[1]))
+    assert same(read_json(flowdir / "Flows" / "skeleton.json"), json.loads(versions[11]))
+
+
+def test_read_only_target_fails_with_error_event_and_keeps_the_old_file(storage, flowdir, pipe):
+    _, _, client = storage
+    target = flowdir / "Flows" / "skeleton.json"
+    before = target.read_bytes()
+    engine = observer(pipe, "engine-watch", "engine")
+    try:
+        os.chmod(target, stat.S_IREAD)
+        answer = ask(client, "cmd.storage.flow.write", {"path": "Flows/skeleton.json",
+                                                        "text": flow_text("changed"), "backup": True})
+        assert not answer["ok"]
+        assert answer["error"]["code"] == "internal"
+        event = engine.wait_event("evt.storage.error", timeout=5)
+        assert event["payload"]["op"] == "flow.write"
+        assert event["payload"]["path"] == "Flows/skeleton.json"
+        assert target.read_bytes() == before
+    finally:
+        os.chmod(target, stat.S_IREAD | stat.S_IWRITE)
+        engine.close()
+
+
+def test_missing_flow_read_reports_storage_error_to_the_engine_topic(storage, pipe):
+    _, _, client = storage
+    engine = observer(pipe, "engine-watch", "engine")
+    try:
+        ask(client, "cmd.storage.flow.read", {"path": "Flows/none.json"})
+        event = engine.wait_event("evt.storage.error", timeout=5)
+        assert event["payload"]["op"] == "flow.read"
+        assert event["payload"]["code"] == "not_found"
+    finally:
+        engine.close()
+
+
+# --- variables --------------------------------------------------------------------------------------
+
+def test_v1_variables_are_read_as_stored(procs, datadir, runs, pipe, session_id, hub):
+    shutil.copytree(V1_VARS, datadir / "Variables")
+    (datadir / "Flows").mkdir()
+    start_storage(procs, datadir, runs, pipe, session_id)
+    wait_hello(hub, "storage")
+    client = AhfClient(pipe, "tester")
+    try:
+        got = ask_ok(client, "cmd.storage.var.get", {"scope": "global", "name": "global_testResults"})
+        assert got["exists"] and got["type"] == "object"
+        assert same(json.loads(got["content"]), read_json(V1_VARS / "global_testResults.ahfvar"))
+        got = ask_ok(client, "cmd.storage.var.get",
+                     {"scope": "static", "flowId": "Flow 1010290492", "name": "static_results"})
+        assert got["exists"] and got["type"] == "object"
+        assert same(json.loads(got["content"]),
+                    read_json(V1_VARS / "Flow 1010290492" / "static_results.ahfvar"))
+        assert not ask_ok(client, "cmd.storage.var.get", {"scope": "global", "name": "nothere"})["exists"]
+    finally:
+        client.close()
+
+
+def test_variable_round_trip_for_strings_numbers_objects_and_utf8(storage, flowdir):
+    _, _, client = storage
+    varsdir = flowdir / "Variables"
+    obj = {"name": "Grüße \"x\" \\ € 中", "list": [1, 2.5, "3", "0.700000"], "nested": {"ß": 7}}
+    ask_ok(client, "cmd.storage.var.set", {"scope": "global", "name": "obj", "type": "object",
+                                           "content": json.dumps(obj, ensure_ascii=False)})
+    meta = read_json(varsdir / "obj.ahfvd")
+    assert meta == {"name": "obj", "type": "object"}
+    assert same(read_json(varsdir / "obj.ahfvar"), obj)
+    got = ask_ok(client, "cmd.storage.var.get", {"scope": "global", "name": "obj"})
+    assert same(json.loads(got["content"]), obj)
+
+    for name, value in [("text", "Ümlaut ß € 中"), ("number", "1.50"), ("int", "42")]:
+        ask_ok(client, "cmd.storage.var.set", {"scope": "static", "flowId": "Flow 1", "name": name,
+                                               "type": "normal", "content": value})
+        assert (varsdir / "Flow 1" / (name + ".ahfvar")).read_bytes() == value.encode("utf-8")
+        got = ask_ok(client, "cmd.storage.var.get", {"scope": "static", "flowId": "Flow 1", "name": name})
+        assert got["type"] == "normal" and got["content"] == value
+
+    listed = ask_ok(client, "cmd.storage.var.list", {"scope": "static", "flowId": "Flow 1"})
+    assert listed["names"] == ["int", "number", "text"]
+
+
+def test_deleting_a_variable_twice_is_not_an_error(storage, flowdir):
+    _, _, client = storage
+    ask_ok(client, "cmd.storage.var.set", {"scope": "global", "name": "gone", "type": "normal", "content": "1"})
+    first = ask_ok(client, "cmd.storage.var.delete", {"scope": "global", "name": "gone"})
+    second = ask_ok(client, "cmd.storage.var.delete", {"scope": "global", "name": "gone"})
+    assert first["existed"] and not second["existed"]
+    assert not (flowdir / "Variables" / "gone.ahfvd").exists()
+    assert not (flowdir / "Variables" / "gone.ahfvar").exists()
+    assert not ask_ok(client, "cmd.storage.var.get", {"scope": "global", "name": "gone"})["exists"]
+
+
+@pytest.mark.parametrize("scope, flowId, name", [("global", "", "../evil"), ("global", "", "a/b"),
+                                                 ("global", "", ""), ("static", "../x", "name"),
+                                                 ("weird", "", "name")])
+def test_variable_names_and_scopes_are_checked(storage, flowdir, scope, flowId, name):
+    _, _, client = storage
+    answer = ask(client, "cmd.storage.var.set", {"scope": scope, "flowId": flowId, "name": name,
+                                                 "type": "normal", "content": "x"})
+    assert answer["error"]["code"] == "bad_payload", answer
+
+
+# --- log --------------------------------------------------------------------------------------------
+
+def test_log_line_has_the_v1_format_and_goes_to_the_log_topic(storage, flowdir, pipe):
+    _, _, client = storage
+    watcher = observer(pipe, "log-watch", "log")
+    try:
+        sender = AhfClient(pipe, "Editor3")
+        ts = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
+        sender.send("storage", "evt.log.append", {"ts": ts, "level": "f1", "source": "Flow 369404488",
+                                                 "flowId": "Flow 369404488", "text": "left mouse button click"})
+        event = watcher.wait_event("evt.log.entry", timeout=5)
+        assert event["payload"]["text"] == "left mouse button click"
+        sender.close()
+        log_txt = flowdir / "Log" / "Log.txt"
+        deadline = time.time() + 5
+        while time.time() < deadline and not (log_txt.exists() and "left mouse button click" in log_txt.read_text("utf-8")):
+            time.sleep(0.05)
+        raw = log_txt.read_bytes().decode("utf-8")
+        line = raw[raw.rindex("\r\n---"):]
+        assert V1_LOG_LINE.match(line[2:]), line
+        assert line.endswith("~Editor3~Flow 369404488~ left mouse button click")
+        # Time is local, as in v1: the stamp is close to the local now (the sender sends UTC).
+        stamp = re.search(r"--- (\d{4} \d{2} \d{2} \d{2}:\d{2}:\d{2})", line).group(1)
+        local_struct = time.strptime(stamp, "%Y %m %d %H:%M:%S")
+        assert abs(time.mktime(local_struct) - time.time()) < 60
+        per_source = flowdir / "Log" / "Log_Flow 369404488.txt"
+        assert per_source.is_file() and "left mouse button click" in per_source.read_text("utf-8")
+    finally:
+        watcher.close()
+
+
+def test_log_file_over_100_kb_is_renamed_to_old_before_the_next_entry(storage, flowdir):
+    _, _, client = storage
+    logdir = flowdir / "Log"
+    logdir.mkdir(exist_ok=True)
+    (logdir / "Log.txt").write_bytes(b"x" * (100 * 1024 + 10))
+    client.send("storage", "evt.log.append", {"ts": "2026-10-10 10:00:00", "level": "a1",
+                                              "source": "rot", "text": "after rotation"})
+    deadline = time.time() + 5
+    while time.time() < deadline and not (logdir / "Log_old.txt").exists():
+        time.sleep(0.05)
+    assert (logdir / "Log_old.txt").stat().st_size > 100 * 1024
+    assert "after rotation" in (logdir / "Log.txt").read_text("utf-8")
+
+
+# --- shutdown ---------------------------------------------------------------------------------------
+
+def test_shutdown_finishes_the_queued_writes_then_says_bye_and_exits_0(storage, flowdir, procs, hub):
+    """Writes sent before sys.shutdown are finished before sys.bye. The test hub forwards the client's
+    frames on its own thread and the shutdown on another path, so the writes get a short head start.
+    The queue drain itself is covered by tests/ahk/storage_queue.test.ahk (FailAll, deadlines)."""
+    run, pid, client = storage
+    names = ["shutdown%d" % i for i in range(3)]
+    for name in names:
+        client.send("storage", "cmd.storage.flow.write",
+                    {"path": "Flows/%s.json" % name, "text": flow_text(name, pad="q" * (1024 * 1024)),
+                     "backup": False}, timeout_ms=30000)
+    time.sleep(0.5)
+    hub.send_to("storage", "sys.shutdown", {"reason": "user", "deadlineMs": 3000})
+    bye = hub.wait_received(lambda m: m.get("type") == "sys.bye" and m.get("from") == "storage", timeout=5)
+    assert bye is not None
+    assert run.wait_exit(timeout=SHUTDOWN_LIMIT_S + 2) == 0
+    for name in names:
+        assert json.loads((flowdir / "Flows" / (name + ".json")).read_text("utf-8"))["name"] == name
+
+
+# --- the engine with the real storage ---------------------------------------------------------------
+
+def test_engine_starts_with_the_real_storage_and_its_log_arrives(procs, datadir, runs, pipe, session_id, hub):
+    """The engine test contract (tests/integration/test_engine.py) against this storage."""
+    (datadir / "Flows").mkdir()
+    shutil.copy(SKELETON_SRC, datadir / "Flows" / "skeleton.json")
+    start_storage(procs, datadir, runs, pipe, session_id)
+    wait_hello(hub, "storage")
+    engine_args = ["--role=engine", "--session=" + session_id, "--hub=" + pipe, "--data=" + str(datadir)]
+    engine = RoleRun(procs, datadir, "engine", engine_args)
+    runs.append(engine)
+    wait_hello(hub, "engine")
+    obs = observer(pipe, "obs-engine", "engine")
+    try:
+        ready = obs.wait_event("evt.engine.ready", timeout=15)
+        assert ready["payload"]["seq"] >= 1
+        snap = obs.request("engine", "cmd.engine.snapshot", {}, timeout=5)["payload"]
+        assert [f["flowId"] for f in snap["flows"]] == ["skeleton"]
+    finally:
+        obs.close()
+    deadline = time.time() + 5
+    engine_log = datadir / "Log" / "Log_engine.txt"
+    while time.time() < deadline and not engine_log.exists():
+        time.sleep(0.05)
+    assert "ready with 1 flow(s)" in engine_log.read_text("utf-8")

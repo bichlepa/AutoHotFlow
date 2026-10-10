@@ -51,6 +51,8 @@ Jede Nachricht ist ein JSON-Objekt mit festem Schema. Der Serializer schreibt di
 
 **Antwort:** `payload` enthält `{ "ok": true, ...Daten }` oder `{ "ok": false, "error": { "code": "...", "message": "..." } }`.
 
+**Antwort später (WI-12):** Ein `cmd.`-Handler darf `Deferred.Marker()` zurückgeben und die Antwort später mit `peer.Reply(request, payload)` senden. Solange der Handler den Marker zurückgibt, sendet der Peer nichts. Der Handler ist dann für genau eine `Reply` verantwortlich, auch auf jedem Fehlerpfad (sonst endet der Absender mit seinem Timeout). Genutzt von `storage` (Warteschlange, Abschnitt 4.6). Umgesetzt in `src/core/ipc/Deferred.ahk`, `Dispatcher.ahk`, `Peer.ahk`.
+
 **Fehlercodes:** `timeout`, `unknown_type`, `bad_payload`, `not_found`, `conflict` (Revision), `busy`, `denied`, `internal`, `peer_gone`, `shutting_down`.
 
 **Pflicht für jeden Empfänger:** jede `cmd.`-Anfrage wird beantwortet (auch mit Fehler). Der Absender erzeugt bei Fristablauf selbst ein lokales `res.` mit `timeout` und verwirft spätere Antworten mit unbekannter `corr`. Ist der Umschlag ungültig, `from`/`id`/`type` aber lesbar, antwortet der Empfänger mit `bad_payload`. Ganz unlesbare Rahmen werden verworfen und gezählt.
@@ -162,7 +164,7 @@ Jedes Ereignis trägt `seq` (steigend pro Engine-Epoche) und `epoch`.
 | `evt.instance.started` / `evt.instance.ended` | `flow:<id>` | `{ flowId, instanceId, reason? }` |
 | `evt.settings.changed` | `engine` | `{ settings }` |
 | `evt.log.entry` | `log` | `{ ts, level, source, flowId?, text }` (Engine/Storage senden Log über 4.5, nicht hier) |
-| `evt.storage.error` | `engine` | `{ op, path, message }` |
+| `evt.storage.error` | `engine` | `{ op, path, code, message }` (WI-12: `op` = Name der Storage-Operation, Abschnitt 4.6; `code` = Fehlercode der Antwort) |
 
 **Umsetzung in WI-10 (`src/engine/`, Phase 2):**
 
@@ -227,9 +229,22 @@ Jedes Ereignis trägt `seq` (steigend pro Engine-Epoche) und `epoch`.
 | `cmd.storage.flow.write` | `{ path, text, backup: true }` | `{ ok }` (atomar, Backups wie v1) |
 | `cmd.storage.var.get` | `{ scope: "global"/"static", flowId?, name }` | `{ ok, exists, type, content }` |
 | `cmd.storage.var.set` | `{ scope, flowId?, name, type, content }` | `{ ok }` (write-behind, Engine wartet nicht darauf) |
-| `cmd.storage.var.delete` / `cmd.storage.var.list` | `{ scope, flowId?, name? }` | `{ ok, names? }` |
-| `cmd.storage.settings.get/set` | `{ settings? }` | `{ ok, settings }` |
+| `cmd.storage.var.delete` | `{ scope, flowId?, name }` | `{ ok, existed }` (zweimal löschen ist kein Fehler, `existed` ist dann false) |
+| `cmd.storage.var.list` | `{ scope, flowId? }` | `{ ok, names }` (sortiert) |
+| `cmd.storage.settings.get/set` | `{ settings? }` | `{ ok, settings }` (Phase 3, noch nicht umgesetzt) |
 | `evt.log.append` (`noReply`) | `{ ts, level, source, flowId?, text }` | keine. Storage schreibt `Log.txt`, `Log_<source>.txt` und leitet an Topic `log` weiter. |
+
+**Umsetzung in WI-12 (`src/storage/`):**
+
+- Alle Antworten kommen über die Warteschlange (`WriteQueue`, eine Operation je Timer-Scheibe). Die Antwort ist `Deferred` (Abschnitt 2). Jede Anfrage wird genau einmal beantwortet, auch bei Frist, Fehler oder Beenden (`shutting_down`).
+- Frist: `timeoutMs` der Anfrage (Standard 30000). Eine Operation, die länger als die Frist wartete, wird nicht ausgeführt und mit `timeout` beantwortet.
+- `cmd.storage.flows.list`: `path` ist `Flows/<name>.json` relativ zum Datenverzeichnis, `name` der Dateiname ohne `.json` (das ist die `flowId` der Engine). `mtime` als Ganzzahl (Sekunden seit 1970).
+- `cmd.storage.flow.read`: `not_found`, wenn die Datei fehlt.
+- `cmd.storage.flow.write`: `text` muss ein JSON-Objekt sein (sonst `bad_payload`). Geschrieben wird atomar (Temp-Datei + `MoveFileEx`), mit CRLF wie v1. `backup` (Standard true): vor dem Ersetzen wird die alte Datei nach `Flows/backup/<name>_backup_<yyyyMMddHHmmss><ms>.json` kopiert, höchstens 10 bleiben. Schlägt das Backup fehl, wird nicht geschrieben (`internal`).
+- Pfade werden vor jedem Dateizugriff geprüft (`bad_payload` bei `..`, Backslash, Unterordner, falscher Endung). Namen von Variablen und Flow-IDs dürfen keine Pfadzeichen enthalten.
+- `cmd.storage.var.*`: `scope` `global` (Dateien in `Variables/`) oder `static` (in `Variables/<flowId>/`). `type` ist `normal` (Inhalt ist der Wert als Text) oder `object` (Inhalt ist JSON-Text, Storage prüft ihn). `var.get` liefert `exists: false`, wenn die Metadatei fehlt. Inhalt wird unverändert geliefert.
+- Fehler: `ok:false` mit `error.code` an den Absender, zusätzlich `evt.storage.error` an Topic `engine` (`op` = Name ohne `cmd.storage.`, z. B. `flow.read`, `flow.write`, `var.set`).
+- `evt.log.append`: Ein Eintrag wird als Zeile `CRLF, "--- yyyy MM dd HH:mm:ss ~<absender>~<source>~ <text>"` an `Log/Log.txt` und `Log/Log_<source>.txt` angehängt (Zeitstempel lokal wie v1, `ts` kommt in UTC). Die Datei über 100 KB wird vorher nach `<name>_old.txt` umbenannt. Der Eintrag wird als `evt.log.entry` `{ts, level, source, flowId?, text}` an Topic `log` weitergeleitet (`ts` unverändert UTC). Storage selbst schreibt seine Einträge direkt in die Warteschlange, nicht an sich selbst.
 
 ### 4.7 Dialoge
 
