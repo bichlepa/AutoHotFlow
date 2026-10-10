@@ -7,6 +7,7 @@
 #Include FlowRecord.ahk
 #Include FlowTable.ahk
 #Include Executor.ahk
+#Include WorkerBridge.ahk
 
 ; Engine role (WI-10, ARCHITECTURE 3, 4, 6.1, PROTOCOL 4.2, 4.3, 4.6).
 ;
@@ -37,6 +38,7 @@ class Engine extends Role {
         this.seq := 0
         this.flows := FlowTable()
         this.executor := Executor(this)
+        this.workers := WorkerBridge(this, Engine._PoolSize(args))
         this._flowsLoaded := false     ; not _loaded: that name is the method _Loaded (case-insensitive)
         this._loadTries := 0
         this._loadRetryFn := () => this._LoadFlows()
@@ -55,6 +57,12 @@ class Engine extends Role {
         this.On("cmd.flow.enable", (msg) => this._CmdFlowEnable(msg, true))
         this.On("cmd.flow.disable", (msg) => this._CmdFlowEnable(msg, false))
         this.On("cmd.flow.patch", (msg) => this._CmdFlowPatch(msg))
+        this.On("evt.worker.done", (msg) => this.workers.OnDone(msg))
+        if (this.workers.Size > 0) {
+            ; Worker crashes come from the supervisor (topic "process"), which owns the process handles.
+            this.On("evt.process.", (msg) => this.workers.OnProcessEvent(msg))
+            this.peer.Subscribe("process")
+        }
         SetTimer(this._safetyFn, Engine.SAFETY_MS)
     }
 
@@ -275,6 +283,14 @@ class Engine extends Role {
         if (IsObject(v))
             throw AhfError("payload field '" key "' must be a value", ErrCode.BAD_PAYLOAD)
         return (v = "") ? "" : String(v)
+    }
+
+    ; Number of worker slots from --workers (default 0: no pool, worker elements end with "exception").
+    static _PoolSize(args) {
+        raw := args.Get("workers", "0")
+        if (!IsInteger(raw) || Integer(raw) < 0 || Integer(raw) > WorkerBridge.MAX_SIZE)
+            throw AhfError("--workers must be an integer from 0 to " WorkerBridge.MAX_SIZE, ErrCode.BAD_ARGS)
+        return Integer(raw)
     }
 
     static _ErrorText(res) {

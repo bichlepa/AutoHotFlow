@@ -11,6 +11,7 @@
 #Include core\Instance.ahk
 #Include core\Scheduler.ahk
 #Include core\ThreadState.ahk
+#Include WorkerBridge.ahk
 
 ; Runs the instances of the engine (WI-10, ARCHITECTURE 2.3, 5.1, 5.2, 6.2). Runs the state machines of
 ; engine/core and calls the elements through ElementRunner. Knows nothing about IPC: it reports through
@@ -20,8 +21,9 @@
 ; ready thread. A run of Tick is limited to TICK_BATCH dispatches, then it schedules itself again, so a flow
 ; of synchronous elements cannot keep the message loop busy.
 ;
-; Modes (ELEMENT-API-V2 section 2): inline runs here. worker is not available before WI-11 and is reported
-; as "exception" with the text "worker not available", never skipped silently. trigger cannot be an action.
+; Modes (ELEMENT-API-V2 section 2): inline runs here. worker goes to the pool (WorkerBridge, WI-11): the thread
+; waits in state ready while every worker is busy, and ends with "exception" ("worker not available") when no
+; worker is usable at all. trigger cannot be an action.
 ;
 ; Parameters are passed as they are stored in the flow file (object with case-insensitive properties).
 ; Expressions are not evaluated in Phase 2 (ARCHITECTURE, WI-10 "Nicht Teil"), so Duration "200" arrives as
@@ -126,6 +128,10 @@ class Executor {
                     thread := run["inst"].Threads.Get(threadId, "")
                     if (!IsObject(thread) || thread.State != "ready")
                         continue
+                    ; A worker element waits while the pool is busy; it is dispatched when a worker reports done.
+                    if (this._IsWorkerElement(run, thread) && this._owner.workers.Usable()
+                        && !this._owner.workers.Free())
+                        continue
                     this._Dispatch(run, thread)
                     progress := true
                     budget -= 1
@@ -155,7 +161,7 @@ class Executor {
             return
         }
         if (cls.Mode = "worker") {
-            ctx.Finish("exception", "worker not available: " classId " runs in a worker (WI-11)")
+            this._DispatchWorker(run, thread, ctx, cls, classId)
             return
         }
         if (cls.Mode != "inline") {
@@ -165,6 +171,33 @@ class Executor {
         params := Executor._Params(run["flow"], elementId)
         run["active"][thread.Id] := Map("cls", cls, "ctx", ctx, "params", params)
         ElementRunner.Run(cls, ctx, params, ObjBindMethod(this, "_OnSlow", flowId))
+    }
+
+    ; Sends a worker element to the pool. The thread stays running until the worker reports (or the job is
+    ; cancelled, see _StopRun). Without a usable worker the run ends with "exception" at once.
+    _DispatchWorker(run, thread, ctx, cls, classId) {
+        params := Executor._ParamMap(run["flow"], thread.ElementId)
+        env := Map("flowId", run["flowId"], "elementId", thread.ElementId, "instanceId", run["instanceId"]
+            , "threadId", thread.Id)
+        execId := this._owner.workers.Run(classId, params, Executor._CopyMap(run["vars"]), env
+            , ObjBindMethod(this, "_OnWorkerDone", ctx))
+        if (execId = "") {
+            ctx.Finish("exception", "worker not available for " classId)
+            return
+        }
+        run["active"][thread.Id] := Map("cls", cls, "ctx", ctx, "params", Executor._Params(run["flow"], thread.ElementId)
+            , "execId", execId)
+    }
+
+    ; Called by WorkerBridge when the job ends (bound: ctx first). Exports become thread variables.
+    _OnWorkerDone(ctx, result, message, exports) {
+        if (!ExecContext.IsResult(result)) {
+            message := "worker reported result '" result "'"
+            result := "exception"
+        }
+        for name, value in exports
+            ctx.SetVar(name, value)
+        ctx.Finish(result, message)
     }
 
     ; Called by ExecContext.Finish (bound arguments first, then ctx, result, msg).
@@ -214,7 +247,10 @@ class Executor {
             if (run["active"].Has(threadId)) {
                 act := run["active"][threadId]
                 run["active"].Delete(threadId)
-                ElementRunner.Stop(act["cls"], act["ctx"], act["params"])
+                if (act.Has("execId"))
+                    this._owner.workers.Cancel(act["execId"])
+                else
+                    ElementRunner.Stop(act["cls"], act["ctx"], act["params"])
             }
             this._ElementStopped(run, thread.ElementId, "stopped", "")
             inst.ReleaseThread(threadId, reason)
@@ -294,16 +330,36 @@ class Executor {
     ; semantics). Objects and null values become "".
     static _Params(def, elementId) {
         p := {}
+        for k, v in Executor._ParamMap(def, elementId)
+            p.%k% := v
+        return p
+    }
+
+    ; The same parameters as a Map (sent to workers as JSON). Objects and null values become "".
+    static _ParamMap(def, elementId) {
+        m := Map()
         el := def.Element(elementId)
         pars := (el is Map) ? el.Get("pars", "") : ""
         if (pars is Map) {
             for k, v in pars {
                 if (IsObject(v))
                     v := ""
-                p.%k% := v
+                m[k] := v
             }
         }
-        return p
+        return m
+    }
+
+    ; A copy of a variable Map (imports of a worker are copies, never references).
+    static _CopyMap(source) {
+        m := Map()
+        for k, v in source
+            m[k] := v
+        return m
+    }
+
+    _IsWorkerElement(run, thread) {
+        return ElementRegistry.ModeOf(run["flow"].ElementClass(thread.ElementId)) = "worker"
     }
 
     ; Snapshot of the keys of a Map, so the Map can change while the keys are walked.

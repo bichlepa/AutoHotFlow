@@ -208,6 +208,16 @@ Jedes Ereignis trägt `seq` (steigend pro Engine-Epoche) und `epoch`.
 - `cmd.worker.cancel` `{execId}`: Antwort `{ok}` (sonst `not_found`), danach `evt.worker.done` mit `stopped`. Ein späteres `Finish` des Elements wird verworfen. Ein Element, das nicht in Scheiben läuft (z. B. `DllCall("Sleep")`), kann den Abbruch nicht empfangen (AHK hat keine Vorkaufrechte, siehe `doc/HOW-TO.md`).
 - `sys.shutdown` während eines Laufs: `evt.worker.done` mit `stopped` vor `sys.bye`.
 
+**Umsetzung in WI-11 auf Engine-Seite (`src/engine/WorkerBridge.ahk`):**
+
+- Option `--workers=<n>` der Engine (0 bis 8, Standard 0 = kein Pool). Slots heißen `worker:1` bis `worker:n`. Mit 0 endet jedes Worker-Element sofort mit `exception` "worker not available".
+- Ein Worker-Element bleibt `running`, bis `evt.worker.done` kommt. Ist alle Pool-Slots belegt, wartet der Thread (Zustand `ready`), bis einer frei ist. Ist kein Slot mehr nutzbar (alle `down`), endet er mit `exception` "worker not available".
+- Antwort `cmd.worker.run` mit Fehler `not_found`, `peer_gone`, `timeout` oder `internal`: Slot wird `down`, Element endet mit `exception` "worker not available: worker:n (<code>)".
+- Absturz oder Ende eines Workers: Die Engine abonniert das Topic `process` beim Supervisor (`cmd.topic.subscribe`, nur mit `--workers` > 0) und wertet `evt.process.crashed` und `evt.process.exited` für `worker:n` aus. Das laufende Element endet mit `exception` "worker crashed (worker:n)". `evt.process.ready` macht einen `down`-Slot wieder `idle`.
+- `cmd.worker.cancel` bei Stopp der Instanz: Der Thread endet sofort (wie inline, Quittung nicht abgewartet). Der Slot bleibt `busy`, bis der Worker `evt.worker.done` schickt, spätestens nach 2 s (dann `down`, Eintrag im Log `a0`).
+- Ergebnisse aus `evt.worker.done`: Exporte werden als Thread-Variablen gesetzt. Ein unbekanntes Ergebnis wird `exception`.
+- `cmd.worker.run` übergibt `imports` als Kopie der Instanzvariablen (Scope `instance`) und `env` mit `flowId`, `elementId`, `instanceId`, `threadId`. Die Frist der Annahme (`timeoutMs`) ist 5000 ms.
+
 ### 4.6 Engine ↔ Storage und Log
 
 | Typ | Nutzlast | Antwort |
