@@ -285,6 +285,7 @@ class Hub {
         try {
             conn.SendFrame(text)
         } catch {
+            ; the client is denied anyway and closed below, a failed courtesy frame is of no use
         }
         ; Close after the frame has had the chance to leave; the close itself is not an error.
         SetTimer(() => conn.Close(), -50)

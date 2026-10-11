@@ -230,7 +230,7 @@ class Executor {
     ; its old element, e.g. a trigger as an action ("cannot be an action"; seen in 2 of about 50 runs
     ; with 200 parallel instances, WI-16).
     _Advance(run, thread) {
-        prev := Critical("On")
+        prev := Critical("On")  ; reason: advancing the thread must not be interrupted (see above)
         try {
             outcome := Scheduler.Advance(run["inst"], run["flow"], thread, () => Ids.Next("thr-"))
             if (outcome["unhandled"]) {

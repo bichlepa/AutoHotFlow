@@ -47,6 +47,7 @@ class Role {
         try {
             FileAppend(level " " source ": " text "`n", "**", "UTF-8-RAW")
         } catch {
+            ; best effort: no usable stderr (see above)
         }
     }
     static ConsoleFn := (level, source, text, flowId := "") => Role.Console(level, source, text)

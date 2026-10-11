@@ -809,3 +809,13 @@ Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge kor
 - **Problem:** Beim Wiederholungslauf `-k "not memory and not backlog"` fehlte die Idle-CPU-Messung, weil der Testname `test_idle_cpu_and_memory_...` "memory" enthält. Es fiel erst bei der Auswertung auf.
 - **Richtig:** Nach dem Lauf die Zahl der Messzeilen je Name prüfen (`AHF_MEASURE_OUT`), nicht nur "7 passed".
 - **Status:** verifiziert
+
+### Statische Prüfung von AHK-Quelltext (`tools/arch_check.py`)
+
+- **Problem 1:** Die Prüfung entfernt Zeichenkettenliterale vor der Mustersuche (sonst treffen `"MsgBox"` oder `DllCall("Sleep")`). Die Regel `critical` sah deshalb `Critical("On")` als `Critical("  ")` und erkannte das Einschalten nicht; sie meldete im ersten Lauf nichts.
+- **Richtig:** Zwei Fassungen des Textes führen (ohne Kommentare/Zeichenketteninhalt, und nur ohne Kommentare) und Argumente wie `"On"` oder `static Mode := "inline"` in der zweiten suchen. Jede Regel braucht einen Selbsttest mit Treffer, sonst bleibt so ein Fehler unbemerkt.
+- **Status:** verifiziert (Selbsttest `critical`, und Lauf gegen den Stand vor den Korrekturen, der 7 Treffer liefert).
+- **Problem 2:** In `catch as e {` hielt das Muster für die Fehlerklasse das Wort `as` selbst für eine Klasse; leere `catch as e {}`-Blöcke wurden übersehen.
+- **Richtig:** Klassenname mit `(?!as\b)` ausschließen.
+- **Status:** verifiziert (Selbsttest `test_catch_variants`).
+- **Quelle:** `tools/arch_check.py`, `tests/test_architecture.py`

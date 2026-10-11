@@ -18,6 +18,8 @@ Gilt für alles unter `src/`, `tests/ahk/` und `tools/`. Sprache der Dokumentati
 
 ## 3. Verbotene Muster (Reviewregeln)
 
+Die Muster mit festem Wortlaut werden **automatisch geprüft**: `python tools/arch_check.py` (Exit 1 bei Verstößen, Ausgabe `datei:zeile: regel: text`) und `tests/test_architecture.py` (Teil des Gesamtlaufs). Regeln: `requires`, `one-class`, `include-core`, `include-roles`, `include-tests`, `dialog`, `file-io`, `blocking`, `inline-element`, `warn`, `critical`, `empty-catch`, `builtin-class`. Eine begründete Ausnahme steht als Kommentar `; arch-ok: <regel> <Begründung>` in derselben oder der vorigen Zeile, oder (für bekannte Altlasten) in der Liste `EXCEPTIONS` in `tools/arch_check.py`. **Neue Regeln werden hier und im Werkzeug (samt Selbsttest) gleichzeitig ergänzt.** Die Prüfung ist bewusst einfach (Zeilen und Muster); `A_TickCount`/Zufall als ID, Zugriff über Prozessgrenzen und fehlendes `try/catch` um Elementcode prüft sie nicht (Review).
+
 | Muster | Wo verboten | Stattdessen |
 |---|---|---|
 | `MsgBox`, `InputBox`, `FileSelect`, `DirSelect`, jedes blockierende GUI | `engine`, `supervisor`, `storage`, `triggerhost`, `core` | Nachricht an UI/Worker (`evt.ui.notice`, Dialog-Element im Worker) |

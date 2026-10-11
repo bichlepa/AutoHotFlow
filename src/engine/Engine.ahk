@@ -85,7 +85,7 @@ class Engine extends Role {
     ; an event emitted by the interrupting thread would otherwise leave first with a higher seq
     ; (found by the 200 parallel instances of the stress test, WI-16).
     Emit(to, msgType, payload) {
-        prev := Critical("On")
+        prev := Critical("On")  ; reason: numbering and sending are one step (see above)
         try {
             this.seq += 1
             payload["epoch"] := this.epoch

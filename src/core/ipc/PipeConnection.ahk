@@ -167,7 +167,7 @@ class PipeConnection {
                     this._Fail(reason, false)
                 if (!this._open)
                     break
-                prev := Critical("On")
+                prev := Critical("On")  ; reason: reading _pumpAgain and clearing _pumping must not be interrupted
                 again := this._pumpAgain
                 if (!again)
                     this._pumping := false
@@ -249,7 +249,7 @@ class PipeConnection {
 
     ; Serialises the write path (SendFrame can be interrupted by a Pump thread and vice versa).
     _DriveWriteGuarded() {
-        prev := Critical("On")
+        prev := Critical("On")  ; reason: checking and setting _writing must not be interrupted
         if (this._writing) {
             this._writeAgain := true
             Critical(prev)
@@ -264,7 +264,7 @@ class PipeConnection {
                 reason := this._DriveWrite()
                 if (reason != "" || !this._open)
                     break
-                prev := Critical("On")
+                prev := Critical("On")  ; reason: reading _writeAgain and clearing _writing must not be interrupted
                 again := this._writeAgain
                 if (!again)
                     this._writing := false
