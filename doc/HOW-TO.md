@@ -474,6 +474,42 @@ Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge kor
 - **Richtig:** In `Storage.Start` nach `super.Start()` `Log.Configure(Storage.SelfLogFn)` setzen. Die Senke legt Einträge direkt in die Warteschlange.
 - **Status:** nicht geprüft (der Pfad ist nur bei Fehlern aktiv, ein gezielter Test fehlt)
 
+### Zwei Timer rufen dieselbe Funktion: Prüfen und Handeln sind getrennte Zeilen (`Executor.Tick`)
+
+- **Problem:** `Executor.Tick` lief aus zwei Timern (Kick und Sicherheitstimer). Er prüfte `thread.State = "ready"`, rief dazwischen noch `workers.Usable()` und startete dann das Element. Unterbricht der andere Timer dazwischen und startet denselben Thread, wurde das Element zweimal gestartet; der Übergang `ready -> running` des zweiten Aufrufs schlug nur als `a0`-Zeile fehl, das Ergebnis von `Dispatch()` wurde nicht ausgewertet.
+- **Falsch:** Sich darauf verlassen, dass ein Timer sich nicht selbst unterbricht (stimmt), und übersehen, dass ihn ein anderer Timer-Thread unterbrechen darf, sobald er länger als ~15 ms läuft.
+- **Richtig:** (1) Das Ergebnis des Übergangs auswerten: `if (!thread.Dispatch()) return`. (2) Die Funktion gegen Wiedereintritt sperren: `Critical("On")`, Flag prüfen und setzen, `Critical(prev)`; wer eine laufende Funktion trifft, setzt nur ein "nochmal"-Flag, die laufende Funktion läuft noch einmal. Das Verlassen (Flag löschen, "nochmal" prüfen) ebenfalls in `Critical`. Auch bei einer Ausnahme das Flag freigeben. (3) Prüfen und Ändern eines Zustands (`TryTransition`, `ThreadState.Finish`) in einem `Critical`-Block, die Meldung ungültiger Übergänge danach.
+- **Status:** verifiziert (Test `Tick: a tick that interrupts before the dispatch does not start an element twice` war vor der Korrektur rot, 2 statt 1 Start; danach grün). Dass der Fehler in der laufenden Engine auftrat, ist nicht beobachtet worden (gelesen).
+- **Quelle:** `src/engine/Executor.ahk` (`Tick`), `src/engine/core/ThreadState.ahk`, `tests/ahk/engine_executor.test.ahk`
+
+### Unterbrechung im Test erzwingen: Haken in der Attrappe
+
+- **Problem:** Ein Fehler, der nur auftritt, wenn ein Timer zwischen zwei Zeilen unterbricht, ist mit echter Zeit kaum zu reproduzieren.
+- **Richtig:** Die Attrappe der Abhängigkeit (`FakeWorkers.Usable`) ruft einmalig einen Haken auf (`owner.executor.Tick()`). Der Aufruf liegt genau zwischen Prüfung und Start und verhält sich wie ein unterbrechender Timer, ohne Zeitabhängigkeit.
+- **Status:** verifiziert
+- **Quelle:** `tests/ahk/helpers/EngineOwner.ahk`
+
+### Klonen erst nach der Änderung: der Klon erbt sie
+
+- **Problem:** `Scheduler.Advance` klonte den Thread für die zweite Verbindung, nachdem der Thread für die erste Verbindung auf das Loop-Element gesetzt und der Loop-Stack gepusht war. Der Klon erbte den Push (Tiefe 1 statt 0). Außerdem wurde der Stack je Verbindung zurückgenommen, die zweite Rücknahme warf.
+- **Richtig:** Zustand einmal herstellen (Pop), dann alle Klone anlegen, danach erst jedem Ziel seine Änderung geben (Element, Push).
+- **Status:** verifiziert (Tests `Advance: branching into a loop pushes only the loop thread` und `Loop: two tail connections pop the loop stack once` waren vor der Korrektur rot)
+- **Quelle:** `src/engine/core/Scheduler.ahk`
+
+### `===` gibt es nicht, `ObjPtr("")` wirft
+
+- **Problem:** Der Vergleich zweier Objekte auf Identität mit `===` ist ein Syntaxfehler ("Missing operand"). `ObjPtr` auf einen leeren String wirft "Expected an object".
+- **Richtig:** `IsObject(a) && ObjPtr(a) = ObjPtr(b)`. Das Skript meldet den Fehler beim Laden (stderr), nicht erst beim Lauf.
+- **Status:** verifiziert
+- **Quelle:** `src/engine/Executor.ahk` (`_DispatchWorker`)
+
+### Map zählt nach Schlüsseln, nicht nach Einfügereihenfolge: FIFO braucht ein Array
+
+- **Problem:** Die Instanzen des Executors liegen in einer `Map` (`inst-<n>`). Die Aufzählung ist nach Schlüssel sortiert, nicht nach dem Start. Für die Reihenfolge der Richtlinie `wait` (FIFO) taugt sie nicht.
+- **Richtig:** Eine eigene Warteschlange (`Array` je Flow, `Push` am Ende, `RemoveAt(1)` am Anfang).
+- **Status:** Sortierung nach Schlüssel verifiziert (Doku und Code gelesen); dass `inst-10` vor `inst-2` einsortiert wird, ist vermutet (nicht gemessen).
+- **Quelle:** `src/engine/Executor.ahk` (`_waiting`)
+
 ## GUI und Hotkeys
 
 ### Klasse aus einer Datei nicht eingebunden: Dialog "local variable ... never assigned"
@@ -819,3 +855,9 @@ Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge kor
 - **Richtig:** Klassenname mit `(?!as\b)` ausschließen.
 - **Status:** verifiziert (Selbsttest `test_catch_variants`).
 - **Quelle:** `tools/arch_check.py`, `tests/test_architecture.py`
+
+### Lange Python-Heredocs mit gemischten Anführungszeichen brechen in der Bash des Werkzeugs
+
+- **Problem:** Ein `python - <<'EOF'`-Heredoc mit vielen `'`, `"` und Backslashes wurde von der Shell abgelehnt ("unexpected EOF"), ohne dass etwas ausgeführt wurde. Ein Heredoc, der AHK-Quelltext schreibt, kann zudem Backslashes zusammenfallen lassen (siehe `AGENTS.md`).
+- **Richtig:** Das Änderungsskript mit dem Editor-Werkzeug als Datei schreiben (Scratchpad) und mit `python datei.py` ausführen. Dabei CRLF/LF der Zieldatei erhalten (`newline=''` beim Lesen und Schreiben).
+- **Status:** verifiziert (zweimal aufgetreten)
