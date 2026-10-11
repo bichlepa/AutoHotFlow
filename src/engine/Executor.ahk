@@ -225,13 +225,22 @@ class Executor {
     }
 
     ; Moves a finished thread on (Scheduler.Advance) and ends the instance when nothing is left.
+    ; Critical: Scheduler.Advance sets a thread "ready" a few lines before it names the next element.
+    ; A dispatch tick that interrupts in between (AHK interrupts after 15 ms) would run the thread with
+    ; its old element, e.g. a trigger as an action ("cannot be an action"; seen in 2 of about 50 runs
+    ; with 200 parallel instances, WI-16).
     _Advance(run, thread) {
-        outcome := Scheduler.Advance(run["inst"], run["flow"], thread, () => Ids.Next("thr-"))
-        if (outcome["unhandled"]) {
-            Log.Write("f0", "engine", "unhandled exception in element " thread.ElementId ": " thread.Message
-                , run["flowId"])
+        prev := Critical("On")
+        try {
+            outcome := Scheduler.Advance(run["inst"], run["flow"], thread, () => Ids.Next("thr-"))
+            if (outcome["unhandled"]) {
+                Log.Write("f0", "engine", "unhandled exception in element " thread.ElementId ": " thread.Message
+                    , run["flowId"])
+            }
+            this._CheckEnded(run, outcome["unhandled"] ? "exception" : "finished")
+        } finally {
+            Critical(prev)
         }
-        this._CheckEnded(run, outcome["unhandled"] ? "exception" : "finished")
     }
 
     ; Stops one instance: running elements get Stop and are released at once (the element has no
