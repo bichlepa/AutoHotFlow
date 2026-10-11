@@ -311,6 +311,8 @@ Der Stub ist ein Minimal-Ersatz für `manager` (ARCHITEKTUR 3). Er zeigt, was di
 4. Eine Lücke in `seq` oder ein neues `epoch` löst Resync aus.
 5. Der Hub hält pro Client eine Ausgabewarteschlange mit Obergrenze (Standard 1000 Nachrichten oder 8 MiB). Läuft sie über, gilt der Client als hängend (`peer_gone` für ausstehende Anfragen), der Supervisor wird informiert.
 
+6. **Laden großer Datenmengen (WI-24):** Wer viele große Antworten anfordert (die Engine beim Start: ein `cmd.storage.flow.read` je Flow-Datei), schickt nicht alle Anfragen auf einmal, sondern höchstens K gleichzeitig (Engine: K = 2) und die nächste nach der Verarbeitung einer Antwort. So liegt ein `sys.ping` höchstens hinter K Antworten in der Pipe. Der Hub leitet große Rahmen über die Kopffelder weiter (Abschnitt 2), seine Kosten je Rahmen sind unabhängig von der Größe der Nutzlast (gemessen 1,7 ms für 109.232 Zeichen). Die Kosten des Empfängers bleiben: `Message.Parse` des Rahmens (0,16 s) und `Json.Parse` des Flow-Texts (0,14 s) für die größte v1-Datei.
+
 ### 5a Ereignisse vor dem Abonnement (Designfrage, WI-07)
 
 Ereignisse werden nur an Abonnenten verteilt, die zum Zeitpunkt des Sendens abonniert sind. Ein Ereignis, das vor dem `cmd.topic.subscribe` einer Rolle gesendet wurde, geht für diese Rolle verloren. Es gibt keine Persistenz und keine Wiederholung (Abschnitt 1, Lieferung).

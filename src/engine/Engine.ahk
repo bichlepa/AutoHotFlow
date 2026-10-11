@@ -15,9 +15,11 @@
 ; files: flow files are read from storage with cmd.storage.flow.read and parsed here. It never shows
 ; a dialog and never blocks: every request has a timeout and is answered by a callback.
 ;
-; Start: after the handshake the engine asks storage for the flow list and reads each file. Single
-; file errors are reported as evt.storage.error and do not stop the start. evt.engine.ready is sent
-; once the list was read. A failing list is retried (LOAD_TRIES times, LOAD_RETRY_MS apart).
+; Start: after the handshake the engine asks storage for the flow list and reads the files, LOAD_PARALLEL at a
+; time (the next request leaves when an answer has been handled, so the message loop answers pings in between).
+; Single file errors are reported as evt.storage.error and do not stop the start. When storage does not answer
+; (timeout, connection lost) the files not yet asked for are reported as failed without being asked.
+; evt.engine.ready is sent once the list was read. A failing list is retried (LOAD_TRIES times, LOAD_RETRY_MS apart).
 ;
 ; Every evt.* carries "epoch" (the start of this engine process) and "seq" (one counter per engine
 ; process, +1 per event). A client that sees a new epoch or a gap in seq asks for cmd.engine.snapshot.
@@ -29,6 +31,10 @@ class Engine extends Role {
     static READ_TIMEOUT_MS := 30000
     static LOAD_TRIES := 5
     static LOAD_RETRY_MS := 500
+    ; At most this many cmd.storage.flow.read are on their way at the same time. Every answer costs the engine a
+    ; parse of the whole flow text (about 100 ms for 93 KB), so a ping behind many answers waited too long (WI-24).
+    ; With K requests in flight, a ping waits for at most K answers.
+    static LOAD_PARALLEL := 2
     ; Safety net for the dispatcher: a tick every 100 ms in case a kick was lost (ARCHITECTURE 2.3).
     static SAFETY_MS := 100
 
@@ -143,8 +149,17 @@ class Engine extends Role {
             this._Loaded()
             return
         }
-        st := Map("pending", files.Length)
-        for f in files {
+        ; pending: files without a result yet; inflight: requests sent and not answered; next: index in files.
+        st := Map("files", files, "pending", files.Length, "inflight", 0, "next", 1, "storageDown", false)
+        this._ReadNext(st)
+    }
+
+    ; Sends read requests until LOAD_PARALLEL are in flight; calls _Loaded when every file has a result.
+    _ReadNext(st) {
+        files := st["files"]
+        while (st["inflight"] < Engine.LOAD_PARALLEL && st["next"] <= files.Length) {
+            f := files[st["next"]]
+            st["next"] += 1
             if (!(f is Map)) {
                 st["pending"] -= 1
                 this._StorageError("flows.list", "", "entry is not an object")
@@ -152,8 +167,19 @@ class Engine extends Role {
             }
             name := f.Get("name", "")
             path := f.Get("path", "")
-            this.peer.Request(Engine.STORAGE, "cmd.storage.flow.read", Map("path", path)
-                , ObjBindMethod(this, "_OnFlowRead", st, name, path), Engine.READ_TIMEOUT_MS)
+            if (st["storageDown"]) {
+                st["pending"] -= 1
+                this._StorageError("flow.read", path, "not read: storage did not answer before")
+                continue
+            }
+            try {
+                this.peer.Request(Engine.STORAGE, "cmd.storage.flow.read", Map("path", path)
+                    , ObjBindMethod(this, "_OnFlowRead", st, name, path), Engine.READ_TIMEOUT_MS)
+                st["inflight"] += 1
+            } catch as e {
+                st["pending"] -= 1
+                this._StorageError("flow.read", path, Type(e) ": " e.Message)
+            }
         }
         if (st["pending"] = 0)
             this._Loaded()
@@ -168,10 +194,15 @@ class Engine extends Role {
             }
         } else {
             this._StorageError("flow.read", path, Engine._ErrorText(res))
+            ; A storage that does not answer would make every further read wait for its own deadline, one after the
+            ; other (before WI-24 all waited at once). The rest is failed at once.
+            code := res.payload.Get("error", Map()) is Map ? res.payload["error"].Get("code", "") : ""
+            if (code = ErrCode.TIMEOUT || code = ErrCode.PEER_GONE || code = ErrCode.SHUTTING_DOWN)
+                st["storageDown"] := true
         }
+        st["inflight"] -= 1
         st["pending"] -= 1
-        if (st["pending"] = 0)
-            this._Loaded()
+        this._ReadNext(st)
     }
 
     _Loaded() {

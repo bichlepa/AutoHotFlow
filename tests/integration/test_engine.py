@@ -152,6 +152,93 @@ def test_engine_loads_flow_announces_ready_and_answers_snapshot(procs, datadir, 
         assert run.wait_exit(timeout=10) == 0, run.stderr_text()
 
 
+class HoldingStorageStub(StorageStub):
+    """Does not answer cmd.storage.flow.read by itself: the test answers the held requests one by one."""
+
+    def __init__(self, pipe, datadir, answer_code=None):
+        super().__init__(pipe, datadir)
+        self.held = []
+        self.max_held = 0
+        self.answer_code = answer_code      # when set, the first read is answered with this error code
+
+    def _handle(self, msg):
+        if msg.get("type") != "cmd.storage.flow.read":
+            return super()._handle(msg)
+        self.read_calls.append(msg["payload"].get("path", ""))
+        self.held.append(msg)
+        self.max_held = max(self.max_held, len(self.held))
+        if self.answer_code:
+            self.client.reply(self.held.pop(), {"ok": False, "error": {"code": self.answer_code, "message": "test"}})
+
+    def release_one(self):
+        msg = self.held.pop(0)
+        target = self.datadir / msg["payload"]["path"]
+        self.client.reply(msg, {"ok": True, "text": target.read_text(encoding="utf-8")})
+
+
+def wait_for(predicate, timeout=5.0):
+    end = time.monotonic() + timeout
+    while time.monotonic() < end:
+        if predicate():
+            return True
+        time.sleep(0.02)
+    return False
+
+
+def test_engine_reads_at_most_two_flow_files_at_a_time_while_loading(procs, datadir, runs, session_id, pipe, hub,
+                                                                    flowdir):
+    # WI-24: the next read is sent when an answer has been handled, so pings get their turn in between.
+    for n in range(8):
+        shutil.copy(SKELETON_SRC, flowdir / "Flows" / ("copy%d.json" % n))
+    stub = HoldingStorageStub(pipe, flowdir).start()
+    try:
+        with observer(pipe, "engine") as obs:
+            run = start_engine(procs, flowdir, runs, pipe, session_id)
+            assert wait_for(lambda: len(stub.held) == 2), "expected two requests in flight, got %d" % len(stub.held)
+            time.sleep(0.5)
+            assert len(stub.held) == 2 and len(stub.read_calls) == 2, "more than two reads in flight: %s" % stub.read_calls
+            for answered in range(1, 10):
+                stub.release_one()
+                expected = min(2, 9 - answered)         # held requests after this answer: the next one has followed
+                assert wait_for(lambda: len(stub.held) == expected),                     "after answer %d: %d held, expected %d" % (answered, len(stub.held), expected)
+            assert stub.max_held <= 2, stub.max_held
+            wait_ready(obs)
+            snap = ask(obs, "cmd.engine.snapshot")
+            assert len(snap["flows"]) == 9
+            hub.send_to("engine", "sys.shutdown", {"reason": "user", "deadlineMs": 1000})
+            assert run.wait_exit(timeout=10) == 0, run.stderr_text()
+    finally:
+        stub.close()
+
+
+def test_engine_does_not_ask_for_more_files_when_storage_has_stopped_answering(procs, datadir, runs, session_id, pipe,
+                                                                              hub, flowdir):
+    # A storage that does not answer would make 200 reads wait for their deadline one after the other once
+    # they are staggered; after the first transport failure the rest is failed at once (WI-24).
+    for n in range(8):
+        shutil.copy(SKELETON_SRC, flowdir / "Flows" / ("copy%d.json" % n))
+    stub = HoldingStorageStub(pipe, flowdir, answer_code="peer_gone").start()
+    try:
+        with observer(pipe, "engine") as obs:
+            run = start_engine(procs, flowdir, runs, pipe, session_id)
+            errors = []
+            for msg in obs.events(timeout=READY_TIMEOUT_S):
+                if msg["type"] == "evt.storage.error":
+                    errors.append(msg)
+                elif msg["type"] == "evt.engine.ready":
+                    break
+            else:
+                pytest.fail("no evt.engine.ready")
+            assert len(stub.read_calls) <= 3, stub.read_calls      # 2 sent at first, 1 more at most before the flag was set
+            assert len(errors) == 9, [e["payload"] for e in errors]       # every file has its error
+            snap = ask(obs, "cmd.engine.snapshot")
+            assert snap["ok"] and snap["flows"] == []
+            hub.send_to("engine", "sys.shutdown", {"reason": "user", "deadlineMs": 1000})
+            assert run.wait_exit(timeout=10) == 0, run.stderr_text()
+    finally:
+        stub.close()
+
+
 def test_flow_get_returns_the_definition_and_unknown_flow_is_not_found(procs, datadir, runs, session_id, pipe,
                                                                       hub, flowdir, storage):
     with observer(pipe, "engine") as obs:
