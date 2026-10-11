@@ -32,7 +32,10 @@ Status: Entwurf. Werkzeuge in dieser Umgebung geprüft: AutoHotkey v2 unter `C:\
 | Engine wird beendet | Neustart, `evt.engine.restarted`, Clients machen Resync, Trigger neu armiert |
 | Engine wird eingefroren | wie oben nach Ping-Timeout |
 | Storage antwortet nicht (eingefroren) | Anfragen laufen in Timeout, Engine blockiert nicht, `evt.storage.error` |
-| Worker stürzt während Ausführung ab | Thread endet mit `exception`, Engine läuft weiter |
+| Worker stürzt während Ausführung ab | Thread endet mit `exception`, Engine läuft weiter, Ersatz wird angefordert (WI-27, `tests/fault/test_worker_lifecycle.py`) |
+| Worker blockiert in einem Aufruf, Abbruch oder Jobfrist | Instanz endet sofort, nach 2 s wird der Prozess beendet, der nächste Job läuft auf einem neuen Worker (WI-27) |
+| Engine stirbt während eines Worker-Jobs | die neue Engine beendet die Waisen, der Pool baut sich neu auf, der nächste Job läuft (WI-27) |
+| Fünf Fehler eines Pools in einer Minute | keine neuen Worker, Worker-Elemente enden mit "worker not available" (WI-27) |
 | Pipe wird vom Client abrupt geschlossen | Hub räumt auf, Ausstehende Anfragen an ihn bekommen `peer_gone` |
 | Supervisor wird hart beendet | Alle Kinder beenden sich nach der Orphan-Frist |
 | Shutdown mit hängendem Prozess | Gesamtdauer unter Frist plus Toleranz, hängender Prozess hart beendet |

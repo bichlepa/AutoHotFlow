@@ -423,8 +423,8 @@ Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge kor
 ### Worker crasht: nur der Supervisor sieht den Prozesstod
 
 - **Problem:** Ein Python-Hub bemerkt den Tod eines Workers nicht. Die Engine erfährt davon nichts, der Job hängt.
-- **Richtig:** Die Engine abonniert das Topic `process` beim Supervisor (nur mit `--workers`). Der Crash-Test startet den echten Supervisor mit `--start=worker:1`. Der Supervisor nimmt das Stand-in-Storage am Hub an, ohne dass es ein Kind ist.
-- **Status:** verifiziert (`test_killed_worker_ends_its_element_with_worker_crashed`, Ende 395 ms nach dem Kill)
+- **Richtig:** Die Engine abonniert das Topic `process` beim Supervisor (nur mit `--workers` > 0). Der Crash-Test startet den echten Supervisor mit storage, engine und manager; die Engine fordert ihren Worker beim Supervisor an (WI-27, `cmd.process.spawn`). Der Supervisor nimmt ein Stand-in-Storage am Hub an, ohne dass es ein Kind ist (nur noch in `test_worker_pool.py` für `engine` als Absender).
+- **Status:** verifiziert (`test_killed_worker_ends_its_element_with_worker_crashed_and_is_not_restarted` in `tests/fault/test_process_crash.py`, Ende 0,09 bis 0,4 s nach dem Kill; `test_killed_worker_ends_its_element_with_worker_crashed_and_the_pool_has_a_replacement`)
 
 ### Python-Client: `sys.pong` ist eine Antwort, kein Ereignis
 
@@ -442,8 +442,8 @@ Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge kor
 ### Ein frozen Prozess zeigt Ack-Timeout und Orphan-Frist
 
 - **Problem:** Ob Engine und Pool bei einem nicht antwortenden Worker enden, war ungeprüft.
-- **Richtig:** `psutil.Process(pid).suspend()` friert den Worker ein. Dann kommt `cmd.worker.run` nicht an (Ack-Timeout 5 s, Element `exception`, "worker not available: worker:1 (timeout)"). Nach einem Abbruch bleibt der Slot 2 s `busy`, dann `down`.
-- **Status:** verifiziert (`test_frozen_worker_does_not_answer_the_run_and_the_element_fails_by_timeout`, `test_frozen_worker_does_not_confirm_the_cancel...`)
+- **Richtig:** `psutil.Process(pid).suspend()` friert den Worker ein. Dann kommt `cmd.worker.run` nicht an (Ack-Timeout 5 s, Element `exception`, "worker not available: worker:1 (timeout)"). Seit WI-27 entfernt die Engine den Slot und lässt den Prozess beenden (`TerminateProcess` beendet auch einen angehaltenen Prozess), der nächste Job läuft auf einem neuen Worker. Nach einem Abbruch ohne Quittung wartet die Engine 2 s (`ORPHAN_MS`), dann wird der Worker beendet und ersetzt (vorher: Slot `down` für immer).
+- **Status:** verifiziert (`test_frozen_worker_does_not_answer_the_run_and_is_replaced`, `test_cancel_of_a_frozen_worker_ends_the_instance_at_once_and_the_process_is_killed_and_replaced` in `tests/fault/test_worker_lifecycle.py`)
 
 ### cmd-Antwort später: der Peer antwortet sonst sofort
 
@@ -992,3 +992,40 @@ Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge kor
 - **Richtig:** Anders nennen (`theHub`).
 - **Status:** verifiziert
 - **Quelle:** `tests/ahk/helpers/hub_frame_cost.ahk`
+
+### Worker-Pool: `Map.Delete` auf einen fehlenden Schlüssel wirft
+
+- **Problem:** `WorkerBridge.OnProcessEvent` rief `this._earlyReady.Delete(name)` für einen Namen, der nie eingetragen war. `Map.Delete` wirft in AHK v2 `UnsetItemError` ("Item has no value"). Der Handler des Peers fing den Fehler und loggte ihn (`handler for evt.process.crashed failed`), der Absturz des Workers blieb ohne Wirkung: das Element hing, bis die Instanz gestoppt wurde.
+- **Falsch:** `m.Delete(key)` ohne Prüfung, wenn der Schlüssel fehlen kann.
+- **Richtig:** `if (m.Has(key)) m.Delete(key)`. Wer in Ereignishandlern löscht, prüft zuerst.
+- **Status:** verifiziert (Test `test_killed_worker_ends_its_element_with_worker_crashed_and_the_pool_has_a_replacement` schlug mit genau diesem Log fehl, nach der Korrektur grün)
+- **Quelle:** `src/engine/WorkerBridge.ahk` (`OnProcessEvent`)
+
+### Worker beschäftigt melden: der Worker, vor dem Start des Elements
+
+- **Problem:** Ein Worker, der in einem Aufruf länger als 6 s blockiert (Download, COM, `DllCall`), beantwortet keine Pings und wurde als hängend beendet (Entscheidung "keine Toleranz" aus WI-11).
+- **Falsch:** Die Engine meldet dem Supervisor den Jobbeginn. Zwei Verbindungen (Engine → Worker, Engine → Supervisor) sind nicht geordnet, und die Engine kann zwischen den Meldungen sterben.
+- **Richtig:** Der Worker sendet `sys.busy {busy: true}` im Handler von `cmd.worker.run`, vor dem Start des Elements (der startet erst über einen Timer, nach der Antwort), und `busy: false` beim Jobende. Der Supervisor pingt einen beschäftigten Worker nicht und wertet keinen Pong. Das Wahrheitsfeld `busy` steht in `BOOL_FIELDS` und `WIRE_BOOL_RE` (WI-26).
+- **Status:** verifiziert (`test_worker_that_blocks_longer_than_the_pong_timeout_is_not_hung_while_it_has_a_job`, 7,5 s Blockade; `test_a_worker_that_blocks_longer_than_6_s_is_not_hung_and_the_element_ends_normal`)
+- **Quelle:** `src/worker/Worker.ahk` (`_CmdRun`, `_SendDone`), `src/supervisor/Heartbeat.ahk`
+
+### Pool-Test: Anfragen aus Python tragen bis zu 250 ms Weckverzug
+
+- **Problem:** Ein Test, der die Zeit "Flow starten bis Instanz beendet" über eine Python-Anfrage maß, zeigte den Weckverzug des Hubs (ein Python-Client hat kein Fenster für den Weckruf, der Hub liest ihn mit dem 250-ms-Timer) als Teil der Zeit.
+- **Richtig:** Zeiten aus Engine-Ereignissen bilden (Ereignis A der Engine bis Ereignis B der Engine). Die Kaltstart-Zeit des Pools ist so die Zeit vom Ende des Trigger-Elements bis zum Start des Worker-Elements.
+- **Status:** verifiziert (Messwerte im Ergebnis von WI-27)
+- **Quelle:** `tests/fault/test_worker_lifecycle.py` (`test_time_to_the_first_job_when_the_worker_has_to_be_started_cold`)
+
+### AHK-Unit-Test: statische Konstanten einer Klasse zur Laufzeit ändern
+
+- **Problem:** Der Test für den nicht quittierten Abbruch hätte 2 s (`WorkerBridge.ORPHAN_MS`) gewartet.
+- **Richtig:** `WorkerBridge.ORPHAN_MS := 150` im Test, im `finally` zurücksetzen. Die Konstante wird bei jedem Aufruf gelesen, nicht beim Laden kopiert.
+- **Status:** verifiziert (`tests/ahk/engine_worker_bridge.test.ahk`: `CancelThatIsNotConfirmedKillsTheWorkerAfterTheOrphanTime`, `JobDeadlineEndsTheJobAtOnceAndCancelsThenKills`; ohne das Zurücksetzen im `finally` bliebe der Wert für spätere Fälle der Datei geändert)
+
+### Supervisor: Zustand eines Kindes vor `CreateProcessW` setzen, nicht danach
+
+- **Problem:** `Children._Launch` setzte `rec["state"] := "starting"` erst nach `ChildLauncher.Start`. AHK unterbricht einen Thread nach 15 ms, der Hub verarbeitet dann Nachrichten, und ein schneller Kind-Prozess meldet sich (`sys.hello`) schon, bevor der unterbrochene Thread Pid und Zustand speichert. `OnHello` setzte `ready`, danach überschrieb `_Launch` mit `starting`: das Kind war für immer "starting" (nach 10 s hängend). Sichtbar wurde es, als die Engine beim Start `cmd.process.list` und einen Worker-Start anforderte und die Unterbrechung lang genug wurde: `test_killed_engine_is_reported_restarted_and_the_others_are_untouched` scheiterte 11 von 12 Mal bei `-n 6`.
+- **Falsch:** Nach dem Start eines Prozesses Zustandsfelder zurücksetzen, die ein Ereignis des neuen Prozesses schon gesetzt haben kann.
+- **Richtig:** Zustand vor dem Start setzen, nach dem Start nur Pid, Handle, Reader und `gone`. `OnHello` übernimmt die Pid des Links, wenn der Datensatz noch keine hat.
+- **Status:** verifiziert (12 von 12 grün nach der Korrektur, 12 von 12 grün auf dem Stand vor WI-27; der Wettlauf selbst ist nicht deterministisch nachgestellt, nur `OnHello` ohne Pid ist ein Unit-Test)
+- **Quelle:** `src/supervisor/Children.ahk` (`_Launch`, `OnHello`)

@@ -153,6 +153,7 @@ Die Rollen `echo`, `crasher`, `hanger`, `slow_shutdown` (Quellen in `tests/integ
 - `cmd.test.echo`, `cmd.test.log`, `cmd.test.logstate`, `cmd.test.setlogtarget`, `cmd.test.throwlater` (`echo`): siehe `tests/integration/helpers/EchoRole.ahk`.
 - Option `--prepare-limit=<ms>` (nur mit `--test-roles`, 100 bis 600000): setzt die Frist von `cmd.app.prepareExit` herab, damit der Timeout-Test in Sekunden läuft. Ohne das Flag gilt die Konstante.
 - Option `--restart-max=<n>` (nur mit `--test-roles`): Zahl der automatischen Neustarts je 60 s statt 3, damit ein Test ein Kind 50-mal neu starten kann (Handle-Leck-Test).
+- Option `--worker-limit=<n>` (nur mit `--test-roles`, 1 bis 16): Höchstzahl lebender Worker statt 16, damit der Test von `cmd.process.spawn` (`busy`) nicht 17 Prozesse braucht.
 - `echo` (WI-23): `cmd.test.stderr {text}` schreibt eine Zeile auf stderr; `cmd.test.log {count, level, text}` schreibt `count` Einträge (Standard `a1`); `cmd.test.throwlater {count}` wirft `count` Fehler aus Timern.
 
 ### 4.1c Unbehandelte Fehler (`evt.diag.error`, WI-23)
@@ -321,7 +322,7 @@ Der Stub ist ein Minimal-Ersatz für `manager` (ARCHITEKTUR 3). Er zeigt, was di
 - **Antwort auf `cmd.app.prepareExit`:** `{ ok: true, cancel: false }`, mit Option `--stub-cancel-exit` `cancel: true` (Abschnitt 2).
 - **Ereignisse als Logzeilen:** jedes empfangene `evt.*` (außer Topic `log`) wird als `evt.log.append` an `storage` gesendet, Quelle `manager`, Text `ui-event {json}`. Storage schreibt `Log/Log_manager.txt`. Das Feld `recvMs` ist die Wandzeit (ms, UTC) beim Eingang. Die Zeilen `stub.*` sind eigene Einträge des Stubs (`stub.ready`, `stub.snapshot` mit `reason`, `stub.command`, `stub.commandAnswer`, `stub.prepareExit`, `stub.shutdown`).
 - **Testbefehl `cmd.test.command` (nur mit `--headless`):** Nutzlast `{ type, payload }`, `type` aus `cmd.flow.start`, `cmd.flow.stop`, `cmd.flow.toggle`, `cmd.engine.snapshot`. Der Stub leitet die Anfrage an `engine` weiter und antwortet mit `{ ok: true, answer: <Antwort der Engine> }`. Andere Typen: `bad_payload`. Die Antwort kommt verzögert (`Deferred`).
-- **Optionen, die der Supervisor an alle Rollen weitergibt:** `--ui=<wort>`, `--headless`, `--stub-cancel-exit`.
+- **Optionen, die der Supervisor an alle Rollen weitergibt:** `--ui=<wort>`, `--headless`, `--stub-cancel-exit`, `--log-level=<0..3>` (WI-23), `--workers=<n>`, `--warm-workers=<n>`, `--worker-idle-ms=<ms>` (WI-27, Pool der Engine, 4.5).
 - **`evt.engine.restarted`:** Die Engine sendet es selbst (sie besitzt die `epoch`), sobald sie nach einem Neustart die Flows geladen hat, direkt vor `evt.flow.list.changed` und `evt.engine.ready`. Sie erkennt den Neustart an der Option `--restarted=<n>`, die der Supervisor nur bei einem automatischen Neustart anhängt (`n` = Zahl der Neustarts im Fenster). Beim ersten Start fehlt die Option, dann kommt kein `evt.engine.restarted`. Der Stub löst den Resync zusätzlich über `evt.process.restarted` und neue `epoch` aus.
 
 ## 5. Verbindungsaufbau, Wiederverbindung, Resync
