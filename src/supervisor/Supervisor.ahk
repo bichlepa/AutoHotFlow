@@ -4,6 +4,7 @@
 #Include ..\core\Ids.ahk
 #Include ..\core\Args.ahk
 #Include ..\core\Time.ahk
+#Include ..\core\PipeNames.ahk
 #Include ..\core\ipc\Wake.ahk
 #Include Hub.ahk
 #Include Children.ahk
@@ -18,7 +19,8 @@
 ; Command line (all options optional):
 ;   AutoHotFlow.ahk --role=supervisor [--session=<id>] [--data=<dir>] [--start=<role>[:<flow>],...]
 ;                   [--deadline=<ms>] [--test-roles] [--command=<text>]
-;   --session   instance key: names the hub pipe ahf.<session>.hub and the mutex. Default "main".
+;   --session   instance key: names the hub pipe and the mutex (PipeNames; the pipe name also carries
+;               the Windows session id and a tag of the user). Default "main".
 ;   --start     roles started at once, each one is required (its evt.process.ready is awaited by tests).
 ;   --deadline  total budget of the shutdown in ms (default 5000, sys.shutdown deadlineMs).
 ;   --test-roles  registers the test roles (tests/integration/helpers) and passes the option on.
@@ -54,8 +56,8 @@ class Supervisor {
         this.session := opts.Get("session", Supervisor.DEFAULT_SESSION)
         if (this.session = "")
             throw AhfError("supervisor: --session is empty", ErrCode.BAD_ARGS)
-        this.pipe := "ahf." this.session ".hub"
-        this.mutexName := "AHF.supervisor." this.session
+        this.pipe := PipeNames.Hub(this.session)
+        this.mutexName := PipeNames.Mutex(this.session)
         this.data := opts.Get("data", A_AppData "\" Supervisor.DEFAULT_DATA_SUBDIR)
         this.testRoles := opts.Has("test-roles")
         ; Only with --test-roles: the answer limit of cmd.app.prepareExit (Shutdown.PREPARE_LIMIT_MS) can be

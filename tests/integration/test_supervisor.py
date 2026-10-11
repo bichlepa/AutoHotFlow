@@ -21,6 +21,7 @@ from pathlib import Path
 import psutil
 import pytest
 
+from support import pipenames, winpipe
 from support.ahfclient import AhfClient, dumps, make_envelope
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -44,7 +45,7 @@ class Sup:
 
     def __init__(self, procs, datadir, session, *args, label="sup"):
         self.session = session
-        self.pipe = "ahf.%s.hub" % session
+        self.pipe = pipenames.hub_pipe(session)
         self.stderr_path = Path(datadir) / ("%s.stderr" % label)
         self._err = open(self.stderr_path, "wb")
         cmd = [sys.executable, str(AHKRUN), "--timeout", "120", str(ENTRY),
@@ -265,6 +266,56 @@ def test_second_instance_forwards_the_command_and_creates_no_hub(started, sessio
     assert first.wait_exit(timeout=20) == EXIT_OK, first.text()
     # ahkrun copies the supervisor's stderr only when it ends, so the delivered command is checked now
     assert "command from command: hallo welt" in first.text(), first.text()
+
+
+# --- pipe and mutex names (WI-22 point 5) ----------------------------------------------------------
+
+def test_hub_pipe_name_carries_the_windows_session_and_the_user(started, session_id):
+    sup = started()
+    expected = pipenames.hub_pipe(session_id)
+    assert expected.startswith("ahf.s%d.u" % pipenames.windows_session_id()), expected
+    py = connect(expected, "py")
+    try:
+        request_ok(py, "supervisor", "cmd.process.list")
+        request_ok(py, "supervisor", "cmd.app.exit", {})
+    finally:
+        py.close()
+    assert sup.wait_exit(timeout=20) == EXIT_OK, sup.text()
+    assert "hub " + expected in sup.text(), sup.text()          # the supervisor announces the name it serves
+
+
+def test_a_foreign_pipe_with_the_old_name_does_not_block_the_start(started, session_id):
+    squatter = winpipe.OverlappedPipe.create_server(pipenames.legacy_hub_pipe(session_id))
+    try:
+        sup = started()
+        py = connect(sup.pipe, "py")
+        try:
+            request_ok(py, "supervisor", "cmd.process.list")
+            request_ok(py, "supervisor", "cmd.app.exit", {})
+        finally:
+            py.close()
+        assert sup.wait_exit(timeout=20) == EXIT_OK, sup.text()
+    finally:
+        squatter.close()
+
+
+def test_the_instance_mutex_lives_in_the_namespace_of_the_windows_session(started, session_id):
+    import ctypes
+    sup = started()
+    py = connect(sup.pipe, "py")
+    try:
+        k32 = ctypes.WinDLL("kernel32", use_last_error=True)
+        k32.OpenMutexW.restype = ctypes.c_void_p
+        k32.OpenMutexW.argtypes = [ctypes.c_uint32, ctypes.c_int, ctypes.c_wchar_p]
+        k32.CloseHandle.argtypes = [ctypes.c_void_p]
+        SYNCHRONIZE = 0x00100000
+        h = k32.OpenMutexW(SYNCHRONIZE, 0, "Local\\AHF.supervisor." + session_id)
+        assert h, "mutex Local\\AHF.supervisor.<session> not found (error %d)" % ctypes.get_last_error()
+        k32.CloseHandle(h)
+        request_ok(py, "supervisor", "cmd.app.exit", {})
+    finally:
+        py.close()
+    assert sup.wait_exit(timeout=20) == EXIT_OK, sup.text()
 
 
 # --- test role availability ------------------------------------------------------------------------

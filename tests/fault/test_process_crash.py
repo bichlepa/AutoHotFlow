@@ -19,6 +19,7 @@ import pytest
 from faultkit import (CRASH_BUDGET_S, FULL_CHAIN, REQUEST_BUDGET_S, STUB_OPTS, RoleProc, alive, death_watch,
                       event, repeat_ids, request_ok, wait_until, write_flow)
 
+from support import pipenames
 from faultfixtures import chains  # noqa: F401  (fixture)
 
 pytestmark = pytest.mark.fault
@@ -115,7 +116,7 @@ def test_killed_worker_ends_its_element_with_worker_crashed_and_is_not_restarted
     before = chain.wait_ready(["storage", "manager", "worker:1"])
     write_flow(datadir, "w8", element_class="Action_TestHangWorker")
     engine = RoleProc(procs, datadir, "engine", ["--role=engine", "--session=" + session_id,
-                                                 "--hub=ahf.%s.hub" % session_id, "--data=" + str(datadir),
+                                                 "--hub=" + pipenames.hub_pipe(session_id), "--data=" + str(datadir),
                                                  "--workers=1"])
     try:
         request_ok(chain.obs, "supervisor", "cmd.topic.subscribe", {"topic": "flow:w8"})

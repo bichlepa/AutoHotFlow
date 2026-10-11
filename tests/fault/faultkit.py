@@ -23,6 +23,7 @@ from pathlib import Path
 
 import psutil
 
+from support import pipenames
 from support.ahfclient import AhfClient
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -168,7 +169,7 @@ class Sup:
 
     def __init__(self, procs, datadir, session, args, label="sup", run_timeout=120):
         self.session = session
-        self.pipe = "ahf.%s.hub" % session
+        self.pipe = pipenames.hub_pipe(session)
         self.datadir = Path(datadir)
         self.stderr_path = self.datadir / ("%s.stderr" % label)
         self._err = open(self.stderr_path, "wb")

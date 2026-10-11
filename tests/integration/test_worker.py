@@ -14,6 +14,7 @@ import time
 import psutil
 import pytest
 
+from support import pipenames
 from support.ahfclient import AhfClient
 from test_engine import (SKELETON_SRC, SLEEP, StorageStub, ask, collect_until, element_states, is_type, make_flow,
                          observer, stop_flow, wait_ready)
@@ -413,7 +414,7 @@ def wait_worker_pid(obs, name, timeout=15.0):
 
 
 def test_killed_worker_ends_its_element_with_worker_crashed(procs, datadir, runs, session_id, flowdir):
-    pipe = "ahf.%s.hub" % session_id
+    pipe = pipenames.hub_pipe(session_id)
     sup_err = open(datadir / "sup.stderr", "wb")
     procs.start([sys.executable, str(AHKRUN), "--timeout", "120", str(ENTRY), "--session=" + session_id,
                  "--data=" + str(flowdir), "--start=worker:1"],

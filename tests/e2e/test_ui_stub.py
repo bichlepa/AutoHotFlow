@@ -30,6 +30,7 @@ from pathlib import Path
 import psutil
 import pytest
 
+from support import pipenames
 from support.ahfclient import AhfClient
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -46,7 +47,7 @@ class Sup:
 
     def __init__(self, procs, datadir, session, args):
         self.session = session
-        self.pipe = "ahf.%s.hub" % session
+        self.pipe = pipenames.hub_pipe(session)
         self.datadir = Path(datadir)
         self._err = open(self.datadir / "sup.stderr", "wb")
         cmd = [sys.executable, str(AHKRUN), "--timeout", "120", str(ENTRY),
