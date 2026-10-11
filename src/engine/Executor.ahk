@@ -25,6 +25,12 @@
 ; waits in state ready while every worker is busy, and ends with "exception" ("worker not available") when no
 ; worker is usable at all. trigger cannot be an action.
 ;
+; Policy "wait" (ARCHITECTURE 5.1, E2, M-11): a start while the flow is executing creates the instance in state
+; waiting and queues it (FIFO per flow, evt.instance.queued). When no started instance of the flow is left, the next
+; waiting one is started. This happens in Tick (_PromoteWaiting), not in the call that ended the previous instance,
+; so a long queue of short flows does not nest calls, and Tick's guard keeps it serial. Stop ends waiting and
+; running instances; waiting ones first, so a stop never starts an instance on its way.
+;
 ; Revisions (ARCHITEKTUR 4.2, E1): a run keeps only the flow ID. Every step reads the newest committed definition
 ; from owner.flows (DefOf), so an edit takes effect at the next step. A running element keeps the class and the
 ; parameters it was started with (they are stored in run["active"]). A flow that is gone from the table stops its
@@ -41,13 +47,17 @@ class Executor {
         this._runs := Map()       ; instanceId -> run (Map, see _NewRun)
         this._counts := Map()     ; "flowId/elementId" -> countRuns (v1 semantics)
         this._lastRun := Map()    ; "flowId/elementId" -> "yyyy-MM-dd HH:mm:ss" of the last start
+        this._waiting := Map()    ; flowId -> Array of instance IDs in the order they were queued (policy wait)
+        this._waiting.CaseSense := "Off"
+        this._wantPromote := Map() ; flowId -> true: an instance ended, a waiting one may start (see Tick)
+        this._wantPromote.CaseSense := "Off"
         this._ticking := false    ; a Tick is running (see Tick)
         this._tickAgain := false  ; a Tick was asked for while one was running
         this._counts.CaseSense := "Off"
         this._lastRun.CaseSense := "Off"
     }
 
-    ; True if an instance of the flow is running or stopping.
+    ; True if an instance of the flow is running, stopping or waiting.
     IsExecuting(flowId) {
         for _, run in this._runs {
             if (run["flowId"] = flowId)
@@ -56,9 +66,15 @@ class Executor {
         return false
     }
 
+    ; True if the instance exists and waits for its turn (policy wait).
+    IsWaiting(instId) {
+        run := this._runs.Get(instId, "")
+        return IsObject(run) && run["inst"].State = "waiting"
+    }
+
     ; Starts an instance of the flow at the given trigger (or the first trigger). Returns the instance ID.
-    ; Throws AhfError: bad_payload (no trigger, or a flow without one, invalid policy), busy (policy skip,
-    ; or wait, which is not implemented yet).
+    ; With the policy wait and a running instance the new one is only queued: IsWaiting(id) is true then.
+    ; Throws AhfError: bad_payload (no trigger, or a flow without one, invalid policy), busy (policy skip).
     StartFlow(rec, triggerId := "") {
         flowId := rec.FlowId
         def := rec.Def
@@ -77,37 +93,76 @@ class Executor {
         }
         if (decision = "skip")
             throw AhfError("flow '" flowId "' is running and its execution policy is skip", ErrCode.BUSY)
-        if (decision = "wait")
-            throw AhfError("flow '" flowId "' is running and its execution policy is wait, not supported in WI-10"
-                , ErrCode.BUSY)
         if (decision = "stop_and_start")
             this.StopFlow(flowId, "policy stop")
 
         instId := Ids.Next("inst-")
         inst := Instance(instId, flowId)
-        trigger := inst.Start(Ids.Next("thr-"), triggerId)
-        if (!IsObject(trigger))
-            throw AhfError("instance '" instId "' could not start", ErrCode.INTERNAL)
-        run := Executor._NewRun(instId, flowId, inst)
+        run := Executor._NewRun(instId, flowId, inst, triggerId)
         this._runs[instId] := run
-        this._owner.Emit("topic:flow:" flowId, "evt.instance.started", Map("flowId", flowId, "instanceId", instId))
-        this._owner.EmitFlowState(flowId)
-        ; The trigger fires when the engine is asked to start the flow: running, then finished (v1 newInstance).
-        this._ElementStarted(run, triggerId)
-        this._ElementStopped(run, triggerId, "normal", "")
-        this._Advance(run, trigger)
+        if (decision = "wait") {
+            inst.Wait()
+            if (!this._waiting.Has(flowId))
+                this._waiting[flowId] := []
+            this._waiting[flowId].Push(instId)
+            this._owner.Emit("topic:flow:" flowId, "evt.instance.queued"
+                , Map("flowId", flowId, "instanceId", instId, "position", this._waiting[flowId].Length))
+            return instId
+        }
+        this._Launch(run, true)
         this._owner.Kick()
         return instId
     }
 
+    ; Starts a new or waiting instance: creates the trigger thread, reports the start and moves the trigger
+    ; thread on. The trigger fires when the engine is asked to start the flow: running, then finished (v1
+    ; newInstance). A waiting instance reads the newest revision now; if the flow or its trigger is gone by
+    ; then, the instance ends without having started. emitState: false when the flow was executing all along.
+    _Launch(run, emitState) {
+        flowId := run["flowId"]
+        instId := run["instanceId"]
+        inst := run["inst"]
+        triggerId := run["triggerId"]
+        def := this._DefOf(run)
+        if (!IsObject(def) || def.ElementKind(triggerId) != "trigger") {
+            reason := IsObject(def) ? "trigger removed" : "flow.deleted"
+            Log.Write("f1", "engine", "instance " instId " not started: " (IsObject(def)
+                ? "trigger '" triggerId "' no longer exists" : "flow is not loaded any more"), flowId)
+            inst.Stop(reason)
+            this._EndRun(run, reason)
+            return
+        }
+        trigger := inst.Start(Ids.Next("thr-"), triggerId)
+        if (!IsObject(trigger))
+            throw AhfError("instance '" instId "' could not start", ErrCode.INTERNAL)
+        this._owner.Emit("topic:flow:" flowId, "evt.instance.started", Map("flowId", flowId, "instanceId", instId))
+        if (emitState)
+            this._owner.EmitFlowState(flowId)
+        this._ElementStarted(run, triggerId)
+        this._ElementStopped(run, triggerId, "normal", "")
+        this._Advance(run, trigger)
+    }
+
+    ; Stops one instance by ID (running or waiting). Returns false if it does not exist.
+    StopInstance(instId, reason := "stop") {
+        run := this._runs.Get(instId, "")
+        if (!IsObject(run))
+            return false
+        this._StopRun(run, reason)
+        return true
+    }
+
     ; Stops all instances of the flow (ARCHITECTURE 5.1). Returns the number of instances stopped.
+    ; Waiting instances are stopped first, so no stop starts an instance that was waiting.
     StopFlow(flowId, reason := "flow.stop") {
         n := 0
-        for instId in Executor._Keys(this._runs) {
-            run := this._runs.Get(instId, "")
-            if (IsObject(run) && run["flowId"] = flowId) {
-                this._StopRun(run, reason)
-                n += 1
+        for waitingPass in [true, false] {
+            for instId in Executor._Keys(this._runs) {
+                run := this._runs.Get(instId, "")
+                if (IsObject(run) && run["flowId"] = flowId && (run["inst"].State = "waiting") = waitingPass) {
+                    this._StopRun(run, reason)
+                    n += 1
+                }
             }
         }
         return n
@@ -120,10 +175,12 @@ class Executor {
     }
 
     StopAll(reason) {
-        for instId in Executor._Keys(this._runs) {
-            run := this._runs.Get(instId, "")
-            if (IsObject(run))
-                this._StopRun(run, reason)
+        for waitingPass in [true, false] {
+            for instId in Executor._Keys(this._runs) {
+                run := this._runs.Get(instId, "")
+                if (IsObject(run) && (run["inst"].State = "waiting") = waitingPass)
+                    this._StopRun(run, reason)
+            }
         }
     }
 
@@ -168,6 +225,13 @@ class Executor {
         progress := true
         while (progress) {
             progress := false
+            for flowId in Executor._Keys(this._wantPromote) {
+                this._wantPromote.Delete(flowId)
+                if (this._PromoteWaiting(flowId)) {
+                    progress := true
+                    budget -= 1
+                }
+            }
             for instId in Executor._Keys(this._runs) {
                 run := this._runs.Get(instId, "")
                 if (!IsObject(run))
@@ -350,6 +414,38 @@ class Executor {
         this._CheckEnded(run, reason)
     }
 
+    ; Starts the first waiting instance of the flow if no started instance is left. Returns true if it did.
+    _PromoteWaiting(flowId) {
+        queue := this._waiting.Get(flowId, "")
+        if (!IsObject(queue) || queue.Length = 0)
+            return false
+        for _, run in this._runs {
+            if (run["flowId"] = flowId && run["inst"].State != "waiting")
+                return false
+        }
+        instId := queue.RemoveAt(1)
+        run := this._runs.Get(instId, "")
+        if (!IsObject(run))
+            return true
+        this._Launch(run, false)
+        return true
+    }
+
+    ; Removes an instance that ended (or was stopped while waiting) from the queue of its flow.
+    _Unqueue(flowId, instId) {
+        queue := this._waiting.Get(flowId, "")
+        if (!IsObject(queue))
+            return
+        for i, id in queue {
+            if (id = instId) {
+                queue.RemoveAt(i)
+                break
+            }
+        }
+        if (queue.Length = 0)
+            this._waiting.Delete(flowId)
+    }
+
     _CheckEnded(run, reason) {
         if (run["inst"].State = "ended")
             this._EndRun(run, reason)
@@ -362,12 +458,15 @@ class Executor {
             if (!this._runs.Has(instId))
                 return
             this._runs.Delete(instId)
+            this._Unqueue(run["flowId"], instId)
+            this._wantPromote[run["flowId"]] := true
         } finally {
             Critical(prev)
         }
         this._owner.Emit("topic:flow:" run["flowId"], "evt.instance.ended"
             , Map("flowId", run["flowId"], "instanceId", instId, "reason", reason))
         this._owner.EmitFlowState(run["flowId"])
+        this._owner.Kick()
     }
 
     ; --- element events ------------------------------------------------------------------------
@@ -408,8 +507,8 @@ class Executor {
 
     ; --- helpers -------------------------------------------------------------------------------
 
-    static _NewRun(instId, flowId, inst) {
-        run := Map("instanceId", instId, "flowId", flowId, "inst", inst
+    static _NewRun(instId, flowId, inst, triggerId) {
+        run := Map("instanceId", instId, "flowId", flowId, "inst", inst, "triggerId", triggerId
             , "vars", VarStore.NewMap(), "active", Map())
         run["active"].CaseSense := "Off"
         return run

@@ -15,11 +15,11 @@ ThreadAllowed() {
 }
 
 InstanceStates() {
-    return ["new", "running", "stopping", "ended"]
+    return ["new", "waiting", "running", "stopping", "ended"]
 }
 
 InstanceAllowed() {
-    return "|new>running|running>stopping|running>ended|stopping>ended|"
+    return "|new>running|new>waiting|waiting>running|waiting>ended|running>stopping|running>ended|stopping>ended|"
 }
 
 ; Callback that records invalid transitions as "from>to (reason)".
@@ -272,6 +272,33 @@ AddForeignThread(inst, thread) {
     inst.AddThread(thread)
 }
 
+; wait policy (E2): an instance is queued (new -> waiting), started later, or stopped while it waits.
+WaitingInstanceStartsLater() {
+    inst := Instance("i1", "f1")
+    Assert.True(inst.Wait(), "queue")
+    Assert.Equal(inst.State, "waiting")
+    thread := inst.Start("t1", "trig")
+    Assert.Equal(inst.State, "running")
+    Assert.Equal(thread.State, "finished")
+}
+
+WaitingInstanceEndsOnStop() {
+    inst := Instance("i1", "f1")
+    inst.Wait()
+    Assert.True(inst.Stop("flow.stop"))
+    Assert.Equal(inst.State, "ended")
+    Assert.Equal(inst.Threads.Count, 0)
+}
+
+RunningInstanceCannotWait() {
+    rec := Recorder()
+    inst := Instance("i1", "f1", rec.cb)
+    inst.Start("t1", "trig")
+    Assert.Equal(inst.Wait(), false)
+    Assert.Equal(inst.State, "running")
+    Assert.Equal(rec.rec.Length, 1)
+}
+
 TestRun.Init()
 
 TestRun.Case("ThreadState: every pair of states matches the table of ARCHITEKTUR 5.2", ThreadTableMatches)
@@ -293,5 +320,8 @@ TestRun.Case("Instance: Expire ends a stopping instance and drops its threads", 
 TestRun.Case("Instance: Expire is only allowed from stopping", ExpireOnlyFromStopping)
 TestRun.Case("Instance: an ended instance rejects Stop, Expire and Start", EndedInstanceIgnoresEverything)
 TestRun.Case("Instance: AddThread rejects a thread of another instance", AddThreadRejectsForeignInstance)
+TestRun.Case("Instance: a queued instance starts later (new -> waiting -> running)", WaitingInstanceStartsLater)
+TestRun.Case("Instance: a waiting instance ends on Stop without threads", WaitingInstanceEndsOnStop)
+TestRun.Case("Instance: a running instance cannot be queued", RunningInstanceCannotWait)
 
 TestRun.Finish()

@@ -173,8 +173,11 @@ Ungültige Übergänge werden **nicht** ausgeführt, sondern mit `a0`-Log abgewi
 |---|---|---|---|
 | (neu) | `flow.start` oder Trigger akzeptiert (nach Ausführungsrichtlinie) | `running` | Thread für Trigger-Element anlegen |
 | (neu) | Richtlinie `skip` und Flow läuft | (abgewiesen) | Callback „skipped“ |
+| (neu) | Richtlinie `wait` und Flow läuft (E2, M-11) | `waiting` | in die Warteschlange des Flows einreihen (FIFO), `evt.instance.queued`, Antwort `waiting: true` |
+| `waiting` | keine gestartete Instanz des Flows mehr (die vorige ist `ended`) und die Instanz ist die erste der Warteschlange | `running` | Thread für Trigger-Element anlegen, `evt.instance.started`. Fehlt der Flow oder der Trigger inzwischen, endet die Instanz ohne `started` (Grund `flow.deleted` bzw. `trigger removed`) |
+| `waiting` | `flow.stop` / Flow gelöscht | `ended` | aus der Warteschlange entfernen, `evt.instance.ended`. Die Instanz hat keinen Thread |
 | `running` | letzter Thread entfernt | `ended` | Instanz entfernen, `flow.executing` neu berechnen |
-| `running` | `flow.stop` / Richtlinie `stop` / `x_InstanceStop` | `stopping` | alle Threads `stopping` |
+| `running` | `flow.stop` / Richtlinie `stop` / `x_InstanceStop` | `stopping` | alle Threads `stopping`. Wartende Instanzen des Flows werden vorher beendet |
 | `stopping` | alle Threads entfernt | `ended` | Callback „stopped“ |
 | `stopping` | Frist (2 s) ohne Quittung | `ended` | Worker hart beenden, loggen |
 | `ended` | beliebig | – | ignorieren (loggen) |

@@ -389,14 +389,59 @@ def test_skip_policy_refuses_a_second_start_with_busy(pipe, flowdir, engine):
         stop_flow(obs, "pol")
 
 
-def test_wait_policy_is_refused_with_busy_until_it_is_implemented(pipe, flowdir, engine):
+def instance_log(got, ids):
+    """['started:1', 'queued:2', ...] of the evt.instance.* messages in got; the number is the index in ids."""
+    return ["%s:%d" % (m["type"].split(".")[-1], ids.index(m["payload"]["instanceId"]) + 1)
+            for _, m in got if m["type"].startswith("evt.instance.")]
+
+
+def test_wait_policy_queues_the_starts_and_runs_them_one_after_the_other(pipe, flowdir, engine):
+    make_flow(flowdir, "pol", sleep_ms=300, policy="wait")
+    with subscribe_flow(pipe, "pol") as obs:
+        wait_ready(obs)
+        answers = [ask(obs, "cmd.flow.start", {"flowId": "pol"}) for _ in range(3)]
+        ids = [a["instanceId"] for a in answers]
+        assert len(set(ids)) == 3
+        assert "waiting" not in answers[0] and answers[1]["waiting"] and answers[2]["waiting"]
+        assert ask(obs, "cmd.engine.snapshot")["flows"][0]["executing"] == 1
+        ended = []
+
+        def third_ended(m):
+            if m["type"] == "evt.instance.ended":
+                ended.append(m)
+            return len(ended) == 3
+
+        got = collect_until(obs, third_ended, timeout=10)
+        # The first events were sent before the observer read them: the start of 1 and the queueing of 2 and 3
+        # are part of got, in this order.
+        assert instance_log(got, ids) == ["started:1", "queued:2", "queued:3", "ended:1", "started:2", "ended:2",
+                                          "started:3", "ended:3"]
+        assert [m["payload"]["reason"] for m in ended] == ["finished"] * 3
+        # No two instances ran at the same time: each Sleep started after the one before had finished.
+        sleeps = [(m["payload"]["state"], t) for t, m in got
+                  if m["type"] == "evt.element.state" and m["payload"]["elementId"] == SLEEP]
+        assert [s for s, _ in sleeps] == ["running", "finished"] * 3, sleeps
+        queued = [m["payload"]["position"] for _, m in got if m["type"] == "evt.instance.queued"]
+        assert queued == [1, 2]
+        check_seq(got)
+        # The flow is executing until the last instance has ended; evt.flow.state 0 follows the last ended.
+        flow_states = [m["payload"]["executing"] for _, m in got if m["type"] == "evt.flow.state"]
+        assert flow_states == [1, 1, 1], flow_states
+        assert obs.wait_event("evt.flow.state", timeout=5)["payload"]["executing"] == 0
+
+
+def test_wait_policy_stop_ends_the_running_and_the_waiting_instances(pipe, flowdir, engine):
     make_flow(flowdir, "pol", sleep_ms=5000, policy="wait")
     with subscribe_flow(pipe, "pol") as obs:
         wait_ready(obs)
-        ask(obs, "cmd.flow.start", {"flowId": "pol"})
-        refused = obs.request("engine", "cmd.flow.start", {"flowId": "pol"}, timeout=5)
-        assert refused["payload"]["error"]["code"] == "busy"
-        stop_flow(obs, "pol")
+        ids = [ask(obs, "cmd.flow.start", {"flowId": "pol"})["instanceId"] for _ in range(3)]
+        assert stop_flow(obs, "pol")["stopped"] == 3
+        got = collect_until(obs, lambda m: m["type"] == "evt.flow.state" and m["payload"]["executing"] == 0,
+                            timeout=5)
+        # The waiting instances end first and never start (PROTOCOL 4.3).
+        assert instance_log(got, ids) == ["started:1", "queued:2", "queued:3", "ended:2", "ended:3", "ended:1"]
+        assert ask(obs, "cmd.engine.snapshot")["flows"][0]["executing"] == 0
+        assert not [m for m in obs.events(timeout=0.4) if m["type"] == "evt.instance.started"]
 
 
 def test_stop_policy_stops_the_running_instance_and_starts_a_new_one(pipe, flowdir, engine):

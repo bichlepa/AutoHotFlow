@@ -223,6 +223,9 @@ class Engine extends Role {
     _CmdFlowStart(msg) {
         rec := this.flows.Require(Engine.Text(msg, "flowId"))
         instId := this.executor.StartFlow(rec, Engine.Optional(msg, "triggerId"))
+        ; Policy wait while the flow runs: the instance is queued (PROTOCOL 4.2), "waiting" is only sent then.
+        if (this.executor.IsWaiting(instId))
+            return Map("instanceId", instId, "waiting", true)
         return Map("instanceId", instId)
     }
 

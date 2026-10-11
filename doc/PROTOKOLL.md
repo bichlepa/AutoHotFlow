@@ -150,8 +150,8 @@ Die Rollen `echo`, `crasher`, `hanger`, `slow_shutdown` (Quellen in `tests/integ
 | `cmd.flow.meta.update` | `{ flowId, name?, category? }` | `{ ok, rev }` |
 | `cmd.flow.patch` | `{ flowId, baseRev, ops: [ ... ] }` | `{ ok, rev }` oder `error.code = "conflict"` mit `{ rev, definition }` |
 | `cmd.flow.save` | `{ flowId }` | `{ ok, savedRev }` nach `storage`-Quittung |
-| `cmd.flow.start` | `{ flowId, triggerId? }` | `{ ok, instanceId }` oder `error.code = "busy"` (Richtlinie `skip`) |
-| `cmd.flow.stop` | `{ flowId }` | `{ ok }` (Stopp eingeleitet, Abschluss per `evt.instance.ended`) |
+| `cmd.flow.start` | `{ flowId, triggerId? }` | `{ ok, instanceId }`, bei Richtlinie `wait` und laufendem Flow `{ ok, instanceId, waiting: true }` (die Instanz ist eingereiht), oder `error.code = "busy"` (Richtlinie `skip`) |
+| `cmd.flow.stop` | `{ flowId }` | `{ ok }` (Stopp eingeleitet, Abschluss per `evt.instance.ended`). Beendet laufende **und** wartende Instanzen |
 | `cmd.flow.toggle` | `{ flowId }` | `{ ok, action: "started"/"stopped" }` |
 | `cmd.flow.enable` / `cmd.flow.disable` | `{ flowId }` | `{ ok }` (schaltet alle Trigger) |
 | `cmd.trigger.enable` / `cmd.trigger.disable` | `{ flowId, elementId }` | `{ ok, message? }` |
@@ -174,7 +174,8 @@ Jedes Ereignis trägt `seq` (steigend pro Engine-Epoche) und `epoch`.
 | `evt.flow.saved` | `flow:<id>` | `{ flowId, savedRev }` |
 | `evt.element.state` | `flow:<id>` | `{ flowId, elementId, state: "idle"/"running"/"finished"/"exception", countRuns, lastRun }` |
 | `evt.connection.state` | `flow:<id>` | `{ flowId, connectionId, state }` |
-| `evt.instance.started` / `evt.instance.ended` | `flow:<id>` | `{ flowId, instanceId, reason? }` |
+| `evt.instance.queued` | `flow:<id>` | `{ flowId, instanceId, position }` (Richtlinie `wait`: die Instanz wartet, `position` ab 1 in der Warteschlange des Flows) |
+| `evt.instance.started` / `evt.instance.ended` | `flow:<id>` | `{ flowId, instanceId, reason? }`. Bei einer wartenden Instanz kommt `started` erst beim Übergang nach `running` |
 | `evt.settings.changed` | `engine` | `{ settings }` |
 | `evt.log.entry` | `log` | `{ ts, level, source, flowId?, text }` (Engine/Storage senden Log über 4.5, nicht hier) |
 | `evt.storage.error` | `engine` | `{ op, path, code, message }` (WI-12: `op` = Name der Storage-Operation, Abschnitt 4.6; `code` = Fehlercode der Antwort) |
@@ -185,12 +186,13 @@ Jedes Ereignis trägt `seq` (steigend pro Engine-Epoche) und `epoch`.
 - `evt.engine.ready` mit `{}` erst nach dem Laden der Flow-Liste. Beim Laden zusätzlich `evt.flow.list.changed` `{added, removed: [], changed: []}`.
 - `evt.storage.error` mit `op` = `flows.list` (Liste fehlgeschlagen, wird bis zu 5-mal wiederholt), `flow.read` (Datei nicht lesbar) oder `flow.parse` (Inhalt ungültig). Der Start wird dadurch nicht blockiert.
 - `evt.element.state` `{flowId, elementId, state, countRuns, lastRun}`. `lastRun` ist der Zeitstempel des letzten Starts (`yyyy-MM-dd HH:mm:ss`, UTC). `countRuns` ist +1 beim Start und -1 beim Ende (wie v1). `state` ist `running`, solange `countRuns > 0`, sonst `finished`, bei Ergebnis `exception` `exception`. Ein Stopp durch die Engine zählt als Ende (Ergebnis `stopped`, Zustand `finished`). Bei `exception` zusätzlich `message` (Meldung der Ausnahme).
-- `evt.instance.ended` `{flowId, instanceId, reason}` mit `reason`: `finished` (letzter Thread regulär beendet), `exception` (letzter Thread ohne passende Verbindung nach einer Ausnahme), `flow.stop`, `toggle`, `policy stop`, `shutdown`.
+- `evt.instance.ended` `{flowId, instanceId, reason}` mit `reason`: `finished` (letzter Thread regulär beendet), `exception` (letzter Thread ohne passende Verbindung nach einer Ausnahme), `flow.stop`, `toggle`, `policy stop`, `shutdown`, `flow.deleted` (Flow gelöscht oder aus der Tabelle verschwunden), `trigger removed` (eine wartende Instanz fand beim Start ihren Trigger nicht mehr, sie endet ohne `started`). Eine wartende Instanz, die gestoppt wird, endet ebenfalls ohne `started`.
 - `evt.flow.state` `{flowId, enabled, executing}` nach `evt.instance.started` bzw. nach `evt.instance.ended`. Beim Ende kommt `evt.flow.state` also **nach** `evt.instance.ended`.
 - Wahrheitswerte (`enabled`, `executing`) gehen als 0 oder 1 auf die Leitung (Abschnitt 2).
-- `cmd.flow.start` `{flowId, triggerId?}`: `{instanceId}`. Ohne `triggerId` der erste Trigger des Flows. Ein Trigger wird vom Start simuliert (`running`, dann `finished`, wie v1 `newInstance`). Fehler: `not_found` (Flow nicht geladen), `bad_payload` (kein Trigger, kein Trigger unter dieser ID, ungültige Richtlinie), `busy` (Richtlinie `skip`, oder `wait`, das in WI-10 nicht umgesetzt ist).
+- `cmd.flow.start` `{flowId, triggerId?}`: `{instanceId}`, bei Richtlinie `wait` und laufendem Flow `{instanceId, waiting: true}` (Einreihen, Abschnitt `wait` unten). Ohne `triggerId` der erste Trigger des Flows. Ein Trigger wird vom Start simuliert (`running`, dann `finished`, wie v1 `newInstance`). Fehler: `not_found` (Flow nicht geladen), `bad_payload` (kein Trigger, kein Trigger unter dieser ID, ungültige Richtlinie), `busy` (Richtlinie `skip`).
 - Richtlinie: `flowSettings.ExecutionPolicy` des Flows, `default` wird zu `parallel` aufgelöst (globale Einstellung gibt es in Phase 2 noch nicht). Die Entscheidung trifft `ExecutionPolicy.Decide` (WI-08).
-- `cmd.flow.stop` `{flowId}`: `{stopped: n}`, Zahl der gestoppten Instanzen. Die Quittung (`evt.instance.ended`) folgt synchron.
+- `cmd.flow.stop` `{flowId}`: `{stopped: n}`, Zahl der gestoppten Instanzen, wartende eingeschlossen (WI-21). Die Quittung (`evt.instance.ended`) folgt synchron. Wartende Instanzen werden zuerst beendet, damit der Stopp keine Instanz nachrücken lässt.
+- **Richtlinie `wait` (WI-21, E2, M-11):** Startet `cmd.flow.start` einen Flow, der gerade läuft, legt die Engine die Instanz im Zustand `waiting` an und sendet `evt.instance.queued`. Die Antwort enthält `waiting: true`. Reihenfolge FIFO je Flow, in der Reihenfolge der Starts (nicht nach der Reihenfolge der Instanz-IDs, anders als v1, das die erste Instanz in der Reihenfolge der Instanzliste nimmt). Sobald keine gestartete Instanz des Flows mehr existiert, startet die erste wartende (`evt.instance.started`, im nächsten Dispatch-Durchlauf der Engine, nicht im Aufruf, der die vorige beendet hat). `evt.flow.state` bleibt `executing: 1`, solange eine Instanz läuft, stoppt oder wartet. Die Richtlinie wird beim Start gelesen. Der Trigger und die Definition werden beim Nachrücken aus der neuesten Revision gelesen (E1). Es gibt keine Obergrenze der Warteschlange (Beobachtungspunkt).
 - `cmd.flow.toggle` `{flowId}`: `{action: "started"/"stopped", instanceId?}`.
 - `cmd.flow.enable` / `cmd.flow.disable` `{flowId}`: `{}`. Setzt nur das Flag und sendet `evt.flow.state`. Trigger werden in Phase 2 nicht scharf geschaltet.
 - `cmd.engine.snapshot`: `settings` ist `{}` (Einstellungen kommen in Phase 3).

@@ -17,11 +17,15 @@
 class Instance {
     ; from state -> allowed target states.
     ; new -> running: flow.start or trigger accepted (v1 newInstance)
+    ; new -> waiting: policy wait and the flow is executing (E2, M-11)
+    ; waiting -> running: the instances before it ended (FIFO per flow)
+    ; waiting -> ended: stopped while waiting (flow stop, flow deleted)
     ; running -> ended: last thread removed (v1 removeThread)
     ; running -> stopping: flow stop or policy stop (v1 stopInstance)
     ; stopping -> ended: all threads removed, or deadline (2 s) without acknowledgement
     static Transitions := Map(
-        "new", ["running"],
+        "new", ["running", "waiting"],
+        "waiting", ["running", "ended"],
         "running", ["stopping", "ended"],
         "stopping", ["ended"],
         "ended", []
@@ -38,7 +42,7 @@ class Instance {
         this.Threads := Map()
     }
 
-    ; new -> running. Creates the trigger thread (threadId, triggerElementId) in state finished
+    ; new or waiting -> running. Creates the trigger thread (threadId, triggerElementId) in state finished
     ; with result "Normal". That is v1 newThread plus finishExecutionOfElement("Normal").
     ; The caller then calls Scheduler.Advance for it. Returns the thread, or "" if rejected.
     Start(threadId, triggerElementId) {
@@ -47,6 +51,11 @@ class Instance {
         thread := ThreadState(threadId, this.Id, triggerElementId, "finished", "Normal", this.OnInvalid)
         this.Threads[threadId] := thread
         return thread
+    }
+
+    ; new -> waiting (policy wait). The instance has no thread until Start. Returns false if rejected.
+    Wait() {
+        return this.TryTransition("waiting", "queued")
     }
 
     ; Adds a thread that belongs to this instance (used for clones made by the Scheduler).
@@ -75,6 +84,10 @@ class Instance {
     ; stop by the caller). Ready and finished threads are removed at once. If no thread is left,
     ; the instance ends. Returns false if the instance is not running.
     Stop(reason := "stop") {
+        if (this.State = "waiting") {
+            ; A waiting instance has no thread: it ends at once.
+            return this.TryTransition("ended", reason)
+        }
         if (!this.TryTransition("stopping", reason))
             return false
         ids := []
@@ -122,13 +135,22 @@ class Instance {
 
     ; Checks the table. Returns true and changes State, or false and reports it.
     TryTransition(newState, reason := "") {
-        allowed := Instance.Transitions.Get(this.State, [])
-        for target in allowed {
-            if (target = newState) {
-                this.State := newState
-                return true
+        ok := false
+        prev := Critical("On")  ; reason: checking and changing the state is one step (an interrupting timer may race)
+        try {
+            allowed := Instance.Transitions.Get(this.State, [])
+            for target in allowed {
+                if (target = newState) {
+                    this.State := newState
+                    ok := true
+                    break
+                }
             }
+        } finally {
+            Critical(prev)
         }
+        if (ok)
+            return true
         Instance.ReportInvalid(this.OnInvalid, this.Id, this.State, newState, reason)
         return false
     }
