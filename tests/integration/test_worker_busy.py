@@ -26,7 +26,8 @@ def test_worker_that_blocks_longer_than_the_pong_timeout_is_not_hung_while_it_ha
     declared the worker hung and ended it (decision of WI-11, 'no tolerance')."""
     sup = started()
     engine = clients(sup.pipe, "engine")
-    watch = watch_for(engine)
+    # a second client watches the process events: two readers on one client would take each other's messages
+    watch = watch_for(clients(sup.pipe, "obs"))
     name = ask(engine, "supervisor", "cmd.process.spawn", {"role": "worker"})["name"]
     pid = wait_ready(engine, [name], timeout=READY_S)[name][1]
     assert ask(engine, name, "cmd.worker.run", run_payload("lb1", "Action_TestLongBlockWorker"))["ok"]

@@ -127,7 +127,7 @@ def test_kill_of_an_unknown_worker_is_not_found(started, clients):
 def test_kill_ends_the_worker_as_a_planned_exit_and_the_supervisor_still_exits_with_0(started, clients):
     sup = started()
     engine = clients(sup.pipe, "engine")
-    watch = watch_for(engine)
+    watch = watch_for(clients(sup.pipe, "obs"))
     name = ask(engine, "supervisor", "cmd.process.spawn", {"role": "worker"})["name"]
     pid = wait_ready(engine, [name], timeout=READY_S)[name][1]
     t0 = time.perf_counter()

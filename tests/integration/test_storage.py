@@ -671,7 +671,7 @@ def test_engine_starts_with_the_real_storage_and_its_log_arrives(procs, datadir,
     shutil.copy(SKELETON_SRC, datadir / "Flows" / "skeleton.json")
     start_storage(procs, datadir, runs, pipe, session_id)
     wait_hello(hub, "storage")
-    engine_args = ["--role=engine", "--session=" + session_id, "--hub=" + pipe, "--data=" + str(datadir)]
+    engine_args = ["--role=engine", "--session=" + session_id, "--hub=" + pipe, "--data=" + str(datadir), "--workers=0"]
     engine = RoleRun(procs, datadir, "engine", engine_args)
     runs.append(engine)
     wait_hello(hub, "engine")

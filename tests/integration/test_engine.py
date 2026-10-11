@@ -104,7 +104,7 @@ def storage(hub, pipe, flowdir):
 
 
 def start_engine(procs, datadir, runs, pipe, session_id, label="engine"):
-    args = ["--role=engine", "--session=" + session_id, "--hub=" + pipe, "--data=" + str(datadir)]
+    args = ["--role=engine", "--session=" + session_id, "--hub=" + pipe, "--data=" + str(datadir), "--workers=0"]
     run = RoleRun(procs, datadir, label, args)
     runs.append(run)
     return run

@@ -108,42 +108,37 @@ def test_killed_manager_stub_is_not_restarted_and_requests_to_it_end_at_once(cha
 
 
 @pytest.mark.parametrize("round_no", repeat_ids())
-def test_killed_worker_ends_its_element_with_worker_crashed_and_is_not_restarted(chains, datadir, procs,
-                                                                                  session_id, round_no):
-    """Regression of WI-11 under the real supervisor. The engine is started by hand with --workers=1 (the
-    supervisor has no option for the pool size), so it is not a child, but it is connected to the same hub."""
-    chain = chains("storage,manager,worker:1", STUB_OPTS)
-    before = chain.wait_ready(["storage", "manager", "worker:1"])
+def test_killed_worker_ends_its_element_with_worker_crashed_and_is_not_restarted(chains, datadir, round_no):
+    """Regression of WI-11 under the real supervisor. Since WI-27 the engine is a child and asks the supervisor for its
+    warm worker (worker:1); the supervisor still never restarts a worker, the engine asks for a new one."""
     write_flow(datadir, "w8", element_class="Action_TestHangWorker")
-    engine = RoleProc(procs, datadir, "engine", ["--role=engine", "--session=" + session_id,
-                                                 "--hub=" + pipenames.hub_pipe(session_id), "--data=" + str(datadir),
-                                                 "--workers=1"])
-    try:
-        request_ok(chain.obs, "supervisor", "cmd.topic.subscribe", {"topic": "flow:w8"})
-        assert chain.rec.wait(event("evt.engine.ready"), timeout=20) is not None, engine.text()
-        instance = chain.obs.request("engine", "cmd.flow.start", {"flowId": "w8"}, timeout=5)["payload"]
-        assert instance["ok"], instance
-        # the worker element (element0000000002) must run before the worker is killed: the trigger runs first
-        running = chain.rec.wait(lambda m: m.get("type") == "evt.element.state"
-                                 and m["payload"].get("elementId") == WORKER_ELEMENT
-                                 and m["payload"].get("state") == "running", timeout=10)
-        assert running is not None, engine.text()
-        pid, t_death, msg = kill_role(chain, "worker:1")
-        assert not msg["payload"]["restart"], "workers are not restarted automatically: %s" % msg
-        ended = chain.rec.wait(event("evt.instance.ended"), timeout=10)
-        assert ended is not None, "instance did not end after the worker died:\n" + engine.text()
-        print("\nMEASURE worker death -> instance ended with 'worker crashed': %.3f s" % (ended[0] - t_death))
-        assert ended[0] - t_death < 3.0, ended[0] - t_death
-        reported = chain.rec.find(lambda m: m.get("type") == "evt.element.state"
-                                  and "worker crashed (worker:1)" in json.dumps(m["payload"]))
-        assert reported, "the element did not report 'worker crashed (worker:1)': %s" % [
-            (m["type"], m["payload"]) for _, m in chain.rec.items if m.get("type", "").startswith("evt.element")]
-        assert ended[1]["payload"]["reason"] == "exception", ended[1]
-        # engine, storage and manager keep running
-        assert "flows" in chain.snapshot_ok()
-        after = chain.states()
-        assert after["storage"]["pid"] == before["storage"] and after["manager"]["pid"] == before["manager"]
-        assert after["worker:1"]["restarts"] == 0 and after["worker:1"]["state"] == "crashed", after["worker:1"]
-    finally:
-        procs.kill(engine.proc)
-        engine.close()
+    chain = chains(FULL_CHAIN, STUB_OPTS)
+    before = chain.wait_ready(["storage", "engine", "manager", "worker:1"])
+    request_ok(chain.obs, "supervisor", "cmd.topic.subscribe", {"topic": "flow:w8"})
+    assert chain.rec.wait(event("evt.engine.ready"), timeout=20) is not None, chain.sup.text()
+    instance = chain.obs.request("engine", "cmd.flow.start", {"flowId": "w8"}, timeout=5)["payload"]
+    assert instance["ok"], instance
+    # the worker element (element0000000002) must run before the worker is killed: the trigger runs first
+    running = chain.rec.wait(lambda m: m.get("type") == "evt.element.state"
+                             and m["payload"].get("elementId") == WORKER_ELEMENT
+                             and m["payload"].get("state") == "running", timeout=10)
+    assert running is not None, chain.sup.text()
+    pid, t_death, msg = kill_role(chain, "worker:1")
+    assert not msg["payload"]["restart"], "workers are not restarted by the supervisor: %s" % msg
+    ended = chain.rec.wait(event("evt.instance.ended"), timeout=10)
+    assert ended is not None, "instance did not end after the worker died:\n" + chain.sup.text()
+    print("\nMEASURE worker death -> instance ended with 'worker crashed': %.3f s" % (ended[0] - t_death))
+    assert ended[0] - t_death < 3.0, ended[0] - t_death
+    reported = chain.rec.find(lambda m: m.get("type") == "evt.element.state"
+                              and "worker crashed (worker:1)" in json.dumps(m["payload"]))
+    assert reported, "the element did not report 'worker crashed (worker:1)': %s" % [
+        (m["type"], m["payload"]) for _, m in chain.rec.items if m.get("type", "").startswith("evt.element")]
+    assert ended[1]["payload"]["reason"] == "exception", ended[1]
+    # engine, storage and manager keep running; the engine has asked for a replacement (a worker with another name)
+    assert "flows" in chain.snapshot_ok()
+    assert wait_until(lambda: any(n != "worker:1" and p["state"] == "ready" for n, p in chain.states().items()
+                                  if n.startswith("worker:")), 15.0), chain.states()
+    after = chain.states()
+    assert after["storage"]["pid"] == before["storage"] and after["manager"]["pid"] == before["manager"]
+    assert after["engine"]["pid"] == before["engine"]
+    assert after["worker:1"]["restarts"] == 0 and after["worker:1"]["state"] == "crashed", after["worker:1"]
