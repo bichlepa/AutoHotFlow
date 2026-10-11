@@ -60,7 +60,10 @@ def test_parallel_instances_all_end_and_the_counters_return_to_zero(stress_chain
     assert len(ended_msgs) == count, "only %d of %d instances ended" % (len(ended_msgs), count)
     assert sorted(m["payload"]["instanceId"] for m in ended_msgs) == sorted(instance_ids)
     reasons = {m["payload"]["reason"] for m in ended_msgs}
-    assert reasons == {"finished"}, reasons
+    failed_elements = [(m["payload"]["elementId"], m["payload"].get("message")) for m in events
+                       if m["type"] == "evt.element.state" and m["payload"]["state"] == "exception"]
+    assert reasons == {"finished"}, "%s; %d instances not finished, element exceptions: %s" % (
+        reasons, sum(1 for m in ended_msgs if m["payload"]["reason"] != "finished"), failed_elements[:5])
 
     # how many were alive at the same time (order of the events as the engine produced them)
     alive = peak = 0
