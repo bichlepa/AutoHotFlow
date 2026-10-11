@@ -796,13 +796,34 @@ Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge kor
 - **Richtig:** Nach jedem Schreiben `PostMessage(WM_AHF_WAKE)` an das Skriptfenster des Supervisors (Klasse `AutoHotkey` der Prozess-ID, `hwnd_of` in `tests/stress/stresskit.py`). Dann Median 1,4 ms. Für Messungen "wie ein AHK-Client" immer so, für den Fall ohne Weckruf gibt es einen eigenen Test.
 - **Status:** verifiziert (10 Läufe: 226 ms ohne, 1,4 ms mit Weckruf)
 
-### Storage schreibt das Log mit rund 30 Zeilen je Sekunde (F-08)
+### Storage schreibt das Log mit rund 30 Zeilen je Sekunde (F-08, behoben in WI-25)
 
-- **Problem:** Der Manager-Stub schreibt jedes Engine-Ereignis über den Storage ins Log (zwei Dateien). Bei rund 290 Ereignissen/s (200 parallele Instanzen und mehr) wuchs der Storage innerhalb von 20 s von 17 auf 56 MB; das Log lief noch 207 s nach dem Ende der Last. Die Warteschlange ist unbegrenzt, und `WriteQueue` führt eine Operation je Timer aus (gelesen); bei rund 15,6 ms Timer-Auflösung wären das etwa 64 Operationen/s, also 32 Zeilen/s bei zwei Dateien (gemessen: 28 Zeilen/s).
-- **Falsch:** Annehmen, dass der Storage jede Menge Log-Zeilen annimmt, und im Dauerlauf mit mehr als etwa 30 Ereignissen/s arbeiten.
-- **Richtig:** Das ist ein Befund, keine Lösung: aufeinanderfolgende Anhänge an dieselbe Datei in einer Operation bündeln oder je Scheibe mehrere Operationen ausführen, und die Warteschlange begrenzen. Bis dahin hält der Dauerlauf (`test_soak.py`) die Last bei rund 20 Ereignissen/s.
-- **Status:** verifiziert für das Verhalten (Messung, RSS kehrt nach dem Abfluss auf 17 MB zurück, also kein Leck); dass `WriteQueue.RunOne` eine Operation je Timer ausführt, ist gelesen; dass die Timer-Auflösung (rund 15,6 ms) den Durchsatz von 28 Zeilen/s erklärt, ist geschlossen und nicht einzeln nachgemessen: vermutet.
-- **Quelle:** `src/storage/WriteQueue.ahk`, `tests/stress/test_log_backlog.py`
+- **Problem:** Der Manager-Stub schreibt jedes Engine-Ereignis über den Storage ins Log (zwei Dateien). `WriteQueue` führte eine Operation je Timer aus (`SetTimer(..., -1)`, Auflösung rund 15,6 ms), je Logzeile zwei Operationen mit Öffnen, Größenabfrage und Schließen: 28 Zeilen/s gemessen. Bei 290 Ereignissen/s wuchs der Storage in 20 s von 17 auf 56 MB und schrieb 207 s nach. Zusätzlich lagen Anfragen und Logzeilen in einer Warteschlange, Anfragen warteten also hinter dem Rückstau.
+- **Falsch:** Eine Operation je Timer-Lauf ausführen, wenn die Operationen klein sind; Logzeilen einzeln anhängen; Anfragen und Log in dieselbe Warteschlange legen.
+- **Richtig:** Zwei Warteschlangen (Anfragen zuerst), je Lauf ein Zeitbudget (10 ms) statt einer Operation, Zeilen je Datei zu einem Bündel zusammenfassen (einmal öffnen und schließen), Obergrenze mit Zähler. Gemessen nach dem Umbau: 1493 Zeilen/s über 10 s gesendet, Marker 0,1 s nach der letzten Zeile geschrieben; 12000 Zeilen im Stoß mit mehr als 3000 Zeilen/s (durch den Sender begrenzt); Flut mit 362 Ereignissen/s: Log 1 s nach dem Ende vollständig (vorher 207 s), RSS 17,6 auf 18,1 MB.
+- **Status:** verifiziert (`tests/stress/test_log_backlog.py`, `tests/integration/test_storage.py`); die Obergrenze des Zeitbudgets (10 ms) ist begründet, nicht gegen andere Werte gemessen.
+- **Quelle:** `src/storage/WriteQueue.ahk`, `src/storage/Storage.ahk`
+
+### Ein Test, der Operationen zählt, muss `Critical` setzen oder Warteschleifen vermeiden (WI-25)
+
+- **Problem:** Ein Komponententest für das Zeitbudget ließ eine Operation mit `Sleep(5)` warten. Die Warteschlange hatte beim Einreihen `SetTimer(pump, -1)` gesetzt; während `Sleep` (und auch in einer langen Schleife, AHK prüft dort alle paar Millisekunden auf Nachrichten) lief der Timer dazwischen und arbeitete selbst Operationen ab. Die Zählung stimmte nicht.
+- **Richtig:** Den Test mit `Critical("On")` beginnen (der Timer wird zurückgestellt) und mit einer Warteschleife über `Time.NowMs()` statt `Sleep` warten. Auch `until` ist ein reserviertes Wort und kann keine Variable sein.
+- **Status:** verifiziert
+- **Quelle:** `tests/ahk/storage_queue.test.ahk`
+
+### Prozess existiert noch? `OpenProcess` und Fehler 87 (WI-25)
+
+- **Problem:** Beim Start sollen Temp-Dateien (`*.ahf-<pid>.tmp`) toter Prozesse gelöscht werden, die eines laufenden nicht.
+- **Richtig:** `OpenProcess(SYNCHRONIZE, 0, pid)`: Handle 0 mit `A_LastError` 87 (`ERROR_INVALID_PARAMETER`) heißt, es gibt keinen Prozess mit dieser Nummer. Andere Fehler (zum Beispiel 5, Zugriff verweigert) werden als "läuft" gewertet, damit nie auf einen Verdacht gelöscht wird. Mit Handle: `WaitForSingleObject(h, 0)` gibt `0x102` (WAIT_TIMEOUT), solange der Prozess läuft. Eine wiederverwendete PID kann eine alte Temp-Datei am Leben halten (harmlos, die Datei wird nie gelesen).
+- **Status:** verifiziert für tote und lebende PID (Test `test_temp_files_of_dead_processes_are_removed_at_start_and_those_of_live_ones_stay`); Zugriff verweigert nicht geprüft.
+- **Quelle:** `src/storage/AtomicFile.ahk`
+
+### `FlushFileBuffers` auf dem Handle einer `FileOpen`-Datei (WI-25)
+
+- **Problem:** Die Temp-Datei wurde vor `MoveFileExW` nur geschlossen, nicht auf die Platte gezwungen; bei Stromausfall kann die Umbenennung vor den Daten landen.
+- **Richtig:** `DllCall("FlushFileBuffers", "Ptr", file.Handle, "Int")` nach `Write`, vor `Close`. `file.Handle` ist das Windows-Handle der `FileOpen`-Datei. Ein Rückgabewert 0 wird als Fehler behandelt (die alte Datei bleibt).
+- **Status:** verifiziert, dass Schreiben und Ersetzen weiter funktionieren (alle Tests zum atomaren Schreiben); dass die Daten bei Stromausfall tatsächlich vor der Umbenennung auf der Platte sind, ist nicht prüfbar (nicht geprüft).
+- **Quelle:** `src/storage/AtomicFile.ahk`
 
 ### Stresstests: voller Umfang nur mit `-m`, Smoke-Variante im Standardlauf
 
