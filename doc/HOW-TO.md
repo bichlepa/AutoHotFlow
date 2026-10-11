@@ -918,3 +918,24 @@ Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge kor
 - **Fallen:** `NumPut("ptr", buffer, ...)` mit einem `Buffer`-Objekt wirft "Invalid parameter(s)", es braucht `buffer.Ptr` (in `DllCall` dagegen darf das Objekt stehen). `StrGet(adresse, länge, "UTF-8")` zählt die Länge in Bytes der Quelle (geprüft mit Umlauten und `U+2713`).
 - **Status:** verifiziert (`tests/ahk/child_launcher.test.ahk`: stdout und stderr, NUL als stdin, Exit-Code, 40 Starts ohne Handle-Zuwachs, fehlgeschlagener Start ohne Leck, UTF-8-Zeichen über Lesegrenzen; `tests/fault/test_diagnose.py`: 50 Neustarts, Handles des Supervisors 179 und 179). **Nicht geprüft:** dass ein Kind wirklich keine anderen Handles erbt (es gibt keinen einfachen Weg, die Handle-Tabelle eines fremden Prozesses aus dem Test zu lesen); die Hub-Pipe ist zusätzlich nicht vererbbar (`CreateNamedPipeW` ohne `SECURITY_ATTRIBUTES`) [gelesen].
 - **Quelle:** `src/supervisor/ChildLauncher.ahk`, `src/supervisor/ChildPipe.ahk`
+
+### Ein Closure ohne erfasste Variable ist immer dasselbe Funktionsobjekt (WI-23)
+
+- **Problem:** `loop 21 { SetTimer(() => Werfe(), -10 * A_Index) }` startete nur **einen** Timer. Alle Closures ohne erfasste Variable sind dasselbe Funktionsobjekt, und `SetTimer` identifiziert einen Timer über das Objekt: Jeder Aufruf setzte den Timer nur neu (Testrolle `echo`, `cmd.test.throwlater`, 21 Fehler erwartet, 1 gesehen).
+- **Richtig:** Jede Closure erfasst etwas Eigenes, z. B. die Nummer: `static MakeFn(n) => () => Werfe(n)` und `SetTimer(MakeFn(A_Index), -10 * A_Index)`.
+- **Status:** verifiziert (Scratch-Skript mit `tools/ahkrun.py`: 1 statt 5 Fehler, mit Nummer 5 von 5; `tests/fault/test_diagnose.py::test_too_many_unhandled_errors_end_the_role_with_exit_6`).
+- **Quelle:** `tests/integration/helpers/EchoRole.ahk`
+
+### Ein Parameter `log` verdeckt die Klasse `Log` (WI-23)
+
+- **Problem:** `AddError(from, payload, log := true)` und dann `Log.Write(...)` warf "This value of type Integer has no method named Write". Bezeichner sind nicht von der Schreibweise abhängig, der Parameter verdeckt die Klasse (wie `role`/`Role`, `children`/`Children`). Der Fehler zeigte sich nur als Logzeile des Hubs "no handler for evt.diag.error ... MethodError", weil der Dispatcher Ausnahmen von Handlern in ein Antwortobjekt verpackt.
+- **Richtig:** Parameter und Variablen nicht wie eine Klasse nennen (`doLog`). Bei einem Handler, der "nichts tut": zuerst die Logzeile "no handler for" des Hubs lesen, sie enthält die Fehlermeldung des Handlers.
+- **Status:** verifiziert
+- **Quelle:** `src/supervisor/DiagLog.ahk`
+
+### OnError-Handler und `mode` (WI-23)
+
+- **Problem:** Der zweite Parameter von `OnError` ist die Art des Fehlers: `"Return"` (Fehler in einer Funktion mit Rückgabe), `"Exit"` (der Thread würde beendet; so kommt ein Fehler aus einem Timer) oder `"ExitApp"`. Rückgabe 1 verhindert den Dialog und das Beenden des Threads.
+- **Richtig:** `Role._OnUnexpected` zählt jeden Fehler, meldet ihn und gibt 1 zurück, damit die Rolle weiterläuft; bei Überschreitung der Schwelle beendet `ExitApp(6)` im Handler den Prozess.
+- **Status:** verifiziert für `Exit` (Timer); `Return` und `ExitApp` nicht einzeln getestet.
+- **Quelle:** `src/core/Role.ahk`

@@ -134,6 +134,7 @@ class Supervisor {
         h.On("sys.bye", (msg) => this.children.OnBye(msg.from, msg.payload.Get("clean", false)))
         h.On("cmd.app.", (msg) => this._OnApp(msg))
         h.On("cmd.process.", (msg) => this._OnProcess(msg))
+        h.On("evt.diag.error", (msg) => this.diag.AddError(msg.from, msg.payload))
         h.onHello := (link) => this._OnHello(link)
         h.onLinkLost := (link, reason) => this.children.OnLinkLost(link["name"], reason)
     }
@@ -243,6 +244,11 @@ class Supervisor {
 
     static _OnError(e, mode) {
         Log.Write("a0", "supervisor", "unexpected " Type(e) ": " e.Message " (line " e.Line ", " mode ")")
+        try {
+            Supervisor.Current.diag.AddError("supervisor", Role.ErrorPayload("supervisor", e, mode), false)
+        } catch {
+            ; the ring is a convenience; the error is logged above
+        }
         return 1
     }
 

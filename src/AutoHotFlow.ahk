@@ -6,7 +6,8 @@
 ; --role=supervisor (or no --role) starts the supervisor (WI-07, src/supervisor/), which is not a Role.
 ; Exit codes: 0 normal end, 1 role or supervisor failed to start (also an error while the files load), 2 bad
 ; arguments, unknown role or a 32-bit interpreter,
-; 3 role not implemented yet, 4 hub lost (orphan guard) or peer closed, 5 supervisor: a child was terminated.
+; 3 role not implemented yet, 4 hub lost (orphan guard) or peer closed, 5 supervisor: a child was terminated,
+; 6 a role: too many unexpected errors (Role.ERROR_LIMIT within Role.ERROR_WINDOW_MS, WI-23).
 ; No dialog is ever shown: every message goes to the console sink (stderr).
 ;
 ; Roles are included here, not loaded dynamically (WI-06). The test roles are compiled in, but they are

@@ -40,16 +40,17 @@ class EchoRole extends Role {
         return Map()
     }
 
-    ; One timer function per error: SetTimer on the same function again would only restart its timer.
+    ; One timer function per error. A closure that captures nothing is the same function object every time
+    ; (SetTimer would only restart its timer), so each one captures its number (doc/HOW-TO.md).
     _ScheduleThrow(count) {
         loop count
-            SetTimer(EchoRole._ThrowFn(), -10 * A_Index)
+            SetTimer(EchoRole._ThrowFn(A_Index), -10 * A_Index)
         return Map()
     }
 
-    static _ThrowFn() => () => EchoRole._ThrowLater()
+    static _ThrowFn(n) => () => EchoRole._ThrowLater(n)
 
-    static _ThrowLater() {
-        throw ValueError("echo role: deliberate error from a timer")
+    static _ThrowLater(n) {
+        throw ValueError("echo role: deliberate error from a timer (" n ")")
     }
 }

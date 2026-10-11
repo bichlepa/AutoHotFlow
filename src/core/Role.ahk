@@ -32,9 +32,17 @@ class Role {
     static EXIT_BAD_ARGS := 2
     static EXIT_NOT_IMPLEMENTED := 3
     static EXIT_HUB_LOST := 4
+    static EXIT_TOO_MANY_ERRORS := 6
     static ORPHAN_MS := 3000
     static GUARD_MS := 200
     static LOG_QUEUE_MAX := 500
+    ; More than ERROR_LIMIT unhandled errors within ERROR_WINDOW_MS end the role with EXIT_TOO_MANY_ERRORS (WI-23).
+    ; 20 in a minute is generous: a healthy role has none, one broken element or timer may throw a few times in a
+    ; row, but 21 means the state is broken and a restart (engine, storage: Children restart rule) is better than
+    ; a zombie. The window keeps rare errors over a long life from adding up.
+    static ERROR_LIMIT := 20
+    static ERROR_WINDOW_MS := 60000
+    static MAX_STACK_CHARS := 4000
     static Current := ""
 
     ; Console sink for the entry point and the last messages of a role. Writes to stderr only,
@@ -77,6 +85,7 @@ class Role {
         this.logQueue := []
         this.logDropped := 0
         this.logTarget := ""
+        this.errorTimes := []
     }
 
     ; Creates the peer, registers the standard and the role handlers, and starts the connection.
@@ -114,6 +123,8 @@ class Role {
 
     ; Default policy for an error nobody caught: log it and keep the role running. The return
     ; value 1 tells AHK that the error is handled (no dialog). A subclass may end the role instead.
+    ; Before this hook runs, the error is counted and sent to the supervisor as evt.diag.error; more than
+    ; ERROR_LIMIT within ERROR_WINDOW_MS end the role with EXIT_TOO_MANY_ERRORS after the hook returned.
     OnUnexpectedError(e, mode) {
         this._Log("a0", "role", this.name " unexpected " Type(e) ": " e.Message " (line " e.Line ", " mode ")")
         return 1
@@ -255,12 +266,53 @@ class Role {
             Role.Console("a0", "role", "unexpected " Type(e) ": " e.Message)
             return 1
         }
+        r._ReportError(e, mode)
+        result := 1
         try {
-            return r.OnUnexpectedError(e, mode)
+            result := r.OnUnexpectedError(e, mode)
         } catch as e2 {
             Role.Console("a0", "role", "OnUnexpectedError failed: " Type(e2) ": " e2.Message)
-            return 1
         }
+        if (r._TooManyErrors())
+            r._Exit(Role.EXIT_TOO_MANY_ERRORS, "too many unexpected errors (more than " Role.ERROR_LIMIT " within "
+                . Role.ERROR_WINDOW_MS " ms)")
+        return result
+    }
+
+    ; Counts the error and tells the supervisor (evt.diag.error). Never throws: this runs inside OnError.
+    _ReportError(e, mode) {
+        try {
+            this.errorTimes.Push(Time.NowMs())
+            if (IsObject(this.peer))
+                this.peer.Send("supervisor", "evt.diag.error", Role.ErrorPayload(this.name, e, mode))
+        } catch as e2 {
+            Role.Console("a0", "role", "could not report an unexpected error: " Type(e2) ": " e2.Message)
+        }
+    }
+
+    ; True when more than ERROR_LIMIT errors were counted within the last ERROR_WINDOW_MS.
+    _TooManyErrors() {
+        now := Time.NowMs()
+        while (this.errorTimes.Length && now - this.errorTimes[1] > Role.ERROR_WINDOW_MS)
+            this.errorTimes.RemoveAt(1)
+        return this.errorTimes.Length > Role.ERROR_LIMIT
+    }
+
+    ; The payload of evt.diag.error (PROTOKOLL 4.1c) for an error object. Missing properties become "".
+    static ErrorPayload(name, e, mode) {
+        p := Map("name", name, "errorType", Type(e), "mode", String(mode))
+        for prop in ["Message", "File", "Line", "Stack"] {
+            value := ""
+            try {
+                value := e.%prop%
+            } catch {
+                ; an error object without this property (a thrown string): empty
+            }
+            p[StrLower(prop)] := (prop = "Line") ? (IsInteger(value) ? Integer(value) : 0) : String(value)
+        }
+        if (StrLen(p["stack"]) > Role.MAX_STACK_CHARS)
+            p["stack"] := SubStr(p["stack"], 1, Role.MAX_STACK_CHARS) "..."
+        return p
     }
 
     ; "editor:Flow 1" -> "editor"

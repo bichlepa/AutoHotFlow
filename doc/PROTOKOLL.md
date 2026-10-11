@@ -117,6 +117,8 @@ Alle Nutzlasten sind Objekte. `flowId`, `elementId`, `connectionId` sind die Bez
 **Exit-Codes des Supervisors** (`AutoHotFlow.ahk --role=supervisor`, Standard ohne `--role`):
 0 sauber (jedes Kind hat sich selbst beendet), 1 Start fehlgeschlagen (z. B. Mutex, ungültige Optionen), 5 mindestens ein Kind wurde nach Frist oder Hang beendet (`TerminateProcess`). Dieselben Zahlen stehen im Einstieg (`src/AutoHotFlow.ahk`). Die zweite Instanz nutzt 0 und 1 (siehe `cmd.app.command`).
 
+**Exit-Codes einer laufenden Rolle** (`Role`): 0 sauberes Ende nach `sys.shutdown`, 3 Rolle nicht umgesetzt, 4 Hub verloren (Orphan-Guard oder Peer geschlossen), 6 zu viele unbehandelte Fehler (4.1c). Der Supervisor schreibt die Bedeutung bekannter Codes in die Logzeile des Absturzes (`Children.EXIT_TEXT`).
+
 **Exit-Codes des Einstiegs vor dem Start der Rolle** (gelten für jede Rolle und den Supervisor, WI-22): 2 der Interpreter ist nicht 64 Bit (`A_PtrSize != 8`, Entscheidung E4; Meldung auf stderr: "AutoHotFlow v2 needs the 64-bit AutoHotkey v2 interpreter"; dieselbe 2 wie bei ungültigen Optionen oder unbekannter Rolle), 1 ein Fehler beim Laden der Dateien, bevor `AhfMain` läuft (z. B. eine Elementdatei, deren `ElementRegistry.Register` wirft; Meldung auf stderr, kein Dialog). Beide Prüfungen stehen im Einstieg vor allen `#Include`-Zeilen.
 
 ### 4.1a Prozessereignisse (Topic `process`, supervisor → Abonnenten)
@@ -142,6 +144,16 @@ Die Rollen `echo`, `crasher`, `hanger`, `slow_shutdown` (Quellen in `tests/integ
 - Option `--prepare-limit=<ms>` (nur mit `--test-roles`, 100 bis 600000): setzt die Frist von `cmd.app.prepareExit` herab, damit der Timeout-Test in Sekunden läuft. Ohne das Flag gilt die Konstante.
 - Option `--restart-max=<n>` (nur mit `--test-roles`): Zahl der automatischen Neustarts je 60 s statt 3, damit ein Test ein Kind 50-mal neu starten kann (Handle-Leck-Test).
 - `echo` (WI-23): `cmd.test.stderr {text}` schreibt eine Zeile auf stderr; `cmd.test.log {count, level, text}` schreibt `count` Einträge (Standard `a1`); `cmd.test.throwlater {count}` wirft `count` Fehler aus Timern.
+
+### 4.1c Unbehandelte Fehler (`evt.diag.error`, WI-23)
+
+| Typ | Von → An | Nutzlast | Wirkung |
+|---|---|---|---|
+| `evt.diag.error` (`noReply`) | Rolle → supervisor | `{ name, errorType, message, file, line, stack, mode }` | Der Supervisor schreibt einen `a0`-Eintrag (Quelle `diag`, Text `unhandled <errorType> in <name>: <message> (<file>, line <line>, <mode>)`) und hält die letzten 50 Meldungen vollständig im Speicher (`DiagLog.Errors()`, Grundlage des Absturzberichts, WI-28). |
+
+Gesendet wird sie von `Role._OnUnexpected` für jeden Fehler, den kein `try/catch` fing (`OnError`), bevor der Hook `OnUnexpectedError` läuft. `name` ist der Rollenname (`echo:a`), `errorType` der AHK-Typ (`ValueError`), `file`/`line` die Stelle, `stack` der Aufrufstapel (`Error.Stack`, auf 4000 Zeichen gekürzt), `mode` die Art des Fehlers laut `OnError` (`Return`, `Exit`, `ExitApp`). Fehlende Felder sind leer. Ist der Peer nicht verbunden, geht die Meldung verloren (der Fehler steht im Log der Rolle). Der Supervisor zählt seine eigenen unbehandelten Fehler im selben Ring (Absender `supervisor`).
+
+**Schwelle:** Mehr als 20 unbehandelte Fehler innerhalb von 60 Sekunden (`Role.ERROR_LIMIT`, `Role.ERROR_WINDOW_MS`) beenden die Rolle mit dem Exit-Code **6** (`Role.EXIT_TOO_MANY_ERRORS`, "too many unexpected errors"); die Meldung steht auf stderr und kommt über die Ausgabe des Kindes in das Log. 20 pro Minute sind großzügig: Eine gesunde Rolle hat keinen, ein kaputtes Element oder ein Timer wirft vielleicht ein paar Mal hintereinander, 21 heißt: der Zustand der Rolle ist kaputt, ein Neustart ist besser als ein Zombie. Das Fenster verhindert, dass seltene Fehler über ein langes Leben zusammenzählen. Für `engine` und `storage` greift danach die normale Neustartregel (4.1a: höchstens 3 Neustarts in 60 s), andere Rollen werden als abgestürzt gemeldet (`evt.process.crashed`, `exitCode` 6).
 
 ### 4.2 Engine-Befehle (Clients → `engine`)
 

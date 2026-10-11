@@ -18,6 +18,8 @@ from faultfixtures import chains  # noqa: F401  (fixture)
 
 pytestmark = pytest.mark.fault
 
+EXIT_TOO_MANY_ERRORS = 6        # Role.EXIT_TOO_MANY_ERRORS
+THRESHOLD = 20                  # Role.ERROR_LIMIT: more than 20 unhandled errors within 60 s end the role
 HANDLE_SLACK = 6                # handles: noise of one-off allocations between two measurements
 
 
@@ -112,6 +114,44 @@ def test_a_bad_log_level_is_refused(procs, datadir, session_id):
         assert "--log-level" in sup.text(), sup.text()
     finally:
         sup.close()
+
+
+def test_an_unhandled_error_arrives_at_the_supervisor(chains, datadir):
+    chain = chains("storage,echo:a", ["--test-roles"])
+    chain.wait_ready(["storage", "echo:a"])
+    echo(chain, "cmd.test.throwlater", {"count": 1})
+    assert wait_for_log(datadir, "deliberate error from a timer"), chain.sup.text()
+    text = log_text(datadir)
+    line = [ln for ln in text.split("\n") if "deliberate error from a timer" in ln and "~supervisor~" in ln]
+    assert line, text                                      # logged by the supervisor, not only by the role
+    assert "echo:a" in line[0] and "ValueError" in line[0], line
+    # the role keeps running (one error is not too many)
+    assert echo(chain, "cmd.test.echo", {"x": "1"})["echo"] == {"x": "1"}
+    assert end_session(chain) == 0, chain.sup.text()
+
+
+def test_too_many_unhandled_errors_end_the_role_with_exit_6(chains, datadir):
+    chain = chains("storage,echo:a", ["--test-roles"])
+    chain.wait_ready(["storage", "echo:a"])
+    old = chain.pid("echo:a")
+    echo(chain, "cmd.test.throwlater", {"count": THRESHOLD + 1})
+    crashed = chain.rec.wait(event("evt.process.crashed", name="echo:a"), timeout=15)
+    assert crashed is not None, chain.sup.text()
+    assert crashed[1]["payload"]["exitCode"] == EXIT_TOO_MANY_ERRORS, crashed
+    assert wait_for_log(datadir, "too many unexpected errors"), chain.sup.text()
+    assert end_session(chain) == 0, chain.sup.text()
+    assert old > 0
+
+
+def test_exactly_the_threshold_does_not_end_the_role(chains, datadir):
+    chain = chains("storage,echo:a", ["--test-roles"])
+    chain.wait_ready(["storage", "echo:a"])
+    echo(chain, "cmd.test.throwlater", {"count": THRESHOLD})
+    assert wait_for_log(datadir, "deliberate error from a timer"), chain.sup.text()
+    # give the 20 timers (10 ms apart) the time to fire: the 20th error is logged by the role itself
+    assert wait_until(lambda: log_text(datadir).count("unhandled ValueError in echo:a") >= THRESHOLD, 15), chain.sup.text()
+    assert echo(chain, "cmd.test.echo", {"x": "2"})["echo"] == {"x": "2"}
+    assert end_session(chain) == 0, chain.sup.text()
 
 
 @pytest.mark.timeout(240)
