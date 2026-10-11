@@ -88,6 +88,11 @@ TestRun.Init()
 TestRun.Case("Tick: a sys.bye that is unread when the process end is seen is read first (F-06, F-11)", ByeIsReadBeforeTheExitIsReported)
 TestRun.Case("Tick: an exit without any sys.bye is reported as not clean", ExitWithoutByeIsNotClean)
 TestRun.Case("Tick: the hub is pumped at the start of every tick", HubIsPumpedEveryTick)
+TestRun.Case("Heartbeat: a child without pong for 6 s of regular ticks is hung", SilentChildIsHung)
+TestRun.Case("Heartbeat: a stand-still of the supervisor does not make a ready child hung", StallDoesNotHangReadyChild)
+TestRun.Case("Heartbeat: a stand-still does not make a starting child hung", StallDoesNotHangStartingChild)
+TestRun.Case("Heartbeat: after a stand-still the ping schedule starts again", PingScheduleRestartsAfterStall)
+TestRun.Case("Heartbeat: a child that is silent after a stand-still is still found", SilentAfterStallIsStillHung)
 
 ByeIsReadBeforeTheExitIsReported() {
     hub := FakeHub()
@@ -117,6 +122,97 @@ HubIsPumpedEveryTick() {
     s._Tick()
     s._Tick()
     Assert.Equal(hub.pumps, 2)
+}
+
+; --- heartbeat ------------------------------------------------------------------------------------
+
+; A ready child without a process (handle 0 is never looked at by Heartbeat).
+AddLiveChild(children, name, state, t0) {
+    rec := AddChildRecord(children, name, state, t0)
+    rec["handle"] := 0
+    return rec
+}
+
+AddChildRecord(children, name, state, t0) {
+    rec := Map("name", name, "role", name, "flow", "", "state", state, "pid", 4242, "handle", 0
+        , "gone", false, "exitCode", "", "startedAt", t0, "readyAt", t0, "lastPingAt", t0, "pingN", 0
+        , "lastPongAt", t0, "bye", false, "byeClean", false, "restartTimes", [], "restartAt", 0
+        , "killAt", 0, "restartable", false)
+    children._recs[name] := rec
+    return rec
+}
+
+NewHeartbeat(state, t0) {
+    hub := FakeHub()
+    ; Not named "children": AHK identifiers are case-insensitive, it would shadow the class Children.
+    kids := Children(Map("session", "t", "pipe", "p", "data", "d", "hubHwnd", 0, "testRoles", false
+        , "script", "x", "roleOpts", ""), hub)
+    AddLiveChild(kids, "echo", state, t0)
+    return [Heartbeat(kids, hub), kids, hub]
+}
+
+; Ticks every 200 ms from t0 + 200 up to and including t0 + untilMs.
+TickRegularly(hb, t0, untilMs) {
+    t := t0 + 200
+    while (t <= t0 + untilMs) {
+        hb.Tick(t)
+        t += 200
+    }
+}
+
+SilentChildIsHung() {
+    t0 := 100000
+    r := NewHeartbeat("ready", t0)
+    TickRegularly(r[1], t0, 7000)
+    Assert.Equal(r[2].State("echo"), "hung")
+    Assert.Equal(r[3].Count("evt.process.hung"), 1)
+}
+
+StallDoesNotHangReadyChild() {
+    t0 := 100000
+    r := NewHeartbeat("ready", t0)
+    hb := r[1]
+    TickRegularly(hb, t0, 1000)
+    hb.Tick(t0 + 1000 + 8000)        ; the supervisor was frozen for 8 s
+    Assert.Equal(r[2].State("echo"), "ready")
+    Assert.Equal(r[3].Count("evt.process.hung"), 0)
+    Assert.Equal(r[3].sent.Length, 0, "no shutdown sent to the child")
+}
+
+StallDoesNotHangStartingChild() {
+    t0 := 100000
+    r := NewHeartbeat("starting", t0)
+    hb := r[1]
+    hb.Tick(t0 + 200)
+    hb.Tick(t0 + 200 + Children.STARTUP_MS + 5000)
+    Assert.Equal(r[2].State("echo"), "starting")
+    ; the start deadline begins again after the stand-still
+    TickRegularly(hb, t0 + 15200, Children.STARTUP_MS - 400)
+    Assert.Equal(r[2].State("echo"), "starting")
+    hb.Tick(t0 + 15200 + Children.STARTUP_MS + 200)
+    Assert.Equal(r[2].State("echo"), "hung")
+}
+
+PingScheduleRestartsAfterStall() {
+    t0 := 100000
+    r := NewHeartbeat("ready", t0)
+    hb := r[1]
+    hb.Tick(t0 + 200)
+    hb.Tick(t0 + 20000)              ; stand-still
+    Assert.Equal(r[3].sent.Length, 0, "no ping at the moment of the reset")
+    hb.Tick(t0 + 20000 + Heartbeat.PING_EVERY_MS)
+    Assert.Equal(r[3].sent.Length, 1)
+    Assert.Equal(r[3].sent[1]["type"], "sys.ping")
+}
+
+SilentAfterStallIsStillHung() {
+    t0 := 100000
+    r := NewHeartbeat("ready", t0)
+    hb := r[1]
+    hb.Tick(t0 + 200)
+    hb.Tick(t0 + 20000)              ; stand-still, reset
+    TickRegularly(hb, t0 + 20000, Heartbeat.PONG_TIMEOUT_MS + 400)
+    Assert.Equal(r[2].State("echo"), "hung")
 }
 
 TestRun.Finish()

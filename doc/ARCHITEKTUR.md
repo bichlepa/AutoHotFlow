@@ -221,6 +221,7 @@ Die Auswahl der nächsten Verbindung folgt exakt v1: Verbindungstyp gleich Ergeb
 | Kindprozess stürzt ab | Prozess-Handle signalisiert oder Pipe gebrochen | Supervisor loggt, startet nach Richtlinie neu (max. 3 Versuche in 60 s), meldet `evt.process.crashed` |
 | Engine stürzt ab | wie oben | Neustart. Laufende Instanzen sind verloren (Dokumentation in [MIGRATION.md](MIGRATION.md)). Clients erhalten `evt.engine.restarted {epoch}` und synchronisieren sich neu. Triggerhost wird neu armiert. |
 | Prozess hängt | kein `sys.pong` auf 3 aufeinanderfolgende Pings (je 2 s) | Supervisor sendet `sys.shutdown`, nach 2 s `TerminateProcess`, dann wie Absturz. Hängt ein Editor, ist nur sein Fenster betroffen. |
+| Supervisor stand still (eingefroren, Standby, Rückstau) | Lücke zwischen zwei Ticks länger als 2 s (`Heartbeat.PING_EVERY_MS`) | Kein Kind wird nach alten Zeitstempeln beurteilt: Pong-/Ping-Zeit und Startfrist aller Kinder beginnen neu bei "jetzt" (`Children.ResetLiveness`), Log `a1` "supervisor stood still". Ein wirklich hängendes Kind wird eine Pong-Frist später gefunden. Die Kinder geben während des Stillstands nicht auf (ihr Orphan-Guard greift nur bei gebrochener Pipe). |
 | Anfrage ohne Antwort | Timeout der Korrelations-ID | Aufrufer erhält `res` mit `error.code = "timeout"`, nie ein endloses Warten |
 | Pipe bricht | `ERROR_BROKEN_PIPE`/`NO_DATA` | Client versucht Wiederaufbau (Backoff 100 ms bis 2 s, max. 10 s), danach Rolle beendet sich |
 | Worker bricht ab | Prozess weg | Engine meldet dem Thread `exception` mit Text „worker crashed“ |

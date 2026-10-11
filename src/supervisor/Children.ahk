@@ -87,6 +87,21 @@ class Children {
     SinceLastPong(name, now) => now - this._recs[name]["lastPongAt"]
     SinceLastPing(name, now) => now - this._recs[name]["lastPingAt"]
 
+    ; The supervisor itself stood still (Heartbeat.Tick): start again with fresh timestamps for every child
+    ; that is judged by time. A child that is already hung keeps its kill time.
+    ResetLiveness(now) {
+        for _, rec in this._recs {
+            if (rec["gone"])
+                continue
+            if (rec["state"] = "starting") {
+                rec["startedAt"] := now
+            } else if (rec["state"] = "ready" || rec["state"] = "stopping") {
+                rec["lastPongAt"] := now
+                rec["lastPingAt"] := now
+            }
+        }
+    }
+
     MarkPing(name, now, n) {
         rec := this._recs[name]
         rec["lastPingAt"] := now
