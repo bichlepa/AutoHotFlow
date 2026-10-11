@@ -24,7 +24,9 @@ SETTLE_S = 4.0          # after the thaw: ping schedule restarts, a wrong verdic
 @pytest.mark.parametrize("round_no", repeat_ids())
 def test_supervisor_stand_still_does_not_make_healthy_children_hung(chains, round_no):
     chain = chains(FULL_CHAIN, STUB_OPTS)
-    before = chain.wait_ready(["storage", "engine", "manager"])
+    # worker:1 is the warm worker the engine asks for when it is ready (WI-27). A worker that is still in its handshake
+    # when the hub freezes gives up after 3 s (no welcome), which is right but not what this test is about.
+    before = chain.wait_ready(["storage", "engine", "manager", "worker:1"])
     sup_pid = chain.sup.ahk_pid()
     sup = psutil.Process(sup_pid)
     sup.suspend()

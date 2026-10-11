@@ -20,7 +20,9 @@ pytestmark = pytest.mark.fault
 @pytest.mark.parametrize("round_no", repeat_ids())
 def test_children_end_within_the_orphan_budget_when_the_supervisor_is_killed(chains, round_no):
     chain = chains(FULL_CHAIN, STUB_OPTS)
-    pids = chain.wait_ready(["storage", "engine", "manager"])
+    # worker:1 is the warm worker of the engine (WI-27). A child that is still connecting when the supervisor dies
+    # lives on until the retry budget of its peer (10 s) is used up: the orphan guard counts a lost connection only.
+    pids = chain.wait_ready(["storage", "engine", "manager", "worker:1"])
     ahk = chain.sup.ahk_pid()
     deaths, codes = {}, {}
     for pid in pids.values():
