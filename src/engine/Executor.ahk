@@ -25,6 +25,11 @@
 ; waits in state ready while every worker is busy, and ends with "exception" ("worker not available") when no
 ; worker is usable at all. trigger cannot be an action.
 ;
+; Revisions (ARCHITEKTUR 4.2, E1): a run keeps only the flow ID. Every step reads the newest committed definition
+; from owner.flows (DefOf), so an edit takes effect at the next step. A running element keeps the class and the
+; parameters it was started with (they are stored in run["active"]). A flow that is gone from the table stops its
+; instances at the next step (reason "flow.deleted"); Engine calls FlowDeleted when it removes a flow.
+;
 ; Parameters are passed as they are stored in the flow file (object with case-insensitive properties).
 ; Expressions are not evaluated in Phase 2 (ARCHITECTURE, WI-10 "Nicht Teil"), so Duration "200" arrives as
 ; text. Action_Sleep converts it with IsNumber.
@@ -83,7 +88,7 @@ class Executor {
         trigger := inst.Start(Ids.Next("thr-"), triggerId)
         if (!IsObject(trigger))
             throw AhfError("instance '" instId "' could not start", ErrCode.INTERNAL)
-        run := Executor._NewRun(instId, flowId, inst, def)
+        run := Executor._NewRun(instId, flowId, inst)
         this._runs[instId] := run
         this._owner.Emit("topic:flow:" flowId, "evt.instance.started", Map("flowId", flowId, "instanceId", instId))
         this._owner.EmitFlowState(flowId)
@@ -106,6 +111,12 @@ class Executor {
             }
         }
         return n
+    }
+
+    ; The flow is deleted: stops all its instances (ARCHITEKTUR 4.2). Returns the number of instances stopped.
+    ; A stop does not wait for acknowledgements (see _StopRun), so deleting never has to give up like v1 does.
+    FlowDeleted(flowId) {
+        return this.StopFlow(flowId, "flow.deleted")
     }
 
     StopAll(reason) {
@@ -161,15 +172,24 @@ class Executor {
                 run := this._runs.Get(instId, "")
                 if (!IsObject(run))
                     continue
+                def := this._DefOf(run)
+                if (!IsObject(def)) {
+                    this._StopRun(run, "flow.deleted")
+                    continue
+                }
                 for threadId in Executor._Keys(run["inst"].Threads) {
                     thread := run["inst"].Threads.Get(threadId, "")
                     if (!IsObject(thread) || thread.State != "ready")
                         continue
+                    ; The definition may have been replaced by a step run from inside this loop.
+                    def := this._DefOf(run)
+                    if (!IsObject(def))
+                        break
                     ; A worker element waits while the pool is busy; it is dispatched when a worker reports done.
-                    if (this._IsWorkerElement(run, thread) && this._owner.workers.Usable()
+                    if (Executor._IsWorkerElement(def, thread) && this._owner.workers.Usable()
                         && !this._owner.workers.Free())
                         continue
-                    this._Dispatch(run, thread)
+                    this._Dispatch(run, thread, def)
                     progress := true
                     budget -= 1
                     if (budget <= 0) {
@@ -183,42 +203,49 @@ class Executor {
 
     ; --- execution -----------------------------------------------------------------------------
 
-    _Dispatch(run, thread) {
+    ; def is the newest revision, read by the caller for this step. Class and parameters are taken from it now.
+    _Dispatch(run, thread, def) {
         ; The thread must be ready. If another tick started it in between, this one must not start it again.
         if (!thread.Dispatch())
             return
         flowId := run["flowId"]
         elementId := thread.ElementId
-        classId := run["flow"].ElementClass(elementId)
+        classId := def.ElementClass(elementId)
         this._ElementStarted(run, elementId)
         ctx := ExecContext(flowId, elementId, run["instanceId"], thread.Id
             , ObjBindMethod(this, "_OnFinish", run["instanceId"], thread.Id)
             , VarStore(run["vars"], VarStore.NewMap()))
+        if (!def.HasElement(elementId)) {
+            ; The element was deleted while the thread waited (ARCHITEKTUR 4.2, M-17).
+            Log.Write("f1", "engine", "element '" elementId "' was removed before it could start", flowId)
+            ctx.Finish("exception", "element was removed")
+            return
+        }
         cls := ElementRegistry.Get(classId)
         if (!IsObject(cls)) {
             ctx.Finish("exception", "unknown element class '" classId "'")
             return
         }
         if (cls.Mode = "worker") {
-            this._DispatchWorker(run, thread, ctx, cls, classId)
+            this._DispatchWorker(run, thread, ctx, cls, classId, def)
             return
         }
         if (cls.Mode != "inline") {
             ctx.Finish("exception", "element " classId " cannot be an action (mode " cls.Mode ")")
             return
         }
-        params := Executor._Params(run["flow"], elementId)
+        params := Executor._Params(def, elementId)
         run["active"][thread.Id] := Map("cls", cls, "ctx", ctx, "params", params)
         ElementRunner.Run(cls, ctx, params, ObjBindMethod(this, "_OnSlow", flowId))
     }
 
     ; Sends a worker element to the pool. The thread stays running until the worker reports (or the job is
     ; cancelled, see _StopRun). Without a usable worker the run ends with "exception" at once.
-    _DispatchWorker(run, thread, ctx, cls, classId) {
-        params := Executor._ParamMap(run["flow"], thread.ElementId)
+    _DispatchWorker(run, thread, ctx, cls, classId, def) {
+        params := Executor._ParamMap(def, thread.ElementId)
         env := Map("flowId", run["flowId"], "elementId", thread.ElementId, "instanceId", run["instanceId"]
             , "threadId", thread.Id)
-        act := Map("cls", cls, "ctx", ctx, "params", Executor._Params(run["flow"], thread.ElementId))
+        act := Map("cls", cls, "ctx", ctx, "params", Executor._Params(def, thread.ElementId))
         ; Workers.Run may end the job before it returns (send error). The entry is made first so that the end
         ; (_OnFinish) removes it, and the execId is added only if the job is still open. Without Critical a
         ; stop between Run and the assignment would find an entry without execId and could not cancel the job.
@@ -281,9 +308,14 @@ class Executor {
     ; its old element, e.g. a trigger as an action ("cannot be an action"; seen in 2 of about 50 runs
     ; with 200 parallel instances, WI-16).
     _Advance(run, thread) {
+        def := this._DefOf(run)
+        if (!IsObject(def)) {
+            this._StopRun(run, "flow.deleted")
+            return
+        }
         prev := Critical("On")  ; reason: advancing the thread must not be interrupted (see above)
         try {
-            outcome := Scheduler.Advance(run["inst"], run["flow"], thread, () => Ids.Next("thr-"))
+            outcome := Scheduler.Advance(run["inst"], def, thread, () => Ids.Next("thr-"))
             if (outcome["unhandled"]) {
                 Log.Write("f0", "engine", "unhandled exception in element " thread.ElementId ": " thread.Message
                     , run["flowId"])
@@ -376,11 +408,17 @@ class Executor {
 
     ; --- helpers -------------------------------------------------------------------------------
 
-    static _NewRun(instId, flowId, inst, def) {
-        run := Map("instanceId", instId, "flowId", flowId, "inst", inst, "flow", def
+    static _NewRun(instId, flowId, inst) {
+        run := Map("instanceId", instId, "flowId", flowId, "inst", inst
             , "vars", VarStore.NewMap(), "active", Map())
         run["active"].CaseSense := "Off"
         return run
+    }
+
+    ; The newest committed definition of the run's flow, or "" if the flow is not loaded any more.
+    _DefOf(run) {
+        rec := this._owner.flows.Get(run["flowId"])
+        return IsObject(rec) ? rec.Def : ""
     }
 
     ; flowSettings.ExecutionPolicy of the flow, "default" when missing (v1 default).
@@ -423,8 +461,8 @@ class Executor {
         return m
     }
 
-    _IsWorkerElement(run, thread) {
-        return ElementRegistry.ModeOf(run["flow"].ElementClass(thread.ElementId)) = "worker"
+    static _IsWorkerElement(def, thread) {
+        return ElementRegistry.ModeOf(def.ElementClass(thread.ElementId)) = "worker"
     }
 
     ; Snapshot of the keys of a Map, so the Map can change while the keys are walked.
