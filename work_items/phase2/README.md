@@ -155,9 +155,9 @@ Der Supervisor startet sich ohne `--role` oder mit `--role=supervisor`.
 
 ## Fortschritt (Agenten haken ab, wenn ein Paket seine Akzeptanzkriterien erfüllt)
 
-- [ ] WI-01  - [ ] WI-02  - [ ] WI-03  - [x] WI-04  - [x] WI-05  - [ ] WI-06
-- [x] WI-07  - [ ] WI-08  - [ ] WI-09  - [x] WI-10  - [x] WI-11  - [x] WI-12
-- [ ] WI-13  - [ ] WI-14 (optional)  - [x] WI-15  - [ ] WI-16  - [ ] WI-17
+- [x] WI-01  - [x] WI-02  - [x] WI-03  - [x] WI-04  - [x] WI-05  - [x] WI-06
+- [x] WI-07  - [x] WI-08  - [x] WI-09  - [x] WI-10  - [x] WI-11  - [x] WI-12
+- [ ] WI-13 (automatisierte Abnahme erfüllt, manuelle GUI-Prüfung offen)  - [ ] WI-14 (optional, nicht gebaut)  - [x] WI-15  - [x] WI-16  - [ ] WI-17 (Schritte 1 bis 5 erledigt)
 
 ## Funde
 
