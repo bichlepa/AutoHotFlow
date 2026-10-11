@@ -17,6 +17,7 @@ pytestmark = pytest.mark.fault
 
 DEADLINE_MS = 2000
 FROZEN_EXIT_SLACK_S = 1.0
+EVENT_LAG_S = 1.0             # the recorder thread of the observer may lag a few ms behind the supervisor exit
 
 
 @pytest.mark.parametrize("round_no", repeat_ids())
@@ -32,8 +33,8 @@ def test_healthy_session_exits_within_2_seconds_and_every_role_says_it_is_clean(
     assert code == EXIT_OK, chain.sup.text()
     assert elapsed <= CLEAN_EXIT_BUDGET_S, "exit took %.2f s" % elapsed
     for name in pids:
-        exited = chain.rec.find(event("evt.process.exited", name=name))
-        assert exited and exited[0][1]["payload"]["clean"], (name, exited)
+        exited = chain.rec.wait(event("evt.process.exited", name=name), timeout=EVENT_LAG_S)
+        assert exited and exited[1]["payload"]["clean"], (name, exited)
     assert not [p for p in pids.values() if alive(p)]
     assert wait_until(lambda: not session_processes(chain.session), 5.0), session_processes(chain.session)
 
@@ -55,8 +56,8 @@ def test_frozen_storage_is_terminated_at_the_deadline_and_the_others_exit_clean(
     assert elapsed <= DEADLINE_MS / 1000 + FROZEN_EXIT_SLACK_S, "exit took %.2f s" % elapsed
     assert wait_until(lambda: storage in death, 3.0), "frozen storage left behind"
     for name in ("engine", "manager"):
-        exited = chain.rec.find(event("evt.process.exited", name=name))
-        assert exited and exited[0][1]["payload"]["clean"], (name, exited)
+        exited = chain.rec.wait(event("evt.process.exited", name=name), timeout=EVENT_LAG_S)
+        assert exited and exited[1]["payload"]["clean"], (name, exited)
     assert wait_until(lambda: not session_processes(chain.session), 5.0), session_processes(chain.session)
 
 
