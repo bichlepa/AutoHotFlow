@@ -30,6 +30,13 @@ class Storage extends Role {
     static LOG_RETRY_MS := 3000
     static LOG_RETRY_DELAY_MS := 20
     ; Log sink of this process: its own entries go straight into the queue (no evt.log.append to itself).
+    ; Log queue (WI-25): limit and bundle size. The limit is lowered by --log-queue-max-lines (tests).
+    static LOG_QUEUE_MAX_LINES := 20000
+    static LOG_QUEUE_MAX_CHARS := 8 * 1024 * 1024
+    static LOG_BUNDLE_MAX_LINES := 500
+    static LOG_BUNDLE_MAX_CHARS := 64 * 1024
+    ; At most this many lost lines of one bundle are listed one by one in the own log.
+    static LOG_LOST_REPORT_MAX := 5
     static SelfLogFn := (level, source, text, flowId := "") => Role.Current._SelfLog(level, source, text, flowId)
 
     __New(args) {
@@ -37,6 +44,13 @@ class Storage extends Role {
         this.queue := WriteQueue()
         this._shutdownUntil := 0
         this.logLinesLost := 0   ; log lines that could not be written even after the retries (F-04)
+        this.logBuffers := Map()           ; file name -> Map(items, scheduled): lines waiting for the file
+        this.logQueuedEntries := 0         ; entries not yet written to all their files
+        this.logQueuedChars := 0
+        this.logLinesDropped := 0          ; entries dropped because the log queue was full (WI-25)
+        this.logDropPending := 0           ; dropped entries not yet announced in the log
+        this.logQueueMaxLines := Integer(args.Get("log-queue-max-lines", Storage.LOG_QUEUE_MAX_LINES))
+        this.logQueueMaxChars := Integer(args.Get("log-queue-max-chars", Storage.LOG_QUEUE_MAX_CHARS))
     }
 
     ; Creates the folders before the connection starts. A failure is logged to the console; the
@@ -181,42 +195,133 @@ class Storage extends Role {
     }
 
     ; Queues one log entry: written to the files, then forwarded to the topic "log" (PROTOCOL 4.6).
-    ; The queue has no deadline for logs: a log line must not be dropped by a timeout.
+    ; Never blocks and never has a deadline. The log queue is limited (logQueueMaxLines entries or
+    ; logQueueMaxChars characters): over the limit the entry is dropped and counted, and a line
+    ; "<n> log lines dropped" is written as soon as there is room again.
     _EnqueueLog(ts, level, source, thread, text, flowId) {
+        if (this.logQueuedEntries >= this.logQueueMaxLines || this.logQueuedChars >= this.logQueueMaxChars) {
+            if (this.logDropPending = 0)
+                Role.Console("a0", "storage", "log queue full (" this.logQueuedEntries " entries), dropping new log lines")
+            this.logDropPending += 1
+            this.logLinesDropped += 1
+            return
+        }
+        this._WriteDropNote()
+        this._EnqueueLogEntry(ts, level, source, thread, text, flowId)
+    }
+
+    ; Writes the note for dropped lines (called when the queue has room).
+    _WriteDropNote() {
+        if (this.logDropPending = 0)
+            return
+        count := this.logDropPending
+        this.logDropPending := 0
+        this._EnqueueLogEntry(FormatTime(A_NowUTC, "yyyy-MM-dd HH:mm:ss"), "a0", "storage", "storage"
+            , count " log lines dropped (log queue was full, " this.logLinesDropped " in total)", "")
+    }
+
+    _EnqueueLogEntry(ts, level, source, thread, text, flowId) {
         entry := Map("ts", ts, "level", level, "source", source, "text", text)
         if (flowId != "")
             entry["flowId"] := flowId
-        logDir := StoragePaths.LogDir(this.dataDir)
         line := LogSink.Line(LogSink.LocalStamp(ts), thread, source, text)
-        ; One operation per file, so a retry of one file never writes the other one twice. The queue
-        ; keeps the order, a locked file holds back the entries behind it for at most LOG_RETRY_MS.
         names := LogSink.FileNames(source)
+        ; The record lives until all files of the entry are written ("left" counts them).
+        rec := Map("entry", entry, "line", line, "left", names.Length, "chars", StrLen(line))
+        this.logQueuedEntries += 1
+        this.logQueuedChars += rec["chars"]
         for index, fileName in names
-            this.queue.Add(this._LogOp(entry, logDir, fileName, line, index = names.Length))
+            this._LogToFile(fileName, Map("rec", rec, "last", index = names.Length))
+    }
+
+    ; Adds the item to the pending lines of the file. One queue operation per file at a time writes the
+    ; pending lines in one go (a bundle), so a file is opened once per bundle, not once per line.
+    _LogToFile(fileName, item) {
+        if (!this.logBuffers.Has(fileName))
+            this.logBuffers[fileName] := Map("items", [], "scheduled", false)
+        buf := this.logBuffers[fileName]
+        buf["items"].Push(item)
+        if (!buf["scheduled"]) {
+            buf["scheduled"] := true
+            this.queue.AddLow(this._LogFileOp(fileName, buf))
+        }
     }
 
     ; A separate method, so each closure has its own parameters (loop variables are shared by closures).
-    _LogOp(entry, logDir, fileName, line, isLast) {
+    ; state["n"] is the number of lines the last run tried to write. The lines stay in the buffer until
+    ; the write worked, so a retry keeps the order and lines that arrive meanwhile join the next bundle.
+    _LogFileOp(fileName, buf) {
+        state := Map("n", 0)
+        logDir := StoragePaths.LogDir(this.dataDir)
         return Map("deadline", "", "retryMs", Storage.LOG_RETRY_MS, "retryDelayMs", Storage.LOG_RETRY_DELAY_MS
-            , "run", () => this._RunLogAppend(logDir, fileName, line)
-            , "finish", (payload) => this._FinishLog(entry, fileName, isLast, payload))
+            , "run", () => this._RunLogBundle(logDir, fileName, buf, state)
+            , "finish", (payload) => this._FinishLogBundle(fileName, buf, state, payload))
     }
 
+    ; Writes up to LOG_BUNDLE_MAX_LINES / LOG_BUNDLE_MAX_CHARS of the pending lines of one file.
     ; Returns the retry request of the queue while another process holds the file (F-04).
-    _RunLogAppend(logDir, fileName, line) {
-        busy := LogSink.AppendTo(logDir, fileName, line)
+    _RunLogBundle(logDir, fileName, buf, state) {
+        text := ""
+        n := 0
+        for item in buf["items"] {
+            line := item["rec"]["line"]
+            if (n > 0 && (n >= Storage.LOG_BUNDLE_MAX_LINES || StrLen(text) + StrLen(line) > Storage.LOG_BUNDLE_MAX_CHARS))
+                break
+            text .= line
+            n += 1
+        }
+        state["n"] := n
+        busy := LogSink.AppendTo(logDir, fileName, text)
         if (busy != "")
             return Map("retry", true, "message", fileName ": " busy)
         return Map()
     }
 
-    ; After the last file of an entry the entry goes to the topic "log". A line that could not be
-    ; written is counted and reported in the own log, never dropped silently.
-    _FinishLog(entry, fileName, last, payload) {
-        if (!payload["ok"])
-            this._LogLineLost(entry, fileName, payload["error"]["message"])
-        if (last)
-            this.peer.Send("topic:log", "evt.log.entry", entry)
+    ; After the bundle (written or lost) every entry whose last file is done goes to the topic "log".
+    ; Lines that could not be written are counted and reported in the own log, never dropped silently.
+    ; A failure before the first run (FailAll at shutdown) loses all pending lines of the file.
+    _FinishLogBundle(fileName, buf, state, payload) {
+        items := buf["items"]
+        n := state["n"]
+        neverRan := (n = 0)
+        if (neverRan)
+            n := items.Length
+        done := []
+        loop n
+            done.Push(items[A_Index])
+        if (n > 0)
+            items.RemoveAt(1, n)
+        buf["scheduled"] := false
+        reported := 0
+        for item in done {
+            rec := item["rec"]
+            if (!payload["ok"]) {
+                reported += 1
+                if (reported <= Storage.LOG_LOST_REPORT_MAX)
+                    this._LogLineLost(rec["entry"], fileName, payload["error"]["message"])
+                else
+                    this.logLinesLost += 1
+            }
+            if (item["last"])
+                this.peer.Send("topic:log", "evt.log.entry", rec["entry"])
+            rec["left"] -= 1
+            if (rec["left"] = 0) {
+                this.logQueuedEntries -= 1
+                this.logQueuedChars -= rec["chars"]
+            }
+        }
+        if (reported > Storage.LOG_LOST_REPORT_MAX)
+            this._SelfLog("a0", "storage", "log line lost: " fileName ", " (reported - Storage.LOG_LOST_REPORT_MAX)
+                " more lines not listed, " this.logLinesLost " lost in total. " payload["error"]["message"])
+        if (items.Length > 0 && !neverRan) {
+            buf["scheduled"] := true
+            this.queue.AddLow(this._LogFileOp(fileName, buf))
+        } else if (items.Length = 0 && this.logBuffers.Get(fileName, "") == buf) {
+            this.logBuffers.Delete(fileName)
+        }
+        ; announce dropped lines when the queue is at most half full again (also without new lines)
+        if (this.logDropPending > 0 && this.logQueuedEntries * 2 <= this.logQueueMaxLines)
+            this._WriteDropNote()
     }
 
     _LogLineLost(entry, fileName, message) {

@@ -103,8 +103,8 @@ def flowdir(datadir):
     return datadir
 
 
-def start_storage(procs, datadir, runs, pipe, session_id, label="storage"):
-    args = ["--role=storage", "--session=" + session_id, "--hub=" + pipe, "--data=" + str(datadir)]
+def start_storage(procs, datadir, runs, pipe, session_id, label="storage", *extra):
+    args = ["--role=storage", "--session=" + session_id, "--hub=" + pipe, "--data=" + str(datadir), *extra]
     run = RoleRun(procs, datadir, label, args)
     runs.append(run)
     return run
@@ -503,6 +503,115 @@ def test_a_log_line_that_cannot_be_written_is_reported_in_the_own_log(storage, f
     assert "log line lost: Log_stuck.txt, source 'stuck'" in text and "never written" in text
     assert "never written" in (logdir / "Log.txt").read_text("utf-8")   # the common log has it
     assert "never written" not in held.read_text("utf-8")
+
+
+# --- WI-25: log throughput, priority of requests, limit of the log queue, temp files ------------------
+
+def _now_utc():
+    return time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
+
+
+def _flood(client, source, count, text="flood line"):
+    """Sends count log lines as fast as the pipe takes them. Returns the seconds it took."""
+    ts = _now_utc()
+    t0 = time.perf_counter()
+    for n in range(count):
+        client.send("storage", "evt.log.append", {"ts": ts, "level": "a1", "source": source,
+                                                 "text": "%s %05d" % (text, n)})
+    return time.perf_counter() - t0
+
+
+def _wait_for_text(path, needle, timeout):
+    """Seconds until needle is in the file, or None."""
+    t0 = time.perf_counter()
+    while time.perf_counter() - t0 < timeout:
+        try:
+            if needle in Path(path).read_bytes().decode("utf-8", "replace"):
+                return time.perf_counter() - t0
+        except OSError:
+            pass
+        time.sleep(0.05)
+    return None
+
+
+def test_a_log_flood_is_written_at_more_than_1000_lines_per_second(storage, flowdir):
+    """F-08: before WI-25 the storage wrote about 30 lines per second. The flood stays below the limit of
+    the log queue (20000 lines), so no line is dropped. The end marker is the last line of the source, so
+    both files (Log.txt and Log_flood.txt) have been written up to it when it shows up. The grace for the
+    machine is large (the rate is asserted over the whole run, sender included, not per second)."""
+    _, pid, client = storage
+    count = 12000
+    t0 = time.perf_counter()
+    sent_s = _flood(client, "flood", count)
+    client.send("storage", "evt.log.append", {"ts": _now_utc(), "level": "a1", "source": "flood", "text": "END MARKER"})
+    logdir = flowdir / "Log"
+    seen = _wait_for_text(logdir / "Log_flood.txt", "END MARKER", 60)
+    total = time.perf_counter() - t0
+    assert seen is not None, "end marker not written within 60 s"
+    assert _wait_for_text(logdir / "Log.txt", "END MARKER", 5) is not None
+    rate = (count + 1) / total
+    rss = psutil.Process(pid).memory_info().rss / 2**20
+    print("\nflood: %d lines, sender %.1f s, all written after %.1f s = %.0f lines/s, storage RSS %.1f MB"
+          % (count, sent_s, total, rate, rss))
+    assert rate > 1000, "%.0f lines/s" % rate
+    assert rss < 120
+
+
+def test_a_request_is_answered_in_time_during_a_log_flood(storage, flowdir, pipe):
+    """F-08: requests and log lines used to share one queue, so a read waited behind the whole flood."""
+    _, _, client = storage
+    other = AhfClient(pipe, "reader")
+    try:
+        _flood(client, "flood", 15000)
+        latencies = []
+        for _ in range(5):
+            t0 = time.perf_counter()
+            ask_ok(other, "cmd.storage.flow.read", {"path": "Flows/skeleton.json"}, timeout=10)
+            latencies.append(time.perf_counter() - t0)
+            time.sleep(0.1)
+    finally:
+        other.close()
+    print("\nflow.read during a flood: %s ms" % ", ".join("%.0f" % (v * 1000) for v in latencies))
+    assert max(latencies) < 1.0, latencies
+
+
+def test_a_flood_over_the_limit_drops_lines_counts_them_and_the_process_stays_up(procs, flowdir, runs, pipe,
+                                                                                 session_id, hub):
+    """F-08: the log queue is limited (default 20000 lines, 8 MB). The limit is lowered here with
+    --log-queue-max-lines, so the flood is small. Dropped lines are counted; once the queue has room again, a line
+    '<n> log lines dropped' is written. Nothing blocks: requests are answered during the flood."""
+    import threading
+    logdir = flowdir / "Log"
+    logdir.mkdir(exist_ok=True)
+    # Log.txt is held by another process for the whole flood, so the queue cannot drain and has to hit
+    # the limit however fast the machine is (a fast storage would keep up with the sender otherwise).
+    held = logdir / "Log.txt"
+    held.write_bytes(b"")
+    stop = threading.Event()
+    holder = threading.Thread(target=_hold_exclusive, args=(held, stop, 0, True), daemon=True)
+    holder.start()
+    start_storage(procs, flowdir, runs, pipe, session_id, "storage", "--log-queue-max-lines=300")
+    pid = wait_hello(hub, "storage")
+    client = AhfClient(pipe, "tester")
+    try:
+        _flood(client, "flood", 6000)
+        ask_ok(client, "cmd.storage.flows.list", timeout=5)      # requests are not blocked by the full queue
+        stop.set()                                                # the file is free again, the queue drains
+        holder.join(5)
+        found = _wait_for_text(logdir / "Log_storage.txt", "log lines dropped", 40)
+        assert found is not None, "no 'log lines dropped' line"
+        text = (logdir / "Log_storage.txt").read_bytes().decode("utf-8")
+        counts = [int(m) for m in re.findall(r"~ (\d+) log lines dropped", text)]
+        assert counts and counts[0] > 0, text[-500:]
+        assert sum(counts) <= 6000 - 300
+        # after the flood a new line is accepted again and written
+        client.send("storage", "evt.log.append", {"ts": _now_utc(), "level": "a1", "source": "after", "text": "after the flood"})
+        assert _wait_for_text(logdir / "Log_after.txt", "after the flood", 15) is not None
+        assert psutil.pid_exists(pid) and psutil.Process(pid).is_running()
+        ask_ok(client, "cmd.storage.flows.list")
+    finally:
+        stop.set()
+        client.close()
 
 
 # --- shutdown ---------------------------------------------------------------------------------------

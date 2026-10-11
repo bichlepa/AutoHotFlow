@@ -1,7 +1,8 @@
 """WI-16: endurance run with mixed operations (marker `soak`, run with `-m soak`).
 
-Duration: AHF_SOAK_SECONDS (default 600). Mixed load (about 20 engine events per second: the manager stub writes every event to the storage log, and the
-storage drains only about 30 lines per second, see finding F-08): parallel bursts of a short flow, start/stop of a long
+Duration: AHF_SOAK_SECONDS (default 600). Mixed load (about 130 engine events per second, six times the load before WI-25: the manager stub writes every
+event to the storage log, and the storage drains well over 1000 lines per second since WI-25, finding F-08; the
+rate is AHF_SOAK_BURST starts of the short flow every 0.25 s, default 4): parallel bursts of a short flow, start/stop of a long
 flow, snapshot requests, flow toggles. AHF_SOAK_CHURN=1 adds clients that connect and leave (off by default:
 that path has its own test, finding F-07 would make every soak run red).
 
@@ -26,6 +27,7 @@ GROWTH_LIMIT = 1.20
 HANDLE_SLACK_FACTOR = 1.10
 P99_BUDGET_MS = 50.0
 BURST_FLOW, LONG_FLOW = "burst", "long"
+BURST_SIZE = int(os.environ.get("AHF_SOAK_BURST", "4"))
 
 
 class Worker(threading.Thread):
@@ -61,7 +63,8 @@ def test_mixed_operations_for_minutes_keep_processes_handles_and_memory_flat(str
     latencies = []
 
     def burst():
-        ids = clients["burst"].send_many("engine", "cmd.flow.start", [{"flowId": BURST_FLOW}], timeout_ms=5000)
+        ids = clients["burst"].send_many("engine", "cmd.flow.start", [{"flowId": BURST_FLOW}] * BURST_SIZE,
+                                         timeout_ms=5000)
         for i in ids:
             assert clients["burst"].answer(i, 10)["payload"].get("ok")
 
@@ -87,7 +90,7 @@ def test_mixed_operations_for_minutes_keep_processes_handles_and_memory_flat(str
         finally:
             c.close()
 
-    workers = [Worker("burst", burst, 0.5, errors, stop), Worker("long", long_flow, 3.0, errors, stop),
+    workers = [Worker("burst", burst, 0.25, errors, stop), Worker("long", long_flow, 3.0, errors, stop),
                Worker("snap", snapshot, 0.05, errors, stop), Worker("toggle", toggle, 2.0, errors, stop)]
     if os.environ.get("AHF_SOAK_CHURN") == "1":
         workers.append(Worker("churn", churn, 0.5, errors, stop))

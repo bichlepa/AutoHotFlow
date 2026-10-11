@@ -1,11 +1,13 @@
-"""WI-16: an event flood and the log queue of the storage (finding F-08, measured, not a budget test).
+"""WI-16, WI-25: an event flood and the log queue of the storage (finding F-08).
 
-The manager stub writes every engine event to the log through the storage (PROTOKOLL 4.8). The storage writes
-the queue one operation per timer slice, so it drains only about 30 lines per second, and the queue has no
-limit. This test floods the engine with events for 20 s and records how far the storage falls behind (memory
-of the storage, time until the log files stop changing). The only assertions are the ones that matter for
-the architecture: the engine stays responsive in the budget while the storage is behind, no process is
-restarted, and the storage still lives and answers afterwards.
+The manager stub writes every engine event to the log through the storage (PROTOKOLL 4.8). Before WI-25 the
+storage drained only about 30 lines per second and the queue had no limit. This test floods the engine with
+events for 20 s and records how far the storage falls behind (memory of the storage, time until the log files
+stop changing). Assertions: the engine stays responsive in the budget, no process is restarted, and (WI-25) the
+log is complete shortly after the flood and the memory of the storage returns close to its start value.
+
+The second test sends log lines straight to the storage at 1500 lines per second for 10 s (WI-25: at least
+1000 lines/s over 10 s), the third floods more than the limit of the log queue allows.
 """
 
 import time
@@ -19,6 +21,8 @@ from stresskit import stress_chain  # noqa: F401  (fixture)
 FLOW = "flood"
 FLOOD_SECONDS = 20.0
 DRAIN_LIMIT_S = 240.0
+DRAIN_BUDGET_S = 60.0   # generous: the drain takes seconds since WI-25, 240 s were not enough before
+RSS_BACK_MB = 40.0      # growth over the start value that is still "back" (the queue holds at most 20000 entries)
 MEDIAN_BUDGET_MS = 5.0
 P99_BUDGET_MS = 50.0
 
@@ -73,3 +77,56 @@ def test_event_flood_keeps_the_engine_responsive_and_the_backlog_of_the_log_is_m
 
     assert all(p["restarts"] == 0 and p["state"] == "ready" for p in states.values()), states
     assert dist.median < MEDIAN_BUDGET_MS and dist.p99 < P99_BUDGET_MS, str(dist)
+    assert drained_after is not None and drained_after < DRAIN_BUDGET_S, drained_after
+    assert after["rss_mb"] < before["rss_mb"] + RSS_BACK_MB, (before, after)
+
+
+def _utc():
+    return time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
+
+
+def _wait_text(path, needle, timeout):
+    end = time.monotonic() + timeout
+    while time.monotonic() < end:
+        try:
+            if needle in Path(path).read_bytes().decode("utf-8", "replace"):
+                return True
+        except OSError:
+            pass
+        time.sleep(0.1)
+    return False
+
+
+@pytest.mark.stress
+@pytest.mark.timeout(300)
+def test_storage_writes_1500_log_lines_per_second_for_10_seconds(stress_chain, datadir):
+    """WI-25: the sender paces itself (150 lines every 100 ms). The end marker is the last line of its source
+    and shows up in both files when the storage has caught up. The rate is not measured per second but
+    as 'all written within 5 s after the last line was sent' (a backlog of seconds would fail it)."""
+    sc = stress_chain(flows={FLOW: (100, "parallel")})
+    sender = sc.client("logsender")
+    storage_pid = sc.pids["storage"]
+    before = metrics.proc_snapshot(storage_pid)
+    count, t0 = 0, time.monotonic()
+    while time.monotonic() - t0 < 10.0:
+        tick = time.monotonic()
+        for _ in range(150):
+            sender.send("storage", "evt.log.append", {"ts": _utc(), "level": "a1", "source": "rate",
+                                                     "text": "rate line %06d" % count})
+            count += 1
+        time.sleep(max(0.0, 0.1 - (time.monotonic() - tick)))
+    sent_s = time.monotonic() - t0
+    sender.send("storage", "evt.log.append", {"ts": _utc(), "level": "a1", "source": "rate", "text": "END MARKER"})
+    sent_at = time.monotonic()
+    logdir = Path(datadir) / "Log"
+    assert _wait_text(logdir / "Log_rate.txt", "END MARKER", 30) and _wait_text(logdir / "Log.txt", "END MARKER", 5)
+    lag = time.monotonic() - sent_at
+    time.sleep(1.0)
+    after = metrics.proc_snapshot(storage_pid)
+    metrics.record("log rate", lines=count, sent_seconds=round(sent_s, 1), lag_after_last_line_s=round(lag, 2),
+                   storage_before=before, storage_after=after, machine=metrics.machine())
+    print("\n%d lines in %.1f s (%.0f/s), end marker written %.2f s after the last line; storage %s -> %s"
+          % (count, sent_s, count / sent_s, lag, before, after))
+    assert count / sent_s > 1000
+    assert lag < 5.0, lag
+    assert after["rss_mb"] < before["rss_mb"] + RSS_BACK_MB, (before, after)
