@@ -58,6 +58,7 @@ class Storage extends Role {
     Start() {
         this._EnsureFolders()
         super.Start()
+        this._QueueTempCleanup()
         Log.Configure(Storage.SelfLogFn)
     }
 
@@ -331,6 +332,28 @@ class Storage extends Role {
             return   ; the report itself is not reported again
         this._SelfLog("a0", "storage", "log line lost: " fileName ", source '" entry["source"] "', text '"
             SubStr(entry["text"], 1, 80) "', " this.logLinesLost " lost in total. " message)
+    }
+
+    ; --- temp files left by a hard stop ---------------------------------------------------------
+
+    ; Deletes stale "*.ahf-<pid>.tmp" files in Flows/ and Variables/ as the first log-priority
+    ; operation, so the start of the role (sys.hello) and the first requests do not wait for the scan.
+    _QueueTempCleanup() {
+        this.queue.AddLow(Map("deadline", "", "run", () => this._RunTempCleanup()
+            , "finish", (payload) => this._FinishTempCleanup(payload)))
+    }
+
+    _RunTempCleanup() {
+        removed := AtomicFile.RemoveStaleTemps(StoragePaths.FlowsDir(this.dataDir))
+        removed += AtomicFile.RemoveStaleTemps(StoragePaths.VarsDir(this.dataDir))
+        return Map("removed", removed)
+    }
+
+    _FinishTempCleanup(payload) {
+        if (!payload["ok"])
+            this._Log("a0", "storage", "cleanup of stale temp files failed: " payload["error"]["message"])
+        else if (payload["removed"] > 0)
+            this._Log("a1", "storage", "removed " payload["removed"] " stale temp file(s) of stopped processes")
     }
 
     ; --- folders -----------------------------------------------------------------------------

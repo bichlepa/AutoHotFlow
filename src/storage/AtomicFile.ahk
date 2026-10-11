@@ -30,6 +30,43 @@ class AtomicFile {
         }
     }
 
+    ; Deletes the temp files "<name>.ahf-<pid>.tmp" below root (recursive) whose process does not run
+    ; any more: a hard stop between the temp write and the rename leaves them (WI-25). A file of a
+    ; running process (also our own, a write may be in progress) stays. Best effort: a file that cannot
+    ; be deleted stays. Returns the number of deleted files.
+    static RemoveStaleTemps(root) {
+        removed := 0
+        if (!DirExist(root))
+            return 0
+        try {
+            loop files root "\*.tmp", "FR" {
+                if (!RegExMatch(A_LoopFileName, "\.ahf-(\d+)\.tmp$", &m) || AtomicFile.ProcessRuns(Integer(m[1])))
+                    continue
+                try {
+                    FileDelete(A_LoopFileFullPath)
+                    removed += 1
+                } catch {
+                    ; held by someone or already gone: next start tries again
+                }
+            }
+        } catch {
+            ; the folder vanished while scanning
+        }
+        return removed
+    }
+
+    ; True while a process with this id exists. An id that cannot be opened because of missing rights
+    ; (access denied) counts as running, so a file is never removed on a doubt.
+    static ProcessRuns(pid) {
+        synchronize := 0x100000
+        handle := DllCall("OpenProcess", "UInt", synchronize, "Int", 0, "UInt", pid, "Ptr")
+        if (!handle)
+            return A_LastError != 87   ; ERROR_INVALID_PARAMETER: no such process
+        stillRunning := (DllCall("WaitForSingleObject", "Ptr", handle, "UInt", 0, "UInt") = 0x102)   ; WAIT_TIMEOUT
+        DllCall("CloseHandle", "Ptr", handle)
+        return stillRunning
+    }
+
     ; Reads a text file as UTF-8. A leading BOM (v1 writes one for some files) is dropped.
     static ReadText(filePath) {
         text := FileRead(filePath, "UTF-8")

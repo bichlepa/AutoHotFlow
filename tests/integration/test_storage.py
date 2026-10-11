@@ -614,6 +614,34 @@ def test_a_flood_over_the_limit_drops_lines_counts_them_and_the_process_stays_up
         client.close()
 
 
+def _dead_pid():
+    pid = 4000000
+    while psutil.pid_exists(pid):
+        pid += 4
+    return pid
+
+
+def test_temp_files_of_dead_processes_are_removed_at_start_and_those_of_live_ones_stay(procs, flowdir, runs, pipe,
+                                                                                         session_id, hub):
+    """WI-25: *.ahf-<pid>.tmp (left after a hard stop) in Flows/ and Variables/ (recursive) go when the
+    process does not run any more. One of a running process (this test) stays."""
+    (flowdir / "Variables" / "Flow 1").mkdir(parents=True)
+    dead = _dead_pid()
+    gone = [flowdir / "Flows" / ("a.json.ahf-%d.tmp" % dead),
+            flowdir / "Variables" / ("global.ahfvd.ahf-%d.tmp" % dead),
+            flowdir / "Variables" / "Flow 1" / ("v.ahfvar.ahf-%d.tmp" % dead)]
+    stays = [flowdir / "Flows" / ("b.json.ahf-%d.tmp" % os.getpid()), flowdir / "Flows" / "keep.json"]
+    unrelated = flowdir / "Flows" / "note.ahf-x.tmp"
+    for f in gone + stays + [unrelated]:
+        f.write_text("x")
+    start_storage(procs, flowdir, runs, pipe, session_id)
+    wait_hello(hub, "storage")
+    deadline = time.time() + 10
+    while time.time() < deadline and any(f.exists() for f in gone):
+        time.sleep(0.1)
+    assert [f.name for f in gone if f.exists()] == []
+    assert all(f.exists() for f in stays) and unrelated.exists()
+
 # --- shutdown ---------------------------------------------------------------------------------------
 
 def test_shutdown_finishes_the_queued_writes_then_says_bye_and_exits_0(storage, flowdir, procs, hub):
