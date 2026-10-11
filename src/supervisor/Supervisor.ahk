@@ -9,6 +9,7 @@
 #Include Hub.ahk
 #Include Children.ahk
 #Include Heartbeat.ahk
+#Include DiagLog.ahk
 #Include Shutdown.ahk
 #Include SupervisorCommand.ahk
 
@@ -84,6 +85,7 @@ class Supervisor {
         this.roleOpts := this._RoleOpts(opts)
         this.mutex := 0
         this.hub := ""
+        this.diag := ""
         this.children := ""
         this.heartbeat := ""
         this.shutdown := ""
@@ -99,6 +101,8 @@ class Supervisor {
             , "hubHwnd", Wake.Hwnd, "testRoles", this.testRoles, "script", A_ScriptFullPath
             , "roleOpts", this.roleOpts)
         this.hub := Hub(this.pipe, this.session)
+        this.diag := DiagLog(this.hub)
+        Log.Configure(this.diag.SinkFn)      ; to storage as soon as it is connected, else queued (WI-23)
         this.children := Children(config, this.hub)
         this.heartbeat := Heartbeat(this.children, this.hub)
         this.shutdown := Shutdown(this.children, this.hub)
@@ -121,8 +125,15 @@ class Supervisor {
         h.On("sys.bye", (msg) => this.children.OnBye(msg.from, msg.payload.Get("clean", false)))
         h.On("cmd.app.", (msg) => this._OnApp(msg))
         h.On("cmd.process.", (msg) => this._OnProcess(msg))
-        h.onHello := (link) => this.children.OnHello(link)
+        h.onHello := (link) => this._OnHello(link)
         h.onLinkLost := (link, reason) => this.children.OnLinkLost(link["name"], reason)
+    }
+
+    ; A client said sys.hello: the children learn about it; the log queue is delivered once storage is there.
+    _OnHello(link) {
+        this.children.OnHello(link)
+        if (link["name"] = DiagLog.STORAGE)
+            this.diag.Flush()
     }
 
     ; Commands to the supervisor itself. cmd.app.exit starts the exit and answers at once.

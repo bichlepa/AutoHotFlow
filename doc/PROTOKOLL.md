@@ -263,6 +263,8 @@ Jedes Ereignis trägt `seq` (steigend pro Engine-Epoche) und `epoch`.
 - Fehler: `ok:false` mit `error.code` an den Absender, zusätzlich `evt.storage.error` an Topic `engine` (`op` = Name ohne `cmd.storage.`, z. B. `flow.read`, `flow.write`, `var.set`).
 - `evt.log.append`: Ein Eintrag wird als Zeile `CRLF, "--- yyyy MM dd HH:mm:ss ~<absender>~<source>~ <text>"` an `Log/Log.txt` und `Log/Log_<source>.txt` angehängt (Zeitstempel lokal wie v1, `ts` kommt in UTC). Die Datei über 100 KB wird vorher nach `<name>_old.txt` umbenannt. Der Eintrag wird als `evt.log.entry` `{ts, level, source, flowId?, text}` an Topic `log` weitergeleitet (`ts` unverändert UTC). Storage selbst schreibt seine Einträge direkt in die Warteschlange, nicht an sich selbst.
 
+- **Log des Supervisors (WI-23):** Der Supervisor ist keine `Role` und hat keinen Peer, sendet seine Einträge aber wie jede Rolle als `evt.log.append` (Absender `supervisor`) über den Hub an `storage`, solange `storage` verbunden ist (`DiagLog`, `src/supervisor/DiagLog.ahk`). Davor und zwischen zwei `storage`-Läufen (Neustart) warten sie in einer Warteschlange (höchstens `Role.LOG_QUEUE_MAX` = 500, die ältesten fallen heraus und werden gezählt), die beim `sys.hello` von `storage` in Reihenfolge geleert wird. Zusätzlich schreibt der Supervisor weiter auf stderr. Ein Fehler beim Senden loggt nicht erneut (Flag gegen Rekursion). Quellen des Supervisors: `supervisor`, `hub`, `children`, `shutdown`.
+
 ### 4.7 Dialoge
 
 Die Engine zeigt nie Dialoge. Muss der Benutzer reagieren, nimmt die Engine einen Worker (Dialog-Element, Modus `worker`) oder sendet an die UI-Rolle:
