@@ -36,6 +36,8 @@ class Executor {
         this._runs := Map()       ; instanceId -> run (Map, see _NewRun)
         this._counts := Map()     ; "flowId/elementId" -> countRuns (v1 semantics)
         this._lastRun := Map()    ; "flowId/elementId" -> "yyyy-MM-dd HH:mm:ss" of the last start
+        this._ticking := false    ; a Tick is running (see Tick)
+        this._tickAgain := false  ; a Tick was asked for while one was running
         this._counts.CaseSense := "Off"
         this._lastRun.CaseSense := "Off"
     }
@@ -115,7 +117,42 @@ class Executor {
     }
 
     ; Starts every ready thread. Called by Engine on each change and by its safety timer.
+    ;
+    ; Not re-entrant: AHK interrupts a timer thread that runs longer than ~15 ms for another one (the kick
+    ; timer and the safety timer both call Tick, and an element may call it through Kick). Two ticks that
+    ; overlap could both see the same thread as ready and start its element twice. A Tick that is asked for
+    ; while one runs only leaves a note; the running one loops once more (like PipeConnection.Pump).
     Tick() {
+        prev := Critical("On")  ; reason: testing and setting the flag is one step
+        if (this._ticking) {
+            this._tickAgain := true
+            Critical(prev)
+            return
+        }
+        this._ticking := true
+        Critical(prev)
+        try {
+            loop {
+                this._TickOnce()
+                prev := Critical("On")  ; reason: leaving and the note of a later Tick must not cross
+                if (!this._tickAgain) {
+                    this._ticking := false
+                    Critical(prev)
+                    break
+                }
+                this._tickAgain := false
+                Critical(prev)
+            }
+        } catch as e {
+            prev := Critical("On")  ; reason: the flag must be released even when a tick fails
+            this._ticking := false
+            this._tickAgain := false
+            Critical(prev)
+            throw e
+        }
+    }
+
+    _TickOnce() {
         budget := Executor.TICK_BATCH
         progress := true
         while (progress) {
@@ -147,7 +184,9 @@ class Executor {
     ; --- execution -----------------------------------------------------------------------------
 
     _Dispatch(run, thread) {
-        thread.Dispatch()
+        ; The thread must be ready. If another tick started it in between, this one must not start it again.
+        if (!thread.Dispatch())
+            return
         flowId := run["flowId"]
         elementId := thread.ElementId
         classId := run["flow"].ElementClass(elementId)
@@ -179,14 +218,26 @@ class Executor {
         params := Executor._ParamMap(run["flow"], thread.ElementId)
         env := Map("flowId", run["flowId"], "elementId", thread.ElementId, "instanceId", run["instanceId"]
             , "threadId", thread.Id)
-        execId := this._owner.workers.Run(classId, params, Executor._CopyMap(run["vars"]), env
-            , ObjBindMethod(this, "_OnWorkerDone", ctx))
-        if (execId = "") {
-            ctx.Finish("exception", "worker not available for " classId)
-            return
+        act := Map("cls", cls, "ctx", ctx, "params", Executor._Params(run["flow"], thread.ElementId))
+        ; Workers.Run may end the job before it returns (send error). The entry is made first so that the end
+        ; (_OnFinish) removes it, and the execId is added only if the job is still open. Without Critical a
+        ; stop between Run and the assignment would find an entry without execId and could not cancel the job.
+        prev := Critical("On")  ; reason: register, start and note the execId as one step (see above)
+        try {
+            run["active"][thread.Id] := act
+            execId := this._owner.workers.Run(classId, params, Executor._CopyMap(run["vars"]), env
+                , ObjBindMethod(this, "_OnWorkerDone", ctx))
+            current := run["active"].Get(thread.Id, "")
+            if (execId = "") {
+                run["active"].Delete(thread.Id)
+            } else if (IsObject(current) && ObjPtr(current) = ObjPtr(act)) {
+                act["execId"] := execId
+            }
+        } finally {
+            Critical(prev)
         }
-        run["active"][thread.Id] := Map("cls", cls, "ctx", ctx, "params", Executor._Params(run["flow"], thread.ElementId)
-            , "execId", execId)
+        if (execId = "")
+            ctx.Finish("exception", "worker not available for " classId)
     }
 
     ; Called by WorkerBridge when the job ends (bound: ctx first). Exports become thread variables.
@@ -274,9 +325,14 @@ class Executor {
 
     _EndRun(run, reason) {
         instId := run["instanceId"]
-        if (!this._runs.Has(instId))
-            return
-        this._runs.Delete(instId)
+        prev := Critical("On")  ; reason: ending is reported once, however often it is asked for
+        try {
+            if (!this._runs.Has(instId))
+                return
+            this._runs.Delete(instId)
+        } finally {
+            Critical(prev)
+        }
         this._owner.Emit("topic:flow:" run["flowId"], "evt.instance.ended"
             , Map("flowId", run["flowId"], "instanceId", instId, "reason", reason))
         this._owner.EmitFlowState(run["flowId"])

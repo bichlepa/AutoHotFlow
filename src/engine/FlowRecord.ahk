@@ -9,4 +9,11 @@ class FlowRecord {
         this.Rev := rev
         this.Enabled := false    ; Phase 2: a flag only, triggers are not armed (WI-14, Phase 3)
     }
+
+    ; Commits a new definition as the next revision. The Executor reads Def at every step (E1), so the
+    ; next step of every running instance sees it. Phase 3 calls this when a patch is applied.
+    Commit(def) {
+        this.Def := def
+        this.Rev += 1
+    }
 }

@@ -1,0 +1,117 @@
+#Requires AutoHotkey v2.0
+; Test owner for Executor (WI-21): a stand-in for Engine that records events instead of sending them.
+; Provides what Executor reads from its owner: flows (FlowTable), workers, Emit, EmitFlowState, Kick.
+#Include ..\..\..\src\engine\Executor.ahk
+#Include ..\..\..\src\engine\FlowTable.ahk
+#Include ..\..\..\src\elements\base\AhfElement.ahk
+#Include ..\..\..\src\elements\base\ElementRegistry.ahk
+
+; Stand-in for WorkerBridge. A job stays open until the test completes it.
+class FakeWorkers {
+    __New() {
+        this.runs := 0
+        this.jobs := Map()
+        this.hasFree := true
+        this.failAtOnce := false   ; Run ends the job at once and still returns the execId (send error)
+        this.hook := ""            ; called once, inside Usable() (an interruption point of Executor.Tick)
+        this.cancelled := []
+    }
+
+    Usable() {
+        h := this.hook
+        if (IsObject(h)) {
+            this.hook := ""
+            h()
+        }
+        return true
+    }
+
+    Free() => this.hasFree
+
+    Run(classId, params, imports, env, onDone) {
+        this.runs += 1
+        execId := "fx-" this.runs
+        if (this.failAtOnce) {
+            onDone("exception", "worker not available", Map())
+            return execId
+        }
+        this.jobs[execId] := onDone
+        return execId
+    }
+
+    Cancel(execId) {
+        this.cancelled.Push(execId)
+        this.jobs.Delete(execId)
+        return true
+    }
+
+    Complete(execId, result := "normal") {
+        onDone := this.jobs[execId]
+        this.jobs.Delete(execId)
+        onDone(result, "", Map())
+    }
+}
+
+class EngineOwner {
+    __New() {
+        this.flows := FlowTable()
+        this.workers := FakeWorkers()
+        this.events := []
+        this.kicks := 0
+        this.executor := Executor(this)
+    }
+
+    Emit(to, msgType, payload) {
+        this.events.Push(Map("to", to, "type", msgType, "payload", payload))
+    }
+
+    EmitFlowState(flowId) {
+        this.Emit("topic:flow:" flowId, "evt.flow.state"
+            , Map("flowId", flowId, "executing", this.executor.IsExecuting(flowId)))
+    }
+
+    Kick() {
+        this.kicks += 1
+    }
+
+    ; Dispatches until nothing is ready (one Tick does that, up to Executor.TICK_BATCH).
+    Drive() {
+        this.executor.Tick()
+    }
+
+    ; "type:n" of the evt.instance.* events, in order, "n" is the index of the instance in ids.
+    InstanceLog(ids) {
+        out := ""
+        for ev in this.events {
+            if (SubStr(ev["type"], 1, 13) != "evt.instance.")
+                continue
+            n := 0
+            for i, id in ids {
+                if (id = ev["payload"]["instanceId"])
+                    n := i
+            }
+            out .= (out = "" ? "" : ",") SubStr(ev["type"], 14) ":" n
+        }
+        return out
+    }
+
+    ; The states of one element as "state state ...".
+    ElementStates(elementId) {
+        out := ""
+        for ev in this.events {
+            if (ev["type"] = "evt.element.state" && ev["payload"]["elementId"] = elementId)
+                out .= (out = "" ? "" : " ") ev["payload"]["state"]
+        }
+        return out
+    }
+
+    ; The reason of the last evt.instance.ended.
+    LastEndReason() {
+        last := ""
+        for ev in this.events {
+            if (ev["type"] = "evt.instance.ended")
+                last := ev["payload"]["reason"]
+        }
+        return last
+    }
+}

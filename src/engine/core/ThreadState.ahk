@@ -54,13 +54,22 @@ class ThreadState {
 
     ; Checks the transition table. Returns true and changes State, or false and reports it.
     TryTransition(newState, reason := "") {
-        allowed := ThreadState.Transitions.Get(this.State, [])
-        for target in allowed {
-            if (target = newState) {
-                this.State := newState
-                return true
+        ok := false
+        prev := Critical("On")  ; reason: checking and changing the state is one step (an interrupting timer may race)
+        try {
+            allowed := ThreadState.Transitions.Get(this.State, [])
+            for target in allowed {
+                if (target = newState) {
+                    this.State := newState
+                    ok := true
+                    break
+                }
             }
+        } finally {
+            Critical(prev)
         }
+        if (ok)
+            return true
         ThreadState.ReportInvalid(this.OnInvalid, "thread " this.Id, this.State, newState, reason)
         return false
     }
@@ -73,12 +82,17 @@ class ThreadState {
     ; running -> finished, with the result and message of the element.
     ; Returns "finished", or "late" if the thread is no longer running (the caller logs f2).
     Finish(result, message := "") {
-        if (this.State != "running")
-            return "late"
-        this.TryTransition("finished", "element finished with result " result)
-        this.Result := result
-        this.Message := message
-        return "finished"
+        prev := Critical("On")  ; reason: only one of two racing Finish calls may win
+        try {
+            if (this.State != "running")
+                return "late"
+            this.TryTransition("finished", "element finished with result " result)
+            this.Result := result
+            this.Message := message
+            return "finished"
+        } finally {
+            Critical(prev)
+        }
     }
 
     ; Copy with a new ID. Keeps state, element, entry point, result and loop stacks (deep copy).

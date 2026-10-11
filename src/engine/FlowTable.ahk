@@ -35,6 +35,15 @@ class FlowTable {
         return out
     }
 
+    ; Removes a flow. Returns true if it was loaded. The caller stops its instances first
+    ; (Executor.FlowDeleted).
+    Remove(flowId) {
+        if (!this._records.Has(flowId))
+            return false
+        this._records.Delete(flowId)
+        return true
+    }
+
     ; Parses the text of a flow file and adds it as revision 1. Throws AhfError for invalid JSON,
     ; a wrong structure or a flow ID that is loaded already.
     Load(flowId, text) {
