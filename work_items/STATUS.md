@@ -131,6 +131,7 @@ Punkte, die bewusst nicht in Phase 2b behoben werden. Je Punkt: was, warum zurü
 | F-09 | `seq` der Engine-Ereignisse vertauscht bei 200 Instanzen | behoben | `4906f7d` |
 | F-10 | Trigger als Aktion ausgeführt (Race zwischen `Advance` und Dispatch-Timer) | behoben; ob `_Dispatch` und das Klonen in `Advance` dasselbe Muster haben, ist nicht geprüft | `887988b` |
 | F-25 | Ein von einem anderen Prozess dauerhaft gehaltenes Logfile verliert nach 3 s das ganze Bündel (bis 500 Zeilen) dieser Datei, nicht nur eine Zeile | offen, niedrig (gezählt und im Log vermerkt, F-04 unverändert) | `WI-25-storage-durchsatz.md` |
+| F-26 | `evt.process.exited` für `manager` gelegentlich mit `clean: false` bei sauberem Ende (`test_healthy_session_exits...`: 7 von 150 Läufen ohne WI-26 auf `f1efb7a`, 5 von 480 mit WI-26; nicht durch WI-26 verursacht). F-06 ist damit nicht vollständig behoben. Ursache nicht untersucht | offen, niedrig bis mittel | `phase2b/WI-26-json-wahrheitswerte.md` |
 
 ## Bekannte Probleme
 
