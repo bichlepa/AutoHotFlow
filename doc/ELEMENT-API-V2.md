@@ -26,6 +26,7 @@ class Action_Example extends AhfElement {
     static Level     := "Beginner"      ; "Beginner" | "Advanced" | "Programmer"
     static Stability := "Stable"        ; "Stable" | "Experimental"
     static Icon      := "example.ico"   ; Dateiname unter assets/Icons, "" = keins
+    static JobTimeoutMs := 0            ; nur Worker: Jobfrist in ms, 0 = keine (WI-27, ARCHITEKTUR 6.4)
 
     static Name()     => Lang("Example")            ; Anzeigename
     static Category() => Lang("General")
@@ -55,6 +56,8 @@ class Action_Example extends AhfElement {
 ```
 
 `TriggerVariables` ersetzt `Element_postTrigger_*`: Es liefert die Thread-Variablen (Name → Wert), die nach dem Ereignis gesetzt werden, und darf keine Seiteneffekte haben (läuft in der Engine, kein I/O).
+
+**Worker-Elemente und Blockieren (WI-27, ARCHITEKTUR 6.4):** Ein Worker-Element darf beliebig lange in einem Aufruf blockieren (Download, COM, `DllCall`, Dialog). Ein Worker mit Job wird nie angepingt und nie als hängend beendet. Zwei Folgen: Ein Abbruch (Stopp der Instanz) erreicht ein Element, das in einem einzigen Aufruf blockiert, nicht. Nach 2 s ohne Quittung lässt die Engine den ganzen Prozess beenden (es läuft nur ein Job je Worker, es geht nichts anderes verloren); `Stop(ctx, params)` des Elements läuft dann nicht mehr, Aufräumen im Element ist dort nicht möglich. Und: Ohne `JobTimeoutMs` hat der Job keine Frist (v1 hatte keine). Setzt eine Klasse `JobTimeoutMs` > 0, endet der Thread nach dieser Zeit mit dem Ergebnis `exception` und der Meldung "worker timeout", und das Element wird wie bei einem Abbruch beendet. Die Frist ist ein Klassenwert, kein Parameter; ein Parameter des Flows (z. B. "Timeout" bei einem Download) bleibt Sache des Elements.
 
 **Klassen-ID:** Nicht über `cls.Name` lesen. Eine Klasse mit `static Name()` verdeckt die eingebaute Eigenschaft, `cls.Name` ist dann eine Funktion. Die ID liefert `ElementRegistry.IdOf(cls)` (intern `Type(cls())`). Verifiziert in WI-09.
 

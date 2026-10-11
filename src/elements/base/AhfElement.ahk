@@ -12,6 +12,9 @@ class AhfElement {
     static Level := "Beginner"       ; "Beginner" | "Advanced" | "Programmer"
     static Stability := "Stable"     ; "Stable" | "Experimental"
     static Icon := ""                ; file name under assets/Icons, "" = none
+    ; Worker elements only: the engine ends the job with the exception "worker timeout" after this many ms and has
+    ; the worker killed if it does not react to the cancel (ARCHITEKTUR 6.4). 0 = no deadline (v1 had none).
+    static JobTimeoutMs := 0
 
     ; Runtime entry point of inline and worker elements. The base class has no behavior: a class
     ; that runs without its own Run is a bug and ends the execution with "exception".

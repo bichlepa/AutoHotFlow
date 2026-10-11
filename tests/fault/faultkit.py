@@ -149,8 +149,9 @@ class RoleProc:
         self._err.close()
 
 
-def write_flow(datadir, name, element_class=None):
-    """Flows/<name>.json: the skeleton flow, optionally with the sleep element replaced by element_class."""
+def write_flow(datadir, name, element_class=None, pars=None):
+    """Flows/<name>.json: the skeleton flow, optionally with the sleep element replaced by element_class
+    (with the parameters pars, default none)."""
     import json
     flow = json.loads(SKELETON_SRC.read_text(encoding="utf-8"))
     flow["name"] = name
@@ -158,7 +159,7 @@ def write_flow(datadir, name, element_class=None):
         element = flow["allElements"]["element0000000002"]
         element["class"] = element_class
         element["name"] = element_class
-        element["pars"] = {}
+        element["pars"] = dict(pars or {})
     path = Path(datadir) / "Flows" / (name + ".json")
     path.parent.mkdir(exist_ok=True)
     path.write_text(json.dumps(flow, ensure_ascii=False, indent=2), encoding="utf-8")
