@@ -84,6 +84,19 @@ Jede Nachricht ist ein JSON-Objekt mit festem Schema. Der Serializer schreibt di
 
 Alle Nutzlasten sind Objekte. `flowId`, `elementId`, `connectionId` sind die Bezeichner aus den Flow-Dateien (z. B. `Flow 1010290492`, `element0000000001`).
 
+**Umsetzungsstand am Ende von Phase 2 (WI-17, Abgleich mit `src/`, verifiziert durch Suche der Typnamen im Quelltext):** Alle Nachrichtentypen, die `src/` sendet oder registriert, stehen in diesem Katalog. Umgekehrt sind die folgenden Typen des Katalogs **noch nicht umgesetzt** (Entwurf für Phase 3 oder später). Ein Client darf sich auf sie noch nicht verlassen:
+
+| Bereich | Noch nicht umgesetzt |
+|---|---|
+| 4.2 Engine-Befehle | `cmd.flow.create`, `cmd.flow.delete`, `cmd.flow.meta.update`, `cmd.flow.save`, `cmd.trigger.enable`, `cmd.trigger.disable`, `cmd.category.*`, `cmd.settings.get/set` |
+| 4.3 Engine-Ereignisse | `evt.flow.committed`, `evt.flow.saved`, `evt.connection.state`, `evt.settings.changed` |
+| 4.4 Engine ↔ Triggerhost | alle (`cmd.trigger.arm`, `cmd.trigger.disarm`, `evt.trigger.fired`, `evt.trigger.error`); der Triggerhost (WI-14, optional) ist nicht gebaut, die Rolle `triggerhost` ist ein Platzhalter |
+| 4.5 | `cmd.engine.var.get` (Worker fragt Variable der Engine) |
+| 4.6 | `cmd.storage.settings.get/set` (steht dort bereits als "noch nicht umgesetzt") |
+| 4.7 Dialoge | `evt.ui.notice`, `cmd.ui.confirmDeleteFlowFile` |
+
+`cmd.flow.patch` ist umgesetzt, kennt aber nur das Schema und die Revisionsprüfung (die Operationen selbst kommen in Phase 3, siehe 4.2). Die Rolle `editor` ist ein Platzhalter (Exit 3), `manager` gibt es nur als Stub (`--ui=stub`, 4.8).
+
 ### 4.1 Lebenszyklus (`sys.*`)
 
 | Typ | Von → An | Nutzlast | Antwort / Wirkung |
