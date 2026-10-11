@@ -181,7 +181,9 @@ class Sup:
         """The supervisor interpreter: the child of ahkrun (ahkrun itself is self.proc)."""
         deadline = time.monotonic() + 5
         while time.monotonic() < deadline:
-            for c in psutil.Process(self.proc.pid).children(recursive=True):
+            # direct children only: with recursive=True the order is not defined, and a role below the
+            # supervisor could be picked by mistake
+            for c in psutil.Process(self.proc.pid).children(recursive=False):
                 try:
                     if "autohotkey" in c.name().lower():
                         return c.pid
