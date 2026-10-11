@@ -106,8 +106,8 @@ class Engine extends Role {
     EmitFlowState(flowId) {
         rec := this.flows.Get(flowId)
         enabled := IsObject(rec) ? rec.Enabled : false
-        this.Emit("topic:flow:" flowId, "evt.flow.state", Map("flowId", flowId, "enabled", enabled
-            , "executing", this.executor.IsExecuting(flowId)))
+        this.Emit("topic:flow:" flowId, "evt.flow.state", Map("flowId", flowId, "enabled", Json.Bool(enabled)
+            , "executing", Json.Bool(this.executor.IsExecuting(flowId))))
     }
 
     ; Asks for a dispatch tick soon (once, after the current message).
@@ -241,7 +241,8 @@ class Engine extends Role {
         list := []
         for rec in this.flows.All() {
             list.Push(Map("flowId", rec.FlowId, "name", rec.Def.Name, "category", rec.Def.Category
-                , "enabled", rec.Enabled, "executing", this.executor.IsExecuting(rec.FlowId), "rev", rec.Rev))
+                , "enabled", Json.Bool(rec.Enabled), "executing", Json.Bool(this.executor.IsExecuting(rec.FlowId))
+                , "rev", rec.Rev))
         }
         return Map("epoch", this.epoch, "seq", this.seq, "flows", list, "settings", Map())
     }
@@ -256,7 +257,7 @@ class Engine extends Role {
         instId := this.executor.StartFlow(rec, Engine.Optional(msg, "triggerId"))
         ; Policy wait while the flow runs: the instance is queued (PROTOCOL 4.2), "waiting" is only sent then.
         if (this.executor.IsWaiting(instId))
-            return Map("instanceId", instId, "waiting", true)
+            return Map("instanceId", instId, "waiting", Json.True)
         return Map("instanceId", instId)
     }
 

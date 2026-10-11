@@ -196,7 +196,7 @@ class StubManager extends Role {
             code := ""
             if (p.Has("error") && IsObject(p["error"]))
                 code := p["error"].Get("code", "")
-            this._Ui("stub.snapshot", Map("reason", reason, "ok", 0, "code", code))
+            this._Ui("stub.snapshot", Map("reason", reason, "ok", Json.False, "code", code))
             return
         }
         ep := p.Get("epoch", 0)
@@ -227,7 +227,7 @@ class StubManager extends Role {
                 this.peer.Subscribe("flow:" id)
             }
         }
-        this._Ui("stub.snapshot", Map("reason", reason, "ok", 1, "epoch", ep, "seq", sq, "flows", ids.Length))
+        this._Ui("stub.snapshot", Map("reason", reason, "ok", Json.True, "epoch", ep, "seq", sq, "flows", ids.Length))
         this.dirty := true
     }
 
@@ -248,8 +248,28 @@ class StubManager extends Role {
     }
 
     _OnTestAnswer(request, t, ans) {
-        this._Ui("stub.commandAnswer", Map("type", t, "ok", ans.payload.Get("ok", 0)))
-        this.peer.Reply(request, Map("ok", true, "answer", ans.payload))
+        this._Ui("stub.commandAnswer", Map("type", t, "ok", Json.Bool(ans.payload.Get("ok", 0))))
+        this.peer.Reply(request, Map("ok", true, "answer", StubManager._WireAnswer(ans.payload)))
+    }
+
+    ; The answer of the engine as it is passed on to the test client: Json.Parse read true/false as 1/0, so the
+    ; truth fields of the protocol are turned back into Json.True/Json.False (a copy, at any depth).
+    static _WireAnswer(node) {
+        static boolFields := "|ok|cancel|started|clean|restart|enabled|executing|exists|existed|waiting|byMeta|delete|"
+        if (node is Map) {
+            out := Map()
+            out.CaseSense := node.CaseSense
+            for key, value in node
+                out[key] := (InStr(boolFields, "|" key "|") && IsNumber(value)) ? Json.Bool(value) : StubManager._WireAnswer(value)
+            return out
+        }
+        if (node is Array) {
+            out := []
+            for item in node
+                out.Push(StubManager._WireAnswer(item))
+            return out
+        }
+        return node
     }
 
     ; --- window actions (called by StubGui; every request has a callback and a timeout) ----------
@@ -346,8 +366,8 @@ class StubManager extends Role {
     ; --- exit ----------------------------------------------------------------------------------
 
     _OnPrepareExit(msg) {
-        this._Ui("stub.prepareExit", Map("cancel", this.cancelExit ? 1 : 0))
-        return Map("ok", true, "cancel", this.cancelExit ? 1 : 0)
+        this._Ui("stub.prepareExit", Map("cancel", Json.Bool(this.cancelExit)))
+        return Map("ok", true, "cancel", Json.Bool(this.cancelExit))
     }
 
     ; --- log -----------------------------------------------------------------------------------

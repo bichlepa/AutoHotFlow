@@ -157,7 +157,7 @@ class Supervisor {
                         . Supervisor.MAX_DEADLINE_MS, ErrCode.BAD_PAYLOAD)
                 deadline := d
             }
-            return Map("started", this.shutdown.BeginExit("user", deadline, msg.from))
+            return Map("started", Json.Bool(this.shutdown.BeginExit("user", deadline, msg.from)))
         }
         if (msg.type = "cmd.app.command") {
             argv := msg.payload.Get("argv", "")

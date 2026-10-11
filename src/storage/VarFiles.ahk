@@ -25,11 +25,12 @@ class VarFiles {
         throw AhfError("unknown variable scope '" scope "'", ErrCode.BAD_PAYLOAD)
     }
 
-    ; Map(exists, type, content). exists is false when the metadata file is missing.
+    ; Map(exists, type, content), the payload of the answer (exists is Json.True/Json.False). exists is false
+    ; when the metadata file is missing.
     static Get(dataDir, scope, flowId, name) {
         stem := VarFiles.Stem(dataDir, scope, flowId, name)
         if (FileExist(stem ".ahfvd") = "")
-            return Map("exists", false)
+            return Map("exists", Json.False)
         meta := ""
         try {
             meta := Json.Parse(AtomicFile.ReadText(stem ".ahfvd"))
@@ -40,7 +41,7 @@ class VarFiles {
             throw AhfError("metadata of variable '" name "' is not a JSON object", ErrCode.INTERNAL)
         if (FileExist(stem ".ahfvar") = "")
             throw AhfError("content of variable '" name "' is missing", ErrCode.INTERNAL)
-        return Map("exists", true, "type", meta.Get("type", "normal")
+        return Map("exists", Json.True, "type", meta.Get("type", "normal")
             , "content", AtomicFile.ReadText(stem ".ahfvar"))
     }
 
@@ -74,7 +75,7 @@ class VarFiles {
             if (FileExist(stem ext) != "")
                 FileDelete(stem ext)
         }
-        return Map("existed", existed)
+        return Map("existed", Json.Bool(existed))
     }
 
     ; Names of the variables of one scope, sorted. Map("names", Array).

@@ -40,7 +40,22 @@ class Message {
             . ',"corr":' (this.corr = "" ? "null" : Json.Stringify(this.corr))
         if (this.timeoutMs > 0)
             text .= ',"timeoutMs":' Integer(this.timeoutMs)
-        return text ',"payload":' Json.Stringify(this.payload) "}"
+        return text ',"payload":' Json.Stringify(Message._WirePayload(this.payload)) "}"
+    }
+
+    ; The payload as it goes on the wire (doc/PROTOKOLL.md section 2). Code keeps `ok` as 1/0 (an AHK `if` on
+    ; Json.False would be true), so the field is turned into Json.True/Json.False here, the one place every
+    ; sender passes: Peer.Send/Reply, hub answers, sys.welcome. The payload itself is not changed (copy).
+    ; Other truth values are made with Json.Bool by the code that builds the payload.
+    static _WirePayload(payload) {
+        if (!(payload is Map) || !payload.Has("ok"))
+            return payload
+        ok := payload["ok"]
+        if (ok == Json.True || ok == Json.False)
+            return payload
+        wire := payload.Clone()
+        wire["ok"] := Json.Bool(ok)
+        return wire
     }
 
     ; Parses and validates one envelope. Throws ProtocolError (code bad_payload) on any problem.

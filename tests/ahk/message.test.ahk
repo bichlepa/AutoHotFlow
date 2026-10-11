@@ -195,6 +195,29 @@ CaseWithFromOnALargeFrame() {
 }
 
 TestRun.Init()
+CaseSerializeWritesOkAsBoolean() {
+    p := Map("ok", 1, "n", 2)
+    Assert.Equal(Message("a", "b", "b#3", "res.x", p, "b#1").Serialize()
+        , '{"to":"a","from":"b","id":"b#3","type":"res.x","corr":"b#1","payload":{"n":2,"ok":true}}')
+    Assert.Equal(Message("a", "b", "b#4", "res.x", Map("ok", 0), "b#1").Serialize()
+        , '{"to":"a","from":"b","id":"b#4","type":"res.x","corr":"b#1","payload":{"ok":false}}')
+    ; The payload is a copy on the wire: the sender's own map keeps the number, so `if p["ok"]` stays right.
+    Assert.Equal(p["ok"], 1)
+    Assert.Equal(Type(p["ok"]), "Integer")
+}
+
+CaseSerializeKeepsExplicitBooleans() {
+    text := Message("a", "b", "b#5", "evt.x", Map("ok", Json.False, "enabled", Json.True, "executing", Json.False)).Serialize()
+    Assert.Equal(text, '{"to":"a","from":"b","id":"b#5","type":"evt.x","corr":null,'
+        . '"payload":{"enabled":true,"executing":false,"ok":false}}')
+}
+
+CaseBooleansReadBackAsOneAndZero() {
+    msg := Message.Parse('{"to":"a","from":"b","id":"b#6","type":"res.x","corr":"b#1","payload":{"ok":true,"waiting":false}}')
+    Assert.Equal(msg.payload["ok"], 1)
+    Assert.Equal(msg.payload["waiting"], 0)
+}
+
 TestRun.Case("ParseHead reads all head fields of a serialized envelope", CaseParseHeadReadsAllFields)
 TestRun.Case("ParseHead reads corr and a missing timeoutMs", CaseParseHeadReadsCorrAndNoTimeout)
 TestRun.Case("ParseHead unescapes quotes and backslashes", CaseParseHeadUnescapesStrings)
@@ -223,4 +246,7 @@ TestRun.Case("ReadTo does not need a valid payload", CaseReadToIgnoresBrokenPayl
 TestRun.Case("ReadTo unescapes quotes and backslashes", CaseReadToUnescapes)
 TestRun.Case("ReadTo rejects a text whose first field is not to", CaseReadToRejectsOtherFirstField)
 TestRun.Case("ReadTo rejects an empty to", CaseReadToRejectsEmptyTo)
+TestRun.Case("serialize writes ok as a JSON boolean and leaves the payload unchanged", CaseSerializeWritesOkAsBoolean)
+TestRun.Case("serialize keeps explicit Json.True and Json.False", CaseSerializeKeepsExplicitBooleans)
+TestRun.Case("booleans on the wire are read as 1 and 0", CaseBooleansReadBackAsOneAndZero)
 TestRun.Finish()

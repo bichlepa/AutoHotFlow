@@ -345,14 +345,14 @@ class Children {
         if (rec["state"] != "hung" && (this.shuttingDown || rec["state"] = "stopping")) {
             rec["state"] := "exited"
             this.hub.Publish("process", "evt.process.exited", Map("name", name, "pid", rec["pid"]
-                , "clean", rec["bye"] && rec["byeClean"], "exitCode", exitCode))
+                , "clean", Json.Bool(rec["bye"] && rec["byeClean"]), "exitCode", exitCode))
             return
         }
         reason := (rec["state"] = "hung") ? "hung" : "exited"
         rec["state"] := "crashed"
         restart := this._ScheduleRestart(rec, now)
         this.hub.Publish("process", "evt.process.crashed", Map("name", name, "pid", rec["pid"], "reason", reason
-            , "exitCode", exitCode, "restart", restart))
+            , "exitCode", exitCode, "restart", Json.Bool(restart)))
         Log.Write("a0", "children", name " ended unexpectedly (" reason ", exit " exitCode
             . (Children.EXIT_TEXT.Has(exitCode) ? ": " Children.EXIT_TEXT[exitCode] : "") ")")
     }

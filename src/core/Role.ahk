@@ -245,7 +245,7 @@ class Role {
         if (this.closing)
             return
         this.closing := true
-        this.peer.Send("supervisor", "sys.bye", Map("clean", true))
+        this.peer.Send("supervisor", "sys.bye", Map("clean", Json.True))
         this.peer.Close()
         ExitApp(Role.EXIT_OK)
     }

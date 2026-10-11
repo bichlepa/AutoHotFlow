@@ -104,7 +104,7 @@ ByeIsReadBeforeTheExitIsReported() {
     s._Tick()
     ev := hub.Find("evt.process.exited")
     Assert.True(IsObject(ev), "evt.process.exited published")
-    Assert.Equal(ev["payload"]["clean"], true, "clean, because the bye was read first")
+    Assert.True(ev["payload"]["clean"] == Json.True, "clean, because the bye was read first")
 }
 
 ExitWithoutByeIsNotClean() {
@@ -114,7 +114,7 @@ ExitWithoutByeIsNotClean() {
     s._Tick()
     ev := hub.Find("evt.process.exited")
     Assert.True(IsObject(ev), "evt.process.exited published")
-    Assert.Equal(ev["payload"]["clean"], false)
+    Assert.True(ev["payload"]["clean"] == Json.False)
 }
 
 HubIsPumpedEveryTick() {
