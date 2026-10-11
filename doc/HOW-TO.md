@@ -939,3 +939,27 @@ Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge kor
 - **Richtig:** `Role._OnUnexpected` zählt jeden Fehler, meldet ihn und gibt 1 zurück, damit die Rolle weiterläuft; bei Überschreitung der Schwelle beendet `ExitApp(6)` im Handler den Prozess.
 - **Status:** verifiziert für `Exit` (Timer); `Return` und `ExitApp` nicht einzeln getestet.
 - **Quelle:** `src/core/Role.ahk`
+
+### Kopffelder eines JSON-Rahmens mit einem RegEx lesen, Nutzlast nur auf Klammern prüfen (WI-24)
+
+- **Problem:** Der Hub parste jeden Rahmen vollständig (`Json.Parse`, neue `Message`, `Serialize`): 220 ms für 109.232 Zeichen. Er braucht nur `to` und muss `from` ersetzen.
+- **Falsch:** Den Rahmen ganz parsen, "weil man dann auch prüft". Oder nur den Anfang lesen (`Message.ReadTo`) und den Rest ungeprüft anhängen: Dann könnte hinter der Nutzlast ein zweites `"from"` stehen, das ein Parser mit "letzter Schlüssel gewinnt" bevorzugt, und der Absender wäre gefälscht.
+- **Richtig:** Ein einziges `RegExMatch` auf den Text in genau der Form von `Message.Serialize` (Kopffelder in fester Reihenfolge, kein Leerraum), das die Nutzlast als ausgeglichenes Objekt mit PCRE-Rekursion erfasst und mit `\}\z` endet: `(?<obj>\{(?:[^{}"]++|"(?:[^"\\]++|\\.)*+"|(?&obj))*+\})\}\z`. Possessive Quantoren (`++`, `*+`) verhindern Backtracking. Passt nichts (anderer Aufbau, Leerraum, Text hinter der Nutzlast), liefert `ParseHead` `""` und der Aufrufer nimmt den alten, vollständigen Weg. Das RegEx in `try` setzen (Übersetzungs- und Grenzfehler werfen). Kosten: 1,3 ms für 109.232 Zeichen. Den neuen Rahmentext baut `SubStr` zusammen: `{"to":<roh>` + `,"from":` + neu + Rest ab `,"id"`.
+- **Falle (Heredoc):** Beim Schreiben der Quelle über ein Shell-Heredoc oder `python - <<EOF` wurde `\\` zu `\`, das RegEx scheiterte beim Übersetzen mit "missing terminating ] for character class". Die Datei mit dem Editor-Werkzeug schreiben (siehe AGENTS.md).
+- **Status:** verifiziert (`tests/ahk/message.test.ahk`, Fälle `ParseHead`/`WithFrom`; `tests/stress/test_big_flows.py`; Rahmen mit Text hinter der Nutzlast wird abgelehnt). Verhalten bei sehr tief verschachtelten Nutzlasten (PCRE-Rekursionsgrenze) **nicht geprüft**; dann gäbe das RegEx einen Fehler oder keinen Treffer und der volle Weg griffe.
+- **Quelle:** `src/core/ipc/Message.ahk`, `src/supervisor/Hub.ahk`
+
+### Der JSON-Parser braucht für einen Text mit vielen Escapes so lange wie für das Dokument selbst (WI-24)
+
+- **Problem:** Ein Flow (92.808 Zeichen) als Zeichenkette in einer Nachricht: `Message.Parse` des Rahmens 161 ms, danach `Json.Parse` des Flow-Texts 143 ms. Die Zeichenkette hat viele `\"` und wird Zeichen für Zeichen entpackt. Die Engine zahlt also für jede Flow-Datei doppelt (dazu 55 ms `Json.Stringify` im Storage).
+- **Falsch:** Anzunehmen, eine lange Zeichenkette sei billig, weil sie "nur ein Wert" ist.
+- **Richtig:** Gemessen, nicht behoben. Mögliche Wege (nicht umgesetzt): Flow-Text nicht als Zeichenkette senden (Nutzlast als Objekt, dann nur einmal parsen), oder die Datei direkt von der Engine lesen lassen (verletzt "Dateien nur im Storage"), oder ein schnellerer Parser (Frage "nativer JSON-Parser", WI-24 Punkt 6).
+- **Status:** verifiziert (Messung mit `tools/ahkrun.py`, 5 Läufe, Mittel; `work_items/phase2b/WI-24-hub-routing-laden.md`)
+- **Quelle:** `src/core/Json.ahk`
+
+### Eine Variable `hub` verdeckt die Klasse `Hub` (WI-24)
+
+- **Problem:** `hub := Hub("x", "y")` in einem Testskript: Ladefehler "This Class cannot be used as an output variable. Specifically: Hub". Bezeichner unterscheiden Groß- und Kleinschreibung nicht (wie bei `log`/`Log`, `role`/`Role`).
+- **Richtig:** Anders nennen (`theHub`).
+- **Status:** verifiziert
+- **Quelle:** `tests/ahk/helpers/hub_frame_cost.ahk`
