@@ -166,13 +166,13 @@ def write_flow(datadir, name, element_class=None):
 class Sup:
     """One supervisor process (ahkrun -> AutoHotFlow.ahk). Output goes to a file, not to a pipe."""
 
-    def __init__(self, procs, datadir, session, args, label="sup"):
+    def __init__(self, procs, datadir, session, args, label="sup", run_timeout=120):
         self.session = session
         self.pipe = "ahf.%s.hub" % session
         self.datadir = Path(datadir)
         self.stderr_path = self.datadir / ("%s.stderr" % label)
         self._err = open(self.stderr_path, "wb")
-        cmd = [sys.executable, str(AHKRUN), "--timeout", "120", str(ENTRY),
+        cmd = [sys.executable, str(AHKRUN), "--timeout", str(run_timeout), str(ENTRY),
                "--session=" + session, "--data=" + str(self.datadir), *args]
         self.t0 = time.perf_counter()
         self.proc = procs.start(cmd, stdout=self._err, stderr=self._err, cwd=str(ROOT))
@@ -274,14 +274,14 @@ def request_ok(client, to, type_, payload=None, timeout=5.0):
 class Chain:
     """A supervisor with its children, plus an observer. Use close() (the fixture does) to end everything."""
 
-    def __init__(self, procs, datadir, session, start, extra=(), label="sup"):
+    def __init__(self, procs, datadir, session, start, extra=(), label="sup", run_timeout=120):
         flows = Path(datadir) / "Flows"
         flows.mkdir(exist_ok=True)
         (flows / (SKELETON_FLOW + ".json")).write_bytes(SKELETON_SRC.read_bytes())
         args = ["--start=" + start, *extra]
         self.session = session
         self.procs = procs
-        self.sup = Sup(procs, datadir, session, args, label=label)
+        self.sup = Sup(procs, datadir, session, args, label=label, run_timeout=run_timeout)
         self.obs = connect(self.sup.pipe, "obs")
         self.rec = None
         self.frozen = set()
