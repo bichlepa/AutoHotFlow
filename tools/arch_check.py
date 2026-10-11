@@ -35,6 +35,8 @@ NO_DIALOG_ROLES = {"core", "engine", "supervisor", "storage", "triggerhost"}
 EXCEPTIONS = [
     ("core/Role.ahk", "file-io", r"FileAppend",
      "Role.Console writes to stderr ('**') with FileAppend, not to a file; documented in Role.ahk (F-05)."),
+    ("AutoHotFlow.ahk", "file-io", r"FileAppend",
+     "AhfConsole writes to stderr ('**') with FileAppend before Role.Console is loaded (WI-22), not to a file."),
     ("AutoHotFlow.ahk", "include-tests", r"tests\\integration\\helpers\\",
      "Entry point includes the test roles registered with --test-roles; resolved by WI-29."),
     ("core/RoleRegistry.ahk", "one-class", r"PlaceholderRole",

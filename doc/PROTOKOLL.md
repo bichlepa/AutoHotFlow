@@ -117,6 +117,8 @@ Alle Nutzlasten sind Objekte. `flowId`, `elementId`, `connectionId` sind die Bez
 **Exit-Codes des Supervisors** (`AutoHotFlow.ahk --role=supervisor`, Standard ohne `--role`):
 0 sauber (jedes Kind hat sich selbst beendet), 1 Start fehlgeschlagen (z. B. Mutex, ungültige Optionen), 5 mindestens ein Kind wurde nach Frist oder Hang beendet (`TerminateProcess`). Dieselben Zahlen stehen im Einstieg (`src/AutoHotFlow.ahk`). Die zweite Instanz nutzt 0 und 1 (siehe `cmd.app.command`).
 
+**Exit-Codes des Einstiegs vor dem Start der Rolle** (gelten für jede Rolle und den Supervisor, WI-22): 2 der Interpreter ist nicht 64 Bit (`A_PtrSize != 8`, Entscheidung E4; Meldung auf stderr: "AutoHotFlow v2 needs the 64-bit AutoHotkey v2 interpreter"; dieselbe 2 wie bei ungültigen Optionen oder unbekannter Rolle), 1 ein Fehler beim Laden der Dateien, bevor `AhfMain` läuft (z. B. eine Elementdatei, deren `ElementRegistry.Register` wirft; Meldung auf stderr, kein Dialog). Beide Prüfungen stehen im Einstieg vor allen `#Include`-Zeilen.
+
 ### 4.1a Prozessereignisse (Topic `process`, supervisor → Abonnenten)
 
 Jeder Eintrag trägt `name` (der Name, unter dem das Kind gestartet wurde, z. B. `engine`, `echo:a`) und `pid`, wo der Prozess bekannt ist.

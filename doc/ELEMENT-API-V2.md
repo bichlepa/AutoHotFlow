@@ -58,7 +58,7 @@ class Action_Example extends AhfElement {
 
 **Klassen-ID:** Nicht über `cls.Name` lesen. Eine Klasse mit `static Name()` verdeckt die eingebaute Eigenschaft, `cls.Name` ist dann eine Funktion. Die ID liefert `ElementRegistry.IdOf(cls)` (intern `Type(cls())`). Verifiziert in WI-09.
 
-**Registrierung:** Am Dateiende `ElementRegistry.Register(Action_Example)`. Die Registry ist ein `Map` mit `CaseSense := "Off"`. Ein generierter Include-Block pro Rolle (Engine, Editor, Worker, Triggerhost) bindet die Dateien ein, keine Textersetzung zur Laufzeit.
+**Registrierung:** Am Dateiende `ElementRegistry.Register(Action_Example)`. Das ist der einzige erlaubte Code auf Dateiebene. Er läuft beim Laden, vor `AhfMain`. Damit ein Fehler dort (doppelte Klasse, ungültiger `Mode`) keinen Dialog zeigt, setzt der Einstieg `src/AutoHotFlow.ahk` `OnError` als erste ausführbare Anweisung, **vor** den `#Include`-Zeilen (Handler `AhfLoadError`: Meldung auf stderr, Exit 1). Eine Elementdatei braucht dafür nichts zu tun. (Entscheidung WI-22: nicht die Registrierung in eine Funktion verlegen, weil das Hunderte Elementdateien in Phase 3 und die Vorlage änderte, ohne mehr zu fangen: der Handler deckt auch jeden anderen Code auf Dateiebene ab.) Die Registry ist ein `Map` mit `CaseSense := "Off"`. Ein generierter Include-Block pro Rolle (Engine, Editor, Worker, Triggerhost) bindet die Dateien ein, keine Textersetzung zur Laufzeit.
 
 **Parametercontainer:** `params` ist ein Objekt mit case-insensitivem Eigenschaftszugriff (`params.Duration` gleich `params.duration`), wie v1 es nutzt. Variablenablagen dagegen sind `Map` mit `CaseSense := "Off"`, damit Variablennamen wie in v1 groß-/kleinschreibungsunabhängig bleiben und v2-Objekte nicht verwechselt werden.
 
