@@ -60,7 +60,7 @@ WI-18 zuerst: Es verkürzt jeden folgenden Testlauf. WI-20 ist reine Dokumentati
 ## Fortschritt
 
 - [x] WI-18  - [x] WI-19  - [x] WI-20  - [x] WI-21  - [x] WI-22  - [x] WI-23
-- [ ] WI-24  - [ ] WI-25  - [ ] WI-26  - [ ] WI-27  - [ ] WI-28  - [ ] WI-29
+- [x] WI-24  - [ ] WI-25  - [ ] WI-26  - [ ] WI-27  - [ ] WI-28  - [ ] WI-29
 
 ## Funde
 
