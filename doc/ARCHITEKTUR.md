@@ -259,6 +259,15 @@ AutoHotFlow/
 └─ tools/                   # Konverter, Übersetzungswerkzeuge, Audit-Skripte
 ```
 
+**Ist-Stand am Ende von Phase 2 (WI-17, verglichen mit dem Dateibaum, verifiziert):** Die Struktur oben ist weiter das Ziel. Abweichungen und Lücken:
+
+- Vorhanden: `src/AutoHotFlow.ahk`, `core/` (zusätzlich `Role.ahk`, `RoleRegistry.ahk`, `Time.ahk`; `ipc/` zusätzlich `Deferred.ahk`, `PipeConnection.ahk`, `PipeListener.ahk`, `FrameReader.ahk`, `FrameWriter.ahk`), `supervisor/`, `engine/` (mit `core/` für Zustandsautomaten, Flowmodell, Scheduler), `storage/`, `worker/`, `manager/` (nur `StubManager.ahk` und `StubGui.ahk`), `elements/base/`.
+- **Nicht vorhanden (Phase 3 oder später):** `triggerhost/` (WI-14 optional, nicht gebaut; die Rolle ist in `RoleRegistry.ahk` ein Platzhalter), `editor/` (Platzhalter-Rolle), `ui_common/`, `assets/`, `elements/default/{actions,conditions,loops,triggers}/`. Statt `elements/default/` gibt es `elements/skeleton/` mit acht Demo- und Testelementen (`Trigger_Manual`, `Action_Sleep`, `Action_Do_nothing`, `Action_Test*`).
+- `tools/` enthält bisher nur `ahkrun.py` und `ahf_dialogwatch.py` (Laufwächter), keine Konverter.
+- **Bewusste Abweichung von der Einbindregel unten:** Der Einstieg `src/AutoHotFlow.ahk` bindet die Testrollen aus `tests/integration/helpers/` ein (`EchoRole`, `CrasherRole`, `HangerRole`, `SlowShutdownRole`). Sie sind nur mit `--test-roles` registriert (PROTOKOLL 4.1b). Das ist eine Abhängigkeit von `src/` auf `tests/`; vor einem Release auflösen (Phase 3: eigener Testeinstieg oder bedingtes Einbinden).
+- `core/RoleRegistry.ahk` enthält zwei Klassen (`RoleRegistry`, `PlaceholderRole`), entgegen der Konvention "eine Klasse pro Datei" (`KONVENTIONEN.md`). Offen.
+- `manager` wird im Einstieg registriert, nicht in `core/RoleRegistry.ahk` (wie `engine`, `storage`, `worker`), damit `core/` keine Rollenordner einbindet.
+
 Regel: Ein Ordner unter `src/` ist ein Prozess-Rollen- oder Bibliotheks-Modul. `core/` darf nichts aus Rollenordnern einbinden. Rollenordner binden nur `core/`, `ui_common/` (nur UI-Rollen) und `elements/` ein, nie einander.
 
 ---
