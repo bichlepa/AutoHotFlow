@@ -94,6 +94,11 @@ TestRun.Case("Heartbeat: a stand-still does not make a starting child hung", Sta
 TestRun.Case("Heartbeat: after a stand-still the ping schedule starts again", PingScheduleRestartsAfterStall)
 TestRun.Case("Heartbeat: a child that is silent after a stand-still is still found", SilentAfterStallIsStillHung)
 TestRun.Case("Heartbeat: a stand-still before the first tick is noticed too (Arm)", StallBeforeTheFirstTick)
+TestRun.Case("Heartbeat: a busy worker is not pinged and not hung (WI-27)", BusyWorkerIsNeitherPingedNorHung)
+TestRun.Case("Heartbeat: the pong time of a worker starts again when its job ends (WI-27)", PongTimeStartsAgainWhenTheJobEnds)
+TestRun.Case("Heartbeat: a worker without a job is hung as before (WI-27)", IdleWorkerWithoutPongIsHung)
+TestRun.Case("Heartbeat: only a worker can be busy (WI-27)", OnlyAWorkerCanBeBusy)
+TestRun.Case("Children: a hello before the pid is stored keeps the state ready and takes the pid (WI-27)", HelloBeforeThePidIsStored)
 
 ByeIsReadBeforeTheExitIsReported() {
     hub := FakeHub()
@@ -224,6 +229,70 @@ StallBeforeTheFirstTick() {
     hb.Tick(t0 + 9000)               ; frozen before the first tick ever ran
     Assert.Equal(r[2].State("echo"), "ready")
     Assert.Equal(r[3].Count("evt.process.hung"), 0)
+}
+
+; --- busy workers (WI-27) ---------------------------------------------------------------------------
+
+NewWorkerHeartbeat(t0) {
+    r := NewHeartbeat("ready", t0)
+    kids := r[2]
+    rec := kids._recs["echo"]
+    kids._recs.Delete("echo")
+    rec["name"] := "worker:1"
+    rec["role"] := "worker"
+    kids._recs["worker:1"] := rec
+    return r
+}
+
+BusyWorkerIsNeitherPingedNorHung() {
+    t0 := 100000
+    r := NewWorkerHeartbeat(t0)
+    r[2].OnBusy("worker:1", true, t0)
+    TickRegularly(r[1], t0, 20000)           ; 20 s without any pong
+    Assert.Equal(r[2].State("worker:1"), "ready")
+    Assert.Equal(r[3].Count("evt.process.hung"), 0)
+    Assert.Equal(r[3].sent.Length, 0, "not pinged")
+}
+
+PongTimeStartsAgainWhenTheJobEnds() {
+    t0 := 100000
+    r := NewWorkerHeartbeat(t0)
+    hb := r[1]
+    r[2].OnBusy("worker:1", true, t0)
+    TickRegularly(hb, t0, 20000)
+    r[2].OnBusy("worker:1", false, t0 + 20000)
+    hb.Tick(t0 + 20200)
+    Assert.Equal(r[2].State("worker:1"), "ready", "the 20 s of the job are not held against it")
+    TickRegularly(hb, t0 + 20200, Heartbeat.PONG_TIMEOUT_MS + 400)
+    Assert.Equal(r[2].State("worker:1"), "hung", "silent after the job: found as before")
+}
+
+IdleWorkerWithoutPongIsHung() {
+    t0 := 100000
+    r := NewWorkerHeartbeat(t0)
+    TickRegularly(r[1], t0, 7000)
+    Assert.Equal(r[2].State("worker:1"), "hung")
+}
+
+OnlyAWorkerCanBeBusy() {
+    t0 := 100000
+    r := NewHeartbeat("ready", t0)           ; the child is "echo"
+    r[2].OnBusy("echo", true, t0)
+    Assert.Equal(r[2].IsBusy("echo"), false)
+    TickRegularly(r[1], t0, 7000)
+    Assert.Equal(r[2].State("echo"), "hung")
+}
+
+; The child said hello while the supervisor was still inside Spawn (interrupted between CreateProcessW and the
+; storing of the pid): the record is ready and keeps the pid of the link.
+HelloBeforeThePidIsStored() {
+    t0 := 100000
+    r := NewHeartbeat("starting", t0)
+    kids := r[2]
+    kids._recs["echo"]["pid"] := 0
+    kids.OnHello(Map("name", "echo", "pid", 5151))
+    Assert.Equal(kids.State("echo"), "ready")
+    Assert.Equal(kids._recs["echo"]["pid"], 5151)
 }
 
 TestRun.Finish()

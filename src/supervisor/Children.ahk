@@ -241,6 +241,8 @@ class Children {
             return
         now := Time.NowMs()
         rec["state"] := "ready"
+        if (rec["pid"] = 0)         ; hello before Launch has stored the pid (see _Launch)
+            rec["pid"] := link["pid"]
         rec["readyAt"] := now
         rec["lastPongAt"] := now
         this.hub.Publish("process", "evt.process.ready", Map("name", name, "pid", link["pid"]))
@@ -252,14 +254,15 @@ class Children {
     }
 
     ; sys.busy of a worker. When the job ends, the pong times start again at "now": the worker was not asked while busy.
-    OnBusy(name, busy) {
+    OnBusy(name, busy, now := "") {
         if (!this._recs.Has(name) || this._recs[name]["role"] != "worker")
             return
         rec := this._recs[name]
         was := rec.Get("busy", false)
         rec["busy"] := busy ? true : false
         if (was && !busy) {
-            now := Time.NowMs()
+            if (now = "")
+                now := Time.NowMs()
             rec["lastPongAt"] := now
             rec["lastPingAt"] := now
         }
@@ -398,6 +401,19 @@ class Children {
         if (isRestart)
             cmd .= ' --restarted=' rec["restartTimes"].Length   ; the role knows it is a restart (engine: evt.engine.restarted)
         cmd .= cfg["roleOpts"]   ; --ui, --headless, --stub-cancel-exit (WI-13), "" when not given
+        ; The state is reset BEFORE the process starts. AHK may interrupt this thread between CreateProcessW and the
+        ; assignment of the pid (the hub handles messages meanwhile, and other requests such as cmd.process.spawn can
+        ; take long). The child can say sys.hello in that time: OnHello then sets "ready" first, and a reset after
+        ; Start would turn it back into "starting" for ever (WI-27: seen as a manager that never became ready).
+        rec["state"] := "starting"
+        rec["startedAt"] := now
+        rec["exitCode"] := ""
+        rec["bye"] := false
+        rec["byeClean"] := false
+        rec["restartAt"] := 0
+        rec["killAt"] := 0
+        rec["busy"] := false
+        rec["killReason"] := ""
         try {
             info := ChildLauncher.Start(cmd)
         } catch as e {
@@ -408,15 +424,6 @@ class Children {
         rec["handle"] := info["process"]
         rec["reader"] := info["reader"]
         rec["gone"] := false
-        rec["state"] := "starting"
-        rec["startedAt"] := now
-        rec["exitCode"] := ""
-        rec["bye"] := false
-        rec["byeClean"] := false
-        rec["restartAt"] := 0
-        rec["killAt"] := 0
-        rec["busy"] := false
-        rec["killReason"] := ""
         if (isRestart)
             this.hub.Publish("process", "evt.process.restarted", Map("name", rec["name"]
                 , "attempt", rec["restartTimes"].Length))
