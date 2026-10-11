@@ -113,27 +113,21 @@ def thaw(pid):
         pass
 
 
-def death_watch(pid, store):
-    """Records the perf_counter time when pid ends. Runs in a thread, so the test keeps reading events."""
+def death_watch(pid, store, codes=None):
+    """Records the perf_counter time when pid ends (and its exit code in codes, if given). Runs in a thread,
+    so the test keeps reading events. The exit code is only available while the watcher holds the process."""
     def run():
+        code = None
         try:
-            psutil.Process(pid).wait(timeout=90)
+            code = psutil.Process(pid).wait(timeout=90)
         except (psutil.Error, psutil.TimeoutExpired):
             pass
+        if codes is not None:
+            codes[pid] = code
         store[pid] = time.perf_counter()
     t = threading.Thread(target=run, name="death-%d" % pid, daemon=True)
     t.start()
     return t
-
-
-def exit_code_of(pid, timeout):
-    """Exit code of a process that ended (psutil waits on its handle on Windows), None if it did not end."""
-    try:
-        return psutil.Process(pid).wait(timeout=timeout)
-    except psutil.NoSuchProcess:
-        return "gone"
-    except psutil.TimeoutExpired:
-        return None
 
 
 class RoleProc:
