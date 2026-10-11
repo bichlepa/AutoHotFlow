@@ -718,3 +718,68 @@ _Noch keine Einträge._
 - **Richtig:** Fixture in `tests/fault/faultfixtures.py`, jedes Testmodul importiert sie (`from faultfixtures import chains`). Immer auch den Gesamtlauf (`python -m pytest tests -q`) prüfen, nicht nur den eigenen Ordner.
 - **Status:** verifiziert (Gesamtlauf war rot mit 2 Sammelfehlern, nach der Umstellung `427 passed, 1 skipped`).
 - **Quelle:** `tests/fault/faultfixtures.py`
+
+### Stresstests: ein AHK-Thread ist nach 15 ms unterbrechbar, Nummerieren und Senden gehören in einen Schritt (F-09)
+
+- **Problem:** Bei 200 parallelen Instanzen kamen `evt.*`-Ereignisse der Engine mit falscher Reihenfolge der `seq` an (253 nach 271). Gleiches mit dem echten Supervisor und mit dem Python-Hub (`WakingHub`), die Ursache lag also in der Engine. `Engine.Emit` vergab `seq` und rief danach `peer.Send` auf; AHK unterbricht einen Thread nach 15 ms, und der unterbrechende Thread (Timer oder Nachricht) sendete seine Ereignisse zuerst. Der Stub verwirft ein Ereignis mit kleinerem `seq` als "schon gesehen".
+- **Falsch:** `this.seq += 1`, dann serialisieren und senden, ohne den Ablauf zu schützen.
+- **Richtig:** `prev := Critical("On")`, `seq` vergeben und senden, im `finally` `Critical(prev)`. Gilt für jede Stelle, an der eine Reihenfolge zwischen "Nummer vergeben" und "abschicken" erhalten bleiben muss.
+- **Status:** verifiziert (vor der Änderung 2 von 2 Läufen mit vertauschter Reihenfolge; danach 3 von 3 Läufen am Python-Hub, und die 200-Instanz-Tests liefen in über 100 Läufen ohne vertauschte `seq`). Die Wirkung von `Critical` auf die Latenz anderer Nachrichten wurde nicht gesondert gemessen (die Messungen oben liegen nach der Änderung).
+- **Quelle:** `src/engine/Engine.ahk` (`Emit`), `tests/stress/test_parallel_instances.py`
+
+### Stresstests: ein Thread kann zwischen zwei Zeilen von einem Timer unterbrochen werden, Zwischenzustände sind sichtbar (F-10)
+
+- **Problem:** In 2 von 53 Läufen mit 200 parallelen Instanzen endete eine Instanz mit `exception` und der Meldung "element Trigger_Manual cannot be an action (mode trigger)". `Scheduler.Advance` setzt den Thread auf `ready` (`TryTransition`) und erst einige Zeilen später auf das nächste Element (`target.ElementId := ...`). Der Dispatch-Timer (`Executor.Tick`) unterbrach dazwischen und führte den Thread mit dem alten Element, dem Trigger, als Aktion aus.
+- **Falsch:** Einen Zustand veröffentlichen (hier: `ready` im Thread-Zustand), bevor die zugehörigen Felder gesetzt sind, in Code, der von Timern unterbrochen werden kann.
+- **Richtig:** Den Übergang als Ganzes unter `Critical` ausführen (`Executor._Advance`) oder die Felder vor dem Zustandswechsel setzen. Wirkung: 60 von 60 Läufen des 50/200-Instanz-Tests ohne Ausfall. Der Fehler trat vorher ohne erkennbares Muster auf (nicht in 12 Einzelläufen, einmal in 10 Gesamtläufen, einmal im 31. Wiederholungslauf). Weitere Stellen mit demselben Muster (z. B. `_Dispatch` zwischen `thread.Dispatch()` und dem Eintrag in `run["active"]`, `Scheduler.Advance` beim Klonen) wurden nicht geprüft.
+- **Status:** Ursache verifiziert (Meldung und Quelltext passen zusammen; direkter Nachweis der Unterbrechung nicht erbracht), Behebung statistisch belegt (60/60).
+- **Quelle:** `src/engine/Executor.ahk` (`_Advance`), `src/engine/core/Scheduler.ahk` (`Advance`), `tests/stress/test_parallel_instances.py`
+
+### Verbindungsobjekt wird nie freigegeben: Referenzzyklus über `ObjBindMethod(this, ...)` (F-07)
+
+- **Problem:** Der Supervisor wuchs um rund 83 KB je Client-Verbindung (400 Verbindungen: 25 → 58 MB), obwohl `num_handles` konstant blieb. AHK v2 zählt Verweise: `this._pollFn := ObjBindMethod(this, "Pump")` in `PipeConnection.__New` ist ein Zyklus (Objekt → gebundene Funktion → Objekt). Das geschlossene Objekt mit seinem 64-KiB-Lesepuffer (`_readBuf`) und dem Rahmenpuffer des `FrameReader` wird nie freigegeben.
+- **Falsch:** Auf `num_handles` allein prüfen. Ein Objekt, das gebundene Funktionen von sich selbst in Feldern hält, schliessen, ohne die Felder zu leeren.
+- **Richtig:** Zyklus beim Schliessen brechen. Probelauf: in `PipeConnection._NotifyClose` nach dem `OnClose`-Handler `this._pollFn := ""` und `this._notifyFn := ""`. Danach 17,47 → 17,49 MB nach 800 Verbindungen (vorher +16 MB je 200), und alle 133 Tests von `tests/integration` und `tests/e2e` blieben grün. Die Änderung liegt in `src/core/` und wurde **nicht übernommen** (nur nach Absprache); der Test `test_many_connects_keep_the_memory_of_the_supervisor_flat` bleibt rot. Sauberer wäre, die Funktionen gar nicht im Objekt zu halten. Dieselbe Bauart (`ObjBindMethod(this, ...)` in einem Feld) steht auch in anderen Klassen: nicht gesucht, nicht geprüft.
+- **Status:** verifiziert (Messung und Probelauf mit Korrektur), Korrektur nicht im Code.
+- **Quelle:** `src/core/ipc/PipeConnection.ahk` (`__New`, `_NotifyClose`), `tests/stress/test_clients_churn.py`
+
+### Der Prozessstatus `ready` heisst nicht, dass die Engine ihre Flows geladen hat
+
+- **Problem:** `cmd.flow.start` kurz nach `ready` in `cmd.process.list` antwortete `not_found` ("flow 'slow' is not loaded"). `ready` bedeutet nur, dass die Rolle `sys.hello` gesendet hat; die Engine lädt ihre Flows danach über den Storage (`evt.engine.ready`).
+- **Richtig:** Nach `ready` `cmd.engine.snapshot` wiederholen, bis die Flows in `flows` stehen (`StressChain.wait_flows`).
+- **Status:** verifiziert (Test war rot, danach grün)
+- **Quelle:** `tests/stress/stresskit.py`
+
+### Python-Client: `events(timeout)` endet erst nach Stille
+
+- **Problem:** `AhfClient.events(timeout=0.3)` ist kein Zeitfenster, sondern "Ende nach 0,3 s ohne neue Nachricht". Läuft ein Flow, kommen ständig Ereignisse, die Schleife endete nie, 20 Threads hingen bis zur Frist.
+- **Falsch:** `sum(1 for _ in client.events(timeout=0.3))`, um 0,3 s lang zu lauschen.
+- **Richtig:** Schleife mit eigener Endzeit und `client._next_event(restzeit)` (`listen` in `test_clients_churn.py`). Jede Warteschleife in einem Test braucht eine eigene Frist samt Meldung (`thread_stacks` in `stresskit.py` gibt die Stapel der hängenden Threads aus).
+- **Status:** verifiziert (Hänger bis zur pytest-Frist, danach grün)
+
+### Python-Clients ohne Fenster: Latenz 210 bis 270 ms, wenn der Hub nicht geweckt wird
+
+- **Problem:** Messungen der Antwortzeit mit `AhfClient` zeigten Median 226 ms. Der Hub sieht Schreibzugriffe eines Clients ohne Weckruf erst auf seinem 250-ms-Takt.
+- **Richtig:** Nach jedem Schreiben `PostMessage(WM_AHF_WAKE)` an das Skriptfenster des Supervisors (Klasse `AutoHotkey` der Prozess-ID, `hwnd_of` in `tests/stress/stresskit.py`). Dann Median 1,4 ms. Für Messungen "wie ein AHK-Client" immer so, für den Fall ohne Weckruf gibt es einen eigenen Test.
+- **Status:** verifiziert (10 Läufe: 226 ms ohne, 1,4 ms mit Weckruf)
+
+### Storage schreibt das Log mit rund 30 Zeilen je Sekunde (F-08)
+
+- **Problem:** Der Manager-Stub schreibt jedes Engine-Ereignis über den Storage ins Log (zwei Dateien). Bei rund 290 Ereignissen/s (200 parallele Instanzen und mehr) wuchs der Storage innerhalb von 20 s von 17 auf 56 MB; das Log lief noch 207 s nach dem Ende der Last. Die Warteschlange ist unbegrenzt, und `WriteQueue` führt eine Operation je Timer aus (gelesen); bei rund 15,6 ms Timer-Auflösung wären das etwa 64 Operationen/s, also 32 Zeilen/s bei zwei Dateien (gemessen: 28 Zeilen/s).
+- **Falsch:** Annehmen, dass der Storage jede Menge Log-Zeilen annimmt, und im Dauerlauf mit mehr als etwa 30 Ereignissen/s arbeiten.
+- **Richtig:** Das ist ein Befund, keine Lösung: aufeinanderfolgende Anhänge an dieselbe Datei in einer Operation bündeln oder je Scheibe mehrere Operationen ausführen, und die Warteschlange begrenzen. Bis dahin hält der Dauerlauf (`test_soak.py`) die Last bei rund 20 Ereignissen/s.
+- **Status:** verifiziert für das Verhalten (Messung, RSS kehrt nach dem Abfluss auf 17 MB zurück, also kein Leck); dass `WriteQueue.RunOne` eine Operation je Timer ausführt, ist gelesen; dass die Timer-Auflösung (rund 15,6 ms) den Durchsatz von 28 Zeilen/s erklärt, ist geschlossen und nicht einzeln nachgemessen: vermutet.
+- **Quelle:** `src/storage/WriteQueue.ahk`, `tests/stress/test_log_backlog.py`
+
+### Stresstests: voller Umfang nur mit `-m`, Smoke-Variante im Standardlauf
+
+- **Problem:** Marker allein schliessen einen Test nicht aus dem Standardlauf aus (es gibt keine `addopts`). Der volle Umfang (200 Instanzen, 1000 Zyklen, 30 s Idle, Flut) würde `python -m pytest tests -q` um Minuten verlängern.
+- **Richtig:** `tests/conftest.py` wirft Tests mit dem Marker `stress` oder `soak` aus der Auswahl, wenn `-m` den Namen nicht enthält. Pro Test gibt es eine unmarkierte Smoke-Variante (`pytest.param(..., id="smoke")`), die im Standardlauf bleibt. Aufruf: `python -m pytest tests -m stress -q`, Dauerlauf `AHF_SOAK_SECONDS=600 python -m pytest tests -m soak -q`.
+- **Status:** verifiziert (Standardlauf und `-m stress` gesammelt und ausgeführt)
+- **Quelle:** `tests/conftest.py`
+
+### `-k "not memory"` schliesst auch den Idle-CPU-Test aus
+
+- **Problem:** Beim Wiederholungslauf `-k "not memory and not backlog"` fehlte die Idle-CPU-Messung, weil der Testname `test_idle_cpu_and_memory_...` "memory" enthält. Es fiel erst bei der Auswertung auf.
+- **Richtig:** Nach dem Lauf die Zahl der Messzeilen je Name prüfen (`AHF_MEASURE_OUT`), nicht nur "7 passed".
+- **Status:** verifiziert
