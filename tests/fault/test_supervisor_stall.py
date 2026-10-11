@@ -37,9 +37,16 @@ def test_supervisor_stand_still_does_not_make_healthy_children_hung(chains, roun
         sup.resume()
     time.sleep(SETTLE_S)
     hung = chain.rec.find(lambda m: m.get("type") in ("evt.process.hung", "evt.process.crashed"))
-    assert not hung, "children judged after the stand-still: %s\n%s" % (hung, chain.sup.text())
+    if hung:
+        chain.request_exit()
+        chain.sup.wait_exit(timeout=30)
+    assert not hung, "children judged after the stand-still: %s\n%s" % ([m["payload"] for _, m in hung],
+                                                                        chain.sup.text())
     after = chain.states()
     for name, pid in before.items():
         assert after[name]["pid"] == pid and after[name]["state"] == "ready", (name, after[name])
     assert "flows" in chain.snapshot_ok()
+    # ahkrun copies the stderr of the supervisor only when it ends: end the session, then read the log
+    assert chain.request_exit()["payload"]["started"]
+    assert chain.sup.wait_exit(timeout=30) == 0, chain.sup.text()
     assert "supervisor stood still" in chain.sup.text(), "stand-still not noticed: " + chain.sup.text()

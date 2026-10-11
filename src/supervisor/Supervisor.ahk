@@ -108,6 +108,7 @@ class Supervisor {
         this.hub.Start()
         for entry in this.startList
             this.children.Spawn(entry)
+        this.heartbeat.Arm(Time.NowMs())
         SetTimer(Supervisor.TickFn, Supervisor.TICK_MS)
         Log.Write("a1", "supervisor", "session " this.session " running, hub " this.pipe)
     }

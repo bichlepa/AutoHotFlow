@@ -25,6 +25,11 @@ class Heartbeat {
         this._lastTickAt := 0
     }
 
+    ; Called once when the supervisor starts its timer, so that a stand-still before the first tick is noticed too.
+    Arm(now) {
+        this._lastTickAt := now
+    }
+
     Tick(now) {
         if (this._lastTickAt > 0 && now - this._lastTickAt > Heartbeat.PING_EVERY_MS) {
             Log.Write("a1", "heartbeat", "supervisor stood still for " Integer(now - this._lastTickAt)

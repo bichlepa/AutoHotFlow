@@ -93,6 +93,7 @@ TestRun.Case("Heartbeat: a stand-still of the supervisor does not make a ready c
 TestRun.Case("Heartbeat: a stand-still does not make a starting child hung", StallDoesNotHangStartingChild)
 TestRun.Case("Heartbeat: after a stand-still the ping schedule starts again", PingScheduleRestartsAfterStall)
 TestRun.Case("Heartbeat: a child that is silent after a stand-still is still found", SilentAfterStallIsStillHung)
+TestRun.Case("Heartbeat: a stand-still before the first tick is noticed too (Arm)", StallBeforeTheFirstTick)
 
 ByeIsReadBeforeTheExitIsReported() {
     hub := FakeHub()
@@ -213,6 +214,16 @@ SilentAfterStallIsStillHung() {
     hb.Tick(t0 + 20000)              ; stand-still, reset
     TickRegularly(hb, t0 + 20000, Heartbeat.PONG_TIMEOUT_MS + 400)
     Assert.Equal(r[2].State("echo"), "hung")
+}
+
+StallBeforeTheFirstTick() {
+    t0 := 100000
+    r := NewHeartbeat("ready", t0)
+    hb := r[1]
+    hb.Arm(t0)                       ; the supervisor starts its timer
+    hb.Tick(t0 + 9000)               ; frozen before the first tick ever ran
+    Assert.Equal(r[2].State("echo"), "ready")
+    Assert.Equal(r[3].Count("evt.process.hung"), 0)
 }
 
 TestRun.Finish()
