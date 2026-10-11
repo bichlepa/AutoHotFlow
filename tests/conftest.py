@@ -24,6 +24,16 @@ TESTS_DIR = Path(__file__).resolve().parent
 RUN_COUNTER = itertools.count(1)
 
 
+@pytest.hookimpl(tryfirst=True)
+def pytest_cmdline_main(config):
+    """Measurements must never run in parallel with other load (idle CPU, latency, memory): a run that asks
+    for stress or soak tests (-m stress / -m soak) is switched to a single process, whatever pytest.ini says."""
+    asked = config.getoption("markexpr") or ""
+    if ("stress" in asked or "soak" in asked) and getattr(config.option, "numprocesses", 0):
+        config.option.numprocesses = 0
+        config.option.dist = "no"
+
+
 def pytest_configure(config):
     config.addinivalue_line("markers", "stress: long-running stress test, run with -m stress")
     config.addinivalue_line("markers", "soak: endurance test (minutes), run with -m soak")

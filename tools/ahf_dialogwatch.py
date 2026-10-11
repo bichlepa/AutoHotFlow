@@ -182,7 +182,7 @@ class DialogWatcher:
     """Background thread. Register root pids with watch(); their process trees are observed."""
 
     def __init__(self, poll_interval=0.15, kill_process=True):
-        self._roots = set()
+        self._roots = {}                  # pid -> process creation time (a recycled pid is not the same process)
         self._events = []
         self._lock = threading.Lock()
         self._poll = poll_interval
@@ -193,8 +193,12 @@ class DialogWatcher:
         self._thread.start()
 
     def watch(self, pid):
+        try:
+            created = psutil.Process(pid).create_time()
+        except psutil.Error:
+            return                        # already gone: nothing to watch, and the pid may be reused soon
         with self._lock:
-            self._roots.add(pid)
+            self._roots[pid] = created
 
     def events(self, pid=None):
         """Events seen so far (for the process tree of pid, or all)."""
@@ -208,6 +212,24 @@ class DialogWatcher:
     def stop(self):
         self._stop.set()
 
+    def _live_roots(self):
+        """Root pids whose process still is the one that was registered. Windows reuses pids quickly; a stale
+        root would make this watcher close and kill dialogs of an unrelated process (seen with pytest-xdist,
+        where several watchers run side by side)."""
+        with self._lock:
+            items = list(self._roots.items())
+        live = set()
+        for pid, created in items:
+            try:
+                if psutil.Process(pid).create_time() == created:
+                    live.add(pid)
+                    continue
+            except psutil.Error:
+                pass
+            with self._lock:
+                self._roots.pop(pid, None)
+        return live
+
     def _tree(self, roots):
         pids = set(roots)
         for r in roots:
@@ -220,8 +242,7 @@ class DialogWatcher:
     def _run(self):
         while not self._stop.is_set():
             try:
-                with self._lock:
-                    roots = set(self._roots)
+                roots = self._live_roots()
                 if roots:
                     pids = self._tree(roots)
                     for hwnd in _top_windows():
@@ -235,7 +256,7 @@ class DialogWatcher:
     def _handle(self, hwnd, pid):
         os.makedirs(OUT_DIR, exist_ok=True)
         self._counter += 1
-        base = os.path.join(OUT_DIR, "%s_pid%d_%d" % (time.strftime("%Y%m%d-%H%M%S"), pid, self._counter))
+        base = os.path.join(OUT_DIR, "%s_pid%d_w%d_%d" % (time.strftime("%Y%m%d-%H%M%S"), pid, os.getpid(), self._counter))
         try:
             pname = psutil.Process(pid).name()
         except psutil.Error:

@@ -770,10 +770,39 @@ Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge kor
 
 ### Stresstests: voller Umfang nur mit `-m`, Smoke-Variante im Standardlauf
 
-- **Problem:** Marker allein schliessen einen Test nicht aus dem Standardlauf aus (es gibt keine `addopts`). Der volle Umfang (200 Instanzen, 1000 Zyklen, 30 s Idle, Flut) würde `python -m pytest tests -q` um Minuten verlängern.
+- **Problem:** Marker allein schliessen einen Test nicht aus dem Standardlauf aus (die `addopts` in `pytest.ini` betreffen nur die Parallelität). Der volle Umfang (200 Instanzen, 1000 Zyklen, 30 s Idle, Flut) würde `python -m pytest tests -q` um Minuten verlängern.
 - **Richtig:** `tests/conftest.py` wirft Tests mit dem Marker `stress` oder `soak` aus der Auswahl, wenn `-m` den Namen nicht enthält. Pro Test gibt es eine unmarkierte Smoke-Variante (`pytest.param(..., id="smoke")`), die im Standardlauf bleibt. Aufruf: `python -m pytest tests -m stress -q`, Dauerlauf `AHF_SOAK_SECONDS=600 python -m pytest tests -m soak -q`.
 - **Status:** verifiziert (Standardlauf und `-m stress` gesammelt und ausgeführt)
 - **Quelle:** `tests/conftest.py`
+
+### Parallele Testläufe (pytest-xdist): gleiches AHK-Skript startet mehrfach
+
+- **Problem:** Beim ersten Lauf mit `-n 8` scheiterten 21 Tests von `tests/test_ahk_runner.py` mit "case not reported ... exit=15". Ursache: Mehrere Worker starteten dieselbe `*.test.ahk`-Datei gleichzeitig. AHK v2 fragt dann "An older instance of this script is already running. Replace it?" (Standardverhalten ohne `#SingleInstance Off`); der Dialog-Wächter schloss den Dialog und beendete den Prozess (`psutil.kill` liefert unter Windows Exit-Code 15). Die Dialogberichte in `%TEMP%\ahf_dialogs\` zeigten es sofort.
+- **Falsch:** Annehmen, dass Isolation über Datenverzeichnis und Sitzungs-ID reicht. Das gilt für Daten und Pipes, nicht für das Skript selbst.
+- **Richtig:** `#SingleInstance Off` in jedes Skript, das ein Test als Hauptskript starten kann (`tests/ahk/lib/Assert.ahk`, `tests/ahk/helpers/*.ahk`; `src/AutoHotFlow.ahk` und die Hilfsskripte in `tests/integration/helpers/` hatten es schon). Dateinamen des Dialog-Wächters enthalten jetzt zusätzlich die PID des Testprozesses (`_w<pid>_`).
+- **Status:** verifiziert (21 Fehler vorher, danach `-n 8` grün)
+- **Quelle:** `tests/ahk/lib/Assert.ahk`, `tools/ahf_dialogwatch.py`
+
+### Dialog-Wächter: wiederverwendete Prozess-IDs (mehrere Watcher nebeneinander)
+
+- **Problem:** Unter xdist schlugen sporadisch `tests/support/test_dialogwatch.py` fehl (Exit 0 statt 97): Der Wächter eines anderen Workers hatte den Dialog geschlossen und den Prozess beendet. Ursache (aus dem Code abgeleitet, die Lücke ist geschlossen, der Einzelfall nicht nachgestellt): Die Wurzel-PIDs blieben im Wächter für immer registriert; Windows vergibt PIDs schnell neu, und eine Test-PID eines anderen Workers lag dann im "Prozessbaum" einer alten Wurzel.
+- **Falsch:** PIDs allein als Identität eines Prozesses behandeln und nie austragen.
+- **Richtig:** Zur PID die Erstellungszeit merken (`psutil.Process(pid).create_time()`), tote oder wiederverwendete Wurzeln vor jedem Durchlauf austragen (`DialogWatcher._live_roots`).
+- **Status:** Lücke verifiziert durch Lesen, Behebung durch Läufe geprüft (siehe Ergebnis in `work_items/phase2b/WI-18-testlaufzeit.md`); Auslöser des Ausfalls vermutet.
+- **Quelle:** `tools/ahf_dialogwatch.py`
+
+### Supervisor: `sys.bye` konnte nach dem Prozessende gelesen werden
+
+- **Problem:** Einmal in 6 parallelen Läufen meldete `test_frozen_storage_is_terminated_at_the_deadline_and_the_others_exit_clean`, der Manager sei nicht sauber beendet (`clean` falsch). Die Rolle sendet `sys.bye` und beendet sich; der Tick des Supervisors konnte das Prozessende sehen, bevor er das noch ungelesene `sys.bye` aus der Pipe gelesen hatte.
+- **Richtig:** `Supervisor._Tick` ruft zuerst `hub.Pump()` auf, dann `children.Tick`. Nicht nachgestellt (nur unter Last aufgetreten), die Reihenfolge im Code ist gelesen.
+- **Status:** Reihenfolge verifiziert (gelesen); dass dies die Ursache des Ausfalls war, ist vermutet.
+- **Quelle:** `src/supervisor/Supervisor.ahk`
+
+### Messungen und xdist
+
+- **Problem:** Idle-CPU- und Latenzmessungen werden unter paralleler Last verfälscht.
+- **Richtig:** `tests/conftest.py` setzt bei `-m stress` / `-m soak` `numprocesses = 0` in `pytest_cmdline_main` (`tryfirst`), das überschreibt `addopts = -n auto`. Geprüft: `-m stress` auf einer Datei läuft ohne `[gw..]`-Worker.
+- **Status:** verifiziert
 
 ### `-k "not memory"` schliesst auch den Idle-CPU-Test aus
 

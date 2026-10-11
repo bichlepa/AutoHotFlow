@@ -81,4 +81,11 @@ pytest tests/e2e tests/fault -q                  # Gesamtsystem
 pytest tests/stress -q -m stress                 # lang, nur auf Wunsch
 ```
 
+**Parallel (Standard seit WI-18).** `pytest.ini` setzt `addopts = -n auto --dist loadgroup` (pytest-xdist, auf diesem Rechner 8 Worker). `python -m pytest tests -q` läuft damit in rund 50 s (seriell rund 340 s). Seriell: `-n 0`. Regeln dazu:
+
+- Läufe mit `-m stress` oder `-m soak` schaltet `tests/conftest.py` (`pytest_cmdline_main`) selbst auf einen Prozess. Messungen (Idle-CPU, Latenz, Speicher) dürfen nie parallel zu anderer Last laufen.
+- Der Marker für Gruppen ist `@pytest.mark.xdist_group("name")` (mit `--dist loadgroup` laufen Tests derselben Gruppe auf demselben Worker nacheinander). Bisher ist keine Gruppe nötig.
+- Jeder Test braucht eigene Namen (Sitzung, Datenverzeichnis, Pipe). Keine Zählung "aller AutoHotkey-Prozesse", Prozesse immer über die Sitzungs-ID im Befehl erkennen (`faultkit.session_processes`).
+- AHK-Testskripte brauchen `#SingleInstance Off` (steht in `tests/ahk/lib/Assert.ahk` und den Helfern), sonst fragt AHK beim zweiten gleichzeitigen Start desselben Skripts nach und der Dialog-Wächter beendet den Lauf (Exit 15).
+
 Umgebungsvariablen: `AHF_AHK2_EXE` (Pfad zum Interpreter), `AHF_TEST_KEEP=1` (Datenverzeichnisse nach dem Test behalten).

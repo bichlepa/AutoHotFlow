@@ -178,6 +178,13 @@ class Supervisor {
 
     _Tick() {
         now := Time.NowMs()
+        ; Read what has arrived before looking for ended processes: a child sends sys.bye and exits, and the
+        ; exit must not be seen before its bye (else the exit is reported as not clean).
+        try {
+            this.hub.Pump()
+        } catch as e {
+            Log.Write("a0", "supervisor", "hub pump failed: " Type(e) ": " e.Message)
+        }
         try {
             this.hub.Tick(now)
         } catch as e {

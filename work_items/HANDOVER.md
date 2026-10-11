@@ -32,7 +32,7 @@ Vor Phase 3 kommt eine Härtungsphase: `work_items/phase2b/README.md` (Entscheid
 - Nichts unter `v1/` ändern.
 - Commits klein und einzeln, Nachricht beschreibt das Warum. Die Attribution steht in der Systemvorgabe der jeweiligen Sitzung.
 - Bei AHK-Schwierigkeiten: Eintrag in `doc/HOW-TO.md` mit Status.
-- Tests: `python -m pytest tests -q` (Standardlauf, über 5 Minuten, im Hintergrund starten, Ausgabe in eine Datei). Stress: `python -m pytest tests -m stress -q`, Dauerlauf `-m soak`, Fault-Wiederholungen `AHF_FAULT_REPEAT=<n>`.
+- Tests: `python -m pytest tests -q` (Standardlauf, seit WI-18 parallel mit `-n auto --dist loadgroup` aus `pytest.ini`, rund 50 s; seriell mit `-n 0`, rund 340 s; im Hintergrund starten, Ausgabe in eine Datei). Stress: `python -m pytest tests -m stress -q`, Dauerlauf `-m soak`, Fault-Wiederholungen `AHF_FAULT_REPEAT=<n>`.
 
 ## Was Phase 2 geliefert hat (verifiziert aus dem Dateibaum und den Paketberichten)
 
