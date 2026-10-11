@@ -41,9 +41,11 @@ class Role {
     ; no file (the one exception to KONVENTIONEN section 3, see doc/HOW-TO.md). Call it as
     ; Role.Console(...); ConsoleFn is only the function value for Log.Configure, because a
     ; function stored in a property receives the class as first argument when called as Role.ConsoleFn(...).
+    ; A role started by the supervisor has stdout and stderr in an anonymous pipe (WI-23, ChildLauncher): what
+    ; it writes here is read by the supervisor and ends up in the log. Without a usable stderr (a role started
+    ; by hand without a console) FileAppend throws; the console is best effort and must never keep a role from
+    ; ending (orphan guard, WI-15, F-05).
     static Console(level, source, text) {
-        ; A role started by the supervisor has no usable stderr (invalid handle): FileAppend throws then.
-        ; The console is best effort and must never keep a role from ending (orphan guard, WI-15).
         try {
             FileAppend(level " " source ": " text "`n", "**", "UTF-8-RAW")
         } catch {

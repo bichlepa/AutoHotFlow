@@ -4,6 +4,7 @@
 #Include ..\core\Time.ahk
 #Include ..\core\Role.ahk
 #Include ..\core\RoleRegistry.ahk
+#Include ChildLauncher.ahk
 
 ; The role processes started by the supervisor (doc/ARCHITEKTUR.md 3, 5.3, 6.2).
 ; One record per child, keyed by its name ("echo" or "echo:a", as the role sees itself).
@@ -16,8 +17,12 @@
 ; hung (no pong, or startup timeout), crashed (the process ended without being asked to).
 ; Events on topic "process": started, restarted, ready, hung, crashed, exited (PROTOCOL 3).
 ;
-; Process handles: OpenProcess with SYNCHRONIZE (exit wait), QUERY (exit code) and TERMINATE (hard
-; end after the shutdown deadline). Exits are seen with WaitForSingleObject(h, 0) on every tick.
+; Process handles: the handle CreateProcessW returns (ChildLauncher, all access) is used for the exit wait
+; (WaitForSingleObject(h, 0) on every tick), the exit code and TerminateProcess (hard end after the deadline).
+; Output (WI-23): stdout and stderr of a child are one anonymous pipe. Every tick reads what is there and
+; writes each line as a log entry (level a0, source = role name, text "[<name>] <line>"); the last
+; OUTPUT_RING_MAX lines of every child stay in memory after the process has ended (Output(name), for the
+; crash report). When a process ends, the rest of its output is read first, then the handles are closed.
 ; Restart policy: only roles in AUTO_RESTART restart by themselves, at most RESTART_MAX times within
 ; RESTART_WINDOW_MS. manager and editor never restart automatically. The test role "crasher" joins the
 ; list only with --test-roles (TEST_AUTO_RESTART), so the policy can be tested without a real engine.
@@ -30,8 +35,18 @@ class Children {
     static AUTO_RESTART := Map("storage", 1, "engine", 1)
     static TEST_AUTO_RESTART := Map("crasher", 1)
     ; SYNCHRONIZE (0x00100000) | PROCESS_QUERY_LIMITED_INFORMATION (0x1000) | PROCESS_TERMINATE (0x1)
+    ; (no longer used by the supervisor: CreateProcessW returns a full-access handle; the unit tests open handles with it)
     static OPEN_ACCESS := 0x00101001
     static WAIT_OBJECT_0 := 0
+    static OUTPUT_RING_MAX := 100
+    ; Per child and tick: at most 64 KB are read and at most 200 lines are logged. The rest of the lines goes
+    ; into the ring only, with one log line that says how many; so a chatty child cannot flood storage.
+    ; The pipe holds 256 KB (ChildLauncher.PIPE_BUFFER), a tick is 200 ms: a child may write about 1.3 MB/s.
+    static READ_MAX := 65536
+    static LINES_PER_TICK := 200
+    ; Exit codes with a meaning, for the log line of a crash.
+    static EXIT_TEXT := Map(1, "failed to start or fatal error", 2, "bad arguments, unknown role or 32-bit interpreter"
+        , 3, "role not implemented", 4, "hub lost", 6, "too many unexpected errors")
 
     shuttingDown := false
     ; Set once a child was terminated by the supervisor (hang or deadline). Decides exit code 5.
@@ -41,6 +56,7 @@ class Children {
         this.config := config
         this.hub := hub
         this._recs := Map()
+        this.restartMax := config.Get("restartMax", Children.RESTART_MAX)
         this._autoRoles := Map()
         for role, _ in Children.AUTO_RESTART
             this._autoRoles[role] := true
@@ -65,13 +81,17 @@ class Children {
         rec := Map("name", entry, "role", roleName, "flow", flow, "state", "starting", "pid", 0, "handle", 0
             , "gone", true, "exitCode", "", "startedAt", 0, "readyAt", 0, "lastPingAt", 0, "pingN", 0
             , "lastPongAt", 0, "bye", false, "byeClean", false, "restartTimes", [], "restartAt", 0
-            , "killAt", 0, "restartable", this._autoRoles.Has(roleName))
+            , "killAt", 0, "restartable", this._autoRoles.Has(roleName)
+            , "reader", "", "output", [])
         this._recs[entry] := rec
         this._Launch(rec, false, Time.NowMs())
     }
 
     ; Process ids of the records (for the tests and the shutdown report).
     Pid(name) => this._recs.Has(name) ? this._recs[name]["pid"] : 0
+
+    ; The last lines the child wrote to stdout/stderr (Array of strings, oldest first), kept after its end.
+    Output(name) => this._recs.Has(name) ? this._recs[name]["output"].Clone() : []
 
     State(name) => this._recs.Has(name) ? this._recs[name]["state"] : ""
 
@@ -259,10 +279,10 @@ class Children {
                 continue
             }
             if (rec["handle"] = 0) {
-                ; Launch could not open the process (it ended at once): counts as an exit.
                 this._OnGone(rec, now)
                 continue
             }
+            this._ReadOutput(rec)
             if (DllCall("WaitForSingleObject", "ptr", rec["handle"], "uint", 0, "uint") = Children.WAIT_OBJECT_0)
                 this._OnGone(rec, now)
         }
@@ -282,15 +302,15 @@ class Children {
         if (isRestart)
             cmd .= ' --restarted=' rec["restartTimes"].Length   ; the role knows it is a restart (engine: evt.engine.restarted)
         cmd .= cfg["roleOpts"]   ; --ui, --headless, --stub-cancel-exit (WI-13), "" when not given
-        pid := 0
         try {
-            Run(cmd, , "Hide", &pid)
+            info := ChildLauncher.Start(cmd)
         } catch as e {
             throw AhfError("could not start " rec["name"] ": " e.Message, ErrCode.INTERNAL)
         }
-        handle := DllCall("OpenProcess", "uint", Children.OPEN_ACCESS, "int", 0, "uint", pid, "ptr")
+        pid := info["pid"]
         rec["pid"] := pid
-        rec["handle"] := handle
+        rec["handle"] := info["process"]
+        rec["reader"] := info["reader"]
         rec["gone"] := false
         rec["state"] := "starting"
         rec["startedAt"] := now
@@ -316,6 +336,7 @@ class Children {
             DllCall("CloseHandle", "ptr", rec["handle"])
             rec["handle"] := 0
         }
+        this._CloseOutput(rec)
         rec["gone"] := true
         rec["exitCode"] := exitCode
         name := rec["name"]
@@ -332,7 +353,50 @@ class Children {
         restart := this._ScheduleRestart(rec, now)
         this.hub.Publish("process", "evt.process.crashed", Map("name", name, "pid", rec["pid"], "reason", reason
             , "exitCode", exitCode, "restart", restart))
-        Log.Write("a0", "children", name " ended unexpectedly (" reason ", exit " exitCode ")")
+        Log.Write("a0", "children", name " ended unexpectedly (" reason ", exit " exitCode
+            . (Children.EXIT_TEXT.Has(exitCode) ? ": " Children.EXIT_TEXT[exitCode] : "") ")")
+    }
+
+    ; --- output of the children --------------------------------------------------------------
+
+    _ReadOutput(rec) {
+        reader := rec["reader"]
+        if (!IsObject(reader))
+            return
+        try {
+            this._Emit(rec, reader.ReadLines(Children.READ_MAX))
+        } catch as e {
+            Log.Write("a0", "children", "reading the output of " rec["name"] " failed: " Type(e) ": " e.Message)
+        }
+    }
+
+    ; The process has ended: the rest of its output is still in the pipe. Read it, then close the pipe.
+    _CloseOutput(rec) {
+        reader := rec["reader"]
+        if (!IsObject(reader))
+            return
+        try {
+            this._Emit(rec, reader.Drain())
+        } catch as e {
+            Log.Write("a0", "children", "reading the output of " rec["name"] " failed: " Type(e) ": " e.Message)
+        }
+        reader.Close()
+        rec["reader"] := ""
+    }
+
+    ; Logs the lines (up to LINES_PER_TICK) and keeps all of them in the ring of the child.
+    _Emit(rec, lines) {
+        ring := rec["output"]
+        for i, line in lines {
+            ring.Push(line)
+            if (i <= Children.LINES_PER_TICK)
+                Log.Write("a0", rec["role"], "[" rec["name"] "] " line)
+        }
+        while (ring.Length > Children.OUTPUT_RING_MAX)
+            ring.RemoveAt(1)
+        if (lines.Length > Children.LINES_PER_TICK)
+            Log.Write("a0", "children", (lines.Length - Children.LINES_PER_TICK) " lines of output of " rec["name"]
+                . " were not logged (the last " Children.OUTPUT_RING_MAX " are kept in memory)")
     }
 
     ; Returns true when a restart is scheduled. Keeps the restart times of the last RESTART_WINDOW_MS.
@@ -343,7 +407,7 @@ class Children {
         for t in rec["restartTimes"]
             if (now - t < Children.RESTART_WINDOW_MS)
                 recent += 1
-        if (recent >= Children.RESTART_MAX) {
+        if (recent >= this.restartMax) {
             Log.Write("a0", "children", rec["name"] " not restarted: " recent " restarts within "
                 . Children.RESTART_WINDOW_MS " ms")
             return false

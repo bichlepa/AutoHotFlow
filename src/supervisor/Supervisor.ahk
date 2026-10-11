@@ -26,6 +26,8 @@
 ;   --deadline  total budget of the shutdown in ms (default 5000, sys.shutdown deadlineMs).
 ;   --test-roles  registers the test roles (tests/integration/helpers) and passes the option on.
 ;   --prepare-limit  (only with --test-roles) answer limit of cmd.app.prepareExit in ms, default 600000.
+;   --restart-max  (only with --test-roles) restarts per RESTART_WINDOW_MS, default Children.RESTART_MAX (3);
+;               lets the tests restart a child many times (handle leaks).
 ;   --ui=<word>, --headless, --stub-cancel-exit  passed on to every role (WI-13: --ui=stub for the manager stub).
 ;
 ; Single instance: a named mutex per session. A second supervisor with the same session sends
@@ -70,6 +72,9 @@ class Supervisor {
                 throw AhfError("supervisor: --prepare-limit must be between " Supervisor.MIN_DEADLINE_MS " and "
                     . Shutdown.PREPARE_LIMIT_MS " ms", ErrCode.BAD_ARGS)
         }
+        this.restartMax := Children.RESTART_MAX
+        if (this.testRoles && opts.Has("restart-max"))
+            this.restartMax := this._Integer(opts, "restart-max", Children.RESTART_MAX)
         this.deadlineMs := this._Integer(opts, "deadline", Supervisor.DEFAULT_DEADLINE_MS)
         if (this.deadlineMs < Supervisor.MIN_DEADLINE_MS || this.deadlineMs > Supervisor.MAX_DEADLINE_MS)
             throw AhfError("supervisor: --deadline must be between " Supervisor.MIN_DEADLINE_MS " and "
@@ -99,7 +104,7 @@ class Supervisor {
             return
         config := Map("session", this.session, "pipe", this.pipe, "data", this.data
             , "hubHwnd", Wake.Hwnd, "testRoles", this.testRoles, "script", A_ScriptFullPath
-            , "roleOpts", this.roleOpts)
+            , "roleOpts", this.roleOpts, "restartMax", this.restartMax)
         this.hub := Hub(this.pipe, this.session)
         this.diag := DiagLog(this.hub)
         Log.Configure(this.diag.SinkFn)      ; to storage as soon as it is connected, else queued (WI-23)

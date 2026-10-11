@@ -23,7 +23,7 @@ Die Muster mit festem Wortlaut werden **automatisch geprüft**: `python tools/ar
 | Muster | Wo verboten | Stattdessen |
 |---|---|---|
 | `MsgBox`, `InputBox`, `FileSelect`, `DirSelect`, jedes blockierende GUI | `engine`, `supervisor`, `storage`, `triggerhost`, `core` | Nachricht an UI/Worker (`evt.ui.notice`, Dialog-Element im Worker) |
-| `FileRead/FileAppend/FileOpen/FileDelete/DirCreate/Loop Files` | alles außer `storage` (und Startparameter-Lesen beim Booten) | Anfrage an `storage` |
+| `FileRead/FileAppend/FileOpen/FileDelete/DirCreate/Loop Files` | alles außer `storage` (und Startparameter-Lesen beim Booten) | Anfrage an `storage`. Keine Datei-I/O im Sinne dieser Regel: Schreiben auf stderr (`**`, `Role.Console`) und das Mitlesen der anonymen Pipe der Kinder durch den Supervisor (`ChildPipe`, `PeekNamedPipe`/`ReadFile` auf ein Handle, das keine Datei ist, nie blockierend). |
 | `Sleep` (>0), `RunWait`, `WinWait*` ohne Timeout, `Loop` mit Wartezeit | alles außer `worker` | `SetTimer`, Callback |
 | `A_TickCount` oder Zufall als ID | überall | `Ids.Next(prefix)` (Zähler pro Prozess) |
 | `Critical` | überall | nicht nötig. Wenn doch, mit Begründung im Kommentar |

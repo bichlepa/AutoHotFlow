@@ -68,7 +68,7 @@ AddChild(children, name, state, now) {
     rec := Map("name", name, "role", name, "flow", "", "state", state, "pid", 4242, "handle", EndedProcessHandle()
         , "gone", false, "exitCode", "", "startedAt", now, "readyAt", now, "lastPingAt", now, "pingN", 0
         , "lastPongAt", now, "bye", false, "byeClean", false, "restartTimes", [], "restartAt", 0
-        , "killAt", 0, "restartable", false)
+        , "killAt", 0, "restartable", false, "reader", "", "output", [])
     children._recs[name] := rec
     return rec
 }
@@ -138,7 +138,7 @@ AddChildRecord(children, name, state, t0) {
     rec := Map("name", name, "role", name, "flow", "", "state", state, "pid", 4242, "handle", 0
         , "gone", false, "exitCode", "", "startedAt", t0, "readyAt", t0, "lastPingAt", t0, "pingN", 0
         , "lastPongAt", t0, "bye", false, "byeClean", false, "restartTimes", [], "restartAt", 0
-        , "killAt", 0, "restartable", false)
+        , "killAt", 0, "restartable", false, "reader", "", "output", [])
     children._recs[name] := rec
     return rec
 }
