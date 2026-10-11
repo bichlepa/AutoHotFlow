@@ -15,6 +15,10 @@ class AtomicFile {
         try {
             handle := FileOpen(tmpPath, "w", "UTF-8-RAW")
             handle.Write(text)
+            ; Data to disk before the rename: without it a power failure can leave the new name with
+            ; empty or partial data (WI-25). A failed flush is an error: the old file stays.
+            if (!DllCall("FlushFileBuffers", "Ptr", handle.Handle, "Int"))
+                throw OSError(A_LastError)
             handle.Close()
         } catch as e {
             if (IsObject(handle))
