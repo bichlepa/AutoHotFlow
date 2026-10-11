@@ -24,7 +24,7 @@ from pathlib import Path, PurePosixPath
 REPO = Path(__file__).resolve().parent.parent
 
 RULES = ("requires", "one-class", "include-core", "include-roles", "include-tests", "dialog", "file-io",
-         "blocking", "inline-element", "warn", "critical", "empty-catch", "builtin-class")
+         "blocking", "inline-element", "warn", "critical", "empty-catch", "builtin-class", "wire-bool")
 
 # Folders under src/ that are libraries, not process roles.
 LIB_DIRS = {"core", "elements", "ui_common"}
@@ -159,6 +159,9 @@ CLASS_RE = re.compile(r"^[ \t]*class[ \t]+(\w+)", re.M | re.I)
 INCLUDE_RE = re.compile(r"^[ \t]*#Include(?:Again)?[ \t]+(?:\*i[ \t]+)?(.+?)[ \t]*$", re.M | re.I)
 WARN_RE = re.compile(r"^[ \t]*#Warn\b(.*)$", re.M | re.I)
 MODE_RE = re.compile(r"\bstatic\s+Mode\s*:=\s*[\"'](\w+)[\"']", re.I)
+# A truth field of the protocol (doc/PROTOKOLL.md section 2) written as a literal true/false/0/1 in a Map. It must be
+# Json.True, Json.False or Json.Bool(...). "ok" is not listed: Message.Serialize converts it centrally.
+WIRE_BOOL_RE = re.compile(r"""(?<!Get\()["'](?:cancel|started|clean|restart|enabled|executing|exists|existed|waiting|byMeta|delete)["']\s*,\s*(?:true|false|[01])\b""", re.I)
 CATCH_RE = re.compile(r"(?<![\w.])catch\b", re.I)
 ARCH_OK_RE = re.compile(r"arch-ok:\s*([\w-]+)\s*(.*)")
 
@@ -319,6 +322,10 @@ def check_text(relpath, text):
         ln = line_of(code, m.start())
         if not (_has_reason(comments.get(ln)) or _has_reason(comments.get(ln - 1) if _comment_only(lines, ln - 1) else None)):
             add(m.start(), "critical", "Critical without a reason in a comment on this or the previous line")
+
+    # wire-bool: literal truth value in a protocol field
+    for m in WIRE_BOOL_RE.finditer(kept):
+        add(m.start(), "wire-bool", f"{m.group(0)}: use Json.True, Json.False or Json.Bool(...) for protocol truth values")
 
     # empty catch
     for m in CATCH_RE.finditer(code):

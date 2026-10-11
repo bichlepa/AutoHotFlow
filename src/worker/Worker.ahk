@@ -52,7 +52,7 @@ class Worker extends Role {
         imports := Worker._Map(msg, "imports")
         env := Worker._Map(msg, "env")
         job := Map("execId", execId, "classId", classId, "params", params, "imports", imports, "env", env
-            , "started", false, "cls", "", "ctx", "")
+            , "started", false, "cls", "", "ctx", "")  ; arch-ok: wire-bool internal job record, never sent
         this._job := job
         SetTimer(this._startFn, -1)
         return Map()

@@ -60,6 +60,8 @@ CASES = [
     ("empty-catch", "engine/A.ahk", "class A {\n    M() {\n        try {\n            X()\n        } catch {\n        }\n    }\n}\n",
      "class A {\n    M() {\n        try {\n            X()\n        } catch {\n            ; best effort, nothing to do\n        }\n    }\n}\n"),
     ("builtin-class", "core/A.ahk", "class TimeoutError extends Error {\n}\n", "class AhfTimeoutError extends Error {\n}\n"),
+    ("wire-bool", "engine/A.ahk", "class A {\n    M() {\n        return Map(\"enabled\", true)\n    }\n}\n",
+     "class A {\n    M() {\n        return Map(\"enabled\", Json.True, \"ok\", true)\n    }\n}\n"),
     ("arch-ok", "engine/A.ahk", "; arch-ok: dialog\nclass A {\n}\n", "; arch-ok: dialog a dialog is needed here\nclass A {\n}\n"),
 ]
 
