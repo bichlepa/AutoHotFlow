@@ -16,7 +16,7 @@ import struct
 import threading
 import time
 
-from support import winpipe
+from support import winpipe, wirebool
 
 PROTOCOL_VERSION = 1
 MAX_FRAME = 16 * 1024 * 1024
@@ -71,9 +71,11 @@ class FrameDecoder:
             body = bytes(self._buf[4:4 + length])
             del self._buf[:4 + length]
             try:
-                out.append(json.loads(body.decode("utf-8")))
+                msg = json.loads(body.decode("utf-8"))
             except (UnicodeDecodeError, ValueError) as exc:
                 raise ProtocolError("invalid JSON frame: %s" % exc)
+            wirebool.record(msg)  # strict check of truth values (WI-26)
+            out.append(msg)
         return out
 
 

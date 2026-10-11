@@ -453,7 +453,7 @@ def test_frozen_child_is_hung_within_8s_and_ended_like_a_crash(started, session_
         assert hung[0] - t_frozen <= HANG_BUDGET_S, "hung after %.2f s" % (hung[0] - t_frozen)
         crashed = watch.wait(event("evt.process.crashed", name="hanger"), timeout=10)
         assert crashed is not None and crashed[1]["payload"]["reason"] == "hung", sup.text()
-        assert not crashed[1]["payload"]["restart"]               # hanger is not auto-restarted
+        assert crashed[1]["payload"]["restart"] is False           # hanger is not auto-restarted
         assert crashed[0] - hung[0] <= 4.0, "terminated %.2f s after the hang" % (crashed[0] - hung[0])
         proc.wait(timeout=5)                                      # the process really ended
         assert not alive(pid)
@@ -486,7 +486,7 @@ def test_clean_exit_with_healthy_children_within_2s_and_no_leftover_process(star
             assert not alive(pid), "child %s left behind" % pid
         for name in ("echo:a", "echo:b"):
             exited = watch.find(event("evt.process.exited", name=name))
-            assert exited and exited[0][1]["payload"]["clean"], (name, exited)
+            assert exited and exited[0][1]["payload"]["clean"] is True, (name, exited)
     finally:
         watch.stop()
         py.close()

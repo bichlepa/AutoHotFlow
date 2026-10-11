@@ -49,7 +49,7 @@ def test_killed_engine_is_reported_restarted_and_the_others_are_untouched(chains
     chain = chains(FULL_CHAIN, STUB_OPTS)
     before = chain.wait_ready(["storage", "engine", "manager"])
     pid, t_death, msg = kill_role(chain, "engine")
-    assert msg["payload"]["restart"], "engine must restart by policy: %s" % msg
+    assert msg["payload"]["restart"] is True, "engine must restart by policy: %s" % msg
     new_pid, t_ready = chain.wait_restarted_ready("engine", pid)
     print("\nMEASURE engine ready again %.3f s after its death" % (t_ready - t_death))
     assert new_pid != pid
@@ -88,7 +88,7 @@ def test_killed_manager_stub_is_not_restarted_and_requests_to_it_end_at_once(cha
     chain = chains(FULL_CHAIN, STUB_OPTS)
     before = chain.wait_ready(["storage", "engine", "manager"])
     _, _, msg = kill_role(chain, "manager")
-    assert not msg["payload"]["restart"], "the UI is never restarted automatically: %s" % msg
+    assert msg["payload"]["restart"] is False, "the UI is never restarted automatically: %s" % msg
     time.sleep(1.0)
     state = chain.states()["manager"]
     assert state["state"] == "crashed" and state["restarts"] == 0, state

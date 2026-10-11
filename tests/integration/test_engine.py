@@ -127,6 +127,7 @@ def wait_ready(obs, timeout=READY_TIMEOUT_S):
 def ask(obs, type_, payload=None, timeout=5.0):
     """Sends a request to the engine and returns its payload (the answer must not be an error)."""
     answer = obs.request("engine", type_, payload or {}, timeout=timeout)
+    assert answer["payload"].get("ok") is True, answer   # a real JSON boolean (PROTOKOLL 2)
     return answer["payload"]
 
 
@@ -145,7 +146,7 @@ def test_engine_loads_flow_announces_ready_and_answers_snapshot(procs, datadir, 
         assert [f["flowId"] for f in snap["flows"]] == ["skeleton"]
         flow = snap["flows"][0]
         assert flow["name"] == "Skeleton" and flow["rev"] == 1
-        assert not flow["enabled"] and not flow["executing"]   # booleans arrive as 0/1 (PROTOCOL 2)
+        assert flow["enabled"] is False and flow["executing"] is False   # real JSON booleans (PROTOCOL 2)
         assert snap["settings"] == {}
 
         hub.send_to("engine", "sys.shutdown", {"reason": "user", "deadlineMs": 1000})
@@ -449,10 +450,10 @@ def test_enable_and_disable_set_the_flag_and_report_it(pipe, flowdir, engine):
         wait_ready(obs)
         ask(obs, "cmd.flow.enable", {"flowId": "skeleton"})
         state = obs.wait_event("evt.flow.state", timeout=5)["payload"]
-        assert state["enabled"] == 1 and state["executing"] == 0
-        assert ask(obs, "cmd.engine.snapshot")["flows"][0]["enabled"] == 1
+        assert state["enabled"] is True and state["executing"] is False
+        assert ask(obs, "cmd.engine.snapshot")["flows"][0]["enabled"] is True
         ask(obs, "cmd.flow.disable", {"flowId": "skeleton"})
-        assert obs.wait_event("evt.flow.state", timeout=5)["payload"]["enabled"] == 0
+        assert obs.wait_event("evt.flow.state", timeout=5)["payload"]["enabled"] is False
 
 
 @pytest.mark.parametrize("policy", ["parallel", "default"])
@@ -489,8 +490,8 @@ def test_wait_policy_queues_the_starts_and_runs_them_one_after_the_other(pipe, f
         answers = [ask(obs, "cmd.flow.start", {"flowId": "pol"}) for _ in range(3)]
         ids = [a["instanceId"] for a in answers]
         assert len(set(ids)) == 3
-        assert "waiting" not in answers[0] and answers[1]["waiting"] and answers[2]["waiting"]
-        assert ask(obs, "cmd.engine.snapshot")["flows"][0]["executing"] == 1
+        assert "waiting" not in answers[0] and answers[1]["waiting"] is True and answers[2]["waiting"] is True
+        assert ask(obs, "cmd.engine.snapshot")["flows"][0]["executing"] is True
         ended = []
 
         def third_ended(m):
@@ -541,7 +542,7 @@ def test_stop_policy_stops_the_running_instance_and_starts_a_new_one(pipe, flowd
         ended = collect_until(obs, lambda m: m["type"] == "evt.instance.ended"
                               and m["payload"]["instanceId"] == first, timeout=5)
         assert ended[-1][1]["payload"]["reason"] == "policy stop"
-        assert ask(obs, "cmd.engine.snapshot")["flows"][0]["executing"] == 1
+        assert ask(obs, "cmd.engine.snapshot")["flows"][0]["executing"] is True
         stop_flow(obs, "pol")
 
 

@@ -354,7 +354,7 @@ def test_cancelled_exit_is_answered_and_nothing_stops(procs, datadir, session_id
         wait_ready(obs, ["storage", "engine", "manager"])
         for topic in ("process", "log"):
             assert obs.request("supervisor", "cmd.topic.subscribe", {"topic": topic}, timeout=5)["payload"]["ok"]
-        assert obs.request("supervisor", "cmd.app.exit", {}, timeout=5)["payload"]["started"]
+        assert obs.request("supervisor", "cmd.app.exit", {}, timeout=5)["payload"]["started"] is True
 
         def cancelled():
             return [m for m in rec.snapshot() if m.get("type") == "evt.app.exitCancelled"]
@@ -365,7 +365,7 @@ def test_cancelled_exit_is_answered_and_nothing_stops(procs, datadir, session_id
         assert states["engine"]["state"] == "ready" and states["storage"]["state"] == "ready"
 
         def answered_in_log():
-            return any(e["type"] == "stub.prepareExit" and e["payload"]["cancel"] == 1
+            return any(e["type"] == "stub.prepareExit" and e["payload"]["cancel"] is True
                        for e in ui_lines_from_log(rec.snapshot()))
         assert wait_until(answered_in_log, 10), "storage never reported the stub's prepareExit answer"
     finally:

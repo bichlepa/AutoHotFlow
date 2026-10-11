@@ -18,6 +18,7 @@ from pathlib import Path
 import pytest
 
 from support import ahk as ahk_locator
+from support import wirebool
 from support.procs import ProcessTracker
 
 TESTS_DIR = Path(__file__).resolve().parent
@@ -53,6 +54,15 @@ def pytest_collection_modifyitems(config, items):
     for item in items:
         if item.get_closest_marker("timeout") is None:
             item.add_marker(pytest.mark.timeout(120))
+
+
+@pytest.fixture(autouse=True)
+def strict_wire_booleans():
+    """A frame that a Python test peer decoded and that carries 1/0 in a boolean protocol field fails the test (WI-26)."""
+    wirebool.take_violations()
+    yield
+    bad = wirebool.take_violations()
+    assert not bad, "boolean protocol fields not sent as JSON true/false: " + "; ".join(bad[:10])
 
 
 @pytest.fixture(scope="session")

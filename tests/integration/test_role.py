@@ -187,7 +187,7 @@ def test_shutdown_sends_bye_and_exits_0_within_one_second(procs, datadir, runs, 
         bye = hub.wait_received(lambda m: m.get("type") == "sys.bye" and m.get("from") == "echo", timeout=2)
         assert code == EXIT_OK, run.stderr_text()
         assert elapsed <= SHUTDOWN_LIMIT_S, "shutdown took %.3f s" % elapsed
-        assert bye is not None and bye["to"] == "supervisor" and bye["payload"]["clean"]
+        assert bye is not None and bye["to"] == "supervisor" and bye["payload"]["clean"] is True
         assert not psutil.pid_exists(pid)
         assert run.wait_exit(timeout=10) == EXIT_OK
         print("\nsys.shutdown -> exit 0 in %.1f ms" % (elapsed * 1000))

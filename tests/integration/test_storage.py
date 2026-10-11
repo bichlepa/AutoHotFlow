@@ -55,7 +55,7 @@ def ask(client, type_, payload=None, timeout=ASK_TIMEOUT_S):
 
 def ask_ok(client, type_, payload=None, timeout=ASK_TIMEOUT_S):
     answer = ask(client, type_, payload, timeout)
-    assert answer.get("ok"), answer
+    assert answer.get("ok") is True, answer   # a real JSON boolean (PROTOKOLL 2)
     return answer
 
 
@@ -299,14 +299,14 @@ def test_v1_variables_are_read_as_stored(procs, datadir, runs, pipe, session_id,
     client = AhfClient(pipe, "tester")
     try:
         got = ask_ok(client, "cmd.storage.var.get", {"scope": "global", "name": "global_testResults"})
-        assert got["exists"] and got["type"] == "object"
+        assert got["exists"] is True and got["type"] == "object"
         assert same(json.loads(got["content"]), read_json(V1_VARS / "global_testResults.ahfvar"))
         got = ask_ok(client, "cmd.storage.var.get",
                      {"scope": "static", "flowId": "Flow 1010290492", "name": "static_results"})
-        assert got["exists"] and got["type"] == "object"
+        assert got["exists"] is True and got["type"] == "object"
         assert same(json.loads(got["content"]),
                     read_json(V1_VARS / "Flow 1010290492" / "static_results.ahfvar"))
-        assert not ask_ok(client, "cmd.storage.var.get", {"scope": "global", "name": "nothere"})["exists"]
+        assert ask_ok(client, "cmd.storage.var.get", {"scope": "global", "name": "nothere"})["exists"] is False
     finally:
         client.close()
 
@@ -339,7 +339,7 @@ def test_deleting_a_variable_twice_is_not_an_error(storage, flowdir):
     ask_ok(client, "cmd.storage.var.set", {"scope": "global", "name": "gone", "type": "normal", "content": "1"})
     first = ask_ok(client, "cmd.storage.var.delete", {"scope": "global", "name": "gone"})
     second = ask_ok(client, "cmd.storage.var.delete", {"scope": "global", "name": "gone"})
-    assert first["existed"] and not second["existed"]
+    assert first["existed"] is True and second["existed"] is False
     assert not (flowdir / "Variables" / "gone.ahfvd").exists()
     assert not (flowdir / "Variables" / "gone.ahfvar").exists()
     assert not ask_ok(client, "cmd.storage.var.get", {"scope": "global", "name": "gone"})["exists"]
