@@ -23,6 +23,9 @@
 ; writes each line as a log entry (level a0, source = role name, text "[<name>] <line>"); the last
 ; OUTPUT_RING_MAX lines of every child stay in memory after the process has ended (Output(name), for the
 ; crash report). When a process ends, the rest of its output is read first, then the handles are closed.
+; Workers (WI-27, ARCHITEKTUR 6.4): the engine asks for them (SpawnWorker) and ends them (KillWorker); they are never
+; restarted here. A worker that reports sys.busy is not pinged and not judged by pongs (OnBusy, IsBusy). Records of
+; ended workers are kept for diagnosis, but only the last GONE_WORKERS_KEEP of them.
 ; Restart policy: only roles in AUTO_RESTART restart by themselves, at most RESTART_MAX times within
 ; RESTART_WINDOW_MS. manager and editor never restart automatically. The test role "crasher" joins the
 ; list only with --test-roles (TEST_AUTO_RESTART), so the policy can be tested without a real engine.
@@ -39,6 +42,9 @@ class Children {
     static OPEN_ACCESS := 0x00101001
     static WAIT_OBJECT_0 := 0
     static OUTPUT_RING_MAX := 100
+    ; Most workers alive at the same time (a safeguard against a faulty engine; the pool size N is the engine's).
+    static WORKER_LIMIT := 16
+    static GONE_WORKERS_KEEP := 8
     ; Per child and tick: at most 64 KB are read and at most 200 lines are logged. The rest of the lines goes
     ; into the ring only, with one log line that says how many; so a chatty child cannot flood storage.
     ; The pipe holds 256 KB (ChildLauncher.PIPE_BUFFER), a tick is 200 ms: a child may write about 1.3 MB/s.
@@ -57,6 +63,8 @@ class Children {
         this.hub := hub
         this._recs := Map()
         this.restartMax := config.Get("restartMax", Children.RESTART_MAX)
+        this.workerLimit := config.Get("workerLimit", Children.WORKER_LIMIT)
+        this._nextWorker := 1
         this._autoRoles := Map()
         for role, _ in Children.AUTO_RESTART
             this._autoRoles[role] := true
@@ -82,9 +90,77 @@ class Children {
             , "gone", true, "exitCode", "", "startedAt", 0, "readyAt", 0, "lastPingAt", 0, "pingN", 0
             , "lastPongAt", 0, "bye", false, "byeClean", false, "restartTimes", [], "restartAt", 0
             , "killAt", 0, "restartable", this._autoRoles.Has(roleName)
-            , "reader", "", "output", [])
+            , "reader", "", "output", [], "busy", false, "killReason", "")  ; arch-ok: wire-bool internal record, never sent
         this._recs[entry] := rec
         this._Launch(rec, false, Time.NowMs())
+    }
+
+    ; Starts the next worker on request of the engine (cmd.process.spawn). Returns its name "worker:<n>". The number
+    ; is never used twice in a session. Throws AhfError: shutting_down, busy (WORKER_LIMIT alive), internal.
+    SpawnWorker() {
+        if (this.shuttingDown)
+            throw AhfError("the supervisor is shutting down", ErrCode.SHUTTING_DOWN)
+        if (this.LiveWorkers() >= this.workerLimit)
+            throw AhfError("already " this.workerLimit " workers alive", ErrCode.BUSY)
+        this._PruneGoneWorkers()
+        name := "worker:" this._nextWorker
+        while (this._recs.Has(name)) {
+            this._nextWorker += 1
+            name := "worker:" this._nextWorker
+        }
+        this._nextWorker += 1
+        this.Spawn(name)
+        return name
+    }
+
+    ; Hard end of a worker on request of the engine (cmd.process.kill). The end is reported as a planned exit
+    ; (evt.process.exited, reason "killed"), is not a crash, does not count for the exit code and never restarts.
+    ; An unknown name throws not_found; a worker that has ended already is not an error.
+    KillWorker(name, reason) {
+        if (!this._recs.Has(name))
+            throw AhfError("no such worker '" name "'", ErrCode.NOT_FOUND)
+        rec := this._recs[name]
+        if (rec["gone"] || rec["handle"] = 0)
+            return
+        Log.Write("a1", "children", "killing " name " on request: " reason)
+        if (rec["state"] != "hung") {
+            rec["state"] := "stopping"
+            rec["killReason"] := "killed"
+        }
+        this.Terminate(name, false)
+    }
+
+    ; Number of workers whose process is still running.
+    LiveWorkers() {
+        n := 0
+        for _, rec in this._recs
+            if (rec["role"] = "worker" && !rec["gone"])
+                n += 1
+        return n
+    }
+
+    ; Keeps the records of the last GONE_WORKERS_KEEP ended workers; older ones go (the list stays short in a long session).
+    _PruneGoneWorkers() {
+        gone := []
+        for name, rec in this._recs
+            if (rec["role"] = "worker" && rec["gone"] && IsInteger(rec["flow"]))
+                gone.Push(Integer(rec["flow"]))
+        if (gone.Length <= Children.GONE_WORKERS_KEEP)
+            return
+        gone := Children._SortedNumbers(gone)
+        loop gone.Length - Children.GONE_WORKERS_KEEP
+            this._recs.Delete("worker:" gone[A_Index])
+    }
+
+    static _SortedNumbers(list) {
+        text := ""
+        for n in list
+            text .= (text = "" ? "" : "`n") Format("{:012d}", n)
+        text := Sort(text)
+        out := []
+        for line in StrSplit(text, "`n")
+            out.Push(Integer(line))
+        return out
     }
 
     ; Process ids of the records (for the tests and the shutdown report).
@@ -150,6 +226,9 @@ class Children {
         return true
     }
 
+    ; True while the child reports sys.busy true (a worker with a job): it is not pinged and not judged by pongs.
+    IsBusy(name) => this._recs.Has(name) ? this._recs[name].Get("busy", false) : false
+
     ; --- events from the hub ------------------------------------------------------------------
 
     ; sys.hello of a child: the role is ready. Clients that are not children are ignored here.
@@ -170,6 +249,20 @@ class Children {
     OnPong(name) {
         if (this._recs.Has(name))
             this._recs[name]["lastPongAt"] := Time.NowMs()
+    }
+
+    ; sys.busy of a worker. When the job ends, the pong times start again at "now": the worker was not asked while busy.
+    OnBusy(name, busy) {
+        if (!this._recs.Has(name) || this._recs[name]["role"] != "worker")
+            return
+        rec := this._recs[name]
+        was := rec.Get("busy", false)
+        rec["busy"] := busy ? true : false
+        if (was && !busy) {
+            now := Time.NowMs()
+            rec["lastPongAt"] := now
+            rec["lastPingAt"] := now
+        }
     }
 
     OnBye(name, clean) {
@@ -203,14 +296,17 @@ class Children {
     }
 
     ; Hard end of a process. The exit is seen on a later tick like any other exit.
-    Terminate(name) {
+    ; countKilled false: a hard end the supervisor was asked for does not make exit code 5 (KillWorker).
+    Terminate(name, countKilled := true) {
         if (!this._recs.Has(name))
             return
         rec := this._recs[name]
         if (rec["gone"] || rec["handle"] = 0)
             return
-        Log.Write("a0", "children", "terminating " name " (pid " rec["pid"] ")")
-        this.killedSome := true
+        if (countKilled) {
+            Log.Write("a0", "children", "terminating " name " (pid " rec["pid"] ")")
+            this.killedSome := true
+        }
         DllCall("TerminateProcess", "ptr", rec["handle"], "uint", 1)
     }
 
@@ -319,6 +415,8 @@ class Children {
         rec["byeClean"] := false
         rec["restartAt"] := 0
         rec["killAt"] := 0
+        rec["busy"] := false
+        rec["killReason"] := ""
         if (isRestart)
             this.hub.Publish("process", "evt.process.restarted", Map("name", rec["name"]
                 , "attempt", rec["restartTimes"].Length))
@@ -344,8 +442,11 @@ class Children {
         ; during a shutdown (or after sys.shutdown was sent) is a normal exit.
         if (rec["state"] != "hung" && (this.shuttingDown || rec["state"] = "stopping")) {
             rec["state"] := "exited"
-            this.hub.Publish("process", "evt.process.exited", Map("name", name, "pid", rec["pid"]
-                , "clean", Json.Bool(rec["bye"] && rec["byeClean"]), "exitCode", exitCode))
+            payload := Map("name", name, "pid", rec["pid"], "clean", Json.Bool(rec["bye"] && rec["byeClean"])
+                , "exitCode", exitCode)
+            if (rec.Get("killReason", "") != "")
+                payload["reason"] := rec["killReason"]
+            this.hub.Publish("process", "evt.process.exited", payload)
             return
         }
         reason := (rec["state"] = "hung") ? "hung" : "exited"

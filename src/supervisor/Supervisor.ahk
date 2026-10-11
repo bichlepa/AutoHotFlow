@@ -28,6 +28,7 @@
 ;   --prepare-limit  (only with --test-roles) answer limit of cmd.app.prepareExit in ms, default 600000.
 ;   --restart-max  (only with --test-roles) restarts per RESTART_WINDOW_MS, default Children.RESTART_MAX (3);
 ;               lets the tests restart a child many times (handle leaks).
+;   --worker-limit  (only with --test-roles) most workers alive at once, default Children.WORKER_LIMIT (16).
 ;   --ui=<word>, --headless, --stub-cancel-exit  passed on to every role (WI-13: --ui=stub for the manager stub).
 ;   --log-level=<0..3>  highest log level that is forwarded to storage (default 2; level 3 stays in the ring of
 ;               Log only). Valid for the supervisor and passed on to every role (WI-23).
@@ -78,6 +79,12 @@ class Supervisor {
         this.restartMax := Children.RESTART_MAX
         if (this.testRoles && opts.Has("restart-max"))
             this.restartMax := this._Integer(opts, "restart-max", Children.RESTART_MAX)
+        ; Only with --test-roles: the limit of living workers can be lowered, so a test needs no 17 processes.
+        this.workerLimit := Children.WORKER_LIMIT
+        if (this.testRoles && opts.Has("worker-limit"))
+            this.workerLimit := this._Integer(opts, "worker-limit", Children.WORKER_LIMIT)
+        if (this.workerLimit < 1 || this.workerLimit > Children.WORKER_LIMIT)
+            throw AhfError("supervisor: --worker-limit must be between 1 and " Children.WORKER_LIMIT, ErrCode.BAD_ARGS)
         this.deadlineMs := this._Integer(opts, "deadline", Supervisor.DEFAULT_DEADLINE_MS)
         if (this.deadlineMs < Supervisor.MIN_DEADLINE_MS || this.deadlineMs > Supervisor.MAX_DEADLINE_MS)
             throw AhfError("supervisor: --deadline must be between " Supervisor.MIN_DEADLINE_MS " and "
@@ -108,7 +115,8 @@ class Supervisor {
             return
         config := Map("session", this.session, "pipe", this.pipe, "data", this.data
             , "hubHwnd", Wake.Hwnd, "testRoles", this.testRoles, "script", A_ScriptFullPath
-            , "roleOpts", this.roleOpts, "restartMax", this.restartMax)
+            , "roleOpts", this.roleOpts, "restartMax", this.restartMax
+            , "workerLimit", this.workerLimit)
         this.hub := Hub(this.pipe, this.session)
         this.diag := DiagLog(this.hub)
         Log.Configure(this.diag.SinkFn)      ; to storage as soon as it is connected, else queued (WI-23)
@@ -132,6 +140,7 @@ class Supervisor {
         h := this.hub
         h.On("sys.pong", (msg) => this.children.OnPong(msg.from))
         h.On("sys.bye", (msg) => this.children.OnBye(msg.from, msg.payload.Get("clean", false)))
+        h.On("sys.busy", (msg) => this._OnBusy(msg))
         h.On("cmd.app.", (msg) => this._OnApp(msg))
         h.On("cmd.process.", (msg) => this._OnProcess(msg))
         h.On("evt.diag.error", (msg) => this.diag.AddError(msg.from, msg.payload))
@@ -172,10 +181,47 @@ class Supervisor {
         throw AhfError("unknown command " msg.type, ErrCode.UNKNOWN_TYPE)
     }
 
+    ; cmd.process.list is open to every client. spawn and kill belong to the engine and only touch workers
+    ; (PROTOCOL 4.1, ARCHITECTURE 6.4): the pool is the engine's, every other process has its own life cycle.
     _OnProcess(msg) {
         if (msg.type = "cmd.process.list")
             return Map("processes", this.children.Snapshot())
+        if (msg.type = "cmd.process.spawn") {
+            Supervisor._RequireEngine(msg)
+            role := msg.payload.Get("role", "")
+            if (IsObject(role) || role = "")
+                throw AhfError("payload field 'role' is missing", ErrCode.BAD_PAYLOAD)
+            if (role != "worker")
+                throw AhfError("only worker processes can be started on request, not '" role "'", ErrCode.DENIED)
+            return Map("name", this.children.SpawnWorker())
+        }
+        if (msg.type = "cmd.process.kill") {
+            Supervisor._RequireEngine(msg)
+            name := msg.payload.Get("name", "")
+            if (IsObject(name) || name = "")
+                throw AhfError("payload field 'name' is missing", ErrCode.BAD_PAYLOAD)
+            if (!RegExMatch(name, "^worker:\d+$"))
+                throw AhfError("only worker processes can be ended on request, not '" name "'", ErrCode.DENIED)
+            reason := msg.payload.Get("reason", "")
+            reason := SubStr(IsObject(reason) ? "" : String(reason), 1, 200)
+            this.children.KillWorker(name, reason)
+            return Map()
+        }
         throw AhfError("unknown command " msg.type, ErrCode.UNKNOWN_TYPE)
+    }
+
+    static _RequireEngine(msg) {
+        if (msg.from != "engine")
+            throw AhfError(msg.type " is reserved for the engine, not for '" msg.from "'", ErrCode.DENIED)
+    }
+
+    ; sys.busy of a worker: begin and end of a job (PROTOCOL 4.1). From anyone else it is dropped. No return value.
+    _OnBusy(msg) {
+        if (Role.BaseName(msg.from) != "worker") {
+            Log.Write("a0", "supervisor", "sys.busy from '" msg.from "' ignored (not a worker)")
+            return
+        }
+        this.children.OnBusy(msg.from, msg.payload.Get("busy", false))
     }
 
     ; --- single instance ---------------------------------------------------------------------
