@@ -111,7 +111,99 @@ CaseReadToRejectsEmptyTo() {
     Assert.Throws(() => ReadToText('{"to":"","from":"x"}'), ProtocolError)
 }
 
+; --- ParseHead / WithFrom (WI-24): head fields without parsing the payload ---------------------------------
+
+CaseParseHeadReadsAllFields() {
+    text := Message("engine", "editor:F1", "editor:F1#17", "cmd.flow.start", Map("flowId", "F1"), "", 5000).Serialize()
+    h := Message.ParseHead(text)
+    Assert.True(IsObject(h))
+    Assert.Equal(h["to"], "engine")
+    Assert.Equal(h["from"], "editor:F1")
+    Assert.Equal(h["id"], "editor:F1#17")
+    Assert.Equal(h["type"], "cmd.flow.start")
+    Assert.Equal(h["corr"], "")
+    Assert.Equal(h["timeoutMs"], 5000)
+}
+
+CaseParseHeadReadsCorrAndNoTimeout() {
+    h := Message.ParseHead(Message("a", "b", "b#2", "res.x", Map("ok", 1), "a#9").Serialize())
+    Assert.Equal(h["corr"], "a#9")
+    Assert.Equal(h["timeoutMs"], 0)
+}
+
+CaseParseHeadUnescapesStrings() {
+    h := Message.ParseHead(Message('t"o', 'fr\om', "x#1", "evt.x").Serialize())
+    Assert.Equal(h["to"], 't"o')
+    Assert.Equal(h["from"], 'fr\om')
+}
+
+CaseParseHeadAcceptsBracesAndQuotesInsideThePayload() {
+    payload := Map("text", '{"a": "}", "b": [1, {"c": "\"}"}]}', "n", Map("deep", Map("deeper", Map())))
+    h := Message.ParseHead(Message("a", "b", "b#1", "evt.x", payload).Serialize())
+    Assert.True(IsObject(h))
+}
+
+CaseParseHeadDoesNotCheckThePayloadContent() {
+    ; the receiver rejects it (Peer._RejectFrame); the hub only needs the head and the end of the payload
+    h := Message.ParseHead('{"to":"a","from":"b","id":"b#1","type":"cmd.x","corr":null,"payload":{broken:1}}')
+    Assert.True(IsObject(h))
+    Assert.Equal(h["to"], "a")
+}
+
+CaseParseHeadGivesUpOnNonCanonicalText() {
+    ; each of these takes the normal way (Parse), which judges them
+    Assert.Equal(Message.ParseHead('{"from":"b","to":"a","id":"b#1","type":"cmd.x","corr":null,"payload":{}}'), "")
+    Assert.Equal(Message.ParseHead('{"to": "a","from":"b","id":"b#1","type":"cmd.x","corr":null,"payload":{}}'), "")
+    Assert.Equal(Message.ParseHead('{"to":"a","from":"b","id":"b#1","type":"cmd.x","payload":{}}'), "")
+    Assert.Equal(Message.ParseHead('{"to":"a","from":"b","id":"b#1","type":"cmd.x","corr":null,"payload":5}'), "")
+    Assert.Equal(Message.ParseHead('{"to":"a","from":"b","id":"b#1","type":"cmd.x","corr":null,"payload":[]}'), "")
+    Assert.Equal(Message.ParseHead('{"to":"a","from":"b","id":"b#1","type":"cmd.x","corr":7,"payload":{}}'), "")
+    Assert.Equal(Message.ParseHead('{"to":"","from":"b","id":"b#1","type":"cmd.x","corr":null,"payload":{}}'), "")
+    Assert.Equal(Message.ParseHead('{"to":"a","from":"b","id":"b#1","type":"cmd.x","corr":null,"payload":{}} '), "")
+    Assert.Equal(Message.ParseHead(""), "")
+}
+
+CaseParseHeadRefusesAnythingAfterThePayload() {
+    ; a second "from" behind the payload would win in a parser that keeps the last duplicate key
+    forged := '{"to":"a","from":"b","id":"b#1","type":"evt.x","corr":null,"payload":{},"from":"forged"}'
+    Assert.Equal(Message.ParseHead(forged), "")
+    forged2 := '{"to":"a","from":"b","id":"b#1","type":"evt.x","corr":null,"payload":{"k":1},"x":{}}'
+    Assert.Equal(Message.ParseHead(forged2), "")
+    forged3 := '{"to":"a","from":"b","id":"b#1","type":"evt.x","corr":null,"payload":{}},"from":"forged"}'
+    Assert.Equal(Message.ParseHead(forged3), "")
+}
+
+CaseWithFromKeepsPayloadAndOtherHeadFields() {
+    payload := Map("text", "a\b", "list", [1, 2], "z", "0.700000")
+    text := Message("topic:engine", "forged", "x#4", "evt.x", payload, "", 0).Serialize()
+    out := Message.WithFrom(text, Message.ParseHead(text), "real:1")
+    Assert.Equal(out, Message("topic:engine", "real:1", "x#4", "evt.x", payload).Serialize())
+    m := Message.Parse(out)
+    Assert.Equal(m.from, "real:1")
+    Assert.Equal(m.payload["text"], "a\b")
+}
+
+CaseWithFromOnALargeFrame() {
+    big := ""
+    loop 2000
+        big .= '{"k": "v\\", "n": [1, 2, 3]} '
+    text := Message("engine", "storage", "storage#1", "res.storage.flow.read", Map("ok", 1, "text", big), "engine#1").Serialize()
+    h := Message.ParseHead(text)
+    Assert.True(IsObject(h))
+    out := Message.WithFrom(text, h, "storage")
+    Assert.Equal(out, text)
+}
+
 TestRun.Init()
+TestRun.Case("ParseHead reads all head fields of a serialized envelope", CaseParseHeadReadsAllFields)
+TestRun.Case("ParseHead reads corr and a missing timeoutMs", CaseParseHeadReadsCorrAndNoTimeout)
+TestRun.Case("ParseHead unescapes quotes and backslashes", CaseParseHeadUnescapesStrings)
+TestRun.Case("ParseHead handles braces and quotes inside the payload", CaseParseHeadAcceptsBracesAndQuotesInsideThePayload)
+TestRun.Case("ParseHead does not check the payload content", CaseParseHeadDoesNotCheckThePayloadContent)
+TestRun.Case("ParseHead gives up on text that is not in canonical form", CaseParseHeadGivesUpOnNonCanonicalText)
+TestRun.Case("ParseHead refuses a text with anything behind the payload", CaseParseHeadRefusesAnythingAfterThePayload)
+TestRun.Case("WithFrom replaces only the sender", CaseWithFromKeepsPayloadAndOtherHeadFields)
+TestRun.Case("WithFrom keeps a large payload byte for byte", CaseWithFromOnALargeFrame)
 TestRun.Case("serialize writes the head fields in fixed order", CaseSerializeHeadOrder)
 TestRun.Case("answer carries corr and leaves out timeoutMs when 0", CaseAnswerCarriesCorr)
 TestRun.Case("payload keeps value types and sorts its keys", CasePayloadTypesAndKeyOrder)

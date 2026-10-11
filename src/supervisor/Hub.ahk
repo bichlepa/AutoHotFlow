@@ -199,6 +199,16 @@ class Hub {
 
     _OnFrame(conn, text) {
         name := this._byConn.Get(ObjPtr(conn), "")
+        ; Frames in the canonical form of Message.Serialize are routed by their head fields only: the payload is
+        ; neither parsed nor built again (a 93 KB flow cost 220 ms as a full Message, WI-24). Messages to the
+        ; supervisor and everything not in canonical form (white space, other order, ...) take the full way.
+        if (name != "") {
+            head := Message.ParseHead(text)
+            if (IsObject(head) && head["to"] != Hub.SUPERVISOR) {
+                this._RouteHead(this._links[name], head, text)
+                return
+            }
+        }
         try {
             msg := Message.Parse(text)
         } catch as e {
@@ -352,6 +362,30 @@ class Hub {
         }
         if (!sent)
             this._Refuse(link, msg, ErrCode.PEER_GONE, "'" to "' does not accept the message")
+    }
+
+    ; The fast way of _Route: the sender is set in the head, the payload text is passed on as it came.
+    ; The hub does not look into the payload: an invalid one is refused by the receiver (Peer._RejectFrame).
+    _RouteHead(link, head, text) {
+        to := head["to"]
+        out := Message.WithFrom(text, head, link["name"])
+        if (SubStr(to, 1, 6) = "topic:") {
+            this._Fanout(SubStr(to, 7), out, link["name"])
+            return
+        }
+        ; Only the head is needed to refuse a command, so the stand-in has no payload.
+        stub := Message(to, link["name"], head["id"], head["type"], "", head["corr"], head["timeoutMs"])
+        if (to = "*") {
+            this._Refuse(link, stub, ErrCode.DENIED, "'*' is reserved for the supervisor")
+            return
+        }
+        target := this._links.Get(to, "")
+        if (target = "") {
+            this._Refuse(link, stub, ErrCode.NOT_FOUND, "no peer '" to "'")
+            return
+        }
+        if (!this._SendFrame(target, out))
+            this._Refuse(link, stub, ErrCode.PEER_GONE, "'" to "' does not accept the message")
     }
 
     _Local(link, msg) {

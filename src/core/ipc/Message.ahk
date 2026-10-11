@@ -93,6 +93,48 @@ class Message {
         }
     }
 
+    ; Reads the head fields of a serialized envelope without parsing the payload (doc/PROTOKOLL.md 2, the hub
+    ; uses it to route large frames cheaply). Returns "" unless the text is exactly what Serialize writes:
+    ; head fields in canonical order, no white space, payload an object that ends right before the last "}".
+    ; "" means "take the normal way" (Parse), it is not an error. Anything the fast reading cannot judge
+    ; (odd order, white space, bad escapes, empty head field, an engine limit of the regex) gives "".
+    ; The payload is only scanned for balanced braces, so nothing can follow it and override a head field.
+    ; Its content is not validated: an invalid payload is rejected by the receiver (Peer._RejectFrame).
+    ; The result is a Map: to, from, id, type, corr, timeoutMs (decoded as in Parse) and "fromEnd", the
+    ; position of the first character after the "from" value, which WithFrom needs.
+    static ParseHead(text) {
+        static pattern := '^\{"to":"((?:[^"\\]++|\\.)*+)","from":"((?:[^"\\]++|\\.)*+)"'
+            . ',"id":"((?:[^"\\]++|\\.)*+)","type":"((?:[^"\\]++|\\.)*+)","corr":(?:null|"((?:[^"\\]++|\\.)*+)")'
+            . '(?:,"timeoutMs":(\d++))?,"payload":(?<obj>\{(?:[^{}"]++|"(?:[^"\\]++|\\.)*+"|(?&obj))*+\})\}\z'
+        try {
+            if (!RegExMatch(text, pattern, &m))
+                return ""
+            to := Message._Unescape(m[1])
+            from := Message._Unescape(m[2])
+            id := Message._Unescape(m[3])
+            msgType := Message._Unescape(m[4])
+            corr := Message._Unescape(m[5])
+        } catch {
+            return ""
+        }
+        if (to = "" || from = "" || id = "" || msgType = "")
+            return ""
+        timeoutMs := (m[6] = "") ? 0 : Integer(m[6])
+        return Map("to", to, "from", from, "id", id, "type", msgType, "corr", corr, "timeoutMs", timeoutMs
+            , "fromEnd", m.Pos(2) + m.Len(2) + 1, "toEnd", m.Pos(1) + m.Len(1) + 1)
+    }
+
+    ; The envelope text of ParseHead with another `from`. Everything else, the payload byte for byte, stays.
+    static WithFrom(text, head, from) {
+        return SubStr(text, 1, head["toEnd"] - 1) ',"from":' Json.Stringify(from) SubStr(text, head["fromEnd"])
+    }
+
+    static _Unescape(raw) {
+        if (!InStr(raw, "\"))
+            return raw
+        return Json.Parse('"' raw '"')
+    }
+
     static _Head(data, key) {
         if (!data.Has(key))
             throw ProtocolError("envelope field '" key "' is missing")

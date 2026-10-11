@@ -245,6 +245,46 @@ def test_message_is_routed_unchanged_and_from_cannot_be_forged(started, session_
     assert sup.wait_exit(timeout=20) == EXIT_OK, sup.text()
 
 
+def test_frames_outside_the_canonical_form_are_routed_with_the_real_sender(started, session_id):
+    # WI-24: canonical frames are routed by their head only; everything else takes the full way. In both
+    # ways the sender is the connection. A "from" written behind the payload must not win either.
+    sup = started()
+    a = connect(sup.pipe, "a")
+    b = connect(sup.pipe, "b")
+    try:
+        # white space after "to": not canonical, parsed fully
+        a._write('{"to": "b", "from": "forged", "id": "a#1", "type": "evt.test.spaced", "corr": null, "payload": {"n": 1}}')
+        got = b.wait_event("evt.test.spaced", timeout=5)
+        assert got["from"] == "a" and got["payload"] == {"n": 1}, got
+        # a second "from" behind the payload
+        a._write('{"to":"b","from":"a","id":"a#2","type":"evt.test.tail","corr":null,"payload":{"n":2},"from":"forged"}')
+        # (the full parser refuses duplicate keys, so the frame is dropped; what matters is that it does not arrive as "forged")
+        arrived = [m for m in b.events(timeout=1.0) if m.get("type") == "evt.test.tail"]
+        assert all(m["from"] == "a" for m in arrived), arrived
+        # canonical frame with a forged sender, payload with braces and quotes inside strings
+        text = {"t": '{"x": "}" \\" ]'}
+        a._write(dumps(make_envelope("forged", "a#3", "b", "evt.test.fast", None, None, text)))
+        got = b.wait_event("evt.test.fast", timeout=5)
+        assert got["from"] == "a" and got["payload"] == text, got
+        # refusals on the fast way: unknown target and the reserved "*"
+        missing = a.request("nobody", "cmd.test.x", {}, timeout=5)
+        assert missing["payload"]["error"]["code"] == "not_found", missing
+        star = a.request("*", "cmd.test.y", {}, timeout=5)
+        assert star["payload"]["error"]["code"] == "denied", star
+        # a topic event reaches subscribers, not the sender
+        request_ok(b, "supervisor", "cmd.topic.subscribe", {"topic": "t1"})
+        a._write(dumps(make_envelope("forged", "a#4", "topic:t1", "evt.test.topic", None, None, {"k": "v"})))
+        got = b.wait_event("evt.test.topic", timeout=5)
+        assert got["from"] == "a" and got["payload"] == {"k": "v"}, got
+    finally:
+        a.close()
+        b.close()
+    py = connect(sup.pipe, "py")
+    request_ok(py, "supervisor", "cmd.app.exit", {})
+    py.close()
+    assert sup.wait_exit(timeout=20) == EXIT_OK, sup.text()
+
+
 # --- single instance -------------------------------------------------------------------------------
 
 def test_second_instance_forwards_the_command_and_creates_no_hub(started, session_id):
