@@ -26,6 +26,9 @@ class Storage extends Role {
     static DEFAULT_TIMEOUT_MS := 30000
     ; Time kept from the shutdown deadline for the last answers and the sys.bye.
     static SHUTDOWN_MARGIN_MS := 500
+    ; A log file held by another process is retried for this long (per file and entry), every delay.
+    static LOG_RETRY_MS := 3000
+    static LOG_RETRY_DELAY_MS := 20
     ; Log sink of this process: its own entries go straight into the queue (no evt.log.append to itself).
     static SelfLogFn := (level, source, text, flowId := "") => Role.Current._SelfLog(level, source, text, flowId)
 
@@ -33,6 +36,7 @@ class Storage extends Role {
         super.__New(args)
         this.queue := WriteQueue()
         this._shutdownUntil := 0
+        this.logLinesLost := 0   ; log lines that could not be written even after the retries (F-04)
     }
 
     ; Creates the folders before the connection starts. A failure is logged to the console; the
@@ -172,7 +176,7 @@ class Storage extends Role {
 
     ; --- log ---------------------------------------------------------------------------------
 
-    _SelfLog(level, source, text, flowId) {
+    _SelfLog(level, source, text, flowId := "") {
         this._EnqueueLog(FormatTime(A_NowUTC, "yyyy-MM-dd HH:mm:ss"), level, source, "storage", text, flowId)
     }
 
@@ -183,20 +187,45 @@ class Storage extends Role {
         if (flowId != "")
             entry["flowId"] := flowId
         logDir := StoragePaths.LogDir(this.dataDir)
-        stamp := LogSink.LocalStamp(ts)
-        this.queue.Add(Map("deadline", "", "run", () => this._RunLogAppend(logDir, stamp, thread, source, text)
-            , "finish", (payload) => this._FinishLog(entry, payload)))
+        line := LogSink.Line(LogSink.LocalStamp(ts), thread, source, text)
+        ; One operation per file, so a retry of one file never writes the other one twice. The queue
+        ; keeps the order, a locked file holds back the entries behind it for at most LOG_RETRY_MS.
+        names := LogSink.FileNames(source)
+        for index, fileName in names
+            this.queue.Add(this._LogOp(entry, logDir, fileName, line, index = names.Length))
     }
 
-    _RunLogAppend(logDir, stamp, thread, source, text) {
-        LogSink.Append(logDir, stamp, thread, source, text)
+    ; A separate method, so each closure has its own parameters (loop variables are shared by closures).
+    _LogOp(entry, logDir, fileName, line, isLast) {
+        return Map("deadline", "", "retryMs", Storage.LOG_RETRY_MS, "retryDelayMs", Storage.LOG_RETRY_DELAY_MS
+            , "run", () => this._RunLogAppend(logDir, fileName, line)
+            , "finish", (payload) => this._FinishLog(entry, fileName, isLast, payload))
+    }
+
+    ; Returns the retry request of the queue while another process holds the file (F-04).
+    _RunLogAppend(logDir, fileName, line) {
+        busy := LogSink.AppendTo(logDir, fileName, line)
+        if (busy != "")
+            return Map("retry", true, "message", fileName ": " busy)
         return Map()
     }
 
-    _FinishLog(entry, payload) {
-        this.peer.Send("topic:log", "evt.log.entry", entry)
+    ; After the last file of an entry the entry goes to the topic "log". A line that could not be
+    ; written is counted and reported in the own log, never dropped silently.
+    _FinishLog(entry, fileName, last, payload) {
         if (!payload["ok"])
-            Role.Console("a0", "storage", "log write failed: " payload["error"]["message"])
+            this._LogLineLost(entry, fileName, payload["error"]["message"])
+        if (last)
+            this.peer.Send("topic:log", "evt.log.entry", entry)
+    }
+
+    _LogLineLost(entry, fileName, message) {
+        this.logLinesLost += 1
+        Role.Console("a0", "storage", "log line lost (" this.logLinesLost " in total) in " fileName ": " message)
+        if (SubStr(entry["text"], 1, 14) = "log line lost:")
+            return   ; the report itself is not reported again
+        this._SelfLog("a0", "storage", "log line lost: " fileName ", source '" entry["source"] "', text '"
+            SubStr(entry["text"], 1, 80) "', " this.logLinesLost " lost in total. " message)
     }
 
     ; --- folders -----------------------------------------------------------------------------

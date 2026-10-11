@@ -92,3 +92,5 @@ Stand: WI-12 umgesetzt, alle Akzeptanzkriterien grün. Commits mit Präfix `WI-1
 - Der Supervisor startet Storage nicht im Integrationstest (`--start=storage` wird nicht geprüft).
 - Einstellungen (`cmd.storage.settings.*`) und `.ahf`-Export: Phase 3, nicht gebaut.
 - Der Engine-Test (`test_engine.py`) nutzt weiter den StorageStub. Der echte Storage ist nur im einen Test oben angebunden.
+
+**Nachtrag F-04 (Log-Zeilen unter Parallellast):** behoben. Schreiben mit `FileOpen` (teilt Lesen und Schreiben) und Wiederholung per Timer in `WriteQueue` bei gesperrter Datei (3 s), danach Zähler `logLinesLost` und Selbstlog-Eintrag. Tests: `test_no_log_line_is_lost_while_other_processes_hold_the_files` (zwei Varianten), `test_a_log_line_that_cannot_be_written_is_reported_in_the_own_log`, AHK-Fälle "a retry keeps the order ..." und "a retry past its time ...". Siehe `doc/HOW-TO.md` (Eintrag F-04) und Commit `WI-12: retry ...` (`git log`).

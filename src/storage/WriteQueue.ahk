@@ -19,6 +19,7 @@ class WriteQueue {
     __New() {
         this._ops := []
         this._pumpFn := () => this._Pump()
+        this._nextDelayMs := -1   ; delay before the next run after a retry request, -1 for none
     }
 
     Pending => this._ops.Length
@@ -29,14 +30,33 @@ class WriteQueue {
     }
 
     ; Runs the first operation and answers it. Returns false when the queue is empty.
+    ; An operation may ask for a later retry (F-04, file locked by another process): its run function
+    ; returns Map("retry", true, "message", text) and the operation has "retryMs" (the time it may keep
+    ; trying, counted from the first retry) and optionally "retryDelayMs". It then stays at the head
+    ; of the queue (the order is kept) and runs again after the delay, by timer, so the message pump
+    ; is free in between. When the time is up, it is answered with code busy.
     RunOne() {
         if (this._ops.Length = 0)
             return false
+        this._nextDelayMs := -1
         op := this._ops.RemoveAt(1)
-        if (op["deadline"] != "" && Time.NowMs() > op["deadline"])
+        if (op["deadline"] != "" && Time.NowMs() > op["deadline"]) {
             payload := WriteQueue.Fail(ErrCode.TIMEOUT, "waited too long in the storage queue, not executed")
-        else
+        } else {
             payload := WriteQueue._RunSafely(op["run"])
+            if (payload.Has("retry")) {
+                now := Time.NowMs()
+                if (!op.Has("retryUntil"))
+                    op["retryUntil"] := now + op.Get("retryMs", 0)
+                if (now < op["retryUntil"]) {
+                    this._ops.InsertAt(1, op)
+                    this._nextDelayMs := op.Get("retryDelayMs", 25)
+                    return true
+                }
+                payload := WriteQueue.Fail(ErrCode.BUSY, "still busy after " op.Get("retryMs", 0) " ms: "
+                    payload.Get("message", ""))
+            }
+        }
         WriteQueue._FinishSafely(op["finish"], payload)
         return true
     }
@@ -52,7 +72,7 @@ class WriteQueue {
     _Pump() {
         this.RunOne()
         if (this._ops.Length > 0)
-            SetTimer(this._pumpFn, -1)
+            SetTimer(this._pumpFn, -Max(this._nextDelayMs, 1))
     }
 
     static Fail(code, text) => Map("ok", false, "error", Map("code", code, "message", text))

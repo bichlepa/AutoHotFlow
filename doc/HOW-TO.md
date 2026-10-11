@@ -524,13 +524,14 @@ _Noch keine Einträge._
 - **Status:** verifiziert (Test `test_engine_restart_is_seen_and_resynced_without_restarting_the_stub` mit echtem Kill, Snapshot mit neuer `epoch`). Offen: die Engine sollte `evt.engine.restarted` senden, siehe `work_items/phase2/findings.md`.
 - **Quelle:** `doc/PROTOKOLL.md` 4.3
 
-### Log-Zeilen gehen verloren, wenn ein anderer Prozess die Datei offen hat (Storage)
+### Log-Zeilen gehen verloren, wenn ein anderer Prozess die Datei offen hat (Storage, F-04)
 
-- **Problem:** Unter Last fehlten im Logfile des Stubs Zeilen (Ereignisse der letzten Sekunden). Die Storage-Ausgabe zeigt `storage unexpected OSError: (6) Das Handle ist ungültig`. Der Schreibvorgang der Zeile scheitert, die Zeile geht verloren. Auslöser war der Testleser, der die Datei während des Laufs las.
-- **Falsch:** Während eines Laufs eine Logdatei mit `read_bytes` lesen, um auf Einträge zu warten.
-- **Richtig:** Während des Laufs das Topic `log` beobachten (Storage leitet jeden Eintrag erst nach dem Schreiben weiter) und die Datei erst nach dem Ende lesen. Die Ursache im Storage (kein Wiederholversuch bei gesperrter Datei) ist offen, siehe `work_items/phase2/WI-13-ui-stub.md`, F-04.
-- **Status:** verifiziert (Fehler mit Reproduktion unter Parallellast: 2 bis 3 von 5 Läufen rot vorher; danach 6 von 6 Parallel-Läufe grün). Die Ursache im Storage-Code ist aus dem Fehlertext abgeleitet, nicht im Debugger gesehen: vermutet.
-- **Quelle:** `src/storage/LogSink.ahk` (`Append`, `_RotateIfBig`), `tests/e2e/test_ui_stub.py`
+- **Problem:** Unter Last fehlten im Logfile Zeilen. Beobachtet wurde `OSError (6) Das Handle ist ungültig`, sobald ein anderer Prozess (Testleser, Editor, Virenscanner) die Datei offen hatte. Die Zeile ging still verloren.
+- **Ursache (verifiziert):** `FileAppend` öffnet die Datei ohne Freigabe. Sobald irgendein anderer Prozess ein Handle auf die Datei hat, auch ein reiner Lesezugriff mit `FILE_SHARE_READ|WRITE`, wirft `FileAppend` `OSError (32)` (Sharing-Verletzung). Es gab keinen Wiederholversuch. Probe im Scratchpad: `CreateFileW` mit Freigabe 0, 1, 3, 7 hält die Datei, danach scheitert `FileAppend` jedes Mal mit 32. `FileGetSize` und `FileExist` gehen, `FileMove` geht nicht immer. Die Fehlernummer 6 aus dem ersten Fund ließ sich nicht erneut erzeugen: nicht geprüft, woher sie stammt (vermutet: veralteter `A_LastError` oder Fehler im damaligen Pfad).
+- **Falsch:** `FileAppend` für Dateien, die andere Prozesse lesen dürfen. Eine Zeile bei Fehler verwerfen oder blockierend in einer Schleife wiederholen.
+- **Richtig:** `FileOpen(pfad, "a", "UTF-8-RAW")` ohne `-rwd`-Flags (teilt Lesen und Schreiben) und bei Sharing-Fehlern (5, 32, 33) den Vorgang im Queue-Kopf lassen: `WriteQueue` führt ihn per Timer erneut aus (`retry`, `retryMs`, `retryDelayMs`), die Reihenfolge bleibt, die Nachrichtenschleife läuft zwischen den Versuchen. Nach 3 s: Antwort `busy`, Zähler `logLinesLost` und ein Selbstlog-Eintrag `log line lost: ...`. Eine Operation je Datei, damit eine Wiederholung nie die andere Datei doppelt beschreibt.
+- **Status:** verifiziert. Vor der Behebung 3 von 3 Läufen rot (nur 30 bis 40 von 120 Zeilen je Quelle). Danach 11 von 11 Läufen grün (Tests `test_no_log_line_is_lost_while_other_processes_hold_the_files` in beiden Varianten und `test_a_log_line_that_cannot_be_written_is_reported_in_the_own_log`), ein roter Lauf lag am Test (Race beim Warten, behoben).
+- **Quelle:** `src/storage/LogSink.ahk` (`AppendTo`), `src/storage/WriteQueue.ahk` (`RunOne`), `src/storage/Storage.ahk` (`_EnqueueLog`), `tests/integration/test_storage.py`, `tests/ahk/storage_queue.test.ahk`
 
 ### Boolesche Antworten als Zahl (Stub)
 

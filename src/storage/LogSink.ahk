@@ -26,17 +26,37 @@ class LogSink {
         return "`r`n--- " stamp " ~" thread "~" source "~ " AtomicFile.Crlf(String(text))
     }
 
-    ; Appends the entry to Log.txt and Log_<source>.txt in logDir.
-    static Append(logDir, stamp, thread, source, text) {
-        if (!DirExist(logDir))
-            DirCreate(logDir)
-        line := LogSink.Line(stamp, thread, source, text)
-        for fileName in ["Log.txt", "Log_" LogSink.SafeName(source) ".txt"] {
+    ; File names of an entry: the common log and the log of its source.
+    static FileNames(source) => ["Log.txt", "Log_" LogSink.SafeName(source) ".txt"]
+
+    ; Appends the entry to one file in logDir (rotating first). Returns "" when written, or the text
+    ; of the error when another process holds the file (sharing or lock violation, access denied by a
+    ; scanner): the caller retries later (F-04). Any other error is thrown.
+    ; FileAppend is not used: it opens the file without sharing, so any other open handle (a viewer,
+    ; a scanner) made it fail with error 32. FileOpen without the deny flags shares read and write.
+    static AppendTo(logDir, fileName, line) {
+        try {
+            if (!DirExist(logDir))
+                DirCreate(logDir)
             filePath := logDir "\" fileName
             LogSink._RotateIfBig(filePath)
-            FileAppend(line, filePath, "UTF-8-RAW")
+            file := FileOpen(filePath, "a", "UTF-8-RAW")
+            try {
+                file.Write(line)
+            } finally {
+                file.Close()
+            }
+        } catch OSError as e {
+            if (LogSink.IsBusy(e))
+                return Type(e) ": " e.Message
+            throw e
         }
+        return ""
     }
+
+    ; True for the errors of a file that another process holds: 5 access denied, 32 sharing violation,
+    ; 33 lock violation. (A_LastError is not used, FileOpen sets e.Number.)
+    static IsBusy(e) => e.Number = 5 || e.Number = 32 || e.Number = 33
 
     ; Replaces characters that are not allowed in file names (v1 sources like "Flow 369404488" are fine).
     static SafeName(source) => RegExReplace(String(source), '[\\/:*?"<>|\x00-\x1F]', "_")
@@ -44,7 +64,12 @@ class LogSink {
     static _RotateIfBig(filePath) {
         if (SubStr(filePath, -8) = "_old.txt")
             return
-        if (FileExist(filePath) != "" && FileGetSize(filePath) > LogSink.MAX_BYTES)
-            FileMove(filePath, SubStr(filePath, 1, -4) "_old.txt", true)
+        try {
+            if (FileExist(filePath) != "" && FileGetSize(filePath) > LogSink.MAX_BYTES)
+                FileMove(filePath, SubStr(filePath, 1, -4) "_old.txt", true)
+        } catch OSError {
+            ; The file is held by another process. Rotation is skipped, the entry is still written;
+            ; the next entry tries again.
+        }
     }
 }

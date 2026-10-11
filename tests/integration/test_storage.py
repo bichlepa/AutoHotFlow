@@ -400,6 +400,111 @@ def test_log_file_over_100_kb_is_renamed_to_old_before_the_next_entry(storage, f
     assert "after rotation" in (logdir / "Log.txt").read_text("utf-8")
 
 
+def _hold_exclusive(path, stop, share_mode, permanent=False):
+    """Opens the file over and over with the given Win32 share mode (0 = nobody else may open it),
+    keeps it for a moment, closes it. Stands in for an editor or a virus scanner."""
+    import ctypes
+    from ctypes import wintypes
+    k32 = ctypes.WinDLL("kernel32", use_last_error=True)
+    k32.CreateFileW.restype = wintypes.HANDLE
+    k32.CreateFileW.argtypes = [wintypes.LPCWSTR, wintypes.DWORD, wintypes.DWORD, wintypes.LPVOID,
+                                wintypes.DWORD, wintypes.DWORD, wintypes.HANDLE]
+    invalid = wintypes.HANDLE(-1).value
+    while not stop.is_set():
+        handle = k32.CreateFileW(str(path), 0x80000000, share_mode, None, 3, 0x80, None)  # GENERIC_READ, OPEN_EXISTING
+        if handle != invalid:
+            if permanent:
+                stop.wait()
+            else:
+                time.sleep(0.004)
+            k32.CloseHandle(handle)
+        time.sleep(0.001)
+
+
+@pytest.mark.parametrize("share_mode", [1, 0], ids=["readers-allow-read", "readers-deny-all"])
+def test_no_log_line_is_lost_while_other_processes_hold_the_files(storage, flowdir, pipe, share_mode):
+    """F-04: other processes open Log.txt and Log_<source>.txt (share mode 1 = FILE_SHARE_READ, like a
+    viewer; 0 = exclusive, like a scanner) while several sources log at once. Every line must arrive,
+    in order per source, in Log.txt and in the file of its source."""
+    import threading
+    _, _, client = storage
+    logdir = flowdir / "Log"
+    logdir.mkdir(exist_ok=True)
+    sources = ["src%d" % i for i in range(4)]
+    per_source = 120
+    for name in ["Log.txt"] + ["Log_%s.txt" % s for s in sources]:
+        (logdir / name).write_bytes(b"")
+    stop = threading.Event()
+    holders = [threading.Thread(target=_hold_exclusive, args=(logdir / name, stop, share_mode), daemon=True)
+               for name in ["Log.txt"] + ["Log_%s.txt" % s for s in sources]]
+    for h in holders:
+        h.start()
+
+    def sender_run(source):
+        sender = AhfClient(pipe, source)
+        ts = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
+        for n in range(per_source):
+            sender.send("storage", "evt.log.append", {"ts": ts, "level": "a1", "source": source,
+                                                     "text": "%s line %04d" % (source, n)})
+        sender.close()
+
+    senders = [threading.Thread(target=sender_run, args=(s,)) for s in sources]
+    try:
+        for t in senders:
+            t.start()
+        for t in senders:
+            t.join(30)
+        total = per_source * len(sources)
+    finally:
+        time.sleep(2.0)   # the holders stay while the storage drains its queue
+        stop.set()
+        for h in holders:
+            h.join(5)
+    # The holders are stopped. Writes in the queue may still be retried; they get the time they are allowed.
+    deadline = time.time() + 30
+    while time.time() < deadline:
+        counts = [len(re.findall(r"~src\d~ src\d line \d{4}", (logdir / name).read_bytes().decode("utf-8")))
+                  for name in ["Log.txt"] + ["Log_%s.txt" % s for s in sources]]
+        if counts[0] >= total and all(c >= per_source for c in counts[1:]):
+            break
+        time.sleep(0.2)
+    for name in ["Log.txt"] + ["Log_%s.txt" % s for s in sources]:
+        text = (logdir / name).read_bytes().decode("utf-8")
+        for s in sources:
+            if name != "Log.txt" and name != "Log_%s.txt" % s:
+                continue
+            found = [int(m) for m in re.findall(r"~%s~ %s line (\d{4})" % (s, s), text)]
+            assert found == list(range(per_source)), "%s in %s: %d lines, first gap near %s" % (
+                s, name, len(found), next((i for i, v in enumerate(found) if v != i), len(found)))
+
+
+def test_a_log_line_that_cannot_be_written_is_reported_in_the_own_log(storage, flowdir, pipe):
+    """F-04: when the retries fail, the loss is not silent: a line in Log_storage.txt names it."""
+    import threading
+    _, _, client = storage
+    logdir = flowdir / "Log"
+    logdir.mkdir(exist_ok=True)
+    held = logdir / "Log_stuck.txt"
+    held.write_bytes(b"")
+    stop = threading.Event()
+    holder = threading.Thread(target=_hold_exclusive, args=(held, stop, 0, True), daemon=True)
+    holder.start()
+    try:
+        client.send("storage", "evt.log.append", {"ts": time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime()),
+                                                 "level": "a1", "source": "stuck", "text": "never written"})
+        own = logdir / "Log_storage.txt"
+        deadline = time.time() + 15
+        while time.time() < deadline and not (own.exists() and "log line lost" in own.read_text("utf-8")):
+            time.sleep(0.2)
+    finally:
+        stop.set()
+        holder.join(5)
+    text = own.read_text("utf-8")
+    assert "log line lost: Log_stuck.txt, source 'stuck'" in text and "never written" in text
+    assert "never written" in (logdir / "Log.txt").read_text("utf-8")   # the common log has it
+    assert "never written" not in held.read_text("utf-8")
+
+
 # --- shutdown ---------------------------------------------------------------------------------------
 
 def test_shutdown_finishes_the_queued_writes_then_says_bye_and_exits_0(storage, flowdir, procs, hub):

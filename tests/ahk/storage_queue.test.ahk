@@ -113,6 +113,52 @@ CaseFailingAnswerDoesNotStopTheQueue() {
     Assert.Equal(seen[1]["name"], "after")
 }
 
+; Fails (asks for a retry) the first `failures` times, then succeeds. Counts the runs.
+BusyThenOk(counter, failures) {
+    counter["n"] += 1
+    if (counter["n"] <= failures)
+        return Map("retry", true, "message", "file held")
+    return Map()
+}
+
+CaseRetryKeepsTheOrderAndSucceedsLater() {
+    q := WriteQueue()
+    seen := []
+    counter := Map("n", 0)
+    after := Map("n", 0)
+    first := MakeOp(seen, "first", () => BusyThenOk(counter, 2))
+    first["retryMs"] := 5000
+    q.Add(first)
+    q.Add(MakeOp(seen, "second", () => Bump(after)))
+    Assert.True(q.RunOne())
+    Assert.Equal(seen.Length, 0)     ; asked for a retry, not answered yet
+    Assert.Equal(q.Pending, 2)       ; and still at the head
+    q.RunOne()
+    Assert.Equal(seen.Length, 0)
+    q.RunOne()                       ; third run succeeds
+    Assert.Equal(counter["n"], 3)
+    Assert.Equal(after["n"], 0)      ; the second operation did not overtake
+    q.RunOne()
+    Assert.Equal(seen.Length, 2)
+    Assert.Equal(seen[1]["name"], "first")
+    Assert.True(seen[1]["payload"]["ok"])
+    Assert.Equal(seen[2]["name"], "second")
+}
+
+CaseRetryEndsWithBusyWhenTheTimeIsUp() {
+    q := WriteQueue()
+    seen := []
+    counter := Map("n", 0)
+    op := MakeOp(seen, "stuck", () => BusyThenOk(counter, 1000))
+    op["retryMs"] := 0
+    q.Add(op)
+    q.RunOne()
+    Assert.Equal(seen.Length, 1)
+    Assert.Equal(seen[1]["payload"]["ok"], false)
+    Assert.Equal(seen[1]["payload"]["error"]["code"], "busy")
+    Assert.Equal(q.Pending, 0)
+}
+
 TestRun.Init()
 TestRun.Case("operations run in order and each is answered once", CaseRunsInOrderAndAnswersEachOnce)
 TestRun.Case("an operation past its deadline is not run and gets timeout", CaseExpiredDeadlineIsNotRun)
@@ -120,4 +166,6 @@ TestRun.Case("an operation before its deadline runs", CaseFutureDeadlineRuns)
 TestRun.Case("errors keep their code (AhfError) or become internal", CaseErrorsKeepTheirCode)
 TestRun.Case("FailAll answers every waiting operation with the given code", CaseFailAllAnswersEveryWaitingOperation)
 TestRun.Case("a failing answer does not stop the queue", CaseFailingAnswerDoesNotStopTheQueue)
+TestRun.Case("a retry keeps the order and can succeed later", CaseRetryKeepsTheOrderAndSucceedsLater)
+TestRun.Case("a retry past its time is answered with busy", CaseRetryEndsWithBusyWhenTheTimeIsUp)
 TestRun.Finish()
