@@ -26,10 +26,19 @@ RUN_COUNTER = itertools.count(1)
 
 def pytest_configure(config):
     config.addinivalue_line("markers", "stress: long-running stress test, run with -m stress")
+    config.addinivalue_line("markers", "soak: endurance test (minutes), run with -m soak")
     config.addinivalue_line("markers", "fault: fault injection test (kill, freeze, timeout)")
 
 
 def pytest_collection_modifyitems(config, items):
+    # Stress and soak tests (full size) only run when asked for with -m (the default run keeps their smoke variants).
+    asked = config.getoption("markexpr") or ""
+    for marker in ("stress", "soak"):
+        if marker not in asked:
+            kept = [i for i in items if i.get_closest_marker(marker) is None]
+            if len(kept) != len(items):
+                config.hook.pytest_deselected(items=[i for i in items if i not in kept])
+                items[:] = kept
     # Hard limit per test, so nothing hangs unnoticed (pytest-timeout).
     for item in items:
         if item.get_closest_marker("timeout") is None:

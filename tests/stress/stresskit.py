@@ -76,6 +76,17 @@ class StressClient(AhfClient):
         return self._wait_answer(msg_id, timeout)
 
 
+def thread_stacks(threads):
+    """Text with the current stack of each live thread (for the message of a test that has to give up)."""
+    import traceback
+    frames = sys._current_frames()
+    out = []
+    for t in threads:
+        if t.is_alive() and t.ident in frames:
+            out.append("--- " + t.name + chr(10) + "".join(traceback.format_stack(frames[t.ident])))
+    return chr(10).join(out)
+
+
 def write_flow(datadir, name, sleep_ms=200, policy="default"):
     """Flows/<name>.json: the skeleton flow with another sleep time and execution policy."""
     flow = json.loads(SKELETON_SRC.read_text(encoding="utf-8"))
@@ -99,9 +110,13 @@ class StressChain:
         self.hub_hwnd = hwnd_of(self.sup_pid) if wake_hub else 0
         self.pids = {}
 
+    def new_client(self, name):
+        """A connected StressClient that the caller closes (thread safe)."""
+        return _connect(self.chain.sup.pipe, name, self.hub_hwnd)
+
     def client(self, name, topics=()):
         """A connected StressClient, subscribed to the topics. Closed at teardown."""
-        client = _connect(self.chain.sup.pipe, name, self.hub_hwnd)
+        client = self.new_client(name)
         self.clients.append(client)
         for topic in topics:
             answer = client.request("supervisor", "cmd.topic.subscribe", {"topic": topic}, timeout=5)
