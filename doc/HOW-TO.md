@@ -118,7 +118,7 @@ Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge kor
 
 - **Problem:** Eine Methode, die `true` oder `false` zurückgibt, liefert in AHK v2 einen Integer. `Assert.Equal(x, false)` prüft deshalb auf Integer, nicht auf einen Bool-Typ. Die Fehlermeldung zeigt "expected 0 (Integer)".
 - **Richtig:** Für Rückgabewerte wie `TryTransition` `Assert.Equal(ok, false)` oder `Assert.True(ok)` verwenden. Beide Seiten sind dann Integer.
-- **Status:** verifiziert (`tests/ahk/engine_states.test.ahk`, Vergleiche mit `false` und `true`)
+- **Status:** verifiziert (`tests/ahk/engine_states.test.ahk`, Vergleiche mit `false` und `true`). Gilt für Programmzustand und Rückgabewerte. Die Leitung ist seit WI-26 anders (`Json.True`/`Json.False`, siehe die Einträge „Wahrheitswerte gehen als Zahl auf die Leitung“ und „`Json.False` ist in AHK wahr“).
 
 ### Dieselbe Datei über verschiedene relative `#Include`-Wege
 
@@ -157,6 +157,14 @@ Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge kor
 - **Status:** verifiziert (im Lauf von WI-07 gefunden; die Fundstelle wurde für diesen Eintrag nicht erneut geprüft)
 - **Quelle:** `src/supervisor/` (WI-07)
 - **Wieder aufgetreten (WI-10):** `src/engine/Engine.ahk` hatte das Feld `_loaded` und die Methode `_Loaded()`. Der Start der Rolle schlug mit der gleichen Meldung fehl (Exit 2, "bad arguments: Property is read-only"). Behoben durch Umbenennen des Feldes in `_flowsLoaded`. Vor dem Benennen einer Methode `_X()` prüfen, ob es schon ein Feld `_x` gibt.
+
+### `Json.False` ist in AHK wahr (WI-26)
+
+- **Problem:** AHK v2 hat keinen Bool-Typ, und jedes Objekt ist wahr. `Json.True` und `Json.False` sind Objekte (damit `Stringify` `true`/`false` schreiben kann), also ist `if Json.False` wahr. Ein Wahrheitswert, der als `Json.False` im Programmzustand liegt und mit `if` geprüft wird, ist ein stiller Fehler.
+- **Falsch:** `payload["ok"] := Json.False` und später `if (payload["ok"])` (so in `WriteQueue`/`Storage._Finish`).
+- **Richtig:** `Json.True`/`Json.False`/`Json.Bool(x)` nur beim Bau der Nachricht unmittelbar vor dem Senden. Intern bleibt es `1`/`0` (und `true`/`false` als AHK-Literale, die `1`/`0` sind). `ok` wandelt `Message.Serialize` auf einer Kopie um. Beim Weitergeben einer geparsten Nutzlast die Wahrheitsfelder neu mit `Json.Bool` setzen (Parse liefert `1`/`0`). Tests prüfen mit `value == Json.False`, nicht mit `Assert.Equal(x, 0)`.
+- **Status:** verifiziert (`tests/ahk/json.test.ahk` „Json.True and Json.False are distinct singletons“, `tests/ahk/message.test.ahk`)
+- **Quelle:** `src/core/Json.ahk`, `src/core/ipc/Message.ahk` (`_WirePayload`), `doc/PROTOKOLL.md` Abschnitt 2
 
 ## Objekte, Maps, Arrays
 
@@ -344,10 +352,11 @@ Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge kor
 - **Status:** verifiziert (10.000 sequentielle Anfragen: Handles 163 → 163 → 163, Pending 0, 0,99 ms je Anfrage). Die Zahl der aktiven Timer selbst ist nicht direkt messbar: nur indirekt über Pending.
 - **Quelle:** `tests/integration/test_peer.py::test_10000_sequential_requests_keep_pending_and_handles_flat`
 
-### Wahrheitswerte gehen als Zahl auf die Leitung
-- **Problem:** Das Protokoll zeigt `"ok": true`. `Json.Parse` liefert `true` als `1`, und `Json.Stringify` schreibt diesen Integer als Zahl. Beim Vergleich in Python ist `1 == True`, so dass der Test den Unterschied nicht bemerkt.
-- **Richtig:** Empfänger prüfen `ok` als Wahrheitswert, nicht als Text. Die Abweichung steht in `doc/PROTOKOLL.md`, Abschnitt 2. Ein eigener Bool-Typ im Json-Baustein wäre die saubere Lösung, ist aber ein Vertragswechsel (WI-02).
-- **Status:** verifiziert (gelesen: `Json.Emit` schreibt Integer als Zahl). Die Bytes einer Antwort wurden nicht ausgegeben.
+### Wahrheitswerte gehen als Zahl auf die Leitung (überholt durch WI-26)
+
+- **Problem:** Das Protokoll zeigt `"ok": true`. `Json.Parse` liefert `true` als `1`, und `Json.Stringify` schrieb diesen Integer als Zahl. Beim Vergleich in Python ist `1 == True`, so dass der Test den Unterschied nicht bemerkte.
+- **Richtig (seit WI-26):** Geschrieben wird `true`/`false` mit `Json.True`, `Json.False`, `Json.Bool(x)`; `ok` wandelt `Message.Serialize` zentral um. Gelesen wird weiter `1`/`0`. Die Regel steht an einer Stelle: `doc/PROTOKOLL.md`, Abschnitt 2.
+- **Status:** verifiziert (WI-26: strenge Prüfung `is True`/`is False` in den Python-Tests und `wirebool` in jedem Test; AHK-Tests `json.test.ahk`, `message.test.ahk`)
 - **Quelle:** `src/core/Json.ahk`, `doc/PROTOKOLL.md`
 
 ### Zweimal `start()` über `with`
@@ -566,11 +575,11 @@ Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge kor
 - **Status:** verifiziert. Vor der Behebung 3 von 3 Läufen rot (nur 30 bis 40 von 120 Zeilen je Quelle). Danach 6 von 6 Läufen grün nach der letzten Testkorrektur (Tests `test_no_log_line_is_lost_while_other_processes_hold_the_files` in beiden Varianten und `test_a_log_line_that_cannot_be_written_is_reported_in_the_own_log`). Davor zwei rote Läufe, die am Test lagen (Race: `Log.txt` ist vor `Log_<Quelle>.txt` vollständig, der Test wartete nur auf die erste Datei), behoben. Gesamtlauf: 406 passed, 1 skipped.
 - **Quelle:** `src/storage/LogSink.ahk` (`AppendTo`), `src/storage/WriteQueue.ahk` (`RunOne`), `src/storage/Storage.ahk` (`_EnqueueLog`), `tests/integration/test_storage.py`, `tests/ahk/storage_queue.test.ahk`
 
-### Boolesche Antworten als Zahl (Stub)
+### Boolesche Antworten als Zahl (Stub, überholt durch WI-26)
 
-- **Problem:** `cancel` soll laut Protokoll ein Bool sein. Der Json-Baustein schreibt `true` als `1`.
-- **Richtig:** Im Stub `cancel` als `1` oder `0` senden. Der Empfänger prüft als Wahrheitswert (siehe oben, Abschnitt "Wahrheitswerte gehen als Zahl auf die Leitung").
-- **Status:** verifiziert (Probe: `cancel: 0` im Log, Test `test_cancelled_exit_is_answered_and_nothing_stops`)
+- **Problem:** `cancel` soll laut Protokoll ein Bool sein. Der Json-Baustein schrieb `true` als `1`.
+- **Richtig (seit WI-26):** Der Stub sendet `cancel` mit `Json.Bool(...)` als `true`/`false`. Der Empfänger liest weiter `1`/`0` (siehe „Wahrheitswerte gehen als Zahl auf die Leitung“).
+- **Status:** verifiziert (Test `test_cancelled_exit_is_answered_and_nothing_stops` prüft `cancel is True`)
 
 ## Tests und Werkzeuge
 
@@ -694,12 +703,11 @@ Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge kor
 - **Status:** verifiziert (WI-07, Testfall für die zweite Instanz)
 - **Quelle:** `src/supervisor/Supervisor.ahk` (`_ForwardIfRunning`), `tests/integration/test_supervisor.py`
 
-### Wahrheitswerte aus AHK sind 0 und 1 auch in den Python-Tests
+### Wahrheitswerte aus AHK sind 0 und 1 auch in den Python-Tests (überholt durch WI-26)
 
-- **Problem:** Ein Test prüfte `payload["ok"] is False`. AHK schreibt Wahrheitswerte als Zahl (`0`/`1`), der Vergleich mit `False` schlug fehl, obwohl die Antwort richtig war (`0 is False` ist falsch).
-- **Falsch:** `assert msg["payload"]["enabled"] is False`.
-- **Richtig:** Wahrheit prüfen: `assert not msg["payload"]["enabled"]`, `assert msg["payload"]["executing"] == 1`. Für `ok` dasselbe. Die Regel steht in `doc/PROTOKOLL.md`, Abschnitt 2.
-- **Status:** verifiziert (Testlauf WI-10: zwei Tests rot mit `0 is False`, nach der Änderung grün).
+- **Problem:** Ein Test prüfte `payload["ok"] is False`. AHK schrieb Wahrheitswerte als Zahl (`0`/`1`), der Vergleich mit `False` schlug fehl, obwohl die Antwort richtig war (`0 is False` ist falsch).
+- **Richtig (seit WI-26):** Die Leitung trägt `true`/`false`, also in Python `is True` / `is False` prüfen (Hilfen in `tests/support/wirebool.py`). Ein Rückfall auf `1`/`0` fällt automatisch auf: jeder Test schlägt fehl, dessen Python-Peer ein Protokollfeld der Liste nicht als JSON-Boolean erhält. Die Regel steht in `doc/PROTOKOLL.md`, Abschnitt 2.
+- **Status:** verifiziert (Testlauf WI-10: `0 is False` rot. WI-26: strenge Tests grün).
 - **Quelle:** `tests/integration/test_engine.py`
 
 ### Lange Dateitexte über Bash-Heredoc: "unexpected EOF"

@@ -18,7 +18,7 @@ Gilt für alles unter `src/`, `tests/ahk/` und `tools/`. Sprache der Dokumentati
 
 ## 3. Verbotene Muster (Reviewregeln)
 
-Die Muster mit festem Wortlaut werden **automatisch geprüft**: `python tools/arch_check.py` (Exit 1 bei Verstößen, Ausgabe `datei:zeile: regel: text`) und `tests/test_architecture.py` (Teil des Gesamtlaufs). Regeln: `requires`, `one-class`, `include-core`, `include-roles`, `include-tests`, `dialog`, `file-io`, `blocking`, `inline-element`, `warn`, `critical`, `empty-catch`, `builtin-class`. Eine begründete Ausnahme steht als Kommentar `; arch-ok: <regel> <Begründung>` in derselben oder der vorigen Zeile, oder (für bekannte Altlasten) in der Liste `EXCEPTIONS` in `tools/arch_check.py`. **Neue Regeln werden hier und im Werkzeug (samt Selbsttest) gleichzeitig ergänzt.** Die Prüfung ist bewusst einfach (Zeilen und Muster); `A_TickCount`/Zufall als ID, Zugriff über Prozessgrenzen und fehlendes `try/catch` um Elementcode prüft sie nicht (Review).
+Die Muster mit festem Wortlaut werden **automatisch geprüft**: `python tools/arch_check.py` (Exit 1 bei Verstößen, Ausgabe `datei:zeile: regel: text`) und `tests/test_architecture.py` (Teil des Gesamtlaufs). Regeln: `requires`, `one-class`, `include-core`, `include-roles`, `include-tests`, `dialog`, `file-io`, `blocking`, `inline-element`, `warn`, `critical`, `empty-catch`, `builtin-class`, `wire-bool`. Eine begründete Ausnahme steht als Kommentar `; arch-ok: <regel> <Begründung>` in derselben oder der vorigen Zeile, oder (für bekannte Altlasten) in der Liste `EXCEPTIONS` in `tools/arch_check.py`. **Neue Regeln werden hier und im Werkzeug (samt Selbsttest) gleichzeitig ergänzt.** Die Prüfung ist bewusst einfach (Zeilen und Muster); `A_TickCount`/Zufall als ID, Zugriff über Prozessgrenzen und fehlendes `try/catch` um Elementcode prüft sie nicht (Review).
 
 | Muster | Wo verboten | Stattdessen |
 |---|---|---|
@@ -30,6 +30,7 @@ Die Muster mit festem Wortlaut werden **automatisch geprüft**: `python tools/ar
 | `try` ohne Behandlung (leerer `catch`) | überall | loggen oder bewusst begründen |
 | Zugriff auf Objekte eines anderen Prozesses, gemeinsamer Speicher, `SendMessage` an andere Rollen | überall | Nachricht über den Hub |
 | Elementcode ohne `try/catch` um den Aufruf | `engine`, `worker`, `triggerhost` | zentrale Aufrufstelle `ElementRunner` |
+| Wahrheitswert als Literal (`"enabled", true`, `"cancel", 1`) in einer Protokoll-Nutzlast; `Json.False` im Programmzustand mit `if` geprüft | überall | `Json.True`/`Json.False`/`Json.Bool(x)` nur beim Bau der Nachricht, intern `1`/`0` (PROTOKOLL 2). `ok` wandelt `Message.Serialize` |
 
 ## 4. Fehler und Protokoll
 
