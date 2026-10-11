@@ -39,6 +39,7 @@ OnError(AhfLoadError)
 #Include elements\skeleton\Action_TestHangWorker.ahk
 #Include elements\skeleton\Action_TestThrowWorker.ahk
 #Include elements\skeleton\Action_TestEchoWorker.ahk
+#Include elements\skeleton\Action_TestLongBlockWorker.ahk
 #Include ..\tests\integration\helpers\EchoRole.ahk
 #Include ..\tests\integration\helpers\CrasherRole.ahk
 #Include ..\tests\integration\helpers\HangerRole.ahk

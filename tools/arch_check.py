@@ -161,7 +161,7 @@ WARN_RE = re.compile(r"^[ \t]*#Warn\b(.*)$", re.M | re.I)
 MODE_RE = re.compile(r"\bstatic\s+Mode\s*:=\s*[\"'](\w+)[\"']", re.I)
 # A truth field of the protocol (doc/PROTOKOLL.md section 2) written as a literal true/false/0/1 in a Map. It must be
 # Json.True, Json.False or Json.Bool(...). "ok" is not listed: Message.Serialize converts it centrally.
-WIRE_BOOL_RE = re.compile(r"""(?<!Get\()["'](?:cancel|started|clean|restart|enabled|executing|exists|existed|waiting|byMeta|delete)["']\s*,\s*(?:true|false|[01])\b""", re.I)
+WIRE_BOOL_RE = re.compile(r"""(?<!Get\()["'](?:cancel|started|clean|restart|enabled|executing|exists|existed|waiting|byMeta|delete|busy)["']\s*,\s*(?:true|false|[01])\b""", re.I)
 CATCH_RE = re.compile(r"(?<![\w.])catch\b", re.I)
 ARCH_OK_RE = re.compile(r"arch-ok:\s*([\w-]+)\s*(.*)")
 

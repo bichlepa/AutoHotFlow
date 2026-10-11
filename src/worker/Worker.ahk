@@ -13,9 +13,13 @@
 ;
 ; Blocking and pings: AHK v2 has one thread per process. Between script lines AHK checks for
 ; window messages, so an element that waits in short slices (Sleep, or a loop of DllCall("Sleep", 100))
-; still answers sys.ping and cancel. A single long blocking call does not (HOW-TO, worker section).
-; Decision for WI-11 (see work_items/phase2/WI-11-worker.md, open points): no heartbeat tolerance.
-; Elements that block for long must work in slices, or the supervisor sees them as hung.
+; still answers sys.ping and cancel. A single long blocking call (download, COM call, long DllCall) does not.
+; Since WI-27 (decision E3, ARCHITEKTUR 6.4) that is allowed: the worker reports to the supervisor when a job
+; begins and ends (sys.busy {busy}). The supervisor neither pings a busy worker nor judges its pongs, so a long
+; blocking call does not make it "hung". The decision of WI-11 ("no heartbeat tolerance") is replaced by this.
+; What stays: a busy worker whose process dies is seen at once (process handle). One that blocks for ever ends
+; only by a cancel that is not confirmed in 2 s, or by the job deadline of the element: the engine then asks the
+; supervisor to kill it (cmd.process.kill). The worker never decides that for itself.
 ;
 ; Cancel: cmd.worker.cancel stops the running element through ElementRunner.Stop and sends
 ; evt.worker.done with result "stopped". A later Finish of the element is ignored. An element that
@@ -33,6 +37,12 @@ class Worker extends Role {
     RegisterHandlers() {
         this.On("cmd.worker.run", (msg) => this._CmdRun(msg))
         this.On("cmd.worker.cancel", (msg) => this._CmdCancel(msg))
+    }
+
+    ; After a reconnect to the hub the supervisor does not know that a job is running.
+    OnReady() {
+        if (this._job != "")
+            this._ReportBusy(true)
     }
 
     ; sys.shutdown: a running element is stopped and reported before sys.bye (ARCHITECTURE 6.3).
@@ -54,6 +64,7 @@ class Worker extends Role {
         job := Map("execId", execId, "classId", classId, "params", params, "imports", imports, "env", env
             , "started", false, "cls", "", "ctx", "")  ; arch-ok: wire-bool internal job record, never sent
         this._job := job
+        this._ReportBusy(true)          ; before the element starts: it may block for long (see the head of this file)
         SetTimer(this._startFn, -1)
         return Map()
     }
@@ -121,8 +132,15 @@ class Worker extends Role {
     }
 
     _SendDone(execId, result, msg, exports) {
+        if (this._job = "")             ; a newer job (not possible while the engine waits for this event) keeps the flag
+            this._ReportBusy(false)
         this.peer.Send("engine", "evt.worker.done", Map("execId", execId, "result", result
             , "message", String(msg), "exports", Worker._Plain(exports)))
+    }
+
+    ; Tells the supervisor that a job begins or ends (PROTOCOL 4.1, sys.busy). No answer.
+    _ReportBusy(busy) {
+        this.peer.Send("supervisor", "sys.busy", Map("busy", Json.Bool(busy)))
     }
 
     ; --- helpers -------------------------------------------------------------------------------
