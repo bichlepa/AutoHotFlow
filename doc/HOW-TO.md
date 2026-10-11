@@ -241,10 +241,6 @@ Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge kor
 
 ## Prozesse, Pipes, Nachrichten
 
-_Noch keine Einträge._
-
-## Prozesse, Pipes, Nachrichten
-
 ### Pipe-Lesen und -Schreiben nur mit überlappten E/A parallel
 
 - **Problem:** Der Python-Client braucht einen Lesethread, während der Hauptthread schreibt. Mit `open(..., "r+b")` (synchroner Handle) wäre das ein Risiko, weil Windows E/A auf demselben synchronen Handle serialisiert. Ein wartendes Lesen würde das Schreiben blockieren.
