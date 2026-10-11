@@ -10,8 +10,9 @@ Gesprochene Sprache mit dem Projektinhaber: Deutsch. Dokumentation: Deutsch. Cod
 
 - Branch: `v2-port` (Portierung). `master` bleibt die lauffähige v1.
 - Phase 0 (Bestandsaufnahme) und Phase 1 (Entwurf) sind abgeschlossen und freigegeben.
-- **Phase 2 (Walking Skeleton) ist als Arbeitspakete geplant, noch nicht begonnen:** `work_items/phase2/README.md`.
-- Es gibt noch keinen v2-Code unter `src/`. Der v1-Stand liegt unverändert in `v1/` (temporär, nur Referenz, **nicht ändern**).
+- **Phase 2 (Walking Skeleton) ist technisch abgeschlossen** (Pakete: `work_items/phase2/README.md`). Es laufen Supervisor, Storage, Engine, Worker-Pool und ein UI-Stub (`manager --ui=stub`) mit den Elementen aus `src/elements/skeleton/`. Fault-Injection- und Stresstests sind grün. **Nicht gebaut:** Triggerhost (WI-14, optional), Editor, echter Manager, echte Elemente; die GUI des Stubs ist nicht von Hand geprüft. Phase 3 ist noch nicht begonnen und braucht die Freigabe des Projektinhabers.
+- Der v2-Code liegt unter `src/` (Rollen `supervisor`, `engine`, `storage`, `worker`, `manager`-Stub), Tests unter `tests/`. Abweichungen von der Zielstruktur: `doc/ARCHITEKTUR.md` Abschnitt 8. Der v1-Stand liegt unverändert in `v1/` (temporär, nur Referenz, **nicht ändern**).
+- Offene Funde (F-06, F-08) und Messlücken: `work_items/STATUS.md`. Übergabe: `work_items/HANDOVER.md`.
 - Statusbericht: `work_items/STATUS.md`.
 
 ## Entscheidungen (verbindlich, Details in `doc/ARCHITEKTUR.md`)
