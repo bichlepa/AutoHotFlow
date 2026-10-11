@@ -264,6 +264,8 @@ class Children {
             cmd .= ' --flow=' rec["flow"]
         if (cfg["testRoles"])
             cmd .= ' --test-roles'
+        if (isRestart)
+            cmd .= ' --restarted=' rec["restartTimes"].Length   ; the role knows it is a restart (engine: evt.engine.restarted)
         cmd .= cfg["roleOpts"]   ; --ui, --headless, --stub-cancel-exit (WI-13), "" when not given
         pid := 0
         try {

@@ -517,11 +517,12 @@ _Noch keine Einträge._
 - **Richtig:** Einträge vom Topic `evt.log.*` nur zählen, nie protokollieren (`StubManager._OnEvent`).
 - **Status:** verifiziert (`logEchoCount` im Probelauf gesetzt, Logdatei ohne Wiederholungen)
 
-### Engine-Neustart: `evt.engine.restarted` wird nicht gesendet
+### Engine-Neustart: `evt.engine.restarted` (F-01)
 
-- **Problem:** PROTOCOL 4.3 nennt `evt.engine.restarted`. Die Engine (WI-10) sendet es nicht. Ein neuer Engine-Prozess meldet nur `evt.engine.ready` mit neuer `epoch`.
-- **Richtig:** Clients erkennen den Neustart über `evt.process.restarted` (name `engine`, Supervisor), über eine neue `epoch` und über `evt.engine.ready`. Der Stub nutzt alle drei Signale (`_OnEvent`).
-- **Status:** verifiziert (Test `test_engine_restart_is_seen_and_resynced_without_restarting_the_stub` mit echtem Kill, Snapshot mit neuer `epoch`). Offen: die Engine sollte `evt.engine.restarted` senden, siehe `work_items/phase2/findings.md`.
+- **Problem:** PROTOCOL 4.3 nennt `evt.engine.restarted`, die Engine (WI-10) sendete es nicht. Ein neuer Engine-Prozess kann von sich aus nicht wissen, ob er der erste oder ein Neustart ist (eine neue `epoch` hat jeder Start).
+- **Richtig:** Der Supervisor hängt bei einem automatischen Neustart `--restarted=<n>` an die Kommandozeile (`Children._Launch`). Die Engine sendet bei dieser Option nach dem Laden der Flows `evt.engine.restarted` mit der neuen `epoch`. Clients können zusätzlich `evt.process.restarted` und die neue `epoch` auswerten (der Stub tut das).
+- **Status:** verifiziert (Test `test_engine_restart_is_seen_and_resynced_without_restarting_the_stub` mit echtem Kill: Ereignis mit neuer `epoch` kommt, beim ersten Start nicht; ohne die Engine-Änderung schlägt dieselbe Assertion fehl).
+- **Quelle:** `src/engine/Engine.ahk` (`_Loaded`), `src/supervisor/Children.ahk` (`_Launch`), `doc/PROTOKOLL.md` 4.3
 - **Quelle:** `doc/PROTOKOLL.md` 4.3
 
 ### Log-Zeilen gehen verloren, wenn ein anderer Prozess die Datei offen hat (Storage, F-04)

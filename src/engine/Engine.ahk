@@ -173,6 +173,10 @@ class Engine extends Role {
         added := []
         for rec in this.flows.All()
             added.Push(rec.FlowId)
+        ; The supervisor starts a restarted engine with --restarted=<n>. The engine owns the epoch, so it
+        ; announces the new one itself (ARCHITECTURE 6.2, PROTOCOL 4.3); clients then call cmd.engine.snapshot.
+        if (this.args.Has("restarted"))
+            this.Emit("topic:engine", "evt.engine.restarted", Map())
         this.Emit("topic:engine", "evt.flow.list.changed", Map("added", added, "removed", [], "changed", []))
         this.Emit("topic:engine", "evt.engine.ready", Map())
         this._Log("a1", "engine", "ready with " this.flows.Count " flow(s)")

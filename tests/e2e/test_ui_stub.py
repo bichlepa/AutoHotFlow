@@ -264,6 +264,18 @@ def test_engine_restart_is_seen_and_resynced_without_restarting_the_stub(procs, 
         epoch_after = wait_until(new_epoch, 15)
         assert epoch_after, "no evt.engine.ready with a new epoch"
 
+        # F-01: the engine announces its restart itself, with the new epoch, before it is ready.
+        def restarted_event():
+            for m in rec.snapshot():
+                if m.get("type") == "evt.engine.restarted":
+                    return m
+            return None
+        announced = wait_until(restarted_event, 15)
+        assert announced, "no evt.engine.restarted on topic engine"
+        assert announced["payload"]["epoch"] == epoch_after and announced["payload"]["epoch"] != epoch_before
+        assert not any(m.get("type") == "evt.engine.restarted" and m["payload"]["epoch"] == epoch_before
+                       for m in rec.snapshot()), "the first start must not announce a restart"
+
         def resynced_in_log():
             return any(e["type"] == "stub.snapshot" and e["payload"].get("ok") == 1
                        and e["payload"].get("epoch") == epoch_after for e in ui_lines_from_log(rec.snapshot()))

@@ -154,7 +154,7 @@ Jedes Ereignis trägt `seq` (steigend pro Engine-Epoche) und `epoch`.
 | Typ | Topic | Nutzlast |
 |---|---|---|
 | `evt.engine.ready` | `engine` | `{ epoch }` |
-| `evt.engine.restarted` | `engine` | `{ epoch }` → Clients führen `cmd.engine.snapshot` aus |
+| `evt.engine.restarted` | `engine` | `{ epoch }` (zusätzlich `seq`) → Clients führen `cmd.engine.snapshot` aus. Sendet die Engine selbst, nur nach einem Neustart durch den Supervisor (Option `--restarted=<n>`), nicht beim ersten Start |
 | `evt.flow.list.changed` | `engine` | `{ added: [..], removed: [..], changed: [..] }` |
 | `evt.flow.state` | `flow:<id>` | `{ flowId, enabled, executing }` |
 | `evt.flow.committed` | `flow:<id>` | `{ flowId, rev, byMeta: bool }` (für Editor nach Manager-Umbenennung) |
@@ -265,7 +265,7 @@ Der Stub ist ein Minimal-Ersatz für `manager` (ARCHITEKTUR 3). Er zeigt, was di
 - **Ereignisse als Logzeilen:** jedes empfangene `evt.*` (außer Topic `log`) wird als `evt.log.append` an `storage` gesendet, Quelle `manager`, Text `ui-event {json}`. Storage schreibt `Log/Log_manager.txt`. Das Feld `recvMs` ist die Wandzeit (ms, UTC) beim Eingang. Die Zeilen `stub.*` sind eigene Einträge des Stubs (`stub.ready`, `stub.snapshot` mit `reason`, `stub.command`, `stub.commandAnswer`, `stub.prepareExit`, `stub.shutdown`).
 - **Testbefehl `cmd.test.command` (nur mit `--headless`):** Nutzlast `{ type, payload }`, `type` aus `cmd.flow.start`, `cmd.flow.stop`, `cmd.flow.toggle`, `cmd.engine.snapshot`. Der Stub leitet die Anfrage an `engine` weiter und antwortet mit `{ ok: true, answer: <Antwort der Engine> }`. Andere Typen: `bad_payload`. Die Antwort kommt verzögert (`Deferred`).
 - **Optionen, die der Supervisor an alle Rollen weitergibt:** `--ui=<wort>`, `--headless`, `--stub-cancel-exit`.
-- **Abweichung von 4.3:** Die Engine sendet kein `evt.engine.restarted` (Umsetzung WI-10 fehlt). Ein neu gestarteter Engine-Prozess meldet sich mit `evt.engine.ready` und neuer `epoch`. Der Stub löst den Resync über die Signale oben aus. Offen in `work_items/phase2/findings.md`.
+- **`evt.engine.restarted`:** Die Engine sendet es selbst (sie besitzt die `epoch`), sobald sie nach einem Neustart die Flows geladen hat, direkt vor `evt.flow.list.changed` und `evt.engine.ready`. Sie erkennt den Neustart an der Option `--restarted=<n>`, die der Supervisor nur bei einem automatischen Neustart anhängt (`n` = Zahl der Neustarts im Fenster). Beim ersten Start fehlt die Option, dann kommt kein `evt.engine.restarted`. Der Stub löst den Resync zusätzlich über `evt.process.restarted` und neue `epoch` aus.
 
 ## 5. Verbindungsaufbau, Wiederverbindung, Resync
 
