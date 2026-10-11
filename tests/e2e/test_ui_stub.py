@@ -113,6 +113,19 @@ def stub_events_from_file(datadir):
     return out
 
 
+def connect_obs(pipe, timeout=20.0):
+    """Connects the observer. A supervisor that starts together with many others (parallel test run) needs
+    more than the 5 s of one connect attempt (F-02), so the attempt is repeated."""
+    deadline = time.monotonic() + timeout
+    while True:
+        try:
+            return AhfClient(pipe, "obs", connect_timeout=2.0)
+        except Exception:      # no pipe yet, or no sys.welcome yet (AhfTimeout)
+            if time.monotonic() > deadline:
+                raise
+            time.sleep(0.01)
+
+
 def wait_until(predicate, timeout, step=0.05):
     end = time.monotonic() + timeout
     while time.monotonic() < end:
@@ -173,7 +186,7 @@ def stubbed(procs, datadir, session_id):
     """Supervisor with storage, engine and the headless stub; the skeleton flow is in Flows/."""
     flow_data(datadir)
     sup = Sup(procs, datadir, session_id, ["--start=storage,engine,manager", "--ui=stub", "--headless"])
-    obs = AhfClient(sup.pipe, "obs")
+    obs = connect_obs(sup.pipe)
     wait_ready(obs, ["storage", "engine", "manager"])
     wait_flow_loaded(obs)
     yield sup, obs
@@ -308,7 +321,7 @@ def test_engine_restart_is_seen_and_resynced_without_restarting_the_stub(procs, 
 def test_stub_answers_at_once_while_the_engine_is_missing(procs, datadir, session_id):
     flow_data(datadir)
     sup = Sup(procs, datadir, session_id, ["--start=storage,manager", "--ui=stub", "--headless"])
-    obs = AhfClient(sup.pipe, "obs")
+    obs = connect_obs(sup.pipe)
     try:
         wait_ready(obs, ["storage", "manager"])
         t0 = time.perf_counter()
@@ -335,7 +348,7 @@ def test_cancelled_exit_is_answered_and_nothing_stops(procs, datadir, session_id
     flow_data(datadir)
     sup = Sup(procs, datadir, session_id,
               ["--start=storage,engine,manager", "--ui=stub", "--headless", "--stub-cancel-exit"])
-    obs = AhfClient(sup.pipe, "obs")
+    obs = connect_obs(sup.pipe)
     rec = Recorder(obs)
     try:
         wait_ready(obs, ["storage", "engine", "manager"])
@@ -365,7 +378,7 @@ def test_cancelled_exit_is_answered_and_nothing_stops(procs, datadir, session_id
 def test_exit_without_cancel_ends_the_stub_cleanly(procs, datadir, session_id):
     flow_data(datadir)
     sup = Sup(procs, datadir, session_id, ["--start=storage,engine,manager", "--ui=stub", "--headless"])
-    obs = AhfClient(sup.pipe, "obs")
+    obs = connect_obs(sup.pipe)
     try:
         wait_ready(obs, ["storage", "engine", "manager"])
         assert obs.request("supervisor", "cmd.topic.subscribe", {"topic": "process"}, timeout=5)["payload"]["ok"]
