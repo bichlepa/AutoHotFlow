@@ -861,3 +861,46 @@ Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge kor
 - **Problem:** Ein `python - <<'EOF'`-Heredoc mit vielen `'`, `"` und Backslashes wurde von der Shell abgelehnt ("unexpected EOF"), ohne dass etwas ausgeführt wurde. Ein Heredoc, der AHK-Quelltext schreibt, kann zudem Backslashes zusammenfallen lassen (siehe `AGENTS.md`).
 - **Richtig:** Das Änderungsskript mit dem Editor-Werkzeug als Datei schreiben (Scratchpad) und mit `python datei.py` ausführen. Dabei CRLF/LF der Zieldatei erhalten (`newline=''` beim Lesen und Schreiben).
 - **Status:** verifiziert (zweimal aufgetreten)
+
+### Code auf Dateiebene läuft vor `AhfMain` und damit vor jedem `OnError` (WI-22)
+
+- **Problem:** Die Elementdateien rufen am Dateiende `ElementRegistry.Register(...)` auf. AHK führt das beim Laden in Textreihenfolge aus, also vor `AhfMain()`. Ein Fehler dort (doppelte Klasse, ungültiger `Mode`) zeigte beim Start einen Fehlerdialog. `/ErrorStdOut` gilt nur für Ladefehler (Syntax), nicht für Laufzeitfehler in diesem Code. Reproduziert mit einem Testelement: `tools/ahkrun.py` meldete Exit 97 (Dialog abgefangen).
+- **Richtig:** `OnError(Handler)` als erste ausführbare Anweisung des Einstiegs, **vor** den `#Include`-Zeilen (Funktionen sind vorher bekannt, der Handler darf weiter unten stehen). Der Handler schreibt auf stderr und beendet den Prozess (`ExitApp(1)`): Ein Prozess mit kaputter Registrierung soll nicht weiterlaufen. Vor dem Start von Supervisor oder Rolle wird er mit `OnError(Handler, 0)` wieder entfernt.
+- **Grund für das Entfernen:** Mehrere `OnError`-Handler werden nacheinander aufgerufen, und ein Handler, der 1 liefert, hält die späteren an [vermutet, aus der AHK-Dokumentation erinnert, nicht nachgestellt]. Der Handler des Einstiegs würde sonst den der Rolle verdecken.
+- **Status:** Verhalten verifiziert (`tests/integration/test_entry.py::test_error_while_loading_files_shows_no_dialog_and_ends_with_exit_1`, vorher Exit 97, nachher Exit 1 mit Meldung auf stderr). Die Aussage über die Reihenfolge der Handler ist vermutet.
+- **Quelle:** `src/AutoHotFlow.ahk`, `tests/integration/helpers/RegisterFailure.ahk`
+
+### Der 32-Bit-Interpreter lädt das Skript bis zur ersten Prüfung ohne Fehler (WI-22)
+
+- **Problem:** Wer den Einstieg mit `AutoHotkey32.exe` startet, bekam vorher einen laufenden Supervisor (Test `test_the_32_bit_interpreter_is_rejected_with_exit_2_and_no_dialog` lief in den Timeout). Pointer-Größen in `DllCall`-Strukturen stimmen dann nicht mehr.
+- **Richtig:** `if (A_PtrSize != 8)` als erste Anweisung vor den `#Include`-Zeilen, Meldung auf stderr, `ExitApp(2)`. Der Test wählt den Interpreter über `AHF_AHK2_EXE` (`tools/ahkrun.py`) und wird übersprungen, wenn `AutoHotkey32.exe` fehlt.
+- **Status:** verifiziert (rot vorher: Timeout, grün nachher: Exit 2 ohne Dialog).
+- **Quelle:** `src/AutoHotFlow.ahk`, `tests/integration/test_entry.py`
+
+### Eine Variable `children` verdeckt die Klasse `Children`
+
+- **Problem:** In einer Testfunktion `children := Children(...)` schlug mit "This local variable has not been assigned a value" fehl. Bezeichner sind in AHK v2 nicht von der Schreibweise abhängig, die lokale Variable verdeckt die Klasse (wie bei `role`/`Role`, siehe Einstieg).
+- **Richtig:** Variablen anders nennen (`kids`). Die Attribute `this.children` sind nicht betroffen, nur freie Variablen.
+- **Status:** verifiziert
+- **Quelle:** `tests/ahk/supervisor_tick.test.ahk`
+
+### Python-Skripte im Bash-Heredoc, die Quelltext mit Backslashes patchen
+
+- **Problem:** Ein `python - <<'EOF'`-Skript, das einen Text mit doppelten Backslashes (Pipe-Pfad `\\.\pipe\...`) suchen sollte, fand ihn nicht: Die Bash des Werkzeugs machte aus zwei Backslashes einen, die Prüfung `assert alt in text` schlug fehl (zweimal aufgetreten, einmal blieb ein Dokument unbemerkt unverändert, weil der Commit trotzdem lief).
+- **Richtig:** Skript mit dem Schreibwerkzeug als Datei schreiben (rohe Zeichenketten `r'...'`) und mit `python datei.py` ausführen. Nach dem Patch `git diff --stat` ansehen, bevor committet wird.
+- **Status:** verifiziert
+- **Quelle:** Arbeit an WI-22
+
+### Der Supervisor steht still: Zeitstempel der Kinder sind danach alle veraltet (WI-22)
+
+- **Problem:** `Heartbeat.Tick` verglich `now - lastPongAt` mit der Pong-Frist. War der Supervisor selbst länger still (Prozess eingefroren, Standby, großer Rückstau), galten alle gesunden Kinder auf einen Schlag als hängend und wurden beendet. Reproduziert: Supervisor mit `psutil.suspend()` 8 s einfrieren, dann `resume()`: `evt.process.hung` und `crashed` für `storage`, `engine`, `manager`.
+- **Richtig:** Der Heartbeat merkt sich den Zeitpunkt des letzten Ticks. Ist die Lücke größer als `PING_EVERY_MS` (2 s), beginnen Pong-, Ping- und Startfristen aller Kinder neu bei "jetzt" (`Children.ResetLiveness`). Ein wirklich hängendes Kind wird eine Pong-Frist später gefunden. Auch ein Stillstand vor dem ersten Tick zählt (`Heartbeat.Arm` beim Start des Timers; ohne das fehlt der Vergleichswert, aufgefallen nur unter Parallellast). Die Kinder geben in der Einfrierzeit nicht selbst auf: Ihr Orphan-Guard greift nur bei gebrochener Pipe, und eine Pipe zu einem eingefrorenen Prozess bleibt offen.
+- **Status:** verifiziert (Einfrieren 8 s: `tests/fault/test_supervisor_stall.py`; Fristen deterministisch: `tests/ahk/supervisor_tick.test.ahk`). Standby/Ruhezustand nicht geprüft, ob `QueryPerformanceCounter` dort weiterzählt: vermutet.
+- **Quelle:** `src/supervisor/Heartbeat.ahk`, `src/supervisor/Children.ahk`
+
+### Pipe-Namen sind maschinenweit, Mutexe gelten je Windows-Sitzung (WI-22)
+
+- **Problem:** Bei zwei angemeldeten Benutzern findet der zweite den Mutex des ersten nicht (eigener Namensraum), will aber dieselbe Pipe `ahf.<session>.hub` bedienen und scheitert an `FILE_FLAG_FIRST_PIPE_INSTANCE`.
+- **Richtig:** Pipe-Name aus Windows-Sitzungs-ID (`ProcessIdToSessionId`) und Hash der Benutzer-SID bilden (`PipeNames.Hub`), Mutex ausdrücklich `Local\...`. Ein Python-Zwilling (`tests/support/pipenames.py`) liefert den gleichen Namen für die Tests.
+- **Status:** Namensbildung und "fremde Pipe mit altem Namen blockiert nicht" verifiziert (`test_supervisor.py`); der Mutex wird in `Local\` gefunden (verifiziert). **Zweiter Windows-Benutzer nicht geprüft** (in dieser Umgebung nicht möglich). Standard-Sicherheitsbeschreibung einer Pipe (Lesezugriff für alle) gelesen, nicht geprüft.
+- **Quelle:** `src/core/PipeNames.ahk`
