@@ -1,75 +1,61 @@
 # Handover: AutoHotFlow v2 Portierung
 
-Stand: 2026-10-10, Branch `v2-port`, letzter Commit `c34e57a` (WI-06). Arbeitsbaum sauber.
+Stand: 2026-10-11, Branch `v2-port`. Phase 2 (Walking Skeleton) ist technisch abgeschlossen. Aktueller Statusbericht mit Funden, Messwerten und Gesamtlauf: `work_items/STATUS.md`.
 
 ## Wichtigste Vorgabe zuerst
 
-Der Projektinhaber hat in einer Datei im Repo-Stamm (inzwischen entfernt) geschrieben: „Stoppe nach diesem Work package!“. Das Paket WI-06 ist fertig und committet. **Nicht eigenständig mit WI-07 weitermachen.** Erst auf eine ausdrückliche Freigabe des Projektinhabers warten. Der Versuch, WI-07 an einen Sonnet-Agenten zu geben, wurde vom Projektinhaber abgelehnt.
+**Nicht eigenständig mit Phase 3 beginnen.** Phase 3 braucht die ausdrückliche Freigabe des Projektinhabers. Offen aus WI-17: Schritt 6 (Phase-3-Plan `work_items/phase3/README.md`) und Schritt 7 (gebündelte Fragen an den Projektinhaber am Ende von `STATUS.md`) sind noch nicht geschrieben. Wer Phase 3 vorbereitet, beginnt damit.
 
-## Pflichtlektüre
+`work_items/` und `v1/` nicht löschen: Das ist laut `AGENTS.md` eine Entscheidung des Projektinhabers nach der Portierung.
+
+## Pflichtlektüre für einen neuen Agenten
 
 1. `AGENTS.md` (Regeln, Werkzeuge, Stolpersteine)
-2. `doc/ARCHITEKTUR.md` Abschnitte 1 bis 6
+2. `doc/ARCHITEKTUR.md` Abschnitte 1 bis 6 und 8 (Abschnitt 8 enthält den Ist-Stand der Ordnerstruktur)
 3. `doc/KONVENTIONEN.md`
-4. `doc/HOW-TO.md` (Wissensbasis, viele Stolpersteine)
-5. `work_items/phase2/README.md` (Verträge, Wellen, Pakete)
-6. `work_items/STATUS.md` (teilweise veraltet, siehe unten)
+4. `doc/HOW-TO.md` (Wissensbasis: viele AHK-v2-Stolpersteine mit Status verifiziert / vermutet / nicht geprüft)
+5. `doc/PROTOKOLL.md` (Abschnitt 4 beginnt mit der Liste der noch nicht umgesetzten Nachrichtentypen)
+6. `work_items/STATUS.md`, `work_items/phase2/README.md`, `work_items/phase2/measurements.md`
+7. Für die Phase-3-Pakete: `doc/ELEMENT-API-V2.md`, `doc/MIGRATION.md`
 
 ## Regeln, die gelten
 
 - AHK-Skripte nie direkt starten, nur über `python tools/ahkrun.py [--timeout N] skript.ahk`. Exit-Codes 97 (Dialog abgefangen), 98 (Timeout), 99 (kein Interpreter).
 - Unbekannte Optionen nie an den AHK-Interpreter geben (`--version` erzeugt einen Dialog).
+- Nie Prozesse nach Namen beenden (`Stop-Process`, `taskkill` nach Bildname). Es laufen fremde AutoHotkey-Prozesse des Projektinhabers (v1-`AutoHotFlow.exe`, PID 29328 mit `/restart /script ...\src\AutoHotFlow.ahk`). Prozesse nach dem Lauf nur ansehen (`Get-CimInstance Win32_Process`), nur selbst gestartete Pids beenden.
 - Eingebaute AHK-v2-Klassennamen nicht neu definieren. Eigene Fehlerklassen mit Präfix `Ahf`.
-- Dateien mit Editor-Werkzeugen schreiben, nicht per Shell-Heredoc. Backslashes in Pipe-Namen fallen sonst zusammen.
+- Dateien mit Editor-Werkzeugen schreiben, nicht per Shell-Heredoc (Backslashes in Pipe-Namen).
 - Nichts unter `v1/` ändern.
-- Commits klein und einzeln, Nachricht beschreibt das Warum. Commit-Attribution: `Co-Authored-By: Claude Haiku 5.5 <noreply@anthropic.com>` (aktuelle Vorgabe).
-- Bei AHK-Schwierigkeiten: Eintrag in `doc/HOW-TO.md` mit Status verifiziert / vermutet / nicht geprüft.
-- Tests: `python -m pytest tests -q` dauert über 60 s. Befehle über 120 s im Hintergrund laufen lassen.
-- Nach jedem Lauf prüfen: keine von den Tests gestarteten `AutoHotkey64.exe` übrig.
+- Commits klein und einzeln, Nachricht beschreibt das Warum. Die Attribution steht in der Systemvorgabe der jeweiligen Sitzung.
+- Bei AHK-Schwierigkeiten: Eintrag in `doc/HOW-TO.md` mit Status.
+- Tests: `python -m pytest tests -q` (Standardlauf, über 5 Minuten, im Hintergrund starten, Ausgabe in eine Datei). Stress: `python -m pytest tests -m stress -q`, Dauerlauf `-m soak`, Fault-Wiederholungen `AHF_FAULT_REPEAT=<n>`.
 
-## Stand der Pakete (Phase 2)
+## Was Phase 2 geliefert hat (verifiziert aus dem Dateibaum und den Paketberichten)
 
-| Paket | Commit | Stand |
-|---|---|---|
-| Testinfrastruktur (WI-01) | `400728e` | fertig |
-| Dialog-Wächter, `ahkrun.py` | `d502043`, `62fd573` | fertig |
-| Core-Basics (WI-03) | `410aa91` | fertig |
-| JSON (WI-02) | `16a6539` | fertig, Parsen 1,5 s statt Ziel 1 s |
-| Pipe-Schicht (WI-04) | `5c997e1`, `e62ed65` | fertig, Race bei 16-MiB-Rahmen behoben |
-| Engine-Kern (WI-08) | `888dd6d` | fertig |
-| Element-Basis (WI-09) | `d11afa1` | fertig |
-| Nachrichtenschicht (WI-05) | `7888b9c` | fertig, 299 grün |
-| Rollenbasis (WI-06) | `c34e57a` | fertig, 308 grün |
-| **Supervisor (WI-07)** | – | **nicht begonnen, wartet auf Freigabe** |
-| Engine-Rolle (WI-10) | – | offen |
-| Worker (WI-11) | – | offen |
-| Storage (WI-12) | – | offen |
-| UI-Stub (WI-13) | – | offen |
-| Triggerhost (WI-14) | – | offen (optional) |
-| Fault-Injection (WI-15) | – | offen |
-| Stresstest (WI-16) | – | offen |
-| Abschluss (WI-17) | – | offen |
+- `src/AutoHotFlow.ahk` (Einstieg, Rollen per `--role`), `src/core/` (Json, Ids, Errors, Args, Log, Time, Role, RoleRegistry, `ipc/` mit Pipe, Rahmen, Weckruf, Message, Dispatcher, Peer).
+- Rollen: `supervisor` (Hub, Prozessüberwachung, zweiphasiges Beenden), `engine` (Zustandsautomaten, Ausführungsrichtlinien, Worker-Anbindung), `storage` (Flows, Variablen, Log, atomares Schreiben, Schreibwarteschlange), `worker` (ein Element zur Zeit), `manager` als Stub (`--ui=stub`, headless oder mit kleinem Fenster).
+- Elemente: nur `src/elements/skeleton/` (Demo- und Testelemente). Basis in `src/elements/base/`.
+- Tests: `tests/ahk` (Unit), `tests/integration`, `tests/e2e`, `tests/fault`, `tests/stress`, Werkzeuge in `tests/support` und `tools/`.
 
-Letzter Gesamtlauf: `308 passed, 1 skipped` (WI-06-Bericht).
+## Ehrlich: was fehlt
 
-## Offene Punkte aus den Berichten
+- **Triggerhost (WI-14, optional) ist nicht gebaut.** Die Rolle ist in `RoleRegistry.ahk` ein Platzhalter. Damit sind `cmd.trigger.*`/`evt.trigger.*` ungetestet und es gibt keinen Absturzfall für den Triggerhost.
+- **Editor-Rolle ist nicht gebaut** (Platzhalter, Exit 3). Deshalb nicht gemessen: Speicher bei 5 Editoren (Ziel unter 100 MB) und Zustandsänderung bis Neuzeichnen (Ziel unter 50 ms). Das Zeichnungsrisiko (ARCHITEKTUR 2.1, 10) ist unbewertet.
+- **GUI des Stubs nicht von Hand geprüft** (Anleitung in `work_items/phase2/WI-13-ui-stub.md`). WI-13 ist deshalb nicht abgehakt.
+- Keine echten Elemente, keine Ausdrucksauswertung, kein echter Manager, keine Übersetzungen, kein Import/Export.
+- `cmd.flow.patch` kennt nur Schema und Revisionsprüfung, die Operationen fehlen. Richtlinie `wait` ist nicht umgesetzt.
 
-- **Fremder Prozess:** `AutoHotkey64.exe` PID 29328, Elternprozess 27720 existiert nicht mehr, Kommandozeile `/restart /script ...\src\AutoHotFlow.ahk`. Stammt nicht von den Tests. Nicht beendet. Vom Projektinhaber prüfen lassen.
-- **Fortschrittshaken:** In `work_items/phase2/README.md` fehlen die Häkchen für WI-03 und WI-06 (WI-04 und WI-05 sind gesetzt).
-- **Doppelte Überschrift** „Prozesse, Pipes, Nachrichten“ in `doc/HOW-TO.md`.
-- **Sporadischer Dialog-Test:** `test_msgbox_is_captured_and_closed` war einmal im Timeout. Behoben wurde die Ursache mit `ctypes.argtypes`, Status vermutet, da nur 20 Läufe belegt.
-- **Rollen (WI-06):** `RoleRegistry.ahk` enthält zwei Klassen (Verletzung „eine Klasse pro Datei“), auslagern. `EchoRole.ahk` ist im Produkteinstieg eingebunden, vor WI-17 entscheiden. `deadlineMs` von `sys.shutdown` wird noch nicht erzwungen (WI-10). Kurzer Hub-Ausfall unter 3 s nicht getestet.
-- **Peer (WI-05):** `tests/support/pyhub.py` sendet keinen Weckruf, Tests nutzen `WakingHub`. Vorschlag: in pyhub.py übernehmen (WI-07). `with WakingHub(...).start()` könnte `start()` doppelt aufrufen (vermutet, nicht ausgeführt).
-- **Storage (WI-12):** CRLF-Entscheidung treffen, v1-Dateien haben CRLF, Ausgabe bisher LF. Backup-Verhalten laut WI-12 neu umsetzen (v1 war wirkungslos, M-07). Doppeltes Entfernen von `.ahfvar` beachten.
-- **MIGRATION.md:** Einträge M-01 bis M-14 vorhanden. M-11 (`wait` ist in v1 wirkungslos, in v2 wirksam) ist vom Projektinhaber nicht ausdrücklich bestätigt, nur im Bericht des Agenten dokumentiert.
-- **Richtlinie `stop` (WI-08):** Frist 2 s laut Tabelle 5.1, v1 hatte keine Frist. Umsetzung bei WI-10.
-- **Dangling-Verbindungen:** 154 von 1039 in den Beispielflows. Ob das Laden warnen soll, ist offen.
-- **Test-Laufzeit:** Der Gesamtlauf liegt bei über 70 s. Bei weiteren Paketen steigt das.
-- **Nicht geprüft:** Timing unter Systemlast, AHK 32 Bit, Verhalten bei gesperrtem Desktop für Screenshots.
+## Offene Punkte (Details und Belege in `STATUS.md`)
 
-## Nächste Schritte (nach Freigabe)
+- Funde F-06 (`clean` in `evt.process.exited` unzuverlässig, Ursache vermutet) und F-08 (Storage-Log-Rückstau, unbegrenzte Warteschlange) für Phase 3. F-02 beobachten (Pipe-Start über 2 s unter Last).
+- `core/RoleRegistry.ahk` enthält zwei Klassen. Der Einstieg bindet Testrollen aus `tests/` ein.
+- Änderungen in `src/core/` ohne Absprache während Phase 2: F-05 (`Role.Console`), F-07 (`PipeConnection`), Entfernen des `manager`-Platzhalters in `RoleRegistry`. Der Projektinhaber soll sie bestätigen.
+- Idle-CPU: Ziel "unter 1 %" ist als Anteil des Gesamtsystems erfüllt (0,23 %), als Prozent eines Kerns nicht (1,8 %). Lesart ist nicht festgelegt.
+- MIGRATION M-11 (`wait` in v1 wirkungslos) ist vom Projektinhaber nicht ausdrücklich bestätigt.
+- Nicht geprüft: Timing unter Systemlast, AHK 32 Bit, gesperrter Desktop für Screenshots, Worker-Pool unter Last, Dauerlauf mit Verbindungswechseln nach dem F-07-Fix.
 
-1. Projektinhaber fragen, ob WI-07 (Supervisor) begonnen werden soll. WI-07 ist Sonnet-Stufe (L, Prozessüberwachung, Beenden).
-2. Danach WI-10 (Engine-Rolle), WI-11 (Worker), WI-12 (Storage), WI-13 (UI-Stub), WI-14 (Triggerhost), WI-15 (Fault-Injection), WI-16 (Stresstest), WI-17 (Abschluss).
-3. Jedes Paket einzeln, mit eigenem Commit. Am Ende jeder Phase `doc/HOW-TO.md` mit committen.
-4. Zum Schluss: `work_items/` und `v1/` löschen (laut `AGENTS.md`), Verantwortung dafür beim Projektinhaber.
+## Nächste Schritte
+
+1. Freigabe des Projektinhabers für Phase 3 abwarten.
+2. WI-17 Schritte 6 und 7 schreiben (Phase-3-Plan mit Reihenfolge Common/Variablen und Ausdrucksauswerter, Flow laden/speichern, Ausführung, Elemente in Gruppen, Editor und Zeichnen, Manager; Messaufgaben für R3, R4, R5 aus ARCHITEKTUR 10 und die offenen Fragen aus ELEMENT-API-V2 Abschnitt 8; gebündelte Fragen an den Projektinhaber).
+3. Nach der Portierung: `work_items/` und `v1/` entfernen (Entscheidung des Projektinhabers).
