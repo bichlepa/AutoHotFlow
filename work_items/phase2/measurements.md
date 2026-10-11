@@ -49,3 +49,19 @@ Ein früherer Entwicklungslauf ergab 2,5 % eines Kerns (Supervisor 1,15 %), also
 ## Dauer der Tests
 
 Ein Durchlauf aller Stresstests ausser Dauertest und Ereignisflut: rund 107 s (10 Läufe: 105 bis 109 s). Ereignisflut: rund 235 s. Idle-CPU: 37 s.
+
+## Phase 2b: große Flow-Dateien (WI-24)
+
+Messung vom 2026-10-11, derselbe Rechner wie oben (8 logische CPUs). Tests: `tests/stress/test_big_flows.py`. Vorher = Stand `ef34b5b`, nachher = Stand mit `0126ecc` und `87fd20f`.
+
+| Größe | Vorher | Nachher |
+|---|---|---|
+| Hub-Kosten je Rahmen (`res.storage.flow.read`, 109.232 Zeichen, 93-KB-Flow), Mittel über 100 Läufe | 216 ms (Maximum 243 ms) | 1,84 ms (Maximum 2,2 ms) |
+| 20 Flows (1,2 MB): Start bis `evt.engine.ready` | 4,46 s | 4,51 s |
+| 20 Flows: größte Antwortzeit `cmd.engine.snapshot` während des Ladens | 658 ms (n=14) | 260 ms (n=55) |
+| 200 Flows (12,1 MB): Start bis `evt.engine.ready` | 31,25 s, **nur 79 von 200 Flows geladen, 122 Lesezugriffe nach 30 s abgelaufen** | 45,3 s, alle 200 geladen, 0 Fehler |
+| 200 Flows: größte Antwortzeit `cmd.engine.snapshot` während des Ladens | 2514 ms (p99 1007 ms) | 506 ms (p99 495 ms, Median 194 ms, n=199, 0 Timeouts) |
+| 200 Flows: `hung`/`crashed`/`restarted` | keine gemeldet | keine |
+| Start der Kette mit einem Flow (`test_start_to_ready_time`, 10 Läufe) | 0,30 s Median | 0,56 s Median (Maximum 1,19 s); Kette mit Last durch den Gesamtlauf davor nicht ausgeschlossen, **nicht untersucht** |
+
+Aufschlüsselung der Kosten für den größten Flow (92.808 Zeichen, Mittel aus 5 Läufen): `Json.Stringify` im Storage 54 ms, `Message.Parse` des Rahmens in der Engine 161 ms, `Json.Parse` des Flow-Texts 143 ms (`FlowDefinition.FromText` 124 ms), `Message.ParseHead` im Hub 1,25 ms.
