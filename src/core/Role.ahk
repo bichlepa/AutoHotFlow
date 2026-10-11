@@ -42,7 +42,12 @@ class Role {
     ; Role.Console(...); ConsoleFn is only the function value for Log.Configure, because a
     ; function stored in a property receives the class as first argument when called as Role.ConsoleFn(...).
     static Console(level, source, text) {
-        FileAppend(level " " source ": " text "`n", "**", "UTF-8-RAW")
+        ; A role started by the supervisor has no usable stderr (invalid handle): FileAppend throws then.
+        ; The console is best effort and must never keep a role from ending (orphan guard, WI-15).
+        try {
+            FileAppend(level " " source ": " text "`n", "**", "UTF-8-RAW")
+        } catch {
+        }
     }
     static ConsoleFn := (level, source, text, flowId := "") => Role.Console(level, source, text)
     static LogSinkFn := (level, source, text, flowId := "") => Role._LogSink(level, source, text, flowId)
