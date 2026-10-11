@@ -2,6 +2,10 @@
 
 Stand: 2026-10-11, Branch `v2-port`. Phase 2 (Walking Skeleton) ist technisch abgeschlossen. Aktueller Statusbericht mit Funden, Messwerten und Gesamtlauf: `work_items/STATUS.md`.
 
+## Neu seit 2026-10-11: Phase 2b
+
+Vor Phase 3 kommt eine Härtungsphase: `work_items/phase2b/README.md` (Entscheidungen E1 bis E8 des Projektinhabers, Pakete WI-18 bis WI-29). Wer weiterarbeitet, beginnt dort mit WI-18. Die Abschnitte unten beschreiben den Stand am Ende von Phase 2 und gelten weiter, die "Nächsten Schritte" am Ende ersetzt der Phase-2b-Plan.
+
 ## Wichtigste Vorgabe zuerst
 
 **Nicht eigenständig mit Phase 3 beginnen.** Phase 3 braucht die ausdrückliche Freigabe des Projektinhabers. Offen aus WI-17: Schritt 6 (Phase-3-Plan `work_items/phase3/README.md`) und Schritt 7 (gebündelte Fragen an den Projektinhaber am Ende von `STATUS.md`) sind noch nicht geschrieben. Wer Phase 3 vorbereitet, beginnt damit.
