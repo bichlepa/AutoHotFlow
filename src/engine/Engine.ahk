@@ -81,11 +81,19 @@ class Engine extends Role {
 
     ; Sends an event to a topic address ("topic:engine", "topic:flow:<id>") with epoch and seq.
     ; The peer drops it when it is not ready (Peer.droppedSends); events are not kept (PROTOCOL 5a).
+    ; Numbering and sending are one step: AHK interrupts a thread that runs longer than 15 ms, and
+    ; an event emitted by the interrupting thread would otherwise leave first with a higher seq
+    ; (found by the 200 parallel instances of the stress test, WI-16).
     Emit(to, msgType, payload) {
-        this.seq += 1
-        payload["epoch"] := this.epoch
-        payload["seq"] := this.seq
-        this.peer.Send(to, msgType, payload)
+        prev := Critical("On")
+        try {
+            this.seq += 1
+            payload["epoch"] := this.epoch
+            payload["seq"] := this.seq
+            this.peer.Send(to, msgType, payload)
+        } finally {
+            Critical(prev)
+        }
     }
 
     ; evt.flow.state for one flow: enabled flag and whether an instance runs.
