@@ -160,11 +160,12 @@ def stress_chain(procs, datadir, session_id):
     """Factory: stress_chain(flows={"name": (sleep_ms, policy)}, wake_hub=True) -> StressChain, started and ready."""
     made = []
 
-    def make(flows=None, wake_hub=True, extra=STUB_OPTS, start=FULL_CHAIN, wait=True):
+    def make(flows=None, wake_hub=True, extra=STUB_OPTS, start=FULL_CHAIN, wait=True,
+             run_timeout=RUN_TIMEOUT_S):
         for name, (sleep_ms, policy) in (flows or {}).items():
             (Path(datadir) / "Flows").mkdir(exist_ok=True)
             write_flow(datadir, name, sleep_ms, policy)
-        chain = Chain(procs, datadir, session_id, start, extra, run_timeout=RUN_TIMEOUT_S)
+        chain = Chain(procs, datadir, session_id, start, extra, run_timeout=run_timeout)
         sc = StressChain(chain, wake_hub=wake_hub)
         made.append(sc)
         if wait:
