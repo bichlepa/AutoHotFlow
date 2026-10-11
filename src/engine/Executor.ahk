@@ -223,8 +223,10 @@ class Executor {
     _TickOnce() {
         budget := Executor.TICK_BATCH
         progress := true
+        waiting := 0
         while (progress) {
             progress := false
+            waiting := 0
             for flowId in Executor._Keys(this._wantPromote) {
                 this._wantPromote.Delete(flowId)
                 if (this._PromoteWaiting(flowId)) {
@@ -251,8 +253,10 @@ class Executor {
                         break
                     ; A worker element waits while the pool is busy; it is dispatched when a worker reports done.
                     if (Executor._IsWorkerElement(def, thread) && this._owner.workers.Usable()
-                        && !this._owner.workers.Free())
+                        && !this._owner.workers.Free()) {
+                        waiting += 1
                         continue
+                    }
                     this._Dispatch(run, thread, def)
                     progress := true
                     budget -= 1
@@ -263,6 +267,9 @@ class Executor {
                 }
             }
         }
+        ; Threads that wait for a worker: the pool grows to meet the demand (WI-27, ARCHITEKTUR 6.4).
+        if (waiting > 0)
+            this._owner.workers.Want(waiting)
     }
 
     ; --- execution -----------------------------------------------------------------------------
@@ -317,7 +324,7 @@ class Executor {
         try {
             run["active"][thread.Id] := act
             execId := this._owner.workers.Run(classId, params, Executor._CopyMap(run["vars"]), env
-                , ObjBindMethod(this, "_OnWorkerDone", ctx))
+                , ObjBindMethod(this, "_OnWorkerDone", ctx), cls.JobTimeoutMs)
             current := run["active"].Get(thread.Id, "")
             if (execId = "") {
                 run["active"].Delete(thread.Id)

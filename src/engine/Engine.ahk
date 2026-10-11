@@ -44,7 +44,8 @@ class Engine extends Role {
         this.seq := 0
         this.flows := FlowTable()
         this.executor := Executor(this)
-        this.workers := WorkerBridge(this, Engine._PoolSize(args))
+        pool := Engine._PoolOptions(args)
+        this.workers := WorkerBridge(this, pool["size"], pool["warm"], pool["idleMs"])
         this._flowsLoaded := false     ; not _loaded: that name is the method _Loaded (case-insensitive)
         this._loadTries := 0
         this._loadRetryFn := () => this._LoadFlows()
@@ -74,12 +75,14 @@ class Engine extends Role {
 
     OnReady() {
         this.SetLogTarget(Engine.STORAGE)
+        this.workers.Start()        ; ends the workers of an earlier engine, then the pool may grow (WI-27)
         if (!this._flowsLoaded)
             this._LoadFlows()
     }
 
     ; sys.shutdown: every instance is stopped before sys.bye (ARCHITECTURE 6.3, step 2).
     OnShutdown(deadlineMs) {
+        this.workers.Stop()
         this.executor.StopAll("shutdown")
     }
 
@@ -332,11 +335,20 @@ class Engine extends Role {
         return (v = "") ? "" : String(v)
     }
 
-    ; Number of worker slots from --workers (default 0: no pool, worker elements end with "exception").
-    static _PoolSize(args) {
-        raw := args.Get("workers", "0")
-        if (!IsInteger(raw) || Integer(raw) < 0 || Integer(raw) > WorkerBridge.MAX_SIZE)
-            throw AhfError("--workers must be an integer from 0 to " WorkerBridge.MAX_SIZE, ErrCode.BAD_ARGS)
+    ; Pool options (WI-27, ARCHITECTURE 6.4): --workers=<N> (default 4, 0 = no pool; worker elements then end with
+    ; "exception"), --warm-workers=<W> (default 1, at most N), --worker-idle-ms=<ms> (default 60000).
+    static _PoolOptions(args) {
+        size := Engine._IntOption(args, "workers", WorkerBridge.DEFAULT_SIZE, 0, WorkerBridge.MAX_SIZE)
+        warm := Engine._IntOption(args, "warm-workers", Min(WorkerBridge.DEFAULT_WARM, size), 0, size)
+        idleMs := Engine._IntOption(args, "worker-idle-ms", WorkerBridge.DEFAULT_IDLE_MS, WorkerBridge.MIN_IDLE_MS
+            , WorkerBridge.MAX_IDLE_MS)
+        return Map("size", size, "warm", warm, "idleMs", idleMs)
+    }
+
+    static _IntOption(args, key, fallback, low, high) {
+        raw := args.Get(key, fallback)
+        if (!IsInteger(raw) || Integer(raw) < low || Integer(raw) > high)
+            throw AhfError("--" key " must be an integer from " low " to " high, ErrCode.BAD_ARGS)
         return Integer(raw)
     }
 

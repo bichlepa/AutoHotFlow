@@ -312,6 +312,15 @@ class Supervisor {
         }
         if (opts.Has("headless"))
             text .= " --headless"
+        ; Pool options of the engine (WI-27); the engine checks the values and exits with 2 on a bad one.
+        for key in ["workers", "warm-workers", "worker-idle-ms"] {
+            if (opts.Has(key)) {
+                value := String(opts[key])
+                if (!RegExMatch(value, "^\d+$"))
+                    throw AhfError("supervisor: --" key " must be a number", ErrCode.BAD_ARGS)
+                text .= " --" key "=" value
+            }
+        }
         if (opts.Has("stub-cancel-exit"))
             text .= " --stub-cancel-exit"
         return text

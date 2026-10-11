@@ -15,6 +15,12 @@ class FakeWorkers {
         this.failAtOnce := false   ; Run ends the job at once and still returns the execId (send error)
         this.hook := ""            ; called once, inside Usable() (an interruption point of Executor.Tick)
         this.cancelled := []
+        this.wanted := []          ; the arguments of Want (threads waiting for a worker)
+        this.timeouts := []        ; the jobTimeoutMs of every Run
+    }
+
+    Want(waiting) {
+        this.wanted.Push(waiting)
     }
 
     Usable() {
@@ -28,8 +34,9 @@ class FakeWorkers {
 
     Free() => this.hasFree
 
-    Run(classId, params, imports, env, onDone) {
+    Run(classId, params, imports, env, onDone, jobTimeoutMs := 0) {
         this.runs += 1
+        this.timeouts.Push(jobTimeoutMs)
         execId := "fx-" this.runs
         if (this.failAtOnce) {
             onDone("exception", "worker not available", Map())
