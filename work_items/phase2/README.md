@@ -157,7 +157,7 @@ Der Supervisor startet sich ohne `--role` oder mit `--role=supervisor`.
 
 - [ ] WI-01  - [ ] WI-02  - [ ] WI-03  - [x] WI-04  - [x] WI-05  - [ ] WI-06
 - [x] WI-07  - [ ] WI-08  - [ ] WI-09  - [x] WI-10  - [x] WI-11  - [x] WI-12
-- [ ] WI-13  - [ ] WI-14 (optional)  - [ ] WI-15  - [ ] WI-16  - [ ] WI-17
+- [ ] WI-13  - [ ] WI-14 (optional)  - [x] WI-15  - [ ] WI-16  - [ ] WI-17
 
 ## Funde
 

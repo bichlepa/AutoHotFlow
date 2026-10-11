@@ -675,3 +675,46 @@ _Noch keine Einträge._
 - **Problem:** Ein Heredoc mit Python-Code (Anführungszeichen, Backslashes, eingebettete Triple-Quotes) brach im Bash-Werkzeug mit `unexpected EOF while looking for matching` ab, die Datei entstand nicht.
 - **Richtig:** Text mit dem Schreib-Werkzeug in eine Datei im Scratchpad schreiben und dann mit einem kurzen Python-Skript an die Zieldatei anhängen oder einsetzen. Die Regel "Dateien mit Edit/Write" aus dem Auftrag gilt auch hier.
 - **Status:** verifiziert (Fehlermeldung im Bash-Lauf, WI-11)
+
+### Konsolenausgabe einer Rolle darf das Beenden nicht verhindern (Orphan-Guard, F-05)
+
+- **Problem:** Von einem Supervisor gestartete Rollen haben kein brauchbares stderr. `FileAppend(text, "**")` wirft dort `OSError (6) Das Handle ist ungültig`. `Role._Exit` schrieb den Grund über `Role.Console`, setzte vorher `closing := true` und kam wegen der Ausnahme nie zu `ExitApp`. Nach einem harten Kill des Supervisors lebten alle Kinder weiter.
+- **Falsch:** Den Orphan-Test nur mit einem Python-Hub und einer über `ahkrun.py` gestarteten Rolle prüfen: dort ist stderr gültig, der Fehler tritt nie auf.
+- **Richtig:** Ausgaben auf der Konsole sind best effort (`try/catch` um `FileAppend`). Vor jedem `ExitApp` im Beenden-Pfad nichts aufrufen, das werfen kann, oder es einfangen. Den Orphan-Fall immer mit dem echten Supervisor testen (`tests/fault/test_orphans.py`).
+- **Status:** verifiziert (Fehler mit `AHF_TEST_KEEP=1` im `Log_role.txt` gesehen; nach dem Fix Enden mit Exit 4 nach 3,3 s, 20 von 20 Läufen).
+- **Quelle:** `src/core/Role.ahk` (`Console`, `_Exit`)
+
+### Fault-Tests: Supervisor-Interpreter unter `ahkrun` finden
+
+- **Problem:** `psutil.Process(ahkrun).children(recursive=True)` hat keine definierte Reihenfolge. Das erste "autohotkey" in der Liste kann eine Rolle sein statt des Supervisors. Der Orphan-Test tötete dann das falsche Ziel.
+- **Richtig:** Nur die direkten Kinder von `ahkrun` ansehen (`children(recursive=False)`).
+- **Status:** verifiziert (gelesen und im Lauf bestätigt: Supervisor-Pid ist Elternprozess der Rollen). Dass `recursive=True` im Fehlerfall wirklich eine Rolle lieferte, wurde nicht belegt: vermutet.
+- **Quelle:** `tests/fault/faultkit.py` (`Sup.ahk_pid`)
+
+### Fault-Tests: Neustartgrenze begrenzt die Kills je Test
+
+- **Problem:** Ein Test, der Storage fünfmal hintereinander tötete, scheiterte: nach dem dritten Kill startete der Supervisor die Rolle nicht mehr (höchstens 3 Neustarts je 60 s, `Children.RESTART_WINDOW_MS`).
+- **Richtig:** Höchstens 3 Kills je Rolle und Sitzung (Test `test_storage_abort.py` nutzt drei Verzögerungen).
+- **Status:** verifiziert (Test war mit fünf Kills rot, mit drei grün).
+- **Quelle:** `src/supervisor/Children.ahk`
+
+### Fault-Tests: Supervisor-Log erst nach dem Ende lesbar, Ereignisse mit Nachlauf
+
+- **Problem:** `Sup.text()` ist während des Laufs leer (ahkrun kopiert stderr erst am Ende). Ein Test, der auf eine Log-Zeile wartete (`client 'x' gone (queue_overflow)`), lief in die Frist. Zudem liest ein Beobachter in einem Thread: unmittelbar nach dem Ende des Supervisors kann ein Ereignis noch nicht in seiner Liste stehen.
+- **Richtig:** Die Sitzung beenden, auf das Ende warten, dann das Log lesen. Ereignisse mit `Recorder.wait(..., timeout=1)` abholen, nicht mit `find`.
+- **Status:** verifiziert (Queue-Overflow-Test: Log-Zeile erst nach dem Ende da; Shutdown-Test: einmal in 20 Läufen `find` zu früh, 80 von 80 grün mit `wait`).
+- **Quelle:** `tests/fault/test_pipe_break.py`, `tests/fault/test_shutdown.py`
+
+### Fault-Tests: Pipe unter einer lebenden Rolle trennen
+
+- **Richtig:** Rolle gegen den Python-Hub (`WakingHub`) starten, dann `link.pipe.close()` des Hubs für genau diese Verbindung. Der Hub nimmt weiter an: die Rolle verbindet sich neu (gleiche Pid, 0,12 s bis `hello`). Wird der Hub gestoppt, endet sie mit Exit 4 nach 3,3 s. Ein Client, der nie liest, ist ein roher Pipe-Client (`winpipe.OverlappedPipe`) ohne Leser-Thread, der nur Anfragen schreibt; der Hub wirft ihn bei 1000 Rahmen Rückstand hinaus.
+- **Status:** verifiziert (`tests/fault/test_pipe_break.py`, 20 Läufe).
+- **Quelle:** `tests/fault/test_pipe_break.py`
+
+### Ein `conftest.py` in einem Testordner verdeckt `tests/conftest.py` für `from conftest import ...`
+
+- **Problem:** Mit `tests/fault/conftest.py` brach die Sammlung des Gesamtlaufs ab: `tests/test_json_flows.py` und `tests/test_ahk_runner.py` machen `from conftest import TESTS_DIR`, und das Modul `conftest` war nach dem Sammeln von `tests/fault/` das aus dem Unterordner (`ImportError: cannot import name 'TESTS_DIR'`). Einzelläufe der Fault-Tests zeigten das nicht.
+- **Falsch:** Fixtures eines Unterordners in dessen `conftest.py` legen, solange andere Tests `conftest` per Namen importieren.
+- **Richtig:** Fixture in `tests/fault/faultfixtures.py`, jedes Testmodul importiert sie (`from faultfixtures import chains`). Immer auch den Gesamtlauf (`python -m pytest tests -q`) prüfen, nicht nur den eigenen Ordner.
+- **Status:** verifiziert (Gesamtlauf war rot mit 2 Sammelfehlern, nach der Umstellung `427 passed, 1 skipped`).
+- **Quelle:** `tests/fault/faultfixtures.py`
