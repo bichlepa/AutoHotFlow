@@ -298,6 +298,49 @@ CheckNestedRoundTripIsStructurallyEqual() {
 
 TestRun.Init()
 
+CheckBoolWritesTrueFalse() {
+    Assert.Equal(Json.Stringify(Json.True), "true")
+    Assert.Equal(Json.Stringify(Json.False), "false")
+    m := Map("a", Json.True, "b", Json.False, "c", [Json.True, Json.False, 1, 0])
+    Assert.Equal(Json.Stringify(m), '{"a":true,"b":false,"c":[true,false,1,0]}')
+}
+
+CheckBoolReadsAsOneAndZero() {
+    ; Reading stays 1/0 on purpose: AHK has no Bool type and `if x` must work (doc/PROTOKOLL.md section 2).
+    m := Json.Parse('{"a":true,"b":false}')
+    Assert.Equal(m["a"], 1)
+    Assert.Equal(Type(m["a"]), "Integer")
+    Assert.Equal(m["b"], 0)
+    Assert.True(!m["b"])
+}
+
+CheckBoolRoundTripIsNotTypePreserving() {
+    back := Json.Parse(Json.Stringify(Map("a", Json.True, "b", Json.False)))
+    Assert.Equal(back["a"], 1)
+    Assert.Equal(back["b"], 0)
+    Assert.Equal(Json.Stringify(back), '{"a":1,"b":0}')
+}
+
+CheckBoolConversion() {
+    Assert.True(Json.Bool(1) == Json.True)
+    Assert.True(Json.Bool(0) == Json.False)
+    Assert.True(Json.Bool("") == Json.False)
+    Assert.True(Json.Bool("0") == Json.False)
+    Assert.True(Json.Bool("x") == Json.True)
+    Assert.True(Json.Bool(5) == Json.True)
+    Assert.True(Json.Bool(Map()) == Json.True)
+    Assert.True(Json.Bool(Json.False) == Json.False)
+    Assert.True(Json.Bool(Json.True) == Json.True)
+}
+
+CheckBoolSingletonsAreDistinctFromNull() {
+    Assert.True(!(Json.True == Json.False))
+    Assert.True(!(Json.True == Json.Null))
+    Assert.True(!(Json.False == Json.Null))
+    ; The trap: Json.False is an object, so AHK counts it as true.
+    Assert.True(Json.False ? true : false)
+}
+
 TestRun.Case("Map CaseSense Off keeps the first spelling of a key", CheckOpenCheckKeySpelling)
 TestRun.Case("Map CaseSense Off enumerates keys in sorted order", CheckOpenCheckEnumerationSorted)
 TestRun.Case("object becomes Map with case-insensitive lookup", CheckObjectIsMapWithCaseInsensitiveLookup)
@@ -341,5 +384,11 @@ TestRun.Case("empty bytes are rejected", CheckEmptyBytesRejected)
 TestRun.Case("integer beyond 18 digits becomes Float", CheckIntegerBeyond18DigitsBecomesFloat)
 TestRun.Case("Json.Null is a singleton", CheckNullSingleton)
 TestRun.Case("nested round trip keeps structure and types", CheckNestedRoundTripIsStructurallyEqual)
+
+TestRun.Case("Json.True and Json.False are written as true and false", CheckBoolWritesTrueFalse)
+TestRun.Case("true and false are read as 1 and 0", CheckBoolReadsAsOneAndZero)
+TestRun.Case("boolean round trip is not type preserving", CheckBoolRoundTripIsNotTypePreserving)
+TestRun.Case("Json.Bool converts 0, 1, empty, '0' and objects", CheckBoolConversion)
+TestRun.Case("Json.True and Json.False are distinct singletons", CheckBoolSingletonsAreDistinctFromNull)
 
 TestRun.Finish()

@@ -11,6 +11,9 @@
 ; Keys that differ only in case inside one object are rejected, because the Map would merge them.
 ;
 ; Errors are JsonError with line and column. Nothing is repaired silently.
+; Booleans: Parse reads true as 1 and false as 0 (so `if x` works in AHK code). Stringify writes
+; Json.True and Json.False as true and false, and Integers as numbers. A round trip therefore does
+; not keep Booleans: true comes back as 1.
 ; Output: keys sorted, indent as in v1 Jxon_Dump (indent 2), no BOM. Line breaks are "`n";
 ; writing the file as UTF-8-RAW keeps it without BOM.
 class Json {
@@ -18,6 +21,16 @@ class Json {
 
     ; Type of the JSON null value. Use it through Json.Null only.
     class NullValue {
+    }
+
+    ; Types of the JSON true and false values for writing. Use them through Json.True, Json.False and
+    ; Json.Bool only. AHK v2 has no Bool type and every object is truthy, so Json.False is TRUTHY in an
+    ; `if`. Never keep these values in program state: use 1 and 0 there and convert with Json.Bool
+    ; when the message is built (doc/PROTOKOLL.md section 2).
+    class TrueValue {
+    }
+
+    class FalseValue {
     }
 
     ; Parser state for one Parse call. Positions are zero-based code units of this.text.
@@ -305,8 +318,24 @@ class Json {
     ; Singleton for JSON null. Compare with ==, not with =.
     static Null := Json.NullValue()
 
+    ; Singletons for JSON true and false, for writing only (see TrueValue). Compare with ==.
+    static True := Json.TrueValue()
+    static False := Json.FalseValue()
+
     ; Maximum nesting depth of arrays and objects. Protects against runaway recursion.
     static MAX_DEPTH := 256
+
+    ; Json.True or Json.False for the truthiness of x as AHK sees it (0, "", "0" and Json.False are false,
+    ; any other number or string and any other object is true). Call it where a message is built.
+    static Bool(x) {
+        if (x == Json.False)
+            return Json.False
+        if (x == Json.True)
+            return Json.True
+        if (IsObject(x))
+            return Json.True
+        return x ? Json.True : Json.False
+    }
 
     ; Parses JSON text. Returns Map | Array | String | Integer | Float, true/false as 1/0, null as Json.Null.
     static Parse(text) {
@@ -337,7 +366,7 @@ class Json {
 
     ; Writes JSON text. indent 0 gives one line, indent n > 0 gives one value per line with n spaces per level.
     ; Map keys are written sorted. Values: String as JSON string, Integer and Float as numbers,
-    ; Map and Array as object and array, Json.Null as null. Other types throw JsonError.
+    ; Map and Array as object and array, Json.True and Json.False as true and false, Json.Null as null. Other types throw JsonError.
     static Stringify(value, indent := 0) {
         if (!IsInteger(indent) || indent < 0)
             throw JsonError("indent must be a non-negative integer", ErrCode.BAD_ARGS)
@@ -349,6 +378,14 @@ class Json {
     static Emit(value, indent, level, &out) {
         if (value == Json.Null) {
             out .= "null"
+            return
+        }
+        if (value == Json.True) {
+            out .= "true"
+            return
+        }
+        if (value == Json.False) {
+            out .= "false"
             return
         }
         t := Type(value)
