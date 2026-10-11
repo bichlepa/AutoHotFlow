@@ -1,7 +1,7 @@
 # Architektur AutoHotFlow v2
 
-Status: Entwurf, freigegeben als Grundlage für Phase 2 (Walking Skeleton). Stand 2026-10-10.
-Zielplattform: AutoHotkey v2 (stock Interpreter, keine AHK_H-Erweiterungen).
+Status: Entwurf, freigegeben als Grundlage für Phase 2 (Walking Skeleton), in Phase 2b ergänzt (WI-20, Entscheidungen E1 bis E8 in `work_items/phase2b/README.md`). Stand 2026-10-11.
+Zielplattform: AutoHotkey v2, **nur 64 Bit** (E4, 2026-10-11). 32 Bit wird nicht unterstützt und beim Start abgewiesen (Umsetzung in WI-22). Begründung: Strukturen und DllCalls werden nur für 64 Bit getestet. Stock Interpreter, keine AHK_H-Erweiterungen.
 Verwandte Dokumente: [PROTOKOLL.md](PROTOKOLL.md), [ELEMENT-API-V2.md](ELEMENT-API-V2.md), [TESTSTRATEGIE.md](TESTSTRATEGIE.md), [KONVENTIONEN.md](KONVENTIONEN.md), [MIGRATION.md](MIGRATION.md).
 
 Kennzeichnung: **[M]** = gemessen oder im Spike bestätigt, **[V1]** = im v1-Code verifiziert, **[A]** = Annahme, die in Phase 2 geprüft wird.
@@ -89,6 +89,8 @@ Das erfüllt die Vorgabe „keine UI-Dialoge aus der Engine“: Dialog-Elemente 
 
 Eine falsch eingestufte Inline-Aktion fällt nicht still auf: Der Engine-Watchdog (6.2) meldet, wenn ein Elementaufruf länger als 250 ms im Engine-Prozess läuft, mit Klasse und Flow.
 
+**Entscheidung E3 (2026-10-11):** Der Supervisor startet und beendet Worker-Prozesse auf Anfrage der Engine (elastischer Pool). Ein Worker, der einen Job bearbeitet, ist von der Ping-Prüfung ausgenommen. Fristen für Jobs hält die Engine. Details in WI-27.
+
 ---
 
 ## 3. Prozesse
@@ -130,13 +132,34 @@ Der Supervisor ist der kleinste und einfachste Prozess. Er ist ein Hub, weil ein
 
 UIs rendern, was die Engine meldet. Ein Editor markiert ein Element nicht selbst als „running“, er empfängt `evt.element.state`. Ein neu verbundener oder neu gestarteter Client holt den Ist-Zustand per `cmd.engine.snapshot` (Resync), danach folgen Ereignisse mit steigender `seq`.
 
-### 4.2 Bearbeitungsmodell (D10)
+### 4.2 Bearbeitungsmodell (D10, E1)
 
 - v1 verhält sich so **[V1]**: Der Editor ändert den „current state“ des Flows direkt im geteilten Speicher, die Ausführung liest bei jedem Schritt aus dem aktuellen Zustand. Änderungen während der Ausführung wirken sich also auf folgende Schritte aus.
+- **Entscheidung E1 (2026-10-11): Ändern während der Ausführung ist erlaubt** (beobachtbares v1-Verhalten). Die Engine nutzt bei jedem Schritt die **neueste committete Revision** eines Flows. Der Ist-Stand weicht davon ab: `Executor._NewRun` (`src/engine/Executor.ahk`, Feld `flow`) hält die Definition beim Start der Instanz fest. Das ändert WI-21.
 - v2 behält dieses beobachtbare Verhalten, aber ohne geteilten Speicher: Der Editor schickt nach jeder abgeschlossenen Benutzeraktion (Mausloslassen, Dialog OK) einen **Patch** `cmd.flow.patch {flowId, baseRev, ops}`. Die Engine wendet ihn atomar an, erhöht `rev` und antwortet mit der neuen `rev`. Die Engine liest bei jedem Schritt die neueste committete Revision. Jede Revision ist ein unveränderlicher Schnappschuss, es gibt keine halb geschriebenen Zustände.
 - Bei `baseRev`-Konflikt (z. B. Manager hat umbenannt) lehnt die Engine ab und sendet den aktuellen Stand. Der Editor führt neu zusammen.
 - Nur-Ansicht-Änderungen (Zoom, Offset) gehören dem Editor und werden mit „Speichern“ als `flowSettings` mitgeschrieben.
 - Speichern ist ein expliziter Befehl: `cmd.flow.save`. Die Engine übergibt den Schnappschuss an `storage`, `storage` schreibt atomar (Temp-Datei + Umbenennen) und meldet `evt.flow.saved`.
+
+**Semantik bei Änderungen während der Ausführung (Zielzustand nach WI-21).** Abgeglichen mit v1 (`v1/Source_Execution/Execution Task/Execution Task.ahk`, Zeilen aus dem Code gelesen, nicht ausgeführt). Abweichungen von v1 stehen in [MIGRATION.md](MIGRATION.md) (M-17, M-18).
+
+| Fall | Verhalten in v2 | Verhalten in v1 |
+|---|---|---|
+| Laufendes Element (`running`), dessen Parameter oder Klasse geändert werden | läuft mit Klasse und Parametern zu Ende, mit denen es gestartet wurde; `Element_stop` mit denselben Werten | Parameter werden beim Start kopiert (`:72`) und aus der Kopie ausgeführt und gestoppt (`:246`, `:211`). Die Klasse für `Element_stop` kommt aber aus dem aktuellen Zustand (`:198`), siehe M-18 |
+| Thread wartet (`ready`, v1 `starting`), Element wird geändert | startet mit den Werten, die im Moment des Starts gelten | liest Klasse und Parameter beim Start aus dem aktuellen Zustand (`:67`, `:72`) |
+| Nächste Verbindung nach dem Ende eines Elements | aus der neuesten Revision | `:110`, `:115`, `:138` lesen den aktuellen Zustand |
+| Thread wartet (`ready`), nächstes Element wurde gelöscht | endet mit Ergebnis `exception`, Meldung „element was removed“, `f1`-Log. Kein Dialog aus der Engine. Abweichung, siehe M-17 | `:67` liefert ein leeres Element, `:71` setzt den Thread auf `running`, `:88`–`:94` findet keine Funktion und ruft `MsgBox` auf, innerhalb der kritischen Sektion. Es wird keine Aufgabe eingereiht, der Thread bleibt dauerhaft `running` (vermutet, dass der Zugriff auf eine Eigenschaft des leeren Werts keinen Fehler wirft, nicht ausgeführt) |
+| Laufendes Element wird gelöscht | läuft zu Ende. Danach findet es keine Verbindung, der Thread endet. Die Meldung nennt Element-ID und den Namen aus dem Start (M-18) | `:110` liefert kein Element, `:153`–`:166` beenden den Thread. Der Name im `f0`-Log bleibt leer (`:161`, vermutet) |
+| Flow wird gelöscht | alle Instanzen werden gestoppt (Grund `flow.deleted`) | `DeleteFlow` stoppt alle Instanzen (`Manage Flows.ahk:190`, `Instances and Threads.ahk:165`–`:188`), wartet höchstens 10 s, sonst bricht es ab und löscht nicht (`Manage Flows.ahk:192`–`:206`). Einen Grund gibt es in v1 nicht. Das Verhalten bei Fristablauf in v2 ist offen (siehe `work_items/STATUS.md`) |
+
+### 4.3 Ausblick: Debugger (E1)
+
+Der Debugger wird in Phase 2b **nicht** gebaut. Die folgenden Anforderungen dürfen spätere Entwürfe aber nicht verbauen:
+
+- Ein **Ausführungstor** im Dispatcher der Engine: Vor jedem Element kann die Ausführung je Instanz oder Flow angehalten werden (Pause, Breakpoint an einem Element, Einzelschritt, künstliche Verzögerung nach jedem Element, z. B. 3 s). Pausieren wirkt an Elementgrenzen; ein laufendes Element (vor allem im Worker) läuft zu Ende.
+- Während einer Pause können Clients alle Variablen einer Instanz lesen und ändern (Nachrichten an die Engine, die Engine besitzt die Variablen, Abschnitt 4).
+- Bearbeiten während der Pause wirkt beim nächsten Schritt (folgt aus E1 und der Tabelle in 4.2).
+- Die Ereignisse dafür (z. B. `evt.instance.paused`) und Befehle (`cmd.debug.*`) entwirft Phase 3 oder später.
 
 ---
 
@@ -232,6 +255,8 @@ Geprüft an den 23 Flows in `v1/AppData/Saved Flows` und `Save.ahk` **[V1]**:
 
 Unbekanntes in Dateien (Schlüssel, die v2 nicht kennt) wird beim Laden **beibehalten und beim Speichern zurückgeschrieben**, damit ein Wechsel zwischen v1 und v2 nichts verliert.
 
+**Entscheidung E8 (2026-10-11):** Wahrheitswerte gehen in v2 als echte JSON-Booleans auf die Leitung (WI-26). Das Flow-Dateiformat darf in v2 künftig vom v1-Format abweichen. Pflicht bleibt, dass alte Flows und Variablen laden. In Phase 2b ändert sich das **Schreibformat der Flows nicht**. Ein neues Schreibformat ist eine eigene Entscheidung in Phase 3, mit Versionskennung in der Datei. Bis dahin schreibt v2 das v1-Format. Ein Flow in einem neuen Format ist für v1 nicht mehr lesbar.
+
 ---
 
 ## 8. Ordnerstruktur
@@ -261,6 +286,7 @@ AutoHotFlow/
 
 **Ist-Stand am Ende von Phase 2 (WI-17, verglichen mit dem Dateibaum, verifiziert):** Die Struktur oben ist weiter das Ziel. Abweichungen und Lücken:
 
+- **Entscheidung E6 (2026-10-11):** Der Triggerhost (WI-14) wird früh in Phase 3 mit den echten Triggern gebaut, nicht in Phase 2b.
 - Vorhanden: `src/AutoHotFlow.ahk`, `core/` (zusätzlich `Role.ahk`, `RoleRegistry.ahk`, `Time.ahk`; `ipc/` zusätzlich `Deferred.ahk`, `PipeConnection.ahk`, `PipeListener.ahk`, `FrameReader.ahk`, `FrameWriter.ahk`), `supervisor/`, `engine/` (mit `core/` für Zustandsautomaten, Flowmodell, Scheduler), `storage/`, `worker/`, `manager/` (nur `StubManager.ahk` und `StubGui.ahk`), `elements/base/`.
 - **Nicht vorhanden (Phase 3 oder später):** `triggerhost/` (WI-14 optional, nicht gebaut; die Rolle ist in `RoleRegistry.ahk` ein Platzhalter), `editor/` (Platzhalter-Rolle), `ui_common/`, `assets/`, `elements/default/{actions,conditions,loops,triggers}/`. Statt `elements/default/` gibt es `elements/skeleton/` mit acht Demo- und Testelementen (`Trigger_Manual`, `Action_Sleep`, `Action_Do_nothing`, `Action_Test*`).
 - `tools/` enthält bisher nur `ahkrun.py` und `ahf_dialogwatch.py` (Laufwächter), keine Konverter.
@@ -278,6 +304,8 @@ Regel: Ein Ordner unter `src/` ist ein Prozess-Rollen- oder Bibliotheks-Modul. `
 - Engine-Zustandsänderung bis Editor-Neuzeichnen: unter 50 ms bei nicht blockiertem Editor.
 - Idle-CPU des Gesamtsystems ohne laufende Flows: unter 1 %.
 - Speicher: unter 100 MB insgesamt bei 5 offenen Editoren.
+
+**Entscheidung E5 (2026-10-11):** Das Ziel für die Idle-CPU gilt für das **Gesamtsystem**. Gemessen 0,23 % (8 CPUs, WI-16), erfüllt. Die Lesart „Summe in Prozent eines Kerns“ (1,8 %) ist damit nicht mehr das Maßstab. Eine Optimierung ist kein Muss und steht als Beobachtungspunkt in `work_items/STATUS.md`.
 
 ---
 

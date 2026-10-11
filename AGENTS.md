@@ -48,7 +48,7 @@ Gesprochene Sprache mit dem Projektinhaber: Deutsch. Dokumentation: Deutsch. Cod
 
 ## Werkzeuge in dieser Umgebung
 
-- AHK v2: `C:\Program Files\AutoHotkey\v2\AutoHotkey64.exe` (mehrere Versionen installiert). Skripte immer mit `#Requires AutoHotkey v2.0`.
+- AHK v2: `C:\Program Files\AutoHotkey\v2\AutoHotkey64.exe` (mehrere Versionen installiert). Skripte immer mit `#Requires AutoHotkey v2.0`. **Nur 64 Bit** (E4): 32-Bit-Interpreter werden nicht unterstützt.
 - Python 3.13 mit `psutil`. `pytest`, `pytest-timeout` und `pytest-xdist` sind zu installieren: `pip install -r tests/requirements.txt`.
 - **Architekturwächter:** `python tools/arch_check.py` prüft `src/**/*.ahk` statisch gegen die Regeln aus `doc/KONVENTIONEN.md` Abschnitt 3 (Includes, Dialoge, Datei-I/O, Blockieren, `Critical`, leere `catch`, eine Klasse pro Datei). Läuft auch als `tests/test_architecture.py`. Begründete Ausnahmen: Kommentar `; arch-ok: <regel> <Begründung>` oder Liste `EXCEPTIONS` im Werkzeug.
 - **Tests laufen standardmäßig parallel** (`pytest.ini`: `-n auto --dist loadgroup`, 8 Worker, rund 50 s statt 340 s). `python -m pytest tests -q` genügt. Seriell: `-n 0` (nötig zum Debuggen eines Einzeltests mit `-s`/`--pdb`). `-m stress`/`-m soak` laufen automatisch in einem Prozess (Messungen dürfen nicht parallel zu anderer Last laufen). Neue Testskripte (AHK), die mehrfach gleichzeitig laufen können, brauchen `#SingleInstance Off`, sonst öffnet AHK einen Rückfrage-Dialog.
