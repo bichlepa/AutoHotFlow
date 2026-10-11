@@ -11,9 +11,12 @@
 ;   - a connection matches if its ConnectionType equals the result (case-insensitive, line 119),
 ;     or if the element is a loop and fromPart equals the result (line 119, "type = loop").
 ;   - for a loop that is left with "tail" or "exception", the loop stack is restored (lines 123 to
-;     126). This happens for each matching connection, as in v1.
+;     126). v1 does this once per matching connection; v2 does it once per finished loop element
+;     (a second pop would throw on the stack of depth 1, WI-21, MIGRATION M-19).
 ;   - the first match moves the thread, every further match gets a clone (lines 128 to 133).
 ;   - when the next element is a loop entered at "head", the loop stack is pushed (lines 142 to 145).
+;     v1 pushes onto the origin thread (OneThreadID); v2 pushes onto the thread that enters the loop
+;     (M-19). Clones are made before any push, so only the thread that enters the loop gets it.
 ;   - no match: the thread is removed (line 166). A result "exception" without a match is
 ;     reported as unhandled (lines 156 to 162), the caller logs f0.
 ;
@@ -62,26 +65,29 @@ class Scheduler {
         }
 
         leavesLoop := (kind = "loop" && (StrLower(result) = "tail" || StrLower(result) = "exception"))
-        ids := []
-        first := true
-        for conn in matches {
-            if (leavesLoop)
-                thread.Loops.Pop()
+        ; The loop is left once, however many connections match: pop the stack before any clone is made, so
+        ; every branch starts from the restored state. v1 popped once per connection (M-14, M-19).
+        if (leavesLoop)
+            thread.Loops.Pop()
+        thread.TryTransition("ready", "next element")
 
-            if (first) {
-                target := thread
-                target.TryTransition("ready", "next element")
-            } else {
-                target := thread.Clone(newId.Call())
-                instance.AddThread(target)
-            }
+        ; Clones are made before any thread is changed, so a clone never inherits the loop push of another
+        ; branch. The moved thread is the first one, the clones follow in connection order.
+        targets := [thread]
+        loop matches.Length - 1 {
+            clone := thread.Clone(newId.Call())
+            instance.AddThread(clone)
+            targets.Push(clone)
+        }
+
+        ids := []
+        for i, conn in matches {
+            target := targets[i]
             target.ElementId := String(conn["to"])
             target.EntryPoint := conn.Has("toPart") ? String(conn["toPart"]) : ""
             if (flow.ElementKind(target.ElementId) = "loop" && StrLower(target.EntryPoint) = "head")
                 target.Loops.Push()
-
             ids.Push(target.Id)
-            first := false
         }
         return Scheduler.Outcome("next", false, ids)
     }

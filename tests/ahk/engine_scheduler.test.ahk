@@ -92,6 +92,42 @@ LoopFlow() {
         '"c5":{"ID":"c5","from":"L","to":"X","type":"Connection","ConnectionType":"Exception"}}}'))
 }
 
+; Loop L with two TAIL connections (to X and to Y) and two Exception connections (to X and to Y).
+LoopTwoExitsFlow() {
+    return FlowDefinition.FromText("loop2", Lines(
+        '{"allElements":{',
+        '"t0":{"ID":"t0","type":"trigger","class":"trigger_Manual","pars":{}},',
+        '"L":{"ID":"L","type":"loop","class":"Loop_SimpleLoop","pars":{}},',
+        '"B":{"ID":"B","type":"action","class":"action_Do_nothing","pars":{}},',
+        '"X":{"ID":"X","type":"action","class":"action_Do_nothing","pars":{}},',
+        '"Y":{"ID":"Y","type":"action","class":"action_Do_nothing","pars":{}}},',
+        '"allConnections":{',
+        '"c1":{"ID":"c1","from":"t0","to":"L","toPart":"HEAD","type":"Connection","ConnectionType":"normal"},',
+        '"c2":{"ID":"c2","from":"L","to":"B","fromPart":"HEAD","type":"Connection","ConnectionType":"normal"},',
+        '"c3":{"ID":"c3","from":"B","to":"L","toPart":"TAIL","type":"Connection","ConnectionType":"normal"},',
+        '"c4":{"ID":"c4","from":"L","to":"X","fromPart":"TAIL","type":"Connection","ConnectionType":"normal"},',
+        '"c5":{"ID":"c5","from":"L","to":"Y","fromPart":"TAIL","type":"Connection","ConnectionType":"normal"},',
+        '"c6":{"ID":"c6","from":"L","to":"X","type":"Connection","ConnectionType":"Exception"},',
+        '"c7":{"ID":"c7","from":"L","to":"Y","type":"Connection","ConnectionType":"Exception"}}}'))
+}
+
+; trigger t0 -> a. a has two normal connections: c2 to the head of loop L, c3 to the plain action c.
+BranchIntoLoopFlow(loopFirst := true) {
+    first := loopFirst ? '"c2":{"ID":"c2","from":"a","to":"L","toPart":"HEAD","type":"Connection","ConnectionType":"normal"},'
+        : '"c2":{"ID":"c2","from":"a","to":"c","type":"Connection","ConnectionType":"normal"},'
+    second := loopFirst ? '"c3":{"ID":"c3","from":"a","to":"c","type":"Connection","ConnectionType":"normal"}}}'
+        : '"c3":{"ID":"c3","from":"a","to":"L","toPart":"HEAD","type":"Connection","ConnectionType":"normal"}}}'
+    return FlowDefinition.FromText("branchloop", Lines(
+        '{"allElements":{',
+        '"t0":{"ID":"t0","type":"trigger","class":"trigger_Manual","pars":{}},',
+        '"a":{"ID":"a","type":"action","class":"action_Do_nothing","pars":{}},',
+        '"L":{"ID":"L","type":"loop","class":"Loop_SimpleLoop","pars":{}},',
+        '"c":{"ID":"c","type":"action","class":"action_Do_nothing","pars":{}}},',
+        '"allConnections":{',
+        '"c1":{"ID":"c1","from":"t0","to":"a","type":"Connection","ConnectionType":"normal"},',
+        first, second))
+}
+
 ; trigger t0 -> a, and one connection to an unknown element (dangling, ignored)
 DanglingFlow() {
     return FlowDefinition.FromText("dangling", Lines(
@@ -313,6 +349,94 @@ LoopExitWithExceptionPopsToo() {
     Assert.Equal(inst.Threads["t1"].Loops.Depth, 0)
 }
 
+; Enters the loop of LoopTwoExitsFlow, sets a variable inside it and finishes the loop element with
+; the given result. Returns [instance, flow, outcome].
+LeaveLoopTwoWays(result) {
+    flow := LoopTwoExitsFlow()
+    pair := StartTrigger(flow)
+    inst := pair[1]
+    Advance(inst, flow, pair[2])
+    loopThread := inst.Threads["t1"]
+    Assert.Equal(loopThread.Loops.Depth, 1)
+    loopThread.Loops.Visible["i"] := 2     ; value inside the loop, must be undone by the pop
+    RunElement(loopThread, result)
+    return [inst, flow, Advance(inst, flow, loopThread)]
+}
+
+LoopTwoTailConnectionsPopOnce() {
+    r := LeaveLoopTwoWays("tail")
+    inst := r[1]
+    out := r[3]
+    Assert.Equal(out["outcome"], "next")
+    Assert.Equal(out["threadIds"].Length, 2)
+    Assert.Equal(inst.Threads.Count, 2)
+    targets := ""
+    for id in out["threadIds"] {
+        t := inst.Threads[id]
+        Assert.Equal(t.State, "ready")
+        Assert.Equal(t.Loops.Depth, 0, "stack depth of " id)
+        Assert.Equal(t.Loops.Visible.Has("i"), false, "loop variable restored in " id)
+        targets .= t.ElementId
+    }
+    Assert.Equal(targets, "XY")
+}
+
+LoopTwoExceptionConnectionsPopOnce() {
+    r := LeaveLoopTwoWays("exception")
+    inst := r[1]
+    out := r[3]
+    Assert.Equal(out["outcome"], "next")
+    Assert.Equal(out["threadIds"].Length, 2)
+    for id in out["threadIds"] {
+        t := inst.Threads[id]
+        Assert.Equal(t.State, "ready")
+        Assert.Equal(t.Loops.Depth, 0, "stack depth of " id)
+        Assert.Equal(t.Loops.Visible.Has("i"), false, "loop variable restored in " id)
+    }
+}
+
+LoopLeftInsideOuterLoopKeepsOuterLevel() {
+    ; The thread already sits inside an outer loop (depth 1 before entering L): both exits keep depth 1.
+    flow := LoopTwoExitsFlow()
+    pair := StartTrigger(flow)
+    inst := pair[1]
+    pair[2].Loops.Push()                  ; outer loop level
+    Advance(inst, flow, pair[2])
+    loopThread := inst.Threads["t1"]
+    Assert.Equal(loopThread.Loops.Depth, 2)
+    RunElement(loopThread, "tail")
+    out := Advance(inst, flow, loopThread)
+    Assert.Equal(out["threadIds"].Length, 2)
+    for id in out["threadIds"]
+        Assert.Equal(inst.Threads[id].Loops.Depth, 1, "stack depth of " id)
+}
+
+BranchIntoLoopPushesOnlyTheLoopThread(loopFirst) {
+    flow := BranchIntoLoopFlow(loopFirst)
+    pair := StartTrigger(flow)
+    inst := pair[1]
+    Advance(inst, flow, pair[2])
+    a := inst.Threads["t1"]
+    RunElement(a, "normal")
+    out := Advance(inst, flow, a)
+    Assert.Equal(out["threadIds"].Length, 2)
+    for id in out["threadIds"] {
+        t := inst.Threads[id]
+        if (t.ElementId = "L")
+            Assert.Equal(t.Loops.Depth, 1, "thread in the loop")
+        else
+            Assert.Equal(t.Loops.Depth, 0, "thread beside the loop (" t.ElementId ")")
+    }
+}
+
+BranchIntoLoopFirst() {
+    BranchIntoLoopPushesOnlyTheLoopThread(true)
+}
+
+BranchIntoLoopSecond() {
+    BranchIntoLoopPushesOnlyTheLoopThread(false)
+}
+
 RealFlowRunsFromTriggerToEnd() {
     text := ReadText(SavedFlowsDir() "\Flow 464187831.json")
     flow := FlowDefinition.FromText("464187831", text)
@@ -353,6 +477,11 @@ TestRun.Case("Advance: exception with a connection is handled by it", ExceptionW
 TestRun.Case("Advance: a thread that is not finished is not moved", AdvanceRequiresFinishedThread)
 TestRun.Case("Loop: head pushes, tail pops and restores the loop variables", LoopPushesOnHeadAndPopsOnTail)
 TestRun.Case("Loop: leaving with exception pops the loop stack too", LoopExitWithExceptionPopsToo)
+TestRun.Case("Loop: two tail connections pop the loop stack once, both threads are ready", LoopTwoTailConnectionsPopOnce)
+TestRun.Case("Loop: two exception connections pop the loop stack once", LoopTwoExceptionConnectionsPopOnce)
+TestRun.Case("Loop: leaving a loop inside an outer loop keeps the outer level in every branch", LoopLeftInsideOuterLoopKeepsOuterLevel)
+TestRun.Case("Advance: branching into a loop pushes only the loop thread (loop connection first)", BranchIntoLoopFirst)
+TestRun.Case("Advance: branching into a loop pushes only the loop thread (loop connection second)", BranchIntoLoopSecond)
 TestRun.Case("real flow 464187831 runs from trigger to end", RealFlowRunsFromTriggerToEnd)
 
 TestRun.Finish()
