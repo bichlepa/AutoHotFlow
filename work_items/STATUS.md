@@ -127,9 +127,10 @@ Punkte, die bewusst nicht in Phase 2b behoben werden. Je Punkt: was, warum zurü
 | F-05 | Orphan-Guard beendete vom Supervisor gestartete Rollen nicht (`Console` warf) | behoben | `f7a728e`, `tests/fault/test_orphans.py` (20/20). Änderung in `src/core/` ohne Absprache, bitte prüfen |
 | F-06 | `clean` in `evt.process.exited` einmal `false` bei sauberem Ende. Ursache: `_OnGone` vor dem Lesen von `sys.bye` | **behoben** (WI-18 Reihenfolge `Pump` vor `children.Tick`, WI-22 deterministischer Test: alte Reihenfolge `clean=false`, neue `true`; `test_shutdown` 2 x 50 Wiederholungen, `clean` nie falsch) | `WI-15-fault-injection.md`, `phase2b/WI-22-supervisor-robustheit.md` |
 | F-07 | Speicherleck 83 KB je Verbindung (Referenzzyklus in `PipeConnection`) | behoben | `4f566bb`, `test_many_connects_keep_the_memory_of_the_supervisor_flat` |
-| F-08 | Storage drainiert Log mit rund 30 Zeilen/s, Warteschlange unbegrenzt | **Phase 3** (Obergrenze und Durchsatz festlegen, bevor der echte Manager und Editor Logs erzeugen) | `WI-16-stress.md` |
+| F-08 | Storage drainierte Log mit rund 30 Zeilen/s, Warteschlange unbegrenzt | behoben in WI-25 (1493 Zeilen/s über 10 s gemessen, Obergrenze 20000 Einträge oder 8 MiB, getrennte Warteschlangen) | `WI-25-storage-durchsatz.md` |
 | F-09 | `seq` der Engine-Ereignisse vertauscht bei 200 Instanzen | behoben | `4906f7d` |
 | F-10 | Trigger als Aktion ausgeführt (Race zwischen `Advance` und Dispatch-Timer) | behoben; ob `_Dispatch` und das Klonen in `Advance` dasselbe Muster haben, ist nicht geprüft | `887988b` |
+| F-25 | Ein von einem anderen Prozess dauerhaft gehaltenes Logfile verliert nach 3 s das ganze Bündel (bis 500 Zeilen) dieser Datei, nicht nur eine Zeile | offen, niedrig (gezählt und im Log vermerkt, F-04 unverändert) | `WI-25-storage-durchsatz.md` |
 
 ## Bekannte Probleme
 
