@@ -29,6 +29,8 @@
 ;   --restart-max  (only with --test-roles) restarts per RESTART_WINDOW_MS, default Children.RESTART_MAX (3);
 ;               lets the tests restart a child many times (handle leaks).
 ;   --ui=<word>, --headless, --stub-cancel-exit  passed on to every role (WI-13: --ui=stub for the manager stub).
+;   --log-level=<0..3>  highest log level that is forwarded to storage (default 2; level 3 stays in the ring of
+;               Log only). Valid for the supervisor and passed on to every role (WI-23).
 ;
 ; Single instance: a named mutex per session. A second supervisor with the same session sends
 ; cmd.app.command {argv} to the running one and exits (exit 0 = delivered, 1 = no answer).
@@ -72,6 +74,7 @@ class Supervisor {
                 throw AhfError("supervisor: --prepare-limit must be between " Supervisor.MIN_DEADLINE_MS " and "
                     . Shutdown.PREPARE_LIMIT_MS " ms", ErrCode.BAD_ARGS)
         }
+        this.logLevel := Log.ParseLevel(opts.Get("log-level", Log.DEFAULT_LEVEL))
         this.restartMax := Children.RESTART_MAX
         if (this.testRoles && opts.Has("restart-max"))
             this.restartMax := this._Integer(opts, "restart-max", Children.RESTART_MAX)
@@ -98,6 +101,7 @@ class Supervisor {
 
     Start() {
         Persistent()
+        Log.SetLevel(this.logLevel)
         OnError(Supervisor.ErrorFn)
         Ids.Configure("supervisor")
         if (this._ForwardIfRunning())
@@ -246,6 +250,8 @@ class Supervisor {
     ; (manager: --ui=stub), --headless and --stub-cancel-exit are the stub's test options.
     _RoleOpts(opts) {
         text := ""
+        if (opts.Has("log-level"))
+            text .= " --log-level=" this.logLevel
         if (opts.Has("ui")) {
             ui := String(opts["ui"])
             if (!RegExMatch(ui, "^[a-z]+$"))

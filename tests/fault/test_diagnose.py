@@ -12,7 +12,7 @@ import time
 import psutil
 import pytest
 
-from faultkit import event, request_ok, wait_until
+from faultkit import Sup, event, request_ok, wait_until
 
 from faultfixtures import chains  # noqa: F401  (fixture)
 
@@ -80,6 +80,38 @@ def test_the_exit_of_a_killed_child_is_in_the_log(chains, datadir):
     assert chain.rec.wait(event("evt.process.crashed", name="echo:a"), timeout=10) is not None
     assert wait_for_log(datadir, "echo:a ended unexpectedly"), chain.sup.text()
     assert end_session(chain) == 0, chain.sup.text()
+
+
+@pytest.mark.parametrize("level,visible,hidden", [
+    (None, ["a0", "a1", "a2"], ["a3"]),
+    ("0", ["a0"], ["a1", "a2", "a3"]),
+    ("3", ["a0", "a1", "a2", "a3"], []),
+])
+def test_the_log_level_decides_what_is_forwarded_to_storage(chains, datadir, level, visible, hidden):
+    extra = ["--test-roles"] + (["--log-level=" + level] if level is not None else [])
+    chain = chains("storage,echo:a", extra)
+    chain.wait_ready(["storage", "echo:a"])
+    echo(chain, "cmd.test.setlogtarget", {"to": "storage"})        # the echo role sends its log to storage
+    for lv in visible + hidden:
+        echo(chain, "cmd.test.log", {"count": 1, "level": lv, "text": "marker-" + lv})
+    # a0 is always forwarded; wait for the last visible one, then end (the end flushes the queue of storage)
+    assert end_session(chain) == 0, chain.sup.text()
+    text = log_text(datadir)
+    for lv in visible:
+        assert "marker-" + lv in text, (lv, text)
+    for lv in hidden:
+        assert "marker-" + lv not in text, (lv, text)
+    # the supervisor obeys the level too (and passes it on): its "started ..." line is an a1 entry
+    assert ("~supervisor~children~ started echo:a" in text) == (level != "0"), text
+
+
+def test_a_bad_log_level_is_refused(procs, datadir, session_id):
+    sup = Sup(procs, datadir, session_id, ["--test-roles", "--log-level=7"])
+    try:
+        assert sup.wait_exit(timeout=30) == 1, sup.text()        # the supervisor failed to start
+        assert "--log-level" in sup.text(), sup.text()
+    finally:
+        sup.close()
 
 
 @pytest.mark.timeout(240)

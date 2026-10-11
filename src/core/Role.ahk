@@ -7,7 +7,7 @@
 
 ; Base class of every role process (doc/ARCHITEKTUR.md 3 and 6, doc/PROTOCOL.md 4.1 and 5).
 ; A role is started by src/AutoHotFlow.ahk with the command line of work_items/phase2/README.md:
-;   --role=<name> --session=<id> --hub=<pipe> --data=<dir> [--flow=<flowId>] [--hubHwnd=<n>]
+;   --role=<name> --session=<id> --hub=<pipe> --data=<dir> [--flow=<flowId>] [--hubHwnd=<n>] [--log-level=<0..3>]
 ;
 ; Subclasses override the hooks and register their own message handlers:
 ;
@@ -70,6 +70,7 @@ class Role {
         this.hubPipe := args.Get("hub", "")
         this.dataDir := args.Get("data", "")
         this.hubHwnd := Integer(args.Get("hubHwnd", 0))
+        this.logLevel := Log.ParseLevel(args.Get("log-level", Log.DEFAULT_LEVEL))   ; throws: the entry exits with 2
         this.peer := ""
         this.closing := false
         this.lostSince := 0
@@ -86,6 +87,7 @@ class Role {
         Role.Current := this
         Persistent()
         Log.Configure(Role.LogSinkFn)
+        Log.SetLevel(this.logLevel)
         OnError(Role.ErrorFn)
         this.peer := Peer(this.name, this.hubPipe, Map("hubHwnd", this.hubHwnd))
         this.peer.On("sys.shutdown", Role.ShutdownFn)
