@@ -22,6 +22,8 @@ from support import winpipe
 from support.ahfclient import AhfClient, FrameDecoder, dumps, encode_frame, make_envelope
 from support.pyhub import WakingHub
 
+from faultfixtures import chains  # noqa: F401  (fixture)
+
 pytestmark = pytest.mark.fault
 
 CYCLES = 30

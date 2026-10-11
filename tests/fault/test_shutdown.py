@@ -13,6 +13,8 @@ import pytest
 from faultkit import (CLEAN_EXIT_BUDGET_S, EXIT_FORCED, EXIT_OK, FULL_CHAIN, STUB_OPTS, alive, death_watch,
                       event, repeat_ids, session_processes, wait_until)
 
+from faultfixtures import chains  # noqa: F401  (fixture)
+
 pytestmark = pytest.mark.fault
 
 DEADLINE_MS = 2000

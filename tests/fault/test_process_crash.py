@@ -19,6 +19,8 @@ import pytest
 from faultkit import (CRASH_BUDGET_S, FULL_CHAIN, REQUEST_BUDGET_S, STUB_OPTS, RoleProc, alive, death_watch,
                       event, repeat_ids, request_ok, wait_until, write_flow)
 
+from faultfixtures import chains  # noqa: F401  (fixture)
+
 pytestmark = pytest.mark.fault
 WORKER_ELEMENT = "element0000000002"
 

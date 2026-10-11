@@ -11,6 +11,8 @@ import pytest
 
 from faultkit import FULL_CHAIN, STUB_OPTS, alive, freeze, session_processes, thaw, wait_until
 
+from faultfixtures import chains  # noqa: F401  (fixture)
+
 pytestmark = pytest.mark.fault
 
 

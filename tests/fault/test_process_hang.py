@@ -14,6 +14,8 @@ import pytest
 
 from faultkit import HANG_BUDGET_S, FULL_CHAIN, STUB_OPTS, alive, death_watch, event, repeat_ids, wait_until
 
+from faultfixtures import chains  # noqa: F401  (fixture)
+
 pytestmark = pytest.mark.fault
 
 CRASH_AFTER_HANG_S = 4.0      # hung -> terminated (KILL_AFTER_MS 2 s) -> reported, with slack

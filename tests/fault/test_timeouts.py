@@ -16,6 +16,8 @@ import pytest
 from faultkit import (EXIT_OK, FULL_CHAIN, REQUEST_BUDGET_S, STUB_OPTS, alive, event, repeat_ids, wait_until)
 from support.ahfclient import AhfTimeout
 
+from faultfixtures import chains  # noqa: F401  (fixture)
+
 pytestmark = pytest.mark.fault
 
 PREPARE_LIMIT_MS = 500

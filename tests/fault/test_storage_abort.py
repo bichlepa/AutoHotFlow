@@ -15,6 +15,8 @@ import pytest
 
 from faultkit import FULL_CHAIN, STUB_OPTS, repeat_ids, request_ok
 
+from faultfixtures import chains  # noqa: F401  (fixture)
+
 pytestmark = pytest.mark.fault
 
 BIG_BYTES = 5 * 1024 * 1024
