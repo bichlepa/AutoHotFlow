@@ -332,6 +332,9 @@ class PipeConnection {
         this._open := false
         this._closeReason := reason
         SetTimer(this._pollFn, 0)
+        ; Break the cycle object -> bound method -> object (AHK counts references, so it would never
+        ; be freed). The timer is off, nothing schedules the poll again while the connection is closed.
+        this._pollFn := ""
         ; Cancel everything that is outstanding on this handle. Buffers must stay valid until the
         ; kernel has finished with them, so wait (bounded) for the cancelled operations.
         DllCall("CancelIoEx", "ptr", this._h, "ptr", 0)
@@ -356,6 +359,8 @@ class PipeConnection {
         if (this._closeNotified)
             return
         this._closeNotified := true
+        ; The notify timer (if any) has fired or is being run by this call: drop the self reference.
+        this._notifyFn := ""
         handler := this.OnClose
         if (!IsObject(handler))
             return
