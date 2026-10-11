@@ -89,7 +89,7 @@ Das erfüllt die Vorgabe „keine UI-Dialoge aus der Engine“: Dialog-Elemente 
 
 Eine falsch eingestufte Inline-Aktion fällt nicht still auf: Der Engine-Watchdog (6.2) meldet, wenn ein Elementaufruf länger als 250 ms im Engine-Prozess läuft, mit Klasse und Flow.
 
-**Entscheidung E3 (2026-10-11):** Der Supervisor startet und beendet Worker-Prozesse auf Anfrage der Engine (elastischer Pool). Ein Worker, der einen Job bearbeitet, ist von der Ping-Prüfung ausgenommen. Fristen für Jobs hält die Engine. Details in WI-27.
+**Entscheidung E3 (2026-10-11):** Der Supervisor startet und beendet Worker-Prozesse auf Anfrage der Engine (elastischer Pool). Ein Worker, der einen Job bearbeitet, ist von der Ping-Prüfung ausgenommen. Fristen für Jobs hält die Engine. Die Regeln stehen in Abschnitt 6.4 (WI-27).
 
 ---
 
@@ -103,7 +103,7 @@ Eine falsch eingestufte Inline-Aktion fällt nicht still auf: Der Engine-Watchdo
 | `triggerhost` | 1 (später n) | Trigger scharf schalten, Ereignisse melden | OS-Handles der Trigger (Hotkeys, Hooks, Timer) | Flows ausführen |
 | `manager` | 0..1 | Flow-Liste, Kategorien, Einstellungen, Import/Export, Log-Anzeige | Fensterzustand | Flows ausführen |
 | `editor:<flowId>` | 0..n | Bearbeiten und Anzeigen eines Flows, Zeichnen | Entwurf des Flows, Undo/Redo, Ansicht (Zoom/Offset), Auswahl | Laufzeitzustand ändern |
-| `worker:<n>` | 0..m (Pool) | blockierende/UI-Elemente ausführen | nur kurzlebige Kopie der Aufgabe | Zustand halten |
+| `worker:<n>` | 0..N (elastischer Pool, Abschnitt 6.4) | blockierende/UI-Elemente ausführen | nur kurzlebige Kopie der Aufgabe | Zustand halten |
 
 Der Supervisor ist der kleinste und einfachste Prozess. Er ist ein Hub, weil ein Neustart der Engine dann keine Verbindung der Clients zerstört. Fällt der Supervisor selbst aus, beenden sich alle Kinder nach kurzer Frist (Orphan-Guard, siehe 6.3).
 
@@ -179,7 +179,7 @@ Ungültige Übergänge werden **nicht** ausgeführt, sondern mit `a0`-Log abgewi
 | `running` | letzter Thread entfernt | `ended` | Instanz entfernen, `flow.executing` neu berechnen |
 | `running` | `flow.stop` / Richtlinie `stop` / `x_InstanceStop` | `stopping` | alle Threads `stopping`. Wartende Instanzen des Flows werden vorher beendet |
 | `stopping` | alle Threads entfernt | `ended` | Callback „stopped“ |
-| `stopping` | Frist (2 s) ohne Quittung | `ended` | Worker hart beenden, loggen |
+| `stopping` | Frist (2 s) ohne Quittung | `ended` | Worker hart beenden, loggen. Die Instanz endet sofort; die Engine fordert das harte Beenden des Workers beim Supervisor an (`cmd.process.kill`, Abschnitt 6.4), sie beendet selbst keinen Prozess |
 | `ended` | beliebig | – | ignorieren (loggen) |
 
 ### 5.2 Thread (`thread`, Zustände wie v1: starting, running, finished, stopping **[V1]**)
@@ -228,7 +228,9 @@ Die Auswahl der nächsten Verbindung folgt exakt v1: Verbindungstyp gleich Ergeb
 | Unbehandelter Fehler in einer Rolle (kein `try/catch`) | `OnError` der Rolle (`Role._OnUnexpected`) | Die Rolle zählt, sendet `evt.diag.error {name, errorType, message, file, line, stack, mode}` an den Supervisor (Log `a0` und Ring der letzten 50) und läuft weiter. Mehr als 20 in 60 s: Exit-Code 6 "too many unexpected errors", für `engine` und `storage` greift danach die Neustartregel. |
 | Anfrage ohne Antwort | Timeout der Korrelations-ID | Aufrufer erhält `res` mit `error.code = "timeout"`, nie ein endloses Warten |
 | Pipe bricht | `ERROR_BROKEN_PIPE`/`NO_DATA` | Client versucht Wiederaufbau (Backoff 100 ms bis 2 s, max. 10 s), danach Rolle beendet sich |
-| Worker bricht ab | Prozess weg | Engine meldet dem Thread `exception` mit Text „worker crashed“ |
+| Worker bricht ab | Prozess weg (`evt.process.crashed`/`exited`) | Engine meldet dem Thread `exception` mit Text „worker crashed“, entfernt den Slot und startet bei Bedarf Ersatz (6.4). Sturmbegrenzung: 5 abnormale Enden in 60 s, dann „worker not available“ |
+| Worker blockiert lange (Download, COM, `DllCall`) | Der Worker meldet Jobbeginn und -ende (`sys.busy`) | Ein beschäftigter Worker wird nicht angepingt und nie als hängend beendet. Er endet nur durch sein Element, durch Abbruch (Frist 2 s, dann hartes Beenden) oder durch die Jobfrist des Elements (6.4) |
+| Engine startet neu | neue Engine-Epoche | Die neue Engine beendet alle vorhandenen `worker:*` (Waisen der alten Epoche) und baut den Pool neu auf (6.4) |
 | Element blockiert die Engine | Watchdog: Elementaufruf > 250 ms (Warnung), > 5 s (Fehler `f0`) | Hinweis auf Klasse und Flow, die Einstufung `inline` ist zu korrigieren |
 | Elementcode wirft | `try/catch` um jeden Aufruf | Thread-Ergebnis `exception` mit Meldung (wie v1 `finishExecutionOfElement(..., "Exception", msg)`) |
 | Ungültiger Zustandsübergang | Zustandsautomat | abgewiesen, `a0`-Log mit Kontext |
@@ -245,6 +247,39 @@ Zwei Phasen, damit Benutzerentscheidungen nicht in harte Timeouts laufen:
 4. **Orphan-Guard:** Jede Rolle prüft alle 2 s, ob der Supervisor noch lebt (Pipe). Sonst beendet sie sich nach 3 s. Beim Systemende (`WM_QUERYENDSESSION`) startet der Supervisor Schritt 2 sofort.
 
 Der v1-Mechanismus `criticalSectionCounter` und die 4-Sekunden-`exit`-Notbremse entfallen.
+
+### 6.4 Worker-Pool (E3, WI-27)
+
+Besitzer des Pools ist die **Engine** (`WorkerBridge`): sie weiß, welche Jobs laufen, und hält alle Fristen. Der **Supervisor** besitzt die Prozesse: er startet und beendet Worker nur auf Anfrage der Engine (`cmd.process.spawn`, `cmd.process.kill`, Rechte in PROTOKOLL 4.1) und überwacht sie wie jedes Kind. Er kennt weder Jobs noch Pool-Größen. Der Worker selbst meldet nur, ob er beschäftigt ist.
+
+| Größe | Wert | Option der Engine | Begründung |
+|---|---|---|---|
+| Obergrenze N | 4 (0 bis 8; 0 = kein Pool) | `--workers=<n>` | Ein Worker kostet etwa 14 MB und 30 ms Startzeit (Messung des Spikes); vier gleichzeitig blockierende Elemente (Dialoge, Downloads) decken die üblichen Flows. Der Supervisor lässt zusätzlich nie mehr als 16 lebende Worker zu (Schutz gegen eine fehlerhafte Engine) |
+| Warme Worker W | 1 (0 bis N) | `--warm-workers=<w>` | Der erste Worker-Job soll nicht auf einen Prozessstart warten |
+| Leerlaufzeit | 60 s (100 ms bis 1 h) | `--worker-idle-ms=<ms>` | Ein Dialog-Flow kehrt oft nach Sekunden wieder; ein Prozess im Leerlauf kostet nur Speicher |
+| Sturmgrenze | 5 abnormale Enden in 60 s | – | siehe unten |
+| Bestätigung des Abbruchs | 2 s (`WorkerBridge.ORPHAN_MS`) | – | wie 5.1 |
+| Annahme eines Jobs | 5 s (`ACK_TIMEOUT_MS`) | – | unverändert |
+| Jobfrist | keine, außer die Elementklasse setzt `JobTimeoutMs` | Eigenschaft der Elementklasse | v1 kannte keine Frist; ein Dialog darf beliebig lange offen bleiben |
+
+**Slots.** Die Engine führt eine Liste von Slots mit den Zuständen `starting` (Start angefordert, noch kein `evt.process.ready`), `idle` und `busy`. Es gibt keinen Zustand `down`: ein Worker, der ausfällt oder beendet wird, verschwindet aus der Liste. Slots und noch offene Startanfragen zusammen sind nie mehr als N.
+
+**Bedarf.** Wartet mindestens ein Thread auf einen Worker (Zustand `ready`, kein Slot `idle`), fordert die Engine so viele Worker an, wie Threads warten, abzüglich der bereits startenden, höchstens bis N. Beim Start der Engine (nach dem Aufräumen der Waisen) werden W Worker angefordert. Der Thread wartet wie bisher in `ready`; der Dispatcher läuft, sobald ein Slot `idle` wird.
+
+**Leerlauf.** Ein `idle`-Slot, der länger als die Leerlaufzeit unbenutzt ist, wird beendet (`cmd.process.kill`, Grund `idle`), solange danach noch mindestens W Worker bleiben. Warme Worker laufen weiter.
+
+**Absturz.** `evt.process.crashed` oder `evt.process.exited` für einen Slot: Slot entfernen, ein laufender Job endet mit `exception` „worker crashed (worker:n)“. Der Supervisor startet Worker nie selbst neu (`Children.AUTO_RESTART`). Fehlen danach Worker (Bedarf oder W), fordert die Engine neue an. **Sturmbegrenzung:** ein Absturz, ein nicht bereit gewordener Start (der Supervisor meldet „hung“), ein abgelehntes `cmd.worker.run` und eine fehlgeschlagene Startanfrage zählen als abnormales Ende. Bei 5 davon innerhalb von 60 s fordert die Engine keine Worker mehr an, bis das älteste Ende das Fenster verlässt. Ist dann kein Worker am Leben, enden wartende und neue Worker-Elemente mit „worker not available“, und die Engine schreibt einmal `a0` „worker pool blocked“. Normales Wachsen und Schrumpfen des Pools zählt nicht, nur Fehler (Abweichung vom Wortlaut „5 Starts in 60 s“ in WI-27: ein Stoß von vier gleichzeitigen Jobs startet vier Worker und ist kein Sturm).
+
+**Beschäftigt und Ping.** Der Worker sendet beim Annehmen eines Jobs `sys.busy {busy: true}` an den Supervisor, bevor das Element startet, und `busy: false`, wenn der Job endet (`done`, `stopped`). Solange ein Worker beschäftigt ist, sendet der Supervisor ihm keinen Ping und beurteilt keinen Pong. Beim Ende der Beschäftigung beginnen die Pong-Zeiten neu. Der Prozess-Handle gilt weiter: ein Worker, der im Job stirbt, wird sofort als abgestürzt erkannt. **Begründung, dass der Worker meldet und nicht die Engine:** Die Tatsache „dieser Prozess führt gerade einen Job aus“ gehört dem Worker (ein Besitzer pro Datum, Abschnitt 4). Die Meldung geht auf dem kürzesten Weg und vor dem Start des Elements, sie braucht keine Abstimmung zwischen zwei Verbindungen (Engine → Worker und Engine → Supervisor sind nicht geordnet), und sie bleibt richtig, wenn die Engine gerade neu startet. Es gibt keine Lücke, in der der Worker blockiert, ohne beschäftigt gemeldet zu sein: die Meldung geschieht im Handler von `cmd.worker.run`, vor dem Start des Elements.
+
+**Abbruch.** Stoppt eine Instanz ein Worker-Element, endet der Thread sofort (wie inline), und die Engine sendet `cmd.worker.cancel`. Kommt binnen 2 s kein `evt.worker.done`, ist der Worker blockiert: die Engine entfernt den Slot und fordert `cmd.process.kill` an (Grund `cancel not confirmed`). Ein Worker, der den Abbruch bestätigt, bleibt im Pool.
+
+**Jobfrist.** Hat die Elementklasse `JobTimeoutMs` > 0, startet die Engine mit dem Job eine Uhr. Läuft sie ab, endet der Thread mit `exception` „worker timeout“, und der Job wird wie ein Abbruch behandelt (Cancel, nach 2 s hartes Beenden). Die Engine hält die Frist, nicht der Worker, denn er kann blockiert sein.
+
+**Neustart der Engine.** Die neue Engine fragt beim Start (`OnReady`, bevor sie selbst Worker anfordert) `cmd.process.list` und beendet alle `worker:*`, die nicht zu ihr gehören (`cmd.process.kill`, Grund `orphan of a previous engine`). Übernehmen wäre unsicher: der Zustand der Jobs (Variablen, Instanz) ist verloren, ihre Ergebnisse wären nicht zuzuordnen. Ein spätes `evt.worker.done` einer Waise wird verworfen (unbekannte `execId`). Schlägt die Abfrage fehl, baut die Engine den Pool trotzdem auf und loggt `a0`; die Waisen laufen dann bis zum Beenden der Sitzung weiter. Zwischen dem Tod der alten und dem Start der neuen Engine leben die Waisen weiter (Neustartverzögerung 300 ms plus Startzeit).
+
+**Beenden.** Beim `sys.shutdown` der Engine fordert sie keine Worker mehr an und beendet keine. Die Worker folgen in Rang 3 (6.3). Ein beschäftigter Worker meldet `stopped` vor `sys.bye`. Der Supervisor lehnt `cmd.process.spawn` nach Beginn des Beendens mit `shutting_down` ab.
+
 
 ---
 

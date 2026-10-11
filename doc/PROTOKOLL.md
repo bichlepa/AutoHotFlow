@@ -59,7 +59,7 @@ Jede Nachricht ist ein JSON-Objekt mit festem Schema. Der Serializer schreibt di
 
 **Pflicht für jeden Empfänger:** jede `cmd.`-Anfrage wird beantwortet (auch mit Fehler). Der Absender erzeugt bei Fristablauf selbst ein lokales `res.` mit `timeout` und verwirft spätere Antworten mit unbekannter `corr`. Ist der Umschlag ungültig, `from`/`id`/`type` aber lesbar, antwortet der Empfänger mit `bad_payload`. Ganz unlesbare Rahmen werden verworfen und gezählt.
 
-**Wahrheitswerte (WI-26, E8):** Auf der Leitung stehen Wahrheitswerte als JSON `true`/`false`, nie als `1`/`0`. Das betrifft alle Felder dieses Dokuments, die als `bool` bezeichnet sind oder wie `ok`, `cancel`, `started`, `clean`, `restart`, `enabled`, `executing`, `exists`, `existed`, `waiting`, `byMeta`, `delete` Wahrheitswerte sind. Die Regel in drei Teilen:
+**Wahrheitswerte (WI-26, E8):** Auf der Leitung stehen Wahrheitswerte als JSON `true`/`false`, nie als `1`/`0`. Das betrifft alle Felder dieses Dokuments, die als `bool` bezeichnet sind oder wie `ok`, `cancel`, `started`, `clean`, `restart`, `enabled`, `executing`, `exists`, `existed`, `waiting`, `byMeta`, `delete`, `busy` Wahrheitswerte sind. Die Regel in drei Teilen:
 - **Schreiben:** `Json.True`, `Json.False` und `Json.Bool(x)` (`src/core/Json.ahk`) erzeugen die Werte, **nur beim Bau der Nachricht unmittelbar vor dem Senden**. AHK v2 hat keinen Bool-Typ, jedes Objekt ist wahr, also ist `Json.False` in einem `if` wahr. Programmzustand und Rückgabewerte bleiben deshalb `1`/`0`. Eine Ausnahme von „beim Bau“ gibt es für `ok`: Der Code setzt `ok` intern weiter als `1`/`0` (`Dispatcher`, `WriteQueue`, `Map("ok", true)`), und `Message.Serialize` wandelt das Feld `ok` der Nutzlast (oberste Ebene, auf einer Kopie) in `true`/`false` um. Das deckt `Peer.Send`/`Peer.Reply`, die Antworten des Hubs und `sys.welcome` ab, weil alles durch `Serialize` geht.
 - **Lesen:** `Json.Parse` liefert `true` als `1` und `false` als `0`, damit `if payload["ok"]` in AHK stimmt. Empfänger sind tolerant: `1`/`0` und `true`/`false` gelten gleich (ältere und fremde Clients).
 - **Der Hub** reicht die Nutzlast als Text durch (`Message.ParseHead`/`WithFrom`, siehe oben) und ändert Wahrheitswerte nicht. Ein Wert, der den Hub als `true` erreicht, kommt als `true` heraus.
@@ -76,7 +76,7 @@ Jede Nachricht ist ein JSON-Objekt mit festem Schema. Der Serializer schreibt di
 | `triggerhost` | Triggerhost |
 | `manager` | Manager |
 | `editor:<flowId>` | Editor des Flows `<flowId>` |
-| `worker:<n>` | Worker, `n` vom Supervisor vergeben |
+| `worker:<n>` | Worker, `n` vom Supervisor vergeben (`cmd.process.spawn`, 4.1) |
 
 **Topics** (Abonnement per `cmd.topic.subscribe {topic}` an `supervisor`, wird bei Wiederverbindung erneuert):
 
@@ -114,10 +114,13 @@ Alle Nutzlasten sind Objekte. `flowId`, `elementId`, `connectionId` sind die Bez
 | `sys.pong` | Rolle → supervisor | `{ n }` | – |
 | `sys.shutdown` | supervisor → alle | `{ reason: "user"/"logoff"/"crash", deadlineMs }` | Rolle räumt auf, sendet `sys.bye`, beendet sich |
 | `sys.bye` | Rolle → supervisor | `{ clean: bool }` | – |
+| `sys.busy` | worker → supervisor | `{ busy: bool }` | – (keine Antwort). Der Worker meldet Beginn (`true`) und Ende (`false`) eines Jobs (WI-27, ARCHITEKTUR 6.4). Solange `busy` wahr ist, sendet der Supervisor dem Worker keinen Ping und beurteilt keinen Pong; beim Ende beginnen die Pong-Zeiten neu. Von einer anderen Rolle als `worker:*` wird die Meldung verworfen (Log `a0`) |
 | `cmd.app.prepareExit` | supervisor → editor/manager | `{}` | `res: { ok, cancel: bool }` (Benutzer kann abbrechen). Frist: 600000 ms (10 Minuten, `Shutdown.PREPARE_LIMIT_MS`). Bei Ablauf synthetische Antwort `{ ok: false, error: { code: "timeout" } }`, die wie „kein Abbruch“ gilt, der Exit geht weiter. Eine spätere echte Antwort wird verworfen (`droppedAnswers`). Die Phase hat keine harte Frist (ARCHITEKTUR 6.3), die Obergrenze verhindert nur, dass eine Anfrage ohne Ende bleibt |
 | `cmd.app.exit` | beliebige UI → supervisor | `{ deadlineMs? }` (optional, Integer 100 bis 60000, sonst Standard `--deadline`, 5000) | startet Beenden (6.3), `res: { ok, started: bool }`; `started` ist false, wenn schon ein Beenden läuft |
 | `cmd.app.command` | zweite Instanz → supervisor | `{ argv: [...] }` (Array von Strings, Kommandozeilen-Wörter; die Instanz übergibt `--command=<text>` als `argv` mit einem Eintrag) | `res: { ok }`. Phase 2 protokolliert den Text nur (`a1`), es gibt noch keine Befehle außer dem Test. Die zweite Instanz beendet sich mit Exit 0 (zugestellt) oder 1 (keine Antwort, Fehler) |
 | `cmd.process.list` | beliebige Rolle → supervisor | `{}` | `res: { ok, processes: [ {name, role, state, pid, restarts} ] }`. Momentaufnahme aller Kinder, Zustände nach ARCHITEKTUR 5.3. Dient als Resync für Späteinsteiger (Abschnitt 5a) |
+| `cmd.process.spawn` | engine → supervisor | `{ role: "worker" }` | `res: { ok, name }`, `name` ist `worker:<n>` (der Supervisor vergibt `n`, aufsteigend, in einer Sitzung nie doppelt). Der Prozess startet wie jedes Kind (`evt.process.started`, bei `sys.hello` `evt.process.ready`). Fehler: `denied` (Absender nicht `engine`, oder `role` nicht `worker`), `shutting_down` (Beenden läuft), `busy` (schon 16 lebende Worker, `Children.WORKER_LIMIT`), `bad_payload` (`role` fehlt), `internal` (Start gescheitert). WI-27 |
+| `cmd.process.kill` | engine → supervisor | `{ name, reason }` | `res: { ok }`. `TerminateProcess` des Kindes `name`. Nur für Namen `worker:<n>`, nur vom Absender `engine`, sonst `denied` (auch für `storage`, `engine`, `manager`). Unbekannter Name: `not_found`. Ein schon beendeter Worker: `ok` (gleichwertig). Das Ende wird wie jedes andere gemeldet, aber als geplant: `evt.process.exited {name, pid, clean: false, exitCode, reason: "killed"}`, kein `crashed`, kein Neustart. Das Beenden zählt nicht für den Exit-Code 5 des Supervisors. `reason` (Text, höchstens 200 Zeichen) steht im Log `a1`. WI-27 |
 | `cmd.topic.subscribe` / `cmd.topic.unsubscribe` | Rolle → supervisor | `{ topic }` | `res: { ok }` |
 | `evt.app.exitCancelled` | supervisor → Topic `process` | `{ by }` (Rolle, die abgebrochen hat) | – (Beenden abgebrochen, nichts wurde gestoppt) |
 
@@ -138,7 +141,7 @@ Jeder Eintrag trägt `name` (der Name, unter dem das Kind gestartet wurde, z. B.
 | `evt.process.ready` | `{ name, pid }` | `sys.hello` angekommen, Rolle meldet sich bereit |
 | `evt.process.hung` | `{ name, reason }` | kein Pong (3 Pings × 2 s) oder kein `sys.hello` innerhalb 10 s. Der Supervisor sendet `sys.shutdown` mit `deadlineMs` 2000, nach 2 s `TerminateProcess` |
 | `evt.process.crashed` | `{ name, pid, reason: "exited"/"hung", exitCode, restart: bool }` | unerwartetes Ende (auch nach Hang). `restart` true, wenn neu gestartet wird |
-| `evt.process.exited` | `{ name, pid }` | Ende nach Aufforderung (Beenden) |
+| `evt.process.exited` | `{ name, pid, clean: bool, exitCode, reason? }` | Ende nach Aufforderung (Beenden). `reason` ist nur bei `cmd.process.kill` gesetzt (`"killed"`). Die Felder `clean` und `exitCode` gelten seit WI-22/23 (vorher hier nicht aufgeführt) |
 | `evt.process.restarted` | `{ name, attempt }` | Neustart nach Richtlinie (automatisch nur für `storage` und `engine`; mit `--test-roles` zusätzlich `crasher`) |
 
 Neustart-Richtlinie: höchstens 3 Neustarts in 60 s, sonst bleibt der Prozess `crashed` (`restart: false`). `manager` und `editor` werden nie automatisch neu gestartet.
@@ -248,7 +251,7 @@ Jedes Ereignis trägt `seq` (steigend pro Engine-Epoche) und `epoch`.
 - `cmd.worker.cancel` `{execId}`: Antwort `{ok}` (sonst `not_found`), danach `evt.worker.done` mit `stopped`. Ein späteres `Finish` des Elements wird verworfen. Ein einzelner langer blockierender Aufruf im Element kann den Abbruch nicht empfangen, weil AHK Nachrichten nur zwischen Befehlszeilen prüft (Schleifen in Scheiben sind unkritisch, siehe `doc/HOW-TO.md`).
 - `sys.shutdown` während eines Laufs: `evt.worker.done` mit `stopped` vor `sys.bye`.
 
-**Umsetzung in WI-11 auf Engine-Seite (`src/engine/WorkerBridge.ahk`):**
+**Umsetzung in WI-11 auf Engine-Seite (`src/engine/WorkerBridge.ahk`).** Der Stand von WI-11 (feste Slots `worker:1..n`, Worker von außen gestartet) ist durch WI-27 ersetzt, siehe den folgenden Abschnitt; die Punkte unten gelten nur dort weiter, wo der Abschnitt WI-27 nichts anderes sagt:
 
 - Option `--workers=<n>` der Engine (0 bis 8, Standard 0 = kein Pool). Slots heißen `worker:1` bis `worker:n`. Mit 0 endet jedes Worker-Element sofort mit `exception` "worker not available".
 - Ein Worker-Element bleibt `running`, bis `evt.worker.done` kommt. Ist alle Pool-Slots belegt, wartet der Thread (Zustand `ready`), bis einer frei ist. Ist kein Slot mehr nutzbar (alle `down`), endet er mit `exception` "worker not available".
@@ -257,6 +260,18 @@ Jedes Ereignis trägt `seq` (steigend pro Engine-Epoche) und `epoch`.
 - `cmd.worker.cancel` bei Stopp der Instanz: Der Thread endet sofort (wie inline, Quittung nicht abgewartet). Der Slot bleibt `busy`, bis der Worker `evt.worker.done` schickt, spätestens nach 2 s (dann `down`, Eintrag im Log `a0`).
 - Ergebnisse aus `evt.worker.done`: Exporte werden als Thread-Variablen gesetzt. Ein unbekanntes Ergebnis wird `exception`.
 - `cmd.worker.run` übergibt `imports` als Kopie der Instanzvariablen (Scope `instance`) und `env` mit `flowId`, `elementId`, `instanceId`, `threadId`. Die Frist der Annahme (`timeoutMs`) ist 5000 ms.
+
+**Umsetzung in WI-27 (elastischer Pool, ARCHITEKTUR 6.4):**
+
+- **Optionen der Engine:** `--workers=<n>` (Obergrenze N, 0 bis 8, Standard 4; 0 = kein Pool, jedes Worker-Element endet mit `exception` "worker not available"), `--warm-workers=<w>` (Standard 1, höchstens N), `--worker-idle-ms=<ms>` (Standard 60000, 100 bis 3600000). Der Supervisor reicht diese drei Optionen an alle Rollen weiter, wenn er sie bekommt. Ungültige Werte: Engine Exit 2.
+- **Slots:** `starting` → (`evt.process.ready`) → `idle` ⇄ `busy`. Worker werden nur durch `cmd.process.spawn` beim Supervisor erzeugt (4.1). Es gibt keine Slots für Worker, die die Engine nicht selbst angefordert hat. Slots und offene Startanfragen sind zusammen höchstens N.
+- **Bedarf und Warmstart:** Wartende Worker-Elemente lösen Startanfragen aus (ARCHITEKTUR 6.4). Nach `OnReady` fragt die Engine `cmd.process.list` (Frist 5 s), beendet alle `worker:*` mit `cmd.process.kill` (Grund `orphan of a previous engine`) und fordert dann W Worker an.
+- **Beschäftigt:** `sys.busy` (4.1) sendet der Worker, nicht die Engine.
+- **`cmd.worker.run`:** `timeoutMs` ist weiter die Frist der Annahme (5000). Neu und nur Engine-intern: eine Jobfrist (`JobTimeoutMs` der Elementklasse), sie steht nicht in der Nachricht.
+- **Antwort auf `cmd.worker.run` mit Fehler** (`not_found`, `peer_gone`, `timeout`, `busy`, `internal`): der Slot wird entfernt, der Worker mit `cmd.process.kill` (Grund `run not accepted: <code>`) beendet, das Element endet mit `exception` "worker not available: worker:n (<code>)".
+- **Abbruch:** `cmd.worker.cancel` wie bisher. Kommt binnen 2 s kein `evt.worker.done`, entfernt die Engine den Slot und fordert `cmd.process.kill` an (Grund `cancel not confirmed`).
+- **Jobfrist:** Ablauf beendet den Thread mit `exception` "worker timeout" und behandelt den Job wie einen Abbruch.
+- **Absturz/Ende** (`evt.process.crashed`/`exited` für einen Slot): Slot entfällt, ein laufender Job endet mit `exception` "worker crashed (worker:n)".
 
 ### 4.6 Engine ↔ Storage und Log
 
