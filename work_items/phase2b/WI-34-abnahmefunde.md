@@ -159,3 +159,89 @@ Commits: `6e5fc35` (F-41, `sys.shutdown` beim späten `sys.hello`), `7f460ba` (F
 - Änderungen außerhalb der im Paket genannten Hauptpfade: `doc/PROTOKOLL.md`, `doc/ARCHITEKTUR.md`, `doc/HOW-TO.md` (Abschnitt 4 gehört eigentlich dem Doku-Agenten; nur das nach Regel 5 und 9 Nötige). Keine Änderung in `src/core/` und `src/engine/`.
 - Die Protokolländerung von F-40 (Hub antwortet mit `peer_gone`) betrifft alle Rollen als Absender; sie brauchen keine Änderung, sollten `peer_gone` aber als "Ausgang unbekannt" behandeln (PROTOKOLL 2). Bitte im Review bestätigen.
 - Restverzögerung aus WI-31 unverändert: nach einem abgebrochenen Laden wartet die Engine 1 s, auch wenn `storage` schon wieder da ist.
+
+## Ergebnis (Abschnitte 3 und 4)
+
+Stand 2026-10-12, Agent für Testkorrekturen und Dokumente. Kennzeichnung: **verifiziert** = gelaufen oder gelesen, **vermutet**, **nicht geprüft**. Kein Haken gesetzt (setzt der Abnahmeagent). Keine Eskalation. Abschnitt 5 (Abnahmelauf) nicht gefahren.
+
+Commits: `4ef3b38` (F-37), `6013d58` (F-38, Produkt und Test), `11e3a96` (F-39), `03664d1` (F-42), `fb0df1c` und `ce97772` (Suche nach festen Wartezeiten), `39591cd` (ARCHITEKTUR 6.3), `a6e4c68` (TESTSTRATEGIE), `3406214` (HOW-TO), dazu der Abschluss-Commit (`STATUS.md`, diese Datei).
+
+### F-37 (`test_worker.py::test_cancel_stops_the_running_element_...`): Status abgeschlossen (wartet auf die Abnahme)
+
+- **Ursache** [verifiziert nachgestellt]: `Worker._CmdRun` trägt den Auftrag sofort ein, ein `cmd.worker.cancel` findet ihn also immer (auch vor dem Start des Elements). `not_found` gibt es nur, wenn das Element schon fertig ist: `Action_TestBlockWorker` blockiert 800 ms. Mit einer Pause von 1,0 s statt 0,1 s im alten Test: dieselbe rote Zeile (`assert ans["ok"]`, Zeile 174). Dass der Ausfall der Abnahme so entstand (Pause plus Last über 800 ms), ist geschlossen, nicht im ausgefallenen Lauf gesehen.
+- **Korrektur:** Das Element blockiert 3 s (`Duration`), der Test wartet mit `cmd.diag.snapshot` auf den Auftrag (`info.job`), die Antwort von `cmd.worker.cancel` steht in der Fehlermeldung, das Fenster für ein spätes zweites `evt.worker.done` folgt der Laufzeit. Die Grenze `CANCEL_BUDGET_S` ist unverändert.
+- **Rot, dann grün:** rot: alter Test mit Pause 1,0 s (`not_found`); grün: neuer Test. Der Hang-Test daneben (`..._cancel_of_the_hang_element_...`) hat kein Rennen (das Element endet nie) und blieb.
+- Einschränkung: "Element läuft" ist nicht abfragbar, der Snapshot zeigt nur den angenommenen Auftrag (`started` steht nicht in `Worker.DiagInfo`). Die längere Laufzeit sichert das Rennen.
+
+### F-38 (`test_debug_role.py::test_refresh_stores_the_snapshot_of_every_role_and_the_supervisor`): Status abgeschlossen (wartet auf die Abnahme)
+
+- **Ursache** [gelesen, im Test über ein spätes Kind nachgestellt]: `RefreshSnapshots` fragte nur Prozesse, die in der Tabelle des Fensters `ready` sind; die Tabelle ist ein Abbild der Ereignisse und kann `worker:1` noch als `starting` führen, obwohl der Supervisor ihn schon `ready` kennt (der Test wartete nur auf die Anwesenheit des Namens).
+- **Produktänderung (Vorschlag aus dem Paket, keine Abweichung):** `src/debugview/DebugView.ahk`: Prozesse, die nicht `ready` sind, werden nicht gefragt, aber mit dem Eintrag `not ready (state: <Zustand>)` gespeichert und angezeigt. `refreshed` zählt wie bisher die Antworten. Der Testbefehl `cmd.test.debug state` liefert zusätzlich `states` (Name zu Zustand). `doc/PROTOKOLL.md` 4.9 angepasst. Eine Entscheidung über den Vorschlag hinaus war nicht nötig.
+- **Rot, dann grün:** neuer Test `test_refresh_shows_a_process_that_is_not_ready_as_not_ready_instead_of_leaving_it_out` (Kind `echo:slowhello4000` ist beim Refresh `starting`): ohne die Änderung (Zweig herausgenommen) rot (`'echo:slowhello4000' in ['debug', 'storage', 'supervisor']` falsch), mit ihr grün. Der alte Test wartet jetzt auf `states["worker:1"] == "ready"` und ist grün.
+
+### F-39 (`test_big_flows.py::test_hub_cost_of_a_large_frame_is_below_the_budget[smoke]`): Status abgeschlossen (wartet auf die Abnahme)
+
+- **Ursache** [gelesen]: feste Grenze `HUB_FRAME_BUDGET_MS = 5.0`, nicht über `scaled()` (5,074 ms im parallelen Lauf). Korrektur: `scaled(HUB_FRAME_BUDGET_MS)`. Die Variante mit 100 Läufen ist `-m stress` und damit seriell (Faktor 1, strenge Grenze). Messwert seriell: 2,07 ms (nach den Änderungen von F-40).
+- Rot/grün: kein roter Test herstellbar (Last-Streuung); grün: `[smoke]` seriell und parallel.
+
+### F-42 (`test_diagnose.py::test_the_handles_of_the_supervisor_stay_flat_over_50_restarts`): Status abgeschlossen (wartet auf die Abnahme), Ursache nicht belegt
+
+- **Auswertung des Supervisor-Logs aus der Meldung** [verifiziert gelesen, Ausgabe des Abnahmelaufs]: Das "Supervisor-Log" in der Meldung war **leer** (`AssertionError: crasher not ready again within 15.0 s:` und danach nichts). `Chain.sup.text()` ist stdout/stderr des Supervisors; die Logzeilen stehen in `Log/Log.txt`. Ob es Last oder ein verzögerter Neustart war, lässt sich daraus nicht sagen. Der Vermerk im STATUS ("Das Supervisor-Log steht in der Meldung") war falsch.
+- **Gelesen:** Die Neustartverzögerung ist im Produkt konstant 300 ms (`Children.RESTART_DELAY_MS`), es gibt keine wachsende Wartezeit; ein Neustart über 15 s wäre ein einmaliger Stillstand der Maschine oder des Supervisors, wie bei F-36 vermutet. [vermutet]
+- **Nachgestellt:** 12 Läufe des Tests gleichzeitig (8 CPUs, `AHF_TIMING_FACTOR=1`, also ohne Skalierung): alle 12 grün, je rund 55 s (rund 1,1 s je Neustart). Nicht reproduziert.
+- **Korrektur:** Die Wartezeit läuft über `scaled()` (im Helfer `Chain.wait_restarted_ready`, deshalb auch für die anderen Aufrufer), ebenso die Gesamtfrist des Tests (`pytest.mark.timeout(scaled(240))`). Bei Überschreitung steht jetzt der Schwanz von `Log/Log.txt` mit der Nummer des Durchlaufs in der Meldung. Die serielle Referenz bleibt 15 s.
+
+### Suche nach festen Wartezeiten und Grenzen
+
+Gesucht: `timeout=` mit Zahl (rund 390 Treffer außerhalb von `tests/support`) und feste `assert ... <` mit Zahlen oder Konstanten. Die meisten `timeout=`-Treffer sind Wartezeiten auf eine Antwort oder ein Ereignis einer lokalen Pipe (Größenordnung Millisekunden) mit 5 bis 30 s, also mindestens zweifachem bis zehnfachem Abstand zum Versprechen; ebenso Fensterlängen für Stille (`events(timeout=0.2)`, untere Grenzen). Angepasst (alle auf `scaled()`, seriell unverändert; Commits `fb0df1c`, `ce97772`):
+
+| Stelle | vorher | Entscheidung |
+|---|---|---|
+| `faultkit.Chain.wait_restarted_ready` (alle Aufrufer) | 10 bis 15 s fest | skaliert im Helfer |
+| `test_worker_lifecycle.py` `ended`, `exited_killed`, `exited_engine_gone` (alle Aufrufer), `evt.process.crashed` 5 s | fest | skaliert im Helfer bzw. an der Stelle |
+| `test_worker_lifecycle.py` `ENGINE_GONE_BUDGET_S` 1,5 s, Stopp eines eingefrorenen Workers `< 6,0`, Timeout `4,5 < x < 9,0` (obere Grenze) | fest | `scaled` (obere Grenzen) |
+| `test_process_crash.py` `evt.process.restarted` 5 s, Instanzende nach Worker-Tod `< 3,0` | fest | `scaled` |
+| `faultkit.HANG_BUDGET_S` und `test_supervisor.py::HANG_BUDGET_S` (8 s), `test_process_hang.py::CRASH_AFTER_HANG_S` (4 s) | fest | `scaled` |
+| `test_timeouts.py` `THAW_AFTER_S + 5,0` | fest | `scaled(5,0)` |
+| `test_ui_stub.py` Ankunftszeit der Ereignisse `< 1000` ms | fest | `scaled(1000)` |
+| `test_peer.py` Weckmeldung 2 s, `test_worker_busy.py` Pong nach langem Auftrag 3 s | fest | `scaled` |
+| `test_pipe.py` Median Weckmeldung `< 25` ms, Höchstwert ohne Weckmeldung `< 600` ms, Median Python-Server `< 25000` µs, Annahme ohne Weckmeldung `< 700` ms | fest | `scaled` |
+
+Bewusst **nicht** geändert:
+- `test_report.py` `FROZEN_BUDGET_S = 2 + 6` s (Versprechen 2 s, schon vierfach) und `1,0 < took < 10,0` (Versprechen 1,5 s, sechsfach); `test_worker_lifecycle.py` `cold < 3,0` (Ziel 0,3 s, zehnfach, fängt nur einen Pool, der nicht startet). Der Abstand ist größer als der Faktor 3.
+- Stresstests mit Mittel- und p99-Grenzen (`test_measurements.py`, `test_log_backlog.py`, `test_soak.py`): alle `-m stress` oder `-m soak`, laufen seriell (Faktor 1), die strenge Grenze soll gelten. `test_clients_churn.py` war schon skaliert. `test_start_to_ready_time[smoke]` hat eine Hänger-Grenze von 10 s, `[10]` ist `-m stress`. `test_parallel_instances.py` `END_LIMIT_S = 20` ist eine Obergrenze gegen Hänger (Instanzen enden nach 1 s).
+- `test_storage.py` `rss < 120` (Speicher), `test_pipe.py` `flood["sent"] < 200` (Anzahl): keine Zeitwerte.
+- Alle Zeiten in negativen Fenstern (`events(timeout=0.2)`, `time.sleep`): untere Grenzen, werden nie skaliert.
+- [nicht geprüft] Die rund 390 `timeout=`-Stellen wurden nach Größe und Zusammenhang gruppiert, nicht jede einzeln gelesen. Wartezeiten von 10 bis 30 s auf Ereignisse nach Neustart oder Hänger (z. B. `test_report.py` 163, `test_process_crash.py` 118/124/128) stehen weiter fest; der Abstand zum Versprechen ist zwei- bis zehnfach. Taucht dort ein Ausfall auf, sind sie die nächsten Kandidaten (Regel in `TESTSTRATEGIE.md`).
+
+### Abschnitt 4: Doku
+
+- `doc/TESTSTRATEGIE.md`: Regel zu Referenzläufen (E17), keine automatischen Wiederholungen, Zeile "Pipe wird vom Client abrupt geschlossen" als umgesetzt mit den Tests, zwei neue Zeilen (F-41, F-38).
+- `work_items/STATUS.md`: E16 und E17 in "Entscheidungen Fix-Block"; F-37, F-38, F-39, F-42 mit Ergebnis (nicht geschlossen).
+- `doc/ARCHITEKTUR.md` 6.3: drei Absätze (Kind meldet sich im Beenden, gestrichener Neustart, `peer_gone` im Beenden). `doc/PROTOKOLL.md` 2 und 5 Punkt 5: schon richtig ("Ausgang unbekannt"), unverändert; nur 4.9 für `states` und `refresh` geändert.
+- `doc/HOW-TO.md`: vier Einträge (Übersicht ohne Zustände, feste Pause gegen Testelement, `scaled()` im Helfer, Meldung mit Beleg), jeweils mit Status.
+- `.vscode/tasks.json`: **keine Änderung nötig.** WI-34 hat keinen neuen Handaufruf eingeführt (keine neue Option, Rolle, Werkzeug oder Testgruppe; die neuen Tests liegen in bestehenden Dateien, die Testrolle `echo:slowhello<ms>` wirkt nur über den Namen). Nach Regel 10 abgeglichen, die Datei selbst nicht geöffnet.
+
+### Gelaufene Tests (alle parallel, `-n auto`, wenn nicht anders gesagt)
+
+- F-37: `tests/integration/test_worker.py`, `test_worker_busy.py`: 17 passed. Rot-Nachstellung mit `-n 0`: 1 failed (Pause 1,0 s).
+- F-38: `tests/fault/test_debug_role.py`, `test_snapshot.py`: 20 passed; neuer Test mit herausgenommenem Zweig rot (`-n 0`), mit ihm grün. `python tools/arch_check.py`: 0 Verstöße.
+- F-39: `tests/stress/test_big_flows.py -k "hub_cost and smoke"`: 1 passed.
+- F-42: `tests/fault/test_diagnose.py`: 12 passed (55 s); 12 gleichzeitige Läufe `-k 50_restarts` mit `AHF_TIMING_FACTOR=1`: 12 passed.
+- Suche, erster Teil: `test_worker_lifecycle.py`, `test_process_crash.py`, `test_process_hang.py`, `test_diagnose.py`, `test_report.py`, `test_storage_abort.py`, `test_timeouts.py`, `test_debug_role.py`, `tests/integration/test_peer.py`, `test_worker_busy.py`, `test_worker.py`, `tests/stress/test_big_flows.py`: 88 passed.
+- Suche, zweiter Teil: `tests/e2e/test_ui_stub.py`, `tests/fault/test_process_hang.py`, `test_process_crash.py`, `test_timeouts.py`, `test_worker_lifecycle.py`, `test_orphans.py`, `tests/integration/test_pipe.py`, `test_supervisor.py`: 76 passed.
+- **Nicht gelaufen:** Gesamtlauf parallel und seriell, `-m stress`, Fault-Wiederholungen (Abschnitt 5, Abnahmeagent). Die Änderungen von `HANG_BUDGET_S` und `ENGINE_GONE_BUDGET_S` lassen die seriellen Werte gleich, sind aber nicht im seriellen Lauf geprüft.
+- Nach den Läufen keine Testprozesse übrig (angesehen; nur `AutoHotkeyU32.exe` und `python.exe` des Projektinhabers).
+
+### Abweichungen
+
+- F-38 ist eine Produktänderung (`src/debugview/DebugView.ahk`) wie im Paket vorgeschlagen; zusätzlich das Feld `states` im Testbefehl `cmd.test.debug state` (PROTOKOLL 4.9). Keine weitere Änderung in `src/`.
+- F-42: Es wurde keine Last- oder Neustartverzögerung belegt (siehe oben); das Paket erwartete eine Auswertung des Logs aus der Meldung, das Log war leer.
+- Die Suche hat mehr Stellen angepasst als die vier Funde (Tabelle oben).
+
+### Offene Punkte
+
+- **F-43** (Kind hält `storage` beim Beenden auf, Reihenfolge der Ränge) ist eine Entscheidung des Projektinhabers und nicht umgesetzt.
+- F-42: Ursache des einen Ausfalls unbekannt. Beim nächsten Ausfall steht der Schwanz von `Log/Log.txt` in der Meldung.
+- F-37: Der Zustand "Element läuft" ist nicht abfragbar (nur "Auftrag angenommen"); ein Feld `started` in `Worker.DiagInfo` würde das ändern (Produktänderung, nicht vorgenommen).
+- Faktor 3 von `scaled()` bleibt wie in E17 entschieden.
