@@ -229,12 +229,17 @@ class DebugView extends Role {
     ; --- snapshots -------------------------------------------------------------------------------------
 
     ; Asks every ready process (and the supervisor) for its snapshot. onDone(count) is called once when all answers or
-    ; deadlines are in; count = number of snapshots stored.
+    ; deadlines are in; count = number of snapshots stored from answers. A process that is not ready (starting, gone, ...)
+    ; is not asked, but it is not left out either: its entry says "not ready (<state>)", because the window is meant to
+    ; show exactly such states (WI-34, F-38).
     RefreshSnapshots(onDone := "") {
         names := ["supervisor"]
-        for name, p in this.processes
+        for name, p in this.processes {
             if (p["state"] = "ready")
                 names.Push(name)
+            else
+                this._StoreSnapshot(name, "not ready (state: " p["state"] ")")
+        }
         st := Map("open", names.Length, "stored", 0, "onDone", onDone)
         for name in names {
             try {
@@ -443,7 +448,10 @@ class DebugView extends Role {
         titles := []
         for d in this.dumps
             titles.Push(d["title"])
-        return Map("processes", this.processNames.Clone(), "snapshots", snapNames, "logEntries", this.logEntries.Length
+        states := Map()
+        for name, p in this.processes
+            states[name] := p["state"]
+        return Map("processes", this.processNames.Clone(), "states", states, "snapshots", snapNames, "logEntries", this.logEntries.Length
             , "logVisible", this.VisibleLog(DebugView.LOG_MAX).Length, "engineEvents", this.events.Length
             , "eventsVisible", this.VisibleEvents(DebugView.EVENT_MAX).Length, "dumps", titles
             , "paused", Json.Bool(this.paused), "lastExport", this.lastExport, "topics", this.peer.Topics())

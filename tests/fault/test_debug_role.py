@@ -64,7 +64,9 @@ def test_the_role_starts_with_start_debug_and_shows_the_process_table(chains, da
 
 def test_refresh_stores_the_snapshot_of_every_role_and_the_supervisor(chains, datadir):
     chain = full_chain(chains, datadir)
-    assert wait_until(lambda: "worker:1" in dbg(chain, "state")["processes"], 10.0)
+    # The window asks only processes that are ready (as it sees them). Wait until its table shows worker:1 as ready,
+    # not merely listed: in the state "starting" it gets the entry "not ready" instead of a snapshot (F-38).
+    assert wait_until(lambda: dbg(chain, "state")["states"].get("worker:1") == "ready", 10.0), dbg(chain, "state")
     answer = dbg(chain, "refresh")
     assert answer["refreshed"] >= 6, answer          # supervisor, storage, engine, manager, debug, worker:1
     assert {"supervisor", "storage", "engine", "manager", "debug", "worker:1"} <= set(answer["snapshots"]), answer
@@ -72,6 +74,24 @@ def test_refresh_stores_the_snapshot_of_every_role_and_the_supervisor(chains, da
     assert '"role": "engine"' in text and '"flows"' in text and "\n" in text      # formatted JSON
     missing = chain.obs.request("debug", "cmd.test.debug", {"action": "snapshot", "name": "nobody"}, timeout=5)["payload"]
     assert missing["ok"] is False and missing["error"]["code"] == "not_found"
+
+
+def test_refresh_shows_a_process_that_is_not_ready_as_not_ready_instead_of_leaving_it_out(chains, datadir):
+    # F-38 (WI-34): RefreshSnapshots asked only the ready processes and left the others out without a trace. The
+    # window is meant to show such states. echo:slowhello says hello 4 s after its start, so it is "starting" here.
+    late = "echo:slowhello4000"
+    chain = chains("storage,debug," + late, ["--test-roles", *STUB_OPTS])
+    chain.wait_ready(["storage", "debug"], timeout=READY_S)
+    assert wait_until(lambda: late in dbg(chain, "state")["processes"], 10.0), dbg(chain, "state")
+    if dbg(chain, "state")["states"].get(late) != "starting":
+        pytest.skip("the late child was already ready (machine too slow for the scenario)")
+    answer = dbg(chain, "refresh")
+    if answer["states"].get(late) != "starting":
+        pytest.skip("the late child became ready during the refresh (machine too slow for the scenario)")
+    assert late in answer["snapshots"], answer
+    assert dbg(chain, "snapshot", name=late)["text"] == "not ready (state: starting)"
+    assert answer["refreshed"] == 3, answer          # supervisor, storage, debug: the answers; the late child is not asked
+    assert {"supervisor", "storage", "debug"} <= set(answer["snapshots"]), answer
 
 
 def test_the_live_log_has_a_level_and_a_source_filter(chains, datadir):
