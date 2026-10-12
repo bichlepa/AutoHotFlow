@@ -1,9 +1,9 @@
 # STATUS: AutoHotFlow → AHK v2
 
-Stand: 2026-10-11 (nach WI-20). Branch `v2-port`. Stand des Codes: Commit `4a2a6e4` (WI-19). Seit `604a4a9` haben WI-18 (Parallelität, Supervisor-Reihenfolge) und WI-19 (Architekturwächter) Code geändert, WI-20 ist reine Dokumentation.
-Aktuelle Phase: **Phase 2b (Härtung vor Phase 3)**, Plan und Pakete in `work_items/phase2b/README.md`. Erledigt: WI-18, WI-19, WI-20. Phase 3 ist nicht begonnen und braucht die Freigabe des Projektinhabers.
+Stand: 2026-10-12 (nach WI-29). Branch `v2-port`. Code-Stand: Commit `20efac2` (WI-29, Code-Änderungen von WI-29 beginnen bei `31afcc2`); seitdem nur Dokumente.
+Aktuelle Phase: **Phase 2b (Härtung vor Phase 3) ist abgeschlossen mit offenen Punkten** (WI-18 bis WI-29 erledigt, Ergebnisse in `work_items/phase2b/`). Phase 3 ist nicht begonnen und braucht die Freigabe des Projektinhabers; offene Entscheidungen des Projektinhabers stehen in `work_items/HANDOVER.md`.
 
-Vorher: **Phase 2 (Walking Skeleton) technisch abgeschlossen, 15 von 17 Paketen fertig.** Offen: WI-13 nur wegen der manuellen GUI-Prüfung, WI-14 (optional) nicht gebaut. WI-17 ist bis Schritt 5 erledigt; der Phase-3-Plan (`work_items/phase3/README.md`) und die Fragenliste an den Projektinhaber (WI-17 Schritte 6 und 7) fehlen noch.
+Davor: **Phase 2 (Walking Skeleton) technisch abgeschlossen, 15 von 17 Paketen fertig.** Offen: WI-13 nur wegen der manuellen GUI-Prüfung, WI-14 (optional, Entscheidung E6: früh in Phase 3) nicht gebaut. WI-17 ist bis Schritt 5 erledigt; der Phase-3-Plan (`work_items/phase3/README.md`) und die Fragenliste an den Projektinhaber (WI-17 Schritte 6 und 7) fehlen noch.
 
 Detailliertes Handover: `work_items/HANDOVER.md`.
 
@@ -44,8 +44,16 @@ Detailliertes Handover: `work_items/HANDOVER.md`.
 |---|---|---|
 | WI-18 Testlaufzeit: parallele Ausführung | fertig | `a6711c5` |
 | WI-19 Architekturwächter | fertig | `4a2a6e4` |
-| WI-20 Entscheidungen und Beobachtungsliste | fertig (dieser Stand) | Commit mit WI-20 im Betreff |
-| WI-21 bis WI-29 | offen, in dieser Reihenfolge | – |
+| WI-20 Entscheidungen und Beobachtungsliste | fertig | `f42ed73` |
+| WI-21 Engine: Loop-Stack, Wiedereintritt, neueste Revision, `wait` | fertig | `9e84422` bis `5a705fc` |
+| WI-22 Supervisor: Heartbeat, Startreihenfolge, 64 Bit, Pipe-Namen | fertig | `856ef22` bis `2da8beb` |
+| WI-23 Diagnose I: Log des Supervisors, stderr der Kinder | fertig | `b47f42c` bis `ef34b5b` |
+| WI-24 Hub routet über Kopffelder, gestaffeltes Laden | fertig | `0126ecc` bis `be3a2a3` |
+| WI-25 Storage: Durchsatz, getrennte Warteschlangen (F-08) | fertig | `831c9e8` bis `f1efb7a` |
+| WI-26 JSON: echte Wahrheitswerte | fertig | `1d07f5d` bis `45c501a` |
+| WI-27 Worker-Pool-Lebenszyklus | fertig | `5404731` bis `bcc5c82` |
+| WI-28 Diagnose II: Snapshot, Absturzbericht, Debug-Fenster | fertig | `d27d0ef` bis `e744800` |
+| WI-29 Aufräumen und Abschluss | fertig, Abschlussläufe mit offenen Punkten (siehe unten) | `31afcc2` bis zum letzten Commit mit WI-29 im Betreff, Ergebnis in `phase2b/WI-29-aufraeumen-abschluss.md` |
 
 ### Abnahme der Phase 2 (`work_items/phase2/README.md`)
 
@@ -60,7 +68,19 @@ Einschränkung zu 3: Der Absturzfall des Triggerhosts fehlt (nicht gebaut), UI-A
 
 ## Letzter Gesamtlauf
 
-Seit WI-18 läuft der Standardlauf parallel (`pytest.ini`, `-n auto`). Letzter Lauf im WI-19-Abschluss (Code-Stand `4a2a6e4`): `python -m pytest tests -q` **458 passed, 1 skipped in 48,4 s** (WI-18: seriell 333 s, parallel 47 bis 50 s; Details in `work_items/phase2b/WI-18-testlaufzeit.md`).
+**Abschlussläufe von Phase 2b (WI-29, Code-Stand `20efac2`, 2026-10-12, ein Rechner mit 8 logischen CPUs, jeder Lauf allein, Ausgaben nicht im Repo):**
+
+| Lauf | Ergebnis | Dauer |
+|---|---|---|
+| `python -m pytest tests -n 0 -q` (seriell) | **704 passed, 1 skipped, 1 failed**, 14 deselected. Rot: `tests/fault/test_debug_role.py::test_a_debug_role_in_the_session_ends_with_it` (`Chain.wait_flows`: Flow `skeleton` nach 20,0 s nicht geladen), siehe F-31 | 596 s |
+| `python -m pytest tests -q` (parallel, `-n auto`) | **705 passed, 1 skipped**, ein Lauf | 113 s |
+| `python -m pytest tests -m stress -q` | **13 passed** (zum ersten Mal vollständig nach F-07 und WI-25) | 211 s |
+| `AHF_FAULT_REPEAT=20 python -m pytest tests/fault -n 0 -q` | **456 passed, 4 failed** von 460. Rot: `test_shutdown.py::test_healthy_session_exits_within_2_seconds_and_every_role_says_it_is_clean[5]` (`manager` `clean: false`), `[12]` (`storage` `clean: false`), `::test_frozen_storage_is_terminated_at_the_deadline_and_the_others_exit_clean[7]` und `[19]` (beide `manager`). Alle vier sind F-26 | 2527 s |
+| `AHF_SOAK_CHURN=1 python -m pytest tests -m soak -q` (600 s mit Verbindungswechseln) | **1 passed** (zum ersten Mal mit Verbindungswechseln nach F-07; die Umgebungsvariable war gesetzt, die Testausgabe zeigt es nicht) | 609 s |
+
+Weitere Prüfung: `test_debug_role.py` allein, 5 Läufe seriell: 55 von 55 grün (je rund 40 s). Der Fehlschlag aus dem seriellen Gesamtlauf ist also nur im Gesamtlauf aufgetreten (siehe F-31). Der parallele Lauf war einmal grün; die Instabilität unter Last (F-19, zeitempfindliche Stresstests) ist nicht erneut gemessen worden. Nach den Läufen waren keine Testprozesse übrig (nur angesehen); es liefen noch `AutoHotkeyU32.exe` (Allgemeine Hilfe.ahk) und `AutoHotkey64.exe` mit `src/AutoHotFlow.ahk` ohne Argumente (beides Prozesse des Projektinhabers).
+
+Davor, im WI-19-Abschluss (Code-Stand `4a2a6e4`): `python -m pytest tests -q` **458 passed, 1 skipped in 48,4 s** (WI-18: seriell 333 s, parallel 47 bis 50 s; Details in `work_items/phase2b/WI-18-testlaufzeit.md`).
 
 Vorher, im WI-17-Abschluss (Code-Stand `604a4a9`): `python -m pytest tests -q`: **431 passed, 1 skipped, 11 deselected in 345,60 s**, Exit 0. Der Skip ist der bewusste Test in `tests/test_ahk_runner.py`; die 11 deselected sind die Stress- und Soak-Tests (laufen nur mit `-m stress` bzw. `-m soak`). Danach waren keine von den Tests gestarteten AutoHotkey-Prozesse übrig (nur angesehen). Der Prozess PID 29328 aus früheren Berichten existierte nicht mehr; es liefen noch `AutoHotkeyU32.exe` (Allgemeine Hilfe.ahk) und das v1-`AutoHotFlow.exe` des Projektinhabers.
 
@@ -130,8 +150,27 @@ Punkte, die bewusst nicht in Phase 2b behoben werden. Je Punkt: was, warum zurü
 | F-08 | Storage drainierte Log mit rund 30 Zeilen/s, Warteschlange unbegrenzt | behoben in WI-25 (1493 Zeilen/s über 10 s gemessen, Obergrenze 20000 Einträge oder 8 MiB, getrennte Warteschlangen) | `WI-25-storage-durchsatz.md` |
 | F-09 | `seq` der Engine-Ereignisse vertauscht bei 200 Instanzen | behoben | `4906f7d` |
 | F-10 | Trigger als Aktion ausgeführt (Race zwischen `Advance` und Dispatch-Timer) | behoben; ob `_Dispatch` und das Klonen in `Advance` dasselbe Muster haben, ist nicht geprüft | `887988b` |
+| F-11 | Reihenfolge in `Supervisor._Tick`: `sys.bye` konnte nach dem Prozessende gelesen werden, `clean` falsch (WI-18) | behoben in WI-18 (Pump vor Tick) und WI-22 (deterministischer Test `tests/ahk/supervisor_tick.test.ahk`). Siehe aber F-26 | `phase2b/WI-18-testlaufzeit.md`, `WI-22-supervisor-robustheit.md` |
+| F-12 | `Scheduler.Advance` ruft `Pop` vor `finished → ready`; bei leerem Stack (M-14) wirft es statt den Thread mit `exception` zu beenden [gelesen] | offen, niedrig. Vorschlag: `Advance` fängt den Fehler und beendet den Thread mit `exception` | `phase2b/WI-21-engine-korrektheit.md` |
+| F-13 | Weitere Prüfen-dann-Ändern-Stellen ohne Schutz (`Executor._OnFinish`/`_StopRun`, `_ElementStarted`/`_ElementStopped`, `WorkerBridge`) [gelesen, nicht reproduziert] | offen, beobachten (Beobachtungsliste) | `phase2b/WI-21-engine-korrektheit.md` |
+| F-14 | `Ids.Next` erhöht und liest den Zähler in getrennten Zeilen; `ExecContext.Finish` prüft und setzt getrennt [gelesen, `src/core/` und `src/elements/`, nicht geändert] | offen, niedrig; in Phase 3 mit `Critical` absichern (Änderung in `src/core/` braucht Absprache) | `phase2b/WI-21-engine-korrektheit.md` |
+| F-15 | Für ein gelöschtes Element sendet die Engine `evt.element.state` (`running`, dann `exception`) [beobachtet] | bewusst so gelassen: Clients ignorieren unbekannte Element-IDs | `phase2b/WI-21-engine-korrektheit.md` |
+| F-16 | Fristen des Supervisors außer dem Heartbeat (`Shutdown.deadlineAt`, `Hub.Request`, Hello-Zeitlimit) laufen nach der Wanduhr und kennen einen Stillstand des Supervisors nicht [gelesen] | offen, Entscheidung des Projektinhabers: in Phase 3 lösen? (Vorschlag: eine zentrale Stillstandserkennung im Tick) | `phase2b/WI-22-supervisor-robustheit.md` |
+| F-17 | Kind mit hoher Log-Last gibt in einem langen Stillstand des Supervisors auf (Pipe-Warteschlange 1000 Rahmen, Orphan-Frist) [gelesen, nicht getestet] | offen, niedrig | `phase2b/WI-22-supervisor-robustheit.md` |
+| F-18 | Hub-Pipe nicht auf den Benutzer beschränkt (Option in WI-22 Punkt 5 nicht umgesetzt) | offen, niedrig; Name enthält Sitzung und Benutzer | `phase2b/WI-22-supervisor-robustheit.md` |
+| F-19 | Zeitbudgets der Fault- und Supervisor-Tests sind unter Last (parallele Läufe) zu eng; in `test_shutdown.py` verdeckt die Zeitprüfung die Aussage über `clean` | offen. Die Reihenfolge der Assertions (`clean` zuerst) ist nicht geändert; Fristen nicht gelockert. Serieller Lauf ist die Referenz | `phase2b/WI-22-supervisor-robustheit.md`, Läufe in WI-29 |
+| F-20 | Meldungen des Supervisors nach dem Weggang von `storage` (und bei einem Absturz des Supervisors) gehen nicht ins Log, nur auf stderr | offen, niedrig; teilweise durch den Absturzbericht (WI-28) abgedeckt | `phase2b/WI-23-diagnose-logpfade.md` |
+| F-21 | Gesprächiges Kind kann `storage` fluten (200 Zeilen je Tick und Kind) | durch WI-25 entschärft (Durchsatz 1493 Zeilen/s, Obergrenze 20000 Einträge oder 8 MiB); Dauerlauf-Messung siehe WI-29 | `phase2b/WI-23-diagnose-logpfade.md`, `WI-25-storage-durchsatz.md` |
+| F-22 | stdout und stderr der Kinder sind nicht unterscheidbar (eine Pipe) | bewusst so gelassen (reicht für die Diagnose) | `phase2b/WI-23-diagnose-logpfade.md` |
+| F-23 | Die Engine zahlt für jede Flow-Datei doppelt (Parsen des Rahmens und des Flow-Textes): rund 0,23 s je Flow, 45 s für 200 Flows | offen, nicht umgesetzt; Alternativen (Flow als Objekt senden, Chunking, nativer Parser) für Phase 3 | `phase2b/WI-24-hub-routing-laden.md` |
+| F-24 | `flows.list` wird beim Start einmal mit `not_found: no peer 'storage'` beantwortet, danach Wiederholung und unnötiges `evt.storage.error` | offen, niedrig, kein Datenverlust | `phase2b/WI-24-hub-routing-laden.md` |
 | F-25 | Ein von einem anderen Prozess dauerhaft gehaltenes Logfile verliert nach 3 s das ganze Bündel (bis 500 Zeilen) dieser Datei, nicht nur eine Zeile | offen, niedrig (gezählt und im Log vermerkt, F-04 unverändert) | `WI-25-storage-durchsatz.md` |
-| F-26 | `evt.process.exited` für `manager` gelegentlich mit `clean: false` bei sauberem Ende (`test_healthy_session_exits...`: 7 von 150 Läufen ohne WI-26 auf `f1efb7a`, 5 von 480 mit WI-26; nicht durch WI-26 verursacht). F-06 ist damit nicht vollständig behoben. Ursache nicht untersucht | offen, niedrig bis mittel | `phase2b/WI-26-json-wahrheitswerte.md` |
+| F-26 | `evt.process.exited` meldet gelegentlich `clean: false` bei sauberem Ende (`manager`, aber auch `storage`). WI-26: 7 von 150 Läufen von `test_healthy_session_exits...` ohne WI-26, 5 von 480 mit WI-26. WI-29: 4 von 460 Läufen in `tests/fault` mit `AHF_FAULT_REPEAT=20` (`test_shutdown.py`: `healthy_session...` [5] und [12], `frozen_storage...` [7] und [19]; `manager` dreimal, `storage` einmal). F-06 ist damit nicht vollständig behoben. Ursache nicht untersucht (vermutet: `sys.bye` wird beim Prozessende noch nicht gelesen, ein weiterer Fall neben F-11) | **offen, mittel**: tritt mit rund 1 % auf, Ursache ungeklärt; zuerst das Supervisor-Log lesen (`AHF_TEST_KEEP=1`) | `phase2b/WI-26-json-wahrheitswerte.md`, `phase2b/WI-29-aufraeumen-abschluss.md`
+| F-27 | Wettlauf in `Children._Launch` (Zustand nach dem Hello überschrieben) | behoben (`9221437`); der Wettlauf selbst ist nicht deterministisch nachgestellt, nur `OnHello` ohne Pid hat einen Unit-Test | `phase2b/WI-27-worker-pool.md` |
+| F-28 | Log-Einträge eines Workers erreichen `storage` nie (`SetLogTarget` fehlt) | offen, niedrig; braucht eine Entscheidung (Log-Pfad über Engine oder direkt), relevant für Phase 3 (Dialog-Elemente) | `phase2b/WI-27-worker-pool.md` |
+| F-29 | Kind im Handshake wird vom Orphan-Guard nicht erfasst (bis 10 s Lebenszeit nach Supervisor-Tod) | offen, niedrig, in ARCHITEKTUR 6.3 nicht beschrieben | `phase2b/WI-27-worker-pool.md` |
+| F-30 | Verlorenes `sys.busy {busy: false}` lässt den Worker beschäftigt erscheinen [vermutet] | offen, niedrig; aufgefangen durch die Annahmefrist der Engine (5 s) | `phase2b/WI-27-worker-pool.md` |
+| F-31 | Einmal im seriellen Gesamtlauf von WI-28: `Chain.wait_flows` nach 20 s ohne geladene Flows im Test `test_the_role_starts_with_start_debug_and_shows_the_process_table` | offen, nicht geklärt (31 Wiederholungen grün). Im WI-29-Gesamtlauf (seriell) erneut, diesmal in `test_a_debug_role_in_the_session_ends_with_it` (gleiche Datei, gleiche Meldung, 20,0 s); `test_debug_role.py` allein 5 x 11 Tests grün. Tritt also nur im langen seriellen Lauf auf (2 von 2 Gesamtläufen); der Testeinstieg von WI-29 ist nicht die Ursache (der erste Fall war vorher). Beim Wiederauftreten Supervisor-Log mit `AHF_TEST_KEEP=1` lesen | `phase2b/WI-28-diagnose-bericht-debugfenster.md` |
 
 ## Bekannte Probleme
 
@@ -144,25 +183,23 @@ Siehe `work_items/ANALYSE.md` Abschnitt 3. Verhaltensänderungen stehen in `doc/
 - **Fremder Prozess:** `AutoHotkey64.exe` PID 29328 (`/restart /script …\src\AutoHotFlow.ahk`) wurde in früheren Berichten gemeldet; am 2026-10-11 nach dem Gesamtlauf nicht mehr vorhanden. Nie von den Tests gestartet oder beendet.
 - **Fortschrittshaken** in `work_items/phase2/README.md`: im Abschluss gesetzt, WI-13 und WI-14 bewusst nicht (WI-17 erst nach Schritt 7).
 - **Sporadischer Dialog-Test** `test_msgbox_is_captured_and_closed`: einmal Timeout, Ursache (ctypes-argtypes) behoben, Status vermutet.
-- **`core/RoleRegistry.ahk`** enthält zwei Klassen (`RoleRegistry`, `PlaceholderRole`), Verletzung "eine Klasse pro Datei".
-- **Einstieg bindet Testrollen aus `tests/`** ein (`EchoRole` u. a., nur mit `--test-roles` registriert). Abhängigkeit `src/` → `tests/`, vor einem Release auflösen.
 - **`deadlineMs`** von `sys.shutdown`: Nur der Storage wertet den Wert aus, Engine und Manager-Stub nicht (siehe Beobachtungsliste). Die Frist erzwingt der Supervisor durch hartes Beenden (`test_frozen_child_at_exit_is_terminated_at_the_deadline`).
 - **`tests/support/pyhub.py`** sendet keinen Weckruf (Tests nutzen `WakingHub`, siehe Beobachtungsliste).
-- **Storage:** Temp-Dateien (`*.ahf-<pid>.tmp`) nach hartem Kill werden nicht aufgeräumt (nicht geprüft). Pfad "neue Datei" beim Abbruch mitten im Schreiben nie beobachtet.
-- **Richtlinie `wait`** ist in der Engine noch nicht umgesetzt (`busy`). M-11 ist bestätigt (E2), Umsetzung in WI-21.
-- **Semantik bei Änderungen während der Ausführung:** Engine hält die Definition noch beim Start fest (`Executor._NewRun`). Umsetzung in WI-21 (E1, ARCHITEKTUR 4.2). Abweichungen von v1: M-17, M-18.
-- **Löschen eines laufenden Flows:** In v1 wartet `DeleteFlow` höchstens 10 s, danach Abbruch ohne Löschen. Das Verhalten in v2 ist nicht festgelegt (offen, vor Phase 3 entscheiden).
+- **Löschen eines laufenden Flows:** Der Befehl fehlt (Phase 3). `Executor.FlowDeleted` stoppt die Instanzen sofort, ohne Frist und ohne Quittung (WI-21, ARCHITEKTUR 4.2); in v1 brach `DeleteFlow` nach 10 s ab. Das ist eine Entscheidung des Agenten in WI-21, vom Projektinhaber **nicht bestätigt**.
+- **Worker-Waisen:** Zwischen dem Tod und dem Neustart der Engine bleiben Worker mit Dialog sichtbar; ob der Supervisor alle `worker:*` beenden soll, sobald die Engine endet, ist offen (WI-27, Entscheidung des Projektinhabers).
+- **Obergrenze des Log-Puffers** im Storage (20000 Einträge oder 8 MiB, WI-25): fester Wert; ob sie eine Einstellung wird (Phase 3), ist offen.
 - **Dangling-Verbindungen:** 154 von 1039 in den Beispielflows. M-13 legt fest: ignorieren und mit `f1`-Log melden.
-- **Test-Laufzeit:** Der Standardlauf ist seit WI-18 parallel (rund 48 s statt 337 s seriell). Er wächst mit jedem Paket, Grenze und Messung in WI-18.
+- **Test-Laufzeit:** Der Standardlauf ist seit WI-18 parallel; am Ende von Phase 2b 113 s parallel und 596 s seriell (706 Tests). Er wächst mit jedem Paket, Grenze und Messung in WI-18.
+- **Paralleler Lauf unter Last:** F-19 (zu enge Zeitbudgets der Fault-Tests), F-26 und zeitempfindliche Stresstests (`clients_churn[smoke]`, `big_flows[smoke]`) sind in früheren parallelen Läufen (WI-22 bis WI-27) rot geworden; die Hub-Frage aus WI-23 (`sys.hello` 15 s lang unbeantwortet) ist nicht erklärt. Der parallele Abschlusslauf war einmal grün. Der serielle Lauf ist die Referenz.
 
 ### Nicht geprüft
 
-Timing unter Systemlast, AHK 32 Bit, Screenshots bei gesperrtem Desktop, Editor-Zeichnen (Phase 3), GUI-Bedienung des Stubs, Dauerlauf mit Verbindungswechseln (`AHF_SOAK_CHURN=1`) nach dem F-07-Fix, Worker-Pool unter Last, Triggerhost (nicht gebaut), AHK-Client (Editor) als Gegenstelle der Latenzmessung.
+Timing unter Systemlast (parallele Läufe siehe oben), zweiter Windows-Benutzer und Standby, Screenshots bei gesperrtem Desktop, Editor-Zeichnen (Phase 3), GUI-Bedienung des Stubs und des Debug-Fensters von Hand (Anleitung in `WI-28`), echte blockierende Dialog-Elemente im Worker, Worker-Pool im Dauerlauf mit mehr als 3 Workern, Triggerhost (nicht gebaut), AHK-Client (Editor) als Gegenstelle der Latenzmessung, Idle-CPU und Speicher mit warmem Worker (nicht neu gemessen).
 
 ## Nächste Schritte
 
-1. Phase 2b in der Reihenfolge aus `work_items/phase2b/README.md`: WI-21 (Engine-Korrektheit, nach E1 und E2) als Nächstes, dann WI-22 bis WI-29.
-2. Phase 3 braucht die Freigabe des Projektinhabers. Der Phase-3-Plan (`work_items/phase3/README.md`) und die Fragenliste (WI-17 Schritte 6 und 7) sind noch offen.
-3. Beobachtungsliste (oben) bei jedem Gesamtlauf im Blick behalten, besonders F-02 und F-11.
-4. Projektinhaber: GUI des Stubs einmal von Hand prüfen (Anleitung in `WI-13-ui-stub.md`), danach WI-13 abhaken.
+1. Projektinhaber: offene Entscheidungen in `work_items/HANDOVER.md` ("Offene Entscheidungen") beantworten und die Freigabe für Phase 3 erteilen. Den Phase-3-Plan (`work_items/phase3/README.md`) entwirft der Projektinhaber mit Claude (WI-17 Schritte 6 und 7).
+2. Vor oder früh in Phase 3: F-26 (`clean: false`, rund 1 %) und F-31 (Flows nach 20 s nicht geladen, nur im langen seriellen Lauf) untersuchen, mit `AHF_TEST_KEEP=1` und dem Supervisor-Log.
+3. Beobachtungsliste (oben) bei jedem Gesamtlauf im Blick behalten.
+4. Projektinhaber: GUI des Stubs einmal von Hand prüfen (Anleitung in `WI-13-ui-stub.md`), danach WI-13 abhaken; ebenso das Debug-Fenster (Anleitung in `WI-28`).
 5. `work_items/` und `v1/` erst nach der Portierung entfernen (Entscheidung des Projektinhabers, nicht jetzt).
