@@ -11,7 +11,8 @@ import time
 import psutil
 import pytest
 
-from faultkit import FULL_CHAIN, STUB_OPTS, alive, event, repeat_ids, wait_until
+from faultkit import FULL_CHAIN, STUB_OPTS, alive, connect, event, repeat_ids, wait_until
+from support import winpipe
 
 from faultfixtures import chains  # noqa: F401  (fixture)
 
@@ -52,3 +53,68 @@ def test_supervisor_stand_still_does_not_make_healthy_children_hung(chains, roun
     assert chain.request_exit()["payload"]["started"]
     assert chain.sup.wait_exit(timeout=30) == 0, chain.sup.text()
     assert "supervisor stood still" in chain.sup.text(), "stand-still not noticed: " + chain.sup.text()
+
+
+# --- deadlines after a stand-still (WI-33, F-16, E12) ---------------------------------------------------------
+
+PREPARE_LIMIT_MS = 5000
+HELLO_LIMIT_S = 5.0     # Hub.HELLO_TIMEOUT_MS
+
+
+def freeze_for(chain, seconds):
+    """Suspends the supervisor interpreter for the given time. Returns the perf_counter time of the thaw."""
+    sup = psutil.Process(chain.sup.ahk_pid())
+    sup.suspend()
+    try:
+        time.sleep(seconds)
+    finally:
+        sup.resume()
+    return time.perf_counter()
+
+
+def test_open_prepare_exit_request_keeps_its_remaining_time_after_a_stand_still(chains):
+    """The answer limit of cmd.app.prepareExit (5 s) is still open when the supervisor stands still for 8 s. After the
+    thaw the request has the rest of its time (a timeout means "no cancel": the session would end at once)."""
+    chain = chains("storage", ["--test-roles", "--prepare-limit=%d" % PREPARE_LIMIT_MS])
+    chain.wait_ready(["storage"])
+    manager = connect(chain.sup.pipe, "manager")
+    try:
+        assert chain.request_exit()["payload"]["started"]
+        request = manager.wait_event("cmd.app.prepareExit", timeout=5)
+        assert request is not None
+        t_thaw = freeze_for(chain, FREEZE_S)
+        code = chain.sup.wait_exit(timeout=30)
+        after = time.perf_counter() - t_thaw
+        print("\nMEASURE prepareExit (limit 5 s) open during a stand-still of %.0f s: exit %.2f s after the thaw"
+              % (FREEZE_S, after))
+        assert code == 0, chain.sup.text()
+        # the rest of the limit is about 4.5 s; without the fix the request ends at the first tick after the thaw
+        assert after > 3.0, "the request ran out at once after the stand-still: exit %.2f s after the thaw" % after
+        assert "supervisor stood still" in chain.sup.text()
+    finally:
+        manager.close()
+
+
+def test_connection_without_hello_keeps_its_remaining_time_after_a_stand_still(chains):
+    """A new connection has 5 s to say sys.hello. The supervisor stands still for 8 s after 1.5 s of it: the connection
+    is not closed at once after the thaw, but after the rest of its time."""
+    chain = chains("storage", ["--test-roles"])
+    chain.wait_ready(["storage"])
+    raw = winpipe.OverlappedPipe.connect_client(chain.sup.pipe, 5.0)
+    try:
+        time.sleep(1.5)             # the hub has accepted the connection (every tick), the hello clock runs
+        t_thaw = freeze_for(chain, FREEZE_S)
+        closed_at = None
+        while time.perf_counter() - t_thaw < 12.0:
+            try:
+                raw.read_some(0.1)
+            except winpipe.PipeClosed:
+                closed_at = time.perf_counter() - t_thaw
+                break
+        print("\nMEASURE connection without hello (limit 5 s) after a stand-still of %.0f s: closed %s s after the thaw"
+              % (FREEZE_S, "%.2f" % closed_at if closed_at is not None else "never"))
+        assert closed_at is not None, "the connection without hello was never closed"
+        # the rest is about 3.5 s; without the fix it is closed at the first tick after the thaw
+        assert closed_at > 2.0, "closed at once after the stand-still: %.2f s after the thaw" % closed_at
+    finally:
+        raw.close()

@@ -211,8 +211,26 @@ class Children {
     SinceLastPong(name, now) => now - this._recs[name]["lastPongAt"]
     SinceLastPing(name, now) => now - this._recs[name]["lastPingAt"]
 
-    ; The supervisor itself stood still (Heartbeat.Tick): start again with fresh timestamps for every child
-    ; that is judged by time. A child that is already hung keeps its kill time.
+    ; The supervisor itself stood still for ms (Supervisor, Stall; WI-33, F-16): the liveness of the children begins again
+    ; at "now" (ResetLiveness), and every other deadline of a record moves by ms, so its rest of the time stays: the kill
+    ; time of a hung child, the time of a planned restart, the end of the wait for the connection of an ended process.
+    ; The restart history (RESTART_WINDOW_MS) is a rate over real time and stays as it is.
+    OnStall(now, ms) {
+        this.ResetLiveness(now)
+        for _, rec in this._recs {
+            if (rec["gone"]) {
+                if (rec["restartAt"] > 0)
+                    rec["restartAt"] += ms
+                continue
+            }
+            if (rec["killAt"] > 0)
+                rec["killAt"] += ms
+            if (rec.Get("exitSeenAt", 0) > 0)
+                rec["exitSeenAt"] += ms
+        }
+    }
+
+    ; Every child that is judged by time starts again with fresh timestamps. (A hung child keeps its kill time here.)
     ResetLiveness(now) {
         for _, rec in this._recs {
             if (rec["gone"])

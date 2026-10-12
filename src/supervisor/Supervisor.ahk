@@ -10,6 +10,7 @@
 #Include Hub.ahk
 #Include Children.ahk
 #Include Heartbeat.ahk
+#Include Stall.ahk
 #Include DiagLog.ahk
 #Include DiagReport.ahk
 #Include Shutdown.ahk
@@ -115,6 +116,7 @@ class Supervisor {
         this.report := ""
         this.heartbeat := ""
         this.shutdown := ""
+        this.stall := Stall(Stall.MIN_GAP_MS, Supervisor.TICK_MS)
     }
 
     Start() {
@@ -143,7 +145,7 @@ class Supervisor {
         this.hub.Start()
         for entry in this.startList
             this.children.Spawn(entry)
-        this.heartbeat.Arm(Time.NowMs())
+        this.stall.Arm(Time.NowMs())
         SetTimer(Supervisor.TickFn, Supervisor.TICK_MS)
         Log.Write("a1", "supervisor", "session " this.session " running, hub " this.pipe)
     }
@@ -315,7 +317,26 @@ class Supervisor {
     ; --- timer and end -----------------------------------------------------------------------
 
     _Tick() {
-        now := Time.NowMs()
+        this._RunTick(Time.NowMs())
+    }
+
+    ; One round of the timer at the time now. First the stand-still check (WI-33, F-16, E12): this is the only place that
+    ; measures a stand-still of the supervisor. If there was one, the holders of deadlines move them by its length, before
+    ; anything is judged by the clock: the children (liveness, kill time, restart, grace), the hub (requests such as
+    ; cmd.app.prepareExit, the hello time of new connections), the shutdown (deadline) and the report (wait for storage).
+    _RunTick(now) {
+        stalledMs := this.stall.Check(now)
+        if (stalledMs > 0) {
+            Log.Write("a1", "supervisor", "supervisor stood still for " stalledMs " ms, deadlines extended")
+            try {
+                this.children.OnStall(now, stalledMs)
+                this.hub.Shift(stalledMs)
+                this.shutdown.Shift(stalledMs)
+                this.report.Shift(now, stalledMs)
+            } catch as e {
+                Log.Write("a0", "supervisor", "extending the deadlines failed: " Type(e) ": " e.Message)
+            }
+        }
         ; Read what has arrived before looking for ended processes: a child sends sys.bye and exits, and the
         ; exit must not be seen before its bye (else the exit is reported as not clean).
         try {

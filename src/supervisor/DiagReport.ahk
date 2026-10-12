@@ -74,7 +74,7 @@ class DiagReport {
         job := Map("id", this._seq, "reason", DiagReport.SafeReason(reason), "auto", auto ? true : false  ; arch-ok: wire-bool internal job record, never sent
             , "stamp", FormatTime(A_Now, "yyyyMMdd-HHmmss"), "createdAt", FormatTime(A_Now, "yyyy-MM-dd HH:mm:ss")
             , "snapshots", Map(), "missing", [], "open", 0, "onDone", onDone, "files", "", "state", "collecting"
-            , "waitFn", "")
+            , "waitFn", "", "waitDueAt", 0)
         Log.Write("a1", "report", "report '" job["reason"] "' started" (auto ? " (automatic)" : ""))
         asked := 0
         for name in this.children.Names() {
@@ -215,9 +215,22 @@ class DiagReport {
         }
         if (IsObject(job["onDone"])) {
             job["waitFn"] := ObjBindMethod(this, "_OnStorageWaitOver", job)
+            job["waitDueAt"] := Time.NowMs() + this.storageWaitMs
             SetTimer(job["waitFn"], -this.storageWaitMs)
         }
         Log.Write("a0", "report", "report '" job["reason"] "' waits for storage (" this._unwritten.Length " waiting)")
+    }
+
+    ; The supervisor stood still for ms (Stall, WI-33, F-16): the wait for storage keeps its rest of the time. The timer
+    ; is set again for the new time. A timer that came due during the stand-still and ran before the tick that noticed
+    ; it only answers the caller early ("kept and written when storage is back"); the report itself is not lost.
+    Shift(now, ms) {
+        for job in this._unwritten {
+            if (IsObject(job["waitFn"])) {
+                job["waitDueAt"] += ms
+                SetTimer(job["waitFn"], -Max(1, Integer(job["waitDueAt"] - now)))
+            }
+        }
     }
 
     _OnStorageWaitOver(job) {

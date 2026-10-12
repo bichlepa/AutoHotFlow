@@ -6,9 +6,9 @@
 ; connected ready child, and a child counts as hung when no pong came for PONG_TIMEOUT_MS (three
 ; missed pings). A child that has not said sys.hello within STARTUP_MS (Children) is hung too.
 ; Stand-still of the supervisor itself (frozen process, standby, a long hub backlog): the timestamps of the
-; children are then old although the children are healthy. When the gap between two ticks is longer than
-; PING_EVERY_MS, no child is judged by the old timestamps: the pong and ping times and the start deadlines
-; begin again at "now" (Children.ResetLiveness). A child that is really silent is found one pong timeout later.
+; children are then old although the children are healthy. The supervisor measures it (Stall, WI-33) and tells
+; Children.OnStall, before the heartbeat runs: no child is judged by the old timestamps, the pong and ping times and
+; the start deadlines begin again at "now". A child that is really silent is found one pong timeout later.
 ; A busy worker (sys.busy, ARCHITEKTUR 6.4) is left alone: no ping, no pong judgement; its process handle still shows a death.
 ; Hung children are handed to Children.MarkHung, which sends sys.shutdown and Children.Terminate
 ; after KILL_AFTER_MS. A frozen process (psutil suspend) is found this way; its pipe stays open.
@@ -23,21 +23,9 @@ class Heartbeat {
         this.children := children
         this.hub := hub
         this._pingCount := 0
-        this._lastTickAt := 0
-    }
-
-    ; Called once when the supervisor starts its timer, so that a stand-still before the first tick is noticed too.
-    Arm(now) {
-        this._lastTickAt := now
     }
 
     Tick(now) {
-        if (this._lastTickAt > 0 && now - this._lastTickAt > Heartbeat.PING_EVERY_MS) {
-            Log.Write("a1", "heartbeat", "supervisor stood still for " Integer(now - this._lastTickAt)
-                . " ms, heartbeat reset")
-            this.children.ResetLiveness(now)
-        }
-        this._lastTickAt := now
         for name in this.children.Names() {
             state := this.children.State(name)
             if (state = "starting") {

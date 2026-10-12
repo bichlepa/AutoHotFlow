@@ -209,6 +209,23 @@ CheckTheCallerIsAnsweredAfterTheWaitAndTheReportStaysForTheNextTime() {
     Assert.Equal(result["ok"], false, "the caller is not answered twice")
 }
 
+; WI-33 (F-16): the supervisor stood still; the wait for storage keeps its rest of the time.
+CheckAStandStillMovesTheWaitForStorage() {
+    r := NewReport(&hub, &children)
+    r.storageWaitMs := 600
+    result := ""
+    r.Request("manual", false, (p) => result := p)
+    Sleep(100)                                  ; build timer; the wait of 600 ms has begun
+    Assert.Equal(r.Stats()["unwritten"], 1)
+    r.Shift(Time.NowMs(), 1000)                 ; the wait is now due about 1.5 s from now
+    Sleep(900)
+    Assert.Equal(result, "", "the caller is not answered before the moved time")
+    Sleep(1000)
+    Assert.True(IsObject(result), "answered after the moved time")
+    Assert.Equal(result["error"]["code"], "peer_gone")
+    Assert.Equal(r.Stats()["unwritten"], 1, "the report is kept")
+}
+
 CheckTheWaitingListIsBounded() {
     r := NewReport(&hub, &children)
     r.storageWaitMs := 100000
@@ -307,6 +324,7 @@ TestRun.Case("an answer without a snapshot counts as missing", CheckARoleWithout
 TestRun.Case("a report without any child is still built (and waits for storage)", CheckAReportWithoutAnyChildIsStillBuilt)
 TestRun.Case("a report waits for storage and is written when it is back", CheckAReportWaitsForStorageAndIsWrittenWhenItIsBack)
 TestRun.Case("the caller is answered after the wait, the report is kept for the next time", CheckTheCallerIsAnsweredAfterTheWaitAndTheReportStaysForTheNextTime)
+TestRun.Case("a stand-still of the supervisor moves the wait for storage (WI-33)", CheckAStandStillMovesTheWaitForStorage)
 TestRun.Case("the list of unwritten reports is bounded", CheckTheWaitingListIsBounded)
 TestRun.Case("a write that finds storage gone is kept", CheckAWriteThatFindsStorageGoneIsKept)
 TestRun.Case("an error answer of storage is passed on", CheckAWriteErrorIsPassedOn)

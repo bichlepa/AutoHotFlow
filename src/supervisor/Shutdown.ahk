@@ -90,6 +90,16 @@ class Shutdown {
         }
     }
 
+    ; The supervisor stood still for ms (Stall, WI-33, F-16): the deadline of the shutdown and the wait after the hard end
+    ; move by that time, so the children keep their rest of the time. (The answer limit of phase 1 is a Hub request and
+    ; moves with the hub.)
+    Shift(ms) {
+        if (this.deadlineAt > 0)
+            this.deadlineAt += ms
+        if (this.killDeadline > 0)
+            this.killDeadline += ms
+    }
+
     ; --- phase 1 -----------------------------------------------------------------------------
 
     _PrepareCallback(gen) => (res) => this._OnPrepare(gen, res)

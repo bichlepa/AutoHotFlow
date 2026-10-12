@@ -29,7 +29,8 @@
 ;   - A client whose send queue overflows is removed; the supervisor decides what that means.
 ;   - Nothing blocks: pipe I/O is overlapped and handled in Pump(), requests to clients carry no wait.
 ; Requests the supervisor sends itself (Request) get exactly one callback: the answer, a synthetic
-; answer {ok:false, error:{code:"timeout"}} when timeoutMs has passed, or "" when the link is lost first.
+; answer {ok:false, error:{code:"timeout"}} when timeoutMs has passed (checked by Tick, moved by Shift), or "" when the
+; link is lost first.
 ; A real answer that comes after the timeout is dropped and counted in droppedAnswers (Peer does the same).
 class Hub {
     static PROTOCOL := 1
@@ -56,7 +57,7 @@ class Hub {
         this._anon := Map()       ; ObjPtr(conn) -> Map("conn", conn, "since", ms)
         this._links := Map()      ; name -> link Map (see _Link)
         this._byConn := Map()     ; ObjPtr(conn) -> name
-        this._pending := Map()    ; request id -> Map("to", name, "type", msgType, "cb", fn, "timerFn", fn)
+        this._pending := Map()    ; request id -> Map("to", name, "type", msgType, "cb", fn, "dueAt", ms)
         this._dispatcher := Dispatcher()
         this._dispatcher.On("cmd.topic.", (msg) => this._SetTopic(msg))
         this._pumpFn := () => this.Pump()
@@ -99,7 +100,11 @@ class Hub {
         }
     }
 
-    ; Closes connections that have not said sys.hello in time. Called by the supervisor's timer.
+    ; The deadlines of the hub, called by the supervisor's timer (WI-33): closes connections that have not said
+    ; sys.hello in time, and ends the requests whose time limit has passed (the callback gets the synthetic timeout
+    ; answer). The deadlines are a list that this tick looks at, not one SetTimer per request: a stand-still of the
+    ; supervisor moves them all (Shift) before this tick runs. A SetTimer that came due during the stand-still could
+    ; run before the tick that notices the stand-still. The accuracy is one tick (200 ms).
     Tick(now) {
         for key, rec in this._anon.Clone() {
             if (now - rec["since"] >= Hub.HELLO_TIMEOUT_MS) {
@@ -107,6 +112,21 @@ class Hub {
                 rec["conn"].Close()
             }
         }
+        due := []
+        for id, rec in this._pending
+            if (now >= rec["dueAt"])
+                due.Push(id)
+        for id in due
+            this._OnTimeout(id)
+    }
+
+    ; The supervisor stood still for ms (Stall): every deadline of the hub moves by that time, so the rest of the time
+    ; is kept (WI-33, F-16): the hello time of the new connections and the time limit of the open requests.
+    Shift(ms) {
+        for _, rec in this._anon
+            rec["since"] += ms
+        for _, rec in this._pending
+            rec["dueAt"] += ms
     }
 
     ; Closes the listener and every connection (local close, no notification to the hub callbacks
@@ -164,16 +184,13 @@ class Hub {
             return id
         }
         ; The id is registered before the frame leaves, so the answer (corr = id) always finds its callback.
-        ; The timer starts after the frame: a refused frame leaves no timer behind.
-        this._pending[id] := Map("to", name, "type", msgType, "cb", cb, "timerFn", "")
+        ; A refused frame is removed again at once.
+        this._pending[id] := Map("to", name, "type", msgType, "cb", cb, "dueAt", Time.NowMs() + timeoutMs)
         if (!this._SendFrame(link, Message(name, Hub.SUPERVISOR, id, msgType, payload, "", timeoutMs).Serialize())) {
             this._pending.Delete(id)
             SetTimer(() => this._CallBack(cb, ""), -1)
             return id
         }
-        timerFn := () => this._OnTimeout(id)
-        this._pending[id]["timerFn"] := timerFn
-        SetTimer(timerFn, -timeoutMs)
         return id
     }
 
@@ -475,14 +492,12 @@ class Hub {
             , Map("ok", false, "error", Map("code", ErrCode.TIMEOUT, "message", text)), id))
     }
 
-    ; Removes a request, stops its timer and calls its callback once. Returns false if it was not pending.
+    ; Removes a request and calls its callback once. Returns false if it was not pending.
     _Finish(id, answer) {
         if (!this._pending.Has(id))
             return false
         rec := this._pending[id]
         this._pending.Delete(id)
-        if (IsObject(rec["timerFn"]))
-            SetTimer(rec["timerFn"], 0)
         this._CallBack(rec["cb"], answer)
         return true
     }
