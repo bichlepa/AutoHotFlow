@@ -26,7 +26,7 @@
     ],
     "tasks": [
         {
-            "label": "Setup: Test-Abhängigkeiten installieren",
+            "label": "Setup: install test dependencies",
             "type": "shell",
             "command": "python",
             "args": [
@@ -39,7 +39,7 @@
             "problemMatcher": []
         },
         {
-            "label": "Test: alle (parallel, Standard)",
+            "label": "Test: all (parallel, default)",
             "type": "shell",
             "command": "python",
             "args": [
@@ -55,7 +55,7 @@
             "problemMatcher": []
         },
         {
-            "label": "Test: alle seriell, ausführlich (-n 0 -v)",
+            "label": "Test: all serial, verbose (-n 0 -v)",
             "type": "shell",
             "command": "python",
             "args": [
@@ -70,7 +70,7 @@
             "problemMatcher": []
         },
         {
-            "label": "Test: nur letzte Fehlschläge (--lf)",
+            "label": "Test: only last failures (--lf)",
             "type": "shell",
             "command": "python",
             "args": [
@@ -84,7 +84,7 @@
             "problemMatcher": []
         },
         {
-            "label": "Test: Auswahl nach Name (-k)",
+            "label": "Test: select by name (-k)",
             "type": "shell",
             "command": "python",
             "args": [
@@ -99,7 +99,7 @@
             "problemMatcher": []
         },
         {
-            "label": "Test: eine Datei oder Ordner, seriell mit Ausgabe (Debug)",
+            "label": "Test: one file or folder, serial with output (debug)",
             "type": "shell",
             "command": "python",
             "args": [
@@ -115,7 +115,7 @@
             "problemMatcher": []
         },
         {
-            "label": "Test: AHK-Unit-Tests (tests/ahk)",
+            "label": "Test: AHK unit tests (tests/ahk)",
             "type": "shell",
             "command": "python",
             "args": [
@@ -128,7 +128,7 @@
             "problemMatcher": []
         },
         {
-            "label": "Test: Integration (tests/integration)",
+            "label": "Test: integration (tests/integration)",
             "type": "shell",
             "command": "python",
             "args": [
@@ -141,7 +141,7 @@
             "problemMatcher": []
         },
         {
-            "label": "Test: End-to-End (tests/e2e)",
+            "label": "Test: end-to-end (tests/e2e)",
             "type": "shell",
             "command": "python",
             "args": [
@@ -154,7 +154,7 @@
             "problemMatcher": []
         },
         {
-            "label": "Test: Fault Injection (-m fault)",
+            "label": "Test: fault injection (-m fault)",
             "type": "shell",
             "command": "python",
             "args": [
@@ -169,7 +169,7 @@
             "problemMatcher": []
         },
         {
-            "label": "Test: JSON-Flows laden (Altbestand)",
+            "label": "Test: load JSON flows (legacy)",
             "type": "shell",
             "command": "python",
             "args": [
@@ -182,7 +182,7 @@
             "problemMatcher": []
         },
         {
-            "label": "Test: Architekturwächter (pytest)",
+            "label": "Test: architecture guard (pytest)",
             "type": "shell",
             "command": "python",
             "args": [
@@ -195,7 +195,7 @@
             "problemMatcher": []
         },
         {
-            "label": "Test: Stress, seriell, Messung (-m stress)",
+            "label": "Test: stress, serial, measurement (-m stress)",
             "type": "shell",
             "command": "python",
             "args": [
@@ -210,7 +210,7 @@
             "problemMatcher": []
         },
         {
-            "label": "Test: Soak, Minuten, seriell (-m soak)",
+            "label": "Test: soak, minutes, serial (-m soak)",
             "type": "shell",
             "command": "python",
             "args": [
@@ -225,7 +225,7 @@
             "problemMatcher": []
         },
         {
-            "label": "Werkzeug: Architekturwächter (arch_check.py)",
+            "label": "Tool: architecture guard (arch_check.py)",
             "type": "shell",
             "command": "python",
             "args": [
@@ -235,7 +235,7 @@
             "problemMatcher": []
         },
         {
-            "label": "Testdaten: Skeleton-Flow in den Datenordner kopieren",
+            "label": "Test data: copy skeleton flow to the data folder",
             "type": "process",
             "command": "powershell",
             "args": [
@@ -249,7 +249,7 @@
             "problemMatcher": []
         },
         {
-            "label": "Start: Produkt (Supervisor, ohne Fenster)",
+            "label": "Start: product (supervisor, no window)",
             "type": "process",
             "command": "C:\\Program Files\\AutoHotkey\\v2\\AutoHotkey64.exe",
             "args": [
@@ -262,7 +262,7 @@
             "problemMatcher": []
         },
         {
-            "label": "Start: Produkt mit Debug-Fenster (--start=storage,engine,debug)",
+            "label": "Start: product with debug window (--start=storage,engine,debug)",
             "type": "process",
             "command": "C:\\Program Files\\AutoHotkey\\v2\\AutoHotkey64.exe",
             "args": [
@@ -276,7 +276,7 @@
             "problemMatcher": []
         },
         {
-            "label": "Start: Debug-Fenster an laufende Instanz (--command=debug)",
+            "label": "Start: debug window on running instance (--command=debug)",
             "type": "process",
             "command": "C:\\Program Files\\AutoHotkey\\v2\\AutoHotkey64.exe",
             "args": [
@@ -290,7 +290,7 @@
             "problemMatcher": []
         },
         {
-            "label": "Start: Manager-Stub mit Debug-Fenster (--ui=stub --start=storage,engine,manager,debug)",
+            "label": "Start: manager stub with debug window (--ui=stub --start=storage,engine,manager,debug)",
             "type": "process",
             "command": "C:\\Program Files\\AutoHotkey\\v2\\AutoHotkey64.exe",
             "args": [
@@ -305,7 +305,7 @@
             "problemMatcher": []
         },
         {
-            "label": "Start: Produkt, Log-Level 3 (--start=storage,engine,debug)",
+            "label": "Start: product, log level 3 (--start=storage,engine,debug)",
             "type": "process",
             "command": "C:\\Program Files\\AutoHotkey\\v2\\AutoHotkey64.exe",
             "args": [
@@ -320,7 +320,7 @@
             "problemMatcher": []
         },
         {
-            "label": "Start: Produkt, nur Fehler im Log (--log-level=0)",
+            "label": "Start: product, errors only in log (--log-level=0)",
             "type": "process",
             "command": "C:\\Program Files\\AutoHotkey\\v2\\AutoHotkey64.exe",
             "args": [
@@ -334,7 +334,7 @@
             "problemMatcher": []
         },
         {
-            "label": "Start: Produkt headless (ohne Fenster)",
+            "label": "Start: product headless (no window)",
             "type": "process",
             "command": "C:\\Program Files\\AutoHotkey\\v2\\AutoHotkey64.exe",
             "args": [
@@ -348,7 +348,7 @@
             "problemMatcher": []
         },
         {
-            "label": "Start: Testeinstieg mit Testrollen und Debug-Fenster (echo:a, debug)",
+            "label": "Start: test entry with test roles and debug window (echo:a, debug)",
             "type": "process",
             "command": "C:\\Program Files\\AutoHotkey\\v2\\AutoHotkey64.exe",
             "args": [
@@ -363,7 +363,7 @@
             "problemMatcher": []
         },
         {
-            "label": "Debug: Debug.Dump in der Testrolle echo:a auslösen (ahf_dump.py)",
+            "label": "Debug: trigger Debug.Dump in test role echo:a (ahf_dump.py)",
             "type": "process",
             "command": "python",
             "args": [
