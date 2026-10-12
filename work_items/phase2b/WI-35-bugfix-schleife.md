@@ -175,6 +175,35 @@ Nicht nötig [Einschätzung]. A und K ändern kein Nachrichtenformat und keine F
 - **F-47** (`test_worker.py::test_cancel_of_the_hang_element_reports_stopped_within_500_ms`, `cmd.worker.cancel` 5 s unbeantwortet): **nicht dieselbe Mechanik** [Beleg aus Code, Ursache nicht geprüft]. Der Test läuft gegen `RoleHub` (`tests/integration/test_role.py:36`, abgeleitet von `WakingHub`/`PyHub`), der seit `27d49cb` wie der echte Hub bei Ende der Zielverbindung sofort `peer_gone` antwortet (`tests/support/pyhub.py:215-223`). Hätte der Worker seine Verbindung verloren, wäre `peer_gone` gekommen, nicht `AhfTimeout`. Es ist also eine unbeantwortete Anfrage an einen lebenden Worker (oder ein verlorener Weckruf/Rahmen). Die verwandte Familie (F-37) gab es schon vor F-40. Ohne Log nicht weiter einzuordnen; beim nächsten Auftreten Snapshot des Workers (`cmd.diag.snapshot`: `peer`-Zähler, `job`) und `AHF_TEST_KEEP=1`.
 - **F-45** (`test_debug_role.py::test_refresh_shows_a_process_that_is_not_ready_as_not_ready_instead_of_leaving_it_out`, `refreshed` 2 statt 3): **nicht dieselbe Mechanik** [vermutet]. In diesem Test stirbt kein Ziel, `peer_gone` entsteht nur beim Ende einer Zielverbindung. `DebugView.RefreshSnapshots` (`src/debugview/DebugView.ahk:235-255`) fragt nur Prozesse, die **das Fenster** als `ready` sieht, und zählt nur Antworten (`_OnSnapshot`, Zeile 257-269). Der Test wartet aber nur auf `ready` beim Supervisor (`chain.wait_ready(["storage", "debug"])`, `test_debug_role.py:84`), nicht in der Tabelle des Fensters. Sieht das Fenster `storage` (oder sich selbst) noch nicht als `ready`, fehlt eine Antwort: 2 statt 3, und Zeile 94 bliebe trotzdem grün (der Eintrag "not ready" zählt als Name). Das ist dasselbe Muster wie F-38, nur für `storage`/`debug` statt `worker:1` [vermutet, nicht nachgestellt]. Alternative Ursache: eine Antwort kam nicht binnen `DebugView.SNAPSHOT_MS` [nicht geprüft].
 
+### Umsetzung Zyklus 1
+
+Stand 2026-10-12, Sonnet. Beide Schritte abgeschlossen, keine Eskalation. Zeilenangaben der Analyse stimmten (`KillWorker`, `_EndWorkersOfGoneEngine`, `_OnRunAnswer`).
+
+**Schritt K (Supervisor), Commit `8f9ecdf`**
+- Rot zuerst (`tests/ahk/supervisor_tick.test.ahk`, vor dem Fix): `KillOfAnEndedWorkerStaysACrash` ("an ended process is not relabelled as stopping: expected "ready" but got "stopping"") und `EngineEndKeepsTheCrashOfAnEndedWorker` ("expected 0 but got 1"). Nur grün (Absicherung): `KillOfARunningWorkerIsAPlannedExit`.
+- Fix: `Children._HasEnded(rec)` (`WaitForSingleObject(handle, 0)`); `KillWorker` loggt `a1` und kehrt zurück, `_EndWorkersOfGoneEngine` überspringt den Worker. Antwort auf `cmd.process.kill` bleibt `ok`. Keine Frist geändert.
+- Grün: alle drei Fälle, ganze Datei 40/40.
+- Doku im selben Commit: PROTOKOLL 4.1 (`cmd.process.kill`), ARCHITEKTUR 6.4 ("Ende mit der Engine"), HOW-TO "Einen schon beendeten Prozess nicht als auf Anfrage beendet umetikettieren".
+
+**Schritt A (Engine), Commit `f6c32e7`**
+- Rot zuerst (`tests/ahk/engine_worker_bridge.test.ahk`): `APeerGoneAnswerToTheRunEndsTheJobAsWorkerCrashed` und `BothOrdersOfPeerGoneAndTheProcessEventEndTheJobOnce` (Reihenfolge "answer first" rot, "event first" war schon grün).
+- Rot zuerst (Integration, `tests/fault/test_worker_lifecycle.py::test_worker_killed_before_it_answers_the_run_ends_the_element_with_worker_crashed_and_is_reported_as_crashed`, mit `repeat_ids()`): Worker eingefroren, Wartebedingung `hub.routedOpen >= 1` aus `cmd.diag.snapshot` des Supervisors (das Feld ist exponiert), dann `psutil kill`. Mit K allein: 3 von 3 rot an der Meldung ("worker not available: worker:1 (peer_gone)"). Vor K und A (Children.ahk vorübergehend auf `HEAD~1`): 3 von 3 rot (2 mal "no evt.process.crashed", 1 mal Meldung). Nach K und A: grün.
+- Fix: `WorkerBridge._OnRunAnswer`: bei `ErrCode.PEER_GONE` Text "worker crashed (<slot>)"; `_Lose` (Slot weg, `cmd.process.kill`, Fehlerzählung) unverändert; andere Codes unverändert.
+- Doku im selben Commit: PROTOKOLL 4.5 (zwei Stellen plus Absturz), ARCHITEKTUR 6.2 (zwei Zeilen) und 6.4 ("Absturz"), HOW-TO "Zwei Meldewege für denselben Tod: keine Reihenfolge annehmen". Alle Einträge: verifiziert.
+
+**Gelaufene Tests (nur die relevanten, keine Gesamtläufe)**
+- `tests/test_ahk_runner.py` (alle AHK-Unit-Tests) plus `tests/test_architecture.py`, `-n 0`: 464 grün, 1 übersprungen (war schon so). `tools/arch_check.py`: 0 Verstöße.
+- `tests/fault/test_worker_lifecycle.py`, `tests/fault/test_process_crash.py`, `tests/integration/test_worker*.py`, `tests/fault/test_report.py`, `tests/integration/test_supervisor.py`, `tests/test_architecture.py`, `-n 4`: 102 grün.
+- Neuer Integrationstest mit `AHF_FAULT_REPEAT=5`: 5 von 5 grün. Gemessen: `crashed` 0,117 s nach dem Kill.
+- **Original `AHF_FAULT_REPEAT=20 python -m pytest tests/fault/test_process_crash.py -k killed_worker -n 0 -q`: 20 von 20 grün, zweimal (Vorher 8 rot von 40; jetzt 0 von 40.)**
+
+**Abweichungen:** keine vom Vorschlag. Der Integrationstest nutzt zusätzlich `repeat_ids()` (die Datei importierte es noch nicht). Der AHK-Unit-Test für `_EndWorkersOfGoneEngine` (in der Analyse "optional") ist umgesetzt.
+
+**Offene Punkte**
+- Das Restrisiko aus der Analyse (Pipe-Ende vor Prozess-Handle signalisiert, `cmd.process.kill` genau in dieser Lücke) ist in 40 plus 5 Läufen nicht aufgetreten; ein Beweis ist das nicht, die Abnahme (`AHF_FAULT_REPEAT=20 tests/fault`) prüft es weiter.
+- `STATUS.md` (F-46 schließen) ist nicht angefasst; das gehört zu Schritt 5 (Abschluss) nach der grünen Abnahme.
+- Nicht von mir: die geänderte `.gitignore` im Arbeitsbaum wurde nicht angefasst.
+
 ### Analyse Zyklus N
 (Opus-Analyse hier eintragen.)
 
