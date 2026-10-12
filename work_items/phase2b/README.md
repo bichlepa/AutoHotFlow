@@ -101,6 +101,7 @@ WI-32 kommt bewusst zuletzt: WI-30 und WI-31 beseitigen zwei Ursachen roter Läu
 
 ### Fortschritt Fix-Block
 
-- [x] WI-30  - [x] WI-31  - [x] WI-33  - [ ] WI-32
+- [x] WI-30  - [x] WI-31  - [x] WI-33  - [x] WI-32 (Aufgabe 1 Testbereinigung und Aufgabe 3 Dokumente)
+- [ ] WI-32 Abnahmeläufe (Aufgabe 2, setzt der spätere Agent, der sie fährt)
 
-Neue Funde ab **F-32**.
+Neue Funde ab **F-32** (vergeben bis F-36, nächste freie Nummer **F-37**; F-34 wurde nie vergeben).
