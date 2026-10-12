@@ -32,6 +32,10 @@ class WriteQueue {
 
     Pending => this._ops.Length + this._low.Length
 
+    ; Waiting requests and waiting log operations, for the snapshot.
+    RequestCount => this._ops.Length
+    LogCount => this._low.Length
+
     Add(op) {
         this._ops.Push(op)
         SetTimer(this._pumpFn, -1)

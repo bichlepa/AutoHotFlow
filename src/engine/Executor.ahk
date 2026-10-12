@@ -41,6 +41,7 @@
 ; text. Action_Sleep converts it with IsNumber.
 class Executor {
     static TICK_BATCH := 1000
+    static DIAG_INSTANCES := 100
 
     __New(owner) {
         this._owner := owner
@@ -64,6 +65,22 @@ class Executor {
                 return true
         }
         return false
+    }
+
+    ; Instances with their threads for the snapshot (doc/PROTOKOLL.md 4.9): ids, states, the element of each thread.
+    ; No variables and no parameters. At most DIAG_INSTANCES instances (the rest is only counted by the caller).
+    DiagInstances() {
+        list := []
+        for instId, run in this._runs {
+            if (list.Length >= Executor.DIAG_INSTANCES)
+                break
+            threads := []
+            for threadId, thread in run["inst"].Threads
+                threads.Push(Map("threadId", threadId, "elementId", thread.ElementId, "state", thread.State
+                    , "result", String(thread.Result)))
+            list.Push(Map("instanceId", instId, "flowId", run["flowId"], "state", run["inst"].State, "threads", threads))
+        }
+        return list
     }
 
     ; True if the instance exists and waits for its turn (policy wait).

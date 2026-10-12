@@ -80,6 +80,17 @@ class Engine extends Role {
             this._LoadFlows()
     }
 
+    ; Role part of the snapshot (doc/PROTOKOLL.md 4.9): loaded flows, instances with threads, the worker pool.
+    DiagInfo() {
+        flows := []
+        for rec in this.flows.All() {
+            flows.Push(Map("flowId", rec.FlowId, "name", rec.Def.Name, "rev", rec.Rev, "enabled", Json.Bool(rec.Enabled)
+                , "executing", Json.Bool(this.executor.IsExecuting(rec.FlowId))))
+        }
+        return Map("epoch", this.epoch, "seq", this.seq, "flows", flows, "instances", this.executor.DiagInstances()
+            , "workers", this.workers.DiagInfo())
+    }
+
     ; sys.shutdown: every instance is stopped before sys.bye (ARCHITECTURE 6.3, step 2).
     OnShutdown(deadlineMs) {
         this.workers.Stop()

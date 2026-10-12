@@ -69,6 +69,16 @@ class WorkerBridge {
     ; N, the most workers at once. 0: no pool.
     Size => this._size
 
+    ; The pool for the snapshot (doc/PROTOKOLL.md 4.9): size, warm workers, the slots with their state, starts on
+    ; their way and the abnormal ends in the storm window.
+    DiagInfo() {
+        slots := []
+        for slot in this._slots
+            slots.Push(Map("name", slot["name"], "state", slot["state"], "execId", slot["execId"]))
+        return Map("size", this._size, "warm", this._warm, "slots", slots, "spawning", this._spawning
+            , "failures", this._FailureCount())
+    }
+
     ; The number of slots that exist now (starting, idle, busy).
     Count => this._slots.Length
 

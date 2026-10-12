@@ -83,6 +83,24 @@ class Peer {
     ; Number of requests waiting for an answer. Every one of them owns exactly one timer.
     PendingCount => this._pending.Count
 
+    ; Counters for the snapshot (doc/PROTOKOLL.md 4.9): the peer's own and those of the connection (send queue,
+    ; failed handlers). Cheap and without side effects.
+    Stats() {
+        conn := this._conn
+        return Map("status", this.status, "pending", this._pending.Count, "lateReplies", this.lateReplies
+            , "badFrames", this.badFrames, "droppedSends", this.droppedSends
+            , "queuedFrames", IsObject(conn) ? conn.QueuedFrames : 0, "queuedBytes", IsObject(conn) ? conn.QueuedBytes : 0
+            , "handlerErrors", IsObject(conn) ? conn.handlerErrors : 0)
+    }
+
+    ; The topics this peer subscribes to (sorted).
+    Topics() {
+        names := []
+        for topic, _ in this._topics
+            names.Push(topic)
+        return names
+    }
+
     ; Registers the handler for incoming messages whose type starts with typePrefix.
     On(typePrefix, handler) {
         this._dispatcher.On(typePrefix, handler)

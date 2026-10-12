@@ -3,6 +3,7 @@
 #Include Log.ahk
 #Include Time.ahk
 #Include Args.ahk
+#Include Snapshot.ahk
 #Include ipc\Peer.ahk
 
 ; Base class of every role process (doc/ARCHITEKTUR.md 3 and 6, doc/PROTOCOL.md 4.1 and 5).
@@ -43,6 +44,7 @@ class Role {
     static ERROR_LIMIT := 20
     static ERROR_WINDOW_MS := 60000
     static MAX_STACK_CHARS := 4000
+    static ERROR_KEEP := 20
     static Current := ""
 
     ; Console sink for the entry point and the last messages of a role. Writes to stderr only,
@@ -68,6 +70,7 @@ class Role {
     static PeerClosedFn := () => Role.Current._OnPeerClosed()
     static GuardFn := () => Role.Current._Guard()
     static ByeFn := () => Role.Current._FinishShutdown()
+    static SnapshotFn := (msg) => Role.Current._CmdDiagSnapshot(msg)
 
     __New(args) {
         this.args := args
@@ -86,6 +89,8 @@ class Role {
         this.logDropped := 0
         this.logTarget := ""
         this.errorTimes := []
+        this.errorCount := 0           ; unhandled errors so far (snapshot)
+        this.errorRing := []           ; the newest ERROR_KEEP of them, with stack (snapshot)
     }
 
     ; Creates the peer, registers the standard and the role handlers, and starts the connection.
@@ -100,6 +105,7 @@ class Role {
         OnError(Role.ErrorFn)
         this.peer := Peer(this.name, this.hubPipe, Map("hubHwnd", this.hubHwnd))
         this.peer.On("sys.shutdown", Role.ShutdownFn)
+        this.peer.On("cmd.diag.snapshot", Role.SnapshotFn)
         this.peer.OnReady := Role.PeerReadyFn
         this.peer.OnClosed := Role.PeerClosedFn
         this.RegisterHandlers()
@@ -121,6 +127,12 @@ class Role {
     OnPeerLost() {
     }
 
+    ; The role part of the snapshot (doc/PROTOKOLL.md 4.9): a Map of names, ids, counters and states. Never
+    ; the content of variables or flows. Must not block and should not throw (a throw becomes info.error).
+    DiagInfo() {
+        return Map()
+    }
+
     ; Default policy for an error nobody caught: log it and keep the role running. The return
     ; value 1 tells AHK that the error is handled (no dialog). A subclass may end the role instead.
     ; Before this hook runs, the error is counted and sent to the supervisor as evt.diag.error; more than
@@ -135,6 +147,27 @@ class Role {
     ; Registers a handler on the peer (call from RegisterHandlers).
     On(typePrefix, handler) {
         this.peer.On(typePrefix, handler)
+    }
+
+    ; --- snapshot ------------------------------------------------------------------------------
+
+    ; cmd.diag.snapshot: the general part is the same for every role, the role part comes from DiagInfo.
+    ; The option "content" of the request is reserved for the flow debugger and ignored.
+    _CmdDiagSnapshot(msg) {
+        return Map("snapshot", this.Snapshot())
+    }
+
+    Snapshot() {
+        snap := Snapshot.General(this.name, this.roleName)
+        snap["peer"] := IsObject(this.peer) ? this.peer.Stats() : Map()
+        snap["log"] := Snapshot.LogPart(this.logQueue.Length, this.logDropped)
+        snap["errors"] := Snapshot.ErrorsPart(this.errorCount, this.errorRing)
+        try {
+            snap["info"] := this.DiagInfo()
+        } catch as e {
+            snap["info"] := Snapshot.InfoError(e)
+        }
+        return snap
     }
 
     ; --- log -----------------------------------------------------------------------------------
@@ -283,8 +316,15 @@ class Role {
     _ReportError(e, mode) {
         try {
             this.errorTimes.Push(Time.NowMs())
+            payload := Role.ErrorPayload(this.name, e, mode)
+            this.errorCount += 1
+            ring := payload.Clone()
+            ring["ts"] := FormatTime(A_NowUTC, "yyyy-MM-dd HH:mm:ss")
+            this.errorRing.Push(ring)
+            while (this.errorRing.Length > Role.ERROR_KEEP)
+                this.errorRing.RemoveAt(1)
             if (IsObject(this.peer))
-                this.peer.Send("supervisor", "evt.diag.error", Role.ErrorPayload(this.name, e, mode))
+                this.peer.Send("supervisor", "evt.diag.error", payload)
         } catch as e2 {
             Role.Console("a0", "role", "could not report an unexpected error: " Type(e2) ": " e2.Message)
         }

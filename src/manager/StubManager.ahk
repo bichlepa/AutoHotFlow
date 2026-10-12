@@ -96,6 +96,12 @@ class StubManager extends Role {
         this._RequestSnapshot("ready")
     }
 
+    ; Role part of the snapshot (doc/PROTOKOLL.md 4.9): subscriptions, sequence state and counters.
+    DiagInfo() {
+        return Map("topics", this.peer.Topics(), "epoch", this.epoch, "lastSeq", this.lastSeq
+            , "flows", this.flowRecs.Count, "events", this.eventCount, "resyncs", this.resyncCount)
+    }
+
     OnShutdown(deadlineMs) {
         this._Ui("stub.shutdown", Map("deadlineMs", deadlineMs))
         this._FlushUi()

@@ -346,7 +346,7 @@ Kein Flow-Debugger (E1), sondern Diagnose des Systems. Alles hier ist nur lesend
 |---|---|
 | `name`, `role`, `pid` | Rollenname (`editor:Flow 1`), Rolle (`editor`), Prozess-ID |
 | `startedAt`, `uptimeMs` | Prozessstart (UTC, `yyyy-MM-dd HH:mm:ss`, aus `GetProcessTimes`) und Laufzeit |
-| `version`, `ahkVersion`, `bits` | `Version.Current` (`src/core/Version.ahk`), `A_AhkVersion`, 64 |
+| `version`, `ahkVersion`, `bits` | `AhfVersion.Current` (`src/core/AhfVersion.ahk`), `A_AhkVersion`, 64 |
 | `rssBytes`, `handles` | Arbeitsspeicher (`GetProcessMemoryInfo`) und Handle-Zahl (`GetProcessHandleCount`) des eigenen Prozesses |
 | `peer` | `{ status, pending, lateReplies, badFrames, droppedSends, queuedFrames, queuedBytes, handlerErrors }` (Zähler von `Peer` und seiner Verbindung, `Peer.Stats()`) |
 | `log` | `{ queued, dropped, sinkErrors, lastSinkError, level, recent: [ {ts, level, source, text} ] }`: `Role.LogStats()`, `Log.sinkErrors`, die letzten 100 Einträge des Ringpuffers von `Log` (WI-23, Texte auf 500 Zeichen gekürzt) |

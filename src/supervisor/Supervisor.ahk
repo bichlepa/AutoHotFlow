@@ -4,6 +4,7 @@
 #Include ..\core\Ids.ahk
 #Include ..\core\Args.ahk
 #Include ..\core\Time.ahk
+#Include ..\core\Snapshot.ahk
 #Include ..\core\PipeNames.ahk
 #Include ..\core\ipc\Wake.ahk
 #Include Hub.ahk
@@ -142,6 +143,7 @@ class Supervisor {
         h.On("sys.bye", (msg) => this.children.OnBye(msg.from, msg.payload.Get("clean", false)))
         h.On("sys.busy", (msg) => this._OnBusy(msg))
         h.On("cmd.app.", (msg) => this._OnApp(msg))
+        h.On("cmd.diag.snapshot", (msg) => Map("snapshot", this.Snapshot()))
         h.On("cmd.process.", (msg) => this._OnProcess(msg))
         h.On("evt.diag.error", (msg) => this.diag.AddError(msg.from, msg.payload))
         h.onHello := (link) => this._OnHello(link)
@@ -179,6 +181,27 @@ class Supervisor {
             return Map()
         }
         throw AhfError("unknown command " msg.type, ErrCode.UNKNOWN_TYPE)
+    }
+
+    ; The supervisor's own snapshot (doc/PROTOKOLL.md 4.9): general part, hub connections, the process table with
+    ; the output of every child (also of the dead ones), the ring of unhandled errors of all roles, the newest
+    ; process events. It has no peer and no role part.
+    Snapshot() {
+        snap := Snapshot.General("supervisor", "supervisor")
+        stats := this.diag.Stats()
+        snap["log"] := Snapshot.LogPart(stats["queued"], stats["dropped"])
+        own := []
+        for rec in this.diag.Errors()
+            if (rec["from"] = "supervisor")
+                own.Push(rec)
+        snap["errors"] := Snapshot.ErrorsPart(own.Length, own)
+        snap["hub"] := this.hub.Stats()
+        snap["children"] := this.children.Describe()
+        snap["diagErrors"] := this.diag.Errors()
+        snap["diagLog"] := stats
+        snap["processEvents"] := this.hub.ProcessEvents()
+        snap["reports"] := Map("written", 0, "unwritten", 0, "autoSuppressed", 0)
+        return snap
     }
 
     ; cmd.process.list is open to every client. spawn and kill belong to the engine and only touch workers

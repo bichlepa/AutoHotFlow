@@ -73,6 +73,13 @@ class Storage extends Role {
         this.On("evt.log.append", (msg) => this._EvtLogAppend(msg))
     }
 
+    ; Role part of the snapshot (doc/PROTOKOLL.md 4.9): queue lengths and the log counters. No file names, no content.
+    DiagInfo() {
+        return Map("queue", Map("requests", this.queue.RequestCount, "log", this.queue.LogCount)
+            , "logQueuedEntries", this.logQueuedEntries, "logQueuedChars", this.logQueuedChars
+            , "logLinesLost", this.logLinesLost, "logLinesDropped", this.logLinesDropped)
+    }
+
     ; sys.shutdown: the time to finish the queue is the deadline minus a margin.
     OnShutdown(deadlineMs) {
         this._shutdownUntil := Time.NowMs() + Max(deadlineMs - Storage.SHUTDOWN_MARGIN_MS, 0)

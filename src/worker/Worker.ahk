@@ -2,6 +2,7 @@
 #Include ..\core\Errors.ahk
 #Include ..\core\Log.ahk
 #Include ..\core\Role.ahk
+#Include ..\core\Time.ahk
 #Include ..\elements\base\ElementRegistry.ahk
 #Include ..\elements\base\ElementRunner.ahk
 #Include WorkerContext.ahk
@@ -39,6 +40,15 @@ class Worker extends Role {
         this.On("cmd.worker.cancel", (msg) => this._CmdCancel(msg))
     }
 
+    ; Role part of the snapshot (doc/PROTOKOLL.md 4.9): the current job (class and execId, no parameters), or "".
+    DiagInfo() {
+        job := this._job
+        if (!IsObject(job))
+            return Map("job", "")
+        return Map("job", Map("execId", job["execId"], "class", job["classId"]
+            , "sinceMs", Integer(Time.NowMs() - job["startedMs"])))
+    }
+
     ; After a reconnect to the hub the supervisor does not know that a job is running.
     OnReady() {
         if (this._job != "")
@@ -62,7 +72,7 @@ class Worker extends Role {
         imports := Worker._Map(msg, "imports")
         env := Worker._Map(msg, "env")
         job := Map("execId", execId, "classId", classId, "params", params, "imports", imports, "env", env
-            , "started", false, "cls", "", "ctx", "")  ; arch-ok: wire-bool internal job record, never sent
+            , "started", false, "cls", "", "ctx", "", "startedMs", Time.NowMs())  ; arch-ok: wire-bool internal job record, never sent
         this._job := job
         this._ReportBusy(true)          ; before the element starts: it may block for long (see the head of this file)
         SetTimer(this._startFn, -1)

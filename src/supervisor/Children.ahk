@@ -3,6 +3,7 @@
 #Include ..\core\Log.ahk
 #Include ..\core\Time.ahk
 #Include ..\core\Role.ahk
+#Include ..\core\Json.ahk
 #Include ..\core\RoleRegistry.ahk
 #Include ChildLauncher.ahk
 
@@ -207,6 +208,19 @@ class Children {
     ; True once the hung child is due for TerminateProcess (after KILL_AFTER_MS).
     KillDue(name, now) => this._recs[name]["killAt"] > 0 && now >= this._recs[name]["killAt"] && !this._recs[name]["gone"]
 
+    ; The process table for the supervisor's snapshot (doc/PROTOKOLL.md 4.9): every record, also of ended
+    ; children, with the restart count, the exit code and the last lines of their output.
+    Describe() {
+        list := []
+        for name, rec in this._recs {
+            list.Push(Map("name", name, "role", rec["role"], "state", rec["state"], "pid", rec["pid"]
+                , "exitCode", rec["exitCode"], "restarts", rec["restartTimes"].Length
+                , "startedAt", rec.Get("startedUtc", ""), "busy", Json.Bool(rec.Get("busy", false))
+                , "killReason", rec.Get("killReason", ""), "output", rec["output"].Clone()))
+        }
+        return list
+    }
+
     ; A snapshot for cmd.process.list.
     Snapshot() {
         list := []
@@ -407,6 +421,7 @@ class Children {
         ; Start would turn it back into "starting" for ever (WI-27: seen as a manager that never became ready).
         rec["state"] := "starting"
         rec["startedAt"] := now
+        rec["startedUtc"] := FormatTime(A_NowUTC, "yyyy-MM-dd HH:mm:ss")
         rec["exitCode"] := ""
         rec["bye"] := false
         rec["byeClean"] := false

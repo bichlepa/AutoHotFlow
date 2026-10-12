@@ -47,6 +47,8 @@ class Hub {
     Listener := ""
     ; Answers that arrived after their request had timed out or ended (or with an unknown corr).
     droppedAnswers := 0
+    ; The newest events of the topic "process" (PROCESS_EVENTS_KEEP), for the snapshot and the crash report.
+    static PROCESS_EVENTS_KEEP := 50
 
     __New(pipeName, session) {
         this.pipeName := pipeName
@@ -58,6 +60,7 @@ class Hub {
         this._dispatcher := Dispatcher()
         this._dispatcher.On("cmd.topic.", (msg) => this._SetTopic(msg))
         this._pumpFn := () => this.Pump()
+        this._processEvents := []
     }
 
     ; Registers a handler for messages addressed to "supervisor" (sys.*, cmd.*). Same rules as Dispatcher.On.
@@ -178,6 +181,28 @@ class Hub {
     Publish(topic, msgType, payload := "") {
         text := Message("topic:" topic, Hub.SUPERVISOR, this._NextId(), msgType, payload).Serialize()
         this._Fanout(topic, text, "")
+        if (topic = "process") {
+            this._processEvents.Push(Map("ts", FormatTime(A_NowUTC, "yyyy-MM-dd HH:mm:ss"), "type", msgType
+                , "payload", IsObject(payload) ? payload : Map()))
+            while (this._processEvents.Length > Hub.PROCESS_EVENTS_KEEP)
+                this._processEvents.RemoveAt(1)
+        }
+    }
+
+    ; The newest events of the topic "process" (copies of the list, oldest first).
+    ProcessEvents() => this._processEvents.Clone()
+
+    ; Connections for the snapshot (doc/PROTOKOLL.md 4.9): per client the pid, the send queue and the topics.
+    Stats() {
+        links := []
+        for name, link in this._links {
+            topics := []
+            for topic, _ in link["topics"]
+                topics.Push(topic)
+            links.Push(Map("name", name, "pid", link["pid"], "queuedFrames", link["conn"].QueuedFrames
+                , "queuedBytes", link["conn"].QueuedBytes, "topics", topics))
+        }
+        return Map("links", links, "droppedAnswers", this.droppedAnswers, "pending", this._pending.Count)
     }
 
     ; --- connections -------------------------------------------------------------------------
