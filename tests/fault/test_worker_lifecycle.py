@@ -283,9 +283,64 @@ def test_engine_restart_during_a_worker_job_leaves_no_orphan_and_the_next_job_ru
     # exactly the new engine's warm worker is left
     assert wait_until(lambda: len(ready_workers(chain)) == 1 and old not in live_workers(chain), READY_S), \
         "workers after the restart: %s" % workers(chain)
-    assert exited_killed(chain, old, timeout=2.0) is not None
+    assert exited_engine_gone(chain, old, timeout=2.0) is not None      # WI-33 (E10): reason "engine gone", was "killed"
     run_echo_ok(chain)
     assert len(live_workers(chain)) == 1, live_workers(chain)
+
+
+# --- the workers end with the engine (WI-33, E10) -------------------------------------------------------------
+
+ENGINE_GONE_BUDGET_S = 1.5          # the aim is 1 s (WI-33); the margin is for the parallel run
+
+
+def exited_engine_gone(chain, name, timeout):
+    return chain.rec.wait(event("evt.process.exited", name=name, reason="engine gone"), timeout=timeout)
+
+
+def test_engine_killed_during_a_hanging_job_ends_the_worker_at_once_and_the_new_engine_builds_the_pool(chains, datadir):
+    flows = dict(ECHO, whang=("Action_TestHangWorker", None))
+    chain = start_chain(chains, datadir, flows)
+    old = next(iter(chain.wait_ready(["worker:1"], timeout=READY_S)))
+    old_pid = chain.pid(old)
+    start_flow(chain, "whang")
+    assert chain.rec.wait(lambda m: m.get("type") == "evt.element.state" and m["payload"].get("flowId") == "whang"
+                          and m["payload"].get("elementId") == WORKER_ELEMENT
+                          and m["payload"].get("state") == "running", timeout=10) is not None
+    time.sleep(0.3)             # the worker has the job and hangs in it
+    engine_pid = chain.pid("engine")
+    t0 = time.perf_counter()
+    psutil.Process(engine_pid).kill()
+    gone = wait_until(lambda: not alive(old_pid), 10.0)
+    took = time.perf_counter() - t0
+    print("\nMEASURE engine killed -> worker with a hanging job gone: %.2f s" % took)
+    assert gone, "the worker %s (pid %d) still lives:\n%s" % (old, old_pid, chain.sup.text())
+    assert took < ENGINE_GONE_BUDGET_S, took
+    got = exited_engine_gone(chain, old, timeout=3.0)
+    assert got is not None, "no evt.process.exited with reason 'engine gone':\n" + chain.sup.text()
+    assert not chain.rec.find(event("evt.process.crashed", name=old))
+    chain.wait_restarted_ready("engine", engine_pid, timeout=15.0)
+    assert wait_until(lambda: len(ready_workers(chain)) == 1 and old not in live_workers(chain), READY_S), \
+        "workers after the restart: %s" % workers(chain)
+    run_echo_ok(chain)          # the new engine's pool serves a new job
+
+
+def test_engine_beyond_the_restart_limit_leaves_no_worker(chains, datadir):
+    flows = dict(ECHO, whang=("Action_TestHangWorker", None))
+    chain = start_chain(chains, datadir, flows, ["--test-roles", "--restart-max=0"])
+    old = next(iter(chain.wait_ready(["worker:1"], timeout=READY_S)))
+    old_pid = chain.pid(old)
+    start_flow(chain, "whang")
+    assert chain.rec.wait(lambda m: m.get("type") == "evt.element.state" and m["payload"].get("flowId") == "whang"
+                          and m["payload"].get("elementId") == WORKER_ELEMENT
+                          and m["payload"].get("state") == "running", timeout=10) is not None
+    time.sleep(0.3)
+    psutil.Process(chain.pid("engine")).kill()
+    assert chain.rec.wait(event("evt.process.crashed", name="engine", restart=False), timeout=10) is not None
+    assert wait_until(lambda: not alive(old_pid), 5.0), "the worker lives although the engine is gone for good:\n" \
+        + chain.sup.text()
+    assert exited_engine_gone(chain, old, timeout=3.0) is not None
+    time.sleep(1.5)
+    assert not live_workers(chain), live_workers(chain)
 
 
 # --- limit, demand, idle end ---------------------------------------------------------------------------------

@@ -428,9 +428,33 @@ class Children {
                 continue
             }
             this._ReadOutput(rec)
-            if (DllCall("WaitForSingleObject", "ptr", rec["handle"], "uint", 0, "uint") = Children.WAIT_OBJECT_0
-                && this._ExitReadable(rec, now))
-                this._OnGone(rec, now)
+            if (DllCall("WaitForSingleObject", "ptr", rec["handle"], "uint", 0, "uint") = Children.WAIT_OBJECT_0) {
+                ; The engine has ended: its workers end now, not when the end has been judged (WI-33, E10).
+                if (rec["role"] = "engine" && rec.Get("exitSeenAt", 0) = 0)
+                    this._EndWorkersOfGoneEngine()
+                if (this._ExitReadable(rec, now))
+                    this._OnGone(rec, now)
+            }
+        }
+    }
+
+    ; E10 (WI-33): when the engine process has ended, every living worker is ended at once. The pool belongs to the
+    ; engine and nobody takes the result of a job any more (a worker with an open dialog would stay for the whole
+    ; session). Not while the session ends: the shutdown order of the ranks applies then. The end is a planned one
+    ; like KillWorker: evt.process.exited with reason "engine gone", no crash, not counted for exit code 5, no restart.
+    ; A new engine builds its pool new; its WorkerBridge.Start still ends what it finds (second safeguard).
+    _EndWorkersOfGoneEngine() {
+        if (this.shuttingDown)
+            return
+        for name, rec in this._recs {
+            if (rec["role"] != "worker" || rec["gone"] || rec["handle"] = 0)
+                continue
+            Log.Write("a1", "children", "ending " name ": the engine is gone")
+            if (rec["state"] != "hung") {
+                rec["state"] := "stopping"
+                rec["killReason"] := "engine gone"
+            }
+            this.Terminate(name, false)
         }
     }
 
