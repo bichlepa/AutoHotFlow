@@ -32,6 +32,12 @@
 ; answer {ok:false, error:{code:"timeout"}} when timeoutMs has passed (checked by Tick, moved by Shift), or "" when the
 ; link is lost first.
 ; A real answer that comes after the timeout is dropped and counted in droppedAnswers (Peer does the same).
+; Requests between clients (F-40, WI-34): the hub remembers every cmd.* it forwards (head fields only: sender, id,
+; type, target) until the answer passes back, or until the deadline of the request (timeoutMs) plus ROUTED_SLACK_MS.
+; When the connection of the target ends (the process died, its pipe broke, its queue overflowed, it reconnected),
+; every request it has not answered gets the answer {ok:false, error:{code:"peer_gone"}} from the hub at once. The
+; connection is read to its end before that, so an answer the target wrote before it died arrives first and is not
+; followed by a second one. Without this the sender waited for its own deadline (30 s for a storage read).
 class Hub {
     static PROTOCOL := 1
     static SUPERVISOR := "supervisor"
@@ -41,6 +47,11 @@ class Hub {
     static HELLO_TIMEOUT_MS := 5000
     ; Accepts per Pump, so a flood of new clients cannot keep the message loop busy.
     static ACCEPTS_PER_PUMP := 64
+    ; A forwarded request is forgotten this long after its own deadline (the sender has given up by then; the slack
+    ; covers the tick of the hub and a sender whose clock runs a little behind). A request without timeoutMs is kept
+    ; for ROUTED_DEFAULT_MS, the longest standard deadline of the protocol (storage operations, PROTOKOLL 2).
+    static ROUTED_SLACK_MS := 1000
+    static ROUTED_DEFAULT_MS := 30000
 
     onHello := ""
     onLinkLost := ""
@@ -58,6 +69,9 @@ class Hub {
         this._links := Map()      ; name -> link Map (see _Link)
         this._byConn := Map()     ; ObjPtr(conn) -> name
         this._pending := Map()    ; request id -> Map("to", name, "type", msgType, "cb", fn, "dueAt", ms)
+        ; forwarded requests between clients (F-40): sender "`n" id -> Map("from", .., "to", .., "type", .., "id", .., "dueAt", ms)
+        this._routed := Map()
+        this.goneAnswers := 0     ; requests answered with peer_gone because their target went away
         this._dispatcher := Dispatcher()
         this._dispatcher.On("cmd.topic.", (msg) => this._SetTopic(msg))
         this._pumpFn := () => this.Pump()
@@ -118,6 +132,13 @@ class Hub {
                 due.Push(id)
         for id in due
             this._OnTimeout(id)
+        ; Forwarded requests past their deadline: the sender has its own timeout answer, the hub only forgets them.
+        expired := []
+        for key, rec in this._routed
+            if (now >= rec["dueAt"])
+                expired.Push(key)
+        for key in expired
+            this._routed.Delete(key)
     }
 
     ; The supervisor stood still for ms (Stall): every deadline of the hub moves by that time, so the rest of the time
@@ -126,6 +147,8 @@ class Hub {
         for _, rec in this._anon
             rec["since"] += ms
         for _, rec in this._pending
+            rec["dueAt"] += ms
+        for _, rec in this._routed
             rec["dueAt"] += ms
     }
 
@@ -219,7 +242,8 @@ class Hub {
             links.Push(Map("name", name, "pid", link["pid"], "queuedFrames", link["conn"].QueuedFrames
                 , "queuedBytes", link["conn"].QueuedBytes, "topics", topics))
         }
-        return Map("links", links, "droppedAnswers", this.droppedAnswers, "pending", this._pending.Count)
+        return Map("links", links, "droppedAnswers", this.droppedAnswers, "pending", this._pending.Count
+            , "routedOpen", this._routed.Count, "goneAnswers", this.goneAnswers)
     }
 
     ; --- connections -------------------------------------------------------------------------
@@ -300,11 +324,13 @@ class Hub {
             return
         }
         if (this._links.Has(name)) {
-            ; A reconnect may arrive before the old connection is noticed as lost. The new one wins.
+            ; A reconnect may arrive before the old connection is noticed as lost. The new one wins. What was sent to
+            ; the old connection and not answered is lost with it (its unread frames are dropped by Close).
             old := this._links[name]
             Log.Write("a1", "hub", "client '" name "' reconnected, old connection replaced")
             this._Unlink(name)
             this._FailPending(name)
+            this._FailRouted(name, "reconnected")
             old["conn"].Close()
         }
         this._anon.Delete(key)
@@ -355,6 +381,8 @@ class Hub {
         link := this._links[name]
         this._Unlink(name)
         this._FailPending(name)
+        this._FailRouted(name, reason)
+        this._ForgetRoutedFrom(name)
         Log.Write("a1", "hub", "client '" name "' gone (" reason ")")
         fn := this.onLinkLost
         if (IsObject(fn)) {
@@ -402,8 +430,11 @@ class Hub {
             this._Refuse(link, msg, ErrCode.BAD_PAYLOAD, "message cannot be forwarded: " e.Message)
             return
         }
-        if (!sent)
+        if (!sent) {
             this._Refuse(link, msg, ErrCode.PEER_GONE, "'" to "' does not accept the message")
+            return
+        }
+        this._NoteRouted(link["name"], to, msg.type, msg.id, msg.corr, msg.timeoutMs)
     }
 
     ; The fast way of _Route: the sender is set in the head, the payload text is passed on as it came.
@@ -426,8 +457,60 @@ class Hub {
             this._Refuse(link, stub, ErrCode.NOT_FOUND, "no peer '" to "'")
             return
         }
-        if (!this._SendFrame(target, out))
+        if (!this._SendFrame(target, out)) {
             this._Refuse(link, stub, ErrCode.PEER_GONE, "'" to "' does not accept the message")
+            return
+        }
+        this._NoteRouted(link["name"], to, head["type"], head["id"], head["corr"], head["timeoutMs"])
+    }
+
+    ; --- requests between clients (F-40, WI-34) --------------------------------------------------
+
+    ; A message from `from` was forwarded to `to`. A cmd.* is remembered until its answer passes back; a res.* that
+    ; passes back ends the request it answers (only when it comes from the target of that request).
+    _NoteRouted(from, to, msgType, id, corr, timeoutMs) {
+        kind := SubStr(msgType, 1, 4)
+        if (kind = "cmd.") {
+            limit := (IsInteger(timeoutMs) && timeoutMs > 0) ? Integer(timeoutMs) : Hub.ROUTED_DEFAULT_MS
+            this._routed[from "`n" id] := Map("from", from, "to", to, "type", msgType, "id", id
+                , "dueAt", Time.NowMs() + limit + Hub.ROUTED_SLACK_MS)
+        } else if (kind = "res." && corr != "") {
+            key := to "`n" corr
+            rec := this._routed.Get(key, "")
+            if (IsObject(rec) && rec["to"] = from)
+                this._routed.Delete(key)
+        }
+    }
+
+    ; The connection of name has ended (it was read to its end): every request it has not answered gets peer_gone,
+    ; sent by the hub to its sender, if the sender is still connected.
+    _FailRouted(name, reason) {
+        keys := []
+        for key, rec in this._routed
+            if (rec["to"] = name)
+                keys.Push(key)
+        if (keys.Length = 0)
+            return
+        for key in keys {
+            rec := this._routed[key]
+            this._routed.Delete(key)
+            this.goneAnswers += 1
+            sender := this._links.Get(rec["from"], "")
+            if (IsObject(sender))
+                this._Reply(sender, rec["type"], rec["id"], Map("ok", false, "error", Map("code", ErrCode.PEER_GONE
+                    , "message", "'" name "' is gone (" reason ") before it answered " rec["type"])))
+        }
+        Log.Write("a1", "hub", keys.Length " open request(s) to '" name "' answered with peer_gone")
+    }
+
+    ; The sender has gone: nobody waits for the answers of its requests any more.
+    _ForgetRoutedFrom(name) {
+        keys := []
+        for key, rec in this._routed
+            if (rec["from"] = name)
+                keys.Push(key)
+        for key in keys
+            this._routed.Delete(key)
     }
 
     _Local(link, msg) {

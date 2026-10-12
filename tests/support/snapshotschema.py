@@ -68,7 +68,8 @@ def check_snapshot(snap, role):
         for i, child in enumerate(snap["children"]):
             _check_fields(child, {"name": str, "role": str, "state": str, "pid": int, "restarts": int,
                                   "startedAt": str, "output": list}, "snapshot.children[%d]" % i)
-        _check_fields(snap["hub"], {"links": list, "droppedAnswers": int, "pending": int}, "snapshot.hub")
+        _check_fields(snap["hub"], {"links": list, "droppedAnswers": int, "pending": int, "routedOpen": int,
+                                    "goneAnswers": int}, "snapshot.hub")
         for i, link in enumerate(snap["hub"]["links"]):
             _check_fields(link, {"name": str, "pid": int, "queuedFrames": int, "queuedBytes": int, "topics": list},
                           "snapshot.hub.links[%d]" % i)

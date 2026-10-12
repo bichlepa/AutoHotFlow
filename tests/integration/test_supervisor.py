@@ -286,6 +286,75 @@ def test_frames_outside_the_canonical_form_are_routed_with_the_real_sender(start
     assert sup.wait_exit(timeout=20) == EXIT_OK, sup.text()
 
 
+PEER_GONE_BUDGET_S = scaled(1.0)      # F-40 (WI-34): an open request to a client that is gone ends within 1 s
+OPEN_REQUEST_S = 10.0                 # the own deadline of these requests: far above the budget
+
+
+def test_open_request_to_a_client_that_goes_away_is_answered_with_peer_gone_at_once(started, session_id):
+    # F-40 (WI-34): the hub forwards a cmd.* and the target goes away before it answers. Before, nobody answered and
+    # the sender waited for its own deadline (the engine: 30 s for storage). Now the hub answers with peer_gone when
+    # the connection of the target ends. An answer that was given before is not followed by a second one.
+    sup = started()
+    a = connect(sup.pipe, "a")
+    b = connect(sup.pipe, "b")
+    try:
+        one = a.send("b", "cmd.test.one", {}, timeout_ms=int(OPEN_REQUEST_S * 1000))
+        asked = b.wait_event("cmd.test.one", timeout=5)
+        b.reply(asked, {"ok": True})
+        assert a._wait_answer(one, 5)["payload"]["ok"] is True
+        two = a.send("b", "cmd.test.two", {"n": 2}, timeout_ms=int(OPEN_REQUEST_S * 1000))
+        b.wait_event("cmd.test.two", timeout=5)          # b has the request and goes away without an answer
+        b.close()
+        t0 = time.perf_counter()
+        try:
+            answer = a._wait_answer(two, OPEN_REQUEST_S)
+        except Exception as e:          # AhfTimeout: the old behaviour
+            pytest.fail("no answer within the own deadline of %.0f s: %s\n%s" % (OPEN_REQUEST_S, e, sup.text()))
+        elapsed = time.perf_counter() - t0
+        print("\nMEASURE open request answered after the target went away: %.3f s" % elapsed)
+        assert answer["type"] == "res.test.two" and answer["from"] == "supervisor", answer
+        assert answer["payload"]["ok"] is False and answer["payload"]["error"]["code"] == "peer_gone", answer
+        assert elapsed <= PEER_GONE_BUDGET_S, "peer_gone took %.2f s" % elapsed
+        time.sleep(0.5)
+        assert one not in a._answers and two not in a._answers, "a second answer arrived: %s" % a._answers
+    finally:
+        a.close()
+        b.close()
+    py = connect(sup.pipe, "py")
+    request_ok(py, "supervisor", "cmd.app.exit", {})
+    py.close()
+    assert sup.wait_exit(timeout=20) == EXIT_OK, sup.text()
+
+
+def test_open_request_to_a_child_whose_process_dies_is_answered_with_peer_gone_at_once(started, session_id):
+    # F-40 (WI-34): the target is a role process that cannot answer (frozen) and is then killed, as a crashing
+    # storage or engine would be. The sender learns it from the hub within 1 s of the death, not at its deadline.
+    sup = started("--start=echo:a", "--test-roles")
+    py = connect(sup.pipe, "py")
+    try:
+        ready = wait_ready(py, ("echo:a",))
+        assert ready is not None, sup.text()
+        pid = ready["echo:a"][1]
+        psutil.Process(pid).suspend()
+        asked = py.send("echo:a", "cmd.test.echo", {"x": 1}, timeout_ms=int(OPEN_REQUEST_S * 1000))
+        time.sleep(0.3)                                   # the request lies in the pipe of the frozen role
+        t_kill = time.perf_counter()
+        psutil.Process(pid).kill()
+        try:
+            answer = py._wait_answer(asked, OPEN_REQUEST_S)
+        except Exception as e:
+            pytest.fail("no answer within the own deadline of %.0f s: %s\n%s" % (OPEN_REQUEST_S, e, sup.text()))
+        elapsed = time.perf_counter() - t_kill
+        assert answer["payload"]["error"]["code"] == "peer_gone", answer
+        assert not alive(pid)
+        print("\nMEASURE open request answered after the death of the target: %.3f s" % elapsed)
+        assert elapsed <= PEER_GONE_BUDGET_S, "peer_gone %.2f s after the death" % elapsed
+    finally:
+        request_ok(py, "supervisor", "cmd.app.exit", {})
+        py.close()
+        assert sup.wait_exit(timeout=20) == EXIT_OK, sup.text()
+
+
 # --- single instance -------------------------------------------------------------------------------
 
 def test_second_instance_forwards_the_command_and_creates_no_hub(started, session_id):

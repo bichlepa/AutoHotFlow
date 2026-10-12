@@ -146,6 +146,9 @@ TestRun.Case("Shutdown: a process that ended by itself at the deadline does not 
 TestRun.Case("Shutdown: a process that has to be terminated at the deadline makes exit code 5 (WI-33)", TerminatedAtTheDeadlineIsAForcedExit)
 TestRun.Case("Hub: a request ends at its limit once, by the tick, and an answer in time wins (WI-33)", HubRequestEndsAtItsLimit)
 TestRun.Case("Hub: a stand-still moves the limit of a request and the hello time of a connection (WI-33)", HubShiftMovesTheLimits)
+TestRun.Case("Hub: a forwarded request is forgotten after its deadline, moves with a stand-still and ends only with the answer of its target (F-40, WI-34)", RoutedRequestEndsWithItsAnswerOrDeadline)
+TestRun.Case("Hub: when the target goes, each open request gets one peer_gone and an answered one none (F-40, WI-34)", GoneTargetAnswersItsOpenRequests)
+TestRun.Case("Hub: the requests of a sender that has gone are forgotten (F-40, WI-34)", RequestsOfAGoneSenderAreForgotten)
 TestRun.Case("Children: the end of the engine ends its workers at once, as a planned end with the reason engine gone (E10, WI-33)", EngineEndEndsTheWorkers)
 TestRun.Case("Children: a worker is not ended when the engine ends during the shutdown (E10, WI-33)", EngineEndDuringShutdownKeepsTheWorkers)
 TestRun.Case("Heartbeat: a child without pong for 6 s of regular ticks is hung", SilentChildIsHung)
@@ -577,6 +580,79 @@ HubShiftMovesTheLimits() {
     h.Tick(t + 8000 + 5200)
     Assert.Equal(answers.Length, 1)
     Assert.True(anon.closed)
+}
+
+; --- requests between clients (F-40, WI-34) ---------------------------------------------------------------------------
+
+; A connection that keeps what is sent to it.
+class RecordConn {
+    __New() {
+        this.frames := []
+    }
+    SendFrame(text) {
+        this.frames.Push(text)
+        return true
+    }
+    Close() {
+    }
+}
+
+AddHubLink(h, name, conn) {
+    h._links[name] := Map("name", name, "conn", conn, "pid", 1, "hwnd", 0, "topics", Map(), "helloAt", 0)
+}
+
+RoutedRequestEndsWithItsAnswerOrDeadline() {
+    h := NewHubWithClient()
+    AddHubLink(h, "st", SinkConn())
+    t := Time.NowMs()
+    h._NoteRouted("ui", "st", "cmd.storage.flow.read", "ui#1", "", 1000)
+    Assert.Equal(h._routed.Count, 1)
+    h.Shift(8000)                                    ; a stand-still of 8 s
+    h.Tick(t + 8000 + 1500)
+    Assert.Equal(h._routed.Count, 1, "the deadline plus the slack has not passed after the shift")
+    h.Tick(t + 8000 + 1000 + Hub.ROUTED_SLACK_MS + 300)
+    Assert.Equal(h._routed.Count, 0, "forgotten after its deadline, without an answer of the hub")
+    h._NoteRouted("ui", "st", "cmd.x.y", "ui#2", "", 5000)
+    h._NoteRouted("other", "ui", "res.x.y", "other#1", "ui#2", 0)
+    Assert.Equal(h._routed.Count, 1, "an answer from someone else than the target does not end it")
+    h._NoteRouted("st", "ui", "res.x.y", "st#1", "ui#2", 0)
+    Assert.Equal(h._routed.Count, 0, "the answer of the target ends it")
+    h._NoteRouted("ui", "st", "evt.x.y", "ui#3", "", 0)
+    Assert.Equal(h._routed.Count, 0, "events are not requests")
+    h._NoteRouted("ui", "st", "cmd.x.z", "ui#4", "", 0)
+    Assert.True(h._routed["ui`nui#4"]["dueAt"] >= Time.NowMs() + Hub.ROUTED_DEFAULT_MS, "without timeoutMs: the default")
+}
+
+GoneTargetAnswersItsOpenRequests() {
+    h := NewHubWithClient()
+    ui := RecordConn()
+    AddHubLink(h, "ui", ui)
+    AddHubLink(h, "st", SinkConn())
+    h._NoteRouted("ui", "st", "cmd.storage.flow.read", "ui#1", "", 30000)
+    h._NoteRouted("ui", "st", "cmd.storage.flow.read", "ui#2", "", 30000)
+    h._NoteRouted("st", "ui", "res.storage.flow.read", "st#1", "ui#1", 0)    ; ui#1 was answered before the end
+    h._FailRouted("st", "peer_closed")
+    Assert.Equal(ui.frames.Length, 1, "one peer_gone, only for the open request")
+    m := Message.Parse(ui.frames[1])
+    Assert.Equal(m.type, "res.storage.flow.read")
+    Assert.Equal(m.corr, "ui#2")
+    Assert.Equal(m.to, "ui")
+    Assert.Equal(m.payload["error"]["code"], ErrCode.PEER_GONE)
+    Assert.True(!m.payload["ok"])
+    Assert.Equal(h._routed.Count, 0)
+    Assert.Equal(h.goneAnswers, 1)
+    h._FailRouted("st", "peer_closed")
+    Assert.Equal(ui.frames.Length, 1, "nothing twice")
+}
+
+RequestsOfAGoneSenderAreForgotten() {
+    h := NewHubWithClient()
+    AddHubLink(h, "st", SinkConn())
+    h._NoteRouted("ui", "st", "cmd.x.y", "ui#1", "", 30000)
+    h._NoteRouted("st", "ui", "cmd.x.y", "st#1", "", 30000)
+    h._ForgetRoutedFrom("ui")
+    Assert.Equal(h._routed.Count, 1, "only the requests of the sender")
+    Assert.True(h._routed.Has("st`nst#1"))
 }
 
 ; --- the workers end with the engine (E10, WI-33) ---------------------------------------------------------------------
