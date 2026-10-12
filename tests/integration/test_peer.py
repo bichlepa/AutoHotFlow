@@ -119,7 +119,7 @@ def test_hello_wakes_the_hub_window_when_hub_hwnd_is_given(procs, ahk_exe, datad
             srv = probe(procs, ahk_exe, datadir, pipe_name, "srv", "serve", "hubHwnd=%d" % hwnd)
             srv.wait_record("ready", timeout=15)
             assert hub.wait_received(lambda m: m.get("type") == "sys.hello", timeout=5) is not None
-            woke = wait_for_wake(hwnd, timeout=2.0)
+            woke = wait_for_wake(hwnd, timeout=scaled(2.0))
             assert woke is not None, "no WM_AHF_WAKE reached the hub window after sys.hello"
             print("\nwake message seen %.2f ms after the hub polled" % (woke * 1000))
     finally:

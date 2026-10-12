@@ -2,6 +2,8 @@
 
 import time
 
+from support.timing import scaled
+
 from test_supervisor import alive, event, wait_ready, watch_for
 from test_worker_pool import READY_S, ask, clients, started  # noqa: F401  (fixtures)
 
@@ -38,6 +40,6 @@ def test_worker_that_blocks_longer_than_the_pong_timeout_is_not_hung_while_it_ha
     assert not watch.find(event("evt.process.crashed", name=name))
     assert alive(pid)
     # idle again: the heartbeat watches it as before (pings are answered)
-    pong = ask(engine, name, "sys.ping", {"n": 1}, timeout=3.0)
+    pong = ask(engine, name, "sys.ping", {"n": 1}, timeout=scaled(3.0))
     assert pong["n"] == 1
     watch.stop()

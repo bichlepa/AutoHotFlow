@@ -20,6 +20,7 @@ from faultkit import (CRASH_BUDGET_S, FULL_CHAIN, REQUEST_BUDGET_S, STUB_OPTS, R
                       event, repeat_ids, request_ok, wait_until, write_flow)
 
 from support import pipenames
+from support.timing import scaled
 from faultfixtures import chains  # noqa: F401  (fixture)
 
 pytestmark = pytest.mark.fault
@@ -53,7 +54,7 @@ def test_killed_engine_is_reported_restarted_and_the_others_are_untouched(chains
     new_pid, t_ready = chain.wait_restarted_ready("engine", pid)
     print("\nMEASURE engine ready again %.3f s after its death" % (t_ready - t_death))
     assert new_pid != pid
-    restarted = chain.rec.wait(event("evt.process.restarted", name="engine"), timeout=5)
+    restarted = chain.rec.wait(event("evt.process.restarted", name="engine"), timeout=scaled(5))
     assert restarted and restarted[1]["payload"]["attempt"] == 1, chain.sup.text()
     # the restarted engine announces itself (PROTOCOL 4.3); a new epoch tells the clients to resync
     announced = chain.rec.wait(lambda m: m.get("type") == "evt.engine.restarted", timeout=15)
@@ -73,7 +74,7 @@ def test_killed_storage_is_restarted_and_the_engine_keeps_running(chains, round_
     assert msg["payload"]["restart"], msg
     new_pid, t_ready = chain.wait_restarted_ready("storage", pid)
     print("\nMEASURE storage ready again %.3f s after its death" % (t_ready - t_death))
-    restarted = chain.rec.wait(event("evt.process.restarted", name="storage"), timeout=5)
+    restarted = chain.rec.wait(event("evt.process.restarted", name="storage"), timeout=scaled(5))
     assert restarted and restarted[1]["payload"]["attempt"] == 1
     # the restarted storage answers its requests again
     answer = request_ok(chain.obs, "storage", "cmd.storage.flows.list", {}, timeout=5)

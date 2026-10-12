@@ -21,7 +21,7 @@ pytestmark = pytest.mark.fault
 
 EXIT_TOO_MANY_ERRORS = 6        # Role.EXIT_TOO_MANY_ERRORS
 THRESHOLD = 20                  # Role.ERROR_LIMIT: more than 20 unhandled errors within 60 s end the role
-RESTART_READY_S = 15.0          # one restart of the crasher is ready again within this time (scaled() in the parallel run)
+RESTART_READY_S = 15.0          # one restart of the crasher is ready again within this time (the helper applies scaled())
 HANDLE_SLACK = 6                # handles: noise of one-off allocations between two measurements
 
 
@@ -168,7 +168,7 @@ def test_the_handles_of_the_supervisor_stay_flat_over_50_restarts(chains, datadi
     for n in range(1, 51):
         request_ok(chain.obs, "crasher", "cmd.test.arm", {})
         try:
-            new, _ = chain.wait_restarted_ready("crasher", old, timeout=scaled(RESTART_READY_S))
+            new, _ = chain.wait_restarted_ready("crasher", old, timeout=RESTART_READY_S)
         except AssertionError as e:
             # F-42: the message of the helper held an empty supervisor text; the log file has the evidence.
             tail = log_text(datadir)[-3000:]

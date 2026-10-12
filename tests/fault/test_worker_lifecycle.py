@@ -13,6 +13,7 @@ import time
 import psutil
 import pytest
 
+from support.timing import scaled
 from faultkit import alive, event, request_ok, wait_until, write_flow
 
 from faultfixtures import chains  # noqa: F401  (fixture)
@@ -57,7 +58,7 @@ def start_flow(chain, flow):
 
 def ended(chain, instance, timeout=10.0):
     got = chain.rec.wait(lambda m: m.get("type") == "evt.instance.ended" and m["payload"].get("instanceId") == instance,
-                         timeout=timeout)
+                         timeout=scaled(timeout))
     assert got is not None, "instance %s did not end:\n%s" % (instance, chain.sup.text())
     return got
 
@@ -85,7 +86,7 @@ def run_echo_ok(chain, flow="wecho"):
 
 
 def exited_killed(chain, name, timeout):
-    return chain.rec.wait(event("evt.process.exited", name=name, reason="killed"), timeout=timeout)
+    return chain.rec.wait(event("evt.process.exited", name=name, reason="killed"), timeout=scaled(timeout))
 
 
 ECHO = {"wecho": ("Action_TestEchoWorker", None)}
@@ -250,7 +251,7 @@ def test_five_failures_within_a_minute_block_the_pool(chains, datadir):
         name, info = found
         killed.append(name)
         psutil.Process(info["pid"]).kill()
-        assert chain.rec.wait(event("evt.process.crashed", name=name), timeout=5) is not None
+        assert chain.rec.wait(event("evt.process.crashed", name=name), timeout=scaled(5)) is not None
     # the fifth failure blocks the pool: no sixth worker, a worker element ends with "worker not available"
     time.sleep(1.5)
     assert not live_workers(chain), live_workers(chain)
@@ -294,7 +295,7 @@ ENGINE_GONE_BUDGET_S = 1.5          # the aim is 1 s (WI-33); the margin is for 
 
 
 def exited_engine_gone(chain, name, timeout):
-    return chain.rec.wait(event("evt.process.exited", name=name, reason="engine gone"), timeout=timeout)
+    return chain.rec.wait(event("evt.process.exited", name=name, reason="engine gone"), timeout=scaled(timeout))
 
 
 def test_engine_killed_during_a_hanging_job_ends_the_worker_at_once_and_the_new_engine_builds_the_pool(chains, datadir):
