@@ -166,6 +166,102 @@ Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge kor
 - **Status:** verifiziert (`tests/ahk/json.test.ahk` „Json.True and Json.False are distinct singletons“, `tests/ahk/message.test.ahk`)
 - **Quelle:** `src/core/Json.ahk`, `src/core/ipc/Message.ahk` (`_WirePayload`), `doc/PROTOKOLL.md` Abschnitt 2
 
+### `Round(x, 1)` liefert einen String
+
+- **Problem:** Ein Messwert mit `Round(ms, 1)` landete in der JSON-Datei als `"14.1"` (String), der Python-Test verglich ihn mit einer Zahl.
+- **Richtig:** `Round(x, n)` mit `n > 0` ist ein `String`, `Round(x)` ein `Integer`. Für eine Zahl `Round(x, 1) + 0` (Float) schreiben.
+- **Status:** verifiziert (`Type(Round(3.14159, 1))` gibt `String`)
+
+### Negative Länge bei `SubStr`: Suffix zählen
+
+- **Problem:** Die Prüfung auf das Ende `_old.txt` nutzte `SubStr(path, -7)`. Das Suffix hat aber 8 Zeichen.
+- **Richtig:** `SubStr(path, -8) = "_old.txt"`. Allgemein: die Länge des Suffixes aus dem Literal zählen, nicht schätzen.
+- **Status:** vermutet (beim Lesen gefunden und vor dem ersten Lauf korrigiert). Der Zweig "schon `_old`" ist nicht gezielt getestet, die Rotation selbst ist getestet (`test_log_file_over_100_kb_...`).
+
+### `FileRead` mit "UTF-8" und BOM
+
+- **Problem:** v1-Variablendateien beginnen mit einem UTF-8-BOM. Ein BOM-Zeichen am Anfang bricht `Json.Parse` und den Vergleich mit Python.
+- **Richtig:** Das Zeichen `Chr(0xFEFF)` am Anfang nach dem Lesen entfernen (`AtomicFile.ReadText`).
+- **Status:** verifiziert (`test_v1_variables_are_read_as_stored`, `test_variable_round_trip_...`). Ob AHK das BOM bei `"UTF-8"` selbst entfernt, ist nicht geprüft; der eigene Schritt macht es unabhängig davon.
+
+### `===` gibt es nicht, `ObjPtr("")` wirft
+
+- **Problem:** Der Vergleich zweier Objekte auf Identität mit `===` ist ein Syntaxfehler ("Missing operand"). `ObjPtr` auf einen leeren String wirft "Expected an object".
+- **Richtig:** `IsObject(a) && ObjPtr(a) = ObjPtr(b)`. Das Skript meldet den Fehler beim Laden (stderr), nicht erst beim Lauf.
+- **Status:** verifiziert
+- **Quelle:** `src/engine/Executor.ahk` (`_DispatchWorker`)
+
+### Klasse aus einer Datei nicht eingebunden: Dialog "local variable ... never assigned"
+
+- **Problem:** `src/manager/StubManager.ahk` rief `StubGui(this)` auf, die Datei `StubGui.ahk` war aber nicht eingebunden. AHK meldet das beim Laden als Warnung, die einen Dialog öffnet: "Warning: This local variable appears to never be assigned a value. Specifically: StubGui". Ohne Wächter hängt der Prozess.
+- **Falsch:** Klasse in einer zweiten Datei verwenden, ohne `#Include` in der Datei, die sie nutzt.
+- **Richtig:** Jede Klasse, die eine Datei benutzt, mit `#Include` dieser Datei einbinden. Dialoge eines Rollenprozesses stehen unter `%TEMP%\ahf_dialogs\` (Text und PNG).
+- **Status:** verifiziert (Dialog erfasst beim Start der Rolle, nach dem Einfügen des `#Include` kein Dialog mehr, Probelauf und `tests/e2e/test_ui_stub.py` grün)
+- **Quelle:** `src/manager/StubManager.ahk`
+
+### Eingebaute Klassennamen von AHK v2 nicht überschreiben
+
+- **Problem:** `class TimeoutError extends AhfError` meldet beim Laden "This class declaration conflicts with an existing Class" und blockiert mit Dialog.
+- **Richtig:** Eigene Namen mit Präfix (`AhfTimeoutError`). Eingebaut sind u. a. `Error`, `TimeoutError`, `ValueError`, `TypeError`, `OSError`, `MemberError`, `PropertyError`, `MethodError`, `IndexError`, `KeyError`, `UnsetError`, `TargetError`, `MemoryError`, `ZeroDivisionError`.
+- **Status:** verifiziert (`TimeoutError`), Rest der Liste aus der AHK-Doku, nicht einzeln geprüft.
+
+### Code auf Dateiebene läuft vor `AhfMain` und damit vor jedem `OnError` (WI-22)
+
+- **Problem:** Die Elementdateien rufen am Dateiende `ElementRegistry.Register(...)` auf. AHK führt das beim Laden in Textreihenfolge aus, also vor `AhfMain()`. Ein Fehler dort (doppelte Klasse, ungültiger `Mode`) zeigte beim Start einen Fehlerdialog. `/ErrorStdOut` gilt nur für Ladefehler (Syntax), nicht für Laufzeitfehler in diesem Code. Reproduziert mit einem Testelement: `tools/ahkrun.py` meldete Exit 97 (Dialog abgefangen).
+- **Richtig:** `OnError(Handler)` als erste ausführbare Anweisung des Einstiegs, **vor** den `#Include`-Zeilen (Funktionen sind vorher bekannt, der Handler darf weiter unten stehen). Der Handler schreibt auf stderr und beendet den Prozess (`ExitApp(1)`): Ein Prozess mit kaputter Registrierung soll nicht weiterlaufen. Vor dem Start von Supervisor oder Rolle wird er mit `OnError(Handler, 0)` wieder entfernt.
+- **Grund für das Entfernen:** Mehrere `OnError`-Handler werden nacheinander aufgerufen, und ein Handler, der 1 liefert, hält die späteren an [vermutet, aus der AHK-Dokumentation erinnert, nicht nachgestellt]. Der Handler des Einstiegs würde sonst den der Rolle verdecken.
+- **Status:** Verhalten verifiziert (`tests/integration/test_entry.py::test_error_while_loading_files_shows_no_dialog_and_ends_with_exit_1`, vorher Exit 97, nachher Exit 1 mit Meldung auf stderr). Die Aussage über die Reihenfolge der Handler ist vermutet.
+- **Quelle:** `src/AutoHotFlow.ahk`, `tests/integration/helpers/RegisterFailure.ahk`
+
+### Der 32-Bit-Interpreter lädt das Skript bis zur ersten Prüfung ohne Fehler (WI-22)
+
+- **Problem:** Wer den Einstieg mit `AutoHotkey32.exe` startet, bekam vorher einen laufenden Supervisor (Test `test_the_32_bit_interpreter_is_rejected_with_exit_2_and_no_dialog` lief in den Timeout). Pointer-Größen in `DllCall`-Strukturen stimmen dann nicht mehr.
+- **Richtig:** `if (A_PtrSize != 8)` als erste Anweisung vor den `#Include`-Zeilen, Meldung auf stderr, `ExitApp(2)`. Der Test wählt den Interpreter über `AHF_AHK2_EXE` (`tools/ahkrun.py`) und wird übersprungen, wenn `AutoHotkey32.exe` fehlt.
+- **Status:** verifiziert (rot vorher: Timeout, grün nachher: Exit 2 ohne Dialog).
+- **Quelle:** `src/AutoHotFlow.ahk`, `tests/integration/test_entry.py`
+
+### Eine Variable `children` verdeckt die Klasse `Children`
+
+- **Problem:** In einer Testfunktion `children := Children(...)` schlug mit "This local variable has not been assigned a value" fehl. Bezeichner sind in AHK v2 nicht von der Schreibweise abhängig, die lokale Variable verdeckt die Klasse (wie bei `role`/`Role`, siehe Einstieg).
+- **Richtig:** Variablen anders nennen (`kids`). Die Attribute `this.children` sind nicht betroffen, nur freie Variablen.
+- **Status:** verifiziert
+- **Quelle:** `tests/ahk/supervisor_tick.test.ahk`
+
+### Ein Closure ohne erfasste Variable ist immer dasselbe Funktionsobjekt (WI-23)
+
+- **Problem:** `loop 21 { SetTimer(() => Werfe(), -10 * A_Index) }` startete nur **einen** Timer. Alle Closures ohne erfasste Variable sind dasselbe Funktionsobjekt, und `SetTimer` identifiziert einen Timer über das Objekt: Jeder Aufruf setzte den Timer nur neu (Testrolle `echo`, `cmd.test.throwlater`, 21 Fehler erwartet, 1 gesehen).
+- **Richtig:** Jede Closure erfasst etwas Eigenes, z. B. die Nummer: `static MakeFn(n) => () => Werfe(n)` und `SetTimer(MakeFn(A_Index), -10 * A_Index)`.
+- **Status:** verifiziert (Scratch-Skript mit `tools/ahkrun.py`: 1 statt 5 Fehler, mit Nummer 5 von 5; `tests/fault/test_diagnose.py::test_too_many_unhandled_errors_end_the_role_with_exit_6`).
+- **Quelle:** `tests/integration/helpers/EchoRole.ahk`
+
+### Ein Parameter `log` verdeckt die Klasse `Log` (WI-23)
+
+- **Problem:** `AddError(from, payload, log := true)` und dann `Log.Write(...)` warf "This value of type Integer has no method named Write". Bezeichner sind nicht von der Schreibweise abhängig, der Parameter verdeckt die Klasse (wie `role`/`Role`, `children`/`Children`). Der Fehler zeigte sich nur als Logzeile des Hubs "no handler for evt.diag.error ... MethodError", weil der Dispatcher Ausnahmen von Handlern in ein Antwortobjekt verpackt.
+- **Richtig:** Parameter und Variablen nicht wie eine Klasse nennen (`doLog`). Bei einem Handler, der "nichts tut": zuerst die Logzeile "no handler for" des Hubs lesen, sie enthält die Fehlermeldung des Handlers.
+- **Status:** verifiziert
+- **Quelle:** `src/supervisor/DiagLog.ahk`
+
+### Eine Variable `hub` verdeckt die Klasse `Hub` (WI-24)
+
+- **Problem:** `hub := Hub("x", "y")` in einem Testskript: Ladefehler "This Class cannot be used as an output variable. Specifically: Hub". Bezeichner unterscheiden Groß- und Kleinschreibung nicht (wie bei `log`/`Log`, `role`/`Role`).
+- **Richtig:** Anders nennen (`theHub`).
+- **Status:** verifiziert
+- **Quelle:** `tests/ahk/helpers/hub_frame_cost.ahk`
+
+### Eine Methode der Basisklasse wird still von einer gleichnamigen Methode der Unterklasse ersetzt (WI-28)
+
+- **Problem:** `Role` bekam die Methode `_CmdSnapshot` für `cmd.diag.snapshot`. Die Engine hat schon eine private Methode `_CmdSnapshot` (für `cmd.engine.snapshot`). Die Methode der Unterklasse ersetzt die der Basisklasse ohne Warnung: Der Aufruf `Role.Current._CmdSnapshot(msg)` lief in die Engine-Methode, die Antwort enthielt `epoch`, `flows` und kein `snapshot`. Die anderen Rollen antworteten richtig, nur die Engine nicht.
+- **Falsch:** In einer Basisklasse eine private Methode mit einem kurzen, naheliegenden Namen anlegen, den eine Unterklasse schon nutzt.
+- **Richtig:** Eindeutiger Name (`_CmdDiagSnapshot`). Vor dem Anlegen einer Methode in `Role` in allen Rollen nach dem Namen suchen (`grep -n "_Name(" src`). Ein Test, der jede Rolle fragt (`tests/fault/test_snapshot.py`), findet so etwas sofort.
+- **Status:** verifiziert (Test rot mit `KeyError: 'snapshot'` für die Engine, grün nach der Umbenennung)
+
+### Eine lokale Variable `role` verdeckt die Klasse `Role` (WI-28)
+
+- **Problem:** `Debug._Send` begann mit `role := Role.Current`. Namen sind nicht von der Groß-/Kleinschreibung abhängig, `role` ist damit eine lokale Variable, die die Klasse `Role` in der ganzen Funktion verdeckt. Die Zeile warf `UnsetError: This local variable has not been assigned a value`, `Debug.Dump` fing den Fehler (es wirft nie) und meldete nur `false`. Der Unit-Test mit einem Fake-Peer zeigte es sofort; ohne ihn wäre `Dump` still wirkungslos geblieben.
+- **Falsch:** `role := Role.Current` (ebenso `hub`, `log`, `children`, siehe die Einträge zu `Hub`, `Log`, `Children`).
+- **Richtig:** Ein anderer Name (`owner := Role.Current`). Eine Funktion, die "nie wirft", braucht einen Test, der den Erfolgsweg prüft, nicht nur, dass nichts geworfen wird.
+- **Status:** verifiziert (`tests/ahk/core_debug.test.ahk`)
+
 ## Objekte, Maps, Arrays
 
 ### Map mit `CaseSense "Off"` behält die Schreibweise der ersten Einfügung
@@ -212,6 +308,28 @@ Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge kor
 - **Status:** verifiziert (Sleep mit Duration `200` und Unit `Milliseconds` in `tests/integration/test_engine.py`). Nicht geprüft: ob `Map` mit `HasProp` für Schlüssel genauso falsch antwortet.
 - **Quelle:** `src/engine/Executor.ahk` (`_Params`)
 
+### Klonen erst nach der Änderung: der Klon erbt sie
+
+- **Problem:** `Scheduler.Advance` klonte den Thread für die zweite Verbindung, nachdem der Thread für die erste Verbindung auf das Loop-Element gesetzt und der Loop-Stack gepusht war. Der Klon erbte den Push (Tiefe 1 statt 0). Außerdem wurde der Stack je Verbindung zurückgenommen, die zweite Rücknahme warf.
+- **Richtig:** Zustand einmal herstellen (Pop), dann alle Klone anlegen, danach erst jedem Ziel seine Änderung geben (Element, Push).
+- **Status:** verifiziert (Tests `Advance: branching into a loop pushes only the loop thread` und `Loop: two tail connections pop the loop stack once` waren vor der Korrektur rot)
+- **Quelle:** `src/engine/core/Scheduler.ahk`
+
+### Map zählt nach Schlüsseln, nicht nach Einfügereihenfolge: FIFO braucht ein Array
+
+- **Problem:** Die Instanzen des Executors liegen in einer `Map` (`inst-<n>`). Die Aufzählung ist nach Schlüssel sortiert, nicht nach dem Start. Für die Reihenfolge der Richtlinie `wait` (FIFO) taugt sie nicht.
+- **Richtig:** Eine eigene Warteschlange (`Array` je Flow, `Push` am Ende, `RemoveAt(1)` am Anfang).
+- **Status:** Sortierung nach Schlüssel verifiziert (Doku und Code gelesen); dass `inst-10` vor `inst-2` einsortiert wird, ist vermutet (nicht gemessen).
+- **Quelle:** `src/engine/Executor.ahk` (`_waiting`)
+
+### Worker-Pool: `Map.Delete` auf einen fehlenden Schlüssel wirft
+
+- **Problem:** `WorkerBridge.OnProcessEvent` rief `this._earlyReady.Delete(name)` für einen Namen, der nie eingetragen war. `Map.Delete` wirft in AHK v2 `UnsetItemError` ("Item has no value"). Der Handler des Peers fing den Fehler und loggte ihn (`handler for evt.process.crashed failed`), der Absturz des Workers blieb ohne Wirkung: das Element hing, bis die Instanz gestoppt wurde.
+- **Falsch:** `m.Delete(key)` ohne Prüfung, wenn der Schlüssel fehlen kann.
+- **Richtig:** `if (m.Has(key)) m.Delete(key)`. Wer in Ereignishandlern löscht, prüft zuerst.
+- **Status:** verifiziert (Test `test_killed_worker_ends_its_element_with_worker_crashed_and_the_pool_has_a_replacement` schlug mit genau diesem Log fehl, nach der Korrektur grün)
+- **Quelle:** `src/engine/WorkerBridge.ahk` (`OnProcessEvent`)
+
 ## Fehlerbehandlung
 
 ### Statische Methode ist kein OnError-Callback
@@ -246,6 +364,13 @@ Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge kor
 - **Richtig:** Die Funktion für `OnError` gibt `1` zurück. Der Fehler ist dann behandelt, es erscheint kein Dialog, und der Prozess läuft weiter. Getestet: Ein Timer wirft `ValueError`, danach beantwortet die Rolle weitere Befehle, und der Fehler steht im Log (`test_error_in_a_timer_is_logged_and_the_role_keeps_running`).
 - **Status:** verifiziert (Test grün). Nicht geprüft: andere Rückgabewerte (z. B. 0) und das Verhalten des Threads, der den Fehler warf, bei anderen Auslösern als Timer.
 - **Quelle:** `src/core/Role.ahk` (`Role._OnUnexpected`)
+
+### OnError-Handler und `mode` (WI-23)
+
+- **Problem:** Der zweite Parameter von `OnError` ist die Art des Fehlers: `"Return"` (Fehler in einer Funktion mit Rückgabe), `"Exit"` (der Thread würde beendet; so kommt ein Fehler aus einem Timer) oder `"ExitApp"`. Rückgabe 1 verhindert den Dialog und das Beenden des Threads.
+- **Richtig:** `Role._OnUnexpected` zählt jeden Fehler, meldet ihn und gibt 1 zurück, damit die Rolle weiterläuft; bei Überschreitung der Schwelle beendet `ExitApp(6)` im Handler den Prozess.
+- **Status:** verifiziert für `Exit` (Timer); `Return` und `ExitApp` nicht einzeln getestet.
+- **Quelle:** `src/core/Role.ahk`
 
 ## Prozesse, Pipes, Nachrichten
 
@@ -314,13 +439,8 @@ Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge kor
 - **Status:** verifiziert (60 von 60 Läufen eines Schleifen-Skripts grün, vorher Ausfall nach 10 bis 40 Läufen; 40 Einzelläufe und 3 Gesamtläufe grün)
 - **Quelle:** `tests/support/winpipe.py` (WI-01), behoben im Zuge von WI-04
 
-### `Round(x, 1)` liefert einen String
-
-- **Problem:** Ein Messwert mit `Round(ms, 1)` landete in der JSON-Datei als `"14.1"` (String), der Python-Test verglich ihn mit einer Zahl.
-- **Richtig:** `Round(x, n)` mit `n > 0` ist ein `String`, `Round(x)` ein `Integer`. Für eine Zahl `Round(x, 1) + 0` (Float) schreiben.
-- **Status:** verifiziert (`Type(Round(3.14159, 1))` gibt `String`)
-
 ### Stand-in-Hub ohne Weckruf: jede Nachricht wartet 250 ms
+
 - **Problem:** `tests/support/pyhub.py` leitet Nachrichten weiter, ohne den Empfänger zu wecken. Der AHK-Peer verarbeitet sie dann erst beim Fallback-Timer. Eine Anfrage mit Antwort kostet dann etwa 250 ms je Richtung, 10.000 Anfragen also rund 40 Minuten.
 - **Falsch:** `PyHub` unverändert als Hub für Peer-Tests nutzen.
 - **Richtig:** `WakingHub(PyHub)` in `tests/integration/test_peer.py` weckt nach jeder Nachricht die Fenster aller Verbindungen mit bekanntem Fenster (`rawpipe.wake`). Das ist die Pflicht des Senders aus PROTOKOLL 1. `pyhub.py` selbst blieb unverändert (liegt außerhalb des Pakets).
@@ -328,6 +448,7 @@ Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge kor
 - **Quelle:** `tests/integration/test_peer.py`, `work_items/phase2/WI-04-ipc-pipe.md`
 
 ### Handler-Rückgabe: nur ein leerer Wert gilt als "nichts zurückgegeben"
+
 - **Problem:** `Dispatcher.Invoke` behandelte jede Nicht-Objekt-Rückgabe als "keine Rückgabe". Ein Handler, der `"text"` zurückgab, bekam `ok:true` statt eines Fehlers.
 - **Falsch:** `if (!IsObject(result)) return Map("ok", true)`.
 - **Richtig:** `if (!IsObject(result) && result == "")` ergibt `ok:true`. Jede andere Nicht-Map-Rückgabe wird `internal`.
@@ -335,18 +456,21 @@ Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge kor
 - **Quelle:** `src/core/ipc/Dispatcher.ahk`
 
 ### Verbindungsaufbau ohne Blockade: ein Versuch, Wiederholung per Timer
+
 - **Problem:** `PipeConnection.Connect(name, 3000)` wartet bis zu 3 s mit `Sleep` im Aufrufer. Ein Peer, der beim Start auf den Hub wartet, würde seinen Nachrichtenpfad so lange anhalten.
 - **Richtig:** `PipeConnection.Connect(name, 0)` macht genau einen Versuch und wirft sofort. Der Peer wiederholt per `SetTimer` mit Backoff (100, 200, 400 ... höchstens 2 s) und meldet nach der Gesamtfrist (10 s) `hub_unreachable`.
 - **Status:** verifiziert (`test_hub_gone_for_longer_than_the_budget_calls_onclosed`: `OnClosed` nach 10,25 s; `test_reconnect_after_hub_restart_resubscribes_and_reports_ready_again`).
 - **Quelle:** `src/core/ipc/Peer.ahk` (`_Attempt`, `_ScheduleRetry`)
 
 ### Ist der Verbindungsabbau noch der aktuelle? `ObjPtr` statt Vergleich
+
 - **Problem:** Ein `OnClose` einer alten Verbindung darf den Zustand des Peers nicht verändern. Der Vergleich der Objekte ist nicht eindeutig dokumentiert.
 - **Richtig:** `ObjPtr(c) != ObjPtr(this._conn)` vergleicht die Identität. Vor dem Zugriff `IsObject` prüfen, weil `this._conn` leer sein kann.
 - **Status:** verifiziert für den Abbau-Pfad (Reconnect-Test und Timeout-Test laufen über `_OnConnClose`). Der Fall "alte Verbindung meldet nach dem Wechsel" wurde nicht gezielt erzeugt: nicht geprüft.
 - **Quelle:** `src/core/ipc/Peer.ahk` (`_OnConnClose`)
 
 ### Ein Timer pro Anfrage: 10.000 Anfragen ohne wachsende Handles
+
 - **Problem:** Jede Anfrage braucht einen Timeout. AHK bietet keine Zählung der aktiven Timer.
 - **Richtig:** Ein `SetTimer(fn, -timeoutMs)` pro Anfrage, bei der Antwort `SetTimer(fn, 0)`. Gezählt wird über `Peer.PendingCount` (muss am Ende 0 sein). Die Handle-Zahl des Prozesses bleibt konstant.
 - **Status:** verifiziert (10.000 sequentielle Anfragen: Handles 163 → 163 → 163, Pending 0, 0,99 ms je Anfrage). Die Zahl der aktiven Timer selbst ist nicht direkt messbar: nur indirekt über Pending.
@@ -360,6 +484,7 @@ Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge kor
 - **Quelle:** `src/core/Json.ahk`, `doc/PROTOKOLL.md`
 
 ### Zweimal `start()` über `with`
+
 - **Problem:** `with WakingHub(name).start() as hub:` ruft `start()` zweimal auf, weil `PyHub.__enter__` selbst `start()` aufruft. Zwei Akzeptierschleifen auf demselben Namen wären die Folge.
 - **Richtig:** `with WakingHub(name) as hub:` (der `__enter__` startet). Ohne `with` `hub = WakingHub(name).start()` und `hub.stop()` im `finally`.
 - **Status:** vermutet (aus dem Quelltext von `tests/support/pyhub.py` gelesen, nicht ausgeführt). Im Code des Pakets so umgesetzt.
@@ -465,18 +590,6 @@ Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge kor
 - **Richtig:** Pro Start einen eigenen Hub mit eigenem Pipe-Namen: `with RoleHub(pipe_n) as hub:` (siehe `test_hard_kill_during_a_big_write_...`).
 - **Status:** verifiziert (Test war rot, nach der Änderung grün)
 
-### Negative Länge bei `SubStr`: Suffix zählen
-
-- **Problem:** Die Prüfung auf das Ende `_old.txt` nutzte `SubStr(path, -7)`. Das Suffix hat aber 8 Zeichen.
-- **Richtig:** `SubStr(path, -8) = "_old.txt"`. Allgemein: die Länge des Suffixes aus dem Literal zählen, nicht schätzen.
-- **Status:** vermutet (beim Lesen gefunden und vor dem ersten Lauf korrigiert). Der Zweig "schon `_old`" ist nicht gezielt getestet, die Rotation selbst ist getestet (`test_log_file_over_100_kb_...`).
-
-### `FileRead` mit "UTF-8" und BOM
-
-- **Problem:** v1-Variablendateien beginnen mit einem UTF-8-BOM. Ein BOM-Zeichen am Anfang bricht `Json.Parse` und den Vergleich mit Python.
-- **Richtig:** Das Zeichen `Chr(0xFEFF)` am Anfang nach dem Lesen entfernen (`AtomicFile.ReadText`).
-- **Status:** verifiziert (`test_v1_variables_are_read_as_stored`, `test_variable_round_trip_...`). Ob AHK das BOM bei `"UTF-8"` selbst entfernt, ist nicht geprüft; der eigene Schritt macht es unabhängig davon.
-
 ### Storage-eigene Log-Senke nach `super.Start()`
 
 - **Problem:** `Role.Start` setzt die Log-Senke auf die Weiterleitung über den Peer. Storage hat aber keinen Log-Empfänger außer sich selbst.
@@ -497,53 +610,6 @@ Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge kor
 - **Richtig:** Die Attrappe der Abhängigkeit (`FakeWorkers.Usable`) ruft einmalig einen Haken auf (`owner.executor.Tick()`). Der Aufruf liegt genau zwischen Prüfung und Start und verhält sich wie ein unterbrechender Timer, ohne Zeitabhängigkeit.
 - **Status:** verifiziert
 - **Quelle:** `tests/ahk/helpers/EngineOwner.ahk`
-
-### Klonen erst nach der Änderung: der Klon erbt sie
-
-- **Problem:** `Scheduler.Advance` klonte den Thread für die zweite Verbindung, nachdem der Thread für die erste Verbindung auf das Loop-Element gesetzt und der Loop-Stack gepusht war. Der Klon erbte den Push (Tiefe 1 statt 0). Außerdem wurde der Stack je Verbindung zurückgenommen, die zweite Rücknahme warf.
-- **Richtig:** Zustand einmal herstellen (Pop), dann alle Klone anlegen, danach erst jedem Ziel seine Änderung geben (Element, Push).
-- **Status:** verifiziert (Tests `Advance: branching into a loop pushes only the loop thread` und `Loop: two tail connections pop the loop stack once` waren vor der Korrektur rot)
-- **Quelle:** `src/engine/core/Scheduler.ahk`
-
-### `===` gibt es nicht, `ObjPtr("")` wirft
-
-- **Problem:** Der Vergleich zweier Objekte auf Identität mit `===` ist ein Syntaxfehler ("Missing operand"). `ObjPtr` auf einen leeren String wirft "Expected an object".
-- **Richtig:** `IsObject(a) && ObjPtr(a) = ObjPtr(b)`. Das Skript meldet den Fehler beim Laden (stderr), nicht erst beim Lauf.
-- **Status:** verifiziert
-- **Quelle:** `src/engine/Executor.ahk` (`_DispatchWorker`)
-
-### Map zählt nach Schlüsseln, nicht nach Einfügereihenfolge: FIFO braucht ein Array
-
-- **Problem:** Die Instanzen des Executors liegen in einer `Map` (`inst-<n>`). Die Aufzählung ist nach Schlüssel sortiert, nicht nach dem Start. Für die Reihenfolge der Richtlinie `wait` (FIFO) taugt sie nicht.
-- **Richtig:** Eine eigene Warteschlange (`Array` je Flow, `Push` am Ende, `RemoveAt(1)` am Anfang).
-- **Status:** Sortierung nach Schlüssel verifiziert (Doku und Code gelesen); dass `inst-10` vor `inst-2` einsortiert wird, ist vermutet (nicht gemessen).
-- **Quelle:** `src/engine/Executor.ahk` (`_waiting`)
-
-## GUI und Hotkeys
-
-### Klasse aus einer Datei nicht eingebunden: Dialog "local variable ... never assigned"
-
-- **Problem:** `src/manager/StubManager.ahk` rief `StubGui(this)` auf, die Datei `StubGui.ahk` war aber nicht eingebunden. AHK meldet das beim Laden als Warnung, die einen Dialog öffnet: "Warning: This local variable appears to never be assigned a value. Specifically: StubGui". Ohne Wächter hängt der Prozess.
-- **Falsch:** Klasse in einer zweiten Datei verwenden, ohne `#Include` in der Datei, die sie nutzt.
-- **Richtig:** Jede Klasse, die eine Datei benutzt, mit `#Include` dieser Datei einbinden. Dialoge eines Rollenprozesses stehen unter `%TEMP%\ahf_dialogs\` (Text und PNG).
-- **Status:** verifiziert (Dialog erfasst beim Start der Rolle, nach dem Einfügen des `#Include` kein Dialog mehr, Probelauf und `tests/e2e/test_ui_stub.py` grün)
-- **Quelle:** `src/manager/StubManager.ahk`
-
-### Gui: Ereignisnamen und Zeilenreihenfolge der ListView
-
-- **Problem:** Die Hilfe zu ListView nennt nur die Ereignisnamen (`Click`, `ItemFocus`, `ItemSelect` u. a.). Die Parameter stehen dort nicht vollständig.
-- **Richtig:** Für Zeilenklicks `lv.OnEvent("Click", (lv, row) => ...)` verwenden. Das Muster `LV_DoubleClick(LV, RowNumber)` aus der Hilfe bestätigt die Reihenfolge (Steuerelement, Zeile). Zeilen nach jedem Neuaufbau über `Modify(row, "Select Focus")` wieder markieren, `Delete()` leert die Liste ohne Parameter.
-- **Status:** vermutet (Ereignisnamen und Parameter aus der Hilfe gelesen. Der Klick selbst ist nicht automatisiert geprüft, nur der Start des Fensters im Smoke-Lauf: Exit 0, kein Dialog).
-- **Quelle:** https://www.autohotkey.com/docs/v2/lib/ListView.htm
-
-### Gui-Fenster schließen beendet nicht den Prozess (Persistent)
-
-- **Problem:** Ein Fenster ohne eigenen Hauptschleifen-Grund endet mit dem letzten Fenster. Der Rollenprozess läuft aber über Timer und Peer weiter.
-- **Richtig:** `Role.Start` setzt `Persistent()`. Das Schließen des Fensters ist im Stub das gleiche wie "Beenden" (`cmd.app.exit`), damit kein Zustand verloren geht und die Anzeige nicht versehentlich verschwindet.
-- **Status:** verifiziert (Smoke-Lauf: Fenster offen, Supervisor antwortet, `cmd.app.exit` führt zu Exit 0)
-- **Quelle:** `src/manager/StubGui.ahk`
-
-## Prozesse, Pipes, Nachrichten (Stub)
 
 ### Zeitmessung über Prozessgrenzen: `Time.NowMs` ist nicht vergleichbar
 
@@ -581,6 +647,153 @@ Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge kor
 - **Richtig (seit WI-26):** Der Stub sendet `cancel` mit `Json.Bool(...)` als `true`/`false`. Der Empfänger liest weiter `1`/`0` (siehe „Wahrheitswerte gehen als Zahl auf die Leitung“).
 - **Status:** verifiziert (Test `test_cancelled_exit_is_answered_and_nothing_stops` prüft `cancel is True`)
 
+### Verbindungsobjekt wird nie freigegeben: Referenzzyklus über `ObjBindMethod(this, ...)` (F-07)
+
+- **Problem:** Der Supervisor wuchs um rund 83 KB je Client-Verbindung (400 Verbindungen: 25 → 58 MB), obwohl `num_handles` konstant blieb. AHK v2 zählt Verweise: `this._pollFn := ObjBindMethod(this, "Pump")` in `PipeConnection.__New` ist ein Zyklus (Objekt → gebundene Funktion → Objekt). Das geschlossene Objekt mit seinem 64-KiB-Lesepuffer (`_readBuf`) und dem Rahmenpuffer des `FrameReader` wird nie freigegeben.
+- **Falsch:** Auf `num_handles` allein prüfen. Ein Objekt, das gebundene Funktionen von sich selbst in Feldern hält, schliessen, ohne die Felder zu leeren.
+- **Richtig:** Zyklus beim Schliessen brechen. Probelauf: in `PipeConnection._NotifyClose` nach dem `OnClose`-Handler `this._pollFn := ""` und `this._notifyFn := ""`. Danach 17,47 → 17,49 MB nach 800 Verbindungen (vorher +16 MB je 200), und alle 133 Tests von `tests/integration` und `tests/e2e` blieben grün. Übernommen in 4f566bb (`_pollFn` in `_Teardown` nach `SetTimer(fn, 0)` geleert, `_notifyFn` am Anfang von `_NotifyClose`); der Test `test_many_connects_keep_the_memory_of_the_supervisor_flat` ist grün (17,46 → 17,46 MB). Die Felder bleiben, weil `SetTimer(fn, 0)` dasselbe Funktionsobjekt zum Abschalten braucht; ein frisch gebundenes Objekt würde den Timer nicht finden. Gilt genauso für Wiederverbindungen im `Peer` (300 Reconnects: 16,6 → 47,9 MB vorher, 14,66 → 14,63 MB nachher). Dieselbe Bauart (`ObjBindMethod(this, ...)` in einem Feld) steht auch in anderen Klassen: nicht gesucht, nicht geprüft.
+- **Allgemein:** Closures wie `() => this._X()` in Feldern desselben Objekts sind derselbe Zyklus. Bei `Peer` ist das unkritisch (der Peer lebt so lange wie der Prozess; die Verbindung hält nur Verweise auf den Peer, nicht umgekehrt, sobald `_conn` geleert ist).
+- **Status:** verifiziert (Messung vor und nach der Korrektur, Tests grün). Andere Klassen mit `ObjBindMethod(this, ...)` in Feldern (Suche: `ExecContext`, `Executor`, `WorkerBridge`, `Engine`) wurden nur gelesen, nicht auf Lecks gemessen.
+- **Quelle:** `src/core/ipc/PipeConnection.ahk` (`__New`, `_NotifyClose`), `tests/stress/test_clients_churn.py`
+
+### Der Prozessstatus `ready` heisst nicht, dass die Engine ihre Flows geladen hat
+
+- **Problem:** `cmd.flow.start` kurz nach `ready` in `cmd.process.list` antwortete `not_found` ("flow 'slow' is not loaded"). `ready` bedeutet nur, dass die Rolle `sys.hello` gesendet hat; die Engine lädt ihre Flows danach über den Storage (`evt.engine.ready`).
+- **Richtig:** Nach `ready` `cmd.engine.snapshot` wiederholen, bis die Flows in `flows` stehen (`StressChain.wait_flows`).
+- **Status:** verifiziert (Test war rot, danach grün)
+- **Quelle:** `tests/stress/stresskit.py`
+
+### Storage schreibt das Log mit rund 30 Zeilen je Sekunde (F-08, behoben in WI-25)
+
+- **Problem:** Der Manager-Stub schreibt jedes Engine-Ereignis über den Storage ins Log (zwei Dateien). `WriteQueue` führte eine Operation je Timer aus (`SetTimer(..., -1)`, Auflösung rund 15,6 ms), je Logzeile zwei Operationen mit Öffnen, Größenabfrage und Schließen: 28 Zeilen/s gemessen. Bei 290 Ereignissen/s wuchs der Storage in 20 s von 17 auf 56 MB und schrieb 207 s nach. Zusätzlich lagen Anfragen und Logzeilen in einer Warteschlange, Anfragen warteten also hinter dem Rückstau.
+- **Falsch:** Eine Operation je Timer-Lauf ausführen, wenn die Operationen klein sind; Logzeilen einzeln anhängen; Anfragen und Log in dieselbe Warteschlange legen.
+- **Richtig:** Zwei Warteschlangen (Anfragen zuerst), je Lauf ein Zeitbudget (10 ms) statt einer Operation, Zeilen je Datei zu einem Bündel zusammenfassen (einmal öffnen und schließen), Obergrenze mit Zähler. Gemessen nach dem Umbau: 1493 Zeilen/s über 10 s gesendet, Marker 0,1 s nach der letzten Zeile geschrieben; 12000 Zeilen im Stoß mit mehr als 3000 Zeilen/s (durch den Sender begrenzt); Flut mit 362 Ereignissen/s: Log 1 s nach dem Ende vollständig (vorher 207 s), RSS 17,6 auf 18,1 MB.
+- **Status:** verifiziert (`tests/stress/test_log_backlog.py`, `tests/integration/test_storage.py`); die Obergrenze des Zeitbudgets (10 ms) ist begründet, nicht gegen andere Werte gemessen.
+- **Quelle:** `src/storage/WriteQueue.ahk`, `src/storage/Storage.ahk`
+
+### Prozess existiert noch? `OpenProcess` und Fehler 87 (WI-25)
+
+- **Problem:** Beim Start sollen Temp-Dateien (`*.ahf-<pid>.tmp`) toter Prozesse gelöscht werden, die eines laufenden nicht.
+- **Richtig:** `OpenProcess(SYNCHRONIZE, 0, pid)`: Handle 0 mit `A_LastError` 87 (`ERROR_INVALID_PARAMETER`) heißt, es gibt keinen Prozess mit dieser Nummer. Andere Fehler (zum Beispiel 5, Zugriff verweigert) werden als "läuft" gewertet, damit nie auf einen Verdacht gelöscht wird. Mit Handle: `WaitForSingleObject(h, 0)` gibt `0x102` (WAIT_TIMEOUT), solange der Prozess läuft. Eine wiederverwendete PID kann eine alte Temp-Datei am Leben halten (harmlos, die Datei wird nie gelesen).
+- **Status:** verifiziert für tote und lebende PID (Test `test_temp_files_of_dead_processes_are_removed_at_start_and_those_of_live_ones_stay`); Zugriff verweigert nicht geprüft.
+- **Quelle:** `src/storage/AtomicFile.ahk`
+
+### `FlushFileBuffers` auf dem Handle einer `FileOpen`-Datei (WI-25)
+
+- **Problem:** Die Temp-Datei wurde vor `MoveFileExW` nur geschlossen, nicht auf die Platte gezwungen; bei Stromausfall kann die Umbenennung vor den Daten landen.
+- **Richtig:** `DllCall("FlushFileBuffers", "Ptr", file.Handle, "Int")` nach `Write`, vor `Close`. `file.Handle` ist das Windows-Handle der `FileOpen`-Datei. Ein Rückgabewert 0 wird als Fehler behandelt (die alte Datei bleibt).
+- **Status:** verifiziert, dass Schreiben und Ersetzen weiter funktionieren (alle Tests zum atomaren Schreiben); dass die Daten bei Stromausfall tatsächlich vor der Umbenennung auf der Platte sind, ist nicht prüfbar (nicht geprüft).
+- **Quelle:** `src/storage/AtomicFile.ahk`
+
+### Supervisor: `sys.bye` konnte nach dem Prozessende gelesen werden
+
+- **Problem:** Einmal in 6 parallelen Läufen meldete `test_frozen_storage_is_terminated_at_the_deadline_and_the_others_exit_clean`, der Manager sei nicht sauber beendet (`clean` falsch). Die Rolle sendet `sys.bye` und beendet sich; der Tick des Supervisors konnte das Prozessende sehen, bevor er das noch ungelesene `sys.bye` aus der Pipe gelesen hatte.
+- **Richtig:** `Supervisor._Tick` ruft zuerst `hub.Pump()` auf, dann `children.Tick`. Nicht nachgestellt (nur unter Last aufgetreten), die Reihenfolge im Code ist gelesen.
+- **Status:** Reihenfolge verifiziert (gelesen); dass dies die Ursache des Ausfalls war, ist vermutet.
+- **Quelle:** `src/supervisor/Supervisor.ahk`
+
+### Der Supervisor steht still: Zeitstempel der Kinder sind danach alle veraltet (WI-22)
+
+- **Problem:** `Heartbeat.Tick` verglich `now - lastPongAt` mit der Pong-Frist. War der Supervisor selbst länger still (Prozess eingefroren, Standby, großer Rückstau), galten alle gesunden Kinder auf einen Schlag als hängend und wurden beendet. Reproduziert: Supervisor mit `psutil.suspend()` 8 s einfrieren, dann `resume()`: `evt.process.hung` und `crashed` für `storage`, `engine`, `manager`.
+- **Richtig:** Der Heartbeat merkt sich den Zeitpunkt des letzten Ticks. Ist die Lücke größer als `PING_EVERY_MS` (2 s), beginnen Pong-, Ping- und Startfristen aller Kinder neu bei "jetzt" (`Children.ResetLiveness`). Ein wirklich hängendes Kind wird eine Pong-Frist später gefunden. Auch ein Stillstand vor dem ersten Tick zählt (`Heartbeat.Arm` beim Start des Timers; ohne das fehlt der Vergleichswert, aufgefallen nur unter Parallellast). Die Kinder geben in der Einfrierzeit nicht selbst auf: Ihr Orphan-Guard greift nur bei gebrochener Pipe, und eine Pipe zu einem eingefrorenen Prozess bleibt offen.
+- **Status:** verifiziert (Einfrieren 8 s: `tests/fault/test_supervisor_stall.py`; Fristen deterministisch: `tests/ahk/supervisor_tick.test.ahk`). Standby/Ruhezustand nicht geprüft, ob `QueryPerformanceCounter` dort weiterzählt: vermutet.
+- **Quelle:** `src/supervisor/Heartbeat.ahk`, `src/supervisor/Children.ahk`
+
+### Pipe-Namen sind maschinenweit, Mutexe gelten je Windows-Sitzung (WI-22)
+
+- **Problem:** Bei zwei angemeldeten Benutzern findet der zweite den Mutex des ersten nicht (eigener Namensraum), will aber dieselbe Pipe `ahf.<session>.hub` bedienen und scheitert an `FILE_FLAG_FIRST_PIPE_INSTANCE`.
+- **Richtig:** Pipe-Name aus Windows-Sitzungs-ID (`ProcessIdToSessionId`) und Hash der Benutzer-SID bilden (`PipeNames.Hub`), Mutex ausdrücklich `Local\...`. Ein Python-Zwilling (`tests/support/pipenames.py`) liefert den gleichen Namen für die Tests.
+- **Status:** Namensbildung und "fremde Pipe mit altem Namen blockiert nicht" verifiziert (`test_supervisor.py`); der Mutex wird in `Local\` gefunden (verifiziert). **Zweiter Windows-Benutzer nicht geprüft** (in dieser Umgebung nicht möglich). Standard-Sicherheitsbeschreibung einer Pipe (Lesezugriff für alle) gelesen, nicht geprüft.
+- **Quelle:** `src/core/PipeNames.ahk`
+
+### CreateProcessW mit umgeleiteten Handles statt Run (WI-23)
+
+- **Problem:** `Run()` startet einen Prozess ohne brauchbares stderr. Ladefehler (`/ErrorStdOut`), die Meldungen von `Role.Console` und die letzten Worte vor einem Absturz gingen verloren, der Supervisor sah nur den Exit-Code (F-05).
+- **Richtig:** `CreateProcessW` per `DllCall` (`src/supervisor/ChildLauncher.ahk`):
+  - `CreatePipe` mit `SECURITY_ATTRIBUTES` (24 Byte, `bInheritHandle` bei Offset 16 = 1), danach `SetHandleInformation(hRead, HANDLE_FLAG_INHERIT, 0)`: nur das Schreibende wird vererbt. Pipe-Puffer groß wählen (256 KB), sonst blockiert das Kind im Schreiben, wenn der Supervisor nur alle 200 ms liest.
+  - `STARTUPINFOEXW` (64 Bit: 112 Byte): `cb` Offset 0, `dwFlags` 60 (`STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES`), `wShowWindow` 64 (0 = `SW_HIDE`), `hStdInput` 80, `hStdOutput` 88, `hStdError` 96, `lpAttributeList` 104. `PROCESS_INFORMATION` (24 Byte): `hProcess` 0, `hThread` 8, `dwProcessId` 16.
+  - Vererbung auf genau die nötigen Handles: `InitializeProcThreadAttributeList` (erst mit `ptr 0` aufrufen, liefert die Größe und scheitert absichtlich), `UpdateProcThreadAttribute` mit `PROC_THREAD_ATTRIBUTE_HANDLE_LIST` (0x20002) und dem Handle-Array, `EXTENDED_STARTUPINFO_PRESENT` (0x80000) in den Flags, `bInheritHandles` = 1. Ohne die Liste erbt das Kind **jedes** vererbbare Handle des Supervisors.
+  - Die Kommandozeile muss ein beschreibbarer `Buffer` sein (`StrPut`), `CreateProcessW` darf in sie schreiben.
+  - Danach im Supervisor `hWrite`, `NUL` und das Thread-Handle schließen, sonst gibt es nie EOF und Handles laufen auf. Das Prozess-Handle von `CreateProcessW` hat alle Rechte (kein `OpenProcess` mehr).
+  - Lesen ohne Blockieren: `PeekNamedPipe` meldet die verfügbaren Bytes, `ReadFile` nimmt genau so viele. Eine abgebrochene Pipe (Schreibende zu) lässt `PeekNamedPipe` scheitern. Zeilen an Byte `0x0A` trennen, erst dann als UTF-8 dekodieren (ein Zeichen kann zwischen zwei Lesevorgängen geteilt sein).
+- **Fallen:** `NumPut("ptr", buffer, ...)` mit einem `Buffer`-Objekt wirft "Invalid parameter(s)", es braucht `buffer.Ptr` (in `DllCall` dagegen darf das Objekt stehen). `StrGet(adresse, länge, "UTF-8")` zählt die Länge in Bytes der Quelle (geprüft mit Umlauten und `U+2713`).
+- **Status:** verifiziert (`tests/ahk/child_launcher.test.ahk`: stdout und stderr, NUL als stdin, Exit-Code, 40 Starts ohne Handle-Zuwachs, fehlgeschlagener Start ohne Leck, UTF-8-Zeichen über Lesegrenzen; `tests/fault/test_diagnose.py`: 50 Neustarts, Handles des Supervisors 179 und 179). **Nicht geprüft:** dass ein Kind wirklich keine anderen Handles erbt (es gibt keinen einfachen Weg, die Handle-Tabelle eines fremden Prozesses aus dem Test zu lesen); die Hub-Pipe ist zusätzlich nicht vererbbar (`CreateNamedPipeW` ohne `SECURITY_ATTRIBUTES`) [gelesen].
+- **Quelle:** `src/supervisor/ChildLauncher.ahk`, `src/supervisor/ChildPipe.ahk`
+
+### Kopffelder eines JSON-Rahmens mit einem RegEx lesen, Nutzlast nur auf Klammern prüfen (WI-24)
+
+- **Problem:** Der Hub parste jeden Rahmen vollständig (`Json.Parse`, neue `Message`, `Serialize`): 220 ms für 109.232 Zeichen. Er braucht nur `to` und muss `from` ersetzen.
+- **Falsch:** Den Rahmen ganz parsen, "weil man dann auch prüft". Oder nur den Anfang lesen (`Message.ReadTo`) und den Rest ungeprüft anhängen: Dann könnte hinter der Nutzlast ein zweites `"from"` stehen, das ein Parser mit "letzter Schlüssel gewinnt" bevorzugt, und der Absender wäre gefälscht.
+- **Richtig:** Ein einziges `RegExMatch` auf den Text in genau der Form von `Message.Serialize` (Kopffelder in fester Reihenfolge, kein Leerraum), das die Nutzlast als ausgeglichenes Objekt mit PCRE-Rekursion erfasst und mit `\}\z` endet: `(?<obj>\{(?:[^{}"]++|"(?:[^"\\]++|\\.)*+"|(?&obj))*+\})\}\z`. Possessive Quantoren (`++`, `*+`) verhindern Backtracking. Passt nichts (anderer Aufbau, Leerraum, Text hinter der Nutzlast), liefert `ParseHead` `""` und der Aufrufer nimmt den alten, vollständigen Weg. Das RegEx in `try` setzen (Übersetzungs- und Grenzfehler werfen). Kosten: 1,3 ms für 109.232 Zeichen. Den neuen Rahmentext baut `SubStr` zusammen: `{"to":<roh>` + `,"from":` + neu + Rest ab `,"id"`.
+- **Falle (Heredoc):** Beim Schreiben der Quelle über ein Shell-Heredoc oder `python - <<EOF` wurde `\\` zu `\`, das RegEx scheiterte beim Übersetzen mit "missing terminating ] for character class". Die Datei mit dem Editor-Werkzeug schreiben (siehe AGENTS.md).
+- **Status:** verifiziert (`tests/ahk/message.test.ahk`, Fälle `ParseHead`/`WithFrom`; `tests/stress/test_big_flows.py`; Rahmen mit Text hinter der Nutzlast wird abgelehnt). Verhalten bei sehr tief verschachtelten Nutzlasten (PCRE-Rekursionsgrenze) **nicht geprüft**; dann gäbe das RegEx einen Fehler oder keinen Treffer und der volle Weg griffe.
+- **Quelle:** `src/core/ipc/Message.ahk`, `src/supervisor/Hub.ahk`
+
+### Der JSON-Parser braucht für einen Text mit vielen Escapes so lange wie für das Dokument selbst (WI-24)
+
+- **Problem:** Ein Flow (92.808 Zeichen) als Zeichenkette in einer Nachricht: `Message.Parse` des Rahmens 161 ms, danach `Json.Parse` des Flow-Texts 143 ms. Die Zeichenkette hat viele `\"` und wird Zeichen für Zeichen entpackt. Die Engine zahlt also für jede Flow-Datei doppelt (dazu 55 ms `Json.Stringify` im Storage).
+- **Falsch:** Anzunehmen, eine lange Zeichenkette sei billig, weil sie "nur ein Wert" ist.
+- **Richtig:** Gemessen, nicht behoben. Mögliche Wege (nicht umgesetzt): Flow-Text nicht als Zeichenkette senden (Nutzlast als Objekt, dann nur einmal parsen), oder die Datei direkt von der Engine lesen lassen (verletzt "Dateien nur im Storage"), oder ein schnellerer Parser (Frage "nativer JSON-Parser", WI-24 Punkt 6).
+- **Status:** verifiziert (Messung mit `tools/ahkrun.py`, 5 Läufe, Mittel; `work_items/phase2b/WI-24-hub-routing-laden.md`)
+- **Quelle:** `src/core/Json.ahk`
+
+### Worker beschäftigt melden: der Worker, vor dem Start des Elements
+
+- **Problem:** Ein Worker, der in einem Aufruf länger als 6 s blockiert (Download, COM, `DllCall`), beantwortet keine Pings und wurde als hängend beendet (Entscheidung "keine Toleranz" aus WI-11).
+- **Falsch:** Die Engine meldet dem Supervisor den Jobbeginn. Zwei Verbindungen (Engine → Worker, Engine → Supervisor) sind nicht geordnet, und die Engine kann zwischen den Meldungen sterben.
+- **Richtig:** Der Worker sendet `sys.busy {busy: true}` im Handler von `cmd.worker.run`, vor dem Start des Elements (der startet erst über einen Timer, nach der Antwort), und `busy: false` beim Jobende. Der Supervisor pingt einen beschäftigten Worker nicht und wertet keinen Pong. Das Wahrheitsfeld `busy` steht in `BOOL_FIELDS` und `WIRE_BOOL_RE` (WI-26).
+- **Status:** verifiziert (`test_worker_that_blocks_longer_than_the_pong_timeout_is_not_hung_while_it_has_a_job`, 7,5 s Blockade; `test_a_worker_that_blocks_longer_than_6_s_is_not_hung_and_the_element_ends_normal`)
+- **Quelle:** `src/worker/Worker.ahk` (`_CmdRun`, `_SendDone`), `src/supervisor/Heartbeat.ahk`
+
+### Supervisor: Zustand eines Kindes vor `CreateProcessW` setzen, nicht danach
+
+- **Problem:** `Children._Launch` setzte `rec["state"] := "starting"` erst nach `ChildLauncher.Start`. AHK unterbricht einen Thread nach 15 ms, der Hub verarbeitet dann Nachrichten, und ein schneller Kind-Prozess meldet sich (`sys.hello`) schon, bevor der unterbrochene Thread Pid und Zustand speichert. `OnHello` setzte `ready`, danach überschrieb `_Launch` mit `starting`: das Kind war für immer "starting" (nach 10 s hängend). Sichtbar wurde es, als die Engine beim Start `cmd.process.list` und einen Worker-Start anforderte und die Unterbrechung lang genug wurde: `test_killed_engine_is_reported_restarted_and_the_others_are_untouched` scheiterte 11 von 12 Mal bei `-n 6`.
+- **Falsch:** Nach dem Start eines Prozesses Zustandsfelder zurücksetzen, die ein Ereignis des neuen Prozesses schon gesetzt haben kann.
+- **Richtig:** Zustand vor dem Start setzen, nach dem Start nur Pid, Handle, Reader und `gone`. `OnHello` übernimmt die Pid des Links, wenn der Datensatz noch keine hat.
+- **Status:** verifiziert (12 von 12 grün nach der Korrektur, 12 von 12 grün auf dem Stand vor WI-27; der Wettlauf selbst ist nicht deterministisch nachgestellt, nur `OnHello` ohne Pid ist ein Unit-Test)
+- **Quelle:** `src/supervisor/Children.ahk` (`_Launch`, `OnHello`)
+
+### Prozessdaten des eigenen Prozesses per DllCall (WI-28)
+
+- **Problem:** Der Snapshot braucht Arbeitsspeicher, Handle-Zahl, Startzeit und Laufzeit, ohne Schleife und ohne WMI.
+- **Richtig:** Pseudo-Handle `GetCurrentProcess()` (-1) genügt für alle drei. `psapi\GetProcessMemoryInfo(h, buf, 72)` mit `PROCESS_MEMORY_COUNTERS` auf 64 Bit: `cb` (uint, Offset 0), `WorkingSetSize` als `uptr` bei Offset 16, Größe 72, vorher `cb` setzen. `GetProcessHandleCount(h, &n)`. `GetProcessTimes(h, created, other, other, other)` mit vier 8-Byte-Puffern, `NumGet(created, 0, "int64")` ist die Erzeugungszeit als FILETIME (100 ns seit 1601). Umrechnung in einen AHK-Zeitstempel: `DateAdd("16010101000000", ticks // 10000000, "Seconds")`; die Laufzeit ist `GetSystemTimeAsFileTime` minus Erzeugungszeit. Alle Aufrufe sind schnell und blockieren nicht.
+- **Status:** verifiziert (`tests/ahk/core_snapshot.test.ahk`: Speicher über 1 MB, Handles über 5, Startzeit im Format und höchstens 2 Minuten alt)
+- **Quelle:** `src/core/ProcInfo.ahk`
+
+### Der Hub kann eine Antwort später senden, wie `Peer` (WI-28)
+
+- **Problem:** Der Absturzbericht wartet auf die Snapshots der Rollen. Der Handler für `cmd.diag.report` im Supervisor darf nicht blockieren und kann deshalb nicht sofort antworten. `Hub._Local` antwortete aber immer sofort mit dem Rückgabewert des Handlers.
+- **Richtig:** Wie bei `Peer` (WI-12): Der Handler gibt `Deferred.Marker()` zurück, `Hub._Local` sendet dann nichts, und `Hub.Reply(request, payload)` sendet die Antwort später. Der Handler ist für genau eine Antwort verantwortlich, auch auf jedem Fehlerpfad (`DiagReport` ruft `onDone` genau einmal auf, auch nach der Wartefrist auf `storage`).
+- **Status:** verifiziert (`tests/ahk/diag_report.test.ahk`, `tests/fault/test_report.py`)
+
+### Ein Bericht, der aus geparsten Kind-Antworten gebaut wird, schreibt Wahrheitswerte als 1/0 (WI-28)
+
+- **Problem:** `Json.Parse` liest `true` als `1`. Der Supervisor baut `report.json` aus den geparsten Snapshots der Rollen und schreibt `"enabled": 1` statt `true`. Die Felder des Supervisors selbst (`busy`, `auto`) sind echte Wahrheitswerte.
+- **Richtig:** Für die Datei, die ein Mensch liest, hinnehmbar und im Ergebnis von WI-28 notiert. Auf der Leitung (`cmd.test.debug`, `export.ok`) gilt weiter die Regel aus WI-26: die Wahrheitsfelder einer weitergereichten Nutzlast werden mit `Json.Bool` neu gesetzt (`DebugView._WireReport`); der Wächter in `tests/conftest.py` fand genau das beim ersten Lauf.
+- **Status:** verifiziert
+
+## GUI und Hotkeys
+
+### Gui: Ereignisnamen und Zeilenreihenfolge der ListView
+
+- **Problem:** Die Hilfe zu ListView nennt nur die Ereignisnamen (`Click`, `ItemFocus`, `ItemSelect` u. a.). Die Parameter stehen dort nicht vollständig.
+- **Richtig:** Für Zeilenklicks `lv.OnEvent("Click", (lv, row) => ...)` verwenden. Das Muster `LV_DoubleClick(LV, RowNumber)` aus der Hilfe bestätigt die Reihenfolge (Steuerelement, Zeile). Zeilen nach jedem Neuaufbau über `Modify(row, "Select Focus")` wieder markieren, `Delete()` leert die Liste ohne Parameter.
+- **Status:** vermutet (Ereignisnamen und Parameter aus der Hilfe gelesen. Der Klick selbst ist nicht automatisiert geprüft, nur der Start des Fensters im Smoke-Lauf: Exit 0, kein Dialog).
+- **Quelle:** https://www.autohotkey.com/docs/v2/lib/ListView.htm
+
+### Gui-Fenster schließen beendet nicht den Prozess (Persistent)
+
+- **Problem:** Ein Fenster ohne eigenen Hauptschleifen-Grund endet mit dem letzten Fenster. Der Rollenprozess läuft aber über Timer und Peer weiter.
+- **Richtig:** `Role.Start` setzt `Persistent()`. Das Schließen des Fensters ist im Stub das gleiche wie "Beenden" (`cmd.app.exit`), damit kein Zustand verloren geht und die Anzeige nicht versehentlich verschwindet.
+- **Status:** verifiziert (Smoke-Lauf: Fenster offen, Supervisor antwortet, `cmd.app.exit` führt zu Exit 0)
+- **Quelle:** `src/manager/StubGui.ahk`
+
+### Das Fenster einer AHK-Rolle ohne Bildschirmzugriff ansehen und bedienen (WI-28)
+
+- **Problem:** Das Debug-Fenster soll gezeigt werden, aber `Graphics.CopyFromScreen` (PowerShell) scheitert hier mit "Das Handle ist ungültig" (kein zugänglicher Desktop), und `keybd_event` erreicht das Fenster nicht (kein Vordergrund).
+- **Richtig:** Das Fenster mit `PrintWindow(hwnd, memDC, 2)` (`PW_RENDERFULLCONTENT`) in ein Bitmap zeichnen lassen (`GetWindowDC`, `CreateCompatibleDC/Bitmap`, `GetDIBits` mit 32 Bit top-down, `PIL.Image.frombuffer("RGBA", ..., "BGRA")`). Das geht ohne sichtbaren Desktop. Bedienen ohne Tastatur: Tabs mit `SendMessage(tabHwnd, WM_KEYDOWN, VK_RIGHT)` (Tab-Steuerung per `FindWindowExW(hwnd, 0, "SysTabControl32", 0)`), Knöpfe mit `BM_CLICK` (0xF5). Knöpfe auf einem Tab sind Kinder des Hauptfensters; `FindWindowExW(tab, ...)` findet sie nicht, `EnumChildWindows` auf das Hauptfenster schon. Das Schließen durch den Benutzer: `PostMessage(hwnd, WM_CLOSE)`.
+- **Status:** verifiziert (Screenshots aller fünf Tabs, Klick auf "Bericht exportieren", "Pause" und das Schließen; `tests/fault/test_debug_role.py::test_the_window_opens_takes_events_and_closes_like_a_user_would` prüft das Fenster und `WM_CLOSE`). Pillow ist dafür lokal nötig, gehört aber nicht zu `tests/requirements.txt`, der Test braucht es nicht.
+
 ## Tests und Werkzeuge
 
 ### Blockierende Fehlerdialoge: `ahkrun.py` und Dialog-Wächter
@@ -596,12 +809,6 @@ Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge kor
 - **Falsch:** WinAPI-Funktionen mit Handle-Parametern ohne `argtypes`/`restype` aufrufen, und in der Wächterschleife Ausnahmen still verwerfen, bevor das Wesentliche (Dialog schließen) erledigt ist.
 - **Richtig:** `argtypes` für jede aufgerufene Funktion setzen. Informationsbeschaffung in `try`, Schließen und Beenden in `finally`.
 - **Status:** verifiziert (20 aufeinanderfolgende Läufe, schlechtester 0,58 s).
-
-### Eingebaute Klassennamen von AHK v2 nicht überschreiben
-
-- **Problem:** `class TimeoutError extends AhfError` meldet beim Laden "This class declaration conflicts with an existing Class" und blockiert mit Dialog.
-- **Richtig:** Eigene Namen mit Präfix (`AhfTimeoutError`). Eingebaut sind u. a. `Error`, `TimeoutError`, `ValueError`, `TypeError`, `OSError`, `MemberError`, `PropertyError`, `MethodError`, `IndexError`, `KeyError`, `UnsetError`, `TargetError`, `MemoryError`, `ZeroDivisionError`.
-- **Status:** verifiziert (`TimeoutError`), Rest der Liste aus der AHK-Doku, nicht einzeln geprüft.
 
 ### Der AHK-Interpreter kennt `--version` nicht
 
@@ -775,22 +982,6 @@ Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge kor
 - **Status:** Ursache verifiziert (Meldung und Quelltext passen zusammen; direkter Nachweis der Unterbrechung nicht erbracht), Behebung statistisch belegt (60/60).
 - **Quelle:** `src/engine/Executor.ahk` (`_Advance`), `src/engine/core/Scheduler.ahk` (`Advance`), `tests/stress/test_parallel_instances.py`
 
-### Verbindungsobjekt wird nie freigegeben: Referenzzyklus über `ObjBindMethod(this, ...)` (F-07)
-
-- **Problem:** Der Supervisor wuchs um rund 83 KB je Client-Verbindung (400 Verbindungen: 25 → 58 MB), obwohl `num_handles` konstant blieb. AHK v2 zählt Verweise: `this._pollFn := ObjBindMethod(this, "Pump")` in `PipeConnection.__New` ist ein Zyklus (Objekt → gebundene Funktion → Objekt). Das geschlossene Objekt mit seinem 64-KiB-Lesepuffer (`_readBuf`) und dem Rahmenpuffer des `FrameReader` wird nie freigegeben.
-- **Falsch:** Auf `num_handles` allein prüfen. Ein Objekt, das gebundene Funktionen von sich selbst in Feldern hält, schliessen, ohne die Felder zu leeren.
-- **Richtig:** Zyklus beim Schliessen brechen. Probelauf: in `PipeConnection._NotifyClose` nach dem `OnClose`-Handler `this._pollFn := ""` und `this._notifyFn := ""`. Danach 17,47 → 17,49 MB nach 800 Verbindungen (vorher +16 MB je 200), und alle 133 Tests von `tests/integration` und `tests/e2e` blieben grün. Übernommen in 4f566bb (`_pollFn` in `_Teardown` nach `SetTimer(fn, 0)` geleert, `_notifyFn` am Anfang von `_NotifyClose`); der Test `test_many_connects_keep_the_memory_of_the_supervisor_flat` ist grün (17,46 → 17,46 MB). Die Felder bleiben, weil `SetTimer(fn, 0)` dasselbe Funktionsobjekt zum Abschalten braucht; ein frisch gebundenes Objekt würde den Timer nicht finden. Gilt genauso für Wiederverbindungen im `Peer` (300 Reconnects: 16,6 → 47,9 MB vorher, 14,66 → 14,63 MB nachher). Dieselbe Bauart (`ObjBindMethod(this, ...)` in einem Feld) steht auch in anderen Klassen: nicht gesucht, nicht geprüft.
-- **Allgemein:** Closures wie `() => this._X()` in Feldern desselben Objekts sind derselbe Zyklus. Bei `Peer` ist das unkritisch (der Peer lebt so lange wie der Prozess; die Verbindung hält nur Verweise auf den Peer, nicht umgekehrt, sobald `_conn` geleert ist).
-- **Status:** verifiziert (Messung vor und nach der Korrektur, Tests grün). Andere Klassen mit `ObjBindMethod(this, ...)` in Feldern (Suche: `ExecContext`, `Executor`, `WorkerBridge`, `Engine`) wurden nur gelesen, nicht auf Lecks gemessen.
-- **Quelle:** `src/core/ipc/PipeConnection.ahk` (`__New`, `_NotifyClose`), `tests/stress/test_clients_churn.py`
-
-### Der Prozessstatus `ready` heisst nicht, dass die Engine ihre Flows geladen hat
-
-- **Problem:** `cmd.flow.start` kurz nach `ready` in `cmd.process.list` antwortete `not_found` ("flow 'slow' is not loaded"). `ready` bedeutet nur, dass die Rolle `sys.hello` gesendet hat; die Engine lädt ihre Flows danach über den Storage (`evt.engine.ready`).
-- **Richtig:** Nach `ready` `cmd.engine.snapshot` wiederholen, bis die Flows in `flows` stehen (`StressChain.wait_flows`).
-- **Status:** verifiziert (Test war rot, danach grün)
-- **Quelle:** `tests/stress/stresskit.py`
-
 ### Python-Client: `events(timeout)` endet erst nach Stille
 
 - **Problem:** `AhfClient.events(timeout=0.3)` ist kein Zeitfenster, sondern "Ende nach 0,3 s ohne neue Nachricht". Läuft ein Flow, kommen ständig Ereignisse, die Schleife endete nie, 20 Threads hingen bis zur Frist.
@@ -804,34 +995,12 @@ Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge kor
 - **Richtig:** Nach jedem Schreiben `PostMessage(WM_AHF_WAKE)` an das Skriptfenster des Supervisors (Klasse `AutoHotkey` der Prozess-ID, `hwnd_of` in `tests/stress/stresskit.py`). Dann Median 1,4 ms. Für Messungen "wie ein AHK-Client" immer so, für den Fall ohne Weckruf gibt es einen eigenen Test.
 - **Status:** verifiziert (10 Läufe: 226 ms ohne, 1,4 ms mit Weckruf)
 
-### Storage schreibt das Log mit rund 30 Zeilen je Sekunde (F-08, behoben in WI-25)
-
-- **Problem:** Der Manager-Stub schreibt jedes Engine-Ereignis über den Storage ins Log (zwei Dateien). `WriteQueue` führte eine Operation je Timer aus (`SetTimer(..., -1)`, Auflösung rund 15,6 ms), je Logzeile zwei Operationen mit Öffnen, Größenabfrage und Schließen: 28 Zeilen/s gemessen. Bei 290 Ereignissen/s wuchs der Storage in 20 s von 17 auf 56 MB und schrieb 207 s nach. Zusätzlich lagen Anfragen und Logzeilen in einer Warteschlange, Anfragen warteten also hinter dem Rückstau.
-- **Falsch:** Eine Operation je Timer-Lauf ausführen, wenn die Operationen klein sind; Logzeilen einzeln anhängen; Anfragen und Log in dieselbe Warteschlange legen.
-- **Richtig:** Zwei Warteschlangen (Anfragen zuerst), je Lauf ein Zeitbudget (10 ms) statt einer Operation, Zeilen je Datei zu einem Bündel zusammenfassen (einmal öffnen und schließen), Obergrenze mit Zähler. Gemessen nach dem Umbau: 1493 Zeilen/s über 10 s gesendet, Marker 0,1 s nach der letzten Zeile geschrieben; 12000 Zeilen im Stoß mit mehr als 3000 Zeilen/s (durch den Sender begrenzt); Flut mit 362 Ereignissen/s: Log 1 s nach dem Ende vollständig (vorher 207 s), RSS 17,6 auf 18,1 MB.
-- **Status:** verifiziert (`tests/stress/test_log_backlog.py`, `tests/integration/test_storage.py`); die Obergrenze des Zeitbudgets (10 ms) ist begründet, nicht gegen andere Werte gemessen.
-- **Quelle:** `src/storage/WriteQueue.ahk`, `src/storage/Storage.ahk`
-
 ### Ein Test, der Operationen zählt, muss `Critical` setzen oder Warteschleifen vermeiden (WI-25)
 
 - **Problem:** Ein Komponententest für das Zeitbudget ließ eine Operation mit `Sleep(5)` warten. Die Warteschlange hatte beim Einreihen `SetTimer(pump, -1)` gesetzt; während `Sleep` (und auch in einer langen Schleife, AHK prüft dort alle paar Millisekunden auf Nachrichten) lief der Timer dazwischen und arbeitete selbst Operationen ab. Die Zählung stimmte nicht.
 - **Richtig:** Den Test mit `Critical("On")` beginnen (der Timer wird zurückgestellt) und mit einer Warteschleife über `Time.NowMs()` statt `Sleep` warten. Auch `until` ist ein reserviertes Wort und kann keine Variable sein.
 - **Status:** verifiziert
 - **Quelle:** `tests/ahk/storage_queue.test.ahk`
-
-### Prozess existiert noch? `OpenProcess` und Fehler 87 (WI-25)
-
-- **Problem:** Beim Start sollen Temp-Dateien (`*.ahf-<pid>.tmp`) toter Prozesse gelöscht werden, die eines laufenden nicht.
-- **Richtig:** `OpenProcess(SYNCHRONIZE, 0, pid)`: Handle 0 mit `A_LastError` 87 (`ERROR_INVALID_PARAMETER`) heißt, es gibt keinen Prozess mit dieser Nummer. Andere Fehler (zum Beispiel 5, Zugriff verweigert) werden als "läuft" gewertet, damit nie auf einen Verdacht gelöscht wird. Mit Handle: `WaitForSingleObject(h, 0)` gibt `0x102` (WAIT_TIMEOUT), solange der Prozess läuft. Eine wiederverwendete PID kann eine alte Temp-Datei am Leben halten (harmlos, die Datei wird nie gelesen).
-- **Status:** verifiziert für tote und lebende PID (Test `test_temp_files_of_dead_processes_are_removed_at_start_and_those_of_live_ones_stay`); Zugriff verweigert nicht geprüft.
-- **Quelle:** `src/storage/AtomicFile.ahk`
-
-### `FlushFileBuffers` auf dem Handle einer `FileOpen`-Datei (WI-25)
-
-- **Problem:** Die Temp-Datei wurde vor `MoveFileExW` nur geschlossen, nicht auf die Platte gezwungen; bei Stromausfall kann die Umbenennung vor den Daten landen.
-- **Richtig:** `DllCall("FlushFileBuffers", "Ptr", file.Handle, "Int")` nach `Write`, vor `Close`. `file.Handle` ist das Windows-Handle der `FileOpen`-Datei. Ein Rückgabewert 0 wird als Fehler behandelt (die alte Datei bleibt).
-- **Status:** verifiziert, dass Schreiben und Ersetzen weiter funktionieren (alle Tests zum atomaren Schreiben); dass die Daten bei Stromausfall tatsächlich vor der Umbenennung auf der Platte sind, ist nicht prüfbar (nicht geprüft).
-- **Quelle:** `src/storage/AtomicFile.ahk`
 
 ### Stresstests: voller Umfang nur mit `-m`, Smoke-Variante im Standardlauf
 
@@ -855,13 +1024,6 @@ Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge kor
 - **Richtig:** Zur PID die Erstellungszeit merken (`psutil.Process(pid).create_time()`), tote oder wiederverwendete Wurzeln vor jedem Durchlauf austragen (`DialogWatcher._live_roots`).
 - **Status:** Lücke verifiziert durch Lesen, Behebung durch Läufe geprüft (siehe Ergebnis in `work_items/phase2b/WI-18-testlaufzeit.md`); Auslöser des Ausfalls vermutet.
 - **Quelle:** `tools/ahf_dialogwatch.py`
-
-### Supervisor: `sys.bye` konnte nach dem Prozessende gelesen werden
-
-- **Problem:** Einmal in 6 parallelen Läufen meldete `test_frozen_storage_is_terminated_at_the_deadline_and_the_others_exit_clean`, der Manager sei nicht sauber beendet (`clean` falsch). Die Rolle sendet `sys.bye` und beendet sich; der Tick des Supervisors konnte das Prozessende sehen, bevor er das noch ungelesene `sys.bye` aus der Pipe gelesen hatte.
-- **Richtig:** `Supervisor._Tick` ruft zuerst `hub.Pump()` auf, dann `children.Tick`. Nicht nachgestellt (nur unter Last aufgetreten), die Reihenfolge im Code ist gelesen.
-- **Status:** Reihenfolge verifiziert (gelesen); dass dies die Ursache des Ausfalls war, ist vermutet.
-- **Quelle:** `src/supervisor/Supervisor.ahk`
 
 ### Messungen und xdist
 
@@ -891,123 +1053,12 @@ Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge kor
 - **Richtig:** Das Änderungsskript mit dem Editor-Werkzeug als Datei schreiben (Scratchpad) und mit `python datei.py` ausführen. Dabei CRLF/LF der Zieldatei erhalten (`newline=''` beim Lesen und Schreiben).
 - **Status:** verifiziert (zweimal aufgetreten)
 
-### Code auf Dateiebene läuft vor `AhfMain` und damit vor jedem `OnError` (WI-22)
-
-- **Problem:** Die Elementdateien rufen am Dateiende `ElementRegistry.Register(...)` auf. AHK führt das beim Laden in Textreihenfolge aus, also vor `AhfMain()`. Ein Fehler dort (doppelte Klasse, ungültiger `Mode`) zeigte beim Start einen Fehlerdialog. `/ErrorStdOut` gilt nur für Ladefehler (Syntax), nicht für Laufzeitfehler in diesem Code. Reproduziert mit einem Testelement: `tools/ahkrun.py` meldete Exit 97 (Dialog abgefangen).
-- **Richtig:** `OnError(Handler)` als erste ausführbare Anweisung des Einstiegs, **vor** den `#Include`-Zeilen (Funktionen sind vorher bekannt, der Handler darf weiter unten stehen). Der Handler schreibt auf stderr und beendet den Prozess (`ExitApp(1)`): Ein Prozess mit kaputter Registrierung soll nicht weiterlaufen. Vor dem Start von Supervisor oder Rolle wird er mit `OnError(Handler, 0)` wieder entfernt.
-- **Grund für das Entfernen:** Mehrere `OnError`-Handler werden nacheinander aufgerufen, und ein Handler, der 1 liefert, hält die späteren an [vermutet, aus der AHK-Dokumentation erinnert, nicht nachgestellt]. Der Handler des Einstiegs würde sonst den der Rolle verdecken.
-- **Status:** Verhalten verifiziert (`tests/integration/test_entry.py::test_error_while_loading_files_shows_no_dialog_and_ends_with_exit_1`, vorher Exit 97, nachher Exit 1 mit Meldung auf stderr). Die Aussage über die Reihenfolge der Handler ist vermutet.
-- **Quelle:** `src/AutoHotFlow.ahk`, `tests/integration/helpers/RegisterFailure.ahk`
-
-### Der 32-Bit-Interpreter lädt das Skript bis zur ersten Prüfung ohne Fehler (WI-22)
-
-- **Problem:** Wer den Einstieg mit `AutoHotkey32.exe` startet, bekam vorher einen laufenden Supervisor (Test `test_the_32_bit_interpreter_is_rejected_with_exit_2_and_no_dialog` lief in den Timeout). Pointer-Größen in `DllCall`-Strukturen stimmen dann nicht mehr.
-- **Richtig:** `if (A_PtrSize != 8)` als erste Anweisung vor den `#Include`-Zeilen, Meldung auf stderr, `ExitApp(2)`. Der Test wählt den Interpreter über `AHF_AHK2_EXE` (`tools/ahkrun.py`) und wird übersprungen, wenn `AutoHotkey32.exe` fehlt.
-- **Status:** verifiziert (rot vorher: Timeout, grün nachher: Exit 2 ohne Dialog).
-- **Quelle:** `src/AutoHotFlow.ahk`, `tests/integration/test_entry.py`
-
-### Eine Variable `children` verdeckt die Klasse `Children`
-
-- **Problem:** In einer Testfunktion `children := Children(...)` schlug mit "This local variable has not been assigned a value" fehl. Bezeichner sind in AHK v2 nicht von der Schreibweise abhängig, die lokale Variable verdeckt die Klasse (wie bei `role`/`Role`, siehe Einstieg).
-- **Richtig:** Variablen anders nennen (`kids`). Die Attribute `this.children` sind nicht betroffen, nur freie Variablen.
-- **Status:** verifiziert
-- **Quelle:** `tests/ahk/supervisor_tick.test.ahk`
-
 ### Python-Skripte im Bash-Heredoc, die Quelltext mit Backslashes patchen
 
 - **Problem:** Ein `python - <<'EOF'`-Skript, das einen Text mit doppelten Backslashes (Pipe-Pfad `\\.\pipe\...`) suchen sollte, fand ihn nicht: Die Bash des Werkzeugs machte aus zwei Backslashes einen, die Prüfung `assert alt in text` schlug fehl (zweimal aufgetreten, einmal blieb ein Dokument unbemerkt unverändert, weil der Commit trotzdem lief).
 - **Richtig:** Skript mit dem Schreibwerkzeug als Datei schreiben (rohe Zeichenketten `r'...'`) und mit `python datei.py` ausführen. Nach dem Patch `git diff --stat` ansehen, bevor committet wird.
 - **Status:** verifiziert
 - **Quelle:** Arbeit an WI-22
-
-### Der Supervisor steht still: Zeitstempel der Kinder sind danach alle veraltet (WI-22)
-
-- **Problem:** `Heartbeat.Tick` verglich `now - lastPongAt` mit der Pong-Frist. War der Supervisor selbst länger still (Prozess eingefroren, Standby, großer Rückstau), galten alle gesunden Kinder auf einen Schlag als hängend und wurden beendet. Reproduziert: Supervisor mit `psutil.suspend()` 8 s einfrieren, dann `resume()`: `evt.process.hung` und `crashed` für `storage`, `engine`, `manager`.
-- **Richtig:** Der Heartbeat merkt sich den Zeitpunkt des letzten Ticks. Ist die Lücke größer als `PING_EVERY_MS` (2 s), beginnen Pong-, Ping- und Startfristen aller Kinder neu bei "jetzt" (`Children.ResetLiveness`). Ein wirklich hängendes Kind wird eine Pong-Frist später gefunden. Auch ein Stillstand vor dem ersten Tick zählt (`Heartbeat.Arm` beim Start des Timers; ohne das fehlt der Vergleichswert, aufgefallen nur unter Parallellast). Die Kinder geben in der Einfrierzeit nicht selbst auf: Ihr Orphan-Guard greift nur bei gebrochener Pipe, und eine Pipe zu einem eingefrorenen Prozess bleibt offen.
-- **Status:** verifiziert (Einfrieren 8 s: `tests/fault/test_supervisor_stall.py`; Fristen deterministisch: `tests/ahk/supervisor_tick.test.ahk`). Standby/Ruhezustand nicht geprüft, ob `QueryPerformanceCounter` dort weiterzählt: vermutet.
-- **Quelle:** `src/supervisor/Heartbeat.ahk`, `src/supervisor/Children.ahk`
-
-### Pipe-Namen sind maschinenweit, Mutexe gelten je Windows-Sitzung (WI-22)
-
-- **Problem:** Bei zwei angemeldeten Benutzern findet der zweite den Mutex des ersten nicht (eigener Namensraum), will aber dieselbe Pipe `ahf.<session>.hub` bedienen und scheitert an `FILE_FLAG_FIRST_PIPE_INSTANCE`.
-- **Richtig:** Pipe-Name aus Windows-Sitzungs-ID (`ProcessIdToSessionId`) und Hash der Benutzer-SID bilden (`PipeNames.Hub`), Mutex ausdrücklich `Local\...`. Ein Python-Zwilling (`tests/support/pipenames.py`) liefert den gleichen Namen für die Tests.
-- **Status:** Namensbildung und "fremde Pipe mit altem Namen blockiert nicht" verifiziert (`test_supervisor.py`); der Mutex wird in `Local\` gefunden (verifiziert). **Zweiter Windows-Benutzer nicht geprüft** (in dieser Umgebung nicht möglich). Standard-Sicherheitsbeschreibung einer Pipe (Lesezugriff für alle) gelesen, nicht geprüft.
-- **Quelle:** `src/core/PipeNames.ahk`
-
-### CreateProcessW mit umgeleiteten Handles statt Run (WI-23)
-
-- **Problem:** `Run()` startet einen Prozess ohne brauchbares stderr. Ladefehler (`/ErrorStdOut`), die Meldungen von `Role.Console` und die letzten Worte vor einem Absturz gingen verloren, der Supervisor sah nur den Exit-Code (F-05).
-- **Richtig:** `CreateProcessW` per `DllCall` (`src/supervisor/ChildLauncher.ahk`):
-  - `CreatePipe` mit `SECURITY_ATTRIBUTES` (24 Byte, `bInheritHandle` bei Offset 16 = 1), danach `SetHandleInformation(hRead, HANDLE_FLAG_INHERIT, 0)`: nur das Schreibende wird vererbt. Pipe-Puffer groß wählen (256 KB), sonst blockiert das Kind im Schreiben, wenn der Supervisor nur alle 200 ms liest.
-  - `STARTUPINFOEXW` (64 Bit: 112 Byte): `cb` Offset 0, `dwFlags` 60 (`STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES`), `wShowWindow` 64 (0 = `SW_HIDE`), `hStdInput` 80, `hStdOutput` 88, `hStdError` 96, `lpAttributeList` 104. `PROCESS_INFORMATION` (24 Byte): `hProcess` 0, `hThread` 8, `dwProcessId` 16.
-  - Vererbung auf genau die nötigen Handles: `InitializeProcThreadAttributeList` (erst mit `ptr 0` aufrufen, liefert die Größe und scheitert absichtlich), `UpdateProcThreadAttribute` mit `PROC_THREAD_ATTRIBUTE_HANDLE_LIST` (0x20002) und dem Handle-Array, `EXTENDED_STARTUPINFO_PRESENT` (0x80000) in den Flags, `bInheritHandles` = 1. Ohne die Liste erbt das Kind **jedes** vererbbare Handle des Supervisors.
-  - Die Kommandozeile muss ein beschreibbarer `Buffer` sein (`StrPut`), `CreateProcessW` darf in sie schreiben.
-  - Danach im Supervisor `hWrite`, `NUL` und das Thread-Handle schließen, sonst gibt es nie EOF und Handles laufen auf. Das Prozess-Handle von `CreateProcessW` hat alle Rechte (kein `OpenProcess` mehr).
-  - Lesen ohne Blockieren: `PeekNamedPipe` meldet die verfügbaren Bytes, `ReadFile` nimmt genau so viele. Eine abgebrochene Pipe (Schreibende zu) lässt `PeekNamedPipe` scheitern. Zeilen an Byte `0x0A` trennen, erst dann als UTF-8 dekodieren (ein Zeichen kann zwischen zwei Lesevorgängen geteilt sein).
-- **Fallen:** `NumPut("ptr", buffer, ...)` mit einem `Buffer`-Objekt wirft "Invalid parameter(s)", es braucht `buffer.Ptr` (in `DllCall` dagegen darf das Objekt stehen). `StrGet(adresse, länge, "UTF-8")` zählt die Länge in Bytes der Quelle (geprüft mit Umlauten und `U+2713`).
-- **Status:** verifiziert (`tests/ahk/child_launcher.test.ahk`: stdout und stderr, NUL als stdin, Exit-Code, 40 Starts ohne Handle-Zuwachs, fehlgeschlagener Start ohne Leck, UTF-8-Zeichen über Lesegrenzen; `tests/fault/test_diagnose.py`: 50 Neustarts, Handles des Supervisors 179 und 179). **Nicht geprüft:** dass ein Kind wirklich keine anderen Handles erbt (es gibt keinen einfachen Weg, die Handle-Tabelle eines fremden Prozesses aus dem Test zu lesen); die Hub-Pipe ist zusätzlich nicht vererbbar (`CreateNamedPipeW` ohne `SECURITY_ATTRIBUTES`) [gelesen].
-- **Quelle:** `src/supervisor/ChildLauncher.ahk`, `src/supervisor/ChildPipe.ahk`
-
-### Ein Closure ohne erfasste Variable ist immer dasselbe Funktionsobjekt (WI-23)
-
-- **Problem:** `loop 21 { SetTimer(() => Werfe(), -10 * A_Index) }` startete nur **einen** Timer. Alle Closures ohne erfasste Variable sind dasselbe Funktionsobjekt, und `SetTimer` identifiziert einen Timer über das Objekt: Jeder Aufruf setzte den Timer nur neu (Testrolle `echo`, `cmd.test.throwlater`, 21 Fehler erwartet, 1 gesehen).
-- **Richtig:** Jede Closure erfasst etwas Eigenes, z. B. die Nummer: `static MakeFn(n) => () => Werfe(n)` und `SetTimer(MakeFn(A_Index), -10 * A_Index)`.
-- **Status:** verifiziert (Scratch-Skript mit `tools/ahkrun.py`: 1 statt 5 Fehler, mit Nummer 5 von 5; `tests/fault/test_diagnose.py::test_too_many_unhandled_errors_end_the_role_with_exit_6`).
-- **Quelle:** `tests/integration/helpers/EchoRole.ahk`
-
-### Ein Parameter `log` verdeckt die Klasse `Log` (WI-23)
-
-- **Problem:** `AddError(from, payload, log := true)` und dann `Log.Write(...)` warf "This value of type Integer has no method named Write". Bezeichner sind nicht von der Schreibweise abhängig, der Parameter verdeckt die Klasse (wie `role`/`Role`, `children`/`Children`). Der Fehler zeigte sich nur als Logzeile des Hubs "no handler for evt.diag.error ... MethodError", weil der Dispatcher Ausnahmen von Handlern in ein Antwortobjekt verpackt.
-- **Richtig:** Parameter und Variablen nicht wie eine Klasse nennen (`doLog`). Bei einem Handler, der "nichts tut": zuerst die Logzeile "no handler for" des Hubs lesen, sie enthält die Fehlermeldung des Handlers.
-- **Status:** verifiziert
-- **Quelle:** `src/supervisor/DiagLog.ahk`
-
-### OnError-Handler und `mode` (WI-23)
-
-- **Problem:** Der zweite Parameter von `OnError` ist die Art des Fehlers: `"Return"` (Fehler in einer Funktion mit Rückgabe), `"Exit"` (der Thread würde beendet; so kommt ein Fehler aus einem Timer) oder `"ExitApp"`. Rückgabe 1 verhindert den Dialog und das Beenden des Threads.
-- **Richtig:** `Role._OnUnexpected` zählt jeden Fehler, meldet ihn und gibt 1 zurück, damit die Rolle weiterläuft; bei Überschreitung der Schwelle beendet `ExitApp(6)` im Handler den Prozess.
-- **Status:** verifiziert für `Exit` (Timer); `Return` und `ExitApp` nicht einzeln getestet.
-- **Quelle:** `src/core/Role.ahk`
-
-### Kopffelder eines JSON-Rahmens mit einem RegEx lesen, Nutzlast nur auf Klammern prüfen (WI-24)
-
-- **Problem:** Der Hub parste jeden Rahmen vollständig (`Json.Parse`, neue `Message`, `Serialize`): 220 ms für 109.232 Zeichen. Er braucht nur `to` und muss `from` ersetzen.
-- **Falsch:** Den Rahmen ganz parsen, "weil man dann auch prüft". Oder nur den Anfang lesen (`Message.ReadTo`) und den Rest ungeprüft anhängen: Dann könnte hinter der Nutzlast ein zweites `"from"` stehen, das ein Parser mit "letzter Schlüssel gewinnt" bevorzugt, und der Absender wäre gefälscht.
-- **Richtig:** Ein einziges `RegExMatch` auf den Text in genau der Form von `Message.Serialize` (Kopffelder in fester Reihenfolge, kein Leerraum), das die Nutzlast als ausgeglichenes Objekt mit PCRE-Rekursion erfasst und mit `\}\z` endet: `(?<obj>\{(?:[^{}"]++|"(?:[^"\\]++|\\.)*+"|(?&obj))*+\})\}\z`. Possessive Quantoren (`++`, `*+`) verhindern Backtracking. Passt nichts (anderer Aufbau, Leerraum, Text hinter der Nutzlast), liefert `ParseHead` `""` und der Aufrufer nimmt den alten, vollständigen Weg. Das RegEx in `try` setzen (Übersetzungs- und Grenzfehler werfen). Kosten: 1,3 ms für 109.232 Zeichen. Den neuen Rahmentext baut `SubStr` zusammen: `{"to":<roh>` + `,"from":` + neu + Rest ab `,"id"`.
-- **Falle (Heredoc):** Beim Schreiben der Quelle über ein Shell-Heredoc oder `python - <<EOF` wurde `\\` zu `\`, das RegEx scheiterte beim Übersetzen mit "missing terminating ] for character class". Die Datei mit dem Editor-Werkzeug schreiben (siehe AGENTS.md).
-- **Status:** verifiziert (`tests/ahk/message.test.ahk`, Fälle `ParseHead`/`WithFrom`; `tests/stress/test_big_flows.py`; Rahmen mit Text hinter der Nutzlast wird abgelehnt). Verhalten bei sehr tief verschachtelten Nutzlasten (PCRE-Rekursionsgrenze) **nicht geprüft**; dann gäbe das RegEx einen Fehler oder keinen Treffer und der volle Weg griffe.
-- **Quelle:** `src/core/ipc/Message.ahk`, `src/supervisor/Hub.ahk`
-
-### Der JSON-Parser braucht für einen Text mit vielen Escapes so lange wie für das Dokument selbst (WI-24)
-
-- **Problem:** Ein Flow (92.808 Zeichen) als Zeichenkette in einer Nachricht: `Message.Parse` des Rahmens 161 ms, danach `Json.Parse` des Flow-Texts 143 ms. Die Zeichenkette hat viele `\"` und wird Zeichen für Zeichen entpackt. Die Engine zahlt also für jede Flow-Datei doppelt (dazu 55 ms `Json.Stringify` im Storage).
-- **Falsch:** Anzunehmen, eine lange Zeichenkette sei billig, weil sie "nur ein Wert" ist.
-- **Richtig:** Gemessen, nicht behoben. Mögliche Wege (nicht umgesetzt): Flow-Text nicht als Zeichenkette senden (Nutzlast als Objekt, dann nur einmal parsen), oder die Datei direkt von der Engine lesen lassen (verletzt "Dateien nur im Storage"), oder ein schnellerer Parser (Frage "nativer JSON-Parser", WI-24 Punkt 6).
-- **Status:** verifiziert (Messung mit `tools/ahkrun.py`, 5 Läufe, Mittel; `work_items/phase2b/WI-24-hub-routing-laden.md`)
-- **Quelle:** `src/core/Json.ahk`
-
-### Eine Variable `hub` verdeckt die Klasse `Hub` (WI-24)
-
-- **Problem:** `hub := Hub("x", "y")` in einem Testskript: Ladefehler "This Class cannot be used as an output variable. Specifically: Hub". Bezeichner unterscheiden Groß- und Kleinschreibung nicht (wie bei `log`/`Log`, `role`/`Role`).
-- **Richtig:** Anders nennen (`theHub`).
-- **Status:** verifiziert
-- **Quelle:** `tests/ahk/helpers/hub_frame_cost.ahk`
-
-### Worker-Pool: `Map.Delete` auf einen fehlenden Schlüssel wirft
-
-- **Problem:** `WorkerBridge.OnProcessEvent` rief `this._earlyReady.Delete(name)` für einen Namen, der nie eingetragen war. `Map.Delete` wirft in AHK v2 `UnsetItemError` ("Item has no value"). Der Handler des Peers fing den Fehler und loggte ihn (`handler for evt.process.crashed failed`), der Absturz des Workers blieb ohne Wirkung: das Element hing, bis die Instanz gestoppt wurde.
-- **Falsch:** `m.Delete(key)` ohne Prüfung, wenn der Schlüssel fehlen kann.
-- **Richtig:** `if (m.Has(key)) m.Delete(key)`. Wer in Ereignishandlern löscht, prüft zuerst.
-- **Status:** verifiziert (Test `test_killed_worker_ends_its_element_with_worker_crashed_and_the_pool_has_a_replacement` schlug mit genau diesem Log fehl, nach der Korrektur grün)
-- **Quelle:** `src/engine/WorkerBridge.ahk` (`OnProcessEvent`)
-
-### Worker beschäftigt melden: der Worker, vor dem Start des Elements
-
-- **Problem:** Ein Worker, der in einem Aufruf länger als 6 s blockiert (Download, COM, `DllCall`), beantwortet keine Pings und wurde als hängend beendet (Entscheidung "keine Toleranz" aus WI-11).
-- **Falsch:** Die Engine meldet dem Supervisor den Jobbeginn. Zwei Verbindungen (Engine → Worker, Engine → Supervisor) sind nicht geordnet, und die Engine kann zwischen den Meldungen sterben.
-- **Richtig:** Der Worker sendet `sys.busy {busy: true}` im Handler von `cmd.worker.run`, vor dem Start des Elements (der startet erst über einen Timer, nach der Antwort), und `busy: false` beim Jobende. Der Supervisor pingt einen beschäftigten Worker nicht und wertet keinen Pong. Das Wahrheitsfeld `busy` steht in `BOOL_FIELDS` und `WIRE_BOOL_RE` (WI-26).
-- **Status:** verifiziert (`test_worker_that_blocks_longer_than_the_pong_timeout_is_not_hung_while_it_has_a_job`, 7,5 s Blockade; `test_a_worker_that_blocks_longer_than_6_s_is_not_hung_and_the_element_ends_normal`)
-- **Quelle:** `src/worker/Worker.ahk` (`_CmdRun`, `_SendDone`), `src/supervisor/Heartbeat.ahk`
 
 ### Pool-Test: Anfragen aus Python tragen bis zu 250 ms Weckverzug
 
@@ -1021,41 +1072,6 @@ Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge kor
 - **Problem:** Der Test für den nicht quittierten Abbruch hätte 2 s (`WorkerBridge.ORPHAN_MS`) gewartet.
 - **Richtig:** `WorkerBridge.ORPHAN_MS := 150` im Test, im `finally` zurücksetzen. Die Konstante wird bei jedem Aufruf gelesen, nicht beim Laden kopiert.
 - **Status:** verifiziert (`tests/ahk/engine_worker_bridge.test.ahk`: `CancelThatIsNotConfirmedKillsTheWorkerAfterTheOrphanTime`, `JobDeadlineEndsTheJobAtOnceAndCancelsThenKills`; ohne das Zurücksetzen im `finally` bliebe der Wert für spätere Fälle der Datei geändert)
-
-### Supervisor: Zustand eines Kindes vor `CreateProcessW` setzen, nicht danach
-
-- **Problem:** `Children._Launch` setzte `rec["state"] := "starting"` erst nach `ChildLauncher.Start`. AHK unterbricht einen Thread nach 15 ms, der Hub verarbeitet dann Nachrichten, und ein schneller Kind-Prozess meldet sich (`sys.hello`) schon, bevor der unterbrochene Thread Pid und Zustand speichert. `OnHello` setzte `ready`, danach überschrieb `_Launch` mit `starting`: das Kind war für immer "starting" (nach 10 s hängend). Sichtbar wurde es, als die Engine beim Start `cmd.process.list` und einen Worker-Start anforderte und die Unterbrechung lang genug wurde: `test_killed_engine_is_reported_restarted_and_the_others_are_untouched` scheiterte 11 von 12 Mal bei `-n 6`.
-- **Falsch:** Nach dem Start eines Prozesses Zustandsfelder zurücksetzen, die ein Ereignis des neuen Prozesses schon gesetzt haben kann.
-- **Richtig:** Zustand vor dem Start setzen, nach dem Start nur Pid, Handle, Reader und `gone`. `OnHello` übernimmt die Pid des Links, wenn der Datensatz noch keine hat.
-- **Status:** verifiziert (12 von 12 grün nach der Korrektur, 12 von 12 grün auf dem Stand vor WI-27; der Wettlauf selbst ist nicht deterministisch nachgestellt, nur `OnHello` ohne Pid ist ein Unit-Test)
-- **Quelle:** `src/supervisor/Children.ahk` (`_Launch`, `OnHello`)
-
-### Eine Methode der Basisklasse wird still von einer gleichnamigen Methode der Unterklasse ersetzt (WI-28)
-
-- **Problem:** `Role` bekam die Methode `_CmdSnapshot` für `cmd.diag.snapshot`. Die Engine hat schon eine private Methode `_CmdSnapshot` (für `cmd.engine.snapshot`). Die Methode der Unterklasse ersetzt die der Basisklasse ohne Warnung: Der Aufruf `Role.Current._CmdSnapshot(msg)` lief in die Engine-Methode, die Antwort enthielt `epoch`, `flows` und kein `snapshot`. Die anderen Rollen antworteten richtig, nur die Engine nicht.
-- **Falsch:** In einer Basisklasse eine private Methode mit einem kurzen, naheliegenden Namen anlegen, den eine Unterklasse schon nutzt.
-- **Richtig:** Eindeutiger Name (`_CmdDiagSnapshot`). Vor dem Anlegen einer Methode in `Role` in allen Rollen nach dem Namen suchen (`grep -n "_Name(" src`). Ein Test, der jede Rolle fragt (`tests/fault/test_snapshot.py`), findet so etwas sofort.
-- **Status:** verifiziert (Test rot mit `KeyError: 'snapshot'` für die Engine, grün nach der Umbenennung)
-
-### Eine lokale Variable `role` verdeckt die Klasse `Role` (WI-28)
-
-- **Problem:** `Debug._Send` begann mit `role := Role.Current`. Namen sind nicht von der Groß-/Kleinschreibung abhängig, `role` ist damit eine lokale Variable, die die Klasse `Role` in der ganzen Funktion verdeckt. Die Zeile warf `UnsetError: This local variable has not been assigned a value`, `Debug.Dump` fing den Fehler (es wirft nie) und meldete nur `false`. Der Unit-Test mit einem Fake-Peer zeigte es sofort; ohne ihn wäre `Dump` still wirkungslos geblieben.
-- **Falsch:** `role := Role.Current` (ebenso `hub`, `log`, `children`, siehe die Einträge zu `Hub`, `Log`, `Children`).
-- **Richtig:** Ein anderer Name (`owner := Role.Current`). Eine Funktion, die "nie wirft", braucht einen Test, der den Erfolgsweg prüft, nicht nur, dass nichts geworfen wird.
-- **Status:** verifiziert (`tests/ahk/core_debug.test.ahk`)
-
-### Prozessdaten des eigenen Prozesses per DllCall (WI-28)
-
-- **Problem:** Der Snapshot braucht Arbeitsspeicher, Handle-Zahl, Startzeit und Laufzeit, ohne Schleife und ohne WMI.
-- **Richtig:** Pseudo-Handle `GetCurrentProcess()` (-1) genügt für alle drei. `psapi\GetProcessMemoryInfo(h, buf, 72)` mit `PROCESS_MEMORY_COUNTERS` auf 64 Bit: `cb` (uint, Offset 0), `WorkingSetSize` als `uptr` bei Offset 16, Größe 72, vorher `cb` setzen. `GetProcessHandleCount(h, &n)`. `GetProcessTimes(h, created, other, other, other)` mit vier 8-Byte-Puffern, `NumGet(created, 0, "int64")` ist die Erzeugungszeit als FILETIME (100 ns seit 1601). Umrechnung in einen AHK-Zeitstempel: `DateAdd("16010101000000", ticks // 10000000, "Seconds")`; die Laufzeit ist `GetSystemTimeAsFileTime` minus Erzeugungszeit. Alle Aufrufe sind schnell und blockieren nicht.
-- **Status:** verifiziert (`tests/ahk/core_snapshot.test.ahk`: Speicher über 1 MB, Handles über 5, Startzeit im Format und höchstens 2 Minuten alt)
-- **Quelle:** `src/core/ProcInfo.ahk`
-
-### Der Hub kann eine Antwort später senden, wie `Peer` (WI-28)
-
-- **Problem:** Der Absturzbericht wartet auf die Snapshots der Rollen. Der Handler für `cmd.diag.report` im Supervisor darf nicht blockieren und kann deshalb nicht sofort antworten. `Hub._Local` antwortete aber immer sofort mit dem Rückgabewert des Handlers.
-- **Richtig:** Wie bei `Peer` (WI-12): Der Handler gibt `Deferred.Marker()` zurück, `Hub._Local` sendet dann nichts, und `Hub.Reply(request, payload)` sendet die Antwort später. Der Handler ist für genau eine Antwort verantwortlich, auch auf jedem Fehlerpfad (`DiagReport` ruft `onDone` genau einmal auf, auch nach der Wartefrist auf `storage`).
-- **Status:** verifiziert (`tests/ahk/diag_report.test.ahk`, `tests/fault/test_report.py`)
 
 ### Test-Beobachter verpasst `evt.engine.ready` (WI-28)
 
@@ -1074,15 +1090,3 @@ Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge kor
 - **Problem:** `user32.EnumWindows(WINFUNCTYPE(...)(visit), 0)` im Test warf `ArgumentError: expected WinFunctionType instance instead of WinFunctionType`: Ein anderes Modul (der Dialog-Wächter) hatte `argtypes` von `EnumWindows` auf `windll.user32` gesetzt, mit einer eigenen `WINFUNCTYPE`-Klasse. Jeder Aufruf von `WINFUNCTYPE` erzeugt eine neue Klasse.
 - **Richtig:** Ein eigenes Objekt verwenden: `user32 = ctypes.WinDLL("user32")`. Dessen Funktionen sind von denen in `windll.user32` getrennt.
 - **Status:** verifiziert (`tests/fault/test_debug_role.py`)
-
-### Das Fenster einer AHK-Rolle ohne Bildschirmzugriff ansehen und bedienen (WI-28)
-
-- **Problem:** Das Debug-Fenster soll gezeigt werden, aber `Graphics.CopyFromScreen` (PowerShell) scheitert hier mit "Das Handle ist ungültig" (kein zugänglicher Desktop), und `keybd_event` erreicht das Fenster nicht (kein Vordergrund).
-- **Richtig:** Das Fenster mit `PrintWindow(hwnd, memDC, 2)` (`PW_RENDERFULLCONTENT`) in ein Bitmap zeichnen lassen (`GetWindowDC`, `CreateCompatibleDC/Bitmap`, `GetDIBits` mit 32 Bit top-down, `PIL.Image.frombuffer("RGBA", ..., "BGRA")`). Das geht ohne sichtbaren Desktop. Bedienen ohne Tastatur: Tabs mit `SendMessage(tabHwnd, WM_KEYDOWN, VK_RIGHT)` (Tab-Steuerung per `FindWindowExW(hwnd, 0, "SysTabControl32", 0)`), Knöpfe mit `BM_CLICK` (0xF5). Knöpfe auf einem Tab sind Kinder des Hauptfensters; `FindWindowExW(tab, ...)` findet sie nicht, `EnumChildWindows` auf das Hauptfenster schon. Das Schließen durch den Benutzer: `PostMessage(hwnd, WM_CLOSE)`.
-- **Status:** verifiziert (Screenshots aller fünf Tabs, Klick auf "Bericht exportieren", "Pause" und das Schließen; `tests/fault/test_debug_role.py::test_the_window_opens_takes_events_and_closes_like_a_user_would` prüft das Fenster und `WM_CLOSE`). Pillow ist dafür lokal nötig, gehört aber nicht zu `tests/requirements.txt`, der Test braucht es nicht.
-
-### Ein Bericht, der aus geparsten Kind-Antworten gebaut wird, schreibt Wahrheitswerte als 1/0 (WI-28)
-
-- **Problem:** `Json.Parse` liest `true` als `1`. Der Supervisor baut `report.json` aus den geparsten Snapshots der Rollen und schreibt `"enabled": 1` statt `true`. Die Felder des Supervisors selbst (`busy`, `auto`) sind echte Wahrheitswerte.
-- **Richtig:** Für die Datei, die ein Mensch liest, hinnehmbar und im Ergebnis von WI-28 notiert. Auf der Leitung (`cmd.test.debug`, `export.ok`) gilt weiter die Regel aus WI-26: die Wahrheitsfelder einer weitergereichten Nutzlast werden mit `Json.Bool` neu gesetzt (`DebugView._WireReport`); der Wächter in `tests/conftest.py` fand genau das beim ersten Lauf.
-- **Status:** verifiziert
