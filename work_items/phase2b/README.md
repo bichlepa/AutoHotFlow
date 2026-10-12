@@ -102,6 +102,6 @@ WI-32 kommt bewusst zuletzt: WI-30 und WI-31 beseitigen zwei Ursachen roter Läu
 ### Fortschritt Fix-Block
 
 - [x] WI-30  - [x] WI-31  - [x] WI-33  - [x] WI-32 (Aufgabe 1 Testbereinigung und Aufgabe 3 Dokumente)
-- [ ] WI-32 Abnahmeläufe (Aufgabe 2, setzt der spätere Agent, der sie fährt)
+- [ ] WI-32 Abnahmeläufe (Aufgabe 2): **gefahren am 2026-10-12, nicht grün.** Seriell und Stress grün; parallel 5 von 10 Läufen grün, Fault 20-mal ein roter Test. Funde F-37 bis F-42, Einzelheiten in `STATUS.md` ("Abnahmelauf Fix-Block"). Haken bleibt offen, bis die parallelen Läufe grün sind.
 
-Neue Funde ab **F-32** (vergeben bis F-36, nächste freie Nummer **F-37**; F-34 wurde nie vergeben).
+Neue Funde ab **F-32** (vergeben bis F-42, nächste freie Nummer **F-43**; F-34 wurde nie vergeben).

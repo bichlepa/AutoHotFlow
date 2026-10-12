@@ -102,3 +102,15 @@ Jeder Lauf allein auf dem Rechner, nichts anderes parallel, Ausgaben in Dateien 
 - Die AHK-Tests mit `Sleep` (Muster 2) sind ungeprüft unter Last.
 - Faktor 3 von `scaled()` ist eine Schätzung, kein gemessener Wert; er sollte nach dem Abnahmelauf (10 parallele Läufe) bestätigt oder angepasst werden.
 - Grobe Dauer dieser Arbeit: rund zwei Stunden; die Zeit ging überwiegend in die Suche nach dem Muster der Zeitgrenzen, die Teil-Läufe (je 40 bis 90 s) und die Untersuchung von F-36.
+
+## Abnahme (Aufgabe 2, 2026-10-12, eigener Agent)
+
+Gefahren auf dem Stand `0a89f65`, jeder Lauf allein, ohne Änderung an Produkt, Tests oder Fristen. Einzelheiten und Meldungen: `work_items/STATUS.md`, Abschnitt "Abnahmelauf Fix-Block (2026-10-12)".
+
+- 10 parallele Gesamtläufe: **5 grün, 5 rot** (Läufe 4, 6, 7, 9, 10; Lauf 10 mit zwei roten Tests). Kriterium "10 von 10" nicht erfüllt. Rot: `test_worker.py::test_cancel_stops_...within_500_ms` (F-37), `test_debug_role.py::test_refresh_stores_the_snapshot...` (F-38, zweimal), `test_big_flows.py::test_hub_cost_of_a_large_frame...[smoke]` (F-39), `test_engine.py::test_engine_resumes_loading_when_storage_restarts...` (F-40), `test_measurements.py::test_start_to_ready_time[smoke]` (F-41).
+- `AHF_TIMING_FACTOR=1` parallel: 732 passed, 1 failed (`test_diagnose.py::test_the_handles_of_the_supervisor_stay_flat_over_50_restarts`, F-42), 115 s.
+- Seriell `-n 0`: **733 passed, 1 skipped, grün**, 628 s. F-31 kam nicht vor.
+- `AHF_FAULT_REPEAT=20 ... tests/fault -n 0`: 463 passed, **1 failed** (F-38), 2547 s. `test_shutdown.py` (`clean: false`, F-26) und `sys.hello` (F-36) kamen nicht vor.
+- `-m stress`: **14 passed**, 207 s (enthält den strengen Log-Raten-Test).
+- Faktor 3 von `scaled()`: kein roter Test beruht auf einer mit `scaled()` gelockerten Grenze; der strenge Lauf war nicht schlechter. Weder bestätigt noch widerlegt.
+- Folge: Der Haken "Abnahme" in `phase2b/README.md` bleibt offen. F-31 ist geschlossen, F-36 zum Schließen empfohlen. Die sechs neuen Funde (F-37 bis F-42) sind nicht behoben und nicht untersucht (Auftrag: nur fahren und dokumentieren); alle sind selten (1 bis 3 Ausfälle in 13 Läufen).

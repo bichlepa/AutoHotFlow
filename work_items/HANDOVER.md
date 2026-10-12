@@ -1,6 +1,6 @@
 # Handover: AutoHotFlow v2 Portierung
 
-Stand: 2026-10-12, Branch `v2-port`. Phase 2 (Walking Skeleton), Phase 2b (Härtung vor Phase 3) und der Fix-Block WI-30 bis WI-33 sind umgesetzt. **Offen: die Abnahmeläufe von WI-32 (Aufgabe 2), die ein späterer, eigener Agent fährt.** Als Nächstes folgt der Phase-3-Plan, den der Projektinhaber mit Claude entwirft. Statusbericht mit Funden, Messwerten und den Abschlussläufen: `work_items/STATUS.md`.
+Stand: 2026-10-12, Branch `v2-port`. Phase 2 (Walking Skeleton), Phase 2b (Härtung vor Phase 3) und der Fix-Block WI-30 bis WI-33 sind umgesetzt. **Die Abnahmeläufe von WI-32 (Aufgabe 2) sind gefahren und nicht grün**: seriell und Stress grün, parallel 5 von 10 Läufen grün, Fault 20-mal ein roter Test (neue Funde F-37 bis F-42, `STATUS.md`, Abschnitt "Abnahmelauf Fix-Block"). Als Nächstes folgt der Phase-3-Plan, den der Projektinhaber mit Claude entwirft. Statusbericht mit Funden, Messwerten und den Abschlussläufen: `work_items/STATUS.md`.
 
 ## Neu seit 2026-10-12: Fix-Block WI-30 bis WI-33 (umgesetzt)
 
@@ -9,7 +9,7 @@ Stand: 2026-10-12, Branch `v2-port`. Phase 2 (Walking Skeleton), Phase 2b (Härt
 - WI-30: Rollen leeren ihre Sendewarteschlange vor dem Ende (`CloseWhenFlushed`), der Supervisor bewertet ein Ende erst nach dem letzten Byte; F-26 behoben (`test_shutdown.py` 400 von 400 grün).
 - WI-31: Die Engine wartet auf `storage` und setzt abgebrochenes Laden fort; F-24 geschlossen, F-31 bis zur Abnahme offen.
 - WI-33: Worker enden mit der Engine (E10); alle Fristen des Supervisors behalten ihren Rest nach einem Stillstand (F-16, E12); Exit 5 nur bei hartem Beenden (F-33).
-- WI-32: Testbereinigung (Aufgabe 1) und Dokumente (Aufgabe 3) sind fertig. **Die Abnahmeläufe (Aufgabe 2) fehlen**: Befehle und Kriterien stehen im Ergebnis von `work_items/phase2b/WI-32-teststabilitaet-abschluss.md`. Neu für Tests: `tests/support/timing.py` (`scaled()`, Zeitgrenzen im parallelen Lauf, `doc/TESTSTRATEGIE.md`); die strenge Log-Rate (F-32) läuft nur noch mit `-m stress`.
+- WI-32: Testbereinigung (Aufgabe 1) und Dokumente (Aufgabe 3) sind fertig. **Die Abnahmeläufe (Aufgabe 2) sind gefahren und nicht grün** (Einzelheiten in `STATUS.md`); Befehle und Kriterien stehen im Ergebnis von `work_items/phase2b/WI-32-teststabilitaet-abschluss.md`. Neu für Tests: `tests/support/timing.py` (`scaled()`, Zeitgrenzen im parallelen Lauf, `doc/TESTSTRATEGIE.md`); die strenge Log-Rate (F-32) läuft nur noch mit `-m stress`.
 
 ## Wichtigste Vorgabe zuerst
 
@@ -65,8 +65,8 @@ Beantwortet am 2026-10-12 (Wortlaut: `work_items/phase2b/README.md`, Nachtrag; �
 
 ## Offene Punkte (Details und Belege in `STATUS.md`, Tabelle "Funde")
 
-- **Abnahmeläufe von WI-32 (Aufgabe 2)** fehlen noch (10 parallele Gesamtläufe, serieller Lauf, Fault 20-mal, Stress). Erst sie zeigen, ob der parallele Lauf verlässlich ist.
-- **F-31** (niedrig, Ursache in WI-31 behoben, nicht bewiesen): `Chain.wait_flows` nach 20 s ohne geladene Flows in `tests/fault/test_debug_role.py`; geschlossen erst, wenn die Abnahme keinen Fall mehr zeigt.
+- **Abnahmeläufe von WI-32 (Aufgabe 2), nicht grün:** parallel 5 von 10 Läufen grün (rote Tests F-37 bis F-41, F-38 zweimal), `AHF_TIMING_FACTOR=1` ein roter Test (F-42), seriell grün, Stress grün, Fault 20-mal ein roter Test (F-38). Zu entscheiden: die Funde F-37 bis F-42 untersuchen oder begründet zurückstellen (der Haken in `phase2b/README.md` ist offen); erst dann gilt der parallele Lauf als verlässlich.
+- **F-31** geschlossen (kein Fall in den Abnahmeläufen). **F-36** (`sys.hello` unbeantwortet) in 14 Läufen nicht aufgetreten, Schließen empfohlen.
 - **F-36** (niedrig bis mittel, Ursache nicht gefunden): `sys.hello` 15 s lang unbeantwortet (die Hub-Frage aus WI-23), in WI-32 in `tests/fault/test_shutdown.py` zusammen mit anderen Tests aufgetreten, als die Maschine langsam war; später nicht reproduzierbar. Details und Hinweise in `STATUS.md`.
 - F-26 (behoben in WI-30), F-24 (WI-31), F-16 und F-33 (WI-33), F-32 und die Zeitgrenzen F-19 (WI-32) sind erledigt. F-35 (Drain-Frist in `src/core/ipc/`) ist offen, niedrig.
 - Weitere Funde F-12 bis F-15, F-17, F-18, F-20 bis F-23, F-25, F-28 bis F-30, F-35: überwiegend niedrig, mit Entscheidung in der Tabelle.
@@ -101,6 +101,6 @@ Timing unter Systemlast, zweiter Windows-Benutzer, Standby, gesperrter Desktop f
 
 ## Nächste Schritte
 
-1. Ein eigener Agent fährt die Abnahmeläufe von WI-32 (Aufgabe 2) und trägt die Ergebnisse in `STATUS.md` ein (Befehle im Ergebnis von `phase2b/WI-32-teststabilitaet-abschluss.md`). Er entscheidet F-31 und F-36.
+1. Die Funde F-37 bis F-42 aus der Abnahme (`STATUS.md`) untersuchen oder begründet zurückstellen; danach die parallelen Läufe wiederholen und den Haken in `phase2b/README.md` setzen. (Die Abnahmeläufe selbst sind am 2026-10-12 gefahren.)
 2. Phase-3-Plan entwerfen (Projektinhaber mit Claude): Reihenfolge Common/Variablen und Ausdrucksauswerter, Flow laden/speichern, Ausführung, Elemente in Gruppen, Triggerhost früh (E6), Editor und Zeichnen, Manager (E14: Verhalten beim Schließen des Fensters); Messaufgaben für R3, R4, R5 aus ARCHITEKTUR 10 und die offenen Fragen aus ELEMENT-API-V2 Abschnitt 8; gebündelte Fragen an den Projektinhaber. Freigabe für Phase 3 erteilen.
 3. Nach der Portierung: `work_items/` und `v1/` entfernen (Entscheidung des Projektinhabers).
