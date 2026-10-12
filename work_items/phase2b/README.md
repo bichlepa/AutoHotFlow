@@ -67,3 +67,40 @@ WI-18 zuerst: Es verkürzt jeden folgenden Testlauf. WI-20 ist reine Dokumentati
 ## Funde
 
 Neue Funde während der Arbeit bekommen die nächste freie Nummer ab **F-11** und stehen in der Paketdatei unter "Ergebnis" (Szenario, Reproduktion, Entscheidung). WI-29 hat sie in `STATUS.md` übertragen (Tabelle "Funde", F-01 bis F-31).
+
+---
+
+## Nachtrag 2026-10-12: Fix-Block WI-30 bis WI-33
+
+Grundlage: Review der Ergebnisse von WI-18 bis WI-29 durch den Projektinhaber mit Claude (2026-10-12). Das Review fand für F-26 und F-31 konkrete Ursachen im Code und im eigenen parallelen Lauf zwei weitere wackelnde Tests. Phase 3 beginnt erst nach diesem Block und braucht weiter die Freigabe des Projektinhabers.
+
+### Entscheidungen des Projektinhabers (2026-10-12)
+
+Die Punkte E9 bis E13 sind Empfehlungen aus dem Review, die der Projektinhaber mit "Gut" angenommen hat. E14 und E15 hat er ausdrücklich so entschieden.
+
+| # | Entscheidung | Wirkt in |
+|---|---|---|
+| E9 | **Löschen eines Flows ohne Frist** (WI-21, `Executor.FlowDeleted`) ist bestätigt: Instanzen stoppen sofort, blockierende Worker beendet der Pool nach `ORPHAN_MS`. | WI-32 (Doku) |
+| E10 | **Worker enden mit der Engine:** Endet der Engine-Prozess (Absturz oder Ende), beendet der Supervisor alle lebenden `worker:*`. Eine neue Engine baut ihren Pool neu auf. | WI-33 |
+| E11 | Die **Obergrenze des Log-Puffers** im Storage (WI-25) bleibt eine interne Konstante, keine Einstellung. | WI-32 (Doku) |
+| E12 | **F-16 wird jetzt gelöst:** Alle Fristen des Supervisors berücksichtigen einen Stillstand des Supervisors, nicht nur der Heartbeat. | WI-33 |
+| E13 | Bestätigt: Änderungen F-05 und F-07 in `src/core/`, MIGRATION M-11, M-17, M-18 (im Review gelesen, ohne Befund). | WI-32 (Doku) |
+| E14 | **Schließen des Manager-Fensters** (beendet heute im Stub die ganze Anwendung): Verhalten des echten Managers wird in **Phase 3** entschieden. | Phase 3 |
+| E15 | **Leeres `--data=`** (Logs landen dann in `C:\Log`) ist vorerst egal: Beobachtungsliste, kein Fix. | WI-32 (Doku) |
+
+### Pakete (in dieser Reihenfolge)
+
+| ID | Titel | Größe | Hängt ab von | Hauptpfade |
+|---|---|---|---|---|
+| [WI-30](WI-30-sauberes-beenden.md) | Sauberes Beenden: keine letzte Nachricht geht verloren (F-26) | M | – | `src/core/ipc/PipeConnection.ahk`, `src/core/Role.ahk`, `src/supervisor/Children.ahk` |
+| [WI-31](WI-31-engine-wartet-auf-storage.md) | Engine wartet auf `storage` und setzt abgebrochenes Laden fort (F-31, F-24) | S | – | `src/engine/Engine.ahk` |
+| [WI-33](WI-33-worker-und-stillstand.md) | Worker enden mit der Engine (E10), Fristen nach Stillstand (F-16, E12) | S | WI-30 | `src/supervisor/` |
+| [WI-32](WI-32-teststabilitaet-abschluss.md) | Teststabilität (paralleler Lauf verlässlich) und Abschluss des Blocks | M | WI-30, WI-31, WI-33 | `tests/`, `work_items/`, `AGENTS.md` |
+
+WI-32 kommt bewusst zuletzt: WI-30 und WI-31 beseitigen zwei Ursachen roter Läufe, WI-32 macht danach den Rest stabil und dient als Abnahme des ganzen Blocks. Änderungen in `src/core/` sind in WI-30 ausdrücklich erlaubt. Die Definition of Done oben gilt unverändert, dazu Regel 10 in `AGENTS.md` (VS-Code-Tasks).
+
+### Fortschritt Fix-Block
+
+- [ ] WI-30  - [ ] WI-31  - [ ] WI-33  - [ ] WI-32
+
+Neue Funde ab **F-32**.

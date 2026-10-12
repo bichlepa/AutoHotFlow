@@ -2,6 +2,10 @@
 
 Stand: 2026-10-12, Branch `v2-port`. Phase 2 (Walking Skeleton) und Phase 2b (Härtung vor Phase 3) sind abgeschlossen, Phase 2b **mit offenen Punkten** (siehe unten). Statusbericht mit Funden, Messwerten und den Abschlussläufen: `work_items/STATUS.md`.
 
+## Neu seit 2026-10-12: Fix-Block WI-30 bis WI-33
+
+Nach dem Review von Phase 2b kommt vor dem Phase-3-Plan ein kurzer Fix-Block: `work_items/phase2b/README.md`, Abschnitt "Nachtrag 2026-10-12" (Entscheidungen E9 bis E15, Pakete WI-30 bis WI-33). Er beantwortet die "Offenen Entscheidungen" 1 bis 5 weiter unten. Wer weiterarbeitet, beginnt mit WI-30.
+
 ## Wichtigste Vorgabe zuerst
 
 **Nicht eigenständig mit Phase 3 beginnen.** Phase 3 braucht die ausdrückliche Freigabe des Projektinhabers. Der Phase-3-Plan (`work_items/phase3/README.md`, WI-17 Schritt 6) und die gebündelten Fragen (WI-17 Schritt 7) sind noch nicht geschrieben; den Plan entwirft der Projektinhaber mit Claude. Wer Phase 3 vorbereitet, beginnt damit und klärt vorher die "Offenen Entscheidungen" unten.
