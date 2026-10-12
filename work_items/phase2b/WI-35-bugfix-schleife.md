@@ -245,3 +245,12 @@ Hinweise:
 - F-43 (Kind hält storage beim Beenden auf): Entscheidung des Projektinhabers.
 - E14 (Manager-Fenster schließen): Phase 3.
 - Phase-3-Plan.
+
+## Ergebnis
+
+Schleife abgeschlossen nach den Zyklen 0 (Ausgangsstand) und 1 (Analyse, Umsetzung, Abnahme). Abnahme grün am 2026-10-12, Code-Stand `2f2e6e5`: 10 parallele Läufe je 752 passed, seriell 752 passed, Fault 20x 505 passed, Stress 14 passed, keine roten Tests (`STATUS.md`, "Abnahmelauf WI-35, Zyklus 1").
+
+- F-46 behoben (Commits `8f9ecdf`, `f6c32e7`), Original-Test 20 von 20 grün, zweimal. Keine neuen Funde in Zyklus 1.
+- F-45 und F-47: in Zyklus 0 und 1 nicht reproduziert, Ursache nicht belegt, Verdachte in "Analyse Zyklus 1". Sie stehen auf "beobachten". Die gezielte Wiederholung aus Schritt 3 ist für Zyklus 1 nicht dokumentiert. Das Akzeptanzkriterium "jeweils mit einem Test, der vorher rot war" ist für diese beiden damit nicht erfüllt.
+- Offen und nicht Teil: F-43 (Entscheidung des Projektinhabers), F-36 (Schließen empfohlen), E14 (Phase 3).
+

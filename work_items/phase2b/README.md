@@ -102,7 +102,7 @@ WI-32 kommt bewusst zuletzt: WI-30 und WI-31 beseitigen zwei Ursachen roter Läu
 ### Fortschritt Fix-Block
 
 - [x] WI-30  - [x] WI-31  - [x] WI-33  - [x] WI-32 (Aufgabe 1 Testbereinigung und Aufgabe 3 Dokumente)
-- [ ] WI-32 Abnahmeläufe (Aufgabe 2): **gefahren am 2026-10-12, nicht grün.** Seriell und Stress grün; parallel 5 von 10 Läufen grün, Fault 20-mal ein roter Test. Funde F-37 bis F-42, Einzelheiten in `STATUS.md` ("Abnahmelauf Fix-Block"). Haken bleibt offen. Wiederholung in WI-34 (2026-10-12): parallel 9 von 10 grün, Stress grün, seriell und Fault 20x rot (F-45 bis F-47), siehe `STATUS.md` ("Abnahmelauf WI-34 (2026-10-12, zweiter)").
+- [x] WI-32 Abnahmeläufe (Aufgabe 2): **grün in der Abnahme WI-35 Zyklus 1 (2026-10-12, Code-Stand 2f2e6e5).** Frühere Läufe (nicht grün): Seriell und Stress grün; parallel 5 von 10 Läufen grün, Fault 20-mal ein roter Test. Funde F-37 bis F-42, Einzelheiten in `STATUS.md` ("Abnahmelauf Fix-Block"). Haken bleibt offen. Wiederholung in WI-34 (2026-10-12): parallel 9 von 10 grün, Stress grün, seriell und Fault 20x rot (F-45 bis F-47), siehe `STATUS.md` ("Abnahmelauf WI-34 (2026-10-12, zweiter)").
 
 Neue Funde ab **F-32** (vergeben bis F-47, nächste freie Nummer **F-48**; F-34 wurde nie vergeben; F-43 kam in WI-34 dazu).
 
@@ -121,8 +121,10 @@ Bestätigt vom Projektinhaber (2026-10-12):
 | E16 | Die Änderung `Peer.CloseWhenFlushed` in `src/core/ipc/Peer.ahk` (WI-30, nicht im Paketwortlaut) ist bestätigt. |
 | E17 | `scaled()` (`tests/support/timing.py`) mit Faktor 3 im parallelen Lauf bleibt. Der serielle Lauf und `-m stress` sind die strenge Referenz und laufen regelmäßig (Regel in `doc/TESTSTRATEGIE.md`, WI-34). |
 
-- [ ] WI-34 (danach den Haken "WI-32 Abnahmeläufe" oben setzen). **Abnahme (Abschnitt 5) am 2026-10-12 gefahren, nicht grün:** parallel 9 von 10 grün (ein Ausfall F-45), Stress grün, seriell 2 rote Tests (F-46, F-47), Fault 20x 5 rote Wiederholungen (F-46). Einzelheiten: `STATUS.md` ("Abnahmelauf WI-34 (2026-10-12, zweiter)"). Haken "WI-34", "Abnahme" und "WI-32 Abnahmeläufe" bleiben offen.
+- [x] WI-34 (Abnahme grün in WI-35 Zyklus 1; danach den Haken "WI-32 Abnahmeläufe" oben setzen). **Abnahme (Abschnitt 5) am 2026-10-12 gefahren, nicht grün:** parallel 9 von 10 grün (ein Ausfall F-45), Stress grün, seriell 2 rote Tests (F-46, F-47), Fault 20x 5 rote Wiederholungen (F-46). Einzelheiten: `STATUS.md` ("Abnahmelauf WI-34 (2026-10-12, zweiter)"). Haken "WI-34", "Abnahme" und "WI-32 Abnahmeläufe" sind mit der grünen Abnahme in WI-35 gesetzt.
 
 ### Nachtrag: WI-35 (Bugfix-Schleife bis zur grünen Abnahme)
 
-- [ ] WI-35 ([Paket](WI-35-bugfix-schleife.md)): Schleife aus Analyse (Opus), Umsetzung (Sonnet) und Testdurchführung (Haiku), bis die Abnahme grün ist. Ausgangsfunde F-45, F-46, F-47. Neue Funde werden im selben Paket behoben.
+- [x] WI-35 ([Paket](WI-35-bugfix-schleife.md)): Schleife aus Analyse (Opus), Umsetzung (Sonnet) und Testdurchführung (Haiku), bis die Abnahme grün ist. Ausgangsfunde F-45, F-46, F-47. Neue Funde werden im selben Paket behoben.
+
+**Fix-Block WI-30 bis WI-35 abgeschlossen** (Abnahme grün am 2026-10-12, Code-Stand `2f2e6e5`: 10 parallele Läufe je 752 passed, seriell 752 passed, Fault 20x 505 passed, Stress 14 passed; `STATUS.md`, "Abnahmelauf WI-35, Zyklus 1"). Offen: F-43 (Entscheidung des Projektinhabers), F-36 (Schließen empfohlen), F-45 und F-47 (beobachten, nicht reproduziert), E14 (Phase 3).
