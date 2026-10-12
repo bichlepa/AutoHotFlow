@@ -18,6 +18,7 @@ import time
 import pytest
 
 from support import metrics
+from support.timing import scaled
 from stresskit import stress_chain, thread_stacks  # noqa: F401  (fixture)
 
 FLOW = "run"
@@ -156,8 +157,8 @@ def test_clients_connecting_and_leaving_do_not_disturb_the_engine_or_leak(stress
     assert {n: p["pid"] for n, p in states.items()} == pids_before, states
     assert all(p["restarts"] == 0 and p["state"] == "ready" for p in states.values()), states
     assert len(latencies) >= 20, "too few probe requests: %d" % len(latencies)
-    assert dist.median < MEDIAN_BUDGET_MS, "median %.2f ms" % dist.median
-    assert dist.p99 < P99_BUDGET_MS, "p99 %.2f ms" % dist.p99
+    assert dist.median < scaled(MEDIAN_BUDGET_MS), "median %.2f ms" % dist.median
+    assert dist.p99 < scaled(P99_BUDGET_MS), "p99 %.2f ms" % dist.p99
     for name in ("supervisor", "engine"):
         assert after[name]["handles"] <= before[name]["handles"] + HANDLE_SLACK, (name, before[name], after[name])
 

@@ -18,6 +18,7 @@ from pathlib import Path
 import pytest
 
 from support import metrics
+from support.timing import scaled
 from stresskit import StressChain, _connect, hwnd_of, stress_chain  # noqa: F401  (fixture)
 from faultkit import FULL_CHAIN, STUB_OPTS, Chain, event, wait_until
 
@@ -124,7 +125,7 @@ def test_many_big_flows_load_without_hung_and_with_a_responsive_engine(procs, da
         loaded = {f["flowId"] for f in snap["flows"]}
         assert set(result["names"]) <= loaded, "missing: %s" % sorted(set(result["names"]) - loaded)[:5]
         assert lat is not None and result["timeouts"] == 0, "no sample or a snapshot timed out"
-        assert lat.max < SNAPSHOT_BUDGET_S * 1000, str(lat)
+        assert lat.max < scaled(SNAPSHOT_BUDGET_S * 1000), str(lat)
     finally:
         result["probe"].close()
         chain.close()

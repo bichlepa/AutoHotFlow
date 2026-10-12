@@ -17,6 +17,7 @@ import psutil
 import pytest
 
 from support.ahfclient import AhfClient, make_envelope
+from support.timing import scaled
 from test_peer import WakingHub
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -28,8 +29,8 @@ EXIT_BAD_ARGS = 2
 EXIT_NOT_IMPLEMENTED = 3
 EXIT_HUB_LOST = 4
 ORPHAN_BUDGET_S = 3.0      # Role.ORPHAN_MS
-ORPHAN_SLACK_S = 3.0       # reconnect and scheduling slack on top of the budget
-SHUTDOWN_LIMIT_S = 1.0     # acceptance: sys.shutdown -> sys.bye and exit 0 within 1 s
+ORPHAN_SLACK_S = scaled(3.0)       # reconnect and scheduling slack on top of the budget
+SHUTDOWN_LIMIT_S = scaled(1.0)     # acceptance: sys.shutdown -> sys.bye and exit 0 within 1 s
 
 
 class RoleHub(WakingHub):

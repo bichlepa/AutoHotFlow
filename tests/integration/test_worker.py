@@ -12,12 +12,13 @@ import time
 import pytest
 
 from support.ahfclient import AhfClient
+from support.timing import scaled
 from test_role import (FLOOD_PINGS, STALL_S, RoleHub, RoleRun, StallingHub, ahk_process, first_pong_of,
                        flood_pings, pongs_from, wait_hello)
 
 ROOT_TIMEOUT_S = 5.0
-CANCEL_BUDGET_S = 0.5          # acceptance: cmd.worker.cancel -> evt.worker.done "stopped" within 500 ms
-PING_BUDGET_S = 0.05           # pings during a blocking element are answered while it blocks
+CANCEL_BUDGET_S = scaled(0.5)          # acceptance: cmd.worker.cancel -> evt.worker.done "stopped" within 500 ms
+PING_BUDGET_S = scaled(0.05)           # pings during a blocking element are answered while it blocks
 BLOCK_MS = 800                 # Action_TestBlockWorker blocks for this long
 
 

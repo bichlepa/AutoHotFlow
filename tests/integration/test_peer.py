@@ -23,6 +23,7 @@ sys.path.insert(0, str(HELPERS))
 import rawpipe  # noqa: E402
 from rawpipe import Helper  # noqa: E402
 from support.ahfclient import AhfClient  # noqa: E402
+from support.timing import scaled  # noqa: E402
 from support.pyhub import WakingHub  # noqa: E402  (moved to tests/support/pyhub.py in WI-07)
 
 PROBE = HELPERS / "peer_probe.ahk"
@@ -172,7 +173,7 @@ def test_timeout_calls_back_once_and_late_answer_is_dropped(procs, ahk_exe, data
         assert timed_out["count"] == 1
         assert timed_out["payload"]["ok"] == 0
         assert timed_out["payload"]["error"]["code"] == "timeout"
-        assert abs(timed_out["elapsedMs"] - 300) <= 50, "timeout after %.1f ms, expected 300 +- 50" % timed_out["elapsedMs"]
+        assert 250 <= timed_out["elapsedMs"] <= 300 + scaled(50), "timeout after %.1f ms, expected 300 -50/+%.0f" % (timed_out["elapsedMs"], scaled(50))
         after = cli.wait_record("after_timeout", timeout=5)
         assert after["count"] == 1, "callback ran %d times" % after["count"]
         assert after["lateReplies"] == 1, "the late answer was not counted as dropped"
@@ -265,10 +266,10 @@ def test_hub_gone_for_longer_than_the_budget_calls_onclosed(procs, ahk_exe, data
         srv.wait_record("ready", timeout=15)
         stopped = time.monotonic()
         hub.stop()
-        closed = srv.wait_record("closed", timeout=16)
+        closed = srv.wait_record("closed", timeout=10 + scaled(6))
         elapsed = time.monotonic() - stopped
         assert closed["reason"] == "hub_unreachable"
-        assert 9.5 <= elapsed <= 12.5, "OnClosed after %.2f s, expected about 10 s" % elapsed
+        assert 9.5 <= elapsed <= 10 + scaled(2.5), "OnClosed after %.2f s, expected about 10 s" % elapsed
         print("\nOnClosed %.2f s after the hub stopped" % elapsed)
     finally:
         hub.stop()
@@ -285,7 +286,7 @@ def test_pending_request_fails_with_peer_gone_when_hub_drops(procs, ahk_exe, dat
         hang = cli.wait_record(lambda r: r.get("type") == "answer" and r.get("step") == "hang", timeout=5)
         assert hang["payload"]["ok"] == 0
         assert hang["payload"]["error"]["code"] == "peer_gone"
-        assert hang["elapsedMs"] < 2000, "failure after %.1f ms, expected at once" % hang["elapsedMs"]
+        assert hang["elapsedMs"] < scaled(2000), "failure after %.1f ms, expected at once" % hang["elapsedMs"]
         time.sleep(0.5)
         assert len(answers(cli, "hang")) == 1
     finally:

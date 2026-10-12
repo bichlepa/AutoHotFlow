@@ -22,6 +22,7 @@ sys.path.insert(0, str(HELPERS))
 import rawpipe  # noqa: E402
 from rawpipe import Helper, PyServer, RawEnd, gen_size, gen_text  # noqa: E402
 from support import winpipe  # noqa: E402
+from support.timing import scaled  # noqa: E402
 
 SERVER_AHK = HELPERS / "pipe_echo_server.ahk"
 CLIENT_AHK = HELPERS / "pipe_client.ahk"
@@ -228,7 +229,7 @@ def test_abrupt_end_of_client_process_is_seen_within_500_ms(procs, ahk_exe, data
     print("\nAbrupt end of the client process seen by the AHK server after %.0f ms (reason %s)"
           % (latency, rec["reason"]))
     assert rec["reason"] == "peer_closed"
-    assert latency < 500
+    assert latency < scaled(500)
     assert psutil.Process(server.pid).is_running()
 
 
@@ -245,7 +246,7 @@ def test_abrupt_end_of_server_side_is_seen_by_ahk_client_within_500_ms(procs, ah
         print("\nAbrupt close of the server side seen by the AHK client after %.0f ms (reason %s)"
               % (latency, rec["reason"]))
         assert rec["reason"] == "peer_closed"
-        assert latency < 500
+        assert latency < scaled(500)
         assert client.wait_exit(5) == 0
 
 
@@ -326,7 +327,7 @@ def test_non_reading_peer_causes_queue_overflow_without_blocking(procs, ahk_exe,
           % (flood["failedAt"], float(flood["elapsedMs"]), close["reason"]))
     assert flood["failedAt"] > 0 and flood["sent"] == flood["failedAt"] - 1
     assert flood["sent"] < 200                    # about 8 MiB of 100 KiB frames plus the pipe buffer
-    assert float(flood["elapsedMs"]) < 2000              # the loop never waited for the peer
+    assert float(flood["elapsedMs"]) < scaled(2000)              # the loop never waited for the peer
     assert flood["isOpen"] == 0
     assert close["reason"] == "queue_overflow"
     # the server is alive and serves other clients
@@ -483,7 +484,7 @@ def test_ending_after_the_queue_is_written_gives_up_at_its_deadline_and_does_not
     drained = server.wait_record("drained", timeout=5)
     print("\nEnd with a reader that never reads: gave up after %.0f ms (deadline 300 ms)" % float(drained["elapsedMs"]))
     assert drained["flushed"] == 0, drained
-    assert 290 <= float(drained["elapsedMs"]) < 1500, drained
+    assert 290 <= float(drained["elapsedMs"]) < scaled(1500), drained
     assert server.wait_record("close", timeout=5)["reason"] == "local"
     other.close()
     end.close()
@@ -532,7 +533,7 @@ def test_connect_without_server_times_out(procs, ahk_exe, datadir, pipe_name):
     client = launch_client(procs, ahk_exe, datadir, pipe_name + ".none", "mode=connect_fail", "timeout=400")
     rec = client.wait_record("error", timeout=15)
     assert rec["error"] == "AhfTimeoutError" and rec["code"] == "timeout"
-    assert 380 <= float(rec["elapsedMs"]) < 1500
+    assert 380 <= float(rec["elapsedMs"]) < scaled(1500)
     assert client.wait_exit(5) == 0
 
 

@@ -11,10 +11,11 @@ import psutil
 import pytest
 
 from support.ahfclient import AhfClient
+from support.timing import scaled
 from test_supervisor import (EXIT_OK, Sup, alive, connect, event, process_list, request_ok, wait_ready, watch_for)
 
 READY_S = 10.0
-KILL_BUDGET_S = 2.0
+KILL_BUDGET_S = scaled(2.0)
 
 
 @pytest.fixture

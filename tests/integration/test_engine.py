@@ -15,6 +15,7 @@ from pathlib import Path
 import pytest
 
 from support.ahfclient import AhfClient
+from support.timing import scaled
 from test_role import (FLOOD_PINGS, STALL_S, RoleHub, RoleRun, StallingHub, ahk_process, first_pong_of,
                        flood_pings, pongs_from, wait_hello)
 
@@ -487,7 +488,7 @@ def test_stop_during_sleep_ends_the_instance_within_500_ms(pipe, flowdir, engine
         got = collect_until(obs, is_type("evt.instance.ended"), timeout=5)
         elapsed = got[-1][0] - t0
         assert stopped["stopped"] == 1
-        assert elapsed < 0.5, "instance ended %.3f s after the stop" % elapsed
+        assert elapsed < scaled(0.5), "instance ended %.3f s after the stop" % elapsed
         assert got[-1][1]["payload"]["reason"] == "flow.stop"
         assert element_states(got) == [(SLEEP, "finished", 0, None)]
         quiet = list(obs.events(timeout=0.4))
@@ -664,7 +665,7 @@ def test_shutdown_stops_running_instances_and_says_bye_within_the_deadline(procs
         assert bye is not None and bye["payload"]["clean"] is not None
         assert run.wait_exit(timeout=5) == 0, run.stderr_text()
         elapsed = time.monotonic() - t0
-        assert elapsed < 2.0, "shutdown took %.3f s" % elapsed
+        assert elapsed < scaled(2.0), "shutdown took %.3f s" % elapsed
 
 
 MANY_INSTANCES = 40

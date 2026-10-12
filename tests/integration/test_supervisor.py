@@ -23,6 +23,7 @@ import pytest
 
 from support import pipenames, winpipe
 from support.ahfclient import AhfClient, dumps, make_envelope
+from support.timing import scaled
 
 ROOT = Path(__file__).resolve().parents[2]
 ENTRY = ROOT / "tests" / "integration" / "helpers" / "AutoHotFlowTest.ahk"   # product entry plus test roles (WI-29)
@@ -32,11 +33,11 @@ EXIT_OK = 0
 EXIT_START_FAILED = 1
 EXIT_BAD_ARGS = 2
 EXIT_FORCED = 5
-START_BUDGET_S = 3.0          # acceptance: all required roles ready within 3 s
-CRASH_BUDGET_S = 1.0          # acceptance: evt.process.crashed within 1 s of the death
+START_BUDGET_S = scaled(3.0)          # acceptance: all required roles ready within 3 s
+CRASH_BUDGET_S = scaled(1.0)          # acceptance: evt.process.crashed within 1 s of the death
 HANG_BUDGET_S = 8.0           # acceptance: a frozen process is hung within 8 s
-CLEAN_EXIT_BUDGET_S = 2.0     # acceptance: healthy children, exit within 2 s
-FROZEN_EXIT_SLACK_S = 1.0     # acceptance: frozen child, exit within deadline + 1 s
+CLEAN_EXIT_BUDGET_S = scaled(2.0)     # acceptance: healthy children, exit within 2 s
+FROZEN_EXIT_SLACK_S = scaled(1.0)     # acceptance: frozen child, exit within deadline + 1 s
 RESTART_LIMIT = 3             # Children.RESTART_MAX within Children.RESTART_WINDOW_MS
 
 

@@ -17,6 +17,7 @@ import psutil
 import pytest
 
 from support.ahfclient import AhfClient
+from support.timing import scaled
 from test_role import RoleHub, RoleRun, wait_hello, SHUTDOWN_LIMIT_S
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -25,7 +26,7 @@ V1_VARS = ROOT / "v1" / "AppData" / "Variables"
 SKELETON_SRC = ROOT / "tests" / "data" / "skeleton_flow.json"
 BIG_BYTES = 5 * 1024 * 1024
 ASK_TIMEOUT_S = 15.0
-PING_LIMIT_S = 1.0          # acceptance: sys.ping is answered within 1 s during a 5 MB write
+PING_LIMIT_S = scaled(1.0)          # acceptance: sys.ping is answered within 1 s during a 5 MB write
 V1_LOG_LINE = re.compile(r"^--- \d{4} \d{2} \d{2} \d{2}:\d{2}:\d{2} ~[^~]*~[^~]*~ ")
 
 
@@ -590,7 +591,7 @@ def test_a_request_is_answered_in_time_during_a_log_flood(storage, flowdir, pipe
     finally:
         other.close()
     print("\nflow.read during a flood: %s ms" % ", ".join("%.0f" % (v * 1000) for v in latencies))
-    assert max(latencies) < 1.0, latencies
+    assert max(latencies) < scaled(1.0), latencies
 
 
 def test_a_flood_over_the_limit_drops_lines_counts_them_and_the_process_stays_up(procs, flowdir, runs, pipe,

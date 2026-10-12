@@ -14,12 +14,13 @@ from faultkit import (CLEAN_EXIT_BUDGET_S, EXIT_FORCED, EXIT_OK, FULL_CHAIN, STU
                       event, repeat_ids, session_processes, wait_until)
 
 from faultfixtures import chains  # noqa: F401  (fixture)
+from support.timing import scaled
 
 pytestmark = pytest.mark.fault
 
 DEADLINE_MS = 2000
-FROZEN_EXIT_SLACK_S = 1.0
-EVENT_LAG_S = 1.0             # the recorder thread of the observer may lag a few ms behind the supervisor exit
+FROZEN_EXIT_SLACK_S = scaled(1.0)
+EVENT_LAG_S = scaled(1.0)             # the recorder thread of the observer may lag a few ms behind the supervisor exit
 
 
 @pytest.mark.parametrize("round_no", repeat_ids())

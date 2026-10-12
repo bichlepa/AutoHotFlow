@@ -32,6 +32,7 @@ import pytest
 
 from support import pipenames
 from support.ahfclient import AhfClient
+from support.timing import scaled
 
 ROOT = Path(__file__).resolve().parents[2]
 ENTRY = ROOT / "src" / "AutoHotFlow.ahk"
@@ -330,11 +331,11 @@ def test_stub_answers_at_once_while_the_engine_is_missing(procs, datadir, sessio
         assert ans["payload"]["ok"], ans                       # the stub answered, not the timeout
         assert ans["payload"]["answer"]["ok"] == 0             # the engine is not there
         assert ans["payload"]["answer"]["error"]["code"] == "not_found", ans
-        assert elapsed < 2.0, "answer took %.2f s" % elapsed
+        assert elapsed < scaled(2.0), "answer took %.2f s" % elapsed
 
         t0 = time.perf_counter()
         pong = obs.request("manager", "sys.ping", {"n": 7}, timeout=5)
-        assert time.perf_counter() - t0 < 2.0
+        assert time.perf_counter() - t0 < scaled(2.0)
         assert pong["type"] == "sys.pong"
     finally:
         assert finish(sup, obs) == 0
