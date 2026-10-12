@@ -36,6 +36,10 @@ Status: Entwurf. Werkzeuge in dieser Umgebung geprüft: AutoHotkey v2 unter `C:\
 | Worker blockiert in einem Aufruf, Abbruch oder Jobfrist | Instanz endet sofort, nach 2 s wird der Prozess beendet, der nächste Job läuft auf einem neuen Worker (WI-27) |
 | Engine stirbt während eines Worker-Jobs | die neue Engine beendet die Waisen, der Pool baut sich neu auf, der nächste Job läuft (WI-27) |
 | Fünf Fehler eines Pools in einer Minute | keine neuen Worker, Worker-Elemente enden mit "worker not available" (WI-27) |
+| Snapshot jeder Rolle (`cmd.diag.snapshot`) | allgemeiner Teil und Rollenteil im festen Schema, keine Inhalte von Variablen und Flows (WI-28, `tests/fault/test_snapshot.py`, Schema in `tests/support/snapshotschema.py`) |
+| Absturzbericht mit allen Rollen, eingefrorener Rolle, abgestürztem Storage | Ordner `Reports/<Zeit>_<Grund>/` mit je Rolle einem Eintrag und lesbarer Zusammenfassung; die eingefrorene Rolle ist als "keine Antwort" vermerkt, der Bericht ist binnen der Frist da; ohne Storage wartet er und bleibt im Speicher (WI-28, `tests/fault/test_report.py`) |
+| Automatischer Bericht nach Absturz, Hänger, Fehlerhäufung | genau ein Bericht je Minute, der Rest wird gezählt, keiner beim Beenden (WI-28) |
+| Debug-Fenster: `--command=debug`, Schließen, Fenster | startet die Rolle einmal, Schließen ist kein Absturz, das Fenster öffnet und schließt wie beim Benutzer (WI-28, `tests/fault/test_debug_role.py`; Bedienung von Hand: Ergebnis in `work_items/phase2b/WI-28-diagnose-bericht-debugfenster.md`) |
 | Pipe wird vom Client abrupt geschlossen | Hub räumt auf, Ausstehende Anfragen an ihn bekommen `peer_gone` |
 | Supervisor wird hart beendet | Alle Kinder beenden sich nach der Orphan-Frist |
 | Shutdown mit hängendem Prozess | Gesamtdauer unter Frist plus Toleranz, hängender Prozess hart beendet |

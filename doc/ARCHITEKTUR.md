@@ -248,7 +248,7 @@ Die Auswahl der nächsten Verbindung folgt exakt v1: Verbindungstyp gleich Ergeb
 Zwei Phasen, damit Benutzerentscheidungen nicht in harte Timeouts laufen:
 
 1. **Prepare (abbrechbar, keine harte Frist):** Supervisor sendet `cmd.app.prepareExit` an Editoren und Manager. Ein Editor mit ungespeicherten Änderungen fragt den Benutzer. Der Benutzer kann abbrechen, dann endet der Vorgang, nichts wurde gestoppt.
-2. **Shutdown (harte Frist, Standard 5 s gesamt):** Supervisor sendet `sys.shutdown {deadlineMs}`. Reihenfolge der Quittungen: Editoren/Manager, Engine (stoppt Instanzen mit je 2 s, schreibt Variablen zu `storage`), Triggerhost (deaktiviert alle Trigger), Worker, zuletzt `storage` (Queue leeren). Jeder Prozess quittiert mit `sys.bye` und beendet sich selbst.
+2. **Shutdown (harte Frist, Standard 5 s gesamt):** Supervisor sendet `sys.shutdown {deadlineMs}`. Reihenfolge der Quittungen: Editoren/Manager/Debug-Fenster (Rang 0, `cmd.app.prepareExit` nur an Editoren und Manager), Engine (stoppt Instanzen mit je 2 s, schreibt Variablen zu `storage`), Triggerhost (deaktiviert alle Trigger), Worker, zuletzt `storage` (Queue leeren). Jeder Prozess quittiert mit `sys.bye` und beendet sich selbst.
 3. Nach der Frist beendet der Supervisor übrige Prozesse hart. Das ist ungefährlich, weil es kein geteiltes Lock gibt und `storage` atomar schreibt (Temp-Datei + `MoveFileEx`).
 4. **Orphan-Guard:** Jede Rolle prüft alle 2 s, ob der Supervisor noch lebt (Pipe). Sonst beendet sie sich nach 3 s. Beim Systemende (`WM_QUERYENDSESSION`) startet der Supervisor Schritt 2 sofort.
 

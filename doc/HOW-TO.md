@@ -1029,3 +1029,60 @@ Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge kor
 - **Richtig:** Zustand vor dem Start setzen, nach dem Start nur Pid, Handle, Reader und `gone`. `OnHello` übernimmt die Pid des Links, wenn der Datensatz noch keine hat.
 - **Status:** verifiziert (12 von 12 grün nach der Korrektur, 12 von 12 grün auf dem Stand vor WI-27; der Wettlauf selbst ist nicht deterministisch nachgestellt, nur `OnHello` ohne Pid ist ein Unit-Test)
 - **Quelle:** `src/supervisor/Children.ahk` (`_Launch`, `OnHello`)
+
+### Eine Methode der Basisklasse wird still von einer gleichnamigen Methode der Unterklasse ersetzt (WI-28)
+
+- **Problem:** `Role` bekam die Methode `_CmdSnapshot` für `cmd.diag.snapshot`. Die Engine hat schon eine private Methode `_CmdSnapshot` (für `cmd.engine.snapshot`). Die Methode der Unterklasse ersetzt die der Basisklasse ohne Warnung: Der Aufruf `Role.Current._CmdSnapshot(msg)` lief in die Engine-Methode, die Antwort enthielt `epoch`, `flows` und kein `snapshot`. Die anderen Rollen antworteten richtig, nur die Engine nicht.
+- **Falsch:** In einer Basisklasse eine private Methode mit einem kurzen, naheliegenden Namen anlegen, den eine Unterklasse schon nutzt.
+- **Richtig:** Eindeutiger Name (`_CmdDiagSnapshot`). Vor dem Anlegen einer Methode in `Role` in allen Rollen nach dem Namen suchen (`grep -n "_Name(" src`). Ein Test, der jede Rolle fragt (`tests/fault/test_snapshot.py`), findet so etwas sofort.
+- **Status:** verifiziert (Test rot mit `KeyError: 'snapshot'` für die Engine, grün nach der Umbenennung)
+
+### Eine lokale Variable `role` verdeckt die Klasse `Role` (WI-28)
+
+- **Problem:** `Debug._Send` begann mit `role := Role.Current`. Namen sind nicht von der Groß-/Kleinschreibung abhängig, `role` ist damit eine lokale Variable, die die Klasse `Role` in der ganzen Funktion verdeckt. Die Zeile warf `UnsetError: This local variable has not been assigned a value`, `Debug.Dump` fing den Fehler (es wirft nie) und meldete nur `false`. Der Unit-Test mit einem Fake-Peer zeigte es sofort; ohne ihn wäre `Dump` still wirkungslos geblieben.
+- **Falsch:** `role := Role.Current` (ebenso `hub`, `log`, `children`, siehe die Einträge zu `Hub`, `Log`, `Children`).
+- **Richtig:** Ein anderer Name (`owner := Role.Current`). Eine Funktion, die "nie wirft", braucht einen Test, der den Erfolgsweg prüft, nicht nur, dass nichts geworfen wird.
+- **Status:** verifiziert (`tests/ahk/core_debug.test.ahk`)
+
+### Prozessdaten des eigenen Prozesses per DllCall (WI-28)
+
+- **Problem:** Der Snapshot braucht Arbeitsspeicher, Handle-Zahl, Startzeit und Laufzeit, ohne Schleife und ohne WMI.
+- **Richtig:** Pseudo-Handle `GetCurrentProcess()` (-1) genügt für alle drei. `psapi\GetProcessMemoryInfo(h, buf, 72)` mit `PROCESS_MEMORY_COUNTERS` auf 64 Bit: `cb` (uint, Offset 0), `WorkingSetSize` als `uptr` bei Offset 16, Größe 72, vorher `cb` setzen. `GetProcessHandleCount(h, &n)`. `GetProcessTimes(h, created, other, other, other)` mit vier 8-Byte-Puffern, `NumGet(created, 0, "int64")` ist die Erzeugungszeit als FILETIME (100 ns seit 1601). Umrechnung in einen AHK-Zeitstempel: `DateAdd("16010101000000", ticks // 10000000, "Seconds")`; die Laufzeit ist `GetSystemTimeAsFileTime` minus Erzeugungszeit. Alle Aufrufe sind schnell und blockieren nicht.
+- **Status:** verifiziert (`tests/ahk/core_snapshot.test.ahk`: Speicher über 1 MB, Handles über 5, Startzeit im Format und höchstens 2 Minuten alt)
+- **Quelle:** `src/core/ProcInfo.ahk`
+
+### Der Hub kann eine Antwort später senden, wie `Peer` (WI-28)
+
+- **Problem:** Der Absturzbericht wartet auf die Snapshots der Rollen. Der Handler für `cmd.diag.report` im Supervisor darf nicht blockieren und kann deshalb nicht sofort antworten. `Hub._Local` antwortete aber immer sofort mit dem Rückgabewert des Handlers.
+- **Richtig:** Wie bei `Peer` (WI-12): Der Handler gibt `Deferred.Marker()` zurück, `Hub._Local` sendet dann nichts, und `Hub.Reply(request, payload)` sendet die Antwort später. Der Handler ist für genau eine Antwort verantwortlich, auch auf jedem Fehlerpfad (`DiagReport` ruft `onDone` genau einmal auf, auch nach der Wartefrist auf `storage`).
+- **Status:** verifiziert (`tests/ahk/diag_report.test.ahk`, `tests/fault/test_report.py`)
+
+### Test-Beobachter verpasst `evt.engine.ready` (WI-28)
+
+- **Problem:** Der Beobachter einer `Chain` abonniert die Topics erst, nachdem der Supervisor gestartet ist. Kommt `evt.engine.ready` vorher, wartet der Test 20 s vergeblich. Ein Test hat das einmal getroffen, ein anderer startete einen Flow, der noch nicht geladen war (`not_found`).
+- **Richtig:** Nicht auf ein Ereignis warten, das vor dem Abonnement kommen kann (PROTOKOLL 5a), sondern den Zustand abfragen: `Chain.wait_flows()` fragt `cmd.engine.snapshot`, bis die Flows geladen sind.
+- **Status:** verifiziert (`tests/fault/faultkit.py`, alle Tests der Dateien `test_snapshot.py`, `test_report.py`, `test_debug_role.py`)
+
+### Test: Der Ordner eines Berichts entsteht vor seinen Dateien (WI-28)
+
+- **Problem:** Ein Test wartete auf den Ordner `Reports/<stamp>_hung-...` und las dann `report.json`: `FileNotFoundError`. Storage legt den Ordner an und schreibt die Dateien danach nacheinander.
+- **Richtig:** Auf die zuletzt geschriebene Datei warten (`summary.txt`, Reihenfolge: sortierte Namen der `Map`), nicht auf den Ordner.
+- **Status:** verifiziert (`tests/fault/test_report.py::wait_report`)
+
+### Python: `ctypes.windll.user32` ist ein gemeinsames Objekt, andere Module setzen `argtypes` darauf (WI-28)
+
+- **Problem:** `user32.EnumWindows(WINFUNCTYPE(...)(visit), 0)` im Test warf `ArgumentError: expected WinFunctionType instance instead of WinFunctionType`: Ein anderes Modul (der Dialog-Wächter) hatte `argtypes` von `EnumWindows` auf `windll.user32` gesetzt, mit einer eigenen `WINFUNCTYPE`-Klasse. Jeder Aufruf von `WINFUNCTYPE` erzeugt eine neue Klasse.
+- **Richtig:** Ein eigenes Objekt verwenden: `user32 = ctypes.WinDLL("user32")`. Dessen Funktionen sind von denen in `windll.user32` getrennt.
+- **Status:** verifiziert (`tests/fault/test_debug_role.py`)
+
+### Das Fenster einer AHK-Rolle ohne Bildschirmzugriff ansehen und bedienen (WI-28)
+
+- **Problem:** Das Debug-Fenster soll gezeigt werden, aber `Graphics.CopyFromScreen` (PowerShell) scheitert hier mit "Das Handle ist ungültig" (kein zugänglicher Desktop), und `keybd_event` erreicht das Fenster nicht (kein Vordergrund).
+- **Richtig:** Das Fenster mit `PrintWindow(hwnd, memDC, 2)` (`PW_RENDERFULLCONTENT`) in ein Bitmap zeichnen lassen (`GetWindowDC`, `CreateCompatibleDC/Bitmap`, `GetDIBits` mit 32 Bit top-down, `PIL.Image.frombuffer("RGBA", ..., "BGRA")`). Das geht ohne sichtbaren Desktop. Bedienen ohne Tastatur: Tabs mit `SendMessage(tabHwnd, WM_KEYDOWN, VK_RIGHT)` (Tab-Steuerung per `FindWindowExW(hwnd, 0, "SysTabControl32", 0)`), Knöpfe mit `BM_CLICK` (0xF5). Knöpfe auf einem Tab sind Kinder des Hauptfensters; `FindWindowExW(tab, ...)` findet sie nicht, `EnumChildWindows` auf das Hauptfenster schon. Das Schließen durch den Benutzer: `PostMessage(hwnd, WM_CLOSE)`.
+- **Status:** verifiziert (Screenshots aller fünf Tabs, Klick auf "Bericht exportieren", "Pause" und das Schließen; `tests/fault/test_debug_role.py::test_the_window_opens_takes_events_and_closes_like_a_user_would` prüft das Fenster und `WM_CLOSE`). Pillow ist dafür lokal nötig, gehört aber nicht zu `tests/requirements.txt`, der Test braucht es nicht.
+
+### Ein Bericht, der aus geparsten Kind-Antworten gebaut wird, schreibt Wahrheitswerte als 1/0 (WI-28)
+
+- **Problem:** `Json.Parse` liest `true` als `1`. Der Supervisor baut `report.json` aus den geparsten Snapshots der Rollen und schreibt `"enabled": 1` statt `true`. Die Felder des Supervisors selbst (`busy`, `auto`) sind echte Wahrheitswerte.
+- **Richtig:** Für die Datei, die ein Mensch liest, hinnehmbar und im Ergebnis von WI-28 notiert. Auf der Leitung (`cmd.test.debug`, `export.ok`) gilt weiter die Regel aus WI-26: die Wahrheitsfelder einer weitergereichten Nutzlast werden mit `Json.Bool` neu gesetzt (`DebugView._WireReport`); der Wächter in `tests/conftest.py` fand genau das beim ersten Lauf.
+- **Status:** verifiziert
