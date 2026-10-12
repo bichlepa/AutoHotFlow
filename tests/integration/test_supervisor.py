@@ -25,7 +25,7 @@ from support import pipenames, winpipe
 from support.ahfclient import AhfClient, dumps, make_envelope
 
 ROOT = Path(__file__).resolve().parents[2]
-ENTRY = ROOT / "src" / "AutoHotFlow.ahk"
+ENTRY = ROOT / "tests" / "integration" / "helpers" / "AutoHotFlowTest.ahk"   # product entry plus test roles (WI-29)
 AHKRUN = ROOT / "tools" / "ahkrun.py"
 
 EXIT_OK = 0

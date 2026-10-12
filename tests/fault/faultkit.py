@@ -27,7 +27,7 @@ from support import pipenames
 from support.ahfclient import AhfClient
 
 ROOT = Path(__file__).resolve().parents[2]
-ENTRY = ROOT / "src" / "AutoHotFlow.ahk"
+ENTRY = ROOT / "tests" / "integration" / "helpers" / "AutoHotFlowTest.ahk"   # product entry plus test roles (WI-29)
 AHKRUN = ROOT / "tools" / "ahkrun.py"
 SKELETON_SRC = ROOT / "tests" / "data" / "skeleton_flow.json"
 SKELETON_FLOW = "skeleton"

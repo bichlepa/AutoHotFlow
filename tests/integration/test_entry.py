@@ -12,6 +12,7 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[2]
 ENTRY = ROOT / "src" / "AutoHotFlow.ahk"
+TEST_ENTRY = ROOT / "tests" / "integration" / "helpers" / "AutoHotFlowTest.ahk"   # WI-29: product entry plus test roles
 AHKRUN = ROOT / "tools" / "ahkrun.py"
 AHK32 = Path(r"C:\Program Files\AutoHotkey\v2\AutoHotkey32.exe")
 
@@ -20,11 +21,11 @@ EXIT_BAD_ARGS = 2
 EXIT_DIALOG_CAUGHT = 97     # tools/ahkrun.py: a dialog appeared and was closed
 
 
-def run_entry(procs, datadir, args, timeout=30):
+def run_entry(procs, datadir, args, timeout=30, entry=ENTRY):
     out = Path(datadir) / "entry.out"
     err = Path(datadir) / "entry.err"
     with open(out, "wb") as o, open(err, "wb") as e:
-        proc = procs.start([sys.executable, str(AHKRUN), "--timeout", str(timeout), str(ENTRY), *args],
+        proc = procs.start([sys.executable, str(AHKRUN), "--timeout", str(timeout), str(entry), *args],
                            stdout=o, stderr=e, cwd=str(ROOT))
         code = proc.wait(timeout=timeout + 15)
     return code, out.read_bytes().decode("utf-8", "replace"), err.read_bytes().decode("utf-8", "replace")
@@ -32,14 +33,14 @@ def run_entry(procs, datadir, args, timeout=30):
 
 def test_error_while_loading_files_shows_no_dialog_and_ends_with_exit_1(procs, datadir, session_id):
     code, out, err = run_entry(procs, datadir, ["--session=" + session_id, "--data=" + str(datadir),
-                                                "--test-roles", "--test-register-failure"])
+                                                "--test-roles", "--test-register-failure"], entry=TEST_ENTRY)
     assert code != EXIT_DIALOG_CAUGHT, "a dialog appeared:\n" + out + err
     assert code == EXIT_START_FAILED, (code, out, err)
     assert "Test_RegisterFailure" in err or "Mode" in err, err
 
 
 def test_a_start_without_the_test_option_is_not_affected_by_the_helper(procs, datadir, session_id):
-    # the helper file is part of the entry, but it acts only with both test options; --role=echo needs a hub
+    # the helper file is part of the test entry, but it acts only with both test options; --role=echo needs a hub
     code, out, err = run_entry(procs, datadir, ["--session=" + session_id, "--data=" + str(datadir),
                                                 "--role=nonexistent"])
     assert code == EXIT_BAD_ARGS, (code, out, err)
