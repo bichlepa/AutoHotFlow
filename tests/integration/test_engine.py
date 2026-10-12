@@ -47,7 +47,11 @@ class StorageStub:
     def _serve(self):
         while not self._stop:
             for msg in self.client.events(timeout=0.2):
-                self._handle(msg)
+                try:
+                    self._handle(msg)
+                except Exception:       # the test closed the client while a message was being answered
+                    if not self._stop:
+                        raise
 
     def _handle(self, msg):
         type_ = msg.get("type")
@@ -178,6 +182,27 @@ class HoldingStorageStub(StorageStub):
         self.client.reply(msg, {"ok": True, "text": target.read_text(encoding="utf-8")})
 
 
+class DyingStorageStub(StorageStub):
+    """Serves `serve` reads, then answers every read with peer_gone (as the hub does for a storage that has died)."""
+
+    def __init__(self, pipe, datadir, serve):
+        super().__init__(pipe, datadir)
+        self.serve = serve
+        self.ok_paths = []
+        self.failed_paths = []
+
+    def _handle(self, msg):
+        if msg.get("type") != "cmd.storage.flow.read":
+            return super()._handle(msg)
+        path = msg["payload"].get("path", "")
+        if len(self.ok_paths) < self.serve:
+            self.ok_paths.append(path)
+            return super()._handle(msg)
+        self.read_calls.append(path)
+        self.failed_paths.append(path)
+        self.client.reply(msg, {"ok": False, "error": {"code": "peer_gone", "message": "storage gone"}})
+
+
 def wait_for(predicate, timeout=5.0):
     end = time.monotonic() + timeout
     while time.monotonic() < end:
@@ -216,13 +241,42 @@ def test_engine_reads_at_most_two_flow_files_at_a_time_while_loading(procs, data
 def test_engine_does_not_ask_for_more_files_when_storage_has_stopped_answering(procs, datadir, runs, session_id, pipe,
                                                                               hub, flowdir):
     # A storage that does not answer would make 200 reads wait for their deadline one after the other once
-    # they are staggered; after the first transport failure the rest is failed at once (WI-24).
+    # they are staggered; after the first transport failure no further file is asked for (WI-24). Since WI-31 this
+    # is no error either: the engine waits, and when storage answers again it reads everything (no file had a result).
     for n in range(8):
         shutil.copy(SKELETON_SRC, flowdir / "Flows" / ("copy%d.json" % n))
-    stub = HoldingStorageStub(pipe, flowdir, answer_code="peer_gone").start()
+    stub = DyingStorageStub(pipe, flowdir, serve=0).start()
     try:
         with observer(pipe, "engine") as obs:
             run = start_engine(procs, flowdir, runs, pipe, session_id)
+            assert wait_for(lambda: len(stub.failed_paths) >= 1, timeout=READY_TIMEOUT_S), "no read was asked"
+            seen = [m for m in obs.events(timeout=2.5) if m["type"] in ("evt.storage.error", "evt.engine.ready")]
+            assert not seen, [m["type"] + " " + str(m["payload"]) for m in seen]
+            assert set(stub.read_calls) <= {"Flows/copy0.json", "Flows/copy1.json"}, stub.read_calls   # only the first two, again and again at 1 s intervals
+            stub.serve = 100                                       # storage answers again; the engine polls the state
+            wait_ready(obs)
+            snap = ask(obs, "cmd.engine.snapshot")
+            assert snap["ok"] and len(snap["flows"]) == 9
+            hub.send_to("engine", "sys.shutdown", {"reason": "user", "deadlineMs": 1000})
+            assert run.wait_exit(timeout=10) == 0, run.stderr_text()
+    finally:
+        stub.close()
+
+
+def test_engine_waits_for_a_storage_that_starts_5_s_after_it_and_reports_no_error(procs, datadir, runs, session_id,
+                                                                                 pipe, hub, flowdir):
+    # WI-31 (F-31, F-24): before, the engine gave up after 5 tries in 2.5 s and never loaded; every try that hit
+    # "no peer 'storage'" was also reported as evt.storage.error.
+    with observer(pipe, "engine") as obs:
+        run = start_engine(procs, flowdir, runs, pipe, session_id)
+        assert hub.wait_for_peer("engine", timeout=READY_TIMEOUT_S)
+        early = []
+        deadline = time.monotonic() + 5.0
+        while time.monotonic() < deadline:                 # storage is late by 5 s
+            early += [m for m in obs.events(timeout=0.2) if m["type"] in ("evt.storage.error", "evt.engine.ready")]
+        assert not early, [m["type"] + " " + str(m["payload"]) for m in early]
+        stub = StorageStub(pipe, flowdir).start()
+        try:
             errors = []
             for msg in obs.events(timeout=READY_TIMEOUT_S):
                 if msg["type"] == "evt.storage.error":
@@ -230,15 +284,53 @@ def test_engine_does_not_ask_for_more_files_when_storage_has_stopped_answering(p
                 elif msg["type"] == "evt.engine.ready":
                     break
             else:
-                pytest.fail("no evt.engine.ready")
-            assert len(stub.read_calls) <= 3, stub.read_calls      # 2 sent at first, 1 more at most before the flag was set
-            assert len(errors) == 9, [e["payload"] for e in errors]       # every file has its error
+                pytest.fail("no evt.engine.ready after storage came up\n" + run.stderr_text())
+            assert not errors, [m["payload"] for m in errors]
+            assert stub.list_calls == 1 and stub.read_calls == ["Flows/skeleton.json"]
             snap = ask(obs, "cmd.engine.snapshot")
-            assert snap["ok"] and snap["flows"] == []
+            assert [f["flowId"] for f in snap["flows"]] == ["skeleton"]
+            hub.send_to("engine", "sys.shutdown", {"reason": "user", "deadlineMs": 1000})
+            assert run.wait_exit(timeout=10) == 0, run.stderr_text()
+        finally:
+            stub.close()
+
+
+def test_engine_resumes_loading_when_storage_restarts_in_the_middle_and_loads_only_the_missing_files(
+        procs, datadir, runs, session_id, pipe, hub, flowdir):
+    # WI-31 (F-24 follow-up): before, the files after the break were failed as errors and never loaded again.
+    for n in range(19):
+        shutil.copy(SKELETON_SRC, flowdir / "Flows" / ("copy%02d.json" % n))
+    all_paths = sorted("Flows/" + p.name for p in (flowdir / "Flows").glob("*.json"))
+    assert len(all_paths) == 20
+    first = DyingStorageStub(pipe, flowdir, serve=7).start()
+    second = None
+    try:
+        with observer(pipe, "engine") as obs:
+            run = start_engine(procs, flowdir, runs, pipe, session_id)
+            assert wait_for(lambda: len(first.failed_paths) >= 1, timeout=READY_TIMEOUT_S), "storage never failed"
+            first.close()                                   # the storage process is gone
+            assert not [m for m in obs.events(timeout=1.0) if m["type"] in ("evt.engine.ready", "evt.storage.error")]
+            second = StorageStub(pipe, flowdir).start()     # it starts again: evt.process.ready storage
+            errors = []
+            for msg in obs.events(timeout=READY_TIMEOUT_S):
+                if msg["type"] == "evt.storage.error":
+                    errors.append(msg)
+                elif msg["type"] == "evt.engine.ready":
+                    break
+            else:
+                pytest.fail("no evt.engine.ready after storage came back\n" + run.stderr_text())
+            assert not errors, [m["payload"] for m in errors]
+            snap = ask(obs, "cmd.engine.snapshot")
+            assert len(snap["flows"]) == 20
+            assert set(first.ok_paths) | set(second.read_calls) == set(all_paths)
+            assert not set(first.ok_paths) & set(second.read_calls), "files that were loaded were read again"
+            assert len(second.read_calls) == 20 - len(first.ok_paths)
             hub.send_to("engine", "sys.shutdown", {"reason": "user", "deadlineMs": 1000})
             assert run.wait_exit(timeout=10) == 0, run.stderr_text()
     finally:
-        stub.close()
+        first.close()
+        if second:
+            second.close()
 
 
 def test_flow_get_returns_the_definition_and_unknown_flow_is_not_found(procs, datadir, runs, session_id, pipe,

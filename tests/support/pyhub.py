@@ -144,6 +144,8 @@ class PyHub:
             peers = self._peer_table()
             self._reply(link, msg, "sys.welcome",
                         {"ok": True, "session": self.session, "peers": peers, "settingsRev": 0})
+            # Like the supervisor (PROTOCOL 4.1a): a role that said hello is ready, subscribers of "process" hear it.
+            self._publish("process", "evt.process.ready", {"name": link.name, "pid": 0})
             return
         if link.name is None:
             return  # nothing is routed before the handshake
@@ -156,6 +158,12 @@ class PyHub:
             self._reply(link, msg, "res.topic.unsubscribe", {"ok": True})
             return
         to = msg.get("to", "")
+        if to == "supervisor" and type_ == "cmd.process.list":
+            # The peers that are connected count as ready children (PROTOCOL 4.1).
+            procs = [{"name": n, "role": n.split(":")[0], "state": "ready", "pid": 0, "restarts": 0}
+                     for n in self._peer_table()]
+            self._reply(link, msg, "res.process.list", {"ok": True, "processes": procs})
+            return
         if to.startswith("topic:"):
             topic = to[len("topic:"):]
             with self._lock:
@@ -170,6 +178,14 @@ class PyHub:
         elif type_.startswith("cmd."):
             self._reply(link, msg, "res." + type_[4:],
                         {"ok": False, "error": {"code": "not_found", "message": "no peer " + str(to)}})
+
+    def _publish(self, topic, type_, payload):
+        with self._lock:
+            targets = [l for l in self._links if topic in l.topics]
+        for target in targets:
+            self._ids += 1
+            target.send(make_envelope("supervisor", "supervisor#%d" % self._ids, "topic:" + topic, type_, None, None,
+                                      payload))
 
     def _forward(self, sender, msg):
         """Copy of the message with `from` set by the hub, keeping the envelope key order."""
