@@ -2,7 +2,7 @@
 
 ## Language
 
-**The repository is English only**: code, comments, documentation, log texts, commit messages, VS Code task labels and issue/PR texts. This keeps the project open for contributors worldwide. The project owner talks to agents in German; that conversation is not part of the repository.
+**The repository is English only**: code, comments, documentation, log texts, commit messages, VS Code task labels and issue/PR texts. This keeps the project open for contributors worldwide.
 
 ## What this is
 
