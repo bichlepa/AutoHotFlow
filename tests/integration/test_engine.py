@@ -15,7 +15,8 @@ from pathlib import Path
 import pytest
 
 from support.ahfclient import AhfClient
-from test_role import RoleHub, RoleRun
+from test_role import (FLOOD_PINGS, STALL_S, RoleHub, RoleRun, StallingHub, ahk_process, first_pong_of,
+                       flood_pings, pongs_from, wait_hello)
 
 ROOT = Path(__file__).resolve().parents[2]
 SKELETON_SRC = ROOT / "tests" / "data" / "skeleton_flow.json"
@@ -572,6 +573,43 @@ def test_shutdown_stops_running_instances_and_says_bye_within_the_deadline(procs
         assert run.wait_exit(timeout=5) == 0, run.stderr_text()
         elapsed = time.monotonic() - t0
         assert elapsed < 2.0, "shutdown took %.3f s" % elapsed
+
+
+MANY_INSTANCES = 40
+
+
+def test_shutdown_with_many_instances_and_a_hub_that_reads_late_delivers_every_ended(procs, datadir, runs,
+                                                                                      session_id, pipe, flowdir):
+    # WI-30 (F-26 cause A): at sys.shutdown the send queue of the engine is full (the hub reads nothing for
+    # STALL_S). StopAll still reaches the observer with one evt.instance.ended per instance, then sys.bye.
+    make_flow(flowdir, "many", sleep_ms=10000, policy="parallel")
+    with StallingHub(pipe, first_pong_of("engine"), STALL_S) as hub:
+        storage = StorageStub(pipe, flowdir).start()
+        try:
+            with subscribe_flow(pipe, "many") as obs:
+                run = start_engine(procs, flowdir, runs, pipe, session_id)
+                wait_ready(obs)
+                ids = {ask(obs, "cmd.flow.start", {"flowId": "many"})["instanceId"] for _ in range(MANY_INSTANCES)}
+                assert len(ids) == MANY_INSTANCES
+                pid = wait_hello(hub, "engine")
+                ahk = ahk_process(pid)
+                flood_pings(hub, "engine")
+                hub.send_to("engine", "sys.shutdown", {"reason": "user", "deadlineMs": 3000})
+                assert ahk.wait(timeout=10) == 0, run.stderr_text()
+                ended = {}
+                deadline = time.monotonic() + 10.0
+                while len(ended) < MANY_INSTANCES and time.monotonic() < deadline:
+                    for msg in obs.events(timeout=0.5):
+                        if msg.get("type") == "evt.instance.ended":
+                            ended[msg["payload"]["instanceId"]] = msg["payload"]["reason"]
+                assert hub.stalled.is_set()
+                assert set(ended) == ids, "%d of %d evt.instance.ended" % (len(ended), MANY_INSTANCES)
+                assert set(ended.values()) == {"shutdown"}, set(ended.values())
+                bye = hub.wait_received(lambda m: m.get("type") == "sys.bye" and m.get("from") == "engine", timeout=5)
+                assert bye is not None and bye["payload"]["clean"] is True, "sys.bye lost"
+                assert pongs_from(hub, "engine") == list(range(1, FLOOD_PINGS + 1))
+        finally:
+            storage.close()
 
 
 # --- patch schema (PROTOCOL 4.2) -----------------------------------------------------------------

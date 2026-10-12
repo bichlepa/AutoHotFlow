@@ -493,7 +493,7 @@ Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge kor
 ### sys.shutdown: Verbindung nicht im Rahmen-Handler schließen
 
 - **Problem:** `sys.shutdown` muss `sys.bye` senden und danach den Prozess beenden. Ein `Peer.Close()` direkt im Handler schließt die Verbindung, während sie gerade den Rahmen abarbeitet. Das Ende des Handlers arbeitet dann mit einem geschlossenen Objekt.
-- **Richtig:** Im Handler nur die Arbeit erledigen und `SetTimer(Role.ByeFn, -1)` setzen. Der Timer sendet `sys.bye {clean:true}`, schließt den Peer und ruft `ExitApp(0)`. Gemessen: Exit 0 etwa 240 ms nach dem Befehl, `sys.bye` kommt beim Hub an (`test_shutdown_sends_bye_and_exits_0_within_one_second`).
+- **Richtig:** Im Handler nur die Arbeit erledigen und `SetTimer(Role.ByeFn, -1)` setzen. Der Timer sendet `sys.bye {clean:true}`, schließt den Peer und ruft `ExitApp(0)`. Gemessen: Exit 0 etwa 240 ms nach dem Befehl, `sys.bye` kommt beim Hub an (`test_shutdown_sends_bye_and_exits_0_within_one_second`). **Seit WI-30** schließt der Timer nicht mehr mit `Peer.Close`, sondern mit `Peer.CloseWhenFlushed` und ruft `ExitApp` erst im Rückruf (siehe "Close verwirft die Warteschlange").
 - **Status:** verifiziert (Test grün, gemessen). Ein direktes `Close` im Handler wurde nicht ausprobiert: nicht geprüft.
 - **Quelle:** `src/core/Role.ahk` (`_OnShutdown`, `_FinishShutdown`)
 
@@ -771,6 +771,15 @@ Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge kor
 - **Problem:** `Json.Parse` liest `true` als `1`. Der Supervisor baut `report.json` aus den geparsten Snapshots der Rollen und schreibt `"enabled": 1` statt `true`. Die Felder des Supervisors selbst (`busy`, `auto`) sind echte Wahrheitswerte.
 - **Richtig:** Für die Datei, die ein Mensch liest, hinnehmbar und im Ergebnis von WI-28 notiert. Auf der Leitung (`cmd.test.debug`, `export.ok`) gilt weiter die Regel aus WI-26: die Wahrheitsfelder einer weitergereichten Nutzlast werden mit `Json.Bool` neu gesetzt (`DebugView._WireReport`); der Wächter in `tests/conftest.py` fand genau das beim ersten Lauf.
 - **Status:** verifiziert
+
+### Close verwirft die Warteschlange: die letzten Rahmen vor dem Ende gehen verloren (WI-30, F-26)
+
+- **Problem:** Eine Rolle sendete `sys.bye` und rief sofort `Peer.Close()` und `ExitApp`. `PipeConnection.Close` bricht mit `CancelIoEx` einen laufenden Schreibvorgang ab und leert die Sendewarteschlange. Was nicht sofort in die Pipe passte (64 KiB Puffer, der Hub liest gerade nicht), war verloren: das `sys.bye` und alles davor (Pongs, Ereignisse, Logzeilen). Der Supervisor meldete dann `clean: false`. Nachgestellt mit einem Hub, der 0,6 s nicht liest (`StallingHub` in `tests/integration/test_role.py`): 572 von 800 Pongs, kein `sys.bye`. Auf Pipe-Ebene: 16 von 101 Rahmen.
+- **Falsch:** `Send(...)` und gleich `Close()`, in der Annahme, `SendFrame` habe den Rahmen schon geschrieben (es gibt `true` zurück, sobald der Rahmen **in der Warteschlange** liegt). Ebenso falsch: `FlushFileBuffers` auf der Pipe, das wartet ohne Frist, bis der Leser alles gelesen hat (blockiert den Prozess, wenn der Hub steht).
+- **Richtig:** `PipeConnection.CloseWhenFlushed(timeoutMs, onDone)`: keine neuen Rahmen mehr (`SendFrame` liefert `false`), ein Timer (10 ms) schreibt die Warteschlange weiter, geschlossen wird bei leerer Warteschlange oder nach der Frist, `onDone(flushed)` genau einmal aus dem Timer, nie im Aufruf. `Peer.CloseWhenFlushed` trennt vorher die Verbindung vom Peer (`OnClose` leer, sonst startete ihr Ende einen Wiederaufbau). `Role._EndProcess` ruft `ExitApp` im Rückruf und setzt zusätzlich einen Notfall-Timer (Frist + 1 s).
+- **Status:** verifiziert (rot, dann grün: `test_pipe.py::test_frames_queued_when_the_connection_is_ended_reach_a_late_reader`, `test_role.py::test_frames_queued_at_shutdown_and_the_bye_reach_a_hub_that_reads_late`; Frist ohne Leser 308 ms bei 300 ms, `..._gives_up_at_its_deadline_and_does_not_block`). Dass genau dies die `clean: false` von F-26 in den Abnahmeläufen erzeugte, ist vermutet (nicht im Lauf nachgewiesen).
+- **Quelle:** `src/core/ipc/PipeConnection.ahk`, `src/core/ipc/Peer.ahk`, `src/core/Role.ahk`
+
 
 ## GUI und Hotkeys
 

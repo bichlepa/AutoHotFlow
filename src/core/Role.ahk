@@ -22,7 +22,8 @@
 ;   }
 ;
 ; Standard handlers: sys.ping/sys.pong live in Peer. sys.shutdown is handled here: OnShutdown,
-; then sys.bye {clean:true} to the supervisor, then Peer.Close and ExitApp(0), in the next timer tick.
+; then sys.bye {clean:true} to the supervisor in the next timer tick, then Peer.CloseWhenFlushed and ExitApp(0)
+; once the send queue is written (at most the rest of the deadline, FLUSH_MAX_MS; WI-30, _EndProcess).
 ; Orphan guard: when the hub connection is lost and not restored within ORPHAN_MS, the role
 ; ends with EXIT_HUB_LOST. The peer's own retry budget (reconnectTotalMs) is the backstop.
 ;
@@ -44,6 +45,17 @@ class Role {
     ; a zombie. The window keeps rare errors over a long life from adding up.
     static ERROR_LIMIT := 20
     static ERROR_WINDOW_MS := 60000
+    ; Ending (WI-30, F-26): the last frames (events, log lines, sys.bye) are written before the process ends
+    ; (Peer.CloseWhenFlushed). The time for that is the rest of the shutdown deadline, but at most FLUSH_MAX_MS:
+    ; a healthy hub empties a full pipe within one or two of its ticks (200 ms), one second also covers a hub that is
+    ; busy with a burst of other clients, and the supervisor ends the process at its deadline anyway. FLUSH_MIN_MS
+    ; keeps one short attempt when the deadline is already spent. Ending without sys.shutdown (the debug window that
+    ; the user closes) and _Exit with a connected peer (too many errors) use FLUSH_MAX_MS and EXIT_FLUSH_MS.
+    ; EXIT_BACKSTOP_MS: ExitApp also runs this long after the flush deadline, should its callback never come.
+    static FLUSH_MAX_MS := 1000
+    static FLUSH_MIN_MS := 50
+    static EXIT_FLUSH_MS := 500
+    static EXIT_BACKSTOP_MS := 1000
     static MAX_STACK_CHARS := 4000
     static ERROR_KEEP := 20
     static Current := ""
@@ -72,6 +84,7 @@ class Role {
     static GuardFn := () => Role.Current._Guard()
     static ByeFn := () => Role.Current._FinishShutdown()
     static SnapshotFn := (msg) => Role.Current._CmdDiagSnapshot(msg)
+    static BackstopFn := () => ExitApp(Role.Current.exitCode)
 
     __New(args) {
         this.args := args
@@ -85,6 +98,8 @@ class Role {
         this.logLevel := Log.ParseLevel(args.Get("log-level", Log.DEFAULT_LEVEL))   ; throws: the entry exits with 2
         this.peer := ""
         this.closing := false
+        this.exitCode := Role.EXIT_OK
+        this.shutdownUntil := 0        ; Time.NowMs() when the deadline of sys.shutdown ends, 0 without sys.shutdown
         this.lostSince := 0
         this.logQueue := []
         this.logDropped := 0
@@ -265,6 +280,7 @@ class Role {
         if (this.closing)
             return
         deadlineMs := msg.payload.Get("deadlineMs", 5000)
+        this.shutdownUntil := Time.NowMs() + (IsNumber(deadlineMs) ? deadlineMs : 5000)
         this._Log("a1", "role", this.name " shutdown requested, deadline " deadlineMs " ms")
         try {
             this.OnShutdown(deadlineMs)
@@ -275,23 +291,45 @@ class Role {
         SetTimer(Role.ByeFn, -1)
     }
 
+    ; sys.bye goes behind everything the role sent before (the stopped instances of the engine, the "stopped" of a
+    ; worker, the last log lines). The process ends when the hub has taken all of it, or at the flush deadline.
     _FinishShutdown() {
         if (this.closing)
             return
         this.closing := true
         this.peer.Send("supervisor", "sys.bye", Map("clean", Json.True))
-        this.peer.Close()
-        ExitApp(Role.EXIT_OK)
+        this._EndProcess(Role.EXIT_OK, this._FlushBudget())
     }
 
+    ; The time the last frames may take: the rest of the shutdown deadline within FLUSH_MIN_MS..FLUSH_MAX_MS.
+    _FlushBudget() {
+        if (this.shutdownUntil = 0)
+            return Role.FLUSH_MAX_MS
+        return Max(Role.FLUSH_MIN_MS, Min(Role.FLUSH_MAX_MS, Integer(this.shutdownUntil - Time.NowMs())))
+    }
+
+    ; Hub lost (orphan guard, peer closed): there is nothing to write, the role ends at once. With a connected peer
+    ; (too many unexpected errors) the last frames (evt.diag.error, log lines) still leave, for EXIT_FLUSH_MS at most.
     _Exit(code, reason) {
         if (this.closing)
             return
         this.closing := true
         Role.Console("a0", "role", this.name " ends with exit " code ": " reason)
+        if (IsObject(this.peer) && this.peer.status = "ready") {
+            this._EndProcess(code, Role.EXIT_FLUSH_MS)
+            return
+        }
         if (IsObject(this.peer))
             this.peer.Close()
         ExitApp(code)
+    }
+
+    ; Ends the process after the send queue is written (Peer.CloseWhenFlushed), at the latest after flushMs.
+    ; Returns at once; ExitApp runs from a timer. The backstop timer ends the process even if the callback is lost.
+    _EndProcess(code, flushMs) {
+        this.exitCode := code
+        SetTimer(Role.BackstopFn, -(flushMs + Role.EXIT_BACKSTOP_MS))
+        this.peer.CloseWhenFlushed(flushMs, (flushed) => ExitApp(code))
     }
 
     static _OnUnexpected(e, mode) {

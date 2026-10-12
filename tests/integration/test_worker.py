@@ -12,7 +12,8 @@ import time
 import pytest
 
 from support.ahfclient import AhfClient
-from test_role import RoleHub, RoleRun, wait_hello
+from test_role import (FLOOD_PINGS, STALL_S, RoleHub, RoleRun, StallingHub, ahk_process, first_pong_of,
+                       flood_pings, pongs_from, wait_hello)
 
 ROOT_TIMEOUT_S = 5.0
 CANCEL_BUDGET_S = 0.5          # acceptance: cmd.worker.cancel -> evt.worker.done "stopped" within 500 ms
@@ -226,6 +227,28 @@ def test_shutdown_while_running_reports_stopped_before_bye(worker, supervisor_cl
                 break
     assert seen == ["done:stopped", "bye"], seen
     assert bye["payload"]["clean"]
+
+
+def test_shutdown_with_a_job_and_a_hub_that_reads_late_still_delivers_stopped_and_bye(procs, datadir, runs, pipe,
+                                                                                       session_id):
+    # WI-30 (F-26 cause A): at sys.shutdown the send queue of the worker is full (the hub reads nothing for
+    # STALL_S). evt.worker.done "stopped" still reaches the engine, and sys.bye comes after it.
+    with StallingHub(pipe, first_pong_of("worker:1"), STALL_S) as hub:
+        run = start_worker(procs, datadir, runs, pipe, session_id)
+        ahk = ahk_process(wait_hello(hub, "worker:1"))
+        with AhfClient(pipe, "engine") as eng:
+            assert send_run(eng, run_payload("f1", "Action_TestHangWorker"))["ok"]
+            time.sleep(0.2)
+            flood_pings(hub, "worker:1")
+            hub.send_to("worker:1", "sys.shutdown", {"reason": "user", "deadlineMs": 3000})
+            assert ahk.wait(timeout=10) == 0, run.stderr_text()
+            assert done_for(eng, "f1")["result"] == "stopped"
+            bye = hub.wait_received(lambda m: m.get("type") == "sys.bye" and m.get("from") == "worker:1", timeout=5)
+            assert hub.stalled.is_set()
+            assert bye is not None and bye["payload"]["clean"] is True, "sys.bye lost"
+            assert pongs_from(hub, "worker:1") == list(range(1, FLOOD_PINGS + 1))
+            types = [m.get("type") for m in hub.received if m.get("from") == "worker:1"]
+            assert types.index("evt.worker.done") < types.index("sys.bye"), types[-5:]
 
 
 # --- sys.busy (WI-27) ------------------------------------------------------------------------------

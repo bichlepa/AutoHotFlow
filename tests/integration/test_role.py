@@ -9,6 +9,7 @@ Exit codes: 0 normal end, 1 start failure, 2 bad arguments or unknown role, 3 no
 
 import subprocess
 import sys
+import threading
 import time
 from pathlib import Path
 
@@ -39,6 +40,44 @@ class RoleHub(WakingHub):
             link = next((l for l in self._links if l.name == name), None)
         assert link is not None, "no peer %r connected to the hub" % name
         assert link.send(make_envelope("supervisor", "supervisor#900", name, type_, None, None, payload))
+
+
+class StallingHub(RoleHub):
+    """RoleHub that stops reading one client once for a while (WI-30, F-26 cause A).
+
+    The first received message that satisfies stall_on holds the reading thread of its connection for stall_s
+    seconds. The role keeps writing meanwhile: its pipe (64 KiB) fills and the rest waits in its send queue.
+    """
+
+    def __init__(self, pipe_name, stall_on, stall_s):
+        super().__init__(pipe_name)
+        self._stall_on = stall_on
+        self._stall_s = stall_s
+        self.stalled = threading.Event()
+
+    def _handle(self, link, msg):
+        if not self.stalled.is_set() and self._stall_on(msg):
+            self.stalled.set()
+            time.sleep(self._stall_s)
+        super()._handle(link, msg)
+
+
+FLOOD_PINGS = 800            # 800 sys.pong of about 140 bytes: more than the 64 KiB of the pipe, fewer than 1000 frames
+STALL_S = 0.6                # the hub reads nothing from the role for this long, less than the flush limit (1 s)
+
+
+def first_pong_of(name):
+    return lambda m: m.get("type") == "sys.pong" and m.get("from") == name
+
+
+def flood_pings(hub, name, count=FLOOD_PINGS):
+    """Sends count sys.ping; the peer of the role answers each with a sys.pong (into its send queue)."""
+    for n in range(1, count + 1):
+        hub.send_to(name, "sys.ping", {"n": n})
+
+
+def pongs_from(hub, name):
+    return [m["payload"]["n"] for m in list(hub.received) if m.get("type") == "sys.pong" and m.get("from") == name]
 
 
 class RoleRun:
@@ -191,6 +230,25 @@ def test_shutdown_sends_bye_and_exits_0_within_one_second(procs, datadir, runs, 
         assert not psutil.pid_exists(pid)
         assert run.wait_exit(timeout=10) == EXIT_OK
         print("\nsys.shutdown -> exit 0 in %.1f ms" % (elapsed * 1000))
+
+
+def test_frames_queued_at_shutdown_and_the_bye_reach_a_hub_that_reads_late(procs, datadir, runs, session_id, pipe):
+    # F-26 cause A (WI-30): when sys.shutdown comes, the role still has frames in its send queue (the hub reads
+    # nothing for STALL_S). Every pong and then sys.bye must arrive; before WI-30 Close dropped the queue.
+    with StallingHub(pipe, first_pong_of("echo"), STALL_S) as hub:
+        run = launch(procs, datadir, runs, pipe, session_id, "echo")
+        pid = wait_hello(hub, "echo")
+        ahk = ahk_process(pid)
+        flood_pings(hub, "echo")
+        hub.send_to("echo", "sys.shutdown", {"reason": "user", "deadlineMs": 3000})
+        assert ahk.wait(timeout=10) == EXIT_OK, run.stderr_text()
+        bye = hub.wait_received(lambda m: m.get("type") == "sys.bye" and m.get("from") == "echo", timeout=5)
+        assert hub.stalled.is_set()
+        pongs = pongs_from(hub, "echo")
+        assert pongs == list(range(1, FLOOD_PINGS + 1)), "%d pongs, last %s" % (len(pongs), pongs[-1:] or None)
+        assert bye is not None and bye["payload"]["clean"] is True, "sys.bye lost"
+        types = [m.get("type") for m in hub.received if m.get("from") == "echo"]
+        assert types[-1] == "sys.bye", types[-3:]
 
 
 def test_hub_gone_role_ends_within_orphan_budget_and_leaves_no_process(procs, datadir, runs, session_id, pipe):

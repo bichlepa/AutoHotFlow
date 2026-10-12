@@ -117,9 +117,30 @@ class Peer {
         this._Attempt()
     }
 
-    ; Ends the peer for good: pending requests get shutting_down, OnClosed is called once.
+    ; Ends the peer for good: pending requests get shutting_down, OnClosed is called once. Frames that still wait
+    ; in the send queue of the connection are dropped (use CloseWhenFlushed for the last frames of a process).
     Close() {
         this._Closed("local")
+    }
+
+    ; Ends the peer for good like Close, but what was sent before still leaves (WI-30, F-26): the connection
+    ; takes no new frames and closes when its send queue is written or after timeoutMs
+    ; (PipeConnection.CloseWhenFlushed). The connection is detached first, so its end starts no reconnect and
+    ; incoming frames are no longer handled. onDone(flushed) is called once, never inside this call; flushed is
+    ; false when there was no open connection, frames were dropped at the deadline, or the hub went away.
+    CloseWhenFlushed(timeoutMs, onDone) {
+        conn := this._conn
+        if (this.status = "closed" || !IsObject(conn) || !conn.IsOpen) {
+            this._Closed("local")
+            SetTimer(() => onDone(false), -1)
+            return
+        }
+        this._conn := ""
+        conn.OnFrame := ""
+        conn.OnClose := ""
+        this._Closed("local")
+        if (!conn.CloseWhenFlushed(timeoutMs, onDone))
+            SetTimer(() => onDone(false), -1)
     }
 
     ; Topic subscription. Kept across reconnects: it is sent again after every handshake.
