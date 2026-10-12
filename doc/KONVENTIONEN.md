@@ -1,58 +1,58 @@
-# Konventionen für den v2-Code
+# Conventions for the v2 code
 
-Gilt für alles unter `src/`, `tests/ahk/` und `tools/`. Sprache der Dokumentation: Deutsch. Sprache im Code (Kommentare, Namen, Logtexte außerhalb von `Lang()`): Englisch, wie in v1.
+Applies to everything under `src/`, `tests/ahk/` and `tools/`. Language of the documentation and of the code (comments, names, log texts outside `Lang()`): English.
 
-## 1. Datei und Struktur
+## 1. Files and structure
 
-- Jede AHK-Datei beginnt mit `#Requires AutoHotkey v2.0`. Rollen-Einstiege zusätzlich `#SingleInstance Off` (mehrere Instanzen derselben Datei sind gewollt) und im Entwicklungsmodus `#Warn All`.
-- **Eine Klasse pro Datei**, Dateiname = Klassenname (`Dispatcher.ahk`). Mehrere freie Funktionen nur in `Util`-Dateien.
-- **Keine globalen Variablen.** Zustand liegt in Klassen oder als `static`-Mitglied. Ausnahmen (Einstieg `A_Args`-Parsing, Registry-Singleton) stehen in `AutoHotFlow.ahk` bzw. im Rollenmodul.
-- Einbindung nur nach den Regeln aus ARCHITEKTUR 8 (`core/` kennt keine Rollen, Rollen kennen einander nicht).
-- Kodierung: UTF-8 ohne BOM, Zeilenende wie im Repo (siehe `.gitattributes`).
+- Every AHK file starts with `#Requires AutoHotkey v2.0`. Role entry points additionally use `#SingleInstance Off` (several instances of the same file are intended) and, in development mode, `#Warn All`.
+- **One class per file**, file name = class name (`Dispatcher.ahk`). Several free functions only in `Util` files.
+- **No global variables.** State lives in classes or as `static` members. Exceptions (the entry point's `A_Args` parsing, the registry singleton) are in `AutoHotFlow.ahk` and the role module respectively.
+- Includes only according to the rules in ARCHITECTURE 8 (`core/` knows no roles, roles do not know each other).
+- Encoding: UTF-8 without BOM, line endings as in the repo (see `.gitattributes`).
 
-## 2. Namen
+## 2. Names
 
-- Klassen, Methoden, Eigenschaften: `PascalCase`. Lokale Variablen und Parameter: `camelCase`. Konstanten: `UPPER_SNAKE`.
-- Nachrichtentypen: klein, punktgetrennt (`cmd.flow.start`). IDs aus Flow-Dateien werden nie verändert.
-- Private Mitglieder beginnen mit `_`.
+- Classes, methods, properties: `PascalCase`. Local variables and parameters: `camelCase`. Constants: `UPPER_SNAKE`.
+- Message types: lowercase, dot-separated (`cmd.flow.start`). IDs from flow files are never changed.
+- Private members start with `_`.
 
-## 3. Verbotene Muster (Reviewregeln)
+## 3. Forbidden patterns (review rules)
 
-Die Muster mit festem Wortlaut werden **automatisch geprüft**: `python tools/arch_check.py` (Exit 1 bei Verstößen, Ausgabe `datei:zeile: regel: text`) und `tests/test_architecture.py` (Teil des Gesamtlaufs). Regeln: `requires`, `one-class`, `include-core`, `include-roles`, `include-tests`, `dialog`, `file-io`, `blocking`, `inline-element`, `warn`, `critical`, `empty-catch`, `builtin-class`, `wire-bool`. Eine begründete Ausnahme steht als Kommentar `; arch-ok: <regel> <Begründung>` in derselben oder der vorigen Zeile, oder (für bekannte Altlasten) in der Liste `EXCEPTIONS` in `tools/arch_check.py`. **Neue Regeln werden hier und im Werkzeug (samt Selbsttest) gleichzeitig ergänzt.** Die Prüfung ist bewusst einfach (Zeilen und Muster); `A_TickCount`/Zufall als ID, Zugriff über Prozessgrenzen und fehlendes `try/catch` um Elementcode prüft sie nicht (Review).
+The patterns with fixed wording are **checked automatically**: `python tools/arch_check.py` (exit 1 on violations, output `file:line: rule: text`) and `tests/test_architecture.py` (part of the full run). Rules: `requires`, `one-class`, `include-core`, `include-roles`, `include-tests`, `dialog`, `file-io`, `blocking`, `inline-element`, `warn`, `critical`, `empty-catch`, `builtin-class`, `wire-bool`. A justified exception is a comment `; arch-ok: <rule> <justification>` on the same or the previous line, or (for known legacy cases) an entry in the `EXCEPTIONS` list in `tools/arch_check.py`. **New rules are added here and in the tool (including its self-test) at the same time.** The check is deliberately simple (lines and patterns); it does not detect `A_TickCount`/randomness used as ID, access across process boundaries, or a missing `try/catch` around element code (review).
 
-| Muster | Wo verboten | Stattdessen |
+| Pattern | Where forbidden | Instead |
 |---|---|---|
-| `MsgBox`, `InputBox`, `FileSelect`, `DirSelect`, jedes blockierende GUI | `engine`, `supervisor`, `storage`, `triggerhost`, `core` | Nachricht an UI/Worker (`evt.ui.notice`, Dialog-Element im Worker) |
-| `FileRead/FileAppend/FileOpen/FileDelete/DirCreate/Loop Files` | alles außer `storage` (und Startparameter-Lesen beim Booten) | Anfrage an `storage`. Keine Datei-I/O im Sinne dieser Regel: Schreiben auf stderr (`**`, `Role.Console`) und das Mitlesen der anonymen Pipe der Kinder durch den Supervisor (`ChildPipe`, `PeekNamedPipe`/`ReadFile` auf ein Handle, das keine Datei ist, nie blockierend). |
-| `Sleep` (>0), `RunWait`, `WinWait*` ohne Timeout, `Loop` mit Wartezeit | alles außer `worker` | `SetTimer`, Callback |
-| `A_TickCount` oder Zufall als ID | überall | `Ids.Next(prefix)` (Zähler pro Prozess) |
-| `Critical` | überall | nicht nötig. Wenn doch, mit Begründung im Kommentar |
-| `try` ohne Behandlung (leerer `catch`) | überall | loggen oder bewusst begründen |
-| Zugriff auf Objekte eines anderen Prozesses, gemeinsamer Speicher, `SendMessage` an andere Rollen | überall | Nachricht über den Hub |
-| Elementcode ohne `try/catch` um den Aufruf | `engine`, `worker`, `triggerhost` | zentrale Aufrufstelle `ElementRunner` |
-| Wahrheitswert als Literal (`"enabled", true`, `"cancel", 1`) in einer Protokoll-Nutzlast; `Json.False` im Programmzustand mit `if` geprüft | überall | `Json.True`/`Json.False`/`Json.Bool(x)` nur beim Bau der Nachricht, intern `1`/`0` (PROTOKOLL 2). `ok` wandelt `Message.Serialize` |
+| `MsgBox`, `InputBox`, `FileSelect`, `DirSelect`, any blocking GUI | `engine`, `supervisor`, `storage`, `triggerhost`, `core` | Message to UI/worker (`evt.ui.notice`, dialog element in the worker) |
+| `FileRead/FileAppend/FileOpen/FileDelete/DirCreate/Loop Files` | everything except `storage` (and reading startup parameters during boot) | Request to `storage`. Not file I/O in the sense of this rule: writing to stderr (`**`, `Role.Console`) and the supervisor reading the anonymous pipe of its children (`ChildPipe`, `PeekNamedPipe`/`ReadFile` on a handle that is not a file, never blocking). |
+| `Sleep` (>0), `RunWait`, `WinWait*` without timeout, `Loop` with a wait time | everything except `worker` | `SetTimer`, callback |
+| `A_TickCount` or randomness as ID | everywhere | `Ids.Next(prefix)` (counter per process) |
+| `Critical` | everywhere | not needed. If it is, with a justification in the comment |
+| `try` without handling (empty `catch`) | everywhere | log it or justify it deliberately |
+| Access to objects of another process, shared memory, `SendMessage` to other roles | everywhere | message via the hub |
+| Element code without `try/catch` around the call | `engine`, `worker`, `triggerhost` | central call site `ElementRunner` |
+| Boolean as literal (`"enabled", true`, `"cancel", 1`) in a protocol payload; `Json.False` in program state checked with `if` | everywhere | `Json.True`/`Json.False`/`Json.Bool(x)` only when building the message, internally `1`/`0` (PROTOCOL 2). `ok` is converted by `Message.Serialize` |
 
-## 4. Fehler und Protokoll
+## 4. Errors and protocol
 
-- Ausnahmen: Klassen `AhfError` (Basis), `ElementError`, `ProtocolError`, `AhfTimeoutError`. Jede trägt `code` (siehe Fehlercodes im Protokoll).
-- Jede Anfrage hat ein Timeout. Es gibt kein Warten ohne Frist. Ausnahme mit Obergrenze: `cmd.app.prepareExit` (10 Minuten, PROTOKOLL 4.1), weil die Benutzerentscheidung keine feste Frist hat.
-- Eingehende Nachrichten werden validiert (Typ, Nutzlast-Pflichtfelder) und bei Fehlern beantwortet, nie ignoriert.
-- Zustandsautomaten sind Klassen mit Übergangstabelle (`static Transitions := Map(...)`). Ungültige Übergänge: `false` zurück plus `a0`-Log.
+- Exceptions: classes `AhfError` (base), `ElementError`, `ProtocolError`, `AhfTimeoutError`. Each carries `code` (see the error codes in the protocol).
+- Every request has a timeout. There is no waiting without a deadline. Exception with an upper bound: `cmd.app.prepareExit` (10 minutes, PROTOCOL 4.1), because the user's decision has no fixed deadline.
+- Incoming messages are validated (type, mandatory payload fields) and answered on error, never ignored.
+- State machines are classes with a transition table (`static Transitions := Map(...)`). Invalid transitions: return `false` plus an `a0` log entry.
 
-## 5. AHK-v2-Fallen (kurz)
+## 5. AHK v2 pitfalls (short)
 
-- `Map` zählt in **sortierter** Schlüsselreihenfolge auf, nicht in Einfügereihenfolge. Wo Reihenfolge zählt: `Array` verwenden.
-- Objekt-Eigenschaften sind case-insensitiv, `Map`-Schlüssel standardmäßig case-sensitiv. Für Variablennamen und Klassen-IDs `m.CaseSense := "Off"` direkt nach dem Erzeugen setzen (vor dem Einfügen).
-- `=` vergleicht Strings case-insensitiv, `==` case-sensitiv. Zahlen und Strings mit Zahlenform: JSON-Typen erhalten, nicht „reparieren“.
-- Zugriff auf nicht vorhandene Map-Schlüssel wirft. `m.Get(key, default)` oder `m.Has(key)`.
-- `A_LastError` direkt nach dem `DllCall` lesen, jeder weitere Aufruf überschreibt ihn.
-- `OnMessage`-Handler und `SetTimer`-Callbacks halten Referenzen. Bei Aufräumen `OnMessage(..., 0)` bzw. `SetTimer(fn, 0)`.
-- Lambdas erfassen Variablen per Referenz. In Schleifen ein lokales Binding erzeugen (`(v := x) => ...` oder Hilfsfunktion).
-- Beim Erzeugen von Dateien über eine Shell (Heredocs) können `\\` zu `\` zusammenfallen. Quelltext immer mit dem Editor-Werkzeug schreiben, Pipe-Namen aus Konstanten bauen.
+- `Map` enumerates in **sorted** key order, not in insertion order. Where order matters: use `Array`.
+- Object properties are case-insensitive, `Map` keys are case-sensitive by default. For variable names and class IDs, set `m.CaseSense := "Off"` directly after creating the map (before inserting).
+- `=` compares strings case-insensitively, `==` case-sensitively. Numbers and strings that look like numbers: keep JSON types, do not "repair" them.
+- Accessing a non-existing map key throws. Use `m.Get(key, default)` or `m.Has(key)`.
+- Read `A_LastError` directly after the `DllCall`; every further call overwrites it.
+- `OnMessage` handlers and `SetTimer` callbacks hold references. When cleaning up: `OnMessage(..., 0)` or `SetTimer(fn, 0)`.
+- Lambdas capture variables by reference. In loops create a local binding (`(v := x) => ...` or a helper function).
+- When creating files through a shell (heredocs), `\\` can collapse to `\`. Always write source code with the editor tool, build pipe names from constants.
 
-## 6. Tests und Doku
+## 6. Tests and docs
 
-- Jede Änderung an `core/`, Zustandsautomaten oder Protokoll bringt einen Test mit.
-- Neue Nachrichtentypen werden in `PROTOKOLL.md` ergänzt.
-- Bewusste Verhaltensänderungen gegenüber v1 stehen in `MIGRATION.md` (ID, Bereich, v1, v2, Grund).
-- Commits sind klein und beschreibend, eine Änderung pro Commit.
+- Every change to `core/`, state machines or the protocol comes with a test.
+- New message types are added to `PROTOCOL.md`.
+- Deliberate behavior changes compared to v1 are recorded in `MIGRATION.md` (ID, area, v1, v2, reason).
+- Commits are small and descriptive, one change per commit.
