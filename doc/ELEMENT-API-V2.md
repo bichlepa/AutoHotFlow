@@ -1,7 +1,7 @@
 # Element API v2
 
 Status: Draft. Basis for porting the 152 v1 elements (114 actions, 17 conditions, 5 loops, 16 triggers).
-Predecessor: the v1 function family `Element_<Task>_<Class>` and the helpers `x_*` (see `work_items/ANALYSE.md`, section 2).
+Predecessor: the v1 function family `Element_<Task>_<Class>` and the helpers `x_*` (see `v2-phase2-final:work_items/ANALYSE.md`, section 2).
 
 ---
 
@@ -26,7 +26,7 @@ class Action_Example extends AhfElement {
     static Level     := "Beginner"      ; "Beginner" | "Advanced" | "Programmer"
     static Stability := "Stable"        ; "Stable" | "Experimental"
     static Icon      := "example.ico"   ; file name under assets/Icons, "" = none
-    static JobTimeoutMs := 0            ; worker only: job deadline in ms, 0 = none (WI-27, ARCHITEKTUR 6.4)
+    static JobTimeoutMs := 0            ; worker only: job deadline in ms, 0 = none (WI-27, ARCHITECTURE 6.4)
 
     static Name()     => Lang("Example")            ; display name
     static Category() => Lang("General")
@@ -57,7 +57,7 @@ class Action_Example extends AhfElement {
 
 `TriggerVariables` replaces `Element_postTrigger_*`: it returns the thread variables (name → value) that are set after the event, and it must not have side effects (it runs in the engine, no I/O).
 
-**Worker elements and blocking (WI-27, ARCHITEKTUR 6.4):** A worker element may block for any length of time within a single call (download, COM, `DllCall`, dialog). A worker with a job is never pinged and never ended as hanging. Two consequences: an abort (stop of the instance) does not reach an element that is blocked in a single call. After 2 s without an acknowledgement, the engine has the whole process terminated (only one job runs per worker, so nothing else is lost); `Stop(ctx, params)` of the element then no longer runs, so cleanup in the element is not possible there. And: without `JobTimeoutMs` the job has no deadline (v1 had none). If a class sets `JobTimeoutMs` > 0, the thread ends after this time with the result `exception` and the message "worker timeout", and the element is terminated as on an abort. The deadline is a class value, not a parameter; a flow parameter (e.g. "Timeout" for a download) remains the responsibility of the element.
+**Worker elements and blocking (WI-27, ARCHITECTURE 6.4):** A worker element may block for any length of time within a single call (download, COM, `DllCall`, dialog). A worker with a job is never pinged and never ended as hanging. Two consequences: an abort (stop of the instance) does not reach an element that is blocked in a single call. After 2 s without an acknowledgement, the engine has the whole process terminated (only one job runs per worker, so nothing else is lost); `Stop(ctx, params)` of the element then no longer runs, so cleanup in the element is not possible there. And: without `JobTimeoutMs` the job has no deadline (v1 had none). If a class sets `JobTimeoutMs` > 0, the thread ends after this time with the result `exception` and the message "worker timeout", and the element is terminated as on an abort. The deadline is a class value, not a parameter; a flow parameter (e.g. "Timeout" for a download) remains the responsibility of the element.
 
 **Class ID:** Do not read it via `cls.Name`. A class with `static Name()` hides the built-in property, so `cls.Name` is then a function. The ID is provided by `ElementRegistry.IdOf(cls)` (internally `Type(cls())`). Verified in WI-09.
 
@@ -317,5 +317,5 @@ A converter (`tools/convert_element.py`, Phase 3) applies the rows of this table
 ## 8. Still to be clarified (Phase 3)
 
 - Exact form of `ctx.Request` and the import list for workers (`imports`) for elements that read arbitrary variables.
-- Whether metadata and runtime code must be separated per role (ARCHITEKTUR R3).
+- Whether metadata and runtime code must be separated per role (ARCHITECTURE R3).
 - Handling of element packages from third parties (`package`, `packageVersion`): the Chrome package is dropped, but the structure of the package information stays so that old flows can be loaded.

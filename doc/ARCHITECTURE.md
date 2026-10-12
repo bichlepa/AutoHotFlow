@@ -1,8 +1,8 @@
 # Architecture AutoHotFlow v2
 
-Status: Draft, approved as the basis for Phase 2 (walking skeleton), extended in Phase 2b (WI-20, decisions E1 to E8 in `work_items/phase2b/README.md`). As of 2026-10-11.
+Status: Draft, approved as the basis for Phase 2 (walking skeleton), extended in Phase 2b (WI-20, decisions E1 to E8 in `doc/DECISIONS.md`). As of 2026-10-11.
 Target platform: AutoHotkey v2, **64-bit only** (E4, 2026-10-11). 32-bit is not supported and is rejected at startup (implementation in WI-22). Reason: structures and DllCalls are only tested for 64-bit. Stock interpreter, no AHK_H extensions.
-Related documents: [PROTOCOL.md](PROTOCOL.md), [ELEMENT-API-V2.md](ELEMENT-API-V2.md), [TESTSTRATEGIE.md](TESTSTRATEGIE.md), [KONVENTIONEN.md](KONVENTIONEN.md), [MIGRATION.md](MIGRATION.md).
+Related documents: [PROTOCOL.md](PROTOCOL.md), [ELEMENT-API-V2.md](ELEMENT-API-V2.md), [TEST-STRATEGY.md](TEST-STRATEGY.md), [CONVENTIONS.md](CONVENTIONS.md), [MIGRATION.md](MIGRATION.md).
 
 Labeling: **[M]** = measured or confirmed in a spike, **[V1]** = verified in the v1 code, **[A]** = assumption to be checked in Phase 2.
 
@@ -36,7 +36,7 @@ Non-goals: new features, a new flow file format, a plugin sandbox against malici
 | D10 | **The editor holds a draft, the engine owns the committed definition.** Changes are applied as patches with a revision number. | See 4.2. One editor per flow, so there are no multi-writer conflicts. |
 | D11 | **Flow file format stays unchanged** (JSON, `ElementIDCounter` etc.). | Requirement 4. See 7. |
 | D12 | **One entry point, roles via parameter**: `AutoHotFlow.ahk --role=<name>`. | One compiled artifact instead of many. The supervisor starts itself with a different role. |
-| D13 | **Tests with pytest as the e2e driver plus small AHK unit tests.** | See [TESTSTRATEGIE.md](TESTSTRATEGIE.md). |
+| D13 | **Tests with pytest as the e2e driver plus small AHK unit tests.** | See [TEST-STRATEGY.md](TEST-STRATEGY.md). |
 
 ### 2.1 Drawing in the editor process (D4)
 
@@ -67,7 +67,7 @@ Compared: named pipes and `WM_COPYDATA`.
 
 - An AHK v2 process runs an overlapped pipe server via `DllCall`. A Python process connects with `open(r"\\.\pipe\name", "r+b", buffering=0)`. This makes pytest-based e2e tests possible without an additional library.
 - Pure polling (timer 250 ms) gives round trips of around 250 ms. With `PostMessage` as a wake-up call after writing, the round-trip time drops to **~0.3 ms** (median).
-- The spike is in `work_items/spikes/` (`pipe_server.ahk`, `client.py`).
+- The spike is in `v2-phase2-final:work_items/spikes/` (`pipe_server.ahk`, `client.py`).
 
 Consequences:
 
@@ -321,10 +321,10 @@ Unknown items in files (keys that v2 does not know) are **kept when loading and 
 
 ```
 AutoHotFlow/
-├─ AGENTS.md                # short summary for agents (state of the work)
+├─ AGENTS.md                # rules and short state for agents
 ├─ README.md
 ├─ doc/                     # permanent documentation (this directory)
-├─ work_items/              # temporary: plans, analyses, spikes (delete after the port)
+├─ work_items/              # temporary: phase 3 working papers (delete after the port)
 ├─ v1/                      # temporary: unchanged v1 state as reference (delete at the end)
 ├─ src/
 │  ├─ AutoHotFlow.ahk       # entry point (includes AhfBoot.ahk, calls AhfMain)
@@ -340,7 +340,7 @@ AutoHotFlow/
 │     ├─ base/              # AhfElement, Registry, Context
 │     └─ default/{actions,conditions,loops,triggers}/
 ├─ assets/                  # icons, language/*.ini, help (taken over from v1 once needed)
-├─ tests/                   # see TESTSTRATEGIE.md
+├─ tests/                   # see TEST-STRATEGY.md
 └─ tools/                   # converters, translation tools, audit scripts
 ```
 
@@ -365,7 +365,7 @@ Rule: a folder under `src/` is a process role or library module. `core/` may not
 - Idle CPU of the overall system without running flows: below 1 %.
 - Memory: below 100 MB in total with 5 open editors.
 
-**Decision E5 (2026-10-11):** The target for idle CPU applies to the **overall system**. Measured 0.23 % (8 CPUs, WI-16), fulfilled. The reading "sum in percent of one core" (1.8 %) is therefore no longer the yardstick. An optimization is not a requirement and is listed as an observation point in `work_items/STATUS.md`.
+**Decision E5 (2026-10-11):** The target for idle CPU applies to the **overall system**. Measured 0.23 % (8 CPUs, WI-16), fulfilled. The reading "sum in percent of one core" (1.8 %) is therefore no longer the yardstick. An optimization is not a requirement and is listed as an observation point in `doc/OPEN-ITEMS.md`.
 
 ---
 
