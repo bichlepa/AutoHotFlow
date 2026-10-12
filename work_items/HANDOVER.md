@@ -1,6 +1,6 @@
 # Handover: AutoHotFlow v2 Portierung
 
-Stand: 2026-10-12, Branch `v2-port`. Phase 2 (Walking Skeleton), Phase 2b (Härtung vor Phase 3) und der Fix-Block WI-30 bis WI-33 sind umgesetzt. **Die Abnahmeläufe von WI-32 (Aufgabe 2) sind gefahren und nicht grün**: seriell und Stress grün, parallel 5 von 10 Läufen grün, Fault 20-mal ein roter Test (neue Funde F-37 bis F-42, `STATUS.md`, Abschnitt "Abnahmelauf Fix-Block"). Als Nächstes folgt der Phase-3-Plan, den der Projektinhaber mit Claude entwirft. Statusbericht mit Funden, Messwerten und den Abschlussläufen: `work_items/STATUS.md`.
+Stand: 2026-10-12, Branch `v2-port`. Phase 2 (Walking Skeleton), Phase 2b (Härtung vor Phase 3) und der Fix-Block WI-30 bis WI-33 sind umgesetzt. **Die Abnahmeläufe von WI-32 (Aufgabe 2) sind gefahren und nicht grün**: seriell und Stress grün, parallel 5 von 10 Läufen grün, Fault 20-mal ein roter Test (neue Funde F-37 bis F-42, `STATUS.md`, Abschnitt "Abnahmelauf Fix-Block"). **Die Wiederholung der Abnahme (WI-34, 2026-10-12, zweiter Lauf) ist ebenfalls nicht grün**: parallel 9 von 10 Läufen grün, Stress grün, seriell 2 rote Tests und Fault 20x 5 rote Wiederholungen (neue Funde F-45 bis F-47, `STATUS.md`, Abschnitt "Abnahmelauf WI-34 (2026-10-12, zweiter)"). Der Fix-Block ist damit nicht grün abgeschlossen. Als Nächstes folgt der Phase-3-Plan, den der Projektinhaber mit Claude entwirft. Statusbericht mit Funden, Messwerten und den Abschlussläufen: `work_items/STATUS.md`.
 
 ## Neu seit 2026-10-12: Fix-Block WI-30 bis WI-33 (umgesetzt)
 
@@ -65,7 +65,8 @@ Beantwortet am 2026-10-12 (Wortlaut: `work_items/phase2b/README.md`, Nachtrag; �
 
 ## Offene Punkte (Details und Belege in `STATUS.md`, Tabelle "Funde")
 
-- **Abnahmeläufe von WI-32 (Aufgabe 2), nicht grün:** parallel 5 von 10 Läufen grün (rote Tests F-37 bis F-41, F-38 zweimal), `AHF_TIMING_FACTOR=1` ein roter Test (F-42), seriell grün, Stress grün, Fault 20-mal ein roter Test (F-38). Zu entscheiden: die Funde F-37 bis F-42 untersuchen oder begründet zurückstellen (der Haken in `phase2b/README.md` ist offen); erst dann gilt der parallele Lauf als verlässlich.
+- **Wiederholung der Abnahme (WI-34), nicht grün:** parallel 9 von 10 grün (F-45 einmal), Stress grün, seriell rot (F-46 Worker-Kill-Test, F-47 `cmd.worker.cancel` unbeantwortet), Fault 20x 5 von 20 Wiederholungen rot (F-46). Offen: F-45 bis F-47 untersuchen (Ursachen nicht belegt), F-43 (Entscheidung des Projektinhabers), F-42. Haken in `phase2b/README.md` bleiben offen.
+- **Abnahmeläufe von WI-32 (Aufgabe 2), nicht grün (älterer Stand):** parallel 5 von 10 Läufen grün (rote Tests F-37 bis F-41, F-38 zweimal), `AHF_TIMING_FACTOR=1` ein roter Test (F-42), seriell grün, Stress grün, Fault 20-mal ein roter Test (F-38). Zu entscheiden: die Funde F-37 bis F-42 untersuchen oder begründet zurückstellen (der Haken in `phase2b/README.md` ist offen); erst dann gilt der parallele Lauf als verlässlich.
 - **F-31** geschlossen (kein Fall in den Abnahmeläufen). **F-36** (`sys.hello` unbeantwortet) in 14 Läufen nicht aufgetreten, Schließen empfohlen.
 - **F-36** (niedrig bis mittel, Ursache nicht gefunden): `sys.hello` 15 s lang unbeantwortet (die Hub-Frage aus WI-23), in WI-32 in `tests/fault/test_shutdown.py` zusammen mit anderen Tests aufgetreten, als die Maschine langsam war; später nicht reproduzierbar. Details und Hinweise in `STATUS.md`.
 - F-26 (behoben in WI-30), F-24 (WI-31), F-16 und F-33 (WI-33), F-32 und die Zeitgrenzen F-19 (WI-32) sind erledigt. F-35 (Drain-Frist in `src/core/ipc/`) ist offen, niedrig.

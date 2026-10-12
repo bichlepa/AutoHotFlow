@@ -245,3 +245,14 @@ Bewusst **nicht** geändert:
 - F-42: Ursache des einen Ausfalls unbekannt. Beim nächsten Ausfall steht der Schwanz von `Log/Log.txt` in der Meldung.
 - F-37: Der Zustand "Element läuft" ist nicht abfragbar (nur "Auftrag angenommen"); ein Feld `started` in `Worker.DiagInfo` würde das ändern (Produktänderung, nicht vorgenommen).
 - Faktor 3 von `scaled()` bleibt wie in E17 entschieden.
+
+## Ergebnis (Abschnitt 5, Abnahme)
+
+Gefahren am 2026-10-12 (Code-Stand `645d99d`, Agent ohne Änderungen an Produktcode, Tests oder Fristen), Einzelheiten in `work_items/STATUS.md`, Abschnitt "Abnahmelauf WI-34 (2026-10-12, zweiter)".
+
+- 10 parallele Gesamtläufe: **9 von 10 grün** (746 passed, 1 skipped); Lauf 1 rot (`test_debug_role.py::test_refresh_shows_a_process_that_is_not_ready_...`, `refreshed` 2 statt 3, F-45). Dauer 111 bis 151 s (Mittel rund 127 s; vorher rund 110 s).
+- Serieller Gesamtlauf: **rot**, 744 passed, 2 failed, 655 s: `test_process_crash.py::test_killed_worker_ends_its_element_with_worker_crashed_and_is_not_restarted[0]` (F-46) und `test_worker.py::test_cancel_of_the_hang_element_reports_stopped_within_500_ms` (F-47).
+- `AHF_FAULT_REPEAT=20 ... tests/fault -n 0`: **rot**, 480 passed, 5 failed, 2646 s; alle fünf sind Wiederholungen des Worker-Kill-Tests (F-46).
+- `-m stress`: **grün**, 14 passed, 197 s.
+- Die Prüfung auf übrige Testprozesse zwischen den Läufen scheiterte an einem falsch zitierten Aufruf im Fahrskript und wurde erst nach allen Läufen von Hand gemacht (keine übrig).
+- Akzeptanzkriterien der Abnahme sind nicht erfüllt. Neue Funde F-45 bis F-47, Ursachen nicht belegt. Nach der Regel dieses Pakets (nicht automatisch wiederholen) wurde nicht nachgefahren. Haken in `phase2b/README.md` bleiben offen.
