@@ -204,6 +204,25 @@ Stand 2026-10-12, Sonnet. Beide Schritte abgeschlossen, keine Eskalation. Zeilen
 - `STATUS.md` (F-46 schließen) ist nicht angefasst; das gehört zu Schritt 5 (Abschluss) nach der grünen Abnahme.
 - Nicht von mir: die geänderte `.gitignore` im Arbeitsbaum wurde nicht angefasst.
 
+### Testdurchführung Zyklus 1
+
+Stand 2026-10-12, Haiku. Code-Stand `2f2e6e5` (HEAD zu Beginn), keine Änderung an Code, Tests oder Fristen. Jeder Lauf allein auf dem Rechner, nacheinander im Hintergrund, Ausgaben im Scratchpad (`a1_*.txt`, Index `a1_index.txt`). Start 21:50:18, Ende 23:15:21.
+
+| Lauf | Befehl | Ergebnis | Dauer | Rote Tests (Meldung, Häufigkeit) |
+|---|---|---|---|---|
+| 1 bis 10 (parallel) | `python -m pytest tests -q` | je 752 passed, 1 skipped | 137 bis 164 s (142, 137, 152, 153, 164, 156, 137, 139, 140, 148 s) | keine, 0 von 10 |
+| Seriell | `python -m pytest tests -n 0 -q` | 752 passed, 1 skipped, 15 deselected | 728 s (pytest 726 s) | keine, 0 von 1 |
+| Fault 20x | `AHF_FAULT_REPEAT=20 python -m pytest tests/fault -n 0 -q` | 505 passed | 2690 s (44:49 min) | keine, 0 von 505 |
+| Stress | `python -m pytest tests -m stress -q` | 14 passed, 754 deselected | 200 s | keine, 0 von 14 |
+
+**Abnahme grün: ja** (alle vier Läufe ohne rote Tests). Nach jedem Lauf: keine Testprozesse übrig (Prozessliste je Lauf in `a1_<lauf>_prozesse.txt`). Fremd und unangetastet: `AutoHotkeyU32.exe` mit "Allgemeine Hilfe.ahk" (PID 16940). Das `python.exe` der VS-Code-Erweiterung stand in den Listen nicht mehr.
+
+Hinweise:
+- F-46 (`test_killed_worker_ends_its_element_with_worker_crashed_and_is_not_restarted`) trat in keinem der Läufe auf, auch nicht in Fault 20x (Vorlauf Zyklus 0: 5 von 20 bzw. 1 seriell).
+- F-45 und F-47 traten nicht auf (Vorlauf Zyklus 0: je 0 Ausfälle).
+- Die gezielte Wiederholung aus Schritt 3 (F-45 und F-47 je 10-mal) ist für Zyklus 1 nicht dokumentiert. Die Umsetzung dokumentiert nur F-46 (20 von 20, zweimal). Die Abnahme wurde auf Anweisung des Auftrags trotzdem gefahren.
+- Die Fault-Anzahl ist mit 505 höher als im Abnahmelauf WI-34 (485). Vermutet: neue Tests seit WI-34 (nicht geprüft, kein Befund dieses Laufs).
+
 ### Analyse Zyklus N
 (Opus-Analyse hier eintragen.)
 
