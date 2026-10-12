@@ -6,16 +6,26 @@
 #Include ..\..\src\supervisor\Supervisor.ahk
 
 ; Stands in for Hub and Heartbeat/Shutdown collaborators. pending holds the messages that lie in the
-; pipes but have not been read yet; Pump() hands them over.
+; pipes but have not been read yet; Pump() hands them over. links holds the names whose connection has not been
+; read to its end yet (Hub.HasLink). pumping simulates a pump that another thread runs at the moment (the timer
+; interrupted it): like PipeConnection.Pump, a second Pump then only marks "pump again" and returns (WI-30).
 class FakeHub {
     __New() {
         this.pending := []
         this.events := []
         this.sent := []
         this.pumps := 0
+        this.links := Map()
+        this.pumping := false
+        this.pumpAgain := false
     }
+    HasLink(name) => this.links.Has(name)
     Pump() {
         this.pumps += 1
+        if (this.pumping) {
+            this.pumpAgain := true
+            return
+        }
         list := this.pending
         this.pending := []
         for fn in list
@@ -88,6 +98,10 @@ TestRun.Init()
 TestRun.Case("Tick: a sys.bye that is unread when the process end is seen is read first (F-06, F-11)", ByeIsReadBeforeTheExitIsReported)
 TestRun.Case("Tick: an exit without any sys.bye is reported as not clean", ExitWithoutByeIsNotClean)
 TestRun.Case("Tick: the hub is pumped at the start of every tick", HubIsPumpedEveryTick)
+TestRun.Case("Tick: an exit is not judged while another pump still reads the connection of the child (F-26, WI-30)", ExitWaitsWhileAPumpRuns)
+TestRun.Case("Children: an ended process whose connection does not end is judged after the grace time (WI-30)", ExitIsJudgedAfterTheGraceTime)
+TestRun.Case("Children: an ended child without a connection is judged at once (WI-30)", ExitWithoutLinkIsJudgedAtOnce)
+TestRun.Case("Children: an ended child that waits for its judgement is neither hung nor terminated (WI-30)", EndedChildIsNotHungNorKilled)
 TestRun.Case("Heartbeat: a child without pong for 6 s of regular ticks is hung", SilentChildIsHung)
 TestRun.Case("Heartbeat: a stand-still of the supervisor does not make a ready child hung", StallDoesNotHangReadyChild)
 TestRun.Case("Heartbeat: a stand-still does not make a starting child hung", StallDoesNotHangStartingChild)
@@ -128,6 +142,73 @@ HubIsPumpedEveryTick() {
     s._Tick()
     s._Tick()
     Assert.Equal(hub.pumps, 2)
+}
+
+; Cause B of F-26: the tick timer interrupted a pump thread of the wake-up. Its own hub.Pump() returns at once
+; (re-entrance guard), so the bye that the interrupted pump has not read yet is unread when the tick sees the
+; ended process. The exit must wait until the connection is read to its end (the link is gone).
+ExitWaitsWhileAPumpRuns() {
+    hub := FakeHub()
+    s := NewSupervisor(hub)
+    AddChild(s.children, "echo", "stopping", Time.NowMs())
+    hub.links["echo"] := true
+    hub.pending.Push(() => s.children.OnBye("echo", true))
+    hub.pumping := true
+    s._Tick()
+    Assert.Equal(hub.Count("evt.process.exited") + hub.Count("evt.process.crashed"), 0
+        , "not judged while the bye may still be unread")
+    ; the interrupted pump goes on: it reads the bye and then the end of the pipe (the hub drops the link)
+    hub.pumping := false
+    hub.Pump()
+    hub.links.Delete("echo")
+    s._Tick()
+    ev := hub.Find("evt.process.exited")
+    Assert.True(IsObject(ev), "evt.process.exited published after the link is gone")
+    Assert.True(ev["payload"]["clean"] == Json.True, "clean, because the bye was read before the exit was judged")
+    Assert.Equal(hub.Count("evt.process.exited"), 1)
+}
+
+ExitIsJudgedAfterTheGraceTime() {
+    hub := FakeHub()
+    s := NewSupervisor(hub)
+    t0 := 100000
+    AddChild(s.children, "echo", "stopping", t0)
+    hub.links["echo"] := true                       ; the connection never ends (or is never read)
+    s.children.Tick(t0)
+    s.children.Tick(t0 + Children.EXIT_GRACE_MS - 1)
+    Assert.Equal(hub.Count("evt.process.exited"), 0, "still waiting within the grace time")
+    s.children.Tick(t0 + Children.EXIT_GRACE_MS)
+    ev := hub.Find("evt.process.exited")
+    Assert.True(IsObject(ev), "judged at the end of the grace time")
+    Assert.True(ev["payload"]["clean"] == Json.False, "no bye was read")
+    Assert.True(s.children.IsGone("echo"))
+}
+
+ExitWithoutLinkIsJudgedAtOnce() {
+    hub := FakeHub()
+    s := NewSupervisor(hub)
+    t0 := 100000
+    AddChild(s.children, "echo", "ready", t0)       ; ended without being asked, never connected
+    s.children.Tick(t0)
+    ev := hub.Find("evt.process.crashed")
+    Assert.True(IsObject(ev), "crashed is reported in the first tick")
+}
+
+EndedChildIsNotHungNorKilled() {
+    hub := FakeHub()
+    s := NewSupervisor(hub)
+    t0 := 100000
+    AddChild(s.children, "echo", "ready", t0)
+    hub.links["echo"] := true
+    s.children.Tick(t0)                              ; the end is seen, the judgement waits for the link
+    s.children.MarkHung("echo", "test")
+    Assert.Equal(s.children.State("echo"), "ready", "an ended process is not hung")
+    s.children.KillAlive()                           ; the shutdown deadline passes in the grace time
+    Assert.Equal(s.children.AnyKilled(), false, "an ended process is not terminated and does not count as killed")
+    hub.links.Delete("echo")
+    s.children.Tick(t0 + 200)
+    ev := hub.Find("evt.process.crashed")
+    Assert.True(IsObject(ev) && ev["payload"]["reason"] == "exited", "an exit, not a hang")
 }
 
 ; --- heartbeat ------------------------------------------------------------------------------------

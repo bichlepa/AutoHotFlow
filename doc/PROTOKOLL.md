@@ -146,6 +146,8 @@ Jeder Eintrag trägt `name` (der Name, unter dem das Kind gestartet wurde, z. B.
 | `evt.process.exited` | `{ name, pid, clean: bool, exitCode, reason? }` | Ende nach Aufforderung (Beenden). `reason` ist nur bei `cmd.process.kill` gesetzt (`"killed"`). Die Felder `clean` und `exitCode` gelten seit WI-22/23 (vorher hier nicht aufgeführt) |
 | `evt.process.restarted` | `{ name, attempt }` | Neustart nach Richtlinie (automatisch nur für `storage` und `engine`; mit `--test-roles` zusätzlich `crasher`) |
 
+**Zeitpunkt von `evt.process.exited` und `evt.process.crashed` (WI-30):** Der Supervisor meldet das Ende eines Prozesses erst, wenn er dessen Verbindung bis zum Ende gelesen hat (ein `sys.bye` ist dann sicher verarbeitet und `clean` stimmt), spätestens 500 ms nach dem Prozessende (`Children.EXIT_GRACE_MS`, für ein Kind ohne Verbindung sofort). Die Meldung kann also bis zu 500 ms nach dem Prozessende kommen; im Normalfall kommt sie im selben Tick (200 ms).
+
 **Freiwilliges Ende (WI-28):** Beendet sich ein Kind von selbst mit `sys.bye {clean: true}` und Exit-Code 0, ohne dass der Supervisor es dazu aufgefordert hat (das Debug-Fenster, das der Benutzer schließt), meldet der Supervisor `evt.process.exited {clean: true}` statt `evt.process.crashed`. Ein hängendes Kind (`hung`) wird weiter immer als `crashed` gemeldet.
 
 Neustart-Richtlinie: höchstens 3 Neustarts in 60 s, sonst bleibt der Prozess `crashed` (`restart: false`). `manager` und `editor` werden nie automatisch neu gestartet.

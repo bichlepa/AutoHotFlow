@@ -689,7 +689,7 @@ Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge kor
 
 - **Problem:** Einmal in 6 parallelen Läufen meldete `test_frozen_storage_is_terminated_at_the_deadline_and_the_others_exit_clean`, der Manager sei nicht sauber beendet (`clean` falsch). Die Rolle sendet `sys.bye` und beendet sich; der Tick des Supervisors konnte das Prozessende sehen, bevor er das noch ungelesene `sys.bye` aus der Pipe gelesen hatte.
 - **Richtig:** `Supervisor._Tick` ruft zuerst `hub.Pump()` auf, dann `children.Tick`. Nicht nachgestellt (nur unter Last aufgetreten), die Reihenfolge im Code ist gelesen.
-- **Status:** Reihenfolge verifiziert (gelesen); dass dies die Ursache des Ausfalls war, ist vermutet.
+- **Status:** Reihenfolge verifiziert (gelesen); dass dies die Ursache des Ausfalls war, ist vermutet. **Nicht ausreichend (WI-30):** siehe "Sperre gegen Wiedereintritt macht 'erst pumpen' wirkungslos" und "Close verwirft die Warteschlange"; seit WI-30 wartet die Bewertung auf das Ende der Verbindung.
 - **Quelle:** `src/supervisor/Supervisor.ahk`
 
 ### Der Supervisor steht still: Zeitstempel der Kinder sind danach alle veraltet (WI-22)
@@ -780,6 +780,13 @@ Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge kor
 - **Status:** verifiziert (rot, dann grün: `test_pipe.py::test_frames_queued_when_the_connection_is_ended_reach_a_late_reader`, `test_role.py::test_frames_queued_at_shutdown_and_the_bye_reach_a_hub_that_reads_late`; Frist ohne Leser 308 ms bei 300 ms, `..._gives_up_at_its_deadline_and_does_not_block`). Dass genau dies die `clean: false` von F-26 in den Abnahmeläufen erzeugte, ist vermutet (nicht im Lauf nachgewiesen).
 - **Quelle:** `src/core/ipc/PipeConnection.ahk`, `src/core/ipc/Peer.ahk`, `src/core/Role.ahk`
 
+### Sperre gegen Wiedereintritt macht "erst pumpen" wirkungslos (WI-30, F-26)
+
+- **Problem:** Seit F-11 ruft `Supervisor._Tick` erst `hub.Pump()`, dann `children.Tick`, damit ein ungelesenes `sys.bye` vor dem Prozessende gelesen wird. Unterbricht der Tick-Timer aber gerade eine `Pump` derselben Verbindung (ausgelöst vom Weckruf, länger als 15 ms), setzt die Sperre in `PipeConnection.Pump` nur `_pumpAgain` und kehrt sofort zurück. Das `sys.bye` bleibt ungelesen, `Children._OnGone` bewertet das Ende mit `clean: false`.
+- **Falsch:** Sich darauf verlassen, dass ein Aufruf von `Pump()` "jetzt alles liest". Mit der Sperre heißt er nur "es wird gelesen, irgendwann in diesem oder einem anderen Thread".
+- **Richtig:** Auf einen Zustand warten, nicht auf ein Ereignis (Muster aus WI-28): Ein beendeter Prozess wird erst bewertet, wenn seine Verbindung bis zum Ende gelesen ist (der Hub entfernt die Verbindung erst beim Lesen des Endes, also nach allen Rahmen davor: `Hub.HasLink` falsch), oder nach einer Nachfrist (500 ms). In dieser Zeit gilt das Kind weder als hängend, noch wird es hart beendet (sonst zählte es als "getötet" und der Exit-Code würde 5).
+- **Status:** verifiziert (Unit-Test `Tick: an exit is not judged while another pump still reads the connection of the child` in `tests/ahk/supervisor_tick.test.ahk`, mit einer Attrappe, deren `Pump` bei laufender Pump nur "nochmal" setzt: vorher rot, `clean` wäre falsch gewesen; dazu Nachfrist und "nicht hängend, nicht getötet"). Dass dieser Wettlauf im echten Supervisor auftrat, ist vermutet (nicht im Lauf beobachtet).
+- **Quelle:** `src/supervisor/Children.ahk` (`_ExitReadable`, `Terminate`, `MarkHung`)
 
 ## GUI und Hotkeys
 

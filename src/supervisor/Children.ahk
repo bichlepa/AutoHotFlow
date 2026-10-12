@@ -20,6 +20,11 @@
 ;
 ; Process handles: the handle CreateProcessW returns (ChildLauncher, all access) is used for the exit wait
 ; (WaitForSingleObject(h, 0) on every tick), the exit code and TerminateProcess (hard end after the deadline).
+; Judging an exit (WI-30, F-26): an ended process is judged (exited/crashed, clean) only after the hub has read its
+; connection to the end (Hub.HasLink is false: the link goes when the end of the pipe is read, so everything the
+; child wrote before, sys.bye included, has been handled), or EXIT_GRACE_MS after the end was seen (a child that
+; never connected, or a connection that does not end). Pumping the hub first in the tick is not enough: a pump that
+; another thread runs at that moment (the tick interrupted it) makes the tick's own pump return at once.
 ; Output (WI-23): stdout and stderr of a child are one anonymous pipe. Every tick reads what is there and
 ; writes each line as a log entry (level a0, source = role name, text "[<name>] <line>"); the last
 ; OUTPUT_RING_MAX lines of every child stay in memory after the process has ended (Output(name), for the
@@ -36,6 +41,10 @@ class Children {
     static RESTART_WINDOW_MS := 60000
     static RESTART_DELAY_MS := 300
     static KILL_AFTER_MS := 2000
+    ; Longest wait between the end of a process and its judgement while its connection is still open (see the head).
+    ; The normal wait is one or two ticks: the pipe of an ended process reports its end at the next read. 500 ms keep
+    ; the reports evt.process.exited/crashed (and a restart) short when the connection does not end for some reason.
+    static EXIT_GRACE_MS := 500
     static AUTO_RESTART := Map("storage", 1, "engine", 1)
     static TEST_AUTO_RESTART := Map("crasher", 1)
     ; SYNCHRONIZE (0x00100000) | PROCESS_QUERY_LIMITED_INFORMATION (0x1000) | PROCESS_TERMINATE (0x1)
@@ -93,7 +102,7 @@ class Children {
         rec := Map("name", entry, "role", roleName, "flow", flow, "state", "starting", "pid", 0, "handle", 0
             , "gone", true, "exitCode", "", "startedAt", 0, "readyAt", 0, "lastPingAt", 0, "pingN", 0
             , "lastPongAt", 0, "bye", false, "byeClean", false, "restartTimes", [], "restartAt", 0
-            , "killAt", 0, "restartable", this._autoRoles.Has(roleName)
+            , "killAt", 0, "restartable", this._autoRoles.Has(roleName), "exitSeenAt", 0
             , "reader", "", "output", [], "busy", false, "killReason", "")  ; arch-ok: wire-bool internal record, never sent
         this._recs[entry] := rec
         this._Launch(rec, false, Time.NowMs())
@@ -321,7 +330,8 @@ class Children {
         if (!this._recs.Has(name))
             return
         rec := this._recs[name]
-        if (rec["state"] = "hung" || rec["gone"])
+        ; An ended process whose exit waits for its connection (EXIT_GRACE_MS) is not hung: it is judged as an exit.
+        if (rec["state"] = "hung" || rec["gone"] || rec.Get("exitSeenAt", 0) > 0)
             return
         rec["state"] := "hung"
         rec["killAt"] := Time.NowMs() + Children.KILL_AFTER_MS
@@ -338,6 +348,9 @@ class Children {
             return
         rec := this._recs[name]
         if (rec["gone"] || rec["handle"] = 0)
+            return
+        ; Ended already, only not judged yet (EXIT_GRACE_MS): nothing to terminate, and it must not count as killed.
+        if (DllCall("WaitForSingleObject", "ptr", rec["handle"], "uint", 0, "uint") = Children.WAIT_OBJECT_0)
             return
         if (countKilled) {
             Log.Write("a0", "children", "terminating " name " (pid " rec["pid"] ")")
@@ -415,9 +428,24 @@ class Children {
                 continue
             }
             this._ReadOutput(rec)
-            if (DllCall("WaitForSingleObject", "ptr", rec["handle"], "uint", 0, "uint") = Children.WAIT_OBJECT_0)
+            if (DllCall("WaitForSingleObject", "ptr", rec["handle"], "uint", 0, "uint") = Children.WAIT_OBJECT_0
+                && this._ExitReadable(rec, now))
                 this._OnGone(rec, now)
         }
+    }
+
+    ; The process has ended. True when its exit may be judged now: the hub has read its connection to the end (no
+    ; link), or EXIT_GRACE_MS have passed since the end was first seen (see the head of this file).
+    _ExitReadable(rec, now) {
+        if (rec.Get("exitSeenAt", 0) = 0)
+            rec["exitSeenAt"] := now
+        if (!this.hub.HasLink(rec["name"]))
+            return true
+        if (now - rec["exitSeenAt"] < Children.EXIT_GRACE_MS)
+            return false
+        Log.Write("a1", "children", rec["name"] " ended, but its connection was not read to the end within "
+            . Children.EXIT_GRACE_MS " ms; judged now")
+        return true
     }
 
     ; --- internals ---------------------------------------------------------------------------
@@ -446,6 +474,7 @@ class Children {
         rec["byeClean"] := false
         rec["restartAt"] := 0
         rec["killAt"] := 0
+        rec["exitSeenAt"] := 0
         rec["busy"] := false
         rec["killReason"] := ""
         try {
