@@ -45,7 +45,9 @@ def test_hub_cost_of_a_large_frame_is_below_the_budget(run_ahk, runs):
     print("\nhub cost of a %d char frame: mean %.3f ms, max %.3f ms (%d runs)"
           % (bench["frame_chars"], bench["mean_ms"], bench["max_ms"], runs))
     assert bench["delivered_ok"] == 1, "the target did not receive the frame unchanged except for `from`"
-    assert bench["mean_ms"] < HUB_FRAME_BUDGET_MS, bench
+    # scaled(): the budget is exact in the serial run and under -m stress (the reference), three times looser in the
+    # parallel run, where 5.07 ms against 5.0 ms was seen (F-39).
+    assert bench["mean_ms"] < scaled(HUB_FRAME_BUDGET_MS), bench
 
 
 def fill_flows(datadir, count):
