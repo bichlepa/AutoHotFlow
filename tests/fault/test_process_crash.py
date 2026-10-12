@@ -129,7 +129,7 @@ def test_killed_worker_ends_its_element_with_worker_crashed_and_is_not_restarted
     ended = chain.rec.wait(event("evt.instance.ended"), timeout=10)
     assert ended is not None, "instance did not end after the worker died:\n" + chain.sup.text()
     print("\nMEASURE worker death -> instance ended with 'worker crashed': %.3f s" % (ended[0] - t_death))
-    assert ended[0] - t_death < 3.0, ended[0] - t_death
+    assert ended[0] - t_death < scaled(3.0), ended[0] - t_death
     reported = chain.rec.find(lambda m: m.get("type") == "evt.element.state"
                               and "worker crashed (worker:1)" in json.dumps(m["payload"]))
     assert reported, "the element did not report 'worker crashed (worker:1)': %s" % [

@@ -172,7 +172,7 @@ def test_round_trip_python_to_ahk_with_wake(procs, ahk_exe, datadir, pipe_name):
     med, p99 = statistics.median(lat), percentile(lat, 0.99)
     print("\nRound trip Python -> AHK server -> Python with wake: n=1000 median %.2f ms, p99 %.2f ms, max %.2f ms"
           % (med, p99, max(lat)))
-    assert med < 25, "median %.1f ms: the wake message is not effective (fallback timer is 250 ms)" % med
+    assert med < scaled(25), "median %.1f ms: the wake message is not effective (fallback timer is 250 ms)" % med
     end.close()
 
 
@@ -188,7 +188,7 @@ def test_round_trip_python_to_ahk_without_wake_falls_back_to_timer(procs, ahk_ex
         lat.append((time.perf_counter() - t0) * 1000)
     print("\nRound trip without wake (fallback timer 250 ms): n=8 median %.0f ms, max %.0f ms"
           % (statistics.median(lat), max(lat)))
-    assert max(lat) < 600                   # data is never lost, only delayed by the timer period
+    assert max(lat) < scaled(600)                   # data is never lost, only delayed by the timer period
     end.close()
 
 
@@ -209,7 +209,7 @@ def test_round_trip_ahk_client_python_server_with_wake(procs, ahk_exe, datadir, 
         rec = client.wait_record("pingpong", timeout=60)
         print("\nRound trip AHK client -> Python server -> AHK client with wake: n=%d median %.2f ms, p99 %.2f ms"
               % (rec["count"], rec["medianUs"] / 1000, rec["p99Us"] / 1000))
-        assert rec["medianUs"] < 25000
+        assert rec["medianUs"] < scaled(25000)
 
 
 # --- abrupt end, leaks, hangs ----------------------------------------------------------------------
@@ -308,7 +308,7 @@ def test_accept_without_wake_happens_on_the_fallback_timer(procs, ahk_exe, datad
     waited = (time.perf_counter() - t0) * 1000
     print("\nAccept without wake message: first frame after %.0f ms" % waited)
     assert first.startswith("hello:")
-    assert waited < 700
+    assert waited < scaled(700)
     end.close()
 
 

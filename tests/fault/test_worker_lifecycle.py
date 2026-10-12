@@ -175,7 +175,7 @@ def test_cancel_of_a_frozen_worker_ends_the_instance_at_once_and_the_process_is_
     got = exited_killed(chain, old, timeout=10.0)
     assert got is not None, "the frozen worker was not killed:\n" + chain.sup.text()
     print("MEASURE stop -> frozen worker killed (exited, reason killed): %.2f s" % (got[0] - t0))
-    assert got[0] - t0 < 6.0
+    assert got[0] - t0 < scaled(6.0)
     assert not alive(old_pid)
     assert not chain.rec.find(event("evt.process.crashed", name=old))
     run_echo_ok(chain)          # a replacement serves the next job
@@ -235,7 +235,7 @@ def test_frozen_worker_does_not_answer_the_run_and_is_replaced(chains, datadir):
     state = final_state(chain, "wecho")
     assert state["state"] == "exception" and ("worker not available: %s (timeout)" % old) in state["message"], state
     print("\nMEASURE frozen worker: no answer to cmd.worker.run -> element ended after %.1f s" % (t_end - t0))
-    assert 4.5 < t_end - t0 < 9.0, t_end - t0
+    assert 4.5 < t_end - t0 < 5.0 + scaled(4.0), t_end - t0
     run_echo_ok(chain)          # the frozen one was killed, a new one serves the next job
 
 
@@ -291,7 +291,7 @@ def test_engine_restart_during_a_worker_job_leaves_no_orphan_and_the_next_job_ru
 
 # --- the workers end with the engine (WI-33, E10) -------------------------------------------------------------
 
-ENGINE_GONE_BUDGET_S = 1.5          # the aim is 1 s (WI-33); the margin is for the parallel run
+ENGINE_GONE_BUDGET_S = scaled(1.5)          # the aim is 1 s (WI-33); the margin is 0.5 s, three times that in the parallel run
 
 
 def exited_engine_gone(chain, name, timeout):

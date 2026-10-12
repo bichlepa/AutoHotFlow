@@ -42,7 +42,7 @@ EXIT_HUB_LOST = 4          # Role.EXIT_HUB_LOST (orphan guard)
 
 START_BUDGET_S = 10.0      # all children ready (generous for a loaded machine; measured values are printed)
 CRASH_BUDGET_S = scaled(1.0)  # evt.process.crashed within 1 s of the death (ARCHITEKTUR 6.2)
-HANG_BUDGET_S = 8.0        # frozen process reported hung within 8 s (WI-15)
+HANG_BUDGET_S = scaled(8.0)        # frozen process reported hung within 8 s (WI-15)
 CLEAN_EXIT_BUDGET_S = scaled(2.0)  # healthy roles: exit within 2 s (WI-15 shutdown)
 ORPHAN_BUDGET_S = 3.0 + scaled(2.0)  # Role.ORPHAN_MS (3 s) plus slack (WI-15 orphans)
 REQUEST_BUDGET_S = scaled(1.0)  # an unanswered request ends at its own limit (test value)

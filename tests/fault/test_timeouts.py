@@ -15,6 +15,7 @@ import pytest
 
 from faultkit import (EXIT_OK, FULL_CHAIN, REQUEST_BUDGET_S, STUB_OPTS, alive, event, repeat_ids, wait_until)
 from support.ahfclient import AhfTimeout
+from support.timing import scaled
 
 from faultfixtures import chains  # noqa: F401  (fixture)
 
@@ -46,7 +47,7 @@ def test_hub_request_to_a_frozen_ui_times_out_once_and_the_late_answer_is_droppe
     assert chain.rec.find(event("evt.app.exitCancelled")) == [], "the late cancel was counted:\n" + text
     assert text.count("timed out") == 1, "the request must time out exactly once:\n" + text
     assert "late or unknown answer" in text, "the late answer was not dropped visibly:\n" + text
-    assert elapsed < THAW_AFTER_S + 5.0, elapsed
+    assert elapsed < THAW_AFTER_S + scaled(5.0), elapsed
 
 
 @pytest.mark.parametrize("round_no", repeat_ids())

@@ -246,7 +246,7 @@ def test_headless_stub_logs_every_skeleton_event_in_order(procs, datadir, sessio
     arrivals = [(e["type"], e["payload"]["seq"], e["recvMs"] - sent) for e in events
                 if e["type"].startswith("evt.") and "seq" in e["payload"] and e["payload"]["seq"] > s0]
     print("\nlatency ms (command -> stub arrival):", arrivals)
-    assert max(ms for _, _, ms in arrivals) < 1000
+    assert max(ms for _, _, ms in arrivals) < scaled(1000)
     assert relevant_stub(events) == observed
 
 

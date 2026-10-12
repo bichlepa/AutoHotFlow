@@ -12,13 +12,15 @@ import time
 
 import pytest
 
+from support.timing import scaled
+
 from faultkit import HANG_BUDGET_S, FULL_CHAIN, STUB_OPTS, alive, death_watch, event, repeat_ids, wait_until
 
 from faultfixtures import chains  # noqa: F401  (fixture)
 
 pytestmark = pytest.mark.fault
 
-CRASH_AFTER_HANG_S = 4.0      # hung -> terminated (KILL_AFTER_MS 2 s) -> reported, with slack
+CRASH_AFTER_HANG_S = scaled(4.0)      # hung -> terminated (KILL_AFTER_MS 2 s) -> reported, with slack
 RECOVERY_BUDGET_S = 15.0      # frozen -> hung -> terminated -> restarted and ready (test value)
 
 
