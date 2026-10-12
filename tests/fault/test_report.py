@@ -45,7 +45,7 @@ def read_report(folder):
 def full_chain(chains, datadir, extra=()):
     chain = chains("storage,engine,manager", [*STUB_OPTS, *extra])
     chain.wait_ready(["storage", "engine", "manager", "worker:1"], timeout=READY_S)
-    assert chain.rec.wait(event("evt.engine.ready"), timeout=READY_S) is not None, chain.sup.text()
+    chain.wait_flows(timeout=READY_S)
     return chain
 
 

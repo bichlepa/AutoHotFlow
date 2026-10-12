@@ -320,6 +320,19 @@ class Chain:
             raise AssertionError("%s not ready again within %.1f s:\n%s" % (name, timeout, self.sup.text()))
         return self.states()[name]["pid"], time.perf_counter()
 
+    def wait_flows(self, flows=(SKELETON_FLOW,), timeout=START_BUDGET_S):
+        """Waits until the engine has loaded the flows (cmd.engine.snapshot). Unlike waiting for evt.engine.ready this
+        cannot be missed when the event came before the observer subscribed (WI-28)."""
+        def loaded():
+            try:
+                have = {f["flowId"] for f in self.snapshot_ok()["flows"]}
+            except Exception:
+                return False
+            return set(flows) <= have
+        if not wait_until(loaded, timeout):
+            raise AssertionError("flows %s not loaded within %.1f s, supervisor said:\n%s"
+                                 % (list(flows), timeout, self.sup.text()))
+
     def snapshot_ok(self, timeout=5.0):
         return request_ok(self.obs, "engine", "cmd.engine.snapshot", {}, timeout=timeout)
 
