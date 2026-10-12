@@ -122,3 +122,7 @@ Bestätigt vom Projektinhaber (2026-10-12):
 | E17 | `scaled()` (`tests/support/timing.py`) mit Faktor 3 im parallelen Lauf bleibt. Der serielle Lauf und `-m stress` sind die strenge Referenz und laufen regelmäßig (Regel in `doc/TESTSTRATEGIE.md`, WI-34). |
 
 - [ ] WI-34 (danach den Haken "WI-32 Abnahmeläufe" oben setzen). **Abnahme (Abschnitt 5) am 2026-10-12 gefahren, nicht grün:** parallel 9 von 10 grün (ein Ausfall F-45), Stress grün, seriell 2 rote Tests (F-46, F-47), Fault 20x 5 rote Wiederholungen (F-46). Einzelheiten: `STATUS.md` ("Abnahmelauf WI-34 (2026-10-12, zweiter)"). Haken "WI-34", "Abnahme" und "WI-32 Abnahmeläufe" bleiben offen.
+
+### Nachtrag: WI-35 (Bugfix-Schleife bis zur grünen Abnahme)
+
+- [ ] WI-35 ([Paket](WI-35-bugfix-schleife.md)): Schleife aus Analyse (Opus), Umsetzung (Sonnet) und Testdurchführung (Haiku), bis die Abnahme grün ist. Ausgangsfunde F-45, F-46, F-47. Neue Funde werden im selben Paket behoben.
