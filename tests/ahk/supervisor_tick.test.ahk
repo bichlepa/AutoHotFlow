@@ -151,6 +151,9 @@ TestRun.Case("Hub: when the target goes, each open request gets one peer_gone an
 TestRun.Case("Hub: the requests of a sender that has gone are forgotten (F-40, WI-34)", RequestsOfAGoneSenderAreForgotten)
 TestRun.Case("Children: the end of the engine ends its workers at once, as a planned end with the reason engine gone (E10, WI-33)", EngineEndEndsTheWorkers)
 TestRun.Case("Children: a worker is not ended when the engine ends during the shutdown (E10, WI-33)", EngineEndDuringShutdownKeepsTheWorkers)
+TestRun.Case("Children: a kill request for a worker whose process has already ended does not turn its crash into a planned exit (F-46, WI-35)", KillOfAnEndedWorkerStaysACrash)
+TestRun.Case("Children: a kill request for a running worker ends it as a planned exit with the reason killed (WI-35)", KillOfARunningWorkerIsAPlannedExit)
+TestRun.Case("Children: the end of the engine does not relabel a worker that has ended already (F-46, WI-35)", EngineEndKeepsTheCrashOfAnEndedWorker)
 TestRun.Case("Heartbeat: a child without pong for 6 s of regular ticks is hung", SilentChildIsHung)
 TestRun.Case("Heartbeat: a stand-still of the supervisor does not make a ready child hung", StallDoesNotHangReadyChild)
 TestRun.Case("Heartbeat: a stand-still does not make a starting child hung", StallDoesNotHangStartingChild)
@@ -686,6 +689,55 @@ EngineEndEndsTheWorkers() {
     Assert.True(IsObject(ev), "evt.process.exited for the worker")
     Assert.Equal(ev["payload"]["reason"], "engine gone")
     Assert.Equal(hub.Count("evt.process.crashed"), 1, "only the engine crashed")
+}
+
+; F-46 (WI-35): the engine asks for the kill of a worker that has died already, the supervisor has not judged its end yet.
+; The end must stay a crash; it is not a planned exit "killed".
+KillOfAnEndedWorkerStaysACrash() {
+    hub := FakeHub()
+    kids := NewKids(hub)
+    t0 := 100000
+    w := AddChild(kids, "worker:1", "ready", t0)         ; process ended, not judged yet
+    w["role"] := "worker"
+    w["flow"] := "1"
+    kids.KillWorker("worker:1", "run not accepted: peer_gone")
+    Assert.Equal(w["state"], "ready", "an ended process is not relabelled as stopping")
+    Assert.Equal(w.Get("killReason", ""), "")
+    kids.Tick(t0)
+    Assert.Equal(hub.Count("evt.process.crashed"), 1, "judged as a crash")
+    Assert.Equal(hub.Count("evt.process.exited"), 0, "not as a planned exit")
+    Assert.Equal(hub.Find("evt.process.crashed")["payload"]["reason"], "exited")
+    Assert.Equal(kids.AnyKilled(), false)
+    Assert.Equal(kids.State("worker:1"), "crashed")
+}
+
+KillOfARunningWorkerIsAPlannedExit() {
+    hub := FakeHub()
+    kids := NewKids(hub)
+    t0 := 100000
+    w := AddWorker(kids, "worker:1", t0)
+    kids.KillWorker("worker:1", "test")
+    Assert.Equal(w["killReason"], "killed")
+    WaitForEnd(w["handle"])
+    kids.Tick(t0 + 200)
+    ev := hub.Find("evt.process.exited")
+    Assert.True(IsObject(ev), "evt.process.exited")
+    Assert.Equal(ev["payload"]["reason"], "killed")
+    Assert.Equal(hub.Count("evt.process.crashed"), 0)
+}
+
+EngineEndKeepsTheCrashOfAnEndedWorker() {
+    hub := FakeHub()
+    kids := NewKids(hub)
+    t0 := 100000
+    engine := AddChild(kids, "engine", "ready", t0)
+    engine["role"] := "engine"
+    w := AddChild(kids, "worker:1", "ready", t0)         ; died before the engine, not judged yet
+    w["role"] := "worker"
+    w["flow"] := "1"
+    kids.Tick(t0)
+    Assert.Equal(hub.Count("evt.process.exited"), 0, "an ended worker is not reported as 'engine gone'")
+    Assert.Equal(hub.Count("evt.process.crashed"), 2, "engine and worker crashed")
 }
 
 EngineEndDuringShutdownKeepsTheWorkers() {

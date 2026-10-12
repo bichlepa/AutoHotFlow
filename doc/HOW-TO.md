@@ -1195,3 +1195,11 @@ Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge kor
 - **Richtig:** Bei Zeitüberschreitungen den Schwanz der Datei `Log/Log.txt` und die Nummer des Durchlaufs mit in die Meldung schreiben (`test_the_handles_of_the_supervisor_stay_flat_over_50_restarts`). Beim nächsten Ausfall steht der Beleg in der Meldung.
 - **Status:** verifiziert (Meldung der Abnahme gelesen: leerer Text), Ursache des einen Ausfalls nicht belegt.
 - **Quelle:** `tests/fault/test_diagnose.py`
+
+### Einen schon beendeten Prozess nicht als auf Anfrage beendet umetikettieren (WI-35, F-46)
+
+- **Problem:** `Children.KillWorker` setzte `state := "stopping"` und `killReason := "killed"`, bevor `Terminate` erkannte, dass der Prozess schon tot war (Handle signalisiert, Ende erst im nächsten Tick bewertet). Ein echter Absturz wurde so als `evt.process.exited {reason: "killed"}` gemeldet, ohne `crashed` und ohne Absturzbericht. Erreichbar wurde das, weil die Engine das `cmd.process.kill` binnen Millisekunden nach dem Tod schickt (seit F-40 antwortet der Hub sofort mit `peer_gone`). `_EndWorkersOfGoneEngine` hatte denselben Fehler. Exit-Code 15 im Ereignis verriet es: `psutil.Process.kill()` endet mit 15, `Terminate` mit 1.
+- **Falsch:** Den Zustand eines Datensatzes ändern und erst danach prüfen, ob die Aktion noch nötig ist. Die Prüfung in der aufgerufenen Funktion (`Terminate`) kommt zu spät.
+- **Richtig:** Vor dem Umetikettieren `WaitForSingleObject(handle, 0)` prüfen (`Children._HasEnded`); ist der Prozess beendet, nichts setzen, nur loggen. Das Ende wird dann normal bewertet.
+- **Status:** verifiziert (AHK-Unit-Tests `KillOfAnEndedWorkerStaysACrash`, `EngineEndKeepsTheCrashOfAnEndedWorker` waren rot, nach dem Fix grün)
+- **Quelle:** `src/supervisor/Children.ahk`, `tests/ahk/supervisor_tick.test.ahk`

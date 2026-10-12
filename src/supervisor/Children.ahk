@@ -150,6 +150,12 @@ class Children {
         rec := this._recs[name]
         if (rec["gone"] || rec["handle"] = 0)
             return
+        ; Ended already, only not judged yet (F-46, WI-35): its end is its own (a crash), not a planned exit. The
+        ; request of the engine can arrive in the few milliseconds between the death and the next tick.
+        if (this._HasEnded(rec)) {
+            Log.Write("a1", "children", name " has ended already, its end is judged as its own (kill request: " reason ")")
+            return
+        }
         Log.Write("a1", "children", "killing " name " on request: " reason)
         if (rec["state"] != "hung") {
             rec["state"] := "stopping"
@@ -377,6 +383,11 @@ class Children {
         DllCall("TerminateProcess", "ptr", rec["handle"], "uint", 1)
     }
 
+    ; True when the process has ended, whether or not its end has been judged (handle signalled).
+    _HasEnded(rec) {
+        return DllCall("WaitForSingleObject", "ptr", rec["handle"], "uint", 0, "uint") = Children.WAIT_OBJECT_0
+    }
+
     KillAlive() {
         for name, rec in this._recs
             if (!rec["gone"])
@@ -474,6 +485,8 @@ class Children {
             return
         for name, rec in this._recs {
             if (rec["role"] != "worker" || rec["gone"] || rec["handle"] = 0)
+                continue
+            if (this._HasEnded(rec))        ; died on its own before: its end is a crash, not "engine gone" (F-46, WI-35)
                 continue
             Log.Write("a1", "children", "ending " name ": the engine is gone")
             if (rec["state"] != "hung") {
