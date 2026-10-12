@@ -796,6 +796,22 @@ Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge kor
 - **Status:** verifiziert (rot, dann grün: `test_pipe.py::test_frames_of_a_peer_that_has_gone_are_read_although_a_write_to_it_fails`; vorher "poke" an den gegangenen Client gescheitert, Verbindung `peer_closed`, die schon geschriebene `note` nie geliefert). Dass dieser Fall den Rest von F-26 erzeugte, ist vermutet (der eine rote Lauf hatte kein Log); passt zu "Manager und Storage".
 - **Quelle:** `src/core/ipc/PipeConnection.ahk` (`_DriveWriteGuarded`, `_WriteSideGone`, `Pump`)
 
+### Eine Nachricht, die nur einmal gesendet wird, erreicht ein Kind nicht, das sich später meldet (WI-34, F-41)
+
+- **Problem:** `Shutdown._SendGroup` schickte `sys.shutdown` einmal an die Kinder einer Gruppe. Ein Kind, das in diesem Moment noch startete (warmer Worker), hatte keine Verbindung: `Hub.Send` gab `false` zurück, niemand merkte es sich. Das Kind meldete sich danach, bekam nie `sys.shutdown`, seine Gruppe wurde nie fertig, `storage` (letzte Gruppe) bekam es auch nicht; beide wurden an der Frist hart beendet (Exit 5).
+- **Falsch:** "Senden" als "zugestellt" behandeln, wenn der Empfänger noch gar nicht verbunden sein kann.
+- **Richtig:** Beim Ereignis, das die Zustellung möglich macht (`sys.hello`), den Soll-Zustand nachholen: `Shutdown.OnHello` schickt `sys.shutdown` mit der Restfrist, wenn die Gruppe des Kindes schon an der Reihe war (oder es in keiner Gruppe ist). Dazu die zweite Quelle von Kindern nach dem Beginn des Beendens schließen: ein schon geplanter Neustart (`restartAt`) wird in `Children.BeginShutdown` gestrichen.
+- **Status:** verifiziert (rot, dann grün: `tests/fault/test_shutdown.py::test_a_child_that_says_hello_during_the_shutdown_...`, vorher Exit 5 an der Frist von 12 s, nachher Exit 0 nach 3,1 s; Unit-Tests in `tests/ahk/supervisor_tick.test.ahk`)
+- **Quelle:** `src/supervisor/Shutdown.ahk`, `src/supervisor/Children.ahk`
+
+### Weitergeleitete Anfragen: wer routet, muss wissen, was offen ist (WI-34, F-40)
+
+- **Problem:** Der Hub leitete `cmd.*` zwischen zwei Clients weiter, ohne sich etwas zu merken. Starb das Ziel vor der Antwort, wartete der Absender seine volle Frist ab (Engine: 30 s für ein `cmd.storage.flow.read`). Im Test mit dem Python-Hub trat das unter Last auf, wenn der Storage-Stub geschlossen wurde, während eine Leseanfrage noch ungelesen in seiner Pipe lag.
+- **Falsch:** Sich darauf verlassen, dass "jede Anfrage beantwortet wird", wenn der Empfänger dazu gar nicht mehr in der Lage ist. Ebenso (verworfen) die Rollen das Ende über `evt.process.*` erkennen lassen: dafür müsste jede Rolle das Topic `process` abonnieren, das Ereignis kommt bis 0,7 s später, und eine gebrochene Pipe eines lebenden Prozesses meldet es gar nicht.
+- **Richtig:** Der Hub merkt sich die Kopffelder jeder weitergeleiteten Anfrage (Absender, `id`, Typ, Ziel) bis zur Antwort des Ziels oder bis Frist plus 1 s, und antwortet beim Ende der Verbindung des Ziels selbst mit `peer_gone`. Die Verbindung wird vorher bis zum Ende gelesen, eine echte Antwort kommt also zuerst. Im Python-Hub der Tests (mehrere Threads) die Anfrage **vor** dem Weiterleiten eintragen, sonst kann die Antwort des Ziels in einem anderen Thread vor dem Eintrag ankommen; Entfernen der Verbindung und Einsammeln ihrer offenen Anfragen in einem Schritt unter derselben Sperre.
+- **Status:** verifiziert (rot, dann grün: `tests/integration/test_supervisor.py::test_open_request_to_a_*` 10 s ohne Antwort, nachher 0,07 bis 0,15 s; `tests/integration/test_engine.py::test_engine_resumes_loading_at_once_when_storage_dies_with_an_open_read` 31,0 s, nachher 1,04 s)
+- **Quelle:** `src/supervisor/Hub.ahk` (`_NoteRouted`, `_FailRouted`), `tests/support/pyhub.py`
+
 ## GUI und Hotkeys
 
 ### Gui: Ereignisnamen und Zeilenreihenfolge der ListView
@@ -1141,3 +1157,10 @@ Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge kor
 - **Richtig:** In der Kill-Phase `_Done(EXIT_CLEAN)` aufrufen; `_Done` macht 5 daraus, wenn `Children.AnyKilled()` wahr ist (`Terminate` zählt nur, wenn der Prozess noch lief).
 - **Status:** verifiziert im AHK-Unit-Test (`EndedAtTheDeadlineIsNoForcedExit`: mit der alten Zeile Exit 5, mit der neuen 0; `TerminatedAtTheDeadlineIsAForcedExit`: 5). Im echten Supervisor nicht nachgestellt.
 - **Quelle:** WI-33, `src/supervisor/Shutdown.ahk`
+
+### Testrolle verzögert starten, ohne Option im Produkt (WI-34)
+
+- **Problem:** Für F-41 musste ein Kind des echten Supervisors sich erst Sekunden nach seinem Start melden. Der Supervisor reicht nur eine feste Liste von Optionen an die Kinder weiter; eine neue Option hätte Produktcode nur für einen Test gebraucht.
+- **Richtig:** Den Namen nutzen, den der Supervisor ohnehin weitergibt: `--start=echo:slowhello3000` startet die Rolle `echo` mit `--flow=slowhello3000`, `EchoRole.Start` erkennt das Muster und ruft `super.Start()` erst per `SetTimer` nach 3000 ms (in einer eigenen Methode `_StartLate`, mit `try`; `AhfMain` hat `Persistent()` schon gesetzt, der Prozess bleibt also während der Wartezeit am Leben).
+- **Status:** verifiziert (`tests/fault/test_shutdown.py`, das Kind ist beim Beenden im Zustand `starting` und meldet sich danach)
+- **Quelle:** `tests/integration/helpers/EchoRole.ahk`
