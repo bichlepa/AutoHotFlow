@@ -1,22 +1,22 @@
-# Protokoll AutoHotFlow v2 (IPC)
+# Protocol AutoHotFlow v2 (IPC)
 
-Status: Entwurf, Protokollversion **1**. Begründung der Technik: [ARCHITEKTUR.md](ARCHITEKTUR.md), Abschnitt 2.2.
+Status: draft, protocol version **1**. Rationale for the technology: [ARCHITEKTUR.md](ARCHITEKTUR.md), section 2.2.
 
 ---
 
 ## 1. Transport
 
-- **Hub:** Der Supervisor betreibt die Pipe `\\.\pipe\ahf.s<winSession>.u<tag>.<session>.hub` (Name aus `PipeNames.Hub`, `src/core/PipeNames.ahk`; `<winSession>` ist die Windows-Sitzungs-ID aus `ProcessIdToSessionId`, `<tag>` sind 8 Hexziffern des FNV-1a-Hashes der Benutzer-SID, z. B. `ahf.s1.u1a2b3c4d.main.hub`). Die Rollen bilden den Namen nicht selbst, sie bekommen ihn mit `--hub=<name>`. Grund (WI-22): Pipe-Namen gelten für den ganzen Rechner, Mutexe nur je Windows-Sitzung. Bei einem zweiten angemeldeten Benutzer (schneller Benutzerwechsel, Terminalserver) fand die zweite Instanz keinen Mutex, wollte denselben Pipe-Namen bedienen und scheiterte mit Exit 1. Tests nutzen `tests/support/pipenames.py` (`hub_pipe(session)`). Alle anderen Rollen verbinden sich als Client. Es gibt keine direkten Verbindungen zwischen Nicht-Hub-Prozessen.
-- **Sitzung (`<session>`):** Standard ist `main` (Option `--session=<id>`, Standard `main`). Abweichung von der ursprünglich geplanten Wahl (Supervisor-PID und Startzeit): Eine zweite Instanz muss den laufenden Hub finden, um ihren Befehl abzugeben (Abschnitt 4.1, `cmd.app.command`). Mit PID und Startzeit kennt sie den Namen nicht. Die Einzelinstanz-Sperre (benannter Mutex `Local\AHF.supervisor.<session>`, ausdrücklich im Namensraum der Windows-Sitzung, `PipeNames.Mutex`) und die Pipe nutzen denselben Schlüssel `<session>`. Mehrere parallele Sitzungen (z. B. Tests) bekommen eigene `--session`-Werte.
-- **Pipe:** Byte-Modus, duplex, `FILE_FLAG_OVERLAPPED`, `PIPE_REJECT_REMOTE_CLIENTS`, eine Serverinstanz pro Client (der Hub legt nach jedem `Connect` eine neue Instanz an).
-- **Rahmen:** `uint32` Länge (little endian) + UTF-8-JSON. Maximale Größe 16 MiB. Größere Nutzdaten (z. B. große Flows) werden über `storage`-Dateien oder Chunking geteilt (`seq/total` in der Nutzlast), nicht über einen größeren Rahmen.
-- **Weckruf:** Nach jedem Schreiben sendet der Sender `PostMessage(peerHwnd, 0x8001, 0, 0)` (`WM_AHF_WAKE`). Der Empfänger liest bei Weckruf und zusätzlich per Fallback-Timer (250 ms). Ein Client, der die Hub-HWND kennt (Peer-Option `hubHwnd`), weckt den Hub schon mit dem `sys.hello` (Abschnitt 5); ohne Weckruf nimmt der Hub den neuen Client erst nach bis zu 250 ms an.
-- **Lieferung:** Reihenfolge pro Verbindung erhalten, höchstens einmal, keine Persistenz. Verlorene Nachrichten werden über Timeouts und Resync (Abschnitt 5) behandelt, nicht über Wiederholung.
-- **Kodierung:** JSON-Zahlen sind Zahlen, Strings Strings. Flow-Daten behalten die Typen der Datei (z. B. `"zoomFactor": "0.700000"` bleibt ein String).
+- **Hub:** The supervisor operates the pipe `\\.\pipe\ahf.s<winSession>.u<tag>.<session>.hub` (name from `PipeNames.Hub`, `src/core/PipeNames.ahk`; `<winSession>` is the Windows session ID from `ProcessIdToSessionId`, `<tag>` is 8 hex digits of the FNV-1a hash of the user SID, e.g. `ahf.s1.u1a2b3c4d.main.hub`). The roles do not build the name themselves; they receive it with `--hub=<name>`. Reason (WI-22): pipe names are valid for the whole machine, mutexes only per Windows session. With a second logged-on user (fast user switching, terminal server), the second instance did not find the mutex, wanted to serve the same pipe name and failed with exit 1. Tests use `tests/support/pipenames.py` (`hub_pipe(session)`). All other roles connect as clients. There are no direct connections between non-hub processes.
+- **Session (`<session>`):** The default is `main` (option `--session=<id>`, default `main`). Deviation from the originally planned choice (supervisor PID and start time): a second instance must find the running hub in order to submit its command (section 4.1, `cmd.app.command`). With PID and start time it would not know the name. The single-instance lock (named mutex `Local\AHF.supervisor.<session>`, explicitly in the namespace of the Windows session, `PipeNames.Mutex`) and the pipe use the same key `<session>`. Several parallel sessions (e.g. tests) get their own `--session` values.
+- **Pipe:** Byte mode, duplex, `FILE_FLAG_OVERLAPPED`, `PIPE_REJECT_REMOTE_CLIENTS`, one server instance per client (the hub creates a new instance after each `Connect`).
+- **Frame:** `uint32` length (little endian) + UTF-8 JSON. Maximum size 16 MiB. Larger payloads (e.g. large flows) are split via `storage` files or chunking (`seq/total` in the payload), not via a larger frame.
+- **Wake-up call:** After each write, the sender sends `PostMessage(peerHwnd, 0x8001, 0, 0)` (`WM_AHF_WAKE`). The receiver reads on the wake-up call and additionally via a fallback timer (250 ms). A client that knows the hub HWND (peer option `hubHwnd`) wakes the hub already with `sys.hello` (section 5); without the wake-up call the hub only accepts the new client after up to 250 ms.
+- **Delivery:** Order per connection is preserved, at most once, no persistence. Lost messages are handled via timeouts and resync (section 5), not via retransmission.
+- **Encoding:** JSON numbers are numbers, strings are strings. Flow data keep the types of the file (e.g. `"zoomFactor": "0.700000"` stays a string).
 
-## 2. Umschlag (Envelope)
+## 2. Envelope
 
-Jede Nachricht ist ein JSON-Objekt mit festem Schema. Der Serializer schreibt die Kopffelder **in dieser Reihenfolge zuerst**, damit der Hub `to` ohne vollständiges Parsen der Nutzlast lesen kann.
+Every message is a JSON object with a fixed schema. The serializer writes the header fields **first, in this order**, so that the hub can read `to` without fully parsing the payload.
 
 ```json
 {
@@ -30,396 +30,395 @@ Jede Nachricht ist ein JSON-Objekt mit festem Schema. Der Serializer schreibt di
 }
 ```
 
-| Feld | Typ | Bedeutung |
+| Field | Type | Meaning |
 |---|---|---|
-| `to` | string | Rollenadresse (siehe 3) oder Topic `topic:<name>` für Ereignisse. `"*"` nur für `sys.*`-Rundrufe des Supervisors. |
-| `from` | string | Absender-Rollenadresse. Der Hub setzt sie anhand der Verbindung und überschreibt falsche Werte. |
-| `id` | string | `<from>#<n>`, `n` ist ein Zähler pro Prozess und Sitzung (nicht `A_TickCount`). |
-| `type` | string | Siehe Präfixe unten. |
-| `corr` | string oder null | Bei Antworten die `id` der Anfrage. |
-| `timeoutMs` | int oder fehlend | Nur bei `cmd.*`, Frist, nach der der Absender die Anfrage als gescheitert behandelt. Standard 5000, `storage`-Operationen 30000. |
-| `payload` | object | Typspezifisch (Abschnitt 4). Immer ein Objekt, nie `null`. |
+| `to` | string | Role address (see 3) or topic `topic:<name>` for events. `"*"` only for `sys.*` broadcasts from the supervisor. |
+| `from` | string | Sender role address. The hub sets it based on the connection and overwrites wrong values. |
+| `id` | string | `<from>#<n>`, `n` is a counter per process and session (not `A_TickCount`). |
+| `type` | string | See prefixes below. |
+| `corr` | string or null | For responses, the `id` of the request. |
+| `timeoutMs` | int or absent | Only for `cmd.*`, deadline after which the sender treats the request as failed. Default 5000, `storage` operations 30000. |
+| `payload` | object | Type-specific (section 4). Always an object, never `null`. |
 
-**Typpräfixe**
+**Type prefixes**
 
-| Präfix | Bedeutung | Antwort erwartet |
+| Prefix | Meaning | Response expected |
 |---|---|---|
-| `cmd.` | Befehl oder Anfrage | ja, genau eine `res.` mit `corr` (außer als `noReply` markiert) |
-| `res.` | Antwort auf `cmd.`, Typ ist `res.<cmdtype ohne "cmd.">` | – |
-| `evt.` | Ereignis, wird an Abonnenten des Topics verteilt | nein |
-| `sys.` | Lebenszyklus (Hallo, Ping, Shutdown) | je Typ |
+| `cmd.` | Command or request | yes, exactly one `res.` with `corr` (unless marked as `noReply`) |
+| `res.` | Response to `cmd.`, type is `res.<cmdtype without "cmd.">` | – |
+| `evt.` | Event, distributed to subscribers of the topic | no |
+| `sys.` | Lifecycle (hello, ping, shutdown) | depends on type |
 
-**Antwort:** `payload` enthält `{ "ok": true, ...Daten }` oder `{ "ok": false, "error": { "code": "...", "message": "..." } }`.
+**Response:** `payload` contains `{ "ok": true, ...data }` or `{ "ok": false, "error": { "code": "...", "message": "..." } }`.
 
-**Antwort später (WI-12):** Ein `cmd.`-Handler darf `Deferred.Marker()` zurückgeben und die Antwort später mit `peer.Reply(request, payload)` senden. Solange der Handler den Marker zurückgibt, sendet der Peer nichts. Der Handler ist dann für genau eine `Reply` verantwortlich, auch auf jedem Fehlerpfad (sonst endet der Absender mit seinem Timeout). Genutzt von `storage` (Warteschlange, Abschnitt 4.6). Umgesetzt in `src/core/ipc/Deferred.ahk`, `Dispatcher.ahk`, `Peer.ahk`.
+**Deferred response (WI-12):** A `cmd.` handler may return `Deferred.Marker()` and send the response later with `peer.Reply(request, payload)`. As long as the handler returns the marker, the peer sends nothing. The handler is then responsible for exactly one `Reply`, also on every error path (otherwise the sender ends with its timeout). Used by `storage` (queue, section 4.6). Implemented in `src/core/ipc/Deferred.ahk`, `Dispatcher.ahk`, `Peer.ahk`.
 
-**Fehlercodes:** `timeout`, `unknown_type`, `bad_payload`, `not_found`, `conflict` (Revision), `busy`, `denied`, `internal`, `peer_gone`, `shutting_down`.
+**Error codes:** `timeout`, `unknown_type`, `bad_payload`, `not_found`, `conflict` (revision), `busy`, `denied`, `internal`, `peer_gone`, `shutting_down`.
 
-**Weiterleitung im Hub (WI-24):** Der Hub liest bei Rahmen von verbundenen Clients nur die Kopffelder (`Message.ParseHead`) und leitet die Nutzlast als Text unverändert weiter. Er ersetzt nur `from` (`Message.WithFrom`). Das gilt für Rahmen **in genau der Form, die `Message.Serialize` schreibt**: Kopffelder in der Reihenfolge `to, from, id, type, corr, [timeoutMs,] payload`, kein Leerraum, `payload` ein Objekt, nach dem Objekt nur noch das schließende `}`. Alles andere (Leerraum, andere Reihenfolge, fehlendes `corr`, Nutzlast kein Objekt, Text hinter der Nutzlast) läuft über den vollständigen Weg (`Message.Parse`, neue `Message`, `Serialize`) wie bisher und wird dort geprüft. Nachrichten an `supervisor` werden immer vollständig geparst. Gemessen: 93-KB-Rahmen kosten im Hub 1,7 ms statt 220 ms. Folge: Der Hub prüft den **Inhalt** der Nutzlast nicht mehr (nur Klammern und Zeichenketten werden gezählt). Eine ungültige Nutzlast weist der Empfänger ab (`Peer._RejectFrame`): ist der Umschlag lesbares JSON, antwortet er auf ein `cmd.` mit `bad_payload`, sonst wird der Rahmen verworfen und gezählt (`badFrames`). Ein Absender, dessen Nutzlast nicht einmal JSON ist, bekommt wie bisher keine Antwort (nur sein eigenes Timeout), denn auch der vollständige Weg kann `from` und `id` dann nicht lesen.
+**Forwarding in the hub (WI-24):** For frames from connected clients, the hub reads only the header fields (`Message.ParseHead`) and forwards the payload unchanged as text. It only replaces `from` (`Message.WithFrom`). This applies to frames **in exactly the form that `Message.Serialize` writes**: header fields in the order `to, from, id, type, corr, [timeoutMs,] payload`, no whitespace, `payload` an object, after the object only the closing `}`. Anything else (whitespace, different order, missing `corr`, payload not an object, text after the payload) goes through the full path (`Message.Parse`, new `Message`, `Serialize`) as before and is checked there. Messages to `supervisor` are always parsed fully. Measured: a 93 KB frame costs 1.7 ms in the hub instead of 220 ms. Consequence: the hub no longer checks the **content** of the payload (it only counts brackets and strings). The receiver rejects an invalid payload (`Peer._RejectFrame`): if the envelope is readable JSON, it answers a `cmd.` with `bad_payload`, otherwise the frame is discarded and counted (`badFrames`). A sender whose payload is not even JSON receives no response, as before (only its own timeout), because even the full path cannot read `from` and `id` in that case.
 
-**Pflicht für jeden Empfänger:** jede `cmd.`-Anfrage wird beantwortet (auch mit Fehler). Der Absender erzeugt bei Fristablauf selbst ein lokales `res.` mit `timeout` und verwirft spätere Antworten mit unbekannter `corr`. Ist der Umschlag ungültig, `from`/`id`/`type` aber lesbar, antwortet der Empfänger mit `bad_payload`. Ganz unlesbare Rahmen werden verworfen und gezählt.
+**Requirement for every receiver:** every `cmd.` request is answered (also with an error). On deadline expiry the sender itself creates a local `res.` with `timeout` and discards later responses with an unknown `corr`. If the envelope is invalid but `from`/`id`/`type` are readable, the receiver answers with `bad_payload`. Completely unreadable frames are discarded and counted.
 
-**Ziel geht vor der Antwort verloren (WI-34, F-40):** Der Hub merkt sich jede `cmd.`-Anfrage, die er von einem Client an einen anderen weiterleitet (nur Kopffelder: Absender, `id`, `type`, Ziel), bis die Antwort (`res.` mit dieser `corr`, vom Ziel der Anfrage) zurückläuft oder die Frist der Anfrage (`timeoutMs`, ohne Angabe 30000) plus 1000 ms vorbei ist. Endet die Verbindung des Ziels vorher (Prozess beendet oder abgestürzt, Pipe gebrochen, Warteschlange übergelaufen, Wiederverbindung unter demselben Namen), antwortet der Hub dem Absender sofort für jede offene Anfrage mit `res.<typ>` `{ ok: false, error: { code: "peer_gone" } }` (`from` ist `supervisor`). Die Verbindung wird vorher bis zum Ende gelesen: eine Antwort, die das Ziel vor seinem Ende geschrieben hat, kommt zuerst an, danach kommt keine zweite. Bei einer Wiederverbindung kann die echte Antwort noch nach dem `peer_gone` kommen; der Absender verwirft sie als unbekannte `corr` (`lateReplies`). `peer_gone` heißt also "Ausgang unbekannt": ein Absender, der eine schreibende Anfrage wiederholt, muss mit doppelter Ausführung rechnen. Anfragen an `supervisor` und die eigenen Anfragen des Hubs (`Hub.Request`) betrifft das nicht, sie haben ihren eigenen Weg. Vorher wartete der Absender bis zu seiner Frist (die Engine beim Laden 30 s).
+**Target lost before the response (WI-34, F-40):** The hub remembers every `cmd.` request that it forwards from one client to another (header fields only: sender, `id`, `type`, target), until the response (`res.` with this `corr`, from the target of the request) arrives back, or the deadline of the request (`timeoutMs`, default 30000 if not given) plus 1000 ms has passed. If the connection of the target ends earlier (process ended or crashed, pipe broken, queue overflow, reconnection under the same name), the hub immediately answers the sender for every open request with `res.<type>` `{ ok: false, error: { code: "peer_gone" } }` (`from` is `supervisor`). The connection is read to its end beforehand: a response that the target wrote before its end arrives first, and no second one follows. On a reconnection the real response may still arrive after the `peer_gone`; the sender discards it as an unknown `corr` (`lateReplies`). `peer_gone` therefore means "outcome unknown": a sender that repeats a write request must reckon with double execution. Requests to `supervisor` and the hub's own requests (`Hub.Request`) are not affected, they have their own path. Previously the sender waited until its deadline (the engine 30 s when loading).
 
-**Wahrheitswerte (WI-26, E8):** Auf der Leitung stehen Wahrheitswerte als JSON `true`/`false`, nie als `1`/`0`. Das betrifft alle Felder dieses Dokuments, die als `bool` bezeichnet sind oder wie `ok`, `cancel`, `started`, `clean`, `restart`, `enabled`, `executing`, `exists`, `existed`, `waiting`, `byMeta`, `delete`, `busy`, `truncated` Wahrheitswerte sind. Die Regel in drei Teilen:
-- **Schreiben:** `Json.True`, `Json.False` und `Json.Bool(x)` (`src/core/Json.ahk`) erzeugen die Werte, **nur beim Bau der Nachricht unmittelbar vor dem Senden**. AHK v2 hat keinen Bool-Typ, jedes Objekt ist wahr, also ist `Json.False` in einem `if` wahr. Programmzustand und Rückgabewerte bleiben deshalb `1`/`0`. Eine Ausnahme von „beim Bau“ gibt es für `ok`: Der Code setzt `ok` intern weiter als `1`/`0` (`Dispatcher`, `WriteQueue`, `Map("ok", true)`), und `Message.Serialize` wandelt das Feld `ok` der Nutzlast (oberste Ebene, auf einer Kopie) in `true`/`false` um. Das deckt `Peer.Send`/`Peer.Reply`, die Antworten des Hubs und `sys.welcome` ab, weil alles durch `Serialize` geht.
-- **Lesen:** `Json.Parse` liefert `true` als `1` und `false` als `0`, damit `if payload["ok"]` in AHK stimmt. Empfänger sind tolerant: `1`/`0` und `true`/`false` gelten gleich (ältere und fremde Clients).
-- **Der Hub** reicht die Nutzlast als Text durch (`Message.ParseHead`/`WithFrom`, siehe oben) und ändert Wahrheitswerte nicht. Ein Wert, der den Hub als `true` erreicht, kommt als `true` heraus.
-- **Round-Trip:** `Parse` und `Stringify` erhalten Wahrheitswerte nicht typgenau (`true` kommt als `1` zurück). Wer eine geparste Nutzlast weitergibt (Beispiel `StubManager._WireAnswer`), setzt die Wahrheitsfelder wieder mit `Json.Bool`. Flow- und Variablendateien ändern ihr Format nicht (Checkbox-Parameter bleiben Zahlen); sie enthalten kein `true`/`false`.
-- **Prüfung:** Python-Testpeers melden jedes empfangene Protokollfeld dieser Liste, das kein JSON-Boolean ist (`tests/support/wirebool.py`, automatisch in jedem Test). `tools/arch_check.py` Regel `wire-bool` meldet Literale wie `"enabled", true` oder `"cancel", 1` in `Map(...)`.
+**Boolean values (WI-26, E8):** On the wire, boolean values are JSON `true`/`false`, never `1`/`0`. This applies to all fields in this document that are called `bool` or are boolean values such as `ok`, `cancel`, `started`, `clean`, `restart`, `enabled`, `executing`, `exists`, `existed`, `waiting`, `byMeta`, `delete`, `busy`, `truncated`. The rule in three parts:
+- **Writing:** `Json.True`, `Json.False` and `Json.Bool(x)` (`src/core/Json.ahk`) create the values, **only when building the message immediately before sending**. AHK v2 has no boolean type, every object is true, so `Json.False` is true in an `if`. Program state and return values therefore remain `1`/`0`. There is one exception to "when building" for `ok`: the code keeps setting `ok` internally as `1`/`0` (`Dispatcher`, `WriteQueue`, `Map("ok", true)`), and `Message.Serialize` converts the field `ok` of the payload (top level, on a copy) into `true`/`false`. This covers `Peer.Send`/`Peer.Reply`, the hub's responses and `sys.welcome`, because everything goes through `Serialize`.
+- **Reading:** `Json.Parse` returns `true` as `1` and `false` as `0`, so that `if payload["ok"]` works in AHK. Receivers are tolerant: `1`/`0` and `true`/`false` count as equal (older and foreign clients).
+- **The hub** passes the payload through as text (`Message.ParseHead`/`WithFrom`, see above) and does not change boolean values. A value that reaches the hub as `true` comes out as `true`.
+- **Round trip:** `Parse` and `Stringify` do not preserve boolean values with exact types (`true` comes back as `1`). Anyone who forwards a parsed payload (example `StubManager._WireAnswer`) sets the boolean fields again with `Json.Bool`. Flow and variable files do not change their format (checkbox parameters remain numbers); they contain no `true`/`false`.
+- **Check:** Python test peers report every received protocol field from this list that is not a JSON boolean (`tests/support/wirebool.py`, automatically in every test). The `tools/arch_check.py` rule `wire-bool` reports literals such as `"enabled", true` or `"cancel", 1` in `Map(...)`.
 
-## 3. Adressen und Topics
+## 3. Addresses and Topics
 
-| Adresse | Rolle |
+| Address | Role |
 |---|---|
-| `supervisor` | Supervisor (Hub, antwortet selbst auf `sys.*`, `cmd.app.*`) |
+| `supervisor` | Supervisor (hub, answers `sys.*`, `cmd.app.*` itself) |
 | `engine` | Engine |
 | `storage` | Storage |
-| `triggerhost` | Triggerhost |
+| `triggerhost` | Trigger host |
 | `manager` | Manager |
-| `debug` | Debug-Fenster (WI-28, 4.9) |
-| `editor:<flowId>` | Editor des Flows `<flowId>` |
-| `worker:<n>` | Worker, `n` vom Supervisor vergeben (`cmd.process.spawn`, 4.1) |
+| `debug` | Debug window (WI-28, 4.9) |
+| `editor:<flowId>` | Editor of the flow `<flowId>` |
+| `worker:<n>` | Worker, `n` assigned by the supervisor (`cmd.process.spawn`, 4.1) |
 
-**Topics** (Abonnement per `cmd.topic.subscribe {topic}` an `supervisor`, wird bei Wiederverbindung erneuert):
+**Topics** (subscription via `cmd.topic.subscribe {topic}` to `supervisor`, renewed on reconnection):
 
-| Topic | Inhalt | Typische Abonnenten |
+| Topic | Content | Typical subscribers |
 |---|---|---|
-| `engine` | `evt.engine.*`, `evt.flow.list.changed`, `evt.settings.changed` | alle UIs |
-| `flow:<flowId>` | `evt.flow.*`, `evt.element.state`, `evt.connection.state`, `evt.instance.*` für diesen Flow | `editor:<flowId>`, `manager` |
-| `log` | `evt.log.entry` | `manager` (Log-Fenster) |
-| `process` | `evt.process.*` (Felder siehe 4.1a), `evt.app.exitCancelled` | `manager`, Tests |
-| `debug` | `evt.debug.dump` (Werte, die Code mit `Debug.Dump` ausgibt, 4.9) | `debug` (Debug-Fenster), Tests |
+| `engine` | `evt.engine.*`, `evt.flow.list.changed`, `evt.settings.changed` | all UIs |
+| `flow:<flowId>` | `evt.flow.*`, `evt.element.state`, `evt.connection.state`, `evt.instance.*` for this flow | `editor:<flowId>`, `manager` |
+| `log` | `evt.log.entry` | `manager` (log window) |
+| `process` | `evt.process.*` (fields see 4.1a), `evt.app.exitCancelled` | `manager`, tests |
+| `debug` | `evt.debug.dump` (values that code outputs with `Debug.Dump`, 4.9) | `debug` (debug window), tests |
 
-## 4. Nachrichtenkatalog
+## 4. Message Catalog
 
-Alle Nutzlasten sind Objekte. `flowId`, `elementId`, `connectionId` sind die Bezeichner aus den Flow-Dateien (z. B. `Flow 1010290492`, `element0000000001`).
+All payloads are objects. `flowId`, `elementId`, `connectionId` are the identifiers from the flow files (e.g. `Flow 1010290492`, `element0000000001`).
 
-**Umsetzungsstand am Ende von Phase 2 (WI-17, Abgleich mit `src/`, verifiziert durch Suche der Typnamen im Quelltext):** Alle Nachrichtentypen, die `src/` sendet oder registriert, stehen in diesem Katalog. Umgekehrt sind die folgenden Typen des Katalogs **noch nicht umgesetzt** (Entwurf für Phase 3 oder später). Ein Client darf sich auf sie noch nicht verlassen:
+**Implementation status at the end of Phase 2 (WI-17, comparison with `src/`, verified by searching the type names in the source code):** All message types that `src/` sends or registers are in this catalog. Conversely, the following types of the catalog are **not yet implemented** (draft for Phase 3 or later). A client must not rely on them yet:
 
-| Bereich | Noch nicht umgesetzt |
+| Area | Not yet implemented |
 |---|---|
-| 4.2 Engine-Befehle | `cmd.flow.create`, `cmd.flow.delete`, `cmd.flow.meta.update`, `cmd.flow.save`, `cmd.trigger.enable`, `cmd.trigger.disable`, `cmd.category.*`, `cmd.settings.get/set` |
-| 4.3 Engine-Ereignisse | `evt.flow.committed`, `evt.flow.saved`, `evt.connection.state`, `evt.settings.changed` |
-| 4.4 Engine ↔ Triggerhost | alle (`cmd.trigger.arm`, `cmd.trigger.disarm`, `evt.trigger.fired`, `evt.trigger.error`); der Triggerhost (WI-14, optional) ist nicht gebaut, die Rolle `triggerhost` ist ein Platzhalter |
-| 4.5 | `cmd.engine.var.get` (Worker fragt Variable der Engine) |
-| 4.6 | `cmd.storage.settings.get/set` (steht dort bereits als "noch nicht umgesetzt") |
-| 4.7 Dialoge | `evt.ui.notice`, `cmd.ui.confirmDeleteFlowFile` |
+| 4.2 Engine commands | `cmd.flow.create`, `cmd.flow.delete`, `cmd.flow.meta.update`, `cmd.flow.save`, `cmd.trigger.enable`, `cmd.trigger.disable`, `cmd.category.*`, `cmd.settings.get/set` |
+| 4.3 Engine events | `evt.flow.committed`, `evt.flow.saved`, `evt.connection.state`, `evt.settings.changed` |
+| 4.4 Engine ↔ trigger host | all (`cmd.trigger.arm`, `cmd.trigger.disarm`, `evt.trigger.fired`, `evt.trigger.error`); the trigger host (WI-14, optional) is not built, the role `triggerhost` is a placeholder |
+| 4.5 | `cmd.engine.var.get` (worker asks the engine for a variable) |
+| 4.6 | `cmd.storage.settings.get/set` (already listed there as "not yet implemented") |
+| 4.7 Dialogs | `evt.ui.notice`, `cmd.ui.confirmDeleteFlowFile` |
 
-`cmd.flow.patch` ist umgesetzt, kennt aber nur das Schema und die Revisionsprüfung (die Operationen selbst kommen in Phase 3, siehe 4.2). Die Rolle `editor` ist ein Platzhalter (Exit 3), `manager` gibt es nur als Stub (`--ui=stub`, 4.8).
+`cmd.flow.patch` is implemented, but only knows the schema and the revision check (the operations themselves come in Phase 3, see 4.2). The role `editor` is a placeholder (exit 3), `manager` exists only as a stub (`--ui=stub`, 4.8).
 
-### 4.1 Lebenszyklus (`sys.*`)
+### 4.1 Lifecycle (`sys.*`)
 
-| Typ | Von → An | Nutzlast | Antwort / Wirkung |
+| Type | From → To | Payload | Response / effect |
 |---|---|---|---|
-| `sys.hello` | Rolle → supervisor | `{ name, pid, hwnd, protocol: 1, epoch? }` | `sys.welcome` |
-| `sys.welcome` | supervisor → Rolle | `{ session, peers: { name: { hwnd } }, settingsRev }` | Rolle ist `ready` |
-| `sys.ping` | supervisor → Rolle | `{ n }` | `sys.pong {n}` innerhalb 1 s |
-| `sys.pong` | Rolle → supervisor | `{ n }` | – |
-| `sys.shutdown` | supervisor → alle | `{ reason: "user"/"logoff"/"crash", deadlineMs }` | Rolle räumt auf, sendet `sys.bye`, beendet sich |
-| `sys.bye` | Rolle → supervisor | `{ clean: bool }` | – (keine Antwort). Die letzte Nachricht der Rolle: alles, was sie vorher gesendet hat, steht davor in derselben Verbindung und kommt vorher an. Danach schließt die Rolle ihre Verbindung erst, wenn ihre Sendewarteschlange geschrieben ist (`Peer.CloseWhenFlushed`), spätestens nach dem Rest von `deadlineMs`, höchstens 1000 ms, und beendet sich (WI-30, ARCHITEKTUR 6.3) |
-| `sys.busy` | worker → supervisor | `{ busy: bool }` | – (keine Antwort). Der Worker meldet Beginn (`true`) und Ende (`false`) eines Jobs (WI-27, ARCHITEKTUR 6.4). Solange `busy` wahr ist, sendet der Supervisor dem Worker keinen Ping und beurteilt keinen Pong; beim Ende beginnen die Pong-Zeiten neu. Von einer anderen Rolle als `worker:*` wird die Meldung verworfen (Log `a0`) |
-| `cmd.app.prepareExit` | supervisor → editor/manager | `{}` | `res: { ok, cancel: bool }` (Benutzer kann abbrechen). Frist: 600000 ms (10 Minuten, `Shutdown.PREPARE_LIMIT_MS`). Bei Ablauf synthetische Antwort `{ ok: false, error: { code: "timeout" } }`, die wie „kein Abbruch“ gilt, der Exit geht weiter. Eine spätere echte Antwort wird verworfen (`droppedAnswers`). Steht der Supervisor während der Frist still (eingefroren, Standby), verlängert sich die Frist um die Dauer des Stillstands (WI-33, ARCHITEKTUR 6.2); die Frist wird vom Tick des Supervisors geprüft und ist auf einen Tick (200 ms) genau. Die Phase hat keine harte Frist (ARCHITEKTUR 6.3), die Obergrenze verhindert nur, dass eine Anfrage ohne Ende bleibt |
-| `cmd.app.exit` | beliebige UI → supervisor | `{ deadlineMs? }` (optional, Integer 100 bis 60000, sonst Standard `--deadline`, 5000) | startet Beenden (6.3), `res: { ok, started: bool }`; `started` ist false, wenn schon ein Beenden läuft |
-| `cmd.app.command` | zweite Instanz → supervisor | `{ argv: [...] }` (Array von Strings, Kommandozeilen-Wörter; die Instanz übergibt `--command=<text>` als `argv` mit einem Eintrag) | `res: { ok, command?, started? }`. Bekannter Befehl (seit WI-28): `debug` startet die Rolle `debug`, falls sie nicht läuft (`started` true), sonst holt es ihr Fenster nach vorn (`evt.debug.show`, `started` false); die Antwort nennt `command: "debug"`. Alles andere wird nur protokolliert (`a1`), die Antwort ist `{ ok }`. Die zweite Instanz beendet sich mit Exit 0 (zugestellt) oder 1 (keine Antwort, Fehler) |
-| `cmd.process.list` | beliebige Rolle → supervisor | `{}` | `res: { ok, processes: [ {name, role, state, pid, restarts} ] }`. Momentaufnahme aller Kinder, Zustände nach ARCHITEKTUR 5.3. Dient als Resync für Späteinsteiger (Abschnitt 5a) |
-| `cmd.process.spawn` | engine → supervisor | `{ role: "worker" }` | `res: { ok, name }`, `name` ist `worker:<n>` (der Supervisor vergibt `n`, aufsteigend, in einer Sitzung nie doppelt). Der Prozess startet wie jedes Kind (`evt.process.started`, bei `sys.hello` `evt.process.ready`). Fehler: `denied` (Absender nicht `engine`, oder `role` nicht `worker`), `shutting_down` (Beenden läuft), `busy` (schon 16 lebende Worker, `Children.WORKER_LIMIT`), `bad_payload` (`role` fehlt), `internal` (Start gescheitert). WI-27 |
-| `cmd.process.kill` | engine → supervisor | `{ name, reason }` | `res: { ok }`. `TerminateProcess` des Kindes `name`. Nur für Namen `worker:<n>`, nur vom Absender `engine`, sonst `denied` (auch für `storage`, `engine`, `manager`). Unbekannter Name: `not_found`. Ein schon beendeter Worker: `ok` (gleichwertig). Ist der Prozess schon beendet, aber sein Ende noch nicht bewertet (die Anfrage trifft zwischen Tod und nächstem Tick ein), wird er nicht als geplant umetikettiert: sein Ende gilt als eigenes und wird normal bewertet, meist `evt.process.crashed` (F-46, WI-35). Sonst wird das Ende wie jedes andere gemeldet, aber als geplant: `evt.process.exited {name, pid, clean: false, exitCode, reason: "killed"}`, kein `crashed`, kein Neustart. Das Beenden zählt nicht für den Exit-Code 5 des Supervisors. `reason` (Text, höchstens 200 Zeichen) steht im Log `a1`. WI-27 |
-| `cmd.topic.subscribe` / `cmd.topic.unsubscribe` | Rolle → supervisor | `{ topic }` | `res: { ok }` |
-| `evt.app.exitCancelled` | supervisor → Topic `process` | `{ by }` (Rolle, die abgebrochen hat) | – (Beenden abgebrochen, nichts wurde gestoppt) |
+| `sys.hello` | role → supervisor | `{ name, pid, hwnd, protocol: 1, epoch? }` | `sys.welcome` |
+| `sys.welcome` | supervisor → role | `{ session, peers: { name: { hwnd } }, settingsRev }` | role is `ready` |
+| `sys.ping` | supervisor → role | `{ n }` | `sys.pong {n}` within 1 s |
+| `sys.pong` | role → supervisor | `{ n }` | – |
+| `sys.shutdown` | supervisor → all | `{ reason: "user"/"logoff"/"crash", deadlineMs }` | role cleans up, sends `sys.bye`, terminates |
+| `sys.bye` | role → supervisor | `{ clean: bool }` | – (no response). The last message of the role: everything it sent before is in front of it on the same connection and arrives before it. Afterwards the role closes its connection only when its send queue has been written (`Peer.CloseWhenFlushed`), at the latest after the rest of `deadlineMs`, at most 1000 ms, and terminates (WI-30, ARCHITEKTUR 6.3) |
+| `sys.busy` | worker → supervisor | `{ busy: bool }` | – (no response). The worker reports the start (`true`) and end (`false`) of a job (WI-27, ARCHITEKTUR 6.4). While `busy` is true, the supervisor sends no ping to the worker and does not evaluate any pong; at the end the pong times restart. Messages from a role other than `worker:*` are discarded (log `a0`) |
+| `cmd.app.prepareExit` | supervisor → editor/manager | `{}` | `res: { ok, cancel: bool }` (user can cancel). Deadline: 600000 ms (10 minutes, `Shutdown.PREPARE_LIMIT_MS`). On expiry, synthetic response `{ ok: false, error: { code: "timeout" } }`, which counts as "no cancel"; the exit continues. A later real response is discarded (`droppedAnswers`). If the supervisor stands still during the deadline (frozen, standby), the deadline is extended by the duration of the standstill (WI-33, ARCHITEKTUR 6.2); the deadline is checked by the supervisor's tick and is accurate to one tick (200 ms). This phase has no hard deadline (ARCHITEKTUR 6.3); the upper limit only prevents a request from never ending |
+| `cmd.app.exit` | any UI → supervisor | `{ deadlineMs? }` (optional, integer 100 to 60000, otherwise default `--deadline`, 5000) | starts the exit (6.3), `res: { ok, started: bool }`; `started` is false if an exit is already running |
+| `cmd.app.command` | second instance → supervisor | `{ argv: [...] }` (array of strings, command-line words; the instance passes `--command=<text>` as `argv` with one entry) | `res: { ok, command?, started? }`. Known command (since WI-28): `debug` starts the role `debug` if it is not running (`started` true), otherwise it brings its window to the front (`evt.debug.show`, `started` false); the response names `command: "debug"`. Anything else is only logged (`a1`), the response is `{ ok }`. The second instance terminates with exit 0 (delivered) or 1 (no response, error) |
+| `cmd.process.list` | any role → supervisor | `{}` | `res: { ok, processes: [ {name, role, state, pid, restarts} ] }`. Snapshot of all children, states according to ARCHITEKTUR 5.3. Serves as resync for late joiners (section 5a) |
+| `cmd.process.spawn` | engine → supervisor | `{ role: "worker" }` | `res: { ok, name }`, `name` is `worker:<n>` (the supervisor assigns `n`, ascending, never duplicated within a session). The process starts like every child (`evt.process.started`, on `sys.hello` `evt.process.ready`). Errors: `denied` (sender not `engine`, or `role` not `worker`), `shutting_down` (exit running), `busy` (already 16 live workers, `Children.WORKER_LIMIT`), `bad_payload` (`role` missing), `internal` (start failed). WI-27 |
+| `cmd.process.kill` | engine → supervisor | `{ name, reason }` | `res: { ok }`. `TerminateProcess` of the child `name`. Only for names `worker:<n>`, only from sender `engine`, otherwise `denied` (also for `storage`, `engine`, `manager`). Unknown name: `not_found`. A worker that has already ended: `ok` (equivalent). If the process has already ended but its end has not yet been evaluated (the request arrives between death and the next tick), it is not relabeled as planned: its end counts as its own and is evaluated normally, usually `evt.process.crashed` (F-46, WI-35). Otherwise the end is reported like any other, but as planned: `evt.process.exited {name, pid, clean: false, exitCode, reason: "killed"}`, no `crashed`, no restart. The termination does not count for the exit code 5 of the supervisor. `reason` (text, at most 200 characters) appears in the log `a1`. WI-27 |
+| `cmd.topic.subscribe` / `cmd.topic.unsubscribe` | role → supervisor | `{ topic }` | `res: { ok }` |
+| `evt.app.exitCancelled` | supervisor → topic `process` | `{ by }` (role that cancelled) | – (exit cancelled, nothing was stopped) |
 
-**Exit-Codes des Supervisors** (`AutoHotFlow.ahk --role=supervisor`, Standard ohne `--role`):
-0 sauber (jedes Kind hat sich selbst beendet), 1 Start fehlgeschlagen (z. B. Mutex, ungültige Optionen), 5 mindestens ein Kind wurde nach Frist oder Hang beendet (`TerminateProcess`). Dieselben Zahlen stehen im Einstieg (`src/AutoHotFlow.ahk`). Die zweite Instanz nutzt 0 und 1 (siehe `cmd.app.command`).
+**Exit codes of the supervisor** (`AutoHotFlow.ahk --role=supervisor`, default without `--role`):
+0 clean (every child has terminated itself), 1 start failed (e.g. mutex, invalid options), 5 at least one child was terminated after deadline or hang (`TerminateProcess`). The same numbers appear in the entry point (`src/AutoHotFlow.ahk`). The second instance uses 0 and 1 (see `cmd.app.command`).
 
-**Exit-Codes einer laufenden Rolle** (`Role`): 0 sauberes Ende nach `sys.shutdown`, 3 Rolle nicht umgesetzt, 4 Hub verloren (Orphan-Guard oder Peer geschlossen), 6 zu viele unbehandelte Fehler (4.1c). Der Supervisor schreibt die Bedeutung bekannter Codes in die Logzeile des Absturzes (`Children.EXIT_TEXT`).
+**Exit codes of a running role** (`Role`): 0 clean end after `sys.shutdown`, 3 role not implemented, 4 hub lost (orphan guard or peer closed), 6 too many unhandled errors (4.1c). The supervisor writes the meaning of known codes into the log line of the crash (`Children.EXIT_TEXT`).
 
-**Exit-Codes des Einstiegs vor dem Start der Rolle** (gelten für jede Rolle und den Supervisor, WI-22): 2 der Interpreter ist nicht 64 Bit (`A_PtrSize != 8`, Entscheidung E4; Meldung auf stderr: "AutoHotFlow v2 needs the 64-bit AutoHotkey v2 interpreter"; dieselbe 2 wie bei ungültigen Optionen oder unbekannter Rolle), 1 ein Fehler beim Laden der Dateien, bevor `AhfMain` läuft (z. B. eine Elementdatei, deren `ElementRegistry.Register` wirft; Meldung auf stderr, kein Dialog). Beide Prüfungen stehen im Einstieg vor allen `#Include`-Zeilen.
+**Exit codes of the entry point before the role starts** (apply to every role and to the supervisor, WI-22): 2 the interpreter is not 64 bit (`A_PtrSize != 8`, decision E4; message on stderr: "AutoHotFlow v2 needs the 64-bit AutoHotkey v2 interpreter"; the same 2 as for invalid options or unknown role), 1 an error when loading the files before `AhfMain` runs (e.g. an element file whose `ElementRegistry.Register` throws; message on stderr, no dialog). Both checks are in the entry point before all `#Include` lines.
 
-### 4.1a Prozessereignisse (Topic `process`, supervisor → Abonnenten)
+### 4.1a Process events (topic `process`, supervisor → subscribers)
 
-Jeder Eintrag trägt `name` (der Name, unter dem das Kind gestartet wurde, z. B. `engine`, `echo:a`) und `pid`, wo der Prozess bekannt ist.
+Each entry carries `name` (the name under which the child was started, e.g. `engine`, `echo:a`) and `pid`, where the process is known.
 
-| Typ | Nutzlast | Bedeutung |
+| Type | Payload | Meaning |
 |---|---|---|
-| `evt.process.started` | `{ name, role, pid }` | Prozess gestartet, noch nicht bereit |
-| `evt.process.ready` | `{ name, pid }` | `sys.hello` angekommen, Rolle meldet sich bereit |
-| `evt.process.hung` | `{ name, reason }` | kein Pong (3 Pings × 2 s) oder kein `sys.hello` innerhalb 10 s. Der Supervisor sendet `sys.shutdown` mit `deadlineMs` 2000, nach 2 s `TerminateProcess` |
-| `evt.process.crashed` | `{ name, pid, reason: "exited"/"hung", exitCode, restart: bool }` | unerwartetes Ende (auch nach Hang). `restart` true, wenn neu gestartet wird |
-| `evt.process.exited` | `{ name, pid, clean: bool, exitCode, reason? }` | Ende nach Aufforderung (Beenden). `reason` ist nur bei einem geplanten Ende eines Workers gesetzt: `"killed"` bei `cmd.process.kill`, `"engine gone"`, wenn der Supervisor die lebenden `worker:*` beendet hat, weil die Engine endete (E10, WI-33; kein `crashed`, zählt nicht für Exit-Code 5, kein Neustart). Die Felder `clean` und `exitCode` gelten seit WI-22/23 (vorher hier nicht aufgeführt) |
-| `evt.process.restarted` | `{ name, attempt }` | Neustart nach Richtlinie (automatisch nur für `storage` und `engine`; mit `--test-roles` zusätzlich `crasher`) |
+| `evt.process.started` | `{ name, role, pid }` | process started, not yet ready |
+| `evt.process.ready` | `{ name, pid }` | `sys.hello` arrived, role reports ready |
+| `evt.process.hung` | `{ name, reason }` | no pong (3 pings × 2 s) or no `sys.hello` within 10 s. The supervisor sends `sys.shutdown` with `deadlineMs` 2000, after 2 s `TerminateProcess` |
+| `evt.process.crashed` | `{ name, pid, reason: "exited"/"hung", exitCode, restart: bool }` | unexpected end (also after a hang). `restart` true if a restart is performed |
+| `evt.process.exited` | `{ name, pid, clean: bool, exitCode, reason? }` | end after request (termination). `reason` is only set for a planned end of a worker: `"killed"` for `cmd.process.kill`, `"engine gone"` if the supervisor terminated the live `worker:*` because the engine ended (E10, WI-33; no `crashed`, does not count for exit code 5, no restart). The fields `clean` and `exitCode` apply since WI-22/23 (not listed here before) |
+| `evt.process.restarted` | `{ name, attempt }` | restart according to policy (automatic only for `storage` and `engine`; with `--test-roles` additionally `crasher`) |
 
-**Zeitpunkt von `evt.process.exited` und `evt.process.crashed` (WI-30):** Der Supervisor meldet das Ende eines Prozesses erst, wenn er dessen Verbindung bis zum Ende gelesen hat (ein `sys.bye` ist dann sicher verarbeitet und `clean` stimmt), spätestens 500 ms nach dem Prozessende (`Children.EXIT_GRACE_MS`, für ein Kind ohne Verbindung sofort). Die Meldung kann also bis zu 500 ms nach dem Prozessende kommen; im Normalfall kommt sie im selben Tick (200 ms).
+**Timing of `evt.process.exited` and `evt.process.crashed` (WI-30):** The supervisor reports the end of a process only when it has read the connection of that process to its end (a `sys.bye` has then been processed safely and `clean` is correct), at the latest 500 ms after the process end (`Children.EXIT_GRACE_MS`; for a child without a connection immediately). The message can therefore arrive up to 500 ms after the process end; normally it arrives in the same tick (200 ms).
 
-**Freiwilliges Ende (WI-28):** Beendet sich ein Kind von selbst mit `sys.bye {clean: true}` und Exit-Code 0, ohne dass der Supervisor es dazu aufgefordert hat (das Debug-Fenster, das der Benutzer schließt), meldet der Supervisor `evt.process.exited {clean: true}` statt `evt.process.crashed`. Ein hängendes Kind (`hung`) wird weiter immer als `crashed` gemeldet.
+**Voluntary exit (WI-28):** If a child terminates itself with `sys.bye {clean: true}` and exit code 0, without the supervisor having asked it to (the debug window that the user closes), the supervisor reports `evt.process.exited {clean: true}` instead of `evt.process.crashed`. A hung child (`hung`) is still always reported as `crashed`.
 
-Neustart-Richtlinie: höchstens 3 Neustarts in 60 s, sonst bleibt der Prozess `crashed` (`restart: false`). `manager` und `editor` werden nie automatisch neu gestartet.
+Restart policy: at most 3 restarts in 60 s, otherwise the process remains `crashed` (`restart: false`). `manager` and `editor` are never restarted automatically.
 
-### 4.1b Testrollen (nur mit `--test-roles`)
+### 4.1b Test roles (only with `--test-roles`)
 
-Die Rollen `echo`, `crasher`, `hanger`, `slow_shutdown` (Quellen in `tests/integration/helpers/`) sind nur im Testeinstieg `tests/integration/helpers/AutoHotFlowTest.ahk` einkompiliert (WI-29) und dort nur mit `--test-roles` registriert. Im Produkteinstieg und ohne das Flag ist ihr Name unbekannt (Exit 2). Zusätzliche Nachrichten der Testrollen:
-- `cmd.test.arm` an `crasher` (`{}`, `res: { ok }`): startet einen Timer (300 ms), nach dem `crasher` sich mit `TerminateProcess` (Exit 7) selbst beendet, ohne `sys.bye`. Der Arm-Schritt erlaubt dem Test, den Prozess zu beobachten, bevor er stirbt (Testszenario für `evt.process.crashed`). Ohne Arm tut `crasher` nichts.
-- `cmd.test.echo`, `cmd.test.log`, `cmd.test.logstate`, `cmd.test.setlogtarget`, `cmd.test.throwlater` (`echo`): siehe `tests/integration/helpers/EchoRole.ahk`.
-- Option `--prepare-limit=<ms>` (nur mit `--test-roles`, 100 bis 600000): setzt die Frist von `cmd.app.prepareExit` herab, damit der Timeout-Test in Sekunden läuft. Ohne das Flag gilt die Konstante.
-- Option `--restart-max=<n>` (nur mit `--test-roles`): Zahl der automatischen Neustarts je 60 s statt 3, damit ein Test ein Kind 50-mal neu starten kann (Handle-Leck-Test).
-- Option `--worker-limit=<n>` (nur mit `--test-roles`, 1 bis 16): Höchstzahl lebender Worker statt 16, damit der Test von `cmd.process.spawn` (`busy`) nicht 17 Prozesse braucht.
-- `echo` (WI-28): `cmd.test.dump {title, value}` ruft `Debug.Dump` auf (4.9).
-- `echo` (WI-23): `cmd.test.stderr {text}` schreibt eine Zeile auf stderr; `cmd.test.log {count, level, text}` schreibt `count` Einträge (Standard `a1`); `cmd.test.throwlater {count}` wirft `count` Fehler aus Timern.
+The roles `echo`, `crasher`, `hanger`, `slow_shutdown` (sources in `tests/integration/helpers/`) are compiled only into the test entry point `tests/integration/helpers/AutoHotFlowTest.ahk` (WI-29), and are registered there only with `--test-roles`. In the product entry point and without the flag, their name is unknown (exit 2). Additional messages of the test roles:
+- `cmd.test.arm` to `crasher` (`{}`, `res: { ok }`): starts a timer (300 ms), after which `crasher` terminates itself with `TerminateProcess` (exit 7), without `sys.bye`. The arm step allows the test to observe the process before it dies (test scenario for `evt.process.crashed`). Without arm, `crasher` does nothing.
+- `cmd.test.echo`, `cmd.test.log`, `cmd.test.logstate`, `cmd.test.setlogtarget`, `cmd.test.throwlater` (`echo`): see `tests/integration/helpers/EchoRole.ahk`.
+- Option `--prepare-limit=<ms>` (only with `--test-roles`, 100 to 600000): lowers the deadline of `cmd.app.prepareExit`, so that the timeout test runs in seconds. Without the flag the constant applies.
+- Option `--restart-max=<n>` (only with `--test-roles`): number of automatic restarts per 60 s instead of 3, so that a test can restart a child 50 times (handle leak test).
+- Option `--worker-limit=<n>` (only with `--test-roles`, 1 to 16): maximum number of live workers instead of 16, so that the test of `cmd.process.spawn` (`busy`) does not need 17 processes.
+- `echo` (WI-28): `cmd.test.dump {title, value}` calls `Debug.Dump` (4.9).
+- `echo` (WI-23): `cmd.test.stderr {text}` writes one line to stderr; `cmd.test.log {count, level, text}` writes `count` entries (default `a1`); `cmd.test.throwlater {count}` throws `count` errors from timers.
 
-### 4.1c Unbehandelte Fehler (`evt.diag.error`, WI-23)
+### 4.1c Unhandled errors (`evt.diag.error`, WI-23)
 
-| Typ | Von → An | Nutzlast | Wirkung |
+| Type | From → To | Payload | Effect |
 |---|---|---|---|
-| `evt.diag.error` (`noReply`) | Rolle → supervisor | `{ name, errorType, message, file, line, stack, mode }` | Der Supervisor schreibt einen `a0`-Eintrag (Quelle `diag`, Text `unhandled <errorType> in <name>: <message> (<file>, line <line>, <mode>)`) und hält die letzten 50 Meldungen vollständig im Speicher (`DiagLog.Errors()`, Grundlage des Absturzberichts, WI-28). |
+| `evt.diag.error` (`noReply`) | role → supervisor | `{ name, errorType, message, file, line, stack, mode }` | The supervisor writes an `a0` entry (source `diag`, text `unhandled <errorType> in <name>: <message> (<file>, line <line>, <mode>)`) and keeps the last 50 reports completely in memory (`DiagLog.Errors()`, basis of the crash report, WI-28). |
 
-Gesendet wird sie von `Role._OnUnexpected` für jeden Fehler, den kein `try/catch` fing (`OnError`), bevor der Hook `OnUnexpectedError` läuft. `name` ist der Rollenname (`echo:a`), `errorType` der AHK-Typ (`ValueError`), `file`/`line` die Stelle, `stack` der Aufrufstapel (`Error.Stack`, auf 4000 Zeichen gekürzt), `mode` die Art des Fehlers laut `OnError` (`Return`, `Exit`, `ExitApp`). Fehlende Felder sind leer. Ist der Peer nicht verbunden, geht die Meldung verloren (der Fehler steht im Log der Rolle). Der Supervisor zählt seine eigenen unbehandelten Fehler im selben Ring (Absender `supervisor`).
+It is sent by `Role._OnUnexpected` for every error that no `try/catch` caught (`OnError`), before the hook `OnUnexpectedError` runs. `name` is the role name (`echo:a`), `errorType` the AHK type (`ValueError`), `file`/`line` the location, `stack` the call stack (`Error.Stack`, truncated to 4000 characters), `mode` the kind of error according to `OnError` (`Return`, `Exit`, `ExitApp`). Missing fields are empty. If the peer is not connected, the message is lost (the error is in the log of the role). The supervisor counts its own unhandled errors in the same ring (sender `supervisor`).
 
-**Schwelle:** Mehr als 20 unbehandelte Fehler innerhalb von 60 Sekunden (`Role.ERROR_LIMIT`, `Role.ERROR_WINDOW_MS`) beenden die Rolle mit dem Exit-Code **6** (`Role.EXIT_TOO_MANY_ERRORS`, "too many unexpected errors"); die Meldung steht auf stderr und kommt über die Ausgabe des Kindes in das Log. 20 pro Minute sind großzügig: Eine gesunde Rolle hat keinen, ein kaputtes Element oder ein Timer wirft vielleicht ein paar Mal hintereinander, 21 heißt: der Zustand der Rolle ist kaputt, ein Neustart ist besser als ein Zombie. Das Fenster verhindert, dass seltene Fehler über ein langes Leben zusammenzählen. Für `engine` und `storage` greift danach die normale Neustartregel (4.1a: höchstens 3 Neustarts in 60 s), andere Rollen werden als abgestürzt gemeldet (`evt.process.crashed`, `exitCode` 6).
+**Threshold:** More than 20 unhandled errors within 60 seconds (`Role.ERROR_LIMIT`, `Role.ERROR_WINDOW_MS`) terminate the role with exit code **6** (`Role.EXIT_TOO_MANY_ERRORS`, "too many unexpected errors"); the message is on stderr and reaches the log via the output of the child. 20 per minute is generous: a healthy role has none, a broken element or a timer may throw a few times in a row; 21 means the state of the role is broken, a restart is better than a zombie. The window prevents rare errors from adding up over a long lifetime. For `engine` and `storage` the normal restart rule then applies (4.1a: at most 3 restarts in 60 s); other roles are reported as crashed (`evt.process.crashed`, `exitCode` 6).
 
-### 4.2 Engine-Befehle (Clients → `engine`)
+### 4.2 Engine commands (clients → `engine`)
 
-| Typ | Nutzlast | Antwort (`payload`) |
+| Type | Payload | Response (`payload`) |
 |---|---|---|
 | `cmd.engine.snapshot` | `{ topics?: [..] }` | `{ ok, epoch, seq, flows: [ {flowId,name,category,enabled,executing,rev} ], settings }` |
-| `cmd.flow.get` | `{ flowId }` | `{ ok, rev, definition }` (Struktur wie Flow-Datei, Abschnitt 7 der Architektur, ohne Ansichtsdaten des Editors) |
+| `cmd.flow.get` | `{ flowId }` | `{ ok, rev, definition }` (structure like the flow file, section 7 of the architecture, without the editor's view data) |
 | `cmd.flow.create` | `{ name, category?, definition? }` | `{ ok, flowId }` |
 | `cmd.flow.delete` | `{ flowId }` | `{ ok }` |
 | `cmd.flow.meta.update` | `{ flowId, name?, category? }` | `{ ok, rev }` |
-| `cmd.flow.patch` | `{ flowId, baseRev, ops: [ ... ] }` | `{ ok, rev }` oder `error.code = "conflict"` mit `{ rev, definition }` |
-| `cmd.flow.save` | `{ flowId }` | `{ ok, savedRev }` nach `storage`-Quittung |
-| `cmd.flow.start` | `{ flowId, triggerId? }` | `{ ok, instanceId }`, bei Richtlinie `wait` und laufendem Flow `{ ok, instanceId, waiting: true }` (die Instanz ist eingereiht), oder `error.code = "busy"` (Richtlinie `skip`) |
-| `cmd.flow.stop` | `{ flowId }` | `{ ok }` (Stopp eingeleitet, Abschluss per `evt.instance.ended`). Beendet laufende **und** wartende Instanzen |
+| `cmd.flow.patch` | `{ flowId, baseRev, ops: [ ... ] }` | `{ ok, rev }` or `error.code = "conflict"` with `{ rev, definition }` |
+| `cmd.flow.save` | `{ flowId }` | `{ ok, savedRev }` after `storage` acknowledgement |
+| `cmd.flow.start` | `{ flowId, triggerId? }` | `{ ok, instanceId }`, with policy `wait` and a running flow `{ ok, instanceId, waiting: true }` (the instance is queued), or `error.code = "busy"` (policy `skip`) |
+| `cmd.flow.stop` | `{ flowId }` | `{ ok }` (stop initiated, completion via `evt.instance.ended`). Ends running **and** waiting instances |
 | `cmd.flow.toggle` | `{ flowId }` | `{ ok, action: "started"/"stopped" }` |
-| `cmd.flow.enable` / `cmd.flow.disable` | `{ flowId }` | `{ ok }` (schaltet alle Trigger) |
+| `cmd.flow.enable` / `cmd.flow.disable` | `{ flowId }` | `{ ok }` (switches all triggers) |
 | `cmd.trigger.enable` / `cmd.trigger.disable` | `{ flowId, elementId }` | `{ ok, message? }` |
-| `cmd.category.*`, `cmd.settings.get/set` | siehe Phase 3 | – |
+| `cmd.category.*`, `cmd.settings.get/set` | see Phase 3 | – |
 
-**Patch-Operationen (`ops`)** (Phase 2 definiert nur das Schema, Phase 3 füllt es):
-`{ op: "element.add"/"element.update"/"element.remove"/"connection.add"/"connection.remove"/"flow.settings", ... }`. Jede Operation trägt die minimal nötigen Felder, Reihenfolge ist wesentlich.
+**Patch operations (`ops`)** (Phase 2 only defines the schema, Phase 3 fills it):
+`{ op: "element.add"/"element.update"/"element.remove"/"connection.add"/"connection.remove"/"flow.settings", ... }`. Each operation carries the minimally required fields; order is essential.
 
-### 4.3 Engine-Ereignisse (`evt.*`, Engine → Topics)
+### 4.3 Engine events (`evt.*`, engine → topics)
 
-Jedes Ereignis trägt `seq` (steigend pro Engine-Epoche) und `epoch`.
+Each event carries `seq` (increasing per engine epoch) and `epoch`.
 
-| Typ | Topic | Nutzlast |
+| Type | Topic | Payload |
 |---|---|---|
 | `evt.engine.ready` | `engine` | `{ epoch }` |
-| `evt.engine.restarted` | `engine` | `{ epoch }` (zusätzlich `seq`) → Clients führen `cmd.engine.snapshot` aus. Sendet die Engine selbst, nur nach einem Neustart durch den Supervisor (Option `--restarted=<n>`), nicht beim ersten Start |
+| `evt.engine.restarted` | `engine` | `{ epoch }` (additionally `seq`) → clients run `cmd.engine.snapshot`. Sent by the engine itself, only after a restart by the supervisor (option `--restarted=<n>`), not at the first start |
 | `evt.flow.list.changed` | `engine` | `{ added: [..], removed: [..], changed: [..] }` |
 | `evt.flow.state` | `flow:<id>` | `{ flowId, enabled, executing }` |
-| `evt.flow.committed` | `flow:<id>` | `{ flowId, rev, byMeta: bool }` (für Editor nach Manager-Umbenennung) |
+| `evt.flow.committed` | `flow:<id>` | `{ flowId, rev, byMeta: bool }` (for the editor after a rename in the manager) |
 | `evt.flow.saved` | `flow:<id>` | `{ flowId, savedRev }` |
 | `evt.element.state` | `flow:<id>` | `{ flowId, elementId, state: "idle"/"running"/"finished"/"exception", countRuns, lastRun }` |
 | `evt.connection.state` | `flow:<id>` | `{ flowId, connectionId, state }` |
-| `evt.instance.queued` | `flow:<id>` | `{ flowId, instanceId, position }` (Richtlinie `wait`: die Instanz wartet, `position` ab 1 in der Warteschlange des Flows) |
-| `evt.instance.started` / `evt.instance.ended` | `flow:<id>` | `{ flowId, instanceId, reason? }`. Bei einer wartenden Instanz kommt `started` erst beim Übergang nach `running` |
+| `evt.instance.queued` | `flow:<id>` | `{ flowId, instanceId, position }` (policy `wait`: the instance waits, `position` from 1 in the queue of the flow) |
+| `evt.instance.started` / `evt.instance.ended` | `flow:<id>` | `{ flowId, instanceId, reason? }`. For a waiting instance, `started` comes only at the transition to `running` |
 | `evt.settings.changed` | `engine` | `{ settings }` |
-| `evt.log.entry` | `log` | `{ ts, level, source, flowId?, text }` (Engine/Storage senden Log über 4.5, nicht hier) |
-| `evt.storage.error` | `engine` | `{ op, path, code, message }` (WI-12: `op` = Name der Storage-Operation, Abschnitt 4.6; `code` = Fehlercode der Antwort). Nur für echte Fehler: Fehlt `storage` beim Start oder ist es beim Laden nicht erreichbar, sendet die Engine kein `evt.storage.error`, sie wartet (ARCHITEKTUR 6.1, WI-31) |
+| `evt.log.entry` | `log` | `{ ts, level, source, flowId?, text }` (engine/storage send log via 4.5, not here) |
+| `evt.storage.error` | `engine` | `{ op, path, code, message }` (WI-12: `op` = name of the storage operation, section 4.6; `code` = error code of the response). Only for real errors: if `storage` is missing at start or unreachable during loading, the engine sends no `evt.storage.error`, it waits (ARCHITEKTUR 6.1, WI-31) |
 
-**Umsetzung in WI-10 (`src/engine/`, Phase 2):**
-
-- Jedes `evt.*` der Engine trägt `epoch` (Startzeit des Engine-Prozesses, UTC mit Millisekunden, als Ganzzahl) und `seq` (ein Zähler pro Engine-Prozess, +1 pro Ereignis).
-- `evt.engine.ready` mit `{}` erst nach dem Laden der Flow-Liste. Beim Laden zusätzlich `evt.flow.list.changed` `{added, removed: [], changed: []}`.
-- `evt.storage.error` mit `op` = `flows.list` (Liste fehlgeschlagen, aus einem anderen Grund als "`storage` fehlt" oder "antwortet nicht"; wird ohne Obergrenze mit wachsender Pause wiederholt), `flow.read` (Datei nicht lesbar) oder `flow.parse` (Inhalt ungültig). Der Start wird dadurch nicht blockiert. Ein fehlendes oder nicht antwortendes `storage` (`not_found` mit "no peer ...", `timeout`, `peer_gone`, `shutting_down`) ist kein Fehler dieser Art (WI-31).
-- **Start der Engine (WI-31):** Die Engine abonniert immer das Topic `process` (nicht erst mit Worker-Pool), fragt `cmd.process.list` und beginnt das Laden, wenn `storage` den Zustand `ready` hat oder `evt.process.ready` `{name: "storage"}` kommt (Abschnitt 5a). Bricht das Laden ab, holt sie die Liste nach dem nächsten `ready` von `storage` neu und liest nur die Dateien ohne Ergebnis.
-- `evt.element.state` `{flowId, elementId, state, countRuns, lastRun}`. `lastRun` ist der Zeitstempel des letzten Starts (`yyyy-MM-dd HH:mm:ss`, UTC). `countRuns` ist +1 beim Start und -1 beim Ende (wie v1). `state` ist `running`, solange `countRuns > 0`, sonst `finished`, bei Ergebnis `exception` `exception`. Ein Stopp durch die Engine zählt als Ende (Ergebnis `stopped`, Zustand `finished`). Bei `exception` zusätzlich `message` (Meldung der Ausnahme).
-- `evt.instance.ended` `{flowId, instanceId, reason}` mit `reason`: `finished` (letzter Thread regulär beendet), `exception` (letzter Thread ohne passende Verbindung nach einer Ausnahme), `flow.stop`, `toggle`, `policy stop`, `shutdown`, `flow.deleted` (Flow gelöscht oder aus der Tabelle verschwunden), `trigger removed` (eine wartende Instanz fand beim Start ihren Trigger nicht mehr, sie endet ohne `started`). Eine wartende Instanz, die gestoppt wird, endet ebenfalls ohne `started`.
-- `evt.flow.state` `{flowId, enabled, executing}` nach `evt.instance.started` bzw. nach `evt.instance.ended`. Beim Ende kommt `evt.flow.state` also **nach** `evt.instance.ended`.
-- Wahrheitswerte (`enabled`, `executing`, `waiting`) gehen als `true`/`false` auf die Leitung (Abschnitt 2).
-- `cmd.flow.start` `{flowId, triggerId?}`: `{instanceId}`, bei Richtlinie `wait` und laufendem Flow `{instanceId, waiting: true}` (Einreihen, Abschnitt `wait` unten). Ohne `triggerId` der erste Trigger des Flows. Ein Trigger wird vom Start simuliert (`running`, dann `finished`, wie v1 `newInstance`). Fehler: `not_found` (Flow nicht geladen), `bad_payload` (kein Trigger, kein Trigger unter dieser ID, ungültige Richtlinie), `busy` (Richtlinie `skip`).
-- Richtlinie: `flowSettings.ExecutionPolicy` des Flows, `default` wird zu `parallel` aufgelöst (globale Einstellung gibt es in Phase 2 noch nicht). Die Entscheidung trifft `ExecutionPolicy.Decide` (WI-08).
-- `cmd.flow.stop` `{flowId}`: `{stopped: n}`, Zahl der gestoppten Instanzen, wartende eingeschlossen (WI-21). Die Quittung (`evt.instance.ended`) folgt synchron. Wartende Instanzen werden zuerst beendet, damit der Stopp keine Instanz nachrücken lässt.
-- **Richtlinie `wait` (WI-21, E2, M-11):** Startet `cmd.flow.start` einen Flow, der gerade läuft, legt die Engine die Instanz im Zustand `waiting` an und sendet `evt.instance.queued`. Die Antwort enthält `waiting: true`. Reihenfolge FIFO je Flow, in der Reihenfolge der Starts (nicht nach der Reihenfolge der Instanz-IDs, anders als v1, das die erste Instanz in der Reihenfolge der Instanzliste nimmt). Sobald keine gestartete Instanz des Flows mehr existiert, startet die erste wartende (`evt.instance.started`, im nächsten Dispatch-Durchlauf der Engine, nicht im Aufruf, der die vorige beendet hat). `evt.flow.state` bleibt `executing: 1`, solange eine Instanz läuft, stoppt oder wartet. Die Richtlinie wird beim Start gelesen. Der Trigger und die Definition werden beim Nachrücken aus der neuesten Revision gelesen (E1). Es gibt keine Obergrenze der Warteschlange (Beobachtungspunkt).
+**Implementation in WI-10 (`src/engine/`, Phase 2):**
+- Every `evt.*` of the engine carries `epoch` (start time of the engine process, UTC with milliseconds, as an integer) and `seq` (a counter per engine process, +1 per event).
+- `evt.engine.ready` with `{}` only after loading the flow list. During loading additionally `evt.flow.list.changed` `{added, removed: [], changed: []}`.
+- `evt.storage.error` with `op` = `flows.list` (list failed, for a reason other than "`storage` missing" or "does not respond"; is retried without upper limit with increasing pause), `flow.read` (file not readable) or `flow.parse` (content invalid). The start is not blocked by this. A missing or non-responding `storage` (`not_found` with "no peer ...", `timeout`, `peer_gone`, `shutting_down`) is not an error of this kind (WI-31).
+- **Start of the engine (WI-31):** The engine always subscribes to the topic `process` (not only with the worker pool), queries `cmd.process.list`, and begins loading when `storage` has the state `ready` or `evt.process.ready` `{name: "storage"}` arrives (section 5a). If loading aborts, it fetches the list anew after the next `ready` from `storage` and reads only the files without a result.
+- `evt.element.state` `{flowId, elementId, state, countRuns, lastRun}`. `lastRun` is the timestamp of the last start (`yyyy-MM-dd HH:mm:ss`, UTC). `countRuns` is +1 at start and -1 at end (as in v1). `state` is `running` as long as `countRuns > 0`, otherwise `finished`, with result `exception` `exception`. A stop by the engine counts as an end (result `stopped`, state `finished`). For `exception` additionally `message` (message of the exception).
+- `evt.instance.ended` `{flowId, instanceId, reason}` with `reason`: `finished` (last thread ended regularly), `exception` (last thread without a matching connection after an exception), `flow.stop`, `toggle`, `policy stop`, `shutdown`, `flow.deleted` (flow deleted or vanished from the table), `trigger removed` (a waiting instance did not find its trigger anymore at start, it ends without `started`). A waiting instance that is stopped also ends without `started`.
+- `evt.flow.state` `{flowId, enabled, executing}` after `evt.instance.started` respectively after `evt.instance.ended`. At the end, `evt.flow.state` therefore comes **after** `evt.instance.ended`.
+- Boolean values (`enabled`, `executing`, `waiting`) go onto the wire as `true`/`false` (section 2).
+- `cmd.flow.start` `{flowId, triggerId?}`: `{instanceId}`, with policy `wait` and a running flow `{instanceId, waiting: true}` (queuing, section `wait` below). Without `triggerId` the first trigger of the flow. A trigger is simulated by the start (`running`, then `finished`, like v1 `newInstance`). Errors: `not_found` (flow not loaded), `bad_payload` (no trigger, no trigger with this ID, invalid policy), `busy` (policy `skip`).
+- Policy: `flowSettings.ExecutionPolicy` of the flow, `default` is resolved to `parallel` (a global setting does not exist yet in Phase 2). The decision is made by `ExecutionPolicy.Decide` (WI-08).
+- `cmd.flow.stop` `{flowId}`: `{stopped: n}`, number of stopped instances, waiting ones included (WI-21). The receipt (`evt.instance.ended`) follows synchronously. Waiting instances are ended first, so that the stop does not let an instance move up.
+- **Policy `wait` (WI-21, E2, M-11):** If `cmd.flow.start` starts a flow that is currently running, the engine creates the instance in the state `waiting` and sends `evt.instance.queued`. The response contains `waiting: true`. Order is FIFO per flow, in the order of the starts (not by the order of the instance IDs, unlike v1, which takes the first instance in the order of the instance list). As soon as no started instance of the flow exists anymore, the first waiting one starts (`evt.instance.started`, in the next dispatch pass of the engine, not in the call that ended the previous one). `evt.flow.state` stays `executing: 1` as long as an instance is running, stopping or waiting. The policy is read at start. The trigger and the definition are read from the latest revision when the next instance moves up (E1). There is no upper limit for the queue (observation point).
 - `cmd.flow.toggle` `{flowId}`: `{action: "started"/"stopped", instanceId?}`.
-- `cmd.flow.enable` / `cmd.flow.disable` `{flowId}`: `{}`. Setzt nur das Flag und sendet `evt.flow.state`. Trigger werden in Phase 2 nicht scharf geschaltet.
-- `cmd.engine.snapshot`: `settings` ist `{}` (Einstellungen kommen in Phase 3).
-- `cmd.flow.patch` `{flowId, baseRev, ops}` (WI-10, nur Schema und Revision): `baseRev` muss eine Ganzzahl sein, `ops` ein Array (sonst `bad_payload`). Weicht `baseRev` von der aktuellen `rev` ab, antwortet die Engine mit `error.code = "conflict"` und auf Payload-Ebene `rev` und `definition` des aktuellen Stands. Alle `ops` werden vor jeder Anwendung geprüft: unbekannter `op` ist `bad_payload` ("unknown patch operation"), bekannte Operationen (`element.add`, `element.update`, `element.remove`, `connection.add`, `connection.remove`, `flow.settings`) sind `bad_payload` ("not applied before phase 3"). Ein leeres `ops` gibt `{rev}` ohne Änderung zurück.
+- `cmd.flow.enable` / `cmd.flow.disable` `{flowId}`: `{}`. Only sets the flag and sends `evt.flow.state`. Triggers are not armed for real in Phase 2.
+- `cmd.engine.snapshot`: `settings` is `{}` (settings come in Phase 3).
+- `cmd.flow.patch` `{flowId, baseRev, ops}` (WI-10, only schema and revision): `baseRev` must be an integer, `ops` an array (otherwise `bad_payload`). If `baseRev` differs from the current `rev`, the engine answers with `error.code = "conflict"` and, at payload level, `rev` and `definition` of the current state. All `ops` are checked before any is applied: unknown `op` is `bad_payload` ("unknown patch operation"), known operations (`element.add`, `element.update`, `element.remove`, `connection.add`, `connection.remove`, `flow.settings`) are `bad_payload` ("not applied before phase 3"). An empty `ops` returns `{rev}` without change.
 
-### 4.4 Engine ↔ Triggerhost
+### 4.4 Engine ↔ trigger host
 
-| Typ | Von → An | Nutzlast | Antwort |
+| Type | From → To | Payload | Response |
 |---|---|---|---|
-| `cmd.trigger.arm` | engine → triggerhost | `{ triggerKey, flowId, elementId, class, params }` (`params` bereits ausgewertet) | `{ ok, message? }` (Fehler z. B. „Hotkey nicht setzbar“) |
+| `cmd.trigger.arm` | engine → triggerhost | `{ triggerKey, flowId, elementId, class, params }` (`params` already evaluated) | `{ ok, message? }` (errors e.g. "hotkey cannot be set") |
 | `cmd.trigger.disarm` | engine → triggerhost | `{ triggerKey }` | `{ ok }` |
-| `evt.trigger.fired` | triggerhost → engine (`to: "engine"`) | `{ triggerKey, flowId, elementId, data }` | keine, die Engine entscheidet nach Ausführungsrichtlinie |
+| `evt.trigger.fired` | triggerhost → engine (`to: "engine"`) | `{ triggerKey, flowId, elementId, data }` | none, the engine decides according to the execution policy |
 | `evt.trigger.error` | triggerhost → engine | `{ triggerKey, message }` | – |
 
-`triggerKey` = `<flowId>/<elementId>`. Bei `evt.engine.restarted` armiert die Engine alle Trigger neu, der Triggerhost verwirft vorher alle bekannten.
+`triggerKey` = `<flowId>/<elementId>`. On `evt.engine.restarted` the engine re-arms all triggers; the trigger host discards all known ones beforehand.
 
-### 4.5 Engine ↔ Worker
+### 4.5 Engine ↔ worker
 
-| Typ | Von → An | Nutzlast | Antwort / Ereignis |
+| Type | From → To | Payload | Response / event |
 |---|---|---|---|
-| `cmd.worker.run` | engine → worker | `{ execId, class, params, imports: { name: value }, env: { flowId, elementId, instanceId, threadId }, timeoutMs? }` | `res: { ok }` (angenommen) |
+| `cmd.worker.run` | engine → worker | `{ execId, class, params, imports: { name: value }, env: { flowId, elementId, instanceId, threadId }, timeoutMs? }` | `res: { ok }` (accepted) |
 | `evt.worker.done` | worker → engine | `{ execId, result, message, exports: { name: value } }` | – |
-| `cmd.worker.cancel` | engine → worker | `{ execId }` | `res: { ok }`, danach `evt.worker.done` mit `result: "stopped"` |
-| `cmd.engine.var.get` | worker → engine | `{ execId, name, scope? }` | `res: { ok, exists, value }` (selten, mit Timeout) |
+| `cmd.worker.cancel` | engine → worker | `{ execId }` | `res: { ok }`, then `evt.worker.done` with `result: "stopped"` |
+| `cmd.engine.var.get` | worker → engine | `{ execId, name, scope? }` | `res: { ok, exists, value }` (rare, with timeout) |
 
-**Umsetzung in WI-11 (`src/worker/`):**
+**Implementation in WI-11 (`src/worker/`):**
 
-- `cmd.worker.run` `{execId, class, params, imports, env, timeoutMs?}`: `env` trägt `flowId`, `elementId`, `instanceId`, `threadId`. Antwort `{ok}` sofort, danach läuft das Element. Ein zweiter Lauf während der Ausführung: `busy`. Eine Klasse, die nicht `Mode := "worker"` hat, endet als `evt.worker.done` mit `exception` ("is not a worker element"). `timeoutMs` nutzt der Worker nicht: die Frist für die Annahme setzt der Absender, die Laufzeit des Elements ist nicht begrenzt.
-- `evt.worker.done` `{execId, result, message, exports}`: `result` ist `normal`, `yes`, `no`, `head`, `tail`, `exception` oder `stopped`. `exports` ist die Map aus `ctx.Export(name, value)` (nur Text und Zahlen). Der Worker sendet ihn genau einmal pro Lauf.
-- `cmd.worker.cancel` `{execId}`: Antwort `{ok}` (sonst `not_found`), danach `evt.worker.done` mit `stopped`. Ein späteres `Finish` des Elements wird verworfen. Ein einzelner langer blockierender Aufruf im Element kann den Abbruch nicht empfangen, weil AHK Nachrichten nur zwischen Befehlszeilen prüft (Schleifen in Scheiben sind unkritisch, siehe `doc/HOW-TO.md`).
-- `sys.shutdown` während eines Laufs: `evt.worker.done` mit `stopped` vor `sys.bye`.
+- `cmd.worker.run` `{execId, class, params, imports, env, timeoutMs?}`: `env` carries `flowId`, `elementId`, `instanceId`, `threadId`. Response `{ok}` immediately, then the element runs. A second run during execution: `busy`. A class that does not have `Mode := "worker"` ends as `evt.worker.done` with `exception` ("is not a worker element"). The worker does not use `timeoutMs`: the deadline for acceptance is set by the sender, the runtime of the element is not limited.
+- `evt.worker.done` `{execId, result, message, exports}`: `result` is `normal`, `yes`, `no`, `head`, `tail`, `exception` or `stopped`. `exports` is the map from `ctx.Export(name, value)` (only text and numbers). The worker sends it exactly once per run.
+- `cmd.worker.cancel` `{execId}`: response `{ok}` (otherwise `not_found`), then `evt.worker.done` with `stopped`. A later `Finish` of the element is discarded. A single long blocking call inside the element cannot receive the cancellation, because AHK only checks messages between command lines (loops in slices are uncritical, see `doc/HOW-TO.md`).
+- `sys.shutdown` during a run: `evt.worker.done` with `stopped` before `sys.bye`.
 
-**Umsetzung in WI-11 auf Engine-Seite (`src/engine/WorkerBridge.ahk`).** Der Stand von WI-11 (feste Slots `worker:1..n`, Worker von außen gestartet) ist durch WI-27 ersetzt, siehe den folgenden Abschnitt; die Punkte unten gelten nur dort weiter, wo der Abschnitt WI-27 nichts anderes sagt:
+**Implementation in WI-11 on the engine side (`src/engine/WorkerBridge.ahk`).** The state of WI-11 (fixed slots `worker:1..n`, workers started from outside) is replaced by WI-27, see the following section; the points below apply only where the WI-27 section says nothing different:
 
-- Option `--workers=<n>` der Engine (0 bis 8, Standard 0 = kein Pool). Slots heißen `worker:1` bis `worker:n`. Mit 0 endet jedes Worker-Element sofort mit `exception` "worker not available".
-- Ein Worker-Element bleibt `running`, bis `evt.worker.done` kommt. Ist alle Pool-Slots belegt, wartet der Thread (Zustand `ready`), bis einer frei ist. Ist kein Slot mehr nutzbar (alle `down`), endet er mit `exception` "worker not available".
-- Antwort `cmd.worker.run` mit Fehler `not_found`, `timeout` oder `internal`: Slot wird `down`, Element endet mit `exception` "worker not available: worker:n (<code>)". Mit `peer_gone` (Verbindung des Workers beendet, der Hub antwortet sofort): Slot wird entfernt, Element endet mit `exception` "worker crashed (worker:n)", wie bei `evt.process.crashed` (F-46, WI-35).
-- Absturz oder Ende eines Workers: Die Engine abonniert das Topic `process` beim Supervisor (`cmd.topic.subscribe`, nur mit `--workers` > 0) und wertet `evt.process.crashed` und `evt.process.exited` für `worker:n` aus. Das laufende Element endet mit `exception` "worker crashed (worker:n)". `evt.process.ready` macht einen `down`-Slot wieder `idle`.
-- `cmd.worker.cancel` bei Stopp der Instanz: Der Thread endet sofort (wie inline, Quittung nicht abgewartet). Der Slot bleibt `busy`, bis der Worker `evt.worker.done` schickt, spätestens nach 2 s (dann `down`, Eintrag im Log `a0`).
-- Ergebnisse aus `evt.worker.done`: Exporte werden als Thread-Variablen gesetzt. Ein unbekanntes Ergebnis wird `exception`.
-- `cmd.worker.run` übergibt `imports` als Kopie der Instanzvariablen (Scope `instance`) und `env` mit `flowId`, `elementId`, `instanceId`, `threadId`. Die Frist der Annahme (`timeoutMs`) ist 5000 ms.
+- Engine option `--workers=<n>` (0 to 8, default 0 = no pool). Slots are called `worker:1` to `worker:n`. With 0 every worker element ends immediately with `exception` "worker not available".
+- A worker element remains `running` until `evt.worker.done` arrives. If all pool slots are occupied, the thread waits (state `ready`) until one is free. If no slot is usable anymore (all `down`), it ends with `exception` "worker not available".
+- Response to `cmd.worker.run` with error `not_found`, `timeout` or `internal`: slot becomes `down`, element ends with `exception` "worker not available: worker:n (<code>)". With `peer_gone` (connection of the worker ended, the hub answers immediately): slot is removed, element ends with `exception` "worker crashed (worker:n)", as with `evt.process.crashed` (F-46, WI-35).
+- Crash or end of a worker: the engine subscribes to the topic `process` at the supervisor (`cmd.topic.subscribe`, only with `--workers` > 0) and evaluates `evt.process.crashed` and `evt.process.exited` for `worker:n`. The running element ends with `exception` "worker crashed (worker:n)". `evt.process.ready` turns a `down` slot back to `idle`.
+- `cmd.worker.cancel` when the instance is stopped: the thread ends immediately (as inline, receipt not awaited). The slot remains `busy` until the worker sends `evt.worker.done`, at the latest after 2 s (then `down`, entry in the log `a0`).
+- Results from `evt.worker.done`: exports are set as thread variables. An unknown result becomes `exception`.
+- `cmd.worker.run` passes `imports` as a copy of the instance variables (scope `instance`) and `env` with `flowId`, `elementId`, `instanceId`, `threadId`. The acceptance deadline (`timeoutMs`) is 5000 ms.
 
-**Umsetzung in WI-27 (elastischer Pool, ARCHITEKTUR 6.4):**
+**Implementation in WI-27 (elastic pool, ARCHITEKTUR 6.4):**
 
-- **Optionen der Engine:** `--workers=<n>` (Obergrenze N, 0 bis 8, Standard 4; 0 = kein Pool, jedes Worker-Element endet mit `exception` "worker not available"), `--warm-workers=<w>` (Standard 1, höchstens N), `--worker-idle-ms=<ms>` (Standard 60000, 100 bis 3600000). Der Supervisor reicht diese drei Optionen an alle Rollen weiter, wenn er sie bekommt. Ungültige Werte: Engine Exit 2.
-- **Slots:** `starting` → (`evt.process.ready`) → `idle` ⇄ `busy`. Worker werden nur durch `cmd.process.spawn` beim Supervisor erzeugt (4.1). Es gibt keine Slots für Worker, die die Engine nicht selbst angefordert hat. Slots und offene Startanfragen sind zusammen höchstens N.
-- **Bedarf und Warmstart:** Wartende Worker-Elemente lösen Startanfragen aus (ARCHITEKTUR 6.4). Nach `OnReady` fragt die Engine `cmd.process.list` (Frist 5 s), beendet alle `worker:*` mit `cmd.process.kill` (Grund `orphan of a previous engine`) und fordert dann W Worker an.
-- **Beschäftigt:** `sys.busy` (4.1) sendet der Worker, nicht die Engine.
-- **`cmd.worker.run`:** `timeoutMs` ist weiter die Frist der Annahme (5000). Neu und nur Engine-intern: eine Jobfrist (`JobTimeoutMs` der Elementklasse), sie steht nicht in der Nachricht.
-- **Antwort auf `cmd.worker.run` mit Fehler** (`not_found`, `peer_gone`, `timeout`, `busy`, `internal`): der Slot wird entfernt, der Worker mit `cmd.process.kill` (Grund `run not accepted: <code>`) beendet, das Element endet mit `exception` "worker not available: worker:n (<code>)". Ausnahme `peer_gone`: das ist der Verlust des Workers, nicht seine Ablehnung, das Element endet mit `exception` "worker crashed (worker:n)" (F-46, WI-35).
-- **Abbruch:** `cmd.worker.cancel` wie bisher. Kommt binnen 2 s kein `evt.worker.done`, entfernt die Engine den Slot und fordert `cmd.process.kill` an (Grund `cancel not confirmed`).
-- **Jobfrist:** Ablauf beendet den Thread mit `exception` "worker timeout" und behandelt den Job wie einen Abbruch.
-- **Absturz/Ende** (`evt.process.crashed`/`exited` für einen Slot): Slot entfällt, ein laufender Job endet mit `exception` "worker crashed (worker:n)". Dieses Ereignis und `peer_gone` auf `cmd.worker.run` melden denselben Tod auf zwei Wegen ohne feste Reihenfolge (der Hub antwortet bis zu einen Tick vor dem Ereignis des Supervisors); die Engine bewertet beide gleich, der Job endet einmal, der Fehler wird einmal gezählt.
+- **Engine options:** `--workers=<n>` (upper limit N, 0 to 8, default 4; 0 = no pool, every worker element ends with `exception` "worker not available"), `--warm-workers=<w>` (default 1, at most N), `--worker-idle-ms=<ms>` (default 60000, 100 to 3600000). The supervisor passes these three options on to all roles if it receives them. Invalid values: engine exit 2.
+- **Slots:** `starting` → (`evt.process.ready`) → `idle` ⇄ `busy`. Workers are created only by `cmd.process.spawn` at the supervisor (4.1). There are no slots for workers that the engine did not request itself. Slots and open start requests together are at most N.
+- **Demand and warm start:** Waiting worker elements trigger start requests (ARCHITEKTUR 6.4). After `OnReady` the engine queries `cmd.process.list` (deadline 5 s), terminates all `worker:*` with `cmd.process.kill` (reason `orphan of a previous engine`) and then requests W workers.
+- **Busy:** `sys.busy` (4.1) is sent by the worker, not by the engine.
+- **`cmd.worker.run`:** `timeoutMs` is still the acceptance deadline (5000). New and internal to the engine only: a job deadline (`JobTimeoutMs` of the element class), it is not in the message.
+- **Response to `cmd.worker.run` with error** (`not_found`, `peer_gone`, `timeout`, `busy`, `internal`): the slot is removed, the worker is terminated with `cmd.process.kill` (reason `run not accepted: <code>`), the element ends with `exception` "worker not available: worker:n (<code>)". Exception `peer_gone`: this is the loss of the worker, not its rejection; the element ends with `exception` "worker crashed (worker:n)" (F-46, WI-35).
+- **Cancellation:** `cmd.worker.cancel` as before. If no `evt.worker.done` arrives within 2 s, the engine removes the slot and requests `cmd.process.kill` (reason `cancel not confirmed`).
+- **Job deadline:** expiry ends the thread with `exception` "worker timeout" and treats the job like a cancellation.
+- **Crash/end** (`evt.process.crashed`/`exited` for a slot): slot is dropped, a running job ends with `exception` "worker crashed (worker:n)". This event and `peer_gone` on `cmd.worker.run` report the same death via two paths without a fixed order (the hub answers up to one tick before the supervisor's event); the engine evaluates both the same way, the job ends once, the error is counted once.
 
-### 4.6 Engine ↔ Storage und Log
+### 4.6 Engine ↔ storage and log
 
-| Typ | Nutzlast | Antwort |
+| Type | Payload | Response |
 |---|---|---|
 | `cmd.storage.flows.list` | `{}` | `{ ok, files: [ {path, name, mtime} ] }` |
-| `cmd.storage.flow.read` | `{ path }` | `{ ok, text }` (rohes JSON, Engine parst) |
-| `cmd.storage.flow.write` | `{ path, text, backup: true }` | `{ ok }` (atomar, Backups wie v1) |
+| `cmd.storage.flow.read` | `{ path }` | `{ ok, text }` (raw JSON, engine parses) |
+| `cmd.storage.flow.write` | `{ path, text, backup: true }` | `{ ok }` (atomic, backups as in v1) |
 | `cmd.storage.var.get` | `{ scope: "global"/"static", flowId?, name }` | `{ ok, exists, type, content }` |
-| `cmd.storage.var.set` | `{ scope, flowId?, name, type, content }` | `{ ok }` (write-behind, Engine wartet nicht darauf) |
-| `cmd.storage.var.delete` | `{ scope, flowId?, name }` | `{ ok, existed }` (zweimal löschen ist kein Fehler, `existed` ist dann false) |
-| `cmd.storage.var.list` | `{ scope, flowId? }` | `{ ok, names }` (sortiert) |
-| `cmd.storage.settings.get/set` | `{ settings? }` | `{ ok, settings }` (Phase 3, noch nicht umgesetzt) |
-| `evt.log.append` (`noReply`) | `{ ts, level, source, flowId?, text }` | keine. Storage schreibt `Log.txt`, `Log_<source>.txt` und leitet an Topic `log` weiter. |
+| `cmd.storage.var.set` | `{ scope, flowId?, name, type, content }` | `{ ok }` (write-behind, the engine does not wait for it) |
+| `cmd.storage.var.delete` | `{ scope, flowId?, name }` | `{ ok, existed }` (deleting twice is no error, `existed` is then false) |
+| `cmd.storage.var.list` | `{ scope, flowId? }` | `{ ok, names }` (sorted) |
+| `cmd.storage.settings.get/set` | `{ settings? }` | `{ ok, settings }` (Phase 3, not yet implemented) |
+| `evt.log.append` (`noReply`) | `{ ts, level, source, flowId?, text }` | none. Storage writes `Log.txt`, `Log_<source>.txt` and forwards to topic `log`. |
 
-**Umsetzung in WI-12 (`src/storage/`):**
+**Implementation in WI-12 (`src/storage/`):**
 
-- Alle Antworten kommen über die Warteschlange (`WriteQueue`, zwei Warteschlangen, Zeitbudget je Timer-Lauf, siehe WI-25 unten). Die Antwort ist `Deferred` (Abschnitt 2). Jede Anfrage wird genau einmal beantwortet, auch bei Frist, Fehler oder Beenden (`shutting_down`).
-- Frist: `timeoutMs` der Anfrage (Standard 30000). Eine Operation, die länger als die Frist wartete, wird nicht ausgeführt und mit `timeout` beantwortet.
-- `cmd.storage.flows.list`: `path` ist `Flows/<name>.json` relativ zum Datenverzeichnis, `name` der Dateiname ohne `.json` (das ist die `flowId` der Engine). `mtime` als Ganzzahl (Sekunden seit 1970).
-- `cmd.storage.flow.read`: `not_found`, wenn die Datei fehlt.
-- `cmd.storage.flow.write`: `text` muss ein JSON-Objekt sein (sonst `bad_payload`). Geschrieben wird atomar (Temp-Datei + `MoveFileEx`), mit CRLF wie v1. `backup` (Standard true): vor dem Ersetzen wird die alte Datei nach `Flows/backup/<name>_backup_<yyyyMMddHHmmss><ms>.json` kopiert, höchstens 10 bleiben. Schlägt das Backup fehl, wird nicht geschrieben (`internal`).
-- Pfade werden vor jedem Dateizugriff geprüft (`bad_payload` bei `..`, Backslash, Unterordner, falscher Endung). Namen von Variablen und Flow-IDs dürfen keine Pfadzeichen enthalten.
-- `cmd.storage.var.*`: `scope` `global` (Dateien in `Variables/`) oder `static` (in `Variables/<flowId>/`). `type` ist `normal` (Inhalt ist der Wert als Text) oder `object` (Inhalt ist JSON-Text, Storage prüft ihn). `var.get` liefert `exists: false`, wenn die Metadatei fehlt. Inhalt wird unverändert geliefert.
-- Fehler: `ok:false` mit `error.code` an den Absender, zusätzlich `evt.storage.error` an Topic `engine` (`op` = Name ohne `cmd.storage.`, z. B. `flow.read`, `flow.write`, `var.set`).
-- `evt.log.append`: Ein Eintrag wird als Zeile `CRLF, "--- yyyy MM dd HH:mm:ss ~<absender>~<source>~ <text>"` an `Log/Log.txt` und `Log/Log_<source>.txt` angehängt (Zeitstempel lokal wie v1, `ts` kommt in UTC). Die Datei über 100 KB wird vorher nach `<name>_old.txt` umbenannt. Der Eintrag wird als `evt.log.entry` `{ts, level, source, flowId?, text}` an Topic `log` weitergeleitet (`ts` unverändert UTC). Storage selbst schreibt seine Einträge direkt in die Warteschlange, nicht an sich selbst.
+- All responses go through the queue (`WriteQueue`, two queues, time budget per timer run, see WI-25 below). The response is `Deferred` (section 2). Every request is answered exactly once, also on deadline, error or shutdown (`shutting_down`).
+- Deadline: `timeoutMs` of the request (default 30000). An operation that waited longer than the deadline is not executed and is answered with `timeout`.
+- `cmd.storage.flows.list`: `path` is `Flows/<name>.json` relative to the data directory, `name` the file name without `.json` (this is the `flowId` of the engine). `mtime` as an integer (seconds since 1970).
+- `cmd.storage.flow.read`: `not_found` if the file is missing.
+- `cmd.storage.flow.write`: `text` must be a JSON object (otherwise `bad_payload`). Writing is atomic (temp file + `MoveFileEx`), with CRLF as in v1. `backup` (default true): before replacing, the old file is copied to `Flows/backup/<name>_backup_<yyyyMMddHHmmss><ms>.json`, at most 10 are kept. If the backup fails, nothing is written (`internal`).
+- Paths are checked before every file access (`bad_payload` for `..`, backslash, subfolder, wrong extension). Names of variables and flow IDs must not contain path characters.
+- `cmd.storage.var.*`: `scope` `global` (files in `Variables/`) or `static` (in `Variables/<flowId>/`). `type` is `normal` (content is the value as text) or `object` (content is JSON text, storage checks it). `var.get` returns `exists: false` if the metadata file is missing. Content is returned unchanged.
+- Errors: `ok:false` with `error.code` to the sender, additionally `evt.storage.error` to topic `engine` (`op` = name without `cmd.storage.`, e.g. `flow.read`, `flow.write`, `var.set`).
+- `evt.log.append`: An entry is appended as a line `CRLF, "--- yyyy MM dd HH:mm:ss ~<sender>~<source>~ <text>"` to `Log/Log.txt` and `Log/Log_<source>.txt` (timestamp local as in v1, `ts` comes in UTC). A file larger than 100 KB is first renamed to `<name>_old.txt`. The entry is forwarded as `evt.log.entry` `{ts, level, source, flowId?, text}` to topic `log` (`ts` unchanged, UTC). Storage itself writes its entries directly into the queue, not to itself.
 
-- **Warteschlangen, Durchsatz und Obergrenze des Logs (WI-25, F-08):** `WriteQueue` hat zwei Warteschlangen: Anfragen (`cmd.storage.*`) und Logoperationen. Eine wartende Anfrage läuft immer vor der nächsten Logoperation, die Reihenfolge innerhalb jeder Warteschlange bleibt. Ein Timer-Lauf arbeitet Operationen ab, bis das Zeitbudget (`WriteQueue.BUDGET_MS` = 10 ms, geprüft zwischen zwei Operationen) verbraucht ist oder nichts mehr läuft; eine einzelne große Operation (5-MB-Schreiben) wird nie geteilt. Danach gibt der Lauf die Nachrichtenschleife frei (`sys.ping`, neue Anfragen). Logzeilen werden je Datei gebündelt: höchstens 500 Zeilen oder 64 K Zeichen je Operation, die Datei wird einmal geöffnet (Rotation vorher, wie bisher), alle Zeilen werden in einem Zug geschrieben. Ist die Datei von einem anderen Prozess gehalten (F-04), bleibt das Bündel samt neuer Zeilen vorn in der Logwarteschlange und wird bis 3 s alle 20 ms wiederholt; Anfragen laufen währenddessen. Danach gelten die Zeilen als verloren (gezählt, `log line lost`, höchstens 5 Zeilen je Bündel einzeln aufgeführt). `evt.log.entry` geht wie bisher nach dem Schreiben der letzten Datei (`Log_<source>.txt`) des Eintrags an Topic `log`. **Obergrenze:** höchstens 20000 Einträge oder 8 MiB (Zeichen) warten gleichzeitig. Darüber werden neue Einträge verworfen und gezählt (nie blockieren, kein Fehler an den Absender); sobald höchstens die Hälfte belegt ist (oder beim nächsten angenommenen Eintrag), schreibt der Storage einen Eintrag der Quelle `storage`, Ebene `a0`: `<n> log lines dropped (log queue was full, <gesamt> in total)`. Die Grenzen lassen sich für Tests mit `--log-queue-max-lines=<n>` und `--log-queue-max-chars=<n>` senken. **Aufräumen beim Start:** als erste Logoperation löscht der Storage `*.ahf-<pid>.tmp` in `Flows/` und `Variables/` (rekursiv), deren Prozess nicht mehr läuft (ein nicht zu öffnender Prozess gilt als laufend). Atomares Schreiben ruft vor der Umbenennung `FlushFileBuffers` für die Temp-Datei auf.
-- **Log-Schwelle und Ringpuffer (WI-23):** Die Option `--log-level=<0..3>` (Standard 2) gilt für den Supervisor und wird von ihm an jede Rolle weitergegeben. Ein Eintrag mit Ziffer über der Schwelle (`a3`, `f3`, `t3` bei Standard) wird **nicht** an die Senke (`storage`) weitergeleitet. Jeder Prozess hält die letzten 500 Einträge aller Ebenen unabhängig von der Senke im Speicher (`Log.Recent()`, Grundlage des Absturzberichts, WI-28). Ungültiger Wert: Rolle Exit 2, Supervisor Exit 1 (Meldung auf stderr). Später eine Einstellung (Phase 3).
-- **Log des Supervisors (WI-23):** Der Supervisor ist keine `Role` und hat keinen Peer, sendet seine Einträge aber wie jede Rolle als `evt.log.append` (Absender `supervisor`) über den Hub an `storage`, solange `storage` verbunden ist (`DiagLog`, `src/supervisor/DiagLog.ahk`). Davor und zwischen zwei `storage`-Läufen (Neustart) warten sie in einer Warteschlange (höchstens `Role.LOG_QUEUE_MAX` = 500, die ältesten fallen heraus und werden gezählt), die beim `sys.hello` von `storage` in Reihenfolge geleert wird. Zusätzlich schreibt der Supervisor weiter auf stderr. Ein Fehler beim Senden loggt nicht erneut (Flag gegen Rekursion). Quellen des Supervisors: `supervisor`, `hub`, `children`, `shutdown`.
+- **Queues, throughput and log limit (WI-25, F-08):** `WriteQueue` has two queues: requests (`cmd.storage.*`) and log operations. A waiting request always runs before the next log operation; the order within each queue remains. A timer run processes operations until the time budget (`WriteQueue.BUDGET_MS` = 10 ms, checked between two operations) is used up or nothing is left to run; a single large operation (5 MB write) is never split. Afterwards the run releases the message loop (`sys.ping`, new requests). Log lines are bundled per file: at most 500 lines or 64 K characters per operation, the file is opened once (rotation beforehand, as before), all lines are written in one go. If the file is held by another process (F-04), the bundle including new lines stays at the front of the log queue and is retried every 20 ms for up to 3 s; requests continue meanwhile. After that the lines count as lost (counted, `log line lost`, at most 5 lines per bundle listed individually). `evt.log.entry` is sent to topic `log` as before, after writing the last file (`Log_<source>.txt`) of the entry. **Limit:** at most 20000 entries or 8 MiB (characters) wait at the same time. Above that, new entries are discarded and counted (never block, no error to the sender); as soon as at most half is occupied (or at the next accepted entry), storage writes an entry of source `storage`, level `a0`: `<n> log lines dropped (log queue was full, <total> in total)`. The limits can be lowered for tests with `--log-queue-max-lines=<n>` and `--log-queue-max-chars=<n>`. **Cleanup at start:** as the first log operation, storage deletes `*.ahf-<pid>.tmp` in `Flows/` and `Variables/` (recursively) whose process is no longer running (a process that cannot be opened counts as running). Atomic writing calls `FlushFileBuffers` on the temp file before the rename.
+- **Log threshold and ring buffer (WI-23):** The option `--log-level=<0..3>` (default 2) applies to the supervisor and is passed by it to every role. An entry with a digit above the threshold (`a3`, `f3`, `t3` at default) is **not** forwarded to the sink (`storage`). Every process keeps the last 500 entries of all levels in memory independently of the sink (`Log.Recent()`, basis of the crash report, WI-28). Invalid value: role exit 2, supervisor exit 1 (message on stderr). A setting for this later (Phase 3).
+- **Log of the supervisor (WI-23):** The supervisor is not a `Role` and has no peer, but it sends its entries like every role as `evt.log.append` (sender `supervisor`) via the hub to `storage`, as long as `storage` is connected (`DiagLog`, `src/supervisor/DiagLog.ahk`). Before that and between two `storage` runs (restart) they wait in a queue (at most `Role.LOG_QUEUE_MAX` = 500, the oldest fall out and are counted), which is emptied in order when `storage` sends `sys.hello`. In addition, the supervisor continues to write to stderr. An error while sending does not log again (flag against recursion). Sources of the supervisor: `supervisor`, `hub`, `children`, `shutdown`.
 
-### 4.7 Dialoge
+### 4.7 Dialogs
 
-Die Engine zeigt nie Dialoge. Muss der Benutzer reagieren, nimmt die Engine einen Worker (Dialog-Element, Modus `worker`) oder sendet an die UI-Rolle:
+The engine never shows dialogs. If the user must react, the engine uses a worker (dialog element, mode `worker`) or sends to the UI role:
 
-| Typ | Von → An | Nutzlast | Antwort |
+| Type | From → To | Payload | Response |
 |---|---|---|---|
-| `evt.ui.notice` | engine/storage → `manager` | `{ level, text, flowId? }` | – (Tray-Hinweis statt MsgBox) |
+| `evt.ui.notice` | engine/storage → `manager` | `{ level, text, flowId? }` | – (tray notice instead of MsgBox) |
 | `cmd.ui.confirmDeleteFlowFile` | engine → `manager` | `{ path, reason: "missing_packages", packages }` | `res: { ok, delete: bool }` (v1: MsgBox in `LoadFlow`) |
 
-### 4.8 Manager-Stub (WI-13, `src/manager/`, nur `--ui=stub`)
+### 4.8 Manager stub (WI-13, `src/manager/`, only `--ui=stub`)
 
-Der Stub ist ein Minimal-Ersatz für `manager` (ARCHITEKTUR 3). Er zeigt, was die Engine meldet. Er hält nur UI-Zustand und keine Wahrheit über die Ausführung.
+The stub is a minimal replacement for `manager` (ARCHITEKTUR 3). It shows what the engine reports. It holds only UI state and no truth about the execution.
 
-- **Abonnements:** `engine`, `process`, `log`, nach dem Snapshot zusätzlich `flow:<flowId>` je Flow.
-- **Resync:** `cmd.engine.snapshot` nach `evt.engine.ready`, nach `evt.flow.list.changed`, nach `evt.process.restarted` (name `engine`), bei neuer `epoch`, bei einer Lücke in `seq` und bei einer veralteten Antwort (Antwort mit kleinerem `seq` als bereits gesehen wird wiederholt). Doppelte Ereignisse (`seq` bereits gesehen) werden verworfen.
-- **Antwort auf `cmd.app.prepareExit`:** `{ ok: true, cancel: false }`, mit Option `--stub-cancel-exit` `cancel: true` (Abschnitt 2).
-- **Ereignisse als Logzeilen:** jedes empfangene `evt.*` (außer Topic `log`) wird als `evt.log.append` an `storage` gesendet, Quelle `manager`, Text `ui-event {json}`. Storage schreibt `Log/Log_manager.txt`. Das Feld `recvMs` ist die Wandzeit (ms, UTC) beim Eingang. Die Zeilen `stub.*` sind eigene Einträge des Stubs (`stub.ready`, `stub.snapshot` mit `reason`, `stub.command`, `stub.commandAnswer`, `stub.prepareExit`, `stub.shutdown`).
-- **Testbefehl `cmd.test.command` (nur mit `--headless`):** Nutzlast `{ type, payload }`, `type` aus `cmd.flow.start`, `cmd.flow.stop`, `cmd.flow.toggle`, `cmd.engine.snapshot`. Der Stub leitet die Anfrage an `engine` weiter und antwortet mit `{ ok: true, answer: <Antwort der Engine> }`. Andere Typen: `bad_payload`. Die Antwort kommt verzögert (`Deferred`).
-- **Optionen, die der Supervisor an alle Rollen weitergibt:** `--ui=<wort>`, `--headless`, `--stub-cancel-exit`, `--log-level=<0..3>` (WI-23), `--workers=<n>`, `--warm-workers=<n>`, `--worker-idle-ms=<ms>` (WI-27, Pool der Engine, 4.5).
-- **`evt.engine.restarted`:** Die Engine sendet es selbst (sie besitzt die `epoch`), sobald sie nach einem Neustart die Flows geladen hat, direkt vor `evt.flow.list.changed` und `evt.engine.ready`. Sie erkennt den Neustart an der Option `--restarted=<n>`, die der Supervisor nur bei einem automatischen Neustart anhängt (`n` = Zahl der Neustarts im Fenster). Beim ersten Start fehlt die Option, dann kommt kein `evt.engine.restarted`. Der Stub löst den Resync zusätzlich über `evt.process.restarted` und neue `epoch` aus.
+- **Subscriptions:** `engine`, `process`, `log`, after the snapshot additionally `flow:<flowId>` for each flow.
+- **Resync:** `cmd.engine.snapshot` after `evt.engine.ready`, after `evt.flow.list.changed`, after `evt.process.restarted` (name `engine`), on a new `epoch`, on a gap in `seq` and on an outdated response (a response with a smaller `seq` than already seen is repeated). Duplicate events (`seq` already seen) are discarded.
+- **Response to `cmd.app.prepareExit`:** `{ ok: true, cancel: false }`, with option `--stub-cancel-exit` `cancel: true` (section 2).
+- **Events as log lines:** every received `evt.*` (except topic `log`) is sent as `evt.log.append` to `storage`, source `manager`, text `ui-event {json}`. Storage writes `Log/Log_manager.txt`. The field `recvMs` is the wall-clock time (ms, UTC) on arrival. The lines `stub.*` are the stub's own entries (`stub.ready`, `stub.snapshot` with `reason`, `stub.command`, `stub.commandAnswer`, `stub.prepareExit`, `stub.shutdown`).
+- **Test command `cmd.test.command` (only with `--headless`):** payload `{ type, payload }`, `type` from `cmd.flow.start`, `cmd.flow.stop`, `cmd.flow.toggle`, `cmd.engine.snapshot`. The stub forwards the request to `engine` and answers with `{ ok: true, answer: <answer of the engine> }`. Other types: `bad_payload`. The answer comes delayed (`Deferred`).
+- **Options that the supervisor passes to all roles:** `--ui=<word>`, `--headless`, `--stub-cancel-exit`, `--log-level=<0..3>` (WI-23), `--workers=<n>`, `--warm-workers=<n>`, `--worker-idle-ms=<ms>` (WI-27, pool of the engine, 4.5).
+- **`evt.engine.restarted`:** The engine sends it itself (it owns the `epoch`), as soon as it has loaded the flows after a restart, directly before `evt.flow.list.changed` and `evt.engine.ready`. It recognizes the restart by the option `--restarted=<n>`, which the supervisor appends only on an automatic restart (`n` = number of restarts in the window). At the first start the option is missing, then no `evt.engine.restarted` comes. The stub additionally triggers the resync via `evt.process.restarted` and a new `epoch`.
 
-### 4.9 Diagnose II: Snapshot, Absturzbericht, Debug-Fenster (WI-28)
+### 4.9 Diagnostics II: snapshot, crash report, debug window (WI-28)
 
-Kein Flow-Debugger (E1), sondern Diagnose des Systems. Alles hier ist nur lesend, bis auf das Schreiben der Berichte durch `storage`.
+Not a flow debugger (E1), but diagnostics of the system. Everything here is read-only, except for the writing of the reports by `storage`.
 
-**`cmd.diag.snapshot`** (beliebige Rolle → jede Rolle, auch `supervisor`; Frist des Aufrufers, Standard 2 s)
+**`cmd.diag.snapshot`** (any role → every role, also `supervisor`; deadline of the caller, default 2 s)
 
-| Anfrage | Antwort |
+| Request | Response |
 |---|---|
-| `{}` (Das Feld `content` ist für den späteren Flow-Debugger reserviert und wird ignoriert: ein Snapshot enthält **nie** Inhalte von Variablen oder Flows, nur Namen, Ids, Zähler und Zustände.) | `{ ok, snapshot }` |
+| `{}` (The field `content` is reserved for the future flow debugger and is ignored: a snapshot **never** contains contents of variables or flows, only names, IDs, counters and states.) | `{ ok, snapshot }` |
 
-`snapshot` ist ein Objekt mit `schema: 1` und diesen Feldern. Der allgemeine Teil kommt aus der Basisklasse `Role` (`Role.Snapshot`), der Rollenteil `info` aus dem Haken `Role.DiagInfo()` (Standard: leeres Objekt). Ein Fehler im Haken ergibt `info: { error: "<Text>" }`, nie einen Fehler der Antwort.
+`snapshot` is an object with `schema: 1` and these fields. The general part comes from the base class `Role` (`Role.Snapshot`), the role part `info` from the hook `Role.DiagInfo()` (default: empty object). An error in the hook yields `info: { error: "<text>" }`, never an error of the response.
 
-| Feld | Inhalt |
+| Field | Content |
 |---|---|
-| `name`, `role`, `pid` | Rollenname (`editor:Flow 1`), Rolle (`editor`), Prozess-ID |
-| `startedAt`, `uptimeMs` | Prozessstart (UTC, `yyyy-MM-dd HH:mm:ss`, aus `GetProcessTimes`) und Laufzeit |
+| `name`, `role`, `pid` | role name (`editor:Flow 1`), role (`editor`), process ID |
+| `startedAt`, `uptimeMs` | process start (UTC, `yyyy-MM-dd HH:mm:ss`, from `GetProcessTimes`) and runtime |
 | `version`, `ahkVersion`, `bits` | `AhfVersion.Current` (`src/core/AhfVersion.ahk`), `A_AhkVersion`, 64 |
-| `rssBytes`, `handles` | Arbeitsspeicher (`GetProcessMemoryInfo`) und Handle-Zahl (`GetProcessHandleCount`) des eigenen Prozesses |
-| `peer` | `{ status, pending, lateReplies, badFrames, droppedSends, queuedFrames, queuedBytes, handlerErrors }` (Zähler von `Peer` und seiner Verbindung, `Peer.Stats()`) |
-| `log` | `{ queued, dropped, sinkErrors, lastSinkError, level, recent: [ {ts, level, source, text} ] }`: `Role.LogStats()`, `Log.sinkErrors`, die letzten 100 Einträge des Ringpuffers von `Log` (WI-23, Texte auf 500 Zeichen gekürzt) |
-| `errors` | `{ count, recent: [ {ts, errorType, message, file, line, stack, mode} ] }`: die letzten 20 unbehandelten Fehler der Rolle (WI-23) mit Stack |
-| `info` | Rollenteil, siehe unten |
+| `rssBytes`, `handles` | memory (`GetProcessMemoryInfo`) and handle count (`GetProcessHandleCount`) of the own process |
+| `peer` | `{ status, pending, lateReplies, badFrames, droppedSends, queuedFrames, queuedBytes, handlerErrors }` (counters of `Peer` and its connection, `Peer.Stats()`) |
+| `log` | `{ queued, dropped, sinkErrors, lastSinkError, level, recent: [ {ts, level, source, text} ] }`: `Role.LogStats()`, `Log.sinkErrors`, the last 100 entries of the ring buffer of `Log` (WI-23, texts truncated to 500 characters) |
+| `errors` | `{ count, recent: [ {ts, errorType, message, file, line, stack, mode} ] }`: the last 20 unhandled errors of the role (WI-23) with stack |
+| `info` | role part, see below |
 
-Rollenteile (`info`):
+Role parts (`info`):
 
-| Rolle | Felder |
+| Role | Fields |
 |---|---|
 | `engine` | `epoch`, `seq`, `flows: [ {flowId, name, rev, enabled, executing} ]`, `instances: [ {instanceId, flowId, state, threads: [ {threadId, elementId, state, result} ]} ]`, `workers: { size, warm, slots: [ {name, state, execId} ], spawning, failures }` |
-| `storage` | `queue: { requests, log }` (Länge der beiden Warteschlangen), `logQueuedEntries`, `logQueuedChars`, `logLinesLost`, `logLinesDropped` |
-| `worker` | `job`: leer, wenn kein Job läuft, sonst `{ execId, class, sinceMs }` |
-| `manager` (Stub) | `topics`, `epoch`, `lastSeq`, `flows` (Zahl), `events`, `resyncs` |
-| `debug` | `topics`, `processes` (Namen), `snapshots` (Rollen mit Snapshot), `logEntries`, `engineEvents`, `dumps`, `paused` |
+| `storage` | `queue: { requests, log }` (length of the two queues), `logQueuedEntries`, `logQueuedChars`, `logLinesLost`, `logLinesDropped` |
+| `worker` | `job`: empty if no job is running, otherwise `{ execId, class, sinceMs }` |
+| `manager` (stub) | `topics`, `epoch`, `lastSeq`, `flows` (count), `events`, `resyncs` |
+| `debug` | `topics`, `processes` (names), `snapshots` (roles with snapshot), `logEntries`, `engineEvents`, `dumps`, `paused` |
 
-Der Supervisor beantwortet die Anfrage selbst (er ist keine `Role` und hat keinen Peer). Statt `peer` und `info` hat sein Snapshot: `hub` (`{ links: [ {name, pid, queuedFrames, queuedBytes, topics} ], droppedAnswers, pending, routedOpen, goneAnswers }`; `routedOpen` = weitergeleitete Anfragen zwischen Clients ohne Antwort, `goneAnswers` = davon mit `peer_gone` beantwortet, weil das Ziel ging, Abschnitt 2, WI-34), `children` (je Kind `{ name, role, state, pid, exitCode, restarts, startedAt, busy, killReason, output: [letzte 100 Zeilen stdout/stderr] }`, auch für beendete Kinder), `diagErrors` (Ring der `evt.diag.error`, bis 50, vollständig mit Stack), `diagLog` (`{ queued, dropped }`), `processEvents` (die letzten 50 Ereignisse des Topics `process`: `{ts, type, payload}`), `reports` (`{ written, unwritten, autoSuppressed }`). `log` und `errors` gibt es auch dort.
+The supervisor answers the request itself (it is not a `Role` and has no peer). Instead of `peer` and `info`, its snapshot has: `hub` (`{ links: [ {name, pid, queuedFrames, queuedBytes, topics} ], droppedAnswers, pending, routedOpen, goneAnswers }`; `routedOpen` = forwarded requests between clients without response, `goneAnswers` = of these, those answered with `peer_gone` because the target was lost, section 2, WI-34), `children` (per child `{ name, role, state, pid, exitCode, restarts, startedAt, busy, killReason, output: [last 100 lines stdout/stderr] }`, also for ended children), `diagErrors` (ring of `evt.diag.error`, up to 50, complete with stack), `diagLog` (`{ queued, dropped }`), `processEvents` (the last 50 events of the topic `process`: `{ts, type, payload}`), `reports` (`{ written, unwritten, autoSuppressed }`). `log` and `errors` are also available there.
 
-**`cmd.diag.report`** (beliebige Rolle → `supervisor`)
+**`cmd.diag.report`** (any role → `supervisor`)
 
-| Anfrage | Antwort |
+| Request | Response |
 |---|---|
-| `{ reason }` (Text, 1 bis 60 Zeichen; Zeichen außer Buchstaben, Ziffern, `.`, `_`, `-` werden im Verzeichnisnamen zu `-`) | `{ ok, path, dir, roles, missing: [ {name, why} ] }` (Antwort verzögert, `Deferred`) |
+| `{ reason }` (text, 1 to 60 characters; characters other than letters, digits, `.`, `_`, `-` become `-` in the directory name) | `{ ok, path, dir, roles, missing: [ {name, why} ] }` (response delayed, `Deferred`) |
 
-Ablauf im Supervisor (`DiagReport`, `src/supervisor/DiagReport.ahk`): Er fragt **jede verbundene Rolle** gleichzeitig mit `cmd.diag.snapshot` (Frist je Rolle `DiagReport.SNAPSHOT_MS` = 2000 ms; es gibt kein Warten ohne Frist). Rollen, die nicht verbunden sind (gestartet, abgestürzt, beendet), und Rollen, die nicht antworten, stehen in `missing` mit dem Grund (`not connected (<state>)`, `no answer within 2000 ms`, `error: <code>`). Wenn alle Antworten oder Fristen da sind, fügt der Supervisor seinen eigenen Snapshot hinzu (mit den Ausgabepuffern auch verstorbener Kinder) und baut zwei Dateien: `report.json` (alle Snapshots, `meta`: Grund, Zeit, automatisch ja/nein, Version, Sitzung) und `summary.txt` (lesbare Zusammenfassung: Prozesstabelle, je Rolle die wichtigsten Zahlen, fehlende Rollen, letzte Fehler). Beides geht an `storage` (`cmd.storage.report.write`). Der Supervisor schreibt nie selbst Dateien.
+Procedure in the supervisor (`DiagReport`, `src/supervisor/DiagReport.ahk`): It queries **every connected role** simultaneously with `cmd.diag.snapshot` (deadline per role `DiagReport.SNAPSHOT_MS` = 2000 ms; there is no waiting without a deadline). Roles that are not connected (started, crashed, ended) and roles that do not answer are listed in `missing` with the reason (`not connected (<state>)`, `no answer within 2000 ms`, `error: <code>`). When all responses or deadlines are in, the supervisor adds its own snapshot (with the output buffers of children that have already died) and builds two files: `report.json` (all snapshots, `meta`: reason, time, automatic yes/no, version, session) and `summary.txt` (readable summary: process table, per role the most important figures, missing roles, last errors). Both go to `storage` (`cmd.storage.report.write`). The supervisor never writes files itself.
 
-*Automatische Berichte.* Der Supervisor löst `reason = "<auslöser>-<name>"` selbst aus bei: unerwartetem Ende eines Kindes (`crashed-<name>`), erreichter Neustartgrenze (`restart-limit-<name>`), `hung-<name>`, und wenn eine Rolle `DiagReport.ERROR_BURST` (10) unbehandelte Fehler innerhalb von 60 s meldet (`errors-<name>`). **Ratenbegrenzung:** höchstens ein automatischer Bericht je 60 s (`DiagReport.AUTO_MIN_INTERVAL_MS`); weitere Auslöser in dieser Zeit werden verworfen, gezählt (`reports.autoSuppressed`) und mit `a1` geloggt. Während des Beendens (`Children.shuttingDown`) gibt es keinen automatischen Bericht. Manuelle Berichte (`cmd.diag.report`) sind nicht begrenzt.
+*Automatic reports.* The supervisor triggers `reason = "<trigger>-<name>"` itself on: unexpected end of a child (`crashed-<name>`), reached restart limit (`restart-limit-<name>`), `hung-<name>`, and when a role reports `DiagReport.ERROR_BURST` (10) unhandled errors within 60 s (`errors-<name>`). **Rate limit:** at most one automatic report every 60 s (`DiagReport.AUTO_MIN_INTERVAL_MS`); further triggers in this time are discarded, counted (`reports.autoSuppressed`) and logged with `a1`. During the exit (`Children.shuttingDown`) there is no automatic report. Manual reports (`cmd.diag.report`) are not limited.
 
-*Storage nicht erreichbar.* Ist `storage` nicht verbunden (abgestürzt, im Neustart), wartet der fertige Bericht im Speicher des Supervisors auf den neu gestarteten Storage, höchstens `DiagReport.STORAGE_WAIT_MS` (10 s). Kommt `storage` rechtzeitig (`sys.hello`), wird er geschrieben und der Aufrufer beantwortet. Sonst antwortet der Supervisor dem Aufrufer mit `error.code = "peer_gone"` ("storage not available, the report is kept and written when storage is back"). Der Bericht bleibt dann im Speicher (höchstens `DiagReport.KEEP_UNWRITTEN` = 5, der älteste fällt heraus) und wird beim nächsten Verbinden von `storage` geschrieben, unter dem ursprünglichen Zeitstempel.
+*Storage not reachable.* If `storage` is not connected (crashed, in restart), the finished report waits in the memory of the supervisor for the newly started storage, at most `DiagReport.STORAGE_WAIT_MS` (10 s). If `storage` comes in time (`sys.hello`), it is written and the caller is answered. Otherwise the supervisor answers the caller with `error.code = "peer_gone"` ("storage not available, the report is kept and written when storage is back"). The report then stays in memory (at most `DiagReport.KEEP_UNWRITTEN` = 5, the oldest falls out) and is written on the next connection of `storage`, under the original timestamp.
 
-**`cmd.storage.report.write`** (`supervisor` → `storage`; andere Absender: `denied`)
+**`cmd.storage.report.write`** (`supervisor` → `storage`; other senders: `denied`)
 
-| Anfrage | Antwort |
+| Request | Response |
 |---|---|
-| `{ stamp, reason, files: { "<datei>": "<text>" } }`. `stamp` = `yyyyMMdd-HHmmss` (lokale Zeit des Supervisors), `reason` wie oben, Dateinamen nur `[A-Za-z0-9._-]`, keine Pfade | `{ ok, path, dir, removed, logs: [ ... ] }`: `path` = `Reports/<stamp>_<reason>` relativ zum Datenverzeichnis, `dir` absolut, `removed` = Zahl der wegen der Aufbewahrung gelöschten alten Berichte, `logs` = kopierte Logdateien |
+| `{ stamp, reason, files: { "<file>": "<text>" } }`. `stamp` = `yyyyMMdd-HHmmss` (local time of the supervisor), `reason` as above, file names only `[A-Za-z0-9._-]`, no paths | `{ ok, path, dir, removed, logs: [ ... ] }`: `path` = `Reports/<stamp>_<reason>` relative to the data directory, `dir` absolute, `removed` = number of old reports deleted due to retention, `logs` = copied log files |
 
-Storage legt `Reports/<stamp>_<reason>/` an (existiert es, wird `-2`, `-3` ... angehängt), schreibt die Dateien atomar, kopiert dazu `Log/Log.txt` und `Log/Log_old.txt`, falls vorhanden (eine nicht lesbare Datei wird übersprungen und nicht in `logs` aufgeführt), und behält danach höchstens 20 Berichtsordner (die ältesten nach Namen fallen weg). Die Operation läuft in der Anfragen-Warteschlange (Frist des Aufrufers, 30 s Standard). Fehler: `bad_payload` (Namen), `denied`, `internal`.
+Storage creates `Reports/<stamp>_<reason>/` (if it exists, `-2`, `-3` ... is appended), writes the files atomically, copies `Log/Log.txt` and `Log/Log_old.txt` into it if present (an unreadable file is skipped and not listed in `logs`), and then keeps at most 20 report folders (the oldest by name fall away). The operation runs in the request queue (deadline of the caller, 30 s default). Errors: `bad_payload` (names), `denied`, `internal`.
 
-**Topic `debug`, `evt.debug.dump`.** `Debug.Dump(value, title := "")` (`src/core/Debug.ahk`) ersetzt `d()` aus v1. Es wandelt `value` in lesbares JSON (Tiefe höchstens 8, höchstens 200 Einträge je Map oder Array, Zyklen und fremde Objekte als `<Typ>`), kürzt bei 60000 Zeichen und sendet `evt.debug.dump { title, ts, json, truncated }` (`truncated` ist ein Wahrheitswert) an `topic:debug`. `from` setzt der Hub. **Blockiert nie, wirft nie:** ohne laufende Rolle, ohne bereite Verbindung oder bei einem Fehler tut es nichts. Höchstens 100 Aufrufe je Sekunde und Prozess (`Debug.MAX_PER_SECOND`), der Rest wird verworfen und gezählt (`Debug.dropped`). Hat niemand das Topic abonniert, verwirft der Hub das Ereignis.
+**Topic `debug`, `evt.debug.dump`.** `Debug.Dump(value, title := "")` (`src/core/Debug.ahk`) replaces `d()` from v1. It converts `value` into readable JSON (depth at most 8, at most 200 entries per map or array, cycles and foreign objects as `<type>`), truncates at 60000 characters and sends `evt.debug.dump { title, ts, json, truncated }` (`truncated` is a boolean value) to `topic:debug`. `from` is set by the hub. **Never blocks, never throws:** without a running role, without a ready connection, or on an error it does nothing. At most 100 calls per second and process (`Debug.MAX_PER_SECOND`); the rest is discarded and counted (`Debug.dropped`). If nobody has subscribed to the topic, the hub discards the event.
 
-**Rolle `debug`** (0..1 Prozess, `src/debugview/DebugView.ahk` und `DebugGui.ahk`; Option `--headless`). Eigener Prozess wie der Manager-Stub: nie modal, kein `MsgBox`, keine Dateien. Er abonniert `process`, `log`, `engine`, `debug` und `flow:<id>` (nach `cmd.engine.snapshot`, wie der Stub). Er zeigt: Prozesstabelle (`cmd.process.list` plus Ereignisse), den Snapshot je Rolle (Knopf "Aktualisieren" und Haken "alle 2 s": `cmd.diag.snapshot` an jede bereite Rolle und an `supervisor`, Frist 3 s), das Live-Log mit Filter (Ebene und Quelle), den Ereignisstrom der Engine mit Pause, die `Debug.Dump`-Werte und den Knopf "Bericht exportieren" (`cmd.diag.report {reason: "manual"}`, zeigt den Pfad). Gestartet wird sie mit `--start=debug` oder durch `--command=debug` an eine laufende Instanz (`cmd.app.command`). Schließt der Benutzer das Fenster, beendet sich nur diese Rolle (`sys.bye {clean: true}`, Exit 0); der Supervisor wertet das als normales Ende (`evt.process.exited`, kein `crashed`, kein automatischer Bericht), siehe 4.1a. Sie wird nie automatisch neu gestartet und beim Beenden mit den UIs zuerst beendet (Rang 0, ohne `cmd.app.prepareExit`).
+**Role `debug`** (0..1 process, `src/debugview/DebugView.ahk` and `DebugGui.ahk`; option `--headless`). Its own process like the manager stub: never modal, no `MsgBox`, no files. It subscribes to `process`, `log`, `engine`, `debug` and `flow:<id>` (after `cmd.engine.snapshot`, like the stub). It shows: process table (`cmd.process.list` plus events), the snapshot per role (button "Refresh" and checkbox "every 2 s": `cmd.diag.snapshot` to every ready role and to `supervisor`, deadline 3 s), the live log with filter (level and source), the event stream of the engine with pause, the `Debug.Dump` values, and the button "Export report" (`cmd.diag.report {reason: "manual"}`, shows the path). It is started with `--start=debug` or by `--command=debug` to a running instance (`cmd.app.command`). If the user closes the window, only this role ends (`sys.bye {clean: true}`, exit 0); the supervisor treats this as a normal end (`evt.process.exited`, no `crashed`, no automatic report), see 4.1a. It is never restarted automatically and, when exiting, it is terminated first together with the UIs (rank 0, without `cmd.app.prepareExit`).
 
-- **Testbefehl `cmd.test.debug` (nur mit `--headless`):** `{ action }` mit `state` (Zähler und Listen des Modells: `processes` Namen, `states` Zustand je Prozess (Name → Zustand nach ARCHITEKTUR 5.3), `snapshots` Rollennamen, `logEntries`, `engineEvents`, `dumps` Titel, `paused`, `lastExport`), `refresh` (holt die Snapshots, Antwort nach dem letzten; `refreshed` zählt die Antworten; ein Prozess, der nicht `ready` ist, wird nicht gefragt, sein Eintrag lautet `not ready (state: <Zustand>)`), `export` (löst `cmd.diag.report` aus, Antwort mit dessen Ergebnis), `pause`/`resume`, `filter` (`{level, source}`; Antwort `state`), `snapshot` (`{name}`: der gespeicherte Snapshot-Text, `not_found` ohne), `close` (wie das Schließen des Fensters: nur diese Rolle endet, mit `sys.bye {clean: true}`). Andere: `bad_payload`.
-- **Echo-Testbefehl `cmd.test.dump { title, value }`** (Testrolle `echo`): ruft `Debug.Dump(value, title)` auf.
+- **Test command `cmd.test.debug` (only with `--headless`):** `{ action }` with `state` (counters and lists of the model: `processes` names, `states` state per process (name → state according to ARCHITEKTUR 5.3), `snapshots` role names, `logEntries`, `engineEvents`, `dumps` titles, `paused`, `lastExport`), `refresh` (fetches the snapshots, response after the last one; `refreshed` counts the responses; a process that is not `ready` is not asked, its entry reads `not ready (state: <state>)`), `export` (triggers `cmd.diag.report`, response with its result), `pause`/`resume`, `filter` (`{level, source}`; response `state`), `snapshot` (`{name}`: the stored snapshot text, `not_found` without), `close` (like closing the window: only this role ends, with `sys.bye {clean: true}`). Others: `bad_payload`.
+- **Echo test command `cmd.test.dump { title, value }`** (test role `echo`): calls `Debug.Dump(value, title)`.
 
-## 5. Verbindungsaufbau, Wiederverbindung, Resync
+## 5. Connection setup, reconnection, resync
 
-1. Rolle verbindet sich, sendet `sys.hello` mit `hwnd` ihres Fensters (Weckruf-Ziel, Abschnitt 1). Der Hub antwortet mit `sys.welcome`. Bis dahin sendet die Rolle nichts außer `sys.hello`. Der Peer (`src/core/ipc/Peer.ahk`) öffnet die Pipe ohne Warten (ein Versuch, dann Wiederholung per Timer), weckt bei bekannter Hub-HWND (Option `hubHwnd`) den Hub schon mit dem `sys.hello` und meldet `ready` erst nach `sys.welcome`.
-2. Rolle abonniert Topics, ruft `cmd.engine.snapshot` auf (UIs) und beginnt, Ereignisse mit `seq` zu verarbeiten.
-3. Bricht die Pipe, baut die Rolle neu auf (Backoff 100 ms, 200, 400, ..., max. 2 s, gesamt 10 s), wiederholt `hello` mit `epoch` des Besitzers, abonniert neu, macht Resync. Gelingt das nicht, beendet sich die Rolle (Orphan-Guard).
-4. Eine Lücke in `seq` oder ein neues `epoch` löst Resync aus.
-5. Der Hub hält pro Client eine Ausgabewarteschlange mit Obergrenze (Standard 1000 Nachrichten oder 8 MiB). Läuft sie über, gilt der Client als hängend (`peer_gone` für ausstehende Anfragen, seit WI-34 umgesetzt, Abschnitt 2 "Ziel geht vor der Antwort verloren"), der Supervisor wird informiert.
+1. A role connects, sends `sys.hello` with the `hwnd` of its window (wake-up target, section 1). The hub answers with `sys.welcome`. Until then the role sends nothing except `sys.hello`. The peer (`src/core/ipc/Peer.ahk`) opens the pipe without waiting (one attempt, then retry via timer), wakes the hub with `sys.hello` already when the hub HWND is known (option `hubHwnd`), and reports `ready` only after `sys.welcome`.
+2. The role subscribes to topics, calls `cmd.engine.snapshot` (UIs), and begins processing events with `seq`.
+3. If the pipe breaks, the role rebuilds the connection (backoff 100 ms, 200, 400, ..., max. 2 s, total 10 s), repeats `hello` with the `epoch` of the owner, subscribes again, and performs a resync. If this fails, the role terminates itself (orphan guard).
+4. A gap in `seq` or a new `epoch` triggers a resync.
+5. The hub keeps an output queue with an upper limit per client (default 1000 messages or 8 MiB). If it overflows, the client counts as hanging (`peer_gone` for pending requests, implemented since WI-34, section 2 "Target lost before the response"), and the supervisor is informed.
 
-6. **Laden großer Datenmengen (WI-24):** Wer viele große Antworten anfordert (die Engine beim Start: ein `cmd.storage.flow.read` je Flow-Datei), schickt nicht alle Anfragen auf einmal, sondern höchstens K gleichzeitig (Engine: K = 2) und die nächste nach der Verarbeitung einer Antwort. So liegt ein `sys.ping` höchstens hinter K Antworten in der Pipe. Der Hub leitet große Rahmen über die Kopffelder weiter (Abschnitt 2), seine Kosten je Rahmen sind unabhängig von der Größe der Nutzlast (gemessen 1,7 ms für 109.232 Zeichen). Die Kosten des Empfängers bleiben: `Message.Parse` des Rahmens (0,16 s) und `Json.Parse` des Flow-Texts (0,14 s) für die größte v1-Datei.
+6. **Loading large amounts of data (WI-24):** Whoever requests many large responses (the engine at start: one `cmd.storage.flow.read` per flow file) does not send all requests at once, but at most K at a time (engine: K = 2) and the next one after processing a response. This way a `sys.ping` is at most behind K responses in the pipe. The hub forwards large frames via the header fields (section 2); its cost per frame is independent of the size of the payload (measured 1.7 ms for 109,232 characters). The receiver's costs remain: `Message.Parse` of the frame (0.16 s) and `Json.Parse` of the flow text (0.14 s) for the largest v1 file.
 
-### 5a Ereignisse vor dem Abonnement (Designfrage, WI-07)
+### 5a Events before subscription (design question, WI-07)
 
-Ereignisse werden nur an Abonnenten verteilt, die zum Zeitpunkt des Sendens abonniert sind. Ein Ereignis, das vor dem `cmd.topic.subscribe` einer Rolle gesendet wurde, geht für diese Rolle verloren. Es gibt keine Persistenz und keine Wiederholung (Abschnitt 1, Lieferung).
+Events are only distributed to subscribers who are subscribed at the time of sending. An event that was sent before a role's `cmd.topic.subscribe` is lost for this role. There is no persistence and no repetition (section 1, delivery).
 
-Daraus folgt die Regel für Späteinsteiger (z. B. ein Manager, der nach dem Start des Supervisors öffnet):
-1. Erst abonnieren (`cmd.topic.subscribe`), dann den Ist-Zustand holen (`cmd.process.list` beim Supervisor, `cmd.engine.snapshot` bei der Engine).
-2. Ereignisse, die zwischen beiden Schritten kommen, können doppelt vorkommen (Snapshot und Ereignis). Der Empfänger darf sie nicht als Zustandswechsel doppelt zählen; der Snapshot ist maßgeblich.
-3. Ein Ereignis, das nie eintraf, wird nicht nachgeholt. Der Snapshot korrigiert es.
+From this follows the rule for late joiners (e.g. a manager that opens after the supervisor has started):
+1. Subscribe first (`cmd.topic.subscribe`), then fetch the current state (`cmd.process.list` at the supervisor, `cmd.engine.snapshot` at the engine).
+2. Events that arrive between these two steps may occur twice (snapshot and event). The receiver must not count them twice as state changes; the snapshot is authoritative.
+3. An event that never arrived is not made up for. The snapshot corrects it.
 
-Der Supervisor hält für `process` keine Historie. `cmd.process.list` ist die einzige Quelle für den Zustand vor dem Abonnement. `tests/integration/test_supervisor.py` nutzt die Momentaufnahme (`process_list`) zum Warten auf Bereitschaft und für die Zustandsprüfung nach Absturz. Ein gezielter Test, bei dem ein Späteinsteiger Ereignisse verpasst, fehlt (nicht geprüft).
+The supervisor keeps no history for `process`. `cmd.process.list` is the only source for the state before subscription. `tests/integration/test_supervisor.py` uses the snapshot (`process_list`) to wait for readiness and for the state check after a crash. A targeted test in which a late joiner misses events is missing (not checked).
 
-## 6. Versionierung und Erweiterung
+## 6. Versioning and extension
 
-- `sys.hello.protocol` ist die Ganzzahl-Version. Unterschiede in der Hauptversion führen zu `error.code = "denied"` im `sys.welcome` und Beenden der Rolle.
-- Unbekannte Felder in Nutzlasten werden ignoriert, unbekannte `type`-Werte mit `unknown_type` beantwortet (Anfragen) oder geloggt und verworfen (Ereignisse).
-- Neue Befehle ergänzen diesen Katalog zusammen mit einem Test in `tests/integration/test_protocol_*.py`.
+- `sys.hello.protocol` is the integer version. Differences in the major version lead to `error.code = "denied"` in `sys.welcome` and termination of the role.
+- Unknown fields in payloads are ignored, unknown `type` values are answered with `unknown_type` (requests) or logged and discarded (events).
+- New commands are added to this catalog together with a test in `tests/integration/test_protocol_*.py`.
