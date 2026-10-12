@@ -1,6 +1,7 @@
 #Requires AutoHotkey v2.0
 #Include Errors.ahk
 #Include Role.ahk
+#Include PlaceholderRole.ahk
 
 ; Maps the role name of --role to its class (work_items/phase2/WI-06). Lookup is case-insensitive.
 ; Each role file ends with RoleRegistry.Register(<name>, <class>); the entry point includes the
@@ -28,16 +29,6 @@ class RoleRegistry {
 
     ; Returns the class for a role name (suffix after ":" ignored), or "" if unknown.
     static Lookup(name) => this.roles.Get(Role.BaseName(name), "")
-}
-
-; Stand-in for roles that are not written yet. It reports that and ends with EXIT_NOT_IMPLEMENTED,
-; so a missing role is visible at once and never opens a dialog. Replaced by the real class when
-; the role is written (the registration below is then changed).
-class PlaceholderRole extends Role {
-    Start() {
-        Role.Console("a0", "role", "role '" this.roleName "' is not implemented yet")
-        ExitApp(Role.EXIT_NOT_IMPLEMENTED)
-    }
 }
 
 ; "supervisor" is not registered here: it is not a Role (WI-07) and the entry point starts it directly.

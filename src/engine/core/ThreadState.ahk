@@ -1,7 +1,7 @@
 #Requires AutoHotkey v2.0
 #Include ..\..\core\Errors.ahk
 #Include ..\..\core\Log.ahk
-#Include Loops.ahk
+#Include LoopStack.ahk
 
 ; Thread state machine (WI-08, ARCHITEKTUR 5.2, normative).
 ;

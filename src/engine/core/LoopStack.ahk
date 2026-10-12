@@ -12,7 +12,7 @@
 ; outer loop, hidden while an inner loop runs). Push stores copies of both current maps, Pop
 ; restores the last pair. Push does not clear the current maps (v1 does not either).
 ;
-; The class file name is fixed by the work package (Loops.ahk), the class is LoopStack.
+; The file is named after the class (WI-29; it was Loops.ahk before).
 ; Variable names are case-insensitive, as in v1 (CaseSense "Off").
 class LoopStack {
     __New() {
