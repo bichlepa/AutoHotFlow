@@ -534,11 +534,11 @@ def _wait_for_text(path, needle, timeout):
     return None
 
 
-def test_a_log_flood_is_written_at_more_than_1000_lines_per_second(storage, flowdir):
-    """F-08: before WI-25 the storage wrote about 30 lines per second. The flood stays below the limit of
-    the log queue (20000 lines), so no line is dropped. The end marker is the last line of the source, so
-    both files (Log.txt and Log_flood.txt) have been written up to it when it shows up. The grace for the
-    machine is large (the rate is asserted over the whole run, sender included, not per second)."""
+def _flood_and_measure(storage, flowdir):
+    """Floods the log with 12000 lines and waits for the end marker in both files. Returns (lines/s over the whole run,
+    storage RSS in MB). The flood stays below the limit of the log queue (20000 lines), so no line is dropped. The end
+    marker is the last line of the source, so both files (Log.txt and Log_flood.txt) have been written up to it when it
+    shows up. The rate is taken over the whole run, sender included, not per second."""
     _, pid, client = storage
     count = 12000
     t0 = time.perf_counter()
@@ -553,6 +553,24 @@ def test_a_log_flood_is_written_at_more_than_1000_lines_per_second(storage, flow
     rss = psutil.Process(pid).memory_info().rss / 2**20
     print("\nflood: %d lines, sender %.1f s, all written after %.1f s = %.0f lines/s, storage RSS %.1f MB"
           % (count, sent_s, total, rate, rss))
+    return rate, rss
+
+
+def test_a_log_flood_is_written_completely_and_far_above_the_old_pace(storage, flowdir):
+    """F-08: before WI-25 the storage wrote about 30 lines per second (12000 lines would take 400 s). Standard run,
+    also in parallel with other tests: the whole flood must be written within the 60 s of the helper (at least 200
+    lines/s, a 6 times margin over the old pace) and the memory stays bounded. The strict rate (more than 1000 lines/s)
+    is measured in the stress group, alone on the machine (F-32, WI-32): a rate depends on the load of the machine."""
+    rate, rss = _flood_and_measure(storage, flowdir)
+    assert rate > 200, "%.0f lines/s" % rate
+    assert rss < 120
+
+
+@pytest.mark.stress
+def test_a_log_flood_is_written_at_more_than_1000_lines_per_second(storage, flowdir):
+    """F-08, the strict rate. Runs with -m stress (a single process, no other load), because a rate is only
+    meaningful then (F-32: 808 lines/s once under parallel load, 3138 lines/s alone)."""
+    rate, rss = _flood_and_measure(storage, flowdir)
     assert rate > 1000, "%.0f lines/s" % rate
     assert rss < 120
 
@@ -671,11 +689,13 @@ def test_engine_starts_with_the_real_storage_and_its_log_arrives(procs, datadir,
     shutil.copy(SKELETON_SRC, datadir / "Flows" / "skeleton.json")
     start_storage(procs, datadir, runs, pipe, session_id)
     wait_hello(hub, "storage")
+    # Subscribe BEFORE the engine starts (PROTOKOLL 5a). Subscribing after its sys.hello could miss evt.engine.ready when
+    # the engine is quick (WI-32, parallel run: failure after 15 s). The state is asked for below in any case.
+    obs = observer(pipe, "obs-engine", "engine")
     engine_args = ["--role=engine", "--session=" + session_id, "--hub=" + pipe, "--data=" + str(datadir), "--workers=0"]
     engine = RoleRun(procs, datadir, "engine", engine_args)
     runs.append(engine)
     wait_hello(hub, "engine")
-    obs = observer(pipe, "obs-engine", "engine")
     try:
         ready = obs.wait_event("evt.engine.ready", timeout=15)
         assert ready["payload"]["seq"] >= 1
