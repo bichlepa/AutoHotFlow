@@ -7,7 +7,7 @@
 ; Not modal: Gui.Show, no MsgBox, no InputBox, no blocking call. The view has no logic: StubManager
 ; builds the model (ViewModel) and calls Render at most 20 times per second, and only after a change.
 ; Labels are ASCII on purpose (the stub has no Lang() yet, and the script encoding is not checked for
-; umlauts). Layout test: doc/MANUAL-CHECKS.md, section "Manager stub".
+; umlauts). Layout test: doc/MANUAL-CHECKS.md, section "1. Manager stub (GUI)".
 class StubGui {
     __New(manager) {
         this.manager := manager
