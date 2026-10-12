@@ -303,3 +303,17 @@ Abnahme von WI-34 Abschnitt 5, Code-Stand `645d99d` (HEAD zu Beginn), ein Rechne
 ### Gesamtaussage
 
 **Der Fix-Block ist nicht grün abgeschlossen.** Parallel 9 von 10 Läufen grün (vorher 5 von 10), `-m stress` grün; **seriell (Referenz) rot** (2 Tests) und **Fault 20x rot** (5 Ausfälle des Worker-Kill-Tests). Regel aus dem Auftrag: rot ist rot, auch bei Einzelfällen. Neue Funde: **F-45, F-46, F-47**. Offen bleiben zusätzlich F-43 (Entscheidung des Projektinhabers) und F-42 (nicht eingegriffen). F-37 bis F-41 traten in diesen Läufen nicht mehr auf (F-38 in neuer Form als F-45).
+
+## Schleife WI-35, Zyklus 0 (Ausgangsstand, 2026-10-12)
+
+Reproduktion der Ausgangsfunde, jeder Lauf allein auf dem Rechner, seriell (`-n 0`). Ausgaben im Scratchpad (`z0_*.txt`, `z0n_*.txt`).
+
+| Test | Befehl | Anzahl Läufe | Anzahl rot | Meldungen | Log-Pfad |
+|---|---|---|---|---|---|
+| F-46 `test_killed_worker_ends_its_element_with_worker_crashed_and_is_not_restarted` | `AHF_FAULT_REPEAT=20 python -m pytest tests/fault/test_process_crash.py -k killed_worker -n 0 -q` | 20 (Lauf 1) + 20 (Wiederholung mit `AHF_TEST_KEEP=1`) | 2 (Lauf 1, Parameter [2], [14]) und 6 (Wiederholung, Parameter [1], [3], [7], [8], [10], [14]) | `AssertionError: no evt.process.crashed for worker:1:` (`tests/fault/test_process_crash.py:37`). Im Log: `worker not available: worker:1 (peer_gone)`, Element-Zustand `exception`. | Wiederholung: `C:\Users\bichl\AppData\Local\Temp\ahf-test-rxcyz_uh\Log\Log.txt`, `...\ahf-test-4ts9iptt\`, `...\ahf-test-i5kukxg7\`, `...\ahf-test-08ntafi6\`, `...\ahf-test-8fh96zr1\`, `...\ahf-test-oz_cm3b_\` (je `Log\Log.txt`). Zuordnung Parameter zu Ordner nicht geprüft. |
+| F-47 `test_cancel_of_the_hang_element_reports_stopped_within_500_ms` | `python -m pytest tests/integration/test_worker.py -k cancel_of_the_hang -n 0 -q` (10 Einzelläufe in einer Schleife) | 10 | 0 | Alle 10 grün (je 1 passed, 0,5 bis 0,8 s). Nicht reproduziert. | keiner (kein Fehlschlag) |
+| F-45 `test_refresh_shows_a_process_that_is_not_ready_as_not_ready_instead_of_leaving_it_out` | `AHF_FAULT_REPEAT=10 python -m pytest tests/fault/test_debug_role.py -k refresh_shows -n 0 -q` | 11 (1 Lauf wie vorgegeben + 10 Einzelläufe) | 0 | Alle grün (je 1 passed, rund 4,8 s). Nicht reproduziert. Hinweis: `AHF_FAULT_REPEAT` wirkt in `test_debug_role.py` nicht (der Test nutzt `REPEATS` nicht), die 10 Wiederholungen sind 10 separate Aufrufe. | keiner |
+
+Befund: F-46 ist im seriellen Einzeltest reproduzierbar (8 rot von 40 Läufen), im Log bestätigt: der Hub beantwortet die offene Anfrage an `worker:1` mit `peer_gone`, `evt.process.crashed` kommt in der Log-Datei nicht vor, das Element endet mit `worker not available: worker:1 (peer_gone)`. F-45 und F-47 traten in dieser Zyklus-0-Reproduktion nicht auf (0 von 21 bzw. 0 von 10 Läufen).
+
+Prozesskontrolle nach den Läufen: keine Testprozesse übrig. Fremd (nicht angefasst): `AutoHotkeyU32.exe` mit "Allgemeine Hilfe.ahk", `python.exe` der VS-Code-Erweiterung (isort, `lsp_server.py`).

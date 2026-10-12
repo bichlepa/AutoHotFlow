@@ -87,7 +87,10 @@ Ist die Abnahme grün: Schritt "Abschluss".
 ## Zyklen (wird während der Schleife gefüllt)
 
 ### Zyklus 0 (Ausgangsstand)
-(Ergebnis von Schritt 0 hier eintragen.)
+Ergebnis in `STATUS.md`, Abschnitt "Schleife WI-35, Zyklus 0". Kurz:
+- F-46 (`test_killed_worker_...`, `AHF_FAULT_REPEAT=20`): reproduzierbar, 8 rot von 40 Läufen (2 von 20, dann 6 von 20 mit `AHF_TEST_KEEP=1`). Meldung: `no evt.process.crashed for worker:1` (`test_process_crash.py:37`). Log: `worker not available: worker:1 (peer_gone)`, kein `evt.process.crashed`. Log-Pfade in STATUS.
+- F-47 (`cancel_of_the_hang`): 0 von 10 rot, nicht reproduziert.
+- F-45 (`refresh_shows`): 0 von 11 rot, nicht reproduziert. `AHF_FAULT_REPEAT` wirkt in diesem Test nicht.
 
 ### Analyse Zyklus N
 (Opus-Analyse hier eintragen.)
