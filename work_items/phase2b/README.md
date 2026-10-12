@@ -101,6 +101,6 @@ WI-32 kommt bewusst zuletzt: WI-30 und WI-31 beseitigen zwei Ursachen roter Läu
 
 ### Fortschritt Fix-Block
 
-- [x] WI-30  - [ ] WI-31  - [ ] WI-33  - [ ] WI-32
+- [x] WI-30  - [x] WI-31  - [ ] WI-33  - [ ] WI-32
 
 Neue Funde ab **F-32**.
