@@ -387,7 +387,14 @@ class WorkerBridge {
         slot := this._SlotNamed(job["slot"])
         if (IsObject(slot))
             this._Lose(slot, "run not accepted: " code)
-        this._Finish(execId, "exception", "worker not available: " job["slot"] " (" code ")")
+        if (code = ErrCode.PEER_GONE) {
+            ; The hub answers peer_gone as soon as the worker's connection ends, usually a tick before the supervisor
+            ; reports the end of the process. The worker is lost, not refusing: same text as evt.process.crashed, so the
+            ; order of the two messages does not matter (F-46, WI-35).
+            this._Finish(execId, "exception", "worker crashed (" job["slot"] ")")
+        } else {
+            this._Finish(execId, "exception", "worker not available: " job["slot"] " (" code ")")
+        }
         this._owner.Kick()
     }
 

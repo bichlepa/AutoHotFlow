@@ -14,7 +14,7 @@ import psutil
 import pytest
 
 from support.timing import scaled
-from faultkit import alive, event, request_ok, wait_until, write_flow
+from faultkit import CRASH_BUDGET_S, alive, event, repeat_ids, request_ok, wait_until, write_flow
 
 from faultfixtures import chains  # noqa: F401  (fixture)
 
@@ -223,6 +223,37 @@ def test_killed_worker_ends_its_element_with_worker_crashed_and_the_pool_has_a_r
     assert chain.rec.find(event("evt.process.crashed", name=old, restart=False))
     assert wait_until(lambda: ready_workers(chain) and old not in ready_workers(chain), READY_S), chain.sup.text()
     run_echo_ok(chain)
+
+
+@pytest.mark.parametrize("round_no", repeat_ids())
+def test_worker_killed_before_it_answers_the_run_ends_the_element_with_worker_crashed_and_is_reported_as_crashed(
+        chains, datadir, round_no):
+    """F-46 (WI-35), deterministic: the run is open at the frozen worker (the hub holds it, hub.routedOpen >= 1), then
+    the worker dies. The hub answers peer_gone at once, before the supervisor has judged the end of the process. The
+    engine must not read that as a refusal, and the supervisor must not report the end as a planned "killed"."""
+    flows = dict(ECHO, whang=("Action_TestHangWorker", None))
+    chain = start_chain(chains, datadir, flows)
+    old = next(iter(chain.wait_ready(["worker:1"], timeout=READY_S)))
+    old_pid = chain.pid(old)
+    chain.freeze(old_pid)
+    instance = start_flow(chain, "whang")
+
+    def run_is_open():
+        snap = request_ok(chain.obs, "supervisor", "cmd.diag.snapshot", {})["snapshot"]
+        return snap["hub"]["routedOpen"] >= 1
+    assert wait_until(run_is_open, scaled(10.0)), "the run never reached the hub:\n" + chain.sup.text()
+    t0 = time.perf_counter()
+    psutil.Process(old_pid).kill()
+    crashed = chain.rec.wait(event("evt.process.crashed", name=old, restart=False), timeout=CRASH_BUDGET_S + 5)
+    assert crashed is not None, "no evt.process.crashed for %s:\n%s" % (old, chain.sup.text())
+    print("\nMEASURE worker killed with an open run -> crashed reported: %.3f s" % (crashed[0] - t0))
+    assert crashed[0] - t0 <= CRASH_BUDGET_S + 0.25, crashed[0] - t0     # 0.25: the observer's wake-up delay
+    assert chain.rec.find(event("evt.process.exited", name=old, reason="killed")) == [], \
+        "the death was reported as a planned end:\n" + chain.sup.text()
+    t_end, msg = ended(chain, instance, timeout=3.0)
+    assert t_end - t0 <= scaled(3.0), t_end - t0
+    state = final_state(chain, "whang")
+    assert state["state"] == "exception" and state["message"] == "worker crashed (%s)" % old, state
 
 
 def test_frozen_worker_does_not_answer_the_run_and_is_replaced(chains, datadir):

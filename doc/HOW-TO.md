@@ -1203,3 +1203,11 @@ Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge kor
 - **Richtig:** Vor dem Umetikettieren `WaitForSingleObject(handle, 0)` prüfen (`Children._HasEnded`); ist der Prozess beendet, nichts setzen, nur loggen. Das Ende wird dann normal bewertet.
 - **Status:** verifiziert (AHK-Unit-Tests `KillOfAnEndedWorkerStaysACrash`, `EngineEndKeepsTheCrashOfAnEndedWorker` waren rot, nach dem Fix grün)
 - **Quelle:** `src/supervisor/Children.ahk`, `tests/ahk/supervisor_tick.test.ahk`
+
+### Zwei Meldewege für denselben Tod: keine Reihenfolge annehmen (WI-35, F-46)
+
+- **Problem:** Die Engine erfuhr den Tod eines Workers auf zwei Wegen: als `peer_gone` auf das offene `cmd.worker.run` (Hub, sofort seit F-40) und als `evt.process.crashed` (Supervisor, erst im nächsten Tick, bis 200 ms später). `_OnRunAnswer` machte aus jeder Fehlerantwort "worker not available", der Slot war dann weg, und das Prozessereignis fand keinen Job mehr. Der Test (`test_killed_worker_...`) schlug in rund 20 Prozent der Läufe fehl, je nachdem, ob der Hub die Antwort des Workers schon gelesen hatte, als der Test ihn beim Ereignis `running` tötete.
+- **Falsch:** Annehmen, ein Weg komme zuerst, oder den Hub warten lassen, bis der Supervisor das Prozessende bewertet hat (Frist von F-40 aufgeweicht, Kopplung Hub-Children).
+- **Richtig:** Beide Wege gleich bewerten (`peer_gone` auf `run` gleich "worker crashed"), Slot und Job nur einmal abschließen; wer zuerst kommt, gewinnt, der zweite findet nichts. Der Test dazu darf nicht auf Zufall bauen: Worker einfrieren, mit `cmd.diag.snapshot` des Supervisors warten, bis `hub.routedOpen >= 1`, dann töten.
+- **Status:** verifiziert (AHK-Unit-Tests in beiden Reihenfolgen, Integrationstest `test_worker_killed_before_it_answers_the_run_...` rot vor, grün nach den Korrekturen; Original 2 mal 20 Läufe grün, vorher 8 von 40 rot)
+- **Quelle:** `src/engine/WorkerBridge.ahk`, `tests/ahk/engine_worker_bridge.test.ahk`, `tests/fault/test_worker_lifecycle.py`

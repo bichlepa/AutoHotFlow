@@ -266,7 +266,7 @@ Jedes Ereignis trägt `seq` (steigend pro Engine-Epoche) und `epoch`.
 
 - Option `--workers=<n>` der Engine (0 bis 8, Standard 0 = kein Pool). Slots heißen `worker:1` bis `worker:n`. Mit 0 endet jedes Worker-Element sofort mit `exception` "worker not available".
 - Ein Worker-Element bleibt `running`, bis `evt.worker.done` kommt. Ist alle Pool-Slots belegt, wartet der Thread (Zustand `ready`), bis einer frei ist. Ist kein Slot mehr nutzbar (alle `down`), endet er mit `exception` "worker not available".
-- Antwort `cmd.worker.run` mit Fehler `not_found`, `peer_gone`, `timeout` oder `internal`: Slot wird `down`, Element endet mit `exception` "worker not available: worker:n (<code>)".
+- Antwort `cmd.worker.run` mit Fehler `not_found`, `timeout` oder `internal`: Slot wird `down`, Element endet mit `exception` "worker not available: worker:n (<code>)". Mit `peer_gone` (Verbindung des Workers beendet, der Hub antwortet sofort): Slot wird entfernt, Element endet mit `exception` "worker crashed (worker:n)", wie bei `evt.process.crashed` (F-46, WI-35).
 - Absturz oder Ende eines Workers: Die Engine abonniert das Topic `process` beim Supervisor (`cmd.topic.subscribe`, nur mit `--workers` > 0) und wertet `evt.process.crashed` und `evt.process.exited` für `worker:n` aus. Das laufende Element endet mit `exception` "worker crashed (worker:n)". `evt.process.ready` macht einen `down`-Slot wieder `idle`.
 - `cmd.worker.cancel` bei Stopp der Instanz: Der Thread endet sofort (wie inline, Quittung nicht abgewartet). Der Slot bleibt `busy`, bis der Worker `evt.worker.done` schickt, spätestens nach 2 s (dann `down`, Eintrag im Log `a0`).
 - Ergebnisse aus `evt.worker.done`: Exporte werden als Thread-Variablen gesetzt. Ein unbekanntes Ergebnis wird `exception`.
@@ -279,10 +279,10 @@ Jedes Ereignis trägt `seq` (steigend pro Engine-Epoche) und `epoch`.
 - **Bedarf und Warmstart:** Wartende Worker-Elemente lösen Startanfragen aus (ARCHITEKTUR 6.4). Nach `OnReady` fragt die Engine `cmd.process.list` (Frist 5 s), beendet alle `worker:*` mit `cmd.process.kill` (Grund `orphan of a previous engine`) und fordert dann W Worker an.
 - **Beschäftigt:** `sys.busy` (4.1) sendet der Worker, nicht die Engine.
 - **`cmd.worker.run`:** `timeoutMs` ist weiter die Frist der Annahme (5000). Neu und nur Engine-intern: eine Jobfrist (`JobTimeoutMs` der Elementklasse), sie steht nicht in der Nachricht.
-- **Antwort auf `cmd.worker.run` mit Fehler** (`not_found`, `peer_gone`, `timeout`, `busy`, `internal`): der Slot wird entfernt, der Worker mit `cmd.process.kill` (Grund `run not accepted: <code>`) beendet, das Element endet mit `exception` "worker not available: worker:n (<code>)".
+- **Antwort auf `cmd.worker.run` mit Fehler** (`not_found`, `peer_gone`, `timeout`, `busy`, `internal`): der Slot wird entfernt, der Worker mit `cmd.process.kill` (Grund `run not accepted: <code>`) beendet, das Element endet mit `exception` "worker not available: worker:n (<code>)". Ausnahme `peer_gone`: das ist der Verlust des Workers, nicht seine Ablehnung, das Element endet mit `exception` "worker crashed (worker:n)" (F-46, WI-35).
 - **Abbruch:** `cmd.worker.cancel` wie bisher. Kommt binnen 2 s kein `evt.worker.done`, entfernt die Engine den Slot und fordert `cmd.process.kill` an (Grund `cancel not confirmed`).
 - **Jobfrist:** Ablauf beendet den Thread mit `exception` "worker timeout" und behandelt den Job wie einen Abbruch.
-- **Absturz/Ende** (`evt.process.crashed`/`exited` für einen Slot): Slot entfällt, ein laufender Job endet mit `exception` "worker crashed (worker:n)".
+- **Absturz/Ende** (`evt.process.crashed`/`exited` für einen Slot): Slot entfällt, ein laufender Job endet mit `exception` "worker crashed (worker:n)". Dieses Ereignis und `peer_gone` auf `cmd.worker.run` melden denselben Tod auf zwei Wegen ohne feste Reihenfolge (der Hub antwortet bis zu einen Tick vor dem Ereignis des Supervisors); die Engine bewertet beide gleich, der Job endet einmal, der Fehler wird einmal gezählt.
 
 ### 4.6 Engine ↔ Storage und Log
 

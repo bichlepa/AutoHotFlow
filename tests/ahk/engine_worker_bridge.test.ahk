@@ -289,6 +289,56 @@ ARunThatTheWorkerRefusesRemovesAndKillsItAndEndsTheJob() {
     Assert.Equal(owner.peer.Names("cmd.process.kill"), "worker:1")
 }
 
+PeerGoneAnswerCode(owner) {
+    owner.peer.Answer(owner.peer.Open("cmd.worker.run")[1], Map("ok", false, "error", Map("code", "peer_gone", "message", "x")))
+}
+
+; F-46 (WI-35): the hub answers peer_gone as soon as the worker is gone; that is a lost worker, not a refusal.
+APeerGoneAnswerToTheRunEndsTheJobAsWorkerCrashed() {
+    r := NewPool(2, 0)
+    owner := r[1]
+    bridge := r[2]
+    bridge.Want(1)
+    SpawnReady(owner, bridge)
+    got := Map("result", "", "message", "", "n", 0)
+    onDone := (result, message, exports) => (got["result"] := result, got["message"] := message, got["n"] += 1)
+    bridge.Run("Action_X", Map(), Map(), Map(), onDone)
+    PeerGoneAnswerCode(owner)
+    Assert.Equal(got["result"], "exception")
+    Assert.Equal(got["message"], "worker crashed (worker:1)")
+    Assert.Equal(bridge.Count, 0)
+    Assert.Equal(owner.peer.Count("cmd.process.kill"), 1)
+    Assert.Equal(owner.peer.Names("cmd.process.kill"), "worker:1")
+    Assert.Equal(bridge._failures.Length, 1, "one failure counted")
+}
+
+; The two ways to learn about the death of a worker have no fixed order (F-46): the job ends once, with the same text.
+BothOrdersOfPeerGoneAndTheProcessEventEndTheJobOnce() {
+    for order in ["answer first", "event first"] {
+        r := NewPool(2, 0)
+        owner := r[1]
+        bridge := r[2]
+        bridge.Want(1)
+        SpawnReady(owner, bridge)
+        got := Map("result", "", "message", "", "n", 0)
+        onDone := (result, message, exports) => (got["result"] := result, got["message"] := message, got["n"] += 1)
+        bridge.Run("Action_X", Map(), Map(), Map(), onDone)
+        run := owner.peer.Open("cmd.worker.run")[1]
+        ev := FakeMsg("evt.process.crashed", Map("name", "worker:1", "pid", 1001))
+        if (order = "answer first") {
+            owner.peer.Answer(run, Map("ok", false, "error", Map("code", "peer_gone", "message", "x")))
+            bridge.OnProcessEvent(ev)
+        } else {
+            bridge.OnProcessEvent(ev)
+            owner.peer.Answer(run, Map("ok", false, "error", Map("code", "peer_gone", "message", "x")))
+        }
+        Assert.Equal(got["n"], 1, order ": the job ends once")
+        Assert.Equal(got["message"], "worker crashed (worker:1)", order)
+        Assert.Equal(bridge._failures.Length, 1, order ": one failure counted")
+        Assert.Equal(bridge.Count, 0, order)
+    }
+}
+
 FiveFailuresBlockThePoolAndWithoutAWorkerItIsNotUsable() {
     r := NewPool(2, 1)
     owner := r[1]
@@ -446,6 +496,8 @@ TestRun.Case("Pool: idle workers beyond the warm ones are killed after the idle 
 TestRun.Case("Pool: a busy worker is not ended as idle", ABusyWorkerIsNotEndedAsIdle)
 TestRun.Case("Pool: crash of a busy worker ends its job, the warm worker is asked for again", CrashOfABusyWorkerEndsItsJobAndTheWarmWorkerIsAskedForAgain)
 TestRun.Case("Pool: a refused run removes and kills the worker and ends the job", ARunThatTheWorkerRefusesRemovesAndKillsItAndEndsTheJob)
+TestRun.Case("Pool: a run answered with peer_gone ends the job as worker crashed, removes and kills the worker (F-46, WI-35)", APeerGoneAnswerToTheRunEndsTheJobAsWorkerCrashed)
+TestRun.Case("Pool: peer_gone and the process event in both orders end the job once with the same text (F-46, WI-35)", BothOrdersOfPeerGoneAndTheProcessEventEndTheJobOnce)
 TestRun.Case("Pool: five failures block the pool", FiveFailuresBlockThePoolAndWithoutAWorkerItIsNotUsable)
 TestRun.Case("Pool: ends caused by the engine are no failures", AnEndThatTheEngineCausedItselfIsNoFailure)
 TestRun.Case("Pool: refused spawn requests are failures", FailedSpawnRequestsAreCountedToo)
