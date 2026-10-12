@@ -13,6 +13,8 @@ Persistent
 ;   * "ctl:farewell"     sends "bye" and closes at once (data must stay readable for the peer),
 ;   * "ctl:burstend:S:C:T"  sends C frames "<i>|" + S bytes and "last", then ends the connection after its send
 ;                        queue is written, at most T ms (CloseWhenFlushed, WI-30); record "drained" {flushed},
+;   * "note:<text>"      is not echoed but recorded {type: note, id, text},
+;   * "ctl:poke:<id>"    sends "poke" to the client <id> at once; record "poke" {wasOpen, ok} (WI-30),
 ;   * "ctl:close"        closes the connection,
 ;   * "ctl:exit"         ends the process.
 ; Result file: JSON lines {type: ready|connect|close|verified|gen_done|flood|error, ...}.
@@ -110,6 +112,10 @@ class EchoServer {
             c.conn.PeerHwnd := Integer(SubStr(text, 7))
             return
         }
+        if (SubStr(text, 1, 5) = "note:") {
+            Kit.Record(EchoServer.resultPath, Map("type", "note", "id", c.id, "text", text))
+            return
+        }
         if (SubStr(text, 1, 4) != "ctl:") {
             ok := c.conn.SendFrame(text)
             if (StrLen(text) > 1000000)
@@ -136,6 +142,8 @@ class EchoServer {
                 c.conn.Close()
             case "burstend":
                 EchoServer._BurstEnd(c, Integer(parts[3]), Integer(parts[4]), Integer(parts[5]))
+            case "poke":
+                EchoServer._Poke(Integer(parts[3]))
             case "close":
                 c.conn.Close()
             case "exit":
@@ -180,6 +188,20 @@ class EchoServer {
         start := Time.NowMs()
         c.conn.CloseWhenFlushed(timeoutMs, (flushed) => Kit.Record(EchoServer.resultPath, Map("type", "drained"
             , "id", c.id, "flushed", flushed ? 1 : 0, "elapsedMs", Round(Time.NowMs() - start, 1) + 0)))
+    }
+
+    ; Sends "poke" to the client with this id, before its frames are read (WI-30). Records whether it was open.
+    static _Poke(id) {
+        for other in EchoServer.clients {
+            if (other.id = id) {
+                wasOpen := other.conn.IsOpen
+                ok := other.conn.SendFrame("poke")
+                Kit.Record(EchoServer.resultPath, Map("type", "poke", "id", id, "wasOpen", wasOpen ? 1 : 0
+                    , "ok", ok ? 1 : 0))
+                return
+            }
+        }
+        Kit.Record(EchoServer.resultPath, Map("type", "poke", "id", id, "wasOpen", 0, "ok", 0))
     }
 
     static _Flood(c, size, count) {

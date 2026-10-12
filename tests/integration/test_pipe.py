@@ -489,6 +489,33 @@ def test_ending_after_the_queue_is_written_gives_up_at_its_deadline_and_does_not
     end.close()
 
 
+def test_frames_of_a_peer_that_has_gone_are_read_although_a_write_to_it_fails(procs, ahk_exe, datadir, pipe_name):
+    # WI-30 (F-26): a client writes its last frame and ends. Before the server has read that frame, it writes
+    # to the client; the write fails (the pipe is being closed). The frame must still be read and delivered,
+    # then the connection ends with peer_closed. Before WI-30 the failed write tore the connection down and
+    # the unread frame (in the hub: the sys.bye of a role) was lost.
+    server, hwnd = launch_server(procs, ahk_exe, datadir, pipe_name)
+    control = connect_client(pipe_name, hwnd)                     # id 1, pumped before the leaving client
+    for attempt in range(1, 6):
+        leaving = connect_client(pipe_name, hwnd, announce=False)
+        leaving_id = 1 + attempt
+        server.wait_record(lambda r: r.get("type") == "connect" and r.get("id") == leaving_id, timeout=5)
+        leaving.send_bytes(rawpipe.encode("note:last words %d" % attempt), wake_peer=False)
+        leaving.close()
+        control.send_text("ctl:poke:%d" % leaving_id)               # wakes the server: the write comes first
+        poke = server.wait_record(lambda r: r.get("type") == "poke" and r.get("id") == leaving_id, timeout=5)
+        if poke["wasOpen"] == 1 and poke["ok"] == 0:
+            break                                                   # the case of the test: write to a gone peer
+        # the fallback timer of the server read the end before the poke: no statement, try again
+    else:
+        pytest.skip("the server always read the end before the write (5 attempts)")
+    note = server.wait_record(lambda r: r.get("type") == "note" and r.get("id") == leaving_id, timeout=5)
+    assert note["text"] == "note:last words %d" % attempt
+    close = server.wait_record(lambda r: r.get("type") == "close" and r.get("id") == leaving_id, timeout=5)
+    assert close["reason"] == "peer_closed", close
+    control.close()
+
+
 def test_python_client_end_after_traffic_is_peer_closed(procs, ahk_exe, datadir, pipe_name):
     server, hwnd = launch_server(procs, ahk_exe, datadir, pipe_name)
     end = connect_client(pipe_name, hwnd)

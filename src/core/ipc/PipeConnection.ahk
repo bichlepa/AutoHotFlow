@@ -20,6 +20,9 @@
 ;
 ; Ending: Close() drops what waits in the send queue (only frames already written into the pipe stay readable for
 ; the peer). The last frames of a process (its events, sys.bye) are ended with CloseWhenFlushed instead.
+; A peer that has gone may have left frames in the pipe that are not read yet (its sys.bye). A write that fails
+; because the peer is gone therefore closes only the write side (the send queue is dropped, SendFrame refuses);
+; reading goes on to the end of the stream, which closes the connection with "peer_closed" (WI-30, F-26).
 class PipeConnection {
     static WAKE_MESSAGE := 0x8001
     ; Reads handled in one Pump before it yields (64 KiB each). Bounds the time a busy peer can
@@ -27,6 +30,9 @@ class PipeConnection {
     static MAX_READS_PER_PUMP := 64
     ; Period of the timer that writes the send queue while CloseWhenFlushed waits (the timer resolution is ~15.6 ms).
     static DRAIN_POLL_MS := 10
+    ; After a write found the peer gone, the rest of its frames is read; the end of the stream follows at once
+    ; (the peer's handle is closed). Should it not come, the connection is closed this long after (a Pump checks it).
+    static WRITE_GONE_MAX_MS := 1000
     ; Handles whose I/O could not be confirmed as cancelled stay referenced here, so the memory
     ; the kernel may still write to is never freed.
     static _graveyard := []
@@ -72,6 +78,7 @@ class PipeConnection {
         this._drainDone := ""          ; its callback, "" once it has been called
         this._drainUntil := 0
         this._drainStart := 0
+        this._writeGoneAt := 0         ; Time.NowMs() when a write found the peer gone (write side closed), else 0
     }
 
     IsOpen => this._open
@@ -118,7 +125,7 @@ class PipeConnection {
     ; current call stack unwinds (not inside this call, so the caller's loop is not re-entered).
     ; Throws ProtocolError if the text is empty or larger than the frame limit (programming error).
     SendFrame(text) {
-        if (!this._open || this._draining)
+        if (!this._open || this._draining || this._writeGoneAt)
             return false
         frame := FrameWriter.Encode(text)
         size := frame.Size
@@ -147,6 +154,8 @@ class PipeConnection {
             this._Fail(reason, true)
             return false
         }
+        if (this._writeGoneAt)
+            return false                        ; the peer is gone, the frame was dropped (see _WriteSideGone)
         if (this.PeerHwnd != 0)
             DllCall("PostMessageW", "ptr", this.PeerHwnd, "uint", PipeConnection.WAKE_MESSAGE, "ptr", 0, "ptr", 0)
         if (this._queue.Length > 0)
@@ -175,6 +184,9 @@ class PipeConnection {
                 if (reason = "" && this._open) {
                     reason := this._DriveWriteGuarded()
                 }
+                if (reason = "" && this._open && this._writeGoneAt
+                    && Time.NowMs() - this._writeGoneAt >= PipeConnection.WRITE_GONE_MAX_MS)
+                    reason := "peer_closed"         ; the end of the stream did not come (see WRITE_GONE_MAX_MS)
                 if (reason != "")
                     this._Fail(reason, false)
                 if (!this._open)
@@ -241,7 +253,7 @@ class PipeConnection {
             else if (this._queue.Length > 0 && Time.NowMs() < this._drainUntil)
                 return                              ; the peer has not read enough yet: try again on the next tick
         }
-        flushed := this._open && this._queue.Length = 0
+        flushed := this._open && !this._writeGoneAt && this._queue.Length = 0
         if (this._open && !flushed)
             Log.Write("a1", "ipc", "closing " this.Name " with " this._queue.Length " frames unwritten after "
                 . Round(Time.NowMs() - this._drainStart) " ms")
@@ -330,6 +342,11 @@ class PipeConnection {
             loop {
                 this._writeAgain := false
                 reason := this._DriveWrite()
+                if (reason = "peer_closed") {
+                    this._WriteSideGone()
+                    reason := ""
+                    break
+                }
                 if (reason != "" || !this._open)
                     break
                 prev := Critical("On")  ; reason: reading _writeAgain and clearing _writing must not be interrupted
@@ -346,9 +363,23 @@ class PipeConnection {
         return reason
     }
 
+    ; A write found the peer gone. Its last frames may still lie unread in the pipe: only the write side is closed
+    ; (the queue cannot be written any more and is dropped); a Pump reads on to the end of the stream.
+    _WriteSideGone() {
+        if (this._writeGoneAt)
+            return
+        this._writeGoneAt := Time.NowMs()
+        this._writePending := false
+        this._writeOffset := 0
+        this._queue := []
+        this._queueBytes := 0
+        if (IsObject(this._pollFn))
+            SetTimer(this._pollFn, -1)
+    }
+
     ; Writes queued frames while the pipe accepts them. Returns "" or a close reason.
     _DriveWrite() {
-        while (this._open && this._queue.Length > 0) {
+        while (this._open && !this._writeGoneAt && this._queue.Length > 0) {
             buf := this._queue[1]
             if (!this._writePending) {
                 DllCall("ResetEvent", "ptr", this._writeEv)

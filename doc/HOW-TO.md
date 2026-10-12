@@ -788,6 +788,14 @@ Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge kor
 - **Status:** verifiziert (Unit-Test `Tick: an exit is not judged while another pump still reads the connection of the child` in `tests/ahk/supervisor_tick.test.ahk`, mit einer Attrappe, deren `Pump` bei laufender Pump nur "nochmal" setzt: vorher rot, `clean` wäre falsch gewesen; dazu Nachfrist und "nicht hängend, nicht getötet"). Dass dieser Wettlauf im echten Supervisor auftrat, ist vermutet (nicht im Lauf beobachtet).
 - **Quelle:** `src/supervisor/Children.ahk` (`_ExitReadable`, `Terminate`, `MarkHung`)
 
+### Ein Schreibfehler an eine gegangene Gegenseite verwarf deren ungelesene letzte Rahmen (WI-30, F-26)
+
+- **Problem:** Nach den Korrekturen für "Close verwirft die Warteschlange" und "Sperre gegen Wiedereintritt" blieb in 400 Läufen von `test_shutdown.py` einmal `clean: false` (Manager). Ursache: Ein Kind schreibt `sys.bye` und beendet sich. Bevor der Hub den Rahmen liest, schreibt er selbst an das Kind (Ereignis eines Topics, das es abonniert hat; der Manager-Stub abonniert `log`, `process`, `engine`, `storage` bekommt jede Logzeile). `WriteFile` scheitert mit 232 ("pipe is being closed"), `SendFrame` ruft `_Fail` und `_Teardown`: das bricht das Lesen ab und verwirft die noch nicht gelesenen eingehenden Bytes, also das `sys.bye`.
+- **Falsch:** Einen Schreibfehler "Gegenseite weg" wie das Ende der Verbindung behandeln. Die Gegenseite kann vor ihrem Ende Daten geschrieben haben, die noch im Puffer der Pipe liegen; sie bleiben nach dem Schließen ihres Handles lesbar.
+- **Richtig:** Bei 109/232/233 aus dem Schreiben nur die Schreibseite schließen (`_WriteSideGone`: Warteschlange verwerfen, `SendFrame` liefert `false`) und weiterlesen, bis das Lesen das Ende meldet; dann `peer_closed`. Obergrenze `WRITE_GONE_MAX_MS` (1 s), falls das Ende nicht kommt. Andere Schreibfehler (`broken`) schließen weiter sofort.
+- **Status:** verifiziert (rot, dann grün: `test_pipe.py::test_frames_of_a_peer_that_has_gone_are_read_although_a_write_to_it_fails`; vorher "poke" an den gegangenen Client gescheitert, Verbindung `peer_closed`, die schon geschriebene `note` nie geliefert). Dass dieser Fall den Rest von F-26 erzeugte, ist vermutet (der eine rote Lauf hatte kein Log); passt zu "Manager und Storage".
+- **Quelle:** `src/core/ipc/PipeConnection.ahk` (`_DriveWriteGuarded`, `_WriteSideGone`, `Pump`)
+
 ## GUI und Hotkeys
 
 ### Gui: Ereignisnamen und Zeilenreihenfolge der ListView
