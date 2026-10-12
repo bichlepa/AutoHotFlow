@@ -5,6 +5,11 @@
 #Include lib\Assert.ahk
 #Include ..\..\src\storage\WriteQueue.ahk
 
+; WI-32: no timer may run between two lines of a case. Add and AddLow arm the queue's own timer; on a loaded
+; machine the thread is interruptible after a stall, and the timer then ran operations in the middle of a case
+; (159 instead of 300 operations in one go). Every case calls RunOne/RunFor itself.
+Critical("On")
+
 ; Operation helpers as named functions (a lambda cannot throw, see doc/HOW-TO.md).
 ThrowBusy() {
     throw AhfError("busy probe", ErrCode.BUSY)
@@ -161,12 +166,13 @@ CaseRetryEndsWithBusyWhenTheTimeIsUp() {
 
 ; --- WI-25: two queues (requests first), time budget per timer run ------------------------------
 
-Sleepy(counter, ms) {
+; A clock for the queue that only moves when an operation uses time (WI-32: no real time in these cases, so a loaded
+; machine cannot change how many operations a budget covers).
+FakeClock() => Map("t", 1000)
+
+Sleepy(counter, clk, ms) {
     counter["n"] += 1
-    ; busy wait: Sleep would let the queue's own timer run operations in between
-    endAt := Time.NowMs() + ms
-    while (Time.NowMs() < endAt)
-        continue
+    clk["t"] += ms
     return Map()
 }
 
@@ -189,35 +195,36 @@ CaseRequestsOvertakeLogOperationsAndBothKeepTheirOrder() {
 }
 
 CaseBudgetRunsManyOperationsInOneGo() {
-    q := WriteQueue()
+    clk := FakeClock()      ; the time stands still, so the budget is never used up
+    q := WriteQueue(() => clk["t"])
     seen := []
     counter := Map("n", 0)
     loop 300
         q.AddLow(MakeOp(seen, "l" A_Index, () => Bump(counter)))
-    ran := q.RunFor(1000)
+    ran := q.RunFor(10)
     Assert.Equal(ran, 300)
     Assert.Equal(q.Pending, 0)
 }
 
 CaseBudgetStopsAfterTheOperationThatUsedItUp() {
-    Critical("On")   ; the queue's own timer must not run operations while the test counts
-    q := WriteQueue()
+    clk := FakeClock()
+    q := WriteQueue(() => clk["t"])
     seen := []
     counter := Map("n", 0)
     loop 40
-        q.AddLow(MakeOp(seen, "s" A_Index, () => Sleepy(counter, 5)))
+        q.AddLow(MakeOp(seen, "s" A_Index, () => Sleepy(counter, clk, 5)))
     ran := q.RunFor(20)
-    ; each operation takes at least 5 ms, so a 20 ms budget cannot cover all 40; at least one runs
-    Assert.True(ran >= 1 && ran < 40)
-    Assert.Equal(q.Pending, 40 - ran)
+    ; each operation takes exactly 5 ms on the fake clock: the budget is used up after the 4th
+    Assert.Equal(ran, 4)
+    Assert.Equal(q.Pending, 36)
 }
 
 CaseOneBigOperationIsNeverSplit() {
-    Critical("On")   ; the queue's own timer must not run operations while the test counts
-    q := WriteQueue()
+    clk := FakeClock()
+    q := WriteQueue(() => clk["t"])
     seen := []
     counter := Map("n", 0)
-    q.Add(MakeOp(seen, "big", () => Sleepy(counter, 60)))
+    q.Add(MakeOp(seen, "big", () => Sleepy(counter, clk, 60)))
     q.Add(MakeOp(seen, "next", () => Bump(counter)))
     ran := q.RunFor(10)
     Assert.Equal(ran, 1)
@@ -226,7 +233,8 @@ CaseOneBigOperationIsNeverSplit() {
 }
 
 CaseLogRetryWaitsForItsDelayWhileRequestsGoOn() {
-    q := WriteQueue()
+    clk := FakeClock()      ; the 300 ms delay cannot pass by itself on a slow machine
+    q := WriteQueue(() => clk["t"])
     seen := []
     counter := Map("n", 0)
     after := Map("n", 0)
@@ -242,6 +250,10 @@ CaseLogRetryWaitsForItsDelayWhileRequestsGoOn() {
     Assert.Equal(after["n"], 1)
     Assert.Equal(counter["n"], 1)          ; the log operation did not run again
     Assert.Equal(q.Pending, 1)
+    clk["t"] += 300                        ; the delay is over
+    Assert.True(q.RunOne())
+    Assert.Equal(counter["n"], 2)
+    Assert.Equal(q.Pending, 0)
 }
 
 TestRun.Init()

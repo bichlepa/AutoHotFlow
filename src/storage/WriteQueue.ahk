@@ -24,7 +24,10 @@ class WriteQueue {
     ; Time one timer run may work before it yields to the message pump (WI-25: justification in the result).
     static BUDGET_MS := 10
 
-    __New() {
+    ; clock: optional function() returning milliseconds in the unit of Time.NowMs(); only unit tests pass one
+    ; (WI-32), so that budget and retry delays can be checked without real time.
+    __New(clock := "") {
+        this._now := (clock = "") ? () => Time.NowMs() : clock
         this._ops := []     ; requests
         this._low := []     ; log operations
         this._pumpFn := () => this._Pump()
@@ -64,12 +67,12 @@ class WriteQueue {
             return false
         }
         op := queue.RemoveAt(1)
-        if (op["deadline"] != "" && Time.NowMs() > op["deadline"]) {
+        if (op["deadline"] != "" && this._now.Call() > op["deadline"]) {
             payload := WriteQueue.Fail(ErrCode.TIMEOUT, "waited too long in the storage queue, not executed")
         } else {
             payload := WriteQueue._RunSafely(op["run"])
             if (payload.Has("retry")) {
-                now := Time.NowMs()
+                now := this._now.Call()
                 if (!op.Has("retryUntil"))
                     op["retryUntil"] := now + op.Get("retryMs", 0)
                 if (now < op["retryUntil"]) {
@@ -88,11 +91,11 @@ class WriteQueue {
     ; Runs operations until the budget (ms) is used up or nothing is runnable. At least one operation
     ; runs when one is runnable. Returns the number of runs.
     RunFor(budgetMs) {
-        start := Time.NowMs()
+        start := this._now.Call()
         runs := 0
         while (this.RunOne()) {
             runs += 1
-            if (Time.NowMs() - start >= budgetMs)
+            if (this._now.Call() - start >= budgetMs)
                 break
         }
         return runs
@@ -104,11 +107,11 @@ class WriteQueue {
             return 1
         if (this._low.Length = 0)
             return -1
-        wait := this._low[1].Get("notBefore", 0) - Time.NowMs()
+        wait := this._low[1].Get("notBefore", 0) - this._now.Call()
         return (wait > 1) ? Ceil(wait) : 1
     }
 
-    _LowDue() => this._low[1].Get("notBefore", 0) <= Time.NowMs()
+    _LowDue() => this._low[1].Get("notBefore", 0) <= this._now.Call()
 
     ; Answers every waiting operation with an error (used at shutdown when the time is up).
     FailAll(code, text) {
