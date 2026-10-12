@@ -46,6 +46,7 @@ Gesprochene Sprache mit dem Projektinhaber: Deutsch. Dokumentation: Deutsch. Cod
 7. Kleine Commits, eine Änderung pro Commit. Die Commit-Nachricht beschreibt das Warum.
 8. Elementcode darf die Engine nie zum Absturz bringen: jeder Aufruf unter `try/catch`, Fehler werden als Ergebnis `exception` gemeldet.
 9. Schwierigkeiten und eigene Fehler bei der AHK-v2-Umsetzung gehören in `doc/HOW-TO.md`: was schwer war, was falsch war, was richtig funktioniert (Format siehe Datei). Das dient als Wissensbasis für andere Agenten. Einträge mit Status (verifiziert / vermutet / nicht geprüft) versehen.
+10. **VS-Code-Tasks für den Projektinhaber:** Jeder Aufruf, den der Projektinhaber von Hand ausführen möchte (Tests, Starts der Anwendung oder einer Rolle, Werkzeuge, Handprüfungen aus einer Anleitung), bekommt einen Task in `.vscode/tasks.json`. Wer einen solchen Aufruf neu einführt oder ändert (neue Option, neue Rolle, neues Werkzeug, neue Testgruppe), ergänzt oder ändert den Task im selben Commit. Bezeichnung auf Deutsch mit Präfix (`Test:`, `Start:`, `Werkzeug:`, `Debug:`, `Testdaten:`, `Setup:`). Ausnahme zur Regel "AHK-Skripte nie direkt starten": Die `Start:`-Tasks starten `AutoHotkey64.exe` direkt, ohne `ahkrun.py` und ohne Timeout, weil der Projektinhaber die Anwendung bedient (ein Dialog blockiert dann, bis er ihn schließt). Für Agenten gilt weiter `ahkrun.py`.
 
 ## Werkzeuge in dieser Umgebung
 

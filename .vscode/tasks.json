@@ -1,0 +1,380 @@
+{
+    // Tasks for tests and starts. Run with "Terminal: Run Task" (Ctrl+Shift+P).
+    // Test tasks run pytest, which uses tools/ahkrun.py for the AHK tests itself.
+    // Start tasks start AutoHotkey64.exe directly: they stay open until closed, so no timeout.
+    // Note: a start task that hits a dialog (MsgBox, runtime error) waits for you to close it.
+    "version": "2.0.0",
+    "inputs": [
+        {
+            "id": "testFilter",
+            "type": "promptString",
+            "description": "pytest -k Ausdruck, z. B. engine or wait",
+            "default": "engine"
+        },
+        {
+            "id": "testPath",
+            "type": "promptString",
+            "description": "Testdatei oder Ordner, z. B. tests/fault/test_timeouts.py",
+            "default": "tests/fault/test_timeouts.py"
+        },
+        {
+            "id": "dataDir",
+            "type": "promptString",
+            "description": "Datenordner für --data (Test- statt echte Daten)",
+            "default": "${env:TEMP}\\ahf_manual"
+        }
+    ],
+    "tasks": [
+        {
+            "label": "Setup: Test-Abhängigkeiten installieren",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "-m",
+                "pip",
+                "install",
+                "-r",
+                "tests/requirements.txt"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Test: alle (parallel, Standard)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "-m",
+                "pytest",
+                "tests",
+                "-q"
+            ],
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Test: alle seriell, ausführlich (-n 0 -v)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "-m",
+                "pytest",
+                "tests",
+                "-n",
+                "0",
+                "-v"
+            ],
+            "group": "test",
+            "problemMatcher": []
+        },
+        {
+            "label": "Test: nur letzte Fehlschläge (--lf)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "-m",
+                "pytest",
+                "tests",
+                "-q",
+                "--lf"
+            ],
+            "group": "test",
+            "problemMatcher": []
+        },
+        {
+            "label": "Test: Auswahl nach Name (-k)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "-m",
+                "pytest",
+                "tests",
+                "-q",
+                "-k",
+                "${input:testFilter}"
+            ],
+            "group": "test",
+            "problemMatcher": []
+        },
+        {
+            "label": "Test: eine Datei oder Ordner, seriell mit Ausgabe (Debug)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "-m",
+                "pytest",
+                "${input:testPath}",
+                "-n",
+                "0",
+                "-v",
+                "-s"
+            ],
+            "group": "test",
+            "problemMatcher": []
+        },
+        {
+            "label": "Test: AHK-Unit-Tests (tests/ahk)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "-m",
+                "pytest",
+                "tests/test_ahk_runner.py",
+                "-q"
+            ],
+            "group": "test",
+            "problemMatcher": []
+        },
+        {
+            "label": "Test: Integration (tests/integration)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "-m",
+                "pytest",
+                "tests/integration",
+                "-q"
+            ],
+            "group": "test",
+            "problemMatcher": []
+        },
+        {
+            "label": "Test: End-to-End (tests/e2e)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "-m",
+                "pytest",
+                "tests/e2e",
+                "-q"
+            ],
+            "group": "test",
+            "problemMatcher": []
+        },
+        {
+            "label": "Test: Fault Injection (-m fault)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "-m",
+                "pytest",
+                "tests",
+                "-q",
+                "-m",
+                "fault"
+            ],
+            "group": "test",
+            "problemMatcher": []
+        },
+        {
+            "label": "Test: JSON-Flows laden (Altbestand)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "-m",
+                "pytest",
+                "tests/test_json_flows.py",
+                "-q"
+            ],
+            "group": "test",
+            "problemMatcher": []
+        },
+        {
+            "label": "Test: Architekturwächter (pytest)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "-m",
+                "pytest",
+                "tests/test_architecture.py",
+                "-q"
+            ],
+            "group": "test",
+            "problemMatcher": []
+        },
+        {
+            "label": "Test: Stress, seriell, Messung (-m stress)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "-m",
+                "pytest",
+                "tests",
+                "-m",
+                "stress",
+                "-v"
+            ],
+            "group": "test",
+            "problemMatcher": []
+        },
+        {
+            "label": "Test: Soak, Minuten, seriell (-m soak)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "-m",
+                "pytest",
+                "tests",
+                "-m",
+                "soak",
+                "-v"
+            ],
+            "group": "test",
+            "problemMatcher": []
+        },
+        {
+            "label": "Werkzeug: Architekturwächter (arch_check.py)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "tools/arch_check.py"
+            ],
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "Testdaten: Skeleton-Flow in den Datenordner kopieren",
+            "type": "process",
+            "command": "powershell",
+            "args": [
+                "-NoProfile",
+                "-Command",
+                "New-Item -ItemType Directory -Force -Path '${input:dataDir}\\Flows' | Out-Null; Copy-Item -Force 'tests\\data\\skeleton_flow.json' '${input:dataDir}\\Flows\\skeleton.json'"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Start: Produkt (Supervisor, ohne Fenster)",
+            "type": "process",
+            "command": "C:\\Program Files\\AutoHotkey\\v2\\AutoHotkey64.exe",
+            "args": [
+                "/ErrorStdOut=UTF-8",
+                "src\\AutoHotFlow.ahk"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Start: Produkt mit Debug-Fenster (--start=storage,engine,debug)",
+            "type": "process",
+            "command": "C:\\Program Files\\AutoHotkey\\v2\\AutoHotkey64.exe",
+            "args": [
+                "/ErrorStdOut=UTF-8",
+                "src\\AutoHotFlow.ahk",
+                "--start=storage,engine,debug"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Start: Debug-Fenster an laufende Instanz (--command=debug)",
+            "type": "process",
+            "command": "C:\\Program Files\\AutoHotkey\\v2\\AutoHotkey64.exe",
+            "args": [
+                "/ErrorStdOut=UTF-8",
+                "src\\AutoHotFlow.ahk",
+                "--command=debug"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Start: Manager-Stub mit Debug-Fenster (--ui=stub --start=storage,engine,manager,debug)",
+            "type": "process",
+            "command": "C:\\Program Files\\AutoHotkey\\v2\\AutoHotkey64.exe",
+            "args": [
+                "/ErrorStdOut=UTF-8",
+                "src\\AutoHotFlow.ahk",
+                "--ui=stub",
+                "--start=storage,engine,manager,debug"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Start: Produkt, Log-Level 3 (--start=storage,engine,debug)",
+            "type": "process",
+            "command": "C:\\Program Files\\AutoHotkey\\v2\\AutoHotkey64.exe",
+            "args": [
+                "/ErrorStdOut=UTF-8",
+                "src\\AutoHotFlow.ahk",
+                "--log-level=3",
+                "--start=storage,engine,debug"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Start: Produkt, nur Fehler im Log (--log-level=0)",
+            "type": "process",
+            "command": "C:\\Program Files\\AutoHotkey\\v2\\AutoHotkey64.exe",
+            "args": [
+                "/ErrorStdOut=UTF-8",
+                "src\\AutoHotFlow.ahk",
+                "--log-level=0"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Start: Produkt headless (ohne Fenster)",
+            "type": "process",
+            "command": "C:\\Program Files\\AutoHotkey\\v2\\AutoHotkey64.exe",
+            "args": [
+                "/ErrorStdOut=UTF-8",
+                "src\\AutoHotFlow.ahk",
+                "--headless"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Start: Testeinstieg mit Testrollen und Debug-Fenster (echo:a, debug)",
+            "type": "process",
+            "command": "C:\\Program Files\\AutoHotkey\\v2\\AutoHotkey64.exe",
+            "args": [
+                "/ErrorStdOut=UTF-8",
+                "tests\\integration\\helpers\\AutoHotFlowTest.ahk",
+                "--test-roles",
+                "--start=echo:a,debug"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Debug: Debug.Dump in der Testrolle echo:a auslösen (ahf_dump.py)",
+            "type": "process",
+            "command": "python",
+            "args": [
+                "tools/ahf_dump.py",
+                "--title",
+                "manuelle Prüfung"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        }
+    ]
+}
