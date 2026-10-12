@@ -1,99 +1,99 @@
-# Element-API v2
+# Element API v2
 
-Status: Entwurf. Grundlage für die Portierung der 152 v1-Elemente (114 Actions, 17 Conditions, 5 Loops, 16 Trigger).
-Vorgänger: die v1-Funktionsfamilie `Element_<Aufgabe>_<Klasse>` und die Helfer `x_*` (siehe `work_items/ANALYSE.md`, Abschnitt 2).
-
----
-
-## 1. Leitlinien
-
-1. **Eine Klasse pro Element**, eine Datei pro Klasse. Der Klassenname ist identisch mit der v1-Klassen-ID (`Action_Sleep`, `Trigger_Hotkey`), denn diese Zeichenkette steht im Feld `class` der gespeicherten Flows. Die Auflösung ist case-insensitiv (v1 schreibt `trigger_manual` und `Trigger_Manual`).
-2. **Alle Methoden sind `static`.** Elemente sind zustandslos. Zustand einer Ausführung liegt in `ctx.State`.
-3. **Der Kontext `ctx` ersetzt `Environment` und alle `x_*`-Funktionen.** Er hat feste, kleingeschriebene Felder (`flowId`, `elementId`, `instanceId`, `threadId`). Die uneinheitliche Schreibweise aus v1 entfällt.
-4. **Fehler sind Exceptions.** `throw ElementError(msg)` beendet die Ausführung mit Ergebnis `exception` und der Meldung. Die Engine fängt jeden Aufruf mit `try/catch`, Elementcode kann sie nicht zum Absturz bringen.
-5. **Parameter kommen ausgewertet an.** Die Engine besitzt die Variablen und wertet Parameter mit `content: "Expression"` aus, bevor `Run`/`Enable` aufgerufen wird. Das gilt auch für Worker und Trigger.
-6. **Ein Element deklariert seinen Ausführungsmodus** (`inline`, `worker`, `trigger`). Siehe ARCHITEKTUR 2.3.
-7. **Keine globalen Variablen, kein `%var%`-Zugriff, kein `ErrorLevel`.**
+Status: Draft. Basis for porting the 152 v1 elements (114 actions, 17 conditions, 5 loops, 16 triggers).
+Predecessor: the v1 function family `Element_<Task>_<Class>` and the helpers `x_*` (see `work_items/ANALYSE.md`, section 2).
 
 ---
 
-## 2. Klassenvertrag
+## 1. Guidelines
+
+1. **One class per element**, one file per class. The class name is identical to the v1 class ID (`Action_Sleep`, `Trigger_Hotkey`), because this string is stored in the `class` field of saved flows. Resolution is case-insensitive (v1 writes `trigger_manual` and `Trigger_Manual`).
+2. **All methods are `static`.** Elements are stateless. The state of one execution lives in `ctx.State`.
+3. **The context `ctx` replaces `Environment` and all `x_*` functions.** It has fixed, lowercase fields (`flowId`, `elementId`, `instanceId`, `threadId`). The inconsistent spelling from v1 goes away.
+4. **Errors are exceptions.** `throw ElementError(msg)` ends the execution with result `exception` and the message. The engine wraps every call in `try/catch`, so element code cannot crash it.
+5. **Parameters arrive already evaluated.** The engine owns the variables and evaluates parameters with `content: "Expression"` before `Run`/`Enable` is called. This also applies to workers and triggers.
+6. **An element declares its execution mode** (`inline`, `worker`, `trigger`). See ARCHITECTURE 2.3.
+7. **No global variables, no `%var%` access, no `ErrorLevel`.**
+
+---
+
+## 2. Class contract
 
 ```ahk
 class Action_Example extends AhfElement {
-    ; --- Metadaten (statisch, billig, ohne Seiteneffekt) ---
+    ; --- Metadata (static, cheap, no side effects) ---
     static Mode      := "inline"        ; "inline" | "worker" | "trigger"
     static Level     := "Beginner"      ; "Beginner" | "Advanced" | "Programmer"
     static Stability := "Stable"        ; "Stable" | "Experimental"
-    static Icon      := "example.ico"   ; Dateiname unter assets/Icons, "" = keins
-    static JobTimeoutMs := 0            ; nur Worker: Jobfrist in ms, 0 = keine (WI-27, ARCHITEKTUR 6.4)
+    static Icon      := "example.ico"   ; file name under assets/Icons, "" = none
+    static JobTimeoutMs := 0            ; worker only: job deadline in ms, 0 = none (WI-27, ARCHITEKTUR 6.4)
 
-    static Name()     => Lang("Example")            ; Anzeigename
+    static Name()     => Lang("Example")            ; display name
     static Category() => Lang("General")
 
-    ; --- Editor-Seite (läuft im Editor-Prozess) ---
-    static Parameters(ctx) => [ ... ]                      ; Beschreibung der Felder (Schema wie v1)
-    static GenerateName(ctx, params) => Lang("Example")    ; Name mit Parametern
-    static CheckSettings(form, params, staticValues) {     ; Felder aktivieren/deaktivieren
+    ; --- Editor side (runs in the editor process) ---
+    static Parameters(ctx) => [ ... ]                      ; field description (schema as in v1)
+    static GenerateName(ctx, params) => Lang("Example")    ; name with parameters
+    static CheckSettings(form, params, staticValues) {     ; enable/disable fields
         form.Disable("WhenRelease", params.BlockKey)
     }
 
-    ; --- Laufzeit-Seite (Engine, Worker oder Triggerhost) ---
+    ; --- Runtime side (engine, worker or trigger host) ---
     static Run(ctx, params) {          ; Action, Condition, Loop
-        ctx.Finish("normal")           ; genau einmal (oder via Timer/Callback später)
+        ctx.Finish("normal")           ; exactly once (or later via timer/callback)
     }
-    static Stop(ctx, params) {         ; optional: Abbruch (Timer des ctx werden automatisch abgebrochen)
+    static Stop(ctx, params) {         ; optional: abort (the timers of ctx are cancelled automatically)
     }
 }
 ```
 
-**Trigger** (`Mode := "trigger"`) haben statt `Run`/`Stop`:
+**Trigger** (`Mode := "trigger"`) has `Enable`/`Disable`/`TriggerVariables` instead of `Run`/`Stop`:
 
 ```ahk
-    static Enable(ctx, params)  ; scharf schalten. Rückgabe: optionale Meldung. throw bei Fehler.
-    static Disable(ctx)         ; abschalten
-    static TriggerVariables(params, data) => Map()   ; reine Funktion, läuft in der Engine
+    static Enable(ctx, params)  ; arm. Return: optional message. throw on error.
+    static Disable(ctx)         ; disarm
+    static TriggerVariables(params, data) => Map()   ; pure function, runs in the engine
 ```
 
-`TriggerVariables` ersetzt `Element_postTrigger_*`: Es liefert die Thread-Variablen (Name → Wert), die nach dem Ereignis gesetzt werden, und darf keine Seiteneffekte haben (läuft in der Engine, kein I/O).
+`TriggerVariables` replaces `Element_postTrigger_*`: it returns the thread variables (name → value) that are set after the event, and it must not have side effects (it runs in the engine, no I/O).
 
-**Worker-Elemente und Blockieren (WI-27, ARCHITEKTUR 6.4):** Ein Worker-Element darf beliebig lange in einem Aufruf blockieren (Download, COM, `DllCall`, Dialog). Ein Worker mit Job wird nie angepingt und nie als hängend beendet. Zwei Folgen: Ein Abbruch (Stopp der Instanz) erreicht ein Element, das in einem einzigen Aufruf blockiert, nicht. Nach 2 s ohne Quittung lässt die Engine den ganzen Prozess beenden (es läuft nur ein Job je Worker, es geht nichts anderes verloren); `Stop(ctx, params)` des Elements läuft dann nicht mehr, Aufräumen im Element ist dort nicht möglich. Und: Ohne `JobTimeoutMs` hat der Job keine Frist (v1 hatte keine). Setzt eine Klasse `JobTimeoutMs` > 0, endet der Thread nach dieser Zeit mit dem Ergebnis `exception` und der Meldung "worker timeout", und das Element wird wie bei einem Abbruch beendet. Die Frist ist ein Klassenwert, kein Parameter; ein Parameter des Flows (z. B. "Timeout" bei einem Download) bleibt Sache des Elements.
+**Worker elements and blocking (WI-27, ARCHITEKTUR 6.4):** A worker element may block for any length of time within a single call (download, COM, `DllCall`, dialog). A worker with a job is never pinged and never ended as hanging. Two consequences: an abort (stop of the instance) does not reach an element that is blocked in a single call. After 2 s without an acknowledgement, the engine has the whole process terminated (only one job runs per worker, so nothing else is lost); `Stop(ctx, params)` of the element then no longer runs, so cleanup in the element is not possible there. And: without `JobTimeoutMs` the job has no deadline (v1 had none). If a class sets `JobTimeoutMs` > 0, the thread ends after this time with the result `exception` and the message "worker timeout", and the element is terminated as on an abort. The deadline is a class value, not a parameter; a flow parameter (e.g. "Timeout" for a download) remains the responsibility of the element.
 
-**Klassen-ID:** Nicht über `cls.Name` lesen. Eine Klasse mit `static Name()` verdeckt die eingebaute Eigenschaft, `cls.Name` ist dann eine Funktion. Die ID liefert `ElementRegistry.IdOf(cls)` (intern `Type(cls())`). Verifiziert in WI-09.
+**Class ID:** Do not read it via `cls.Name`. A class with `static Name()` hides the built-in property, so `cls.Name` is then a function. The ID is provided by `ElementRegistry.IdOf(cls)` (internally `Type(cls())`). Verified in WI-09.
 
-**Registrierung:** Am Dateiende `ElementRegistry.Register(Action_Example)`. Das ist der einzige erlaubte Code auf Dateiebene. Er läuft beim Laden, vor `AhfMain`. Damit ein Fehler dort (doppelte Klasse, ungültiger `Mode`) keinen Dialog zeigt, setzt der Einstieg `src/AutoHotFlow.ahk` `OnError` als erste ausführbare Anweisung, **vor** den `#Include`-Zeilen (Handler `AhfLoadError`: Meldung auf stderr, Exit 1). Eine Elementdatei braucht dafür nichts zu tun. (Entscheidung WI-22: nicht die Registrierung in eine Funktion verlegen, weil das Hunderte Elementdateien in Phase 3 und die Vorlage änderte, ohne mehr zu fangen: der Handler deckt auch jeden anderen Code auf Dateiebene ab.) Die Registry ist ein `Map` mit `CaseSense := "Off"`. Ein generierter Include-Block pro Rolle (Engine, Editor, Worker, Triggerhost) bindet die Dateien ein, keine Textersetzung zur Laufzeit.
+**Registration:** At the end of the file: `ElementRegistry.Register(Action_Example)`. This is the only code allowed at file level. It runs at load time, before `AhfMain`. So that an error there (duplicate class, invalid `Mode`) does not show a dialog, the entry point `src/AutoHotFlow.ahk` sets `OnError` as its first executable statement, **before** the `#Include` lines (handler `AhfLoadError`: message to stderr, exit 1). An element file needs nothing for this. (Decision WI-22: the registration is not moved into a function, because that would change hundreds of element files in Phase 3 without catching more: the handler also covers any other code at file level.) The registry is a `Map` with `CaseSense := "Off"`. A generated include block per role (engine, editor, worker, trigger host) includes the files; no text substitution at run time.
 
-**Parametercontainer:** `params` ist ein Objekt mit case-insensitivem Eigenschaftszugriff (`params.Duration` gleich `params.duration`), wie v1 es nutzt. Variablenablagen dagegen sind `Map` mit `CaseSense := "Off"`, damit Variablennamen wie in v1 groß-/kleinschreibungsunabhängig bleiben und v2-Objekte nicht verwechselt werden.
+**Parameter container:** `params` is an object with case-insensitive property access (`params.Duration` equals `params.duration`), as v1 uses it. Variable stores, on the other hand, are `Map` objects with `CaseSense := "Off"`, so that variable names remain case-insensitive as in v1 and v2 objects are not confused with them.
 
 ---
 
-## 3. Kontext `ctx`
+## 3. Context `ctx`
 
-| Mitglied | Ersetzt (v1) | Bemerkung |
+| Member | Replaces (v1) | Remarks |
 |---|---|---|
-| `ctx.flowId`, `.elementId`, `.instanceId`, `.threadId` | `Environment.FlowID` usw. | feste Schreibweise |
-| `ctx.EvalParams(params)` | `x_AutoEvaluateParameters` | gibt ausgewertete Parameter zurück, wirft bei Fehler (kein `_error`) |
-| `ctx.EvalParams(params, skipList)` | mit `p_skipList` | – |
+| `ctx.flowId`, `.elementId`, `.instanceId`, `.threadId` | `Environment.FlowID` etc. | fixed spelling |
+| `ctx.EvalParams(params)` | `x_AutoEvaluateParameters` | returns evaluated parameters, throws on error (no `_error`) |
+| `ctx.EvalParams(params, skipList)` | with `p_skipList` | – |
 | `ctx.Finish(result, msg := "")` | `x_finish` | `result`: `normal`, `yes`, `no`, `exception`, `head`, `tail` |
-| `ctx.SetVar(name, value, scope := "")` | `x_SetVariable` | `scope`: `thread`, `loop`, `instance`, `static`, `global`, wie v1. Phase 2 (WI-09): nur `""`/`thread` und `instance`, andere Scopes werfen `ElementError`. |
-| `ctx.GetVar(name, default := "")` | `x_GetVariable` | Sucht erst im Thread-, dann im Instanz-Scope. Liefert `default`, wenn nicht gesetzt (Phase 2: Parameter `default` ergänzt, WI-09). Im Worker nur über `imports` oder `ctx.Request`. |
-| `ctx.After(ms, fn)` | `x_NewFunctionObject` + `SetTimer` | Timer gehört zur Ausführung, wird bei Stopp/Ende automatisch abgebrochen |
-| `ctx.State` | `x_SetExecutionValue`/`x_GetExecutionValue`, `x_SetTriggerValue`/`x_getTriggerValue` | Objekt pro Ausführung (Run) bzw. pro scharf geschaltetem Trigger |
-| `ctx.Fire(data := "")` | `x_trigger` | nur Trigger. Meldet `evt.trigger.fired` |
-| `ctx.Log(level, text)` | `x_log` | Level `f0` bis `f3` |
-| `ctx.Request(type, payload, callback, timeoutMs)` | – (neu) | Anfrage an die Engine mit Callback. Nur Worker/Trigger. |
-| `ctx.RunScript(code, imports, exports)` | `x_ExecuteInNewAHKThread` | für AHK-Code-Elemente. Läuft immer als Worker. |
-| `Lang(key, args*)` | `x_lang` | globale Funktion, Sprachdateien unverändert |
-| `form.Disable(id, cond)`, `form.Enable(id, cond)` | `x_Par_Disable`/`x_Par_Enable` | nur in `CheckSettings` |
-| `form.SetValue(id, v)`, `form.SetChoices(id, list)`, `form.SetLabel(id, text)` | `x_Par_SetValue` usw. | – |
+| `ctx.SetVar(name, value, scope := "")` | `x_SetVariable` | `scope`: `thread`, `loop`, `instance`, `static`, `global`, as in v1. Phase 2 (WI-09): only `""`/`thread` and `instance`; other scopes throw `ElementError`. |
+| `ctx.GetVar(name, default := "")` | `x_GetVariable` | Searches the thread scope first, then the instance scope. Returns `default` if not set (Phase 2: parameter `default` added, WI-09). In a worker only via `imports` or `ctx.Request`. |
+| `ctx.After(ms, fn)` | `x_NewFunctionObject` + `SetTimer` | timer belongs to the execution and is cancelled automatically on stop/end |
+| `ctx.State` | `x_SetExecutionValue`/`x_GetExecutionValue`, `x_SetTriggerValue`/`x_getTriggerValue` | object per execution (Run) or per armed trigger |
+| `ctx.Fire(data := "")` | `x_trigger` | triggers only. Sends `evt.trigger.fired` |
+| `ctx.Log(level, text)` | `x_log` | levels `f0` to `f3` |
+| `ctx.Request(type, payload, callback, timeoutMs)` | – (new) | request to the engine with callback. Workers/triggers only. |
+| `ctx.RunScript(code, imports, exports)` | `x_ExecuteInNewAHKThread` | for AHK code elements. Always runs as a worker. |
+| `Lang(key, args*)` | `x_lang` | global function, language files unchanged |
+| `form.Disable(id, cond)`, `form.Enable(id, cond)` | `x_Par_Disable`/`x_Par_Enable` | only in `CheckSettings` |
+| `form.SetValue(id, v)`, `form.SetChoices(id, list)`, `form.SetLabel(id, text)` | `x_Par_SetValue` etc. | – |
 
-Die Zahl der tatsächlich genutzten v1-Helfer ist 88 (`x_*`). Die häufigsten: `x_lang` (2211 Aufrufe), `x_finish` (681), `x_Par_Disable`/`Enable` (~420), `x_SetVariable` (171), `x_AutoEvaluateParameters` (129).
+The number of v1 helpers (`x_*`) actually used is 88. The most frequent: `x_lang` (2211 calls), `x_finish` (681), `x_Par_Disable`/`Enable` (~420), `x_SetVariable` (171), `x_AutoEvaluateParameters` (129).
 
 ---
 
-## 4. Beispiel 1: `Action_Sleep` (inline, mit Timer)
+## 4. Example 1: `Action_Sleep` (inline, with timer)
 
-**v1** (`v1/Source_Elements/Default/Actions/Sleep.ahk`, gekürzt):
+**v1** (`v1/Source_Elements/Default/Actions/Sleep.ahk`, abridged):
 
 ```ahk
 Element_run_Action_Sleep(Environment, ElementParameters)
@@ -160,27 +160,27 @@ class Action_Sleep extends AhfElement {
     }
 
     static Run(ctx, params) {
-        p := ctx.EvalParams(params)          ; wirft bei Fehler -> Ergebnis "exception"
+        p := ctx.EvalParams(params)          ; throws on error -> result "exception"
         switch p.Unit {
             case "Milliseconds": ms := p.Duration
             case "Seconds":      ms := p.Duration * 1000
             case "Minutes":      ms := p.Duration * 60000
         }
-        ctx.After(ms, () => ctx.Finish("normal"))   ; Timer wird bei Stopp automatisch entfernt
+        ctx.After(ms, () => ctx.Finish("normal"))   ; timer is removed automatically on stop
     }
 }
 
 ElementRegistry.Register(Action_Sleep)
 ```
 
-Was sich ändert: kein `Element_stop` mehr nötig (der Kontext räumt den Timer ab), Fehlerpfad entfällt (Exception), Rückruf als Lambda statt benannter Funktion.
-Was gleich bleibt: Klassen-ID, Parameter-IDs und -Schema, Sprachschlüssel, Ergebnisstrings, Namensformat.
+What changes: no `Element_stop` needed any more (the context removes the timer), the error path is gone (exception), the callback is a lambda instead of a named function.
+What stays the same: class ID, parameter IDs and schema, language keys, result strings, name format.
 
 ---
 
-## 5. Beispiel 2: `Trigger_Hotkey` (läuft im Triggerhost)
+## 5. Example 2: `Trigger_Hotkey` (runs in the trigger host)
 
-**v1** (`v1/Source_Elements/Default/Triggers/Hotkey.ahk`): `Element_enable_`, `Element_disable_`, `Element_postTrigger_`, Callback `Trigger_Hotkey_Trigger` → `x_trigger(Environment)`. Der Hotkey wird mit `hotkey, % fullHotkey, % functionObject, UseErrorLevel on` gesetzt.
+**v1** (`v1/Source_Elements/Default/Triggers/Hotkey.ahk`): `Element_enable_`, `Element_disable_`, `Element_postTrigger_`, callback `Trigger_Hotkey_Trigger` → `x_trigger(Environment)`. The hotkey is set with `hotkey, % fullHotkey, % functionObject, UseErrorLevel on`.
 
 **v2:**
 
@@ -205,7 +205,7 @@ class Trigger_Hotkey extends AhfElement {
             {type: "Checkbox", id: "WhenRelease", default: 0, label: Lang("Trigger on release rather than press")},
             {type: "Label", label: Lang("Scope")},
             {type: "Radio", id: "UseWindow", default: 1, result: "enum"
-                , choices: [...]   ; wie v1
+                , choices: [...]   ; as in v1
                 , enum: ["Everywhere", "WindowIsActive", "WindowExists", "WindowIsNotActive", "WindowNotExists"]}
         ]
         WindowFunctions.AddIdentificationParameters(p, {noExcludes: true})
@@ -223,7 +223,7 @@ class Trigger_Hotkey extends AhfElement {
             form.Enable(id, showWin)
     }
 
-    ; params sind ausgewertet (die Engine hat Variablen aufgelöst)
+    ; params are evaluated (the engine has resolved the variables)
     static Enable(ctx, params) {
         if (params.hotkey = "")
             throw ElementError(Lang("The_Hotkey_is_not_set!"))
@@ -236,7 +236,7 @@ class Trigger_Hotkey extends AhfElement {
         if params.Wildcard
             full := "*" full
 
-        ctx.State.hotIf := Trigger_Hotkey._ContextFor(params)   ; Funktion oder ""
+        ctx.State.hotIf := Trigger_Hotkey._ContextFor(params)   ; function or ""
         ctx.State.full := full
         try {
             Trigger_Hotkey._SetContext(ctx.State.hotIf)
@@ -244,22 +244,22 @@ class Trigger_Hotkey extends AhfElement {
         } catch as e {
             throw ElementError(Lang("The hotkey %1% cannot be set!", full))
         } finally {
-            HotIf()                                             ; Kontext zurücksetzen
+            HotIf()                                             ; reset the context
         }
         return Lang("The hotkey %1% was set.", full)
     }
 
     static Disable(ctx) {
-        ; wichtig: derselbe Kontext wie beim Setzen (v1 vergisst das)
+        ; important: same context as when setting (v1 forgets this)
         Trigger_Hotkey._SetContext(ctx.State.hotIf)
         try Hotkey(ctx.State.full, "Off")
         HotIf()
     }
 
-    ; reine Funktion, läuft in der Engine
+    ; pure function, runs in the engine
     static TriggerVariables(params, data) => Map("A_Hotkey", params.hotkey)
 
-    ; Fensterkontext über HotIfWinActive/HotIfWinExist/... bzw. HotIf(fn)
+    ; window context via HotIfWinActive/HotIfWinExist/... or HotIf(fn)
     static _ContextFor(params) { ... }
     static _SetContext(hotIf) { ... }
 }
@@ -267,55 +267,55 @@ class Trigger_Hotkey extends AhfElement {
 ElementRegistry.Register(Trigger_Hotkey)
 ```
 
-Was sich ändert: Die Engine wertet Parameter aus und schickt sie an den Triggerhost (`cmd.trigger.arm`). `x_enabled`/`x_disabled` entfallen (Rückgabewert bzw. Exception), `Element_postTrigger_` wird zur reinen Funktion `TriggerVariables`.
-Was verbessert ist (in [MIGRATION.md](MIGRATION.md) vermerkt): `Disable` setzt denselben `HotIf`-Kontext wie `Enable`. In v1 wird `hotkey, <key>, off` ohne Kontext aufgerufen, ein kontextgebundener Hotkey bleibt dann möglicherweise aktiv.
-Zusätzlich: v1 ruft im Fehlerfall der Fensterparameter in `Element_enable` `x_finish` statt `x_enabled` auf (`Hotkey.ahk` Zeile 134). In v2 gibt es dieses Muster nicht mehr, ein Fehler ist immer `throw`.
+What changes: the engine evaluates the parameters and sends them to the trigger host (`cmd.trigger.arm`). `x_enabled`/`x_disabled` are dropped (return value or exception), and `Element_postTrigger_` becomes the pure function `TriggerVariables`.
+What is improved (noted in [MIGRATION.md](MIGRATION.md)): `Disable` sets the same `HotIf` context as `Enable`. In v1, `hotkey, <key>, off` is called without a context, so a context-bound hotkey may remain active.
+Additionally: in v1, in the error case of the window parameter in `Element_enable`, `x_finish` is called instead of `x_enabled` (`Hotkey.ahk` line 134). In v2 this pattern no longer exists; an error is always a `throw`.
 
 ---
 
-## 6. Mechanische Umsetzungsregeln
+## 6. Mechanical conversion rules
 
 | v1 | v2 |
 |---|---|
 | `Element_run_<C>(Environment, ElementParameters)` | `static Run(ctx, params)` in `class <C> extends AhfElement` |
-| `Element_getName_<C>()` usw. | `static Name()`, `Category()`, `Level`, `Stability`, `Icon` |
+| `Element_getName_<C>()` etc. | `static Name()`, `Category()`, `Level`, `Stability`, `Icon` |
 | `Element_getParametrizationDetails_<C>(Environment)` | `static Parameters(ctx)` |
 | `Element_GenerateName_<C>(Environment, ElementParameters)` | `static GenerateName(ctx, params)` |
 | `Element_CheckSettings_<C>(Environment, ElementParameters, staticValues)` | `static CheckSettings(form, params, staticValues)` |
-| `Element_stop_<C>` | `static Stop(ctx, params)` (häufig überflüssig) |
+| `Element_stop_<C>` | `static Stop(ctx, params)` (often unnecessary) |
 | `Element_enable_<C>` / `Element_disable_<C>` / `Element_postTrigger_<C>` | `Enable` / `Disable` / `TriggerVariables` |
 | `x_AutoEvaluateParameters` + `if _error` | `ctx.EvalParams` |
 | `x_finish(Environment, r, m)` | `ctx.Finish(r, m)` |
-| `x_enabled`/`x_disabled` | Rückgabe bzw. `throw` |
+| `x_enabled`/`x_disabled` | return value or `throw` |
 | `x_lang("k")` | `Lang("k")` |
 | `x_NewFunctionObject` + `SetTimer, % fo, -n` | `ctx.After(n, fn)` |
 | `x_SetExecutionValue` / `x_getExecutionValue` | `ctx.State.<name>` |
 | `StringReplace, out, in, a, b, all` | `out := StrReplace(in, a, b)` |
 | `IfInString, hay, needle` | `if InStr(hay, needle)` |
 | `FileRead, v, path` + `ErrorLevel` | `try v := FileRead(path)` / `catch` |
-| `Object()` / `{}` als Wörterbuch mit exakten Schlüsseln | `Map()` |
+| `Object()` / `{}` as a dictionary with exact keys | `Map()` |
 | `if x is number` | `IsNumber(x)` |
-| `%var%` als Befehlsparameter | Ausdruck |
+| `%var%` as a command parameter | expression |
 | `Return %x%` | `return x` |
-| `global` Deklaration in Funktionen | explizite Parameter oder `static` |
+| `global` declaration in functions | explicit parameters or `static` |
 
-Ein Konverter (`tools/convert_element.py`, Phase 3) übernimmt die Zeilen dieser Tabelle automatisch, setzt `Mode` nach Heuristik und markiert alle nicht eindeutig umsetzbaren Stellen mit `; TODO(v2-review): <Grund>`.
+A converter (`tools/convert_element.py`, Phase 3) applies the rows of this table automatically, sets `Mode` by heuristic, and marks every place that cannot be converted unambiguously with `; TODO(v2-review): <reason>`.
 
-**Heuristik für `Mode`:** `worker`, wenn der Quelltext einen von `RunWait`, `WinWait*`, `MsgBox`, `InputBox`, `FileSelect*`, `URLDownloadToFile`, `HTTPRequest`, `DllCall`, `ComObject`, `Gui`, `Sleep` (außerhalb von Timern), `x_ExecuteInNewAHKThread` enthält. Sonst `inline`. Triggerklassen sind immer `trigger`. Das Ergebnis wird von Hand geprüft.
+**Heuristic for `Mode`:** `worker` if the source contains one of `RunWait`, `WinWait*`, `MsgBox`, `InputBox`, `FileSelect*`, `URLDownloadToFile`, `HTTPRequest`, `DllCall`, `ComObject`, `Gui`, `Sleep` (outside of timers), `x_ExecuteInNewAHKThread`. Otherwise `inline`. Trigger classes are always `trigger`. The result is checked by hand.
 
-**Als unsicher markiert (nicht raten):** alles mit eigenem AHK-Thread, COM, DllCall, TTS, Eject, `Class_Monitor`, Bildschirmeinstellungen, `Block_User_Input`.
+**Marked as uncertain (do not guess):** everything with its own AHK thread, COM, DllCall, TTS, Eject, `Class_Monitor`, screen settings, `Block_User_Input`.
 
 ---
 
-## 7. Was bleibt
+## 7. What stays
 
-- Das Beschreibungsformat der Parameter (`type`, `id`, `default`, `content: "Expression"`, `result: "enum"`, `choices`, `enum`, `WarnIfEmpty`, ...) damit der Einstellungsdialog des Editors portierbar bleibt.
-- Klassen-IDs, Parameter-IDs, Ergebnisstrings, Sprachschlüssel, Paketname und -version in Flow-Dateien.
-- Die Semantik der Loop-Eintrittspunkte (`head`/`tail`, `x_getEntryPoint` wird `ctx.entryPoint`).
-- Loop-Variablen (`A_Index` usw.) über `ctx.SetVar(..., "loop")`.
+- The parameter description format (`type`, `id`, `default`, `content: "Expression"`, `result: "enum"`, `choices`, `enum`, `WarnIfEmpty`, ...), so that the editor's settings dialog remains portable.
+- Class IDs, parameter IDs, result strings, language keys, package name and version in flow files.
+- The semantics of the loop entry points (`head`/`tail`; `x_getEntryPoint` becomes `ctx.entryPoint`).
+- Loop variables (`A_Index` etc.) via `ctx.SetVar(..., "loop")`.
 
-## 8. Noch zu klären (Phase 3)
+## 8. Still to be clarified (Phase 3)
 
-- Genaue Form von `ctx.Request` und der Importliste für Worker (`imports`) bei Elementen, die beliebige Variablen lesen.
-- Ob Metadaten und Laufzeitcode je Rolle getrennt werden müssen (ARCHITEKTUR R3).
-- Umgang mit Elementpaketen von Dritten (`package`, `packageVersion`): Das Chrome-Paket entfällt, die Struktur der Paketinformation bleibt für das Laden alter Flows erhalten.
+- Exact form of `ctx.Request` and the import list for workers (`imports`) for elements that read arbitrary variables.
+- Whether metadata and runtime code must be separated per role (ARCHITEKTUR R3).
+- Handling of element packages from third parties (`package`, `packageVersion`): the Chrome package is dropped, but the structure of the package information stays so that old flows can be loaded.
