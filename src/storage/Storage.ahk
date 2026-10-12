@@ -11,6 +11,7 @@
 #Include FlowFiles.ahk
 #Include VarFiles.ahk
 #Include LogSink.ahk
+#Include ReportFiles.ahk
 
 ; Storage role (WI-12, ARCHITECTURE D7 and 4, PROTOCOL 4.6). The only process that touches files
 ; under the data directory: flows, variables and logs. Requests are queued (WriteQueue) and answered
@@ -70,6 +71,7 @@ class Storage extends Role {
         this.On("cmd.storage.var.set", (msg) => this._CmdVarSet(msg))
         this.On("cmd.storage.var.delete", (msg) => this._CmdVarDelete(msg))
         this.On("cmd.storage.var.list", (msg) => this._CmdVarList(msg))
+        this.On("cmd.storage.report.write", (msg) => this._CmdReportWrite(msg))
         this.On("evt.log.append", (msg) => this._EvtLogAppend(msg))
     }
 
@@ -149,6 +151,19 @@ class Storage extends Role {
         scope := msg.payload.Get("scope", "global")
         flowId := msg.payload.Get("flowId", "")
         return this._Defer(msg, "var.list", flowId, () => VarFiles.List(this.dataDir, scope, flowId))
+    }
+
+    ; cmd.storage.report.write (WI-28, PROTOKOLL 4.9): only the supervisor builds reports. The contents are checked
+    ; again by ReportFiles (names), the write runs in the request queue like every other file operation.
+    _CmdReportWrite(msg) {
+        if (msg.from != "supervisor")
+            throw AhfError("cmd.storage.report.write is reserved for the supervisor, not for '" msg.from "'", ErrCode.DENIED)
+        p := msg.payload
+        stamp := p.Get("stamp", "")
+        reason := p.Get("reason", "")
+        files := p.Get("files", "")
+        return this._Defer(msg, "report.write", reason
+            , () => ReportFiles.Write(this.dataDir, stamp, reason, files))
     }
 
     ; evt.log.append (noReply): no answer. Invalid entries are reported to the console only.

@@ -56,6 +56,9 @@ class Children {
         , 3, "role not implemented", 4, "hub lost", 6, "too many unexpected errors")
 
     shuttingDown := false
+    ; Function property (kind, name): the supervisor wants to know about incidents (crashed, restart-limit, hung)
+    ; to write a report (WI-28). Called after the event was published; a failure of it is logged and ignored.
+    onIncident := ""
     ; Set once a child was terminated by the supervisor (hang or deadline). Decides exit code 5.
     killedSome := false
 
@@ -310,6 +313,7 @@ class Children {
         Log.Write("a0", "children", name " hung: " reason)
         this.hub.Publish("process", "evt.process.hung", Map("name", name, "reason", reason))
         this.hub.Send(name, "sys.shutdown", Map("reason", "crash", "deadlineMs", Children.KILL_AFTER_MS))
+        this._Incident("hung", name)
     }
 
     ; Hard end of a process. The exit is seen on a later tick like any other exit.
@@ -478,6 +482,19 @@ class Children {
             , "exitCode", exitCode, "restart", Json.Bool(restart)))
         Log.Write("a0", "children", name " ended unexpectedly (" reason ", exit " exitCode
             . (Children.EXIT_TEXT.Has(exitCode) ? ": " Children.EXIT_TEXT[exitCode] : "") ")")
+        this._Incident("crashed", name)
+    }
+
+    ; Tells the supervisor about an incident (see onIncident). Never throws.
+    _Incident(kind, name) {
+        fn := this.onIncident
+        if (!IsObject(fn))
+            return
+        try {
+            fn(kind, name)
+        } catch as e {
+            Log.Write("a0", "children", "incident handler failed: " Type(e) ": " e.Message)
+        }
     }
 
     ; --- output of the children --------------------------------------------------------------
@@ -533,6 +550,7 @@ class Children {
         if (recent >= this.restartMax) {
             Log.Write("a0", "children", rec["name"] " not restarted: " recent " restarts within "
                 . Children.RESTART_WINDOW_MS " ms")
+            this._Incident("restart-limit", rec["name"])
             return false
         }
         rec["restartAt"] := now + Children.RESTART_DELAY_MS

@@ -11,6 +11,7 @@
 #Include Children.ahk
 #Include Heartbeat.ahk
 #Include DiagLog.ahk
+#Include DiagReport.ahk
 #Include Shutdown.ahk
 #Include SupervisorCommand.ahk
 
@@ -96,6 +97,14 @@ class Supervisor {
             if (entry != "")
                 this.startList.Push(entry)
         }
+        ; Only with --test-roles: how long a finished report waits for storage (DiagReport.STORAGE_WAIT_MS).
+        this.reportWaitMs := DiagReport.STORAGE_WAIT_MS
+        if (this.testRoles && opts.Has("report-wait")) {
+            this.reportWaitMs := this._Integer(opts, "report-wait", DiagReport.STORAGE_WAIT_MS)
+            if (this.reportWaitMs < 100 || this.reportWaitMs > DiagReport.STORAGE_WAIT_MS)
+                throw AhfError("supervisor: --report-wait must be between 100 and " DiagReport.STORAGE_WAIT_MS " ms"
+                    , ErrCode.BAD_ARGS)
+        }
         this.hasCommand := opts.Has("command")
         this.command := String(opts.Get("command", ""))
         this.roleOpts := this._RoleOpts(opts)
@@ -103,6 +112,7 @@ class Supervisor {
         this.hub := ""
         this.diag := ""
         this.children := ""
+        this.report := ""
         this.heartbeat := ""
         this.shutdown := ""
     }
@@ -122,6 +132,9 @@ class Supervisor {
         this.diag := DiagLog(this.hub)
         Log.Configure(this.diag.SinkFn)      ; to storage as soon as it is connected, else queued (WI-23)
         this.children := Children(config, this.hub)
+        this.report := DiagReport(this.hub, this.children, () => this.Snapshot(), this.session)
+        this.report.storageWaitMs := this.reportWaitMs
+        this.children.onIncident := (kind, name) => this.report.Auto(kind, name)
         this.heartbeat := Heartbeat(this.children, this.hub)
         this.shutdown := Shutdown(this.children, this.hub)
         this.shutdown.prepareLimitMs := this.prepareLimitMs
@@ -145,7 +158,8 @@ class Supervisor {
         h.On("cmd.app.", (msg) => this._OnApp(msg))
         h.On("cmd.diag.snapshot", (msg) => Map("snapshot", this.Snapshot()))
         h.On("cmd.process.", (msg) => this._OnProcess(msg))
-        h.On("evt.diag.error", (msg) => this.diag.AddError(msg.from, msg.payload))
+        h.On("cmd.diag.report", (msg) => this._OnReport(msg))
+        h.On("evt.diag.error", (msg) => this._OnDiagError(msg))
         h.onHello := (link) => this._OnHello(link)
         h.onLinkLost := (link, reason) => this.children.OnLinkLost(link["name"], reason)
     }
@@ -153,8 +167,26 @@ class Supervisor {
     ; A client said sys.hello: the children learn about it; the log queue is delivered once storage is there.
     _OnHello(link) {
         this.children.OnHello(link)
-        if (link["name"] = DiagLog.STORAGE)
+        if (link["name"] = DiagLog.STORAGE) {
             this.diag.Flush()
+            this.report.OnStorageHello()
+        }
+    }
+
+    ; evt.diag.error of a role: kept in the ring and logged; a burst of them starts an automatic report (WI-28).
+    _OnDiagError(msg) {
+        this.diag.AddError(msg.from, msg.payload)
+        this.report.NoteError(msg.from)
+    }
+
+    ; cmd.diag.report {reason}: the answer comes when the report is written (or storage did not take it).
+    _OnReport(msg) {
+        reason := msg.payload.Get("reason", "")
+        if (IsObject(reason) || reason = "" || StrLen(reason) > DiagReport.REASON_MAX)
+            throw AhfError("payload field 'reason' must be a text of 1 to " DiagReport.REASON_MAX " characters"
+                , ErrCode.BAD_PAYLOAD)
+        this.report.Request(reason, false, (payload) => this.hub.Reply(msg, payload))
+        return Deferred.Marker()
     }
 
     ; Commands to the supervisor itself. cmd.app.exit starts the exit and answers at once.
@@ -200,7 +232,7 @@ class Supervisor {
         snap["diagErrors"] := this.diag.Errors()
         snap["diagLog"] := stats
         snap["processEvents"] := this.hub.ProcessEvents()
-        snap["reports"] := Map("written", 0, "unwritten", 0, "autoSuppressed", 0)
+        snap["reports"] := this.report.Stats()
         return snap
     }
 

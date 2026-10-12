@@ -419,10 +419,25 @@ class Hub {
             return
         }
         result := this._dispatcher.Invoke(msg)
+        ; The handler answers later with Reply (WI-28: the crash report waits for the snapshots of the roles).
+        if (result is Deferred)
+            return
         if (SubStr(msg.type, 1, 4) = "cmd.")
             this._Reply(link, msg.type, msg.id, result)
         else if (!result["ok"])
             Log.Write("a1", "hub", "no handler for " msg.type " from " link["name"] ": " result["error"]["message"])
+    }
+
+    ; The late answer to a cmd.* request whose handler returned Deferred.Marker(). Returns false when the
+    ; sender is not connected any more. payload is a Map, "ok" is added by the caller or Message.Serialize.
+    Reply(request, payload) {
+        link := this._links.Get(request.from, "")
+        if (!IsObject(link))
+            return false
+        if (!payload.Has("ok"))
+            payload["ok"] := true
+        this._Reply(link, request.type, request.id, payload)
+        return true
     }
 
     ; Answers a request that came from a client (cmd.* to the supervisor or unroutable target).
