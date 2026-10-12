@@ -99,6 +99,21 @@ class Children {
         this._Launch(rec, false, Time.NowMs())
     }
 
+    ; Starts a role that is not running: a new child, or the record of an ended one again (the debug window that the
+    ; user closed and opens again, WI-28). Returns true when a process was started, false when it runs already.
+    ; Throws what Spawn throws. The restart count of an ended record is kept (it is the history of the name).
+    Open(entry) {
+        if (!this._recs.Has(entry)) {
+            this.Spawn(entry)
+            return true
+        }
+        rec := this._recs[entry]
+        if (!rec["gone"])
+            return false
+        this._Launch(rec, false, Time.NowMs())
+        return true
+    }
+
     ; Starts the next worker on request of the engine (cmd.process.spawn). Returns its name "worker:<n>". The number
     ; is never used twice in a session. Throws AhfError: shutting_down, busy (WORKER_LIMIT alive), internal.
     SpawnWorker() {
@@ -450,7 +465,7 @@ class Children {
         Log.Write("a1", "children", "started " rec["name"] " (pid " pid ")")
     }
 
-    ; The process has ended. Decides between exited (asked to stop) and crashed, and about a restart.
+    ; The process has ended. Decides between exited (asked to stop, or gone with a clean goodbye) and crashed, and about a restart.
     _OnGone(rec, now) {
         exitCode := ""
         if (rec["handle"] != 0) {
@@ -466,7 +481,10 @@ class Children {
         name := rec["name"]
         ; A hung child that is killed is a crash, also during a shutdown. Everything else that ends
         ; during a shutdown (or after sys.shutdown was sent) is a normal exit.
-        if (rec["state"] != "hung" && (this.shuttingDown || rec["state"] = "stopping")) {
+        ; A child that said sys.bye {clean} and ended with exit 0 left by its own wish (the debug window that the user
+        ; closed, WI-28): a normal exit, not a crash.
+        voluntary := (rec["bye"] && rec["byeClean"] && exitCode == 0)
+        if (rec["state"] != "hung" && (this.shuttingDown || rec["state"] = "stopping" || voluntary)) {
             rec["state"] := "exited"
             payload := Map("name", name, "pid", rec["pid"], "clean", Json.Bool(rec["bye"] && rec["byeClean"])
                 , "exitCode", exitCode)
@@ -563,7 +581,7 @@ class Children {
     }
 
     _RankOf(role) {
-        if (role = "manager" || role = "editor")
+        if (role = "manager" || role = "editor" || role = "debug")
             return 0
         if (role = "engine")
             return 1

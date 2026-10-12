@@ -210,6 +210,8 @@ class Supervisor {
             for word in argv
                 text .= (text = "" ? "" : " ") String(word)
             Log.Write("a1", "supervisor", "command from " msg.from ": " text)
+            if (StrLower(Trim(text)) = "debug")
+                return this._OpenDebug()
             return Map()
         }
         throw AhfError("unknown command " msg.type, ErrCode.UNKNOWN_TYPE)
@@ -234,6 +236,17 @@ class Supervisor {
         snap["processEvents"] := this.hub.ProcessEvents()
         snap["reports"] := this.report.Stats()
         return snap
+    }
+
+    ; The command "debug" (--command=debug of a second instance): starts the debug window if it is not running, else
+    ; asks the running one to come to the front. The answer says which (PROTOKOLL 4.1).
+    _OpenDebug() {
+        if (this.children.shuttingDown)
+            throw AhfError("the supervisor is shutting down", ErrCode.SHUTTING_DOWN)
+        started := this.children.Open("debug")
+        if (!started)
+            this.hub.Send("debug", "evt.debug.show", Map())
+        return Map("command", "debug", "started", Json.Bool(started))
     }
 
     ; cmd.process.list is open to every client. spawn and kill belong to the engine and only touch workers

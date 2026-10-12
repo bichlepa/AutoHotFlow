@@ -31,6 +31,7 @@ OnError(AhfLoadError)
 #Include worker\Worker.ahk
 #Include storage\Storage.ahk
 #Include manager\StubManager.ahk
+#Include debugview\DebugView.ahk
 #Include elements\skeleton\Trigger_Manual.ahk
 #Include elements\skeleton\Action_Sleep.ahk
 #Include elements\skeleton\Action_Do_nothing.ahk
@@ -119,6 +120,7 @@ AhfRegisterRoles() {
     RoleRegistry.Register("worker", Worker)
     RoleRegistry.Register("storage", Storage)
     RoleRegistry.Register("manager", StubManager)   ; WI-13: stub only, needs --ui=stub
+    RoleRegistry.Register("debug", DebugView)       ; WI-28: the debug window (--headless without a window)
 }
 
 ; Registers the test roles (tests/integration/helpers). Called only with --test-roles.
