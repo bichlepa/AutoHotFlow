@@ -104,6 +104,7 @@ Eine falsch eingestufte Inline-Aktion fällt nicht still auf: Der Engine-Watchdo
 | `manager` | 0..1 | Flow-Liste, Kategorien, Einstellungen, Import/Export, Log-Anzeige | Fensterzustand | Flows ausführen |
 | `editor:<flowId>` | 0..n | Bearbeiten und Anzeigen eines Flows, Zeichnen | Entwurf des Flows, Undo/Redo, Ansicht (Zoom/Offset), Auswahl | Laufzeitzustand ändern |
 | `worker:<n>` | 0..N (elastischer Pool, Abschnitt 6.4) | blockierende/UI-Elemente ausführen | nur kurzlebige Kopie der Aufgabe | Zustand halten |
+| `debug` | 0..1 | Debug-Fenster: Prozesstabelle, Snapshot je Rolle, Live-Log, Ereignisstrom, `Debug.Dump`-Werte, Bericht exportieren (WI-28, PROTOKOLL 4.9) | Fensterzustand, Ansichtsfilter | Zustand anderer Rollen ändern, Dateien anfassen |
 
 Der Supervisor ist der kleinste und einfachste Prozess. Er ist ein Hub, weil ein Neustart der Engine dann keine Verbindung der Clients zerstört. Fällt der Supervisor selbst aus, beenden sich alle Kinder nach kurzer Frist (Orphan-Guard, siehe 6.3).
 
@@ -126,6 +127,9 @@ Der Supervisor ist der kleinste und einfachste Prozess. Er ist ein Hub, weil ein
 | Einstellungen (Datei) | storage | – |
 | Trigger-Handles (Hotkey, Hook) | triggerhost | engine kennt nur den Soll-Zustand |
 | Prozessliste, Neustartzähler | supervisor | – |
+| Diagnosedaten eines Prozesses (Ringpuffer von Log, letzte unbehandelte Fehler, Zähler von Peer und Verbindung) | der Prozess selbst; andere bekommen eine Kopie per `cmd.diag.snapshot` (Abschnitt 6.2, PROTOKOLL 4.9) | `debug`, Absturzbericht |
+| Ausgabepuffer der Kinder (stdout/stderr, auch beendeter), Ring der `evt.diag.error`, Ereignisse des Topics `process`, noch nicht geschriebene Berichte | supervisor | Absturzbericht |
+| Berichtsordner `Reports/` | storage (einziger Schreiber, der Supervisor liefert nur den Inhalt) | – |
 | Sprachtexte | jede Rolle lädt `language/*.ini` selbst, read-only | – |
 
 ### 4.1 Zustandsänderungen sind Ereignisse
@@ -226,6 +230,8 @@ Die Auswahl der nächsten Verbindung folgt exakt v1: Verbindungstyp gleich Ergeb
 | Ausgabe eines Kindes (stderr, Ladefehler, letzte Worte) | Der Supervisor startet Kinder mit `CreateProcessW`, stdout und stderr zeigen auf eine anonyme Pipe (`ChildLauncher`); jeder Tick liest sie ohne Blockieren (`ChildPipe`, `PeekNamedPipe`) | Jede Zeile wird ein Log-Eintrag (`a0`, Quelle = Rolle, Text `[<Name>] <Zeile>`) und kommt über `DiagLog` nach `storage`. Je Kind bleiben die letzten 100 Zeilen im Speicher, auch nach dem Prozessende (`Children.Output`, Grundlage des Absturzberichts, WI-28). Beim Ende wird der Rest gelesen, dann werden die Handles geschlossen. Je Tick höchstens 64 KB gelesen und 200 Zeilen geloggt, der Rest nur im Ringpuffer. Vererbt werden nur Schreibende der Pipe und `NUL` (`PROC_THREAD_ATTRIBUTE_HANDLE_LIST`), keine Hub-Pipe. |
 | Meldungen, die für die Diagnose zu viel sind | `--log-level=<0..3>` (Standard 2) | Nur Einträge bis zu dieser Ziffer gehen an `storage`. Die letzten 500 Einträge aller Ebenen bleiben je Prozess im Ringpuffer von `Log` (für den Absturzbericht). |
 | Unbehandelter Fehler in einer Rolle (kein `try/catch`) | `OnError` der Rolle (`Role._OnUnexpected`) | Die Rolle zählt, sendet `evt.diag.error {name, errorType, message, file, line, stack, mode}` an den Supervisor (Log `a0` und Ring der letzten 50) und läuft weiter. Mehr als 20 in 60 s: Exit-Code 6 "too many unexpected errors", für `engine` und `storage` greift danach die Neustartregel. |
+| Snapshot (WI-28) | Jede Rolle beantwortet `cmd.diag.snapshot` (PROTOKOLL 4.9): allgemeiner Teil aus `Role.Snapshot` (Prozess, Speicher, Handles, Peer-Zähler, Log-Ring, letzte unbehandelte Fehler), Rollenteil aus dem Haken `Role.DiagInfo()`. Der Supervisor beantwortet ihn selbst (Prozesstabelle mit Neustarthistorie und Exit-Codes, Hub-Verbindungen und Warteschlangen, Ausgabepuffer der Kinder). Nie Inhalte von Variablen oder Flows. | Antwort kommt aus dem laufenden Prozess. Ein eingefrorener Prozess antwortet nicht; das merkt der Aufrufer an seiner Frist |
+| Absturzbericht (WI-28) | `cmd.diag.report {reason}` oder automatisch bei: Kind unerwartet beendet (`crashed`), Neustartgrenze erreicht, `hung`, 10 unbehandelte Fehler einer Rolle in 60 s | Der Supervisor fragt alle verbundenen Rollen gleichzeitig nach dem Snapshot (Frist 2 s je Rolle, fehlende Antworten stehen im Bericht), ergänzt seinen eigenen Snapshot samt Ausgabepuffern verstorbener Kinder und schickt `report.json` und `summary.txt` an `storage` (`cmd.storage.report.write`), das `Reports/<yyyyMMdd-HHmmss>_<Grund>/` schreibt, die letzten Logdateien kopiert und 20 Berichte behält. Automatisch höchstens einer je Minute, keiner während des Beendens. Ist `storage` nicht da, wartet der Bericht bis 10 s im Speicher des Supervisors; danach wird er beim nächsten Verbinden von `storage` geschrieben. Der Supervisor schreibt nie selbst Dateien |
 | Anfrage ohne Antwort | Timeout der Korrelations-ID | Aufrufer erhält `res` mit `error.code = "timeout"`, nie ein endloses Warten |
 | Pipe bricht | `ERROR_BROKEN_PIPE`/`NO_DATA` | Client versucht Wiederaufbau (Backoff 100 ms bis 2 s, max. 10 s), danach Rolle beendet sich |
 | Worker bricht ab | Prozess weg (`evt.process.crashed`/`exited`) | Engine meldet dem Thread `exception` mit Text „worker crashed“, entfernt den Slot und startet bei Bedarf Ersatz (6.4). Sturmbegrenzung: 5 abnormale Enden in 60 s, dann „worker not available“ |
@@ -319,6 +325,7 @@ AutoHotFlow/
 │  ├─ supervisor/  engine/  storage/  triggerhost/  worker/
 │  ├─ ui_common/            # Lang(), GUI-Helfer
 │  ├─ manager/  editor/     # editor/render/ = Renderer-Schnittstelle (D4)
+│  ├─ debugview/            # Rolle debug (WI-28): DebugView.ahk, DebugGui.ahk
 │  └─ elements/
 │     ├─ base/              # AhfElement, Registry, Context
 │     └─ default/{actions,conditions,loops,triggers}/
@@ -330,7 +337,7 @@ AutoHotFlow/
 **Ist-Stand am Ende von Phase 2 (WI-17, verglichen mit dem Dateibaum, verifiziert):** Die Struktur oben ist weiter das Ziel. Abweichungen und Lücken:
 
 - **Entscheidung E6 (2026-10-11):** Der Triggerhost (WI-14) wird früh in Phase 3 mit den echten Triggern gebaut, nicht in Phase 2b.
-- Vorhanden: `src/AutoHotFlow.ahk`, `core/` (zusätzlich `Role.ahk`, `RoleRegistry.ahk`, `Time.ahk`; `ipc/` zusätzlich `Deferred.ahk`, `PipeConnection.ahk`, `PipeListener.ahk`, `FrameReader.ahk`, `FrameWriter.ahk`), `supervisor/`, `engine/` (mit `core/` für Zustandsautomaten, Flowmodell, Scheduler), `storage/`, `worker/`, `manager/` (nur `StubManager.ahk` und `StubGui.ahk`), `elements/base/`.
+- Vorhanden: `src/AutoHotFlow.ahk`, `core/` (zusätzlich `Role.ahk`, `RoleRegistry.ahk`, `Time.ahk`; `ipc/` zusätzlich `Deferred.ahk`, `PipeConnection.ahk`, `PipeListener.ahk`, `FrameReader.ahk`, `FrameWriter.ahk`), `supervisor/`, `engine/` (mit `core/` für Zustandsautomaten, Flowmodell, Scheduler), `storage/`, `worker/`, `manager/` (nur `StubManager.ahk` und `StubGui.ahk`), `debugview/` (WI-28, `DebugView.ahk`, `DebugGui.ahk`), `elements/base/`. `core/` hat seit WI-28 zusätzlich `Version.ahk`, `ProcInfo.ahk` und `Debug.ahk`; `supervisor/` hat `DiagReport.ahk`.
 - **Nicht vorhanden (Phase 3 oder später):** `triggerhost/` (WI-14 optional, nicht gebaut; die Rolle ist in `RoleRegistry.ahk` ein Platzhalter), `editor/` (Platzhalter-Rolle), `ui_common/`, `assets/`, `elements/default/{actions,conditions,loops,triggers}/`. Statt `elements/default/` gibt es `elements/skeleton/` mit acht Demo- und Testelementen (`Trigger_Manual`, `Action_Sleep`, `Action_Do_nothing`, `Action_Test*`).
 - `tools/` enthält bisher nur `ahkrun.py` und `ahf_dialogwatch.py` (Laufwächter), keine Konverter.
 - **Bewusste Abweichung von der Einbindregel unten:** Der Einstieg `src/AutoHotFlow.ahk` bindet die Testrollen aus `tests/integration/helpers/` ein (`EchoRole`, `CrasherRole`, `HangerRole`, `SlowShutdownRole`). Sie sind nur mit `--test-roles` registriert (PROTOKOLL 4.1b). Das ist eine Abhängigkeit von `src/` auf `tests/`; vor einem Release auflösen (Phase 3: eigener Testeinstieg oder bedingtes Einbinden).

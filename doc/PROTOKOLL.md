@@ -75,6 +75,7 @@ Jede Nachricht ist ein JSON-Objekt mit festem Schema. Der Serializer schreibt di
 | `storage` | Storage |
 | `triggerhost` | Triggerhost |
 | `manager` | Manager |
+| `debug` | Debug-Fenster (WI-28, 4.9) |
 | `editor:<flowId>` | Editor des Flows `<flowId>` |
 | `worker:<n>` | Worker, `n` vom Supervisor vergeben (`cmd.process.spawn`, 4.1) |
 
@@ -86,6 +87,7 @@ Jede Nachricht ist ein JSON-Objekt mit festem Schema. Der Serializer schreibt di
 | `flow:<flowId>` | `evt.flow.*`, `evt.element.state`, `evt.connection.state`, `evt.instance.*` für diesen Flow | `editor:<flowId>`, `manager` |
 | `log` | `evt.log.entry` | `manager` (Log-Fenster) |
 | `process` | `evt.process.*` (Felder siehe 4.1a), `evt.app.exitCancelled` | `manager`, Tests |
+| `debug` | `evt.debug.dump` (Werte, die Code mit `Debug.Dump` ausgibt, 4.9) | `debug` (Debug-Fenster), Tests |
 
 ## 4. Nachrichtenkatalog
 
@@ -117,7 +119,7 @@ Alle Nutzlasten sind Objekte. `flowId`, `elementId`, `connectionId` sind die Bez
 | `sys.busy` | worker → supervisor | `{ busy: bool }` | – (keine Antwort). Der Worker meldet Beginn (`true`) und Ende (`false`) eines Jobs (WI-27, ARCHITEKTUR 6.4). Solange `busy` wahr ist, sendet der Supervisor dem Worker keinen Ping und beurteilt keinen Pong; beim Ende beginnen die Pong-Zeiten neu. Von einer anderen Rolle als `worker:*` wird die Meldung verworfen (Log `a0`) |
 | `cmd.app.prepareExit` | supervisor → editor/manager | `{}` | `res: { ok, cancel: bool }` (Benutzer kann abbrechen). Frist: 600000 ms (10 Minuten, `Shutdown.PREPARE_LIMIT_MS`). Bei Ablauf synthetische Antwort `{ ok: false, error: { code: "timeout" } }`, die wie „kein Abbruch“ gilt, der Exit geht weiter. Eine spätere echte Antwort wird verworfen (`droppedAnswers`). Die Phase hat keine harte Frist (ARCHITEKTUR 6.3), die Obergrenze verhindert nur, dass eine Anfrage ohne Ende bleibt |
 | `cmd.app.exit` | beliebige UI → supervisor | `{ deadlineMs? }` (optional, Integer 100 bis 60000, sonst Standard `--deadline`, 5000) | startet Beenden (6.3), `res: { ok, started: bool }`; `started` ist false, wenn schon ein Beenden läuft |
-| `cmd.app.command` | zweite Instanz → supervisor | `{ argv: [...] }` (Array von Strings, Kommandozeilen-Wörter; die Instanz übergibt `--command=<text>` als `argv` mit einem Eintrag) | `res: { ok }`. Phase 2 protokolliert den Text nur (`a1`), es gibt noch keine Befehle außer dem Test. Die zweite Instanz beendet sich mit Exit 0 (zugestellt) oder 1 (keine Antwort, Fehler) |
+| `cmd.app.command` | zweite Instanz → supervisor | `{ argv: [...] }` (Array von Strings, Kommandozeilen-Wörter; die Instanz übergibt `--command=<text>` als `argv` mit einem Eintrag) | `res: { ok, command?, started? }`. Bekannter Befehl (seit WI-28): `debug` startet die Rolle `debug`, falls sie nicht läuft (`started` true), sonst holt es ihr Fenster nach vorn (`evt.debug.show`, `started` false); die Antwort nennt `command: "debug"`. Alles andere wird nur protokolliert (`a1`), die Antwort ist `{ ok }`. Die zweite Instanz beendet sich mit Exit 0 (zugestellt) oder 1 (keine Antwort, Fehler) |
 | `cmd.process.list` | beliebige Rolle → supervisor | `{}` | `res: { ok, processes: [ {name, role, state, pid, restarts} ] }`. Momentaufnahme aller Kinder, Zustände nach ARCHITEKTUR 5.3. Dient als Resync für Späteinsteiger (Abschnitt 5a) |
 | `cmd.process.spawn` | engine → supervisor | `{ role: "worker" }` | `res: { ok, name }`, `name` ist `worker:<n>` (der Supervisor vergibt `n`, aufsteigend, in einer Sitzung nie doppelt). Der Prozess startet wie jedes Kind (`evt.process.started`, bei `sys.hello` `evt.process.ready`). Fehler: `denied` (Absender nicht `engine`, oder `role` nicht `worker`), `shutting_down` (Beenden läuft), `busy` (schon 16 lebende Worker, `Children.WORKER_LIMIT`), `bad_payload` (`role` fehlt), `internal` (Start gescheitert). WI-27 |
 | `cmd.process.kill` | engine → supervisor | `{ name, reason }` | `res: { ok }`. `TerminateProcess` des Kindes `name`. Nur für Namen `worker:<n>`, nur vom Absender `engine`, sonst `denied` (auch für `storage`, `engine`, `manager`). Unbekannter Name: `not_found`. Ein schon beendeter Worker: `ok` (gleichwertig). Das Ende wird wie jedes andere gemeldet, aber als geplant: `evt.process.exited {name, pid, clean: false, exitCode, reason: "killed"}`, kein `crashed`, kein Neustart. Das Beenden zählt nicht für den Exit-Code 5 des Supervisors. `reason` (Text, höchstens 200 Zeichen) steht im Log `a1`. WI-27 |
@@ -144,6 +146,8 @@ Jeder Eintrag trägt `name` (der Name, unter dem das Kind gestartet wurde, z. B.
 | `evt.process.exited` | `{ name, pid, clean: bool, exitCode, reason? }` | Ende nach Aufforderung (Beenden). `reason` ist nur bei `cmd.process.kill` gesetzt (`"killed"`). Die Felder `clean` und `exitCode` gelten seit WI-22/23 (vorher hier nicht aufgeführt) |
 | `evt.process.restarted` | `{ name, attempt }` | Neustart nach Richtlinie (automatisch nur für `storage` und `engine`; mit `--test-roles` zusätzlich `crasher`) |
 
+**Freiwilliges Ende (WI-28):** Beendet sich ein Kind von selbst mit `sys.bye {clean: true}` und Exit-Code 0, ohne dass der Supervisor es dazu aufgefordert hat (das Debug-Fenster, das der Benutzer schließt), meldet der Supervisor `evt.process.exited {clean: true}` statt `evt.process.crashed`. Ein hängendes Kind (`hung`) wird weiter immer als `crashed` gemeldet.
+
 Neustart-Richtlinie: höchstens 3 Neustarts in 60 s, sonst bleibt der Prozess `crashed` (`restart: false`). `manager` und `editor` werden nie automatisch neu gestartet.
 
 ### 4.1b Testrollen (nur mit `--test-roles`)
@@ -154,6 +158,7 @@ Die Rollen `echo`, `crasher`, `hanger`, `slow_shutdown` (Quellen in `tests/integ
 - Option `--prepare-limit=<ms>` (nur mit `--test-roles`, 100 bis 600000): setzt die Frist von `cmd.app.prepareExit` herab, damit der Timeout-Test in Sekunden läuft. Ohne das Flag gilt die Konstante.
 - Option `--restart-max=<n>` (nur mit `--test-roles`): Zahl der automatischen Neustarts je 60 s statt 3, damit ein Test ein Kind 50-mal neu starten kann (Handle-Leck-Test).
 - Option `--worker-limit=<n>` (nur mit `--test-roles`, 1 bis 16): Höchstzahl lebender Worker statt 16, damit der Test von `cmd.process.spawn` (`busy`) nicht 17 Prozesse braucht.
+- `echo` (WI-28): `cmd.test.dump {title, value}` ruft `Debug.Dump` auf (4.9).
 - `echo` (WI-23): `cmd.test.stderr {text}` schreibt eine Zeile auf stderr; `cmd.test.log {count, level, text}` schreibt `count` Einträge (Standard `a1`); `cmd.test.throwlater {count}` wirft `count` Fehler aus Timern.
 
 ### 4.1c Unbehandelte Fehler (`evt.diag.error`, WI-23)
@@ -324,6 +329,68 @@ Der Stub ist ein Minimal-Ersatz für `manager` (ARCHITEKTUR 3). Er zeigt, was di
 - **Testbefehl `cmd.test.command` (nur mit `--headless`):** Nutzlast `{ type, payload }`, `type` aus `cmd.flow.start`, `cmd.flow.stop`, `cmd.flow.toggle`, `cmd.engine.snapshot`. Der Stub leitet die Anfrage an `engine` weiter und antwortet mit `{ ok: true, answer: <Antwort der Engine> }`. Andere Typen: `bad_payload`. Die Antwort kommt verzögert (`Deferred`).
 - **Optionen, die der Supervisor an alle Rollen weitergibt:** `--ui=<wort>`, `--headless`, `--stub-cancel-exit`, `--log-level=<0..3>` (WI-23), `--workers=<n>`, `--warm-workers=<n>`, `--worker-idle-ms=<ms>` (WI-27, Pool der Engine, 4.5).
 - **`evt.engine.restarted`:** Die Engine sendet es selbst (sie besitzt die `epoch`), sobald sie nach einem Neustart die Flows geladen hat, direkt vor `evt.flow.list.changed` und `evt.engine.ready`. Sie erkennt den Neustart an der Option `--restarted=<n>`, die der Supervisor nur bei einem automatischen Neustart anhängt (`n` = Zahl der Neustarts im Fenster). Beim ersten Start fehlt die Option, dann kommt kein `evt.engine.restarted`. Der Stub löst den Resync zusätzlich über `evt.process.restarted` und neue `epoch` aus.
+
+### 4.9 Diagnose II: Snapshot, Absturzbericht, Debug-Fenster (WI-28)
+
+Kein Flow-Debugger (E1), sondern Diagnose des Systems. Alles hier ist nur lesend, bis auf das Schreiben der Berichte durch `storage`.
+
+**`cmd.diag.snapshot`** (beliebige Rolle → jede Rolle, auch `supervisor`; Frist des Aufrufers, Standard 2 s)
+
+| Anfrage | Antwort |
+|---|---|
+| `{}` (Das Feld `content` ist für den späteren Flow-Debugger reserviert und wird ignoriert: ein Snapshot enthält **nie** Inhalte von Variablen oder Flows, nur Namen, Ids, Zähler und Zustände.) | `{ ok, snapshot }` |
+
+`snapshot` ist ein Objekt mit `schema: 1` und diesen Feldern. Der allgemeine Teil kommt aus der Basisklasse `Role` (`Role.Snapshot`), der Rollenteil `info` aus dem Haken `Role.DiagInfo()` (Standard: leeres Objekt). Ein Fehler im Haken ergibt `info: { error: "<Text>" }`, nie einen Fehler der Antwort.
+
+| Feld | Inhalt |
+|---|---|
+| `name`, `role`, `pid` | Rollenname (`editor:Flow 1`), Rolle (`editor`), Prozess-ID |
+| `startedAt`, `uptimeMs` | Prozessstart (UTC, `yyyy-MM-dd HH:mm:ss`, aus `GetProcessTimes`) und Laufzeit |
+| `version`, `ahkVersion`, `bits` | `Version.Current` (`src/core/Version.ahk`), `A_AhkVersion`, 64 |
+| `rssBytes`, `handles` | Arbeitsspeicher (`GetProcessMemoryInfo`) und Handle-Zahl (`GetProcessHandleCount`) des eigenen Prozesses |
+| `peer` | `{ status, pending, lateReplies, badFrames, droppedSends, queuedFrames, queuedBytes, handlerErrors }` (Zähler von `Peer` und seiner Verbindung, `Peer.Stats()`) |
+| `log` | `{ queued, dropped, sinkErrors, lastSinkError, level, recent: [ {ts, level, source, text} ] }`: `Role.LogStats()`, `Log.sinkErrors`, die letzten 100 Einträge des Ringpuffers von `Log` (WI-23, Texte auf 500 Zeichen gekürzt) |
+| `errors` | `{ count, recent: [ {ts, errorType, message, file, line, stack, mode} ] }`: die letzten 20 unbehandelten Fehler der Rolle (WI-23) mit Stack |
+| `info` | Rollenteil, siehe unten |
+
+Rollenteile (`info`):
+
+| Rolle | Felder |
+|---|---|
+| `engine` | `epoch`, `seq`, `flows: [ {flowId, name, rev, enabled, executing} ]`, `instances: [ {instanceId, flowId, state, threads: [ {threadId, elementId, state, result} ]} ]`, `workers: { size, warm, slots: [ {name, state, execId} ], spawning, failures }` |
+| `storage` | `queue: { requests, log }` (Länge der beiden Warteschlangen), `logQueuedEntries`, `logQueuedChars`, `logLinesLost`, `logLinesDropped` |
+| `worker` | `job`: leer, wenn kein Job läuft, sonst `{ execId, class, sinceMs }` |
+| `manager` (Stub) | `topics`, `epoch`, `lastSeq`, `flows` (Zahl), `events`, `resyncs` |
+| `debug` | `topics`, `processes` (Namen), `snapshots` (Rollen mit Snapshot), `logEntries`, `engineEvents`, `dumps`, `paused` |
+
+Der Supervisor beantwortet die Anfrage selbst (er ist keine `Role` und hat keinen Peer). Statt `peer` und `info` hat sein Snapshot: `hub` (`{ links: [ {name, pid, queuedFrames, queuedBytes, topics} ], droppedAnswers, pending }`), `children` (je Kind `{ name, role, state, pid, exitCode, restarts, startedAt, busy, killReason, output: [letzte 100 Zeilen stdout/stderr] }`, auch für beendete Kinder), `diagErrors` (Ring der `evt.diag.error`, bis 50, vollständig mit Stack), `diagLog` (`{ queued, dropped }`), `processEvents` (die letzten 50 Ereignisse des Topics `process`: `{ts, type, payload}`), `reports` (`{ written, unwritten, autoSuppressed }`). `log` und `errors` gibt es auch dort.
+
+**`cmd.diag.report`** (beliebige Rolle → `supervisor`)
+
+| Anfrage | Antwort |
+|---|---|
+| `{ reason }` (Text, 1 bis 60 Zeichen; Zeichen außer Buchstaben, Ziffern, `.`, `_`, `-` werden im Verzeichnisnamen zu `-`) | `{ ok, path, dir, roles, missing: [ {name, why} ] }` (Antwort verzögert, `Deferred`) |
+
+Ablauf im Supervisor (`DiagReport`, `src/supervisor/DiagReport.ahk`): Er fragt **jede verbundene Rolle** gleichzeitig mit `cmd.diag.snapshot` (Frist je Rolle `DiagReport.SNAPSHOT_MS` = 2000 ms; es gibt kein Warten ohne Frist). Rollen, die nicht verbunden sind (gestartet, abgestürzt, beendet), und Rollen, die nicht antworten, stehen in `missing` mit dem Grund (`not connected (<state>)`, `no answer within 2000 ms`, `error: <code>`). Wenn alle Antworten oder Fristen da sind, fügt der Supervisor seinen eigenen Snapshot hinzu (mit den Ausgabepuffern auch verstorbener Kinder) und baut zwei Dateien: `report.json` (alle Snapshots, `meta`: Grund, Zeit, automatisch ja/nein, Version, Sitzung) und `summary.txt` (lesbare Zusammenfassung: Prozesstabelle, je Rolle die wichtigsten Zahlen, fehlende Rollen, letzte Fehler). Beides geht an `storage` (`cmd.storage.report.write`). Der Supervisor schreibt nie selbst Dateien.
+
+*Automatische Berichte.* Der Supervisor löst `reason = "<auslöser>-<name>"` selbst aus bei: unerwartetem Ende eines Kindes (`crashed-<name>`), erreichter Neustartgrenze (`restart-limit-<name>`), `hung-<name>`, und wenn eine Rolle `DiagReport.ERROR_BURST` (10) unbehandelte Fehler innerhalb von 60 s meldet (`errors-<name>`). **Ratenbegrenzung:** höchstens ein automatischer Bericht je 60 s (`DiagReport.AUTO_MIN_INTERVAL_MS`); weitere Auslöser in dieser Zeit werden verworfen, gezählt (`reports.autoSuppressed`) und mit `a1` geloggt. Während des Beendens (`Children.shuttingDown`) gibt es keinen automatischen Bericht. Manuelle Berichte (`cmd.diag.report`) sind nicht begrenzt.
+
+*Storage nicht erreichbar.* Ist `storage` nicht verbunden (abgestürzt, im Neustart), wartet der fertige Bericht im Speicher des Supervisors auf den neu gestarteten Storage, höchstens `DiagReport.STORAGE_WAIT_MS` (10 s). Kommt `storage` rechtzeitig (`sys.hello`), wird er geschrieben und der Aufrufer beantwortet. Sonst antwortet der Supervisor dem Aufrufer mit `error.code = "peer_gone"` ("storage not available, the report is kept and written when storage is back"). Der Bericht bleibt dann im Speicher (höchstens `DiagReport.KEEP_UNWRITTEN` = 5, der älteste fällt heraus) und wird beim nächsten Verbinden von `storage` geschrieben, unter dem ursprünglichen Zeitstempel.
+
+**`cmd.storage.report.write`** (`supervisor` → `storage`; andere Absender: `denied`)
+
+| Anfrage | Antwort |
+|---|---|
+| `{ stamp, reason, files: { "<datei>": "<text>" } }`. `stamp` = `yyyyMMdd-HHmmss` (lokale Zeit des Supervisors), `reason` wie oben, Dateinamen nur `[A-Za-z0-9._-]`, keine Pfade | `{ ok, path, dir, removed, logs: [ ... ] }`: `path` = `Reports/<stamp>_<reason>` relativ zum Datenverzeichnis, `dir` absolut, `removed` = Zahl der wegen der Aufbewahrung gelöschten alten Berichte, `logs` = kopierte Logdateien |
+
+Storage legt `Reports/<stamp>_<reason>/` an (existiert es, wird `-2`, `-3` ... angehängt), schreibt die Dateien atomar, kopiert dazu `Log/Log.txt` und `Log/Log_old.txt`, falls vorhanden (eine nicht lesbare Datei wird übersprungen und nicht in `logs` aufgeführt), und behält danach höchstens 20 Berichtsordner (die ältesten nach Namen fallen weg). Die Operation läuft in der Anfragen-Warteschlange (Frist des Aufrufers, 30 s Standard). Fehler: `bad_payload` (Namen), `denied`, `internal`.
+
+**Topic `debug`, `evt.debug.dump`.** `Debug.Dump(value, title := "")` (`src/core/Debug.ahk`) ersetzt `d()` aus v1. Es wandelt `value` in lesbares JSON (Tiefe höchstens 8, höchstens 200 Einträge je Map oder Array, Zyklen und fremde Objekte als `<Typ>`), kürzt bei 60000 Zeichen und sendet `evt.debug.dump { title, ts, json, truncated }` (`truncated` ist ein Wahrheitswert) an `topic:debug`. `from` setzt der Hub. **Blockiert nie, wirft nie:** ohne laufende Rolle, ohne bereite Verbindung oder bei einem Fehler tut es nichts. Höchstens 100 Aufrufe je Sekunde und Prozess (`Debug.MAX_PER_SECOND`), der Rest wird verworfen und gezählt (`Debug.dropped`). Hat niemand das Topic abonniert, verwirft der Hub das Ereignis.
+
+**Rolle `debug`** (0..1 Prozess, `src/debugview/DebugView.ahk` und `DebugGui.ahk`; Option `--headless`). Eigener Prozess wie der Manager-Stub: nie modal, kein `MsgBox`, keine Dateien. Er abonniert `process`, `log`, `engine`, `debug` und `flow:<id>` (nach `cmd.engine.snapshot`, wie der Stub). Er zeigt: Prozesstabelle (`cmd.process.list` plus Ereignisse), den Snapshot je Rolle (Knopf "Aktualisieren" und Haken "alle 2 s": `cmd.diag.snapshot` an jede bereite Rolle und an `supervisor`, Frist 3 s), das Live-Log mit Filter (Ebene und Quelle), den Ereignisstrom der Engine mit Pause, die `Debug.Dump`-Werte und den Knopf "Bericht exportieren" (`cmd.diag.report {reason: "manual"}`, zeigt den Pfad). Gestartet wird sie mit `--start=debug` oder durch `--command=debug` an eine laufende Instanz (`cmd.app.command`). Schließt der Benutzer das Fenster, beendet sich nur diese Rolle (`sys.bye {clean: true}`, Exit 0); der Supervisor wertet das als normales Ende (`evt.process.exited`, kein `crashed`, kein automatischer Bericht), siehe 4.1a. Sie wird nie automatisch neu gestartet und beim Beenden mit den UIs zuerst beendet (Rang 0, ohne `cmd.app.prepareExit`).
+
+- **Testbefehl `cmd.test.debug` (nur mit `--headless`):** `{ action }` mit `state` (Zähler und Listen des Modells: `processes` Namen, `snapshots` Rollennamen, `logEntries`, `engineEvents`, `dumps` Titel, `paused`, `lastExport`), `refresh` (holt die Snapshots, Antwort nach dem letzten), `export` (löst `cmd.diag.report` aus, Antwort mit dessen Ergebnis), `pause`/`resume`, `filter` (`{level, source}`; Antwort `state`). Andere: `bad_payload`.
+- **Echo-Testbefehl `cmd.test.dump { title, value }`** (Testrolle `echo`): ruft `Debug.Dump(value, title)` auf.
 
 ## 5. Verbindungsaufbau, Wiederverbindung, Resync
 
