@@ -16,7 +16,7 @@
 #Include Shutdown.ahk
 #Include SupervisorCommand.ahk
 
-; Role "supervisor" (doc/ARCHITEKTUR 3, 6; work_items/phase2/WI-07). The supervisor is the hub of the
+; Role "supervisor" (doc/ARCHITECTURE 3, 6; v2-phase2-final:v2-phase2-final:work_items/phase2/WI-07-supervisor.md-supervisor.md). The supervisor is the hub of the
 ; star topology, starts and watches the role processes, and ends the session in two phases. It does
 ; not inherit from Role (it has no peer of its own) and contains no business logic.
 ;
@@ -221,7 +221,7 @@ class Supervisor {
         throw AhfError("unknown command " msg.type, ErrCode.UNKNOWN_TYPE)
     }
 
-    ; The supervisor's own snapshot (doc/PROTOKOLL.md 4.9): general part, hub connections, the process table with
+    ; The supervisor's own snapshot (doc/PROTOCOL.md 4.9): general part, hub connections, the process table with
     ; the output of every child (also of the dead ones), the ring of unhandled errors of all roles, the newest
     ; process events. It has no peer and no role part.
     Snapshot() {
@@ -243,7 +243,7 @@ class Supervisor {
     }
 
     ; The command "debug" (--command=debug of a second instance): starts the debug window if it is not running, else
-    ; asks the running one to come to the front. The answer says which (PROTOKOLL 4.1).
+    ; asks the running one to come to the front. The answer says which (PROTOCOL 4.1).
     _OpenDebug() {
         if (this.children.shuttingDown)
             throw AhfError("the supervisor is shutting down", ErrCode.SHUTTING_DOWN)

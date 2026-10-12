@@ -1,7 +1,7 @@
 #Requires AutoHotkey v2.0
 #Include Errors.ahk
 
-; Process-local ids for messages, flows and instances (doc/PROTOKOLL.md section 2).
+; Process-local ids for messages, flows and instances (doc/PROTOCOL.md section 2).
 ; A counter per process, starting at 1. A_TickCount and random values are not used.
 class Ids {
     static processName := ""

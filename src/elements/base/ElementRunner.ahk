@@ -6,11 +6,11 @@
 #Include ElementRegistry.ahk
 #Include ExecContext.ahk
 
-; The one place where element code is called (doc/KONVENTIONEN.md section 3). No element call
+; The one place where element code is called (doc/CONVENTIONS.md section 3). No element call
 ; happens outside this class. Any exception from element code ends the run with "exception" and the
 ; exception message, so element code cannot crash the engine.
 class ElementRunner {
-    ; Calls to Run longer than this are reported to onSlow (ARCHITEKTUR 2.3, watchdog).
+    ; Calls to Run longer than this are reported to onSlow (ARCHITECTURE 2.3, watchdog).
     static SlowMs := 250
 
     ; Runs cls.Run(ctx, params). params must already be evaluated.

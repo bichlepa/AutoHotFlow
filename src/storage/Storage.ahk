@@ -75,7 +75,7 @@ class Storage extends Role {
         this.On("evt.log.append", (msg) => this._EvtLogAppend(msg))
     }
 
-    ; Role part of the snapshot (doc/PROTOKOLL.md 4.9): queue lengths and the log counters. No file names, no content.
+    ; Role part of the snapshot (doc/PROTOCOL.md 4.9): queue lengths and the log counters. No file names, no content.
     DiagInfo() {
         return Map("queue", Map("requests", this.queue.RequestCount, "log", this.queue.LogCount)
             , "logQueuedEntries", this.logQueuedEntries, "logQueuedChars", this.logQueuedChars
@@ -153,7 +153,7 @@ class Storage extends Role {
         return this._Defer(msg, "var.list", flowId, () => VarFiles.List(this.dataDir, scope, flowId))
     }
 
-    ; cmd.storage.report.write (WI-28, PROTOKOLL 4.9): only the supervisor builds reports. The contents are checked
+    ; cmd.storage.report.write (WI-28, PROTOCOL 4.9): only the supervisor builds reports. The contents are checked
     ; again by ReportFiles (names), the write runs in the request queue like every other file operation.
     _CmdReportWrite(msg) {
         if (msg.from != "supervisor")

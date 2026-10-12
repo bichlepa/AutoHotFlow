@@ -43,7 +43,7 @@ class Message {
         return text ',"payload":' Json.Stringify(Message._WirePayload(this.payload)) "}"
     }
 
-    ; The payload as it goes on the wire (doc/PROTOKOLL.md section 2). Code keeps `ok` as 1/0 (an AHK `if` on
+    ; The payload as it goes on the wire (doc/PROTOCOL.md section 2). Code keeps `ok` as 1/0 (an AHK `if` on
     ; Json.False would be true), so the field is turned into Json.True/Json.False here, the one place every
     ; sender passes: Peer.Send/Reply, hub answers, sys.welcome. The payload itself is not changed (copy).
     ; Other truth values are made with Json.Bool by the code that builds the payload.
@@ -108,7 +108,7 @@ class Message {
         }
     }
 
-    ; Reads the head fields of a serialized envelope without parsing the payload (doc/PROTOKOLL.md 2, the hub
+    ; Reads the head fields of a serialized envelope without parsing the payload (doc/PROTOCOL.md 2, the hub
     ; uses it to route large frames cheaply). Returns "" unless the text is exactly what Serialize writes:
     ; head fields in canonical order, no white space, payload an object that ends right before the last "}".
     ; "" means "take the normal way" (Parse), it is not an error. Anything the fast reading cannot judge

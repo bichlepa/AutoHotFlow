@@ -7,8 +7,8 @@
 #Include Debug.ahk
 #Include ipc\Peer.ahk
 
-; Base class of every role process (doc/ARCHITEKTUR.md 3 and 6, doc/PROTOCOL.md 4.1 and 5).
-; A role is started by src/AutoHotFlow.ahk with the command line of work_items/phase2/README.md:
+; Base class of every role process (doc/ARCHITECTURE.md 3 and 6, doc/PROTOCOL.md 4.1 and 5).
+; A role is started by src/AutoHotFlow.ahk with the command line of v2-phase2-final:work_items/phase2/README.md:
 ;   --role=<name> --session=<id> --hub=<pipe> --data=<dir> [--flow=<flowId>] [--hubHwnd=<n>] [--log-level=<0..3>]
 ;
 ; Subclasses override the hooks and register their own message handlers:
@@ -61,7 +61,7 @@ class Role {
     static Current := ""
 
     ; Console sink for the entry point and the last messages of a role. Writes to stderr only,
-    ; no file (the one exception to KONVENTIONEN section 3, see doc/HOW-TO.md). Call it as
+    ; no file (the one exception to CONVENTIONS section 3, see doc/HOW-TO.md). Call it as
     ; Role.Console(...); ConsoleFn is only the function value for Log.Configure, because a
     ; function stored in a property receives the class as first argument when called as Role.ConsoleFn(...).
     ; A role started by the supervisor has stdout and stderr in an anonymous pipe (WI-23, ChildLauncher): what
@@ -143,7 +143,7 @@ class Role {
     OnPeerLost() {
     }
 
-    ; The role part of the snapshot (doc/PROTOKOLL.md 4.9): a Map of names, ids, counters and states. Never
+    ; The role part of the snapshot (doc/PROTOCOL.md 4.9): a Map of names, ids, counters and states. Never
     ; the content of variables or flows. Must not block and should not throw (a throw becomes info.error).
     DiagInfo() {
         return Map()
@@ -377,7 +377,7 @@ class Role {
         return this.errorTimes.Length > Role.ERROR_LIMIT
     }
 
-    ; The payload of evt.diag.error (PROTOKOLL 4.1c) for an error object. Missing properties become "".
+    ; The payload of evt.diag.error (PROTOCOL 4.1c) for an error object. Missing properties become "".
     static ErrorPayload(name, e, mode) {
         p := Map("name", name, "errorType", Type(e), "mode", String(mode))
         for prop in ["Message", "File", "Line", "Stack"] {

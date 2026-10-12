@@ -2,14 +2,14 @@
 #Include ..\core\Time.ahk
 #Include Children.ahk
 
-; Liveness of the child processes (doc/ARCHITEKTUR 6.2, WI-07): sys.ping every PING_EVERY_MS to each
+; Liveness of the child processes (doc/ARCHITECTURE 6.2, WI-07): sys.ping every PING_EVERY_MS to each
 ; connected ready child, and a child counts as hung when no pong came for PONG_TIMEOUT_MS (three
 ; missed pings). A child that has not said sys.hello within STARTUP_MS (Children) is hung too.
 ; Stand-still of the supervisor itself (frozen process, standby, a long hub backlog): the timestamps of the
 ; children are then old although the children are healthy. The supervisor measures it (Stall, WI-33) and tells
 ; Children.OnStall, before the heartbeat runs: no child is judged by the old timestamps, the pong and ping times and
 ; the start deadlines begin again at "now". A child that is really silent is found one pong timeout later.
-; A busy worker (sys.busy, ARCHITEKTUR 6.4) is left alone: no ping, no pong judgement; its process handle still shows a death.
+; A busy worker (sys.busy, ARCHITECTURE 6.4) is left alone: no ping, no pong judgement; its process handle still shows a death.
 ; Hung children are handed to Children.MarkHung, which sends sys.shutdown and Children.Terminate
 ; after KILL_AFTER_MS. A frozen process (psutil suspend) is found this way; its pipe stays open.
 ;

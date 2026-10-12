@@ -3,7 +3,7 @@
 #Include ..\..\core\Log.ahk
 #Include LoopStack.ahk
 
-; Thread state machine (WI-08, ARCHITEKTUR 5.2, normative).
+; Thread state machine (WI-08, ARCHITECTURE 5.2, normative).
 ;
 ; States follow v1 with one rename: v1 "starting" is "ready" here (v1 Execution Task.ahk:57).
 ; Transitions are only allowed if listed in Transitions. Anything else returns false and is
@@ -26,7 +26,7 @@ class ThreadState {
     ; stopping -> removed: stop acknowledged or deadline
     ; ready -> removed: instance stop before dispatch
     ; finished -> removed: instance stop while the result waits for the dispatcher (not in the
-    ;   table of ARCHITEKTUR 5.2, see WI-08 open question 4)
+    ;   table of ARCHITECTURE 5.2, see WI-08 open question 4)
     static Transitions := Map(
         "ready", ["running", "removed"],
         "running", ["finished", "stopping"],

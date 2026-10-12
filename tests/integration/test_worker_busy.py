@@ -1,4 +1,4 @@
-"""WI-27: sys.busy. A worker with a job is not pinged and not judged by pongs (ARCHITEKTUR 6.4, PROTOKOLL 4.1)."""
+"""WI-27: sys.busy. A worker with a job is not pinged and not judged by pongs (ARCHITECTURE 6.4, PROTOCOL 4.1)."""
 
 import time
 

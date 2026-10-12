@@ -1,9 +1,9 @@
 """WI-28 step e: the role debug (src/debugview/), headless for the tests, and a smoke test of the window.
-doc/PROTOKOLL.md 4.9. The model is tested through cmd.test.debug (headless only); what the window looks like and how it
+doc/PROTOCOL.md 4.9. The model is tested through cmd.test.debug (headless only); what the window looks like and how it
 reacts to the mouse is for the project owner (WI-28 result, "Handpruefung").
 
 --command=debug is the second instance of the entry point: it hands the command to the running supervisor (exit 0) and
-the supervisor starts the role if it is not running (PROTOKOLL 4.1, cmd.app.command).
+the supervisor starts the role if it is not running (PROTOCOL 4.1, cmd.app.command).
 """
 
 import ctypes

@@ -1,4 +1,4 @@
-"""Name of the hub pipe of a supervisor (WI-22 point 5, doc/PROTOKOLL.md section 1).
+"""Name of the hub pipe of a supervisor (WI-22 point 5, doc/PROTOCOL.md section 1).
 
 Python twin of src/core/PipeNames.ahk: ahf.s<windows session id>.u<8 hex digits of the FNV-1a hash of the user SID>.<session>.hub
 Tests ask this function instead of building the name themselves, so there is one place to change.

@@ -1,4 +1,4 @@
-"""Frame and envelope rules of PROTOKOLL 1 (pure Python, no process needed)."""
+"""Frame and envelope rules of PROTOCOL 1 (pure Python, no process needed)."""
 
 import json
 import struct

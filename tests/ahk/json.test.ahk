@@ -306,7 +306,7 @@ CheckBoolWritesTrueFalse() {
 }
 
 CheckBoolReadsAsOneAndZero() {
-    ; Reading stays 1/0 on purpose: AHK has no Bool type and `if x` must work (doc/PROTOKOLL.md section 2).
+    ; Reading stays 1/0 on purpose: AHK has no Bool type and `if x` must work (doc/PROTOCOL.md section 2).
     m := Json.Parse('{"a":true,"b":false}')
     Assert.Equal(m["a"], 1)
     Assert.Equal(Type(m["a"]), "Integer")

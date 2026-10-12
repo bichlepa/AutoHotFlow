@@ -3,7 +3,7 @@
 #Include ..\core\Log.ahk
 #Include ..\core\Role.ahk
 
-; Log sink of the supervisor and collector of the unhandled errors of the roles (WI-23, doc/ARCHITEKTUR.md 6.2).
+; Log sink of the supervisor and collector of the unhandled errors of the roles (WI-23, doc/ARCHITECTURE.md 6.2).
 ; The supervisor is not a Role and has no peer, so it cannot use Role's log queue. Every entry goes
 ;   1. to the console (stderr), as before, and
 ;   2. as evt.log.append straight through the hub to "storage" (sender "supervisor"), while storage is
@@ -65,7 +65,7 @@ class DiagLog {
     ; Counters for the tests and the report: entries waiting and entries dropped from the queue.
     Stats() => Map("queued", this.queue.Length, "dropped", this.dropped)
 
-    ; evt.diag.error of a role: kept in the ring and logged. payload is the Map of PROTOKOLL 4.1c. doLog false: the caller has logged it already.
+    ; evt.diag.error of a role: kept in the ring and logged. payload is the Map of PROTOCOL 4.1c. doLog false: the caller has logged it already.
     AddError(from, payload, doLog := true) {
         if (Type(payload) != "Map")
             payload := Map("message", String(payload))

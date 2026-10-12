@@ -1,13 +1,13 @@
 #Requires AutoHotkey v2.0
 
-; Window of the manager stub (work_items/phase2/WI-13). Shows the flow list, the element states of the
+; Window of the manager stub (v2-phase2-final:v2-phase2-final:work_items/phase2/WI-13-ui-stub.md). Shows the flow list, the element states of the
 ; selected flow and a status line (connection, epoch, seq, counters, last command latency). Buttons:
 ; Start, Stop (selected flow), Beenden (cmd.app.exit). Closing the window means Beenden.
 ;
 ; Not modal: Gui.Show, no MsgBox, no InputBox, no blocking call. The view has no logic: StubManager
 ; builds the model (ViewModel) and calls Render at most 20 times per second, and only after a change.
 ; Labels are ASCII on purpose (the stub has no Lang() yet, and the script encoding is not checked for
-; umlauts). Layout test: work_items/phase2/WI-13-ui-stub.md, section "Testanleitung GUI".
+; umlauts). Layout test: doc/MANUAL-CHECKS.md, section "Manager stub".
 class StubGui {
     __New(manager) {
         this.manager := manager

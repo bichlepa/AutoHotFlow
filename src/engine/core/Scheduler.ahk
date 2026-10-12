@@ -4,7 +4,7 @@
 #Include Instance.ahk
 #Include FlowDefinition.ahk
 
-; Choice of the next connection after an element finished (WI-08, ARCHITEKTUR 5.2).
+; Choice of the next connection after an element finished (WI-08, ARCHITECTURE 5.2).
 ;
 ; Port of the finished branch of executionTask in
 ; v1/Source_Execution/Execution Task/Execution Task.ahk, lines 98 to 170:

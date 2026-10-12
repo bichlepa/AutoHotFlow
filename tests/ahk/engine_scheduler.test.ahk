@@ -1,5 +1,5 @@
 #Requires AutoHotkey v2.0
-; Unit tests for src/engine/core/Scheduler.ahk (WI-08, ARCHITEKTUR 5.2, v1 Execution Task.ahk 98-170).
+; Unit tests for src/engine/core/Scheduler.ahk (WI-08, ARCHITECTURE 5.2, v1 Execution Task.ahk 98-170).
 #Include lib\Assert.ahk
 #Include ..\..\src\engine\core\Scheduler.ahk
 #Include ..\..\src\engine\core\FlowDefinition.ahk

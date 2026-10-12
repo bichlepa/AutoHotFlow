@@ -15,7 +15,7 @@
 ; Blocking and pings: AHK v2 has one thread per process. Between script lines AHK checks for
 ; window messages, so an element that waits in short slices (Sleep, or a loop of DllCall("Sleep", 100))
 ; still answers sys.ping and cancel. A single long blocking call (download, COM call, long DllCall) does not.
-; Since WI-27 (decision E3, ARCHITEKTUR 6.4) that is allowed: the worker reports to the supervisor when a job
+; Since WI-27 (decision E3, ARCHITECTURE 6.4) that is allowed: the worker reports to the supervisor when a job
 ; begins and ends (sys.busy {busy}). The supervisor neither pings a busy worker nor judges its pongs, so a long
 ; blocking call does not make it "hung". The decision of WI-11 ("no heartbeat tolerance") is replaced by this.
 ; What stays: a busy worker whose process dies is seen at once (process handle). One that blocks for ever ends
@@ -40,7 +40,7 @@ class Worker extends Role {
         this.On("cmd.worker.cancel", (msg) => this._CmdCancel(msg))
     }
 
-    ; Role part of the snapshot (doc/PROTOKOLL.md 4.9): the current job (class and execId, no parameters), or "".
+    ; Role part of the snapshot (doc/PROTOCOL.md 4.9): the current job (class and execId, no parameters), or "".
     DiagInfo() {
         job := this._job
         if (!IsObject(job))

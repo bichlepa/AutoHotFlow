@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
-; Unit tests for src/engine/core/ThreadState.ahk and Instance.ahk (WI-08, ARCHITEKTUR 5.1, 5.2).
-; The expected transitions below are copied from the tables in doc/ARCHITEKTUR.md, not from the code.
+; Unit tests for src/engine/core/ThreadState.ahk and Instance.ahk (WI-08, ARCHITECTURE 5.1, 5.2).
+; The expected transitions below are copied from the tables in doc/ARCHITECTURE.md, not from the code.
 #Include lib\Assert.ahk
 #Include ..\..\src\engine\core\Instance.ahk
 #Include ..\..\src\core\Log.ahk
@@ -301,8 +301,8 @@ RunningInstanceCannotWait() {
 
 TestRun.Init()
 
-TestRun.Case("ThreadState: every pair of states matches the table of ARCHITEKTUR 5.2", ThreadTableMatches)
-TestRun.Case("Instance: every pair of states matches the table of ARCHITEKTUR 5.1", InstanceTableMatches)
+TestRun.Case("ThreadState: every pair of states matches the table of ARCHITECTURE 5.2", ThreadTableMatches)
+TestRun.Case("Instance: every pair of states matches the table of ARCHITECTURE 5.1", InstanceTableMatches)
 TestRun.Case("Thread: late Finish is ignored without an invalid report", LateFinishIsIgnored)
 TestRun.Case("Thread: Finish stores result and message after running", FinishStoresResult)
 TestRun.Case("Thread: Clone copies state and deep-copies the loop stack", CloneIsDeep)

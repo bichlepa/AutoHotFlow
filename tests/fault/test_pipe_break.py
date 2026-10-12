@@ -1,4 +1,4 @@
-"""WI-15: a pipe breaks while the processes live (PROTOCOL 5, ARCHITEKTUR 6.2).
+"""WI-15: a pipe breaks while the processes live (PROTOCOL 5, ARCHITECTURE 6.2).
 
 Four cases:
   1. A client closes its pipe abruptly (many times): the hub cleans up, no handle leak, the chain answers.

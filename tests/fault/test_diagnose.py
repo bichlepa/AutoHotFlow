@@ -1,5 +1,5 @@
 """WI-23: diagnosis. Where do the messages of the supervisor, the stderr of the children and the unhandled
-errors of the roles end up? (doc/ARCHITEKTUR.md 6.2, doc/PROTOKOLL.md 4.1 and 4.6)
+errors of the roles end up? (doc/ARCHITECTURE.md 6.2, doc/PROTOCOL.md 4.1 and 4.6)
 
 All tests run a real supervisor with its real children (faultkit.Chain). The test role echo
 (tests/integration/helpers/EchoRole.ahk) writes to stderr, to the log and throws errors on request.

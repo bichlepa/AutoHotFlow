@@ -12,7 +12,7 @@
 ;
 ; Never modal: Gui.Show, no MsgBox, no InputBox, no blocking call. Labels are ASCII (no Lang() yet).
 ; The list controls are rebuilt only for the visible tab and only when its section changed (DebugView.rev).
-; How to check it by hand: work_items/phase2b/WI-28-diagnose-bericht-debugfenster.md, "Handpruefung".
+; How to check it by hand: doc/MANUAL-CHECKS.md, section "Debug window".
 class DebugGui {
     static MARGIN := 10
     static TOP_ROW := 34

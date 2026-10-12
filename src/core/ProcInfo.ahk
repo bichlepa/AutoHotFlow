@@ -2,7 +2,7 @@
 #Include Errors.ahk
 #Include AhfVersion.ahk
 
-; Facts about the own process, for the snapshot (doc/PROTOKOLL.md 4.9). Every call is a quick Windows API
+; Facts about the own process, for the snapshot (doc/PROTOCOL.md 4.9). Every call is a quick Windows API
 ; call on the pseudo handle of the current process; nothing blocks and nothing throws (a failed call gives 0).
 ;
 ;   ProcInfo.Rss()         working set in bytes (GetProcessMemoryInfo)

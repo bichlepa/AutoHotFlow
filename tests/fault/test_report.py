@@ -1,5 +1,5 @@
 """WI-28 step c: the crash report (cmd.diag.report, automatic reports, storage's Reports/ folder).
-doc/PROTOKOLL.md 4.9, doc/ARCHITEKTUR.md 6.2.
+doc/PROTOCOL.md 4.9, doc/ARCHITECTURE.md 6.2.
 
 Real supervisor with its real children (faultkit.Chain). The evidence is the folder Reports/<stamp>_<reason>/ in
 the data directory (written by storage) and the answers of the supervisor. Waits are for events or folders; the

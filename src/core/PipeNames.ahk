@@ -1,7 +1,7 @@
 #Requires AutoHotkey v2.0
 #Include Errors.ahk
 
-; The names the supervisor and the second instance use to find each other (WI-22 point 5, doc/PROTOKOLL.md 1).
+; The names the supervisor and the second instance use to find each other (WI-22 point 5, doc/PROTOCOL.md 1).
 ; One place for all of them: the roles do not build the hub name, they get it with --hub=<name>.
 ;
 ;   PipeNames.Hub("main")     -> "ahf.s1.u1a2b3c4d.main.hub"

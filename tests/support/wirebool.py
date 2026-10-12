@@ -1,4 +1,4 @@
-"""Strict check for boolean fields on the wire (WI-26, doc/PROTOKOLL.md section 2).
+"""Strict check for boolean fields on the wire (WI-26, doc/PROTOCOL.md section 2).
 
 AHK writes truth values as JSON true/false. Python decodes them to bool, so a field that falls back
 to 1/0 shows up as int. `is_bool` is the strict test for one value; every frame the Python test

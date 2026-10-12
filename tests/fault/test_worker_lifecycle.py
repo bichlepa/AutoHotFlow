@@ -1,4 +1,4 @@
-"""WI-27: life cycle of the worker pool under the real supervisor, storage and engine (ARCHITEKTUR 6.4).
+"""WI-27: life cycle of the worker pool under the real supervisor, storage and engine (ARCHITECTURE 6.4).
 
 A Chain (faultkit) is a supervisor with storage and engine as children, plus a Python observer. The pool
 options of the engine (--workers, --warm-workers, --worker-idle-ms) are passed on by the supervisor. The

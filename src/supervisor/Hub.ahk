@@ -10,7 +10,7 @@
 #Include ..\core\ipc\PipeListener.ahk
 #Include ..\core\ipc\Wake.ahk
 
-; The hub of the star topology (doc/ARCHITEKTUR.md D6, doc/PROTOKOLL.md 1, 2, 3, 5).
+; The hub of the star topology (doc/ARCHITECTURE.md D6, doc/PROTOCOL.md 1, 2, 3, 5).
 ; Owned by the supervisor. It accepts pipe clients, performs the handshake (sys.hello/sys.welcome),
 ; routes messages by `to`, keeps the topic subscriptions and answers the messages addressed to
 ; "supervisor". It contains no business logic: the supervisor registers handlers with On().
@@ -49,7 +49,7 @@ class Hub {
     static ACCEPTS_PER_PUMP := 64
     ; A forwarded request is forgotten this long after its own deadline (the sender has given up by then; the slack
     ; covers the tick of the hub and a sender whose clock runs a little behind). A request without timeoutMs is kept
-    ; for ROUTED_DEFAULT_MS, the longest standard deadline of the protocol (storage operations, PROTOKOLL 2).
+    ; for ROUTED_DEFAULT_MS, the longest standard deadline of the protocol (storage operations, PROTOCOL 2).
     static ROUTED_SLACK_MS := 1000
     static ROUTED_DEFAULT_MS := 30000
 
@@ -232,7 +232,7 @@ class Hub {
     ; The newest events of the topic "process" (copies of the list, oldest first).
     ProcessEvents() => this._processEvents.Clone()
 
-    ; Connections for the snapshot (doc/PROTOKOLL.md 4.9): per client the pid, the send queue and the topics.
+    ; Connections for the snapshot (doc/PROTOCOL.md 4.9): per client the pid, the send queue and the topics.
     Stats() {
         links := []
         for name, link in this._links {

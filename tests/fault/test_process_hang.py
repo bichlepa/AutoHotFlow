@@ -1,6 +1,6 @@
 """WI-15: a role process is frozen (psutil suspend). UI stub, engine and storage.
 
-Expected (ARCHITEKTUR 6.2, PROTOCOL 4.1a): the supervisor misses three pongs (pings every 2 s, pong timeout
+Expected (ARCHITECTURE 6.2, PROTOCOL 4.1a): the supervisor misses three pongs (pings every 2 s, pong timeout
 6 s), reports evt.process.hung within HANG_BUDGET_S of the freeze, sends sys.shutdown, terminates the
 process after KILL_AFTER_MS, and reports evt.process.crashed with reason "hung". From there it is handled
 like a crash: engine and storage restart by policy, the UI does not. The rest of the system keeps working.

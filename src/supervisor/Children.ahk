@@ -7,14 +7,14 @@
 #Include ..\core\RoleRegistry.ahk
 #Include ChildLauncher.ahk
 
-; The role processes started by the supervisor (doc/ARCHITEKTUR.md 3, 5.3, 6.2).
+; The role processes started by the supervisor (doc/ARCHITECTURE.md 3, 5.3, 6.2).
 ; One record per child, keyed by its name ("echo" or "echo:a", as the role sees itself).
 ;
 ;   children := Children(config, hub)     ; config Map: session, pipe, data, hubHwnd, testRoles, script
 ;   children.Spawn("echo:a")              ; starts AutoHotkey with --role=echo --flow=a ...
 ;   children.Tick(now)                    ; called by the supervisor's timer: process exits, restarts
 ;
-; States (ARCHITEKTUR 5.3): starting -> ready (sys.hello) -> stopping (sys.shutdown sent) -> exited;
+; States (ARCHITECTURE 5.3): starting -> ready (sys.hello) -> stopping (sys.shutdown sent) -> exited;
 ; hung (no pong, or startup timeout), crashed (the process ended without being asked to).
 ; Events on topic "process": started, restarted, ready, hung, crashed, exited (PROTOCOL 3).
 ;
@@ -29,7 +29,7 @@
 ; writes each line as a log entry (level a0, source = role name, text "[<name>] <line>"); the last
 ; OUTPUT_RING_MAX lines of every child stay in memory after the process has ended (Output(name), for the
 ; crash report). When a process ends, the rest of its output is read first, then the handles are closed.
-; Workers (WI-27, ARCHITEKTUR 6.4): the engine asks for them (SpawnWorker) and ends them (KillWorker); they are never
+; Workers (WI-27, ARCHITECTURE 6.4): the engine asks for them (SpawnWorker) and ends them (KillWorker); they are never
 ; restarted here. A worker that reports sys.busy is not pinged and not judged by pongs (OnBusy, IsBusy). Records of
 ; ended workers are kept for diagnosis, but only the last GONE_WORKERS_KEEP of them.
 ; Restart policy: only roles in AUTO_RESTART restart by themselves, at most RESTART_MAX times within
@@ -259,7 +259,7 @@ class Children {
     ; True once the hung child is due for TerminateProcess (after KILL_AFTER_MS).
     KillDue(name, now) => this._recs[name]["killAt"] > 0 && now >= this._recs[name]["killAt"] && !this._recs[name]["gone"]
 
-    ; The process table for the supervisor's snapshot (doc/PROTOKOLL.md 4.9): every record, also of ended
+    ; The process table for the supervisor's snapshot (doc/PROTOCOL.md 4.9): every record, also of ended
     ; children, with the restart count, the exit code and the last lines of their output.
     Describe() {
         list := []
@@ -421,7 +421,7 @@ class Children {
         }
     }
 
-    ; Living children grouped by shutdown rank (ARCHITEKTUR 6.3): UI first, storage last.
+    ; Living children grouped by shutdown rank (ARCHITECTURE 6.3): UI first, storage last.
     ; Returns an Array of Arrays of names, ordered by rank.
     ShutdownGroups() {
         ranks := Map()

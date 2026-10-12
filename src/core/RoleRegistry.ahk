@@ -3,7 +3,7 @@
 #Include Role.ahk
 #Include PlaceholderRole.ahk
 
-; Maps the role name of --role to its class (work_items/phase2/WI-06). Lookup is case-insensitive.
+; Maps the role name of --role to its class (v2-phase2-final:work_items/phase2/WI-06-role-basis.md). Lookup is case-insensitive.
 ; Each role file ends with RoleRegistry.Register(<name>, <class>); the entry point includes the
 ; role files, there is no dynamic loading. Names with a suffix ("editor:Flow 1") are looked up
 ; by their base name ("editor").

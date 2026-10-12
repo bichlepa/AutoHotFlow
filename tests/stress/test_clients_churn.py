@@ -5,7 +5,7 @@ connect, subscribe to the topics of the engine and the flow, ask for a snapshot,
 close. The probe client asks `cmd.engine.snapshot` all the time and measures the answer latency.
 
 Expected: no error in any client, no unanswered request, the snapshot latency stays in the budget of
-ARCHITEKTUR 9 (median under 5 ms, p99 under 50 ms), no process restarted, and the handles of the supervisor
+ARCHITECTURE 9 (median under 5 ms, p99 under 50 ms), no process restarted, and the handles of the supervisor
 and of the engine are the same before and after (no leak per connection).
 
 The smoke variant runs in the default test run, the full one with `-m stress`.

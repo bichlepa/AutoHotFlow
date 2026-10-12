@@ -1,7 +1,7 @@
 #Requires AutoHotkey v2.0
 #Include Errors.ahk
 
-; JSON reader and writer (WI-02, doc/ARCHITEKTUR.md section 7, work_items/phase2/README.md contract).
+; JSON reader and writer (WI-02, doc/ARCHITECTURE.md section 7, v2-phase2-final:work_items/phase2/README.md contract).
 ;
 ; Types are kept: a JSON string becomes String, a JSON number without point or exponent becomes
 ; Integer, any other number becomes Float. So "zoomFactor": "0.700000" stays a String and "x": 7
@@ -26,7 +26,7 @@ class Json {
     ; Types of the JSON true and false values for writing. Use them through Json.True, Json.False and
     ; Json.Bool only. AHK v2 has no Bool type and every object is truthy, so Json.False is TRUTHY in an
     ; `if`. Never keep these values in program state: use 1 and 0 there and convert with Json.Bool
-    ; when the message is built (doc/PROTOKOLL.md section 2).
+    ; when the message is built (doc/PROTOCOL.md section 2).
     class TrueValue {
     }
 

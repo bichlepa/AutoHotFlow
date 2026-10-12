@@ -83,7 +83,7 @@ class Peer {
     ; Number of requests waiting for an answer. Every one of them owns exactly one timer.
     PendingCount => this._pending.Count
 
-    ; Counters for the snapshot (doc/PROTOKOLL.md 4.9): the peer's own and those of the connection (send queue,
+    ; Counters for the snapshot (doc/PROTOCOL.md 4.9): the peer's own and those of the connection (send queue,
     ; failed handlers). Cheap and without side effects.
     Stats() {
         conn := this._conn

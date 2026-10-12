@@ -1,7 +1,7 @@
 """Measurement helpers of the stress tests (WI-16): latency distributions, process memory/handles/CPU.
 
 record() prints a `MEASURE` line and, if AHF_MEASURE_OUT names a file, appends one JSON line to it, so a run
-can be collected into work_items/phase2/measurements.md afterwards.
+can be collected into doc/MEASUREMENTS.md afterwards.
 """
 
 import json

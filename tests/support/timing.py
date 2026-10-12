@@ -1,6 +1,6 @@
-"""Upper time limits of the tests under parallel load (WI-32, doc/TESTSTRATEGIE.md, section "Zeitgrenzen").
+"""Upper time limits of the tests under parallel load (WI-32, doc/TEST-STRATEGY.md, section "Zeitgrenzen").
 
-A limit like "the role exits within 1 s" is a promise of the product (ARCHITEKTUR 6). It can only be measured
+A limit like "the role exits within 1 s" is a promise of the product (ARCHITECTURE 6). It can only be measured
 exactly when the machine does nothing else. The standard run is parallel (pytest-xdist, one test process per CPU,
 each test starting several AutoHotkey processes), so a process can be descheduled for a few hundred ms and miss
 such a limit without any defect (1.158 s against a limit of 1.0 s was seen).

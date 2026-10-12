@@ -93,7 +93,7 @@ class Engine extends Role {
             this._WaitForStorage()
     }
 
-    ; Role part of the snapshot (doc/PROTOKOLL.md 4.9): loaded flows, instances with threads, the worker pool.
+    ; Role part of the snapshot (doc/PROTOCOL.md 4.9): loaded flows, instances with threads, the worker pool.
     DiagInfo() {
         flows := []
         for rec in this.flows.All() {

@@ -3,13 +3,13 @@
 #Include ..\..\core\Log.ahk
 #Include ThreadState.ahk
 
-; Instance state machine (WI-08, ARCHITEKTUR 5.1, normative).
+; Instance state machine (WI-08, ARCHITECTURE 5.1, normative).
 ;
 ; One instance = one run of a flow, started by a trigger. It holds its threads. The instance
 ; ends when its last thread is removed (v1 removeThread / removeInstance, Instances and
 ; Threads.ahk).
 ;
-; The row "(new) + policy skip" of ARCHITEKTUR 5.1 is not a transition: no instance is created.
+; The row "(new) + policy skip" of ARCHITECTURE 5.1 is not a transition: no instance is created.
 ; ExecutionPolicy.Decide returns "skip" and the caller reports the callback "skipped".
 ;
 ; Invalid transitions return false and go to OnInvalid(from, to, reason) or the a0 log, as in
@@ -31,7 +31,7 @@ class Instance {
         "ended", []
     )
 
-    ; Deadline in ms for a stopping instance (ARCHITEKTUR 5.1). The caller uses it for its timer.
+    ; Deadline in ms for a stopping instance (ARCHITECTURE 5.1). The caller uses it for its timer.
     static StopDeadlineMs := 2000
 
     __New(id, flowId, onInvalid := "") {

@@ -3,7 +3,7 @@
 #Include StoragePaths.ahk
 #Include AtomicFile.ahk
 
-; Crash and diagnostic reports in <data>/Reports/ (WI-28, doc/PROTOKOLL.md 4.9). The supervisor builds the
+; Crash and diagnostic reports in <data>/Reports/ (WI-28, doc/PROTOCOL.md 4.9). The supervisor builds the
 ; contents (it never writes files) and sends them as cmd.storage.report.write; this class writes them.
 ;
 ;   Reports/<yyyyMMdd-HHmmss>_<reason>/        one folder per report ("-2", "-3" ... when the name exists)

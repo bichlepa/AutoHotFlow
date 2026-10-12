@@ -133,7 +133,7 @@ def wait_ready(obs, timeout=READY_TIMEOUT_S):
 def ask(obs, type_, payload=None, timeout=5.0):
     """Sends a request to the engine and returns its payload (the answer must not be an error)."""
     answer = obs.request("engine", type_, payload or {}, timeout=timeout)
-    assert answer["payload"].get("ok") is True, answer   # a real JSON boolean (PROTOKOLL 2)
+    assert answer["payload"].get("ok") is True, answer   # a real JSON boolean (PROTOCOL 2)
     return answer["payload"]
 
 

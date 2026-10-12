@@ -1,4 +1,4 @@
-"""Shared helpers of the fault injection tests (WI-15, doc/TESTSTRATEGIE.md 2, level L4).
+"""Shared helpers of the fault injection tests (WI-15, doc/TEST-STRATEGY.md 2, level L4).
 
 A Chain is one supervisor (tools/ahkrun.py -> src/AutoHotFlow.ahk) with its real child roles, plus a
 Python observer client ("obs") that subscribes to the process topic and records every event with its
@@ -7,7 +7,7 @@ arrival time. Roles are found by name through cmd.process.list (the pid is the o
 Every process of a test carries the unique session id in its command line (--session=<id>). That is how
 a test finds its own leftovers (session_processes) and never touches a process that is not its own.
 
-Budgets (WI-15 acceptance, PROTOCOL 4.1a, ARCHITEKTUR 6.2) are constants here, so the tests and the
+Budgets (WI-15 acceptance, PROTOCOL 4.1a, ARCHITECTURE 6.2) are constants here, so the tests and the
 measurement notes use the same numbers.
 
 Repetition: AHF_FAULT_REPEAT=<n> runs every scenario n times (acceptance: 20). The default is 1, so the
@@ -41,7 +41,7 @@ EXIT_FORCED = 5
 EXIT_HUB_LOST = 4          # Role.EXIT_HUB_LOST (orphan guard)
 
 START_BUDGET_S = 10.0      # all children ready (generous for a loaded machine; measured values are printed)
-CRASH_BUDGET_S = scaled(1.0)  # evt.process.crashed within 1 s of the death (ARCHITEKTUR 6.2)
+CRASH_BUDGET_S = scaled(1.0)  # evt.process.crashed within 1 s of the death (ARCHITECTURE 6.2)
 HANG_BUDGET_S = scaled(8.0)        # frozen process reported hung within 8 s (WI-15)
 CLEAN_EXIT_BUDGET_S = scaled(2.0)  # healthy roles: exit within 2 s (WI-15 shutdown)
 ORPHAN_BUDGET_S = 3.0 + scaled(2.0)  # Role.ORPHAN_MS (3 s) plus slack (WI-15 orphans)

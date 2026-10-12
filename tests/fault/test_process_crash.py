@@ -1,13 +1,13 @@
 """WI-15: a role process is killed hard (TerminateProcess). Engine, storage, manager stub and worker.
 
-Expected for each role (ARCHITEKTUR 6.2, PROTOCOL 4.1a, 4.1 restart policy):
+Expected for each role (ARCHITECTURE 6.2, PROTOCOL 4.1a, 4.1 restart policy):
   - the supervisor reports evt.process.crashed (reason "exited") within CRASH_BUDGET_S of the death,
   - the restart follows the policy: engine and storage restart (attempt 1), manager and worker do not,
   - the other roles keep their pid and stay ready,
   - a request to a role that is down is answered at once (not_found), it does not hang.
 
 Every test runs REPEATS times (AHF_FAULT_REPEAT, acceptance 20). Times are printed as MEASURE lines and
-recorded in work_items/phase2/WI-15-fault-injection.md, section Ergebnis.
+recorded in v2-phase2-final:work_items/phase2/WI-15-fault-injection.md, section Ergebnis.
 """
 
 import json

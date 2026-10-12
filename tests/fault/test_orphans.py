@@ -1,4 +1,4 @@
-"""WI-15: the supervisor is killed hard. Its children must not survive it (orphan guard, ARCHITEKTUR 6.3).
+"""WI-15: the supervisor is killed hard. Its children must not survive it (orphan guard, ARCHITECTURE 6.3).
 
 Each role keeps trying to reach the hub for ORPHAN_MS (3 s) and then ends with exit 4 (Role.EXIT_HUB_LOST).
 The budget of the test is ORPHAN_BUDGET_S (3 s plus 2 s of slack, WI-15). Nothing may be left behind.

@@ -1,5 +1,5 @@
 #Requires AutoHotkey v2.0
-; Unit tests for the execution policy "wait" in src/engine/Executor.ahk (WI-21, ARCHITEKTUR 5.1, E2, M-11).
+; Unit tests for the execution policy "wait" in src/engine/Executor.ahk (WI-21, ARCHITECTURE 5.1, E2, M-11).
 #Include helpers\ExecutorKit.ahk
 
 WaitFlow() {

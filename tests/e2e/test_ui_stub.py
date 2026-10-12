@@ -16,7 +16,7 @@ stub.command with the send time of a forwarded command, so the arrival latency i
 clock. Python requests reach the hub on its 250 ms fallback timer, so times that start with a Python
 send are not used; only stub.command -> event arrival is measured.
 
-The GUI (StubGui) is not tested here: see work_items/phase2/WI-13-ui-stub.md, "Testanleitung GUI".
+The GUI (StubGui) is not tested here: see v2-phase2-final:work_items/phase2/WI-13-ui-stub.md, "Testanleitung GUI".
 """
 
 import json

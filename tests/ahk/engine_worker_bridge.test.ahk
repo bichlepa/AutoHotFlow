@@ -1,5 +1,5 @@
 #Requires AutoHotkey v2.0
-; Unit tests for the pool rules in src/engine/WorkerBridge.ahk (WI-27, ARCHITEKTUR 6.4): size limit, demand, warm
+; Unit tests for the pool rules in src/engine/WorkerBridge.ahk (WI-27, ARCHITECTURE 6.4): size limit, demand, warm
 ; workers, idle end, failures and the storm limit, cancel that is not confirmed, job deadline, orphans at the start.
 ; No process is started: the owner is a stand-in whose peer records every request. The tests answer them by hand.
 ; Timers run while Sleep() pumps messages.

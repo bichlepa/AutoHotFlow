@@ -4,7 +4,7 @@
 
 ; Test element for WI-27: blocks in ONE call for 7.5 s (longer than the supervisor's pong timeout of 6 s), then
 ; finishes "normal". The worker answers no ping and no cancel meanwhile. It shows that a busy worker is not
-; declared hung (ARCHITEKTUR 6.4).
+; declared hung (ARCHITECTURE 6.4).
 class Action_TestLongBlockWorker extends AhfElement {
     static Mode := "worker"
     static Level := "Programmer"

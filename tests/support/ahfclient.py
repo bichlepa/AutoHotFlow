@@ -1,4 +1,4 @@
-"""Python client for the AutoHotFlow v2 IPC protocol (doc/PROTOKOLL.md, protocol version 1).
+"""Python client for the AutoHotFlow v2 IPC protocol (doc/PROTOCOL.md, protocol version 1).
 
 Frame: uint32 little endian length + UTF-8 JSON. Envelope key order: to, from, id, type,
 corr, timeoutMs, payload (head fields first, so a hub can route without parsing the payload).

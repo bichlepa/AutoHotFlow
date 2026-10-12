@@ -1,7 +1,7 @@
 #Requires AutoHotkey v2.0
 #Include ..\..\core\Errors.ahk
 
-; Execution policy decision for a new instance of a flow (WI-08, ARCHITEKTUR 5.1).
+; Execution policy decision for a new instance of a flow (WI-08, ARCHITECTURE 5.1).
 ;
 ; Source in v1 (read, not run):
 ;   - v1/Source_Execution/Execution Task/Instances and Threads.ahk, function newInstance,
@@ -13,7 +13,7 @@
 ;     reads the policy again, but from the flow root key "ExecutionPolicy", which does not exist
 ;     in v1 flows (the key is under flowSettings, see v1/Source_Common/Flows/Load.ahk:230).
 ;     For "wait" the dispatcher lets only the first running instance of a flow go on. In v1 this
-;     gate is therefore unreachable (see work_items/phase2/WI-08-engine-core.md, open question 1).
+;     gate is therefore unreachable (see v2-phase2-final:work_items/phase2/WI-08-engine-core.md, open question 1).
 ;   - Global default: v1/Source_Common/Settings/Settings.ahk:14 ("parallel").
 ;   - Valid values: v1/Source_Common/Flows/Load.ahk:231 ("default", "parallel", "skip", "wait",
 ;     "stop"). Comparison is case-insensitive (v1 "=").

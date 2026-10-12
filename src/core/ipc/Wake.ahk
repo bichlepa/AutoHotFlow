@@ -1,7 +1,7 @@
 #Requires AutoHotkey v2.0
 #Include ..\Log.ahk
 
-; Wake-up of a process that waits for pipe data (doc/ARCHITEKTUR.md 2.2).
+; Wake-up of a process that waits for pipe data (doc/ARCHITECTURE.md 2.2).
 ; The sender posts WM_AHF_WAKE to the peer's script window after each write; the receiver pumps
 ; its connections on that message and, as a safety net, on a fallback timer (250 ms), so a lost
 ; wake-up only delays delivery.

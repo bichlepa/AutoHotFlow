@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 ; Unit tests for the order of work in Supervisor._Tick and the heartbeat rules (WI-22, F-06, F-11,
-; doc/ARCHITEKTUR.md 6.2). No process of the roles is started: Children works on hand-made records,
+; doc/ARCHITECTURE.md 6.2). No process of the roles is started: Children works on hand-made records,
 ; the hub is a fake whose Pump() delivers what "has already arrived".
 #Include lib\Assert.ahk
 #Include ..\..\src\supervisor\Supervisor.ahk

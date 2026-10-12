@@ -2,7 +2,7 @@
 #Include ..\..\core\Errors.ahk
 #Include ..\..\core\Json.ahk
 
-; Flow model in the v1 file format (WI-08, ARCHITECTURE 7, work_items/phase2/README.md).
+; Flow model in the v1 file format (WI-08, ARCHITECTURE 7, v2-phase2-final:work_items/phase2/README.md).
 ;
 ; Reads the parsed v1 flow JSON (Json.Parse, types kept) and offers lookups by element and
 ; connection ID. Nothing is changed: Raw is the parsed Map, unknown keys stay in it.
@@ -19,7 +19,7 @@
 ; Maps keyed by ID use CaseSense "Off", as the v1 object keys do.
 class FlowDefinition {
     ; Builds the model from the text of a flow file. Errors are AhfError with a readable
-    ; message, never a crash. rev is the committed revision (see ARCHITEKTUR 4.2).
+    ; message, never a crash. rev is the committed revision (see ARCHITECTURE 4.2).
     static FromText(flowId, text, rev := 1) {
         try {
             raw := Json.Parse(text)

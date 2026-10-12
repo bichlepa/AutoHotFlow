@@ -3,7 +3,7 @@
 #Include ..\core\Time.ahk
 #Include Children.ahk
 
-; Ending the session in two phases (doc/ARCHITEKTUR 6.3, WI-07).
+; Ending the session in two phases (doc/ARCHITECTURE 6.3, WI-07).
 ;
 ; Phase 1, prepare (cancellable, no deadline): cmd.app.prepareExit goes to every connected manager and
 ; editor. Any answer with cancel:true stops the exit (evt.app.exitCancelled, nothing is stopped). A
@@ -26,7 +26,7 @@ class Shutdown {
     static EXIT_FORCED := 5
     static KILL_WAIT_MS := 1500
     ; Upper bound for the answers to cmd.app.prepareExit (10 minutes). It is not a hard deadline of the exit
-    ; (ARCHITEKTUR 6.3 has none for phase 1): a UI may take long to decide, but a request must still end.
+    ; (ARCHITECTURE 6.3 has none for phase 1): a UI may take long to decide, but a request must still end.
     ; When it passes, the UI counts as "no cancel" and the exit goes on. Not sent to the UIs, not a protocol value.
     static PREPARE_LIMIT_MS := 600000
 

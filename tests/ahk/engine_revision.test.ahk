@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 ; Unit tests for src/engine/Executor.ahk (WI-21): the newest committed revision is used at every step
-; (ARCHITEKTUR 4.2, E1). Executor runs against EngineOwner (helpers/), which records the events.
+; (ARCHITECTURE 4.2, E1). Executor runs against EngineOwner (helpers/), which records the events.
 #Include helpers\ExecutorKit.ahk
 
 ; --- newest revision (point 3) ---------------------------------------------------------------------

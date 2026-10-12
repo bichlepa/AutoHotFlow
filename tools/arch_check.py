@@ -2,7 +2,7 @@
 """Static architecture check for the AutoHotFlow v2 sources (WI-19).
 
 Reads every .ahk file under src/, removes comments and string literals, and looks for rule breaks
-(see doc/KONVENTIONEN.md section 3 and doc/ARCHITEKTUR.md section 8). The check is deliberately simple
+(see doc/CONVENTIONS.md section 3 and doc/ARCHITECTURE.md section 8). The check is deliberately simple
 (lines and patterns, no AHK parser). A false positive is justified with a comment at the place:
 
     ; arch-ok: <rule> <reason>
@@ -12,7 +12,7 @@ better placed in the source live in EXCEPTIONS below, each with a reason. An exc
 matches anything is reported (rule "exception-unused") so that resolved items get removed.
 
 Usage:  python tools/arch_check.py [--root DIR]      (exit 1 if there are violations)
-When a rule is added or changed, update doc/KONVENTIONEN.md section 3 in the same commit.
+When a rule is added or changed, update doc/CONVENTIONS.md section 3 in the same commit.
 """
 
 import argparse
@@ -151,7 +151,7 @@ CLASS_RE = re.compile(r"^[ \t]*class[ \t]+(\w+)", re.M | re.I)
 INCLUDE_RE = re.compile(r"^[ \t]*#Include(?:Again)?[ \t]+(?:\*i[ \t]+)?(.+?)[ \t]*$", re.M | re.I)
 WARN_RE = re.compile(r"^[ \t]*#Warn\b(.*)$", re.M | re.I)
 MODE_RE = re.compile(r"\bstatic\s+Mode\s*:=\s*[\"'](\w+)[\"']", re.I)
-# A truth field of the protocol (doc/PROTOKOLL.md section 2) written as a literal true/false/0/1 in a Map. It must be
+# A truth field of the protocol (doc/PROTOCOL.md section 2) written as a literal true/false/0/1 in a Map. It must be
 # Json.True, Json.False or Json.Bool(...). "ok" is not listed: Message.Serialize converts it centrally.
 WIRE_BOOL_RE = re.compile(r"""(?<!Get\()["'](?:cancel|started|clean|restart|enabled|executing|exists|existed|waiting|byMeta|delete|busy|truncated)["']\s*,\s*(?:true|false|[01])\b""", re.I)
 CATCH_RE = re.compile(r"(?<![\w.])catch\b", re.I)

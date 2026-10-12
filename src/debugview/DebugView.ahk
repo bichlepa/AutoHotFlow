@@ -6,7 +6,7 @@
 #Include ..\core\Role.ahk
 #Include DebugGui.ahk
 
-; Role "debug": the debug window (WI-28, doc/ARCHITEKTUR 3, doc/PROTOKOLL 4.9). It shows the internals of the running
+; Role "debug": the debug window (WI-28, doc/ARCHITECTURE 3, doc/PROTOCOL 4.9). It shows the internals of the running
 ; system: the process table, the snapshot of every role, the live log (level and source filter), the stream of engine and
 ; process events (with a pause), the values that code sends with Debug.Dump, and a button that writes a diagnostic
 ; report. It reads and shows only; it changes nothing in the other roles (not a flow debugger, E1).
@@ -16,7 +16,7 @@
 ;
 ; Like the manager stub: never modal, no MsgBox, no file access. The model (this class) holds all state; DebugGui is a
 ; view that is drawn from it at most 10 times per second and only after a change. --headless runs without a window and
-; adds the test command cmd.test.debug (PROTOKOLL 4.9). Closing the window ends only this role (CloseWindow).
+; adds the test command cmd.test.debug (PROTOCOL 4.9). Closing the window ends only this role (CloseWindow).
 ;
 ; Every request has a timeout and a callback. Received events are only stored (a ring each); nothing is logged per
 ; event, so the log that this window shows cannot feed itself.
@@ -73,7 +73,7 @@ class DebugView extends Role {
         this.On("evt.", (msg) => this._OnEvent(msg))
         if (this.headless)
             this.On("cmd.test.debug", (msg) => this._OnTestCommand(msg))
-        ; The subscriptions are kept by the peer and sent again after every handshake (PROTOKOLL 3).
+        ; The subscriptions are kept by the peer and sent again after every handshake (PROTOCOL 3).
         for topic in DebugView.TOPICS
             this.peer.Subscribe(topic)
     }
@@ -93,7 +93,7 @@ class DebugView extends Role {
         }
     }
 
-    ; Role part of the snapshot (PROTOKOLL 4.9).
+    ; Role part of the snapshot (PROTOCOL 4.9).
     DiagInfo() {
         names := []
         for name, _ in this.snapshots
@@ -425,7 +425,7 @@ class DebugView extends Role {
     }
 
     ; The answer of cmd.diag.report as it is passed on in a test answer: Json.Parse read "ok" as 1/0, so the truth
-    ; field is turned back into Json.True/Json.False (PROTOKOLL 2, a copy of the fields the test looks at).
+    ; field is turned back into Json.True/Json.False (PROTOCOL 2, a copy of the fields the test looks at).
     static _WireReport(p) {
         out := Map("ok", Json.Bool(p.Get("ok", false)))
         for key in ["path", "dir", "roles", "missing", "error"]

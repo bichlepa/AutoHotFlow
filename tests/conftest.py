@@ -1,4 +1,4 @@
-"""Shared fixtures for the AutoHotFlow v2 test suite (see doc/TESTSTRATEGIE.md).
+"""Shared fixtures for the AutoHotFlow v2 test suite (see doc/TEST-STRATEGY.md).
 
 Environment variables:
   AHF_AHK2_EXE   path to the AutoHotkey v2 interpreter (default: C:\\Program Files\\AutoHotkey\\v2\\AutoHotkey64.exe)

@@ -1,6 +1,6 @@
 """WI-16, WI-25: an event flood and the log queue of the storage (finding F-08).
 
-The manager stub writes every engine event to the log through the storage (PROTOKOLL 4.8). Before WI-25 the
+The manager stub writes every engine event to the log through the storage (PROTOCOL 4.8). Before WI-25 the
 storage drained only about 30 lines per second and the queue had no limit. This test floods the engine with
 events for 20 s and records how far the storage falls behind (memory of the storage, time until the log files
 stop changing). Assertions: the engine stays responsive in the budget, no process is restarted, and (WI-25) the

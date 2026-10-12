@@ -7,7 +7,7 @@
 #Include ..\core\Role.ahk
 #Include StubGui.ahk
 
-; Role "manager" in stub mode (work_items/phase2/WI-13, doc/ARCHITEKTUR 2.1 and 4.1, doc/PROTOCOL 4.3, 5, 5a).
+; Role "manager" in stub mode (WI-13, doc/ARCHITECTURE 2.1 and 4.1, doc/PROTOCOL 4.3, 5, 5a).
 ; A minimal stand-in for the real manager. It shows what the engine reports and sends commands on request.
 ; It holds UI state only (flow list, element states, the last sequence number). The truth about the
 ; execution stays in the engine.
@@ -20,7 +20,7 @@
 ; Every engine event and every process event is written as one line through storage:
 ;   Log/Log_manager.txt, "... ~manager~manager~ ui-event {"type":..,"recvMs":..,"payload":{..}}"
 ; recvMs is the wall clock in ms (UTC, GetSystemTimePreciseAsFileTime) of the arrival at the stub.
-; The stub does no file I/O itself (KONVENTIONEN 3). Its own log lines come back on topic log: they are
+; The stub does no file I/O itself (CONVENTIONS 3). Its own log lines come back on topic log: they are
 ; counted, never written again (that would be an endless loop).
 ;
 ; Resync (PROTOCOL 5, 5a): cmd.engine.snapshot after evt.engine.ready, after evt.flow.list.changed, after
@@ -96,7 +96,7 @@ class StubManager extends Role {
         this._RequestSnapshot("ready")
     }
 
-    ; Role part of the snapshot (doc/PROTOKOLL.md 4.9): subscriptions, sequence state and counters.
+    ; Role part of the snapshot (doc/PROTOCOL.md 4.9): subscriptions, sequence state and counters.
     DiagInfo() {
         return Map("topics", this.peer.Topics(), "epoch", this.epoch, "lastSeq", this.lastSeq
             , "flows", this.flowRecs.Count, "events", this.eventCount, "resyncs", this.resyncCount)

@@ -8,12 +8,12 @@
 ; method, which hides the built-in .Name property of the class object. Use ElementRegistry.IdOf(cls)
 ; for the class id.
 class AhfElement {
-    static Mode := "inline"          ; "inline" | "worker" | "trigger" (ARCHITEKTUR 2.3)
+    static Mode := "inline"          ; "inline" | "worker" | "trigger" (ARCHITECTURE 2.3)
     static Level := "Beginner"       ; "Beginner" | "Advanced" | "Programmer"
     static Stability := "Stable"     ; "Stable" | "Experimental"
     static Icon := ""                ; file name under assets/Icons, "" = none
     ; Worker elements only: the engine ends the job with the exception "worker timeout" after this many ms and has
-    ; the worker killed if it does not react to the cancel (ARCHITEKTUR 6.4). 0 = no deadline (v1 had none).
+    ; the worker killed if it does not react to the cancel (ARCHITECTURE 6.4). 0 = no deadline (v1 had none).
     static JobTimeoutMs := 0
 
     ; Runtime entry point of inline and worker elements. The base class has no behavior: a class

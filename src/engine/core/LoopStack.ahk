@@ -1,7 +1,7 @@
 #Requires AutoHotkey v2.0
 #Include ..\..\core\Errors.ahk
 
-; Stack of loop variables per thread (WI-08, ARCHITEKTUR 5.2).
+; Stack of loop variables per thread (WI-08, ARCHITECTURE 5.2).
 ;
 ; Port of v1 LoopVariable_AddToStack and LoopVariable_RestoreFromStack
 ; (v1/Source_Execution/Variables/Variables.ahk:174 and :194). Used from

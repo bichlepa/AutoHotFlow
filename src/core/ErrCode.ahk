@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 
-; Error codes as static properties (no global variables, see doc/KONVENTIONEN.md section 1).
+; Error codes as static properties (no global variables, see doc/CONVENTIONS.md section 1).
 class ErrCode {
     static TIMEOUT := "timeout"
     static UNKNOWN_TYPE := "unknown_type"

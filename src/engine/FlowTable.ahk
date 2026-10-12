@@ -4,8 +4,8 @@
 #Include FlowRecord.ahk
 
 ; The loaded flows of the engine, keyed by flow ID (the file name without ".json"). Keys are case
-; insensitive, as v1 object keys are (KONVENTIONEN section 5). Pure bookkeeping: no I/O. The text of
-; a flow file comes from storage, the engine only parses it (ARCHITEKTUR 6.1, step 3).
+; insensitive, as v1 object keys are (CONVENTIONS section 5). Pure bookkeeping: no I/O. The text of
+; a flow file comes from storage, the engine only parses it (ARCHITECTURE 6.1, step 3).
 class FlowTable {
     __New() {
         this._records := Map()

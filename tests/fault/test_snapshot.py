@@ -1,4 +1,4 @@
-"""WI-28 step b: cmd.diag.snapshot of every role (doc/PROTOKOLL.md 4.9, ARCHITEKTUR 6.2).
+"""WI-28 step b: cmd.diag.snapshot of every role (doc/PROTOCOL.md 4.9, ARCHITECTURE 6.2).
 
 Real supervisor with its real children (faultkit.Chain). Each role answers with the general part (Role.Snapshot)
 and its own part (DiagInfo); the supervisor answers for itself. The schema is checked by

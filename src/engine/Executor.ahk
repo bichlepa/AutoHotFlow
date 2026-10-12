@@ -31,7 +31,7 @@
 ; so a long queue of short flows does not nest calls, and Tick's guard keeps it serial. Stop ends waiting and
 ; running instances; waiting ones first, so a stop never starts an instance on its way.
 ;
-; Revisions (ARCHITEKTUR 4.2, E1): a run keeps only the flow ID. Every step reads the newest committed definition
+; Revisions (ARCHITECTURE 4.2, E1): a run keeps only the flow ID. Every step reads the newest committed definition
 ; from owner.flows (DefOf), so an edit takes effect at the next step. A running element keeps the class and the
 ; parameters it was started with (they are stored in run["active"]). A flow that is gone from the table stops its
 ; instances at the next step (reason "flow.deleted"); Engine calls FlowDeleted when it removes a flow.
@@ -67,7 +67,7 @@ class Executor {
         return false
     }
 
-    ; Instances with their threads for the snapshot (doc/PROTOKOLL.md 4.9): ids, states, the element of each thread.
+    ; Instances with their threads for the snapshot (doc/PROTOCOL.md 4.9): ids, states, the element of each thread.
     ; No variables and no parameters. At most DIAG_INSTANCES instances (the rest is only counted by the caller).
     DiagInstances() {
         list := []
@@ -185,7 +185,7 @@ class Executor {
         return n
     }
 
-    ; The flow is deleted: stops all its instances (ARCHITEKTUR 4.2). Returns the number of instances stopped.
+    ; The flow is deleted: stops all its instances (ARCHITECTURE 4.2). Returns the number of instances stopped.
     ; A stop does not wait for acknowledgements (see _StopRun), so deleting never has to give up like v1 does.
     FlowDeleted(flowId) {
         return this.StopFlow(flowId, "flow.deleted")
@@ -284,7 +284,7 @@ class Executor {
                 }
             }
         }
-        ; Threads that wait for a worker: the pool grows to meet the demand (WI-27, ARCHITEKTUR 6.4).
+        ; Threads that wait for a worker: the pool grows to meet the demand (WI-27, ARCHITECTURE 6.4).
         if (waiting > 0)
             this._owner.workers.Want(waiting)
     }
@@ -304,7 +304,7 @@ class Executor {
             , ObjBindMethod(this, "_OnFinish", run["instanceId"], thread.Id)
             , VarStore(run["vars"], VarStore.NewMap()))
         if (!def.HasElement(elementId)) {
-            ; The element was deleted while the thread waited (ARCHITEKTUR 4.2, M-17).
+            ; The element was deleted while the thread waited (ARCHITECTURE 4.2, M-17).
             Log.Write("f1", "engine", "element '" elementId "' was removed before it could start", flowId)
             ctx.Finish("exception", "element was removed")
             return

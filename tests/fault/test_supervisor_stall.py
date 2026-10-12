@@ -1,6 +1,6 @@
 """WI-22 point 1: the supervisor itself stands still (frozen process, as in standby or after a long backlog).
 
-Expected (ARCHITEKTUR 6.2): after the stand-still no child is judged by its old pong time. No
+Expected (ARCHITECTURE 6.2): after the stand-still no child is judged by its old pong time. No
 evt.process.hung, no evt.process.crashed, all pids unchanged, all roles ready. The children do not give
 up during the freeze either (their orphan guard acts only on a broken pipe, which a frozen hub does not cause).
 A child that really is frozen afterwards is still found (test_process_hang).

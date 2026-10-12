@@ -2,7 +2,7 @@
 #Include Errors.ahk
 #Include Log.ahk
 
-; Parses the command line of a role process (see work_items/phase2/README.md, role call).
+; Parses the command line of a role process (see v2-phase2-final:work_items/phase2/README.md, role call).
 ; Accepted forms: --key=value (the value may contain "="), --flag (value 1), and positional words.
 class Args {
     ; Keys every role process must receive.

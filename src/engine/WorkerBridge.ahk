@@ -69,7 +69,7 @@ class WorkerBridge {
     ; N, the most workers at once. 0: no pool.
     Size => this._size
 
-    ; The pool for the snapshot (doc/PROTOKOLL.md 4.9): size, warm workers, the slots with their state, starts on
+    ; The pool for the snapshot (doc/PROTOCOL.md 4.9): size, warm workers, the slots with their state, starts on
     ; their way and the abnormal ends in the storm window.
     DiagInfo() {
         slots := []

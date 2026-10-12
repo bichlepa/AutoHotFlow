@@ -2,7 +2,7 @@
 #SingleInstance Off
 
 ; Boot code of every role process (WI-29: split from the entry so that the test entry can reuse it). The entry
-; src/AutoHotFlow.ahk includes this file and calls AhfMain(). It is the single entry point of every role process (doc/ARCHITEKTUR.md D12, work_items/phase2/README.md):
+; src/AutoHotFlow.ahk includes this file and calls AhfMain(). It is the single entry point of every role process (doc/ARCHITECTURE.md D12, v2-phase2-final:work_items/phase2/README.md):
 ;   AutoHotkey64.exe src\AutoHotFlow.ahk --role=<name> --session=<id> --hub=<pipe> --data=<dir> [--flow=<id>] [--hubHwnd=<n>] [--test-roles]
 ; --role=supervisor (or no --role) starts the supervisor (WI-07, src/supervisor/), which is not a Role.
 ; Exit codes: 0 normal end, 1 role or supervisor failed to start (also an error while the files load), 2 bad

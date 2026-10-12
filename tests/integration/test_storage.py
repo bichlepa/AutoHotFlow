@@ -56,7 +56,7 @@ def ask(client, type_, payload=None, timeout=ASK_TIMEOUT_S):
 
 def ask_ok(client, type_, payload=None, timeout=ASK_TIMEOUT_S):
     answer = ask(client, type_, payload, timeout)
-    assert answer.get("ok") is True, answer   # a real JSON boolean (PROTOKOLL 2)
+    assert answer.get("ok") is True, answer   # a real JSON boolean (PROTOCOL 2)
     return answer
 
 
@@ -690,7 +690,7 @@ def test_engine_starts_with_the_real_storage_and_its_log_arrives(procs, datadir,
     shutil.copy(SKELETON_SRC, datadir / "Flows" / "skeleton.json")
     start_storage(procs, datadir, runs, pipe, session_id)
     wait_hello(hub, "storage")
-    # Subscribe BEFORE the engine starts (PROTOKOLL 5a). Subscribing after its sys.hello could miss evt.engine.ready when
+    # Subscribe BEFORE the engine starts (PROTOCOL 5a). Subscribing after its sys.hello could miss evt.engine.ready when
     # the engine is quick (WI-32, parallel run: failure after 15 s). The state is asked for below in any case.
     obs = observer(pipe, "obs-engine", "engine")
     engine_args = ["--role=engine", "--session=" + session_id, "--hub=" + pipe, "--data=" + str(datadir), "--workers=0"]

@@ -6,7 +6,7 @@
 #Include ..\core\AhfVersion.ahk
 #Include ReportText.ahk
 
-; Crash and diagnostic reports of the supervisor (WI-28, doc/PROTOKOLL.md 4.9, ARCHITEKTUR 6.2).
+; Crash and diagnostic reports of the supervisor (WI-28, doc/PROTOCOL.md 4.9, ARCHITECTURE 6.2).
 ;
 ; A report asks every connected child for cmd.diag.snapshot (all at once, SNAPSHOT_MS per role), adds the own
 ; snapshot of the supervisor, builds report.json and summary.txt and hands them to "storage"

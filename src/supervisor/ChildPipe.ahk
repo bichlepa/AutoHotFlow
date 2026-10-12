@@ -2,7 +2,7 @@
 
 ; Read end of the anonymous pipe that carries stdout and stderr of one child (WI-23, ChildLauncher).
 ; Nothing here blocks: PeekNamedPipe tells how many bytes are there, ReadFile then takes exactly those.
-; Reading an anonymous pipe is not file I/O in the sense of KONVENTIONEN section 3 (no file is opened).
+; Reading an anonymous pipe is not file I/O in the sense of CONVENTIONS section 3 (no file is opened).
 ;
 ;   pipe := ChildPipe(hRead)
 ;   lines := pipe.ReadLines(65536)   ; new complete lines (Array of strings), at most 64 KB are read

@@ -1,5 +1,5 @@
 """WI-15: the session is ended while the roles are healthy, while one role is frozen, while the UI cancels in
-the prepare phase, and twice in a row (ARCHITEKTUR 6.3, WI-15 shutdown list).
+the prepare phase, and twice in a row (ARCHITECTURE 6.3, WI-15 shutdown list).
 
 Budgets: healthy roles exit within CLEAN_EXIT_BUDGET_S (2 s); with a frozen role the exit ends within the
 deadline plus 1 s (the supervisor terminates the frozen process at the deadline, exit code 5).

@@ -1,7 +1,7 @@
 #Requires AutoHotkey v2.0
 #Include ..\Errors.ahk
 
-; Frame format of the IPC pipes (doc/PROTOKOLL.md section 1):
+; Frame format of the IPC pipes (doc/PROTOCOL.md section 1):
 ;   uint32 little endian length N, followed by N bytes of UTF-8 text.
 ; An empty frame (N = 0) is not valid: every message is a JSON object.
 class FrameWriter {

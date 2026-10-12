@@ -5,7 +5,7 @@
 #Include Time.ahk
 
 ; Debug.Dump(value, title := "") replaces the v1 function d() (v1/Source_Common/Debug/Debug.ahk, WI-28,
-; doc/PROTOKOLL.md 4.9). It turns any value into readable JSON and sends it as evt.debug.dump to the topic
+; doc/PROTOCOL.md 4.9). It turns any value into readable JSON and sends it as evt.debug.dump to the topic
 ; "debug", where the debug window shows it.
 ;
 ;   Debug.Dump(myMap, "state of the loop")
