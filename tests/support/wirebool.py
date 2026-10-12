@@ -11,7 +11,7 @@ import threading
 # Payload fields that are truth values by the protocol (any depth, matched by key name).
 BOOL_FIELDS = frozenset({
     "ok", "cancel", "started", "clean", "restart", "enabled", "executing", "exists", "existed",
-    "waiting", "byMeta", "delete", "busy",
+    "waiting", "byMeta", "delete", "busy", "truncated",
 })
 
 # Payload fields that carry user data (flow definitions, element parameters, variable values). Their content

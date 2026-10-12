@@ -4,6 +4,7 @@
 #Include Time.ahk
 #Include Args.ahk
 #Include Snapshot.ahk
+#Include Debug.ahk
 #Include ipc\Peer.ahk
 
 ; Base class of every role process (doc/ARCHITEKTUR.md 3 and 6, doc/PROTOCOL.md 4.1 and 5).

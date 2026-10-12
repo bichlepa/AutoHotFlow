@@ -9,6 +9,10 @@
 ;   cmd.test.stderr {text}       -> one line on stderr (Role.Console), the supervisor logs it (WI-23)
 ;   cmd.test.logstate            -> {queued, dropped, last}
 ;   cmd.test.setlogtarget {to}   -> Role.SetLogTarget(to)
+;   cmd.test.dump {title, value, kind, count} -> Debug.Dump (WI-28). kind: "value" (default, the value of the request),
+;                                   "cycle" (a Map that contains itself), "big" (a 200000 character text), "deep" (30 levels),
+;                                   "objects" (functions and a class instance). count: how many times (default 1).
+;                                   Answer: {sent, dropped, failed} (the counters of Debug)
 ;   cmd.test.throwlater {count}  -> count errors thrown from timers (default 1); the role keeps running
 ;                                   until the limit of Role.ERROR_LIMIT is exceeded (WI-23)
 ;
@@ -22,12 +26,34 @@ class EchoRole extends Role {
         this.On("cmd.test.logstate", (msg) => this.LogStats())
         this.On("cmd.test.setlogtarget", (msg) => this._SetTarget(msg.payload["to"]))
         this.On("cmd.test.throwlater", (msg) => this._ScheduleThrow(msg.payload.Get("count", 1)))
+        this.On("cmd.test.dump", (msg) => this._Dump(msg.payload))
     }
 
     _LogMany(count, level, text) {
         loop count
             Log.Write(level, "echo", (text = "") ? "entry " A_Index : text)
         return Map("logged", count)
+    }
+
+    _Dump(p) {
+        kind := p.Get("kind", "value")
+        value := p.Get("value", "")
+        if (kind = "cycle") {
+            value := Map("name", "loop")
+            value["self"] := value
+        } else if (kind = "big") {
+            value := Format("{:200000}", "")
+        } else if (kind = "deep") {
+            value := Map("leaf", 1)
+            loop 30
+                value := Map("next", value)
+        } else if (kind = "objects") {
+            value := Map("fn", StrLen, "bound", ObjBindMethod(this, "_Stderr"), "role", this, "plain", {a: 1, b: [1, 2]})
+        }
+        sent := 0
+        loop p.Get("count", 1)
+            sent += Debug.Dump(value, p.Get("title", "")) ? 1 : 0
+        return Map("sentNow", sent, "sent", Debug.sent, "dropped", Debug.dropped, "failed", Debug.failed)
     }
 
     _Stderr(text) {
