@@ -35,16 +35,8 @@ NO_DIALOG_ROLES = {"core", "engine", "supervisor", "storage", "triggerhost"}
 EXCEPTIONS = [
     ("core/Role.ahk", "file-io", r"FileAppend",
      "Role.Console writes to stderr ('**') with FileAppend, not to a file; documented in Role.ahk (F-05)."),
-    ("AutoHotFlow.ahk", "file-io", r"FileAppend",
+    ("AhfBoot.ahk", "file-io", r"FileAppend",
      "AhfConsole writes to stderr ('**') with FileAppend before Role.Console is loaded (WI-22), not to a file."),
-    ("AutoHotFlow.ahk", "include-tests", r"tests\\integration\\helpers\\",
-     "Entry point includes the test roles registered with --test-roles; resolved by WI-29."),
-    ("core/RoleRegistry.ahk", "one-class", r"PlaceholderRole",
-     "RoleRegistry and PlaceholderRole share one file; resolved by WI-29."),
-    ("core/Errors.ahk", "one-class", r"class (ErrCode|AhfError|ProtocolError|AhfTimeoutError|ElementError|JsonError)\b",
-     "The error hierarchy (ErrCode + 5 tiny subclasses) lives in one module by design (PROTOKOLL 2); open point, see WI-19 result."),
-    ("engine/core/Loops.ahk", "one-class", r"class LoopStack\b",
-     "File is named Loops.ahk but holds class LoopStack; rename is out of scope for WI-19, open point."),
 ]
 
 # Built-in AutoHotkey v2 classes that must not be redefined.

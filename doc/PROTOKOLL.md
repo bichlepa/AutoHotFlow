@@ -152,7 +152,7 @@ Neustart-Richtlinie: höchstens 3 Neustarts in 60 s, sonst bleibt der Prozess `c
 
 ### 4.1b Testrollen (nur mit `--test-roles`)
 
-Die Rollen `echo`, `crasher`, `hanger`, `slow_shutdown` (Quellen in `tests/integration/helpers/`) sind im Einstieg einkompiliert, aber nur mit `--test-roles` registriert. Ohne das Flag ist ihr Name unbekannt (Exit 2). Zusätzliche Nachrichten der Testrollen:
+Die Rollen `echo`, `crasher`, `hanger`, `slow_shutdown` (Quellen in `tests/integration/helpers/`) sind nur im Testeinstieg `tests/integration/helpers/AutoHotFlowTest.ahk` einkompiliert (WI-29) und dort nur mit `--test-roles` registriert. Im Produkteinstieg und ohne das Flag ist ihr Name unbekannt (Exit 2). Zusätzliche Nachrichten der Testrollen:
 - `cmd.test.arm` an `crasher` (`{}`, `res: { ok }`): startet einen Timer (300 ms), nach dem `crasher` sich mit `TerminateProcess` (Exit 7) selbst beendet, ohne `sys.bye`. Der Arm-Schritt erlaubt dem Test, den Prozess zu beobachten, bevor er stirbt (Testszenario für `evt.process.crashed`). Ohne Arm tut `crasher` nichts.
 - `cmd.test.echo`, `cmd.test.log`, `cmd.test.logstate`, `cmd.test.setlogtarget`, `cmd.test.throwlater` (`echo`): siehe `tests/integration/helpers/EchoRole.ahk`.
 - Option `--prepare-limit=<ms>` (nur mit `--test-roles`, 100 bis 600000): setzt die Frist von `cmd.app.prepareExit` herab, damit der Timeout-Test in Sekunden läuft. Ohne das Flag gilt die Konstante.

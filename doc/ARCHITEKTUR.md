@@ -318,7 +318,8 @@ AutoHotFlow/
 ├─ work_items/              # temporär: Pläne, Analysen, Spikes (nach der Portierung löschen)
 ├─ v1/                      # temporär: unveränderter v1-Stand als Referenz (am Ende löschen)
 ├─ src/
-│  ├─ AutoHotFlow.ahk       # Einstieg, Rollen-Dispatch
+│  ├─ AutoHotFlow.ahk       # Einstieg (bindet AhfBoot.ahk ein, ruft AhfMain)
+│  ├─ AhfBoot.ahk           # Bootcode, Rollen-Dispatch (WI-29)
 │  ├─ core/                 # prozessübergreifende Bausteine, keine GUI
 │  │  ├─ Json.ahk  Ids.ahk  Errors.ahk  Log.ahk  Args.ahk
 │  │  └─ ipc/               # Pipe, Frame, Wake, Message, Dispatcher, Peer
@@ -337,11 +338,11 @@ AutoHotFlow/
 **Ist-Stand am Ende von Phase 2 (WI-17, verglichen mit dem Dateibaum, verifiziert):** Die Struktur oben ist weiter das Ziel. Abweichungen und Lücken:
 
 - **Entscheidung E6 (2026-10-11):** Der Triggerhost (WI-14) wird früh in Phase 3 mit den echten Triggern gebaut, nicht in Phase 2b.
-- Vorhanden: `src/AutoHotFlow.ahk`, `core/` (zusätzlich `Role.ahk`, `RoleRegistry.ahk`, `Time.ahk`; `ipc/` zusätzlich `Deferred.ahk`, `PipeConnection.ahk`, `PipeListener.ahk`, `FrameReader.ahk`, `FrameWriter.ahk`), `supervisor/`, `engine/` (mit `core/` für Zustandsautomaten, Flowmodell, Scheduler), `storage/`, `worker/`, `manager/` (nur `StubManager.ahk` und `StubGui.ahk`), `debugview/` (WI-28, `DebugView.ahk`, `DebugGui.ahk`), `elements/base/`. `core/` hat seit WI-28 zusätzlich `AhfVersion.ahk`, `ProcInfo.ahk`, `Snapshot.ahk` und `Debug.ahk`; `supervisor/` hat `DiagReport.ahk`.
+- Vorhanden: `src/AutoHotFlow.ahk`, `src/AhfBoot.ahk`, `core/` (zusätzlich `Role.ahk`, `RoleRegistry.ahk`, `Time.ahk`; `ipc/` zusätzlich `Deferred.ahk`, `PipeConnection.ahk`, `PipeListener.ahk`, `FrameReader.ahk`, `FrameWriter.ahk`), `supervisor/`, `engine/` (mit `core/` für Zustandsautomaten, Flowmodell, Scheduler), `storage/`, `worker/`, `manager/` (nur `StubManager.ahk` und `StubGui.ahk`), `debugview/` (WI-28, `DebugView.ahk`, `DebugGui.ahk`), `elements/base/`. `core/` hat seit WI-28 zusätzlich `AhfVersion.ahk`, `ProcInfo.ahk`, `Snapshot.ahk` und `Debug.ahk`; `supervisor/` hat `DiagReport.ahk`.
 - **Nicht vorhanden (Phase 3 oder später):** `triggerhost/` (WI-14 optional, nicht gebaut; die Rolle ist in `RoleRegistry.ahk` ein Platzhalter), `editor/` (Platzhalter-Rolle), `ui_common/`, `assets/`, `elements/default/{actions,conditions,loops,triggers}/`. Statt `elements/default/` gibt es `elements/skeleton/` mit acht Demo- und Testelementen (`Trigger_Manual`, `Action_Sleep`, `Action_Do_nothing`, `Action_Test*`).
 - `tools/` enthält bisher nur `ahkrun.py` und `ahf_dialogwatch.py` (Laufwächter), keine Konverter.
-- **Bewusste Abweichung von der Einbindregel unten:** Der Einstieg `src/AutoHotFlow.ahk` bindet die Testrollen aus `tests/integration/helpers/` ein (`EchoRole`, `CrasherRole`, `HangerRole`, `SlowShutdownRole`). Sie sind nur mit `--test-roles` registriert (PROTOKOLL 4.1b). Das ist eine Abhängigkeit von `src/` auf `tests/`; vor einem Release auflösen (Phase 3: eigener Testeinstieg oder bedingtes Einbinden).
-- `core/RoleRegistry.ahk` enthält zwei Klassen (`RoleRegistry`, `PlaceholderRole`), entgegen der Konvention "eine Klasse pro Datei" (`KONVENTIONEN.md`). Offen.
+- **Testeinstieg (WI-29):** Der Produkteinstieg `src/AutoHotFlow.ahk` bindet nur `src/AhfBoot.ahk` ein (der gesamte Bootcode und die Rollenregistrierung) und ruft `AhfMain()`. Die Testrollen (`EchoRole`, `CrasherRole`, `HangerRole`, `SlowShutdownRole`, `RegisterFailure`) liegen in `tests/integration/helpers/`; der Testeinstieg `tests/integration/helpers/AutoHotFlowTest.ahk` bindet `AhfBoot.ahk` und diese Rollen ein und setzt `AhfTestRolesFn`. Der Supervisor startet Kinder mit `A_ScriptFullPath`, also erben sie den Einstieg. Mit `--test-roles` am Produkteinstieg passiert nichts (die Rollen sind dort nicht einkompiliert, ihr Name ist unbekannt). `src/` bindet nichts aus `tests/` ein (Wächterregel `include-tests`, keine Ausnahme mehr).
+- Jede Datei unter `src/` hat höchstens eine Klasse (WI-29): `core/Errors.ahk` bindet nur noch `ErrCode.ahk`, `AhfError.ahk`, `ProtocolError.ahk`, `AhfTimeoutError.ahk`, `ElementError.ahk`, `JsonError.ahk` ein; `PlaceholderRole` hat `core/PlaceholderRole.ahk`; `engine/core/Loops.ahk` heißt `LoopStack.ahk`.
 - `manager` wird im Einstieg registriert, nicht in `core/RoleRegistry.ahk` (wie `engine`, `storage`, `worker`), damit `core/` keine Rollenordner einbindet.
 
 Regel: Ein Ordner unter `src/` ist ein Prozess-Rollen- oder Bibliotheks-Modul. `core/` darf nichts aus Rollenordnern einbinden. Rollenordner binden nur `core/`, `ui_common/` (nur UI-Rollen) und `elements/` ein, nie einander.
