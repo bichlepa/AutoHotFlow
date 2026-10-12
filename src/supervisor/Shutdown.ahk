@@ -83,8 +83,10 @@ class Shutdown {
                 this._SendGroup(now)
             }
         } else if (this.phase = "kill") {
+            ; Whether the exit is forced is decided in _Done by Children.AnyKilled (F-33, WI-33): a process that ended by itself
+            ; at the deadline and is only judged now was not terminated, so it must not make the exit code 5.
             if (this.children.AllGone() || now >= this.killDeadline)
-                this._Done(Shutdown.EXIT_FORCED)
+                this._Done(Shutdown.EXIT_CLEAN)
         }
     }
 
@@ -141,7 +143,7 @@ class Shutdown {
     }
 
     _Done(code) {
-        ; A child that was terminated earlier (after a hang) also makes the exit forced.
+        ; A child that was terminated (at the deadline, or earlier after a hang) makes the exit forced.
         if (this.children.AnyKilled())
             code := Shutdown.EXIT_FORCED
         this.phase := "done"
