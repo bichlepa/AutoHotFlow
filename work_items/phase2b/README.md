@@ -105,3 +105,20 @@ WI-32 kommt bewusst zuletzt: WI-30 und WI-31 beseitigen zwei Ursachen roter Läu
 - [ ] WI-32 Abnahmeläufe (Aufgabe 2): **gefahren am 2026-10-12, nicht grün.** Seriell und Stress grün; parallel 5 von 10 Läufen grün, Fault 20-mal ein roter Test. Funde F-37 bis F-42, Einzelheiten in `STATUS.md` ("Abnahmelauf Fix-Block"). Haken bleibt offen, bis die parallelen Läufe grün sind.
 
 Neue Funde ab **F-32** (vergeben bis F-42, nächste freie Nummer **F-43**; F-34 wurde nie vergeben).
+
+### Nachtrag: WI-34 (Funde aus der Abnahme)
+
+Review der Abnahme durch den Projektinhaber mit Claude (2026-10-12): F-41 ist ein Produktfehler (ein Kind, das sich während des Beendens meldet, bekommt nie `sys.shutdown`), F-40 möglicherweise (Anfragen an einen gestorbenen Prozess warten ihre volle Frist ab), F-37, F-38, F-39 und F-42 sind sehr wahrscheinlich Testprobleme.
+
+| ID | Titel | Größe | Hängt ab von | Hauptpfade |
+|---|---|---|---|---|
+| [WI-34](WI-34-abnahmefunde.md) | Funde aus der Abnahme (F-37 bis F-42), Abnahme wiederholen | M | WI-30 bis WI-33 | `src/supervisor/`, `src/core/ipc/Peer.ahk` (falls F-40 bestätigt), `tests/` |
+
+Bestätigt vom Projektinhaber (2026-10-12):
+
+| # | Entscheidung |
+|---|---|
+| E16 | Die Änderung `Peer.CloseWhenFlushed` in `src/core/ipc/Peer.ahk` (WI-30, nicht im Paketwortlaut) ist bestätigt. |
+| E17 | `scaled()` (`tests/support/timing.py`) mit Faktor 3 im parallelen Lauf bleibt. Der serielle Lauf und `-m stress` sind die strenge Referenz und laufen regelmäßig (Regel in `doc/TESTSTRATEGIE.md`, WI-34). |
+
+- [ ] WI-34 (danach den Haken "WI-32 Abnahmeläufe" oben setzen)

@@ -101,6 +101,6 @@ Timing unter Systemlast, zweiter Windows-Benutzer, Standby, gesperrter Desktop f
 
 ## Nächste Schritte
 
-1. Die Funde F-37 bis F-42 aus der Abnahme (`STATUS.md`) untersuchen oder begründet zurückstellen; danach die parallelen Läufe wiederholen und den Haken in `phase2b/README.md` setzen. (Die Abnahmeläufe selbst sind am 2026-10-12 gefahren.)
+1. **WI-34** (`phase2b/WI-34-abnahmefunde.md`): F-41 (Produktfehler: ein Kind, das sich während des Beendens meldet, bekommt nie `sys.shutdown`) und F-40 (Anfragen an einen gestorbenen Prozess warten ihre volle Frist ab, vermutet) beheben oder klären, F-37, F-38, F-39, F-42 als Testkorrekturen, dann die Abnahme wiederholen und die Haken in `phase2b/README.md` setzen.
 2. Phase-3-Plan entwerfen (Projektinhaber mit Claude): Reihenfolge Common/Variablen und Ausdrucksauswerter, Flow laden/speichern, Ausführung, Elemente in Gruppen, Triggerhost früh (E6), Editor und Zeichnen, Manager (E14: Verhalten beim Schließen des Fensters); Messaufgaben für R3, R4, R5 aus ARCHITEKTUR 10 und die offenen Fragen aus ELEMENT-API-V2 Abschnitt 8; gebündelte Fragen an den Projektinhaber. Freigabe für Phase 3 erteilen.
 3. Nach der Portierung: `work_items/` und `v1/` entfernen (Entscheidung des Projektinhabers).
