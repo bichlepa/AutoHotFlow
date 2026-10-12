@@ -1,382 +1,382 @@
-# Architektur AutoHotFlow v2
+# Architecture AutoHotFlow v2
 
-Status: Entwurf, freigegeben als Grundlage für Phase 2 (Walking Skeleton), in Phase 2b ergänzt (WI-20, Entscheidungen E1 bis E8 in `work_items/phase2b/README.md`). Stand 2026-10-11.
-Zielplattform: AutoHotkey v2, **nur 64 Bit** (E4, 2026-10-11). 32 Bit wird nicht unterstützt und beim Start abgewiesen (Umsetzung in WI-22). Begründung: Strukturen und DllCalls werden nur für 64 Bit getestet. Stock Interpreter, keine AHK_H-Erweiterungen.
-Verwandte Dokumente: [PROTOKOLL.md](PROTOKOLL.md), [ELEMENT-API-V2.md](ELEMENT-API-V2.md), [TESTSTRATEGIE.md](TESTSTRATEGIE.md), [KONVENTIONEN.md](KONVENTIONEN.md), [MIGRATION.md](MIGRATION.md).
+Status: Draft, approved as the basis for Phase 2 (walking skeleton), extended in Phase 2b (WI-20, decisions E1 to E8 in `work_items/phase2b/README.md`). As of 2026-10-11.
+Target platform: AutoHotkey v2, **64-bit only** (E4, 2026-10-11). 32-bit is not supported and is rejected at startup (implementation in WI-22). Reason: structures and DllCalls are only tested for 64-bit. Stock interpreter, no AHK_H extensions.
+Related documents: [PROTOCOL.md](PROTOCOL.md), [ELEMENT-API-V2.md](ELEMENT-API-V2.md), [TESTSTRATEGIE.md](TESTSTRATEGIE.md), [KONVENTIONEN.md](KONVENTIONEN.md), [MIGRATION.md](MIGRATION.md).
 
-Kennzeichnung: **[M]** = gemessen oder im Spike bestätigt, **[V1]** = im v1-Code verifiziert, **[A]** = Annahme, die in Phase 2 geprüft wird.
-
----
-
-## 1. Ziele
-
-1. Deadlocks und Race Conditions können **konstruktiv nicht mehr entstehen**: kein geteilter Speicher, kein globales Lock, jedes Datum hat genau einen schreibenden Besitzer.
-2. Kein blockierender Aufruf im Nachrichtenpfad. Datei-I/O und Dialoge laufen nie in der Engine.
-3. Ein hängender oder abstürzender Prozess reißt keinen anderen mit. Das System erkennt ihn und reagiert definiert.
-4. Alte Flows (`.json`) und Variablen (`.ahfvd`/`.ahfvar`) laden unverändert.
-5. Das Elementformat der 114 Actions plus Conditions, Loops und Trigger lässt sich weitgehend mechanisch portieren.
-
-Nicht-Ziele: neue Features, neues Flow-Dateiformat, Plugin-Sandbox gegen böswilligen Elementcode.
+Labeling: **[M]** = measured or confirmed in a spike, **[V1]** = verified in the v1 code, **[A]** = assumption to be checked in Phase 2.
 
 ---
 
-## 2. Entscheidungen
+## 1. Goals
 
-| # | Entscheidung | Begründung |
+1. Deadlocks and race conditions **can no longer arise by construction**: no shared memory, no global lock, every datum has exactly one writing owner.
+2. No blocking call in the message path. File I/O and dialogs never run in the engine.
+3. A hanging or crashing process does not take any other process with it. The system detects it and reacts in a defined way.
+4. Old flows (`.json`) and variables (`.ahfvd`/`.ahfvar`) load unchanged.
+5. The element format of the 114 actions plus conditions, loops and triggers can be ported largely mechanically.
+
+Non-goals: new features, a new flow file format, a plugin sandbox against malicious element code.
+
+---
+
+## 2. Decisions
+
+| # | Decision | Rationale |
 |---|---|---|
-| D1 | **Mehrere Prozesse, keine Threads.** | AHK v2 hat keine Threads im selben Prozess. Pseudo-Threads sind kooperativ: eine blockierende Operation hält alles an. Echte Parallelität gibt es nur über Prozesse. |
-| D2 | **Ein Editor-Prozess pro geöffnetem Flow.** | Mehrere Editoren sind gleichzeitig offen, auch nicht fokussierte müssen laufend aktualisiert werden. Ein Prozess pro Editor entkoppelt Zeichnen, Eingabe und Abstürze. Kosten **[M]**: ~30 ms Start, ~14 MB RSS, 0 % CPU im Leerlauf je Prozess. Das ist vernachlässigbar. |
-| D3 | **Manager (Flow-Liste, Einstellungen, Import/Export) ist ein eigener Prozess.** | Wie der Editor: Dialoge und Baumansicht dürfen die Engine nie anhalten. |
-| D4 | **Zeichnen läuft im Editor-Prozess, hinter einer schmalen `Renderer`-Schnittstelle.** | Siehe 2.1. Dadurch ist es später ohne Umbau des Editors in einen eigenen Prozess abtrennbar. |
-| D5 | **IPC: Named Pipes (Byte-Modus, overlapped) für Daten, `PostMessage` nur als Weckruf.** | Siehe 2.2. `WM_COPYDATA` verworfen. |
-| D6 | **Sterntopologie: der Supervisor ist der Hub.** Alle Prozesse verbinden sich mit ihm, er routet. | Hält Verbindungen auch bei Engine-Neustart stabil, einzige Stelle für Prozessüberwachung. Der Supervisor enthält keine Fachlogik und blockiert nie. |
-| D7 | **Ein `storage`-Prozess besitzt alle Dateien** (Flows, Variablen, Einstellungen, Logs). | I/O nie im kritischen Pfad. Ein Schreiber pro Datei verhindert Dateikonflikte zwischen Prozessen. In v1 war das nur über das globale Lock gelöst, das dafür gehalten werden musste. |
-| D8 | **Ein `triggerhost`-Prozess hält OS-Hooks, Hotkeys und Trigger-Timer.** | Low-Level-Hooks müssen schnell antworten, sonst entfernt Windows sie. Das darf nicht von Engine-Last abhängen. Trigger-Arten können später auf mehrere Hosts verteilt werden. |
-| D9 | **Elemente laufen hybrid: `inline` in der Engine oder `worker` in einem eigenen Prozess.** | Siehe 2.3. Blockierende, riskante oder UI-zeigende Elemente laufen in Workern. Das entspricht dem v1-Muster „eigener Thread für AHK-Code“. |
-| D10 | **Editor hält einen Entwurf, die Engine besitzt die committete Definition.** Änderungen laufen als Patches mit Revisionsnummer. | Siehe 4.2. Ein Editor pro Flow, daher keine Mehrschreiber-Konflikte. |
-| D11 | **Flow-Dateiformat bleibt unverändert** (JSON, `ElementIDCounter` etc.). | Anforderung 4. Siehe 7. |
-| D12 | **Ein Einstieg, Rollen per Parameter**: `AutoHotFlow.ahk --role=<name>`. | Ein kompiliertes Artefakt statt vieler. Der Supervisor startet sich selbst mit anderer Rolle. |
-| D13 | **Tests mit pytest als e2e-Treiber plus kleine AHK-Unit-Tests.** | Siehe [TESTSTRATEGIE.md](TESTSTRATEGIE.md). |
+| D1 | **Multiple processes, no threads.** | AHK v2 has no threads within the same process. Pseudo-threads are cooperative: one blocking operation stops everything. Real parallelism only exists through processes. |
+| D2 | **One editor process per open flow.** | Several editors are open at the same time, and even unfocused ones must be updated continuously. One process per editor decouples drawing, input and crashes. Cost **[M]**: ~30 ms start, ~14 MB RSS, 0 % CPU when idle, per process. This is negligible. |
+| D3 | **Manager (flow list, settings, import/export) is its own process.** | As with the editor: dialogs and the tree view must never stall the engine. |
+| D4 | **Drawing runs in the editor process, behind a narrow `Renderer` interface.** | See 2.1. This makes it separable into its own process later without reworking the editor. |
+| D5 | **IPC: named pipes (byte mode, overlapped) for data, `PostMessage` only as a wake-up call.** | See 2.2. `WM_COPYDATA` rejected. |
+| D6 | **Star topology: the supervisor is the hub.** All processes connect to it, and it routes. | Keeps connections stable even when the engine restarts; the single place for process monitoring. The supervisor contains no business logic and never blocks. |
+| D7 | **One `storage` process owns all files** (flows, variables, settings, logs). | I/O never in the critical path. One writer per file prevents file conflicts between processes. In v1 this was only solved through the global lock, which had to be held for it. |
+| D8 | **One `triggerhost` process holds OS hooks, hotkeys and trigger timers.** | Low-level hooks must respond quickly, or Windows removes them. This must not depend on engine load. Trigger types can later be distributed across several hosts. |
+| D9 | **Elements run in a hybrid way: `inline` in the engine or `worker` in their own process.** | See 2.3. Blocking, risky or UI-showing elements run in workers. This corresponds to the v1 pattern "own thread for AHK code". |
+| D10 | **The editor holds a draft, the engine owns the committed definition.** Changes are applied as patches with a revision number. | See 4.2. One editor per flow, so there are no multi-writer conflicts. |
+| D11 | **Flow file format stays unchanged** (JSON, `ElementIDCounter` etc.). | Requirement 4. See 7. |
+| D12 | **One entry point, roles via parameter**: `AutoHotFlow.ahk --role=<name>`. | One compiled artifact instead of many. The supervisor starts itself with a different role. |
+| D13 | **Tests with pytest as the e2e driver plus small AHK unit tests.** | See [TESTSTRATEGIE.md](TESTSTRATEGIE.md). |
 
-### 2.1 Zeichnen im Editor-Prozess (D4)
+### 2.1 Drawing in the editor process (D4)
 
-Ausgangslage: v1 hatte einen zentralen Draw-Thread, der alle Flows zeichnete und dabei um dasselbe Lock konkurrierte. Das war eine Ursache der schlechten Performanz.
+Starting point: v1 had a central draw thread that drew all flows and competed for the same lock while doing so. This was one cause of the poor performance.
 
-In v2 zeichnet jeder Editor-Prozess nur seinen eigenen Flow, mit eigenem Prozess und ohne geteilte Locks. Mehrere Editoren zeichnen damit parallel auf verschiedenen CPU-Kernen. Der verbleibende Nachteil: Ein langer Zeichenvorgang blockiert die Eingabe **desselben** Editors. Das mildern wir durch:
+In v2 each editor process draws only its own flow, with its own process and without shared locks. Several editors therefore draw in parallel on different CPU cores. The remaining disadvantage: a long drawing operation blocks the input of **the same** editor. We mitigate this through:
 
-- Zeichnen nur bei Änderung (Dirty-Flag), Zusammenfassen mehrerer Änderungen auf einen Frame, Obergrenze ca. 30 Bilder/s.
-- Der `Renderer` bekommt einen **unveränderlichen Szenen-Schnappschuss** (`Scene`: Elemente, Verbindungen, Ansicht, Zustände) und ein Ziel (HWND oder Bitmap). Er liest keinen Editor-Zustand direkt.
+- Drawing only on change (dirty flag), coalescing several changes into one frame, upper limit of about 30 frames/s.
+- The `Renderer` receives an **immutable scene snapshot** (`Scene`: elements, connections, view, states) and a target (HWND or bitmap). It does not read editor state directly.
 
-Trennbarkeit: Ersetzt man den Aufruf `Renderer.Draw(scene, target)` durch eine Nachricht `cmd.render.draw {scene}` an einen `render`-Prozess, der in ein gemeinsam genutztes Bitmap (File Mapping) rendert, ändert sich nur der Editor-Adapter. Der Renderer-Code bleibt gleich.
+Separability: if the call `Renderer.Draw(scene, target)` is replaced by a message `cmd.render.draw {scene}` to a `render` process that renders into a shared bitmap (file mapping), only the editor adapter changes. The renderer code stays the same.
 
-Kriterium für die Abtrennung **[A]**: Wenn ein Frame bei einem realistischen großen Flow (z. B. 300 Elemente) im Mittel über 16 ms liegt oder die Eingabe spürbar stockt, wird der Render-Prozess gebaut. Die Messung ist Teil von Phase 3 (Editor).
+Criterion for separation **[A]**: If a frame for a realistic large flow (e.g. 300 elements) averages more than 16 ms, or the input noticeably stutters, the render process is built. The measurement is part of Phase 3 (editor).
 
 ### 2.2 IPC (D5)
 
-Verglichen: Named Pipes und `WM_COPYDATA`.
+Compared: named pipes and `WM_COPYDATA`.
 
-| Kriterium | Named Pipe | WM_COPYDATA |
+| Criterion | Named pipe | WM_COPYDATA |
 |---|---|---|
-| Richtung / Trennung | bidirektional, pro Verbindung getrennt | pro Richtung ein Fenster-Handle nötig |
-| Blockieren | Schreiben in overlapped-Modus mit Timeout, Aufrufer bleibt handlungsfähig | `SendMessage` blockiert, bis der Empfänger die Nachricht verarbeitet hat. Ein hängender Empfänger hängt den Sender (genau der Deadlock, den wir vermeiden wollen). `PostMessage` ist nicht möglich, weil der Datenzeiger gültig bleiben muss. |
-| Absturzerkennung | Gegenseite weg → `ERROR_BROKEN_PIPE` | nur über Fenster-Handle-Prüfung |
-| Größe | frei (Rahmen mit Längenpräfix) | begrenzt durch Speicher, UIPI-Probleme bei erhöhten Prozessen |
-| Aufwand | höher (DllCall, OVERLAPPED) | gering |
+| Direction / separation | bidirectional, separated per connection | one window handle needed per direction |
+| Blocking | writing in overlapped mode with timeout, caller remains able to act | `SendMessage` blocks until the receiver has processed the message. A hanging receiver hangs the sender (exactly the deadlock we want to avoid). `PostMessage` is not possible, because the data pointer must stay valid. |
+| Crash detection | peer gone → `ERROR_BROKEN_PIPE` | only via window handle check |
+| Size | free (frame with length prefix) | limited by memory, UIPI problems with elevated processes |
+| Effort | higher (DllCall, OVERLAPPED) | low |
 
-**Entscheidung:** Named Pipes. Der Aufwand wurde in einem Spike geprüft **[M]**:
+**Decision:** named pipes. The effort was checked in a spike **[M]**:
 
-- Ein AHK-v2-Prozess betreibt per `DllCall` einen overlapped Pipe-Server. Ein Python-Prozess verbindet sich mit `open(r"\\.\pipe\name", "r+b", buffering=0)`. Damit sind pytest-basierte e2e-Tests ohne Zusatzbibliothek möglich.
-- Reines Polling (Timer 250 ms) ergibt Round-Trips um 250 ms. Mit `PostMessage` als Weckruf nach dem Schreiben sinkt die Round-Trip-Zeit auf **~0,3 ms** (Median).
-- Der Spike liegt in `work_items/spikes/` (`pipe_server.ahk`, `client.py`).
+- An AHK v2 process runs an overlapped pipe server via `DllCall`. A Python process connects with `open(r"\\.\pipe\name", "r+b", buffering=0)`. This makes pytest-based e2e tests possible without an additional library.
+- Pure polling (timer 250 ms) gives round trips of around 250 ms. With `PostMessage` as a wake-up call after writing, the round-trip time drops to **~0.3 ms** (median).
+- The spike is in `work_items/spikes/` (`pipe_server.ahk`, `client.py`).
 
-Konsequenzen:
+Consequences:
 
-- Nach jedem Schreiben sendet der Sender `PostMessage(peerHwnd, WM_AHF_WAKE)`. Der Empfänger liest bei Weckruf **und** zusätzlich per Fallback-Timer (250 ms), damit ein verlorener Weckruf nichts blockiert.
-- Die HWNDs werden im Handshake (`sys.hello`/`sys.welcome`) ausgetauscht.
-- Pipes sind `PIPE_REJECT_REMOTE_CLIENTS`, der Name enthält eine Session-ID.
+- After each write, the sender sends `PostMessage(peerHwnd, WM_AHF_WAKE)`. On a wake-up call the receiver reads **and** additionally via a fallback timer (250 ms), so that a lost wake-up call blocks nothing.
+- The HWNDs are exchanged in the handshake (`sys.hello`/`sys.welcome`).
+- Pipes are `PIPE_REJECT_REMOTE_CLIENTS`; the name contains a session ID.
 
-### 2.3 Elementausführung: inline oder worker (D9)
+### 2.3 Element execution: inline or worker (D9)
 
-AHK v2 hat kein `await`. Ein Element, das `RunWait`, `WinWait`, einen Download oder einen Dialog nutzt, würde die Engine anhalten.
+AHK v2 has no `await`. An element that uses `RunWait`, `WinWait`, a download or a dialog would stall the engine.
 
-| Modus | Läuft in | Für | Regel |
+| Mode | Runs in | For | Rule |
 |---|---|---|---|
-| `inline` | Engine | schnelle, nicht blockierende Elemente (Variablen, Strings, Zahlen, Listen, Timer über `SetTimer`) | darf **nie** blockieren. Langes läuft über `ctx.After(ms, fn)` oder wird in Teile zerlegt. |
-| `worker` | eigener Prozess aus einem Pool | blockierende, riskante oder UI-zeigende Elemente: Dialoge (`MsgBox`, `InputBox`, `FileSelect`), `RunWait`, Netzwerk, COM, DllCall, AHK-Skript | bekommt **ausgewertete Parameter** und eine explizite Importliste, liefert Ergebnis plus Exportvariablen zurück |
-| `trigger` | triggerhost | alle Trigger | siehe [ELEMENT-API-V2.md](ELEMENT-API-V2.md) |
+| `inline` | engine | fast, non-blocking elements (variables, strings, numbers, lists, timers via `SetTimer`) | must **never** block. Anything long runs via `ctx.After(ms, fn)` or is split into parts. |
+| `worker` | own process from a pool | blocking, risky or UI-showing elements: dialogs (`MsgBox`, `InputBox`, `FileSelect`), `RunWait`, network, COM, DllCall, AHK script | receives **evaluated parameters** and an explicit import list, returns result plus export variables |
+| `trigger` | triggerhost | all triggers | see [ELEMENT-API-V2.md](ELEMENT-API-V2.md) |
 
-Das erfüllt die Vorgabe „keine UI-Dialoge aus der Engine“: Dialog-Elemente laufen im Worker. Die Engine „bittet die UI per Nachricht“. Der Worker ist der UI-Prozess dafür.
+This fulfills the requirement "no UI dialogs from the engine": dialog elements run in the worker. The engine "asks the UI by message". The worker is the UI process for this.
 
-Eine falsch eingestufte Inline-Aktion fällt nicht still auf: Der Engine-Watchdog (6.2) meldet, wenn ein Elementaufruf länger als 250 ms im Engine-Prozess läuft, mit Klasse und Flow.
+An incorrectly classified inline action does not fail silently: the engine watchdog (6.2) reports when an element call runs longer than 250 ms in the engine process, with class and flow.
 
-**Entscheidung E3 (2026-10-11):** Der Supervisor startet und beendet Worker-Prozesse auf Anfrage der Engine (elastischer Pool). Ein Worker, der einen Job bearbeitet, ist von der Ping-Prüfung ausgenommen. Fristen für Jobs hält die Engine. Die Regeln stehen in Abschnitt 6.4 (WI-27).
+**Decision E3 (2026-10-11):** The supervisor starts and stops worker processes on request of the engine (elastic pool). A worker that is processing a job is exempt from the ping check. Deadlines for jobs are held by the engine. The rules are in section 6.4 (WI-27).
 
 ---
 
-## 3. Prozesse
+## 3. Processes
 
-| Rolle (`--role`) | Anzahl | Aufgabe | Besitzt | Tut niemals |
+| Role (`--role`) | Count | Task | Owns | Never does |
 |---|---:|---|---|---|
-| `supervisor` | 1 | Start, Überwachung, Neustart, Shutdown, Hub/Router, Tray-Symbol | Prozessliste, Session-ID | Fachlogik, Datei-I/O, Dialoge |
-| `storage` | 1 | Dateizugriff, Log-Senke, Einstellungsdatei | alle Dateien unter dem Datenverzeichnis | Fachentscheidungen, Dialoge |
-| `engine` | 1 | Flow-Definitionen (committed), Instanzen, Threads, Variablen, Ausführung inline-Elemente, Trigger-Soll-Zustand | Laufzeitzustand | blockieren, Dateien anfassen, Dialoge zeigen |
-| `triggerhost` | 1 (später n) | Trigger scharf schalten, Ereignisse melden | OS-Handles der Trigger (Hotkeys, Hooks, Timer) | Flows ausführen |
-| `manager` | 0..1 | Flow-Liste, Kategorien, Einstellungen, Import/Export, Log-Anzeige | Fensterzustand | Flows ausführen |
-| `editor:<flowId>` | 0..n | Bearbeiten und Anzeigen eines Flows, Zeichnen | Entwurf des Flows, Undo/Redo, Ansicht (Zoom/Offset), Auswahl | Laufzeitzustand ändern |
-| `worker:<n>` | 0..N (elastischer Pool, Abschnitt 6.4) | blockierende/UI-Elemente ausführen | nur kurzlebige Kopie der Aufgabe | Zustand halten |
-| `debug` | 0..1 | Debug-Fenster: Prozesstabelle, Snapshot je Rolle, Live-Log, Ereignisstrom, `Debug.Dump`-Werte, Bericht exportieren (WI-28, PROTOKOLL 4.9) | Fensterzustand, Ansichtsfilter | Zustand anderer Rollen ändern, Dateien anfassen |
+| `supervisor` | 1 | start, monitoring, restart, shutdown, hub/router, tray icon | process list, session ID | business logic, file I/O, dialogs |
+| `storage` | 1 | file access, log sink, settings file | all files under the data directory | business decisions, dialogs |
+| `engine` | 1 | flow definitions (committed), instances, threads, variables, execution of inline elements, trigger target state | runtime state | block, touch files, show dialogs |
+| `triggerhost` | 1 (later n) | arm triggers, report events | OS handles of the triggers (hotkeys, hooks, timers) | execute flows |
+| `manager` | 0..1 | flow list, categories, settings, import/export, log display | window state | execute flows |
+| `editor:<flowId>` | 0..n | edit and display a flow, drawing | draft of the flow, undo/redo, view (zoom/offset), selection | change runtime state |
+| `worker:<n>` | 0..N (elastic pool, section 6.4) | execute blocking/UI elements | only a short-lived copy of the task | hold state |
+| `debug` | 0..1 | debug window: process table, snapshot per role, live log, event stream, `Debug.Dump` values, export report (WI-28, PROTOCOL 4.9) | window state, view filter | change state of other roles, touch files |
 
-Der Supervisor ist der kleinste und einfachste Prozess. Er ist ein Hub, weil ein Neustart der Engine dann keine Verbindung der Clients zerstört. Fällt der Supervisor selbst aus, beenden sich alle Kinder nach kurzer Frist (Orphan-Guard, siehe 6.3).
+The supervisor is the smallest and simplest process. It is a hub, because a restart of the engine then does not destroy the clients' connections. If the supervisor itself fails, all children terminate after a short deadline (orphan guard, see 6.3).
 
 ---
 
-## 4. Datenbesitz
+## 4. Data ownership
 
-**Ein Besitzer pro Datum.** Alle anderen bekommen Kopien oder Ereignisse, nie Referenzen.
+**One owner per datum.** All others receive copies or events, never references.
 
-| Datum | Besitzer (einziger Schreiber) | Kopien / Konsumenten |
+| Datum | Owner (sole writer) | Copies / consumers |
 |---|---|---|
-| Flow-Definition (committed, mit `rev`) | engine | editor (Entwurf), manager (Metadaten für Liste) |
-| Flow-Entwurf, Undo/Redo, Auswahl, Zoom, Offset | `editor:<flowId>` | – |
-| Instanzen, Threads, Element-Ausführungsstatus | engine | UI per Ereignis (`evt.element.state`) |
-| Variablen `instance`/`thread`/`loop` | engine | – (Worker bekommt Kopie der importierten) |
-| Variablen `global`/`static` (Arbeitskopie) | engine | – |
-| Variablen-Dateien auf Platte | storage | – (write-behind aus der Engine) |
-| Flow-Dateien, Backups | storage | – |
-| Einstellungen (Laufzeit) | engine | alle als read-only Kopie per `evt.settings.changed` |
-| Einstellungen (Datei) | storage | – |
-| Trigger-Handles (Hotkey, Hook) | triggerhost | engine kennt nur den Soll-Zustand |
-| Prozessliste, Neustartzähler | supervisor | – |
-| Diagnosedaten eines Prozesses (Ringpuffer von Log, letzte unbehandelte Fehler, Zähler von Peer und Verbindung) | der Prozess selbst; andere bekommen eine Kopie per `cmd.diag.snapshot` (Abschnitt 6.2, PROTOKOLL 4.9) | `debug`, Absturzbericht |
-| Ausgabepuffer der Kinder (stdout/stderr, auch beendeter), Ring der `evt.diag.error`, Ereignisse des Topics `process`, noch nicht geschriebene Berichte | supervisor | Absturzbericht |
-| Berichtsordner `Reports/` | storage (einziger Schreiber, der Supervisor liefert nur den Inhalt) | – |
-| Sprachtexte | jede Rolle lädt `language/*.ini` selbst, read-only | – |
+| Flow definition (committed, with `rev`) | engine | editor (draft), manager (metadata for the list) |
+| Flow draft, undo/redo, selection, zoom, offset | `editor:<flowId>` | – |
+| Instances, threads, element execution status | engine | UI via event (`evt.element.state`) |
+| Variables `instance`/`thread`/`loop` | engine | – (worker receives a copy of the imported ones) |
+| Variables `global`/`static` (working copy) | engine | – |
+| Variable files on disk | storage | – (write-behind from the engine) |
+| Flow files, backups | storage | – |
+| Settings (runtime) | engine | everyone as read-only copy via `evt.settings.changed` |
+| Settings (file) | storage | – |
+| Trigger handles (hotkey, hook) | triggerhost | engine only knows the target state |
+| Process list, restart counter | supervisor | – |
+| Diagnostic data of a process (ring buffer of log, last unhandled errors, counters of peer and connection) | the process itself; others receive a copy via `cmd.diag.snapshot` (section 6.2, PROTOCOL 4.9) | `debug`, crash report |
+| Output buffer of the children (stdout/stderr, also of ended ones), ring of `evt.diag.error`, events of the topic `process`, reports not yet written | supervisor | crash report |
+| Report folder `Reports/` | storage (sole writer; the supervisor only supplies the content) | – |
+| Language texts | each role loads `language/*.ini` itself, read-only | – |
 
-### 4.1 Zustandsänderungen sind Ereignisse
+### 4.1 State changes are events
 
-UIs rendern, was die Engine meldet. Ein Editor markiert ein Element nicht selbst als „running“, er empfängt `evt.element.state`. Ein neu verbundener oder neu gestarteter Client holt den Ist-Zustand per `cmd.engine.snapshot` (Resync), danach folgen Ereignisse mit steigender `seq`.
+UIs render what the engine reports. An editor does not mark an element as "running" itself; it receives `evt.element.state`. A newly connected or restarted client fetches the actual state via `cmd.engine.snapshot` (resync); afterwards events follow with increasing `seq`.
 
-### 4.2 Bearbeitungsmodell (D10, E1)
+### 4.2 Editing model (D10, E1)
 
-- v1 verhält sich so **[V1]**: Der Editor ändert den „current state“ des Flows direkt im geteilten Speicher, die Ausführung liest bei jedem Schritt aus dem aktuellen Zustand. Änderungen während der Ausführung wirken sich also auf folgende Schritte aus.
-- **Entscheidung E1 (2026-10-11): Ändern während der Ausführung ist erlaubt** (beobachtbares v1-Verhalten). Die Engine nutzt bei jedem Schritt die **neueste committete Revision** eines Flows. Umgesetzt in WI-21: Ein Lauf (`Executor._NewRun`) merkt sich nur die `flowId`. Jeder Schritt (Start eines Elements, Wahl der nächsten Verbindung) holt die Definition über `Executor._DefOf` aus der `FlowTable` der Engine. Eine neue Revision (`FlowRecord.Commit`) gilt damit beim nächsten Schritt aller laufenden Instanzen. Klasse und Parameter eines laufenden Elements stehen in `run["active"]` und bleiben die vom Start.
-- v2 behält dieses beobachtbare Verhalten, aber ohne geteilten Speicher: Der Editor schickt nach jeder abgeschlossenen Benutzeraktion (Mausloslassen, Dialog OK) einen **Patch** `cmd.flow.patch {flowId, baseRev, ops}`. Die Engine wendet ihn atomar an, erhöht `rev` und antwortet mit der neuen `rev`. Die Engine liest bei jedem Schritt die neueste committete Revision. Jede Revision ist ein unveränderlicher Schnappschuss, es gibt keine halb geschriebenen Zustände.
-- Bei `baseRev`-Konflikt (z. B. Manager hat umbenannt) lehnt die Engine ab und sendet den aktuellen Stand. Der Editor führt neu zusammen.
-- Nur-Ansicht-Änderungen (Zoom, Offset) gehören dem Editor und werden mit „Speichern“ als `flowSettings` mitgeschrieben.
-- Speichern ist ein expliziter Befehl: `cmd.flow.save`. Die Engine übergibt den Schnappschuss an `storage`, `storage` schreibt atomar (Temp-Datei + Umbenennen) und meldet `evt.flow.saved`.
+- v1 behaves like this **[V1]**: the editor changes the "current state" of the flow directly in shared memory, and execution reads the current state at each step. Changes during execution therefore affect the following steps.
+- **Decision E1 (2026-10-11): changing during execution is allowed** (observable v1 behavior). The engine uses the **latest committed revision** of a flow at each step. Implemented in WI-21: a run (`Executor._NewRun`) only stores the `flowId`. Each step (start of an element, selection of the next connection) fetches the definition via `Executor._DefOf` from the engine's `FlowTable`. A new revision (`FlowRecord.Commit`) therefore applies to all running instances at their next step. Class and parameters of a running element are in `run["active"]` and remain those from the start.
+- v2 keeps this observable behavior, but without shared memory: after each completed user action (mouse release, dialog OK) the editor sends a **patch** `cmd.flow.patch {flowId, baseRev, ops}`. The engine applies it atomically, increments `rev` and answers with the new `rev`. The engine reads the latest committed revision at each step. Every revision is an immutable snapshot; there are no half-written states.
+- On a `baseRev` conflict (e.g. the manager has renamed something), the engine rejects and sends the current state. The editor merges again.
+- View-only changes (zoom, offset) belong to the editor and are written along as `flowSettings` with "Save".
+- Saving is an explicit command: `cmd.flow.save`. The engine hands the snapshot to `storage`, `storage` writes atomically (temp file + rename) and reports `evt.flow.saved`.
 
-**Semantik bei Änderungen während der Ausführung (Zielzustand nach WI-21).** Abgeglichen mit v1 (`v1/Source_Execution/Execution Task/Execution Task.ahk`, Zeilen aus dem Code gelesen, nicht ausgeführt). Abweichungen von v1 stehen in [MIGRATION.md](MIGRATION.md) (M-17, M-18).
+**Semantics for changes during execution (target state after WI-21).** Reconciled with v1 (`v1/Source_Execution/Execution Task/Execution Task.ahk`, lines read from the code, not executed). Deviations from v1 are in [MIGRATION.md](MIGRATION.md) (M-17, M-18).
 
-| Fall | Verhalten in v2 | Verhalten in v1 |
+| Case | Behavior in v2 | Behavior in v1 |
 |---|---|---|
-| Laufendes Element (`running`), dessen Parameter oder Klasse geändert werden | läuft mit Klasse und Parametern zu Ende, mit denen es gestartet wurde; `Element_stop` mit denselben Werten | Parameter werden beim Start kopiert (`:72`) und aus der Kopie ausgeführt und gestoppt (`:246`, `:211`). Die Klasse für `Element_stop` kommt aber aus dem aktuellen Zustand (`:198`), siehe M-18 |
-| Thread wartet (`ready`, v1 `starting`), Element wird geändert | startet mit den Werten, die im Moment des Starts gelten | liest Klasse und Parameter beim Start aus dem aktuellen Zustand (`:67`, `:72`) |
-| Nächste Verbindung nach dem Ende eines Elements | aus der neuesten Revision | `:110`, `:115`, `:138` lesen den aktuellen Zustand |
-| Thread wartet (`ready`), nächstes Element wurde gelöscht | endet mit Ergebnis `exception`, Meldung „element was removed“, `f1`-Log. Kein Dialog aus der Engine. Abweichung, siehe M-17 | `:67` liefert ein leeres Element, `:71` setzt den Thread auf `running`, `:88`–`:94` findet keine Funktion und ruft `MsgBox` auf, innerhalb der kritischen Sektion. Es wird keine Aufgabe eingereiht, der Thread bleibt dauerhaft `running` (vermutet, dass der Zugriff auf eine Eigenschaft des leeren Werts keinen Fehler wirft, nicht ausgeführt) |
-| Laufendes Element wird gelöscht | läuft zu Ende. Danach findet es keine Verbindung, der Thread endet. Die Meldung nennt Element-ID und den Namen aus dem Start (M-18) | `:110` liefert kein Element, `:153`–`:166` beenden den Thread. Der Name im `f0`-Log bleibt leer (`:161`, vermutet) |
-| Flow wird gelöscht | alle Instanzen werden gestoppt (Grund `flow.deleted`, `Executor.FlowDeleted`). Der Stopp wartet auf keine Quittung (`Executor._StopRun`), das Löschen kann also nicht an einer Frist scheitern. Verschwindet ein Flow aus der Tabelle, ohne dass `FlowDeleted` lief, stoppt der nächste Schritt der Instanz sie mit demselben Grund | `DeleteFlow` stoppt alle Instanzen (`Manage Flows.ahk:190`, `Instances and Threads.ahk:165`–`:188`), wartet höchstens 10 s, sonst bricht es ab und löscht nicht (`Manage Flows.ahk:192`–`:206`). Einen Grund gibt es in v1 nicht. In v2 gibt es keine Frist und keinen Abbruch: das Löschen ohne Frist ist **bestätigt** vom Projektinhaber am 2026-10-12 (E9). Instanzen stoppen sofort; ein blockierender Worker wird vom Pool nach `WorkerBridge.ORPHAN_MS` (2 s) beendet |
+| Running element (`running`) whose parameters or class are changed | runs to the end with the class and parameters it was started with; `Element_stop` with the same values | Parameters are copied at start (`:72`) and executed and stopped from the copy (`:246`, `:211`). The class for `Element_stop` however comes from the current state (`:198`), see M-18 |
+| Thread waits (`ready`, v1 `starting`), element is changed | starts with the values that apply at the moment of start | reads class and parameters at start from the current state (`:67`, `:72`) |
+| Next connection after the end of an element | from the latest revision | `:110`, `:115`, `:138` read the current state |
+| Thread waits (`ready`), next element was deleted | ends with result `exception`, message "element was removed", `f1` log. No dialog from the engine. Deviation, see M-17 | `:67` returns an empty element, `:71` sets the thread to `running`, `:88`–`:94` finds no function and calls `MsgBox`, inside the critical section. No task is queued, the thread stays `running` permanently (assumed that access to a property of the empty value throws no error, not executed) |
+| Running element is deleted | runs to the end. Afterwards it finds no connection, the thread ends. The message names the element ID and the name from the start (M-18) | `:110` returns no element, `:153`–`:166` end the thread. The name in the `f0` log remains empty (`:161`, assumed) |
+| Flow is deleted | all instances are stopped (reason `flow.deleted`, `Executor.FlowDeleted`). The stop waits for no acknowledgement (`Executor._StopRun`), so the deletion cannot fail on a deadline. If a flow disappears from the table without `FlowDeleted` having run, the next step of the instance stops it with the same reason | `DeleteFlow` stops all instances (`Manage Flows.ahk:190`, `Instances and Threads.ahk:165`–`:188`), waits at most 10 s, otherwise it aborts and does not delete (`Manage Flows.ahk:192`–`:206`). v1 has no reason for this. In v2 there is no deadline and no abort: deleting without a deadline is **confirmed** by the project owner on 2026-10-12 (E9). Instances stop immediately; a blocking worker is terminated by the pool after `WorkerBridge.ORPHAN_MS` (2 s) |
 
-### 4.3 Ausblick: Debugger (E1)
+### 4.3 Outlook: debugger (E1)
 
-Der Debugger wird in Phase 2b **nicht** gebaut. Die folgenden Anforderungen dürfen spätere Entwürfe aber nicht verbauen:
+The debugger is **not** built in Phase 2b. However, the following requirements must not be blocked by later designs:
 
-- Ein **Ausführungstor** im Dispatcher der Engine: Vor jedem Element kann die Ausführung je Instanz oder Flow angehalten werden (Pause, Breakpoint an einem Element, Einzelschritt, künstliche Verzögerung nach jedem Element, z. B. 3 s). Pausieren wirkt an Elementgrenzen; ein laufendes Element (vor allem im Worker) läuft zu Ende.
-- Während einer Pause können Clients alle Variablen einer Instanz lesen und ändern (Nachrichten an die Engine, die Engine besitzt die Variablen, Abschnitt 4).
-- Bearbeiten während der Pause wirkt beim nächsten Schritt (folgt aus E1 und der Tabelle in 4.2).
-- Die Ereignisse dafür (z. B. `evt.instance.paused`) und Befehle (`cmd.debug.*`) entwirft Phase 3 oder später.
-
----
-
-## 5. Zustandsautomaten
-
-Ungültige Übergänge werden **nicht** ausgeführt, sondern mit `a0`-Log abgewiesen. Die Tabellen sind normativ.
-
-### 5.1 Instanz (`instance`)
-
-| Von | Ereignis | Nach | Aktion |
-|---|---|---|---|
-| (neu) | `flow.start` oder Trigger akzeptiert (nach Ausführungsrichtlinie) | `running` | Thread für Trigger-Element anlegen |
-| (neu) | Richtlinie `skip` und Flow läuft | (abgewiesen) | Callback „skipped“ |
-| (neu) | Richtlinie `wait` und Flow läuft (E2, M-11) | `waiting` | in die Warteschlange des Flows einreihen (FIFO), `evt.instance.queued`, Antwort `waiting: true` |
-| `waiting` | keine gestartete Instanz des Flows mehr (die vorige ist `ended`) und die Instanz ist die erste der Warteschlange | `running` | Thread für Trigger-Element anlegen, `evt.instance.started`. Fehlt der Flow oder der Trigger inzwischen, endet die Instanz ohne `started` (Grund `flow.deleted` bzw. `trigger removed`) |
-| `waiting` | `flow.stop` / Flow gelöscht | `ended` | aus der Warteschlange entfernen, `evt.instance.ended`. Die Instanz hat keinen Thread |
-| `running` | letzter Thread entfernt | `ended` | Instanz entfernen, `flow.executing` neu berechnen |
-| `running` | `flow.stop` / Richtlinie `stop` / `x_InstanceStop` | `stopping` | alle Threads `stopping`. Wartende Instanzen des Flows werden vorher beendet |
-| `stopping` | alle Threads entfernt | `ended` | Callback „stopped“ |
-| `stopping` | Frist (2 s) ohne Quittung | `ended` | Worker hart beenden, loggen. Die Instanz endet sofort; die Engine fordert das harte Beenden des Workers beim Supervisor an (`cmd.process.kill`, Abschnitt 6.4), sie beendet selbst keinen Prozess |
-| `ended` | beliebig | – | ignorieren (loggen) |
-
-### 5.2 Thread (`thread`, Zustände wie v1: starting, running, finished, stopping **[V1]**)
-
-| Von | Ereignis | Nach | Aktion |
-|---|---|---|---|
-| `ready` (v1 `starting`) | Dispatcher wählt Thread | `running` | Element starten (inline oder Worker) |
-| `running` | `ctx.Finish(result, msg)` | `finished` | Ergebnis speichern, Zähler und Zustand des Elements aktualisieren |
-| `finished` | passende Verbindung gefunden | `ready` | nächstes Element setzen, bei mehr als einer Verbindung Thread klonen |
-| `finished` | keine passende Verbindung | `removed` | bei Ergebnis `exception`: unbehandelt loggen und melden |
-| `running` | Stopp der Instanz | `stopping` | `Element_stop` aufrufen oder Worker abbrechen |
-| `stopping` | Stopp-Quittung oder Frist | `removed` | – |
-| `ready` | Stopp der Instanz | `removed` | – |
-| `finished`/`stopping`/`removed` | verspätetes `Finish` | (keine) | ignorieren, `f2`-Log (entspricht v1) |
-
-Die Auswahl der nächsten Verbindung folgt exakt v1: Verbindungstyp gleich Ergebnis, bei Schleifen zusätzlich `fromPart` **[V1]**. Loop-Variablen werden beim Eintritt auf einen Stack gelegt und beim Verlassen (`tail`/`exception`) wiederhergestellt **[V1]**.
-
-### 5.3 Prozess (durch den Supervisor überwacht)
-
-`starting` → (`sys.hello`) → `ready` → (`sys.shutdown`) → `stopping` → `exited`. Abweichungen: `hung` (Ping-Timeout), `crashed` (Prozess weg oder Pipe gebrochen). Siehe 6.2.
+- An **execution gate** in the dispatcher of the engine: before each element, execution can be paused per instance or flow (pause, breakpoint on an element, single step, artificial delay after each element, e.g. 3 s). Pausing takes effect at element boundaries; a running element (especially in the worker) runs to its end.
+- During a pause, clients can read and change all variables of an instance (messages to the engine; the engine owns the variables, section 4).
+- Editing during a pause takes effect at the next step (follows from E1 and the table in 4.2).
+- The events for this (e.g. `evt.instance.paused`) and commands (`cmd.debug.*`) are designed in Phase 3 or later.
 
 ---
 
-## 6. Ablauf, Fehler, Beenden
+## 5. State machines
 
-### 6.1 Start
+Invalid transitions are **not** executed, but rejected with an `a0` log. The tables are normative.
 
-1. Einstieg `AutoHotFlow.ahk` (Rolle `supervisor`). Ein benannter Mutex stellt Einzelinstanz sicher. Ist schon eine Instanz da, leitet der Aufruf Kommandozeilenbefehle (v1: `AHFCommand`) per Pipe an sie weiter und endet.
-2. Supervisor erstellt die Hub-Pipe und startet `storage`. `storage` meldet `sys.hello`, lädt Einstellungen und Verzeichnisindex.
-3. Supervisor startet `engine`. Die Engine holt Einstellungen und alle Flow-Dateien über `storage` (Antworten, nie blockierend), lädt sie in den Speicher und meldet `evt.engine.ready`. Die Dateien liest die Engine **gestaffelt**: höchstens `Engine.LOAD_PARALLEL` (2) `cmd.storage.flow.read` gleichzeitig, die nächste Anfrage geht erst nach der Verarbeitung einer Antwort hinaus (WI-24). Grund: Jede Antwort kostet die Engine das Parsen des ganzen Flow-Texts (rund 0,3 s für 93 KB); kämen alle Antworten auf einmal, stünde ein `sys.ping` hinter allen und der Supervisor hielte die Engine für hängend. Antwortet `storage` nicht (Timeout, Verbindung weg, kein Peer `storage`), fragt die Engine keine weitere Datei an und meldet auch keinen Fehler. **Die Engine wartet auf `storage` (WI-31, F-31, F-24):** Sie abonniert das Topic `process` und fragt dann `cmd.process.list`; sobald `storage` dort `ready` ist oder `evt.process.ready` mit Name `storage` kommt, beginnt sie das Laden. Ist `storage` noch nicht da, fragt sie im Abstand von 1 s erneut, ohne Obergrenze der Versuche, ohne `evt.storage.error` und mit höchstens einer Logzeile (`a1`) je 30 s. Bricht das Laden ab, wartet sie genauso wieder auf `storage`, holt die Liste neu und liest nur die Dateien, die noch kein Ergebnis haben (geladen, oder echter Lese- oder Parse-Fehler); bereits geladene Flows bleiben. `evt.engine.ready` kommt erst, wenn jede Datei der Liste ein Ergebnis hat. Das Routing im Hub liest bei solchen Rahmen nur die Kopffelder (PROTOKOLL 2).
-4. Supervisor startet `triggerhost`. Die Engine schickt `cmd.trigger.arm` für die Trigger aktiver Flows. Fehler pro Trigger werden zurückgemeldet, sie verhindern den Start nicht.
-5. Supervisor startet `manager` (außer `--background`). Das Tray-Symbol hängt am Supervisor.
-6. Jeder Schritt hat ein Timeout (Standard 10 s). Scheitert ein Pflichtprozess, meldet der Supervisor das über Tray-Hinweis und Log und beendet die Session sauber.
+### 5.1 Instance (`instance`)
 
-### 6.2 Fehlerbehandlung
+| From | Event | To | Action |
+|---|---|---|---|
+| (new) | `flow.start` or trigger accepted (according to execution policy) | `running` | create thread for trigger element |
+| (new) | policy `skip` and flow is running | (rejected) | callback "skipped" |
+| (new) | policy `wait` and flow is running (E2, M-11) | `waiting` | enqueue in the flow's queue (FIFO), `evt.instance.queued`, response `waiting: true` |
+| `waiting` | no started instance of the flow anymore (the previous one is `ended`) and the instance is the first in the queue | `running` | create thread for trigger element, `evt.instance.started`. If the flow or the trigger is missing by now, the instance ends without `started` (reason `flow.deleted` or `trigger removed`) |
+| `waiting` | `flow.stop` / flow deleted | `ended` | remove from queue, `evt.instance.ended`. The instance has no thread |
+| `running` | last thread removed | `ended` | remove instance, recalculate `flow.executing` |
+| `running` | `flow.stop` / policy `stop` / `x_InstanceStop` | `stopping` | all threads `stopping`. Waiting instances of the flow are ended beforehand |
+| `stopping` | all threads removed | `ended` | callback "stopped" |
+| `stopping` | deadline (2 s) without acknowledgement | `ended` | terminate worker hard, log. The instance ends immediately; the engine requests the hard termination of the worker from the supervisor (`cmd.process.kill`, section 6.4), it terminates no process itself |
+| `ended` | any | – | ignore (log) |
 
-| Szenario | Erkennung | Reaktion |
+### 5.2 Thread (`thread`, states as in v1: starting, running, finished, stopping **[V1]**)
+
+| From | Event | To | Action |
+|---|---|---|---|
+| `ready` (v1 `starting`) | dispatcher selects thread | `running` | start element (inline or worker) |
+| `running` | `ctx.Finish(result, msg)` | `finished` | save result, update counter and state of the element |
+| `finished` | matching connection found | `ready` | set next element, clone thread if there is more than one connection |
+| `finished` | no matching connection | `removed` | for result `exception`: log as unhandled and report |
+| `running` | stop of the instance | `stopping` | call `Element_stop` or cancel worker |
+| `stopping` | stop acknowledgement or deadline | `removed` | – |
+| `ready` | stop of the instance | `removed` | – |
+| `finished`/`stopping`/`removed` | late `Finish` | (none) | ignore, `f2` log (corresponds to v1) |
+
+The selection of the next connection follows v1 exactly: connection type equals result, and for loops additionally `fromPart` **[V1]**. Loop variables are pushed onto a stack on entry and restored on exit (`tail`/`exception`) **[V1]**.
+
+### 5.3 Process (monitored by the supervisor)
+
+`starting` → (`sys.hello`) → `ready` → (`sys.shutdown`) → `stopping` → `exited`. Deviations: `hung` (ping timeout), `crashed` (process gone or pipe broken). See 6.2.
+
+---
+
+## 6. Flow, errors, shutdown
+
+### 6.1 Startup
+
+1. Entry point `AutoHotFlow.ahk` (role `supervisor`). A named mutex ensures a single instance. If an instance already exists, the call forwards command-line commands (v1: `AHFCommand`) to it via pipe and ends.
+2. Supervisor creates the hub pipe and starts `storage`. `storage` reports `sys.hello`, loads settings and the directory index.
+3. Supervisor starts `engine`. The engine fetches settings and all flow files via `storage` (responses, never blocking), loads them into memory and reports `evt.engine.ready`. The engine reads the files **staggered**: at most `Engine.LOAD_PARALLEL` (2) `cmd.storage.flow.read` at the same time; the next request goes out only after a response has been processed (WI-24). Reason: each response costs the engine the parsing of the whole flow text (about 0.3 s for 93 KB); if all responses came at once, a `sys.ping` would wait behind all of them and the supervisor would consider the engine hung. If `storage` does not respond (timeout, connection gone, no peer `storage`), the engine requests no further file and also reports no error. **The engine waits for `storage` (WI-31, F-31, F-24):** it subscribes to the topic `process` and then asks `cmd.process.list`; as soon as `storage` is `ready` there or `evt.process.ready` arrives with name `storage`, it starts loading. If `storage` is not there yet, it asks again at an interval of 1 s, without an upper limit on attempts, without `evt.storage.error`, and with at most one log line (`a1`) per 30 s. If loading aborts, it likewise waits again for `storage`, fetches the list anew and reads only the files that have no result yet (loaded, or a real read or parse error); already loaded flows remain. `evt.engine.ready` comes only when every file of the list has a result. Routing in the hub reads only the header fields for such frames (PROTOCOL 2).
+4. Supervisor starts `triggerhost`. The engine sends `cmd.trigger.arm` for the triggers of active flows. Errors per trigger are reported back; they do not prevent startup.
+5. Supervisor starts `manager` (except with `--background`). The tray icon is attached to the supervisor.
+6. Each step has a timeout (default 10 s). If a mandatory process fails, the supervisor reports this via tray notice and log and ends the session cleanly.
+
+### 6.2 Error handling
+
+| Scenario | Detection | Reaction |
 |---|---|---|
-| Kindprozess stürzt ab | Prozess-Handle signalisiert oder Pipe gebrochen | Supervisor loggt, startet nach Richtlinie neu (max. 3 Versuche in 60 s), meldet `evt.process.crashed` |
-| Engine stürzt ab | wie oben | Neustart. Laufende Instanzen sind verloren (Dokumentation in [MIGRATION.md](MIGRATION.md)). Clients erhalten `evt.engine.restarted {epoch}` und synchronisieren sich neu. Triggerhost wird neu armiert. |
-| Prozess hängt | kein `sys.pong` auf 3 aufeinanderfolgende Pings (je 2 s) | Supervisor sendet `sys.shutdown`, nach 2 s `TerminateProcess`, dann wie Absturz. Hängt ein Editor, ist nur sein Fenster betroffen. |
-| Supervisor stand still (eingefroren, Standby, Rückstau) | Lücke zwischen zwei Ticks länger als 2 s (`Stall.MIN_GAP_MS`). **Eine** Stelle misst das: der Anfang von `Supervisor._RunTick` (`Stall.Check`), noch vor jeder Bewertung nach der Uhr (WI-33, F-16, E12) | Die Länge des Stillstands (Lücke minus ein regulärer Tick) wird allen Fristinhabern gemeldet, jede Frist rückt um diese Zeit weiter und behält so ihre Restzeit (Log `a1` "supervisor stood still for N ms, deadlines extended"). Kein Kind wird nach alten Zeitstempeln beurteilt: Pong-/Ping-Zeit und Startfrist aller Kinder beginnen neu bei "jetzt" (`Children.ResetLiveness`); Killzeit eines hängenden Kindes, Zeit eines geplanten Neustarts und Nachfrist eines beendeten Prozesses rücken um die Länge (`Children.OnStall`). Anfragen des Hubs (`Hub.Request`, z. B. `cmd.app.prepareExit` mit 10 Minuten) und die `sys.hello`-Frist neuer Verbindungen rücken (`Hub.Shift`), ebenso die Frist und die Kill-Wartezeit des Beendens (`Shutdown.Shift`) und das Warten eines Berichts auf `storage` (`DiagReport.Shift`). Ein wirklich hängendes Kind wird eine Pong-Frist später gefunden. Die Kinder geben während des Stillstands nicht auf (ihr Orphan-Guard greift nur bei gebrochener Pipe). **Anfragen des Hubs sind keine `SetTimer`-Timer mehr, sondern eine Fristliste, die der Tick prüft** (`Hub.Tick`, Genauigkeit ein Tick, 200 ms): Ein `SetTimer`, der im Stillstand fällig wurde, könnte vor dem Tick laufen, der den Stillstand bemerkt, und die Anfrage sofort ablaufen lassen. Nicht verschoben (bewusst): das Fenster der Neustarthistorie (60 s, eine Rate über echte Zeit), der Mindestabstand automatischer Berichte, das Fenster der Fehlerzählung. Die Fristen der Rollen (`Peer.Request` über `SetTimer`) laufen nach einem Standby der Maschine alle auf einmal ab: Antwort `timeout`, der Aufrufer wiederholt (Beobachtungsliste). |
-| Engine endet (Absturz, Neustartgrenze, Ende außerhalb des Beendens der Sitzung) | Prozess-Handle der Engine signalisiert (`Children.Tick`) | Der Supervisor beendet sofort alle lebenden `worker:*` (E10, WI-33): `evt.process.exited {reason: "engine gone"}`, kein `crashed`, nicht für Exit-Code 5, kein Neustart. Sie warten nicht auf die Bewertung des Engine-Endes. Beim Beenden der Sitzung gilt die Reihenfolge der Ränge (6.3). |
-| Log des Supervisors | Der Supervisor hat keinen Peer | `DiagLog` sendet seine Einträge als `evt.log.append` über den Hub an `storage`, davor in einer Warteschlange (max. 500), die beim `sys.hello` von `storage` geleert wird. Auch ohne stderr (Doppelklick-Start) bleibt jede Meldung des Supervisors im `Log/Log.txt`. |
-| Ausgabe eines Kindes (stderr, Ladefehler, letzte Worte) | Der Supervisor startet Kinder mit `CreateProcessW`, stdout und stderr zeigen auf eine anonyme Pipe (`ChildLauncher`); jeder Tick liest sie ohne Blockieren (`ChildPipe`, `PeekNamedPipe`) | Jede Zeile wird ein Log-Eintrag (`a0`, Quelle = Rolle, Text `[<Name>] <Zeile>`) und kommt über `DiagLog` nach `storage`. Je Kind bleiben die letzten 100 Zeilen im Speicher, auch nach dem Prozessende (`Children.Output`, Grundlage des Absturzberichts, WI-28). Beim Ende wird der Rest gelesen, dann werden die Handles geschlossen. Je Tick höchstens 64 KB gelesen und 200 Zeilen geloggt, der Rest nur im Ringpuffer. Vererbt werden nur Schreibende der Pipe und `NUL` (`PROC_THREAD_ATTRIBUTE_HANDLE_LIST`), keine Hub-Pipe. |
-| Meldungen, die für die Diagnose zu viel sind | `--log-level=<0..3>` (Standard 2) | Nur Einträge bis zu dieser Ziffer gehen an `storage`. Die letzten 500 Einträge aller Ebenen bleiben je Prozess im Ringpuffer von `Log` (für den Absturzbericht). |
-| Unbehandelter Fehler in einer Rolle (kein `try/catch`) | `OnError` der Rolle (`Role._OnUnexpected`) | Die Rolle zählt, sendet `evt.diag.error {name, errorType, message, file, line, stack, mode}` an den Supervisor (Log `a0` und Ring der letzten 50) und läuft weiter. Mehr als 20 in 60 s: Exit-Code 6 "too many unexpected errors", für `engine` und `storage` greift danach die Neustartregel. |
-| Snapshot (WI-28) | Jede Rolle beantwortet `cmd.diag.snapshot` (PROTOKOLL 4.9): allgemeiner Teil aus `Role.Snapshot` (Prozess, Speicher, Handles, Peer-Zähler, Log-Ring, letzte unbehandelte Fehler), Rollenteil aus dem Haken `Role.DiagInfo()`. Der Supervisor beantwortet ihn selbst (Prozesstabelle mit Neustarthistorie und Exit-Codes, Hub-Verbindungen und Warteschlangen, Ausgabepuffer der Kinder). Nie Inhalte von Variablen oder Flows. | Antwort kommt aus dem laufenden Prozess. Ein eingefrorener Prozess antwortet nicht; das merkt der Aufrufer an seiner Frist |
-| Absturzbericht (WI-28) | `cmd.diag.report {reason}` oder automatisch bei: Kind unerwartet beendet (`crashed`), Neustartgrenze erreicht, `hung`, 10 unbehandelte Fehler einer Rolle in 60 s | Der Supervisor fragt alle verbundenen Rollen gleichzeitig nach dem Snapshot (Frist 2 s je Rolle, fehlende Antworten stehen im Bericht), ergänzt seinen eigenen Snapshot samt Ausgabepuffern verstorbener Kinder und schickt `report.json` und `summary.txt` an `storage` (`cmd.storage.report.write`), das `Reports/<yyyyMMdd-HHmmss>_<Grund>/` schreibt, die letzten Logdateien kopiert und 20 Berichte behält. Automatisch höchstens einer je Minute, keiner während des Beendens. Ist `storage` nicht da, wartet der Bericht bis 10 s im Speicher des Supervisors; danach wird er beim nächsten Verbinden von `storage` geschrieben. Der Supervisor schreibt nie selbst Dateien |
-| Anfrage ohne Antwort | Timeout der Korrelations-ID | Aufrufer erhält `res` mit `error.code = "timeout"`, nie ein endloses Warten |
-| Ziel einer offenen Anfrage geht weg (stirbt, Pipe bricht) (WI-34, F-40) | Der Hub merkt sich weitergeleitete `cmd.*` (Kopffelder) bis zur Antwort; die Verbindung des Ziels endet | Der Hub antwortet dem Absender sofort mit `peer_gone` (PROTOKOLL 2), nicht erst die Frist des Absenders. Gemessen 0,07 bis 0,15 s statt der Frist (10 s im Test, 30 s beim Laden der Engine). Die Rollen brauchen dafür nichts: `peer_gone` ist eine normale Fehlerantwort. Ausnahme: der Worker-Pool der Engine wertet `peer_gone` auf `cmd.worker.run` als Verlust des Workers ("worker crashed", F-46, WI-35), weil die Antwort vor dem Prozessereignis des Supervisors eintrifft |
-| Pipe bricht | `ERROR_BROKEN_PIPE`/`NO_DATA` | Client versucht Wiederaufbau (Backoff 100 ms bis 2 s, max. 10 s), danach Rolle beendet sich |
-| Worker bricht ab | Prozess weg (`evt.process.crashed`/`exited`) oder `peer_gone` auf dem offenen `cmd.worker.run` (der Hub antwortet bis zu einen Tick vor dem Prozessereignis; beide Wege gelten gleich, ihre Reihenfolge ist offen, F-46) | Engine meldet dem Thread `exception` mit Text „worker crashed“, entfernt den Slot und startet bei Bedarf Ersatz (6.4). Sturmbegrenzung: 5 abnormale Enden in 60 s, dann „worker not available“ |
-| Worker blockiert lange (Download, COM, `DllCall`) | Der Worker meldet Jobbeginn und -ende (`sys.busy`) | Ein beschäftigter Worker wird nicht angepingt und nie als hängend beendet. Er endet nur durch sein Element, durch Abbruch (Frist 2 s, dann hartes Beenden) oder durch die Jobfrist des Elements (6.4) |
-| Engine startet neu | neue Engine-Epoche | Der Supervisor hat die Worker der alten Engine schon beendet (Zeile "Engine endet"). Die neue Engine beendet trotzdem alle noch vorhandenen `worker:*` (zweite Sicherung, `WorkerBridge.Start`) und baut den Pool neu auf (6.4) |
-| Element blockiert die Engine | Watchdog: Elementaufruf > 250 ms (Warnung), > 5 s (Fehler `f0`) | Hinweis auf Klasse und Flow, die Einstufung `inline` ist zu korrigieren |
-| Elementcode wirft | `try/catch` um jeden Aufruf | Thread-Ergebnis `exception` mit Meldung (wie v1 `finishExecutionOfElement(..., "Exception", msg)`) |
-| Ungültiger Zustandsübergang | Zustandsautomat | abgewiesen, `a0`-Log mit Kontext |
-| Datei nicht schreibbar | `storage` meldet Fehler | `evt.storage.error`, Engine behält Arbeitskopie, UI zeigt Hinweis. Nie ein Dialog aus der Engine. |
-| Unbekannte Nachricht | Dispatcher | `res` mit `error.code = "unknown_type"`, geloggt |
+| Child process crashes | process handle signaled or pipe broken | supervisor logs, restarts according to policy (max. 3 attempts in 60 s), reports `evt.process.crashed` |
+| Engine crashes | as above | restart. Running instances are lost (documented in [MIGRATION.md](MIGRATION.md)). Clients receive `evt.engine.restarted {epoch}` and resynchronize. Triggerhost is re-armed. |
+| Process hangs | no `sys.pong` for 3 consecutive pings (2 s each) | supervisor sends `sys.shutdown`, after 2 s `TerminateProcess`, then as with a crash. If an editor hangs, only its window is affected. |
+| Supervisor stood still (frozen, standby, backlog) | gap between two ticks longer than 2 s (`Stall.MIN_GAP_MS`). **One** place measures this: the start of `Supervisor._RunTick` (`Stall.Check`), before any evaluation by the clock (WI-33, F-16, E12) | The length of the standstill (gap minus one regular tick) is reported to all deadline holders; each deadline is pushed back by this time and thus keeps its remaining time (log `a1` "supervisor stood still for N ms, deadlines extended"). No child is judged by old timestamps: pong/ping time and startup deadline of all children begin anew at "now" (`Children.ResetLiveness`); kill time of a hanging child, time of a planned restart and grace period of an ended process are shifted by the length (`Children.OnStall`). Requests of the hub (`Hub.Request`, e.g. `cmd.app.prepareExit` with 10 minutes) and the `sys.hello` deadline of new connections are shifted (`Hub.Shift`), likewise the deadline and kill wait time of the shutdown (`Shutdown.Shift`) and a report's wait for `storage` (`DiagReport.Shift`). A truly hanging child is found one pong deadline later. The children do not give up during the standstill (their orphan guard only triggers on a broken pipe). **Requests of the hub are no longer `SetTimer` timers, but a deadline list that the tick checks** (`Hub.Tick`, precision one tick, 200 ms): a `SetTimer` that became due during the standstill could run before the tick that notices the standstill, and expire the request immediately. Deliberately not shifted: the window of the restart history (60 s, a rate over real time), the minimum interval of automatic reports, the window of the error count. The deadlines of the roles (`Peer.Request` via `SetTimer`) all expire at once after a standby of the machine: response `timeout`, the caller retries (watch list). |
+| Engine ends (crash, restart limit, end outside of session shutdown) | process handle of the engine signaled (`Children.Tick`) | The supervisor immediately terminates all living `worker:*` (E10, WI-33): `evt.process.exited {reason: "engine gone"}`, not `crashed`, not for exit code 5, no restart. They do not wait for the evaluation of the engine's end. When the session ends, the order of ranks applies (6.3). |
+| Log of the supervisor | the supervisor has no peer | `DiagLog` sends its entries as `evt.log.append` via the hub to `storage`, queued beforehand (max. 500), which is emptied on `sys.hello` from `storage`. Even without stderr (double-click start), every message of the supervisor remains in `Log/Log.txt`. |
+| Output of a child (stderr, load errors, last words) | the supervisor starts children with `CreateProcessW`; stdout and stderr point to an anonymous pipe (`ChildLauncher`); each tick reads it without blocking (`ChildPipe`, `PeekNamedPipe`) | Each line becomes a log entry (`a0`, source = role, text `[<Name>] <line>`) and goes via `DiagLog` to `storage`. Per child, the last 100 lines remain in memory, also after the process has ended (`Children.Output`, basis of the crash report, WI-28). At the end the remainder is read, then the handles are closed. Per tick at most 64 KB read and 200 lines logged; the rest only in the ring buffer. Only the writing end of the pipe and `NUL` are inherited (`PROC_THREAD_ATTRIBUTE_HANDLE_LIST`), not the hub pipe. |
+| Messages that are too much for diagnosis | `--log-level=<0..3>` (default 2) | Only entries up to this digit go to `storage`. The last 500 entries of all levels remain per process in the ring buffer of `Log` (for the crash report). |
+| Unhandled error in a role (no `try/catch`) | `OnError` of the role (`Role._OnUnexpected`) | The role counts it, sends `evt.diag.error {name, errorType, message, file, line, stack, mode}` to the supervisor (log `a0` and ring of the last 50) and continues running. More than 20 in 60 s: exit code 6 "too many unexpected errors"; for `engine` and `storage` the restart rule applies afterwards. |
+| Snapshot (WI-28) | every role answers `cmd.diag.snapshot` (PROTOCOL 4.9): general part from `Role.Snapshot` (process, memory, handles, peer counters, log ring, last unhandled errors), role part from the hook `Role.DiagInfo()`. The supervisor answers it itself (process table with restart history and exit codes, hub connections and queues, output buffers of the children). Never contents of variables or flows. | The answer comes from the running process. A frozen process does not answer; the caller notices this at its deadline |
+| Crash report (WI-28) | `cmd.diag.report {reason}` or automatically on: child ended unexpectedly (`crashed`), restart limit reached, `hung`, 10 unhandled errors of a role in 60 s | The supervisor asks all connected roles simultaneously for the snapshot (deadline 2 s per role; missing answers are noted in the report), adds its own snapshot including output buffers of dead children, and sends `report.json` and `summary.txt` to `storage` (`cmd.storage.report.write`), which writes `Reports/<yyyyMMdd-HHmmss>_<reason>/`, copies the latest log files and keeps 20 reports. Automatically at most one per minute, none during shutdown. If `storage` is not there, the report waits up to 10 s in the supervisor's memory; afterwards it is written on the next connection of `storage`. The supervisor never writes files itself |
+| Request without response | timeout of the correlation ID | caller receives `res` with `error.code = "timeout"`, never an endless wait |
+| Target of an open request goes away (dies, pipe breaks) (WI-34, F-40) | The hub remembers forwarded `cmd.*` (header fields) until the response; the connection of the target ends | The hub immediately answers the sender with `peer_gone` (PROTOCOL 2), not only when the sender's deadline expires. Measured 0.07 to 0.15 s instead of the deadline (10 s in the test, 30 s when loading the engine). The roles need nothing for this: `peer_gone` is a normal error response. Exception: the engine's worker pool treats `peer_gone` on `cmd.worker.run` as loss of the worker ("worker crashed", F-46, WI-35), because the response arrives before the supervisor's process event |
+| Pipe breaks | `ERROR_BROKEN_PIPE`/`NO_DATA` | client attempts reconnection (backoff 100 ms to 2 s, max. 10 s), afterwards the role terminates itself |
+| Worker fails | process gone (`evt.process.crashed`/`exited`) or `peer_gone` on the open `cmd.worker.run` (the hub answers up to one tick before the process event; both paths apply equally, their order is open, F-46) | Engine reports the thread `exception` with text "worker crashed", removes the slot and starts a replacement if needed (6.4). Storm limit: 5 abnormal ends in 60 s, then "worker not available" |
+| Worker blocks for a long time (download, COM, `DllCall`) | the worker reports job start and end (`sys.busy`) | A busy worker is not pinged and never terminated as hung. It ends only through its element, through cancellation (deadline 2 s, then hard termination) or through the job deadline of the element (6.4) |
+| Engine restarts | new engine epoch | The supervisor has already terminated the workers of the old engine (line "Engine ends"). The new engine nevertheless terminates all remaining `worker:*` (second safeguard, `WorkerBridge.Start`) and rebuilds the pool (6.4) |
+| Element blocks the engine | watchdog: element call > 250 ms (warning), > 5 s (error `f0`) | Note with class and flow; the classification `inline` must be corrected |
+| Element code throws | `try/catch` around each call | thread result `exception` with message (like v1 `finishExecutionOfElement(..., "Exception", msg)`) |
+| Invalid state transition | state machine | rejected, `a0` log with context |
+| File not writable | `storage` reports error | `evt.storage.error`, engine keeps working copy, UI shows notice. Never a dialog from the engine. |
+| Unknown message | dispatcher | `res` with `error.code = "unknown_type"`, logged |
 
-### 6.3 Beenden
+### 6.3 Shutdown
 
-Zwei Phasen, damit Benutzerentscheidungen nicht in harte Timeouts laufen:
+Two phases, so that user decisions do not run into hard timeouts:
 
-1. **Prepare (abbrechbar, keine harte Frist):** Supervisor sendet `cmd.app.prepareExit` an Editoren und Manager. Ein Editor mit ungespeicherten Änderungen fragt den Benutzer. Der Benutzer kann abbrechen, dann endet der Vorgang, nichts wurde gestoppt.
-2. **Shutdown (harte Frist, Standard 5 s gesamt):** Supervisor sendet `sys.shutdown {deadlineMs}`. Reihenfolge der Quittungen: Editoren/Manager/Debug-Fenster (Rang 0, `cmd.app.prepareExit` nur an Editoren und Manager), Engine (stoppt Instanzen mit je 2 s, schreibt Variablen zu `storage`), Triggerhost (deaktiviert alle Trigger), Worker, zuletzt `storage` (Queue leeren). Jeder Prozess quittiert mit `sys.bye` und beendet sich selbst.
-   - **Die Rolle leert vor dem Ende (WI-30, F-26):** `sys.bye` ist die letzte Nachricht einer Rolle, alles davor Gesendete (Ereignisse der gestoppten Instanzen, `evt.worker.done` "stopped", Logzeilen, in Phase 3 die Variablen an `storage`) steht in derselben Sendewarteschlange davor. Die Rolle schließt ihre Verbindung mit `Peer.CloseWhenFlushed` statt `Close` (`Close` verwirft die Warteschlange): keine neuen Rahmen, die Warteschlange wird per Timer weiter geschrieben, geschlossen wird, wenn sie leer ist, spätestens nach dem Rest der Frist aus `sys.shutdown`, höchstens 1000 ms (`Role.FLUSH_MAX_MS`), mindestens 50 ms. Erst dann `ExitApp`. Kein `FlushFileBuffers` (wartet ohne Frist auf den Leser). Beim Hub-Verlust (`Role._Exit`) gibt es nichts zu leeren, die Rolle endet sofort; endet sie mit verbundenem Peer (zu viele Fehler, Exit 6), leert sie höchstens 500 ms.
-   - **Der Supervisor bewertet nach dem letzten Byte (WI-30, F-26):** Ein beendeter Prozess wird erst als `exited`/`crashed` bewertet (und `clean` bestimmt), wenn der Hub seine Verbindung bis zum Ende gelesen hat (die Verbindung ist weg, `Hub.HasLink` falsch), oder 500 ms nach dem Prozessende (`Children.EXIT_GRACE_MS`), falls das Kind nie verbunden war oder die Verbindung nicht endet. Grund: `hub.Pump()` vor `children.Tick` (F-11) reicht nicht, wenn der Tick eine laufende Pump derselben Verbindung unterbrochen hat; deren Sperre gegen Wiedereintritt lässt die Pump des Ticks sofort zurückkehren. Damit das Lesen bis zum Ende auch dann gelingt, wenn der Hub vorher an das schon beendete Kind schreibt, schließt ein Schreibfehler "Gegenseite weg" in `PipeConnection` nur die Schreibseite; gelesen wird bis zum Ende des Datenstroms (höchstens 1 s). Bis zur Bewertung bleibt der Zustand unverändert; das Kind gilt in dieser Zeit weder als hängend, noch wird es hart beendet (`Terminate` prüft das Prozessende). `evt.process.exited`/`crashed`, das Ende einer Gruppe beim Beenden (falls kein `sys.bye` kam) und ein Neustart verzögern sich um höchstens diese Nachfrist, im Normalfall um keinen Tick.
-   - **Ein Kind meldet sich während des Beendens (WI-34, F-41):** `sys.shutdown` geht an die Kinder einer Gruppe einmal, wenn die Gruppe an der Reihe ist. Ein Kind, das dann noch startet (der warme Worker, ein Editor, das Debug-Fenster) und erst danach `sys.hello` sagt, bekäme es sonst nie: seine Gruppe und alle späteren, zuletzt `storage`, warteten bis zur Frist, und `storage` würde hart beendet (Exit 5; die Warteschlange von `storage` ginge verloren). Deshalb schickt `Shutdown.OnHello` (aufgerufen von `Supervisor._OnHello`) in der Phase `shutdown` beim `sys.hello` sofort `sys.shutdown` mit der Restfrist, wenn die Gruppe des Kindes schon an der Reihe war oder gerade ist, und auch, wenn das Kind in keiner Gruppe steht (sein Prozess entstand, als die Gruppen gebildet wurden). Ein Kind einer späteren Gruppe wartet auf seine Gruppe (normale Reihenfolge). In der Phase `prepare` entstehen die Gruppen später und enthalten das Kind; in der Phase `kill` hat `KillAlive` es schon beendet. Die harte Frist ändert sich nicht. Offen: ein Kind, das beim Erreichen seiner Gruppe noch nie verbunden war, hält diese und alle späteren Gruppen bis zu seinem `sys.hello` auf (F-43, Entscheidung des Projektinhabers).
-   - **Geplante Neustarts entfallen (WI-34, F-41):** Ein Absturz von `storage` oder `engine` kurz vor dem Beginn des Beendens plant einen Neustart (`RESTART_DELAY_MS`, 300 ms). `Children.BeginShutdown` streicht ihn, sonst entstünde der Prozess mitten im Beenden in keiner Gruppe. Neue Kinder entstehen im Beenden sonst nicht: `cmd.process.spawn` und `cmd.app.command debug` werfen `shutting_down`.
-   - **Offene Anfragen an ein gegangenes Ziel (WI-34, F-40):** Geht ein Kind während des Beendens (oder sonst), beantwortet der Hub die offenen weitergeleiteten Anfragen sofort mit `peer_gone` (6.2, PROTOKOLL 2). `peer_gone` heißt "Ausgang unbekannt"; wer beim Beenden auf eine Antwort wartet (z. B. die Engine auf `storage`), wartet nicht mehr bis zur eigenen Frist.
-3. Nach der Frist beendet der Supervisor übrige Prozesse hart. Der Exit-Code 5 gilt nur, wenn dabei wirklich ein Prozess beendet wurde (`Children.AnyKilled`, WI-33, F-33): ein Prozess, der sich an der Frist von selbst beendet hat und erst in der Nachfrist bewertet wird, macht den Exit nicht erzwungen. Die Frist und die Wartezeit nach dem harten Beenden rücken bei einem Stillstand des Supervisors weiter (6.2). Das ist ungefährlich, weil es kein geteiltes Lock gibt und `storage` atomar schreibt (Temp-Datei + `MoveFileEx`).
-4. **Orphan-Guard:** Jede Rolle prüft alle 2 s, ob der Supervisor noch lebt (Pipe). Sonst beendet sie sich nach 3 s. Beim Systemende (`WM_QUERYENDSESSION`) startet der Supervisor Schritt 2 sofort.
+1. **Prepare (abortable, no hard deadline):** supervisor sends `cmd.app.prepareExit` to editors and manager. An editor with unsaved changes asks the user. The user can cancel; then the process ends and nothing was stopped.
+2. **Shutdown (hard deadline, default 5 s total):** supervisor sends `sys.shutdown {deadlineMs}`. Order of acknowledgements: editors/manager/debug window (rank 0, `cmd.app.prepareExit` only to editors and manager), engine (stops instances with 2 s each, writes variables to `storage`), triggerhost (deactivates all triggers), workers, finally `storage` (empty queue). Each process acknowledges with `sys.bye` and terminates itself.
+   - **The role flushes before ending (WI-30, F-26):** `sys.bye` is the last message of a role; everything sent before it (events of the stopped instances, `evt.worker.done` "stopped", log lines, in Phase 3 the variables to `storage`) is in the same send queue ahead of it. The role closes its connection with `Peer.CloseWhenFlushed` instead of `Close` (`Close` discards the queue): no new frames, the queue continues to be written via timer, and it is closed when empty, at the latest after the rest of the deadline from `sys.shutdown`, at most 1000 ms (`Role.FLUSH_MAX_MS`), at least 50 ms. Only then `ExitApp`. No `FlushFileBuffers` (waits without deadline for the reader). When the hub is lost (`Role._Exit`) there is nothing to flush; the role ends immediately. If it ends with a connected peer (too many errors, exit 6), it flushes at most 500 ms.
+   - **The supervisor evaluates after the last byte (WI-30, F-26):** An ended process is evaluated as `exited`/`crashed` (and `clean` is determined) only when the hub has read its connection to the end (the connection is gone, `Hub.HasLink` false), or 500 ms after the process end (`Children.EXIT_GRACE_MS`), if the child never connected or the connection does not end. Reason: `hub.Pump()` before `children.Tick` (F-11) is not enough if the tick interrupted a running pump of the same connection; that pump's guard against re-entry makes the tick's pump return immediately. So that reading to the end also succeeds when the hub has written to the already ended child beforehand, a write error "peer gone" in `PipeConnection` closes only the write side; reading continues to the end of the data stream (at most 1 s). Until evaluation the state stays unchanged; the child counts in this time neither as hanging nor is it terminated hard (`Terminate` checks the process end). `evt.process.exited`/`crashed`, the end of a group during shutdown (if no `sys.bye` came) and a restart are delayed by at most this grace period, normally by no tick.
+   - **A child reports itself during shutdown (WI-34, F-41):** `sys.shutdown` is sent to the children of a group once, when the group is its turn. A child that starts only then (the warm worker, an editor, the debug window) and says `sys.hello` only afterwards would otherwise never receive it: its group and all later groups, finally `storage`, would wait until the deadline, and `storage` would be terminated hard (exit 5; the queue of `storage` would be lost). Therefore `Shutdown.OnHello` (called by `Supervisor._OnHello`) in phase `shutdown` immediately sends `sys.shutdown` with the remaining deadline upon `sys.hello`, if the child's group was already or is currently its turn, and also if the child is in no group (its process came into being when the groups were formed). A child of a later group waits for its group (normal order). In phase `prepare` the groups form later and contain the child; in phase `kill` `KillAlive` has already terminated it. The hard deadline does not change. Open: a child that has never been connected when its group is reached holds this group and all later groups until its `sys.hello` (F-43, decision of the project owner).
+   - **Planned restarts are dropped (WI-34, F-41):** A crash of `storage` or `engine` shortly before shutdown begins plans a restart (`RESTART_DELAY_MS`, 300 ms). `Children.BeginShutdown` cancels it, otherwise the process would come into being in the middle of shutdown in no group. New children otherwise do not come into being during shutdown: `cmd.process.spawn` and `cmd.app.command debug` throw `shutting_down`.
+   - **Open requests to a gone target (WI-34, F-40):** If a child goes away during shutdown (or otherwise), the hub immediately answers the open forwarded requests with `peer_gone` (6.2, PROTOCOL 2). `peer_gone` means "outcome unknown"; whoever waits for a response during shutdown (e.g. the engine for `storage`) no longer waits until its own deadline.
+3. After the deadline, the supervisor terminates remaining processes hard. Exit code 5 applies only if a process was really terminated in the process (`Children.AnyKilled`, WI-33, F-33): a process that ended itself at the deadline and is evaluated only in the grace period does not make the exit forced. The deadline and the wait time after the hard termination are pushed back during a standstill of the supervisor (6.2). This is harmless, because there is no shared lock and `storage` writes atomically (temp file + `MoveFileEx`).
+4. **Orphan guard:** every role checks every 2 s whether the supervisor is still alive (pipe). Otherwise it terminates itself after 3 s. At system shutdown (`WM_QUERYENDSESSION`) the supervisor starts step 2 immediately.
 
-Der v1-Mechanismus `criticalSectionCounter` und die 4-Sekunden-`exit`-Notbremse entfallen.
+The v1 mechanism `criticalSectionCounter` and the 4-second `exit` emergency brake are dropped.
 
-### 6.4 Worker-Pool (E3, WI-27)
+### 6.4 Worker pool (E3, WI-27)
 
-Besitzer des Pools ist die **Engine** (`WorkerBridge`): sie weiß, welche Jobs laufen, und hält alle Fristen. Der **Supervisor** besitzt die Prozesse: er startet und beendet Worker nur auf Anfrage der Engine (`cmd.process.spawn`, `cmd.process.kill`, Rechte in PROTOKOLL 4.1) und überwacht sie wie jedes Kind. Er kennt weder Jobs noch Pool-Größen. Der Worker selbst meldet nur, ob er beschäftigt ist.
+The owner of the pool is the **engine** (`WorkerBridge`): it knows which jobs are running and holds all deadlines. The **supervisor** owns the processes: it starts and terminates workers only on request of the engine (`cmd.process.spawn`, `cmd.process.kill`, rights in PROTOCOL 4.1) and monitors them like any child. It knows neither jobs nor pool sizes. The worker itself reports only whether it is busy.
 
-| Größe | Wert | Option der Engine | Begründung |
+| Size | Value | Engine option | Rationale |
 |---|---|---|---|
-| Obergrenze N | 4 (0 bis 8; 0 = kein Pool) | `--workers=<n>` | Ein Worker kostet etwa 14 MB und 30 ms Startzeit (Messung des Spikes); vier gleichzeitig blockierende Elemente (Dialoge, Downloads) decken die üblichen Flows. Der Supervisor lässt zusätzlich nie mehr als 16 lebende Worker zu (Schutz gegen eine fehlerhafte Engine) |
-| Warme Worker W | 1 (0 bis N) | `--warm-workers=<w>` | Der erste Worker-Job soll nicht auf einen Prozessstart warten |
-| Leerlaufzeit | 60 s (100 ms bis 1 h) | `--worker-idle-ms=<ms>` | Ein Dialog-Flow kehrt oft nach Sekunden wieder; ein Prozess im Leerlauf kostet nur Speicher |
-| Sturmgrenze | 5 abnormale Enden in 60 s | – | siehe unten |
-| Bestätigung des Abbruchs | 2 s (`WorkerBridge.ORPHAN_MS`) | – | wie 5.1 |
-| Annahme eines Jobs | 5 s (`ACK_TIMEOUT_MS`) | – | unverändert |
-| Jobfrist | keine, außer die Elementklasse setzt `JobTimeoutMs` | Eigenschaft der Elementklasse | v1 kannte keine Frist; ein Dialog darf beliebig lange offen bleiben |
+| Upper limit N | 4 (0 to 8; 0 = no pool) | `--workers=<n>` | A worker costs about 14 MB and 30 ms startup time (measurement of the spike); four simultaneously blocking elements (dialogs, downloads) cover the usual flows. The supervisor additionally never allows more than 16 living workers (protection against a faulty engine) |
+| Warm workers W | 1 (0 to N) | `--warm-workers=<w>` | The first worker job should not wait for a process start |
+| Idle time | 60 s (100 ms to 1 h) | `--worker-idle-ms=<ms>` | A dialog flow often returns after seconds; an idle process costs only memory |
+| Storm limit | 5 abnormal ends in 60 s | – | see below |
+| Confirmation of cancellation | 2 s (`WorkerBridge.ORPHAN_MS`) | – | as 5.1 |
+| Acceptance of a job | 5 s (`ACK_TIMEOUT_MS`) | – | unchanged |
+| Job deadline | none, unless the element class sets `JobTimeoutMs` | property of the element class | v1 had no deadline; a dialog may stay open arbitrarily long |
 
-**Slots.** Die Engine führt eine Liste von Slots mit den Zuständen `starting` (Start angefordert, noch kein `evt.process.ready`), `idle` und `busy`. Es gibt keinen Zustand `down`: ein Worker, der ausfällt oder beendet wird, verschwindet aus der Liste. Slots und noch offene Startanfragen zusammen sind nie mehr als N.
+**Slots.** The engine keeps a list of slots with the states `starting` (start requested, no `evt.process.ready` yet), `idle` and `busy`. There is no state `down`: a worker that fails or is terminated disappears from the list. Slots and still open start requests together are never more than N.
 
-**Bedarf.** Wartet mindestens ein Thread auf einen Worker (Zustand `ready`, kein Slot `idle`), fordert die Engine so viele Worker an, wie Threads warten, abzüglich der bereits startenden, höchstens bis N. Beim Start der Engine (nach dem Aufräumen der Waisen) werden W Worker angefordert. Der Thread wartet wie bisher in `ready`; der Dispatcher läuft, sobald ein Slot `idle` wird.
+**Demand.** If at least one thread waits for a worker (state `ready`, no slot `idle`), the engine requests as many workers as threads are waiting, minus those already starting, at most up to N. At engine start (after cleaning up orphans) W workers are requested. The thread waits in `ready` as before; the dispatcher runs as soon as a slot becomes `idle`.
 
-**Leerlauf.** Ein `idle`-Slot, der länger als die Leerlaufzeit unbenutzt ist, wird beendet (`cmd.process.kill`, Grund `idle`), solange danach noch mindestens W Worker bleiben. Warme Worker laufen weiter.
+**Idle.** An `idle` slot that has been unused for longer than the idle time is terminated (`cmd.process.kill`, reason `idle`), as long as at least W workers remain afterwards. Warm workers keep running.
 
-**Absturz.** `evt.process.crashed` oder `evt.process.exited` für einen Slot oder `peer_gone` als Antwort auf das offene `cmd.worker.run` (F-46, WI-35; wer zuerst kommt, beendet den Job, der zweite findet weder Slot noch Job): Slot entfernen, ein laufender Job endet mit `exception` „worker crashed (worker:n)“. Der Supervisor startet Worker nie selbst neu (`Children.AUTO_RESTART`). Fehlen danach Worker (Bedarf oder W), fordert die Engine neue an. **Sturmbegrenzung:** ein Absturz, ein nicht bereit gewordener Start (der Supervisor meldet „hung“), ein abgelehntes `cmd.worker.run` und eine fehlgeschlagene Startanfrage zählen als abnormales Ende. Bei 5 davon innerhalb von 60 s fordert die Engine keine Worker mehr an, bis das älteste Ende das Fenster verlässt. Ist dann kein Worker am Leben, enden wartende und neue Worker-Elemente mit „worker not available“, und die Engine schreibt einmal `a0` „worker pool blocked“. Normales Wachsen und Schrumpfen des Pools zählt nicht, nur Fehler (Abweichung vom Wortlaut „5 Starts in 60 s“ in WI-27: ein Stoß von vier gleichzeitigen Jobs startet vier Worker und ist kein Sturm).
+**Crash.** `evt.process.crashed` or `evt.process.exited` for a slot, or `peer_gone` as the response to the open `cmd.worker.run` (F-46, WI-35; whichever comes first ends the job, the second finds neither slot nor job): remove the slot; a running job ends with `exception` "worker crashed (worker:n)". The supervisor never restarts workers itself (`Children.AUTO_RESTART`). If workers are then missing (demand or W), the engine requests new ones. **Storm limit:** a crash, a start that never became ready (the supervisor reports "hung"), a rejected `cmd.worker.run` and a failed start request count as abnormal ends. With 5 of them within 60 s, the engine requests no more workers until the oldest end leaves the window. If no worker is alive then, waiting and new worker elements end with "worker not available", and the engine writes `a0` "worker pool blocked" once. Normal growth and shrinkage of the pool does not count, only errors (deviation from the wording "5 starts in 60 s" in WI-27: a burst of four simultaneous jobs starts four workers and is not a storm).
 
-**Ende mit der Engine (E10, WI-33).** Endet der Engine-Prozess (Absturz, Neustartgrenze erreicht, Ende außerhalb des Beendens der Sitzung), beendet der Supervisor sofort alle lebenden `worker:*` (`Children._EndWorkersOfGoneEngine`): ihr Ergebnis nimmt niemand mehr an, und ein Worker mit offenem Dialog bliebe sonst bis zum Ende der Sitzung stehen, wenn keine neue Engine kommt. Das Ende wird gemeldet wie `cmd.process.kill`, als geplantes Ende: `evt.process.exited {reason: "engine gone"}`, kein `crashed`, nicht für Exit-Code 5, kein Neustart. Ein Worker, dessen Prozess schon vorher beendet war (Handle signalisiert, Ende noch nicht bewertet), wird nicht umetikettiert: sein Ende bleibt ein `crashed` (F-46, WI-35); dasselbe gilt für `cmd.process.kill` (`Children._HasEnded`). Der Supervisor reagiert, sobald das Prozess-Handle der Engine signalisiert (im selben Tick), nicht erst nach der Bewertung des Engine-Endes. Beim Beenden der Sitzung bleibt es bei der Reihenfolge der Ränge. Die neue Engine baut ihren Pool neu auf (Bedarf, warme Worker); `WorkerBridge.Start` beendet weiter, was es noch findet (zweite Sicherung).
+**End with the engine (E10, WI-33).** If the engine process ends (crash, restart limit reached, end outside of session shutdown), the supervisor immediately terminates all living `worker:*` (`Children._EndWorkersOfGoneEngine`): nobody accepts their result any more, and a worker with an open dialog would otherwise remain until the end of the session if no new engine comes. The end is reported like `cmd.process.kill`, as a planned end: `evt.process.exited {reason: "engine gone"}`, not `crashed`, not for exit code 5, no restart. A worker whose process had already ended before (handle signaled, end not yet evaluated) is not relabeled: its end remains a `crashed` (F-46, WI-35); the same applies to `cmd.process.kill` (`Children._HasEnded`). The supervisor reacts as soon as the process handle of the engine is signaled (in the same tick), not only after the evaluation of the engine's end. When the session ends, the order of ranks remains. The new engine rebuilds its pool (demand, warm workers); `WorkerBridge.Start` terminates whatever else it still finds (second safeguard).
 
-**Beschäftigt und Ping.** Der Worker sendet beim Annehmen eines Jobs `sys.busy {busy: true}` an den Supervisor, bevor das Element startet, und `busy: false`, wenn der Job endet (`done`, `stopped`). Solange ein Worker beschäftigt ist, sendet der Supervisor ihm keinen Ping und beurteilt keinen Pong. Beim Ende der Beschäftigung beginnen die Pong-Zeiten neu. Der Prozess-Handle gilt weiter: ein Worker, der im Job stirbt, wird sofort als abgestürzt erkannt. **Begründung, dass der Worker meldet und nicht die Engine:** Die Tatsache „dieser Prozess führt gerade einen Job aus“ gehört dem Worker (ein Besitzer pro Datum, Abschnitt 4). Die Meldung geht auf dem kürzesten Weg und vor dem Start des Elements, sie braucht keine Abstimmung zwischen zwei Verbindungen (Engine → Worker und Engine → Supervisor sind nicht geordnet), und sie bleibt richtig, wenn die Engine gerade neu startet. Es gibt keine Lücke, in der der Worker blockiert, ohne beschäftigt gemeldet zu sein: die Meldung geschieht im Handler von `cmd.worker.run`, vor dem Start des Elements.
+**Busy and ping.** When a worker accepts a job, it sends `sys.busy {busy: true}` to the supervisor before the element starts, and `busy: false` when the job ends (`done`, `stopped`). While a worker is busy, the supervisor sends it no ping and does not evaluate any pong. When the busy state ends, the pong times begin anew. The process handle still applies: a worker that dies during a job is detected as crashed immediately. **Reason why the worker reports and not the engine:** the fact "this process is currently running a job" belongs to the worker (one owner per datum, section 4). The message goes by the shortest route and before the element starts; it needs no coordination between two connections (engine → worker and engine → supervisor are not ordered); and it remains correct when the engine is just restarting. There is no gap in which the worker blocks without being reported as busy: the message happens in the handler of `cmd.worker.run`, before the element starts.
 
-**Abbruch.** Stoppt eine Instanz ein Worker-Element, endet der Thread sofort (wie inline), und die Engine sendet `cmd.worker.cancel`. Kommt binnen 2 s kein `evt.worker.done`, ist der Worker blockiert: die Engine entfernt den Slot und fordert `cmd.process.kill` an (Grund `cancel not confirmed`). Ein Worker, der den Abbruch bestätigt, bleibt im Pool.
+**Cancellation.** If an instance stops a worker element, the thread ends immediately (as with inline), and the engine sends `cmd.worker.cancel`. If no `evt.worker.done` arrives within 2 s, the worker is blocked: the engine removes the slot and requests `cmd.process.kill` (reason `cancel not confirmed`). A worker that confirms the cancellation remains in the pool.
 
-**Jobfrist.** Hat die Elementklasse `JobTimeoutMs` > 0, startet die Engine mit dem Job eine Uhr. Läuft sie ab, endet der Thread mit `exception` „worker timeout“, und der Job wird wie ein Abbruch behandelt (Cancel, nach 2 s hartes Beenden). Die Engine hält die Frist, nicht der Worker, denn er kann blockiert sein.
+**Job deadline.** If the element class has `JobTimeoutMs` > 0, the engine starts a clock with the job. If it expires, the thread ends with `exception` "worker timeout", and the job is treated like a cancellation (cancel, after 2 s hard termination). The engine holds the deadline, not the worker, because the worker may be blocked.
 
-**Neustart der Engine.** Die neue Engine fragt beim Start (`OnReady`, bevor sie selbst Worker anfordert) `cmd.process.list` und beendet alle `worker:*`, die nicht zu ihr gehören (`cmd.process.kill`, Grund `orphan of a previous engine`). Übernehmen wäre unsicher: der Zustand der Jobs (Variablen, Instanz) ist verloren, ihre Ergebnisse wären nicht zuzuordnen. Ein spätes `evt.worker.done` einer Waise wird verworfen (unbekannte `execId`). Schlägt die Abfrage fehl, baut die Engine den Pool trotzdem auf und loggt `a0`; die Waisen laufen dann bis zum Beenden der Sitzung weiter. Zwischen dem Tod der alten und dem Start der neuen Engine leben die Waisen weiter (Neustartverzögerung 300 ms plus Startzeit).
+**Restart of the engine.** On start, the new engine (`OnReady`, before it requests workers itself) asks `cmd.process.list` and terminates all `worker:*` that do not belong to it (`cmd.process.kill`, reason `orphan of a previous engine`). Adopting them would be unsafe: the state of the jobs (variables, instance) is lost, and their results could not be assigned. A late `evt.worker.done` from an orphan is discarded (unknown `execId`). If the query fails, the engine builds the pool anyway and logs `a0`; the orphans then keep running until the end of the session. Between the death of the old engine and the start of the new one the orphans stay alive (restart delay 300 ms plus startup time).
 
-**Beenden.** Beim `sys.shutdown` der Engine fordert sie keine Worker mehr an und beendet keine. Die Worker folgen in Rang 3 (6.3). Ein beschäftigter Worker meldet `stopped` vor `sys.bye`. Der Supervisor lehnt `cmd.process.spawn` nach Beginn des Beendens mit `shutting_down` ab.
+**Shutdown.** On `sys.shutdown` the engine requests no more workers and terminates none. The workers follow in rank 3 (6.3). A busy worker reports `stopped` before `sys.bye`. After shutdown has begun, the supervisor rejects `cmd.process.spawn` with `shutting_down`.
 
-
----
-
-## 7. Kompatibilität mit v1-Dateien
-
-Geprüft an den 23 Flows in `v1/AppData/Saved Flows` und `Save.ahk` **[V1]**:
-
-- Flow-Datei: JSON, UTF-8 ohne BOM, Einrückung 2. Wurzelschlüssel: `name`, `category` (als **Name**, nicht ID), `ElementIDCounter`, `flowSettings`, `allElements`, `allConnections`.
-- Elemente haben `ID`, `type`, `class`, `x`, `y`, `name`, `StandardName`, `pars` (nur die von der Klasse deklarierten Parameter), `package`, `packageVersion`, optional `HeightOfVerticalBar` (Loop), `DefaultTrigger` (`trigger_manual`), `enabled` (Trigger).
-- Verbindungen haben `ID`, `from`, `to`, `type`, `ConnectionType`, optional `fromPart`/`toPart`.
-- **Werte sind gemischt als JSON-String und JSON-Zahl gespeichert.** In den 23 Beispieldateien stehen 17.453 Strings und 703 Zahlen (z. B. `"ElementIDCounter": "5"` und `"zoomFactor": "0.700000"` als Strings, `"DelimiterComma": 1` und `"x": 7` als Zahlen). `true`, `false` und `null` kommen nicht vor. v2 muss den Typ je Wert erhalten (AHK v2 unterscheidet `String`, `Integer`, `Float`, das macht das möglich). Round-Trip-Tests vergleichen geparste Struktur und Typen.
-- Ein Schlüssel `CompabilityVersion` kommt in den vorhandenen Dateien nicht vor. Nach `Compatibility.ahk` ist ein fehlender Wert gleich „älteste Version“ (v1-Hooks sind leer). Die Hook-Struktur (`package`-spezifische Funktion) bleibt erhalten.
-- Variablen: globale unter `<Datenverzeichnis>/Variables/<name>.ahfvd`, statische unter `<Datenverzeichnis>/Variables/<FlowID>/<name>.ahfvd` (z. B. `Flow 1010290492`). `.ahfvd` enthält JSON-Metadaten `{name, type}`, `.ahfvar` den Inhalt (bei `type=object` JSON).
-- Export/Import `.ahf` ist ein ZIP (7z). Bleibt erhalten.
-- Das Backup-Verhalten (bis 10 Dateien, `backup/`-Unterordner) bleibt.
-
-Unbekanntes in Dateien (Schlüssel, die v2 nicht kennt) wird beim Laden **beibehalten und beim Speichern zurückgeschrieben**, damit ein Wechsel zwischen v1 und v2 nichts verliert.
-
-**Entscheidung E8 (2026-10-11):** Wahrheitswerte gehen in v2 als echte JSON-Booleans auf die Leitung (WI-26). Das Flow-Dateiformat darf in v2 künftig vom v1-Format abweichen. Pflicht bleibt, dass alte Flows und Variablen laden. In Phase 2b ändert sich das **Schreibformat der Flows nicht**. Ein neues Schreibformat ist eine eigene Entscheidung in Phase 3, mit Versionskennung in der Datei. Bis dahin schreibt v2 das v1-Format. Ein Flow in einem neuen Format ist für v1 nicht mehr lesbar.
 
 ---
 
-## 8. Ordnerstruktur
+## 7. Compatibility with v1 files
+
+Checked against the 23 flows in `v1/AppData/Saved Flows` and `Save.ahk` **[V1]**:
+
+- Flow file: JSON, UTF-8 without BOM, indentation 2. Root keys: `name`, `category` (as **name**, not ID), `ElementIDCounter`, `flowSettings`, `allElements`, `allConnections`.
+- Elements have `ID`, `type`, `class`, `x`, `y`, `name`, `StandardName`, `pars` (only the parameters declared by the class), `package`, `packageVersion`, optionally `HeightOfVerticalBar` (loop), `DefaultTrigger` (`trigger_manual`), `enabled` (trigger).
+- Connections have `ID`, `from`, `to`, `type`, `ConnectionType`, optionally `fromPart`/`toPart`.
+- **Values are stored mixed as JSON string and JSON number.** In the 23 sample files there are 17,453 strings and 703 numbers (e.g. `"ElementIDCounter": "5"` and `"zoomFactor": "0.700000"` as strings, `"DelimiterComma": 1` and `"x": 7` as numbers). `true`, `false` and `null` do not occur. v2 must preserve the type of each value (AHK v2 distinguishes `String`, `Integer`, `Float`, which makes this possible). Round-trip tests compare parsed structure and types.
+- A key `CompabilityVersion` does not occur in the existing files. According to `Compatibility.ahk`, a missing value equals "oldest version" (v1 hooks are empty). The hook structure (`package`-specific function) is preserved.
+- Variables: global ones under `<data directory>/Variables/<name>.ahfvd`, static ones under `<data directory>/Variables/<FlowID>/<name>.ahfvd` (e.g. `Flow 1010290492`). `.ahfvd` contains JSON metadata `{name, type}`, `.ahfvar` the content (JSON for `type=object`).
+- Export/import `.ahf` is a ZIP (7z). Preserved.
+- The backup behavior (up to 10 files, `backup/` subfolder) remains.
+
+Unknown items in files (keys that v2 does not know) are **kept when loading and written back when saving**, so that switching between v1 and v2 loses nothing.
+
+**Decision E8 (2026-10-11):** Truth values go as real JSON booleans over the wire in v2 (WI-26). The flow file format may in future differ from the v1 format in v2. The requirement remains that old flows and variables load. In Phase 2b the **write format of the flows does not change**. A new write format is a separate decision in Phase 3, with a version marker in the file. Until then v2 writes the v1 format. A flow in a new format is no longer readable for v1.
+
+---
+
+## 8. Folder structure
 
 ```
 AutoHotFlow/
-├─ AGENTS.md                # Kurzumriss für Agenten (Stand der Arbeit)
+├─ AGENTS.md                # short summary for agents (state of the work)
 ├─ README.md
-├─ doc/                     # dauerhafte Dokumentation (dieses Verzeichnis)
-├─ work_items/              # temporär: Pläne, Analysen, Spikes (nach der Portierung löschen)
-├─ v1/                      # temporär: unveränderter v1-Stand als Referenz (am Ende löschen)
+├─ doc/                     # permanent documentation (this directory)
+├─ work_items/              # temporary: plans, analyses, spikes (delete after the port)
+├─ v1/                      # temporary: unchanged v1 state as reference (delete at the end)
 ├─ src/
-│  ├─ AutoHotFlow.ahk       # Einstieg (bindet AhfBoot.ahk ein, ruft AhfMain)
-│  ├─ AhfBoot.ahk           # Bootcode, Rollen-Dispatch (WI-29)
-│  ├─ core/                 # prozessübergreifende Bausteine, keine GUI
+│  ├─ AutoHotFlow.ahk       # entry point (includes AhfBoot.ahk, calls AhfMain)
+│  ├─ AhfBoot.ahk           # boot code, role dispatch (WI-29)
+│  ├─ core/                 # cross-process building blocks, no GUI
 │  │  ├─ Json.ahk  Ids.ahk  Errors.ahk  Log.ahk  Args.ahk
 │  │  └─ ipc/               # Pipe, Frame, Wake, Message, Dispatcher, Peer
 │  ├─ supervisor/  engine/  storage/  triggerhost/  worker/
-│  ├─ ui_common/            # Lang(), GUI-Helfer
-│  ├─ manager/  editor/     # editor/render/ = Renderer-Schnittstelle (D4)
-│  ├─ debugview/            # Rolle debug (WI-28): DebugView.ahk, DebugGui.ahk
+│  ├─ ui_common/            # Lang(), GUI helpers
+│  ├─ manager/  editor/     # editor/render/ = Renderer interface (D4)
+│  ├─ debugview/            # role debug (WI-28): DebugView.ahk, DebugGui.ahk
 │  └─ elements/
 │     ├─ base/              # AhfElement, Registry, Context
 │     └─ default/{actions,conditions,loops,triggers}/
-├─ assets/                  # Icons, language/*.ini, help (aus v1 übernommen, sobald gebraucht)
-├─ tests/                   # siehe TESTSTRATEGIE.md
-└─ tools/                   # Konverter, Übersetzungswerkzeuge, Audit-Skripte
+├─ assets/                  # icons, language/*.ini, help (taken over from v1 once needed)
+├─ tests/                   # see TESTSTRATEGIE.md
+└─ tools/                   # converters, translation tools, audit scripts
 ```
 
-**Ist-Stand am Ende von Phase 2 (WI-17, verglichen mit dem Dateibaum, verifiziert):** Die Struktur oben ist weiter das Ziel. Abweichungen und Lücken:
+**Actual state at the end of Phase 2 (WI-17, compared with the file tree, verified):** The structure above remains the target. Deviations and gaps:
 
-- **Entscheidung E6 (2026-10-11):** Der Triggerhost (WI-14) wird früh in Phase 3 mit den echten Triggern gebaut, nicht in Phase 2b.
-- Vorhanden: `src/AutoHotFlow.ahk`, `src/AhfBoot.ahk`, `core/` (zusätzlich `Role.ahk`, `RoleRegistry.ahk`, `Time.ahk`; `ipc/` zusätzlich `Deferred.ahk`, `PipeConnection.ahk`, `PipeListener.ahk`, `FrameReader.ahk`, `FrameWriter.ahk`), `supervisor/`, `engine/` (mit `core/` für Zustandsautomaten, Flowmodell, Scheduler), `storage/`, `worker/`, `manager/` (nur `StubManager.ahk` und `StubGui.ahk`), `debugview/` (WI-28, `DebugView.ahk`, `DebugGui.ahk`), `elements/base/`. `core/` hat seit WI-28 zusätzlich `AhfVersion.ahk`, `ProcInfo.ahk`, `Snapshot.ahk` und `Debug.ahk`; `supervisor/` hat `DiagReport.ahk`.
-- **Nicht vorhanden (Phase 3 oder später):** `triggerhost/` (WI-14 optional, nicht gebaut; die Rolle ist in `RoleRegistry.ahk` ein Platzhalter), `editor/` (Platzhalter-Rolle), `ui_common/`, `assets/`, `elements/default/{actions,conditions,loops,triggers}/`. Statt `elements/default/` gibt es `elements/skeleton/` mit acht Demo- und Testelementen (`Trigger_Manual`, `Action_Sleep`, `Action_Do_nothing`, `Action_Test*`).
-- `tools/` enthält bisher nur `ahkrun.py` und `ahf_dialogwatch.py` (Laufwächter), keine Konverter.
-- **Testeinstieg (WI-29):** Der Produkteinstieg `src/AutoHotFlow.ahk` bindet nur `src/AhfBoot.ahk` ein (der gesamte Bootcode und die Rollenregistrierung) und ruft `AhfMain()`. Die Testrollen (`EchoRole`, `CrasherRole`, `HangerRole`, `SlowShutdownRole`, `RegisterFailure`) liegen in `tests/integration/helpers/`; der Testeinstieg `tests/integration/helpers/AutoHotFlowTest.ahk` bindet `AhfBoot.ahk` und diese Rollen ein und setzt `AhfTestRolesFn`. Der Supervisor startet Kinder mit `A_ScriptFullPath`, also erben sie den Einstieg. Mit `--test-roles` am Produkteinstieg passiert nichts (die Rollen sind dort nicht einkompiliert, ihr Name ist unbekannt). `src/` bindet nichts aus `tests/` ein (Wächterregel `include-tests`, keine Ausnahme mehr).
-- Jede Datei unter `src/` hat höchstens eine Klasse (WI-29): `core/Errors.ahk` bindet nur noch `ErrCode.ahk`, `AhfError.ahk`, `ProtocolError.ahk`, `AhfTimeoutError.ahk`, `ElementError.ahk`, `JsonError.ahk` ein; `PlaceholderRole` hat `core/PlaceholderRole.ahk`; `engine/core/Loops.ahk` heißt `LoopStack.ahk`.
-- `manager` wird im Einstieg registriert, nicht in `core/RoleRegistry.ahk` (wie `engine`, `storage`, `worker`), damit `core/` keine Rollenordner einbindet.
+- **Decision E6 (2026-10-11):** The triggerhost (WI-14) is built early in Phase 3 with the real triggers, not in Phase 2b.
+- Present: `src/AutoHotFlow.ahk`, `src/AhfBoot.ahk`, `core/` (additionally `Role.ahk`, `RoleRegistry.ahk`, `Time.ahk`; `ipc/` additionally `Deferred.ahk`, `PipeConnection.ahk`, `PipeListener.ahk`, `FrameReader.ahk`, `FrameWriter.ahk`), `supervisor/`, `engine/` (with `core/` for state machines, flow model, scheduler), `storage/`, `worker/`, `manager/` (only `StubManager.ahk` and `StubGui.ahk`), `debugview/` (WI-28, `DebugView.ahk`, `DebugGui.ahk`), `elements/base/`. Since WI-28, `core/` additionally has `AhfVersion.ahk`, `ProcInfo.ahk`, `Snapshot.ahk` and `Debug.ahk`; `supervisor/` has `DiagReport.ahk`.
+- **Not present (Phase 3 or later):** `triggerhost/` (WI-14 optional, not built; the role is a placeholder in `RoleRegistry.ahk`), `editor/` (placeholder role), `ui_common/`, `assets/`, `elements/default/{actions,conditions,loops,triggers}/`. Instead of `elements/default/` there is `elements/skeleton/` with eight demo and test elements (`Trigger_Manual`, `Action_Sleep`, `Action_Do_nothing`, `Action_Test*`).
+- `tools/` so far contains only `ahkrun.py` and `ahf_dialogwatch.py` (watchdog), no converters.
+- **Test entry point (WI-29):** The product entry point `src/AutoHotFlow.ahk` includes only `src/AhfBoot.ahk` (the entire boot code and role registration) and calls `AhfMain()`. The test roles (`EchoRole`, `CrasherRole`, `HangerRole`, `SlowShutdownRole`, `RegisterFailure`) are in `tests/integration/helpers/`; the test entry point `tests/integration/helpers/AutoHotFlowTest.ahk` includes `AhfBoot.ahk` and these roles and sets `AhfTestRolesFn`. The supervisor starts children with `A_ScriptFullPath`, so they inherit the entry point. With `--test-roles` at the product entry point nothing happens (the roles are not compiled in there, their name is unknown). `src/` includes nothing from `tests/` (guard rule `include-tests`, no exception any more).
+- Each file under `src/` has at most one class (WI-29): `core/Errors.ahk` now includes only `ErrCode.ahk`, `AhfError.ahk`, `ProtocolError.ahk`, `AhfTimeoutError.ahk`, `ElementError.ahk`, `JsonError.ahk`; `PlaceholderRole` has `core/PlaceholderRole.ahk`; `engine/core/Loops.ahk` is called `LoopStack.ahk`.
+- `manager` is registered in the entry point, not in `core/RoleRegistry.ahk` (like `engine`, `storage`, `worker`), so that `core/` does not include any role folders.
 
-Regel: Ein Ordner unter `src/` ist ein Prozess-Rollen- oder Bibliotheks-Modul. `core/` darf nichts aus Rollenordnern einbinden. Rollenordner binden nur `core/`, `ui_common/` (nur UI-Rollen) und `elements/` ein, nie einander.
-
----
-
-## 9. Leistungsbudgets (Ziele, in Phase 2 gemessen)
-
-- Nachrichtenlatenz lokal (Engine ↔ Client über Hub): Median unter 5 ms, 99 % unter 50 ms.
-- Engine-Zustandsänderung bis Editor-Neuzeichnen: unter 50 ms bei nicht blockiertem Editor.
-- Idle-CPU des Gesamtsystems ohne laufende Flows: unter 1 %.
-- Speicher: unter 100 MB insgesamt bei 5 offenen Editoren.
-
-**Entscheidung E5 (2026-10-11):** Das Ziel für die Idle-CPU gilt für das **Gesamtsystem**. Gemessen 0,23 % (8 CPUs, WI-16), erfüllt. Die Lesart „Summe in Prozent eines Kerns“ (1,8 %) ist damit nicht mehr das Maßstab. Eine Optimierung ist kein Muss und steht als Beobachtungspunkt in `work_items/STATUS.md`.
+Rule: a folder under `src/` is a process role or library module. `core/` may not include anything from role folders. Role folders include only `core/`, `ui_common/` (UI roles only) and `elements/`, never each other.
 
 ---
 
-## 10. Risiken und offene Punkte
+## 9. Performance budgets (targets, measured in Phase 2)
 
-| # | Risiko / offener Punkt | Gegenmaßnahme |
+- Message latency locally (engine ↔ client via hub): median below 5 ms, 99 % below 50 ms.
+- Engine state change until editor redraw: below 50 ms with a non-blocked editor.
+- Idle CPU of the overall system without running flows: below 1 %.
+- Memory: below 100 MB in total with 5 open editors.
+
+**Decision E5 (2026-10-11):** The target for idle CPU applies to the **overall system**. Measured 0.23 % (8 CPUs, WI-16), fulfilled. The reading "sum in percent of one core" (1.8 %) is therefore no longer the yardstick. An optimization is not a requirement and is listed as an observation point in `work_items/STATUS.md`.
+
+---
+
+## 10. Risks and open points
+
+| # | Risk / open point | Countermeasure |
 |---|---|---|
-| R1 | Overlapped Named Pipes in AHK v2 sind fehleranfällig (OVERLAPPED-Struktur, Handle-Lebensdauer). | In Phase 2 als getestete Bibliothek `core/ipc` mit Python-Gegenstelle, Fault-Injection-Tests. Spike liegt vor. |
-| R2 | Zeichnen im Editor-Prozess könnte bei sehr großen Flows ruckeln. | `Renderer`-Schnittstelle, Messung in Phase 3, Trennkriterium in 2.1. |
-| R3 | Alle Elementklassen in jeder Rolle einzubinden kostet Parse-Zeit und Speicher (v1: 29.000 Zeilen). | Messen. Falls zu groß: Metadaten und Laufzeitcode je Rolle in getrennte Dateien. |
-| R4 | Elemente mit Callback-Bedarf an die Engine (`GetVariable` im Worker) brauchen Request/Response ohne `await`. | Callback-API `ctx.Request(...)` mit Timeout. Worker dürfen blockierend warten (eigener Prozess), die Engine nie. |
-| R5 | Ausführungsrichtlinien (`default`, `parallel`, `skip`, `wait`, `stop`): genaue Semantik muss aus `newInstance` und `executionTask` übernommen werden. | Charakterisierungstests gegen v1 vor dem Port (Phase 3). |
-| R6 | Verhaltensabweichung: Engine-Absturz verliert laufende Instanzen. | In [MIGRATION.md](MIGRATION.md) dokumentiert. v1 hatte denselben Effekt beim Absturz des Gesamtprozesses. |
-| R7 | Installer/Kompilierung (Ahk2Exe v2, ein Artefakt mit Rollenparameter). | Spätere Phase, Einstieg ist dafür bereits vorbereitet (D12). |
+| R1 | Overlapped named pipes in AHK v2 are error-prone (OVERLAPPED structure, handle lifetime). | In Phase 2 as a tested library `core/ipc` with a Python counterpart, fault-injection tests. Spike exists. |
+| R2 | Drawing in the editor process could stutter with very large flows. | `Renderer` interface, measurement in Phase 3, separation criterion in 2.1. |
+| R3 | Including all element classes in every role costs parse time and memory (v1: 29,000 lines). | Measure. If too large: metadata and runtime code per role in separate files. |
+| R4 | Elements with a need for callbacks to the engine (`GetVariable` in the worker) need request/response without `await`. | Callback API `ctx.Request(...)` with timeout. Workers may wait blocking (own process), the engine never. |
+| R5 | Execution policies (`default`, `parallel`, `skip`, `wait`, `stop`): exact semantics must be taken over from `newInstance` and `executionTask`. | Characterization tests against v1 before the port (Phase 3). |
+| R6 | Behavioral deviation: engine crash loses running instances. | Documented in [MIGRATION.md](MIGRATION.md). v1 had the same effect when the whole process crashed. |
+| R7 | Installer/compilation (Ahk2Exe v2, one artifact with role parameter). | Later phase, entry point is already prepared for it (D12). |
