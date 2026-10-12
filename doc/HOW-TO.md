@@ -1,1213 +1,1211 @@
-# How-to AHK v2 (Wissensbasis)
+# How-to AHK v2 (knowledge base)
 
-Sammlung von Stolpersteinen, Fehlern und Lösungen bei der Umsetzung in AutoHotkey v2. Gedacht als Hilfe für Agenten und Entwickler, die nach uns am Code arbeiten.
+Collection of pitfalls, mistakes and solutions encountered while implementing in AutoHotkey v2. Meant as a help for agents and developers who work on the code after us.
 
-Wer eine Schwierigkeit oder einen eigenen Fehler bemerkt, trägt ihn hier ein (siehe `AGENTS.md`, Regel 9).
+If you notice a difficulty or a mistake of your own, record it here (see `AGENTS.md`, rule 9).
 
-## Eintragsformat
+## Entry format
 
 ```markdown
-### <Kurztitel>
+### <short title>
 
-- **Problem:** Was schiefging bzw. was schwer war.
-- **Falsch:** Der fehlerhafte Ansatz oder Code (kurz).
-- **Richtig:** Die funktionierende Lösung (kurz, mit Codebeispiel wenn nötig).
-- **Status:** verifiziert (getestet/gelesen) | vermutet | nicht geprüft
-- **Quelle:** Doku-Link oder Datei, wo es auftrat (optional).
+- **Problem:** What went wrong or what was difficult.
+- **Wrong:** The faulty approach or code (brief).
+- **Right:** The working solution (brief, with a code example if needed).
+- **Status:** verified (tested/read) | assumed | not checked
+- **Source:** Doc link or file where it occurred (optional).
 ```
 
-Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge korrigieren oder löschen, nicht duplizieren.
+Append new entries at the end of the matching category. Correct or delete outdated entries, do not duplicate them.
 
-## Kategorien
+## Categories
 
-- Syntax und Sprache
-- Objekte, Maps, Arrays
-- Fehlerbehandlung
-- Prozesse, Pipes, Nachrichten
-- GUI und Hotkeys
-- Tests und Werkzeuge
+- Syntax and language
+- Objects, Maps, Arrays
+- Error handling
+- Processes, pipes, messages
+- GUI and hotkeys
+- Tests and tools
 
 ---
 
-## Syntax und Sprache
+## Syntax and language
 
-### Lambda kann kein `throw` enthalten
+### A lambda cannot contain `throw`
 
-- **Problem:** Ein Test wollte einen Fehler aus einer Lambda werfen. Das Skript brach beim Laden ab.
-- **Falsch:** `TestRun.Case("x", () => throw ValueError("boom"))`
-- **Richtig:** `throw` ist eine Anweisung, keine Ausdruck. Eine benannte Funktion verwenden: `ThrowBoom() { throw ValueError("boom") }` und dann `() => Assert.Throws(ThrowBoom, ValueError)`.
-- **Status:** verifiziert (Editor-Diagnose und Ladefehler, `tests/ahk/selfcheck.test.ahk`)
+- **Problem:** A test wanted to throw an error from a lambda. The script aborted while loading.
+- **Wrong:** `TestRun.Case("x", () => throw ValueError("boom"))`
+- **Right:** `throw` is a statement, not an expression. Use a named function: `ThrowBoom() { throw ValueError("boom") }` and then `() => Assert.Throws(ThrowBoom, ValueError)`.
+- **Status:** verified (editor diagnostic and load error, `tests/ahk/selfcheck.test.ahk`)
 
-### FileAppend schreibt bei neuer Datei ein BOM
+### FileAppend writes a BOM for a new file
 
-- **Problem:** Die Ergebnisdatei der AHK-Tests beginnt mit einem UTF-8-BOM. Ein Python-Leser mit `utf-8` bekommt `﻿` vor dem ersten JSON-Objekt.
-- **Falsch:** `FileAppend(line, path, "UTF-8")` und Lesen mit `encoding="utf-8"`.
-- **Richtig:** Die Hilfe sagt: Ein BOM wird nur geschrieben, wenn `"UTF-8"` oder `"UTF-16"` angegeben ist, und nur bei neu angelegter Datei. Python liest mit `encoding="utf-8-sig"`. Für Ausgaben ohne BOM (Flow-Dateien) `"UTF-8-RAW"` nehmen: verifiziert in `tests/test_json_flows.py` (keine BOM-Bytes in den geschriebenen Dateien).
-- **Status:** verifiziert (Ausgabedatei mit BOM gesehen, Python-Leser mit `utf-8-sig` in `tests/conftest.py`; `UTF-8-RAW` in WI-02)
-- **Quelle:** https://www.autohotkey.com/docs/v2/lib/FileAppend.htm
+- **Problem:** The result file of the AHK tests starts with a UTF-8 BOM. A Python reader using `utf-8` gets `﻿` in front of the first JSON object.
+- **Wrong:** `FileAppend(line, path, "UTF-8")` and reading with `encoding="utf-8"`.
+- **Right:** The help says: a BOM is only written if `"UTF-8"` or `"UTF-16"` is specified, and only when the file is newly created. Python reads with `encoding="utf-8-sig"`. For output without a BOM (flow files) use `"UTF-8-RAW"`: verified in `tests/test_json_flows.py` (no BOM bytes in the written files).
+- **Status:** verified (output file with BOM seen, Python reader with `utf-8-sig` in `tests/conftest.py`; `UTF-8-RAW` in WI-02)
+- **Source:** https://www.autohotkey.com/docs/v2/lib/FileAppend.htm
 
-### #Include relativ zur einbindenden Datei
+### #Include is relative to the including file
 
-- **Problem:** Test-Skripte binden `lib\Assert.ahk` ein. Die Pfade hängen von der Datei ab, nicht vom Arbeitsverzeichnis.
-- **Richtig:** Relative `#Include`-Pfade beziehen sich auf das Verzeichnis der Datei, die `#Include` enthält. `SetWorkingDir` wirkt darauf nicht, weil `#Include` vor dem Start des Skripts verarbeitet wird. Für Pfade in Testdateien, die aus Python erzeugt werden, den absoluten Pfad einsetzen.
-- **Status:** verifiziert (Tests mit Skripten im `datadir` und mit `tests/ahk/`)
-- **Quelle:** https://www.autohotkey.com/docs/v2/lib/_Include.htm
+- **Problem:** Test scripts include `lib\Assert.ahk`. The paths depend on the file, not on the working directory.
+- **Right:** Relative `#Include` paths refer to the directory of the file that contains the `#Include`. `SetWorkingDir` has no effect on them, because `#Include` is processed before the script starts. For paths in test files generated by Python, insert the absolute path.
+- **Status:** verified (tests with scripts in the `datadir` and with `tests/ahk/`)
+- **Source:** https://www.autohotkey.com/docs/v2/lib/_Include.htm
 
-### Statische Methode als Callback verschiebt die Parameter
+### A static method used as a callback shifts the parameters
 
-- **Problem:** `Log.Configure(Log.Memory)` mit `static Memory(level, source, text, flowId)` lieferte `level` = zweites Argument ("args" statt "a1"). Eine Senke `this.sink(...)` mit einer freien Funktion bekam das Objekt `Log` als zusätzliches erstes Argument: "Too many parameters passed to function" bzw. ein leeres Array (IndexError). Beides wurde in `Log.Write` still geschluckt und nur gezählt, deshalb sah man die Ursache nicht sofort.
-- **Falsch:** `static Memory(level, ...)` als Senke übergeben. Oder `this.sink(level, ...)` aufrufen, wenn `sink` eine Funktion ist.
-- **Richtig:** Callbacks als Funktionseigenschaft definieren, `static Memory := (level, source, text, flowId := "") => ...`. Beim Aufruf über eine lokale Variable: `sink := this.sink` und dann `sink(level, ...)`. So bekommt die Funktion genau die übergebenen Argumente.
-- **Status:** verifiziert (`tests/ahk/core_log.test.ahk`, Fälle "custom sink function" und "sink receives level, source, text and flowId")
-- **Quelle:** `src/core/Log.ahk`
+- **Problem:** `Log.Configure(Log.Memory)` with `static Memory(level, source, text, flowId)` gave `level` = second argument ("args" instead of "a1"). A sink `this.sink(...)` with a free function received the object `Log` as an additional first argument: "Too many parameters passed to function" or an empty array (IndexError). Both were silently swallowed in `Log.Write` and only counted, which is why the cause was not visible right away.
+- **Wrong:** Passing `static Memory(level, ...)` as a sink. Or calling `this.sink(level, ...)` when `sink` is a function.
+- **Right:** Define callbacks as a function property, `static Memory := (level, source, text, flowId := "") => ...`. When calling via a local variable: `sink := this.sink` and then `sink(level, ...)`. This way the function receives exactly the arguments passed.
+- **Status:** verified (`tests/ahk/core_log.test.ahk`, cases "custom sink function" and "sink receives level, source, text and flowId")
+- **Source:** `src/core/Log.ahk`
 
-### Aufruf ohne Ergebnispfad zeigt einen Dialog
+### Call without a result path shows a dialog
 
-- **Problem:** `python tools/ahkrun.py tests/ahk/core_ids.test.ahk` startete die Testdatei ohne Ergebnispfad. `TestRun.Init` wirft "missing result file argument", der Dialog-Wächter hat ihn gefangen (Exit 97). Das ist korrekt, aber keine gültige Testausführung.
-- **Richtig:** Testdateien über pytest laufen lassen (`python -m pytest tests -q`). Der Runner übergibt den Ergebnispfad. Direkt nur mit Ergebnisdatei als Argument: `python tools/ahkrun.py tests/ahk/core_ids.test.ahk C:\...\result.jsonl`.
-- **Status:** verifiziert (Dialog-Wächter-Lauf, Exit 97)
+- **Problem:** `python tools/ahkrun.py tests/ahk/core_ids.test.ahk` started the test file without a result path. `TestRun.Init` threw "missing result file argument", the dialog guard caught it (exit 97). This is correct, but not a valid test run.
+- **Right:** Run test files via pytest (`python -m pytest tests -q`). The runner passes the result path. Directly, only with the result file as argument: `python tools/ahkrun.py tests/ahk/core_ids.test.ahk C:\...\result.jsonl`.
+- **Status:** verified (dialog guard run, exit 97)
 
-### Backslash ist in AHK v2 kein Escape-Zeichen
+### Backslash is not an escape character in AHK v2
 
-- **Problem:** Beim Schreiben von JSON-Testtexten und Escape-Erwartungen stimmte die Länge nicht, weil `"\\"` zwei Backslashes ergibt.
-- **Falsch:** `"\\"` erwarten, wenn ein Backslash gemeint ist.
-- **Richtig:** `"\"` ist ein Backslash, `"\\"` sind zwei. Der Escape-Charakter ist der Backtick: `` `n ``, `` `t ``, `` `r ``. In `"..."` ist ein Anführungszeichen `""`, in `'...'` einfach `"`. JSON-Text mit Escapes in einfachen Hochkommata schreiben: `'"é"'`.
-- **Status:** verifiziert (`tests/ahk/json.test.ahk`, Fälle zu Steuerzeichen und Escapes)
+- **Problem:** When writing JSON test texts and escape expectations, the length did not match, because `"\\"` yields two backslashes.
+- **Wrong:** Expecting `"\\"` when one backslash is meant.
+- **Right:** `"\"` is one backslash, `"\\"` is two. The escape character is the backtick: `` `n ``, `` `t ``, `` `r ``. Inside `"..."` a quotation mark is `""`, inside `'...'` it is simply `"`. Write JSON text with escapes in single quotes: `'"é"'`.
+- **Status:** verified (`tests/ahk/json.test.ahk`, cases for control characters and escapes)
 
-### `<` vergleicht Strings numerisch, `Sort` sortiert nur Text
+### `<` compares strings numerically, `Sort` sorts only text
 
-- **Problem:** `"a" < "B"` öffnete den Dialog "Expected a Number but got a String". `Sort(array)` öffnete "Parameter #1 of Sort requires a String".
-- **Falsch:** `if (a < b)` für Textordnung. `Sort(arr)` mit einem Array.
-- **Richtig:** Textordnung über `Ord()` der Zeichen vergleichen (siehe `Json.Less` in `src/core/Json.ahk`). Ein Array sortiert AHK v2 nicht von sich aus; `Sort` arbeitet nur auf Text mit Trennzeichen.
-- **Status:** verifiziert (Ausgabe im Experiment, `Json.SortedKeys` in den Tests)
+- **Problem:** `"a" < "B"` opened the dialog "Expected a Number but got a String". `Sort(array)` opened "Parameter #1 of Sort requires a String".
+- **Wrong:** `if (a < b)` for text order. `Sort(arr)` with an array.
+- **Right:** Compare text order via `Ord()` of the characters (see `Json.Less` in `src/core/Json.ahk`). AHK v2 does not sort an array by itself; `Sort` works only on text with delimiters.
+- **Status:** verified (output in an experiment, `Json.SortedKeys` in the tests)
 
-### `=` und `!=` vergleichen Strings ohne Groß-/Kleinschreibung
+### `=` and `!=` compare strings case-insensitively
 
-- **Problem:** Eine Literalprüfung soll `True` nicht als `true` durchlassen.
-- **Falsch:** `SubStr(text, pos, 4) != "true"`.
-- **Richtig:** `!==` (und `==`) vergleichen case-sensitiv. `Json.ParseLiteral` nutzt `!==`.
-- **Status:** verifiziert für `!==` (Test "invalid literal is rejected" mit `[True]`). `!=` selbst nicht gesondert getestet, Verhalten laut Doku.
+- **Problem:** A literal check should not accept `True` as `true`.
+- **Wrong:** `SubStr(text, pos, 4) != "true"`.
+- **Right:** `!==` (and `==`) compare case-sensitively. `Json.ParseLiteral` uses `!==`.
+- **Status:** verified for `!==` (test "invalid literal is rejected" with `[True]`). `!=` itself not separately tested, behavior according to the documentation.
 
-### Float als Text: Präzision und Form
+### Float as text: precision and form
 
-- **Problem:** Die Standardumwandlung ist für JSON ungeeignet: Präzision geht verloren, und `1.0` wird zu `1`, also zu einer Ganzzahl beim Lesen.
-- **Falsch:** `"" f` oder `String(f)` für JSON-Ausgabe.
-- **Richtig:** `Format("{:.15g}", f)`, wenn `Float(s) != f`, dann `Format("{:.17g}", f)`. Fehlt `.` und `e`, `.0` anhängen. `Float("1e400")` liefert `inf`, das muss vorher abgewiesen werden (`f - f != 0`).
-- **Status:** verifiziert (`Format`-Ausgaben: `1/3` gibt `0.33333333333333331`, `1e20` gibt `1e+20`, `1.0` gibt `1`; Tests zur Präzision). Die Standardumwandlung eines Floats in Text wurde nicht geprüft.
+- **Problem:** The standard conversion is unsuitable for JSON: precision is lost, and `1.0` becomes `1`, i.e. an integer when read back.
+- **Wrong:** `"" f` or `String(f)` for JSON output.
+- **Right:** `Format("{:.15g}", f)`; if `Float(s) != f`, then `Format("{:.17g}", f)`. If neither `.` nor `e` is present, append `.0`. `Float("1e400")` returns `inf`, which must be rejected beforehand (`f - f != 0`).
+- **Status:** verified (`Format` outputs: `1/3` gives `0.33333333333333331`, `1e20` gives `1e+20`, `1.0` gives `1`; precision tests). The default conversion of a float to text was not checked.
 
-### Verschachtelte Klasse mit statischem Singleton
+### Nested class with a static singleton
 
-- **Problem:** `Json.Null` als Singleton einer eigenen Klasse, ohne eine zweite Klasse in derselben Datei anzulegen.
-- **Richtig:** `class Json { class NullValue {} static Null := Json.NullValue() }` funktioniert. `Type()` liefert `Json.NullValue`. Die verschachtelte Klasse muss vor der statischen Zeile stehen, damit der Lader sie kennt (in `Json.ahk` so umgesetzt).
-- **Status:** verifiziert (`tests/ahk/json.test.ahk`, Fall "Json.Null is a singleton")
+- **Problem:** `Json.Null` as a singleton of its own class, without creating a second class in the same file.
+- **Right:** `class Json { class NullValue {} static Null := Json.NullValue() }` works. `Type()` returns `Json.NullValue`. The nested class must come before the static line so that the loader knows it (implemented this way in `Json.ahk`).
+- **Status:** verified (`tests/ahk/json.test.ahk`, case "Json.Null is a singleton")
 
-### Performance: Aufrufe pro Zeichen kosten
+### Performance: calls per character are expensive
 
-- **Problem:** Ein Parser mit `SubStr` pro Zeichen und Eigenschaftszugriff pro Zeichen brauchte 2,8 s für 10.000 Nachrichten zu je 364 Zeichen.
-- **Richtig:** Textläufe mit einem `RegExMatch`-Aufruf je Zeichenkette holen, Zeichencodes per `NumGet` aus einem UTF-16-Puffer lesen, `SkipWs` ohne Regex, wenn kein Leerzeichen folgt. Danach etwa 1,5 s Parsen und 0,6 s Schreiben (Messlauf, `tests/test_json_flows.py`). Die Restkosten sind die Methodenaufrufe pro Token. Das Ziel "unter 1 s" wurde damit nicht erreicht.
-- **Status:** verifiziert (gemessen, Werte schwanken je Lauf)
+- **Problem:** A parser using `SubStr` per character and a property access per character needed 2.8 s for 10,000 messages of 364 characters each.
+- **Right:** Fetch runs of text with one `RegExMatch` call per character string, read character codes via `NumGet` from a UTF-16 buffer, and use `SkipWs` without regex when no whitespace follows. Afterwards about 1.5 s for parsing and 0.6 s for writing (measurement run, `tests/test_json_flows.py`). The remaining cost is the method calls per token. The goal "under 1 s" was not reached with this.
+- **Status:** verified (measured, values vary per run)
 
-### Reserviertes Wort `loop` nicht als Variablenname
+### Reserved word `loop` must not be used as a variable name
 
-- **Problem:** In einem Test hieß eine Variable `loop`. Der Editor meldete "The following reserved word 'loop' must not be used as a variable name", dazu Folgefehler wie "Missing operand" an den Stellen, an denen die Variable benutzt wurde.
-- **Falsch:** `loop := inst.Threads["t1"]` und `RunElement(loop, "head")`.
-- **Richtig:** Anderen Namen wählen (`loopThread`). Das Wort in Zeichenketten (`"type":"loop"`) ist unproblematisch. Die Editor-Diagnose vor dem ersten Testlauf lesen, dann erspart man sich einen Ladefehler.
-- **Status:** verifiziert (Editor-Diagnose in `tests/ahk/engine_scheduler.test.ahk`, nach dem Umbenennen laufen die Tests grün)
+- **Problem:** In a test, a variable was called `loop`. The editor reported "The following reserved word 'loop' must not be used as a variable name", plus follow-up errors such as "Missing operand" at the places where the variable was used.
+- **Wrong:** `loop := inst.Threads["t1"]` and `RunElement(loop, "head")`.
+- **Right:** Choose another name (`loopThread`). The word inside strings (`"type":"loop"`) is harmless. Read the editor diagnostics before the first test run; that saves a load error.
+- **Status:** verified (editor diagnostic in `tests/ahk/engine_scheduler.test.ahk`; after renaming, the tests run green)
 
-### Wahrheitswerte sind Integer 1 und 0
+### Truth values are the integers 1 and 0
 
-- **Problem:** Eine Methode, die `true` oder `false` zurückgibt, liefert in AHK v2 einen Integer. `Assert.Equal(x, false)` prüft deshalb auf Integer, nicht auf einen Bool-Typ. Die Fehlermeldung zeigt "expected 0 (Integer)".
-- **Richtig:** Für Rückgabewerte wie `TryTransition` `Assert.Equal(ok, false)` oder `Assert.True(ok)` verwenden. Beide Seiten sind dann Integer.
-- **Status:** verifiziert (`tests/ahk/engine_states.test.ahk`, Vergleiche mit `false` und `true`). Gilt für Programmzustand und Rückgabewerte. Die Leitung ist seit WI-26 anders (`Json.True`/`Json.False`, siehe die Einträge „Wahrheitswerte gehen als Zahl auf die Leitung“ und „`Json.False` ist in AHK wahr“).
+- **Problem:** A method that returns `true` or `false` returns an integer in AHK v2. `Assert.Equal(x, false)` therefore checks for an integer, not for a Bool type. The error message shows "expected 0 (Integer)".
+- **Right:** For return values such as `TryTransition`, use `Assert.Equal(ok, false)` or `Assert.True(ok)`. Both sides are then integers.
+- **Status:** verified (`tests/ahk/engine_states.test.ahk`, comparisons with `false` and `true`). Applies to program state and return values. The wire format has been different since WI-26 (`Json.True`/`Json.False`, see the entries "Truth values go over the wire as numbers" and "`Json.False` is true in AHK").
 
-### Dieselbe Datei über verschiedene relative `#Include`-Wege
+### The same file via different relative `#Include` paths
 
-- **Problem:** `src/core/Log.ahk` wird über `Instance.ahk` (und `ThreadState.ahk`) eingebunden und zusätzlich direkt vom Test. Es war unklar, ob AHK dabei eine doppelte Klassendefinition meldet.
-- **Richtig:** Kein Fehler. Die Pfade `..\..\core\Log.ahk` und `..\..\src\core\Log.ahk` zeigen auf dieselbe Datei, AHK lädt sie einmal. Mehrfach-Einbindung über Abhängigkeitsketten ist damit unkritisch.
-- **Status:** verifiziert (Testläufe `engine_states` und `engine_scheduler` ohne Ladefehler)
-- **Quelle:** `src/engine/core/Instance.ahk`, `tests/ahk/engine_states.test.ahk`
+- **Problem:** `src/core/Log.ahk` is included via `Instance.ahk` (and `ThreadState.ahk`) and additionally directly by the test. It was unclear whether AHK reports a duplicate class definition in that case.
+- **Right:** Not an error. The paths `..\..\core\Log.ahk` and `..\..\src\core\Log.ahk` point to the same file, AHK loads it once. Multiple inclusion through dependency chains is therefore harmless.
+- **Status:** verified (test runs `engine_states` and `engine_scheduler` without load errors)
+- **Source:** `src/engine/core/Instance.ahk`, `tests/ahk/engine_states.test.ahk`
 
-### Zähler für Test-IDs im Closure statt global
+### Counter for test IDs in a closure instead of a global
 
-- **Problem:** Tests brauchen fortlaufende Thread-IDs. Globale Variablen verbietet `doc/KONVENTIONEN.md`, eine `static`-Variable in einer Funktion war schwer zu lesen.
-- **Richtig:** Ein Map-Objekt anlegen und die Funktion als Closure übergeben: `counter := Map("n", 1)` und `() => NextId(counter)`. Das Map-Objekt ist veränderlich und wird von allen Aufrufen gemeinsam benutzt.
-- **Status:** verifiziert (`MakeIds` in `tests/ahk/engine_scheduler.test.ahk`)
+- **Problem:** Tests need consecutive thread IDs. Global variables are forbidden by `doc/KONVENTIONEN.md`, and a `static` variable in a function was hard to read.
+- **Right:** Create a Map object and pass the function as a closure: `counter := Map("n", 1)` and `() => NextId(counter)`. The Map object is mutable and is shared by all calls.
+- **Status:** verified (`MakeIds` in `tests/ahk/engine_scheduler.test.ahk`)
 
-### Funktion in einer Eigenschaft: Aufruf mit Punkt übergibt die Klasse als erstes Argument
+### Function in a property: calling with a dot passes the class as the first argument
 
-- **Problem:** `Role.ConsoleFn("a0", "role", text)` (Funktionseigenschaft mit Lambda) öffnete den Dialog "Expected a String but got a Class". Der erste Parameter war die Klasse `Role`, nicht der Pegel.
-- **Falsch:** `static ConsoleFn := (level, source, text) => ...` und der Aufruf `Klasse.ConsoleFn(...)`.
-- **Richtig:** Die Funktion über eine statische Methode aufrufen (`Role.Console(...)`). Die Eigenschaft nur als Wert übergeben, z. B. `Log.Configure(Role.ConsoleFn)` oder als Callback. Gleiches Muster wie `Log.Write`, dort über die lokale Kopie `sink := this.sink`.
-- **Status:** verifiziert (Dialog beim Start mit unbekannter Rolle, danach grün). Warum AHK den Klassennamen durchreicht, wurde nicht in der Doku nachgelesen: vermutet.
-- **Quelle:** `src/core/Role.ahk`
+- **Problem:** `Role.ConsoleFn("a0", "role", text)` (function property with a lambda) opened the dialog "Expected a String but got a Class". The first parameter was the class `Role`, not the level.
+- **Wrong:** `static ConsoleFn := (level, source, text) => ...` and the call `Class.ConsoleFn(...)`.
+- **Right:** Call the function via a static method (`Role.Console(...)`). Pass the property only as a value, e.g. `Log.Configure(Role.ConsoleFn)` or as a callback. Same pattern as `Log.Write`, there via the local copy `sink := this.sink`.
+- **Status:** verified (dialog at start with an unknown role, green afterwards). Why AHK passes the class name through was not looked up in the documentation: assumed.
+- **Source:** `src/core/Role.ahk`
 
-### Lokale Variable mit dem Namen einer Klasse
+### Local variable with the name of a class
 
-- **Problem:** In `AhfMain` stand `role := ""`. Danach schlug `Role.ConsoleFn(...)` im selben Gültigkeitsbereich fehl: "This local variable has not been assigned a value. Specifically: role".
-- **Falsch:** Lokale Variable `role` neben der Klasse `Role`.
-- **Richtig:** AHK v2 behandelt Bezeichner ohne Unterschied der Schreibweise, `role` ist also `Role`. Lokale Namen nicht wie Klassen wählen (`roleObj`).
-- **Status:** verifiziert (Dialog beim Start, nach der Umbenennung grün).
-- **Quelle:** `src/AutoHotFlow.ahk`
+- **Problem:** `AhfMain` contained `role := ""`. Afterwards `Role.ConsoleFn(...)` failed in the same scope: "This local variable has not been assigned a value. Specifically: role".
+- **Wrong:** Local variable `role` next to the class `Role`.
+- **Right:** AHK v2 treats identifiers without regard to case, so `role` is `Role`. Do not name local variables like classes (`roleObj`).
+- **Status:** verified (dialog at start, green after renaming).
+- **Source:** `src/AutoHotFlow.ahk`
 
-### Feld und Methode mit gleichem Namen: `Property is read-only`
+### Field and method with the same name: `Property is read-only`
 
-- **Problem:** Eine Klasse hatte ein Feld und eine Methode mit Namen, die sich nur in der Schreibweise unterscheiden. AHK v2 behandelt Bezeichner case-insensitiv, also sind es dieselben Namen. Der Zugriff auf das Feld schlug mit "Property is read-only" fehl.
-- **Falsch:** Feld `state` und Methode `State()` in derselben Klasse.
-- **Richtig:** Felder und Methoden verschieden benennen (z. B. Feld `stateName`, Methode `State()`), auch wenn die Schreibweise nur leicht abweicht.
-- **Status:** verifiziert (im Lauf von WI-07 gefunden; die Fundstelle wurde für diesen Eintrag nicht erneut geprüft)
-- **Quelle:** `src/supervisor/` (WI-07)
-- **Wieder aufgetreten (WI-10):** `src/engine/Engine.ahk` hatte das Feld `_loaded` und die Methode `_Loaded()`. Der Start der Rolle schlug mit der gleichen Meldung fehl (Exit 2, "bad arguments: Property is read-only"). Behoben durch Umbenennen des Feldes in `_flowsLoaded`. Vor dem Benennen einer Methode `_X()` prüfen, ob es schon ein Feld `_x` gibt.
+- **Problem:** A class had a field and a method whose names differ only in capitalization. AHK v2 treats identifiers case-insensitively, so these are the same name. Access to the field failed with "Property is read-only".
+- **Wrong:** Field `state` and method `State()` in the same class.
+- **Right:** Name fields and methods differently (e.g. field `stateName`, method `State()`), even if the spelling differs only slightly.
+- **Status:** verified (found during WI-07; the location was not re-checked for this entry)
+- **Source:** `src/supervisor/` (WI-07)
+- **Occurred again (WI-10):** `src/engine/Engine.ahk` had the field `_loaded` and the method `_Loaded()`. The start of the role failed with the same message (exit 2, "bad arguments: Property is read-only"). Fixed by renaming the field to `_flowsLoaded`. Before naming a method `_X()`, check whether a field `_x` already exists.
 
-### `Json.False` ist in AHK wahr (WI-26)
+### `Json.False` is true in AHK (WI-26)
 
-- **Problem:** AHK v2 hat keinen Bool-Typ, und jedes Objekt ist wahr. `Json.True` und `Json.False` sind Objekte (damit `Stringify` `true`/`false` schreiben kann), also ist `if Json.False` wahr. Ein Wahrheitswert, der als `Json.False` im Programmzustand liegt und mit `if` geprüft wird, ist ein stiller Fehler.
-- **Falsch:** `payload["ok"] := Json.False` und später `if (payload["ok"])` (so in `WriteQueue`/`Storage._Finish`).
-- **Richtig:** `Json.True`/`Json.False`/`Json.Bool(x)` nur beim Bau der Nachricht unmittelbar vor dem Senden. Intern bleibt es `1`/`0` (und `true`/`false` als AHK-Literale, die `1`/`0` sind). `ok` wandelt `Message.Serialize` auf einer Kopie um. Beim Weitergeben einer geparsten Nutzlast die Wahrheitsfelder neu mit `Json.Bool` setzen (Parse liefert `1`/`0`). Tests prüfen mit `value == Json.False`, nicht mit `Assert.Equal(x, 0)`.
-- **Status:** verifiziert (`tests/ahk/json.test.ahk` „Json.True and Json.False are distinct singletons“, `tests/ahk/message.test.ahk`)
-- **Quelle:** `src/core/Json.ahk`, `src/core/ipc/Message.ahk` (`_WirePayload`), `doc/PROTOKOLL.md` Abschnitt 2
+- **Problem:** AHK v2 has no Bool type, and every object is true. `Json.True` and `Json.False` are objects (so that `Stringify` can write `true`/`false`), so `if Json.False` is true. A truth value that sits in the program state as `Json.False` and is checked with `if` is a silent error.
+- **Wrong:** `payload["ok"] := Json.False` and later `if (payload["ok"])` (as in `WriteQueue`/`Storage._Finish`).
+- **Right:** Use `Json.True`/`Json.False`/`Json.Bool(x)` only when building the message, immediately before sending. Internally it stays `1`/`0` (and `true`/`false` as AHK literals, which are `1`/`0`). `Message.Serialize` converts `ok` on a copy. When passing on a parsed payload, set the truth fields again with `Json.Bool` (parsing yields `1`/`0`). Tests check with `value == Json.False`, not with `Assert.Equal(x, 0)`.
+- **Status:** verified (`tests/ahk/json.test.ahk` "Json.True and Json.False are distinct singletons", `tests/ahk/message.test.ahk`)
+- **Source:** `src/core/Json.ahk`, `src/core/ipc/Message.ahk` (`_WirePayload`), `doc/PROTOKOLL.md` section 2
 
-### `Round(x, 1)` liefert einen String
+### `Round(x, 1)` returns a string
 
-- **Problem:** Ein Messwert mit `Round(ms, 1)` landete in der JSON-Datei als `"14.1"` (String), der Python-Test verglich ihn mit einer Zahl.
-- **Richtig:** `Round(x, n)` mit `n > 0` ist ein `String`, `Round(x)` ein `Integer`. Für eine Zahl `Round(x, 1) + 0` (Float) schreiben.
-- **Status:** verifiziert (`Type(Round(3.14159, 1))` gibt `String`)
+- **Problem:** A measured value with `Round(ms, 1)` ended up in the JSON file as `"14.1"` (string), and the Python test compared it with a number.
+- **Right:** `Round(x, n)` with `n > 0` is a `String`, `Round(x)` is an `Integer`. For a number, write `Round(x, 1) + 0` (float).
+- **Status:** verified (`Type(Round(3.14159, 1))` returns `String`)
 
-### Negative Länge bei `SubStr`: Suffix zählen
+### Negative length in `SubStr`: count the suffix
 
-- **Problem:** Die Prüfung auf das Ende `_old.txt` nutzte `SubStr(path, -7)`. Das Suffix hat aber 8 Zeichen.
-- **Richtig:** `SubStr(path, -8) = "_old.txt"`. Allgemein: die Länge des Suffixes aus dem Literal zählen, nicht schätzen.
-- **Status:** vermutet (beim Lesen gefunden und vor dem ersten Lauf korrigiert). Der Zweig "schon `_old`" ist nicht gezielt getestet, die Rotation selbst ist getestet (`test_log_file_over_100_kb_...`).
+- **Problem:** The check for the ending `_old.txt` used `SubStr(path, -7)`. But the suffix has 8 characters.
+- **Right:** `SubStr(path, -8) = "_old.txt"`. In general: count the length of the suffix from the literal, do not estimate it.
+- **Status:** assumed (found while reading and corrected before the first run). The branch "already `_old`" is not specifically tested; the rotation itself is tested (`test_log_file_over_100_kb_...`).
 
-### `FileRead` mit "UTF-8" und BOM
+### `FileRead` with "UTF-8" and BOM
 
-- **Problem:** v1-Variablendateien beginnen mit einem UTF-8-BOM. Ein BOM-Zeichen am Anfang bricht `Json.Parse` und den Vergleich mit Python.
-- **Richtig:** Das Zeichen `Chr(0xFEFF)` am Anfang nach dem Lesen entfernen (`AtomicFile.ReadText`).
-- **Status:** verifiziert (`test_v1_variables_are_read_as_stored`, `test_variable_round_trip_...`). Ob AHK das BOM bei `"UTF-8"` selbst entfernt, ist nicht geprüft; der eigene Schritt macht es unabhängig davon.
+- **Problem:** v1 variable files start with a UTF-8 BOM. A BOM character at the start breaks `Json.Parse` and the comparison with Python.
+- **Right:** Remove the character `Chr(0xFEFF)` at the start after reading (`AtomicFile.ReadText`).
+- **Status:** verified (`test_v1_variables_are_read_as_stored`, `test_variable_round_trip_...`). Whether AHK itself removes the BOM with `"UTF-8"` is not checked; our own step does it regardless.
 
-### `===` gibt es nicht, `ObjPtr("")` wirft
+### `===` does not exist, `ObjPtr("")` throws
 
-- **Problem:** Der Vergleich zweier Objekte auf Identität mit `===` ist ein Syntaxfehler ("Missing operand"). `ObjPtr` auf einen leeren String wirft "Expected an object".
-- **Richtig:** `IsObject(a) && ObjPtr(a) = ObjPtr(b)`. Das Skript meldet den Fehler beim Laden (stderr), nicht erst beim Lauf.
-- **Status:** verifiziert
-- **Quelle:** `src/engine/Executor.ahk` (`_DispatchWorker`)
+- **Problem:** Comparing two objects for identity with `===` is a syntax error ("Missing operand"). `ObjPtr` on an empty string throws "Expected an object".
+- **Right:** `IsObject(a) && ObjPtr(a) = ObjPtr(b)`. The script reports the error at load time (stderr), not only when it runs.
+- **Status:** verified
+- **Source:** `src/engine/Executor.ahk` (`_DispatchWorker`)
 
-### Klasse aus einer Datei nicht eingebunden: Dialog "local variable ... never assigned"
+### Class not included from its file: dialog "local variable ... never assigned"
 
-- **Problem:** `src/manager/StubManager.ahk` rief `StubGui(this)` auf, die Datei `StubGui.ahk` war aber nicht eingebunden. AHK meldet das beim Laden als Warnung, die einen Dialog öffnet: "Warning: This local variable appears to never be assigned a value. Specifically: StubGui". Ohne Wächter hängt der Prozess.
-- **Falsch:** Klasse in einer zweiten Datei verwenden, ohne `#Include` in der Datei, die sie nutzt.
-- **Richtig:** Jede Klasse, die eine Datei benutzt, mit `#Include` dieser Datei einbinden. Dialoge eines Rollenprozesses stehen unter `%TEMP%\ahf_dialogs\` (Text und PNG).
-- **Status:** verifiziert (Dialog erfasst beim Start der Rolle, nach dem Einfügen des `#Include` kein Dialog mehr, Probelauf und `tests/e2e/test_ui_stub.py` grün)
-- **Quelle:** `src/manager/StubManager.ahk`
+- **Problem:** `src/manager/StubManager.ahk` called `StubGui(this)`, but the file `StubGui.ahk` was not included. AHK reports this at load time as a warning that opens a dialog: "Warning: This local variable appears to never be assigned a value. Specifically: StubGui". Without the guard the process hangs.
+- **Wrong:** Using a class from a second file without `#Include` of that file in the file that uses it.
+- **Right:** Include every class that a file uses with `#Include` of that file. Dialogs of a role process are stored under `%TEMP%\ahf_dialogs\` (text and PNG).
+- **Status:** verified (dialog captured at role start; after inserting the `#Include` no dialog any more, trial run and `tests/e2e/test_ui_stub.py` green)
+- **Source:** `src/manager/StubManager.ahk`
 
-### Eingebaute Klassennamen von AHK v2 nicht überschreiben
+### Do not override built-in AHK v2 class names
 
-- **Problem:** `class TimeoutError extends AhfError` meldet beim Laden "This class declaration conflicts with an existing Class" und blockiert mit Dialog.
-- **Richtig:** Eigene Namen mit Präfix (`AhfTimeoutError`). Eingebaut sind u. a. `Error`, `TimeoutError`, `ValueError`, `TypeError`, `OSError`, `MemberError`, `PropertyError`, `MethodError`, `IndexError`, `KeyError`, `UnsetError`, `TargetError`, `MemoryError`, `ZeroDivisionError`.
-- **Status:** verifiziert (`TimeoutError`), Rest der Liste aus der AHK-Doku, nicht einzeln geprüft.
+- **Problem:** `class TimeoutError extends AhfError` reports "This class declaration conflicts with an existing Class" at load time and blocks with a dialog.
+- **Right:** Use own names with a prefix (`AhfTimeoutError`). Built-in are, among others, `Error`, `TimeoutError`, `ValueError`, `TypeError`, `OSError`, `MemberError`, `PropertyError`, `MethodError`, `IndexError`, `KeyError`, `UnsetError`, `TargetError`, `MemoryError`, `ZeroDivisionError`.
+- **Status:** verified (`TimeoutError`); rest of the list from the AHK documentation, not checked individually.
 
-### Code auf Dateiebene läuft vor `AhfMain` und damit vor jedem `OnError` (WI-22)
+### Code at file level runs before `AhfMain` and thus before any `OnError` (WI-22)
 
-- **Problem:** Die Elementdateien rufen am Dateiende `ElementRegistry.Register(...)` auf. AHK führt das beim Laden in Textreihenfolge aus, also vor `AhfMain()`. Ein Fehler dort (doppelte Klasse, ungültiger `Mode`) zeigte beim Start einen Fehlerdialog. `/ErrorStdOut` gilt nur für Ladefehler (Syntax), nicht für Laufzeitfehler in diesem Code. Reproduziert mit einem Testelement: `tools/ahkrun.py` meldete Exit 97 (Dialog abgefangen).
-- **Richtig:** `OnError(Handler)` als erste ausführbare Anweisung des Einstiegs, **vor** den `#Include`-Zeilen (Funktionen sind vorher bekannt, der Handler darf weiter unten stehen). Der Handler schreibt auf stderr und beendet den Prozess (`ExitApp(1)`): Ein Prozess mit kaputter Registrierung soll nicht weiterlaufen. Vor dem Start von Supervisor oder Rolle wird er mit `OnError(Handler, 0)` wieder entfernt.
-- **Grund für das Entfernen:** Mehrere `OnError`-Handler werden nacheinander aufgerufen, und ein Handler, der 1 liefert, hält die späteren an [vermutet, aus der AHK-Dokumentation erinnert, nicht nachgestellt]. Der Handler des Einstiegs würde sonst den der Rolle verdecken.
-- **Status:** Verhalten verifiziert (`tests/integration/test_entry.py::test_error_while_loading_files_shows_no_dialog_and_ends_with_exit_1`, vorher Exit 97, nachher Exit 1 mit Meldung auf stderr). Die Aussage über die Reihenfolge der Handler ist vermutet.
-- **Quelle:** `src/AutoHotFlow.ahk`, `tests/integration/helpers/RegisterFailure.ahk`
+- **Problem:** The element files call `ElementRegistry.Register(...)` at the end of the file. AHK executes that at load time in text order, i.e. before `AhfMain()`. An error there (duplicate class, invalid `Mode`) showed an error dialog at start. `/ErrorStdOut` applies only to load errors (syntax), not to run-time errors in this code. Reproduced with a test element: `tools/ahkrun.py` reported exit 97 (dialog caught).
+- **Right:** `OnError(Handler)` as the first executable statement of the entry point, **before** the `#Include` lines (functions are known beforehand, the handler may stand further down). The handler writes to stderr and ends the process (`ExitApp(1)`): a process with a broken registration should not keep running. Before the supervisor or role starts, it is removed again with `OnError(Handler, 0)`.
+- **Reason for removing it:** Several `OnError` handlers are called one after another, and a handler that returns 1 stops the later ones [assumed, recalled from the AHK documentation, not reproduced]. The entry point's handler would otherwise hide the role's handler.
+- **Status:** behavior verified (`tests/integration/test_entry.py::test_error_while_loading_files_shows_no_dialog_and_ends_with_exit_1`, before: exit 97, afterwards: exit 1 with message on stderr). The statement about the order of the handlers is assumed.
+- **Source:** `src/AutoHotFlow.ahk`, `tests/integration/helpers/RegisterFailure.ahk`
 
-### Der 32-Bit-Interpreter lädt das Skript bis zur ersten Prüfung ohne Fehler (WI-22)
+### The 32-bit interpreter loads the script without error up to the first check (WI-22)
 
-- **Problem:** Wer den Einstieg mit `AutoHotkey32.exe` startet, bekam vorher einen laufenden Supervisor (Test `test_the_32_bit_interpreter_is_rejected_with_exit_2_and_no_dialog` lief in den Timeout). Pointer-Größen in `DllCall`-Strukturen stimmen dann nicht mehr.
-- **Richtig:** `if (A_PtrSize != 8)` als erste Anweisung vor den `#Include`-Zeilen, Meldung auf stderr, `ExitApp(2)`. Der Test wählt den Interpreter über `AHF_AHK2_EXE` (`tools/ahkrun.py`) und wird übersprungen, wenn `AutoHotkey32.exe` fehlt.
-- **Status:** verifiziert (rot vorher: Timeout, grün nachher: Exit 2 ohne Dialog).
-- **Quelle:** `src/AutoHotFlow.ahk`, `tests/integration/test_entry.py`
+- **Problem:** Anyone starting the entry point with `AutoHotkey32.exe` previously got a running supervisor (test `test_the_32_bit_interpreter_is_rejected_with_exit_2_and_no_dialog` ran into the timeout). Pointer sizes in `DllCall` structures then no longer match.
+- **Right:** `if (A_PtrSize != 8)` as the first statement before the `#Include` lines, message on stderr, `ExitApp(2)`. The test selects the interpreter via `AHF_AHK2_EXE` (`tools/ahkrun.py`) and is skipped if `AutoHotkey32.exe` is missing.
+- **Status:** verified (red before: timeout, green afterwards: exit 2 without dialog).
+- **Source:** `src/AutoHotFlow.ahk`, `tests/integration/test_entry.py`
 
-### Eine Variable `children` verdeckt die Klasse `Children`
+### A variable `children` shadows the class `Children`
 
-- **Problem:** In einer Testfunktion `children := Children(...)` schlug mit "This local variable has not been assigned a value" fehl. Bezeichner sind in AHK v2 nicht von der Schreibweise abhängig, die lokale Variable verdeckt die Klasse (wie bei `role`/`Role`, siehe Einstieg).
-- **Richtig:** Variablen anders nennen (`kids`). Die Attribute `this.children` sind nicht betroffen, nur freie Variablen.
-- **Status:** verifiziert
-- **Quelle:** `tests/ahk/supervisor_tick.test.ahk`
+- **Problem:** In a test function, `children := Children(...)` failed with "This local variable has not been assigned a value". Identifiers in AHK v2 are not case-dependent, the local variable shadows the class (as with `role`/`Role`, see the entry above).
+- **Right:** Name variables differently (`kids`). The attributes `this.children` are not affected, only free variables.
+- **Status:** verified
+- **Source:** `tests/ahk/supervisor_tick.test.ahk`
 
-### Ein Closure ohne erfasste Variable ist immer dasselbe Funktionsobjekt (WI-23)
+### A closure without a captured variable is always the same function object (WI-23)
 
-- **Problem:** `loop 21 { SetTimer(() => Werfe(), -10 * A_Index) }` startete nur **einen** Timer. Alle Closures ohne erfasste Variable sind dasselbe Funktionsobjekt, und `SetTimer` identifiziert einen Timer über das Objekt: Jeder Aufruf setzte den Timer nur neu (Testrolle `echo`, `cmd.test.throwlater`, 21 Fehler erwartet, 1 gesehen).
-- **Richtig:** Jede Closure erfasst etwas Eigenes, z. B. die Nummer: `static MakeFn(n) => () => Werfe(n)` und `SetTimer(MakeFn(A_Index), -10 * A_Index)`.
-- **Status:** verifiziert (Scratch-Skript mit `tools/ahkrun.py`: 1 statt 5 Fehler, mit Nummer 5 von 5; `tests/fault/test_diagnose.py::test_too_many_unhandled_errors_end_the_role_with_exit_6`).
-- **Quelle:** `tests/integration/helpers/EchoRole.ahk`
+- **Problem:** `loop 21 { SetTimer(() => Werfe(), -10 * A_Index) }` started only **one** timer. All closures without a captured variable are the same function object, and `SetTimer` identifies a timer by that object: each call only reset the timer (test role `echo`, `cmd.test.throwlater`, 21 errors expected, 1 seen).
+- **Right:** Each closure captures something of its own, e.g. the number: `static MakeFn(n) => () => Werfe(n)` and `SetTimer(MakeFn(A_Index), -10 * A_Index)`.
+- **Status:** verified (scratch script with `tools/ahkrun.py`: 1 instead of 5 errors, with number 5 of 5; `tests/fault/test_diagnose.py::test_too_many_unhandled_errors_end_the_role_with_exit_6`).
+- **Source:** `tests/integration/helpers/EchoRole.ahk`
 
-### Ein Parameter `log` verdeckt die Klasse `Log` (WI-23)
+### A parameter `log` shadows the class `Log` (WI-23)
 
-- **Problem:** `AddError(from, payload, log := true)` und dann `Log.Write(...)` warf "This value of type Integer has no method named Write". Bezeichner sind nicht von der Schreibweise abhängig, der Parameter verdeckt die Klasse (wie `role`/`Role`, `children`/`Children`). Der Fehler zeigte sich nur als Logzeile des Hubs "no handler for evt.diag.error ... MethodError", weil der Dispatcher Ausnahmen von Handlern in ein Antwortobjekt verpackt.
-- **Richtig:** Parameter und Variablen nicht wie eine Klasse nennen (`doLog`). Bei einem Handler, der "nichts tut": zuerst die Logzeile "no handler for" des Hubs lesen, sie enthält die Fehlermeldung des Handlers.
-- **Status:** verifiziert
-- **Quelle:** `src/supervisor/DiagLog.ahk`
+- **Problem:** `AddError(from, payload, log := true)` and then `Log.Write(...)` threw "This value of type Integer has no method named Write". Identifiers do not depend on case, the parameter shadows the class (like `role`/`Role`, `children`/`Children`). The error only showed up as a log line of the hub, "no handler for evt.diag.error ... MethodError", because the dispatcher wraps exceptions from handlers in a response object.
+- **Right:** Do not name parameters and variables like a class (`doLog`). For a handler that "does nothing": first read the hub's log line "no handler for"; it contains the error message of the handler.
+- **Status:** verified
+- **Source:** `src/supervisor/DiagLog.ahk`
 
-### Eine Variable `hub` verdeckt die Klasse `Hub` (WI-24)
+### A variable `hub` shadows the class `Hub` (WI-24)
 
-- **Problem:** `hub := Hub("x", "y")` in einem Testskript: Ladefehler "This Class cannot be used as an output variable. Specifically: Hub". Bezeichner unterscheiden Groß- und Kleinschreibung nicht (wie bei `log`/`Log`, `role`/`Role`).
-- **Richtig:** Anders nennen (`theHub`).
-- **Status:** verifiziert
-- **Quelle:** `tests/ahk/helpers/hub_frame_cost.ahk`
+- **Problem:** `hub := Hub("x", "y")` in a test script: load error "This Class cannot be used as an output variable. Specifically: Hub". Identifiers are not case-sensitive (as with `log`/`Log`, `role`/`Role`).
+- **Right:** Name it differently (`theHub`).
+- **Status:** verified
+- **Source:** `tests/ahk/helpers/hub_frame_cost.ahk`
 
-### Eine Methode der Basisklasse wird still von einer gleichnamigen Methode der Unterklasse ersetzt (WI-28)
+### A method of the base class is silently replaced by a same-named method of the subclass (WI-28)
 
-- **Problem:** `Role` bekam die Methode `_CmdSnapshot` für `cmd.diag.snapshot`. Die Engine hat schon eine private Methode `_CmdSnapshot` (für `cmd.engine.snapshot`). Die Methode der Unterklasse ersetzt die der Basisklasse ohne Warnung: Der Aufruf `Role.Current._CmdSnapshot(msg)` lief in die Engine-Methode, die Antwort enthielt `epoch`, `flows` und kein `snapshot`. Die anderen Rollen antworteten richtig, nur die Engine nicht.
-- **Falsch:** In einer Basisklasse eine private Methode mit einem kurzen, naheliegenden Namen anlegen, den eine Unterklasse schon nutzt.
-- **Richtig:** Eindeutiger Name (`_CmdDiagSnapshot`). Vor dem Anlegen einer Methode in `Role` in allen Rollen nach dem Namen suchen (`grep -n "_Name(" src`). Ein Test, der jede Rolle fragt (`tests/fault/test_snapshot.py`), findet so etwas sofort.
-- **Status:** verifiziert (Test rot mit `KeyError: 'snapshot'` für die Engine, grün nach der Umbenennung)
+- **Problem:** `Role` got the method `_CmdSnapshot` for `cmd.diag.snapshot`. The engine already has a private method `_CmdSnapshot` (for `cmd.engine.snapshot`). The subclass method replaces the base class method without a warning: the call `Role.Current._CmdSnapshot(msg)` ran into the engine method, and the reply contained `epoch`, `flows` and no `snapshot`. The other roles replied correctly, only the engine did not.
+- **Wrong:** Creating a private method in a base class with a short, obvious name that a subclass already uses.
+- **Right:** Use a unique name (`_CmdDiagSnapshot`). Before creating a method in `Role`, search for the name in all roles (`grep -n "_Name(" src`). A test that asks every role (`tests/fault/test_snapshot.py`) finds such a case immediately.
+- **Status:** verified (test red with `KeyError: 'snapshot'` for the engine, green after the renaming)
 
-### Eine lokale Variable `role` verdeckt die Klasse `Role` (WI-28)
+### A local variable `role` shadows the class `Role` (WI-28)
 
-- **Problem:** `Debug._Send` begann mit `role := Role.Current`. Namen sind nicht von der Groß-/Kleinschreibung abhängig, `role` ist damit eine lokale Variable, die die Klasse `Role` in der ganzen Funktion verdeckt. Die Zeile warf `UnsetError: This local variable has not been assigned a value`, `Debug.Dump` fing den Fehler (es wirft nie) und meldete nur `false`. Der Unit-Test mit einem Fake-Peer zeigte es sofort; ohne ihn wäre `Dump` still wirkungslos geblieben.
-- **Falsch:** `role := Role.Current` (ebenso `hub`, `log`, `children`, siehe die Einträge zu `Hub`, `Log`, `Children`).
-- **Richtig:** Ein anderer Name (`owner := Role.Current`). Eine Funktion, die "nie wirft", braucht einen Test, der den Erfolgsweg prüft, nicht nur, dass nichts geworfen wird.
-- **Status:** verifiziert (`tests/ahk/core_debug.test.ahk`)
+- **Problem:** `Debug._Send` began with `role := Role.Current`. Names are not case-dependent, so `role` is a local variable that shadows the class `Role` in the whole function. The line threw `UnsetError: This local variable has not been assigned a value`, `Debug.Dump` caught the error (it never throws) and only reported `false`. The unit test with a fake peer showed this immediately; without it, `Dump` would have stayed silently ineffective.
+- **Wrong:** `role := Role.Current` (likewise `hub`, `log`, `children`, see the entries for `Hub`, `Log`, `Children`).
+- **Right:** A different name (`owner := Role.Current`). A function that "never throws" needs a test that checks the success path, not just that nothing is thrown.
+- **Status:** verified (`tests/ahk/core_debug.test.ahk`)
 
-## Objekte, Maps, Arrays
+## Objects, Maps, Arrays
 
-### Map mit `CaseSense "Off"` behält die Schreibweise der ersten Einfügung
+### Map with `CaseSense "Off"` keeps the spelling of the first insertion
 
-- **Problem:** Offene Prüfung von WI-02: Bleibt die Schreibweise der Schlüssel bei der Aufzählung erhalten?
-- **Richtig:** Ja. Die erste Einfügung bestimmt die Schreibweise. Eine spätere Einfügung in anderer Schreibweise ersetzt nur den Wert. Die Aufzählung ist außerdem sortiert (`zebra`, `apple`, `mango` kommen als `apple`, `mango`, `zebra`). Ein eigener `AhfMap` ist deshalb nicht nötig. Zwei Schlüssel, die sich nur in der Schreibweise unterscheiden, werden zu einem: `Json.Parse` weist das ab.
-- **Status:** verifiziert (`tests/ahk/json.test.ahk`, "Map CaseSense Off keeps the first spelling of a key" und "... enumerates keys in sorted order"). Die Sortierung ist beobachtet, nicht dokumentiert.
+- **Problem:** Open question from WI-02: Is the spelling of the keys preserved when enumerating?
+- **Right:** Yes. The first insertion determines the spelling. A later insertion in a different spelling only replaces the value. The enumeration is also sorted (`zebra`, `apple`, `mango` come out as `apple`, `mango`, `zebra`). A custom `AhfMap` is therefore not necessary. Two keys that differ only in spelling become one: `Json.Parse` rejects that.
+- **Status:** verified (`tests/ahk/json.test.ahk`, "Map CaseSense Off keeps the first spelling of a key" and "... enumerates keys in sorted order"). The sorting is observed, not documented.
 
-### Schlüssel vor dem Löschen aus einer Map in ein Array kopieren
+### Copy keys into an array before deleting from a Map
 
-- **Problem:** Beim Stoppen einer Instanz werden Threads aus einer `Map` entfernt, während über die Map iteriert wird.
-- **Richtig:** Die Schlüssel zuerst in ein Array kopieren, dann in dieser Liste laufen (`Instance.Stop`). Ob das Löschen während der `for`-Schleife über eine Map funktioniert, wurde nicht geprüft; die Kopie vermeidet die Frage.
-- **Status:** nicht geprüft (nur das Muster mit Kopie ist im Einsatz)
-- **Quelle:** `src/engine/core/Instance.ahk`
+- **Problem:** When stopping an instance, threads are removed from a `Map` while iterating over the map.
+- **Right:** First copy the keys into an array, then iterate over that list (`Instance.Stop`). Whether deleting during a `for` loop over a Map works was not checked; the copy avoids the question.
+- **Status:** not checked (only the copy pattern is in use)
+- **Source:** `src/engine/core/Instance.ahk`
 
-### Statische Methode `Name()` verdeckt die `.Name`-Eigenschaft der Klasse
+### Static method `Name()` shadows the `.Name` property of the class
 
-- **Problem:** Die Registry wollte die Klassen-ID aus `cls.Name` lesen. Bei Element-Klassen liefert das eine Funktion (Typ `Func`), nicht den Klassennamen, weil `static Name()` die eingebaute Eigenschaft verdeckt.
-- **Falsch:** `id := cls.Name` für Klassen mit `static Name() => ...`.
-- **Richtig:** Die Klassen-ID als Typ einer Instanz lesen: `Type(cls())` liefert `Action_Sleep`. Elemente haben keinen Konstruktor, der Aufruf ist billig. Siehe `ElementRegistry.IdOf`.
-- **Status:** verifiziert (Probe im Scratchpad: `cls.Name` gibt `Func`, `Type(cls())` gibt den Klassennamen; `tests/ahk/element_registry.test.ahk`, Fall "IdOf gives the class name")
-- **Quelle:** `src/elements/base/ElementRegistry.ahk`
+- **Problem:** The registry wanted to read the class ID from `cls.Name`. For element classes this returns a function (type `Func`), not the class name, because `static Name()` shadows the built-in property.
+- **Wrong:** `id := cls.Name` for classes with `static Name() => ...`.
+- **Right:** Read the class ID as the type of an instance: `Type(cls())` returns `Action_Sleep`. Elements have no constructor, so the call is cheap. See `ElementRegistry.IdOf`.
+- **Status:** verified (probe in the scratchpad: `cls.Name` gives `Func`, `Type(cls())` gives the class name; `tests/ahk/element_registry.test.ahk`, case "IdOf gives the class name")
+- **Source:** `src/elements/base/ElementRegistry.ahk`
 
-### `static __New()` setzt die Schlüsselschreibweise einer statischen Map
+### `static __New()` sets the key spelling of a static Map
 
-- **Problem:** Eine `static`-Map soll Schlüssel ohne Groß-/Kleinschreibung speichern. Die Einstellung `CaseSense` lässt sich in der Klassenzeile nicht als Anweisung ausführen.
-- **Richtig:** `static __New() { this.classes.CaseSense := "Off" }` läuft beim Laden der Klasse, vor der ersten Nutzung. Danach findet `Has("TRIGGER_MANUAL")` einen Eintrag `Trigger_Manual`.
-- **Status:** verifiziert (Probe im Scratchpad: `Has` case-insensitiv; `tests/ahk/element_registry.test.ahk`, Fall "lookup is case-insensitive")
-- **Quelle:** `src/elements/base/ElementRegistry.ahk`
+- **Problem:** A `static` Map should store keys without regard to case. The setting `CaseSense` cannot be executed as a statement in the class line.
+- **Right:** `static __New() { this.classes.CaseSense := "Off" }` runs when the class is loaded, before the first use. Afterwards `Has("TRIGGER_MANUAL")` finds an entry `Trigger_Manual`.
+- **Status:** verified (probe in the scratchpad: `Has` case-insensitive; `tests/ahk/element_registry.test.ahk`, case "lookup is case-insensitive")
+- **Source:** `src/elements/base/ElementRegistry.ahk`
 
-### Callback mit Zustand: `ObjBindMethod` statt Lambda in der Schleife
+### Callback with state: `ObjBindMethod` instead of a lambda in a loop
 
-- **Problem:** Die Engine liest je Flow-Datei eine Antwort von `storage`. Der Callback braucht den Namen und den Pfad der Datei, und ein Zähler der offenen Antworten muss von allen Callbacks gemeinsam geändert werden.
-- **Falsch:** `for f in files { peer.Request(..., (res) => this._OnRead(st, f["name"], res)) }`. Lambdas erfassen Variablen per Referenz, alle Callbacks sähen am Ende den letzten Eintrag.
-- **Richtig:** `peer.Request(..., ObjBindMethod(this, "_OnFlowRead", st, name, path), timeout)`. Die gebundenen Argumente kommen vor dem Argument des Aufrufers, der Callback ist `_OnFlowRead(st, name, path, res)`. Der Zähler ist eine `Map`, damit alle Callbacks dieselbe Änderung sehen.
-- **Status:** verifiziert (`tests/integration/test_engine.py`, Laden von zwei Flow-Dateien, Fehlerdatei mit `flow.parse`, Namen und Pfade stimmen).
-- **Quelle:** `src/engine/Engine.ahk` (`_OnFlowList`)
+- **Problem:** The engine reads one reply from `storage` per flow file. The callback needs the name and the path of the file, and a counter of open replies must be changed by all callbacks together.
+- **Wrong:** `for f in files { peer.Request(..., (res) => this._OnRead(st, f["name"], res)) }`. Lambdas capture variables by reference, so at the end all callbacks would see the last entry.
+- **Right:** `peer.Request(..., ObjBindMethod(this, "_OnFlowRead", st, name, path), timeout)`. The bound arguments come before the argument of the caller, the callback is `_OnFlowRead(st, name, path, res)`. The counter is a `Map`, so that all callbacks see the same change.
+- **Status:** verified (`tests/integration/test_engine.py`, loading of two flow files, error file with `flow.parse`, names and paths match).
+- **Source:** `src/engine/Engine.ahk` (`_OnFlowList`)
 
-### Parameter eines Elements als Objekt mit Eigenschaftszugriff
+### Parameter of an element as an object with property access
 
-- **Problem:** `Action_Sleep` liest `params.Duration` und `params.Unit` (Eigenschaftszugriff, wie v1). Die Flow-Datei hat die Parameter als `Map`.
-- **Falsch:** Die `Map` direkt als `params` übergeben.
-- **Richtig:** Ein Objekt bauen: `p := {}` und für jeden Schlüssel `p.%k% := v` (Objekte und `null` werden zu `""`). Eigenschaftsnamen sind case-insensitiv, wie v1 es braucht.
-- **Status:** verifiziert (Sleep mit Duration `200` und Unit `Milliseconds` in `tests/integration/test_engine.py`). Nicht geprüft: ob `Map` mit `HasProp` für Schlüssel genauso falsch antwortet.
-- **Quelle:** `src/engine/Executor.ahk` (`_Params`)
+- **Problem:** `Action_Sleep` reads `params.Duration` and `params.Unit` (property access, as in v1). The flow file has the parameters as a `Map`.
+- **Wrong:** Passing the `Map` directly as `params`.
+- **Right:** Build an object: `p := {}` and for each key `p.%k% := v` (objects and `null` become `""`). Property names are case-insensitive, as v1 requires.
+- **Status:** verified (Sleep with Duration `200` and Unit `Milliseconds` in `tests/integration/test_engine.py`). Not checked: whether a `Map` with `HasProp` for keys answers just as wrongly.
+- **Source:** `src/engine/Executor.ahk` (`_Params`)
 
-### Klonen erst nach der Änderung: der Klon erbt sie
+### Clone only after the change: the clone inherits it
 
-- **Problem:** `Scheduler.Advance` klonte den Thread für die zweite Verbindung, nachdem der Thread für die erste Verbindung auf das Loop-Element gesetzt und der Loop-Stack gepusht war. Der Klon erbte den Push (Tiefe 1 statt 0). Außerdem wurde der Stack je Verbindung zurückgenommen, die zweite Rücknahme warf.
-- **Richtig:** Zustand einmal herstellen (Pop), dann alle Klone anlegen, danach erst jedem Ziel seine Änderung geben (Element, Push).
-- **Status:** verifiziert (Tests `Advance: branching into a loop pushes only the loop thread` und `Loop: two tail connections pop the loop stack once` waren vor der Korrektur rot)
-- **Quelle:** `src/engine/core/Scheduler.ahk`
+- **Problem:** `Scheduler.Advance` cloned the thread for the second connection after the thread for the first connection had been set to the loop element and the loop stack had been pushed. The clone inherited the push (depth 1 instead of 0). In addition, the stack was rolled back per connection, and the second rollback threw.
+- **Right:** Establish the state once (pop), then create all clones, and only afterwards give each target its change (element, push).
+- **Status:** verified (tests `Advance: branching into a loop pushes only the loop thread` and `Loop: two tail connections pop the loop stack once` were red before the correction)
+- **Source:** `src/engine/core/Scheduler.ahk`
 
-### Map zählt nach Schlüsseln, nicht nach Einfügereihenfolge: FIFO braucht ein Array
+### A Map orders by keys, not by insertion order: FIFO needs an array
 
-- **Problem:** Die Instanzen des Executors liegen in einer `Map` (`inst-<n>`). Die Aufzählung ist nach Schlüssel sortiert, nicht nach dem Start. Für die Reihenfolge der Richtlinie `wait` (FIFO) taugt sie nicht.
-- **Richtig:** Eine eigene Warteschlange (`Array` je Flow, `Push` am Ende, `RemoveAt(1)` am Anfang).
-- **Status:** Sortierung nach Schlüssel verifiziert (Doku und Code gelesen); dass `inst-10` vor `inst-2` einsortiert wird, ist vermutet (nicht gemessen).
-- **Quelle:** `src/engine/Executor.ahk` (`_waiting`)
+- **Problem:** The instances of the executor are kept in a `Map` (`inst-<n>`). The enumeration is sorted by key, not by start time. It is not suitable for the order of the policy `wait` (FIFO).
+- **Right:** A dedicated queue (`Array` per flow, `Push` at the end, `RemoveAt(1)` at the beginning).
+- **Status:** Sorting by key verified (documentation and code read); that `inst-10` is sorted before `inst-2` is assumed (not measured).
+- **Source:** `src/engine/Executor.ahk` (`_waiting`)
 
-### Worker-Pool: `Map.Delete` auf einen fehlenden Schlüssel wirft
+### Worker pool: `Map.Delete` on a missing key throws
 
-- **Problem:** `WorkerBridge.OnProcessEvent` rief `this._earlyReady.Delete(name)` für einen Namen, der nie eingetragen war. `Map.Delete` wirft in AHK v2 `UnsetItemError` ("Item has no value"). Der Handler des Peers fing den Fehler und loggte ihn (`handler for evt.process.crashed failed`), der Absturz des Workers blieb ohne Wirkung: das Element hing, bis die Instanz gestoppt wurde.
-- **Falsch:** `m.Delete(key)` ohne Prüfung, wenn der Schlüssel fehlen kann.
-- **Richtig:** `if (m.Has(key)) m.Delete(key)`. Wer in Ereignishandlern löscht, prüft zuerst.
-- **Status:** verifiziert (Test `test_killed_worker_ends_its_element_with_worker_crashed_and_the_pool_has_a_replacement` schlug mit genau diesem Log fehl, nach der Korrektur grün)
-- **Quelle:** `src/engine/WorkerBridge.ahk` (`OnProcessEvent`)
+- **Problem:** `WorkerBridge.OnProcessEvent` called `this._earlyReady.Delete(name)` for a name that was never entered. `Map.Delete` throws `UnsetItemError` in AHK v2 ("Item has no value"). The peer's handler caught the error and logged it (`handler for evt.process.crashed failed`), so the crash of the worker had no effect: the element hung until the instance was stopped.
+- **Wrong:** `m.Delete(key)` without a check when the key may be missing.
+- **Right:** `if (m.Has(key)) m.Delete(key)`. Whoever deletes in event handlers checks first.
+- **Status:** verified (test `test_killed_worker_ends_its_element_with_worker_crashed_and_the_pool_has_a_replacement` failed with exactly this log, green after the correction)
+- **Source:** `src/engine/WorkerBridge.ahk` (`OnProcessEvent`)
 
-## Fehlerbehandlung
+## Error handling
 
-### Statische Methode ist kein OnError-Callback
+### A static method is not an OnError callback
 
-- **Problem:** `OnError(TestRun.OnUnhandled)` mit einer statischen Klassenmethode brach mit "Invalid callback function" ab. Der Fehler trat schon beim Init auf, das Skript endete ohne Ergebnisdatei.
-- **Falsch:** `static OnUnhandled(e, mode)` in einer Klasse, dann `OnError(Klasse.OnUnhandled)`.
-- **Richtig:** Eine freie Funktion `AhfUnhandledError(e, mode)` übergeben. Sie schreibt eine `fatal`-Zeile und beendet mit `ExitApp(2)`. Damit hängt kein Fehlerdialog den Lauf auf.
-- **Status:** verifiziert (`tests/ahk/lib/Assert.ahk`, Test `test_unhandled_error_ends_run_without_dialog`)
+- **Problem:** `OnError(TestRun.OnUnhandled)` with a static class method aborted with "Invalid callback function". The error already occurred during init, and the script ended without a result file.
+- **Wrong:** `static OnUnhandled(e, mode)` in a class, then `OnError(Class.OnUnhandled)`.
+- **Right:** Pass a free function `AhfUnhandledError(e, mode)`. It writes a `fatal` line and ends with `ExitApp(2)`. This way no error dialog blocks the run.
+- **Status:** verified (`tests/ahk/lib/Assert.ahk`, test `test_unhandled_error_ends_run_without_dialog`)
 
-### Skript ohne Summary endet mit Exit-Code 0
+### Script without summary ends with exit code 0
 
-- **Problem:** Ein Skript, das vor `TestRun.Finish()` endet (etwa nach einem Ladefehler, der still bleibt, oder vergessenem Finish), liefert Exit-Code 0 und keine Summary. Allein am Exit-Code erkennt man den Fehler nicht.
-- **Richtig:** Der Runner verlangt die Summary-Zeile zusätzlich zu Exit-Code 0 (`test_ahk_file_completes`).
-- **Status:** verifiziert (Test `test_script_without_finish_has_no_summary`, Beobachtung beim Fehlschlag des Init)
+- **Problem:** A script that ends before `TestRun.Finish()` (e.g. after a load error that stays silent, or a forgotten Finish) returns exit code 0 and no summary. The exit code alone does not reveal the error.
+- **Right:** The runner requires the summary line in addition to exit code 0 (`test_ahk_file_completes`).
+- **Status:** verified (test `test_script_without_finish_has_no_summary`, observation when the init failed)
 
-### Laufzeitfehler in Lambda gilt als "error", nicht als "fail"
+### Run-time error in a lambda counts as "error", not as "fail"
 
-- **Problem:** Unterscheidung zwischen Assert-Fehlschlag und unerwartetem Fehler muss für den Bericht erhalten bleiben.
-- **Richtig:** `TestRun.Case` fängt `AssertFailed` als `fail` und jeden anderen Fehler als `error` mit Typ, Meldung und Zeile.
-- **Status:** verifiziert (Test `test_failing_and_erroring_cases_are_reported_red`)
+- **Problem:** The distinction between an assert failure and an unexpected error must be preserved for the report.
+- **Right:** `TestRun.Case` catches `AssertFailed` as `fail` and every other error as `error` with type, message and line.
+- **Status:** verified (test `test_failing_and_erroring_cases_are_reported_red`)
 
-### Callback, der wirft, bricht den Zustandsautomaten nicht ab
+### A callback that throws does not abort the state machine
 
-- **Problem:** Der Callback `onInvalid` eines Zustandsautomaten kann selbst einen Fehler werfen. Ungefangen würde das den Übergang mitten im Aufruf abbrechen.
-- **Richtig:** Den Callback in `try/catch` aufrufen, den Fehler als a0-Log schreiben und trotzdem `false` zurückgeben (`ThreadState.ReportInvalid`).
-- **Status:** verifiziert (Test "a throwing callback is logged, not raised" in `tests/ahk/engine_states.test.ahk`)
-- **Quelle:** `src/engine/core/ThreadState.ahk`
+- **Problem:** The callback `onInvalid` of a state machine can itself throw an error. Uncaught, that would abort the transition in the middle of the call.
+- **Right:** Call the callback in `try/catch`, write the error as an a0 log, and still return `false` (`ThreadState.ReportInvalid`).
+- **Status:** verified (test "a throwing callback is logged, not raised" in `tests/ahk/engine_states.test.ahk`)
+- **Source:** `src/engine/core/ThreadState.ahk`
 
-### OnError: Rückgabe 1 hält den Prozess am Leben
+### OnError: return value 1 keeps the process alive
 
-- **Problem:** Ein Fehler in einem Timer soll eine Rolle nicht beenden, und der Standarddialog darf nicht erscheinen.
-- **Richtig:** Die Funktion für `OnError` gibt `1` zurück. Der Fehler ist dann behandelt, es erscheint kein Dialog, und der Prozess läuft weiter. Getestet: Ein Timer wirft `ValueError`, danach beantwortet die Rolle weitere Befehle, und der Fehler steht im Log (`test_error_in_a_timer_is_logged_and_the_role_keeps_running`).
-- **Status:** verifiziert (Test grün). Nicht geprüft: andere Rückgabewerte (z. B. 0) und das Verhalten des Threads, der den Fehler warf, bei anderen Auslösern als Timer.
-- **Quelle:** `src/core/Role.ahk` (`Role._OnUnexpected`)
+- **Problem:** An error in a timer should not end a role, and the standard dialog must not appear.
+- **Right:** The function for `OnError` returns `1`. The error is then handled, no dialog appears, and the process keeps running. Tested: a timer throws `ValueError`, afterwards the role answers further commands, and the error is in the log (`test_error_in_a_timer_is_logged_and_the_role_keeps_running`).
+- **Status:** verified (test green). Not checked: other return values (e.g. 0) and the behavior of the thread that threw the error for triggers other than timers.
+- **Source:** `src/core/Role.ahk` (`Role._OnUnexpected`)
 
-### OnError-Handler und `mode` (WI-23)
+### OnError handler and `mode` (WI-23)
 
-- **Problem:** Der zweite Parameter von `OnError` ist die Art des Fehlers: `"Return"` (Fehler in einer Funktion mit Rückgabe), `"Exit"` (der Thread würde beendet; so kommt ein Fehler aus einem Timer) oder `"ExitApp"`. Rückgabe 1 verhindert den Dialog und das Beenden des Threads.
-- **Richtig:** `Role._OnUnexpected` zählt jeden Fehler, meldet ihn und gibt 1 zurück, damit die Rolle weiterläuft; bei Überschreitung der Schwelle beendet `ExitApp(6)` im Handler den Prozess.
-- **Status:** verifiziert für `Exit` (Timer); `Return` und `ExitApp` nicht einzeln getestet.
-- **Quelle:** `src/core/Role.ahk`
+- **Problem:** The second parameter of `OnError` is the kind of error: `"Return"` (error in a function with a return value), `"Exit"` (the thread would be ended; this is how an error from a timer arrives) or `"ExitApp"`. Return value 1 prevents the dialog and the ending of the thread.
+- **Right:** `Role._OnUnexpected` counts every error, reports it and returns 1 so that the role keeps running; when the threshold is exceeded, `ExitApp(6)` in the handler ends the process.
+- **Status:** verified for `Exit` (timer); `Return` and `ExitApp` not tested individually.
+- **Source:** `src/core/Role.ahk`
+## Processes, pipes, messages
 
-## Prozesse, Pipes, Nachrichten
+### Pipe reads and writes in parallel only with overlapped I/O
 
-### Pipe-Lesen und -Schreiben nur mit überlappten E/A parallel
+- **Problem:** The Python client needs a read thread while the main thread writes. With `open(..., "r+b")` (synchronous handle) this is a risk, because Windows serializes I/O on the same synchronous handle. A pending read would block the write.
+- **Right:** `FILE_FLAG_OVERLAPPED` with its own OVERLAPPED and event per direction (`tests/support/winpipe.py`). Writes are serialized with a lock, reads run with a timeout via `WaitForSingleObject` and `CancelIoEx`.
+- **Status:** verified (tests `tests/support/test_client_hub.py`, request and reply while the read thread is running). The synchronous case itself was not tested: assumed.
 
-- **Problem:** Der Python-Client braucht einen Lesethread, während der Hauptthread schreibt. Mit `open(..., "r+b")` (synchroner Handle) wäre das ein Risiko, weil Windows E/A auf demselben synchronen Handle serialisiert. Ein wartendes Lesen würde das Schreiben blockieren.
-- **Richtig:** `FILE_FLAG_OVERLAPPED` mit eigenem OVERLAPPED und Event je Richtung (`tests/support/winpipe.py`). Schreiben über ein Lock, Lesen mit Timeout über `WaitForSingleObject` und `CancelIoEx`.
-- **Status:** verifiziert (Tests `tests/support/test_client_hub.py`, Anfrage und Antwort während laufendem Lesethread). Der synchrone Fall selbst wurde nicht getestet: vermutet.
+### PostMessageW with a NULL handle reports success
 
-### PostMessageW mit NULL-Handle meldet Erfolg
+- **Problem:** A test expected `False` for `PostMessageW(0, ...)` (no window). The call returns `TRUE`.
+- **Right:** For "window does not exist", use a real, destroyed window handle. Do not use the return value of `wake()` as an error check.
+- **Status:** verified (failing test, afterwards removed)
 
-- **Problem:** Ein Test erwartete `False` für `PostMessageW(0, ...)` (kein Fenster). Der Aufruf meldet `TRUE`.
-- **Richtig:** Für "Fenster existiert nicht" ein echtes, zerstörtes Fenster-Handle verwenden. Die Rückgabe von `wake()` nicht als Fehlerprüfung nutzen.
-- **Status:** verifiziert (fehlschlagender Test, danach entfernt)
+### Overlapped structure: fields with ctypes
 
-### Overlapped-Struktur: Felder mit ctypes
+- **Problem:** The spike set `hEvent` via an offset (`2*A_PtrSize + 8`). In Python the structure is more convenient, but the field sizes must match.
+- **Right:** `ctypes.Structure` with `c_size_t` for `Internal`/`InternalHigh`, `DWORD` for `Offset`/`OffsetHigh`, `HANDLE` for `hEvent`. Pass buffers as integers via `ctypes.addressof(...)`, not as arrays.
+- **Status:** verified (tests pass, read and write buffers)
 
-- **Problem:** Der Spike setzte `hEvent` über einen Offset (`2*A_PtrSize + 8`). In Python ist die Struktur bequemer, aber die Feldgrößen müssen stimmen.
-- **Richtig:** `ctypes.Structure` mit `c_size_t` für `Internal`/`InternalHigh`, `DWORD` für `Offset`/`OffsetHigh`, `HANDLE` für `hEvent`. Puffer über `ctypes.addressof(...)` als Ganzzahl übergeben, nicht als Array.
-- **Status:** verifiziert (Tests laufen durch, Lese- und Schreibpuffer)
+### AHK: overlapped pipe I/O with DllCall (pattern that works)
 
-### AHK: überlappende Pipe-E/A mit DllCall (Muster, das trägt)
+- **Problem:** Server and client need non-blocking pipes in AHK v2 without threads (WI-04, `src/core/ipc/`).
+- **Right:**
+  - `OVERLAPPED` as `Buffer(32, 0)`, event (`CreateEventW`, manual reset, not signaled) entered at offset `2*A_PtrSize + 8`. Keep the structure, buffer and event as members, never as locals.
+  - Read: `ResetEvent`, `ReadFile(h, buf, n, 0, ov)` (byte counter `NULL` is allowed with overlapped I/O). Return 0 and `A_LastError = 997` is the normal case. Never check completion with `WaitForSingleObject` on a return of 0; use `GetOverlappedResult(h, ov, &n, 0)`: `0` with error `996` (`ERROR_IO_INCOMPLETE`) means "not yet", any other error means the end. This also applies when `ReadFile`/`WriteFile` immediately returned `TRUE`.
+  - Other side gone: `109` (`ERROR_BROKEN_PIPE`) on read, `232` or `109` on write. A read of `0` bytes in byte mode is also the end.
+  - Close: `CancelIoEx(h, 0)`, wait (bounded) on the event of the pending operations, only then `CloseHandle` and free the buffers. Frames already written remain readable for the other side even if you close immediately (tested: `test_data_written_before_close_is_still_readable`).
+  - Server: one waiting instance per `PipeListener`. `ConnectNamedPipe` can return `535` (`ERROR_PIPE_CONNECTED`) if the client was faster: treat that as connected. Create the next instance before handing over the connected one, so a client never sees "not found".
+  - Client: `CreateFileW` with retry on `2` and `231`. For waiting, use `DllCall("Sleep")` and `WaitNamedPipeW`: AHK's own `Sleep` processes messages and would pull timers and wake-up calls into the middle of connection setup.
+- **Status:** verified (`tests/integration/test_pipe.py`, 26 tests, both directions with a Python peer and an AHK peer). That AHK's `Sleep` processes messages is stated in the docs and was not measured separately.
+- **Source:** `src/core/ipc/PipeConnection.ahk`, `PipeListener.ahk`
 
-- **Problem:** Server und Client brauchen nicht blockierende Pipes in AHK v2 ohne Threads (WI-04, `src/core/ipc/`).
-- **Richtig:**
-  - `OVERLAPPED` als `Buffer(32, 0)`, Ereignis (`CreateEventW`, manuell, nicht signalisiert) bei Offset `2*A_PtrSize + 8` eintragen. Struktur, Puffer und Ereignis als Mitglieder halten, nie lokal.
-  - Lesen: `ResetEvent`, `ReadFile(h, buf, n, 0, ov)` (Byte-Zähler `NULL` ist bei überlappter E/A erlaubt). Rückgabe 0 und `A_LastError = 997` ist der Normalfall. Fertigstellung nie mit `WaitForSingleObject` auf Rückgabe 0 prüfen, sondern mit `GetOverlappedResult(h, ov, &n, 0)`: `0` mit Fehler `996` (`ERROR_IO_INCOMPLETE`) heißt "noch nicht", jeder andere Fehler ist das Ende. Das gilt auch, wenn `ReadFile`/`WriteFile` sofort `TRUE` lieferte.
-  - Gegenseite weg: `109` (`ERROR_BROKEN_PIPE`) beim Lesen, `232` oder `109` beim Schreiben. Ein Lesen mit `0` Bytes im Byte-Modus ist ebenfalls das Ende.
-  - Schließen: `CancelIoEx(h, 0)`, auf das Ereignis der ausstehenden Vorgänge warten (begrenzt), erst dann `CloseHandle` und Puffer freigeben. Bereits geschriebene Rahmen bleiben für die Gegenseite lesbar, auch wenn man sofort schließt (getestet: `test_data_written_before_close_is_still_readable`).
-  - Server: eine wartende Instanz pro `PipeListener`. `ConnectNamedPipe` kann `535` (`ERROR_PIPE_CONNECTED`) liefern, wenn der Client schneller war: das gilt als verbunden. Die nächste Instanz vor dem Übergeben der verbundenen anlegen, dann sieht ein Client nie "nicht gefunden".
-  - Client: `CreateFileW` mit Wiederholung bei `2` und `231`. Für das Warten `DllCall("Sleep")` und `WaitNamedPipeW` nehmen: AHKs eigenes `Sleep` verarbeitet Nachrichten und würde Timer und Weckrufe mitten in den Verbindungsaufbau ziehen.
-- **Status:** verifiziert (`tests/integration/test_pipe.py`, 26 Tests, beide Richtungen mit Python-Gegenstelle und AHK-Gegenstelle). Dass AHKs `Sleep` Nachrichten verarbeitet, steht in der Doku und wurde nicht gesondert gemessen.
-- **Quelle:** `src/core/ipc/PipeConnection.ahk`, `PipeListener.ahk`
+### The wake-up call only covers writing (follow-up timer and fallback timer)
 
-### Der Weckruf deckt nur das Schreiben ab (Folge-Timer und Fallback-Timer)
+- **Problem:** The wake-up call only says "data written", not "data read". A pending overlapped `WriteFile` (large queue) and a connection break do not trigger a message. With only the wake-up call, draining large frames stalled at 250 ms per frame, and a Python peer that knows no wake-up call would be delayed permanently.
+- **Right:** Two paths: (1) If a connection still has frames in its queue, `SendFrame`/`Pump` schedules a follow-up pump with `SetTimer(fn, -1)` (so draining runs at timer resolution, not at 250 ms). (2) The fallback timer (250 ms, `Wake.Install`) detects connection breaks and new clients. Measured: the termination of a process is noticed after 42 to 98 ms (depending on the phase of the timer, at most about 250 ms). A new connection without a wake-up call from the client is accepted after at most about 250 ms. Clients should send a wake-up call to the hub after connecting.
+- **Status:** verified (measurements in a test run with `-s`). The conditions in the real hub (many clients) were not checked.
 
-- **Problem:** Der Weckruf sagt nur "Daten geschrieben", nicht "Daten gelesen". Ein ausstehendes überlapptes `WriteFile` (große Warteschlange) und der Verbindungsabbruch lösen keine Nachricht aus. Mit nur Weckruf stockte der Abfluss großer Rahmen auf 250 ms je Rahmen, und ein Python-Gegenüber, das keinen Weckruf kennt, hätte dauerhaft Verzögerung.
-- **Richtig:** Zwei Wege: (1) Hat eine Verbindung noch Rahmen in der Warteschlange, plant `SendFrame`/`Pump` mit `SetTimer(fn, -1)` einen Folge-Pump (damit läuft der Abfluss mit Timer-Auflösung, nicht mit 250 ms). (2) Der Fallback-Timer (250 ms, `Wake.Install`) erkennt Verbindungsabbruch und neue Clients. Gemessen: Abbruch eines Prozesses wird nach 42 bis 98 ms bemerkt (je nach Phase des Timers, höchstens ca. 250 ms). Eine neue Verbindung ohne Weckruf des Clients wird nach höchstens ca. 250 ms angenommen. Clients sollten nach dem Verbinden einen Weckruf an den Hub senden.
-- **Status:** verifiziert (Messungen im Testlauf mit `-s`). Die Verhältnisse im echten Hub (viele Clients) sind nicht geprüft.
+### Static method is not a SetTimer callback
 
-### Statische Methode ist kein SetTimer-Callback
+- **Problem:** `SetTimer(Role.Run, -1)` with `static Run() {...}` opens the dialog "Invalid callback function". The helper process hung until the dialog guard terminated it (exit 15, no result file).
+- **Wrong:** `SetTimer(Class.Method, ...)` with a static method.
+- **Right:** A function object property `static RunFn := (*) => Role.Run()` and `SetTimer(Role.RunFn, ...)`, or `ObjBindMethod(Role, "Run")`. Same trap as with `OnError` (see above). The same function object must also be passed to switch it off (`SetTimer(fn, 0)`).
+- **Status:** verified (dialog text in the guard folder, test green after the change)
 
-- **Problem:** `SetTimer(Role.Run, -1)` mit `static Run() {...}` öffnet den Dialog "Invalid callback function". Der Helferprozess hing, bis der Dialog-Wächter ihn beendete (Exit 15, keine Ergebnisdatei).
-- **Falsch:** `SetTimer(Klasse.Methode, ...)` mit einer statischen Methode.
-- **Richtig:** Funktionseigenschaft `static RunFn := (*) => Role.Run()` und `SetTimer(Role.RunFn, ...)`, oder `ObjBindMethod(Role, "Run")`. Dieselbe Falle wie bei `OnError` (siehe oben). Dieselbe Funktionseigenschaft muss auch zum Abschalten (`SetTimer(fn, 0)`) übergeben werden.
-- **Status:** verifiziert (Dialogtext im Wächterordner, Test grün nach der Änderung)
+### Re-entry: Pump, SendFrame and handlers interrupt each other
 
-### Wiedereintritt: Pump, SendFrame und Handler unterbrechen einander
+- **Problem:** AHK threads are interrupted after 15 ms of run time (wake-up call, timer). An `OnFrame` handler that itself calls `SendFrame`, and an interrupting `Pump`, access the same queues.
+- **Right:** Per connection, two guard flags (`_pumping`, `_writing`) with an "again" flag. Wrap the check and set in `prev := Critical("On") ... Critical(prev)`, because two separate lines could otherwise be interrupted. `Critical("On")` returns the previous setting (`0` off, `16` on), `Critical(prev)` restores it. Handler errors are caught and logged, otherwise the state machine would be left half-finished. `OnClose` on `queue_overflow` from `SendFrame` is deferred via `SetTimer(fn, -1)`, so the caller's loop is not altered by the handler.
+- **Status:** verified for the function (tests green, 12000 ping-pong runs without a lost wake-up call). The guards themselves were not tested specifically against a real interruption (not reproducible on demand): assumed.
 
-- **Problem:** AHK-Threads werden nach 15 ms Laufzeit unterbrochen (Weckruf, Timer). Ein `OnFrame`-Handler, der selbst `SendFrame` aufruft, und ein unterbrechender `Pump` greifen auf dieselben Warteschlangen zu.
-- **Richtig:** Pro Verbindung zwei Wächter-Flags (`_pumping`, `_writing`) mit "nochmal"-Flag. Prüfen und Setzen in `prev := Critical("On") ... Critical(prev)` kapseln, weil zwei getrennte Zeilen sonst unterbrochen werden könnten. `Critical("On")` liefert die vorherige Einstellung (`0` aus, `16` an), `Critical(prev)` stellt sie wieder her. Handlerfehler werden gefangen und geloggt, sonst bliebe der Zustandsautomat halb fertig. `OnClose` bei `queue_overflow` aus `SendFrame` heraus wird per `SetTimer(fn, -1)` verzögert, damit die Schleife des Aufrufers nicht durch den Handler verändert wird.
-- **Status:** verifiziert für die Funktion (Tests grün, 12000 Ping-Pong-Läufe ohne verlorenen Weckruf). Die Wächter selbst sind nicht gezielt gegen eine echte Unterbrechung getestet (nicht reproduzierbar erzwungen): vermutet.
+### Queue limit: backlog behind the running frame, collect completed writes beforehand
 
-### Warteschlangengrenze: Rückstand hinter dem laufenden Rahmen, vorher abgeschlossene Schreibvorgänge einsammeln
+- **Problem:** Two errors in a row. (1) The first version checked `backlog + new frame > maxQueueBytes`: a 16 MiB frame was rejected with `queue_overflow` if a small one was still pending. (2) The second version checked the backlog before the frame including the running one: after the echo of a 16 MiB frame, the reader had read everything, but nobody had collected the completion (`Pump` had not yet run). The next small frame saw 16 MiB of backlog and triggered `queue_overflow` (about 1 in 5 runs of `test_frame_of_exactly_16_mib_is_echoed`).
+- **Wrong:** `queueBytes + size > maxQueueBytes`, where the backlog counts the running frame and completed writes that have not been collected.
+- **Right:** In `SendFrame`, first `_DriveWriteGuarded()` (collect completed writes), then overflow applies when the bytes **behind** the running frame (`queueBytes - queue[1].Size`) reach `maxQueueBytes` or `maxQueueFrames` frames are pending. The running frame is bounded by the frame limit and is the kernel's concern. A single large frame can always be sent.
+- **Status:** verified (40 consecutive single runs green, 3 full runs green; before, 3 of 20 red, partly due to this error)
 
-- **Problem:** Zwei Fehler in Folge. (1) Erste Fassung prüfte `Rückstand + neuer Rahmen > maxQueueBytes`: ein 16-MiB-Rahmen wurde mit `queue_overflow` abgelehnt, wenn noch ein kleiner stand. (2) Zweite Fassung prüfte den Rückstand vor dem Rahmen inklusive des laufenden: nach dem Echo eines 16-MiB-Rahmens hatte der Leser alles gelesen, aber niemand hatte den Abschluss eingesammelt (`Pump` lief noch nicht). Der nächste kleine Rahmen sah 16 MiB Rückstand und löste `queue_overflow` aus (ca. 1 von 5 Läufen von `test_frame_of_exactly_16_mib_is_echoed`).
-- **Falsch:** `queueBytes + size > maxQueueBytes`, und der Rückstand zählt den laufenden Rahmen und nicht eingesammelte, längst fertige Schreibvorgänge mit.
-- **Richtig:** In `SendFrame` zuerst `_DriveWriteGuarded()` (fertige Schreibvorgänge einsammeln), dann gilt Überlauf, wenn die Bytes **hinter** dem laufenden Rahmen (`queueBytes - queue[1].Size`) `maxQueueBytes` erreicht haben oder `maxQueueFrames` Rahmen anstehen. Der laufende Rahmen ist durch das Rahmenlimit begrenzt und Sache des Kernels. Ein einzelner großer Rahmen ist immer sendbar.
-- **Status:** verifiziert (40 aufeinanderfolgende Einzelläufe grün, 3 Gesamtläufe grün; vorher 3 von 20 rot, ein Teil davon dieser Fehler)
+### Python test reader lost bytes when a read was cancelled (`winpipe.read_some`)
 
-### Python-Testleser verlor Bytes beim Abbruch eines Lesevorgangs (`winpipe.read_some`)
+- **Problem:** `test_frame_of_exactly_16_mib_is_echoed` occasionally waited 60 s for a reply although the AHK server had written it completely (server: `wp=0 q=0`, `echo_big sendOk=1`). The cause was in the Python test support: `read_some` waits 100 ms, then cancels with `CancelIoEx` and afterwards always returned `None`. If the read completes between the end of the wait and the cancel (thread briefly preempted, GIL), the cancel does nothing, the bytes are in `n` and were discarded. A frame was then missing forever.
+- **Wrong:** After `CancelIoEx` and `GetOverlappedResult(..., wait=True)`, ignore the result and return `None`.
+- **Right:** If `GetOverlappedResult` succeeds with `n > 0`, return the bytes. An overlapped read can still have completed despite the cancel (the same holds for writing). Found with the server's state log (`status` records in `pipe_echo_server.ahk`): server done, client without data.
+- **Status:** verified (60 of 60 runs of a loop script green, previously failed after 10 to 40 runs; 40 single runs and 3 full runs green)
+- **Source:** `tests/support/winpipe.py` (WI-01), fixed in the course of WI-04
 
-- **Problem:** `test_frame_of_exactly_16_mib_is_echoed` wartete gelegentlich 60 s auf eine Antwort, obwohl der AHK-Server sie vollständig geschrieben hatte (Server: `wp=0 q=0`, `echo_big sendOk=1`). Ursache lag in der Python-Testunterstützung: `read_some` wartet 100 ms, bricht dann mit `CancelIoEx` ab und gab danach immer `None` zurück. Schließt der Lesevorgang zwischen Wartezeitende und Abbruch ab (Thread kurz verdrängt, GIL), tut der Abbruch nichts, die Bytes liegen in `n` und wurden verworfen. Ein Rahmen fehlte dann für immer.
-- **Falsch:** Nach `CancelIoEx` und `GetOverlappedResult(..., wait=True)` das Ergebnis ignorieren und `None` liefern.
-- **Richtig:** Ist `GetOverlappedResult` erfolgreich mit `n > 0`, die Bytes zurückgeben. Ein überlapptes Lesen kann beim Abbruch trotzdem abgeschlossen sein (dasselbe gilt für Schreiben). Gefunden mit Zustandsprotokoll des Servers (`status`-Datensätze in `pipe_echo_server.ahk`): Server fertig, Client ohne Daten.
-- **Status:** verifiziert (60 von 60 Läufen eines Schleifen-Skripts grün, vorher Ausfall nach 10 bis 40 Läufen; 40 Einzelläufe und 3 Gesamtläufe grün)
-- **Quelle:** `tests/support/winpipe.py` (WI-01), behoben im Zuge von WI-04
+### Stand-in hub without wake-up call: every message waits 250 ms
 
-### Stand-in-Hub ohne Weckruf: jede Nachricht wartet 250 ms
+- **Problem:** `tests/support/pyhub.py` forwards messages without waking the receiver. The AHK peer then processes them only at the fallback timer. A request with reply then costs about 250 ms per direction, so 10,000 requests take roughly 40 minutes.
+- **Wrong:** Use `PyHub` unchanged as the hub for peer tests.
+- **Right:** `WakingHub(PyHub)` in `tests/integration/test_peer.py` wakes the windows of all connections with a known window after each message (`rawpipe.wake`). This is the sender's obligation from PROTOKOLL 1. `pyhub.py` itself stayed unchanged (it lies outside the package).
+- **Status:** verified (10,000 requests with `WakingHub` in 9.9 s). The value without a wake-up call (250 ms) is taken from the WI-04 measurement; not measured separately for the peer path.
+- **Source:** `tests/integration/test_peer.py`, `work_items/phase2/WI-04-ipc-pipe.md`
 
-- **Problem:** `tests/support/pyhub.py` leitet Nachrichten weiter, ohne den Empfänger zu wecken. Der AHK-Peer verarbeitet sie dann erst beim Fallback-Timer. Eine Anfrage mit Antwort kostet dann etwa 250 ms je Richtung, 10.000 Anfragen also rund 40 Minuten.
-- **Falsch:** `PyHub` unverändert als Hub für Peer-Tests nutzen.
-- **Richtig:** `WakingHub(PyHub)` in `tests/integration/test_peer.py` weckt nach jeder Nachricht die Fenster aller Verbindungen mit bekanntem Fenster (`rawpipe.wake`). Das ist die Pflicht des Senders aus PROTOKOLL 1. `pyhub.py` selbst blieb unverändert (liegt außerhalb des Pakets).
-- **Status:** verifiziert (10.000 Anfragen mit `WakingHub` in 9,9 s). Den Wert ohne Weckruf (250 ms) übernehme ich aus der WI-04-Messung, für den Peer-Pfad nicht gesondert gemessen.
-- **Quelle:** `tests/integration/test_peer.py`, `work_items/phase2/WI-04-ipc-pipe.md`
+### Handler return: only an empty value counts as "nothing returned"
 
-### Handler-Rückgabe: nur ein leerer Wert gilt als "nichts zurückgegeben"
+- **Problem:** `Dispatcher.Invoke` treated every non-object return value as "no return". A handler that returned `"text"` got `ok:true` instead of an error.
+- **Wrong:** `if (!IsObject(result)) return Map("ok", true)`.
+- **Right:** `if (!IsObject(result) && result == "")` gives `ok:true`. Any other non-Map return becomes `internal`.
+- **Status:** verified (test "a handler returning a non-Map is an internal error" was red, green after the change; `tests/ahk/dispatcher.test.ahk`).
+- **Source:** `src/core/ipc/Dispatcher.ahk`
 
-- **Problem:** `Dispatcher.Invoke` behandelte jede Nicht-Objekt-Rückgabe als "keine Rückgabe". Ein Handler, der `"text"` zurückgab, bekam `ok:true` statt eines Fehlers.
-- **Falsch:** `if (!IsObject(result)) return Map("ok", true)`.
-- **Richtig:** `if (!IsObject(result) && result == "")` ergibt `ok:true`. Jede andere Nicht-Map-Rückgabe wird `internal`.
-- **Status:** verifiziert (Test "a handler returning a non-Map is an internal error" war rot, nach der Änderung grün; `tests/ahk/dispatcher.test.ahk`).
-- **Quelle:** `src/core/ipc/Dispatcher.ahk`
+### Connection setup without blocking: one attempt, retry via timer
 
-### Verbindungsaufbau ohne Blockade: ein Versuch, Wiederholung per Timer
+- **Problem:** `PipeConnection.Connect(name, 3000)` waits up to 3 s with `Sleep` in the caller. A peer that waits for the hub at startup would stall its message path for that long.
+- **Right:** `PipeConnection.Connect(name, 0)` makes exactly one attempt and throws immediately. The peer retries via `SetTimer` with backoff (100, 200, 400 ... at most 2 s) and reports `hub_unreachable` after the total deadline (10 s).
+- **Status:** verified (`test_hub_gone_for_longer_than_the_budget_calls_onclosed`: `OnClosed` after 10.25 s; `test_reconnect_after_hub_restart_resubscribes_and_reports_ready_again`).
+- **Source:** `src/core/ipc/Peer.ahk` (`_Attempt`, `_ScheduleRetry`)
 
-- **Problem:** `PipeConnection.Connect(name, 3000)` wartet bis zu 3 s mit `Sleep` im Aufrufer. Ein Peer, der beim Start auf den Hub wartet, würde seinen Nachrichtenpfad so lange anhalten.
-- **Richtig:** `PipeConnection.Connect(name, 0)` macht genau einen Versuch und wirft sofort. Der Peer wiederholt per `SetTimer` mit Backoff (100, 200, 400 ... höchstens 2 s) und meldet nach der Gesamtfrist (10 s) `hub_unreachable`.
-- **Status:** verifiziert (`test_hub_gone_for_longer_than_the_budget_calls_onclosed`: `OnClosed` nach 10,25 s; `test_reconnect_after_hub_restart_resubscribes_and_reports_ready_again`).
-- **Quelle:** `src/core/ipc/Peer.ahk` (`_Attempt`, `_ScheduleRetry`)
+### Is the connection teardown still the current one? `ObjPtr` instead of comparison
 
-### Ist der Verbindungsabbau noch der aktuelle? `ObjPtr` statt Vergleich
+- **Problem:** An `OnClose` of an old connection must not change the state of the peer. Comparing the objects is not clearly documented.
+- **Right:** `ObjPtr(c) != ObjPtr(this._conn)` compares identity. Check `IsObject` before access, because `this._conn` may be empty.
+- **Status:** verified for the teardown path (reconnect test and timeout test run through `_OnConnClose`). The case "old connection reports after the switch" was not produced deliberately: not checked.
+- **Source:** `src/core/ipc/Peer.ahk` (`_OnConnClose`)
 
-- **Problem:** Ein `OnClose` einer alten Verbindung darf den Zustand des Peers nicht verändern. Der Vergleich der Objekte ist nicht eindeutig dokumentiert.
-- **Richtig:** `ObjPtr(c) != ObjPtr(this._conn)` vergleicht die Identität. Vor dem Zugriff `IsObject` prüfen, weil `this._conn` leer sein kann.
-- **Status:** verifiziert für den Abbau-Pfad (Reconnect-Test und Timeout-Test laufen über `_OnConnClose`). Der Fall "alte Verbindung meldet nach dem Wechsel" wurde nicht gezielt erzeugt: nicht geprüft.
-- **Quelle:** `src/core/ipc/Peer.ahk` (`_OnConnClose`)
+### One timer per request: 10,000 requests without growing handles
 
-### Ein Timer pro Anfrage: 10.000 Anfragen ohne wachsende Handles
+- **Problem:** Every request needs a timeout. AHK offers no count of active timers.
+- **Right:** One `SetTimer(fn, -timeoutMs)` per request, on reply `SetTimer(fn, 0)`. Counted via `Peer.PendingCount` (must be 0 at the end). The handle count of the process stays constant.
+- **Status:** verified (10,000 sequential requests: handles 163 → 163 → 163, pending 0, 0.99 ms per request). The number of active timers itself is not directly measurable: only indirectly via pending.
+- **Source:** `tests/integration/test_peer.py::test_10000_sequential_requests_keep_pending_and_handles_flat`
 
-- **Problem:** Jede Anfrage braucht einen Timeout. AHK bietet keine Zählung der aktiven Timer.
-- **Richtig:** Ein `SetTimer(fn, -timeoutMs)` pro Anfrage, bei der Antwort `SetTimer(fn, 0)`. Gezählt wird über `Peer.PendingCount` (muss am Ende 0 sein). Die Handle-Zahl des Prozesses bleibt konstant.
-- **Status:** verifiziert (10.000 sequentielle Anfragen: Handles 163 → 163 → 163, Pending 0, 0,99 ms je Anfrage). Die Zahl der aktiven Timer selbst ist nicht direkt messbar: nur indirekt über Pending.
-- **Quelle:** `tests/integration/test_peer.py::test_10000_sequential_requests_keep_pending_and_handles_flat`
+### Boolean values go onto the wire as numbers (superseded by WI-26)
 
-### Wahrheitswerte gehen als Zahl auf die Leitung (überholt durch WI-26)
+- **Problem:** The protocol shows `"ok": true`. `Json.Parse` returns `true` as `1`, and `Json.Stringify` wrote this integer as a number. In Python `1 == True`, so the test did not notice the difference.
+- **Right (since WI-26):** `true`/`false` are written with `Json.True`, `Json.False`, `Json.Bool(x)`; `ok` is converted centrally by `Message.Serialize`. Reading still accepts `1`/`0`. The rule is in one place: `doc/PROTOKOLL.md`, section 2.
+- **Status:** verified (WI-26: strict checks `is True`/`is False` in the Python tests and `wirebool` in every test; AHK tests `json.test.ahk`, `message.test.ahk`)
+- **Source:** `src/core/Json.ahk`, `doc/PROTOKOLL.md`
 
-- **Problem:** Das Protokoll zeigt `"ok": true`. `Json.Parse` liefert `true` als `1`, und `Json.Stringify` schrieb diesen Integer als Zahl. Beim Vergleich in Python ist `1 == True`, so dass der Test den Unterschied nicht bemerkte.
-- **Richtig (seit WI-26):** Geschrieben wird `true`/`false` mit `Json.True`, `Json.False`, `Json.Bool(x)`; `ok` wandelt `Message.Serialize` zentral um. Gelesen wird weiter `1`/`0`. Die Regel steht an einer Stelle: `doc/PROTOKOLL.md`, Abschnitt 2.
-- **Status:** verifiziert (WI-26: strenge Prüfung `is True`/`is False` in den Python-Tests und `wirebool` in jedem Test; AHK-Tests `json.test.ahk`, `message.test.ahk`)
-- **Quelle:** `src/core/Json.ahk`, `doc/PROTOKOLL.md`
+### Two `start()` calls via `with`
 
-### Zweimal `start()` über `with`
+- **Problem:** `with WakingHub(name).start() as hub:` calls `start()` twice, because `PyHub.__enter__` itself calls `start()`. Two accept loops on the same name would be the result.
+- **Right:** `with WakingHub(name) as hub:` (the `__enter__` starts it). Without `with`: `hub = WakingHub(name).start()` and `hub.stop()` in `finally`.
+- **Status:** assumed (read from the source of `tests/support/pyhub.py`, not executed). Implemented this way in the package code.
+- **Source:** `tests/support/pyhub.py` (`__enter__`)
 
-- **Problem:** `with WakingHub(name).start() as hub:` ruft `start()` zweimal auf, weil `PyHub.__enter__` selbst `start()` aufruft. Zwei Akzeptierschleifen auf demselben Namen wären die Folge.
-- **Richtig:** `with WakingHub(name) as hub:` (der `__enter__` startet). Ohne `with` `hub = WakingHub(name).start()` und `hub.stop()` im `finally`.
-- **Status:** vermutet (aus dem Quelltext von `tests/support/pyhub.py` gelesen, nicht ausgeführt). Im Code des Pakets so umgesetzt.
-- **Quelle:** `tests/support/pyhub.py` (`__enter__`)
+### sys.shutdown: do not close the connection inside the frame handler
 
-### sys.shutdown: Verbindung nicht im Rahmen-Handler schließen
+- **Problem:** `sys.shutdown` must send `sys.bye` and then end the process. A `Peer.Close()` directly in the handler closes the connection while it is processing the frame. The end of the handler then works with a closed object.
+- **Right:** In the handler only do the work and set `SetTimer(Role.ByeFn, -1)`. The timer sends `sys.bye {clean:true}`, closes the peer and calls `ExitApp(0)`. Measured: exit 0 about 240 ms after the command, `sys.bye` arrives at the hub (`test_shutdown_sends_bye_and_exits_0_within_one_second`). **Since WI-30** the timer closes with `Peer.CloseWhenFlushed` instead of `Peer.Close` and calls `ExitApp` only in the callback (see "Close discards the queue").
+- **Status:** verified (test green, measured). A direct `Close` in the handler was not tried: not checked.
+- **Source:** `src/core/Role.ahk` (`_OnShutdown`, `_FinishShutdown`)
 
-- **Problem:** `sys.shutdown` muss `sys.bye` senden und danach den Prozess beenden. Ein `Peer.Close()` direkt im Handler schließt die Verbindung, während sie gerade den Rahmen abarbeitet. Das Ende des Handlers arbeitet dann mit einem geschlossenen Objekt.
-- **Richtig:** Im Handler nur die Arbeit erledigen und `SetTimer(Role.ByeFn, -1)` setzen. Der Timer sendet `sys.bye {clean:true}`, schließt den Peer und ruft `ExitApp(0)`. Gemessen: Exit 0 etwa 240 ms nach dem Befehl, `sys.bye` kommt beim Hub an (`test_shutdown_sends_bye_and_exits_0_within_one_second`). **Seit WI-30** schließt der Timer nicht mehr mit `Peer.Close`, sondern mit `Peer.CloseWhenFlushed` und ruft `ExitApp` erst im Rückruf (siehe "Close verwirft die Warteschlange").
-- **Status:** verifiziert (Test grün, gemessen). Ein direktes `Close` im Handler wurde nicht ausprobiert: nicht geprüft.
-- **Quelle:** `src/core/Role.ahk` (`_OnShutdown`, `_FinishShutdown`)
+### Hub loss: measure the orphan guard's deadline in its own timer
 
-### Hub-Verlust: die Frist des Orphan-Guards im eigenen Timer messen
+- **Problem:** The peer retries the connection setup for up to 10 s (budget). A role, however, should end after 3 s, and for that it needs its own clock.
+- **Right:** A timer (200 ms) reads `peer.status`. If it reads `reconnecting`, it records the time. After 3 s without `ready` it calls `ExitApp(4)`. Measured: end 3.25 s after the hub was stopped, no process left over (psutil).
+- **Status:** verified (`test_hub_gone_role_ends_within_orphan_budget_and_leaves_no_process`). The start of the deadline is inaccurate by up to 200 ms, because it is only set at the next timer tick.
+- **Source:** `src/core/Role.ahk` (`_Guard`)
 
-- **Problem:** Der Peer wiederholt den Verbindungsaufbau bis zu 10 s (Budget). Eine Rolle soll sich aber nach 3 s beenden, und dafür braucht sie eine eigene Uhr.
-- **Richtig:** Ein Timer (200 ms) liest `peer.status`. Steht dort `reconnecting`, merkt er sich den Zeitpunkt. Nach 3 s ohne `ready` ruft er `ExitApp(4)` auf. Gemessen: Ende 3,25 s nach dem Stopp des Hubs, kein Prozess übrig (psutil).
-- **Status:** verifiziert (`test_hub_gone_role_ends_within_orphan_budget_and_leaves_no_process`). Der Beginn der Frist ist um bis zu 200 ms ungenau, weil er erst beim nächsten Timer-Tick gesetzt wird.
-- **Quelle:** `src/core/Role.ahk` (`_Guard`)
+### Events before subscription are lost: use a snapshot
 
-### Ereignisse vor dem Abonnement gehen verloren: Snapshot nutzen
+- **Problem:** A client that subscribes after startup does not receive the earlier `evt.process.*` events. Whoever waits for `evt.process.ready` waits in vain if the event came earlier.
+- **Wrong:** Waiting for an event that was sent before `cmd.topic.subscribe`.
+- **Right:** Subscribe first, then fetch the state as a snapshot (`cmd.process.list` at the supervisor, `cmd.engine.snapshot` at the engine). Process events afterwards. See `doc/PROTOKOLL.md`, section 5a.
+- **Status:** verified (WI-07, `test_supervisor.py`, waiting via `process_list`)
+- **Source:** `doc/PROTOKOLL.md` 5a, `src/supervisor/Children.ahk` (`Snapshot`)
 
-- **Problem:** Ein Client, der nach dem Start abonniert, bekommt die früheren `evt.process.*`-Ereignisse nicht. Wer auf `evt.process.ready` wartet, wartet dann vergeblich, wenn das Ereignis schon vorher kam.
-- **Falsch:** Auf ein Ereignis warten, das vor `cmd.topic.subscribe` gesendet wurde.
-- **Richtig:** Erst abonnieren, dann den Zustand per Momentaufnahme holen (`cmd.process.list` beim Supervisor, `cmd.engine.snapshot` bei der Engine). Ereignisse danach verarbeiten. Siehe `doc/PROTOKOLL.md`, Abschnitt 5a.
-- **Status:** verifiziert (WI-07, `test_supervisor.py`, Warten über `process_list`)
-- **Quelle:** `doc/PROTOKOLL.md` 5a, `src/supervisor/Children.ahk` (`Snapshot`)
+### Hub.Request must use the registered message ID
 
-### Hub.Request muss die registrierte Nachrichten-ID verwenden
+- **Problem:** The reply to a supervisor request must find its callback (`corr` = ID of the request). If the request carries a different ID than the registered one, the reply finds no callback. Without a timer the callback would then stay open forever (before commit `2bc8424`, `Hub.Request` had no timer).
+- **Wrong:** Generate the ID for the message again after it was stored in the callback directory.
+- **Right:** Generate the ID once, store it in the directory under this ID and set the same ID in the message (`Hub.Request` in `src/supervisor/Hub.ahk`). The timer starts after sending and is stopped on completion.
+- **Status:** verified (test `test_answer_to_a_hub_request_reaches_its_callback_once` in `tests/integration/test_supervisor.py`: the real reply ends the exit before the deadline, no timeout in the log). A correlation failure was not provoked on purpose (no counter-test with a deliberately wrong ID).
+- **Source:** `src/supervisor/Hub.ahk` (`Request`, `_Finish`)
+- **Note on log timing:** The stderr lines of the supervisor appear batched, not in real time. Timing measurements via the appearance of a log line are unreliable (measured in the test: about 2 s delay at a 500 ms deadline). The order can be checked via the reply, not via the log (this is how the timeout test is built). Status: verified (measurement in the test run and a probe in the scratchpad)
+- **Source:** `src/supervisor/Hub.ahk` (`Request`)
 
-- **Problem:** Die Antwort auf eine Anfrage des Supervisors muss den Rückruf finden (`corr` = ID der Anfrage). Trägt die Anfrage eine andere ID als die registrierte, findet die Antwort keinen Rückruf. Ohne Timer bliebe der Rückruf dann für immer offen (vor Commit `2bc8424` hatte `Hub.Request` keinen Timer).
-- **Falsch:** Die ID für die Nachricht neu erzeugen, nachdem sie im Rückruf-Verzeichnis abgelegt wurde.
-- **Richtig:** Die ID einmal erzeugen, im Verzeichnis unter dieser ID ablegen und dieselbe ID in die Nachricht setzen (`Hub.Request` in `src/supervisor/Hub.ahk`). Der Timer startet nach dem Senden und wird beim Abschluss gestoppt.
-- **Status:** verifiziert (Test `test_answer_to_a_hub_request_reaches_its_callback_once` in `tests/integration/test_supervisor.py`: die echte Antwort beendet den Exit vor der Frist, kein Timeout im Log). Ein Fehlschlag der Korrelation wurde nicht gezielt provoziert (kein Gegentest mit absichtlich falscher ID).
-- **Quelle:** `src/supervisor/Hub.ahk` (`Request`, `_Finish`)
-- **Hinweis Log-Zeitpunkt:** Die stderr-Zeilen des Supervisors erscheinen gebündelt, nicht in Echtzeit. Zeitmessungen über das Erscheinen einer Log-Zeile sind unzuverlässig (im Test gemessen: ~2 s Verzug bei 500 ms Frist). Die Reihenfolge lässt sich über die Antwort prüfen, nicht über das Log (so ist der Timeout-Test gebaut). Status: verifiziert (Messung im Testlauf und Probe im Scratchpad)
-- **Quelle:** `src/supervisor/Hub.ahk` (`Request`)
+### Worker: reply before the element, start the element via timer
 
-### Worker: Antwort vor dem Element, Element per Timer starten
+- **Problem:** `cmd.worker.run` should answer `ok` immediately, the element runs afterwards. If the handler starts the element directly, the reply waits as long as the element.
+- **Wrong:** Run the element in the handler and then `return Map()`.
+- **Right:** Store the job, set `SetTimer(this._startFn, -1)`, the handler replies. The same for the result of a cancel (`evt.worker.done` via timer -1), so that the reply to `cmd.worker.cancel` arrives before the event (order checked in the hub protocol).
+- **Status:** verified (`tests/integration/test_worker.py`, hub capture: `res.worker.cancel` before `evt.worker.done`)
+- **Source:** `src/worker/Worker.ahk` (`_CmdRun`, `_StopCurrent`)
 
-- **Problem:** `cmd.worker.run` soll sofort mit `ok` antworten, das Element läuft danach. Startet der Handler das Element direkt, wartet die Antwort so lange wie das Element.
-- **Falsch:** Element im Handler ausführen und dann `return Map()`.
-- **Richtig:** Auftrag speichern, `SetTimer(this._startFn, -1)` setzen, Handler antwortet. Dasselbe für das Ergebnis eines Abbruchs (`evt.worker.done` über Timer -1), damit die Antwort auf `cmd.worker.cancel` vor dem Ereignis ankommt (Reihenfolge im Hub-Protokoll geprüft).
-- **Status:** verifiziert (`tests/integration/test_worker.py`, Hub-Mitschnitt: `res.worker.cancel` vor `evt.worker.done`)
-- **Quelle:** `src/worker/Worker.ahk` (`_CmdRun`, `_StopCurrent`)
+### `DllCall("Sleep")` lets messages in between lines
 
-### `DllCall("Sleep")` lässt Nachrichten zwischen den Zeilen zu
+- **Problem:** `Action_TestHangWorker` (loop with `DllCall("Sleep", 1000)`) was supposed to accept no messages according to its comment. In fact the worker answered `cmd.worker.cancel`, but only after up to one slice: 812 ms with 1000 ms slices, 29 ms with 100 ms slices (target WI-11: 500 ms).
+- **Wrong:** Assuming a call that waits in `DllCall` is blind to messages (this holds only within one call).
+- **Right:** AHK checks window messages between command lines. The latency is therefore the length of the longest wait slice. Split long waits into short steps (100 ms). A single long call is not interrupted (not checked which value is critical).
+- **Status:** verified (measurement: cancel 812 ms vs. 29 ms, test runs). The cause in the AHK code was not read: assumed (message check between lines, peek interval).
+- **Source:** `src/elements/skeleton/Action_TestHangWorker.ahk`
 
-- **Problem:** `Action_TestHangWorker` (Schleife mit `DllCall("Sleep", 1000)`) sollte laut Kommentar keine Nachrichten annehmen. Tatsächlich beantwortete der Worker `cmd.worker.cancel`, aber erst nach bis zu einer Scheibe: 812 ms bei 1000-ms-Scheiben, 29 ms bei 100-ms-Scheiben (Ziel WI-11: 500 ms).
-- **Falsch:** Annahme, ein Aufruf, der in `DllCall` wartet, sei für Nachrichten blind (gilt nur innerhalb eines Aufrufs).
-- **Richtig:** AHK prüft Fensternachrichten zwischen den Befehlszeilen. Die Latenz ist daher die Länge der längsten Wartescheibe. Lange Wartezeiten in kurze Schritte teilen (100 ms). Ein einzelner langer Aufruf wird nicht unterbrochen (nicht geprüft, welcher Wert kritisch ist).
-- **Status:** verifiziert (Messung: Abbruch 812 ms vs. 29 ms, Testläufe). Die Ursache im AHK-Code nicht nachgelesen: vermutet (Nachrichtenprüfung zwischen Zeilen, Peek-Intervall).
-- **Quelle:** `src/elements/skeleton/Action_TestHangWorker.ahk`
+### Dialogs (InputBox, MsgBox) are windows of class `#32770`
 
-### Dialoge (InputBox, MsgBox) sind Fenster der Klasse `#32770`
+- **Problem:** A test element with `InputBox(..., "T1")` returned `Cancel` in the worker after 0.12 s. The dialog guard of `ahkrun.py` had closed the window and ended the run with exit 97.
+- **Wrong:** Running dialog elements with a test under `ahkrun.py` and expecting a real result.
+- **Right:** `InputBox` shows a standard dialog (probe: buttons "OK" and "Cancel"). Such elements cannot be tested under the guard. A separate run without the guard or an abstraction of the dialog is needed. WI-11 does not require it; the element was removed again.
+- **Status:** verified (probe with `ahkrun.py`, exit 97; `src/elements/skeleton` without the element)
 
-- **Problem:** Ein Test-Element mit `InputBox(..., "T1")` gab im Worker `Cancel` nach 0,12 s zurück. Der Dialog-Wächter von `ahkrun.py` hatte das Fenster geschlossen und den Lauf mit Exit 97 beendet.
-- **Falsch:** Dialog-Elemente mit einem Test unter `ahkrun.py` ausführen und ein echtes Ergebnis erwarten.
-- **Richtig:** `InputBox` zeigt einen Standarddialog (Probe: Schaltflächen "OK" und "Abbrechen"). Solche Elemente lassen sich unter dem Wächter nicht testen. Eigener Lauf ohne Wächter oder eine Abstraktion des Dialogs nötig. WI-11 verlangt das nicht; das Element wurde wieder entfernt.
-- **Status:** verifiziert (Probe mit `ahkrun.py`, Exit 97; `src/elements/skeleton` ohne das Element)
+### Worker crashes: only the supervisor sees the process death
 
-### Worker crasht: nur der Supervisor sieht den Prozesstod
+- **Problem:** A Python hub does not notice the death of a worker. The engine learns nothing about it, the job hangs.
+- **Right:** The engine subscribes to the topic `process` at the supervisor (only with `--workers` > 0). The crash test starts the real supervisor with storage, engine and manager; the engine requests its worker from the supervisor (WI-27, `cmd.process.spawn`). The supervisor accepts a stand-in storage at the hub without it being a child (only still in `test_worker_pool.py` for `engine` as sender).
+- **Status:** verified (`test_killed_worker_ends_its_element_with_worker_crashed_and_is_not_restarted` in `tests/fault/test_process_crash.py`, end 0.09 to 0.4 s after the kill; `test_killed_worker_ends_its_element_with_worker_crashed_and_the_pool_has_a_replacement`)
 
-- **Problem:** Ein Python-Hub bemerkt den Tod eines Workers nicht. Die Engine erfährt davon nichts, der Job hängt.
-- **Richtig:** Die Engine abonniert das Topic `process` beim Supervisor (nur mit `--workers` > 0). Der Crash-Test startet den echten Supervisor mit storage, engine und manager; die Engine fordert ihren Worker beim Supervisor an (WI-27, `cmd.process.spawn`). Der Supervisor nimmt ein Stand-in-Storage am Hub an, ohne dass es ein Kind ist (nur noch in `test_worker_pool.py` für `engine` als Absender).
-- **Status:** verifiziert (`test_killed_worker_ends_its_element_with_worker_crashed_and_is_not_restarted` in `tests/fault/test_process_crash.py`, Ende 0,09 bis 0,4 s nach dem Kill; `test_killed_worker_ends_its_element_with_worker_crashed_and_the_pool_has_a_replacement`)
+### Python client: `sys.pong` is a reply, not an event
 
-### Python-Client: `sys.pong` ist eine Antwort, kein Ereignis
+- **Problem:** The test waited in vain with `wait_event("sys.pong")`, although the worker answered.
+- **Wrong:** `send` and then `events()`.
+- **Right:** `client.request("worker:1", "sys.ping", {...})`. Replies carry `corr` and do not end up in the event stream of `AhfClient.events()`.
+- **Status:** verified (`test_pings_are_answered_while_a_blocking_element_runs`)
 
-- **Problem:** Der Test wartete mit `wait_event("sys.pong")` vergeblich, obwohl der Worker antwortete.
-- **Falsch:** `send` und danach `events()`.
-- **Richtig:** `client.request("worker:1", "sys.ping", {...})`. Antworten tragen `corr` und landen nicht im Ereignisstrom von `AhfClient.events()`.
-- **Status:** verifiziert (`test_pings_are_answered_while_a_blocking_element_runs`)
+### Wait loop over `events()` discards foreign messages
 
-### Warteschleife über `events()` verwirft fremde Nachrichten
+- **Problem:** A helper function read with `events()` and searched for one message. Events of other runs that it did not search for were lost, and the test then waited in vain.
+- **Right:** Collect all events of a time window (`late = [m for m in ... if type == ...]`) or process events in order with one list per type.
+- **Status:** verified (test run `test_cancel_stops_the_running_element...`, the second `done` was initially missing)
 
-- **Problem:** Eine Hilfsfunktion las mit `events()` und suchte eine Nachricht. Ereignisse anderer Läufe, die sie nicht suchte, gingen verloren, der Test wartete dann vergeblich.
-- **Richtig:** Alle Ereignisse eines Zeitfensters sammeln (`late = [m for m in ... if type == ...]`) oder Ereignisse der Reihe nach mit einer Liste pro Typ bearbeiten.
-- **Status:** verifiziert (Testlauf `test_cancel_stops_the_running_element...`, zweites `done` fehlte zunächst)
+### A frozen process shows ack timeout and orphan deadline
 
-### Ein frozen Prozess zeigt Ack-Timeout und Orphan-Frist
+- **Problem:** Whether the engine and pool end when a worker does not respond was unchecked.
+- **Right:** `psutil.Process(pid).suspend()` freezes the worker. Then `cmd.worker.run` does not arrive (ack timeout 5 s, element `exception`, "worker not available: worker:1 (timeout)"). Since WI-27 the engine removes the slot and lets the process be terminated (`TerminateProcess` also ends a suspended process), the next job runs on a new worker. After a cancel without acknowledgement, the engine waits 2 s (`ORPHAN_MS`), then the worker is terminated and replaced (before: slot `down` forever).
+- **Status:** verified (`test_frozen_worker_does_not_answer_the_run_and_is_replaced`, `test_cancel_of_a_frozen_worker_ends_the_instance_at_once_and_the_process_is_killed_and_replaced` in `tests/fault/test_worker_lifecycle.py`)
 
-- **Problem:** Ob Engine und Pool bei einem nicht antwortenden Worker enden, war ungeprüft.
-- **Richtig:** `psutil.Process(pid).suspend()` friert den Worker ein. Dann kommt `cmd.worker.run` nicht an (Ack-Timeout 5 s, Element `exception`, "worker not available: worker:1 (timeout)"). Seit WI-27 entfernt die Engine den Slot und lässt den Prozess beenden (`TerminateProcess` beendet auch einen angehaltenen Prozess), der nächste Job läuft auf einem neuen Worker. Nach einem Abbruch ohne Quittung wartet die Engine 2 s (`ORPHAN_MS`), dann wird der Worker beendet und ersetzt (vorher: Slot `down` für immer).
-- **Status:** verifiziert (`test_frozen_worker_does_not_answer_the_run_and_is_replaced`, `test_cancel_of_a_frozen_worker_ends_the_instance_at_once_and_the_process_is_killed_and_replaced` in `tests/fault/test_worker_lifecycle.py`)
+### cmd reply later: otherwise the peer replies immediately
 
-### cmd-Antwort später: der Peer antwortet sonst sofort
+- **Problem:** Storage should run file operations in a queue (no I/O in the message path). `Peer` however sends the reply to a `cmd.*` when the handler returns, with its return value. A later reply was not possible.
+- **Wrong:** Write the file synchronously in the handler and then reply. Then every other message (including `sys.ping`) waits for the full file time.
+- **Right:** The handler returns `Deferred.Marker()` and puts the request in the queue. The reply is sent with `peer.Reply(msg, payload)`. Every error path must reply, otherwise the sender ends with its deadline. The change is in commit `419051a` (`src/core/ipc/Deferred.ahk`, `Dispatcher.ahk`, `Peer.ahk`). It touches `core/` and needs agreement (open, see WI-12 result).
+- **Status:** verified (`tests/ahk/dispatcher.test.ahk`, case "a Deferred marker is passed through"; `tests/integration/test_storage.py`, all requests via the queue; peer and worker tests green)
 
-- **Problem:** Storage soll Dateioperationen in einer Warteschlange ausführen (kein I/O im Nachrichtenpfad). `Peer` sendet die Antwort auf ein `cmd.*` aber beim Rücksprung des Handlers, mit dessen Rückgabewert. Eine spätere Antwort war nicht möglich.
-- **Falsch:** Die Datei im Handler synchron schreiben und dann antworten. Dann wartet jede andere Nachricht (auch `sys.ping`) die volle Dateizeit.
-- **Richtig:** Der Handler gibt `Deferred.Marker()` zurück und legt die Anfrage in die Warteschlange. Die Antwort kommt mit `peer.Reply(msg, payload)`. Jeder Fehlerpfad muss antworten, sonst endet der Absender mit seiner Frist. Die Änderung steht in Commit `419051a` (`src/core/ipc/Deferred.ahk`, `Dispatcher.ahk`, `Peer.ahk`). Sie berührt `core/` und braucht eine Absprache (offen, siehe WI-12 Ergebnis).
-- **Status:** verifiziert (`tests/ahk/dispatcher.test.ahk`, Fall "a Deferred marker is passed through"; `tests/integration/test_storage.py`, alle Anfragen über die Warteschlange; Peer- und Worker-Tests grün)
+### Atomic replace: MoveFileExW with flags, write protection stays visible
 
-### Atomar ersetzen: MoveFileExW mit Flags, Schreibschutz bleibt sichtbar
+- **Problem:** v1 deletes the file and writes it anew (`FileDelete` + `FileAppend`). A crash in between loses the file.
+- **Right:** Write a temp file in the same folder (`FileOpen(tmp, "w", "UTF-8-RAW")`), then `DllCall("MoveFileExW", "Str", tmp, "Str", target, "UInt", 0x9, "Int")`. `0x9` = `MOVEFILE_REPLACE_EXISTING` (1) | `MOVEFILE_WRITE_THROUGH` (8). Read `A_LastError` directly after the call. A write-protected target file makes the replace fail with an access error, the old file stays unchanged.
+- **Status:** verified (`test_read_only_target_fails_with_error_event_and_keeps_the_old_file`, `test_hard_kill_during_a_big_write_...`)
 
-- **Problem:** v1 löscht die Datei und schreibt sie neu (`FileDelete` + `FileAppend`). Ein Absturz dazwischen verliert die Datei.
-- **Richtig:** Temp-Datei im selben Ordner schreiben (`FileOpen(tmp, "w", "UTF-8-RAW")`), dann `DllCall("MoveFileExW", "Str", tmp, "Str", target, "UInt", 0x9, "Int")`. `0x9` = `MOVEFILE_REPLACE_EXISTING` (1) | `MOVEFILE_WRITE_THROUGH` (8). `A_LastError` direkt nach dem Aufruf lesen. Eine schreibgeschützte Zieldatei lässt das Ersetzen mit Zugriffsfehler scheitern, die alte Datei bleibt unverändert.
-- **Status:** verifiziert (`test_read_only_target_fails_with_error_event_and_keeps_the_old_file`, `test_hard_kill_during_a_big_write_...`)
+### Test helper: `wait_hello` finds the old `sys.hello` in the same hub
 
-### Testhelfer: `wait_hello` findet das alte `sys.hello` im selben Hub
+- **Problem:** `wait_hello(hub, name)` returns the first `sys.hello` of this name that the hub has ever seen. If the same role is started twice in the same hub, the old PID comes back. The test then killed an already ended process (`psutil.NoSuchProcess`).
+- **Wrong:** Start one role after another in the same hub and call `wait_hello` each time.
+- **Right:** One hub per start, with its own pipe name: `with RoleHub(pipe_n) as hub:` (see `test_hard_kill_during_a_big_write_...`).
+- **Status:** verified (test was red, green after the change)
 
-- **Problem:** `wait_hello(hub, name)` liefert das erste `sys.hello` dieses Namens, das der Hub je gesehen hat. Startet man dieselbe Rolle zweimal im selben Hub, kommt die alte PID zurück. Der Test tötete dann einen schon beendeten Prozess (`psutil.NoSuchProcess`).
-- **Falsch:** Eine Rolle nacheinander im selben Hub starten und `wait_hello` jedes Mal aufrufen.
-- **Richtig:** Pro Start einen eigenen Hub mit eigenem Pipe-Namen: `with RoleHub(pipe_n) as hub:` (siehe `test_hard_kill_during_a_big_write_...`).
-- **Status:** verifiziert (Test war rot, nach der Änderung grün)
+### Storage's own log sink after `super.Start()`
 
-### Storage-eigene Log-Senke nach `super.Start()`
+- **Problem:** `Role.Start` sets the log sink to forwarding via the peer. Storage, however, has no log receiver except itself.
+- **Right:** In `Storage.Start`, set `Log.Configure(Storage.SelfLogFn)` after `super.Start()`. The sink places entries directly into the queue.
+- **Status:** not checked (the path is only active on errors, a targeted test is missing)
 
-- **Problem:** `Role.Start` setzt die Log-Senke auf die Weiterleitung über den Peer. Storage hat aber keinen Log-Empfänger außer sich selbst.
-- **Richtig:** In `Storage.Start` nach `super.Start()` `Log.Configure(Storage.SelfLogFn)` setzen. Die Senke legt Einträge direkt in die Warteschlange.
-- **Status:** nicht geprüft (der Pfad ist nur bei Fehlern aktiv, ein gezielter Test fehlt)
+### Two timers call the same function: checking and acting are separate lines (`Executor.Tick`)
 
-### Zwei Timer rufen dieselbe Funktion: Prüfen und Handeln sind getrennte Zeilen (`Executor.Tick`)
+- **Problem:** `Executor.Tick` ran from two timers (kick and safety timer). It checked `thread.State = "ready"`, still called `workers.Usable()` in between and then started the element. If the other timer interrupts in between and starts the same thread, the element was started twice; the transition `ready -> running` of the second call failed only as an `a0` line, and the result of `Dispatch()` was not evaluated.
+- **Wrong:** Relying on a timer not interrupting itself (true), and overlooking that another timer thread may interrupt it as soon as it runs longer than about 15 ms.
+- **Right:** (1) Evaluate the result of the transition: `if (!thread.Dispatch()) return`. (2) Lock the function against re-entry: `Critical("On")`, check and set the flag, `Critical(prev)`; whoever hits a running function only sets an "again" flag, and the running function runs once more. Leaving (clear the flag, check "again") is also done in `Critical`. Release the flag even on an exception. (3) Check and change a state (`TryTransition`, `ThreadState.Finish`) in one `Critical` block, report invalid transitions afterwards.
+- **Status:** verified (test `Tick: a tick that interrupts before the dispatch does not start an element twice` was red before the fix, 2 instead of 1 start; green afterwards). That the error occurred in the running engine was not observed (read from the code).
+- **Source:** `src/engine/Executor.ahk` (`Tick`), `src/engine/core/ThreadState.ahk`, `tests/ahk/engine_executor.test.ahk`
 
-- **Problem:** `Executor.Tick` lief aus zwei Timern (Kick und Sicherheitstimer). Er prüfte `thread.State = "ready"`, rief dazwischen noch `workers.Usable()` und startete dann das Element. Unterbricht der andere Timer dazwischen und startet denselben Thread, wurde das Element zweimal gestartet; der Übergang `ready -> running` des zweiten Aufrufs schlug nur als `a0`-Zeile fehl, das Ergebnis von `Dispatch()` wurde nicht ausgewertet.
-- **Falsch:** Sich darauf verlassen, dass ein Timer sich nicht selbst unterbricht (stimmt), und übersehen, dass ihn ein anderer Timer-Thread unterbrechen darf, sobald er länger als ~15 ms läuft.
-- **Richtig:** (1) Das Ergebnis des Übergangs auswerten: `if (!thread.Dispatch()) return`. (2) Die Funktion gegen Wiedereintritt sperren: `Critical("On")`, Flag prüfen und setzen, `Critical(prev)`; wer eine laufende Funktion trifft, setzt nur ein "nochmal"-Flag, die laufende Funktion läuft noch einmal. Das Verlassen (Flag löschen, "nochmal" prüfen) ebenfalls in `Critical`. Auch bei einer Ausnahme das Flag freigeben. (3) Prüfen und Ändern eines Zustands (`TryTransition`, `ThreadState.Finish`) in einem `Critical`-Block, die Meldung ungültiger Übergänge danach.
-- **Status:** verifiziert (Test `Tick: a tick that interrupts before the dispatch does not start an element twice` war vor der Korrektur rot, 2 statt 1 Start; danach grün). Dass der Fehler in der laufenden Engine auftrat, ist nicht beobachtet worden (gelesen).
-- **Quelle:** `src/engine/Executor.ahk` (`Tick`), `src/engine/core/ThreadState.ahk`, `tests/ahk/engine_executor.test.ahk`
+### Force an interruption in a test: hook in the stub
 
-### Unterbrechung im Test erzwingen: Haken in der Attrappe
+- **Problem:** An error that only occurs when a timer interrupts between two lines is hard to reproduce with real time.
+- **Right:** The stub of the dependency (`FakeWorkers.Usable`) calls a hook once (`owner.executor.Tick()`). The call sits exactly between check and start and behaves like an interrupting timer, without time dependence.
+- **Status:** verified
+- **Source:** `tests/ahk/helpers/EngineOwner.ahk`
 
-- **Problem:** Ein Fehler, der nur auftritt, wenn ein Timer zwischen zwei Zeilen unterbricht, ist mit echter Zeit kaum zu reproduzieren.
-- **Richtig:** Die Attrappe der Abhängigkeit (`FakeWorkers.Usable`) ruft einmalig einen Haken auf (`owner.executor.Tick()`). Der Aufruf liegt genau zwischen Prüfung und Start und verhält sich wie ein unterbrechender Timer, ohne Zeitabhängigkeit.
-- **Status:** verifiziert
-- **Quelle:** `tests/ahk/helpers/EngineOwner.ahk`
+### Time measurement across process boundaries: `Time.NowMs` is not comparable
 
-### Zeitmessung über Prozessgrenzen: `Time.NowMs` ist nicht vergleichbar
+- **Problem:** The stub should measure arrival times of events. `Time.NowMs` is a performance counter (QueryPerformanceCounter) and has its own zero point in each process.
+- **Wrong:** Comparing `recvMs := Time.NowMs()` in the stub with `time.perf_counter()` in the test.
+- **Right:** Wall-clock time via `GetSystemTimePreciseAsFileTime` (buffer 8 bytes, `NumGet(buf, 0, "Int64") / 10000 - 11644473600000` gives ms since 1970 UTC). This corresponds to `time.time() * 1000` in Python. See `StubManager.WallMs`.
+- **Status:** verified (probe: arrival times in the log, latencies 2 to 4 ms between command and first event, `tests/e2e/test_ui_stub.py`)
 
-- **Problem:** Der Stub soll Ankunftszeiten von Ereignissen messen. `Time.NowMs` ist ein Zähler der Leistungsmessung (QueryPerformanceCounter) und hat in jedem Prozess einen eigenen Nullpunkt.
-- **Falsch:** `recvMs := Time.NowMs()` im Stub und `time.perf_counter()` im Test vergleichen.
-- **Richtig:** Wandzeit über `GetSystemTimePreciseAsFileTime` (Puffer 8 Byte, `NumGet(buf, 0, "Int64") / 10000 - 11644473600000` ergibt ms seit 1970 UTC). Das entspricht `time.time() * 1000` in Python. Siehe `StubManager.WallMs`.
-- **Status:** verifiziert (Probe: Ankunftszeiten im Log, Latenzen 2 bis 4 ms zwischen Befehl und erstem Ereignis, `tests/e2e/test_ui_stub.py`)
+### Events that the stub logs itself come back via topic `log`
 
-### Ereignisse, die der Stub selbst protokolliert, kommen über Topic `log` zurück
+- **Problem:** The stub writes every event via `storage` into the log file. `storage` forwards every entry to topic `log`. If the stub subscribes to `log`, it writes every entry again, and the log grows endlessly.
+- **Right:** Only count entries of topic `evt.log.*`, never log them (`StubManager._OnEvent`).
+- **Status:** verified (`logEchoCount` set in the probe run, log file without repetitions)
 
-- **Problem:** Der Stub schreibt jedes Ereignis über `storage` in das Logfile. `storage` leitet jeden Eintrag an Topic `log` weiter. Abonniert der Stub `log`, schreibt er jeden Eintrag erneut, und das Protokoll wächst endlos.
-- **Richtig:** Einträge vom Topic `evt.log.*` nur zählen, nie protokollieren (`StubManager._OnEvent`).
-- **Status:** verifiziert (`logEchoCount` im Probelauf gesetzt, Logdatei ohne Wiederholungen)
+### Engine restart: `evt.engine.restarted` (F-01)
 
-### Engine-Neustart: `evt.engine.restarted` (F-01)
+- **Problem:** PROTOKOLL 4.3 names `evt.engine.restarted`, the engine (WI-10) did not send it. A new engine process cannot know by itself whether it is the first start or a restart (every start has a new `epoch`).
+- **Right:** On an automatic restart, the supervisor appends `--restarted=<n>` to the command line (`Children._Launch`). With this option the engine sends `evt.engine.restarted` with the new `epoch` after loading the flows. Clients can additionally evaluate `evt.process.restarted` and the new `epoch` (the stub does this).
+- **Status:** verified (test `test_engine_restart_is_seen_and_resynced_without_restarting_the_stub` with a real kill: event with new `epoch` arrives, not on the first start; without the engine change the same assertion fails).
+- **Source:** `src/engine/Engine.ahk` (`_Loaded`), `src/supervisor/Children.ahk` (`_Launch`), `doc/PROTOKOLL.md` 4.3
+- **Source:** `doc/PROTOKOLL.md` 4.3
 
-- **Problem:** PROTOCOL 4.3 nennt `evt.engine.restarted`, die Engine (WI-10) sendete es nicht. Ein neuer Engine-Prozess kann von sich aus nicht wissen, ob er der erste oder ein Neustart ist (eine neue `epoch` hat jeder Start).
-- **Richtig:** Der Supervisor hängt bei einem automatischen Neustart `--restarted=<n>` an die Kommandozeile (`Children._Launch`). Die Engine sendet bei dieser Option nach dem Laden der Flows `evt.engine.restarted` mit der neuen `epoch`. Clients können zusätzlich `evt.process.restarted` und die neue `epoch` auswerten (der Stub tut das).
-- **Status:** verifiziert (Test `test_engine_restart_is_seen_and_resynced_without_restarting_the_stub` mit echtem Kill: Ereignis mit neuer `epoch` kommt, beim ersten Start nicht; ohne die Engine-Änderung schlägt dieselbe Assertion fehl).
-- **Quelle:** `src/engine/Engine.ahk` (`_Loaded`), `src/supervisor/Children.ahk` (`_Launch`), `doc/PROTOKOLL.md` 4.3
-- **Quelle:** `doc/PROTOKOLL.md` 4.3
+### Log lines get lost when another process has the file open (storage, F-04)
 
-### Log-Zeilen gehen verloren, wenn ein anderer Prozess die Datei offen hat (Storage, F-04)
+- **Problem:** Under load, lines were missing from the log file. Observed was `OSError (6) The handle is invalid`, as soon as another process (test reader, editor, virus scanner) had the file open. The line was silently lost.
+- **Cause (verified):** `FileAppend` opens the file without sharing. As soon as any other process holds a handle on the file, even a pure read access with `FILE_SHARE_READ|WRITE`, `FileAppend` throws `OSError (32)` (sharing violation). There was no retry. Probe in the scratchpad: `CreateFileW` with sharing 0, 1, 3, 7 holds the file, after that `FileAppend` fails with 32 every time. `FileGetSize` and `FileExist` work, `FileMove` does not always work. The error number 6 from the first finding could not be reproduced: not checked where it came from (assumed: stale `A_LastError` or an error in the code path at that time).
+- **Wrong:** `FileAppend` for files that other processes may read. Discarding a line on error or retrying in a blocking loop.
+- **Right:** `FileOpen(path, "a", "UTF-8-RAW")` without `-rwd` flags (shares read and write), and on sharing errors (5, 32, 33) leave the operation at the head of the queue: `WriteQueue` executes it again via timer (`retry`, `retryMs`, `retryDelayMs`), the order is kept, the message loop runs between attempts. After 3 s: reply `busy`, counter `logLinesLost` and a self-log entry `log line lost: ...`. One operation per file, so that a retry never writes the other file twice.
+- **Status:** verified. Before the fix 3 of 3 runs red (only 30 to 40 of 120 lines per source). Afterwards 6 of 6 runs green after the last test correction (tests `test_no_log_line_is_lost_while_other_processes_hold_the_files` in both variants and `test_a_log_line_that_cannot_be_written_is_reported_in_the_own_log`). Before that, two red runs that were due to the test (race: `Log.txt` is complete before `Log_<source>.txt`, the test only waited for the first file), fixed. Full run: 406 passed, 1 skipped.
+- **Source:** `src/storage/LogSink.ahk` (`AppendTo`), `src/storage/WriteQueue.ahk` (`RunOne`), `src/storage/Storage.ahk` (`_EnqueueLog`), `tests/integration/test_storage.py`, `tests/ahk/storage_queue.test.ahk`
 
-- **Problem:** Unter Last fehlten im Logfile Zeilen. Beobachtet wurde `OSError (6) Das Handle ist ungültig`, sobald ein anderer Prozess (Testleser, Editor, Virenscanner) die Datei offen hatte. Die Zeile ging still verloren.
-- **Ursache (verifiziert):** `FileAppend` öffnet die Datei ohne Freigabe. Sobald irgendein anderer Prozess ein Handle auf die Datei hat, auch ein reiner Lesezugriff mit `FILE_SHARE_READ|WRITE`, wirft `FileAppend` `OSError (32)` (Sharing-Verletzung). Es gab keinen Wiederholversuch. Probe im Scratchpad: `CreateFileW` mit Freigabe 0, 1, 3, 7 hält die Datei, danach scheitert `FileAppend` jedes Mal mit 32. `FileGetSize` und `FileExist` gehen, `FileMove` geht nicht immer. Die Fehlernummer 6 aus dem ersten Fund ließ sich nicht erneut erzeugen: nicht geprüft, woher sie stammt (vermutet: veralteter `A_LastError` oder Fehler im damaligen Pfad).
-- **Falsch:** `FileAppend` für Dateien, die andere Prozesse lesen dürfen. Eine Zeile bei Fehler verwerfen oder blockierend in einer Schleife wiederholen.
-- **Richtig:** `FileOpen(pfad, "a", "UTF-8-RAW")` ohne `-rwd`-Flags (teilt Lesen und Schreiben) und bei Sharing-Fehlern (5, 32, 33) den Vorgang im Queue-Kopf lassen: `WriteQueue` führt ihn per Timer erneut aus (`retry`, `retryMs`, `retryDelayMs`), die Reihenfolge bleibt, die Nachrichtenschleife läuft zwischen den Versuchen. Nach 3 s: Antwort `busy`, Zähler `logLinesLost` und ein Selbstlog-Eintrag `log line lost: ...`. Eine Operation je Datei, damit eine Wiederholung nie die andere Datei doppelt beschreibt.
-- **Status:** verifiziert. Vor der Behebung 3 von 3 Läufen rot (nur 30 bis 40 von 120 Zeilen je Quelle). Danach 6 von 6 Läufen grün nach der letzten Testkorrektur (Tests `test_no_log_line_is_lost_while_other_processes_hold_the_files` in beiden Varianten und `test_a_log_line_that_cannot_be_written_is_reported_in_the_own_log`). Davor zwei rote Läufe, die am Test lagen (Race: `Log.txt` ist vor `Log_<Quelle>.txt` vollständig, der Test wartete nur auf die erste Datei), behoben. Gesamtlauf: 406 passed, 1 skipped.
-- **Quelle:** `src/storage/LogSink.ahk` (`AppendTo`), `src/storage/WriteQueue.ahk` (`RunOne`), `src/storage/Storage.ahk` (`_EnqueueLog`), `tests/integration/test_storage.py`, `tests/ahk/storage_queue.test.ahk`
+### Boolean replies as numbers (stub, superseded by WI-26)
 
-### Boolesche Antworten als Zahl (Stub, überholt durch WI-26)
+- **Problem:** According to the protocol, `cancel` should be a bool. The Json module wrote `true` as `1`.
+- **Right (since WI-26):** The stub sends `cancel` with `Json.Bool(...)` as `true`/`false`. The receiver still reads `1`/`0` (see "Boolean values go onto the wire as numbers").
+- **Status:** verified (test `test_cancelled_exit_is_answered_and_nothing_stops` checks `cancel is True`)
 
-- **Problem:** `cancel` soll laut Protokoll ein Bool sein. Der Json-Baustein schrieb `true` als `1`.
-- **Richtig (seit WI-26):** Der Stub sendet `cancel` mit `Json.Bool(...)` als `true`/`false`. Der Empfänger liest weiter `1`/`0` (siehe „Wahrheitswerte gehen als Zahl auf die Leitung“).
-- **Status:** verifiziert (Test `test_cancelled_exit_is_answered_and_nothing_stops` prüft `cancel is True`)
+### Connection object is never released: reference cycle via `ObjBindMethod(this, ...)` (F-07)
 
-### Verbindungsobjekt wird nie freigegeben: Referenzzyklus über `ObjBindMethod(this, ...)` (F-07)
+- **Problem:** The supervisor grew by about 83 KB per client connection (400 connections: 25 → 58 MB), although `num_handles` stayed constant. AHK v2 counts references: `this._pollFn := ObjBindMethod(this, "Pump")` in `PipeConnection.__New` is a cycle (object → bound function → object). The closed object with its 64 KiB read buffer (`_readBuf`) and the frame buffer of the `FrameReader` is never released.
+- **Wrong:** Checking only `num_handles`. Closing an object that holds bound functions of itself in its fields without clearing the fields.
+- **Right:** Break the cycle when closing. Trial run: in `PipeConnection._NotifyClose`, after the `OnClose` handler, `this._pollFn := ""` and `this._notifyFn := ""`. Afterwards 17.47 → 17.49 MB after 800 connections (before +16 MB per 200), and all 133 tests of `tests/integration` and `tests/e2e` stayed green. Adopted in 4f566bb (`_pollFn` cleared in `_Teardown` after `SetTimer(fn, 0)`, `_notifyFn` at the start of `_NotifyClose`); the test `test_many_connects_keep_the_memory_of_the_supervisor_flat` is green (17.46 → 17.46 MB). The fields remain, because `SetTimer(fn, 0)` needs the same function object to switch off; a freshly bound object would not find the timer. The same applies to reconnects in the `Peer` (300 reconnects: 16.6 → 47.9 MB before, 14.66 → 14.63 MB afterwards). The same pattern (`ObjBindMethod(this, ...)` in a field) also exists in other classes: not searched, not checked.
+- **General:** Closures such as `() => this._X()` in fields of the same object are the same cycle. For `Peer` this is harmless (the peer lives as long as the process; the connection only holds references to the peer, not the other way round, once `_conn` is cleared).
+- **Status:** verified (measurement before and after the fix, tests green). Other classes with `ObjBindMethod(this, ...)` in fields (search: `ExecContext`, `Executor`, `WorkerBridge`, `Engine`) were only read, not measured for leaks.
+- **Source:** `src/core/ipc/PipeConnection.ahk` (`__New`, `_NotifyClose`), `tests/stress/test_clients_churn.py`
 
-- **Problem:** Der Supervisor wuchs um rund 83 KB je Client-Verbindung (400 Verbindungen: 25 → 58 MB), obwohl `num_handles` konstant blieb. AHK v2 zählt Verweise: `this._pollFn := ObjBindMethod(this, "Pump")` in `PipeConnection.__New` ist ein Zyklus (Objekt → gebundene Funktion → Objekt). Das geschlossene Objekt mit seinem 64-KiB-Lesepuffer (`_readBuf`) und dem Rahmenpuffer des `FrameReader` wird nie freigegeben.
-- **Falsch:** Auf `num_handles` allein prüfen. Ein Objekt, das gebundene Funktionen von sich selbst in Feldern hält, schliessen, ohne die Felder zu leeren.
-- **Richtig:** Zyklus beim Schliessen brechen. Probelauf: in `PipeConnection._NotifyClose` nach dem `OnClose`-Handler `this._pollFn := ""` und `this._notifyFn := ""`. Danach 17,47 → 17,49 MB nach 800 Verbindungen (vorher +16 MB je 200), und alle 133 Tests von `tests/integration` und `tests/e2e` blieben grün. Übernommen in 4f566bb (`_pollFn` in `_Teardown` nach `SetTimer(fn, 0)` geleert, `_notifyFn` am Anfang von `_NotifyClose`); der Test `test_many_connects_keep_the_memory_of_the_supervisor_flat` ist grün (17,46 → 17,46 MB). Die Felder bleiben, weil `SetTimer(fn, 0)` dasselbe Funktionsobjekt zum Abschalten braucht; ein frisch gebundenes Objekt würde den Timer nicht finden. Gilt genauso für Wiederverbindungen im `Peer` (300 Reconnects: 16,6 → 47,9 MB vorher, 14,66 → 14,63 MB nachher). Dieselbe Bauart (`ObjBindMethod(this, ...)` in einem Feld) steht auch in anderen Klassen: nicht gesucht, nicht geprüft.
-- **Allgemein:** Closures wie `() => this._X()` in Feldern desselben Objekts sind derselbe Zyklus. Bei `Peer` ist das unkritisch (der Peer lebt so lange wie der Prozess; die Verbindung hält nur Verweise auf den Peer, nicht umgekehrt, sobald `_conn` geleert ist).
-- **Status:** verifiziert (Messung vor und nach der Korrektur, Tests grün). Andere Klassen mit `ObjBindMethod(this, ...)` in Feldern (Suche: `ExecContext`, `Executor`, `WorkerBridge`, `Engine`) wurden nur gelesen, nicht auf Lecks gemessen.
-- **Quelle:** `src/core/ipc/PipeConnection.ahk` (`__New`, `_NotifyClose`), `tests/stress/test_clients_churn.py`
+### The process state `ready` does not mean that the engine has loaded its flows
 
-### Der Prozessstatus `ready` heisst nicht, dass die Engine ihre Flows geladen hat
+- **Problem:** `cmd.flow.start` shortly after `ready` in `cmd.process.list` answered `not_found` ("flow 'slow' is not loaded"). `ready` only means that the role has sent `sys.hello`; the engine loads its flows afterwards via storage (`evt.engine.ready`).
+- **Right:** After `ready`, repeat `cmd.engine.snapshot` until the flows appear in `flows` (`StressChain.wait_flows`).
+- **Status:** verified (test was red, green afterwards)
+- **Source:** `tests/stress/stresskit.py`
 
-- **Problem:** `cmd.flow.start` kurz nach `ready` in `cmd.process.list` antwortete `not_found` ("flow 'slow' is not loaded"). `ready` bedeutet nur, dass die Rolle `sys.hello` gesendet hat; die Engine lädt ihre Flows danach über den Storage (`evt.engine.ready`).
-- **Richtig:** Nach `ready` `cmd.engine.snapshot` wiederholen, bis die Flows in `flows` stehen (`StressChain.wait_flows`).
-- **Status:** verifiziert (Test war rot, danach grün)
-- **Quelle:** `tests/stress/stresskit.py`
+### Storage writes the log at about 30 lines per second (F-08, fixed in WI-25)
 
-### Storage schreibt das Log mit rund 30 Zeilen je Sekunde (F-08, behoben in WI-25)
+- **Problem:** The manager stub writes every engine event via storage into the log (two files). `WriteQueue` executed one operation per timer run (`SetTimer(..., -1)`, resolution about 15.6 ms), per log line two operations with open, size query and close: 28 lines/s measured. At 290 events/s the storage grew from 17 to 56 MB in 20 s and kept writing for 207 s. In addition, requests and log lines sat in one queue, so requests waited behind the backlog.
+- **Wrong:** Executing one operation per timer run when the operations are small; appending log lines one by one; putting requests and log into the same queue.
+- **Right:** Two queues (requests first), per run a time budget (10 ms) instead of one operation, lines per file batched into one bundle (open and close once), upper limit with a counter. Measured after the rework: 1493 lines/s sent over 10 s, marker written 0.1 s after the last line; 12000 lines in a burst at more than 3000 lines/s (limited by the sender); flood with 362 events/s: log complete 1 s after the end (before 207 s), RSS 17.6 to 18.1 MB.
+- **Status:** verified (`tests/stress/test_log_backlog.py`, `tests/integration/test_storage.py`); the upper limit of the time budget (10 ms) is justified, not measured against other values.
+- **Source:** `src/storage/WriteQueue.ahk`, `src/storage/Storage.ahk`
 
-- **Problem:** Der Manager-Stub schreibt jedes Engine-Ereignis über den Storage ins Log (zwei Dateien). `WriteQueue` führte eine Operation je Timer aus (`SetTimer(..., -1)`, Auflösung rund 15,6 ms), je Logzeile zwei Operationen mit Öffnen, Größenabfrage und Schließen: 28 Zeilen/s gemessen. Bei 290 Ereignissen/s wuchs der Storage in 20 s von 17 auf 56 MB und schrieb 207 s nach. Zusätzlich lagen Anfragen und Logzeilen in einer Warteschlange, Anfragen warteten also hinter dem Rückstau.
-- **Falsch:** Eine Operation je Timer-Lauf ausführen, wenn die Operationen klein sind; Logzeilen einzeln anhängen; Anfragen und Log in dieselbe Warteschlange legen.
-- **Richtig:** Zwei Warteschlangen (Anfragen zuerst), je Lauf ein Zeitbudget (10 ms) statt einer Operation, Zeilen je Datei zu einem Bündel zusammenfassen (einmal öffnen und schließen), Obergrenze mit Zähler. Gemessen nach dem Umbau: 1493 Zeilen/s über 10 s gesendet, Marker 0,1 s nach der letzten Zeile geschrieben; 12000 Zeilen im Stoß mit mehr als 3000 Zeilen/s (durch den Sender begrenzt); Flut mit 362 Ereignissen/s: Log 1 s nach dem Ende vollständig (vorher 207 s), RSS 17,6 auf 18,1 MB.
-- **Status:** verifiziert (`tests/stress/test_log_backlog.py`, `tests/integration/test_storage.py`); die Obergrenze des Zeitbudgets (10 ms) ist begründet, nicht gegen andere Werte gemessen.
-- **Quelle:** `src/storage/WriteQueue.ahk`, `src/storage/Storage.ahk`
+### Does the process still exist? `OpenProcess` and error 87 (WI-25)
 
-### Prozess existiert noch? `OpenProcess` und Fehler 87 (WI-25)
+- **Problem:** At startup, temp files (`*.ahf-<pid>.tmp`) of dead processes should be deleted, but not those of a running process.
+- **Right:** `OpenProcess(SYNCHRONIZE, 0, pid)`: handle 0 with `A_LastError` 87 (`ERROR_INVALID_PARAMETER`) means there is no process with this number. Other errors (for example 5, access denied) are counted as "running", so that nothing is ever deleted on suspicion. With a handle: `WaitForSingleObject(h, 0)` returns `0x102` (WAIT_TIMEOUT) as long as the process runs. A reused PID can keep an old temp file alive (harmless, the file is never read).
+- **Status:** verified for dead and live PID (test `test_temp_files_of_dead_processes_are_removed_at_start_and_those_of_live_ones_stay`); access denied not checked.
+- **Source:** `src/storage/AtomicFile.ahk`
 
-- **Problem:** Beim Start sollen Temp-Dateien (`*.ahf-<pid>.tmp`) toter Prozesse gelöscht werden, die eines laufenden nicht.
-- **Richtig:** `OpenProcess(SYNCHRONIZE, 0, pid)`: Handle 0 mit `A_LastError` 87 (`ERROR_INVALID_PARAMETER`) heißt, es gibt keinen Prozess mit dieser Nummer. Andere Fehler (zum Beispiel 5, Zugriff verweigert) werden als "läuft" gewertet, damit nie auf einen Verdacht gelöscht wird. Mit Handle: `WaitForSingleObject(h, 0)` gibt `0x102` (WAIT_TIMEOUT), solange der Prozess läuft. Eine wiederverwendete PID kann eine alte Temp-Datei am Leben halten (harmlos, die Datei wird nie gelesen).
-- **Status:** verifiziert für tote und lebende PID (Test `test_temp_files_of_dead_processes_are_removed_at_start_and_those_of_live_ones_stay`); Zugriff verweigert nicht geprüft.
-- **Quelle:** `src/storage/AtomicFile.ahk`
+### `FlushFileBuffers` on the handle of a `FileOpen` file (WI-25)
 
-### `FlushFileBuffers` auf dem Handle einer `FileOpen`-Datei (WI-25)
+- **Problem:** Before `MoveFileExW`, the temp file was only closed, not forced to disk; on a power failure the rename can land before the data.
+- **Right:** `DllCall("FlushFileBuffers", "Ptr", file.Handle, "Int")` after `Write`, before `Close`. `file.Handle` is the Windows handle of the `FileOpen` file. A return value of 0 is treated as an error (the old file stays).
+- **Status:** verified that writing and replacing still work (all tests for atomic writing); that the data is actually on disk before the rename in a power failure cannot be checked (not checked).
+- **Source:** `src/storage/AtomicFile.ahk`
 
-- **Problem:** Die Temp-Datei wurde vor `MoveFileExW` nur geschlossen, nicht auf die Platte gezwungen; bei Stromausfall kann die Umbenennung vor den Daten landen.
-- **Richtig:** `DllCall("FlushFileBuffers", "Ptr", file.Handle, "Int")` nach `Write`, vor `Close`. `file.Handle` ist das Windows-Handle der `FileOpen`-Datei. Ein Rückgabewert 0 wird als Fehler behandelt (die alte Datei bleibt).
-- **Status:** verifiziert, dass Schreiben und Ersetzen weiter funktionieren (alle Tests zum atomaren Schreiben); dass die Daten bei Stromausfall tatsächlich vor der Umbenennung auf der Platte sind, ist nicht prüfbar (nicht geprüft).
-- **Quelle:** `src/storage/AtomicFile.ahk`
+### Supervisor: `sys.bye` could be read after the process had ended
 
-### Supervisor: `sys.bye` konnte nach dem Prozessende gelesen werden
+- **Problem:** Once in 6 parallel runs, `test_frozen_storage_is_terminated_at_the_deadline_and_the_others_exit_clean` reported that the manager had not ended cleanly (`clean` false). The role sends `sys.bye` and ends itself; the supervisor's tick could see the process end before it had read the still unread `sys.bye` from the pipe.
+- **Right:** `Supervisor._Tick` calls `hub.Pump()` first, then `children.Tick`. Not reproduced (only occurred under load), the order in the code was read.
+- **Status:** order verified (read); that this was the cause of the failure is assumed. **Not sufficient (WI-30):** see "Re-entry lock makes 'pump first' ineffective" and "Close discards the queue"; since WI-30 the assessment waits for the end of the connection.
+- **Source:** `src/supervisor/Supervisor.ahk`
 
-- **Problem:** Einmal in 6 parallelen Läufen meldete `test_frozen_storage_is_terminated_at_the_deadline_and_the_others_exit_clean`, der Manager sei nicht sauber beendet (`clean` falsch). Die Rolle sendet `sys.bye` und beendet sich; der Tick des Supervisors konnte das Prozessende sehen, bevor er das noch ungelesene `sys.bye` aus der Pipe gelesen hatte.
-- **Richtig:** `Supervisor._Tick` ruft zuerst `hub.Pump()` auf, dann `children.Tick`. Nicht nachgestellt (nur unter Last aufgetreten), die Reihenfolge im Code ist gelesen.
-- **Status:** Reihenfolge verifiziert (gelesen); dass dies die Ursache des Ausfalls war, ist vermutet. **Nicht ausreichend (WI-30):** siehe "Sperre gegen Wiedereintritt macht 'erst pumpen' wirkungslos" und "Close verwirft die Warteschlange"; seit WI-30 wartet die Bewertung auf das Ende der Verbindung.
-- **Quelle:** `src/supervisor/Supervisor.ahk`
+### The supervisor stands still: timestamps of the children are all outdated afterwards (WI-22)
 
-### Der Supervisor steht still: Zeitstempel der Kinder sind danach alle veraltet (WI-22)
+- **Problem:** `Heartbeat.Tick` compared `now - lastPongAt` with the pong deadline. If the supervisor itself stood still for longer (process frozen, standby, large backlog), all healthy children at once counted as hanging and were terminated. Reproduced: freeze the supervisor with `psutil.suspend()` for 8 s, then `resume()`: `evt.process.hung` and `crashed` for `storage`, `engine`, `manager`.
+- **Right:** The heartbeat records the time of the last tick. If the gap is larger than `PING_EVERY_MS` (2 s), the pong, ping and start deadlines of all children begin anew at "now" (`Children.ResetLiveness`). A child that really hangs is found one pong deadline later. A standstill before the first tick also counts (`Heartbeat.Arm` at the start of the timer; without it the comparison value is missing, noticed only under parallel load). The children do not give up themselves during the freeze: their orphan guard only triggers on a broken pipe, and a pipe to a frozen process stays open.
+- **Status:** verified (freeze 8 s: `tests/fault/test_supervisor_stall.py`; deadlines deterministic: `tests/ahk/supervisor_tick.test.ahk`). Standby/hibernation not checked; whether `QueryPerformanceCounter` keeps counting there: assumed.
+- **Source:** `src/supervisor/Heartbeat.ahk`, `src/supervisor/Children.ahk`
 
-- **Problem:** `Heartbeat.Tick` verglich `now - lastPongAt` mit der Pong-Frist. War der Supervisor selbst länger still (Prozess eingefroren, Standby, großer Rückstau), galten alle gesunden Kinder auf einen Schlag als hängend und wurden beendet. Reproduziert: Supervisor mit `psutil.suspend()` 8 s einfrieren, dann `resume()`: `evt.process.hung` und `crashed` für `storage`, `engine`, `manager`.
-- **Richtig:** Der Heartbeat merkt sich den Zeitpunkt des letzten Ticks. Ist die Lücke größer als `PING_EVERY_MS` (2 s), beginnen Pong-, Ping- und Startfristen aller Kinder neu bei "jetzt" (`Children.ResetLiveness`). Ein wirklich hängendes Kind wird eine Pong-Frist später gefunden. Auch ein Stillstand vor dem ersten Tick zählt (`Heartbeat.Arm` beim Start des Timers; ohne das fehlt der Vergleichswert, aufgefallen nur unter Parallellast). Die Kinder geben in der Einfrierzeit nicht selbst auf: Ihr Orphan-Guard greift nur bei gebrochener Pipe, und eine Pipe zu einem eingefrorenen Prozess bleibt offen.
-- **Status:** verifiziert (Einfrieren 8 s: `tests/fault/test_supervisor_stall.py`; Fristen deterministisch: `tests/ahk/supervisor_tick.test.ahk`). Standby/Ruhezustand nicht geprüft, ob `QueryPerformanceCounter` dort weiterzählt: vermutet.
-- **Quelle:** `src/supervisor/Heartbeat.ahk`, `src/supervisor/Children.ahk`
+### Pipe names are machine-wide, mutexes apply per Windows session (WI-22)
 
-### Pipe-Namen sind maschinenweit, Mutexe gelten je Windows-Sitzung (WI-22)
+- **Problem:** With two signed-in users, the second one does not find the mutex of the first (own namespace), but wants to serve the same pipe `ahf.<session>.hub` and fails on `FILE_FLAG_FIRST_PIPE_INSTANCE`.
+- **Right:** Build the pipe name from the Windows session ID (`ProcessIdToSessionId`) and a hash of the user SID (`PipeNames.Hub`), mutex explicitly `Local\...`. A Python twin (`tests/support/pipenames.py`) delivers the same name for the tests.
+- **Status:** name building and "foreign pipe with the old name does not block" verified (`test_supervisor.py`); the mutex is found in `Local\` (verified). **Second Windows user not checked** (not possible in this environment). Standard security descriptor of a pipe (read access for everyone) read, not checked.
+- **Source:** `src/core/PipeNames.ahk`
 
-- **Problem:** Bei zwei angemeldeten Benutzern findet der zweite den Mutex des ersten nicht (eigener Namensraum), will aber dieselbe Pipe `ahf.<session>.hub` bedienen und scheitert an `FILE_FLAG_FIRST_PIPE_INSTANCE`.
-- **Richtig:** Pipe-Name aus Windows-Sitzungs-ID (`ProcessIdToSessionId`) und Hash der Benutzer-SID bilden (`PipeNames.Hub`), Mutex ausdrücklich `Local\...`. Ein Python-Zwilling (`tests/support/pipenames.py`) liefert den gleichen Namen für die Tests.
-- **Status:** Namensbildung und "fremde Pipe mit altem Namen blockiert nicht" verifiziert (`test_supervisor.py`); der Mutex wird in `Local\` gefunden (verifiziert). **Zweiter Windows-Benutzer nicht geprüft** (in dieser Umgebung nicht möglich). Standard-Sicherheitsbeschreibung einer Pipe (Lesezugriff für alle) gelesen, nicht geprüft.
-- **Quelle:** `src/core/PipeNames.ahk`
+### CreateProcessW with redirected handles instead of Run (WI-23)
 
-### CreateProcessW mit umgeleiteten Handles statt Run (WI-23)
+- **Problem:** `Run()` starts a process without usable stderr. Load errors (`/ErrorStdOut`), the messages of `Role.Console` and the last words before a crash were lost; the supervisor only saw the exit code (F-05).
+- **Right:** `CreateProcessW` via `DllCall` (`src/supervisor/ChildLauncher.ahk`):
+  - `CreatePipe` with `SECURITY_ATTRIBUTES` (24 bytes, `bInheritHandle` at offset 16 = 1), then `SetHandleInformation(hRead, HANDLE_FLAG_INHERIT, 0)`: only the write end is inherited. Choose a large pipe buffer (256 KB), otherwise the child blocks on writing if the supervisor reads only every 200 ms.
+  - `STARTUPINFOEXW` (64 bit: 112 bytes): `cb` at offset 0, `dwFlags` 60 (`STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES`), `wShowWindow` 64 (0 = `SW_HIDE`), `hStdInput` 80, `hStdOutput` 88, `hStdError` 96, `lpAttributeList` 104. `PROCESS_INFORMATION` (24 bytes): `hProcess` 0, `hThread` 8, `dwProcessId` 16.
+  - Inheritance to exactly the needed handles: `InitializeProcThreadAttributeList` (first call with `ptr 0`, returns the size and fails deliberately), `UpdateProcThreadAttribute` with `PROC_THREAD_ATTRIBUTE_HANDLE_LIST` (0x20002) and the handle array, `EXTENDED_STARTUPINFO_PRESENT` (0x80000) in the flags, `bInheritHandles` = 1. Without the list the child inherits **every** inheritable handle of the supervisor.
+  - The command line must be a writable `Buffer` (`StrPut`), since `CreateProcessW` may write into it.
+  - Afterwards in the supervisor close `hWrite`, `NUL` and the thread handle, otherwise there is never EOF and handles pile up. The process handle from `CreateProcessW` has all rights (no `OpenProcess` anymore).
+  - Read without blocking: `PeekNamedPipe` reports the available bytes, `ReadFile` takes exactly that many. A broken pipe (write end closed) makes `PeekNamedPipe` fail. Split lines at byte `0x0A`, only then decode as UTF-8 (a character may be split between two reads).
+- **Pitfalls:** `NumPut("ptr", buffer, ...)` with a `Buffer` object throws "Invalid parameter(s)", it needs `buffer.Ptr` (in `DllCall` the object may be passed). `StrGet(address, length, "UTF-8")` counts the length in bytes of the source (checked with umlauts and `U+2713`).
+- **Status:** verified (`tests/ahk/child_launcher.test.ahk`: stdout and stderr, NUL as stdin, exit code, 40 starts without handle growth, failed start without leak, UTF-8 characters across read boundaries; `tests/fault/test_diagnose.py`: 50 restarts, supervisor handles 179 and 179). **Not checked:** that a child really inherits no other handles (there is no simple way to read the handle table of a foreign process from the test); the hub pipe is additionally not inheritable (`CreateNamedPipeW` without `SECURITY_ATTRIBUTES`) [read].
+- **Source:** `src/supervisor/ChildLauncher.ahk`, `src/supervisor/ChildPipe.ahk`
 
-- **Problem:** `Run()` startet einen Prozess ohne brauchbares stderr. Ladefehler (`/ErrorStdOut`), die Meldungen von `Role.Console` und die letzten Worte vor einem Absturz gingen verloren, der Supervisor sah nur den Exit-Code (F-05).
-- **Richtig:** `CreateProcessW` per `DllCall` (`src/supervisor/ChildLauncher.ahk`):
-  - `CreatePipe` mit `SECURITY_ATTRIBUTES` (24 Byte, `bInheritHandle` bei Offset 16 = 1), danach `SetHandleInformation(hRead, HANDLE_FLAG_INHERIT, 0)`: nur das Schreibende wird vererbt. Pipe-Puffer groß wählen (256 KB), sonst blockiert das Kind im Schreiben, wenn der Supervisor nur alle 200 ms liest.
-  - `STARTUPINFOEXW` (64 Bit: 112 Byte): `cb` Offset 0, `dwFlags` 60 (`STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES`), `wShowWindow` 64 (0 = `SW_HIDE`), `hStdInput` 80, `hStdOutput` 88, `hStdError` 96, `lpAttributeList` 104. `PROCESS_INFORMATION` (24 Byte): `hProcess` 0, `hThread` 8, `dwProcessId` 16.
-  - Vererbung auf genau die nötigen Handles: `InitializeProcThreadAttributeList` (erst mit `ptr 0` aufrufen, liefert die Größe und scheitert absichtlich), `UpdateProcThreadAttribute` mit `PROC_THREAD_ATTRIBUTE_HANDLE_LIST` (0x20002) und dem Handle-Array, `EXTENDED_STARTUPINFO_PRESENT` (0x80000) in den Flags, `bInheritHandles` = 1. Ohne die Liste erbt das Kind **jedes** vererbbare Handle des Supervisors.
-  - Die Kommandozeile muss ein beschreibbarer `Buffer` sein (`StrPut`), `CreateProcessW` darf in sie schreiben.
-  - Danach im Supervisor `hWrite`, `NUL` und das Thread-Handle schließen, sonst gibt es nie EOF und Handles laufen auf. Das Prozess-Handle von `CreateProcessW` hat alle Rechte (kein `OpenProcess` mehr).
-  - Lesen ohne Blockieren: `PeekNamedPipe` meldet die verfügbaren Bytes, `ReadFile` nimmt genau so viele. Eine abgebrochene Pipe (Schreibende zu) lässt `PeekNamedPipe` scheitern. Zeilen an Byte `0x0A` trennen, erst dann als UTF-8 dekodieren (ein Zeichen kann zwischen zwei Lesevorgängen geteilt sein).
-- **Fallen:** `NumPut("ptr", buffer, ...)` mit einem `Buffer`-Objekt wirft "Invalid parameter(s)", es braucht `buffer.Ptr` (in `DllCall` dagegen darf das Objekt stehen). `StrGet(adresse, länge, "UTF-8")` zählt die Länge in Bytes der Quelle (geprüft mit Umlauten und `U+2713`).
-- **Status:** verifiziert (`tests/ahk/child_launcher.test.ahk`: stdout und stderr, NUL als stdin, Exit-Code, 40 Starts ohne Handle-Zuwachs, fehlgeschlagener Start ohne Leck, UTF-8-Zeichen über Lesegrenzen; `tests/fault/test_diagnose.py`: 50 Neustarts, Handles des Supervisors 179 und 179). **Nicht geprüft:** dass ein Kind wirklich keine anderen Handles erbt (es gibt keinen einfachen Weg, die Handle-Tabelle eines fremden Prozesses aus dem Test zu lesen); die Hub-Pipe ist zusätzlich nicht vererbbar (`CreateNamedPipeW` ohne `SECURITY_ATTRIBUTES`) [gelesen].
-- **Quelle:** `src/supervisor/ChildLauncher.ahk`, `src/supervisor/ChildPipe.ahk`
+### Read the header fields of a JSON frame with a regex, check the payload only for brackets (WI-24)
 
-### Kopffelder eines JSON-Rahmens mit einem RegEx lesen, Nutzlast nur auf Klammern prüfen (WI-24)
+- **Problem:** The hub parsed every frame completely (`Json.Parse`, new `Message`, `Serialize`): 220 ms for 109,232 characters. It only needs `to` and must replace `from`.
+- **Wrong:** Parsing the whole frame "because then one also checks it". Or reading only the start (`Message.ReadTo`) and appending the rest unchecked: then a second `"from"` could follow the payload, which a parser with "last key wins" would prefer, and the sender would be forged.
+- **Right:** A single `RegExMatch` on the text in exactly the form of `Message.Serialize` (header fields in fixed order, no whitespace), which captures the payload as a balanced object with PCRE recursion and ends with `\}\z`: `(?<obj>\{(?:[^{}"]++|"(?:[^"\\]++|\\.)*+"|(?&obj))*+\})\}\z`. Possessive quantifiers (`++`, `*+`) prevent backtracking. If nothing matches (different structure, whitespace, text after the payload), `ParseHead` returns `""` and the caller takes the old, complete path. Set the regex in `try` (compilation and boundary errors throw). Cost: 1.3 ms for 109,232 characters. The new frame text is assembled by `SubStr`: `{"to":<raw>` + `,"from":` + new + rest from `,"id"`.
+- **Pitfall (heredoc):** When writing the source via a shell heredoc or `python - <<EOF`, `\\` became `\`, and the regex failed to compile with "missing terminating ] for character class". Write the file with the editor tool (see AGENTS.md).
+- **Status:** verified (`tests/ahk/message.test.ahk`, cases `ParseHead`/`WithFrom`; `tests/stress/test_big_flows.py`; frame with text behind the payload is rejected). Behavior with very deeply nested payloads (PCRE recursion limit) **not checked**; then the regex would give an error or no match and the full path would apply.
+- **Source:** `src/core/ipc/Message.ahk`, `src/supervisor/Hub.ahk`
 
-- **Problem:** Der Hub parste jeden Rahmen vollständig (`Json.Parse`, neue `Message`, `Serialize`): 220 ms für 109.232 Zeichen. Er braucht nur `to` und muss `from` ersetzen.
-- **Falsch:** Den Rahmen ganz parsen, "weil man dann auch prüft". Oder nur den Anfang lesen (`Message.ReadTo`) und den Rest ungeprüft anhängen: Dann könnte hinter der Nutzlast ein zweites `"from"` stehen, das ein Parser mit "letzter Schlüssel gewinnt" bevorzugt, und der Absender wäre gefälscht.
-- **Richtig:** Ein einziges `RegExMatch` auf den Text in genau der Form von `Message.Serialize` (Kopffelder in fester Reihenfolge, kein Leerraum), das die Nutzlast als ausgeglichenes Objekt mit PCRE-Rekursion erfasst und mit `\}\z` endet: `(?<obj>\{(?:[^{}"]++|"(?:[^"\\]++|\\.)*+"|(?&obj))*+\})\}\z`. Possessive Quantoren (`++`, `*+`) verhindern Backtracking. Passt nichts (anderer Aufbau, Leerraum, Text hinter der Nutzlast), liefert `ParseHead` `""` und der Aufrufer nimmt den alten, vollständigen Weg. Das RegEx in `try` setzen (Übersetzungs- und Grenzfehler werfen). Kosten: 1,3 ms für 109.232 Zeichen. Den neuen Rahmentext baut `SubStr` zusammen: `{"to":<roh>` + `,"from":` + neu + Rest ab `,"id"`.
-- **Falle (Heredoc):** Beim Schreiben der Quelle über ein Shell-Heredoc oder `python - <<EOF` wurde `\\` zu `\`, das RegEx scheiterte beim Übersetzen mit "missing terminating ] for character class". Die Datei mit dem Editor-Werkzeug schreiben (siehe AGENTS.md).
-- **Status:** verifiziert (`tests/ahk/message.test.ahk`, Fälle `ParseHead`/`WithFrom`; `tests/stress/test_big_flows.py`; Rahmen mit Text hinter der Nutzlast wird abgelehnt). Verhalten bei sehr tief verschachtelten Nutzlasten (PCRE-Rekursionsgrenze) **nicht geprüft**; dann gäbe das RegEx einen Fehler oder keinen Treffer und der volle Weg griffe.
-- **Quelle:** `src/core/ipc/Message.ahk`, `src/supervisor/Hub.ahk`
+### The JSON parser needs as long for a text with many escapes as for the document itself (WI-24)
 
-### Der JSON-Parser braucht für einen Text mit vielen Escapes so lange wie für das Dokument selbst (WI-24)
+- **Problem:** A flow (92,808 characters) as a string in a message: `Message.Parse` of the frame 161 ms, then `Json.Parse` of the flow text 143 ms. The string has many `\"` and is unpacked character by character. The engine thus pays twice for every flow file (plus 55 ms `Json.Stringify` in storage).
+- **Wrong:** Assuming a long string is cheap because it is "only one value".
+- **Right:** Measured, not fixed. Possible paths (not implemented): do not send the flow text as a string (payload as an object, then parse only once), or let the engine read the file directly (violates "files only in storage"), or a faster parser (question "native JSON parser", WI-24 point 6).
+- **Status:** verified (measurement with `tools/ahkrun.py`, 5 runs, mean; `work_items/phase2b/WI-24-hub-routing-laden.md`)
+- **Source:** `src/core/Json.ahk`
 
-- **Problem:** Ein Flow (92.808 Zeichen) als Zeichenkette in einer Nachricht: `Message.Parse` des Rahmens 161 ms, danach `Json.Parse` des Flow-Texts 143 ms. Die Zeichenkette hat viele `\"` und wird Zeichen für Zeichen entpackt. Die Engine zahlt also für jede Flow-Datei doppelt (dazu 55 ms `Json.Stringify` im Storage).
-- **Falsch:** Anzunehmen, eine lange Zeichenkette sei billig, weil sie "nur ein Wert" ist.
-- **Richtig:** Gemessen, nicht behoben. Mögliche Wege (nicht umgesetzt): Flow-Text nicht als Zeichenkette senden (Nutzlast als Objekt, dann nur einmal parsen), oder die Datei direkt von der Engine lesen lassen (verletzt "Dateien nur im Storage"), oder ein schnellerer Parser (Frage "nativer JSON-Parser", WI-24 Punkt 6).
-- **Status:** verifiziert (Messung mit `tools/ahkrun.py`, 5 Läufe, Mittel; `work_items/phase2b/WI-24-hub-routing-laden.md`)
-- **Quelle:** `src/core/Json.ahk`
+### Worker busy reporting: the worker, before the start of the element
 
-### Worker beschäftigt melden: der Worker, vor dem Start des Elements
+- **Problem:** A worker that blocks in one call for longer than 6 s (download, COM, `DllCall`) does not answer pings and was terminated as hanging (decision "no tolerance" from WI-11).
+- **Wrong:** The engine reports the start of the job to the supervisor. Two connections (engine → worker, engine → supervisor) are not ordered, and the engine can die between the messages.
+- **Right:** The worker sends `sys.busy {busy: true}` in the handler of `cmd.worker.run`, before the element starts (it only starts via a timer, after the reply), and `busy: false` at the end of the job. The supervisor does not ping a busy worker and does not evaluate a pong. The boolean field `busy` is in `BOOL_FIELDS` and `WIRE_BOOL_RE` (WI-26).
+- **Status:** verified (`test_worker_that_blocks_longer_than_the_pong_timeout_is_not_hung_while_it_has_a_job`, 7.5 s blockade; `test_a_worker_that_blocks_longer_than_6_s_is_not_hung_and_the_element_ends_normal`)
+- **Source:** `src/worker/Worker.ahk` (`_CmdRun`, `_SendDone`), `src/supervisor/Heartbeat.ahk`
 
-- **Problem:** Ein Worker, der in einem Aufruf länger als 6 s blockiert (Download, COM, `DllCall`), beantwortet keine Pings und wurde als hängend beendet (Entscheidung "keine Toleranz" aus WI-11).
-- **Falsch:** Die Engine meldet dem Supervisor den Jobbeginn. Zwei Verbindungen (Engine → Worker, Engine → Supervisor) sind nicht geordnet, und die Engine kann zwischen den Meldungen sterben.
-- **Richtig:** Der Worker sendet `sys.busy {busy: true}` im Handler von `cmd.worker.run`, vor dem Start des Elements (der startet erst über einen Timer, nach der Antwort), und `busy: false` beim Jobende. Der Supervisor pingt einen beschäftigten Worker nicht und wertet keinen Pong. Das Wahrheitsfeld `busy` steht in `BOOL_FIELDS` und `WIRE_BOOL_RE` (WI-26).
-- **Status:** verifiziert (`test_worker_that_blocks_longer_than_the_pong_timeout_is_not_hung_while_it_has_a_job`, 7,5 s Blockade; `test_a_worker_that_blocks_longer_than_6_s_is_not_hung_and_the_element_ends_normal`)
-- **Quelle:** `src/worker/Worker.ahk` (`_CmdRun`, `_SendDone`), `src/supervisor/Heartbeat.ahk`
+### Supervisor: set a child's state before `CreateProcessW`, not after
 
-### Supervisor: Zustand eines Kindes vor `CreateProcessW` setzen, nicht danach
+- **Problem:** `Children._Launch` set `rec["state"] := "starting"` only after `ChildLauncher.Start`. AHK interrupts a thread after 15 ms, the hub then processes messages, and a fast child process reports itself (`sys.hello`) before the interrupted thread has stored PID and state. `OnHello` set `ready`, then `_Launch` overwrote it with `starting`: the child was "starting" forever (hanging after 10 s). It became visible when the engine requested `cmd.process.list` and a worker start at startup and the interruption was long enough: `test_killed_engine_is_reported_restarted_and_the_others_are_untouched` failed 11 of 12 times with `-n 6`.
+- **Wrong:** After starting a process, resetting state fields that an event of the new process may already have set.
+- **Right:** Set the state before the start, after the start only PID, handle, reader and `gone`. `OnHello` takes over the PID of the link if the record does not have one yet.
+- **Status:** verified (12 of 12 green after the fix, 12 of 12 green on the state before WI-27; the race itself is not reproduced deterministically, only `OnHello` without PID is a unit test)
+- **Source:** `src/supervisor/Children.ahk` (`_Launch`, `OnHello`)
 
-- **Problem:** `Children._Launch` setzte `rec["state"] := "starting"` erst nach `ChildLauncher.Start`. AHK unterbricht einen Thread nach 15 ms, der Hub verarbeitet dann Nachrichten, und ein schneller Kind-Prozess meldet sich (`sys.hello`) schon, bevor der unterbrochene Thread Pid und Zustand speichert. `OnHello` setzte `ready`, danach überschrieb `_Launch` mit `starting`: das Kind war für immer "starting" (nach 10 s hängend). Sichtbar wurde es, als die Engine beim Start `cmd.process.list` und einen Worker-Start anforderte und die Unterbrechung lang genug wurde: `test_killed_engine_is_reported_restarted_and_the_others_are_untouched` scheiterte 11 von 12 Mal bei `-n 6`.
-- **Falsch:** Nach dem Start eines Prozesses Zustandsfelder zurücksetzen, die ein Ereignis des neuen Prozesses schon gesetzt haben kann.
-- **Richtig:** Zustand vor dem Start setzen, nach dem Start nur Pid, Handle, Reader und `gone`. `OnHello` übernimmt die Pid des Links, wenn der Datensatz noch keine hat.
-- **Status:** verifiziert (12 von 12 grün nach der Korrektur, 12 von 12 grün auf dem Stand vor WI-27; der Wettlauf selbst ist nicht deterministisch nachgestellt, nur `OnHello` ohne Pid ist ein Unit-Test)
-- **Quelle:** `src/supervisor/Children.ahk` (`_Launch`, `OnHello`)
+### Process data of the own process via DllCall (WI-28)
 
-### Prozessdaten des eigenen Prozesses per DllCall (WI-28)
+- **Problem:** The snapshot needs memory, handle count, start time and run time, without a loop and without WMI.
+- **Right:** Pseudo handle `GetCurrentProcess()` (-1) suffices for all three. `psapi\GetProcessMemoryInfo(h, buf, 72)` with `PROCESS_MEMORY_COUNTERS` on 64 bit: `cb` (uint, offset 0), `WorkingSetSize` as `uptr` at offset 16, size 72, set `cb` beforehand. `GetProcessHandleCount(h, &n)`. `GetProcessTimes(h, created, other, other, other)` with four 8-byte buffers, `NumGet(created, 0, "int64")` is the creation time as FILETIME (100 ns since 1601). Conversion into an AHK timestamp: `DateAdd("16010101000000", ticks // 10000000, "Seconds")`; the run time is `GetSystemTimeAsFileTime` minus creation time. All calls are fast and do not block.
+- **Status:** verified (`tests/ahk/core_snapshot.test.ahk`: memory above 1 MB, handles above 5, start time in the format and at most 2 minutes old)
+- **Source:** `src/core/ProcInfo.ahk`
 
-- **Problem:** Der Snapshot braucht Arbeitsspeicher, Handle-Zahl, Startzeit und Laufzeit, ohne Schleife und ohne WMI.
-- **Richtig:** Pseudo-Handle `GetCurrentProcess()` (-1) genügt für alle drei. `psapi\GetProcessMemoryInfo(h, buf, 72)` mit `PROCESS_MEMORY_COUNTERS` auf 64 Bit: `cb` (uint, Offset 0), `WorkingSetSize` als `uptr` bei Offset 16, Größe 72, vorher `cb` setzen. `GetProcessHandleCount(h, &n)`. `GetProcessTimes(h, created, other, other, other)` mit vier 8-Byte-Puffern, `NumGet(created, 0, "int64")` ist die Erzeugungszeit als FILETIME (100 ns seit 1601). Umrechnung in einen AHK-Zeitstempel: `DateAdd("16010101000000", ticks // 10000000, "Seconds")`; die Laufzeit ist `GetSystemTimeAsFileTime` minus Erzeugungszeit. Alle Aufrufe sind schnell und blockieren nicht.
-- **Status:** verifiziert (`tests/ahk/core_snapshot.test.ahk`: Speicher über 1 MB, Handles über 5, Startzeit im Format und höchstens 2 Minuten alt)
-- **Quelle:** `src/core/ProcInfo.ahk`
+### The hub can send a reply later, like `Peer` (WI-28)
 
-### Der Hub kann eine Antwort später senden, wie `Peer` (WI-28)
+- **Problem:** The crash report waits for the snapshots of the roles. The handler for `cmd.diag.report` in the supervisor must not block and therefore cannot reply immediately. `Hub._Local` however always replied immediately with the return value of the handler.
+- **Right:** As with `Peer` (WI-12): the handler returns `Deferred.Marker()`, `Hub._Local` then sends nothing, and `Hub.Reply(request, payload)` sends the reply later. The handler is responsible for exactly one reply, also on every error path (`DiagReport` calls `onDone` exactly once, also after the waiting period for `storage` has expired).
+- **Status:** verified (`tests/ahk/diag_report.test.ahk`, `tests/fault/test_report.py`)
 
-- **Problem:** Der Absturzbericht wartet auf die Snapshots der Rollen. Der Handler für `cmd.diag.report` im Supervisor darf nicht blockieren und kann deshalb nicht sofort antworten. `Hub._Local` antwortete aber immer sofort mit dem Rückgabewert des Handlers.
-- **Richtig:** Wie bei `Peer` (WI-12): Der Handler gibt `Deferred.Marker()` zurück, `Hub._Local` sendet dann nichts, und `Hub.Reply(request, payload)` sendet die Antwort später. Der Handler ist für genau eine Antwort verantwortlich, auch auf jedem Fehlerpfad (`DiagReport` ruft `onDone` genau einmal auf, auch nach der Wartefrist auf `storage`).
-- **Status:** verifiziert (`tests/ahk/diag_report.test.ahk`, `tests/fault/test_report.py`)
+### A report built from parsed child replies writes boolean values as 1/0 (WI-28)
 
-### Ein Bericht, der aus geparsten Kind-Antworten gebaut wird, schreibt Wahrheitswerte als 1/0 (WI-28)
+- **Problem:** `Json.Parse` reads `true` as `1`. The supervisor builds `report.json` from the parsed snapshots of the roles and writes `"enabled": 1` instead of `true`. The supervisor's own fields (`busy`, `auto`) are real boolean values.
+- **Right:** Acceptable for the file that a human reads, and noted in the result of WI-28. On the wire (`cmd.test.debug`, `export.ok`) the rule from WI-26 still applies: the boolean fields of a forwarded payload are set anew with `Json.Bool` (`DebugView._WireReport`); the guard in `tests/conftest.py` found exactly this on the first run.
+- **Status:** verified
 
-- **Problem:** `Json.Parse` liest `true` als `1`. Der Supervisor baut `report.json` aus den geparsten Snapshots der Rollen und schreibt `"enabled": 1` statt `true`. Die Felder des Supervisors selbst (`busy`, `auto`) sind echte Wahrheitswerte.
-- **Richtig:** Für die Datei, die ein Mensch liest, hinnehmbar und im Ergebnis von WI-28 notiert. Auf der Leitung (`cmd.test.debug`, `export.ok`) gilt weiter die Regel aus WI-26: die Wahrheitsfelder einer weitergereichten Nutzlast werden mit `Json.Bool` neu gesetzt (`DebugView._WireReport`); der Wächter in `tests/conftest.py` fand genau das beim ersten Lauf.
-- **Status:** verifiziert
+### Close discards the queue: the last frames before the end are lost (WI-30, F-26)
 
-### Close verwirft die Warteschlange: die letzten Rahmen vor dem Ende gehen verloren (WI-30, F-26)
+- **Problem:** A role sent `sys.bye` and immediately called `Peer.Close()` and `ExitApp`. `PipeConnection.Close` cancels a running write with `CancelIoEx` and empties the send queue. What did not fit into the pipe immediately (64 KiB buffer, the hub is not reading at that moment) was lost: the `sys.bye` and everything before it (pongs, events, log lines). The supervisor then reported `clean: false`. Reproduced with a hub that does not read for 0.6 s (`StallingHub` in `tests/integration/test_role.py`): 572 of 800 pongs, no `sys.bye`. At pipe level: 16 of 101 frames.
+- **Wrong:** `Send(...)` and immediately `Close()`, on the assumption that `SendFrame` has already written the frame (it returns `true` as soon as the frame is in the **queue**). Equally wrong: `FlushFileBuffers` on the pipe, which waits without deadline until the reader has read everything (blocks the process if the hub stands still).
+- **Right:** `PipeConnection.CloseWhenFlushed(timeoutMs, onDone)`: no new frames (`SendFrame` returns `false`), a timer (10 ms) keeps writing the queue, closing happens when the queue is empty or after the deadline, `onDone(flushed)` exactly once from the timer, never in the call. `Peer.CloseWhenFlushed` first separates the connection from the peer (`OnClose` empty, otherwise its end would start a reconnect). `Role._EndProcess` calls `ExitApp` in the callback and additionally sets an emergency timer (deadline + 1 s).
+- **Status:** verified (red, then green: `test_pipe.py::test_frames_queued_when_the_connection_is_ended_reach_a_late_reader`, `test_role.py::test_frames_queued_at_shutdown_and_the_bye_reach_a_hub_that_reads_late`; deadline without reader 308 ms at 300 ms, `..._gives_up_at_its_deadline_and_does_not_block`). That exactly this produced the `clean: false` of F-26 in the acceptance runs is assumed (not proven in a run).
+- **Source:** `src/core/ipc/PipeConnection.ahk`, `src/core/ipc/Peer.ahk`, `src/core/Role.ahk`
 
-- **Problem:** Eine Rolle sendete `sys.bye` und rief sofort `Peer.Close()` und `ExitApp`. `PipeConnection.Close` bricht mit `CancelIoEx` einen laufenden Schreibvorgang ab und leert die Sendewarteschlange. Was nicht sofort in die Pipe passte (64 KiB Puffer, der Hub liest gerade nicht), war verloren: das `sys.bye` und alles davor (Pongs, Ereignisse, Logzeilen). Der Supervisor meldete dann `clean: false`. Nachgestellt mit einem Hub, der 0,6 s nicht liest (`StallingHub` in `tests/integration/test_role.py`): 572 von 800 Pongs, kein `sys.bye`. Auf Pipe-Ebene: 16 von 101 Rahmen.
-- **Falsch:** `Send(...)` und gleich `Close()`, in der Annahme, `SendFrame` habe den Rahmen schon geschrieben (es gibt `true` zurück, sobald der Rahmen **in der Warteschlange** liegt). Ebenso falsch: `FlushFileBuffers` auf der Pipe, das wartet ohne Frist, bis der Leser alles gelesen hat (blockiert den Prozess, wenn der Hub steht).
-- **Richtig:** `PipeConnection.CloseWhenFlushed(timeoutMs, onDone)`: keine neuen Rahmen mehr (`SendFrame` liefert `false`), ein Timer (10 ms) schreibt die Warteschlange weiter, geschlossen wird bei leerer Warteschlange oder nach der Frist, `onDone(flushed)` genau einmal aus dem Timer, nie im Aufruf. `Peer.CloseWhenFlushed` trennt vorher die Verbindung vom Peer (`OnClose` leer, sonst startete ihr Ende einen Wiederaufbau). `Role._EndProcess` ruft `ExitApp` im Rückruf und setzt zusätzlich einen Notfall-Timer (Frist + 1 s).
-- **Status:** verifiziert (rot, dann grün: `test_pipe.py::test_frames_queued_when_the_connection_is_ended_reach_a_late_reader`, `test_role.py::test_frames_queued_at_shutdown_and_the_bye_reach_a_hub_that_reads_late`; Frist ohne Leser 308 ms bei 300 ms, `..._gives_up_at_its_deadline_and_does_not_block`). Dass genau dies die `clean: false` von F-26 in den Abnahmeläufen erzeugte, ist vermutet (nicht im Lauf nachgewiesen).
-- **Quelle:** `src/core/ipc/PipeConnection.ahk`, `src/core/ipc/Peer.ahk`, `src/core/Role.ahk`
+### Re-entry lock makes "pump first" ineffective (WI-30, F-26)
 
-### Sperre gegen Wiedereintritt macht "erst pumpen" wirkungslos (WI-30, F-26)
+- **Problem:** Since F-11, `Supervisor._Tick` calls `hub.Pump()` first, then `children.Tick`, so that an unread `sys.bye` is read before the process ends. If however the tick timer interrupts a `Pump` of the same connection (triggered by the wake-up call, longer than 15 ms), the lock in `PipeConnection.Pump` only sets `_pumpAgain` and returns immediately. The `sys.bye` remains unread, `Children._OnGone` judges the end with `clean: false`.
+- **Wrong:** Relying on a call to `Pump()` "reading everything now". With the lock it only means "it will be read, at some point in this or another thread".
+- **Right:** Wait for a state, not for an event (pattern from WI-28): a terminated process is judged only when its connection has been read to the end (the hub removes the connection only when reading the end, thus after all frames before it: `Hub.HasLink` false), or after a grace period (500 ms). During this time the child counts neither as hanging nor is it killed hard (otherwise it would count as "killed" and the exit code would be 5).
+- **Status:** verified (unit test `Tick: an exit is not judged while another pump still reads the connection of the child` in `tests/ahk/supervisor_tick.test.ahk`, with a stub whose `Pump` only sets "again" while a pump is running: red before, `clean` would have been false; plus grace period and "not hanging, not killed"). That this race occurred in the real supervisor is assumed (not observed in a run).
+- **Source:** `src/supervisor/Children.ahk` (`_ExitReadable`, `Terminate`, `MarkHung`)
 
-- **Problem:** Seit F-11 ruft `Supervisor._Tick` erst `hub.Pump()`, dann `children.Tick`, damit ein ungelesenes `sys.bye` vor dem Prozessende gelesen wird. Unterbricht der Tick-Timer aber gerade eine `Pump` derselben Verbindung (ausgelöst vom Weckruf, länger als 15 ms), setzt die Sperre in `PipeConnection.Pump` nur `_pumpAgain` und kehrt sofort zurück. Das `sys.bye` bleibt ungelesen, `Children._OnGone` bewertet das Ende mit `clean: false`.
-- **Falsch:** Sich darauf verlassen, dass ein Aufruf von `Pump()` "jetzt alles liest". Mit der Sperre heißt er nur "es wird gelesen, irgendwann in diesem oder einem anderen Thread".
-- **Richtig:** Auf einen Zustand warten, nicht auf ein Ereignis (Muster aus WI-28): Ein beendeter Prozess wird erst bewertet, wenn seine Verbindung bis zum Ende gelesen ist (der Hub entfernt die Verbindung erst beim Lesen des Endes, also nach allen Rahmen davor: `Hub.HasLink` falsch), oder nach einer Nachfrist (500 ms). In dieser Zeit gilt das Kind weder als hängend, noch wird es hart beendet (sonst zählte es als "getötet" und der Exit-Code würde 5).
-- **Status:** verifiziert (Unit-Test `Tick: an exit is not judged while another pump still reads the connection of the child` in `tests/ahk/supervisor_tick.test.ahk`, mit einer Attrappe, deren `Pump` bei laufender Pump nur "nochmal" setzt: vorher rot, `clean` wäre falsch gewesen; dazu Nachfrist und "nicht hängend, nicht getötet"). Dass dieser Wettlauf im echten Supervisor auftrat, ist vermutet (nicht im Lauf beobachtet).
-- **Quelle:** `src/supervisor/Children.ahk` (`_ExitReadable`, `Terminate`, `MarkHung`)
+### A write error to a peer that has gone discarded its unread last frames (WI-30, F-26)
 
-### Ein Schreibfehler an eine gegangene Gegenseite verwarf deren ungelesene letzte Rahmen (WI-30, F-26)
+- **Problem:** After the fixes for "Close discards the queue" and "Re-entry lock", in 400 runs of `test_shutdown.py` `clean: false` remained once (manager). Cause: a child writes `sys.bye` and ends itself. Before the hub reads the frame, it writes to the child itself (event of a topic it subscribed to; the manager stub subscribes to `log`, `process`, `engine`, `storage` receives every log line). `WriteFile` fails with 232 ("pipe is being closed"), `SendFrame` calls `_Fail` and `_Teardown`: this aborts the reading and discards the not yet read incoming bytes, thus the `sys.bye`.
+- **Wrong:** Treating a write error "peer gone" like the end of the connection. The peer may have written data before its end that still sits in the pipe's buffer; it remains readable after its handle is closed.
+- **Right:** On 109/232/233 from writing, close only the write side (`_WriteSideGone`: discard the queue, `SendFrame` returns `false`) and keep reading until the read reports the end; then `peer_closed`. Upper limit `WRITE_GONE_MAX_MS` (1 s), in case the end does not come. Other write errors (`broken`) still close immediately.
+- **Status:** verified (red, then green: `test_pipe.py::test_frames_of_a_peer_that_has_gone_are_read_although_a_write_to_it_fails`; before, a "poke" to the departed client failed, connection `peer_closed`, the already written `note` never delivered). That this case produced the rest of F-26 is assumed (the one red run had no log); fits "manager and storage".
+- **Source:** `src/core/ipc/PipeConnection.ahk` (`_DriveWriteGuarded`, `_WriteSideGone`, `Pump`)
 
-- **Problem:** Nach den Korrekturen für "Close verwirft die Warteschlange" und "Sperre gegen Wiedereintritt" blieb in 400 Läufen von `test_shutdown.py` einmal `clean: false` (Manager). Ursache: Ein Kind schreibt `sys.bye` und beendet sich. Bevor der Hub den Rahmen liest, schreibt er selbst an das Kind (Ereignis eines Topics, das es abonniert hat; der Manager-Stub abonniert `log`, `process`, `engine`, `storage` bekommt jede Logzeile). `WriteFile` scheitert mit 232 ("pipe is being closed"), `SendFrame` ruft `_Fail` und `_Teardown`: das bricht das Lesen ab und verwirft die noch nicht gelesenen eingehenden Bytes, also das `sys.bye`.
-- **Falsch:** Einen Schreibfehler "Gegenseite weg" wie das Ende der Verbindung behandeln. Die Gegenseite kann vor ihrem Ende Daten geschrieben haben, die noch im Puffer der Pipe liegen; sie bleiben nach dem Schließen ihres Handles lesbar.
-- **Richtig:** Bei 109/232/233 aus dem Schreiben nur die Schreibseite schließen (`_WriteSideGone`: Warteschlange verwerfen, `SendFrame` liefert `false`) und weiterlesen, bis das Lesen das Ende meldet; dann `peer_closed`. Obergrenze `WRITE_GONE_MAX_MS` (1 s), falls das Ende nicht kommt. Andere Schreibfehler (`broken`) schließen weiter sofort.
-- **Status:** verifiziert (rot, dann grün: `test_pipe.py::test_frames_of_a_peer_that_has_gone_are_read_although_a_write_to_it_fails`; vorher "poke" an den gegangenen Client gescheitert, Verbindung `peer_closed`, die schon geschriebene `note` nie geliefert). Dass dieser Fall den Rest von F-26 erzeugte, ist vermutet (der eine rote Lauf hatte kein Log); passt zu "Manager und Storage".
-- **Quelle:** `src/core/ipc/PipeConnection.ahk` (`_DriveWriteGuarded`, `_WriteSideGone`, `Pump`)
+### A message that is sent only once does not reach a child that reports itself later (WI-34, F-41)
 
-### Eine Nachricht, die nur einmal gesendet wird, erreicht ein Kind nicht, das sich später meldet (WI-34, F-41)
+- **Problem:** `Shutdown._SendGroup` sent `sys.shutdown` once to the children of a group. A child that was still starting at that moment (warm worker) had no connection: `Hub.Send` returned `false`, nobody noted it. The child reported itself afterwards, never received `sys.shutdown`, its group never finished, `storage` (last group) did not get it either; both were terminated hard at the deadline (exit 5).
+- **Wrong:** Treating "send" as "delivered" when the receiver cannot be connected yet.
+- **Right:** On the event that makes delivery possible (`sys.hello`), catch up on the target state: `Shutdown.OnHello` sends `sys.shutdown` with the remaining deadline if the child's group was already due (or it is in no group). In addition, close the second source of children after shutdown has begun: an already scheduled restart (`restartAt`) is cancelled in `Children.BeginShutdown`.
+- **Status:** verified (red, then green: `tests/fault/test_shutdown.py::test_a_child_that_says_hello_during_the_shutdown_...`, before exit 5 at the 12 s deadline, afterwards exit 0 after 3.1 s; unit tests in `tests/ahk/supervisor_tick.test.ahk`)
+- **Source:** `src/supervisor/Shutdown.ahk`, `src/supervisor/Children.ahk`
 
-- **Problem:** `Shutdown._SendGroup` schickte `sys.shutdown` einmal an die Kinder einer Gruppe. Ein Kind, das in diesem Moment noch startete (warmer Worker), hatte keine Verbindung: `Hub.Send` gab `false` zurück, niemand merkte es sich. Das Kind meldete sich danach, bekam nie `sys.shutdown`, seine Gruppe wurde nie fertig, `storage` (letzte Gruppe) bekam es auch nicht; beide wurden an der Frist hart beendet (Exit 5).
-- **Falsch:** "Senden" als "zugestellt" behandeln, wenn der Empfänger noch gar nicht verbunden sein kann.
-- **Richtig:** Beim Ereignis, das die Zustellung möglich macht (`sys.hello`), den Soll-Zustand nachholen: `Shutdown.OnHello` schickt `sys.shutdown` mit der Restfrist, wenn die Gruppe des Kindes schon an der Reihe war (oder es in keiner Gruppe ist). Dazu die zweite Quelle von Kindern nach dem Beginn des Beendens schließen: ein schon geplanter Neustart (`restartAt`) wird in `Children.BeginShutdown` gestrichen.
-- **Status:** verifiziert (rot, dann grün: `tests/fault/test_shutdown.py::test_a_child_that_says_hello_during_the_shutdown_...`, vorher Exit 5 an der Frist von 12 s, nachher Exit 0 nach 3,1 s; Unit-Tests in `tests/ahk/supervisor_tick.test.ahk`)
-- **Quelle:** `src/supervisor/Shutdown.ahk`, `src/supervisor/Children.ahk`
+### Forwarded requests: whoever routes must know what is open (WI-34, F-40)
 
-### Weitergeleitete Anfragen: wer routet, muss wissen, was offen ist (WI-34, F-40)
+- **Problem:** The hub forwarded `cmd.*` between two clients without remembering anything. If the target died before the reply, the sender waited its full deadline (engine: 30 s for a `cmd.storage.flow.read`). In the test with the Python hub this occurred under load, when the storage stub was closed while a read request still sat unread in its pipe.
+- **Wrong:** Relying on "every request is answered" when the receiver is no longer able to do so. Equally (rejected) letting the roles detect the end via `evt.process.*`: for that every role would have to subscribe to the topic `process`, the event arrives up to 0.7 s later, and a broken pipe of a living process does not report it at all.
+- **Right:** The hub notes the header fields of every forwarded request (sender, `id`, type, target) until the target's reply or until the deadline plus 1 s, and on the end of the target's connection it replies itself with `peer_gone`. The connection is read to its end beforehand, so a real reply arrives first. In the Python hub of the tests (several threads) register the request **before** forwarding, otherwise the target's reply may arrive in another thread before the entry exists; removing the connection and collecting its open requests happen in one step under the same lock.
+- **Status:** verified (red, then green: `tests/integration/test_supervisor.py::test_open_request_to_a_*` 10 s without reply, afterwards 0.07 to 0.15 s; `tests/integration/test_engine.py::test_engine_resumes_loading_at_once_when_storage_dies_with_an_open_read` 31.0 s, afterwards 1.04 s)
+- **Source:** `src/supervisor/Hub.ahk` (`_NoteRouted`, `_FailRouted`), `tests/support/pyhub.py`
 
-- **Problem:** Der Hub leitete `cmd.*` zwischen zwei Clients weiter, ohne sich etwas zu merken. Starb das Ziel vor der Antwort, wartete der Absender seine volle Frist ab (Engine: 30 s für ein `cmd.storage.flow.read`). Im Test mit dem Python-Hub trat das unter Last auf, wenn der Storage-Stub geschlossen wurde, während eine Leseanfrage noch ungelesen in seiner Pipe lag.
-- **Falsch:** Sich darauf verlassen, dass "jede Anfrage beantwortet wird", wenn der Empfänger dazu gar nicht mehr in der Lage ist. Ebenso (verworfen) die Rollen das Ende über `evt.process.*` erkennen lassen: dafür müsste jede Rolle das Topic `process` abonnieren, das Ereignis kommt bis 0,7 s später, und eine gebrochene Pipe eines lebenden Prozesses meldet es gar nicht.
-- **Richtig:** Der Hub merkt sich die Kopffelder jeder weitergeleiteten Anfrage (Absender, `id`, Typ, Ziel) bis zur Antwort des Ziels oder bis Frist plus 1 s, und antwortet beim Ende der Verbindung des Ziels selbst mit `peer_gone`. Die Verbindung wird vorher bis zum Ende gelesen, eine echte Antwort kommt also zuerst. Im Python-Hub der Tests (mehrere Threads) die Anfrage **vor** dem Weiterleiten eintragen, sonst kann die Antwort des Ziels in einem anderen Thread vor dem Eintrag ankommen; Entfernen der Verbindung und Einsammeln ihrer offenen Anfragen in einem Schritt unter derselben Sperre.
-- **Status:** verifiziert (rot, dann grün: `tests/integration/test_supervisor.py::test_open_request_to_a_*` 10 s ohne Antwort, nachher 0,07 bis 0,15 s; `tests/integration/test_engine.py::test_engine_resumes_loading_at_once_when_storage_dies_with_an_open_read` 31,0 s, nachher 1,04 s)
-- **Quelle:** `src/supervisor/Hub.ahk` (`_NoteRouted`, `_FailRouted`), `tests/support/pyhub.py`
+### An overview must not omit non-ready states: show processes that are not ready as "not ready" (WI-34, F-38)
 
-### Eine Übersicht darf nicht lesende Zustände weglassen: nicht bereite Prozesse als "nicht bereit" zeigen (WI-34, F-38)
+- **Problem:** `DebugView.RefreshSnapshots` queried only processes in state `ready` and left out all others without a trace. The window thus did not show exactly the states it was meant for (`starting`, `gone`). The test that expected "at least 6 snapshots" was red when a process (the warm worker) was still `starting` in the window: 5 instead of 6.
+- **Wrong:** Filtering the list of targets to `ready` and silently omitting the rest; in the test, only waiting until the name appears in the process list (any state).
+- **Right:** Do not query processes that are not ready, but show them with the entry `not ready (state: <state>)`. The test command `cmd.test.debug state` returns `states` (name → state) for this; the test waits for `ready`, not for presence in the list.
+- **Status:** verified (`tests/fault/test_debug_role.py::test_refresh_shows_a_process_that_is_not_ready_as_not_ready_instead_of_leaving_it_out`: without the change the late process is missing from the snapshots; with it green; the changed test `test_refresh_stores_the_snapshot_of_every_role_and_the_supervisor` green). The cause of the failure in the acceptance run was read from the code (state `starting` in the window), not observed in the failing run.
+- **Source:** `src/debugview/DebugView.ahk`
+## GUI and hotkeys
 
-- **Problem:** `DebugView.RefreshSnapshots` fragte nur Prozesse im Zustand `ready` und ließ alle anderen ohne Spur weg. Das Fenster zeigte damit gerade die Zustände nicht, für die es gedacht ist (`starting`, `gone`). Der Test, der "mindestens 6 Snapshots" erwartete, war rot, wenn ein Prozess (der warme Worker) im Fenster noch `starting` war: 5 statt 6.
-- **Falsch:** Die Liste der Ziele auf `ready` filtern und den Rest schweigend auslassen; im Test nur warten, bis der Name in der Prozessliste steht (irgendein Zustand).
-- **Richtig:** Nicht bereite Prozesse nicht fragen, aber mit dem Eintrag `not ready (state: <Zustand>)` anzeigen. Der Testbefehl `cmd.test.debug state` liefert dazu `states` (Name → Zustand); der Test wartet auf `ready`, nicht auf die Anwesenheit in der Liste.
-- **Status:** verifiziert (`tests/fault/test_debug_role.py::test_refresh_shows_a_process_that_is_not_ready_as_not_ready_instead_of_leaving_it_out`: ohne die Änderung fehlt der späte Prozess in den Snapshots; mit ihr grün; der geänderte Test `test_refresh_stores_the_snapshot_of_every_role_and_the_supervisor` grün). Die Ursache des Ausfalls in der Abnahme ist aus dem Code gelesen (Zustand im Fenster `starting`), nicht im ausgefallenen Lauf beobachtet.
-- **Quelle:** `src/debugview/DebugView.ahk`
+### Gui: Event names and row order of the ListView
 
-## GUI und Hotkeys
+- **Problem:** The ListView help only names the events (`Click`, `ItemFocus`, `ItemSelect`, among others). It does not list the parameters completely.
+- **Right:** For row clicks, use `lv.OnEvent("Click", (lv, row) => ...)`. The pattern `LV_DoubleClick(LV, RowNumber)` from the help confirms the order (control, row). After each rebuild, mark rows again with `Modify(row, "Select Focus")`; `Delete()` clears the list without parameters.
+- **Status:** assumed (event names and parameters read from the help. The click itself is not checked by automation, only the start of the window in the smoke run: exit 0, no dialog).
+- **Source:** https://www.autohotkey.com/docs/v2/lib/ListView.htm
 
-### Gui: Ereignisnamen und Zeilenreihenfolge der ListView
+### Closing the Gui window does not end the process (Persistent)
 
-- **Problem:** Die Hilfe zu ListView nennt nur die Ereignisnamen (`Click`, `ItemFocus`, `ItemSelect` u. a.). Die Parameter stehen dort nicht vollständig.
-- **Richtig:** Für Zeilenklicks `lv.OnEvent("Click", (lv, row) => ...)` verwenden. Das Muster `LV_DoubleClick(LV, RowNumber)` aus der Hilfe bestätigt die Reihenfolge (Steuerelement, Zeile). Zeilen nach jedem Neuaufbau über `Modify(row, "Select Focus")` wieder markieren, `Delete()` leert die Liste ohne Parameter.
-- **Status:** vermutet (Ereignisnamen und Parameter aus der Hilfe gelesen. Der Klick selbst ist nicht automatisiert geprüft, nur der Start des Fensters im Smoke-Lauf: Exit 0, kein Dialog).
-- **Quelle:** https://www.autohotkey.com/docs/v2/lib/ListView.htm
+- **Problem:** A window without its own reason to keep the main loop alive ends with the last window. The role process, however, keeps running through timers and the peer.
+- **Right:** `Role.Start` sets `Persistent()`. In the stub, closing the window does the same as "quit" (`cmd.app.exit`), so no state is lost and the display does not disappear by accident.
+- **Status:** verified (smoke run: window open, supervisor answers, `cmd.app.exit` leads to exit 0)
+- **Source:** `src/manager/StubGui.ahk`
 
-### Gui-Fenster schließen beendet nicht den Prozess (Persistent)
+### Viewing and operating the window of an AHK role without screen access (WI-28)
 
-- **Problem:** Ein Fenster ohne eigenen Hauptschleifen-Grund endet mit dem letzten Fenster. Der Rollenprozess läuft aber über Timer und Peer weiter.
-- **Richtig:** `Role.Start` setzt `Persistent()`. Das Schließen des Fensters ist im Stub das gleiche wie "Beenden" (`cmd.app.exit`), damit kein Zustand verloren geht und die Anzeige nicht versehentlich verschwindet.
-- **Status:** verifiziert (Smoke-Lauf: Fenster offen, Supervisor antwortet, `cmd.app.exit` führt zu Exit 0)
-- **Quelle:** `src/manager/StubGui.ahk`
+- **Problem:** The debug window should be shown, but `Graphics.CopyFromScreen` (PowerShell) fails here with "The handle is invalid" (no accessible desktop), and `keybd_event` does not reach the window (no foreground).
+- **Right:** Let `PrintWindow(hwnd, memDC, 2)` (`PW_RENDERFULLCONTENT`) draw the window into a bitmap (`GetWindowDC`, `CreateCompatibleDC/Bitmap`, `GetDIBits` with 32 bit top-down, `PIL.Image.frombuffer("RGBA", ..., "BGRA")`). This works without a visible desktop. Operating without keyboard: tabs with `SendMessage(tabHwnd, WM_KEYDOWN, VK_RIGHT)` (tab control found via `FindWindowExW(hwnd, 0, "SysTabControl32", 0)`), buttons with `BM_CLICK` (0xF5). Buttons on a tab are children of the main window; `FindWindowExW(tab, ...)` does not find them, `EnumChildWindows` on the main window does. Closing as a user would: `PostMessage(hwnd, WM_CLOSE)`.
+- **Status:** verified (screenshots of all five tabs, click on "Bericht exportieren" [export report], "Pause" and closing; `tests/fault/test_debug_role.py::test_the_window_opens_takes_events_and_closes_like_a_user_would` checks the window and `WM_CLOSE`). Pillow is required locally for this, but it is not part of `tests/requirements.txt`; the test does not need it.
 
-### Das Fenster einer AHK-Rolle ohne Bildschirmzugriff ansehen und bedienen (WI-28)
+## Tests and tools
 
-- **Problem:** Das Debug-Fenster soll gezeigt werden, aber `Graphics.CopyFromScreen` (PowerShell) scheitert hier mit "Das Handle ist ungültig" (kein zugänglicher Desktop), und `keybd_event` erreicht das Fenster nicht (kein Vordergrund).
-- **Richtig:** Das Fenster mit `PrintWindow(hwnd, memDC, 2)` (`PW_RENDERFULLCONTENT`) in ein Bitmap zeichnen lassen (`GetWindowDC`, `CreateCompatibleDC/Bitmap`, `GetDIBits` mit 32 Bit top-down, `PIL.Image.frombuffer("RGBA", ..., "BGRA")`). Das geht ohne sichtbaren Desktop. Bedienen ohne Tastatur: Tabs mit `SendMessage(tabHwnd, WM_KEYDOWN, VK_RIGHT)` (Tab-Steuerung per `FindWindowExW(hwnd, 0, "SysTabControl32", 0)`), Knöpfe mit `BM_CLICK` (0xF5). Knöpfe auf einem Tab sind Kinder des Hauptfensters; `FindWindowExW(tab, ...)` findet sie nicht, `EnumChildWindows` auf das Hauptfenster schon. Das Schließen durch den Benutzer: `PostMessage(hwnd, WM_CLOSE)`.
-- **Status:** verifiziert (Screenshots aller fünf Tabs, Klick auf "Bericht exportieren", "Pause" und das Schließen; `tests/fault/test_debug_role.py::test_the_window_opens_takes_events_and_closes_like_a_user_would` prüft das Fenster und `WM_CLOSE`). Pillow ist dafür lokal nötig, gehört aber nicht zu `tests/requirements.txt`, der Test braucht es nicht.
+### Blocking error dialogs: `ahkrun.py` and the dialog watcher
 
-## Tests und Werkzeuge
+- **Problem:** A load error (e.g. class conflict), an unhandled runtime error or a `MsgBox` opens a dialog. The process waits for a click, and the calling agent hangs.
+- **Wrong:** Start the script directly with the interpreter and wait for it to return.
+- **Right:** `python tools/ahkrun.py --timeout 30 skript.ahk`. Load errors: `/ErrorStdOut=UTF-8` writes them to stderr. All other dialogs: `tools/ahf_dialogwatch.py` detects windows of class `#32770` in the process tree, reads the text (also RichEdit via `WM_GETTEXT`), saves text and PNG under `%TEMP%\ahf_dialogs\`, closes the dialog and ends the process (exit code 97).
+- **Status:** verified (`tests/support/test_dialogwatch.py`: load error, runtime error, `MsgBox`, timeout). Limits: only dialogs of class `#32770`, no own GUI window. Under a locked desktop, `PrintWindow` not checked.
 
-### Blockierende Fehlerdialoge: `ahkrun.py` und Dialog-Wächter
+### ctypes: without `argtypes`, 64-bit handles fail intermittently
 
-- **Problem:** Ein Ladefehler (z. B. Klassenkonflikt), ein unbehandelter Laufzeitfehler oder eine `MsgBox` öffnet einen Dialog. Der Prozess wartet auf Klick, der aufrufende Agent hängt.
-- **Falsch:** Skript direkt mit dem Interpreter starten und auf Rückkehr warten.
-- **Richtig:** `python tools/ahkrun.py --timeout 30 skript.ahk`. Ladefehler: `/ErrorStdOut=UTF-8` schreibt sie auf stderr. Alle übrigen Dialoge: `tools/ahf_dialogwatch.py` erkennt Fenster der Klasse `#32770` im Prozessbaum, liest den Text (auch RichEdit per `WM_GETTEXT`), speichert Text und PNG unter `%TEMP%\ahf_dialogs\`, schließt den Dialog, beendet den Prozess (Exit-Code 97).
-- **Status:** verifiziert (`tests/support/test_dialogwatch.py`: Ladefehler, Laufzeitfehler, `MsgBox`, Timeout). Grenzen: nur Dialoge der Klasse `#32770`, kein eigenes GUI-Fenster. Unter einem gesperrten Desktop `PrintWindow` nicht geprüft.
+- **Problem:** The dialog watcher closed dialogs only sometimes (runs between 0.5 s and 17 s, once a timeout). Cause: `GetDIBits` without `argtypes` received a handle as a C `int`; for values above 2**31 this raised `OverflowError`. The exception was swallowed by the watcher thread, and the dialog stayed open.
+- **Wrong:** Call WinAPI functions with handle parameters without `argtypes`/`restype`, and silently discard exceptions in the watcher loop before the essential step (closing the dialog) is done.
+- **Right:** Set `argtypes` for every function called. Gather information in `try`, closing and ending in `finally`.
+- **Status:** verified (20 consecutive runs, worst 0.58 s).
 
-### ctypes: ohne `argtypes` scheitern 64-Bit-Handles sporadisch
+### The AHK interpreter does not know `--version`
 
-- **Problem:** Der Dialog-Wächter schloss Dialoge nur manchmal (Läufe zwischen 0,5 s und 17 s, einmal Timeout). Ursache: `GetDIBits` ohne `argtypes` wurde ein Handle als C-`int` übergeben, bei Werten über 2**31 gab es `OverflowError`. Die Ausnahme wurde vom Wächter-Thread verschluckt, der Dialog blieb offen.
-- **Falsch:** WinAPI-Funktionen mit Handle-Parametern ohne `argtypes`/`restype` aufrufen, und in der Wächterschleife Ausnahmen still verwerfen, bevor das Wesentliche (Dialog schließen) erledigt ist.
-- **Richtig:** `argtypes` für jede aufgerufene Funktion setzen. Informationsbeschaffung in `try`, Schließen und Beenden in `finally`.
-- **Status:** verifiziert (20 aufeinanderfolgende Läufe, schlechtester 0,58 s).
+- **Problem:** `AutoHotkey64.exe --version` results in the dialog "Script file not found. --version".
+- **Right:** Do not query the version via the command line. Path and `#Requires AutoHotkey v2.0` are enough. In a script, output `A_AhkVersion`.
+- **Status:** verified (self-triggered).
 
-### Der AHK-Interpreter kennt `--version` nicht
+### Test processes with output in files, not through pipes
 
-- **Problem:** `AutoHotkey64.exe --version` ergibt den Dialog "Script file not found. --version".
-- **Richtig:** Version nicht über die Kommandozeile abfragen. Pfad und `#Requires AutoHotkey v2.0` genügen. In einem Skript `A_AhkVersion` ausgeben.
-- **Status:** verifiziert (selbst ausgelöst).
+- **Problem:** An AHK process started with `subprocess.PIPE` can keep the pipe open on timeout. `communicate()` then hangs as well.
+- **Right:** Redirect stdout and stderr to files in the data directory (`tests/conftest.py`, `run_ahk`). On `TimeoutExpired`, end the tree with `psutil`.
+- **Status:** verified (test `test_hung_script_is_killed_at_timeout`, afterwards no `AutoHotkey64.exe` left over)
 
-### Testprozesse mit Ausgabe in Dateien, nicht über Pipes
+### Stand-in hub discarded `sys.pong`
 
-- **Problem:** Ein AHK-Prozess, der per `subprocess.PIPE` gestartet wird, kann bei Timeout die Pipe offen halten. `communicate()` hängt dann ebenfalls.
-- **Richtig:** stdout und stderr in Dateien im Datenverzeichnis umlenken (`tests/conftest.py`, `run_ahk`). Bei `TimeoutExpired` den Baum mit `psutil` beenden.
-- **Status:** verifiziert (Test `test_hung_script_is_killed_at_timeout`, danach kein `AutoHotkey64.exe` übrig)
+- **Problem:** The ping test hung. The Python hub had ignored `sys.pong` instead of routing it.
+- **Right:** Only `sys.hello` is answered by the hub; all other messages are routed. The exception for `sys.pong` has been removed.
+- **Status:** verified (test `test_ping_is_answered_by_the_client`)
 
-### Stand-in-Hub hat `sys.pong` verworfen
+### Raw string with pipe names
 
-- **Problem:** Der Ping-Test blieb hängen. Der Python-Hub hatte `sys.pong` ignoriert, statt es zu routen.
-- **Richtig:** Nur `sys.hello` wird vom Hub beantwortet, alle anderen Nachrichten werden geroutet. Die Ausnahme für `sys.pong` ist entfernt.
-- **Status:** verifiziert (Test `test_ping_is_answered_by_the_client`)
+- **Problem:** `r"\\.\pipe\"` is a syntax error in Python, because a raw string must not end with a backslash.
+- **Right:** `PIPE_PREFIX = "\\\\.\\pipe\\"` as a normal string. Names are only appended (`tests/support/winpipe.py`).
+- **Status:** verified (code runs, pipe connections in the tests)
 
-### Rohstring mit Pipe-Namen
+### One red MsgBox dialog test result (timeout 98 instead of 97)
 
-- **Problem:** `r"\\.\pipe\"` ist in Python ein Syntaxfehler, weil ein Rohstring nicht mit einem Backslash enden darf.
-- **Richtig:** `PIPE_PREFIX = "\\\\.\\pipe\\"` als normale Zeichenkette. Namen werden nur angehängt (`tests/support/winpipe.py`).
-- **Status:** verifiziert (Code läuft, Pipe-Verbindungen in den Tests)
+- **Problem:** `test_msgbox_is_captured_and_closed` once timed out (exit 98) in a full suite run. On repetition in isolation and in the full suite it was green.
+- **Right:** For sporadic failures, first run repetitions (`-k msgbox`, three runs). If it recurs, check the dialog watcher's time window and the process tree query.
+- **Status:** assumed (timing outlier, not reproduced; cause not investigated)
 
-### Einmal rotes MsgBox-Dialog-Testergebnis (Timeout 98 statt 97)
+### Dialog watcher test sporadically exit 98 instead of 97
 
-- **Problem:** `test_msgbox_is_captured_and_closed` lief in einer Gesamtsuite einmal in den Timeout (Exit 98). Bei Wiederholung in Isolation und in der Gesamtsuite grün.
-- **Richtig:** Bei Sporadik zuerst Wiederholungen laufen lassen (`-k msgbox`, drei Läufe). Wenn es wiederkehrt, Dialog-Wächter-Zeitfenster und Prozessbaum-Abfrage prüfen.
-- **Status:** vermutet (Timing-Ausreißer, nicht reproduziert; Ursache nicht untersucht)
+- **Problem:** `tests/support/test_dialogwatch.py::test_runtime_error_dialog_is_captured` was red at WI-02 (98 instead of 97). In four isolated runs, one was red. Same pattern as the MsgBox entry above.
+- **Right:** Repeat (`-k runtime_error`, several runs). Do not count the test as the cause of your own package as long as it remains sporadic. Cause open.
+- **Status:** verified (repetition: 1 of 4 isolated runs red). Cause not investigated.
 
-### Dialog-Wächter-Test sporadisch Exit 98 statt 97
+### Result file of a test helper: Python and AHK access at the same time
 
-- **Problem:** `tests/support/test_dialogwatch.py::test_runtime_error_dialog_is_captured` lief bei WI-02 rot (98 statt 97). In vier isolierten Läufen war einer rot. Dasselbe Muster wie beim MsgBox-Eintrag oben.
-- **Richtig:** Wiederholen (`-k runtime_error`, mehrere Läufe). Den Test nicht als Ursache des eigenen Pakets werten, solange er sporadisch bleibt. Ursache offen.
-- **Status:** verifiziert (Wiederholung: 1 von 4 isolierten Läufen rot). Ursache nicht untersucht.
+- **Problem:** The Python test polled the JSON Lines file of an AHK helper every 5 ms. `FileAppend` in the `OnClose` handler then failed with an access error. The exception was caught in the handler, the entry was lost, and the test reported "no connection-close message". Conversely, Python raised `PermissionError` while reading while AHK was writing.
+- **Wrong:** A single `FileAppend` attempt in the helper, a single `read_bytes` in the test.
+- **Right:** Both sides retry briefly (`Kit.Record` up to 200 times with `DllCall("Sleep", 2)`, `rawpipe.read_jsonl` up to 50 times). An incomplete last line is ignored.
+- **Status:** verified (error reproducible; after the change, 8 runs of the 26 pipe tests without occurrence)
+- **Source:** `tests/integration/helpers/PipeTestKit.ahk`, `rawpipe.py`
 
-### Ergebnisdatei eines Testhelfers: Zugriff Python und AHK gleichzeitig
+### Test server in Python: return of the handler closes the connection
 
-- **Problem:** Der Python-Test fragte die JSON-Lines-Datei eines AHK-Helfers alle 5 ms ab. `FileAppend` im `OnClose`-Handler scheiterte dann mit einem Zugriffsfehler. Die Ausnahme wurde im Handler gefangen, der Eintrag ging verloren und der Test meldete "keine Verbindungsabbruch-Meldung". Umgekehrt warf Python `PermissionError` beim Lesen, während AHK schrieb.
-- **Falsch:** Ein einziger `FileAppend`-Versuch im Helfer, ein einziger `read_bytes` im Test.
-- **Richtig:** Beide Seiten wiederholen kurz (`Kit.Record` bis 200 mal mit `DllCall("Sleep", 2)`, `rawpipe.read_jsonl` bis 50 mal). Eine unvollständige letzte Zeile wird ignoriert.
-- **Status:** verifiziert (Fehler reproduzierbar, nach der Änderung 8 Durchläufe der 26 Pipe-Tests ohne Auftreten)
-- **Quelle:** `tests/integration/helpers/PipeTestKit.ahk`, `rawpipe.py`
+- **Problem:** `PyServer(name, handler=lambda end: None)` closed the connection immediately; the AHK client saw an immediate end ("connection closed") instead of the expected data.
+- **Right:** The handler owns the connection. If you want to use it from outside, let it block (`lambda end: end.closed.wait(300)`).
+- **Status:** verified (own error in the test)
 
-### Testserver in Python: Rückkehr des Handlers schließt die Verbindung
+### Control frames in the check mode of the test server
 
-- **Problem:** `PyServer(name, handler=lambda end: None)` schloss die Verbindung sofort, der AHK-Client sah ein sofortiges Ende ("connection closed") statt der erwarteten Daten.
-- **Richtig:** Der Handler besitzt die Verbindung. Wer sie von außen benutzen will, lässt ihn blockieren (`lambda end: end.closed.wait(300)`).
-- **Status:** verifiziert (eigener Fehler im Test)
+- **Problem:** After `ctl:expect:N`, the AHK test server held the next N frames as check data and therefore read the following control frame `ctl:gen` as frame 0 (check failed, everything shifted by one).
+- **Right:** Start the generator first (`ctl:gen`), then send `ctl:expect`. In check mode there are no control frames.
+- **Status:** verified (own error in the test)
 
-### Steuerrahmen im Prüfmodus des Testservers
+### One-time failure of `test_ahk_server_python_client_exchanges_10000_frames`
 
-- **Problem:** Der AHK-Testserver hielt nach `ctl:expect:N` die nächsten N Rahmen für Prüfdaten und las deshalb den nachfolgenden Steuerrahmen `ctl:gen` als Rahmen 0 (Prüfung fehlgeschlagen, alles um eins verschoben).
-- **Richtig:** Zuerst den Erzeuger starten (`ctl:gen`), dann `ctl:expect` senden. Im Prüfmodus gibt es keine Steuerrahmen.
-- **Status:** verifiziert (eigener Fehler im Test)
+- **Problem:** In a full suite run the test failed once (message not secured). In 15 single runs and 3 parallel file runs afterwards, no further failure.
+- **Right:** Very probably the same error as "Python test reader lost bytes" (above): frame by frame through the Python reader, a lost chunk makes the test hang.
+- **Status:** assumed (not reproduced, therefore not proven)
 
-### Einmaliger Fehlschlag von `test_ahk_server_python_client_exchanges_10000_frames`
+### Starting role processes via ahkrun.py, output in files
 
-- **Problem:** In einer Gesamtsuite schlug der Test einmal fehl (Meldung nicht gesichert). In 15 Einzelläufen und 3 parallelen Dateiläufen danach nicht mehr.
-- **Richtig:** Sehr wahrscheinlich derselbe Fehler wie "Python-Testleser verlor Bytes" (oben): Rahmen für Rahmen durch den Python-Leser, ein verlorener Chunk lässt den Test hängen.
-- **Status:** vermutet (nicht reproduziert, daher nicht bewiesen)
+- **Problem:** A role test needs the process next to a running hub. `tools/ahkrun.py` waits until the end, and a pipe buffer for the output can block.
+- **Right:** Start `ahkrun.py` as a child process via `procs.start`, output in files (`--timeout 60`). The AutoHotkey PID is in `sys.hello` (`payload.pid`) and is a child of ahkrun (`psutil.Process(pid).ppid()`). The exit code of ahkrun is that of the script. Wait for the AHK process via psutil to measure the end exactly.
+- **Status:** verified (`tests/integration/test_role.py`, 9 tests).
+- **Source:** `tests/integration/test_role.py` (`RoleRun`)
 
-### Rollenprozesse über ahkrun.py starten, Ausgabe in Dateien
+### Entry point writes messages to stderr, without a file
 
-- **Problem:** Ein Rollentest braucht den Prozess neben einem laufenden Hub. `tools/ahkrun.py` wartet bis zum Ende, und ein Pipe-Puffer für die Ausgabe kann blockieren.
-- **Richtig:** `ahkrun.py` als Kindprozess über `procs.start` starten, Ausgabe in Dateien (`--timeout 60`). Die AutoHotkey-PID steht im `sys.hello` (`payload.pid`) und ist Kind von ahkrun (`psutil.Process(pid).ppid()`). Der Exit-Code von ahkrun ist der des Skripts. Den AHK-Prozess per psutil warten, um das Ende genau zu messen.
-- **Status:** verifiziert (`tests/integration/test_role.py`, 9 Tests).
-- **Quelle:** `tests/integration/test_role.py` (`RoleRun`)
+- **Problem:** The entry point has no log sink yet (storage does not exist in this phase). "unknown role" and similar messages must still be visible, without a dialog.
+- **Right:** `FileAppend(text, "**", "UTF-8-RAW")` writes to stderr and creates no file. This is an exception to KONVENTIONEN 3 (there only `storage`), justified by console output. `ahkrun.py` passes stderr on to the caller.
+- **Status:** verified (`test_unknown_role_exits_2_with_message_and_no_dialog`, `test_role_without_implementation_reports_not_implemented`).
+- **Source:** `src/core/Role.ahk` (`Role.Console`)
 
-### Einstieg schreibt Meldungen auf stderr, ohne Datei
+### psutil status lags behind `suspend` by 3 to 73 ms
 
-- **Problem:** Der Einstieg hat noch keine Log-Senke (storage gibt es in dieser Phase noch nicht). "unknown role" und ähnliche Meldungen müssen trotzdem sichtbar sein, ohne Dialog.
-- **Richtig:** `FileAppend(text, "**", "UTF-8-RAW")` schreibt auf stderr und legt keine Datei an. Das ist eine Ausnahme zu KONVENTIONEN 3 (dort nur `storage`), begründet mit Konsolenausgabe. `ahkrun.py` reicht stderr an den Aufrufer weiter.
-- **Status:** verifiziert (`test_unknown_role_exits_2_with_message_and_no_dialog`, `test_role_without_implementation_reports_not_implemented`).
-- **Quelle:** `src/core/Role.ahk` (`Role.Console`)
+- **Problem:** After `psutil.Process.suspend()`, `psutil.Process.status()` does not immediately show `STATUS_STOPPED`. The status lags behind by a few milliseconds. A one-time check right after stopping is therefore unreliable.
+- **Wrong:** Read `status()` once after `suspend` and check it immediately.
+- **Right:** Poll the status in a short loop (10 ms interval, deadline 2 s) until it is `STATUS_STOPPED` (`tests/support/test_procs.py`, `test_suspend_and_resume`).
+- **Status:** verified (30 runs measured, delay up to 73 ms)
+- **Source:** `tests/support/test_procs.py`
 
-### psutil-Status hinkt nach `suspend` um 3 bis 73 ms
+### ahkrun writes stderr only at the end: logs of running processes are empty
 
-- **Problem:** Nach `psutil.Process.suspend()` zeigt `psutil.Process.status()` nicht sofort `STATUS_STOPPED`. Der Status hinkt um einige Millisekunden hinterher. Eine einmalige Prüfung direkt nach dem Anhalten ist deshalb unzuverlässig.
-- **Falsch:** Einmal `status()` nach `suspend` lesen und sofort prüfen.
-- **Richtig:** Den Status in einer kurzen Schleife (10 ms Abstand, Frist 2 s) pollen, bis er `STATUS_STOPPED` ist (`tests/support/test_procs.py`, `test_suspend_and_resume`).
-- **Status:** verifiziert (30 Läufe gemessen, Verzögerung bis 73 ms)
-- **Quelle:** `tests/support/test_procs.py`
+- **Problem:** A role process running via `tools/ahkrun.py` delivers its output on stderr only at the end. While it runs, log files and output are empty. A diagnosis via the output is then not possible.
+- **Wrong:** Look into the output during the run to check the state.
+- **Right:** Query the state via messages (e.g. `cmd.process.list`, `sys.hello`); evaluate the output only after the end.
+- **Status:** verified (WI-07, test runs with `ahkrun.py`)
+- **Source:** `tools/ahkrun.py`, `tests/integration/test_role.py`
 
-### ahkrun schreibt stderr erst am Ende: Logs laufender Prozesse sind leer
+### Assertion on a substring: `running for session` also matches other messages
 
-- **Problem:** Ein Rollenprozess, der über `tools/ahkrun.py` läuft, liefert seine Ausgabe auf stderr erst beim Ende. Während er läuft, sind Log-Dateien und Ausgabe leer. Eine Diagnose über die Ausgabe ist dann nicht möglich.
-- **Falsch:** Während des Laufs in die Ausgabe schauen, um Zustand zu prüfen.
-- **Richtig:** Zustand über Nachrichten abfragen (z. B. `cmd.process.list`, `sys.hello`), die Ausgabe erst nach dem Ende auswerten.
-- **Status:** verifiziert (WI-07, Testläufe mit `ahkrun.py`)
-- **Quelle:** `tools/ahkrun.py`, `tests/integration/test_role.py`
+- **Problem:** An assertion searched for the substring `running for session`. The message "already running for session main, forwarding the command" (second instance) also contains it. The substring therefore also matches a different case than intended.
+- **Wrong:** `assert "running for session" in text`.
+- **Right:** Check the whole message and its start (e.g. line start `session main running`), or check the message via an event instead of text.
+- **Status:** verified (WI-07, test case for the second instance)
+- **Source:** `src/supervisor/Supervisor.ahk` (`_ForwardIfRunning`), `tests/integration/test_supervisor.py`
 
-### Assertion auf Teilstring: `running for session` trifft auch andere Meldungen
+### Truth values from AHK are 0 and 1 also in the Python tests (superseded by WI-26)
 
-- **Problem:** Eine Assertion suchte nach dem Teilstring `running for session`. Die Meldung "already running for session main, forwarding the command" (zweite Instanz) enthält ihn ebenfalls. Der Teilstring trifft also auch einen anderen Fall, als gemeint war.
-- **Falsch:** `assert "running for session" in text`.
-- **Richtig:** Die ganze Meldung und ihren Anfang prüfen (z. B. Zeilenanfang `session main running`), oder die Meldung über ein Ereignis statt über Text prüfen.
-- **Status:** verifiziert (WI-07, Testfall für die zweite Instanz)
-- **Quelle:** `src/supervisor/Supervisor.ahk` (`_ForwardIfRunning`), `tests/integration/test_supervisor.py`
+- **Problem:** A test checked `payload["ok"] is False`. AHK wrote truth values as numbers (`0`/`1`); the comparison with `False` failed, although the answer was correct (`0 is False` is false).
+- **Right (since WI-26):** The wire carries `true`/`false`, so check `is True` / `is False` in Python (helpers in `tests/support/wirebool.py`). A fallback to `1`/`0` fails automatically: every test fails whose Python peer does not receive a protocol field of the list as a JSON boolean. The rule is in `doc/PROTOKOLL.md`, section 2.
+- **Status:** verified (test run WI-10: `0 is False` red. WI-26: strict tests green).
+- **Source:** `tests/integration/test_engine.py`
 
-### Wahrheitswerte aus AHK sind 0 und 1 auch in den Python-Tests (überholt durch WI-26)
+### Long file texts via Bash heredoc: "unexpected EOF"
 
-- **Problem:** Ein Test prüfte `payload["ok"] is False`. AHK schrieb Wahrheitswerte als Zahl (`0`/`1`), der Vergleich mit `False` schlug fehl, obwohl die Antwort richtig war (`0 is False` ist falsch).
-- **Richtig (seit WI-26):** Die Leitung trägt `true`/`false`, also in Python `is True` / `is False` prüfen (Hilfen in `tests/support/wirebool.py`). Ein Rückfall auf `1`/`0` fällt automatisch auf: jeder Test schlägt fehl, dessen Python-Peer ein Protokollfeld der Liste nicht als JSON-Boolean erhält. Die Regel steht in `doc/PROTOKOLL.md`, Abschnitt 2.
-- **Status:** verifiziert (Testlauf WI-10: `0 is False` rot. WI-26: strenge Tests grün).
-- **Quelle:** `tests/integration/test_engine.py`
+- **Problem:** A heredoc with Python code (quotation marks, backslashes, embedded triple quotes) aborted in the Bash tool with `unexpected EOF while looking for matching`; the file was not created.
+- **Right:** Write the text with the write tool into a file in the scratchpad, then append it to or insert it into the target file with a short Python script. The rule "write source files with the editor tool, not with shell heredocs" (AGENTS.md) applies here too.
+- **Status:** verified (error message in the Bash run, WI-11)
 
-### Lange Dateitexte über Bash-Heredoc: "unexpected EOF"
+### Console output of a role must not prevent shutdown (orphan guard, F-05)
 
-- **Problem:** Ein Heredoc mit Python-Code (Anführungszeichen, Backslashes, eingebettete Triple-Quotes) brach im Bash-Werkzeug mit `unexpected EOF while looking for matching` ab, die Datei entstand nicht.
-- **Richtig:** Text mit dem Schreib-Werkzeug in eine Datei im Scratchpad schreiben und dann mit einem kurzen Python-Skript an die Zieldatei anhängen oder einsetzen. Die Regel "Dateien mit Edit/Write" aus dem Auftrag gilt auch hier.
-- **Status:** verifiziert (Fehlermeldung im Bash-Lauf, WI-11)
+- **Problem:** Roles started by a supervisor have no usable stderr. `FileAppend(text, "**")` throws there `OSError (6) The handle is invalid`. `Role._Exit` wrote the reason via `Role.Console`, had set `closing := true` beforehand, and because of the exception never reached `ExitApp`. After a hard kill of the supervisor, all children kept living.
+- **Wrong:** Test the orphan case only with a Python hub and a role started via `ahkrun.py`: there stderr is valid, the error never occurs.
+- **Right:** Console output is best effort (`try/catch` around `FileAppend`). Before every `ExitApp` in the shutdown path, call nothing that can throw, or catch it. Always test the orphan case with the real supervisor (`tests/fault/test_orphans.py`).
+- **Status:** verified (error seen with `AHF_TEST_KEEP=1` in `Log_role.txt`; after the fix, ending with exit 4 after 3.3 s, 20 of 20 runs).
+- **Source:** `src/core/Role.ahk` (`Console`, `_Exit`)
 
-### Konsolenausgabe einer Rolle darf das Beenden nicht verhindern (Orphan-Guard, F-05)
+### Fault tests: find the supervisor interpreter under `ahkrun`
 
-- **Problem:** Von einem Supervisor gestartete Rollen haben kein brauchbares stderr. `FileAppend(text, "**")` wirft dort `OSError (6) Das Handle ist ungültig`. `Role._Exit` schrieb den Grund über `Role.Console`, setzte vorher `closing := true` und kam wegen der Ausnahme nie zu `ExitApp`. Nach einem harten Kill des Supervisors lebten alle Kinder weiter.
-- **Falsch:** Den Orphan-Test nur mit einem Python-Hub und einer über `ahkrun.py` gestarteten Rolle prüfen: dort ist stderr gültig, der Fehler tritt nie auf.
-- **Richtig:** Ausgaben auf der Konsole sind best effort (`try/catch` um `FileAppend`). Vor jedem `ExitApp` im Beenden-Pfad nichts aufrufen, das werfen kann, oder es einfangen. Den Orphan-Fall immer mit dem echten Supervisor testen (`tests/fault/test_orphans.py`).
-- **Status:** verifiziert (Fehler mit `AHF_TEST_KEEP=1` im `Log_role.txt` gesehen; nach dem Fix Enden mit Exit 4 nach 3,3 s, 20 von 20 Läufen).
-- **Quelle:** `src/core/Role.ahk` (`Console`, `_Exit`)
+- **Problem:** `psutil.Process(ahkrun).children(recursive=True)` has no defined order. The first "autohotkey" in the list may be a role instead of the supervisor. The orphan test then killed the wrong target.
+- **Right:** Look only at the direct children of `ahkrun` (`children(recursive=False)`).
+- **Status:** verified (read and confirmed in a run: supervisor PID is the parent process of the roles). That `recursive=True` actually returned a role in the error case was not proven: assumed.
+- **Source:** `tests/fault/faultkit.py` (`Sup.ahk_pid`)
 
-### Fault-Tests: Supervisor-Interpreter unter `ahkrun` finden
+### Fault tests: restart limit caps the kills per test
 
-- **Problem:** `psutil.Process(ahkrun).children(recursive=True)` hat keine definierte Reihenfolge. Das erste "autohotkey" in der Liste kann eine Rolle sein statt des Supervisors. Der Orphan-Test tötete dann das falsche Ziel.
-- **Richtig:** Nur die direkten Kinder von `ahkrun` ansehen (`children(recursive=False)`).
-- **Status:** verifiziert (gelesen und im Lauf bestätigt: Supervisor-Pid ist Elternprozess der Rollen). Dass `recursive=True` im Fehlerfall wirklich eine Rolle lieferte, wurde nicht belegt: vermutet.
-- **Quelle:** `tests/fault/faultkit.py` (`Sup.ahk_pid`)
+- **Problem:** A test that killed storage five times in a row failed: after the third kill, the supervisor no longer started the role (at most 3 restarts per 60 s, `Children.RESTART_WINDOW_MS`).
+- **Right:** At most 3 kills per role and session (test `test_storage_abort.py` uses three delays).
+- **Status:** verified (test was red with five kills, green with three).
+- **Source:** `src/supervisor/Children.ahk`
 
-### Fault-Tests: Neustartgrenze begrenzt die Kills je Test
+### Fault tests: supervisor log only readable after the end, events with grace period
 
-- **Problem:** Ein Test, der Storage fünfmal hintereinander tötete, scheiterte: nach dem dritten Kill startete der Supervisor die Rolle nicht mehr (höchstens 3 Neustarts je 60 s, `Children.RESTART_WINDOW_MS`).
-- **Richtig:** Höchstens 3 Kills je Rolle und Sitzung (Test `test_storage_abort.py` nutzt drei Verzögerungen).
-- **Status:** verifiziert (Test war mit fünf Kills rot, mit drei grün).
-- **Quelle:** `src/supervisor/Children.ahk`
+- **Problem:** `Sup.text()` is empty during the run (ahkrun copies stderr only at the end). A test waiting for a log line (`client 'x' gone (queue_overflow)`) ran into the deadline. In addition, an observer reads in a thread: immediately after the supervisor has ended, an event may not yet be in its list.
+- **Right:** End the session, wait for the end, then read the log. Fetch events with `Recorder.wait(..., timeout=1)`, not with `find`.
+- **Status:** verified (queue overflow test: log line only present after the end; shutdown test: `find` too early once in 20 runs, 80 of 80 green with `wait`).
+- **Source:** `tests/fault/test_pipe_break.py`, `tests/fault/test_shutdown.py`
 
-### Fault-Tests: Supervisor-Log erst nach dem Ende lesbar, Ereignisse mit Nachlauf
+### Fault tests: break the pipe under a living role
 
-- **Problem:** `Sup.text()` ist während des Laufs leer (ahkrun kopiert stderr erst am Ende). Ein Test, der auf eine Log-Zeile wartete (`client 'x' gone (queue_overflow)`), lief in die Frist. Zudem liest ein Beobachter in einem Thread: unmittelbar nach dem Ende des Supervisors kann ein Ereignis noch nicht in seiner Liste stehen.
-- **Richtig:** Die Sitzung beenden, auf das Ende warten, dann das Log lesen. Ereignisse mit `Recorder.wait(..., timeout=1)` abholen, nicht mit `find`.
-- **Status:** verifiziert (Queue-Overflow-Test: Log-Zeile erst nach dem Ende da; Shutdown-Test: einmal in 20 Läufen `find` zu früh, 80 von 80 grün mit `wait`).
-- **Quelle:** `tests/fault/test_pipe_break.py`, `tests/fault/test_shutdown.py`
+- **Right:** Start the role against the Python hub (`WakingHub`), then `link.pipe.close()` of the hub for exactly this connection. The hub keeps accepting: the role reconnects (same PID, 0.12 s until `hello`). If the hub is stopped, the role ends with exit 4 after 3.3 s. A client that never reads is a raw pipe client (`winpipe.OverlappedPipe`) without a reader thread, which only writes requests; the hub throws it out at a backlog of 1000 frames.
+- **Status:** verified (`tests/fault/test_pipe_break.py`, 20 runs).
+- **Source:** `tests/fault/test_pipe_break.py`
 
-### Fault-Tests: Pipe unter einer lebenden Rolle trennen
+### A `conftest.py` in a test folder shadows `tests/conftest.py` for `from conftest import ...`
 
-- **Richtig:** Rolle gegen den Python-Hub (`WakingHub`) starten, dann `link.pipe.close()` des Hubs für genau diese Verbindung. Der Hub nimmt weiter an: die Rolle verbindet sich neu (gleiche Pid, 0,12 s bis `hello`). Wird der Hub gestoppt, endet sie mit Exit 4 nach 3,3 s. Ein Client, der nie liest, ist ein roher Pipe-Client (`winpipe.OverlappedPipe`) ohne Leser-Thread, der nur Anfragen schreibt; der Hub wirft ihn bei 1000 Rahmen Rückstand hinaus.
-- **Status:** verifiziert (`tests/fault/test_pipe_break.py`, 20 Läufe).
-- **Quelle:** `tests/fault/test_pipe_break.py`
+- **Problem:** With `tests/fault/conftest.py`, collection of the full run aborted: `tests/test_json_flows.py` and `tests/test_ahk_runner.py` do `from conftest import TESTS_DIR`, and after collecting `tests/fault/` the module `conftest` was the one from the subfolder (`ImportError: cannot import name 'TESTS_DIR'`). Single runs of the fault tests did not show this.
+- **Wrong:** Put fixtures of a subfolder in its `conftest.py` as long as other tests import `conftest` by name.
+- **Right:** Fixture in `tests/fault/faultfixtures.py`; each test module imports it (`from faultfixtures import chains`). Always also check the full run (`python -m pytest tests -q`), not only your own folder.
+- **Status:** verified (full run was red with 2 collection errors; after the change `427 passed, 1 skipped`).
+- **Source:** `tests/fault/faultfixtures.py`
 
-### Ein `conftest.py` in einem Testordner verdeckt `tests/conftest.py` für `from conftest import ...`
+### Stress tests: an AHK thread can be interrupted after 15 ms; numbering and sending belong in one step (F-09)
 
-- **Problem:** Mit `tests/fault/conftest.py` brach die Sammlung des Gesamtlaufs ab: `tests/test_json_flows.py` und `tests/test_ahk_runner.py` machen `from conftest import TESTS_DIR`, und das Modul `conftest` war nach dem Sammeln von `tests/fault/` das aus dem Unterordner (`ImportError: cannot import name 'TESTS_DIR'`). Einzelläufe der Fault-Tests zeigten das nicht.
-- **Falsch:** Fixtures eines Unterordners in dessen `conftest.py` legen, solange andere Tests `conftest` per Namen importieren.
-- **Richtig:** Fixture in `tests/fault/faultfixtures.py`, jedes Testmodul importiert sie (`from faultfixtures import chains`). Immer auch den Gesamtlauf (`python -m pytest tests -q`) prüfen, nicht nur den eigenen Ordner.
-- **Status:** verifiziert (Gesamtlauf war rot mit 2 Sammelfehlern, nach der Umstellung `427 passed, 1 skipped`).
-- **Quelle:** `tests/fault/faultfixtures.py`
+- **Problem:** With 200 parallel instances, `evt.*` events of the engine arrived with the wrong order of `seq` (253 after 271). The same occurred with the real supervisor and with the Python hub (`WakingHub`); the cause was therefore in the engine. `Engine.Emit` assigned `seq` and then called `peer.Send`; AHK interrupts a thread after 15 ms, and the interrupting thread (timer or message) sent its events first. The stub discards an event with a smaller `seq` as "already seen".
+- **Wrong:** `this.seq += 1`, then serialize and send, without protecting the sequence.
+- **Right:** `prev := Critical("On")`, assign `seq` and send, in `finally` `Critical(prev)`. Applies to every place where an order between "assign number" and "send" must be preserved.
+- **Status:** verified (before the change 2 of 2 runs with swapped order; afterwards 3 of 3 runs at the Python hub, and the 200-instance tests ran over 100 times without swapped `seq`). The effect of `Critical` on the latency of other messages was not measured separately (the measurements above are after the change).
+- **Source:** `src/engine/Engine.ahk` (`Emit`), `tests/stress/test_parallel_instances.py`
 
-### Stresstests: ein AHK-Thread ist nach 15 ms unterbrechbar, Nummerieren und Senden gehören in einen Schritt (F-09)
+### Stress tests: a thread can be interrupted by a timer between two lines, intermediate states are visible (F-10)
 
-- **Problem:** Bei 200 parallelen Instanzen kamen `evt.*`-Ereignisse der Engine mit falscher Reihenfolge der `seq` an (253 nach 271). Gleiches mit dem echten Supervisor und mit dem Python-Hub (`WakingHub`), die Ursache lag also in der Engine. `Engine.Emit` vergab `seq` und rief danach `peer.Send` auf; AHK unterbricht einen Thread nach 15 ms, und der unterbrechende Thread (Timer oder Nachricht) sendete seine Ereignisse zuerst. Der Stub verwirft ein Ereignis mit kleinerem `seq` als "schon gesehen".
-- **Falsch:** `this.seq += 1`, dann serialisieren und senden, ohne den Ablauf zu schützen.
-- **Richtig:** `prev := Critical("On")`, `seq` vergeben und senden, im `finally` `Critical(prev)`. Gilt für jede Stelle, an der eine Reihenfolge zwischen "Nummer vergeben" und "abschicken" erhalten bleiben muss.
-- **Status:** verifiziert (vor der Änderung 2 von 2 Läufen mit vertauschter Reihenfolge; danach 3 von 3 Läufen am Python-Hub, und die 200-Instanz-Tests liefen in über 100 Läufen ohne vertauschte `seq`). Die Wirkung von `Critical` auf die Latenz anderer Nachrichten wurde nicht gesondert gemessen (die Messungen oben liegen nach der Änderung).
-- **Quelle:** `src/engine/Engine.ahk` (`Emit`), `tests/stress/test_parallel_instances.py`
+- **Problem:** In 2 of 53 runs with 200 parallel instances, an instance ended with `exception` and the message "element Trigger_Manual cannot be an action (mode trigger)". `Scheduler.Advance` sets the thread to `ready` (`TryTransition`) and only a few lines later to the next element (`target.ElementId := ...`). The dispatch timer (`Executor.Tick`) interrupted in between and ran the thread with the old element, the trigger, as an action.
+- **Wrong:** Publish a state (here: `ready` in the thread state) before the associated fields are set, in code that timers can interrupt.
+- **Right:** Run the transition as a whole under `Critical` (`Executor._Advance`), or set the fields before the state change. Effect: 60 of 60 runs of the 50/200-instance test without failure. The error previously occurred without a recognizable pattern (not in 12 single runs, once in 10 full runs, once in the 31st repetition run). Other places with the same pattern (e.g. `_Dispatch` between `thread.Dispatch()` and the entry in `run["active"]`, `Scheduler.Advance` when cloning) were not checked.
+- **Status:** cause verified (message and source code match; no direct proof of the interruption), fix statistically proven (60/60).
+- **Source:** `src/engine/Executor.ahk` (`_Advance`), `src/engine/core/Scheduler.ahk` (`Advance`), `tests/stress/test_parallel_instances.py`
 
-### Stresstests: ein Thread kann zwischen zwei Zeilen von einem Timer unterbrochen werden, Zwischenzustände sind sichtbar (F-10)
+### Python client: `events(timeout)` ends only after silence
 
-- **Problem:** In 2 von 53 Läufen mit 200 parallelen Instanzen endete eine Instanz mit `exception` und der Meldung "element Trigger_Manual cannot be an action (mode trigger)". `Scheduler.Advance` setzt den Thread auf `ready` (`TryTransition`) und erst einige Zeilen später auf das nächste Element (`target.ElementId := ...`). Der Dispatch-Timer (`Executor.Tick`) unterbrach dazwischen und führte den Thread mit dem alten Element, dem Trigger, als Aktion aus.
-- **Falsch:** Einen Zustand veröffentlichen (hier: `ready` im Thread-Zustand), bevor die zugehörigen Felder gesetzt sind, in Code, der von Timern unterbrochen werden kann.
-- **Richtig:** Den Übergang als Ganzes unter `Critical` ausführen (`Executor._Advance`) oder die Felder vor dem Zustandswechsel setzen. Wirkung: 60 von 60 Läufen des 50/200-Instanz-Tests ohne Ausfall. Der Fehler trat vorher ohne erkennbares Muster auf (nicht in 12 Einzelläufen, einmal in 10 Gesamtläufen, einmal im 31. Wiederholungslauf). Weitere Stellen mit demselben Muster (z. B. `_Dispatch` zwischen `thread.Dispatch()` und dem Eintrag in `run["active"]`, `Scheduler.Advance` beim Klonen) wurden nicht geprüft.
-- **Status:** Ursache verifiziert (Meldung und Quelltext passen zusammen; direkter Nachweis der Unterbrechung nicht erbracht), Behebung statistisch belegt (60/60).
-- **Quelle:** `src/engine/Executor.ahk` (`_Advance`), `src/engine/core/Scheduler.ahk` (`Advance`), `tests/stress/test_parallel_instances.py`
+- **Problem:** `AhfClient.events(timeout=0.3)` is not a time window but "ends after 0.3 s without a new message". If a flow runs, events keep coming, the loop never ended, and 20 threads hung until the deadline.
+- **Wrong:** `sum(1 for _ in client.events(timeout=0.3))` to listen for 0.3 s.
+- **Right:** Loop with its own end time and `client._next_event(remaining time)` (`listen` in `test_clients_churn.py`). Every waiting loop in a test needs its own deadline together with a message (`thread_stacks` in `stresskit.py` prints the stacks of the hanging threads).
+- **Status:** verified (hang until the pytest deadline, green afterwards)
 
-### Python-Client: `events(timeout)` endet erst nach Stille
+### Python clients without a window: latency 210 to 270 ms when the hub is not woken
 
-- **Problem:** `AhfClient.events(timeout=0.3)` ist kein Zeitfenster, sondern "Ende nach 0,3 s ohne neue Nachricht". Läuft ein Flow, kommen ständig Ereignisse, die Schleife endete nie, 20 Threads hingen bis zur Frist.
-- **Falsch:** `sum(1 for _ in client.events(timeout=0.3))`, um 0,3 s lang zu lauschen.
-- **Richtig:** Schleife mit eigener Endzeit und `client._next_event(restzeit)` (`listen` in `test_clients_churn.py`). Jede Warteschleife in einem Test braucht eine eigene Frist samt Meldung (`thread_stacks` in `stresskit.py` gibt die Stapel der hängenden Threads aus).
-- **Status:** verifiziert (Hänger bis zur pytest-Frist, danach grün)
+- **Problem:** Measurements of the response time with `AhfClient` showed a median of 226 ms. The hub sees write accesses of a client without a wake-up call only on its 250 ms tick.
+- **Right:** After each write, `PostMessage(WM_AHF_WAKE)` to the script window of the supervisor (class `AutoHotkey` of the process ID, `hwnd_of` in `tests/stress/stresskit.py`). Then median 1.4 ms. Always do this for measurements "like an AHK client"; for the case without a wake-up call there is a separate test.
+- **Status:** verified (10 runs: 226 ms without, 1.4 ms with wake-up call)
 
-### Python-Clients ohne Fenster: Latenz 210 bis 270 ms, wenn der Hub nicht geweckt wird
+### A test that counts operations must set `Critical` or avoid waiting loops (WI-25)
 
-- **Problem:** Messungen der Antwortzeit mit `AhfClient` zeigten Median 226 ms. Der Hub sieht Schreibzugriffe eines Clients ohne Weckruf erst auf seinem 250-ms-Takt.
-- **Richtig:** Nach jedem Schreiben `PostMessage(WM_AHF_WAKE)` an das Skriptfenster des Supervisors (Klasse `AutoHotkey` der Prozess-ID, `hwnd_of` in `tests/stress/stresskit.py`). Dann Median 1,4 ms. Für Messungen "wie ein AHK-Client" immer so, für den Fall ohne Weckruf gibt es einen eigenen Test.
-- **Status:** verifiziert (10 Läufe: 226 ms ohne, 1,4 ms mit Weckruf)
+- **Problem:** A component test for the time budget let an operation wait with `Sleep(5)`. The queue had set `SetTimer(pump, -1)` when enqueuing; during `Sleep` (and also in a long loop, where AHK checks for messages every few milliseconds) the timer ran in between and processed operations itself. The count was wrong.
+- **Right:** Start the test with `Critical("On")` (the timer is deferred) and wait with a loop over `Time.NowMs()` instead of `Sleep`. Also, `until` is a reserved word and cannot be a variable.
+- **Status:** verified
+- **Source:** `tests/ahk/storage_queue.test.ahk`
 
-### Ein Test, der Operationen zählt, muss `Critical` setzen oder Warteschleifen vermeiden (WI-25)
+### Stress tests: full scope only with `-m`, smoke variant in the standard run
 
-- **Problem:** Ein Komponententest für das Zeitbudget ließ eine Operation mit `Sleep(5)` warten. Die Warteschlange hatte beim Einreihen `SetTimer(pump, -1)` gesetzt; während `Sleep` (und auch in einer langen Schleife, AHK prüft dort alle paar Millisekunden auf Nachrichten) lief der Timer dazwischen und arbeitete selbst Operationen ab. Die Zählung stimmte nicht.
-- **Richtig:** Den Test mit `Critical("On")` beginnen (der Timer wird zurückgestellt) und mit einer Warteschleife über `Time.NowMs()` statt `Sleep` warten. Auch `until` ist ein reserviertes Wort und kann keine Variable sein.
-- **Status:** verifiziert
-- **Quelle:** `tests/ahk/storage_queue.test.ahk`
+- **Problem:** A marker alone does not exclude a test from the standard run (the `addopts` in `pytest.ini` only concern parallelism). The full scope (200 instances, 1000 cycles, 30 s idle, flood) would lengthen `python -m pytest tests -q` by minutes.
+- **Right:** `tests/conftest.py` drops tests with the marker `stress` or `soak` from the selection if `-m` does not contain the name. Each test has an unmarked smoke variant (`pytest.param(..., id="smoke")`) that stays in the standard run. Call: `python -m pytest tests -m stress -q`, endurance run `AHF_SOAK_SECONDS=600 python -m pytest tests -m soak -q`.
+- **Status:** verified (standard run and `-m stress` collected and executed)
+- **Source:** `tests/conftest.py`
 
-### Stresstests: voller Umfang nur mit `-m`, Smoke-Variante im Standardlauf
+### Parallel test runs (pytest-xdist): the same AHK script starts several times
 
-- **Problem:** Marker allein schliessen einen Test nicht aus dem Standardlauf aus (die `addopts` in `pytest.ini` betreffen nur die Parallelität). Der volle Umfang (200 Instanzen, 1000 Zyklen, 30 s Idle, Flut) würde `python -m pytest tests -q` um Minuten verlängern.
-- **Richtig:** `tests/conftest.py` wirft Tests mit dem Marker `stress` oder `soak` aus der Auswahl, wenn `-m` den Namen nicht enthält. Pro Test gibt es eine unmarkierte Smoke-Variante (`pytest.param(..., id="smoke")`), die im Standardlauf bleibt. Aufruf: `python -m pytest tests -m stress -q`, Dauerlauf `AHF_SOAK_SECONDS=600 python -m pytest tests -m soak -q`.
-- **Status:** verifiziert (Standardlauf und `-m stress` gesammelt und ausgeführt)
-- **Quelle:** `tests/conftest.py`
+- **Problem:** In the first run with `-n 8`, 21 tests of `tests/test_ahk_runner.py` failed with "case not reported ... exit=15". Cause: several workers started the same `*.test.ahk` file at the same time. AHK v2 then asks "An older instance of this script is already running. Replace it?" (default behavior without `#SingleInstance Off`); the dialog watcher closed the dialog and ended the process (`psutil.kill` returns exit code 15 under Windows). The dialog reports in `%TEMP%\ahf_dialogs\` showed it immediately.
+- **Wrong:** Assume that isolation via data directory and session ID is enough. That holds for data and pipes, not for the script itself.
+- **Right:** `#SingleInstance Off` in every script that a test can start as the main script (`tests/ahk/lib/Assert.ahk`, `tests/ahk/helpers/*.ahk`; `src/AutoHotFlow.ahk` and the helper scripts in `tests/integration/helpers/` already had it). File names of the dialog watcher now additionally contain the PID of the test process (`_w<pid>_`).
+- **Status:** verified (21 errors before, `-n 8` green afterwards)
+- **Source:** `tests/ahk/lib/Assert.ahk`, `tools/ahf_dialogwatch.py`
 
-### Parallele Testläufe (pytest-xdist): gleiches AHK-Skript startet mehrfach
+### Dialog watcher: reused process IDs (several watchers side by side)
 
-- **Problem:** Beim ersten Lauf mit `-n 8` scheiterten 21 Tests von `tests/test_ahk_runner.py` mit "case not reported ... exit=15". Ursache: Mehrere Worker starteten dieselbe `*.test.ahk`-Datei gleichzeitig. AHK v2 fragt dann "An older instance of this script is already running. Replace it?" (Standardverhalten ohne `#SingleInstance Off`); der Dialog-Wächter schloss den Dialog und beendete den Prozess (`psutil.kill` liefert unter Windows Exit-Code 15). Die Dialogberichte in `%TEMP%\ahf_dialogs\` zeigten es sofort.
-- **Falsch:** Annehmen, dass Isolation über Datenverzeichnis und Sitzungs-ID reicht. Das gilt für Daten und Pipes, nicht für das Skript selbst.
-- **Richtig:** `#SingleInstance Off` in jedes Skript, das ein Test als Hauptskript starten kann (`tests/ahk/lib/Assert.ahk`, `tests/ahk/helpers/*.ahk`; `src/AutoHotFlow.ahk` und die Hilfsskripte in `tests/integration/helpers/` hatten es schon). Dateinamen des Dialog-Wächters enthalten jetzt zusätzlich die PID des Testprozesses (`_w<pid>_`).
-- **Status:** verifiziert (21 Fehler vorher, danach `-n 8` grün)
-- **Quelle:** `tests/ahk/lib/Assert.ahk`, `tools/ahf_dialogwatch.py`
+- **Problem:** Under xdist, `tests/support/test_dialogwatch.py` failed sporadically (exit 0 instead of 97): the watcher of another worker had closed the dialog and ended the process. Cause (derived from the code; the gap is closed, the individual case not reproduced): the root PIDs stayed registered in the watcher forever; Windows reassigns PIDs quickly, and a test PID of another worker then lay in the "process tree" of an old root.
+- **Wrong:** Treat PIDs alone as the identity of a process and never remove them.
+- **Right:** Store the creation time with the PID (`psutil.Process(pid).create_time()`); remove dead or reused roots before each pass (`DialogWatcher._live_roots`).
+- **Status:** gap verified by reading, fix checked by runs (see result in `work_items/phase2b/WI-18-testlaufzeit.md`); trigger of the failure assumed.
+- **Source:** `tools/ahf_dialogwatch.py`
 
-### Dialog-Wächter: wiederverwendete Prozess-IDs (mehrere Watcher nebeneinander)
+### Measurements and xdist
 
-- **Problem:** Unter xdist schlugen sporadisch `tests/support/test_dialogwatch.py` fehl (Exit 0 statt 97): Der Wächter eines anderen Workers hatte den Dialog geschlossen und den Prozess beendet. Ursache (aus dem Code abgeleitet, die Lücke ist geschlossen, der Einzelfall nicht nachgestellt): Die Wurzel-PIDs blieben im Wächter für immer registriert; Windows vergibt PIDs schnell neu, und eine Test-PID eines anderen Workers lag dann im "Prozessbaum" einer alten Wurzel.
-- **Falsch:** PIDs allein als Identität eines Prozesses behandeln und nie austragen.
-- **Richtig:** Zur PID die Erstellungszeit merken (`psutil.Process(pid).create_time()`), tote oder wiederverwendete Wurzeln vor jedem Durchlauf austragen (`DialogWatcher._live_roots`).
-- **Status:** Lücke verifiziert durch Lesen, Behebung durch Läufe geprüft (siehe Ergebnis in `work_items/phase2b/WI-18-testlaufzeit.md`); Auslöser des Ausfalls vermutet.
-- **Quelle:** `tools/ahf_dialogwatch.py`
+- **Problem:** Idle CPU and latency measurements are distorted under parallel load.
+- **Right:** `tests/conftest.py` sets `numprocesses = 0` in `pytest_cmdline_main` (`tryfirst`) for `-m stress` / `-m soak`; this overrides `addopts = -n auto`. Checked: `-m stress` on one file runs without `[gw..]` workers.
+- **Status:** verified
 
-### Messungen und xdist
+### `-k "not memory"` also excludes the idle CPU test
 
-- **Problem:** Idle-CPU- und Latenzmessungen werden unter paralleler Last verfälscht.
-- **Richtig:** `tests/conftest.py` setzt bei `-m stress` / `-m soak` `numprocesses = 0` in `pytest_cmdline_main` (`tryfirst`), das überschreibt `addopts = -n auto`. Geprüft: `-m stress` auf einer Datei läuft ohne `[gw..]`-Worker.
-- **Status:** verifiziert
+- **Problem:** In the repetition run with `-k "not memory and not backlog"`, the idle CPU measurement was missing, because the test name `test_idle_cpu_and_memory_...` contains "memory". This was only noticed during evaluation.
+- **Right:** After the run, check the number of measurement lines per name (`AHF_MEASURE_OUT`), not only "7 passed".
+- **Status:** verified
 
-### `-k "not memory"` schliesst auch den Idle-CPU-Test aus
+### Static checking of AHK source code (`tools/arch_check.py`)
 
-- **Problem:** Beim Wiederholungslauf `-k "not memory and not backlog"` fehlte die Idle-CPU-Messung, weil der Testname `test_idle_cpu_and_memory_...` "memory" enthält. Es fiel erst bei der Auswertung auf.
-- **Richtig:** Nach dem Lauf die Zahl der Messzeilen je Name prüfen (`AHF_MEASURE_OUT`), nicht nur "7 passed".
-- **Status:** verifiziert
+- **Problem 1:** The check removes string literals before the pattern search (otherwise `"MsgBox"` or `DllCall("Sleep")` would match). The rule `critical` therefore saw `Critical("On")` as `Critical("  ")` and did not detect the enabling; in the first run it reported nothing.
+- **Right:** Keep two versions of the text (without comments/string content, and only without comments) and search for arguments such as `"On"` or `static Mode := "inline"` in the second. Every rule needs a self-test with a hit, otherwise such an error stays unnoticed.
+- **Status:** verified (self-test `critical`, and a run against the state before the corrections, which yields 7 hits).
+- **Problem 2:** In `catch as e {`, the pattern for the error class took the word `as` itself for a class; empty `catch as e {}` blocks were overlooked.
+- **Right:** Exclude the class name with `(?!as\b)`.
+- **Status:** verified (self-test `test_catch_variants`).
+- **Source:** `tools/arch_check.py`, `tests/test_architecture.py`
 
-### Statische Prüfung von AHK-Quelltext (`tools/arch_check.py`)
+### Long Python heredocs with mixed quotation marks break in the tool's Bash
 
-- **Problem 1:** Die Prüfung entfernt Zeichenkettenliterale vor der Mustersuche (sonst treffen `"MsgBox"` oder `DllCall("Sleep")`). Die Regel `critical` sah deshalb `Critical("On")` als `Critical("  ")` und erkannte das Einschalten nicht; sie meldete im ersten Lauf nichts.
-- **Richtig:** Zwei Fassungen des Textes führen (ohne Kommentare/Zeichenketteninhalt, und nur ohne Kommentare) und Argumente wie `"On"` oder `static Mode := "inline"` in der zweiten suchen. Jede Regel braucht einen Selbsttest mit Treffer, sonst bleibt so ein Fehler unbemerkt.
-- **Status:** verifiziert (Selbsttest `critical`, und Lauf gegen den Stand vor den Korrekturen, der 7 Treffer liefert).
-- **Problem 2:** In `catch as e {` hielt das Muster für die Fehlerklasse das Wort `as` selbst für eine Klasse; leere `catch as e {}`-Blöcke wurden übersehen.
-- **Richtig:** Klassenname mit `(?!as\b)` ausschließen.
-- **Status:** verifiziert (Selbsttest `test_catch_variants`).
-- **Quelle:** `tools/arch_check.py`, `tests/test_architecture.py`
+- **Problem:** A `python - <<'EOF'` heredoc with many `'`, `"` and backslashes was rejected by the shell ("unexpected EOF"), without anything being executed. A heredoc that writes AHK source code can also make backslashes collapse (see `AGENTS.md`).
+- **Right:** Write the change script as a file with the editor tool (scratchpad) and run it with `python datei.py`. Preserve the CRLF/LF line endings of the target file (`newline=''` when reading and writing).
+- **Status:** verified (occurred twice)
 
-### Lange Python-Heredocs mit gemischten Anführungszeichen brechen in der Bash des Werkzeugs
+### Python scripts in a Bash heredoc that patch source code with backslashes
 
-- **Problem:** Ein `python - <<'EOF'`-Heredoc mit vielen `'`, `"` und Backslashes wurde von der Shell abgelehnt ("unexpected EOF"), ohne dass etwas ausgeführt wurde. Ein Heredoc, der AHK-Quelltext schreibt, kann zudem Backslashes zusammenfallen lassen (siehe `AGENTS.md`).
-- **Richtig:** Das Änderungsskript mit dem Editor-Werkzeug als Datei schreiben (Scratchpad) und mit `python datei.py` ausführen. Dabei CRLF/LF der Zieldatei erhalten (`newline=''` beim Lesen und Schreiben).
-- **Status:** verifiziert (zweimal aufgetreten)
+- **Problem:** A `python - <<'EOF'` script that was to search for a text with double backslashes (pipe path `\\.\pipe\...`) did not find it: the tool's Bash turned two backslashes into one, the check `assert alt in text` failed (occurred twice; once a document remained unchanged unnoticed, because the commit ran anyway).
+- **Right:** Write the script as a file with the write tool (raw strings `r'...'`) and run it with `python datei.py`. After the patch, look at `git diff --stat` before committing.
+- **Status:** verified
+- **Source:** work on WI-22
 
-### Python-Skripte im Bash-Heredoc, die Quelltext mit Backslashes patchen
+### Pool test: requests from Python carry up to 250 ms of wake-up delay
 
-- **Problem:** Ein `python - <<'EOF'`-Skript, das einen Text mit doppelten Backslashes (Pipe-Pfad `\\.\pipe\...`) suchen sollte, fand ihn nicht: Die Bash des Werkzeugs machte aus zwei Backslashes einen, die Prüfung `assert alt in text` schlug fehl (zweimal aufgetreten, einmal blieb ein Dokument unbemerkt unverändert, weil der Commit trotzdem lief).
-- **Richtig:** Skript mit dem Schreibwerkzeug als Datei schreiben (rohe Zeichenketten `r'...'`) und mit `python datei.py` ausführen. Nach dem Patch `git diff --stat` ansehen, bevor committet wird.
-- **Status:** verifiziert
-- **Quelle:** Arbeit an WI-22
+- **Problem:** A test that measured the time "start flow until instance ended" via a Python request showed the hub's wake-up delay (a Python client has no window for the wake-up call; the hub reads it with the 250 ms timer) as part of the time.
+- **Right:** Form times from engine events (engine event A to engine event B). The cold-start time of the pool is thus the time from the end of the trigger element to the start of the worker element.
+- **Status:** verified (measured values in the result of WI-27)
+- **Source:** `tests/fault/test_worker_lifecycle.py` (`test_time_to_the_first_job_when_the_worker_has_to_be_started_cold`)
 
-### Pool-Test: Anfragen aus Python tragen bis zu 250 ms Weckverzug
+### AHK unit test: change static constants of a class at runtime
 
-- **Problem:** Ein Test, der die Zeit "Flow starten bis Instanz beendet" über eine Python-Anfrage maß, zeigte den Weckverzug des Hubs (ein Python-Client hat kein Fenster für den Weckruf, der Hub liest ihn mit dem 250-ms-Timer) als Teil der Zeit.
-- **Richtig:** Zeiten aus Engine-Ereignissen bilden (Ereignis A der Engine bis Ereignis B der Engine). Die Kaltstart-Zeit des Pools ist so die Zeit vom Ende des Trigger-Elements bis zum Start des Worker-Elements.
-- **Status:** verifiziert (Messwerte im Ergebnis von WI-27)
-- **Quelle:** `tests/fault/test_worker_lifecycle.py` (`test_time_to_the_first_job_when_the_worker_has_to_be_started_cold`)
+- **Problem:** The test for the unacknowledged abort would have waited 2 s (`WorkerBridge.ORPHAN_MS`).
+- **Right:** `WorkerBridge.ORPHAN_MS := 150` in the test, reset in `finally`. The constant is read on each call, not copied at load time.
+- **Status:** verified (`tests/ahk/engine_worker_bridge.test.ahk`: `CancelThatIsNotConfirmedKillsTheWorkerAfterTheOrphanTime`, `JobDeadlineEndsTheJobAtOnceAndCancelsThenKills`; without the reset in `finally` the value would remain changed for later cases of the file)
 
-### AHK-Unit-Test: statische Konstanten einer Klasse zur Laufzeit ändern
+### Test observer misses `evt.engine.ready` (WI-28)
 
-- **Problem:** Der Test für den nicht quittierten Abbruch hätte 2 s (`WorkerBridge.ORPHAN_MS`) gewartet.
-- **Richtig:** `WorkerBridge.ORPHAN_MS := 150` im Test, im `finally` zurücksetzen. Die Konstante wird bei jedem Aufruf gelesen, nicht beim Laden kopiert.
-- **Status:** verifiziert (`tests/ahk/engine_worker_bridge.test.ahk`: `CancelThatIsNotConfirmedKillsTheWorkerAfterTheOrphanTime`, `JobDeadlineEndsTheJobAtOnceAndCancelsThenKills`; ohne das Zurücksetzen im `finally` bliebe der Wert für spätere Fälle der Datei geändert)
+- **Problem:** The observer of a `Chain` subscribes to the topics only after the supervisor has started. If `evt.engine.ready` arrives before that, the test waits 20 s in vain. One test hit this once, another started a flow that was not yet loaded (`not_found`).
+- **Right:** Do not wait for an event that may arrive before the subscription (PROTOKOLL 5a); instead query the state: `Chain.wait_flows()` polls `cmd.engine.snapshot` until the flows are loaded.
+- **Status:** verified (`tests/fault/faultkit.py`, all tests of the files `test_snapshot.py`, `test_report.py`, `test_debug_role.py`)
 
-### Test-Beobachter verpasst `evt.engine.ready` (WI-28)
+### Test: the folder of a report is created before its files (WI-28)
 
-- **Problem:** Der Beobachter einer `Chain` abonniert die Topics erst, nachdem der Supervisor gestartet ist. Kommt `evt.engine.ready` vorher, wartet der Test 20 s vergeblich. Ein Test hat das einmal getroffen, ein anderer startete einen Flow, der noch nicht geladen war (`not_found`).
-- **Richtig:** Nicht auf ein Ereignis warten, das vor dem Abonnement kommen kann (PROTOKOLL 5a), sondern den Zustand abfragen: `Chain.wait_flows()` fragt `cmd.engine.snapshot`, bis die Flows geladen sind.
-- **Status:** verifiziert (`tests/fault/faultkit.py`, alle Tests der Dateien `test_snapshot.py`, `test_report.py`, `test_debug_role.py`)
+- **Problem:** A test waited for the folder `Reports/<stamp>_hung-...` and then read `report.json`: `FileNotFoundError`. Storage creates the folder and then writes the files one after another.
+- **Right:** Wait for the file written last (`summary.txt`; order: sorted names of the `Map`), not for the folder.
+- **Status:** verified (`tests/fault/test_report.py::wait_report`)
 
-### Test: Der Ordner eines Berichts entsteht vor seinen Dateien (WI-28)
+### Python: `ctypes.windll.user32` is a shared object; other modules set `argtypes` on it (WI-28)
 
-- **Problem:** Ein Test wartete auf den Ordner `Reports/<stamp>_hung-...` und las dann `report.json`: `FileNotFoundError`. Storage legt den Ordner an und schreibt die Dateien danach nacheinander.
-- **Richtig:** Auf die zuletzt geschriebene Datei warten (`summary.txt`, Reihenfolge: sortierte Namen der `Map`), nicht auf den Ordner.
-- **Status:** verifiziert (`tests/fault/test_report.py::wait_report`)
+- **Problem:** `user32.EnumWindows(WINFUNCTYPE(...)(visit), 0)` in the test raised `ArgumentError: expected WinFunctionType instance instead of WinFunctionType`: another module (the dialog watcher) had set the `argtypes` of `EnumWindows` on `windll.user32`, with its own `WINFUNCTYPE` class. Every call of `WINFUNCTYPE` creates a new class.
+- **Right:** Use an own object: `user32 = ctypes.WinDLL("user32")`. Its functions are separate from those in `windll.user32`.
+- **Status:** verified (`tests/fault/test_debug_role.py`)
 
-### Python: `ctypes.windll.user32` ist ein gemeinsames Objekt, andere Module setzen `argtypes` darauf (WI-28)
+### Waiting for a role: query the state, do not count (WI-31)
 
-- **Problem:** `user32.EnumWindows(WINFUNCTYPE(...)(visit), 0)` im Test warf `ArgumentError: expected WinFunctionType instance instead of WinFunctionType`: Ein anderes Modul (der Dialog-Wächter) hatte `argtypes` von `EnumWindows` auf `windll.user32` gesetzt, mit einer eigenen `WINFUNCTYPE`-Klasse. Jeder Aufruf von `WINFUNCTYPE` erzeugt eine neue Klasse.
-- **Richtig:** Ein eigenes Objekt verwenden: `user32 = ctypes.WinDLL("user32")`. Dessen Funktionen sind von denen in `windll.user32` getrennt.
-- **Status:** verifiziert (`tests/fault/test_debug_role.py`)
+- **Problem:** The engine gave up after 5 attempts in 2.5 s if `storage` was not yet connected (F-31), and reported every attempt as `evt.storage.error` (F-24). A first replacement, which reloaded immediately on "ready", ran into a loop (1440 read attempts in 2.5 s) when a role counted as `ready` but every request ended with `peer_gone`.
+- **Right:** First subscribe to the topic `process`, then ask `cmd.process.list` (PROTOKOLL 5a), without an upper limit on attempts, but with a pause (1 s) between two requests and at most one log line per 30 s. After an aborted load, also restart only after the pause. Only `evt.process.ready` may restart immediately.
+- **Status:** verified (`tests/integration/test_engine.py`: `test_engine_waits_for_a_storage_that_starts_5_s_after_it_and_reports_no_error`, `test_engine_resumes_loading_when_storage_restarts_in_the_middle_and_loads_only_the_missing_files`, `test_engine_does_not_ask_for_more_files_when_storage_has_stopped_answering`)
 
-### Warten auf eine Rolle: Zustand abfragen, nicht zählen (WI-31)
+### Deadlines via SetTimer do not survive a standstill: use a deadline list in the tick (WI-33)
 
-- **Problem:** Die Engine gab nach 5 Versuchen in 2,5 s auf, wenn `storage` noch nicht verbunden war (F-31), und meldete jeden Versuch als `evt.storage.error` (F-24). Ein erster Ersatz, der bei "bereit" sofort neu lädt, rannte in eine Schleife (1440 Leseversuche in 2,5 s), als eine Rolle als `ready` galt, aber jede Anfrage mit `peer_gone` endete.
-- **Richtig:** Erst das Topic `process` abonnieren, dann `cmd.process.list` fragen (PROTOKOLL 5a), ohne Obergrenze der Versuche, aber mit Pause (1 s) zwischen zwei Fragen und höchstens einer Logzeile je 30 s. Nach einem abgebrochenen Laden ebenfalls erst nach der Pause neu beginnen. Nur `evt.process.ready` darf sofort neu starten.
-- **Status:** verifiziert (`tests/integration/test_engine.py`: `test_engine_waits_for_a_storage_that_starts_5_s_after_it_and_reports_no_error`, `test_engine_resumes_loading_when_storage_restarts_in_the_middle_and_loads_only_the_missing_files`, `test_engine_does_not_ask_for_more_files_when_storage_has_stopped_answering`)
+- **Problem:** A deadline set with `SetTimer(fn, -ms)` (`Hub.Request`, e.g. `cmd.app.prepareExit` with 10 minutes) runs on wall-clock time. If the process stands still (frozen, standby), the timer is due afterwards. It may run before the tick that notices the standstill; the order of due timers cannot be controlled. A reset of the timers in the tick would then come too late; the request has already ended with "timeout".
+- **Right:** Write the deadline as a point in time (`dueAt`) into the entry of the request and check it in the tick (`Hub.Tick`). The tick measures the standstill first (`Stall.Check`) and shifts all `dueAt` values (`Hub.Shift`); afterwards it checks the deadlines. Cost: the deadline is accurate to one tick (200 ms). For deadlines where an early expiry is harmless (`DiagReport`: waiting for `storage`), it is enough to reset the timer with the remaining time.
+- **Status:** verified (`tests/fault/test_supervisor_stall.py::test_open_prepare_exit_request_keeps_its_remaining_time_after_a_stand_still`: before, the request ended 0.24 s after resuming, afterwards 5.11 s; AHK unit tests in `tests/ahk/supervisor_tick.test.ahk`). That a `SetTimer` would actually run before the tick is not reproduced, only not excluded.
+- **Source:** WI-33, `src/supervisor/Stall.ahk`, `src/supervisor/Hub.ahk`
 
-### Fristen über SetTimer überstehen keinen Stillstand: eine Fristliste im Tick verwenden (WI-33)
+### Processes of a planned end: set the reason in the record before the end is evaluated (WI-33)
 
-- **Problem:** Eine Frist, die mit `SetTimer(fn, -ms)` gesetzt ist (`Hub.Request`, z. B. `cmd.app.prepareExit` mit 10 Minuten), läuft nach der Wanduhr. Steht der Prozess still (eingefroren, Standby), ist der Timer danach fällig. Er kann vor dem Tick laufen, der den Stillstand bemerkt; die Reihenfolge fälliger Timer ist nicht zu steuern. Ein Rücksetzen der Timer im Tick käme dann zu spät, die Anfrage ist schon mit "timeout" beendet.
-- **Richtig:** Die Frist als Zeitpunkt (`dueAt`) in den Eintrag der Anfrage schreiben und im Tick prüfen (`Hub.Tick`). Der Tick misst den Stillstand zuerst (`Stall.Check`) und verschiebt alle `dueAt` (`Hub.Shift`), danach prüft er die Fristen. Kosten: die Frist ist auf einen Tick (200 ms) genau. Für Fristen, bei denen ein verfrühter Ablauf harmlos ist (`DiagReport`: Warten auf `storage`), genügt es, den Timer mit der Restzeit neu zu setzen.
-- **Status:** verifiziert (`tests/fault/test_supervisor_stall.py::test_open_prepare_exit_request_keeps_its_remaining_time_after_a_stand_still`: vorher endete die Anfrage 0,24 s nach dem Fortsetzen, nachher 5,11 s; AHK-Unit-Tests in `tests/ahk/supervisor_tick.test.ahk`). Dass ein `SetTimer` tatsächlich vor dem Tick laufen würde, ist nicht nachgestellt, nur nicht ausgeschlossen.
-- **Quelle:** WI-33, `src/supervisor/Stall.ahk`, `src/supervisor/Hub.ahk`
+- **Problem:** If the supervisor stops workers because the engine ended, an end without a request would count as `crashed` (with report and count).
+- **Right:** As with `KillWorker`, set the state `stopping` and `killReason` ("engine gone") before `TerminateProcess`; `Children._OnGone` then reports `evt.process.exited` with `reason` and does not count for exit code 5 (`Terminate(name, false)`). The trigger is the signaled process handle of the engine in the tick, not the evaluation of the end, which can wait up to 500 ms.
+- **Status:** verified (`tests/fault/test_worker_lifecycle.py::test_engine_killed_during_a_hanging_job_ends_the_worker_at_once_and_the_new_engine_builds_the_pool`: worker gone 0.21 s after the death of the engine)
+- **Source:** WI-33, `src/supervisor/Children.ahk`
 
-### Prozesse eines geplanten Endes: Grund im Datensatz setzen, bevor das Ende bewertet wird (WI-33)
+### Exit code 5 only after a real termination (WI-33, F-33)
 
-- **Problem:** Beendet der Supervisor Worker, weil die Engine endete, wäre ein Ende ohne Anfrage ein `crashed` (mit Bericht und Zählung).
-- **Richtig:** Wie bei `KillWorker` vor `TerminateProcess` den Zustand `stopping` und `killReason` ("engine gone") setzen; `Children._OnGone` meldet dann `evt.process.exited` mit `reason`, zählt nicht für Exit-Code 5 (`Terminate(name, false)`). Der Auslöser ist das signalisierte Prozess-Handle der Engine im Tick, nicht die Bewertung des Endes, die bis zu 500 ms warten kann.
-- **Status:** verifiziert (`tests/fault/test_worker_lifecycle.py::test_engine_killed_during_a_hanging_job_ends_the_worker_at_once_and_the_new_engine_builds_the_pool`: Worker 0,21 s nach dem Tod der Engine weg)
-- **Quelle:** WI-33, `src/supervisor/Children.ahk`
+- **Problem:** The kill phase of `Shutdown` called `_Done(EXIT_FORCED)` as soon as the deadline had passed, even if the process had ended by itself at the deadline and was only waiting for its evaluation (grace period from WI-30).
+- **Right:** In the kill phase call `_Done(EXIT_CLEAN)`; `_Done` turns this into 5 if `Children.AnyKilled()` is true (`Terminate` counts only if the process was still running).
+- **Status:** verified in the AHK unit test (`EndedAtTheDeadlineIsNoForcedExit`: with the old line exit 5, with the new one 0; `TerminatedAtTheDeadlineIsAForcedExit`: 5). Not reproduced in the real supervisor.
+- **Source:** WI-33, `src/supervisor/Shutdown.ahk`
 
-### Exit-Code 5 nur nach wirklichem Beenden (WI-33, F-33)
+### Test role starts late, without an option in the product (WI-34)
 
-- **Problem:** Die Kill-Phase von `Shutdown` rief `_Done(EXIT_FORCED)` auf, sobald die Frist verstrichen war, auch wenn der Prozess sich an der Frist von selbst beendet hatte und nur noch auf seine Bewertung wartete (Nachfrist aus WI-30).
-- **Richtig:** In der Kill-Phase `_Done(EXIT_CLEAN)` aufrufen; `_Done` macht 5 daraus, wenn `Children.AnyKilled()` wahr ist (`Terminate` zählt nur, wenn der Prozess noch lief).
-- **Status:** verifiziert im AHK-Unit-Test (`EndedAtTheDeadlineIsNoForcedExit`: mit der alten Zeile Exit 5, mit der neuen 0; `TerminatedAtTheDeadlineIsAForcedExit`: 5). Im echten Supervisor nicht nachgestellt.
-- **Quelle:** WI-33, `src/supervisor/Shutdown.ahk`
+- **Problem:** For F-41, a child of the real supervisor had to report only seconds after its start. The supervisor passes only a fixed list of options to the children; a new option would have needed product code for just one test.
+- **Right:** Use the name the supervisor passes on anyway: `--start=echo:slowhello3000` starts the role `echo` with `--flow=slowhello3000`; `EchoRole.Start` recognizes the pattern and calls `super.Start()` only after 3000 ms via `SetTimer` (in its own method `_StartLate`, with `try`; `AhfMain` has already set `Persistent()`, so the process stays alive during the waiting time).
+- **Status:** verified (`tests/fault/test_shutdown.py`; the child is in state `starting` at shutdown and reports afterwards)
+- **Source:** `tests/integration/helpers/EchoRole.ahk`
 
-### Testrolle verzögert starten, ohne Option im Produkt (WI-34)
+### A fixed pause before an abort against a test element with a fixed runtime is a race (WI-34, F-37)
 
-- **Problem:** Für F-41 musste ein Kind des echten Supervisors sich erst Sekunden nach seinem Start melden. Der Supervisor reicht nur eine feste Liste von Optionen an die Kinder weiter; eine neue Option hätte Produktcode nur für einen Test gebraucht.
-- **Richtig:** Den Namen nutzen, den der Supervisor ohnehin weitergibt: `--start=echo:slowhello3000` startet die Rolle `echo` mit `--flow=slowhello3000`, `EchoRole.Start` erkennt das Muster und ruft `super.Start()` erst per `SetTimer` nach 3000 ms (in einer eigenen Methode `_StartLate`, mit `try`; `AhfMain` hat `Persistent()` schon gesetzt, der Prozess bleibt also während der Wartezeit am Leben).
-- **Status:** verifiziert (`tests/fault/test_shutdown.py`, das Kind ist beim Beenden im Zustand `starting` und meldet sich danach)
-- **Quelle:** `tests/integration/helpers/EchoRole.ahk`
+- **Problem:** `test_cancel_stops_the_running_element_...` waited 0.1 s after `cmd.worker.run`, then sent `cmd.worker.cancel`. `Action_TestBlockWorker` blocks only 800 ms. Under load, the abort came after the end of the element; the answer was `not_found` (`assert ans["ok"]` red, the answer was not in the message).
+- **Wrong:** Wait for a fixed time and assume the element is then still running.
+- **Right:** Let the element run long enough (parameter `Duration`, 3 s), wait for the job with the request `cmd.diag.snapshot` (`info.job`), write the answer of the abort into the error message, and adapt the window for a late second `evt.worker.done` to the runtime of the element. Reproduced: the same message with a pause of 1.0 s.
+- **Status:** verified (reproduction with pause 1.0 s red, new test green). That the failure of the acceptance run arose exactly this way is inferred from that, not seen in the failed run.
+- **Source:** `tests/integration/test_worker.py`
 
-### Feste Pause vor einem Abbruch gegen ein Testelement mit fester Laufzeit ist ein Rennen (WI-34, F-37)
+### Fixed number next to a product deadline: `scaled()`, in the helper and only once (WI-34, F-39, F-42)
 
-- **Problem:** `test_cancel_stops_the_running_element_...` wartete 0,1 s nach `cmd.worker.run`, dann `cmd.worker.cancel`. `Action_TestBlockWorker` blockiert nur 800 ms. Unter Last kam der Abbruch nach dem Ende des Elements; die Antwort war `not_found` (`assert ans["ok"]` rot, die Antwort stand nicht in der Meldung).
-- **Falsch:** Auf eine feste Zeit warten und annehmen, das Element laufe dann noch.
-- **Richtig:** Das Element lang genug laufen lassen (Parameter `Duration`, 3 s), mit der Anfrage `cmd.diag.snapshot` auf den Auftrag warten (`info.job`), die Antwort des Abbruchs in die Fehlermeldung schreiben und das Fenster für ein spätes zweites `evt.worker.done` an die Laufzeit des Elements anpassen. Nachgestellt: dieselbe Meldung mit einer Pause von 1,0 s.
-- **Status:** verifiziert (Nachstellung mit Pause 1,0 s rot, neuer Test grün). Dass der Ausfall der Abnahme genau so entstand, ist daraus geschlossen, nicht im ausgefallenen Lauf gesehen.
-- **Quelle:** `tests/integration/test_worker.py`
+- **Problem:** `HUB_FRAME_BUDGET_MS = 5.0` (measured 5.07 ms in the parallel run) and `wait_restarted_ready(..., timeout=15)` were fixed numbers next to a product deadline (restart delay 300 ms plus start) and were not in `scaled()`. The search for `timeout=` with a number found further waiting times close to product deadlines (end of workers with the engine, hang detection 8 s, stop of a frozen worker).
+- **Wrong:** Scale the limit at the call site and in the helper (double scaling: 3 times 3 = 9), or loosen a limit without proving the cause.
+- **Right:** If a helper waits (`wait_restarted_ready`, `ended`, `exited_killed`), it scales itself, and the call sites keep their number. Constants that are only limits (`HANG_BUDGET_S`) carry `scaled()` in their definition. Never lower limits, counts and results. Serial and under `-m stress` the value stays exact.
+- **Status:** verified (the changed files run green, in parallel; the serial run is the acceptance). Whether F-42 was a load or a restart delay is not proven (see next entry).
+- **Source:** `tests/support/timing.py`, `tests/fault/faultkit.py`
 
-### Feste Zahl neben einer Frist des Produkts: `scaled()`, im Helfer und nur einmal (WI-34, F-39, F-42)
+### An error message must contain the evidence, otherwise the finding stays unexplained (WI-34, F-42)
 
-- **Problem:** `HUB_FRAME_BUDGET_MS = 5.0` (gemessen 5,07 ms im parallelen Lauf) und `wait_restarted_ready(..., timeout=15)` waren feste Zahlen neben einer Frist des Produkts (Neustartverzögerung 300 ms plus Start) und standen nicht in `scaled()`. Die Suche nach `timeout=` mit Zahl fand weitere Wartezeiten dicht an Produktfristen (Ende der Worker mit der Engine, Hängererkennung 8 s, Stopp eines eingefrorenen Workers).
-- **Falsch:** Die Grenze an der Aufrufstelle und im Helfer skalieren (Doppelskalierung: 3 mal 3 = 9) oder eine Grenze lockern, ohne die Ursache zu belegen.
-- **Richtig:** Wartet ein Helfer (`wait_restarted_ready`, `ended`, `exited_killed`), skaliert er selbst, und die Aufrufstellen behalten ihre Zahl. Konstanten, die nur Grenzen sind (`HANG_BUDGET_S`), tragen `scaled()` in der Definition. Untere Grenzen, Anzahlen und Ergebnisse nie. Seriell und unter `-m stress` bleibt der Wert genau.
-- **Status:** verifiziert (die geänderten Dateien laufen grün, parallel; der serielle Lauf macht die Abnahme). Ob F-42 eine Last- oder eine Neustartverzögerung war, ist nicht belegt (siehe nächster Eintrag).
-- **Quelle:** `tests/support/timing.py`, `tests/fault/faultkit.py`
+- **Problem:** `Chain.wait_restarted_ready` wrote `self.sup.text()` into the message. That is the stdout/stderr of the supervisor and was empty (the log lines are in `Log/Log.txt` in the data directory). The finding F-42 ("supervisor log in the message") could therefore not be evaluated; 12 concurrent runs without scaling were all green (cause not proven).
+- **Right:** On timeouts, write the tail of the file `Log/Log.txt` and the number of the pass into the message (`test_the_handles_of_the_supervisor_stay_flat_over_50_restarts`). At the next failure, the evidence is in the message.
+- **Status:** verified (message of the acceptance run read: empty text); cause of the one failure not proven.
+- **Source:** `tests/fault/test_diagnose.py`
 
-### Eine Fehlermeldung muss den Beleg enthalten, sonst bleibt der Fund unerklärt (WI-34, F-42)
+### Do not relabel a process that has already ended as ended on request (WI-35, F-46)
 
-- **Problem:** `Chain.wait_restarted_ready` schreibt `self.sup.text()` in die Meldung. Das ist der stdout/stderr des Supervisors und war leer (die Logzeilen stehen in `Log/Log.txt` im Datenverzeichnis). Der Fund F-42 ("Supervisor-Log in der Meldung") ließ sich deshalb nicht auswerten; 12 gleichzeitige Läufe ohne Skalierung waren alle grün (Ursache nicht belegt).
-- **Richtig:** Bei Zeitüberschreitungen den Schwanz der Datei `Log/Log.txt` und die Nummer des Durchlaufs mit in die Meldung schreiben (`test_the_handles_of_the_supervisor_stay_flat_over_50_restarts`). Beim nächsten Ausfall steht der Beleg in der Meldung.
-- **Status:** verifiziert (Meldung der Abnahme gelesen: leerer Text), Ursache des einen Ausfalls nicht belegt.
-- **Quelle:** `tests/fault/test_diagnose.py`
+- **Problem:** `Children.KillWorker` set `state := "stopping"` and `killReason := "killed"` before `Terminate` recognized that the process was already dead (handle signaled, end evaluated only in the next tick). A real crash was thus reported as `evt.process.exited {reason: "killed"}`, without `crashed` and without a crash report. This became reachable because the engine sends `cmd.process.kill` within milliseconds after the death (since F-40 the hub answers immediately with `peer_gone`). `_EndWorkersOfGoneEngine` had the same error. Exit code 15 in the event revealed it: `psutil.Process.kill()` ends with 15, `Terminate` with 1.
+- **Wrong:** Change the state of a record and only then check whether the action is still needed. The check in the called function (`Terminate`) comes too late.
+- **Right:** Before relabeling, check `WaitForSingleObject(handle, 0)` (`Children._HasEnded`); if the process has ended, set nothing, only log. The end is then evaluated normally.
+- **Status:** verified (AHK unit tests `KillOfAnEndedWorkerStaysACrash`, `EngineEndKeepsTheCrashOfAnEndedWorker` were red; green after the fix)
+- **Source:** `src/supervisor/Children.ahk`, `tests/ahk/supervisor_tick.test.ahk`
 
-### Einen schon beendeten Prozess nicht als auf Anfrage beendet umetikettieren (WI-35, F-46)
+### Two reporting paths for the same death: assume no order (WI-35, F-46)
 
-- **Problem:** `Children.KillWorker` setzte `state := "stopping"` und `killReason := "killed"`, bevor `Terminate` erkannte, dass der Prozess schon tot war (Handle signalisiert, Ende erst im nächsten Tick bewertet). Ein echter Absturz wurde so als `evt.process.exited {reason: "killed"}` gemeldet, ohne `crashed` und ohne Absturzbericht. Erreichbar wurde das, weil die Engine das `cmd.process.kill` binnen Millisekunden nach dem Tod schickt (seit F-40 antwortet der Hub sofort mit `peer_gone`). `_EndWorkersOfGoneEngine` hatte denselben Fehler. Exit-Code 15 im Ereignis verriet es: `psutil.Process.kill()` endet mit 15, `Terminate` mit 1.
-- **Falsch:** Den Zustand eines Datensatzes ändern und erst danach prüfen, ob die Aktion noch nötig ist. Die Prüfung in der aufgerufenen Funktion (`Terminate`) kommt zu spät.
-- **Richtig:** Vor dem Umetikettieren `WaitForSingleObject(handle, 0)` prüfen (`Children._HasEnded`); ist der Prozess beendet, nichts setzen, nur loggen. Das Ende wird dann normal bewertet.
-- **Status:** verifiziert (AHK-Unit-Tests `KillOfAnEndedWorkerStaysACrash`, `EngineEndKeepsTheCrashOfAnEndedWorker` waren rot, nach dem Fix grün)
-- **Quelle:** `src/supervisor/Children.ahk`, `tests/ahk/supervisor_tick.test.ahk`
-
-### Zwei Meldewege für denselben Tod: keine Reihenfolge annehmen (WI-35, F-46)
-
-- **Problem:** Die Engine erfuhr den Tod eines Workers auf zwei Wegen: als `peer_gone` auf das offene `cmd.worker.run` (Hub, sofort seit F-40) und als `evt.process.crashed` (Supervisor, erst im nächsten Tick, bis 200 ms später). `_OnRunAnswer` machte aus jeder Fehlerantwort "worker not available", der Slot war dann weg, und das Prozessereignis fand keinen Job mehr. Der Test (`test_killed_worker_...`) schlug in rund 20 Prozent der Läufe fehl, je nachdem, ob der Hub die Antwort des Workers schon gelesen hatte, als der Test ihn beim Ereignis `running` tötete.
-- **Falsch:** Annehmen, ein Weg komme zuerst, oder den Hub warten lassen, bis der Supervisor das Prozessende bewertet hat (Frist von F-40 aufgeweicht, Kopplung Hub-Children).
-- **Richtig:** Beide Wege gleich bewerten (`peer_gone` auf `run` gleich "worker crashed"), Slot und Job nur einmal abschließen; wer zuerst kommt, gewinnt, der zweite findet nichts. Der Test dazu darf nicht auf Zufall bauen: Worker einfrieren, mit `cmd.diag.snapshot` des Supervisors warten, bis `hub.routedOpen >= 1`, dann töten.
-- **Status:** verifiziert (AHK-Unit-Tests in beiden Reihenfolgen, Integrationstest `test_worker_killed_before_it_answers_the_run_...` rot vor, grün nach den Korrekturen; Original 2 mal 20 Läufe grün, vorher 8 von 40 rot)
-- **Quelle:** `src/engine/WorkerBridge.ahk`, `tests/ahk/engine_worker_bridge.test.ahk`, `tests/fault/test_worker_lifecycle.py`
+- **Problem:** The engine learned of the death of a worker by two paths: as `peer_gone` on the open `cmd.worker.run` (hub, immediately since F-40) and as `evt.process.crashed` (supervisor, only in the next tick, up to 200 ms later). `_OnRunAnswer` turned every error answer into "worker not available"; the slot was then gone, and the process event found no job anymore. The test (`test_killed_worker_...`) failed in about 20 percent of the runs, depending on whether the hub had already read the answer of the worker when the test killed it at the event `running`.
+- **Wrong:** Assume one path comes first, or let the hub wait until the supervisor has evaluated the process end (deadline of F-40 softened, coupling hub-children).
+- **Right:** Evaluate both paths the same way (`peer_gone` on `run` equals "worker crashed"); complete slot and job only once; whoever comes first wins, the second finds nothing. The test for it must not rely on chance: freeze the worker, wait with `cmd.diag.snapshot` of the supervisor until `hub.routedOpen >= 1`, then kill.
+- **Status:** verified (AHK unit tests in both orders; integration test `test_worker_killed_before_it_answers_the_run_...` red before, green after the corrections; original 2 times 20 runs green, before 8 of 40 red)
+- **Source:** `src/engine/WorkerBridge.ahk`, `tests/ahk/engine_worker_bridge.test.ahk`, `tests/fault/test_worker_lifecycle.py`
