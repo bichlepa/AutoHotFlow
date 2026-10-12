@@ -437,6 +437,58 @@ def test_data_written_before_close_is_still_readable(procs, ahk_exe, datadir, pi
     end.close()
 
 
+BURST_FRAMES = 100          # 100 frames of 4000 bytes: far more than the 64 KiB of the pipe
+BURST_SIZE = 4000
+
+
+def burst_end(procs, ahk_exe, datadir, pipe_name, timeout_ms):
+    """A client that does not read yet asks the AHK server for a burst and the end of the connection (WI-30)."""
+    server, hwnd = launch_server(procs, ahk_exe, datadir, pipe_name)
+    end = RawEnd.connect(pipe_name, timeout=10, read=False)
+    end.peer_hwnd = hwnd
+    rawpipe.wake(hwnd)
+    end.send_text("hello:0")
+    end.send_text("ctl:burstend:%d:%d:%d" % (BURST_SIZE, BURST_FRAMES, timeout_ms))
+    rec = server.wait_record("burstend", timeout=15)
+    assert rec["queuedFrames"] > 0, "the burst fitted into the pipe, the test shows nothing: %s" % rec
+    return server, end
+
+
+def test_frames_queued_when_the_connection_is_ended_reach_a_late_reader(procs, ahk_exe, datadir, pipe_name):
+    # F-26 cause A (WI-30): frames that still wait in the send queue when the connection is ended are written
+    # first; the last one arrives, then the end of the stream.
+    server, end = burst_end(procs, ahk_exe, datadir, pipe_name, 5000)
+    time.sleep(0.5)                                  # the reader is late: the pipe is full meanwhile
+    end.start_reading()
+    frames = end.recv_all(timeout=10)
+    assert frames[0].startswith("hello:")
+    body = frames[1:]
+    assert len(body) == BURST_FRAMES + 1, "got %d frames, the last is %r" % (len(body), body[-1][:20] if body else None)
+    assert [f.split("|")[0] for f in body[:-1]] == [str(i) for i in range(1, BURST_FRAMES + 1)]
+    assert body[-1] == "last"
+    drained = server.wait_record("drained", timeout=5)
+    assert drained["flushed"] == 1, drained
+    close = server.wait_record("close", timeout=5)
+    assert close["reason"] == "local"
+    end.close()
+
+
+def test_ending_after_the_queue_is_written_gives_up_at_its_deadline_and_does_not_block(procs, ahk_exe, datadir,
+                                                                                       pipe_name):
+    # A reader that never reads: the end waits at most its deadline (300 ms), then the connection closes with
+    # the rest dropped. Meanwhile the server serves other clients (nothing blocks).
+    server, end = burst_end(procs, ahk_exe, datadir, pipe_name, 300)
+    other = connect_client(pipe_name, server.wait_record("ready")["hwnd"])
+    assert echo_once(other, "not blocked") == "not blocked"
+    drained = server.wait_record("drained", timeout=5)
+    print("\nEnd with a reader that never reads: gave up after %.0f ms (deadline 300 ms)" % float(drained["elapsedMs"]))
+    assert drained["flushed"] == 0, drained
+    assert 290 <= float(drained["elapsedMs"]) < 1500, drained
+    assert server.wait_record("close", timeout=5)["reason"] == "local"
+    other.close()
+    end.close()
+
+
 def test_python_client_end_after_traffic_is_peer_closed(procs, ahk_exe, datadir, pipe_name):
     server, hwnd = launch_server(procs, ahk_exe, datadir, pipe_name)
     end = connect_client(pipe_name, hwnd)

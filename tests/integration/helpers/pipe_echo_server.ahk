@@ -11,6 +11,8 @@ Persistent
 ;   * "ctl:expect:N"     verifies the next N frames against Kit.GenText instead of echoing,
 ;   * "ctl:flood:S:C"    sends C frames of S bytes in a tight loop, stops when SendFrame fails,
 ;   * "ctl:farewell"     sends "bye" and closes at once (data must stay readable for the peer),
+;   * "ctl:burstend:S:C:T"  sends C frames "<i>|" + S bytes and "last", then ends the connection after its send
+;                        queue is written, at most T ms (CloseWhenFlushed, WI-30); record "drained" {flushed},
 ;   * "ctl:close"        closes the connection,
 ;   * "ctl:exit"         ends the process.
 ; Result file: JSON lines {type: ready|connect|close|verified|gen_done|flood|error, ...}.
@@ -132,6 +134,8 @@ class EchoServer {
             case "farewell":
                 c.conn.SendFrame("bye")
                 c.conn.Close()
+            case "burstend":
+                EchoServer._BurstEnd(c, Integer(parts[3]), Integer(parts[4]), Integer(parts[5]))
             case "close":
                 c.conn.Close()
             case "exit":
@@ -163,6 +167,19 @@ class EchoServer {
             SetTimer(EchoServer._GenTick, 0)
             EchoServer.genTimerOn := false
         }
+    }
+
+    ; Sends count frames "<i>|xxx..." of about size bytes and a frame "last", then ends the connection
+    ; (WI-30, F-26 cause A). The frames that do not fit into the pipe wait in the send queue.
+    static _BurstEnd(c, size, count, timeoutMs) {
+        pad := Kit.Repeat("x", size)
+        loop count
+            c.conn.SendFrame(A_Index "|" pad)
+        c.conn.SendFrame("last")
+        Kit.Record(EchoServer.resultPath, Map("type", "burstend", "id", c.id, "queuedFrames", c.conn.QueuedFrames))
+        start := Time.NowMs()
+        c.conn.CloseWhenFlushed(timeoutMs, (flushed) => Kit.Record(EchoServer.resultPath, Map("type", "drained"
+            , "id", c.id, "flushed", flushed ? 1 : 0, "elapsedMs", Round(Time.NowMs() - start, 1) + 0)))
     }
 
     static _Flood(c, size, count) {

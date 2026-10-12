@@ -13,14 +13,20 @@
 ;   conn.OnClose := (conn, reason) => ...           ; once; reason see below
 ;   conn.SendFrame(text)  -> true | false
 ;   conn.Pump()           ; called on wake and by the fallback timer (see Wake.ahk)
+;   conn.CloseWhenFlushed(1000, (flushed) => ExitApp())   ; end after the send queue is written (WI-30)
 ;
 ; Close reasons: "peer_closed" (end of stream, the normal end), "broken" (I/O error),
 ; "queue_overflow" (send queue limit hit), "protocol_error" (bad frame header), "local" (Close()).
+;
+; Ending: Close() drops what waits in the send queue (only frames already written into the pipe stay readable for
+; the peer). The last frames of a process (its events, sys.bye) are ended with CloseWhenFlushed instead.
 class PipeConnection {
     static WAKE_MESSAGE := 0x8001
     ; Reads handled in one Pump before it yields (64 KiB each). Bounds the time a busy peer can
     ; keep the message loop away; the rest is picked up by a follow-up timer.
     static MAX_READS_PER_PUMP := 64
+    ; Period of the timer that writes the send queue while CloseWhenFlushed waits (the timer resolution is ~15.6 ms).
+    static DRAIN_POLL_MS := 10
     ; Handles whose I/O could not be confirmed as cancelled stay referenced here, so the memory
     ; the kernel may still write to is never freed.
     static _graveyard := []
@@ -61,9 +67,15 @@ class PipeConnection {
         this._writeAgain := false
         this._pollFn := ObjBindMethod(this, "Pump")
         this._notifyFn := ObjBindMethod(this, "_NotifyClose")
+        this._draining := false        ; CloseWhenFlushed runs: no new frames
+        this._drainFn := ""            ; its timer (a bound method: a cycle, broken when the drain ends)
+        this._drainDone := ""          ; its callback, "" once it has been called
+        this._drainUntil := 0
+        this._drainStart := 0
     }
 
     IsOpen => this._open
+    IsDraining => this._draining
     QueuedBytes => this._queueBytes
     QueuedFrames => this._queue.Length
     CloseReason => this._closeReason
@@ -101,12 +113,12 @@ class PipeConnection {
     }
 
     ; Queues a frame and tries to write at once. Never blocks.
-    ; Returns false if the connection is closed or the queue limit was hit; in the latter case the
-    ; connection is closed with reason "queue_overflow" and OnClose is raised right after the
+    ; Returns false if the connection is closed or ending (CloseWhenFlushed), or the queue limit was hit; in the
+    ; latter case the connection is closed with reason "queue_overflow" and OnClose is raised right after the
     ; current call stack unwinds (not inside this call, so the caller's loop is not re-entered).
     ; Throws ProtocolError if the text is empty or larger than the frame limit (programming error).
     SendFrame(text) {
-        if (!this._open)
+        if (!this._open || this._draining)
             return false
         frame := FrameWriter.Encode(text)
         size := frame.Size
@@ -190,7 +202,63 @@ class PipeConnection {
         this._Fail("local", false)
     }
 
+    ; Ends the connection after the send queue is written (WI-30): the last frames of a process (its events, sys.bye)
+    ; must not be dropped as Close drops them. From now on SendFrame refuses new frames. A timer (DRAIN_POLL_MS)
+    ; writes the queue on; the connection is closed with Close (OnClose "local") as soon as the queue is empty, or
+    ; when timeoutMs has passed (the rest is dropped), or earlier with the reason of an I/O error (peer gone).
+    ; Never blocks and never waits without a limit: no FlushFileBuffers (it waits for the reader of the pipe without
+    ; any limit). Frames written into the pipe stay readable for the peer after the close.
+    ; onDone(flushed) is called exactly once, from the timer and never inside this call; flushed is true when every
+    ; queued frame was written. Pump keeps working meanwhile (incoming frames still reach OnFrame).
+    ; Returns false (and never calls onDone) when the connection is closed already or an end is already running.
+    CloseWhenFlushed(timeoutMs, onDone := "") {
+        if (!this._open || this._draining)
+            return false
+        this._draining := true
+        this._drainDone := IsObject(onDone) ? onDone : ""
+        this._drainStart := Time.NowMs()
+        this._drainUntil := this._drainStart + Max(0, timeoutMs)
+        this._drainFn := ObjBindMethod(this, "_Drain")
+        ; Collect what the kernel has finished and start the next write now; the decision waits for the timer,
+        ; so onDone never runs inside the caller.
+        reason := this._DriveWriteGuarded()
+        if (reason != "")
+            this._Fail(reason, true)
+        SetTimer(this._drainFn, PipeConnection.DRAIN_POLL_MS)
+        return true
+    }
+
     ; --- internals ---------------------------------------------------------------------------
+
+    ; Timer of CloseWhenFlushed: writes on, and ends the connection once the queue is empty or the time is up.
+    _Drain() {
+        if (!this._draining || !IsObject(this._drainFn))
+            return
+        if (this._open) {
+            reason := this._DriveWriteGuarded()
+            if (reason != "")
+                this._Fail(reason, false)
+            else if (this._queue.Length > 0 && Time.NowMs() < this._drainUntil)
+                return                              ; the peer has not read enough yet: try again on the next tick
+        }
+        flushed := this._open && this._queue.Length = 0
+        if (this._open && !flushed)
+            Log.Write("a1", "ipc", "closing " this.Name " with " this._queue.Length " frames unwritten after "
+                . Round(Time.NowMs() - this._drainStart) " ms")
+        SetTimer(this._drainFn, 0)
+        this._drainFn := ""                         ; breaks the cycle object -> bound method -> object (F-07)
+        this.Close()
+        cb := this._drainDone
+        this._drainDone := ""
+        if (!IsObject(cb))
+            return
+        try {
+            cb(flushed)
+        } catch as e {
+            this.handlerErrors += 1
+            Log.Write("a0", "ipc", "CloseWhenFlushed callback failed: " Type(e) ": " e.Message)
+        }
+    }
 
     ; Reads what has completed. Returns "" or a close reason (not yet applied).
     _PumpRead() {

@@ -79,6 +79,22 @@ class RawEnd:
     def connect(cls, name, timeout=5.0, read=True):
         return cls(winpipe.OverlappedPipe.connect_client(name, timeout), read=read)
 
+    def start_reading(self):
+        """Starts the reader thread of an end that was created with read=False (a reader that comes late)."""
+        if self._thread is None:
+            self._thread = threading.Thread(target=self._read_loop, name="rawend-reader", daemon=True)
+            self._thread.start()
+
+    def recv_all(self, timeout=10.0):
+        """Every frame until the peer has closed the connection. Raises TimeoutError if it stays open."""
+        out = []
+        deadline = time.monotonic() + timeout
+        while True:
+            try:
+                out.append(self.recv(timeout=max(0.05, deadline - time.monotonic())))
+            except winpipe.PipeClosed:
+                return out
+
     def _read_loop(self):
         buf = bytearray()
         try:
