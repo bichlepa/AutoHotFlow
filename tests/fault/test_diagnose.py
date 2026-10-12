@@ -13,6 +13,7 @@ import psutil
 import pytest
 
 from faultkit import Sup, event, request_ok, wait_until
+from support.timing import scaled
 
 from faultfixtures import chains  # noqa: F401  (fixture)
 
@@ -20,6 +21,7 @@ pytestmark = pytest.mark.fault
 
 EXIT_TOO_MANY_ERRORS = 6        # Role.EXIT_TOO_MANY_ERRORS
 THRESHOLD = 20                  # Role.ERROR_LIMIT: more than 20 unhandled errors within 60 s end the role
+RESTART_READY_S = 15.0          # one restart of the crasher is ready again within this time (scaled() in the parallel run)
 HANDLE_SLACK = 6                # handles: noise of one-off allocations between two measurements
 
 
@@ -154,7 +156,7 @@ def test_exactly_the_threshold_does_not_end_the_role(chains, datadir):
     assert end_session(chain) == 0, chain.sup.text()
 
 
-@pytest.mark.timeout(240)
+@pytest.mark.timeout(scaled(240))
 def test_the_handles_of_the_supervisor_stay_flat_over_50_restarts(chains, datadir):
     """Every start opens a pipe, a process handle and a thread handle; every end must close them again."""
     chain = chains("storage,crasher", ["--test-roles", "--restart-max=100"])
@@ -165,7 +167,12 @@ def test_the_handles_of_the_supervisor_stay_flat_over_50_restarts(chains, datadi
     old = chain.pid("crasher")
     for n in range(1, 51):
         request_ok(chain.obs, "crasher", "cmd.test.arm", {})
-        new, _ = chain.wait_restarted_ready("crasher", old, timeout=15)
+        try:
+            new, _ = chain.wait_restarted_ready("crasher", old, timeout=scaled(RESTART_READY_S))
+        except AssertionError as e:
+            # F-42: the message of the helper held an empty supervisor text; the log file has the evidence.
+            tail = log_text(datadir)[-3000:]
+            raise AssertionError("restart %d: %s\nlog tail:\n%s" % (n, e, tail)) from e
         old = new
         if n in (5, 50):
             counts.append(proc.num_handles())
