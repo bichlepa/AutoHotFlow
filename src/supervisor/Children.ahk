@@ -397,9 +397,17 @@ class Children {
 
     AnyKilled() => this.killedSome
 
-    ; Stops automatic restarts. Called when the shutdown starts.
+    ; Stops automatic restarts. Called when the shutdown starts. A restart that is planned already (a crash within the last
+    ; RESTART_DELAY_MS) is cancelled too (F-41, WI-34): it would start a process in the middle of the shutdown, in no group
+    ; of the order, that is only ended at the deadline.
     BeginShutdown() {
         this.shuttingDown := true
+        for name, rec in this._recs {
+            if (rec["gone"] && rec["restartAt"] > 0) {
+                rec["restartAt"] := 0
+                Log.Write("a1", "children", "planned restart of " name " cancelled: the session ends")
+            }
+        }
     }
 
     ; Living children grouped by shutdown rank (ARCHITEKTUR 6.3): UI first, storage last.

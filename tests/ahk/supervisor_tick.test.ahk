@@ -163,6 +163,7 @@ TestRun.Case("Shutdown: a child of a group that had its turn gets sys.shutdown a
 TestRun.Case("Shutdown: a child of a later group that says hello during the shutdown waits for the turn of its group (F-41, WI-34)", LateHelloOfALaterGroupWaitsForItsTurn)
 TestRun.Case("Shutdown: a child that is in no group (started after the groups were made) gets sys.shutdown at its hello (F-41, WI-34)", LateHelloOfAChildInNoGroup)
 TestRun.Case("Shutdown: a hello in the prepare phase or in the kill phase gets no sys.shutdown (F-41, WI-34)", HelloOutsideThePhaseShutdownGetsNothing)
+TestRun.Case("Children: a restart that was planned before the shutdown does not start (F-41, WI-34)", PlannedRestartIsCancelledByTheShutdown)
 
 ByeIsReadBeforeTheExitIsReported() {
     hub := FakeHub()
@@ -767,6 +768,37 @@ HelloOutsideThePhaseShutdownGetsNothing() {
     s.shutdown.phase := "kill"
     s._OnHello(Map("name", "echo:late", "pid", 1))
     Assert.Equal(hub.SentCount("echo:late", "sys.shutdown"), 0, "kill: KillAlive has ended it already")
+}
+
+; Children that start no process: _Launch only records the name.
+class NoLaunchChildren extends Children {
+    launched := []
+    _Launch(rec, isRestart, now) {
+        this.launched.Push(rec["name"])
+    }
+}
+
+; The engine crashed and its restart is planned (RESTART_DELAY_MS) when the session begins to end. Before WI-34 the
+; tick still started it: a new engine in the middle of the shutdown, in no group, terminated at the deadline (exit 5).
+PlannedRestartIsCancelledByTheShutdown() {
+    t0 := 100000
+    for shuttingDown in [false, true] {
+        kids := NoLaunchChildren(Map("session", "t", "pipe", "p", "data", "d", "hubHwnd", 0, "testRoles", false
+            , "script", "x", "roleOpts", ""), FakeHub())
+        rec := AddChildRecord(kids, "engine", "crashed", t0)
+        rec["role"] := "engine"
+        rec["gone"] := true
+        rec["restartAt"] := t0 + Children.RESTART_DELAY_MS
+        if (shuttingDown)
+            kids.BeginShutdown()
+        kids.Tick(t0 + Children.RESTART_DELAY_MS + 200)
+        if (!shuttingDown) {
+            Assert.Equal(kids.launched.Length, 1, "without a shutdown the planned restart starts (the test double works)")
+            continue
+        }
+        Assert.Equal(kids.launched.Length, 0, "no restart while the session ends")
+        Assert.Equal(rec["restartAt"], 0, "the planned restart is cancelled")
+    }
 }
 
 TestRun.Finish()
