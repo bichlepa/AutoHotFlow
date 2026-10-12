@@ -1120,3 +1120,24 @@ Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge kor
 - **Problem:** Die Engine gab nach 5 Versuchen in 2,5 s auf, wenn `storage` noch nicht verbunden war (F-31), und meldete jeden Versuch als `evt.storage.error` (F-24). Ein erster Ersatz, der bei "bereit" sofort neu lädt, rannte in eine Schleife (1440 Leseversuche in 2,5 s), als eine Rolle als `ready` galt, aber jede Anfrage mit `peer_gone` endete.
 - **Richtig:** Erst das Topic `process` abonnieren, dann `cmd.process.list` fragen (PROTOKOLL 5a), ohne Obergrenze der Versuche, aber mit Pause (1 s) zwischen zwei Fragen und höchstens einer Logzeile je 30 s. Nach einem abgebrochenen Laden ebenfalls erst nach der Pause neu beginnen. Nur `evt.process.ready` darf sofort neu starten.
 - **Status:** verifiziert (`tests/integration/test_engine.py`: `test_engine_waits_for_a_storage_that_starts_5_s_after_it_and_reports_no_error`, `test_engine_resumes_loading_when_storage_restarts_in_the_middle_and_loads_only_the_missing_files`, `test_engine_does_not_ask_for_more_files_when_storage_has_stopped_answering`)
+
+### Fristen über SetTimer überstehen keinen Stillstand: eine Fristliste im Tick verwenden (WI-33)
+
+- **Problem:** Eine Frist, die mit `SetTimer(fn, -ms)` gesetzt ist (`Hub.Request`, z. B. `cmd.app.prepareExit` mit 10 Minuten), läuft nach der Wanduhr. Steht der Prozess still (eingefroren, Standby), ist der Timer danach fällig. Er kann vor dem Tick laufen, der den Stillstand bemerkt; die Reihenfolge fälliger Timer ist nicht zu steuern. Ein Rücksetzen der Timer im Tick käme dann zu spät, die Anfrage ist schon mit "timeout" beendet.
+- **Richtig:** Die Frist als Zeitpunkt (`dueAt`) in den Eintrag der Anfrage schreiben und im Tick prüfen (`Hub.Tick`). Der Tick misst den Stillstand zuerst (`Stall.Check`) und verschiebt alle `dueAt` (`Hub.Shift`), danach prüft er die Fristen. Kosten: die Frist ist auf einen Tick (200 ms) genau. Für Fristen, bei denen ein verfrühter Ablauf harmlos ist (`DiagReport`: Warten auf `storage`), genügt es, den Timer mit der Restzeit neu zu setzen.
+- **Status:** verifiziert (`tests/fault/test_supervisor_stall.py::test_open_prepare_exit_request_keeps_its_remaining_time_after_a_stand_still`: vorher endete die Anfrage 0,24 s nach dem Fortsetzen, nachher 5,11 s; AHK-Unit-Tests in `tests/ahk/supervisor_tick.test.ahk`). Dass ein `SetTimer` tatsächlich vor dem Tick laufen würde, ist nicht nachgestellt, nur nicht ausgeschlossen.
+- **Quelle:** WI-33, `src/supervisor/Stall.ahk`, `src/supervisor/Hub.ahk`
+
+### Prozesse eines geplanten Endes: Grund im Datensatz setzen, bevor das Ende bewertet wird (WI-33)
+
+- **Problem:** Beendet der Supervisor Worker, weil die Engine endete, wäre ein Ende ohne Anfrage ein `crashed` (mit Bericht und Zählung).
+- **Richtig:** Wie bei `KillWorker` vor `TerminateProcess` den Zustand `stopping` und `killReason` ("engine gone") setzen; `Children._OnGone` meldet dann `evt.process.exited` mit `reason`, zählt nicht für Exit-Code 5 (`Terminate(name, false)`). Der Auslöser ist das signalisierte Prozess-Handle der Engine im Tick, nicht die Bewertung des Endes, die bis zu 500 ms warten kann.
+- **Status:** verifiziert (`tests/fault/test_worker_lifecycle.py::test_engine_killed_during_a_hanging_job_ends_the_worker_at_once_and_the_new_engine_builds_the_pool`: Worker 0,21 s nach dem Tod der Engine weg)
+- **Quelle:** WI-33, `src/supervisor/Children.ahk`
+
+### Exit-Code 5 nur nach wirklichem Beenden (WI-33, F-33)
+
+- **Problem:** Die Kill-Phase von `Shutdown` rief `_Done(EXIT_FORCED)` auf, sobald die Frist verstrichen war, auch wenn der Prozess sich an der Frist von selbst beendet hatte und nur noch auf seine Bewertung wartete (Nachfrist aus WI-30).
+- **Richtig:** In der Kill-Phase `_Done(EXIT_CLEAN)` aufrufen; `_Done` macht 5 daraus, wenn `Children.AnyKilled()` wahr ist (`Terminate` zählt nur, wenn der Prozess noch lief).
+- **Status:** verifiziert im AHK-Unit-Test (`EndedAtTheDeadlineIsNoForcedExit`: mit der alten Zeile Exit 5, mit der neuen 0; `TerminatedAtTheDeadlineIsAForcedExit`: 5). Im echten Supervisor nicht nachgestellt.
+- **Quelle:** WI-33, `src/supervisor/Shutdown.ahk`
