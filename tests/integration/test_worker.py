@@ -20,6 +20,7 @@ ROOT_TIMEOUT_S = 5.0
 CANCEL_BUDGET_S = scaled(0.5)          # acceptance: cmd.worker.cancel -> evt.worker.done "stopped" within 500 ms
 PING_BUDGET_S = scaled(0.05)           # pings during a blocking element are answered while it blocks
 BLOCK_MS = 800                 # Action_TestBlockWorker blocks for this long
+CANCEL_BLOCK_MS = 3000         # the element of the cancel test blocks longer, so a late cancel still finds it (F-37)
 
 
 @pytest.fixture
@@ -167,18 +168,30 @@ def test_cancel_of_unknown_execution_is_not_found(worker):
 # --- cancel, pings, shutdown -----------------------------------------------------------------------
 
 def test_cancel_stops_the_running_element_and_reports_stopped_within_500_ms(worker):
-    assert send_run(worker, run_payload("c1", "Action_TestBlockWorker"))["ok"]
-    time.sleep(0.1)
+    # The element must still run when the cancel arrives (F-37): with the default 800 ms a loaded machine
+    # delayed the cancel past the end of the element and the answer was not_found. So the element blocks long,
+    # and the test waits until the worker reports the job in its snapshot (job accepted) before it cancels.
+    assert send_run(worker, run_payload("c1", "Action_TestBlockWorker", {"Duration": str(CANCEL_BLOCK_MS)}))["ok"]
+    started = time.perf_counter()
+    deadline = time.monotonic() + ROOT_TIMEOUT_S
+    while True:
+        snap = worker.request("worker:1", "cmd.diag.snapshot", {}, timeout=ROOT_TIMEOUT_S)["payload"]
+        info = snap.get("snapshot", {}).get("info", {})
+        if isinstance(info.get("job"), dict):
+            break
+        assert time.monotonic() < deadline, "the worker never showed the job in its snapshot: %r" % (snap,)
+        time.sleep(0.05)
     t0 = time.perf_counter()
     ans = worker.request("worker:1", "cmd.worker.cancel", {"execId": "c1"}, timeout=ROOT_TIMEOUT_S)["payload"]
-    assert ans["ok"]
+    assert ans["ok"], "cancel answer: %r (seconds since the run: %.2f)" % (ans, t0 - started)
     done = done_for(worker, "c1")
     elapsed = time.perf_counter() - t0
     assert done["result"] == "stopped"
     assert elapsed < CANCEL_BUDGET_S, elapsed
-    # The element's own Finish comes at 800 ms after its start, while this window is open. It must not
+    # The element's own Finish comes CANCEL_BLOCK_MS after its start, while this window is open. It must not
     # produce a second evt.worker.done for c1.
-    late = [m for m in worker.events(timeout=1.2) if m.get("type") == "evt.worker.done"]
+    window = max(0.5, CANCEL_BLOCK_MS / 1000.0 - (time.perf_counter() - started) + 0.5)
+    late = [m for m in worker.events(timeout=window) if m.get("type") == "evt.worker.done"]
     assert not late, late
     assert send_run(worker, run_payload("c2", "Action_TestEchoWorker"))["ok"]
     assert done_for(worker, "c2")["result"] == "normal"
