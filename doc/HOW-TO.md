@@ -812,6 +812,14 @@ Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge kor
 - **Status:** verifiziert (rot, dann grün: `tests/integration/test_supervisor.py::test_open_request_to_a_*` 10 s ohne Antwort, nachher 0,07 bis 0,15 s; `tests/integration/test_engine.py::test_engine_resumes_loading_at_once_when_storage_dies_with_an_open_read` 31,0 s, nachher 1,04 s)
 - **Quelle:** `src/supervisor/Hub.ahk` (`_NoteRouted`, `_FailRouted`), `tests/support/pyhub.py`
 
+### Eine Übersicht darf nicht lesende Zustände weglassen: nicht bereite Prozesse als "nicht bereit" zeigen (WI-34, F-38)
+
+- **Problem:** `DebugView.RefreshSnapshots` fragte nur Prozesse im Zustand `ready` und ließ alle anderen ohne Spur weg. Das Fenster zeigte damit gerade die Zustände nicht, für die es gedacht ist (`starting`, `gone`). Der Test, der "mindestens 6 Snapshots" erwartete, war rot, wenn ein Prozess (der warme Worker) im Fenster noch `starting` war: 5 statt 6.
+- **Falsch:** Die Liste der Ziele auf `ready` filtern und den Rest schweigend auslassen; im Test nur warten, bis der Name in der Prozessliste steht (irgendein Zustand).
+- **Richtig:** Nicht bereite Prozesse nicht fragen, aber mit dem Eintrag `not ready (state: <Zustand>)` anzeigen. Der Testbefehl `cmd.test.debug state` liefert dazu `states` (Name → Zustand); der Test wartet auf `ready`, nicht auf die Anwesenheit in der Liste.
+- **Status:** verifiziert (`tests/fault/test_debug_role.py::test_refresh_shows_a_process_that_is_not_ready_as_not_ready_instead_of_leaving_it_out`: ohne die Änderung fehlt der späte Prozess in den Snapshots; mit ihr grün; der geänderte Test `test_refresh_stores_the_snapshot_of_every_role_and_the_supervisor` grün). Die Ursache des Ausfalls in der Abnahme ist aus dem Code gelesen (Zustand im Fenster `starting`), nicht im ausgefallenen Lauf beobachtet.
+- **Quelle:** `src/debugview/DebugView.ahk`
+
 ## GUI und Hotkeys
 
 ### Gui: Ereignisnamen und Zeilenreihenfolge der ListView
@@ -1164,3 +1172,26 @@ Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge kor
 - **Richtig:** Den Namen nutzen, den der Supervisor ohnehin weitergibt: `--start=echo:slowhello3000` startet die Rolle `echo` mit `--flow=slowhello3000`, `EchoRole.Start` erkennt das Muster und ruft `super.Start()` erst per `SetTimer` nach 3000 ms (in einer eigenen Methode `_StartLate`, mit `try`; `AhfMain` hat `Persistent()` schon gesetzt, der Prozess bleibt also während der Wartezeit am Leben).
 - **Status:** verifiziert (`tests/fault/test_shutdown.py`, das Kind ist beim Beenden im Zustand `starting` und meldet sich danach)
 - **Quelle:** `tests/integration/helpers/EchoRole.ahk`
+
+### Feste Pause vor einem Abbruch gegen ein Testelement mit fester Laufzeit ist ein Rennen (WI-34, F-37)
+
+- **Problem:** `test_cancel_stops_the_running_element_...` wartete 0,1 s nach `cmd.worker.run`, dann `cmd.worker.cancel`. `Action_TestBlockWorker` blockiert nur 800 ms. Unter Last kam der Abbruch nach dem Ende des Elements; die Antwort war `not_found` (`assert ans["ok"]` rot, die Antwort stand nicht in der Meldung).
+- **Falsch:** Auf eine feste Zeit warten und annehmen, das Element laufe dann noch.
+- **Richtig:** Das Element lang genug laufen lassen (Parameter `Duration`, 3 s), mit der Anfrage `cmd.diag.snapshot` auf den Auftrag warten (`info.job`), die Antwort des Abbruchs in die Fehlermeldung schreiben und das Fenster für ein spätes zweites `evt.worker.done` an die Laufzeit des Elements anpassen. Nachgestellt: dieselbe Meldung mit einer Pause von 1,0 s.
+- **Status:** verifiziert (Nachstellung mit Pause 1,0 s rot, neuer Test grün). Dass der Ausfall der Abnahme genau so entstand, ist daraus geschlossen, nicht im ausgefallenen Lauf gesehen.
+- **Quelle:** `tests/integration/test_worker.py`
+
+### Feste Zahl neben einer Frist des Produkts: `scaled()`, im Helfer und nur einmal (WI-34, F-39, F-42)
+
+- **Problem:** `HUB_FRAME_BUDGET_MS = 5.0` (gemessen 5,07 ms im parallelen Lauf) und `wait_restarted_ready(..., timeout=15)` waren feste Zahlen neben einer Frist des Produkts (Neustartverzögerung 300 ms plus Start) und standen nicht in `scaled()`. Die Suche nach `timeout=` mit Zahl fand weitere Wartezeiten dicht an Produktfristen (Ende der Worker mit der Engine, Hängererkennung 8 s, Stopp eines eingefrorenen Workers).
+- **Falsch:** Die Grenze an der Aufrufstelle und im Helfer skalieren (Doppelskalierung: 3 mal 3 = 9) oder eine Grenze lockern, ohne die Ursache zu belegen.
+- **Richtig:** Wartet ein Helfer (`wait_restarted_ready`, `ended`, `exited_killed`), skaliert er selbst, und die Aufrufstellen behalten ihre Zahl. Konstanten, die nur Grenzen sind (`HANG_BUDGET_S`), tragen `scaled()` in der Definition. Untere Grenzen, Anzahlen und Ergebnisse nie. Seriell und unter `-m stress` bleibt der Wert genau.
+- **Status:** verifiziert (die geänderten Dateien laufen grün, parallel; der serielle Lauf macht die Abnahme). Ob F-42 eine Last- oder eine Neustartverzögerung war, ist nicht belegt (siehe nächster Eintrag).
+- **Quelle:** `tests/support/timing.py`, `tests/fault/faultkit.py`
+
+### Eine Fehlermeldung muss den Beleg enthalten, sonst bleibt der Fund unerklärt (WI-34, F-42)
+
+- **Problem:** `Chain.wait_restarted_ready` schreibt `self.sup.text()` in die Meldung. Das ist der stdout/stderr des Supervisors und war leer (die Logzeilen stehen in `Log/Log.txt` im Datenverzeichnis). Der Fund F-42 ("Supervisor-Log in der Meldung") ließ sich deshalb nicht auswerten; 12 gleichzeitige Läufe ohne Skalierung waren alle grün (Ursache nicht belegt).
+- **Richtig:** Bei Zeitüberschreitungen den Schwanz der Datei `Log/Log.txt` und die Nummer des Durchlaufs mit in die Meldung schreiben (`test_the_handles_of_the_supervisor_stay_flat_over_50_restarts`). Beim nächsten Ausfall steht der Beleg in der Meldung.
+- **Status:** verifiziert (Meldung der Abnahme gelesen: leerer Text), Ursache des einen Ausfalls nicht belegt.
+- **Quelle:** `tests/fault/test_diagnose.py`
