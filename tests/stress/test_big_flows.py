@@ -109,11 +109,8 @@ def test_many_big_flows_load_without_hung_and_with_a_responsive_engine(procs, da
         restarts = {n: p.get("restarts") for n, p in states.items()}
         bad_events = chain.rec.find(lambda m: m.get("type") in ("evt.process.hung", "evt.process.crashed",
                                                                 "evt.process.restarted"))
-        # The engine may ask for the list before storage is connected; it retries (Engine.LOAD_RETRY_MS), and the
-        # hub answers that first request with not_found. That is not a loading error.
-        errors = chain.rec.find(lambda m: m.get("type") == "evt.storage.error"
-                                and not (m["payload"].get("op") == "flows.list"
-                                         and "not_found" in m["payload"].get("message", "")))
+        # Since WI-31 the engine waits for storage and reports no error for it (F-24): every error counts.
+        errors = chain.rec.find(lambda m: m.get("type") == "evt.storage.error")
         metrics.record("big flow collection loaded", flows=count, megabytes=round(result["bytes"] / 2**20, 2),
                        seconds_to_ready=round(result["t_ready"], 2),
                        snapshot_during_load_ms=lat.as_dict() if lat else None,
