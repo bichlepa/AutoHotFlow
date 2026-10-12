@@ -60,8 +60,10 @@ WI-18 zuerst: Es verkürzt jeden folgenden Testlauf. WI-20 ist reine Dokumentati
 ## Fortschritt
 
 - [x] WI-18  - [x] WI-19  - [x] WI-20  - [x] WI-21  - [x] WI-22  - [x] WI-23
-- [x] WI-24  - [x] WI-25  - [x] WI-26  - [x] WI-27  - [x] WI-28  - [ ] WI-29
+- [x] WI-24  - [x] WI-25  - [x] WI-26  - [x] WI-27  - [x] WI-28  - [x] WI-29
+
+**Gesamtstatus Phase 2b (2026-10-12): abgeschlossen mit offenen Punkten.** Alle Pakete sind umgesetzt. Die Abschlussläufe (WI-29) sind nicht vollständig grün: seriell 704 von 706 Tests grün (1 rot, F-31; 1 übersprungen), parallel grün, Stress 13 von 13, Dauerlauf mit Verbindungswechseln grün, Fault-Tests 20-mal 456 von 460 (4 rot, F-26). Offene Entscheidungen des Projektinhabers und Punkte: `work_items/HANDOVER.md` und das Ergebnis in `WI-29-aufraeumen-abschluss.md`. Phase 3 braucht die Freigabe des Projektinhabers.
 
 ## Funde
 
-Neue Funde während der Arbeit bekommen die nächste freie Nummer ab **F-11** und stehen in der Paketdatei unter "Ergebnis" (Szenario, Reproduktion, Entscheidung). WI-29 überträgt sie in `STATUS.md`.
+Neue Funde während der Arbeit bekommen die nächste freie Nummer ab **F-11** und stehen in der Paketdatei unter "Ergebnis" (Szenario, Reproduktion, Entscheidung). WI-29 hat sie in `STATUS.md` übertragen (Tabelle "Funde", F-01 bis F-31).
