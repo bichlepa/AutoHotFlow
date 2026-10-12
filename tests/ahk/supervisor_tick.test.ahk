@@ -19,7 +19,9 @@ class FakeHub {
         this.pumping := false
         this.pumpAgain := false
         this.shifted := 0
+        this.offline := Map()       ; names that are not connected: Send returns false and sends nothing (like Hub)
     }
+    LinkNames() => []
     Shift(ms) {
         this.shifted += ms
     }
@@ -41,8 +43,24 @@ class FakeHub {
         this.events.Push(Map("type", type, "payload", payload))
     }
     Send(to, type, payload) {
-        this.sent.Push(Map("to", to, "type", type))
+        if (this.offline.Has(to))
+            return false
+        this.sent.Push(Map("to", to, "type", type, "payload", payload))
         return true
+    }
+    SentCount(to, type) {
+        n := 0
+        for m in this.sent
+            if (m["to"] = to && m["type"] = type)
+                n += 1
+        return n
+    }
+    LastSent(to, type) {
+        found := ""
+        for m in this.sent
+            if (m["to"] = to && m["type"] = type)
+                found := m
+        return found
     }
     Count(type) {
         n := 0
@@ -141,6 +159,10 @@ TestRun.Case("Heartbeat: the pong time of a worker starts again when its job end
 TestRun.Case("Heartbeat: a worker without a job is hung as before (WI-27)", IdleWorkerWithoutPongIsHung)
 TestRun.Case("Heartbeat: only a worker can be busy (WI-27)", OnlyAWorkerCanBeBusy)
 TestRun.Case("Children: a hello before the pid is stored keeps the state ready and takes the pid (WI-27)", HelloBeforeThePidIsStored)
+TestRun.Case("Shutdown: a child of a group that had its turn gets sys.shutdown at its late hello, then the next group follows (F-41, WI-34)", LateHelloGetsTheShutdown)
+TestRun.Case("Shutdown: a child of a later group that says hello during the shutdown waits for the turn of its group (F-41, WI-34)", LateHelloOfALaterGroupWaitsForItsTurn)
+TestRun.Case("Shutdown: a child that is in no group (started after the groups were made) gets sys.shutdown at its hello (F-41, WI-34)", LateHelloOfAChildInNoGroup)
+TestRun.Case("Shutdown: a hello in the prepare phase or in the kill phase gets no sys.shutdown (F-41, WI-34)", HelloOutsideThePhaseShutdownGetsNothing)
 
 ByeIsReadBeforeTheExitIsReported() {
     hub := FakeHub()
@@ -665,6 +687,86 @@ HelloBeforeThePidIsStored() {
     kids.OnHello(Map("name", "echo", "pid", 5151))
     Assert.Equal(kids.State("echo"), "ready")
     Assert.Equal(kids._recs["echo"]["pid"], 5151)
+}
+
+; --- a child that says hello during the shutdown (F-41, WI-34) --------------------------------------------------
+
+; A supervisor with a real Shutdown and two children without processes (handle 0; Children.Tick is not called).
+NewShutdownSupervisor(hub, children) {
+    s := NewSupervisor(hub)
+    s.shutdown := Shutdown(s.children, hub)
+    s.shutdown.reason := "user"
+    s.shutdown.deadlineMs := 5000
+    for entry in children {
+        rec := AddLiveChild(s.children, entry[1], entry[3], Time.NowMs())
+        rec["role"] := entry[2]
+    }
+    return s
+}
+
+; The late child (rank 3) is still starting when its group gets sys.shutdown: nothing reaches it. Its hello comes later.
+; It must get sys.shutdown then, with the rest of the deadline, and storage (rank 4) follows once it said bye.
+LateHelloGetsTheShutdown() {
+    hub := FakeHub()
+    s := NewShutdownSupervisor(hub, [["storage", "storage", "ready"], ["echo:late", "echo", "starting"]])
+    hub.offline["echo:late"] := true
+    s.shutdown._StartShutdown()
+    s.shutdown.Tick(Time.NowMs())
+    Assert.Equal(hub.SentCount("echo:late", "sys.shutdown"), 0, "not connected yet: nothing was sent")
+    Assert.Equal(hub.SentCount("storage", "sys.shutdown"), 0, "storage waits for the group of the late child")
+    hub.offline.Delete("echo:late")
+    s._OnHello(Map("name", "echo:late", "pid", 1))
+    msg := hub.LastSent("echo:late", "sys.shutdown")
+    Assert.True(IsObject(msg), "the late child gets sys.shutdown at its hello")
+    d := msg["payload"]["deadlineMs"]
+    Assert.True(d > 0 && d <= 5000, "with the rest of the deadline, got " d)
+    Assert.Equal(msg["payload"]["reason"], "user")
+    Assert.Equal(s.children.State("echo:late"), "stopping")
+    s.children.OnBye("echo:late", true)
+    s.shutdown.Tick(Time.NowMs())
+    Assert.Equal(hub.SentCount("storage", "sys.shutdown"), 1, "then the last group, storage")
+    Assert.Equal(hub.SentCount("echo:late", "sys.shutdown"), 1, "once")
+}
+
+; The manager (rank 0) has not said bye yet when the late child (rank 3) says hello: the order of the ranks applies.
+LateHelloOfALaterGroupWaitsForItsTurn() {
+    hub := FakeHub()
+    s := NewShutdownSupervisor(hub, [["manager", "manager", "ready"], ["echo:late", "echo", "starting"]
+        , ["storage", "storage", "ready"]])
+    hub.offline["echo:late"] := true
+    s.shutdown._StartShutdown()
+    Assert.Equal(hub.SentCount("manager", "sys.shutdown"), 1)
+    hub.offline.Delete("echo:late")
+    s._OnHello(Map("name", "echo:late", "pid", 1))
+    Assert.Equal(hub.SentCount("echo:late", "sys.shutdown"), 0, "its group has not had its turn yet")
+    s.children.OnBye("manager", true)
+    s.shutdown.Tick(Time.NowMs())
+    Assert.Equal(hub.SentCount("echo:late", "sys.shutdown"), 1, "sent when its group has its turn, once")
+    Assert.Equal(hub.SentCount("storage", "sys.shutdown"), 0, "storage after it")
+}
+
+; A child that was not alive when the groups were made (its process was being created at that moment) is in no group.
+; Nobody waits for it in the order, but the shutdown waits for its end (AllGone): it gets sys.shutdown at its hello.
+LateHelloOfAChildInNoGroup() {
+    hub := FakeHub()
+    s := NewShutdownSupervisor(hub, [["storage", "storage", "ready"]])
+    s.shutdown._StartShutdown()
+    rec := AddLiveChild(s.children, "worker:1", "starting", Time.NowMs())
+    rec["role"] := "worker"
+    s._OnHello(Map("name", "worker:1", "pid", 1))
+    Assert.Equal(hub.SentCount("worker:1", "sys.shutdown"), 1)
+}
+
+HelloOutsideThePhaseShutdownGetsNothing() {
+    hub := FakeHub()
+    s := NewShutdownSupervisor(hub, [["echo:late", "echo", "starting"]])
+    s.shutdown.phase := "prepare"
+    s._OnHello(Map("name", "echo:late", "pid", 1))
+    Assert.Equal(hub.SentCount("echo:late", "sys.shutdown"), 0, "prepare: the groups are made later and include it")
+    s.children._recs["echo:late"]["state"] := "starting"
+    s.shutdown.phase := "kill"
+    s._OnHello(Map("name", "echo:late", "pid", 1))
+    Assert.Equal(hub.SentCount("echo:late", "sys.shutdown"), 0, "kill: KillAlive has ended it already")
 }
 
 TestRun.Finish()

@@ -90,6 +90,36 @@ class Shutdown {
         }
     }
 
+    ; A child said sys.hello (Supervisor._OnHello, after Children.OnHello). A child that was still starting when its group
+    ; got sys.shutdown (the warm worker, an editor, the debug window) could not be reached then (F-41, WI-34): without
+    ; this its group would wait for a bye that never comes, the later groups (storage last) would never get sys.shutdown,
+    ; and all of them would be terminated at the deadline. So in phase 2 a child whose group has had its turn (or is
+    ; having it now) gets sys.shutdown at its hello, with the rest of the deadline. A child of a later group waits for the
+    ; turn of its group (the order of the ranks applies). A child in no group (its process was being created when the
+    ; groups were made) gets it at once: nobody waits for it in the order, but the shutdown waits for its end (AllGone).
+    ; In the prepare phase nothing is needed (the groups are made later and include it), in the kill phase neither
+    ; (KillAlive has ended every process that was alive).
+    OnHello(name, now := "") {
+        if (this.phase != "shutdown" || !this.children.Has(name) || this.children.IsGone(name))
+            return
+        if (this._GroupOf(name) > this.groupIndex)
+            return
+        if (now = "")
+            now := Time.NowMs()
+        remaining := Max(1, Integer(this.deadlineAt - now))
+        Log.Write("a1", "shutdown", name " connected during the shutdown, sys.shutdown sent (" remaining " ms left)")
+        this.children.SendShutdown(name, this.reason, remaining)
+    }
+
+    ; Index of the group of name in this.groups, 0 when it is in none.
+    _GroupOf(name) {
+        for i, group in this.groups
+            for n in group
+                if (n = name)
+                    return i
+        return 0
+    }
+
     ; The supervisor stood still for ms (Stall, WI-33, F-16): the deadline of the shutdown and the wait after the hard end
     ; move by that time, so the children keep their rest of the time. (The answer limit of phase 1 is a Hub request and
     ; moves with the hub.)

@@ -166,13 +166,15 @@ class Supervisor {
         h.onLinkLost := (link, reason) => this.children.OnLinkLost(link["name"], reason)
     }
 
-    ; A client said sys.hello: the children learn about it; the log queue is delivered once storage is there.
+    ; A client said sys.hello: the children learn about it; the log queue is delivered once storage is there. A child that
+    ; connects while the session ends gets sys.shutdown when its group has had its turn (Shutdown.OnHello, F-41, WI-34).
     _OnHello(link) {
         this.children.OnHello(link)
         if (link["name"] = DiagLog.STORAGE) {
             this.diag.Flush()
             this.report.OnStorageHello()
         }
+        this.shutdown.OnHello(link["name"])
     }
 
     ; evt.diag.error of a role: kept in the ring and logged; a burst of them starts an automatic report (WI-28).

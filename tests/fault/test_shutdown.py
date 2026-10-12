@@ -85,6 +85,37 @@ def test_ui_cancels_the_exit_in_phase_one_and_the_session_keeps_working(chains, 
     procs.kill(chain.sup.proc)          # the stub cancels every exit: end the session here
 
 
+LATE_HELLO_MS = 3000         # echo:slowhello<ms> connects this long after its start (EchoRole, WI-34)
+LATE_DEADLINE_MS = 12000     # far above the late hello: an exit at the deadline (the old fault) is easy to tell apart
+
+
+@pytest.mark.parametrize("round_no", repeat_ids())
+def test_a_child_that_says_hello_during_the_shutdown_gets_sys_shutdown_and_the_session_exits_clean(chains, round_no):
+    # F-41 (WI-34): a child that is still starting when its group gets sys.shutdown (the warm worker, an editor, the
+    # debug window) says sys.hello later. It must get sys.shutdown then; before the fix it never did, its group never
+    # ended, storage (the last group) never got sys.shutdown, and both were terminated at the deadline (exit 5).
+    late = "echo:slowhello%d" % LATE_HELLO_MS
+    chain = chains("storage," + late, ["--test-roles"])
+    pids = chain.wait_ready(["storage"])
+    state = chain.states()[late]["state"]
+    if state != "starting":
+        pytest.skip("the late child was already %s when the exit began (machine too slow for the scenario)" % state)
+    t0 = time.perf_counter()
+    answer = chain.request_exit({"deadlineMs": LATE_DEADLINE_MS})
+    assert answer["payload"]["started"] is True, answer
+    code = chain.sup.wait_exit(timeout=LATE_DEADLINE_MS / 1000 + 10)
+    elapsed = time.perf_counter() - t0
+    print("\nMEASURE exit with a child that says hello during the shutdown: %.2f s, exit %s" % (elapsed, code))
+    assert code == EXIT_OK, chain.sup.text()
+    assert elapsed <= LATE_HELLO_MS / 1000 + CLEAN_EXIT_BUDGET_S, "exit took %.2f s" % elapsed
+    assert chain.rec.wait(event("evt.process.ready", name=late), timeout=EVENT_LAG_S), "the late child never said hello"
+    for name in ("storage", late):
+        exited = chain.rec.wait(event("evt.process.exited", name=name), timeout=EVENT_LAG_S)
+        assert exited and exited[1]["payload"]["clean"] is True, (name, exited)
+    assert not alive(pids["storage"])
+    assert wait_until(lambda: not session_processes(chain.session), 5.0), session_processes(chain.session)
+
+
 @pytest.mark.parametrize("round_no", repeat_ids())
 def test_two_sessions_in_a_row_both_exit_within_2_seconds(chains, round_no):
     for n in (1, 2):

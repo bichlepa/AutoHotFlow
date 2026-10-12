@@ -17,7 +17,28 @@
 ;                                   until the limit of Role.ERROR_LIMIT is exceeded (WI-23)
 ;
 ; sys.shutdown is handled by the base class (sys.bye, exit 0).
+;
+; Test option in the name (WI-34, F-41): "echo:slowhello<ms>" (the flow part of the name) starts its connection to the
+; hub only <ms> after the process start, so a test can end the session while this child is still starting and says
+; sys.hello during the shutdown. The supervisor needs no option for it (it starts the child as --flow=slowhello<ms>).
 class EchoRole extends Role {
+    Start() {
+        if (RegExMatch(this.flowId, "^slowhello(\d+)$", &m)) {
+            SetTimer(ObjBindMethod(this, "_StartLate"), -Integer(m[1]))
+            return
+        }
+        super.Start()
+    }
+
+    _StartLate() {
+        try {
+            super.Start()
+        } catch as e {
+            Role.Console("a0", "echo", this.name " failed to start late: " Type(e) ": " e.Message)
+            ExitApp(1)
+        }
+    }
+
     RegisterHandlers() {
         this.On("cmd.test.echo", (msg) => Map("echo", msg.payload))
         this.On("cmd.test.log", (msg) => this._LogMany(msg.payload.Get("count", 0), msg.payload.Get("level", "a1")
