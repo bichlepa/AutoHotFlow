@@ -1114,3 +1114,9 @@ Neue Einträge am Ende der passenden Kategorie anfügen. Veraltete Einträge kor
 - **Problem:** `user32.EnumWindows(WINFUNCTYPE(...)(visit), 0)` im Test warf `ArgumentError: expected WinFunctionType instance instead of WinFunctionType`: Ein anderes Modul (der Dialog-Wächter) hatte `argtypes` von `EnumWindows` auf `windll.user32` gesetzt, mit einer eigenen `WINFUNCTYPE`-Klasse. Jeder Aufruf von `WINFUNCTYPE` erzeugt eine neue Klasse.
 - **Richtig:** Ein eigenes Objekt verwenden: `user32 = ctypes.WinDLL("user32")`. Dessen Funktionen sind von denen in `windll.user32` getrennt.
 - **Status:** verifiziert (`tests/fault/test_debug_role.py`)
+
+### Warten auf eine Rolle: Zustand abfragen, nicht zählen (WI-31)
+
+- **Problem:** Die Engine gab nach 5 Versuchen in 2,5 s auf, wenn `storage` noch nicht verbunden war (F-31), und meldete jeden Versuch als `evt.storage.error` (F-24). Ein erster Ersatz, der bei "bereit" sofort neu lädt, rannte in eine Schleife (1440 Leseversuche in 2,5 s), als eine Rolle als `ready` galt, aber jede Anfrage mit `peer_gone` endete.
+- **Richtig:** Erst das Topic `process` abonnieren, dann `cmd.process.list` fragen (PROTOKOLL 5a), ohne Obergrenze der Versuche, aber mit Pause (1 s) zwischen zwei Fragen und höchstens einer Logzeile je 30 s. Nach einem abgebrochenen Laden ebenfalls erst nach der Pause neu beginnen. Nur `evt.process.ready` darf sofort neu starten.
+- **Status:** verifiziert (`tests/integration/test_engine.py`: `test_engine_waits_for_a_storage_that_starts_5_s_after_it_and_reports_no_error`, `test_engine_resumes_loading_when_storage_restarts_in_the_middle_and_loads_only_the_missing_files`, `test_engine_does_not_ask_for_more_files_when_storage_has_stopped_answering`)
