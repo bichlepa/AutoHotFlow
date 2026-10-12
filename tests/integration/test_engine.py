@@ -204,6 +204,29 @@ class DyingStorageStub(StorageStub):
         self.client.reply(msg, {"ok": False, "error": {"code": "peer_gone", "message": "storage gone"}})
 
 
+class VanishingStorageStub(StorageStub):
+    """Serves `serve` reads, then dies at the next read without answering it: the read stays open (F-40, WI-34)."""
+
+    def __init__(self, pipe, datadir, serve):
+        super().__init__(pipe, datadir)
+        self.serve = serve
+        self.ok_paths = []
+        self.open_path = None
+        self.vanished = threading.Event()
+
+    def _handle(self, msg):
+        if msg.get("type") != "cmd.storage.flow.read" or self.vanished.is_set():
+            return super()._handle(msg)
+        path = msg["payload"].get("path", "")
+        if len(self.ok_paths) < self.serve:
+            self.ok_paths.append(path)
+            return super()._handle(msg)
+        self.open_path = path
+        self._stop = True               # the process is gone: the connection ends, the read is never answered
+        self.client.close()
+        self.vanished.set()
+
+
 def wait_for(predicate, timeout=5.0):
     end = time.monotonic() + timeout
     while time.monotonic() < end:
@@ -326,6 +349,46 @@ def test_engine_resumes_loading_when_storage_restarts_in_the_middle_and_loads_on
             assert set(first.ok_paths) | set(second.read_calls) == set(all_paths)
             assert not set(first.ok_paths) & set(second.read_calls), "files that were loaded were read again"
             assert len(second.read_calls) == 20 - len(first.ok_paths)
+            hub.send_to("engine", "sys.shutdown", {"reason": "user", "deadlineMs": 1000})
+            assert run.wait_exit(timeout=10) == 0, run.stderr_text()
+    finally:
+        first.close()
+        if second:
+            second.close()
+
+
+RESUME_BUDGET_S = scaled(5.0)   # from the death of storage to evt.engine.ready (Engine.READ_TIMEOUT_MS is 30 s)
+
+
+def test_engine_resumes_loading_at_once_when_storage_dies_with_an_open_read(procs, datadir, runs, session_id, pipe,
+                                                                            hub, flowdir):
+    # F-40 (WI-34): storage dies while a cmd.storage.flow.read of the engine is open. The hub answers it with
+    # peer_gone when the connection of storage ends; before, nobody answered it and the engine waited for its own
+    # deadline (30 s) before it resumed. The answer is from the hub, so this needs the hub of the test to do the same
+    # as the supervisor (tests/support/pyhub.py, Hub.ahk).
+    for n in range(19):
+        shutil.copy(SKELETON_SRC, flowdir / "Flows" / ("copy%02d.json" % n))
+    first = VanishingStorageStub(pipe, flowdir, serve=7).start()
+    second = None
+    try:
+        with observer(pipe, "engine") as obs:
+            run = start_engine(procs, flowdir, runs, pipe, session_id)
+            assert first.vanished.wait(READY_TIMEOUT_S), "storage never died\n" + run.stderr_text()
+            t_dead = time.perf_counter()
+            assert wait_for(lambda: "storage" not in hub.peers(), timeout=5.0), "the hub kept the dead storage"
+            second = StorageStub(pipe, flowdir).start()
+            ready = None
+            for msg in obs.events(timeout=RESUME_BUDGET_S):
+                if msg["type"] == "evt.engine.ready":
+                    ready = time.perf_counter() - t_dead
+                    break
+            print("\nMEASURE storage died with an open read (%s): engine ready %s s later"
+                  % (first.open_path, "%.2f" % ready if ready is not None else "not within %.1f" % RESUME_BUDGET_S))
+            assert ready is not None, "no evt.engine.ready within %.1f s after storage died\n%s" % (
+                RESUME_BUDGET_S, run.stderr_text())
+            snap = ask(obs, "cmd.engine.snapshot")
+            assert len(snap["flows"]) == 20
+            assert first.open_path in second.read_calls, "the open read was not asked again"
             hub.send_to("engine", "sys.shutdown", {"reason": "user", "deadlineMs": 1000})
             assert run.wait_exit(timeout=10) == 0, run.stderr_text()
     finally:

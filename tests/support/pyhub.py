@@ -5,6 +5,10 @@ It answers sys.hello with sys.welcome, routes messages by `to`, sets `from` to t
 registered name of the sender, answers unknown cmd.* with a not_found error, and
 fans out topic messages to subscribers. It is deliberately simple and is not the
 production hub.
+
+Like the supervisor (Hub.ahk, F-40, WI-34) it remembers the cmd.* it forwards until the answer passes back; when the
+connection of the target ends first, the sender gets {ok: false, error: {code: "peer_gone"}} from the hub. A cmd.*
+the target does not accept (write failed) is answered with peer_gone at once.
 """
 
 import threading
@@ -44,6 +48,8 @@ class PyHub:
         self._threads = []
         self._acceptor = None
         self._ids = 0
+        self._routed = {}           # (sender, id) -> {"from", "to", "type", "id"}: forwarded cmd.* without answer yet
+        self.gone_answers = 0       # requests answered with peer_gone because their target went away
 
     # --- lifecycle -----------------------------------------------------------
     def start(self):
@@ -126,11 +132,16 @@ class PyHub:
         except (winpipe.PipeClosed, OSError, ValueError):
             pass
         finally:
+            gone = []
             with self._cond:
                 if link in self._links:
                     self._links.remove(link)
+                if link.name:
+                    gone = self._take_routed(link.name)     # in the same step: a new link of the name is not hit
                 self._cond.notify_all()
             link.pipe.close()
+            if link.name:
+                self._answer_gone(link.name, gone)
 
     def _handle(self, link, msg):
         with self._cond:
@@ -174,10 +185,43 @@ class PyHub:
         with self._lock:
             target = next((l for l in self._links if l.name == to), None)
         if target is not None:
-            target.send(self._forward(link, msg))
+            if type_.startswith("cmd."):
+                with self._lock:
+                    self._routed[(link.name, msg.get("id"))] = {"from": link.name, "to": to, "type": type_,
+                                                                "id": msg.get("id")}
+            elif type_.startswith("res.") and msg.get("corr"):
+                with self._lock:
+                    rec = self._routed.get((to, msg.get("corr")))
+                    if rec is not None and rec["to"] == link.name:
+                        del self._routed[(to, msg.get("corr"))]
+            if not target.send(self._forward(link, msg)) and type_.startswith("cmd."):
+                with self._lock:
+                    self._routed.pop((link.name, msg.get("id")), None)
+                self._reply(link, msg, "res." + type_[4:],
+                            {"ok": False, "error": {"code": "peer_gone", "message": "%s does not accept it" % to}})
         elif type_.startswith("cmd."):
             self._reply(link, msg, "res." + type_[4:],
                         {"ok": False, "error": {"code": "not_found", "message": "no peer " + str(to)}})
+
+    def _take_routed(self, name):
+        """The connection of name has ended (the lock is held): removes its open requests and returns them; its own
+        requests are forgotten (nobody waits for their answers)."""
+        gone = [rec for rec in self._routed.values() if rec["to"] == name]
+        for key in [k for k, rec in self._routed.items() if rec["to"] == name or rec["from"] == name]:
+            del self._routed[key]
+        return gone
+
+    def _answer_gone(self, name, gone):
+        """Each request that name has not answered gets peer_gone, if its sender is still connected."""
+        with self._lock:
+            senders = {l.name: l for l in self._links if l.name}
+        for rec in gone:
+            self.gone_answers += 1
+            sender = senders.get(rec["from"])
+            if sender is not None:
+                self._reply(sender, {"from": rec["from"], "id": rec["id"]}, "res." + rec["type"][4:],
+                            {"ok": False, "error": {"code": "peer_gone",
+                                                    "message": "%s is gone before it answered %s" % (name, rec["type"])}})
 
     def _publish(self, topic, type_, payload):
         with self._lock:
