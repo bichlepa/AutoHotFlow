@@ -930,8 +930,8 @@ PlannedRestartIsCancelledByTheShutdown() {
     }
 }
 
-; --data wins over AHF_DATA_DIR, which wins over %APPDATA%\AutoHotFlow. The environment of this process is changed
-; and restored, nothing is started.
+; --data wins over AHF_DATA_DIR, which wins over %APPDATA%\AutoHotFlow v2 (not the v1 folder, E33). The environment
+; of this process is changed and restored, nothing is started.
 DataDirFollowsOptionThenEnvironmentThenAppData() {
     saved := EnvGet(Supervisor.DATA_DIR_ENV)
     try {
@@ -939,7 +939,7 @@ DataDirFollowsOptionThenEnvironmentThenAppData() {
         Assert.Equal(Supervisor.DataDir(Map("data", "C:\option-dir")), "C:\option-dir", "--data wins")
         Assert.Equal(Supervisor.DataDir(Map()), "C:\env-dir", "the environment variable is the second choice")
         EnvSet(Supervisor.DATA_DIR_ENV, "")
-        Assert.Equal(Supervisor.DataDir(Map()), A_AppData "\AutoHotFlow", "without both: the application data folder")
+        Assert.Equal(Supervisor.DataDir(Map()), A_AppData "\AutoHotFlow v2", "without both: the application data folder of v2")
     } finally {
         EnvSet(Supervisor.DATA_DIR_ENV, saved)
     }

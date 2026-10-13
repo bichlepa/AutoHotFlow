@@ -25,7 +25,7 @@
 ;                   [--deadline=<ms>] [--test-roles] [--command=<text>]
 ;   --session   instance key: names the hub pipe and the mutex (PipeNames; the pipe name also carries
 ;               the Windows session id and a tag of the user). Default "main".
-;   --data      data directory. Without it: the environment variable AHF_DATA_DIR, else %APPDATA%\AutoHotFlow.
+;   --data      data directory. Without it: the environment variable AHF_DATA_DIR, else %APPDATA%\AutoHotFlow v2.
 ;               Every role gets the resolved path with --data.
 ;   --start     roles started at once, each one is required (its evt.process.ready is awaited by tests).
 ;   --deadline  total budget of the shutdown in ms (default 5000, sys.shutdown deadlineMs).
@@ -46,7 +46,7 @@
 class Supervisor {
     static DEFAULT_SESSION := "main"
     static DEFAULT_DEADLINE_MS := 5000
-    static DEFAULT_DATA_SUBDIR := "AutoHotFlow"
+    static DEFAULT_DATA_SUBDIR := "AutoHotFlow v2"    ; not the folder of v1 (%APPDATA%\AutoHotFlow, E33)
     static DATA_DIR_ENV := "AHF_DATA_DIR"
     static MIN_DEADLINE_MS := 100
     static MAX_DEADLINE_MS := 60000
@@ -64,7 +64,7 @@ class Supervisor {
         s.Start()
     }
 
-    ; The data directory: --data, else the environment variable AHF_DATA_DIR, else %APPDATA%\AutoHotFlow.
+    ; The data directory: --data, else the environment variable AHF_DATA_DIR, else %APPDATA%\AutoHotFlow v2.
     ; A_AppData cannot be redirected through the environment (it comes from the shell API), so the variable is the
     ; only way to keep a process away from the real directory (the tests set it to a guard directory).
     static DataDir(opts) {
