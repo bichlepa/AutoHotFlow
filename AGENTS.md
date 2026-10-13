@@ -58,7 +58,7 @@ AutoHotFlow (AHF) is being ported from AutoHotkey v1 (AutoHotkey_H with `AhkThre
 
 ## Working in parallel
 
-Several agents may work at the same time only in **separate workspaces**: one git worktree and one branch `wip/<name>` per agent (`python tools/new_workspace.py <name>`). Never change the main checkout or another workspace, and do not merge into `v2-port` yourself; the integrator does. Roles, rules, conflict-prone files and limits: `doc/PARALLEL-WORK.md`. If you were not started in a workspace of your own and other agents may be working, ask before you change files.
+Several agents may work at the same time only in **separate workspaces**: one git worktree and one branch `wip/<name>` per agent (`python tools/new_workspace.py <name>`). Never change the main checkout or another workspace, and do not merge into `v2-port` yourself; the integrator does. Roles, rules, conflict-prone files and limits: `doc/PARALLEL-WORK.md`. If you were not started in a workspace of your own and other agents may be working, ask before you change files. A prompt for an orchestrator that starts and integrates the agents: `doc/ORCHESTRATOR.md`.
 
 ## Tools in this environment
 

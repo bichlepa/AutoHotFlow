@@ -33,7 +33,7 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 | F-45 | `refreshed` 2 instead of 3 in the debug role test | observed, open | |
 | F-47 | `cmd.worker.cancel` unanswered in the hang test | observed, open | |
 | F-48* | `cmd.worker.run` unanswered for 5 s in `test_worker_busy.py` | observed once, open | |
-| F-49* | `flow 'wecho' is not loaded` after an engine restart during a worker job | test problem (wait missing), test fixed on `wip/bug-f49`; product contract note below | yes |
+| F-49* | `flow 'wecho' is not loaded` after an engine restart during a worker job | test problem (wait missing), test fixed; product contract note below | yes |
 | F-50* | `storage` not ready within 45 s after a freeze in the hang test | observed once under load, open | |
 | F-51* | Log line lost while other processes hold the files (`readers-allow-read`) | observed once at `-n 12`, open | |
 
