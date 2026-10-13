@@ -4,7 +4,7 @@ Status: 2026-10-12, branch `v2-port`, after the fix block WI-30 to WI-35 (accept
 
 This document lists everything that is still open, observed, or deferred. Of the 45 finding IDs used in the work items (F-01 to F-47; F-34 and F-44 were never assigned), 27 are closed and are not carried over here. Their history is in the tag `v2-phase2-final`, table "Funde" in `v2-phase2-final:work_items/STATUS.md`. The work-item files that this document cites were removed from the working tree; they can be read with `git show v2-phase2-final:<path>`.
 
-Three findings are status "observed, open": F-36, F-45 and F-47. None of them is closed. The source recommends closing F-36, but that is a decision of the project owner and has not been made yet.
+Seven findings are status "observed, open": F-36, F-45, F-47 and the provisional F-48 to F-51 (2026-10-13, found while building the test tiers). None of them is closed. The source recommends closing F-36, but that is a decision of the project owner and has not been made yet.
 
 Entries marked **(phase 3)** matter for the phase 3 plan.
 
@@ -32,6 +32,12 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 | F-43 | Slow child during shutdown holds later groups | open, decision needed | yes |
 | F-45 | `refreshed` 2 instead of 3 in the debug role test | observed, open | |
 | F-47 | `cmd.worker.cancel` unanswered in the hang test | observed, open | |
+| F-48* | `cmd.worker.run` unanswered for 5 s in `test_worker_busy.py` | observed once, open | |
+| F-49* | `flow 'wecho' is not loaded` after an engine restart during a worker job | observed once, open, may be a product race | yes |
+| F-50* | `storage` not ready within 45 s after a freeze in the hang test | observed once under load, open | |
+| F-51* | Log line lost while other processes hold the files (`readers-allow-read`) | observed once at `-n 12`, open | |
+
+* provisional IDs, assigned by the agent on 2026-10-13; the project owner assigns the final ones.
 
 ## Findings
 
@@ -185,7 +191,8 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 **Status:** Observed, open. Not reproduced in the WI-35 cycle 1 (10 parallel runs, 1 serial run, 505 fault runs, 14 stress runs). Cause not verified. The targeted repetition for F-45 is not documented.
 **Why deferred:** Not reproduced. The source suspects (assumed) that `DebugView.RefreshSnapshots` asks only the processes the window already sees as `ready`, the same pattern as F-38. The other possibility is that an answer missed `DebugView.SNAPSHOT_MS`.
 **Sign that it matters:** `assert 2 == 3` in the test under parallel load.
-**Action:** On the next failure, read the output and the snapshot of the failing role (`cmd.diag.snapshot`), with `AHF_TEST_KEEP=1`.
+**Update 2026-10-13:** It failed again in 1 of about 10 `--all` runs (8 workers). The report fetched at the moment of the failure shows supervisor, `storage` and `debug` as `ready` with the late child `starting`, so the process side was in the expected state. Assumed (not proven) cause: the window's own table still showed `storage` or `debug` as not ready, the same lag as in `test_refresh_stores_the_snapshot_of_every_role_and_the_supervisor` (2 of 4 runs, `4 >= 6`). Both tests now wait until the window's table shows the roles as `ready`; 12 further `--all` runs did not show it again. Status: mitigated in the test, cause not proven. If it returns, the lag is in `DebugView` and not in the test.
+**Action:** On the next failure, read the run log (`doc/TEST-STRATEGY.md` section 6): `diagnosis/`, `Reports/`, `Log/`.
 **Evidence:** `v2-phase2-final:work_items/phase2b/WI-35-bugfix-schleife.md` (section "Analyse Zyklus 1"); `v2-phase2-final:work_items/STATUS.md`, "Abnahmelauf WI-34 (2026-10-12, zweiter)" and "Abnahmelauf WI-35, Zyklus 1".
 
 ### F-47: `cmd.worker.cancel` unanswered in the hang test
@@ -196,6 +203,38 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 **Sign that it matters:** `AhfTimeout: no answer to engine#3 within 5.0 s` at the cancel call.
 **Action:** On the next failure, take the snapshot of the worker (`cmd.diag.snapshot`) and run with `AHF_TEST_KEEP=1`.
 **Evidence:** `v2-phase2-final:work_items/phase2b/WI-35-bugfix-schleife.md`; `v2-phase2-final:work_items/STATUS.md`, "Abnahmelauf WI-34 (2026-10-12, zweiter)" and "Schleife WI-35, Zyklus 0".
+
+### F-48*: `cmd.worker.run` unanswered for 5 s in `test_worker_busy.py`
+
+**What:** `test_worker_that_blocks_longer_than_the_pong_timeout_is_not_hung_while_it_has_a_job`: the worker was `ready`, `cmd.worker.run` got no answer within 5 s (`AhfTimeout: no answer to engine#4`).
+**Status:** Observed once in about 10 `--all` runs (8 workers), 2026-10-13. Not reproduced in 10 single runs under background load. Supervisor log was empty (no `storage` in that test), so there is no evidence for a cause. Possibly the same family as F-47 (an unanswered request to a worker); not proven. The 5 s default of `ask()` in `test_worker_pool.py` does not go through `scaled()`; that is a suspicion, not a finding.
+**Sign that it matters:** the same `AhfTimeout` on `cmd.worker.run`.
+**Action:** On the next failure read `diagnosis/snapshot_supervisor.json` (children output, log ring) in the run log. Compare with F-47.
+**Evidence:** saved run log `%TEMP%/ahf_testruns_keep/20261013-145541-19344` (failure text only, no diagnosis yet).
+
+### F-49*: `flow 'wecho' is not loaded` after an engine restart during a worker job (phase 3)
+
+**What:** `test_engine_restart_during_a_worker_job_leaves_no_orphan_and_the_next_job_runs` (`tests/fault/test_worker_lifecycle.py`): after the engine restart, starting the flow was answered with `not_found`, "flow 'wecho' is not loaded".
+**Status:** Observed once in about 10 `--all` runs, 2026-10-13. Not analysed. Two readings, none verified: the test starts the flow before the engine has loaded its flows after the restart (test problem), or the engine reports `ready` before the flow table is loaded (product race, family F-13).
+**Sign that it matters:** `not_found` for a flow right after an engine restart in a real session.
+**Action:** Read the saved run log (`Log/`, `Reports/`, supervisor snapshot) and the engine start sequence in `Engine.ahk`; decide test or product. Do this before phase 3 builds on the restart behavior.
+**Evidence:** saved run log `%TEMP%/ahf_testruns_keep/20261013-151836-20516`.
+
+### F-50*: `storage` not ready within 45 s after a freeze in the hang test
+
+**What:** `test_frozen_storage_is_hung_ended_and_restarted_and_answers_again[0]`: "storage not ready again within 45.0 s".
+**Status:** Observed once in about 10 `--all` runs, 2026-10-13, under full load (8 workers, many AHK processes). Not analysed; load is assumed, not proven. The limit already goes through `scaled()`.
+**Sign that it matters:** the same message, especially at low load.
+**Action:** Read the saved run log (`Reports/`, supervisor log): was `storage` started late, or did it hang a second time?
+**Evidence:** saved run log `%TEMP%/ahf_testruns_keep/20261013-152128-3060` (includes the report written at the moment of the failure).
+
+### F-51*: Log line lost while other processes hold the files (`readers-allow-read`)
+
+**What:** `test_no_log_line_is_lost_while_other_processes_hold_the_files[readers-allow-read]` failed once at `-n 12` (more workers than the 8 cores, run took 51 s). The test serial and in 8 more runs passed.
+**Status:** Observed once, 2026-10-13. Run log did not exist yet, no evidence kept. Related to F-25 (permanently locked log file loses a batch), not proven.
+**Sign that it matters:** the failure at normal worker counts, or "lines lost" in a real session.
+**Action:** On the next failure read the failure text and `Log/` in the run log.
+**Evidence:** none kept.
 
 ## Watch list (E7)
 
@@ -214,7 +253,7 @@ These items were deliberately not fixed in phase 2b. Closed items (F-05, F-07, F
 - **Test runtime grows.** At the end of phase 2b the run took 113 s in parallel and 596 s serially (706 tests). In WI-35 cycle 1 the parallel runs took 137 to 164 s, the serial run 728 s (752 tests). Each package adds time. *Action:* watch it with each full run.
 - **Delete command for a running flow is missing (phase 3).** `Executor.FlowDeleted` stops the instances at once, without a deadline and without an acknowledgment (E9, confirmed by the owner on 2026-10-12). In v1, `DeleteFlow` gave up after 10 s. The command itself is not built yet.
 - **Dangling connections.** 154 of 1039 connections in the example flows are dangling. M-13 defines the behavior: ignore them and report them with an `f1` log entry (documented in `doc/MIGRATION.md`).
-- **Parallel runs under load.** F-19 (the time limits) is closed. The remaining risk is F-36, F-45 and F-47 (see above).
+- **Parallel runs under load.** F-19 (the time limits) is closed. The remaining risk is F-36, F-45, F-47 and, since 2026-10-13, F-48 to F-51 (see above). The default run (fast tier) showed none of them in about 10 runs; the `--all` run with 8 workers showed one different test in about every second run. A gate with fewer workers (`-n 4`) is not measured yet.
 - **Progress checkboxes.** In `v2-phase2-final:work_items/phase2/README.md` the phase 2 checkbox is set. WI-13 and WI-14 were deliberately not checked. WI-17 is checked only after step 7 (phase 3 plan and questions to the owner) is done.
 - **Foreign process.** `AutoHotkey64.exe` (PID 29328, `/restart /script ...\src\AutoHotFlow.ahk`) was reported in earlier runs. It was gone on 2026-10-11, and the tests never started or stopped it. *Action:* none; check if it reappears.
 
