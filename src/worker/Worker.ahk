@@ -49,11 +49,11 @@ class Worker extends Role {
             , "sinceMs", Integer(Time.NowMs() - job["startedMs"])))
     }
 
-    ; After a reconnect to the hub the supervisor does not know that a job is running.
+    ; After a reconnect to the hub the supervisor does not know whether a job is running: a sys.busy sent while the
+    ; link was down is dropped (Peer.Send), either direction. So the current state is always announced (F-30).
     OnReady() {
         this.SetLogTarget("storage")    ; F-28: without a target the entries of the worker (and of its elements) were never written
-        if (this._job != "")
-            this._ReportBusy(true)
+        this._ReportBusy(this._job != "")
     }
 
     ; sys.shutdown: a running element is stopped and reported before sys.bye (ARCHITECTURE 6.3).

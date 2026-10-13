@@ -213,3 +213,36 @@ def test_role_ends_with_exit_4_when_its_pipe_is_cut_and_the_hub_does_not_come_ba
         hub.stop()
         procs.kill(run.proc)
         run.close()
+
+
+def busy_flags(hub, name):
+    """The `busy` values of the sys.busy messages of one role in the order the hub received them (hello = marker)."""
+    flags = []
+    for msg in list(hub.received):
+        if msg.get("from") != name:
+            continue
+        if msg.get("type") == "sys.hello":
+            flags.append("hello")
+        elif msg.get("type") == "sys.busy":
+            flags.append(bool(msg["payload"].get("busy")))
+    return flags
+
+
+def test_worker_announces_its_busy_state_again_after_it_rebuilt_the_connection(procs, datadir, session_id):
+    """F-30: a sys.busy {busy: false} sent while the link is down is dropped. The supervisor then keeps the worker
+    as busy for ever (no ping, no pong judgement). After a reconnect the worker must announce its state, also when
+    it has no job (before the fix it announced only `true` for a running job)."""
+    pipe = "ahf.%s.fw" % session_id
+    args = ["--role=worker", "--session=" + session_id, "--hub=" + pipe, "--data=" + str(datadir), "--flow=1"]
+    with WakingHub(pipe) as hub:
+        run = RoleProc(procs, datadir, "worker1", args)
+        try:
+            wait_hello(hub, "worker:1")
+            cut_link(hub, "worker:1")
+            assert wait_until(lambda: hello_count(hub, "worker:1") == 2, ORPHAN_BUDGET_S + 2.0, step=0.02), \
+                "worker did not reconnect:\n" + run.text()
+            assert wait_until(lambda: busy_flags(hub, "worker:1")[-1:] == [False], 3.0, step=0.02), \
+                "no sys.busy false after the reconnect: %r\n%s" % (busy_flags(hub, "worker:1"), run.text())
+        finally:
+            procs.kill(run.proc)
+            run.close()
