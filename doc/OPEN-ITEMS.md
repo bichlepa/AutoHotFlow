@@ -26,7 +26,7 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 | F-25 | Permanently locked log file loses a whole batch | open, low (stall case fixed in 2675105) | |
 | F-28 | Worker log entries never reach `storage` | closed (fixed in 58e48d2) | yes |
 | F-29 | Child in handshake is not covered by the orphan guard | open, low | |
-| F-30 | Lost `sys.busy {busy: false}` | assumed, open, low | |
+| F-30 | Lost `sys.busy {busy: false}` | closed (reconnect case fixed in 4d97c49) | |
 | F-35 | Hub connection deadlines ignore supervisor stalls | open, low | |
 | F-36 | `sys.hello` unanswered for 15 s in `test_shutdown.py` | observed, open | |
 | F-43 | Slow child during shutdown holds later groups | open, decision needed | yes |
@@ -156,8 +156,9 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 ### F-30: Lost `sys.busy {busy: false}`
 
 **What:** A lost `sys.busy {busy: false}` message leaves the worker shown as busy.
-**Status:** Assumed (the source tags it as suspected). Open, low priority.
-**Why deferred:** The engine's acceptance deadline of 5 s covers the case.
+**Status:** Closed (2026-10-13) for the case that can be shown, fixed in 4d97c49, see the update. Before: assumed, low priority.
+**Update 2026-10-13 (bug hunter):** Verified by reading and by a test. `Peer.Send` drops a message without a trace while the peer is not `ready` (`droppedSends`, `src/core/ipc/Peer.ahk`). `Worker.OnReady` announced the busy state only for a running job (`true`), never `false`. If the link broke during a job and the job ended in the gap, `sys.busy {busy:false}` was dropped, the reconnect announced nothing, and the supervisor kept the worker as busy for ever: `Children.OnLinkLost` resets nothing, `OnHello` ignores a child that is not `starting` and `Heartbeat.Tick` skips a busy child. Effect: an idle worker that later hangs is never detected, and the process is not ended as hung. The engine's 5 s acceptance deadline does not cover this (it concerns the job, not the heartbeat). Fix: `Worker.OnReady` always announces the current state (`true` or `false`). The new test `test_worker_announces_its_busy_state_again_after_it_rebuilt_the_connection` (`tests/fault/test_pipe_break.py`, stand-in hub, link cut by the hub) fails before (`['hello', 'hello']`, run 20261013-183502-13236) and passes after (run 20261013-183508-7492, commit 4d97c49 plus the test). `test_worker.py` and `test_architecture.py` 44 passed (run 20261013-183521-20328). Decision taken: fix in the worker, not in the supervisor; the alternative (reset `busy` when the child's link is lost or on a new hello) would also cover a worker that dies in the gap, but a worker that is still running a job would then be pinged until its `true` arrives. Not checked: the exact race (job end inside the gap) is not forced, the test checks the announcement after a reconnect; the engine does not receive the lost `evt.worker.done` either (a separate matter: the slot is released by the engine's own deadlines, read in `WorkerBridge`, not tested).
+**Why deferred:** (was) The engine's acceptance deadline of 5 s was thought to cover the case; it does not.
 **Sign that it matters:** A worker shown as busy for more than 5 s.
 **Action:** Verify the case if it is seen. Otherwise no action.
 **Evidence:** `v2-phase2-final:work_items/phase2b/WI-27-worker-pool.md`.
