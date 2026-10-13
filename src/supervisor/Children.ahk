@@ -440,10 +440,14 @@ class Children {
         return groups
     }
 
-    ; True when every named child has said sys.bye or has already ended.
+    ; True when every named child has said sys.bye or has already ended. A child that has never connected (state
+    ; "starting") does not hold its group (F-43): it cannot be told to shut down and has sent nothing that a later group
+    ; (storage) must still write. Its late sys.hello is handled by Shutdown.OnHello; at the deadline it is ended.
     GroupDone(names) {
         for name in names {
             rec := this._recs[name]
+            if (rec["state"] = "starting")
+                continue
             if (!rec["bye"] && !rec["gone"])
                 return false
         }

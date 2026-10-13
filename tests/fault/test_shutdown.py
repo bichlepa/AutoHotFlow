@@ -118,6 +118,34 @@ def test_a_child_that_says_hello_during_the_shutdown_gets_sys_shutdown_and_the_s
     assert wait_until(lambda: not session_processes(chain.session), 5.0), session_processes(chain.session)
 
 
+SLOW_HELLO_MS = int(scaled(4000))      # F-43: this child says hello long after the deadline
+SLOW_DEADLINE_MS = int(scaled(1500))
+
+
+@pytest.mark.slow
+@pytest.mark.parametrize("round_no", repeat_ids())
+def test_a_child_that_has_not_connected_does_not_hold_storage_and_the_session_ends_with_storage_clean(chains, round_no):
+    # F-43: a child in state "starting" (here a worker whose hello comes after the deadline) used to hold its group and
+    # with it storage, the last group. At the deadline storage was terminated without sys.shutdown (clean false). Now
+    # the group does not wait for a child that has never connected: storage is told to shut down and ends clean; the
+    # late child is the only one that is ended at the deadline (exit 5).
+    late = "echo:slowhello%d" % SLOW_HELLO_MS
+    chain = chains("storage," + late, ["--test-roles"])
+    pids = chain.wait_ready(["storage"])
+    state = chain.states()[late]["state"]
+    if state != "starting":
+        pytest.skip("the late child was already %s when the exit began (machine too slow for the scenario)" % state)
+    answer = chain.request_exit({"deadlineMs": SLOW_DEADLINE_MS})
+    assert answer["payload"]["started"] is True, answer
+    code = chain.sup.wait_exit(timeout=SLOW_DEADLINE_MS / 1000 + scaled(10))
+    assert code == EXIT_FORCED, "the late child must be ended at the deadline (exit 5), got %s" % code + chain.sup.text()
+    exited = chain.rec.wait(event("evt.process.exited", name="storage"), timeout=EVENT_LAG_S)
+    assert exited and exited[1]["payload"]["clean"] is True, ("storage was not told to shut down", exited, chain.sup.text())
+    assert "terminating storage" not in chain.sup.text(), chain.sup.text()
+    assert not alive(pids["storage"])
+    assert wait_until(lambda: not session_processes(chain.session), 5.0), session_processes(chain.session)
+
+
 @pytest.mark.slow
 @pytest.mark.parametrize("round_no", repeat_ids())
 def test_two_sessions_in_a_row_both_exit_within_2_seconds(chains, round_no):

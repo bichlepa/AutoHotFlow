@@ -835,7 +835,7 @@ NewShutdownSupervisor(hub, children) {
 }
 
 ; The late child (rank 3) is still starting when its group gets sys.shutdown: nothing reaches it. Its hello comes later.
-; It must get sys.shutdown then, with the rest of the deadline, and storage (rank 4) follows once it said bye.
+; It must get sys.shutdown then, with the rest of the deadline. Storage (rank 4) does not wait for it (F-43).
 LateHelloGetsTheShutdown() {
     hub := FakeHub()
     s := NewShutdownSupervisor(hub, [["storage", "storage", "ready"], ["echo:late", "echo", "starting"]])
@@ -843,7 +843,7 @@ LateHelloGetsTheShutdown() {
     s.shutdown._StartShutdown()
     s.shutdown.Tick(Time.NowMs())
     Assert.Equal(hub.SentCount("echo:late", "sys.shutdown"), 0, "not connected yet: nothing was sent")
-    Assert.Equal(hub.SentCount("storage", "sys.shutdown"), 0, "storage waits for the group of the late child")
+    Assert.Equal(hub.SentCount("storage", "sys.shutdown"), 1, "storage does not wait for a child that has not connected (F-43)")
     hub.offline.Delete("echo:late")
     s._OnHello(Map("name", "echo:late", "pid", 1))
     msg := hub.LastSent("echo:late", "sys.shutdown")
@@ -854,7 +854,7 @@ LateHelloGetsTheShutdown() {
     Assert.Equal(s.children.State("echo:late"), "stopping")
     s.children.OnBye("echo:late", true)
     s.shutdown.Tick(Time.NowMs())
-    Assert.Equal(hub.SentCount("storage", "sys.shutdown"), 1, "then the last group, storage")
+    Assert.Equal(hub.SentCount("storage", "sys.shutdown"), 1, "once")
     Assert.Equal(hub.SentCount("echo:late", "sys.shutdown"), 1, "once")
 }
 
