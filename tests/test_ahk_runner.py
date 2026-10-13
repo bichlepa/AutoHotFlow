@@ -42,7 +42,13 @@ def _file_results(path, run_ahk, request):
     return cache[path]
 
 
-@pytest.mark.parametrize("ahk_file", AHK_FILES, ids=lambda p: p.name)
+def _grouped(ahk_file, *values):
+    """All items of one file form one xdist group: the file runs once, on one worker (the cache is per process).
+    Without the group every worker that gets a case of the file would run the whole file again."""
+    return pytest.param(ahk_file, *values, marks=pytest.mark.xdist_group(ahk_file.name))
+
+
+@pytest.mark.parametrize("ahk_file", [_grouped(f) for f in AHK_FILES], ids=lambda p: p.name)
 def test_ahk_file_completes(ahk_file, run_ahk, request):
     """The whole file ran to its summary line, exited 0, and had no failed or errored case."""
     res = _file_results(ahk_file, run_ahk, request)
@@ -54,7 +60,8 @@ def test_ahk_file_completes(ahk_file, run_ahk, request):
     assert res.returncode == 0, "exit code %s, summary %s" % (res.returncode, summaries[-1])
 
 
-@pytest.mark.parametrize("ahk_file,case_name", CASES, ids=lambda v: v.name if isinstance(v, Path) else v)
+@pytest.mark.parametrize("ahk_file,case_name", [_grouped(f, name) for f, name in CASES],
+                         ids=lambda v: v.name if isinstance(v, Path) else v)
 def test_ahk_case(ahk_file, case_name, run_ahk, request):
     res = _file_results(ahk_file, run_ahk, request)
     records = [r for r in res.records if r.get("type") == "case" and r.get("name") == case_name]
@@ -125,6 +132,7 @@ def test_script_without_finish_has_no_summary(datadir, run_ahk):
     assert not [r for r in res.records if r.get("type") == "summary"]
 
 
+@pytest.mark.slow
 @pytest.mark.timeout(60)
 def test_hung_script_is_killed_at_timeout(datadir, run_ahk, session_id):
     marker = "hang-" + session_id  # unique in the command line, so only this process matches
