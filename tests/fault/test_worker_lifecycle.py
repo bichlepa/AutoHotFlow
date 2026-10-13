@@ -315,6 +315,8 @@ def test_engine_restart_during_a_worker_job_leaves_no_orphan_and_the_next_job_ru
     t0 = time.perf_counter()
     psutil.Process(engine_pid).kill()
     new_engine, _ = chain.wait_restarted_ready("engine", engine_pid, timeout=15.0)
+    # "ready" in the supervisor is the hello of the engine; the flows are loaded later (F-49)
+    chain.wait_flows(["wecho"], timeout=READY_S)
     assert wait_until(lambda: not alive(old_pid), 10.0), "the orphan %s (pid %d) still lives:\n%s" % (
         old, old_pid, chain.sup.text())
     print("\nMEASURE engine killed -> orphan worker gone: %.2f s" % (time.perf_counter() - t0))
@@ -375,6 +377,7 @@ def test_engine_killed_during_a_hanging_job_ends_the_worker_at_once_and_the_new_
     assert got is not None, "no evt.process.exited with reason 'engine gone':\n" + chain.sup.text()
     assert not chain.rec.find(event("evt.process.crashed", name=old))
     chain.wait_restarted_ready("engine", engine_pid, timeout=15.0)
+    chain.wait_flows(["wecho"], timeout=READY_S)        # F-49
     assert wait_until(lambda: len(ready_workers(chain)) == 1 and old not in live_workers(chain), READY_S), \
         "workers after the restart: %s" % workers(chain)
     run_echo_ok(chain)          # the new engine's pool serves a new job
