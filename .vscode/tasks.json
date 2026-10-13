@@ -312,6 +312,20 @@
             "problemMatcher": []
         },
         {
+            "label": "Tool: expression parser benchmark (parse cache; result in %TEMP%/ahf_expr_bench.txt)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "tools/ahkrun.py",
+                "--timeout",
+                "120",
+                "tests/ahk/helpers/expr_bench.ahk",
+                "${env:TEMP}/ahf_expr_bench.txt"
+            ],
+            "group": "test",
+            "problemMatcher": []
+        },
+        {
             "label": "Tool: run suite at HEAD + uncommitted changes (worktree, you can keep working)",
             "type": "shell",
             "command": "python",
