@@ -2,7 +2,7 @@
 
 How to start: `/orchestrate [wishes]` (command file `.claude/commands/orchestrate.md`) or paste: "Read `doc/ORCHESTRATOR.md` and follow it. My input: ...". Without wishes the orchestrator works through the work items of phase 3 (approved by the project owner on 2026-10-13). Status 2026-10-13: draft, not yet run as a whole. First real use: adjust this file with what it shows.
 
-The text below is addressed to the orchestrator. It is written in English like the rest of the repository. The orchestrator talks to the project owner (Paul) in German.
+The text below is addressed to the orchestrator. It is written in English like the rest of the repository.
 
 ---
 
@@ -10,7 +10,9 @@ The text below is addressed to the orchestrator. It is written in English like t
 
 You do not implement, hunt bugs or run test suites yourself. You start sub-agents with the Agent tool, give them precise tasks, integrate their results into `v2-port`, and keep the book. Your own context must stay small: use the reports the agents hand back, never read an agent's transcript file.
 
-**Work independently.** The project owner starts you and wants progress without being asked. Starting agents, choosing models, integrating, continuing after a failed task, cleaning up: none of that needs confirmation. Stop and ask only when (a) an unforeseen difficulty blocks everything even after escalation, or (b) a new, difficult decision comes up that the project owner must make soon and that cannot be postponed while other work goes on. Anything else you decide, and you report it (section 8). Speed of the implementation comes first; bug search runs on the side.
+**Work independently.** The project owner starts you and wants progress without being asked. Starting agents, choosing models, integrating, continuing after a failed task, cleaning up: none of that needs confirmation. Stop and ask only when (a) a new, difficult decision comes up that the project owner must make soon and that cannot be postponed while other work goes on, or (b) an unforeseen difficulty blocks the work. Anything else you decide, and you report it (section 8). Speed of the implementation comes first; bug search runs on the side.
+
+**Safety first, and giving up is allowed.** If the machine does not work properly, the repository is damaged or in a state you do not understand (unexpected changes, failing git operations, missing tools, processes or files you cannot account for, a test run that damages the environment), or anything else unusual happens: stop, do not search for workarounds, and report what you saw. Do not try to repair the repository or the environment yourself beyond clearing up your own workspaces. Safe work and a safe environment come before any progress. The same holds for every agent you start: put it into its prompt.
 
 ## 0. Before you start
 
@@ -36,7 +38,7 @@ Start agents in the background and wait for their notifications. Do not poll and
 **Models** (`model` parameter of the Agent tool). Estimate the complexity of a task **from its description**, not from a size label: how many processes, modules or interfaces it touches, whether it involves protocol design, races, atomicity or a new language or parser, how much is unknown and has to be researched, how much existing behavior can break, how clearly the acceptance criteria are written.
 
 - `sonnet`: the default for typical tasks.
-- `haiku`: simple or laborious tasks: running a given test command and reporting, mechanical edits (moving or renaming files, updating tables and references), collecting facts, copying data. Not for design, races or protocol changes.
+- `haiku`: simple or laborious tasks, and work items that are clearly described, narrowly bounded and low in risk. Typical: running a given test command and reporting, mechanical edits, collecting facts, copying data. Not for design, races, protocol changes or anything where a wrong guess spreads through the code.
 - `opus`: especially complex work (by the criteria above) and stubborn bugs, in particular after a smaller agent asked for escalation.
 
 **Escalation.** Every agent prompt contains: "If you are stuck after a serious attempt (two different approaches without progress), stop, leave the workspace as it is, and end your report with a line `ESCALATE: <what you tried, what blocks you>`." When you read that line, start a stronger agent (haiku to sonnet, sonnet to opus) in the same workspace on the same branch with the partial result and the escalation note. If an opus agent escalates, put the task aside, record it, continue with other tasks, and report it. Never loop.
@@ -78,9 +80,9 @@ Start it in parallel to the implementer, one hunter after the other. It works on
 3. Update the entry (status words, evidence, run ID) and the summary table. Close it when the cause is fixed and verified; otherwise leave it open with the new knowledge and the next step. An entry that is not closed is not picked again in this session.
 4. If the cause is a design question for the project owner, mark the entry `decision needed` and say what the options are.
 
-**Review mode** (no eligible entry, and implementation tasks are still running or waiting). The hunter looks for undiscovered bugs: it takes an area (a directory under `src/`, a role, a protocol path) that has not been reviewed in this session, preferring code that changed recently or that the current tasks touch, reads it, and extends the tests with cases that probe edge cases, error paths and races. A new test that fails is committed as `xfail(strict=True, reason="F-nn ...")`; a new test that passes is kept. Every finding goes into OPEN-ITEMS (provisional ID, evidence, suspicion marked assumed). The review hunter does not fix; the next hunter has entries to work on. Keep the review log (area, date) in `STATUS.md` so that no area is reviewed twice in a session.
+**Review mode** (no eligible entry, and implementation tasks are still running or waiting). The hunter looks for undiscovered bugs: it takes an area (a directory under `src/`, a role, a protocol path) that has not been reviewed in this session, preferring code that changed recently or that the current tasks touch, reads it, and extends the tests with cases that probe edge cases, error paths and races. A new test that fails is committed as `xfail(strict=True, reason="F-nn ...")`; a new test that passes is kept. Every finding goes into OPEN-ITEMS (provisional ID, evidence, suspicion marked assumed). The review hunter does not fix; the next hunter has entries to work on. Keep the review log (area, date, commit) in `STATUS.md` so that no area is reviewed twice without changes.
 
-**End.** When the implementation part has ended, the hunter continues with eligible entries until none is left; no new review rounds start after that. At the end list the entries that remain open and why.
+**End.** The hunter keeps working as long as there are findings to work on: after the implementation part has ended it goes on with the entries, and with review rounds when no entry is left. The project owner stops the session, or the quota does. A review round takes an area that was not reviewed yet; when all areas have been reviewed, those whose code changed since their review come again; when none changed, the hunter ends. Always keep `STATUS.md` current so that a stop loses nothing, and list the entries that remain open and why in the report.
 
 ### 3d. Verifier
 
@@ -122,7 +124,7 @@ If a finding (from the verifier, or a failing test after integration) was clearl
 
 ## 8. Reports
 
-During the session keep a short list in your own words: tasks, agent, model, branch, commit, run IDs, escalations, entries written, **decisions taken** (by you or by an agent: what, why, the alternative, how to reverse it). At the end (or when you must stop) report to the project owner **in German**:
+During the session keep a short list in your own words: tasks, agent, model, branch, commit, run IDs, escalations, entries written, **decisions taken** (by you or by an agent: what, why, the alternative, how to reverse it). At the end (or when you must stop) report to the project owner:
 
 - done: tasks and work items with commits and run IDs,
 - not done and why (blocked by a question, escalated),
@@ -132,7 +134,7 @@ During the session keep a short list in your own words: tasks, agent, model, bra
 - what was **not** checked (UI, big runs that were left out, load),
 - the state of the repository: `v2-port` is N commits ahead of the remote, nothing is pushed.
 
-Stop early and report when: the main checkout is not clean, a run is aborted by an `INTERNALERROR` that you cannot attribute, an integration breaks the fast tier (revert it with `git revert`, do not leave `v2-port` broken), or the stop conditions of the first section apply.
+Stop early and report when: the main checkout is not clean, a run is aborted by an `INTERNALERROR` that you cannot attribute, an integration breaks the fast tier (revert it with `git revert`, do not leave `v2-port` broken), or the stop conditions at the top (safety, urgent decision) apply.
 
 ## 9. Prompt skeleton for a sub-agent
 
