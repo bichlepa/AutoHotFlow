@@ -56,6 +56,10 @@ AutoHotFlow (AHF) is being ported from AutoHotkey v1 (AutoHotkey_H with `AhkThre
 9. Difficulties and own mistakes in the AHK v2 implementation go into `doc/HOW-TO.md`: what was hard, what was wrong, what works (format in the file). Each entry carries a status (verified / assumed / not checked). This is not a bug tracker. Good: bugs that could easily come back. Bad: past bugs in a finished module.
 10. **VS Code tasks for the project owner:** every call the project owner may want to run by hand (tests, starting the app or a role, tools, manual checks from a guide) gets a task in `.vscode/tasks.json`. Whoever adds or changes such a call (new option, new role, new tool, new test group) updates the task in the same commit. Labels are in English with a prefix (`Test:`, `Start:`, `Tool:`, `Debug:`, `Testdata:`, `Setup:`). Exception to "never start AHK scripts directly": the `Start:` tasks start `AutoHotkey64.exe` directly, without `ahkrun.py` and without timeout, because the owner operates the app (a dialog then blocks until closed). Agents still use `ahkrun.py`.
 
+## Working in parallel
+
+Several agents may work at the same time only in **separate workspaces**: one git worktree and one branch `wip/<name>` per agent (`python tools/new_workspace.py <name>`). Never change the main checkout or another workspace, and do not merge into `v2-port` yourself; the integrator does. Roles, rules, conflict-prone files and limits: `doc/PARALLEL-WORK.md`. If you were not started in a workspace of your own and other agents may be working, ask before you change files.
+
 ## Tools in this environment
 
 - AHK v2: `C:\Program Files\AutoHotkey\v2\AutoHotkey64.exe` (several versions installed). Scripts always start with `#Requires AutoHotkey v2.0`. **64 bit only** (E4): 32-bit interpreters are not supported.

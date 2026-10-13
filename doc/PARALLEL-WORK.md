@@ -1,0 +1,68 @@
+# Parallel work
+
+Status: 2026-10-13. The tools are tested (`tests/test_new_workspace.py`, `tests/test_run_suite.py`). The procedure has not yet been tried with several real agents at the same time, and the load of three parallel activities on one PC has not been measured. Findings from the first real use go into this document.
+
+## 1. Principle
+
+**One agent, one workspace, one branch.** A workspace is a git worktree with its own branch `wip/<name>`. Agents never share a working tree. Long test runs happen on a frozen state (`tools/run_suite.py`), so nobody edits the code that a run is testing.
+
+```
+python tools/new_workspace.py <name> [--from <ref>]     # branch wip/<name> and the folder ..\AutoHotFlow-wt\<name>
+python tools/new_workspace.py --list                    # all workspaces: commits ahead/behind v2-port, changes
+python tools/new_workspace.py --remove <name>           # worktree away; the branch only when it is merged
+```
+
+The tool works from the main checkout and from inside a workspace. VS Code tasks: `Tool: new workspace`, `Tool: list workspaces`, `Tool: remove workspace`.
+
+## 2. Rules
+
+1. Work only in your own workspace. Never change the main checkout or another workspace.
+2. Commit on your branch (`wip/<name>`), small commits as in AGENTS.md rule 7. Do not merge into `v2-port` yourself; the integrator does.
+3. Run tests from your workspace: the fast tier directly (`python -m pytest tests -q`), everything that takes minutes through `python tools/run_suite.py --with-changes` in the background. A second agent tests your branch with `--ref wip/<name>`.
+4. No `gui` tests and no desktop automation unless the project owner agrees: windows and focus belong to one session at a time.
+5. Start every process of a test with `--data=<temp dir>` (the tests do this; `conftest.py` fails a test that touches the default directory). Never start the product against `%APPDATA%\AutoHotFlow` from an agent.
+6. Files that many tasks touch (section 4) get **appended** entries only; do not reorder or reformat them.
+7. State what is verified, assumed, not checked (AGENTS.md rule 6). A test result belongs to a code state: name the commit, or "HEAD + uncommitted changes" for `--with-changes`.
+
+## 3. Roles
+
+**Implementer.** Gets a task, creates a workspace, changes code and tests, runs the fast tier and the tests of the affected group, commits. Result: the branch, a short list of what changed, which tests ran on which commit, what was not checked. Interface changes (`doc/PROTOCOL.md`) are their own first commit, so others can see them early.
+
+**Bug hunter.** Result is a *finding*, not a fix, unless the project owner asked for the fix.
+1. Reproduce on a fixed commit: `python tools/run_suite.py --ref <sha> -- <test path>::<test> -q -n 0`. A flaky test is run several times (a shell loop around the command) and the failure rate is stated, for example 3 of 20.
+2. Reduce it to one test in the own workspace. A test that fails for a known reason is committed on the branch and marked `xfail(strict=True, reason="F-nn ...")`, so it turns loud when the bug is fixed.
+3. Find the introducing commit: in the own workspace `git bisect start <bad> <good>` and `git bisect run python -m pytest <test> -q -n 0` (the workspace is yours, bisect may move its HEAD).
+4. Report: symptom, repro command, failure rate, cause (verified / assumed), first bad commit, proposed fix. Appending the entry to `doc/OPEN-ITEMS.md` is part of the branch.
+
+**Tester.** Runs suites on branches and on the base for comparison, with the same arguments: `python tools/run_suite.py --ref v2-port -- tests -q --all` and `... --ref wip/<name> ...`. A failed test is run again serially (`-n 0`) before it is reported, and a failure that also occurs on the base is not a regression of the branch. Report: commit, command, counts, the failures with the run log folder (`%TEMP%\ahf_runs\<id>\pytest-log`).
+
+**Integrator** (the project owner, or one agent that has been asked). In the main checkout on `v2-port`:
+```
+python tools/run_suite.py --ref wip/<name> -- tests -q --all      # green, or the known failures of the base only
+git merge --no-ff wip/<name>                                     # conflicts: see section 4
+python tools/new_workspace.py --remove <name>
+```
+Branches are merged one after another; the second one is rebased or merged with `v2-port` first and tested again, because its test result was for a different base.
+
+## 4. Files with a high conflict risk
+
+| File | Rule |
+|---|---|
+| `doc/OPEN-ITEMS.md`, `doc/HOW-TO.md` | new entries at the end of their section, ID ranges per task are agreed first (`F-nn`), no renumbering |
+| `doc/PROTOCOL.md` | one commit per interface change, early; the same message type is never added by two branches |
+| `.vscode/tasks.json` | new tasks at the end of their group |
+| `tests/conftest.py`, `tests/support/` | changes are small and separate; the foundation tier runs before the merge |
+| `AGENTS.md`, `doc/TEST-STRATEGY.md` | only the integrator or the project owner |
+
+## 5. Load and limits
+
+- `tools/run_suite.py` allows 2 runs at the same time with 4 workers each and lets a `-m stress`/`-m soak` run wait for an idle machine. This is a budget, not a guarantee: timing tests (`scaled()`) can become unstable on a loaded machine. A failure that appears only under parallel load is rerun alone before it counts. Use `--max-runs 1` for a clean comparison.
+- A workspace contains only what git tracks. Everything a test needs is in `tests/data`; a run in a fresh worktree shows a missing dependency as a failure, which is the intended check.
+- Agents do not share a desktop session cleanly. GUI work (manual checks, `gui` tests) is done by one party at a time.
+- Disk: every workspace is a full checkout without history; remove finished ones.
+
+## 6. Not covered
+
+- Agents do not talk to each other. Coordination goes through branches, the finding entries and the integrator.
+- Nothing prevents an agent from breaking rule 1; the tools do not enforce it.
+- The load of an implementer, a bug hunter and a tester at the same time on one machine is unmeasured (section 5).

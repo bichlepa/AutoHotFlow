@@ -28,6 +28,12 @@
             "type": "promptString",
             "description": "Commit, Branch oder Tag fuer den Suite-Lauf im Worktree",
             "default": "HEAD"
+        },
+        {
+            "id": "workspaceName",
+            "type": "promptString",
+            "description": "Name des Workspaces (Branch wip/<Name>, Ordner neben dem Repo)",
+            "default": "bugfix-1"
         }
     ],
     "tasks": [
@@ -356,6 +362,46 @@
             "args": [
                 "tools/run_suite.py",
                 "--status"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Tool: new workspace (worktree + branch wip/<name>)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "tools/new_workspace.py",
+                "${input:workspaceName}"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Tool: list workspaces",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "tools/new_workspace.py",
+                "--list"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Tool: remove workspace (branch only when merged)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "tools/new_workspace.py",
+                "--remove",
+                "${input:workspaceName}"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
