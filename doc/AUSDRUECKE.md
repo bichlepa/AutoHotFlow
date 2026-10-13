@@ -1,0 +1,268 @@
+# Expression language of AutoHotFlow v2
+
+Specification of the language that parameters and scripts are written in, and of the library `src/expr/` that reads it. The name of the file is German ("Ausdruecke" = expressions) and kept for historical reasons; the text is English.
+
+Status: tokenizer and parser are implemented and tested (`tests/ahk/expr_*.test.ahk`). **Evaluation is not part of this document's code yet** (WI-38); sections 14 and 15 name what is decided so far and what the later packages add.
+
+The language follows AutoHotkey v2 (decision E22) as far as that makes sense in AutoHotFlow. Where it deviates, section 14 says so.
+
+## 1. Overview
+
+Two forms, same syntax and same parser:
+
+| Form | Input | Use | Result of the parser |
+|---|---|---|---|
+| **expression** | one expression | a parameter whose content type is `Expression` | one expression node (`Empty` for an empty text) |
+| **script** | several lines | `Action_Script` and similar (v1: `var_evaluateScript`) | a `Script` node with a list of statements |
+
+```
+res := Expr.ParseExpression(text)       ; or Expr.ParseScript(text)
+if (res["ok"])  ... res["ast"] ...      ; syntax tree, section 9
+else            msg := Expr.FormatErrors(res)   ; errors with line, column and the marked line, section 10
+```
+
+The parser knows nothing about variables or functions: whether `foo(1)` names a function that exists, or what a variable contains, is decided at evaluation.
+
+## 2. Lexical elements
+
+- **Whitespace:** space, tab, carriage return, vertical tab, form feed. Line breaks are whitespace in the expression form and separate statements in the script form (section 8).
+- **Comments:** `;` up to the end of the line. A `;` must have whitespace (or the start of the line) in front of it, as in AutoHotkey; `x;y` is an error. A `;` inside a string is text. No block comments `/* */` (section 13).
+- **Numbers:** `42`, `007` (the value is 7; the spelling is kept in the node), `0x1F` (hexadecimal, at most 63 bits), `3.14`, `.5`, `1e3`, `1.5E-3`. A number without point and exponent is an Integer, any other a Float. A decimal integer literal that does not fit into 63 bits becomes a Float. Not valid: `5.` (a dot needs digits behind it), `1_000`, `1,000`, `1.2.3`, `12abc`, `0x` (all errors). There is no sign in a literal: `-5` is the unary minus applied to `5`.
+- **Strings:** `"..."` or `'...'`, no line break inside. The escape character is the backtick:
+
+  | Escape | Meaning |
+  |---|---|
+  | `` `n `` `` `r `` `` `t `` | line feed, carriage return, tab |
+  | `` `b `` `` `v `` `` `a `` `` `f `` | backspace, vertical tab, bell, form feed |
+  | `` `" `` `` `' `` ` `` `` | a quote, an apostrophe, a backtick |
+  | `` `; `` `` `% `` `` `, `` `` `: `` `` `{ `` `` `} `` | that character |
+
+  Any other escape (`` `x ``, `` `1 ``, `` `N `` - the letters are case sensitive) is an error. Two strings that touch (`"a""b"`) are an error with a hint: v1 wrote a quote inside a string as `""`; here it is `` `" ``. With a space between them they are concatenated. Percent signs in strings are text (`"50%"`, `"%x%"`); there is no `%var%` substitution inside strings.
+- **Keywords** (ignore case): `and`, `or`, `not`, `if`, `else`, `true`, `false`. `true` and `false` are the numbers 1 and 0 (the node keeps the spelling). The others are operators or statement words and cannot be variable names. A word that only starts like a keyword (`andy`, `iffy`, `trueish`) is a name. After a dot a keyword is a plain name (`a.and`).
+
+## 3. Names
+
+A name consists of ASCII letters and digits, `_`, and any character above U+007F (umlauts, Cyrillic, emoji...). It must not start with a digit. Names ignore case (`ABC` = `abc`); the node keeps the spelling as written. Variable names are not limited to the names built into the language; where a variable lives is decided by the evaluator from the prefix (`A_`, `global_`, `static_`; WI-40).
+
+Rules for variable names in general (`ExprNames.Check`, the same answers as v1 `Var_CheckName(name, true)`): `"Empty"`, `"StartsWithNumber"`, `"ForbiddenCharacter"` or `"OK"`. In addition to the characters above, `#`, `@` and `$` are valid in a name (v1 accepted them), and a name has at most 253 characters. The expression language itself cannot write `#`, `@`, `$`; such variables can be reached through a dynamic name (section 4) or as parameter of type `VariableName`.
+
+## 4. Paths and dynamic names
+
+| Written | Meaning | Node |
+|---|---|---|
+| `a.b` | member `b` of `a` | `Index` with `dot = 1`, key `String "b"` |
+| `a.1`, `list.0` | member with a number as key | `Index`, key `Number` |
+| `a[expr]` | key computed from an expression | `Index` with `dot = 0` |
+| `a.%k%` | key is the value of `k` | `Index`, key is the expression `k` |
+| `a.x%i%` | key is `"x"` joined with the value of `i` | `Index`, key is a concatenation |
+| `a%i%`, `%n%`, `ro%x%nd`, `a%i+1%b` | the **name** of a variable is assembled from text and values | `DynVar` |
+
+A dot is the member operator only when it touches the value in front of it and a name (or `%`) behind it. A key of digits only is a `Number` if it has no leading zero (`a.007` has the key `"007"`). `%expr%` can contain any expression; the closing `%` ends it, so a `%` inside needs parentheses. Parts of a dynamic name must touch each other (`a %i%` is a concatenation of `a` and `%i%`). Digits directly behind `%` belong to the name (`a%i%1`).
+
+Paths can be assigned to (`a.b := 5`, `a[i] := 9`, `a%i% := 5`) and called (`a.b(1)` is a method call, section 7).
+
+## 5. Operators and precedence
+
+From **low** to **high** binding (the order of AutoHotkey v2, verified against its documentation):
+
+| Level | Operators | Associativity |
+|---|---|---|
+| 1 | `:=` `+=` `-=` `*=` `/=` `//=` `.=` | right; left side must be a variable or a path |
+| 2 | `\|\|` `or` | left |
+| 3 | `&&` `and` | left |
+| 4 | `not` (same as `!` with a low precedence: `not 1 = 2` is `not (1 = 2)`) | right |
+| 5 | `=` `==` `!=` `!==` (`=`/`!=` ignore case, `==`/`!==` do not) | left |
+| 6 | `<` `>` `<=` `>=` | left |
+| 7 | concatenation: ` . ` and two operands next to each other | left |
+| 8 | `+` `-` | left |
+| 9 | `*` `/` `//` | left |
+| 10 | unary `-`, `!` (`!1 = 2` is `(!1) = 2`) | right |
+| 11 | call `f(...)`, index `a[...]`, member `a.b` | left |
+
+- Comparisons chain to the left: `1 < 2 < 3` is `(1 < 2) < 3`.
+- `&&` and `||` are also written `and` and `or`. In the tree they are always `&&`, `||` and `!`.
+- **Concatenation:** ` . ` needs whitespace on both sides (a dot without space on both sides is a member operator or an error). Without a dot, two operands next to each other are concatenated: `"a" x "b"`, `x " " y`, `"Sum: " (a + b)`. A `-` is always subtraction (`x -1` is `x - 1`). A `(` after whitespace starts a new operand (`round (2.5)` is `round` concatenated with `2.5`); without whitespace it is a call. Concatenation binds weaker than `+`: `"a" 1 + 2` is `"a" (1 + 2)`.
+- An assignment is an expression and has a value (`x := y := 3`, `(x := 3) + 1`, `if (x := f())`). Parentheses are not a node; the node inside gets the span including the parentheses.
+
+## 6. Grammar
+
+```
+expression-form  = [ expr ]                                  empty is allowed
+script-form      = { statement }
+statement        = block | if | expr                         expr must be an assignment or a call
+block            = "{" { statement } "}"
+if               = "if" expr statement [ "else" statement ]
+expr             = or [ assign-op expr ]                     left side: name, dynamic name or path
+or               = and { ("||" | "or") and }
+and              = not { ("&&" | "and") not }
+not              = "not" not | equality
+equality         = relational { ("=" | "==" | "!=" | "!==") relational }
+relational       = concat { ("<" | ">" | "<=" | ">=") concat }
+concat           = add { "." add | add }                     second form: operand next to operand
+add              = mul { ("+" | "-") mul }
+mul              = unary { ("*" | "/" | "//") unary }
+unary            = ("-" | "!") unary | postfix
+postfix          = primary { "(" [ args ] ")" | "[" expr "]" | "." member }
+primary          = number | string | "true" | "false" | name | "(" expr ")"
+name             = part { part }                             parts touch each other, at least one word or %expr%
+part             = word | "%" expr "%"
+args             = expr { "," expr }
+```
+
+## 7. Function calls
+
+`name(arg, ...)` and `obj.method(arg, ...)` are parsed for **any** name. Arguments are expressions (also assignments); an empty argument or a trailing comma is an error. Only a name, a dynamic name or a path can be called; `"a"(1)`, `5(1)`, `f(1)(2)` are errors.
+
+Which functions exist is decided by the evaluator (WI-38); calling an unknown function is an evaluation error, not a syntax error. v1 knew `round`, `object` and `print` (they could never be called there, because of a parser bug). The set for v2 and its behaviour is defined in WI-38 together with the converter (WI-39). Names are case-insensitive.
+
+## 8. Script form
+
+One statement per line. An empty line or a comment line is skipped.
+
+- **Statements:** an assignment (`x := 1`, `a.b += 2`), a function or method call (`print("hi")`), a block, an `if`. A line that is anything else (`1 + 1`, `x`, `x y`, `loop 3`, `return`) is an error; the language has no other statements (section 13).
+- **`if expr`** followed by a statement on the next line, or by a block `{ ... }` (the brace may be on the same line as the condition). An optional `else` follows: on the same line after `}`, or on its own line; it takes a statement or block, or another `if` (`else if`). An `else` belongs to the nearest `if`. A statement on the same line as the condition without braces is not possible.
+- **Blocks:** `{` and `}` may be on their own lines or on one line (`{ x := 1 }`). Blocks nest.
+- **Continuation:** a statement goes on in the next line when the line ends with an operator (`x := 1 +`), or inside `( )`, `[ ]` and call parentheses. An operator at the **start** of the next line does not continue the previous line (unlike AutoHotkey): `x := 1` followed by `+ 2` is an error.
+- Line breaks `\n` and `\r\n` are both accepted.
+
+## 9. Syntax tree
+
+Nodes are `Map`s. Absent children are the empty string `""`. Trees are never changed after parsing; the parse cache hands out the same tree again.
+
+**Common fields of every node**
+
+| Field | Meaning |
+|---|---|
+| `type` | the node type, below |
+| `pos` | 1-based index of the first character in the source text |
+| `end` | index of the first character after the node (`end - pos` is the length) |
+| `line`, `col` | 1-based position of the first character (columns count UTF-16 code units, a tab is one column) |
+| `depth` | height of the tree from this node down; a leaf has 1. At most 200 (section 11) |
+
+**Expression nodes**
+
+| `type` | Extra fields | Notes |
+|---|---|---|
+| `Number` | `value` (Integer or Float), `text` (spelling) | also `true`/`false` (`value` 1/0, `text` as written) |
+| `String` | `value` (decoded text) | the span includes the quotes |
+| `Var` | `name` | spelling as written |
+| `DynVar` | `parts` (Array of nodes) | the values of the parts are joined as text and give the name; literal parts are `String` nodes |
+| `Unary` | `op` (`"-"` or `"!"`), `operand` | `not` is `"!"` |
+| `Binary` | `op`, `left`, `right` | `op`: `+ - * / // . = == != !== < > <= >= && \|\|`; `.` is concatenation, explicit or implicit |
+| `Assign` | `op` (`:= += -= *= /= //= .=`), `target`, `value` | `target` is `Var`, `DynVar` or `Index` |
+| `Index` | `object`, `key` (expression), `dot` (1 if written with a dot, else 0) | `a.b` has the key `String "b"`; `a.1` the key `Number 1` |
+| `Call` | `callee` (`Var`, `DynVar` or `Index`), `args` (Array) | function call if the callee is a name, method call if it is an `Index` |
+| `Empty` | | whole input of the expression form is empty (only whitespace and comments) |
+
+**Statement nodes (script form)**
+
+| `type` | Extra fields |
+|---|---|
+| `Script` | `body` (Array of statements) |
+| `Block` | `body` |
+| `If` | `cond` (expression), `then` (statement), `else` (statement, or `""`) |
+| `ExprStmt` | `expr` (an `Assign` or a `Call`) |
+
+**Result of a parse** (a `Map`): `ok` (1 or 0), `kind` (`"expression"` or `"script"`), `ast` (root node; `""` if there are errors), `errors` (Array, empty if `ok`). Partial trees are not returned.
+
+## 10. Errors
+
+The parser never throws for bad input. (`Expr.Parse` throws a `ValueError` for an unknown `kind` - a programming error.) Every error is a `Map`:
+
+| Field | Meaning |
+|---|---|
+| `message` | text for the user, English, not translated |
+| `line`, `col`, `pos` | position of the error (1-based); `pos` is the index in the text |
+| `length` | number of characters marked (0 at the end of the input) |
+| `lineText` | the source line without its line break |
+| `marked` | the line with the marked part between `-> ` and ` <-`, like v1 `wholelinehighlighted`: `x := 1 + -> * <- 2` |
+
+`Expr.FormatErrors(res)` gives `line 1, column 10: unexpected '*'; an operand is expected` and the marked line, for every error.
+
+**Several errors are collected:** the tokenizer reports all text it cannot read (bad characters, unclosed strings, bad escapes, bad numbers) and goes on; in the script form the parser skips the rest of a line after a syntax error and reads the next line; in the expression form only the first syntax error is reported. Errors are sorted by position, never reported twice for the same position, and at most 50 are collected. Operators that exist in AutoHotkey but not here get their own message (`the modulo operator '%' is not supported`).
+
+## 11. Limits
+
+AutoHotkey ends the whole process (not just the call) when its call stack is full (about 2000 calls; verified). The parser and every later walk over the tree must stay far below that, so the language has limits. Hitting one is a normal error.
+
+| Limit | Value | Error |
+|---|---|---|
+| nesting of parentheses, brackets, calls, unary operators, `%...%`, blocks and `if` | 50 | `nested too deeply` |
+| height of the tree (`depth`), e.g. a chain `1 + 1 + ... + 1` | 200 (about 200 terms) | `the expression is too long or too deeply built` |
+| errors collected | 50 | the rest is dropped |
+| length of a name | 253 (variable name rule); the expression parser itself accepts longer names | - |
+
+No limit on the length of strings, comments, the number of statements or arguments (tested with a string of one million characters, 5000 statements, 5000 arguments). The evaluator (WI-38) may walk the tree recursively up to the height limit.
+
+## 12. Parse cache
+
+`Expr.Parse` caches results by (form, text): the engine evaluates the same parameter texts over and over. At most 2000 entries; when full, the oldest entry is removed (first in, first out; reading does not renew it). Results with errors are cached too. Texts longer than 20000 characters are not cached. `useCache := false` skips the cache. The result `Map` and the tree in it are shared: **do not change them.**
+
+Measurement (`tests/ahk/helpers/expr_bench.ahk`, 2000 rounds each, one run on the development PC, AutoHotkey v2 64 bit):
+
+| Input | Parse without cache | Cache hit |
+|---|---|---|
+| `x + 1` (5 characters) | 170 us | 1.5 us |
+| `round(a.b * 2.5, 2) . " units"` | 455 us | 1.5 us |
+| `(count >= 10 and name = "abc") or not done` | 496 us | 1.5 us |
+| `A_Index // 2 + list[i + 1].width * (offset - 3)` | 597 us | 1.5 us |
+| script of 7 lines (101 characters) | 1051 us | 1.7 us |
+
+Average 554 us uncached, 1.6 us cached (about 300 times faster). Filling the cache with 3000 different texts (the first 1000 are removed again) took 504 ms, so about 170 us per new text. The parser is not fast (many small objects and calls); the cache is what keeps repeated evaluation cheap. Not measured: memory use of 2000 cached trees.
+
+## 13. Deliberately missing (possible later)
+
+| Missing | Why / note |
+|---|---|
+| `%` as modulo | `%` delimits dynamic names; a `Mod()` function may come with WI-38 |
+| `**` power, bitwise `& \| ^ ~ << >> >>>`, `~=`, `??`, `?:` ternary | not used by v1 flows |
+| `++`, `--`, unary `+` | write `x += 1` |
+| `x ^= 2`, `x %= 2` and other compound assignments beyond section 5 | `^=` was accepted by the v1 tokenizer only |
+| comma operator, several expressions in one statement | |
+| `[ ]` array literals, `{ }` object literals, `=>` functions | objects come from `Object()` (WI-38) |
+| `is`, `in`, `contains` | |
+| `loop`, `while`, `for`, `return`, `break`, `try`, `throw`, `switch`, `class`, `global`/`local`/`static` declarations | the script form is `if`/`else`, blocks and assignments only; variable scope comes from the name prefix (WI-40) |
+| block comments `/* */`, line continuation sections `( ... )` | |
+| `<>` for not equal | write `!=` |
+
+## 14. Differences from AutoHotkey v2
+
+Decided by the project owner (2026-10-13) and to be implemented by the evaluator (WI-38):
+
+- **E29: `/` with two integers** returns an Integer if the division is exact (`4/2` is `2`, `-8/-2` is `4`), else a Float (`7/2` is `3.5`). AutoHotkey v2 gives `2.0` for `4/2`. This is a rule of the language. `//` is the integer division as in AutoHotkey v2 (`7//2` is `3`, `-7//2` is `-3`; a Float operand is a `TypeError` there, handled as E25).
+- **E30: `<` `>` `<=` `>=` follow AutoHotkey v2.** A comparison with a text that is not a number throws a `TypeError` in AutoHotkey (`"a" < "B"`); in AutoHotFlow the evaluator catches it (E25): the result is the empty text (false) plus an `f1` log entry. A text comparison that v1 did alphabetically is therefore false. `"10" < "9"` compares numbers (false). `=` and `==` compare as in AutoHotkey.
+- **E31: `&&` and `||` return the operand** as AutoHotkey v2 does (`"a" || 0` is `"a"`, `0 && "x"` is `0`), not 1/0 as in v1. Evaluation is short-circuit (`0 and (x := 5)` does not assign). As a condition both behave the same.
+- **E32: text form of floats** is the AutoHotkey v2 form, without own formatting (`0.1+0.2` is `0.30000000000000004`, `1/3` is `0.33333333333333331`).
+- **E25: type errors** while calculating (`"" + 1`, `"abc" + 1`) are caught; the result is the empty text and an `f1` log entry (in AutoHotkey v2 they throw a `TypeError`).
+
+Differences in the **syntax** (implemented and tested):
+
+- Only the operators of section 5 exist; the rest of AutoHotkey's operators are errors with an explanatory message (section 13).
+- Strings: the escape set of section 2 (no `` `s ``, `` `0 ``, `` `u+XXXX ``); no line break inside a string; touching strings (`"a""b"`) are an error.
+- Dynamic names have the v1 form `a%i%`, `a%i%b`, `%n%` (AutoHotkey v2 only has `%expr%` as a deref). Parts must touch each other.
+- Implicit concatenation does not need whitespace between operands that cannot be confused (`x"-"y`, `"a"1`); AutoHotkey requires whitespace. `-` is always subtraction.
+- `5.`, `1_000` and numbers followed by letters are errors; an integer literal beyond 63 bits becomes a Float (own rule, not checked against AutoHotkey).
+- `true` and `false` are keywords with the values 1 and 0 and cannot be variable names.
+- Statements: only assignments, calls, blocks and `if` (section 8). An operator at the start of a line does not continue the previous line.
+- `a.b` with the numeric member `a.1` is accepted (v1 list access); AutoHotkey writes `a[1]`.
+- Not checked: the exact behaviour of AutoHotkey for escapes `` `, `` and `` `: ``, and for `;` directly after a closing quote.
+
+## 15. Differences from v1 and conversion
+
+Filled by WI-39 (converter of old expressions). Known syntax differences the parser already reports as errors, as input for the converter:
+
+| v1 text | v2 parser | Conversion |
+|---|---|---|
+| `"a""b"` (quote inside a string) | error: touching strings | rewrite as `` "a`"b" `` |
+| `"a"."b"` | error: dot needs spaces | add spaces |
+| `1 <> 2` | error | `!=` |
+| `x ^= 2`, `x %= 2`, `7 % 3` | error | not in the language (section 13); WI-39 decides |
+| `1x := 1` | error: invalid name | - |
+| strings with `` ` `` followed by an unknown character | error | v1 dropped the backtick; rewrite |
+| `;` inside a string after whitespace (v1 cut the string) | text | the v1 behaviour was a bug |
+
+## 16. Tokens (for implementers)
+
+`ExprTokenizer` produces `ExprToken` objects: `NUM` (with `value`), `STR` (with the decoded `value`), `WORD`, `OP`, `NL` (script form only; several in a row become one), `ERR` (unreadable text, already reported) and `EOF`. Each token has `pos`, `len`, `line`, `col` and `ws` (whitespace, comment or line break before it). A `.` that touches a value in front of it and a name or `%` behind it is marked `member`, and the name behind it is scanned as a plain word (so `a.1` and `a.and` work). The scan uses one `RegExMatch` per token part, not one call per character.
+
+Library files (`src/expr/`, includes only `src/core/` and itself, no GUI, no file access): `Expr` (entry point and cache use), `ExprParser`, `ExprTokenizer`, `ExprToken`, `ExprNode` (node constructors, the single place of the schema), `ExprNames`, `ExprDiag` (error records), `ExprCache`, `ExprAbort` (internal, never leaves the parser).
