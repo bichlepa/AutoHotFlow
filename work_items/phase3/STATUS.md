@@ -23,12 +23,12 @@ Owner's commits on `v2-port` (not made by an agent): `bdae120` (ORCHESTRATOR rul
 
 ## Last verified state
 
-Verified by the verifier: commit `6023cde` (WI-37, fast run 20261013-192532-6023cded, 434 passed, exit 0, no INTERNALERROR; architecture check 0 violations on the live tree). Before that, `6f4241c` (F-30, fast, slow and foundation runs green, run IDs in the table above). Tree hashes (`git rev-parse <commit>:src <commit>:tests <commit>:tools`):
+Verified by the verifier: commit `346341f` (F-72, fast run 20261013-192931-346341fd (436 passed), slow run 20261013-193015-346341fd (86 passed), foundation run 20261013-193207-346341fd (439 passed, 1 skipped, the deliberate runner self-check skip), exit 0 each, no INTERNALERROR; architecture check 0 violations on the live tree). Before that, `6023cde` (WI-37, fast run 20261013-192532-6023cded). Before that, `6f4241c` (F-30, fast, slow and foundation runs green, run IDs in the table above). Tree hashes (`git rev-parse <commit>:src <commit>:tests <commit>:tools`):
 
 | Path | Tree hash |
 |---|---|
-| `src` | `b7bf6a2f4deeb70be8a323e2e85ea9cc626fa8c8` |
-| `tests` | `83a8adc3e807205b017719de5c815cfcd9a2e37c` |
+| `src` | `26f183722397c584cd6a05d95676c3654c21bd71` |
+| `tests` | `a341ee19a5c644dcb4355daf7bcf797471cc7314` |
 | `tools` | `0503826a18037e2f8eaba3aea61d677270f0edb6` |
 
 Verification of `9eb84e0` (before): fast run 20261013-182355-9eb84e08, foundation run 20261013-182435-9eb84e08.
