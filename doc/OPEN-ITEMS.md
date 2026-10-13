@@ -285,6 +285,7 @@ Next step (from the source): write the phase 3 plan with the project owner, then
 4. **F-43.** The owner decides on the proposal (a child that never connected does not count as a condition of its group). Phase 3.
 5. **F-36.** Closing is recommended by the source. The decision is open; the item stays "observed, open" until then.
 6. **Factor 3 of `scaled()` (E17).** Decided to stay. Observe only.
+7. **Settings file and working directory of flows (S4, S2).** v2 reads no `settings.json` yet (`cmd.storage.settings.get/set` is not implemented). When it does: (a) the v1 default of `FlowWorkingDir` is `A_MyDocuments\AutoHotFlow`, the real Documents folder of the user. The default in v2 is decided on purpose, not taken over from v1. (b) The test profile of a data directory always carries a `settings.json` with `FlowWorkingDir` below the data directory and `UILanguage` `en`. (c) The auxiliary files of the v1 "Automatic tests" (text files, ini, shortcuts in `Documents\AutoHotFlow`) become synthetic fixtures in `tests/data/workdir/`; WI-43 must not depend on the owner's Documents folder.
 
 ## Sources
 
