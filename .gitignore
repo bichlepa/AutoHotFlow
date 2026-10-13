@@ -30,3 +30,6 @@ tests/.tmp/
 /temp
 /log
 *.tmp
+
+# private golden data of the project owner (his own flows and variables, never checked in)
+/tests/golden/private/

@@ -423,6 +423,72 @@
             "problemMatcher": []
         },
         {
+            "label": "Testdata: generate golden data from v1",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "tools/golden_v1.py"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Testdata: check that the golden data is reproducible (no write)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "tools/golden_v1.py",
+                "--check"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Testdata: collect golden cases from the example flows of v1",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "tools/golden_corpus.py"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Testdata: golden data of the private flows (local only, tests/golden/private)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "tools/golden_corpus.py",
+                "--flows",
+                "${env:APPDATA}\\AutoHotFlow\\Flows",
+                "--out",
+                "tests/golden/private/cases/corpus_private.json"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Testdata: run the golden cases of the private flows in v1 (local only)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "tools/golden_v1.py",
+                "--private"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
             "label": "Start: product (supervisor, no window)",
             "type": "process",
             "command": "C:\\Program Files\\AutoHotkey\\v2\\AutoHotkey64.exe",
