@@ -9,7 +9,7 @@ Session start: 2026-10-13, work-item mode (no wishes). Main checkout clean, on `
 | WI | Title | State | Model | Branch / workspace | Commit | Run ID | Date | Note |
 |---|---|---|---|---|---|---|---|---|
 | WI-36 | Golden data from v1 | done | sonnet (implementer), haiku (line-ending fix) | integrated: 786a688 to 9ccf5b3; fix 829ce0f | 829ce0f | fast run 20261013-185858-829ce0f4 (336 passed), golden `--check` exit 0 on the main checkout | 2026-10-13 | 2161 cases, 18 groups; `evalparam` not implemented (optional in the work item); findings in `tests/golden/findings.json` |
-| WI-37 | Expression language v2: spec, tokenizer, parser | in progress | sonnet (implementer) | `wip/wi-37` | | | 2026-10-13 | started after WI-36 (one task at a time, slot 1) |
+| WI-37 | Expression language v2: spec, tokenizer, parser | done | sonnet (implementer) | integrated: 0a24b4c to 6023cde | 6023cde | fast run 20261013-192532-6023cded (434 passed, exit 0), arch check 0 violations (live tree) | 2026-10-13 | `src/expr/`, `doc/AUSDRUECKE.md`, L1 tests. Decisions to confirm: unsupported syntax (spec section 15: `%` modulo, `^=`, `%=`, `<>`, `"a""b"`), tree height limit 200. One flaky failure of `test_worker_reports_not_busy_after_a_cancel_too` in an implementer run, not reproduced on the integrated state. |
 | WI-38 | Evaluator | open | | | | | 2026-10-13 | depends on WI-37 |
 | WI-39 | Converter v1 expressions | open | | | | | 2026-10-13 | depends on WI-36, WI-37, WI-38 |
 | WI-40 | Variable model in the engine | open | | | | | 2026-10-13 | depends on WI-38 |
@@ -23,13 +23,13 @@ Owner's commits on `v2-port` (not made by an agent): `bdae120` (ORCHESTRATOR rul
 
 ## Last verified state
 
-Verified by the verifier: commit `6f4241c` (fast run 20261013-183714-6f4241c4, slow run 20261013-183749-6f4241c4, foundation run 20261013-183932-6f4241c4, all exit 0, no INTERNALERROR; architecture check 0 violations). Tree hashes (`git rev-parse <commit>:src <commit>:tests <commit>:tools`):
+Verified by the verifier: commit `6023cde` (WI-37, fast run 20261013-192532-6023cded, 434 passed, exit 0, no INTERNALERROR; architecture check 0 violations on the live tree). Before that, `6f4241c` (F-30, fast, slow and foundation runs green, run IDs in the table above). Tree hashes (`git rev-parse <commit>:src <commit>:tests <commit>:tools`):
 
 | Path | Tree hash |
 |---|---|
-| `src` | `da6e67bb198614dbb05b9cb93a857ca720b40a72` |
-| `tests` | `b175982afce980905f1d38fc913c9428f74b3fcd` |
-| `tools` | `577aaa4bd697558f445e65df21a6481a8edc893e` |
+| `src` | `b7bf6a2f4deeb70be8a323e2e85ea9cc626fa8c8` |
+| `tests` | `83a8adc3e807205b017719de5c815cfcd9a2e37c` |
+| `tools` | `0503826a18037e2f8eaba3aea61d677270f0edb6` |
 
 Verification of `9eb84e0` (before): fast run 20261013-182355-9eb84e08, foundation run 20261013-182435-9eb84e08.
 
