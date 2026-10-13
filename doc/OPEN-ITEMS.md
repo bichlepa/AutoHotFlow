@@ -16,7 +16,7 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 |---|---|---|---|
 | F-02 | Pipe not ready within 2 s under load | open, observed | |
 | F-12 | `Scheduler.Advance` pops before the state change | closed (fixed in 183c561) | |
-| F-13 | Unprotected check-then-act spots in the engine | open, observed | |
+| F-13 | Unprotected check-then-act spots in the engine | open (counts guarded in ad6ac7d; rest read and found protected) | |
 | F-14 | `Ids.Next` and `ExecContext.Finish` not atomic | open, low | yes |
 | F-15 | Engine sends events for a deleted element | accepted | |
 | F-17 | Chatty child gives up during a long supervisor stall | open, low | |
@@ -24,7 +24,7 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 | F-20 | Supervisor messages after `storage` is gone go only to stderr | open, low | |
 | F-23 | Flow file parsed twice in the engine | open, not implemented | yes |
 | F-25 | Permanently locked log file loses a whole batch | open, low (stall case fixed in 2675105) | |
-| F-28 | Worker log entries never reach `storage` | open, low | yes |
+| F-28 | Worker log entries never reach `storage` | closed (fixed in 58e48d2) | yes |
 | F-29 | Child in handshake is not covered by the orphan guard | open, low | |
 | F-30 | Lost `sys.busy {busy: false}` | assumed, open, low | |
 | F-35 | Hub connection deadlines ignore supervisor stalls | open, low | |
@@ -63,6 +63,7 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 
 **What:** Further spots that check and then change state without protection: `Executor._OnFinish`/`_StopRun`, `_ElementStarted`/`_ElementStopped`, and `WorkerBridge`.
 **Status:** Open, observed. Read in code, not reproduced.
+**Update 2026-10-13 (bug hunter):** Re-read `Executor` and `WorkerBridge` (verified by reading, nothing reproduced). Already protected: `_Advance`, `_DispatchWorker` (register, run, note execId), `_EndRun`, the tick flag, `ThreadState.Dispatch/Finish` (`Critical`). `_OnFinish` and `_StopRun` are safe against a late finish: `_StopRun` puts the threads into `stopping` first, and a `Finish` on such a thread answers `late`, so `_ElementStopped` is not called twice. `WorkerBridge` has no `Critical`, but its callbacks change only the slot list and the job map in short sequences with no sends between the check and the change; `Run` sets slot and job before it sends. One real spot found: `_ElementStarted` and `_ElementStopped` read, changed and stored `_counts` in separate lines; an interrupting dispatch tick for the same element could lose an update, so the count (and the `running` state shown to the UI) would be wrong for ever. Guarded with `Critical` in ad6ac7d. No test: the interruption cannot be forced. `WorkerBridge` stays unprotected on purpose; not proven to be needed. Not checked: stress runs.
 **Why deferred:** No failure seen; the source says "beobachten".
 **Sign that it matters:** Inconsistent engine state after parallel start and stop of instances.
 **Action:** Watch the stress runs. If a case is reproduced, protect the spot (the source suggests `Critical` in phase 3, see F-14).
@@ -136,8 +137,9 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 ### F-28: Worker log entries never reach `storage` (phase 3)
 
 **What:** Log entries of a worker never reach `storage`, because `SetLogTarget` is missing.
-**Status:** Open, low priority.
-**Why deferred:** It needs a decision on the log route (through the engine, or directly). The source says this becomes relevant with dialog elements in phase 3.
+**Status:** Closed (2026-10-13), fixed in 58e48d2, see the update.
+**Update 2026-10-13 (bug hunter):** Closed. Verified: `Worker` never called `SetLogTarget` (`grep` over `src`: only engine, manager, debug role), so its entries (role messages such as `shutdown requested`, `Log.Write` of elements) stayed in the 500-entry queue and were dropped. The new test `test_log_entries_of_the_worker_reach_storage` (`tests/integration/test_worker.py`) failed before (run 20261013-181219-14824) and passes after; `test_worker.py` and `test_architecture.py` 44 passed (run 20261013-181230-15192), `test_worker_pool.py`, `test_worker_busy.py`, `tests/fault/test_worker_lifecycle.py` 14 passed (run 20261013-181247-8412), all on 58e48d2. Decision taken: the worker logs straight to `storage` in `OnReady`, like the other roles; the alternative (through the engine) adds a hop and a dependency on the engine and was not needed. Not checked: load of a chatty element on `storage`.
+**Why deferred:** (was) It needed a decision on the log route (through the engine, or directly). The source says this becomes relevant with dialog elements in phase 3.
 **Sign that it matters:** Missing worker log lines. This becomes important with dialog elements.
 **Action:** Decide the log route, then add `SetLogTarget`.
 **Evidence:** `v2-phase2-final:work_items/phase2b/WI-27-worker-pool.md`.
