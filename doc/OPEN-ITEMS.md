@@ -25,7 +25,7 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 | F-23 | Flow file parsed twice in the engine | open, not implemented | yes |
 | F-25 | Permanently locked log file loses a whole batch | open, low (stall case fixed in 2675105) | |
 | F-28 | Worker log entries never reach `storage` | closed (fixed in 58e48d2) | yes |
-| F-29 | Child in handshake is not covered by the orphan guard | open, low | |
+| F-29 | Child in handshake is not covered by the orphan guard | open, low, decision needed (change in `src/core/`) | |
 | F-30 | Lost `sys.busy {busy: false}` | closed (reconnect case fixed in 4d97c49) | |
 | F-35 | Hub connection deadlines ignore supervisor stalls | open, low | |
 | F-36 | `sys.hello` unanswered for 15 s in `test_shutdown.py` | observed, open | |
@@ -147,7 +147,9 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 ### F-29: Child in handshake is not covered by the orphan guard
 
 **What:** A child that is still in the handshake is not covered by the orphan guard. It can live up to 10 s after the supervisor has died.
-**Status:** Open, low priority. Not described in `doc/ARCHITECTURE.md` 6.3.
+**Status:** Open, low priority, decision needed. Not described in `doc/ARCHITECTURE.md` 6.3.
+**Update 2026-10-13 (bug hunter):** Cause verified by reading and by one measurement. `Role._Guard` (`src/core/Role.ahk`) starts the orphan clock only when `peer.status = "reconnecting"`; for every other status it resets `lostSince`. A role that has never been welcomed is `connecting` (first attempts) or `handshake`, so the guard does not count. The role then ends by the budget of the peer, not by the guard: `Peer.DEFAULT_RECONNECT_TOTAL_MS` (10 s) for a hub that is not there, and `helloTimeoutMs` (3 s) per attempt plus 3 s guard when the hub accepts the pipe but does not answer. Measured: `python tools/ahkrun.py src/AutoHotFlow.ahk --role=worker --hub=<pipe nobody serves> ...` ends with exit 4 `peer closed (hub_unreachable)` after 10.2 s (direct call, no pytest run id, commit 4d97c49), against about 3 s after a connection that was already ready (`test_role_ends_with_exit_4_when_its_pipe_is_cut_and_the_hub_does_not_come_back`). A supervisor that dies while a child is still starting therefore leaves that child for up to 10 s, not 3 s. A hub that is dead but whose pipe broke after the welcome is covered. Not changed: the fix is in `src/core/` and needs the project owner's agreement.
+**Options:** (a) In `Role._Guard` also count `connecting` and `handshake` as lost (clock from the start of the process), so ARCHITECTURE 6.3 point 4 holds without exception; risk: a role started by hand or by a test before its hub (the supervisor creates the hub pipe before it starts children, read, not checked for every test setup) would give up after 3 s instead of 10 s, so such tests must be checked. (b) Keep the 10 s and describe it in ARCHITECTURE 6.3 ("a role that has not yet connected waits up to 10 s"). (c) Lower `reconnectTotalMs` for the first connect only. Recommendation: (a) with a test that starts a role without a hub and expects exit 4 within `ORPHAN_BUDGET_S`; low priority, the effect is a stray process for a few seconds.
 **Why deferred:** Low priority.
 **Sign that it matters:** A child process still runs up to 10 s after the supervisor is gone.
 **Action:** Describe the behavior in `doc/ARCHITECTURE.md` 6.3, or close the gap.
