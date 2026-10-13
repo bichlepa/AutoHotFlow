@@ -326,6 +326,23 @@ def test_engine_restart_during_a_worker_job_leaves_no_orphan_and_the_next_job_ru
     assert len(live_workers(chain)) == 1, live_workers(chain)
 
 
+@pytest.mark.slow
+def test_f49_restarted_engine_is_ready_for_the_supervisor_before_it_has_loaded_its_flows(chains, datadir):
+    """F-49, deterministic: storage is frozen, so the restarted engine can say hello (state "ready" in the
+    supervisor) but cannot load its flows. A start in this window is answered with not_found. This is the
+    documented order (PROTOCOL 4.3: evt.engine.ready only after loading), so a test that starts a flow after an
+    engine restart has to wait for the flows first (chain.wait_flows)."""
+    chain = start_chain(chains, datadir, ECHO)
+    storage_pid = chain.pid("storage")
+    engine_pid = chain.pid("engine")
+    chain.freeze(storage_pid)
+    psutil.Process(engine_pid).kill()
+    chain.wait_restarted_ready("engine", engine_pid, timeout=15.0)
+    answer = chain.obs.request("engine", "cmd.flow.start", {"flowId": "wecho"}, timeout=5)["payload"]
+    assert answer["ok"] is False and answer["error"]["code"] == "not_found", answer
+    assert "not loaded" in answer["error"]["message"], answer
+
+
 # --- the workers end with the engine (WI-33, E10) -------------------------------------------------------------
 
 ENGINE_GONE_BUDGET_S = scaled(1.5)          # the aim is 1 s (WI-33); the margin is 0.5 s, three times that in the parallel run
