@@ -15,7 +15,7 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 | ID | Title | Status | Phase 3 |
 |---|---|---|---|
 | F-02 | Pipe not ready within 2 s under load | open, observed | |
-| F-12 | `Scheduler.Advance` pops before the state change | open, low | |
+| F-12 | `Scheduler.Advance` pops before the state change | closed (fixed in 183c561) | |
 | F-13 | Unprotected check-then-act spots in the engine | open, observed | |
 | F-14 | `Ids.Next` and `ExecContext.Finish` not atomic | open, low | yes |
 | F-15 | Engine sends events for a deleted element | accepted | |
@@ -53,8 +53,8 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 ### F-12: `Scheduler.Advance` pops before the state change
 
 **What:** `Scheduler.Advance` calls `Pop` before `finished -> ready`. With an empty stack (M-14) it throws instead of ending the thread with `exception`.
-**Status:** Open, low priority. Read in code.
-**Why deferred:** Low priority; the bad case needs an empty stack.
+**Status:** Closed (2026-10-13), fixed in 183c561. Verified: the effect was worse than an error in the log. `Pop` threw out of `Scheduler.Advance`, out of `Executor._Advance` and `_OnFinish`, into the finish callback of the element; the thread stayed `finished` for ever and the instance never ended (read in code: `Scheduler.Advance`, `Executor._OnFinish`/`_Advance`). Reproduced by the new unit test `Loop: leaving with an empty stack ends the thread as unhandled (F-12)` in `tests/ahk/engine_scheduler.test.ahk`: before the fix `error: AhfError: LoopStack.Pop: loop stack is empty`, after the fix 21 of 21 pass (direct `ahkrun.py` call, no pytest run id). Fix: with `leavesLoop` and an empty stack the thread is released, the outcome is `removed` with `unhandled` true, and the executor logs `f0` with the message `loop stack is empty when leaving loop ...`. This matches M-14 ("thread ends with exception"). Not checked: the pytest fast tier and the engine end-to-end with such a flow (no flow that enters a loop at `tail` exists in the test data).
+**Why deferred:** (was) low priority; the bad case needs an empty stack.
 **Sign that it matters:** An unhandled error from `Advance` in the engine log when a stack is empty.
 **Action:** Proposal from the source: `Advance` catches the error and ends the thread with `exception`.
 **Evidence:** `v2-phase2-final:work_items/phase2b/WI-21-engine-korrektheit.md`.
@@ -75,6 +75,7 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 **Why deferred:** Low risk so far. A change in `src/core/` needs the project owner's agreement.
 **Sign that it matters:** Duplicate IDs, or an element that finishes twice.
 **Action:** In phase 3, guard both spots with `Critical`, with the agreement of the project owner.
+**Update 2026-10-13 (bug hunter):** Re-read, both races are real in principle: AHK v2 may interrupt a thread between lines (timer or message handler), so `Ids.Next` (`src/core/Ids.ahk:22-24`: increment, then read `this.counter`) can return the same number twice if an interrupting call runs in between, and `ExecContext.Finish` (`src/elements/base/ExecContext.ahk:36-40`) can run `onFinish` twice. `Executor._Advance` already uses `Critical` for the same reason (WI-16 seen 2 of about 50 runs). Not reproduced. Smallest fix for `Ids.Next`: read into a local and use `Critical "On"`/restore, or compute `n := ++this.counter` in one expression (still not formally atomic). Not done because it changes `src/core/`; waiting for the owner's agreement.
 **Evidence:** `v2-phase2-final:work_items/phase2b/WI-21-engine-korrektheit.md`.
 
 ### F-15: Engine sends events for a deleted element
