@@ -65,4 +65,18 @@ Branches are merged one after another; the second one is rebased or merged with 
 
 - Agents do not talk to each other. Coordination goes through branches, the finding entries and the integrator.
 - Nothing prevents an agent from breaking rule 1; the tools do not enforce it.
-- The load of an implementer, a bug hunter and a tester at the same time on one machine is unmeasured (section 5).
+- The load of an implementer, a bug hunter and a tester at the same time on one machine is unmeasured beyond the first trial (section 7).
+
+## 7. First trial (2026-10-13)
+
+One implementer (`bigflows` duplicates removed) and one bug hunter (F-49) worked in their own workspaces at the same time, the tester reviewed both branches, the integrator merged four branches in a throw-away workspace and ran the whole suite on the result (782 passed, 1 skipped, exit 0, 3 workers). No file conflicts: the branches touched different files.
+
+What the trial showed:
+
+- **A test failure under load can end the whole run.** A timing test failed during a `--all` run with 3 workers next to two other runs, and the diagnosis collection of `conftest.py` raised inside the report hook. xdist then stopped (INTERNALERROR, exit 3, about 80 tests did not run). Fixed in `tests/conftest.py`; this was found by the tester only because the run was read, not just its last line: **look at the exit code and at `INTERNALERROR` in `output.txt`, not only at the counts.**
+- **Git stores `tests/data/flows` byte-exact (CRLF), the older folders normalized (LF).** Comparing git blobs of a moved file shows a difference although the content is the same; compare working-tree files or normalize line ends first.
+- **Scripted edits.** Heredoc code and CRLF files: a replace string with `\n` does not match a file with `\r\n`. Use the editor tool, or read and write with `newline=""`.
+- **Loops in the background.** A shell loop started with `&` in the tool shell ended with the command that started it. Put repeated runs in a script file and run it in the foreground (with a timeout) or as a background task of its own.
+- **`-n`.** `run_suite.py` puts its own `-n 4` before the pytest arguments, so a later `-n 0` of the caller wins. This is intended; the printed command shows both.
+- **Load was too low to provoke the F-49 race.** The original failure needed heavy load; in the trial 3 to 4 s runs did not fail. A race is therefore shown with a deterministic test (freeze the dependency), not with load.
+- **The saved run log of a failure can disappear** (`%TEMP%\ahf_testruns_keep` was gone). Copy the evidence of a finding into the finding entry.
