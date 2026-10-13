@@ -36,7 +36,7 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 | F-49* | `flow 'wecho' is not loaded` after an engine restart during a worker job | test problem (wait missing), test fixed; product contract note below | yes |
 | F-50* | `storage` not ready within 45 s after a freeze in the hang test | observed once under load, open | |
 | F-51* | Log line lost while other processes hold the files (`readers-allow-read`) | observed once at `-n 12`, open (stall hypothesis fixed in 2675105, not proven) | |
-| F-72* | A second start is silent (forwarded to a running supervisor) | observed by manual check, open, decision needed (feedback) | |
+| F-72* | A second start is silent (forwarded to a running supervisor) | closed (fixed in 10c1f01, interface in d530148) | |
 | F-73* | Closing the debug window is reported as a crash; the supervisor stays up | observed by manual check, open (manager part decided by E14) | |
 | F-74* | Manual-check guide and start tasks do not match | verified, open (owner's agent) | |
 
@@ -262,6 +262,9 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 **Sign that it matters:** a start that does nothing and gives no hint why.
 **Action:** Decide the user-visible feedback (for example a message that an instance is already running, or show the existing window). Not decided.
 **Evidence:** diagnosis run on the owner's machine (read only); the supervisor log of `%APPDATA%\AutoHotFlow v2`.
+**Update 2026-10-13, closed.** Decision of the project owner: the running supervisor tells the manager to show its window (the v1 behaviour). Interface: `cmd.manager.show` (`doc/PROTOCOL.md` 4.8), commit d530148. Implementation in commit 10c1f01: a forwarded `cmd.app.command` without `--command` makes the supervisor log `manager show requested by second start` and send `cmd.manager.show`; a manager that is not running is started like at the first start (`manager is not running (not_running), started it`); the second start still exits with 0. The stub manager shows and raises its window; the headless stub records `stub.show`. The difference to v1 (`#SingleInstance, force` replaced the old instance) is `M-23` in `doc/MIGRATION.md`.
+**Verified:** `tests/fault/test_second_start.py` (real second-start command line, headless stub): failed before the change (no `stub.show`, no manager started), passes after. Fast tier: run 20261013-192725-2312, commit 10c1f01, exit 0, 338 passed, no `INTERNALERROR`. Foundation tier: run 20261013-192746-13396, commit 10c1f01, exit 0, 439 passed, 1 skipped, no `INTERNALERROR`. `python tools/arch_check.py`: 0 violations.
+**Not checked:** the visible window by hand (no `gui` test, see `doc/TEST-STRATEGY.md`): that `Show` and `Restore` bring the stub window to the front in front of other applications (Windows may only flash the taskbar button for a background process).
 
 ### F-73*: Closing the debug window is reported as a crash, and the supervisor stays up
 
