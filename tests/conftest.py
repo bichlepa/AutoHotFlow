@@ -121,7 +121,12 @@ def _collect_diagnosis(session, target):
         from support.ahfclient import AhfClient
         client = AhfClient(pipenames.hub_pipe(session), "testdiag", connect_timeout=1.5)
     except Exception as e:          # no supervisor (the test ended it itself, or the test has no session)
-        (target / "diagnosis-none.txt").write_text("no diagnosis: %s: %s\n" % (type(e).__name__, e), encoding="utf-8")
+        try:
+            target.mkdir(parents=True, exist_ok=True)       # the folder does not exist yet at this point
+            (target / "diagnosis-none.txt").write_text("no diagnosis: %s: %s\n" % (type(e).__name__, e),
+                                                       encoding="utf-8")
+        except OSError:
+            pass
         return
     try:
         target.mkdir(parents=True, exist_ok=True)
@@ -242,7 +247,10 @@ def pytest_runtest_makereport(item, call):
     if report.when == "call" and report.failed and os.environ.get(RUNLOG_ENV):
         session = item.funcargs.get("session_id") if hasattr(item, "funcargs") else None
         if session:
-            _collect_diagnosis(session, _runlog_dir() / "data" / _safe_name(item.nodeid) / "diagnosis")
+            try:
+                _collect_diagnosis(session, _runlog_dir() / "data" / _safe_name(item.nodeid) / "diagnosis")
+            except Exception:       # an exception in a hook aborts the whole xdist run (INTERNALERROR)
+                pass
 
 
 def pytest_sessionstart(session):
