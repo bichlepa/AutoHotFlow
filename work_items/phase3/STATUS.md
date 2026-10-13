@@ -27,9 +27,9 @@ Verified by the verifier: commit `6f4241c` (fast run 20261013-183714-6f4241c4, s
 
 | Path | Tree hash |
 |---|---|
-| `src` | `70563a527621744da7f73dd65cc8d9e6eaa6a871` |
-| `tests` | `4dcc84cb2b3986789123eef57c5e41987bcff2f2` |
-| `tools` | `a7f04da87a3129d9ba332b78d439c92195492d92` |
+| `src` | `da6e67bb198614dbb05b9cb93a857ca720b40a72` |
+| `tests` | `b175982afce980905f1d38fc913c9428f74b3fcd` |
+| `tools` | `577aaa4bd697558f445e65df21a6481a8edc893e` |
 
 Verification of `9eb84e0` (before): fast run 20261013-182355-9eb84e08, foundation run 20261013-182435-9eb84e08.
 
@@ -93,7 +93,7 @@ Hunter run 1 (2026-10-13) worked on two entries and stopped. Candidates not look
 | F-25 | accepted: a permanently locked log file may lose its batch | OPEN-ITEMS, status `accepted` |
 | F-29 | accepted: low impact, the 10 s stay (option (b)); ARCHITECTURE 6.3 still to be written | OPEN-ITEMS, status `accepted` |
 | F-36 | closed | OPEN-ITEMS, closed |
-| F-43 | not decided: the next bug hunter explains it and gives a recommendation | OPEN-ITEMS, `decision needed` |
+| F-43 | decided: implement the recommendation (a child in state `starting` does not hold its shutdown group) | implemented in 03c5ee6, closed in 1d62e4a; verifier green: fast run 20261013-191224-1d62e4ab (336), slow run 20261013-191306-1d62e4ab (86), foundation run 20261013-191456-1d62e4ab (439, 1 skipped = the deliberate skip of the runner self-check) |
 
 ## Decisions taken by the orchestrator
 
