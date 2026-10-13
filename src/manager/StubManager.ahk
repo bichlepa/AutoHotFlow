@@ -82,6 +82,7 @@ class StubManager extends Role {
     RegisterHandlers() {
         this.On("evt.", (msg) => this._OnEvent(msg))
         this.On("cmd.app.prepareExit", (msg) => this._OnPrepareExit(msg))
+        this.On("cmd.manager.show", (msg) => this._OnShow(msg))
         if (this.headless)
             this.On("cmd.test.command", (msg) => this._OnTestCommand(msg))
         ; Subscriptions are kept by the peer and sent again after every handshake (PROTOCOL 3).
@@ -374,6 +375,15 @@ class StubManager extends Role {
     _OnPrepareExit(msg) {
         this._Ui("stub.prepareExit", Map("cancel", Json.Bool(this.cancelExit)))
         return Map("ok", true, "cancel", Json.Bool(this.cancelExit))
+    }
+
+    ; cmd.manager.show (F-72, PROTOCOL 4.8): a second start of the product. Shows the window and brings it to the front.
+    ; Without a window (--headless) only the ui-event line is written.
+    _OnShow(msg) {
+        this._Ui("stub.show", Map("headless", this.headless ? 1 : 0))
+        if (IsObject(this.view))
+            this.view.Raise()
+        return Map("ok", true)
     }
 
     ; --- log -----------------------------------------------------------------------------------

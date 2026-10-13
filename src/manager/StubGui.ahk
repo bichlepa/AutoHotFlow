@@ -53,6 +53,12 @@ class StubGui {
             this.elemList.Add("", e["elementId"], e["state"], e["countRuns"], e["lastRun"], e["message"])
     }
 
+    ; The window is made visible and brought to the front (cmd.manager.show, a second start of the product).
+    Raise() {
+        this.win.Show()
+        this.win.Restore()
+    }
+
     Close() {
         this.win.Destroy()
     }

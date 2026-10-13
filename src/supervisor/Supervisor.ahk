@@ -231,6 +231,8 @@ class Supervisor {
             Log.Write("a1", "supervisor", "command from " msg.from ": " text)
             if (StrLower(Trim(text)) = "debug")
                 return this._OpenDebug()
+            if (argv.Length = 0)
+                this._ShowManager()
             return Map()
         }
         throw AhfError("unknown command " msg.type, ErrCode.UNKNOWN_TYPE)
@@ -266,6 +268,34 @@ class Supervisor {
         if (!started)
             this.hub.Send("debug", "evt.debug.show", Map())
         return Map("command", "debug", "started", Json.Bool(started))
+    }
+
+    ; A plain second start (no --command, F-72, the v1 behaviour): the manager shows its window. A running manager is
+    ; asked (cmd.manager.show, PROTOCOL 4.8); one that is not running is started like at the first start and shows its
+    ; window on its own. Never throws: the second start must end with exit 0, a failure is only logged.
+    _ShowManager() {
+        Log.Write("a1", "supervisor", "manager show requested by second start")
+        if (this.children.shuttingDown) {
+            Log.Write("a1", "supervisor", "manager show ignored: the supervisor is shutting down")
+            return
+        }
+        if (this.hub.HasLink("manager")) {
+            this.hub.Request("manager", "cmd.manager.show", Map(), (ans) => this._OnManagerShown(ans), 3000)
+            return
+        }
+        try {
+            started := this.children.Open("manager")
+            Log.Write("a1", "supervisor", started ? "manager is not running (not_running), started it"
+                : "manager is starting, it shows its window by itself")
+        } catch as e {
+            Log.Write("a0", "supervisor", "manager is not running (not_running) and could not be started: " e.Message)
+        }
+    }
+
+    _OnManagerShown(ans) {
+        ok := (IsObject(ans) && ans.payload.Get("ok", 0)) ? true : false
+        Log.Write(ok ? "a1" : "a0", "supervisor", "manager show " (ok ? "done"
+            : "failed: " (IsObject(ans) ? ans.type : "manager gone")))
     }
 
     ; cmd.process.list is open to every client. spawn and kill belong to the engine and only touch workers
