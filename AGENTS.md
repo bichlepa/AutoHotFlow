@@ -72,7 +72,7 @@ Several agents may work at the same time only in **separate workspaces**: one gi
 - **Never start AHK scripts directly; use `python tools/ahkrun.py [--timeout N] script.ahk [args]`.** An unhandled AHK error or a `MsgBox` otherwise opens a dialog that blocks the call forever. `ahkrun.py` passes `/ErrorStdOut=UTF-8` (load errors such as syntax errors go to stderr), catches any dialog that still appears (text and PNG screenshot in `%TEMP%\ahf_dialogs\`, the path is printed), closes it and ends the process. Exit codes: 97 dialog caught, 98 timeout, 99 no interpreter. The pytest runs use the same guard automatically.
 - Never pass unknown command-line options (e.g. `--version`) to the AHK interpreter: it takes them for a script name and shows a dialog.
 - Do not redefine built-in AHK v2 class names (`TimeoutError`, `ValueError`, `OSError`, `TypeError`, `MemberError`, ...). Own error classes carry the prefix `Ahf` (`AhfTimeoutError`).
-- `.claude/commands/*` (local, not versioned) still refer to the v1 structure.
+- `.claude/commands/` is versioned (project commands). `orchestrate.md` starts the orchestrator (`doc/ORCHESTRATOR.md`).
 
 ## Looking up AHK help online
 
