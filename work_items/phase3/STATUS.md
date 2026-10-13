@@ -9,15 +9,17 @@ Session start: 2026-10-13, work-item mode (no wishes). Main checkout clean, on `
 | WI | Title | State | Model | Branch / workspace | Commit | Run ID | Date | Note |
 |---|---|---|---|---|---|---|---|---|
 | WI-36 | Golden data from v1 | in progress | sonnet (implementer) | `wip/wi-36` | | | 2026-10-13 | starts after WI-34 (done) |
-| WI-37 | Expression language v2: spec, tokenizer, parser | blocked | | | | | 2026-10-13 | spec depends on open questions 1, 2, 3, 6 of the phase 3 README (unanswered) |
-| WI-38 | Evaluator | blocked | | | | | 2026-10-13 | depends on WI-37 (blocked) and questions 1, 2, 3, 6 |
-| WI-39 | Converter v1 expressions | blocked | | | | | 2026-10-13 | depends on WI-36, WI-37, WI-38 |
-| WI-40 | Variable model in the engine | blocked | | | | | 2026-10-13 | depends on WI-38 |
-| WI-41 | global/static permanent, data folder | blocked | | | | | 2026-10-13 | depends on WI-40; open question 4 (default data folder) |
-| WI-42 | Parameter evaluation and ctx API | blocked | | | | | 2026-10-13 | depends on WI-38, WI-39, WI-40 |
-| WI-43 | Acceptance S1 | blocked | | | | | 2026-10-13 | depends on all |
+| WI-37 | Expression language v2: spec, tokenizer, parser | open | | | | | 2026-10-13 | no dependency; the owner's answers E29 to E32 (`d423cb9`) are in; runs after WI-36 (one task at a time, slot 1) |
+| WI-38 | Evaluator | open | | | | | 2026-10-13 | depends on WI-37 |
+| WI-39 | Converter v1 expressions | open | | | | | 2026-10-13 | depends on WI-36, WI-37, WI-38 |
+| WI-40 | Variable model in the engine | open | | | | | 2026-10-13 | depends on WI-38 |
+| WI-41 | global/static permanent, data folder | open | | | | | 2026-10-13 | depends on WI-40; E33 (default data folder) is done in `9eb84e0`, the owner's commit, not yet verified by the verifier |
+| WI-42 | Parameter evaluation and ctx API | open | | | | | 2026-10-13 | depends on WI-38, WI-39, WI-40 |
+| WI-43 | Acceptance S1 | open | | | | | 2026-10-13 | depends on all |
 
-Blocked = not started because of the dependency named in the note. Open questions of `work_items/phase3/README.md` are answered by the project owner; none is answered yet.
+Open questions of `work_items/phase3/README.md`: all answered by the project owner on 2026-10-13 (E29 to E33, commit `d423cb9`). No work item is blocked by a question now. Work items run one after the other (ORCHESTRATOR 3b).
+
+Owner's commits on `v2-port` (not made by an agent): `bdae120` (ORCHESTRATOR rule 4: owner's local work), `d423cb9` (answers E29 to E32, WI-37/38/39/41 text), `9eb84e0` (E33: default data folder `%APPDATA%\AutoHotFlow v2`, touches `src/supervisor/`, so the foundation tier must run on it).
 
 ## Agents
 
