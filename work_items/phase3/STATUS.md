@@ -13,7 +13,7 @@ Session start: 2026-10-13, work-item mode (no wishes). Main checkout clean, on `
 | WI-38 | Evaluator | open | | | | | 2026-10-13 | depends on WI-37 |
 | WI-39 | Converter v1 expressions | open | | | | | 2026-10-13 | depends on WI-36, WI-37, WI-38 |
 | WI-40 | Variable model in the engine | open | | | | | 2026-10-13 | depends on WI-38 |
-| WI-41 | global/static permanent, data folder | open | | | | | 2026-10-13 | depends on WI-40; E33 (default data folder) is done in `9eb84e0`, the owner's commit, not yet verified by the verifier |
+| WI-41 | global/static permanent, data folder | open | | | | | 2026-10-13 | depends on WI-40; E33 (default data folder) is done in `9eb84e0`, the owner's commit, verified: fast run 20261013-182355-9eb84e08 (301 passed), foundation run 20261013-182435-9eb84e08 (437 passed, 1 skipped, not identified), exit 0 both |
 | WI-42 | Parameter evaluation and ctx API | open | | | | | 2026-10-13 | depends on WI-38, WI-39, WI-40 |
 | WI-43 | Acceptance S1 | open | | | | | 2026-10-13 | depends on all |
 
