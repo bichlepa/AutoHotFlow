@@ -41,6 +41,10 @@ Highest F-nn at session start: F-51 (provisional F-48* to F-51*). F-44 was never
 
 | Entry | Area | Result | Commit | Run ID |
 |---|---|---|---|---|
+| F-12 | engine scheduler, empty loop stack | closed, fixed with a unit test (fails before, passes after) | 183c561 (fix), 6d635cc (book) | unit file only, no pytest run ID |
+| F-14 | `Ids.Next`, `ExecContext.Finish` | open, re-read, not reproduced; fix in `src/core/` needs owner agreement | 6d635cc | - |
+
+Hunter run 1 (2026-10-13) worked on two entries and stopped. Candidates not looked at yet: F-02, F-13, F-17, F-18, F-20, F-23, F-25, F-28, F-29, F-30, F-35, F-36, F-45, F-47, F-48*, F-49*, F-50*, F-51*.
 
 ## Review log
 
@@ -51,6 +55,7 @@ Highest F-nn at session start: F-51 (provisional F-48* to F-51*). F-44 was never
 
 | Branch | Commits | Date | Commit on v2-port | Run ID | Verifier |
 |---|---|---|---|---|---|
+| wip/hunt-1 | 183c561, 6d635cc | 2026-10-13 | 5e16445, 7161777 (cherry-pick, no conflict) | run 20261013-180408-71617779, commit 7161777 | fast tier green: 298 passed, exit 0, no INTERNALERROR; arch check 0 violations (run on the main checkout, not on the frozen commit) |
 
 ## Decisions taken by the orchestrator
 
