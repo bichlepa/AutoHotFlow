@@ -23,7 +23,7 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 | F-18 | Hub pipe not restricted to the user | open, low | |
 | F-20 | Supervisor messages after `storage` is gone go only to stderr | open, low | |
 | F-23 | Flow file parsed twice in the engine | open, not implemented | yes |
-| F-25 | Permanently locked log file loses a whole batch | open, low | |
+| F-25 | Permanently locked log file loses a whole batch | open, low (stall case fixed in 2675105) | |
 | F-28 | Worker log entries never reach `storage` | open, low | yes |
 | F-29 | Child in handshake is not covered by the orphan guard | open, low | |
 | F-30 | Lost `sys.busy {busy: false}` | assumed, open, low | |
@@ -35,7 +35,7 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 | F-48* | `cmd.worker.run` unanswered for 5 s in `test_worker_busy.py` | observed once, open | |
 | F-49* | `flow 'wecho' is not loaded` after an engine restart during a worker job | test problem (wait missing), test fixed; product contract note below | yes |
 | F-50* | `storage` not ready within 45 s after a freeze in the hang test | observed once under load, open | |
-| F-51* | Log line lost while other processes hold the files (`readers-allow-read`) | observed once at `-n 12`, open | |
+| F-51* | Log line lost while other processes hold the files (`readers-allow-read`) | observed once at `-n 12`, open (stall hypothesis fixed in 2675105, not proven) | |
 
 * provisional IDs, assigned by the agent on 2026-10-13; the project owner assigns the final ones.
 
@@ -127,6 +127,7 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 
 **What:** When another process holds a log file for good, the storage loses the whole batch (up to 500 lines) for that file after 3 s, not only one line.
 **Status:** Open, low priority. Counted and noted in the log. F-04 is unchanged.
+**Update 2026-10-13 (bug hunter):** Analysed with F-51. The retry time of a log operation (`LOG_RETRY_MS` 3 s, `WriteQueue.RunOne`) ran on the wall clock from the first failed attempt. Read in code and shown by a unit test with a fake clock: when the process is stalled for longer than the retry time between two attempts (starved process on a loaded machine, freeze), the first attempt after the stall found the time up and the whole bundle was answered `busy` and reported lost without a further try. Fixed in 2675105 (a gap above 1 s between two attempts is added to the retry time); the new case `a stall does not use up the retry time` in `tests/ahk/storage_queue.test.ahk` fails before and passes after (direct `ahkrun.py` call, 15 of 15 pass), `tests/integration/test_storage.py` 32 passed (run 20261013-180701-17584, commit 2675105 plus uncommitted doc). This is the data-loss path for a stall only; the loss of a batch for a file that is held permanently (the original F-25 point: the batch is lost after 3 s, up to 500 lines) is unchanged and still open as a decision. Not checked: that a real stall caused the original loss.
 **Why deferred:** Low priority.
 **Sign that it matters:** Missing log lines for one file while another process holds it.
 **Action:** Decide whether the loss is acceptable, or change the batch handling.
@@ -234,6 +235,7 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 
 **What:** `test_no_log_line_is_lost_while_other_processes_hold_the_files[readers-allow-read]` failed once at `-n 12` (more workers than the 8 cores, run took 51 s). The test serial and in 8 more runs passed.
 **Status:** Observed once, 2026-10-13. Run log did not exist yet, no evidence kept. Related to F-25 (permanently locked log file loses a batch), not proven.
+**Update 2026-10-13 (bug hunter):** Not reproduced: the test passes serially (2 of 2) and I did not create artificial load. The holder keeps the file for about 4 ms out of every 5 ms with `FILE_SHARE_READ` only, so a write attempt finds it free only occasionally; with 100 or more attempts in 3 s a loss needs a long gap between attempts, which is the stall case fixed for F-25 in 2675105 (assumed cause, not proven; no evidence of the original failure exists). If it fails again at normal worker counts after 2675105, the cause is something else: read `Log_storage.txt` in the run log for `log line lost` and its message.
 **Sign that it matters:** the failure at normal worker counts, or "lines lost" in a real session.
 **Action:** On the next failure read the failure text and `Log/` in the run log.
 **Evidence:** none kept.
