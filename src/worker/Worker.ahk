@@ -51,6 +51,7 @@ class Worker extends Role {
 
     ; After a reconnect to the hub the supervisor does not know that a job is running.
     OnReady() {
+        this.SetLogTarget("storage")    ; F-28: without a target the entries of the worker (and of its elements) were never written
         if (this._job != "")
             this._ReportBusy(true)
     }

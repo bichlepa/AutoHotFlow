@@ -284,3 +284,18 @@ def test_worker_reports_not_busy_after_a_cancel_too(worker, supervisor_client):
     assert worker.request("worker:1", "cmd.worker.cancel", {"execId": "b2"}, timeout=ROOT_TIMEOUT_S)["payload"]["ok"]
     assert done_for(worker, "b2")["result"] == "stopped"
     assert busy_messages(supervisor_client) == [True, False]
+
+
+def test_log_entries_of_the_worker_reach_storage(worker, supervisor_client, hub, pipe):
+    # F-28: the worker never set a log target, its entries stayed in its own queue and were never written.
+    with AhfClient(pipe, "storage") as storage:
+        assert send_run(worker, run_payload("l1", "Action_TestEchoWorker"))["ok"]
+        assert done_for(worker, "l1")["result"] == "normal"
+        hub.send_to("worker:1", "sys.shutdown", {"reason": "user", "deadlineMs": 2000})
+        entries = []
+        deadline = time.monotonic() + ROOT_TIMEOUT_S
+        while time.monotonic() < deadline and not any("shutdown requested" in e["payload"]["text"] for e in entries):
+            entries += [m for m in storage.events(timeout=0.5) if m.get("type") == "evt.log.append"]
+        texts = [e["payload"]["text"] for e in entries if e.get("from") == "worker:1"]
+        assert any("shutdown requested" in t for t in texts), texts
+
