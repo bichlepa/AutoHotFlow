@@ -395,7 +395,7 @@
             "problemMatcher": []
         },
         {
-            "label": "Tool: remove workspace (branch only when merged)",
+            "label": "Tool: remove workspace (branch only when its changes are on v2-port)",
             "type": "shell",
             "command": "python",
             "args": [

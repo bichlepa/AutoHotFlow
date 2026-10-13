@@ -9,7 +9,7 @@ Status: 2026-10-13. The tools are tested (`tests/test_new_workspace.py`, `tests/
 ```
 python tools/new_workspace.py <name> [--from <ref>]     # branch wip/<name> and the folder ..\AutoHotFlow-wt\<name>
 python tools/new_workspace.py --list                    # all workspaces: commits ahead/behind v2-port, changes
-python tools/new_workspace.py --remove <name>           # worktree away; the branch only when it is merged
+python tools/new_workspace.py --remove <name>           # worktree away; the branch only when its changes are on v2-port
 ```
 
 The tool works from the main checkout and from inside a workspace. VS Code tasks: `Tool: new workspace`, `Tool: list workspaces`, `Tool: remove workspace`.
@@ -36,13 +36,13 @@ The tool works from the main checkout and from inside a workspace. VS Code tasks
 
 **Tester.** Runs suites on branches and on the base for comparison, with the same arguments: `python tools/run_suite.py --ref v2-port -- tests -q --all` and `... --ref wip/<name> ...`. A failed test is run again serially (`-n 0`) before it is reported, and a failure that also occurs on the base is not a regression of the branch. Report: commit, command, counts, the failures with the run log folder (`%TEMP%\ahf_runs\<id>\pytest-log`).
 
-**Integrator** (the project owner, or one agent that has been asked). In the main checkout on `v2-port`:
+**Integrator** (the project owner, or one agent that has been asked). The history of `v2-port` stays linear: no merge commits and no temporary branches in the graph. In the main checkout on `v2-port`:
 ```
 python tools/run_suite.py --ref wip/<name> -- tests -q --all      # green, or the known failures of the base only
-git merge --no-ff wip/<name>                                     # conflicts: see section 4
-python tools/new_workspace.py --remove <name>
+git cherry-pick v2-port..wip/<name>                               # copies the commits of the branch (conflicts: section 4)
+python tools/new_workspace.py --remove <name>                     # worktree away, branch deleted: its patches are on v2-port
 ```
-Branches are merged one after another; the second one is rebased or merged with `v2-port` first and tested again, because its test result was for a different base.
+`git cherry-pick` is used instead of `git rebase` because the branch is checked out in its workspace and git does not rebase a branch that another worktree holds. Branches are taken over one after another; the next one is tested again on the new `v2-port` (a cherry-pick can succeed without a conflict and still break a test), because its earlier result was for a different base. When the tree of `v2-port` after the cherry-picks equals the tree that was tested (`git rev-parse HEAD^{tree}`), that result still holds.
 
 ## 4. Files with a high conflict risk
 

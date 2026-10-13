@@ -82,6 +82,22 @@ def test_remove_refuses_uncommitted_work_and_keeps_an_unmerged_branch(repo):
     assert "wip/one" in git(repo, "branch", "--list")
 
 
+def test_remove_deletes_a_branch_whose_commits_were_cherry_picked(repo):
+    """The integrator keeps a linear history: the commits are copied, their IDs differ, the patches do not."""
+    tool(repo, "three")
+    ws = repo.parent / "ws" / "three"
+    (ws / "d.txt").write_text("z", encoding="utf-8")
+    git(ws, "add", "d.txt")
+    git(ws, "commit", "-q", "-m", "work")
+    (repo / "other.txt").write_text("o", encoding="utf-8")          # the base moved on: the copy gets a new parent
+    git(repo, "add", "other.txt")
+    git(repo, "commit", "-q", "-m", "other work on the base")
+    git(repo, "cherry-pick", "wip/three")
+    assert git(repo, "rev-parse", "HEAD") != git(ws, "rev-parse", "HEAD")
+    out = tool(repo, "--remove", "three")
+    assert "deleted" in out and "wip/three" not in git(repo, "branch", "--list")
+
+
 def test_remove_deletes_a_merged_branch(repo):
     tool(repo, "two")
     ws = repo.parent / "ws" / "two"

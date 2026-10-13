@@ -3,7 +3,7 @@
 Usage:
     python tools/new_workspace.py <name> [--from REF]       create branch wip/<name> and the worktree <root>\\<name>
     python tools/new_workspace.py --list                    all workspaces: branch, commits ahead/behind the base, state
-    python tools/new_workspace.py --remove <name> [--force] remove the worktree; the branch only when it is merged
+    python tools/new_workspace.py --remove <name> [--force] remove the worktree; the branch only when its changes are on the base
 
 Options: --base BRANCH (default v2-port, what "ahead/behind" and "merged" refer to), --repo PATH (default: the
 repository of this file). The workspace root is the folder next to the repository, <repo name>-wt (override with
@@ -127,7 +127,14 @@ def list_workspaces(repo, main, root, base):
     return 0
 
 
-def remove(repo, main, root, name, force):
+def taken_over(main, base, branch):
+    """True when every commit of the branch is on the base, merged or (the usual way here, a linear history)
+    cherry-picked or rebased: git cherry compares the patches, so changed commit IDs do not matter."""
+    _, out = git(main, "cherry", base, branch, check=False)
+    return not any(line.startswith("+") for line in out.splitlines())
+
+
+def remove(repo, main, root, name, force, base="v2-port"):
     path = root / name
     entry = [(p, b) for p, b in worktrees(repo) if same_path(p, path)]
     if not entry:
@@ -145,11 +152,11 @@ def remove(repo, main, root, name, force):
     git(main, "worktree", "prune", check=False)
     print("worktree %s removed" % path)
     if branch and branch.startswith(BRANCH_PREFIX):
-        code, out = git(main, "branch", "-d", branch, check=False)
-        if code == 0:
-            print("branch %s deleted (it was merged)" % branch)
+        if taken_over(main, base, branch):
+            git(main, "branch", "-D", branch)
+            print("branch %s deleted (its changes are on %s)" % (branch, base))
         else:
-            print("branch %s kept: it has commits that are not merged yet" % branch)
+            print("branch %s kept: it has changes that are not on %s yet" % (branch, base))
     return 0
 
 
@@ -170,7 +177,7 @@ def main(argv=None):
         if args.list:
             return list_workspaces(repo, main_tree, root, args.base)
         if args.remove:
-            return remove(repo, main_tree, root, args.remove, args.force)
+            return remove(repo, main_tree, root, args.remove, args.force, args.base)
         if args.name:
             return create(repo, main_tree, root, args.name, args.ref)
         parser.print_usage(sys.stderr)
