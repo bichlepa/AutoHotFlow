@@ -23,15 +23,17 @@ Owner's commits on `v2-port` (not made by an agent): `bdae120` (ORCHESTRATOR rul
 
 ## Last verified state
 
-Verified by the verifier (run IDs above): commit `9eb84e0`. Tree hashes (`git rev-parse <commit>:src <commit>:tests <commit>:tools`):
+Verified by the verifier: commit `6f4241c` (fast run 20261013-183714-6f4241c4, slow run 20261013-183749-6f4241c4, foundation run 20261013-183932-6f4241c4, all exit 0, no INTERNALERROR; architecture check 0 violations). Tree hashes (`git rev-parse <commit>:src <commit>:tests <commit>:tools`):
 
 | Path | Tree hash |
 |---|---|
-| `src` | `5667d6cb828be4a025adea13a70e2789e7f8bbd7` |
-| `tests` | `54f2656b04cd2993065e4e27201874b2f50e113a` |
+| `src` | `70563a527621744da7f73dd65cc8d9e6eaa6a871` |
+| `tests` | `4dcc84cb2b3986789123eef57c5e41987bcff2f2` |
 | `tools` | `a7f04da87a3129d9ba332b78d439c92195492d92` |
 
-Later commits on `v2-port` that did not change these trees (verification skipped, nothing source-related changed): `924205b`, `eda1d3f` (both status book or docs only; `eda1d3f` changes `doc/ORCHESTRATOR.md`). The verifier rule in `doc/ORCHESTRATOR.md` section 3d applies from now on.
+Verification of `9eb84e0` (before): fast run 20261013-182355-9eb84e08, foundation run 20261013-182435-9eb84e08.
+
+Later commits on `v2-port` after `6f4241c` that did not change these trees: none verified yet. The verifier rule in `doc/ORCHESTRATOR.md` section 3d applies from now on.
 
 ## Agents
 
@@ -80,6 +82,7 @@ Hunter run 1 (2026-10-13) worked on two entries and stopped. Candidates not look
 | Branch | Commits | Date | Commit on v2-port | Run ID | Verifier |
 |---|---|---|---|---|---|
 | wip/hunt-1 | 183c561, 6d635cc | 2026-10-13 | 5e16445, 7161777 (cherry-pick, no conflict) | run 20261013-180408-71617779, commit 7161777 | fast tier green: 298 passed, exit 0, no INTERNALERROR; arch check 0 violations (run on the main checkout, not on the frozen commit) |
+| wip/hunt-4 | 4d97c49, 7efddfc, 9436902 | 2026-10-13 | 1de6658, 2ac9583, 6f4241c (cherry-pick, no conflict) | fast run 20261013-183714-6f4241c4 (301 passed), slow run 20261013-183749-6f4241c4 (85 passed), foundation run 20261013-183932-6f4241c4 (438 passed, 1 skipped, not identified), commit 6f4241c | all exit 0, no INTERNALERROR; arch check 0 violations |
 | wip/hunt-3 | 58e48d2, ad6ac7d, 3815990 | 2026-10-13 | c0ecec5, b53185a, d6713f6 (cherry-pick, no conflict) | fast run 20261013-181410-d6713f6a (301 passed), slow run 20261013-181447-d6713f6a (85 passed), commit d6713f6 | both exit 0, no INTERNALERROR; arch check 0 violations |
 | wip/hunt-2 | 2675105, 68b42d8 | 2026-10-13 | c292dfb, fdcae63 (cherry-pick, no conflict) | fast run 20261013-180755-fdcae630 (300 passed), slow run 20261013-180831-fdcae630 (85 passed), commit fdcae63 | both exit 0, no INTERNALERROR; arch check 0 violations |
 
