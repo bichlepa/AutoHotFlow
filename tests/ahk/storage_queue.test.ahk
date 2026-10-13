@@ -256,6 +256,45 @@ CaseLogRetryWaitsForItsDelayWhileRequestsGoOn() {
     Assert.Equal(q.Pending, 0)
 }
 
+CaseRetryTimeIsNotUsedUpByAStall() {
+    clk := FakeClock()
+    q := WriteQueue(() => clk["t"])
+    seen := []
+    counter := Map("n", 0)
+    log := MakeOp(seen, "log", () => BusyThenOk(counter, 2))
+    log["retryMs"] := 3000
+    log["retryDelayMs"] := 20
+    q.AddLow(log)
+    Assert.True(q.RunOne())                ; first attempt fails, the retry time starts
+    clk["t"] += 5000                       ; the process is stalled for longer than the retry time
+    Assert.True(q.RunOne())                ; second attempt fails: the stall does not end the retries
+    Assert.Equal(seen.Length, 0)
+    clk["t"] += 20
+    Assert.True(q.RunOne())                ; third attempt works
+    Assert.Equal(seen.Length, 1)
+    Assert.True(seen[1]["payload"]["ok"])
+}
+
+CaseRetryStillEndsWithBusyWithoutAStall() {
+    clk := FakeClock()
+    q := WriteQueue(() => clk["t"])
+    seen := []
+    counter := Map("n", 0)
+    log := MakeOp(seen, "log", () => BusyThenOk(counter, 1000))
+    log["retryMs"] := 3000
+    log["retryDelayMs"] := 20
+    q.AddLow(log)
+    loop 400 {
+        q.RunOne()
+        clk["t"] += 20
+        if (seen.Length > 0)
+            break
+    }
+    Assert.Equal(seen.Length, 1)
+    Assert.Equal(seen[1]["payload"]["error"]["code"], "busy")
+    Assert.True(counter["n"] > 100 && counter["n"] < 200)
+}
+
 TestRun.Init()
 TestRun.Case("operations run in order and each is answered once", CaseRunsInOrderAndAnswersEachOnce)
 TestRun.Case("an operation past its deadline is not run and gets timeout", CaseExpiredDeadlineIsNotRun)
@@ -270,4 +309,6 @@ TestRun.Case("a budget runs many small operations in one go", CaseBudgetRunsMany
 TestRun.Case("a budget stops after the operation that used it up", CaseBudgetStopsAfterTheOperationThatUsedItUp)
 TestRun.Case("one big operation is never split", CaseOneBigOperationIsNeverSplit)
 TestRun.Case("a log retry waits for its delay while requests go on", CaseLogRetryWaitsForItsDelayWhileRequestsGoOn)
+TestRun.Case("a stall does not use up the retry time", CaseRetryTimeIsNotUsedUpByAStall)
+TestRun.Case("a retry without a stall still ends with busy", CaseRetryStillEndsWithBusyWithoutAStall)
 TestRun.Finish()

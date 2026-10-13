@@ -24,6 +24,9 @@ class WriteQueue {
     ; Time one timer run may work before it yields to the message pump (WI-25: justification in the result).
     static BUDGET_MS := 10
 
+    ; A gap this long between two attempts of a retrying operation is a stall and is not counted against its retry time.
+    static STALL_MS := 1000
+
     ; clock: optional function() returning milliseconds in the unit of Time.NowMs(); only unit tests pass one
     ; (WI-32), so that budget and retry delays can be checked without real time.
     __New(clock := "") {
@@ -73,8 +76,15 @@ class WriteQueue {
             payload := WriteQueue._RunSafely(op["run"])
             if (payload.Has("retry")) {
                 now := this._now.Call()
-                if (!op.Has("retryUntil"))
+                if (!op.Has("retryUntil")) {
                     op["retryUntil"] := now + op.Get("retryMs", 0)
+                } else if (now - op["lastTry"] > WriteQueue.STALL_MS) {
+                    ; Longer than any retry delay since the last attempt: the process was stalled (or busy
+                    ; with requests). That time did not give the other process a chance to let go, so it
+                    ; does not count against the retry time (F-25, F-51).
+                    op["retryUntil"] += now - op["lastTry"]
+                }
+                op["lastTry"] := now
                 if (now < op["retryUntil"]) {
                     op["notBefore"] := now + op.Get("retryDelayMs", 25)
                     queue.InsertAt(1, op)
