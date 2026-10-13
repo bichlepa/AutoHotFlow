@@ -23,12 +23,12 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 | F-18 | Hub pipe not restricted to the user | open, low | |
 | F-20 | Supervisor messages after `storage` is gone go only to stderr | open, low | |
 | F-23 | Flow file parsed twice in the engine | open, not implemented | yes |
-| F-25 | Permanently locked log file loses a whole batch | open, low (stall case fixed in 2675105) | |
+| F-25 | Permanently locked log file loses a whole batch | accepted (owner, 2026-10-13: acceptable risk; stall case fixed in 2675105) | |
 | F-28 | Worker log entries never reach `storage` | closed (fixed in 58e48d2) | yes |
-| F-29 | Child in handshake is not covered by the orphan guard | open, low, decision needed (change in `src/core/`) | |
+| F-29 | Child in handshake is not covered by the orphan guard | accepted (owner, 2026-10-13: low impact; 10 s instead of 3 s, option (b)) | |
 | F-30 | Lost `sys.busy {busy: false}` | closed (reconnect case fixed in 4d97c49) | |
 | F-35 | Hub connection deadlines ignore supervisor stalls | open, low | |
-| F-36 | `sys.hello` unanswered for 15 s in `test_shutdown.py` | observed, open | |
+| F-36 | `sys.hello` unanswered for 15 s in `test_shutdown.py` | closed (owner decision, 2026-10-13) | |
 | F-43 | Slow child during shutdown holds later groups | open, decision needed | yes |
 | F-45 | `refreshed` 2 instead of 3 in the debug role test | observed, open | |
 | F-47 | `cmd.worker.cancel` unanswered in the hang test | observed, open | |
@@ -127,7 +127,7 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 ### F-25: Permanently locked log file loses a whole batch
 
 **What:** When another process holds a log file for good, the storage loses the whole batch (up to 500 lines) for that file after 3 s, not only one line.
-**Status:** Open, low priority. Counted and noted in the log. F-04 is unchanged.
+**Status:** Accepted by the project owner (2026-10-13) as an acceptable risk. Counted and noted in the log. F-04 is unchanged. The stall case was fixed in 2675105 (see update above).
 **Update 2026-10-13 (bug hunter):** Analysed with F-51. The retry time of a log operation (`LOG_RETRY_MS` 3 s, `WriteQueue.RunOne`) ran on the wall clock from the first failed attempt. Read in code and shown by a unit test with a fake clock: when the process is stalled for longer than the retry time between two attempts (starved process on a loaded machine, freeze), the first attempt after the stall found the time up and the whole bundle was answered `busy` and reported lost without a further try. Fixed in 2675105 (a gap above 1 s between two attempts is added to the retry time); the new case `a stall does not use up the retry time` in `tests/ahk/storage_queue.test.ahk` fails before and passes after (direct `ahkrun.py` call, 15 of 15 pass), `tests/integration/test_storage.py` 32 passed (run 20261013-180701-17584, commit 2675105 plus uncommitted doc). This is the data-loss path for a stall only; the loss of a batch for a file that is held permanently (the original F-25 point: the batch is lost after 3 s, up to 500 lines) is unchanged and still open as a decision. Not checked: that a real stall caused the original loss.
 **Why deferred:** Low priority.
 **Sign that it matters:** Missing log lines for one file while another process holds it.
@@ -147,7 +147,7 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 ### F-29: Child in handshake is not covered by the orphan guard
 
 **What:** A child that is still in the handshake is not covered by the orphan guard. It can live up to 10 s after the supervisor has died.
-**Status:** Open, low priority, decision needed. Not described in `doc/ARCHITECTURE.md` 6.3.
+**Status:** Accepted by the project owner (2026-10-13): low impact, the 10 s stay (option (b) below). Not yet described in `doc/ARCHITECTURE.md` 6.3; that description is still to be written.
 **Update 2026-10-13 (bug hunter):** Cause verified by reading and by one measurement. `Role._Guard` (`src/core/Role.ahk`) starts the orphan clock only when `peer.status = "reconnecting"`; for every other status it resets `lostSince`. A role that has never been welcomed is `connecting` (first attempts) or `handshake`, so the guard does not count. The role then ends by the budget of the peer, not by the guard: `Peer.DEFAULT_RECONNECT_TOTAL_MS` (10 s) for a hub that is not there, and `helloTimeoutMs` (3 s) per attempt plus 3 s guard when the hub accepts the pipe but does not answer. Measured: `python tools/ahkrun.py src/AutoHotFlow.ahk --role=worker --hub=<pipe nobody serves> ...` ends with exit 4 `peer closed (hub_unreachable)` after 10.2 s (direct call, no pytest run id, commit 4d97c49), against about 3 s after a connection that was already ready (`test_role_ends_with_exit_4_when_its_pipe_is_cut_and_the_hub_does_not_come_back`). A supervisor that dies while a child is still starting therefore leaves that child for up to 10 s, not 3 s. A hub that is dead but whose pipe broke after the welcome is covered. Not changed: the fix is in `src/core/` and needs the project owner's agreement.
 **Options:** (a) In `Role._Guard` also count `connecting` and `handshake` as lost (clock from the start of the process), so ARCHITECTURE 6.3 point 4 holds without exception; risk: a role started by hand or by a test before its hub (the supervisor creates the hub pipe before it starts children, read, not checked for every test setup) would give up after 3 s instead of 10 s, so such tests must be checked. (b) Keep the 10 s and describe it in ARCHITECTURE 6.3 ("a role that has not yet connected waits up to 10 s"). (c) Lower `reconnectTotalMs` for the first connect only. Recommendation: (a) with a test that starts a role without a hub and expects exit 4 within `ORPHAN_BUDGET_S`; low priority, the effect is a stray process for a few seconds.
 **Why deferred:** Low priority.
@@ -177,7 +177,7 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 ### F-36: `sys.hello` unanswered for 15 s in `test_shutdown.py`
 
 **What:** The observer's `sys.hello` was unanswered for 15 s (`AhfTimeout: no answer to obs#1 within 2.0 s`, then repeated retries in `faultkit.connect`). It happened in `tests/fault/test_shutdown.py` (`test_healthy_session_exits...`, `test_ui_cancels_the_exit...`) when the file ran in parallel with other test files. This is the hub question from WI-23.
-**Status:** Observed, open. Verified in 2 of 2 runs with 14 files and 2 of 3 runs with two files, also without the WI-32 changes. Not seen again in 14 acceptance runs (WI-32 and WI-35). The source recommends closing it; the decision is open.
+**Status:** Observed, open. Verified in 2 of 2 runs with 14 files and 2 of 3 runs with two files, also without the WI-32 changes. Not seen again in 14 acceptance runs (WI-32 and WI-35). The project owner decided to close it (2026-10-13).
 **Why deferred:** The cause was not found. The source suspects a slow machine at that time (assumed, not proven). The failing test's data directory was empty and the supervisor's stderr was empty.
 **Sign that it matters:** `AhfTimeout: no answer to obs#1 within 2.0 s` in `faultkit.connect`.
 **Action:** The project owner decides whether to close it (recommended). If it comes back: run with `AHF_TEST_KEEP=1`, watch the processes of the session with `psutil` during the hang (state, CPU, threads), and check whether the supervisor's `AutoHotkey64.exe` is running.
