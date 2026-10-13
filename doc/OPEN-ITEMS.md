@@ -36,6 +36,9 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 | F-49* | `flow 'wecho' is not loaded` after an engine restart during a worker job | test problem (wait missing), test fixed; product contract note below | yes |
 | F-50* | `storage` not ready within 45 s after a freeze in the hang test | observed once under load, open | |
 | F-51* | Log line lost while other processes hold the files (`readers-allow-read`) | observed once at `-n 12`, open (stall hypothesis fixed in 2675105, not proven) | |
+| F-72* | A second start is silent (forwarded to a running supervisor) | observed by manual check, open, decision needed (feedback) | |
+| F-73* | Closing the windows does not end the application | observed by manual check, open (related to E14) | |
+| F-74* | Manual-check guide and start tasks do not match | verified, open (owner's agent) | |
 
 * provisional IDs, assigned by the agent on 2026-10-13; the project owner assigns the final ones.
 
