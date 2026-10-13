@@ -14,8 +14,8 @@ from conftest import TESTS_DIR
 
 REPO = TESTS_DIR.parent
 FLOW_DIRS = [
-    REPO / "v1" / "AppData" / "Saved Flows",
-    REPO / "v1" / "Saved Flows" / "demo flows",
+    TESTS_DIR / "data" / "flows" / "v1_examples",
+    TESTS_DIR / "data" / "flows" / "personal",
 ]
 FLOW_HELPER = TESTS_DIR / "ahk" / "helpers" / "json_flows.ahk"
 BENCH_HELPER = TESTS_DIR / "ahk" / "helpers" / "json_bench.ahk"
@@ -23,7 +23,7 @@ BOM = b"\xef\xbb\xbf"
 
 
 def flow_files():
-    """Top-level *.json files of the v1 flow folders. backup/ folders are not part of the set."""
+    """Top-level *.json files of the example flow folders (tests/data/flows)."""
     files = []
     for d in FLOW_DIRS:
         files.extend(sorted(d.glob("*.json")))
@@ -50,7 +50,7 @@ def assert_same_types_and_values(original, written, path="$"):
 def run_flow_helper(run_ahk, out_dir):
     """Runs the helper over all v1 flow folders. Returns the RunResult after checking the run itself."""
     files = flow_files()
-    assert files, "no v1 flow files found in %s" % FLOW_DIRS
+    assert files, "no example flow files found in %s" % FLOW_DIRS
     res = run_ahk(FLOW_HELPER, str(out_dir), *map(str, FLOW_DIRS), timeout=120)
     assert not res.timed_out, "helper did not finish: %s" % res.stderr
     assert res.returncode == 0, "helper exit %s, stderr: %s" % (res.returncode, res.stderr)

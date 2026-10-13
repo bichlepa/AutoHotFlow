@@ -1,11 +1,11 @@
 #Requires AutoHotkey v2.0
 ; Unit tests for src/engine/core/FlowDefinition.ahk (WI-08, ARCHITECTURE 7).
-; The real v1 flows are read at run time from v1/AppData/Saved Flows (read only).
+; The example flows are read at run time from tests/data/flows/v1_examples (read only).
 #Include lib\Assert.ahk
 #Include ..\..\src\engine\core\FlowDefinition.ahk
 
 SavedFlowsDir() {
-    return A_ScriptDir "\..\..\v1\AppData\Saved Flows"
+    return A_ScriptDir "\..\data\flows\v1_examples"
 }
 
 ; Reads a file as text, without a leading UTF-8 byte order mark.

@@ -8,7 +8,7 @@ Status: Draft. Tools checked in this environment: AutoHotkey v2 at `C:\Program F
 2. **Python speaks the protocol.** `tests/support/ahfclient.py` implements framing, `sys.hello` and wake-up (`ctypes.windll.user32.PostMessageW`). This allows every role to be tested against a real hub connection. Confirmed in the spike: `open(r"\\.\pipe\...", "r+b", buffering=0)` connects to an AHK v2 pipe.
 3. **Nothing hangs unnoticed.** Every test has a hard time limit (`pytest-timeout`), every started process is tracked in a fixture and terminated at the end together with its children (`psutil`).
 4. **Isolation.** Every test gets its own temporary data directory (`--data=<dir>`) and its own session ID, so that pipe names do not collide and tests can run in parallel.
-5. **Real data only as a copy.** Round-trip tests work with copies of the flows from `v1/AppData/Saved Flows` (into `tests/data/flows/`). Never write into `v1/`.
+5. **Defined starting conditions, no dependency on `v1/`.** Test data lives in `tests/data/` (checked in, byte exact, see `tests/data/README.md`). A test never reads from `v1/`, never touches the default data directory (`%APPDATA%\AutoHotFlow`) and starts every process with its own `--data=<dir>`. `tests/test_no_v1_dependency.py` enforces the first rule (exception: `tests/golden/`, which generates reference data with the v1 interpreter; the results are checked in).
 
 ## 2. Levels
 
@@ -59,10 +59,10 @@ Note: The v1 hangs were never reliably reproducible. A comparison test against v
 
 ## 4. Round trip and compatibility
 
-- For every file in `tests/data/flows/*.json`: load, save, load again. The parsed structures must be equal **including types** (`"1"` stays a string). Unknown keys are preserved.
-- Variables: read and write `.ahfvd`/`.ahfvar` pairs, identical content.
+- For every file in `tests/data/flows/v1_examples/` and `tests/data/flows/personal/`: load, save, load again. The parsed structures must be equal **including types** (`"1"` stays a string). Unknown keys are preserved.
+- Variables: read and write `.ahfvd`/`.ahfvar` pairs, identical content. The pairs in `tests/data/variables/` are synthetic and cover the formats (with and without BOM, CRLF, object content with mixed types). More are added when a feature needs them.
 - `.ahf` export/import: round trip via ZIP.
-- Existing test flows (category "Automatic tests" in `v1/AppData/Saved Flows`) will later serve as acceptance flows for the engine (run them, check the result).
+- Existing test flows (category "Automatic tests" in `tests/data/flows/v1_examples/`) will later serve as acceptance flows for the engine (run them, check the result).
 
 ## 5. Structure of the directory `tests/`
 
@@ -78,7 +78,7 @@ tests/
 │  ├─ lib/Assert.ahk
 │  └─ *.test.ahk
 ├─ integration/  e2e/  fault/  stress/  golden/
-└─ data/flows/                # copies of real v1 flows
+└─ data/                      # flows/v1_examples, flows/personal, variables (synthetic), bigflows, skeleton_flow.json
 ```
 
 ## 6. Execution

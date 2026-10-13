@@ -21,8 +21,8 @@ from support.timing import scaled
 from test_role import RoleHub, RoleRun, wait_hello, SHUTDOWN_LIMIT_S
 
 ROOT = Path(__file__).resolve().parents[2]
-V1_FLOWS = ROOT / "v1" / "AppData" / "Saved Flows"
-V1_VARS = ROOT / "v1" / "AppData" / "Variables"
+FLOW_DIRS = [ROOT / "tests" / "data" / "flows" / "v1_examples", ROOT / "tests" / "data" / "flows" / "personal"]
+DATA_VARS = ROOT / "tests" / "data" / "variables"
 SKELETON_SRC = ROOT / "tests" / "data" / "skeleton_flow.json"
 BIG_BYTES = 5 * 1024 * 1024
 ASK_TIMEOUT_S = 15.0
@@ -174,8 +174,8 @@ def test_flow_write_rejects_text_that_is_not_a_json_object(storage, flowdir):
 def test_v1_flows_round_trip_through_storage_with_same_structure_and_types(procs, datadir, runs, pipe,
                                                                            session_id, hub):
     """Reads every v1 flow, writes it back through storage and compares structure and JSON types."""
-    flows = sorted(V1_FLOWS.glob("Flow *.json"))
-    assert len(flows) >= 20, "v1 example flows are missing"
+    flows = sorted(f for d in FLOW_DIRS for f in d.glob("Flow *.json"))
+    assert len(flows) >= 20, "example flows in tests/data/flows are missing"
     (datadir / "Flows").mkdir()
     for src in flows:
         shutil.copy(src, datadir / "Flows" / src.name)
@@ -294,20 +294,21 @@ def test_missing_flow_read_reports_storage_error_to_the_engine_topic(storage, pi
 # --- variables --------------------------------------------------------------------------------------
 
 def test_v1_variables_are_read_as_stored(procs, datadir, runs, pipe, session_id, hub):
-    shutil.copytree(V1_VARS, datadir / "Variables")
+    shutil.copytree(DATA_VARS, datadir / "Variables")
     (datadir / "Flows").mkdir()
     start_storage(procs, datadir, runs, pipe, session_id)
     wait_hello(hub, "storage")
     client = AhfClient(pipe, "tester")
     try:
-        got = ask_ok(client, "cmd.storage.var.get", {"scope": "global", "name": "global_testResults"})
+        got = ask_ok(client, "cmd.storage.var.get", {"scope": "global", "name": "global_synthetic_list"})
         assert got["exists"] is True and got["type"] == "object"
-        assert same(json.loads(got["content"]), read_json(V1_VARS / "global_testResults.ahfvar"))
+        assert same(json.loads(got["content"]), read_json(DATA_VARS / "global_synthetic_list.ahfvar"))
         got = ask_ok(client, "cmd.storage.var.get",
-                     {"scope": "static", "flowId": "Flow 1010290492", "name": "static_results"})
+                     {"scope": "static", "flowId": "Flow 1000000001", "name": "static_synthetic_map"})
         assert got["exists"] is True and got["type"] == "object"
         assert same(json.loads(got["content"]),
-                    read_json(V1_VARS / "Flow 1010290492" / "static_results.ahfvar"))
+                    read_json(DATA_VARS / "Flow 1000000001" / "static_synthetic_map.ahfvar"))
+        assert json.loads(got["content"])["text"] == "1" and json.loads(got["content"])["number"] == 2
         assert ask_ok(client, "cmd.storage.var.get", {"scope": "global", "name": "nothere"})["exists"] is False
     finally:
         client.close()

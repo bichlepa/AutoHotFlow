@@ -5,7 +5,7 @@
 #Include ..\..\src\engine\core\FlowDefinition.ahk
 
 SavedFlowsDir() {
-    return A_ScriptDir "\..\..\v1\AppData\Saved Flows"
+    return A_ScriptDir "\..\data\flows\v1_examples"
 }
 
 ReadText(path) {
