@@ -819,3 +819,46 @@ Append new entries at the end of the matching category. Correct or delete outdat
 - **Right:** The stub of a dependency (`FakeWorkers.Usable`) calls a hook once (`owner.executor.Tick()`). The call sits exactly between check and start and behaves like an interrupting timer, without time dependence.
 - **Status:** verified
 - **Source:** `tests/ahk/helpers/EngineOwner.ahk`
+
+### The v1 interpreter does not understand `/ErrorStdOut=UTF-8`
+
+- **Problem:** `tools/ahkrun.py --interpreter` first passed the same `/ErrorStdOut=UTF-8` as for v2. The v1 interpreter (AutoHotkey_H 1.1.32.00) does not know the suffix and opens a dialog (the dialog guard caught it, exit 97), even for a script that is correct.
+- **Wrong:** `/ErrorStdOut=UTF-8` for the v1 interpreter.
+- **Right:** `/ErrorStdOut` without a suffix. Load errors then go to stderr (`script.ahk (3) : ==> Missing ")"`, exit code 2). The output encoding of `FileAppend ..., *` was not checked; the golden harness writes its results to a file with `UTF-8-RAW` and only ASCII (non-ASCII as `\uXXXX`).
+- **Status:** verified (both variants run with `ahkrun.run(..., interpreter=...)`)
+- **Source:** `tools/ahkrun.py` (`ERROR_OPTION_CUSTOM`)
+
+### v1: a `try` block turns failing commands into exceptions, also inside called functions
+
+- **Problem:** The first harness wrapped every case in `try/catch`. `FileDelete` of a file that does not exist (inside `GlobalVariable_Set`) then threw an exception with the message `1` (the ErrorLevel), which v1 never does because it never calls these functions inside a `try`.
+- **Wrong:** `try { Var_Set(...) } catch e { ... }` around code that uses commands which set ErrorLevel.
+- **Right:** No `try` around the code under test. An uncaught error opens a dialog; with `ahkrun.py` the dialog is caught and the generator records the case as `uncaught_error` and goes on with the next case.
+- **Status:** verified (first run of the harness: exception `1` from `FileDelete`)
+- **Source:** `tests/golden/v1/harness.ahk`
+
+### v1: returning a variable from a function turns a number into text
+
+- **Problem:** The kind of a value ("pure number" or text, determined the way `Jxon_Dump` does: `ObjGetCapacity([v], 1) == ""` is true for a pure number) changed on the way through functions.
+- **Right:** `return v` and `ObjFullyClone(v)` give a text even if `v` held a number; `return a + b` and a direct read from an object give a number. Consequence for the golden data: everything that v1 reads through `Var_Get` is text, only the result of arithmetic is a number (`doc/TEST-STRATEGY.md` section 7, `tests/golden/findings.json`). A float given as JSON number to `Jxon_Load` becomes a text (only integers are converted), so the harness takes numbers as text and adds `+ 0`.
+- **Status:** verified (small v1 script and golden cases `variables.instance.number`, `varaccess.set.number`)
+- **Source:** `tests/golden/v1/harness.ahk`, `v1/Lib/Json/Jxon.ahk`
+
+### v1: `global` outside a function makes a super-global; included files run in include order
+
+- **Problem:** The v1 sources use `_WorkingDir`, `global_AllBuiltInVars` and similar inside functions without declaring them. It was unclear how the harness can supply them.
+- **Right:** A `global x := ...` statement outside any function creates a variable that every function sees (AutoHotkey_L feature). Top-level code of an included file (`Global variables.ahk` creates the `Variables` folder from `_WorkingDir`) runs in the position of the `#Include` in the auto-execute section, so set `_WorkingDir` before the include and call the main function after all includes. Functions and classes may be anywhere.
+- **Status:** verified (harness runs against the unchanged v1 sources)
+- **Source:** `tests/golden/v1/harness.ahk`
+
+### v1: a hanging case needs a watchdog timer, and a folder reset costs 0.4 s
+
+- **Problem:** The v1 script parser loops forever for some inputs (a line that starts with `;`), and the generator waited for the outer timeout. Separately, removing and recreating a folder with `FileRemoveDir`/`FileCreateDir` took 413 ms per pair on this machine (20 pairs: 8266 ms), which made 1200 cases take 9 minutes.
+- **Right:** `SetTimer` with a check of `A_TickCount` interrupts a long running loop of the main thread in v1; the timer writes the result line `timeout` and calls `ExitApp`, and the generator restarts after that case. Reset the folder only when the previous case left a file there (check with `Loop, Files`); the run then takes about 2 minutes for 2200 cases. The cause of the slow folder operations (virus scanner, indexer) is assumed, not checked.
+- **Status:** verified (6 hangs ended by the watchdog; timing measured)
+- **Source:** `tests/golden/v1/harness.ahk`, `tools/golden_v1.py`
+
+### Bash tool: `( ... ) &` kept running after the call
+
+- **Problem:** `(cmd > file; echo done >> file) &` in the Bash tool returned at once and the output file stayed empty, which looked as if nothing had started. The job was in fact running; starting the same command again with `run_in_background` produced two runs that wrote the same result files.
+- **Right:** Start a long command once with the tool's `run_in_background`, and look at the process list (`Get-CimInstance Win32_Process`) before starting it again. This contradicts the note in `doc/PARALLEL-WORK.md` section 7 ("a shell loop started with `&` ended with the command that started it") for this one observation.
+- **Status:** observed once; cause not investigated

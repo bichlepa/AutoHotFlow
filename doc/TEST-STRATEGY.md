@@ -19,7 +19,7 @@ Status: Draft. Tools checked in this environment: AutoHotkey v2 at `C:\Program F
 | **L3 e2e** | `tests/e2e/` | Whole system (supervisor, engine, storage, trigger host, UI stub). Python behaves like an editor/manager. | flow runs, events arrive, start/stop/shutdown |
 | **L4 Fault injection** | `tests/fault/` | Terminate processes (`kill`), freeze them (`psutil.Process.suspend()`), close the pipe, delay responses. | crash, hang, timeout without hanging in the whole system |
 | **L5 Stress** | `tests/stress/` | many instances, rapid start/stop sequences, clients connect and disconnect under load. Fixed time budget, result as a report. | race conditions, leaks, message backlog |
-| **L6 Characterization** | `tests/golden/` | Inputs and outputs of the v1 behavior as data (JSON). v2 must reproduce them. | expression evaluation, variable substitution, connection selection, load/save |
+| **L6 Characterization** | `tests/golden/` | Inputs and outputs of the v1 behavior as data (JSON). v2 must reproduce them. | expression evaluation, variable substitution, connection selection, load/save (expressions and variables: section 7) |
 
 ## 3. Important scenarios
 
@@ -134,3 +134,30 @@ clean comparison use `--max-runs 1`. The run needs everything in the commit: a d
 ignored file shows up as a failure here (this is how the `v1/AppData/Variables` dependency was found).
 
 Environment variables: `AHF_AHK2_EXE` (path to the interpreter), `AHF_TEST_KEEP=1` (keep data directories after the test). `AHF_DATA_DIR` is set by `conftest.py` to the guard directory (product variable: data directory when `--data` is missing).
+
+## 7. Golden data from v1 (L6, WI-36)
+
+What v1 actually returns for expressions, scripts, variable substitution and variable access. The data comes from the v1 code itself, run with the v1 interpreter (`v1/AutoHotKey/AutoHotFlow.exe`, AutoHotkey_H 1.1.32, 32 bit), not from reading the code. It is the yardstick of the converter (WI-39): a converted expression must return in v2 what v1 returned.
+
+| Path | Content |
+|---|---|
+| `tests/golden/cases/<group>.json` | the cases (inputs). Hand-written groups: `arithmetic`, `division`, `comparison`, `logic`, `concat`, `numbers`, `strings`, `variables`, `assignment`, `functions`, `errors`, `script`, `replace`, `builtin`, `varaccess`, `names`, `objects`. `corpus_flows` is generated from the example flows (below). |
+| `tests/golden/expected/<group>.json` | the results from v1, one line per case (checked in; a change shows in the diff) |
+| `tests/golden/findings.json` | the suspected v1 bugs confirmed or refuted with case IDs, further observations, what the corpus shows, what is not covered |
+| `tests/golden/v1/harness.ahk` | the harness (v1 syntax, runs only in the v1 interpreter): includes the unchanged v1 sources (`Code tokenizer/parser/evaluator.ahk`, `Expression evaluator.ahk`, `Global variables.ahk`, `Variables.ahk`, `Jxon.ahk`, `Objects.ahk`) and replaces the rest of v1 (object store with the v1 `parseObjectPath`, critical section, logger, `lang`, flow and element properties) by small stand-ins. No dialog. Not named `*.test.ahk`, so pytest does not collect it. |
+| `tests/golden/private/` | the project owner's own flows (E27), **local only, in `.gitignore`**, never checked in |
+| `tools/golden_v1.py` | generator: cases to results |
+| `tools/golden_corpus.py` | collects the cases of the corpus from flows |
+| `tests/golden/test_golden_format.py` | pytest: every case file has a result file, both follow the format, the findings name existing cases; a sample of 12 cases is run in the v1 interpreter and compared with the stored results |
+
+**Case.** `{"id", "kind", "text", ...}`. Kinds: `expression` (`Var_EvaluateExpression`), `script` (`var_evaluateScript`), `replace` (`Var_replaceVariables`, with `convertObjects`), `checkname` (`Var_CheckName`), `destination` (`Var_RetrieveDestination`, with `location`), `varget`, `varset` (`Var_Get`, `Var_Set`, with `value` and `location`). Optional: `vars` (initial variables per scope `instance`, `thread`, `loop`, `global`, `static`; JSON number = number, string = text, object or array = object), `common` (the functions without instance and thread, `Var_*_Common`, as used by editor and manager), `volatile` (value changes from run to run, only the type is stored), `note`, `sources`. The format is checked by `golden_v1.check_case` (unknown fields are refused).
+
+**Result.** `outcome` (`ok`, `parse_error`, `eval_error`, `parse_error_ignored`, `uncaught_error` with the dialog text in `detail`, `timeout` when v1 hangs for more than 8 s), `value` (`{type: number|text|object, value, text}`; `type` is determined the way Jxon does it, `text` is `"" . value`), `errors` (parser and evaluator, with phase, description, line, column), `errorText` (the text v1 returns to the caller), `variables` after the run in all scopes (assignments!), `log` (the v1 log lines, e.g. `f0` for a missing variable). For a number, `value` is a JSON number and `text` the exact v1 text (v1 writes floats with 6 decimals: `2.000000`); compare numbers by `value`, text forms by `text`.
+
+**Generating.** On purpose only, not in every test run: VS Code task `Testdata: generate golden data from v1` or `python tools/golden_v1.py` (measured: about 2 minutes for 2200 cases, six of which hang and wait for the 8 s watchdog). `python tools/golden_v1.py --check` generates without writing and lists the groups that differ (reproducibility check). `--group NAME`, `--show ID` (debugging: run the cases whose id contains ID and print them). The generator starts the harness through `tools/ahkrun.py --interpreter` (dialog guard, timeout); a case that raises an uncaught error or hangs is recorded as such and the run goes on with the next case. The interpreter understands only `/ErrorStdOut` without `=UTF-8` (see HOW-TO).
+
+**Corpus.** `python tools/golden_corpus.py` (task `Testdata: collect golden cases from the example flows of v1`) turns the parameter values of the example flows in `v1/AppData/Saved Flows` into cases. The content type of a parameter is read from the v1 element files (`Element_getParametrizationDetails_*`); when it is unclear, the value runs as expression and as substitution. `--stats` prints statistics, `--report` what the results show.
+
+**Private data (E27).** `python tools/golden_corpus.py --flows <folder> --out tests/golden/private/cases/corpus_private.json`, then `python tools/golden_v1.py --private` (tasks `Testdata: golden data of the private flows ...`). The folder is in `.gitignore`. Only counts may leave the machine (WI-39, WI-43).
+
+**Comparison with v2** is part of WI-39. Volatile cases and the `uncaught_error`/`timeout` outcomes are not expected to match.
