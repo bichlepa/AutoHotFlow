@@ -78,7 +78,7 @@ tests/
 │  ├─ lib/Assert.ahk
 │  └─ *.test.ahk
 ├─ integration/  e2e/  fault/  stress/  golden/
-└─ data/                      # flows/v1_examples, flows/personal, variables (synthetic), bigflows, skeleton_flow.json
+└─ data/                      # flows/v1_examples, flows/personal, variables (synthetic), skeleton_flow.json
 ```
 
 ## 6. Execution

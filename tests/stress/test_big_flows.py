@@ -2,8 +2,8 @@
 
  - Hub cost of one large frame: a res.storage.flow.read with the biggest v1 flow (93 KB) goes through
    Hub._OnFrame (fake connections, no I/O). Budget: under 5 ms (before WI-24: about 220 ms).
- - Many flows at the start: the Data directory holds N big flows (copies of the large v1 flows under new
-   names, tests/data/bigflows). The chain must start without `hung`/`crashed`, load every flow, and a
+ - Many flows at the start: the Data directory holds N big flows (copies of the 8 large v1 flows under new
+   names, BIG_FLOW_NAMES from tests/data/flows/v1_examples). The chain must start without `hung`/`crashed`, load every flow, and a
    `cmd.engine.snapshot` asked during the loading must be answered in under 1 s. The time from the start
    of the supervisor to `evt.engine.ready` is recorded (a finding if it is far above 30 s, WI-24 point 6).
 
@@ -23,8 +23,12 @@ from stresskit import StressChain, _connect, hwnd_of, stress_chain  # noqa: F401
 from faultkit import FULL_CHAIN, STUB_OPTS, Chain, event, wait_until
 
 TESTS_DIR = Path(__file__).resolve().parents[1]
-BIG_FLOWS = TESTS_DIR / "data" / "bigflows"
-BIGGEST_FLOW = BIG_FLOWS / "Flow 1010290492.json"
+V1_EXAMPLES = TESTS_DIR / "data" / "flows" / "v1_examples"
+# The 8 largest v1 flows (sorted by name); the other v1 examples are small and not part of this test.
+BIG_FLOW_NAMES = ["Flow 1010290492.json", "Flow 1087828277.json", "Flow 1210127300.json", "Flow 130786371.json",
+                  "Flow 1384439262.json", "Flow 369404488.json", "Flow 561135904.json", "Flow 65341778.json"]
+BIG_FLOWS = [V1_EXAMPLES / name for name in BIG_FLOW_NAMES]
+BIGGEST_FLOW = V1_EXAMPLES / "Flow 1010290492.json"
 HELPER = TESTS_DIR / "ahk" / "helpers" / "hub_frame_cost.ahk"
 
 HUB_FRAME_BUDGET_MS = 5.0
@@ -54,8 +58,8 @@ def fill_flows(datadir, count):
     """Copies the big flows round-robin to Flows/<n>.json. Returns the flow ids and the total size in bytes."""
     flows = Path(datadir) / "Flows"
     flows.mkdir(exist_ok=True)
-    sources = sorted(BIG_FLOWS.glob("*.json"))
-    assert sources, "no flows in %s" % BIG_FLOWS
+    sources = BIG_FLOWS
+    assert all(src.is_file() for src in sources), "missing big flows in %s" % V1_EXAMPLES
     names, total = [], 0
     for n in range(count):
         src = sources[n % len(sources)]
