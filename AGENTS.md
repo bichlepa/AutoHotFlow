@@ -14,7 +14,7 @@ AutoHotFlow (AHF) is being ported from AutoHotkey v1 (AutoHotkey_H with `AhkThre
 - Phase 0 (inventory) and phase 1 (design) are done and approved.
 - **Phase 2 (walking skeleton) is complete.** Phase 2b (hardening) is complete, and the fix block WI-30 to WI-35 is complete with a green acceptance run (WI-35 cycle 1, code state `2f2e6e5`).
 - Not built yet: trigger host (E6, early in phase 3), editor, real manager, real elements. The GUI of the stub has not been checked by hand.
-- **Phase 3 has not started and needs the project owner's approval.** Its plan is being drafted with the project owner.
+- **Phase 3 (the v1 feature scope in the new architecture) is approved by the project owner (2026-10-13).** Plan: `work_items/phase3/README.md`, step S1 (WI-36 to WI-43) is detailed. The open questions of the plan are answered by the project owner in separate sessions; a work item that depends on one waits.
 - Open findings: `doc/OPEN-ITEMS.md`. Decisions: `doc/DECISIONS.md`. Work-package history: `doc/HISTORY.md`. Full work-item history before the cleanup: git tag `v2-phase2-final` (`git show v2-phase2-final:work_items/STATUS.md`).
 - Test timing: `tests/support/timing.py` (`scaled()`; see `doc/TEST-STRATEGY.md`).
 

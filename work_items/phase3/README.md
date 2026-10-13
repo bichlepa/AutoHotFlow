@@ -1,6 +1,6 @@
 # Phase 3: v1 feature scope in the new architecture, plan
 
-Status: 2026-10-12, draft (project owner with Claude). Branch `v2-port`. Located in `work_items/phase3/` (temporary, delete after the port). **Phase 3 is not started until the project owner gives explicit approval.**
+Status: 2026-10-12, draft (project owner with Claude). Branch `v2-port`. Located in `work_items/phase3/` (temporary, delete after the port). **Phase 3 is approved by the project owner (2026-10-13).**
 
 Basis: Phase 2 (walking skeleton), Phase 2b (hardening) and the fix block up to WI-34. What already exists: processes, IPC, supervisor, storage, engine with state machines and latest revision, worker pool, diagnostics, debug window, skeleton elements. What is missing: see `work_items/HANDOVER.md`, "Offene Punkte" (Open points).
 

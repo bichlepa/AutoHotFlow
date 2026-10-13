@@ -16,7 +16,7 @@ Commit IDs in the table below are the short IDs from the sources. The "Commits" 
 | Phase 2, walking skeleton | WI-01 to WI-17 | done, except WI-13 (manual GUI check) and WI-14 (not built, decision E6) |
 | Phase 2b, hardening before phase 3 | WI-18 to WI-29 | done, with open points (end state of phase 2b) |
 | Fix block | WI-30 to WI-35 (WI-30, WI-31, WI-33, WI-32, WI-34, WI-35 in this order of work) | done; acceptance green in WI-35, cycle 1 |
-| Phase 3 | WI-36 to WI-43 | not started; plan is a draft and needs the project owner's approval |
+| Phase 3 | WI-36 to WI-43 | approved by the project owner on 2026-10-13; the work items are open |
 
 WI-36 to WI-43 are in `work_items/phase3/` in the working tree. They are not tracked by git and have no commits (checked with `git ls-files`).
 

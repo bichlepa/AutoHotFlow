@@ -33,7 +33,7 @@ Where the detailed wording is in a repository document, the table names that doc
 | ID | Question | Status | Where it is tracked |
 |---|---|---|---|
 | E14 | What the real manager does when its window is closed (only close the window, minimise to tray, or end the application). | **Open.** Decided in phase 3. | `v2-phase2-final:work_items/HANDOVER.md`, "Offene Entscheidungen", item 1 |
-| Phase 3 approval | Phase 3 is not started. It needs the explicit approval of the project owner, after the phase 3 plan has been drawn up together with Claude. | **Open.** The plan is a draft in `work_items/phase3/README.md`. | `work_items/phase3/README.md`; `v2-phase2-final:work_items/HANDOVER.md`, "Offene Entscheidungen", item 2 |
+| Phase 3 approval | Phase 3 needs the explicit approval of the project owner, after the phase 3 plan has been drawn up together with Claude. | **Approved by the project owner on 2026-10-13.** The plan is `work_items/phase3/README.md`. | `work_items/phase3/README.md`; `v2-phase2-final:work_items/HANDOVER.md`, "Offene Entscheidungen", item 2 |
 
 Not E-numbered, but still waiting for the project owner: finding F-43 (see the findings table in `v2-phase2-final:work_items/STATUS.md`, and `HANDOVER.md`, "Offene Punkte"). The sources also recommend closing F-36. That is a finding, not a decision entry.
 
