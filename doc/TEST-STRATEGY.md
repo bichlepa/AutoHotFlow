@@ -8,7 +8,7 @@ Status: Draft. Tools checked in this environment: AutoHotkey v2 at `C:\Program F
 2. **Python speaks the protocol.** `tests/support/ahfclient.py` implements framing, `sys.hello` and wake-up (`ctypes.windll.user32.PostMessageW`). This allows every role to be tested against a real hub connection. Confirmed in the spike: `open(r"\\.\pipe\...", "r+b", buffering=0)` connects to an AHK v2 pipe.
 3. **Nothing hangs unnoticed.** Every test has a hard time limit (`pytest-timeout`), every started process is tracked in a fixture and terminated at the end together with its children (`psutil`).
 4. **Isolation.** Every test gets its own temporary data directory (`--data=<dir>`) and its own session ID, so that pipe names do not collide and tests can run in parallel.
-5. **Defined starting conditions, no dependency on `v1/`.** Test data lives in `tests/data/` (checked in, byte exact, see `tests/data/README.md`). A test never reads from `v1/`, never touches the default data directory (`%APPDATA%\AutoHotFlow`) and starts every process with its own `--data=<dir>`. `tests/test_no_v1_dependency.py` enforces the first rule (exception: `tests/golden/`, which generates reference data with the v1 interpreter; the results are checked in).
+5. **Defined starting conditions, no dependency on `v1/`.** Test data lives in `tests/data/` (checked in, byte exact, see `tests/data/README.md`). A test never reads from `v1/`, never touches the default data directory (`%APPDATA%\AutoHotFlow`) and starts every process with its own `--data=<dir>`. As a safety net, `conftest.py` sets `AHF_DATA_DIR` (the supervisor's fallback when `--data` is missing, `Supervisor.DataDir`) to an empty guard directory; a test after which it is not empty fails (`default_dir_guard`). `A_AppData` itself cannot be redirected through `APPDATA` (verified). `tests/test_no_v1_dependency.py` enforces the first rule (exception: `tests/golden/`, which generates reference data with the v1 interpreter; the results are checked in).
 
 ## 2. Levels
 
@@ -124,4 +124,4 @@ python -m pytest tests -q -m stress              # long, on request only (-m soa
 - Every test needs its own names (session, data directory, pipe). No counting of "all AutoHotkey processes"; always recognize processes via the session ID in the command (`faultkit.session_processes`).
 - AHK test scripts need `#SingleInstance Off` (present in `tests/ahk/lib/Assert.ahk` and the helpers), otherwise AHK asks on a second simultaneous start of the same script and the dialog guard ends the run (exit 15).
 
-Environment variables: `AHF_AHK2_EXE` (path to the interpreter), `AHF_TEST_KEEP=1` (keep data directories after the test).
+Environment variables: `AHF_AHK2_EXE` (path to the interpreter), `AHF_TEST_KEEP=1` (keep data directories after the test). `AHF_DATA_DIR` is set by `conftest.py` to the guard directory (product variable: data directory when `--data` is missing).

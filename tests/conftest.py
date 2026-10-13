@@ -159,7 +159,21 @@ def pytest_addoption(parser):
                      help="run only the foundation tests, including the slow ones (no gui, stress, soak)")
 
 
+DEFAULT_DIR_GUARD_ENV = "AHF_DATA_DIR"    # read by the supervisor when --data is missing (Supervisor.DataDir)
+
+
+def _install_default_dir_guard(config):
+    """A process of a test that starts without --data would work in %APPDATA%\\AutoHotFlow, the real directory of
+    the project owner. The controller points the fallback to an empty guard directory, which workers and child
+    processes inherit; default_dir_guard (below) fails the test that puts anything into it."""
+    guard = tempfile.mkdtemp(prefix="ahf-default-data-guard-")
+    os.environ[DEFAULT_DIR_GUARD_ENV] = guard
+    config._ahf_guard_dir = guard
+
+
 def pytest_configure(config):
+    if not hasattr(config, "workerinput"):                                         # the controller (or a plain run)
+        _install_default_dir_guard(config)
     if not hasattr(config, "workerinput") and not os.environ.get(RUNLOG_ENV):     # the controller (or a plain run)
         base = Path(os.environ.get("AHF_TEST_LOGS") or Path(tempfile.gettempdir()) / "ahf_testruns")
         try:
@@ -263,6 +277,9 @@ def pytest_runtest_logreport(report):
 
 def pytest_sessionfinish(session, exitstatus):
     config = session.config
+    guard = getattr(config, "_ahf_guard_dir", None)
+    if guard:
+        shutil.rmtree(guard, ignore_errors=True)
     results = getattr(config, "_ahf_results", None)
     run_dir = _runlog_dir() if results is not None else None
     if run_dir is None or not results:
@@ -293,6 +310,22 @@ def pytest_terminal_summary(terminalreporter):
     run_dir = os.environ.get(RUNLOG_ENV)
     if run_dir and getattr(terminalreporter.config, "_ahf_results", None):
         terminalreporter.write_line("Run log: " + run_dir)
+
+
+@pytest.fixture(autouse=True)
+def default_dir_guard():
+    """Fails a test after which the default data directory (the guard directory, see above) is not empty: some
+    process was started without --data. The leftovers are removed, so only the tests running at that moment notice."""
+    guard = os.environ.get(DEFAULT_DIR_GUARD_ENV)
+    yield
+    if not guard or not Path(guard).is_dir():
+        return
+    leftovers = sorted(p.name for p in Path(guard).iterdir())
+    if leftovers:
+        for p in Path(guard).iterdir():
+            shutil.rmtree(p, ignore_errors=True) if p.is_dir() else p.unlink(missing_ok=True)
+        pytest.fail("a process worked in the default data directory (guard %s): %s. Start every process of a test "
+                    "with --data=<datadir>." % (guard, ", ".join(leftovers[:10])), pytrace=False)
 
 
 @pytest.fixture(autouse=True)
