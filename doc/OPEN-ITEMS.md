@@ -4,7 +4,7 @@ Status: 2026-10-12, branch `v2-port`, after the fix block WI-30 to WI-35 (accept
 
 This document lists everything that is still open, observed, or deferred. Of the 45 finding IDs used in the work items (F-01 to F-47; F-34 and F-44 were never assigned), 27 are closed and are not carried over here. Their history is in the tag `v2-phase2-final`, table "Funde" in `v2-phase2-final:work_items/STATUS.md`. The work-item files that this document cites were removed from the working tree; they can be read with `git show v2-phase2-final:<path>`.
 
-Seven findings are status "observed, open": F-36, F-45, F-47 and the provisional F-48 to F-51 (2026-10-13, found while building the test tiers). None of them is closed. The source recommends closing F-36, but that is a decision of the project owner and has not been made yet.
+The open findings that are observed but not closed are F-45, F-47, the provisional F-48 to F-51 and F-73 and F-74 (2026-10-13, from the test tiers and the manual check). F-36 is closed by the project owner (2026-10-13).
 
 Entries marked **(phase 3)** matter for the phase 3 plan.
 
