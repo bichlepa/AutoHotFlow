@@ -67,6 +67,14 @@ class Scheduler {
         leavesLoop := (kind = "loop" && (StrLower(result) = "tail" || StrLower(result) = "exception"))
         ; The loop is left once, however many connections match: pop the stack before any clone is made, so
         ; every branch starts from the restored state. v1 popped once per connection (M-14, M-19).
+        if (leavesLoop && thread.Loops.Depth = 0) {
+            ; Broken loop (for example entered at "tail"): Pop would throw out of the finish callback and
+            ; leave the thread "finished" for ever, so the instance would never end (F-12). End the thread
+            ; as an unhandled exception instead; the caller logs f0 with this message.
+            thread.Message := "loop stack is empty when leaving loop " thread.ElementId " with '" result "'"
+            instance.ReleaseThread(thread.Id, "loop stack is empty")
+            return Scheduler.Outcome("removed", true, [])
+        }
         if (leavesLoop)
             thread.Loops.Pop()
         thread.TryTransition("ready", "next element")
