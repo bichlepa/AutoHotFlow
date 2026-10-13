@@ -87,7 +87,7 @@ Start it in parallel to the implementer, one hunter after the other. It works on
 
 ### 3d. Verifier
 
-After every completed task, once its commits are on `v2-port`, start a verifier on the integrated state. It:
+After a completed task whose commits are on `v2-port` **really changed source code**, start a verifier on the integrated state. Source code here means files that run or are tested: `src/`, `tests/` (code and data), `tools/`, `.ahk` and `.py` files anywhere. **No verifier** when the task changed only documentation (`doc/`, `*.md`, `work_items/`), comments, prompts, `.vscode/` or `.claude/`, and none for a state that was verified already: compare `git rev-parse HEAD:src HEAD:tests HEAD:tools` with the tree hashes that `STATUS.md` records for the last verified state (record them when a verifier starts). Say in `STATUS.md` that the verification was skipped and why. The verifier:
 
 1. Runs the tests that the change needs (section 4) with `python tools/run_suite.py --ref HEAD` (frozen state), once per test selection.
 2. Looks briefly at the reports and at the source of the change. If something is conspicuous, it writes down a **suspicion** (marked assumed). It does no deep root-cause research and does not fix anything.
