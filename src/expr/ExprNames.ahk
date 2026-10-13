@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 
-; Rules for variable names (doc/AUSDRUECKE.md section 3), same answers as v1 Var_CheckName(name, true).
+; Rules for variable names (doc/EXPRESSION-LANGUAGE.md section 3), same answers as v1 Var_CheckName(name, true).
 class ExprNames {
     ; Longest name AutoHotkey accepts.
     static MAX_LENGTH := 253

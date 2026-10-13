@@ -1,6 +1,6 @@
 # Expression language of AutoHotFlow v2
 
-Specification of the language that parameters and scripts are written in, and of the library `src/expr/` that reads it. The name of the file is German ("Ausdruecke" = expressions) and kept for historical reasons; the text is English.
+Specification of the language that parameters and scripts are written in, and of the library `src/expr/` that reads it.
 
 Status: tokenizer and parser are implemented and tested (`tests/ahk/expr_*.test.ahk`). **Evaluation is not part of this document's code yet** (WI-38); sections 14 and 15 name what is decided so far and what the later packages add.
 

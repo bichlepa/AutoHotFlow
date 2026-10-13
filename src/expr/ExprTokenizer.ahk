@@ -3,7 +3,7 @@
 #Include ExprNames.ahk
 #Include ExprDiag.ahk
 
-; Tokenizer of the expression language (doc/AUSDRUECKE.md sections 2 to 5 and 16).
+; Tokenizer of the expression language (doc/EXPRESSION-LANGUAGE.md sections 2 to 5 and 16).
 ;
 ; Usage: tk := ExprTokenizer(text, script), tk.Run(), then tk.tokens (Array of ExprToken, the last one is
 ; always the EOF token) and tk.errors (Array of error Maps, see ExprDiag). Nothing is thrown for bad

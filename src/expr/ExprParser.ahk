@@ -3,7 +3,7 @@
 #Include ExprNode.ahk
 #Include ExprAbort.ahk
 
-; Recursive descent parser of the expression language (doc/AUSDRUECKE.md).
+; Recursive descent parser of the expression language (doc/EXPRESSION-LANGUAGE.md).
 ;
 ;   result := ExprParser.Parse(text, "expression")   ; or "script"
 ;
@@ -12,7 +12,7 @@
 ; tokenizer reports all unreadable text, the script form goes on with the next line after a syntax error,
 ; the expression form reports the first syntax error.
 ;
-; Precedence from low to high (grammar in doc/AUSDRUECKE.md section 6):
+; Precedence from low to high (grammar in doc/EXPRESSION-LANGUAGE.md section 6):
 ;   assignment (right) < || or < && and < not < = == != !== < < > <= >= < concatenation < + - < * / // <
 ;   unary - ! < postfix (call, [index], .member)
 class ExprParser {

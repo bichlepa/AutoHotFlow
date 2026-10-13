@@ -1,7 +1,7 @@
 #Requires AutoHotkey v2.0
 #Include ExprToken.ahk
 
-; Construction of AST nodes (doc/AUSDRUECKE.md section 9 describes every node type).
+; Construction of AST nodes (doc/EXPRESSION-LANGUAGE.md section 9 describes every node type).
 ; A node is a Map. All nodes have these fields:
 ;   type   node type, see below
 ;   pos    1-based index of the first character in the source text

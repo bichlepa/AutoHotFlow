@@ -2,7 +2,7 @@
 #Include ExprParser.ahk
 #Include ExprCache.ahk
 
-; Entry point of the expression library (doc/AUSDRUECKE.md).
+; Entry point of the expression library (doc/EXPRESSION-LANGUAGE.md).
 ;
 ;   res := Expr.ParseExpression(text)     ; one value, as in a parameter
 ;   res := Expr.ParseScript(text)         ; several statements

@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 
-; Error records of the parser (doc/AUSDRUECKE.md section 10). An error is a Map:
+; Error records of the parser (doc/EXPRESSION-LANGUAGE.md section 10). An error is a Map:
 ;   message   text for the user (English, not translated)
 ;   line, col 1-based position of the error
 ;   pos       1-based index of the first character in the source text

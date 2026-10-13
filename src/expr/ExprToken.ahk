@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 
-; One token of the expression language (doc/AUSDRUECKE.md section 16).
+; One token of the expression language (doc/EXPRESSION-LANGUAGE.md section 16).
 ;
 ; type: "NUM" (value is an Integer or Float), "STR" (value is the decoded text), "WORD" (name or keyword),
 ;       "OP" (operator or punctuation, text is the source text), "NL" (line break, script form only),

@@ -1,5 +1,5 @@
 #Requires AutoHotkey v2.0
-; Unit tests for operators, precedence, paths and calls of the expression language (WI-37, doc/AUSDRUECKE.md sections 4 to 7).
+; Unit tests for operators, precedence, paths and calls of the expression language (WI-37, doc/EXPRESSION-LANGUAGE.md sections 4 to 7).
 #Include lib\ExprCheck.ahk
 
 CheckArithmeticPrecedence() {

@@ -1,5 +1,5 @@
 #Requires AutoHotkey v2.0
-; Unit tests for the script form of the expression language (WI-37, doc/AUSDRUECKE.md section 8).
+; Unit tests for the script form of the expression language (WI-37, doc/EXPRESSION-LANGUAGE.md section 8).
 #Include lib\ExprCheck.ahk
 
 S(text) => ExprCheck.Sexp(text, "script")

@@ -335,7 +335,7 @@ AutoHotFlow/
 │  ├─ supervisor/  engine/  storage/  triggerhost/  worker/
 │  ├─ ui_common/            # Lang(), GUI helpers
 │  ├─ manager/  editor/     # editor/render/ = Renderer interface (D4)
-│  ├─ expr/                 # library: expression language (tokenizer, parser, syntax tree, parse cache), doc/AUSDRUECKE.md
+│  ├─ expr/                 # library: expression language (tokenizer, parser, syntax tree, parse cache), doc/EXPRESSION-LANGUAGE.md
 │  ├─ debugview/            # role debug (WI-28): DebugView.ahk, DebugGui.ahk
 │  └─ elements/
 │     ├─ base/              # AhfElement, Registry, Context
