@@ -8,17 +8,17 @@ An AST from WI-37 is evaluated. The operators compute with AHK v2 (E22), with a 
 
 ## Read first
 
-README of this phase (E22, E24, E25, open questions 1 to 3 and 6), `doc/AUSDRUECKE.md` (WI-37), `v1/Source_Common/Variables/Code evaluator.ahk`.
+README of this phase (E22, E24, E25, E29 to E32), `doc/AUSDRUECKE.md` (WI-37), `v1/Source_Common/Variables/Code evaluator.ahk`.
 
 ## Tasks
 
 1. **Variable access via an interface** (`resolver.Get(path)`, `Set(path, value)`, `Has(path)`; `path` is an array of the evaluated parts). For the tests a simple resolver; the real one comes from WI-40. This keeps the evaluator free of engine code.
 2. **Operators** with the v2 operators, wrapped in `try`: a `TypeError` (e.g. `"" + 1`) yields `""`, an `f1` log via a callback function (E25) and an entry in the warnings of the result. Likewise division by zero (AHK v2 throws `ZeroDivisionError`, verified); what v1 returns here is shown by the golden data.
-3. **Own rules** (one line each in `doc/AUSDRUECKE.md`, "Differences from AHK v2"), subject to the open questions:
-   - `/` with two integers that divide exactly returns an integer (question 1).
-   - `<`, `>`, `<=`, `>=` compare text alphabetically, case-insensitive, if one operand is not a number (question 2; AHK v2 throws here).
-   - `&&`/`||` return the operand as AHK v2 does (question 3).
-   - Text form of floats (question 6): AHK v2 writes `0.1+0.2` as `0.30000000000000004` and `1/3` as `0.33333333333333331` (verified). Proposal: at most 15 significant digits, trailing zeros removed, an integer-valued float keeps `.0`.
+3. **Rules** (one line each in `doc/AUSDRUECKE.md`, "Differences from AHK v2"; decided 2026-10-13):
+   - `/` with two integers that divide exactly returns an integer (E29). This is the only own rule; everything else is AHK v2.
+   - `<`, `>`, `<=`, `>=` as in AHK v2 (E30): a non-numeric text operand throws a `TypeError`, which by E25 gives `""` and an `f1` log.
+   - `&&`/`||` return the operand as in AHK v2 (E31).
+   - Text form of floats as in AHK v2, no own formatting (E32): `0.1+0.2` gives `0.30000000000000004`.
 4. **Missing variable:** as in v1 an empty value and a log (v1: `f0` "Retrieving variable ... failed. It does not exist"); whether this is a warning in the result is decided by the caller (WI-42).
 5. **Functions** from the list in `doc/AUSDRUECKE.md`, via a table name → function (extensible), unknown function = error with position. `object()` returns a `Map` with `CaseSense := "Off"` (E28). `print` goes to the log.
 6. **Script form:** statements in order, `if`/`else`, blocks; return of the last value as in v1.

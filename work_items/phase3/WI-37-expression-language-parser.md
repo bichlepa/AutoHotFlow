@@ -8,7 +8,7 @@ The new expression language is described and can be parsed. It follows AHK v2 (E
 
 ## Read first
 
-README of this phase (S1, decisions E22 to E25, open questions 1 to 3 and 6), `v1/Source_Common/Variables/Code tokenizer.ahk` and `Code parser.ahk` (as a starting point for the language scope, not as a template for the semantics), AHK v2 documentation `Variables.htm` (operators, precedence).
+README of this phase (S1, decisions E22 to E25 and E29 to E32), `v1/Source_Common/Variables/Code tokenizer.ahk` and `Code parser.ahk` (as a starting point for the language scope, not as a template for the semantics), AHK v2 documentation `Variables.htm` (operators, precedence).
 
 ## Tasks
 

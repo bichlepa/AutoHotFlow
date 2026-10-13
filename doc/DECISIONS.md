@@ -23,17 +23,30 @@ Where the detailed wording is in a repository document, the table names that doc
 | E11 | 2026-10-12 | The upper limit of the log buffer in the storage role (20000 entries or 8 MiB, WI-25) stays an internal constant, not a setting. | Documented in WI-32. | `v2-phase2-final:work_items/STATUS.md`, section "Entscheidungen Fix-Block" and "Bekannte Probleme" |
 | E12 | 2026-10-12 | Finding F-16 is solved: all deadlines of the supervisor account for a stand-still of the supervisor, not only the heartbeat. | Implemented in WI-33. | `doc/ARCHITECTURE.md` 6.2 and 6.3 |
 | E13 | 2026-10-12 | Confirmed: the changes F-05 and F-07 in `src/core/`, and MIGRATION M-11, M-17, M-18. | Documented in WI-32. | `doc/MIGRATION.md` |
-| E14 | 2026-10-12 | Closing the manager window. In the stub this ends the whole application. The behaviour of the real manager is decided in phase 3. | None yet. The stub behaviour is unchanged. **Open** (see "Open"). | `v2-phase2-final:work_items/phase2b/README.md`, "Nachtrag"; `v2-phase2-final:work_items/HANDOVER.md`, "Offene Entscheidungen", item 1 |
+| E14 | 2026-10-12, decided 2026-10-13 | Closing the manager window only closes (hides) the window; AutoHotFlow keeps running. Only the "Exit" button of the manager and the "Exit" entry of the tray menu end the application. Same as v1 (read: the v1 manager has no `GuiClose` handler; `Button_manager_Exit` and the tray entry call the exit). | Real manager in phase 3, step S4. The stub still ends the whole application when its window is closed. | `work_items/phase3/README.md`, decisions |
 | E15 | 2026-10-12 | An empty `--data=` (logs then go to `C:\Log`) is acceptable for now. Watch list entry, no fix. | None. | `v2-phase2-final:work_items/STATUS.md`, "Beobachtungsliste" |
 | E16 | 2026-10-12 (date of the WI-34 addendum; no separate date in the source) | The change `Peer.CloseWhenFlushed` in `src/core/ipc/Peer.ahk` (made in WI-30, not in the package wording) is confirmed. | Code change in place since WI-30. | `doc/ARCHITECTURE.md` 6.3; `v2-phase2-final:work_items/phase2b/README.md`, "Nachtrag WI-34" |
 | E17 | 2026-10-12 (date of the WI-34 addendum; no separate date in the source) | `scaled()` (`tests/support/timing.py`) with factor 3 in the parallel test run stays. The serial run (`-n 0`) and `-m stress` are the strict reference. They run at least at the end of every package that changes timing behaviour, and at the end of every block. | Rule in the test strategy. | `doc/TEST-STRATEGY.md` (timing section, "The parallel run is not the reference") |
+| E18 | 2026-10-12 | Phase 3 order: runtime first (S1 to S3), then the manager before the editor. | Plan of phase 3. | `work_items/phase3/README.md` |
+| E19 | 2026-10-12 | Debugger, compilation and installer are not part of phase 3. | Plan of phase 3. | `work_items/phase3/README.md` |
+| E20 | 2026-10-12 | The element scope stays small (core set) until the editor is finished; the remaining elements come in S8. | Plan of phase 3. | `work_items/phase3/README.md` |
+| E21 | 2026-10-12 | v2 must load old flows and variables; how v2 saves is free. v2 works in its own data folder, old data comes in through an import. Supersedes the "format stays" part of E8 for writing. | Plan of phase 3 (S1, S4). | `work_items/phase3/README.md` |
+| E22 | 2026-10-12 | The v1 expression evaluation is not reproduced. The new expression language follows AHK v2; old expressions are converted on load. A converted formula returns the v1 result except for documented deviations. v1 bugs that probably occur in no real flow are not reproduced. | WI-37 to WI-39. | `work_items/phase3/README.md` |
+| E23 | 2026-10-12 | Golden data is generated with the v1 code and the v1 interpreter (`v1/` is only read and run). | WI-36. | `work_items/phase3/README.md` |
+| E24 | 2026-10-12 | Numbers are written as text in the v2 form (`0.75`), not as in v1 (`0.750000`). Refined by E32. | WI-38. | `work_items/phase3/README.md` |
+| E25 | 2026-10-12 | A type error while calculating (`"" + 1`) is caught and logged (`f1`); the result is the empty text, as in v1. | WI-38. | `work_items/phase3/README.md` |
+| E26 | 2026-10-12 | The engine evaluates the parameters of worker elements in advance, with one error per parameter; `ctx.EvalParams` throws at the first error that is not skipped. Inline elements evaluate on call. | WI-42. | `work_items/phase3/README.md` |
+| E27 | 2026-10-12 | The private flows and variables of the project owner are an extra test corpus, used only locally (`tests/golden/private/`, not checked in). | WI-36. | `work_items/phase3/README.md` |
+| E28 | 2026-10-12 | `Lang()` moves to `src/core/` in S1; variable files keep the pair format `.ahfvd`/`.ahfvar`; object variables are `Map` with `CaseSense := "Off"`; the working directory for `file`/`folder` parameters keeps the v1 default until S4. | WI-40 to WI-42. | `work_items/phase3/README.md` |
+| E29 | 2026-10-13 | `/` with two integers returns an integer when the division is exact (`4/2` = `2`), otherwise a float. An own rule of the language (AHK v2 gives `2.0`). | WI-38. | `work_items/phase3/README.md` |
+| E30 | 2026-10-13 | `<`, `>`, `<=`, `>=` follow AHK v2. A non-numeric text operand throws a `TypeError`, which by E25 gives `""` and a log; v1 compared such texts alphabetically. | WI-38, WI-39, MIGRATION. | `work_items/phase3/README.md` |
+| E31 | 2026-10-13 | `&&`/`\|\|` return the operand as in AHK v2, not `1`/`0` as in v1. | WI-38, MIGRATION. | `work_items/phase3/README.md` |
+| E32 | 2026-10-13 | Floats keep the AHK v2 text form without own formatting (`0.1+0.2` gives `0.30000000000000004`). A rounding option as an element parameter may come later. | WI-38. | `work_items/phase3/README.md` |
+| E33 | 2026-10-13 | The default data folder of v2 is `%APPDATA%\AutoHotFlow v2`, separate from the folder of the productive v1 (`%APPDATA%\AutoHotFlow`). Order: `--data`, `AHF_DATA_DIR`, default. | `Supervisor.DEFAULT_DATA_SUBDIR`. | `doc/MIGRATION.md` M-22 |
 
 ## Open
 
-| ID | Question | Status | Where it is tracked |
-|---|---|---|---|
-| E14 | What the real manager does when its window is closed (only close the window, minimise to tray, or end the application). | **Open.** Decided in phase 3. | `v2-phase2-final:work_items/HANDOVER.md`, "Offene Entscheidungen", item 1 |
-| Phase 3 approval | Phase 3 needs the explicit approval of the project owner, after the phase 3 plan has been drawn up together with Claude. | **Approved by the project owner on 2026-10-13.** The plan is `work_items/phase3/README.md`. | `work_items/phase3/README.md`; `v2-phase2-final:work_items/HANDOVER.md`, "Offene Entscheidungen", item 2 |
+None. Phase 3 is approved by the project owner (2026-10-13); the plan is `work_items/phase3/README.md`.
 
 Not E-numbered, but still waiting for the project owner: finding F-43 (see the findings table in `v2-phase2-final:work_items/STATUS.md`, and `HANDOVER.md`, "Offene Punkte"). The sources also recommend closing F-36. That is a finding, not a decision entry.
 
@@ -59,4 +72,4 @@ The Phase 0 and Phase 1 release by the project owner has nine items. The sources
 
 - E17 is worded differently in two places. `v2-phase2-final:work_items/phase2b/README.md` says the serial run and `-m stress` run "regelmäßig" (regularly). `v2-phase2-final:work_items/STATUS.md` and the test strategy give the rule above (end of each timing-relevant package and end of each block). This file uses the wording of the test strategy. Not checked: which wording the project owner meant.
 - E16 appears under the same ID in every source that mentions it. No other numbering was found.
-- `work_items/phase3/README.md` still says the plan is in `temp/phase3/` and will move after WI-34. The folder is `work_items/phase3/` now, and the fix block (WI-30 to WI-35) ran before phase 3. Stale text, not a decision.
+- E18 to E28 were decided on 2026-10-12 while the phase 3 plan was drafted, E29 to E33 on 2026-10-13 as answers to its open questions. Their wording is in `work_items/phase3/README.md`; this table gives a short form.
