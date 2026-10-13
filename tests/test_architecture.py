@@ -101,6 +101,19 @@ def test_include_rules_details():
     assert "include-core" not in rules("core/ipc/A.ahk", "#Include ..\\Log.ahk\n")
 
 
+def test_expr_library_rules():
+    # expr/ is a library: every role may include it, it includes only core/, and it has no dialogs and no file access
+    assert "include-roles" not in rules("engine/A.ahk", "#Include ..\\expr\\Expr.ahk\n")
+    assert "include-roles" not in rules("worker/A.ahk", "#Include ..\\expr\\Expr.ahk\n")
+    assert "include-core" in rules("core/A.ahk", "#Include ..\\expr\\Expr.ahk\n")
+    assert "include-roles" not in rules("expr/A.ahk", "#Include ..\\core\\Log.ahk\n#Include B.ahk\n")
+    assert "include-roles" in rules("expr/A.ahk", "#Include ..\\engine\\X.ahk\n")
+    assert "include-roles" in rules("expr/A.ahk", "#Include ..\\elements\\base\\X.ahk\n")
+    assert "dialog" in rules("expr/A.ahk", "class A {\n    M() {\n        MsgBox(\"x\")\n    }\n}\n")
+    assert "file-io" in rules("expr/A.ahk", "class A {\n    M() {\n        FileRead(\"x\")\n    }\n}\n")
+    assert "blocking" in rules("expr/A.ahk", "class A {\n    M() {\n        Sleep(100)\n    }\n}\n")
+
+
 def test_roles_may_do_what_the_table_allows():
     assert "dialog" not in rules("manager/A.ahk", "class A {\n    M() {\n        MsgBox(\"x\")\n    }\n}\n")
     assert "dialog" in rules("storage/A.ahk", "class A {\n    M() {\n        InputBox(\"x\")\n    }\n}\n")

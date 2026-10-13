@@ -335,6 +335,7 @@ AutoHotFlow/
 │  ├─ supervisor/  engine/  storage/  triggerhost/  worker/
 │  ├─ ui_common/            # Lang(), GUI helpers
 │  ├─ manager/  editor/     # editor/render/ = Renderer interface (D4)
+│  ├─ expr/                 # library: expression language (tokenizer, parser, syntax tree, parse cache), doc/AUSDRUECKE.md
 │  ├─ debugview/            # role debug (WI-28): DebugView.ahk, DebugGui.ahk
 │  └─ elements/
 │     ├─ base/              # AhfElement, Registry, Context
@@ -354,7 +355,7 @@ AutoHotFlow/
 - Each file under `src/` has at most one class (WI-29): `core/Errors.ahk` now includes only `ErrCode.ahk`, `AhfError.ahk`, `ProtocolError.ahk`, `AhfTimeoutError.ahk`, `ElementError.ahk`, `JsonError.ahk`; `PlaceholderRole` has `core/PlaceholderRole.ahk`; `engine/core/Loops.ahk` is called `LoopStack.ahk`.
 - `manager` is registered in the entry point, not in `core/RoleRegistry.ahk` (like `engine`, `storage`, `worker`), so that `core/` does not include any role folders.
 
-Rule: a folder under `src/` is a process role or library module. `core/` may not include anything from role folders. Role folders include only `core/`, `ui_common/` (UI roles only) and `elements/`, never each other.
+Rule: a folder under `src/` is a process role or library module. `core/` may not include anything from role folders. Role folders include only `core/`, `expr/` (library, includes only `core/`), `ui_common/` (UI roles only) and `elements/`, never each other.
 
 ---
 
