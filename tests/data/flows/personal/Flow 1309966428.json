@@ -1,0 +1,512 @@
+{
+  "allConnections": {
+    "connection0000000003": {
+      "ConnectionType": "normal",
+      "from": "element0000000001",
+      "ID": "connection0000000003",
+      "to": "element0000000002",
+      "type": "Connection"
+    },
+    "connection0000000004": {
+      "ConnectionType": "normal",
+      "from": "element0000000002",
+      "ID": "connection0000000004",
+      "to": "element0000000005",
+      "type": "Connection"
+    },
+    "connection0000000010": {
+      "ConnectionType": "Yes",
+      "from": "element0000000005",
+      "ID": "connection0000000010",
+      "to": "element0000000011",
+      "toPart": "HEAD",
+      "type": "Connection"
+    },
+    "connection0000000016": {
+      "ConnectionType": "Yes",
+      "from": "element0000000005",
+      "ID": "connection0000000016",
+      "to": "element0000000017",
+      "type": "Connection"
+    },
+    "connection0000000018": {
+      "ConnectionType": "normal",
+      "from": "element0000000011",
+      "fromPart": "HEAD",
+      "ID": "connection0000000018",
+      "to": "element0000000032",
+      "type": "Connection"
+    },
+    "connection0000000020": {
+      "ConnectionType": "No",
+      "from": "element0000000019",
+      "ID": "connection0000000020",
+      "to": "element0000000021",
+      "type": "Connection"
+    },
+    "connection0000000022": {
+      "ConnectionType": "normal",
+      "from": "element0000000021",
+      "ID": "connection0000000022",
+      "to": "element0000000011",
+      "toPart": "TAIL",
+      "type": "Connection"
+    },
+    "connection0000000023": {
+      "ConnectionType": "Yes",
+      "from": "element0000000019",
+      "ID": "connection0000000023",
+      "to": "element0000000011",
+      "toPart": "TAIL",
+      "type": "Connection"
+    },
+    "connection0000000030": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000030",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000031": {
+      "ConnectionType": "Yes",
+      "from": "element0000000032",
+      "ID": "connection0000000031",
+      "to": "element0000000019",
+      "type": "Connection"
+    },
+    "connection0000000033": {
+      "ConnectionType": "No",
+      "from": "element0000000032",
+      "ID": "connection0000000033",
+      "to": "element0000000021",
+      "type": "Connection"
+    },
+    "connection0000000035": {
+      "ConnectionType": "Exception",
+      "from": "element0000000021",
+      "ID": "connection0000000035",
+      "to": "element0000000034",
+      "type": "Connection"
+    },
+    "connection0000000045": {
+      "ConnectionType": "normal",
+      "from": "element0000000036",
+      "ID": "connection0000000045",
+      "to": "element0000000037",
+      "type": "Connection"
+    },
+    "connection0000000046": {
+      "ConnectionType": "normal",
+      "from": "element0000000037",
+      "ID": "connection0000000046",
+      "to": "element0000000038",
+      "type": "Connection"
+    },
+    "connection0000000047": {
+      "ConnectionType": "Yes",
+      "from": "element0000000038",
+      "ID": "connection0000000047",
+      "to": "element0000000039",
+      "toPart": "HEAD",
+      "type": "Connection"
+    },
+    "connection0000000048": {
+      "ConnectionType": "Yes",
+      "from": "element0000000038",
+      "ID": "connection0000000048",
+      "to": "element0000000040",
+      "type": "Connection"
+    },
+    "connection0000000049": {
+      "ConnectionType": "normal",
+      "from": "element0000000039",
+      "fromPart": "HEAD",
+      "ID": "connection0000000049",
+      "to": "element0000000043",
+      "type": "Connection"
+    },
+    "connection0000000050": {
+      "ConnectionType": "No",
+      "from": "element0000000041",
+      "ID": "connection0000000050",
+      "to": "element0000000042",
+      "type": "Connection"
+    },
+    "connection0000000051": {
+      "ConnectionType": "normal",
+      "from": "element0000000042",
+      "ID": "connection0000000051",
+      "to": "element0000000039",
+      "toPart": "TAIL",
+      "type": "Connection"
+    },
+    "connection0000000052": {
+      "ConnectionType": "Yes",
+      "from": "element0000000041",
+      "ID": "connection0000000052",
+      "to": "element0000000039",
+      "toPart": "TAIL",
+      "type": "Connection"
+    },
+    "connection0000000053": {
+      "ConnectionType": "Yes",
+      "from": "element0000000043",
+      "ID": "connection0000000053",
+      "to": "element0000000041",
+      "type": "Connection"
+    },
+    "connection0000000054": {
+      "ConnectionType": "No",
+      "from": "element0000000043",
+      "ID": "connection0000000054",
+      "to": "element0000000042",
+      "type": "Connection"
+    },
+    "connection0000000055": {
+      "ConnectionType": "Exception",
+      "from": "element0000000042",
+      "ID": "connection0000000055",
+      "to": "element0000000044",
+      "type": "Connection"
+    }
+  },
+  "allElements": {
+    "element0000000001": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "1",
+      "enabled": "0",
+      "ID": "element0000000001",
+      "name": "Manual - \"Trigger eager wall\"",
+      "package": "Default",
+      "packageVersion": "1.2.1",
+      "pars": {
+        "ID": "Trigger eager wall"
+      },
+      "StandardName": 1,
+      "type": "trigger",
+      "x": 0,
+      "y": 0
+    },
+    "element0000000002": {
+      "class": "action_Select_folder",
+      "ID": "element0000000002",
+      "name": "Select folder - selectedFolder - ",
+      "package": "Default",
+      "packageVersion": "1.2.1",
+      "pars": {
+        "AllowUpward": 1,
+        "ButtonNewFolder": 0,
+        "EditField": 0,
+        "folder": "",
+        "title": "Select a folder",
+        "Varname": "selectedFolder"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "0",
+      "y": "175"
+    },
+    "element0000000005": {
+      "class": "condition_File_Has_Attribute",
+      "ID": "element0000000005",
+      "name": "File has attribute - Directory - %selectedFolder%",
+      "package": "Default",
+      "packageVersion": "1.2.1",
+      "pars": {
+        "Attribute": "D",
+        "file": "%selectedFolder%"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "0",
+      "y": "315"
+    },
+    "element0000000011": {
+      "class": "loop_Loop_Through_Files",
+      "HeightOfVerticalBar": "595",
+      "ID": "element0000000011",
+      "name": "Loop through files - %selectedFolder%\\* - Operate on files - Recursive",
+      "package": "Default",
+      "packageVersion": "1.2.1",
+      "pars": {
+        "file": "%selectedFolder%\\*",
+        "OperateOnWhat": "Files",
+        "Recurse": "1"
+      },
+      "StandardName": "1",
+      "type": "Loop",
+      "x": "140",
+      "y": "700"
+    },
+    "element0000000017": {
+      "class": "action_New_List",
+      "ID": "element0000000017",
+      "name": "New list excludedFileTypes - As first value - Multiple values 'jpg,jpeg,mp3,mpeg,avi,ogg,lnk,png'",
+      "package": "Default",
+      "packageVersion": "1.2.1",
+      "pars": {
+        "DelimiterComma": "1",
+        "DelimiterLinefeed": "0",
+        "DelimiterSemicolon": 0,
+        "DelimiterSpace": 0,
+        "expression": "String",
+        "expressionPos": "String",
+        "NumberOfElements": "Multiple",
+        "Position": "keyName",
+        "Varname": "excludedFileTypes",
+        "VarValue": "New element",
+        "VarValues": "jpg,jpeg,mp3,mpeg,avi,ogg,lnk,png",
+        "WhichPosition": "First"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "280",
+      "y": "385"
+    },
+    "element0000000019": {
+      "class": "condition_List_Contains_Element",
+      "ID": "element0000000019",
+      "name": "List contains element - Value '1' in list 'excludedFileTypes'",
+      "package": "Default",
+      "packageVersion": "1.2.1",
+      "pars": {
+        "InputList": "excludedFileTypes",
+        "isExpressionPosition": "String",
+        "isExpressionSearchContent": "String",
+        "Position": 1,
+        "SearchContent": "%a_loopfileext%",
+        "SearchWhat": "Content"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "280",
+      "y": "1015"
+    },
+    "element0000000021": {
+      "class": "action_Message_Box",
+      "ID": "element0000000021",
+      "name": "Message box - Title - %a_loopfilename%",
+      "package": "Default",
+      "packageVersion": "1.2.1",
+      "pars": {
+        "ButtonLabel": "OK",
+        "ButtonLabelCancel": "Cancel",
+        "Height": 200,
+        "IfClose": "Exception",
+        "IfDismiss": "Exception",
+        "IsTimeout": "NoTimeout",
+        "message": "%a_loopfilename%",
+        "OnTimeout": "Normal",
+        "ShowCancelButton": 0,
+        "TimeoutUnits": 10,
+        "title": "Title",
+        "Unit": "Seconds",
+        "Width": 300
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "455",
+      "y": "1015"
+    },
+    "element0000000032": {
+      "class": "condition_Expression",
+      "ID": "element0000000032",
+      "name": "Expression - a_loopfiletype != \"\"",
+      "package": "Default",
+      "packageVersion": "1.2.1",
+      "pars": {
+        "Expression": "a_loopfiletype != \"\""
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "280",
+      "y": "805"
+    },
+    "element0000000034": {
+      "class": "condition_Debug_dialog",
+      "ID": "element0000000034",
+      "name": "Debug dialog",
+      "package": "Default",
+      "packageVersion": "1.2.1",
+      "pars": {},
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "665",
+      "y": "1225"
+    },
+    "element0000000036": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "0",
+      "enabled": "0",
+      "ID": "element0000000036",
+      "name": "Manual - \"Nur bestimmte Dateitypen\"",
+      "package": "Default",
+      "packageVersion": "1.2.1",
+      "pars": {
+        "ID": "Nur bestimmte Dateitypen"
+      },
+      "StandardName": "1",
+      "type": "trigger",
+      "x": "1225",
+      "y": "70"
+    },
+    "element0000000037": {
+      "class": "action_Select_folder",
+      "ID": "element0000000037",
+      "name": "Select folder - selectedFolder - ",
+      "package": "Default",
+      "packageVersion": "1.2.1",
+      "pars": {
+        "AllowUpward": 1,
+        "ButtonNewFolder": 0,
+        "EditField": 0,
+        "folder": "",
+        "title": "Select a folder",
+        "Varname": "selectedFolder"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "1225",
+      "y": "245"
+    },
+    "element0000000038": {
+      "class": "condition_File_Has_Attribute",
+      "ID": "element0000000038",
+      "name": "File has attribute - Directory - %selectedFolder%",
+      "package": "Default",
+      "packageVersion": "1.2.1",
+      "pars": {
+        "Attribute": "D",
+        "file": "%selectedFolder%"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "1225",
+      "y": "385"
+    },
+    "element0000000039": {
+      "class": "loop_Loop_Through_Files",
+      "HeightOfVerticalBar": "595",
+      "ID": "element0000000039",
+      "name": "Loop through files - %selectedFolder%\\* - Operate on files - Recursive",
+      "package": "Default",
+      "packageVersion": "1.2.1",
+      "pars": {
+        "file": "%selectedFolder%\\*",
+        "OperateOnWhat": "Files",
+        "Recurse": "1"
+      },
+      "StandardName": "1",
+      "type": "Loop",
+      "x": "1365",
+      "y": "770"
+    },
+    "element0000000040": {
+      "class": "action_New_List",
+      "ID": "element0000000040",
+      "name": "New list excludedFileTypes - As first value - Multiple values 'jpg,jpeg,mp3,mpeg,avi,ogg,lnk,png'",
+      "package": "Default",
+      "packageVersion": "1.2.1",
+      "pars": {
+        "DelimiterComma": "1",
+        "DelimiterLinefeed": "0",
+        "DelimiterSemicolon": 0,
+        "DelimiterSpace": 0,
+        "expression": "String",
+        "expressionPos": "String",
+        "NumberOfElements": "Multiple",
+        "Position": "keyName",
+        "Varname": "excludedFileTypes",
+        "VarValue": "New element",
+        "VarValues": "jpg,jpeg,mp3,mpeg,avi,ogg,lnk,png",
+        "WhichPosition": "First"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "1505",
+      "y": "455"
+    },
+    "element0000000041": {
+      "class": "condition_List_Contains_Element",
+      "ID": "element0000000041",
+      "name": "List contains element - Value '1' in list 'excludedFileTypes'",
+      "package": "Default",
+      "packageVersion": "1.2.1",
+      "pars": {
+        "InputList": "excludedFileTypes",
+        "isExpressionPosition": "String",
+        "isExpressionSearchContent": "String",
+        "Position": 1,
+        "SearchContent": "%a_loopfileext%",
+        "SearchWhat": "Content"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "1505",
+      "y": "1085"
+    },
+    "element0000000042": {
+      "class": "action_Message_Box",
+      "ID": "element0000000042",
+      "name": "Message box - Title - %a_loopfilename%",
+      "package": "Default",
+      "packageVersion": "1.2.1",
+      "pars": {
+        "ButtonLabel": "OK",
+        "ButtonLabelCancel": "Cancel",
+        "Height": 200,
+        "IfClose": "Exception",
+        "IfDismiss": "Exception",
+        "IsTimeout": "NoTimeout",
+        "message": "%a_loopfilename%",
+        "OnTimeout": "Normal",
+        "ShowCancelButton": 0,
+        "TimeoutUnits": 10,
+        "title": "Title",
+        "Unit": "Seconds",
+        "Width": 300
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "1680",
+      "y": "1085"
+    },
+    "element0000000043": {
+      "class": "condition_Expression",
+      "ID": "element0000000043",
+      "name": "Expression - a_loopfiletype != \"\"",
+      "package": "Default",
+      "packageVersion": "1.2.1",
+      "pars": {
+        "Expression": "a_loopfiletype != \"\""
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "1505",
+      "y": "875"
+    },
+    "element0000000044": {
+      "class": "condition_Debug_dialog",
+      "ID": "element0000000044",
+      "name": "Debug dialog",
+      "package": "Default",
+      "packageVersion": "1.2.1",
+      "pars": {},
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "1890",
+      "y": "1295"
+    }
+  },
+  "category": "Dateien",
+  "ElementIDCounter": "55",
+  "flowSettings": {
+    "DefaultWorkingDir": 1,
+    "ExecutionPolicy": "default",
+    "Offsetx": "-220.000000",
+    "Offsety": "110.000000",
+    "WorkingDir": "",
+    "zoomFactor": "0.7"
+  },
+  "name": "SmartCompress"
+}

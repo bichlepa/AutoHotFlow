@@ -1,0 +1,180 @@
+{
+  "allConnections": {
+    "connection0000000008": {
+      "ConnectionType": "normal",
+      "from": "element0000000002",
+      "ID": "connection0000000008",
+      "to": "element0000000009",
+      "type": "Connection"
+    },
+    "connection0000000010": {
+      "ConnectionType": "Yes",
+      "from": "element0000000009",
+      "ID": "connection0000000010",
+      "to": "element0000000011",
+      "type": "Connection"
+    },
+    "connection0000000012": {
+      "ConnectionType": "normal",
+      "from": "element0000000011",
+      "ID": "connection0000000012",
+      "to": "element0000000013",
+      "type": "Connection"
+    },
+    "connection0000000015": {
+      "ConnectionType": "normal",
+      "from": "element0000000014",
+      "ID": "connection0000000015",
+      "to": "element0000000002",
+      "type": "Connection"
+    },
+    "connection0000000016": {
+      "ConnectionType": "normal",
+      "from": "element0000000001",
+      "ID": "connection0000000016",
+      "to": "element0000000002",
+      "type": "Connection"
+    },
+    "connection0000000018": {
+      "ConnectionType": "Exception",
+      "from": "element0000000002",
+      "ID": "connection0000000018",
+      "to": "element0000000017",
+      "type": "Connection"
+    }
+  },
+  "allElements": {
+    "element0000000001": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "1",
+      "enabled": "0",
+      "ID": "element0000000001",
+      "name": "Manual - \"Trigger early joke\"",
+      "package": "Default",
+      "packageVersion": "1.2.1",
+      "pars": {
+        "ID": "Trigger early joke"
+      },
+      "StandardName": 1,
+      "type": "trigger",
+      "x": 0,
+      "y": 0
+    },
+    "element0000000002": {
+      "class": "action_Input_Box",
+      "ID": "element0000000002",
+      "name": "Input box: Zeit - Ausschalten nach Zeit - In wieviel Minuten ausschalten?",
+      "package": "Default",
+      "packageVersion": "1.2.1",
+      "pars": {
+        "ButtonLabel": "OK",
+        "ButtonLabelCancel": "Cancel",
+        "defaultText": "10",
+        "Height": 250,
+        "IfClose": "Exception",
+        "IfDismiss": "Exception",
+        "IsTimeout": "NoTimeout",
+        "MaskUserInput": 0,
+        "message": "In wieviel Minuten ausschalten?",
+        "MultilineEdit": 0,
+        "MultilineEditRows": 4,
+        "OnlyNumbers": "0",
+        "OnTimeout": "Normal",
+        "ShowCancelButton": 0,
+        "TimeoutUnits": 10,
+        "title": "Ausschalten nach Zeit",
+        "Unit": "Seconds",
+        "Varname": "Zeit",
+        "Width": 300
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "70",
+      "y": "245"
+    },
+    "element0000000009": {
+      "class": "condition_Variable_content_is",
+      "ID": "element0000000009",
+      "name": "Variable content is Number - zeit",
+      "package": "Default",
+      "packageVersion": "1.2.1",
+      "pars": {
+        "variableContentType": "number",
+        "varname": "zeit",
+        "varnameContent": "VariableName"
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "105",
+      "y": "490"
+    },
+    "element0000000011": {
+      "class": "action_Sleep",
+      "ID": "element0000000011",
+      "name": "Sleep: zeit m",
+      "package": "Default",
+      "packageVersion": "1.2.1",
+      "pars": {
+        "Duration": "zeit",
+        "Unit": "Minutes"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "105",
+      "y": "700"
+    },
+    "element0000000013": {
+      "class": "action_Suspend_Computer",
+      "ID": "element0000000013",
+      "name": "Suspend computer",
+      "package": "Default",
+      "packageVersion": "1.2.1",
+      "pars": {},
+      "StandardName": "1",
+      "type": "Action",
+      "x": "105",
+      "y": "875"
+    },
+    "element0000000014": {
+      "class": "trigger_Shortcut",
+      "enabled": "1",
+      "ID": "element0000000014",
+      "name": "Shortcut - %A_Desktop%\\Flow Ausschalten nach Zeit.lnk",
+      "package": "Default",
+      "packageVersion": "1.2.1",
+      "pars": {
+        "RemoveShortcutOnDisabling": 1,
+        "ShortCutPath": "%A_Desktop%\\Flow Ausschalten nach Zeit.lnk"
+      },
+      "StandardName": "1",
+      "type": "Trigger",
+      "x": "210",
+      "y": "-35"
+    },
+    "element0000000017": {
+      "class": "action_Do_nothing",
+      "ID": "element0000000017",
+      "name": "Do nothing",
+      "package": "Default",
+      "packageVersion": "1.2.1",
+      "pars": {
+        "executionResult": "Normal"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "490",
+      "y": "420"
+    }
+  },
+  "category": "Zeit",
+  "ElementIDCounter": "18",
+  "flowSettings": {
+    "DefaultWorkingDir": 1,
+    "ExecutionPolicy": "default",
+    "Offsetx": "-171.428571",
+    "Offsety": "-292.857143",
+    "WorkingDir": "",
+    "zoomFactor": "0.7"
+  },
+  "name": "Ausschalten nach Zeit"
+}

@@ -1,0 +1,75 @@
+{
+  "allConnections": {
+    "connection0000000003": {
+      "ConnectionType": "normal",
+      "from": "element0000000001",
+      "ID": "connection0000000003",
+      "to": "element0000000004",
+      "type": "Connection"
+    },
+    "connection0000000008": {
+      "ConnectionType": "normal",
+      "from": "element0000000004",
+      "ID": "connection0000000008",
+      "to": "element0000000007",
+      "type": "Connection"
+    }
+  },
+  "allElements": {
+    "element0000000001": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "1",
+      "enabled": "0",
+      "ID": "element0000000001",
+      "name": "Manual - \"Trigger floating message\"",
+      "package": "Default",
+      "packageVersion": "1.2.1",
+      "pars": {
+        "ID": "Trigger floating message"
+      },
+      "StandardName": 1,
+      "type": "trigger",
+      "x": 0,
+      "y": 0
+    },
+    "element0000000004": {
+      "class": "action_Encode_string",
+      "ID": "element0000000004",
+      "name": "Encode string - EncodedString - asdf aweg - URL",
+      "package": "Default",
+      "packageVersion": "1.2.1",
+      "pars": {
+        "outputEncodingFormat": "URL",
+        "Varname": "EncodedString",
+        "VarValue": "asdf aweg"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "245",
+      "y": "245"
+    },
+    "element0000000007": {
+      "class": "condition_Debug_dialog",
+      "ID": "element0000000007",
+      "name": "Debug dialog",
+      "package": "Default",
+      "packageVersion": "1.2.1",
+      "pars": {},
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "385",
+      "y": "420"
+    }
+  },
+  "category": "",
+  "ElementIDCounter": "9",
+  "flowSettings": {
+    "DefaultWorkingDir": 1,
+    "ExecutionPolicy": "default",
+    "Offsetx": -200,
+    "Offsety": -200,
+    "WorkingDir": "",
+    "zoomFactor": "0.7"
+  },
+  "name": "New flow 1"
+}

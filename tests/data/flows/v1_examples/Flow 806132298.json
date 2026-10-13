@@ -1,0 +1,370 @@
+{
+  "allConnections": {
+    "connection0000000005": {
+      "ConnectionType": "normal",
+      "from": "element0000000002",
+      "ID": "connection0000000005",
+      "to": "element0000000032",
+      "type": "Connection"
+    },
+    "connection0000000007": {
+      "ConnectionType": "normal",
+      "from": "element0000000001",
+      "ID": "connection0000000007",
+      "to": "element0000000002",
+      "type": "Connection"
+    },
+    "connection0000000008": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000008",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000011": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000011",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000019": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000019",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000023": {
+      "ConnectionType": "normal",
+      "from": "element0000000006",
+      "ID": "connection0000000023",
+      "to": "element0000000024",
+      "type": "Connection"
+    },
+    "connection0000000028": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000028",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000029": {
+      "ConnectionType": "normal",
+      "from": "element0000000030",
+      "ID": "connection0000000029",
+      "to": "element0000000006",
+      "type": "Connection"
+    },
+    "connection0000000034": {
+      "ConnectionType": "Yes",
+      "from": "element0000000032",
+      "ID": "connection0000000034",
+      "to": "element0000000035",
+      "type": "Connection"
+    },
+    "connection0000000036": {
+      "ConnectionType": "normal",
+      "from": "element0000000035",
+      "ID": "connection0000000036",
+      "to": "element0000000046",
+      "type": "Connection"
+    },
+    "connection0000000047": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000047",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000048": {
+      "ConnectionType": "Yes",
+      "from": "element0000000046",
+      "ID": "connection0000000048",
+      "to": "element0000000030",
+      "type": "Connection"
+    }
+  },
+  "allElements": {
+    "element0000000001": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "1",
+      "enabled": "0",
+      "ID": "element0000000001",
+      "name": "Manual - \"Trigger joke teller\"",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "ID": "Trigger joke teller"
+      },
+      "StandardName": "1",
+      "type": "trigger",
+      "x": "280",
+      "y": "35"
+    },
+    "element0000000002": {
+      "class": "Action_HTTP_Request",
+      "ID": "element0000000002",
+      "name": "HTTP request - https:\/\/icanhazdadjoke.com\/",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "BypassProxy": "",
+        "Codepage": "",
+        "ContentLength": "",
+        "ContentMD5": "",
+        "Contenttype": "",
+        "Flags": "",
+        "InputFile": "",
+        "IsExpression": "String",
+        "Method": "GET",
+        "OutputFile": "HTTPResponseData.html",
+        "PostData": "",
+        "Proxy": "",
+        "RequestHeaders": "",
+        "ResponseDataVar": "HTTPResponseData",
+        "ResponseHeadersVar": "HTTPResponseHeaders",
+        "URIEncodePostData": 0,
+        "URL": "https:\/\/icanhazdadjoke.com\/",
+        "UserAgent": "",
+        "WhereToGetPostData": "NoUpload",
+        "WhereToPutResponseData": "Variable",
+        "WhetherBypassProxy": 0,
+        "WhichCodepage": "utf-8",
+        "WhichContentLength": "automatic",
+        "WhichContentMD5": "automatic",
+        "WhichContentType": "automatic",
+        "WhichMethod": "automatic",
+        "WhichProxy": "none",
+        "WhichUserAgent": "automatic"
+      },
+      "StandardName": "1",
+      "type": "action",
+      "x": "280",
+      "y": "210"
+    },
+    "element0000000006": {
+      "class": "Action_Tooltip",
+      "ID": "element0000000006",
+      "name": "Tooltip: %joke% - 10 s - Follow mouse",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "duration": "10",
+        "follow_mouse": 1,
+        "text": "%joke%",
+        "Unit": "Seconds"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "280",
+      "y": "1050"
+    },
+    "element0000000024": {
+      "class": "Action_Speech_output",
+      "ID": "element0000000024",
+      "name": "Speech output -  - Microsoft Zira Desktop",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "pitch": 0,
+        "speed": 0,
+        "text": "%joke%",
+        "TTSEngine": "Microsoft Zira Desktop",
+        "volume": 100,
+        "WaitUntilCurrentFinishes": 1,
+        "WaitUntilPreviousFinished": 0
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "280",
+      "y": "1190"
+    },
+    "element0000000030": {
+      "class": "Action_replace_in_a_string",
+      "ID": "element0000000030",
+      "name": "Replace in a string - joke - joke - <\/br> -  ",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "CaseSensitive": "CaseInsensitive",
+        "expression": "Expression",
+        "ReplaceAll": "all",
+        "ReplaceText": " ",
+        "SearchText": "<\/br>",
+        "Varname": "joke",
+        "VarValue": "joke"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "280",
+      "y": "910"
+    },
+    "element0000000032": {
+      "class": "condition_Expression",
+      "ID": "element0000000032",
+      "name": "Expression - HTTPResponseData != \"\"",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "Expression": "HTTPResponseData != \"\""
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "280",
+      "y": "385"
+    },
+    "element0000000035": {
+      "class": "action_Substring2",
+      "ID": "element0000000035",
+      "name": "Substring2 - joke - HTTPResponseData",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "EndPos": 5,
+        "EndTextCaseSensitive": 0,
+        "EndTextExcluding": "<\/p>",
+        "EndTextIncluding": "",
+        "expression": "Expression",
+        "expressionEnd": "String",
+        "expressionStart": "String",
+        "Length": 5,
+        "StartPos": 1,
+        "StartTextCaseSensitive": 0,
+        "StartTextExcluding": "<p class=\"subtitle\">",
+        "StartTextIncluding": "",
+        "Varname": "joke",
+        "VarValue": "HTTPResponseData",
+        "WhereToBegin": "String",
+        "WhereToEnd": "String"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "280",
+      "y": "595"
+    },
+    "element0000000040": {
+      "class": "action_Do_nothing",
+      "ID": "element0000000040",
+      "name": "Download a website which contains a joke",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "executionResult": "Normal"
+      },
+      "StandardName": "0",
+      "type": "action",
+      "x": "525",
+      "y": "210"
+    },
+    "element0000000041": {
+      "class": "action_Do_nothing",
+      "ID": "element0000000041",
+      "name": "Extract the joke from the website content",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "executionResult": "Normal"
+      },
+      "StandardName": "0",
+      "type": "action",
+      "x": "525",
+      "y": "595"
+    },
+    "element0000000042": {
+      "class": "action_Do_nothing",
+      "ID": "element0000000042",
+      "name": "Replace occurences of \"<br>\" with spaces",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "executionResult": "Normal"
+      },
+      "StandardName": "0",
+      "type": "action",
+      "x": "525",
+      "y": "910"
+    },
+    "element0000000043": {
+      "class": "action_Do_nothing",
+      "ID": "element0000000043",
+      "name": "Show tooltip with the joke",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "executionResult": "Normal"
+      },
+      "StandardName": "0",
+      "type": "action",
+      "x": "525",
+      "y": "1050"
+    },
+    "element0000000044": {
+      "class": "action_Do_nothing",
+      "ID": "element0000000044",
+      "name": "Do speech output with the joke",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "executionResult": "Normal"
+      },
+      "StandardName": "0",
+      "type": "action",
+      "x": "525",
+      "y": "1190"
+    },
+    "element0000000045": {
+      "class": "action_Do_nothing",
+      "ID": "element0000000045",
+      "name": "Check whether download was successful",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "executionResult": "Normal"
+      },
+      "StandardName": "0",
+      "type": "action",
+      "x": "525",
+      "y": "385"
+    },
+    "element0000000046": {
+      "class": "condition_Expression",
+      "ID": "element0000000046",
+      "name": "Expression - joke != \"\"",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "Expression": "joke != \"\""
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "280",
+      "y": "735"
+    },
+    "element0000000049": {
+      "class": "action_Do_nothing",
+      "ID": "element0000000049",
+      "name": "Check whether joke could be extracted",
+      "package": "Default",
+      "packageVersion": "1.2.0",
+      "pars": {
+        "executionResult": "Normal"
+      },
+      "StandardName": "0",
+      "type": "action",
+      "x": "525",
+      "y": "735"
+    }
+  },
+  "category": "",
+  "ElementIDCounter": "49",
+  "flowSettings": {
+    "DefaultWorkingDir": 1,
+    "ExecutionPolicy": "default",
+    "Offsetx": "-687.142857",
+    "Offsety": "-328.571429",
+    "WorkingDir": "",
+    "zoomFactor": "0.7"
+  },
+  "name": "Joke teller"
+}

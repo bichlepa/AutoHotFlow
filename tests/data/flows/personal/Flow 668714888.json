@@ -1,0 +1,197 @@
+﻿{
+  "allConnections": {
+    "connection0000000004": {
+      "ConnectionType": "normal",
+      "from": "element0000000003",
+      "ID": "connection0000000004",
+      "to": "element0000000016",
+      "type": "Connection"
+    },
+    "connection0000000006": {
+      "ConnectionType": "normal",
+      "from": "element0000000005",
+      "ID": "connection0000000006",
+      "to": "element0000000007",
+      "type": "Connection"
+    },
+    "connection0000000008": {
+      "ConnectionType": "normal",
+      "from": "element0000000007",
+      "ID": "connection0000000008",
+      "to": "element0000000009",
+      "type": "Connection"
+    },
+    "connection0000000012": {
+      "ConnectionType": "normal",
+      "from": "element0000000009",
+      "ID": "connection0000000012",
+      "to": "element0000000011",
+      "type": "Connection"
+    },
+    "connection0000000013": {
+      "ConnectionType": "normal",
+      "from": "element0000000011",
+      "ID": "connection0000000013",
+      "to": "element0000000010",
+      "type": "Connection"
+    },
+    "connection0000000014": {
+      "ConnectionType": "normal",
+      "from": "",
+      "ID": "connection0000000014",
+      "to": "",
+      "type": "Connection"
+    },
+    "connection0000000015": {
+      "ConnectionType": "Yes",
+      "from": "element0000000016",
+      "ID": "connection0000000015",
+      "to": "element0000000005",
+      "type": "Connection"
+    }
+  },
+  "allElements": {
+    "element0000000001": {
+      "class": "Trigger_Manual",
+      "DefaultTrigger": "1",
+      "enabled": "0",
+      "ID": "element0000000001",
+      "name": "Manuell - \"Trigger friendly night\"",
+      "package": "default",
+      "pars": {
+        "ID": "Trigger friendly night"
+      },
+      "StandardName": 1,
+      "type": "trigger",
+      "x": 0,
+      "y": 0
+    },
+    "element0000000003": {
+      "class": "Trigger_Clipboard_Changes",
+      "enabled": "0",
+      "ID": "element0000000003",
+      "name": "Zwischenablage \u00E4ndert sich",
+      "package": "default",
+      "pars": {},
+      "StandardName": "1",
+      "type": "Trigger",
+      "x": "420",
+      "y": "70"
+    },
+    "element0000000005": {
+      "class": "Action_Get_Clipboard",
+      "ID": "element0000000005",
+      "name": "Zwischenablage lesen - clipboard",
+      "package": "default",
+      "pars": {
+        "Varname": "clipboard"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "455",
+      "y": "350"
+    },
+    "element0000000007": {
+      "class": "Action_Trim_a_string",
+      "ID": "element0000000007",
+      "name": "Einen String k\u00FCrzen - clipboard - clipboard - Zeichen '%a_space%%a_tab%%a_lf%%a_cr%' aus Beide Seiten entfernen",
+      "package": "default",
+      "pars": {
+        "expression": "Expression",
+        "LeftSide": 1,
+        "Length": 6,
+        "OmitChars": "%a_space%%a_tab%%a_lf%%a_cr%",
+        "RightSide": "1",
+        "TrimWhat": "Specified",
+        "Varname": "clipboard",
+        "VarValue": "clipboard"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "455",
+      "y": "525"
+    },
+    "element0000000009": {
+      "class": "Action_Set_Flow_Status",
+      "ID": "element0000000009",
+      "name": "Flow-Status einstellen - Deaktivieren: Dieser Flow - Alle Trigger",
+      "package": "default",
+      "pars": {
+        "Enable": "Disable",
+        "flowID": "",
+        "ThisFlow": 1,
+        "triggerID": "",
+        "WhichTrigger": "Any"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "455",
+      "y": "735"
+    },
+    "element0000000010": {
+      "class": "Action_Set_Flow_Status",
+      "ID": "element0000000010",
+      "name": "Flow-Status einstellen - Aktivieren: Dieser Flow - Alle Trigger",
+      "package": "default",
+      "pars": {
+        "Enable": "Enable",
+        "flowID": "",
+        "ThisFlow": 1,
+        "triggerID": "",
+        "WhichTrigger": "Any"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "455",
+      "y": "1050"
+    },
+    "element0000000011": {
+      "class": "Action_Set_Clipboard",
+      "ID": "element0000000011",
+      "name": "In Zwischenablage schreiben - clipboard",
+      "package": "default",
+      "pars": {
+        "expression": "expression",
+        "text": "clipboard"
+      },
+      "StandardName": "1",
+      "type": "Action",
+      "x": "455",
+      "y": "875"
+    },
+    "element0000000016": {
+      "class": "Condition_Window_Active",
+      "ID": "element0000000016",
+      "name": "Fenster ist aktiv:  - Prozess: chrome.exe",
+      "package": "default",
+      "pars": {
+        "ahk_class": "",
+        "ahk_exe": "chrome.exe",
+        "ahk_id": "",
+        "ahk_pid": "",
+        "ExcludeText": "",
+        "excludeTitle": "",
+        "FindHiddenText": 0,
+        "FindHiddenWindow": 0,
+        "TitleMatchMode": "2",
+        "winText": "",
+        "Wintitle": ""
+      },
+      "StandardName": "1",
+      "type": "Condition",
+      "x": "455",
+      "y": "210"
+    }
+  },
+  "category": "Clipboard",
+  "ElementIDCounter": "16",
+  "flowSettings": {
+    "DefaultWorkingDir": 1,
+    "ExecutionPolicy": "default",
+    "Offsetx": -200,
+    "Offsety": -200,
+    "WorkingDir": "",
+    "zoomFactor": "0.7"
+  },
+  "name": "Whitespaces entfernen"
+}

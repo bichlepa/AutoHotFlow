@@ -15,3 +15,7 @@
 *.PDF	 diff=astextplain
 *.rtf	 diff=astextplain
 *.RTF	 diff=astextplain
+
+# Test data is compared byte for byte (BOM, CRLF as written by AHF v1): no line-ending conversion
+tests/data/flows/**/*.json -text
+tests/data/variables/** -text
