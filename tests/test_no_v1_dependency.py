@@ -15,7 +15,8 @@ V1_PATH = re.compile(r'''(?:^|[\s"'\\/(=])v1[\\/]|["']v1["']\s*/''')
 
 SCANNED = [("src", "*.ahk"), ("tests", "*.py"), ("tests", "*.ahk"), ("tools", "*.py"), ("tools", "*.ahk")]
 EXEMPT_PREFIXES = ("tests/golden/",)
-EXEMPT_FILES = {"tests/test_no_v1_dependency.py"}
+# the two tools of the golden data read v1 on purpose (WI-36); their results are checked in
+EXEMPT_FILES = {"tests/test_no_v1_dependency.py", "tools/golden_v1.py", "tools/golden_corpus.py"}
 
 
 def is_comment(line):

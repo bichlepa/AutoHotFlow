@@ -1,7 +1,11 @@
 """Runs an AutoHotkey v2 script headless and never hangs on error dialogs.
 
 Usage:
-    python tools/ahkrun.py [--timeout SECONDS] script.ahk [script args...]
+    python tools/ahkrun.py [--timeout SECONDS] [--interpreter EXE] script.ahk [script args...]
+
+--interpreter runs the script with another interpreter (the v1 interpreter of the v1 folder, for the
+golden data, see tools/golden_v1.py). Dialog guard and timeout work the same; only /ErrorStdOut without the
+encoding suffix is passed to it, because that interpreter does not know /ErrorStdOut=UTF-8.
 
 What it does for the caller (humans and agents):
   * passes /ErrorStdOut=UTF-8, so load-time errors (syntax errors, class conflicts, ...)
@@ -27,16 +31,28 @@ from ahf_dialogwatch import shared_watcher  # noqa: E402
 from ahk import find_ahk_exe  # noqa: E402
 
 CREATE_NO_WINDOW = 0x08000000
+ERROR_OPTION_CUSTOM = "/ErrorStdOut"   # for --interpreter; see HOW-TO (AutoHotkey_H 1.1.32)
 
 
-def run(script, args=(), timeout=60.0, cwd=None):
-    """Returns (returncode, stdout, stderr, dialogs). returncode 97/98 as documented above."""
-    exe, reason = find_ahk_exe()
+def run(script, args=(), timeout=60.0, cwd=None, interpreter=None, error_option=None):
+    """Returns (returncode, stdout, stderr, dialogs). returncode 97/98 as documented above.
+
+    interpreter: path of another interpreter (the v1 interpreter for the golden data), instead of
+    the AutoHotkey v2 one. error_option: the /ErrorStdOut switch to pass; the default is
+    /ErrorStdOut=UTF-8 for the v2 interpreter and ERROR_OPTION_CUSTOM for any other one.
+    """
+    if interpreter:
+        exe, reason = (os.path.abspath(interpreter), None) if os.path.isfile(interpreter) \
+            else (None, "interpreter not found: %s" % interpreter)
+        error_option = error_option or ERROR_OPTION_CUSTOM
+    else:
+        exe, reason = find_ahk_exe()
+        error_option = error_option or "/ErrorStdOut=UTF-8"
     if not exe:
         return 99, "", reason, []
     script = os.path.abspath(script)
     watcher = shared_watcher()
-    proc = subprocess.Popen([exe, "/ErrorStdOut=UTF-8", script, *map(str, args)],
+    proc = subprocess.Popen([exe, error_option, script, *map(str, args)],
                             stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.DEVNULL,
                             cwd=cwd or os.path.dirname(os.path.abspath(script)),
                             creationflags=CREATE_NO_WINDOW)
@@ -62,13 +78,20 @@ def run(script, args=(), timeout=60.0, cwd=None):
 
 def main(argv):
     timeout = 60.0
-    if argv and argv[0] == "--timeout":
-        timeout = float(argv[1])
+    interpreter = None
+    while argv and argv[0] in ("--timeout", "--interpreter"):
+        if len(argv) < 2:
+            print(__doc__)
+            return 2
+        if argv[0] == "--timeout":
+            timeout = float(argv[1])
+        else:
+            interpreter = argv[1]
         argv = argv[2:]
     if not argv:
         print(__doc__)
         return 2
-    code, out, err, dialogs = run(argv[0], argv[1:], timeout)
+    code, out, err, dialogs = run(argv[0], argv[1:], timeout, interpreter=interpreter)
     if out:
         sys.stdout.write(out)
     if err:
