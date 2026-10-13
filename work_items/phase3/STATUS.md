@@ -21,6 +21,18 @@ Open questions of `work_items/phase3/README.md`: all answered by the project own
 
 Owner's commits on `v2-port` (not made by an agent): `bdae120` (ORCHESTRATOR rule 4: owner's local work), `d423cb9` (answers E29 to E32, WI-37/38/39/41 text), `9eb84e0` (E33: default data folder `%APPDATA%\AutoHotFlow v2`, touches `src/supervisor/`, so the foundation tier must run on it).
 
+## Last verified state
+
+Verified by the verifier (run IDs above): commit `9eb84e0`. Tree hashes (`git rev-parse <commit>:src <commit>:tests <commit>:tools`):
+
+| Path | Tree hash |
+|---|---|
+| `src` | `5667d6cb828be4a025adea13a70e2789e7f8bbd7` |
+| `tests` | `54f2656b04cd2993065e4e27201874b2f50e113a` |
+| `tools` | `a7f04da87a3129d9ba332b78d439c92195492d92` |
+
+Later commits on `v2-port` that did not change these trees (verification skipped, nothing source-related changed): `924205b`, `eda1d3f` (both status book or docs only; `eda1d3f` changes `doc/ORCHESTRATOR.md`). The verifier rule in `doc/ORCHESTRATOR.md` section 3d applies from now on.
+
 ## Agents
 
 | Slot | Role | Model | Workspace | Branch | Task | State |
