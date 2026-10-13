@@ -37,7 +37,7 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 | F-50* | `storage` not ready within 45 s after a freeze in the hang test | observed once under load, open | |
 | F-51* | Log line lost while other processes hold the files (`readers-allow-read`) | observed once at `-n 12`, open (stall hypothesis fixed in 2675105, not proven) | |
 | F-72* | A second start is silent (forwarded to a running supervisor) | observed by manual check, open, decision needed (feedback) | |
-| F-73* | Closing the windows does not end the application | observed by manual check, open (related to E14) | |
+| F-73* | Closing the debug window is reported as a crash; the supervisor stays up | observed by manual check, open (manager part decided by E14) | |
 | F-74* | Manual-check guide and start tasks do not match | verified, open (owner's agent) | |
 
 * provisional IDs, assigned by the agent on 2026-10-13; the project owner assigns the final ones.
@@ -263,12 +263,12 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 **Action:** Decide the user-visible feedback (for example a message that an instance is already running, or show the existing window). Not decided.
 **Evidence:** diagnosis run on the owner's machine (read only); the supervisor log of `%APPDATA%\AutoHotFlow v2`.
 
-### F-73*: Closing the windows does not end the application
+### F-73*: Closing the debug window is reported as a crash, and the supervisor stays up
 
-**What:** After the manager and the debug window were closed (2 s after start, no quit command sent), the supervisor kept running without any window. Both children were logged as `ended unexpectedly (exited, exit 0)` and a crash report was written, although they exited normally. The manual check step 5 expects the process to end.
-**Status:** Observed once by the project owner's manual check (2026-10-13). Verified by the logs. Cause in code not analysed (`StubGui.ahk:29` sends the quit only on `UserExit`). Related to E14 (open decision, S4).
-**Sign that it matters:** a process stays alive after its windows are closed; false crash reports.
-**Action:** Decide the close behaviour (E14), then fix the exit classification of a normal exit and the quit path.
+**What:** After the manager and the debug window were closed (2 s after start, no quit command sent), the supervisor kept running. Both children were logged as `ended unexpectedly (exited, exit 0)` and a crash report was written, although they exited normally. The manual check step 8 of the debug window expects only the debug process to end, with no "ended unexpectedly" entry and no report.
+**Status:** Observed once by the project owner's manual check (2026-10-13). Verified by the logs. The manager part is decided: closing the manager window only hides it, the application keeps running, and only its Exit button or the tray entry ends it (E14, `work_items/phase3/README.md`, S4). So the manager does not count as a defect. The debug part is a defect. Cause in code not analysed.
+**Sign that it matters:** false crash reports after a normal close of a window.
+**Action:** Fix the exit classification of a normal window close (debug window, and the manager window in S4), and check the quit path. The manual check guide must follow E14 (see F-74).
 **Evidence:** `Log_children` of the last manual session (the entries at 19:12:51).
 
 ### F-74*: Manual-check guide and start tasks do not match
@@ -321,9 +321,8 @@ Editor, real manager, real elements, trigger host (WI-14, decision E6: built ear
 
 Decisions on entries are in the summary table (status `decision needed`, `accepted`, `closed`) and in the status book `work_items/phase3/STATUS.md`, section "Decisions of the project owner". This chapter lists only what is open without an entry:
 
-1. **Closing the manager window (E14, phase 3, S4).** In the stub, closing the window ends the whole application. The real manager decides in S4: close the window only, go to the tray, or quit.
-2. **Hand check of the GUI.** The owner checks the stub and the debug window by hand, using the guides in the "Not checked" section. The phase 2 checkbox for WI-13 stays open until then.
-3. **Default working directory of flows (S4).** v2 reads no `settings.json` yet. The v1 default of `FlowWorkingDir` is `A_MyDocuments\AutoHotFlow`; v2 takes it over only if decided in S4. The test profile of a data directory will carry a `settings.json` with `FlowWorkingDir` below the data directory and `UILanguage` `en`. The auxiliary files of the v1 "Automatic tests" become fixtures in `tests/data/workdir/`; WI-43 does not depend on the owner's Documents folder.
+1. **Hand check of the GUI.** The owner checks the stub and the debug window by hand, using the guides in the "Not checked" section. The phase 2 checkbox for WI-13 stays open until then.
+2. **Default working directory of flows (S4).** v2 reads no `settings.json` yet. The v1 default of `FlowWorkingDir` is `A_MyDocuments\AutoHotFlow`; v2 takes it over only if decided in S4. The test profile of a data directory will carry a `settings.json` with `FlowWorkingDir` below the data directory and `UILanguage` `en`. The auxiliary files of the v1 "Automatic tests" become fixtures in `tests/data/workdir/`; WI-43 does not depend on the owner's Documents folder.
 
 ## Sources
 
