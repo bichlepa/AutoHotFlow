@@ -22,6 +22,12 @@
             "type": "promptString",
             "description": "Datenordner für --data (Test- statt echte Daten)",
             "default": "${env:TEMP}\\ahf_manual"
+        },
+        {
+            "id": "suiteRef",
+            "type": "promptString",
+            "description": "Commit, Branch oder Tag fuer den Suite-Lauf im Worktree",
+            "default": "HEAD"
         }
     ],
     "tasks": [
@@ -297,6 +303,63 @@
                 "tools/arch_check.py"
             ],
             "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "Tool: run suite at HEAD + uncommitted changes (worktree, you can keep working)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "tools/run_suite.py",
+                "--with-changes"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Tool: run suite --all at HEAD + uncommitted changes (worktree)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "tools/run_suite.py",
+                "--with-changes",
+                "--",
+                "tests",
+                "-q",
+                "--all"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Tool: run suite at a commit (worktree)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "tools/run_suite.py",
+                "--ref",
+                "${input:suiteRef}"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Tool: list the last suite runs (--status)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "tools/run_suite.py",
+                "--status"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
             "problemMatcher": []
         },
         {

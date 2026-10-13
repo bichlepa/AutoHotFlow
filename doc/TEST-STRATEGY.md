@@ -124,4 +124,13 @@ python -m pytest tests -q -m stress              # long, on request only (-m soa
 - Every test needs its own names (session, data directory, pipe). No counting of "all AutoHotkey processes"; always recognize processes via the session ID in the command (`faultkit.session_processes`).
 - AHK test scripts need `#SingleInstance Off` (present in `tests/ahk/lib/Assert.ahk` and the helpers), otherwise AHK asks on a second simultaneous start of the same script and the dialog guard ends the run (exit 15).
 
+**Parallel work: runs on a frozen state.** `python tools/run_suite.py` runs the suite in its own git worktree
+(`--ref <commit>`, or `--with-changes` for HEAD plus the uncommitted changes), so the working tree stays free while a
+long run goes on, and the result belongs to exactly one code state. Output, `result.json` and the run log are in
+`%TEMP%hf_runs\<id>\` (last 20 runs). Load budget: 4 xdist workers per run, 2 runs at the same time; a run with
+`-m stress` or `-m soak` waits until no other run is active and blocks the start of others. Measurements therefore
+stay comparable. Timing tests (`scaled()`) can still become flaky when other programs load the machine; for a
+clean comparison use `--max-runs 1`. The run needs everything in the commit: a dependency on an untracked or
+ignored file shows up as a failure here (this is how the `v1/AppData/Variables` dependency was found).
+
 Environment variables: `AHF_AHK2_EXE` (path to the interpreter), `AHF_TEST_KEEP=1` (keep data directories after the test). `AHF_DATA_DIR` is set by `conftest.py` to the guard directory (product variable: data directory when `--data` is missing).
