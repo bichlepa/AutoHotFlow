@@ -193,6 +193,36 @@ Append new entries at the end of the matching category. Correct or delete outdat
 - **Status:** verified (`tests/fault/test_diagnose.py::test_too_many_unhandled_errors_end_the_role_with_exit_6`)
 - **Source:** `tests/integration/helpers/EchoRole.ahk`
 
+### A space before `;` inside a string literal starts a comment
+
+- **Problem:** In the AHK source, `"a ; b"` or `'x ; y'` is cut at the `;` and the file fails to load with `Missing """`.
+- **Wrong:** `Assert.Equal(S("x := 1 ; c"), ...)` in a test file.
+- **Right:** Write the semicolon escaped: ``"x := 1 `; c"``. A `;` without whitespace in front (`"a;b"`) is fine.
+- **Status:** verified
+- **Source:** `tests/ahk/expr_*.test.ahk`
+
+### Call stack overflow ends the whole process
+
+- **Problem:** A function recursion deeper than about 2000 calls (between 1500 and 3000 measured) is a critical error: AutoHotkey shows a dialog and exits. It cannot be caught with `try`.
+- **Wrong:** Recursive descent without a depth limit on input from users.
+- **Right:** Count the nesting and report an error before the limit (`ExprParser.MAX_NEST`, `ExprNode.MAX_DEPTH`). A parser frame costs about 12 calls per nesting level.
+- **Status:** verified (`F(n)` recursion test with `ahkrun.py`)
+- **Source:** `src/expr/ExprParser.ahk`
+
+### PCRE in AHK: characters above U+FFFF and a start position inside a surrogate pair
+
+- **Problem:** `[\x{80}-\x{FFFF}]` does not match an emoji (one code point above U+FFFF, two UTF-16 units). `RegExMatch` with a start position in the middle of a surrogate pair stops with `PCRE execution error`.
+- **Right:** Use `\x{10FFFF}` as the upper bound. When stepping over "one character" behind an escape character, take two units if the first one is in D800 to DBFF. Found by a random-input test.
+- **Status:** verified
+- **Source:** `src/expr/ExprTokenizer.ahk`, test `random input never throws and always gives consistent results`
+
+### `Integer("12345678901234567890")` wraps around
+
+- **Problem:** A decimal text beyond 63 bits does not throw; it returns a wrapped negative number (`-6101065172474983726`). `Integer("0xFFFFFFFFFFFFFFFFF")` gives `-1`.
+- **Right:** Check the digit count (and compare to `"9223372036854775807"`) before converting; use `Float()` or report an error.
+- **Status:** verified
+- **Source:** `src/expr/ExprTokenizer.ahk`
+
 ## Objects, Maps, Arrays
 
 ### Map with `CaseSense "Off"` keeps the spelling of the first insertion
