@@ -86,6 +86,16 @@ Hunter run 1 (2026-10-13) worked on two entries and stopped. Candidates not look
 | wip/hunt-3 | 58e48d2, ad6ac7d, 3815990 | 2026-10-13 | c0ecec5, b53185a, d6713f6 (cherry-pick, no conflict) | fast run 20261013-181410-d6713f6a (301 passed), slow run 20261013-181447-d6713f6a (85 passed), commit d6713f6 | both exit 0, no INTERNALERROR; arch check 0 violations |
 | wip/hunt-2 | 2675105, 68b42d8 | 2026-10-13 | c292dfb, fdcae63 (cherry-pick, no conflict) | fast run 20261013-180755-fdcae630 (300 passed), slow run 20261013-180831-fdcae630 (85 passed), commit fdcae63 | both exit 0, no INTERNALERROR; arch check 0 violations |
 
+## Decisions of the project owner (2026-10-13)
+
+| Entry | Decision | Recorded in |
+|---|---|---|
+| F-25 | accepted: a permanently locked log file may lose its batch | OPEN-ITEMS, status `accepted` |
+| F-29 | accepted: low impact, the 10 s stay (option (b)); ARCHITECTURE 6.3 still to be written | OPEN-ITEMS, status `accepted` |
+| F-36 | closed | OPEN-ITEMS, closed |
+| F-43 | not decided: the next bug hunter explains it and gives a recommendation | OPEN-ITEMS, `decision needed` |
+
 ## Decisions taken by the orchestrator
 
-(none yet)
+- Hunter runs are not limited to two entries per run on principle; the limit of run 1 to 3 was a choice that the procedure does not require.
+- WI-36: the golden check on Windows compares line endings; a fix is in progress on a separate workspace (see the WI-36 row).
