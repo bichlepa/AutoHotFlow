@@ -497,17 +497,21 @@ class Executor {
 
     _ElementStarted(run, elementId) {
         key := run["flowId"] "/" elementId
+        prev := Critical("On")  ; reason: read, change and store of the count is one step (a dispatch tick may interrupt)
         n := this._counts.Get(key, 0) + 1
         this._counts[key] := n
         this._lastRun[key] := FormatTime(A_NowUTC, "yyyy-MM-dd HH:mm:ss")
+        Critical(prev)
         this._EmitElement(run["flowId"], elementId, "running", n, "")
     }
 
     ; result "normal", "yes", "no", "head", "tail", "exception" or "stopped" (stop by the engine).
     _ElementStopped(run, elementId, result, msg) {
         key := run["flowId"] "/" elementId
+        prev := Critical("On")  ; reason: read, change and store of the count is one step (see _ElementStarted)
         n := Max(0, this._counts.Get(key, 0) - 1)
         this._counts[key] := n
+        Critical(prev)
         if (n > 0)
             state := "running"
         else
