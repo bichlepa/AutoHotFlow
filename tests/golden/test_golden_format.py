@@ -67,6 +67,25 @@ def test_volatile_results_hold_no_value():
                     assert result.get("value", {}).get("value", golden_v1.VOLATILE) == golden_v1.VOLATILE, cid
 
 
+def test_the_check_compares_content_and_not_line_endings(tmp_path):
+    # a Windows working copy has CRLF, the generated text is LF: the same content must count as unchanged
+    source = EXPECTED / "arithmetic.json"
+    with open(source, encoding="utf-8", newline="") as f:
+        text = f.read()
+    assert "\r" not in text.replace("\r\n", "")
+    generated = text.replace("\r\n", "\n")
+    crlf = tmp_path / "crlf.json"
+    with open(crlf, "w", encoding="utf-8", newline="\r\n") as f:
+        f.write(generated)
+    assert b"\r\n" in crlf.read_bytes()
+    assert golden_v1.differs_from_checked_in(str(crlf), generated) is False
+    changed = tmp_path / "changed.json"
+    with open(changed, "w", encoding="utf-8", newline="\r\n") as f:
+        f.write(generated.replace("1.1.32", "1.1.31", 1))
+    assert golden_v1.differs_from_checked_in(str(changed), generated) is True
+    assert golden_v1.differs_from_checked_in(str(tmp_path / "missing.json"), generated) is True
+
+
 def test_the_result_files_name_the_v1_interpreter_they_come_from():
     with open(EXPECTED / "arithmetic.json", encoding="utf-8") as f:
         interpreter = json.load(f)["interpreter"]

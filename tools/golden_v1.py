@@ -258,6 +258,17 @@ def dump_result_file(group, description, header, results):
     return "\n".join(lines)
 
 
+def differs_from_checked_in(target, text):
+    """True when the file at target is missing or its content differs from the generated text (read only).
+    Line endings do not count: git stores the files with LF, a Windows working copy (* text=auto) has CRLF, and the
+    generator writes LF. Only the checked-in side is normalized; the generated text is LF already."""
+    if not os.path.isfile(target):
+        return True
+    with open(target, encoding="utf-8", newline="") as f:
+        old = f.read().replace("\r\n", "\n")
+    return old != text
+
+
 def check_result_file(data, case_data):
     """Returns a list of problems of one result file against its case file (empty = fine)."""
     problems = []
@@ -362,11 +373,7 @@ def main(argv):
             results = {c["id"]: finish_result(c, raw[c["id"]]) for c in data["cases"]}
             text = dump_result_file(group, data.get("description", ""), header, results)
             target = os.path.join(expected_dir, group + ".json")
-            old = None
-            if os.path.isfile(target):
-                with open(target, encoding="utf-8", newline="") as f:
-                    old = f.read()
-            if old != text:
+            if differs_from_checked_in(target, text):
                 differing.append(group)
             if not args.check:
                 with open(target, "w", encoding="utf-8", newline="\n") as f:
