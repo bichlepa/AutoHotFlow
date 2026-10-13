@@ -44,13 +44,13 @@ RESTART_LIMIT = 3             # Children.RESTART_MAX within Children.RESTART_WIN
 class Sup:
     """One supervisor process (ahkrun -> AutoHotFlow.ahk). Output goes to a file, not to a pipe."""
 
-    def __init__(self, procs, datadir, session, *args, label="sup"):
+    def __init__(self, procs, datadir, session, *args, label="sup", pass_data=True):
         self.session = session
         self.pipe = pipenames.hub_pipe(session)
         self.stderr_path = Path(datadir) / ("%s.stderr" % label)
         self._err = open(self.stderr_path, "wb")
         cmd = [sys.executable, str(AHKRUN), "--timeout", "120", str(ENTRY),
-               "--session=" + session, "--data=" + str(datadir), *args]
+               "--session=" + session, *(["--data=" + str(datadir)] if pass_data else []), *args]
         self.t0 = time.perf_counter()
         self.proc = procs.start(cmd, stdout=self._err, stderr=self._err, cwd=str(ROOT))
 
@@ -216,6 +216,24 @@ def test_required_roles_are_ready_within_3_seconds(started, session_id):
         assert set(pids) <= set(children_of(sup.proc.pid))
         states = {p["name"]: p["state"] for p in process_list(py)}
         assert states == {"echo:a": "ready", "echo:b": "ready"}, states
+    finally:
+        request_ok(py, "supervisor", "cmd.app.exit", {})
+        py.close()
+        assert sup.wait_exit(timeout=20) == EXIT_OK, sup.text()
+
+
+def test_data_directory_comes_from_the_environment_when_data_is_missing(started, datadir, monkeypatch):
+    """Without --data the supervisor uses AHF_DATA_DIR (the tests rely on it to keep processes away from the real
+    application data directory). The storage role gets the resolved path and writes its log there."""
+    monkeypatch.setenv("AHF_DATA_DIR", str(datadir))
+    sup = started("--start=storage", pass_data=False)
+    py = connect(sup.pipe, "py")
+    try:
+        assert wait_ready(py, ("storage",)) is not None, "storage not ready; supervisor said:\n%s" % sup.text()
+        deadline = time.monotonic() + scaled(5.0)
+        while time.monotonic() < deadline and not (datadir / "Log").is_dir():
+            time.sleep(0.05)
+        assert (datadir / "Log").is_dir(), "storage wrote nothing into AHF_DATA_DIR; supervisor said:\n%s" % sup.text()
     finally:
         request_ok(py, "supervisor", "cmd.app.exit", {})
         py.close()

@@ -170,6 +170,7 @@ TestRun.Case("Shutdown: a child of a later group that says hello during the shut
 TestRun.Case("Shutdown: a child that is in no group (started after the groups were made) gets sys.shutdown at its hello (F-41, WI-34)", LateHelloOfAChildInNoGroup)
 TestRun.Case("Shutdown: a hello in the prepare phase or in the kill phase gets no sys.shutdown (F-41, WI-34)", HelloOutsideThePhaseShutdownGetsNothing)
 TestRun.Case("Children: a restart that was planned before the shutdown does not start (F-41, WI-34)", PlannedRestartIsCancelledByTheShutdown)
+TestRun.Case("Data directory: --data wins over AHF_DATA_DIR, which wins over the application data folder", DataDirFollowsOptionThenEnvironmentThenAppData)
 
 ByeIsReadBeforeTheExitIsReported() {
     hub := FakeHub()
@@ -926,6 +927,21 @@ PlannedRestartIsCancelledByTheShutdown() {
         }
         Assert.Equal(kids.launched.Length, 0, "no restart while the session ends")
         Assert.Equal(rec["restartAt"], 0, "the planned restart is cancelled")
+    }
+}
+
+; --data wins over AHF_DATA_DIR, which wins over %APPDATA%\AutoHotFlow. The environment of this process is changed
+; and restored, nothing is started.
+DataDirFollowsOptionThenEnvironmentThenAppData() {
+    saved := EnvGet(Supervisor.DATA_DIR_ENV)
+    try {
+        EnvSet(Supervisor.DATA_DIR_ENV, "C:\env-dir")
+        Assert.Equal(Supervisor.DataDir(Map("data", "C:\option-dir")), "C:\option-dir", "--data wins")
+        Assert.Equal(Supervisor.DataDir(Map()), "C:\env-dir", "the environment variable is the second choice")
+        EnvSet(Supervisor.DATA_DIR_ENV, "")
+        Assert.Equal(Supervisor.DataDir(Map()), A_AppData "\AutoHotFlow", "without both: the application data folder")
+    } finally {
+        EnvSet(Supervisor.DATA_DIR_ENV, saved)
     }
 }
 

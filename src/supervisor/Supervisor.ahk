@@ -25,6 +25,8 @@
 ;                   [--deadline=<ms>] [--test-roles] [--command=<text>]
 ;   --session   instance key: names the hub pipe and the mutex (PipeNames; the pipe name also carries
 ;               the Windows session id and a tag of the user). Default "main".
+;   --data      data directory. Without it: the environment variable AHF_DATA_DIR, else %APPDATA%\AutoHotFlow.
+;               Every role gets the resolved path with --data.
 ;   --start     roles started at once, each one is required (its evt.process.ready is awaited by tests).
 ;   --deadline  total budget of the shutdown in ms (default 5000, sys.shutdown deadlineMs).
 ;   --test-roles  registers the test roles (tests/integration/helpers) and passes the option on.
@@ -45,6 +47,7 @@ class Supervisor {
     static DEFAULT_SESSION := "main"
     static DEFAULT_DEADLINE_MS := 5000
     static DEFAULT_DATA_SUBDIR := "AutoHotFlow"
+    static DATA_DIR_ENV := "AHF_DATA_DIR"
     static MIN_DEADLINE_MS := 100
     static MAX_DEADLINE_MS := 60000
     static TICK_MS := 200
@@ -61,13 +64,25 @@ class Supervisor {
         s.Start()
     }
 
+    ; The data directory: --data, else the environment variable AHF_DATA_DIR, else %APPDATA%\AutoHotFlow.
+    ; A_AppData cannot be redirected through the environment (it comes from the shell API), so the variable is the
+    ; only way to keep a process away from the real directory (the tests set it to a guard directory).
+    static DataDir(opts) {
+        if (opts.Has("data"))
+            return opts["data"]
+        fromEnv := EnvGet(Supervisor.DATA_DIR_ENV)
+        if (fromEnv != "")
+            return fromEnv
+        return A_AppData "\" Supervisor.DEFAULT_DATA_SUBDIR
+    }
+
     __New(opts) {
         this.session := opts.Get("session", Supervisor.DEFAULT_SESSION)
         if (this.session = "")
             throw AhfError("supervisor: --session is empty", ErrCode.BAD_ARGS)
         this.pipe := PipeNames.Hub(this.session)
         this.mutexName := PipeNames.Mutex(this.session)
-        this.data := opts.Get("data", A_AppData "\" Supervisor.DEFAULT_DATA_SUBDIR)
+        this.data := Supervisor.DataDir(opts)
         this.testRoles := opts.Has("test-roles")
         ; Only with --test-roles: the answer limit of cmd.app.prepareExit (Shutdown.PREPARE_LIMIT_MS) can be
         ; lowered, so the tests see a timeout in seconds. A product start always uses the constant.
