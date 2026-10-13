@@ -16,9 +16,10 @@ You do not implement, hunt bugs or run test suites yourself. You start sub-agent
 
 ## 0. Before you start
 
-1. Read `AGENTS.md`, `doc/PARALLEL-WORK.md` (workspaces, rules, roles), `doc/OPEN-ITEMS.md`, and for work items `work_items/phase3/README.md`, the `WI-*.md` files and `work_items/phase3/STATUS.md` if it exists. Run `git status` and `git worktree list`: the main checkout must be clean and on `v2-port`, otherwise stop and tell the project owner. Workspaces left over from an earlier session: see section 10.
+1. Read `AGENTS.md`, `doc/PARALLEL-WORK.md` (workspaces, rules, roles), `doc/OPEN-ITEMS.md`, and for work items `work_items/phase3/README.md`, the `WI-*.md` files and `work_items/phase3/STATUS.md` if it exists. Run `git status` and `git worktree list`. The main checkout should be on `v2-port`; if it is not, do not switch it: you can start agents (their workspaces come from the `v2-port` ref) but integrations wait (section 5). Workspaces left over from an earlier session: see section 10. **The project owner may be working in the main checkout** (section 5a): local changes there are not a reason to stop.
 2. **Input.** The text after the command is the project owner's wishes. If it is empty, you are in *work-item mode* (3b). If it says that the project owner is away ("I am away", "unattended", "abwesend"), UI tests are allowed (section 6); otherwise they are not.
 3. **Never push.** You and the agents work locally. The project owner pushes.
+4. **The project owner's local work.** He may change files in the main checkout and may commit to `v2-port` while you work. Expect new commits on `v2-port` (workspaces are created from the current tip, integration copies onto whatever the tip is). Never edit, stage, commit, stash, reset, check out over or delete his local changes, and never use `--with-changes` for a run (it would test his unfinished work): test runs use `--ref HEAD`. When you must commit in the main checkout yourself (`STATUS.md`, a correction after integration), name the paths and nothing else: `git commit --only -m "..." -- <paths>` (tested: it leaves his staged and unstaged changes alone; a new file needs `git add -N <path>` first). Never `git add -A`, `git commit -a` or `git stash`.
 
 ## 1. Agents and slots
 
@@ -109,10 +110,18 @@ When an implementer or hunter reports, in the main checkout:
 
 1. Look at the diff (`git diff --stat v2-port...<branch>`), the commit messages, the decisions listed in the report, and whether the report names run IDs. A task whose report says `ESCALATE` is not integrated; handle it as in section 1.
 2. **Check the documents in the diff for volatile names** (branch names such as `wip/...`, workspace names, run folders, temporary paths). Have them corrected in the agent's workspace (or correct them yourself in one extra commit on top of the integration) so that nothing volatile stays in the repository.
-3. `git cherry-pick v2-port..<branch>`. **No merge commits**, no temporary branches stay (`python tools/new_workspace.py --remove <name>` deletes the branch when its patches are on `v2-port`).
-4. A conflict: `git cherry-pick --abort`, and ask the agent (resume it with SendMessage if it is still alive, otherwise start a new one in its workspace) to bring its branch up to date with `git rebase v2-port` in its workspace and to run its short tests again. Then integrate again.
-5. Integrate one branch at a time. After each, `git status` must be clean.
-6. Record commit and run ID in `STATUS.md`.
+3. **Bring the branch up to date in its own workspace first**: if `git merge-base --is-ancestor v2-port <branch>` fails, `v2-port` has moved since the branch was created (the project owner commits too). Have the agent run `git rebase v2-port` in its workspace (or do it there yourself) and run its short tests again if the rebase changed anything. Conflicts are resolved there, never in the main checkout.
+4. `git cherry-pick v2-port..<branch>` in the main checkout. **No merge commits**, no temporary branches stay (`python tools/new_workspace.py --remove <name>` deletes the branch when its patches are on `v2-port`).
+5. If the cherry-pick still stops with a conflict (a commit arrived in the meantime): `git cherry-pick --abort`, go back to step 3 (resume the agent with SendMessage if it is still alive, otherwise start a new one in its workspace). If it is refused because of the project owner's local changes, see section 5a: that needs `git cherry-pick --quit`, not `--abort`.
+6. Integrate one branch at a time. After each, the working tree must differ from before only by what the integration changed; the project owner's local changes are as they were.
+7. Record commit and run ID in `STATUS.md`.
+
+### 5a. When the project owner has local changes
+
+1. Before every integration look at `git status`. Tested behavior of `git cherry-pick`: **unstaged** local changes in files that the incoming commits do not touch do not matter, the cherry-pick works around them. It is **refused** (exit 128, nothing applied) when a changed file is affected, and also when anything is **staged**. A refused range cherry-pick leaves a "cherry-pick in progress" state behind: clear it with `git cherry-pick --quit` (keeps his changes and HEAD; do not use `--abort` here). Do not force anything and do not move his changes away: leave the branch and its workspace as they are, write the task as `integration pending` in `STATUS.md` with the reason, and **report it** (it is part of the final report; no need to stop the session).
+2. Try the pending integrations again each time another agent has finished, and when the project owner wakes you (he will tell you that his changes are committed or gone). Until then the next tasks start from the current `v2-port` tip; work that depends on a pending integration waits, the rest goes on.
+3. If a cherry-pick stops with a conflict against a commit that the project owner made on `v2-port`, handle it as a normal conflict (section 5, steps 3 and 5): the agent rebases onto the new tip.
+4. If the project owner switched the main checkout to another branch, do not switch it back: integrations wait as above.
 
 ## 6. UI tests
 
@@ -134,7 +143,7 @@ During the session keep a short list in your own words: tasks, agent, model, bra
 - what was **not** checked (UI, big runs that were left out, load),
 - the state of the repository: `v2-port` is N commits ahead of the remote, nothing is pushed.
 
-Stop early and report when: the main checkout is not clean, a run is aborted by an `INTERNALERROR` that you cannot attribute, an integration breaks the fast tier (revert it with `git revert`, do not leave `v2-port` broken), or the stop conditions at the top (safety, urgent decision) apply.
+Stop early and report when: a run is aborted by an `INTERNALERROR` that you cannot attribute, an integration breaks the fast tier (revert it with `git revert`, do not leave `v2-port` broken), or the stop conditions at the top (safety, urgent decision) apply.
 
 ## 9. Prompt skeleton for a sub-agent
 
@@ -156,4 +165,4 @@ The session will hit quota limits again and again. Work so that it can be resume
 
 - Keep `work_items/phase3/STATUS.md` current after every state change (task, agent, model, branch, commit, run IDs, ID blocks given, review log). In wishes mode keep a section "Wishes" in the same file with the same columns.
 - Agents commit often. An agent that notices a limit commits what works, notes in its report where it stopped, and ends.
-- At the start of a session read `STATUS.md` and `git worktree list`. A workspace with commits that are not on `v2-port` belongs to an unfinished task: continue it (new agent in that workspace, with the notes) or integrate it if it is complete. A workspace without commits and without changes is removed.
+- At the start of a session read `STATUS.md` and `git worktree list`, and look at the project owner's local state again (section 5a); retry the integrations marked `integration pending`. A workspace with commits that are not on `v2-port` belongs to an unfinished task: continue it (new agent in that workspace, with the notes) or integrate it if it is complete. A workspace without commits and without changes is removed.
