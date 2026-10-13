@@ -123,15 +123,16 @@ def test_the_findings_name_existing_cases():
     for path in EXPECTED.glob("*.json"):
         with open(path, encoding="utf-8") as f:
             ids.update(json.load(f)["results"])
-    with open(REPO / "tests" / "golden" / "findings.json", encoding="utf-8") as f:
-        findings = json.load(f)
-    assert len(findings["suspicions"]) >= 6
-    for item in findings["suspicions"]:
-        assert item["verdict"], item["id"]
-    for item in findings["suspicions"] + findings["observations"]:
-        assert item["cases"], item
-        for cid in item["cases"]:
-            assert cid in ids, "%s: no such case %s" % (item.get("id") or item["topic"], cid)
+    with open(REPO / "tests" / "golden" / "FINDINGS.md", encoding="utf-8") as f:
+        text = f.read()
+    assert text.count("\n### S") >= 6
+    cited = []
+    for line in text.splitlines():
+        if line.startswith("Cases: "):
+            cited.extend(line.split("`")[1::2])
+    assert cited
+    for cid in cited:
+        assert cid in ids, "FINDINGS.md: no such case %s" % cid
 
 
 # ---- the corpus tool (pure functions, no v1 needed) ----

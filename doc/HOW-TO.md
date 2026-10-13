@@ -869,7 +869,7 @@ Append new entries at the end of the matching category. Correct or delete outdat
 ### v1: returning a variable from a function turns a number into text
 
 - **Problem:** The kind of a value ("pure number" or text, determined the way `Jxon_Dump` does: `ObjGetCapacity([v], 1) == ""` is true for a pure number) changed on the way through functions.
-- **Right:** `return v` and `ObjFullyClone(v)` give a text even if `v` held a number; `return a + b` and a direct read from an object give a number. Consequence for the golden data: everything that v1 reads through `Var_Get` is text, only the result of arithmetic is a number (`doc/TEST-STRATEGY.md` section 7, `tests/golden/findings.json`). A float given as JSON number to `Jxon_Load` becomes a text (only integers are converted), so the harness takes numbers as text and adds `+ 0`.
+- **Right:** `return v` and `ObjFullyClone(v)` give a text even if `v` held a number; `return a + b` and a direct read from an object give a number. Consequence for the golden data: everything that v1 reads through `Var_Get` is text, only the result of arithmetic is a number (`doc/TEST-STRATEGY.md` section 7, `tests/golden/FINDINGS.md`). A float given as JSON number to `Jxon_Load` becomes a text (only integers are converted), so the harness takes numbers as text and adds `+ 0`.
 - **Status:** verified (small v1 script and golden cases `variables.instance.number`, `varaccess.set.number`)
 - **Source:** `tests/golden/v1/harness.ahk`, `v1/Lib/Json/Jxon.ahk`
 

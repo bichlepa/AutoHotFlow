@@ -143,7 +143,7 @@ What v1 actually returns for expressions, scripts, variable substitution and var
 |---|---|
 | `tests/golden/cases/<group>.json` | the cases (inputs). Hand-written groups: `arithmetic`, `division`, `comparison`, `logic`, `concat`, `numbers`, `strings`, `variables`, `assignment`, `functions`, `errors`, `script`, `replace`, `builtin`, `varaccess`, `names`, `objects`. `corpus_flows` is generated from the example flows (below). |
 | `tests/golden/expected/<group>.json` | the results from v1, one line per case (checked in; a change shows in the diff) |
-| `tests/golden/findings.json` | the suspected v1 bugs confirmed or refuted with case IDs, further observations, what the corpus shows, what is not covered |
+| `tests/golden/FINDINGS.md` | the suspected v1 bugs confirmed or refuted with case IDs, further observations, what the corpus shows, what is not covered |
 | `tests/golden/v1/harness.ahk` | the harness (v1 syntax, runs only in the v1 interpreter): includes the unchanged v1 sources (`Code tokenizer/parser/evaluator.ahk`, `Expression evaluator.ahk`, `Global variables.ahk`, `Variables.ahk`, `Jxon.ahk`, `Objects.ahk`) and replaces the rest of v1 (object store with the v1 `parseObjectPath`, critical section, logger, `lang`, flow and element properties) by small stand-ins. No dialog. Not named `*.test.ahk`, so pytest does not collect it. |
 | `tests/golden/private/` | the project owner's own flows (E27), **local only, in `.gitignore`**, never checked in |
 | `tools/golden_v1.py` | generator: cases to results |
