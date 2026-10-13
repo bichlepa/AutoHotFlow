@@ -292,15 +292,11 @@ Editor, real manager, real elements, trigger host (WI-14, decision E6: built ear
 
 ## Open decisions
 
-Phase 3 was approved by the project owner on 2026-10-13. The plan is `work_items/phase3/README.md`.
+Decisions on entries are in the summary table (status `decision needed`, `accepted`, `closed`) and in the status book `work_items/phase3/STATUS.md`, section "Decisions of the project owner". This chapter lists only what is open without an entry:
 
-1. **Closing the manager window (E14, phase 3).** In the stub, closing the window ends the whole application. What the real manager does (close the window only, go to the tray, or quit) is decided in phase 3.
-2. **Questions of the phase 3 plan.** The open questions in `work_items/phase3/README.md` ("Open questions for the project owner") are answered by the project owner in separate sessions. A work item that depends on one waits.
-3. **Hand check of the GUI.** The owner checks the stub and the debug window by hand, using the guides in the "Not checked" section. The phase 2 checkbox for WI-13 stays open until then.
-4. **F-43.** The owner decides on the proposal (a child that never connected does not count as a condition of its group). Phase 3.
-5. **F-36.** Closing is recommended by the source. The decision is open; the item stays "observed, open" until then.
-6. **Factor 3 of `scaled()` (E17).** Decided to stay. Observe only.
-7. **Settings file and working directory of flows (S4, S2).** v2 reads no `settings.json` yet (`cmd.storage.settings.get/set` is not implemented). When it does: (a) the v1 default of `FlowWorkingDir` is `A_MyDocuments\AutoHotFlow`, the real Documents folder of the user. The default in v2 is decided on purpose, not taken over from v1. (b) The test profile of a data directory always carries a `settings.json` with `FlowWorkingDir` below the data directory and `UILanguage` `en`. (c) The auxiliary files of the v1 "Automatic tests" (text files, ini, shortcuts in `Documents\AutoHotFlow`) become synthetic fixtures in `tests/data/workdir/`; WI-43 must not depend on the owner's Documents folder.
+1. **Closing the manager window (E14, phase 3, S4).** In the stub, closing the window ends the whole application. The real manager decides in S4: close the window only, go to the tray, or quit.
+2. **Hand check of the GUI.** The owner checks the stub and the debug window by hand, using the guides in the "Not checked" section. The phase 2 checkbox for WI-13 stays open until then.
+3. **Default working directory of flows (S4).** v2 reads no `settings.json` yet. The v1 default of `FlowWorkingDir` is `A_MyDocuments\AutoHotFlow`; v2 takes it over only if decided in S4. The test profile of a data directory will carry a `settings.json` with `FlowWorkingDir` below the data directory and `UILanguage` `en`. The auxiliary files of the v1 "Automatic tests" become fixtures in `tests/data/workdir/`; WI-43 does not depend on the owner's Documents folder.
 
 ## Sources
 
