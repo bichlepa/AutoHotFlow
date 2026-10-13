@@ -107,6 +107,15 @@ def test_remove_from_inside_the_workspace_is_refused_and_changes_nothing(repo):
     assert not ws.exists()
 
 
+def test_list_shows_only_the_workspaces_of_the_tool(repo):
+    """The temporary worktree of tools/run_suite.py (or any other) is not a workspace."""
+    tool(repo, "one")
+    other = repo.parent / "elsewhere" / "tree"
+    git(repo, "worktree", "add", "--detach", "-q", str(other), "HEAD")
+    out = tool(repo, "--list")
+    assert "wip/one" in out and "elsewhere" not in out and "(detached)" not in out
+
+
 def test_remove_of_an_unknown_workspace_is_refused(repo):
     assert "no workspace" in tool(repo, "--remove", "nothere", expect=1)
 

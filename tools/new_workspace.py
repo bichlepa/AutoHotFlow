@@ -116,7 +116,8 @@ def describe(main, path, branch, base):
 
 
 def list_workspaces(repo, main, root, base):
-    rows = [(p, b) for p, b in worktrees(repo) if not same_path(p, main)]
+    # only the workspaces of this tool: worktrees of other tools (tools/run_suite.py) are not shown
+    rows = [(p, b) for p, b in worktrees(repo) if not same_path(p, main) and is_within(p, root)]
     if not rows:
         print("no workspaces (root: %s)" % root)
         return 0
