@@ -71,6 +71,14 @@ def same_path(a, b):
     return os.path.normcase(os.path.abspath(str(a))) == os.path.normcase(os.path.abspath(str(b)))
 
 
+def is_within(inner, outer):
+    a, b = os.path.normcase(os.path.abspath(str(inner))), os.path.normcase(os.path.abspath(str(outer)))
+    try:
+        return os.path.commonpath([a, b]) == b
+    except ValueError:          # different drives
+        return False
+
+
 def create(repo, main, root, name, ref):
     if not NAME.match(name):
         raise Refused("name '%s': 1 to 40 characters of A-Z a-z 0-9 . _ - and no leading . _ -" % name)
@@ -124,6 +132,10 @@ def remove(repo, main, root, name, force):
     if not entry:
         raise Refused("no workspace '%s' below %s" % (name, root))
     branch = entry[0][1]
+    if is_within(Path.cwd(), path):
+        # Windows cannot delete a folder that is the current folder of a process (also of the calling shell)
+        raise Refused("the current folder is inside the workspace %s; change to another folder (for example the "
+                      "main checkout %s) and run --remove again" % (name, main))
     if path.exists() and not force:
         _, status = git(path, "status", "--porcelain")
         if status:

@@ -93,6 +93,20 @@ def test_remove_deletes_a_merged_branch(repo):
     assert "deleted" in out and "wip/two" not in git(repo, "branch", "--list")
 
 
+def test_remove_from_inside_the_workspace_is_refused_and_changes_nothing(repo):
+    """Windows cannot delete the current folder of a process. The tool says so before it touches anything."""
+    tool(repo, "one")
+    ws = repo.parent / "ws" / "one"
+    env = dict(os.environ, AHF_WORKSPACES_DIR=str(repo.parent / "ws"))
+    proc = subprocess.run([sys.executable, str(TOOL), "--repo", str(ws), "--remove", "one"], cwd=str(ws),
+                          capture_output=True, env=env)
+    assert proc.returncode == 1 and b"current folder is inside" in proc.stderr
+    assert (ws / "a.txt").is_file()
+    assert "wip/one" in git(repo, "worktree", "list", "--porcelain")
+    tool(repo, "--remove", "one")           # from outside it works
+    assert not ws.exists()
+
+
 def test_remove_of_an_unknown_workspace_is_refused(repo):
     assert "no workspace" in tool(repo, "--remove", "nothere", expect=1)
 
