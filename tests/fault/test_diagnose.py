@@ -156,16 +156,19 @@ def test_exactly_the_threshold_does_not_end_the_role(chains, datadir):
     assert end_session(chain) == 0, chain.sup.text()
 
 
+@pytest.mark.parametrize("restarts", [pytest.param(12, id="smoke", marks=pytest.mark.slow),
+                                      pytest.param(50, id="full", marks=pytest.mark.stress)])
 @pytest.mark.timeout(scaled(240))
-def test_the_handles_of_the_supervisor_stay_flat_over_50_restarts(chains, datadir):
-    """Every start opens a pipe, a process handle and a thread handle; every end must close them again."""
+def test_the_handles_of_the_supervisor_stay_flat_over_many_restarts(chains, datadir, restarts):
+    """Every start opens a pipe, a process handle and a thread handle; every end must close them again.
+    smoke (12 restarts, slow) shows a leak of one handle per restart; full (50, stress) is the long run."""
     chain = chains("storage,crasher", ["--test-roles", "--restart-max=100"])
     chain.wait_ready(["storage", "crasher"])
     sup_pid = chain.sup.ahk_pid()
     proc = psutil.Process(sup_pid)
     counts = []
     old = chain.pid("crasher")
-    for n in range(1, 51):
+    for n in range(1, restarts + 1):
         request_ok(chain.obs, "crasher", "cmd.test.arm", {})
         try:
             new, _ = chain.wait_restarted_ready("crasher", old, timeout=RESTART_READY_S)
@@ -174,8 +177,8 @@ def test_the_handles_of_the_supervisor_stay_flat_over_50_restarts(chains, datadi
             tail = log_text(datadir)[-3000:]
             raise AssertionError("restart %d: %s\nlog tail:\n%s" % (n, e, tail)) from e
         old = new
-        if n in (5, 50):
+        if n in (2, restarts):
             counts.append(proc.num_handles())
-    print("\nMEASURE handles of the supervisor after 5 and 50 restarts: %s" % counts)
+    print("\nMEASURE handles of the supervisor after 2 and %d restarts: %s" % (restarts, counts))
     assert counts[1] <= counts[0] + HANDLE_SLACK, counts
     assert end_session(chain) == 0, chain.sup.text()

@@ -31,6 +31,7 @@ def flow_text(label, pad=""):
     return json.dumps(obj, ensure_ascii=False, indent=2)
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize("round_no", repeat_ids())
 def test_killed_storage_mid_write_leaves_the_old_or_the_new_file_never_a_half_one(chains, datadir, round_no):
     chain = chains(FULL_CHAIN, STUB_OPTS)

@@ -36,6 +36,7 @@ def full_chain(chains, datadir, flows=(), extra=()):
     return chain
 
 
+@pytest.mark.slow
 def test_every_role_answers_with_the_general_part_and_its_own_part(chains, datadir):
     chain = full_chain(chains, datadir)
     for name, role in (("storage", "storage"), ("engine", "engine"), ("manager", "manager"),

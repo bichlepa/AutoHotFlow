@@ -31,6 +31,7 @@ def test_load_error_goes_to_stderr_without_dialog(tmp_path):
     assert "conflicts with an existing Class" in err and "TimeoutError" in err
 
 
+@pytest.mark.gui
 def test_runtime_error_dialog_is_captured(tmp_path):
     code, out, err, dialogs = ahkrun.run(_script(tmp_path, 'x := Map()\nx["a"].foo()'), timeout=20)
     assert code == 97
@@ -38,6 +39,7 @@ def test_runtime_error_dialog_is_captured(tmp_path):
     assert dialogs[0].png_path and os.path.getsize(dialogs[0].png_path) > 1000
 
 
+@pytest.mark.gui
 def test_msgbox_is_captured_and_closed(tmp_path):
     code, out, err, dialogs = ahkrun.run(_script(tmp_path, 'MsgBox("blocking box")'), timeout=20)
     assert code == 97

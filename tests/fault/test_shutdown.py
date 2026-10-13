@@ -42,6 +42,7 @@ def test_healthy_session_exits_within_2_seconds_and_every_role_says_it_is_clean(
     assert wait_until(lambda: not session_processes(chain.session), 5.0), session_processes(chain.session)
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize("round_no", repeat_ids())
 def test_frozen_storage_is_terminated_at_the_deadline_and_the_others_exit_clean(chains, round_no):
     chain = chains(FULL_CHAIN, STUB_OPTS)
@@ -89,6 +90,7 @@ LATE_HELLO_MS = 3000         # echo:slowhello<ms> connects this long after its s
 LATE_DEADLINE_MS = 12000     # far above the late hello: an exit at the deadline (the old fault) is easy to tell apart
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize("round_no", repeat_ids())
 def test_a_child_that_says_hello_during_the_shutdown_gets_sys_shutdown_and_the_session_exits_clean(chains, round_no):
     # F-41 (WI-34): a child that is still starting when its group gets sys.shutdown (the warm worker, an editor, the
@@ -116,6 +118,7 @@ def test_a_child_that_says_hello_during_the_shutdown_gets_sys_shutdown_and_the_s
     assert wait_until(lambda: not session_processes(chain.session), 5.0), session_processes(chain.session)
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize("round_no", repeat_ids())
 def test_two_sessions_in_a_row_both_exit_within_2_seconds(chains, round_no):
     for n in (1, 2):

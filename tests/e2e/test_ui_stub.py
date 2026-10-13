@@ -197,6 +197,7 @@ def stubbed(procs, datadir, session_id):
 
 # --- acceptance 2 of the phase: every state change reaches the stub ---------------------------------
 
+@pytest.mark.slow
 def test_headless_stub_logs_every_skeleton_event_in_order(procs, datadir, session_id, stubbed):
     sup, obs = stubbed
     rec = Recorder(obs)
@@ -252,6 +253,7 @@ def test_headless_stub_logs_every_skeleton_event_in_order(procs, datadir, sessio
 
 # --- acceptance 2: engine restart is seen, the stub is resynced, the stub keeps running ----------
 
+@pytest.mark.slow
 def test_engine_restart_is_seen_and_resynced_without_restarting_the_stub(procs, datadir, session_id, stubbed):
     sup, obs = stubbed
     rec = Recorder(obs)

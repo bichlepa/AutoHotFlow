@@ -141,6 +141,7 @@ def test_no_pool_means_worker_not_available(chains, datadir):
 
 # --- a long blocking call ----------------------------------------------------------------------------
 
+@pytest.mark.slow
 def test_a_worker_that_blocks_longer_than_6_s_is_not_hung_and_the_element_ends_normal(chains, datadir):
     chain = start_chain(chains, datadir, {"wlong": ("Action_TestLongBlockWorker", None)})
     name = next(iter(chain.wait_ready(["worker:1"], timeout=READY_S)))
@@ -157,6 +158,7 @@ def test_a_worker_that_blocks_longer_than_6_s_is_not_hung_and_the_element_ends_n
 
 # --- cancel, deadline ---------------------------------------------------------------------------------
 
+@pytest.mark.slow
 def test_cancel_of_a_frozen_worker_ends_the_instance_at_once_and_the_process_is_killed_and_replaced(chains, datadir):
     flows = dict(ECHO, wfreeze=("Action_TestFreezeWorker", None))
     chain = start_chain(chains, datadir, flows)
@@ -182,6 +184,7 @@ def test_cancel_of_a_frozen_worker_ends_the_instance_at_once_and_the_process_is_
     assert old not in live_workers(chain)
 
 
+@pytest.mark.slow
 def test_job_deadline_ends_the_element_with_worker_timeout_and_kills_the_worker(chains, datadir):
     flows = dict(ECHO, wtimeout=("Action_TestFreezeTimeoutWorker", None))
     chain = start_chain(chains, datadir, flows)
@@ -256,6 +259,7 @@ def test_worker_killed_before_it_answers_the_run_ends_the_element_with_worker_cr
     assert state["state"] == "exception" and state["message"] == "worker crashed (%s)" % old, state
 
 
+@pytest.mark.slow
 def test_frozen_worker_does_not_answer_the_run_and_is_replaced(chains, datadir):
     chain = start_chain(chains, datadir, ECHO)
     old = next(iter(chain.wait_ready(["worker:1"], timeout=READY_S)))
@@ -270,6 +274,7 @@ def test_frozen_worker_does_not_answer_the_run_and_is_replaced(chains, datadir):
     run_echo_ok(chain)          # the frozen one was killed, a new one serves the next job
 
 
+@pytest.mark.slow
 def test_five_failures_within_a_minute_block_the_pool(chains, datadir):
     chain = start_chain(chains, datadir, ECHO, ["--workers=2"])
     killed = []
@@ -295,6 +300,7 @@ def test_five_failures_within_a_minute_block_the_pool(chains, datadir):
 
 # --- restart of the engine -------------------------------------------------------------------------------
 
+@pytest.mark.slow
 def test_engine_restart_during_a_worker_job_leaves_no_orphan_and_the_next_job_runs(chains, datadir):
     flows = dict(ECHO, wfreeze=("Action_TestFreezeWorker", None))
     chain = start_chain(chains, datadir, flows)
@@ -329,6 +335,7 @@ def exited_engine_gone(chain, name, timeout):
     return chain.rec.wait(event("evt.process.exited", name=name, reason="engine gone"), timeout=scaled(timeout))
 
 
+@pytest.mark.slow
 def test_engine_killed_during_a_hanging_job_ends_the_worker_at_once_and_the_new_engine_builds_the_pool(chains, datadir):
     flows = dict(ECHO, whang=("Action_TestHangWorker", None))
     chain = start_chain(chains, datadir, flows)
@@ -356,6 +363,7 @@ def test_engine_killed_during_a_hanging_job_ends_the_worker_at_once_and_the_new_
     run_echo_ok(chain)          # the new engine's pool serves a new job
 
 
+@pytest.mark.slow
 def test_engine_beyond_the_restart_limit_leaves_no_worker(chains, datadir):
     flows = dict(ECHO, whang=("Action_TestHangWorker", None))
     chain = start_chain(chains, datadir, flows, ["--test-roles", "--restart-max=0"])
@@ -377,6 +385,7 @@ def test_engine_beyond_the_restart_limit_leaves_no_worker(chains, datadir):
 
 # --- limit, demand, idle end ---------------------------------------------------------------------------------
 
+@pytest.mark.slow
 def test_more_jobs_than_the_limit_wait_and_the_limit_is_never_exceeded(chains, datadir):
     names = ["wb%d" % i for i in range(4)]
     flows = {n: ("Action_TestBlockWorker", {"Duration": "1500"}) for n in names}
@@ -408,6 +417,7 @@ def test_more_jobs_than_the_limit_wait_and_the_limit_is_never_exceeded(chains, d
     assert len(workers(chain)) <= 2, workers(chain)
 
 
+@pytest.mark.slow
 def test_idle_workers_beyond_the_warm_one_end_after_the_idle_time(chains, datadir):
     names = ["wi%d" % i for i in range(3)]
     flows = {n: ("Action_TestBlockWorker", {"Duration": "2500"}) for n in names}

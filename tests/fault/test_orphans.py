@@ -17,6 +17,7 @@ from faultfixtures import chains  # noqa: F401  (fixture)
 pytestmark = pytest.mark.fault
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize("round_no", repeat_ids())
 def test_children_end_within_the_orphan_budget_when_the_supervisor_is_killed(chains, round_no):
     chain = chains(FULL_CHAIN, STUB_OPTS)

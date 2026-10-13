@@ -252,6 +252,7 @@ def test_frames_queued_at_shutdown_and_the_bye_reach_a_hub_that_reads_late(procs
         assert types[-1] == "sys.bye", types[-3:]
 
 
+@pytest.mark.slow
 def test_hub_gone_role_ends_within_orphan_budget_and_leaves_no_process(procs, datadir, runs, session_id, pipe):
     hub = RoleHub(pipe).start()
     try:
@@ -292,6 +293,7 @@ def test_error_in_a_timer_is_logged_and_the_role_keeps_running(procs, datadir, r
         assert ahk.wait(timeout=10) == EXIT_OK, run.stderr_text()
 
 
+@pytest.mark.slow
 def test_log_queue_keeps_500_and_sends_them_when_storage_is_the_target(procs, datadir, runs, session_id, pipe):
     with RoleHub(pipe) as hub, AhfClient(pipe, "storage") as storage:
         run = launch(procs, datadir, runs, pipe, session_id, "echo")

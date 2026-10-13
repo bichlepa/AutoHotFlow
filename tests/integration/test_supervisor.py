@@ -441,6 +441,7 @@ def test_test_roles_are_unknown_without_the_flag(started, session_id):
 
 # --- crash and restart policy ------------------------------------------------------------------------
 
+@pytest.mark.slow
 def test_crashed_child_is_reported_within_1s_restarted_by_policy_and_others_are_untouched(started, session_id):
     sup = started("--start=echo:keep,crasher", "--test-roles")
     py = connect(sup.pipe, "py")
@@ -506,6 +507,7 @@ def test_crashed_child_is_reported_within_1s_restarted_by_policy_and_others_are_
 
 # --- hang ----------------------------------------------------------------------------------------------
 
+@pytest.mark.slow
 def test_frozen_child_is_hung_within_8s_and_ended_like_a_crash(started, session_id):
     sup = started("--start=hanger", "--test-roles")
     py = connect(sup.pipe, "py")
@@ -580,6 +582,7 @@ def test_slow_child_is_waited_for_and_not_terminated(started, session_id):
         py.close()
 
 
+@pytest.mark.slow
 def test_frozen_child_at_exit_is_terminated_at_the_deadline(started, session_id):
     sup = started("--start=echo:a,hanger", "--test-roles", "--deadline=2000")
     py = connect(sup.pipe, "py")
@@ -635,6 +638,7 @@ def test_a_manager_can_cancel_the_exit_in_the_prepare_phase(started, session_id)
 
 # --- Hub.Request deadline (WI-07 open point) -----------------------------------------------------------
 
+@pytest.mark.slow
 def test_request_without_answer_times_out_and_late_answer_is_dropped(started, session_id):
     """A UI that never answers cmd.app.prepareExit: the request ends at its limit with a timeout, the exit
     goes on (a timeout is no cancel), and an answer that comes later is dropped, not counted as a cancel."""

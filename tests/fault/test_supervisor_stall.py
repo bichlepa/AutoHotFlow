@@ -22,6 +22,7 @@ FREEZE_S = 8.0          # longer than the pong timeout (6 s)
 SETTLE_S = 4.0          # after the thaw: ping schedule restarts, a wrong verdict would fall here
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize("round_no", repeat_ids())
 def test_supervisor_stand_still_does_not_make_healthy_children_hung(chains, round_no):
     chain = chains(FULL_CHAIN, STUB_OPTS)
@@ -72,6 +73,7 @@ def freeze_for(chain, seconds):
     return time.perf_counter()
 
 
+@pytest.mark.slow
 def test_open_prepare_exit_request_keeps_its_remaining_time_after_a_stand_still(chains):
     """The answer limit of cmd.app.prepareExit (5 s) is still open when the supervisor stands still for 8 s. After the
     thaw the request has the rest of its time (a timeout means "no cancel": the session would end at once)."""
@@ -95,6 +97,7 @@ def test_open_prepare_exit_request_keeps_its_remaining_time_after_a_stand_still(
         manager.close()
 
 
+@pytest.mark.slow
 def test_connection_without_hello_keeps_its_remaining_time_after_a_stand_still(chains):
     """A new connection has 5 s to say sys.hello. The supervisor stands still for 8 s after 1.5 s of it: the connection
     is not closed at once after the thaw, but after the rest of its time."""

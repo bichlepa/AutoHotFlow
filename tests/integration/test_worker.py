@@ -167,6 +167,7 @@ def test_cancel_of_unknown_execution_is_not_found(worker):
 
 # --- cancel, pings, shutdown -----------------------------------------------------------------------
 
+@pytest.mark.slow
 def test_cancel_stops_the_running_element_and_reports_stopped_within_500_ms(worker):
     # The element must still run when the cancel arrives (F-37): with the default 800 ms a loaded machine
     # delayed the cancel past the end of the element and the answer was not_found. So the element blocks long,

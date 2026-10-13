@@ -69,6 +69,7 @@ def handles_of(pid):
     return psutil.Process(pid).num_handles()
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize("round_no", repeat_ids())
 def test_clients_that_close_abruptly_are_cleaned_up_without_handle_leak(chains, round_no):
     chain = chains(FULL_CHAIN, STUB_OPTS)
@@ -103,6 +104,7 @@ def test_clients_that_close_abruptly_are_cleaned_up_without_handle_leak(chains, 
     assert "flows" in chain.snapshot_ok()
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize("round_no", repeat_ids())
 def test_client_that_never_reads_is_removed_on_queue_overflow_and_the_chain_stays_responsive(chains, round_no):
     chain = chains(FULL_CHAIN, STUB_OPTS)
@@ -188,6 +190,7 @@ def test_role_rebuilds_the_connection_after_the_hub_cut_its_pipe(procs, datadir,
             run.close()
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize("round_no", repeat_ids())
 def test_role_ends_with_exit_4_when_its_pipe_is_cut_and_the_hub_does_not_come_back(procs, datadir, session_id,
                                                                                      round_no):

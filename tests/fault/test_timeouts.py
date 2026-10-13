@@ -26,6 +26,7 @@ THAW_AFTER_S = 1.2            # after the limit, before the exit would otherwise
 CALLER_LIMIT_S = 1.0
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize("round_no", repeat_ids())
 def test_hub_request_to_a_frozen_ui_times_out_once_and_the_late_answer_is_dropped(chains, round_no):
     chain = chains(FULL_CHAIN, STUB_OPTS + ["--test-roles", "--prepare-limit=%d" % PREPARE_LIMIT_MS,
@@ -50,6 +51,7 @@ def test_hub_request_to_a_frozen_ui_times_out_once_and_the_late_answer_is_droppe
     assert elapsed < THAW_AFTER_S + scaled(5.0), elapsed
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize("round_no", repeat_ids())
 def test_request_to_a_frozen_engine_ends_at_the_callers_limit_and_the_engine_is_then_restarted(chains, round_no):
     chain = chains(FULL_CHAIN, STUB_OPTS)

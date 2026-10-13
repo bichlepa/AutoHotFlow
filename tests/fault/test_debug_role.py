@@ -62,13 +62,16 @@ def test_the_role_starts_with_start_debug_and_shows_the_process_table(chains, da
     assert snap["info"]["paused"] is False
 
 
+@pytest.mark.slow
 def test_refresh_stores_the_snapshot_of_every_role_and_the_supervisor(chains, datadir):
     chain = full_chain(chains, datadir)
-    # The window asks only processes that are ready (as it sees them). Wait until its table shows worker:1 as ready,
-    # not merely listed: in the state "starting" it gets the entry "not ready" instead of a snapshot (F-38).
-    assert wait_until(lambda: dbg(chain, "state")["states"].get("worker:1") == "ready", 10.0), dbg(chain, "state")
+    # The window asks only processes that are ready (as it sees them). Wait until its table shows every role as
+    # ready, not merely listed: in the state "starting" it gets the entry "not ready" instead of a snapshot (F-38).
+    # Waiting for worker:1 alone was not enough: a loaded run (--all) refreshed 4 of 6 now and then.
+    roles = ("storage", "engine", "manager", "debug", "worker:1")
+    assert wait_until(lambda: all(dbg(chain, "state")["states"].get(r) == "ready" for r in roles), 15.0),         dbg(chain, "state")["states"]
     answer = dbg(chain, "refresh")
-    assert answer["refreshed"] >= 6, answer          # supervisor, storage, engine, manager, debug, worker:1
+    assert answer["refreshed"] >= 6, (answer, dbg(chain, "state")["states"])   # supervisor + the five roles
     assert {"supervisor", "storage", "engine", "manager", "debug", "worker:1"} <= set(answer["snapshots"]), answer
     text = dbg(chain, "snapshot", name="engine")["text"]
     assert '"role": "engine"' in text and '"flows"' in text and "\n" in text      # formatted JSON
@@ -76,6 +79,7 @@ def test_refresh_stores_the_snapshot_of_every_role_and_the_supervisor(chains, da
     assert missing["ok"] is False and missing["error"]["code"] == "not_found"
 
 
+@pytest.mark.slow
 def test_refresh_shows_a_process_that_is_not_ready_as_not_ready_instead_of_leaving_it_out(chains, datadir):
     # F-38 (WI-34): RefreshSnapshots asked only the ready processes and left the others out without a trace. The
     # window is meant to show such states. echo:slowhello says hello 4 s after its start, so it is "starting" here.
@@ -83,6 +87,10 @@ def test_refresh_shows_a_process_that_is_not_ready_as_not_ready_instead_of_leavi
     chain = chains("storage,debug," + late, ["--test-roles", *STUB_OPTS])
     chain.wait_ready(["storage", "debug"], timeout=READY_S)
     assert wait_until(lambda: late in dbg(chain, "state")["processes"], 10.0), dbg(chain, "state")
+    # chain.wait_ready looks at the supervisor's events; the window's own table may still lag behind (a loaded run
+    # refreshed 2 of 3 now and then, report showed every role ready).
+    assert wait_until(lambda: all(dbg(chain, "state")["states"].get(r) == "ready" for r in ("storage", "debug")),
+                      10.0), dbg(chain, "state")["states"]
     if dbg(chain, "state")["states"].get(late) != "starting":
         pytest.skip("the late child was already ready (machine too slow for the scenario)")
     answer = dbg(chain, "refresh")
@@ -112,6 +120,7 @@ def test_the_live_log_has_a_level_and_a_source_filter(chains, datadir):
     assert dbg(chain, "filter", level=3, source="")["logVisible"] == base
 
 
+@pytest.mark.slow
 def test_the_event_stream_can_be_paused_and_resumed(chains, datadir):
     chain = full_chain(chains, datadir)
     assert wait_until(lambda: "flow:skeleton" in dbg(chain, "state")["topics"], 10.0)
@@ -143,6 +152,7 @@ def test_dump_values_arrive_in_the_window(chains, datadir):
     assert state, dbg(chain, "state")
 
 
+@pytest.mark.slow
 def test_the_export_button_writes_a_report_and_shows_the_path(chains, datadir):
     chain = full_chain(chains, datadir)
     answer = dbg(chain, "export", timeout=25.0)
@@ -155,6 +165,7 @@ def test_the_export_button_writes_a_report_and_shows_the_path(chains, datadir):
 
 # --- starting and closing ----------------------------------------------------------------------------------
 
+@pytest.mark.slow
 def test_command_debug_starts_the_role_once_and_a_second_call_starts_no_second(chains, datadir):
     chain = full_chain(chains, datadir, start="storage,engine,manager")
     assert "debug" not in chain.states()
@@ -173,6 +184,7 @@ def test_command_debug_starts_the_role_once_and_a_second_call_starts_no_second(c
     assert other["ok"] and "command" not in other
 
 
+@pytest.mark.slow
 def test_closing_the_window_ends_only_that_role_without_a_crash_and_it_can_be_opened_again(chains, datadir):
     chain = full_chain(chains, datadir)
     old = chain.pid("debug")
@@ -194,6 +206,7 @@ def test_closing_the_window_ends_only_that_role_without_a_crash_and_it_can_be_op
     assert dbg(chain, "state")["processes"]
 
 
+@pytest.mark.slow
 def test_the_debug_role_is_not_restarted_when_it_crashes(chains, datadir):
     chain = full_chain(chains, datadir)
     psutil.Process(chain.pid("debug")).kill()
@@ -230,6 +243,7 @@ def window_of(pid):
     return found
 
 
+@pytest.mark.gui
 def test_the_window_opens_takes_events_and_closes_like_a_user_would(chains, datadir):
     """No --headless: the role builds its window. The test checks that it opens, that events, log lines and dumps
     do not break the drawing (the role stays alive and answers), and that WM_CLOSE (the X button) ends only that role

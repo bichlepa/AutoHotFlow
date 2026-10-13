@@ -85,15 +85,37 @@ tests/
 
 ```
 pip install -r tests/requirements.txt
-pytest tests/ahk tests/integration -q            # fast
-pytest tests/e2e tests/fault -q                  # whole system
-pytest tests/stress -q -m stress                 # long, on request only
+python -m pytest tests -q                        # fast tier (default, every change)
+python -m pytest tests -q --foundation          # IPC / supervisor / diagnosis base, incl. its slow tests
+python -m pytest tests -q --all -m slow          # slow tier only
+python -m pytest tests -q --all                  # fast + slow + foundation + gui
+python -m pytest tests -q --all -m gui -n 0      # windows and dialogs appear
+python -m pytest tests -q -m stress              # long, on request only (-m soak: minutes)
 ```
 
-**Parallel (default since WI-18).** `pytest.ini` sets `addopts = -n auto --dist loadgroup` (pytest-xdist, 8 workers on this machine). `python -m pytest tests -q` thus runs in about 50 s (serial about 340 s). Serial: `-n 0`. Rules for this:
+**Tiers (marker-based, across the folders).** The folders say what a test checks, the markers say when it runs. Measured serial run: 752 tests, 10:44 min; 69 tests of 3 s or more took 433 s of them.
+
+| Tier | Marker | Runs | Content |
+|---|---|---|---|
+| fast | none | default, every change | everything that takes less than about 3 s, shows no window and is not foundation |
+| foundation | `foundation` (set centrally in `tests/conftest.py`: `FOUNDATION_FILES`, `FOUNDATION_AHK`) | `--foundation` or `--all`; when the base changes (see below) and at the end of every block | tests of the base that later packages are not expected to change: IPC (pipe, frame, peer, dispatcher), supervisor and process coordination (crash, hang, stall, shutdown, orphans, pipe break, timeouts), diagnosis (report, debug role and dump), the test tooling. About 60 % of the work of the default run before the split |
+| slow | `slow` | `-m slow` or `--all`; at the end of a package that touches timing, supervisor, worker or storage, and at the end of every block | tests that wait for deadlines (hang detection, idle times, reconnect budgets, restarts in a row), about 3 s or more including the setup. Smoke variants in `tests/stress/` count as slow automatically |
+| gui | `gui` | `-m gui` or `--all`; rarely, by hand, when the owner does not use the PC | tests that open a window or provoke a dialog on the desktop (debug window, `ahkrun` dialog guard with a real `MsgBox`) |
+| stress / soak | `stress`, `soak` | `-m stress`, `-m soak`, serial | unchanged, see section 3 |
+
+- A new test that waits for a deadline of the product or takes about 3 s or more gets `@pytest.mark.slow`. A test that must show a window gets `@pytest.mark.gui` (not `slow` at the same time: `-m gui` would drop it). Tests of windows stay `--headless` wherever the window itself is not the subject.
+- `-m` only names the groups to switch on (conftest). Without `--all`, `slow`, `foundation` and `gui` are deselected unless named in `-m`. A test in several tiers runs only when all of them are on, so use `--all -m fault`, `--all -m slow`, `--all -m gui`. `--foundation` is the short form for the foundation tier including its slow tests (without gui).
+- **Run log (every run).** `%TEMP%/ahf_testruns/<time>-<pid>/` (the path is printed at the end of the run; `AHF_TEST_LOGS` changes the folder; the newest 15 runs are kept): `summary.txt` (command, counts, failed tests, slowest 20), `results.txt` (every test in start order with UTC/local start time, outcome, duration), `failures/<test>.<phase>.txt` (times, xdist worker, traceback, captured output) and `data/<test>/` for every failed test: the data directory (`Log/*.txt`, `Reports/`, `*.stderr`) and `diagnosis/` with `snapshot_supervisor.json` and `report_answer.json`. The diagnosis is fetched from the supervisor while it still runs (the failure hook runs before the fixture teardown): the snapshot holds the log ring and the output of the children and works without `storage`; the crash report (`reason: test-failed`, written into `Reports/` of the data directory) is only requested when `storage` is connected. Without a `session_id` fixture (unit tests) or when the test ended the supervisor itself, `diagnosis-none.txt` says why there is none.
+- **Times:** the application logs in UTC (`ts` yyyyMMddHHmmss), report folders carry local time; the run log shows both. Passed tests leave no data (`AHF_TEST_KEEP=1` keeps all directories as before).
+- **When the foundation runs:** when a change touches `src/core/` (incl. `ipc/`), `src/supervisor/`, `src/AhfBoot.ahk`, `src/AutoHotFlow.ahk`, `src/debugview/`, `tests/support/`, `tests/integration/helpers/` or `tools/ahkrun.py`, and at the end of every block. Other changes (engine, storage, worker, elements, manager, editor) do not need it: they still start the real supervisor in the e2e and engine tests, so a break of the base shows up there too. A new role that the supervisor starts needs its entry in `tests/fault/test_snapshot.py` (that file stays in the default run for this reason).
+- `FOUNDATION_FILES` is the one place to change when a test belongs to the base or no longer does. New test files of a topic that is not in the list are fast by default.
+- Several tests exist as a smoke variant (`slow`) and a full variant (`stress`), e.g. the handle count of the supervisor over 12 restarts (smoke) and over 50 (full, `tests/fault/test_diagnose.py`).
+- The strict reference run (`-n 0`, below) uses `--all`.
+
+**Parallel (default since WI-18).** `pytest.ini` sets `addopts = -n auto --dist loadgroup` (pytest-xdist, 8 workers on this machine). `python -m pytest tests -q` (fast tier) thus runs in about 16 s with 8 workers (about 12 s with `-n 16`; the work adds up to about 100 s of test time). `--foundation` takes about 55 s, `--all` about 90 s (serial about 640 s). Serial: `-n 0`. Rules for this:
 
 - Runs with `-m stress` or `-m soak` are switched to a single process by `tests/conftest.py` (`pytest_cmdline_main`) itself. Measurements (idle CPU, latency, memory) must never run in parallel with other load.
-- The marker for groups is `@pytest.mark.xdist_group("name")` (with `--dist loadgroup`, tests of the same group run one after another on the same worker). So far no group is needed.
+- The marker for groups is `@pytest.mark.xdist_group("name")` (with `--dist loadgroup`, tests of the same group run one after another on the same worker). `tests/test_ahk_runner.py` puts all items of one `.test.ahk` file into one group: its result cache is per process, without the group every worker that gets one case would run the whole file again (30 files were run up to 8 times each; the default run took 42 s instead of 32 s).
 - **Time limits (WI-32).** An upper time limit that checks a promise of the product ("the role ends within 1 s", "crash reported within 1 s") runs through `support.timing.scaled()`: in the serial run (`-n 0`, `-m stress`, `-m soak`) it applies unchanged (this is the reference); in a parallel run (xdist worker) it is multiplied by the factor 3 (`AHF_TIMING_FACTOR` overrides it, `1` is strict). Only **upper** limits are scaled, never lower ones (a timeout must not fire too early), never counts or results. A red test in the parallel run then means "far too slow", not "somewhat slow on a loaded machine". A new time limit that checks a product promise must go through `scaled()`; measurements with fixed numbers (throughput, latency distribution) belong in `-m stress`.
 - **The parallel run is not the reference (WI-34, E17).** Because `scaled()` relaxes the upper limits by the factor 3 in the parallel run, this run no longer detects a deterioration of latency up to this factor. The factor 3 stays. Therefore: **the serial run (`-n 0`) and `python -m pytest tests -m stress` are run at least at the end of every package that changes timing behavior, and at the end of every block.** They are the strict reference, their result counts. Waits for events that lie close to deadlines of the product (restart, end of a worker, detected hang) also run through `scaled()`; a fixed `timeout=` with a number next to such a deadline is a finding (F-42).
 - **Do not automatically repeat red tests.** No `pytest-rerunfailures` and no loop that repeats a red test until it turns green. A flaky test can show a real error (F-26 was one, F-40 and F-41 were too). A red test is classified: test problem (then prove the cause and correct it, do not quietly relax a limit) or product defect (then a test that is red beforehand).

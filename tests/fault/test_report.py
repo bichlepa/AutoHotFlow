@@ -110,6 +110,7 @@ def test_only_the_supervisor_may_write_reports(chains, datadir):
 
 # --- a frozen role ----------------------------------------------------------------------------------
 
+@pytest.mark.slow
 def test_a_frozen_role_is_marked_and_the_report_is_ready_within_the_deadline(chains, datadir):
     chain = chains("storage,echo:a", ["--test-roles"])
     chain.wait_ready(["storage", "echo:a"])
@@ -131,6 +132,7 @@ def test_a_frozen_role_is_marked_and_the_report_is_ready_within_the_deadline(cha
 
 # --- automatic reports ------------------------------------------------------------------------------
 
+@pytest.mark.slow
 def test_a_crash_writes_a_report_by_itself_and_the_rate_limit_holds_back_the_next(chains, datadir):
     chain = chains("storage,crasher", ["--test-roles"])
     chain.wait_ready(["storage", "crasher"])
@@ -156,6 +158,7 @@ def test_a_crash_writes_a_report_by_itself_and_the_rate_limit_holds_back_the_nex
     assert manual_report(chain, "manual")["ok"]
 
 
+@pytest.mark.slow
 def test_a_hung_role_writes_a_report_by_itself(chains, datadir):
     chain = chains("storage,echo:a", ["--test-roles"])
     chain.wait_ready(["storage", "echo:a"])
@@ -208,6 +211,7 @@ def test_a_report_waits_for_a_restarted_storage_and_is_written_then(chains, data
     assert wait_report(datadir, "crashed-storage") is not None
 
 
+@pytest.mark.slow
 def test_a_report_for_a_storage_that_never_returns_is_answered_in_time_and_kept(chains, datadir):
     chain = chains("storage,engine", ["--test-roles", "--restart-max=0", "--report-wait=1500"])
     chain.wait_ready(["storage", "engine"], timeout=READY_S)

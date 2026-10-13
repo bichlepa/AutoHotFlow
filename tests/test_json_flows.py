@@ -97,6 +97,7 @@ def test_written_files_have_v1_layout(run_ahk, tmp_path):
     assert not mismatches, "layout differs from json.dumps(indent=2) in: %s" % mismatches
 
 
+@pytest.mark.slow
 def test_ten_thousand_messages_are_measured(run_ahk, record_property):
     res = run_ahk(BENCH_HELPER, timeout=120)
     assert not res.timed_out, "benchmark did not finish: %s" % res.stderr

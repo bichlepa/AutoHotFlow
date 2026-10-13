@@ -39,7 +39,7 @@
             "problemMatcher": []
         },
         {
-            "label": "Test: all (parallel, default)",
+            "label": "Test: fast (parallel, default, no slow, no foundation, no windows)",
             "type": "shell",
             "command": "python",
             "args": [
@@ -55,13 +55,77 @@
             "problemMatcher": []
         },
         {
-            "label": "Test: all serial, verbose (-n 0 -v)",
+            "label": "Test: slow tests only (--all -m slow, parallel)",
             "type": "shell",
             "command": "python",
             "args": [
                 "-m",
                 "pytest",
                 "tests",
+                "-q",
+                "--all",
+                "-m",
+                "slow"
+            ],
+            "group": "test",
+            "problemMatcher": []
+        },
+        {
+            "label": "Test: everything except stress (--all, parallel; windows appear)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "-m",
+                "pytest",
+                "tests",
+                "-q",
+                "--all"
+            ],
+            "group": "test",
+            "problemMatcher": []
+        },
+        {
+            "label": "Test: gui (--all -m gui, windows and dialogs appear, do not use the PC)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "-m",
+                "pytest",
+                "tests",
+                "-q",
+                "--all",
+                "-m",
+                "gui",
+                "-n",
+                "0",
+                "-v"
+            ],
+            "group": "test",
+            "problemMatcher": []
+        },
+        {
+            "label": "Test: foundation (IPC, supervisor, diagnosis; incl. slow, no windows)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "-m",
+                "pytest",
+                "tests",
+                "-q",
+                "--foundation"
+            ],
+            "group": "test",
+            "problemMatcher": []
+        },
+        {
+            "label": "Test: everything except stress, serial, verbose (--all -n 0 -v)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "-m",
+                "pytest",
+                "tests",
+                "--all",
                 "-n",
                 "0",
                 "-v"
@@ -154,7 +218,7 @@
             "problemMatcher": []
         },
         {
-            "label": "Test: fault injection (-m fault)",
+            "label": "Test: fault injection incl. slow (--all -m fault)",
             "type": "shell",
             "command": "python",
             "args": [
@@ -162,6 +226,7 @@
                 "pytest",
                 "tests",
                 "-q",
+                "--all",
                 "-m",
                 "fault"
             ],

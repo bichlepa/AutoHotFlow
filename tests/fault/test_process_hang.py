@@ -53,6 +53,7 @@ def expect_terminated(chain, name, pid, t_hung, restart):
     return crashed
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize("round_no", repeat_ids())
 def test_frozen_engine_is_hung_ended_and_restarted_while_the_others_work(chains, round_no):
     chain = chains(FULL_CHAIN, STUB_OPTS)
@@ -70,6 +71,7 @@ def test_frozen_engine_is_hung_ended_and_restarted_while_the_others_work(chains,
     assert "flows" in chain.snapshot_ok()
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize("round_no", repeat_ids())
 def test_frozen_storage_is_hung_ended_and_restarted_and_answers_again(chains, round_no):
     chain = chains(FULL_CHAIN, STUB_OPTS)
@@ -85,6 +87,7 @@ def test_frozen_storage_is_hung_ended_and_restarted_and_answers_again(chains, ro
     assert after["manager"]["pid"] == before["manager"] and after["manager"]["state"] == "ready"
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize("round_no", repeat_ids())
 def test_frozen_ui_stub_is_hung_ended_and_not_restarted(chains, round_no):
     chain = chains(FULL_CHAIN, STUB_OPTS)

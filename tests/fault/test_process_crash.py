@@ -45,6 +45,7 @@ def kill_role(chain, name):
     return pid, death[pid], msg
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize("round_no", repeat_ids())
 def test_killed_engine_is_reported_restarted_and_the_others_are_untouched(chains, round_no):
     chain = chains(FULL_CHAIN, STUB_OPTS)
@@ -84,6 +85,7 @@ def test_killed_storage_is_restarted_and_the_engine_keeps_running(chains, round_
     assert after["manager"]["pid"] == before["manager"] and after["manager"]["state"] == "ready"
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize("round_no", repeat_ids())
 def test_killed_manager_stub_is_not_restarted_and_requests_to_it_end_at_once(chains, round_no):
     chain = chains(FULL_CHAIN, STUB_OPTS)
@@ -108,6 +110,7 @@ def test_killed_manager_stub_is_not_restarted_and_requests_to_it_end_at_once(cha
     assert "flows" in chain.snapshot_ok()
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize("round_no", repeat_ids())
 def test_killed_worker_ends_its_element_with_worker_crashed_and_is_not_restarted(chains, datadir, round_no):
     """Regression of WI-11 under the real supervisor. Since WI-27 the engine is a child and asks the supervisor for its

@@ -262,6 +262,7 @@ def test_engine_reads_at_most_two_flow_files_at_a_time_while_loading(procs, data
         stub.close()
 
 
+@pytest.mark.slow
 def test_engine_does_not_ask_for_more_files_when_storage_has_stopped_answering(procs, datadir, runs, session_id, pipe,
                                                                               hub, flowdir):
     # A storage that does not answer would make 200 reads wait for their deadline one after the other once
@@ -287,6 +288,7 @@ def test_engine_does_not_ask_for_more_files_when_storage_has_stopped_answering(p
         stub.close()
 
 
+@pytest.mark.slow
 def test_engine_waits_for_a_storage_that_starts_5_s_after_it_and_reports_no_error(procs, datadir, runs, session_id,
                                                                                  pipe, hub, flowdir):
     # WI-31 (F-31, F-24): before, the engine gave up after 5 tries in 2.5 s and never loaded; every try that hit

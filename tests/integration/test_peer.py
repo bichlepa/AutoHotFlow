@@ -259,6 +259,7 @@ def test_reconnect_after_hub_restart_resubscribes_and_reports_ready_again(procs,
             hub2.stop()
 
 
+@pytest.mark.slow
 def test_hub_gone_for_longer_than_the_budget_calls_onclosed(procs, ahk_exe, datadir, pipe_name):
     hub = WakingHub(pipe_name).start()
     try:
@@ -297,6 +298,7 @@ def test_pending_request_fails_with_peer_gone_when_hub_drops(procs, ahk_exe, dat
 
 # --- many requests ----------------------------------------------------------------------------
 
+@pytest.mark.slow
 def test_10000_sequential_requests_keep_pending_and_handles_flat(procs, ahk_exe, datadir, pipe_name):
     with WakingHub(pipe_name):
         srv = probe(procs, ahk_exe, datadir, pipe_name, "srv", "serve")

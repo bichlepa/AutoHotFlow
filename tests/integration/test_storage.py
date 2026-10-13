@@ -170,6 +170,7 @@ def test_flow_write_rejects_text_that_is_not_a_json_object(storage, flowdir):
 
 # --- v1 round trip ----------------------------------------------------------------------------------
 
+@pytest.mark.slow
 def test_v1_flows_round_trip_through_storage_with_same_structure_and_types(procs, datadir, runs, pipe,
                                                                            session_id, hub):
     """Reads every v1 flow, writes it back through storage and compares structure and JSON types."""
@@ -479,6 +480,7 @@ def test_no_log_line_is_lost_while_other_processes_hold_the_files(storage, flowd
                 s, name, len(found), next((i for i, v in enumerate(found) if v != i), len(found)))
 
 
+@pytest.mark.slow
 def test_a_log_line_that_cannot_be_written_is_reported_in_the_own_log(storage, flowdir, pipe):
     """F-04: when the retries fail, the loss is not silent: a line in Log_storage.txt names it."""
     import threading
@@ -557,6 +559,7 @@ def _flood_and_measure(storage, flowdir):
     return rate, rss
 
 
+@pytest.mark.slow
 def test_a_log_flood_is_written_completely_and_far_above_the_old_pace(storage, flowdir):
     """F-08: before WI-25 the storage wrote about 30 lines per second (12000 lines would take 400 s). Standard run,
     also in parallel with other tests: the whole flood must be written within the 60 s of the helper (at least 200
@@ -576,6 +579,7 @@ def test_a_log_flood_is_written_at_more_than_1000_lines_per_second(storage, flow
     assert rss < 120
 
 
+@pytest.mark.slow
 def test_a_request_is_answered_in_time_during_a_log_flood(storage, flowdir, pipe):
     """F-08: requests and log lines used to share one queue, so a read waited behind the whole flood."""
     _, _, client = storage

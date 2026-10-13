@@ -2,6 +2,8 @@
 
 import time
 
+import pytest
+
 from support.timing import scaled
 
 from test_supervisor import alive, event, wait_ready, watch_for
@@ -23,6 +25,7 @@ def done_for(client, exec_id, timeout):
     return None
 
 
+@pytest.mark.slow
 def test_worker_that_blocks_longer_than_the_pong_timeout_is_not_hung_while_it_has_a_job(started, clients):
     """Action_TestLongBlockWorker blocks in one call for 7.5 s (pong timeout 6 s): before WI-27 the heartbeat
     declared the worker hung and ended it (decision of WI-11, 'no tolerance')."""
