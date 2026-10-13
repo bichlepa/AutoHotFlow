@@ -8,8 +8,8 @@ Session start: 2026-10-13, work-item mode (no wishes). Main checkout clean, on `
 
 | WI | Title | State | Model | Branch / workspace | Commit | Run ID | Date | Note |
 |---|---|---|---|---|---|---|---|---|
-| WI-36 | Golden data from v1 | in progress | sonnet (implementer) | `wip/wi-36` | | | 2026-10-13 | starts after WI-34 (done) |
-| WI-37 | Expression language v2: spec, tokenizer, parser | open | | | | | 2026-10-13 | no dependency; the owner's answers E29 to E32 (`d423cb9`) are in; runs after WI-36 (one task at a time, slot 1) |
+| WI-36 | Golden data from v1 | done | sonnet (implementer), haiku (line-ending fix) | integrated: 786a688 to 9ccf5b3; fix 829ce0f | 829ce0f | fast run 20261013-185858-829ce0f4 (336 passed), golden `--check` exit 0 on the main checkout | 2026-10-13 | 2161 cases, 18 groups; `evalparam` not implemented (optional in the work item); findings in `tests/golden/findings.json` |
+| WI-37 | Expression language v2: spec, tokenizer, parser | in progress | sonnet (implementer) | `wip/wi-37` | | | 2026-10-13 | started after WI-36 (one task at a time, slot 1) |
 | WI-38 | Evaluator | open | | | | | 2026-10-13 | depends on WI-37 |
 | WI-39 | Converter v1 expressions | open | | | | | 2026-10-13 | depends on WI-36, WI-37, WI-38 |
 | WI-40 | Variable model in the engine | open | | | | | 2026-10-13 | depends on WI-38 |
