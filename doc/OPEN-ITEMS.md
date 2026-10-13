@@ -252,6 +252,29 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 **Action:** On the next failure read the failure text and `Log/` in the run log.
 **Evidence:** none kept.
 
+### F-72*: A second start is silent (forwarded to a running supervisor)
+
+**What:** When the product is started while a supervisor is still running, the start is forwarded as an empty `cmd.app.command` and the second process exits with 0. Nothing is shown, no dialog, no console output. The `--start` options of the second start are ignored.
+**Status:** Observed by the project owner's manual check (2026-10-13). Verified by the supervisor log (nine lines `command from command:` between 19:13 and 19:17, run 2026-10-13 manual session) and by reading the code: `src/supervisor/Supervisor.ahk:316-331` (`_ForwardIfRunning`, mutex `Local\AHF.supervisor.main`), `src/supervisor/Supervisor.ahk:224-234` (empty command only logged), `src/supervisor/SupervisorCommand.ahk:32-46`.
+**Sign that it matters:** a start that does nothing and gives no hint why.
+**Action:** Decide the user-visible feedback (for example a message that an instance is already running, or show the existing window). Not decided.
+**Evidence:** diagnosis run on the owner's machine (read only); the supervisor log of `%APPDATA%\AutoHotFlow v2`.
+
+### F-73*: Closing the windows does not end the application
+
+**What:** After the manager and the debug window were closed (2 s after start, no quit command sent), the supervisor kept running without any window. Both children were logged as `ended unexpectedly (exited, exit 0)` and a crash report was written, although they exited normally. The manual check step 5 expects the process to end.
+**Status:** Observed once by the project owner's manual check (2026-10-13). Verified by the logs. Cause in code not analysed (`StubGui.ahk:29` sends the quit only on `UserExit`). Related to E14 (open decision, S4).
+**Sign that it matters:** a process stays alive after its windows are closed; false crash reports.
+**Action:** Decide the close behaviour (E14), then fix the exit classification of a normal exit and the quit path.
+**Evidence:** `Log_children` of the last manual session (the entries at 19:12:51).
+
+### F-74*: Manual-check guide and start tasks do not match
+
+**What:** The guide `doc/MANUAL-CHECKS.md` (section 1) asks for an empty data folder with `skeleton_flow.json` copied to `Flows\skeleton.json`. The VS Code start task passes no `--data` and no `--session`, so the product uses the default folder `%APPDATA%\AutoHotFlow v2`, which has no skeleton flow. Also, the process tasks print nothing when the application ends, so the end cannot be seen in the task.
+**Status:** Verified by reading `doc/MANUAL-CHECKS.md:13-21` and `.vscode/tasks.json` (the manager stub task, lines 533-546). Not checked: the VS Code UI behaviour.
+**Action:** The project owner has another agent fix the task and the guide.
+**Evidence:** manual check of the project owner, step 2 and step 5.
+
 ## Watch list (E7)
 
 These items were deliberately not fixed in phase 2b. Closed items (F-05, F-07, F-11, F-16, F-19 and others) are not listed. The findings above are not repeated here.
