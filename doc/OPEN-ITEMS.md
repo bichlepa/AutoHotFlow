@@ -38,7 +38,7 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 | F-282 | The stress test with 200 big flows fails its snapshot budget (largest snapshot answer during loading 2326 ms, budget 1000 ms) | observed once at the S1 acceptance (WI-43); measured in WI-46: the conversion is not the cause (worst case 8 % of the load time), largest snapshot answer 0.56 to 0.79 s in 6 of 7 runs, once 1.5 s; guarded by a stress run at the end of every S2 package on the load path | yes |
 | F-284 | A numeric text outside the range of Float (`1e-3001`) is true in a boolean test of AutoHotkey when it is a concatenation result, and false in the evaluator | verified by the expression oracle (one case in 40,000 random cases), open, low, AutoHotkey quirk | |
 | F-364 | `cmd.flow.get` returns `flowSettings.strictTypes` as `1`/`0` instead of JSON `true`/`false` | verified (WI-49 test, a file with `true` came back as `1`), open, low | |
-| F-374* | `test_cancel_stops_the_running_element_and_reports_stopped_within_500_ms` did not see the job in the snapshot of the worker | observed once in a slow-tier run next to another suite run, 5 of 5 green alone, open | |
+| F-374 | `test_cancel_stops_the_running_element_and_reports_stopped_within_500_ms` did not see the job in the snapshot of the worker | observed once in a slow-tier run next to another suite run, 5 of 5 green alone, open | |
 
 * Provisional IDs (with `*`) were renumbered to final IDs on 2026-10-14, at the owner's request. Mapping, old to new: F-48 to F-269, F-49 to F-270, F-50 to F-271, F-51 to F-272, F-73 to F-273, F-74 to F-274, F-85 to F-275, F-125 to F-276, F-105 to F-277, F-165 to F-278, F-235 to F-279, F-236 to F-280, F-255 to F-281, F-268 to F-282, F-72 to F-283 (closed). From now on the orchestrator assigns the final ID before the commit.
 
@@ -238,7 +238,7 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 **Status:** verified by the test `tests/integration/test_flowrun.py` (WI-49), which compares the definition with the file it wrote. Open, low: no client reads the key yet. Not checked: whether the wire check of booleans (WI-26) knows this field.
 **Action:** decide whether `cmd.flow.get` converts the key back to a boolean (like `ToFileText`), then tighten the test (it accepts `1` now).
 
-### F-374*: the cancel test of the worker did not see the job in the snapshot
+### F-374: the cancel test of the worker did not see the job in the snapshot
 
 **What:** In a slow-tier run (`--all -m slow`, 4 workers, a foundation run of the same commit at the same time) `tests/integration/test_worker.py::test_cancel_stops_the_running_element_and_reports_stopped_within_500_ms` failed: "the worker never showed the job in its snapshot", with a snapshot whose `info.job` was empty at an uptime of the worker of 5088 ms. The element (`Action_TestBlockWorker`, 3000 ms) runs for 3 s, so the polling (deadline 5 s, a request every 50 ms) either saw no answer while the job ran, or the job was over before the first answer came. Seen on the commit that added the variable requests of WI-50; that change does not touch this path (the test speaks to the worker directly, the element uses no variable).
 **Status:** observed once; 5 of 5 runs of the test alone (serial) green. Cause not investigated (assumed: load, the snapshot answers came late).
