@@ -13,7 +13,7 @@ Session start: 2026-10-13, work-item mode (no wishes). Main checkout clean, on `
 | WI-38 | Evaluator | done | sonnet (implementer) | integrated: ebcb01e to 0506198 (rebased once onto v2-port) | 0506198 | fast run 20261014-061523-4784 (482 passed, exit 0, on the rebased branch); verifier pending | 2026-10-14 | `src/expr/` evaluator, 31 us per typical expression (parse cache hit); decisions to confirm: `missing` field in the result, failed `+=` leaves `""`, text that looks like an integer counts as integer for E29, `mod` added, MIGRATION M-24 to M-26 |
 | WI-39 | Converter v1 expressions | done (owner accepted the catalog and the decisions of the implementer, 2026-10-14; F-105 stays open) | sonnet (implementer) | integrated: 7 commits, the last is 1e444c2 (rebased once onto v2-port) | 1e444c2 (first commit 7732b8e) | fast run 20261014-064430-17980 (514 passed, exit 0, rebased branch); verifier pending | 2026-10-14 | 1418 expression/script cases against the golden data: 726 agree after conversion, 490 accepted deviations, 194 depend on the WIP variable model (WI-40), 8 unsupported; open: owner review of the catalog (EXPRESSION-LANGUAGE 15.1), the five unsupported forms, F-105 (E30) decision; private golden cases not checked (no data on the machine) |
 | WI-40 | Variable model in the engine | done, verified | opus (implementer) | integrated: deade8e to 84a3912 (7 commits, rebased once onto v2-port) | 84a3912 | fast run 20261014-071610-364 (548 passed, exit 0, on the rebased tree; trees identical to 84a3912); verifier green: fast 20261014-071710-84a39123 (548 passed), slow 20261014-071759-84a39123 (86 passed, 2 xfailed, the F-85 and F-17 marks), arch 0 violations, golden test file in the fast run; foundation not run, no foundation-list file changed since aa81047 (verified there) | 2026-10-14 | `src/engine/vars/`; golden 2161 cases compared, all destination, checkname, replace (389/392 agree, 3 with class) and varset cases agree or have a class; decisions to confirm: M-43 (`object . "x"` gives empty plus warning), no Arrays in variables, SetVar rules, A_LanguageName real name; F-105 still open |
-| WI-41 | global/static permanent, data folder | in progress | sonnet (implementer) | wip/wi-41 | | | 2026-10-14 | depends on WI-40; E33 (default data folder) is done in `9eb84e0`, the owner's commit, verified: fast run 20261013-182355-9eb84e08 (301 passed), foundation run 20261013-182435-9eb84e08 (437 passed, 1 skipped, not identified), exit 0 both |
+| WI-41 | global/static permanent, data folder | done, verifier running | sonnet (implementer) | integrated: 4f3c3ce to 2c20eff (5 commits, rebased once onto v2-port) | 2c20eff | implementer, before the rebase: fast 20261014-165057-10900 (566 passed), serial 20261014-165356-18628 (566), slow 20261014-165146-91d44148 (86 passed, 1 xfailed, 1 xpassed: F-85/F-17 marks), foundation 20261014-165149-91d44148 (440 passed, 1 skipped). Verifier on 2c20eff: see the verifier row | 2026-10-14 | `src/engine/vars/VarLoader.ahk`, `VarWriter.ahk`; messages kept as `cmd.storage.var.get/set/delete/list`; M-06, M-39; not checked: real data folder, hand start, load of hundreds of variables, standby, ack wait at shutdown | depends on WI-40; E33 (default data folder) is done in `9eb84e0`, the owner's commit, verified: fast run 20261013-182355-9eb84e08 (301 passed), foundation run 20261013-182435-9eb84e08 (437 passed, 1 skipped, not identified), exit 0 both |
 | WI-42 | Parameter evaluation and ctx API | open | | | | | 2026-10-13 | depends on WI-38, WI-39, WI-40 |
 | WI-43 | Acceptance S1 | open | | | | | 2026-10-13 | depends on all |
 
@@ -43,7 +43,8 @@ Session 3 start: 2026-10-14, work-item mode, HEAD `26211f2` on `v2-port`, main c
 
 | Slot | Role | Model | Workspace | Branch | Task | State |
 |---|---|---|---|---|---|---|
-| 1 | Implementer | sonnet | wi-41 | wip/wi-41 | WI-41 | running |
+| 1 | Implementer | sonnet | wi-41 (removed) | (deleted) | WI-41 | done, integrated |
+| 4 | Verifier WI-41 | sonnet | verify-7 | wip/verify-7 | fast, slow, foundation and arch on 2c20eff | running |
 | 2 | Bug hunter | sonnet | hunt-6 (removed) | (deleted) | F-18 (pipe DACL restricted to owner and system): fixed and closed, integrated as 9e4aa08, fe00e33, bc30f80 (rebased once onto v2-port, cleanup commit for a run folder name in CLOSED-ITEMS); workspace removed | done, verifier running |
 | 3 | Verifier F-18 | sonnet | verify-6 (removed) | (deleted) | verification of `bc30f80`: fast run 20261014-164350-bc30f804 (548 passed, exit 0), slow run 20261014-164436-bc30f804 (86 passed, 2 xfailed, exit 0), foundation run 20261014-164640-bc30f804 (443 passed, 1 skipped, exit 0), no INTERNALERROR, arch 0 violations, no findings; tree hashes src `b07a425b`, tests `24710c35`, tools `dd542ea8` | done |
 
@@ -85,6 +86,10 @@ Highest F-nn at session 2 start: F-74 (provisional F-73*, F-74*). F-44 was never
 | M | Verifier WI-39 (`1e444c2`) | F-165 to F-174 |
 
 Open point (assumed, not tested, from the F-18 review): for an elevated process whose default owner is the Administrators group, a non-elevated client of the same user might be denied by the owner ACE. Not covered by any test. Check when the supervisor runs elevated.
+
+Decisions taken by the WI-41 implementer (listed in its report, to be objected to by the owner): kept the existing message names `cmd.storage.var.get/set/delete/list`; loaded texts stay texts, numbers are written as text (M-39); files written without BOM, read with or without (M-16); no wait for the write acknowledgements at shutdown (storage empties its queue last; assumed acceptable, same class as M-01); test element `Action_TestSetVar` with its own `Plain()` conversion (arch rule).
+
+Known limits of WI-41 (from the report): a flow started before `evt.engine.ready` can see a variable as missing; static variables of flows that are not loaded are not read; no test with the owner's real data folder.
 
 ## Bug hunter log
 
