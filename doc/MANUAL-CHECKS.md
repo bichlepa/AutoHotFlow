@@ -96,11 +96,12 @@ Tester: Paul
 Stub (section 1): not part of this record (see the run record above)
 Debug window (section 2): steps 1, 2, 4 to 9 pass; step 3 fails
 Notes: Step 3 fails: the Snapshots text jumps to the top on every 2-second refresh.
-  Cause in src/debugview/DebugGui.ahk (_DrawSnapshots): the text contains the
-  time "Stand ...", so it changes on every refresh and is always replaced; setting
-  the Edit value resets the scroll position. Not yet fixed (open decision). The
-  check of the expected text "replaced only when changed" cannot be met while the
-  time is in the same text. Step 1: the second start with --start=debug on a running
+  Cause (src/debugview/DebugGui.ahk, _DrawSnapshots): the text changes on every
+  refresh and is replaced; setting the Edit value resets the scroll position.
+  First fix attempt (commit bfda2d9): the time "Stand ..." was moved out of the
+  text into its own label. This did not help, because uptimeMs and rssBytes in
+  the JSON change on every refresh as well. The fields stay. Still open: F-256*
+  in doc/OPEN-ITEMS.md (scroll position to be saved and restored). Step 1: the second start with --start=debug on a running
   system only shows the manager; the debug window was opened with --command=debug
   (the way the guide describes for a running system). Step 2: the table changed
   after the engine was stopped by hand (a crash report was written for each stop).
