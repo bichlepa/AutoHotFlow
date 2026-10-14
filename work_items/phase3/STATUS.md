@@ -93,7 +93,7 @@ Highest F-nn at session 2 start: F-74 (provisional F-73*, F-74*). F-44 was never
 
 Open point (assumed, from the WI-41 review, hunter round 4): the supervisor's shutdown deadline for storage was not reviewed; it must leave storage enough time to empty its queue after the engine's flush. Also not checked: a race between the write timer and shutdown (interruption with real threads, assumed tiny).
 
-Open point (assumed, from the WI-41 review): at shutdown the engine does not wait for storage's answer to the variable writes. A storage crash at that exact moment loses the last changes without a message (FlushAll ignores late errors). Accepted by design so far (ARCHITECTURE 6.3); the owner should confirm.
+Decision of the project owner (2026-10-14, confirmed): at shutdown the engine does not wait for storage's answer to the variable writes. A storage crash at that exact moment loses the last changes without a message (FlushAll ignores late errors). Accepted.
 
 Open point (assumed, not tested, from the F-18 review): for an elevated process whose default owner is the Administrators group, a non-elevated client of the same user might be denied by the owner ACE. Not covered by any test. Check when the supervisor runs elevated.
 
