@@ -30,6 +30,18 @@
             "default": "HEAD"
         },
         {
+            "id": "oracleSeed",
+            "type": "promptString",
+            "description": "Seed of the random run of the expression oracle (a failing seed is printed)",
+            "default": "1"
+        },
+        {
+            "id": "oracleCount",
+            "type": "promptString",
+            "description": "Number of generated cases of the expression oracle",
+            "default": "20000"
+        },
+        {
             "id": "workspaceName",
             "type": "promptString",
             "description": "Name des Workspaces (Branch wip/<Name>, Ordner neben dem Repo)",
@@ -510,6 +522,34 @@
             "args": [
                 "tools/golden_v1.py",
                 "--private"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Test: expression oracle (fixed corpus)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "tools/expr_oracle.py"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Tool: expression oracle with random seed",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "tools/expr_oracle.py",
+                "--seed",
+                "${input:oracleSeed}",
+                "--count",
+                "${input:oracleCount}"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"

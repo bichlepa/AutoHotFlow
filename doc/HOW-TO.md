@@ -1017,3 +1017,11 @@ Append new entries at the end of the matching category. Correct or delete outdat
 - **Right:** Wait for `evt.engine.ready` (it comes after the variables are loaded, WI-41) before such a flow starts, as `tests/fault/test_var_persistence.py` does.
 - **Status:** verified (red before, green after the wait)
 - **Source:** `tests/fault/test_param_eval.py`
+
+### Generated AHK v2 code: some mistakes stop the whole script at load time, one case can end the process
+
+- **Problem:** The expression oracle (`tools/expr_oracle.py`) writes one script with thousands of cases. A string literal in front of an arithmetic operator (`"a" + 1`, `"a" * x`, `!"a" * 2`) is a **load error** ("Unexpected operator following literal string"): the script does not start at all, not even for the other cases. `1 + "a"`, `-"a"`, `1 / 0` and `Mod(1, 0)` load fine and throw a `TypeError` or `ZeroDivisionError` when they run. An unassigned variable that is read gives a warning dialog at load time unless `#Warn All, Off` is set. `MinInt // -1` (and `Mod(MinInt, -1)`) ends the whole process, no `try` can catch it.
+- **Wrong:** Generating `"a" + 1` and expecting a catchable error; running all cases in one process and losing every result when one case ends the process.
+- **Right:** The generator never puts a string literal in front of an arithmetic operator (a variable that holds the text is fine), and keeps `//` and `Mod` away from operands near the limits of Integer. The runner works in batches and bisects a batch that ends without a result, so the offending case is reported by its ID (`NativeCrash`). Write a `Main()` and call it: a script whose `Main` is never called exits 0 without any output.
+- **Status:** verified (WI-44)
+- **Source:** `tools/expr_oracle.py`

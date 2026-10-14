@@ -238,6 +238,8 @@ Average 554 us uncached, 1.6 us cached (about 300 times faster). Filling the cac
 
 Decided by the project owner (2026-10-13) and implemented by the evaluator (WI-38, tests in `tests/ahk/expr_eval_operators.test.ahk`):
 
+Since WI-44 the list is checked against native AutoHotkey v2: generated expressions run as real AutoHotkey code and in the evaluator, and every difference must be one of the entries below or of the list in section 19.
+
 - **E29: `/` with two integers** returns an Integer if the division is exact (`4/2` is `2`, `-8/-2` is `4`), else a Float (`7/2` is `3.5`). AutoHotkey v2 gives `2.0` for `4/2`. This is a rule of the language. `//` is the integer division as in AutoHotkey v2 (`7//2` is `3`, `-7//2` is `-3`; a Float operand is a `TypeError` there, handled as E25).
 - **E30: `<` `>` `<=` `>=` follow AutoHotkey v2.** A comparison with a text that is not a number throws a `TypeError` in AutoHotkey (`"a" < "B"`); in AutoHotFlow the evaluator catches it (E25): the result is the empty text (false) plus an `f1` log entry. A text comparison that v1 did alphabetically is therefore false. `"10" < "9"` compares numbers (false). `=` and `==` compare as in AutoHotkey.
 - **E31: `&&` and `||` return the operand** as AutoHotkey v2 does (`"a" || 0` is `"a"`, `0 && "x"` is `0`), not 1/0 as in v1. Evaluation is short-circuit (`0 and (x := 5)` does not assign). As a condition both behave the same.
@@ -260,7 +262,7 @@ Differences in the **syntax** (implemented and tested):
 - Strings: the escape set of section 2 (no `` `s ``, `` `0 ``, `` `u+XXXX ``); no line break inside a string; touching strings (`"a""b"`) are an error.
 - Dynamic names have the v1 form `a%i%`, `a%i%b`, `%n%` (AutoHotkey v2 only has `%expr%` as a deref). Parts must touch each other.
 - Implicit concatenation does not need whitespace between operands that cannot be confused (`x"-"y`, `"a"1`); AutoHotkey requires whitespace. `-` is always subtraction.
-- `5.`, `1_000` and numbers followed by letters are errors; an integer literal beyond 63 bits becomes a Float (own rule, not checked against AutoHotkey).
+- `5.`, `1_000` and numbers followed by letters are errors; an integer literal beyond 63 bits becomes a Float (own rule; AutoHotkey wraps it around, checked by the oracle, section 19).
 - `true` and `false` are keywords with the values 1 and 0 and cannot be variable names.
 - Statements: only assignments, calls, blocks and `if` (section 8). An operator at the start of a line does not continue the previous line.
 - `a.b` with the numeric member `a.1` is accepted (v1 list access); AutoHotkey writes `a[1]`.
@@ -493,3 +495,45 @@ Measured with `tests/ahk/helpers/expr_eval_bench.ahk` and `VarAccess` instead of
 The element API (`ctx`, ELEMENT-API-V2 section 3) is `SetVar`, `GetVar` (a copy, or the default if it does not exist; no log), `DeleteVar`, `VarLocation` (`loop`, `thread`, `builtin`, `instance`, `static`, `global` or empty; v1 wrote `Loop`, `Thread`, `BuiltIn`) and `ListVars(scope)` (the visible variables of a scope, or of all scopes in the order loop, thread, instance, static, global; no hidden and no built-in variables, as v1 `Var_GetListOf*Vars`).
 
 **A worker** gets copies of the visible loop, thread and instance variables as its imports (a loop variable hides a thread variable of the same name); global, static, hidden and built-in variables are not sent. Its exports come back as variables where their name says (an `A_` name as a thread variable). Both are provisional until variables in the worker are reached through `ctx.Request` (S2, R4).
+
+## 19. Oracle: what is compared with native AutoHotkey v2, and the deliberate deviations
+
+The language follows AutoHotkey v2 (E22), so AutoHotkey v2 itself is the yardstick of the evaluator (E35, WI-44; the v1 golden data of section 15 is frozen and only a regression test of the converter). `tools/expr_oracle.py` generates expressions from the grammar with a seed, runs each one as AutoHotkey code (a function per case, the variables as parameters, `try/catch`) and in the evaluator, and compares type (`Type()`), text form (`String()`) and error. Details of the tool and the tiers: doc/TEST-STRATEGY.md section 8.
+
+### 19.1 The subset that is compared
+
+| Part of the language | Compared with native AutoHotkey v2 |
+|---|---|
+| Numbers: decimal, `007`, `0x10`, `1e3`, `1.5e-3`, `3.14`, big and small values near the limits of Integer and Float | yes |
+| `true`, `false` | yes (the variables of AutoHotkey with the values 1 and 0) |
+| Variables (numbers, texts that look like numbers, the empty text, a `Map`), names ignore case | yes (the same initial values on both sides) |
+| String literals `"..."`, `'...'` without escapes | yes, but only where AutoHotkey accepts them: a literal in front of an arithmetic operator is a load error there (`"a" + 1`), so the generator puts texts into such operations through variables |
+| Unary `-`, `!`, `not`; binary `+ - * / // . = == != !== < > <= >= && \|\|`; parentheses; precedence and associativity | yes (including chains such as `1 < 2 < 3`) |
+| `Round(x [, n])`, `Mod(a, b)` (`round`, `mod` here) | yes |
+| Reading a member of a `Map` with `m["k"]` | yes |
+| Assignments `:= += -= *= /= //= .=` to a variable, also nested in an expression | yes (only the value of the assignment is compared, not the variable afterwards) |
+| Dot paths into variables (`a.b`, `a.1`, `a.%k%`), dynamic names (`a%i%`, `%n%`) | no (not AutoHotkey code; specification tests `tests/ahk/expr_*.test.ahk`, `vars_model.test.ahk`) |
+| `object()`, `print()` | no (functions of AutoHotFlow) |
+| Built-in variables of AutoHotFlow (`A_Index`, `A_FlowName`, ...), scopes, `global_`/`static_` | no (engine, section 18) |
+| The script form (`if`/`else`, blocks, one statement per line) | no (a different grammar than an AutoHotkey script; `tests/ahk/expr_script.test.ahk`) |
+| `and`, `or` | not generated (the same nodes as `&&` and `\|\|`; specification tests) |
+| Implicit concatenation without a dot (`x "a"`, `x"-"y`), string escapes, syntax errors | no (own rules, sections 2 and 5; specification tests) |
+
+### 19.2 Deliberate deviations from native AutoHotkey v2
+
+The comparison accepts a difference only if it is one of these (`CLASSES` in `tools/expr_oracle.py`; each has at least one case in the fixed corpus). Where a deviation changes the value, the case has a *model*: the same expression with the deviation applied in native code. The evaluator must agree with the model, so a deviation cannot hide a second difference.
+
+| Class | Deviation | Decision |
+|---|---|---|
+| E25 | A calculation or function call that throws in AutoHotkey (`TypeError`, `ZeroDivisionError`, `ValueError`) gives a warning and the empty text for that part; the evaluation goes on. The message of the warning contains the message of AutoHotkey, so the error class is the same. In strict mode (E34) the caller turns the warning into an error of the element. The value of the whole expression is not compared (AutoHotkey ends the expression at the first error, the evaluator goes on with the empty text). Examples: `"" + 1`, `1 / 0`, `"abc" < 5`, `Round("abc")`, `m + 1` | E25, E30, E34 |
+| E29 | `/` of two integers (or texts that look like integers) that divide exactly gives an Integer (`4 / 2` is `2`, AutoHotkey: `2.0`). Model: `/` as the function `D`; `x /= y` as `x := D(x, y)` | E29 |
+| literal beyond 63 bits | A decimal integer literal that does not fit into 63 bits is a Float (`12345678901234567890` is `1.2345678901234567e+19`); AutoHotkey wraps it around to `-6101065172474983726`. Model: the literal with `.0` | own rule (section 14) |
+| missing | A variable or `Map` key that does not exist gives the empty text, an `f0` log entry and an entry in `missing`; it is not a warning (AutoHotkey: `UnsetError`, `UnsetItemError`). The value of the whole expression is not compared | section 14 |
+
+Verified by the oracle (so these statements of section 14 are no longer only read from the documentation): `<` `>` `<=` `>=` with a text that is not a number throw a `TypeError` in AutoHotkey; `"10" < "9"` in variables compares numbers; `=` of two variables that hold `"1.0"` and `"1"` compares texts (false); `&&` and `||` return the operand; `not` binds weaker than the comparison; `4/2` is `2.0`.
+
+Differences that the oracle does not compare because the native script would not load or would end the process:
+
+- `"a" + 1` (a string literal in front of an arithmetic operator): a load error in AutoHotkey (`Unexpected operator following literal string`); the evaluator reports the type error as a warning (E25). `1 + "a"` loads there and is compared.
+- `MinInt // -1` and `Mod(MinInt, -1)`: end the AutoHotkey process; the evaluator refuses the first as a calculation error and gives `0` for `mod(x, -1)` of integers (section 14). The generator keeps `//` and `Mod` away from operands near the limits of Integer.
+- A text that is a number outside the range of Float (`1e-3001`, made by appending digits to a tiny Float) as the operand of `||`, `&&`, `!` or `if`: AutoHotkey takes the temporary text as true, the evaluator (which keeps the value in a variable) as false (finding F-284*, AutoHotkey quirk). The generator does not build such texts.
