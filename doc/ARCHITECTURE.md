@@ -313,6 +313,14 @@ Checked against the 23 flows in `v1/AppData/Saved Flows` and `Save.ahk` **[V1]**
 
 Unknown items in files (keys that v2 does not know) are **kept when loading and written back when saving**, so that switching between v1 and v2 loses nothing.
 
+**Format version and conversion of expression texts (WI-39, E21, E22).** v2 reads old flows unchanged and converts the expression texts on load (doc/EXPRESSION-LANGUAGE.md section 15). So that a text is never converted twice and no v1 text stays unconverted for ever:
+
+- A file written by v2 has the root key `"formatVersion": 2`. A file without it comes from v1; all its elements are candidates for the conversion.
+- Which parameters of an element are expressions, only its class knows (`Parameters()`: content type `Expression`, `number`, `positiveNumber`, `integer`, `positiveInteger`, `positiveIntegerOrZero`, or the type selected by the user in the parameter named by `contentID`; plus `static V1Syntax` for parameters that the element evaluates itself). The engine converts on load, using the element registry.
+- An element whose class is not in the registry (in S1 to S7 most of them, E20) keeps its v1 texts. A save writes it with `"v1Text": true`. In a file with `formatVersion` only elements with this marker are converted, as soon as their class is known; the marker is removed in memory at that moment and not written again.
+- The two keys are not part of the definition in memory (`FlowDefinition.Raw`); `FlowDefinition.Pending` names the waiting elements and `FlowDefinition.ToFileText()` writes the keys. A save with `cmd.flow.save`.
+- The conversion of a flow is idempotent: loading a file that was saved by v2 changes no text. This is the version marker that E8 announced; apart from the two keys the format is the v1 format.
+
 **Decision E8 (2026-10-11):** Truth values go as real JSON booleans over the wire in v2 (WI-26). The flow file format may in future differ from the v1 format in v2. The requirement remains that old flows and variables load. In Phase 2b the **write format of the flows does not change**. A new write format is a separate decision in Phase 3, with a version marker in the file. Until then v2 writes the v1 format. A flow in a new format is no longer readable for v1.
 
 ---
