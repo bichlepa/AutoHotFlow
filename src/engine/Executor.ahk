@@ -43,9 +43,8 @@
 ; and the global variables (owner.vars, EngineVars). A worker gets copies of the visible loop, thread and instance
 ; variables as imports.
 ;
-; Parameters are passed as they are stored in the flow file (object with case-insensitive properties).
-; Expressions are not evaluated in Phase 2 (ARCHITECTURE, WI-10 "Nicht Teil"), so Duration "200" arrives as
-; text. Action_Sleep converts it with IsNumber.
+; Parameters are passed as they are stored in the flow file (object with case-insensitive properties). An inline
+; element evaluates them when it calls ctx.EvalParams (WI-42, as v1 x_AutoEvaluateParameters).
 class Executor {
     static TICK_BATCH := 1000
     static DIAG_INSTANCES := 100
@@ -326,6 +325,8 @@ class Executor {
             ctx.Finish("exception", "unknown element class '" classId "'")
             return
         }
+        ctx.cls := cls                          ; Parameters() of the class for ctx.EvalParams (WI-42)
+        ctx.strictTypes := def.StrictTypes      ; the type mode of the flow (E34)
         if (cls.Mode = "worker") {
             this._DispatchWorker(run, thread, ctx, cls, classId, def)
             return

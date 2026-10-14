@@ -11,7 +11,7 @@ Predecessor: the v1 function family `Element_<Task>_<Class>` and the helpers `x_
 2. **All methods are `static`.** Elements are stateless. The state of one execution lives in `ctx.State`.
 3. **The context `ctx` replaces `Environment` and all `x_*` functions.** It has fixed, lowercase fields (`flowId`, `elementId`, `instanceId`, `threadId`). The inconsistent spelling from v1 goes away.
 4. **Errors are exceptions.** `throw ElementError(msg)` ends the execution with result `exception` and the message. The engine wraps every call in `try/catch`, so element code cannot crash it.
-5. **Parameters arrive already evaluated.** The engine owns the variables and evaluates parameters with `content: "Expression"` before `Run`/`Enable` is called. This also applies to workers and triggers.
+5. **Parameters are evaluated by `ctx.EvalParams`.** `Run` receives the parameters as they are stored; the element evaluates them with `ctx.EvalParams(params)` as v1 did with `x_AutoEvaluateParameters` (section 3.1). The engine owns the variables: for a worker element it evaluates all parameters before the job is sent, and `ctx.EvalParams` in the worker returns these values (E26, WI-42). Triggers: S3.
 6. **An element declares its execution mode** (`inline`, `worker`, `trigger`). See ARCHITECTURE 2.3.
 7. **No global variables, no `%var%` access, no `ErrorLevel`.**
 
@@ -74,14 +74,21 @@ class Action_Example extends AhfElement {
 | Member | Replaces (v1) | Remarks |
 |---|---|---|
 | `ctx.flowId`, `.elementId`, `.instanceId`, `.threadId` | `Environment.FlowID` etc. | fixed spelling |
-| `ctx.EvalParams(params)` | `x_AutoEvaluateParameters` | returns evaluated parameters, throws on error (no `_error`) |
-| `ctx.EvalParams(params, skipList)` | with `p_skipList` | – |
+| `ctx.EvalParams(params, skipList := "")` | `x_AutoEvaluateParameters` (with `p_skipList`) | Returns the evaluated parameters as an object with case-insensitive properties; throws `ElementError` with the v1 text at the first error (no `_error`). Rules: section 3.1. `skipList`: an Array of ids or a text with commas; skipped parameters are not in the result. In a worker: the values that the engine evaluated before the job (E26). |
+| `ctx.EvalMoreParams(evaluated, params, names)` | `x_AutoEvaluateAdditionalParameters` | Evaluates the parameters `names` (Array or text with commas) into `evaluated` and returns it (a new object if `evaluated` is not one). Errors as `EvalParams`. |
 | `ctx.Finish(result, msg := "")` | `x_finish` | `result`: `normal`, `yes`, `no`, `exception`, `head`, `tail` |
-| `ctx.SetVar(name, value, scope := "", hidden := false)` | `x_SetVariable` | The name decides the scope as in v1 (WI-40, doc/EXPRESSION-LANGUAGE.md section 18.2): `A_` names are loop or thread variables and need `scope` `"thread"` or `"loop"`; `global_` and `static_` names are global and static; any other name is an instance variable. Returns 1, or 0 if refused (logged `f0` with the v1 text). The value is copied; an Array becomes a `Map` with the keys 1..n. |
-| `ctx.GetVar(name, default := "", hidden := false)` | `x_GetVariable` | Reads a variable or a member (`"list.1"`) where its name says (an `A_` name: loop, thread, then built-in). Returns a copy, or `default` if it does not exist (no log). In a worker only via `imports` or `ctx.Request`. |
-| `ctx.DeleteVar(name, hidden := false)` | `x_DeleteVariable` | Deletes a variable or a member; 1 if it existed. Built-in variables cannot be deleted. |
-| `ctx.VarLocation(name, hidden := false)` | `x_GetVariableLocation` | `"loop"`, `"thread"`, `"builtin"`, `"instance"`, `"static"`, `"global"` or `""` |
-| `ctx.ListVars(scope := "")` | `x_GetListOf*Vars` | names of the visible variables of one scope, or of all scopes (`""`) in the order loop, thread, instance, static, global |
+| `ctx.SetVar(name, value, scope := "", hidden := false)` | `x_SetVariable` | The name decides the scope as in v1 (WI-40, doc/EXPRESSION-LANGUAGE.md section 18.2): `A_` names are loop or thread variables and need `scope` `"thread"` or `"loop"`; `global_` and `static_` names are global and static; any other name is an instance variable. Returns 1, or 0 if refused (logged `f0` with the v1 text). The value is copied; an Array becomes a `Map` with the keys 1..n. Worker: not available (use `ctx.Export`; R4, S2). |
+| `ctx.GetVar(name, default := "", hidden := false)` | `x_GetVariable` | Reads a variable or a member (`"list.1"`) where its name says (an `A_` name: loop, thread, then built-in). Returns a copy, or `default` if it does not exist (no log). Worker: reads the copy of the visible loop, thread and instance variables that came with the job (`imports`); global, static, hidden and built-in variables come with `ctx.Request` (R4, S2). |
+| `ctx.DeleteVar(name, hidden := false)` | `x_DeleteVariable` | Deletes a variable or a member; 1 if it existed. Built-in variables cannot be deleted. Worker: R4 (S2). |
+| `ctx.GetVarLocation(name, hidden := false)` | `x_GetVariableLocation` | `"loop"`, `"thread"`, `"builtin"`, `"instance"`, `"static"`, `"global"` or `""`. `ctx.VarLocation` is the same (name of WI-40). Worker: R4 (S2). |
+| `ctx.GetVarType(name, hidden := false)` | `x_getVariableType` | `"object"`, `"normal"`, or `""` if the variable does not exist. Worker: from the copy (as `GetVar`). |
+| `ctx.ListVars(scope := "")` | `x_GetListOf*Vars` | names of the visible variables of one scope, or of all scopes (`""`) in the order loop, thread, instance, static, global. Worker: R4 (S2). |
+| `ctx.ReplaceVariables(text, convertObjects := false)` | `x_replaceVariables` | `%name%` substitution (doc/EXPRESSION-LANGUAGE.md section 18.5); `convertObjects` is the v1 option `ConvertObjectToString`. Worker: R4 (S2). |
+| `ctx.EvaluateExpression(text)` | `x_EvaluateExpression` + `if (res.error)` | Returns the value. Throws `ElementError` with the errors of the evaluator (line, column, marked line), as v1 finished with `res.error`. In strict mode (flow option `strictTypes`, E34) a warning (type error, division by zero) throws too; in compatibility mode the failed part is the empty text and an `f1` entry (E25). Worker: R4 (S2). |
+| `ctx.EvaluateScript(text)` | `x_EvaluateScript` + `if (res.errors)` | The value of the last statement; errors as `EvaluateExpression`. Worker: R4 (S2). |
+| `ctx.CheckVarName(name)` | `x_CheckVariableName` | 1 if valid (not empty, no digit at the start, no forbidden character), else 0. Also in a worker. |
+| `ctx.ExportInstanceVars()` | `x_ExportAllInstanceVars` | A copy (`Map` name → value) of the visible instance variables; v1 returned the object itself. Worker: R4 (S2). |
+| `ctx.ImportInstanceVars(vars)` | `x_ImportInstanceVars` | Sets every entry of the `Map` as an instance variable, whatever the prefix of the name (as v1); an empty name or one with a forbidden character is skipped (`f0`). Worker: R4 (S2). |
 | `ctx.After(ms, fn)` | `x_NewFunctionObject` + `SetTimer` | timer belongs to the execution and is cancelled automatically on stop/end |
 | `ctx.State` | `x_SetExecutionValue`/`x_GetExecutionValue`, `x_SetTriggerValue`/`x_getTriggerValue` | object per execution (Run) or per armed trigger |
 | `ctx.Fire(data := "")` | `x_trigger` | triggers only. Sends `evt.trigger.fired` |
@@ -93,6 +100,25 @@ class Action_Example extends AhfElement {
 | `form.SetValue(id, v)`, `form.SetChoices(id, list)`, `form.SetLabel(id, text)` | `x_Par_SetValue` etc. | – |
 
 The number of v1 helpers (`x_*`) actually used is 88. The most frequent: `x_lang` (2211 calls), `x_finish` (681), `x_Par_Disable`/`Enable` (~420), `x_SetVariable` (171), `x_AutoEvaluateParameters` (129).
+
+### 3.1 Parameter evaluation (WI-42)
+
+`ctx.EvalParams` is the port of v1 `x_AutoEvaluateParameters` and `x_AutoEvaluateOneParameter` (`v1/Source_Execution/API/API for Elements.ahk:60` to `:369`), code in `src/elements/base/ParamEvaluator.ahk`. It walks `Parameters(ctx)` of the class in order. An entry without `id` and an entry of type `Label` or `Button` is skipped; an `id` that is an Array stands for several parameters with the same description. A parameter that the flow does not have gets the `default` of its description (v1 fills the defaults in when it loads a flow). The value is evaluated by the content type (`content`; an Array means the user selects the type in the parameter named by `contentID`, default `contentDefault`):
+
+| Content type / field type | Evaluation | Error (v1 text, `Lang`) |
+|---|---|---|
+| type `file` or `folder` | `%var%` substitution, then the full path: a relative path (also the empty one, Shlwapi `PathIsRelative`) is put below the working directory of the flow (`A_WorkingDir`, until S4 `A_MyDocuments "\AutoHotFlow"`, E28) | `WarnIfEmpty` and empty after the substitution: `String '%1%' is empty` |
+| `String` | `%var%` substitution; with `contentConvertObjects` an object gives its JSON text | `WarnIfEmpty`: `String '%1%' is empty` |
+| `Expression`, `number`, `positiveNumber`, `integer`, `positiveInteger`, `positiveIntegerOrZero` | the expression (doc/EXPRESSION-LANGUAGE.md section 17), the value keeps its type (`Integer`, `Float`, text, `Map`) | evaluator error: `An error occured while parsing expression '%1%'`, an empty line and the errors (line, column, marked line); `WarnIfEmpty` and empty result: `Result of expression '%1%' is empty`; a result that is not empty is checked: `is not a number` (number types, `IsNumber`), `is not an integer` (integer types, `IsInteger`: `4/2` is an Integer by E29, `1.5*2` is a Float), `is not a positive number` (`positiveInteger`, below 1), `is not a positive number or zero` (`positiveIntegerOrZero`, `positiveNumber`, below 0). As in v1 the checks run one after the other and the last failing one gives the message; a text that is not a number compares alphabetically with 1 or 0 there (v1 `>=`) |
+| `VariableName` | `%var%` substitution, then the name rule (`ExprNames.Check`, v1 `Var_CheckName`) | `Variable name '%1%' is not valid.` (an empty name only with `WarnIfEmpty`) |
+| `RawString` or none | unchanged (a number in the file stays a number) | `WarnIfEmpty`: `Parameter '%1%' is empty` |
+| anything else | unchanged | `Parameter '%1%' has unsupported content type` |
+
+- **Errors** end the evaluation at the first parameter (in the order of `Parameters()`) with an error: `ElementError` with the text, so the element ends with `exception` (unless it catches it). v1 evaluated the rest and reported the last error (MIGRATION M-48).
+- **Strict mode** (flow option `strictTypes`, E34, ARCHITECTURE 7): a warning of the evaluator (a type error in a comparison or calculation, a division by zero, a failing function) is an error of the parameter, with the warnings in place of the errors in the text. In compatibility mode (migrated flows) the failed part is the empty text (E25). A missing variable is no error in either mode (it gives the empty text; used in a calculation that is a type error).
+- **Log:** every entry of the evaluator goes to the log of the element with the parameter: `f1` for errors and warnings (`parameter 'X': Expression warning: ...`), `f0` for a missing variable (as v1), with the flow ID. The editor shows the `f1` warnings later (S4/S5). The `f0` entry of a missing variable in a `%var%` substitution comes from the variable model (doc/EXPRESSION-LANGUAGE.md section 18.5).
+- **Worker elements (E26):** the engine evaluates all parameters before it sends the job, with the variables and the mode of the engine, and sends one entry per parameter: the value or the error (`cmd.worker.run`, field `evaluated`, PROTOCOL 4.5). `ctx.EvalParams` in the worker returns these values and throws at the first error of a parameter that is not skipped; `EvalMoreParams` reads the same entries. An assignment in a parameter that the element skips has therefore run already (MIGRATION M-48).
+- **Runtime:** measured in WI-42 (`tests/ahk/helpers/evalparams_bench.ahk`); see the result of the work item.
 
 ---
 
@@ -290,6 +316,14 @@ Additionally: in v1, in the error case of the window parameter in `Element_enabl
 | `Element_stop_<C>` | `static Stop(ctx, params)` (often unnecessary) |
 | `Element_enable_<C>` / `Element_disable_<C>` / `Element_postTrigger_<C>` | `Enable` / `Disable` / `TriggerVariables` |
 | `x_AutoEvaluateParameters` + `if _error` | `ctx.EvalParams` |
+| `x_AutoEvaluateAdditionalParameters(EvaluatedParameters, Environment, ElementParameters, list)` | `p := ctx.EvalMoreParams(p, params, list)` |
+| `x_EvaluateExpression` + `if (res.error)` / `res.result` | `ctx.EvaluateExpression(text)` (throws; returns the value) |
+| `x_EvaluateScript` + `if (res.errors)` | `ctx.EvaluateScript(text)` |
+| `x_replaceVariables(Environment, s, "ConvertObjectToString")` | `ctx.ReplaceVariables(s, true)` |
+| `x_GetVariable`, `x_SetVariable`, `x_DeleteVariable`, `x_getVariableType`, `x_GetVariableLocation` | `ctx.GetVar`, `ctx.SetVar`, `ctx.DeleteVar`, `ctx.GetVarType`, `ctx.GetVarLocation` |
+| `x_GetListOfAllVars`, `x_GetListOf<Scope>Vars` | `ctx.ListVars("")`, `ctx.ListVars("<scope>")` |
+| `x_CheckVariableName` | `ctx.CheckVarName` |
+| `x_ExportAllInstanceVars`, `x_ImportInstanceVars` | `ctx.ExportInstanceVars()`, `ctx.ImportInstanceVars(map)` |
 | `x_finish(Environment, r, m)` | `ctx.Finish(r, m)` |
 | `x_enabled`/`x_disabled` | return value or `throw` |
 | `x_lang("k")` | `Lang("k")` |

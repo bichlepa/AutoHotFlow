@@ -164,6 +164,34 @@ class VarAccess {
         return out
     }
 
+    ; A copy of the visible instance variables, name -> value (v1 x_ExportAllInstanceVars, WI-42). Empty in common.
+    ExportInstance() {
+        out := VarValues.NewMap()
+        if (this.common)
+            return out
+        for name, value in this.inst.Vars
+            out[name] := VarValues.Copy(value)
+        return out
+    }
+
+    ; Sets every entry of a Map (name -> value) as a visible instance variable (v1 x_ImportInstanceVars, which set the
+    ; instance variables directly, whatever the prefix of the name). An empty name or one with a forbidden character
+    ; is skipped with an f0 entry. Throws ElementError in common (there are no instance variables).
+    ImportInstance(vars) {
+        if (this.common)
+            throw ElementError("instance variables are not available here")
+        if (!(vars is Map))
+            throw ElementError("ImportInstanceVars needs a Map of name -> value")
+        for name, value in vars {
+            check := VarNames.Check(String(name))
+            if (check = "Empty" || check = "ForbiddenCharacter") {
+                this._Log("f0", "Setting variable '" name "' failed. It contains forbidden characters.")
+                continue
+            }
+            this.inst.Vars[String(name)] := VarValues.Import(value)
+        }
+    }
+
     ; ---- resolver of the evaluator ----------------------------------------------------------------------------
 
     Has(path) => IsObject(this._Find(path, false)) ? 1 : 0
