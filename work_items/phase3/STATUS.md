@@ -10,7 +10,7 @@ Session start: 2026-10-13, work-item mode (no wishes). Main checkout clean, on `
 |---|---|---|---|---|---|---|---|---|
 | WI-36 | Golden data from v1 | done | sonnet (implementer), haiku (line-ending fix) | integrated: 786a688 to 9ccf5b3; fix 829ce0f | 829ce0f | fast run 20261013-185858-829ce0f4 (336 passed), golden `--check` exit 0 on the main checkout | 2026-10-13 | 2161 cases, 18 groups; `evalparam` not implemented (optional in the work item); findings in `tests/golden/FINDINGS.md` |
 | WI-37 | Expression language v2: spec, tokenizer, parser | done | sonnet (implementer) | integrated: 0a24b4c to 6023cde | 6023cde | fast run 20261013-192532-6023cded (434 passed, exit 0), arch check 0 violations (live tree) | 2026-10-13 | `src/expr/`, `doc/EXPRESSION-LANGUAGE.md` (renamed from the German file name), L1 tests. Decisions to confirm: unsupported syntax (spec section 15: `%` modulo, `^=`, `%=`, `<>`, `"a""b"`), tree height limit 200. One flaky failure of `test_worker_reports_not_busy_after_a_cancel_too` in an implementer run, not reproduced on the integrated state. |
-| WI-38 | Evaluator | open | | | | | 2026-10-13 | depends on WI-37 |
+| WI-38 | Evaluator | done | sonnet (implementer) | integrated: ebcb01e to 0506198 (rebased once onto v2-port) | 0506198 | fast run 20261014-061523-4784 (482 passed, exit 0, on the rebased branch); verifier pending | 2026-10-14 | `src/expr/` evaluator, 31 us per typical expression (parse cache hit); decisions to confirm: `missing` field in the result, failed `+=` leaves `""`, text that looks like an integer counts as integer for E29, `mod` added, MIGRATION M-24 to M-26 |
 | WI-39 | Converter v1 expressions | open | | | | | 2026-10-13 | depends on WI-36, WI-37, WI-38 |
 | WI-40 | Variable model in the engine | open | | | | | 2026-10-13 | depends on WI-38 |
 | WI-41 | global/static permanent, data folder | open | | | | | 2026-10-13 | depends on WI-40; E33 (default data folder) is done in `9eb84e0`, the owner's commit, verified: fast run 20261013-182355-9eb84e08 (301 passed), foundation run 20261013-182435-9eb84e08 (437 passed, 1 skipped, not identified), exit 0 both |
@@ -43,9 +43,9 @@ Session 2 start: 2026-10-14, work-item mode, HEAD `f0793ce` on `v2-port`, main c
 
 | Slot | Role | Model | Workspace | Branch | Task | State |
 |---|---|---|---|---|---|---|
-| 1 | Implementer | sonnet | `wi-38` | `wip/wi-38` | WI-38 | running |
-| 2 | Bug hunter | sonnet | (removed) | (deleted) | OPEN-ITEMS: F-17 (xfail, decision needed), F-85 new; integrated as 28f131a, 1127f66 | done, next hunter pending |
-| 3 | Verifier | sonnet | (removed) | (deleted) | baseline `f0793ce`: done, see "Last verified state" | done |
+| 1 | Implementer | sonnet | `wi-39` | `wip/wi-39` | WI-39 | running (started 2026-10-14) |
+| 2 | Bug hunter | sonnet | `hunt-6` | `wip/hunt-6` | OPEN-ITEMS, round 2 | running (started 2026-10-14) |
+| 3 | Verifier | sonnet | `verify-2` | `wip/verify-2` | verification of `0506198` (fast, slow, arch check) | running (started 2026-10-14) |
 | 4 | Resumed agent | - | - | - | - | none |
 
 ## ID blocks (OPEN-ITEMS)
@@ -59,6 +59,10 @@ Highest F-nn at session 2 start: F-74 (provisional F-73*, F-74*). F-44 was never
 | C | Implementer WI-38 | F-75 to F-84 |
 | D | Bug hunter hunt-5 | F-85 to F-94 |
 | E | Verifier baseline `f0793ce` | F-95 to F-104 |
+| F | Implementer WI-38 | F-75 to F-84 (none used) |
+| G | Implementer WI-39 | F-105 to F-114 |
+| H | Bug hunter round 2 | F-115 to F-124 |
+| I | Verifier `0506198` | F-125 to F-134 |
 
 ## Bug hunter log
 
