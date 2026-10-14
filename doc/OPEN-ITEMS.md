@@ -37,6 +37,7 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 | F-165* | The F-17 xfail test passes again (strict XPASS) in the slow tier, after the F-125 fix | fixed by dropping strict on the F-17 test; watch | |
 | F-235* | `VarWriter.FlushAll` loses the variables beyond the limit of the peer (1000 waiting requests) | verified in a probe with a stand-in peer, open, low | |
 | F-236* | `test_killed_worker_ends_its_element_with_worker_crashed_and_is_not_restarted[0]` got no `evt.process.crashed` for `worker:1` in the slow tier | observed once, not investigated, open | |
+| F-255* | `#Warn` dialog for `Engine` in `VarLoader.ahk:101` seen in a manual unit test run | observed once, not analysed, open | |
 
 * provisional IDs, assigned by the agent on 2026-10-13; the project owner assigns the final ones.
 
@@ -228,6 +229,14 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 **Status:** observed once, not repeated, not investigated (rule: no re-run to chase a failure). Open.
 **Evidence:** run ID `20261014-170456-2d573956`, commit `2d57395`, command `python tools/run_suite.py --ref HEAD -- tests -q --all -m slow` (4 workers), exit code 1, `1 failed, 85 passed, 2 xfailed in 121.75s`, no INTERNALERROR. The fast tier (run ID `20261014-170405-2d573956`, `tests -q`) was green, 568 passed.
 **Suspicion (assumed):** The changes under verification (`VarAccess.ahk`, `Engine.OnShutdown`, unit tests) do not touch the supervisor, the worker pool start or the crash report, so they are probably not the cause. More likely a timing or load problem in the chain (worker killed while the engine was just starting the element; the supervisor text being empty suggests the log was not yet flushed) or an earlier hint of F-50/F-51 class flakiness. Not checked.
+
+### F-255*: `#Warn` warning dialog from the variable loader (manual run)
+
+**What:** During a manual run of a unit test script, the dialog guard caught a `#Warn` warning: "This local variable appears to never be assigned a value. Specifically: Engine", at `src/engine/vars/VarLoader.ahk:101` (`Engine._StorageGone(res)` in the error branch of the load continuation, and the same kind of reference at lines 104 and 106). The dialog report is in the dialog folder of the run (not in the repository).
+**Status:** observed once, not analysed. Open.
+**Evidence:** dialog report of the unit test file `tests/ahk/engine_var_files.test.ahk` run by hand, 2026-10-14 16:42, workspace of the WI-41 implementer, commit `2c20eff` (the same code is on `v2-port`). The automated runs (fast and slow tier) were green, so the warning does not show up there.
+**Suspicion (assumed):** the class `Engine` is not known in the include list of that unit test file, so `#Warn` treats the name as an unset local. If so, it is a test-harness include problem, not a product bug. Not checked: whether the product entry point loads the same name without a warning.
+**Next step:** check which include list the unit test loads (`tests/ahk/`), confirm it is a harness problem, and fix the include. If the product shows the warning too, it is a product bug.
 
 ## Watch list (E7)
 
