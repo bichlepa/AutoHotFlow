@@ -221,7 +221,7 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 **Status:** Fixed by dropping strict on the F-17 test; watch. The same symptom as F-125. The commit under verification already contains the F-125 fix (the test waits for the first lines of the burst, commit `d354ff5`), so that fix did not remove the XPASS, or this is the same rare timing outcome. Not reproduced again, not investigated.
 **Evidence:** run ID `20261014-064633-1e444c2d`, commit `1e444c2`, command `python tools/run_suite.py --ref HEAD -- tests -q --all -m slow` (4 workers), exit code 1, `1 failed, 86 passed, 1 xfailed in 130.43s`, no INTERNALERROR. The fast tier (run ID `20261014-064547-1e444c2d`, 514 passed, exit 0) and the foundation tier (run ID `20261014-064848-1e444c2d`, 439 passed, 1 skipped, exit 0) of the same commit are green. The architecture check reports 0 violations.
 **Suspicion (assumed):** The change under verification (WI-39: `src/engine/`, `src/expr/`, `src/elements/skeleton/`) does not touch `src/core/` or `src/supervisor/`, so it is probably not the cause. Either the F-125 fix is not enough (the loop runs, but the role's queue still does not reach the limit during the 6 s suspension, for example because the machine is fast), or the F-17 defect depends on timing in a way the test does not control. No second sample, so the rate is unknown.
-**Action:** Watch, and count it together with F-125 (two XPASS observed). If it appears a third time, drop `strict` for this test and note the rate in F-17.
+**Action:** Done: `strict` is dropped for this test (see F-125 and F-17). Watch the result; an XPASS is now reported, not an error. Note the rate in F-17.
 
 ## Watch list (E7)
 
