@@ -18,6 +18,7 @@ class FakeWorkers {
         this.wanted := []          ; the arguments of Want (threads waiting for a worker)
         this.timeouts := []        ; the jobTimeoutMs of every Run
         this.imports := []         ; the imports of every Run
+        this.payloads := Map()     ; execId -> Map classId, params, imports, env, evaluated (what cmd.worker.run sends)
     }
 
     Want(waiting) {
@@ -35,11 +36,13 @@ class FakeWorkers {
 
     Free() => this.hasFree
 
-    Run(classId, params, imports, env, onDone, jobTimeoutMs := 0) {
+    Run(classId, params, imports, env, onDone, jobTimeoutMs := 0, evaluated := "") {
         this.runs += 1
         this.timeouts.Push(jobTimeoutMs)
         this.imports.Push(imports)
         execId := "fx-" this.runs
+        this.payloads[execId] := Map("classId", classId, "params", params, "imports", imports, "env", env
+            , "evaluated", evaluated)
         if (this.failAtOnce) {
             onDone("exception", "worker not available", Map())
             return execId
@@ -54,10 +57,10 @@ class FakeWorkers {
         return true
     }
 
-    Complete(execId, result := "normal", exports := "") {
+    Complete(execId, result := "normal", exports := "", message := "") {
         onDone := this.jobs[execId]
         this.jobs.Delete(execId)
-        onDone(result, "", IsObject(exports) ? exports : Map())
+        onDone(result, message, IsObject(exports) ? exports : Map())
     }
 }
 

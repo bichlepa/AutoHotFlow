@@ -5,6 +5,7 @@
 #Include ..\elements\base\ElementRegistry.ahk
 #Include ..\elements\base\ElementRunner.ahk
 #Include ..\elements\base\ExecContext.ahk
+#Include ..\elements\base\ParamEvaluator.ahk
 #Include core\ExecutionPolicy.ahk
 #Include core\FlowDefinition.ahk
 #Include core\Instance.ahk
@@ -44,7 +45,9 @@
 ; variables as imports.
 ;
 ; Parameters are passed as they are stored in the flow file (object with case-insensitive properties). An inline
-; element evaluates them when it calls ctx.EvalParams (WI-42, as v1 x_AutoEvaluateParameters).
+; element evaluates them when it calls ctx.EvalParams (WI-42, as v1 x_AutoEvaluateParameters); for a worker element
+; the engine evaluates all of them before the job is sent (E26, _DispatchWorker), because the worker has no access to
+; the variables.
 class Executor {
     static TICK_BATCH := 1000
     static DIAG_INSTANCES := 100
@@ -343,6 +346,15 @@ class Executor {
     ; Sends a worker element to the pool. The thread stays running until the worker reports (or the job is
     ; cancelled, see _StopRun). Without a usable worker the run ends with "exception" at once.
     _DispatchWorker(run, thread, ctx, cls, classId, def) {
+        ; E26: the engine evaluates every parameter now, with its variables and the mode of the flow; the worker has no
+        ; access to them. The imports are taken afterwards, so an assignment in a parameter is part of them.
+        try {
+            evaluated := Executor._EvalForWorker(cls, ctx, Executor._Params(def, thread.ElementId))
+        } catch as e {
+            ; Parameters() of the class or the evaluation failed (element code never takes the engine down)
+            ctx.Finish("exception", "parameters of " classId " could not be evaluated: " e.Message)
+            return
+        }
         params := Executor._ParamMap(def, thread.ElementId)
         env := Map("flowId", run["flowId"], "elementId", thread.ElementId, "instanceId", run["instanceId"]
             , "threadId", thread.Id)
@@ -354,7 +366,7 @@ class Executor {
         try {
             run["active"][thread.Id] := act
             execId := this._owner.workers.Run(classId, params, ctx.vars.Imports(), env
-                , ObjBindMethod(this, "_OnWorkerDone", ctx), cls.JobTimeoutMs)
+                , ObjBindMethod(this, "_OnWorkerDone", ctx), cls.JobTimeoutMs, evaluated)
             current := run["active"].Get(thread.Id, "")
             if (execId = "") {
                 run["active"].Delete(thread.Id)
@@ -366,6 +378,40 @@ class Executor {
         }
         if (execId = "")
             ctx.Finish("exception", "worker not available for " classId)
+    }
+
+    ; Every parameter of a worker element, evaluated in the engine (E26, ParamEvaluator): an Array, in the order of
+    ; Parameters(), of Map {id, value} or {id, error}. The value is made fit for JSON (_Wire). Throws if Parameters() of
+    ; the class throws.
+    static _EvalForWorker(cls, ctx, params) {
+        list := []
+        src := ctx.EvalSource()
+        for item in ParamEvaluator.List(cls, ctx) {
+            src.at.param := item["id"]
+            r := ParamEvaluator.One(item, params, src)
+            entry := Map("id", r["id"])
+            if (r["error"] != "")
+                entry["error"] := r["error"]
+            else
+                entry["value"] := Executor._Wire(r["value"])
+            list.Push(entry)
+        }
+        return list
+    }
+
+    ; A value that JSON can carry: a Float that is not finite (inf, nan) becomes its text, a Map is copied with its
+    ; values made fit too. JSON has no Integer keys: the worker turns keys of digits back into Integers.
+    static _Wire(value) {
+        if (value is Map) {
+            m := Map()
+            m.CaseSense := "Off"
+            for k, v in value
+                m[k] := Executor._Wire(v)
+            return m
+        }
+        if (Type(value) = "Float" && value - value != 0)
+            return String(value)
+        return value
     }
 
     ; Called by WorkerBridge when the job ends (bound: ctx first). Exports become variables where their name says (an

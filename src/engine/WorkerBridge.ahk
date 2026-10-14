@@ -164,7 +164,9 @@ class WorkerBridge {
     ; Starts a job on an idle slot. Returns the execId, or "" when no slot is idle.
     ; params and imports are Maps, env is a Map with flowId, elementId, instanceId and threadId.
     ; jobTimeoutMs > 0: the job ends with "worker timeout" after that long (class property JobTimeoutMs).
-    Run(classId, params, imports, env, onDone, jobTimeoutMs := 0) {
+    ; evaluated: the parameters evaluated by the engine (E26, WI-42), an Array of Maps {id, value} or {id, error} in the
+    ; order of Parameters(); sent as the field "evaluated" (PROTOCOL 4.5).
+    Run(classId, params, imports, env, onDone, jobTimeoutMs := 0, evaluated := "") {
         slot := this._IdleSlot()
         if (!IsObject(slot))
             return ""
@@ -178,7 +180,7 @@ class WorkerBridge {
             SetTimer(job["deadline"], -jobTimeoutMs)
         }
         payload := Map("execId", execId, "class", classId, "params", params, "imports", imports, "env", env
-            , "timeoutMs", WorkerBridge.ACK_TIMEOUT_MS)
+            , "evaluated", (evaluated is Array) ? evaluated : [], "timeoutMs", WorkerBridge.ACK_TIMEOUT_MS)
         try {
             this._owner.peer.Request(slot["name"], "cmd.worker.run", payload
                 , ObjBindMethod(this, "_OnRunAnswer", execId), WorkerBridge.ACK_TIMEOUT_MS)

@@ -252,7 +252,7 @@ Each event carries `seq` (increasing per engine epoch) and `epoch`.
 
 | Type | From → To | Payload | Response / event |
 |---|---|---|---|
-| `cmd.worker.run` | engine → worker | `{ execId, class, params, imports: { name: value }, env: { flowId, elementId, instanceId, threadId }, timeoutMs? }` | `res: { ok }` (accepted) |
+| `cmd.worker.run` | engine → worker | `{ execId, class, params, imports: { name: value }, env: { flowId, elementId, instanceId, threadId }, evaluated: [ { id, value } \| { id, error } ], timeoutMs? }` | `res: { ok }` (accepted) |
 | `evt.worker.done` | worker → engine | `{ execId, result, message, exports: { name: value } }` | – |
 | `cmd.worker.cancel` | engine → worker | `{ execId }` | `res: { ok }`, then `evt.worker.done` with `result: "stopped"` |
 | `cmd.engine.var.get` | worker → engine | `{ execId, name, scope? }` | `res: { ok, exists, value }` (rare, with timeout) |
@@ -285,6 +285,12 @@ Each event carries `seq` (increasing per engine epoch) and `epoch`.
 - **Cancellation:** `cmd.worker.cancel` as before. If no `evt.worker.done` arrives within 2 s, the engine removes the slot and requests `cmd.process.kill` (reason `cancel not confirmed`).
 - **Job deadline:** expiry ends the thread with `exception` "worker timeout" and treats the job like a cancellation.
 - **Crash/end** (`evt.process.crashed`/`exited` for a slot): slot is dropped, a running job ends with `exception` "worker crashed (worker:n)". This event and `peer_gone` on `cmd.worker.run` report the same death via two paths without a fixed order (the hub answers up to one tick before the supervisor's event); the engine evaluates both the same way, the job ends once, the error is counted once.
+
+**Evaluated parameters (WI-42, E26, ELEMENT-API-V2 section 3.1):**
+
+- Before it sends `cmd.worker.run`, the engine evaluates every parameter of the element class (`Parameters()`, labels and buttons left out) with its variables and the type mode of the flow (`strictTypes`), and sends them as `evaluated`: an array in the order of `Parameters()`, one object per parameter, `{ id, value }` or `{ id, error }`. `value` is a text, a number or an object (a variable object; JSON has no integer keys, the worker turns a key of decimal digits back into an Integer as the engine stores it; a float that is not finite is sent as its text). `error` is the text of v1 (`Lang`) that `ctx.EvalParams` throws. `params` stays the raw parameters of the flow. `imports` are taken after the evaluation, so an assignment in a parameter is part of them.
+- The worker answers `bad_payload` if `evaluated` is there and is not an array of objects with an `id`. A missing `evaluated` is an empty list (`ctx.EvalParams` then returns no parameters).
+- If `Parameters()` of the class throws in the engine, no job is sent: the element ends with `exception` ("parameters of <class> could not be evaluated: <message>").
 
 ### 4.6 Engine ↔ storage and log
 

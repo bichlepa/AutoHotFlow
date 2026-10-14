@@ -72,7 +72,9 @@ class Worker extends Role {
         params := Worker._Map(msg, "params")
         imports := Worker._Map(msg, "imports")
         env := Worker._Map(msg, "env")
+        evaluated := Worker._List(msg, "evaluated")
         job := Map("execId", execId, "classId", classId, "params", params, "imports", imports, "env", env
+            , "evaluated", evaluated
             , "started", false, "cls", "", "ctx", "", "startedMs", Time.NowMs())  ; arch-ok: wire-bool internal job record, never sent
         this._job := job
         this._ReportBusy(true)          ; before the element starts: it may block for long (see the head of this file)
@@ -98,7 +100,7 @@ class Worker extends Role {
         execId := job["execId"]
         env := job["env"]
         ctx := WorkerContext(env.Get("flowId", ""), env.Get("elementId", ""), env.Get("instanceId", "")
-            , env.Get("threadId", ""), job["imports"], ObjBindMethod(this, "_OnFinish", execId))
+            , env.Get("threadId", ""), job["imports"], ObjBindMethod(this, "_OnFinish", execId), job["evaluated"])
         job["ctx"] := ctx
         cls := ElementRegistry.Get(job["classId"])
         if (!IsObject(cls)) {
@@ -171,6 +173,21 @@ class Worker extends Role {
             return Map()
         if (!(v is Map))
             throw AhfError("payload field '" key "' must be an object", ErrCode.BAD_PAYLOAD)
+        return v
+    }
+
+    ; An optional list field (Array), empty Array when missing. Each entry of "evaluated" (E26) must be an object with
+    ; an id; anything else is bad_payload.
+    static _List(msg, key) {
+        v := msg.payload.Get(key, "")
+        if (v = "")
+            return []
+        if (!(v is Array))
+            throw AhfError("payload field '" key "' must be an array", ErrCode.BAD_PAYLOAD)
+        for entry in v {
+            if (!(entry is Map) || !entry.Has("id"))
+                throw AhfError("payload field '" key "' must hold objects with an id", ErrCode.BAD_PAYLOAD)
+        }
         return v
     }
 

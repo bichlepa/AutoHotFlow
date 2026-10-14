@@ -159,6 +159,41 @@ def test_run_without_execid_is_bad_payload(worker):
     assert ans["error"]["code"] == "bad_payload"
 
 
+def test_evaluated_parameters_reach_the_element_and_an_error_ends_it(worker):
+    """WI-42, E26: ctx.EvalParams in the worker returns what the engine sent in `evaluated`; the first error of a
+    parameter that is not skipped ends the element with exception and the text of the engine."""
+    import json
+    payload = run_payload("ev1", "Action_TestExprParamsWorker", {"Tag": "w", "Skip": "Int"})
+    payload["evaluated"] = [{"id": "Expr", "value": 10}, {"id": "Num", "value": 2.5},
+                            {"id": "Obj", "value": {"1": "a", "k": "v"}},
+                            {"id": "Int", "error": "Result of expression '2.5' is not an integer"},
+                            {"id": "Tag", "value": "w"}, {"id": "Skip", "value": "Int"}]
+    assert send_run(worker, payload)["ok"]
+    done = done_for(worker, "ev1")
+    assert done["result"] == "normal", done
+    report = json.loads(done["exports"]["global_evalresult_w"])
+    assert report["Expr"] == {"type": "Integer", "value": 10}
+    assert report["Num"] == {"type": "Float", "value": 2.5}
+    assert report["Obj"] == {"type": "Map", "value": {"1": "a", "k": "v"}}
+    assert "Int" not in report
+
+    payload = run_payload("ev2", "Action_TestExprParamsWorker", {"Tag": "w"})
+    payload["evaluated"] = [{"id": "Expr", "value": 1}, {"id": "Int", "error": "Result of expression '2.5' is not an integer"}]
+    assert send_run(worker, payload)["ok"]
+    done = done_for(worker, "ev2")
+    assert done["result"] == "exception"
+    assert done["message"] == "Result of expression '2.5' is not an integer"
+
+
+def test_evaluated_that_is_not_a_list_of_entries_is_bad_payload(worker):
+    for bad in ({"Expr": 1}, [{"value": 1}], ["Expr"]):
+        payload = run_payload("ev3", "Action_TestExprParamsWorker")
+        payload["evaluated"] = bad
+        ans = worker.request("worker:1", "cmd.worker.run", payload, timeout=ROOT_TIMEOUT_S)["payload"]
+        assert not ans["ok"], bad
+        assert ans["error"]["code"] == "bad_payload", bad
+
+
 def test_cancel_of_unknown_execution_is_not_found(worker):
     ans = worker.request("worker:1", "cmd.worker.cancel", {"execId": "nope"}, timeout=ROOT_TIMEOUT_S)["payload"]
     assert not ans["ok"]

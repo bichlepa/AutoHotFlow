@@ -3,13 +3,62 @@
 ; of v1 x_AutoEvaluateParameters per content type, the flow option strictTypes (E34), the f1 entries of the evaluator.
 ; The test element Action_TestExprParams (src/elements/skeleton) evaluates its parameters with ctx.EvalParams and
 ; leaves the result in global_evalresult; it runs in an Executor with the stand-in owner (no processes).
+;
+; Worker (E26): every case of the content types runs a second time with Action_TestExprParamsWorker. The engine side is
+; the real Executor (it evaluates the parameters and hands them to the stand-in pool, FakeWorkers); the worker side is
+; the real WorkerContext, fed with what cmd.worker.run would carry (a JSON round trip of params, imports and
+; evaluated). The cases expect the same results in both modes, except where E26 differs on purpose.
 #Include helpers\ExecutorKit.ahk
+#Include ..\..\src\worker\WorkerContext.ahk
 #Include ..\..\src\elements\skeleton\Action_TestExprParams.ahk
+#Include ..\..\src\elements\skeleton\Action_TestExprParamsWorker.ahk
 
 ; Calls a ctx function inside a running element: Probe.onRun of Test_Count is the hook. Returns what fn returned, or
 ; the ElementError as "error: <message>".
 class CtxProbe {
     static result := ""
+}
+
+; worker: Eval runs the worker twin of the test element.
+class EvalMode {
+    static worker := false
+}
+
+; A case that runs with the worker element.
+InWorker(fn) {
+    return CaseInWorker
+    CaseInWorker() {
+        EvalMode.worker := true
+        try {
+            fn()
+        } finally {
+            EvalMode.worker := false
+        }
+    }
+}
+
+; Runs the open jobs of the stand-in pool the way a worker process does: the payload crosses JSON, the element runs in a
+; WorkerContext, its result and exports go back through the bridge (FakeWorkers.Complete).
+RunWorkerJobs(owner) {
+    fw := owner.workers
+    ids := []
+    for execId in fw.jobs
+        ids.Push(execId)
+    for execId in ids {
+        job := fw.payloads[execId]
+        wire := Json.Parse(Json.Stringify(Map("params", job["params"], "imports", job["imports"]
+            , "evaluated", job["evaluated"])))
+        done := Map("result", "", "message", "")
+        env := job["env"]
+        ctx := WorkerContext(env["flowId"], env["elementId"], env["instanceId"], env["threadId"], wire["imports"]
+            , (c, result, msg) => (done["result"] := result, done["message"] := msg), wire["evaluated"])
+        p := {}
+        for k, v in wire["params"]
+            p.%k% := v
+        ElementRunner.Run(ElementRegistry.Get(job["classId"]), ctx, p)
+        fw.Complete(execId, done["result"], ctx.exports, done["message"])
+    }
+    owner.Drive()
 }
 
 ; Global variables of every case.
@@ -46,6 +95,8 @@ EvalFlow(pars, strict := false, cls := "Action_TestExprParams", settings := "") 
 ; Runs the element once and returns Map: result ("normal" or "exception"), message, values (Map id -> Map type,
 ; value; empty after an exception), owner.
 Eval(pars, strict := false, cls := "Action_TestExprParams", settings := "") {
+    if (cls = "Action_TestExprParams" && EvalMode.worker)
+        cls := "Action_TestExprParamsWorker"
     Probe.Reset()
     Log.memoryLines := []
     owner := EngineOwner()
@@ -53,6 +104,8 @@ Eval(pars, strict := false, cls := "Action_TestExprParams", settings := "") {
     SetGlobals(owner)
     owner.executor.StartFlow(owner.flows.Get("e"))
     owner.Drive()
+    if (owner.workers.jobs.Count)
+        RunWorkerJobs(owner)
     return Outcome(owner)
 }
 
@@ -256,16 +309,21 @@ CheckSkipListAndMore() {
     Ok(r)
     Assert.Equal(Val(r, "Expr"), 5)
     Fails(Eval(P("Expr", "1 +", "Skip", "Expr", "More", "Expr")), "An error occured while parsing expression '1 +'")
-    ; an assignment in a skipped parameter does not run (inline)
+    ; an assignment in a skipped parameter does not run inline; for a worker element the engine has evaluated every
+    ; parameter before the job (E26, MIGRATION M-48)
     r := Eval(P("Expr", "global_side := 1", "Skip", "Expr"))
-    Assert.True(!r["owner"].vars.Global.Has("global_side"))
+    Ok(r)
+    Assert.Equal(r["owner"].vars.Global.Has("global_side"), EvalMode.worker ? 1 : 0, "assignment in a skipped parameter")
 }
 
 CheckTheFirstErrorStops() {
-    ; Expr comes before Num in Parameters(): its error is reported, Num is not evaluated (its assignment does not run)
+    ; Expr comes before Num in Parameters(): its error is reported. Inline, Num is not evaluated (its assignment does not
+    ; run); a worker element got every parameter evaluated (E26)
     r := Eval(P("Expr", "1 +", "Num", "global_after := 1"))
     Fails(r, "An error occured while parsing expression '1 +'")
-    Assert.True(!r["owner"].vars.Global.Has("global_after"))
+    Assert.Equal(r["owner"].vars.Global.Has("global_after"), EvalMode.worker ? 1 : 0)
+    ; with two errors the first one in the order of Parameters() is reported (Expr before Int)
+    Fails(Eval(P("Int", "2.5", "Expr", "1 +")), "An error occured while parsing expression '1 +'")
 }
 
 ; ---- strict mode (E34) ------------------------------------------------------------------------------------------
@@ -359,6 +417,71 @@ CheckExportAndImportInstanceVars() {
     Assert.Equal(InElement(ExportImport), "1|two|3||")
 }
 
+; ---- worker (E26) -----------------------------------------------------------------------------------------------
+
+; What the engine sends: one entry per parameter in the order of Parameters(), a value or an error, also for the
+; parameters that the element will skip. Labels and buttons are not in it.
+CheckTheEngineSendsEveryParameterEvaluated() {
+    EvalMode.worker := true
+    try {
+        r := Eval(P("Expr", "global_n * 2", "Int", "2.5", "Skip", "Int"))
+    } finally {
+        EvalMode.worker := false
+    }
+    Ok(r)
+    list := r["owner"].workers.payloads["fx-1"]["evaluated"]
+    ids := ""
+    for entry in list
+        ids .= (ids = "" ? "" : ",") entry["id"]
+    Assert.Equal(ids, "Expr,Num,PosNum,Int,PosInt,PosIntOrZero,NeededExpr,Either,Text,Json,Needed,VarName,NeededVar,Raw,"
+        . "NeededRaw,File,NeededFile,Folder,Script,Condition,EitherType,Tag,Skip,More")
+    Assert.Equal(list[1]["value"], 10)
+    Assert.True(!list[4].Has("value") && InStr(list[4]["error"], "is not an integer"), "error entry of Int")
+    ; the element skipped Int: no error, and Int is not in its result
+    Assert.True(!r["values"].Has("Int"))
+}
+
+; A Map value crosses JSON: its keys of digits are Integers again in the worker, as in the engine.
+CheckAMapValueKeepsItsIntegerKeysInTheWorker() {
+    ctx := WorkerContext("f", "a1", "i", "t", Json.Parse('{"list":{"1":"a","2":{"x":"y"},"k":"v"}}'), ""
+        , Json.Parse('[{"id":"Expr","value":{"1":"a","10":"b","k":{"2":3}}},{"id":"Bad","error":"boom"}]'))
+    p := ctx.EvalParams({}, "Bad")
+    Assert.True(p.Expr is Map)
+    Assert.Equal(p.Expr[1], "a")
+    Assert.Equal(p.Expr[10], "b")
+    Assert.Equal(p.Expr["K"][2], 3)
+    err := Assert.Throws(() => ctx.EvalParams({}), ElementError)
+    Assert.Equal(err.Message, "boom")
+    ; GetVar and GetVarType read the imported copy
+    Assert.Equal(ctx.GetVar("list.1"), "a")
+    Assert.Equal(ctx.GetVar("LIST.2.x"), "y")
+    Assert.Equal(ctx.GetVar("list.3", "none"), "none")
+    Assert.Equal(ctx.GetVarType("list"), "object")
+    Assert.Equal(ctx.GetVarType("list.1"), "normal")
+    Assert.Equal(ctx.GetVarType("nothing"), "")
+    Assert.Equal(ctx.GetVar("list", "", true), "", "hidden variables are not in the copy")
+    ; the rest needs the engine (R4)
+    Assert.Throws(() => ctx.ReplaceVariables("%x%"), ElementError)
+    Assert.Throws(() => ctx.EvaluateExpression("1"), ElementError)
+    Assert.Throws(() => ctx.ListVars(), ElementError)
+    Assert.Equal(ctx.CheckVarName("ok"), 1)
+}
+
+; Parameters() of a worker class that throws: the element ends with exception, the engine goes on.
+class Action_TestBrokenWorkerParams extends AhfElement {
+    static Mode := "worker"
+    static Parameters(ctx) {
+        throw Error("Parameters needs the editor")
+    }
+}
+ElementRegistry.Register(Action_TestBrokenWorkerParams)
+
+CheckParametersThatThrowEndTheWorkerElement() {
+    r := Eval(P(), false, "Action_TestBrokenWorkerParams")
+    Fails(r, "parameters of Action_TestBrokenWorkerParams could not be evaluated: Parameters needs the editor")
+    Assert.Equal(r["owner"].workers.runs, 0, "no job was sent")
+}
+
 TestRun.Init()
 
 TestRun.Case("String: %var% substitution, contentConvertObjects", CheckString)
@@ -381,5 +504,26 @@ TestRun.Case("strict mode: a type error ends the element with exception", CheckT
 TestRun.Case("ctx.ReplaceVariables, EvaluateExpression, EvaluateScript", CheckReplaceAndEvaluate)
 TestRun.Case("ctx.GetVarType, GetVarLocation, CheckVarName", CheckVarFunctions)
 TestRun.Case("ctx.ExportInstanceVars and ImportInstanceVars", CheckExportAndImportInstanceVars)
+
+TestRun.Case("worker: String", InWorker(CheckString))
+TestRun.Case("worker: String WarnIfEmpty", InWorker(CheckStringWarnIfEmpty))
+TestRun.Case("worker: Expression value and type", InWorker(CheckExpression))
+TestRun.Case("worker: Expression syntax error", InWorker(CheckExpressionError))
+TestRun.Case("worker: Expression WarnIfEmpty", InWorker(CheckExpressionWarnIfEmpty))
+TestRun.Case("worker: number and positiveNumber", InWorker(CheckNumber))
+TestRun.Case("worker: integer types", InWorker(CheckInteger))
+TestRun.Case("worker: the last failing check gives the message", InWorker(CheckTheLastFailingCheckGivesTheMessage))
+TestRun.Case("worker: VariableName", InWorker(CheckVariableName))
+TestRun.Case("worker: RawString", InWorker(CheckRawString))
+TestRun.Case("worker: file and folder", InWorker(CheckFileAndFolder))
+TestRun.Case("worker: contentID", InWorker(CheckSelectableContent))
+TestRun.Case("worker: labels, buttons, defaults", InWorker(CheckLabelsAndButtonsAreSkippedMissingParametersGetTheDefault))
+TestRun.Case("worker: skip list and EvalMoreParams; an assignment in a skipped parameter runs (E26)", InWorker(CheckSkipListAndMore))
+TestRun.Case("worker: the first error is reported; every parameter was evaluated (E26)", InWorker(CheckTheFirstErrorStops))
+TestRun.Case("worker: compatibility mode", InWorker(CheckTypeErrorInCompatibilityMode))
+TestRun.Case("worker: strict mode", InWorker(CheckTypeErrorInStrictMode))
+TestRun.Case("worker: the engine sends every parameter evaluated, values and errors in order", CheckTheEngineSendsEveryParameterEvaluated)
+TestRun.Case("worker: a Map value keeps its Integer keys; GetVar reads the imported copy; the rest needs R4", CheckAMapValueKeepsItsIntegerKeysInTheWorker)
+TestRun.Case("worker: Parameters() that throws ends the element, no job is sent", CheckParametersThatThrowEndTheWorkerElement)
 
 TestRun.Finish()
