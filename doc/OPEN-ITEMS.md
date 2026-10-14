@@ -35,6 +35,7 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 | F-85* | A burst of log lines closes the hub's link to `storage` and loses the lines | reproduced, open, decision needed (same fix as F-17) | yes |
 | F-125* | The F-17 xfail test passes (strict XPASS) in the slow tier | fixed in the test (commit e6bcfdd); cause assumed, XPASS not reproduced; watch | |
 | F-105* | A comparison with an empty or missing variable is true in v1 and false in v2 | verified in the golden data, decision needed (E30) | yes |
+| F-165* | The F-17 xfail test passes again (strict XPASS) in the slow tier, after the F-125 fix | observed once in the verification of 1e444c2, open; probably the same cause as F-125 | |
 
 * provisional IDs, assigned by the agent on 2026-10-13; the project owner assigns the final ones.
 
@@ -212,6 +213,14 @@ Status words follow the sources: *verified* (read or tested), *assumed* (suspect
 **Options:** (a) keep E30: a flow that relies on it must initialise its counters (MIGRATION M-25 says so); (b) the evaluator treats the empty text as 0 in a comparison with a number (a small deviation from AutoHotkey, in `ExprEvaluator`), which gives the v1 result for the empty and the missing variable, though not for a non-numeric text such as `"abc"`.
 **Action:** Decision of the project owner. WI-39 does not change the evaluator.
 **Evidence:** the two case IDs above; deviation catalog in `doc/EXPRESSION-LANGUAGE.md` section 15.1 (class "text comparison").
+
+### F-165*: The F-17 xfail test passes again (strict XPASS) in the slow tier, after the F-125 fix
+
+**What:** `tests/fault/test_log_burst.py::test_a_chatty_role_survives_a_long_stand_still_of_the_supervisor` is marked `xfail(strict=True)` (F-17). In the slow tier it passed, so the strict mark turned the result into `FAILED` with `[XPASS(strict)] F-17: a chatty role gives up during a long stand-still of the supervisor`. The other test of the file (F-85) was `xfailed` as expected.
+**Status:** Observed once, open. The same symptom as F-125. The commit under verification already contains the F-125 fix (the test waits for the first lines of the burst, commit `d354ff5`), so that fix did not remove the XPASS, or this is the same rare timing outcome. Not reproduced again, not investigated.
+**Evidence:** run ID `20261014-064633-1e444c2d`, commit `1e444c2`, command `python tools/run_suite.py --ref HEAD -- tests -q --all -m slow` (4 workers), exit code 1, `1 failed, 86 passed, 1 xfailed in 130.43s`, no INTERNALERROR. The fast tier (run ID `20261014-064547-1e444c2d`, 514 passed, exit 0) and the foundation tier (run ID `20261014-064848-1e444c2d`, 439 passed, 1 skipped, exit 0) of the same commit are green. The architecture check reports 0 violations.
+**Suspicion (assumed):** The change under verification (WI-39: `src/engine/`, `src/expr/`, `src/elements/skeleton/`) does not touch `src/core/` or `src/supervisor/`, so it is probably not the cause. Either the F-125 fix is not enough (the loop runs, but the role's queue still does not reach the limit during the 6 s suspension, for example because the machine is fast), or the F-17 defect depends on timing in a way the test does not control. No second sample, so the rate is unknown.
+**Action:** Watch, and count it together with F-125 (two XPASS observed). If it appears a third time, drop `strict` for this test and note the rate in F-17.
 
 ## Watch list (E7)
 
