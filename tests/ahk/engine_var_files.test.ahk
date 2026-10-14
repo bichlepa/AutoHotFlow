@@ -222,6 +222,30 @@ CaseARefusedMemberAssignmentCreatesNothing() {
     Assert.Equal(seen.Length, 0)
 }
 
+class ThrowingStopper {
+    Stop() {
+        throw Error("probe: stop failed")
+    }
+    StopAll(reason) {
+        throw Error("probe: stop failed")
+    }
+}
+
+; The variables are the only thing a shutdown must not lose: a failing step before them may not skip the flush.
+CaseShutdownFlushesTheVariablesEvenWhenStoppingTheInstancesFails() {
+    eng := FakeEngine(), store := EngineVars()
+    w := VarWriter(eng, store, 60000, 4000)
+    store.Global["a"] := "1"
+    w.Touch("global", "", "a")
+    eng.workers := ThrowingStopper()
+    eng.executor := ThrowingStopper()
+    eng.varWriter := w
+    try {
+        Engine.Prototype.OnShutdown.Call(eng, 3000)
+    }
+    Assert.Equal(eng.peer.sent.Length, 1)
+}
+
 ; --- VarLoader ---------------------------------------------------------------------------------------------
 
 CaseLoaderListsThenReadsTwoAtATimeAndParsesObjects() {
@@ -322,6 +346,7 @@ TestRun.Case("a full send queue marks the variable again", CaseAFullSendQueueMar
 TestRun.Case("FlushAll sends everything with the deadline and stops the writer", CaseFlushAllSendsEverythingWithTheDeadlineAndStopsTheWriter)
 TestRun.Case("VarAccess marks only global and static changes", CaseVarAccessMarksOnlyGlobalAndStaticChanges)
 TestRun.Case("a refused member assignment creates nothing", CaseARefusedMemberAssignmentCreatesNothing)
+TestRun.Case("a shutdown flushes the variables although stopping the instances fails", CaseShutdownFlushesTheVariablesEvenWhenStoppingTheInstancesFails)
 TestRun.Case("the loader lists, reads two at a time and parses objects", CaseLoaderListsThenReadsTwoAtATimeAndParsesObjects)
 TestRun.Case("the loader stops when storage is gone and continues with what is left", CaseLoaderStopsWhenStorageIsGoneAndContinuesWithWhatIsLeft)
 TestRun.Case("the loader reports an unreadable variable and goes on", CaseLoaderReportsAnUnreadableVariableAndGoesOn)

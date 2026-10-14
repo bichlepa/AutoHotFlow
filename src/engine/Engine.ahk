@@ -125,8 +125,18 @@ class Engine extends Role {
     ; not wait for the answers: the frames are in the send queue ahead of sys.bye, and storage is the last process to
     ; end and empties its queue.
     OnShutdown(deadlineMs) {
-        this.workers.Stop()
-        this.executor.StopAll("shutdown")
+        ; The variables are written whatever goes wrong while the instances are stopped: they are the one thing
+        ; that cannot be recovered later.
+        try {
+            this.workers.Stop()
+        } catch as e {
+            this._Log("a0", "engine", "shutdown: stopping the workers failed: " Type(e) ": " e.Message)
+        }
+        try {
+            this.executor.StopAll("shutdown")
+        } catch as e {
+            this._Log("a0", "engine", "shutdown: stopping the instances failed: " Type(e) ": " e.Message)
+        }
         sent := this.varWriter.FlushAll(deadlineMs)
         if (sent > 0)
             this._Log("a1", "engine", "shutdown: " sent " variable(s) sent to storage")
