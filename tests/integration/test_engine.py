@@ -35,6 +35,7 @@ class StorageStub:
         self.list_calls = 0
         self.read_calls = []
         self.logs = []          # payloads of evt.log.append (noReply), in arrival order
+        self.var_writes = []    # (type, payload) of cmd.storage.var.set / .delete, in arrival order (WI-41)
 
     def start(self):
         self._thread.start()
@@ -65,6 +66,12 @@ class StorageStub:
             for p in sorted((self.datadir / "Flows").glob("*.json")):
                 files.append({"path": "Flows/" + p.name, "name": p.stem, "mtime": int(p.stat().st_mtime)})
             self.client.reply(msg, {"ok": True, "files": files})
+        elif type_ == "cmd.storage.var.list":
+            # WI-41: the engine loads the variables before evt.engine.ready. This stand-in holds none.
+            self.client.reply(msg, {"ok": True, "names": []})
+        elif type_ in ("cmd.storage.var.set", "cmd.storage.var.delete"):
+            self.var_writes.append((type_, payload))
+            self.client.reply(msg, {"ok": True})
         elif type_ == "cmd.storage.flow.read":
             path = payload.get("path", "")
             self.read_calls.append(path)

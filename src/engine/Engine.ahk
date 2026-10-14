@@ -9,6 +9,8 @@
 #Include Executor.ahk
 #Include WorkerBridge.ahk
 #Include vars\EngineVars.ahk
+#Include vars\VarLoader.ahk
+#Include vars\VarWriter.ahk
 
 ; Engine role (WI-10, ARCHITECTURE 3, 4, 6.1, PROTOCOL 4.2, 4.3, 4.6).
 ;
@@ -23,7 +25,10 @@
 ; evt.storage.error and do not stop the start. When storage does not answer (timeout, connection lost, no such
 ; peer) the files not yet asked for are not asked, nothing is reported as an error, and the engine waits for
 ; storage again; then it fetches the list again and reads only the files that have no result yet.
-; evt.engine.ready is sent once every file of the list has a result (loaded, or a real read or parse error).
+; Then (WI-41) it loads the global and static variables through storage (VarLoader, staggered the same way, with
+; the same waiting for storage after an abort); evt.engine.ready is sent once every file of the list has a result
+; (loaded, or a real read or parse error) and the variables are loaded. Changes of the variables are written back
+; delayed by VarWriter and at shutdown.
 ; A list that fails for another reason is retried without limit, with a growing pause.
 ;
 ; Every evt.* carries "epoch" (the start of this engine process) and "seq" (one counter per engine
@@ -55,7 +60,11 @@ class Engine extends Role {
         this.epoch := Engine._NewEpoch()
         this.seq := 0
         this.flows := FlowTable()
-        this.vars := EngineVars()      ; global and static variables (WI-40; files: WI-41)
+        this.vars := EngineVars()      ; global and static variables (WI-40)
+        this.varLoader := VarLoader(this, this.vars)
+        varOpts := Engine._VarOptions(args)
+        this.varWriter := VarWriter(this, this.vars, varOpts["delayMs"], varOpts["timeoutMs"])
+        this.vars.OnChange := (scope, flowId, name) => this.varWriter.Touch(scope, flowId, name)
         this.executor := Executor(this)
         pool := Engine._PoolOptions(args)
         this.workers := WorkerBridge(this, pool["size"], pool["warm"], pool["idleMs"])
@@ -106,13 +115,21 @@ class Engine extends Role {
                 , "executing", Json.Bool(this.executor.IsExecuting(rec.FlowId))))
         }
         return Map("epoch", this.epoch, "seq", this.seq, "flows", flows, "instances", this.executor.DiagInstances()
-            , "workers", this.workers.DiagInfo())
+            , "workers", this.workers.DiagInfo()
+            , "variables", Map("loaded", this.varLoader.Count, "writePending", this.varWriter.Pending
+                , "writeInflight", this.varWriter.Inflight))
     }
 
-    ; sys.shutdown: every instance is stopped before sys.bye (ARCHITECTURE 6.3, step 2).
+    ; sys.shutdown: every instance is stopped, then the variables that are not written yet go to storage, all before
+    ; sys.bye (ARCHITECTURE 6.3, step 2). The requests carry the rest of the deadline as their limit. The engine does
+    ; not wait for the answers: the frames are in the send queue ahead of sys.bye, and storage is the last process to
+    ; end and empties its queue.
     OnShutdown(deadlineMs) {
         this.workers.Stop()
         this.executor.StopAll("shutdown")
+        sent := this.varWriter.FlushAll(deadlineMs)
+        if (sent > 0)
+            this._Log("a1", "engine", "shutdown: " sent " variable(s) sent to storage")
     }
 
     ; --- events --------------------------------------------------------------------------------
@@ -321,7 +338,18 @@ class Engine extends Role {
         this._ReadNext(st)
     }
 
+    ; Every flow file has a result: the variables are next (their static tables are per loaded flow).
     _Loaded() {
+        if (this._flowsLoaded)
+            return
+        flowIds := []
+        for rec in this.flows.All()
+            flowIds.Push(rec.FlowId)
+        this.varLoader.Run(flowIds, () => this._VarsLoaded(), (why) => this._LoadInterrupted(why))
+    }
+
+    ; Flows and variables are loaded: the start is complete.
+    _VarsLoaded() {
         if (this._flowsLoaded)
             return
         this._flowsLoaded := true
@@ -336,7 +364,7 @@ class Engine extends Role {
             this.Emit("topic:engine", "evt.engine.restarted", Map())
         this.Emit("topic:engine", "evt.flow.list.changed", Map("added", added, "removed", [], "changed", []))
         this.Emit("topic:engine", "evt.engine.ready", Map())
-        this._Log("a1", "engine", "ready with " this.flows.Count " flow(s)")
+        this._Log("a1", "engine", "ready with " this.flows.Count " flow(s) and " this.varLoader.Count " variable(s)")
     }
 
     _StorageError(op, path, message) {
@@ -481,6 +509,14 @@ class Engine extends Role {
         idleMs := Engine._IntOption(args, "worker-idle-ms", WorkerBridge.DEFAULT_IDLE_MS, WorkerBridge.MIN_IDLE_MS
             , WorkerBridge.MAX_IDLE_MS)
         return Map("size", size, "warm", warm, "idleMs", idleMs)
+    }
+
+    ; Options of the variable files (WI-41): --var-write-delay-ms=<ms> (default 200, 0 to 60000): how long a change
+    ; waits for more changes of the same variable; --var-write-timeout-ms=<ms> (default 10000, 100 to 120000): limit
+    ; of one write request to storage. The supervisor passes both on to the engine.
+    static _VarOptions(args) {
+        return Map("delayMs", Engine._IntOption(args, "var-write-delay-ms", VarWriter.DELAY_MS, 0, 60000)
+            , "timeoutMs", Engine._IntOption(args, "var-write-timeout-ms", VarWriter.TIMEOUT_MS, 100, 120000))
     }
 
     static _IntOption(args, key, fallback, low, high) {

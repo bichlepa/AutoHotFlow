@@ -134,7 +134,7 @@ Append new entries at the end of the matching category. Correct or delete outdat
 
 - **Problem:** A class had a field and a method whose names differ only in capitalization (`_loaded` and `_Loaded()`). Access to the field failed with "Property is read-only", because identifiers are case-insensitive.
 - **Right:** Name fields and methods so that they differ in more than capitalization. Before naming a method `_X()`, check whether a field `_x` already exists.
-- **Status:** verified (role start failed with exit 2 and this message; green after renaming the field to `_flowsLoaded`)
+- **Status:** verified (role start failed with exit 2 and this message; green after renaming the field to `_flowsLoaded`). It came back in WI-41 (`_failed` in `VarWriter` against the method `_Failed()`): the engine then ended with exit 2 "bad arguments: Property is read-only" before any other test could say why; see the entry "An error in a constructor of a role shows only as exit 2" below.
 - **Source:** `src/engine/Engine.ahk`
 
 ### `Json.False` is true in AHK
@@ -980,3 +980,10 @@ Append new entries at the end of the matching category. Correct or delete outdat
 - **Problem:** A patch script written in a shell heredoc replaced text with a replacement that contained a backslash followed by n (meant as the two characters, for a JSON text inside an AHK string). The file got a real line break instead, and did not load. The doubled backslash of the script was halved on its way (the pitfall of AGENTS.md about heredocs, here with `\\n`). The same script silently did not match when the file had CRLF line ends.
 - **Right:** Use the editor tool for small changes. In a script, build the backslash with `chr(92)` and the line break with `chr(10)`, read and write with `newline=""`, and check with `print(old in s)` that the text was found. Better still, write the patch script itself with the editor tool and run the file: in WI-40 a quoted heredoc (`<<'EOF'`) with a Python script still lost one of two backslashes, so `engine\\vars` arrived as `engine\vars` and Python made `\v` a vertical tab (an `#Include` that could not be opened); `"\\r\\n"` became a broken string.
 - **Status:** verified (several failed patches in WI-39 and WI-40)
+
+### An error in the constructor of a role shows only as exit 2 "bad arguments"
+
+- **Problem:** `AhfBoot` builds the role in a `try` and reports every exception as `bad arguments: <message>`, without the line. A mistake in a new class that the constructor creates (WI-41: a field and a method with the same name) looks like a wrong option, and the supervisor restarts the engine three times.
+- **Right:** Build the role in a small test script and print `e.Message`, `e.File`, `e.Line` and `e.Stack` of the exception: `#Include src\AhfBoot.ahk`, then `try { Engine(Map("session", "x", "hub", "h", "data", "d")) } catch as e { FileAppend(e.Stack, "**") }`, run with `tools/ahkrun.py`. The stack names the line of the failed assignment.
+- **Status:** verified (WI-41)
+- **Source:** `src/AhfBoot.ahk`
