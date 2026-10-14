@@ -8,6 +8,7 @@
 #Include FlowTable.ahk
 #Include Executor.ahk
 #Include WorkerBridge.ahk
+#Include vars\EngineVars.ahk
 
 ; Engine role (WI-10, ARCHITECTURE 3, 4, 6.1, PROTOCOL 4.2, 4.3, 4.6).
 ;
@@ -54,6 +55,7 @@ class Engine extends Role {
         this.epoch := Engine._NewEpoch()
         this.seq := 0
         this.flows := FlowTable()
+        this.vars := EngineVars()      ; global and static variables (WI-40; files: WI-41)
         this.executor := Executor(this)
         pool := Engine._PoolOptions(args)
         this.workers := WorkerBridge(this, pool["size"], pool["warm"], pool["idleMs"])

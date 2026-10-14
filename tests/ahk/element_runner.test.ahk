@@ -1,5 +1,5 @@
 #Requires AutoHotkey v2.0
-; Unit tests for src/elements/base/ExecContext.ahk, VarStore.ahk and ElementRunner.ahk (WI-09,
+; Unit tests for src/elements/base/ExecContext.ahk and ElementRunner.ahk (WI-09,
 ; doc/ELEMENT-API-V2.md section 3). Timer cases use the message loop: Sleep() runs timers.
 #Include lib\Assert.ahk
 #Include ..\..\src\elements\base\ElementRunner.ahk
@@ -100,9 +100,8 @@ TestRun.Case("Context: Finish rejects an unknown result", FinishRejectsUnknownRe
 TestRun.Case("Context: After rejects a non-function callback", AfterRejectsNonFunction)
 TestRun.Case("Context: After rejects a negative delay", AfterRejectsNegativeDelay)
 TestRun.Case("Context: After after Finish schedules nothing", AfterAfterFinishIsNoop)
-TestRun.Case("Context: variables in thread and instance scope", VariablesScopes)
-TestRun.Case("Context: thread variable shadows instance variable", ThreadShadowsInstance)
-TestRun.Case("Context: unsupported variable scope throws", UnsupportedScopeThrows)
+TestRun.Case("Context: variable calls go to the access object of the engine", VariablesGoToTheAccessObject)
+TestRun.Case("Context: without an access object there are no variables", NoVariablesWithoutAccessObject)
 
 ExceptionBecomesException() {
     rec := Recorder()
@@ -197,31 +196,34 @@ AfterAfterFinishIsNoop() {
     Assert.Equal(ctx.After(10, Noop), 0)
 }
 
-VariablesScopes() {
-    vars := VarStore()
-    ctx := MakeCtx(Recorder(), vars)
-    ctx.SetVar("Counter", 5)
-    Assert.Equal(ctx.GetVar("counter"), 5, "names are case-insensitive")
-    Assert.Equal(ctx.GetVar("missing", "dflt"), "dflt")
-    ctx.SetVar("shared", "x", "instance")
-
-    other := ExecContext("flow1", "e2", "inst1", "t2", "", VarStore(vars.instance))
-    Assert.Equal(other.GetVar("shared"), "x", "instance scope is shared")
-    Assert.Equal(other.GetVar("Counter", "none"), "none", "thread scope is not shared")
+; Records the calls of ExecContext; the rules of the variables are tested in vars_*.test.ahk (WI-40).
+class FakeAccess {
+    calls := []
+    SetVar(name, value, location, hidden) => (this.calls.Push("set " name "=" value " " location " " hidden), 1)
+    GetVar(name, default, hidden) => (this.calls.Push("get " name " " hidden), "v")
+    DeleteVar(name, hidden) => (this.calls.Push("delete " name), 1)
+    Location(name, hidden) => (this.calls.Push("location " name), "instance")
+    ListVars(scope) => (this.calls.Push("list " scope), ["a"])
 }
 
-ThreadShadowsInstance() {
-    ctx := MakeCtx(Recorder())
-    ctx.SetVar("v", "inst", "instance")
-    Assert.Equal(ctx.GetVar("v"), "inst")
-    ctx.SetVar("v", "thr")
-    Assert.Equal(ctx.GetVar("v"), "thr")
+VariablesGoToTheAccessObject() {
+    access := FakeAccess()
+    ctx := MakeCtx(Recorder(), access)
+    Assert.Equal(ctx.SetVar("A_x", 5, "thread"), 1)
+    Assert.Equal(ctx.GetVar("x", "dflt", true), "v")
+    Assert.Equal(ctx.DeleteVar("x"), 1)
+    Assert.Equal(ctx.VarLocation("x"), "instance")
+    Assert.Equal(ctx.ListVars("global")[1], "a")
+    Assert.Equal(access.calls.Length, 5)
+    Assert.Equal(access.calls[1], "set A_x=5 thread 0")
+    Assert.Equal(access.calls[2], "get x 1")
+    Assert.Equal(access.calls[5], "list global")
 }
 
-UnsupportedScopeThrows() {
+NoVariablesWithoutAccessObject() {
     ctx := MakeCtx(Recorder())
-    Assert.Throws(() => ctx.SetVar("x", 1, "loop"), ElementError)
-    Assert.Throws(() => ctx.vars.Get("global", "x"), ElementError)
+    Assert.Throws(() => ctx.SetVar("x", 1), ElementError)
+    Assert.Throws(() => ctx.GetVar("x"), ElementError)
 }
 
 TestRun.Finish()

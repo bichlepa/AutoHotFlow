@@ -1,6 +1,6 @@
 #Requires AutoHotkey v2.0
 ; Test owner for Executor (WI-21): a stand-in for Engine that records events instead of sending them.
-; Provides what Executor reads from its owner: flows (FlowTable), workers, Emit, EmitFlowState, Kick.
+; Provides what Executor reads from its owner: flows (FlowTable), vars (EngineVars), workers, Emit, EmitFlowState, Kick.
 #Include ..\..\..\src\engine\Executor.ahk
 #Include ..\..\..\src\engine\FlowTable.ahk
 #Include ..\..\..\src\elements\base\AhfElement.ahk
@@ -17,6 +17,7 @@ class FakeWorkers {
         this.cancelled := []
         this.wanted := []          ; the arguments of Want (threads waiting for a worker)
         this.timeouts := []        ; the jobTimeoutMs of every Run
+        this.imports := []         ; the imports of every Run
     }
 
     Want(waiting) {
@@ -37,6 +38,7 @@ class FakeWorkers {
     Run(classId, params, imports, env, onDone, jobTimeoutMs := 0) {
         this.runs += 1
         this.timeouts.Push(jobTimeoutMs)
+        this.imports.Push(imports)
         execId := "fx-" this.runs
         if (this.failAtOnce) {
             onDone("exception", "worker not available", Map())
@@ -52,16 +54,17 @@ class FakeWorkers {
         return true
     }
 
-    Complete(execId, result := "normal") {
+    Complete(execId, result := "normal", exports := "") {
         onDone := this.jobs[execId]
         this.jobs.Delete(execId)
-        onDone(result, "", Map())
+        onDone(result, "", IsObject(exports) ? exports : Map())
     }
 }
 
 class EngineOwner {
     __New() {
         this.flows := FlowTable()
+        this.vars := EngineVars()
         this.workers := FakeWorkers()
         this.events := []
         this.kicks := 0

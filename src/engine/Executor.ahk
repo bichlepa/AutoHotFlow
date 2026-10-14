@@ -5,13 +5,15 @@
 #Include ..\elements\base\ElementRegistry.ahk
 #Include ..\elements\base\ElementRunner.ahk
 #Include ..\elements\base\ExecContext.ahk
-#Include ..\elements\base\VarStore.ahk
 #Include core\ExecutionPolicy.ahk
 #Include core\FlowDefinition.ahk
 #Include core\Instance.ahk
 #Include core\Scheduler.ahk
 #Include core\ThreadState.ahk
 #Include WorkerBridge.ahk
+#Include vars\BuiltInVars.ahk
+#Include vars\VarAccess.ahk
+#Include vars\VarNames.ahk
 
 ; Runs the instances of the engine (WI-10, ARCHITECTURE 2.3, 5.1, 5.2, 6.2). Runs the state machines of
 ; engine/core and calls the elements through ElementRunner. Knows nothing about IPC: it reports through
@@ -35,6 +37,11 @@
 ; from owner.flows (DefOf), so an edit takes effect at the next step. A running element keeps the class and the
 ; parameters it was started with (they are stored in run["active"]). A flow that is gone from the table stops its
 ; instances at the next step (reason "flow.deleted"); Engine calls FlowDeleted when it removes a flow.
+;
+; Variables (WI-40, doc/EXPRESSION-LANGUAGE.md section 18): every element run gets a VarAccess, its view on the loop
+; and thread variables of its thread (ThreadState), the instance variables (Instance), the static variables of the flow
+; and the global variables (owner.vars, EngineVars). A worker gets copies of the visible loop, thread and instance
+; variables as imports.
 ;
 ; Parameters are passed as they are stored in the flow file (object with case-insensitive properties).
 ; Expressions are not evaluated in Phase 2 (ARCHITECTURE, WI-10 "Nicht Teil"), so Duration "200" arrives as
@@ -152,6 +159,10 @@ class Executor {
         trigger := inst.Start(Ids.Next("thr-"), triggerId)
         if (!IsObject(trigger))
             throw AhfError("instance '" instId "' could not start", ErrCode.INTERNAL)
+        ; Thread variables about the trigger event (v1 newInstance, Instances and Threads.ahk:91). Set before the
+        ; trigger thread moves on, so every branch has them.
+        trigger.Vars["A_TriggerTime"] := A_Now
+        trigger.Vars["A_TriggerID"] := triggerId
         this._owner.Emit("topic:flow:" flowId, "evt.instance.started", Map("flowId", flowId, "instanceId", instId))
         if (emitState)
             this._owner.EmitFlowState(flowId)
@@ -302,7 +313,7 @@ class Executor {
         this._ElementStarted(run, elementId)
         ctx := ExecContext(flowId, elementId, run["instanceId"], thread.Id
             , ObjBindMethod(this, "_OnFinish", run["instanceId"], thread.Id)
-            , VarStore(run["vars"], VarStore.NewMap()))
+            , this._VarAccess(run, thread, def, elementId))
         if (!def.HasElement(elementId)) {
             ; The element was deleted while the thread waited (ARCHITECTURE 4.2, M-17).
             Log.Write("f1", "engine", "element '" elementId "' was removed before it could start", flowId)
@@ -340,7 +351,7 @@ class Executor {
         prev := Critical("On")  ; reason: register, start and note the execId as one step (see above)
         try {
             run["active"][thread.Id] := act
-            execId := this._owner.workers.Run(classId, params, Executor._CopyMap(run["vars"]), env
+            execId := this._owner.workers.Run(classId, params, ctx.vars.Imports(), env
                 , ObjBindMethod(this, "_OnWorkerDone", ctx), cls.JobTimeoutMs)
             current := run["active"].Get(thread.Id, "")
             if (execId = "") {
@@ -355,14 +366,15 @@ class Executor {
             ctx.Finish("exception", "worker not available for " classId)
     }
 
-    ; Called by WorkerBridge when the job ends (bound: ctx first). Exports become thread variables.
+    ; Called by WorkerBridge when the job ends (bound: ctx first). Exports become variables where their name says (an
+    ; A_ name a thread variable). Provisional until variables in the worker (S2, R4).
     _OnWorkerDone(ctx, result, message, exports) {
         if (!ExecContext.IsResult(result)) {
             message := "worker reported result '" result "'"
             result := "exception"
         }
         for name, value in exports
-            ctx.SetVar(name, value)
+            ctx.SetVar(name, value, VarNames.IsA(name) ? "thread" : "")
         ctx.Finish(result, message)
     }
 
@@ -536,8 +548,7 @@ class Executor {
     ; --- helpers -------------------------------------------------------------------------------
 
     static _NewRun(instId, flowId, inst, triggerId) {
-        run := Map("instanceId", instId, "flowId", flowId, "inst", inst, "triggerId", triggerId
-            , "vars", VarStore.NewMap(), "active", Map())
+        run := Map("instanceId", instId, "flowId", flowId, "inst", inst, "triggerId", triggerId, "active", Map())
         run["active"].CaseSense := "Off"
         return run
     }
@@ -580,12 +591,15 @@ class Executor {
         return m
     }
 
-    ; A copy of a variable Map (imports of a worker are copies, never references).
-    static _CopyMap(source) {
-        m := Map()
-        for k, v in source
-            m[k] := v
-        return m
+    ; The view of one element run on the variables (WI-40). The built-in variables a_flowName, a_elementName and
+    ; a_workingdir come from the revision the element starts with.
+    _VarAccess(run, thread, def, elementId) {
+        el := def.Element(elementId)
+        name := (el is Map) ? el.Get("name", "") : ""
+        env := Map("flowId", run["flowId"], "elementId", elementId, "flowName", def.Name
+            , "elementName", IsObject(name) ? "" : String(name)
+            , "workingDir", BuiltInVars.WorkingDirOf(def.Raw.Get("flowSettings", "")))
+        return VarAccess(this._owner.vars, run["inst"], thread, env)
     }
 
     static _IsWorkerElement(def, thread) {

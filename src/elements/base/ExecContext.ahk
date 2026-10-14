@@ -1,7 +1,6 @@
 #Requires AutoHotkey v2.0
 #Include ..\..\core\Errors.ahk
 #Include ..\..\core\Log.ahk
-#Include VarStore.ahk
 
 ; Context of one inline execution of an element (doc/ELEMENT-API-V2.md section 3, inline subset).
 ;
@@ -20,7 +19,7 @@ class ExecContext {
         this.threadId := threadId
         this.entryPoint := ""            ; "head" | "tail" for loops, "" otherwise
         this.State := {}                 ; per-run state of the element
-        this.vars := IsObject(vars) ? vars : VarStore()
+        this.vars := vars                ; VarAccess of the engine, or "" (no variables)
         this.onFinish := onFinish
         this.finished := false
         this.result := ""
@@ -76,14 +75,41 @@ class ExecContext {
         Log.Write(level, "element " this.elementId, text, this.flowId)
     }
 
-    ; Sets a variable. scope "" or "thread" (default) or "instance".
-    SetVar(name, value, scope := "") {
-        this.vars.Set(scope, name, value)
+    ; Variables (WI-40, doc/ELEMENT-API-V2.md section 3). The name decides the scope as in v1: A_ names are loop or
+    ; thread variables (scope "loop" or "thread" is required to set one), global_ and static_ names are global and
+    ; static, any other name is an instance variable. The engine passes the access object (VarAccess); without it
+    ; (a worker, a test without engine) there are no variables.
+
+    ; Sets a variable (v1 x_SetVariable). scope: "" or, for an A_ name, "thread" or "loop". Returns 1, or 0 if the
+    ; name or the scope is not allowed (logged f0, as in v1).
+    SetVar(name, value, scope := "", hidden := false) {
+        return this._Vars().SetVar(name, value, scope, hidden)
     }
 
-    ; Reads a variable: thread scope first, then instance scope. Returns default if unset.
-    GetVar(name, default := "") {
-        return this.vars.Find(name, default)
+    ; Reads a variable or a member ("list.1"), as a copy; default if it does not exist (v1 x_GetVariable).
+    GetVar(name, default := "", hidden := false) {
+        return this._Vars().GetVar(name, default, hidden)
+    }
+
+    ; Deletes a variable or a member. Returns 1 if it existed (v1 x_DeleteVariable).
+    DeleteVar(name, hidden := false) {
+        return this._Vars().DeleteVar(name, hidden)
+    }
+
+    ; "loop", "thread", "builtin", "instance", "static", "global" or "" (v1 x_GetVariableLocation).
+    VarLocation(name, hidden := false) {
+        return this._Vars().Location(name, hidden)
+    }
+
+    ; Names of the visible variables of a scope, or of all scopes for "" (v1 x_GetListOf*Vars).
+    ListVars(scope := "") {
+        return this._Vars().ListVars(scope)
+    }
+
+    _Vars() {
+        if (!IsObject(this.vars))
+            throw ElementError("variables are not available in this context")
+        return this.vars
     }
 
     _RunTimer(seq) {

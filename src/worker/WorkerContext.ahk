@@ -28,11 +28,11 @@ class WorkerContext extends ExecContext {
     }
 
     ; Variables of the engine are not reachable from a worker (ARCHITECTURE 4). Use imports and exports.
-    GetVar(name, default := "") {
+    GetVar(name, default := "", hidden := false) {
         throw ElementError("GetVar is not available in a worker, use GetImport")
     }
 
-    SetVar(name, value, scope := "") {
+    SetVar(name, value, scope := "", hidden := false) {
         throw ElementError("SetVar is not available in a worker, use Export")
     }
 
