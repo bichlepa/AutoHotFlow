@@ -3,18 +3,19 @@
 Usage:
     python tools/golden_compare.py [--plain] [--private] [--group NAME ...] [--list CLASS] [--unclassified]
 
-For every case of the kinds `expression` and `script` in tests/golden/cases the text is evaluated by the new
-evaluator (harness tests/golden/v2/harness.ahk, started through tools/ahkrun.py) and the result is compared with
-the stored result of v1 (tests/golden/expected). By default the text is converted first (V1ExprConverter);
---plain evaluates the unchanged text, which is the deviation catalog of doc/EXPRESSION-LANGUAGE.md section 15.
+For every case in tests/golden/cases the harness tests/golden/v2/harness.ahk (started through tools/ahkrun.py) runs
+the v2 code with the variable model of the engine and the result is compared with the stored result of v1
+(tests/golden/expected): expressions and scripts with the new evaluator, `replace` with the %var% substitution,
+`checkname` and `destination` with the name rules, `varget` and `varset` with the variable access of elements
+(WI-40). By default the text of an expression or script is converted first (V1ExprConverter); --plain evaluates the
+unchanged text, which is the deviation catalog of doc/EXPRESSION-LANGUAGE.md section 15.
 
 Every case gets a verdict: `same` or a deviation class (see CLASSES). A class has a handling: `accept` (the
 difference is known and decided), `unsupported` (the converter reports the text, the owner decides) or `open`
 (a deviation without a class: this is a failure of the check). The table of classes is printed; exit code 1 if any
 case is `open`.
 
-Only the kinds `expression` and `script` are compared. `replace` (WI-42), variable access and destinations (WI-40)
-are not part of the expression language.
+Variables are compared per scope (instance, thread, loop, global, static).
 """
 
 import argparse
@@ -36,7 +37,7 @@ GOLDEN = os.path.join(ROOT, "tests", "golden")
 HARNESS = os.path.join(GOLDEN, "v2", "harness.ahk")
 PUBLIC = (os.path.join(GOLDEN, "cases"), os.path.join(GOLDEN, "expected"))
 PRIVATE = (os.path.join(GOLDEN, "private", "cases"), os.path.join(GOLDEN, "private", "expected"))
-KINDS = ("expression", "script")
+KINDS = ("expression", "script", "replace", "checkname", "destination", "varget", "varset")
 SCOPES = ("instance", "thread", "loop", "global", "static")
 
 
@@ -62,26 +63,44 @@ def load_cases(paths, groups=None):
     return out
 
 
+INT_KEY = re.compile(r"-?\d{1,18}")
+
+
 def merge_keys(value):
-    """Object keys ignore case (v1 and the new language): the first spelling stays, the last value wins."""
+    """Object keys ignore case (v1 and the new language): the first spelling stays, the last value wins. A key that
+    looks like an integer is that integer ("01" and "1" are one key), as in v1 and in v2 (VarValues.NormKey). The
+    order of the case file counts, so this is done here and not by the JSON parser of the harness (a Map)."""
     if isinstance(value, list):
         return [merge_keys(x) for x in value]
     if isinstance(value, dict):
         out, spelling = {}, {}
         for k, x in value.items():
-            low = str(k).lower()
+            k = str(k)
+            if INT_KEY.fullmatch(k):
+                k = str(int(k))
+            low = k.lower()
             out[spelling.setdefault(low, k)] = merge_keys(x)
         return out
     return value
 
 
 def flat_vars(case):
-    """The variables of all scopes in one table (the scope model is WI-40; a name in two scopes is not compared)."""
+    """The variables of all scopes in one table (used to see whether a case has an object)."""
     flat = {}
     for scope in SCOPES:
         for name, value in (case.get("vars") or {}).get(scope, {}).items():
             flat[name] = merge_keys(value)
     return flat
+
+
+def scoped_vars(case):
+    """The variables of a case per scope, keys of objects merged as both languages ignore their case."""
+    out = {}
+    for scope in SCOPES:
+        entries = (case.get("vars") or {}).get(scope, {})
+        if entries:
+            out[scope] = {name: merge_keys(value) for name, value in entries.items()}
+    return out
 
 
 def run_harness(cases, mode, timeout=120):
@@ -90,7 +109,13 @@ def run_harness(cases, mode, timeout=120):
     try:
         src = os.path.join(tmp, "input.json")
         out = os.path.join(tmp, "result.jsonl")
-        payload = [{"id": c["id"], "kind": c["kind"], "text": c["text"], "vars": flat_vars(c)} for c, _ in cases]
+        payload = []
+        for c, _ in cases:
+            item = {"id": c["id"], "kind": c["kind"], "text": c["text"], "vars": scoped_vars(c)}
+            for key in ("common", "location", "value", "convertObjects"):
+                if key in c:
+                    item[key] = c[key]
+            payload.append(item)
         with open(src, "w", encoding="utf-8") as f:
             json.dump(payload, f)
         rc, stdout, stderr, dialogs = ahkrun.run(HARNESS, [out, src, mode], timeout=timeout)
@@ -180,15 +205,20 @@ def numberish(a, b):
 
 
 def vars_flat_v1(r1):
+    """The variables after the run as {"scope:name": value} (names in lower case)."""
     out = {}
     for scope in SCOPES:
         for name, v in r1.get("variables", {}).get(scope, {}).items():
-            out[name.lower()] = v1_plain(v)
+            out[scope + ":" + name.lower()] = v1_plain(v)
     return out
 
 
 def vars_flat_v2(r2):
-    return {k.lower(): v2_plain(v) for k, v in r2.get("vars", {}).items()}
+    out = {}
+    for scope, entries in r2.get("vars", {}).items():
+        for name, v in entries.items():
+            out[scope + ":" + name.lower()] = v2_plain(v)
+    return out
 
 
 # ---------------------------------------------------------------------------------------------- classes
@@ -297,12 +327,13 @@ def main(argv=None):
     for verdict in sorted(counts, key=lambda v: (v != "same", v == "open", v)):
         handling = golden_classes.CLASSES.get(verdict, ("", ""))[0]
         print("  %-40s %5d  %s" % (verdict, counts[verdict], handling))
-    if rows and rows[0]["conv"]:
+    converted = [r for r in rows if r["conv"]]
+    if converted:
         stats = {}
-        for r in rows:
+        for r in converted:
             stats[r["conv"]["status"]] = stats.get(r["conv"]["status"], 0) + 1
         print("conversion: " + ", ".join("%s %d" % kv for kv in sorted(stats.items())))
-        print("not idempotent: %d" % sum(1 for r in rows if not r["conv"]["idempotent"]))
+        print("not idempotent: %d" % sum(1 for r in converted if not r["conv"]["idempotent"]))
     if args.list and not args.private:
         for r in rows:
             if r["verdict"] == args.list:

@@ -1,4 +1,5 @@
-"""Deviation classes of the comparison of v1 and the new expression language (work item WI-39).
+"""Deviation classes of the comparison of v1 and v2: the new expression language (work item WI-39) and the variable
+model (WI-40).
 
 Used by tools/golden_compare.py. `classify(case, r1, r2)` gives the verdict of one golden case: `same`, the name
 of a class from CLASSES, or `open` (a deviation without a class: a failure of the check).
@@ -13,14 +14,9 @@ import golden_compare as gc
 #   rewrite      the converter rewrites the text so that the result agrees; a verdict of this class in the converted
 #                run is a defect of the converter
 #   unsupported  syntax the converter reports and leaves unchanged; the owner has not decided (OPEN-ITEMS)
-#   later        not part of the expression language (variable model WI-40, parameter evaluation WI-42): the case
-#                is not compared here
 CLASSES = {
     "v1 error": ("accept", "v1 reports an error or hangs; nothing to reproduce (E22)"),
     "number format": ("accept", "the same number in the text form of v2 (E24, E32)"),
-    "built-in variable": ("later", "A_ names are provided by the variable model (WI-40)"),
-    "scope prefix": ("later", "global_ and static_ names are provided by the variable model (WI-40, WI-41)"),
-    "object model": ("later", "keys of objects (integer keys, order, copies) belong to the variable model (WI-40)"),
     "unsupported syntax": ("unsupported", "% as modulo, ^=, %=, <> and \"a\"\"b\": reported, not converted"),
     "script result value": ("accept", "the value of a script is the value of its last statement (v1: unspecific)"),
     "assignment value": ("accept", "an assignment has a value in v2; in v1 it has none (the empty text)"),
@@ -41,6 +37,17 @@ CLASSES = {
     "number literal spelling": ("rewrite", "v1 passes a number literal on as text (1.50, 007); v2 reads it as a number"),
     "concatenation dot": ("rewrite", "v1 reads \"a\".\"b\" as concatenation; v2 needs spaces around the dot"),
     "backtick": ("rewrite", "a backtick in front of a character that v2 does not know as an escape"),
+    # variable model (WI-40)
+    "assignment refused": ("accept", "an assignment that v1 refuses with an f0 log (an A_ name, no permission) is an "
+                                     "error of the expression in v2, with the same text"),
+    "built-in value": ("accept", "A_PtrSize is 8 (64 bit only, E4); A_LanguageName is the name of the language, "
+                                 "v1 always gave the empty text"),
+    "path into global or static": ("accept", "v1 cannot read a member of a global or static object (it looks for "
+                                             "a file of that name); v2 can"),
+    "object as text": ("accept", "an object in a concatenation is a type error in v2 (empty text and a warning, "
+                                 "E25); v1 used the empty text for the object"),
+    "json text": ("accept", "the JSON text of an object (ConvertObjectToString) writes / without a backslash and a "
+                            "float inside an object as a number; v1 wrote \\/ and a text"),
 }
 
 BUILTIN = re.compile(r"(?<![\w.])a_\w", re.I)
@@ -104,6 +111,50 @@ def v1_error_detail(r1):
     return errs[0]["description"][:80] if errs else r1["outcome"]
 
 
+def classify_access(case, r1, r2):
+    """The kinds of the variable model (WI-40): replace, checkname, destination, varget, varset."""
+    if r2["outcome"] != "ok":
+        return "open", "; ".join(r2.get("errors", []))[:100]
+    v1v = gc.v1_plain(r1.get("value"))
+    v2v = gc.v2_plain(r2.get("value"))
+    detail = "v1 %r, v2 %r" % (r1.get("value", {}).get("text", r1.get("value")), r2["value"].get("text", r2["value"]))
+    if case["kind"] == "checkname":
+        return ("same", "") if gc.text_of(v1v) == gc.text_of(v2v) else ("open", detail)
+    if case["kind"] == "destination":
+        # v1 returns the location as the caller spelled it ("Thread"), v2 in lower case
+        return ("same", "") if gc.text_of(v1v).lower() == gc.text_of(v2v).lower() else ("open", detail)
+    vars_same = same_vars(r1, r2)
+    if gc.same_value(v1v, v2v) and vars_same:
+        if gc.text_of(v1v) == gc.text_of(v2v) or not gc.numberish(v1v, v2v):
+            return "same", ""
+        return "number format", detail
+    if vars_same and isinstance(v1v, str) and isinstance(v2v, str):
+        if case["kind"] == "replace" and case.get("convertObjects") and same_json_text(v1v, v2v):
+            return "json text", detail
+        if numbers_in_text(v1v) == numbers_in_text(v2v):
+            return "number format", detail
+    if vars_same and SCOPE_PATH.search(case["text"]) and v1v == "":
+        return "path into global or static", detail
+    return "open", detail
+
+
+SCOPE_PATH = re.compile(r"(?<![\w.])(global|static)_\w+(\.|\[)", re.I)
+FLOAT_TEXT = re.compile(r"\d+\.\d+")
+
+
+def numbers_in_text(text):
+    """The text with every decimal number in one form (0.500000 and 0.5 are the same)."""
+    return FLOAT_TEXT.sub(lambda m: repr(float(m.group(0))), text)
+
+
+def same_json_text(a, b):
+    """True if two JSON texts differ only in an escaped slash and in floats written as text or as number."""
+    def norm(t):
+        t = t.replace("\\/", "/")
+        return re.sub(r'"(-?\d+\.\d+)"', r"\1", t)
+    return numbers_in_text(norm(a)) == numbers_in_text(norm(b))
+
+
 def classify(case, r1, r2):
     """Returns (verdict, detail). verdict: "same", a class name, or "open"."""
     text = case["text"]
@@ -115,8 +166,13 @@ def classify(case, r1, r2):
 
     if r1["outcome"] in ("parse_error", "eval_error", "uncaught_error", "timeout", "parse_error_ignored"):
         return "v1 error", v1_error_detail(r1)
-    if BUILTIN.search(text):
-        return "built-in variable", ""
+    if case.get("volatile"):
+        # only the type of the v1 value is stored: the v2 value must exist (built-in variables)
+        if r2["outcome"] == "ok" and not any(BUILTIN.match(m) for m in r2.get("missing", [])):
+            return "same", ""
+        return "open", "volatile value: %r" % (r2.get("errors") or r2.get("missing"),)
+    if kind not in ("expression", "script"):
+        return classify_access(case, r1, r2)
     v2err = r2["outcome"] != "ok"
     if UNSUPPORTED.search(bare) or (re.search(r'"[^"\n]*""', text) and v2err):
         if v2err or conv_status(conv) == "unsupported":
@@ -133,8 +189,19 @@ def classify(case, r1, r2):
             return "number literal spelling", detail
         return "number format", detail
 
-    if SCOPE.search(text):
-        return "scope prefix", ""
+    # variable model (WI-40)
+    errs = " ".join(r2.get("errors", []))
+    if v2err and "failed. No permission." in errs and vars_same:
+        return "assignment refused", errs[:100]
+    if re.fullmatch(r"\s*(a_ptrsize|a_languagename)\s*", text, re.I):
+        return "built-in value", "v1 %r, v2 %r" % (r1["value"].get("text", ""), r2["value"]["text"])
+    if SCOPE_PATH.search(bare) and not v2err and v1v == "" and not ASSIGN.search(bare):
+        return "path into global or static", ""
+    if has_object(case) and any(w.startswith("'.' failed") for w in r2.get("warnings", [])):
+        return "object as text", ""
+    if has_object(case) and re.search(r"\]\s*[\[.]", bare) and not v2err:
+        return "v1 ignores text", "v1 reads only the first index of a chain"
+
     if kind == "script" and not v2err and vars_same:
         return "script result value", ""
     if LOGIC.search(bare) and not v2err and gc.same_value(v1v, v2v) and not vars_same:
@@ -143,8 +210,6 @@ def classify(case, r1, r2):
         return "assignment value", "assignment inside an expression"
     if PATH_ASSIGN.search(bare):
         return "assignment to a path", ""
-    if has_object(case):
-        return "object model", ""
     if v2err:
         errs = " ".join(r2.get("errors", []))
         if "needs a space" in errs and not glued(text):

@@ -1,20 +1,26 @@
 #Requires AutoHotkey v2.0
 #SingleInstance Off
-; Harness of the comparison of the new expression language with the golden data of v1 (WI-39,
-; doc/TEST-STRATEGY.md section 7, doc/EXPRESSION-LANGUAGE.md section 15).
+; Harness of the comparison of v2 with the golden data of v1 (WI-39, WI-40, doc/TEST-STRATEGY.md section 7,
+; doc/EXPRESSION-LANGUAGE.md sections 15 and 18).
 ;
 ;   AutoHotkey64.exe harness.ahk <result file> <input file> <mode>
 ;
-; <input file>   JSON: an Array of cases {"id", "kind" ("expression" or "script"), "text", "vars" (name -> value)}.
-;                A JSON number is a number, a string a text, an array or object a Map (an array gets the keys "1", "2", ...).
-; <mode>         "plain": evaluate the text as it is. "convert": run the v1 converter first and evaluate its result.
+; <input file>   JSON: an Array of cases {"id", "kind", "text", "vars", "common", "location", "value", "convertObjects"}.
+;                kind: "expression", "script", "replace", "checkname", "destination", "varget", "varset".
+;                vars: scope ("instance", "thread", "loop", "global", "static") -> name -> value. A JSON number is a
+;                number, a string a text, an array or object an object (VarValues.Import: a Map, a list has the keys 1..n).
+;                common: the place without instance and thread (the editor and the manager; v1 *_Common).
+; <mode>         "plain": evaluate the text as it is. "convert": run the v1 converter first (expression and script).
 ; <result file>  one JSON object per line and case: {"id", "conv", "outcome", "value", "errors", "warnings", "missing",
-;                "log", "vars"}. "value" and the values in "vars" are {"type", "text"} (objects: {"type":"Map","value":{...}}).
-; Runs the cases in this process; no dialog, no file access except the three files.
-#Include ..\..\ahk\lib\ExprTestResolver.ahk
+;                "log", "vars"}. "value" and the values in "vars" are {"type", "text"} (objects: {"type":"Map","value":{...}});
+;                "vars" is scope -> name -> value.
+; Runs the cases in this process with the variable model of the engine (src/engine/vars); no dialog, no file access
+; except the three files.
 #Include ..\..\..\src\expr\Expr.ahk
 #Include ..\..\..\src\expr\V1ExprConverter.ahk
 #Include ..\..\..\src\core\Json.ahk
+#Include ..\..\..\src\engine\core\Instance.ahk
+#Include ..\..\..\src\engine\vars\VarAccess.ahk
 
 Main() {
     if (A_Args.Length < 3) {
@@ -30,7 +36,7 @@ Main() {
         try {
             rec := RunCase(c, convert)
         } catch as e {
-            rec := Map("id", c["id"], "outcome", "harness_failure", "detail", Type(e) ": " e.Message)
+            rec := Map("id", c["id"], "outcome", "harness_failure", "detail", Type(e) ": " e.Message " (line " e.Line ")")
         }
         lines .= Json.Stringify(rec) "`n"
     }
@@ -38,68 +44,90 @@ Main() {
     ExitApp(0)
 }
 
+; The stand-ins of the v1 harness for the values that depend on the application (tests/golden/v1/harness.ahk).
+GoldenEnv() => Map("flowId", "flow1", "elementId", "element1", "flowName", "GoldenFlow", "elementName", "GoldenElement"
+    , "workingDir", "<flow working dir>", "ahfVersion", "golden")
+
 RunCase(c, convert) {
     text := c["text"]
     kind := c["kind"]
     rec := Map("id", c["id"])
-    if (convert) {
+    if (convert && (kind = "expression" || kind = "script")) {
         conv := V1ExprConverter.Convert(text, kind)
         again := V1ExprConverter.Convert(conv["text"], kind)
         rec["conv"] := Map("status", conv["status"], "text", conv["text"], "changes", conv["changes"],
             "messages", conv["messages"], "idempotent", (again["text"] == conv["text"]) ? 1 : 0)
         text := conv["text"]
     }
-    vars := Map()
-    for name, value in c.Get("vars", Map())
-        vars[name] := ToValue(value)
-    resolver := ExprTestResolver(vars)
+    store := EngineVars()
+    inst := Instance("inst1", "flow1")
+    thread := ThreadState("thr1", "inst1", "element1")
+    tables := Map("instance", inst.Vars, "thread", thread.Vars, "loop", thread.Loops.Visible, "global", store.Global
+        , "static", store.Static("flow1"))
+    vars := c.Get("vars", Map())
+    if (vars is Map) {
+        for scope, entries in vars {
+            for name, value in entries
+                tables[scope][name] := VarValues.Import(value)
+        }
+    }
+    common := c.Get("common", 0) ? true : false
     log := []
-    res := Expr.Evaluate(text, resolver, (level, msg) => log.Push(level ": " msg), kind)
+    logFn := (level, msg) => log.Push(level ": " msg)
+    access := common ? VarAccess(store, "", "", GoldenEnv(), logFn) : VarAccess(store, inst, thread, GoldenEnv(), logFn)
     errors := []
-    for e in res["errors"]
-        errors.Push(e["message"])
     warnings := []
-    for w in res["warnings"]
-        warnings.Push(w["message"])
     missing := []
-    for m in res["missing"]
-        missing.Push(m["name"])
+    location := String(c.Get("location", ""))
+    switch kind {
+        case "expression", "script":
+            res := Expr.Evaluate(text, access, logFn, kind)
+            for e in res["errors"]
+                errors.Push(e["message"])
+            for w in res["warnings"]
+                warnings.Push(w["message"])
+            for m in res["missing"]
+                missing.Push(m["name"])
+            value := res["value"]
+        case "replace":
+            value := access.Replace(text, c.Get("convertObjects", 0) ? true : false, missing)
+        case "checkname":
+            value := VarNames.Check(text)
+        case "destination":
+            value := VarNames.Destination(text, location, common)
+        case "varget":
+            if (!access.HasVar(text))
+                missing.Push(text)
+            value := access.GetVar(text)
+        case "varset":
+            access.SetVar(text, c.Get("value", ""), location)
+            value := ""
+        default:
+            throw ValueError("unknown kind " kind)
+    }
     rec["outcome"] := errors.Length ? "error" : "ok"
     rec["errors"] := errors
     rec["warnings"] := warnings
     rec["missing"] := missing
     rec["log"] := log
     if (!errors.Length)
-        rec["value"] := Describe(res["value"])
+        rec["value"] := Describe(value)
     out := Map()
-    for name, value in resolver.vars
-        out[name] := Describe(value)
+    for scope, table in tables {
+        entries := Map()
+        for name, v in table
+            entries[name] := Describe(v)
+        out[scope] := entries
+    }
     rec["vars"] := out
     return rec
-}
-
-; JSON value to evaluator value: arrays and objects become case-insensitive Maps with text keys.
-ToValue(v) {
-    if (v is Array) {
-        m := ExprTestResolver.NewMap()
-        for item in v
-            m[String(A_Index)] := ToValue(item)
-        return m
-    }
-    if (v is Map) {
-        m := ExprTestResolver.NewMap()
-        for key, item in v
-            m[key] := ToValue(item)
-        return m
-    }
-    return v
 }
 
 Describe(v) {
     if (v is Map) {
         inner := Map()
         for key, item in v
-            inner[key] := Describe(item)
+            inner[String(key)] := Describe(item)
         return Map("type", "Map", "value", inner)
     }
     return Map("type", Type(v), "text", String(v))
