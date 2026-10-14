@@ -44,9 +44,10 @@ Session 3 start: 2026-10-14, work-item mode, HEAD `26211f2` on `v2-port`, main c
 | Slot | Role | Model | Workspace | Branch | Task | State |
 |---|---|---|---|---|---|---|
 | 1 | Implementer | sonnet | wi-41 | wip/wi-41 | WI-41 | running |
-| 2 | Bug hunter | sonnet | hunt-6 | wip/hunt-6 | OPEN-ITEMS, two entries at most | running |
+| 2 | Bug hunter | sonnet | hunt-6 (removed) | (deleted) | F-18 (pipe DACL restricted to owner and system): fixed and closed, integrated as 9e4aa08, fe00e33, bc30f80 (rebased once onto v2-port, cleanup commit for a run folder name in CLOSED-ITEMS); workspace removed | done, verifier running |
+| 3 | Verifier F-18 | sonnet | verify-6 | wip/verify-6 | fast, slow, foundation and arch on bc30f80 | running |
 
-ID blocks (session 3): implementer WI-41 F-195 to F-204; bug hunter hunt-6 F-205 to F-214. Verifier of the next integration: F-215 to F-224.
+ID blocks (session 3): implementer WI-41 F-195 to F-204; bug hunter hunt-6 F-205 to F-214 (none used, F-18 was already open); verifier verify-6 F-215 to F-224. 
 
 Session 2 start: 2026-10-14, work-item mode, HEAD `f0793ce` on `v2-port`, main checkout clean, no workspaces left over. Since the last verified state `346341f`, source/tests changed (WI-36 finding format `769903d`, plus the owner's doc commits): a baseline verification of `f0793ce` is started (verifier, `verify-1`).
 
@@ -87,6 +88,7 @@ Highest F-nn at session 2 start: F-74 (provisional F-73*, F-74*). F-44 was never
 
 | Entry | Area | Result | Commit | Run ID |
 |---|---|---|---|---|
+| F-18 (session 3) | hub pipe access (DACL) | closed: pipe was readable by Everyone and anonymous; test fails before, passes after; fixed with owner and system only | 9e4aa08, fe00e33, bc30f80 | foundation run on commit 7dc61bc (443 passed, 1 skipped, exit 0), fast run on f444510 (548 passed, exit 0). Not checked: a real second user, an elevated supervisor |
 | F-12 | engine scheduler, empty loop stack | closed, fixed with a unit test (fails before, passes after) | 183c561 (fix), 6d635cc (book) | unit file only, no pytest run ID |
 | F-14 | `Ids.Next`, `ExecContext.Finish` | open, re-read, not reproduced; fix in `src/core/` needs owner agreement | 6d635cc | - |
 
